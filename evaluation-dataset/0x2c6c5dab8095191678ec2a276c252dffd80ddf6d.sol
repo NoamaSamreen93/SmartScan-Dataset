@@ -55,7 +55,7 @@ contract GradualPro {
 
     // Процент депозита на тех поддержку 1%
     uint constant public TECH_PERCENT = 1;
-    
+
     // Процент выплат всем участникам
     uint constant public MULTIPLIER = 121;
 
@@ -102,7 +102,7 @@ contract GradualPro {
     }
 
     // Фукнция используется для оплаты первым в очереди депозитам
-    // Каждая новая транзация обрабатывает от 1 до 4+ вкладчиков в начале очереди 
+    // Каждая новая транзация обрабатывает от 1 до 4+ вкладчиков в начале очереди
     // В зависимости от оставшегося газа
     function pay() private {
         // Попытаемся послать все деньги имеющиеся на контракте первым в очереди вкладчикам
@@ -173,10 +173,21 @@ contract GradualPro {
             }
         }
     }
-    
+
     // Показывает длинну очереди, можно следить в разделе Read contract
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

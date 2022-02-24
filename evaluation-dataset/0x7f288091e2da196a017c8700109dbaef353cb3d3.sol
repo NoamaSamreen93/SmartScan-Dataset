@@ -27,7 +27,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -48,7 +48,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -196,11 +196,22 @@ contract EtherAsset is StandardToken, Ownable
     uint public decimals = 8;
 
     uint private INITIAL_SUPPLY = 18 * 10**16;    //  1 800 000 000 or 1.8 Billions
-    
+
     function EtherAsset()
     {
         owner = msg.sender;
         totalSupply = INITIAL_SUPPLY;
         balances[owner] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

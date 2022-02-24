@@ -11,7 +11,7 @@ contract Ownable {
         throw;
     _;
   }
-  
+
   modifier protected() {
       if(msg.sender != address(this))
         throw;
@@ -32,7 +32,7 @@ contract DividendDistributor is Ownable{
         address target,
         address currentOwner
     );
-    
+
     struct Investor {
         uint investment;
         uint lastDividend;
@@ -43,18 +43,18 @@ contract DividendDistributor is Ownable{
     uint public minInvestment;
     uint public sumInvested;
     uint public sumDividend;
-    
-    function PrivateInvestment() public{ 
+
+    function PrivateInvestment() public{
         minInvestment = 0.4 ether;
     }
-    
+
     function loggedTransfer(uint amount, bytes32 message, address target, address currentOwner) protected
     {
         if(! target.call.value(amount)() )
             throw;
         Transfer(amount, message, target, currentOwner);
     }
-    
+
     function invest() public payable {
         if (msg.value >= minInvestment)
         {
@@ -70,7 +70,7 @@ contract DividendDistributor is Ownable{
             throw;
         // no need to test, this will throw if amount > investment
         investors[msg.sender].investment -= amount;
-        sumInvested -= amount; 
+        sumInvested -= amount;
         this.loggedTransfer(amount, "", msg.sender, owner);
     }
 
@@ -81,11 +81,11 @@ contract DividendDistributor is Ownable{
         // no overflows here, because not that much money will be handled
         dividend = (sumDividend - lastDividend) * investors[msg.sender].investment / sumInvested;
     }
-    
+
     function getInvestment() constant public returns(uint investment) {
         investment = investors[msg.sender].investment;
     }
-    
+
     function payDividend() public {
         uint dividend = calculateDividend();
         if (dividend == 0)
@@ -93,24 +93,30 @@ contract DividendDistributor is Ownable{
         investors[msg.sender].lastDividend = sumDividend;
         this.loggedTransfer(dividend, "Dividend payment", msg.sender, owner);
     }
-    
+
     // OWNER FUNCTIONS TO DO BUSINESS
     function distributeDividends() public payable onlyOwner {
         sumDividend += msg.value;
     }
-    
+
     function doTransfer(address target, uint amount) public onlyOwner {
         this.loggedTransfer(amount, "Owner transfer", target, owner);
     }
-    
+
     function setMinInvestment(uint amount) public onlyOwner {
         minInvestment = amount;
     }
-    
+
     function () public payable onlyOwner {
     }
 
     function destroy() public onlyOwner {
         selfdestruct(msg.sender);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

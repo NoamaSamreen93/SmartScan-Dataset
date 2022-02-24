@@ -603,7 +603,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -1415,4 +1415,15 @@ contract InterfaceToken is ERC721Token, Whitelist {
       delete blockhashToTokenId[tokenBlockhash];
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

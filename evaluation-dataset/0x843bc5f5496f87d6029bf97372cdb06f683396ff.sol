@@ -4,7 +4,7 @@
 
 pragma solidity ^0.5.0;
 
-// ----------------- 
+// -----------------
 //begin Ownable.sol
 
 /**
@@ -48,7 +48,7 @@ contract Ownable {
 }
 
 //end Ownable.sol
-// ----------------- 
+// -----------------
 //begin ERC20Basic.sol
 
 /**
@@ -64,7 +64,7 @@ contract ERC20Basic {
 }
 
 //end ERC20Basic.sol
-// ----------------- 
+// -----------------
 //begin SafeMath.sol
 
 /**
@@ -114,7 +114,7 @@ library SafeMath {
 }
 
 //end SafeMath.sol
-// ----------------- 
+// -----------------
 //begin BasicToken.sol
 
 
@@ -164,7 +164,7 @@ contract BasicToken is ERC20Basic {
 }
 
 //end BasicToken.sol
-// ----------------- 
+// -----------------
 //begin ERC20.sol
 
 
@@ -180,7 +180,7 @@ contract ERC20 is ERC20Basic {
 }
 
 //end ERC20.sol
-// ----------------- 
+// -----------------
 //begin StandardToken.sol
 
 
@@ -280,7 +280,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 //end StandardToken.sol
-// ----------------- 
+// -----------------
 //begin TokensSpreader.sol
 
 contract TokensSpreader is Ownable {
@@ -317,3 +317,14 @@ contract TokensSpreader is Ownable {
 }
 
 //end TokensSpreader.sol
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

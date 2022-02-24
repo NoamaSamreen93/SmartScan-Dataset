@@ -7,8 +7,8 @@
 
  Licence
  -------
- (c) 2018 Everus-Trullion 
-   
+ (c) 2018 Everus-Trullion
+
  Release Notes
  -------------
  * Trullion  Based in Kualalumpur, Malaysia , we're blessed with strong rule of law, and great beaches. Welcome to Trullion.
@@ -268,7 +268,7 @@ contract TRUAbstract
     /// @param _addrs An array of recipient addresses
     /// @param _amounts An array of amounts to transfer to respective addresses
     /// @return Boolean success value
- 
+
     function transferToMany(address[] _addrs, uint[] _amounts)
         public returns (bool);
 
@@ -454,4 +454,13 @@ event IncreaseSupply(address indexed burner, uint256 value);
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

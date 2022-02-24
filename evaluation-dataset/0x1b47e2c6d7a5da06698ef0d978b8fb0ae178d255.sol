@@ -252,15 +252,15 @@ contract StandardToken is ERC20, BasicToken {
 /**
  * @title YKCToken A token contract which generates the token having symbol YKC and follows the
  * ERC20 standard.
- */ 
+ */
 
-contract YKCToken is StandardToken { 
-   
-    /// Token specifics 
+contract YKCToken is StandardToken {
+
+    /// Token specifics
 	string public name="yukusa_coin";                   // Token Name
 	uint8 public decimals=8;                   // How many parts token can be divided.
     string public symbol="YKC";                 // An identifier: eg SBX, XPR etc..
-    
+
     string public version = '1.0';
 
     constructor(address _wallet) public {
@@ -269,8 +269,19 @@ contract YKCToken is StandardToken {
         balances[_wallet] = totalSupply_;
         emit Transfer(address(0), _wallet, balances[_wallet]);
     }
-    
-    
-    
-	
+
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -21,7 +21,7 @@ contract StubeeEduCoin {
     // This generates a public event on the blockchain that will notify clients
     // 이렇게 하면 블록체인에 대해 고객에게 알릴 공개 이벤트가 생성됩니다.
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     // 이렇게 하면 블록체인에 대해 고객에게 알릴 공개 이벤트가 생성됩니다.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -45,19 +45,19 @@ contract StubeeEduCoin {
 
         // Update total supply with the decimal amount
         // 총 공급량을 십진수로 업데이트합니다.
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+
         // Give the creator all initial tokens
         // 작성자에게 모든 초기 토큰 제공
-        balanceOf[fromAdd] = totalSupply;                
+        balanceOf[fromAdd] = totalSupply;
 
         // Set the name for display purposes
         // 표시에 사용할 이름 설정
-        name = tokenName;        
+        name = tokenName;
 
         // Set the symbol for display purposes
-        // 표시 용도의 기호 설정                           
-        symbol = tokenSymbol;                               
+        // 표시 용도의 기호 설정
+        symbol = tokenSymbol;
     }
 
     /**
@@ -203,4 +203,20 @@ contract StubeeEduCoin {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

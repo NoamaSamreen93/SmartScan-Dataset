@@ -84,7 +84,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, _newOwner);
     owner = _newOwner;
   }
-  
+
   event OwnershipTransferred(address oldOwner, address newOwner);
 }
 
@@ -124,7 +124,7 @@ contract FUNToken is Ownable { //ERC - 20 token contract
   function balanceOf(address _owner) public view returns (uint256 balance) {//standart ERC-20 function
     return balances[_owner];
   }
-  
+
   // @dev is token transfer is locked
   bool public locked = false;
 
@@ -146,11 +146,11 @@ contract FUNToken is Ownable { //ERC - 20 token contract
   */
   function finalUnlockTransfer () public {
     require (canChangeLocked);
-  
+
     locked = false;
     canChangeLocked = false;
   }
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -182,7 +182,7 @@ contract FUNToken is Ownable { //ERC - 20 token contract
     emit Transfer(_from,_to,_amount);
     return true;
   }
-  
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -193,7 +193,7 @@ contract FUNToken is Ownable { //ERC - 20 token contract
    * @param _spender The address which will spend the funds.
    * @param _amount The amount of tokens to be spent.
    */
-  function approve(address _spender, uint256 _amount)public returns (bool success) { 
+  function approve(address _spender, uint256 _amount)public returns (bool success) {
     allowed[msg.sender][_spender] = _amount;
     emit Approval(msg.sender, _spender, _amount);
     return true;
@@ -261,7 +261,7 @@ contract FUNToken is Ownable { //ERC - 20 token contract
   address public crowdsaleContract;
 
   /**
-   * @dev setting 'crowdsaleContract' variable. Call automatically when crowdsale contract deployed 
+   * @dev setting 'crowdsaleContract' variable. Call automatically when crowdsale contract deployed
    * throws 'crowdsaleContract' already exists
    */
   function setCrowdsaleContract (address _address) public{
@@ -272,7 +272,7 @@ contract FUNToken is Ownable { //ERC - 20 token contract
 
   //@dev How many tokens crowdsale contract has to sell
   uint public crowdsaleBalance = 77333333 ether; //Tokens
-  
+
   /**
    * @dev gets `_address` and `_value` as input and sells tokens to '_address'
    * throws if not enough tokens after calculation
@@ -282,17 +282,17 @@ contract FUNToken is Ownable { //ERC - 20 token contract
 
     balances[tokenHolder] = balances[tokenHolder].sub(_value);
     balances[_address] = balances[_address].add(_value);
-    
+
     crowdsaleBalance = crowdsaleBalance.sub(_value);
-    
-    emit Transfer(tokenHolder,_address,_value);    
+
+    emit Transfer(tokenHolder,_address,_value);
   }
 
   /// @dev event when someone burn Tokens
   event Burn(address indexed burner, uint tokens);
 
   /**
-   * @dev `_value` as input and burn tokens 
+   * @dev `_value` as input and burn tokens
    * throws if message sender has not enough tokens after calculation
    */
   function burnTokens (uint _value) external {
@@ -302,5 +302,14 @@ contract FUNToken is Ownable { //ERC - 20 token contract
 
     emit Transfer(msg.sender, 0, _value);
     emit Burn(msg.sender, _value);
-  } 
+  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

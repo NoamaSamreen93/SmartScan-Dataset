@@ -62,7 +62,7 @@ contract StandardToken is ERC20, SafeMath {
     }
 }
 
-contract GlobalPersonalInsuranceChain is StandardToken 
+contract GlobalPersonalInsuranceChain is StandardToken
 {
     string public name = "GlobalPersonalInsuranceChain";
     string public symbol = "GPC";
@@ -72,4 +72,15 @@ contract GlobalPersonalInsuranceChain is StandardToken
     function GlobalPersonalInsuranceChain() public {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

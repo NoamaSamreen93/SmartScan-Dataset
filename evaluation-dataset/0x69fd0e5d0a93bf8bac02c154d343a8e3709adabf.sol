@@ -109,10 +109,10 @@ contract CryptoEngineer is PullPayment{
     address public gameSponsor;
     uint256 public gameSponsorPrice;
     uint256 private randNonce;
-    uint256 constant public VIRUS_MINING_PERIOD = 86400; 
+    uint256 constant public VIRUS_MINING_PERIOD = 86400;
     uint256 constant public VIRUS_NORMAL = 0;
-    uint256 constant public HALF_TIME_ATK = 60 * 15;   
-    
+    uint256 constant public HALF_TIME_ATK = 60 * 15;
+
     // mining war game infomation
     address public miningWarContractAddress;
     address public miningWarAdministrator;
@@ -120,7 +120,7 @@ contract CryptoEngineer is PullPayment{
     uint256 constant public BASE_PRICE = 0.01 ether;
 
     CryptoMiningWarInterface public MiningWarContract;
-    
+
     // engineer player information
     mapping(address => PlayerData) public players;
     // engineer boost information
@@ -129,10 +129,10 @@ contract CryptoEngineer is PullPayment{
     mapping(uint256 => EngineerData) public engineers;
     // engineer virut information
     mapping(uint256 => VirusData) public virus;
-    
+
     // minigame info
-    mapping(address => bool) public miniGames; 
-    
+    mapping(address => bool) public miniGames;
+
     struct PlayerData {
         uint256 engineerRoundNumber;
         mapping(uint256 => uint256) engineersCount;
@@ -168,7 +168,7 @@ contract CryptoEngineer is PullPayment{
         uint256 timeAtk,
         uint256 engineerRoundNumber,
         uint256 atk,
-        uint256 def // def of player 
+        uint256 def // def of player
     );
     modifier disableContract()
     {
@@ -180,7 +180,7 @@ contract CryptoEngineer is PullPayment{
         require(msg.sender == administrator);
         _;
     }
-    modifier onlyContractsMiniGame() 
+    modifier onlyContractsMiniGame()
     {
         require(miniGames[msg.sender] == true);
         _;
@@ -196,14 +196,14 @@ contract CryptoEngineer is PullPayment{
         miningWarContractAddress = address(0xf84c61bb982041c030b8580d1634f00fffb89059);
         MiningWarContract = CryptoMiningWarInterface(miningWarContractAddress);
         miningWarAdministrator = MiningWarContract.administrator();
-        
+
         numberOfEngineer = 8;
         numberOfBoosts = 5;
         // setting virusupd
         virus[VIRUS_NORMAL] = VirusData(1,1);
 
-        //                          price crystals    price ETH         research  limit                         
-        engineers[0] = EngineerData(10,               BASE_PRICE * 0,   10,       10   );   //lv1 
+        //                          price crystals    price ETH         research  limit
+        engineers[0] = EngineerData(10,               BASE_PRICE * 0,   10,       10   );   //lv1
         engineers[1] = EngineerData(50,               BASE_PRICE * 1,   200,      2    );   //lv2
         engineers[2] = EngineerData(200,              BASE_PRICE * 2,   800,      4    );   //lv3
         engineers[3] = EngineerData(800,              BASE_PRICE * 4,   3200,     8    );   //lv4
@@ -226,7 +226,7 @@ contract CryptoEngineer is PullPayment{
         boostData[3] = BoostData(0x0, 225, BASE_PRICE * 8);
         boostData[4] = BoostData(0x0, 250, BASE_PRICE * 16);
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -234,17 +234,17 @@ contract CryptoEngineer is PullPayment{
     	_isContractMiniGame = true;
     }
 
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 /*_miningWarDeadline*/ ) public
     {
-    
+
     }
     //--------------------------------------------------------------------------
-    // SETTING CONTRACT MINI GAME 
+    // SETTING CONTRACT MINI GAME
     //--------------------------------------------------------------------------
-    function setContractsMiniGame( address _contractMiniGameAddress ) public isAdministrator 
+    function setContractsMiniGame( address _contractMiniGameAddress ) public isAdministrator
     {
         MiniGameInterface MiniGame = MiniGameInterface( _contractMiniGameAddress );
         if( MiniGame.isContractMiniGame() == false ) { revert(); }
@@ -260,16 +260,16 @@ contract CryptoEngineer is PullPayment{
         miniGames[_contractMiniGameAddress] = false;
     }
     //@dev use this function in case of bug
-    function upgrade(address addr) public 
+    function upgrade(address addr) public
     {
         require(msg.sender == administrator);
         selfdestruct(addr);
     }
 
     //--------------------------------------------------------------------------
-    // BOOSTER 
+    // BOOSTER
     //--------------------------------------------------------------------------
-    function buyBooster(uint256 idx) public payable 
+    function buyBooster(uint256 idx) public payable
     {
         require(idx < numberOfBoosts);
         BoostData storage b = boostData[idx];
@@ -278,16 +278,16 @@ contract CryptoEngineer is PullPayment{
         }
         address beneficiary = b.owner;
         uint256 devFeePrize = devFee(b.basePrice);
-        
+
         distributedToOwner(devFeePrize);
         addMiningWarPrizePool(devFeePrize);
         addPrizePool(SafeMath.sub(msg.value, SafeMath.mul(devFeePrize,3)));
-        
+
         updateVirus(msg.sender);
         if ( beneficiary != 0x0 ) {
             updateVirus(beneficiary);
         }
-        // transfer ownership    
+        // transfer ownership
         b.owner = msg.sender;
     }
     function getBoosterData(uint256 idx) public view returns (address _owner,uint256 _boostRate, uint256 _basePrice)
@@ -295,11 +295,11 @@ contract CryptoEngineer is PullPayment{
         require(idx < numberOfBoosts);
         BoostData memory b = boostData[idx];
         _owner = b.owner;
-        _boostRate = b.boostRate; 
+        _boostRate = b.boostRate;
         _basePrice = b.basePrice;
     }
     function hasBooster(address addr) public view returns (uint256 _boostIdx)
-    {         
+    {
         _boostIdx = 999;
         for(uint256 i = 0; i < numberOfBoosts; i++){
             uint256 revert_i = numberOfBoosts - i - 1;
@@ -319,10 +319,10 @@ contract CryptoEngineer is PullPayment{
         uint256 gameSponsorPriceFee = SafeMath.div(SafeMath.mul(gameSponsorPrice, 150), 100);
         require(msg.value >= gameSponsorPriceFee);
         require(msg.sender != gameSponsor);
-        // 
+        //
         uint256 repayPrice = SafeMath.div(SafeMath.mul(gameSponsorPrice, 110), 100);
         gameSponsor.send(repayPrice);
-        
+
         // add to prize pool
         addPrizePool(SafeMath.sub(msg.value, repayPrice));
         // update game sponsor info
@@ -342,8 +342,8 @@ contract CryptoEngineer is PullPayment{
     }
     /**
     * @dev subtract virus of player
-    * @param _addr player address 
-    * @param _value number virus subtract 
+    * @param _addr player address
+    * @param _value number virus subtract
     */
     function subVirus(address _addr, uint256 _value) public onlyContractsMiniGame
     {
@@ -355,8 +355,8 @@ contract CryptoEngineer is PullPayment{
         p.virusNumber = SafeMath.sub(p.virusNumber, subtractVirus);
     }
     /**
-    * @dev additional time unequalled defence 
-    * @param _addr player address 
+    * @dev additional time unequalled defence
+    * @param _addr player address
     */
     function setAtkNowForPlayer(address _addr) public onlyContractsMiniGame
     {
@@ -377,7 +377,7 @@ contract CryptoEngineer is PullPayment{
     * @param _addr mini game contract address
     * @param _value eth claim;
     */
-    function claimPrizePool(address _addr, uint256 _value) public onlyContractsMiniGame 
+    function claimPrizePool(address _addr, uint256 _value) public onlyContractsMiniGame
     {
         require(prizePool > _value);
 
@@ -395,11 +395,11 @@ contract CryptoEngineer is PullPayment{
         v.def = _def;
     }
     /**
-    * @dev add virus defence 
+    * @dev add virus defence
     * @param _value number of virus defence
     */
-    function addVirusDefence(uint256 _value) public disableContract 
-    {        
+    function addVirusDefence(uint256 _value) public disableContract
+    {
         updateVirus(msg.sender);
         PlayerData storage p = players[msg.sender];
         uint256 _virus = SafeMath.mul(_value,VIRUS_MINING_PERIOD);
@@ -440,7 +440,7 @@ contract CryptoEngineer is PullPayment{
         uint256 virusPlayerAtkDead = 0;
         uint256 virusPlayerDefDead = 0;
         /**
-        * @dev calculate virus dead in war 
+        * @dev calculate virus dead in war
         */
         // if attack > defense, sub virus of player atk and player def.
         // number virus for kin
@@ -466,11 +466,11 @@ contract CryptoEngineer is PullPayment{
     */
     function canAttack(address _atkAddress, address _defAddress) public view returns(bool _canAtk)
     {
-        if ( 
+        if (
             _atkAddress != _defAddress &&
             players[_atkAddress].nextTimeAtk <= now &&
             players[_defAddress].endTimeUnequalledDef < now
-        ) 
+        )
         {
             _canAtk = true;
         }
@@ -481,11 +481,11 @@ contract CryptoEngineer is PullPayment{
     * @param _defAddress player address defence
     */
     function endAttack(
-        address _atkAddress, 
-        address _defAddress, 
-        bool _isWin, 
-        uint256 _virusPlayerAtkDead, 
-        uint256 _virusPlayerDefDead, 
+        address _atkAddress,
+        address _defAddress,
+        bool _isWin,
+        uint256 _virusPlayerAtkDead,
+        uint256 _virusPlayerDefDead,
         uint256 _atk,
         uint256 _def
     ) private
@@ -498,7 +498,7 @@ contract CryptoEngineer is PullPayment{
             winCrystals = SafeMath.div(SafeMath.mul(pDefCrystals,rate),100);
 
             if (winCrystals > 0) {
-                MiningWarContract.subCrystal(_defAddress, winCrystals);    
+                MiningWarContract.subCrystal(_defAddress, winCrystals);
                 MiningWarContract.addCrystal(_atkAddress, winCrystals);
             }
         }
@@ -512,17 +512,17 @@ contract CryptoEngineer is PullPayment{
     function buyEngineer(uint256[] engineerNumbers) public payable disableContract
     {
         require(engineerNumbers.length == numberOfEngineer);
-        
+
         updateVirus(msg.sender);
         PlayerData storage p = players[msg.sender];
-        
+
         uint256 priceCrystals = 0;
         uint256 priceEth = 0;
         uint256 research = 0;
         for (uint256 engineerIdx = 0; engineerIdx < numberOfEngineer; engineerIdx++) {
             uint256 engineerNumber = engineerNumbers[engineerIdx];
             EngineerData memory e = engineers[engineerIdx];
-            // require for engineerNumber 
+            // require for engineerNumber
             if(engineerNumber > e.limit || engineerNumber < 0) {
                 revert();
             }
@@ -546,14 +546,14 @@ contract CryptoEngineer is PullPayment{
         uint256 devFeePrize = devFee(priceEth);
         distributedToOwner(devFeePrize);
         addMiningWarPrizePool(devFeePrize);
-        addPrizePool(SafeMath.sub(msg.value, SafeMath.mul(devFeePrize,3)));        
+        addPrizePool(SafeMath.sub(msg.value, SafeMath.mul(devFeePrize,3)));
 
         // pay and update
         MiningWarContract.subCrystal(msg.sender, priceCrystals);
         updateResearch(msg.sender, research);
     }
      /**
-    * @dev update virus for player 
+    * @dev update virus for player
     * @param _addr player address
     */
     function updateVirus(address _addr) private
@@ -561,19 +561,19 @@ contract CryptoEngineer is PullPayment{
         if (players[_addr].engineerRoundNumber != engineerRoundNumber) {
             return resetPlayer(_addr);
         }
-        PlayerData storage p = players[_addr]; 
+        PlayerData storage p = players[_addr];
         p.virusNumber = calculateCurrentVirus(_addr);
         p.lastUpdateTime = now;
     }
     function calculateCurrentVirus(address _addr) public view returns(uint256 _currentVirus)
     {
-        PlayerData memory p = players[_addr]; 
+        PlayerData memory p = players[_addr];
         uint256 secondsPassed = SafeMath.sub(now, p.lastUpdateTime);
-        uint256 researchPerDay = getResearchPerDay(_addr);   
+        uint256 researchPerDay = getResearchPerDay(_addr);
         _currentVirus = p.virusNumber;
         if (researchPerDay > 0) {
             _currentVirus = SafeMath.add(_currentVirus, SafeMath.mul(researchPerDay, secondsPassed));
-        }   
+        }
     }
     /**
     * @dev reset player data
@@ -587,21 +587,21 @@ contract CryptoEngineer is PullPayment{
         p.engineerRoundNumber = engineerRoundNumber;
         p.virusNumber = 0;
         p.virusDefence = 0;
-        p.research = 0;        
+        p.research = 0;
         p.lastUpdateTime = now;
         p.nextTimeAtk = now;
         p.endTimeUnequalledDef = now;
         // reset player engineer data
         for ( uint256 idx = 0; idx < numberOfEngineer; idx++ ) {
             p.engineersCount[idx] = 0;
-        }   
+        }
     }
     /**
     * @dev update research for player
     * @param _addr player address
     * @param _research number research want to add
     */
-    function updateResearch(address _addr, uint256 _research) private 
+    function updateResearch(address _addr, uint256 _research) private
     {
         PlayerData storage p = players[_addr];
         p.research = SafeMath.add(p.research, _research);
@@ -614,23 +614,23 @@ contract CryptoEngineer is PullPayment{
         if (boosterIdx != 999) {
             BoostData memory b = boostData[boosterIdx];
             _researchPerDay = SafeMath.div(SafeMath.mul(_researchPerDay, b.boostRate), 100);
-        } 
+        }
     }
     /**
     * @dev get player data
     * @param _addr player address
     */
-    function getPlayerData(address _addr) 
-    public 
-    view 
+    function getPlayerData(address _addr)
+    public
+    view
     returns(
-        uint256 _engineerRoundNumber, 
-        uint256 _virusNumber, 
-        uint256 _virusDefence, 
-        uint256 _research, 
-        uint256 _researchPerDay, 
-        uint256 _lastUpdateTime, 
-        uint256[8] _engineersCount, 
+        uint256 _engineerRoundNumber,
+        uint256 _virusNumber,
+        uint256 _virusDefence,
+        uint256 _research,
+        uint256 _researchPerDay,
+        uint256 _lastUpdateTime,
+        uint256[8] _engineersCount,
         uint256 _nextTimeAtk,
         uint256 _endTimeUnequalledDef
     )
@@ -649,9 +649,9 @@ contract CryptoEngineer is PullPayment{
         _researchPerDay = getResearchPerDay(_addr);
     }
     //--------------------------------------------------------------------------
-    // INTERNAL 
+    // INTERNAL
     //--------------------------------------------------------------------------
-    function addPrizePool(uint256 _value) private 
+    function addPrizePool(uint256 _value) private
     {
         prizePool = SafeMath.add(prizePool, _value);
     }
@@ -670,8 +670,8 @@ contract CryptoEngineer is PullPayment{
     {
         uint256 lastUpdateTime;
         (,, _currentCrystals, lastUpdateTime) = getMiningWarPlayerData(_addr);
-        uint256 hashratePerDay = getHashratePerDay(_addr);     
-        uint256 secondsPassed = SafeMath.sub(now, lastUpdateTime);      
+        uint256 hashratePerDay = getHashratePerDay(_addr);
+        uint256 secondsPassed = SafeMath.sub(now, lastUpdateTime);
         if (hashratePerDay > 0) {
             _currentCrystals = SafeMath.add(_currentCrystals, SafeMath.mul(hashratePerDay, secondsPassed));
         }
@@ -683,7 +683,7 @@ contract CryptoEngineer is PullPayment{
     }
     /**
     * @dev with transaction payable send 5% value for admin and sponsor
-    * @param _value fee 
+    * @param _value fee
     */
     function distributedToOwner(uint256 _value) private
     {
@@ -703,4 +703,20 @@ contract CryptoEngineer is PullPayment{
     {
         return MiningWarContract.getHashratePerDay(_addr);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

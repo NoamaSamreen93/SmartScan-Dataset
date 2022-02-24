@@ -193,7 +193,7 @@ contract Crowdsale {
   function () external payable {
     buyTokens(msg.sender, "", "");
   }
-  
+
     function getReferrals(address referrer) public view returns (uint256){
       return referraltokenamount[referrer];
   }
@@ -214,7 +214,7 @@ contract Crowdsale {
 
     // update state
     tokenSold = tokenSold.add(tokens);
-    
+
     if((bytes(referralemail).length != 0) && (referrals[referralemail] != 0)){
         address referral = referrals[referralemail];
         uint256 referraltokens = tokens.mul(5) / 100;
@@ -222,13 +222,13 @@ contract Crowdsale {
         referraltokenamount[referral] = referraltokenamount[referral] + tokens;
         tokenSold = tokenSold.add(referraltokens);
     }
-    
+
     if((bytes(youremail).length != 0) && (referrals[youremail] == 0)){
         referrals[youremail] = _beneficiary;
     }
-    
 
-    
+
+
     _processPurchase(_beneficiary, tokens);
     emit TokenPurchase(
       msg.sender,
@@ -335,6 +335,14 @@ contract Crowdsale {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
 
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -1,48 +1,48 @@
 pragma solidity ^0.4.0;
 
- 
+
 contract Token {
- 
+
     /// @return total amount of tokens
     function totalSupply() public constant returns (uint256 supply) {}
- 
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) public constant returns (uint256 balance) {}
- 
+
     /// @notice send `_value` token to `_to` from `msg.sender`
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool success) {}
- 
+
     /// @notice send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
     /// @param _from The address of the sender
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {}
- 
+
     /// @notice `msg.sender` approves `_addr` to spend `_value` tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @param _value The amount of wei to be approved for transfer
     /// @return Whether the approval was successful or not
     function approve(address _spender, uint256 _value) public returns (bool success) {}
- 
+
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {}
- 
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-   
+
 }
- 
- 
- 
+
+
+
 contract StandardToken is Token {
- 
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -55,7 +55,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
- 
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         //same as above. Replace this line with the following if you want to protect against wrapping uints.
         //if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
@@ -67,36 +67,36 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
- 
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
- 
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
 }
- 
- 
+
+
 contract SeneroToken is StandardToken {
- 
+
     function () public {
         //if ether is sent to this address, send it back.
         revert();
     }
- 
+
     /* Public variables of the token */
- 
+
     /*
     NOTE:
     The following variables are OPTIONAL vanities. One does not have to include them.
@@ -107,11 +107,11 @@ contract SeneroToken is StandardToken {
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 token = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier
     string public version = 'H1.0';       //human 0.1 standard. Just an arbitrary versioning scheme.
- 
-   
+
+
     function SeneroToken(
         ) public {
-       
+
         balances[0xAf468Bcc3B923C6d5588b9f3032a042Eb4ca4F60] = 259600; // A
         balances[0x6ddD1c854EbAfFdb4bFf8CF8334871612A314285] = 178200; // sendev
         balances[0x1B355DEB18bE4B579E4F1272cFc9958b2B0C5d49] = 209000; // twochain
@@ -123,24 +123,35 @@ contract SeneroToken is StandardToken {
         balances[0x0b1ae337a9d0f62c9026effcfdcee442e3ce31e6] = 178200; // marihang
         balances[0xc62f738afab6fbce2cbc7f0fd274858cdc4a1448] = 158400; // jimbojones3000
         balances[0xa510184cB3C83021253d7DD48FD28035ccEB4af4] = 270600; // Smoxer
-       
-       
+
+
         balances[msg.sender] = 17800000;           // Rest of the coins
         totalSupply = 20000000;                    // Update total supply (100000 for example)
         name = "Senero";                           // Set the name for display purposes
         decimals = 18;                             // Amount of decimals for display purposes
         symbol = "SEN";                            // Set the symbol for display purposes
     }
- 
+
     /* Approves and then calls the receiving contract */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
- 
+
         //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a contract in here just for this.
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -31,11 +31,11 @@ library SafeMath {
 
 
 contract ETFW{
-    
+
     using SafeMath for uint256;
     string public name;
     string public symbol;
-    uint8 public decimals = 4;  
+    uint8 public decimals = 4;
     uint256 public totalSupply;
 
     mapping (address => uint256) public balanceOf;
@@ -44,10 +44,10 @@ contract ETFW{
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
     function ETFW() public {
-        totalSupply = 100000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "Ether Future Wins";                                   
-        symbol = "ETFW";                               
+        totalSupply = 100000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "Ether Future Wins";
+        symbol = "ETFW";
     }
 
 
@@ -68,7 +68,7 @@ contract ETFW{
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         _transfer(_from, _to, _value);
         return true;
@@ -81,4 +81,15 @@ contract ETFW{
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

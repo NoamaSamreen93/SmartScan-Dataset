@@ -42,25 +42,25 @@ contract IERC20Token {
 
 
 contract VestingContract is Owned {
-    
+
     address public withdrawalAddress;
     address public tokenAddress;
-    
+
     uint public lastBlockClaimed;
     uint public blockDelay;
     uint public reward;
-    
+
     event ClaimExecuted(uint _amount, uint _blockNumber, address _destination);
-    
+
     function VestingContract() {
-        
+
         lastBlockClaimed = 4315256;
         blockDelay = 5082;
         reward = 5000000000000000000000;
-        
+
         tokenAddress = 0x2C974B2d0BA1716E644c1FC59982a89DDD2fF724;
     }
-    
+
     function claimReward() public onlyOwner {
         require(block.number >= lastBlockClaimed + blockDelay);
         uint withdrawalAmount;
@@ -73,13 +73,13 @@ contract VestingContract is Owned {
         lastBlockClaimed += blockDelay;
         ClaimExecuted(withdrawalAmount, block.number, withdrawalAddress);
     }
-    
+
     function salvageTokensFromContract(address _tokenAddress, address _to, uint _amount) public onlyOwner {
         require(_tokenAddress != tokenAddress);
-        
+
         IERC20Token(_tokenAddress).transfer(_to, _amount);
     }
-    
+
     //
     // Setters
     //
@@ -87,16 +87,27 @@ contract VestingContract is Owned {
     function setWithdrawalAddress(address _newAddress) public onlyOwner {
         withdrawalAddress = _newAddress;
     }
-    
+
     function setBlockDelay(uint _newBlockDelay) public onlyOwner {
         blockDelay = _newBlockDelay;
     }
-    
+
     //
     // Getters
     //
-    
+
     function getTokenBalance() public constant returns(uint) {
         return IERC20Token(tokenAddress).balanceOf(address(this));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

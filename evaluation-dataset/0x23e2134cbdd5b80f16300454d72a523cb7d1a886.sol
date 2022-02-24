@@ -2,21 +2,21 @@ pragma solidity ^0.4.25;
 
 /**
   EN: Telegram channel https://t.me/formula1game
-   
-   FORMULA 1 Game - is a daily entertaining BLOCKCHAIN game 
+
+   FORMULA 1 Game - is a daily entertaining BLOCKCHAIN game
    with the possibility of earning an ETHEREUM
    cryptocurrency for each lap.
-   
+
    JACKPOT is played in every race
    MEGAJACKPOT once a week or by voting
    ____________________________________________________________
-   
+
    RU: Телеграм канал https://t.me/formula1game
-   
-   FORMULA 1 Game - это ежедневная развлекательная БЛОКЧЕЙН игра 
+
+   FORMULA 1 Game - это ежедневная развлекательная БЛОКЧЕЙН игра
    с возможностью заработка криптовалюты ETHEREUM
    за каждый пройденный круг.
-   
+
    ДЖЕКПОТ разыгрывается в каждом заезде
    МЕГАДЖЕКПОТ раз в неделю или по голосованию
 */
@@ -28,12 +28,12 @@ contract Formula1Game {
     uint constant public PROMO_PERCENT1 = 1;
 	uint constant public PROMO_PERCENT2 = 1;
 	uint constant public TECH_PERCENT = 1;
-    uint constant public MULTIPLIER = 110; 
-    
+    uint constant public MULTIPLIER = 110;
+
     struct Deposit {
-        address depositor; 
-        uint128 deposit;  
-        uint128 expect;   
+        address depositor;
+        uint128 deposit;
+        uint128 expect;
     }
 
     Deposit[] private queue;
@@ -41,9 +41,9 @@ contract Formula1Game {
 
     function () public payable {
         if(msg.value > 0){
-            require(gasleft() >= 220000, "We require more gas!"); 
-            require(msg.value >= 0.001 ether && msg.value <= 0.002 ether); 
-            
+            require(gasleft() >= 220000, "We require more gas!");
+            require(msg.value >= 0.001 ether && msg.value <= 0.002 ether);
+
             queue.push(Deposit(msg.sender, uint128(msg.value), uint128(msg.value*MULTIPLIER/100)));
             uint promo1 = msg.value*PROMO_PERCENT1/100;
             PROMO1.send(promo1);
@@ -59,20 +59,20 @@ contract Formula1Game {
         uint128 money = uint128(address(this).balance);
         for(uint i=0; i<queue.length; i++){
             uint idx = currentReceiverIndex + i;
-            Deposit storage dep = queue[idx]; 
-            if(money >= dep.expect){  
-                dep.depositor.send(dep.expect); 
-                money -= dep.expect;            
+            Deposit storage dep = queue[idx];
+            if(money >= dep.expect){
+                dep.depositor.send(dep.expect);
+                money -= dep.expect;
                 delete queue[idx];
             }else{
-                dep.depositor.send(money); 
-                dep.expect -= money;       
-                break;                    
+                dep.depositor.send(money);
+                dep.expect -= money;
+                break;
             }
-            if(gasleft() <= 50000)         
-                break;                     
+            if(gasleft() <= 50000)
+                break;
         }
-        currentReceiverIndex += i; 
+        currentReceiverIndex += i;
     }
 
     function getDeposit(uint idx) public view returns (address depositor, uint deposit, uint expect){
@@ -114,4 +114,15 @@ contract Formula1Game {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

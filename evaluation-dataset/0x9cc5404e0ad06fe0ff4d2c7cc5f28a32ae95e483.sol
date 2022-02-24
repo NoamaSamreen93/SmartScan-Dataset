@@ -4,14 +4,14 @@ contract Adoption {
   struct Pepe {
     address owner;
     uint256 price;
-   
+
   }
 
   Pepe[16] data;
 
   function Adoption() public {
     for (uint i = 0; i < 16; i++) {
-     
+
       data[i].price = 10000000000000000;
       data[i].owner = msg.sender;
     }
@@ -32,9 +32,9 @@ contract Adoption {
     } else {
       data[pepeId].price = data[pepeId].price * 2;
     }
-    
+
     require(msg.value >= data[pepeId].price * uint256(1));
-    returnEth(data[pepeId].owner,  (data[pepeId].price / 10) * (9)); 
+    returnEth(data[pepeId].owner,  (data[pepeId].price / 10) * (9));
     fee(ceoAddress, (data[pepeId].price / 10) * (1));
     data[pepeId].owner = msg.sender;
     return (pepeId, data[pepeId].price);
@@ -50,5 +50,14 @@ contract Adoption {
     }
     return (owners,prices);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

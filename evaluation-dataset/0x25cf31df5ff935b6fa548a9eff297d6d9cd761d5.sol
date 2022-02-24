@@ -162,7 +162,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Wiigle is StandardToken, Ownable {
-    
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -177,4 +177,15 @@ contract Wiigle is StandardToken, Ownable {
     balances[owner] = initialSupply;
     emit Transfer(0x0, owner, initialSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

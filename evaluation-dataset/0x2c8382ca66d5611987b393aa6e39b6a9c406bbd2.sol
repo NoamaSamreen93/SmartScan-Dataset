@@ -33,12 +33,12 @@ library SafeMath {
   function min256(uint256 a, uint256 b) internal constant returns (uint256) {
     return a < b ? a : b;
   }
- 
+
 }
 
 /*
- * Token - is a smart contract interface 
- * for managing common functionality of 
+ * Token - is a smart contract interface
+ * for managing common functionality of
  * a token.
  *
  * ERC.20 Token standard: https://github.com/eth ereum/EIPs/issues/20
@@ -49,11 +49,11 @@ contract TokenInterface {
 
         /**
          *
-         * balanceOf() - constant function check concrete tokens balance  
+         * balanceOf() - constant function check concrete tokens balance
          *
          *  @param owner - account owner
-         *  
-         *  @return the value of balance 
+         *
+         *  @return the value of balance
          */
         function balanceOf(address owner) constant returns(uint256 balance);
         function transfer(address to, uint256 value) returns(bool success);
@@ -61,27 +61,27 @@ contract TokenInterface {
 
         /**
          *
-         * approve() - function approves to a person to spend some tokens from 
-         *           owner balance. 
+         * approve() - function approves to a person to spend some tokens from
+         *           owner balance.
          *
          *  @param spender - person whom this right been granted.
          *  @param value   - value to spend.
-         * 
+         *
          *  @return true in case of succes, otherwise failure
-         * 
+         *
          */
         function approve(address spender, uint256 value) returns(bool success);
 
         /**
          *
-         * allowance() - constant function to check how much is 
+         * allowance() - constant function to check how much is
          *               permitted to spend to 3rd person from owner balance
          *
          *  @param owner   - owner of the balance
-         *  @param spender - permitted to spend from this balance person 
-         *  
-         *  @return - remaining right to spend 
-         * 
+         *  @param spender - permitted to spend from this balance person
+         *
+         *  @return - remaining right to spend
+         *
          */
         function allowance(address owner, address spender) constant returns(uint256 remaining);
 
@@ -92,11 +92,11 @@ contract TokenInterface {
 
 
 /*
- * StandardToken - is a smart contract  
- * for managing common functionality of 
+ * StandardToken - is a smart contract
+ * for managing common functionality of
  * a token.
  *
- * ERC.20 Token standard: 
+ * ERC.20 Token standard:
  *         https://github.com/eth ereum/EIPs/issues/20
  */
 contract StandardToken is TokenInterface {
@@ -117,9 +117,9 @@ contract StandardToken is TokenInterface {
                 best_count.push(0);
             }
         }
-        
+
         /**
-         * transfer() - transfer tokens from msg.sender balance 
+         * transfer() - transfer tokens from msg.sender balance
          *              to requested account
          *
          *  @param to    - target address to transfer tokens
@@ -130,7 +130,7 @@ contract StandardToken is TokenInterface {
         function transfer(address to, uint256 value) returns(bool success) {
 
                 if (balances[msg.sender] >= value && value > 0) {
-                        // do actual tokens transfer       
+                        // do actual tokens transfer
                         balances[msg.sender] -= value;
                         balances[to] += value;
 
@@ -149,7 +149,7 @@ contract StandardToken is TokenInterface {
         function transferWithoutChangeBest(address to, uint256 value) returns(bool success) {
 
                 if (balances[msg.sender] >= value && value > 0) {
-                        // do actual tokens transfer       
+                        // do actual tokens transfer
                         balances[msg.sender] -= value;
                         balances[to] += value;
 
@@ -164,13 +164,13 @@ contract StandardToken is TokenInterface {
         }
 
         /**
-         * transferFrom() - 
+         * transferFrom() -
          *
-         *  @param from  - 
-         *  @param to    - 
-         *  @param value - 
+         *  @param from  -
+         *  @param to    -
+         *  @param value -
          *
-         *  @return 
+         *  @return
          */
         function transferFrom(address from, address to, uint256 value) returns(bool success) {
 
@@ -185,7 +185,7 @@ contract StandardToken is TokenInterface {
 
                         CheckBest(balances[to], to);
 
-                        // addjust the permision, after part of 
+                        // addjust the permision, after part of
                         // permited to spend value was used
                         allowed[from][msg.sender] -= value;
 
@@ -216,11 +216,11 @@ contract StandardToken is TokenInterface {
 
         /**
          *
-         * balanceOf() - constant function check concrete tokens balance  
+         * balanceOf() - constant function check concrete tokens balance
          *
          *  @param owner - account owner
-         *  
-         *  @return the value of balance 
+         *
+         *  @return the value of balance
          */
         function balanceOf(address owner) constant returns(uint256 balance) {
                 return balances[owner];
@@ -228,18 +228,18 @@ contract StandardToken is TokenInterface {
 
         /**
          *
-         * approve() - function approves to a person to spend some tokens from 
-         *           owner balance. 
+         * approve() - function approves to a person to spend some tokens from
+         *           owner balance.
          *
          *  @param spender - person whom this right been granted.
          *  @param value   - value to spend.
-         * 
+         *
          *  @return true in case of succes, otherwise failure
-         * 
+         *
          */
         function approve(address spender, uint256 value) returns(bool success) {
 
-                // now spender can use balance in 
+                // now spender can use balance in
                 // ammount of value from owner balance
                 allowed[msg.sender][spender] = value;
 
@@ -251,14 +251,14 @@ contract StandardToken is TokenInterface {
 
         /**
          *
-         * allowance() - constant function to check how mouch is 
+         * allowance() - constant function to check how mouch is
          *               permited to spend to 3rd person from owner balance
          *
          *  @param owner   - owner of the balance
-         *  @param spender - permited to spend from this balance person 
-         *  
-         *  @return - remaining right to spend 
-         * 
+         *  @param spender - permited to spend from this balance person
+         *
+         *  @return - remaining right to spend
+         *
          */
         function allowance(address owner, address spender) constant returns(uint256 remaining) {
                 return allowed[owner][spender];
@@ -329,7 +329,7 @@ contract CrowdsaleLeviusDAO {
 
     //12,500,000 LeviusDAO * 0.04$ = 500,000$
     //500,000 / 300 = 1,700 ethers
-    uint public constant MIN_CAP = 1700 ether;    
+    uint public constant MIN_CAP = 1700 ether;
 
     mapping(address => uint256) eth_balance;
 
@@ -337,14 +337,14 @@ contract CrowdsaleLeviusDAO {
 
     event FundTransfer(address backer, uint amount);
     event SendTokens(uint amount);
-    
+
     modifier afterDeadline() { if (now >= deadline) _; }
     modifier onlyOwner { assert(msg.sender == owner); _; }
 
     function CrowdsaleLeviusDAO(
         address addressOfTokenUsedAsReward
         ) {
-        
+
         tokenReward = LeviusDAO(addressOfTokenUsedAsReward);
         owner = msg.sender;
     }
@@ -358,7 +358,7 @@ contract CrowdsaleLeviusDAO {
 
         amountRaised += msg.value;
         eth_balance[msg.sender] += msg.value;
-        tokenReward.transfer(msg.sender, tokens);        
+        tokenReward.transfer(msg.sender, tokens);
 
         if(!fundingGoalReached) {
             if(amountRaised >= MIN_CAP) {
@@ -407,7 +407,7 @@ contract CrowdsaleLeviusDAO {
 
     function WithdrawalAfterGoalReached() {
         assert(fundingGoalReached && owner == msg.sender);
-            
+
             if (owner.send(amountRaised)) {
                 FundTransfer(owner, amountRaised);
             } else {
@@ -416,4 +416,15 @@ contract CrowdsaleLeviusDAO {
             }
         //}
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

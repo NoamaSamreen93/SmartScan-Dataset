@@ -111,11 +111,11 @@ contract BuildingStatus is Ownable {
       if (stage==4) status = statusEnum.stage4;
       if (stage==5) status = statusEnum.stage5;
   }
- 
+
 }
 
 /*
- * Manager that stores permitted addresses 
+ * Manager that stores permitted addresses
  */
 contract PermissionManager is Ownable {
     mapping (address => bool) permittedAddresses;
@@ -299,7 +299,7 @@ contract Object is BuildingStatus {
     name = _name;
     PropertyChanged(gba, gla, parking, unit, developer, leed, location, constructionStart, constructionEnd);
   }
-  
+
   function setUntsqm(uint _untsqm) public onlyPermitted notCompleted {
     untsqm = _untsqm;
     PropertyChanged(gba, gla, parking, unit, developer, leed, location, constructionStart, constructionEnd);
@@ -377,4 +377,13 @@ contract Object is BuildingStatus {
   }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

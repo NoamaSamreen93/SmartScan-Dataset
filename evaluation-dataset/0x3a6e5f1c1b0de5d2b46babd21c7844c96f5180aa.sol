@@ -21,7 +21,7 @@ contract SPBevents {
         uint256 amount,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper get a random number
     event onCheckMainpot
     (
@@ -30,7 +30,7 @@ contract SPBevents {
         address indexed sniperAddress,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper get a random number
     event onCheckLuckypot
     (
@@ -39,7 +39,7 @@ contract SPBevents {
         address indexed sniperAddress,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper get a random number
     event onCheckKingpot
     (
@@ -48,7 +48,7 @@ contract SPBevents {
         uint256 indexed roundID,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper get a random number hit the exact same numbers that other snipers have
     event onCheckHitNumber
     (
@@ -58,7 +58,7 @@ contract SPBevents {
         uint256 roundID,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper send eth
     event onEndTx
     (
@@ -68,7 +68,7 @@ contract SPBevents {
         uint256 laffID,
         uint256 timeStamp
     );
-    
+
     // fired whenever a sniper send eth for ICO
     event onICOAngel
     (
@@ -76,7 +76,7 @@ contract SPBevents {
         uint256 amount,
         uint256 timeStamp
     );
-    
+
     event onOEZDay
     (
         uint256 amount,
@@ -87,22 +87,22 @@ contract SPBevents {
 contract modularBillion is SPBevents {}
 
 contract SniperBillion is modularBillion {
-    
+
     using SafeMath for *;
     using Array256Lib for uint256[];
-   
-    
+
+
     address constant private comReward_ = 0x8Aa94D530cC572aF0C730147E1ab76875F25f71C;
     address constant private comMarket_ = 0x6c14CAAc549d7411faE4e201105B4D33afb8a3db;
     address constant private comICO_ = 0xbAdb636C5C3665a969159a6b993F811D9F263639;
     address constant private donateAccount_ =  0x1bB064708eBf4763BeB495877E99Dfeb75198942;
-    
+
     RubyFundForwarderInterface constant private Ruby_Fund = RubyFundForwarderInterface(0x7D653E0Ecb4DAF3166a49525Df04147a7180B051);
     SniperBookInterface constant private SniperBook = SniperBookInterface(0xc294FA45F713B09d865A088543765800F47514eD);
 
     string constant public name   = "Sniper Billion Official";
     string constant public symbol = "SPB";
-    
+
 
     uint256 constant private icoEndTime_ = 24 hours;   // ICO timer end at this
     uint256 constant private maxNumber_  = 100000000; // 100,000,000 - 100 million
@@ -110,17 +110,17 @@ contract SniperBillion is modularBillion {
     uint256 public totalSum_;
     uint256 public rID_;
     uint256 public icoAmount_;
-    
+
     bool private isDrawed_ = false;
     uint256 lastSID_;
-    
+
     uint256[] private globalArr_;
-    uint256[] private icoSidArr_;            
+    uint256[] private icoSidArr_;
     uint256[] private luckyPotBingoArr_;
     uint256[] private airdropPotBingoArr_;
-    
+
     //****************
-    // SNIPER DATA 
+    // SNIPER DATA
     //****************
     mapping (address => uint256) public sIDxAddr_;          // (addr => sID) returns sniper id by address
     mapping (bytes32 => uint256) public sIDxName_;          // (name => sID) returns sniper id by name
@@ -129,25 +129,25 @@ contract SniperBillion is modularBillion {
     mapping (uint256 => SPBdatasets.Sniper) public spr_;   // (sID => data) sniper data
     mapping (uint256 => SPBdatasets.Round) public round_;
     mapping (uint256 => mapping (bytes32 => bool)) public sprNames_; // (sID => name => bool) list of names a sniper owns.
-    
-    
+
+
     constructor()
-        public 
+        public
     {
         //does nothing
     }
 
     /**
-     * @dev used to make sure no one can interact with contract until it has 
-     * been activated. 
+     * @dev used to make sure no one can interact with contract until it has
+     * been activated.
      */
     modifier isActivated() {
-        require(activated_ == true, "its not ready yet.  check our discord"); 
+        require(activated_ == true, "its not ready yet.  check our discord");
         _;
     }
 
     /**
-     * @dev prevents contracts from interacting with Sniper Billion Game 
+     * @dev prevents contracts from interacting with Sniper Billion Game
      */
     modifier isHuman() {
         require(tx.origin == msg.sender, "sorry humans only");
@@ -155,22 +155,22 @@ contract SniperBillion is modularBillion {
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 100000000000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
-        _;    
+        _;
     }
-    
+
     /**
-     * @dev check boundaries for ico time 
+     * @dev check boundaries for ico time
      */
     modifier isIcoPhase() {
         require(now < round_[1].icoend, "ico end");
         _;
     }
-    
+
     /**
      * @dev after the ICO ends, the game begins
      */
@@ -178,16 +178,16 @@ contract SniperBillion is modularBillion {
         require(now > round_[rID_].icoend, "start");
         _;
     }
-    
+
     /**
      * @dev sets boundaries for ico
      */
     modifier isWithinIcoLimits(uint256 _eth) {
         require(_eth >= 1000000000000000000, "pocket lint: not a valid currency");
         require(_eth <= 200000000000000000000, "ico up to 200 Ether");
-        _;    
+        _;
     }
-    
+
     /**
      * @dev emergency buy uses last stored affiliate ID
      */
@@ -201,14 +201,14 @@ contract SniperBillion is modularBillion {
     {
         // determine if sniper is new or not
         determineSID();
-            
+
         // fetch sniper id
         uint256 _sID = sIDxAddr_[msg.sender];
-        
-        // buy core 
+
+        // buy core
         buyCore(_sID, spr_[_sID].laff);
     }
-    
+
     function buyXaddr(address _affCode)
         public
         isActivated()
@@ -219,10 +219,10 @@ contract SniperBillion is modularBillion {
     {
         // determine if sniper is new or not
         determineSID();
-        
+
         // fetch player id
         uint256 _sID = sIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -230,33 +230,33 @@ contract SniperBillion is modularBillion {
         {
             // use last stored affiliate code
             _affID = spr_[_sID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = sIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != spr_[_sID].laff)
             {
                 // update last affiliate
                 spr_[_sID].laff = _affID;
             }
         }
-        
+
 
         // if no affiliate code was given or player tried to use their own, lolz
         if (_affCode == address(0) || _affCode == msg.sender)
         {
             // use last stored affiliate code
             _affID = spr_[_sID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = sIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != spr_[_sID].laff)
             {
                 // update last affiliate
@@ -264,7 +264,7 @@ contract SniperBillion is modularBillion {
             }
         }
 
-        // buy core 
+        // buy core
         buyCore(_sID, _affID);
     }
 
@@ -279,34 +279,34 @@ contract SniperBillion is modularBillion {
     {
         // determine if sniper is new or not
         determineSID();
-        
-        
+
+
         // fetch sniper id
         uint256 _sID = sIDxAddr_[msg.sender];
-        
-        spr_[_sID].icoAmt = spr_[_sID].icoAmt.add(msg.value); 
-        
+
+        spr_[_sID].icoAmt = spr_[_sID].icoAmt.add(msg.value);
+
         icoSidArr_.push(_sID);
-        
+
         //ico amount 80% to mainpot
         round_[1].mpot = round_[1].mpot.add((msg.value / 100).mul(80));
-        
+
         //total ICO amount
         icoAmount_ = icoAmount_.add(msg.value);
-        
+
         //ico amount 20% to community.
         uint256 _icoEth = (msg.value / 100).mul(20);
-        
+
         if(_icoEth > 0)
             comICO_.transfer(_icoEth);
-            
+
         emit onICOAngel(msg.sender, msg.value, block.timestamp);
     }
-    
+
 
     /**
      * @dev withdraws all of your earnings.
-     * -functionhash- 
+     * -functionhash-
      */
     function withdraw()
         public
@@ -315,30 +315,30 @@ contract SniperBillion is modularBillion {
     {
         // grab time
         uint256 _now = now;
-        
+
         // fetch player ID
         uint256 _sID = sIDxAddr_[msg.sender];
-        
+
 
         // get their earnings
        uint256 _eth = withdrawEarnings(_sID);
-        
+
         // gib moni
         if (_eth > 0)
             spr_[_sID].addr.transfer(_eth);
-        
+
         // fire withdraw event
         emit SPBevents.onWithdraw(_sID, msg.sender, _eth, _now);
-        
+
     }
-    
+
 
     function withdrawEarnings(uint256 _sID)
         private
         returns(uint256)
     {
 
-        // from vaults 
+        // from vaults
         uint256 _earnings = (spr_[_sID].win).add(spr_[_sID].gen).add(spr_[_sID].aff).add(spr_[_sID].gems);
         if (_earnings > 0)
         {
@@ -384,8 +384,8 @@ contract SniperBillion is modularBillion {
         private
     {
         uint256 _rID = rID_;
- 
-        //If the sniper does not enter the game through the affiliate, then 10% is paid to the team, 
+
+        //If the sniper does not enter the game through the affiliate, then 10% is paid to the team,
         //otherwise, paid to the affiliate.
 
         if(_affID == 0 && spr_[_sID].laff == 0) {
@@ -409,10 +409,10 @@ contract SniperBillion is modularBillion {
 
         uint256 _value = _eth;
         uint256 _laffRearwd = _value / 10;
-        
+
         //affiliate sniper
         spr_[_affID].aff = spr_[_affID].aff.add(_laffRearwd);
-        
+
         //set sniper last affiliate id;
         spr_[_sID].laff = _affID;
         spr_[_sID].lplyt = _now;
@@ -420,9 +420,9 @@ contract SniperBillion is modularBillion {
         _value = _value.sub(_laffRearwd);
 
         uint256 _rndFireNum = generateRandom();
-        
+
         emit onEndTx(_sID, _eth, _rndFireNum, _affID, _now);
-        
+
         round_[_rID].ltime = _now;
 
         bool _isBingoLp = false;
@@ -438,10 +438,10 @@ contract SniperBillion is modularBillion {
         }else{
 
             globalArrEqualZero(_rID, _sID, _value, _rndFireNum);
-            
+
         }
         _isBingoLp = calcBingoLuckyPot(_rndFireNum);
-        
+
         //bingo luckypot
         if(_isBingoLp){
             spr_[_sID].win = spr_[_sID].win.add(round_[_rID].lpot);
@@ -452,33 +452,33 @@ contract SniperBillion is modularBillion {
         //bingo kingpot
         if(_eth >= 500000000000000000){
             _isBingoKp = calcBingoAirdropPot(_rndFireNum);
-            
+
             if(_isBingoKp){
                 spr_[_sID].win = spr_[_sID].win.add(round_[_rID].apot);
                 round_[_rID].apot = 0;
                 emit onCheckKingpot(_rndFireNum, spr_[_sID].addr, _rID, block.timestamp);
             }
         }
-        
+
         //win mainpot
         checkWinMainPot(_rID, _sID, _rndFireNum);
-        
+
         //surprise mother fuck
         autoDrawWithOEZDay();
     }
-    
+
     /**
-     * @dev If the game is too crazy, the first draw will not be available for 180 days, 
-     * and the contract will be automatically assigned to ensure the benefit of everyone. 
+     * @dev If the game is too crazy, the first draw will not be available for 180 days,
+     * and the contract will be automatically assigned to ensure the benefit of everyone.
      * If the prize is opened once in 180 days, this setting is invalid.
      */
-    
+
     function autoDrawWithOEZDay()
         private
     {
         uint256 _oezDay = round_[rID_].strt + 180 days;
         if(!isDrawed_ && now > _oezDay){
-            
+
             totalSum_ = 0;
 
             // If an ICO investor exists
@@ -487,24 +487,24 @@ contract SniperBillion is modularBillion {
             // all sniper  30%
             // marketing    5%
             // donate       5%
-            
+
             // If the ICO investor does not exist
             // team        30%
             // all sniper  60%
             // marketing    5%
             // donate       5%
-            
+
             uint256 _cttBalance = round_[rID_].mpot.add(round_[rID_].lpot).add(round_[rID_].apot);
-            
-            
+
+
             uint256 _communityRewards = (_cttBalance / 100).mul(30);
-            
+
             if(_communityRewards > 0)
                 comReward_.transfer(_communityRewards);
-                
+
             uint256 _sniperDividend;
-            
-        
+
+
             if(icoAmount_ > 0){
                 // sniper dividend 30%
                 _sniperDividend = (_cttBalance / 100).mul(30);
@@ -515,54 +515,54 @@ contract SniperBillion is modularBillion {
                 // sniper dividend 60%
                 _sniperDividend = (_cttBalance / 100).mul(60);
             }
-            
-            
+
+
             //each piece
             uint256 _eachPiece = _sniperDividend / lastSID_;
-            
+
             for(uint256 i = 1; i < lastSID_; i++)
             {
                 spr_[i].win = spr_[i].win.add(_eachPiece);
             }
-            
-            
+
+
             //marketing 5% & donate 5%
             uint256 _communityMarket = (_cttBalance / 100).mul(5);
             if(_communityMarket > 0){
                 comMarket_.transfer(_communityMarket);
                 donateAccount_.transfer(_communityMarket);
             }
-            
+
             emit onOEZDay(_cttBalance, now);
-            
+
             round_[rID_].mpot = 0;
             round_[rID_].lpot = 0;
             round_[rID_].apot = 0;
-            
+
             uint256 _icoEndTime = round_[rID_].icoend;
-            
+
             rID_++;
-            
+
             round_[rID_].strt = now;
             round_[rID_].icoend = _icoEndTime;
-            
+
         }
     }
-    
+
     function globalArrEqualZero(uint256 _rID, uint256 _sID, uint256 _value, uint256 _rndFireNum)
         private
     {
         round_[_rID].mpot = round_[_rID].mpot.add(((_value / 2) / 100).mul(90));
         round_[_rID].lpot = round_[_rID].lpot.add(((_value / 2) / 100).mul(5));
         round_[_rID].apot = round_[_rID].apot.add(((_value / 2) / 100).mul(5));
-        
+
         sidXnum_[_rndFireNum] = _sID;
-        
+
         spr_[_sID].numbers.push(_rndFireNum);
         spr_[_sID].snums++;
         spr_[_sID].gen = spr_[_sID].gen.add(_value / 2);
         globalArr_.push(_rndFireNum);
-        
+
         totalSum_ = totalSum_.add(_rndFireNum);
     }
 
@@ -575,26 +575,26 @@ contract SniperBillion is modularBillion {
 
         (_found, _index) = globalArr_.indexOf(_rndFireNum, false);
         _opID = sidXnum_[_rndFireNum];
-        
-        
+
+
 
         if(_found){
 
             (_found, _index) = spr_[_opID].numbers.indexOf(_rndFireNum, false);
-            
+
             itemRemove(spr_[_opID].numbers, _index);
 
             spr_[_opID].snums--;
-            
+
             sidXnum_[_rndFireNum] = _sID;
-            
+
             spr_[_sID].snums++;
             spr_[_sID].numbers.push(_rndFireNum);
-            
+
             spr_[_opID].win = spr_[_opID].win.add(_value);
-            
+
             emit onCheckHitNumber(_rndFireNum, _opID, spr_[_sID].addr, _rID, block.timestamp);
-    
+
         }else{
             round_[_rID].mpot = round_[_rID].mpot.add(((_value / 2) / 100).mul(90));
             round_[_rID].lpot = round_[_rID].lpot.add(((_value / 2) / 100).mul(5));
@@ -606,45 +606,45 @@ contract SniperBillion is modularBillion {
 
             if(_index == 0){
                 _opID = sidXnum_[globalArr_[_index + 1]];
-                
+
                 spr_[_opID].win = spr_[_opID].win.add(((_value / 2) / 100).mul(50));
-            
-                
+
+
                 spr_[_sID].snums++;
                 spr_[_sID].numbers.push(_rndFireNum);
                 spr_[_sID].gen = spr_[_sID].gen.add(((_value / 2) / 100).mul(50));
-                
+
                 sidXnum_[_rndFireNum] = _sID;
-                
+
             }else if(_index == globalArr_.length - 1){
                 _opID = sidXnum_[globalArr_[_index -1]];
-                
+
                 spr_[_opID].win = spr_[_opID].win.add(((_value / 2) / 100).mul(50));
-                
+
                 spr_[_sID].snums++;
                 spr_[_sID].numbers.push(_rndFireNum);
                 spr_[_sID].gen = spr_[_sID].gen.add(((_value / 2) / 100).mul(50));
-                
+
                 sidXnum_[_rndFireNum] = _sID;
-                
+
             }else{
                 uint256 _leftSID = sidXnum_[globalArr_[_index - 1]];
                 uint256 _rightSID = sidXnum_[globalArr_[_index + 1]];
-                
+
                 spr_[_leftSID].win = spr_[_leftSID].win.add(((_value / 2) / 100).mul(50));
                 spr_[_rightSID].win = spr_[_rightSID].win.add(((_value / 2) / 100).mul(50));
-                
+
                 spr_[_sID].snums++;
                 spr_[_sID].numbers.push(_rndFireNum);
-                
-                
+
+
                 sidXnum_[_rndFireNum] = _sID;
             }
-            
-            
-                
+
+
+
         }
-        
+
         totalSum_ = totalSum_.add(_rndFireNum);
     }
 
@@ -656,61 +656,61 @@ contract SniperBillion is modularBillion {
         uint256 _index = 0;
         if(globalArr_[0] != _rndFireNum)
         {
-            
+
             round_[_rID].mpot = round_[_rID].mpot.add(((_value / 2) / 100).mul(90));
             round_[_rID].lpot = round_[_rID].lpot.add(((_value / 2) / 100).mul(5));
             round_[_rID].apot = round_[_rID].apot.add(((_value / 2) / 100).mul(5));
-            
+
             sidXnum_[_rndFireNum] = _sID;
-            
+
             spr_[_opID].win = spr_[_opID].win.add((_value / 4));
-            
+
             spr_[_sID].snums++;
             spr_[_sID].numbers.push(_rndFireNum);
             spr_[_sID].gen = spr_[_sID].gen.add((_value / 4));
-    
+
             globalArr_.push(_rndFireNum);
         }else{
             spr_[_opID].win = spr_[_opID].win.add(_value);
-            
+
             (_found, _index) = spr_[_opID].numbers.indexOf(_rndFireNum, false);
-        
+
             itemRemove(spr_[_opID].numbers, _index);
 
             sidXnum_[_rndFireNum] = _sID;
-            
+
             spr_[_opID].snums--;
 
             spr_[_sID].snums++;
             spr_[_sID].numbers.push(_rndFireNum);
-            
+
             emit onCheckHitNumber(_rndFireNum, _opID, spr_[_sID].addr, _rID, block.timestamp);
-            
+
         }
-        
+
         totalSum_ = totalSum_.add(_rndFireNum);
     }
-    
+
     function checkLuckyPot(uint256 _rndFireNum) private returns(uint256){
         delete luckyPotBingoArr_;
         uint256 number = _rndFireNum;
         uint returnNum = number;
         while (number > 0) {
-            uint256 digit = uint8(number % 10); 
+            uint256 digit = uint8(number % 10);
             number = number / 10;
- 
+
             luckyPotBingoArr_.push(digit);
         }
 
         return returnNum;
     }
-    
+
     function checkAirdropPot(uint256 _rndFireNum) private returns(uint256){
         delete airdropPotBingoArr_;
         uint256 number = _rndFireNum;
         uint returnNum = number;
         while (number > 0) {
-            uint256 digit = uint8(number % 10); 
+            uint256 digit = uint8(number % 10);
             number = number / 10;
 
             airdropPotBingoArr_.push(digit);
@@ -718,17 +718,17 @@ contract SniperBillion is modularBillion {
 
         return returnNum;
     }
-    
+
     function getDigit(uint256 x) private view returns (uint256) {
         return luckyPotBingoArr_[x];
     }
-    
+
 
     function calcBingoLuckyPot(uint256 _rndFireNum)
         private
         returns(bool)
     {
-        
+
         bool _isBingoLucky = false;
         checkLuckyPot(_rndFireNum);
         uint256 _flag;
@@ -752,21 +752,21 @@ contract SniperBillion is modularBillion {
         bool _isBingoAirdrop = false;
         checkAirdropPot(_rndFireNum);
         uint256 _temp;
-        
+
         if(airdropPotBingoArr_.length > 1) {
-            
+
             airdropPotBingoArr_.heapSort();
-            
+
             _temp = airdropPotBingoArr_[0];
-            
+
             for(uint256 i = 0; i < airdropPotBingoArr_.length; i++){
-                if(i == 0 || airdropPotBingoArr_[i] == _temp.add(i)){         
+                if(i == 0 || airdropPotBingoArr_[i] == _temp.add(i)){
                     _isBingoAirdrop = true;
                 }else{
                     _isBingoAirdrop = false;
                     break;
                 }
-                
+
             }
         }
 
@@ -775,30 +775,30 @@ contract SniperBillion is modularBillion {
 
     function checkWinMainPot(uint256 _rID, uint256 _sID, uint256 _rndFireNum) private {
         if(totalSum_ == maxNumber_){
-            
+
             isDrawed_ = true;
-            
+
             totalSum_ = 0;
 
             spr_[_sID].snums = 0;
             delete spr_[_sID].numbers;
-            
+
             // winer 48%
             // next round 20%
             // ico 20%
             // marketing 1%
             // donate 1%
             // team 10%
-            
+
             uint256 _nextMpot;
             uint256 _nextLpot = round_[_rID].lpot;
             uint256 _nextApot = round_[_rID].apot;
             uint256 _icoEndTime = round_[_rID].icoend;
-   
+
             //If no one is involved in the ICO, 20% of the ICO will be allocated, 10% of which will be allocated to the community and 10% to the next round.
-            
+
             uint256 _communityRewards;
-            
+
             if(icoAmount_ > 0){
                 //next round 20%
                 _nextMpot = (round_[_rID].mpot / 100).mul(20);
@@ -810,32 +810,32 @@ contract SniperBillion is modularBillion {
                 // team 20%
                 _communityRewards = (round_[_rID].mpot / 100).mul(20);
             }
-            
+
             if(_communityRewards > 0)
                 comReward_.transfer(_communityRewards);
-            
+
             spr_[_sID].win = spr_[_sID].win.add((round_[rID_].mpot / 100).mul(48));
-            
+
             //marketing 1% & donate 1%
             uint256 _communityMarket = (round_[_rID].mpot / 100).mul(1);
             if(_communityMarket > 0){
                 comMarket_.transfer(_communityMarket);
                 donateAccount_.transfer(_communityMarket);
             }
-            
-            
+
+
             emit onCheckMainpot(_rndFireNum, _rID, spr_[_sID].addr, block.timestamp);
-            
+
             //ico 20%
             if(icoAmount_ > 0){
                 uint256 _icoValue = (round_[_rID].mpot / 100).mul(20);
                 distributeICO(_icoValue);
             }
-            
+
             round_[rID_].mpot = 0;
             round_[rID_].lpot = 0;
             round_[rID_].apot = 0;
-            
+
             rID_++;
 
             round_[rID_].strt = now;
@@ -843,14 +843,14 @@ contract SniperBillion is modularBillion {
             round_[rID_].lpot = _nextLpot;
             round_[rID_].apot = _nextApot;
             round_[rID_].icoend = _icoEndTime;
-            
+
         }else{
 
             if(totalSum_ > maxNumber_){
                 uint256 _overNum = totalSum_.sub(maxNumber_);
                 totalSum_ = maxNumber_.sub(_overNum);
             }
-            
+
         }
     }
 
@@ -864,7 +864,7 @@ contract SniperBillion is modularBillion {
             spr_[icoSidArr_[i]].gems = spr_[icoSidArr_[i]].gems.add(_rs);
         }
     }
-    
+
     function percent(uint256 numerator, uint256 denominator, uint256 precision) private pure returns(uint256 quotient) {
 
          // caution, check safe-to-multiply here
@@ -877,7 +877,7 @@ contract SniperBillion is modularBillion {
 
     /**
      * @dev gets existing or registers new sID.  use this when a sniper may be new
-     * @return sID 
+     * @return sID
      */
     function determineSID()
         private
@@ -886,26 +886,26 @@ contract SniperBillion is modularBillion {
         // if sniper is new to this version of H1M
         if (_sID == 0)
         {
-            // grab their sniper ID, name and last aff ID, from sniper names contract 
+            // grab their sniper ID, name and last aff ID, from sniper names contract
             _sID = SniperBook.getSniperID(msg.sender);
             lastSID_ = _sID;
             bytes32 _name = SniperBook.getSniperName(_sID);
             uint256 _laff = SniperBook.getSniperLAff(_sID);
-            
-            // set up sniper account 
+
+            // set up sniper account
             sIDxAddr_[msg.sender] = _sID;
             spr_[_sID].addr = msg.sender;
-            
+
             if (_name != "")
             {
                 sIDxName_[_name] = _sID;
                 spr_[_sID].name = _name;
                 sprNames_[_sID][_name] = true;
             }
-            
+
             if (_laff != 0 && _laff != _sID)
                 spr_[_sID].laff = _laff;
-            
+
         }
     }
 
@@ -913,7 +913,7 @@ contract SniperBillion is modularBillion {
     /**
      *  for UI
      */
-     
+
     function getTotalSum()
         public
         isHuman()
@@ -922,37 +922,37 @@ contract SniperBillion is modularBillion {
     {
         return(totalSum_);
     }
-    
+
     function getCurrentRoundInfo()
         public
         isHuman()
         view
         returns(uint256, uint256, uint256, uint256, uint256, uint256[] memory)
     {
-        
+
         return(rID_, totalSum_, round_[rID_].lpot, round_[rID_].mpot, round_[rID_].apot, globalArr_);
     }
-    
+
     function getSniperInfo(address _addr)
         public
         isHuman()
         view
         returns(uint256[] memory, uint256, uint256, uint256, uint256,  uint256)
     {
-        
+
         return(spr_[sIDxAddr_[_addr]].numbers, spr_[sIDxAddr_[_addr]].aff, spr_[sIDxAddr_[_addr]].win, spr_[sIDxAddr_[_addr]].gems, spr_[sIDxAddr_[_addr]].gen, spr_[sIDxAddr_[_addr]].icoAmt);
     }
-    
+
     function getSID(address _addr)
         public
         isHuman()
         view
         returns(uint256)
     {
-        
+
         return(sIDxAddr_[_addr]);
     }
-    
+
     function getGameTime()
         public
         isHuman()
@@ -967,13 +967,13 @@ contract SniperBillion is modularBillion {
     }
 
     /** upon contract deploy, it will be deactivated.  this is a one time
-     * use function that will activate the contract.  we do this so devs 
+     * use function that will activate the contract.  we do this so devs
      * have time to set things up on the web end                            **/
     bool public activated_ = false;
     function activate()
         public
     {
-        // only luckyteam can activate 
+        // only luckyteam can activate
         require(
             msg.sender == 0x461f346C3B3D401A5f9Fef44bAB704e96abC926F ||
             msg.sender == 0x727fE77FFDf8D40F34f641DfB358d9856F9563cA ||
@@ -982,32 +982,32 @@ contract SniperBillion is modularBillion {
 			msg.sender == 0x9f01209Fb1FA757cF6025C2aBf17b847408deDE5,
             "only luckyteam can activate"
         );
-        
+
         // make sure comReward its been linked.
         require(address(comReward_) != address(0), "must link to comReward address");
-        
+
         // make sure comMarket its been linked.
         require(address(comMarket_) != address(0), "must link to comMarket address");
 
         // make sure comICO its been linked.
         require(address(comICO_) != address(0), "must link to comICO address");
-        
+
         // make sure donateAccount its been linked.
         require(address(donateAccount_) != address(0), "must link to donateAccount address");
-        
+
         // can only be ran once
         require(activated_ == false, "H1M already activated");
-        
-        // activate the contract 
+
+        // activate the contract
         activated_ = true;
-        
+
         // lets start first round
 		rID_ = 1;
         round_[1].strt = now;
         round_[1].icostrt = now;
         round_[1].icoend = now + icoEndTime_;
     }
-    
+
     function receiveSniperInfo(uint256 _sID, address _addr, bytes32 _name, uint256 _laff)
         external
     {
@@ -1025,9 +1025,9 @@ contract SniperBillion is modularBillion {
         if (sprNames_[_sID][_name] == false)
             sprNames_[_sID][_name] = true;
     }
-    
+
     /**
-     * @dev receives entire player name list 
+     * @dev receives entire player name list
      */
     function receiveSniperNameList(uint256 _sID, bytes32 _name)
         external
@@ -1035,12 +1035,12 @@ contract SniperBillion is modularBillion {
         require (msg.sender == address(SniperBook), "your not playerNames contract... hmmm..");
         if(sprNames_[_sID][_name] == false)
             sprNames_[_sID][_name] = true;
-    }   
+    }
 
 }
 
 library SPBdatasets {
-    
+
     struct Round {
         uint256 strt;    // time round started
         uint256 icostrt; // time ico started
@@ -1050,7 +1050,7 @@ library SPBdatasets {
         uint256 lpot;    // lucky pot;
         uint256 mpot;    // main pot paid to winner
     }
-    
+
     struct Sniper {
         address addr;   // player address
         bytes32 name;   // player name
@@ -1093,19 +1093,19 @@ interface SniperBookInterface {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -1121,7 +1121,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -1133,30 +1133,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -1167,20 +1167,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -1389,4 +1389,15 @@ library Array256Lib {
 
     length = self.length;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

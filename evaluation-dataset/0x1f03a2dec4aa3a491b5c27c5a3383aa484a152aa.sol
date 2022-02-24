@@ -1217,7 +1217,7 @@ contract BetContract is usingOraclize{
 
       require(maxWin < maxProfit);
     }
-    
+
     function opencode(bytes32 queryId) private {
       if (lableCount[queryId] < 1) revert();
       uint[3] memory codes = [uint(0),0,0];//开奖号码
@@ -1731,4 +1731,15 @@ contract BetContract is usingOraclize{
           }
       }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

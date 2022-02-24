@@ -31,12 +31,12 @@ library SafeMath {
 contract owned {
     address public owner;
     mapping (address => bool) public owners;
-    
+
     constructor() public {
         owner = msg.sender;
         owners[msg.sender] = true;
     }
-    
+
     modifier zeus {
         require(msg.sender == owner);
         _;
@@ -50,11 +50,11 @@ contract owned {
     function addOwner(address _newOwner) zeus public {
         owners[_newOwner] = true;
     }
-    
+
     function removeOwner(address _oldOwner) zeus public {
         owners[_oldOwner] = false;
     }
-    
+
     function transferOwnership(address newOwner) public zeus {
         owner = newOwner;
         owners[newOwner] = true;
@@ -67,12 +67,12 @@ contract ContractConn {
 }
 
 contract POC is owned{
-    
+
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
     uint256 private constant DAY30 = 2592000;
@@ -83,18 +83,18 @@ contract POC is owned{
     mapping (address => uint256) private freezeBalance;
     mapping (address => uint256) private startReleaseTime;
     mapping (address => uint256) private endLockTime;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     constructor() public {
-        totalSupply = 200000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "Pacific Ocean Coin";                                   
-        symbol = "POC";                               
+        totalSupply = 200000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "Pacific Ocean Coin";
+        symbol = "POC";
     }
 
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to].add(_value) > balanceOf[_to]);
@@ -124,7 +124,7 @@ contract POC is owned{
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         _transfer(_from, _to, _value);
         return true;
@@ -136,7 +136,7 @@ contract POC is owned{
         emit Approval(msg.sender,_spender,_value);
         return true;
     }
-    
+
     function lock (uint256 _type, address _to, uint256 _value) public athena {
         require(lockType[_to] == 0, "Each address can only be locked once and only accepts one lock mode.");
         lockType[_to] = _type;
@@ -152,14 +152,30 @@ contract POC is owned{
         }
         _transfer(msg.sender, _to, _value);
     }
-    
+
     function extract(address _tokenAddr,address _to,uint256 _value) public athena{
        ContractConn conn = ContractConn(_tokenAddr);
        conn.transfer(_to,_value);
     }
-  
+
     function extractEth(uint256 _value) athena public{
        msg.sender.transfer(_value);
     }
- 
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

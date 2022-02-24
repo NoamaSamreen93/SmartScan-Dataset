@@ -1,7 +1,7 @@
 pragma solidity ^0.5.2;
 
 /**
- * @title RegistryInterface Interface 
+ * @title RegistryInterface Interface
  */
 interface RegistryInterface {
     function logic(address logicAddr) external view returns (bool);
@@ -92,10 +92,10 @@ contract UserNote {
             bar := calldataload(36)
         }
         emit LogNote(
-            msg.sig, 
-            msg.sender, 
-            foo, 
-            bar, 
+            msg.sig,
+            msg.sender,
+            foo,
+            bar,
             msg.value,
             msg.data
         );
@@ -133,7 +133,7 @@ contract UserWallet is UserAuth, UserNote {
         bytes memory _data,
         uint _src,
         uint _session
-    ) 
+    )
         public
         payable
         note
@@ -146,7 +146,7 @@ contract UserWallet is UserAuth, UserNote {
             _src,
             _session
         );
-        
+
         // call contract in current context
         assembly {
             let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 0)
@@ -165,4 +165,13 @@ contract UserWallet is UserAuth, UserNote {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

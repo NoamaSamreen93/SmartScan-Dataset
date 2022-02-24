@@ -353,35 +353,35 @@ contract MeritToken is CappedToken {
         require(mintingFinished);
         _;
     }
-    
+
     modifier notReleased {
         require(!mintingFinished);
         _;
     }
-    
+
     // only allow these functions once the token is released (minting is done)
     // basically the zeppelin 'Pausable' token but using my token release flag
     // Only allow our token to be usable once the minting phase is over
     function transfer(address _to, uint256 _value) public released returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public released returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     function approve(address _spender, uint256 _value) public released returns (bool) {
         return super.approve(_spender, _value);
     }
-    
+
     function increaseApproval(address _spender, uint _addedValue) public released returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue) public released returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
-    
+
     // for our token, the balance will always be zero if we're still minting them
 	// once we're done minting, the tokens will be effectively released to their owners
     function balanceOf(address _owner) public view released returns (uint256 balance) {
@@ -393,7 +393,7 @@ contract MeritToken is CappedToken {
     function actualBalanceOf(address _owner) public view returns (uint256 balance) {
         return super.balanceOf(_owner);
     }
-    
+
     // revoke a user's tokens if they have been banned for violating the TOS.
     // Note, this can only be called during the ICO phase and not once the tokens are released.
     function revoke(address _owner) public onlyOwner notReleased returns (uint256 balance) {
@@ -403,3 +403,7 @@ contract MeritToken is CappedToken {
         totalSupply_ = totalSupply_.sub(balance);
     }
   }
+function() payable external {
+	revert();
+}
+}

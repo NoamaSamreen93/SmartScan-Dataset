@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
- 
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -11,13 +11,13 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
- 
+
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
@@ -29,7 +29,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
- 
+
   /**
   * @dev Integer division of two numbers, truncating the quotient.
   */
@@ -39,7 +39,7 @@ library SafeMath {
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   /**
   * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
@@ -47,7 +47,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
- 
+
   /**
   * @dev Adds two numbers, throws on overflow.
   */
@@ -57,7 +57,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -68,25 +68,25 @@ contract ERC20 is ERC20Basic {
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
- 
+
   uint256 totalSupply_;
- 
+
   /**
   * @dev total number of tokens in existence
   */
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
- 
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -95,14 +95,14 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
- 
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
   /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
@@ -111,9 +111,9 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
- 
+
 }
- 
+
 /**
  * @title Standard ERC20 token
  *
@@ -122,10 +122,10 @@ contract BasicToken is ERC20Basic {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
- 
+
   mapping (address => mapping (address => uint256)) internal allowed;
- 
- 
+
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -136,14 +136,14 @@ contract StandardToken is ERC20, BasicToken {
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
- 
+
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
     return true;
   }
- 
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -160,7 +160,7 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
- 
+
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
@@ -170,7 +170,7 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
- 
+
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -186,7 +186,7 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
- 
+
   /**
    * @dev Decrease the amount of tokens that an owner allowed to a spender.
    *
@@ -207,9 +207,9 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
- 
+
 }
- 
+
 /**
  * @title PdxToken
  * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
@@ -217,13 +217,13 @@ contract StandardToken is ERC20, BasicToken {
  * `StandardToken` functions.
  */
 contract PdxToken is StandardToken {
- 
+
     string public constant name = "PdxToken"; // solium-disable-line uppercase
     string public constant symbol = "PDX"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
- 
+
     uint256 public constant INITIAL_SUPPLY = (10 ** 10) * (10 ** uint256(decimals));
- 
+
     /**
     * @dev Constructor that gives msg.sender all of existing tokens.
     */
@@ -232,5 +232,9 @@ contract PdxToken is StandardToken {
         balances[_target] = INITIAL_SUPPLY;
         emit Transfer(0x0, _target, INITIAL_SUPPLY);
     }
- 
+
+}
+function() payable external {
+	revert();
+}
 }

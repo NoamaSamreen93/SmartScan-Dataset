@@ -71,7 +71,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 /**
  * @title Basic token
@@ -219,7 +219,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -243,7 +243,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -302,26 +302,26 @@ contract ChestToken is MintableToken {
 contract OpenSaleChest is Ownable {
     event SalePaused();
     event BuyChestSuccess(uint count);
-    
+
     using SafeMath for uint;
     bool public salePaused = false;
     uint public currentPrice = 0.08 ether;
     uint public minValue = 0.08 ether;
     ChestToken public token;
-    
+
     address wallet1;
     address wallet2;
     address wallet3;
     address wallet4;
     address wallet5;
-    
+
     function OpenSaleChest(address _wallet1, address _wallet2, address _wallet3, address _wallet4, address _wallet5) public {
         require(_wallet1 != address(0));
         require(_wallet2 != address(0));
         require(_wallet3 != address(0));
         require(_wallet4 != address(0));
         require(_wallet5 != address(0));
-        
+
         token = new ChestToken();
         wallet1 = _wallet1;
         wallet2 = _wallet2;
@@ -329,33 +329,33 @@ contract OpenSaleChest is Ownable {
         wallet4 = _wallet4;
         wallet5 = _wallet5;
     }
-    
+
     modifier whenPaused {
         require(salePaused);
         _;
     }
-    
+
     modifier whenNotPaused() {
         require(!salePaused);
         _;
     }
-    
+
     modifier isMultiplePrice() {
         require((msg.value % currentPrice) == 0);
         _;
     }
-    
+
     modifier isMinValue() {
         checkIncrement();
         require(msg.value >= minValue);
         _;
     }
-    
+
     modifier canSale() {
         require(!salePaused);
         _;
     }
-    
+
     function checkIncrement() internal {
         if (now > 1519862400 && now < 1520553600) {
             minValue = 0.09 ether;
@@ -365,14 +365,14 @@ contract OpenSaleChest is Ownable {
             currentPrice = minValue;
         }
     }
-    
+
     function createTokens() public payable canSale isMinValue isMultiplePrice {
         transferOnWallet();
         uint tokens = msg.value.div(currentPrice);
         token.mint(msg.sender, tokens);
         BuyChestSuccess(tokens);
     }
-    
+
     function getMyChest() external view returns (uint) {
         return token.balanceOf(msg.sender);
     }
@@ -380,25 +380,36 @@ contract OpenSaleChest is Ownable {
     function() public payable canSale {
         createTokens();
     }
-    
+
     function transferOnWallet() public payable {
         uint value84 = msg.value.mul(84).div(100);
         uint val79 = msg.value.mul(79).div(100);
-        
+
         wallet1.transfer(msg.value - value84);
         wallet2.transfer(msg.value - val79);
         wallet3.transfer(msg.value - val79);
         wallet4.transfer(msg.value - val79);
         wallet5.transfer(msg.value - val79);
-        
+
     }
-    
+
     function pause() external onlyOwner whenNotPaused {
         salePaused = true;
     }
-    
+
     function unpause() external onlyOwner whenPaused {
         salePaused = false;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 // ----------------------------------------------------------------------------
 // 'Ixellion' CROWDSALE token contract
 //
-// Deployed to : 
+// Deployed to :
 // Symbol      : IXL
 // Name        : Ixellion
 // Total supply: 1000000000
@@ -235,4 +235,8 @@ contract Ixellion is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

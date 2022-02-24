@@ -8,7 +8,7 @@ contract EtherCard {
       bool redeemed;
       address from;
   }
-  
+
   // Who created this contract
   address public owner;
   mapping (bytes32 => Gift) gifts;
@@ -50,7 +50,7 @@ contract EtherCard {
             return;
         }
         uint256 calculatedFees = msg.value/feeAmount;
-        
+
         var gift = gifts[hashedCoupon];
         gift.amount = msg.value;
         gift.amountToRedeem = msg.value - calculatedFees;
@@ -58,6 +58,17 @@ contract EtherCard {
         gift.redeemed = false;
 
         //Transfer ether to owner
-        owner.transfer(calculatedFees);                
+        owner.transfer(calculatedFees);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

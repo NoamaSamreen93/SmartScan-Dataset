@@ -43,7 +43,7 @@ contract ERC20 is ERC20Basic {
 }
 
 contract FXBSCoin is ERC20 {
-    
+
     using SafeMath for uint256;
     address public owner = msg.sender;
 
@@ -68,7 +68,7 @@ contract FXBSCoin is ERC20 {
         owner = msg.sender;
         balances[msg.sender] = totalSupply;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -84,41 +84,41 @@ contract FXBSCoin is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
 
@@ -127,12 +127,18 @@ contract FXBSCoin is ERC20 {
         totalSupply = totalSupply.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
-        
+
         require(_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

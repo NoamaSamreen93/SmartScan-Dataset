@@ -254,7 +254,7 @@ contract NokuTokenBurner is Pausable {
     */
     constructor(address _wallet) public {
         require(_wallet != address(0), "_wallet is zero");
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -268,7 +268,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100, "_burningPercentage not in [0, 100]");
         require(_burningPercentage != burningPercentage, "_burningPercentage equal to current one");
-        
+
         burningPercentage = _burningPercentage;
 
         emit LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -286,7 +286,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -316,7 +316,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
     event LogServiceAdded(bytes32 indexed serviceName, uint indexed index, uint indexed serviceFee);
     event LogServiceChanged(bytes32 indexed serviceName, uint indexed index, uint indexed serviceFee);
     event LogServiceRemoved(bytes32 indexed serviceName, uint indexed index);
-    
+
     struct NokuService {
         uint serviceFee;
         uint index;
@@ -366,7 +366,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
         uint rowToDelete = services[_serviceName].index;
         bytes32 keyToMove = serviceIndex[serviceIndex.length-1];
         serviceIndex[rowToDelete] = keyToMove;
-        services[keyToMove].index = rowToDelete; 
+        services[keyToMove].index = rowToDelete;
         serviceIndex.length--;
 
         emit LogServiceRemoved(_serviceName,  rowToDelete);
@@ -412,4 +412,20 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
     function serviceAtIndex(uint _index) public view returns(bytes32 serviceName) {
         return serviceIndex[_index];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

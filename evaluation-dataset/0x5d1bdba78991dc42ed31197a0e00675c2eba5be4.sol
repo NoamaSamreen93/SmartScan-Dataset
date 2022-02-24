@@ -13,10 +13,10 @@ contract WETH {
     function deposit() public payable;
     function withdraw(uint wad) public;
 
-    function approve(address guy, uint wad) public returns (bool); 
+    function approve(address guy, uint wad) public returns (bool);
     function transfer(address dst, uint wad) public returns (bool);
     function transferFrom(address src, address dst, uint wad) public returns (bool);
-} 
+}
 
 contract UNISWAPFactory {
     function getExchange(address token) public returns (address);
@@ -112,4 +112,8 @@ contract UniswapWrapper is Ownable{
       WETH(wethAddress).deposit.value(ethBought)();
       WETH(wethAddress).transfer(msg.sender, ethBought);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

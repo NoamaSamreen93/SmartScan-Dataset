@@ -17,5 +17,13 @@ contract DataPost{
   	function postData(string data, string hash_algorithm,string signature,string signature_spec){
   		emit dataPosted(msg.sender,data,hash_algorithm,signature,signature_spec);
   	}
-   
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

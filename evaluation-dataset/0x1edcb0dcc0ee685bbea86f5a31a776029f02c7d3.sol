@@ -32,7 +32,7 @@ contract Token {
     bytes32 public symbol;
     uint256 public totalSupply;
     uint8 public decimals;
-    bool public allowTransactions; 
+    bool public allowTransactions;
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -47,12 +47,23 @@ contract TokenDistribute is OwnerHelper
     constructor() public
     {
     }
-    
+
     function multipleTokenDistribute(address _token, address[] _addresses, uint[] _values) public onlyOwner
     {
         for(uint i = 0; i < _addresses.length ; i++)
         {
-            Token(_token).transfer(_addresses[i], _values[i] * E18);  
+            Token(_token).transfer(_addresses[i], _values[i] * E18);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

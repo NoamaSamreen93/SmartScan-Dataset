@@ -1,4 +1,4 @@
-// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network 
+// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network
 // Temporarily have SafeMath here until all contracts have been migrated to SafeMathLib version from OpenZeppelin
 
 pragma solidity ^0.4.8;
@@ -603,7 +603,7 @@ contract CrowdsaleExt is Haltable {
     if (isWhiteListed) {
       uint num = 0;
       for (var i = 0; i < joinedCrowdsalesLen; i++) {
-        if (this == joinedCrowdsales[i]) 
+        if (this == joinedCrowdsales[i])
           num = i;
       }
 
@@ -858,7 +858,7 @@ contract CrowdsaleExt is Haltable {
 
     uint num = 0;
     for (var i = 0; i < joinedCrowdsalesLen; i++) {
-      if (this == joinedCrowdsales[i]) 
+      if (this == joinedCrowdsales[i])
         num = i;
     }
 
@@ -1259,4 +1259,17 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     maximumSellableTokens = tokens;
     MaximumSellableTokensChanged(maximumSellableTokens);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

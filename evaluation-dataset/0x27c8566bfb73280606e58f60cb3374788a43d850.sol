@@ -26,7 +26,7 @@ contract AuthenticationManager {
     /* Fired whenever an account-reader contract is removed. */
     event AccountReaderRemoved(address removedBy, address account);
 
-    /* When this contract is first setup we use the creator as the first admin */    
+    /* When this contract is first setup we use the creator as the first admin */
     function AuthenticationManager() {
         /* Set the first admin to be the person creating the contract */
         adminAddresses[msg.sender] = true;
@@ -76,7 +76,7 @@ contract AuthenticationManager {
         // Fail if this account is already admin
         if (adminAddresses[_address])
             throw;
-        
+
         // Add the user
         adminAddresses[_address] = true;
         AdminAdded(msg.sender, _address);
@@ -112,7 +112,7 @@ contract AuthenticationManager {
         // Fail if this account is already in the list
         if (accountReaderAddresses[_address])
             throw;
-        
+
         // Add the user
         accountReaderAddresses[_address] = true;
         AccountReaderAdded(msg.sender, _address);
@@ -159,7 +159,7 @@ contract TransparencyRelayer {
 
     /* An array defining all the fund values as supplied by SIFT over the time of the contract. */
     FundValueRepresentation[] public fundValues;
-    
+
     /* An array defining the history of account balances over time. */
     AccountBalanceRepresentation[] public accountBalances;
 
@@ -220,4 +220,15 @@ contract TransparencyRelayer {
         /* Audit this */
         AccountBalance(_accountType, _accountIssuer, _balance, _accountReference, _validationUrl, _timestamp, now);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

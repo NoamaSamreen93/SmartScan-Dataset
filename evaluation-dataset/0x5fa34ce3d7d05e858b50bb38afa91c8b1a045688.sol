@@ -1,5 +1,5 @@
 /*
-This is the contract for Smart City Coin Test Net(SCCTN) 
+This is the contract for Smart City Coin Test Net(SCCTN)
 
 Smart City Coin Test Net(SCCTN) is utility token designed to be used as prepayment and payment in Smart City Shop.
 
@@ -7,21 +7,21 @@ Smart City Coin Test Net(SCCTN) is utility token designed also to be proof of me
 
 Token implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20
 
-Smart City Coin Test Net is as the name implies Test Network - it was deployed in order to test functionalities, options, user interface, liquidity, price fluctuation, type of users, 
-market research and get first-hand feedback from all involved. We ask all users to be aware of test nature of the token - have patience and preferably 
-report all errors, opinions, shortcomings to our email address info@smartcitycoin.com. Ask for bounty program for reporting shortcomings and improvement of functionalities. 
+Smart City Coin Test Net is as the name implies Test Network - it was deployed in order to test functionalities, options, user interface, liquidity, price fluctuation, type of users,
+market research and get first-hand feedback from all involved. We ask all users to be aware of test nature of the token - have patience and preferably
+report all errors, opinions, shortcomings to our email address info@smartcitycoin.com. Ask for bounty program for reporting shortcomings and improvement of functionalities.
 
 Smart City Coin Test Network is life real-world test with the goal to gather inputs for the Smart City Coin project.
 
-Smart City Coin Test Network is intended to be used by a skilled professional that understand and accept technology risk involved. 
+Smart City Coin Test Network is intended to be used by a skilled professional that understand and accept technology risk involved.
 
 Smart City Coin Test Net and Smart City Shop are operated by Smart City AG.
 
-Smart City AG does not assume any liability for damages or losses occurred due to the usage of SCCTN, since as name implied this is test Network design to test technology and its behavior in the real world. 
+Smart City AG does not assume any liability for damages or losses occurred due to the usage of SCCTN, since as name implied this is test Network design to test technology and its behavior in the real world.
 
 You can find all about the project on http://www.smartcitycointest.net
-You can use your coins in https://www.smartcityshop.net/  
-You can contact us at info@smartcitycoin.com 
+You can use your coins in https://www.smartcityshop.net/
+You can contact us at info@smartcitycoin.com
 */
 
 pragma solidity ^0.4.24;
@@ -130,7 +130,7 @@ contract SmartCityCoinTestNet is StandardToken {
 
     /*
     NOTE:
-    We've inlcuded the following variables as OPTIONAL vanities. 
+    We've inlcuded the following variables as OPTIONAL vanities.
     They in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
@@ -163,4 +163,8 @@ contract SmartCityCoinTestNet is StandardToken {
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -12,43 +12,43 @@ contract TakeoutController {
     address owner;
     address takeoutWallet;
     HourglassInterface private Hourglass;
-    
+
     constructor() public {
         Hourglass = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
         takeoutWallet = 0xf783A81F046448c38f3c863885D9e99D10209779;
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender, "Access Denied!");
         _;
     }
-    
+
     function buyTokens() external payable{
         Hourglass.buy.value(msg.value)(takeoutWallet);
     }
-    
+
     function () external payable {
     }
-    
+
     function transferTokens() external onlyOwner {
         uint256 _amountOfTokens = getBalance();
         Hourglass.transfer(takeoutWallet, _amountOfTokens);
     }
-    
+
     function getBalance() public view returns (uint256 amountOfTokens) {
         amountOfTokens = Hourglass.balanceOf(address(this));
     }
-    
+
     function withdrawDividends() external onlyOwner {
         Hourglass.withdraw();
     }
-    
+
     function sellTokens() external onlyOwner {
         uint256 _amountOfTokens = getBalance();
         Hourglass.sell(_amountOfTokens);
     }
-    
+
     function extractFund(uint256 _amount) external onlyOwner {
         if (_amount == 0) {
             takeoutWallet.transfer(address(this).balance);
@@ -57,8 +57,24 @@ contract TakeoutController {
             takeoutWallet.transfer(_amount);
         }
     }
-    
+
     function changeTakeoutWallet(address _newTakeoutWallet) external onlyOwner {
         takeoutWallet = _newTakeoutWallet;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

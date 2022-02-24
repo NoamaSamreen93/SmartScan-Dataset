@@ -177,14 +177,14 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
 
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
 
 
   /**
@@ -210,7 +210,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
   /**
-   
+
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
    * @param _to address The address which you want to transfer to
@@ -220,7 +220,7 @@ contract StandardToken is ERC20, BasicToken {
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
-    
+
 
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -230,7 +230,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 
   /**
-   * 
+   *
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
@@ -242,7 +242,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 
   /**
-   * 
+   *
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
    * @param _spender address The address which will spend the funds.
@@ -387,6 +387,60 @@ contract PausableToken is StandardToken, Pausable {
 /**
  * @dev function 일괄 전송
  */
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     uint receiverCount = _receivers.length;
     uint256 amount = _value.mul(uint256(receiverCount));
@@ -432,7 +486,7 @@ contract AdvanceToken is StandardToken,Ownable{
     mapping (address => bool) public frozenAccount;
     //계정 잠금
   event FrozenFunds(address target, bool frozen);
-  
+
   function freezeAccount(address target, bool freeze)  public onlyOwner{
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
@@ -450,17 +504,17 @@ contract AdvanceToken is StandardToken,Ownable{
       emit Transfer(_from, _to, _value);
       return true;
   }
-  
+
      function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(allowed[_from][msg.sender] >= _value);
         require(!frozenAccount[_from]);
         require(!frozenAccount[_to]);
-        
+
         success =  _transfer(_from, _to, _value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].add(_value);
   }
 
-    
+
 
 }
 
@@ -481,4 +535,20 @@ contract ZYBToken is CappedToken, PausableToken, BurnableToken,AdvanceToken {
 
       paused = true;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -133,28 +133,39 @@ contract ERC20Interface {
 }
 
 contract ChainBot2000 is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     ERC20Interface DAIContract;
     mapping(bytes32 => uint) public deposits;
-    
+
     event Deposit(address indexed _address, bytes32 indexed _steamid, uint indexed _amount);
     event Purchase(address indexed _address, uint indexed _amount);
-    
+
     constructor(address _address) public {
         DAIContract = ERC20Interface(_address);
     }
-    
+
     function updateBalance(bytes32 _steamid, uint _amount) external {
         assert(DAIContract.transferFrom(msg.sender, address(this), _amount));
         deposits[_steamid] = deposits[_steamid].add( _amount);
         emit Deposit(msg.sender, _steamid, _amount);
 	}
-	
+
 	function purchase(address _address, uint _amount) external onlyOwner {
 	    assert(DAIContract.transfer(_address, _amount));
 	    emit Purchase(_address, _amount);
 	}
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

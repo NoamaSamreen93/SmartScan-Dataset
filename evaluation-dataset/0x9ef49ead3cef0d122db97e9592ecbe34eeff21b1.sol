@@ -50,7 +50,7 @@ contract GexCryptoPresale is owned {
     uint256 public totalInvestors;
 
     function GexCryptoPresale() {
-        presaleStart = 1508011200; 
+        presaleStart = 1508011200;
         saleEnd = 1512972000;
         presaleBonus = 30;
         buyingPrice = 350877190000000;
@@ -94,4 +94,13 @@ contract GexCryptoPresale is owned {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

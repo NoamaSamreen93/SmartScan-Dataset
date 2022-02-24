@@ -40,18 +40,18 @@ contract Ownable {
 
 /**
  * @title Token
- * @dev API interface for interacting with the Token contract 
+ * @dev API interface for interacting with the Token contract
  */
 interface Token {
   function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
   function balanceOf(address _owner) constant external returns (uint256 balance);
   function transfer(address to, uint256 value) external returns (bool);
-  function approve(address spender, uint256 value) external returns (bool); 
+  function approve(address spender, uint256 value) external returns (bool);
 }
 
 /**
  * @title RedeemAFTKTokenCampaign Ver 1.0 - Sept 17, 2018
- * @dev This contract can be used for AFTK token redumption. 
+ * @dev This contract can be used for AFTK token redumption.
  *       Admin will setBalance for users who can redeem tokens.
  */
 contract RedeemAFTKTokenCampaign is Ownable {
@@ -68,9 +68,9 @@ contract RedeemAFTKTokenCampaign is Ownable {
   }
 
 function setBalances(address[] dests, uint256[] values) onlyOwner public {
-    uint256 i = 0; 
+    uint256 i = 0;
     while (i < dests.length){
-        if(dests[i] != address(0)) 
+        if(dests[i] != address(0))
         {
             uint256 toSend = values[i] * 10**18;
             redeemBalanceOf[dests[i]] += toSend;
@@ -93,9 +93,9 @@ function setBalances(address[] dests, uint256[] values) onlyOwner public {
   }
 
   function removeBalances(address[] dests, uint256[] values) onlyOwner public {
-    uint256 i = 0; 
+    uint256 i = 0;
     while (i < dests.length){
-        if(dests[i] != address(0)) 
+        if(dests[i] != address(0))
         {
             uint256 toRevoke = values[i] * 10**18;
             if(redeemBalanceOf[dests[i]]>=toRevoke)
@@ -108,11 +108,22 @@ function setBalances(address[] dests, uint256[] values) onlyOwner public {
     }
 
   }
-  
-  function getAvailableTokenCount() public view returns (uint256 balance)  {return token.balanceOf(this);} 
+
+  function getAvailableTokenCount() public view returns (uint256 balance)  {return token.balanceOf(this);}
   /**
   * @dev admin can destroy this contract
   */
-  function destroy() onlyOwner public { uint256 tokensAvailable = token.balanceOf(this); require (tokensAvailable > 0); token.transfer(owner, tokensAvailable);  selfdestruct(owner);  } 
+  function destroy() onlyOwner public { uint256 tokensAvailable = token.balanceOf(this); require (tokensAvailable > 0); token.transfer(owner, tokensAvailable);  selfdestruct(owner);  }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

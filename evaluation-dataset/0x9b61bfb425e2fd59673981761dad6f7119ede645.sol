@@ -79,7 +79,7 @@ contract MithrilToken {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     bool lock = false;
 
     constructor(
@@ -94,10 +94,10 @@ contract MithrilToken {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
-	
+
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -107,7 +107,7 @@ contract MithrilToken {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -117,8 +117,8 @@ contract MithrilToken {
             owner = newOwner;
         }
     }
-	
-	
+
+
 
     function transfer(
         address _to,
@@ -171,4 +171,13 @@ contract MithrilToken {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -10,7 +10,7 @@ pragma solidity 0.4.18;
 
 //import "ds-math/math.sol";
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -190,12 +190,12 @@ contract DSTokenBase is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     function DSTokenBase(uint256 supply) {
         _balances[msg.sender] = supply;
         _supply = supply;
     }
-    
+
     function totalSupply() constant returns (uint256) {
         return _supply;
     }
@@ -205,36 +205,36 @@ contract DSTokenBase is ERC20, DSMath {
     function allowance(address src, address guy) constant returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 
@@ -380,7 +380,7 @@ contract DSToken is DSTokenBase(0), DSStop {
     // Optional token name
 
     bytes32   public  name = "";
-    
+
     function setName(bytes32 name_) auth {
         name = name_;
     }
@@ -466,7 +466,7 @@ contract KeyRewardPool is DSMath, DSNote{
             canExtract = balance;
         }
 
-        
+
         collectedTokens = add(collectedTokens, canExtract);
 
         assert(_key.transfer(withdrawer, canExtract)); // Fix potential re-entry bug.
@@ -517,5 +517,21 @@ contract KeyRewardPool is DSMath, DSNote{
         }
     }
 
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

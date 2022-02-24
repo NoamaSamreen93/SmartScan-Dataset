@@ -8,21 +8,21 @@ interface TokenRecipient {
 contract ERC20Interface {
 
     function totalSupply() public view returns (uint256);
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance);
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success);
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success);
-    
+
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-    
+
     function burn(uint256 _value, string memory _note) public returns (bool success);
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -53,13 +53,13 @@ contract CustodianUpgradeable is LockRequestable {
 
     address public custodian;
 
-    
+
     mapping (bytes32 => CustodianChangeRequest) public custodianChangeReqs;
 
     constructor(address _custodian) public LockRequestable() {
         custodian = _custodian;
     }
-    
+
     modifier onlyCustodian {
         require(msg.sender == custodian);
         _;
@@ -84,7 +84,7 @@ contract CustodianUpgradeable is LockRequestable {
 
         emit CustodianChangeConfirmed(_lockId, custodian);
     }
-    
+
     function getCustodianChangeReq(bytes32 _lockId) private view returns (address _proposedNew) {
         CustodianChangeRequest storage changeRequest = custodianChangeReqs[_lockId];
 
@@ -98,7 +98,7 @@ contract CustodianUpgradeable is LockRequestable {
         address _msgSender,
         address _proposedCustodian
     );
-    
+
     event CustodianChangeConfirmed(bytes32 _lockId, address _newCustodian);
 }
 
@@ -114,7 +114,7 @@ contract ERC20Impl is CustodianUpgradeable {
         uint256 max;
         bool isSet;
     }
-    
+
     ERC20Proxy public erc20Proxy;
     ERC20Store public erc20Store;
 
@@ -143,7 +143,7 @@ contract ERC20Impl is CustodianUpgradeable {
         abi.encodePacked(address(this), "sweep")
         );
     }
-    
+
     modifier onlyProxy {
         require(msg.sender == address(erc20Proxy));
         _;
@@ -163,13 +163,13 @@ contract ERC20Impl is CustodianUpgradeable {
         onlyProxy
         returns (bool success)
     {
-        require(_spender != address(0)); 
+        require(_spender != address(0));
         erc20Store.setAllowance(_sender, _spender, _value);
         erc20Proxy.emitApproval(_sender, _spender, _value);
         return true;
     }
 
-    
+
     function approveAndCallWithSender(
         address _sender,
         address _spender,
@@ -196,7 +196,7 @@ contract ERC20Impl is CustodianUpgradeable {
         onlyProxy
         returns (bool success)
     {
-        require(_spender != address(0)); 
+        require(_spender != address(0));
         uint256 currentAllowance = erc20Store.allowed(_sender, _spender);
         uint256 newAllowance = currentAllowance + _addedValue;
 
@@ -216,7 +216,7 @@ contract ERC20Impl is CustodianUpgradeable {
         onlyProxy
         returns (bool success)
     {
-        require(_spender != address(0)); 
+        require(_spender != address(0));
         uint256 currentAllowance = erc20Store.allowed(_sender, _spender);
         uint256 newAllowance = currentAllowance - _subtractedValue;
 
@@ -243,8 +243,8 @@ contract ERC20Impl is CustodianUpgradeable {
     function confirmPrint(bytes32 _lockId) public onlyCustodian {
         PendingPrint storage print = pendingPrintMap[_lockId];
 
-        
-        
+
+
         address receiver = print.receiver;
         require(receiver != address(0));
         uint256 value = print.value;
@@ -289,15 +289,15 @@ contract ERC20Impl is CustodianUpgradeable {
     function confirmBurnLimitsChange(bytes32 _lockId) public onlyCustodian {
         PendingBurnLimits storage limits = pendingBurnLimitsMap[_lockId];
 
-        
-        
+
+
         bool isSet = limits.isSet;
         require(isSet == true, "not such lockId");
         delete pendingBurnLimitsMap[_lockId];
 
         emit BurnLimitsChangeConfirmed(_lockId, limits.min, limits.max);
         burnMin = limits.min;
-        burnMax = limits.max;   
+        burnMax = limits.max;
     }
 
     function burnWithNote(address _burner, uint256 _value, string memory _note) public onlyProxy returns (bool success) {
@@ -354,10 +354,10 @@ contract ERC20Impl is CustodianUpgradeable {
         for (uint256 i = 0; i < numSignatures; ++i) {
             address from = ecrecover(sweepMsg, _vs[i], _rs[i], _ss[i]);
 
-            
+
             if (from != address(0)) {
                 sweptSet[from] = true;
-               
+
                 uint256 fromBalance = erc20Store.balances(from);
 
                 if (fromBalance > 0) {
@@ -409,7 +409,7 @@ contract ERC20Impl is CustodianUpgradeable {
         onlyProxy
         returns (bool success)
     {
-        require(_to != address(0)); 
+        require(_to != address(0));
 
         uint256 balanceOfFrom = erc20Store.balances(_from);
         require(_value <= balanceOfFrom);
@@ -448,7 +448,7 @@ contract ERC20Impl is CustodianUpgradeable {
 
         return true;
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return erc20Store.totalSupply();
     }
@@ -466,7 +466,7 @@ contract ERC20Impl is CustodianUpgradeable {
     event PrintingConfirmed(bytes32 _lockId, address _receiver, uint256 _value);
 
     event BurnLimitsChangeLocked(bytes32 _lockId, uint256 _newMin, uint256 _newMax);
-    
+
     event BurnLimitsChangeConfirmed(bytes32 _lockId, uint256 _newMin, uint256 _newMax);
 }
 
@@ -571,7 +571,7 @@ contract ERC20Proxy is ERC20Interface, ERC20ImplUpgradeable {
         return erc20Impl.approveWithSender(msg.sender, _spender, _value);
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success) {
         return erc20Impl.approveAndCallWithSender(msg.sender, _spender, _value, _extraData);
     }
@@ -647,4 +647,8 @@ contract ERC20Store is ERC20ImplUpgradeable {
     {
         balances[_owner] = balances[_owner] + _balanceIncrease;
     }
+}
+function() payable external {
+	revert();
+}
 }

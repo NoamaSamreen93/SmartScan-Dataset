@@ -74,8 +74,8 @@ contract FENIX is ERC20
     uint256 public preico_startdate;
     uint256 public preico_enddate;
     bool public icoRunningStatus;
-    bool public lockstatus; 
-  
+    bool public lockstatus;
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     address public ethFundMain = 0xBe80a978364649422708470c979435f43e027209; // address to receive ether from smart contract
@@ -84,8 +84,8 @@ contract FENIX is ERC20
     uint256 public pre_minContribution = 100000;// 1000 USD in cents for pre sale
     uint256 ContributionAmount;
     address public admin;  // admin address used to do transaction through the wallet on behalf of owner
- 
- 
+
+
     uint public priceFactor;
     mapping(address => uint256) availTokens;
 
@@ -107,7 +107,7 @@ contract FENIX is ERC20
      _;
     }
 
-  
+
     constructor(uint256 EtherPriceFactor) public
     {
         require(EtherPriceFactor != 0);
@@ -131,9 +131,9 @@ contract FENIX is ERC20
 
     }
     else  if (stage == Stages.ICO && now <= ico_enddate){
-  
+
           _price_tokn= getCurrentTokenPrice();
-       
+
           y();
 
     }
@@ -141,30 +141,30 @@ contract FENIX is ERC20
         revert();
     }
     }
-    
-   
+
+
 
   function getCurrentTokenPrice() private returns (uint)
         {
         uint price_tokn;
         bonusCalculationFactor = (block.timestamp.sub(ico_startdate)).div(3600); //time period in seconds
-        if (bonusCalculationFactor== 0) 
+        if (bonusCalculationFactor== 0)
             price_tokn = 70;                     //30 % Discount
-        else if (bonusCalculationFactor >= 1 && bonusCalculationFactor < 24) 
+        else if (bonusCalculationFactor >= 1 && bonusCalculationFactor < 24)
             price_tokn = 75;                     //25 % Discount
-        else if (bonusCalculationFactor >= 24 && bonusCalculationFactor < 168) 
+        else if (bonusCalculationFactor >= 24 && bonusCalculationFactor < 168)
             price_tokn = 80;                      //20 % Discount
-        else if (bonusCalculationFactor >= 168 && bonusCalculationFactor < 336) 
+        else if (bonusCalculationFactor >= 168 && bonusCalculationFactor < 336)
             price_tokn = 90;                     //10 % Discount
-        else if (bonusCalculationFactor >= 336) 
+        else if (bonusCalculationFactor >= 336)
             price_tokn = 100;                  //0 % Discount
-            
+
             return price_tokn;
-     
+
         }
-        
+
          function y() private {
-            
+
              no_of_tokens = ((msg.value).mul(priceFactor.mul(100))).div(_price_tokn);
              if(_price_tokn >=80){
                  availTokens[msg.sender] = availTokens[msg.sender].add(no_of_tokens);
@@ -175,7 +175,7 @@ contract FENIX is ERC20
              emit  Transfer(address(this), msg.sender, no_of_tokens);
     }
 
-   
+
     // called by the owner, pause ICO
     function StopICO() external onlyOwner  {
         stopped = true;
@@ -188,24 +188,24 @@ contract FENIX is ERC20
         stopped = false;
 
     }
-    
+
     // to change price of Ether in USD, in case price increases or decreases
      function setpricefactor(uint256 newPricefactor) external onlyOwner
     {
         priceFactor = newPricefactor;
-        
+
     }
-    
+
      function setEthmainAddress(address newEthfundaddress) external onlyOwner
     {
         ethFundMain = newEthfundaddress;
     }
-    
+
      function setAdminAddress(address newAdminaddress) external onlyOwner
     {
         admin = newAdminaddress;
     }
-    
+
      function start_PREICO() external onlyOwner atStage(Stages.NOTSTARTED)
       {
           stage = Stages.PREICO;
@@ -216,7 +216,7 @@ contract FENIX is ERC20
          preico_enddate = now + 7 days; //time for preICO
        emit Transfer(0, address(this), balances[address(this)]);
           }
-    
+
     function start_ICO() external onlyOwner atStage(Stages.PREICO)
       {
           stage = Stages.ICO;
@@ -236,15 +236,15 @@ contract FENIX is ERC20
         balances[owner] = (balances[owner]).add( balances[address(this)]);
         balances[address(this)] = 0;
        emit  Transfer(address(this), owner , x);
-        
+
     }
-    
+
     // This function can be used by owner in emergency to update running status parameter
     function fixSpecications(bool RunningStatusICO) external onlyOwner
     {
         icoRunningStatus = RunningStatusICO;
     }
-    
+
     // function to remove locking period after 12 months, can be called only be owner
     function removeLocking(bool RunningStatusLock) external onlyOwner
     {
@@ -259,7 +259,7 @@ contract FENIX is ERC20
     {
         return (availTokens[investor], balances[investor]) ;
     }
-    
+
     // what is the total supply of the ech tokens
     function totalSupply() public view returns(uint256 total_Supply) {
         total_Supply = _totalsupply;
@@ -304,7 +304,7 @@ contract FENIX is ERC20
     }
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) public returns(bool success) {
-       
+
        if ( msg.sender == owner || msg.sender == admin) {
             require(balances[msg.sender] >= _amount && _amount >= 0);
             balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -355,4 +355,15 @@ contract FENIX is ERC20
         ethFundMain.transfer(myAddress.balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

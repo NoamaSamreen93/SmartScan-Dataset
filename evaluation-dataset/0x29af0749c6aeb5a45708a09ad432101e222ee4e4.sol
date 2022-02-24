@@ -185,7 +185,7 @@ contract SMILE {
     function tokenFallback(address _from, uint256 _value, bytes _data) public {}
 
     /**
-     * 
+     *
      *      Partial ERC-223 Transfer to Address implementation.
      *      The bytes parameter is intentioanlly dropped as it
      *      is not utilized.
@@ -247,4 +247,15 @@ contract SMILE {
      */
 
     function() public {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

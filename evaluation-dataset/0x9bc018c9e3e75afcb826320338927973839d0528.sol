@@ -115,12 +115,12 @@ contract DopamemePresale is Claimable {
 
     uint256 public tokensGenerated;
     uint256 public investorsLength;
-    
+
     address vault;
     mapping(address => uint256) public investorBalances;
     mapping(address => uint256) public investorToken;
     mapping(address => bool) whitelist;
-    
+
     modifier notPaused() {
         require(!paused);
         _;
@@ -146,7 +146,7 @@ contract DopamemePresale is Claimable {
     function toFound() public constant returns(uint256) {
         return maxCap >= totalInvestedInWei ? maxCap - totalInvestedInWei : 0;
     }
-    
+
     /// @return Total to invest in weis.
     function tokensleft() public constant returns(uint256) {
         return DMT_TotalSuply > tokensGenerated ? DMT_TotalSuply - tokensGenerated : 0;
@@ -168,7 +168,7 @@ contract DopamemePresale is Claimable {
     function pauseContribution(bool _paused) onlyOwner {
         paused = _paused;
     }
-    
+
     function initialize(address _vault) public onlyOwner {
         require(!isInitialized);
         require(_vault != 0x0);
@@ -203,7 +203,7 @@ contract DopamemePresale is Claimable {
     function getTime() internal view returns(uint256) {
         return now;
     }
-    
+
     function isValidPurchase(uint256 _amount) internal view returns(bool) {
         bool nonZero = _amount > 0;
         bool hasMinimumAmount = investorBalances[msg.sender].add(_amount) >= minimum_investment;
@@ -238,4 +238,13 @@ contract DopamemePresale is Claimable {
     event NewSale(address indexed investor, uint256 _tokens);
     event Initialized(uint256 _block, uint _now);
     event Finalized(uint256 _block, uint _now);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

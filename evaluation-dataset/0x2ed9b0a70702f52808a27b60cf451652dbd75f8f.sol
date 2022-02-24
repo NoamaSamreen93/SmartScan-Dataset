@@ -37,9 +37,9 @@ contract ERC20 {
 
 
 /*
-The SilentNotary Smart-Contract is specifically developed and designed to provide users 
-the opportunity to fix any fact of evidence in a variety of many digital forms, including 
-but not limited: photo, video, sound recording, chat, multi-user chat by uploading hash of 
+The SilentNotary Smart-Contract is specifically developed and designed to provide users
+the opportunity to fix any fact of evidence in a variety of many digital forms, including
+but not limited: photo, video, sound recording, chat, multi-user chat by uploading hash of
 the User’s data to the Ethereum blockchain.
 */
 /// @title SilentNotary contract - store SHA-384 file hash in blockchain
@@ -113,5 +113,16 @@ contract SilentNotary is Ownable {
 	/// @return Returns true if hash exist
 	function exist(bytes32 hash) internal constant returns (bool) {
 	    return entryStorage[hash].blockNumber != 0;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

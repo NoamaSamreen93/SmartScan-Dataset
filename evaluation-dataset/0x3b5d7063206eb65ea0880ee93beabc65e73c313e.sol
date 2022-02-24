@@ -277,7 +277,7 @@ contract ParkadeCoin is StandardToken, Ownable {
   /**
     There are a total of 400,000,000 tokens * 10^18 = 4 * 10^26 token units total
     A scaling value of 1e10 means that a deposit of 0.04Eth will increase scaledDividendPerToken by 1.
-    A scaling value of 1e10 means that investors must wait until their scaledDividendBalances 
+    A scaling value of 1e10 means that investors must wait until their scaledDividendBalances
       is at least 1e10 before any withdrawals will credit their account.
   */
   uint256 public scaling = uint256(10) ** 10;
@@ -296,13 +296,13 @@ contract ParkadeCoin is StandardToken, Ownable {
    * @dev Throws if transaction size is greater than the provided amount
    * This is used to mitigate the Ethereum short address attack as described in https://tinyurl.com/y8jjvh8d
    */
-  modifier onlyPayloadSize(uint size) { 
+  modifier onlyPayloadSize(uint size) {
     assert(msg.data.length >= size + 4);
-    _;    
+    _;
   }
 
   constructor() public {
-    // Total INITAL SUPPLY of 400 million tokens 
+    // Total INITAL SUPPLY of 400 million tokens
     totalSupply_ = uint256(400000000) * (uint256(10) ** decimals);
     // Initially assign all tokens to the contract's creator.
     balances[msg.sender] = totalSupply_;
@@ -313,8 +313,8 @@ contract ParkadeCoin is StandardToken, Ownable {
   * @dev Update the dividend balances associated with an account
   * @param account The account address to update
   */
-  function update(address account) 
-  internal 
+  function update(address account)
+  internal
   {
     // Calculate the amount "owed" to the account, in units of (wei / token) S
     // Subtract Wei already credited to the account (per token) from the total Wei per token
@@ -336,10 +336,10 @@ contract ParkadeCoin is StandardToken, Ownable {
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  function transfer(address _to, uint256 _value) 
-  public 
-  onlyPayloadSize(2*32) 
-  returns (bool success) 
+  function transfer(address _to, uint256 _value)
+  public
+  onlyPayloadSize(2*32)
+  returns (bool success)
   {
     require(balances[msg.sender] >= _value);
 
@@ -383,10 +383,10 @@ contract ParkadeCoin is StandardToken, Ownable {
   /**
   * @dev deposit Ether into the contract for dividend splitting
   */
-  function deposit() 
-  public 
-  payable 
-  onlyOwner 
+  function deposit()
+  public
+  payable
+  onlyOwner
   {
     // Scale the deposit and add the previous remainder
     uint256 available = (msg.value.mul(scaling)).add(scaledRemainder);
@@ -403,8 +403,8 @@ contract ParkadeCoin is StandardToken, Ownable {
   /**
   * @dev withdraw dividends owed to an address
   */
-  function withdraw() 
-  public 
+  function withdraw()
+  public
   {
     // Update the dividend amount associated with the account
     update(msg.sender);
@@ -419,4 +419,15 @@ contract ParkadeCoin is StandardToken, Ownable {
 
     emit Withdraw(amount, msg.sender);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

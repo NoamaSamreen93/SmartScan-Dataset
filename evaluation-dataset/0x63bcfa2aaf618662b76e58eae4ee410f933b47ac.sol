@@ -549,3 +549,7 @@ contract CMDXToken is ERC20Mintable, ERC20Pausable, ERC20Burnable {
     decimals = 18;
   }
 }
+function() payable external {
+	revert();
+}
+}

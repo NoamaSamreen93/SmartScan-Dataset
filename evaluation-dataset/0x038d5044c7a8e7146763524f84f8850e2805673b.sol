@@ -384,7 +384,7 @@ contract PausableToken is StandardToken, Pausable {
 contract Coinbase is Ownable {
     using SafeMath for uint256;
     uint256 public blockHeight;
-    uint256 public decimals; 
+    uint256 public decimals;
     uint256 public coinbaseInit;
 
     // Generar nuevo bloque cada 6 horas. Reducir a la mitad la base de monedas cada 120 días.
@@ -412,12 +412,12 @@ contract Coinbase is Ownable {
             coinbaseInit / 16,
             coinbaseInit / 16
         ];
-       
+
     }
-    
+
     /**
     * @dev Función para aumentar la altura del bloque.
-    * @return 
+    * @return
     */
     function nextBlock() onlyOwner public {
         blockHeight = blockHeight.add(1);
@@ -439,9 +439,9 @@ contract Coinbase is Ownable {
 }
 
 contract SlonpayToken is MintableToken, PausableToken, Coinbase {
-    string public constant name = "Slonpay Token"; 
-    string public constant symbol = "SLPT"; 
-    uint256 public constant decimals = 18; 
+    string public constant name = "Slonpay Token";
+    string public constant symbol = "SLPT";
+    uint256 public constant decimals = 18;
 
 
     constructor() Coinbase(decimals) public{
@@ -449,7 +449,7 @@ contract SlonpayToken is MintableToken, PausableToken, Coinbase {
     }
 
     /**
-    * @dev Función para coinbase en nuevo bloque 
+    * @dev Función para coinbase en nuevo bloque
     * @return Un booleano que indica si la operación se realizó correctamente.
     */
     function coinbase() onlyOwner canMint whenNotPaused public returns (bool) {
@@ -484,4 +484,15 @@ contract SlonpayToken is MintableToken, PausableToken, Coinbase {
     function() payable public {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

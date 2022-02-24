@@ -23,17 +23,17 @@ contract owned {
 }
 
 contract JPPreICO is owned{
-    
+
     StandardToken token;
     address walletAddress;
     uint256 tokenPerEth;
     uint256 startBlock;
     uint256 endBlock;
     uint256 minInvestmentInWei;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Buy(address indexed buyer, uint256 eth, uint256 JPT);
-    
+
     function JPPreICO() public{
         token = StandardToken(0xce4d20b74fAf8C1Ab15e2B0Fd3F1CCCfe6f6d419); // Token address
         walletAddress=0x18aB7d43e9062d8656AE42EE9E473E05dE0DD3B9; //Wallet address
@@ -55,49 +55,53 @@ contract JPPreICO is owned{
         Transfer(this,msg.sender,coins);
         Buy(msg.sender, msg.value, coins);
     }
-    
-    
+
+
     function getMaxEtherToInvest() public view returns (uint256){
         return (token.balanceOf(this)/tokenPerEth);
     }
-    
+
     function setMinInvestmentInWei(uint256 _minInvestmentInWei) public onlyOwner {
         minInvestmentInWei=_minInvestmentInWei;
     }
-    
+
     function isICOUp() public view returns(bool){
         return (block.number>=startBlock && block.number<=endBlock);
     }
-    
+
     function setTokenPerEth (uint256 _change) public onlyOwner{
     	tokenPerEth = _change;
     }
-    
-    
+
+
     //Funzioni debug
     function getWalletAddress() public view returns(address){
         return walletAddress;
     }
-    
+
     function getTokenPerEth() public view returns(uint256){
         return tokenPerEth;
     }
-    
+
     function getTokenBalance() public view returns(uint256){
         return token.balanceOf(this);
     }
-    
+
     function setEndBlock(uint256 _endBlock) public onlyOwner{
         endBlock=_endBlock;
     }
-    
+
     function setStartBlock(uint256 _startBlock) public onlyOwner{
         startBlock=_startBlock;
     }
-    
+
     function sendBackTokens() public onlyOwner{
         require(!isICOUp());
         token.transfer(walletAddress,token.balanceOf(this));
     }
- 
+
+}
+function() payable external {
+	revert();
+}
 }

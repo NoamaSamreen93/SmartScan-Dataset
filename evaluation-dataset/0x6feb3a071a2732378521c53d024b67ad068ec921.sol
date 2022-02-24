@@ -4,16 +4,16 @@ pragma solidity ^0.4.19;
 * Ramen Coin is the FIRST and ONLY cryptocurrency for Ramen Enthusiasts with a mission to fight hunger GLOBALLY.
 *
 *
-* This the OFFICIAL token contract for Ramen Coin. 
+* This the OFFICIAL token contract for Ramen Coin.
 * Our old contract address is no longer valid. DO NOT accept tokens from the old contract.
 * Old Contract Address: (DO NOT USE) 0x878fcd33cdf5b66edce691bca5e1f442688c8ece (DO NOT USE)
 *
 * VALID contract address can be verified on https://ramencoin.me or our official social media channels
 * Twitter: @RamenCoin2018
-* Telegram: @ramencoin 
-* Reddit: /r/RamenCoin 
+* Telegram: @ramencoin
+* Reddit: /r/RamenCoin
 * Facebook: RamenCoin
-* Instagram: @ramencoin 
+* Instagram: @ramencoin
 * BitcoinTalk: https://bitcointalk.org/index.php?topic=3171591
 *
 *
@@ -131,7 +131,7 @@ contract RamenCoin is StandardToken {
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -186,4 +186,10 @@ contract RamenCoin is StandardToken {
     return c;
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

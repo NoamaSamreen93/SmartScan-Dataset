@@ -17,7 +17,7 @@ For more info about DevCash, visit https://dev.cash
 pragma solidity ^0.4.8;
 
 contract EIP20Interface {
-  
+
     /// total amount of tokens
     uint256 public totalSupply;
 
@@ -110,4 +110,15 @@ contract DevCash is EIP20Interface {
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

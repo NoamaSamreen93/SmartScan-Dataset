@@ -229,7 +229,7 @@ contract HighCastleToken is BurnableToken, HasNoEther {
 
     uint256 constant FREEZE_END = 1520553600;
 	// 1520553600 - Fri, 09 Mar 2018 00:00:00 GMT
-	
+
     /**
     * @dev Constructor that gives msg.sender all of existing tokens.
     */
@@ -271,4 +271,13 @@ contract HighCastleToken is BurnableToken, HasNoEther {
             transfer(_to[i], _value[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

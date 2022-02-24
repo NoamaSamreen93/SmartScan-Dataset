@@ -11,8 +11,8 @@ MIT PGP KEY ID: 078E41CB
 
  contract token {
 
- 	function transfer(address _to, uint256 _value) returns (bool); 
- 
+ 	function transfer(address _to, uint256 _value) returns (bool);
+
  }
 
 
@@ -51,11 +51,11 @@ contract admined {
 }
 
 contract Sender is admined {
-    
+
     token public DEEM;
-    
+
 	function Sender (token _addressOfToken) public {
-		DEEM = _addressOfToken; 
+		DEEM = _addressOfToken;
 	}
 
     function batch(address[] _data, uint256 _amount) onlyAdmin public { //It takes an array of addresses and an amount
@@ -67,4 +67,15 @@ contract Sender is admined {
     function() public {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

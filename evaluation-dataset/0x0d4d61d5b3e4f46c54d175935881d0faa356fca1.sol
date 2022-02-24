@@ -31,8 +31,8 @@ contract RobocallsTokenSale  is Owned {
     address public main_addr;
     address public tokenOwner;
     Robocalls r;
-    
-    
+
+
     constructor() public {
         bonusEnds = now + 8 weeks;
         endDate = now + 8 weeks;
@@ -41,18 +41,18 @@ contract RobocallsTokenSale  is Owned {
         tokenOwner = 0x6ec4dd24d36d94e96cc33f1ea84ad3e44008c628;
         r = Robocalls(main_addr);
     }
-    
-    
+
+
     function setEndDate(uint _newEndDate ) public {
         require(msg.sender==owner);
         endDate =  _newEndDate;
-    } 
-    
+    }
+
     function setBonusEndDate(uint _newBonusEndDate ) public {
         require(msg.sender==owner);
         bonusEnds =  _newBonusEndDate;
-    } 
-    
+    }
+
     // ------------------------------------------------------------------------
     // CrowdSale Function 10,000,000 RCALLS Tokens per 1 ETH
     // ------------------------------------------------------------------------
@@ -68,4 +68,15 @@ contract RobocallsTokenSale  is Owned {
         owner.transfer(msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

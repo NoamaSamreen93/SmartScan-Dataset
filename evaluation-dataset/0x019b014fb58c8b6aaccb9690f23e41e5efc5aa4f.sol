@@ -1,17 +1,17 @@
 pragma solidity 0.4.23;
 
 /*=============================================
-* Proof of JohnMcAfee (25%)     
-* https://JohnMcAfee.surge.sh/   will be complete by EOD 4/30       
-* Temp UI: https://powc.io and paste contract address 
+* Proof of JohnMcAfee (25%)
+* https://JohnMcAfee.surge.sh/   will be complete by EOD 4/30
+* Temp UI: https://powc.io and paste contract address
 =====================================================*/
 /*
-*   _________     ______              ______  ___     _______________          
-*  ______  /________  /________      ___   |/  /________    |__  __/_________ 
+*   _________     ______              ______  ___     _______________
+*  ______  /________  /________      ___   |/  /________    |__  __/_________
 *  ___ _  /_  __ \_  __ \_  __ \     __  /|_/ /_  ___/_  /| |_  /_ _  _ \  _ \
 *  / /_/ / / /_/ /  / / /  / / /     _  /  / / / /__ _  ___ |  __/ /  __/  __/
-*  \____/  \____//_/ /_//_/ /_/      /_/  /_/  \___/ /_/  |_/_/    \___/\___/ 
-*                                                                             
+*  \____/  \____//_/ /_//_/ /_/      /_/  /_/  \___/ /_/  |_/_/    \___/\___/
+*
 * -> Features!
 * All the features from all the great Po schemes, with dividend fee 25%:
 * [x] Highly Secure: Hundreds of thousands of investers of the original PoWH3D, holding tens of thousands of ethers.
@@ -57,7 +57,7 @@ contract POJM {
     uint constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint constant internal magnitude = 2**64;
     address owner = msg.sender;
-    
+
     // proof of stake (defaults at 50 tokens)
     uint public stakingRequirement = 50e18;
 
@@ -65,7 +65,7 @@ contract POJM {
    /*===============================
     =            STORAGE           =
     ==============================*/
-    
+
     // amount of shares for each address (scaled number)
     mapping(address => uint) internal tokenBalanceLedger_;
     mapping(address => uint) internal referralBalance_;
@@ -77,7 +77,7 @@ contract POJM {
     /*==============================
     =            EVENTS            =
     ==============================*/
-    
+
     event onTokenPurchase(
         address indexed customerAddress,
         uint incomingEthereum,
@@ -412,7 +412,7 @@ contract POJM {
 
         return _amountOfTokens;
     }
-    
+
     /**
      * Calculate Token price based on an amount of incoming ethereum
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -541,4 +541,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

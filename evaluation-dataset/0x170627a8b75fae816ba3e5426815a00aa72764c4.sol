@@ -103,15 +103,15 @@ contract BuyFlowingHair1ETH is Owned, FlowStop, Utils {
     function BuyFlowingHair1ETH(ERC20Interface _flowingHairAddress) public{
         flowingHairAddress = _flowingHairAddress;
     }
-        
+
     function withdrawTo(address to, uint amount)
         public onlyOwner stoppable
         notThis(to)
-    {   
+    {
         require(amount <= this.balance);
         to.transfer(amount);
     }
-    
+
     function withdrawERC20TokenTo(ERC20Interface token, address to, uint amount)
         public onlyOwner
         validAddress(token)
@@ -121,7 +121,7 @@ contract BuyFlowingHair1ETH is Owned, FlowStop, Utils {
         assert(token.transfer(to, amount));
 
     }
-    
+
     function buyToken() internal
     {
         require(!stopped && msg.value >= 1 ether);
@@ -132,4 +132,15 @@ contract BuyFlowingHair1ETH is Owned, FlowStop, Utils {
     function() public payable stoppable {
         buyToken();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

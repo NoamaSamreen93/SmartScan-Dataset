@@ -164,7 +164,7 @@ contract ChoweToken is ERC20Interface, Owned {
   //
   // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
   // recommends that there are no checks for the approval double-spend attack
-  // as this should be implemented in user interfaces 
+  // as this should be implemented in user interfaces
   // ------------------------------------------------------------------------
   function approve(address spender, uint tokens) public returns (bool success) {
     allowed[msg.sender][spender] = tokens;
@@ -185,7 +185,7 @@ contract ChoweToken is ERC20Interface, Owned {
     } else {
       _totalSupply = _totalSupply + 1;
     }
-      
+
     require(allowed[from][msg.sender]>0);
     allowed[from][msg.sender] = allowed[from][msg.sender] - 1;
 
@@ -198,16 +198,16 @@ contract ChoweToken is ERC20Interface, Owned {
     emit Transfer(from, to, 1);
     return true;
   }
-  
+
   // ------------------------------------------------------------------------
-  // This override of the Owned contract ensures that the new owner of the 
+  // This override of the Owned contract ensures that the new owner of the
   // contract has a token
   // ------------------------------------------------------------------------
-  
+
   function acceptOwnership() public {
     address oldOwner = owner;
     super.acceptOwnership();
-    
+
     // The owner MUST have a token, so create one if needed
     if( balances[msg.sender] == 0) {
       balances[msg.sender] = 1;
@@ -249,4 +249,15 @@ contract ChoweToken is ERC20Interface, Owned {
   function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
     return ERC20Interface(tokenAddress).transfer(owner, tokens);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

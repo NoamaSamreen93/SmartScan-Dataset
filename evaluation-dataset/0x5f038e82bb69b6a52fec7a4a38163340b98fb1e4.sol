@@ -151,3 +151,7 @@ contract BTP {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

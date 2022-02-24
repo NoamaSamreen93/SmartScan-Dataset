@@ -84,7 +84,7 @@ contract TokenERC20 {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * Destroy tokens
      *
@@ -127,4 +127,15 @@ contract MasterNet is owned, TokenERC20 {
     function burnToken(uint256 _value) onlyOwner public returns (bool success) {
         return burn(_value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

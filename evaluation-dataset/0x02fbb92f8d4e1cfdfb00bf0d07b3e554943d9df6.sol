@@ -179,7 +179,7 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 contract MinesteriaCoin is StandardBurnableToken {
 
   string public constant name = "Minesteria coin";
-  string public constant symbol = "MINE"; 
+  string public constant symbol = "MINE";
   uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 1000000000000 * (10 ** uint256(decimals));
@@ -189,4 +189,15 @@ contract MinesteriaCoin is StandardBurnableToken {
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

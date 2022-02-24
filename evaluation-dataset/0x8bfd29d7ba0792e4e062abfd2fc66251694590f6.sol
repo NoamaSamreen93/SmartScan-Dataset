@@ -617,9 +617,9 @@ contract ERC223ReceivingContract is Ownable {
 
 
   function tokenFallback(address _from, uint _value, address _to) {
-      
+
   }
-  
+
   using SafeMath for uint256;
 
   // The token being sold
@@ -700,7 +700,7 @@ contract ERC223ReceivingContract is Ownable {
   function rate() public view returns (uint256) {
     return _rate;
   }
-  
+
   function setRate(uint256 setRate) public onlyOwner returns(uint256)
   {
       _rate = setRate;
@@ -839,4 +839,15 @@ contract ERC223ReceivingContract is Ownable {
     _wallet.transfer(msg.value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -70,7 +70,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -79,7 +79,7 @@ contract Owned {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract LotanCoin is ERC20Interface, Owned {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -89,10 +89,10 @@ contract LotanCoin is ERC20Interface, Owned {
 
     mapping(address => uint) public balances;
     mapping(address => mapping(address => uint)) public allowed;
-    
+
     event Burn(address indexed burner, uint256 value);
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -104,16 +104,16 @@ contract LotanCoin is ERC20Interface, Owned {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Reject when someone sends ethers to this contract
     // ------------------------------------------------------------------------
     function() public payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -139,7 +139,7 @@ contract LotanCoin is ERC20Interface, Owned {
         require(to != address(0));
         require(tokens > 0);
         require(balances[msg.sender] >= tokens);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -153,12 +153,12 @@ contract LotanCoin is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(spender != address(0));
         require(tokens > 0);
-        
+
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -167,7 +167,7 @@ contract LotanCoin is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -179,7 +179,7 @@ contract LotanCoin is ERC20Interface, Owned {
         require(tokens > 0);
         require(balances[from] >= tokens);
         require(allowed[from][msg.sender] >= tokens);
-        
+
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -195,8 +195,8 @@ contract LotanCoin is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -208,13 +208,13 @@ contract LotanCoin is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -227,7 +227,7 @@ contract LotanCoin is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -237,8 +237,8 @@ contract LotanCoin is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Function to burn tokens
     // _value The amount of tokens to burn.
@@ -247,11 +247,17 @@ contract LotanCoin is ERC20Interface, Owned {
     function burn(uint256 _value) onlyOwner public {
       require(_value > 0);
       require(_value <= balances[msg.sender]);
-      
+
       balances[owner] = balances[owner].sub(_value);
       _totalSupply = _totalSupply.sub(_value);
       emit Burn(owner, _value);
       emit Transfer(owner, address(0), _value);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

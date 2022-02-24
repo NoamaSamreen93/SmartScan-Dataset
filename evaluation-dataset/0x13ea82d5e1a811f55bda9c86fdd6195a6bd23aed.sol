@@ -36,7 +36,7 @@ contract TravellingFreeToken {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-	
+
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -59,4 +59,15 @@ contract TravellingFreeToken {
         Transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

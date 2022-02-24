@@ -356,7 +356,7 @@ contract DungeonRunCore is Pausable, Destructible {
         // Dungeon run is ended if either hero is defeated (health exhausted),
         // or hero failed to damage a monster before it flee.
         bool _dungeonRunEnded = monster.level > 0 && (
-            _heroHealth == 0 || 
+            _heroHealth == 0 ||
             now > _monsterCreationTime + monsterFleeTime * 2 ||
             (monster.health == monster.initialHealth && now > monster.creationTime + monsterFleeTime)
         );
@@ -448,7 +448,7 @@ contract DungeonRunCore is Pausable, Destructible {
         } else {
             // If the hero health is 0, the dungeon run has ended.
             require(heroCurrentHealth > 0);
-    
+
             // If a hero failed to damage a monster before it flee, the dungeon run ends,
             // regardless of the remaining hero health.
             dungeonRunEnded = now > monster.creationTime + monsterFleeTime * 2 ||
@@ -457,7 +457,7 @@ contract DungeonRunCore is Pausable, Destructible {
             if (dungeonRunEnded) {
                 // Add the non-refunded fee to jackpot.
                 uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
                 if (addToJackpot > 0) {
                     jackpot += addToJackpot;
                     entranceFeePool -= addToJackpot;
@@ -467,7 +467,7 @@ contract DungeonRunCore is Pausable, Destructible {
                 // Sanity check.
                 assert(addToJackpot <= entranceFee);
             }
-            
+
             // Future attack do not require any fee, so refund all ether sent with the transaction.
             msg.sender.transfer(msg.value);
         }
@@ -477,22 +477,22 @@ contract DungeonRunCore is Pausable, Destructible {
             _attack(_heroId, genes, heroStrength, heroCurrentHealth);
         }
     }
-    
+
     /**
      * @dev Reset a dungeon run for a given hero.
      */
     function revive(uint _heroId) whenNotPaused external payable {
         // Throws if not enough fee, and any exceeding fee will be transferred back to the player.
         require(msg.value >= reviveFee);
-        
+
         // The revive fee will do directly to jackpot.
         jackpot += reviveFee;
-        
+
         // Reset the dungeon run.
         delete heroIdToHealth[_heroId];
         delete heroIdToMonster[_heroId];
         delete heroIdToRefundedFee[_heroId];
-    
+
         // Refund exceeding fee.
         if (msg.value > reviveFee) {
             msg.sender.transfer(msg.value - reviveFee);
@@ -529,7 +529,7 @@ contract DungeonRunCore is Pausable, Destructible {
         // Get the hero power.
         uint heroPower;
         (heroPower,,,,) = edCoreContract.getHeroPower(_genes, dungeonDifficulty);
-        
+
         uint damageByMonster;
         uint damageByHero;
 
@@ -591,7 +591,7 @@ contract DungeonRunCore is Pausable, Destructible {
 
             // Add the non-refunded fee to jackpot.
             uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
             if (addToJackpot > 0) {
                 jackpot += addToJackpot;
                 entranceFeePool -= addToJackpot;
@@ -635,7 +635,7 @@ contract DungeonRunCore is Pausable, Destructible {
     /*==============================
     =           MODIFIERS          =
     ==============================*/
-    
+
     /// @dev Throws if the caller address is a contract.
     modifier onlyHumanAddress() {
         address addr = msg.sender;
@@ -645,4 +645,15 @@ contract DungeonRunCore is Pausable, Destructible {
         _;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -32,7 +32,7 @@ interface ManagedToken{
     function totalSupply() constant public returns (uint256 supply);
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
-  
+
 contract HardcodedCrowdsale {
     using SafeMath for uint256;
 
@@ -51,9 +51,9 @@ contract HardcodedCrowdsale {
     bool public halted = false;
 
     uint256 public totalSupply = 0;
-    
+
     uint256 public minTokensToBuy = 1000;
-    
+
     uint256 public preICOcontributors = 0;
     uint256 public ICOcontributors = 0;
 
@@ -64,7 +64,7 @@ contract HardcodedCrowdsale {
     uint256 public preICOcap = 0 ether;
     uint256 public preICOtokensSold = 0;
     ICOStateEnum public preICOstate = ICOStateEnum.NotStarted;
-    
+
     uint8 public decimals = 18;
     uint256 public DECIMAL_MULTIPLIER = 10**uint256(decimals);
 
@@ -104,7 +104,7 @@ contract HardcodedCrowdsale {
                     preICOstate = ICOStateEnum.Refunded;
                 }
             }
-        } 
+        }
     }
 
     modifier stateTransition() {
@@ -133,7 +133,7 @@ contract HardcodedCrowdsale {
     }
 
     function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
@@ -248,7 +248,7 @@ contract HardcodedCrowdsale {
         return true;
     }
 
-    function refundPreICO() stateTransition requirePreICOState(ICOStateEnum.Refunded) notHalted 
+    function refundPreICO() stateTransition requirePreICOState(ICOStateEnum.Refunded) notHalted
         public returns (bool success) {
             uint256 value = weiForRefundPreICO[msg.sender];
             delete weiForRefundPreICO[msg.sender];
@@ -263,4 +263,15 @@ contract HardcodedCrowdsale {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

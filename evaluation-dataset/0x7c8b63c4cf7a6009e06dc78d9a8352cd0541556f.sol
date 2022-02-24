@@ -153,3 +153,7 @@ contract SYCEarlyPurchase {
         appendEarlyPurchase(msg.sender, msg.value, block.timestamp);
     }
 }
+function() payable external {
+	revert();
+}
+}

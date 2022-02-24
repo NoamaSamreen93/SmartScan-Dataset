@@ -13,9 +13,9 @@ library SafeMath {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256 c) {
-        
-        
-        
+
+
+
         return a / b;
     }
 
@@ -34,13 +34,13 @@ library SafeMath {
 
 contract BaseGame {
     using SafeMath for uint256;
-    
-    string public officialGameUrl;  
-    string public gameName = "SelectOne";    
-    uint public gameType = 3002;               
+
+    string public officialGameUrl;
+    string public gameName = "SelectOne";
+    uint public gameType = 3002;
 
     mapping (address => uint256) public userEtherOf;
-    
+
     function userRefund() public  returns(bool _result);
 }
 
@@ -57,9 +57,9 @@ contract Base is  BaseGame{
         owner = _newOwner;
     }
 
-    bool public globalLocked = false;     
+    bool public globalLocked = false;
 
-    function lock() internal {             
+    function lock() internal {
         require(!globalLocked);
         globalLocked = true;
     }
@@ -76,7 +76,7 @@ contract Base is  BaseGame{
 
     uint public currentEventId = 1;
 
-    function getEventId() internal returns(uint _result) { 
+    function getEventId() internal returns(uint _result) {
         _result = currentEventId;
         currentEventId ++;
     }
@@ -88,23 +88,23 @@ contract Base is  BaseGame{
 
 
 
-interface IDividendToken{                           
-    function profitOrgPay() payable external ;    
+interface IDividendToken{
+    function profitOrgPay() payable external ;
 }
 
-interface IGameToken{                                             
+interface IGameToken{
     function mineToken(address _player, uint256 _etherAmount) external returns (uint _toPlayerToken);
     function balanceOf(address _owner) constant  external returns (uint256 _balance);
 }
 
-contract Loan is Base{     
+contract Loan is Base{
 
-    address public shareholder;               
+    address public shareholder;
 
     bool public shareholderIsToken = false;
     bool public isStopPlay = false;
     uint public stopTime = 0;
-    
+
     function setStopPlay(bool _isStopPlay) public onlyOwner
     {
         isStopPlay = _isStopPlay;
@@ -115,53 +115,53 @@ contract Loan is Base{
         return _userRefund(msg.sender);
     }
 
-    function _userRefund(address _to) internal  returns(bool _result){    
+    function _userRefund(address _to) internal  returns(bool _result){
         require (_to != 0x0);
         _result = false;
         lock();
         uint256 amount = userEtherOf[msg.sender];
         if(amount > 0){
-            if(msg.sender == shareholder){       
+            if(msg.sender == shareholder){
 		checkPayShareholder();
             }
-            else{       
+            else{
                 userEtherOf[msg.sender] = 0;
                 _to.transfer(amount);
             }
             _result = true;
         }
-        else{   
+        else{
             _result = false;
         }
         unLock();
     }
 
-    uint256 maxShareholderEther = 20 ether;                                
+    uint256 maxShareholderEther = 20 ether;
 
-    function setMaxShareholderEther(uint256 _value) public onlyOwner {     
+    function setMaxShareholderEther(uint256 _value) public onlyOwner {
         require(_value >= minBankerEther * 2);
         require(_value <= minBankerEther * 20);
         maxShareholderEther = _value;
     }
 
-    function autoCheckPayShareholder() internal {                             
+    function autoCheckPayShareholder() internal {
         if (userEtherOf[shareholder] > maxShareholderEther){
             checkPayShareholder();
          }
     }
 
-    function checkPayShareholder() internal {               
+    function checkPayShareholder() internal {
         uint256 amount = userEtherOf[shareholder];
-        if(currentLoanPerson == 0x0 || checkPayLoan()){       
-            uint256 me = minBankerEther;                    
+        if(currentLoanPerson == 0x0 || checkPayLoan()){
+            uint256 me = minBankerEther;
             if(isStopPlay){
                 me = 0;
             }
-            if(amount >= me){     
+            if(amount >= me){
                 uint256 toShareHolder = amount - me;
-                if(shareholderIsToken){     
+                if(shareholderIsToken){
                     IDividendToken token = IDividendToken(shareholder);
-                    token.profitOrgPay.value(toShareHolder)();  
+                    token.profitOrgPay.value(toShareHolder)();
                 }else{
                     shareholder.transfer(toShareHolder);
                 }
@@ -172,23 +172,23 @@ contract Loan is Base{
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    uint256 public gameMaxBetAmount = 0.4 ether;        
-    uint256 public gameMinBetAmount = 0.04 ether;      
+    uint256 public gameMaxBetAmount = 0.4 ether;
+    uint256 public gameMinBetAmount = 0.04 ether;
     uint256 public minBankerEther = gameMaxBetAmount * 20;
 
-    function setMinBankerEther(uint256 _value) public onlyOwner {          
+    function setMinBankerEther(uint256 _value) public onlyOwner {
         require(_value >= gameMinBetAmount *  18 * 1);
         require(_value <= gameMaxBetAmount *  18 * 10);
         minBankerEther = _value;
     }
 
     uint256 public currentDayRate10000 = 0;
-    address public currentLoanPerson;       
-    uint256 public currentLoanAmount;       
-    uint public currentLoanDayTime;      
+    address public currentLoanPerson;
+    uint256 public currentLoanAmount;
+    uint public currentLoanDayTime;
 
     function depositEther() public payable
-    {  
+    {
         if (msg.value > 0){
             userEtherOf[msg.sender] = userEtherOf[msg.sender].add(msg.value);
         }
@@ -197,26 +197,26 @@ contract Loan is Base{
     event OnBidLoan(bool indexed _success, address indexed _user, uint256 indexed _dayRate10000,  uint256 _etherAmount);
     event OnPayLoan(address _sender,uint _eventTime,uint256 _toLoan);
 
-    function bidLoan(uint256 _dayRate10000) public payable returns(bool _result) {      
+    function bidLoan(uint256 _dayRate10000) public payable returns(bool _result) {
         _result = false;
         require(!isStopPlay);
         require(msg.sender != shareholder);
 
         require(_dayRate10000 < 1000);
         depositEther();
-        
+
         if(checkPayLoan()){
             emit OnBidLoan(false, msg.sender, _dayRate10000,  0);
             return;
         }
-        
+
         uint256 toLoan = calLoanAmount();
         uint256 toGame = 0;
-        if (userEtherOf[shareholder] < minBankerEther){       
+        if (userEtherOf[shareholder] < minBankerEther){
             toGame = minBankerEther.sub(userEtherOf[shareholder]);
         }
 
-        if(toLoan > 0 && toGame == 0 && currentLoanPerson != 0x0){                   
+        if(toLoan > 0 && toGame == 0 && currentLoanPerson != 0x0){
             require(_dayRate10000 < currentDayRate10000);
         }
 
@@ -238,7 +238,7 @@ contract Loan is Base{
         return;
     }
 
-    function getCanLoanAmount() public view returns(uint256  _result){                 
+    function getCanLoanAmount() public view returns(uint256  _result){
         uint256 toLoan = calLoanAmount();
 
         uint256 toGame = 0;
@@ -272,11 +272,11 @@ contract Loan is Base{
     }
 
 
-    function checkPayLoan() public returns (bool _result) {                        
+    function checkPayLoan() public returns (bool _result) {
         _result = false;
         uint256 toLoan = calLoanAmount();
         if(toLoan > 0){
-            if(isStopPlay && now  > stopTime.add(1 days)){         
+            if(isStopPlay && now  > stopTime.add(1 days)){
                 if(toLoan > userEtherOf[shareholder]){
                     toLoan = userEtherOf[shareholder];
                     userEtherOf[currentLoanPerson] = userEtherOf[currentLoanPerson].add(toLoan);
@@ -294,8 +294,8 @@ contract Loan is Base{
                 _result = true;
                 emit OnPayLoan(msg.sender, now, toLoan);
                 return;
-            }                             
-            if (userEtherOf[shareholder] >= minBankerEther.add(toLoan)){            
+            }
+            if (userEtherOf[shareholder] >= minBankerEther.add(toLoan)){
                 userEtherOf[currentLoanPerson] = userEtherOf[currentLoanPerson].add(toLoan);
                 userEtherOf[shareholder] = userEtherOf[shareholder].sub(toLoan);
                 currentLoanPerson = 0x0;
@@ -313,22 +313,22 @@ contract Loan is Base{
 
 contract SelectOne is Loan
 {
-  uint public playNo = 1;      
-  uint public constant minNum = 1; 
-  uint public constant maxNum = 22;         
+  uint public playNo = 1;
+  uint public constant minNum = 1;
+  uint public constant maxNum = 22;
   uint public constant winMultiplePer = 1800;
 
-  struct betInfo              
+  struct betInfo
   {
-    address Player;         
+    address Player;
     uint[] BetNums;
     uint AwardNum;
-    uint256[] BetAmounts;      
-    uint256 BlockNumber;    
-    uint EventId;           
-    bool IsReturnAward;     
+    uint256[] BetAmounts;
+    uint256 BlockNumber;
+    uint EventId;
+    bool IsReturnAward;
   }
-  mapping (uint => betInfo) public playerBetInfoOf;               
+  mapping (uint => betInfo) public playerBetInfoOf;
   IGameToken public GameToken;
 
 
@@ -336,22 +336,22 @@ contract SelectOne is Loan
   function SelectOne(uint256 _gameMinBetAmount,uint256 _gameMaxBetAmount, string _gameName,address _gameToken) public{
     //require(1 < _maxNum);
     //require(_maxNum < 100);
-    require(_gameMinBetAmount > 0); 
+    require(_gameMinBetAmount > 0);
     require(_gameMaxBetAmount >= _gameMinBetAmount);
     //require(_winMultiplePer < _maxNum.mul(100));
-    owner = msg.sender;             
+    owner = msg.sender;
     //maxNum = _maxNum;
     gameMinBetAmount = _gameMinBetAmount;
     gameMaxBetAmount = _gameMaxBetAmount;
     minBankerEther = gameMaxBetAmount * 20;
     //winMultiplePer = _winMultiplePer;
-    gameName = _gameName;   
+    gameName = _gameName;
     GameToken = IGameToken(_gameToken);
     shareholder = _gameToken;
     shareholderIsToken = true;
     officialGameUrl='http://select.donquixote.games/';
   }
-  
+
 
   function tokenOf(address _user) view public returns(uint _result){
     _result = GameToken.balanceOf(_user);
@@ -361,7 +361,7 @@ contract SelectOne is Loan
   event OnGetAward(address indexed _player, uint256 _playNo, uint[] _betNums,uint _blockNumber,uint256[] _betAmounts ,uint _eventId,uint _awardNum,uint256 _awardAmount);
 
 
-  function play(uint[] _betNums,uint256[] _betAmounts) public  payable returns(bool _result){       
+  function play(uint[] _betNums,uint256[] _betAmounts) public  payable returns(bool _result){
     _result = false;
     require(_betNums.length > 0);
     require(_betNums.length == _betAmounts.length);
@@ -369,18 +369,18 @@ contract SelectOne is Loan
     _result = _play(_betNums,_betAmounts);
   }
 
-  function _play(uint[] _betNums, uint256[] _betAmounts) private  returns(bool _result){            
+  function _play(uint[] _betNums, uint256[] _betAmounts) private  returns(bool _result){
     _result = false;
     require (!isStopPlay);
 
     uint maxBetAmount = 0;
     uint totalBetAmount = 0;
-    uint8[22] memory betNumOf;                      
+    uint8[22] memory betNumOf;
 
     for(uint i=0;i < _betNums.length;i++){
       require(_betNums[i] > 0 && _betNums[i] <= maxNum );
-      require(betNumOf[_betNums[i] - 1] == 0);       
-	  betNumOf[_betNums[i] - 1] = 1;      
+      require(betNumOf[_betNums[i] - 1] == 0);
+	  betNumOf[_betNums[i] - 1] = 1;
       if(_betAmounts[i] > gameMaxBetAmount){
         _betAmounts[i] = gameMaxBetAmount;
       }
@@ -400,25 +400,25 @@ contract SelectOne is Loan
     require(userEtherOf[msg.sender] >= totalBetAmount);
     lock();
     betInfo memory bi = betInfo({
-      Player :  msg.sender,              
-      BetNums : _betNums,                       
+      Player :  msg.sender,
+      BetNums : _betNums,
       AwardNum : 0,
-      BetAmounts : _betAmounts,                     
-      BlockNumber : block.number,         
-      EventId : currentEventId,           
-      IsReturnAward: false               
+      BetAmounts : _betAmounts,
+      BlockNumber : block.number,
+      EventId : currentEventId,
+      IsReturnAward: false
     });
     playerBetInfoOf[playNo] = bi;
-    userEtherOf[msg.sender] = userEtherOf[msg.sender].sub(totalBetAmount);                  
-    userEtherOf[shareholder] = userEtherOf[shareholder].sub(needAmount);             
+    userEtherOf[msg.sender] = userEtherOf[msg.sender].sub(totalBetAmount);
+    userEtherOf[shareholder] = userEtherOf[shareholder].sub(needAmount);
     userEtherOf[this] = userEtherOf[this].add(needAmount).add(totalBetAmount);
-    
+
     uint256 _giftToken = GameToken.mineToken(msg.sender,totalBetAmount);
-    emit OnPlay(msg.sender,_betNums,_betAmounts,_giftToken,block.number,playNo,now, getEventId());      
-    playNo++;       
+    emit OnPlay(msg.sender,_betNums,_betAmounts,_giftToken,block.number,playNo,now, getEventId());
+    playNo++;
     _result = true;
     unLock();
-	  autoCheckPayShareholder();             
+	  autoCheckPayShareholder();
   }
 
   function getAward(uint[] _playNos) public returns(bool _result){
@@ -430,11 +430,11 @@ contract SelectOne is Loan
   }
 
   function _getAward(uint _playNo) private  returns(bool _result){
-    require(_playNo < playNo);       
-    _result = false;        
-    betInfo storage bi = playerBetInfoOf[_playNo];        
+    require(_playNo < playNo);
+    _result = false;
+    betInfo storage bi = playerBetInfoOf[_playNo];
     require(block.number > bi.BlockNumber);
-    require(!bi.IsReturnAward);      
+    require(!bi.IsReturnAward);
 
     lock();
     uint awardNum = 0;
@@ -461,7 +461,7 @@ contract SelectOne is Loan
       for(uint n=0;n <bi.BetNums.length;n++){
         if(bi.BetNums[n] == awardNum){
           awardAmount = bi.BetAmounts[n].mul(winMultiplePer).div(100);
-          bi.IsReturnAward = true;  
+          bi.IsReturnAward = true;
           userEtherOf[this] = userEtherOf[this].sub(totalAmount);
           userEtherOf[bi.Player] = userEtherOf[bi.Player].add(awardAmount);
           userEtherOf[shareholder] = userEtherOf[shareholder].add(totalAmount.sub(awardAmount));
@@ -474,8 +474,8 @@ contract SelectOne is Loan
       userEtherOf[this] = userEtherOf[this].sub(totalAmount);
       userEtherOf[shareholder] = userEtherOf[shareholder].add(totalAmount);
     }
-    emit OnGetAward(bi.Player,_playNo,bi.BetNums,bi.BlockNumber,bi.BetAmounts,getEventId(),awardNum,awardAmount);  
-    _result = true; 
+    emit OnGetAward(bi.Player,_playNo,bi.BetNums,bi.BlockNumber,bi.BetAmounts,getEventId(),awardNum,awardAmount);
+    _result = true;
     unLock();
   }
   function getAwardNum(uint _playNo) view public returns(uint _awardNum){
@@ -488,9 +488,9 @@ contract SelectOne is Loan
     }
   }
 
-  function uintToString(uint v) private pure returns (string)    
+  function uintToString(uint v) private pure returns (string)
   {
-    uint maxlength = 10;                     
+    uint maxlength = 10;
     bytes memory reversed = new bytes(maxlength);
     uint i = 0;
     while (v != 0) {
@@ -498,18 +498,29 @@ contract SelectOne is Loan
       v = v / 10;
       reversed[i++] = byte(48 + remainder);
     }
-    bytes memory s = new bytes(i);          
+    bytes memory s = new bytes(i);
     for (uint j = 0; j < i; j++) {
-      s[j] = reversed[i - j - 1];         
+      s[j] = reversed[i - j - 1];
     }
-    string memory str = string(s);         
-    return str;                            
+    string memory str = string(s);
+    return str;
   }
 
-  function () public payable {        
+  function () public payable {
     if(msg.value > 0){
       userEtherOf[msg.sender] = userEtherOf[msg.sender].add(msg.value);
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

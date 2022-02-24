@@ -475,7 +475,7 @@ contract ERC721SlimToken is Ownable, ERC721, ERC165, ERC721Metadata {
     public
   {
     address tokenOwner = ownerOf(_tokenId);
-    require(isSenderApprovedFor(_tokenId) || 
+    require(isSenderApprovedFor(_tokenId) ||
       (approvedContractAddresses[msg.sender] && tokenOwner == tx.origin), "not an approved sender");
     require(tokenOwner == _from, "wrong owner");
     _clearApprovalAndTransfer(ownerOf(_tokenId), _to, _tokenId);
@@ -831,7 +831,7 @@ contract CryptoBoss is ContractAccessControl {
     cfoAddress = msg.sender;
     withdrawalAddress = msg.sender;
   }
-  
+
   function setGasRefundForClaimLoot(uint256 _gasRefundForClaimLoot) external onlyCEO {
       gasRefundForClaimLoot = _gasRefundForClaimLoot;
   }
@@ -857,7 +857,7 @@ contract CryptoBoss is ContractAccessControl {
   }
 
   function leaderboardEntries(uint day) public view returns
-    (uint etherPot, bool dailyLootClaimed, uint blockDeadline, address[] memory entryAddresses, uint[] memory entryDamages) {    
+    (uint etherPot, bool dailyLootClaimed, uint blockDeadline, address[] memory entryAddresses, uint[] memory entryDamages) {
 
     dailyLootClaimed = dailyLootClaimedPerDay[day];
     blockDeadline = (((day+1) * blocksInADay) / encounterBlockDuration) * encounterBlockDuration;
@@ -945,7 +945,7 @@ contract CryptoBoss is ContractAccessControl {
     uint winnerIndex = numParticipants;
 
     // binary search for a value winnerIndex where
-    // winnerDamageValue < cumulativeDamage[winnerIndex] and 
+    // winnerDamageValue < cumulativeDamage[winnerIndex] and
     // winnerDamageValue >= cumulativeDamage[winnerIndex-1]
 
     uint min = 0;
@@ -970,19 +970,19 @@ contract CryptoBoss is ContractAccessControl {
   }
 
   function getBlockToHashForResults(uint encounterId) public view returns (uint) {
-      
+
     uint blockToHash = (encounterId+1)*encounterBlockDuration - 1;
-    
+
     require(block.number > blockToHash);
-    
+
     uint diff = block.number - (blockToHash+1);
     if (diff > 255) {
         blockToHash += (diff/256)*256;
     }
-    
+
     return blockToHash;
   }
-  
+
   function getEncounterResults(uint encounterId, address player) public view returns (
     address winnerAddress, uint lootTokenId, uint consolationPrizeTokenId,
     bool lootClaimed, uint damageDealt, uint totalDamageDealt) {
@@ -1007,12 +1007,12 @@ contract CryptoBoss is ContractAccessControl {
 
     if (consolationPrizeTokenId != 0) {
         lootClaimed = encounter.participantData[player].consolationPrizeClaimed;
-        
+
         // This way has problems:
     //   lootClaimed = tokenContract.exists(consolationPrizeTokenId);
     }
   }
-  
+
     function getLootClaimed(uint encounterId, address player) external view returns (bool, bool) {
         ParticipantData memory participantData = encountersById[encounterId].participantData[player];
         return (
@@ -1032,16 +1032,16 @@ contract CryptoBoss is ContractAccessControl {
 
   function getWeaponRarityFromTokenId(uint tokenId) pure internal returns (uint) {
     return tokenId & 0xff;
-  }  
+  }
 
   // damageType: 0=physical 1=magic 2=water 3=earth 4=fire
   function getWeaponDamageFromTokenId(uint tokenId, uint damageType) pure internal returns (uint) {
     return ((tokenId >> (64 + damageType*8)) & 0xff);
-  }  
+  }
 
   function getPureWeaponDamageFromTokenId(uint tokenId) pure internal returns (uint) {
     return ((tokenId >> (56)) & 0xff);
-  }  
+  }
 
   function getMonsterDefenseFromDna(uint monsterDna, uint damageType) pure internal returns (uint) {
     return ((monsterDna >> (64 + damageType*8)) & 0xff);
@@ -1173,7 +1173,7 @@ contract CryptoBoss is ContractAccessControl {
       tokenContract.transferFrom(msg.sender, 1, sacrificeTokenId4);
     }
 
-    encounter.participantData[msg.sender] = ParticipantData(uint32(damage), uint64(cumulativeDamage), 
+    encounter.participantData[msg.sender] = ParticipantData(uint32(damage), uint64(cumulativeDamage),
       forgeWeaponRarity(sacrificeTokenId1, sacrificeTokenId2, sacrificeTokenId3, sacrificeTokenId4),
       forgeWeaponPureDamage(sacrificeTokenId1, sacrificeTokenId2, sacrificeTokenId3, sacrificeTokenId4),
       false, false);
@@ -1209,7 +1209,7 @@ contract CryptoBoss is ContractAccessControl {
         // refund gas
         msg.sender.transfer(gasRefundForClaimLootWithConsolationPrize);
     } else {
-        
+
         // refund gas
         msg.sender.transfer(gasRefundForClaimLoot);
     }
@@ -1265,4 +1265,20 @@ contract CryptoBoss is ContractAccessControl {
   {
     return tokenContract.tokenOfOwnerByIndex(_owner, _index);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

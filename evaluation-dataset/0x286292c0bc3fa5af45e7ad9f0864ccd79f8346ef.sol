@@ -874,7 +874,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1029,17 +1029,17 @@ contract usingOraclize {
 // claes.cash
 // Contract address: claescash.eth
 // ----------------------------------------------------------------------------------------------
- 
+
 //
 //  ****************************************** Rule book *****************************************
 //  The round is 7 days long, the contract stops accepting bets 2 days prior the rounds end.
-//  The winners gets the the amount of new tweets and/or whats in the stake during the round. 
+//  The winners gets the the amount of new tweets and/or whats in the stake during the round.
 //
-//  §0 if there is no winner the amount of new tweets is added in the stake as Claes Cash.  
-//  §1 If there are many winners they share the amount, and if the amount is not shareable with 
-//     the winners the first one to gather the prize will receive all of it. 
-//      Example 3 tweets, 5 winners, will not be able split. The first to withdraw will get 3 CC. 
-//  §2 If the amount is not shareable even between the number of winners, the first one to gather 
+//  §0 if there is no winner the amount of new tweets is added in the stake as Claes Cash.
+//  §1 If there are many winners they share the amount, and if the amount is not shareable with
+//     the winners the first one to gather the prize will receive all of it.
+//      Example 3 tweets, 5 winners, will not be able split. The first to withdraw will get 3 CC.
+//  §2 If the amount is not shareable even between the number of winners, the first one to gather
 //     the prize will get the bonus until the amount is even shareable.
 //      Example 5 tweets 3 winners, two will get 1 CC each, the first  will get  3 CC (5%3 = 2)
 //  §3 If number of tweets have decreased during the round, 0 tweets is the correct answer
@@ -1053,36 +1053,36 @@ contract usingOraclize {
 contract ERC20Interface {
     // Get the total token supply
     function totalSupply() public constant returns (uint256 totalSupply);
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) public constant returns (uint256 balance);
-  
+
      // Send _value amount of tokens to address _to
      function transfer(address _to, uint256 _value) public returns (bool success);
-  
+
      // Send _value amount of tokens from address _from to address _to
      function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
-  
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      // this function is required for some DEX functionality
      function approve(address _spender, uint256 _value) public returns (bool success);
-  
+
      // Returns the amount which _spender is still allowed to withdraw from _owner
      function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
-  
+
      // Triggered when tokens are transferred.
      event Transfer(address indexed _from, address indexed _to, uint256 _value);
-  
+
      // Triggered whenever approve(address _spender, uint256 _value) is called.
      event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
 contract Claes is ERC20Interface, usingOraclize {
     string public constant symbol = "CC";
     string public constant name = "Claes Cash";
     uint8 public constant decimals = 0;
-    
+
     // Storage for price in WEI for each day
     uint256[] ICOprice = [1705809128630710,1792607003891050,2161527412018200,3100000000000000,4850815505189580,7420474777448070,10495413267662000,13600000000000000,16352510087266600,18584222474460800,20297203394353400,21574226804123700,22514888079125500,23206887467068100,23718512088594900,24100000000000000,24387375737585200,24606234413965100,24774758401095100,24905928237129500,25009083126444700,25091004900315500,25156667500184900,25209756097561000,25253028594880900,25288569247319300,25317968132920800,25342449317335500,25362963238901500,25380253925826900,25394908351183700];
 
@@ -1120,7 +1120,7 @@ contract Claes is ERC20Interface, usingOraclize {
 
     //Oraclize check, in case Oricalize would send the same callback twice
     mapping(bytes32=>bool) validIds;
-    
+
     // Oraclized tweets for past rounds, round/number_of_tweets
     mapping(uint256 => uint256) pastRoundsTweets;
 
@@ -1128,7 +1128,7 @@ contract Claes is ERC20Interface, usingOraclize {
     mapping(uint256 => mapping (address => Betted)) bets;
 
     // Kepp track of bets each round, round/bet/numbers
-    mapping(uint256 => mapping(uint256 => uint256)) differentBets; 
+    mapping(uint256 => mapping(uint256 => uint256)) differentBets;
 
     // Keep track of number of bets each tound, round/number_of_bets
     mapping(uint256 => uint256) numOfBets;
@@ -1182,16 +1182,16 @@ contract Claes is ERC20Interface, usingOraclize {
         require(msg.sender == owner);
         _;
     }
-    
+
     // The balance of a particular account?
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -1227,7 +1227,7 @@ contract Claes is ERC20Interface, usingOraclize {
             return false;
         }
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value. ERC-20 related
     function approve(address _spender, uint256 _amount) public returns (bool success) {
@@ -1249,7 +1249,7 @@ contract Claes is ERC20Interface, usingOraclize {
         uint256 totalTweets = uint256(parseInt(result));
         int256 diffTweets = int256(totalTweets - pastRoundsTweets[currentRoundCount-1]);
 
-        // If tweets have decreased 
+        // If tweets have decreased
         if(diffTweets <= 0){
             //If there are any winners, then reset stake
             if(differentBets[currentRoundCount][0] > 0){
@@ -1263,7 +1263,7 @@ contract Claes is ERC20Interface, usingOraclize {
         // If tweets have increased
         }else{
             //If there are any winners, then reset stake
-           if(differentBets[currentRoundCount][uint256(diffTweets)] > 0){ 
+           if(differentBets[currentRoundCount][uint256(diffTweets)] > 0){
                 roundStake[currentRoundCount+1] = 0;
 
                 //there is at least one winner then the total supply is raised
@@ -1288,7 +1288,7 @@ contract Claes is ERC20Interface, usingOraclize {
     function changeBetPrice(uint256 setBetPrice) public onlyOwner {
         betPrice = setBetPrice;
     }
-    
+
     //This function is only used if Twitter changes it's design
     function changeURL(string URL) public onlyOwner {
         _oraclizeURL = URL;
@@ -1306,7 +1306,7 @@ contract Claes is ERC20Interface, usingOraclize {
     function checkBetting(uint256 round, address lookupAddress) public constant returns(bool){
         if((currentRoundCount>round) && (round>0)){
             int256 diffTweets = getTweetsDiff(round);
-             // If tweets have decreased 
+             // If tweets have decreased
             if(diffTweets <= 0){
                 if(bets[round][lookupAddress].bet == 0 && bets[round][lookupAddress].betted){
                     return true;
@@ -1318,7 +1318,7 @@ contract Claes is ERC20Interface, usingOraclize {
             return false;
         }
     }
-    
+
     // Backup function if oraclize does not run as scheduled, everyone can run this!
     function newRound() public payable {
         if( now >= (roundStartedTimestamp + 7 days + 2 hours)){
@@ -1347,7 +1347,7 @@ contract Claes is ERC20Interface, usingOraclize {
     // Get number of bets
     function getNumBets(uint256 round) public constant returns(uint256){
         if(round == 0){
-            return numOfBets[currentRoundCount]; 
+            return numOfBets[currentRoundCount];
         }else{
             return numOfBets[round];
         }
@@ -1355,7 +1355,7 @@ contract Claes is ERC20Interface, usingOraclize {
     // Get what's in stake for a specific round
     function getInStake(uint256 round) public constant returns(uint256){
         if(round == 0){
-            return roundStake[currentRoundCount]; 
+            return roundStake[currentRoundCount];
            }else{
             return roundStake[round];
            }
@@ -1366,7 +1366,7 @@ contract Claes is ERC20Interface, usingOraclize {
         return pastRoundsTweets[round];
     }
 
-    // Possible for winner to withdraw Claes Cash prize 
+    // Possible for winner to withdraw Claes Cash prize
     function winnerWithdraw (uint256 round) public {
         // Check if the address is a winner and that the address have not withdrawn already
         if(checkBetting(round, msg.sender) && !bets[round][msg.sender].withdrawn){
@@ -1374,7 +1374,7 @@ contract Claes is ERC20Interface, usingOraclize {
             int256 diffTweets = getTweetsDiff(round);
             uint256 prize;
             uint256 correctBet;
-            // If tweets have decreased 
+            // If tweets have decreased
             if(diffTweets <= 0){
                 correctBet = 0;
             }else{
@@ -1382,7 +1382,7 @@ contract Claes is ERC20Interface, usingOraclize {
             }
 
             uint256 prizeShared = uint256((correctBet + roundStake[round])/differentBets[round][correctBet]);
-            
+
             // By the rules the first withdrawn shall have a bonus if it's not possible to share even
             if(!firstWithdrawn[round]){
                 firstWithdrawn[round] = true;
@@ -1411,9 +1411,9 @@ contract Claes is ERC20Interface, usingOraclize {
             return uint256(ICOprice[(block.timestamp-genesisTimestamp)/(1 days)]);
         } else {
             return  25500000000000000;
-        } 
+        }
     }
-    
+
     function ownerWithdraw() public onlyOwner {
         uint256 balance = uint256(this.balance/2);
         if(this.balance > 0){
@@ -1439,4 +1439,15 @@ contract Claes is ERC20Interface, usingOraclize {
 
     //Fallback function, accept donations
     function() public payable { }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

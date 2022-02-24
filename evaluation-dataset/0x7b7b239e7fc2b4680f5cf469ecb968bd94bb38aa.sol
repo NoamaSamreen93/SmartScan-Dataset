@@ -32,7 +32,7 @@ contract SafeMath {
 
 /*
  * Base Token for ERC20 compatibility
- * ERC20 interface 
+ * ERC20 interface
  * see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 {
@@ -53,7 +53,7 @@ contract ERC223Interface {
 /*
  * Contract that is working with ERC223 tokens
  */
- 
+
 contract ContractReceiver {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
@@ -123,9 +123,9 @@ contract StandardToken is ERC20, SafeMath, ERC223Interface {
      * @param _data    Transaction metadata.
      */
     function transfer(address _to, uint _value, bytes _data)
-    onlyPayloadSize(2 * 32) 
+    onlyPayloadSize(2 * 32)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         require(_to != address(0));
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -148,15 +148,15 @@ contract StandardToken is ERC20, SafeMath, ERC223Interface {
         }else{return false;}
 
     }
-    
+
     /**
      *
      * Transfer with ERC223 specification
      *
      * http://vessenes.com/the-erc20-short-address-attack-explained/
      */
-    function transfer(address _to, uint _value) 
-    onlyPayloadSize(2 * 32) 
+    function transfer(address _to, uint _value)
+    onlyPayloadSize(2 * 32)
     public
     returns (bool success)
     {
@@ -183,7 +183,7 @@ contract StandardToken is ERC20, SafeMath, ERC223Interface {
 
     function transferFrom(address _from, address _to, uint _value)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         require(_to != address(0));
         require(_value <= balances[_from]);
@@ -200,7 +200,7 @@ contract StandardToken is ERC20, SafeMath, ERC223Interface {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint _value) 
+    function approve(address _spender, uint _value)
     public
     returns (bool success)
     {
@@ -247,7 +247,7 @@ contract StandardToken is ERC20, SafeMath, ERC223Interface {
 
 contract CoSoundToken is StandardToken, Ownable {
     string public name;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public symbol;
     uint totalEthInWei;
 
@@ -260,7 +260,7 @@ contract CoSoundToken is StandardToken, Ownable {
     }
 
     /* Approves and then calls the receiving contract */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData)
     public
     returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -274,8 +274,8 @@ contract CoSoundToken is StandardToken, Ownable {
         revert();
     }
 
-    function transferToCrowdsale(address _to, uint _value) 
-    onlyPayloadSize(2 * 32) 
+    function transferToCrowdsale(address _to, uint _value)
+    onlyPayloadSize(2 * 32)
     onlyOwner
     public
     returns (bool success)
@@ -287,8 +287,14 @@ contract CoSoundToken is StandardToken, Ownable {
             emit Transfer(msg.sender, _to, _value);
             return true;
         }
-        else { 
-            return false; 
+        else {
+            return false;
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

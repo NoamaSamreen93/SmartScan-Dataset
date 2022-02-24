@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract ZipperMultisigFactory
 {
     address zipper;
-    
+
     function ZipperMultisigFactory(address _zipper) public
     {
         zipper = _zipper;
@@ -14,12 +14,12 @@ contract ZipperMultisigFactory
         address[] memory addys = new address[](2);
         addys[0] = zipper;
         addys[1] = msg.sender;
-        
+
         MultiSigWallet a = new MultiSigWallet(addys, 2);
-        
+
         MultisigCreated(a, msg.sender, zipper);
     }
-    
+
     function changeZipper(address _newZipper) public
     {
         require(msg.sender == zipper);
@@ -407,4 +407,15 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

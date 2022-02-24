@@ -66,7 +66,7 @@ contract Pausable is Ownable {
     }
     _;
   }
-  
+
   modifier onlyInEmergency {
     if (!stopped) {
       throw;
@@ -101,11 +101,11 @@ contract ERC20 is ERC20Basic {
  */
 contract PullPayment {
   using SafeMath for uint;
-  
+
   mapping(address => uint) public payments;
   event LogRefundETH(address to, uint value);
   /**
-  *  Store sent amount as credit to be pulled, called by payer 
+  *  Store sent amount as credit to be pulled, called by payer
   **/
   function asyncSend(address dest, uint amount) internal {
     payments[dest] = payments[dest].add(amount);
@@ -114,7 +114,7 @@ contract PullPayment {
   function withdrawPayments() {
     address payee = msg.sender;
     uint payment = payments[payee];
-    
+
     if (payment == 0) {
       throw;
     }
@@ -129,13 +129,13 @@ contract PullPayment {
   }
 }
 contract BasicToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
   */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -203,7 +203,7 @@ contract OrenCoin is StandardToken, Ownable {
   This smart contract collects ETH, and in return emits OrenCoin tokens to the backers
 */
 contract Crowdsale is Pausable, PullPayment {
-    
+
     using SafeMath for uint;
     struct Backer {
         uint weiReceived; // Amount of Ether given
@@ -264,39 +264,39 @@ contract Crowdsale is Pausable, PullPayment {
         coin = OrenCoin(_OrenCoinAddress);
         multisigEther = _to;
     }
-    /* 
+    /*
      * The fallback function corresponds to a donation in ETH
      */
     function() stopInEmergency respectTimeFrame payable {
         receiveETH(msg.sender);
     }
-    /* 
+    /*
      * To call to start the crowdsale
      */
     function start() onlyOwner {
         if (startTime != 0) throw; // Crowdsale was already started
-        startTime = now ;            
-        endTime =  now + CROWDSALE_PERIOD;    
+        startTime = now ;
+        endTime =  now + CROWDSALE_PERIOD;
     }
     /*
      *  Receives a donation in Ether
     */
     function receiveETH(address beneficiary) internal {
         if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
-        
+
         uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER).div(1 ether)); // Compute the number of OrenCoin to send
-        if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;    
+        if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;
         Backer backer = backers[beneficiary];
-        coin.transfer(beneficiary, coinToSend); // Transfer OrenCoins right now 
+        coin.transfer(beneficiary, coinToSend); // Transfer OrenCoins right now
         backer.coinSent = backer.coinSent.add(coinToSend);
-        backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer    
+        backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer
         etherReceived = etherReceived.add(msg.value); // Update the total wei collected during the crowdfunding
         coinSentToEther = coinSentToEther.add(coinToSend);
         // Send events
         LogCoinsEmited(msg.sender ,coinToSend);
-        LogReceivedETH(beneficiary, etherReceived); 
+        LogReceivedETH(beneficiary, etherReceived);
     }
-    
+
     /*
      *Compute the OrenCoin bonus according to the investment period
      */
@@ -304,7 +304,7 @@ contract Crowdsale is Pausable, PullPayment {
         if (coinSentToEther < 20000000000000000) return amount.add(amount.mul(10).div(25));   // bonus 40%
         return amount.add(amount.mul(100).div(333)); //bonus 30%
     }
-    /*  
+    /*
      * Finalize the crowdsale, should be called after the refund period
     */
     function finalize() onlyOwner public {
@@ -315,20 +315,20 @@ contract Crowdsale is Pausable, PullPayment {
             }
         }
         if (coinSentToEther < MIN_CAP && now < endTime + 5 days) throw; // If MIN_CAP is not reached donors have 5days to get refund before we can finalise
-        
+
 
         if (!multisigEther.send(this.balance)) {
             throw;
         }
-        
-        
+
+
         uint remains = coin.balanceOf(this);
         if (remains > 0) { // Burn the rest of OrenCoins
             if (!coin.burn(remains)) throw ;
         }
         crowdsaleClosed = true;
     }
-    /*  
+    /*
     * Failsafe drain
     */
     function drain() onlyOwner {
@@ -355,21 +355,21 @@ contract Crowdsale is Pausable, PullPayment {
         uint minCoinsToSell = bonus(MIN_INVEST_ETHER.mul(COIN_PER_ETHER) / (1 ether));
         if(remains > minCoinsToSell) throw;
         Backer backer = backers[owner];
-        coin.transfer(owner, remains); // Transfer OrenCoins right now 
+        coin.transfer(owner, remains); // Transfer OrenCoins right now
         backer.coinSent = backer.coinSent.add(remains);
         coinSentToEther = coinSentToEther.add(remains);
         // Send events
         LogCoinsEmited(this ,remains);
-        LogReceivedETH(owner, etherReceived); 
+        LogReceivedETH(owner, etherReceived);
     }
-    /* 
+    /*
      * When MIN_CAP is not reach:
      * 1) backer call the "approve" function of the OrenCoin token contract with the amount of all OrenCoins they got in order to be refund
      * 2) backer call the "refund" function of the Crowdsale contract with the same amount of OrenCoins
      * 3) backer call the "withdrawPayments" function of the Crowdsale contract to get a refund in ETH
      */
     function refund(uint _value) minCapNotReached public {
-        
+
         if (_value != backers[msg.sender].coinSent) throw; // compare value from backer balance
         coin.transferFrom(msg.sender, address(this), _value); // get the token back to the crowdsale contract
         if (!coin.burn(_value)) throw ; // token sent for refund are burnt
@@ -379,4 +379,13 @@ contract Crowdsale is Pausable, PullPayment {
             asyncSend(msg.sender, ETHToSend); // pull payment to get refund in ETH
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -131,23 +131,23 @@ contract TokenMoney is owned,StandardToken {
 
   //name of contact
     string public name = "TokenMoney";
-    
+
     //symbol of contact
     string public symbol = "TOM";
-    
-    //ddecimals 
+
+    //ddecimals
     uint8 public decimals = 18;
-    
- 
+
+
 //total amount
     uint256 public totalSupply;
     uint256 public initialSupply;
     //
-    
+
     //version
     string public version = "v1.0";
-    
-   
+
+
     //create an array with all blance
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -158,9 +158,9 @@ contract TokenMoney is owned,StandardToken {
 
     function TokenMoney() public {
         initialSupply = 3600000;
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-                                    
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+
     }
 
   /**
@@ -195,4 +195,10 @@ contract TokenMoney is owned,StandardToken {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -137,21 +137,21 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
     /*
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint _addedValue) 
+  function increaseApproval (address _spender, uint _addedValue)
     returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) 
+  function decreaseApproval (address _spender, uint _subtractedValue)
     returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -166,45 +166,56 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Exploreon is StandardToken {
-    
+
     string public name = "Exploreon";
     string public symbol = "XPL";
     uint public decimals = 3;
-    
+
     uint public INITIAL_SUPPLY = 1000000;
-    
-    address public constant multisig = 
+
+    address public constant multisig =
     0x2aD9bebacc45d649E438eF24DeD6348d4a650b77;
-    
+
     // 1 ether = 1000 EXP
     uint public constant PRICE = 1000;
-    
+
     function Exploreon() {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
-    
+
     function () payable {
         createTokens(msg.sender);
     }
-    
+
     function createTokens(address recipient) payable {
         if (msg.value == 0){
             throw;
         }
-        
+
         uint tokens = msg.value.mul(getPrice());
         totalSupply = totalSupply.add(tokens);
-        
+
         balances[recipient] = balances[recipient].add(tokens);
-        
+
         if (!multisig.send(msg.value)) {
             throw;
         }
     }
-    
+
     function getPrice() constant returns (uint result) {
         return PRICE;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

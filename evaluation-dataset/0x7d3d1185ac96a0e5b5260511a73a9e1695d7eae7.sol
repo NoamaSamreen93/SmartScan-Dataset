@@ -193,8 +193,8 @@ contract StandardToken is ERC20, BasicToken {
 }
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
@@ -315,9 +315,9 @@ contract HabibiCoin is CappedToken {
   string public name = "HabibiCoin";
   string public symbol = "HBB";
   uint256 public decimals = 18;
-  
-  constructor(uint256 _cap) CappedToken(_cap) Ownable() public { 
-  }  
+
+  constructor(uint256 _cap) CappedToken(_cap) Ownable() public {
+  }
 }
 
 contract Crowdsale is Ownable {
@@ -423,39 +423,50 @@ contract HabibiCrowdsale is MintedCrowdsale {
   constructor(uint256 _rate, address _wallet, ERC20 _token) Crowdsale(_rate, _wallet, _token) Ownable() public {
     active = true;
   }
-  
+
   function mint(address _to, uint256 _amount) public onlyOwner returns (bool) {
       return HabibiCoin(token).mint(_to, _amount);
   }
-  
+
   function changeTokenOwner(address _to) public onlyOwner {
       HabibiCoin(token).transferOwnership(_to);
   }
-  
+
   /**
    * @dev Function to stop minting new tokens in crowdsale(initial distribution).
    * @return True if the operation was successful.
    */
   function finishMinting() public onlyOwner returns (bool) {
     return HabibiCoin(token).finishMinting();
-  }      
-  
+  }
+
   function stopCrowdsale() public onlyOwner {
       active = false;
   }
-  
+
   function startCrowdsale() public onlyOwner {
       active = true;
   }
-  
+
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal
   {
       require(active == true);
       super._preValidatePurchase(_beneficiary, _weiAmount);
   }
-  
+
   function setNewRate(uint256 newRate) public onlyOwner
   {
       rate = newRate;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

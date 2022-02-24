@@ -502,8 +502,8 @@ contract SnowBallToken is Ownable, Claimable, MintableToken, BurnableToken {
         require(token.transfer(_to, balance), "transfer failed");
     }
 
-    function superTransfer(address _to, uint256 _value) 
-        internal 
+    function superTransfer(address _to, uint256 _value)
+        internal
         isNotPaused
         validRecipient(_to)
         hasBalance(msg.sender, _value)
@@ -515,8 +515,8 @@ contract SnowBallToken is Ownable, Claimable, MintableToken, BurnableToken {
         return true;
     }
 
-    function superTransferFrom(address _from, address _to, uint256 _value) 
-        internal 
+    function superTransferFrom(address _from, address _to, uint256 _value)
+        internal
         isNotPaused
         hasBalance(_from, _value)
         hasApproval(_from, _value)
@@ -577,8 +577,8 @@ contract SnowBallToken is Ownable, Claimable, MintableToken, BurnableToken {
     }
 
     function setPausedTransfers(bool _state)
-        external 
-        onlyOwner 
+        external
+        onlyOwner
     {
         require(pausedTransfers != _state);
         pausedTransfers = _state;
@@ -620,4 +620,20 @@ contract SnowBallToken is Ownable, Claimable, MintableToken, BurnableToken {
         return block.timestamp;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -20,10 +20,10 @@ contract NobarToken {
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
 
@@ -67,16 +67,16 @@ contract NobarToken {
         }
     }
 
- 
+
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                  
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
-  
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
@@ -86,4 +86,15 @@ contract NobarToken {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

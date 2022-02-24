@@ -74,7 +74,7 @@ interface IERC20 {
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -553,7 +553,7 @@ contract PauserRole {
         emit PauserRemoved(account);
     }
 }
- 
+
 /**
  * @dev Contract module which allows children to implement an emergency stop
  * mechanism that can be triggered by an authorized account.
@@ -623,7 +623,7 @@ contract Pausable is PauserRole {
         emit Unpaused(msg.sender);
     }
 }
- 
+
 /**
  * @title Pausable token
  * @dev ERC20 modified with pausable transfers.
@@ -663,4 +663,13 @@ contract GfcCoinToken is ERC20, ERC20Burnable, ERC20Detailed, ERC20Pausable {
         public {
             _mint(_onwerAddress, _initialSupply);
         }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

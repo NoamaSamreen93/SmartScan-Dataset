@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint) balances;
 
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
    */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -99,7 +99,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 contract StandardToken is BasicToken, ERC20 {
@@ -369,4 +369,15 @@ contract OxToken is StandardToken, LimitedTransferToken, Ownable, Destructible {
     return now;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

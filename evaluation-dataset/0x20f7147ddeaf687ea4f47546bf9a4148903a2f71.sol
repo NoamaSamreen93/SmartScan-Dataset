@@ -59,9 +59,9 @@ contract Ownable {
 }
 
 contract TokenERC20 is Ownable {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "千币";
     string public constant symbol     = "QB";
     uint32 public constant decimals   = 18;
@@ -70,38 +70,38 @@ contract TokenERC20 is Ownable {
 	uint256 public airdrop;
     uint256 public startBalance;
   	uint256 public buyPrice ;
-	
-    mapping(address => bool) touched; 
+
+    mapping(address => bool) touched;
     mapping(address => uint256) balances;
 	mapping(address => mapping (address => uint256)) internal allowed;
-	mapping(address => bool) public frozenAccount;   
-	
+	mapping(address => bool) public frozenAccount;
+
 	event FrozenFunds(address target, bool frozen);
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-	event Burn(address indexed burner, uint256 value);   
-	
+	event Burn(address indexed burner, uint256 value);
+
 	function TokenERC20(
         uint256 initialSupply
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
-		 
+
 		if( !touched[msg.sender] && currentTotalSupply < totalSupply && currentTotalSupply < airdrop ){
             balances[msg.sender] = balances[msg.sender].add( startBalance );
             touched[msg.sender] = true;
             currentTotalSupply = currentTotalSupply.add( startBalance );
         }
-		
-		require(!frozenAccount[msg.sender]); 
+
+		require(!frozenAccount[msg.sender]);
 		require(_value <= balances[msg.sender]);
 
 		balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -109,13 +109,13 @@ contract TokenERC20 is Ownable {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
-		require(_value <= allowed[_from][msg.sender]);	
-		require(!frozenAccount[_from]); 
-		
+		require(_value <= allowed[_from][msg.sender]);
+		require(!frozenAccount[_from]);
+
         if( !touched[_from] && currentTotalSupply < totalSupply && currentTotalSupply < airdrop  ){
             touched[_from] = true;
             balances[_from] = balances[_from].add( startBalance );
@@ -156,7 +156,7 @@ contract TokenERC20 is Ownable {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
+
 	function getBalance(address _a) internal constant returns(uint256) {
         if( currentTotalSupply < totalSupply ){
             if( touched[_a] )
@@ -167,12 +167,12 @@ contract TokenERC20 is Ownable {
             return balances[_a];
         }
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
-	
- 
+
+
 	function burn(address _useradd,uint256 _value)  public  {
 		_burn(_useradd, _value);
 	}
@@ -184,32 +184,43 @@ contract TokenERC20 is Ownable {
 		emit Burn(_who, _value);
 		emit Transfer(_who, address(0), _value);
 	}
-	
- 
+
+
 	function mintToken(address target, uint256 mintedAmount) onlyOwner public {
         balances[target] = balances[target].add(mintedAmount);
         totalSupply = totalSupply.add(mintedAmount);
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, target, mintedAmount);
     }
-	
- 
+
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-	
+
 	function () payable public {
-  
+
     }
-	
+
     function getEth(uint num) payable public onlyOwner {
     	owner.transfer(num);
     }
-	
+
 	function modifyairdrop(uint256 _airdrop,uint256 _startBalance ) public onlyOwner {
 		airdrop = _airdrop;
 		startBalance = _startBalance;
 	}
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

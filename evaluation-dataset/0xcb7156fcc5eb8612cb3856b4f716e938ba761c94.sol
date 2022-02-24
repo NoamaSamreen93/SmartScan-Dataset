@@ -32,9 +32,9 @@ library SafeMath {
 contract ERC20 {
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-  
+
   uint256 public totalSupply;
-  
+
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
@@ -53,7 +53,7 @@ contract StandardToken is ERC20 {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -144,7 +144,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 contract Pausable is Ownable {
@@ -176,7 +176,7 @@ contract Pausable is Ownable {
     emit PausePublic(newPausedPublic);
     emit PauseOwnerAdmin(newPausedOwnerAdmin);
   }
-  
+
 }
 
 contract PausableToken is StandardToken, Pausable {
@@ -222,16 +222,16 @@ contract RBCToken is PausableToken {
 
         totalSupply = _totalTokenAmount;
         balances[_owner] = _totalTokenAmount;
-        
+
         emit Transfer(address(0x0), _owner, _totalTokenAmount);
     }
 
-    function transfer(address _to, uint _value) validDestination(_to) public returns (bool) 
+    function transfer(address _to, uint _value) validDestination(_to) public returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -248,7 +248,7 @@ contract RBCToken is PausableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -266,4 +266,13 @@ contract RBCToken is PausableToken {
         emit AdminTransferred(admin, newAdmin);
         admin = newAdmin;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

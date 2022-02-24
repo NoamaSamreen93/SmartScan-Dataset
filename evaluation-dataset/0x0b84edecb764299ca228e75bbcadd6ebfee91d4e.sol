@@ -28,10 +28,10 @@ contract EtherCartel{
         Kilos[msg.sender]=SafeMath.add(Kilos[msg.sender],newKilo);
         claimedDrugs[msg.sender]=0;
         lastCollect[msg.sender]=now;
-        
+
         //send referral drugs
         claimedDrugs[referrals[msg.sender]]=SafeMath.add(claimedDrugs[referrals[msg.sender]],SafeMath.div(drugsUsed,5));
-        
+
         //boost market to nerf kilo hoarding
         marketDrugs=SafeMath.add(marketDrugs,SafeMath.div(drugsUsed,10));
     }
@@ -139,4 +139,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

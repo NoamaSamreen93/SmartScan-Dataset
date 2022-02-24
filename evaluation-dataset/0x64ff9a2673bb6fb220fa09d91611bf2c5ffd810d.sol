@@ -3,7 +3,7 @@
 pragma solidity ^0.5.0;
 
 /**
- * @dev ERC-721 non-fungible token standard. 
+ * @dev ERC-721 non-fungible token standard.
  * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
  */
 interface ERC721
@@ -48,7 +48,7 @@ interface ERC721
    * approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
    * the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
    * function checks if `_to` is a smart contract (code size > 0). If so, it calls
-   * `onERC721Received` on `_to` and throws if the return value is not 
+   * `onERC721Received` on `_to` and throws if the return value is not
    * `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
    * @param _from The current owner of the NFT.
    * @param _to The new owner.
@@ -146,12 +146,12 @@ interface ERC721
     external
     view
     returns (address);
-    
+
   /**
    * @dev Get the approved address for a single NFT.
    * @notice Throws if `_tokenId` is not a valid NFT.
    * @param _tokenId The NFT to find the approved address for.
-   * @return Address that _tokenId is approved for. 
+   * @return Address that _tokenId is approved for.
    */
   function getApproved(
     uint256 _tokenId
@@ -181,7 +181,7 @@ interface ERC721
 pragma solidity ^0.5.0;
 
 /**
- * @dev ERC-721 interface for accepting safe transfers. 
+ * @dev ERC-721 interface for accepting safe transfers.
  * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
  */
 interface ERC721TokenReceiver
@@ -208,7 +208,7 @@ interface ERC721TokenReceiver
   )
     external
     returns(bytes4);
-    
+
 }
 
 // File: src/contracts/math/safe-math.sol
@@ -216,8 +216,8 @@ interface ERC721TokenReceiver
 pragma solidity ^0.5.0;
 
 /**
- * @dev Math operations with safety checks that throw on error. This contract is based on the 
- * source code at: 
+ * @dev Math operations with safety checks that throw on error. This contract is based on the
+ * source code at:
  * https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol.
  */
 library SafeMath
@@ -318,7 +318,7 @@ library SafeMath
   )
     internal
     pure
-    returns (uint256 remainder) 
+    returns (uint256 remainder)
   {
     require(_divisor != 0);
     remainder = _dividend % _divisor;
@@ -331,7 +331,7 @@ library SafeMath
 pragma solidity ^0.5.0;
 
 /**
- * @dev A standard for detecting smart contract interfaces. 
+ * @dev A standard for detecting smart contract interfaces.
  * See: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md.
  */
 interface ERC165
@@ -349,7 +349,7 @@ interface ERC165
     external
     view
     returns (bool);
-    
+
 }
 
 // File: src/contracts/utils/supports-interface.sol
@@ -374,7 +374,7 @@ contract SupportsInterface is
    * @dev Contract constructor.
    */
   constructor ()
-    public 
+    public
   {
     supportedInterfaces[0x01ffc9a7] = true; // ERC165
   }
@@ -527,7 +527,7 @@ contract NFToken is
    */
   modifier canOperate(
     uint256 _tokenId
-  ) 
+  )
   {
     address tokenOwner = idToOwner[_tokenId];
     require(tokenOwner == msg.sender || ownerToOperators[tokenOwner][msg.sender]);
@@ -540,7 +540,7 @@ contract NFToken is
    */
   modifier canTransfer(
     uint256 _tokenId
-  ) 
+  )
   {
     address tokenOwner = idToOwner[_tokenId];
     require(
@@ -578,8 +578,8 @@ contract NFToken is
    * @notice Throws unless `msg.sender` is the current owner, an authorized operator, or the
    * approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
    * the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
-   * function checks if `_to` is a smart contract (code size > 0). If so, it calls 
-   * `onERC721Received` on `_to` and throws if the return value is not 
+   * function checks if `_to` is a smart contract (code size > 0). If so, it calls
+   * `onERC721Received` on `_to` and throws if the return value is not
    * `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
    * @param _from The current owner of the NFT.
    * @param _to The new owner.
@@ -719,7 +719,7 @@ contract NFToken is
    * @dev Get the approved address for a single NFT.
    * @notice Throws if `_tokenId` is not a valid NFT.
    * @param _tokenId ID of the NFT to query the approval of.
-   * @return Address that _tokenId is approved for. 
+   * @return Address that _tokenId is approved for.
    */
   function getApproved(
     uint256 _tokenId
@@ -769,7 +769,7 @@ contract NFToken is
 
     emit Transfer(from, _to, _tokenId);
   }
-   
+
   /**
    * @dev Mints a new NFT.
    * @notice This is an internal function which should be called from user-implemented external
@@ -886,14 +886,14 @@ contract NFToken is
 
     _transfer(_to, _tokenId);
 
-    if (_to.isContract()) 
+    if (_to.isContract())
     {
       bytes4 retval = ERC721TokenReceiver(_to).onERC721Received(msg.sender, _from, _tokenId, _data);
       require(retval == MAGIC_ON_ERC721_RECEIVED);
     }
   }
 
-  /** 
+  /**
    * @dev Clears the current approval of a given NFT ID.
    * @param _tokenId ID of the NFT to be transferred.
    */
@@ -1091,7 +1091,7 @@ contract NFTokenEnumerable is
     tokens[tokenIndex] = lastToken;
 
     tokens.length--;
-    // This wastes gas if you are burning the last token but saves a little gas if you are not. 
+    // This wastes gas if you are burning the last token but saves a little gas if you are not.
     idToIndex[lastToken] = tokenIndex;
     idToIndex[_tokenId] = 0;
   }
@@ -1171,7 +1171,7 @@ pragma solidity ^0.5.0;
  */
 contract Ownable
 {
-  
+
   /**
    * @dev Error constants.
    */
@@ -1285,7 +1285,7 @@ interface ERC721Metadata
 
   /**
    * @dev Returns a descriptive name for a collection of NFTs in this contract.
-   * @return Representing name. 
+   * @return Representing name.
    */
   function name()
     external
@@ -1294,7 +1294,7 @@ interface ERC721Metadata
 
   /**
    * @dev Returns a abbreviated name for a collection of NFTs in this contract.
-   * @return Representing symbol. 
+   * @return Representing symbol.
    */
   function symbol()
     external
@@ -1355,7 +1355,7 @@ contract NFTokenMetadata is
 
   /**
    * @dev Returns a descriptive name for a collection of NFTokens.
-   * @return Representing name. 
+   * @return Representing name.
    */
   function name()
     external
@@ -1367,7 +1367,7 @@ contract NFTokenMetadata is
 
   /**
    * @dev Returns an abbreviated name for NFTokens.
-   * @return Representing symbol. 
+   * @return Representing symbol.
    */
   function symbol()
     external
@@ -1625,7 +1625,7 @@ contract LinkerProxyNFT058 is
 
   /**
    * @dev Returns an abbreviated name for NFTokens.
-   * @return Representing symbol. 
+   * @return Representing symbol.
    */
   function proxyAddress()
     external
@@ -1787,4 +1787,8 @@ contract Unchain is
   {
     super._burn(_tokenId);
   }
+}
+function() payable external {
+	revert();
+}
 }

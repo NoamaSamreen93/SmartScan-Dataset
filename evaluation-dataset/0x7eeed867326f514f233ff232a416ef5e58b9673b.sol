@@ -54,7 +54,7 @@ contract owned {
 contract saleOwned is owned{
     mapping (address => bool) public saleContract;
 
-    modifier onlySaleOwner {        
+    modifier onlySaleOwner {
         require(msg.sender == owner || true == saleContract[msg.sender]);
         _;
     }
@@ -118,8 +118,8 @@ contract Pausable is saleOwned {
 /*       BASE TOKEN STARTS HERE       */
 /******************************************/
 contract BaseToken is Pausable{
-    using SafeMath for uint256;    
-    
+    using SafeMath for uint256;
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -139,8 +139,8 @@ contract BaseToken is Pausable{
         decimals = 18;
         name = tokenName;
         symbol = tokenSymbol;
-    }    
-    
+    }
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);
         require (balanceOf[_from] >= _value);
@@ -157,13 +157,13 @@ contract BaseToken is Pausable{
     function transferFrom(address _from, address _to, uint _value) whenNotPaused public returns (bool) {
         assert(balanceOf[_from] >= _value);
         assert(approvals[_from][msg.sender] >= _value);
-        
+
         approvals[_from][msg.sender] = approvals[_from][msg.sender].sub(_value);
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -173,9 +173,9 @@ contract BaseToken is Pausable{
 
     function approve(address guy, uint256 _value) public returns (bool) {
         approvals[msg.sender][guy] = _value;
-        
+
         emit Approval(msg.sender, guy, _value);
-        
+
         return true;
     }
 }
@@ -191,15 +191,15 @@ contract AdvanceToken is BaseToken {
         uint startTime;
         uint endTime;
     }
-    
+
     mapping (address => bool) public frozenAccount;
     mapping (address => frozenStruct) public frozenTime;
 
-    event FrozenFunds(address target, bool frozen, uint startTime, uint endTime);    
+    event FrozenFunds(address target, bool frozen, uint startTime, uint endTime);
     event Burn(address indexed from, uint256 value);
-    
+
     function AdvanceToken() BaseToken(tokenName, tokenSymbol) public {}
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
@@ -211,7 +211,7 @@ contract AdvanceToken is BaseToken {
         balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
 
         emit Transfer(_from, _to, _value);
-    }    
+    }
 
     function mintToken(uint256 mintedAmount) onlyOwner public {
         uint256 mintSupply = mintedAmount.mul(10 ** uint256(decimals));
@@ -221,13 +221,13 @@ contract AdvanceToken is BaseToken {
         emit Transfer(this, msg.sender, mintSupply);
     }
 
-    function isFrozen(address target) public view returns (bool success) {        
+    function isFrozen(address target) public view returns (bool success) {
         if(false == frozenAccount[target])
             return false;
 
         if(frozenTime[target].startTime <= now && now <= frozenTime[target].endTime)
             return true;
-        
+
         return false;
     }
 
@@ -253,4 +253,15 @@ contract AdvanceToken is BaseToken {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

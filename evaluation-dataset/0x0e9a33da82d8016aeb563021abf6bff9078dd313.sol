@@ -86,7 +86,7 @@ contract token {function transfer (address receiver, uint _amount) public { } }
 
 contract Distribute is Ownable{
 
-  
+
 
     token tokenReward = token(0xdd007278B667F6bef52fD0a4c23604aA1f96039a);
 
@@ -110,4 +110,15 @@ contract Distribute is Ownable{
 
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

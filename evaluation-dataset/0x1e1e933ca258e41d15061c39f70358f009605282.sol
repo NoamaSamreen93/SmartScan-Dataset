@@ -27,22 +27,22 @@ contract token {
 
 	/* This creates an array with all balances */
 	mapping (address => uint256) public balanceOf;
-	
-	
+
+
 	/* mappping to store allowances. */
 	mapping (address => mapping (address => uint256)) public allowance;
-	
-	
+
+
 
 	/* This generates a public event on the blockchain that will notify clients */
 	event Transfer(address indexed from, address indexed to, uint256 value);
-	
+
 	/* This generates a public event on the blockchain that will notify clients */
     event Approval(address indexed tokenOwner, address indexed spender, uint256 tokens);
 
 
 	event Burn(address indexed from, uint256 value);
-	
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
 	function token (
 			string tokenName,
@@ -124,7 +124,7 @@ contract ProgressiveToken is owned, token {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * Transfer tokens from other address
      *
@@ -164,7 +164,7 @@ contract ProgressiveToken is owned, token {
 		emit Transfer(0, owner, mintedAmount);
 		emit Transfer(owner, target, mintedAmount);
 	}
-	
+
 	/**
      * Set allowance for other address
      *
@@ -243,4 +243,15 @@ contract ProgressiveToken is owned, token {
 		}
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

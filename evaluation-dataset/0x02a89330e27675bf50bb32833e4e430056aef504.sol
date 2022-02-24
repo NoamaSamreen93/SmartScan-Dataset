@@ -60,7 +60,7 @@ contract SmartBondsSale {
   uint256 public endTime;
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   uint256 public badgerAmount;
   uint256 public investAmount;
   uint256 public buyoutAmount;
@@ -77,15 +77,15 @@ contract SmartBondsSale {
 
   function SmartBondsSale() {
     // ether addressess where funds will be distributed
-    badgerWallet = 0x5cB7a6547A9408e3C9B09FB5c640d4fB767b8070; 
+    badgerWallet = 0x5cB7a6547A9408e3C9B09FB5c640d4fB767b8070;
     investmentFundWallet = 0x8F2d31E3c259F65222D0748e416A79e51589Ce3b;
     buyoutWallet = 0x336b903eF5e3c911df7f8172EcAaAA651B80CA1D;
-   
-    // address of SmartBonds Token 
+
+    // address of SmartBonds Token
     addressOfTokenUsedAsReward = 0x38dCb83980183f089FC7D147c5bF82E5C9b8F237;
     tokenReward = token(addressOfTokenUsedAsReward);
-    
-    // start and end times of contract sale 
+
+    // start and end times of contract sale
     startTime = 1533583718; // now
     endTime = startTime + 182 * 1 days; // 182 days
   }
@@ -100,12 +100,12 @@ contract SmartBondsSale {
     require(beneficiary != 0x0);
     require(validPurchase());
 
-    // minimum amount is 2.5 eth, and max is 25 eth 
+    // minimum amount is 2.5 eth, and max is 25 eth
     uint256 weiAmount = msg.value;
-    if(weiAmount < 2.5 * 10**18) throw; 
+    if(weiAmount < 2.5 * 10**18) throw;
     if(weiAmount > 25 * 10**18) throw;
-    
-    // divide wei sent into distribution wallets 
+
+    // divide wei sent into distribution wallets
     badgerAmount = (5 * weiAmount)/100;
     buyoutAmount = (25 * weiAmount)/100;
     investAmount = (70 * weiAmount)/100;
@@ -154,4 +154,15 @@ contract SmartBondsSale {
     if(msg.sender!=badgerWallet) throw;
     tokenReward.transfer(badgerWallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

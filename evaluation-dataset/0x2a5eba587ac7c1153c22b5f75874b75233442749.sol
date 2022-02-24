@@ -10,19 +10,19 @@ pragma solidity ^0.4.25;
 * [✓] 1% Token transfer
 * [✓] No Referral Tokens Go to Everyone
 * [✓] 5% Promotion
-* BetterDivs is a platform built for short term minting profit accumulation. 
-* Our service works as exchange wallet for securing your assets in form of decentralized fully automated (BDT) token. 
-* Token is built to function without any 2nd or 3rd party control. 
+* BetterDivs is a platform built for short term minting profit accumulation.
+* Our service works as exchange wallet for securing your assets in form of decentralized fully automated (BDT) token.
+* Token is built to function without any 2nd or 3rd party control.
 * All tokens are visible on main network and traceable for full transparency with no governance or overseeing institution involved.
-* Concept of this token works as follows: 
-*    BDT Holders have increasing assets via hour that most of the time is being accumulated without any actual use-case. 
-*    So when you collect your Minting profit of example 1.00 ETH after time it still remains as same amount of coins. 
-*    Our goal is to change that. If you have accumulated assets worth 1.00 ETH and transform it into BDT you will receive matching amount of tokens to your ETH according to current market price. 
-*    As token amount grows you will generate more and more ETH same as other users whom have joined the platform. 
-*    Withdraw actions on platform conduct 10% withdraw fees from value that is transformed into BDT assets that works as return of investment for token holders within platform. 
-*    While you keep your assets as long as accumulated enough growth % from (investment - fees) you have no risk of losing any assets. 
+* Concept of this token works as follows:
+*    BDT Holders have increasing assets via hour that most of the time is being accumulated without any actual use-case.
+*    So when you collect your Minting profit of example 1.00 ETH after time it still remains as same amount of coins.
+*    Our goal is to change that. If you have accumulated assets worth 1.00 ETH and transform it into BDT you will receive matching amount of tokens to your ETH according to current market price.
+*    As token amount grows you will generate more and more ETH same as other users whom have joined the platform.
+*    Withdraw actions on platform conduct 10% withdraw fees from value that is transformed into BDT assets that works as return of investment for token holders within platform.
+*    While you keep your assets as long as accumulated enough growth % from (investment - fees) you have no risk of losing any assets.
 *    Therefore we would like to point out that while you join the platform and have not reached return that covers initial fee you have a very small risk of losing only assets paid in fees if a total market collapse occurs;
-*    As for token holder you will earn shared amount of every transformation to BDT token or withdraw that is proportional your token amount vs total tokens in circulation. 
+*    As for token holder you will earn shared amount of every transformation to BDT token or withdraw that is proportional your token amount vs total tokens in circulation.
 *    All fees conducted from any users on the platform are fully paid out to token holders without any fee.
 *
 */
@@ -94,9 +94,9 @@ contract BetterDivs {
 
 mapping (address => uint256) balances;
 mapping (address => uint256) timestamp;
-    
-    
-        
+
+
+
     function buy(address _referredBy) public payable returns (uint256) {
         purchaseTokens(msg.value, _referredBy);
         uint256 getmsgvalue = msg.value / 20;
@@ -368,4 +368,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

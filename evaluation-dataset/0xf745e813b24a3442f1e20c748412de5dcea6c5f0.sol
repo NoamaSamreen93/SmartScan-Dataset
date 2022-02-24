@@ -269,7 +269,7 @@ contract UpgradeabilityProxy is BaseUpgradeabilityProxy {
       (bool success,) = _logic.delegatecall(_data);
       require(success);
     }
-  }  
+  }
 }
 
 // File: zos-lib/contracts/upgradeability/BaseAdminUpgradeabilityProxy.sol
@@ -400,7 +400,7 @@ pragma solidity ^0.5.0;
 
 /**
  * @title AdminUpgradeabilityProxy
- * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for 
+ * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for
  * initializing the implementation, admin, and init data.
  */
 contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, UpgradeabilityProxy {
@@ -431,7 +431,7 @@ pragma solidity ^0.5.0;
  * of upgrading it as well as transferring it to another admin.
  */
 contract ProxyAdmin is ZOSLibOwnable {
-  
+
   /**
    * @dev Returns the current implementation of a proxy.
    * This is needed because only the proxy admin can query it.
@@ -487,4 +487,13 @@ contract ProxyAdmin is ZOSLibOwnable {
   function upgradeAndCall(AdminUpgradeabilityProxy proxy, address implementation, bytes memory data) payable public onlyOwner {
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -23,7 +23,7 @@ contract DC is ERC20Interface {
     string public constant symbol = "DC";
     string public constant name = "docoin";
 
-    uint256 public _totalSupply = 10 ** 19; 
+    uint256 public _totalSupply = 10 ** 19;
 
     // Owner of this contract
     address public owner;
@@ -176,4 +176,15 @@ contract DC is ERC20Interface {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

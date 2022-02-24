@@ -47,19 +47,19 @@ contract ERC20Basic {
 
 /**
  * @title Crowdsale
- * @dev Crowdsale contract 
+ * @dev Crowdsale contract
  */
 contract Crowdsale is SafeMath {
 
     // token address
     address public tokenAddress = 0xa5FD4f631Ddf9C37d7B8A2c429a58bDC78abC843;
-    
+
     // The token being sold
     ERC20Basic public ipc = ERC20Basic(tokenAddress);
-    
+
     // address where funds are collected
     address public crowdsaleAgent = 0x783fE4521c2164eB6a7972122E7E33a1D1A72799;
-    
+
     address public owner = 0xa52858fB590CFe15d03ee1F3803F2D3fCa367166;
 
     // amount of raised money in wei
@@ -74,17 +74,17 @@ contract Crowdsale is SafeMath {
     uint256 public deadlineOne = 1520168400;   //(GMT): Sunday, 4. March 2018 13:00:00
     uint256 public deadlineTwo = 1520427600;   //(GMT): Wednesday, 7. March 2018 13:00:00
     uint256 public deadlineThree = 1520773200; //(GMT): Sunday, 11. March 2018 13:00:00
-    uint256 public endTime = 1522674000;       //(GMT): Monday, 2. April 2018 13:00:00 
-    
+    uint256 public endTime = 1522674000;       //(GMT): Monday, 2. April 2018 13:00:00
+
     // token amount for one ether during crowdsale
-    uint public firstRate = 6000; 
+    uint public firstRate = 6000;
     uint public secondRate = 5500;
     uint public thirdRate = 5000;
     uint public finalRate = 4400;
 
     // token distribution during Crowdsale
     mapping(address => uint256) public distribution;
-    
+
     /**
      * event for token purchase logging
      * @param purchaser who paid for the tokens
@@ -98,7 +98,7 @@ contract Crowdsale is SafeMath {
         require(msg.sender == crowdsaleAgent);
         _;
     }
-    
+
     // fallback function can be used to buy tokens
     function () public payable {
         buyTokens(msg.sender);
@@ -125,14 +125,14 @@ contract Crowdsale is SafeMath {
     function hasEnded() public view returns (bool) {
         return now > endTime;
     }
-    
+
     // set crowdsale wallet where funds are collected
     function setCrowdsaleAgent(address _crowdsaleAgent) public returns (bool) {
         require(msg.sender == owner || msg.sender == crowdsaleAgent);
         crowdsaleAgent = _crowdsaleAgent;
         return true;
     }
-    
+
     // set ico times
     function setTimes(  uint256 _startTime, bool changeStartTime,
                         uint256 firstDeadline, bool changeFirstDeadline,
@@ -145,9 +145,9 @@ contract Crowdsale is SafeMath {
         if(changeThirdDeadline) deadlineThree = thirdDeadline;
         if(changeEndTime) endTime = _endTime;
         return true;
-                            
+
     }
-    
+
     // set token rates
     function setNewIPCRates(uint _firstRate, bool changeFirstRate,
                             uint _secondRate, bool changeSecondRate,
@@ -159,13 +159,13 @@ contract Crowdsale is SafeMath {
         if(changeFinalRate) finalRate = _finaleRate;
         return true;
     }
-    
+
     // set new minumum amount of Wei to participate in ICO
     function setMinimumEtherAmount(uint256 _minimumEtherAmountInWei) onlyCrowdsaleAgent public returns (bool) {
         minimumEtherAmount = _minimumEtherAmountInWei;
         return true;
     }
-    
+
     // withdraw remaining IPC token amount after crowdsale has ended
     function withdrawRemainingIPCToken() onlyCrowdsaleAgent public returns (bool) {
         uint256 remainingToken = ipc.balanceOf(this);
@@ -173,7 +173,7 @@ contract Crowdsale is SafeMath {
         ipc.transfer(crowdsaleAgent, remainingToken);
         return true;
     }
-    
+
     // send erc20 token from this contract
     function withdrawERC20Token(address beneficiary, address _token) onlyCrowdsaleAgent public {
         ERC20Basic erc20Token = ERC20Basic(_token);
@@ -181,7 +181,7 @@ contract Crowdsale is SafeMath {
         require(amount>0);
         erc20Token.transfer(beneficiary, amount);
     }
-    
+
     // transfer 'weiAmount' wei to 'beneficiary'
     function sendEther(address beneficiary, uint256 weiAmount) onlyCrowdsaleAgent public {
         beneficiary.transfer(weiAmount);
@@ -191,7 +191,7 @@ contract Crowdsale is SafeMath {
     function calcTokenAmount(uint256 weiAmount) internal view returns (uint256) {
         uint256 price;
         if (now >= startTime && now < deadlineOne) {
-            price = firstRate; 
+            price = firstRate;
         } else if (now >= deadlineOne && now < deadlineTwo) {
             price = secondRate;
         } else if (now >= deadlineTwo && now < deadlineThree) {
@@ -216,10 +216,26 @@ contract Crowdsale is SafeMath {
         bool hasTokenBalance = ipc.balanceOf(this) > 0;
         return withinPeriod && isMinimumAmount && hasTokenBalance;
     }
-     
+
     // selfdestruct crowdsale contract only after crowdsale has ended
     function killContract() onlyCrowdsaleAgent public {
         require(hasEnded() && ipc.balanceOf(this) == 0);
      selfdestruct(crowdsaleAgent);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 /**
  * @title The SEEDVenture ERC20 Token
- * 
+ *
  * @author Fabio Pacchioni <fabio.pacchioni@gmail.com>
  * @author Marco Vasapollo <ceo@metaring.com>
  */
@@ -291,4 +291,13 @@ contract SEEDToken is BasicERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

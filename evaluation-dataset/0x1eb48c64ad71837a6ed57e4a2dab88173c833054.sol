@@ -270,8 +270,8 @@ contract MintableToken is StandardToken, Ownable {
     require(!mintingFinished);
     _;
   }
- 
-  
+
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -295,7 +295,7 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
   function resumeMinting() onlyOwner public returns (bool) {
     mintingFinished = false;
     return true;
@@ -316,8 +316,8 @@ function startTransfer() external onlyOwner
   {
   transferAllowed = true ;
   }
-  
-  
+
+
   function endTransfer() external onlyOwner
   {
   transferAllowed = false ;
@@ -340,7 +340,7 @@ return true;
 }
 
 
-  
+
 contract ZebiCoin is MintableToken {
   string public constant name = "Zebi Coin";
   string public constant symbol = "ZCO";
@@ -358,7 +358,7 @@ contract ZCrowdsale is Ownable{
 
   // The token being sold
    MintableToken public token;
-   
+
   uint64 public tokenDecimals;
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -366,64 +366,64 @@ contract ZCrowdsale is Ownable{
   uint256 public endTime;
   uint256 public minTransAmount;
   uint256 public mintedTokensCap; //max 87 million tokens in presale.
-  
+
    //contribution
   mapping(address => uint256) contribution;
-  
+
   //bad contributor
   mapping(address => bool) cancelledList;
 
   // address where funds are collected
   address public wallet;
 
-  bool public withinRefundPeriod; 
-  
+  bool public withinRefundPeriod;
+
   // how many token units a buyer gets per ether
   uint256 public ETHtoZCOrate;
 
   // amount of raised money in wei without factoring refunds
   uint256 public weiRaised;
-  
+
   bool public stopped;
-  
+
    modifier stopInEmergency {
     require (!stopped);
     _;
   }
-  
-  
-  
+
+
+
   modifier inCancelledList {
     require(cancelledList[msg.sender]);
     _;
   }
-  
+
   modifier inRefundPeriod {
   require(withinRefundPeriod);
   _;
- }  
+ }
 
   /**
    * event for token purchase logging
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   event TakeEth(address sender,uint256 value);
-  
+
   event Withdraw(uint256 _value);
-  
+
   event SetParticipantStatus(address _participant);
-   
+
   event Refund(address sender,uint256 refundBalance);
 
 
   function ZCrowdsale(uint256 _startTime, uint256 _endTime, uint256 _ETHtoZCOrate, address _wallet,uint256 _minTransAmount,uint256 _mintedTokensCap) public {
-  
+
 	require(_startTime >= now);
     require(_endTime >= _startTime);
     require(_ETHtoZCOrate > 0);
     require(_wallet != address(0));
-	
+
 	token = new ZebiCoin();
 	//token = createTokenContract();
     startTime = _startTime;
@@ -432,48 +432,48 @@ contract ZCrowdsale is Ownable{
     wallet = _wallet;
     minTransAmount = _minTransAmount;
 	tokenDecimals = 8;
-    mintedTokensCap = _mintedTokensCap.mul(10**tokenDecimals);            // mintedTokensCap is in Zwei 
-	
+    mintedTokensCap = _mintedTokensCap.mul(10**tokenDecimals);            // mintedTokensCap is in Zwei
+
   }
 
   // fallback function can be used to buy tokens
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
     function finishMint() onlyOwner public returns (bool) {
     token.finishMinting();
     return true;
   }
-  
+
   function resumeMint() onlyOwner public returns (bool) {
     token.resumeMinting();
     return true;
   }
- 
- 
+
+
   function startTransfer() external onlyOwner
   {
   token.startTransfer() ;
   }
-  
-  
+
+
    function endTransfer() external onlyOwner
   {
   token.endTransfer() ;
   }
-  
+
   function transferTokenOwnership(address owner) external onlyOwner
   {
-    
+
 	token.transferOwnership(owner);
   }
-  
-   
+
+
   function viewCancelledList(address participant) public view returns(bool){
   return cancelledList[participant];
-  
-  }  
+
+  }
 
   // low level token purchase function
   function buyTokens(address beneficiary) public payable {
@@ -484,7 +484,7 @@ contract ZCrowdsale is Ownable{
 
     // calculate token amount to be created
     uint256 tokens = getTokenAmount(weiAmount);
-   
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
     token.mint(beneficiary, tokens);
@@ -494,7 +494,7 @@ contract ZCrowdsale is Ownable{
     forwardFunds();
   }
 
-  
+
   // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   //function createTokenContract() internal returns (MintableToken) {
@@ -503,8 +503,8 @@ contract ZCrowdsale is Ownable{
 
   // returns value in zwei
   // Override this method to have a way to add business logic to your crowdsale when buying
-  function getTokenAmount(uint256 weiAmount) public view returns(uint256) {                      
-  
+  function getTokenAmount(uint256 weiAmount) public view returns(uint256) {
+
 	uint256 ETHtoZweiRate = ETHtoZCOrate.mul(10**tokenDecimals);
     return  SafeMath.div((weiAmount.mul(ETHtoZweiRate)),(1 ether));
   }
@@ -514,16 +514,16 @@ contract ZCrowdsale is Ownable{
     wallet.transfer(msg.value);
   }
 
-  
+
   function enableRefundPeriod() external onlyOwner{
   withinRefundPeriod = true;
   }
-  
+
   function disableRefundPeriod() external onlyOwner{
   withinRefundPeriod = false;
   }
-  
-  
+
+
    // called by the owner on emergency, triggers stopped state
   function emergencyStop() external onlyOwner {
     stopped = true;
@@ -536,9 +536,9 @@ contract ZCrowdsale is Ownable{
 
   function viewContribution(address participant) public view returns(uint256){
   return contribution[participant];
-  }  
-  
-  
+  }
+
+
   // @return true if the transaction can buy tokens
   function validPurchase() internal view returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
@@ -548,34 +548,34 @@ contract ZCrowdsale is Ownable{
 	bool withinmintedTokensCap = mintedTokensCap >= (token.totalSupply() + getTokenAmount(msg.value));
     return withinPeriod && validAmount && withinmintedTokensCap;
   }
-  
-   function refund() external inCancelledList inRefundPeriod {                                                    
+
+   function refund() external inCancelledList inRefundPeriod {
         require((contribution[msg.sender] > 0) && token.balanceOf(msg.sender)>0);
-       uint256 refundBalance = contribution[msg.sender];	   
+       uint256 refundBalance = contribution[msg.sender];
        contribution[msg.sender] = 0;
 		token.burn(msg.sender);
-        msg.sender.transfer(refundBalance); 
+        msg.sender.transfer(refundBalance);
 		Refund(msg.sender,refundBalance);
-    } 
-	
+    }
+
 	function forcedRefund(address _from) external onlyOwner {
 	   require(cancelledList[_from]);
 	   require((contribution[_from] > 0) && token.balanceOf(_from)>0);
-       uint256 refundBalance = contribution[_from];	  
+       uint256 refundBalance = contribution[_from];
        contribution[_from] = 0;
 		token.burn(_from);
-        _from.transfer(refundBalance); 
+        _from.transfer(refundBalance);
 		Refund(_from,refundBalance);
-	
+
 	}
-	
-	
-	
-	//takes ethers from zebiwallet to smart contract 
+
+
+
+	//takes ethers from zebiwallet to smart contract
     function takeEth() external payable {
 		TakeEth(msg.sender,msg.value);
     }
-	
+
 	//transfers ether from smartcontract to zebiwallet
      function withdraw(uint256 _value) public onlyOwner {
         wallet.transfer(_value);
@@ -584,7 +584,7 @@ contract ZCrowdsale is Ownable{
 	 function addCancellation (address _participant) external onlyOwner returns (bool success) {
            cancelledList[_participant] = true;
 		   return true;
-   } 
+   }
 }
 
 
@@ -606,78 +606,78 @@ contract ZebiCoinTempMgr is Ownable{
 
   // address where funds are collected
   address public wallet;
-  
-  // instance of presale contract  
+
+  // instance of presale contract
   ZebiCoinCrowdsale public preSaleCSSC;
-  
+
   // instance of token contract
   ZebiCoin public tsc;
-   
-  // number of decimals allowed in ZCO 
+
+  // number of decimals allowed in ZCO
   uint64 tokenDecimals;
-   
+
   //bad contributor of presale
   mapping(address => bool) preSaleCancelledList;
 
   // contains token value in zwei
   mapping(address => uint256) noncsAllocations;
-  
+
   // check for refund period
-  bool public withinRefundPeriod; 
-  
+  bool public withinRefundPeriod;
+
   // amount refunded to each investor
   mapping(address => uint256)  preSaleRefunds;
-  
-  
-  
+
+
+
   modifier inPreSaleCancelledList {
     require(preSaleCancelledList[msg.sender]);
     _;
   }
-  
+
   modifier inRefundPeriod {
   require(withinRefundPeriod);
   _;
  }
- 
- 
+
+
   event TakeEth(address sender,uint256 value);
   event Withdraw(uint256 _value);
   event PreSaleRefund(address sender,uint256 refundBalance);
   event AllocatenonCSTokens(address indexed beneficiary,uint256 amount);
 
-  
+
   function ZebiCoinTempMgr(address presaleCrowdsale, address tokenAddress, address _wallet) public {
- 
+
     wallet = _wallet;
     preSaleCSSC = ZebiCoinCrowdsale(presaleCrowdsale);
 	tsc = ZebiCoin(tokenAddress);
     tokenDecimals = tsc.decimals();
   }
-  
+
   function finishMint() onlyOwner public returns (bool) {
     tsc.finishMinting();
     return true;
   }
-  
+
   function resumeMint() onlyOwner public returns (bool) {
     tsc.resumeMinting();
     return true;
   }
- 
- 
+
+
   function startTransfer() external onlyOwner{
     tsc.startTransfer() ;
   }
-  
+
   function endTransfer() external onlyOwner{
     tsc.endTransfer() ;
   }
-  
+
   function transferTokenOwnership(address owner) external onlyOwner{
     tsc.transferOwnership(owner);
   }
-  
+
   function allocatenonCSTokens(address beneficiary,uint256 tokens) external onlyOwner
   {
 	require(beneficiary != address(0));
@@ -686,67 +686,78 @@ contract ZebiCoinTempMgr is Ownable{
 	tsc.mint(beneficiary, Zweitokens);
 	AllocatenonCSTokens(beneficiary,Zweitokens);
   }
-	
+
   function revertNoncsallocation(address beneficiary) external onlyOwner
   {
 	require(noncsAllocations[beneficiary]!=0);
 	noncsAllocations[beneficiary]=0;
 	tsc.burn(beneficiary);
   }
- 
+
   function viewNoncsallocations(address participant) public view returns(uint256){
     return noncsAllocations[participant];
   }
-  
+
   function viewPreSaleCancelledList(address participant) public view returns(bool){
     return preSaleCancelledList[participant];
-  } 
-  
+  }
+
   function viewPreSaleRefunds(address participant) public view returns(uint256){
     return preSaleRefunds[participant];
-  } 
-  
+  }
+
   function enableRefundPeriod() external onlyOwner{
     withinRefundPeriod = true;
   }
-  
+
   function disableRefundPeriod() external onlyOwner{
     withinRefundPeriod = false;
   }
-  
-  function refund() external inPreSaleCancelledList inRefundPeriod {                                                    
+
+  function refund() external inPreSaleCancelledList inRefundPeriod {
     require((preSaleCSSC.viewContribution(msg.sender) > 0) && tsc.balanceOf(msg.sender)>0);
-    uint256 refundBalance = preSaleCSSC.viewContribution(msg.sender);	   
+    uint256 refundBalance = preSaleCSSC.viewContribution(msg.sender);
     preSaleRefunds[msg.sender] = refundBalance;
     tsc.burn(msg.sender);
-    msg.sender.transfer(refundBalance); 
+    msg.sender.transfer(refundBalance);
 	PreSaleRefund(msg.sender,refundBalance);
-  } 
-	
+  }
+
   function forcedRefund(address _from) external onlyOwner {
 	require(preSaleCancelledList[_from]);
 	require((preSaleCSSC.viewContribution(_from) > 0) && tsc.balanceOf(_from)>0);
-    uint256 refundBalance = preSaleCSSC.viewContribution(_from);	  
+    uint256 refundBalance = preSaleCSSC.viewContribution(_from);
     preSaleRefunds[_from] = refundBalance;
 	tsc.burn(_from);
-    _from.transfer(refundBalance); 
+    _from.transfer(refundBalance);
 	PreSaleRefund(_from,refundBalance);
   }
-  
-  //takes ethers from zebiwallet to smart contract 
+
+  //takes ethers from zebiwallet to smart contract
   function takeEth() external payable {
 	TakeEth(msg.sender,msg.value);
   }
-	
+
   //transfers ether from smartcontract to zebiwallet
   function withdraw(uint256 _value) public onlyOwner {
     wallet.transfer(_value);
 	Withdraw(_value);
   }
-	
+
   function addCancellation (address _participant) external onlyOwner returns (bool success) {
     preSaleCancelledList[_participant] = true;
 	return true;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

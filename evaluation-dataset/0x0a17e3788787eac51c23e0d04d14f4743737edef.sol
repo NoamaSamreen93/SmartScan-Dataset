@@ -112,8 +112,8 @@ contract AccessControl {
 
     modifier onlyCLevel() {
         require(
-            msg.sender == cooAddress || 
-            msg.sender == ceoAddress || 
+            msg.sender == cooAddress ||
+            msg.sender == ceoAddress ||
             msg.sender == cfoAddress
         );
         _;
@@ -198,7 +198,7 @@ contract TournamentBase {
     event StartCompetition(uint256 id, uint256 time, address[32] users);
     event CancelCompetition(uint256 id);
     event Sponsor(address user, uint256 competitionId, address target, uint256 fee);
-    
+
     event Ball(uint256 competitionId, uint8 gameIndex, address user, uint32 playerId, uint8 time);
     event Battle(uint256 competitionId, uint8 gameIndex, address userA, uint8 scoreA, address userB, uint8 scoreB);
     event Champion(uint256 competitionId, address user);
@@ -253,9 +253,9 @@ contract TournamentBase {
 }
 
 contract PlayerSkill {
-    enum SkillType { Undefined, WinGamesInOneTournament, ScoreInOneGame, ScoreInOneTournament, 
+    enum SkillType { Undefined, WinGamesInOneTournament, ScoreInOneGame, ScoreInOneTournament,
         FanOfPlayerID, ChampionWithPlayerID, HattricksInOneTuournament, Terminator,
-        LonelyKiller, VictoryBringer, Saver, ICanDoBetterTournament, ICanDoBetter, 
+        LonelyKiller, VictoryBringer, Saver, ICanDoBetterTournament, ICanDoBetter,
         LearnFromFailure, LearnFromFailureTournament}
 
     struct SkillConfig {
@@ -530,7 +530,7 @@ contract TournamentCompetition is TournamentBase, PlayerSkill {
         address winner = ci.users[battleInfo.teamIndexs[0]];
         Champion(_competitionId, winner);
 
-        triggerSkill(battleInfo.allPlayerIds, _teamWinCounts, gameScores, 
+        triggerSkill(battleInfo.allPlayerIds, _teamWinCounts, gameScores,
             gameBalls, playerBalls, playerUnAwakeSkillIds, _playerAwakeSkills);
     }
 
@@ -548,7 +548,7 @@ contract TournamentCompetition is TournamentBase, PlayerSkill {
             _playerUnAwakeSkillIds[i] = bsCoreContract.queryPlayerUnAwakeSkillIds(_battleInfo.allPlayerIds[i]);
 
             // uint256[3] memory teamAttrs;
-            // (teamAttrs, _battleInfo.teamInfos[i].playerAtkWeights) = _calTeamAttribute(ci.users[i], team.defenceCount, team.midfieldCount, team.forwardCount, _battleInfo.allPlayerIds[i]);   
+            // (teamAttrs, _battleInfo.teamInfos[i].playerAtkWeights) = _calTeamAttribute(ci.users[i], team.defenceCount, team.midfieldCount, team.forwardCount, _battleInfo.allPlayerIds[i]);
 
             // _battleInfo.teamInfos[i].attack = uint16(teamAttrs[0]);
             // _battleInfo.teamInfos[i].defense = uint16(teamAttrs[1]);
@@ -581,7 +581,7 @@ contract TournamentCompetition is TournamentBase, PlayerSkill {
         _battleInfo.teamLength = resultTeamLength;
     }
 
-    function _battleTeam(BattleInfo _battleInfo, uint8[4][31] _gameScores, uint8[3][3][31] _gameBalls, 
+    function _battleTeam(BattleInfo _battleInfo, uint8[4][31] _gameScores, uint8[3][3][31] _gameBalls,
             uint8[5][11][32] _playerBalls) internal returns (uint8 scoreA, uint8 scoreB) {
         BattleTeam memory _aTeam = _battleInfo.teamInfos[_battleInfo.indexA];
         BattleTeam memory _bTeam = _battleInfo.teamInfos[_battleInfo.indexB];
@@ -1094,7 +1094,7 @@ contract TournamentCore is TournamentInterface, TournamentCompetition, AccessCon
             if (m != i - 1) {
 
                 user = selectUserInfo[i - 1 - startI];
-            
+
                 if (m < startI) {
                     teamUserInfo[m] = user;
                     userToTeam[user].index = uint128(m + 1);
@@ -1126,7 +1126,7 @@ contract TournamentCore is TournamentInterface, TournamentCompetition, AccessCon
         address targetUser = ci.users[_teamIdx];
         Team storage teamInfo = userToTeam[targetUser];
         require(teamInfo.status == TeamStatus.Competition);
-        
+
         SponsorsInfo storage si = sponsorInfos[_competitionId][_teamIdx];
         si.sponsors[_sender] = (si.sponsors[_sender]).add(_count);
         si.totalAmount = (si.totalAmount).add(_count);
@@ -1298,4 +1298,15 @@ contract TournamentCore is TournamentInterface, TournamentCompetition, AccessCon
         userCount = ci.userCount;
         status = ci.status;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

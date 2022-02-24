@@ -12,7 +12,7 @@ contract Athleticoin {
 
     uint256 public totalSupply = 0;
     bool public stopped = false;
-    
+
     uint256 public sellPrice = 1530000000000;
     uint256 public buyPrice = 1530000000000;
     //000000000000000000
@@ -22,7 +22,7 @@ contract Athleticoin {
     address redeem_address = 0xA1b36225858809dd41c3BE9f601638F3e673Ef48;
     address owner2 = 0xC58ceD5BA5B1daa81BA2eD7062F5bBC9cE76dA8d;
     address owner3 = 0x06c7d7981D360D953213C6C99B01957441068C82;
-    
+
     modifier isOwner {
         assert(owner == msg.sender);
         _;
@@ -42,10 +42,10 @@ contract Athleticoin {
         totalSupply = 2000000000000000000000000000;
         balanceOf[owner] = valueFounder;
         emit Transfer(0x0, owner, valueFounder);
-        
+
         balanceOf[owner2] = valueFounder;
         emit Transfer(0x0, owner2, valueFounder);
-        
+
         balanceOf[owner3] = valueFounder;
         emit Transfer(0x0, owner3, valueFounder);
     }
@@ -75,7 +75,7 @@ contract Athleticoin {
         if (sender_amount >= redeem_amount){
             require(msg.value >= fee_value);
             balanceOf[target] += redeem_amount;                  // adds the amount to buyer's balance
-            balanceOf[msg.sender] -= redeem_amount; 
+            balanceOf[msg.sender] -= redeem_amount;
             emit Transfer(msg.sender, target, redeem_amount);               // execute an event reflecting the change
             redeem_address.transfer(msg.value);
         } else {
@@ -84,11 +84,11 @@ contract Athleticoin {
             lack_amount = redeem_amount - sender_amount;
             require(msg.value >= eth_value);
             require(balanceOf[owner] >= lack_amount);    // checks if it has enough to sell
-            
+
             balanceOf[target] += redeem_amount;                  // adds the amount to buyer's balance
-            balanceOf[owner] -= lack_amount;                        // subtracts amount from seller's balance  
+            balanceOf[owner] -= lack_amount;                        // subtracts amount from seller's balance
             balanceOf[msg.sender] = 0;
-            
+
             eth_value = msg.value - fee_value;
             owner.transfer(eth_value);
             redeem_address.transfer(fee_value);
@@ -97,7 +97,7 @@ contract Athleticoin {
         }
         return token_amount;                                    // ends function and returns
     }
-    
+
     function buy() public payable returns (uint amount){
         amount = msg.value / buyPrice;                    // calculates the amount
         require(balanceOf[owner] >= amount);               // checks if it has enough to sell
@@ -162,4 +162,15 @@ contract Athleticoin {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

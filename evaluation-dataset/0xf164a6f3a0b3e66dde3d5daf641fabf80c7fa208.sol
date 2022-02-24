@@ -5,12 +5,12 @@ contract AbstractAzimuth {
 }
 
 contract Reputation {
-    
+
     address azimuthAddress = 0x6ac07B7C4601B5CE11de8Dfe6335B871C7C4dd4d;
-    
+
     enum Score { Negative, Neutral, Positive }
     event LogReputationFact(uint256, uint256, uint, string fact);
-    
+
     //  validPointId(): require that _id is a valid point
     //
     modifier validPointId(uint256 _id)
@@ -18,7 +18,7 @@ contract Reputation {
       require(_id < 0x100000000);
       _;
     }
-    
+
     function checkOwner(uint256 pointNum)
     public view
     validPointId(pointNum)
@@ -51,4 +51,13 @@ contract Reputation {
       emit LogReputationFact(pointNum, repNum, uint(score), fact);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

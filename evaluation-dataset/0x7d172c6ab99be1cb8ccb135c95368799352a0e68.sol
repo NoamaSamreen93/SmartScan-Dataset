@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
  * @title Contract that will work with ERC223 tokens.
  */
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     /**
      * @dev Standard ERC223 function that will handle incoming token transfers.
      *
@@ -529,4 +529,15 @@ contract Cake is PausableToken {
     function tokenURI() external view returns (string) {
         return tokenURI_;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

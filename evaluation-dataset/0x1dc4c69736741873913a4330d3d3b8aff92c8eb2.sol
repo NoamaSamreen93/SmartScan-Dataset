@@ -55,18 +55,18 @@ library SafeMath {
 
 
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     uint256 public totalSupply;
 
    function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-    
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -78,7 +78,7 @@ contract StandardToken is ERC20 {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -99,28 +99,39 @@ contract StandardToken is ERC20 {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function totalSupply() public constant returns (uint _totalSupply) {
         _totalSupply = totalSupply;
     }
 
- 
+
 }
 
 
 contract MYC is StandardToken {
 
-    string public name ="1MalaysiaCoin";                   
-    uint8 public decimals = 8;                
-    string public symbol = "MYC";                
+    string public name ="1MalaysiaCoin";
+    uint8 public decimals = 8;
+    string public symbol = "MYC";
     uint256 public initialSupply = 100000000;
-  
+
 
     function MYC() public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
-      
-    }
-    
 
+    }
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

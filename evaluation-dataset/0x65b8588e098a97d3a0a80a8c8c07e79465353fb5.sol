@@ -275,3 +275,7 @@ contract Asset is ERC20Token {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

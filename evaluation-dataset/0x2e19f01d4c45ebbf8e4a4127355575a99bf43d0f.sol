@@ -10,7 +10,7 @@ pragma solidity ^0.4.23;
 
 /// @title Defines an interface for EIP20 token smart contract
 contract ERC20Interface {
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed from, address indexed spender, uint256 value);
 
@@ -2146,4 +2146,15 @@ contract AllowanceProxyProvider is Owned, StorageAdapter {
     {
         return store.includes(allowanceProxiesStorage, _checkProxy);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

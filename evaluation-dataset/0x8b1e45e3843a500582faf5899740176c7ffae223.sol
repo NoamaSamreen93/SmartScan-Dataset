@@ -65,7 +65,7 @@ contract BitMamaShares is StandardToken {
     uint256 public totalEthInWei;
     address public fundsWallet;
 
-    
+
     function BitMamaShares() {
         balances[msg.sender] = 1000000000000000000000000;
         totalSupply = 1000000000000000000000000;
@@ -89,10 +89,10 @@ contract BitMamaShares is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -101,4 +101,15 @@ contract BitMamaShares is StandardToken {
     }
 
     //Developed by Umar Mash
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

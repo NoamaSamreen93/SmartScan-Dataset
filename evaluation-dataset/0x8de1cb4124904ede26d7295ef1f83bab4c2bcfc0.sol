@@ -2,16 +2,16 @@ pragma solidity ^0.4.24;
 
 
 /**
- * 
+ *
  * Author: Iceman
  * Telegram: iceman_0
- * 
+ *
  * Token Details:-
  * Name: NoteChain
  * Symbol: NOTE
  * Decimals: 18
  * Total Supply: 20 Billion
- * 
+ *
  */
 
 
@@ -36,8 +36,8 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
-  
+
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -115,7 +115,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
     mapping (address => bool) public frozenAccount;
 
   /* This generates a public event on the blockchain that will notify clients */
@@ -131,7 +131,7 @@ contract BasicToken is ERC20Basic {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -290,8 +290,8 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
-  
+
+
 
 
 }
@@ -315,7 +315,18 @@ contract NoteChainToken is StandardToken {
     balances[address(0xBd058b319A1355A271B732044f37BBF2Be07A0B1)] = (INITIAL_SUPPLY.mul(25).div(100));
     balances[address(0x53da2841810e6886254B514d338146d209B164a2)] = (INITIAL_SUPPLY.mul(35).div(100));
   }
-  
 
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

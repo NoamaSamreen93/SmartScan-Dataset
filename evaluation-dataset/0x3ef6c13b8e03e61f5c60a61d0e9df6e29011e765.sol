@@ -15,7 +15,7 @@ contract Token
 {
 	string internal _symbol;
 	string internal _name;
-	uint8 internal _decimals;	
+	uint8 internal _decimals;
     uint256 internal _totalSupply;
    	mapping(address =>uint) internal _balanceOf;
 	mapping(address => mapping(address => uint)) internal _allowances;
@@ -28,11 +28,11 @@ contract Token
     }
 
 	function name() public constant returns (string){
-        	return _name;    
+        	return _name;
 	}
 
 	function symbol() public constant returns (string){
-        	return _symbol;    
+        	return _symbol;
 	}
 
 	function decimals() public constant returns (uint8){
@@ -44,20 +44,20 @@ contract Token
 	}
 }
 contract Admined{
-    
+
     address public owner;
 
     function Admined() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         owner = newOwner;
     }
 }
@@ -67,19 +67,19 @@ contract MyToken is Admined, ERC20,Token("TTL","Talent Token",18,500000000000000
    	mapping(address =>uint) private _balanceOf;
     mapping(address => mapping(address => uint)) private _allowances;
 	bool public transferAllowed = false;
-    
-    modifier whenTransferAllowed() 
+
+    modifier whenTransferAllowed()
 	{
         if(msg.sender != owner){
         	require(transferAllowed);
         }
         _;
     }
-    
+
      function MyToken() public{
         	_balanceOf[msg.sender]=_totalSupply;
     }
-    	
+
     function balanceOf(address _addr)public constant returns (uint balance){
        	return _balanceOf[_addr];
 	}
@@ -92,15 +92,15 @@ contract MyToken is Admined, ERC20,Token("TTL","Talent Token",18,500000000000000
            	return true;
 		}
 		return false;
-    	}	
-    
+    	}
+
 	function transferFrom(address _from, address _to, uint _value)whenTransferAllowed public returns(bool success){
         require(balanceOf(_from)>=_value && _value<= _allowances[_from][msg.sender]);
         {
 			_balanceOf[_from]-=_value;
     		_balanceOf[_to]+=_value;
 			_allowances[_from][msg.sender] -= _value;
-			Transfer(_from, _to, _value);  
+			Transfer(_from, _to, _value);
 			return true;
     	}
         	return false;
@@ -114,7 +114,7 @@ contract MyToken is Admined, ERC20,Token("TTL","Talent Token",18,500000000000000
     	function allowance(address _owner, address _spender) public constant returns(uint remaining){
         	return _allowances[_owner][_spender];
         }
-        
+
     function allowTransfer() onlyOwner public {
         transferAllowed = true;
     }
@@ -126,7 +126,7 @@ contract MyToken is Admined, ERC20,Token("TTL","Talent Token",18,500000000000000
         Burn(msg.sender, _value);
         return true;
     }
-    
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(_value <= _balanceOf[_from]);
         require(_value <= _allowances[_from][msg.sender]);
@@ -136,4 +136,15 @@ contract MyToken is Admined, ERC20,Token("TTL","Talent Token",18,500000000000000
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

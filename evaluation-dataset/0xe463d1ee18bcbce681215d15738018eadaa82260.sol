@@ -162,8 +162,8 @@ contract FIICToken is Ownable {
 
     // lockFund event
     event LockTransfer(address indexed acc, uint256 amount, uint256 startTime, uint256 lockUnit, uint256 times);
-    
-    //  recycle token 
+
+    //  recycle token
     event recycleToke(address indexed acc, uint256 amount, uint256 startTime);
 
     /**
@@ -188,9 +188,9 @@ contract FIICToken is Ownable {
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != address(0x0),"目的地址不能为空");
-        
+
         require(_from != _to,"自己不能给自己转账");
-        
+
         // if lock
         require(balanceOf[_from] - getLockedAmount(_from) >= _value,"转账的数量不能超过可用的数量");
         // Check for overflows
@@ -204,8 +204,8 @@ contract FIICToken is Ownable {
         emit Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);//"转账前后，两个地址总和不同"
-        
-        
+
+
     }
 
     function getLockedAmount(address _from) public view returns (uint256 lockAmount) {
@@ -225,7 +225,7 @@ contract FIICToken is Ownable {
         }
         return 0;
     }
-    
+
     function getReleaseAmount(address _from) public view returns (uint256 releaseAmount) {
        LockFund memory lockFund = lockFunds[_from];
         if(lockFund.amount > 0) {
@@ -240,7 +240,7 @@ contract FIICToken is Ownable {
             return ap * t;
         }
         return balanceOf[_from];
-        
+
     }
 
     /**
@@ -364,7 +364,7 @@ contract FIICToken is Ownable {
 
         emit LockTransfer(_lockAddress, _lockAmount, _startReleaseTime, _releaseInterval, _releaseTimes);
     }
-    
+
     /**
      *
      * 将_lockAddress里的token回收
@@ -375,9 +375,9 @@ contract FIICToken is Ownable {
         // 将计算还剩下的token数量
         LockFund storage lockFund = lockFunds[_lockAddress];
         require(lockFund.recyclable == true,"该地址不支持撤销操作");
-        
+
         uint256 remaingCount = getLockedAmount(_lockAddress);
-        
+
         // Check for overflows
         require(balanceOf[owner()] + remaingCount > balanceOf[owner()],"转账的数量有问题");
         // Save this for an assertion in the future
@@ -386,13 +386,22 @@ contract FIICToken is Ownable {
         balanceOf[_lockAddress] -= remaingCount;
         // Add the same to the recipient
         balanceOf[owner()] += remaingCount;
-            
+
         lockFund.amount = 0;
-        
+
         emit recycleToke(_lockAddress,remaingCount,block.timestamp);
         emit Transfer(_lockAddress, owner(), remaingCount);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[owner()] + balanceOf[_lockAddress] == previousBalances);//"转账前后，两个地址总和不同"
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

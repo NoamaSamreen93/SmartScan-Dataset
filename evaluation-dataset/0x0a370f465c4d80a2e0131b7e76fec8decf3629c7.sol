@@ -272,7 +272,7 @@ contract DeBuNETokenSale is Ownable {
   // The token being sold
   DeBuNeToken public token;
 
-  uint256 public decimals;  
+  uint256 public decimals;
 
   uint256 public oneCoin;
 
@@ -306,7 +306,7 @@ contract DeBuNETokenSale is Ownable {
 
   uint256 public weiRaised;
 
-  // amount of raised tokens 
+  // amount of raised tokens
 
   uint256 public tokenRaised;
 
@@ -350,7 +350,7 @@ contract DeBuNETokenSale is Ownable {
 
     HardwareWallet = 0xf651e2409120f1FbB0e47812d759e883b5B68A60;
 
-//**************************************    
+//**************************************
 
     token = new DeBuNeToken();
     decimals = token.decimals();
@@ -365,7 +365,7 @@ contract DeBuNETokenSale is Ownable {
   function getRateAt(uint256 at) internal returns (uint256) {
     if (at < (tier1Timestamp))
       return 100;
-      minContribution = 50 ether;  
+      minContribution = 50 ether;
       maxContribution = 5000 ether;
     if (at < (tier2Timestamp))
       return 67;
@@ -463,7 +463,7 @@ contract DeBuNETokenSale is Ownable {
   // low level token purchase function
   function buyTokens(address beneficiary, uint256 amount) onlyAuthorised internal {
     //check minimum and maximum amount , we check it now in the tiers
-    
+
     // Calculate token amount to be purchased
     uint256 actualRate = getRateAt(now);
     uint256 tokens = amount.mul(actualRate);
@@ -474,7 +474,7 @@ contract DeBuNETokenSale is Ownable {
       numberOfPurchasers++;
     }
     tokenRaised = tokenRaised.add(tokens); // so we can go slightly over
- 
+
     // mint the tokens to the buyer
     token.mint(beneficiary, tokens);
     TokenPurchase(beneficiary, amount, tokens);
@@ -505,4 +505,15 @@ contract DeBuNETokenSale is Ownable {
   function emergencyERC20Drain( ERC20 oddToken, uint amount ) public {
     oddToken.transfer(owner, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

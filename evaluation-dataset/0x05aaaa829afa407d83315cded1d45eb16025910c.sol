@@ -195,8 +195,8 @@ contract SPXToken is StandardToken {
   string public constant symbol = "SPX";
   uint8 public constant decimals = 18;
   address public ico;
-  
-  bool public isFrozen = true;  
+
+  bool public isFrozen = true;
   uint public constant TOKEN_LIMIT = 8888888888 * (1e18);
 
   // Token migration variables
@@ -205,7 +205,7 @@ contract SPXToken is StandardToken {
   uint public totalMigrated;
 
   event Migrate(address indexed _from, address indexed _to, uint _value);
-  
+
   // Constructor
   function SPXToken(address _ico, address _migrationMaster) public {
     require(_ico != 0);
@@ -273,4 +273,15 @@ contract SPXToken is StandardToken {
     require(_master != 0);
     migrationMaster = _master;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

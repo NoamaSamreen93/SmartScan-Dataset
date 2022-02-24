@@ -152,17 +152,17 @@ contract PSIToken is StandardToken {
    */
   function PSIToken() public {
     totalSupply = INITIAL_SUPPLY;
-    
+
 
     //Round A Investors 15%
     balances[0xa801fcD3CDf65206F567645A3E8c4537739334A2] = 150000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0xa801fcD3CDf65206F567645A3E8c4537739334A2, 150000000 * (10 ** uint256(decimals)));
 
-    //Presales Mining  35% 
+    //Presales Mining  35%
     balances[0xE95aaFA9286337c89746c97fFBD084aD90AFF8Df] = 350000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender,0xE95aaFA9286337c89746c97fFBD084aD90AFF8Df, 350000000 * (10 ** uint256(decimals)));
 
-    
+
     //Community 10%
     balances[0xDCe73461af69C315B87dbb015F3e1341294d72c7] = 100000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0xDCe73461af69C315B87dbb015F3e1341294d72c7, 100000000 * (10 ** uint256(decimals)));
@@ -171,11 +171,11 @@ contract PSIToken is StandardToken {
     balances[0x0d5A4EBbC1599006fdd7999F0e1537b3e60f0dc0] = 230000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0x0d5A4EBbC1599006fdd7999F0e1537b3e60f0dc0, 230000000 * (10 ** uint256(decimals)));
 
-    //Core Teams 12% 
+    //Core Teams 12%
     balances[0x63de19f0028F8402264052D9163AC66ca0c8A26c] = 120000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender,0x63de19f0028F8402264052D9163AC66ca0c8A26c, 120000000 * (10 ** uint256(decimals)));
 
-    
+
     //Expense 3%
     balances[0x403121629cfa4fC39aAc8Bf331AD627B31AbCa29] = 30000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0x403121629cfa4fC39aAc8Bf331AD627B31AbCa29, 30000000 * (10 ** uint256(decimals)));
@@ -185,7 +185,13 @@ contract PSIToken is StandardToken {
     balances[0xBD1acB661e8211EE462114d85182560F30BE7A94] = 20000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0xBD1acB661e8211EE462114d85182560F30BE7A94, 20000000 * (10 ** uint256(decimals)));
 
-    
+
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

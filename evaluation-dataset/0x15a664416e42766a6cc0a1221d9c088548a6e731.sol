@@ -62,7 +62,7 @@ contract BasicToken is ERC20Basic {
   // timestamp when token release is enabled
   uint256 public releaseTime = 1536917418;
   address owner;
-  
+
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
@@ -70,7 +70,7 @@ contract BasicToken is ERC20Basic {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-    
+
     function BasicToken() {
         owner  = msg.sender;
     }
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
         require(now > releaseTime  || msg.sender == owner);
         _;
     }
-    
+
   function transfer(address _to, uint256 _value) public notPaused  returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -111,16 +111,16 @@ contract StandardToken is ERC20, BasicToken {
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
-    
+
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
-    
-   
-     return true;   
- 
-   
+
+
+     return true;
+
+
   }
 
   function approve(address _spender, uint256 _value) public returns (bool) {
@@ -174,9 +174,9 @@ contract StandardToken is ERC20, BasicToken {
 
 contract WEBN is StandardToken {
 
-  string public constant name = "WEBN"; 
-  string public constant symbol = "WEBN"; 
-  uint8 public constant decimals = 8; 
+  string public constant name = "WEBN";
+  string public constant symbol = "WEBN";
+  uint8 public constant decimals = 8;
 
   uint256 public constant INITIAL_SUPPLY = 6000000000 * (10 ** uint256(decimals));
 
@@ -186,4 +186,15 @@ contract WEBN is StandardToken {
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

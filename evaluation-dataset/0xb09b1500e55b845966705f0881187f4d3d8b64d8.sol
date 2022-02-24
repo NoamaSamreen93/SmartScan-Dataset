@@ -270,7 +270,7 @@ contract MountableToken is StandardToken, Owned, BurnableToken {
     /// DD.MM.YYYY
     /// HOT sale start time
     uint64 private constant dateHOTSale = 1562407200 - 7 hours;
-    
+
     /// preSale start time 13.07.2019 (10:00:00 o'clock UTC+7 / WIB)
     uint64 private constant preSale = 1563012000 - 7 hours;
 
@@ -419,7 +419,7 @@ contract MountableToken is StandardToken, Owned, BurnableToken {
         tokenSaleClosed = true;
 
         owner.transfer(address(this).balance);
-        
+
     }
 
     /**
@@ -457,4 +457,13 @@ contract MountableToken is StandardToken, Owned, BurnableToken {
         return super.transfer(_to, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

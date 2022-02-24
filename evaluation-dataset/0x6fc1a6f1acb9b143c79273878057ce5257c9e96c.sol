@@ -120,3 +120,9 @@ contract ERC20MigrationTestable is Graceful, Owned {
         return _contract.transfer(msg.sender, _contract.balanceOf(address(this)));
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

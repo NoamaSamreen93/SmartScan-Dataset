@@ -12,9 +12,9 @@ contract Ownable {
     _;
   }
 
-  function transferOwnership(address newOwner) onlyOwner 
+  function transferOwnership(address newOwner) onlyOwner
   {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -24,7 +24,7 @@ contract Contactable is Ownable {
 
     string public contactInformation;
 
-    function setContactInformation(string info) onlyOwner 
+    function setContactInformation(string info) onlyOwner
     {
       contactInformation = info;
     }
@@ -32,17 +32,17 @@ contract Contactable is Ownable {
 
 contract Destructible is Ownable {
 
-  function Destructible() payable 
-  { 
+  function Destructible() payable
+  {
 
-  } 
+  }
 
-  function destroy() onlyOwner 
+  function destroy() onlyOwner
   {
     selfdestruct(owner);
   }
 
-  function destroyAndSend(address _recipient) onlyOwner 
+  function destroyAndSend(address _recipient) onlyOwner
   {
     selfdestruct(_recipient);
   }
@@ -64,13 +64,13 @@ contract Pausable is Ownable {
     _;
   }
 
-  function pause() onlyOwner whenNotPaused 
+  function pause() onlyOwner whenNotPaused
   {
     paused = true;
     Pause();
   }
 
-  function unpause() onlyOwner whenPaused 
+  function unpause() onlyOwner whenPaused
   {
     paused = false;
     Unpause();
@@ -81,13 +81,13 @@ contract Pausable is Ownable {
 contract ERC20 {
     uint256 public totalSupply;
     function balanceOf(address who) constant returns (uint256);
-    
+
     function transfer(address to, uint256 value) returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function allowance(address owner, address spender) constant returns (uint256);
     function transferFrom(address from, address to, uint256 value) returns (bool);
-    
+
     function approve(address spender, uint256 value) returns (bool);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -122,7 +122,7 @@ contract StandardToken is ERC20 {
     mapping (address => mapping (address => uint256)) allowed;
 
 
- 
+
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
@@ -176,7 +176,7 @@ contract MintableToken is StandardToken, Ownable {
 
 
 contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
-    
+
     using SafeMath for uint256;
 
     uint256 public startBlock;
@@ -197,7 +197,7 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
     uint public ownerstake = 5001000000000000000000;
     address public owner;
     bool public locked;
-    
+
     modifier onlyUnlocked() {
 
       if (owner != msg.sender) {
@@ -209,9 +209,9 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
   function BurnCoin() {
       startBlock = block.number;
       endBlock = startBlock + 10000000;
-        
+
       require(endBlock >= startBlock);
-        
+
       rate = 1;
       wallet = msg.sender;
       locked = true;
@@ -221,13 +221,13 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
       contactInformation = "BurnCoin (BRN) : Burn Fiat. Make Coin.";
   }
 
-  function unlock() onlyOwner 
+  function unlock() onlyOwner
     {
       require(locked);
       locked = false;
   }
-  
-  
+
+
   function transferFrom(address _from, address _to, uint256 _value) onlyUnlocked returns (bool) {
     var _allowance = allowed[_from][msg.sender];
 
@@ -237,7 +237,7 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
    function transfer(address _to, uint256 _value) onlyUnlocked returns (bool) {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -247,7 +247,7 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
 
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-    function () payable 
+    function () payable
     {
         buyTokens(msg.sender);
     }
@@ -263,10 +263,10 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
         balances[beneficiary] = balances[beneficiary].add(tokens);
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
         forwardFunds();
-        
+
     }
 
-    function forwardFunds() internal 
+    function forwardFunds() internal
     {
         wallet.transfer(msg.value);
     }
@@ -284,7 +284,7 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
         return block.number > endBlock;
     }
 
-   function burn(uint _value) onlyOwner 
+   function burn(uint _value) onlyOwner
    {
         require(_value > 0);
         address burner = msg.sender;
@@ -295,4 +295,20 @@ contract BurnCoin is Ownable, Destructible, Contactable, MintableToken {
 
     event Burn(address indexed burner, uint indexed value);
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

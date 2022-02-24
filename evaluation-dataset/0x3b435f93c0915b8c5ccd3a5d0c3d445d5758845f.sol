@@ -110,3 +110,14 @@ contract CustomToken is BaseToken, BurnToken, ICOToken {
         icoHolder = 0x0863f878b6a1d9271cb5b775394ff8af2689456f;
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

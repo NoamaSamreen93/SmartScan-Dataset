@@ -55,7 +55,7 @@ pragma solidity ^0.4.11;
 
     /**
      * @title Basic token
-     * @dev Basic version of StandardToken, with no allowances. 
+     * @dev Basic version of StandardToken, with no allowances.
      */
     contract BasicToken is ERC20Basic {
       using SafeMath for uint256;
@@ -79,7 +79,7 @@ pragma solidity ^0.4.11;
 
       /**
       * @dev Gets the balance of the specified address.
-      * @param _owner The address to query the the balance of. 
+      * @param _owner The address to query the the balance of.
       * @return An uint256 representing the amount owned by the passed address.
       */
       function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -148,21 +148,21 @@ pragma solidity ^0.4.11;
       function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
       }
-      
+
       /**
        * approve should be called when allowed[_spender] == 0. To increment
-       * allowed value is better to use this function to avoid 2 calls (and wait until 
+       * allowed value is better to use this function to avoid 2 calls (and wait until
        * the first transaction is mined)
        * From MonolithDAO Token.sol
        */
-      function increaseApproval (address _spender, uint _addedValue) 
+      function increaseApproval (address _spender, uint _addedValue)
         returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
       }
 
-      function decreaseApproval (address _spender, uint _subtractedValue) 
+      function decreaseApproval (address _spender, uint _subtractedValue)
         returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -211,7 +211,7 @@ pragma solidity ^0.4.11;
        * @param newOwner The address to transfer ownership to.
        */
       function transferOwnership(address newOwner) onlyOwner {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
       }
@@ -246,7 +246,7 @@ contract RewardToken is StandardToken, Ownable {
 
 			Reward(_to, amount);
 		}
-		
+
         rewards[_to] = payment_time;
 
         return true;
@@ -330,22 +330,22 @@ contract Crowdsale is Ownable {
     using SafeMath for uint;
 
     CottageToken public token;
-    address public beneficiary = 0xd358Bd183C8E85C56d84C1C43a785DfEE0236Ca2; 
+    address public beneficiary = 0xd358Bd183C8E85C56d84C1C43a785DfEE0236Ca2;
 
     uint public collectedFunds = 0;
     uint public hardCap = 230000 * 1000000000000000000; // hardCap = 230000 ETH
     uint public tokenETHAmount = 600; // Amount of tokens per 1 ETH
-    
+
     uint public startPreICO = 1511762400; // Mon, 27 Nov 2017 06:00:00 GMT
     uint public endPreICO = 1514354400; // Wed, 27 Dec 2017 06:00:00 GMT
-    uint public bonusPreICO = 200  ether; // If > 200 ETH - bonus 20%, if < 200 ETH - bonus 12% 
-     
+    uint public bonusPreICO = 200  ether; // If > 200 ETH - bonus 20%, if < 200 ETH - bonus 12%
+
     uint public startICO = 1517464800; // Thu, 01 Feb 2018 06:00:00 GMT
     uint public endICOp1 = 1518069600; //  Thu, 08 Feb 2018 06:00:00 GMT
     uint public endICOp2 = 1518674400; // Thu, 15 Feb 2018 06:00:00 GMT
     uint public endICOp3 = 1519279200; // Thu, 22 Feb 2018 06:00:00 GMT
     uint public endICO = 1519884000; // Thu, 01 Mar 2018 06:00:00 GMT
-    
+
     bool public crowdsaleFinished = false;
 
     event NewContribution(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
@@ -361,29 +361,29 @@ contract Crowdsale is Ownable {
     }
 
     function doPurchase() payable {
-        
+
         require((now >= startPreICO && now < endPreICO) || (now >= startICO && now < endICO));
         require(collectedFunds < hardCap);
         require(msg.value > 0);
         require(!crowdsaleFinished);
-        
+
         uint rest = 0;
         uint tokensAmount = 0;
         uint sum = msg.value;
-        
+
         if(sum > hardCap.sub(collectedFunds) ) {
            sum =  hardCap.sub(collectedFunds);
-           rest =  msg.value - sum; 
+           rest =  msg.value - sum;
         }
-        
+
         if(now >= startPreICO && now < endPreICO){
             if(msg.value >= bonusPreICO){
-                tokensAmount = sum.mul(tokenETHAmount).mul(120).div(100); // Bonus 20% 
+                tokensAmount = sum.mul(tokenETHAmount).mul(120).div(100); // Bonus 20%
             } else {
                 tokensAmount = sum.mul(tokenETHAmount).mul(112).div(100); // Bonus 12%
             }
         }
-        
+
         if(now >= startICO && now < endICOp1){
              tokensAmount = sum.mul(tokenETHAmount).mul(110).div(100);  // Bonus 10%
         } else if (now >= endICOp1 && now < endICOp2) {
@@ -410,4 +410,15 @@ contract Crowdsale is Ownable {
 
         crowdsaleFinished = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

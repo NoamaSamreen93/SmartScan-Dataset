@@ -399,7 +399,7 @@ contract PhasedCrowdsale is TimedCrowdsale {
     phases = _phases;
     divisors = _divisors;
   }
-  
+
   function getCurrentPhaseCloseTime() view returns (int256, int256) {
     if(now < openingTime) {
       return (int256(openingTime), -2);
@@ -446,11 +446,11 @@ contract YOLCrowdsale is Ownable, TimedCrowdsale, PhasedCrowdsale {
   }
 
   constructor(
-    uint256 _rate, uint _divisor, address _wallet, 
-    ERC20 _token, uint256 _openingTime, uint256 _closingTime, 
+    uint256 _rate, uint _divisor, address _wallet,
+    ERC20 _token, uint256 _openingTime, uint256 _closingTime,
     uint256[] _phases, uint256[] _divisors,
-    address _afterCrowdsaleAddress) 
-    public 
+    address _afterCrowdsaleAddress)
+    public
     Ownable()
     Crowdsale(_rate, _divisor, _wallet, _token)
     TimedCrowdsale(_openingTime, _closingTime)
@@ -463,4 +463,15 @@ contract YOLCrowdsale is Ownable, TimedCrowdsale, PhasedCrowdsale {
 
     token.transfer(afterCrowdsaleAddress, restTokenBalance);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

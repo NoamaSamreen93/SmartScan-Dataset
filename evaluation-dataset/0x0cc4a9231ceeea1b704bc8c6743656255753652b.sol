@@ -3,27 +3,27 @@ pragma solidity ^0.4.18;
 
 contract Owned {
 
- 
+
     address public owner;
 
-  
+
     address public newOwner;
 
-    
+
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
-   
+
     function Owned() public {
         owner = msg.sender;
     }
 
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
 
-  
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
@@ -89,14 +89,14 @@ contract ApproveAndCallFallBack {
 contract FunWorldCoinToken is ERC20Interface, Owned {
 
 
-  
+
     string  public  symbol;
 
 
     string  public  name;
 
 
-  
+
     uint8 public decimals;
 
 
@@ -177,9 +177,20 @@ contract FunWorldCoinToken is ERC20Interface, Owned {
     }
 
 
-  
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

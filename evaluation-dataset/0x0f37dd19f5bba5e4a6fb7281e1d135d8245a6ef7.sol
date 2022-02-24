@@ -79,7 +79,7 @@ contract DateTime {
  */
 contract manager {
     address public admin; //Admin address is public
-    
+
     /**
     * @dev This contructor takes the msg.sender as the first administer
     */
@@ -118,7 +118,7 @@ contract IADTGE is manager {
     using SafeMath for uint256;
 
     DateTime dateTimeContract = DateTime(0x1a6184CD4C5Bea62B0116de7962EE7315B7bcBce);//Main
-    
+
     //This TGE contract have 2 states
     enum State {
         Ongoing,
@@ -142,7 +142,7 @@ contract IADTGE is manager {
     event LogFundingSuccessful(uint _totalRaised);
     event LogFunderInitialized(address _creator);
     event LogContributorsPayout(address _addr, uint _amount);
-    
+
     modifier notFinished() {
         require(state != State.Successful);
         _;
@@ -152,9 +152,9 @@ contract IADTGE is manager {
     * @notice TGE constructor
     */
     constructor () public {
-        
+
         creator = msg.sender;
-    
+
         emit LogFunderInitialized(creator);
     }
 
@@ -170,20 +170,20 @@ contract IADTGE is manager {
         if (now < startTime.add(15 days)){
 
             tokenBought = msg.value.mul(rates[0]);
-        
+
         } else {
 
             tokenBought = msg.value.mul(rates[1]);
-        
+
         }
 
         totalDistributed = totalDistributed.add(tokenBought);
-        
+
         tokenReward.transfer(msg.sender, tokenBought);
 
         emit LogFundingReceived(msg.sender, msg.value, totalRaised);
         emit LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
@@ -227,7 +227,7 @@ contract IADTGE is manager {
 
         uint256 remainder = _address.balanceOf(this); //Check remainder tokens
         _address.transfer(admin,remainder); //Transfer tokens to admin
-        
+
     }
 
     /*
@@ -235,8 +235,19 @@ contract IADTGE is manager {
     */
 
     function () public payable {
-        
+
         contribute();
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -48,7 +48,7 @@ contract Ownable {
  * @title ERC20
  * @dev ERC20 interface
  */
-contract ERC20 {            
+contract ERC20 {
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     function allowance(address owner, address spender) public view returns (uint256);
@@ -117,7 +117,7 @@ contract EGMToken is ERC20, Ownable {
     event Burn(uint256 wad);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
 
     constructor () public{
         _balances[msg.sender] = totalSupply;
@@ -132,7 +132,7 @@ contract EGMToken is ERC20, Ownable {
     function allowance(address src, address guy) public view returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(dst != address(0));
         require(wad > 0 && _balances[msg.sender] >= wad);
@@ -141,7 +141,7 @@ contract EGMToken is ERC20, Ownable {
         emit Transfer(msg.sender, dst, wad);
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint256 wad) public returns (bool) {
         require(src != address(0));
         require(dst != address(0));
@@ -152,7 +152,7 @@ contract EGMToken is ERC20, Ownable {
         emit Transfer(src, dst, wad);
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) public returns (bool) {
         require(guy != address(0));
         require(wad > 0 && wad <= _balances[msg.sender]);
@@ -176,4 +176,17 @@ contract EGMToken is ERC20, Ownable {
         emit Burn(wad);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,5 +1,5 @@
-// The elements of the array listTINAmotley can be claimed, 
-// transferred, bought, and sold on the ethereum network. 
+// The elements of the array listTINAmotley can be claimed,
+// transferred, bought, and sold on the ethereum network.
 // Users can also add to the original array.
 
 // The elements in listTINAmotley below are recited in a video
@@ -9,42 +9,42 @@
 
 // This program is based on CryptoPunks, by Larva Labs.
 
-// List elements in listTINAmotley contain text snippets from 
-// Margaret Thatcher, Donna Haraway (A Cyborg Manfesto), Francois 
-// Rabelias (Gargantua and Pantagruel), Walt Whitman (Germs), and 
+// List elements in listTINAmotley contain text snippets from
+// Margaret Thatcher, Donna Haraway (A Cyborg Manfesto), Francois
+// Rabelias (Gargantua and Pantagruel), Walt Whitman (Germs), and
 // Miguel de Cervantes (Don Quixote).
 
-// A list element associated with _index can be claimed if 
+// A list element associated with _index can be claimed if
 // gift_CanBeClaimed(_index) returns true. For inquiries
-// about receiving lines owned by info_ownerOfContract for free, 
-// email ListTINAmotley@gmail.com. 
+// about receiving lines owned by info_ownerOfContract for free,
+// email ListTINAmotley@gmail.com.
 
-// In general, the functions that begin with "gift_" are used for 
-// claiming, transferring, and creating script lines without cost beyond 
-// the transaction fee. For example, to claim an available list element 
-// associated with _index, execute the gift_ClaimTINAmotleyLine(_index) 
+// In general, the functions that begin with "gift_" are used for
+// claiming, transferring, and creating script lines without cost beyond
+// the transaction fee. For example, to claim an available list element
+// associated with _index, execute the gift_ClaimTINAmotleyLine(_index)
 // function.
 
-// The functions that begin with "info_" are used to obtain information 
-// about aspects of the program state, including the address that owns 
-// a list element, and the "for sale" or "bid" status of a list element. 
+// The functions that begin with "info_" are used to obtain information
+// about aspects of the program state, including the address that owns
+// a list element, and the "for sale" or "bid" status of a list element.
 
 // The functions that begin with "market_" are used for buying, selling, and
 // placing bids on a list element. For example, to bid on the list element
 // associated with _index, send the bid (in wei, not ether) along with
 // the function execution of market_DeclareBid(_index).
 
-// Note that if there's a transaction involving ether (successful sale, 
+// Note that if there's a transaction involving ether (successful sale,
 // accepted bid, etc..), the ether (don't forget: in units of wei) is not
 // automatically credited to an account; it has to be withdrawn by
 // calling market_WithdrawWei().
 
-// Source code and code used to test the contract are available at 
+// Source code and code used to test the contract are available at
 // https://github.com/ListTINAmotley/LcommaG
 
 // EVERYTHING IS IN UNITS OF WEI, NOT ETHER!
 
-// Contract is deployed at  on the 
+// Contract is deployed at  on the
 // mainnet.
 
 
@@ -60,11 +60,11 @@ contract LcommaG {
     string[] private listTINAmotley;
     // Contains the total number of elements in the list
     uint256 private listTINAmotleyTotalSupply;
-    
+
     mapping (uint => address) private listTINAmotleyIndexToAddress;
     mapping(address => uint256) private listTINAmotleyBalanceOf;
- 
-    // Put list element up for sale by owner. Can be linked to specific 
+
+    // Put list element up for sale by owner. Can be linked to specific
     // potential buyer
     struct forSaleInfo {
         bool isForSale;
@@ -86,7 +86,7 @@ contract LcommaG {
     mapping (uint256 => forSaleInfo) public info_ForSaleInfoByIndex;
     // Public info about highest bid for each token.
     mapping (uint256 => bidInfo) public info_BidInfoByIndex;
-    // Information about withdrawals (in units of wei) available  
+    // Information about withdrawals (in units of wei) available
     //  ... for addresses due to failed bids, successful sales, etc...
     mapping (address => uint256) public info_PendingWithdrawals;
 
@@ -95,18 +95,18 @@ contract LcommaG {
 
     event Claim(uint256 tokenId, address indexed to);
     event Transfer(uint256 tokenId, address indexed from, address indexed to);
-    event ForSaleDeclared(uint256 indexed tokenId, address indexed from, 
+    event ForSaleDeclared(uint256 indexed tokenId, address indexed from,
         uint256 minValue,address indexed to);
     event ForSaleWithdrawn(uint256 indexed tokenId, address indexed from);
-    event ForSaleBought(uint256 indexed tokenId, uint256 value, 
+    event ForSaleBought(uint256 indexed tokenId, uint256 value,
         address indexed from, address indexed to);
-    event BidDeclared(uint256 indexed tokenId, uint256 value, 
+    event BidDeclared(uint256 indexed tokenId, uint256 value,
         address indexed from);
-    event BidWithdrawn(uint256 indexed tokenId, uint256 value, 
+    event BidWithdrawn(uint256 indexed tokenId, uint256 value,
         address indexed from);
-    event BidAccepted(uint256 indexed tokenId, uint256 value, 
+    event BidAccepted(uint256 indexed tokenId, uint256 value,
         address indexed from, address indexed to);
-    
+
     constructor () public {
     	info_OwnerOfContract = msg.sender;
 	info_Name = "LcommaG";
@@ -221,32 +221,32 @@ contract LcommaG {
 	listTINAmotleyIndexToAddress[53] = info_OwnerOfContract;
 	listTINAmotley.push("TINA TINA TINA");
 	listTINAmotleyIndexToAddress[54] = info_OwnerOfContract;
-       
+
 	listTINAmotleyBalanceOf[info_OwnerOfContract] = 42;
 	listTINAmotleyBalanceOf[address(0)] = 13;
 	listTINAmotleyTotalSupply = 55;
      }
-     
+
     function info_TotalSupply() public view returns (uint256 total){
         total = listTINAmotleyTotalSupply;
         return total;
     }
 
     //Number of list elements owned by an account.
-    function info_BalanceOf(address _owner) public view 
+    function info_BalanceOf(address _owner) public view
             returns (uint256 balance){
         balance = listTINAmotleyBalanceOf[_owner];
         return balance;
     }
-    
+
     //Shows text of a list element.
-    function info_SeeTINAmotleyLine(uint256 _tokenId) external view 
+    function info_SeeTINAmotleyLine(uint256 _tokenId) external view
             returns(string){
         require(_tokenId < listTINAmotleyTotalSupply);
         return listTINAmotley[_tokenId];
     }
-    
-    function info_OwnerTINAmotleyLine(uint256 _tokenId) external view 
+
+    function info_OwnerTINAmotleyLine(uint256 _tokenId) external view
             returns (address owner){
         require(_tokenId < listTINAmotleyTotalSupply);
         owner = listTINAmotleyIndexToAddress[_tokenId];
@@ -261,7 +261,7 @@ contract LcommaG {
 	else
 	  return false;
 	  }
-	
+
     // Claim line owned by address(0).
     function gift_ClaimTINAmotleyLine(uint256 _tokenId) external returns(bool){
         require(_tokenId < listTINAmotleyTotalSupply);
@@ -273,8 +273,8 @@ contract LcommaG {
         return true;
     }
 
-   // Create new list element. 
-    function gift_CreateTINAmotleyLine(string _text) external returns(bool){ 
+   // Create new list element.
+    function gift_CreateTINAmotleyLine(string _text) external returns(bool){
         require (msg.sender != address(0));
         uint256  oldTotalSupply = listTINAmotleyTotalSupply;
         listTINAmotleyTotalSupply++;
@@ -300,56 +300,56 @@ contract LcommaG {
         return true;
     }
 
-    // Let anyone interested know that the owner put a token up for sale. 
+    // Let anyone interested know that the owner put a token up for sale.
     // Anyone can obtain it by sending an amount of wei equal to or
-    // larger than  _minPriceInWei. 
-    function market_DeclareForSale(uint256 _tokenId, uint256 _minPriceInWei) 
+    // larger than  _minPriceInWei.
+    function market_DeclareForSale(uint256 _tokenId, uint256 _minPriceInWei)
             external returns (bool){
         require (_tokenId < listTINAmotleyTotalSupply);
         address tokenOwner = listTINAmotleyIndexToAddress[_tokenId];
         require (msg.sender == tokenOwner);
-        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(true, _tokenId, 
+        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(true, _tokenId,
             msg.sender, _minPriceInWei, address(0));
         emit ForSaleDeclared(_tokenId, msg.sender, _minPriceInWei, address(0));
         return true;
     }
-    
-    // Let anyone interested know that the owner put a token up for sale. 
-    // Only the address _to can obtain it by sending an amount of wei equal 
+
+    // Let anyone interested know that the owner put a token up for sale.
+    // Only the address _to can obtain it by sending an amount of wei equal
     // to or larger than _minPriceInWei.
-    function market_DeclareForSaleToAddress(uint256 _tokenId, uint256 
+    function market_DeclareForSaleToAddress(uint256 _tokenId, uint256
             _minPriceInWei, address _to) external returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
         address tokenOwner = listTINAmotleyIndexToAddress[_tokenId];
         require (msg.sender == tokenOwner);
-        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(true, _tokenId, 
+        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(true, _tokenId,
             msg.sender, _minPriceInWei, _to);
         emit ForSaleDeclared(_tokenId, msg.sender, _minPriceInWei, _to);
         return true;
     }
 
-    // Owner no longer wants token for sale, or token has changed owner, 
+    // Owner no longer wants token for sale, or token has changed owner,
     // so previously posted for sale is no longer valid.
     function market_WithdrawForSale(uint256 _tokenId) public returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
         require (msg.sender == listTINAmotleyIndexToAddress[_tokenId]);
-        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(false, _tokenId, 
+        info_ForSaleInfoByIndex[_tokenId] = forSaleInfo(false, _tokenId,
             address(0), 0, address(0));
         emit ForSaleWithdrawn(_tokenId, msg.sender);
         return true;
     }
-    
-    // I'll take it. Must send at least as many wei as minValue in 
+
+    // I'll take it. Must send at least as many wei as minValue in
     // forSale structure.
     function market_BuyForSale(uint256 _tokenId) payable external returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
         forSaleInfo storage existingForSale = info_ForSaleInfoByIndex[_tokenId];
         require(existingForSale.isForSale);
-        require(existingForSale.onlySellTo == address(0) || 
+        require(existingForSale.onlySellTo == address(0) ||
             existingForSale.onlySellTo == msg.sender);
-        require(msg.value >= existingForSale.minValue); 
-        require(existingForSale.seller == 
-            listTINAmotleyIndexToAddress[_tokenId]); 
+        require(msg.value >= existingForSale.minValue);
+        require(existingForSale.seller ==
+            listTINAmotleyIndexToAddress[_tokenId]);
         address seller = listTINAmotleyIndexToAddress[_tokenId];
         rawTransfer(seller, msg.sender, _tokenId);
         // must withdrawal for sale after transfer to make sure msg.sender
@@ -361,7 +361,7 @@ contract LcommaG {
         emit ForSaleBought(_tokenId, msg.value, seller, msg.sender);
         return true;
     }
-    
+
     // Let anyone interested know that potential buyer put up money for a token.
     function market_DeclareBid(uint256 _tokenId) payable external returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
@@ -374,12 +374,12 @@ contract LcommaG {
         if (existingBid.value > 0){
             info_PendingWithdrawals[existingBid.bidder] += existingBid.value;
         }
-        info_BidInfoByIndex[_tokenId] = bidInfo(true, _tokenId, 
+        info_BidInfoByIndex[_tokenId] = bidInfo(true, _tokenId,
             msg.sender, msg.value);
         emit BidDeclared(_tokenId, msg.value, msg.sender);
         return true;
     }
-    
+
     // Potential buyer changes mind and withdrawals bid.
     function market_WithdrawBid(uint256 _tokenId) external returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
@@ -395,9 +395,9 @@ contract LcommaG {
         emit BidWithdrawn(_tokenId, amount, msg.sender);
         return true;
     }
-    
+
     // Accept bid, and transfer money and token. All money in wei.
-    function market_AcceptBid(uint256 _tokenId, uint256 minPrice) 
+    function market_AcceptBid(uint256 _tokenId, uint256 minPrice)
             external returns(bool){
         require (_tokenId < listTINAmotleyTotalSupply);
         address seller = listTINAmotleyIndexToAddress[_tokenId];
@@ -417,7 +417,7 @@ contract LcommaG {
         emit BidAccepted(_tokenId, amount, seller, buyer);
         return true;
     }
-    
+
     // Retrieve money to successful sale, failed bid, withdrawn bid, etc.
     //  All in wei. Note that refunds, income, etc. are NOT automatically
     // deposited in the user's address. The user must withdraw the funds.
@@ -427,28 +427,39 @@ contract LcommaG {
        info_PendingWithdrawals[msg.sender] = 0;
        msg.sender.transfer(amount);
        return true;
-    } 
-    
+    }
+
     function clearNewOwnerBid(address _to, uint256 _tokenId) internal {
         // clear bid when become owner via transfer or forSaleBuy
         bidInfo storage existingBid = info_BidInfoByIndex[_tokenId];
         if (existingBid.bidder == _to){
             uint256 amount = existingBid.value;
             info_PendingWithdrawals[_to] += amount;
-            info_BidInfoByIndex[_tokenId] = bidInfo(false, _tokenId, 
+            info_BidInfoByIndex[_tokenId] = bidInfo(false, _tokenId,
                 address(0), 0);
             emit BidWithdrawn(_tokenId, amount, _to);
         }
-      
+
     }
-    
-    function rawTransfer(address _from, address _to, uint256 _tokenId) 
+
+    function rawTransfer(address _from, address _to, uint256 _tokenId)
             internal {
         listTINAmotleyBalanceOf[_from]--;
         listTINAmotleyBalanceOf[_to]++;
         listTINAmotleyIndexToAddress[_tokenId] = _to;
         emit Transfer(_tokenId, _from, _to);
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

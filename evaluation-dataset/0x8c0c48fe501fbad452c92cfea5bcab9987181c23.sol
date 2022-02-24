@@ -64,7 +64,7 @@ contract OutCloud is ERC20
     // uint256 public ico_enddate;
     uint256 public preico_startdate;
     uint256 public preico_enddate;
-    bool public lockstatus; 
+    bool public lockstatus;
     uint256 constant public ETH_DECIMALS = 10 ** 18;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -75,8 +75,8 @@ contract OutCloud is ERC20
     uint256 public minContribution = 10000; // 10 USD  (1 USD = 1000)
     uint256 ContributionAmount;
     uint dis;
-   
- 
+
+
     uint public priceFactor;
    // mapping(address => uint256) availTokens;
 
@@ -98,7 +98,7 @@ contract OutCloud is ERC20
      _;
     }
 
-  
+
     constructor(uint256 EtherPriceFactor) public
     {
         require(EtherPriceFactor != 0);
@@ -108,7 +108,7 @@ contract OutCloud is ERC20
         lockstatus = true;
         priceFactor = EtherPriceFactor;
         emit Transfer(0, owner, balances[owner]);
-       
+
     }
 
     function () public payable
@@ -118,15 +118,15 @@ contract OutCloud is ERC20
         require(!stopped && msg.sender != owner);
         ContributionAmount = ((msg.value).mul(priceFactor.mul(1000)));// 1USD = 1000
         if (stage == Stages.PREICO && now <= preico_enddate){
-            
-             
+
+
            dis= getCurrentTokenPricepreICO(ContributionAmount);
            _price_token = _price_token.sub(_price_token.mul(dis).div(100));
           y();
 
     }
     else  if (stage == Stages.ICO ){
-  
+
           dis= getCurrentTokenPriceICO(ContributionAmount);
            _price_token = _price_token.sub(_price_token.mul(dis).div(100));
           y();
@@ -136,50 +136,50 @@ contract OutCloud is ERC20
         revert();
     }
     }
-    
-   
+
+
 
   function getCurrentTokenPricepreICO(uint256 individuallyContributedEtherInWei) private returns (uint)
         {
         require(individuallyContributedEtherInWei >= (minContribution.mul(ETH_DECIMALS)));
         uint disc;
         bonusCalculationFactor = (block.timestamp.sub(preico_startdate)).div(604800); // 1 week time period in seconds
-        if (bonusCalculationFactor== 0) 
+        if (bonusCalculationFactor== 0)
             disc = 30;                     //30 % Discount
-        else if (bonusCalculationFactor == 1) 
+        else if (bonusCalculationFactor == 1)
             disc = 20;                     //20 % Discount
-        else if (bonusCalculationFactor ==2 ) 
+        else if (bonusCalculationFactor ==2 )
             disc = 10;                      //10 % Discount
-        else if (bonusCalculationFactor == 3) 
+        else if (bonusCalculationFactor == 3)
            disc = 5;                     //5 % Discount
-        
-            
+
+
             return disc;
-     
+
         }
-        
+
         function getCurrentTokenPriceICO(uint256 individuallyContributedEtherInWei) private returns (uint)
         {
         require(individuallyContributedEtherInWei >= (minContribution.mul(ETH_DECIMALS)));
         uint disc;
         bonusCalculationFactor = (block.timestamp.sub(ico_startdate)).div(604800); // 1 week time period in seconds
-        if (bonusCalculationFactor== 0) 
+        if (bonusCalculationFactor== 0)
             disc = 30;                     //30 % Discount
-        else if (bonusCalculationFactor == 1) 
+        else if (bonusCalculationFactor == 1)
             disc = 20;                     //20 % Discount
-        else if (bonusCalculationFactor ==2 ) 
+        else if (bonusCalculationFactor ==2 )
             disc = 10;                      //10 % Discount
-        else if (bonusCalculationFactor == 3) 
+        else if (bonusCalculationFactor == 3)
            disc = 5;                     //5 % Discount
-        else if (bonusCalculationFactor > 3) 
+        else if (bonusCalculationFactor > 3)
            disc = 0;                  //0% Discount
-            
+
             return disc;
-     
+
         }
-        
+
          function y() private {
-            
+
              no_of_tokens = ((msg.value).mul(priceFactor.mul(1000))).div(_price_token); //(1USD =1000)
              ethreceived = ethreceived.add(msg.value);
              balances[address(this)] = (balances[address(this)]).sub(no_of_tokens);
@@ -187,7 +187,7 @@ contract OutCloud is ERC20
              emit Transfer(address(this), msg.sender, no_of_tokens);
     }
 
-   
+
     // called by the owner, pause ICO
     function StopICO() external onlyOwner  {
         stopped = true;
@@ -200,20 +200,20 @@ contract OutCloud is ERC20
         stopped = false;
 
     }
-    
+
     // to change price of Ether in USD, in case price increases or decreases
      function setpricefactor(uint256 newPricefactor) external onlyOwner
     {
         priceFactor = newPricefactor;
-        
+
     }
-    
+
      function setEthmainAddress(address newEthfundaddress) external onlyOwner
     {
         ethFundMain = newEthfundaddress;
     }
- 
-    
+
+
      function start_PREICO() external onlyOwner atStage(Stages.NOTSTARTED)
       {
           stage = Stages.PREICO;
@@ -224,7 +224,7 @@ contract OutCloud is ERC20
          preico_enddate = now + 28 days; //time period for preICO = 4 weeks
       emit Transfer(0, address(this), balances[address(this)]);
           }
-    
+
     function start_ICO() external onlyOwner atStage(Stages.PREICO)
       {
           stage = Stages.ICO;
@@ -234,7 +234,7 @@ contract OutCloud is ERC20
           ico_startdate = now;
         //  ico_enddate = now + 28 days; //time period for ICO = 4 weeks
           emit Transfer(0, address(this), TotalICOSupply);
-      
+
           }
 
     function end_ICO() external onlyOwner atStage(Stages.ICO)
@@ -246,10 +246,10 @@ contract OutCloud is ERC20
         balances[owner] = (balances[owner]).add( balances[address(this)]);
         balances[address(this)] = 0;
        emit  Transfer(address(this), owner , x);
-        
+
     }
-    
-  
+
+
    // This function can be used by owner in emergency to update running status parameter
     function removeLocking(bool RunningStatusLock) external onlyOwner
     {
@@ -257,7 +257,7 @@ contract OutCloud is ERC20
     }
 
 
-  
+
     // what is the total supply of the ech tokens
     function totalSupply() public view returns(uint256 total_Supply) {
         total_Supply = _totalsupply;
@@ -300,7 +300,7 @@ contract OutCloud is ERC20
     }
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) public returns(bool success) {
-       
+
        if ( lockstatus && msg.sender == owner) {
             require(balances[msg.sender] >= _amount && _amount >= 0);
             balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -308,7 +308,7 @@ contract OutCloud is ERC20
             emit Transfer(msg.sender, _to, _amount);
             return true;
         }
-      
+
           else if(!lockstatus)
          {
            require(balances[msg.sender] >= _amount && _amount >= 0);
@@ -340,4 +340,15 @@ contract OutCloud is ERC20
         ethFundMain.transfer(myAddress.balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

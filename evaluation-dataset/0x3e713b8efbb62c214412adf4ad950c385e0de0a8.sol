@@ -103,16 +103,16 @@ contract T8EXToken is StandardToken {
     string public constant symbol = "T8EX";
     uint8  public constant decimals = 18;
 
-	address public minter; 
-	uint    public tokenSaleEndTime; 
+	address public minter;
+	uint    public tokenSaleEndTime;
 
 	// token lockup for cornerstone investors
-	mapping(address=>uint) public lockedBalanceCor; 
+	mapping(address=>uint) public lockedBalanceCor;
 	mapping(uint=>address) lockedBalanceCor_index;
 	uint lockedBalanceCor_count;
 
 	// token lockup for private investors
-	mapping(address=>uint) public lockedBalancePri; 
+	mapping(address=>uint) public lockedBalancePri;
 	mapping(uint=>address) lockedBalancePri_index;
 	uint lockedBalancePri_count;
 
@@ -139,7 +139,7 @@ contract T8EXToken is StandardToken {
 	function transfer(address _to, uint _value)
         public
         validDestination(_to)
-        returns (bool) 
+        returns (bool)
     {
         return super.transfer(_to, _value);
     }
@@ -147,7 +147,7 @@ contract T8EXToken is StandardToken {
 	function transferFrom(address _from, address _to, uint _value)
         public
         validDestination(_to)
-        returns (bool) 
+        returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -167,7 +167,7 @@ contract T8EXToken is StandardToken {
 	function createLockedTokenCor(address _recipient, uint _value)
 		whenMintable
 		onlyMinter
-		returns (bool) 
+		returns (bool)
 	{
 		lockedBalanceCor_index[lockedBalanceCor_count] = _recipient;
 		lockedBalanceCor[_recipient] += _value;
@@ -193,7 +193,7 @@ contract T8EXToken is StandardToken {
 	function createLockedTokenPri(address _recipient, uint _value)
 		whenMintable
 		onlyMinter
-		returns (bool) 
+		returns (bool)
 	{
 		lockedBalancePri_index[lockedBalancePri_count] = _recipient;
 		lockedBalancePri[_recipient] += _value;
@@ -211,6 +211,19 @@ contract T8EXToken is StandardToken {
 			address investor = lockedBalancePri_index[i];
 			balances[investor] += lockedBalancePri[investor];
 			lockedBalancePri[investor] = 0;
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
 		}
 	}
 }

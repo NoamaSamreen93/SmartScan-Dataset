@@ -1,8 +1,8 @@
 /**
- * ############################################################## 
- * 
+ * ##############################################################
+ *
  *  CFT2 ERC-20 Test Token
- * 
+ *
  * ##############################################################
  */
 
@@ -430,4 +430,13 @@ contract CFTestToken2 is Ownable, ERC20, ERC20Detailed {
         selfdestruct(beneficiary);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,10 +1,10 @@
 // ----------------------------------------------------------------------------------------------
-// Developer Nechesov Andrey & ObjectMicro, Inc 
+// Developer Nechesov Andrey & ObjectMicro, Inc
 // ----------------------------------------------------------------------------------------------
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/issues/20
 
-pragma solidity ^0.4.23;    
+pragma solidity ^0.4.23;
 
   library SafeMath {
     function mul(uint256 a, uint256 b) internal returns (uint256) {
@@ -35,60 +35,60 @@ pragma solidity ^0.4.23;
   contract ERC20Interface {
       // Get the total token supply
       function totalSupply() constant returns (uint256 totalSupply);
-   
+
       // Get the account balance of another account with address _owner
       function balanceOf(address _owner) constant returns (uint256 balance);
-   
+
       // Send _value amount of tokens to address _to
       function transfer(address _to, uint256 _value) returns (bool success);
-   
+
       // Send _value amount of tokens from address _from to address _to
       function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-   
+
       // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
       // If this function is called again it overwrites the current allowance with _value.
       // this function is required for some DEX functionality
       function approve(address _spender, uint256 _value) returns (bool success);
-   
+
       // Returns the amount which _spender is still allowed to withdraw from _owner
       function allowance(address _owner, address _spender) constant returns (uint256 remaining);
-   
+
       // Triggered when tokens are transferred.
       event Transfer(address indexed _from, address indexed _to, uint256 _value);
-   
+
       // Triggered whenever approve(address _spender, uint256 _value) is called.
       event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-  }  
-   
+  }
+
   contract Iou_Token is ERC20Interface {
 
       string public constant symbol = "IOU";
       string public constant name = "IOU token";
-      uint8 public constant decimals = 18; 
-           
-      uint256 public constant maxTokens = 800*10**6*10**18; 
-      uint256 public constant ownerSupply = maxTokens*30/100;
-      uint256 _totalSupply = ownerSupply;  
+      uint8 public constant decimals = 18;
 
-      uint256 public constant token_price = 10**18*1/800; 
-      uint256 public pre_ico_start = 1528416000; 
-      uint256 public ico_start = 1531008000; 
-      uint256 public ico_finish = 1541635200; 
-      uint public constant minValuePre = 10**18*1/1000000; 
-      uint public constant minValue = 10**18*1/1000000; 
+      uint256 public constant maxTokens = 800*10**6*10**18;
+      uint256 public constant ownerSupply = maxTokens*30/100;
+      uint256 _totalSupply = ownerSupply;
+
+      uint256 public constant token_price = 10**18*1/800;
+      uint256 public pre_ico_start = 1528416000;
+      uint256 public ico_start = 1531008000;
+      uint256 public ico_finish = 1541635200;
+      uint public constant minValuePre = 10**18*1/1000000;
+      uint public constant minValue = 10**18*1/1000000;
       uint public constant maxValue = 3000*10**18;
 
       uint public coef = 102;
 
       using SafeMath for uint;
-      
+
       // Owner of this contract
       address public owner;
       address public moderator;
-   
+
       // Balances for each account
       mapping(address => uint256) balances;
-   
+
       // Owner of account approves the transfer of an amount to another account
       mapping(address => mapping (address => uint256)) allowed;
 
@@ -102,11 +102,11 @@ pragma solidity ^0.4.23;
       address[] public orders_sell_list;
 
       // Triggered on set SELL order
-      event Order_sell(address indexed _owner, uint256 _max_amount, uint256 _price);      
+      event Order_sell(address indexed _owner, uint256 _max_amount, uint256 _price);
 
       // Triggered on execute SELL order
-      event Order_execute(address indexed _from, address indexed _to, uint256 _amount, uint256 _price);      
-   
+      event Order_execute(address indexed _from, address indexed _to, uint256 _amount, uint256 _price);
+
       // Functions with this modifier can only be executed by the owner
       modifier onlyOwner() {
           if (msg.sender != owner) {
@@ -124,17 +124,17 @@ pragma solidity ^0.4.23;
       }
 
       // Functions change owner
-      function changeOwner(address _owner) onlyOwner returns (bool result) {                    
+      function changeOwner(address _owner) onlyOwner returns (bool result) {
           owner = _owner;
           return true;
-      }            
+      }
 
       // Functions change moderator
-      function changeModerator(address _moderator) onlyOwner returns (bool result) {                    
+      function changeModerator(address _moderator) onlyOwner returns (bool result) {
           moderator = _moderator;
           return true;
-      }            
-   
+      }
+
       // Constructor
       function Iou_Token() {
           //owner = msg.sender;
@@ -142,12 +142,12 @@ pragma solidity ^0.4.23;
           moderator = 0x788C45Dd60aE4dBE5055b5Ac02384D5dc84677b0;
           balances[owner] = ownerSupply;
       }
-      
-      //default function      
-      function() payable {        
-          tokens_buy();        
+
+      //default function
+      function() payable {
+          tokens_buy();
       }
-      
+
       function totalSupply() constant returns (uint256 totalSupply) {
           totalSupply = _totalSupply;
       }
@@ -184,16 +184,16 @@ pragma solidity ^0.4.23;
           ico_finish = _ico_finish;
           return true;
       }
-   
+
       // Total tokens on user address
       function balanceOf(address _owner) constant returns (uint256 balance) {
           return balances[_owner];
       }
-   
-      // Transfer the balance from owner's account to another account
-      function transfer(address _to, uint256 _amount) returns (bool success) {          
 
-          if (balances[msg.sender] >= _amount 
+      // Transfer the balance from owner's account to another account
+      function transfer(address _to, uint256 _amount) returns (bool success) {
+
+          if (balances[msg.sender] >= _amount
               && _amount > 0
               && balances[_to] + _amount > balances[_to]) {
               balances[msg.sender] -= _amount;
@@ -204,7 +204,7 @@ pragma solidity ^0.4.23;
               return false;
           }
       }
-   
+
       // Send _value amount of tokens from address _from to address _to
       // The transferFrom method is used for a withdraw workflow, allowing contracts to send
       // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -215,7 +215,7 @@ pragma solidity ^0.4.23;
           address _from,
           address _to,
           uint256 _amount
-     ) returns (bool success) {         
+     ) returns (bool success) {
 
          if (balances[_from] >= _amount
              && allowed[_from][msg.sender] >= _amount
@@ -230,7 +230,7 @@ pragma solidity ^0.4.23;
              return false;
          }
      }
-  
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount) returns (bool success) {
@@ -238,19 +238,19 @@ pragma solidity ^0.4.23;
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-    
-     //Return param, how many tokens can send _spender from _owner account  
+
+     //Return param, how many tokens can send _spender from _owner account
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
-     } 
+     }
 
       /**
       * Buy tokens on pre-ico and ico with bonuses on time boundaries
       */
-      function tokens_buy() payable returns (bool) { 
+      function tokens_buy() payable returns (bool) {
 
         uint256 tnow = now;
-        
+
         if(tnow < pre_ico_start) throw;
         if(tnow > ico_finish) throw;
         if(_totalSupply >= maxTokens) throw;
@@ -261,8 +261,8 @@ pragma solidity ^0.4.23;
         uint tokens_buy = (msg.value*10**18).div(token_price);
         uint tokens_buy_total;
 
-        if(!(tokens_buy > 0)) throw;   
-        
+        if(!(tokens_buy > 0)) throw;
+
         //Bonus for total tokens amount for all contract
         uint b1 = 0;
         //Time bonus on Pre-ICO && ICO
@@ -287,27 +287,27 @@ pragma solidity ^0.4.23;
         }
         if(50*10**6*10**18 <= _totalSupply) {
           b1 = tokens_buy*5/100;
-        }        
+        }
 
         if(tnow < ico_start) {
           b2 = tokens_buy*40/100;
         }
         if((ico_start + 86400*0 <= tnow)&&(tnow < ico_start + 86400*5)){
           b2 = tokens_buy*5/100;
-        } 
-        if((ico_start + 86400*5 <= tnow)&&(tnow < ico_start + 86400*10)){
-          b2 = tokens_buy*4/100;        
-        } 
-        if((ico_start + 86400*10 <= tnow)&&(tnow < ico_start + 86400*20)){
-          b2 = tokens_buy*5/100;        
-        } 
-        if((ico_start + 86400*20 <= tnow)&&(tnow < ico_start + 86400*30)){
-          b2 = tokens_buy*2/100;        
-        } 
-        if(ico_start + 86400*30 <= tnow){
-          b2 = tokens_buy*1/100;        
         }
-        
+        if((ico_start + 86400*5 <= tnow)&&(tnow < ico_start + 86400*10)){
+          b2 = tokens_buy*4/100;
+        }
+        if((ico_start + 86400*10 <= tnow)&&(tnow < ico_start + 86400*20)){
+          b2 = tokens_buy*5/100;
+        }
+        if((ico_start + 86400*20 <= tnow)&&(tnow < ico_start + 86400*30)){
+          b2 = tokens_buy*2/100;
+        }
+        if(ico_start + 86400*30 <= tnow){
+          b2 = tokens_buy*1/100;
+        }
+
 
         if((1000*10**18 <= tokens_buy)&&(5000*10**18 <= tokens_buy)) {
           b3 = tokens_buy*5/100;
@@ -327,21 +327,21 @@ pragma solidity ^0.4.23;
 
         tokens_buy_total = tokens_buy.add(b1);
         tokens_buy_total = tokens_buy_total.add(b2);
-        tokens_buy_total = tokens_buy_total.add(b3);        
+        tokens_buy_total = tokens_buy_total.add(b3);
 
         if(_totalSupply.add(tokens_buy_total) > maxTokens) throw;
         _totalSupply = _totalSupply.add(tokens_buy_total);
-        balances[msg.sender] = balances[msg.sender].add(tokens_buy_total);         
+        balances[msg.sender] = balances[msg.sender].add(tokens_buy_total);
 
         return true;
       }
-      
+
       /**
       * Get total SELL orders
-      */      
+      */
       function orders_sell_total () constant returns (uint256) {
         return orders_sell_list.length;
-      } 
+      }
 
       /**
       * Get how many tokens can buy from this SELL order
@@ -359,38 +359,38 @@ pragma solidity ^0.4.23;
       }
 
       /**
-      * User create SELL order.  
+      * User create SELL order.
       */
       function order_sell(uint256 _max_amount, uint256 _price) returns (bool) {
 
         if(!(_max_amount > 0)) throw;
-        if(!(_price > 0)) throw;        
+        if(!(_price > 0)) throw;
 
         orders_sell_amount[msg.sender] = _max_amount;
         orders_sell_price[msg.sender] = (_price*coef).div(100);
-        orders_sell_list.push(msg.sender);        
+        orders_sell_list.push(msg.sender);
 
-        Order_sell(msg.sender, _max_amount, orders_sell_price[msg.sender]);      
+        Order_sell(msg.sender, _max_amount, orders_sell_price[msg.sender]);
 
         return true;
       }
 
       /**
-      * Order Buy tokens - it's order search sell order from user _from and if all ok, send token and money 
+      * Order Buy tokens - it's order search sell order from user _from and if all ok, send token and money
       */
       function order_buy(address _from, uint256 _max_price) payable returns (bool) {
-        
+
         if(!(msg.value > 0)) throw;
-        if(!(_max_price > 0)) throw;        
+        if(!(_max_price > 0)) throw;
         if(!(orders_sell_amount[_from] > 0)) throw;
-        if(!(orders_sell_price[_from] > 0)) throw; 
+        if(!(orders_sell_price[_from] > 0)) throw;
         if(orders_sell_price[_from] > _max_price) throw;
 
         uint _amount = (msg.value*10**18).div(orders_sell_price[_from]);
         uint _amount_from = get_orders_sell_amount(_from);
 
-        if(_amount > _amount_from) _amount = _amount_from;        
-        if(!(_amount > 0)) throw;        
+        if(_amount > _amount_from) _amount = _amount_from;
+        if(!(_amount > 0)) throw;
 
         uint _total_money = (orders_sell_price[_from]*_amount).div(10**18);
         if(_total_money > msg.value) throw;
@@ -404,12 +404,21 @@ pragma solidity ^0.4.23;
         if(_seller_money > 0) _from.send(_seller_money);
         if(_buyer_money > 0) msg.sender.send(_buyer_money);
 
-        orders_sell_amount[_from] -= _amount;        
+        orders_sell_amount[_from] -= _amount;
         balances[_from] -= _amount;
-        balances[msg.sender] += _amount; 
+        balances[msg.sender] += _amount;
 
         Order_execute(_from, msg.sender, _amount, orders_sell_price[_from]);
 
       }
-      
+
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -95,10 +95,10 @@ contract DTT is StandardToken {
 
     /* Public variables of the token */
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';    
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
 
     function DTT(
@@ -122,3 +122,10 @@ contract DTT is StandardToken {
         return true;
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

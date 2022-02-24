@@ -12,7 +12,7 @@ contract ERC20 {
 }
 
 library SafeMath {
-  
+
   function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -45,7 +45,7 @@ contract OnlyOwner {
   address private controller;
   //log the previous and new controller when event  is fired.
   event SetNewController(address prev_controller, address new_controller);
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -56,26 +56,26 @@ contract OnlyOwner {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier isOwner {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
-   * @dev Throws if called by any account other than the controller. 
+   * @dev Throws if called by any account other than the controller.
    */
   modifier isController {
     require(msg.sender == controller);
     _;
   }
-  
+
   function replaceController(address new_controller) isController public returns(bool){
     require(new_controller != address(0x0));
 	controller = new_controller;
     emit SetNewController(msg.sender,controller);
-    return true;   
+    return true;
   }
 
 }
@@ -86,7 +86,7 @@ contract StandardToken is ERC20{
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
-  
+
     function _transfer(address _from, address _to, uint256 _value) internal returns (bool success){
       //prevent sending of tokens from genesis address or to self
       require(_from != address(0) && _from != _to);
@@ -98,8 +98,8 @@ contract StandardToken is ERC20{
       return true;
     }
 
-  function transfer(address _to, uint256 _value) public returns (bool success) 
-  { 
+  function transfer(address _to, uint256 _value) public returns (bool success)
+  {
     require(_value <= balances[msg.sender]);
       _transfer(msg.sender,_to,_value);
       emit Transfer(msg.sender, _to, _value);
@@ -114,7 +114,7 @@ contract StandardToken is ERC20{
       require(balances[_to] + _value > balances[_to]);
       //call transfer function
       _transfer(_from,_to,_value);
-      //subtract the amount allowed to the sender 
+      //subtract the amount allowed to the sender
       allowed[_from][msg.sender] = _allowance.safeSub(_value);
       //trigger Transfer event
       emit Transfer(_from, _to, _value);
@@ -125,7 +125,7 @@ contract StandardToken is ERC20{
       return balances[_owner];
     }
 
-    
+
 
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -170,7 +170,7 @@ contract CCN is StandardToken, OnlyOwner{
     uint256 private approvalCounts =0;
     uint256 private minRequiredApprovals =2;
     address public burnedTokensReceiver;
-    
+
     constructor() public{
         balances[msg.sender] = totalSupply;
         burnedTokensReceiver = 0x0000000000000000000000000000000000000000;
@@ -183,7 +183,7 @@ contract CCN is StandardToken, OnlyOwner{
     function setApprovalCounts(uint _value) public isController {
         approvalCounts = _value;
     }
-    
+
     /**
    * @dev Function to set minimum require approval variable value.
    * @param _value uint The value by which minRequiredApprovals variable will be set.
@@ -194,7 +194,7 @@ contract CCN is StandardToken, OnlyOwner{
         minRequiredApprovals = _value;
         return true;
     }
-    
+
     /**
    * @dev Function to get approvalCounts variable value.
    * @return approvalCounts.
@@ -202,7 +202,7 @@ contract CCN is StandardToken, OnlyOwner{
     function getApprovalCount() public view isController returns(uint){
         return approvalCounts;
     }
-    
+
      /**
    * @dev Function to get burned Tokens Receiver address.
    * @return burnedTokensReceiver.
@@ -210,14 +210,25 @@ contract CCN is StandardToken, OnlyOwner{
     function getBurnedTokensReceiver() public view isController returns(address){
         return burnedTokensReceiver;
     }
-    
-    
+
+
     function controllerApproval(address _from, uint256 _value) public isOwner returns (bool) {
         require(minRequiredApprovals <= approvalCounts);
-		require(_value <= balances[_from]);		
+		require(_value <= balances[_from]);
         balances[_from] = balances[_from].safeSub(_value);
         balances[burnedTokensReceiver] = balances[burnedTokensReceiver].safeAdd(_value);
         emit Transfer(_from,burnedTokensReceiver, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

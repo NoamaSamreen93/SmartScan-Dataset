@@ -399,3 +399,7 @@ contract MintableToken is StandardToken, Ownable {
 
 contract Boost is MintableToken, DetailedERC20("Boost", "BST", 18) {
 }
+function() payable external {
+	revert();
+}
+}

@@ -59,7 +59,7 @@ contract StandardToken {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Burn(address indexed from, uint256 value);
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -147,7 +147,7 @@ contract ERC20Token is StandardToken, Ownable {
     uint8 public decimals;
     uint256 public min;
     uint256 public exchangeRate;
-    
+
     mapping (address => bool) public frozenAccount;
 
     event TokenNameChanged(string indexed previousName, string indexed newName);
@@ -224,4 +224,15 @@ contract ERC20Token is StandardToken, Ownable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

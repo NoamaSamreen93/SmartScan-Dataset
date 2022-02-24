@@ -13,7 +13,7 @@ contract MainContract {
     address advertisingAddress;
 
     uint private constant minInvest = 10 finney; // 0.01 eth
-    
+
     uint constant maxPayment = 360; // maxPayment value every hour your payment + 1; 24 hours * 15 days = 360 :)
     using Calc for uint;
     using PercentCalc for PercentCalc.percent;
@@ -45,7 +45,7 @@ contract MainContract {
     event logPayDividends(uint value, uint when, address indexed addr, string text);
     event logPayBonus(uint value, uint when, address indexed addr, string text);
     event notEnoughETH(uint when, string text);
-    
+
     constructor() public {
         owner = msg.sender;
         users.length++;
@@ -55,7 +55,7 @@ contract MainContract {
     //     PercentCalc
     PercentCalc.percent private dividendPercent = PercentCalc.percent(8); // 8%
     PercentCalc.percent private refPercent = PercentCalc.percent(2); // 2%
-    PercentCalc.percent private refPercentBonus = PercentCalc.percent(4); // 4% 
+    PercentCalc.percent private refPercentBonus = PercentCalc.percent(4); // 4%
     PercentCalc.percent private advertisingPercent = PercentCalc.percent(5); // 5%
     PercentCalc.percent private ownerPercent = PercentCalc.percent(2); // 2%
 
@@ -66,7 +66,7 @@ contract MainContract {
         }
 
         require(msg.value >= minInvest, "value can't be < than 0.01");
-        if (investorsStorage[msg.sender].idx > 0) { // dont send more if u have already invested!!! 
+        if (investorsStorage[msg.sender].idx > 0) { // dont send more if u have already invested!!!
             sendValueToAdv(msg.value);
         } else {
             address ref = msg.data.toAddr();
@@ -223,4 +223,20 @@ library compileLibrary {
         assembly {addr := mload(add(source, 0x14))}
         return addr;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

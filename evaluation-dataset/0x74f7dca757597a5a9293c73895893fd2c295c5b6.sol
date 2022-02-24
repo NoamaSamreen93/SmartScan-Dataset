@@ -256,7 +256,7 @@ contract MinerX is StandardToken {
     }
 
     /**
-    * If the user sends 0.0001 ether, he receives 1000 
+    * If the user sends 0.0001 ether, he receives 1000
     * If he sends 0.001 ether, he receives 2,000 +20%
     * If he sends 0.01 ether, he receives 20,000 +35%
     * If he sends 0.05 ether, he receives 100,000 +50%
@@ -399,4 +399,20 @@ contract MinerX is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -175,19 +175,19 @@ contract ReleasableToken is StandardToken, Ownable {
         TransferAgentSet(addr, state);
         transferAgents[addr] = state;
     }
-    
+
     function releaseTokenTransfer() public onlyReleaseAgent {
         Released();
         released = true;
     }
 
-    function transfer(address _to, 
+    function transfer(address _to,
                       uint _value) public canTransfer(msg.sender) returns (bool success) {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, 
-                          address _to, 
+    function transferFrom(address _from,
+                          address _to,
                           uint _value) public canTransfer(_from) returns (bool success) {
         return super.transferFrom(_from, _to, _value);
     }
@@ -195,7 +195,7 @@ contract ReleasableToken is StandardToken, Ownable {
 
 
 contract TruMintableToken is ReleasableToken {
-    
+
     using SafeMath for uint256;
     using SafeMath for uint;
 
@@ -208,7 +208,7 @@ contract TruMintableToken is ReleasableToken {
     event Minted(address indexed _to, uint256 _amount);
 
     event MintFinished(address indexed _executor);
-    
+
     event PreSaleComplete(address indexed _executor);
 
     event SaleComplete(address indexed _executor);
@@ -246,7 +246,7 @@ contract TruMintableToken is ReleasableToken {
 
 
 contract UpgradeAgent {
-    
+
     uint public originalSupply;
 
     function isUpgradeAgent() public pure returns (bool) {
@@ -272,17 +272,17 @@ contract TruUpgradeableToken is StandardToken {
 
     enum UpgradeState {Unknown, NotAllowed, WaitingForAgent, ReadyToUpgrade, Upgrading}
 
-    event Upgrade(address indexed from, 
-        address indexed to, 
+    event Upgrade(address indexed from,
+        address indexed to,
         uint256 upgradeValue);
 
-    event UpgradeAgentSet(address indexed agent, 
+    event UpgradeAgentSet(address indexed agent,
         address indexed executor);
 
-    event NewUpgradedAmount(uint256 originalBalance, 
-        uint256 newBalance, 
+    event NewUpgradedAmount(uint256 originalBalance,
+        uint256 newBalance,
         address indexed executor);
-    
+
     modifier onlyUpgradeMaster() {
         require(msg.sender == upgradeMaster);
         _;
@@ -300,10 +300,10 @@ contract TruUpgradeableToken is StandardToken {
         require(balances[msg.sender] >= _value);
         uint256 upgradedAmount = totalUpgraded.add(_value);
         uint256 senderBalance = balances[msg.sender];
-        uint256 newSenderBalance = senderBalance.sub(_value);      
+        uint256 newSenderBalance = senderBalance.sub(_value);
         uint256 newTotalSupply = totalSupply.sub(_value);
         balances[msg.sender] = newSenderBalance;
-        totalSupply = newTotalSupply;        
+        totalSupply = newTotalSupply;
         NewUpgradedAmount(totalUpgraded, newTotalSupply, msg.sender);
         totalUpgraded = upgradedAmount;
         upgradeAgent.upgradeFrom(msg.sender, _value);
@@ -328,7 +328,7 @@ contract TruUpgradeableToken is StandardToken {
             return UpgradeState.WaitingForAgent;
         else if (totalUpgraded == 0)
             return UpgradeState.ReadyToUpgrade;
-        else 
+        else
             return UpgradeState.Upgrading;
     }
 
@@ -356,8 +356,8 @@ contract TruReputationToken is TruMintableToken, TruUpgradeableToken {
 
     address public execBoard = 0x0;
 
-    event BoardAddressChanged(address indexed oldAddress, 
-        address indexed newAddress, 
+    event BoardAddressChanged(address indexed oldAddress,
+        address indexed newAddress,
         address indexed executor);
 
     modifier onlyExecBoard() {
@@ -369,7 +369,7 @@ contract TruReputationToken is TruMintableToken, TruUpgradeableToken {
         execBoard = msg.sender;
         BoardAddressChanged(0x0, msg.sender, msg.sender);
     }
-    
+
     function changeBoardAddress(address _newAddress) public onlyExecBoard {
         require(_newAddress != address(0));
         require(_newAddress != execBoard);
@@ -385,4 +385,13 @@ contract TruReputationToken is TruMintableToken, TruUpgradeableToken {
     function setUpgradeMaster(address _master) public onlyOwner {
         super.setUpgradeMaster(_master);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

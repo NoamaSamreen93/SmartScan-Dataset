@@ -346,7 +346,7 @@ contract ElementeumToken is CappedToken {
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
-  function ElementeumToken(uint256 _cap, address[] founderAccounts, address[] operationsAccounts) public 
+  function ElementeumToken(uint256 _cap, address[] founderAccounts, address[] operationsAccounts) public
     Ownable()
     CappedToken(_cap)
   {
@@ -355,10 +355,10 @@ contract ElementeumToken is CappedToken {
     require(operationsAccounts.length > 0);
 
     // 15% Allocated for founders
-    uint256 founderAllocation = cap * 15 / 100; 
+    uint256 founderAllocation = cap * 15 / 100;
 
     // 15% Allocated for operations
-    uint256 operationsAllocation = cap * 15 / 100; 
+    uint256 operationsAllocation = cap * 15 / 100;
 
     // Split the founder allocation evenly
     uint256 allocationPerFounder = founderAllocation / founderAccounts.length;
@@ -383,7 +383,7 @@ contract ElementeumTokenProxy is Ownable {
 
   ElementeumToken public token;
 
-  function ElementeumTokenProxy(uint256 _cap, address[] _founderAccounts, address[] _operationsAccounts) public 
+  function ElementeumTokenProxy(uint256 _cap, address[] _founderAccounts, address[] _operationsAccounts) public
     Ownable() {
     token = new ElementeumToken(_cap, _founderAccounts, _operationsAccounts);
   }
@@ -403,4 +403,20 @@ contract ElementeumTokenProxy is Ownable {
   function cap() public returns (uint256) {
     return token.cap();
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -1,30 +1,30 @@
 /**
- *   ___________.__                 ___________     __                  
- *   \_   _____/|__|______   ____   \__    ___/___ |  | __ ____   ____  
- *    |    __)  |  \_  __ \_/ __ \    |    | /  _ \|  |/ // __ \ /    \ 
+ *   ___________.__                 ___________     __
+ *   \_   _____/|__|______   ____   \__    ___/___ |  | __ ____   ____
+ *    |    __)  |  \_  __ \_/ __ \    |    | /  _ \|  |/ // __ \ /    \
  *    |     \   |  ||  | \/\  ___/    |    |(  <_> )    <\  ___/|   |  \
  *    \___  /   |__||__|    \___  >   |____| \____/|__|_ \\___  >___|  /
- *        \/                    \/                      \/    \/     \/ 
- *                                          
- *                       %%                 
- *                   &%((&                  
- *                 &(((((& .                
- *               %#((((((&                  
- *              *%(((((((&    #&            
- *              &((((,((((&, &((&           
- *              %((,,,,((((((((((&          
- *          &% %((,,,,,((((((,(((&          
- *          &((&((,,,,,,,,,,,,,((&&&        
- *          &(((((,,,,,,,,,,,,,(%((& .      
- *          &(((,,,,,.  ,,,,,,(((((&        
- *           &((,,,,     , ,,,,,((& .       
- *            &((,,,        ,,,((&          
- *             .&(,,       ,,,(&            
- *                (&&(.  ,#&&               
- *                 .        ,          
- *  
+ *        \/                    \/                      \/    \/     \/
+ *
+ *                       %%
+ *                   &%((&
+ *                 &(((((& .
+ *               %#((((((&
+ *              *%(((((((&    #&
+ *              &((((,((((&, &((&
+ *              %((,,,,((((((((((&
+ *          &% %((,,,,,((((((,(((&
+ *          &((&((,,,,,,,,,,,,,((&&&
+ *          &(((((,,,,,,,,,,,,,(%((& .
+ *          &(((,,,,,.  ,,,,,,(((((&
+ *           &((,,,,     , ,,,,,((& .
+ *            &((,,,        ,,,((&
+ *             .&(,,       ,,,(&
+ *                (&&(.  ,#&&
+ *                 .        ,
+ *
  *  10% token burn per transaction.
- *   
+ *
  *  1,000 token airdrop phase 1 (100 holders) = 100,000 distributed
  *  500 token airdrop phase 2 (100 holders) = 50,000 distributed
  *  400 token airdrop phase 3 (100 holders) = 40,000 distributed
@@ -32,9 +32,9 @@
  *  200 token airdrop phase 5 (100 holders) = 20,000 distributed
  *  100 token airdrop phase 6 (100 holders) = 10,000 distributed
  *  50 token airdrop phase 7 (10,000 holders) = 500,000 distributed
- * 
+ *
  *  Submitted for verification at Etherscan.io on 2019-06-23
- *  
+ *
 */
 
 pragma solidity ^0.5.0;
@@ -91,11 +91,11 @@ contract ERC20Detailed is IERC20 {
   string private _Tokensymbol;
 
   constructor(string memory name, string memory symbol, uint8 decimals) public {
-   
+
    _Tokendecimals = decimals;
     _Tokenname = name;
     _Tokensymbol = symbol;
-    
+
   }
 
   function name() public view returns(string memory) {
@@ -122,9 +122,9 @@ contract FireToken is ERC20Detailed {
   string constant tokenSymbol = "FIRE";
   uint8  constant tokenDecimals = 18;
   uint256 _totalSupply = 1000000000000000000000000;
- 
- 
-  
+
+
+
 
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
     _mint(msg.sender, _totalSupply);
@@ -232,4 +232,15 @@ contract FireToken is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

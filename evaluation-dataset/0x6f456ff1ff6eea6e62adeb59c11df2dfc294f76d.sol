@@ -193,3 +193,9 @@ contract EthColor is Ownable, EthColorAccount {
     function () external {
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

@@ -304,7 +304,7 @@ contract Arroundtoken is ERC20, Claimable {
     address public accFoundNDF3;
     address public accTeam;
     address public accBounty;
-  
+
     // Implementation of frozen funds
     mapping(address => uint64) public frozenAccounts;
 
@@ -313,7 +313,7 @@ contract Arroundtoken is ERC20, Claimable {
     ///////////////
     event NewFreeze(address _acc, uint64 _timestamp);
     event BatchDistrib(uint8 cnt, uint256 batchAmount);
-    
+
     /**
      * @param _accTDE - main address for token distribution
      * @param _accFoundCDF  - address for CDF Found tokens (WP)
@@ -321,20 +321,20 @@ contract Arroundtoken is ERC20, Claimable {
      * @param _accFoundNDF2 - address for NDF Found tokens (WP)
      * @param _accFoundNDF3 - address for NDF Found tokens (WP)
      * @param _accTeam - address for team tokens, will frozzen by one year
-     * @param _accBounty - address for bounty tokens 
+     * @param _accBounty - address for bounty tokens
      * @param _initialSupply - subj
-     */  
+     */
     constructor (
-        address _accTDE, 
+        address _accTDE,
         address _accFoundCDF,
         address _accFoundNDF1,
         address _accFoundNDF2,
         address _accFoundNDF3,
         address _accTeam,
-        address _accBounty, 
+        address _accBounty,
         uint256 _initialSupply
     )
-    public 
+    public
     {
         require(_accTDE       != address(0));
         require(_accFoundCDF  != address(0));
@@ -352,13 +352,13 @@ contract Arroundtoken is ERC20, Claimable {
         accFoundNDF1   = _accFoundNDF1;
         accFoundNDF2   = _accFoundNDF2;
         accFoundNDF3   = _accFoundNDF3;
-        
+
         accTeam        = _accTeam;
         accBounty      = _accBounty;
         _totalSupply   = _initialSupply * (10 ** uint256(decimals));// All ARR tokens in the world
-        
+
        //Initial token distribution
-        _balances[_accTDE]       = 1104000000 * (10 ** uint256(decimals)); // TDE,      36.8%=28.6+8.2 
+        _balances[_accTDE]       = 1104000000 * (10 ** uint256(decimals)); // TDE,      36.8%=28.6+8.2
         _balances[_accFoundCDF]  = 1251000000 * (10 ** uint256(decimals)); // CDF,      41.7%
         _balances[_accFoundNDF1] =  150000000 * (10 ** uint256(decimals)); // 0.50*NDF, 10.0%
         _balances[_accFoundNDF2] =  105000000 * (10 ** uint256(decimals)); // 0.35*NDF, 10.0%
@@ -382,10 +382,10 @@ contract Arroundtoken is ERC20, Claimable {
         emit NewFreeze(_accFoundNDF3,   TDE_FINISH + 63158400);
 
     }
-    
+
     modifier onlyTokenKeeper() {
         require(
-            msg.sender == accTDE || 
+            msg.sender == accTDE ||
             msg.sender == accFoundCDF ||
             msg.sender == accFoundNDF1 ||
             msg.sender == accBounty
@@ -393,7 +393,7 @@ contract Arroundtoken is ERC20, Claimable {
         _;
     }
 
-    function() external { } 
+    function() external { }
 
     /**
      * @dev Returns standart ERC20 result with frozen accounts check
@@ -426,7 +426,7 @@ contract Arroundtoken is ERC20, Claimable {
         require(frozenAccounts[msg.sender] < now);
         return super.increaseAllowance(_spender, _addedValue);
     }
-    
+
     /**
      * @dev Returns standart ERC20 result with frozen accounts check
      */
@@ -435,13 +435,13 @@ contract Arroundtoken is ERC20, Claimable {
         return super.decreaseAllowance(_spender, _subtractedValue);
     }
 
-    
+
     /**
      * @dev Batch transfer function. Allow to save up 50% of gas
      */
-    function multiTransfer(address[] calldata  _investors, uint256[] calldata   _value )  
-        external 
-        onlyTokenKeeper 
+    function multiTransfer(address[] calldata  _investors, uint256[] calldata   _value )
+        external
+        onlyTokenKeeper
         returns (uint256 _batchAmount)
     {
         require(_investors.length <= 255); //audit recommendation
@@ -459,7 +459,7 @@ contract Arroundtoken is ERC20, Claimable {
         emit BatchDistrib(cnt, amount);
         return amount;
     }
-  
+
     /**
      * @dev Owner can claim any tokens that transfered to this contract address
      */
@@ -471,6 +471,15 @@ contract Arroundtoken is ERC20, Claimable {
 }
   //***************************************************************
   // Based on best practice of https://github.com/Open Zeppelin/zeppelin-solidity
-  // Adapted and amended by IBERGroup; 
+  // Adapted and amended by IBERGroup;
   // Code released under the MIT License(see git root).
   ////**************************************************************
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

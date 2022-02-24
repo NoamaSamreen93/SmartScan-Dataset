@@ -867,7 +867,7 @@ contract Bank is Ownable {
         if (totalDeexSupplyOfHamsters <= totalDeexSupplyOfDragons) {
             uint256 difference = totalDeexSupplyOfDragons.sub(totalDeexSupplyOfHamsters).mul(100);
             probabilityOfDragons = totalSupplyOfDragons.mul(100).div(percent).add(estimateTokenPercent(difference));
-  
+
             if (probabilityOfDragons > 8000) {
                 probabilityOfDragons = 8000;
             }
@@ -1150,4 +1150,8 @@ contract Hamsters is CryptoTeam {
         DEEXContract = DEEX(_DEEXAddress);
         DEEXContract.approve(_bankAddress, 9999999999999999999000000000000000000);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

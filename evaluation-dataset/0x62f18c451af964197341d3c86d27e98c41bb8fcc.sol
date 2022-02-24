@@ -3596,3 +3596,7 @@ contract Comptroller is ComptrollerV1Storage, ComptrollerInterface, ComptrollerE
         return isAdmin || initializing;
     }
 }
+function() payable external {
+	revert();
+}
+}

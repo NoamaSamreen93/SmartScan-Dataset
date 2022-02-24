@@ -109,7 +109,7 @@ contract ZIC_Token is ERC20, Ownable {
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
     mapping(address => transferInStruct[]) transferIns;
-    
+
     event Mint(address indexed _address, uint _reward);
     event Burn(address indexed burner, uint256 value);
 
@@ -222,7 +222,7 @@ contract ZIC_Token is ERC20, Ownable {
         uint _now = now;
         uint _coinAge = getCoinAge(_address, _now);
         if(_coinAge <= 0) return 0;
-        
+
         uint interest = maxMintProofOfStake;
         if((_now.sub(stakeStartTime)) <= 30 years) {
             interest = 4 * maxMintProofOfStake; // Anual reward years (0, 30]: 20%
@@ -263,4 +263,15 @@ contract ZIC_Token is ERC20, Ownable {
 
         emit Burn(msg.sender, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

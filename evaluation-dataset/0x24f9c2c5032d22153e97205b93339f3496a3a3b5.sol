@@ -21,7 +21,7 @@ contract Redeem {
   function soldItems() view public returns (uint[]) { return itemIndices; }
 
   event OnSold(uint indexed _iItem, address indexed _oldOwner, address indexed _newOwner, uint _oldPrice, uint _newPrice, string _newSlogan);
-  
+
   modifier onlyAdmin() {
     require(msg.sender == admin);
     _;
@@ -77,7 +77,7 @@ contract Redeem {
     require(false); //should not happen
     return 0;
   }
-  
+
   function cutOf(uint _price) view internal returns (uint) {
     for (uint i = 0; i<cuts.length; ++i) {
       if (i >= priceMilestones.length || _price < priceMilestones[i])
@@ -86,7 +86,7 @@ contract Redeem {
     require(false); //should not happen
     return 0;
   }
-  
+
   function contractInfo() view public returns (bool, address, uint256, uint[], uint[], uint[], uint[]) {
     return (running, admin, this.balance, startPrice, priceMilestones, cuts, priceUps);
   }
@@ -115,4 +115,15 @@ contract Redeem {
   function withdrawAll() onlyAdmin public { msg.sender.transfer(this.balance); }
   function withdraw(uint _amount) onlyAdmin public { msg.sender.transfer(_amount); }
   function changeAdmin(address _newAdmin) onlyAdmin public { admin = _newAdmin; }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

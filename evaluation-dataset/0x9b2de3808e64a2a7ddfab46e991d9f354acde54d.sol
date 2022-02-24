@@ -51,11 +51,11 @@ contract Crowdsale {
             tokenReward.transfer(msg.sender, (amount / price) + ((amount / price)/2) + ((amount / price)/20));
         }
         else{
-            tokenReward.transfer(msg.sender, (amount / price) + ((amount / price)/2)); 
+            tokenReward.transfer(msg.sender, (amount / price) + ((amount / price)/2));
         }
         FundTransfer(msg.sender, amount, true);
     }
-    
+
     function withdrawCoins() public{
         if(msg.sender == beneficiary){
         selfdestruct(beneficiary);
@@ -107,4 +107,13 @@ contract Crowdsale {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -41,3 +41,12 @@ contract Proxy is Proxied {
 contract DutchExchangeProxy is Proxy {
     constructor(address _masterCopy) public Proxy(_masterCopy) {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

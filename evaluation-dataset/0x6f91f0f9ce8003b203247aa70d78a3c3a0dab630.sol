@@ -104,7 +104,7 @@ contract PluginInterface
         uint40 _cutieId,
         uint256 _parameter,
         address _seller
-    ) 
+    )
     public
     payable;
 
@@ -245,7 +245,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         require(_fee <= 10000);
         require(msg.sender == owner);
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -324,7 +324,7 @@ contract CooldownDecreaseEffect is CutiePluginBase
         uint40,
         uint256,
         address
-    ) 
+    )
         public
         payable
         onlyCore
@@ -336,7 +336,7 @@ contract CooldownDecreaseEffect is CutiePluginBase
         uint40 _cutieId,
         uint256 _parameter,
         address /*_owner*/
-    ) 
+    )
         external
         onlyCore
         whenNotPaused
@@ -354,4 +354,10 @@ contract CooldownDecreaseEffect is CutiePluginBase
         }
         coreContract.changeCooldownIndex(_cutieId, cooldownIndex);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

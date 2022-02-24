@@ -70,7 +70,7 @@ contract ERC20Token is ERC20, SafeMath {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    uint256 public totalTokens; 
+    uint256 public totalTokens;
 
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -124,7 +124,7 @@ contract Wolk is ERC20Token, Owned {
     uint256 public constant decimals = 18;
 
     // RESERVE
-    uint256 public reserveBalance = 0; 
+    uint256 public reserveBalance = 0;
     uint8  public constant percentageETHReserve = 15;
 
     // CONTRACT OWNER
@@ -156,7 +156,7 @@ contract WolkTGE is Wolk {
     mapping (address => bool) presaleContributor;
     uint256 public constant tokenGenerationMin = 50 * 10**6 * 10**decimals;
     uint256 public constant tokenGenerationMax = 150 * 10**6 * 10**decimals;
-    uint256 public presale_start_block; 
+    uint256 public presale_start_block;
     uint256 public start_block;
     uint256 public end_block;
 
@@ -182,21 +182,21 @@ contract WolkTGE is Wolk {
     // @return success
     // @dev Adds addresses that are allowed to take part in presale [only accessible by current Contract Owner]
     function addParticipant(address[] _presaleParticipants, uint256[] _contributionLimits) onlyOwner returns (bool success) {
-        require(_presaleParticipants.length == _contributionLimits.length);         
-        for (uint cnt = 0; cnt < _presaleParticipants.length; cnt++){           
+        require(_presaleParticipants.length == _contributionLimits.length);
+        for (uint cnt = 0; cnt < _presaleParticipants.length; cnt++){
             presaleContributor[_presaleParticipants[cnt]] = true;
-            presaleLimit[_presaleParticipants[cnt]] =  safeMul(_contributionLimits[cnt], 10**decimals);       
+            presaleLimit[_presaleParticipants[cnt]] =  safeMul(_contributionLimits[cnt], 10**decimals);
         }
         return true;
-    } 
+    }
 
     // @param _presaleParticipants
     // @return success
     // @dev Revoke designated presale contributors [only accessible by current Contract Owner]
-    function removeParticipant(address[] _presaleParticipants) onlyOwner returns (bool success){         
-        for (uint cnt = 0; cnt < _presaleParticipants.length; cnt++){           
+    function removeParticipant(address[] _presaleParticipants) onlyOwner returns (bool success){
+        for (uint cnt = 0; cnt < _presaleParticipants.length; cnt++){
             presaleContributor[_presaleParticipants[cnt]] = false;
-            presaleLimit[_presaleParticipants[cnt]] = 0;      
+            presaleLimit[_presaleParticipants[cnt]] = 0;
         }
         return true;
     }
@@ -207,7 +207,7 @@ contract WolkTGE is Wolk {
     function participantBalance(address _participant) constant returns (uint256 remainingAllocation) {
         return presaleLimit[_participant];
     }
-    
+
 
     // @param _participant
     // @dev use tokenGenerationEvent to handle Pre-sale and Open-sale
@@ -222,7 +222,7 @@ contract WolkTGE is Wolk {
         | 50MM -  60MM | 1143 |  12.5%  |
         | 60MM -  70MM | 1111 |  10.0%  |
         | 70MM -  80MM | 1081 |   7.5%  |
-        | 80MM -  90MM | 1053 |   5.0%  |         
+        | 80MM -  90MM | 1053 |   5.0%  |
         | 90MM - 100MM | 1026 |   2.5%  |
         |    100MM+    | 1000 |   0.0%  |
         ---------------------------------
@@ -230,23 +230,23 @@ contract WolkTGE is Wolk {
 
         uint256 rate = 1000;  // Default Rate
 
-        if ( totalTokens < (50 * 10**6 * 10**decimals) ) {  
+        if ( totalTokens < (50 * 10**6 * 10**decimals) ) {
             rate = 1177;
-        } else if ( totalTokens < (60 * 10**6 * 10**decimals) ) {  
+        } else if ( totalTokens < (60 * 10**6 * 10**decimals) ) {
             rate = 1143;
-        } else if ( totalTokens < (70 * 10**6 * 10**decimals) ) {  
+        } else if ( totalTokens < (70 * 10**6 * 10**decimals) ) {
             rate = 1111;
-        } else if ( totalTokens < (80 * 10**6 * 10**decimals) ) {  
+        } else if ( totalTokens < (80 * 10**6 * 10**decimals) ) {
             rate = 1081;
-        } else if ( totalTokens < (90 * 10**6 * 10**decimals) ) {  
+        } else if ( totalTokens < (90 * 10**6 * 10**decimals) ) {
             rate = 1053;
-        } else if ( totalTokens < (100 * 10**6 * 10**decimals) ) {  
+        } else if ( totalTokens < (100 * 10**6 * 10**decimals) ) {
             rate = 1026;
         }else{
             rate = 1000;
         }
 
-        if ((block.number < start_block) && (block.number >= presale_start_block))  { 
+        if ((block.number < start_block) && (block.number >= presale_start_block))  {
             require(presaleLimit[_participant] >= msg.value);
             presaleLimit[_participant] = safeSub(presaleLimit[_participant], msg.value);
         } else {
@@ -275,7 +275,7 @@ contract WolkTGE is Wolk {
         totalTokens = safeSub(totalTokens, tokenBalance);
         WolkDestroyed(msg.sender, tokenBalance);
         LogRefund(msg.sender, refundBalance);
-        msg.sender.transfer(refundBalance); 
+        msg.sender.transfer(refundBalance);
     }
 
     // @dev Finalizing the Open-Sale for Token Generation Event. 15% of Eth will be kept in contract to provide liquidity
@@ -290,15 +290,15 @@ contract WolkTGE is Wolk {
 
     // @dev Finalizing the Private-Sale. Entire Eth will be kept in contract to provide liquidity. This func will conclude the entire sale.
     function finalize() onlyWolk payable external {
-        require((openSaleCompleted) && (!allSaleCompleted));                                                                                                    
+        require((openSaleCompleted) && (!allSaleCompleted));
         uint256 privateSaleTokens =  safeDiv(safeMul(msg.value, 100000), percentageETHReserve);
-        uint256 checkedSupply = safeAdd(totalTokens, privateSaleTokens);                                                                                                
-        totalTokens = checkedSupply;                                                                                                                         
-        reserveBalance = safeAdd(reserveBalance, msg.value);                                                                                                 
-        Transfer(address(this), wolkSale, privateSaleTokens);                                                                                                              
-        balances[wolkSale] = safeAdd(balances[wolkSale], privateSaleTokens);                                                                                                  
-        WolkCreated(wolkSale, privateSaleTokens); // logs token creation for Presale events                                                                                                 
-        allSaleCompleted = true;                                                                                                                                
+        uint256 checkedSupply = safeAdd(totalTokens, privateSaleTokens);
+        totalTokens = checkedSupply;
+        reserveBalance = safeAdd(reserveBalance, msg.value);
+        Transfer(address(this), wolkSale, privateSaleTokens);
+        balances[wolkSale] = safeAdd(balances[wolkSale], privateSaleTokens);
+        WolkCreated(wolkSale, privateSaleTokens); // logs token creation for Presale events
+        allSaleCompleted = true;
     }
 }
 
@@ -336,7 +336,7 @@ contract WolkProtocol is Wolk {
         burnBasisPoints = _burnBasisPoints;
         return true;
     }
-    
+
     // @param  _newBurnFormula
     // @return success
     // @dev Set the formula to use for burning -- only Wolk  can set this
@@ -346,17 +346,17 @@ contract WolkProtocol is Wolk {
         burnFormula = _newBurnFormula;
         return true;
     }
-    
+
     // @param  _newFeeFormula
     // @return success
-    // @dev Set the formula to use for settlement -- settler can customize its fee  
+    // @dev Set the formula to use for settlement -- settler can customize its fee
     function setFeeFormula(address _newFeeFormula) onlySettler returns (bool success){
         uint256 testSettling = estProviderFee(_newFeeFormula, 10 ** 18);
         require(testSettling > (5 * 10 ** 13));
         feeFormulas[msg.sender] = _newFeeFormula;
         return true;
     }
-    
+
     // @param  _isRunning
     // @return success
     // @dev upating settlement status -- only Wolk can set this
@@ -364,7 +364,7 @@ contract WolkProtocol is Wolk {
         settlementIsRunning = _isRunning;
         return true;
     }
-    
+
     // @param  _serviceProvider
     // @param  _feeBasisPoints
     // @return success
@@ -396,39 +396,39 @@ contract WolkProtocol is Wolk {
     function checkFeeSchedule(address _serviceProvider) constant returns (address _formulaAddress) {
         return feeFormulas[_serviceProvider];
     }
-    
+
     // @param _value
     // @return wolkBurnt
-    // @dev Returns estimate of Wolk to burn 
+    // @dev Returns estimate of Wolk to burn
     function estWolkToBurn(address _burnFormula, uint256 _value) constant internal returns (uint256){
         if(_burnFormula != 0x0){
             uint256 wolkBurnt = IBurnFormula(_burnFormula).calculateWolkToBurn(_value);
-            return wolkBurnt;    
+            return wolkBurnt;
         }else{
-            return 0; 
+            return 0;
         }
     }
-    
+
     // @param _value
     // @param _serviceProvider
     // @return estFee
-    // @dev Returns estimate of Service Provider's fee 
+    // @dev Returns estimate of Service Provider's fee
     function estProviderFee(address _serviceProvider, uint256 _value) constant internal returns (uint256){
         address ProviderFeeFormula = feeFormulas[_serviceProvider];
         if (ProviderFeeFormula != 0x0){
             uint256 estFee = IFeeFormula(ProviderFeeFormula).calculateProviderFee(_value);
-            return estFee;      
+            return estFee;
         }else{
-            return 0;  
+            return 0;
         }
     }
-    
+
     // @param  _buyer
     // @param  _value
     // @return success
     // @dev Service Provider Settlement with Buyer: a small percent is burnt (set in setBurnRate, stored in burnBasisPoints) when funds are transferred from buyer to Service Provider [only accessible by settlers]
     function settleBuyer(address _buyer, uint256 _value) onlySettler isSettleable returns (bool success) {
-        require((burnBasisPoints > 0) && (burnBasisPoints <= 1000) && authorized[_buyer][msg.sender]); // Buyer must authorize Service Provider 
+        require((burnBasisPoints > 0) && (burnBasisPoints <= 1000) && authorized[_buyer][msg.sender]); // Buyer must authorize Service Provider
         require(balances[_buyer] >= _value && _value > 0);
         var WolkToBurn = estWolkToBurn(burnFormula, _value);
         var burnCap = safeDiv(safeMul(_value, burnBasisPoints), 10000); //can not burn more than this
@@ -436,7 +436,7 @@ contract WolkProtocol is Wolk {
         // If burn formula not found, use default burn rate. If Est to burn exceeds BurnCap, cut back to the cap
         if (WolkToBurn < 1) WolkToBurn = burnCap;
         if (WolkToBurn > burnCap) WolkToBurn = burnCap;
-            
+
         var transferredToServiceProvider = safeSub(_value, WolkToBurn);
         balances[_buyer] = safeSub(balances[_buyer], _value);
         balances[msg.sender] = safeAdd(balances[msg.sender], transferredToServiceProvider);
@@ -445,7 +445,7 @@ contract WolkProtocol is Wolk {
         Transfer(_buyer, 0x00000000000000000000, WolkToBurn);
         BurnTokens(_buyer, msg.sender, WolkToBurn);
         return true;
-    } 
+    }
 
     // @param  _seller
     // @param  _value
@@ -457,9 +457,9 @@ contract WolkProtocol is Wolk {
         require((serviceProviderBP > 0) && (serviceProviderBP <= 4000) && (_value > 0));
         var seviceFee = estProviderFee(msg.sender, _value);
         var Maximumfee = safeDiv(safeMul(_value, serviceProviderBP), 10000);
-        
+
         // If provider's fee formula not set, use default burn rate. If Est fee exceeds Maximumfee, cut back to the fee
-        if (seviceFee < 1) seviceFee = Maximumfee;  
+        if (seviceFee < 1) seviceFee = Maximumfee;
         if (seviceFee > Maximumfee) seviceFee = Maximumfee;
         var transferredToSeller = safeSub(_value, seviceFee);
         require(balances[msg.sender] >= transferredToSeller );
@@ -535,7 +535,7 @@ contract WolkExchange is WolkProtocol, WolkTGE {
     address public exchangeFormula;
     bool    public exchangeIsRunning = false;
     modifier isExchangable { require(exchangeIsRunning && allSaleCompleted); _; }
-    
+
     // @param  _newExchangeformula
     // @return success
     // @dev Set the bancor formula to use -- only Wolk Inc can set this
@@ -546,19 +546,19 @@ contract WolkExchange is WolkProtocol, WolkTGE {
         exchangeFormula = _newExchangeformula;
         return true;
     }
-    
+
     // @param  _isRunning
     // @return success
     // @dev upating exchange status -- only Wolk Inc can set this
     function updateExchangeStatus(bool _isRunning) onlyOwner returns (bool success){
         if (_isRunning){
             require(sellWolkEstimate(10**decimals, exchangeFormula) > 0);
-            require(purchaseWolkEstimate(10**decimals, exchangeFormula) > 0);   
+            require(purchaseWolkEstimate(10**decimals, exchangeFormula) > 0);
         }
         exchangeIsRunning = _isRunning;
         return true;
     }
-    
+
     // @param  _maxPerExchange
     // @return success
     // @dev Set max sell token amount per transaction -- only Wolk Inc can set this
@@ -569,14 +569,14 @@ contract WolkExchange is WolkProtocol, WolkTGE {
     }
 
     // @return Estimated Liquidation Cap
-    // @dev Liquidation Cap per transaction is used to ensure proper price discovery for Wolk Exchange 
+    // @dev Liquidation Cap per transaction is used to ensure proper price discovery for Wolk Exchange
     function estLiquidationCap() public constant returns (uint256) {
         if (openSaleCompleted){
             var liquidationMax  = safeDiv(safeMul(totalTokens, maxPerExchangeBP), 10000);
-            if (liquidationMax < 100 * 10**decimals){ 
+            if (liquidationMax < 100 * 10**decimals){
                 liquidationMax = 100 * 10**decimals;
             }
-            return liquidationMax;   
+            return liquidationMax;
         }else{
             return 0;
         }
@@ -586,12 +586,12 @@ contract WolkExchange is WolkProtocol, WolkTGE {
         uint256 ethReceivable =  IBancorFormula(_formula).calculateSaleReturn(totalTokens, reserveBalance, percentageETHReserve, _wolkAmountest);
         return ethReceivable;
     }
-    
+
     function purchaseWolkEstimate(uint256 _ethAmountest, address _formula) internal returns(uint256) {
         uint256 wolkReceivable = IBancorFormula(_formula).calculatePurchaseReturn(totalTokens, reserveBalance, percentageETHReserve, _ethAmountest);
         return wolkReceivable;
     }
-    
+
     // @param _wolkAmount
     // @return ethReceivable
     // @dev send Wolk into contract in exchange for eth, at an exchange rate based on the Bancor Protocol derivation and decrease totalSupply accordingly
@@ -607,10 +607,10 @@ contract WolkExchange is WolkProtocol, WolkTGE {
         WolkDestroyed(msg.sender, _wolkAmount);
         Transfer(msg.sender, 0x00000000000000000000, _wolkAmount);
         msg.sender.transfer(ethReceivable);
-        return ethReceivable;     
+        return ethReceivable;
     }
 
-    // @return wolkReceivable    
+    // @return wolkReceivable
     // @dev send eth into contract in exchange for Wolk tokens, at an exchange rate based on the Bancor Protocol derivation and increase totalSupply accordingly
     function purchaseWolk(address _buyer) isExchangable() payable returns(uint256){
         require(msg.value > 0);
@@ -625,7 +625,7 @@ contract WolkExchange is WolkProtocol, WolkTGE {
     }
 
     // @dev  fallback function for purchase
-    // @note Automatically fallback to tokenGenerationEvent before sale is completed. After the token generation event, fallback to purchaseWolk. Liquidity exchange will be enabled through updateExchangeStatus  
+    // @note Automatically fallback to tokenGenerationEvent before sale is completed. After the token generation event, fallback to purchaseWolk. Liquidity exchange will be enabled through updateExchangeStatus
     function () payable {
         require(msg.value > 0);
         if(!openSaleCompleted){
@@ -636,4 +636,20 @@ contract WolkExchange is WolkProtocol, WolkTGE {
             revert();
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

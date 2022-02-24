@@ -147,7 +147,7 @@ contract EtherStake is Ownable {
  * Copyright 2019
  * admin@etherpornstars.com
  */
-    
+
   using SafeMath for uint;
   // Address set to win pot when time runs out
   address payable public  leadAddress;
@@ -179,12 +179,12 @@ contract EtherStake is Ownable {
   event InvestReceipt(
     address _player,
     uint _stakeBought);
-    
+
     struct divKeeper {
       mapping(address => uint) playerStakeAtDay;
       uint totalStakeAtDay;
       uint revenueAtDay;
-  } 
+  }
 
     constructor() public {
         roundId = 1;
@@ -193,7 +193,7 @@ contract EtherStake is Ownable {
         roundEndTime = now + timeInAWeek; // round 1 end time 604800 seconds=7 days
         startOfNewDay = now + timeInADay;
         stakeMultiplier = 1100;
-        totalStake = 1000000000; 
+        totalStake = 1000000000;
     }
 
 
@@ -201,7 +201,7 @@ contract EtherStake is Ownable {
     function() external payable {
         require(msg.value >= 10000000000000000 && msg.value < 1000000000000000000000, "0.01 ETH minimum."); // Minimum stake buy is 0.01 ETH, max 1000
 
-        if(now > roundEndTime){ // Check if round is over, then start new round. 
+        if(now > roundEndTime){ // Check if round is over, then start new round.
             startNewRound();
         }
 
@@ -236,7 +236,7 @@ contract EtherStake is Ownable {
         addTime(stakeBought);
         emit InvestReceipt(msg.sender, stakeBought);
     }
-    
+
 
     // Message stored forever, but only displayed on the site when your address is leading
     function addMessage(string memory _message) public {
@@ -260,7 +260,7 @@ contract EtherStake is Ownable {
         require(_messageBytes.length <= playerMessageMaxLength, "Too long");
         playerName[msg.sender] = _name;
     }
-  
+
     function getName(address _playerAddress)
     external
     view
@@ -269,12 +269,12 @@ contract EtherStake is Ownable {
   ) {
       playerName_ = playerName[_playerAddress];
   }
-   
-    
+
+
     function getPlayerCurrentRoundDivs(address _playerAddress) public view returns(uint playerTotalDivs) {
         uint _playerTotalDivs;
         uint _playerRollingStake;
-        for(uint c = 0 ; c < day; c++) { //iterate through all days of current round 
+        for(uint c = 0 ; c < day; c++) { //iterate through all days of current round
             uint _playerStakeAtDay = playerDivsInADay[roundId][c].playerStakeAtDay[_playerAddress];
             if(_playerStakeAtDay == 0 && _playerRollingStake == 0){
                     continue; //if player has no stake then continue out to save gas
@@ -287,13 +287,13 @@ contract EtherStake is Ownable {
         }
         return _playerTotalDivs.div(2); // Divide by 2, 50% goes to players as dividends, 50% goes to the jackpot.
     }
-    
+
     function getPlayerPreviousRoundDivs(address _playerAddress) public view returns(uint playerPreviousRoundDivs) {
         uint _playerPreviousRoundDivs;
-        for(uint r = 1 ; r < roundId; r++) { // Iterate through all previous rounds 
+        for(uint r = 1 ; r < roundId; r++) { // Iterate through all previous rounds
             uint _playerRollingStake;
             uint _lastDay = roundIdToDays[r];
-            for(uint p = 0 ; p < _lastDay; p++) { //iterate through all days of previous round 
+            for(uint p = 0 ; p < _lastDay; p++) { //iterate through all days of previous round
                 uint _playerStakeAtDay = playerDivsInADay[r][p].playerStakeAtDay[_playerAddress];
                 if(_playerStakeAtDay == 0 && _playerRollingStake == 0){
                         continue; // If player has no stake then continue to next day to save gas
@@ -307,18 +307,18 @@ contract EtherStake is Ownable {
         }
         return _playerPreviousRoundDivs.div(2); // Divide by 2, 50% goes to players as dividends, 50% goes to the jackpot.
     }
-    
+
     function getPlayerTotalDivs(address _playerAddress) public view returns(uint PlayerTotalDivs) {
         uint _playerTotalDivs;
         _playerTotalDivs += getPlayerPreviousRoundDivs(_playerAddress);
         _playerTotalDivs += getPlayerCurrentRoundDivs(_playerAddress);
-        
+
         return _playerTotalDivs;
     }
-    
+
     function getPlayerCurrentStake(address _playerAddress) public view returns(uint playerCurrentStake) {
         uint _playerRollingStake;
-        for(uint c = 0 ; c <= day; c++) { //iterate through all days of current round 
+        for(uint c = 0 ; c <= day; c++) { //iterate through all days of current round
             uint _playerStakeAtDay = playerDivsInADay[roundId][c].playerStakeAtDay[_playerAddress];
             if(_playerStakeAtDay == 0 && _playerRollingStake == 0){
                     continue; //if player has no stake then continue out to save gas
@@ -327,7 +327,7 @@ contract EtherStake is Ownable {
         }
         return _playerRollingStake;
     }
-    
+
 
     // Buy a stake using your earned dividends from past or current round
     function reinvestDivs(uint _divs) external{
@@ -358,7 +358,7 @@ contract EtherStake is Ownable {
         emit CashedOut(msg.sender, _divs);
     }
     // Reinvests all of a players dividends using contract, for people without MetaMask
-    function reinvestDivsWithContract(address payable _reinvestor) external{ 
+    function reinvestDivsWithContract(address payable _reinvestor) external{
         require(msg.sender == reinvestmentContractAddress);
         uint _senderDivs = getPlayerTotalDivs(_reinvestor);
         uint _spentDivs = spentDivs[_reinvestor];
@@ -375,7 +375,7 @@ contract EtherStake is Ownable {
         emit InvestReceipt(msg.sender, _availableDivs);
     }
     // Withdraws all of a players dividends using contract, for people without MetaMask
-    function withdrawDivsWithContract(address payable _withdrawer) external{ 
+    function withdrawDivsWithContract(address payable _withdrawer) external{
         require(msg.sender == withdrawalContractAddress);
         uint _senderDivs = getPlayerTotalDivs(_withdrawer);
         uint _spentDivs = spentDivs[_withdrawer];
@@ -385,7 +385,7 @@ contract EtherStake is Ownable {
         _withdrawer.transfer(_availableDivs);
         emit CashedOut(_withdrawer, _availableDivs);
     }
-    
+
     // Time functions
     function addTime(uint _stakeBought) private {
         uint _timeAdd = _stakeBought/1000000000000; //1000000000000 0.01 ETH adds 2.77 hours
@@ -394,12 +394,12 @@ contract EtherStake is Ownable {
         }else{
         roundEndTime += timeInADay; //24 hour cap
         }
-            
+
         if(now > startOfNewDay) { //check if 24 hours has passed
             startNewDay();
         }
     }
-    
+
     function startNewDay() private {
         playerDivsInADay[roundId][day].totalStakeAtDay = totalStake;
         playerDivsInADay[roundId][day].revenueAtDay = totalStake - playerDivsInADay[roundId][day-1].totalStakeAtDay; //div revenue today = pot today - pot yesterday
@@ -410,7 +410,7 @@ contract EtherStake is Ownable {
         ++day;
     }
 
-    function startNewRound() private { 
+    function startNewRound() private {
         playerDivsInADay[roundId][day].totalStakeAtDay = totalStake; //commit last changes to ending round
         playerDivsInADay[roundId][day].revenueAtDay = totalStake - playerDivsInADay[roundId][day-1].totalStakeAtDay; //div revenue today = pot today - pot yesterday
         roundIdToDays[roundId] = day; //save last day of ending round
@@ -438,20 +438,20 @@ contract EtherStake is Ownable {
      returns(uint256) {
      return(roundEndTime.sub(now));
      }
-     
+
     function returnDayTimeLeft()
      public view
      returns(uint256) {
      return(startOfNewDay.sub(now));
      }
-     
+
     function returnSeedAtRound(uint _roundId)
      public view
      returns(uint256) {
      return(seed[_roundId]);
      }
     function returnjackpot()
-     public view 
+     public view
      returns(uint256){
         uint winnerShare = totalStake/2 + seed[roundId]; //add last seed to pot
         uint nextseed = totalStake/10; //10% of pot to seed next round
@@ -459,7 +459,7 @@ contract EtherStake is Ownable {
         return winnerShare;
     }
     function returnEarningsAtDay(uint256 _roundId, uint256 _day, address _playerAddress)
-     public view 
+     public view
      returns(uint256){
         uint earnings = playerDivsInADay[_roundId][_day].playerStakeAtDay[_playerAddress];
         return earnings;
@@ -471,23 +471,34 @@ contract EtherStake is Ownable {
 }
 
 contract WithdrawalContract {
-    
+
     address payable public etherStakeAddress;
     address payable public owner;
-    
-    
+
+
     constructor(address payable _etherStakeAddress) public {
         etherStakeAddress = _etherStakeAddress;
         owner = msg.sender;
     }
-    
+
     function() external payable{
         require(msg.value >= 10000000000000000, "0.01 ETH Fee");
         EtherStake instanceEtherStake = EtherStake(etherStakeAddress);
         instanceEtherStake.withdrawDivsWithContract(msg.sender);
     }
-    
+
     function collectFees() external {
         owner.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

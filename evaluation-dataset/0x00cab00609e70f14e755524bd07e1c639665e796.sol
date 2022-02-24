@@ -22,19 +22,19 @@ contract owned {
 
 
 contract token {
-    string public name; 
-    string public symbol; 
-    uint8 public decimals = 8;  
-    uint256 public totalSupply; 
+    string public name;
+    string public symbol;
+    uint8 public decimals = 8;
+    uint256 public totalSupply;
 
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    event Transfer(address indexed from, address indexed to, uint256 value); 
-    event Burn(address indexed from, uint256 value);  
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Burn(address indexed from, uint256 value);
 
     constructor(uint256 initialSupply, string tokenName, string tokenSymbol) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
+        totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;                        //balanceOf[msg.sender] = totalSupply;
         name = tokenName;
         symbol = tokenSymbol;
@@ -61,7 +61,7 @@ contract token {
         _transfer(msg.sender, _to, _value);
     }
 
-  
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);         // Check allowance
         allowance[_from][msg.sender] -= _value;
@@ -75,7 +75,7 @@ contract token {
         return true;
     }
 
- 
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -128,7 +128,7 @@ contract SVC is owned, token {
 
     }
 
- 
+
     function mintToken(address target, uint256 mintedAmount) onlyOwner public {
 
         balances[target] += mintedAmount;
@@ -138,10 +138,21 @@ contract SVC is owned, token {
         emit Transfer(this, target, mintedAmount);
     }
 
-  
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

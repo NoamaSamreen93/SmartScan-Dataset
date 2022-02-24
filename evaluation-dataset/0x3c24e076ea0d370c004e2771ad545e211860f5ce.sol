@@ -83,7 +83,7 @@ contract Ownable {
  * @dev Provide multi-ownable functionality to a smart contract.
  * @dev Note this contract preserves the idea of a master owner where this owner
  * cannot be removed or deleted. Master owner's are the only owner's who can add
- * and remove other owner's. Transfer of master ownership is supported and can 
+ * and remove other owner's. Transfer of master ownership is supported and can
  * also only be transferred by the current master owner
  * @dev When master ownership is transferred the original master owner is not
  * removed from the additional owners list
@@ -126,7 +126,7 @@ contract MultiOwnable is Ownable {
 	event OwnershipAdded (
 		address indexed addedOwner
 	);
-	
+
 	/**
 	 * @dev Ownership removed event for Dapps interested in this event
 	 */
@@ -140,7 +140,7 @@ contract MultiOwnable is Ownable {
 	 * @dev The super user cannot be deleted from the ownership mapping and
 	 * can only be transferred
 	 */
-	constructor() 
+	constructor()
 	Ownable()
 	public
 	{
@@ -216,14 +216,14 @@ contract MultiOwnable is Ownable {
 	 * @dev Only the master owner can transfer ownership to another address
 	 * @dev Only existing owners can have ownership transferred to them
 	 */
-	function transferOwnership(address _newOwnership) 
-	onlyMaster 
-	public 
+	function transferOwnership(address _newOwnership)
+	onlyMaster
+	public
 	{
 		// Ensure the new ownership is not address(0)
 		require(_newOwnership != address(0), "Invalid address specified (0x0)");
 		// Ensure the new ownership address is not the current ownership addressess
-		require(_newOwnership != owner(), "Address specified must not match current owner address.");		
+		require(_newOwnership != owner(), "Address specified must not match current owner address.");
 		// Ensure that the new ownership is promoted from existing owners
 		require(isOwner(_newOwnership), "Master ownership can only be transferred to an existing owner address.");
 		// Call into the parent class and transfer ownership
@@ -728,8 +728,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -1124,9 +1124,9 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	/**
 	 * @dev CrowdsaleStage enumeration indicating which operational stage this contract is running
 	 */
-	enum CrowdsaleStage { 
-		preICO, 
-		bonusICO, 
+	enum CrowdsaleStage {
+		preICO,
+		bonusICO,
 		mainICO
 	}
 
@@ -1139,13 +1139,13 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	uint256 public startTime;
 	uint256 public endTime;
 	address public depositWallet;
-	bool    public kycRequired;	
+	bool    public kycRequired;
 	bool	public refundRemainingOk;
 
 	uint256 public tokensSold;
 
 	/**
-	 * @dev Contribution structure representing a token purchase 
+	 * @dev Contribution structure representing a token purchase
 	 */
 	struct OrderBook {
 		uint256 weiAmount;   // Amount of Wei that has been contributed towards tokens by this address
@@ -1203,7 +1203,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	TimedCrowdsale(_startTime, _endTime)
 	MultiOwnable()
 	Pausable()
-	{ 
+	{
 		tokenAddress      = _tokenAddress;
 		tokenRate         = _tokenRate;
 		tokenCap          = _tokenCap;
@@ -1242,7 +1242,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	}
 
 	/**
-	 * @dev getExchangeRate() provides a public facing manner in which to 
+	 * @dev getExchangeRate() provides a public facing manner in which to
 	 * determine the current rate of exchange in the crowdsale
 	 * @param _weiAmount is the amount of wei to purchase tokens with
 	 * @return number of tokens the specified wei amount would purchase
@@ -1365,9 +1365,9 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	/**
 	 * @dev isAddressKYCVerified() checks the KYV Verification status of the specified address
 	 * @param _addressToLookuo address to check status of KYC Verification
-	 * @return kyc status of the specified address 
+	 * @return kyc status of the specified address
 	 */
-	function isKYCVerified(address _addressToLookuo) 
+	function isKYCVerified(address _addressToLookuo)
 	whenNotPaused
 	onlyWhileOpen
 	public
@@ -1386,7 +1386,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	 * @dev Approve in bulk the specified addfresses indicating they were KYC Verified
 	 * @param _addressesForApproval is a list of addresses that are to be KYC Verified
 	 */
-	function bulkApproveKYCAddresses(address[] _addressesForApproval) 
+	function bulkApproveKYCAddresses(address[] _addressesForApproval)
 	onlyOwner
 	whenNotPaused
 	onlyWhileOpen
@@ -1409,7 +1409,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	 * @dev Revoke in bulk the specified addfresses indicating they were denied KYC Verified
 	 * @param _addressesToRevoke is a list of addresses that are to be KYC Verified
 	 */
-	function bulkRevokeKYCAddresses(address[] _addressesToRevoke) 
+	function bulkRevokeKYCAddresses(address[] _addressesToRevoke)
 	onlyOwner
 	whenNotPaused
 	onlyWhileOpen
@@ -1472,11 +1472,11 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	}
 
 	/**
-	 * @dev _approveKYCAddress provides the function to approve the specified address 
+	 * @dev _approveKYCAddress provides the function to approve the specified address
 	 * indicating KYC Verified
 	 * @param _addressToApprove of the user that is being verified
 	 */
-	function _approveKYCAddress(address _addressToApprove) 
+	function _approveKYCAddress(address _addressToApprove)
 	onlyOwner
 	internal
 	{
@@ -1524,12 +1524,12 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 			if (_weiAmount >= 21 ether) { // 20% bonus
 				return 480e8;
 			}
-			
+
 			// Determine if the purchase is >= 11 ether
 			if (_weiAmount >= 11 ether) { // 15% bonus
 				return 460e8;
 			}
-			
+
 			// Determine if the purchase is >= 5 ether
 			if (_weiAmount >= 5 ether) { // 10% bonus
 				return 440e8;
@@ -1582,7 +1582,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 	 * @param _beneficiary is the address that is currently purchasing tokens
 	 * @param _weiAmount is the number of tokens this address is attempting to purchase
 	 */
-	function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) 
+	function _preValidatePurchase(address _beneficiary, uint256 _weiAmount)
 	whenNotPaused
 	internal
 	view
@@ -1593,7 +1593,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 		uint256 requestedTokens = getExchangeRate(_weiAmount);
 		// Calculate the currently sold tokens
 		uint256 tempTotalTokensSold = tokensSold;
-		// Incrememt total tokens		
+		// Incrememt total tokens
 		tempTotalTokensSold.add(requestedTokens);
 		// Ensure total max token cap is > tempTotalTokensSold
 		require(tempTotalTokensSold <= tokenCap, "Requested wei amount will exceed the max token cap and was not accepted.");
@@ -1632,7 +1632,7 @@ contract SparkleBaseCrowdsale is MultiOwnable, Pausable, TimedCrowdsale {
 
 contract SparkleCrowdsale is SparkleBaseCrowdsale {
 
-  // Token contract address 
+  // Token contract address
   address public initTokenAddress = 0x4b7aD3a56810032782Afce12d7d27122bDb96efF;
   // Crowdsale specification
   uint256 public initTokenRate     = 400e8;
@@ -1642,10 +1642,23 @@ contract SparkleCrowdsale is SparkleBaseCrowdsale {
   address public initDepositWallet = 0x0926a84C83d7B88338588Dca2729b590D787FA34;
   bool public initKYCRequired      = true;
 
-  constructor() 
+  constructor()
 	SparkleBaseCrowdsale(ERC20(initTokenAddress), initTokenRate, initTokenCap, initStartTime, initEndTime, initDepositWallet, initKYCRequired)
 	public
 	{
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

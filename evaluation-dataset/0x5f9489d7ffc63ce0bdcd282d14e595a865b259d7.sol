@@ -416,3 +416,7 @@ contract Distribution is CanTransferTokens, SafeMath, useContractWeb {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

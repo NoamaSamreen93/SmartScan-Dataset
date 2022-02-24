@@ -84,12 +84,12 @@ contract TokenERC20 {
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
-        assert(balanceOf[_from] + balanceOf[_to] == previousBalances); 
+        assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
-    
 
-    
+
+
 }
 
 /******************************************/
@@ -195,19 +195,19 @@ contract Mimicoin is CalledA, TokenERC20 {
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         uint amount = msg.value * (10 ** uint256(decimals)) / buyPrice;               // calculates the amount
-        _transfer(callers[0], msg.sender, amount);    
+        _transfer(callers[0], msg.sender, amount);
     }
 
     /// @notice Sell `amount` tokens to contract
     /// @param amount amount of tokens to be sold
     function sell(uint256 amount) public {
-       require(balanceOf[msg.sender] >= amount);         
+       require(balanceOf[msg.sender] >= amount);
        uint revenue = safeMul(amount,sellPrice);
        revenue = revenue / (10 ** uint256(decimals));
         msg.sender.transfer (revenue);
         _transfer(msg.sender, callers[0], amount);
     }
-    
+
     function safeMul(uint a, uint b) internal pure returns (uint) {
         uint c = a * b;
         assert(a == 0 || c / a == b);
@@ -224,4 +224,8 @@ contract Mimicoin is CalledA, TokenERC20 {
         assert(c>=a && c>=b);
         return c;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

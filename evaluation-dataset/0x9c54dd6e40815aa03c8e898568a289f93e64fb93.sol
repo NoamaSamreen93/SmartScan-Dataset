@@ -1,6 +1,6 @@
 pragma solidity ^0.4.2;
 
-//  import "./IERC20.sol"; 
+//  import "./IERC20.sol";
 //  import "./SafeMath.sol";
 
 pragma solidity ^0.4.2;
@@ -350,4 +350,13 @@ contract BettingGameZone is ERC20, ERC20Detailed, ERC20Burnable {
    constructor () public ERC20Detailed("BettingGameZone", "BGZ", 18) {
        _mint(msg.sender, INITIAL_SUPPLY);
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

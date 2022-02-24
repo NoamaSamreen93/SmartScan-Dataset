@@ -216,12 +216,12 @@ contract UTBTokenTest is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-	
+
 	// The UTBT can be bought or sold.
 
 	uint256 public sellPrice;
     uint256 public buyPrice;
-	
+
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
     /// @param newSellPrice Price the users can sell to the contract
     /// @param newBuyPrice Price users can buy from the contract
@@ -243,4 +243,10 @@ contract UTBTokenTest is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

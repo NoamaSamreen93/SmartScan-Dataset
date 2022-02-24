@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -97,20 +97,20 @@ contract HerdiusToken is StandardToken {
 
     /* Public variables of the token */
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
 
 
     function HerdiusToken(
         ) {
-        balances[msg.sender] = 60000000000000000000000000;               
-        totalSupply = 60000000000000000000000000;                        
-        name = "Herdius";                                  
-        decimals = 18;                            
-        symbol = "HER";                               
+        balances[msg.sender] = 60000000000000000000000000;
+        totalSupply = 60000000000000000000000000;
+        name = "Herdius";
+        decimals = 18;
+        symbol = "HER";
     }
 
     /* Approves and then calls the receiving contract */
@@ -124,4 +124,13 @@ contract HerdiusToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

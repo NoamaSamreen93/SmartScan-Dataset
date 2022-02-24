@@ -71,7 +71,7 @@ contract TripCash is Ownable {
         if (_from != owner) {
             require(transferAllowed);
         }
-        
+
         if (_from == teamWallet1) {
             require(now >= endTime + 15552000);
         }
@@ -79,7 +79,7 @@ contract TripCash is Ownable {
         if (_from == teamWallet2) {
             require(now >= endTime + 31536000);
         }
-        
+
         _;
     }
 
@@ -145,7 +145,7 @@ contract TripCash is Ownable {
 
         //calc teamTokenAmount bonuses
         teamTokenAmount = _value * teamPercent / 60;
-        
+
         transfer(ownerWallet, ownerTokenAmount);
         transfer(fundWallet, bountyTokenAmount);
         transfer(teamWallet1, teamTokenAmount);
@@ -277,11 +277,11 @@ contract TripCash is Ownable {
             }
         }
     }
-    
+
     /**
-     * Unsold and undistributed tokens will be vested (50% for 2 years, 50% for 4 years) 
-     * to be allocated for the future development needs of the project; 
-     * in case of high unexpected volatility of the token, 
+     * Unsold and undistributed tokens will be vested (50% for 2 years, 50% for 4 years)
+     * to be allocated for the future development needs of the project;
+     * in case of high unexpected volatility of the token,
      * part or all of the vested tokens can be burned to support the token's value.
      * /
     /**
@@ -300,7 +300,7 @@ contract TripCash is Ownable {
         Burn(burner, _value);
         return true;
     }
-    
+
     /**
      *  Allownes refund
      */
@@ -308,7 +308,7 @@ contract TripCash is Ownable {
         require(now >= endTime);
         refundToken = true;
     }
-    
+
      /**
      *  function for finishing ICO and allowed token transfer
      */
@@ -322,7 +322,7 @@ contract TripCash is Ownable {
 
     /**
      * return investor tokens and burning
-     * 
+     *
      */
     function refund()  canRefundToken public returns (bool){
         uint256 _value = balances[msg.sender];
@@ -338,4 +338,15 @@ contract TripCash is Ownable {
     event Burn(address indexed burner, uint256 value);
     event Refund(address indexed refuner, uint256 value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

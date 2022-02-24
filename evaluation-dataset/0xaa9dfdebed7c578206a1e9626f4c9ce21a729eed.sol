@@ -88,7 +88,7 @@ contract Adminable {
 contract Authorizable is Adminable {
 
     address public authorizedAddress;
-    
+
     modifier onlyAuthorized() {
         require(msg.sender == authorizedAddress);
         _;
@@ -105,10 +105,10 @@ contract Authorizable is Adminable {
 /**
     @title Soar Storage
     @author Marek Tlacbaba (marek@soar.earth)
-    @dev This smart contract behave as simple storage and can be 
+    @dev This smart contract behave as simple storage and can be
     accessed only by authorized caller who is responsible for any
-    checks and validation. The authorized caller can updated by 
-    admins so it allows to update application logic 
+    checks and validation. The authorized caller can updated by
+    admins so it allows to update application logic
     and keeping data and events untouched.
 */
 
@@ -117,7 +117,7 @@ contract Authorizable is Adminable {
 contract SoarStorage is Authorizable {
 
     /**
-    Status: 
+    Status:
         0 - unknown
         1 - created
         2 - updated
@@ -139,22 +139,22 @@ contract SoarStorage is Authorizable {
         bytes32 filehash,
         address indexed owner,
         address indexed sponsor,
-        string previewUrl, 
-        string url, 
+        string previewUrl,
+        string url,
         string pointWKT,
-        bytes12 geohash, 
+        bytes12 geohash,
         string metadata
     );
 
     event ListingUpdated (
         bytes32 filehash,
-        address indexed owner, 
+        address indexed owner,
         address indexed sponsor,
-        string previewUrl, 
-        string url, 
+        string previewUrl,
+        string url,
         string pointWKT,
-        bytes12 geohash, 
-        string metadata 
+        bytes12 geohash,
+        string metadata
     );
 
     event ListingDeleted (
@@ -164,26 +164,26 @@ contract SoarStorage is Authorizable {
     );
 
     event Sale(
-        address indexed buyer, 
-        bytes32 id, 
-        address indexed owner, 
+        address indexed buyer,
+        bytes32 id,
+        address indexed owner,
         address sponsor,
         bytes32 indexed filehash,
-        uint price 
+        uint price
     );
 
     function putListing (
         bytes32 _filehash,
         address _owner,
         address _sponsor,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
         string memory _metadata
-    ) 
-        public 
-        onlyAuthorized 
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].owner = _owner;
         listings[_filehash].sponsor = _sponsor;
@@ -191,13 +191,13 @@ contract SoarStorage is Authorizable {
         listings[_filehash].status = 1;
         counter++;
         emit Listing(
-            _filehash, 
+            _filehash,
             _owner,
-            _sponsor, 
-            _previewUrl, 
-            _url, 
-            _pointWKT, 
-            _geohash, 
+            _sponsor,
+            _previewUrl,
+            _url,
+            _pointWKT,
+            _geohash,
             _metadata
         );
     }
@@ -206,34 +206,34 @@ contract SoarStorage is Authorizable {
         bytes32 _filehash,
         address _owner,
         address _sponsor,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
-        string memory _metadata 
-    ) 
-        public 
-        onlyAuthorized 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
+        string memory _metadata
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].geohash = _geohash;
         listings[_filehash].status = 2;
         emit ListingUpdated(
-            _filehash, 
+            _filehash,
             _owner,
-            _sponsor, 
-            _previewUrl, 
-            _url, 
-            _pointWKT, 
-            _geohash, 
+            _sponsor,
+            _previewUrl,
+            _url,
+            _pointWKT,
+            _geohash,
             _metadata
         );
     }
 
     function deleteListing(
-        bytes32 _filehash 
+        bytes32 _filehash
     )
-        public 
-        onlyAuthorized 
+        public
+        onlyAuthorized
     {
         listings[_filehash].status = 3;
         counter--;
@@ -243,18 +243,18 @@ contract SoarStorage is Authorizable {
     function putSale (
         address _buyer,
         bytes32 _id,
-        bytes32 _filehash, 
+        bytes32 _filehash,
         uint256 _price
-    ) 
-        public 
-        onlyAuthorized 
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].sales[_buyer][_id] = _price;
         listings[_filehash].salesCount++;
         emit Sale(_buyer, _id, listings[_filehash].owner, listings[_filehash].sponsor, _filehash, _price);
     }
 
-    function getListingDetails(bytes32 _filehash, address _user, bytes32 _id) 
+    function getListingDetails(bytes32 _filehash, address _user, bytes32 _id)
         public view
         returns (
             address owner_,
@@ -270,4 +270,13 @@ contract SoarStorage is Authorizable {
         status_ = listings[_filehash].status;
         sale_ = listings[_filehash].sales[_user][_id];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

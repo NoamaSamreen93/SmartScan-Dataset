@@ -88,7 +88,7 @@ contract CryptoMiningWar is PullPayment {
     bool public initialized = false;
     uint256 public roundNumber = 0;
     uint256 public deadline;
-    uint256 public CRTSTAL_MINING_PERIOD = 86400; 
+    uint256 public CRTSTAL_MINING_PERIOD = 86400;
     uint256 public HALF_TIME = 8 hours;
     uint256 public ROUND_TIME = 86400 * 7;
 	uint256 public prizePool = 0;
@@ -153,7 +153,7 @@ contract CryptoMiningWar is PullPayment {
         uint clientNumber,
         uint randomNumber
     );
-    modifier isNotOver() 
+    modifier isNotOver()
     {
         require(now <= deadline);
         _;
@@ -163,12 +163,12 @@ contract CryptoMiningWar is PullPayment {
         require(tx.origin == msg.sender);
         _;
     }
-    modifier isCurrentRound() 
+    modifier isCurrentRound()
     {
         require(players[msg.sender].roundNumber == roundNumber);
         _;
     }
-    modifier limitSell() 
+    modifier limitSell()
     {
         PlayerData storage p = players[msg.sender];
         if(p.hashrate <= MINIMUM_LIMIT_SELL){
@@ -194,10 +194,10 @@ contract CryptoMiningWar is PullPayment {
         minerData[0] = MinerData(10,            10,         10);   //lv1
         minerData[1] = MinerData(100,           200,        2);    //lv2
         minerData[2] = MinerData(400,           800,        4);    //lv3
-        minerData[3] = MinerData(1600,          3200,       8);    //lv4 
-        minerData[4] = MinerData(6400,          9600,       16);   //lv5 
-        minerData[5] = MinerData(25600,         38400,      32);   //lv6 
-        minerData[6] = MinerData(204800,        204800,     64);   //lv7 
+        minerData[3] = MinerData(1600,          3200,       8);    //lv4
+        minerData[4] = MinerData(6400,          9600,       16);   //lv5
+        minerData[5] = MinerData(25600,         38400,      32);   //lv6
+        minerData[6] = MinerData(204800,        204800,     64);   //lv7
         minerData[7] = MinerData(1638400,       819200,     65536); //lv8
     }
     function () public payable
@@ -212,7 +212,7 @@ contract CryptoMiningWar is PullPayment {
         initialized = true;
     }
 
-    function startNewRound() private 
+    function startNewRound() private
     {
         deadline = SafeMath.add(now, ROUND_TIME);
         roundNumber = SafeMath.add(roundNumber, 1);
@@ -277,7 +277,7 @@ contract CryptoMiningWar is PullPayment {
         sponsorFee = getCurrentPrice(SafeMath.add(sponsorLevel, 1));
     }
     //--------------------------------------------------------------------------
-    // Miner 
+    // Miner
     //--------------------------------------------------------------------------
     function getFreeMiner(address ref) public disableContract isNotOver
     {
@@ -310,7 +310,7 @@ contract CryptoMiningWar is PullPayment {
 		emit eventDoQuest(clientNumber, randomNumber);
 	}
     function buyMiner(uint256[] minerNumbers) public isNotOver isCurrentRound
-    {   
+    {
         require(minerNumbers.length == numberOfMiners);
         uint256 minerIdx = 0;
         MinerData memory m;
@@ -362,12 +362,12 @@ contract CryptoMiningWar is PullPayment {
         }
         hasBoost = hasBooster(addr);
         referral_count = p.referral_count;
-        noQuest        = p.noQuest; 
+        noQuest        = p.noQuest;
 		playerBalance = payments[addr];
     }
     function getHashratePerDay(address minerAddr) public view returns (uint256 personalProduction)
     {
-        PlayerData storage p = players[minerAddr];   
+        PlayerData storage p = players[minerAddr];
         personalProduction = addReferralHashrate(minerAddr, p.hashrate);
         uint256 boosterIdx = hasBooster(minerAddr);
         if (boosterIdx != 999) {
@@ -376,9 +376,9 @@ contract CryptoMiningWar is PullPayment {
         }
     }
     //--------------------------------------------------------------------------
-    // BOOSTER 
+    // BOOSTER
     //--------------------------------------------------------------------------
-    function buyBooster(uint256 idx) public isNotOver isCurrentRound payable 
+    function buyBooster(uint256 idx) public isNotOver isCurrentRound payable
     {
         require(idx < numberOfBoosts);
         BoostData storage b = boostData[idx];
@@ -399,15 +399,15 @@ contract CryptoMiningWar is PullPayment {
         uint256 level = getCurrentLevel(b.startingLevel, b.startingTime, b.halfLife);
         b.startingLevel = SafeMath.add(level, 1);
         b.startingTime = now;
-        // transfer ownership    
+        // transfer ownership
         b.owner = msg.sender;
     }
-    function getBoosterData(uint256 idx) public view returns (address owner,uint256 boostRate, uint256 startingLevel, 
+    function getBoosterData(uint256 idx) public view returns (address owner,uint256 boostRate, uint256 startingLevel,
         uint256 startingTime, uint256 currentPrice, uint256 halfLife)
     {
         require(idx < numberOfBoosts);
         owner            = boostData[idx].owner;
-        boostRate        = boostData[idx].boostRate; 
+        boostRate        = boostData[idx].boostRate;
         startingLevel    = boostData[idx].startingLevel;
         startingTime     = boostData[idx].startingTime;
         currentPrice     = getBoosterPrice(idx);
@@ -419,7 +419,7 @@ contract CryptoMiningWar is PullPayment {
         return getCurrentPrice(getCurrentLevel(booster.startingLevel, booster.startingTime, booster.halfLife));
     }
     function hasBooster(address addr) public view returns (uint256 boostIdx)
-    {         
+    {
         boostIdx = 999;
         for(uint256 i = 0; i < numberOfBoosts; i++){
             uint256 revert_i = numberOfBoosts - i - 1;
@@ -430,9 +430,9 @@ contract CryptoMiningWar is PullPayment {
         }
     }
     //--------------------------------------------------------------------------
-    // Market 
+    // Market
     //--------------------------------------------------------------------------
-    function buyCrystalDemand(uint256 amount, uint256 unitPrice,string title, string description) public isNotOver isCurrentRound payable 
+    function buyCrystalDemand(uint256 amount, uint256 unitPrice,string title, string description) public isNotOver isCurrentRound payable
     {
         require(unitPrice >= 100000000000);
         require(amount >= 1000);
@@ -483,7 +483,7 @@ contract CryptoMiningWar is PullPayment {
 			asyncSend(o.owner, balance);
         }
         o.unitPrice = 0;
-        o.amount = 0;  
+        o.amount = 0;
         o.title = "title";
         o.description = "description";
         o.owner = 0;
@@ -514,7 +514,7 @@ contract CryptoMiningWar is PullPayment {
         }
     }
     //-------------------------Sell-----------------------------
-    function sellCrystalDemand(uint256 amount, uint256 unitPrice, string title, string description) 
+    function sellCrystalDemand(uint256 amount, uint256 unitPrice, string title, string description)
     public isNotOver isCurrentRound limitSell
     {
         require(amount >= 1000);
@@ -549,7 +549,7 @@ contract CryptoMiningWar is PullPayment {
         require(amount <= o.amount);
 		uint256 price = SafeMath.mul(amount, o.unitPrice);
         require(msg.value >= price);
-        PlayerData storage buyer = players[msg.sender];        
+        PlayerData storage buyer = players[msg.sender];
         uint256 fee = devFee(price);
 		asyncSend(sponsor, fee);
 		asyncSend(administrator, fee);
@@ -568,7 +568,7 @@ contract CryptoMiningWar is PullPayment {
             p.crystals = SafeMath.add(p.crystals, SafeMath.mul(o.amount, CRTSTAL_MINING_PERIOD));
         }
         o.unitPrice = 0;
-        o.amount = 0; 
+        o.amount = 0;
         o.title = "title";
         o.description = "description";
         o.owner = 0;
@@ -599,7 +599,7 @@ contract CryptoMiningWar is PullPayment {
         }
     }
     //--------------------------------------------------------------------------
-    // Other 
+    // Other
     //--------------------------------------------------------------------------
     function devFee(uint256 amount) public pure returns(uint256)
     {
@@ -610,14 +610,14 @@ contract CryptoMiningWar is PullPayment {
         return address(this).balance;
     }
 	//@dev use this function in case of bug
-    function upgrade(address addr) public 
+    function upgrade(address addr) public
     {
         require(msg.sender == administrator);
         selfdestruct(addr);
     }
 
     //--------------------------------------------------------------------------
-    // Private 
+    // Private
     //--------------------------------------------------------------------------
     function updateHashrate(address addr) private
     {
@@ -646,7 +646,7 @@ contract CryptoMiningWar is PullPayment {
             }
         }
     }
-    function addReferralHashrate(address addr, uint256 hashrate) private view returns(uint256 personalProduction) 
+    function addReferralHashrate(address addr, uint256 hashrate) private view returns(uint256 personalProduction)
     {
         PlayerData storage p = players[addr];
         if(p.referral_count < 5){
@@ -657,7 +657,7 @@ contract CryptoMiningWar is PullPayment {
             personalProduction = SafeMath.add(hashrate, 200);
         }
     }
-    function getCurrentLevel(uint256 startingLevel, uint256 startingTime, uint256 halfLife) private view returns(uint256) 
+    function getCurrentLevel(uint256 startingLevel, uint256 startingTime, uint256 halfLife) private view returns(uint256)
     {
         uint256 timePassed=SafeMath.sub(now, startingTime);
         uint256 levelsPassed=SafeMath.div(timePassed, halfLife);
@@ -666,7 +666,7 @@ contract CryptoMiningWar is PullPayment {
         }
         return SafeMath.sub(startingLevel, levelsPassed);
     }
-    function getCurrentPrice(uint256 currentLevel) private view returns(uint256) 
+    function getCurrentPrice(uint256 currentLevel) private view returns(uint256)
     {
         return SafeMath.mul(BASE_PRICE, 2**currentLevel);
     }
@@ -690,7 +690,7 @@ contract CryptoMiningWar is PullPayment {
                 rankList[idx] = tempList[idx];
             }
         }
-        
+
         return true;
     }
     function inRankList(address addr) internal view returns(bool)
@@ -727,4 +727,15 @@ contract CryptoMiningWar is PullPayment {
         if (i < right)
             quickSort(list, i, right);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

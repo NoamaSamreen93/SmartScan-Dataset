@@ -11,9 +11,9 @@ pragma solidity ^0.4.15;
 contract Controlled {
     /// @notice The address of the controller is the only address that can call
     ///  a function with this modifier
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     address public controller;
@@ -226,14 +226,14 @@ contract TokenController {
 */
 contract ApproveAndCallReceiver {
     function receiveApproval(
-        address _from, 
-        uint256 _amount, 
-        address _token, 
+        address _from,
+        uint256 _amount,
+        address _token,
         bytes _data
     );
 }
 
- 
+
 /*
   Copyright 2017, Anton Egorov (Mothership Foundation)
   Copyright 2017, Jordi Baylina (Giveth)
@@ -552,12 +552,12 @@ contract MiniMeToken is MiniMeTokenI {
     /// @param _transfersEnabled True if transfers are allowed in the clone
     /// @return The address of the new MiniMeToken Contract
     function createCloneToken(
-        string _cloneTokenName, 
-        uint8 _cloneDecimalUnits, 
-        string _cloneTokenSymbol, 
-        uint _snapshotBlock, 
+        string _cloneTokenName,
+        uint8 _cloneDecimalUnits,
+        string _cloneTokenSymbol,
+        uint _snapshotBlock,
         bool _transfersEnabled
-    ) returns(address) 
+    ) returns(address)
     {
 
         if (_snapshotBlock == 0) {
@@ -762,7 +762,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -779,9 +779,9 @@ contract MiniMeTokenFactory {
     }
 }
 
-contract DataBrokerDaoToken is MiniMeToken {  
+contract DataBrokerDaoToken is MiniMeToken {
 
-    function DataBrokerDaoToken(address _tokenFactory) MiniMeToken(   
+    function DataBrokerDaoToken(address _tokenFactory) MiniMeToken(
       _tokenFactory,
       0x0,                    // no parent token
       0,                      // no snapshot block number from parent
@@ -789,7 +789,7 @@ contract DataBrokerDaoToken is MiniMeToken {
       18,                     // Decimals
       "DATA",                 // Symbol
       true                   // Enable transfers
-      ) 
+      )
       {}
 
 }
@@ -833,18 +833,18 @@ contract EarlyTokenSale is TokenController, Controlled {
     using SafeMath for uint256;
 
     // In UNIX time format - http://www.unixtimestamp.com/
-    uint256 public startFundingTime;       
+    uint256 public startFundingTime;
     uint256 public endFundingTime;
-    
+
     // 15% of tokens hard cap, at 1200 tokens per ETH
     // 225,000,000*0.15 => 33,750,000 / 1200 => 28,125 ETH
     uint256 constant public maximumFunding = 28125 ether;
-    uint256 constant public tokensPerEther = 1200; 
+    uint256 constant public tokensPerEther = 1200;
     uint256 constant public maxGasPrice = 50000000000;
-    
+
     // antispam
     uint256 constant public maxCallFrequency = 100;
-    mapping (address => uint256) public lastCallBlock; 
+    mapping (address => uint256) public lastCallBlock;
 
     // total amount raised in wei
     uint256 public totalCollected;
@@ -863,9 +863,9 @@ contract EarlyTokenSale is TokenController, Controlled {
     /// @param _vaultAddress     The address that will store the donated funds
     /// @param _tokenAddress     Address of the token contract this contract controls
     function EarlyTokenSale(
-        uint _startFundingTime, 
-        uint _endFundingTime, 
-        address _vaultAddress, 
+        uint _startFundingTime,
+        uint _endFundingTime,
+        address _vaultAddress,
         address _tokenAddress
     ) {
         require(_endFundingTime > now);
@@ -952,7 +952,7 @@ contract EarlyTokenSale is TokenController, Controlled {
 
         // Creates an equal amount of tokens as ether sent. The new tokens are created in the `_owner` address
         require(tokenContract.generateTokens(_owner, tokensPerEther.mul(msg.value)));
-        
+
         return true;
     }
 
@@ -981,7 +981,7 @@ contract EarlyTokenSale is TokenController, Controlled {
         require(now > endFundingTime || totalCollected >= maximumFunding);
         require(!finalized);
 
-        uint256 reservedTokens = 225000000 * 0.35 * 10**18;      
+        uint256 reservedTokens = 225000000 * 0.35 * 10**18;
         if (!tokenContract.generateTokens(vaultAddress, reservedTokens)) {
             revert();
         }
@@ -1034,4 +1034,15 @@ contract EarlyTokenSale is TokenController, Controlled {
         require(!paused);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

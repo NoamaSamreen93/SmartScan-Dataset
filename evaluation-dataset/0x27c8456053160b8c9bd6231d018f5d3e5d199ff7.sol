@@ -60,7 +60,7 @@ contract PiplCorpToken {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         if (_to == 0x0) return false;
@@ -90,4 +90,15 @@ contract PiplCorpToken {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

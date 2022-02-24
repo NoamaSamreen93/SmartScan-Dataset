@@ -65,7 +65,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -97,7 +97,7 @@ contract Crowdsale {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
@@ -114,7 +114,7 @@ contract Crowdsale {
     wallet = _wallet;
   }
 
-  // creates the token to be sold. 
+  // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
@@ -254,7 +254,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -316,21 +316,21 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   /**
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint _addedValue) 
+  function increaseApproval (address _spender, uint _addedValue)
     returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) 
+  function decreaseApproval (address _spender, uint _subtractedValue)
     returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -421,7 +421,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
 
     finalization();
     Finalized();
-    
+
     isFinalized = true;
   }
 
@@ -603,11 +603,11 @@ contract liebes is MintableToken, BurnableToken, PausableToken {
     function burn(uint256 _value) public {
         super.burn(_value);
     }
-   
+
     function pause() onlyOwner whenNotPaused public {
         super.pause();
     }
-   
+
     function unpause() onlyOwner whenPaused public {
         super.unpause();
     }
@@ -623,4 +623,20 @@ contract liebes is MintableToken, BurnableToken, PausableToken {
         Transfer(msg.sender, _recipient, _amount);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

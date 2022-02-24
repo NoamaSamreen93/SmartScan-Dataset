@@ -149,14 +149,14 @@ contract Madstackscoin is StandardToken, SafeMath {
     /// and cap was not reached. Returns token count.
     function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       uint tokenCount = msg.value / buyPrice;
       if (tokenCount > tierBudget) {
         tokenCount = tierBudget;
       }
-      
+
       uint investment = tokenCount * buyPrice;
 
       balances[msg.sender] += tokenCount;
@@ -192,9 +192,20 @@ contract Madstackscoin is StandardToken, SafeMath {
 
     /// @dev Contract constructor function sets initial token balances.
     function Madstackscoin()
-    {   
+    {
         // It's not a good scam unless it's pre-mined
         balances[founder] = 1000000;
         totalSupply += 1000000;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

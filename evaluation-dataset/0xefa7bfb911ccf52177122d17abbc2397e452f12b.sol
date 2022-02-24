@@ -71,3 +71,12 @@ contract Token{
     event Transfer(address indexed _from, address indexed _to, uint256 _amount);
     event Approval(address indexed _owner, address indexed _to, uint256 _amount);
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

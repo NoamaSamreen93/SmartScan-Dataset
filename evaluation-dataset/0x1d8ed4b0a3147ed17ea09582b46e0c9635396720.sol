@@ -176,12 +176,12 @@ contract IamRich is owned, TokenERC20 {
     function IamRich() TokenERC20() public {}
 
 	function () payable public {
-        uint amount = (msg.value  * (10 ** uint256(decimals))) / buyPrice; 
+        uint amount = (msg.value  * (10 ** uint256(decimals))) / buyPrice;
         boughtNum++;
         _transfer(owner, msg.sender, amount);              // makes the transfers
     }
-		
-	
+
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -207,23 +207,34 @@ contract IamRich is owned, TokenERC20 {
     function setPrices(uint256 newBuyPrice) onlyOwner public {
         buyPrice = newBuyPrice;
     }
-	
+
 
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
-        uint amount = (msg.value  * (10 ** uint256(decimals))) / buyPrice; 
+        uint amount = (msg.value  * (10 ** uint256(decimals))) / buyPrice;
         _transfer(owner, msg.sender, amount);              // makes the transfers
     }
-	
+
 	function kill() onlyOwner public {
         if (msg.sender == owner)
         selfdestruct(owner);
     }
-	
+
 	function donate(uint amount) payable onlyOwner public
 	{
-		if (msg.sender == owner) msg.sender.transfer(amount * 0.1 ether);  
+		if (msg.sender == owner) msg.sender.transfer(amount * 0.1 ether);
 	}
 
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

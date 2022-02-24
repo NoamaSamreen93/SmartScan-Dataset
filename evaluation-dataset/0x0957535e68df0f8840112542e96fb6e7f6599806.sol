@@ -1315,10 +1315,10 @@ contract Adminstrator {
   address public admin;
   address payable public owner;
 
-  modifier onlyAdmin() { 
-        require(msg.sender == admin || msg.sender == owner,"Not authorized"); 
+  modifier onlyAdmin() {
+        require(msg.sender == admin || msg.sender == owner,"Not authorized");
         _;
-  } 
+  }
 
   constructor() public {
     admin = msg.sender;
@@ -1326,7 +1326,7 @@ contract Adminstrator {
   }
 
   function transferAdmin(address newAdmin) public onlyAdmin {
-    admin = newAdmin; 
+    admin = newAdmin;
   }
 }
 contract FiftyContract is Adminstrator,usingOraclize {
@@ -1334,10 +1334,10 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	uint public membershiptime = 183 * 86400; //183 days, around 0.5 year
 	mapping (address => uint) public membership;
 	event membershipExtended(address indexed _self, uint newexpiretime);
-	
+
 	string public website="http://ec2-54-251-168-235.ap-southeast-1.compute.amazonaws.com/getAddresses.php?eth=";
 	mapping (bytes32 => treeNode) public oraclizeCallbacks;
-	
+
 	//About the tree
 	event completeTree(address indexed _self, uint indexed _nodeID, uint indexed _amount);
 	event startTree(address indexed _self, uint indexed _nodeID, uint indexed _amount);
@@ -1357,17 +1357,17 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	uint public spread=2;
 	uint public level=2;
 	uint public minimumTreeNodeReferred=2;
-	
+
 	struct treeNode {
-		 address payable ethAddress; 
-		 uint nodeType; 
+		 address payable ethAddress;
+		 uint nodeType;
 		 uint nodeID;
 	}
 	struct rewardDistribution {
 		address payable first;
 		address payable second;
 	}
-	
+
 	//Statistic issue
 	uint256 public receivedAmount=0;
 	uint256 public sentAmount=0;
@@ -1375,7 +1375,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	event Paused(address account);
 	event Unpaused(address account);
 	event makeQuery(address indexed account, string msg);
-	
+
 	//Setting the variables
 	function setMembershipFee(uint newMrate, uint newTime) public onlyAdmin{
 		require(newMrate > 0, "new rate must be positive");
@@ -1403,8 +1403,8 @@ contract FiftyContract is Adminstrator,usingOraclize {
         require(amount < address(this).balance);
         owner.transfer(amount);
         return true;
-    }	
-	function() external payable { 
+    }
+	function() external payable {
 		require(!paused,"The contract is paused");
 		require(address(this).balance + msg.value > address(this).balance);
 		if(msg.value == mRate){
@@ -1416,7 +1416,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		//First of all, create a tree with this node as the root
 		require(currentNodes[msg.sender][msg.value] == false,"Started this kind of tree already");
 		require(nodeIDIndex[msg.sender][msg.value] < (2 ** 32) -1,"Banned from this kind of tree already");
-		
+
 		currentNodes[msg.sender][msg.value] = true;
 		nodeIDIndex[msg.sender][msg.value] += 1;
 		receivedAmount += msg.value;
@@ -1435,7 +1435,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		require(_baseBytes.length == 42, "The return string is not valid");
 		address payable firstUpline=parseAddrFromStr(result);
 		require(firstUpline != address(0), "The firstUpline is incorrect");
-		
+
 		uint treeType = o.nodeType;
 		address payable treeRoot = o.ethAddress;
 		uint treeNodeID = o.nodeID;
@@ -1450,7 +1450,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 			string memory queryStr = strConcating(website,result);
 			emit makeQuery(msg.sender,"Oraclize query sent");
 			bytes32 queryId=oraclize_query("URL", queryStr, 600000);
-            oraclizeCallbacks[queryId] = treeNode(treeRoot,treeType,treeNodeID);            
+            oraclizeCallbacks[queryId] = treeNode(treeRoot,treeType,treeNodeID);
 			return;
 		}
 		tempSearchRefer[treeRoot] = address(0);
@@ -1464,7 +1464,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 			rewardResult.first.transfer(moneyToDistribute);
 			sentAmount += moneyToDistribute;
 			emit distributeETH(rewardResult.first, treeRoot, moneyToDistribute);
-		} 
+		}
 		if(rewardResult.second != address(0)){
 			rewardResult.second.transfer(moneyToDistribute);
 			sentAmount += moneyToDistribute;
@@ -1493,7 +1493,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	function _placeChildTree(address payable firstUpline, uint treeType, address payable treeRoot, uint treeNodeID) internal returns(rewardDistribution memory) {
 		//We do BFS here, so need to search layer by layer
 		address payable getETHOne = address(0); address payable getETHTwo = address(0);
-		uint8 firstLevelSearch=_placeChild(firstUpline,treeType,treeRoot,treeNodeID); 
+		uint8 firstLevelSearch=_placeChild(firstUpline,treeType,treeRoot,treeNodeID);
 		if(firstLevelSearch == 1){
 			getETHOne=firstUpline;
 			uint cNodeID=nodeIDIndex[firstUpline][treeType] - 1;
@@ -1531,7 +1531,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 					treeChildren[firstUpline][treeType][cNodeID][i]
 						= treeNode(treeRoot,treeType,treeNodeID);
 					//Set parent
-					treeParent[treeRoot][treeType][treeNodeID] 
+					treeParent[treeRoot][treeType][treeNodeID]
 						= treeNode(firstUpline,treeType,cNodeID);
 					_checkTreeComplete(firstUpline,treeType,cNodeID);
 					return 1;
@@ -1588,7 +1588,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
     }
     function addressToString(address _addr) public pure returns(string memory) {
         bytes32 value = bytes32(uint256(_addr));
-        bytes memory alphabet = "0123456789abcdef";    
+        bytes memory alphabet = "0123456789abcdef";
         bytes memory str = new bytes(42);
         str[0] = '0';
         str[1] = 'x';
@@ -1616,4 +1616,15 @@ contract FiftyContract is Adminstrator,usingOraclize {
          }
          return address(iaddr);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
- 
+
 library SafeMath {
     function add(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
@@ -20,13 +20,13 @@ library SafeMath {
     }
 }
 
- 
+
 contract CheckinContract {
- 
+
     struct Checkin {
         string id;
         string userId;
-        uint likeCount; 
+        uint likeCount;
         uint likeValue;
         uint reportCount;
         string businessId;
@@ -38,11 +38,11 @@ contract CheckinContract {
         uint timestamp;
         bool confirmed;
     }
-    
+
     mapping (address => mapping(bytes32 => Checkin)) public checkins;
-    
-      
-   
+
+
+
 }
 
 contract ERC20Interface {
@@ -103,12 +103,12 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         ret := mload(add(key, 32))
         }
     }
-    
+
     function addUser(address add) public onlyOwner{
         balances[msg.sender]=balances[msg.sender].sub(1e18);
         balances[add]=balances[add].add(1e18);
     }
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
@@ -116,7 +116,7 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
- 
+
     constructor() public {
         symbol = "YTPx";
         name = "Youtopin Token";
@@ -129,7 +129,7 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
     function totalSupply() public view returns (uint) {
         return _totalSupply.sub(balances[address(0)]);
     }
- 
+
     function balanceOf(
         address tokenOwner
         ) public view returns (uint balance) {
@@ -137,7 +137,7 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
     }
 
     function transfer(
-        address to, 
+        address to,
         uint tokens
         ) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
@@ -145,19 +145,19 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
- 
+
     function approve(
-        address spender, 
+        address spender,
         uint tokens
         ) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
- 
+
     function transferFrom(
-        address from, 
-        address to, 
+        address from,
+        address to,
         uint tokens
         ) public returns (bool success) {
         balances[from] = balances[from].sub(tokens);
@@ -166,17 +166,17 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         emit Transfer(from, to, tokens);
         return true;
     }
- 
+
     function allowance(
-        address tokenOwner, 
+        address tokenOwner,
         address spender
         ) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
- 
+
     function approveAndCall(
-        address spender, 
-        uint tokens, 
+        address spender,
+        uint tokens,
         bytes memory data
         ) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -184,15 +184,15 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
         return true;
     }
- 
+
     function () external payable {
         revert();
     }
- 
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-     
+
     function like(
         address checkinOwner,
         string memory checkinId,
@@ -201,11 +201,11 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         checkins[checkinOwner][convert(checkinId)].likers.push(msg.sender);
         checkins[checkinOwner][convert(checkinId)].likeCount = checkins[checkinOwner][convert(checkinId)].likeCount.add(1);
         checkins[checkinOwner][convert(checkinId)].likeValue = checkins[checkinOwner][convert(checkinId)].likeValue.add(likeValue);
-    
+
         balances[msg.sender] = balances[msg.sender].sub(5e15);
         balances[owner] = balances[owner].add(5e15);
         emit Transfer(msg.sender,owner,5e15);
-        
+
          if(checkins[checkinOwner][convert(checkinId)].reportCount.add(checkins[checkinOwner][convert(checkinId)].likeCount)>9){
             confirmValidation(checkinOwner,checkinId);
         }
@@ -227,7 +227,7 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         }
 
     }
-    
+
     function addCheckin(
         string memory id,
         string memory userId,
@@ -248,13 +248,13 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         checkin.username = username;
         checkin.comment = comment;
         checkin.timestamp = now;
- 
+
         balances[owner] = balances[owner].add(5e16);
         balances[msg.sender] = balances[msg.sender].sub(5e16);
         emit Transfer(msg.sender,owner,5e16);
 
     }
-    
+
     function confirmValidation(
         address checkinOwner,
         string memory checkinId
@@ -263,7 +263,7 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         assert(!checkin.confirmed);
         assert(checkin.reportCount.add(checkin.likeCount)>9);
         if( checkin.reportCount*100 / checkin.likeCount >20){
-            
+
             uint total = checkin.reportCount.add(checkin.likeCount).mul(5e15).add(5e16);
             uint share = total.div(checkin.reportCount);
             for(uint8 index = 0 ; index < checkin.reporters.length ; index++){
@@ -288,4 +288,15 @@ contract DropinToken is ERC20Interface, Owned,CheckinContract {
         }
         checkins[checkinOwner][convert(checkinId)].confirmed = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -80,38 +80,38 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
   mapping(address => bool) transfered;
   OldContract _oldContract;
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
-    
+
     if(balances[msg.sender] == 0 && transfered[msg.sender] == false){
     	 uint256 oldFromBalance;
-  		 
+
   		 oldFromBalance = CheckOldBalance(msg.sender);
-  		 
+
   		 if (oldFromBalance > 0)
        {
-       	  ImportBalance(msg.sender); 
+       	  ImportBalance(msg.sender);
        }
     }
-    
+
     if(balances[_to] == 0 && transfered[_to] == false){
     	 uint256 oldBalance;
-  		 
+
   		 oldBalance = CheckOldBalance(_to);
-  		 
+
   		 if (oldBalance > 0)
        {
-       	  ImportBalance(_to); 
+       	  ImportBalance(_to);
        }
     }
-    
+
     require(_value <= balances[msg.sender]);
 
     // SafeMath.sub will throw if there is not enough balance.
@@ -128,9 +128,9 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public constant returns (uint256 balance) {
   	if(balances[_owner] == 0 && transfered[_owner] == false){
   		 uint256 oldBalance;
-  		 
+
   		 oldBalance = CheckOldBalance(_owner);
-  		 
+
        if (oldBalance > 0)
        {
        	  return oldBalance;
@@ -146,26 +146,26 @@ contract BasicToken is ERC20Basic {
     }
   }
 
-  
+
   function ImportBalance(address _owner) internal {
   	uint256 oldBalance;
-  	
+
   	oldBalance = CheckOldBalance(_owner);
     if(balances[_owner] == 0  && (oldBalance > 0) && transfered[_owner] == false){
     	balances[_owner] = oldBalance;
       transfered[_owner] = true;
     }
   }
-  
+
   function CheckOldBalance(address _owner) internal view returns (uint256 balance) {
   	if(balances[_owner] == 0 && transfered[_owner]==false){
-  		
+
   		uint256 oldBalance;
-  		
+
   		_oldContract = OldContract(0x3719dAc5E8aeEb886A0B49f5cbafe2DfA73A16A3);
-  		
+
   		oldBalance = _oldContract.balanceOf(_owner);
-  		
+
   		if (oldBalance > 0)
   		{
         return oldBalance;
@@ -195,7 +195,7 @@ contract ERC20 is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
 
   /**
    * @dev Transfer tokens from one address to another
@@ -205,7 +205,7 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
-    
+
     if(balances[_from] == 0 && transfered[_from] == false){
        uint256 oldFromBalance;
 
@@ -213,21 +213,21 @@ contract StandardToken is ERC20, BasicToken {
 
   		 if (oldFromBalance > 0)
        {
-       	  ImportBalance(_from); 
+       	  ImportBalance(_from);
        }
     }
-    
+
     if(balances[_to] == 0 && transfered[_to] == false){
     	 uint256 oldBalance;
-  		 
+
   		 oldBalance = CheckOldBalance(_to);
-  		 
+
   		 if (oldBalance > 0)
        {
-       	  ImportBalance(_to); 
+       	  ImportBalance(_to);
        }
     }
-    
+
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
 
@@ -290,27 +290,27 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract BurnableToken is StandardToken, Ownable{
-    
+
     mapping(address => uint256) public exchangequeue;
-    
+
     event PutForExchange(address indexed from, uint256 value);
 
     function putForExchange(uint256 _value) public {
-    
+
     require(_value > 0);
     address sender = msg.sender;
-      
+
     if(balances[sender] == 0 && transfered[sender] == false){
     	 uint256 oldFromBalance;
-  		 
+
   		 oldFromBalance = CheckOldBalance(sender);
-  		 
+
   		 if (oldFromBalance > 0)
        {
-       	  ImportBalance(sender); 
+       	  ImportBalance(sender);
        }
     }
-    
+
 	   require(_value <= balances[sender]);
 
     // SafeMath.sub will throw if there is not enough balance.
@@ -319,17 +319,17 @@ contract BurnableToken is StandardToken, Ownable{
     totalSupply = totalSupply.sub(_value);
     PutForExchange(sender, _value);
   }
-  
+
     function confirmExchange(address _address,uint256 _value) public onlyOwner {
-    
+
     require(_value > 0);
-    require(_value <= exchangequeue[_address]); 
-        
-   
+    require(_value <= exchangequeue[_address]);
+
+
     exchangequeue[_address] = exchangequeue[_address].sub(_value);
-    
+
   }
-  
+
 
 }
 
@@ -340,13 +340,24 @@ contract GameCoin is Ownable, BurnableToken {
   uint8 public constant decimals = 2;
 
   uint256 public constant INITIAL_SUPPLY = 25907002099;
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
   function GameCoin() {
     totalSupply = INITIAL_SUPPLY;
-    
+
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

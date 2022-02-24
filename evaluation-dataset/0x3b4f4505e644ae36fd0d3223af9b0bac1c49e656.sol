@@ -9,17 +9,17 @@ pragma solidity ^0.4.24;
  *                                │ Setup Instructions │
  *                                └────────────────────┘
  * (Step 1) import this contracts interface into your contract
- * 
+ *
  *    import "./DiviesInterface.sol";
- * 
+ *
  * (Step 2) set up the interface and point it to this contract
- * 
+ *
  *    DiviesInterface private Divies = DiviesInterface(0xeB0b5FA53843aAa2e636ccB599bA4a8CE8029aA1);
  *                                ┌────────────────────┐
  *                                │ Usage Instructions │
  *                                └────────────────────┘
  * call as follows anywhere in your code:
- *   
+ *
  *    Divies.deposit.value(amount)();
  *          ex:  Divies.deposit.value(232000000000000000000)();
  */
@@ -42,7 +42,7 @@ contract Divies {
     using UintCompressor for uint256;
 
     HourglassInterface constant H4Dcontract_ = HourglassInterface(0xeB0b5FA53843aAa2e636ccB599bA4a8CE8029aA1);
-    
+
     uint256 public pusherTracker_ = 100;
     mapping (address => Pusher) public pushers_;
     struct Pusher
@@ -51,7 +51,7 @@ contract Divies {
         uint256 time;
     }
     uint256 public rateLimiter_;
-    
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // MODIFIERS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,7 +59,7 @@ contract Divies {
         require(tx.origin == msg.sender);
         _;
     }
-    
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // BALANCE
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,8 +70,8 @@ contract Divies {
     {
         return (address(this).balance);
     }
-    
-    
+
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // DEPOSIT
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,13 +79,13 @@ contract Divies {
         external
         payable
     {
-        
+
     }
-    
+
     // used so the distribute function can call hourglass's withdraw
     function() external payable {}
-    
-    
+
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // EVENTS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -98,13 +98,13 @@ contract Divies {
     );
     /* compression key
     [0-14] - timestamp
-    [15-29] - caller pusher tracker 
-    [30-44] - global pusher tracker 
+    [15-29] - caller pusher tracker
+    [30-44] - global pusher tracker
     [45-46] - percent
     [47] - greedy
-    */  
-    
-    
+    */
+
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // DISTRIBUTE
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,63 +114,63 @@ contract Divies {
     {
         // make sure _percent is within boundaries
         require(_percent > 0 && _percent < 100, "please pick a percent between 1 and 99");
-        
+
         // data setup
         address _pusher = msg.sender;
         uint256 _bal = address(this).balance;
         uint256 _mnPayout;
         uint256 _compressedData;
-        
+
         // limit pushers greed (use "if" instead of require for level 42 top kek)
         if (
             pushers_[_pusher].tracker <= pusherTracker_.sub(100) && // pusher is greedy: wait your turn
             pushers_[_pusher].time.add(1 hours) < now               // pusher is greedy: its not even been 1 hour
         )
         {
-            // update pushers wait que 
+            // update pushers wait que
             pushers_[_pusher].tracker = pusherTracker_;
             pusherTracker_++;
-            
+
             // setup mn payout for event
             if (H4Dcontract_.balanceOf(_pusher) >= H4Dcontract_.stakingRequirement())
                 _mnPayout = (_bal / 10) / 3;
-            
+
             // setup _stop.  this will be used to tell the loop to stop
             uint256 _stop = (_bal.mul(100 - _percent)) / 100;
-            
-            // buy & sell    
+
+            // buy & sell
             H4Dcontract_.buy.value(_bal)(_pusher);
             H4Dcontract_.sell(H4Dcontract_.balanceOf(address(this)));
-            
+
             // setup tracker.  this will be used to tell the loop to stop
             uint256 _tracker = H4Dcontract_.dividendsOf(address(this));
-    
+
             // reinvest/sell loop
-            while (_tracker >= _stop) 
+            while (_tracker >= _stop)
             {
                 // lets burn some tokens to distribute dividends to H4D holders
                 H4Dcontract_.reinvest();
                 H4Dcontract_.sell(H4Dcontract_.balanceOf(address(this)));
-                
+
                 // update our tracker with estimates (yea. not perfect, but cheaper on gas)
                 _tracker = (_tracker.mul(81)) / 100;
             }
-            
+
             // withdraw
             H4Dcontract_.withdraw();
         } else {
             _compressedData = _compressedData.insert(1, 47, 47);
         }
-        
+
         // update pushers timestamp  (do outside of "if" for super saiyan level top kek)
         pushers_[_pusher].time = now;
-    
-        // prep event compression data 
+
+        // prep event compression data
         _compressedData = _compressedData.insert(now, 0, 14);
         _compressedData = _compressedData.insert(pushers_[_pusher].tracker, 15, 29);
         _compressedData = _compressedData.insert(pusherTracker_, 30, 44);
         _compressedData = _compressedData.insert(_percent, 45, 46);
-            
+
         // fire event
         emit onDistribute(_pusher, _bal, _mnPayout, address(this).balance, _compressedData);
     }
@@ -183,30 +183,30 @@ contract Divies {
 
 library UintCompressor {
     using SafeMath for *;
-    
+
     function insert(uint256 _var, uint256 _include, uint256 _start, uint256 _end)
         internal
         pure
         returns(uint256)
     {
-        // check conditions 
+        // check conditions
         require(_end < 77 && _start < 77, "start/end must be less than 77");
         require(_end >= _start, "end must be >= start");
-        
+
         // format our start/end points
         _end = exponent(_end).mul(10);
         _start = exponent(_start);
-        
-        // check that the include data fits into its segment 
+
+        // check that the include data fits into its segment
         require(_include < (_end / _start));
-        
+
         // build middle
         if (_include > 0)
             _include = _include.mul(_start);
-        
+
         return((_var.sub((_var / _start).mul(_start))).add(_include).add((_var / _end).mul(_end)));
     }
-    
+
     function extract(uint256 _input, uint256 _start, uint256 _end)
 	    internal
 	    pure
@@ -215,15 +215,15 @@ library UintCompressor {
         // check conditions
         require(_end < 77 && _start < 77, "start/end must be less than 77");
         require(_end >= _start, "end must be >= start");
-        
+
         // format our start/end points
         _end = exponent(_end).mul(10);
         _start = exponent(_start);
-        
+
         // return requested section
         return((((_input / _start).mul(_start)).sub((_input / _end).mul(_end))) / _start);
     }
-    
+
     function exponent(uint256 _position)
         private
         pure
@@ -239,19 +239,19 @@ library UintCompressor {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -267,7 +267,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -279,30 +279,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -313,20 +313,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -334,4 +334,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

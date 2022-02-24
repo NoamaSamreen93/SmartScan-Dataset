@@ -218,9 +218,9 @@ contract Ownable {
 /////////////////
 
 contract CORUtilityToken is StandardToken, Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     // Descriptive properties
     string public constant name = "CORUtilityToken";
     string public constant symbol = "COR";
@@ -239,7 +239,7 @@ contract CORUtilityToken is StandardToken, Ownable {
     uint256 public fundingStartBlock = 4826150;
     uint256 public fundingEndBlock = 5087090;
     uint256 public constant tokenCreationCap =  10 * (10**6) * 10**decimals;
-    
+
     // Setting the exchange rate for the COR alpha utility token sale.
     uint256 public constant COREthExchangeRate = 100;
 
@@ -272,4 +272,15 @@ contract CORUtilityToken is StandardToken, Ownable {
       etherProceedsAccount.transfer(this.balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

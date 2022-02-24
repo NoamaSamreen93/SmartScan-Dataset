@@ -239,12 +239,12 @@ contract Crowdsale is Ownable {
 
   // The token being sold
   token myToken;
-  
+
   // address where funds are collected
   address public wallet;
-  
+
   // rate => tokens per ether
-  uint256 public rate = 750000 ; 
+  uint256 public rate = 750000 ;
 
   // amount of raised money in wei
   uint256 public weiRaised;
@@ -270,7 +270,7 @@ contract Crowdsale is Ownable {
 
   function getBalance() public constant returns(uint256){
       return myToken.balanceOf(this);
-  }    
+  }
 
   // low level token purchase function
   function buyTokens(address beneficiary) public payable {
@@ -308,4 +308,15 @@ contract Crowdsale is Ownable {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

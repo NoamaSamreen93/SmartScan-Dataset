@@ -60,7 +60,7 @@ contract Owned {
     function transferOwnership(address _newOwner) onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     // BK Ok - Accept ownership transfer
     function acceptOwnership() {
         if (msg.sender == newOwner) {
@@ -117,7 +117,7 @@ contract ERC20Token is Owned {
     // Transfer the balance from owner's account to another account
     // ------------------------------------------------------------------------
     // BK NOTE - This function will return true/false instead of throwing an
-    //           error, as the conditions protect against overflows and 
+    //           error, as the conditions protect against overflows and
     //           underflows
     // BK NOTE - This function does not protect against the short address
     //           bug, but the short address bug is more the responsibility
@@ -147,10 +147,10 @@ contract ERC20Token is Owned {
     // _value amount. If this function is called again it overwrites the
     // current allowance with _value.
     // ------------------------------------------------------------------------
-    // BK NOTE - This simpler method of `approve(...)` together with 
-    //           `transferFrom(...)` can be used in the double spending attack, 
-    //           but the risk is low, and can be mitigated by the user setting 
-    //           the approval limit to 0 before changing the limit 
+    // BK NOTE - This simpler method of `approve(...)` together with
+    //           `transferFrom(...)` can be used in the double spending attack,
+    //           but the risk is low, and can be mitigated by the user setting
+    //           the approval limit to 0 before changing the limit
     function approve(
         address _spender,
         uint256 _amount
@@ -167,12 +167,12 @@ contract ERC20Token is Owned {
     // have approve(...)-d this transfer
     // ------------------------------------------------------------------------
     // BK NOTE - This function will return true/false instead of throwing an
-    //           error, as the conditions protect against overflows and 
+    //           error, as the conditions protect against overflows and
     //           underflows
-    // BK NOTE - This simpler method of `transferFrom(...)` together with 
-    //           `approve(...)` can be used in the double spending attack, 
-    //           but the risk is low, and can be mitigated by the user setting 
-    //           the approval limit to 0 before changing the limit 
+    // BK NOTE - This simpler method of `transferFrom(...)` together with
+    //           `approve(...)` can be used in the double spending attack,
+    //           but the risk is low, and can be mitigated by the user setting
+    //           the approval limit to 0 before changing the limit
     // BK NOTE - This function does not protect against the short address
     //           bug, but the short address bug is more the responsibility
     //           of automated processes checking the data sent to this function
@@ -210,7 +210,7 @@ contract ERC20Token is Owned {
     // ------------------------------------------------------------------------
     // BK Ok
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -238,7 +238,7 @@ contract ArenaplayToken is ERC20Token {
     // 1498741200
     // Do not use `now` here
     // BK NOTE - This contract uses the date/time instead of blocks to determine
-    //           the start, end and BET/ETH scale. The use of date/time in 
+    //           the start, end and BET/ETH scale. The use of date/time in
     //           these contracts can be used by miners to skew the block time.
     //           This is not a significant risk in a crowdfunding contract.
     uint256 public constant STARTDATE = 1501173471;
@@ -250,7 +250,7 @@ contract ArenaplayToken is ERC20Token {
     //           ETH/USD exchange rate. The aim for Dao.Casino is to raise
     //           USD 25 million, INCLUDING the precommitments. This cap will
     //           have to take into account the ETH equivalent amount of the
-    //           precommitment 
+    //           precommitment
     uint256 public constant CAP = 44432 ether;
 
     // Cannot have a constant address here - Solidity bug
@@ -267,7 +267,7 @@ contract ArenaplayToken is ERC20Token {
 
 
     // ------------------------------------------------------------------------
- 
+
     // ------------------------------------------------------------------------
     // BK Ok - Calculate the BET/ETH at this point in time
     function buyPrice() constant returns (uint256) {
@@ -275,7 +275,7 @@ contract ArenaplayToken is ERC20Token {
     }
 
     // BK Ok - Calculate BET/ETH at any point in time. Can be used in EtherScan
-    //         to determine past, current or future BET/ETH rate 
+    //         to determine past, current or future BET/ETH rate
     // BK NOTE - Scale is continuous
     function buyPriceAt(uint256 at) constant returns (uint256) {
         if (at < STARTDATE) {
@@ -366,8 +366,8 @@ contract ArenaplayToken is ERC20Token {
         multisig.transfer(msg.value);
     }
     // BK Ok
-    event TokensBought(address indexed buyer, uint256 ethers, 
-        uint256 newEtherBalance, uint256 tokens, uint256 multisigTokens, 
+    event TokensBought(address indexed buyer, uint256 ethers,
+        uint256 newEtherBalance, uint256 tokens, uint256 multisigTokens,
         uint256 newTotalSupply, uint256 buyPrice);
 
 
@@ -415,7 +415,7 @@ contract ArenaplayToken is ERC20Token {
     // finalised
     // ------------------------------------------------------------------------
     // BK Ok
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
         returns (bool success)
     {
         // Cannot transfer before crowdsale ends or cap reached
@@ -432,9 +432,20 @@ contract ArenaplayToken is ERC20Token {
     // ------------------------------------------------------------------------
     // BK Ok - Only owner
     function transferAnyERC20Token(address tokenAddress, uint amount)
-      onlyOwner returns (bool success) 
+      onlyOwner returns (bool success)
     {
         // BK Ok
         return ERC20Token(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

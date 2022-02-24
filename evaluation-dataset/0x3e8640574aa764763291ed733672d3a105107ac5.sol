@@ -297,7 +297,7 @@ contract Members is MembersInterface, OwnableContract {
 
         emit MerchantAdd(merchant);
         return true;
-    } 
+    }
 
     event MerchantRemove(address indexed merchant);
 
@@ -324,4 +324,17 @@ contract Members is MembersInterface, OwnableContract {
     function getMerchants() external view returns (address[]) {
         return merchants.getValueList();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

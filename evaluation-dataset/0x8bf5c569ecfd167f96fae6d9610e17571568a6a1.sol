@@ -79,7 +79,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -533,17 +533,28 @@ contract KyberOasisReserve is KyberReserveInterface, Withdrawable, Utils2 {
             require(destToken.transfer(destAddress, userExpectedDestAmount));
         } else {
             require(srcToken.transferFrom(msg.sender, this, srcAmount));
- 
+
             actualDestAmount = otc.sellAllAmount(srcToken, srcAmount, wethToken, destAmountIncludingFees);
             require(actualDestAmount >= destAmountIncludingFees);
             wethToken.withdraw(actualDestAmount);
 
             // transfer back only requested dest amount.
-            destAddress.transfer(userExpectedDestAmount); 
+            destAddress.transfer(userExpectedDestAmount);
         }
 
         TradeExecute(msg.sender, srcToken, srcAmount, destToken, userExpectedDestAmount, destAddress);
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

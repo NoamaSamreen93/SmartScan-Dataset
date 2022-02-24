@@ -54,7 +54,7 @@ contract Owned {
   constructor() public {
     owner = msg.sender;
   }
-  
+
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
@@ -114,7 +114,7 @@ contract ERC20Token is ERC20 {
  * @title COOTEST
  */
 contract COIN is ERC20Token, Owned {
-  
+
   string  public constant name     = "RED STAR TOKEN";
   string  public constant symbol   = "RST";
   uint256 public constant decimals = 18;
@@ -132,4 +132,15 @@ contract COIN is ERC20Token, Owned {
   function transferAnyERC20Token(address _tokenAddress, uint256 _value) public onlyOwner returns (bool) {
     return ERC20(_tokenAddress).transfer(rescueAddress, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

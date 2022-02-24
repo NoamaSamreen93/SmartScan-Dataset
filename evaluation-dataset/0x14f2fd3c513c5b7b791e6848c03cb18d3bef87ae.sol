@@ -18,7 +18,7 @@ contract Token {
     //获取账户_spender可以从账户_owner中转出token的数量
     function allowance(address _owner, address _spender) constant returns  (uint256 remaining);
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
@@ -50,7 +50,7 @@ contract StandardToken is Token {
         return balances[_owner];
     }
     //授权账户_spender可以从消息发送者账户转出数量为_value的token
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -85,8 +85,19 @@ contract HumanStandardToken is StandardToken {
         //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a contract in here just for this.
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
-        
+
         require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

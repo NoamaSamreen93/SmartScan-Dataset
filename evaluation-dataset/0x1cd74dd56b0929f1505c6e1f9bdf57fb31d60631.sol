@@ -3,11 +3,11 @@ pragma solidity ^0.4.16;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract BugisContract {
-    
+
     string public name = "Bugis";
     string public symbol = "BGS";
     uint8 public decimals = 18;
-    
+
     uint256 public initialSupply = 600000;
     uint256 public totalSupply;
 
@@ -27,11 +27,11 @@ contract BugisContract {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function BugisContract(
-        
+
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
-        
+
     }
 
     /**
@@ -148,4 +148,15 @@ contract BugisContract {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

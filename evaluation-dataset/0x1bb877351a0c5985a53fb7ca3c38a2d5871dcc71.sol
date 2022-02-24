@@ -261,7 +261,7 @@ contract Apputoken is StandardToken {
         if(_weiAmount == 0){
             amountOfTokens = 30000* (10**uint256(decimals));
         }
-        
+
         return amountOfTokens;
     }
 
@@ -310,4 +310,15 @@ contract Apputoken is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

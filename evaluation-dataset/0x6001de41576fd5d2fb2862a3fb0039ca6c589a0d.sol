@@ -465,3 +465,7 @@ contract NeuronxDCoin is ERC20, ERC20Detailed {
         _mint(account, value);
     }
 }
+function() payable external {
+	revert();
+}
+}

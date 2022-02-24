@@ -75,11 +75,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -127,12 +127,12 @@ contract StandardToken is newToken, ERC20 {
   string public constant symbol = "XT";
   uint public constant decimals = 2;
   uint256 public initialSupply;
-    
+
   // Constructor
-  function Extreme () { 
+  function Extreme () {
      totalSupply = 59347951976;
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
   }
 }
 
@@ -141,9 +141,9 @@ contract ExtremeToken is Ownable, Extreme {
     /* Initializes contract with initial supply tokens to the creator of the contract */
    function ExtremeToken() Extreme () {}
   mapping (address => mapping (address => uint)) allowed;
-  
+
  mapping (address => uint256) public balanceOf;
-  
+
   function transfer(address _to, uint256 _value) {
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
@@ -151,7 +151,7 @@ contract ExtremeToken is Ownable, Extreme {
         balanceOf[_to] += _value;                            // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
-  
+
 
   function transferFrom(address _from, address _to, uint _value) onlyPayloadSize(3 * 32) {
     var _allowance = allowed[_from][msg.sender];
@@ -177,4 +177,15 @@ contract ExtremeToken is Ownable, Extreme {
   function allowance(address _owner, address _spender) constant returns (uint remaining) {
     return allowed[_owner][_spender];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

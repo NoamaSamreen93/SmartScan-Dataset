@@ -3,19 +3,19 @@ pragma solidity ^0.4.23;
 contract CoinCM
 {
 
-    address public admin_address = 0x0AD3766cb4eFcd4d5407A79BE926E6d701C52E47; 
-    address public account_address = 0x0AD3766cb4eFcd4d5407A79BE926E6d701C52E47; 
-    
-    mapping(address => uint256) balances;
-    
-    string public name = "CMall"; 
-    string public symbol = "CM"; 
-    uint8 public decimals = 18; 
-    uint256 initSupply = 2000000000; 
-    uint256 public totalSupply = 0; 
+    address public admin_address = 0x0AD3766cb4eFcd4d5407A79BE926E6d701C52E47;
+    address public account_address = 0x0AD3766cb4eFcd4d5407A79BE926E6d701C52E47;
 
-    constructor() 
-    payable 
+    mapping(address => uint256) balances;
+
+    string public name = "CMall";
+    string public symbol = "CM";
+    uint8 public decimals = 18;
+    uint256 initSupply = 2000000000;
+    uint256 public totalSupply = 0;
+
+    constructor()
+    payable
     public
     {
         totalSupply = mul(initSupply, 10**uint256(decimals));
@@ -28,24 +28,24 @@ contract CoinCM
     }
 
     event Transfer(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 value
-    ); 
+    );
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
         balances[msg.sender] = sub(balances[msg.sender],_value);
 
-            
+
 
         balances[_to] = add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -53,7 +53,7 @@ contract CoinCM
     }
 
     // ========= 授权转账相关逻辑 =============
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
     event Approval(
         address indexed owner,
@@ -74,8 +74,8 @@ contract CoinCM
         require(_value <= allowed[_from][msg.sender]);
 
         balances[_from] = sub(balances[_from], _value);
-        
-        
+
+
         balances[_to] = add(balances[_to], _value);
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
@@ -83,11 +83,11 @@ contract CoinCM
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -128,21 +128,21 @@ contract CoinCM
 
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = sub(oldValue, _subtractedValue);
         }
-        
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    
-    
 
-     
-    
+
+
+
+
 
     modifier admin_only()
     {
@@ -150,9 +150,9 @@ contract CoinCM
         _;
     }
 
-    function setAdmin( address new_admin_address ) 
-    public 
-    admin_only 
+    function setAdmin( address new_admin_address )
+    public
+    admin_only
     returns (bool)
     {
         require(new_admin_address != address(0));
@@ -160,7 +160,7 @@ contract CoinCM
         return true;
     }
 
-    
+
     function withDraw()
     public
     admin_only
@@ -171,16 +171,16 @@ contract CoinCM
 
     function () external payable
     {
-                
-        
-        
-           
+
+
+
+
     }
 
 
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -190,22 +190,33 @@ contract CoinCM
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

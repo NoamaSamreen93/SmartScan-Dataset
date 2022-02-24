@@ -23,7 +23,7 @@ contract Forwarder {
   function Forwarder(address pool) public {
     parentAddress = 0xE4402b9f8034A9B2857FFeE4Cf96605a364B16A1;
   }
- 
+
   /**
    * Modifier that will execute internal code block only if the sender is the parent address
    */
@@ -85,4 +85,15 @@ contract ForwarderTarget {
   function() public payable {
     // accept unspendable balance
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

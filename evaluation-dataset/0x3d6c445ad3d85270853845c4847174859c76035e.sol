@@ -5,21 +5,21 @@ pragma solidity ^0.4.16;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract TokenTKC {
-    
+
     string public name = "iTech Token";
     string public symbol = "TKC";
     uint256 public decimals = 18;
-    
+
     uint256 public totalSupply = 1000*1000*1000**decimals;
 
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    
+
     event Burn(address indexed from, uint256 value);
 
     /**
@@ -29,27 +29,27 @@ contract TokenTKC {
      */
     function TokenTKC(
     ) public {
-        balanceOf[msg.sender] = totalSupply;                
+        balanceOf[msg.sender] = totalSupply;
     }
 
     /**
      * Internal transfer, only can be called by this contract
      */
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require(_to != 0x0);
-        
+
         require(balanceOf[_from] >= _value);
-        
+
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        
+
         balanceOf[_from] -= _value;
-        
+
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -75,7 +75,7 @@ contract TokenTKC {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -122,9 +122,9 @@ contract TokenTKC {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
@@ -138,12 +138,25 @@ contract TokenTKC {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

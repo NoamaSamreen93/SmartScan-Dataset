@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -51,7 +51,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -82,16 +82,16 @@ contract StandardToken is Token {
 
  contract ProjectXPetroleum is StandardToken { // CHANGE THIS. Update the contract name.
 
-    
+
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'XPetroleum Smart Contract'; 
+    string public version = 'XPetroleum Smart Contract';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-   
+
     function ProjectXPetroleum() {
         balances[msg.sender] = 8000000000000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
         totalSupply = 8000000000000000;                        // Update total supply (1000 for example) (CHANGE THIS)
@@ -100,7 +100,7 @@ contract StandardToken is Token {
         symbol = "XPL";                                             // Set the symbol for display purposes (CHANGE THIS)
         fundsWallet = 0x00C33C49f9A2a920e3f3787204CBDa9012D1912e;                                    // The owner of the contract gets ETH
     }
-    
+
 
     function() payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -114,18 +114,29 @@ contract StandardToken is Token {
 
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
-        
-        fundsWallet.transfer(msg.value);                               
+
+        fundsWallet.transfer(msg.value);
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

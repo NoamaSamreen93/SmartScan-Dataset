@@ -165,7 +165,7 @@ interface StoreInterface {
 
     // Pays Oracle fees in the margin currency, erc20Address, to the store. To be used if the margin currency is an
     // ERC20 token rather than ETH. All approved tokens are transfered.
-    function payOracleFeesErc20(address erc20Address) external; 
+    function payOracleFeesErc20(address erc20Address) external;
 
     // Computes the Oracle fees that a contract should pay for a period. `pfc` is the "profit from corruption", or the
     // maximum amount of margin currency that a token sponsor could extract from the contract through corrupting the
@@ -227,4 +227,13 @@ contract CentralizedStore is StoreInterface, Withdrawable {
     }
 
     event SetFixedOracleFeePerSecond(uint newOracleFee);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

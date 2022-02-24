@@ -7,17 +7,17 @@ pragma solidity ^0.4.21;
 
 contract PoCGame
 {
-    
+
     /**
      * Modifiers
      */
-     
+
     modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
-    
+
    modifier isOpenToPublic()
     {
         require(openToPublic);
@@ -31,12 +31,12 @@ contract PoCGame
     }
 
     modifier  onlyPlayers()
-    { 
-        require (wagers[msg.sender] > 0); 
-        _; 
+    {
+        require (wagers[msg.sender] > 0);
+        _;
     }
-    
-   
+
+
     /**
      * Events
      */
@@ -63,54 +63,54 @@ contract PoCGame
     /**
      * Constructor
      */
-    constructor(address whaleAddress, uint256 wagerLimit) 
+    constructor(address whaleAddress, uint256 wagerLimit)
     onlyRealPeople()
-    public 
+    public
     {
         openToPublic = false;
         owner = msg.sender;
         whale = whaleAddress;
         totalDonated = 0;
         betLimit = wagerLimit;
-        
+
     }
 
 
     /**
      * Let the public play
      */
-    function OpenToThePublic() 
+    function OpenToThePublic()
     onlyOwner()
     public
     {
         openToPublic = true;
     }
-    
+
     /**
      * Adjust the bet amounts
      */
-    function AdjustBetAmounts(uint256 amount) 
+    function AdjustBetAmounts(uint256 amount)
     onlyOwner()
     public
     {
         betLimit = amount;
-        
+
         emit BetLimitChanged(betLimit);
     }
-    
+
      /**
      * Adjust the difficulty
      */
-    function AdjustDifficulty(uint256 amount) 
+    function AdjustDifficulty(uint256 amount)
     onlyOwner()
     public
     {
         difficulty = amount;
-        
+
         emit DifficultyChanged(difficulty);
     }
-    
-    
+
+
     function() public payable { }
 
     /**
@@ -118,13 +118,13 @@ contract PoCGame
      */
     function wager()
     isOpenToPublic()
-    onlyRealPeople() 
+    onlyRealPeople()
     payable
-    public 
+    public
     {
         //You have to send exactly 0.01 ETH.
         require(msg.value == betLimit);
-        
+
         //You cannot wager multiple times
         require(wagers[msg.sender] == 0);
 
@@ -133,7 +133,7 @@ contract PoCGame
         wagers[msg.sender] = msg.value;
         emit Wager(msg.value, msg.sender);
     }
-    
+
     /**
      * method to determine winners and losers
      */
@@ -148,18 +148,18 @@ contract PoCGame
         {
             timestamps[msg.sender] = 0;
             wagers[msg.sender] = 0;
-    
+
             uint256 winningNumber = uint256(keccak256(abi.encodePacked(blockhash(blockNumber),  msg.sender)))%difficulty +1;
-    
+
             if(winningNumber == difficulty / 2)
             {
                 payout(msg.sender);
             }
-            else 
+            else
             {
                 //player loses
                 loseWager(betLimit / 2);
-            }    
+            }
         }
         else
         {
@@ -172,7 +172,7 @@ contract PoCGame
      */
     function donate()
     isOpenToPublic()
-    public 
+    public
     payable
     {
         donateToWhale(msg.value);
@@ -181,11 +181,11 @@ contract PoCGame
     /**
      * Payout ETH to winner
      */
-    function payout(address winner) 
-    internal 
+    function payout(address winner)
+    internal
     {
         uint256 ethToTransfer = address(this).balance / 2;
-        
+
         winner.transfer(ethToTransfer);
         emit Win(ethToTransfer, winner);
     }
@@ -193,8 +193,8 @@ contract PoCGame
     /**
      * Payout ETH to whale
      */
-    function donateToWhale(uint256 amount) 
-    internal 
+    function donateToWhale(uint256 amount)
+    internal
     {
         whale.call.value(amount)(bytes4(keccak256("donate()")));
         totalDonated += amount;
@@ -204,53 +204,53 @@ contract PoCGame
     /**
      * Payout ETH to whale when player loses
      */
-    function loseWager(uint256 amount) 
-    internal 
+    function loseWager(uint256 amount)
+    internal
     {
         whale.call.value(amount)(bytes4(keccak256("donate()")));
         totalDonated += amount;
         emit Lose(amount, msg.sender);
     }
-    
+
 
     /**
      * ETH balance of contract
      */
-    function ethBalance() 
-    public 
-    view 
+    function ethBalance()
+    public
+    view
     returns (uint256)
     {
         return address(this).balance;
     }
-    
-    
+
+
     /**
      * current difficulty of the game
      */
-    function currentDifficulty() 
-    public 
-    view 
+    function currentDifficulty()
+    public
+    view
     returns (uint256)
     {
         return difficulty;
     }
-    
-    
+
+
     /**
      * current bet amount for the game
      */
-    function currentBetLimit() 
-    public 
-    view 
+    function currentBetLimit()
+    public
+    view
     returns (uint256)
     {
         return betLimit;
     }
-    
+
     function hasPlayerWagered(address player)
-    public 
-    view 
+    public
+    view
     returns (bool)
     {
         if(wagers[player] > 0)
@@ -261,15 +261,15 @@ contract PoCGame
         {
             return false;
         }
-        
+
     }
 
     /**
      * For the UI to properly display the winner's pot
      */
-    function winnersPot() 
-    public 
-    view 
+    function winnersPot()
+    public
+    view
     returns (uint256)
     {
         return address(this).balance / 2;
@@ -278,17 +278,28 @@ contract PoCGame
     /**
      * A trap door for when someone sends tokens other than the intended ones so the overseers can decide where to send them.
      */
-    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens) 
-    public 
-    onlyOwner() 
-    returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens)
+    public
+    onlyOwner()
+    returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(tokenOwner, tokens);
     }
 }
 
 //Define ERC20Interface.transfer, so PoCWHALE can transfer tokens accidently sent to it.
-contract ERC20Interface 
+contract ERC20Interface
 {
     function transfer(address to, uint256 tokens) public returns (bool success);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

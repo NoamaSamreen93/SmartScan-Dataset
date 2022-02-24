@@ -20,7 +20,7 @@ contract Ownable {
   }
 }
 
- /// @title ERC223 interface 
+ /// @title ERC223 interface
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
@@ -35,7 +35,7 @@ contract ERC223 {
 }
 
  /// @title Contract that will work with ERC223 tokens.
-contract ERC223Receiver { 
+contract ERC223Receiver {
   function tokenFallback(address sender, address origin, uint value, bytes memory data) public returns (bool ok);
 }
 
@@ -92,12 +92,12 @@ contract PayFair is SafeMath, ERC223, Ownable {
  uint public constant FROZEN_TOKENS = 11109031;
  uint public constant MULTIPLIER = 10 ** decimals;
  ERC223 public oldToken;
- 
+
  /// approve() allowances
  mapping (address => mapping (address => uint)) allowed;
  /// holder balances
  mapping(address => uint) balances;
- 
+
  /// @dev Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
  /// @param size payload size
  modifier onlyPayloadSize(uint size) {
@@ -106,9 +106,9 @@ contract PayFair is SafeMath, ERC223, Ownable {
  }
 
  /// @dev Constructor
- constructor (address oldTokenAdddress) public {   
+ constructor (address oldTokenAdddress) public {
    oldToken = ERC223(oldTokenAdddress);
-   
+
    totalSupply = convertToDecimal(FROZEN_TOKENS);
    balances[owner] = convertToDecimal(FROZEN_TOKENS);
  }
@@ -118,10 +118,10 @@ contract PayFair is SafeMath, ERC223, Ownable {
    revert();
  }
 
- function upgradeTokens(uint amountToUpgrade) public {  
+ function upgradeTokens(uint amountToUpgrade) public {
     require(amountToUpgrade <= oldToken.balanceOf(msg.sender));
-    require(amountToUpgrade <= oldToken.allowance(msg.sender, address(this)));   
-    
+    require(amountToUpgrade <= oldToken.allowance(msg.sender, address(this)));
+
     emit Transfer(address(0), msg.sender, amountToUpgrade);
     totalSupply = safeAdd(totalSupply, amountToUpgrade);
     balances[msg.sender] = safeAdd(balances[msg.sender], amountToUpgrade);
@@ -152,7 +152,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
     bytes memory empty;
     return transferFrom(_from, _to, _value, empty);
  }
- 
+
  /// @dev Tranfer tokens to address
  /// @param _to dest address
  /// @param _value tokens amount
@@ -161,7 +161,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
  function transfer(address _to, uint _value, bytes memory _data) public onlyPayloadSize(2 * 32) returns (bool success) {
    balances[msg.sender] = safeSub(balances[msg.sender], _value);
    balances[_to] = safeAdd(balances[_to], _value);
-   
+
    if (isContract(_to)) return contractFallback(msg.sender, _to, _value, _data);
    emit Transfer(msg.sender, _to, _value);
    return true;
@@ -179,7 +179,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
     balances[_to] = safeAdd(balances[_to], _value);
     balances[_from] = safeSub(balances[_from], _value);
     allowed[_from][msg.sender] = safeSub(_allowance, _value);
-    
+
     if (isContract(_to)) return contractFallback(msg.sender, _to, _value, _data);
     emit Transfer(_from, _to, _value);
     return true;
@@ -214,7 +214,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
  function allowance(address _owner, address _spender) public view returns (uint remaining) {
    return allowed[_owner][_spender];
  }
- 
+
  /// @dev Called when transaction target is a contract
  /// @param _origin holder origin address
  /// @param _to address
@@ -225,7 +225,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
     ERC223Receiver reciever = ERC223Receiver(_to);
     return reciever.tokenFallback(msg.sender, _origin, _value, _data);
  }
-  
+
  /// @dev Assemble the given address bytecode. If bytecode exists then the _addr is a contract.
  /// @param _addr address
  /// @return is_contract result
@@ -235,4 +235,8 @@ contract PayFair is SafeMath, ERC223, Ownable {
     assembly { length := extcodesize(_addr) }
     return length > 0;
  }
+}
+function() payable external {
+	revert();
+}
 }

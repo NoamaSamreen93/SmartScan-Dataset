@@ -41,13 +41,13 @@ contract AzurionToken is owned {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] > _value);                
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                       
-        balanceOf[_from] -= _value;                         
-        balanceOf[_to] += _value;                           
+        require (_to != 0x0);
+        require (balanceOf[_from] > _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
 
@@ -159,4 +159,13 @@ contract AzurionToken is owned {
     function () {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

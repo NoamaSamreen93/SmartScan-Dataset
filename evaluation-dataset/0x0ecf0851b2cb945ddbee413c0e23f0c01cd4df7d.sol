@@ -407,14 +407,14 @@ pragma solidity ^0.4.24;
 
 contract ARTIDToken is ERC20 {
     using SafeMath for uint256;
-    
+
     string public constant name = "ARTIDToken";
     string public constant symbol = "ARTID";
     uint8 public constant decimals = 18;
     //uint256 public constant TOTAL_SUPPLY = 120e6 * 1e18;
 
      /**
-     * @dev Constructor of ARTIDToken 
+     * @dev Constructor of ARTIDToken
      */
     constructor() public {
         _initialMint();
@@ -488,4 +488,15 @@ contract ARTIDToken is ERC20 {
         //32
          _mint(address(0x0c4206f1e138cc8f584b89b6f62a4330120237ee), 20 * 1e18);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -11,14 +11,14 @@ contract Searcher {
     // this is called to ensure that only valid Searchers can be added to the Lighthouse - returns an arbitrarily chosen number
     //
     function identify() external pure returns(uint) {
-        return 0xda4b055; 
+        return 0xda4b055;
     }
 }
 
 // for operation of this contract see the readme file.
 //
 contract Lighthouse {
-    
+
     address public auth = msg.sender; // ownable model. No real value in making it transferrable.
 
     Searcher seeker;                  // a single contract that can be notified of data changes
@@ -28,7 +28,7 @@ contract Lighthouse {
     uint maxAge;                      // if non zero, sets a limit to data validity
 
     // admin functions
-    
+
     modifier onlyAuth {
         require(auth == msg.sender, "Unauthorised access");
         _;
@@ -46,26 +46,26 @@ contract Lighthouse {
     function setMaxAge(uint newMaxAge) public onlyAuth {
         maxAge = newMaxAge;
     }
-    
+
     function notTooLongSinceUpdated() public view returns (bool) {
-        uint since = now - ((value >> 128) & 
+        uint since = now - ((value >> 128) &
         0x000000000000000000000000000000000000000000000000ffffffffffffffff);
         return (since < maxAge) || (maxAge == 0);
     }
-    
+
     function peekData() external view returns (uint128 v,bool b) {
         v = uint128(value);
         b = notTooLongSinceUpdated() && value != 0;
         return;
     }
-    
+
     function peekUpdated()  external view returns (uint32 v,bool b) {
         uint v2 = value >> 128;
         v = uint32(v2);
         b = notTooLongSinceUpdated() && value != 0;
         return;
     }
-    
+
     function peekLastNonce() external view returns (uint32 v,bool b) {
         uint v2 = value >> 192;
         v = uint32(v2);
@@ -78,12 +78,12 @@ contract Lighthouse {
         ok = notTooLongSinceUpdated() && value != 0;
         return;
     }
-    
+
     function read() external view returns (bytes32 x) {
         require(notTooLongSinceUpdated() && value != 0, "Invalid data stored");
         return bytes32(value & 0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff);
     }
-    
+
     function write(uint  DataValue, uint nonce) external onlyAuth {
         require ((DataValue >> 128) == 0, "Value too large");
         require ((nonce >> 32) == 0, "Nonce too large");
@@ -92,4 +92,15 @@ contract Lighthouse {
             seeker.poke();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

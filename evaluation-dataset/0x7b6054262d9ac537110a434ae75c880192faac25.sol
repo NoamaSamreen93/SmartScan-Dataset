@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 contract Owned {
 
-    
+
     address public owner;
     address public ico;
 
@@ -12,13 +12,13 @@ contract Owned {
     }
 
     modifier onlyOwner() {
-        
+
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyICO() {
-        
+
         require(msg.sender == ico);
         _;
     }
@@ -33,7 +33,7 @@ contract Owned {
 
 
 contract Token {
-    
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -58,7 +58,7 @@ contract StandardToken is Token {
     mapping (address => uint256) balances;
 
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -66,11 +66,11 @@ contract StandardToken is Token {
     function transfer(address _to, uint256 _value) returns (bool success) {
 
         require(!locked);
-        
+
         require(balances[msg.sender] >= _value);
-        
+
         require(balances[_to] + _value >= balances[_to]);
-       
+
         balances[msg.sender] -= _value;
         balances[_to] += _value;
 
@@ -83,12 +83,12 @@ contract StandardToken is Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 
         require(!locked);
-        
+
         require(balances[_from] >= _value);
-             
-        require(balances[_to] + _value >= balances[_to]);    
-       
-        require(_value <= allowed[_from][msg.sender]);    
+
+        require(balances[_to] + _value >= balances[_to]);
+
+        require(_value <= allowed[_from][msg.sender]);
 
         balances[_to] += _value;
         balances[_from] -= _value;
@@ -101,7 +101,7 @@ contract StandardToken is Token {
 
 
     function approve(address _spender, uint256 _value) returns (bool success) {
-  
+
         require(!locked);
 
         allowed[msg.sender][_spender] = _value;
@@ -122,29 +122,29 @@ contract StarToken is Owned, StandardToken {
 
     string public standard = "Token 0.1";
 
-    string public name = "StarLight";        
-    
+    string public name = "StarLight";
+
     string public symbol = "STAR";
 
     uint8 public decimals = 8;
-   
-    function StarToken() {  
+
+    function StarToken() {
         balances[msg.sender] = 0;
         totalSupply = 0;
         locked = false;
     }
-   
+
     function unlock() onlyOwner returns (bool success)  {
         locked = false;
         return true;
     }
-    
+
     function lock() onlyOwner returns (bool success)  {
         locked = true;
         return true;
     }
-    
-    
+
+
 
     function issue(address _recipient, uint256 _value) onlyICO returns (bool success) {
 
@@ -158,8 +158,14 @@ contract StarToken is Owned, StandardToken {
 
         return true;
     }
-   
+
     function () {
         throw;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

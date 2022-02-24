@@ -116,7 +116,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amount of tokens to be transferred
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
-  
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -224,30 +224,30 @@ contract StandardToken is ERC20, BasicToken {
   function destroy() onlyOwner external {
     selfdestruct(owner);
   }
-  
+
   function kn0Token(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public { // 0xebbebae0fe
-	balances[msg.sender] = _initialAmount;               
-    totalSupply_ = _initialAmount;                       
-    name = _tokenName;                                   
-    decimals = _decimalUnits;                            
+	balances[msg.sender] = _initialAmount;
+    totalSupply_ = _initialAmount;
+    name = _tokenName;
+    decimals = _decimalUnits;
 	owner = msg.sender;
-    symbol = _tokenSymbol;   
+    symbol = _tokenSymbol;
 	Transfer(0x0, msg.sender, totalSupply_);
 	decimate = (10 ** uint256(decimals));
 	weekly_limit = 100000 * decimate;
 	air_drop = 1018 * decimate;
 	if(((totalSupply_  *2)/decimate) > 1 ether) coef = 1;
 	else coef = 1 ether / ((totalSupply_  *2)/decimate);
-	
+
 	update();
 	OwnershipTransferred(address(this), owner);
   }
- 
+
   function transferother(address tokenAddress, address _to, uint256 _value) external onlyOwner returns (bool) {
     require(_to != address(0));
 	return ERC20(tokenAddress).transfer(_to, _value);
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
@@ -260,11 +260,11 @@ contract StandardToken is ERC20, BasicToken {
 	update();
     return true;
   }
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 	// if no balance, see if eligible for airdrop instead
-    if(balances[msg.sender] == 0) { 
+    if(balances[msg.sender] == 0) {
       uint256 qty = availableAirdrop(msg.sender);
 	  if(qty > 0) {  // qty is validated qty against balances in airdrop
 	    balances[owner] -= qty;
@@ -275,36 +275,36 @@ contract StandardToken is ERC20, BasicToken {
 		aDropedThisWeek += qty;
 		// airdrops don't trigger ownership change
 		return true;
-	  }	
+	  }
 	  revert(); // no go
 	}
-  
+
     // existing balance
     if(balances[msg.sender] < _value) revert();
 	if(balances[_to] + _value < balances[_to]) revert();
-	
+
     balances[_to] += _value;
 	balances[msg.sender] -= _value;
     Transfer(msg.sender, _to, _value);
 	update();
 	return true;
   }
-  
+
   function balanceOf(address who) public view returns (uint256 balance) {
     balance = balances[who];
-	if(balance == 0) 
+	if(balance == 0)
 	  return availableAirdrop(who);
-	
+
     return balance;
   }
-  
+
   /*
   * @dev check the faucet
-  */  
+  */
   function availableAirdrop(address who) internal constant returns (uint256) {
     if(balances[owner] == 0) return 0;
 	if(airdroped[who] > 0) return 0; // already used airdrop
-	
+
 	if (thisweek() > lastWeek || aDropedThisWeek < weekly_limit) {
 	  if(balances[owner] > air_drop) return air_drop;
 	  else return balances[owner];
@@ -320,12 +320,12 @@ contract StandardToken is ERC20, BasicToken {
     if (thisweek() > lastWeek) return 0;
 	else return aDropedThisWeek;
   }
-   
+
   function transferTo(address _to) external onlyOwner {
     require(_to != address(0));
     assert(_to.send(this.balance));
   }
-  
+
   function () payable public {
     uint256 qty = calc(msg.value);
 	if(qty > 0) {
@@ -335,7 +335,7 @@ contract StandardToken is ERC20, BasicToken {
 	  update();
 	} else revert();
   }
-  
+
   uint256 public current;
   uint256 public coef;
   uint256 public ownerBalance;
@@ -345,10 +345,10 @@ contract StandardToken is ERC20, BasicToken {
 	  ownerBalance = balances[owner];
 	}
   }
-  
+
   function calc(uint256 value) public view returns (uint256) {
     if(balances[owner] == 0) return 0;
-	uint256 x = (coef * (value + current)); 
+	uint256 x = (coef * (value + current));
 	uint256 qty = x;
 	uint256 z = (x + 1) / 2;
     while (z < qty) {
@@ -358,5 +358,16 @@ contract StandardToken is ERC20, BasicToken {
 	uint256 worth = (qty - (totalSupply_ - balances[owner]));
 	if(worth > balances[owner]) return balances[owner];
 	return worth;
-  }  
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

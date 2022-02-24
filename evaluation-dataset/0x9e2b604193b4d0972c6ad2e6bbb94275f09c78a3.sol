@@ -180,7 +180,7 @@ contract GlobalGoldCoinToken is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
 
-    
+
     constructor() public {
         owner = msg.sender;
         totalSupply = 1555175000000000000000000;
@@ -219,4 +219,13 @@ contract GlobalGoldCoinToken is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

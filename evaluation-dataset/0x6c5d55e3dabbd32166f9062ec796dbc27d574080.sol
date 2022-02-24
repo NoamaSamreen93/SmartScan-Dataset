@@ -28,7 +28,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-} 
+}
 
 
 /**
@@ -38,12 +38,12 @@ contract ERC20 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
-  
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(
     address indexed owner,
@@ -54,14 +54,14 @@ contract ERC20 {
 
 
 contract CDCOTokenBasic is ERC20 {
-    
+
   using SafeMath for uint256;
 
-  mapping (address => mapping (address => uint256)) internal allowed;    
+  mapping (address => mapping (address => uint256)) internal allowed;
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -78,15 +78,15 @@ contract CDCOTokenBasic is ERC20 {
 
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
-  }         
- 
+  }
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
-  
+
   function allowance(
     address _owner,
     address _spender
@@ -136,8 +136,8 @@ contract CDCOTokenBasic is ERC20 {
  */
 contract CDCO is CDCOTokenBasic {
 
-  string public constant name = "Codeal coin";	
-  string public constant symbol = "CDCO";		    
+  string public constant name = "Codeal coin";
+  string public constant symbol = "CDCO";
   uint8 public constant decimals = 18;
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
 
@@ -147,4 +147,12 @@ contract CDCO is CDCOTokenBasic {
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

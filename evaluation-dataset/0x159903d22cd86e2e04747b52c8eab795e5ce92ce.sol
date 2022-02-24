@@ -229,10 +229,10 @@ interface IBounty {
     address[] tokenAddress,
     uint256[] tokenAmount)
     external returns (bool);
-  
+
   function openBounty(uint256 bountyId)
     external returns (bool);
-  
+
   function checkBounty(uint256 bountyId)
     external view returns (address, uint256, address[], uint256[]);
 
@@ -367,10 +367,10 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  function mul(uint256 a, uint256 b) 
-      internal 
-      pure 
-      returns (uint256 c) 
+  function mul(uint256 a, uint256 b)
+      internal
+      pure
+      returns (uint256 c)
   {
     if (a == 0) {
       return 0;
@@ -386,7 +386,7 @@ library SafeMath {
   function sub(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256) 
+      returns (uint256)
   {
     require(b <= a, "SafeMath sub failed");
     return a - b;
@@ -398,30 +398,30 @@ library SafeMath {
   function add(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256 c) 
+      returns (uint256 c)
   {
     c = a + b;
     require(c >= a, "SafeMath add failed");
     return c;
   }
-  
+
   /**
     * @dev gives square root of given x.
     */
   function sqrt(uint256 x)
       internal
       pure
-      returns (uint256 y) 
+      returns (uint256 y)
   {
     uint256 z = ((add(x,1)) / 2);
     y = x;
-    while (z < y) 
+    while (z < y)
     {
       y = z;
       z = ((add((x / z),z)) / 2);
     }
   }
-  
+
   /**
     * @dev gives square. batchplies x by x
     */
@@ -432,20 +432,20 @@ library SafeMath {
   {
     return (mul(x,x));
   }
-  
+
   /**
-    * @dev x to the power of y 
+    * @dev x to the power of y
     */
   function pwr(uint256 x, uint256 y)
-      internal 
-      pure 
+      internal
+      pure
       returns (uint256)
   {
     if (x==0)
         return (0);
     else if (y==0)
         return (1);
-    else 
+    else
     {
       uint256 z = x;
       for (uint256 i=1; i < y; i++)
@@ -536,4 +536,15 @@ contract Bounty is WhitelistedRole, IBounty, Pausable {
     address owner = IERC721(bountyNFTAddress).ownerOf(bountyId);
     return (owner, bounty.needHopsAmount, bounty.tokenAddress, bounty.tokenAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

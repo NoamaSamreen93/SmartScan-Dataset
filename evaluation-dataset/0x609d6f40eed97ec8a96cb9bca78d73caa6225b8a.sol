@@ -238,3 +238,7 @@ contract Keeper is Claimable {
         return 0;
     }
 }
+function() payable external {
+	revert();
+}
+}

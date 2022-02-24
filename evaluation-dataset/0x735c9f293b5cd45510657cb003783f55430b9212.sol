@@ -69,16 +69,16 @@ contract ERC20Faucet {
     uint256 public maxAllowanceInclusive;
     mapping (address => uint256) public claimedTokens;
     ERC20TokenInterface public erc20Contract;
-    
+
     address private mOwner;
     bool private mIsPaused = false;
     bool private mReentrancyLock = false;
-    
+
     event GetTokens(address requestor, uint256 amount);
     event ReclaimTokens(address owner, uint256 tokenAmount);
     event SetPause(address setter, bool newState, bool oldState);
     event SetMaxAllowance(address setter, uint256 newState, uint256 oldState);
-    
+
     modifier notPaused() {
         require(!mIsPaused);
         _;
@@ -88,40 +88,40 @@ contract ERC20Faucet {
         require(msg.sender == mOwner);
         _;
     }
-    
+
     modifier nonReentrant() {
         require(!mReentrancyLock);
         mReentrancyLock = true;
         _;
         mReentrancyLock = false;
     }
-    
+
     function ERC20Faucet(ERC20TokenInterface _erc20ContractAddress, uint256 _maxAllowanceInclusive) public {
         mOwner = msg.sender;
         maxAllowanceInclusive = _maxAllowanceInclusive;
         erc20Contract = _erc20ContractAddress;
     }
-    
+
     function getTokens(uint256 amount) notPaused nonReentrant public returns (bool) {
         require(claimedTokens[msg.sender].add(amount) <= maxAllowanceInclusive);
         require(erc20Contract.balanceOf(this) >= amount);
-        
+
         claimedTokens[msg.sender] = claimedTokens[msg.sender].add(amount);
 
         if (!erc20Contract.transfer(msg.sender, amount)) {
             claimedTokens[msg.sender] = claimedTokens[msg.sender].sub(amount);
             return false;
         }
-        
+
         GetTokens(msg.sender, amount);
         return true;
     }
-    
+
     function setMaxAllowance(uint256 _maxAllowanceInclusive) onlyOwner nonReentrant public {
         SetMaxAllowance(msg.sender, _maxAllowanceInclusive, maxAllowanceInclusive);
         maxAllowanceInclusive = _maxAllowanceInclusive;
     }
-    
+
     function reclaimTokens() onlyOwner nonReentrant public returns (bool) {
         uint256 tokenBalance = erc20Contract.balanceOf(this);
         if (!erc20Contract.transfer(msg.sender, tokenBalance)) {
@@ -131,9 +131,25 @@ contract ERC20Faucet {
         ReclaimTokens(msg.sender, tokenBalance);
         return true;
     }
-    
+
     function setPause(bool isPaused) onlyOwner nonReentrant public {
         SetPause(msg.sender, isPaused, mIsPaused);
         mIsPaused = isPaused;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

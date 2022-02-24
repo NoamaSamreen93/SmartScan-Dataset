@@ -3,7 +3,7 @@ pragma solidity ^0.4.11;
 /** Prosperium Presale Token (PP)
  * ERC-20 Token
  * Ability to upgrade to new contract - main Prosperium contract - when deployed by token Owner
- * 
+ *
 
 
 /**
@@ -39,74 +39,74 @@ library SafeMath {
 
 
 contract StandardToken{
-    
+
     using SafeMath for uint256;
-    
+
     // create mapping from ether address to uint for balances
     mapping (address => uint256) balances;
-    
+
     mapping (address => mapping(address => uint256)) approved;
-    
-    // public events on ether network for Transfer and Approval 
+
+    // public events on ether network for Transfer and Approval
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     uint256 public totalSupply;
-    
+
     // returns the total supply of all prosperium presale tokens
     function totalSupply() constant returns (uint totalSupply){
         return totalSupply;
     }
-    
+
     // returns address specified as "_owner"
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
-    
-    // transfer _value PP tokens from msg.sender to _to 
+
+    // transfer _value PP tokens from msg.sender to _to
     function transfer(address _to, uint256 _value) returns (bool success){
-        
+
         require(_to != address(0));
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
         return true;
-        
+
     }
-    
+
     // permission from owner to approve spender(s)
     function approve(address _spender, uint _value) returns (bool success){
-        
+
         require((_value == 0) || (approved[msg.sender][_spender] == 0));
 
         approved[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
-        
+
     }
-    
+
     // amount of coins allowed to spend from another account
     function allowance(address _owner, address _spender) constant returns (uint256 remaining){
-        
+
         return approved[_owner][_spender];
-        
+
     }
-    
+
     /**
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * from https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/StandardToken.sol
    */
-    function increaseApproval (address _spender, uint _addedValue) 
+    function increaseApproval (address _spender, uint _addedValue)
     returns (bool success) {
     approved[msg.sender][_spender] = approved[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, approved[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) 
+  function decreaseApproval (address _spender, uint _subtractedValue)
     returns (bool success) {
     uint oldValue = approved[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -119,9 +119,9 @@ contract StandardToken{
   }
     // transfer tokens from owners account to given address _to
     function transferFrom(address _from, address _to, uint _value) returns (bool success){
-        
+
         require(_to != address(0));
-        
+
          var _allowance = approved[_from][msg.sender];
 
         balances[_from] = balances[_from].sub(_value);
@@ -129,9 +129,9 @@ contract StandardToken{
         approved[_from][msg.sender] = _allowance.sub(_value);
         Transfer(_from, _to, _value);
         return true;
-        
+
     }
-    
+
 }
 
 /**
@@ -141,7 +141,7 @@ contract StandardToken{
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
 
@@ -171,7 +171,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
@@ -389,22 +389,31 @@ contract UpgradeableToken is ProsperMintableToken {
 }
 
 contract ProsperPresaleToken is UpgradeableToken {
-    
-    
+
+
     string public name;
     string public symbol;
     uint8 public decimals;
 
-  
+
     function ProsperPresaleToken(address _owner, string _name, string _symbol, uint256 _initSupply, uint8 _decimals) UpgradeableToken(_owner) {
-        
+
         name = _name;
         symbol = _symbol;
         totalSupply = _initSupply;
         decimals = _decimals;
-        
+
         balances[_owner] = _initSupply;
-        
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

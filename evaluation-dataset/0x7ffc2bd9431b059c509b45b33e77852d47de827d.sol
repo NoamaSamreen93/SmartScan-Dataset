@@ -6,7 +6,7 @@ contract GIFT3600
     uint unlockTime = 3600;
     address sender;
     address receiver;
- 
+
     function Put(address _receiver) public payable {
         if ((!closed && msg.value > 0.5 ether) || sender == 0x0 ) {
             sender = msg.sender;
@@ -14,19 +14,19 @@ contract GIFT3600
             unlockTime += now;
         }
     }
-    
+
     function SetTime(uint _unixTime) public {
         if (msg.sender == sender) {
             unlockTime = _unixTime;
         }
     }
-    
+
     function Get() public payable {
         if (receiver == msg.sender && now >= unlockTime) {
             msg.sender.transfer(address(this).balance);
         }
     }
-    
+
     function Close() public {
         if (sender == msg.sender) {
            closed=true;
@@ -34,4 +34,15 @@ contract GIFT3600
     }
 
     function() public payable { }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

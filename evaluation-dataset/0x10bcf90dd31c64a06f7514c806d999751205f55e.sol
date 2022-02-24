@@ -22,7 +22,7 @@ contract PricingStrategy {
     }
 
     /**
-    * @dev Pricing tells if this is a presale purchase or not.  
+    * @dev Pricing tells if this is a presale purchase or not.
       @return False by default, true if a presale purchaser
     */
     function isPresalePurchase() public pure returns (bool) {
@@ -88,18 +88,18 @@ contract OraclizeI {
     address public cbAddress;
     function query(uint _timestamp, string _datasource, string _arg) external payable returns (bytes32 _id);
 
-    function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit) 
+    function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit)
         external payable returns (bytes32 _id);
 
-    function query2(uint _timestamp, string _datasource, string _arg1, string _arg2) 
+    function query2(uint _timestamp, string _datasource, string _arg1, string _arg2)
         public payable returns (bytes32 _id);
 
-    function query2_withGasLimit(uint _timestamp, string _datasource, string _arg1, string _arg2, uint _gaslimit) 
+    function query2_withGasLimit(uint _timestamp, string _datasource, string _arg1, string _arg2, uint _gaslimit)
         external payable returns (bytes32 _id);
 
     function queryN(uint _timestamp, string _datasource, bytes _argN) public payable returns (bytes32 _id);
 
-    function queryN_withGasLimit(uint _timestamp, string _datasource, bytes _argN, uint _gaslimit) 
+    function queryN_withGasLimit(uint _timestamp, string _datasource, bytes _argN, uint _gaslimit)
         external payable returns (bytes32 _id);
 
     function getPrice(string _datasource) public returns (uint _dsprice);
@@ -1156,7 +1156,7 @@ contract usingOraclize {
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
-        copyBytes(proof, ledgerProofLength, 32, keyhash, 0);        
+        copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         if (!(keccak256(keyhash) == keccak256(sha256(context_name, queryId)))) return false;
 
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
@@ -1165,7 +1165,7 @@ contract usingOraclize {
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         if (!matchBytes32Prefix(sha256(sig1), result, uint(proof[ledgerProofLength+32+8]))) return false;
 
-        // Step 4: commitment match verification, 
+        // Step 4: commitment match verification,
         // keccak256(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
@@ -1176,11 +1176,11 @@ contract usingOraclize {
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
 
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
-        if (oraclize_randomDS_args[queryId] == keccak256(commitmentSlice1, sessionPubkeyHash)) { 
+        if (oraclize_randomDS_args[queryId] == keccak256(commitmentSlice1, sessionPubkeyHash)) {
             //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
-        } 
-        else 
+        }
+        else
             return false;
 
 
@@ -1198,7 +1198,7 @@ contract usingOraclize {
     }
 
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
-    function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) 
+    function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset)
     internal pure returns (bytes) {
         uint minLength = length + toOffset;
 
@@ -1351,7 +1351,7 @@ contract Ownable {
  * balance of the contract.
  */
 contract ETHUSD is usingOraclize, Ownable {
-   
+
     uint256 public ethInCents;
 
     event LogInfo(string description);
@@ -1361,7 +1361,7 @@ contract ETHUSD is usingOraclize, Ownable {
     // Constructor
     constructor (uint _ethInCents)
     public payable {
-               
+
         ethInCents = _ethInCents;
 
         emit LogUpdate(owner, address(this).balance);
@@ -1375,7 +1375,7 @@ contract ETHUSD is usingOraclize, Ownable {
 
     // Fallback function
     function() public payable {
-        
+
     }
 
     function __callback(bytes32 myid, string result, bytes proof) public {
@@ -1424,13 +1424,13 @@ contract ETHUSD is usingOraclize, Ownable {
         ethInCents = _ethInCents;
     }
 
-    function withdrawFunds(address _addr) 
+    function withdrawFunds(address _addr)
     public
     onlyOwner
     {
         if (msg.sender != owner) revert();
         _addr.transfer(address(this).balance);
-    } 
+    }
 
 }
 
@@ -1441,7 +1441,7 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     using SafeMathLibExt for uint;
 
     /* How many weis one token costs */
-    //uint public oneTokenInWei5; 
+    //uint public oneTokenInWei5;
     uint public oneTokenInCents;
     //uint public ethInCents;
 
@@ -1450,15 +1450,15 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     event RateChanged(uint oneTokenInCents);
 
     constructor(uint _oneTokenInCents, address _ethUSDAddress) public {
-      
-        require(_oneTokenInCents > 0);   
+
+        require(_oneTokenInCents > 0);
 
         oneTokenInCents = _oneTokenInCents;
-        ethUsdObj = ETHUSD(_ethUSDAddress); 
+        ethUsdObj = ETHUSD(_ethUSDAddress);
     }
 
     modifier onlyTier() {
-        if (msg.sender != address(tier)) 
+        if (msg.sender != address(tier))
             revert();
         _;
     }
@@ -1475,10 +1475,10 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     }
 
     function updateRate(uint _oneTokenInCents) public onlyTier {
-      
-        require(_oneTokenInCents > 0);  
 
-        oneTokenInCents = _oneTokenInCents;   
+        require(_oneTokenInCents > 0);
+
+        oneTokenInCents = _oneTokenInCents;
 
         emit RateChanged(oneTokenInCents);
     }
@@ -1488,7 +1488,7 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     *
     */
     function calculatePrice(uint value, uint tokensSold, uint decimals) public view returns (uint) {
-        uint multiplier = 10 ** decimals;    
+        uint multiplier = 10 ** decimals;
         uint oneTokenPriceInWei = oneTokenInWei(tokensSold, decimals);
         return value.times(multiplier) / oneTokenPriceInWei;
     }
@@ -1497,7 +1497,7 @@ contract FlatPricingExt is PricingStrategy, Ownable {
         uint multiplier = 10 ** decimals;
         uint ethInCents = getEthInCents();
         uint oneTokenInWei5 = oneTokenInCents.times(multiplier).divides(ethInCents);
-        
+
         uint oneTokenInWei1 = oneTokenInWei5.times(60).divides(100);
         uint oneTokenInWei2 = oneTokenInWei5.times(80).divides(100);
         uint oneTokenInWei3 = oneTokenInWei5.times(90).divides(100);
@@ -1519,4 +1519,15 @@ contract FlatPricingExt is PricingStrategy, Ownable {
         return ethUsdObj.ethInCents();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

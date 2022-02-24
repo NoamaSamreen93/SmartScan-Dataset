@@ -66,7 +66,7 @@ contract TOSInstitutionsHoldingContract {
 
 
     uint256 public released = 0;
-    uint256 public totalLockAmount = 0; 
+    uint256 public totalLockAmount = 0;
     function TOSInstitutionsHoldingContract() public {}
     function release() public {
 
@@ -85,4 +85,10 @@ contract TOSInstitutionsHoldingContract {
             released = releasePercentages[num];
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

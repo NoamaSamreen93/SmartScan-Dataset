@@ -32,7 +32,7 @@ library SafeMath {
 
 
 
-//This is the basic wrapped Ether contract. 
+//This is the basic wrapped Ether contract.
 //All money deposited is transformed into ERC20 tokens at the rate of 1 wei = 1 token
 contract Wrapped_Ether {
 
@@ -128,4 +128,15 @@ contract Wrapped_Ether {
 
   //Returns the remaining allowance of tokens granted to the _spender from the _owner
   function allowance(address _owner, address _spender) public view returns (uint remaining) { return allowed[_owner][_spender]; }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

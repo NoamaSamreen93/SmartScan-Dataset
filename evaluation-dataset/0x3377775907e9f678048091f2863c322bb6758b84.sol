@@ -18,7 +18,7 @@ contract ContractTokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -109,5 +109,16 @@ contract GLBToken is ContractTokenERC20 {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

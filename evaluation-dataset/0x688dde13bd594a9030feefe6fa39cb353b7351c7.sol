@@ -32,7 +32,7 @@ library SafeMath {
 }
 
 contract ERC20 {
-    
+
   function totalSupply()public view returns (uint256 total_Supply);
   function balanceOf(address who)public view returns (uint256);
   function allowance(address owner, address spender)public view returns (uint256);
@@ -52,13 +52,13 @@ contract UpgradeAgent {
   function upgradeFrom(address _from, uint256 _value) public;
 }
 
-contract CVEN is ERC20 { 
+contract CVEN is ERC20 {
     using SafeMath for uint256;
-    //--- Token configurations ----// 
+    //--- Token configurations ----//
     string public constant name = "Concordia Ventures Stablecoin";
     string public constant symbol = "CVEN";
     uint8 public constant decimals = 18;
-    
+
     //--- Token allocations -------//
     uint256 public _totalsupply;
     uint256 public mintedTokens;
@@ -68,11 +68,11 @@ contract CVEN is ERC20 {
     address public owner;
     address public ethFundMain;
     UpgradeAgent public upgradeAgent;
-    
+
     //--- Variables ---------------//
     bool public lockstatus = false;
     bool public stopped = false;
-    
+
     mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowed;
     mapping(address => bool) public locked;
@@ -95,7 +95,7 @@ contract CVEN is ERC20 {
     function totalSupply() public view returns (uint256 total_Supply) {
         total_Supply = _totalsupply;
     }
-    
+
     function balanceOf(address _owner)public view returns (uint256 balance) {
         return balances[_owner];
     }
@@ -123,7 +123,7 @@ contract CVEN is ERC20 {
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _amount)public returns (bool success)  {
         require(!lockstatus, "Token is locked now");
         require( _spender != 0x0, "Address can not be 0x0");
@@ -133,16 +133,16 @@ contract CVEN is ERC20 {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
     function burn(uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value, "Balance does not have enough tokens");
-        require(!locked[msg.sender], "Sender address is locked");   
-        balances[msg.sender] = (balances[msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        require(!locked[msg.sender], "Sender address is locked");
+        balances[msg.sender] = (balances[msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -150,10 +150,10 @@ contract CVEN is ERC20 {
     function burnFrom(address from, uint256 _value) public returns (bool success) {
         require(balances[from] >= _value, "Source balance does not have enough tokens");
         require(allowed[from][msg.sender] >= _value, "Source balance does not have enough tokens");
-        require(!locked[from], "Source address is locked");   
+        require(!locked[from], "Source address is locked");
         balances[from] = (balances[from]).sub(_value);
-        allowed[from][msg.sender] = (allowed[from][msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        allowed[from][msg.sender] = (allowed[from][msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(from, _value);
         return true;
     }
@@ -187,7 +187,7 @@ contract CVEN is ERC20 {
         emit Mint(from, receiver, value);
         emit Transfer(0, receiver, value);
     }
-    
+
     function haltMintToken() external onlyOwner {
         require(!stopped, "Minting is stopping");
         stopped = true;
@@ -211,7 +211,7 @@ contract CVEN is ERC20 {
 	    emit Transfer(msg.sender, newOwner, balances[newOwner]);
 	}
 
-    function forwardFunds() external onlyOwner { 
+    function forwardFunds() external onlyOwner {
         address myAddress = this;
         ethFundMain.transfer(myAddress.balance);
     }
@@ -251,4 +251,20 @@ contract CVEN is ERC20 {
         emit Upgrade(msg.sender, upgradeAgent, value);
         emit Transfer(msg.sender, 0, value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

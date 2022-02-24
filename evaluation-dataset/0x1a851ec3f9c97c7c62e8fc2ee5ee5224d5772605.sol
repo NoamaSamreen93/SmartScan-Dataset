@@ -112,7 +112,7 @@ library SafeMath {
 contract Treaties {
     using SafeMath for uint;
 
-    SafeNetToken public token; 
+    SafeNetToken public token;
 
     address public creator;
     bool public creatorInited = false;
@@ -151,7 +151,7 @@ contract Treaties {
                 _;
             }
         }
-    }   
+    }
 
     event NewRequest(uint8 rType, address beneficiary, string treatyHash, uint tokensAmount, uint ethAmount, uint percentage, uint id);
     event RequestConfirmed(uint id);
@@ -354,4 +354,15 @@ contract Treaties {
         refunds[msg.sender] = 0;
         assert(msg.sender.send(refund));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

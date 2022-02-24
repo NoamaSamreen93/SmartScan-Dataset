@@ -174,7 +174,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -222,9 +222,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract MOONToken is StandardToken {
 
-    string public constant name = "Moon"; 
+    string public constant name = "Moon";
     string public constant symbol = "MOON";
-    uint8 public constant decimals = 18; 
+    uint8 public constant decimals = 18;
 
     uint256 public constant INITIAL_SUPPLY = 1e27;  // 1e9 * 1e18, that is 1000,000,000 ACTM.
 
@@ -236,4 +236,15 @@ contract MOONToken is StandardToken {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

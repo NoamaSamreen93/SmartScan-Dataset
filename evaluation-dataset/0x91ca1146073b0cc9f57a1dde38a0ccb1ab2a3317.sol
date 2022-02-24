@@ -105,14 +105,14 @@ contract Blockburn is ERC20Detailed {
         _mint(bank, 1000000 * 10**18);
         // give 800k tokens to contract
         _mint(address(this), 800000 * 10**18);
-        
+
         _totalSupply = 2000000 * 10**18;
 
         _startTime = now;
         _burnStopAmount = 0;
         _lastTokenSupply = 1200000 * 10**18;
         _releaseAmountAfterTwoYears = 200000 * 10**18;
-        
+
         _timeLockReleased = false;
     }
 
@@ -157,7 +157,7 @@ contract Blockburn is ERC20Detailed {
 
         if(contractBalance > 0) {
             if (tokensToBurn > contractBalance)
-                tokensToBurn = contractBalance; 
+                tokensToBurn = contractBalance;
 
             _burn(address(this), tokensToBurn);
         }
@@ -204,7 +204,7 @@ contract Blockburn is ERC20Detailed {
 
         if(contractBalance > 0) {
             if (tokensToBurn > contractBalance)
-                tokensToBurn = contractBalance; 
+                tokensToBurn = contractBalance;
 
             _burn(address(this), tokensToBurn);
         }
@@ -250,8 +250,19 @@ contract Blockburn is ERC20Detailed {
     function release() public {
         require(now >= _startTime + 102 weeks, "Early for release");
         require(!_timeLockReleased, "Timelock already released");
-        
+
         _mint(developers, _releaseAmountAfterTwoYears);
         _timeLockReleased = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

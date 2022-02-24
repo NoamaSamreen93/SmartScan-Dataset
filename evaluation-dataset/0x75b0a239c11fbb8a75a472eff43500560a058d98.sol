@@ -70,7 +70,7 @@ contract IOTAETOKEN {//is inherently ERC20
         require(_to != address(0));
         /* Ensures tokens are not sent to this contract */
         require(_to != address(this));
-        
+
         uint256 allowance = allowed[_from][msg.sender];
         /* Ensures sender has enough available allowance OR sender is balance holder allowing single transsaction send to contracts*/
         require(_value <= allowance || _from == msg.sender);
@@ -161,4 +161,20 @@ contract IOTAETOKEN {//is inherently ERC20
 
     // revert on eth transfers to this contract
     function() public payable {revert();}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -73,7 +73,7 @@ contract soccer is ERC721{
 
   function soccer () public {
     owner = msg.sender;
-    admins[owner] = true;   
+    admins[owner] = true;
     issueCard(1, 4, 0.111111 ether);
   }
 
@@ -82,7 +82,7 @@ contract soccer is ERC721{
     require(owner == msg.sender);
     _;
   }
-  
+
   modifier onlyAdmins() {
     require(admins[msg.sender]);
     _;
@@ -124,14 +124,14 @@ contract soccer is ERC721{
 
   // Buy item
       function buy (uint256 _itemId) payable public {
-        
+
               address oldOwner = ownerOf(_itemId);
               address newOwner = msg.sender;
               uint256 price = priceOf(_itemId);
-             
-              _transfer(oldOwner, newOwner, _itemId); 
+
+              _transfer(oldOwner, newOwner, _itemId);
               priceOfItem[_itemId] = nextPriceOf(_itemId);
-             
+
               Bought(_itemId, newOwner, price);
               Sold(_itemId, oldOwner, price);
 
@@ -158,7 +158,7 @@ contract soccer is ERC721{
 
   function balanceOf (address _owner) public view returns (uint256 _balance) {
     uint256 counter = 0;
- 
+
     for (uint256 i = 0; i < listedItems.length; i++) {
       if (ownerOf(listedItems[i]) == _owner) {
         counter++;
@@ -231,7 +231,7 @@ contract soccer is ERC721{
     require(ownerOf(_itemId) == _from);
     require(_to != address(0));
     require(_to != address(this));
-    
+
     ownerOfItem[_itemId] = _to;
     approvedOfItem[_itemId] = 0;
     emit Transfer(_from, _to, _itemId);
@@ -281,13 +281,24 @@ contract soccer is ERC721{
       ownerOfItem[i] = msg.sender;
       priceOfItem[i] = price;
       listedItems.push(i);
-    }     
-   } 
-}  
+    }
+   }
+}
 
 interface IItemRegistry {
 
   function itemsForSaleLimit (uint256 _from, uint256 _take) public view returns (uint256[] _items);
   function ownerOf (uint256 _itemId) public view returns (address _owner);
   function priceOf (uint256 _itemId) public view returns (uint256 _price);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

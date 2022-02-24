@@ -31,7 +31,7 @@ library SafeMath {
 }
 
 contract DoubleUp {
-    //using the library of safe mathematical operations    
+    //using the library of safe mathematical operations
     using SafeMath
     for uint;
     //array of last users withdrawal
@@ -88,7 +88,7 @@ contract DoubleUp {
                 usersInvestment[msg.sender] = 0;
                 usersTime[msg.sender] = 0;
                 dividends[msg.sender] = 0;
-            }    
+            }
         }
     }
 
@@ -152,19 +152,19 @@ contract DoubleUp {
 
     //return of deposit balance
     function returnDeposit() isIssetUser private {
-        
+
         //check for day limit
         require(((maxReturn.sub(ruturnedOfThisDay) > 0) || (dayOfLastReturn != now.div(1 days))), 'Day limit of return is ended');
-        //check that user didnt get more than 91% of his deposit 
+        //check that user didnt get more than 91% of his deposit
         require(usersInvestment[msg.sender].sub(usersInvestment[msg.sender].mul(projectPercent).div(100)) > dividends[msg.sender].add(payoutAmount()), 'You have already repaid your 91% of deposit. Use 0!');
-        
+
         //pay dividents
         collectPercent();
         //userDeposit-percentWithdraw-(userDeposit*projectPercent/100)
         uint withdrawalAmount = usersInvestment[msg.sender].sub(dividends[msg.sender]).sub(usersInvestment[msg.sender].mul(projectPercent).div(100));
-        //if this day is different from the day of last return then recharge max reurn 
+        //if this day is different from the day of last return then recharge max reurn
         if(dayOfLastReturn!=now.div(1 days)) { ruturnedOfThisDay = 0; dayOfLastReturn = now.div(1 days); }
-        
+
         if(withdrawalAmount > maxReturn.sub(ruturnedOfThisDay)){
             withdrawalAmount = maxReturn.sub(ruturnedOfThisDay);
             //recalculate the rest of users investment (like he make it right now)
@@ -191,10 +191,19 @@ contract DoubleUp {
             makeDeposit();
         }
     }
-    
+
     function _bytesToAddress(bytes data) private pure returns(address addr) {
         assembly {
-            addr := mload(add(data, 20)) 
+            addr := mload(add(data, 20))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -252,7 +252,7 @@ contract Presale {
      */
     function calcAmount() internal returns (uint256) {
         if (now < startTime && msg.value >= early_bird_minimal) {
-            return (msg.value / wei_per_token / 60) * 70;   
+            return (msg.value / wei_per_token / 60) * 70;
         }
         return msg.value / wei_per_token;
     }
@@ -314,4 +314,15 @@ contract Token is MintableToken {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

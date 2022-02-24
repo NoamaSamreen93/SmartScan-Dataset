@@ -6,34 +6,34 @@ pragma solidity ^0.4.25;
  *
  * The contract has been tested for vulnerabilities!
  *
- */ 
+ */
 
 contract ZzzInvest{
 
     mapping (address => uint256) public invested;
 
-    mapping (address => uint256) public payments; 
-     
+    mapping (address => uint256) public payments;
+
     mapping (address => address) public investedRef;
-    
+
     mapping (address => uint256) public atBlock;
-	
+
 	mapping (address => uint256) public regBlock;
-	
+
 	mapping (address => uint256) public remaining;
-	
+
 	mapping (address => uint256) public remday;
-    
+
     mapping (address => uint256) public cashBack;
-    
+
     mapping (address => uint256) public cashRef;
-    
+
     mapping (address => uint256) public admComiss;
-    
+
     using SafeMath for uint;
     using ToAddress for *;
     using Zero for *;
-    
+
     address private adm_addr; //NB!
     uint256 private start_block;
     uint256 private constant dividends = 2000;           	// 20.00%
@@ -43,7 +43,7 @@ contract ZzzInvest{
     uint256 private constant block_of_24h = 5900;       	// ~24 hour
 	uint256 private constant block_of_contract = 23600;   // ~24 hour * 365 * 2 4307000
     uint256 private constant min_invesment = 10 finney; // 0.01 eth
-    
+
     //Statistics
     uint256 private all_invest_users_count = 0;
     uint256 private all_invest = 0;
@@ -55,66 +55,66 @@ contract ZzzInvest{
     address private last_invest_addr = 0;
     uint256 private last_invest_amount = 0;
     uint256 private last_invest_block = 0;
-    
+
     constructor() public {
     adm_addr = msg.sender;
     start_block = block.number;
     }
-    
+
     // this function called every time anyone sends a transaction to this contract
     function() public payable {
-        
+
         uint256 amount = 0;
-		
-			
+
+
 				// Block Registration
             if (regBlock[msg.sender] == 0){
-                regBlock[msg.sender] = block.number; 
+                regBlock[msg.sender] = block.number;
 				remaining[msg.sender] = block_of_contract;
 				remday[msg.sender] = remaining[msg.sender].div(block_of_24h);
-            }	
+            }
             else
                  {
                    remaining[msg.sender] = block_of_contract.sub(block.number).sub(regBlock[msg.sender]);
 				   remday[msg.sender] = remaining[msg.sender].div(block_of_24h);
-				   
+
                  }
-			
-			
+
+
 			if (remaining[msg.sender] == 0){
-                invested[msg.sender] = 0; 
-                regBlock[msg.sender] = block.number; 
+                invested[msg.sender] = 0;
+                regBlock[msg.sender] = block.number;
 				remaining[msg.sender] = block_of_contract;
 				remday[msg.sender] = remaining[msg.sender].div(block_of_24h);
             }
-			
-			
-        
+
+
+
         // if sender is invested more than 0 ether
         if (invested[msg.sender] != 0 && remaining[msg.sender] != 0){
-		
+
             // calculate profit:
 //amount = (amount invested) * 20.00% * (blocks since last transaction) / 5900
 //amount = invested[msg.sender] * dividends / 10000 * (block.number - atBlock[msg.sender]) / block_of_24h;
 amount = invested[msg.sender].mul(dividends).div(10000).mul(block.number.sub(atBlock[msg.sender])).div(block_of_24h);
         }
-        
+
         if (msg.value == 0) {
-           
+
             // Commission payment
             if (admComiss[adm_addr] != 0 && msg.sender == adm_addr){
                 amount = amount.add(admComiss[adm_addr]);
                 admComiss[adm_addr] = 0;
                 all_adm_payments += amount;
                }
-           
+
             // Payment of referral fees
             if (cashRef[msg.sender] != 0){
                 amount = amount.add(cashRef[msg.sender]);
                 cashRef[msg.sender] = 0;
                 all_ref_payments += amount;
             }
-            
+
             // Payment of cashback
             if (cashBack[msg.sender] != 0){
                 amount = amount.add(cashBack[msg.sender]);
@@ -124,78 +124,78 @@ amount = invested[msg.sender].mul(dividends).div(10000).mul(block.number.sub(atB
            }
         else
            {
-            
+
             // Minimum payment
             require(msg.value >= min_invesment, "msg.value must be >= 0.01 ether (10 finney)");
-               
+
             // Enrollment fees
             admComiss[adm_addr] += msg.value.mul(adm_comission).div(100);
-             
+
             address ref_addr = msg.data.toAddr();
-            
+
               if (ref_addr.notZero()) {
-                  
+
                  //Anti-Cheat mode
                  require(msg.sender != ref_addr, "referal must be != msg.sender");
-                  
+
                  // Referral enrollment
                  cashRef[ref_addr] += msg.value.mul(ref_bonus).div(100);
-                 
+
                  // Securing the referral for the investor
                  investedRef[msg.sender] = ref_addr;
-                 
+
                  // Cashback Enrollment
                  if (invested[msg.sender] == 0)
                      cashBack[msg.sender] += msg.value.mul(ref_cashback).div(100);
-                 
+
                  }
                  else
                  {
                  // Referral enrollment
                    if (investedRef[msg.sender].notZero())
-                      cashRef[investedRef[msg.sender]] += msg.value.mul(ref_bonus).div(100);    
+                      cashRef[investedRef[msg.sender]] += msg.value.mul(ref_bonus).div(100);
                  }
-                 
-                 
-            if (invested[msg.sender] == 0) all_invest_users_count++;   
-               
+
+
+            if (invested[msg.sender] == 0) all_invest_users_count++;
+
             // investment accounting
-            invested[msg.sender] += msg.value;  
+            invested[msg.sender] += msg.value;
             atBlock[msg.sender] = block.number;
-			
+
             // statistics
             all_invest += msg.value;
             if (invested[msg.sender] > 0) all_reinvest += msg.value;
             last_invest_addr = msg.sender;
             last_invest_amount = msg.value;
             last_invest_block = block.number;
-            
+
            }
-           
+
          // record block number and invested amount (msg.value) of this transaction
-         atBlock[msg.sender] = block.number;    
-           
+         atBlock[msg.sender] = block.number;
+
          if (amount != 0)
             {
             // send calculated amount of ether directly to sender (aka YOU)
             address sender = msg.sender;
-            
+
             all_payments += amount;
             payments[sender] += amount;
-            
+
             sender.transfer(amount);
             }
-		
-		
-			
-			
+
+
+
+
    }
-   
-    
+
+
     //Stat
     //getFundStatsMap
     function getFundStatsMap() public view returns (uint256[7]){
-    uint256[7] memory stateMap; 
+    uint256[7] memory stateMap;
     stateMap[0] = all_invest_users_count;
     stateMap[1] = all_invest;
     stateMap[2] = all_payments;
@@ -203,29 +203,29 @@ amount = invested[msg.sender].mul(dividends).div(10000).mul(block.number.sub(atB
     stateMap[4] = all_ref_payments;
     stateMap[5] = all_adm_payments;
     stateMap[6] = all_reinvest;
-    return (stateMap); 
+    return (stateMap);
     }
-    
+
     //getUserStats
     function getUserStats(address addr) public view returns (uint256,uint256,uint256,uint256,uint256,uint256,address){
-    return (invested[addr],cashBack[addr],cashRef[addr],atBlock[addr],block.number,payments[addr],investedRef[addr]); 
+    return (invested[addr],cashBack[addr],cashRef[addr],atBlock[addr],block.number,payments[addr],investedRef[addr]);
     }
-	
+
 	//getRemainingDays
     function getRemainingDays(address addr) public view returns (uint256,uint256,uint256){
-    return (remaining[addr],remday[addr],regBlock[addr]); 
+    return (remaining[addr],remday[addr],regBlock[addr]);
     }
-    
+
     //getWebStats
     function getWebStats() public view returns (uint256,uint256,uint256,uint256,address,uint256,uint256){
-    return (all_invest_users_count,address(this).balance,all_invest,all_payments,last_invest_addr,last_invest_amount,last_invest_block); 
+    return (all_invest_users_count,address(this).balance,all_invest,all_payments,last_invest_addr,last_invest_amount,last_invest_block);
     }
-  
-}   
-    
+
+}
+
 
 library SafeMath {
- 
+
 
 /**
   * @dev Multiplies two numbers, reverts on overflow.
@@ -313,4 +313,20 @@ library Zero {
   function isZero(address addr) internal pure returns(bool) {
     return addr == address(0);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -137,9 +137,9 @@ contract ICWToken is StandardToken {
     address public contributorsAddress = 0x42cd691a49e8FF418528Fe906553B002846dE3cf;
     // company address
     address public companyAddress = 0xf9C722e5c7c3313BBcD80e9A78e055391f75C732;
-    // market Address 
+    // market Address
     address public marketAddress = 0xbd2F5D1975ccE83dfbf2B5743B1F8409CF211f90;
-    // ICO Address 
+    // ICO Address
     address public icoAddress = 0xe26E3a77cA40b3e04C64E29f6c076Eec25a66E76;
 
     // the share of contributors
@@ -172,4 +172,20 @@ contract ICWToken is StandardToken {
         emit Transfer(address(0), icoAddress, valueIcoAddress);
 
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -199,7 +199,7 @@ contract WalletSimple {
   ) public onlySigner {
     // Verify the other signer
     var operationHash = keccak256("ETHER", toAddress, value, data, expireTime, sequenceId);
-    
+
     var otherSigner = verifyMultiSig(toAddress, operationHash, signature, expireTime, sequenceId);
 
     // Success, send the transaction
@@ -209,7 +209,7 @@ contract WalletSimple {
     }
     Transacted(msg.sender, otherSigner, operationHash, toAddress, value, data);
   }
-  
+
   /**
    * Execute a multi-signature token transfer from this wallet using 2 signers: one from msg.sender and the other from ecrecover.
    * Sequence IDs are numbers starting from 1. They are used to prevent replay attacks and may not be repeated.
@@ -231,15 +231,15 @@ contract WalletSimple {
   ) public onlySigner {
     // Verify the other signer
     var operationHash = keccak256("ERC20", toAddress, value, tokenContractAddress, expireTime, sequenceId);
-    
+
     verifyMultiSig(toAddress, operationHash, signature, expireTime, sequenceId);
-    
+
     ERC20Interface instance = ERC20Interface(tokenContractAddress);
     if (!instance.transfer(toAddress, value)) {
         revert();
     }
   }
-  
+
   /**
    * Execute a token flush from one of the forwarder addresses. This transfer needs only a single signature and can be done by any signer
    *
@@ -247,7 +247,7 @@ contract WalletSimple {
    * @param tokenContractAddress the address of the erc20 token contract
    */
   function flushForwarderTokens(
-    address forwarderAddress, 
+    address forwarderAddress,
     address tokenContractAddress
   ) public onlySigner {
     Forwarder forwarder = Forwarder(forwarderAddress);
@@ -380,4 +380,15 @@ contract WalletSimple {
     }
     return highestSequenceId + 1;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

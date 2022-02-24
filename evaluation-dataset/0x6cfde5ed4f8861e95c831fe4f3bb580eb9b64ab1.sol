@@ -388,14 +388,14 @@ contract ACOToken is PausableToken {
 
   uint256 public constant initialSupply_ = 1000000000 * (10 ** uint256(decimals));
   uint256 public tokensForPublicSale = 100000000 * (10 ** 18);
-  uint256 public pricePerToken = (10 ** 16); //1 Eth = 1 ACO 
+  uint256 public pricePerToken = (10 ** 16); //1 Eth = 1 ACO
 
   uint256 minETH = 0 * (10**18); // 0 ether
   uint256 maxETH = 100 * (10**18); // 10 ether
-  
+
   //Crowdsale running
   bool public isCrowdsaleOpen=true;
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -404,7 +404,7 @@ contract ACOToken is PausableToken {
     balances[msg.sender] = balances[msg.sender].add(initialSupply_);
     emit Transfer(address(0), msg.sender, initialSupply_);
   }
-  
+
    function startCrowdSale() public onlyOwner {
      isCrowdsaleOpen=true;
   }
@@ -412,7 +412,7 @@ contract ACOToken is PausableToken {
    function stopCrowdSale() public onlyOwner {
      isCrowdsaleOpen=false;
   }
-  
+
   function sendToInvestor(address _to, uint256 _value) public onlyOwner {
     transfer(_to, _value);
   }
@@ -426,7 +426,7 @@ contract ACOToken is PausableToken {
     require(_pricePerToken > 0);
     require(_min >= 0);
     require(_max > 0);
-    pricePerToken = 0; 
+    pricePerToken = 0;
     pricePerToken = pricePerToken.add(_pricePerToken);
     tokensForPublicSale = 0;
     tokensForPublicSale = tokensForPublicSale.add(_tokensForPublicSale);
@@ -436,7 +436,7 @@ contract ACOToken is PausableToken {
     maxETH = maxETH.add(_max);
  }
 
-  
+
   function buyTokens() public payable returns(uint tokenAmount) {
 
     uint256 _tokenAmount;
@@ -472,4 +472,12 @@ contract ACOToken is PausableToken {
       buyTokens();
   }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

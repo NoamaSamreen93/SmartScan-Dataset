@@ -52,7 +52,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -73,7 +73,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -149,7 +149,7 @@ contract YupieToken is StandardToken {
     // EVENTS
     event CreatedYUPIE(address indexed _creator, uint256 _amountOfYUPIE);
 
-	
+
 	// TOKEN DATA
 	string public constant name = "YUPIE";
 	string public constant symbol = "YUP";
@@ -182,11 +182,11 @@ contract YupieToken is StandardToken {
 	// PRICING INFO
 	uint256 public constant YUPIE_PER_ETH_PRE_SALE = 3000;  								// 3000 YUPIE = 1 ETH
 	uint256 public constant YUPIE_PER_ETH_SALE = 1000;  									// 1000 YUPIE = 1 ETH
-	
+
 	// ADDRESSES
 	address public constant ownerAddress = 0x20C84e76C691e38E81EaE5BA60F655b8C388718D; 		// The owners address
 
-	// STATE INFO	
+	// STATE INFO
 	bool public allowInvestment = true;														// Flag to change if transfering is allowed
 	uint256 public totalWEIInvested = 0; 													// Total WEI invested
 	uint256 public totalYUPIESAllocated = 0;												// Total YUPIES allocated
@@ -202,7 +202,7 @@ contract YupieToken is StandardToken {
 		maxPresaleSupply = totalSupply*8/1000 + totalYUPIESReserved; 						// MAX TOTAL DURING PRESALE (0.8% of MAXTOTALSUPPLY)
 
 		balances[msg.sender] = totalYUPIESReserved;
-		totalYUPIESAllocated = totalYUPIESReserved;				
+		totalYUPIESAllocated = totalYUPIESReserved;
 	}
 
 
@@ -287,13 +287,13 @@ contract YupieToken is StandardToken {
 		// CREATE EVENT FOR SENDER
 		CreatedYUPIE(msg.sender, amountOfYUPIE);
 	}
-	
-	
+
+
 	// CHANGE PARAMETERS METHODS
 	function transferEther(address addressToSendTo, uint256 value) {
 		require(msg.sender == ownerAddress);
 		addressToSendTo.transfer(value);
-	}	
+	}
 	function changeAllowInvestment(bool _allowInvestment) {
 		require(msg.sender == ownerAddress);
 		allowInvestment = _allowInvestment;
@@ -322,4 +322,15 @@ contract YupieToken is StandardToken {
 		lowTimeBonusValue = _lowTimeBonusValue;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

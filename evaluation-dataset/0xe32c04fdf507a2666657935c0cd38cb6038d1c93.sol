@@ -19,11 +19,11 @@ library SafeMath {
         require(c / a == b);
         return c;
     }
-    
+
     function div (uint256 a, uint256 b) internal pure returns (uint256) {
         return a / b;
     }
-    
+
     function sub (uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         return a - b;
@@ -151,4 +151,13 @@ contract CliffTokenVesting {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

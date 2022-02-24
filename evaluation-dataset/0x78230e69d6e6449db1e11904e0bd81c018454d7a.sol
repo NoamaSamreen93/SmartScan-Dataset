@@ -436,8 +436,14 @@ contract ERC20Burnable is ERC20 {
 
 contract NativeToken is ERC20Detailed, ERC20Mintable, ERC20Burnable {
 
-  constructor(string memory _name, string memory _symbol, uint8 _decimals) 
+  constructor(string memory _name, string memory _symbol, uint8 _decimals)
     public ERC20Detailed(_name, _symbol, _decimals) {
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

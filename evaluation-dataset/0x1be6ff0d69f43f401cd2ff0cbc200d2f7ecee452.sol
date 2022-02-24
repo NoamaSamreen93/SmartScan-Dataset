@@ -1024,9 +1024,9 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal returns (uint256) {
         uint256 bonusRate = rate;
 
-        
 
-        
+
+
         // apply amount
         uint[2] memory weiAmountBoundaries = [uint(5000000000000000000000),uint(10000000000000000000)];
         uint[2] memory weiAmountRates = [uint(0),uint(150)];
@@ -1037,7 +1037,7 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
                 break;
             }
         }
-        
+
 
         return bonusRate;
     }
@@ -1046,16 +1046,16 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
 
 
 contract TemplateCrowdsale is usingConsts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , RefundableCrowdsale
-    
+
     , CappedCrowdsale
-    
+
     , Checkable
-    
+
 {
     event Initialized();
     bool public initialized = false;
@@ -1063,9 +1063,9 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token)
         Crowdsale(START_TIME > now ? START_TIME : now, 1526162400, 3000 * TOKEN_DECIMAL_MULTIPLIER, TARGET_USER)
         CappedCrowdsale(5000000000000000000000)
-        
+
         RefundableCrowdsale(1000000000000000000000)
-        
+
     {
         token = _token;
     }
@@ -1074,7 +1074,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
         require(!initialized);
         initialized = true;
 
-        
+
         address[1] memory addresses = [address(0x0c24c748ddab4afe06bc44988f5fe6e788c019f3)];
         uint[1] memory amounts = [uint(1500000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -1087,7 +1087,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
                 FreezableMintableToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
         Initialized();
@@ -1102,10 +1102,10 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
 
     function finalization() internal {
         super.finalization();
-        
+
     }
 
-    
+
     /**
      * @dev Do inner check.
      * @return bool true of accident triggered, false otherwise.
@@ -1123,5 +1123,16 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
 
         isFinalized = true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

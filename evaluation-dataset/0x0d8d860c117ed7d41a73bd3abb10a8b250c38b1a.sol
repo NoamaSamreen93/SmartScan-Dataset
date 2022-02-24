@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 /**
  * ICrowdsale
  *
- * Base crowdsale interface to manage the sale of 
+ * Base crowdsale interface to manage the sale of
  * an ERC20 token
  *
  * #created 09/09/2017
@@ -37,27 +37,27 @@ interface ICrowdsale {
     function hasBalance(address _beneficiary, uint _releaseDate) public view returns (bool);
 
 
-    /** 
+    /**
      * Get the allocated token balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated token balance will be retrieved
      * @return The allocated token balance
      */
     function balanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Get the allocated eth balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated eth balance will be retrieved
      * @return The allocated eth balance
      */
     function ethBalanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Get invested and refundable balance of `_owner` (only contributions during the ICO phase are registered)
-     * 
+     *
      * @param _owner The address from which the refundable balance will be retrieved
      * @return The invested refundable balance
      */
@@ -75,7 +75,7 @@ interface ICrowdsale {
 
 
     /**
-     * Convert `_wei` to an amount in tokens using 
+     * Convert `_wei` to an amount in tokens using
      * the `_rate`
      *
      * @param _wei amount of wei to convert
@@ -87,11 +87,11 @@ interface ICrowdsale {
 
     /**
      * Receive ether and issue tokens to the sender
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable;
@@ -127,8 +127,8 @@ interface ICrowdsale {
 
 
     /**
-     * Refund in the case of an unsuccessful crowdsale. The 
-     * crowdsale is considered unsuccessful if minAmount was 
+     * Refund in the case of an unsuccessful crowdsale. The
+     * crowdsale is considered unsuccessful if minAmount was
      * not raised before end of the crowdsale
      */
     function refund() public;
@@ -145,11 +145,11 @@ interface ICrowdsaleProxy {
 
     /**
      * Receive ether and issue tokens to the sender
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable;
@@ -183,7 +183,7 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
 
     address public owner;
     ICrowdsale public target;
-    
+
 
     /**
      * Deploy proxy
@@ -199,9 +199,9 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
 
     /**
      * Receive contribution and forward to the crowdsale
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
      */
     function () public payable {
@@ -228,4 +228,15 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
     function contributeFor(address _beneficiary) public payable returns (uint) {
         target.contributeFor.value(msg.value)(_beneficiary);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

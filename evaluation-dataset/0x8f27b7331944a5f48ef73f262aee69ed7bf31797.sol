@@ -48,15 +48,15 @@ contract IMCUnlockRecord is Owned{
 
     // 执行者地址
     address public executorAddress;
-    
+
     // 解锁记录
     mapping(uint => RecordInfo) public unlockRecord;
-    
+
     constructor() public{
         // 初始化合约执行者
         executorAddress = msg.sender;
     }
-    
+
     /**
      * 修改executorAddress，只有owner能够修改
      * @param _addr address 地址
@@ -64,8 +64,8 @@ contract IMCUnlockRecord is Owned{
     function modifyExecutorAddr(address _addr) public onlyOwner {
         executorAddress = _addr;
     }
-    
-     
+
+
     /**
      * 解锁记录添加
      * @param _date uint 记录日期（解锁ID）
@@ -86,9 +86,20 @@ contract IMCUnlockRecord is Owned{
 
         // 解锁日志记录
         emit UnlockRecordAdd(_date, _hash, _data, _fileFormat, _stripLen);
-        
+
         return true;
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -115,7 +115,7 @@ library F3Ddatasets {
         uint256 pID;
         uint256 offer;
     }
-    
+
     struct EventReturns {
         address winnerBigPotAddr;         // winner address
         uint256 amountWonBigPot;          // amount won
@@ -541,7 +541,7 @@ contract FoMo3DFast is F3Devents {
     }
 
     function updateGenVault(uint256 _pID, uint256 _rIDlast)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedEarnings(_pID, _rIDlast);
         if (_earnings > 0)
@@ -568,7 +568,7 @@ contract FoMo3DFast is F3Devents {
         // from that round to gen vault.
         if (plyr_[_pID].lrnd != 0)
             updateGenVault(_pID, plyr_[_pID].lrnd);
-            
+
         // update player's last round played
         plyr_[_pID].lrnd = rID_;
     }
@@ -584,7 +584,7 @@ contract FoMo3DFast is F3Devents {
         // 加入未统计的分钥匙的钱
         if (plyrRnds_[_pID][_rID].keys == 0)
             managePlayer(_pID);
-        
+
         // update bigPot leader
         bigPot_[_rID].plyr = _pID;
 
@@ -699,13 +699,13 @@ contract FoMo3DFast is F3Devents {
     {
         // calc profit per key & round mask based on this buy:  (dust goes to pot)
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (bigPot_[_rID].keys);
-        bigPot_[_rID].mask = _ppt.add(bigPot_[_rID].mask); 
-            
+        bigPot_[_rID].mask = _ppt.add(bigPot_[_rID].mask);
+
         // calculate player earning from their own buy (only based on the keys
         // they just bought).  & update player earnings mask
         uint256 _pearn = (_ppt.mul(_keys)) / (1000000000000000000);
         plyrRnds_[_pID][_rID].mask = (((bigPot_[_rID].mask.mul(_keys)) / (1000000000000000000)).sub(_pearn)).add(plyrRnds_[_pID][_rID].mask);
-        
+
         // calculate & return dust
         return(_gen.sub((_ppt.mul(bigPot_[_rID].keys)) / (1000000000000000000)));
     }
@@ -1203,4 +1203,15 @@ contract FoMo3DFast is F3Devents {
         );
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

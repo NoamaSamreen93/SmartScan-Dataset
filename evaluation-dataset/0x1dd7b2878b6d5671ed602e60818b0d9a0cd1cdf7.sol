@@ -334,7 +334,7 @@ contract FinToken is PausableToken {
 
     modifier onlyWhenUnlocked()
     {
-        require(isUnlocked());            
+        require(isUnlocked());
         _;
     }
 
@@ -349,12 +349,12 @@ contract FinToken is PausableToken {
         return super.transferFrom(_from, _to, _value);
     }
 
-    function getLockFundsReleaseTime(address _addr) public view returns(uint) 
+    function getLockFundsReleaseTime(address _addr) public view returns(uint)
     {
         return approvedInvestorListWithDate[_addr];
     }
 
-    function setLockFunds(address[] newInvestorList, uint releaseTime) onlyOwner public 
+    function setLockFunds(address[] newInvestorList, uint releaseTime) onlyOwner public
     {
         require(releaseTime > getTime());
         for (uint i = 0; i < newInvestorList.length; i++)
@@ -363,7 +363,7 @@ contract FinToken is PausableToken {
         }
     }
 
-    function removeLockFunds(address[] investorList) onlyOwner public 
+    function removeLockFunds(address[] investorList) onlyOwner public
     {
         for (uint i = 0; i < investorList.length; i++)
         {
@@ -372,14 +372,14 @@ contract FinToken is PausableToken {
         }
     }
 
-    function setLockFund(address newInvestor, uint releaseTime) onlyOwner public 
+    function setLockFund(address newInvestor, uint releaseTime) onlyOwner public
     {
         require(releaseTime > getTime());
         approvedInvestorListWithDate[newInvestor] = releaseTime;
     }
 
 
-    function removeLockFund(address investor) onlyOwner public 
+    function removeLockFund(address investor) onlyOwner public
     {
         approvedInvestorListWithDate[investor] = 0;
         delete(approvedInvestorListWithDate[investor]);
@@ -414,8 +414,19 @@ contract FinToken is PausableToken {
         admin = newAdmin;
     }
 
-    function () public payable 
+    function () public payable
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

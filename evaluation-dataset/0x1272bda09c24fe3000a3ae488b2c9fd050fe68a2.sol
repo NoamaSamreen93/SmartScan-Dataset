@@ -101,7 +101,7 @@ contract owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-	
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -115,10 +115,10 @@ interface token {
 }
 
 contract preCrowdsaleETH is owned {
-    
+
     // Library
     using SafeMath for uint;
-    
+
     uint public price;
     uint8 decimals;
     uint8 public refPercent;
@@ -135,17 +135,17 @@ contract preCrowdsaleETH is owned {
     uint public endDate;
     address public beneficiary;
     token public tokenReward;
-    
+
     mapping(address => uint256) public balanceOfEth;
     mapping(address => uint256) public balanceTokens;
     mapping(address => uint256) public buyTokens;
     mapping(address => uint256) public buyTokensBonus;
     mapping(address => uint256) public bountyTokens;
     mapping(address => uint256) public refTokens;
-    
+
     bool fundingGoalReached = false;
     bool crowdsaleClosed = false;
-    
+
     using Address for *;
     using Zero for *;
 
@@ -183,11 +183,11 @@ contract preCrowdsaleETH is owned {
     function () payable external {
         require(!crowdsaleClosed);
         require(now >= startDate && now <= endDate);
-        
+
         uint256 amount = msg.value;
         uint256 buyTokens = msg.value.mul(price);
         uint256 buyBonus = 0;
-        
+
         // HardCap
         require(hardCap >= buyTokens.add(buyBonus));
 
@@ -198,11 +198,11 @@ contract preCrowdsaleETH is owned {
 		} else if (now <= bonusEnds20){
 			buyBonus = msg.value.mul(price.mul(20).div(100));
 		} else if (now <= bonusEnds10){
-			buyBonus = msg.value.mul(price.mul(10).div(100));	
+			buyBonus = msg.value.mul(price.mul(10).div(100));
 		} else if (now <= bonusEnds5){
 			buyBonus = msg.value.mul(price.mul(5).div(100));
 		}
-		
+
 		// Verification of input data on referral
         address referrerAddr = msg.data.toAddress();
         uint256 refTokens = msg.value.mul(price).mul(refPercent).div(100);
@@ -212,9 +212,9 @@ contract preCrowdsaleETH is owned {
             totalSalesTokens = totalSalesTokens.add(buyTokens).add(buyBonus).add(refTokens);
             addTokensBonusRef(msg.sender, buyTokens, buyBonus, referrerAddr, refTokens);
 		    emit FundTransfer(msg.sender, amount, true);
-		    
+
         } else {
-    
+
             balanceOfEth[msg.sender] = balanceOfEth[msg.sender].add(amount);
             totalSalesEth = totalSalesEth.add(amount);
             totalSalesTokens = totalSalesTokens.add(buyTokens).add(buyBonus);
@@ -269,21 +269,21 @@ contract preCrowdsaleETH is owned {
             }
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Set referer percent
     // ------------------------------------------------------------------------
 	function setRefPer(uint8 percent) public onlyOwner {
 	    refPercent = percent;
 	}
-	
+
 	function addTokens(address to, uint256 tokens) internal {
         require(!crowdsaleClosed);
         balanceTokens[to] = balanceTokens[to].add(tokens);
         buyTokens[to] = buyTokens[to].add(tokens);
         tokenReward.transfer(to, tokens);
     }
-    
+
     function addTokensBonus(address to, uint256 buyToken, uint256 buyBonus) internal {
         require(!crowdsaleClosed);
         balanceTokens[to] = balanceTokens[to].add(buyToken).add(buyBonus);
@@ -291,29 +291,40 @@ contract preCrowdsaleETH is owned {
         buyTokensBonus[to] = buyTokensBonus[to].add(buyBonus);
         tokenReward.transfer(to, buyToken.add(buyBonus));
     }
-    
+
     function addBountyTokens(address to, uint256 bountyToken) internal {
         require(!crowdsaleClosed);
         balanceTokens[to] = balanceTokens[to].add(bountyToken);
         bountyTokens[to] = bountyTokens[to].add(bountyToken);
         tokenReward.transfer(to, bountyToken);
     }
-    
+
     function addTokensBonusRef(address to, uint256 buyToken, uint256 buyBonus, address referrerAddr, uint256 refToken) internal {
         require(!crowdsaleClosed);
         balanceTokens[to] = balanceTokens[to].add(buyToken).add(buyBonus);
         buyTokens[to] = buyTokens[to].add(buyToken);
         buyTokensBonus[to] = buyTokensBonus[to].add(buyBonus);
         tokenReward.transfer(to, buyToken.add(buyBonus));
-        
+
         // Referral bonus
         balanceTokens[referrerAddr] = balanceTokens[referrerAddr].add(refToken);
         refTokens[referrerAddr] = refTokens[referrerAddr].add(refToken);
         tokenReward.transfer(referrerAddr, refToken);
     }
-    
+
     /// @notice Send all tokens to Owner after ICO
     function sendAllTokensToOwner(uint256 _revardTokens) onlyOwner public {
         tokenReward.transfer(owner, _revardTokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

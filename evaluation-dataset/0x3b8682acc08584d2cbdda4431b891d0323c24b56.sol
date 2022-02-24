@@ -58,7 +58,7 @@ contract Ownable {
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
-  } 
+  }
 
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
@@ -79,25 +79,25 @@ contract LoveContribution is Ownable {
 
   //The token being given
   LoveToken  token;
-  
+
   // contribution in wei
   mapping(address => uint256) public contributionOf;
-  
+
   // array of contributors
   address[] contributors;
-  
+
   // array of top contributed winners
    address[] topWinners=[address(0),address(0),address(0),address(0),address(0),address(0),address(0),address(0),address(0),address(0),address(0)];
-  
+
   // array of random winners
   address[] randomWinners;
-  
+
   // won amount in wei
   mapping(address => uint256) public amountWon;
-  
+
   // ckeck whether the winner withdrawn the won amount
   mapping(address => bool) public claimed;
-  
+
   // ckeck whether the contributor completed KYC
   mapping(address => bool) public KYCDone;
 
@@ -110,10 +110,10 @@ contract LoveContribution is Ownable {
 
   // amount of wei raised
   uint256 public weiRaised;
-  
+
   // amount of wei withdrawn by owner
   uint256 public ownerWithdrawn;
-  
+
   event contributionSuccessful(address indexed contributedBy, uint256 contribution, uint256 tokenReceived);
   event FundTransfer(address indexed beneficiary, uint256 amount);
   event FundTransferFailed();
@@ -133,8 +133,8 @@ contract LoveContribution is Ownable {
   function () external payable {
     contribute();
   }
-    
-   
+
+
   /**
    * @dev low level token purchase function
    */
@@ -142,34 +142,34 @@ contract LoveContribution is Ownable {
     uint256 weiAmount = msg.value;
     require(msg.sender != address(0) && weiAmount >= 5e15);
     require(now >= startTime && now <= endTime);
-    
+
     // calculate the number of tokens to be send. multipling with (10 ** 8) since the token used has 8 decimals
     uint256 numToken = getTokenAmount(weiAmount).mul(10 ** 8);
-    
-    // check whether the contract have enough token balance 
+
+    // check whether the contract have enough token balance
     require(token.balanceOf(this).sub(numToken) > 0 );
-    
+
     // check whether the sender is contributing for the first time
     if(contributionOf[msg.sender] <= 0){
         contributors.push(msg.sender);
         token.freeze(msg.sender);
     }
-    
+
     contributionOf[msg.sender] = contributionOf[msg.sender].add(weiAmount);
-    
+
     token.transfer(msg.sender, numToken);
-    
+
     weiRaised = weiRaised.add(weiAmount);
-    
+
     updateWinnersList();
-    
+
     contributionSuccessful(msg.sender,weiAmount,numToken);
   }
 
   // @return Number of tokens
   function getTokenAmount(uint256 weiAmount) internal returns(uint256) {
        uint256 tokenAmount;
-       
+
         if(weiRaised <= 100 ether){
             rate = 10e14;
             tokenAmount = weiAmount.div(rate);
@@ -195,9 +195,9 @@ contract LoveContribution is Ownable {
             tokenAmount = weiAmount.div(rate);
             return tokenAmount;
         }
-        
+
   }
-  
+
   // update winners list
   function updateWinnersList() internal returns(bool) {
       if(topWinners[0] != msg.sender){
@@ -232,27 +232,27 @@ contract LoveContribution is Ownable {
   function hasEnded() public view returns (bool) {
     return (now > endTime) ;
   }
-  
+
   /**
    * @dev Function to find the winners
    */
   function findWinners() public onlyOwner {
     require(now >= endTime);
-    
+
     // number of contributors
     uint256 len=contributors.length;
-    
+
     // factor multiplied to get the deserved percentage of weiRaised for a winner
     uint256 mulFactor=50;
-    
-    // setting top ten winners with won amount 
+
+    // setting top ten winners with won amount
     for(uint256 num = 0; num < 10 && num < len; num++){
       amountWon[topWinners[num]]=(weiRaised.div(1000)).mul(mulFactor);
       mulFactor=mulFactor.sub(5);
      }
      topWinners.length--;
-       
-    // setting next 10 random winners 
+
+    // setting next 10 random winners
     if(len > 10 && len <= 20 ){
         for(num = 0 ; num < 20 && num < len; num++){
             if(amountWon[contributors[num]] <= 0){
@@ -271,7 +271,7 @@ contract LoveContribution is Ownable {
                 amountWon[contributors[randomNo]]=(weiRaised.div(1000)).mul(3);
             }
             else{
-                
+
                 for(uint256 j = 0; j < len; j++){
                     randomNo=(randomNo.add(1)) % len;
                     if(amountWon[contributors[randomNo]] <= 0){
@@ -281,11 +281,11 @@ contract LoveContribution is Ownable {
                     }
                 }
             }
-        }    
+        }
     }
   }
-  
-    
+
+
   /**
    * @dev Generate a random using the block number and loop count as the seed of randomness.
    */
@@ -293,26 +293,26 @@ contract LoveContribution is Ownable {
     uint256 rand = block.number.mul(count);
     return rand;
   }
-  
+
   /**
    * @dev Function to stop the contribution
    */
   function stop() public onlyOwner  {
     endTime = now ;
   }
-  
+
   /**
    * @dev Function for withdrawing eth by the owner
    */
   function ownerWithdrawal(uint256 amt) public onlyOwner  {
-    // Limit owner from withdrawing not more than 70% 
+    // Limit owner from withdrawing not more than 70%
     require((amt.add(ownerWithdrawn)) <= (weiRaised.div(100)).mul(70));
     if (owner.send(amt)) {
         ownerWithdrawn=ownerWithdrawn.add(amt);
         FundTransfer(owner, amt);
     }
   }
-  
+
   /**
    * @dev Function for approving contributors after KYC
    */
@@ -325,7 +325,7 @@ contract LoveContribution is Ownable {
         token.release(addr);
     }
   }
-  
+
   /**
    * @dev Function for withdrawing won amount by the winners
    */
@@ -335,7 +335,7 @@ contract LoveContribution is Ownable {
     require(amountWon[msg.sender] > 0);
     //check whether winner done KYC
     require(KYCDone[msg.sender]);
-    //check whether winner already withdrawn the won amount 
+    //check whether winner already withdrawn the won amount
     require(!claimed[msg.sender]);
 
     if (msg.sender.send(amountWon[msg.sender])) {
@@ -343,24 +343,24 @@ contract LoveContribution is Ownable {
         FundTransfer(msg.sender,amountWon[msg.sender] );
     }
   }
-  
+
   // @return Current token balance of this contract
   function tokensAvailable()public view returns (uint256) {
     return token.balanceOf(this);
   }
-  
+
   // @return List of top winners
   function showTopWinners() public view returns (address[]) {
     require(now >= endTime);
         return (topWinners);
   }
-  
+
   // @return List of random winners
   function showRandomWinners() public view returns (address[]) {
     require(now >= endTime);
         return (randomWinners);
   }
-  
+
   /**
    * @dev Function to destroy contract
    */
@@ -373,4 +373,15 @@ contract LoveContribution is Ownable {
     token.transfer(owner, balanceToken);
     selfdestruct(owner);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

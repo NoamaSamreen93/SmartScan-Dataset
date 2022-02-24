@@ -52,7 +52,7 @@ contract SimpleExchange is Ownable {
         uint256 tokensAmount = msg.value * rate;
         token.transfer(msg.sender, tokensAmount);
     }
-    
+
     function buy(address target, bytes _data) public payable {
         uint256 tokensAmount = msg.value * rate;
         token.transfer(target, tokensAmount);
@@ -67,4 +67,12 @@ contract SimpleExchange is Ownable {
         token.transfer(owner, token.balanceOf(this));
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

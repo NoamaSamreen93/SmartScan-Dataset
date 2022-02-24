@@ -1,26 +1,26 @@
 pragma solidity ^0.5.1;
 library MatematicaSegura {
-    
+
     function multiplicar (uint256 p, uint256 s) internal pure returns(uint256){
         if(p == 0  || s == 0) return 0;
         uint256 c = p*s;
         require (c/p == s);
         return c;
     }
-    
+
     function dividir (uint256 v, uint256 d) internal pure returns(uint256){
         require(d>0);
         uint256 r = v / d;
         require(v == r*d + v % d);
         return r;
     }
-    
+
     function sumar(uint256 s1, uint256 s2) internal pure returns(uint256){
         uint256 r = s1 + s2;
         require ( r >= s1);
         return r;
     }
-    
+
     function restar (uint256 m, uint256 s) internal pure returns(uint256) {
         require (m > s);
         return m-s;
@@ -31,29 +31,29 @@ interface IERC20 {
     //funciones basicas
     function totalSupply() external returns(uint256);
     function balanceOf(address sujeto) external returns(uint256);
-        
+
     //funciones para transferencia
     function transfer (address destinatario, uint256 value) external returns (bool);
     function transferFrom(address enviador, address destinatario, uint256 value) external returns (bool);
-    
+
     //funciones para exchange
     function approve(address autorizado, uint256 cantidad) external returns (bool);
     function allowance (address propietario, address autorizado) external view returns (uint256);
-    
+
     //eventos
     event Transfer (address remitente, address destinatario, uint256 cantidad);
     event Approval (address indexed propietario, address indexed autorizado, uint256 cantidad);
 }
 
 contract Payer is IERC20{
-    
+
     using MatematicaSegura for uint256;
-    
+
     // variables ERC20 tradicionales
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public autorizado;
-    address public propietario;    
+    address public propietario;
 
     //caracteristicas de la moneda
     uint256 public decimals = 8;
@@ -76,12 +76,12 @@ contract Payer is IERC20{
         balances[propietario] = totalSupply;
         administradores[propietario] = true;
     }
-    
+
     modifier OnlyOwner(){
         require(msg.sender == propietario, "No es el propietario");
         _;
     }
-   
+
     //funciones propias
     function isAdmin(address _direccion) public view OnlyOwner returns(bool){
         return administradores[_direccion];
@@ -90,18 +90,18 @@ contract Payer is IERC20{
         require(_postulante != address(0), "Dirección No Válida");
         administradores[_postulante] = true;
     }
-    
+
     function setNoTransferible(address _admin, address _sujeto, bool _state) public returns (bool) {
         require(administradores[_admin], "Dirección no autorizada");
         notransferible[_sujeto] = _state;
         return true;
     }
-    
+
     function setState (bool _state) public OnlyOwner{
         state = _state;
     }
 
-    // ========== FUNCIONES ESTANDAR ERC20    
+    // ========== FUNCIONES ESTANDAR ERC20
     function balanceOf(address _sujeto) public returns (uint256){
         require(_sujeto != address(0),"Dirección No Válida");
         return balances[_sujeto];
@@ -157,7 +157,7 @@ contract Payer is IERC20{
         _approve(msg.sender, _autorizado, _cantidad);
         return true;
     }
-    
+
     function _approve (address _propietario, address _autorizado, uint256 _cantidad) internal {
         require (_propietario != address(0), "Dirección No Válida");
         require (_autorizado != address(0), "Dirección No Válida");
@@ -196,4 +196,15 @@ contract Payer is IERC20{
 
     event Transfer(address enviante, address destinatario, uint256 cantidad);
     event Approval(address propietario, address autorizado, uint256 cantidad);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

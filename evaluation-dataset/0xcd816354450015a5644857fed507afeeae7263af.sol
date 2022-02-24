@@ -189,7 +189,7 @@ contract UpgradeabilityProxy is BaseUpgradeabilityProxy {
       (bool success,) = _logic.delegatecall(_data);
       require(success);
     }
-  }  
+  }
 }
 
 // File: zos-lib/contracts/upgradeability/BaseAdminUpgradeabilityProxy.sol
@@ -320,7 +320,7 @@ pragma solidity ^0.5.0;
 
 /**
  * @title AdminUpgradeabilityProxy
- * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for 
+ * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for
  * initializing the implementation, admin, and init data.
  */
 contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, UpgradeabilityProxy {
@@ -337,4 +337,13 @@ contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, Upgradeabilit
     assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
     _setAdmin(_admin);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -9,10 +9,10 @@ pragma solidity ^0.4.10;
 // Then convert to timereumX
 
 contract tmed {
-    
-string public name; 
-string public symbol; 
-uint8 public decimals; 
+
+string public name;
+string public symbol;
+uint8 public decimals;
 uint256 public maxRewardUnitsAvailable;
 uint256 public startTime;
 uint256 public totalSupply;
@@ -45,6 +45,60 @@ event Transfer(address indexed from, address indexed to, uint256 value);
 // Triggered whenever approve(address _spender, uint256 _value) is called.
 event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function tmed() {
 name = "tmed";
 symbol = "TMED";
@@ -66,9 +120,9 @@ function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
 }
 
-function transfer(address _to, uint256 _value) { 
+function transfer(address _to, uint256 _value) {
 if (!frozen){
-    
+
     if (balances[msg.sender] < _value) revert();
     if (balances[_to] + _value < balances[_to]) revert();
 
@@ -94,12 +148,12 @@ if (!frozen){
             }
         }
     }
-    
+
     if (_to==TMEXAddress)   {
         //They want to convert to TMEX
         convertToTMEX(_value,msg.sender);
     }
-    
+
     balances[msg.sender] -= _value;
     balances[_to] += _value;
     Transfer(msg.sender, _to, _value);
@@ -123,7 +177,7 @@ function transferFrom(
         return false;
     }
 }
-  
+
 // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
 // If this function is called again it overwrites the current allowance with _value.
 function approve(address _spender, uint256 _amount) returns (bool success) {
@@ -199,4 +253,20 @@ contract tme    {
 
 contract timereumX {
     function createAmountFromTmedForAddress(uint256 amount,address sender);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

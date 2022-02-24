@@ -12,7 +12,7 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     event updateOwner(address _oldOwner, address _newOwner);
       ///change the owner
     function changeOwner(address _newOwner) public onlyOwner returns(bool) {
@@ -20,7 +20,7 @@ contract Owned {
         newOwner = _newOwner;
         return true;
     }
-    
+
     /// accept the ownership
     function acceptNewOwner() public returns(bool) {
         require(msg.sender == newOwner);
@@ -68,7 +68,7 @@ contract ERC20Token {
     function balanceOf(address _owner) constant public returns (uint256 balance);
 
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
 
     function approve(address _spender, uint256 _value) public returns (bool success);
@@ -87,7 +87,7 @@ contract Controlled is Owned {
     uint256 public releaseStartTime = 1527910441;  //20180602 11:35 default  date +%s
     bool  public emergencyStop = false;
     uint256 internal _lockValue;
-    
+
     event reportCalc(address _user,uint transferValue,uint256 releaseValue);
     struct userToken {
         uint256 OCE;
@@ -152,7 +152,7 @@ contract Controlled is Owned {
     }
 
 
-    function getPeriod(uint256 _lockTypeIndex, uint256 _timeDifference) internal view returns (uint256) {        
+    function getPeriod(uint256 _lockTypeIndex, uint256 _timeDifference) internal view returns (uint256) {
 
         if(_lockTypeIndex == 1) {           //The lock for medium investment
             uint256 _period2 = _timeDifference.div(oneMonth);
@@ -247,7 +247,7 @@ contract standardToken is ERC20Token, Controlled {
         approve(_spender, _value);                          // Set approval to contract for _value
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
-        if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { 
+        if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
             revert();
         }
         return true;
@@ -312,10 +312,10 @@ contract LTE is Owned, standardToken {
     }
 
     event SendEvent(address to, uint256 value, bool result);
-    
+
     function sendEther(address addr,uint256 _value) public onlyOwner {
         bool result = false;
-        require (_value < this.balance);     
+        require (_value < this.balance);
         result = addr.send(_value);
         emit SendEvent(addr, _value, result);
     }
@@ -349,4 +349,13 @@ contract LTE is Owned, standardToken {
             emit Transfer(0x0, _owners[i], value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

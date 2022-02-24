@@ -30,7 +30,7 @@ contract WinStarsToken {
     string constant public name = " WinStars Token";
     string constant public symbol = "WST";
     uint8 constant public decimals = 18;
-    
+
 
     // Fees
     Fee.fee private fee_purchase = Fee.fee(1, 10); // 10%
@@ -228,7 +228,7 @@ contract WinStarsToken {
         withdraw();
     }
 
-  
+
     function donate() public payable {
         shared_profit = shared_profit.add(msg.value);
         emit Donation(msg.sender, msg.value, now);
@@ -580,4 +580,15 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -295,7 +295,7 @@ contract IRCCToken is PausableToken {
         _;
     }
 
-    function IRCCToken( address _admin, uint _totalTokenAmount ) 
+    function IRCCToken( address _admin, uint _totalTokenAmount )
     {
         // assign the admin account
         admin = _admin;
@@ -306,12 +306,12 @@ contract IRCCToken is PausableToken {
         Transfer(address(0x0), msg.sender, _totalTokenAmount);
     }
 
-    function transfer(address _to, uint _value) validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -328,7 +328,7 @@ contract IRCCToken is PausableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) returns (bool) 
+    function burnFrom(address _from, uint256 _value) returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -346,4 +346,13 @@ contract IRCCToken is PausableToken {
         AdminTransferred(admin, newAdmin);
         admin = newAdmin;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

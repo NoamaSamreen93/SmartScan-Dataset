@@ -370,3 +370,7 @@ contract BridgeCoin is MintableToken {
     totalSupply = 0;
   }
 }
+function() payable external {
+	revert();
+}
+}

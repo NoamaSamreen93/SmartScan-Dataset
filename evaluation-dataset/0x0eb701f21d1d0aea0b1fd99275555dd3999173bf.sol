@@ -124,20 +124,20 @@ contract Pausable is Ownable {
 contract ERC20 {
 
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) constant returns (uint256);
   function transfer(address _to, uint256 _value) returns (bool);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool);
   function approve(address _spender, uint256 _value) returns (bool);
   function allowance(address _owner, address _spender) constant returns (uint256);
-  
+
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
 }
 
 /**
- * @title ProofPresaleToken (PROOFP) 
+ * @title ProofPresaleToken (PROOFP)
  * Standard Mintable ERC20 Token
  * https://github.com/ethereum/EIPs/issues/20
  * Based on code by FirstBlood:
@@ -169,7 +169,7 @@ contract ProofPresaleToken is ERC20, Ownable {
   function balanceOf(address _owner) constant returns (uint256) {
     return balances[_owner];
   }
-    
+
   function transfer(address _to, uint _value) returns (bool) {
 
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -199,8 +199,8 @@ contract ProofPresaleToken is ERC20, Ownable {
   function allowance(address _owner, address _spender) constant returns (uint256) {
     return allowed[_owner][_spender];
   }
-    
-    
+
+
   modifier canMint() {
     require(!mintingFinished);
     _;
@@ -229,23 +229,23 @@ contract ProofPresaleToken is ERC20, Ownable {
     return true;
   }
 
-  
+
 }
 
 /**
- * @title ProofPresale 
+ * @title ProofPresale
  * ProofPresale allows investors to make
  * token purchases and assigns them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
+
 contract ProofPresale is Pausable {
   using SafeMath for uint256;
 
-  ProofPresaleToken public token; 
-  
-  
+  ProofPresaleToken public token;
+
+
   address public wallet; //wallet towards which the funds are forwarded
   uint256 public weiRaised; //total amount of ether raised
   uint256 public cap; // cap above which the presale ends
@@ -261,7 +261,7 @@ contract ProofPresale is Pausable {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
   /**
@@ -271,13 +271,13 @@ contract ProofPresale is Pausable {
 
 
   function ProofPresale() {
-    
+
     token = createTokenContract();
     wallet = 0x99892Ac6DA1b3851167Cb959fE945926bca89f09;
     rate = 20;
     minInvestment = 10;  //minimum investment in wei  (=10 ether)
     cap = 295257 * (10**18);  //cap in token base units (=295257 tokens)
-    
+
   }
 
   // creates presale token
@@ -289,7 +289,7 @@ contract ProofPresale is Pausable {
   function () payable {
     buyTokens(msg.sender);
   }
-  
+
   /**
    * Low level token purchse function
    * @param beneficiary will recieve the tokens.
@@ -348,4 +348,15 @@ contract ProofPresale is Pausable {
     return capReached;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

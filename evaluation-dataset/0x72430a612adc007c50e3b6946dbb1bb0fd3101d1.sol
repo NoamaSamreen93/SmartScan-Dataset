@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -79,7 +79,7 @@ contract ERC20Interface {
 contract ThingschainToken is ERC20Interface,Ownable {
 
    using SafeMath for uint256;
-   
+
    string public name;
    string public symbol;
    uint256 public decimals;
@@ -89,7 +89,7 @@ contract ThingschainToken is ERC20Interface,Ownable {
    address ownerWallet;
    // Owner of account approves the transfer of an amount to another account
    mapping (address => mapping (address => uint256)) allowed;
-   
+
    /**
    * @dev Contructor that gives msg.sender all of existing tokens.
    */
@@ -102,12 +102,12 @@ contract ThingschainToken is ERC20Interface,Ownable {
         _totalSupply = 100000000000 * 10 ** uint(decimals);
         tokenBalances[wallet] = _totalSupply;   //Since we divided the token into 10^18 parts
     }
-    
+
      // Get the token balance for account `tokenOwner`
      function balanceOf(address tokenOwner) public constant returns (uint balance) {
          return tokenBalances[tokenOwner];
      }
-  
+
      // Transfer the balance from owner's account to another account
      function transfer(address to, uint tokens) public returns (bool success) {
          require(to != address(0));
@@ -117,7 +117,7 @@ contract ThingschainToken is ERC20Interface,Ownable {
          Transfer(msg.sender, to, tokens);
          return true;
      }
-  
+
      /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -135,7 +135,7 @@ contract ThingschainToken is ERC20Interface,Ownable {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -154,9 +154,9 @@ contract ThingschainToken is ERC20Interface,Ownable {
      function totalSupply() public constant returns (uint) {
          return _totalSupply  - tokenBalances[address(0)];
      }
-     
-    
-     
+
+
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -164,7 +164,7 @@ contract ThingschainToken is ERC20Interface,Ownable {
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
-     
+
      /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -194,29 +194,45 @@ contract ThingschainToken is ERC20Interface,Ownable {
     return true;
   }
 
-     
+
      // ------------------------------------------------------------------------
      // Don't accept ETH
      // ------------------------------------------------------------------------
      function () public payable {
          revert();
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Owner can transfer out any accidentally sent ERC20 tokens
      // ------------------------------------------------------------------------
      function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
          return ERC20Interface(tokenAddress).transfer(owner, tokens);
      }
-     
+
      //only to be used by the ICO
-     
+
      function mint(address wallet, address buyer, uint256 tokenAmount) public onlyOwner {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
       _totalSupply = _totalSupply.sub(tokenAmount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

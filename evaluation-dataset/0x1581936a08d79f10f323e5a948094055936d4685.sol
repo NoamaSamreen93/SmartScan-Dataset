@@ -13,10 +13,10 @@ pragma solidity ^0.4.18;
 // Decimals    : 18
 
 
- 
+
 //YOUR SUPPORT:
 //we appreciate your support, we are very excited and excited for all your support,
-// 
+//
 
 //supportive wallet:
 
@@ -246,4 +246,15 @@ contract Linfinity is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

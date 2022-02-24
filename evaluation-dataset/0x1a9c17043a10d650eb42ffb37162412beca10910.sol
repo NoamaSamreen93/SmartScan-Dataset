@@ -9,7 +9,7 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
-    }  
+    }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -17,7 +17,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-  
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -33,9 +33,9 @@ library SafeMath {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract BCE {
-    
+
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     address public owner;
     string public name;
@@ -53,9 +53,9 @@ contract BCE {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     // 1 ether = 500 bitcoin ethers
-    uint256 public constant RATE = 500; 
+    uint256 public constant RATE = 500;
 
     /**
      * Constructor function
@@ -74,25 +74,25 @@ contract BCE {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
-    
+
     function () public payable {
         createTokens();
-    } 
-    
+    }
+
     /*function BCEToken() public {
         balanceOf[msg.sender] = totalSupply;
         owner = msg.sender;
     } */
-    
+
 	function createTokens() public payable {
-	    require(totalSupply > 0); // Max Bitcoin Ethers in circulation = 21 mil. 
+	    require(totalSupply > 0); // Max Bitcoin Ethers in circulation = 21 mil.
         require(msg.value > 0);
         uint256 tokens = msg.value.mul(RATE);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(tokens);
         totalSupply = totalSupply.sub(tokens);
         owner.transfer(msg.value);
-    } 
-    
+    }
+
     function balanceOf(address _owner) public constant returns (uint256 balance){
         return balanceOf[_owner];
     }
@@ -211,4 +211,15 @@ contract BCE {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

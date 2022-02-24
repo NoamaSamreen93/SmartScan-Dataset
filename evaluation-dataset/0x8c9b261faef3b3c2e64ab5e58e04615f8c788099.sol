@@ -7,7 +7,7 @@ pragma solidity ^0.4.23;
 
 pragma solidity ^0.4.23;
 
-/* NFT Metadata Schema 
+/* NFT Metadata Schema
 {
     "title": "Asset Metadata",
     "type": "object",
@@ -544,7 +544,7 @@ contract ERC721Holder is ERC721Receiver {
         address,
         uint256,
         bytes
-    ) 
+    )
         public
         returns(bytes4)
         {
@@ -584,7 +584,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
     /**
     * @dev Returns an URI for a given token ID
     * @dev Throws if the token ID does not exist. May return an empty string.
-    * @notice The user/developper needs to add the tokenID, in the end of URL, to 
+    * @notice The user/developper needs to add the tokenID, in the end of URL, to
     * use the URI and get all details. Ex. www.<apiURL>.com/token/<tokenID>
     * @param _tokenId uint256 ID of the token to query
     */
@@ -785,19 +785,19 @@ contract ERC721Token is ERC721, ERC721BasicToken {
     }
 
 }
-/* Lucid Sight, Inc. ERC-721 Collectibles. 
+/* Lucid Sight, Inc. ERC-721 Collectibles.
  * @title LSNFT - Lucid Sight, Inc. Non-Fungible Token
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
 contract LSNFT is ERC721Token {
-  
+
   /*** EVENTS ***/
 
   /// @dev The Created event is fired whenever a new collectible comes into existence.
   event Created(address owner, uint256 tokenId);
-  
+
   /*** DATATYPES ***/
-  
+
   struct NFT {
     // The sequence of potential attributes a Collectible has and can provide in creation events. Used in Creation logic to spwan new Cryptos
     uint256 attributes;
@@ -818,10 +818,10 @@ contract LSNFT is ERC721Token {
     // the event that created a Legendary Trophy. This optional field should be able to be written
     // to after generation if we determine an event was newsworthy enough
     uint256 earnedBy;
-    
+
     // asset metadata
     uint256 assetDetails;
-    
+
     // Attach/Detach Flag
     uint256 isAttached;
   }
@@ -854,16 +854,16 @@ contract LSNFT is ERC721Token {
     uint256 newLSNFTId = allNFTs.push(_lsnftObj) - 1;
 
     _mint(_owner, newLSNFTId);
-    
+
     // Created event
     emit Created(_owner, newLSNFTId);
 
     return newLSNFTId;
   }
 
-  /// @dev Gets attributes of NFT  
+  /// @dev Gets attributes of NFT
   function _getAttributesOfToken(uint256 _tokenId) internal returns(NFT) {
-    NFT storage lsnftObj = allNFTs[_tokenId];  
+    NFT storage lsnftObj = allNFTs[_tokenId];
     return lsnftObj;
   }
 
@@ -882,7 +882,7 @@ contract LSNFT is ERC721Token {
 /** Controls state and access rights for contract functions
  * @title Operational Control
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
- * Inspired and adapted from contract created by OpenZeppelin 
+ * Inspired and adapted from contract created by OpenZeppelin
  * Ref: https://github.com/OpenZeppelin/zeppelin-solidity/
  */
 contract OperationalControl {
@@ -1099,13 +1099,13 @@ contract CollectibleBase is LSNFT {
         uint32 _sequenceId = getSequenceId(_teamId);
 
         uint256 newNFTCryptoId = _createNFT(_nftData, _owner, _isAttached);
-        
+
         nftTeamIdToSequenceIdToCollectible[_teamId][_sequenceId] = newNFTCryptoId;
         nftTeamIndexToCollectibleCount[_teamId] = _sequenceId;
 
         return newNFTCryptoId;
     }
-    
+
     function getSequenceId(uint256 _teamId) internal returns (uint32) {
         return (nftTeamIndexToCollectibleCount[_teamId] + 1);
     }
@@ -1122,7 +1122,7 @@ contract CollectibleBase is LSNFT {
     /** @param _owner The owner whose ships tokens we are interested in.
       * @dev This method MUST NEVER be called by smart contract code. First, it's fairly
       *  expensive (it walks the entire Collectibles owners array looking for NFT belonging to owner)
-    */      
+    */
     function tokensOfOwner(address _owner) external view returns(uint256[] ownerTokens) {
         uint256 tokenCount = balanceOf(_owner);
 
@@ -1152,7 +1152,7 @@ contract CollectibleBase is LSNFT {
 
         // Get Token Obj
         NFT storage lsnftObj = allNFTs[_tokenId];
-        
+
         lsnftObj.mlbPlayerId = _newMLBPlayerId;
 
         // Update Token Data with new updated attributes
@@ -1166,7 +1166,7 @@ contract CollectibleBase is LSNFT {
 
         // Get Token Obj
         NFT storage lsnftObj = allNFTs[_tokenId];
-        
+
         lsnftObj.earnedBy = _earnedBy;
 
         // Update Token Data with new updated attributes
@@ -1188,16 +1188,16 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
 
     /// @dev Counts the number of promo collectibles that can be made per-team
     uint256[31]  public promoCreatedCount;
-    
+
     /// @dev Counts the number of seed collectibles that can be made in total
     uint256 public seedCreatedCount;
 
     /// @dev Bool to toggle batch support
     bool public isBatchSupported = true;
-    
+
     /// @dev A mapping of contracts that can trigger functions
     mapping (address => bool) public contractsApprovedList;
-    
+
     /**
      * @dev        Helps to toggle batch supported flag
      * @param      _flag  The flag
@@ -1206,19 +1206,19 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         isBatchSupported = _flag;
     }
 
-    modifier canCreate() { 
-        require (contractsApprovedList[msg.sender] || 
+    modifier canCreate() {
+        require (contractsApprovedList[msg.sender] ||
             msg.sender == managerPrimary ||
-            msg.sender == managerSecondary); 
-        _; 
+            msg.sender == managerSecondary);
+        _;
     }
-    
+
     /**
      * @dev Add an address to the Approved List
      * @param _newAddress   The new address to be approved for interaction with the contract
      */
     function addToApproveList(address _newAddress) public onlyManager {
-        
+
         require (!contractsApprovedList[_newAddress]);
         contractsApprovedList[_newAddress] = true;
     }
@@ -1232,7 +1232,7 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         delete contractsApprovedList[_newAddress];
     }
 
-    
+
     /**
      * @dev Generates promo collectibles. Only callable by Game Master, with isAttached as 0.
      * @notice The generation of an asset if limited via the generationSeasonController
@@ -1266,16 +1266,16 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         if(allNFTs.length > 0) {
             promoCreatedCount[_teamId]++;
         }
-        
+
         uint32 _sequenceId = getSequenceId(_teamId);
-        
+
         uint256 assetDetails = uint256(uint64(now));
         assetDetails |= uint256(_sequenceId)<<64;
         assetDetails |= uint256(_teamId)<<96;
         assetDetails |= uint256(_posId)<<104;
 
         uint256[5] memory _nftData = [assetDetails, _attributes, _gameId, _playerOverrideId, _mlbPlayerId];
-        
+
         return _createNFTCollectible(_teamId, _attributes, nftOwner, 0, _nftData);
     }
 
@@ -1304,21 +1304,21 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         returns (uint256) {
 
         address nftOwner = _owner;
-        
+
         if (nftOwner == address(0)) {
              nftOwner = managerPrimary;
         }
-        
+
         seedCreatedCount++;
         uint32 _sequenceId = getSequenceId(_teamId);
-        
+
         uint256 assetDetails = uint256(uint64(now));
         assetDetails |= uint256(_sequenceId)<<64;
         assetDetails |= uint256(_teamId)<<96;
         assetDetails |= uint256(_posId)<<104;
 
         uint256[5] memory _nftData = [assetDetails, _attributes, _gameId, _playerOverrideId, _mlbPlayerId];
-        
+
         return _createNFTCollectible(_teamId, _attributes, nftOwner, 0, _nftData);
     }
 
@@ -1348,21 +1348,21 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         returns (uint256) {
 
         address nftOwner = _owner;
-        
+
         if (nftOwner == address(0)) {
              nftOwner = managerPrimary;
         }
-        
+
         rewardsRedeemed++;
         uint32 _sequenceId = getSequenceId(_teamId);
-        
+
         uint256 assetDetails = uint256(uint64(now));
         assetDetails |= uint256(_sequenceId)<<64;
         assetDetails |= uint256(_teamId)<<96;
         assetDetails |= uint256(_posId)<<104;
 
         uint256[5] memory _nftData = [assetDetails, _attributes, _gameId, _playerOverrideId, _mlbPlayerId];
-        
+
         return _createNFTCollectible(_teamId, _attributes, nftOwner, 0, _nftData);
     }
 
@@ -1392,21 +1392,21 @@ contract CollectibleMinting is CollectibleBase, OperationalControl {
         returns (uint256) {
 
         address nftOwner = _owner;
-        
+
         if (nftOwner == address(0)) {
              nftOwner = managerPrimary;
         }
-        
+
         rewardsRedeemed++;
         uint32 _sequenceId = getSequenceId(_teamId);
-        
+
         uint256 assetDetails = uint256(uint64(now));
         assetDetails |= uint256(_sequenceId)<<64;
         assetDetails |= uint256(_teamId)<<96;
         assetDetails |= uint256(_posId)<<104;
 
         uint256[5] memory _nftData = [assetDetails, _attributes, _gameId, _playerOverrideId, _mlbPlayerId];
-        
+
         return _createNFTCollectible(_teamId, _attributes, nftOwner, 2, _nftData);
     }
 }
@@ -1424,7 +1424,7 @@ contract SaleManager {
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
 contract MLBNFT is CollectibleMinting {
-    
+
     /// @dev Set in case the MLBNFT contract requires an upgrade
     address public newContractAddress;
 
@@ -1532,7 +1532,7 @@ contract MLBNFT is CollectibleMinting {
         uint256 generationSeason
         ) {
         NFT memory obj  = _getAttributesOfToken(_tokenId);
-        
+
         attributes = obj.attributes;
         currentGameCardId = obj.currentGameCardId;
         mlbGameId = obj.mlbGameId;
@@ -1549,7 +1549,7 @@ contract MLBNFT is CollectibleMinting {
         generationSeason = generationSeasonDict[(obj.attributes % 1000000) / 1000];
     }
 
-    
+
     /**
      * @dev This is public rather than external so we can call super.unpause
      * without using an expensive CALL.
@@ -1625,9 +1625,9 @@ contract MLBNFT is CollectibleMinting {
         require (contractsApprovedList[msg.sender]);
 
         NFT memory obj  = _getAttributesOfToken(_playerId);
-        
+
         obj.currentGameCardId = _gameCardNumber;
-        
+
         if ( _gameCardNumber == 0 ) {
             obj.isAttached = 0;
         } else {
@@ -1643,7 +1643,7 @@ contract MLBNFT is CollectibleMinting {
      * @param _tokenId  The token identifier
      * @param _attachment  The attachment
      */
-    function addAttachmentToCollectible ( 
+    function addAttachmentToCollectible (
         uint256 _tokenId,
         uint256 _attachment)
         external
@@ -1666,7 +1666,7 @@ contract MLBNFT is CollectibleMinting {
         whenNotPaused {
 
         require (exists(_tokenId));
-        
+
         delete nftCollectibleAttachments[_tokenId];
         emit AssetUpdated(_tokenId);
     }
@@ -1677,13 +1677,13 @@ contract MLBNFT is CollectibleMinting {
      * @param _to       to address
      * @param _tokenId  The token identifier
      */
-    function giftAsset(address _to, uint256 _tokenId) public whenNotPaused {        
+    function giftAsset(address _to, uint256 _tokenId) public whenNotPaused {
         safeTransferFrom(msg.sender, _to, _tokenId);
     }
-    
+
     /**
      * @dev responsible for setting the tokenURI.
-     * @notice The user/developper needs to add the tokenID, in the end of URL, to 
+     * @notice The user/developper needs to add the tokenID, in the end of URL, to
      * use the URI and get all details. Ex. www.<apiURL>.com/token/<tokenID>
      * @param _tokenURI  The token uri
      */
@@ -1716,7 +1716,7 @@ contract MLBNFT is CollectibleMinting {
     }
 
     /**
-     * @dev set Generation Season Controller, can only be called by Managers._season can be [0,1,2,3..] and 
+     * @dev set Generation Season Controller, can only be called by Managers._season can be [0,1,2,3..] and
      * _value can be [0,1,N].
      * @notice _value of 1: means generation of collectible is allowed. anything, apart from 1, wont allow generating assets for that season.
      * @param _season    Season UINT representation
@@ -1747,7 +1747,7 @@ contract MLBNFT is CollectibleMinting {
         NFT memory obj  = _getAttributesOfToken(_tokenId);
         playerId = ((obj.attributes.div(100000000000000000)) % 1000);
     }
-    
+
     /**
      * @dev Helper function to avoid calling getCollectibleDetails
      * @notice Gets the attachments for an asset
@@ -1760,7 +1760,7 @@ contract MLBNFT is CollectibleMinting {
         for(uint i=0;i<_attachments.length;i++){
             attachments.push(_attachments[i]);
         }
-        
+
         return attachments;
     }
 
@@ -1797,24 +1797,24 @@ contract MLBNFT is CollectibleMinting {
         whenNotPaused {
             require (isBatchSupported);
 
-            require (_teamId.length > 0 && _attributes.length > 0 && 
-                _playerOverrideId.length > 0 && _mlbPlayerId.length > 0 && 
+            require (_teamId.length > 0 && _attributes.length > 0 &&
+                _playerOverrideId.length > 0 && _mlbPlayerId.length > 0 &&
                 _to.length > 0);
 
             uint256 assetDetails;
             uint256[5] memory _nftData;
-            
+
             for(uint ii = 0; ii < _attributes.length; ii++){
-                require (_to[ii] != address(0) && _teamId[ii] != 0 && _attributes.length != 0 && 
+                require (_to[ii] != address(0) && _teamId[ii] != 0 && _attributes.length != 0 &&
                     _mlbPlayerId[ii] != 0);
-                
+
                 assetDetails = uint256(uint64(now));
                 assetDetails |= uint256(getSequenceId(_teamId[ii]))<<64;
                 assetDetails |= uint256(_teamId[ii])<<96;
                 assetDetails |= uint256((_attributes[ii]/1000000000000000000000000000000000000000)-800)<<104;
-        
+
                 _nftData = [assetDetails, _attributes[ii], 0, _playerOverrideId[ii], _mlbPlayerId[ii]];
-                
+
                 _createNFTCollectible(_teamId[ii], _attributes[ii], _to[ii], 0, _nftData);
             }
         }
@@ -1849,16 +1849,16 @@ contract MLBNFT is CollectibleMinting {
 
             for(uint ii = 0; ii < _attributes.length; ii++){
 
-                require (_to[ii] != address(0) && _teamId[ii] != 0 && _attributes.length != 0 && 
+                require (_to[ii] != address(0) && _teamId[ii] != 0 && _attributes.length != 0 &&
                     _mlbPlayerId[ii] != 0);
-        
+
                 assetDetails = uint256(uint64(now));
                 assetDetails |= uint256(getSequenceId(_teamId[ii]))<<64;
                 assetDetails |= uint256(_teamId[ii])<<96;
                 assetDetails |= uint256((_attributes[ii]/1000000000000000000000000000000000000000)-800)<<104;
-        
+
                 _nftData = [assetDetails, _attributes[ii], 0, _playerOverrideId[ii], _mlbPlayerId[ii]];
-                
+
                 _createNFTCollectible(_teamId[ii], _attributes[ii], _to[ii], 2, _nftData);
             }
         }
@@ -1880,7 +1880,7 @@ contract MLBNFT is CollectibleMinting {
     {
         // Asset should not be in play
         require (checkIsAttached(_tokenId) == 0);
-        
+
         require (_from != address(0));
 
         require (_to != address(0));
@@ -1900,9 +1900,9 @@ contract MLBNFT is CollectibleMinting {
      * @param      _toB       the address sending to
      */
     function multiBatchTransferFrom(
-        uint256[] _tokenIds, 
-        address[] _fromB, 
-        address[] _toB) 
+        uint256[] _tokenIds,
+        address[] _fromB,
+        address[] _toB)
         public
     {
         require (isBatchSupported);
@@ -1912,7 +1912,7 @@ contract MLBNFT is CollectibleMinting {
         uint256 _id;
         address _to;
         address _from;
-        
+
         for (uint256 i = 0; i < _tokenIds.length; ++i) {
 
             require (_tokenIds[i] != 0 && _fromB[i] != 0 && _toB[i] != 0);
@@ -1923,9 +1923,9 @@ contract MLBNFT is CollectibleMinting {
 
             transferFrom(_from, _to, _id);
         }
-        
+
     }
-    
+
     /**
      * @dev     Facilitates batch trasnfer of collectible, depending if batch is supported on contract
      * @notice        Batch TransferFrom with the same to & from address
@@ -1933,7 +1933,7 @@ contract MLBNFT is CollectibleMinting {
      * @param      _from      the address sending from
      * @param      _to        the address sending to
      */
-    function batchTransferFrom(uint256[] _tokenIds, address _from, address _to) 
+    function batchTransferFrom(uint256[] _tokenIds, address _from, address _to)
         public
     {
         require (isBatchSupported);
@@ -1941,9 +1941,9 @@ contract MLBNFT is CollectibleMinting {
         require (_tokenIds.length > 0 && _from != address(0) && _to != address(0));
 
         uint256 _id;
-        
+
         for (uint256 i = 0; i < _tokenIds.length; ++i) {
-            
+
             require (_tokenIds[i] != 0);
 
             _id = _tokenIds[i];
@@ -1951,7 +1951,7 @@ contract MLBNFT is CollectibleMinting {
             transferFrom(_from, _to, _id);
         }
     }
-    
+
     /**
      * @dev     Facilitates batch trasnfer of collectible, depending if batch is supported on contract.
      * Checks for collectible 0,address 0 and then performs the transfer
@@ -1961,8 +1961,8 @@ contract MLBNFT is CollectibleMinting {
      * @param      _toB       the address sending to
      */
     function multiBatchSafeTransferFrom(
-        uint256[] _tokenIds, 
-        address[] _fromB, 
+        uint256[] _tokenIds,
+        address[] _fromB,
         address[] _toB
         )
         public
@@ -1974,7 +1974,7 @@ contract MLBNFT is CollectibleMinting {
         uint256 _id;
         address _to;
         address _from;
-        
+
         for (uint256 i = 0; i < _tokenIds.length; ++i) {
 
             require (_tokenIds[i] != 0 && _fromB[i] != 0 && _toB[i] != 0);
@@ -1996,12 +1996,12 @@ contract MLBNFT is CollectibleMinting {
      * @param      _to       the address sending to
      */
     function batchSafeTransferFrom(
-        uint256[] _tokenIds, 
-        address _from, 
+        uint256[] _tokenIds,
+        address _from,
         address _to
         )
         public
-    {   
+    {
         require (isBatchSupported);
 
         require (_tokenIds.length > 0 && _from != address(0) && _to != address(0));
@@ -2016,29 +2016,29 @@ contract MLBNFT is CollectibleMinting {
 
     /**
      * @notice     Batch Function to approve the spender
-     * @dev        Helps to approve a batch of collectibles 
+     * @dev        Helps to approve a batch of collectibles
      * @param      _tokenIds  The asset identifiers
      * @param      _spender   The spender
      */
     function batchApprove(
-        uint256[] _tokenIds, 
+        uint256[] _tokenIds,
         address _spender
         )
         public
-    {   
+    {
         require (isBatchSupported);
 
         require (_tokenIds.length > 0 && _spender != address(0));
-        
+
         uint256 _id;
         for (uint256 i = 0; i < _tokenIds.length; ++i) {
 
             require (_tokenIds[i] != 0);
-            
+
             _id = _tokenIds[i];
             approve(_spender, _id);
         }
-        
+
     }
 
     /**
@@ -2053,21 +2053,21 @@ contract MLBNFT is CollectibleMinting {
         bool _approved
         )
         public
-    {   
+    {
         require (isBatchSupported);
 
         require (_spenders.length > 0);
 
         address _spender;
-        for (uint256 i = 0; i < _spenders.length; ++i) {        
+        for (uint256 i = 0; i < _spenders.length; ++i) {
 
             require (address(_spenders[i]) != address(0));
-                
+
             _spender = _spenders[i];
             setApprovalForAll(_spender, _approved);
         }
-    }  
-    
+    }
+
     /**
      * @dev        Function to request Detachment from our Contract
      * @notice     a wallet can request to detach it collectible, so, that it can be used in other third-party contracts.
@@ -2210,9 +2210,9 @@ contract MLBNFT is CollectibleMinting {
      */
     function updateIsAttached(uint256 _tokenId, uint256 _isAttached) internal {
         NFT memory obj  = _getAttributesOfToken(_tokenId);
-        
+
         obj.isAttached = _isAttached;
-    
+
         allNFTs[_tokenId] = obj;
         emit AssetUpdated(_tokenId);
     }
@@ -2227,7 +2227,7 @@ contract MLBNFT is CollectibleMinting {
     */
     function initiateCreateSale(uint256 _tokenId, uint256 _startingPrice, uint256 _endingPrice, uint256 _duration) external {
         require (_tokenId != 0);
-        
+
         // If MLBNFT is already on any sale, this will throw
         // because it will be owned by the sale contract.
         address owner = ownerOf(_tokenId);
@@ -2239,7 +2239,7 @@ contract MLBNFT is CollectibleMinting {
         require (_duration == _duration);
 
         require (checkIsAttached(_tokenId) == 0);
-        
+
         // One time approval for the tokenID
         _approveForSale(msg.sender, address(saleManagerAddress), _tokenId);
 
@@ -2257,13 +2257,13 @@ contract MLBNFT is CollectibleMinting {
     function batchCreateAssetSale(uint256[] _tokenIds, uint256[] _startingPrices, uint256[] _endingPrices, uint256[] _durations) external whenNotPaused {
 
         require (_tokenIds.length > 0 && _startingPrices.length > 0 && _endingPrices.length > 0 && _durations.length > 0);
-        
+
         // Sale contract checks input sizes
         for(uint ii = 0; ii < _tokenIds.length; ii++){
 
             // Do not process for tokenId 0
             require (_tokenIds[ii] != 0);
-            
+
             require (_startingPrices[ii] == _startingPrices[ii]);
             require (_endingPrices[ii] == _endingPrices[ii]);
             require (_durations[ii] == _durations[ii]);
@@ -2276,11 +2276,22 @@ contract MLBNFT is CollectibleMinting {
 
             // Check whether the collectible is inPlay. If inPlay cant put it on Sale
             require (checkIsAttached(_tokenIds[ii]) == 0);
-            
+
             // approve token to for Sale creation
             _approveForSale(msg.sender, address(saleManagerAddress), _tokenIds[ii]);
-            
+
             saleManagerAddress.createSale(_tokenIds[ii], _startingPrices[ii], _endingPrices[ii], _durations[ii], msg.sender);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

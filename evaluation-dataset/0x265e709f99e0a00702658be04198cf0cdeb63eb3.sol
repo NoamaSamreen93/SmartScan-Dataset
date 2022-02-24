@@ -23,7 +23,7 @@ COPYRIGHT (C) 2019 LITTLEBEEX TECHNOLOGY，ALL RIGHTS RESERVED.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including 
+"Software"), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -267,7 +267,7 @@ contract BasicToken is ERC20Basic {
   }
 
   /**@dev Lock accounts through timestamp refer to:https://www.epochconverter.com */
-  
+
   function freezeWithTimestamp(address _target,uint256 _timestamp) onlyOwner public returns (bool) {
     require(_target != address(0));
     frozenTimestamp[_target] = _timestamp;
@@ -299,7 +299,7 @@ contract BasicToken is ERC20Basic {
 
 contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
 /**
 * @dev Transfer tokens from one address to another
 * @param _from address The address which you want to send tokens from
@@ -314,7 +314,7 @@ contract StandardToken is ERC20, BasicToken {
     require(!frozenAccount[_from]);
     require(!frozenAccount[_to]);
     require(now > frozenTimestamp[_from]);
-    require(now > frozenTimestamp[_to]); 
+    require(now > frozenTimestamp[_to]);
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -489,7 +489,7 @@ contract CappedToken is MintableToken {
 * @param _amount The amount of tokens to mint.
 * @return A boolean that indicates if the operation was successful.
 */
-   
+
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
     require(totalSupply_.add(_amount) <= cap);
     return super.mint(_to, _amount);
@@ -529,7 +529,7 @@ contract LT_Token is CappedToken, PausableToken {
 /**
 * @dev Constructor that gives msg.sender all of existing tokens.
 */
-  
+
   constructor() CappedToken(MAX_SUPPLY) public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
@@ -542,7 +542,7 @@ contract LT_Token is CappedToken, PausableToken {
 * @param _amount The amount of tokens to mint.
 * @return A boolean that indicates if the operation was successful.
 */
-  
+
   function mint(address _to, uint256 _amount) onlyOwner canMint whenNotPaused public returns (bool) {
     return super.mint(_to, _amount);
   }
@@ -551,7 +551,7 @@ contract LT_Token is CappedToken, PausableToken {
 * @dev Function to stop minting new tokens.
 * @return True if the operation was successful.
 */
-  
+
   function finishMinting() onlyOwner canMint whenNotPaused public returns (bool) {
     return super.finishMinting();
   }
@@ -568,4 +568,15 @@ contract LT_Token is CappedToken, PausableToken {
   function() payable external {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

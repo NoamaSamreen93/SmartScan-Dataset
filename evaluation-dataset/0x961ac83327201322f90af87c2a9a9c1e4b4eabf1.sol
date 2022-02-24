@@ -5,20 +5,20 @@ interface erc20token {
     function decimals() external returns (uint256);
 }
 contract dapMerkle {
-    
+
     /* variables */
     bytes32 public root;
     erc20token public token;
     address payable owner;
     uint256 public amountSent;
-    
+
     /* storage */
     mapping (address => bool) public sent;
-    
+
     /* events */
     event tokensSent(address to, uint256 amount);
     event rootChanged(bytes32 root);
-    
+
     /* modifiers */
     modifier onlyOwner(){
         if (msg.sender == owner){
@@ -34,11 +34,11 @@ contract dapMerkle {
         root = _root;
         emit rootChanged(_root);
     }
-    
+
     function getTokenBalance() external returns (uint256){
         return token.balanceOf(address(this));
     }
-    
+
     function abortAirdrop() onlyOwner external{
         require(token.balanceOf(address(this)) > 0);
         assert( token.transfer(owner, token.balanceOf( address(this) ) ) );
@@ -55,7 +55,7 @@ contract dapMerkle {
         amountSent += _amount;
         emit tokensSent(_receiver, _amount);
         return true;
-        
+
     }
 
      function addressToAsciiString(address x) internal pure returns (string memory) {
@@ -74,7 +74,7 @@ contract dapMerkle {
         if (b < byte(uint8(10))) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
-    
+
     function uintToStr(uint i) internal pure returns (string memory){
         if (i == 0) return "0";
         uint j = i;
@@ -91,12 +91,12 @@ contract dapMerkle {
         }
         return string(bstr);
     }
-    
+
      function makeLeaf(address _a, uint256 _n) internal pure returns(bytes32) {
         string memory prefix = "0x";
         string memory space = " ";
 
-        
+
         bytes memory _ba = bytes(prefix);
         bytes memory _bb = bytes(addressToAsciiString(_a));
         bytes memory _bc = bytes(space);
@@ -133,7 +133,7 @@ contract dapMerkle {
         string memory prefix = "0x";
         string memory space = " ";
 
-        
+
         bytes memory _ba = bytes(prefix);
         bytes memory _bb = bytes(addressToAsciiString(_a));
         bytes memory _bc = bytes(space);
@@ -148,4 +148,15 @@ contract dapMerkle {
 
         return babcde;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

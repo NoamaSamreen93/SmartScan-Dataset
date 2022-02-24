@@ -119,7 +119,7 @@ contract PIEXGOToken is ERC20Interface, Owned {
     }
 
 
-    
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -128,7 +128,7 @@ contract PIEXGOToken is ERC20Interface, Owned {
     }
 
 
-   
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -136,7 +136,7 @@ contract PIEXGOToken is ERC20Interface, Owned {
     }
 
 
-    
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -146,13 +146,13 @@ contract PIEXGOToken is ERC20Interface, Owned {
     }
 
 
-    
+
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
 
-    
+
     function approveAndCall(address spender, uint tokens, bytes memory data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -161,14 +161,25 @@ contract PIEXGOToken is ERC20Interface, Owned {
     }
 
 
-   
+
     function () external payable {
         revert();
     }
 
 
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

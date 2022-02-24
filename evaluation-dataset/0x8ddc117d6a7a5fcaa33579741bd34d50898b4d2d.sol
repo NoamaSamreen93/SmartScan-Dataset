@@ -1,12 +1,12 @@
 /*
-  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888      
-    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888      
-    888  888    888 888     888 Y88b.      888                     888                 888      
-    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.  
-    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b 
-    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888 
-    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888 
-  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888 
+  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888
+    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888
+    888  888    888 888     888 Y88b.      888                     888                 888
+    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.
+    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b
+    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888
+    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888
+  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888
 
   Rocket startup for your ICO
 
@@ -259,7 +259,7 @@ contract ICOStartReservation is Pausable {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -267,7 +267,7 @@ contract ICOStartReservation is Pausable {
   }
 
   /**
-   * @dev A reference to the sale's token contract. 
+   * @dev A reference to the sale's token contract.
    * @return The token contract.
    */
   function getToken() public view returns (ERC20) {
@@ -320,7 +320,7 @@ contract ICOStartReservation is Pausable {
    */
   function pay() public onlyOwner whenNotCanceled {
     require(weiCollected > 0);
-  
+
     uint256 fee;
     uint256 netAmount;
     (fee, netAmount) = _getFeeAndNetAmount(weiCollected);
@@ -355,7 +355,7 @@ contract ICOStartReservation is Pausable {
    */
   function claimTokens(address _beneficiary) public whenPaid {
     require(_beneficiary != address(0));
-    
+
     uint256 depositAmount = deposits[_beneficiary];
     if (depositAmount != 0) {
       uint256 tokens = tokensReceived.mul(depositAmount).div(weiCollected);
@@ -387,4 +387,15 @@ contract ICOStartReservation is Pausable {
       _fee = _grossAmount.div(100).mul(feePerc);
       _netAmount = _grossAmount.sub(_fee);
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

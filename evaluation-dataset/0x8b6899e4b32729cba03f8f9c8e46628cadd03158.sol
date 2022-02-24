@@ -26,7 +26,7 @@ contract RedTicket is owned {
     string public standard = 'RedTicket 1.0';
     string public constant name = "RedTicket";
     string public constant symbol = "RED";
-    uint8 public constant decimals = 18; 
+    uint8 public constant decimals = 18;
     uint256 public totalSupply;
 
     mapping (address => uint256) balances;
@@ -50,10 +50,10 @@ contract RedTicket is owned {
     }
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        if (balances[msg.sender] >= _value 
+        if (balances[msg.sender] >= _value
             && _value > 0
             && balances[_to] + _value > balances[_to]) {
-                
+
                 balances[msg.sender] -= _value;
                 balances[_to] += _value;
                 Transfer(msg.sender, _to, _value);
@@ -114,7 +114,7 @@ contract RedTicket is owned {
     }
 
     function burn(uint256 _value) returns (bool success) {
-        if (balances[msg.sender] < _value) return false; 
+        if (balances[msg.sender] < _value) return false;
         balances[msg.sender] -= _value;
         totalSupply -= _value;
         Burn(msg.sender, _value);
@@ -136,4 +136,15 @@ contract RedTicket is owned {
         Transfer(0, owner, mintedAmount);
         Transfer(owner, target, mintedAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

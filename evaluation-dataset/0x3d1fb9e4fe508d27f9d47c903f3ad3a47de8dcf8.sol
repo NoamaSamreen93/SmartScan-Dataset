@@ -409,7 +409,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -871,4 +871,17 @@ contract AATokenPrivatesale is FinalizableCrowdsale, CappedCrowdsale, Individual
         uint256 remaining = token.balanceOf(this);
         token.transfer(owner, remaining);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

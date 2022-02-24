@@ -134,7 +134,7 @@ contract PPCToken is StandardToken {
     string public constant symbol = "PPC";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 20000000000 * (10 ** uint256(decimals));
-    // market Address 
+    // market Address
     address public marketAddress = 0x3172f12a77402BB52001A766E1d09b573967De61;
     /**
      * Constructor that gives three address all existing tokens.
@@ -144,4 +144,15 @@ contract PPCToken is StandardToken {
         balances[marketAddress] = totalSupply;
         emit Transfer(address(0), marketAddress, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

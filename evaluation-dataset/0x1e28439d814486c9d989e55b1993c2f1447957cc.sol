@@ -68,7 +68,7 @@ library SafeMath {
     return c;
   }
 
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {    
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c;
   }
@@ -88,7 +88,7 @@ library SafeMath {
 /**
  * @title VosAIInvitation token ERC20
  *
- * @dev Implementation of the VosAIInvitation token. * 
+ * @dev Implementation of the VosAIInvitation token. *
  */
 contract VosaiInvitationToken is IERC20 {
   using SafeMath for uint256;
@@ -232,17 +232,17 @@ contract VosaiInvitationAirdrop is Ownable {
   VosaiInvitationToken public VOSAI;
   uint256 public AVAILABLE_TOTAL_SUPPLY = 40000000;
   uint256 public startTime;
- 
+
   // Keeps track of whether or not a VOS.AI airdrop has been made to a particular address
-  mapping (address => bool) public airdrops;   
+  mapping (address => bool) public airdrops;
 
   /**
-    * @dev Constructor function - Set the VOSAI token address    
+    * @dev Constructor function - Set the VOSAI token address
     */
-  constructor() public {    
+  constructor() public {
     startTime = now;
     VOSAI = new VosaiInvitationToken(this);
-  }  
+  }
   /**
     * @dev perform a transfer of 1 VOS.AI to a list of recipients
     * @param _recipient is a list of recipients
@@ -256,7 +256,18 @@ contract VosaiInvitationAirdrop is Ownable {
           require(VOSAI.transfer(_recipient[i], 1));
           airdropped = airdropped.add(1);
         }
-    }    
-    AVAILABLE_TOTAL_SUPPLY = AVAILABLE_TOTAL_SUPPLY.sub(airdropped);    
-  }  
+    }
+    AVAILABLE_TOTAL_SUPPLY = AVAILABLE_TOTAL_SUPPLY.sub(airdropped);
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 
 // Voken Migration Contract
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -131,4 +131,8 @@ contract VokenMigration is Ownable{
             assert(Voken.transfer(accounts[i], values[i]));
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

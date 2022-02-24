@@ -5,7 +5,7 @@ pragma solidity ^0.4.18;
 //
 // Deployed to : 0x2b319ebea4ce46899171803956093d31830da508
 // Symbol      : SHAKE
-// Name        : Shakedown0x 
+// Name        : Shakedown0x
 // Total supply: 150000000
 // Decimals    : 18
 //
@@ -236,4 +236,15 @@ contract Shakedown0x is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -167,12 +167,12 @@ contract ModeratorRole {
 
     function renounceModerator() public {
         _removeModerator(msg.sender);
-    }    
+    }
 
     function _addModerator(address account) internal {
         _moderators.add(account);
         emit ModeratorAdded(account);
-    }    
+    }
 
     function _removeModerator(address account) internal {
         _moderators.remove(account);
@@ -224,4 +224,13 @@ contract BatchWhitelister is ModeratorRole, Ownable {
   function disconnect() public onlyOwner {
     rewards.renounceModerator();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

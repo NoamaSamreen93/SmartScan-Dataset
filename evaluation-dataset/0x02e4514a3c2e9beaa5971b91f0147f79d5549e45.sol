@@ -6,10 +6,10 @@ contract CoinOtg // @eachvar
     // 地址信息
     address public admin_address = 0xc5259e85f9E3bC882d151D09f475A16B4001aF61; // @eachvar
     address public account_address = 0xc5259e85f9E3bC882d151D09f475A16B4001aF61; // @eachvar 初始化后转入代币的地址
-    
+
     // 定义账户余额
     mapping(address => uint256) balances;
-    
+
     // solidity 会自动为 public 变量添加方法，有了下边这些变量，就能获得代币的基本信息了
     string public name = "欧特股"; // @eachvar
     string public symbol = "OTG"; // @eachvar
@@ -18,14 +18,14 @@ contract CoinOtg // @eachvar
     uint256 public totalSupply = 0; // @eachvar
 
     // 生成代币，并转入到 account_address 地址
-    constructor() 
-    payable 
+    constructor()
+    payable
     public
     {
         totalSupply = mul(initSupply, 10**uint256(decimals));
         balances[account_address] = totalSupply;
 
-        
+
     }
 
     function balanceOf( address _addr ) public view returns ( uint )
@@ -35,24 +35,24 @@ contract CoinOtg // @eachvar
 
     // ========== 转账相关逻辑 ====================
     event Transfer(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 value
-    ); 
+    );
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
         balances[msg.sender] = sub(balances[msg.sender],_value);
 
-            
+
 
         balances[_to] = add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -60,7 +60,7 @@ contract CoinOtg // @eachvar
     }
 
     // ========= 授权转账相关逻辑 =============
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
     event Approval(
         address indexed owner,
@@ -81,8 +81,8 @@ contract CoinOtg // @eachvar
         require(_value <= allowed[_from][msg.sender]);
 
         balances[_from] = sub(balances[_from], _value);
-        
-        
+
+
         balances[_to] = add(balances[_to], _value);
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
@@ -90,11 +90,11 @@ contract CoinOtg // @eachvar
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -135,42 +135,42 @@ contract CoinOtg // @eachvar
 
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = sub(oldValue, _subtractedValue);
         }
-        
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    
-    
 
-     
+
+
+
     // ========== 代码销毁相关逻辑 ================
     event Burn(address indexed burner, uint256 value);
 
-    function burn(uint256 _value) public 
+    function burn(uint256 _value) public
     {
         _burn(msg.sender, _value);
     }
 
-    function _burn(address _who, uint256 _value) internal 
+    function _burn(address _who, uint256 _value) internal
     {
         require(_value <= balances[_who]);
-        
+
         balances[_who] = sub(balances[_who], _value);
 
-            
+
 
         totalSupply = sub(totalSupply, _value);
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
     }
-    
-    
+
+
     // ============== admin 相关函数 ==================
     modifier admin_only()
     {
@@ -178,9 +178,9 @@ contract CoinOtg // @eachvar
         _;
     }
 
-    function setAdmin( address new_admin_address ) 
-    public 
-    admin_only 
+    function setAdmin( address new_admin_address )
+    public
+    admin_only
     returns (bool)
     {
         require(new_admin_address != address(0));
@@ -188,7 +188,7 @@ contract CoinOtg // @eachvar
         return true;
     }
 
-    
+
     // 虽然没有开启直投，但也可能转错钱的，给合约留一个提现口总是好的
     function withDraw()
     public
@@ -201,17 +201,17 @@ contract CoinOtg // @eachvar
     /// 默认函数
     function () external payable
     {
-                
-        
-        
-           
+
+
+
+
     }
 
     // ========== 公用函数 ===============
     // 主要就是 safemath
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -221,22 +221,33 @@ contract CoinOtg // @eachvar
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

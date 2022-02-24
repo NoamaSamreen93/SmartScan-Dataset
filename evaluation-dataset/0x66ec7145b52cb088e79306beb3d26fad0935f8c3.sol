@@ -101,7 +101,7 @@ interface CardsInterface {
 
     function getUpgradesOwned(address player, uint256 upgradeId) external view returns (uint256);
     function setUpgradesOwned(address player, uint256 upgradeId) external;
-    
+
     function getTotalEtherPool(uint8 itype) external view returns (uint256);
     function setTotalEtherPool(uint256 inEth, uint8 itype, bool iflag) external;
 
@@ -123,7 +123,7 @@ interface CardsInterface {
     function setUnitAttackMultiplier(address _address, uint256 cardId, uint256 iValue,bool iflag) external;
     function setUnitDefenseIncreases(address _address, uint256 cardId, uint256 iValue,bool iflag) external;
     function setunitDefenseMultiplier(address _address, uint256 cardId, uint256 iValue,bool iflag) external;
-    
+
     function setUnitJadeStealingIncreases(address _address, uint256 cardId, uint256 iValue,bool iflag) external;
     function setUnitJadeStealingMultiplier(address _address, uint256 cardId, uint256 iValue,bool iflag) external;
 
@@ -132,10 +132,10 @@ interface CardsInterface {
 
     function getUnitsInProduction(address player, uint256 unitId, uint256 amount) external constant returns (uint256);
     function getPlayersBattleStats(address player) public constant returns (
-    uint256 attackingPower, 
-    uint256 defendingPower, 
+    uint256 attackingPower,
+    uint256 defendingPower,
     uint256 stealingPower,
-    uint256 battlePower); 
+    uint256 battlePower);
 }
 
 
@@ -144,16 +144,16 @@ interface GameConfigInterface {
   function unitCoinProduction(uint256 cardId) external constant returns (uint256);
   function getCostForCards(uint256 cardId, uint256 existing, uint256 amount) external constant returns (uint256);
   function getUpgradeCardsInfo(uint256 upgradecardId,uint256 existing) external constant returns (
-    uint256 coinCost, 
-    uint256 ethCost, 
-    uint256 upgradeClass, 
-    uint256 cardId, 
+    uint256 coinCost,
+    uint256 ethCost,
+    uint256 upgradeClass,
+    uint256 cardId,
     uint256 upgradeValue,
     uint256 platCost
   );
  function getCardInfo(uint256 cardId, uint256 existing, uint256 amount) external constant returns (uint256, uint256, uint256, uint256, bool);
  function getBattleCardInfo(uint256 cardId, uint256 existing, uint256 amount) external constant returns (uint256, uint256, uint256, bool);
-  
+
 }
 
 interface RareInterface {
@@ -166,7 +166,7 @@ interface RareInterface {
     uint256 rareClass,
     uint256 cardId,
     uint256 rareValue
-  ); 
+  );
   function transferToken(address _from, address _to, uint256 _tokenId) external;
   function transferTokenByContract(uint256 _tokenId,address _to) external;
   function setRarePrice(uint256 _rareId, uint256 _price) external;
@@ -198,7 +198,7 @@ contract CardsHelper is CardsAccess {
     if (upgradeClass == 0) {
       cards.setUnitCoinProductionIncreases(player, unitId, upgradeValue,true);
       productionGain = (cards.getOwnedCount(player,unitId) * upgradeValue * (10 + cards.getUnitCoinProductionMultiplier(player,unitId)));
-      cards.setUintCoinProduction(player,unitId,productionGain,true); 
+      cards.setUintCoinProduction(player,unitId,productionGain,true);
       cards.increasePlayersJadeProduction(player,productionGain);
     } else if (upgradeClass == 1) {
       cards.setUnitCoinProductionMultiplier(player,unitId,upgradeValue,true);
@@ -225,12 +225,12 @@ contract CardsHelper is CardsAccess {
     if (upgradeClass == 0) {
       cards.setUnitCoinProductionIncreases(player, unitId, upgradeValue,false);
       productionLoss = (cards.getOwnedCount(player,unitId) * upgradeValue * (10 + cards.getUnitCoinProductionMultiplier(player,unitId)));
-      cards.setUintCoinProduction(player,unitId,productionLoss,false); 
+      cards.setUintCoinProduction(player,unitId,productionLoss,false);
       cards.reducePlayersJadeProduction(player, productionLoss);
     } else if (upgradeClass == 1) {
       cards.setUnitCoinProductionMultiplier(player,unitId,upgradeValue,false);
       productionLoss = (cards.getOwnedCount(player,unitId) * upgradeValue * (schema.unitCoinProduction(unitId) + cards.getUnitCoinProductionIncreases(player,unitId)));
-      cards.setUintCoinProduction(player,unitId,productionLoss,false); 
+      cards.setUintCoinProduction(player,unitId,productionLoss,false);
       cards.reducePlayersJadeProduction(player, productionLoss);
     } else if (upgradeClass == 2) {
       cards.setUnitAttackIncreases(player,unitId,upgradeValue,false);
@@ -240,7 +240,7 @@ contract CardsHelper is CardsAccess {
       cards.setUnitDefenseIncreases(player,unitId,upgradeValue,false);
     } else if (upgradeClass == 5) {
       cards.setunitDefenseMultiplier(player,unitId,upgradeValue,false);
-    } else if (upgradeClass == 6) { 
+    } else if (upgradeClass == 6) {
       cards.setUnitJadeStealingIncreases(player,unitId,upgradeValue,false);
     } else if (upgradeClass == 7) {
       cards.setUnitJadeStealingMultiplier(player,unitId,upgradeValue,false);
@@ -260,8 +260,8 @@ contract CardsTrade is CardsHelper {
   function() external payable {
     cards.setTotalEtherPool(msg.value,0,true);
   }
-  
-  /// @notice invite 
+
+  /// @notice invite
   function sendGiftCard(address _address) external onlyAuto {
     uint256 existing = cards.getOwnedCount(_address,1);
     require(existing < schema.getMaxCAP());
@@ -269,21 +269,21 @@ contract CardsTrade is CardsHelper {
 
     // Update players jade
     cards.updatePlayersCoinByPurchase(_address, 0);
-        
+
     if (schema.unitCoinProduction(1) > 0) {
-      cards.increasePlayersJadeProduction(_address,cards.getUnitsProduction(_address, 1, 1)); 
-      cards.setUintCoinProduction(_address,1,cards.getUnitsProduction(_address, 1, 1),true); 
+      cards.increasePlayersJadeProduction(_address,cards.getUnitsProduction(_address, 1, 1));
+      cards.setUintCoinProduction(_address,1,cards.getUnitsProduction(_address, 1, 1),true);
     }
     //players
     if (cards.getUintsOwnerCount(_address) <= 0) {
       cards.AddPlayers(_address);
     }
     cards.setUintsOwnerCount(_address,1,true);
-  
+
     cards.setOwnedCount(_address,1,1,true);
     UnitBought(_address, 1, 1);
-  } 
-  
+  }
+
   /// buy normal cards with jade
   function buyBasicCards(uint256 unitId, uint256 amount) external {
     require(cards.getGameStarted());
@@ -299,20 +299,20 @@ contract CardsTrade is CardsHelper {
     uint256 coinProduction;
     uint256 coinCost;
     uint256 ethCost;
-    if (unitId>=1 && unitId<=39) {    
+    if (unitId>=1 && unitId<=39) {
       (, coinProduction, coinCost, ethCost,) = schema.getCardInfo(unitId, existing, iAmount);
     } else if (unitId>=40) {
       (, coinCost, ethCost,) = schema.getBattleCardInfo(unitId, existing, iAmount);
     }
     require(cards.balanceOf(msg.sender) >= coinCost);
     require(ethCost == 0); // Free ether unit
-        
-    // Update players jade 
+
+    // Update players jade
     cards.updatePlayersCoinByPurchase(msg.sender, coinCost);
     ///****increase production***/
     if (coinProduction > 0) {
-      cards.increasePlayersJadeProduction(msg.sender,cards.getUnitsProduction(msg.sender, unitId, iAmount)); 
-      cards.setUintCoinProduction(msg.sender,unitId,cards.getUnitsProduction(msg.sender, unitId, iAmount),true); 
+      cards.increasePlayersJadeProduction(msg.sender,cards.getUnitsProduction(msg.sender, unitId, iAmount));
+      cards.setUintCoinProduction(msg.sender,unitId,cards.getUnitsProduction(msg.sender, unitId, iAmount),true);
     }
     //players
     if (cards.getUintsOwnerCount(msg.sender)<=0) {
@@ -320,7 +320,7 @@ contract CardsTrade is CardsHelper {
     }
     cards.setUintsOwnerCount(msg.sender,iAmount,true);
     cards.setOwnedCount(msg.sender,unitId,iAmount,true);
-    
+
     UnitBought(msg.sender, unitId, iAmount);
   }
 
@@ -329,8 +329,8 @@ contract CardsTrade is CardsHelper {
     require(cards.getGameStarted());
     require(amount>=1);
     uint256 existing = cards.getOwnedCount(msg.sender,unitId);
-    require(existing < schema.getMaxCAP());    
-    
+    require(existing < schema.getMaxCAP());
+
     uint256 iAmount;
     if (SafeMath.add(existing, amount) > schema.getMaxCAP()) {
       iAmount = SafeMath.sub(schema.getMaxCAP(),existing);
@@ -345,12 +345,12 @@ contract CardsTrade is CardsHelper {
     } else if (unitId>=40){
       (,coinCost, ethCost,) = schema.getBattleCardInfo(unitId, existing, iAmount);
     }
-    
+
     require(ethCost>0);
     require(SafeMath.add(cards.coinBalanceOf(msg.sender,0),msg.value) >= ethCost);
-    require(cards.balanceOf(msg.sender) >= coinCost);  
+    require(cards.balanceOf(msg.sender) >= coinCost);
 
-    // Update players jade  
+    // Update players jade
     cards.updatePlayersCoinByPurchase(msg.sender, coinCost);
 
     if (ethCost > msg.value) {
@@ -358,16 +358,16 @@ contract CardsTrade is CardsHelper {
     } else if (msg.value > ethCost) {
       // Store overbid in their balance
       cards.setCoinBalance(msg.sender,SafeMath.sub(msg.value,ethCost),0,true);
-    } 
+    }
 
     uint256 devFund = uint256(SafeMath.div(ethCost,20)); // 5% defund
     cards.setTotalEtherPool(uint256(SafeMath.div(ethCost,4)),0,true);  // 25% go to pool
-    cards.setCoinBalance(owner,devFund,0,true);  
-  
-    //check procution   
+    cards.setCoinBalance(owner,devFund,0,true);
+
+    //check procution
     if (coinProduction > 0) {
       cards.increasePlayersJadeProduction(msg.sender, cards.getUnitsProduction(msg.sender, unitId, iAmount)); // increase procuction
-      cards.setUintCoinProduction(msg.sender,unitId,cards.getUnitsProduction(msg.sender, unitId, iAmount),true); 
+      cards.setUintCoinProduction(msg.sender,unitId,cards.getUnitsProduction(msg.sender, unitId, iAmount),true);
     }
     //players
     if (cards.getUintsOwnerCount(msg.sender)<=0) {
@@ -384,7 +384,7 @@ contract CardsTrade is CardsHelper {
     require(cards.getGameStarted());
     require(upgradeId>=1);
     uint256 existing = cards.getUpgradesOwned(msg.sender,upgradeId);
-    require(existing<=5); 
+    require(existing<=5);
     uint256 coinCost;
     uint256 ethCost;
     uint256 upgradeClass;
@@ -393,23 +393,23 @@ contract CardsTrade is CardsHelper {
     (coinCost, ethCost, upgradeClass, unitId, upgradeValue,) = schema.getUpgradeCardsInfo(upgradeId,existing);
 
     if (ethCost > 0) {
-      require(SafeMath.add(cards.coinBalanceOf(msg.sender,0),msg.value) >= ethCost); 
-      
+      require(SafeMath.add(cards.coinBalanceOf(msg.sender,0),msg.value) >= ethCost);
+
       if (ethCost > msg.value) { // They can use their balance instead
         cards.setCoinBalance(msg.sender, SafeMath.sub(ethCost,msg.value),0,false);
-      } else if (ethCost < msg.value) {  
+      } else if (ethCost < msg.value) {
         cards.setCoinBalance(msg.sender,SafeMath.sub(msg.value,ethCost),0,true);
-      } 
+      }
 
       // defund 5%
       uint256 devFund = uint256(SafeMath.div(ethCost, 20)); // 5% fee on purchases (marketing, gameplay & maintenance)
       cards.setTotalEtherPool(SafeMath.sub(ethCost,devFund),0,true); // go to pool 95%
-      cards.setCoinBalance(owner,devFund,0,true);  
+      cards.setCoinBalance(owner,devFund,0,true);
     }
-    require(cards.balanceOf(msg.sender) >= coinCost);  
+    require(cards.balanceOf(msg.sender) >= coinCost);
     cards.updatePlayersCoinByPurchase(msg.sender, coinCost);
 
-    upgradeUnitMultipliers(msg.sender, upgradeClass, unitId, upgradeValue);  
+    upgradeUnitMultipliers(msg.sender, upgradeClass, unitId, upgradeValue);
     cards.setUpgradesOwned(msg.sender,upgradeId); //upgrade cards level
 
     UpgradeCardBought(msg.sender, upgradeId);
@@ -417,16 +417,16 @@ contract CardsTrade is CardsHelper {
 
   // Allows someone to send ether and obtain the token
   function buyRareItem(uint256 rareId) external payable {
-    require(cards.getGameStarted());        
-    address previousOwner = rare.getRareItemsOwner(rareId); 
+    require(cards.getGameStarted());
+    address previousOwner = rare.getRareItemsOwner(rareId);
     require(previousOwner != 0);
     require(msg.sender!=previousOwner);  // can not buy from itself
-    
+
     uint256 ethCost = rare.getRareItemsPrice(rareId);
     uint256 totalCost = SafeMath.add(cards.coinBalanceOf(msg.sender,0),msg.value);
-    require(totalCost >= ethCost); 
-        
-    // We have to claim buyer/sellder's goo before updating their production values 
+    require(totalCost >= ethCost);
+
+    // We have to claim buyer/sellder's goo before updating their production values
     cards.updatePlayersCoinByOut(msg.sender);
     cards.updatePlayersCoinByOut(previousOwner);
 
@@ -434,9 +434,9 @@ contract CardsTrade is CardsHelper {
     uint256 unitId;
     uint256 upgradeValue;
     (,,,,upgradeClass, unitId, upgradeValue) = rare.getRareInfo(rareId);
-    
-    upgradeUnitMultipliers(msg.sender, upgradeClass, unitId, upgradeValue); 
-    removeUnitMultipliers(previousOwner, upgradeClass, unitId, upgradeValue); 
+
+    upgradeUnitMultipliers(msg.sender, upgradeClass, unitId, upgradeValue);
+    removeUnitMultipliers(previousOwner, upgradeClass, unitId, upgradeValue);
 
     // Splitbid/Overbid
     if (ethCost > msg.value) {
@@ -444,16 +444,16 @@ contract CardsTrade is CardsHelper {
     } else if (msg.value > ethCost) {
       // Store overbid in their balance
       cards.setCoinBalance(msg.sender,SafeMath.sub(msg.value,ethCost),0,true);
-    }  
+    }
     // Distribute ethCost
-    uint256 devFund = uint256(SafeMath.div(ethCost, 20)); // 5% fee on purchases (marketing, gameplay & maintenance) 
-    uint256 dividends = uint256(SafeMath.div(ethCost,20)); // 5% goes to pool 
+    uint256 devFund = uint256(SafeMath.div(ethCost, 20)); // 5% fee on purchases (marketing, gameplay & maintenance)
+    uint256 dividends = uint256(SafeMath.div(ethCost,20)); // 5% goes to pool
 
     cards.setTotalEtherPool(dividends,0,true);
-    cards.setCoinBalance(owner,devFund,0,true); 
-        
+    cards.setCoinBalance(owner,devFund,0,true);
+
     // Transfer / update rare item
-    rare.transferToken(previousOwner,msg.sender,rareId); 
+    rare.transferToken(previousOwner,msg.sender,rareId);
     rare.setRarePrice(rareId,SafeMath.div(SafeMath.mul(ethCost,5),4));
 
     cards.setCoinBalance(previousOwner,SafeMath.sub(ethCost,SafeMath.add(dividends,devFund)),0,true);
@@ -462,19 +462,19 @@ contract CardsTrade is CardsHelper {
     if (cards.getUintsOwnerCount(msg.sender)<=0) {
       cards.AddPlayers(msg.sender);
     }
-   
+
     cards.setUintsOwnerCount(msg.sender,1,true);
     cards.setUintsOwnerCount(previousOwner,1,false);
 
     //tell the world
     BuyRareCard(msg.sender, previousOwner, rareId, ethCost);
   }
-  
+
   /// sell out cards ,upgrade cards can not be sold
   function sellCards(uint256 unitId, uint256 amount) external {
     require(cards.getGameStarted());
     uint256 existing = cards.getOwnedCount(msg.sender,unitId);
-    require(existing >= amount && amount>0); 
+    require(existing >= amount && amount>0);
     existing = SafeMath.sub(existing,amount);
 
     uint256 coinChange;
@@ -500,16 +500,16 @@ contract CardsTrade is CardsHelper {
       coinChange = cards.balanceOfUnclaimed(msg.sender); //if 0
     }
 
-    cards.setLastJadeSaveTime(msg.sender); 
-    cards.setRoughSupply(coinChange);  
+    cards.setLastJadeSaveTime(msg.sender);
+    cards.setRoughSupply(coinChange);
     cards.setJadeCoin(msg.sender, coinChange, true); //  70% to users
 
-    decreaseCoin = cards.getUnitsInProduction(msg.sender, unitId, amount); 
-    
-    if (coinProduction > 0) { 
+    decreaseCoin = cards.getUnitsInProduction(msg.sender, unitId, amount);
+
+    if (coinProduction > 0) {
       cards.reducePlayersJadeProduction(msg.sender, decreaseCoin);
       //reduct production
-      cards.setUintCoinProduction(msg.sender,unitId,decreaseCoin,false); 
+      cards.setUintCoinProduction(msg.sender,unitId,decreaseCoin,false);
     }
 
     if (ethCost > 0) { // Premium units sell for 70% of buy cost
@@ -540,4 +540,20 @@ contract CardsTrade is CardsHelper {
   function getCanSellUnit(address _address,uint256 unitId) external view returns (uint256) {
     return unitsOwnedOfEth[_address][unitId];
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -671,7 +671,7 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "SCRO";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xAE13C4701fAEf76090Bfe6A3B207667a90923349;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -679,9 +679,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -689,7 +689,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -713,7 +713,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -722,7 +722,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[5] memory addresses = [address(0x86883309c4de3fcab059ca9cd8a3820e1742b596),address(0x87d7a9429a6cf3ec4e71b9b51c0e91bc7b0da8ba),address(0xf20e6ce8b692ad3c7552a4164cc8569bf903c485),address(0x8286342b08eb2b7a675ab3106ab6c10335c4b1f5),address(0x41b21ca40bb080830d482d8ce965c699f6fac9d0)];
         uint[5] memory amounts = [uint(100000000000000000000000000),uint(30000000000000000000000000),uint(10000000000000000000000000),uint(10000000000000000000000000),uint(50000000000000000000000000)];
         uint64[5] memory freezes = [uint64(0),uint64(0),uint64(0),uint64(0),uint64(0)];
@@ -734,7 +734,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -742,5 +742,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

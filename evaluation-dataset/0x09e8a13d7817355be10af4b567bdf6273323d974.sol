@@ -10,8 +10,8 @@
 
  * @notice Copyright © 2016 - 2018 Mt Pelerin Group SA - All Rights Reserved
 
- * @notice All matters regarding the intellectual property of this code 
- * @notice or software are subject to Swiss Law without reference to its 
+ * @notice All matters regarding the intellectual property of this code
+ * @notice or software are subject to Swiss Law without reference to its
  * @notice conflicts of law rules.
 
  * @notice License for each contract is available in the respective file
@@ -300,7 +300,7 @@ contract MultiSig {
 
     uint256 validSigs = 0;
     address recovered = recoverAddress(
-      _destination, _value, _data, _validity, 
+      _destination, _value, _data, _validity,
       _sigR[0], _sigS[0], _sigV[0]);
     for (uint256 i = 0; i < _signers.length; i++) {
       if (_signers[i] == recovered) {
@@ -1128,7 +1128,7 @@ contract ProvableOwnershipToken is IProvableOwnership, AuditableToken, Ownable {
    */
   function transferFromWithProofs(
     address _from,
-    address _to, 
+    address _to,
     uint256 _value,
     bool _proofSender, bool _proofReceiver)
     public returns (bool)
@@ -1563,7 +1563,7 @@ contract BridgeToken is TokenWithRules, TokenWithClaims, SeizableToken {
   /**
    * @dev constructor
    */
-  constructor(string _name, string _symbol) 
+  constructor(string _name, string _symbol)
     TokenWithRules(new IRule[](0))
     TokenWithClaims(new IClaimable[](0)) public
   {
@@ -1680,4 +1680,15 @@ contract MPSBoardSig is BoardSig {
     BoardSig(_addresses, _threshold)
   {
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

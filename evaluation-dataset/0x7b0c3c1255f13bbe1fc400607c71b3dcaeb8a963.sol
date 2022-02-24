@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 
 /**
  * @title SafeMath
- * @dev Math operations with safety checks 
- * @dev based on the open-zeppelin template 
+ * @dev Math operations with safety checks
+ * @dev based on the open-zeppelin template
  */
 library SafeMath {
 
@@ -30,10 +30,10 @@ library SafeMath {
 
 /**
  * @title VTCoin - Standard ERC20 token
- * @dev based on the open-zeppelin template 
+ * @dev based on the open-zeppelin template
  */
 contract VTCoin {
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -49,17 +49,17 @@ contract VTCoin {
     * @param value The initial number of tokens to mint.
     */
     constructor (uint256 value) public {
-	
+
         _name = "ValueTank Coin";
         _symbol = "VTC";
         _decimals = 2;
-        
+
         _balances[msg.sender] = value;
         _totalSupply = value;
         emit Transfer(address(0), msg.sender, value);
 
     }
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -158,4 +158,10 @@ contract VTCoin {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

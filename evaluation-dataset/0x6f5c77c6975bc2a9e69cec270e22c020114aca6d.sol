@@ -48,8 +48,8 @@ contract EIP20Interface {
     /// @return Whether the burn was successful or not
     function burn(uint256 _value) public returns (bool success);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Burn(address indexed burner, uint256 value);
 }
@@ -138,3 +138,9 @@ contract EIP20 is EIP20Interface {
 }
 
 contract KKKKCOIN is EIP20(1290000000, "KKKKCOIN", 2, "KKKK") {}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

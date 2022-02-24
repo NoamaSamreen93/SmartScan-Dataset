@@ -2,7 +2,7 @@
 //   ______   __            __          ______                                       ______             __              //
 //  /      \ |  \          |  \        /      \                                     /      \           |  \             //
 // |  $$$$$$\| $$  ______  | $$____   |  $$$$$$\ ______   _______    ______        |  $$$$$$\  ______   \$$ _______     //
-// | $$ __\$$| $$ /      \ | $$    \  | $$_  \$$/      \ |       \  /      \       | $$   \$$ /      \ |  \|       \    // 
+// | $$ __\$$| $$ /      \ | $$    \  | $$_  \$$/      \ |       \  /      \       | $$   \$$ /      \ |  \|       \    //
 // | $$|    \| $$|  $$$$$$\| $$$$$$$\ | $$ \   |  $$$$$$\| $$$$$$$\|  $$$$$$\      | $$      |  $$$$$$\| $$| $$$$$$$\   //
 // | $$ \$$$$| $$| $$  | $$| $$  | $$ | $$$$   | $$  | $$| $$  | $$| $$    $$      | $$   __ | $$  | $$| $$| $$  | $$   //
 // | $$__| $$| $$| $$__/ $$| $$__/ $$ | $$     | $$__/ $$| $$  | $$| $$$$$$$$      | $$__/  \| $$__/ $$| $$| $$  | $$   //
@@ -76,7 +76,7 @@ contract GlobfoneCoin is ERC20 {
     using SafeMath for uint256;
     address owner = msg.sender;
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;    
+    mapping (address => mapping (address => uint256)) allowed;
     string public constant name = "Globfone Coin"; //* Token Name *//
     string public constant symbol = "GFC"; //* Globfone Coin Symbol *//
     uint public constant decimals = 8; //* Number of Decimals *//
@@ -103,27 +103,27 @@ contract GlobfoneCoin is ERC20 {
         require(msg.sender == owner);
         _;
     }
-    
+
     function GlobfoneCoin () public {
-        owner = msg.sender;    
+        owner = msg.sender;
         distr(owner, totalDistributed);
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
 
     function finishDistribution() onlyOwner canDistr public returns (bool) {
         distributionFinished = true;
         emit DistrFinished();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
-        totalDistributed = totalDistributed.add(_amount);        
+        totalDistributed = totalDistributed.add(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
@@ -133,10 +133,10 @@ contract GlobfoneCoin is ERC20 {
 
     function doAirdrop(address _participant, uint _amount) internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
 
         require( totalDistributed < totalSupply );
-        
+
         balances[_participant] = balances[_participant].add(_amount);
         totalDistributed = totalDistributed.add(_amount);
 
@@ -147,30 +147,30 @@ contract GlobfoneCoin is ERC20 {
         emit Transfer(address(0), _participant, _amount);
     }
 
-    function AirdropSingle(address _participant, uint _amount) public onlyOwner {        
+    function AirdropSingle(address _participant, uint _amount) public onlyOwner {
         doAirdrop(_participant, _amount);
     }
 
-    function AirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {        
+    function AirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i], _amount);
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
-           
+
     function () external payable {
         getTokens();
      }
-    
+
     function getTokens() payable canDistr  public {
         uint256 tokens = 0;
         require( msg.value >= MIN );
         require( msg.value > 0 );
-        tokens = tokensPerEth.mul(msg.value) / 1 ether;        
+        tokens = tokensPerEth.mul(msg.value) / 1 ether;
         address investor = msg.sender;
-        
+
         if (tokens > 0) {
             distr(investor, tokens);
         }
@@ -189,26 +189,26 @@ contract GlobfoneCoin is ERC20 {
     function balanceOf(address _owner) constant public returns (uint256) {
         return balances[_owner];
     }
-    
-    
+
+
     function freeze(uint256 _value) returns (bool success) {
         if (balances[msg.sender] < _value) throw;                               // Check if the sender has enough
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.add(freezeOf[msg.sender], _value);       // Updates totalSupply
         Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) returns (bool success) {
         if (freezeOf[msg.sender] < _value) throw;                               // Check if the sender has enough
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         freezeOf[msg.sender] = SafeMath.sub(freezeOf[msg.sender], _value);      // Subtract from the sender
 		balances[msg.sender] = SafeMath.add(balances[msg.sender], _value);
         Unfreeze(msg.sender, _value);
         return true;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         //check if sender has balance and for oveflow
         require(_to != address(0));
@@ -218,7 +218,7 @@ contract GlobfoneCoin is ERC20 {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[_from]);
@@ -236,32 +236,32 @@ contract GlobfoneCoin is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     } //withdraw foreign tokens
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
-    } 
-    
-    
+    }
+
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     //withdraw Ethereum from Contract address
     function withdrawEther() onlyOwner public {
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     //Burning specific amount of GlobFone Coins
     function burnGlobFoneCoin(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
@@ -270,6 +270,22 @@ contract GlobfoneCoin is ERC20 {
         totalSupply = totalSupply.sub(_value);
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
-    } 
-    
+    }
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

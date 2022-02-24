@@ -89,7 +89,7 @@ contract Ownable {
         _;
     }
 
-   
+
 
 }
 
@@ -106,7 +106,7 @@ contract Crowdsale is Ownable {
 
   // The token being sold
   TravelHelperToken public token;
-  
+
   uint public ethPrice;
 
   // Address where funds are collected
@@ -120,10 +120,10 @@ contract Crowdsale is Ownable {
   uint256 public preIcoTokensSold = 0;
   uint256 public discountedIcoTokensSold = 0;
   uint256 public icoTokensSold = 0;
-  
-  
+
+
   uint256 public mainTokensPerDollar = 400 * 1 ether;
-  
+
   uint256 public totalRaisedInCents;
   uint256 public presaleTokensPerDollar = 533.3333 * 1 ether;
   uint256 public discountedTokensPerDollar = 444.4444 * 1 ether;
@@ -133,15 +133,15 @@ contract Crowdsale is Ownable {
   uint256 public mainIcoStartBlock;
   uint256 public mainIcoEndBlock;
   uint public preSaleDuration =  (7 days)/(15);
-  uint public discountedSaleDuration = (15 days)/(15); 
-  uint public mainSaleDuration = (15 days)/(15); 
-  
-  
+  uint public discountedSaleDuration = (15 days)/(15);
+  uint public mainSaleDuration = (15 days)/(15);
+
+
   modifier CrowdsaleStarted(){
       require(crowdsaleStarted);
       _;
   }
- 
+
   /**
    * Event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -174,9 +174,9 @@ contract Crowdsale is Ownable {
       discountedIcoStartBlock = block.number + preSaleDuration;
       mainIcoStartBlock = block.number + preSaleDuration + discountedSaleDuration;
       mainIcoEndBlock = block.number + preSaleDuration + discountedSaleDuration + mainSaleDuration;
-      
+
   }
-  
+
   // -----------------------------------------
   // Crowdsale external interface
   // -----------------------------------------
@@ -196,7 +196,7 @@ contract Crowdsale is Ownable {
     uint256 weiAmount = msg.value;
     require(weiAmount > 0);
     require(ethPrice > 0);
-    uint256 usdCents = weiAmount.mul(ethPrice).div(1 ether); 
+    uint256 usdCents = weiAmount.mul(ethPrice).div(1 ether);
 
     // calculate token amount to be created
     uint256 tokens = _getTokenAmount(usdCents);
@@ -210,8 +210,8 @@ contract Crowdsale is Ownable {
      emit TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
     _forwardFunds();
   }
-  
- 
+
+
    /**
    * @dev sets the value of ether price in cents.Can be called only by the owner account.
    * @param _ethPriceInCents price in cents .
@@ -261,7 +261,7 @@ contract Crowdsale is Ownable {
   function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
     _deliverTokens(_beneficiary, _tokenAmount);
   }
-  
+
 
   /**
    * @param _usdCents Value in usd cents to be converted into tokens
@@ -269,15 +269,15 @@ contract Crowdsale is Ownable {
    */
   function _getTokenAmount(uint256 _usdCents) CrowdsaleStarted public view returns (uint256) {
     uint256 tokens;
-    
+
     if (block.number > preIcoStartBlock && block.number < discountedIcoStartBlock ) tokens = _usdCents.div(100).mul(presaleTokensPerDollar);
     if (block.number >= discountedIcoStartBlock && block.number < mainIcoStartBlock )  tokens = _usdCents.div(100).mul(discountedTokensPerDollar);
     if (block.number >= mainIcoStartBlock && block.number < mainIcoEndBlock )  tokens = _usdCents.div(100).mul(mainTokensPerDollar);
-    
+
 
     return tokens;
   }
-  
+
    /**
    * @return returns the current stage of sale
    */
@@ -300,18 +300,18 @@ contract Crowdsale is Ownable {
         {
             return 'Sale ended';
         }
-      
+
      }
-      
+
     /**
        * @dev burn the unsold tokens.
-       
+
        */
      function burnTokens() public onlyOwner {
         require(block.number > mainIcoEndBlock);
         require(token.burnTokensForSale());
       }
-        
+
   /**
    * @dev finalize the crowdsale.After finalizing ,tokens transfer can be done.
    */
@@ -319,12 +319,23 @@ contract Crowdsale is Ownable {
     require(block.number > mainIcoEndBlock);
     token.finalize();
   }
-  
-  
+
+
   /**
    * @dev Determines how ETH is stored/forwarded on purchases.
    */
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

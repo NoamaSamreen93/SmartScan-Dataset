@@ -79,7 +79,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -482,7 +482,7 @@ contract KyberOasisReserve is KyberReserveInterface, Withdrawable, Utils2 {
         }
 
         // otc's terminology is of offer maker, so their sellGem is the taker's dest token.
-        (, offerPayAmt, offerBuyAmt) = getMatchingOffer(wrappedDest, wrappedSrc, actualSrcQty); 
+        (, offerPayAmt, offerBuyAmt) = getMatchingOffer(wrappedDest, wrappedSrc, actualSrcQty);
 
         // make sure to take only one level of order book to avoid gas inflation.
         if (actualSrcQty > offerBuyAmt) return 0;
@@ -530,13 +530,13 @@ contract KyberOasisReserve is KyberReserveInterface, Withdrawable, Utils2 {
             require(destToken.transfer(destAddress, userExpectedDestAmount));
         } else {
             require(srcToken.transferFrom(msg.sender, this, srcAmount));
- 
+
             actualDestAmount = takeMatchingOffer(srcToken, wethToken, srcAmount);
             require(actualDestAmount >= destAmountIncludingFees);
             wethToken.withdraw(actualDestAmount);
 
             // transfer back only requested dest amount.
-            destAddress.transfer(userExpectedDestAmount); 
+            destAddress.transfer(userExpectedDestAmount);
         }
 
         TradeExecute(msg.sender, srcToken, srcAmount, destToken, userExpectedDestAmount, destAddress);
@@ -600,4 +600,15 @@ contract KyberOasisReserve is KyberReserveInterface, Withdrawable, Utils2 {
         return ((isTokenListed[src] && ETH_TOKEN_ADDRESS == dest) ||
                 (isTokenListed[dest] && ETH_TOKEN_ADDRESS == src));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

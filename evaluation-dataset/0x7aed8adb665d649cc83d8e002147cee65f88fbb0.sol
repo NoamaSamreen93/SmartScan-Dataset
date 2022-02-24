@@ -459,7 +459,7 @@ contract DUBI is StandardToken, BurnableToken, RBAC {
     // logs
     MintLog(_to, _amount);
     Transfer(0x0, _to, _amount);
-    
+
     return true;
   }
 }
@@ -479,7 +479,7 @@ contract Purpose is StandardToken, BurnableToken, RBAC {
     totalSupply = 1000000000 ether;
     balances[supplier] = totalSupply;
   }
-  
+
   // used by burner contract to burn athenes tokens
   function supplyBurn(uint256 _value) external onlyRole(ROLE_BURN) returns (bool) {
     require(_value > 0);
@@ -695,4 +695,10 @@ contract Hodler is Ownable {
       item.fulfilled
     );
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

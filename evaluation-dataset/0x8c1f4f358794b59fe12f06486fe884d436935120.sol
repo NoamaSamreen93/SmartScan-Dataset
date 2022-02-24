@@ -110,7 +110,7 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
 
      uint remaining;
      uint price;
-     
+
      address public fundsWallet;           // Where should the raised ETH go?
 
 
@@ -122,19 +122,19 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
         name = "NIKOLA";
         decimals = 0;
         _totalSupply = 50000000;
-        
+
     //    fundsWallet = 0xADA046d84E344E2b1233F3661981D8c2D182C9aA;
           fundsWallet = msg.sender;
-      
+
         balances[fundsWallet] = _totalSupply;
-        
+
         remaining = 0;
-        
+
         price = 1;
-        
+
         Transfer(address(0),fundsWallet, _totalSupply);
-        
-        
+
+
     }
 
 
@@ -173,7 +173,7 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -184,7 +184,7 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -233,27 +233,27 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
   function () payable public
    {
        BuyTickets( (msg.value/(1000000000000000000*0.001))*price );
-       
+
    }
-  
+
    function BuyTickets(uint amount) payable public
    {
-     
+
         require( (msg.value)>(1000000000000000000*0.001) && amount < _totalSupply);
 
         balances[msg.sender] +=amount;
         _totalSupply-=amount;
-       
-    
+
+
         balances[fundsWallet] = _totalSupply;
-        
+
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);      
-        
+        fundsWallet.transfer(msg.value);
+
    }
-    
+
 
 
     // ------------------------------------------------------------------------
@@ -262,4 +262,15 @@ contract Nikola is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

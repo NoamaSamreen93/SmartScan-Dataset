@@ -186,7 +186,7 @@ contract TokenSwap is Ownable {
         require(allowance > 0, "sender need to approve token to swap contract.");
 
         if (_fromToken.transferFrom(msg.sender, address(0x0), allowance)) {
-            // It only works correctly when the rate is 1000. 
+            // It only works correctly when the rate is 1000.
             uint256 swappedValue = allowance.add(999);
             swappedValue = swappedValue.div(_rate);
 
@@ -204,4 +204,15 @@ contract TokenSwap is Ownable {
 
         emit Deactivate(reserve);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

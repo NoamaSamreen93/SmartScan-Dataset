@@ -279,7 +279,7 @@ contract BABA is ERC20Interface, Owned {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -299,7 +299,7 @@ contract BABA is ERC20Interface, Owned {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -395,4 +395,13 @@ contract BABA is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

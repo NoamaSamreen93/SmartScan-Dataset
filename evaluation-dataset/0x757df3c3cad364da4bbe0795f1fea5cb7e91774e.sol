@@ -57,7 +57,7 @@ contract RobincoinERC20 {
         string tokenSymbol
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
-        balanceOf[msg.sender] = totalSupply;  
+        balanceOf[msg.sender] = totalSupply;
         name = tokenName;
         symbol = tokenSymbol;
     }
@@ -103,8 +103,8 @@ contract RobincoinERC20 {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);  
-        balanceOf[msg.sender] -= _value; 
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
         emit Burn(msg.sender, _value);
         return true;
@@ -112,10 +112,10 @@ contract RobincoinERC20 {
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;                              // Aggiorno
         emit Burn(_from, _value);
         return true;
@@ -139,13 +139,13 @@ contract Robincoin is owned, RobincoinERC20 {
     ) RobincoinERC20(initialSupply, tokenName, tokenSymbol) public {}
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);               
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                       
-        balanceOf[_from] -= _value;                         
-        balanceOf[_to] += _value;                           
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
     }
 
@@ -161,4 +161,20 @@ contract Robincoin is owned, RobincoinERC20 {
         emit FrozenFunds(target, freeze);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

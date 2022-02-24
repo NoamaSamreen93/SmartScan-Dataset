@@ -18,9 +18,9 @@ contract Manageable {
   /**
    * @dev Checks if the msg.sender is the manager.
    */
-  modifier onlyManager() { 
+  modifier onlyManager() {
     require (msg.sender == manager && manager != 0x0);
-    _; 
+    _;
   }
 }
 
@@ -31,9 +31,9 @@ contract Activatable is Manageable {
   event DeactivatedContract(uint256 deactivatedAt);
 
   bool public active;
-  
+
   /**
-   * @dev Check if the contract is active. 
+   * @dev Check if the contract is active.
    */
   modifier isActive() {
     require(active);
@@ -41,7 +41,7 @@ contract Activatable is Manageable {
   }
 
   /**
-   * @dev Check if the contract is not active. 
+   * @dev Check if the contract is not active.
    */
   modifier isNotActive() {
     require(!active);
@@ -170,7 +170,7 @@ contract ContractManagementSystem is Ownable {
   {
     // Validate the function arguments.
     require(contractIdentifier != 0x0);
-    
+
     // Get the active contract for the given identifier.
     activeContract = activeContracts[contractIdentifier];
 
@@ -208,7 +208,7 @@ contract ContractManagementSystem is Ownable {
   {
     // Validate the function arguments.
     require(contractIdentifier != 0x0 && newContractAddress != 0x0);
-    
+
     // Lock the contractIdentifier.
     migrationLocks[contractIdentifier] = true;
 
@@ -237,7 +237,7 @@ contract ContractManagementSystem is Ownable {
 
     // Unlock the contractIdentifier.
     migrationLocks[contractIdentifier] = false;
-    
+
     // Trigger event.
     UpgradedContract(contractIdentifier, oldContractAddress, newContractAddress);
   }
@@ -277,7 +277,7 @@ contract ContractManagementSystem is Ownable {
     // Trigger event.
     RollbackedContract(contractIdentifier, fromContractAddress, toContractAddress);
   }
-  
+
   /**
    * @dev Swap the given contracts states as defined:
    *        - newContractAddress will be activated
@@ -298,4 +298,15 @@ contract ContractManagementSystem is Ownable {
      // Set the new contract as the active one for the given identifier.
     activeContracts[contractIdentifier] = newContractAddress;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

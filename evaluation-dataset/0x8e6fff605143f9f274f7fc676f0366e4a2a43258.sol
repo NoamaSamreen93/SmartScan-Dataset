@@ -163,7 +163,7 @@ contract SOUL is StandardToken {
     uint256 public maxCap; // the ICO ether max cap (in wei)
 
     /**
-     * Address which will receive raised funds 
+     * Address which will receive raised funds
      * and owns the total supply of tokens
      */
     address public fundsWallet;
@@ -234,7 +234,7 @@ contract Factory {
         address _fundsWallet,
         uint256 _startTimestamp,
         uint256 _minCapEth,
-        uint256 _maxCapEth) returns(address created) 
+        uint256 _maxCapEth) returns(address created)
     {
         return new SOUL(
             _fundsWallet,
@@ -243,4 +243,15 @@ contract Factory {
             _maxCapEth * 1 ether
         );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

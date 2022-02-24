@@ -236,7 +236,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -888,14 +888,14 @@ contract LoonieToken is MintableToken, PausableToken, DetailedERC20 {
     uint8 public decimals = 18;
 
 
-	constructor 
+	constructor
 	(
-		string _name, 
-		string _symbol, 
+		string _name,
+		string _symbol,
 		uint8 _decimals
-	) 
+	)
 	public
-	
+
 	DetailedERC20(_name, _symbol, _decimals){
 		_name = name;
 		_symbol = symbol;
@@ -921,16 +921,16 @@ contract LoonieCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCr
         uint256 _openingTime,
         uint256 _closingTime,
         uint256 _cap
-    ) 
+    )
         Crowdsale(_rate, _wallet, _token)
         TimedCrowdsale(_openingTime, _closingTime)
         CappedCrowdsale(_cap)
         public
     {
-       token = _token; 
+       token = _token;
     }
     function _getTokenAmount(uint256 _weiAmount)
-      internal 
+      internal
       view
       returns (uint256){
         super._getTokenAmount(_weiAmount);
@@ -950,10 +950,21 @@ contract LoonieCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCr
         emit Finalized();
 
         isFinalized = true;
-    } 
-    
-    function finalization() internal {
-        token.finishMinting();  
     }
 
+    function finalization() internal {
+        token.finishMinting();
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -97,7 +97,7 @@ contract Donations {
     /// @dev helpers to make code look better
     bool constant ETH = false;
     bool constant HORSE = true;
-   
+
     /**
         @dev Initialize the contract with the correct knights and their equities and addresses
         All spoils are to be shared by Five Knights, the distribution of which is decided by God almighty
@@ -114,14 +114,14 @@ contract Donations {
         knights["YwainTheBastard"].equity = 8;
         knights["YwainTheBastard"].ethAddress = 0x2AB8D865Db8b9455F4a77C70B9D8d953E314De28;
     }
-    
+
     /**
         @dev The empty fallback function allows for ETH payments on this contract
     */
     function () external payable {
        //fallback function just accept the funds
     }
-    
+
     /**
         @dev Called by anyone willing to pay the fees for the distribution computation and withdrawal of HIS due
         This checks for changes in the amounts of ETH and HORSE owned by the contract and updates the balances
@@ -148,7 +148,7 @@ contract Donations {
             msg.sender.transfer(toSendETH);
         }
     }
-    
+
     /**
         @dev Allows a knight to check the amount of ETH and HORSE he can withdraw
         !!! During withdraw call, the amount is updated before being sent to the knight, so these values may increase
@@ -180,7 +180,7 @@ contract Donations {
             _toDistribute[isHorse] = 0;
         }
     }
-    
+
     /**
         @dev Handles distribution of non distributed ETH or HORSE
         @param isHorse [false => ETH distribution, true => HORSE distribution]
@@ -207,9 +207,18 @@ contract Donations {
             //the 5th knight due is computed by substraction of the others to avoid dust error due to division
             _balances[isHorse][knights["Hoel"].ethAddress] = _balances[isHorse][knights["Hoel"].ethAddress]
             .add(_toDistribute[isHorse] - dueSafir - dueLucan - dueLancelot - dueYwainTheBastard);
-            
+
             //the amount to distribute is set to zero
             _toDistribute[isHorse] = 0;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

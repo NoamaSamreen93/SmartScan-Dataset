@@ -278,20 +278,20 @@ contract KittyBountiesAdmin is Ownable, Pausable {
     /* ****** */
 
     /// @dev This event is fired whenever the owner changes the successfulBountyFeeInBasisPoints.
-    /// @param newSuccessfulBountyFeeInBasisPoints  The SuccessfulFee is expressed in basis points (hundredths of a percantage), 
+    /// @param newSuccessfulBountyFeeInBasisPoints  The SuccessfulFee is expressed in basis points (hundredths of a percantage),
     ///  and is charged when a bounty is successfully completed.
     event SuccessfulBountyFeeInBasisPointsUpdated(uint256 newSuccessfulBountyFeeInBasisPoints);
 
-    /// @dev This event is fired whenever the owner changes the unsuccessfulBountyFeeInWei. 
-    /// @param newUnsuccessfulBountyFeeInWei  The UnsuccessfulBountyFee is paid by the original bounty creator if the bounty expires 
-    ///  without being completed. When a bounty is created, the bounty creator specifies how long the bounty is valid for. If the 
-    ///  bounty is not fulfilled by this expiration date, the original creator can then freely withdraw their funds, minus the 
+    /// @dev This event is fired whenever the owner changes the unsuccessfulBountyFeeInWei.
+    /// @param newUnsuccessfulBountyFeeInWei  The UnsuccessfulBountyFee is paid by the original bounty creator if the bounty expires
+    ///  without being completed. When a bounty is created, the bounty creator specifies how long the bounty is valid for. If the
+    ///  bounty is not fulfilled by this expiration date, the original creator can then freely withdraw their funds, minus the
     ///  UnsuccessfulBountyFee, although the bounty is still fulfillable until the bounty creator withdraws their funds.
     event UnsuccessfulBountyFeeInWeiUpdated(uint256 newUnsuccessfulBountyFeeInWei);
 
-    /// @dev This event is fired whenever the owner changes the maximumLockupDurationInBlocks. 
-    /// @param newMaximumLockoutDurationInBlocks  To prevent users from accidentally locking up ether for an eternity, the lockout 
-    ///  period of all bounties is capped using this variable, which is inially set to 4 weeks. This is measured in blocks, which 
+    /// @dev This event is fired whenever the owner changes the maximumLockupDurationInBlocks.
+    /// @param newMaximumLockoutDurationInBlocks  To prevent users from accidentally locking up ether for an eternity, the lockout
+    ///  period of all bounties is capped using this variable, which is inially set to 4 weeks. This is measured in blocks, which
     ///  are created roughly once every 15 seconds. If the community expresses that they would like a longer maximumLockoutDuration,
     ///  the creator will adjust this variable.
     event MaximumLockoutDurationInBlocksUpdated(uint256 newMaximumLockoutDurationInBlocks);
@@ -314,12 +314,12 @@ contract KittyBountiesAdmin is Ownable, Pausable {
     uint256 public unsuccessfulBountyFeeInWei = 0.008 ether;
 
     /// @dev To prevent users from accidentally locking up ether for an eternity, the lockout period of all bounties is capped
-    ///  using this variable, which is inially set to 4 weeks. This is measured in blocks, which are created roughly once every 15 seconds. 
+    ///  using this variable, which is inially set to 4 weeks. This is measured in blocks, which are created roughly once every 15 seconds.
     ///  If the community expresses that they would like a longer maximumLockoutDuration, the creator will adjust this variable.
     /// @notice This is initalized to 4 weeks in blocks (161280 = 4 (weeks) * 7 (days) * 24 (hours) * 60 (minutes) * 4 (blocks per minute))
     ///  Note that this rests on the assumption that each block takes 15 seconds to propagate. This maximum lockout can be changed by the owner
     ///  if this assumption is invalidated.
-    uint256 public maximumLockoutDurationInBlocks = 161280; 
+    uint256 public maximumLockoutDurationInBlocks = 161280;
 
     /* ********* */
     /* CONSTANTS */
@@ -342,7 +342,7 @@ contract KittyBountiesAdmin is Ownable, Pausable {
         kittyCore = KittyCore(kittyCoreAddress);
     }
 
-    /// @notice Sets the successfulBountyFeeInBasisPoints value (in basis points). Any bounties that are successfully fulfilled 
+    /// @notice Sets the successfulBountyFeeInBasisPoints value (in basis points). Any bounties that are successfully fulfilled
     ///  will have this fee deducted from amount sent to the bounty hunter.
     /// @notice Only callable by the owner.
     /// @dev As this configuration is a basis point, the value to set must be less than or equal to 10000.
@@ -362,8 +362,8 @@ contract KittyBountiesAdmin is Ownable, Pausable {
         emit UnsuccessfulBountyFeeInWeiUpdated(_newUnsuccessfulBountyFeeInWei);
     }
 
-    /// @notice Sets the maximumLockoutDurationInBlocks value. To prevent users from accidentally locking up ether for an eternity, the 
-    ///  lockout period of all bounties is capped using this variable, which is inially set to 4 weeks. This is measured in blocks, which 
+    /// @notice Sets the maximumLockoutDurationInBlocks value. To prevent users from accidentally locking up ether for an eternity, the
+    ///  lockout period of all bounties is capped using this variable, which is inially set to 4 weeks. This is measured in blocks, which
     ///  are created roughly once every 15 seconds. If the assumption of 1 block every 15 seconds is ever invalidated, the owner is able
     ///  to change the maximumLockoutDurationInBlocks using this function.
     /// @notice Only callable by the owner.
@@ -407,17 +407,17 @@ contract KittyCore {
 }
 
 /// @title Main contract for KittyBounties. This contract manages funds from creation to fulfillment for bounties.
-/// @notice Once created, a bounty locks up ether. Optionally, the bounty creator may specify a number of blocks 
-///  to "lock" their bounty, thus preventing them from being able to cancel their bounty or withdraw their ether 
-///  until that number of blocks have passed. This guarantees a time period for bounty hunters to attempt to 
-///  breed for a cat with the specified cattributes, generation, and/or cooldown. This option is included since 
-///  perhaps many breeders will not chase a bounty without this guarantee. After that point, the bounty creator 
-///  can withdraw their funds if they wish and invalidate the bounty, or they can continue to leave the bounty 
+/// @notice Once created, a bounty locks up ether. Optionally, the bounty creator may specify a number of blocks
+///  to "lock" their bounty, thus preventing them from being able to cancel their bounty or withdraw their ether
+///  until that number of blocks have passed. This guarantees a time period for bounty hunters to attempt to
+///  breed for a cat with the specified cattributes, generation, and/or cooldown. This option is included since
+///  perhaps many breeders will not chase a bounty without this guarantee. After that point, the bounty creator
+///  can withdraw their funds if they wish and invalidate the bounty, or they can continue to leave the bounty
 ///  active.
-/// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract before calling 
-///  fulfillBountyAndClaimFunds(). There is no danger of this contract overreaching its approval, since the 
-///  CryptoKitties Core contract's approve() function only approves this contract for a single Cryptokitty. 
-///  Calling approve() allows this contract to transfer the specified kitty in the fulfillOfferAndClaimFunds() 
+/// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract before calling
+///  fulfillBountyAndClaimFunds(). There is no danger of this contract overreaching its approval, since the
+///  CryptoKitties Core contract's approve() function only approves this contract for a single Cryptokitty.
+///  Calling approve() allows this contract to transfer the specified kitty in the fulfillOfferAndClaimFunds()
 ///  function.
 contract KittyBounties is KittyBountiesAdmin {
 
@@ -428,49 +428,49 @@ contract KittyBounties is KittyBountiesAdmin {
     /* DATA TYPES */
     /* ********** */
 
-    /// @dev The main Bounty struct. The struct fits in four 256-bits words due to Solidity's rules for struct 
+    /// @dev The main Bounty struct. The struct fits in four 256-bits words due to Solidity's rules for struct
     ///  packing.
 	struct Bounty {
 		// A bounty creator specifies which portion of the CryptoKitties genome is relevant to this bounty.
 		// This is a bitwise mask, that zeroes out all other portions of the Cryptokitties genome besides
-        // those that the bounty creator is interested in. If a bounty creator does not wish to specify 
-        // genes (perhaps they want to specify generation, but don't have a preference for genes), they can 
+        // those that the bounty creator is interested in. If a bounty creator does not wish to specify
+        // genes (perhaps they want to specify generation, but don't have a preference for genes), they can
         // submit a geneMask of uint256(0) and genes of uint256(0).
 		uint256 geneMask;
-        // A bounty creator specifies which cattributes they are seeking. If a user possesses a cat that 
-        // has both the specified cattributes, the specified generation, and the specified cooldown, then 
-        // they can trade that cat for the bounty. If a bounty creator does not wish to specify genes 
-        // (perhaps they want to specify generation, but don't have a preference for genes), they can 
+        // A bounty creator specifies which cattributes they are seeking. If a user possesses a cat that
+        // has both the specified cattributes, the specified generation, and the specified cooldown, then
+        // they can trade that cat for the bounty. If a bounty creator does not wish to specify genes
+        // (perhaps they want to specify generation, but don't have a preference for genes), they can
         // submit a geneMask of uint256(0) and genes of uint256(0).
         uint256 genes;
 		// The price (in wei) that a user will receive if they successfully fulfill this bounty.
 		uint128 bountyPrice;
-		// The total value (in wei) that the bounty creator originally sent to the contract to create this 
+		// The total value (in wei) that the bounty creator originally sent to the contract to create this
         // bounty. This includes the potential fees to be paid to the contract creator.
 		uint128 totalValueIncludingFees;
-		// The fee that is paid if the bounty is not fulfilled and the owner withdraws their funds. This 
-        // is stored in the Bounty struct to ensure that users are charged the fee that existed at the 
-        // time of a bounty's creation, in case the contract owner changes the fees between when the bounty 
+		// The fee that is paid if the bounty is not fulfilled and the owner withdraws their funds. This
+        // is stored in the Bounty struct to ensure that users are charged the fee that existed at the
+        // time of a bounty's creation, in case the contract owner changes the fees between when the bounty
         // is created and when the bounty creator withdraws their funds.
 		uint128 unsuccessfulBountyFeeInWei;
-		// Optionally, a bounty creator can set a minimum number of blocks that must pass before they can 
-        // cancel a bounty and withdraw their funds (in order to guarantee a time period for bounty hunters 
-        // to attempt to breed for the specified cat). After the time period has passed, the owner can 
-        // withdraw their funds if they wish, but the bounty stays valid until they do so. This allows for 
-        // the possiblity of leaving a bounty open indefinitely until it is filled if the bounty creator 
+		// Optionally, a bounty creator can set a minimum number of blocks that must pass before they can
+        // cancel a bounty and withdraw their funds (in order to guarantee a time period for bounty hunters
+        // to attempt to breed for the specified cat). After the time period has passed, the owner can
+        // withdraw their funds if they wish, but the bounty stays valid until they do so. This allows for
+        // the possiblity of leaving a bounty open indefinitely until it is filled if the bounty creator
         // wishes to do so.
 		uint64 minBlockBountyValidUntil;
-        // A bounty creator can specify the exact generation that they are seeking. If they are willing to 
-        // accept cats of any generation that have the cattributes specified above, they may submit 
+        // A bounty creator can specify the exact generation that they are seeking. If they are willing to
+        // accept cats of any generation that have the cattributes specified above, they may submit
         // UINT16_MAX for this variable for it to be ignored.
         uint16 generation;
-		// A bounty creator can specify the highest cooldownIndex that they are seeking, allowing users to 
-        // place bounties on virgin cats or cats with a sufficient cooldown to be useful in a fancy chase. 
-        // If they are willing to accept cats of any cooldown, they may submit a cooldownIndex of 13 (which 
-        // is the highest cooldown index that the Cryptokitties Core contract allows) for this variable to 
+		// A bounty creator can specify the highest cooldownIndex that they are seeking, allowing users to
+        // place bounties on virgin cats or cats with a sufficient cooldown to be useful in a fancy chase.
+        // If they are willing to accept cats of any cooldown, they may submit a cooldownIndex of 13 (which
+        // is the highest cooldown index that the Cryptokitties Core contract allows) for this variable to
         // be ignored.
         uint16 highestCooldownIndexAccepted;
-        // The creator of the bounty. This address receives the specified cat if the bounty is fulfilled, 
+        // The creator of the bounty. This address receives the specified cat if the bounty is fulfilled,
         // or receives their money back (minus unsuccessfulBountyFee) if the bounty is not fulfilled.
 		address bidder;
     }
@@ -479,38 +479,38 @@ contract KittyBounties is KittyBountiesAdmin {
     /* EVENTS */
     /* ****** */
 
-    /// @dev This event is fired whenever a user creates a new bounty for a cat with a particular set of 
+    /// @dev This event is fired whenever a user creates a new bounty for a cat with a particular set of
     ///  cattributes, generation, and/or cooldown that they are seeking.
-    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the 
+    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the
     ///  bountyIdToBounty mapping.
-    /// @param bidder  The creator of the bounty. This address receives the specified cat if the bounty 
-    ///  is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the bounty is not 
+    /// @param bidder  The creator of the bounty. This address receives the specified cat if the bounty
+    ///  is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the bounty is not
     ///  fulfilled.
-    /// @param bountyPrice  The price (in wei) that a user will receive if they successfully fulfill 
+    /// @param bountyPrice  The price (in wei) that a user will receive if they successfully fulfill
     ///  this bounty.
-    /// @param minBlockBountyValidUntil  Every bounty is valid until at least a specified block. Before 
-    ///  that point, the owner cannot withdraw their funds (in order to guarantee a time period for bounty 
-    ///  hunters to attempt to breed for the specified cat). After the time period has passed, the owner 
-    ///  can withdraw their funds if they wish, but the bounty stays valid until they do so. This allows 
-    ///  for the possiblity of leaving a bounty open indefinitely until it is filled if the bounty creator 
+    /// @param minBlockBountyValidUntil  Every bounty is valid until at least a specified block. Before
+    ///  that point, the owner cannot withdraw their funds (in order to guarantee a time period for bounty
+    ///  hunters to attempt to breed for the specified cat). After the time period has passed, the owner
+    ///  can withdraw their funds if they wish, but the bounty stays valid until they do so. This allows
+    ///  for the possiblity of leaving a bounty open indefinitely until it is filled if the bounty creator
     ///  wishes to do so.
-    /// @param geneMask  A bounty creator specifies which portion of the CryptoKitties genome is relevant 
-    ///  to this bounty. This is a bitwise mask, that zeroes out all other portions of the Cryptokitties 
-    ///  genome besides those that the bounty creator is interested in. 
-    /// @param genes  A bounty creator specifies which cattributes they are seeking. If a user possesses 
-    ///  a cat that has both the specified cattributes and the specified generation, then they can trade 
+    /// @param geneMask  A bounty creator specifies which portion of the CryptoKitties genome is relevant
+    ///  to this bounty. This is a bitwise mask, that zeroes out all other portions of the Cryptokitties
+    ///  genome besides those that the bounty creator is interested in.
+    /// @param genes  A bounty creator specifies which cattributes they are seeking. If a user possesses
+    ///  a cat that has both the specified cattributes and the specified generation, then they can trade
     ///  that cat for the bounty.
-    /// @param generation  A bounty creator can specify the exact generation that they are seeking. If 
-    ///  they are willing to accept cats of any generation that have the cattributes specified above, 
+    /// @param generation  A bounty creator can specify the exact generation that they are seeking. If
+    ///  they are willing to accept cats of any generation that have the cattributes specified above,
     ///  they may submit UINT16_MAX for this variable for it to be ignored.
-    /// @param highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex that 
-    ///  they are seeking, allowing users to place bounties on virgin cats or cats with a sufficient 
-    ///  cooldown to be useful in a fancy chase. If they are willing to accept cats of any cooldown, they 
-    ///  may submit a cooldownIndex of 13 (which is the highest cooldown index that the Cryptokitties 
+    /// @param highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex that
+    ///  they are seeking, allowing users to place bounties on virgin cats or cats with a sufficient
+    ///  cooldown to be useful in a fancy chase. If they are willing to accept cats of any cooldown, they
+    ///  may submit a cooldownIndex of 13 (which is the highest cooldown index that the Cryptokitties
     ///  Core contract allows) for this variable to be ignored.
-    /// @param unsuccessfulBountyFeeInWei  The fee that is paid if the bounty is not fulfilled and the 
-    ///  owner withdraws their funds. This is stored in the Bounty struct to ensure that users are charged 
-    ///  the fee that existed at the time of a bounty's creation, in case the contract owner changes the 
+    /// @param unsuccessfulBountyFeeInWei  The fee that is paid if the bounty is not fulfilled and the
+    ///  owner withdraws their funds. This is stored in the Bounty struct to ensure that users are charged
+    ///  the fee that existed at the time of a bounty's creation, in case the contract owner changes the
     ///  fees between when the bounty is created and when the bounty creator withdraws their funds.
     event CreateBountyAndLockFunds(
     	uint256 bountyId,
@@ -524,39 +524,39 @@ contract KittyBounties is KittyBountiesAdmin {
         uint256 unsuccessfulBountyFeeInWei
     );
 
-    /// @dev This event is fired if a bounty hunter trades in a cat with the specified 
+    /// @dev This event is fired if a bounty hunter trades in a cat with the specified
     ///  cattributes/generation/cooldown and claims the funds locked within the bounty.
-    /// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract before 
-    ///  calling fulfillBountyAndClaimFunds(). There is no danger of this contract overreaching its 
-    ///  approval, since the CryptoKitties Core contract's approve() function only approves this 
-    ///  contract for a single Cryptokitty. Calling approve() allows this contract to transfer the 
+    /// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract before
+    ///  calling fulfillBountyAndClaimFunds(). There is no danger of this contract overreaching its
+    ///  approval, since the CryptoKitties Core contract's approve() function only approves this
+    ///  contract for a single Cryptokitty. Calling approve() allows this contract to transfer the
     ///  specified kitty in the fulfillOfferAndClaimFunds() function.
-    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the 
+    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the
     ///  bountyIdToBounty mapping.
-    /// @param kittyId  The id of the CryptoKitty that fulfills the bounty requirements. 
-    /// @param bidder  The creator of the bounty. This address receives the specified cat if the 
-    ///  bounty is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the 
+    /// @param kittyId  The id of the CryptoKitty that fulfills the bounty requirements.
+    /// @param bidder  The creator of the bounty. This address receives the specified cat if the
+    ///  bounty is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the
     ///  bounty is not fulfilled.
-    /// @param bountyPrice  The price (in wei) that a user will receive if they successfully 
+    /// @param bountyPrice  The price (in wei) that a user will receive if they successfully
     ///  fulfill this bounty.
-    /// @param geneMask  A bounty creator specifies which portion of the CryptoKitties genome is 
-    ///  relevant to this bounty. This is a bitwise mask, that zeroes out all other portions of the 
-    ///  Cryptokitties genome besides those that the bounty creator is interested in. 
-    /// @param genes  A bounty creator specifies which cattributes they are seeking. If a user 
-    ///  possesses a cat that has both the specified cattributes and the specified generation, then 
+    /// @param geneMask  A bounty creator specifies which portion of the CryptoKitties genome is
+    ///  relevant to this bounty. This is a bitwise mask, that zeroes out all other portions of the
+    ///  Cryptokitties genome besides those that the bounty creator is interested in.
+    /// @param genes  A bounty creator specifies which cattributes they are seeking. If a user
+    ///  possesses a cat that has both the specified cattributes and the specified generation, then
     ///  they can trade that cat for the bounty.
-    /// @param generation  A bounty creator can specify the exact generation that they are seeking. 
-    ///  If they are willing to accept cats of any generation that have the cattributes specified 
+    /// @param generation  A bounty creator can specify the exact generation that they are seeking.
+    ///  If they are willing to accept cats of any generation that have the cattributes specified
     ///  above, they may submit UINT16_MAX for this variable for it to be ignored.
-    /// @param highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex 
-    ///  that they are seeking, allowing users to place bounties on virgin cats or cats with a 
-    ///  sufficient cooldown to be useful in a fancy chase. If they are willing to accept cats of 
-    ///  any cooldown, they may submit a cooldownIndex of 13 (which is the highest cooldown index 
+    /// @param highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex
+    ///  that they are seeking, allowing users to place bounties on virgin cats or cats with a
+    ///  sufficient cooldown to be useful in a fancy chase. If they are willing to accept cats of
+    ///  any cooldown, they may submit a cooldownIndex of 13 (which is the highest cooldown index
     ///  that the Cryptokitties Core contract allows) for this variable to be ignored.
-    /// @param successfulBountyFeeInWei  The fee that is paid when the bounty is fulfilled. This 
-    ///  fee is calculated from totalValueIncludingFees and bountyPrice, which are both stored in 
-    ///  the Bounty struct to ensure that users are charged the fee that existed at the time of a 
-    ///  bounty's creation, in case the owner changes the fees between when the bounty is created 
+    /// @param successfulBountyFeeInWei  The fee that is paid when the bounty is fulfilled. This
+    ///  fee is calculated from totalValueIncludingFees and bountyPrice, which are both stored in
+    ///  the Bounty struct to ensure that users are charged the fee that existed at the time of a
+    ///  bounty's creation, in case the owner changes the fees between when the bounty is created
     ///  and when the bounty is fulfilled.
     event FulfillBountyAndClaimFunds(
         uint256 bountyId,
@@ -570,23 +570,23 @@ contract KittyBounties is KittyBountiesAdmin {
         uint256 successfulBountyFeeInWei
     );
 
-    /// @dev This event is fired when a bounty creator wishes to invalidate a bounty. The bounty 
-    ///  creator withdraws the funds and cancels the bounty, preventing anybody from fulfilling 
+    /// @dev This event is fired when a bounty creator wishes to invalidate a bounty. The bounty
+    ///  creator withdraws the funds and cancels the bounty, preventing anybody from fulfilling
     ///  that particular bounty.
-    /// @notice If a bounty creator specified a lock time, a bounty creator cannot withdraw funds 
-    ///  or invalidate a bounty until at least the originally specified number of blocks have 
-    ///  passed. This guarantees a time period for bounty hunters to attempt to breed for a cat 
-    ///  with the specified cattributes/generation/cooldown. However, if the contract is frozen, 
-    ///  a bounty creator may withdraw their funds immediately with no fees taken by the contract 
+    /// @notice If a bounty creator specified a lock time, a bounty creator cannot withdraw funds
+    ///  or invalidate a bounty until at least the originally specified number of blocks have
+    ///  passed. This guarantees a time period for bounty hunters to attempt to breed for a cat
+    ///  with the specified cattributes/generation/cooldown. However, if the contract is frozen,
+    ///  a bounty creator may withdraw their funds immediately with no fees taken by the contract
     ///  owner, since the bounty creator would only freeze the contract if a vulnerability was found.
-    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the 
+    /// @param bountyId  A unique identifier for the Bounty Struct for this bounty, found in the
     ///  bountyIdToBounty mapping.
-    /// @param bidder  The creator of the bounty. This address receives the specified cat if the 
-    ///  bounty is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the 
+    /// @param bidder  The creator of the bounty. This address receives the specified cat if the
+    ///  bounty is fulfilled, or receives their money back (minus unsuccessfulBountyFee) if the
     ///  bounty is not fulfilled.
     /// @param withdrawnAmount  The amount returned to the bounty creator (in wei). If the contract
-    ///  is not frozen, then this is the total value originally sent to the contract minus 
-    ///  unsuccessfulBountyFeeInWei. However, if the contract is frozen, no fees are taken, and the 
+    ///  is not frozen, then this is the total value originally sent to the contract minus
+    ///  unsuccessfulBountyFeeInWei. However, if the contract is frozen, no fees are taken, and the
     ///  entire amount is returned to the bounty creator.
     event WithdrawBounty(
         uint256 bountyId,
@@ -598,20 +598,20 @@ contract KittyBounties is KittyBountiesAdmin {
     /* STORAGE */
     /* ******* */
 
-    /// @dev A mapping that tracks bounties that have been created, regardless of whether they have 
-    ///  been cancelled or claimed thereafter. See the activeBounties mapping to determine whether 
+    /// @dev A mapping that tracks bounties that have been created, regardless of whether they have
+    ///  been cancelled or claimed thereafter. See the activeBounties mapping to determine whether
     ///  a particular bounty is still active.
     mapping (uint256 => Bounty) public bountyIdToBounty;
 
-    /// @dev An index that increments with each Bounty created. Allows the ability to jump directly 
+    /// @dev An index that increments with each Bounty created. Allows the ability to jump directly
     ///  to a specified bounty.
     uint256 public bountyId = 0;
 
-    /// @dev A flag indicating that the contract still contains funds for this particular bounty. 
-    ///  This flag is set to false if the bounty is fulfilled, if the funds are withdrawn by the 
-    ///  original owner, or if this bounty has not yet been created. In all of these cases, the 
-    ///  contract no longer holds funds for this specific bounty. Solidity initializes variables 
-    ///  to zero, so there is no concern that the mapping will have been erroneously initialized 
+    /// @dev A flag indicating that the contract still contains funds for this particular bounty.
+    ///  This flag is set to false if the bounty is fulfilled, if the funds are withdrawn by the
+    ///  original owner, or if this bounty has not yet been created. In all of these cases, the
+    ///  contract no longer holds funds for this specific bounty. Solidity initializes variables
+    ///  to zero, so there is no concern that the mapping will have been erroneously initialized
     ///  with any values set to true.
     mapping (uint256 => bool) public activeBounties;
 
@@ -619,34 +619,34 @@ contract KittyBounties is KittyBountiesAdmin {
     /* FUNCTIONS */
     /* ********* */
 
-    /// @notice Allows a user to create a new bounty for a cat with a particular set of cattributes, 
-    ///  generation, and/or cooldown. This optionally involves locking up a specified amount of eth 
-    ///  for at least a specified number of blocks, in order to guarantee a time period for bounty 
-    ///  hunters to attempt to breed for a cat with the specified cattributes and generation. 
-	/// @param _geneMask  A bounty creator specifies which portion of the CryptoKitties genome is 
-    ///  relevant to this bounty. This is a bitwise mask, that zeroes out all other portions of the 
-    ///  Cryptokitties genome besides those that the bounty creator is interested in. If a bounty 
-    ///  creator does not wish to specify genes (perhaps they want to specify generation, but don't 
+    /// @notice Allows a user to create a new bounty for a cat with a particular set of cattributes,
+    ///  generation, and/or cooldown. This optionally involves locking up a specified amount of eth
+    ///  for at least a specified number of blocks, in order to guarantee a time period for bounty
+    ///  hunters to attempt to breed for a cat with the specified cattributes and generation.
+	/// @param _geneMask  A bounty creator specifies which portion of the CryptoKitties genome is
+    ///  relevant to this bounty. This is a bitwise mask, that zeroes out all other portions of the
+    ///  Cryptokitties genome besides those that the bounty creator is interested in. If a bounty
+    ///  creator does not wish to specify genes (perhaps they want to specify generation, but don't
     ///  have a preference for genes), they can submit a geneMask of uint256(0).
-    /// @param _genes  A bounty creator specifies which cattributes they are seeking. If a user 
-    ///  possesses a cat that has the specified cattributes, the specified generation, and the 
+    /// @param _genes  A bounty creator specifies which cattributes they are seeking. If a user
+    ///  possesses a cat that has the specified cattributes, the specified generation, and the
     ///  specified cooldown, then they can trade that cat for the bounty.
-    /// @param _generation  A bounty creator can specify the exact generation that they are seeking. 
-    ///  If they are willing to accept cats of any generation that have the cattributes specified 
+    /// @param _generation  A bounty creator can specify the exact generation that they are seeking.
+    ///  If they are willing to accept cats of any generation that have the cattributes specified
     ///  above, they may submit UINT16_MAX for this variable for it to be ignored.
-    /// @param _highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex 
-    ///  that they are seeking, allowing users to place bounties on virgin cats or cats with a 
-    ///  sufficient cooldown to be useful in a fancy chase. If they are willing to accept cats of 
-    ///  any cooldown, they may submit  a cooldownIndex of 13 (which is the highest cooldown index 
+    /// @param _highestCooldownIndexAccepted  A bounty creator can specify the highest cooldownIndex
+    ///  that they are seeking, allowing users to place bounties on virgin cats or cats with a
+    ///  sufficient cooldown to be useful in a fancy chase. If they are willing to accept cats of
+    ///  any cooldown, they may submit  a cooldownIndex of 13 (which is the highest cooldown index
     ///  that the Cryptokitties Core contract allows) for this variable to be ignored.
-    /// @param _minNumBlocksBountyIsValidFor  The bounty creator specifies the minimum number of 
-    ///  blocks that this bounty is valid for. Every bounty is valid until at least a specified 
-    ///  block. Before that point, the owner cannot withdraw their funds (in order to guarantee a 
-    ///  time period for bounty hunters to attempt to breed for the specified cat). After the time 
-    ///  period has passed, the owner can withdraw their funds if they wish, but the bounty stays 
-    ///  valid until they do so. This allows for the possiblity of leaving a bounty open indefinitely 
+    /// @param _minNumBlocksBountyIsValidFor  The bounty creator specifies the minimum number of
+    ///  blocks that this bounty is valid for. Every bounty is valid until at least a specified
+    ///  block. Before that point, the owner cannot withdraw their funds (in order to guarantee a
+    ///  time period for bounty hunters to attempt to breed for the specified cat). After the time
+    ///  period has passed, the owner can withdraw their funds if they wish, but the bounty stays
+    ///  valid until they do so. This allows for the possiblity of leaving a bounty open indefinitely
     ///  until it is filled if the bounty creator wishes to do so.
-    /// @notice This function is payable, and any eth sent to this function is interpreted as the 
+    /// @notice This function is payable, and any eth sent to this function is interpreted as the
     ///  value that the user wishes to lock up for this bounty.
     function createBountyAndLockFunds(uint256 _geneMask, uint256 _genes, uint256 _generation, uint256 _highestCooldownIndexAccepted, uint256 _minNumBlocksBountyIsValidFor) external payable whenNotPaused {
     	require(msg.value >= unsuccessfulBountyFeeInWei.mul(uint256(2)), 'the value of your bounty must be at least twice as large as the unsuccessful bounty fee');
@@ -672,7 +672,7 @@ contract KittyBounties is KittyBountiesAdmin {
 
         bountyIdToBounty[bountyId] = bounty;
         activeBounties[bountyId] = true;
-        
+
         emit CreateBountyAndLockFunds(
             bountyId,
 	        msg.sender,
@@ -688,18 +688,18 @@ contract KittyBounties is KittyBountiesAdmin {
         bountyId = bountyId.add(uint256(1));
     }
 
-    /// @notice After calling approve() in the CryptoKitties Core contract, a bounty hunter can 
+    /// @notice After calling approve() in the CryptoKitties Core contract, a bounty hunter can
     ///  submit the id of a kitty that they own and a bounty that they would like to fulfill. If
     ///  the kitty fits the requirements of the bounty, and if the bounty hunter owns the kitty,
-    ///  then this function transfers the kitty to the original bounty creator and transfers the 
+    ///  then this function transfers the kitty to the original bounty creator and transfers the
     ///  locked eth to the bounty hunter.
-    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found in 
+    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found in
     ///  the bountyIdToBounty mapping.
     /// @param _kittyId  The id of the CryptoKitty that fulfills the bounty requirements.
-    /// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract 
-    ///  before calling fulfillBountyAndClaimFunds(). There is no danger of this contract 
-    ///  overreaching its approval, since the CryptoKitties Core contract's approve() function 
-    /// only approves this contract for a single Cryptokitty. Calling approve() allows this 
+    /// @notice The bounty hunter must first call approve() in the Cryptokitties Core contract
+    ///  before calling fulfillBountyAndClaimFunds(). There is no danger of this contract
+    ///  overreaching its approval, since the CryptoKitties Core contract's approve() function
+    /// only approves this contract for a single Cryptokitty. Calling approve() allows this
     /// contract to transfer the specified kitty in the fulfillOfferAndClaimFunds() function.
     function fulfillBountyAndClaimFunds(uint256 _bountyId, uint256 _kittyId) external whenNotPaused {
     	require(activeBounties[_bountyId], 'this bounty has either already completed or has not yet begun');
@@ -714,7 +714,7 @@ contract KittyBounties is KittyBountiesAdmin {
 
         // By submitting ~uint16(0) as the target generation (which is uint16_MAX), a bounty creator can specify that they do not have a preference for generation.
     	require((uint16(bounty.generation) == ~uint16(0) || uint16(generation) == uint16(bounty.generation)), 'your cat is not the correct generation to fulfill this bounty');
-    	// By submitting uint256(0) as the target genemask and submitting uint256(0) for the target genes, a bounty creator can specify that they do not have 
+    	// By submitting uint256(0) as the target genemask and submitting uint256(0) for the target genes, a bounty creator can specify that they do not have
     	// a preference for genes.
     	require((genes & bounty.geneMask) == (bounty.genes & bounty.geneMask), 'your cat does not have the correct genes to fulfill this bounty');
     	// By submitting 13 as the target highestCooldownIndexAccepted, a bounty creator can specify that they do not have a preference for cooldown (since
@@ -740,14 +740,14 @@ contract KittyBounties is KittyBountiesAdmin {
         );
     }
 
-    /// @notice Allows a bounty creator to withdraw the funds locked within a bounty, but only 
-    ///  once a specified time period (measured in blocks) has passed. Prohibiting the bounty 
-    ///  creator from withdrawing their funds until this point guarantees a time period for 
-    ///  bounty hunters to attempt to breed for a cat with the specified cattributes and 
-    ///  generation. If a bounty creator withdraws their funds, then the bounty is invalidated 
-    ///  and bounty hunters can no longer try to fulfill it. A flat fee is taken from the bounty 
+    /// @notice Allows a bounty creator to withdraw the funds locked within a bounty, but only
+    ///  once a specified time period (measured in blocks) has passed. Prohibiting the bounty
+    ///  creator from withdrawing their funds until this point guarantees a time period for
+    ///  bounty hunters to attempt to breed for a cat with the specified cattributes and
+    ///  generation. If a bounty creator withdraws their funds, then the bounty is invalidated
+    ///  and bounty hunters can no longer try to fulfill it. A flat fee is taken from the bounty
     ///  creator's original deposit, specified by unsuccessfulBountyFeeInWei.
-    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found in 
+    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found in
     ///  the bountyIdToBounty mapping.
     function withdrawUnsuccessfulBounty(uint256 _bountyId) external whenNotPaused {
     	require(activeBounties[_bountyId], 'this bounty has either already completed or has not yet begun');
@@ -766,13 +766,13 @@ contract KittyBounties is KittyBountiesAdmin {
         );
     }
 
-    /// @notice Allows a bounty creator to withdraw the funds locked within a bounty, even if 
-    ///  the time period that the bounty was guaranteed to be locked for has not passed. This 
-    ///  function can only be called when the contract is frozen, and would be used as an 
-    ///  emergency measure to allow users to withdraw their funds immediately. No fees are 
+    /// @notice Allows a bounty creator to withdraw the funds locked within a bounty, even if
+    ///  the time period that the bounty was guaranteed to be locked for has not passed. This
+    ///  function can only be called when the contract is frozen, and would be used as an
+    ///  emergency measure to allow users to withdraw their funds immediately. No fees are
     ///  taken when this function is called.
     /// @notice Only callable when the contract is frozen.
-    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found 
+    /// @param _bountyId  A unique identifier for the Bounty Struct for this bounty, found
     ///  in the bountyIdToBounty mapping.
     function withdrawBountyWithNoFeesTakenIfContractIsFrozen(uint256 _bountyId) external whenPaused {
     	require(activeBounties[_bountyId], 'this bounty has either already completed or has not yet begun');
@@ -788,23 +788,34 @@ contract KittyBounties is KittyBountiesAdmin {
         );
     }
 
-    /// @notice Computes the bounty price given a total value sent when creating a bounty, 
-    ///  and the current successfulBountyFee in percentage basis points. 
-    /// @dev 10000 is not a magic number, but is the maximum number of basis points that 
+    /// @notice Computes the bounty price given a total value sent when creating a bounty,
+    ///  and the current successfulBountyFee in percentage basis points.
+    /// @dev 10000 is not a magic number, but is the maximum number of basis points that
     ///  can exist (with basis points being hundredths of a percent).
-    /// @param _totalValueIncludingFees The amount of ether (in wei) that was sent to 
+    /// @param _totalValueIncludingFees The amount of ether (in wei) that was sent to
     ///  create a bounty
-    /// @param _successfulBountyFeeInBasisPoints The percentage (in basis points) of that 
+    /// @param _successfulBountyFeeInBasisPoints The percentage (in basis points) of that
     ///  total amount that will be taken as a fee if the bounty is successfully completed.
-    /// @return The amount of ether (in wei) that will be rewarded if the bounty is 
+    /// @return The amount of ether (in wei) that will be rewarded if the bounty is
     ///  successfully fulfilled
     function _computeBountyPrice(uint256 _totalValueIncludingFees, uint256 _successfulBountyFeeInBasisPoints) internal pure returns (uint256) {
     	return (_totalValueIncludingFees.mul(uint256(10000).sub(_successfulBountyFeeInBasisPoints))).div(uint256(10000));
     }
 
-    /// @dev By calling 'revert' in the fallback function, we prevent anyone from 
+    /// @dev By calling 'revert' in the fallback function, we prevent anyone from
     ///  accidentally sending funds directly to this contract.
     function() external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

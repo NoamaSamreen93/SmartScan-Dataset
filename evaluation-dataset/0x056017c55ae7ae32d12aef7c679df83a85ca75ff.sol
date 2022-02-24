@@ -221,13 +221,13 @@ contract DelayedReleaseToken is StandardToken {
 
     /**
      * @dev Release the previously specified amount of tokens to the provided address
-     * @param destination Address for which tokens will be released (minted) 
+     * @param destination Address for which tokens will be released (minted)
      */
     function releaseTokens(address destination) public {
         require((msg.sender == temporaryAdmin) && (!hasBeenReleased));
         hasBeenReleased = true;
         balances[destination] = numberOfDelayedTokens;
-        Transfer(address(0), destination, numberOfDelayedTokens); 
+        Transfer(address(0), destination, numberOfDelayedTokens);
         TokensReleased(destination, numberOfDelayedTokens);
     }
 
@@ -259,13 +259,13 @@ contract UTXORedeemableToken is StandardToken {
      * @param pos Starting position from which to copy
      * @return Extracted length 32 byte array
      */
-    function extract(bytes data, uint pos) private pure returns (bytes32 result) { 
+    function extract(bytes data, uint pos) private pure returns (bytes32 result) {
         for (uint i = 0; i < 32; i++) {
             result ^= (bytes32(0xff00000000000000000000000000000000000000000000000000000000000000) & data[i + pos]) >> (i * 8);
         }
         return result;
     }
-    
+
     /**
      * @dev Validate that a provided ECSDA signature was signed by the specified address
      * @param hash Hash of signed data
@@ -309,14 +309,14 @@ contract UTXORedeemableToken is StandardToken {
      */
     function pubKeyToBitcoinAddress(bytes pubKey, bool isCompressed) public pure returns (bytes20) {
         /* Helpful references:
-           - https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresses 
+           - https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresses
            - https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js
         */
 
         /* x coordinate - first 32 bytes of public key */
         uint x = uint(extract(pubKey, 0));
         /* y coordinate - second 32 bytes of public key */
-        uint y = uint(extract(pubKey, 32)); 
+        uint y = uint(extract(pubKey, 32));
         uint8 startingByte;
         if (isCompressed) {
             /* Hash the compressed public key format. */
@@ -351,11 +351,11 @@ contract UTXORedeemableToken is StandardToken {
     function canRedeemUTXO(bytes32 txid, bytes20 originalAddress, uint8 outputIndex, uint satoshis, bytes proof) public constant returns (bool) {
         /* Calculate the hash of the Merkle leaf associated with this UTXO. */
         bytes32 merkleLeafHash = keccak256(txid, originalAddress, outputIndex, satoshis);
-    
+
         /* Verify the proof. */
         return canRedeemUTXOHash(merkleLeafHash, proof);
     }
-      
+
     /**
      * @dev Verify that a UTXO with the specified Merkle leaf hash can be redeemed
      * @param merkleLeafHash Merkle tree hash of the UTXO to be checked
@@ -406,7 +406,7 @@ contract UTXORedeemableToken is StandardToken {
         /* Sanity check. */
         require(totalRedeemed <= maximumRedeemable);
 
-        /* Credit the redeemer. */ 
+        /* Credit the redeemer. */
         balances[msg.sender] = SafeMath.add(balances[msg.sender], tokensRedeemed);
 
         /* Mark the transfer event. */
@@ -414,7 +414,7 @@ contract UTXORedeemableToken is StandardToken {
 
         /* Mark the UTXO redemption event. */
         UTXORedeemed(txid, outputIndex, satoshis, proof, pubKey, v, r, s, msg.sender, tokensRedeemed);
-        
+
         /* Return the number of tokens redeemed. */
         return tokensRedeemed;
 
@@ -457,4 +457,15 @@ contract WyvernToken is DelayedReleaseToken, UTXORedeemableToken, BurnableToken 
         multiplier = SATS_TO_TOKENS;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -805,7 +805,7 @@ contract RatScam is modularRatScam {
                 _eventData_.genAmount
             );
         }
-        
+
         _rID = rID_;
         core(_rID, _pID, msg.value, _affID, _eventData_);
     }
@@ -849,7 +849,7 @@ contract RatScam is modularRatScam {
                 _eventData_.genAmount
             );
         }
-        
+
         // get earnings from all vaults and return unused to gen vault
         // because we use a custom safemath library.  this will throw if player
         // tried to spend more eth than they have.
@@ -1155,7 +1155,7 @@ contract RatScam is modularRatScam {
             _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         }
         uint256 _dust = _gen.sub((_ppt.mul(round_[_rID].keys)) / 1000000000000000000);
-        
+
         if (_dust > 0)
         {
             _gen = _gen.sub(_dust);
@@ -1727,4 +1727,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

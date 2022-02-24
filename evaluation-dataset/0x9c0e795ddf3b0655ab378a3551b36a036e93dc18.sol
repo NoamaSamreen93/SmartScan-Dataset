@@ -138,7 +138,7 @@ contract MultiOwned is IMultiOwned {
             uint indexToDelete = owners[_account];
             address keyToMove = ownersIndex[ownersIndex.length - 1];
             ownersIndex[indexToDelete] = keyToMove;
-            owners[keyToMove] = indexToDelete; 
+            owners[keyToMove] = indexToDelete;
             ownersIndex.length--;
         }
     }
@@ -148,7 +148,7 @@ contract MultiOwned is IMultiOwned {
 /**
  * IObservable
  *
- * Allows observers to register and unregister with the 
+ * Allows observers to register and unregister with the
  * implementing smart-contract that is observable
  *
  * #created 09/10/2017
@@ -159,7 +159,7 @@ interface IObservable {
 
     /**
      * Returns true if `_account` is a registered observer
-     * 
+     *
      * @param _account The account to test against
      * @return Whether the account is a registered observer
      */
@@ -168,7 +168,7 @@ interface IObservable {
 
     /**
      * Gets the amount of registered observers
-     * 
+     *
      * @return The amount of registered observers
      */
     function getObserverCount() public view returns (uint);
@@ -176,7 +176,7 @@ interface IObservable {
 
     /**
      * Gets the observer at `_index`
-     * 
+     *
      * @param _index The index of the observer
      * @return The observers address
      */
@@ -185,7 +185,7 @@ interface IObservable {
 
     /**
      * Register `_observer` as an observer
-     * 
+     *
      * @param _observer The account to add as an observer
      */
     function registerObserver(address _observer) public;
@@ -193,7 +193,7 @@ interface IObservable {
 
     /**
      * Unregister `_observer` as an observer
-     * 
+     *
      * @param _observer The account to remove as an observer
      */
     function unregisterObserver(address _observer) public;
@@ -203,7 +203,7 @@ interface IObservable {
 /**
  * Abstract Observable
  *
- * Allows observers to register and unregister with the the 
+ * Allows observers to register and unregister with the the
  * implementing smart-contract that is observable
  *
  * #created 09/10/2017
@@ -219,7 +219,7 @@ contract Observable is IObservable {
 
     /**
      * Returns true if `_account` is a registered observer
-     * 
+     *
      * @param _account The account to test against
      * @return Whether the account is a registered observer
      */
@@ -230,7 +230,7 @@ contract Observable is IObservable {
 
     /**
      * Gets the amount of registered observers
-     * 
+     *
      * @return The amount of registered observers
      */
     function getObserverCount() public view returns (uint) {
@@ -240,7 +240,7 @@ contract Observable is IObservable {
 
     /**
      * Gets the observer at `_index`
-     * 
+     *
      * @param _index The index of the observer
      * @return The observers address
      */
@@ -251,7 +251,7 @@ contract Observable is IObservable {
 
     /**
      * Register `_observer` as an observer
-     * 
+     *
      * @param _observer The account to add as an observer
      */
     function registerObserver(address _observer) public {
@@ -264,7 +264,7 @@ contract Observable is IObservable {
 
     /**
      * Unregister `_observer` as an observer
-     * 
+     *
      * @param _observer The account to remove as an observer
      */
     function unregisterObserver(address _observer) public {
@@ -280,7 +280,7 @@ contract Observable is IObservable {
 
 
     /**
-     * Returns whether it is allowed to register `_observer` by calling 
+     * Returns whether it is allowed to register `_observer` by calling
      * canRegisterObserver() in the implementing smart-contract
      *
      * @param _observer The address to register as an observer
@@ -290,7 +290,7 @@ contract Observable is IObservable {
 
 
     /**
-     * Returns whether it is allowed to unregister `_observer` by calling 
+     * Returns whether it is allowed to unregister `_observer` by calling
      * canRegisterObserver() in the implementing smart-contract
      *
      * @param _observer The address to unregister as an observer
@@ -304,7 +304,7 @@ contract Observable is IObservable {
 /**
  * ITokenObserver
  *
- * Allows a token smart-contract to notify observers 
+ * Allows a token smart-contract to notify observers
  * when tokens are received
  *
  * #created 09/10/2017
@@ -314,7 +314,7 @@ interface ITokenObserver {
 
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -337,7 +337,7 @@ contract TokenObserver is ITokenObserver {
 
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -350,7 +350,7 @@ contract TokenObserver is ITokenObserver {
 
     /**
      * Event handler
-     * 
+     *
      * Called by `_token` when a token amount is received
      *
      * @param _token The token contract that received the transaction
@@ -436,28 +436,28 @@ contract InputValidator {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IToken { 
+interface IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() public view returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -465,9 +465,9 @@ interface IToken {
     function transfer(address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -476,9 +476,9 @@ interface IToken {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -486,9 +486,9 @@ interface IToken {
     function approve(address _spender, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -510,7 +510,7 @@ contract Token is IToken, InputValidator {
 
     // Ethereum token standard
     string public standard = "Token 0.3.1";
-    string public name;        
+    string public name;
     string public symbol;
     uint8 public decimals;
 
@@ -528,9 +528,9 @@ contract Token is IToken, InputValidator {
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 
-    /** 
+    /**
      * Construct ERC20 token
-     * 
+     *
      * @param _name The full token name
      * @param _symbol The token symbol (aberration)
      * @param _decimals The token precision
@@ -544,9 +544,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Get the total token supply
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() public view returns (uint) {
@@ -554,9 +554,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
@@ -565,9 +565,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -575,7 +575,7 @@ contract Token is IToken, InputValidator {
     function transfer(address _to, uint _value) public safe_arguments(2) returns (bool) {
 
         // Check if the sender has enough tokens
-        require(balances[msg.sender] >= _value);   
+        require(balances[msg.sender] >= _value);
 
         // Check for overflows
         require(balances[_to] + _value >= balances[_to]);
@@ -590,13 +590,13 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
-     * @return Whether the transfer was successful or not 
+     * @return Whether the transfer was successful or not
      */
     function transferFrom(address _from, address _to, uint _value) public safe_arguments(3) returns (bool) {
 
@@ -622,9 +622,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -640,9 +640,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -660,23 +660,23 @@ contract Token is IToken, InputValidator {
  * Adds the following functionality to the basic ERC20 token
  * - Locking
  * - Issuing
- * - Burning 
+ * - Burning
  *
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IManagedToken { 
+interface IManagedToken {
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() public view returns (bool);
 
 
     /**
-     * Locks the token so that the transfering of value is disabled 
+     * Locks the token so that the transfering of value is disabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -684,7 +684,7 @@ interface IManagedToken {
 
 
     /**
-     * Unlocks the token so that the transfering of value is enabled 
+     * Unlocks the token so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -706,7 +706,7 @@ interface IManagedToken {
      *
      * @param _from The address that owns the tokens to be burned
      * @param _value The amount of tokens to be burned
-     * @return Whether the tokens where sucessfully burned or not 
+     * @return Whether the tokens where sucessfully burned or not
      */
     function burn(address _from, uint _value) public returns (bool);
 }
@@ -718,7 +718,7 @@ interface IManagedToken {
  * Adds the following functionality to the basic ERC20 token
  * - Locking
  * - Issuing
- * - Burning 
+ * - Burning
  *
  * #created 29/09/2017
  * #author Frank Bonnet
@@ -738,23 +738,23 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
     }
 
 
-    /** 
+    /**
      * Construct managed ERC20 token
-     * 
+     *
      * @param _name The full token name
      * @param _symbol The token symbol (aberration)
      * @param _decimals The token precision
      * @param _locked Whether the token should be locked initially
      */
-    function ManagedToken(string _name, string _symbol, uint8 _decimals, bool _locked) public 
+    function ManagedToken(string _name, string _symbol, uint8 _decimals, bool _locked) public
         Token(_name, _symbol, _decimals) {
         locked = _locked;
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -764,9 +764,9 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -777,9 +777,9 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
     }
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -789,9 +789,9 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
     }
 
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() public view returns (bool) {
@@ -800,7 +800,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
 
 
     /**
-     * Locks the token so that the transfering of value is enabled 
+     * Locks the token so that the transfering of value is enabled
      *
      * @return Whether the locking was successful or not
      */
@@ -811,7 +811,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
 
 
     /**
-     * Unlocks the token so that the transfering of value is enabled 
+     * Unlocks the token so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -829,7 +829,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
      * @return Whether the approval was successful or not
      */
     function issue(address _to, uint _value) public only_owner safe_arguments(2) returns (bool) {
-        
+
         // Check for overflows
         require(balances[_to] + _value >= balances[_to]);
 
@@ -837,7 +837,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
         balances[_to] += _value;
         totalTokenSupply += _value;
 
-        // Notify listeners 
+        // Notify listeners
         Transfer(0, this, _value);
         Transfer(this, _to, _value);
         return true;
@@ -863,7 +863,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
         balances[_from] -= _value;
         totalTokenSupply -= _value;
 
-        // Notify listeners 
+        // Notify listeners
         Transfer(_from, 0, _value);
         return true;
     }
@@ -873,10 +873,10 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
 /**
  * ATM Security token (KATM)
  *
- * KATM maintaining the primary security functions of the ATM token as 
+ * KATM maintaining the primary security functions of the ATM token as
  * outlined within the whitepaper.
  *
- * Those who bear ATMS will be entitled to profit sharing in the form of dividends, 
+ * Those who bear ATMS will be entitled to profit sharing in the form of dividends,
  * and is considered the "Security" token.
  *
  * #created 30/10/2017
@@ -884,7 +884,7 @@ contract ManagedToken is IManagedToken, Token, MultiOwned {
  */
 contract KATMToken is ManagedToken, Observable, TokenRetriever {
 
-    
+
     /**
      * Construct the managed security token
      */
@@ -913,10 +913,10 @@ contract KATMToken is ManagedToken, Observable, TokenRetriever {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
      * - Notifies registered observers when the observer receives tokens
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -931,10 +931,10 @@ contract KATMToken is ManagedToken, Observable, TokenRetriever {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
      * - Notifies registered observers when the observer receives tokens
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -952,8 +952,8 @@ contract KATMToken is ManagedToken, Observable, TokenRetriever {
 
     /**
      * Failsafe mechanism
-     * 
-     * Allows the owner to retrieve tokens from the contract that 
+     *
+     * Allows the owner to retrieve tokens from the contract that
      * might have been send there by accident
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -969,4 +969,16 @@ contract KATMToken is ManagedToken, Observable, TokenRetriever {
     function () public payable {
         revert();
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

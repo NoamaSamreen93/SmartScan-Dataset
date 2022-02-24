@@ -40,7 +40,7 @@ contract Operations {
     }
 }
 contract DataRegister is Operations {
-    bytes32 Institute; 
+    bytes32 Institute;
     address owner;
     mapping(bytes10 => bytes) Instructor;
     mapping(uint => bytes10) InstructorUIds;
@@ -115,7 +115,7 @@ contract DataRegister is Operations {
         _;
     }
     function RegisterInstructor(
-        string memory instructorUId, 
+        string memory instructorUId,
         string memory instructor
         ) public onlyOwner notEmpty(instructorUId) notEmpty(instructor) uniqueInstructorUId(instructorUId) returns(bool) {
             bytes10 _instructorUId = bytes10(stringToBytes32(instructorUId));
@@ -131,7 +131,7 @@ contract DataRegister is Operations {
         string memory EndDate,
         uint Hours,
         uint InstructorId
-        ) public onlyOwner notEmpty(CourseUId) notEmpty(CourseName) 
+        ) public onlyOwner notEmpty(CourseUId) notEmpty(CourseName)
             isPositive(Hours) haveInstructor(InstructorId) uniqueCourseUId(CourseUId) {
             course memory _course = setCourseElements(CourseName, StartDate, EndDate, Hours, InstructorId);
             CourseCount++;
@@ -140,8 +140,8 @@ contract DataRegister is Operations {
             Course[_courseUId] = _course;
     }
     function setCourseElements(
-        string memory CourseName, 
-        string memory StartDate, 
+        string memory CourseName,
+        string memory StartDate,
         string memory EndDate,
         uint Hours,
         uint InstructorId
@@ -173,7 +173,7 @@ contract DataRegister is Operations {
         uint StudentId,
         uint CertificateType,
         string memory Result
-        ) public onlyOwner haveStudent(StudentId) haveCourse(CourseId) 
+        ) public onlyOwner haveStudent(StudentId) haveCourse(CourseId)
         uniqueCertificateUId(CertificateUId) isPositive(CertificateType) returns(bool) {
             certificate memory _certificate;
             _certificate.CourseId = CourseId;
@@ -221,14 +221,14 @@ contract CryptoClassCertificate is DataRegister {
     function GetInstructors() public view onlyOwner returns(string memory) {
         uint len = 30;
         uint i;
-        for (i=1 ; i <= InstructorCount ; i++) 
+        for (i=1 ; i <= InstructorCount ; i++)
             len += 30 + Instructor[InstructorUIds[i]].length;
         bytes memory instructors = new bytes(len);
         uint[1] memory pointer;
         pointer[0]=0;
         copyBytesNToBytes('{ "Instructors":[', instructors, pointer);
         for (i=1 ; i <= InstructorCount ; i++) {
-            if (i > 1) 
+            if (i > 1)
                 copyBytesNToBytes(',', instructors, pointer);
             copyBytesNToBytes('{"Id":"', instructors, pointer);
             copyBytesNToBytes(InstructorUIds[i], instructors, pointer);
@@ -265,7 +265,7 @@ contract CryptoClassCertificate is DataRegister {
         course memory _course;
         uint i;
         for (i=1; i<=CourseCount; i++) {
-            if (Course[CourseUIds[i]].InstructorId == _instructorId) { 
+            if (Course[CourseUIds[i]].InstructorId == _instructorId) {
                 _course = Course[CourseUIds[i]];
                 len += 180 + Institute.length + _course.CourseName.length + Instructor[InstructorUIds[_course.InstructorId]].length;
             }
@@ -384,7 +384,7 @@ contract CryptoClassCertificate is DataRegister {
     function GetStudents() public view onlyOwner returns(string memory) {
         uint len = 30;
         uint i;
-        for (i=1 ; i <= StudentCount ; i++) 
+        for (i=1 ; i <= StudentCount ; i++)
             len += 50 + 3 + Student[StudentUIds[i]].Name.length;
         bytes memory students = new bytes(len);
         uint[1] memory pointer;
@@ -467,7 +467,7 @@ contract CryptoClassCertificate is DataRegister {
         return(string(certSpec));
     }
     function GetCertificateTypeDescription(uint Type) pure internal returns(bytes10) {
-        if (Type == 1) 
+        if (Type == 1)
             return('Attendance');
         else if (Type == 2)
             return('Online');
@@ -477,5 +477,18 @@ contract CryptoClassCertificate is DataRegister {
             return('ELearning');
         else
             return(bytes10(uintToBytesN(Type)));
-    } 
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

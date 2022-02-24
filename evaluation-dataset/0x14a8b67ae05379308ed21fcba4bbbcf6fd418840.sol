@@ -6,10 +6,10 @@ contract LoversForLife {
         string lover2;
         string whyDoYouLove;
         uint worth;
-        
-        
+
+
     }
-    
+
     uint minPrice = 500000000000000;
     uint maxPrice = 500000000000000000;
     address creator;
@@ -25,7 +25,7 @@ contract LoversForLife {
         require(msg.sender == creator);
         minPrice = price;
     }
-    
+
     function createLover(string l1, string l2, string message) public payable{
         require(msg.value >= minPrice);
         require(msg.value <= maxPrice);
@@ -34,22 +34,33 @@ contract LoversForLife {
             lover2: l2,
             whyDoYouLove: message,
             worth: msg.value
-            
-            
+
+
         });
-        
+
         loverList.push(newLover);
         loverNumber[msg.sender] = amountOfLovers;
         amountOfLovers++;
-       
+
         creator.transfer(msg.value);
     }
-    
+
     function findLover(address user) public view returns (uint){
         return loverNumber[user];
     }
-    
-    
-    
-    
+
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

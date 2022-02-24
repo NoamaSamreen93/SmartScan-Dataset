@@ -186,7 +186,7 @@ contract TombAction is TombOwnership {
         if (msg.value < currentPrice) revert();
         _createTombWithData(msg.sender, data);
     }
- 
+
     function changePrice(uint256 newPrice) external onlyOwner {
         //gwei to ether
         uint256 gweiUnit = 1000000000;
@@ -203,4 +203,15 @@ contract TombCore is TombAction {
         ownerAddress = msg.sender;
         currentPrice = 0.02 ether;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -86,15 +86,15 @@ contract Sports3D {
 
     /// @dev Collect 100 TICKETS to activate your link
     uint256 public stakingRequirement = 100e18;
-    
+
     address internal devFeeAddress = 0x5B2FA02281491E51a97c0b087215c8b2597C8a2f;
     address internal marketingFeeAddress = 0x4c326AB6Ee2b1D6BB001231Ea76b8C7093474eD0;
     address internal ownerFeeAddress = 0x2959114502Fca4d506Ae7cf88f602e7038a29AC1;
-    address internal employeeFeeAddress1 = 0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF; 
+    address internal employeeFeeAddress1 = 0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF;
     address internal employeeFeeAddress2 = 0xC6D4a4A0bf0507749D4a23C9550A826207b5D94b;
     address internal neatFeeAddress = 0x8b8158c9D815E7720e16CEc3e1166A2D4F96b8A6;
 
-    
+
     address internal admin;
     mapping(address => bool) internal ambassadors_;
 
@@ -113,80 +113,80 @@ contract Sports3D {
     uint256 constant internal ambassadorQuota_ = 5000 ether;
     bool public onlyAmbassadors = true;
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
-    
+
     uint ACTIVATION_TIME = 1544389200;
-    
+
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if(onlyAmbassadors){
             require(
                 // is the customer in the ambassador list?
                 (ambassadors_[msg.sender] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[msg.sender] + _amountOfEthereum) <= ambassadorMaxPurchase_)
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[msg.sender] = SafeMath.add(ambassadorAccumulatedQuota_[msg.sender], _amountOfEthereum);
-        
+
             // execute
             _;
         }else{
             onlyAmbassadors=false;
             _;
         }
-        
+
     }
-    
-    
+
+
     function Sports3D() public{
         admin=msg.sender;
         ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; //
-        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; // 
-        ambassadors_[0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF] = true; // 
+        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; //
+        ambassadors_[0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF] = true; //
         ambassadors_[0xC6D4a4A0bf0507749D4a23C9550A826207b5D94b] = true; //
         ambassadors_[0x77dD6596171174C8A21Ad859847ddAdDb8D11460] = true; //
         ambassadors_[0xEc31176d4df0509115abC8065A8a3F8275aafF2b] = true; //
         ambassadors_[0x2277715856C6d9E0181BA01d21e059f76C79f2bD] = true; //
         ambassadors_[0x7A5C4cAF90e9211D7D474918F764eBdC2f9Ec1a3] = true; //
-        
-        
-        
-        
+
+
+
+
 
     }
-    
+
   function disableAmbassadorPhase() public{
         require(admin==msg.sender);
         onlyAmbassadors=false;
     }
-    
+
   function changeEmployee1(address _employeeAddress1) public{
         require(admin==msg.sender);
         employeeFeeAddress1=_employeeAddress1;
     }
-    
+
   function changeEmployee2(address _employeeAddress2) public{
         require(admin==msg.sender);
         employeeFeeAddress2=_employeeAddress2;
     }
-    
+
   function changeMarketing(address _marketingAddress) public{
         require(admin==msg.sender);
         marketingFeeAddress=_marketingAddress;
     }
-    
+
   function changeNeat(address _neatAddress) public{
         require(admin==msg.sender);
         neatFeeAddress=_neatAddress;
     }
-    
+
     /*=======================================
     =            PUBLIC FUNCTIONS           =
     =======================================*/
@@ -268,7 +268,7 @@ contract Sports3D {
         uint256 _marketingFee = SafeMath.div(SafeMath.mul(_ethereum, 5), 200);
         uint256 _ownerFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 200);
         uint256 _neatFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 200);
-        
+
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(SafeMath.sub(SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _devFee), _marketingFee), _ownerFee), _neatFee);
 
         // burn the sold tokens
@@ -290,7 +290,7 @@ contract Sports3D {
         neatFeeAddress.transfer(_neatFee);
         // fire event
          onTokenSell(_customerAddress, _tokens, _taxedEthereum, now, buyPrice());
-       
+
     }
 
 
@@ -448,7 +448,7 @@ contract Sports3D {
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 200));
-        
+
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
@@ -627,4 +627,13 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

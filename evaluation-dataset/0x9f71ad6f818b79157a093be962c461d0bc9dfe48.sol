@@ -119,27 +119,27 @@ contract Token is StandardToken, SafeMath, Ownable {
 
 contract Apen is Token {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'A1.1'; 
-    uint256 public unitsPerEth;     
-    uint256 public maxApenSell;         
-    uint256 public totalEthPos;  
-    address public ownerWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'A1.1';
+    uint256 public unitsPerEth;
+    uint256 public maxApenSell;
+    uint256 public totalEthPos;
+    address public ownerWallet;
 
     function Apen() public {
-        decimals = 18;   
-        totalSupply = withDecimals(21000000, decimals); 
-        balances[msg.sender] = totalSupply;  
-        maxApenSell = div(totalSupply, 2);         
-        name = "Apen";                                             
-        symbol = "APEN";                                 
-        unitsPerEth = 1000;                           
+        decimals = 18;
+        totalSupply = withDecimals(21000000, decimals);
+        balances[msg.sender] = totalSupply;
+        maxApenSell = div(totalSupply, 2);
+        name = "Apen";
+        symbol = "APEN";
+        unitsPerEth = 1000;
     }
 
     function() public payable{
-        
+
         uint256 amount = mul(msg.value, unitsPerEth);
         require(balances[ownerWallet] >= amount);
         require(balances[ownerWallet] >= maxApenSell);
@@ -152,7 +152,7 @@ contract Apen is Token {
 
         totalEthPos = add(totalEthPos, msg.value);
 
-        ownerWallet.transfer(msg.value);                               
+        ownerWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -162,4 +162,13 @@ contract Apen is Token {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

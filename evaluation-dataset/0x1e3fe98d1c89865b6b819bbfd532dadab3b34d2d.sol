@@ -118,7 +118,7 @@ contract DETToken is ERC20 {
   string private constant name_ = 'DETToken';                                 // Set the token name for display
   string private constant symbol_ = 'DET';                                         // Set the token symbol for display
   uint8 private constant decimals_ = 18;                                          // Set the number of decimals for display
-  
+
 
   constructor () public {
     balances[msg.sender] = totalSupply_;
@@ -131,7 +131,7 @@ contract DETToken is ERC20 {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
    /**
   * @dev Token name
   */
@@ -205,7 +205,7 @@ contract DETToken is ERC20 {
    */
   function approve(address _spender, uint256 _value) public returns (bool) {
     require(_spender != address(0));
-	
+
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
@@ -234,5 +234,16 @@ contract DETToken is ERC20 {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
     return true;
-  }  
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

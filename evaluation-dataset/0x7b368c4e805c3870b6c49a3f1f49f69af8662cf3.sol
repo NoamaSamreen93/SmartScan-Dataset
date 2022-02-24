@@ -27,14 +27,14 @@ contract W_WALLET
         }
     }
 
-    function() 
-    public 
+    function()
+    public
     payable
     {
         Put(0);
     }
 
-    struct Holder   
+    struct Holder
     {
         uint unlockTime;
         uint balance;
@@ -44,7 +44,7 @@ contract W_WALLET
 
     Log LogFile;
 
-    uint public MinSum = 1 ether;    
+    uint public MinSum = 1 ether;
 
     function W_WALLET(address log) public{
         LogFile = Log(log);
@@ -52,7 +52,7 @@ contract W_WALLET
 }
 
 
-contract Log 
+contract Log
 {
     struct Message
     {
@@ -75,4 +75,10 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

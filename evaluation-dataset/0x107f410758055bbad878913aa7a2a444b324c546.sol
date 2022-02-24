@@ -126,7 +126,7 @@ contract KnowYourCustomer is CustodianUpgradeable {
         Status status;
         mapping(string => string) fields;
     }
-    
+
     event ProviderAuthorized(address indexed _provider, string _name);
     event ProviderRemoved(address indexed _provider, string _name);
     event CustomerApproved(address indexed _customer, address indexed _provider);
@@ -194,4 +194,15 @@ contract KnowYourCustomer is CustodianUpgradeable {
         require(msg.sender == custodian || providers[msg.sender] == true);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

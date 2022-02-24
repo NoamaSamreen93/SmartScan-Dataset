@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -140,7 +140,7 @@ contract StandardToken is IERC20 {
     mapping (address => mapping (address => uint256)) internal _allowed;
 
     uint256 internal _totalSupply;
-    
+
     /**
      * @dev Total number of tokens in existence.
      */
@@ -386,7 +386,7 @@ contract FreezableToken is PausableToken {
         frozenCheck(_from);
         frozenCheck(_to);
         return super.transferFrom(_from, _to, _value);
-    }   
+    }
 }
 
 contract AICCToken is FreezableToken {
@@ -454,7 +454,7 @@ contract AICCToken is FreezableToken {
             return 0;
         }
      }
-    
+
     /**
      * @dev Rewrite the transfer function to automatically unlock the locked tokens.
      */
@@ -495,4 +495,13 @@ contract AICCToken is FreezableToken {
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

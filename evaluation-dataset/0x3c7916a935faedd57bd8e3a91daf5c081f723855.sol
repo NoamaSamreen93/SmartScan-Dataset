@@ -109,7 +109,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -256,4 +256,17 @@ contract PowerToken is TokenERC20 {
     function PowerToken() TokenERC20(100000000, "PowerCoin", "LHF", 18) public {
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

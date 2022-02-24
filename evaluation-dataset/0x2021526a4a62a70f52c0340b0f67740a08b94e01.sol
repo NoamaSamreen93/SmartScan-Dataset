@@ -13,7 +13,7 @@ contract Bcxss {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
 
@@ -27,7 +27,7 @@ contract Bcxss {
     ) public {
         owner = msg.sender;
         name = tokenName;
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;
@@ -42,7 +42,7 @@ contract Bcxss {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -52,7 +52,7 @@ contract Bcxss {
             owner = newOwner;
         }
     }
- 
+
 
     function _transfer(address _from, address _to, uint _value) isLock internal {
         require (_to != 0x0);
@@ -92,8 +92,8 @@ contract Bcxss {
     }
 
     function burnFrom(address _from, uint256 _value) onlyOwner public returns (bool success) {
-        require(balanceOf[_from] >= _value); 
-        require(_value <= allowance[_from][msg.sender]); 
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;
@@ -107,7 +107,7 @@ contract Bcxss {
         totalSupply += _amount;
         emit Transfer(this, target, _amount);
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
@@ -119,4 +119,15 @@ contract Bcxss {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

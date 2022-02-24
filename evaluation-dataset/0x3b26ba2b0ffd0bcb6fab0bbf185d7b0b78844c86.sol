@@ -158,7 +158,7 @@ contract MintableToken is StandardToken, Ownable {
     Mint(_to, _amount);
     Transfer(address(0), _to, _amount);
     ChangeBalance (address(0), 0, _to, balances[_to], ++seq);
-    return true; 
+    return true;
   }
 }
 
@@ -194,7 +194,7 @@ contract Crowdsale {
   uint256 public cap;
 
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount, uint256 seq);
-  
+
   function Crowdsale(uint256[] _startTime, uint256[] _endTime, uint256[] _rates, address _wallet, uint256 _cap) public {
     // require(_startTime >= now);
 
@@ -210,8 +210,8 @@ contract Crowdsale {
     rates = _rates;
 
     // token = createTokenContract();
-    
-    
+
+
     startTime = _startTime[0];
     endTime = _endTime[_endTime.length - 1];
     rate = _rates[0];
@@ -243,7 +243,7 @@ contract Crowdsale {
         rate = rates[i];
         break;
       }
-    }    
+    }
     uint256 tokens = weiAmount.mul(rate);
     require (checkCap(tokens));
 
@@ -263,7 +263,7 @@ contract Crowdsale {
   function validPurchase() internal view returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
     bool nonZeroPurchase = msg.value != 0;
-    
+
     return withinPeriod && nonZeroPurchase;
   }
 
@@ -324,7 +324,7 @@ contract OMXCrowdsale is FinalizableCrowdsale {
     uint256 salesCap    = 300000000000000000000000000;
     uint256 cap         = 500000000000000000000000000;
 
-  function OMXCrowdsale(address _wallet, address _token) public 
+  function OMXCrowdsale(address _wallet, address _token) public
       FinalizableCrowdsale() Crowdsale(start, end, rate, _wallet, salesCap)
   {
       companyWallet = _wallet;
@@ -343,4 +343,15 @@ contract OMXCrowdsale is FinalizableCrowdsale {
       token.mint(companyWallet, cap - token.totalSupply());
       super.finalize();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

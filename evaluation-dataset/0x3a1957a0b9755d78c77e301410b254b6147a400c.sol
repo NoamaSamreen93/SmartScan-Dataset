@@ -832,7 +832,7 @@ contract IMarketplace {
 // File: contracts/GameData.sol
 
 contract GameData {
-    struct Country {       
+    struct Country {
         bytes2 isoCode;
         uint8 animalsCount;
         uint256[3] animalIds;
@@ -843,15 +843,15 @@ contract GameData {
         uint256 currentValue;
         uint8 rarity; // 0-4, rarity = stat range, higher rarity = better stats
 
-        bytes32 name;         
+        bytes32 name;
         uint256 countryId; // country of origin
 
     }
 
     struct Dna {
-        uint256 animalId; 
+        uint256 animalId;
         uint8 effectiveness; //  1 - 100, 100 = same stats as a wild card
-    }    
+    }
 }
 
 // File: openzeppelin-solidity/contracts/ownership/Ownable.sol
@@ -1374,4 +1374,15 @@ contract CryptoServal is ERC721Token("CryptoServal", "CS"), GameData, Restricted
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

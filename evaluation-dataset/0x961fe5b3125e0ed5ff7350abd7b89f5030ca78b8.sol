@@ -1,4 +1,4 @@
-/*  
+/*
     Subscrypto
     Copyright (C) 2019 Subscrypto Team
 
@@ -121,7 +121,7 @@ contract Subscrypto {
     );
 
     event Unsubscribe(
-        address indexed subscriber, 
+        address indexed subscriber,
         address indexed receiver
     );
 
@@ -231,7 +231,7 @@ contract Subscrypto {
 
         nextIndex++;
     }
-    
+
     /**
      * Deactivate a subscription. Must be called by the subscriber's account.
      * Payments cannot be collected from deactivated subscriptons.
@@ -312,7 +312,7 @@ contract Subscrypto {
      * Collect all available *funded* payments for a receiver's account.
      * Helper function that calls executeDebitsRange() with the full range.
      * Will process as many payments as possible with the gas provided and exit gracefully.
-     * 
+     *
      * @param receiver address
      */
     function executeDebits(address receiver) external {
@@ -377,7 +377,7 @@ contract Subscrypto {
     /**
      * Collect available *funded* payments for a receiver's account within a certain range of receiverSubs[receiver].
      * Will process as many payments as possible with the gas provided and exit gracefully.
-     * 
+     *
      * @param receiver address
      * @param start starting index of receiverSubs[receiver]
      * @param end ending index of receiverSubs[receiver]
@@ -534,4 +534,15 @@ contract Subscrypto {
     function centsToWad(uint cents) internal pure returns (uint) {
         return cents.mul(10**16);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

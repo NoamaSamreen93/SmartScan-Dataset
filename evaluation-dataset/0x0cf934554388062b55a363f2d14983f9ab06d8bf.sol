@@ -1078,7 +1078,7 @@ contract FCToken is ERC721Full, ERC721Pausable, Ownable {
   struct FC {
     uint _tokenID;
     uint _type;
-  }  
+  }
 
   // EVENTS
   event EventBuy(address buyer, uint tokenId, uint cat_type, uint price);
@@ -1087,7 +1087,7 @@ contract FCToken is ERC721Full, ERC721Pausable, Ownable {
   // BASE BUY FUNCTION
 
   function buyKitty(uint p_type) public payable {
-    
+
     require(!paused());
     require(p_type >= 0);
     require(_prices.length > p_type);
@@ -1186,4 +1186,15 @@ contract FCToken is ERC721Full, ERC721Pausable, Ownable {
     }
     else super._isApprovedOrOwner(spender,tokenId);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

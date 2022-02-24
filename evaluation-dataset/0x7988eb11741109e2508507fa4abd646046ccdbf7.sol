@@ -64,7 +64,7 @@ library SafeMath {
 
 contract ERC20 is Token {
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) public balance;
 
     mapping (address => mapping (address => uint256)) public allowed;
@@ -89,7 +89,7 @@ contract ERC20 is Token {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0), "Can't send to null");
         require(_to != address(this), "Can't send to contract");
-        
+
         uint256 allowance = allowed[_from][msg.sender];
         require(_value <= allowance || _from == msg.sender, "Not allowed to send that much");
 
@@ -120,7 +120,7 @@ contract ERC20 is Token {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         remaining = allowed[_owner][_spender];
-    } 
+    }
 
     function totalSupply() public view returns (uint256 supply) {
         return 0;
@@ -156,7 +156,7 @@ contract Ownable {
    */
 
     function transferOwnership(address payable _newAdmin) public onlyAdmin {
-        require(_newAdmin != address(0), "New admin can't be null");      
+        require(_newAdmin != address(0), "New admin can't be null");
         admin = _newAdmin;
     }
 
@@ -274,7 +274,7 @@ library Maps {
         self.lastIndex = 0;
         return ;
     }
-    
+
     function contains(Map storage self, Participant memory participant) internal view returns (bool exists) {
         return self.indexes[participant.Address] > 0;
     }
@@ -305,7 +305,7 @@ contract CsnCrowdConfigurableSale is Ownable {
     using SafeMath for uint256;
 
     // start and end date where investments are allowed (both inclusive)
-    uint256 public startDate; 
+    uint256 public startDate;
     uint256 public endDate;
 
     // Minimum amount to participate
@@ -319,9 +319,9 @@ contract CsnCrowdConfigurableSale is Ownable {
     // how many token units a buyer gets per ether
     uint256 public baseRate;
     //cap for the sale
-    uint256 public cap; 
+    uint256 public cap;
 
-    uint256 capBonus1; 
+    uint256 capBonus1;
     uint256 capBonus2;
     uint256 capBonus3;
 
@@ -335,7 +335,7 @@ contract CsnCrowdConfigurableSale is Ownable {
     bool public isFinalized = false;
     bool public isCanceled = false;
 
-    
+
     function getRate() public view returns (uint256) {
         uint256 bonus = 0;
         if(weiRaised >= capBonus3)
@@ -355,7 +355,7 @@ contract CsnCrowdConfigurableSale is Ownable {
         }
         return baseRate.safeAdd(bonus);
     }
-    
+
     function isStarted() public view returns (bool) {
         return startDate <= block.timestamp;
     }
@@ -384,7 +384,7 @@ contract CsnCrowdSaleBase is CsnCrowdConfigurableSale {
     * @param purchaser who paid for the tokens
     * @param value weis paid for purchase
     * @param amount amount of tokens purchased
-    */ 
+    */
     event BuyTokens(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
     event ClaimBack(address indexed purchaser, uint256 amount);
@@ -412,7 +412,7 @@ contract CsnCrowdSaleBase is CsnCrowdConfigurableSale {
         uint256 amount = 0;
         uint256 tokens = 0;
         uint256 newBalance = 0;
-       
+
         participations[msg.sender] = participations[msg.sender].safeAdd(_weiAmount);
         if(participants.containsAddress(msg.sender))
         {
@@ -429,7 +429,7 @@ contract CsnCrowdSaleBase is CsnCrowdConfigurableSale {
             amount = amountIncl.safeMul(rate);
             tokens = amount.safeDiv(1000000000000000000);
             newBalance = tokens;
-        } 
+        }
         participants.insertOrUpdate(Maps.Participant(msg.sender, participations[msg.sender], newBalance, block.timestamp));
 
         //forward funds to wallet
@@ -458,11 +458,11 @@ contract CsnCrowdSaleBase is CsnCrowdConfigurableSale {
         Tokens = participant.Tokens;
         Timestamp = participant.Timestamp;
     }
-    
+
     function Contains(address _address) public view returns (bool) {
         return participants.contains(Maps.Participant(_address, 0, 0, block.timestamp));
     }
-    
+
     function Destroy() private returns (bool) {
         participants.destroy();
     }
@@ -659,4 +659,10 @@ contract TestCrowdSaleAboveSupply is CsnCrowdSaleBase {
         bonus2 = 150;
         bonus3 = 50;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

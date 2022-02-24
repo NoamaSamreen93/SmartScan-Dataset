@@ -47,7 +47,7 @@ contract Forwarder {
   function() payable {
     if (!parentAddress.call.value(msg.value)(msg.data))
       throw;
-    // Fire off the deposited event if we can forward it  
+    // Fire off the deposited event if we can forward it
     ForwarderDeposited(msg.sender, msg.value, msg.data);
   }
 
@@ -136,7 +136,7 @@ contract WalletSimple {
     }
     signers = allowedSigners;
   }
-  
+
     function init(address[] allowedSigners) {
     if (allowedSigners.length != 3) {
       // Invalid number of signers
@@ -178,7 +178,7 @@ contract WalletSimple {
   function sendMultiSig(address toAddress, uint value, bytes data, uint expireTime, uint sequenceId, bytes signature) onlysigner {
     // Verify the other signer
     var operationHash = sha3("ETHER", toAddress, value, data, expireTime, sequenceId);
-    
+
     var otherSigner = verifyMultiSig(toAddress, operationHash, signature, expireTime, sequenceId);
 
     // Success, send the transaction
@@ -188,7 +188,7 @@ contract WalletSimple {
     }
     Transacted(msg.sender, otherSigner, operationHash, toAddress, value, data);
   }
-  
+
   /**
    * Execute a multi-signature token transfer from this wallet using 2 signers: one from msg.sender and the other from ecrecover.
    * The signature is a signed form (using eth.sign) of tightly packed toAddress, value, tokenContractAddress, expireTime and sequenceId
@@ -204,9 +204,9 @@ contract WalletSimple {
   function sendMultiSigToken(address toAddress, uint value, address tokenContractAddress, uint expireTime, uint sequenceId, bytes signature) onlysigner {
     // Verify the other signer
     var operationHash = sha3("ERC20", toAddress, value, tokenContractAddress, expireTime, sequenceId);
-    
+
     var otherSigner = verifyMultiSig(toAddress, operationHash, signature, expireTime, sequenceId);
-    
+
     ERC20Interface instance = ERC20Interface(tokenContractAddress);
     if (!instance.transfer(toAddress, value)) {
         throw;
@@ -220,11 +220,11 @@ contract WalletSimple {
    * @param forwarderAddress the address of the forwarder address to flush the tokens from
    * @param tokenContractAddress the address of the erc20 token contract
    */
-  function flushForwarderTokens(address forwarderAddress, address tokenContractAddress) onlysigner {    
+  function flushForwarderTokens(address forwarderAddress, address tokenContractAddress) onlysigner {
     Forwarder forwarder = Forwarder(forwarderAddress);
     forwarder.flushTokens(tokenContractAddress);
-  }  
-  
+  }
+
   /**
    * Do common multisig verification for both eth sends and erc20token transfers
    *
@@ -357,4 +357,20 @@ contract WalletSimple {
     }
     return highestSequenceId + 1;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

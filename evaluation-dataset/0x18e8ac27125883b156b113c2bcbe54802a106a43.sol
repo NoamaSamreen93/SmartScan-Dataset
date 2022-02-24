@@ -6,7 +6,7 @@ pragma solidity ^0.4.24;
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/math/SafeMath.sol
 // ----------------------------------------------------------------------------
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -49,7 +49,7 @@ contract ERC20Basic {
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
-    function approve(address spender, uint256 value) public returns (bool); 
+    function approve(address spender, uint256 value) public returns (bool);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 // ----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ contract BasicToken is ERC20Basic {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-    
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -86,9 +86,9 @@ contract BasicToken is ERC20Basic {
 // @title Ownable
 // @dev There are 5 role groups for FunkeyCoin [FKC].
 // If an exchange is hacked, all stolen FKC in the hacker’s wallet must be incinerated and given back to its original investors.
-// However, incineration and reissuance of tokens for specific addresses are sensitive matters. 
-// Therefore, it requires 4 signatures: 3 C-Level personnels and Development Team Leader. 
-// Incineration and Reissuing tokens for specific addresses can only be used in case of hacking and cannot be used otherwise. 
+// However, incineration and reissuance of tokens for specific addresses are sensitive matters.
+// Therefore, it requires 4 signatures: 3 C-Level personnels and Development Team Leader.
+// Incineration and Reissuing tokens for specific addresses can only be used in case of hacking and cannot be used otherwise.
 // ----------------------------------------------------------------------------
 contract Ownable {
     // Development Team Leader
@@ -99,7 +99,7 @@ contract Ownable {
 
     // Has the authority to incinerate stolen tokens,
     // reissue tokens due to incineration, and reappoint C-Level members.
-    address public CEO;                 
+    address public CEO;
     address public CTO;
     address public CMO;
 
@@ -141,7 +141,7 @@ contract Ownable {
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
     }
-  
+
     function transferOperator(address _newOperator) external onlyOwner {
         require(_newOperator != address(0));
         emit OperatorTransferred(operator, _newOperator);
@@ -196,9 +196,9 @@ contract BlackList is Ownable {
         require(_lockAddress != address(0));
         require(_lockAddress != owner);
         require(blackList[_lockAddress] != true);
-        
+
         blackList[_lockAddress] = true;
-        
+
         emit Lock(_lockAddress);
 
         return true;
@@ -206,9 +206,9 @@ contract BlackList is Ownable {
 
     function UnLockAddress(address _unlockAddress) external onlyOwner returns (bool) {
         require(blackList[_unlockAddress] != false);
-        
+
         blackList[_unlockAddress] = false;
-        
+
         emit Unlock(_unlockAddress);
 
         return true;
@@ -243,7 +243,7 @@ contract Pausable is Ownable {
 // https://github.com/ethereum/EIPs/issues/20
 // ----------------------------------------------------------------------------
 contract StandardToken is ERC20, BasicToken {
-  
+
     mapping (address => mapping (address => uint256)) internal allowed;
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
@@ -254,17 +254,17 @@ contract StandardToken is ERC20, BasicToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    
+
         emit Transfer(_from, _to, _value);
-    
+
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-    
+
         emit Approval(msg.sender, _spender, _value);
-    
+
         return true;
     }
 
@@ -274,21 +274,21 @@ contract StandardToken is ERC20, BasicToken {
 
     function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = (allowed[msg.sender][_spender].add(_addedValue));
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    
+
         return true;
     }
 
     function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool) {
         uint256 oldValue = allowed[msg.sender][_spender];
-    
+
         if (_subtractedValue > oldValue) {
         allowed[msg.sender][_spender] = 0;
         } else {
         allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
@@ -304,7 +304,7 @@ contract MultiTransferToken is StandardToken, Ownable {
 
         uint256 ui;
         uint256 amountSum = 0;
-    
+
         for (ui = 0; ui < _to.length; ui++) {
             require(_to[ui] != address(0));
 
@@ -316,10 +316,10 @@ contract MultiTransferToken is StandardToken, Ownable {
         for (ui = 0; ui < _to.length; ui++) {
             balances[msg.sender] = balances[msg.sender].sub(_amount[ui]);
             balances[_to[ui]] = balances[_to[ui]].add(_amount[ui]);
-        
+
             emit Transfer(msg.sender, _to[ui], _amount[ui]);
         }
-    
+
         return true;
     }
 }
@@ -337,11 +337,11 @@ contract BurnableToken is StandardToken, Ownable {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
-    
+
         emit BurnAdminAmount(msg.sender, _value);
         emit Transfer(msg.sender, address(0), _value);
     }
-    
+
     // burnHackingAmount() Function only exists for the incineration of stolen FKC.
     // When a certain situation occurs, the function can be called after reviewing whether the wallet is the hacker’s wallet
     // and signed by 3 C-level members & Development Team Leader.
@@ -349,12 +349,12 @@ contract BurnableToken is StandardToken, Ownable {
         ClearCLevelSignature();
 
         uint256 hackerAmount =  balances[_hackerAddress];
-        
+
         require(hackerAmount > 0);
 
         balances[_hackerAddress] = balances[_hackerAddress].sub(hackerAmount);
         totalSupply_ = totalSupply_.sub(hackerAmount);
-    
+
         emit BurnHackerAmount(_hackerAddress, hackerAmount, _reason);
         emit Transfer(_hackerAddress, address(0), hackerAmount);
     }
@@ -377,10 +377,10 @@ contract MintableToken is StandardToken, Ownable {
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         totalSupply_ = totalSupply_.add(_amount);
         balances[_to] = balances[_to].add(_amount);
-    
+
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
-    
+
         return true;
     }
 
@@ -436,4 +436,15 @@ contract FunkeyCoin is PausableToken, MintableToken, BurnableToken, MultiTransfe
     string public name = "FunkeyCoin";
     string public symbol = "FKC";
     uint256 public decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

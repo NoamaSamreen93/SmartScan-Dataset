@@ -7,7 +7,7 @@ pragma solidity 0.5.7;
 *  ver. 1.0.7
 *  2019-04-29
 *  https://xeuro.online
-*  address: https://etherscan.io/address/0xe577e0B200d00eBdecbFc1cd3F7E8E04C70476BE 
+*  address: https://etherscan.io/address/0xe577e0B200d00eBdecbFc1cd3F7E8E04C70476BE
 *  deployed on block: 7660532
 *  solc version : 0.5.7+commit.6da8b019
 **/
@@ -774,4 +774,13 @@ contract xEuro {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

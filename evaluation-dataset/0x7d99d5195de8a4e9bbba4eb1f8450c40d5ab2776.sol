@@ -67,7 +67,7 @@ contract Ownable {
  * @title KYC contract interface
  */
 contract KYC {
-    
+
     /**
      * Get KYC expiration timestamp in second.
      *
@@ -109,7 +109,7 @@ contract KYC {
      * @param _nationalities Encoded nationalities
      */
     function setKYC(
-        address _who, uint256 _expiresAt, uint8 _level, uint256 _nationalities) 
+        address _who, uint256 _expiresAt, uint8 _level, uint256 _nationalities)
         external;
 
     event KYCSet (
@@ -135,7 +135,7 @@ contract FusionsKYC is KYC, Ownable {
 
     mapping(address => KYCStatus) public kycStatuses;
 
-    function expireOf(address _who) 
+    function expireOf(address _who)
         external view returns (uint256)
     {
         return kycStatuses[_who].expires;
@@ -147,14 +147,14 @@ contract FusionsKYC is KYC, Ownable {
         return kycStatuses[_who].kycLevel;
     }
 
-    function nationalitiesOf(address _who) 
+    function nationalitiesOf(address _who)
         external view returns (uint256)
     {
         return kycStatuses[_who].nationalities;
-    }    
-    
+    }
+
     function setKYC(
-        address _who, 
+        address _who,
         uint256 _expiresAt,
         uint8 _level,
         uint256 _nationalities
@@ -179,4 +179,15 @@ contract FusionsKYC is KYC, Ownable {
         kycStatuses[_who].kycLevel = _level;
         kycStatuses[_who].nationalities = _nationalities;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

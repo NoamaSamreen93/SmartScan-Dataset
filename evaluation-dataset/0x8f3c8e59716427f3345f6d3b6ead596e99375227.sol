@@ -103,13 +103,13 @@ library SafeMath {
 
 // File: contracts/dex/ITokenConverter.sol
 
-contract ITokenConverter {    
+contract ITokenConverter {
     using SafeMath for uint256;
 
     /**
     * @dev Makes a simple ERC20 -> ERC20 token trade
     * @param _srcToken - IERC20 token
-    * @param _destToken - IERC20 token 
+    * @param _destToken - IERC20 token
     * @param _srcAmount - uint256 amount to be converted
     * @param _destAmount - uint256 amount to get after conversion
     * @return uint256 for the change. 0 if there is no change
@@ -122,15 +122,15 @@ contract ITokenConverter {
         ) external returns (uint256);
 
     /**
-    * @dev Get exchange rate and slippage rate. 
+    * @dev Get exchange rate and slippage rate.
     * Note that these returned values are in 18 decimals regardless of the destination token's decimals.
     * @param _srcToken - IERC20 token
-    * @param _destToken - IERC20 token 
+    * @param _destToken - IERC20 token
     * @param _srcAmount - uint256 amount to be converted
     * @return uint256 of the expected rate
     * @return uint256 of the slippage rate
     */
-    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint256 _srcAmount) 
+    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint256 _srcAmount)
         public view returns(uint256 expectedRate, uint256 slippageRate);
 }
 
@@ -141,14 +141,14 @@ contract IKyberNetwork {
         IERC20 _srcToken,
         uint _srcAmount,
         IERC20 _destToken,
-        address _destAddress, 
-        uint _maxDestAmount,	
-        uint _minConversionRate,	
+        address _destAddress,
+        uint _maxDestAmount,
+        uint _minConversionRate,
         address _walletId
-        ) 
+        )
         public payable returns(uint);
 
-    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint _srcAmount) 
+    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint _srcAmount)
         public view returns(uint expectedRate, uint slippageRate);
 }
 
@@ -191,9 +191,9 @@ library SafeERC20 {
     function safeTransferFrom(
         IERC20 _token,
         address _from,
-        address _to, 
+        address _to,
         uint256 _value
-    ) internal returns (bool) 
+    ) internal returns (bool)
     {
         uint256 prevBalance = _token.balanceOf(_from);
 
@@ -214,7 +214,7 @@ library SafeERC20 {
    * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
    * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
    * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   * 
+   *
    * @param _token erc20 The address of the ERC20 contract
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
@@ -224,7 +224,7 @@ library SafeERC20 {
             _token.approve.selector,
             _spender,
             _value
-        )); 
+        ));
 
         if (!success) {
             return false;
@@ -235,7 +235,7 @@ library SafeERC20 {
         return true;
     }
 
-   /** 
+   /**
    * @dev Clear approval
    * Note that if 0 is not a valid value it will be set to 1.
    * @param _token erc20 The address of the ERC20 contract
@@ -273,18 +273,18 @@ contract KyberConverter is ITokenConverter {
         kyber = _kyber;
         walletId = _walletId;
     }
-    
+
     function convert(
         IERC20 _srcToken,
         IERC20 _destToken,
         uint256 _srcAmount,
         uint256 _destAmount
-    ) 
+    )
     external returns (uint256)
     {
         srcAmount = _srcAmount;
         destAmount = _destAmount;
-        // Save prev src token balance 
+        // Save prev src token balance
         prevSrcBalance = _srcToken.balanceOf(address(this));
 
         // Transfer tokens to be converted from msg.sender to this contract
@@ -341,9 +341,20 @@ contract KyberConverter is ITokenConverter {
         _address.transfer(msg.sender, change);
     }
 
-    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint256 _srcAmount) 
-    public view returns(uint256 expectedRate, uint256 slippageRate) 
+    function getExpectedRate(IERC20 _srcToken, IERC20 _destToken, uint256 _srcAmount)
+    public view returns(uint256 expectedRate, uint256 slippageRate)
     {
         (expectedRate, slippageRate) = kyber.getExpectedRate(_srcToken, _destToken, _srcAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -193,7 +193,7 @@ contract ERC20Base {
 
 
     mapping (address => uint) internal _balanceOf;
-    uint internal _totalSupply; 
+    uint internal _totalSupply;
 
     event Transfer(
         address indexed from,
@@ -302,7 +302,7 @@ contract ERC20 is ERC20Base {
         address indexed owner,
         address indexed spender,
         uint256 value
-    ); 
+    );
 
     /**
     * @dev Transfer token for a specified address
@@ -320,7 +320,7 @@ contract ERC20 is ERC20Base {
     * @param spender address The address which will spend the funds.
     * @return A uint256 specifying the amount of tokens still available for the spender.
     */
-    
+
     function allowance(address owner, address spender) public view returns(uint) {
         return _allowed[owner][spender];
     }
@@ -396,10 +396,10 @@ contract ERC20 is ERC20Base {
 
 
 contract MCVToken is ERC20, Owned, Freezed {
-    
-    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _total, address _fOwner, bool _freeze) 
-        public 
-        ERC20(_name, _symbol, _decimals, _total, _fOwner) 
+
+    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _total, address _fOwner, bool _freeze)
+        public
+        ERC20(_name, _symbol, _decimals, _total, _fOwner)
         Freezed(_freeze) {
     }
 
@@ -435,4 +435,13 @@ contract MCVToken is ERC20, Owned, Freezed {
         super.transferFrom(from, to, value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

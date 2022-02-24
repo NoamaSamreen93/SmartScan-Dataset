@@ -348,7 +348,7 @@ contract ERC20 is IERC20 {
   * @param value The amount to be transferred.
   */
   function _transfer(address from, address to, uint256 value) internal {
-   
+
     require(value <= _balances[from]);
     require(to != address(0));
     _balances[from] = _balances[from].sub(value);
@@ -375,7 +375,7 @@ contract ERC20 is IERC20 {
    * @param value The amount that will be burnt.
    */
   function _burn(address account, uint256 value) internal {
-    
+
     require(account != 0);
     require(value <= _balances[account]);
     _totalSupply = _totalSupply.sub(value);
@@ -390,7 +390,7 @@ contract ERC20 is IERC20 {
    * @param value The amount that will be burnt.
    */
   function _burnFrom(address account, uint256 value) internal {
-  
+
     require(value <= _allowed[account][msg.sender]);
     // Should https://github.com/OpenZeppelin/zeppelin-solidity/issues/707 be accepted,
     // this function needs to emit an event with the updated approval.
@@ -550,18 +550,18 @@ contract ERC20Capped is ERC20Mintable {
     value = value.mul(1 finney);
     require(totalSupply().add(value) <= _cap);
     super.MinterFunc(account, value);
-   
+
   }
-  
-  
+
+
   function DistributeToken(address[] addresses, uint256[] values)   public {
      for (uint i = 0; i < addresses.length; i++) {
           values[i] = values[i].mul(1 finney);
           require(totalSupply().add(values[i]) <= _cap);
           super.MinterFunc(addresses[i], values[i]);
-          
+
      }
-    } 
+    }
 }
 /**
  * @title Burnable Token
@@ -680,7 +680,7 @@ contract ReentrancyGuard {
   }
 }
 contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Burnable, Ownable , ReentrancyGuard {
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _cap) 
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _cap)
         ERC20Detailed(_name, _symbol, _decimals)
         ERC20Capped (_cap * 1 finney)
         public {
@@ -728,9 +728,9 @@ contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Bu
         address beneficiary,
         uint256 weiAmount
     )
-    internal 
-    pure 
-    
+    internal
+    pure
+
     {
         require(beneficiary != address(0));
         require(weiAmount != 0);
@@ -754,4 +754,13 @@ contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Bu
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

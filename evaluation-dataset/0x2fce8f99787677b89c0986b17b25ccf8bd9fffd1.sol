@@ -161,18 +161,18 @@ contract Contactable is Ownable{
 
 /**
  *  @title MerchantWallet
- *  Serves as a public Merchant profile with merchant profile info, 
+ *  Serves as a public Merchant profile with merchant profile info,
  *      payment settings and latest reputation value.
  *  Also MerchantWallet accepts payments for orders.
  */
 
 contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
-    
+
     string constant VERSION = "0.3";
 
     /// Address of merchant's account, that can withdraw from wallet
     address public merchantAccount;
-    
+
     /// Unique Merchant identifier hash
     bytes32 public merchantIdHash;
 
@@ -200,7 +200,7 @@ contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
     function MerchantWallet(address _merchantAccount, string _merchantId) public {
         require(_merchantAccount != 0x0);
         require(bytes(_merchantId).length > 0);
-        
+
         merchantAccount = _merchantAccount;
         merchantIdHash = keccak256(_merchantId);
     }
@@ -243,7 +243,7 @@ contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
     ) external onlyOwner
     {
         profileMap[profileKey] = profileValue;
-        
+
         if (bytes(repKey).length != 0) {
             compositeReputationMap[repKey] = repValue;
         }
@@ -350,7 +350,7 @@ library SafeMath {
 contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
 
     using SafeMath for uint256;
-    
+
     string constant VERSION = "0.4";
 
     /**
@@ -359,7 +359,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
      *  15‰ = 1.5%
      */
     uint public constant FEE_PERMILLE = 15;
-    
+
     /**
      *  Address of Monetha Vault for fee collection
      */
@@ -378,10 +378,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     function MonethaGateway(address _monethaVault, address _admin) public {
         require(_monethaVault != 0x0);
         monethaVault = _monethaVault;
-        
+
         setAdmin(_admin);
     }
-    
+
     /**
      *  acceptPayment accept payment from PaymentAcceptor, forwards it to merchant's wallet
      *      and collects Monetha fee.
@@ -598,4 +598,15 @@ contract PrivatePaymentProcessor is Pausable, Destructible, Contactable, Restric
 
         merchantWallet = _newWallet;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

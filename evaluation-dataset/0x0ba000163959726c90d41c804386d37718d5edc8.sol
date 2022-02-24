@@ -78,22 +78,22 @@ library AddressUtils {
 
 /**
  * Strings Library
- * 
- * In summary this is a simple library of string functions which make simple 
+ *
+ * In summary this is a simple library of string functions which make simple
  * string operations less tedious in solidity.
- * 
+ *
  * Please be aware these functions can be quite gas heavy so use them only when
  * necessary not to clog the blockchain with expensive transactions.
- * 
+ *
  * @author James Lockhart <james@n3tw0rk.co.uk>
  */
 library Strings {
 
     /**
      * Concat (High gas cost)
-     * 
+     *
      * Appends two strings together and returns a new value
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string which will be the concatenated
      *              prefix
@@ -108,7 +108,7 @@ library Strings {
 
         assert(_valueBytes.length > 0);
 
-        string memory _tmpValue = new string(_baseBytes.length + 
+        string memory _tmpValue = new string(_baseBytes.length +
             _valueBytes.length);
         bytes memory _newValue = bytes(_tmpValue);
 
@@ -130,7 +130,7 @@ library Strings {
      * Index Of
      *
      * Locates and returns the position of a character within a string
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string acting as the haystack to be
      *              searched
@@ -150,7 +150,7 @@ library Strings {
      *
      * Locates and returns the position of a character within a string starting
      * from a defined offset
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string acting as the haystack to be
      *              searched
@@ -180,9 +180,9 @@ library Strings {
 
     /**
      * Length
-     * 
+     *
      * Returns the length of the specified string
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string to be measured
      * @return uint The length of the passed string
@@ -196,11 +196,11 @@ library Strings {
 
     /**
      * Sub String
-     * 
+     *
      * Extracts the beginning part of a string based on the desired length
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
-     *              otherwise this is the string that will be used for 
+     *              otherwise this is the string that will be used for
      *              extracting the sub string from
      * @param _length The length of the sub string to be extracted from the base
      * @return string The extracted sub string
@@ -213,12 +213,12 @@ library Strings {
 
     /**
      * Sub String
-     * 
+     *
      * Extracts the part of a string based on the desired length and offset. The
      * offset and length must not exceed the lenth of the base string.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
-     *              otherwise this is the string that will be used for 
+     *              otherwise this is the string that will be used for
      *              extracting the sub string from
      * @param _length The length of the sub string to be extracted from the base
      * @param _offset The starting point to extract the sub string from
@@ -284,17 +284,17 @@ library Strings {
 
     /**
      * Compare To
-     * 
-     * Compares the characters of two strings, to ensure that they have an 
+     *
+     * Compares the characters of two strings, to ensure that they have an
      * identical footprint
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *               otherwise this is the string base to compare against
      * @param _value The string the base is being compared to
      * @return bool Simply notates if the two string have an equivalent
      */
-    function compareTo(string _base, string _value) 
-        internal 
+    function compareTo(string _base, string _value)
+        internal
         returns (bool) {
         bytes memory _baseBytes = bytes(_base);
         bytes memory _valueBytes = bytes(_value);
@@ -314,11 +314,11 @@ library Strings {
 
     /**
      * Compare To Ignore Case (High gas cost)
-     * 
+     *
      * Compares the characters of two strings, converting them to the same case
      * where applicable to alphabetic characters to distinguish if the values
      * match.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *               otherwise this is the string base to compare against
      * @param _value The string the base is being compared to
@@ -336,7 +336,7 @@ library Strings {
         }
 
         for(uint i = 0; i < _baseBytes.length; i++) {
-            if (_baseBytes[i] != _valueBytes[i] && 
+            if (_baseBytes[i] != _valueBytes[i] &&
                 _upper(_baseBytes[i]) != _upper(_valueBytes[i])) {
                 return false;
             }
@@ -347,16 +347,16 @@ library Strings {
 
     /**
      * Upper
-     * 
+     *
      * Converts all the values of a string to their corresponding upper case
      * value.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string base to convert to upper case
-     * @return string 
+     * @return string
      */
-    function upper(string _base) 
-        internal 
+    function upper(string _base)
+        internal
         returns (string) {
         bytes memory _baseBytes = bytes(_base);
         for (uint i = 0; i < _baseBytes.length; i++) {
@@ -367,16 +367,16 @@ library Strings {
 
     /**
      * Lower
-     * 
+     *
      * Converts all the values of a string to their corresponding lower case
      * value.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string base to convert to lower case
-     * @return string 
+     * @return string
      */
-    function lower(string _base) 
-        internal 
+    function lower(string _base)
+        internal
         returns (string) {
         bytes memory _baseBytes = bytes(_base);
         for (uint i = 0; i < _baseBytes.length; i++) {
@@ -387,10 +387,10 @@ library Strings {
 
     /**
      * Upper
-     * 
+     *
      * Convert an alphabetic character to upper case and return the original
      * value when not alphabetic
-     * 
+     *
      * @param _b1 The byte to be converted to upper case
      * @return bytes1 The converted value if the passed value was alphabetic
      *                and in a lower case otherwise returns the original value
@@ -409,10 +409,10 @@ library Strings {
 
     /**
      * Lower
-     * 
+     *
      * Convert an alphabetic character to lower case and return the original
      * value when not alphabetic
-     * 
+     *
      * @param _b1 The byte to be converted to lower case
      * @return bytes1 The converted value if the passed value was alphabetic
      *                and in a upper case otherwise returns the original value
@@ -425,7 +425,7 @@ library Strings {
         if (_b1 >= 0x41 && _b1 <= 0x5A) {
             return bytes1(uint8(_b1)+32);
         }
-        
+
         return _b1;
     }
 }
@@ -433,23 +433,23 @@ library Strings {
 
 /**
  * Integers Library
- * 
+ *
  * In summary this is a simple library of integer functions which allow a simple
  * conversion to and from strings
- * 
+ *
  * @author James Lockhart <james@n3tw0rk.co.uk>
  */
 library Integers {
     /**
      * Parse Int
-     * 
-     * Converts an ASCII string value into an uint as long as the string 
+     *
+     * Converts an ASCII string value into an uint as long as the string
      * its self is a valid unsigned integer
-     * 
+     *
      * @param _value The ASCII string to be converted to an unsigned integer
      * @return uint The unsigned value of the ASCII string
      */
-    function parseInt(string _value) 
+    function parseInt(string _value)
         public
         pure
         returns (uint _ret) {
@@ -461,16 +461,16 @@ library Integers {
             j*=10;
         }
     }
-    
+
     /**
      * To String
-     * 
+     *
      * Converts an unsigned integer to the ASCII string equivalent value
-     * 
+     *
      * @param _base The unsigned integer to be converted to a string
      * @return string The resulting ASCII string value
      */
-    function toString(uint _base) 
+    function toString(uint _base)
         internal
         pure
         returns (string) {
@@ -495,7 +495,7 @@ library Integers {
      * @param _base The 8 bit unsigned integer
      * @return byte The byte equivalent
      */
-    function toByte(uint8 _base) 
+    function toByte(uint8 _base)
         public
         pure
         returns (byte _ret) {
@@ -512,9 +512,9 @@ library Integers {
      * Converts an unsigned integer to bytes
      *
      * @param _base The integer to be converted to bytes
-     * @return bytes The bytes equivalent 
+     * @return bytes The bytes equivalent
      */
-    function toBytes(uint _base) 
+    function toBytes(uint _base)
         internal
         pure
         returns (bytes _ret) {
@@ -954,4 +954,15 @@ contract HEROES {
   function test(uint256 _x) returns (bool) {
     return now <= _x;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

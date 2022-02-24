@@ -8,18 +8,18 @@ contract Ownable {
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 
-  
+
   function Ownable() public {
     owner = msg.sender;
   }
 
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
 
-  
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
@@ -31,7 +31,7 @@ contract Ownable {
 
 library SafeMath {
 
-  
+
 	function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
 		if (a == 0) {
 		  return 0;
@@ -88,12 +88,12 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -104,7 +104,7 @@ contract BasicToken is ERC20Basic {
     return true;
   }
 
-  
+
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
@@ -118,7 +118,7 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
@@ -131,26 +131,26 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
-  
+
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
 
-  
+
   function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
- 
+
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -167,9 +167,9 @@ contract StandardToken is ERC20, BasicToken {
 
 contract PointlessToken is StandardToken, Ownable {
 
-  string public constant name = "The Pointless Coin"; 
-  string public constant symbol = "PNTL"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "The Pointless Coin";
+  string public constant symbol = "PNTL";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 1000000 * (10 ** uint256(decimals));
 
@@ -182,4 +182,15 @@ contract PointlessToken is StandardToken, Ownable {
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

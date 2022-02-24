@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
- 
+
 
 contract owned {
 
     address public owner;
 
- 
+
 
     function owned() public {
 
@@ -14,7 +14,7 @@ contract owned {
 
     }
 
- 
+
 
     modifier onlyOwner {
 
@@ -24,7 +24,7 @@ contract owned {
 
     }
 
- 
+
 
     function transferOwnership(address newOwner) onlyOwner public {
 
@@ -34,7 +34,7 @@ contract owned {
 
 }
 
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -83,7 +83,7 @@ library SafeMath {
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
- 
+
 
 contract TokenERC20 {
 
@@ -99,7 +99,7 @@ contract TokenERC20 {
 
     uint256 public totalSupply;
 
- 
+
 
     // This creates an array with all balances
 
@@ -107,19 +107,19 @@ contract TokenERC20 {
 
     mapping (address => mapping (address => uint256)) public allowance;
 
- 
+
 
     // This generates a public event on the blockchain that will notify clients
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
- 
+
 
     // This notifies clients about the amount burnt
 
     event Burn(address indexed from, uint256 value);
 
- 
+
 
     /**
 
@@ -151,7 +151,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -193,7 +193,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -217,7 +217,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -249,7 +249,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -277,7 +277,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -315,7 +315,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -345,7 +345,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -383,7 +383,7 @@ contract TokenERC20 {
 
 }
 
- 
+
 
 /******************************************/
 
@@ -391,28 +391,28 @@ contract TokenERC20 {
 
 /******************************************/
 
- 
+
 
 contract TRIUM is owned, TokenERC20 {
 
- 
+
 
     uint256 public sellPrice;
 
     uint256 public buyPrice;
 
- 
+
 
     mapping (address => bool) public frozenAccount;
 
- 
+
 
     /* This generates a public event on the blockchain that will notify clients */
 
     event FrozenFunds(address target, bool frozen);
-    
+
     using SafeMath for uint256;
- 
+
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
 
@@ -426,7 +426,7 @@ contract TRIUM is owned, TokenERC20 {
 
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
 
- 
+
 
     /* Internal transfer, only can be called by this contract */
 
@@ -449,23 +449,23 @@ contract TRIUM is owned, TokenERC20 {
         Transfer(_from, _to, _value);
 
     }
-    
+
     function batchTransfer(address[] _tos, uint256[] _amount) onlyOwner public returns (bool success) {
-        require(_tos.length == _amount.length); 
+        require(_tos.length == _amount.length);
         uint256 i;
         uint256 sum = 0;
-        for(i = 0; i < _amount.length; i++) { 
-            sum = sum.add(_amount[i]); 
+        for(i = 0; i < _amount.length; i++) {
+            sum = sum.add(_amount[i]);
             require(_tos[i] != address(0));
         }
         require(balanceOf[msg.sender] >= sum);
         for(i = 0; i < _tos.length; i++){
             transfer(_tos[i], _amount[i]);
-            return true; 
+            return true;
         }
     }
 
- 
+
 
     /// @notice Create `mintedAmount` tokens and send it to `target`
 
@@ -485,7 +485,7 @@ contract TRIUM is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
 
@@ -501,7 +501,7 @@ contract TRIUM is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
 
@@ -517,7 +517,7 @@ contract TRIUM is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice Buy tokens from contract by sending ether
 
@@ -529,7 +529,7 @@ contract TRIUM is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice Sell `amount` tokens to contract
 
@@ -545,4 +545,15 @@ contract TRIUM is owned, TokenERC20 {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

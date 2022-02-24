@@ -21,7 +21,7 @@ contract ERC223ReceivingContract {
 }
 
 contract CCP is ERC223, ERC20 {
-    
+
 	using SafeMath for uint256;
 
 	uint public constant _totalSupply = 2100000000e18;
@@ -46,7 +46,7 @@ contract CCP is ERC223, ERC20 {
 	function balanceOf(address _owner) public view returns (uint256 balance) {
 		return balances[_owner];
 	}
-    
+
 	function transfer(address _to, uint256 _value) public returns (bool success) {
 		require(
 			!isContract(_to)
@@ -56,7 +56,7 @@ contract CCP is ERC223, ERC20 {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-    
+
 	function transfer(address _to, uint256 _value, bytes _data) public returns (bool success){
 		require(
 			isContract(_to)
@@ -67,7 +67,7 @@ contract CCP is ERC223, ERC20 {
 		emit Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
-    
+
 	function isContract(address _from) private view returns (bool) {
 		uint256 codeSize;
 		assembly {
@@ -75,8 +75,8 @@ contract CCP is ERC223, ERC20 {
 		}
 		return codeSize > 0;
 	}
-    
-    
+
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
 		require(
 			balances[_from] >= _value
@@ -88,7 +88,7 @@ contract CCP is ERC223, ERC20 {
 		emit Transfer(_from, _to, _value);
 		return true;
 	}
-    
+
 	function approve(address _spender, uint256 _value) public returns (bool success) {
 		require(
 			(_value == 0) || (allowed[msg.sender][_spender] == 0)
@@ -97,7 +97,7 @@ contract CCP is ERC223, ERC20 {
 		emit Approval(msg.sender, _spender, _value);
 		return true;
 	}
-    
+
 	function allowance(address _owner, address _spender) public view returns (uint256 remain) {
 		return allowed[_owner][_spender];
 	}
@@ -105,7 +105,7 @@ contract CCP is ERC223, ERC20 {
 	function () public payable {
 		revert();
 	}
-    
+
 	event Transfer(address  indexed _from, address indexed _to, uint256 _value);
 	event Transfer(address indexed _from, address  indexed _to, uint _value, bytes _data);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -142,5 +142,21 @@ library SafeMath {
 		uint256 c = a + b;
 		assert(c >= a);
 		return c;
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

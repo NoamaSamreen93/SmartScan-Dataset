@@ -94,23 +94,23 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
-    
+
   /// This is where we hold INVE token and the only address from which
   /// `issue token` can be invocated.
   ///
   /// Note: this will be initialized during the contract deployment.
   address public owner;
-  
+
   /// This is a switch to control the liquidity of INVE
   bool public transferable = true;
-  
+
   mapping(address => uint) balances;
 
-  //The frozen accounts 
+  //The frozen accounts
   mapping (address => bool) public frozenAccount;
   /**
    * @dev Fix for the ERC20 short address attack.
@@ -121,12 +121,12 @@ contract BasicToken is ERC20Basic {
      }
      _;
   }
-  
+
   modifier unFrozenAccount{
       require(!frozenAccount[msg.sender]);
       _;
   }
-  
+
   modifier onlyOwner {
       if (owner == msg.sender) {
           _;
@@ -135,7 +135,7 @@ contract BasicToken is ERC20Basic {
           throw;
         }
   }
-  
+
   modifier onlyTransferable {
       if (transferable) {
           _;
@@ -149,22 +149,22 @@ contract BasicToken is ERC20Basic {
   */
   /// Emitted when the target account is frozen
   event FrozenFunds(address target, bool frozen);
-  
+
   /// Emitted when a function is invocated by unauthorized addresses.
   event InvalidCaller(address caller);
 
   /// Emitted when some INVE coins are burn.
   event Burn(address caller, uint value);
-  
+
   /// Emitted when the ownership is transferred.
   event OwnershipTransferred(address indexed from, address indexed to);
-  
+
   /// Emitted if the account is invalid for transaction.
   event InvalidAccount(address indexed addr, bytes msg);
-  
+
   /// Emitted when the liquity of INVE is switched off
   event LiquidityAlarm(bytes msg);
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -178,12 +178,12 @@ contract BasicToken is ERC20Basic {
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
     }
-    
+
   }
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) view returns (uint balance) {
@@ -197,11 +197,11 @@ contract BasicToken is ERC20Basic {
       frozenAccount[target]=freeze;
       FrozenFunds(target, freeze);
     }
-  
+
   function accountFrozenStatus(address target) view returns (bool frozen) {
       return frozenAccount[target];
   }
-  
+
   function transferOwnership(address newOwner) onlyOwner public {
       if (newOwner != address(0)) {
           address oldOwner=owner;
@@ -209,12 +209,12 @@ contract BasicToken is ERC20Basic {
           OwnershipTransferred(oldOwner, owner);
         }
   }
-  
+
   function switchLiquidity (bool _transferable) onlyOwner returns (bool success) {
       transferable=_transferable;
       return true;
   }
-  
+
   function liquidityStatus () view returns (bool _transferable) {
       return transferable;
   }
@@ -243,10 +243,10 @@ contract StandardToken is BasicToken, ERC20 {
 
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
     // if (_value > _allowance) throw;
-    
+
     // Check account _from and _to is not frozen
     require(!frozenAccount[_from]&&!frozenAccount[_to]);
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -279,7 +279,7 @@ contract StandardToken is BasicToken, ERC20 {
   function allowance(address _owner, address _spender) view returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 /// @title InterValue Protocol Token.
@@ -290,8 +290,8 @@ contract INVEToken is StandardToken {
     uint public constant DECIMALS = 18;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the INVE Coin
      * @param _owner The escrow account address, all ethers will
      * be sent to this address.
@@ -312,4 +312,15 @@ contract INVEToken is StandardToken {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

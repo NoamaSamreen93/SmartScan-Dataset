@@ -44,7 +44,7 @@ return balances[_owner];
 
 
 function transfer(address _to, uint256 _amount) public returns (bool success) {
-if (balances[msg.sender] >= _amount 
+if (balances[msg.sender] >= _amount
 && _amount > 0
 && balances[_to] + _amount > balances[_to]) {
 balances[msg.sender] -= _amount;
@@ -86,4 +86,15 @@ return true;
 function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
 return allowed[_owner][_spender];
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

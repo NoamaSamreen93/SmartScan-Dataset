@@ -95,14 +95,14 @@ contract VestingFund is Ownable {
 
   /**
    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
-   * _beneficiary, tokens are release in an incremental fashion after a quater has passed until _start + _quarters * 3 * months. 
+   * _beneficiary, tokens are release in an incremental fashion after a quater has passed until _start + _quarters * 3 * months.
    * By then all of the balance will have vested.
    * @param _beneficiary address of the beneficiary to whom vested tokens are transferred
    * @param _quarters number of quarters the vesting will last
    * @param _token ERC20 token which is being vested
    */
   function VestingFund(address _beneficiary, uint256 _start, uint256 _quarters, address _token) public {
-    
+
     require(_beneficiary != address(0) && _token != address(0));
     require(_quarters > 0);
 
@@ -180,4 +180,15 @@ library SafeERC20 {
   function safeApprove(ERC20 token, address spender, uint256 value) internal {
     assert(token.approve(spender, value));
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 pragma solidity 0.4.24;
- 
+
 /**
  * Copyright 2018, Flowchain.co
  *
@@ -132,7 +132,7 @@ interface Token {
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
-    function transfer(address _to, uint256 _value) public returns (bool success);    
+    function transfer(address _to, uint256 _value) public returns (bool success);
 }
 
 /**
@@ -247,7 +247,7 @@ contract Vesting is Ownable {
      * @dev Creates a vesting contract that vests its balance of FLC token to the
      * beneficiary, gradually in a linear fashion until start + duration. By then all
      * of the balance will have vested.
-     * @param beneficiary address of the beneficiary to whom vested tokens are transferred     
+     * @param beneficiary address of the beneficiary to whom vested tokens are transferred
      * @param cliffDuration duration in seconds of the cliff in which tokens will begin to vest
      * @param start the time (as Unix time) at which point vesting starts
      * @param duration duration in seconds of the period in which the tokens will vest
@@ -305,7 +305,7 @@ contract Vesting is Ownable {
      * @notice Mints and transfers tokens to beneficiary.
      * @param token ERC20 token which is being vested
      */
-    function release(address token) public onlyOwner {    
+    function release(address token) public onlyOwner {
         uint256 unreleased = _releasableAmount(token);
 
         require(unreleased > 0);
@@ -339,4 +339,15 @@ contract Vesting is Ownable {
             return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

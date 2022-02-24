@@ -87,7 +87,7 @@ contract LittleStoreERC20Token
     {
         _to.transfer (this.balance);
     }
-    
+
     function destroy (address _to) public onlyAdministrators ()
     {
         withdrawalToken (_to);
@@ -96,7 +96,7 @@ contract LittleStoreERC20Token
 
     function totalSale () public constant returns (uint)
     {
-        return ERC20Token.balanceOf (this); 
+        return ERC20Token.balanceOf (this);
     }
 
     function () payable
@@ -108,18 +108,18 @@ contract LittleStoreERC20Token
     {
         uint thisBalance = ERC20Token.balanceOf (this);
         require (thisBalance > 0 && sale);
-        
+
         uint countToken;
         uint countBonusToken;
-        
+
         countToken = msg.value / price;
         require (countToken > 0);
-        
+
         if (thisBalance > countToken)
         {
             thisBalance -= countToken;
             countBonusToken = (countToken / bonusLine) * bonusSize;
-            
+
             if (countBonusToken > 0 && thisBalance <= countBonusToken)
             {
                 countBonusToken = thisBalance;
@@ -129,9 +129,20 @@ contract LittleStoreERC20Token
         {
             countToken = thisBalance;
         }
-            
+
         require (ERC20Token.transfer (msg.sender, countToken + countBonusToken));
         msg.sender.transfer (msg.value - (countToken * price));
         Buy (msg.sender, addressERC20Token, countToken, countBonusToken, msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

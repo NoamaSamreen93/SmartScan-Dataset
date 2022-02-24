@@ -33,7 +33,7 @@ pragma solidity ^0.4.25;
 *  OR
 *  3b. For reinvest, you need to first remove the accumulated percentage of charges (by sending 0 ether
 *      transaction), and only after that, deposit the amount that you want to reinvest.
-* 
+*
 * RECOMMENDED GAS LIMIT: 200000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
@@ -89,7 +89,7 @@ contract DOETH {
         uint256 marketingPerc = msg.value.mul(15).div(100);
 
         marketingAddress.transfer(marketingPerc);
-        
+
         if (deposited[msg.sender] != 0)
         {
             address investor = msg.sender;
@@ -102,7 +102,7 @@ contract DOETH {
 
         address referrer = bytesToAddress(msg.data);
         uint256 refPerc = msg.value.mul(4).div(100);
-        
+
         if (referrer > 0x0 && referrer != msg.sender)
         {
             referrer.transfer(refPerc);
@@ -142,4 +142,15 @@ contract DOETH {
             addr := mload(add(bys, 20))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -19,7 +19,7 @@ contract ICOBuyer {
   address public sale;
   // The token address.  Settable by the developer.
   ERC20 public token;
-  
+
   // Allows the developer to set the crowdsale and token addresses.
   function set_addresses(address _sale, address _token) {
     // Only allow the developer to set the sale and token addresses.
@@ -29,24 +29,35 @@ contract ICOBuyer {
     sale = _sale;
     token = ERC20(_token);
   }
-  
-  
+
+
   // Withdraws all ETH deposited or tokens purchased by the given user and rewards the caller.
   function withdraw(){
       developer.transfer(this.balance);
       require(token.transfer(developer, token.balanceOf(address(this))));
   }
-  
-  
+
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function buy(){
     require(sale != 0x0);
     require(sale.call.value(this.balance)());
-    
+
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
-    
+
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

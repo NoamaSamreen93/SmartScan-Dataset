@@ -9,16 +9,16 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 /*-------------------------------------------------------------------------*/
 contract owned {
     address public owner;
- 
+
     function owned() {
         owner = msg.sender;
     }
- 
+
     modifier onlyOwner {
         if (msg.sender != owner) throw;
         _;
     }
- 
+
     function transferOwnership(address newOwner) onlyOwner {
         if (newOwner == 0x0) throw;
         owner = newOwner;
@@ -30,58 +30,58 @@ contract owned {
  */
 contract SafeMath {
   //internals
- 
+
   function safeMul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function safeAdd(uint a, uint b) internal returns (uint) {
     uint c = a + b;
     assert(c>=a && c>=b);
     return c;
   }
- 
+
   function assert(bool assertion) internal {
     if (!assertion) throw;
   }
 }
 /*-------------------------------------------------------------------------*/
 contract LFDNetwork is owned, SafeMath {
- 
+
 string public LFDNetworkWebsite= "https://fltd.io/Affiliate";
 address public LFDNetworkAddress = this;
 address public creator = msg.sender;
     string public name = "LFD Network";
     string public symbol = " LFDN";
-    uint8 public decimals = 18;    
+    uint8 public decimals = 18;
     uint256 public totalSupply = 1000000000000000000000000000;
     uint256 public buyPrice = 11500;
 uint256 public sellPrice = 11500;
-   
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 mapping (address => bool) public frozenAccount;
- 
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
      // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 event FrozenFunds(address target, bool frozen);
-    
+
     /**
      * Constrctor function
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function LFDNetwork() public {
-        balanceOf[msg.sender] = totalSupply;    
+        balanceOf[msg.sender] = totalSupply;
 creator = msg.sender;
     }
     /**
@@ -100,7 +100,7 @@ creator = msg.sender;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
- 
+
     /**
      * Transfer tokens
      *
@@ -112,27 +112,27 @@ creator = msg.sender;
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice ; 
+        uint amount = msg.value * buyPrice ;
 uint amountRaised;
 uint bonus = 0;
- 
+
 bonus = getBonus(amount);
 amount = amount +  bonus;
- 
+
 //amount = now ;
- 
-        require(balanceOf[creator] >= amount);              
+
+        require(balanceOf[creator] >= amount);
         require(msg.value > 0);
-amountRaised = safeAdd(amountRaised, msg.value);                    
-balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);     
-        balanceOf[creator] = safeSub(balanceOf[creator], amount);           
-        Transfer(creator, msg.sender, amount);              
+amountRaised = safeAdd(amountRaised, msg.value);
+balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
+        balanceOf[creator] = safeSub(balanceOf[creator], amount);
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
     }
- 
+
 /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -142,8 +142,8 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
- 
- 
+
+
 /**
      * Set allowance for other address
      *
@@ -157,7 +157,7 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
- 
+
     /**
      * Set allowance for other address and notify
      *
@@ -176,7 +176,7 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
             return true;
         }
     }
- 
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -184,7 +184,7 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
- 
+
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
     /// @param newSellPrice Price the users can sell to the contract
     /// @param newBuyPrice Price users can buy from the contract
@@ -192,8 +192,8 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
- 
- 
+
+
 /**
      * Destroy tokens
      *
@@ -208,7 +208,7 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         Burn(msg.sender, _value);
         return true;
     }
- 
+
 /**
      * Destroy tokens from other account
      *
@@ -226,32 +226,32 @@ balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
         Burn(_from, _value);
         return true;
     }
- 
+
 function getBonus(uint _amount) constant private returns (uint256) {
-        
-if(now >= 99999996 && now <= 184999996) { 
+
+if(now >= 99999996 && now <= 184999996) {
             return _amount * 50 / 100;
         }
- 
-if(now >= 404999997 && now <= 434999997) { 
+
+if(now >= 404999997 && now <= 434999997) {
             return _amount * 40 / 100;
         }
- 
-if(now >= 434999998 && now <= 464999998) { 
+
+if(now >= 434999998 && now <= 464999998) {
             return _amount * 30 / 100;
         }
- 
-if(now >= 464999999 && now <= 494999999) { 
+
+if(now >= 464999999 && now <= 494999999) {
             return _amount * 20 / 100;
         }
- 
-if(now >= 495000000 && now <= 525000000) { 
+
+if(now >= 495000000 && now <= 525000000) {
             return _amount * 10 / 100;
         }
- 
+
         return 0;
     }
- 
+
 /// @notice Sell `amount` tokens to contract
     /// @param amount amount of tokens to be sold
     function sell(uint256 amount) public {
@@ -259,6 +259,15 @@ if(now >= 495000000 && now <= 525000000) {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
- 
+
  }
 /*-------------------------------------------------------------------------*/
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

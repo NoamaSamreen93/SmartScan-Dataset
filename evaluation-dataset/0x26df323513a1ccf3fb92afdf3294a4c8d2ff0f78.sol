@@ -63,7 +63,7 @@ contract ERC20 is ERC20Basic {
 contract Ownable {
 	address public owner;
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-	
+
 	/**
 	 * @dev The Ownable constructor sets the original `owner` of the contract to the sender
 	 * account.
@@ -288,20 +288,31 @@ contract ATokenERC20 is PausableToken {
 	string public name = "KGXS";
 	string public symbol = "KGXS";
 	uint8 public constant decimals = 18;
-	
+
 	constructor() public {
 		balances[msg.sender] = totalSupply_;
 	}
 
 	function addLockValue(address addr,uint256 _value) public onlyOwner {
 		uint256 _reqlockValues= lockValues[addr].add(_value);
-		require(_reqlockValues <= balances[addr]);    
+		require(_reqlockValues <= balances[addr]);
 		require(addr != address(0));
-		lockValues[addr] = lockValues[addr].add(_value);        
-	}    
+		lockValues[addr] = lockValues[addr].add(_value);
+	}
 	function subLockValue(address addr,uint256 _value) public onlyOwner {
 		require(addr != address(0));
 		require(_value <= lockValues[addr]);
-		lockValues[addr] = lockValues[addr].sub(_value);        
+		lockValues[addr] = lockValues[addr].sub(_value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

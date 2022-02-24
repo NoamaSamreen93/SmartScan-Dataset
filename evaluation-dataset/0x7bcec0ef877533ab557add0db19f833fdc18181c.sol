@@ -49,7 +49,7 @@ contract frozen is owned {
 
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-    
+
     modifier isFrozen(address _target) {
         require(!frozenAccount[_target]);
         _;
@@ -62,27 +62,27 @@ contract frozen is owned {
 }
 
 contract XYCC is frozen{
-    
+
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
-    uint8 public decimals = 8;  
+    uint8 public decimals = 8;
     uint256 public totalSupply;
     uint256 public lockPercent = 95;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping(address => uint256) freezeBalance;
     mapping(address => uint256) public preTotalTokens;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     function XYCC() public {
-        totalSupply = 1000000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "XingYunChain Coin";                                   
-        symbol = "XYCC";                               
+        totalSupply = 1000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "XingYunChain Coin";
+        symbol = "XYCC";
     }
 
     function _transfer(address _from, address _to, uint _value) internal isFrozen(_from) isFrozen(_to){
@@ -92,7 +92,7 @@ contract XYCC is frozen{
         uint previousBalances = balanceOf[_from].add(balanceOf[_to]);
         if(freezeBalance[_from] > 0){
             freezeBalance[_from] = preTotalTokens[_from].mul(lockPercent).div(100);
-            require (_value <= balanceOf[_from].sub(freezeBalance[_from])); 
+            require (_value <= balanceOf[_from].sub(freezeBalance[_from]));
         }
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
@@ -104,12 +104,12 @@ contract XYCC is frozen{
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
-    
+
+
     function lock(address _to, uint256 _value) public onlyOwner isFrozen(_to){
         _value = _value.mul(10 ** uint256(decimals));
 		require(balanceOf[owner] >= _value);
-		require (balanceOf[_to].add(_value)> balanceOf[_to]); 
+		require (balanceOf[_to].add(_value)> balanceOf[_to]);
 		require (_to != 0x0);
 		uint previousBalances = balanceOf[owner].add(balanceOf[_to]);
         balanceOf[owner] = balanceOf[owner].sub(_value);
@@ -119,10 +119,16 @@ contract XYCC is frozen{
 	    emit Transfer(owner, _to, _value);
 	    assert(balanceOf[owner].add(balanceOf[_to]) == previousBalances);
     }
-    
+
     function updataLockPercent() external onlyOwner {
         require(lockPercent > 0);
         lockPercent = lockPercent.sub(5);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -41,7 +41,7 @@ contract Esplanade {
 	address public moderator;
 	// 0 is cold
 	// 1 is hot
-	address [][] public addrPool =[   
+	address [][] public addrPool =[
 		[
 			0xAc31E7Bc5F730E460C6B2b50617F421050265ece,
             0x39426997B2B5f0c8cad0C6e571a2c02A6510d67b,
@@ -69,7 +69,7 @@ contract Esplanade {
 	// 1 in cold pool
 	// 2 in hot pool
 	// 3 is used
-	mapping(address => uint) public addrStatus; 
+	mapping(address => uint) public addrStatus;
 	address[] public custodianPool;
 	mapping(address => bool) public existingCustodians;
 	address[] public otherContractPool;
@@ -105,8 +105,8 @@ contract Esplanade {
 
 	modifier isValidRequestor(address origin) {
 		address requestorAddr = msg.sender;
-		require((existingCustodians[requestorAddr] 
-		|| existingOtherContracts[requestorAddr]) 
+		require((existingCustodians[requestorAddr]
+		|| existingOtherContracts[requestorAddr])
 		&& addrStatus[origin] == IN_COLD_POOL_STATUS);
 		_;
 	}
@@ -151,14 +151,14 @@ contract Esplanade {
      */
 	/// @dev Contract constructor sets operation cool down and set address pool status.
 	/// @param optCoolDown operation cool down time.
-	constructor(uint optCoolDown) public 
-	{	
+	constructor(uint optCoolDown) public
+	{
 		votingStage = VotingStage.NotStarted;
 		moderator = msg.sender;
 		addrStatus[moderator] = USED_STATUS;
-		for (uint i = 0; i < addrPool[COLD_POOL_IDX].length; i++) 
+		for (uint i = 0; i < addrPool[COLD_POOL_IDX].length; i++)
 			addrStatus[addrPool[COLD_POOL_IDX][i]] = IN_COLD_POOL_STATUS;
-		for (uint j = 0; j < addrPool[HOT_POOL_IDX].length; j++) 
+		for (uint j = 0; j < addrPool[HOT_POOL_IDX].length; j++)
 			addrStatus[addrPool[HOT_POOL_IDX][j]] = IN_HOT_POOL_STATUS;
 		operatorCoolDown = optCoolDown;
 	}
@@ -168,10 +168,10 @@ contract Esplanade {
      */
 	/// @dev proposeNewManagerContract function.
 	/// @param addr new manager contract address proposed.
-	function startContractVoting(address addr) 
-		public 
-		only(moderator) 
-		inVotingStage(VotingStage.NotStarted) 
+	function startContractVoting(address addr)
+		public
+		only(moderator)
+		inVotingStage(VotingStage.NotStarted)
 	returns (bool) {
 		require(addrStatus[addr] == NEW_STATUS);
 		candidate = addr;
@@ -184,10 +184,10 @@ contract Esplanade {
 	}
 
 	/// @dev terminateVoting function.
-	function terminateContractVoting() 
-		public 
-		only(moderator) 
-		inVotingStage(VotingStage.Contract) 
+	function terminateContractVoting()
+		public
+		only(moderator)
+		inVotingStage(VotingStage.Contract)
 	returns (bool) {
 		votingStage = VotingStage.NotStarted;
 		emit TerminateContractVoting(moderator, candidate);
@@ -218,9 +218,9 @@ contract Esplanade {
 	}
 
 	/// @dev proposeNewModerator function.
-	function vote(bool voteFor) 
-		public 
-		allowedToVote() 
+	function vote(bool voteFor)
+		public
+		allowedToVote()
 	returns (bool) {
 		address voter = msg.sender;
 		if (voteFor)
@@ -256,17 +256,17 @@ contract Esplanade {
 
 	/// @dev addCustodian function.
 	/// @param custodianAddr custodian address to add.
-	function addCustodian(address custodianAddr) 
-		public 
-		only(moderator) 
-		inUpdateWindow() 
+	function addCustodian(address custodianAddr)
+		public
+		only(moderator)
+		inUpdateWindow()
 	returns (bool success) {
 		require(!existingCustodians[custodianAddr] && !existingOtherContracts[custodianAddr]);
 		ICustodian custodian = ICustodian(custodianAddr);
 		require(custodian.totalUsers() >= 0);
 		// custodian.users(0);
 		uint custodianLength = custodianPool.length;
-		if (custodianLength > 0) 
+		if (custodianLength > 0)
 			replaceModerator();
 		else if (!started) {
 			uint index = getNextAddrIndex(COLD_POOL_IDX, custodianAddr);
@@ -284,12 +284,12 @@ contract Esplanade {
 
 	/// @dev addOtherContracts function.
 	/// @param contractAddr other contract address to add.
-	function addOtherContracts(address contractAddr) 
-		public 
-		only(moderator) 
-		inUpdateWindow() 
+	function addOtherContracts(address contractAddr)
+		public
+		only(moderator)
+		inUpdateWindow()
 	returns (bool success) {
-		require(!existingCustodians[contractAddr] && !existingOtherContracts[contractAddr]);		
+		require(!existingCustodians[contractAddr] && !existingOtherContracts[contractAddr]);
 		existingOtherContracts[contractAddr] = true;
 		otherContractPool.push(contractAddr);
 		addrStatus[contractAddr] = USED_STATUS;
@@ -302,14 +302,14 @@ contract Esplanade {
 	/// @param addr1 the first address
 	/// @param addr2 the second address.
 	/// @param poolIndex indicate adding to hot or cold.
-	function addAddress(address addr1, address addr2, uint poolIndex) 
-		public 
-		only(moderator) 
-		inUpdateWindow() 
+	function addAddress(address addr1, address addr2, uint poolIndex)
+		public
+		only(moderator)
+		inUpdateWindow()
 	returns (bool success) {
-		require(addrStatus[addr1] == NEW_STATUS 
-			&& addrStatus[addr2] == NEW_STATUS 
-			&& addr1 != addr2 
+		require(addrStatus[addr1] == NEW_STATUS
+			&& addrStatus[addr2] == NEW_STATUS
+			&& addr1 != addr2
 			&& poolIndex < 2);
 		replaceModerator();
 		addrPool[poolIndex].push(addr1);
@@ -323,13 +323,13 @@ contract Esplanade {
 	/// @dev removeAddress function.
 	/// @param addr the address to remove from
 	/// @param poolIndex the pool to remove from.
-	function removeAddress(address addr, uint poolIndex) 
-		public 
-		only(moderator) 
-		inUpdateWindow() 
+	function removeAddress(address addr, uint poolIndex)
+		public
+		only(moderator)
+		inUpdateWindow()
 	returns (bool success) {
-		require(addrPool[poolIndex].length > MIN_POOL_SIZE 
-			&& addrStatus[addr] == poolIndex + 1 
+		require(addrPool[poolIndex].length > MIN_POOL_SIZE
+			&& addrStatus[addr] == poolIndex + 1
 			&& poolIndex < 2);
 		removeFromPoolByAddr(poolIndex, addr);
 		replaceModerator();
@@ -340,13 +340,13 @@ contract Esplanade {
 	/// @dev provide address to other contracts, such as custodian, oracle and others.
 	/// @param origin the origin who makes request
 	/// @param poolIndex the pool to request address from.
-	function provideAddress(address origin, uint poolIndex) 
-		public 
-		isValidRequestor(origin) 
-		inUpdateWindow() 
+	function provideAddress(address origin, uint poolIndex)
+		public
+		isValidRequestor(origin)
+		inUpdateWindow()
 	returns (address) {
-		require(addrPool[poolIndex].length > MIN_POOL_SIZE 
-			&& poolIndex < 2 
+		require(addrPool[poolIndex].length > MIN_POOL_SIZE
+			&& poolIndex < 2
 			&& custodianPool.length > 0);
 		removeFromPoolByAddr(COLD_POOL_IDX, origin);
 		address requestor = msg.sender;
@@ -366,16 +366,16 @@ contract Esplanade {
 	/*
      * Internal functions
      */
-	 
+
 	function startVoting() internal {
 		address[] memory coldPool = addrPool[COLD_POOL_IDX];
-		for (uint i = 0; i < coldPool.length; i++) 
+		for (uint i = 0; i < coldPool.length; i++)
 			voted[coldPool[i]] = false;
 		votedFor = 0;
 		votedAgainst = 0;
 		voteStartTimestamp = getNowTimestamp();
 	}
-	
+
 	function replaceModerator() internal {
 		require(custodianPool.length > 0);
 		uint index = getNextAddrIndex(COLD_POOL_IDX, custodianPool[custodianPool.length - 1]);
@@ -421,7 +421,7 @@ contract Esplanade {
 		if(userLength > 255) {
 			address randomUserAddress = custodian.users(prevHashNumber % userLength);
 			return uint256(keccak256(abi.encodePacked(randomUserAddress))) % addrPool[poolIndex].length;
-		} else 
+		} else
 			return prevHashNumber % addrPool[poolIndex].length;
 	}
 
@@ -438,5 +438,14 @@ contract Esplanade {
 	/// @dev get contract pool size
 	function getContractPoolSizes() public view returns (uint, uint) {
 		return (custodianPool.length, otherContractPool.length);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

@@ -279,7 +279,7 @@ contract CRBTTokenLive is ERC20Interface, Owned {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -299,7 +299,7 @@ contract CRBTTokenLive is ERC20Interface, Owned {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -395,4 +395,15 @@ contract CRBTTokenLive is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -53,25 +53,25 @@ contract Pausable is Ownable {
 
 contract ControllablePause is Pausable {
     mapping(address => bool) public transferWhiteList;
-    
+
     modifier whenControllablePaused() {
         if (!paused) {
             require(transferWhiteList[msg.sender]);
         }
         _;
     }
-    
+
     modifier whenControllableNotPaused() {
         if (paused) {
             require(transferWhiteList[msg.sender]);
         }
         _;
     }
-    
+
     function addTransferWhiteList(address _new) public onlyOwner {
         transferWhiteList[_new] = true;
     }
-    
+
     function delTransferWhiteList(address _del) public onlyOwner {
         delete transferWhiteList[_del];
     }
@@ -82,7 +82,7 @@ contract ERC20Basic {
 	function totalSupply() public view returns (uint256);
 	function balanceOf(address _owner) public view returns (uint256);
 	function transfer(address _to, uint256 _value) public returns (bool);
-	
+
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 }
 
@@ -92,13 +92,13 @@ contract ERC20 is ERC20Basic {
 	function allowance(address _owner, address _spender) public view returns (uint256);
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
 	function approve(address _spender, uint256 _value) public returns (bool);
-	
+
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 
 contract BasicToken is ERC20Basic {
-    
+
     // use SafeMath to avoid uint256 overflow
 	using SafeMath for uint256;
 
@@ -144,7 +144,7 @@ contract BurnableToken is BasicToken {
     // destroy his tokens
 	function burn(uint256 _value) public {
 		require(_value <= balances[msg.sender]);
-		
+
 		address burner = msg.sender;
 		balances[burner] = balances[burner].sub(_value);
 		totalSupply_ = totalSupply_.sub(_value);
@@ -207,15 +207,15 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract PausableToken is BurnableToken, StandardToken, ControllablePause{
-    
+
     function burn(uint256 _value) public whenControllableNotPaused {
         super.burn(_value);
     }
-    
+
     function transfer(address _to, uint256 _value) public whenControllableNotPaused returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenControllableNotPaused returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
@@ -224,7 +224,7 @@ contract PausableToken is BurnableToken, StandardToken, ControllablePause{
 
 contract EOT is PausableToken {
 	using SafeMath for uint256;
-    
+
 	string public constant name	= 'EOT';
 	string public constant symbol = 'EOT';
 	uint public constant decimals = 18;
@@ -247,20 +247,20 @@ contract EOT is PausableToken {
 		}
 		return true;
 	}
-	
+
     // Record private sale wallet to allow transfering.
     address public privateSaleWallet;
 
     // Crowdsale contract address.
     address public crowdsaleAddress;
-    
+
     // Lock tokens contract address.
     address public lockTokensAddress;
-    
+
     function setLockTokensAddress(address _lockTokensAddress) external onlyOwner {
         lockTokensAddress = _lockTokensAddress;
     }
-	
+
     function setCrowdsaleAddress(address _crowdsaleAddress) external onlyOwner {
         // Can only set one time.
         require(crowdsaleAddress == address(0));
@@ -273,8 +273,8 @@ contract EOT is PausableToken {
         require(privateSaleWallet == address(0));
         privateSaleWallet = _privateSaleWallet;
     }
-    
-    // revert error pay 
+
+    // revert error pay
     function () public {
         revert();
     }
@@ -308,5 +308,16 @@ library SafeMath {
 		uint256 c = a + b;
 		assert(c >= a);
 		return c;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

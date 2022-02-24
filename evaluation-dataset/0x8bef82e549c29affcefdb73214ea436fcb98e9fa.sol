@@ -3,7 +3,7 @@ pragma solidity ^0.4.17;
 //Developed by Zenos Pavlakou
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure  returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -29,7 +29,7 @@ library SafeMath {
 
 
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -40,7 +40,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
     /**
      * Transfers ACO tokens from the sender's account to another given account.
-     * 
+     *
      * @param _to The address of the recipient.
      * @param _amount The amount of tokens to send.
      * */
@@ -94,7 +94,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
     /**
      * Returns the balance of a given address.
-     * 
+     *
      * @param _addr The address of the balance to query.
      **/
     function balanceOf(address _addr) public constant returns (uint256) {
@@ -108,9 +108,9 @@ contract AdvancedToken is BasicToken, ERC20 {
     mapping (address => mapping (address => uint256)) allowances;
 
     /**
-     * Transfers tokens from the account of the owner by an approved spender. 
-     * The spender cannot spend more than the approved amount. 
-     * 
+     * Transfers tokens from the account of the owner by an approved spender.
+     * The spender cannot spend more than the approved amount.
+     *
      * @param _from The address of the owners account.
      * @param _amount The amount of tokens to transfer.
      * */
@@ -124,12 +124,12 @@ contract AdvancedToken is BasicToken, ERC20 {
     }
 
     /**
-     * Allows another account to spend a given amount of tokens on behalf of the 
+     * Allows another account to spend a given amount of tokens on behalf of the
      * owner's account. If the owner has previously allowed a spender to spend
      * tokens on his or her behalf and would like to change the approval amount,
      * he or she will first have to set the allowance back to 0 and then update
      * the allowance.
-     * 
+     *
      * @param _spender The address of the spenders account.
      * @param _amount The amount of tokens the spender is allowed to spend.
      * */
@@ -143,7 +143,7 @@ contract AdvancedToken is BasicToken, ERC20 {
 
     /**
      * Returns the approved allowance from an owners account to a spenders account.
-     * 
+     *
      * @param _owner The address of the owners account.
      * @param _spender The address of the spenders account.
      **/
@@ -161,12 +161,12 @@ contract MintableToken is AdvancedToken {
     event MintingFinished();
 
     /**
-     * Generates new ACO tokens during the ICO, after which the minting period 
-     * will terminate permenantly. This function can only be called by the ICO 
+     * Generates new ACO tokens during the ICO, after which the minting period
+     * will terminate permenantly. This function can only be called by the ICO
      * contract.
-     * 
+     *
      * @param _to The address of the account to mint new tokens to.
-     * @param _amount The amount of tokens to mint. 
+     * @param _amount The amount of tokens to mint.
      * */
     function mint(address _to, uint256 _amount) external onlyOwner onlyPayloadSize(2 * 32) returns (bool) {
         require(_to != 0x0 && _amount > 0 && !mintingFinished);
@@ -179,14 +179,14 @@ contract MintableToken is AdvancedToken {
 
     /**
      * Terminates the minting period permenantly. This function can only be called
-     * by the ICO contract only when the duration of the ICO has ended. 
+     * by the ICO contract only when the duration of the ICO has ended.
      * */
     function finishMinting() external onlyOwner {
         require(!mintingFinished);
         mintingFinished = true;
         MintingFinished();
     }
-    
+
     /**
      * Returns true if the minting period has ended, false otherwhise.
      * */
@@ -207,4 +207,15 @@ contract ACO is MintableToken {
         name = "ACO";
         symbol = "ACO";
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

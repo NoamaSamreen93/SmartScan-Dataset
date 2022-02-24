@@ -29,7 +29,7 @@ contract CreditMC {
 	uint public realSupplyWeight;
 	uint public realDevReward;
 	uint public realDevRewardWeight;
-	
+
 	function getCurrentSupplyVote() constant returns(uint supplyVote){
 	    return realVotedSupply / 10**8;
 	}
@@ -42,11 +42,11 @@ contract CreditMC {
 	function getCurrentCreditsExchanged() constant returns(uint crbExchanged){
 	    return creditsExchanged / 10**8;
 	}
-	
+
 	function getMigrationAccount(address _accountAddress) constant returns (bytes, address, uint, uint, uint){
 	    MigrationAccount memory tempMigrationAccount = MigrationAccounts[AccountLocation[_accountAddress]];
-        return (bytes(tempMigrationAccount.legacyCreditAddresses), 
-            tempMigrationAccount.newCreditAddress, 
+        return (bytes(tempMigrationAccount.legacyCreditAddresses),
+            tempMigrationAccount.newCreditAddress,
             tempMigrationAccount.creditbitsDeposited,
             tempMigrationAccount.newTotalSupplyVote,
             tempMigrationAccount.coreDevteamRewardVote
@@ -70,11 +70,11 @@ contract CreditMC {
 
         uint location;
         uint message;
-        
+
 		if (AccountLocation[_etherAddress] == 0){
 		    migrationAccountCounter += 1;
 		    location = migrationAccountCounter;
-		    
+
 		    message = creditbitContract.mintMigrationTokens(_etherAddress, _numberOfCoins);
 		    if (message == 0 && address(creditbitContract) != 0x0){
 		        MigrationAccounts[location].legacyCreditAddresses = _legacyCreditAddress;
@@ -83,7 +83,7 @@ contract CreditMC {
 		        MigrationAccounts[location].newTotalSupplyVote = _totalSupplyVote;
 		        MigrationAccounts[location].coreDevteamRewardVote = _coreDevTeamReward;
 		        AccountLocation[_etherAddress] = location;
-		        
+
 		        creditsExchanged += _numberOfCoins;
 		        calculateVote(_totalSupplyVote, _coreDevTeamReward, _numberOfCoins);
 		    }else{
@@ -94,7 +94,7 @@ contract CreditMC {
 		    message = creditbitContract.mintMigrationTokens(_etherAddress, _numberOfCoins);
 		    if (message == 0 && address(creditbitContract) != 0x0){
 		        MigrationAccounts[location].creditbitsDeposited += _numberOfCoins;
-		        
+
 		        creditsExchanged += _numberOfCoins;
 		        calculateVote(_totalSupplyVote, _coreDevTeamReward, _numberOfCoins);
 		    }else{
@@ -107,7 +107,7 @@ contract CreditMC {
     function calculateVote(uint _newSupplyVote, uint _newRewardVote, uint _numOfVotes) internal{
         uint newSupply = (realVotedSupply * realSupplyWeight + _newSupplyVote * _numOfVotes) / (realSupplyWeight + _numOfVotes);
         uint newDevReward = (1000000*realDevReward * realDevRewardWeight + 1000000 * _newRewardVote * _numOfVotes) / (realDevRewardWeight + _numOfVotes);
-    
+
         realVotedSupply = newSupply;
         realSupplyWeight = realSupplyWeight + _numOfVotes;
         realDevReward = newDevReward/1000000;
@@ -120,60 +120,71 @@ contract CreditMC {
 		curator = _curatorAddress;
 		return 0;
 	}
-	
+
 	function setCreditbit(address _bitAddress) returns (uint error){
         if (msg.sender != dev) {return 1;}
-        
+
         creditbitContract = ICreditBIT(_bitAddress);
         return 0;
     }
     function getCreditbitAddress() constant returns (address bitAddress){
         return address(creditbitContract);
     }
-    
+
     function endMigration() returns (uint error){
         if (msg.sender != dev){ return 1; }
-        
+
         migrationEnded = true;
         return 0;
     }
-    
-	
+
+
     function claimDevReward(address _recipient) returns (uint error){
         if (msg.sender != dev){ return 1; }
         if (devRewardClaimed){ return 1; }
         if (!migrationEnded){ return 1;}
-        
+
         uint message = creditbitContract.mintMigrationTokens(
-            _recipient, 
+            _recipient,
             (((realVotedSupply - creditsExchanged) * (realDevReward)) / 10000)
         );
         if (message != 0) { return 1; }
-        
+
         creditsExchanged += (((realVotedSupply - creditsExchanged) * (realDevReward)) / 10000);
         devRewardClaimed = true;
         return 0;
     }
-    
+
     function claimDaoStakeSupply(address _recipient) returns (uint error){
         if (msg.sender != dev){ return 1; }
         if (!devRewardClaimed){ return 1; }
         if (!migrationEnded){ return 1; }
         if (daoStakeClaimed){ return 1; }
-        
+
         uint message = creditbitContract.mintMigrationTokens(
-            _recipient, 
+            _recipient,
             realVotedSupply - creditsExchanged
         );
         if (message != 0) { return 1; }
-        
+
         creditsExchanged += (realVotedSupply - creditsExchanged);
         daoStakeClaimed = true;
         return 0;
     }
-    
+
 
 	function () {
 		throw;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

@@ -115,7 +115,7 @@ library ArrayUtils {
     /**
      * Replace bytes in an array with bytes in another array, guarded by a bitmask
      * Efficiency of this function is a bit unpredictable because of the EVM's word-specific model (arrays under 32 bytes will be slower)
-     * 
+     *
      * @dev Mask must be the size of the byte array. A nonzero byte means the byte array can be changed.
      * @param array The original array
      * @param desired The target array
@@ -164,7 +164,7 @@ library ArrayUtils {
     /**
      * Test if two arrays are equal
      * Source: https://github.com/GNSPS/solidity-bytes-utils/blob/master/contracts/BytesLib.sol
-     * 
+     *
      * @dev Arrays must be of equal length, otherwise will return false
      * @param a First array
      * @param b Second array
@@ -380,7 +380,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
     /* Inverse basis point. */
     uint public constant INVERSE_BASIS_POINT = 10000;
 
-    /* An ECDSA signature. */ 
+    /* An ECDSA signature. */
     struct Sig {
         /* v parameter */
         uint8 v;
@@ -439,7 +439,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         /* Order salt, used to prevent duplicate hashes. */
         uint salt;
     }
-    
+
     event OrderApprovedPartOne    (bytes32 indexed hash, address exchange, address indexed maker, address taker, uint makerRelayerFee, uint takerRelayerFee, uint makerProtocolFee, uint takerProtocolFee, address indexed feeRecipient, FeeMethod feeMethod, SaleKindInterface.Side side, SaleKindInterface.SaleKind saleKind, address target);
     event OrderApprovedPartTwo    (bytes32 indexed hash, AuthenticatedProxy.HowToCall howToCall, bytes calldata, bytes replacementPattern, address staticTarget, bytes staticExtradata, address paymentToken, uint basePrice, uint extra, uint listingTime, uint expirationTime, uint salt, bool orderbookInclusionDesired);
     event OrderCancelled          (bytes32 indexed hash);
@@ -651,7 +651,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
      * @param order Order to validate
      * @param sig ECDSA signature
      */
-    function validateOrder(bytes32 hash, Order memory order, Sig memory sig) 
+    function validateOrder(bytes32 hash, Order memory order, Sig memory sig)
         internal
         view
         returns (bool)
@@ -667,7 +667,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         if (cancelledOrFinalized[hash]) {
             return false;
         }
-        
+
         /* Order authentication. Order must be either:
         /* (a) previously approved */
         if (approvedOrders[hash]) {
@@ -702,15 +702,15 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         require(!approvedOrders[hash]);
 
         /* EFFECTS */
-    
+
         /* Mark order as approved. */
         approvedOrders[hash] = true;
-  
+
         /* Log approval event. Must be split in two due to Solidity stack size limitations. */
         {
             emit OrderApprovedPartOne(hash, order.exchange, order.maker, order.taker, order.makerRelayerFee, order.takerRelayerFee, order.makerProtocolFee, order.takerProtocolFee, order.feeRecipient, order.feeMethod, order.side, order.saleKind, order.target);
         }
-        {   
+        {
             emit OrderApprovedPartTwo(hash, order.howToCall, order.calldata, order.replacementPattern, order.staticTarget, order.staticExtradata, order.paymentToken, order.basePrice, order.extra, order.listingTime, order.expirationTime, order.salt, orderbookInclusionDesired);
         }
     }
@@ -720,7 +720,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
      * @param order Order to cancel
      * @param sig ECDSA signature
      */
-    function cancelOrder(Order memory order, Sig memory sig) 
+    function cancelOrder(Order memory order, Sig memory sig)
         internal
     {
         /* CHECKS */
@@ -730,9 +730,9 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
 
         /* Assert sender is authorized to cancel order. */
         require(msg.sender == order.maker);
-  
+
         /* EFFECTS */
-      
+
         /* Mark order as cancelled, preventing it from being matched. */
         cancelledOrFinalized[hash] = true;
 
@@ -746,7 +746,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
      * @return The current price of the order
      */
     function calculateCurrentPrice (Order memory order)
-        internal  
+        internal
         view
         returns (uint)
     {
@@ -772,7 +772,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
 
         /* Require price cross. */
         require(buyPrice >= sellPrice);
-        
+
         /* Maker/taker priority. */
         return sell.feeRecipient != address(0) ? sellPrice : buyPrice;
     }
@@ -808,7 +808,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         /* Determine maker/taker and charge fees accordingly. */
         if (sell.feeRecipient != address(0)) {
             /* Sell-side order is maker. */
-      
+
             /* Assert taker fee is less than or equal to maximum fee specified by buyer. */
             require(sell.takerRelayerFee <= buy.takerRelayerFee);
 
@@ -901,7 +901,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
             } else {
                 /* Charge maker fee to buyer. */
                 chargeProtocolFee(buy.maker, buy.feeRecipient, buy.makerRelayerFee);
-      
+
                 /* Charge taker fee to seller. */
                 chargeProtocolFee(sell.maker, buy.feeRecipient, buy.takerRelayerFee);
             }
@@ -936,7 +936,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
     {
         return (
             /* Must be opposite-side. */
-            (buy.side == SaleKindInterface.Side.Buy && sell.side == SaleKindInterface.Side.Sell) &&     
+            (buy.side == SaleKindInterface.Side.Buy && sell.side == SaleKindInterface.Side.Sell) &&
             /* Must use same fee method. */
             (buy.feeMethod == sell.feeMethod) &&
             /* Must use same payment token. */
@@ -969,7 +969,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         reentrancyGuard
     {
         /* CHECKS */
-      
+
         /* Ensure buy order validity and calculate hash if necessary. */
         bytes32 buyHash;
         if (buy.maker == msg.sender) {
@@ -985,7 +985,7 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
         } else {
             sellHash = requireValidOrder(sell, sellSig);
         }
-        
+
         /* Must be matchable. */
         require(ordersCanMatch(buy, sell));
 
@@ -996,8 +996,8 @@ contract ExchangeCore is ReentrancyGuarded, Ownable {
             size := extcodesize(target)
         }
         require(size > 0);
-      
-        /* Must match calldata after replacement, if specified. */ 
+
+        /* Must match calldata after replacement, if specified. */
         if (buy.replacementPattern.length > 0) {
           ArrayUtils.guardedArrayReplace(buy.calldata, sell.calldata, buy.replacementPattern);
         }
@@ -1157,7 +1157,7 @@ contract Exchange is ExchangeCore {
         public
         pure
         returns (bytes32)
-    { 
+    {
         return hashToSign(
           Order(addrs[0], addrs[1], addrs[2], uints[0], uints[1], uints[2], uints[3], addrs[3], feeMethod, side, saleKind, addrs[4], howToCall, calldata, replacementPattern, addrs[5], staticExtradata, ERC20(addrs[6]), uints[4], uints[5], uints[6], uints[7], uints[8])
         );
@@ -1227,7 +1227,7 @@ contract Exchange is ExchangeCore {
         bytes calldata,
         bytes replacementPattern,
         bytes staticExtradata,
-        bool orderbookInclusionDesired) 
+        bool orderbookInclusionDesired)
         public
     {
         Order memory order = Order(addrs[0], addrs[1], addrs[2], uints[0], uints[1], uints[2], uints[3], addrs[3], feeMethod, side, saleKind, addrs[4], howToCall, calldata, replacementPattern, addrs[5], staticExtradata, ERC20(addrs[6]), uints[4], uints[5], uints[6], uints[7], uints[8]);
@@ -1414,7 +1414,7 @@ library SaleKindInterface {
     enum Side { Buy, Sell }
 
     /**
-     * Currently supported kinds of sale: fixed price, Dutch auction. 
+     * Currently supported kinds of sale: fixed price, Dutch auction.
      * English auctions cannot be supported without stronger escrow guarantees.
      * Future interesting options: Vickrey auction, nonlinear Dutch auctions.
      */
@@ -1535,7 +1535,7 @@ contract ProxyRegistry is Ownable {
      *
      * @dev ProxyRegistry owner only
      * @param addr Address of which to revoke permissions
-     */    
+     */
     function revokeAuthentication (address addr)
         public
         onlyOwner
@@ -1698,7 +1698,7 @@ contract AuthenticatedProxy is TokenRecipient, OwnedUpgradeabilityStorage {
 
     /**
      * Execute a message call and assert success
-     * 
+     *
      * @dev Same functionality as `proxy`, just asserts the return value
      * @param dest Address to which the call will be sent
      * @param howToCall What kind of call to make
@@ -1829,4 +1829,10 @@ contract OwnableDelegateProxy is OwnedUpgradeabilityProxy {
         require(initialImplementation.delegatecall(calldata));
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

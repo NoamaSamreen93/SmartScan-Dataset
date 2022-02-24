@@ -48,7 +48,7 @@ contract StandardToken is Token {
         }
         return(i);
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
@@ -58,9 +58,9 @@ contract Cyrus is StandardToken{
         throw;
     }
 
-    string public name;                   
-    uint8 public decimals;              
-    string public symbol;                
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
     function Cyrus(
         ) {
@@ -76,4 +76,15 @@ contract Cyrus is StandardToken{
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

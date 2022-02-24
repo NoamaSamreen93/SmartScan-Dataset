@@ -1,23 +1,23 @@
 pragma solidity ^0.4.15;
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a / b;
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -26,9 +26,9 @@ library SafeMath {
 }
 
 contract Ownable {
-    
+
   address public owner;
- 
+
   function Ownable() {
     owner = msg.sender;
   }
@@ -39,10 +39,10 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
- 
+
 }
 
 contract SingleTokenCoin {
@@ -110,8 +110,8 @@ contract Crowdsale is Ownable {
   address public marketingAddr;
 
   address public unsoldAddr;
-  address public collectAddr;  
-  
+  address public collectAddr;
+
   bool public mintingFinished = false;
 
   //Storage for Founding Buyers Token
@@ -145,12 +145,12 @@ contract Crowdsale is Ownable {
   address[] private public_investors;   // 4
 
   uint256 private soldTokens;
-  
+
   uint256 private maxcup;
 
-  uint256 private totalAmount; 
-  uint256 private foundingAmount; 
-  uint256 private angelAmount;  
+  uint256 private totalAmount;
+  uint256 private foundingAmount;
+  uint256 private angelAmount;
   uint256 private preSaleAmount;
   uint256 private PEInvestorAmount;
   uint256 private publicSaleAmount;
@@ -158,8 +158,8 @@ contract Crowdsale is Ownable {
   uint256 private coreTeamAmount;
   uint256 private coreTeamAuto;
   uint256 private coreTeamManual;
-  uint256 private itDevAmount;  
-  uint256 private futDevAmount; 
+  uint256 private itDevAmount;
+  uint256 private futDevAmount;
   uint256 private commFoundAmount;
   uint256 private socWarefareAmount;
   uint256 private marketingAmount;
@@ -175,8 +175,8 @@ contract Crowdsale is Ownable {
   uint256 private public_sale_totalETH;
 
   uint256 private firstPhaseAmount;
-  uint256 private secondPhaseAmount; 
-  uint256 private thirdPhaseAmount;  
+  uint256 private secondPhaseAmount;
+  uint256 private thirdPhaseAmount;
   uint256 private fourPhaseAmount;
 
   uint256 private firstPhaseDiscount;
@@ -188,7 +188,7 @@ contract Crowdsale is Ownable {
 
   bool private moveTokens;
 
-  bool withdrowTokensComplete = false;  
+  bool withdrowTokensComplete = false;
 
   function Crowdsale(address token_addr) {
 
@@ -218,7 +218,7 @@ contract Crowdsale is Ownable {
     public_sale_finish = public_sale_start + 14 days;
 
     moveTokens = false;
-    
+
     isAngel = true;
     isPreSale = false;
     isPublic = false;
@@ -304,7 +304,7 @@ contract Crowdsale is Ownable {
   }
 
   function() external payable {
-    mint();    
+    mint();
   }
 
   function bytesToUInt(bytes32 v) private constant returns (uint ret) {
@@ -338,7 +338,7 @@ contract Crowdsale is Ownable {
   }
 
   function calculatePrice(uint256 _usd, uint256 _pre_sale_sold) private constant returns(uint256) {
-    
+
     if (currentPhase == 1 && pre_sale_sold + _pre_sale_sold <= firstPhaseAmount) {
       return _usd.mul(firstPhaseDiscount).div(100);
     }
@@ -377,7 +377,7 @@ contract Crowdsale is Ownable {
       require(foundingAmount >= _tokens);
 
       founding_buyers_token[_address] = founding_buyers_token[_address].add(_tokens);
-    
+
       founding_sold = founding_sold + _tokens;
 
       token.transferTokens(_address, _tokens, public_sale_start, 1);
@@ -397,9 +397,9 @@ contract Crowdsale is Ownable {
       require(PEInvestorAmount >= _tokens);
 
       pe_buyers_token[_address] = pe_buyers_token[_address].add(_tokens);
-    
+
       peInvestors_sold = peInvestors_sold + _tokens;
-      
+
       token.transferTokens(_address, _tokens, public_sale_start, 2);
 
       PEInvestorAmount = PEInvestorAmount - _tokens;
@@ -575,7 +575,7 @@ contract Crowdsale is Ownable {
       if (currentPhase == 2 && pre_sale_sold + tokens + totalTokensPhase > secondPhaseAmount) {
         (availableTokensPhase, ethToRefundPhase) = calculateMinorRefund(secondPhaseAmount, pre_sale_sold, currentRate, tokens);
         totalTokensPhase = totalTokensPhase + availableTokensPhase;
-        
+
         remETH = ethToRefundPhase;
 
         currentPhase = 3;
@@ -587,7 +587,7 @@ contract Crowdsale is Ownable {
       if (currentPhase == 3 && pre_sale_sold + tokens + totalTokensPhase > thirdPhaseAmount) {
         (availableTokensPhase, ethToRefundPhase) = calculateMinorRefund(thirdPhaseAmount, pre_sale_sold, currentRate, tokens);
         totalTokensPhase = totalTokensPhase + availableTokensPhase;
-        
+
         remETH = ethToRefundPhase;
 
         currentPhase = 4;
@@ -599,7 +599,7 @@ contract Crowdsale is Ownable {
       if (currentPhase == 4 && pre_sale_sold + tokens + totalTokensPhase > fourPhaseAmount) {
         (availableTokensPhase, ethToRefundPhase) = calculateMinorRefund(fourPhaseAmount, pre_sale_sold, currentRate, tokens);
         totalTokensPhase = totalTokensPhase + availableTokensPhase;
-        
+
         remETH = ethToRefundPhase;
 
         currentPhase = 0;
@@ -626,8 +626,8 @@ contract Crowdsale is Ownable {
         tokens = availableTokensPhase;
         eth = eth - ethToRefundPhase;
         refund(ethToRefundPhase);
-        
-      }    
+
+      }
     }
 
     if (isPublic) {
@@ -636,7 +636,7 @@ contract Crowdsale is Ownable {
         tokens = availableTokensPhase;
         eth = eth - ethToRefundPhase;
         refund(ethToRefundPhase);
-        
+
       }
     }
 
@@ -650,7 +650,7 @@ contract Crowdsale is Ownable {
     }
 
     soldTokens = soldTokens + tokens;
-    
+
     totalETH = totalETH + eth;
   }
 
@@ -668,9 +668,9 @@ contract Crowdsale is Ownable {
     collectAddr.transfer(this.balance);
   }
 
-  function withdrowTokens() public onlyOwner {    
+  function withdrowTokens() public onlyOwner {
     if (!withdrowTokensComplete) {
-      
+
       token.withdrowTokens(coreTeamAddr, coreTeamAmount);
       token.withdrowTokens(itDevAddr, itDevAmount);
       token.withdrowTokens(futDevAddr, futDevAmount);
@@ -703,7 +703,7 @@ contract Crowdsale is Ownable {
       pre_sale_buyers_eth[_address] = pre_sale_buyers_eth[_address].add(_amount);
 
       pre_sale_buyers_token[_address] = pre_sale_buyers_token[_address].add(_tokens);
-    
+
       pre_sale_sold = pre_sale_sold + _tokens;
     }
 
@@ -715,7 +715,7 @@ contract Crowdsale is Ownable {
       public_buyers_eth[_address] = public_buyers_eth[_address].add(_amount);
 
       public_buyers_token[_address] = public_buyers_token[_address].add(_tokens);
-    
+
       public_sale_sold = public_sale_sold + _tokens;
     }
   }
@@ -821,7 +821,7 @@ contract Crowdsale is Ownable {
     return (totalETH, angel_sale_totalETH, pre_sale_totalETH, public_sale_totalETH);
   }
 
-  function getCurrentPrice() public constant returns(uint256) {  
+  function getCurrentPrice() public constant returns(uint256) {
     uint256 price = calculateRate();
     return calculatePrice(price, 0);
   }
@@ -838,11 +838,22 @@ contract Crowdsale is Ownable {
     if (msg.value != 0) {
         wrapper.transfer(msg.value);
     }
-    
+
     wrapper.update("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
   }
 
   function getWrapperData() public constant returns(bytes32) {
     return wrapper.getWrapperData();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

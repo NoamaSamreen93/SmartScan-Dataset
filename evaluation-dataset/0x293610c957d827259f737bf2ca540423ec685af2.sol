@@ -40,9 +40,9 @@ contract Ownable {
     owner = newOwner;
   }
    function kill() public onlyOwner{
-      
+
           selfdestruct(owner); // 销毁合约
-       
+
     }
 
 }
@@ -196,7 +196,7 @@ contract MLC is Pausable, DetailedERC20 {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
- 
+
 
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
@@ -208,4 +208,15 @@ contract MLC is Pausable, DetailedERC20 {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

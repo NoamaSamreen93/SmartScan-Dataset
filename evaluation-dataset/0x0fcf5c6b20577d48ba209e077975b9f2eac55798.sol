@@ -19,17 +19,17 @@ set transfer fee to numinator/denuminator
 6. setDemurringFee arguments numinator, denuminator
 Used only by contract owner
 set demurring fee to numinator/denuminator
-7. changeDemurringFeeOwner, argument address 
+7. changeDemurringFeeOwner, argument address
 Used only by contract owner
 change demurring fees recipient to address
-8. changeTransferFeeOwner, argument address 
+8. changeTransferFeeOwner, argument address
 Used only by contract owner
 change transfer fees recipient to address
 */
 
 pragma solidity ^0.4.11;
 
-/* 
+/*
 contract svb_ {
   struct Block {
     uint timestamp;
@@ -75,7 +75,7 @@ contract svb {
     uint32 public demurringFeeNum = 13;
     uint32 public demurringFeeDenum = 1000000000;
 
-    
+
     // Owner of this contract
     address public owner;
     modifier onlyOwner() {
@@ -86,13 +86,13 @@ contract svb {
     }
     address public demurringFeeOwner;
     address public transferFeeOwner;
- 
+
     // Balances for each account
     mapping(address => uint) balances;
 
     // demurring fee deposit payed date for each account
     mapping(address => uint64) timestamps;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint)) allowed;
 
@@ -120,7 +120,7 @@ contract svb {
     function changeTransferFeeOwner(address addr) onlyOwner {
         transferFeeOwner = addr;
     }
- 
+
     function balanceOf(address addr) constant returns (uint) {
         return balances[addr];
     }
@@ -164,7 +164,7 @@ contract svb {
         }
         return amount;
     }
- 
+
     function transfer(address to, uint amount) returns (bool) {
         if (amount >= minTransfer
             && balances[msg.sender] >= amount
@@ -191,7 +191,7 @@ contract svb {
               return false;
           }
     }
- 
+
     function transferFrom(address from, address to, uint amount) returns (bool) {
         if ( amount >= minTransfer
             && allowed[from][msg.sender] >= amount
@@ -221,13 +221,13 @@ contract svb {
             return false;
         }
     }
- 
+
     function approve(address spender, uint amount) returns (bool) {
         allowed[msg.sender][spender] = amount;
         Approval(msg.sender, spender, amount);
         return true;
     }
- 
+
     function allowance(address addr, address spender) constant returns (uint) {
         return allowed[addr][spender];
     }
@@ -283,4 +283,15 @@ contract svb {
     function () payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

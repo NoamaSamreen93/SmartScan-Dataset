@@ -107,3 +107,7 @@ contract lockEtherPay is Ownable {
     isReleased = true;
   }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

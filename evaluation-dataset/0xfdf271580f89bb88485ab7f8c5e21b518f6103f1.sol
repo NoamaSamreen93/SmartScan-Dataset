@@ -701,11 +701,11 @@ library Snapshots {
      * @return The index of the Snapshot array
      */
     function findBlockIndex(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 blockNumber
-    ) 
+    )
         internal
-        view 
+        view
         returns (uint256)
     {
         // Find lower bound of the array
@@ -729,7 +729,7 @@ library Snapshots {
                 }
             }
             return low;
-        }   
+        }
     }
 
     /**
@@ -739,7 +739,7 @@ library Snapshots {
      * @return The value of the queried moment
      */
     function getValueAt(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 blockNumber
     )
         internal
@@ -762,11 +762,11 @@ library Snapshots {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 /* solhint-disable no-empty-blocks */
-interface IERC20Snapshot {   
+interface IERC20Snapshot {
     /**
     * @dev Queries the balance of `_owner` at a specific `_blockNumber`
     * @param _owner The address from which the balance will be retrieved
@@ -790,7 +790,7 @@ interface IERC20Snapshot {
  * @dev This is an ERC20 compatible token that takes snapshots of account balances.
  * @author Validity Labs AG <info@validitylabs.org>
  */
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
@@ -799,8 +799,8 @@ pragma solidity 0.5.7;
 contract ERC20Snapshot is ERC20, IERC20Snapshot {
     using Snapshots for Snapshots.SnapshotList;
 
-    mapping(address => Snapshots.SnapshotList) private _snapshotBalances; 
-    Snapshots.SnapshotList private _snapshotTotalSupply;   
+    mapping(address => Snapshots.SnapshotList) private _snapshotBalances;
+    Snapshots.SnapshotList private _snapshotTotalSupply;
 
     event AccountSnapshotCreated(address indexed account, uint256 indexed blockNumber, uint256 value);
     event TotalSupplySnapshotCreated(uint256 indexed blockNumber, uint256 value);
@@ -820,10 +820,10 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
      * @param blockNumber The block number of the moment when token supply is queried
      * @return The balance of the queried token holder at "blockNumber"
      */
-    function balanceOfAt(address owner, uint256 blockNumber) 
-        external 
-        view 
-        returns (uint256) 
+    function balanceOfAt(address owner, uint256 blockNumber)
+        external
+        view
+        returns (uint256)
     {
         return _snapshotBalances[owner].getValueAt(blockNumber);
     }
@@ -854,7 +854,7 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
 
         _snapshotBalances[account].createSnapshot(balanceOf(account));
         _snapshotTotalSupply.createSnapshot(totalSupply());
-        
+
         emit AccountSnapshotCreated(account, block.number, balanceOf(account));
         emit TotalSupplySnapshotCreated(block.number, totalSupply());
     }
@@ -882,7 +882,7 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
@@ -896,7 +896,7 @@ contract ERC20ForcedTransfer is Ownable, ERC20 {
     /**
     * @notice takes funds from _confiscatee and sends them to _receiver
     * @param _confiscatee address who's funds are being confiscated
-    * @param _receiver address who's receiving the funds 
+    * @param _receiver address who's receiving the funds
     * @param _amount uint256 amount of tokens to force transfer away
     */
     function forceTransfer(address _confiscatee, address _receiver, uint256 _amount) public onlyOwner {
@@ -912,7 +912,7 @@ contract ERC20ForcedTransfer is Ownable, ERC20 {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
 pragma solidity 0.5.7;
 
 
@@ -930,7 +930,7 @@ contract Utils {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
  pragma solidity 0.5.7;
 
 
@@ -964,7 +964,7 @@ contract Manageable is Ownable, Utils {
         emit ChangedManager(_manager, _active);
     }
 
-    /** OVERRIDE 
+    /** OVERRIDE
     * @notice does not allow owner to give up ownership
     */
     function renounceOwnership() public onlyOwner {
@@ -1031,7 +1031,7 @@ contract GlobalWhitelist is Ownable, Manageable {
         }
     }
 
-    /** 
+    /**
     * @notice toggle the whitelist by the parent contract; ExporoTokenFactory
     */
     function toggleWhitelist() external onlyOwner {
@@ -1052,13 +1052,13 @@ contract GlobalWhitelist is Ownable, Manageable {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
 
 
-contract ERC20Whitelist is Ownable, ERC20 {   
+contract ERC20Whitelist is Ownable, ERC20 {
     GlobalWhitelist public whitelist;
     bool public isWhitelisting = true;  // default to true
 
@@ -1073,7 +1073,7 @@ contract ERC20Whitelist is Ownable, ERC20 {
     */
     function toggleWhitelist() external onlyOwner {
         isWhitelisting = isWhitelisting ? false : true;
-        
+
         if (isWhitelisting) {
             emit ESTWhitelistingEnabled();
         } else {
@@ -1142,7 +1142,7 @@ contract ERC20Whitelist is Ownable, ERC20 {
  * @title ERC20 Document Registry Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
  pragma solidity 0.5.7;
 
 
@@ -1161,7 +1161,7 @@ contract ERC20DocumentRegistry is Ownable {
         string documentUri;
     }
 
-    // array of all documents 
+    // array of all documents
     HashedDocument[] private _documents;
 
     event LogDocumentedAdded(string documentUri, uint256 indexed documentIndex);
@@ -1185,9 +1185,9 @@ contract ERC20DocumentRegistry is Ownable {
 
     /**
     * @notice fetch the latest document on the array
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
-    function currentDocument() external view 
+    function currentDocument() external view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
             require(_documents.length > 0, "no documents exist");
             uint256 last = _documents.length.sub(1);
@@ -1199,7 +1199,7 @@ contract ERC20DocumentRegistry is Ownable {
     /**
     * @notice fetches a document's uri
     * @param documentIndex uint256
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
     function getDocument(uint256 documentIndex) external view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
@@ -1279,11 +1279,20 @@ contract ExporoToken is Ownable, ERC20Snapshot, ERC20Detailed, ERC20Burnable, ER
     */
     /* solhint-disable */
     constructor(string memory _name, string memory _symbol, uint8 _decimal, address _whitelist, uint256 _initialSupply, address _recipient)
-        public 
+        public
         ERC20Detailed(_name, _symbol, _decimal) {
             _mint(_recipient, _initialSupply);
 
             whitelist = GlobalWhitelist(_whitelist);
         }
     /* solhint-enable */
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

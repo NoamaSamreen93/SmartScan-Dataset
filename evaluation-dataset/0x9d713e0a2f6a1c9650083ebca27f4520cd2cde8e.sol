@@ -3,7 +3,7 @@
  * Non-Profit Open Software License 3.0 (NPOSL-3.0)
  * https://opensource.org/licenses/NPOSL-3.0
  */
- 
+
 
 pragma solidity 0.4.25;
 
@@ -301,7 +301,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -880,4 +880,13 @@ contract TokenSale is RefundableCrowdsale, PostDeliveryCrowdsale {
       return weiRaised >= _target;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

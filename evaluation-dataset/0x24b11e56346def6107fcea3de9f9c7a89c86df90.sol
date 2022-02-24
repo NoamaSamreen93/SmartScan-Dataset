@@ -103,7 +103,7 @@ contract GTEX is ERC20Interface, Pausable {
     mapping(address => uint) public lockInfo;
     mapping(address => mapping(address => uint)) internal allowed;
     mapping (address => bool) public admins;
-    
+
     modifier onlyAdmin {
         require(msg.sender == owner || admins[msg.sender]);
         _;
@@ -131,7 +131,7 @@ contract GTEX is ERC20Interface, Pausable {
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require(_to != 0x0);                                    // Prevent transfer to 0x0 address. 
+        require(_to != 0x0);                                    // Prevent transfer to 0x0 address.
         require(_value != 0);                                   // Prevent transfer 0
         require(balances[_from] >= _value);                     // Check if the sender has enough
         require(balances[_from] - _value >= lockInfo[_from]);   // Check after transaction, balance is still more than locked value
@@ -161,7 +161,7 @@ contract GTEX is ERC20Interface, Pausable {
     function allowance(address tokenOwner, address spender) public whenNotPaused view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     //Admin Tool
     function lockOf(address tokenOwner) public view returns (uint lockedToken) {
         return lockInfo[tokenOwner];
@@ -172,15 +172,15 @@ contract GTEX is ERC20Interface, Pausable {
         lockInfo[target] = lockedToken;
         emit FrozenFunds(target, lockedToken);
     }
-    
+
     //Batch lock amount with array
     function batchLockArray(address[] accounts, uint[] lockedToken) public whenNotPaused onlyAdmin {
       for (uint i = 0; i < accounts.length; i++) {
            lock(accounts[i], lockedToken[i]);
         }
     }
-    
-    //Send token with lock 
+
+    //Send token with lock
     function sendTokensWithLock (address receiver, uint tokens, bool freeze) public whenNotPaused onlyAdmin {
         _transfer(msg.sender, receiver, tokens);
         if(freeze) {
@@ -200,4 +200,15 @@ contract GTEX is ERC20Interface, Pausable {
     function sendInitialTokens (address user) public onlyOwner {
         _transfer(msg.sender, user, balanceOf(owner));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

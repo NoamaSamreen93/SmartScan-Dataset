@@ -114,7 +114,7 @@ contract LEBChain is ERC20 {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
- 
+
 
     function enableWhitelist(address[] addresses) onlyOwner public {
         for (uint i = 0; i < addresses.length; i++) {
@@ -299,4 +299,15 @@ contract LEBChain is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

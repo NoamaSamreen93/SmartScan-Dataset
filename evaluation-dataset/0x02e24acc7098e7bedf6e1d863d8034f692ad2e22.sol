@@ -4,12 +4,12 @@ pragma solidity ^0.4.21;
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address _from, address _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -31,7 +31,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -63,12 +63,12 @@ contract SafeMath {
 	  assert(z >= x);
 	  return z;
   }
-	
+
   function safeDiv(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x / y;
     return z;
   }
-	
+
   function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x * y;
     assert(x == 0 || z / x == y);
@@ -90,7 +90,7 @@ contract SafeMath {
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint256 _decimals);
@@ -98,7 +98,7 @@ contract ERC223 {
 
   function transfer(address to, uint value) public returns (bool ok);
   function transfer(address to, uint value, bytes data) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -110,18 +110,18 @@ contract ContractReceiver {
 contract ERC223Token is ERC223,SafeMath ,Ownable {
 
   mapping(address => uint) balances;
-  
+
   string public name;
   string public symbol;
   uint256 public decimals;
   uint256 public totalSupply;
-  
+
   address public crowdsaleAgent;
   address[] public addrCotracts;
-  bool public released = false;  
+  bool public released = false;
   mapping(address => bool) public privilegedAddr;
   bool public privilege = false;
-  
+
   /**
    * @dev The function can be called only by crowdsale agent.
    */
@@ -129,7 +129,7 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
     assert(msg.sender == crowdsaleAgent);
     _;
   }
-  
+
   /**
    * @dev Limit token transfer until the crowdsale is over.
    */
@@ -144,8 +144,8 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
       }
     }
     _;
-  } 
-  
+  }
+
   // Function to access name of token .
   function name() public view returns (string _name) {
       return name;
@@ -162,8 +162,8 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
   function totalSupply() public view returns (uint256 _totalSupply) {
       return totalSupply;
   }
-  
-  
+
+
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data) public canTransfer returns (bool success) {
     if(isContract(_to)) {
@@ -173,7 +173,7 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
         return transferToAddress(_to, _value, _data);
     }
   }
-  
+
   // Standard function transfer similar to ERC20 transfer with no _data .
   // Added due to backwards compatibility reasons .
   function transfer(address _to, uint _value) public canTransfer returns (bool success) {
@@ -206,7 +206,7 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
     emit Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balanceOf(msg.sender) < _value) revert();
@@ -238,13 +238,13 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
   function balanceOf(address _owner) public view returns (uint balance) {
     return balances[_owner];
   }
-  
-  /** 
+
+  /**
    * @dev Create new tokens and allocate them to an address. Only callably by a crowdsale agent
    * @param _to dest address
    * @param _value tokens amount
    * @return mint result
-   */ 
+   */
   function mint(address _to, uint _value, bytes _data) public onlyCrowdsaleAgent returns (bool success) {
     totalSupply = safeAdd(totalSupply, _value);
     balances[_to] = safeAdd(balances[_to], _value);
@@ -259,33 +259,33 @@ contract ERC223Token is ERC223,SafeMath ,Ownable {
   function setCrowdsaleAgent(address _crowdsaleAgent) public onlyOwner {
     crowdsaleAgent = _crowdsaleAgent;
   }
-  
+
   /**
-   * @dev One way function to release the tokens to the wild. Can be called only from the release agent that is the final ICO contract. 
+   * @dev One way function to release the tokens to the wild. Can be called only from the release agent that is the final ICO contract.
    */
   function releaseTokenTransfer() public onlyCrowdsaleAgent {
     released = true;
   }
-  
+
   function releasePrivilege() public onlyCrowdsaleAgent {
     privilege = true;
   }
-  
+
   function setAddrForPrivilege(address _owner) public onlyCrowdsaleAgent {
     privilegedAddr[_owner] = true;
   }
-  
+
   function getAddrForPrivilege(address _owner) public view returns (bool success){
     return privilegedAddr[_owner];
   }
 
 }
 
-/** 
+/**
  * @title Oil-T contract - standard ERC20 token with Short Hand Attack and approve() race condition mitigation.
  */
 contract OilToken is ERC223Token{
-  
+
   /**
    * @dev The function can be called only by agent.
    */
@@ -300,26 +300,26 @@ contract OilToken is ERC223Token{
 
   /** Name and symbol were updated. */
   event UpdatedTokenInformation(string newName, string newSymbol);
-  
+
   /**
    * @param _name Token name
    * @param _symbol Token symbol - should be all caps
    * @param _decimals Number of decimal places
    */
-   
+
   function OilToken(string _name, string _symbol, uint256 _decimals) public {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
-  }   
-  
+  }
+
    function tokenFallback(address _from, uint _value, bytes _data) public onlyAgent returns (bool success){
     balances[this] = safeSub(balanceOf(this), _value);
     balances[_from] = safeAdd(balanceOf(_from), _value);
     emit Transfer(this, _from, _value, _data);
     return true;
   }
-  
+
   /**
    * Owner can update token information here.
    *
@@ -334,15 +334,15 @@ contract OilToken is ERC223Token{
     symbol = _symbol;
     emit UpdatedTokenInformation(name, symbol);
   }
-  
+
   function setAddr (address _addr) public onlyOwner {
     addrCotracts.push(_addr);
   }
- 
+
   function transferForICO(address _to, uint _value) public onlyCrowdsaleAgent returns (bool success) {
     return this.transfer(_to, _value);
   }
- 
+
   function delAddr (uint number) public onlyOwner {
     require(number < addrCotracts.length);
     for(uint i = number; i < addrCotracts.length-1; i++) {
@@ -350,4 +350,15 @@ contract OilToken is ERC223Token{
     }
     addrCotracts.length = addrCotracts.length-1;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

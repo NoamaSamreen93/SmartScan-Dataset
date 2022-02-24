@@ -5,7 +5,7 @@ pragma solidity 0.5.0;
 // ERC Token Standard #20 Interface
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20Basic.sol
-// 
+//
 // ----------------------------------------------------------------------------
 contract ERC20Interface {
     function totalSupply() public view returns (uint256);
@@ -59,7 +59,7 @@ contract AuthorisedContractBase is HorizonContractBase {
     constructor() public {
         // The contract owner is always authorised.
         setAuthorised(msg.sender, true);
-    } 
+    }
 
     /**
      * @notice Add or remove special privileges.
@@ -171,10 +171,10 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
     // Public identity variables of the token used by ERC20 platforms.
     string public name = "Talketh";
     string public symbol = "VOX";
-    
+
     // There is no good reason to deviate from 18 decimals, see https://github.com/ethereum/EIPs/issues/724.
     uint8 public decimals = 18;
-    
+
     // The total supply of tokens, set at creation, decreased with burn.
     uint256 public totalSupply_;
 
@@ -284,7 +284,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
     function transfer(address to, uint256 value) public returns (bool) {
         return _transfer(msg.sender, to, value);
     }
-	
+
     /**
      * Transfer pre-approved tokens on behalf of an account.
      *
@@ -296,7 +296,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      */
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
         require(value <= allowanceCollection[from][msg.sender], "Amount to transfer is greater than allowance.");
-		
+
         allowanceCollection[from][msg.sender] = allowanceCollection[from][msg.sender].sub(value);
         _transfer(from, to, value);
         return true;
@@ -354,7 +354,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's KYC app will register a hash of the Contributors
-     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be 
+     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be
      * notified of the submission and retrieve the Contributor data for formal review.
      *
      * All Contributors must successfully complete our ICO KYC review prior to being allowed on-board.
@@ -376,7 +376,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's registered KYC provider submits their approval
-     * for this Contributor to particpate using the ICO-Platform portal. 
+     * for this Contributor to particpate using the ICO-Platform portal.
      *
      * Each Contributor will then be sent the Ethereum, Bitcoin and IBAN account numbers to
      * deposit their Approved Contribution in exchange for VOX Tokens.
@@ -398,7 +398,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform shall register a fully licensed Swiss KYC
-     * provider to assess each potential Contributor for KYC and AML under Swiss law. 
+     * provider to assess each potential Contributor for KYC and AML under Swiss law.
      *
      * -- End ICO-Platform Note --
      *
@@ -422,7 +422,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's portal shall award referrers as part of the ICO
-     * VOX Token issuance procedure as overseen by the Swiss KYC provider. 
+     * VOX Token issuance procedure as overseen by the Swiss KYC provider.
      *
      * -- End ICO-Platform Note --
      *
@@ -442,7 +442,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      * During the ICO phase the owner will allocate tokens once KYC completes and funds are deposited.
      *
      * ---- ICO-Platform Note ----
-     * The horizon-globex.com ICO platform's portal shall issue VOX Token to Contributors on receipt of 
+     * The horizon-globex.com ICO platform's portal shall issue VOX Token to Contributors on receipt of
      * the Approved Contribution funds at the KYC providers Escrow account/wallets.
      * Only after VOX Tokens are issued to the Contributor can the Swiss KYC provider allow the transfer
      * of funds from their Escrow to Company.
@@ -457,7 +457,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
 
         // If an attempt is made to transfer more tokens than owned, transfer the remainder.
         uint256 toTransfer = (value > (balances[msg.sender] - rewardPool_ )) ? (balances[msg.sender] - rewardPool_) : value;
-        
+
         _transfer(msg.sender, to, toTransfer);
 
         // Handle a referred account receiving tokens.
@@ -472,7 +472,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
      * End the ICO phase in accordance with KYC procedures and clean up.
      *
      * ---- ICO-Platform Note ----
-     * The horizon-globex.com ICO platform's portal shall halt the ICO at the end of the 
+     * The horizon-globex.com ICO platform's portal shall halt the ICO at the end of the
      * Contribution Period, as defined in the ICO Terms and Conditions https://talketh.io/Terms.
      *
      * -- End ICO-Platform Note --
@@ -485,7 +485,7 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
 
         emit IcoComplete();
     }
-	
+
     /**
      * Internal transfer, can only be called by this contract
      *
@@ -502,11 +502,11 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
         // Quick exit for zero, but allow it in case this transfer is part of a chain.
         if(value == 0)
             return true;
-		
+
         // Perform the transfer.
         balances[from] = balances[from].sub(value);
         balances[to] = balances[to].add(value);
-		
+
         // Any tokens sent to to owner are implicitly burned.
         if (to == owner) {
             _burn(to, value);
@@ -534,4 +534,13 @@ contract VOXToken is ERC20Interface, AuthorisedContractBase {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

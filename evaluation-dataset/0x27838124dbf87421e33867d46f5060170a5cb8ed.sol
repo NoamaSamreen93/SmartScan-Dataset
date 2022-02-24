@@ -114,7 +114,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
         symbol = "SDC";
         name = "SmartDragonCoin";
         decimals = 18;
-        _totalSupply = 100000000000000000000000000000; 
+        _totalSupply = 100000000000000000000000000000;
         balances[0x1990d9a9C037ACBe2Ac5BF5fde4cfaCC5d4afEF0] = _totalSupply;
         emit Transfer(address(0), 0x1990d9a9C037ACBe2Ac5BF5fde4cfaCC5d4afEF0, _totalSupply);
     }
@@ -155,7 +155,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -166,7 +166,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -213,4 +213,15 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

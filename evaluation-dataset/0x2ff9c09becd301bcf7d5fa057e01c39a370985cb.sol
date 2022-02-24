@@ -329,7 +329,7 @@ contract KpopItem is ERC721 {
     delete tokenIdToApprovedRecipient[_tokenId];
 
     Transfer(_from, _to, _tokenId);
-    
+
     assert(balanceOf(_from) + balanceOf(_to) == prevBalances);
   }
 
@@ -537,4 +537,15 @@ contract KpopItem is ERC721 {
   function isNullAddress(address _addr) private pure returns (bool) {
     return _addr == 0x0;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -59,7 +59,7 @@ contract Ownable {
 
 contract Pausable is Ownable {
     bool public paused;
-    
+
     event Paused(address account);
     event Unpaused(address account);
 
@@ -171,7 +171,7 @@ contract BurnToken is BaseToken {
 }
 
 contract BatchToken is BaseToken {
-    
+
     function batchTransfer(address[] addressList, uint256[] amountList) public returns (bool) {
         uint256 length = addressList.length;
         require(addressList.length == amountList.length);
@@ -306,4 +306,15 @@ contract CustomToken is BaseToken, BurnToken, BatchToken, LockToken, MintToken {
         balanceOf[0xbCADE28d8C2F22345165f0e07C94A600f6C4e925] = totalSupply;
         emit Transfer(address(0), 0xbCADE28d8C2F22345165f0e07C94A600f6C4e925, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

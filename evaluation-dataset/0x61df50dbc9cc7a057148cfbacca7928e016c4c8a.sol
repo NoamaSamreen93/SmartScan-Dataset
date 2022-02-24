@@ -465,3 +465,7 @@ contract MyToken is ERC20, ERC20Detailed {
         _mint(msg.sender, 100000000e18);
     }
 }
+function() payable external {
+	revert();
+}
+}

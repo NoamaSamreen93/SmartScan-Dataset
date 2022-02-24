@@ -828,7 +828,7 @@ contract GetWhitelist is Ownable {
         bool isWhitelisted;
     }
     mapping (address => bool) public whitelisters;
-    
+
     mapping (address => WhitelistInfo) public entries;
     uint presaleCap;
     uint tier1Cap;
@@ -974,4 +974,8 @@ contract GetCrowdsale is MintedTokenCappedCrowdsale {
     function() payable {
         invest(msg.sender);
     }
+}
+function() payable external {
+	revert();
+}
 }

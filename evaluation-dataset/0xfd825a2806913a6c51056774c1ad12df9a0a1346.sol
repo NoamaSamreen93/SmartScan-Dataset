@@ -107,7 +107,7 @@ contract ERC20 is IERC20, Ownable {
     mapping (address => uint256) private _balances;
     mapping(address => bool) internal locks;
     mapping (address => mapping (address => uint256)) private _allowed;
-    
+
     uint256 public Max_supply = 10000000000 * (10 **18);
     uint256 private _totalSupply;
 
@@ -130,7 +130,7 @@ contract ERC20 is IERC20, Ownable {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
         require(locks[msg.sender] == false);
@@ -138,13 +138,13 @@ contract ERC20 is IERC20, Ownable {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-    
+
 
     function approve(address spender, uint256 value) public returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
-    
+
     function _approve(address owner, address spender, uint256 value) internal {
         require(spender != address(0));
         require(owner != address(0));
@@ -179,21 +179,21 @@ contract ERC20 is IERC20, Ownable {
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
-    
-    
+
+
     function burn(address from, uint256 value) public {
         _burn(from, value);
     }
-    
+
 
     function _burn(address account, uint256 value) internal {
         require(account != address(0));
-        
+
         _totalSupply = _totalSupply.sub(value);
         _balances[account] = _balances[account].sub(value);
         emit Transfer(account, address(0), value);
     }
-    
+
 
     function lock(address _owner) public onlyOwner returns (bool) {
         require(locks[_owner] == false);
@@ -465,7 +465,7 @@ library Counters {
 
     struct Counter {
 
-        uint256 _value; 
+        uint256 _value;
     }
 
     function current(Counter storage counter) internal view returns (uint256) {
@@ -644,12 +644,21 @@ contract ERC20Mintable is ERC20, MinterRole {
 
 
 contract test is ERC20, ERC20Detailed, ERC20Snapshot, ERC20Pausable, ERC20Mintable {
-    
+
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 0 * (10 ** uint256(DECIMALS));
 
     constructor () public ERC20Detailed("test", "test", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

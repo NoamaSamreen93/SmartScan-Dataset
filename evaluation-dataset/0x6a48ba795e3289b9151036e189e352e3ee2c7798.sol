@@ -145,3 +145,7 @@ contract SXCToken {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

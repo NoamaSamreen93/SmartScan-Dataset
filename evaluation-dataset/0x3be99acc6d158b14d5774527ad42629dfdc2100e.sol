@@ -16,7 +16,7 @@ contract ERC20Basic {
 }
 
 contract ERC20 is ERC20Basic {
-    function allowance(address owner, address spender) 
+    function allowance(address owner, address spender)
         public view returns (uint256);
 
     function transferFrom(address from, address to, uint256 value)
@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
     function transferWholeTokens(address _to, uint256 _value) public returns (bool) {
         // the sum is entered in whole tokens (1 = 1 token)
         uint256 value = _value;
@@ -176,16 +176,16 @@ contract GoldenUnitToken is StandardToken {
     uint32 public constant decimals = 18;
     uint256 public INITIAL_SUPPLY = 50000 * 1 ether;
     address public CrowdsaleAddress;
-    
+
     event Mint(address indexed to, uint256 amount);
-    
+
     constructor(address _CrowdsaleAddress) public {
-      
+
         CrowdsaleAddress = _CrowdsaleAddress;
         totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;      
+        balances[msg.sender] = INITIAL_SUPPLY;
     }
-  
+
     modifier onlyOwner() {
         require(msg.sender == CrowdsaleAddress);
         _;
@@ -198,7 +198,7 @@ contract GoldenUnitToken is StandardToken {
         emit Transfer(_from, CrowdsaleAddress, _value);
         return true;
     }
-  
+
     function mint(uint256 _amount)  public onlyOwner returns (bool){
         totalSupply_ = totalSupply_.add(_amount);
         balances[CrowdsaleAddress] = balances[CrowdsaleAddress].add(_amount);
@@ -211,7 +211,7 @@ contract GoldenUnitToken is StandardToken {
     function() external payable {
         // The token contract don`t receive ether
         revert();
-    }  
+    }
 }
 
 contract Ownable {
@@ -242,7 +242,7 @@ contract Ownable {
 }
 
 contract Crowdsale is Ownable {
-    using SafeMath for uint; 
+    using SafeMath for uint;
     address myAddress = this;
     uint public  saleRate = 30;  //tokens for 1 ether
     uint public  purchaseRate = 30;  //tokens for 1 ether
@@ -261,7 +261,7 @@ contract Crowdsale is Ownable {
 
 
     GoldenUnitToken public token = new GoldenUnitToken(myAddress);
-  
+
 
     function mintTokens(uint256 _amount) public onlyOwner returns (bool){
         //_amount in tokens. 1 = 1 token
@@ -281,8 +281,8 @@ contract Crowdsale is Ownable {
         require (value >= 1);
         value = value.mul(1 ether);
         token.transfer(_newInvestor, value);
-    }  
-    
+    }
+
     function takeTokens(address _Investor, uint256 _value) public onlyOwner payable {
         // the function take tokens from users to contract
         // the sum is entered in whole tokens (1 = 1 token)
@@ -290,21 +290,21 @@ contract Crowdsale is Ownable {
         require (_Investor != address(0));
         require (value >= 1);
         value = value.mul(1 ether);
-        token.acceptTokens(_Investor, value);    
-    }  
+        token.acceptTokens(_Investor, value);
+    }
 
- 
- 
+
+
     function setSaleRate(uint256 newRate) public onlyOwner {
         saleRate = newRate;
         emit SaleRates(newRate);
     }
-  
+
     function setPurchaseRate(uint256 newRate) public onlyOwner {
         purchaseRate = newRate;
         emit PurchaseRates(newRate);
-    }  
-   
+    }
+
     function startPurchaseTokens() public onlyOwner {
         purchaseTokens = true;
     }
@@ -312,7 +312,7 @@ contract Crowdsale is Ownable {
     function stopPurchaseTokens() public onlyOwner {
         purchaseTokens = false;
     }
-  
+
     function purchase (uint256 _valueTokens) public purchaseAlloved payable {
         // function purchase tokens and send ether to sender
         address profitOwner = msg.sender;
@@ -333,7 +333,7 @@ contract Crowdsale is Ownable {
             profitOwner.transfer(valueEther);
         }
     }
-  
+
     function WithdrawProfit (address _to, uint256 _value) public onlyOwner payable {
         // function withdraw prohit
         require (myAddress.balance >= _value);
@@ -341,14 +341,25 @@ contract Crowdsale is Ownable {
         _to.transfer(_value);
         emit Withdraw(msg.sender, _to, _value);
     }
- 
+
     function saleTokens() internal {
         require (msg.value >= 1 ether);  //minimum 1 ether
         uint tokens = saleRate.mul(msg.value);
         token.transfer(msg.sender, tokens);
     }
- 
+
     function() external payable {
         saleTokens();
-    }    
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

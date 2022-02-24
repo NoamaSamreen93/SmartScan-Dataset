@@ -1337,7 +1337,7 @@ contract usingOraclize {
 
 END ORACLIZE_API
 
-*/ 
+*/
 
 interface PriceWatcherI
 {
@@ -1350,34 +1350,34 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
     uint256 private lastOracleUpdateTime = 0;
     uint256 public errorCounter = 0;
     string public errorString;
-    
+
     mapping(address => bool) public administrators;
     bool public adminOverrideEnabled = false;
     uint256 private adminOverrideUDScentsPerETH = 0;
     mapping(address => bool) public whitelistedUsers;
-    
+
     // Oracle settings
     uint256 public oracleQueryIntervalSeconds = 10 * 60;
     string public oracleQueryType = "URL";
     string public oracleQueryString = "json(https://api.pro.coinbase.com/products/ETH-USD/ticker).price";
     bool public oracleStopped = false;
     uint256 public oracleCallbackGasLimit = 150000;
-    
-    
+
+
     constructor() payable public
     {
         administrators[msg.sender] = true;
-        
+
         triggerPriceUpdate(1);
     }
-    
+
     // Administrative functions
-    
+
     // Deposit ETH
     function () payable external
     {
     }
-    
+
     // Withdraw ETH
     function withdraw(uint256 _amount) external
     {
@@ -1389,7 +1389,7 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         require(administrators[msg.sender]);
         msg.sender.transfer(address(this).balance);
     }
-    
+
     // Add/remove administrators
     function addAdministrator(address _newAdministrator) external
     {
@@ -1401,7 +1401,7 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         require(administrators[msg.sender]);
         administrators[_administrator] = false;
     }
-    
+
     // Admin override
     function enableAdminOverride(uint256 _USDcentsPerETH) external
     {
@@ -1414,7 +1414,7 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         require(administrators[msg.sender]);
         adminOverrideEnabled = false;
     }
-    
+
     // Oracle settings
     function setOracleCallbackGasLimit(uint256 _gasLimit) external
     {
@@ -1442,18 +1442,18 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         require(administrators[msg.sender]);
         oracleStopped = _stopped;
     }
-    
+
     // User whitelisting
     function setUserWhitelisted(address _user, bool _whitelisted) external
     {
         require(administrators[msg.sender]);
         whitelistedUsers[_user] = _whitelisted;
     }
-    
+
     function getUSDcentsPerETH() external view returns (uint256 _USDcentsPerETH)
     {
         require(whitelistedUsers[msg.sender] || !isContract(msg.sender));
-        
+
         if (adminOverrideEnabled)
         {
             return adminOverrideUDScentsPerETH;
@@ -1463,14 +1463,14 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
             return lastOracleUSDcentsPerETH;
         }
     }
-    
+
     function triggerPriceUpdate(uint256 _delaySeconds) public
     {
         require(administrators[msg.sender] || msg.sender == oraclize_cbAddress());
-        
+
         oraclize_query(_delaySeconds, oracleQueryType, oracleQueryString, oracleCallbackGasLimit);
     }
-    
+
     // (str="123.89421", decimals=2) => (success=true, 12389)
     // (str="123.8"    , decimals=2) => (success=true, 12380)
     // (str="77"       , decimals=2) => (success=true,  7700)
@@ -1479,7 +1479,7 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         _uint = 0;
         bool seenDecimalPoint = false;
         uint256 decimalsSeen = 0;
-        
+
         // Loop over the characters of the string
         for (uint256 i=0; i<bytes(_str).length; i++)
         {
@@ -1512,25 +1512,25 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
                 return (false, _uint);
             }
         }
-        
+
         while (decimalsSeen < _decimals)
         {
             _uint *= 10;
             decimalsSeen++;
         }
-        
+
         _success = true;
     }
-    
+
     function __callback(bytes32 myid, string memory result) public
     {
         require(msg.sender == oraclize_cbAddress());
-        
+
         bool parseSuccess;
         uint256 centsPerETH;
-        
+
         (parseSuccess, centsPerETH) = numberString_to_uint(result, 2);
-        
+
         if (!parseSuccess || centsPerETH == 0)
         {
             errorCounter++;
@@ -1546,7 +1546,7 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
             }
         }
     }
-    
+
     function isContract(address _addr) private view returns (bool)
     {
         uint256 size;
@@ -1556,4 +1556,13 @@ contract PriceWatcher is usingOraclize, PriceWatcherI
         }
         return size != 0;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -142,3 +142,14 @@ contract EgeregToken {
     event Burn(address indexed burner, uint value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

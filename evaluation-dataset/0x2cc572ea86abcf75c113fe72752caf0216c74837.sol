@@ -22,7 +22,7 @@ contract owned {	// Defines contract Owner
 		TransferOwnership (owner, newOwner);
 		owner = newOwner;
 	}
-	
+
 	// Modifiers
 	modifier onlyOwner {
 		require(msg.sender == owner);
@@ -189,4 +189,15 @@ contract YourMomTokenCrowdsale is owned {
 	function remainingTokens() public constant returns (uint256 tokensStillOnSale) { return currentContractAllowance; }
 	function crowdsaleStarted() public constant returns (bool isCrowdsaleStarted) { if (now >= crowdsaleStartTime) { return true; } else { return false; } }
 	function reclaimEtherDeadline() public constant returns (uint256 deadlineToReclaimEtherIfFailSafeWasActivated) { return reclaimForgottenEtherDeadline; }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

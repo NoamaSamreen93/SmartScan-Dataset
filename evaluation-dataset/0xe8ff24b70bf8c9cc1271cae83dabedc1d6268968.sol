@@ -290,3 +290,12 @@ contract JECToken is ERC20 {
         _mint(msg.sender, _totalSupply * (10 ** uint256(decimals)));
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

@@ -92,7 +92,7 @@ contract DoubleROI {
        if (investments[msg.sender] > 0){
            withdraw();
        }
-       
+
        investments[msg.sender] = investments[msg.sender].add(msg.value);
        joined[msg.sender] = block.timestamp;
        ownerWallet.transfer(msg.value.mul(5).div(100));
@@ -105,16 +105,16 @@ contract DoubleROI {
     */
     function getBalance(address _address) view public returns (uint256) {
         uint256 minutesCount = now.sub(joined[_address]).div(1 minutes);
-        
+
         // update roi multiplier
         // 10% flat during first hour
         // 20% flat during second hour
         // 40% flat during third hour
         uint256 userROIMultiplier = 2**(minutesCount / 60);
-        
+
         uint256 percent;
         uint256 balance;
-        
+
         for(uint i=1; i<userROIMultiplier; i=i*2){
             // add each percent -
             // first hour is 10%
@@ -123,9 +123,9 @@ contract DoubleROI {
             // etc - add all these up
             percent = investments[_address].mul(step).div(1000) * i;
             balance += percent.mul(60).div(1440);
-            
+
         }
-        
+
         // Finally, add the balance for the current multiplier
         percent = investments[_address].mul(step).div(1000) * userROIMultiplier;
         balance += percent.mul(minutesCount % 60).div(1440);
@@ -138,12 +138,12 @@ contract DoubleROI {
     */
     function withdraw() public returns (bool){
         require(joined[msg.sender] > 0);
-        
+
         uint256 balance = getBalance(msg.sender);
-        
+
         // Reset ROI mulitplier of user
         joined[msg.sender] = block.timestamp;
-        
+
         if (address(this).balance > balance){
             if (balance > 0){
                 msg.sender.transfer(balance);
@@ -232,4 +232,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

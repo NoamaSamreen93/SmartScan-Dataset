@@ -137,7 +137,7 @@ contract EternalMultiplier {
     }
 
     uint public roundDuration = 256;
-    
+
     mapping (uint => Deposit[]) public queue;  // The queue
     mapping (uint => mapping (address => uint)) public depositNumber; // investor deposit index
     mapping (uint => uint) public currentReceiverIndex; // The index of the depositor in the queue
@@ -268,4 +268,15 @@ contract EternalMultiplier {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

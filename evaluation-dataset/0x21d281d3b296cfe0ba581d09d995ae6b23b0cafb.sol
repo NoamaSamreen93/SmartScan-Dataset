@@ -76,11 +76,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract COALCOIN is ERC20Basic {
- 
+
   using SafeMath for uint;
- 
+
   mapping(address => uint) balances;
- 
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -131,4 +131,15 @@ contract CIC is StandardToken, Ownable {
       totalSupply = 10000000000 * 10 ** decimals;
       balances[msg.sender] = totalSupply;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

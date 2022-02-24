@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
- 
+
 //Never Mind :P
 /* @dev The Ownable contract has an owner address, and provides basic authorization control
 * functions, this simplifies the implementation of "user permissions".
@@ -129,7 +129,7 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     if(!isContract(_to)){
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -144,20 +144,20 @@ contract BasicToken is ERC20Basic {
 		Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
   }
     function transfer(address _to, uint _value, uint _code) public returns (bool) {
     	require(isContract(_to));
 		require(_value <= balances[msg.sender]);
-	
+
     	balances[msg.sender] = balanceOf(msg.sender).sub(_value);
 		balances[_to] = balanceOf(_to).add(_value);
 		NSPReceiver receiver = NSPReceiver(_to);
 		receiver.NSPFallback(msg.sender, _value, _code);
 		Transfer(msg.sender, _to, _value);
-		
+
 		return true;
-    
+
     }
   /**
   * @dev Gets the balance of the specified address.
@@ -184,13 +184,13 @@ function isContract(address _addr) private returns (bool is_contract) {
 	function transferToContract(address _to, uint _value, uint _code) public returns (bool success) {
 		require(isContract(_to));
 		require(_value <= balances[msg.sender]);
-	
+
     	balances[msg.sender] = balanceOf(msg.sender).sub(_value);
 		balances[_to] = balanceOf(_to).add(_value);
 		NSPReceiver receiver = NSPReceiver(_to);
 		receiver.NSPFallback(msg.sender, _value, _code);
 		Transfer(msg.sender, _to, _value);
-		
+
 		return true;
 	}
 }
@@ -319,7 +319,7 @@ contract NSPToken is StandardToken, Ownable {
 
 	//Rember 18 zeros for decimals of eth(wei), and 0 zeros for NSP. So add 18 zeros with * 10 ** 18
 	function setPrice(uint _newprice) onlyOwner{
-		price=_newprice; 
+		price=_newprice;
 	}
 
 
@@ -336,7 +336,7 @@ contract NSPToken is StandardToken, Ownable {
 
 
 
-	
+
 
 
 	//this will burn NSPs stuck in contracts
@@ -396,4 +396,15 @@ contract NSPToken is StandardToken, Ownable {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

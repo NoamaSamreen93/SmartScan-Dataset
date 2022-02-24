@@ -6,7 +6,7 @@ contract Nines {
   struct Nine {
     address owner;
     uint256 cost;
-  }    
+  }
 
   mapping (uint256 => Nine) public nines;
   mapping (address => string) public msgs;
@@ -64,7 +64,7 @@ contract Nines {
     seatPrice = SafeMath.mul(SafeMath.div(seatPrice, 100), 109);
     msg.sender.transfer(excess);
   }
-  
+
   function setMessage(string message) public payable {
     msgs[msg.sender] = message;
   }
@@ -96,4 +96,13 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

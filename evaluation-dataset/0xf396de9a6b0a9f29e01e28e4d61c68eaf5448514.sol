@@ -709,7 +709,7 @@ pragma solidity ^0.5.0;
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction is SignatureBouncer, Ownable {
     using SafeERC20 for ERC20Burnable;
 
@@ -939,4 +939,13 @@ contract DutchAuction is SignatureBouncer, Ownable {
 
         endTime = now;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

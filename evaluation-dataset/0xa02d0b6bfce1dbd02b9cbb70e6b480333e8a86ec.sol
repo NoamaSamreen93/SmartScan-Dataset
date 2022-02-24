@@ -315,8 +315,17 @@ contract IPWT is ERC20, ERC20Detailed {
     string private _symbol = "IPWT";
     uint8 private _decimals = 18;
     uint256 public initialSupply = 10000000000 * (10 ** uint256(_decimals));
-   
+
     constructor() public ERC20Detailed(_name, _symbol, _decimals) {
         _mint(msg.sender, initialSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

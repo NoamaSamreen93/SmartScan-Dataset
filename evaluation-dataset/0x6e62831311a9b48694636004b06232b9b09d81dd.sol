@@ -387,3 +387,9 @@ contract JokerToken is StandardToken, Ownable {
         return StandardToken.transferFrom(_from, _to, _value);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

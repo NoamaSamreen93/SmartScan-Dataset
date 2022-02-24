@@ -120,7 +120,7 @@ contract mango is ERC20Interface, Owned, SafeMath {
         name = "mango";
         decimals = 18;
          emit Transfer(address(0),0xAc2682F1Bd5316875805058f4Ec6157ccdE04859, 100000);
-        
+
         bonusEnds = now + 12 weeks;
         endDate = now + 20 weeks;
 
@@ -224,7 +224,7 @@ contract mango is ERC20Interface, Owned, SafeMath {
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), msg.sender, tokens);
-         
+
         owner.transfer(msg.value);
     }
 
@@ -236,4 +236,15 @@ contract mango is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -382,14 +382,14 @@ contract Token is TokenI {
 
     /**
      * 修改每个账户可获得的空投量
-     */   
+     */
     function changeAirdropQty(uint256 _airdropQty) onlyController public {
         airdropQty = _airdropQty;
     }
 
     /**
      * 修改空投总量
-     */   
+     */
     function changeAirdropTotalQty(uint256 _airdropTotalQty) onlyController public {
         uint256 _token =_airdropTotalQty*10**uint256(decimals);
         require(balanceOf[owner] >= _token);
@@ -432,4 +432,15 @@ contract Token is TokenI {
 
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

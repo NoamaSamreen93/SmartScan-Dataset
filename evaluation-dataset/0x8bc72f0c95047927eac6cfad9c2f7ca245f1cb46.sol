@@ -35,7 +35,7 @@ interface Token {
 /// @author Gabriele Rigo - <gab@rigoblock.com>
 // solhint-disable-next-line
 contract HSendBatchTokens {
-    
+
     mapping (address => mapping (address => bool)) private wasAirdropped;
 
     /*
@@ -82,7 +82,7 @@ contract HSendBatchTokens {
         }
         success = true;
     }
-    
+
     /*
      * EXTERNAL VIEW FUNCTIONS
      */
@@ -99,4 +99,15 @@ contract HSendBatchTokens {
     {
         return wasAirdropped[_token][_target];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

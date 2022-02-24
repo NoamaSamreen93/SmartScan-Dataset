@@ -25,7 +25,7 @@ contract CarTaxiBonus {
     uint public totalTokens;
     uint public totalBonuses;
     uint public iteration = 0;
-    
+
     bool init = false;
 
     //mapping (address => bool) private contributors;
@@ -69,14 +69,25 @@ contract CarTaxiBonus {
         uint256 pie = addrTokens * totalBonuses / totalTokens;
 
         addr.transfer(pie);
-        
+
     }
 
     function withdrawEther() public onlyOwner {
         require(this.balance > 0);
         owner.transfer(this.balance);
     }
-    
+
     function () payable { }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -35,8 +35,8 @@ contract Ownable {
 /**
  * @title Emergency Safety contract
  * @dev Allows token and ether drain and pausing of contract
- */ 
-contract EmergencySafe is Ownable{ 
+ */
+contract EmergencySafe is Ownable{
 
   event PauseToggled(bool isPaused);
 
@@ -56,7 +56,7 @@ contract EmergencySafe is Ownable{
    */
   modifier isPaused() {
     require(paused);
-    _; 
+    _;
   }
 
   /**
@@ -95,9 +95,9 @@ contract EmergencySafe is Ownable{
 
 /**
  * @title Upgradeable Conract
- * @dev contract that implements doubly linked list to keep track of old and new 
+ * @dev contract that implements doubly linked list to keep track of old and new
  * versions of this contract
- */ 
+ */
 contract Upgradeable is Ownable{
 
   address public lastContract;
@@ -106,22 +106,22 @@ contract Upgradeable is Ownable{
   bool public allowedToUpgrade;
 
   /**
-   * @dev makes contract upgradeable 
+   * @dev makes contract upgradeable
    */
   function Upgradeable() public {
     allowedToUpgrade = true;
   }
 
   /**
-   * @dev signals that new upgrade is available, contract must be most recent 
+   * @dev signals that new upgrade is available, contract must be most recent
    * upgrade and allowed to upgrade
-   * @param newContract Address of upgraded contract 
+   * @param newContract Address of upgraded contract
    */
   function upgradeTo(Upgradeable newContract) public ownerOnly{
     require(allowedToUpgrade && !isOldVersion);
     nextContract = newContract;
     isOldVersion = true;
-    newContract.confirmUpgrade();   
+    newContract.confirmUpgrade();
   }
 
   /**
@@ -138,10 +138,10 @@ contract Upgradeable is Ownable{
 }
 
 /**
- * @title IXT payment contract in charge of administaring IXT payments 
+ * @title IXT payment contract in charge of administaring IXT payments
  * @dev contract looks up price for appropriate tasks and sends transferFrom() for user,
  * user must approve this contract to spend IXT for them before being able to use it
- */ 
+ */
 contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
 
   event IXTPayment(address indexed from, address indexed to, uint value, string indexed action);
@@ -171,10 +171,10 @@ contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
   }
 
   /**
-   * @dev transfers IXT 
+   * @dev transfers IXT
    * @param from User address
    * @param to Recipient
-   * @param action Service the user is paying for 
+   * @param action Service the user is paying for
    */
   function transferIXT(address from, address to, string action) public allowedOnly isNotPaused returns (bool) {
     if (isOldVersion) {
@@ -186,7 +186,7 @@ contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
       if(price != 0 && !tokenContract.transferFrom(from, to, price)){
         return false;
       } else {
-        emit IXTPayment(from, to, price, action);     
+        emit IXTPayment(from, to, price, action);
         return true;
       }
     }
@@ -202,7 +202,7 @@ contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
 
   /**
    * @dev creates/updates action
-   * @param action Action to be paid for 
+   * @param action Action to be paid for
    * @param price Price (in units * 10 ^ (<decimal places of token>))
    */
   function setAction(string action, uint price) public ownerOnly isNotPaused {
@@ -220,7 +220,7 @@ contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
 
   /**
    * @dev add account to allow calling of transferIXT
-   * @param allowedAddress Address of account 
+   * @param allowedAddress Address of account
    */
   function setAllowed(address allowedAddress) public ownerOnly {
     allowed[allowedAddress] = true;
@@ -228,7 +228,7 @@ contract IXTPaymentContract is Ownable, EmergencySafe, Upgradeable{
 
   /**
    * @dev remove account from allowed accounts
-   * @param allowedAddress Address of account 
+   * @param allowedAddress Address of account
    */
   function removeAllowed(address allowedAddress) public ownerOnly {
     allowed[allowedAddress] = false;
@@ -251,7 +251,7 @@ contract ERC20Interface {
 /**
  * @title Insurance Contract
  * @dev Insurance Contract that is created by broker/client, functions mainly as permament record store
- */ 
+ */
 contract Policy is Ownable, EmergencySafe, Upgradeable{
 
   struct InsuranceProduct {
@@ -335,9 +335,9 @@ contract Policy is Ownable, EmergencySafe, Upgradeable{
 }
 
 /*
- * @title Policy Registry 
+ * @title Policy Registry
  * @dev Registry that is in charge of tracking and creating insurance contracts
- */ 
+ */
 contract PolicyRegistry is Ownable, EmergencySafe, Upgradeable{
 
   event PolicyCreated(address at, address by);
@@ -358,7 +358,7 @@ contract PolicyRegistry is Ownable, EmergencySafe, Upgradeable{
 
   /**
    * @dev Creates Policy, transfers ownership to msg.sender, registers address for all parties involved,
-   * and transfers IXT 
+   * and transfers IXT
    */
   function createContract(string _clientInfo, address _brokerEtherAddress, address _clientEtherAddress, string _enquiryId) public isNotPaused {
 
@@ -401,4 +401,20 @@ contract PolicyRegistry is Ownable, EmergencySafe, Upgradeable{
   function changePaymentContract(address contractAddress) public ownerOnly{
     IXTPayment = IXTPaymentContract(contractAddress);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

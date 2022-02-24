@@ -682,7 +682,7 @@ contract ERC20CappedMintable is ERC20, MinterRole {
         public
         onlyMinter
         returns (bool)
-    {   
+    {
         require(totalSupply.add(amount) <= _cap);
         _mint(to, amount);
         return true;
@@ -816,7 +816,7 @@ contract ERC20Releasable is ERC20, Ownable {
 
 
 contract BXBCoin is ERC20Burnable, ERC20CappedMintable, ERC20Pausable, ERC20Releasable {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -850,4 +850,15 @@ contract BXBCoin is ERC20Burnable, ERC20CappedMintable, ERC20Pausable, ERC20Rele
     function releaseTokenTransfer() public onlyReleaseAgent {
         super.releaseTokenTransfer();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

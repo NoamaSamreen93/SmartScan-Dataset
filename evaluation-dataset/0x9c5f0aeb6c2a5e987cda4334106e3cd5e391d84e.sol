@@ -207,25 +207,25 @@ contract SpecialERC20 {
 
 contract Random {
   function getRandom(bytes32 hash) public view returns (uint);
-    
+
 }
 
 contract RedEnvelope is Pausable {
-    
+
     using SafeMath for uint;
     using SafeERC20 for ERC20;
-    
+
     Random public random;
 
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     struct Info {
         address token;
         address owner;
@@ -239,22 +239,22 @@ contract RedEnvelope is Pausable {
         string desc;
         uint fill;
     }
-    
+
     string public name = "RedEnvelope";
-    
+
     mapping(bytes32 => Info) public infos;
     mapping (address => bool) public tokenWhiteList;
-    
+
     struct SnatchInfo {
         address user;
         uint amount;
         uint time;
     }
-    
+
     mapping(bytes32 => SnatchInfo[]) public snatchInfos;
-    
+
     constructor() public {
-        
+
     }
 
     function enableToken(address[] addr, bool[] enable) public onlyOwner() {
@@ -267,23 +267,23 @@ contract RedEnvelope is Pausable {
     function tokenIsEnable(address addr) public view returns (bool) {
         return tokenWhiteList[addr];
     }
-    
+
     function setRandom(address _random) public onlyOwner isHuman() {
         random = Random(_random);
     }
-    
+
     event RedEnvelopeCreated(bytes32 hash);
-    
+
     // 创建红包
     function create(
-        bool isSpecialERC20, 
-        address token, 
-        uint amount, 
-        uint count, 
-        uint expires, 
-        address[] limitAddress, 
-        bool isRandom, 
-        string desc, 
+        bool isSpecialERC20,
+        address token,
+        uint amount,
+        uint count,
+        uint expires,
+        address[] limitAddress,
+        bool isRandom,
+        string desc,
         uint nonce
     ) public payable isHuman() whenNotPaused() {
         if (token == address(0)) {
@@ -297,14 +297,14 @@ contract RedEnvelope is Pausable {
         require(amount > 0);
         require(count > 0);
         require(expires > now);
-        
+
         bytes32 hash = sha256(abi.encodePacked(this, isSpecialERC20, token, amount, expires, nonce, msg.sender, now));
         require(infos[hash].created == 0);
         infos[hash] = Info(token, msg.sender, amount, count, limitAddress, isRandom, isSpecialERC20, expires, now, desc, 0);
-     
-        emit RedEnvelopeCreated(hash);   
+
+        emit RedEnvelopeCreated(hash);
     }
-    
+
     event Snatch(bytes32 hash, address user, uint amount, uint time);
 
     // 抢红包
@@ -313,8 +313,8 @@ contract RedEnvelope is Pausable {
         require(info.created > 0);
         require(info.amount >= info.fill);
         require(info.expires >= now);
-        
-        
+
+
         if (info.limitAddress.length > 0) {
             bool find = false;
             for (uint i = 0; i < info.limitAddress.length; i++) {
@@ -331,7 +331,7 @@ contract RedEnvelope is Pausable {
         for (i = 0; i < curSnatchInfos.length; i++) {
             require (curSnatchInfos[i].user != msg.sender);
         }
-        
+
         uint per = 0;
 
         if (info.isRandom) {
@@ -356,18 +356,18 @@ contract RedEnvelope is Pausable {
             }
         }
         info.fill = info.fill.add(per);
-        
+
         emit Snatch(hash, msg.sender, per, now);
     }
-    
+
     event RedEnvelopeSendBack(bytes32 hash, address owner, uint amount);
-    
+
     function sendBack(bytes32 hash) public isHuman(){
         Info storage info = infos[hash];
         require(info.expires < now);
         require(info.fill < info.amount);
         require(info.owner == msg.sender);
-        
+
         uint back = info.amount.sub(info.fill);
         info.fill = info.amount;
         if (info.token == address(0)) {
@@ -379,69 +379,78 @@ contract RedEnvelope is Pausable {
                 ERC20(info.token).transfer(msg.sender, back);
             }
         }
-        
+
         emit RedEnvelopeSendBack(hash, msg.sender, back);
     }
-    
+
     function getInfo(bytes32 hash) public view returns(
-        address token, 
-        address owner, 
-        uint amount, 
-        uint count, 
-        address[] limitAddress, 
-        bool isRandom, 
-        bool isSpecialERC20, 
-        uint expires, 
-        uint created, 
+        address token,
+        address owner,
+        uint amount,
+        uint count,
+        address[] limitAddress,
+        bool isRandom,
+        bool isSpecialERC20,
+        uint expires,
+        uint created,
         string desc,
         uint fill
     ) {
         Info storage info = infos[hash];
-        return (info.token, 
-            info.owner, 
-            info.amount, 
-            info.count, 
-            info.limitAddress, 
-            info.isRandom, 
-            info.isSpecialERC20, 
-            info.expires, 
-            info.created, 
+        return (info.token,
+            info.owner,
+            info.amount,
+            info.count,
+            info.limitAddress,
+            info.isRandom,
+            info.isSpecialERC20,
+            info.expires,
+            info.created,
             info.desc,
             info.fill
         );
     }
 
     function getLightInfo(bytes32 hash) public view returns (
-        address token, 
-        uint amount, 
-        uint count,  
+        address token,
+        uint amount,
+        uint count,
         uint fill,
         uint userCount
     ) {
         Info storage info = infos[hash];
         SnatchInfo[] storage snatchInfo = snatchInfos[hash];
-        return (info.token, 
-            info.amount, 
-            info.count, 
+        return (info.token,
+            info.amount,
+            info.count,
             info.fill,
             snatchInfo.length
         );
     }
-    
+
     function getSnatchInfo(bytes32 hash) public view returns (address[] user, uint[] amount, uint[] time) {
         SnatchInfo[] storage info = snatchInfos[hash];
-        
+
         address[] memory _user = new address[](info.length);
         uint[] memory _amount = new uint[](info.length);
         uint[] memory _time = new uint[](info.length);
-        
+
         for (uint i = 0; i < info.length; i++) {
             _user[i] = info[i].user;
             _amount[i] = info[i].amount;
             _time[i] = info[i].time;
         }
-        
+
         return (_user, _amount, _time);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -574,10 +574,10 @@ contract SwapContract is TeamRole {
      */
     constructor () public {
         _newToken = IERC20(address(new TuneTradeToken()));
-        
+
         _newToken.mint(_swapMaster, 50000010000000000000000010);
         emit MasterTokensSwapped(50000010000000000000000010);
-            
+
         _reset();
     }
 
@@ -707,4 +707,13 @@ contract SwapContract is TeamRole {
         _oldToken.safeTransferFrom(msg.sender, address(this), amountToSwap);
         _newToken.mint(msg.sender, amountToSwap);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

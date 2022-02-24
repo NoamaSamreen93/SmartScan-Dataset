@@ -23,18 +23,18 @@ mapping (address => uint) public tickets;
 // constructor function
 function olty_6() {
     owner = msg.sender;
-    
+
     charity = 0x889cbf08666fa94B2E74Dc6645059A60E25f9079;
     dividend = 0xD942E1F5f0fACD4540896843087E1e937A399828;
     maintain = 0x0e0146235236FC9E3f700991193E189f63eC4c32;
     fuel = 0x7aC1BC1E05Fc374e287Df5537fd03e5ef40b7333;
     winner = 0x6b730f4D92e236D0eC22b2baFf26873F297d7e67;
-    
+
     ownershipDistribute[charity] = 5;
     ownershipDistribute[dividend] =10;
     ownershipDistribute[maintain] = 15;
     ownershipDistribute[fuel] = 5;
-    ownershipDistribute[winner] = 65;    
+    ownershipDistribute[winner] = 65;
 }
 
 
@@ -48,13 +48,13 @@ function buyTickets(uint no_tickets) payable {
 
 function distribute(uint winner_select, uint winning_no, address win, uint promo)
      returns(bool success) {
-         
+
     uint bal = this.balance;
-    
+
     if (promo != 1) {
     if (msg.sender == owner) {
     charity.transfer(bal * ownershipDistribute[charity] / 100);
-    fuel.transfer(bal * ownershipDistribute[fuel] / 100);    
+    fuel.transfer(bal * ownershipDistribute[fuel] / 100);
     dividend.transfer(bal * ownershipDistribute[dividend] / 100);
     maintain.transfer(bal * ownershipDistribute[maintain] / 100);
     if (winner_select == 1) {
@@ -69,12 +69,12 @@ function distribute(uint winner_select, uint winning_no, address win, uint promo
     throw;
     } // else statement
     return true;
-    }   
-    
+    }
+
     if (promo == 1) {
     if (msg.sender == owner) {
     charity.transfer(bal * ownershipDistribute[charity] / 100);
-    fuel.transfer(bal * ownershipDistribute[fuel] / 100);    
+    fuel.transfer(bal * ownershipDistribute[fuel] / 100);
     dividend.transfer(bal * ownershipDistribute[dividend] / 100);
 
     if (winner_select == 1) {
@@ -89,8 +89,17 @@ function distribute(uint winner_select, uint winning_no, address win, uint promo
     throw;
     } // else statement
     return true;
-    }       
-    
+    }
+
 }  // function distribute
 
 }  // contract olty_6
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

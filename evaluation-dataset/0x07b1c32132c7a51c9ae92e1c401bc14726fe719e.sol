@@ -10,7 +10,7 @@ contract BSHCrowd {
     bool public fundingGoalReached = false;  //达成众筹目标
     bool public crowdsaleClosed = false; //众筹关闭
 
-    mapping(address => uint256) public balance; 
+    mapping(address => uint256) public balance;
 
     event GoalReached(address _beneficiary, uint _amountRaised);
     event FundTransfer(address _backer, uint _amount, bool _isContribution);
@@ -44,7 +44,7 @@ contract BSHCrowd {
             //达成众筹目标
             fundingGoalReached = true;
             GoalReached(beneficiary, amountRaised);
-                
+
             //关闭众筹
             crowdsaleClosed = true;
         }
@@ -71,4 +71,15 @@ contract BSHCrowd {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

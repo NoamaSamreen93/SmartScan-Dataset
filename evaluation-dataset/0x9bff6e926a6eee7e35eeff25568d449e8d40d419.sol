@@ -9,7 +9,7 @@ contract XBL_ERC20Wrapper
 }
 
 
-contract SwapContrak 
+contract SwapContrak
 {
     XBL_ERC20Wrapper private ERC20_CALLS;
 
@@ -19,7 +19,7 @@ contract SwapContrak
     address public swap_address;
     address public XBLContract_addr;
 
-    mapping(string => uint256) registered_for_swap_db; 
+    mapping(string => uint256) registered_for_swap_db;
     mapping(uint256 => string) address_to_eosio_username;
 
 
@@ -35,7 +35,7 @@ contract SwapContrak
     {
         return number * percent / 100;
     }
-    
+
 
     function registerSwap(uint256 xbl_amount, string memory eosio_username) public returns (int256 STATUS_CODE)
     {
@@ -43,7 +43,7 @@ contract SwapContrak
         if (ERC20_CALLS.allowance(msg.sender, swap_address) < xbl_amount)
             return -1;
 
-        if (ERC20_CALLS.balanceOf(msg.sender) < xbl_amount) 
+        if (ERC20_CALLS.balanceOf(msg.sender) < xbl_amount)
             return - 2;
 
         ERC20_CALLS.transferFrom(msg.sender, swap_address, xbl_amount);
@@ -56,17 +56,29 @@ contract SwapContrak
             eosio_balance = xbl_amount;
         }
         registered_for_swap_db[eosio_username] = eosio_balance;
-        address_to_eosio_username[register_counter] = eosio_username; 
+        address_to_eosio_username[register_counter] = eosio_username;
         register_counter += 1;
     }
-    
+
     function getEOSIO_USERNAME(uint256 target) public view returns (string memory eosio_username)
     {
         return address_to_eosio_username[target];
     }
-     
-    function getBalanceByEOSIO_USERNAME(string memory eosio_username) public view returns (uint256 eosio_balance) 
+
+    function getBalanceByEOSIO_USERNAME(string memory eosio_username) public view returns (uint256 eosio_balance)
     {
         return registered_for_swap_db[eosio_username];
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

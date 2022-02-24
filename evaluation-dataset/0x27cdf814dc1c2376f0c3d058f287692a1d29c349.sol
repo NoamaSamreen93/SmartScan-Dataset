@@ -7,11 +7,11 @@ pragma solidity ^0.4.24;
  */
 contract Ownable {
   address public owner;
-  
+
   struct Admins {
     mapping(address=>bool) isAdmin;
   }
-  
+
   Admins internal admins;
   event OwnershipRenounced(address indexed previousOwner);
   event OwnershipTransferred(
@@ -35,28 +35,28 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
-  
+
+
   function addAdmin(address candidate) public onlyOwner returns(bool) {
     admins.isAdmin[candidate] = true;
     return true;
   }
-  
+
   function removeAdmin(address candidate) public onlyOwner returns(bool) {
     admins.isAdmin[candidate] = false;
     return true;
   }
-  
+
   function checkAdmin(address candidate) public onlyOwner view returns(bool) {
     return admins.isAdmin[candidate];
   }
-  
-  
+
+
   modifier onlyAdmins() {
     require(admins.isAdmin[msg.sender] == true);
     _;
   }
-  
+
   /**
    * @dev Allows the current owner to relinquish control of the contract.
    * @notice Renouncing to ownership will leave the contract without an owner.
@@ -208,12 +208,12 @@ contract BasicToken is ERC20Basic {
   /**
   * @dev Total number of tokens in existence
   */
-  
+
   constructor(uint256 totalSupply) public {
       totalSupply_ = totalSupply;
       balances[msg.sender] = totalSupply_;
   }
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -232,13 +232,13 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public returns (bool) {
       uint cnt = _receivers.length;
       uint256 amount = _value.mul(uint256(cnt));
       require(cnt > 0 && cnt <= 20);
       require(_value > 0 && balances[msg.sender] >= amount);
-  
+
       balances[msg.sender] = balances[msg.sender].sub(amount);
       for (uint i = 0; i < cnt; i++) {
           balances[_receivers[i]] = balances[_receivers[i]].add(_value);
@@ -300,8 +300,8 @@ contract StandardToken is DetailedERC20('IntellishareToken','ine',18), BasicToke
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
-  
+
+
 
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -383,7 +383,7 @@ contract StandardToken is DetailedERC20('IntellishareToken','ine',18), BasicToke
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
   function recoverLost(
     address lost,
     uint256 amount
@@ -417,7 +417,7 @@ contract Intellishare is StandardToken, Pausable {
       public
       whenNotPaused
       onlyAdmins
-      returns (bool) 
+      returns (bool)
     {
       return super.batchTransfer(_receivers, _value);
     }
@@ -466,7 +466,7 @@ contract Intellishare is StandardToken, Pausable {
   {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
   function recoverLost(
       address lost,
       uint256 amount
@@ -478,4 +478,15 @@ contract Intellishare is StandardToken, Pausable {
     {
         return super.recoverLost(lost,amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

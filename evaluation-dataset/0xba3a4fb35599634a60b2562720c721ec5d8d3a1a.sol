@@ -158,11 +158,11 @@ contract WeedConnect is ERC20Interface, Ownable{
      string public constant symbol = "420";
      string public constant name = "WeedConnect";
      uint public constant decimals = 18;
-     
+
      constructor () public {
           _totalSupply = 420000000 * (10 ** decimals);
           _balances[msg.sender] = _totalSupply;
-          
+
           emit Transfer(address(0), msg.sender, _totalSupply);
      }
 
@@ -275,4 +275,13 @@ contract WeedConnect is ERC20Interface, Ownable{
      function () external payable {
           revert();
      }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

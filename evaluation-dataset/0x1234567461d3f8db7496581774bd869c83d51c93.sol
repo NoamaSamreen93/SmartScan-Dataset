@@ -413,7 +413,7 @@ contract MintableMasterToken is MintableToken {
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
 */
 contract CAToken is MintableMasterToken, PausableToken {
-    
+
     // Metadata
     string public constant symbol = "CAT";
     string public constant name = "BitClave";
@@ -440,4 +440,15 @@ contract CAToken is MintableMasterToken, PausableToken {
         return super.finishMinting();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

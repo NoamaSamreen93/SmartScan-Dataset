@@ -92,7 +92,7 @@ contract mAlek {
     }
 
     function mintTokens(address _to, uint256 _value) {
-        require (owner == msg.sender);        
+        require (owner == msg.sender);
         balances[_to] = balances[_to].add(_value*10**18);
         _totalSupply = _totalSupply.add(_value*10**18);
         Transfer(0x0, this, _value*10**18);
@@ -112,7 +112,7 @@ contract mAlek {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
-        return true;        
+        return true;
     }
 
     function transferFrom (address _from, address _to, uint256 _value) returns (bool success) {
@@ -136,4 +136,15 @@ contract mAlek {
 
     event Transfer (address indexed _from, address indexed _to, uint256 _value);
     event Approval (address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

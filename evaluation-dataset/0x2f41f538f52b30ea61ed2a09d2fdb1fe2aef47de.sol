@@ -34,8 +34,8 @@ contract TokenERC20 {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-       
-    
+
+
     /**
      * Constrctor function
      *
@@ -117,17 +117,17 @@ contract ONTOPToken is owned, TokenERC20 {
        uint256 frozen_total;
        // uint256 realsestep;
     }
-    
+
     struct frozenInfo_prv {
        uint256 realsestep;
     }
-    
+
     uint private constant timerate = 1;
     string public declaration = "frozenInfos will reflush by function QueryFrozenCoins and transfer.";
     // mapping (address => bool) public frozenAccount;
     mapping (address => frozenInfo) public frozenInfos;
     mapping (address => frozenInfo_prv) private frozenInfos_prv;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
@@ -139,23 +139,23 @@ contract ONTOPToken is owned, TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
-    
+
     function _resetFrozenInfo(address target) internal {
        frozenInfos[target].frozen_total = 0;
        frozenInfos[target].time_end_frozen = 0;
        frozenInfos_prv[target].realsestep = 0;
        frozenInfos[target].time_last_query = 0;
-       frozenInfos[target].frozenAccBytime = false; 
+       frozenInfos[target].frozenAccBytime = false;
     }
-    
+
     function _refulshFrozenInfo(address target) internal {
-       if(frozenInfos[target].frozenAccBytime) 
+       if(frozenInfos[target].frozenAccBytime)
         {
             uint nowtime = now ;// + 60*60*24*365*5 ;
             frozenInfos[target].time_last_query = nowtime;
             if(nowtime>=frozenInfos[target].time_end_frozen)
             {
-               _resetFrozenInfo(target);              
+               _resetFrozenInfo(target);
             }
             else
             {
@@ -168,11 +168,11 @@ contract ONTOPToken is owned, TokenERC20 {
                   frozenInfos[target].frozen_total=releasecoin;
                }
             }
-        }       
+        }
     }
-    
+
     /* Internal transfer, only can be called by this contract */
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
@@ -181,9 +181,9 @@ contract ONTOPToken is owned, TokenERC20 {
         // require(!frozenAccount[_to]);                       // Check if recipient is frozen
         require(!frozenInfos[_from].frozenAccount);                     // Check if sender is frozen
         require(!frozenInfos[_to].frozenAccount);                       // Check if recipient is frozen
-        require(!frozenInfos[_to].frozenAccBytime); 
-                
-        if(frozenInfos[_from].frozenAccBytime) 
+        require(!frozenInfos[_to].frozenAccBytime);
+
+        if(frozenInfos[_from].frozenAccBytime)
         {
             _refulshFrozenInfo(_from);
             if(frozenInfos[_from].frozenAccBytime)
@@ -192,7 +192,7 @@ contract ONTOPToken is owned, TokenERC20 {
                    require(false);
             }
         }
-        
+
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -206,11 +206,11 @@ contract ONTOPToken is owned, TokenERC20 {
         frozenInfos[target].frozenAccount = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     function freezeAccountByTime(address target, uint time) onlyOwner public {
         // frozenAccount[target] = freeze;
         require (target != 0x0);
-        require (balanceOf[target] >= 1); 
+        require (balanceOf[target] >= 1);
         require(!frozenInfos[target].frozenAccBytime);
         require (time >0);
         frozenInfos[target].frozenAccBytime = true;
@@ -218,22 +218,33 @@ contract ONTOPToken is owned, TokenERC20 {
         frozenInfos[target].time_end_frozen = nowtime + time * timerate;
         frozenInfos[target].time_last_query = nowtime;
         frozenInfos[target].frozen_total = balanceOf[target];
-        frozenInfos_prv[target].realsestep = frozenInfos[target].frozen_total / (time * timerate);  
-        require (frozenInfos_prv[target].realsestep>0);      
+        frozenInfos_prv[target].realsestep = frozenInfos[target].frozen_total / (time * timerate);
+        require (frozenInfos_prv[target].realsestep>0);
         emit FrozenTotal(target, frozenInfos[target].frozen_total);
-    }    
-    
+    }
+
     function UnfreezeAccountByTime(address target) onlyOwner public {
         _resetFrozenInfo(target);
         emit FrozenTotal(target, frozenInfos[target].frozen_total);
     }
-    
+
     function QueryFrozenCoins(address _from) public returns (uint256 total) {
         require (_from != 0x0);
         require(frozenInfos[_from].frozenAccBytime);
-        _refulshFrozenInfo(_from);        
+        _refulshFrozenInfo(_from);
         emit FrozenTotal(_from, frozenInfos[_from].frozen_total);
         return frozenInfos[_from].frozen_total;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

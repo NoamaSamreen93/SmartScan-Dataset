@@ -95,7 +95,7 @@ contract Ownable {
 /**
  * @title DragonAdvisors
  * @dev DragonAdvisors works like a tap and release tokens periodically
- * to advisors on the owners permission 
+ * to advisors on the owners permission
  */
 contract DragonAdvisors is Ownable{
   using SafeERC20 for ERC20Basic;
@@ -109,7 +109,7 @@ contract DragonAdvisors is Ownable{
 
   // amount of tokens available for release
   uint256 public releasedTokens;
-  
+
   event TokenTapAdjusted(uint256 released);
 
   constructor() public {
@@ -117,7 +117,7 @@ contract DragonAdvisors is Ownable{
     owner = address(0xA5101498679Fa973c5cF4c391BfF991249934E73);      // overriding owner
 
     advisor = address(0x33068dA7B5B6cc8bFac0a6186B9062ea25F8e670);
-    
+
     releasedTokens = 0;
   }
 
@@ -128,14 +128,14 @@ contract DragonAdvisors is Ownable{
     require(_amount > 0);
     require(releasedTokens >= _amount);
     releasedTokens = releasedTokens.sub(_amount);
-    
+
     uint256 balance = token.balanceOf(this);
     require(balance >= _amount);
-    
+
 
     token.safeTransfer(advisor, _amount);
   }
-  
+
   /**
    * @notice Owner can move tokens to any address
    */
@@ -148,7 +148,7 @@ contract DragonAdvisors is Ownable{
 
     token.safeTransfer(_to, _amount);
   }
-  
+
   function adjustTap(uint256 _amount) external onlyOwner{
       require(_amount > 0);
       uint256 balance = token.balanceOf(this);
@@ -156,8 +156,17 @@ contract DragonAdvisors is Ownable{
       releasedTokens = _amount;
       emit TokenTapAdjusted(_amount);
   }
-  
+
   function () public payable {
       revert();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

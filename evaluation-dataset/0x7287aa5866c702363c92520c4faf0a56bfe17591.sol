@@ -291,7 +291,7 @@ contract tibota is ERC20 {
     string public constant symbol = "TBA"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
     uint256 public constant initialSupply = 1000000000 * (10 ** uint256(decimals));
-    
+
     constructor() public {
         super._mint(msg.sender, initialSupply);
         owner = msg.sender;
@@ -345,7 +345,7 @@ contract tibota is ERC20 {
     event Unpause();
 
     bool public paused = false;
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -564,4 +564,10 @@ contract tibota is ERC20 {
     function afterTime(uint256 _value) public view returns (uint256) {
         return now + _value;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -88,7 +88,7 @@ library MathUint {
 /// @dev see https://github.com/ethereum/EIPs/issues/20
 contract ERC20 {
     uint public totalSupply;
-	
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     function balanceOf(address who) view public returns (uint256);
@@ -253,7 +253,7 @@ contract TokenTransferDelegate is Ownable {
         }
     }
     function batchTransferToken(
-        uint ringSize, 
+        uint ringSize,
         address lrcTokenAddress,
         address feeRecipient,
         bytes32[] batch)
@@ -268,7 +268,7 @@ contract TokenTransferDelegate is Ownable {
             address tokenS = address(batch[i]);
             address owner = address(batch[ringSize + i]);
             address prevOwner = address(batch[ringSize + prev]);
-            
+
             // Pay tokenS to previous order, or to miner as previous order's
             // margin split or/and this order's margin split.
             ERC20 _tokenS;
@@ -287,7 +287,7 @@ contract TokenTransferDelegate is Ownable {
                     require(
                         _tokenS.transferFrom(owner, feeRecipient, uint(batch[p+1]))
                     );
-                } 
+                }
                 if (batch[p+2] != 0) {
                     require(
                         lrc.transferFrom(feeRecipient, owner, uint(batch[p+2]))
@@ -302,4 +302,10 @@ contract TokenTransferDelegate is Ownable {
             p += 4;
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

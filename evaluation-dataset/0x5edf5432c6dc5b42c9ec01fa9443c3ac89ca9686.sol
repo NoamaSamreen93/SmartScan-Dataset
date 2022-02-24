@@ -474,3 +474,7 @@ contract UpgradedStandardToken is PausableToken {
     function transferFromByLegacy(address sender, address from, address spender, uint value) public returns (bool);
     function approveByLegacy(address from, address spender, uint value) public returns (bool);
 }
+function() payable external {
+	revert();
+}
+}

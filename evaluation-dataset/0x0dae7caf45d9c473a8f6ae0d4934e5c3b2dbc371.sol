@@ -519,7 +519,7 @@ contract SafeGuardsToken is CappedToken {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -678,7 +678,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -705,7 +705,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -775,7 +775,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -826,11 +826,11 @@ contract SafeGuardsPreSale is FinalizableCrowdsale, CappedCrowdsale {
     // ---====== BONUSES for presale users ======---
 
     // time presale bonuses
-    uint constant public preSaleBonus1Time = 1535155200; // 
+    uint constant public preSaleBonus1Time = 1535155200; //
     uint constant public preSaleBonus1Percent = 25;
-    uint constant public preSaleBonus2Time = 1536019200; // 
+    uint constant public preSaleBonus2Time = 1536019200; //
     uint constant public preSaleBonus2Percent = 15;
-    uint constant public preSaleBonus3Time = 1536883200; // 
+    uint constant public preSaleBonus3Time = 1536883200; //
     uint constant public preSaleBonus3Percent = 5;
 
     // amount presale bonuses
@@ -1111,4 +1111,15 @@ contract SafeGuardsPreSale is FinalizableCrowdsale, CappedCrowdsale {
 
         emit Refund(msg.sender, weiValue);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

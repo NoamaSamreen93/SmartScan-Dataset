@@ -660,7 +660,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -850,4 +850,12 @@ contract Trustee is Owned {
 
         UnlockGrant(msg.sender, transferable);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -41,7 +41,7 @@ contract QforaSale {
   uint256 public tokenSold;          //new
   uint256 public threshold;          //new
   uint256 public hardCap;            //new
-  uint256 public bonusRate;          // new, 20 means 20% 
+  uint256 public bonusRate;          // new, 20 means 20%
   address public wallet;                              //RefundVault.sol
   address public owner;                               //Ownable.sol
   bool public isFinalized;                     //FinalizableCrowdsale.sol
@@ -114,7 +114,7 @@ contract QforaSale {
 //    _postValidatePurchase(_beneficiary, weiAmount);
   }
 
-  function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal isWhitelisted(_beneficiary) {    
+  function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal isWhitelisted(_beneficiary) {
       //Crowdsale.sol, WhitelistedCrowdsale.sol
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
@@ -152,7 +152,7 @@ contract QforaSale {
   }
 
   function finalization() internal {                     //RefundableCrowdsale.sol (change state)
-    if (goalReached()) { close(); } 
+    if (goalReached()) { close(); }
     else               { enableRefunds(); }
     //super.finalization();
   }
@@ -207,16 +207,16 @@ contract QforaSale {
     emit OwnershipTransferred(owner, _newOwner);
     owner = _newOwner;
   }
-    
+
   function destroyAndSend(address _recipient) onlyOwner public {   //Destructible.sol
     selfdestruct(_recipient);
   }
 
 /* new functions */
-  function transferToken(address to, uint256 value) onlyOwner public { 
+  function transferToken(address to, uint256 value) onlyOwner public {
     token.transfer(to, value);
   }
-  
+
   function setBonusRate(uint256 _bonusRate) public onlyOwner{
     _setBonusRate(_bonusRate);
   }
@@ -224,7 +224,7 @@ contract QforaSale {
   function _setBonusRate(uint256 _bonusRate) internal {
     bonusRate = _bonusRate;
   }
-  
+
   function getWeiBalance() public view returns(uint256) {
     return address(this).balance;
   }
@@ -246,13 +246,24 @@ contract QforaSale {
   }
 
   function setSmallInvestor(address _beneficiary, uint256 weiAmount, uint256 totalTokens) public onlyOwner {
-    require(whitelist[_beneficiary]); 
-    require(weiAmount >= 1 ether ); 
-    require(weiRaised.add(weiAmount) <= hardCap ); 
+    require(whitelist[_beneficiary]);
+    require(weiAmount >= 1 ether );
+    require(weiRaised.add(weiAmount) <= hardCap );
     weiRaised = weiRaised.add(weiAmount);
-    tokenSold = tokenSold.add(totalTokens); 
-    _processPurchase(_beneficiary, totalTokens);     
+    tokenSold = tokenSold.add(totalTokens);
+    _processPurchase(_beneficiary, totalTokens);
     deposit(_beneficiary, weiAmount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

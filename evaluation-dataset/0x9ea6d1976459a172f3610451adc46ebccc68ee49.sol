@@ -43,10 +43,10 @@ pragma solidity ^0.4.19;
 
 
 /*
-This contract was editted and deploy by ICONEMY - An platform that makes crypto easy! 
+This contract was editted and deploy by ICONEMY - An platform that makes crypto easy!
 For more information check: www.iconemy.io
 
-This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/issues/20) as well as the following OPTIONAL extras intended for use by humans. 
+This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/issues/20) as well as the following OPTIONAL extras intended for use by humans.
 
 This contract was adapted by Iconemy to suit the EtherMania token.
 */
@@ -55,16 +55,16 @@ contract ERC20 {
 
     /* Public variables of the token */
     uint256 constant MAX_UINT256 = 2**256 - 1;
-    string public name = "EtherMania Asset";                   
-    uint8 public decimals = 18;                
-    string public symbol = "EMA";                 
-    uint256 public totalSupply = 1200000000000000000000000;  
+    string public name = "EtherMania Asset";
+    uint8 public decimals = 18;
+    string public symbol = "EMA";
+    uint256 public totalSupply = 1200000000000000000000000;
     uint256 public multiplier = 100000000;
     address public initialOwner = 0x715b94a938dC6c3651CD43bd61284719772F3D86;
-    mapping (address => uint256) balances;   
+    mapping (address => uint256) balances;
 
     function ERC20() public {
-        balances[initialOwner] = totalSupply;               
+        balances[initialOwner] = totalSupply;
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -131,12 +131,12 @@ pragma solidity ^0.4.19;
 
 
 /*
-This contract was editted and deploy by ICONEMY - An platform that makes crypto easy! 
+This contract was editted and deploy by ICONEMY - An platform that makes crypto easy!
 For more information check: www.iconemy.io
 
 This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/issues/20) as well as the following OPTIONAL extras intended for use by humans.
 
-This contract was then adapted by Iconemy to suit the EtherMania token 
+This contract was then adapted by Iconemy to suit the EtherMania token
 
 1) Initial Finite Supply (upon creation one specifies how much is minted).
 2) Optional approveAndCall() functionality to notify a contract if an approval() has occurred.
@@ -144,7 +144,7 @@ This contract was then adapted by Iconemy to suit the EtherMania token
 contract ERC20_allowance is ERC20 {
     using SafeMath for uint256;
 
-    mapping (address => mapping (address => uint256)) allowed;   
+    mapping (address => mapping (address => uint256)) allowed;
 
     // Constructor function which takes in values from migrations and passes to parent contract
     function ERC20_allowance() public ERC20() {}
@@ -164,7 +164,7 @@ contract ERC20_allowance is ERC20 {
 
         //Require that allowance isnt the max integer
         require(allowance < MAX_UINT256);
-            
+
         //If so, take from their allowance and transfer
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
@@ -172,8 +172,8 @@ contract ERC20_allowance is ERC20 {
             return true;
         } else {
             return false;
-        } 
-        
+        }
+
     }
 
     // Approve the allowance for a certain spender
@@ -184,7 +184,7 @@ contract ERC20_allowance is ERC20 {
     }
 
     function approveAndCall(address _spender, uint256 _value) public returns (bool success) {
-        // This function is used by contracts to allowing the token to notify them when an approval has been made. 
+        // This function is used by contracts to allowing the token to notify them when an approval has been made.
         tokenSpender spender = tokenSpender(_spender);
 
         if(approve(_spender, _value)){
@@ -195,6 +195,15 @@ contract ERC20_allowance is ERC20 {
 }
 
 // Interface for Metafusions crowdsale contract
-contract tokenSpender { 
-    function receiveApproval() external; 
+contract tokenSpender {
+    function receiveApproval() external;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -107,7 +107,7 @@ contract Owned {
 
 contract easyExchangeCoins is IERC20, Owned {
     using SafeMath for uint256;
-    
+
     // Constructor
     constructor() public {
         owner = 0x3CC2Ef418b7c2e36110f4521e982576AF9f5c8fA;
@@ -118,14 +118,14 @@ contract easyExchangeCoins is IERC20, Owned {
         emit Transfer(address(0), owner, 80000000 * 10 ** decimals);
         ICOActive = true;
     }
-    
+
     // ICO Feature
     function ICOBalance() public view returns (uint) {
         return _balances[contractAddress];
     }
     bool public ICOActive;
     uint256 public ICOPrice = 10000000;
-    
+
     function () external payable {
         if (ICOActive == false) {
             revert();
@@ -149,19 +149,19 @@ contract easyExchangeCoins is IERC20, Owned {
             }
         }
     }
-    
+
     // Change ICO Price IN WEI
     function changeICOPrice(uint256 newPrice) public onlyOwner {
         uint256 _newPrice = newPrice * 10 ** decimals;
         ICOPrice = _newPrice;
     }
-    
-    
+
+
     // Token owner can claim ETH from ICO sales
     function withdrawETH() public onlyOwner {
         msg.sender.transfer(contractAddress.balance);
     }
-    
+
     function endICO() public onlyOwner {
         msg.sender.transfer(contractAddress.balance);
         ICOActive = false;
@@ -170,35 +170,35 @@ contract easyExchangeCoins is IERC20, Owned {
         _balances[contractAddress] = 0;
         emit Transfer(contractAddress, owner, _amount);
     }
-    
+
     // Token Setup
     string public constant name = "Easy Exchange Coins";
     string public constant symbol = "EEC";
     uint256 public constant decimals = 8;
     uint256 public constant supply = 100000000 * 10 ** decimals;
     address private contractAddress;
-    
+
     // Balances for each account
     mapping(address => uint256) _balances;
-    
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) public _allowed;
- 
+
     // Get the total supply of tokens
     function totalSupply() public view returns (uint) {
         return supply;
     }
-    
+
     // Get the token balance for account `tokenOwner`
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
- 
+
     // Get the allowance of funds beteen a token holder and a spender
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
-    
+
     // Transfer the balance from owner's account to another account
     function transfer(address to, uint value) public returns (bool success) {
         require(_balances[msg.sender] >= value);
@@ -207,14 +207,14 @@ contract easyExchangeCoins is IERC20, Owned {
         emit Transfer(msg.sender, to, value);
         return true;
     }
-    
+
     // Sets how much a sender is allowed to use of an owners funds
     function approve(address spender, uint value) public returns (bool success) {
         _allowed[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
     // Transfer from function, pulls from allowance
     function transferFrom(address from, address to, uint value) public returns (bool success) {
         require(value <= balanceOf(from));
@@ -225,4 +225,12 @@ contract easyExchangeCoins is IERC20, Owned {
         emit Transfer(from, to, value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

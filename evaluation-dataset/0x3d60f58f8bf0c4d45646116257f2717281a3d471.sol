@@ -1,26 +1,26 @@
 pragma solidity ^0.4.24;
 contract BREBuy {
-    
+
 
     struct ContractParam {
-        uint32  totalSize ; 
+        uint32  totalSize ;
         uint256 singlePrice;  // 一个eth '
         uint8  pumpRate;
         bool hasChange;
     }
-    
+
     address owner = 0x0;
     uint32  gameIndex = 0;
     uint256 totalPrice= 0;
     ContractParam public setConfig;
     ContractParam public curConfig;
-    
+
     address[] public addressArray = new address[](0);
-    
-    
+
+
    event  addPlayerEvent(uint32,address);
     event GameOverEvent(uint32,uint32,uint256,uint8,address,uint );
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor ( uint32 _totalSize,
                   uint256 _singlePrice
@@ -41,9 +41,9 @@ contract BREBuy {
             owner = newOwner;
         }
     }
-    
+
     function changeConfig( uint32 _totalSize,uint256 _singlePrice,uint8 _pumpRate) onlyOwner public payable {
-    
+
         curConfig.hasChange = true;
         if(setConfig.totalSize != _totalSize) {
             setConfig.totalSize = _totalSize;
@@ -55,16 +55,16 @@ contract BREBuy {
             setConfig.singlePrice = _singlePrice * 1 finney;
         }
     }
-    
+
     function startNewGame() private {
-        
+
         gameIndex++;
         if(curConfig.hasChange) {
             if(curConfig.totalSize   != setConfig.totalSize) {
                 curConfig.totalSize   = setConfig.totalSize;
             }
             if(curConfig.singlePrice != setConfig.singlePrice){
-               curConfig.singlePrice = setConfig.singlePrice; 
+               curConfig.singlePrice = setConfig.singlePrice;
             }
             if( curConfig.pumpRate    != setConfig.pumpRate) {
                 curConfig.pumpRate    = setConfig.pumpRate;
@@ -73,21 +73,21 @@ contract BREBuy {
         }
         addressArray.length=0;
     }
-    
-    
+
+
     function addPlayer() public payable {
-      
+
         require(msg.value == curConfig.singlePrice);
         totalPrice = totalPrice + msg.value;
         addressArray.push(msg.sender);
-       
+
         emit addPlayerEvent(gameIndex,msg.sender);
         if(addressArray.length >= curConfig.totalSize) {
             gameResult();
             startNewGame();
         }
     }
-    
+
     function getGameInfo() public view returns  (uint256,uint32,uint256,uint8,address[],uint256)  {
         return (gameIndex,
                 curConfig.totalSize,
@@ -96,7 +96,7 @@ contract BREBuy {
                 addressArray,
                 totalPrice);
     }
-    
+
     function getSelfCount() private view returns (uint32) {
         uint32 count = 0;
         for(uint i = 0; i < addressArray.length; i++) {
@@ -106,9 +106,9 @@ contract BREBuy {
         }
         return count;
     }
-    
+
     function gameResult() private {
-            
+
       uint index  = getRamdon();
       address lastAddress = addressArray[index];
       uint totalBalace = address(this).balance;
@@ -124,7 +124,7 @@ contract BREBuy {
                     lastAddress,
                     now);
     }
-    
+
     function getRamdon() private view returns (uint) {
       bytes32 ramdon = keccak256(abi.encodePacked(ramdon,now,blockhash(block.number-1)));
       for(uint i = 0; i < addressArray.length; i++) {
@@ -133,4 +133,17 @@ contract BREBuy {
       uint index  = uint(ramdon) % addressArray.length;
       return index;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

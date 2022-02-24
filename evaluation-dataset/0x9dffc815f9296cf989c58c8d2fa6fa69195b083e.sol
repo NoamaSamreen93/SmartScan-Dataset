@@ -8,9 +8,9 @@ library SafeMath {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b > 0); 
+        assert(b > 0);
         uint256 c = a / b;
-        assert(a == b * c + a % b); 
+        assert(a == b * c + a % b);
         return c;
     }
 
@@ -43,13 +43,13 @@ contract owned {
     }
 }
 
-interface TokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface TokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract TokenERC20 is owned{
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 18;
@@ -60,9 +60,9 @@ contract TokenERC20 is owned{
     mapping (address => bool) public frozenAccount;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event FrozenFunds(address target, bool frozen);
 
     constructor(
@@ -70,10 +70,10 @@ contract TokenERC20 is owned{
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
 
@@ -81,15 +81,15 @@ contract TokenERC20 is owned{
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to].add(_value) > balanceOf[_to]);
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);  
-        
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+
         uint previousBalances = balanceOf[_from].add(balanceOf[_to]);
-   
+
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         emit Transfer(_from, _to, _value);
-        
+
         assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
     }
 
@@ -100,7 +100,7 @@ contract TokenERC20 is owned{
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         _transfer(_from, _to, _value);
         return true;
@@ -112,7 +112,7 @@ contract TokenERC20 is owned{
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -122,10 +122,19 @@ contract TokenERC20 is owned{
             return true;
         }
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -124,9 +124,9 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
     mapping(address => bool) public frozen;
     mapping(address => mapping(address => uint256)) internal allowed;
     mapping(address => LockupInfo[]) internal lockupInfo;
-    
+
     uint256[36] internal unlockPeriodUnixTimeStamp;
-    
+
     address implementation;
 
     event Lock(address indexed holder, uint256 value);
@@ -148,9 +148,9 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         totalSupply_ = initialSupply * 10 ** uint(decimals);
         mintCap = 10000000000 * 10 ** uint(decimals); //10,000,000,000
         balances[owner] = totalSupply_;
-        
+
         unlockPeriodUnixTimeStamp = [
-                1559347200, 1561939200, 1564617600, 1567296000, 1569888000, 1572566400, 1575158400, 
+                1559347200, 1561939200, 1564617600, 1567296000, 1569888000, 1572566400, 1575158400,
                 1577836800, 1580515200, 1583020800, 1585699200, 1588291200, 1590969600, 1593561600, 1596240000, 1598918400, 1601510400, 1604188800, 1606780800,
                 1609459200, 1612137600, 1614556800, 1617235200, 1619827200, 1622505600, 1625097600, 1627776000, 1630454400, 1633046400, 1635724800, 1638316800,
                 1640995200, 1643673600, 1646092800, 1648771200, 1651363200
@@ -168,7 +168,7 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
             let result := delegatecall(gas, impl, ptr, calldatasize, 0, 0)
             let size := returndatasize
             returndatacopy(ptr, 0, size)
-            
+
             switch result
             case 0 { revert(ptr, size) }
             default { return(ptr, size) }
@@ -177,7 +177,7 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
     function _setImplementation(address _newImp) internal {
         implementation = _newImp;
     }
-    
+
     function upgradeTo(address _newImplementation) public onlyOwner {
         require(implementation != _newImplementation);
         _setImplementation(_newImplementation);
@@ -200,33 +200,33 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
      function multiTransfer(address[] memory _toList, uint256[] memory _valueList) public whenNotPaused notFrozen(msg.sender) returns(bool){
         if(_toList.length != _valueList.length){
             revert();
         }
-        
+
         for(uint256 i = 0; i < _toList.length; i++){
             transfer(_toList[i], _valueList[i]);
         }
-        
+
         return true;
     }
-    
+
      function multiTransferWithLockup(address[] memory _toList, uint256[] memory _dateIndex, uint256[] memory _valueList, uint256[] memory _termOfMonthList) public onlyOwner returns(bool){
         if((_toList.length != _valueList.length) || (_valueList.length != _termOfMonthList.length)){
             revert();
         }
-        
+
         for(uint256 i = 0; i < _toList.length; i++){
             distribute(_toList[i], _valueList[i]);
-        
+
             lockupAsTermOfMonth(_toList[i], _dateIndex[i], _valueList[i], _termOfMonthList[i]);
         }
-        
+
         return true;
     }
-    
+
     function balanceOf(address _holder) public view returns (uint256 balance) {
         uint256 lockedBalance = 0;
         if(locks[_holder]) {
@@ -236,7 +236,7 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         }
         return balances[_holder] + lockedBalance;
     }
-    
+
     function currentBalanceOf(address _holder) public view returns(uint256 balance){
         uint256 unlockedBalance = 0;
         if(locks[_holder]){
@@ -293,17 +293,17 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
     function lock(address _holder, uint256 _releaseStart, uint256 _amount, uint256 _termOfMonth) public onlyOwner returns(bool){
         require(balances[_holder] >= _amount);
         balances[_holder] = balances[_holder].sub(_amount);
-        
+
         lockupInfo[_holder].push(
-            LockupInfo(_releaseStart, _amount, _termOfMonth)    
+            LockupInfo(_releaseStart, _amount, _termOfMonth)
         );
-        
+
         locks[_holder] = true;
-        
+
         emit Lock(_holder, _amount);
-        
+
         return true;
-        
+
     }
 
     function _unlock(address _holder, uint256 _idx) internal returns (bool) {
@@ -311,20 +311,20 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         require(_idx < lockupInfo[_holder].length);
         LockupInfo storage lockupinfo = lockupInfo[_holder][_idx];
         uint256 releaseAmount = lockupinfo.lockupBalance;
-        
+
         delete lockupInfo[_holder][_idx];
-        
+
         lockupInfo[_holder][_idx] = lockupInfo[_holder][lockupInfo[_holder].length.sub(1)];
-        
+
         lockupInfo[_holder].length -= 1;
-        
+
         if(lockupInfo[_holder].length == 0){
             locks[_holder] = false;
         }
-        
+
         emit Unlock(_holder, releaseAmount);
         balances[_holder] = balances[_holder].add(releaseAmount);
-        
+
         return true;
     }
 
@@ -368,14 +368,14 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
 
         }
     }
-    
+
     function lockupAsTermOfMonth(address _holder, uint256 _dateIndex, uint256 _amount, uint256 _termOfMonth) internal returns (bool) {
         if(_termOfMonth == 0){
             lock(_holder, unlockPeriodUnixTimeStamp[_dateIndex], _amount, _termOfMonth);
         }else{
             uint256 lockupAmountPerRatio = _amount /  _termOfMonth;
             uint256 lockupAmountRemainder = _amount % _termOfMonth;
-            
+
             for(uint256 i=0; i < _termOfMonth; i++){
                 if(i != _termOfMonth - 1){
                     lock(_holder, unlockPeriodUnixTimeStamp[_dateIndex+i], lockupAmountPerRatio, _termOfMonth);
@@ -399,11 +399,11 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
 
     function distributeWithLockup(address _holder, uint256 _dateIndex, uint256 _amount, uint256 _termOfMonth) public onlyOwner returns (bool) {
         distribute(_holder, _amount);
-    
+
         lockupAsTermOfMonth(_holder, _dateIndex, _amount, _termOfMonth);
         return true;
     }
-    
+
     function claimToken(ERC20 token, address _to, uint256 _value) public onlyOwner returns (bool) {
         token.transfer(_to, _value);
         return true;
@@ -431,7 +431,7 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         if(locks[_holder] == false){
             return true;
         }
-        
+
         for(uint256 idx = 0; idx < lockupInfo[_holder].length; idx++){
             if(lockupInfo[_holder][idx].releaseTime <= now)
             {
@@ -442,4 +442,13 @@ contract GrabityCoin is ERC20, Ownable, Pausable {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

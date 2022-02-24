@@ -131,20 +131,20 @@ library SafeMath {
 
 library Helper {
     using SafeMath for uint256;
-    
-        
-    function bytes32ToUint(bytes32 n) 
+
+
+    function bytes32ToUint(bytes32 n)
         public
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         return uint256(n);
     }
-    
-    function stringToBytes32(string memory source) 
+
+    function stringToBytes32(string memory source)
         public
         pure
-        returns (bytes32 result) 
+        returns (bytes32 result)
     {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
@@ -155,15 +155,15 @@ library Helper {
             result := mload(add(source, 32))
         }
     }
-    
-    function stringToUint(string memory source) 
+
+    function stringToUint(string memory source)
         public
         pure
         returns (uint256)
     {
         return bytes32ToUint(stringToBytes32(source));
     }
-    
+
     function validUsername(string _username)
         public
         pure
@@ -176,8 +176,8 @@ library Helper {
         if (bytes(_username)[len-1] == 32) return false;
         // Erste Char != '0'
         return uint256(bytes(_username)[0]) != 48;
-    }   
-    
+    }
+
     function getRandom(uint256 _seed, uint256 _range)
         public
         pure
@@ -191,28 +191,28 @@ library Helper {
 
 contract Ticket {
     using SafeMath for uint256;
-    
+
     modifier buyable() {
         require(block.timestamp > round[currentRound].startRound, "Not start, back later please");
         require(block.timestamp < round[currentRound].endRoundByClock1&&(round[currentRound].endRoundByClock2==0 ||block.timestamp < round[currentRound].endRoundByClock2), "round over");
         _;
     }
-    
+
     modifier onlyAdmin() {
         require(msg.sender == devTeam1, "admin required");
         _;
     }
-    
+
     modifier registered(){
         require(citizenContract.isCitizen(msg.sender), "must be a citizen");
         _;
     }
-        
+
     modifier onlyCoreContract() {
         require(isCoreContract[msg.sender], "admin required");
         _;
     }
-    
+
     event BuyATicket(
         address indexed buyer,
         uint256 ticketFrom,
@@ -224,14 +224,14 @@ contract Ticket {
     address devTeam2;
     address devTeam3;
     address devTeam4;
-    
+
     uint256 TICKET_PRICE = 2*10**15; // 3 demical 0.002
-    
+
     uint256 constant public ZOOM = 1000;
     uint256 constant public PBASE = 24;
     uint256 constant public RDIVIDER = 50000;
     uint256 constant public PMULTI = 48;
-    
+
     // percent
     uint256 constant public EARLY_PERCENT = 20;
     uint256 constant public EARLY_PERCENT_FOR_CURRENT = 70;
@@ -240,7 +240,7 @@ contract Ticket {
     uint256 constant public DEV_PERCENT = 3;
     uint256 constant public DIVIDEND_PERCENT = 10;
     uint256 constant public REWARD_PERCENT = 50;
-    
+
     //  reward part
     uint256 constant public LAST_BUY_PERCENT = 20;
     uint8[6] public JACKPOT_PERCENT = [uint8(25),5,5,5,5,5];
@@ -248,23 +248,23 @@ contract Ticket {
     uint256 constant public MOST_F1_EARNED_PERCENT = 4;
     uint8[5] public DRAW_PERCENT = [uint8(6),1,1,1,1]; // 3 demicel 0.2%
     uint256 constant public NEXTROUND_PERCENT = 20;
-    
+
     uint256 constant public F1_LIMIT = 1 ether;
-    
+
     // clock
     uint8 constant public MULTI_TICKET = 3;
     uint256 constant public LIMMIT_CLOCK_2_ETH = 300 ether;
     uint256 constant public ONE_MIN = 60;
-    uint256 constant public ONE_HOUR = 3600; 
+    uint256 constant public ONE_HOUR = 3600;
     uint256 constant public ONE_DAY = 24 * ONE_HOUR;
-    
+
     // contract
     CitizenInterface public citizenContract;
     DAAInterface public DAAContract;
     mapping (address => bool) public isCoreContract;
     uint256 public coreContractSum;
     address[] public coreContracts;
-    
+
     struct Round {
         uint256 priviousTicketSum;
         uint256 ticketSum;
@@ -278,17 +278,17 @@ contract Ticket {
         mapping(uint256 => Slot) ticketSlot; // from 1
         uint256 ticketSlotSum;              // last
         mapping( address => uint256[]) pSlot;
-        
+
         uint256 earlyIncomeMarkSum;
         mapping(address => uint256) earlyIncomeMark;
-        
+
         uint256 startRound;
         uint256 endRoundByClock1;
         uint256 endRoundByClock2;
         uint256 endRound;
         uint8 numberClaimed;
-        
-        
+
+
         bool is_running_clock2;
     }
     uint256 public totalEthSpendTicket;
@@ -302,29 +302,29 @@ contract Ticket {
     mapping(address => uint256) mostF1EarnerdId;
     mapping(address => uint256) mostSpenderId;
     mapping(uint256 => address[])  roundWinner;
-        
+
     struct Slot {
         address buyer;
         uint256 ticketFrom;
         uint256 ticketTo;
     }
-    
-    
+
+
 
     constructor (address[4] _devTeam)
         public
     {
-        devTeam1 = _devTeam[0]; 
-        devTeam2 = _devTeam[1]; 
-        devTeam3 = _devTeam[2]; 
-        devTeam4 = _devTeam[3]; 
+        devTeam1 = _devTeam[0];
+        devTeam2 = _devTeam[1];
+        devTeam3 = _devTeam[2];
+        devTeam4 = _devTeam[3];
         currentRound=0;
         round[currentRound].startRound = 1560693600;
         round[currentRound].endRoundByClock1 = round[currentRound].startRound.add(48*ONE_HOUR);
         round[currentRound].endRound = round[currentRound].endRoundByClock1;
     }
-    
-       // DAAContract, TicketContract, CitizenContract 
+
+       // DAAContract, TicketContract, CitizenContract
     function joinNetwork(address[3] _contract)
         public
     {
@@ -337,7 +337,7 @@ contract Ticket {
         }
         coreContractSum = 3;
     }
-    
+
     function addCoreContract(address _address) public  // [dev1]
         onlyAdmin()
     {
@@ -346,7 +346,7 @@ contract Ticket {
         coreContracts.push(_address);
         coreContractSum+=1;
     }
-    
+
     function getRestHour() private view returns(uint256){
         uint256 tempCurrentRound;
         if (now>round[currentRound].startRound){
@@ -358,7 +358,7 @@ contract Ticket {
         if (now>round[tempCurrentRound].endRound) return 0;
         return round[tempCurrentRound].endRound.sub(now);
     }
-    
+
     function getRestHourClock2() private view returns(uint256){
         if (round[currentRound].is_running_clock2){
             if ((round[currentRound].endRoundByClock2.sub(now)).div(ONE_HOUR)>0){
@@ -368,14 +368,14 @@ contract Ticket {
         }
         return 48;
     }
-    
+
     function getTicketPrice() public view returns(uint256){
         if (round[currentRound].is_running_clock2){
             return TICKET_PRICE + TICKET_PRICE*(50-getRestHourClock2())*4/100;
         }
         return TICKET_PRICE;
     }
-    
+
     function softMostF1(address _ref) private {
         uint256 citizen_spender = round[currentRound].RefF1Sum[_ref];
         uint256 i=1;
@@ -403,8 +403,8 @@ contract Ticket {
             }
             i++;
         }
-    } 
-    
+    }
+
 
     function softMostSpender(address _ref) private {
         uint256 citizen_spender = round[currentRound].citizenTicketSpend[_ref];
@@ -433,15 +433,15 @@ contract Ticket {
             }
             i++;
         }
-    } 
-    
+    }
+
     function addTicketEthSpend(address _sender,uint256 _value) private{
         citizenContract.addTicketEthSpend(_sender,_value);
-        
+
         address refAdress = citizenContract.getRef(_sender);
         if (refAdress != devTeam3 && round[currentRound].citizenTicketSpend[_sender]<F1_LIMIT){ // devTeam3 cannot receiver this arward.
             uint256 valueFromF1;
-            
+
             //  limmit at 1 ether
             if (round[currentRound].citizenTicketSpend[_sender].add(_value)>F1_LIMIT){
                 uint256 temp = round[currentRound].citizenTicketSpend[_sender].add(_value).sub(F1_LIMIT);
@@ -449,36 +449,36 @@ contract Ticket {
             } else {
                 valueFromF1 = _value;
             }
-            
+
             // sum f1 deposit
             round[currentRound].RefF1Sum[refAdress] = round[currentRound].RefF1Sum[refAdress].add(valueFromF1);
-            
+
             //  find max mostF1Earnerd
             softMostF1(refAdress);
-            
+
         }
-        
+
         round[currentRound].citizenTicketSpend[_sender] = round[currentRound].citizenTicketSpend[_sender].add(_value);
-        
+
         // find max mostSpender
         softMostSpender(_sender);
-        
+
         // calculate total
         totalEthSpendTicket = totalEthSpendTicket.add(_value);
     }
-    
-    
+
+
     function isAddressTicket(uint256 _round,uint256 _slot, uint256 _ticket) private view returns(bool){
         Slot storage temp = round[_round].ticketSlot[_slot];
         if (temp.ticketFrom<=_ticket&&_ticket<=temp.ticketTo) return true;
         return false;
     }
-    
+
     function getAddressTicket(uint256 _round, uint256 _ticket) public view returns(address){
         uint256 _from = 0;
         uint256 _to = round[_round].ticketSlotSum;
         uint256 _mid;
-        
+
         while(_from<=_to){
             _mid = (_from+_to).div(2);
             if (isAddressTicket(_round,_mid,_ticket)) return round[_round].ticketSlot[_mid].buyer;
@@ -489,29 +489,29 @@ contract Ticket {
                 _from = _mid+1;
             }
         }
-        
+
         // if errors
         return round[_round].ticketSlot[_mid].buyer;
     }
-    
+
     function drawWinner() public registered() {
         // require(round[currentRound].participantTicketAmount[msg.sender] > 0, "must buy at least 1 ticket");
         require(round[currentRound].endRound.add(ONE_MIN)<now);
-        
+
         // address lastbuy = getAddressTicket(currentRound, round[currentRound].ticketSum-1);
         address lastbuy = round[currentRound].ticketSlot[round[currentRound].ticketSlotSum].buyer;
         roundWinner[currentRound].push(lastbuy);
         uint256 arward_last_buy = round[currentRound].totalEth*LAST_BUY_PERCENT/100;
         lastbuy.transfer(arward_last_buy);
         citizenContract.addWinIncome(lastbuy,arward_last_buy);
-        
+
         mostSpender[1].transfer(round[currentRound].totalEth*MOST_SPENDER_PERCENT/100);
         citizenContract.addWinIncome(mostSpender[1],round[currentRound].totalEth*MOST_SPENDER_PERCENT/100);
         mostF1Earnerd[1].transfer(round[currentRound].totalEth*MOST_F1_EARNED_PERCENT/100);
         citizenContract.addWinIncome(mostF1Earnerd[1],round[currentRound].totalEth*MOST_F1_EARNED_PERCENT/100);
         roundWinner[currentRound].push(mostSpender[1]);
         roundWinner[currentRound].push(mostF1Earnerd[1]);
-        
+
         uint256 _seed = getSeed();
         for (uint256 i = 0; i < 6; i++){
             uint256 winNumber = Helper.getRandom(_seed, round[currentRound].ticketSum);
@@ -522,8 +522,8 @@ contract Ticket {
             roundWinner[currentRound].push(winCitizen);
             _seed = _seed + (_seed / 10);
         }
-        
-        
+
+
         uint256 totalEthLastRound = round[currentRound].totalEth*NEXTROUND_PERCENT/100;
         // Next Round
         delete mostSpender;
@@ -535,7 +535,7 @@ contract Ticket {
         round[currentRound].endRound = round[currentRound].endRoundByClock1;
         claim();
     }
-    
+
     function claim() public registered() {
         // require drawed winner
         require(currentRound>0&&round[currentRound].ticketSum==0);
@@ -553,11 +553,11 @@ contract Ticket {
         round[lastRound].numberClaimed = round[lastRound].numberClaimed+1;
         round[lastRound].endRound = now.add(5*ONE_MIN);
     }
-    
+
     function getEarlyIncomeMark(uint256 _ticketSum) public pure returns(uint256){
         uint256 base = _ticketSum * ZOOM / RDIVIDER;
         uint256 expo = base.mul(base).mul(base); //^3
-        expo = expo.mul(expo).mul(PMULTI); 
+        expo = expo.mul(expo).mul(PMULTI);
         expo =  expo.div(ZOOM**5);
         return (1 + PBASE*ZOOM / (1*ZOOM + expo));
     }
@@ -566,7 +566,7 @@ contract Ticket {
         uint256 ethDeposit = msg.value;
         address _sender = msg.sender;
         require(_quantity*getTicketPrice()==ethDeposit,"Not enough eth for current quantity");
-        
+
         // after one day sale  | extra time
         if (now>=round[currentRound].startRound.add(ONE_DAY)){
             uint256 extraTime = _quantity.mul(30);
@@ -576,11 +576,11 @@ contract Ticket {
                 round[currentRound].endRoundByClock1 = round[currentRound].endRoundByClock1.add(extraTime);
             }
         }
-        
+
         // F1, most spender
         addTicketEthSpend(_sender, ethDeposit);
-        
-        
+
+
         if (round[currentRound].participantTicketAmount[_sender]==0){
             round[currentRound].participant.push(_sender);
         }
@@ -588,18 +588,18 @@ contract Ticket {
         if(round[currentRound].is_running_clock2){
             _quantity=_quantity.mul(MULTI_TICKET);
         }
-        
+
         uint256 ticketSlotSumTemp = round[currentRound].ticketSlotSum.add(1);
         round[currentRound].ticketSlotSum = ticketSlotSumTemp;
         round[currentRound].ticketSlot[ticketSlotSumTemp].buyer = _sender;
         round[currentRound].ticketSlot[ticketSlotSumTemp].ticketFrom = round[currentRound].ticketSum+1;
-        
+
         // 20% Early Income Mark
         uint256 earlyIncomeMark = getEarlyIncomeMark(round[currentRound].ticketSum);
         earlyIncomeMark = earlyIncomeMark.mul(_quantity);
         round[currentRound].earlyIncomeMarkSum = earlyIncomeMark.add(round[currentRound].earlyIncomeMarkSum);
         round[currentRound].earlyIncomeMark[_sender] = earlyIncomeMark.add(round[currentRound].earlyIncomeMark[_sender]);
-        
+
         round[currentRound].ticketSum = round[currentRound].ticketSum.add(_quantity);
         ticketSum = ticketSum.add(_quantity);
         ticketSumByAddress[_sender] = ticketSumByAddress[_sender].add(_quantity);
@@ -607,29 +607,29 @@ contract Ticket {
         round[currentRound].participantTicketAmount[_sender] = round[currentRound].participantTicketAmount[_sender].add(_quantity);
         round[currentRound].pSlot[_sender].push(ticketSlotSumTemp);
         emit BuyATicket(_sender, round[currentRound].ticketSlot[ticketSlotSumTemp].ticketFrom, round[currentRound].ticketSlot[ticketSlotSumTemp].ticketTo, now);
-            
+
         // 20% EarlyIncome
         uint256 earlyIncome=  ethDeposit*EARLY_PERCENT/100;
         citizenContract.pushEarlyIncome.value(earlyIncome)();
-        
+
         // 17% Revenue
         uint256 revenue =  ethDeposit*REVENUE_PERCENT/100;
         citizenContract.pushTicketRefIncome.value(revenue)(_sender);
-        
+
         // 10% Devidend
         uint256 devidend =  ethDeposit*DIVIDEND_PERCENT/100;
         DAAContract.pushDividend.value(devidend)();
-        
+
         // 3% devTeam
         uint256 devTeamPaid = ethDeposit*DEV_PERCENT/100;
         devTeam1.transfer(devTeamPaid);
-        
+
         // 50% reward
         uint256 rewardPaid = ethDeposit*REWARD_PERCENT/100;
         round[currentRound].totalEth = rewardPaid.add(round[currentRound].totalEth);
-        
+
         round[currentRound].totalEthRoundSpend = ethDeposit.add(round[currentRound].totalEthRoundSpend);
-        
+
         // Run clock 2
         if (round[currentRound].is_running_clock2==false&&((currentRound==0 && round[currentRound].totalEth>=LIMMIT_CLOCK_2_ETH)||(currentRound>0&&round[currentRound].totalEth>round[currentRound-1].totalEth))){
             round[currentRound].is_running_clock2=true;
@@ -641,10 +641,10 @@ contract Ticket {
             tempEndRound = round[currentRound].endRoundByClock1;
         }
         round[currentRound].endRound = tempEndRound;
-        
+
         return true;
     }
-    
+
     // early income real time display
     function getEarlyIncomeView(address _sender, bool _current) public view returns(uint256){
         uint256 _last_round = earlyIncomeRoundPulled[_sender];
@@ -660,7 +660,7 @@ contract Ticket {
         }
         return _sum;
     }
-    
+
     //  early income pull
     function getEarlyIncomePull(address _sender) onlyCoreContract() public returns(uint256){
         uint256 _last_round = earlyIncomeRoundPulled[_sender];
@@ -672,7 +672,7 @@ contract Ticket {
         earlyIncomeRoundPulled[_sender] = currentRound;
         return _sum;
     }
-    
+
     function getEarlyIncomeByRound(address _buyer, uint256 _round) public view returns(uint256){
         uint256 _previous_round;
         _previous_round = _round-1;
@@ -681,7 +681,7 @@ contract Ticket {
         uint256 _totalEth = round[_round].totalEthRoundSpend*EARLY_PERCENT/100;
         uint256 _currentAmount = _totalEth*EARLY_PERCENT_FOR_CURRENT/100;
         uint256 _previousAmount = _totalEth*EARLY_PERCENT_FOR_PREVIOUS/100;
-        
+
         if (round[_round].earlyIncomeMarkSum>0){
              _sum = round[_round].earlyIncomeMark[_buyer].mul(_currentAmount).div(round[_round].earlyIncomeMarkSum);
         }
@@ -698,55 +698,68 @@ contract Ticket {
     {
         return uint64(keccak256(block.timestamp, block.difficulty));
     }
-    
+
     function sendTotalEth() onlyAdmin() public {
         DAAContract.pushDividend.value(address(this).balance)();
         round[currentRound].totalEth=0;
     }
-    
+
     function getMostSpender() public view returns(address[4]){
         return mostSpender;
     }
-    
+
     function getMostF1Earnerd() public view returns(address[4]){
         return mostF1Earnerd;
     }
-    
+
     function getResultWinner(uint256 _round) public view returns(address[]){
         require(_round<currentRound);
         return roundWinner[_round];
     }
-    
+
     function getCitizenTicketSpend(uint256 _round, address _sender) public view returns(uint256){
         return round[_round].citizenTicketSpend[_sender];
     }
-    
+
     function getCititzenTicketSum(uint256 _round) public view returns(uint256){
         address _sender =msg.sender;
         return round[_round].participantTicketAmount[_sender];
     }
-    
+
     function getRefF1Sum(uint256 _round, address _sender) public view returns(uint256){
         return round[_round].RefF1Sum[_sender];
     }
-    
+
     function getLastBuy(uint256 _round) public view returns(address){
         return round[_round].ticketSlot[round[_round].ticketSlotSum].buyer;
     }
-    
+
     function getCitizenSumSlot(uint256 _round) public view returns(uint256){
         address _sender = msg.sender;
         return round[_round].pSlot[_sender].length;
     }
-    
+
     function getCitizenSlotId(uint256 _round, uint256 _id) public view returns(uint256){
         address _sender = msg.sender;
         return round[_round].pSlot[_sender][_id];
     }
-    
+
     function getCitizenSlot(uint256 _round, uint256 _slotId) public view returns(address, uint256, uint256){
         Slot memory _slot = round[_round].ticketSlot[_slotId];
         return (_slot.buyer,_slot.ticketFrom,_slot.ticketTo);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

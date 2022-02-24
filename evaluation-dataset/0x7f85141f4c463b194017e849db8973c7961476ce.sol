@@ -50,7 +50,7 @@ contract CellTokens {
   uint8 private Reserved_upRow = 8;
   uint8 private Reserved_downRow = 39;
   uint8 private max_merge_size = 2;
-  
+
   event Bought (uint256 indexed _itemId, address indexed _owner, uint256 _price);
   event Sold (uint256 indexed _itemId, address indexed _owner, uint256 _price);
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
@@ -65,14 +65,14 @@ contract CellTokens {
   uint256 private increaseLimit3 = 2.0 ether;
   uint256 private increaseLimit4 = 5.0 ether;
   uint256 private startingPrice = 0.001 ether;
-  
+
   uint256[] private listedItems;
-  
+
   mapping (uint256 => address) private ownerOfItem;
   mapping (uint256 => uint256) private priceOfItem;
   mapping (address => string) private usernameOfAddress;
-  
-  
+
+
   function CellTokens () public {
     owner = msg.sender;
     admins[owner] = true;
@@ -124,7 +124,7 @@ contract CellTokens {
   }
   function setMaxMerge(uint8 num)onlyAdmins() external{
       max_merge_size = num;
-  }  
+  }
   /* Withdraw */
   /*
   */
@@ -163,7 +163,7 @@ contract CellTokens {
       return _price.mul(2).div(100); // 2%
     }
   }
-  
+
   function requestMerge(uint256[] ids)onlyMergeEnable() external {
       require(ids.length == 4);
       require(ids[0]%(10**8)/(10**4)<max_merge_size);
@@ -177,7 +177,7 @@ contract CellTokens {
       require(ids[0]+ (10**12) == ids[1]);
       require(ids[0]+ (10**8) == ids[2]);
       require(ids[0]+ (10**8) + (10**12) == ids[3]);
-      
+
       uint256 newPrice = priceOfItem[ids[0]]+priceOfItem[ids[1]]+priceOfItem[ids[2]]+priceOfItem[ids[3]];
       uint256 newId = ids[0] + ids[0]%(10**8);
       listedItems.push(newId);
@@ -187,8 +187,8 @@ contract CellTokens {
       ownerOfItem[ids[1]] = address(0);
       ownerOfItem[ids[2]] = address(0);
       ownerOfItem[ids[3]] = address(0);
-  } 
-  
+  }
+
   function checkIsOnSale(uint256 _ypos)public view returns(bool isOnSale){
       if(_ypos<Reserved_upRow||_ypos>Reserved_downRow){
           return false;
@@ -233,11 +233,11 @@ contract CellTokens {
 
         uint256 excess = msg.value.sub(price);
         address newOwner = msg.sender;
-    
+
     	ownerOfItem[_index] = newOwner;
         uint256 devCut = calculateDevCut(price);
         oldOwner.transfer(price.sub(devCut));
-    
+
         if (excess > 0) {
           newOwner.transfer(excess);
         }
@@ -255,11 +255,11 @@ contract CellTokens {
         priceOfItem[_itemId] = calculateNextPrice(price);
         uint256 excess = msg.value.sub(price);
         address newOwner = msg.sender;
-    
+
     	ownerOfItem[_itemId] = newOwner;
         uint256 devCut = calculateDevCut(price);
         oldOwner.transfer(price.sub(devCut));
-    
+
         if (excess > 0) {
           newOwner.transfer(excess);
         }
@@ -280,7 +280,7 @@ contract CellTokens {
   function symbol() public pure returns (string _symbol) {
     return "cells";
   }
-  
+
   function totalSupply() public view returns (uint256 _totalSupply) {
       uint256 total = 0;
       for(uint8 i=0; i<listedItems.length; i++){
@@ -300,11 +300,11 @@ contract CellTokens {
     }
     return counter;
   }
-  
+
   function ownerOf (uint256 _itemId) public view returns (address _owner) {
     return ownerOfItem[_itemId];
   }
-  
+
   function cellsOf (address _owner) public view returns (uint256[] _tokenIds) {
     uint256[] memory items = new uint256[](balanceOf(_owner));
     uint256 itemCounter = 0;
@@ -332,15 +332,15 @@ contract CellTokens {
     function isAdmin (address _admin) public view returns (bool _isAdmin) {
         return admins[_admin];
     }
-    
+
     function startingPriceOf () public view returns (uint256 _startingPrice) {
         return startingPrice;
     }
-    
+
     function priceOf (uint256 _itemId) public view returns (uint256 _price) {
         return priceOfItem[_itemId];
     }
-    
+
     function nextPriceOf (uint256 _itemId) public view returns (uint256 _nextPrice) {
         return calculateNextPrice(priceOf(_itemId));
     }
@@ -352,7 +352,7 @@ contract CellTokens {
         (xpos,ypos,size) = parseId(_itemId);
         return (ownerOfItem[_itemId],startingPriceOf(),priceOf(_itemId),nextPriceOf(_itemId),xpos,ypos,size);
     }
-    
+
     function getAllCellInfo()external view returns(uint256[] _tokenIds,uint256[] _prices, address[] _owners){
         uint256[] memory items = new uint256[](totalSupply());
         uint256[] memory prices = new uint256[](totalSupply());
@@ -374,4 +374,15 @@ contract CellTokens {
     function showBalance () onlyAdmins() public view returns (uint256 _ProfitBalance) {
         return this.balance;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

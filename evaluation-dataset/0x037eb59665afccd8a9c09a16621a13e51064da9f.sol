@@ -33,31 +33,31 @@ library SafeMath {
 
 contract ERC20 {
     uint256 public totalSupply;
-  
+
     function balanceOf(address who) constant public returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     function allowance(address owner, address spender) public constant returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
     function approve(address spender, uint256 value) public returns (bool);
-  
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-  
+
 }
 
 
 
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint256;
-    
+
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
 
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0) && _value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -68,11 +68,11 @@ contract StandardToken is ERC20 {
     function balanceOf(address _owner) public  constant returns (uint256 balance) {
         return balances[_owner];
     }
-  
-  
+
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         var _allowance = allowed[_from][msg.sender];
-        
+
         require(_to != address(0) && _value <= balances[_from] && _value <= _allowance);
 
         balances[_to] = balances[_to].add(_value);
@@ -86,18 +86,18 @@ contract StandardToken is ERC20 {
     function approve(address _spender, uint256 _value) public returns (bool) {
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         //change allowance to zero before changing allowance
-        
+
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
 
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
-    
+
+
     function increaseApproval (address _spender, uint _addedValue) public returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -106,7 +106,7 @@ contract StandardToken is ERC20 {
 
     function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
-        
+
         if (_subtractedValue > oldValue) {
         allowed[msg.sender][_spender] = 0;
         } else {
@@ -122,9 +122,9 @@ contract StandardToken is ERC20 {
 
 contract Ownable {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
     function Ownable() public {
         owner = msg.sender;
     }
@@ -157,20 +157,31 @@ contract TwinToken is StandardToken, Ownable {
         balances[msg.sender] = initialSupply;
         Transfer(0x0, msg.sender, initialSupply);
     }
-  
+
     /*
     This method is custom made for distributing token among team / marketing / advisors etc
     only accessible to owner of the token contract
     */
-  
+
     function distributeTokens(address _to, uint256 _value) public onlyOwner returns (bool success) {
         _value = _value * 10**18;
         require(balances[owner] >= _value && _value > 0);
-        
+
         balances[_to] = balances[_to].add(_value);
         balances[owner] = balances[owner].sub(_value);
         Transfer(owner, _to, _value);
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

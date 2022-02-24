@@ -4,7 +4,7 @@ pragma solidity ^0.4.18;
 *
 * Alteum Token
 * AUMX ERC223 Token Standard
-* Author: Lex Garza 
+* Author: Lex Garza
 * by ALTEUM / Copanga
 *
 **************************************************************/
@@ -17,7 +17,7 @@ pragma solidity ^0.4.18;
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint8 _decimals);
@@ -26,7 +26,7 @@ contract ERC223 {
   function transfer(address to, uint value) public returns (bool ok);
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -46,17 +46,17 @@ contract SafeMath
         assert(c >= a);
         return c;
       }
-    
+
 	function safeSub(uint256 a, uint256 b) internal pure returns (uint256) {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a / b;
 		return c;
 	}
-	
+
 	function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if (a == 0) {
 			return 0;
@@ -74,11 +74,11 @@ contract AUMXToken is ERC223, SafeMath{
 	string public symbol = "AUM";
 	uint8 public decimals = 8; // Using a Satoshi as base for our decimals: 0.00000001;
 	uint256 public totalSupply = 5000000000000000; // 50,000,000 AUM's, not mineable, not mintable;
-	
+
 	bool locked;
 	address Owner;
 	address swapperAddress;
-	
+
 	function AUMXToken() public {
 		locked = true;
 		Owner = msg.sender;
@@ -86,19 +86,19 @@ contract AUMXToken is ERC223, SafeMath{
 		balances[msg.sender] = totalSupply;
 		allowed[msg.sender][swapperAddress] = totalSupply;
 	}
-	
+
 	modifier isUnlocked()
 	{
 		if(locked && msg.sender != Owner) revert();
 		_;
 	}
-	
+
 	modifier onlyOwner()
 	{
 		if(msg.sender != Owner) revert();
 		_;
 	}
-	  
+
 	// Function to access name of token .
 	function name() public view returns (string _name) {
 		return name;
@@ -115,7 +115,7 @@ contract AUMXToken is ERC223, SafeMath{
 	function totalSupply() public view returns (uint256 _totalSupply) {
 		return totalSupply;
 	}
-	  
+
 	function ChangeSwapperAddress(address newSwapperAddress) public onlyOwner
 	{
 		address oldSwapperAddress = swapperAddress;
@@ -124,14 +124,14 @@ contract AUMXToken is ERC223, SafeMath{
 		allowed[msg.sender][oldSwapperAddress] = 0;
 		allowed[msg.sender][newSwapperAddress] = setAllowance;
 	}
-	
+
 	function UnlockToken() public onlyOwner
 	{
 		locked = false;
 	}
-	  
-	  
-	  
+
+
+
 	// Function that is called when a user or another contract wants to transfer funds .
 	function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public isUnlocked returns (bool success) {
 		if(isContract(_to)) {
@@ -146,7 +146,7 @@ contract AUMXToken is ERC223, SafeMath{
 			return transferToAddress(_to, _value, _data);
 		}
 	}
-	  
+
 
 	// Function that is called when a user or another contract wants to transfer funds .
 	function transfer(address _to, uint _value, bytes _data) public isUnlocked returns (bool success) {
@@ -157,7 +157,7 @@ contract AUMXToken is ERC223, SafeMath{
 			return transferToAddress(_to, _value, _data);
 		}
 	}
-	  
+
 	// Standard function transfer similar to ERC20 transfer with no _data .
 	// Added due to backwards compatibility reasons .
 	function transfer(address _to, uint _value) public isUnlocked returns (bool success) {
@@ -190,7 +190,7 @@ contract AUMXToken is ERC223, SafeMath{
 		Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
-	  
+
 	//function that is called when transaction target is a contract
 	function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
 		if (balanceOf(msg.sender) < _value) revert();
@@ -201,13 +201,13 @@ contract AUMXToken is ERC223, SafeMath{
 		Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint _value) public returns(bool)
 	{
 		if(locked && msg.sender != swapperAddress) revert();
 		if (balanceOf(_from) < _value) revert();
 		if(_value > allowed[_from][msg.sender]) revert();
-		
+
 		balances[_from] = safeSub(balanceOf(_from), _value);
 		allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
 		balances[_to] = safeAdd(balanceOf(_to), _value);
@@ -218,5 +218,16 @@ contract AUMXToken is ERC223, SafeMath{
 
 	function balanceOf(address _owner) public view returns (uint balance) {
 		return balances[_owner];
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

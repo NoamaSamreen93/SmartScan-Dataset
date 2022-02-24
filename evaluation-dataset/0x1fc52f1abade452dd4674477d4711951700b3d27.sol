@@ -179,10 +179,10 @@ contract TokenVesting is Ownable {
 
     // The duration in seconds of the cliff in which tokens will begin to vest
     uint256 public cliff;
-    
+
     // When the vesting starts as timestamp in seconds from Unix epoch
     uint256 public startTime;
-    
+
     // The duration in seconds of the period in which the tokens will vest
     uint256 public duration;
 
@@ -473,9 +473,9 @@ contract AdaptableToken is Burnable, Mintable, PausableToken {
     uint256 public transferableFromBlock;
 
     uint256 public lockEndBlock;
-    
+
     mapping (address => uint256) public initiallyLockedAmount;
-    
+
     function AdaptableToken(uint256 _transferableFromBlock, uint256 _lockEndBlock) internal {
         require(_lockEndBlock > _transferableFromBlock);
         transferableFromBlock = _transferableFromBlock;
@@ -591,7 +591,7 @@ contract AdaptableToken is Burnable, Mintable, PausableToken {
         totalSupply = totalSupply.sub(_amount);
 
         Transfer(msg.sender, address(0), _amount);
-        
+
         return true;
     }
 
@@ -623,4 +623,15 @@ contract NokuMasterToken is AdaptableToken {
     function NokuMasterToken(uint256 _transferableFromBlock, uint256 _lockEndBlock)
         AdaptableToken(_transferableFromBlock, _lockEndBlock) public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

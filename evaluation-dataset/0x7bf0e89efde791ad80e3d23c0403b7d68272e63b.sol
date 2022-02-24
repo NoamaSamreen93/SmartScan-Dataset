@@ -432,7 +432,7 @@ contract Consumer is Ownable {
 contract HookableToken is MintableToken, PausableToken, BurnableToken {
 
     Consumer public consumerAddress;
-    
+
     constructor(address _consumerAddress) public {
         consumerAddress = Consumer(_consumerAddress);
     }
@@ -501,7 +501,7 @@ contract ICOToken is MintableToken, PausableToken, HookableToken {
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
-    constructor(address _consumerAdr) public 
+    constructor(address _consumerAdr) public
     HookableToken(_consumerAdr){
     }
 
@@ -517,4 +517,10 @@ contract ICOToken is MintableToken, PausableToken, HookableToken {
 
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

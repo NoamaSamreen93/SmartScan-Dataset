@@ -1151,3 +1151,10 @@ contract ESCBCoin is MiniMeIrrVesDivToken {
     true            // Enable transfers
     ) {}
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

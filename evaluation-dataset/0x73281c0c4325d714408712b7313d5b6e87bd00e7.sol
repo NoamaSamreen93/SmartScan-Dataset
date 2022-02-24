@@ -46,7 +46,7 @@ library SafeMath {
  */
 contract ERC20Token {
     uint256 public totalSupply;  /* shorthand for public function and a property */
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
@@ -70,10 +70,10 @@ contract StandardToken is ERC20Token {
     string public name;
     string public symbol;
     uint8 public decimals;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     /**
      * @dev The constructor assigns the token name, symbols and decimals.
      */
@@ -108,8 +108,8 @@ contract StandardToken is ERC20Token {
 
     /**
      * @dev Give permission to `_spender` to spend `_value` number of tokens on your behalf.
-     * E.g. You place a buy or sell order on an exchange and in that example, the 
-     * `_spender` address is the address of the contract the exchange created to add your token to their 
+     * E.g. You place a buy or sell order on an exchange and in that example, the
+     * `_spender` address is the address of the contract the exchange created to add your token to their
      * website and you are `msg.sender`.
      *
      * @param _spender The address which will spend the funds.
@@ -148,7 +148,7 @@ contract StandardToken is ERC20Token {
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_value <= allowed[_from][msg.sender]);
-        
+
         allowed[_from][msg.sender] = allowed[_from][msg.sender].minus(_value);
         executeTransfer(_from, _to, _value);
 
@@ -161,7 +161,7 @@ contract StandardToken is ERC20Token {
     function executeTransfer(address _from, address _to, uint256 _value) internal {
         require(_to != address(0));
         require(_value != 0 && _value <= balances[_from]);
-        
+
         balances[_from] = balances[_from].minus(_value);
         balances[_to] = balances[_to].plus(_value);
 
@@ -231,7 +231,7 @@ contract MintableToken is StandardToken {
     */
     function disableMinting() onlyMinter canMint public {
         mintingDisabled = true;
-       
+
         emit MintingDisabled();
     }
 }
@@ -294,7 +294,7 @@ contract HasOwner {
         owner = _owner;
     }
 
-    /** 
+    /**
      * @dev Access control modifier that allows only the current owner to call the function.
      */
     modifier onlyOwner {
@@ -321,7 +321,7 @@ contract HasOwner {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     /**
      * @dev The `newOwner` finishes the ownership transfer process by accepting the
      * ownership.
@@ -387,12 +387,12 @@ contract AbstractFundraiser {
      * @param _amount The amount of received funds in ether.
      */
     function receiveFunds(address _address, uint256 _amount) internal;
-    
+
     /**
      * @dev It throws an exception if the transaction does not meet the preconditions.
      */
     function validateTransaction() internal view;
-    
+
     /**
      * @dev this overridable function makes and handles tokens to buyers
      */
@@ -410,7 +410,7 @@ contract AbstractFundraiser {
 /**
  * @title Basic Fundraiser
  *
- * @dev An abstract contract that is a base for fundraisers. 
+ * @dev An abstract contract that is a base for fundraisers.
  * It implements a generic procedure for handling received funds:
  * 1. Validates the transaciton preconditions
  * 2. Calculates the amount of tokens based on the conversion rate.
@@ -626,7 +626,7 @@ contract IndividualCapsFundraiser is BasicFundraiser {
         if (individualMaxCap == 0) {
             return;
         }
-        
+
         individualMaxCapTokens = individualMaxCap * _conversionRate;
 
         emit IndividualMaxCapTokensChanged(individualMaxCapTokens);
@@ -812,7 +812,7 @@ contract PresaleFundraiser is MintableTokenFundraiser {
     /**
      * @dev Internal funciton that helps to check if the pre-sale is active
      */
-    
+
     function isPresaleActive() internal view returns (bool) {
         return now < presaleEndTime && now >= presaleStartTime;
     }
@@ -858,7 +858,7 @@ contract BigchainToken is MintableToken, BurnableToken {
             "BCHAIN", // Token symbol
             18  // Token decimals
         )
-        
+
         MintableToken(_minter)
         public
     {
@@ -875,18 +875,18 @@ contract BigchainToken is MintableToken, BurnableToken {
  */
 
 contract BigchainTokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, IndividualCapsFundraiser, CappedFundraiser, ForwardFundsFundraiser, GasPriceLimitFundraiser {
-    
+
 
     constructor()
         HasOwner(msg.sender)
         public
     {
         token = new BigchainToken(
-        
+
         address(this)  // The fundraiser is the minter
         );
 
-        
+
 
         initializeBasicFundraiser(
             1537963200, // Start date = 2018-09-26 12:00 UTC
@@ -915,9 +915,25 @@ contract BigchainTokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, 
             (350 ether) // Hard cap
         );
 
-        
 
-        
+
+
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

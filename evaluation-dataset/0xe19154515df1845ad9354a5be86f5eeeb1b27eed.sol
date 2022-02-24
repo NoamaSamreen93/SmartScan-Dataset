@@ -69,17 +69,17 @@ library PaymentLib {
 library BytesLib {
 
 
-  // index returns the index of the first instance of sub in s, or -1 if sub is not present in s. 
+  // index returns the index of the first instance of sub in s, or -1 if sub is not present in s.
   function index(bytes memory b, bytes memory subb, uint start) internal pure returns(int) {
     uint lensubb = subb.length;
-    
+
     uint hashsubb;
     uint ptrb;
     assembly {
       hashsubb := keccak256(add(subb, 0x20), lensubb)
       ptrb := add(b, 0x20)
     }
-    
+
     for (uint lenb = b.length; start < lenb; start++) {
       if (start+lensubb > lenb) {
         return -1;
@@ -93,9 +93,9 @@ library BytesLib {
       }
     }
     return -1;
-  }  
-  
-  // index returns the index of the first instance of sub in s, or -1 if sub is not present in s. 
+  }
+
+  // index returns the index of the first instance of sub in s, or -1 if sub is not present in s.
   function index(bytes memory b, bytes memory sub) internal pure returns(int) {
     return index(b, sub, 0);
   }
@@ -120,23 +120,23 @@ library BytesLib {
       i = index(b, sub, uint(i)+sub.length);
     }
   }
-  
+
   function equals(bytes memory b, bytes memory a) internal pure returns(bool equal) {
     if (b.length != a.length) {
       return false;
     }
-    
+
     uint len = b.length;
-    
+
     assembly {
       equal := eq(keccak256(add(b, 0x20), len), keccak256(add(a, 0x20), len))
-    }  
+    }
   }
-  
+
   function copy(bytes memory b) internal pure returns(bytes memory) {
     return abi.encodePacked(b);
   }
-  
+
   function slice(bytes memory b, uint start, uint end) internal pure returns(bytes memory r) {
     if (start > end) {
       return r;
@@ -145,37 +145,37 @@ library BytesLib {
       end = b.length-1;
     }
     r = new bytes(end-start+1);
-    
+
     uint j;
     uint i = start;
     for (; i <= end; (i++, j++)) {
       r[j] = b[i];
     }
   }
-  
+
   function append(bytes memory b, bytes memory a) internal pure returns(bytes memory r) {
     return abi.encodePacked(b, a);
   }
-  
-  
+
+
   function replace(bytes memory b, bytes memory oldb, bytes memory newb) internal pure returns(bytes memory r) {
     if (equals(oldb, newb)) {
       return copy(b);
     }
-    
+
     uint n = count(b, oldb);
     if (n == 0) {
       return copy(b);
     }
-    
+
     uint start;
     for (uint i; i < n; i++) {
       uint j = start;
-      j += uint(index(slice(b, start, b.length-1), oldb));  
+      j += uint(index(slice(b, start, b.length-1), oldb));
       if (j!=0) {
         r = append(r, slice(b, start, j-1));
       }
-      
+
       r = append(r, newb);
       start = j + oldb.length;
     }
@@ -335,7 +335,7 @@ library ProofLib {
     require(proofLen >= 4, "proof lib: chain proof length too low");
     bytes memory slotData = uncleHeader;
     uint slotDataPtr;  assembly { slotDataPtr := add(slotData, 32) }
-    
+
     for (uint offset; ;) {
       // uncles blob
       (uint blobPtr, uint blobLen, uint blobShift) = blobPtrLenShift(chainProof, offset, slotData.length);
@@ -346,34 +346,34 @@ library ProofLib {
       // calc uncles hash
       assembly { hash := keccak256(blobPtr, blobLen) }
       offset += blobLen;
-      
-      
+
+
       // header blob
       (blobPtr, blobLen, blobShift) = blobPtrLenShift(chainProof, offset, 32);
       offset += 4;
       uint hashSlot; assembly { hashSlot := mload(add(blobPtr, blobShift)) }
       require(hashSlot == 0, "proof lib: non-empty uncles hash slot");
-      assembly { 
+      assembly {
         mstore(add(blobPtr, blobShift), hash)  // put uncles hash to uncles hash slot.
         hash := keccak256(blobPtr, blobLen) // calc header hash
       }
       offset += blobLen;
-      
+
       // return if has not next blob
       if (offset+4 >= proofLen) {
         return hash;
       }
-      
+
       // copy header blob to slotData for using in next blob
       slotData = new bytes(blobLen); assembly { slotDataPtr := add(slotData, 32) }
       memcpy(blobPtr, slotDataPtr, blobLen);
     }
   }
-  
+
   function uncleHeader(bytes memory proof, bytes32 hostSeedHash) internal pure returns(bytes32 headerHash, bytes memory header) {
     uint proofLen = proof.length;
     require(proofLen >= 4, "proof lib: uncle proof length too low");
-    uint blobPtr; uint blobLen; 
+    uint blobPtr; uint blobLen;
     bytes32 blobHash = hostSeedHash;
     for (uint offset; offset+4 < proofLen; offset += blobLen) {
       uint blobShift;
@@ -381,22 +381,22 @@ library ProofLib {
       offset += 4;
       uint hashSlot; assembly { hashSlot := mload(add(blobPtr, blobShift)) }
       require(hashSlot == 0, "proof lib: non-empty hash slot");
-      assembly { 
-        mstore(add(blobPtr, blobShift), blobHash) 
+      assembly {
+        mstore(add(blobPtr, blobShift), blobHash)
         blobHash := keccak256(blobPtr, blobLen)
       }
     }
-    
+
     header = new bytes(blobLen);
     uint headerPtr; assembly { headerPtr := add(header, 32) }
-    memcpy(blobPtr, headerPtr, blobLen); 
+    memcpy(blobPtr, headerPtr, blobLen);
     return (blobHash, header);
   }
 
   function receiptAddr(bytes memory proof) internal pure returns(address addr) {
     uint b;
     uint offset; assembly { offset := add(add(proof, 32), 4) }
-    
+
     // leaf header
     assembly { b := byte(0, mload(offset)) }
     require(b >= 0xf7, "proof lib: receipt leaf longer than 55 bytes");
@@ -453,15 +453,15 @@ library ProofLib {
     // address header
     assembly { b := byte(0, mload(offset)) }
     require(b == 0x94, "proof lib: address is 20 bytes long");
-    
+
     offset -= 11;
     assembly { addr := and(mload(offset), 0xffffffffffffffffffffffffffffffffffffffff) }
   }
 
 
   function blobPtrLenShift(bytes memory proof, uint offset, uint slotDataLen) internal pure returns(uint ptr, uint len, uint shift) {
-    assembly { 
-      ptr := add(add(proof, 32), offset) 
+    assembly {
+      ptr := add(add(proof, 32), offset)
       len := and(mload(sub(ptr, 30)), 0xffff)
     }
     require(proof.length >= len+offset+4, "proof lib: blob length out of range proof");
@@ -490,7 +490,7 @@ library ProofLib {
       let destpart := and(mload(dest), mask)
       mstore(dest, or(destpart, srcpart))
     }
-  }   
+  }
 }
 
 
@@ -503,7 +503,7 @@ library SlotGameLib {
   using NumberLib for NumberLib.Number;
 
   struct Bet {
-    uint amount; 
+    uint amount;
     uint40 blockNumber; // 40
     address payable gambler; // 160
     bool exist; // 1
@@ -548,12 +548,12 @@ library SlotGameLib {
   uint private constant JACKPOT_PERCENT = 1;
   uint private constant MIN_WIN_PERCENT = 30;
   uint private constant MIN_BET_AMOUNT = 10 + (HANDLE_BET_COST * 100 / MIN_WIN_PERCENT * 100) / (100 - HOUSE_EDGE_PERCENT - JACKPOT_PERCENT);
-  
+
   function MinBetAmount() internal pure returns(uint) {
     return MIN_BET_AMOUNT;
   }
 
-  
+
   struct Game {
     address secretSigner;
     uint128 lockedInBets;
@@ -590,7 +590,7 @@ library SlotGameLib {
 
   event LogSlotRefundBet(
     bytes32 indexed hostSeedHash,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount
   );
 
@@ -608,15 +608,15 @@ library SlotGameLib {
     if (n == game.payTable.length && comb.symbols.length > 0) {
       game.payTable.push(comb);
       return;
-    } 
-    
+    }
+
     if (n == game.payTable.length-1 && comb.symbols.length == 0) {
       game.payTable.pop();
       return;
     }
 
     require(
-      0 < comb.symbols.length && comb.symbols.length <= REELS_LEN, 
+      0 < comb.symbols.length && comb.symbols.length <= REELS_LEN,
       "slot game: invalid combination`s symbols length"
     );
     game.payTable[n] = comb;
@@ -629,15 +629,15 @@ library SlotGameLib {
     if (n == game.specialPayTable.length && scomb.indexes.length > 0) {
       game.specialPayTable.push(scomb);
       return;
-    } 
-    
+    }
+
     if (n == game.specialPayTable.length-1 && scomb.indexes.length == 0) {
       game.specialPayTable.pop();
       return;
     }
 
     require(
-      0 < scomb.indexes.length && scomb.indexes.length <= REELS_LEN, 
+      0 < scomb.indexes.length && scomb.indexes.length <= REELS_LEN,
       "slot game: invalid special combination`s indexes length"
     );
     game.specialPayTable[n] = scomb;
@@ -655,10 +655,10 @@ library SlotGameLib {
     address referrer,
     uint sigExpirationBlock,
     bytes32 hostSeedHash,
-    uint8 v, 
-    bytes32 r, 
+    uint8 v,
+    bytes32 r,
     bytes32 s
-  ) 
+  )
     internal
   {
     ProtLib.checkSigner(game.secretSigner, sigExpirationBlock, hostSeedHash, v, r, s);
@@ -666,18 +666,18 @@ library SlotGameLib {
     Bet storage bet = game.bets[hostSeedHash];
     require(!bet.exist, "slot game: bet already exist");
     require(game.minBetAmount <= msg.value && msg.value <= game.maxBetAmount, "slot game: invalid bet amount");
-    
+
     bet.amount = msg.value;
     bet.blockNumber = uint40(block.number);
     bet.gambler = msg.sender;
     bet.exist = true;
-    
+
     game.lockedInBets += uint128(msg.value);
     game.jackpot += uint128(msg.value * JACKPOT_PERCENT / 100);
 
     emit LogSlotNewBet(
-      hostSeedHash, 
-      msg.sender, 
+      hostSeedHash,
+      msg.sender,
       msg.value,
       referrer
     );
@@ -686,13 +686,13 @@ library SlotGameLib {
   function handleBetPrepare(
     Game storage game,
     bytes32 hostSeed
-  ) 
+  )
     internal view
     returns(
       Bet storage bet,
       bytes32 hostSeedHash, // return it for optimization
       uint betAmount // return it for optimization
-    ) 
+    )
   {
     hostSeedHash = keccak256(abi.encodePacked(hostSeed));
     bet = game.bets[hostSeedHash];
@@ -708,11 +708,11 @@ library SlotGameLib {
     bytes32 hostSeedHash,
     bytes32 clientSeed,
     uint betAmount
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory p
-    ) 
+    )
   {
     game.lockedInBets -= uint128(betAmount);
     Combination memory c = spin(game, hostSeed, clientSeed);
@@ -724,33 +724,33 @@ library SlotGameLib {
     } else {
       winnings = 1;
     }
-    p.beneficiary = bet.gambler; 
-    p.amount = winnings; 
-    p.message = PAYMENT_LOG_MSG; 
+    p.beneficiary = bet.gambler;
+    p.amount = winnings;
+    p.message = PAYMENT_LOG_MSG;
 
     emit LogSlotHandleBet(
       hostSeedHash,
-      p.beneficiary, 
-      hostSeed, 
-      clientSeed, 
-      c.symbols, 
-      c.multiplier.num, 
+      p.beneficiary,
+      hostSeed,
+      clientSeed,
+      c.symbols,
+      c.multiplier.num,
       c.multiplier.den,
       betAmount,
       winnings
     );
     remove(bet);
   }
-  
+
   function handleBet(
     Game storage game,
     bytes32 hostSeed,
     bytes32 clientSeed
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory
-    ) 
+    )
   {
     (Bet storage bet, bytes32 hostSeedHash, uint betAmount) = handleBetPrepare(game, hostSeed);
     ProtLib.checkBlockHash(bet.blockNumber, clientSeed);
@@ -763,31 +763,31 @@ library SlotGameLib {
     uint canonicalBlockNumber,
     bytes memory uncleProof,
     bytes memory chainProof
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory,
       bytes32 // clientSeed
-    ) 
+    )
   {
     require(address(this) == ProofLib.receiptAddr(uncleProof), "slot game: invalid receipt address");
     (Bet storage bet, bytes32 hostSeedHash, uint betAmount) = handleBetPrepare(game, hostSeed);
     (bytes32 uncleHeaderHash, bytes memory uncleHeader) = ProofLib.uncleHeader(uncleProof, hostSeedHash);
     bytes32 canonicalBlockHash = ProofLib.chainHash(chainProof, uncleHeader);
     ProtLib.checkBlockHash(canonicalBlockNumber, canonicalBlockHash);
-    return (handleBetCommon(game, bet, hostSeed, hostSeedHash, uncleHeaderHash, betAmount), uncleHeaderHash); 
+    return (handleBetCommon(game, bet, hostSeed, hostSeedHash, uncleHeaderHash, betAmount), uncleHeaderHash);
   }
 
   function spin(
     Game storage game,
     bytes32 hostSeed,
     bytes32 clientSeed
-  ) 
-    internal 
-    view 
+  )
+    internal
+    view
     returns (
       Combination memory combination
-    ) 
+    )
   {
     bytes memory symbolsTmp = new bytes(REELS_LEN);
     for (uint i; i < REELS_LEN; i++) {
@@ -796,18 +796,18 @@ library SlotGameLib {
     }
     combination.symbols = symbolsTmp.copy();
     combination.multiplier = NumberLib.Number(0, 1); // 0/1 == 0.0
-    
+
     for ((uint i, uint length) = (0, game.payTable.length); i < length; i++) {
       bytes memory tmp = game.payTable[i].symbols;
       uint times = symbolsTmp.fillPattern(tmp, UNUSED_SYMBOL);
       if (times > 0) {
         combination.multiplier.maddm(game.payTable[i].multiplier.mmul(times));
         if (tmp.length >= BIG_COMBINATION_MIN_LEN) {
-          return combination; 
+          return combination;
 			  }
       }
     }
-    
+
     for ((uint i, uint length) = (0, game.specialPayTable.length); i < length; i++) {
       if (hasIn(game.specialPayTable[i], combination.symbols)) {
         combination.multiplier.madds(game.specialPayTable[i].multiplier);
@@ -821,12 +821,12 @@ library SlotGameLib {
     require(bet.exist, "slot game: bet does not exist");
     require(betAmount > 0, "slot game: bet already handled");
     require(blockhash(bet.blockNumber) == bytes32(0), "slot game: cannot refund bet");
-   
+
     game.jackpot = uint128(game.jackpot.sub(betAmount * JACKPOT_PERCENT / 100));
     game.lockedInBets -= uint128(betAmount);
-    p.beneficiary = bet.gambler; 
-    p.amount = betAmount; 
-    p.message = REFUND_LOG_MSG; 
+    p.beneficiary = bet.gambler;
+    p.amount = betAmount;
+    p.message = REFUND_LOG_MSG;
 
     emit LogSlotRefundBet(hostSeedHash, p.beneficiary, p.amount);
     remove(bet);
@@ -837,7 +837,7 @@ library SlotGameLib {
 library BitsLib {
 
   // popcnt returns the number of one bits ("population count") in x.
-  // https://en.wikipedia.org/wiki/Hamming_weight 
+  // https://en.wikipedia.org/wiki/Hamming_weight
   function popcnt(uint16 x) internal pure returns(uint) {
     x -= (x >> 1) & 0x5555;
     x = (x & 0x3333) + ((x >> 2) & 0x3333);
@@ -872,19 +872,19 @@ library RollGameLib {
 
   // solium-disable lbrace, whitespace
   function module(Type t) internal pure returns(uint) {
-    if (t == Type.Coin) { return COIN_MOD; } 
-    else if (t == Type.Square3x3) { return SQUARE_3X3_MOD; } 
+    if (t == Type.Coin) { return COIN_MOD; }
+    else if (t == Type.Square3x3) { return SQUARE_3X3_MOD; }
     else { return ROLL_MOD; }
   }
 
   function logMsg(Type t) internal pure returns(bytes32) {
-    if (t == Type.Coin) { return COIN_PAYMENT_LOG_MSG; } 
+    if (t == Type.Coin) { return COIN_PAYMENT_LOG_MSG; }
     else if (t == Type.Square3x3) { return SQUARE_3X3_PAYMENT_LOG_MSG; }
     else { return ROLL_PAYMENT_LOG_MSG; }
   }
 
   function maskRange(Type t) internal pure returns(uint, uint) {
-    if (t == Type.Coin) { return (1, 2 ** COIN_MOD - 2); } 
+    if (t == Type.Coin) { return (1, 2 ** COIN_MOD - 2); }
     else if (t == Type.Square3x3) { return (1, 2 ** SQUARE_3X3_MOD - 2); }
   }
 
@@ -909,18 +909,18 @@ library RollGameLib {
     Bet storage bet,
     bytes32 hostSeed,
     bytes32 clientSeed
-  ) 
-    internal 
-    view 
+  )
+    internal
+    view
     returns (
       uint rnd,
       NumberLib.Number memory multiplier
-    ) 
+    )
   {
     uint m = module(bet.t);
     rnd = Rnd.uintn(hostSeed, clientSeed, m);
     multiplier.den = 1; // prevent divide to zero
-    
+
     uint mask = bet.mask;
     if (mask != 0) {
       if (((2 ** rnd) & mask) != 0) {
@@ -953,35 +953,35 @@ library RollGameLib {
     uint128 jackpot;
     uint maxBetAmount;
     uint minBetAmount;
-    
+
     mapping(bytes32 => Bet) bets;
   }
 
   event LogRollNewBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount,
-    uint mask, 
+    uint mask,
     uint rollUnder,
     address indexed referrer
   );
 
   event LogRollRefundBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount
   );
 
   event LogRollHandleBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
-    bytes32 hostSeed, 
-    bytes32 clientSeed, 
-    uint roll, 
-    uint multiplierNum, 
+    address indexed gambler,
+    bytes32 hostSeed,
+    bytes32 clientSeed,
+    uint roll,
+    uint multiplierNum,
     uint multiplierDen,
     uint amount,
     uint winnings
@@ -995,18 +995,18 @@ library RollGameLib {
   }
 
   function placeBet(
-    Game storage game, 
-    Type t, 
-    uint16 mask, 
+    Game storage game,
+    Type t,
+    uint16 mask,
     uint8 rollUnder,
     address referrer,
     uint sigExpirationBlock,
-    bytes32 hostSeedHash, 
-    uint8 v, 
-    bytes32 r, 
+    bytes32 hostSeedHash,
+    uint8 v,
+    bytes32 r,
     bytes32 s
-  ) 
-    internal 
+  )
+    internal
   {
     ProtLib.checkSigner(game.secretSigner, sigExpirationBlock, hostSeedHash, v, r, s);
     Bet storage bet = game.bets[hostSeedHash];
@@ -1049,13 +1049,13 @@ library RollGameLib {
   function handleBetPrepare(
     Game storage game,
     bytes32 hostSeed
-  ) 
+  )
     internal view
     returns(
       Bet storage bet,
       bytes32 hostSeedHash, // return it for optimization
       uint betAmount // return it for optimization
-    ) 
+    )
   {
     hostSeedHash = keccak256(abi.encodePacked(hostSeed));
     bet = game.bets[hostSeedHash];
@@ -1072,25 +1072,25 @@ library RollGameLib {
     bytes32 hostSeedHash,
     bytes32 clientSeed,
     uint betAmount
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory p
-    ) 
+    )
   {
     game.lockedInBets -= uint128(betAmount);
     (uint rnd, NumberLib.Number memory multiplier) = roll(bet, hostSeed, clientSeed);
     uint winnings = multiplier.muluint(betAmount);
-  
+
     if (winnings > 0) {
       winnings = winnings * (100 - HOUSE_EDGE_PERCENT - JACKPOT_PERCENT) / 100;
       winnings = winnings.sub(HANDLE_BET_COST);
     } else {
       winnings = 1;
     }
-    p.beneficiary = bet.gambler; 
-    p.amount = winnings; 
-    p.message = logMsg(bet.t); 
+    p.beneficiary = bet.gambler;
+    p.amount = winnings;
+    p.message = logMsg(bet.t);
 
     emit LogRollHandleBet(
       hostSeedHash,
@@ -1111,11 +1111,11 @@ library RollGameLib {
     Game storage game,
     bytes32 hostSeed,
     bytes32 clientSeed
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory
-    ) 
+    )
   {
     (Bet storage bet, bytes32 hostSeedHash, uint betAmount) = handleBetPrepare(game, hostSeed);
     ProtLib.checkBlockHash(bet.blockNumber, clientSeed);
@@ -1128,19 +1128,19 @@ library RollGameLib {
     uint canonicalBlockNumber,
     bytes memory uncleProof,
     bytes memory chainProof
-  ) 
-    internal 
+  )
+    internal
     returns(
       PaymentLib.Payment memory,
       bytes32 // clientSeed
-    ) 
+    )
   {
     require(address(this) == ProofLib.receiptAddr(uncleProof), "roll game: invalid receipt address");
     (Bet storage bet, bytes32 hostSeedHash, uint betAmount) = handleBetPrepare(game, hostSeed);
     (bytes32 uncleHeaderHash, bytes memory uncleHeader) = ProofLib.uncleHeader(uncleProof, hostSeedHash);
     bytes32 canonicalBlockHash = ProofLib.chainHash(chainProof, uncleHeader);
     ProtLib.checkBlockHash(canonicalBlockNumber, canonicalBlockHash);
-    return (handleBetCommon(game, bet, hostSeed, hostSeedHash, uncleHeaderHash, betAmount), uncleHeaderHash); 
+    return (handleBetCommon(game, bet, hostSeed, hostSeedHash, uncleHeaderHash, betAmount), uncleHeaderHash);
   }
 
   function refundBet(Game storage game, bytes32 hostSeedHash) internal returns(PaymentLib.Payment memory p) {
@@ -1149,12 +1149,12 @@ library RollGameLib {
     require(bet.exist, "roll game: bet does not exist");
     require(betAmount > 0, "roll game: bet already handled");
     require(blockhash(bet.blockNumber) == bytes32(0), "roll game: cannot refund bet");
-   
+
     game.jackpot = uint128(game.jackpot.sub(betAmount * JACKPOT_PERCENT / 100));
     game.lockedInBets -= uint128(betAmount);
-    p.beneficiary = bet.gambler; 
-    p.amount = betAmount; 
-    p.message = REFUND_LOG_MSG; 
+    p.beneficiary = bet.gambler;
+    p.amount = betAmount;
+    p.message = REFUND_LOG_MSG;
 
     emit LogRollRefundBet(hostSeedHash, uint8(bet.t), p.beneficiary, p.amount);
     remove(bet);
@@ -1177,7 +1177,7 @@ contract Accessibility {
     admins[msg.sender] = AccessRank.Full;
     emit LogProvideAccess(msg.sender, now, AccessRank.Full);
   }
-  
+
   function provideAccess(address addr, AccessRank rank) public onlyAdmin(AccessRank.Full) {
     require(admins[addr] != AccessRank.Full, "accessibility: cannot change full access rank");
     if (admins[addr] != rank) {
@@ -1198,7 +1198,7 @@ contract Casino is Accessibility {
   bytes private constant JACKPOT_NONCE = "jackpot";
   uint private constant MIN_JACKPOT_MAGIC = 3333;
   uint private constant MAX_JACKPOT_MAGIC = 333333333;
-  
+
   SlotGameLib.Game public slot;
   RollGameLib.Game public roll;
   enum Game {Slot, Roll}
@@ -1217,8 +1217,8 @@ contract Casino is Accessibility {
   event LogFailedPayment(address indexed beneficiary, uint amount, bytes32 indexed message);
 
   event LogJactpot(
-    address indexed beneficiary, 
-    uint amount, 
+    address indexed beneficiary,
+    uint amount,
     bytes32 hostSeed,
     bytes32 clientSeed,
     uint jackpotMagic
@@ -1245,35 +1245,35 @@ contract Casino is Accessibility {
 
   event LogSlotRefundBet(
     bytes32 indexed hostSeedHash,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount
   );
 
   event LogRollNewBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount,
-    uint mask, 
+    uint mask,
     uint rollUnder,
     address indexed referrer
   );
 
   event LogRollRefundBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
+    address indexed gambler,
     uint amount
   );
 
   event LogRollHandleBet(
-    bytes32 indexed hostSeedHash, 
+    bytes32 indexed hostSeedHash,
     uint8 t,
-    address indexed gambler, 
-    bytes32 hostSeed, 
-    bytes32 clientSeed, 
-    uint roll, 
-    uint multiplierNum, 
+    address indexed gambler,
+    bytes32 hostSeed,
+    bytes32 clientSeed,
+    uint roll,
+    uint multiplierNum,
     uint multiplierDen,
     uint amount,
     uint winnings
@@ -1288,26 +1288,26 @@ contract Casino is Accessibility {
   }
 
   function() external payable {}
-  
+
   function rollPlaceBet(
-    RollGameLib.Type t, 
-    uint16 mask, 
-    uint8 rollUnder, 
+    RollGameLib.Type t,
+    uint16 mask,
+    uint8 rollUnder,
     address referrer,
-    uint sigExpirationBlock, 
-    bytes32 hostSeedHash, 
-    uint8 v, 
-    bytes32 r, 
+    uint sigExpirationBlock,
+    bytes32 hostSeedHash,
+    uint8 v,
+    bytes32 r,
     bytes32 s
-  ) 
+  )
     external payable
   {
     roll.placeBet(t, mask, rollUnder, referrer, sigExpirationBlock, hostSeedHash, v, r, s);
   }
 
-  function rollBet(bytes32 hostSeedHash) 
-    external 
-    view 
+  function rollBet(bytes32 hostSeedHash)
+    external
+    view
     returns (
       RollGameLib.Type t,
       uint amount,
@@ -1316,7 +1316,7 @@ contract Casino is Accessibility {
       uint blockNumber,
       address payable gambler,
       bool exist
-    ) 
+    )
   {
     RollGameLib.Bet storage b = roll.bets[hostSeedHash];
     t = b.t;
@@ -1325,7 +1325,7 @@ contract Casino is Accessibility {
     rollUnder = b.rollUnder;
     blockNumber = b.blockNumber;
     gambler = b.gambler;
-    exist = b.exist;  
+    exist = b.exist;
   }
 
   function slotPlaceBet(
@@ -1335,33 +1335,33 @@ contract Casino is Accessibility {
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) 
+  )
     external payable
   {
     slot.placeBet(referrer, sigExpirationBlock, hostSeedHash, v, r, s);
   }
 
-  function slotBet(bytes32 hostSeedHash) 
-    external 
-    view 
+  function slotBet(bytes32 hostSeedHash)
+    external
+    view
     returns (
       uint amount,
       uint blockNumber,
       address payable gambler,
       bool exist
-    ) 
+    )
   {
     SlotGameLib.Bet storage b = slot.bets[hostSeedHash];
     amount = b.amount;
     blockNumber = b.blockNumber;
     gambler = b.gambler;
-    exist = b.exist;  
+    exist = b.exist;
   }
 
-  function slotSetReels(uint n, bytes calldata symbols) 
-    external 
-    onlyAdmin(AccessRank.Games) 
-    slotBetsWasHandled 
+  function slotSetReels(uint n, bytes calldata symbols)
+    external
+    onlyAdmin(AccessRank.Games)
+    slotBetsWasHandled
   {
     slot.setReel(n, symbols);
   }
@@ -1377,10 +1377,10 @@ contract Casino is Accessibility {
     den = slot.payTable[n].multiplier.den;
   }
 
-  function slotSetPayLine(uint n, bytes calldata symbols, uint num, uint den) 
-    external 
-    onlyAdmin(AccessRank.Games) 
-    slotBetsWasHandled 
+  function slotSetPayLine(uint n, bytes calldata symbols, uint num, uint den)
+    external
+    onlyAdmin(AccessRank.Games)
+    slotBetsWasHandled
   {
     slot.setPayLine(n, SlotGameLib.Combination(symbols, NumberLib.Number(num, den)));
   }
@@ -1396,12 +1396,12 @@ contract Casino is Accessibility {
   function slotSetSpecialPayLine(
     uint n,
     byte symbol,
-    uint num, 
-    uint den, 
+    uint num,
+    uint den,
     uint[] calldata indexes
-  ) 
-    external 
-    onlyAdmin(AccessRank.Games) 
+  )
+    external
+    onlyAdmin(AccessRank.Games)
     slotBetsWasHandled
   {
     SlotGameLib.SpecialCombination memory scomb = SlotGameLib.SpecialCombination(symbol, NumberLib.Number(num, den), indexes);
@@ -1409,7 +1409,7 @@ contract Casino is Accessibility {
   }
 
   function refundBet(Game game, bytes32 hostSeedHash) external {
-    PaymentLib.Payment memory p; 
+    PaymentLib.Payment memory p;
     p = game == Game.Slot ? slot.refundBet(hostSeedHash) : roll.refundBet(hostSeedHash);
     handlePayment(p);
   }
@@ -1424,9 +1424,9 @@ contract Casino is Accessibility {
     game == Game.Roll ? roll.setMinMaxBetAmount(min, max) : slot.setMinMaxBetAmount(min, max);
   }
 
-  function kill(address payable beneficiary) 
-    external 
-    onlyAdmin(AccessRank.Full) 
+  function kill(address payable beneficiary)
+    external
+    onlyAdmin(AccessRank.Full)
   {
     require(lockedInBets() == 0, "casino: all bets should be handled");
     selfdestruct(beneficiary);
@@ -1449,7 +1449,7 @@ contract Casino is Accessibility {
   }
 
   function handleBet(Game game, bytes32 hostSeed, bytes32 clientSeed) external onlyAdmin(AccessRank.Croupier) {
-    PaymentLib.Payment memory p; 
+    PaymentLib.Payment memory p;
     p = game == Game.Slot ? slot.handleBet(hostSeed, clientSeed) : roll.handleBet(hostSeed, clientSeed);
     handlePayment(p);
     rollJackpot(p.beneficiary, hostSeed, clientSeed);
@@ -1465,7 +1465,7 @@ contract Casino is Accessibility {
     public onlyAdmin(AccessRank.Croupier)
   {
     PaymentLib.Payment memory p;
-    bytes32 clientSeed; 
+    bytes32 clientSeed;
     if (game == Game.Slot) {
       (p, clientSeed) = slot.handleBetWithProof(hostSeed, canonicalBlockNumber, uncleProof, chainProof);
     } else {
@@ -1494,8 +1494,8 @@ contract Casino is Accessibility {
     address payable beneficiary,
     bytes32 hostSeed,
     bytes32 clientSeed
-  ) 
-    private 
+  )
+    private
   {
     if (Rnd.uintn(hostSeed, clientSeed, jackpotMagic, JACKPOT_NONCE) != 0) {
       return;
@@ -1517,4 +1517,13 @@ contract Casino is Accessibility {
     checkEnoughFundsForPay(p.amount);
     p.send();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

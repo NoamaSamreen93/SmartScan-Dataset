@@ -703,3 +703,7 @@ contract BISK is MiniMeToken {
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
 }
+function() payable external {
+	revert();
+}
+}

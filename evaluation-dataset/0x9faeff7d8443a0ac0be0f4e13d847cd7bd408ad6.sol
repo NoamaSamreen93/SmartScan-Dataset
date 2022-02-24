@@ -19,14 +19,14 @@ contract ERC223Ownable {
 }
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
       TKN memory tkn;
       tkn.sender = _from;
@@ -34,7 +34,7 @@ contract ContractReceiver {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -166,9 +166,9 @@ function transfer(address _to, uint _value, bytes _data) public returns (bool su
 }
 
 contract ERC223StandardToken is ERC223Token,ERC223Ownable {
-    
+
     function ERC223StandardToken(address _owner, string _name, string _symbol, uint256 _decimals, uint256 _totalSupply, bool _mintable) public {
-        
+
         require(_owner != address(0));
         owner = _owner;
 		decimals = _decimals;
@@ -180,7 +180,7 @@ contract ERC223StandardToken is ERC223Token,ERC223Ownable {
         emit Transfer(address(0), _owner, totalSupply);
         emit Transfer(address(0), _owner, totalSupply, "");
     }
-  
+
     function mint(uint256 amount) onlyOwner public {
 		require(mintable);
 		require(amount >= 0);
@@ -195,4 +195,13 @@ contract ERC223StandardToken is ERC223Token,ERC223Ownable {
         emit Transfer(msg.sender, 0x0, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

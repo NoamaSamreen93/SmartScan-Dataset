@@ -40,7 +40,7 @@ contract CharToken is ERC721 {
   /// @dev Emitted when a bug is found int the contract and the contract is upgraded at a new address.
   /// In the event this happens, the current contract is paused indefinitely
   event ContractUpgrade(address newContract);
-  ///bonus issuance    
+  ///bonus issuance
   event Bonus(address to, uint256 bonus);
 
   /*** CONSTANTS ***/
@@ -74,9 +74,9 @@ contract CharToken is ERC721 {
   address public cooAddress;
   address public cfoAddress;
   uint256 public promoCreatedCount;
-  //***pack below into a struct for gas optimization    
+  //***pack below into a struct for gas optimization
   //promo per each N trx is effective until date, and its frequency (every nth buy)
-  uint256 public bonusUntilDate;   
+  uint256 public bonusUntilDate;
   uint256 bonusFrequency;
   /*** DATATYPES ***/
   struct Char {
@@ -85,7 +85,7 @@ contract CharToken is ERC721 {
     //wiki pageid of char
     string wikiID_Name; //save gas
   }
-  Char[] private chars; 
+  Char[] private chars;
 
   /*** ACCESS MODIFIERS ***/
   /// @dev Access modifier for CEO-only functionality
@@ -112,7 +112,7 @@ contract CharToken is ERC721 {
     require(
       msg.sender == ceoAddress ||
       msg.sender == cooAddress ||
-      msg.sender == cfoAddress 
+      msg.sender == cfoAddress
     );
     _;
   }
@@ -123,7 +123,7 @@ contract CharToken is ERC721 {
     cfoAddress = msg.sender;
     bonusUntilDate = now; //Bonus after Nth buy is valid until this date
     bonusFrequency = 3; //Bonus distributed after every Nth buy
-    
+
     //create genesis chars
     createContractChar("42268616_Captain Ahab",0);
     createContractChar("455401_Frankenstein",0);
@@ -151,10 +151,10 @@ contract CharToken is ERC721 {
     createContractChar("54246379_Dorian_Gray",0);
     createContractChar("55483_Robinson_Crusoe",0);
     createContractChar("380143_Black_Beauty",0);
-    createContractChar("6364074_Phantom_of_the_Opera",0); 
+    createContractChar("6364074_Phantom_of_the_Opera",0);
     createContractChar("15055_Ivanhoe",0);
     createContractChar("21491685_Tarzan",0);
-    /* */    
+    /* */
   }
 
   /*** PUBLIC FUNCTIONS ***/
@@ -218,7 +218,7 @@ contract CharToken is ERC721 {
     require(_price != charIndexToPrice[_tokenId]);
     require(_tokenId < chars.length);
     //C level can override price for only own and contract tokens
-    require((_owns(address(this), _tokenId)) || (  _owns(msg.sender, _tokenId)) ); 
+    require((_owns(address(this), _tokenId)) || (  _owns(msg.sender, _tokenId)) );
     charIndexToPrice[_tokenId] = _price;
   }
   function changeCharPrice(uint256 _tokenId, uint256 _price) public {
@@ -226,11 +226,11 @@ contract CharToken is ERC721 {
     require(_tokenId < chars.length);
     require(_price != charIndexToPrice[_tokenId]);
     //require(_price > charIndexToPrice[_tokenId]);  //EA>should we enforce this?
-    uint256 maxPrice = SafeMath.div(SafeMath.mul(charIndexToPrice[_tokenId], 1000),100); //10x 
+    uint256 maxPrice = SafeMath.div(SafeMath.mul(charIndexToPrice[_tokenId], 1000),100); //10x
     uint256 minPrice = SafeMath.div(SafeMath.mul(charIndexToPrice[_tokenId], 50),100); //half price
-    require(_price >= minPrice); 
-    require(_price <= maxPrice); 
-    charIndexToPrice[_tokenId] = _price; 
+    require(_price >= minPrice);
+    require(_price <= maxPrice);
+    charIndexToPrice[_tokenId] = _price;
   }
   /* ERC721 */
   function implementsERC721() public view returns (bool _implements) {
@@ -300,7 +300,7 @@ contract CharToken is ERC721 {
       chars[_tokenId].wikiID_Name);
     msg.sender.transfer(purchaseExcess);
     //distribute bonus if earned and promo is ongoing and every nth buy trx
-      if( (now < bonusUntilDate && (addressToTrxCount[newOwner] % bonusFrequency) == 0) ) 
+      if( (now < bonusUntilDate && (addressToTrxCount[newOwner] % bonusFrequency) == 0) )
       {
           //bonus operation here
           uint rand = uint (keccak256(now)) % 50 ; //***earn up to 50% of 6% commissions
@@ -334,8 +334,8 @@ contract CharToken is ERC721 {
     require(_newCFO != address(0));
     cfoAddress = _newCFO;
   }
-  
-  
+
+
   /// @notice Allow pre-approved user to take ownership of a token
   /// @param _tokenId The ID of the Token that can be transferred if this call succeeds.
   /// @dev Required for ERC-721 compliance.
@@ -462,7 +462,7 @@ contract CharToken is ERC721 {
     }
     // Emit the transfer event.
     emit Transfer(_from, _to, _tokenId);
-  //update trx count  
+  //update trx count
   addressToTrxCount[_to]++;
   }
 }
@@ -503,4 +503,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

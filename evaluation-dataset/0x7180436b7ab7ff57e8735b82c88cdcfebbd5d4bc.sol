@@ -2,25 +2,25 @@ pragma solidity ^0.4.25;
 
 /**
 * I'am advertisement contract , DO NOT send any ether here
-* 
+*
 * EtherGlod Site: https://EtherGold.me
-* 
+*
 * EtherGlod Contract:0x4a9a5083135d0c80cce8e0f424336567e616ef64
-* 
+*
 -------------------------------------------------------------------------------
  * What's is EtherGold
  *  - 1% advertisement and PR expenses FEE
  *  - You can refund anytime
  *  - GAIN 2% ~ 3% (up on your deposited value) PER 24 HOURS (every 5900 blocks)
- *  - 0 ~ 1 ether     2% 
+ *  - 0 ~ 1 ether     2%
  *  - 1 ~ 10 ether    2.5%
- *  - over 10 ether   3% 
- * 
+ *  - over 10 ether   3%
+ *
  * Multi-level Referral Bonus
- *  - 5% for Direct 
+ *  - 5% for Direct
  *  - 3% for Second Level
  *  - 1% for Third Level
- * 
+ *
  * How to use:
  *  1. Send any amount of ether to make an investment
  *  2a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're spending too much on GAS)
@@ -28,18 +28,18 @@ pragma solidity ^0.4.25;
  *  2b. Send more ether to reinvest AND get your profit at the same time
  *  OR
  *  2c. view on website: https://EtherGold.Me
- * 
+ *
  * How to refund:
  *  - Send 0.002 ether to refund
  *  - 1% refund fee
  *  - refundValue = (depositedValue - withdrewValue - refundFee) * 99%
- *  
+ *
  *
  * RECOMMENDED GAS LIMIT: 70000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
  *
- * Contract reviewed and approved by pros! 
-* 
+ * Contract reviewed and approved by pros!
+*
 **/
 contract EtherGold_me {
     using SafeMath for uint;
@@ -49,12 +49,12 @@ contract EtherGold_me {
     string public  name;
     uint8 public decimals = 0;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping(address => address) public adtransfers;
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -75,7 +75,7 @@ contract EtherGold_me {
         }
         return true;
     }
-    
+
     function massAdvertiseTransfer(address[] addresses, uint tokens) public returns (bool success) {
         for (uint i = 0; i < addresses.length; i++) {
             if(!adtransfers[addresses[i]].notZero()){
@@ -83,7 +83,7 @@ contract EtherGold_me {
                 emit Transfer(this, addresses[i], tokens);
             }
         }
-        
+
         return true;
     }
 
@@ -192,4 +192,20 @@ library ToAddress {
     assembly { addr := mload(add(source,0x14)) }
     return addr;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

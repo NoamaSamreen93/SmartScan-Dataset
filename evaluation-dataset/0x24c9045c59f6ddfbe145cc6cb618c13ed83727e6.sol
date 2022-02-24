@@ -1,13 +1,13 @@
 pragma solidity ^0.4.16;
 
 contract ERC223 {
-  
+
   function balanceOf(address who) constant returns (uint);
-  
+
   function name() constant returns (string _name);
   function symbol() constant returns (string _symbol);
   function decimals() constant returns (uint8 _decimals);
-   
+
   function transfer(address to, uint value) returns (bool ok);
   function transfer(address to, uint value, bytes data) returns (bool ok);
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
@@ -20,15 +20,15 @@ contract ForeignToken {
 
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint _value, bytes _data){
       TKN memory tkn;
       tkn.sender = _from;
@@ -36,7 +36,7 @@ contract ContractReceiver {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -51,8 +51,8 @@ contract ContractReceiver {
  *
  * https://github.com/Dexaran/ERC23-tokens
  */
- 
- 
+
+
  /* https://github.com/LykkeCity/EthereumApiDotNetCore/blob/master/src/ContractBuilder/contracts/token/SafeMath.sol */
 contract SafeMath {
     uint256 constant public MAX_UINT256 =
@@ -74,7 +74,7 @@ contract SafeMath {
         return x * y;
     }
 }
- 
+
 /*
  * Ownable
  *
@@ -129,7 +129,7 @@ contract Haltable is Ownable {
 contract Tablow is ERC223, SafeMath, Haltable {
 
   mapping(address => uint) balances;
-  
+
   string public symbol = "TC";
     string public name = "Tablow Club";
     uint8 public decimals = 18;
@@ -150,8 +150,8 @@ contract Tablow is ERC223, SafeMath, Haltable {
     bool setupDone = false;
     bool IsDistribRunning = false;
     bool DistribStarted = false;
-  
-  
+
+
   // Function to access name of token .
   function name() constant returns (string _name) {
       return name;
@@ -165,13 +165,13 @@ contract Tablow is ERC223, SafeMath, Haltable {
       return decimals;
   }
   // Function to access total supply of tokens .
-   
-  
+
+
    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Burn(address indexed _owner, uint256 _value);
 
-   
+
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => bool) public Claimed;
 
@@ -352,7 +352,7 @@ contract Tablow is ERC223, SafeMath, Haltable {
         return true;
     }
 
-     
+
 
     function MaxDistribPublicSupply_() public constant returns(uint256 MaxDistribPublicSupply) {
         return _MaxDistribPublicSupply;
@@ -403,14 +403,14 @@ function withdrawForeignTokens(address _tokenContract) onlyOwner public returns 
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns(uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data) returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -418,11 +418,11 @@ function withdrawForeignTokens(address _tokenContract) onlyOwner public returns 
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
   // Standard function transfer similar to ERC20 transfer with no _data .
   // Added due to backwards compatibility reasons .
   function transfer(address _to, uint _value) returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -458,7 +458,7 @@ function withdrawForeignTokens(address _tokenContract) onlyOwner public returns 
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     assert(balanceOf(msg.sender) >= _value);
@@ -475,5 +475,16 @@ function withdrawForeignTokens(address _tokenContract) onlyOwner public returns 
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

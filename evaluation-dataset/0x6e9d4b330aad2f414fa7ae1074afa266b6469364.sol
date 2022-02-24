@@ -371,7 +371,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
     function ClockAuction(address _nftAddress, uint256 _cut) public {
         require(_cut <= 10000);
         ownerCut = _cut;
-        
+
         ERC721 candidateContract = ERC721(_nftAddress);
         require(candidateContract.implementsERC721());
         nonFungibleContract = candidateContract;
@@ -577,4 +577,10 @@ contract AetherClockAuction is ClockAuction {
         }
         return sum / 5;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

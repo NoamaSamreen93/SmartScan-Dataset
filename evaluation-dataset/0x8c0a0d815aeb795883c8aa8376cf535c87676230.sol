@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
         public returns (bool);
 
     function approve(address spender, uint256 value) public returns (bool);
-    
+
     event Approval(
         address indexed owner,
         address indexed spender,
@@ -241,7 +241,7 @@ contract StandardToken is ERC20, BasicToken {
 contract MultiOwnable {
     address public superOwner;
     mapping (address => bool) owners;
-    
+
     event ChangeSuperOwner(address indexed newSuperOwner);
     event AddOwner(address indexed newOwner);
     event DeleteOwner(address indexed toDeleteOwner);
@@ -269,20 +269,20 @@ contract MultiOwnable {
     }
 
     function deleteOwner(address owner) public onlySuperOwner returns (bool) {
-        
+
         require(owner != address(0));
         owners[owner] = false;
-        
+
         emit DeleteOwner(owner);
-        
+
         return true;
     }
     function changeSuperOwner(address _superOwner) public onlySuperOwner returns(bool) {
-        
+
         superOwner = _superOwner;
-        
+
         emit ChangeSuperOwner(_superOwner);
-        
+
         return true;
     }
 
@@ -292,7 +292,7 @@ contract MultiOwnable {
 }
 
 contract HasNoEther is MultiOwnable {
-    
+
     /**
   * @dev Constructor that rejects incoming Ether
   * The `payable` flag is added so we can access `msg.value` without compiler warning. If we
@@ -303,13 +303,13 @@ contract HasNoEther is MultiOwnable {
     constructor() public payable {
         require(msg.value == 0);
     }
-    
+
     /**
    * @dev Disallows direct send by settings a default function without the `payable` flag.
    */
     function() external {
     }
-    
+
     /**
    * @dev Transfer all Ether held by the contract to the owner.
    */
@@ -321,9 +321,9 @@ contract HasNoEther is MultiOwnable {
 }
 
 contract Blacklist is MultiOwnable {
-   
+
     mapping(address => bool) blacklisted;
-    
+
     event TMTG_Blacklisted(address indexed blacklist);
     event TMTG_Whitelisted(address indexed whitelist);
 
@@ -331,7 +331,7 @@ contract Blacklist is MultiOwnable {
         require(!blacklisted[node]);
         _;
     }
-    
+
     /**
     * @dev Check a certain node is in a blacklist
     * @param node  Check whether the user at a certain node is in a blacklist
@@ -342,7 +342,7 @@ contract Blacklist is MultiOwnable {
 
     /**
     * @dev Process blacklisting
-    * @param node Process blacklisting. Put the user in the blacklist.   
+    * @param node Process blacklisting. Put the user in the blacklist.
     */
     function blacklist(address node) public onlyOwner returns (bool) {
         blacklisted[node] = true;
@@ -352,8 +352,8 @@ contract Blacklist is MultiOwnable {
     }
 
     /**
-    * @dev Process unBlacklisting. 
-    * @param node Remove the user from the blacklist.   
+    * @dev Process unBlacklisting.
+    * @param node Remove the user from the blacklist.
     */
     function unblacklist(address node) public onlyOwner returns (bool) {
         blacklisted[node] = false;
@@ -375,7 +375,7 @@ contract PausableToken is StandardToken, HasNoEther, Blacklist {
     event Unpause(address addr);
     event UnlockAddress(address addr);
     event LockAddress(address addr);
-    
+
     /**
      * @dev 서킷브레이커가 작동하거나 해당 계정이 언락인 경우
      */
@@ -426,20 +426,31 @@ contract lbcCoin is PausableToken {
     string public constant name = "BIO";
     uint8 public constant decimals = 0;
     string public constant symbol = "BIO";
-    uint256 public constant INITIAL_SUPPLY = 1e10 * (10 ** uint256(decimals)); 
+    uint256 public constant INITIAL_SUPPLY = 1e10 * (10 ** uint256(decimals));
 
     constructor() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
-        
+
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
     function destory() onlySuperOwner public returns (bool) {
-        
+
         selfdestruct(superOwner);
 
         return true;
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

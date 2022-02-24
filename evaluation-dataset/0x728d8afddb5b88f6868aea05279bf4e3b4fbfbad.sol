@@ -17,7 +17,7 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -259,7 +259,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         AddedBlackList(_evilUser);
@@ -310,7 +310,7 @@ contract WenboToken is Pausable, StandardToken, BlackList {
     // @param _symbol Token symbol
     // @param _decimals Token decimals
     function WenboToken() public {
-        uint _initialSupply = 10000 * (10 ** 18); 
+        uint _initialSupply = 10000 * (10 ** 18);
         _totalSupply = _initialSupply;
         balances[owner] = _initialSupply;
         deprecated = false;
@@ -415,4 +415,20 @@ contract WenboToken is Pausable, StandardToken, BlackList {
     // Called when contract is deprecated
     event Deprecate(address newAddress);
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

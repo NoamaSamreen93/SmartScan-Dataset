@@ -343,3 +343,12 @@ contract TimeLockedStaking is ERC165, ISimpleStaking {
     emit Staked(user, amount, stakers[user].totalAmount, data);
   }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

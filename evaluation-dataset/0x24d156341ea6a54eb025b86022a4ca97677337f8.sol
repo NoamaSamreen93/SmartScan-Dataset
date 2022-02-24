@@ -920,7 +920,7 @@ contract GirlOps is GirlBasicToken, TrustedContractControl {
 
   string public name = "Cryptogirl";
   string public symbol = "CG";
-  
+
   function createGirl(uint _genes, address _owner, uint16 _starLevel)
       onlyTrustedContract(msg.sender) public returns (uint) {
       require (_starLevel > 0);
@@ -1456,4 +1456,15 @@ contract PrizePool is Ownable {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

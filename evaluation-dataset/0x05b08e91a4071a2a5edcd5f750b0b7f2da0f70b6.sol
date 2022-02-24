@@ -537,7 +537,7 @@ contract RefundableCrowdsale is Crowdsale {
   function finalizeCrowdsale() onlyOwner external {
     require(!isFinalized);
 
-    if (goalReached()) {  
+    if (goalReached()) {
       vault.close();
     } else {
       vault.enableRefunds();
@@ -594,4 +594,15 @@ contract DaytaCrowdsale is Crowdsale, RefundableCrowdsale {
     function createTokenContract() internal returns (MintableToken) {
         return new Dayta();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

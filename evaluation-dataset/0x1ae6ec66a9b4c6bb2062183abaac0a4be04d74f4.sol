@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 //standard library for uint
-library SafeMath { 
+library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0 || b == 0){
         return 0;
@@ -81,12 +81,12 @@ contract SHAREToken is Ownable { //ERC - 20 token contract
   function balanceOf(address _address) public view returns (uint256 balance) {//standard ERC-20 function
     return balances[_address];
   }
-  
+
   bool public locked = true;
   function changeLockTransfer (bool _request) public onlyOwner {
     locked = _request;
   }
-  
+
   //standard ERC-20 function
   function transfer(address _to, uint256 _amount) public returns (bool success) {
     require(this != _to && _to != address(0));
@@ -109,7 +109,7 @@ contract SHAREToken is Ownable { //ERC - 20 token contract
   }
 
   //standard ERC-20 function
-  function approve(address _spender, uint256 _amount)public returns (bool success) { 
+  function approve(address _spender, uint256 _amount)public returns (bool success) {
     allowed[msg.sender][_spender] = _amount;
     emit Approval(msg.sender, _spender, _amount);
     return true;
@@ -121,7 +121,7 @@ contract SHAREToken is Ownable { //ERC - 20 token contract
   }
 
   address public tokenHolder;
-  
+
   constructor() public {
     owner = 0x4fD26ff0Af100C017BEA88Bd6007FcB68C237960;
     tokenHolder = 0x4fD26ff0Af100C017BEA88Bd6007FcB68C237960;
@@ -138,19 +138,19 @@ contract SHAREToken is Ownable { //ERC - 20 token contract
   }
 
   uint public crowdsaleBalance = 120000000 * ((uint)(10) ** (uint)(decimals)); //include decimals;
-  
+
   function sendCrowdsaleTokens (address _address, uint _value) public {
     require(msg.sender == crowdsaleContract);
 
     balances[tokenHolder] = balances[tokenHolder].sub(_value);
     balances[_address] = balances[_address].add(_value);
-    
+
     crowdsaleBalance = crowdsaleBalance.sub(_value);
-    
-    emit Transfer(tokenHolder,_address,_value);    
+
+    emit Transfer(tokenHolder,_address,_value);
   }
 
-  uint public teamBalance = 20000000 * ((uint)(10) ** (uint)(decimals)); 
+  uint public teamBalance = 20000000 * ((uint)(10) ** (uint)(decimals));
   uint public foundersBalance = 40000000 * ((uint)(10) ** (uint)(decimals));
   uint public platformReferral = 10000000 * ((uint)(10) ** (uint)(decimals));
   uint public bountyBalance = 6000000 * ((uint)(10) ** (uint)(decimals));
@@ -224,4 +224,15 @@ contract SHAREToken is Ownable { //ERC - 20 token contract
     crowdsaleBalance = 0;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

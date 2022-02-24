@@ -75,7 +75,7 @@ contract LockToken is BaseToken {
         uint256 amount;
         uint256 endtime;
     }
-    
+
     mapping (address => LockMeta) public lockedAddresses;
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -107,4 +107,15 @@ contract CustomToken is BaseToken, ICOToken, LockToken {
     function() public payable {
         ico();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

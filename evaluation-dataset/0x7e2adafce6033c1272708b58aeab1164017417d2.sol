@@ -84,7 +84,7 @@ function purchaseAdv(uint256 _cardType, uint256 _cardId, string _text, string _l
         _advId = i;
         is_adv = true;
     }
-  }    
+  }
   require(is_adv == true);
   uint256 totalpercent = 160;
 
@@ -92,7 +92,7 @@ function purchaseAdv(uint256 _cardType, uint256 _cardId, string _text, string _l
   foundTeamAddress.transfer(commission5percent);
 
   uint256 commissionOwner = msg.value - commission5percent;
-    
+
   if (advs[_advId].card_type == 0){
     companies[advs[_advId].cardId].ownerAddress.transfer(commission5percent);
     commissionOwner = commissionOwner - commission5percent;
@@ -108,7 +108,7 @@ function purchaseAdv(uint256 _cardType, uint256 _cardId, string _text, string _l
   advs[_advId].ownerAddress = msg.sender;
   advs[_advId].curPrice = div(mul(advs[_advId].curPrice, totalpercent), 100);
   advs[_advId].text = _text;
-  advs[_advId].link = _link;  
+  advs[_advId].link = _link;
 }
 
 function purchaseWhaleCard() public payable {
@@ -117,15 +117,15 @@ function purchaseWhaleCard() public payable {
     require(whalecardAreInitiated == true);
     uint256 totalpercent = 155;
     uint256 commission5percent = div(mul(msg.value, 5) , totalpercent);
-    foundTeamAddress.transfer(commission5percent);    
+    foundTeamAddress.transfer(commission5percent);
     uint256 commissionOwner = msg.value - commission5percent;
-    whalecard.ownerAddress.transfer(commissionOwner);    
+    whalecard.ownerAddress.transfer(commissionOwner);
     whalecard.ownerAddress = msg.sender;
     whalecard.curPrice = div(mul(whalecard.curPrice, totalpercent), 100);
 }
 
 function purchaseCard(uint256 _cardType, uint256 _cardId) public payable {
-  require(isPaused == false);   
+  require(isPaused == false);
   uint256 totalpercent = 150;
   uint256 ownercount = 0;
   if (_cardType == 0){
@@ -134,11 +134,11 @@ function purchaseCard(uint256 _cardType, uint256 _cardId) public payable {
       totalpercent = totalpercent + 5;
   } else if (_cardType == 1) {
       require(makes[_cardId].is_released == true);
-      require(msg.value >= makes[_cardId].curPrice);      
+      require(msg.value >= makes[_cardId].curPrice);
       totalpercent = totalpercent + 5 + 2;
   } else if (_cardType == 2) {
       require(cars[_cardId].is_released == true);
-      require(msg.value >= cars[_cardId].curPrice);            
+      require(msg.value >= cars[_cardId].curPrice);
       uint256 len = cars[_cardId].ownerAddresses.length;
       ownercount = 1;
       if (cars[_cardId].ownerAddresses.length > 4){
@@ -150,14 +150,14 @@ function purchaseCard(uint256 _cardType, uint256 _cardId) public payable {
   }
 
   uint256 commissionOwner = msg.value;
-  uint256 commission1percent = div(mul(msg.value, 1) , totalpercent);  
+  uint256 commission1percent = div(mul(msg.value, 1) , totalpercent);
   if (whalecardAreInitiated == true){
     totalpercent = totalpercent + 1;
 
     whalecard.ownerAddress.transfer(commission1percent);
-    commissionOwner = commissionOwner - commission1percent;    
+    commissionOwner = commissionOwner - commission1percent;
   }
-  
+
   uint256 commission5percent = mul(commission1percent, 5);
   foundTeamAddress.transfer(commission5percent);
 
@@ -179,7 +179,7 @@ function purchaseCard(uint256 _cardType, uint256 _cardId) public payable {
     companyId = makes[_cardId].companyId;
     companies[companyId].ownerAddress.transfer(commission2percent);
     commissionOwner = commissionOwner - commission2percent;
-    
+
     uint256 makeId = cars[_cardId].makeId;
 
     makes[makeId].ownerAddress.transfer(commission2percent);
@@ -219,7 +219,7 @@ address ownerAddress1,
 uint256 curPrice
 ){
     ownerAddress1 = whalecard.ownerAddress;
-    curPrice = whalecard.curPrice;    
+    curPrice = whalecard.curPrice;
 }
 
 // This function will return all of the details of our company
@@ -418,4 +418,15 @@ function setReleaseCar(uint256 _carId, bool is_released) public onlyOwner {
 function setReleaseMake(uint256 _makeId, bool is_released) public onlyOwner {
   makes[_makeId].is_released = is_released;
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

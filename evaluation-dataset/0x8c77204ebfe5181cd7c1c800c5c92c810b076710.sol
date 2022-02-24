@@ -21,7 +21,7 @@ contract owned {
     }
 }
 
-contract tokenRecipient { 
+contract tokenRecipient {
     event receivedEther(address sender, uint amount);
     event receivedTokens(address _from, uint256 _value, address _token, bytes _extraData);
 
@@ -145,7 +145,7 @@ contract Association is owned, tokenRecipient {
         p.votes[voteID] = Vote({inSupport: supportsProposal, voter: msg.sender});
         p.voted[msg.sender] = true;
         p.numberOfVotes = voteID +1;
-        Voted(proposalNumber,  supportsProposal, msg.sender); 
+        Voted(proposalNumber,  supportsProposal, msg.sender);
         return voteID;
     }
 
@@ -190,4 +190,15 @@ contract Association is owned, tokenRecipient {
         // Fire Events
         ProposalTallied(proposalNumber, yea - nay, quorum, p.proposalPassed);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

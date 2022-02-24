@@ -16,7 +16,7 @@ pragma solidity ^0.4.24;
 // Safe maths
 // ----------------------------------------------------------------------------
 library SafeMath {
-    
+
     /**
     * @dev Adds two numbers, reverts on overflow.
     */
@@ -149,7 +149,7 @@ contract IMCToken is ERC20Interface, Owned {
         decimals = 8;
         _totalSupply = 1000000000 * (10 ** uint(decimals));
         balances[owner] = _totalSupply;
-        
+
         emit Transfer(address(0), owner, _totalSupply);
     }
 
@@ -231,7 +231,7 @@ contract IMCToken is ERC20Interface, Owned {
      * @return success 交易成功
      */
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        
+
         if (_from == msg.sender) {
             // 自己转账时不需要approve，可以直接进行转账
             _transfer(_from, _to, _value);
@@ -295,7 +295,7 @@ contract IMCToken is ERC20Interface, Owned {
      */
     function approveContractCall(address _contractAddress) public onlyOwner returns (bool){
         externalContractAddress = _contractAddress;
-        
+
         return true;
     }
 
@@ -305,4 +305,20 @@ contract IMCToken is ERC20Interface, Owned {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

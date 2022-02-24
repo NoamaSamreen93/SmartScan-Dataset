@@ -330,7 +330,7 @@ contract LockableToken is PausableToken {
 
 	event LockToken(address indexed benefit, uint256 amount, uint256 releasetime);
 	event ReleaseToken(address indexed benefit, uint256 amount);
-	
+
 	/**
      * @dev Transfers and locks tokens.
      * @param to The address to transfer to.
@@ -400,8 +400,8 @@ contract LockableToken is PausableToken {
 			if(tmp.releaseTime != 0 && now >= tmp.releaseTime){
 				releasable = releasable.add(tmp.amount);
 			}
-		}	
-		return releasable;	
+		}
+		return releasable;
 	}
 }
 
@@ -475,7 +475,7 @@ contract IOAEXBDR is Token {
     function transferAndLock(address _to, uint256 _value, uint256 _lockdays) public returns (bool success) {
         require(_to != AbcInstance,"can't transfer to AbcToken address directly");
         return super.transferAndLock(_to,_value,_lockdays);
-    }   
+    }
 
     /**
      * @dev set AbcToken's address
@@ -646,4 +646,15 @@ contract IOAEXBDR is Token {
         totalSupply = totalSupply.add(value);
         emit Mint(target,value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

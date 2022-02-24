@@ -792,7 +792,7 @@ contract DSChiefFab {
 }
 
 ////// src/VoteProxy.sol
-// VoteProxy - vote w/ a hot or cold wallet using a proxy identity 
+// VoteProxy - vote w/ a hot or cold wallet using a proxy identity
 
 /* pragma solidity ^0.4.24; */
 
@@ -810,7 +810,7 @@ contract VoteProxy {
         chief = _chief;
         cold = _cold;
         hot = _hot;
-        
+
         gov = chief.GOV();
         iou = chief.IOU();
         gov.approve(chief, uint256(-1));
@@ -821,9 +821,9 @@ contract VoteProxy {
         require(msg.sender == hot || msg.sender == cold, "Sender must be a Cold or Hot Wallet");
         _;
     }
-    
+
     function lock(uint256 wad) public auth {
-        gov.pull(cold, wad);   // mkr from cold 
+        gov.pull(cold, wad);   // mkr from cold
         chief.lock(wad);       // mkr out, ious in
     }
 
@@ -857,7 +857,7 @@ contract VoteProxyFactory {
 
     event LinkRequested(address indexed cold, address indexed hot);
     event LinkConfirmed(address indexed cold, address indexed hot, address indexed voteProxy);
-    
+
     constructor(DSChief chief_) public { chief = chief_; }
 
     function hasProxy(address guy) public view returns (bool) {
@@ -886,7 +886,7 @@ contract VoteProxyFactory {
     function breakLink() public {
         require(hasProxy(msg.sender), "No VoteProxy found for this sender");
 
-        VoteProxy voteProxy = coldMap[msg.sender] != address(0) 
+        VoteProxy voteProxy = coldMap[msg.sender] != address(0)
             ? coldMap[msg.sender] : hotMap[msg.sender];
         address cold = voteProxy.cold();
         address hot = voteProxy.hot();
@@ -900,4 +900,15 @@ contract VoteProxyFactory {
         initiateLink(msg.sender);
         return approveLink(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -3,10 +3,10 @@ pragma solidity ^0.4.23;
 // File: contracts/ERC223.sol
 
 contract ERC223 {
-	
+
 	// Get the account balance of another account with address owner
 	function balanceOf(address owner) public view returns (uint);
-	
+
 	function name() public view returns (string);
 	function symbol() public view returns (string);
 	function decimals() public view returns (uint8);
@@ -14,7 +14,7 @@ contract ERC223 {
 
 	// Needed due to backwards compatibility reasons because of ERC20 transfer function does't have bytes
 	// parameter. This function must transfer tokens and invoke the function tokenFallback(address, uint256,
-	// bytes) in to, if to is a contract. If the tokenFallback function is not implemented in to (receiver 
+	// bytes) in to, if to is a contract. If the tokenFallback function is not implemented in to (receiver
 	// contract), the transaaction must fail and the transfer of tokens should not occur.
 	function transfer(address to, uint value) public returns (bool success);
 
@@ -36,8 +36,8 @@ contract ERC223 {
 
 // File: contracts/ERC223ReceivingContract.sol
 
-contract ERC223ReceivingContract { 
-	
+contract ERC223ReceivingContract {
+
 	// A function for handling token transfers, which is called from the token contract, when a token holder sends
 	// tokens. from is the address of the sender of the token, value is the amount of incoming tokens, and data is
 	// attached data siimilar to msg.data of Ether transactions. It works by analogy with the fallback function of
@@ -80,7 +80,7 @@ library SafeMath {function mul(uint a, uint b) internal pure returns (uint) {
 
   function min64(uint64 a, uint64 b) internal pure returns (uint64) {
         return a < b ? a : b;
-    } 
+    }
 
     function max256(uint256 a, uint256 b) internal pure returns (uint256) {
     return a >= b ? a : b;
@@ -107,7 +107,7 @@ contract MyToken is ERC223 {
     uint8 public decimals;
     uint public totalSupply;
 
- 
+
     constructor(string _name, string _symbol,  uint _totalSupply) public {
 		name = _name;
 		symbol = _symbol;
@@ -184,5 +184,16 @@ contract MyToken is ERC223 {
 			len := extcodesize(addr)
 		}
 		return (len > 0);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

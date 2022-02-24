@@ -393,7 +393,7 @@ contract ERC1132 {
         bytes32 indexed _reason,
         uint256 _amount
     );
-    
+
     /**
      * @dev Locks a specified amount of tokens against an address,
      *      for a specified reason and time
@@ -403,7 +403,7 @@ contract ERC1132 {
      */
     function lock(bytes32 _reason, uint256 _amount, uint256 _time, address _of)
         public returns (bool);
-  
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason
@@ -413,7 +413,7 @@ contract ERC1132 {
      */
     function tokensLocked(address _of, bytes32 _reason)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason at a specific time
@@ -424,14 +424,14 @@ contract ERC1132 {
      */
     function tokensLockedAtTime(address _of, bytes32 _reason, uint256 _time)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns total tokens held by an address (locked + transferable)
      * @param _of The address to query the total balance of
      */
     function totalBalanceOf(address _of)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Extends lock for a specified reason and time
      * @param _reason The reason to lock tokens
@@ -439,7 +439,7 @@ contract ERC1132 {
      */
     function extendLock(bytes32 _reason, uint256 _time)
         public returns (bool);
-    
+
     /**
      * @dev Increase number of tokens locked for a specified reason
      * @param _reason The reason to lock tokens
@@ -455,7 +455,7 @@ contract ERC1132 {
      */
     function tokensUnlockable(address _of, bytes32 _reason)
         public view returns (uint256 amount);
- 
+
     /**
      * @dev Unlocks the unlockable tokens of a specified address
      * @param _of Address of user, claiming back unlockable tokens
@@ -485,7 +485,7 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
     string public constant symbol = "FIT";
     uint256 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 5000000000 * (10 ** decimals);
-    
+
 	constructor() public {
         totalSupply_ = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
@@ -540,7 +540,7 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
         transfer(address(this), _amount);
 
         locked[_to][_reason] = lockToken(_amount, validUntil, false);
-        
+
         emit Locked(_to, _reason, _amount, validUntil);
         return true;
     }
@@ -553,7 +553,7 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
         if (!locked[_of][_reason].claimed)
             amount = locked[_of][_reason].amount;
     }
-    
+
     function tokensLockedAtTime(address _of, bytes32 _reason, uint256 _time)
         public
         view
@@ -572,8 +572,8 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
 
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             amount = amount.add(tokensLocked(_of, lockReason[_of][i]));
-        }   
-    }    
+        }
+    }
 
     function extendLock(bytes32 _reason, uint256 _time)
         public onlyOwner
@@ -623,7 +623,7 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
                 locked[_of][lockReason[_of][i]].claimed = true;
                 emit Unlocked(_of, lockReason[_of][i], lockedTokens);
             }
-        }  
+        }
 
         if (unlockableTokens > 0)
             this.transfer(_of, unlockableTokens);
@@ -636,6 +636,18 @@ contract FACITE is StandardToken, Ownable, ERC1132 {
     {
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             unlockableTokens = unlockableTokens.add(tokensUnlockable(_of, lockReason[_of][i]));
-        }  
+        }
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

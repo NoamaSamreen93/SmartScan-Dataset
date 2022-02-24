@@ -8,8 +8,8 @@ pragma solidity ^0.4.19;
 contract Convertible {
 
     function convertMainchainGPX(string destinationAccount, string extra) external returns (bool);
-  
-    // ParcelX deamon program is monitoring this event. 
+
+    // ParcelX deamon program is monitoring this event.
     // Once it triggered, ParcelX will transfer corresponding GPX to destination account
     event Converted(address indexed who, string destinationAccount, uint256 amount, string extra);
 }
@@ -39,7 +39,7 @@ contract ERC20 {
 
 /**
  * FEATURE 2): MultiOwnable implementation
- * Transactions approved by _multiRequires of _multiOwners' addresses will be executed. 
+ * Transactions approved by _multiRequires of _multiOwners' addresses will be executed.
 
  * All functions needing unit-tests cannot be INTERNAL
  */
@@ -52,7 +52,7 @@ contract MultiOwnable {
     mapping (bytes32 => uint) internal m_pendings;
 
     event AcceptConfirm(address indexed who, uint confirmTotal);
-    
+
     // constructor is given number of sigs required to do protected "multiOwner" transactions
     function MultiOwnable (address[] _multiOwners, uint _multiRequires) public {
         require(0 < _multiRequires && _multiRequires <= _multiOwners.length);
@@ -99,7 +99,7 @@ contract MultiOwnable {
         if (ownerIndex == m_numOwners) {
             return false;  // Not Owner
         }
-        
+
         uint newBitFinger = (m_pendings[operation] | (2 ** ownerIndex));
 
         uint confirmTotal = 0;
@@ -108,7 +108,7 @@ contract MultiOwnable {
                 confirmTotal ++;
             }
         }
-        
+
         AcceptConfirm(currentUser, confirmTotal);
 
         if (confirmTotal >= m_multiRequires) {
@@ -199,12 +199,12 @@ library SafeMath {
 // File: contracts\ParcelXGPX.sol
 
 /**
- * The main body of final smart contract 
+ * The main body of final smart contract
  */
 contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
 
     using SafeMath for uint256;
-  
+
     string public constant name = "TestGPXv2";
     string public constant symbol = "TestGPXv2";
     uint8 public constant decimals = 18;
@@ -214,7 +214,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXToken(address[] _multiOwners, uint _multiRequires) 
+    function ParcelXToken(address[] _multiOwners, uint _multiRequires)
         MultiOwnable(_multiOwners, _multiRequires) public {
         tokenPool = this;
         require(tokenPool != address(0));
@@ -225,7 +225,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
      * FEATURE 1): ERC20 implementation
      */
     function totalSupply() public view returns (uint256) {
-        return TOTAL_SUPPLY;       
+        return TOTAL_SUPPLY;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
@@ -286,11 +286,11 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
      * FEATURE 4): Buyable implements
      * 0.000268 eth per GPX, so the rate is 1.0 / 0.000268 = 3731.3432835820895
      */
-    uint256 internal buyRate = uint256(3731); 
-    
+    uint256 internal buyRate = uint256(3731);
+
     event Deposit(address indexed who, uint256 value);
     event Withdraw(address indexed who, uint256 value, address indexed lastApprover, string extra);
-        
+
 
     function getBuyRate() external view returns (uint256) {
         return buyRate;
@@ -314,7 +314,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         balances[tokenPool] = balances[tokenPool].sub(tokens);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         Transfer(tokenPool, msg.sender, tokens);
-        
+
         return tokens;
     }
 
@@ -345,4 +345,8 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         return true;
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

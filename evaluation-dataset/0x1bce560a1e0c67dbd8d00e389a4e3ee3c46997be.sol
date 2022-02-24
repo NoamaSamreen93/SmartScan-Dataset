@@ -28,7 +28,7 @@ contract OmiseGOClassic {
     function OmiseGOClassic(
     ) public {
         totalSupply = 140 * 10 ** (6+uint256(decimals));  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;               
+        balanceOf[msg.sender] = totalSupply;
         name = "OmiseGO Classic";                                   // Set the name for display purposes
         symbol = "OMGC";                               // Set the symbol for display purposes
     }
@@ -147,4 +147,15 @@ contract OmiseGOClassic {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

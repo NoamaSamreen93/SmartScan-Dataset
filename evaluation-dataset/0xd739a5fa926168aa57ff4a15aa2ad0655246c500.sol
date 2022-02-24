@@ -237,7 +237,7 @@ contract Bussiness is Ownable {
             resetPrice(arrayTokenIdSale[i]);
         }
     }
-    
+
     function revenue() public onlyCeoAddress returns (uint256, uint256){
         uint256 ethfee = 0;
         uint256 hbfee = 0;
@@ -255,7 +255,7 @@ contract Bussiness is Ownable {
         uint256 hb = hbwalletToken.balanceOf(address(this)) - hbfee;
         return (eth, hb);
     }
-    
+
     function changeCeo(address _address) public onlyCeoAddress {
         require(_address != address(0));
         ceoAddress = _address;
@@ -285,4 +285,13 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

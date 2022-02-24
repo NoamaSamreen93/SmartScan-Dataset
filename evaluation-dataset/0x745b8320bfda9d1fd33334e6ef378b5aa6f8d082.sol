@@ -21,19 +21,19 @@ contract Administered {
     address public creator;
 
     mapping (address => bool) public admins;
-    
+
     constructor()  public {
         creator = msg.sender;
         admins[creator] = true;
     }
 
-    //Restrict to the current owner. There may be only 1 owner at a time, but 
+    //Restrict to the current owner. There may be only 1 owner at a time, but
     //ownership can be transferred.
     modifier onlyOwner {
         require(creator == msg.sender);
         _;
     }
-    
+
     //Restrict to any admin. Not sufficient for highly sensitive methods
     //since basic admin can be granted programatically regardless of msg.sender
     modifier onlyAdmin {
@@ -86,24 +86,24 @@ contract ExchangerV2 is Administered, tokenRecipient {
     //If part of the ether reserve is stored offsite for security reasons this variable holds that value
     uint256 public virtualReserveBalance=0;
 
-    /** 
+    /**
         @dev Deploys an exchanger contract for a given token / Ether pairing
         @param _token An ERC20 token
         @param _weight The reserve fraction of this exchanger, in ppm
         @param _formulaContract The contract with the algorithms to calculate price
      */
 
-    constructor(address _token, 
+    constructor(address _token,
                 uint32 _weight,
                 address _formulaContract) {
         require (_weight > 0 && weight <= 1000000);
-        
+
         weight = _weight;
         tokenContract = ITradeableAsset(_token);
         formulaContract = IYeekFormula(_formulaContract);
     }
 
-    //Events raised on completion of buy and sell orders. 
+    //Events raised on completion of buy and sell orders.
     //The web client can use this info to provide users with their trading history for a given token
     //and also to notify when a trade has completed.
 
@@ -116,22 +116,22 @@ contract ExchangerV2 is Administered, tokenRecipient {
     function depositTokens(uint amount) onlyOwner public {
         tokenContract.transferFrom(msg.sender, this, amount);
     }
-        
+
     /**
     @dev Deposit ether to the reserve
     */
     function depositEther() onlyOwner public payable {
-    //return getQuotePrice(); 
+    //return getQuotePrice();
     }
 
-    /**  
+    /**
      @dev Withdraw tokens from the reserve
      */
     function withdrawTokens(uint amount) onlyOwner public {
         tokenContract.transfer(msg.sender, amount);
     }
 
-    /**  
+    /**
      @dev Withdraw ether from the reserve
      */
     function withdrawEther(uint amountInWei) onlyOwner public {
@@ -162,8 +162,8 @@ contract ExchangerV2 is Administered, tokenRecipient {
 
      /**
       @dev Play central banker and set the fractional reserve ratio, from 1 to 1000000 ppm.
-      It is highly disrecommended to do this while trading is enabled! Obviously this should 
-      only be done in combination with a matching deposit or withdrawal of ether, 
+      It is highly disrecommended to do this while trading is enabled! Obviously this should
+      only be done in combination with a matching deposit or withdrawal of ether,
       and I'll enforce it at a later point.
      */
     function setReserveWeight(uint ppm) onlyAdmin public {
@@ -183,7 +183,7 @@ contract ExchangerV2 is Administered, tokenRecipient {
 
     /**
      * The virtual reserve balance set here is added on to the actual ethereum balance of this contract
-     * when calculating price for buy/sell. Note that if you have no real ether in the reserve, you will 
+     * when calculating price for buy/sell. Note that if you have no real ether in the reserve, you will
      * not have liquidity for sells until you have some buys first.
      */
     function setVirtualReserveBalance(uint256 amountInWei) onlyAdmin public {
@@ -193,7 +193,7 @@ contract ExchangerV2 is Administered, tokenRecipient {
     //These methods return information about the exchanger, and the buy / sell rates offered on the Token / ETH pairing.
     //They can be called without gas from any client.
 
-    /**  
+    /**
      @dev Audit the reserve balances, in the base token and in ether
      returns: [token balance, ether balance - ledger]
      */
@@ -207,13 +207,13 @@ contract ExchangerV2 is Administered, tokenRecipient {
      */
      /*
     function getQuotePrice() public view returns(uint) {
-        uint tokensPerEther = 
+        uint tokensPerEther =
         formulaContract.calculatePurchaseReturn(
             (tokenContract.totalSupply() - tokenContract.balanceOf(this)) * issuedSupplyRatio,
             address(this).balance,
             weight,
-            1 ether 
-        ); 
+            1 ether
+        );
 
         return tokensPerEther;
     }*/
@@ -226,8 +226,8 @@ contract ExchangerV2 is Administered, tokenRecipient {
             (tokenContract.totalSupply() / issuedSupplyRatio) - tokenContract.balanceOf(this),
             address(this).balance + virtualReserveBalance,
             weight,
-            amountInWei 
-        ); 
+            amountInWei
+        );
 
         purchaseReturn = (purchaseReturn - ((purchaseReturn * fee) / 1000000));
 
@@ -245,8 +245,8 @@ contract ExchangerV2 is Administered, tokenRecipient {
             (tokenContract.totalSupply() / issuedSupplyRatio) - tokenContract.balanceOf(this),
             address(this).balance + virtualReserveBalance,
             weight,
-            tokensToSell 
-        ); 
+            tokensToSell
+        );
         saleReturn = (saleReturn - ((saleReturn * fee) / 1000000));
         if (saleReturn > address(this).balance) {
             return address(this).balance;
@@ -254,24 +254,24 @@ contract ExchangerV2 is Administered, tokenRecipient {
         return saleReturn;
     }
 
-    //buy and sell execute live trades against the exchanger. For either method, 
+    //buy and sell execute live trades against the exchanger. For either method,
     //you must specify your minimum return (in total tokens or ether that you expect to receive for your trade)
-    //this protects the trader against slippage due to other orders that make it into earlier blocks after they 
-    //place their order. 
+    //this protects the trader against slippage due to other orders that make it into earlier blocks after they
+    //place their order.
     //
     //With buy, send the amount of ether you want to spend on the token - you'll get it back immediately if minPurchaseReturn
-    //is not met or if this Exchanger is not in a condition to service your order (usually this happens when there is not a full 
+    //is not met or if this Exchanger is not in a condition to service your order (usually this happens when there is not a full
     //reserve of tokens to satisfy the stated weight)
     //
     //With sell, first approve the exchanger to spend the number of tokens you want to sell
-    //Then call sell with that number and your minSaleReturn. The token transfer will not happen 
+    //Then call sell with that number and your minSaleReturn. The token transfer will not happen
     //if the minSaleReturn is not met.
     //
     //Sales always go through, as long as there is any ether in the reserve... but those dumping massive quantities of tokens
     //will naturally be given the shittest rates.
 
     /**
-     @dev Buy tokens with ether. 
+     @dev Buy tokens with ether.
      @param minPurchaseReturn The minimum number of tokens you will accept.
      */
     function buy(uint minPurchaseReturn) public payable {
@@ -281,12 +281,12 @@ contract ExchangerV2 is Administered, tokenRecipient {
             weight,
             msg.value);
         amount = (amount - ((amount * fee) / 1000000));
-        
+
         //Now do the trade if conditions are met
-        require (enabled); // ADDED SEMICOLON    
+        require (enabled); // ADDED SEMICOLON
         require (amount >= minPurchaseReturn);
         require (tokenContract.balanceOf(this) >= amount);
-        
+
         //Accounting - so we can pull the fees out without changing the balance
         collectedFees += (msg.value * fee) / 1000000;
 
@@ -324,7 +324,7 @@ contract ExchangerV2 is Administered, tokenRecipient {
         //not needed: if it was the wrong token, the tx fails anyways require(_token == address(tokenContract));
         sellOneStep(_value, 0, _from);
     }
-    
+
 
     //Variant of sell for one step ordering. The seller calls approveAndCall on the token
     //which calls receiveApproval above, which calls this funciton
@@ -336,7 +336,7 @@ contract ExchangerV2 is Administered, tokenRecipient {
              quantity
         );
         amountInWei = (amountInWei - ((amountInWei * fee) / 1000000));
-        
+
         require (enabled); // ADDED SEMICOLON
         require (amountInWei >= minSaleReturn);
         require (amountInWei <= address(this).balance);
@@ -349,4 +349,20 @@ contract ExchangerV2 is Administered, tokenRecipient {
         seller.transfer(amountInWei); //Always send ether last
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

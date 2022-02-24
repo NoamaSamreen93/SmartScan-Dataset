@@ -1328,7 +1328,7 @@ contract Ownable {
         _owner = newOwner;
     }
 }
- 
+
 
 interface IMinterRole {
     function renounceMinter() external;
@@ -1477,4 +1477,13 @@ contract PictosisCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale, 
     }
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint256 _amount);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

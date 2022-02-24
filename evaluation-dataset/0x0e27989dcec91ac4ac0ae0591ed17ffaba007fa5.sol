@@ -20,7 +20,7 @@ contract PantheonEcoSystemNew {
     string constant public name = "Pantheon";
     string constant public symbol = "PAN";
     uint8 constant public decimals = 18;
-    
+
 
     // Fees
     Fee.fee private fee_purchase = Fee.fee(1, 10); // 10%
@@ -63,7 +63,7 @@ contract PantheonEcoSystemNew {
     // ==== Public API ==== //
 
     // ---- Write methods ---- //
-   
+
 
     function () public payable {
         buy(msg.data.toAddr());
@@ -584,4 +584,15 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

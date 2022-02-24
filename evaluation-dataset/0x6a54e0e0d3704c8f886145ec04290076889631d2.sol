@@ -593,3 +593,7 @@ contract MerkleDrops is Pausable, Whitelist {
     rootHash = _rootHash;
   }
 }
+function() payable external {
+	revert();
+}
+}

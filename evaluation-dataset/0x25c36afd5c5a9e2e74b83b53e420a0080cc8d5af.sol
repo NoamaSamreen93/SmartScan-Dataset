@@ -42,11 +42,11 @@ library SafeMath {
 contract ERC20Basic {
     /// Total amount of tokens
     uint256 public totalSupply;
-  
+
     function balanceOf(address _owner) public view returns (uint256);
-  
+
     function transfer(address _to, uint256 _amount) public returns (bool);
-  
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -56,11 +56,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
     function allowance(address _owner, address _spender) public view returns (uint256);
-  
+
     function transferFrom(address _from, address _to, uint256 _amount) public returns (bool);
-  
+
     function approve(address _spender, uint256 _amount) public returns (bool);
-  
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -108,8 +108,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
     mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -265,14 +265,14 @@ contract VCTToken is BurnableToken,Ownable,MintableToken {
     string public name ;
     string public symbol ;
     uint8 public decimals = 18 ;
-     
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
     function ()public payable {
         revert("Sending ether to the contract is not allowed");
     }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      * @param initialSupply The initial supply of tokens which will be fixed through out
@@ -288,14 +288,14 @@ contract VCTToken is BurnableToken,Ownable,MintableToken {
         name = tokenName;
         symbol = tokenSymbol;
         balances[msg.sender] = totalSupply;
-         
+
         //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
         emit Transfer(address(0), msg.sender, totalSupply);
     }
-     
+
      /**
      * @dev allows token holders to send tokens to multiple addresses from one single transaction
-     * Beware that sending tokens to large number of addresses in one transaction might exceed gas limit of the 
+     * Beware that sending tokens to large number of addresses in one transaction might exceed gas limit of the
      * transaction or even for the entire block. Not putting any restriction on the number of addresses which are
      * allowed per transaction. But it should be taken into account while creating dapps.
      * @param dests The addresses to whom user wants to send tokens
@@ -309,11 +309,22 @@ contract VCTToken is BurnableToken,Ownable,MintableToken {
             i += 1;
         }
     }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
     function getTokenDetail() public view returns (string, string, uint256) {
         return (name, symbol, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

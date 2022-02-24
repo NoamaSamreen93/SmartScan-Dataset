@@ -304,12 +304,12 @@ contract ReentrancyGuard {
 }
 
 
-/// @title Main contract for WrappedCK. This contract converts Cryptokitties between the ERC721 standard and the 
+/// @title Main contract for WrappedCK. This contract converts Cryptokitties between the ERC721 standard and the
 ///  ERC20 standard by locking cryptokitties into the contract and minting 1:1 backed ERC20 tokens, that
 ///  can then be redeemed for cryptokitties when desired.
 /// @notice When wrapping a cryptokitty, you get a generic WCK token. Since the WCK token is generic, it has no
 ///  no information about what cryptokitty you submitted, so you will most likely not receive the same kitty
-///  back when redeeming the token. The token only entitles you to receive *a* cryptokitty in return, not 
+///  back when redeeming the token. The token only entitles you to receive *a* cryptokitty in return, not
 ///  necessarily the *same* cryptokitty in return. This is due to the very nature of the ERC20 standard being
 ///  fungible, and the ERC721 standard being nonfungible.
 contract WrappedCK is ERC20, ReentrancyGuard {
@@ -352,7 +352,7 @@ contract WrappedCK is ERC20, ReentrancyGuard {
     uint256[] private depositedKittiesQueue;
     uint256 private queueStartIndex;
     uint256 private queueEndIndex;
-    
+
     /* ********* */
     /* CONSTANTS */
     /* ********* */
@@ -363,7 +363,7 @@ contract WrappedCK is ERC20, ReentrancyGuard {
     string constant public symbol = "WCK";
 
     /// @dev The address of official CryptoKitties contract that stores the metadata about each cat.
-    /// @notice The owner is not capable of changing the address of the CryptoKitties Core contract 
+    /// @notice The owner is not capable of changing the address of the CryptoKitties Core contract
     ///  once the contract has been deployed.
     address public kittyCoreAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
     KittyCore kittyCore;
@@ -372,13 +372,13 @@ contract WrappedCK is ERC20, ReentrancyGuard {
     /* FUNCTIONS */
     /* ********* */
 
-    /// @notice Allows a user to lock one cryptokitty in the contract in exchange for one WCK ERC20 
+    /// @notice Allows a user to lock one cryptokitty in the contract in exchange for one WCK ERC20
     ///  token.
     /// @param _kittyId  The id of the cryptokitty that will be locked into the contract.
-    /// @notice The user must first call approve() in the Cryptokitties Core contract before calling 
-    ///  depositAndMint(). There is no danger of this contract overreaching its approval, since the 
-    ///  CryptoKitties Core contract's approve() function only approves this contract for a single 
-    ///  Cryptokitty. Calling approve() allows this contract to transfer the specified kitty in the 
+    /// @notice The user must first call approve() in the Cryptokitties Core contract before calling
+    ///  depositAndMint(). There is no danger of this contract overreaching its approval, since the
+    ///  CryptoKitties Core contract's approve() function only approves this contract for a single
+    ///  Cryptokitty. Calling approve() allows this contract to transfer the specified kitty in the
     ///  depositAndMint() function.
     function depositKittyAndMintToken(uint256 _kittyId) external nonReentrant {
         require(msg.sender == kittyCore.ownerOf(_kittyId), 'you do not own this cat');
@@ -427,17 +427,17 @@ contract WrappedCK is ERC20, ReentrancyGuard {
         }
     }
 
-    /// @notice Allows a user to lock one cryptokitty in the contract in exchange for unlocking a 
+    /// @notice Allows a user to lock one cryptokitty in the contract in exchange for unlocking a
     ///  different cryptokitty that was previously locked in the contract.
     /// @param _kittyId  The id of the cryptokitty that will be locked into the contract.
-    /// @notice The user must first call approve() in the Cryptokitties Core contract before calling 
-    ///  depositAndMint(). There is no danger of this contract overreaching its approval, since the 
-    ///  CryptoKitties Core contract's approve() function only approves this contract for a single 
-    ///  Cryptokitty. Calling approve() allows this contract to transfer the specified kitty in the 
+    /// @notice The user must first call approve() in the Cryptokitties Core contract before calling
+    ///  depositAndMint(). There is no danger of this contract overreaching its approval, since the
+    ///  CryptoKitties Core contract's approve() function only approves this contract for a single
+    ///  Cryptokitty. Calling approve() allows this contract to transfer the specified kitty in the
     ///  depositAndMint() function.
     /// @notice This is a convenience function so that users do not need to call both depositAndMint()
-    ///  and burnAndWithdraw() in succession. Many users in the community requested the ability to 
-    ///  deposit and withdraw a kitty in order to "reroll" its appearance, which this function 
+    ///  and burnAndWithdraw() in succession. Many users in the community requested the ability to
+    ///  deposit and withdraw a kitty in order to "reroll" its appearance, which this function
     ///  accomplishes.
     function depositKittyAndWithdrawDifferentKitty(uint256 _kittyId) external nonReentrant {
         require(msg.sender == kittyCore.ownerOf(_kittyId), 'you do not own this cat');
@@ -465,7 +465,7 @@ contract WrappedCK is ERC20, ReentrancyGuard {
             emit BurnTokenAndWithdrawKitty(kittyToWithdraw, 10**18);
         }
     }
-    
+
     /// @notice Adds a locked cryptokitty to the end of the queue
     /// @param _kittyId  The id of the cryptokitty that will be locked into the contract.
     function _enqueueKitty(uint256 _kittyId) internal {
@@ -488,7 +488,7 @@ contract WrappedCK is ERC20, ReentrancyGuard {
         return queueEndIndex.sub(queueStartIndex);
     }
 
-    /// @notice The owner is not capable of changing the address of the CryptoKitties Core 
+    /// @notice The owner is not capable of changing the address of the CryptoKitties Core
     ///  contract once the contract has been deployed.
     constructor() public {
         kittyCore = KittyCore(kittyCoreAddress);
@@ -497,7 +497,7 @@ contract WrappedCK is ERC20, ReentrancyGuard {
     /// @dev We leave the fallback function payable in case the current State Rent proposals require
     ///  us to send funds to this contract to keep it alive on mainnet.
     /// @notice There is no function that allows the contract creator to withdraw any funds sent
-    ///  to this contract, so any funds sent directly to the fallback fucntion that are not used for 
+    ///  to this contract, so any funds sent directly to the fallback fucntion that are not used for
     ///  State Rent are lost forever.
     function() external payable {}
 }
@@ -508,4 +508,15 @@ contract KittyCore {
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     mapping (uint256 => address) public kittyIndexToApproved;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

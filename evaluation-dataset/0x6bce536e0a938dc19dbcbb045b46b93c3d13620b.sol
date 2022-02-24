@@ -64,7 +64,7 @@ contract MyToken {
 
     /* Approve and then communicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -120,7 +120,7 @@ contract TemplateToken is owned, MyToken {
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (frozenAccount[_from]) revert();                        // Check if frozen            
+        if (frozenAccount[_from]) revert();                        // Check if frozen
         if (balanceOf[_from] < _value) revert();                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert();   // Check allowance
@@ -145,7 +145,7 @@ contract TemplateToken is owned, MyToken {
     function setBuyRate(uint newBuyRate) onlyOwner {
         buyRate = newBuyRate;
     }
-    
+
     function setSelling(bool newStatus) onlyOwner {
         isSelling = newStatus;
     }
@@ -157,8 +157,16 @@ contract TemplateToken is owned, MyToken {
         balanceOf[owner] -= amount;                         // subtracts amount from seller's balance
         Transfer(owner, msg.sender, amount);                // execute an event reflecting the change
     }
-    
+
     function withdrawToOwner(uint256 amountWei) onlyOwner {
         owner.transfer(amountWei);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

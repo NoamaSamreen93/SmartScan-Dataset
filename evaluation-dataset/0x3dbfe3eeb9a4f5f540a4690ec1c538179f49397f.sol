@@ -479,7 +479,7 @@ contract ERC721 is ERC165, IERC721 {
    */
   function _mint(address to, uint256 tokenId) internal {
     require(to != address(0));
-  
+
     _addTokenTo(to, tokenId);
     emit Transfer(address(0), to, tokenId);
   }
@@ -741,7 +741,7 @@ contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
   constructor(string name, string symbol) public {
     _name = name;
     _symbol = symbol;
-   
+
     // register the supported interfaces to conform to ERC721 via ERC165
     _registerInterface(InterfaceId_ERC721Metadata);
   }
@@ -903,7 +903,7 @@ contract ERC721MetadataMintable is ERC721, ERC721Metadata, MinterRole {
     onlyMinter
     returns (bool)
   {
-    
+
     _mint(to, tokenId);
     _setTokenURI(tokenId, tokenURI);
     return true;
@@ -942,4 +942,17 @@ contract ERC721FullBatchMint is ERC721Enumerable, ERC721MetadataMintable {
     }
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

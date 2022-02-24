@@ -105,7 +105,7 @@ contract SNcoin_Token is ERC20Interface, Owned {
     uint8 private constant limitBranchStep = 10;
 
     address public controller;
-    
+
     // Flag that determines if the token is transferable or not.
     bool public transfersEnabled;
     // ------------------------------------------------------------------------
@@ -125,7 +125,7 @@ contract SNcoin_Token is ERC20Interface, Owned {
     function setController(address _newController) public onlyOwner {
         controller = _newController;
     }
-    
+
     function limitOfTeam() public constant returns (uint8 limit) {
         return 100 - limits[limitTeamIdx];
     }
@@ -196,7 +196,7 @@ contract SNcoin_Token is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address _spender, uint _amount) public returns (bool success) {
         require(transfersEnabled);
@@ -235,7 +235,7 @@ contract SNcoin_Token is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -354,7 +354,7 @@ contract SNcoin_Token is ERC20Interface, Owned {
            // First update the balance array with the new value for the address
            //  sending the tokens
            balances[_from] = previousBalanceFrom - _amount;
-           
+
            if (limited_balances[_from].limitType > 0) {
                require(limited_balances[_from].limitType <= limitBranchType);
                uint minimumLimit = (limited_balances[_from].initial * limits[limited_balances[_from].limitType - 1])/100;
@@ -392,6 +392,17 @@ contract SNcoin_Token is ERC20Interface, Owned {
         token.transfer(owner, balance);
         emit ClaimedTokens(_token, owner, balance);
     }
-    
+
     event ClaimedTokens(address indexed _token, address indexed _owner, uint _amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

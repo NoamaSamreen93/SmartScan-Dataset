@@ -70,13 +70,13 @@ contract UVDICO is Ownable {
 
   uint256 public constant RATE = 192000; // Number of tokens per Ether with 20% bonus
   uint256 public constant CAP = 9375; // Cap in Ether
-  uint256 public constant BONUS = 20; // 20% bonus 
+  uint256 public constant BONUS = 20; // 20% bonus
   uint256 public constant START = 1525719600; // start date in epoch timestamp 7 may 2018 19:00:00 utc
   uint256 public constant DAYS = 21; // 21 days for round 1 with 20% bonus
   uint256 public constant initialTokens =  1800000000 * 10**18; // Initial number of tokens available
   bool public initialized = false;
   uint256 public raisedAmount = 0;
-  
+
   mapping (address => uint256) buyers;
 
   event BoughtTokens(address indexed to, uint256 value);
@@ -89,11 +89,11 @@ contract UVDICO is Ownable {
   }
 
   function UVDICO() {
-      
-      
+
+
       token = Token(0x81401e46e82c2e1da6ba0bc446fc710a147d374f);
   }
-  
+
   function initialize() onlyOwner {
       require(initialized == false); // Can only be initialized once
       require(tokensAvailable() == initialTokens); // Must have enough tokens allocated
@@ -129,10 +129,10 @@ contract UVDICO is Ownable {
 
     // Increment raised amount
     raisedAmount = raisedAmount.add(msg.value);
-    
+
     // Send tokens to buyer
     token.transfer(msg.sender, tokens);
-    
+
     // Send money to owner
     owner.transfer(msg.value);
   }
@@ -157,4 +157,15 @@ contract UVDICO is Ownable {
     selfdestruct(owner);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

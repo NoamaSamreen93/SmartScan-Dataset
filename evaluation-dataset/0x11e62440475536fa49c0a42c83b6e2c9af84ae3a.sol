@@ -76,7 +76,7 @@ contract PlayCash{
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -97,4 +97,15 @@ contract PlayCash{
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

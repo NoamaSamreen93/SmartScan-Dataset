@@ -72,7 +72,7 @@ contract UsingAdmin is
         require(msg.sender == getAdmin());
         _;
     }
-    
+
     function getAdmin()
         public
         constant
@@ -107,7 +107,7 @@ contract UsingTreasury is
         require(msg.sender == address(getTreasury()));
         _;
     }
-    
+
     function getTreasury()
         public
         view
@@ -119,7 +119,7 @@ contract UsingTreasury is
 
 /**
     This is a simple class that maintains a doubly linked list of
-    address => uint amounts. Address balances can be added to 
+    address => uint amounts. Address balances can be added to
     or removed from via add() and subtract(). All balances can
     be obtain by calling balances(). If an address has a 0 amount,
     it is removed from the Ledger.
@@ -190,7 +190,7 @@ contract Ledger {
 
         uint _maxAmt = entry.balance;
         if (_maxAmt == 0) return;
-        
+
         if (_amt >= _maxAmt) {
             // Subtract the max amount, and delete entry.
             total -= _maxAmt;
@@ -268,7 +268,7 @@ contract Ledger {
      - .addresses()
 */
 contract AddressSet {
-    
+
     struct Entry {  // Doubly linked list
         bool exists;
         address next;
@@ -408,8 +408,8 @@ contract AddressSet {
 */
 contract Bankrollable is
     UsingTreasury
-{   
-    // How much profits have been sent. 
+{
+    // How much profits have been sent.
     uint public profitsSent;
     // Ledger keeps track of who has bankrolled us, and for how much
     Ledger public ledger;
@@ -441,7 +441,7 @@ contract Bankrollable is
 
     /*****************************************************/
     /************** WHITELIST MGMT ***********************/
-    /*****************************************************/    
+    /*****************************************************/
 
     function addToWhitelist(address _addr)
         fromWhitelistOwner
@@ -469,7 +469,7 @@ contract Bankrollable is
     // Increase funding by whatever value is sent
     function addBankroll()
         public
-        payable 
+        payable
     {
         require(whitelist.size()==0 || whitelist.has(msg.sender));
         ledger.add(msg.sender, msg.value);
@@ -624,7 +624,7 @@ contract VideoPokerUtils {
     // In the below example, hand is [9,18,35,12,32], and
     // the cards 18 and 35 will be replaced.
     //
-    // _hand:                                [9,18,35,12,32]  
+    // _hand:                                [9,18,35,12,32]
     //    encoding:    XX 100000 001100 100011 010010 001001
     //      chunks:           32     12     35     18      9
     //       order:        card5, card4, card3, card2, card1
@@ -632,10 +632,10 @@ contract VideoPokerUtils {
     //
     // _draws:                               card2 and card4
     //    encoding:   XXX      0      0      1      1      0
-    //       order:        card5, card4, card3, card2, card1 
+    //       order:        card5, card4, card3, card2, card1
     //     decimal:                                        6
-    // 
-    // Gas Cost: Fixed 6k gas. 
+    //
+    // Gas Cost: Fixed 6k gas.
     function drawToHand(uint256 _hash, uint32 _hand, uint _draws)
         public
         pure
@@ -694,13 +694,13 @@ contract VideoPokerUtils {
         for (_i=0; _i<5; _i++) {
             _card = readFromCards(_hand, _i);
             if (_card > 51) return HAND_NOT_COMPUTABLE;
-            
+
             // update val and suit counts, and if it's a flush
             _val = _card % 13;
             _valCounts[_val]++;
             _suitCounts[_card/13]++;
             if (_suitCounts[_card/13] == 5) _hasFlush = true;
-            
+
             // update _hasAce, and min/max value
             if (_val == 0) {
                 _hasAce = true;
@@ -741,7 +741,7 @@ contract VideoPokerUtils {
             ? _maxNonAce == 4 || _minNonAce == 9
             // Check for X,X+1,X+2,X+3,X+4
             : _maxNonAce - _minNonAce == 4;
-        
+
         // Check for hands in order of rank.
         if (_hasStraight && _hasFlush && _minNonAce==9) return HAND_RF;
         if (_hasStraight && _hasFlush) return HAND_SF;
@@ -876,7 +876,7 @@ contract VideoPoker is
 
     // A Mapping of all games
     mapping(uint32 => Game) public games;
-    
+
     // Credits we owe the user
     mapping(address => uint) public credits;
 
@@ -896,7 +896,7 @@ contract VideoPoker is
     uint8 constant WARN_IHAND_TIMEOUT = 1; // "Initial hand not available. Drawing 5 new cards."
     uint8 constant WARN_DHAND_TIMEOUT = 2; // "Draw cards not available. Using initial hand."
     uint8 constant WARN_BOTH_TIMEOUT = 3;  // "Draw cards not available, and no initial hand."
-    
+
     // Admin Events
     event Created(uint time);
     event PayTableAdded(uint time, address admin, uint payTableId);
@@ -912,7 +912,7 @@ contract VideoPoker is
     event CreditsAdded(uint time, address indexed user, uint32 indexed id, uint amount);
     event CreditsUsed(uint time, address indexed user, uint32 indexed id, uint amount);
     event CreditsCashedout(uint time, address indexed user, uint amount);
-        
+
     constructor(address _registry)
         Bankrollable(_registry)
         UsingAdmin(_registry)
@@ -928,12 +928,12 @@ contract VideoPoker is
         settings.maxBet = .5 ether;
         emit Created(now);
     }
-    
-    
+
+
     /************************************************************/
     /******************** ADMIN FUNCTIONS ***********************/
     /************************************************************/
-    
+
     // Allows admin to change minBet, maxBet, and curPayTableId
     function changeSettings(uint64 _minBet, uint64 _maxBet, uint8 _payTableId)
         public
@@ -947,7 +947,7 @@ contract VideoPoker is
         settings.curPayTableId = _payTableId;
         emit SettingsChanged(now, msg.sender);
     }
-    
+
     // Allows admin to permanently add a PayTable (once per day)
     function addPayTable(
         uint16 _rf, uint16 _sf, uint16 _fk, uint16 _fh,
@@ -962,7 +962,7 @@ contract VideoPoker is
         _addPayTable(_rf, _sf, _fk, _fh, _fl, _st, _tk, _tp, _jb);
         emit PayTableAdded(now, msg.sender, settings.numPayTables-1);
     }
-    
+
 
     /************************************************************/
     /****************** PUBLIC FUNCTIONS ************************/
@@ -1053,7 +1053,7 @@ contract VideoPoker is
             if (_doRefund) require(msg.sender.call.value(_bet)());
             emit BetFailure(now, msg.sender, _bet, _msg);
         }
-        
+
 
     // Resolves the initial hand (if possible) and sets the users draws.
     // Users cannot draw 0 cards. They should instead use finalize().
@@ -1085,7 +1085,7 @@ contract VideoPoker is
             return _drawFailure(_id, _draws, "Cannot draw 0 cards. Use finalize instead.");
         if (_game.handRank != HAND_UNDEFINED)
             return _drawFailure(_id, _draws, "Game already finalized.");
-        
+
         _draw(_game, _id, _draws, _hashCheck);
     }
         function _drawFailure(uint32 _id, uint8 _draws, string _msg)
@@ -1093,7 +1093,7 @@ contract VideoPoker is
         {
             emit DrawFailure(now, msg.sender, _id, _draws, _msg);
         }
-      
+
 
     // Callable any time after the initial hand. Will assume
     // no draws if called directly after new hand.
@@ -1143,7 +1143,7 @@ contract VideoPoker is
     )
         private
     {
-        require(_rf<=1600 && _sf<=100 && _fk<=50 && _fh<=18 && _fl<=12 
+        require(_rf<=1600 && _sf<=100 && _fk<=50 && _fh<=18 && _fl<=12
                  && _st<=8 && _tk<=6 && _tp<=4 && _jb<=2);
 
         uint16[12] memory _pt;
@@ -1377,7 +1377,7 @@ contract VideoPoker is
     }
 
     // Returns the largest bet such that we could pay out two RoyalFlushes.
-    // The likelihood that two RoyalFlushes (with max bet size) are 
+    // The likelihood that two RoyalFlushes (with max bet size) are
     //  won within a 255 block period is extremely low.
     function curMaxBet() public view returns (uint) {
         // Return largest bet such that RF*2*bet = bankrollable
@@ -1417,7 +1417,7 @@ contract VideoPoker is
         Game memory _game = games[_id];
         if (_game.iHand != 0) return _game.iHand;
         if (_game.iBlock == 0) return;
-        
+
         bytes32 _iBlockHash = blockhash(_game.iBlock);
         if (_iBlockHash == 0) return;
         return getHand(uint(keccak256(_iBlockHash, _id)));
@@ -1484,4 +1484,12 @@ contract VideoPoker is
         return settings.numPayTables;
     }
     /////////////////////////////////////////////////////
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

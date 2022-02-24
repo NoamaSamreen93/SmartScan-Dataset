@@ -24,7 +24,7 @@ contract Ownable {
 }
 
 contract ZNTZLTDistributionTest is Ownable {
-    
+
     bool public isLive = true;
     string public name = "ZNT-ZLT Distribution Test";
     address public beneficiary;
@@ -35,17 +35,17 @@ contract ZNTZLTDistributionTest is Ownable {
     uint256 public availableZLT;
     token public tokenZNT;
     token public tokenZLT;
-    
+
     mapping(address => uint256) public donationOf;
-    
+
     constructor() public {
-        
+
         beneficiary = msg.sender;
     }
 
     // Callback function, distribute tokens to sender when ETH donation is recieved
     function () payable public {
-        
+
         require(isLive);
         uint256 donation = msg.value;
         uint256 amountZNT = donation * rateOfZNT;
@@ -59,7 +59,7 @@ contract ZNTZLTDistributionTest is Ownable {
         tokenZLT.transfer(msg.sender, amountZLT);
         beneficiary.transfer(donation);
     }
-    
+
     // Halts or resumes the distribution process
     function toggleIsLive() public onlyOwner {
         if(isLive) {
@@ -68,7 +68,7 @@ contract ZNTZLTDistributionTest is Ownable {
             isLive = true;
         }
     }
-    
+
 
     // Withdraw available token in this contract
     function withdrawAvailableToken(address _address, uint256 amountZNT, uint256 amountZLT) public onlyOwner {
@@ -78,33 +78,44 @@ contract ZNTZLTDistributionTest is Ownable {
         tokenZNT.transfer(_address, amountZNT);
         tokenZLT.transfer(_address, amountZLT);
     }
-    
+
     // Set token rate per ETH donation/contribution
     function setTokensPerEth(uint256 rateZNT, uint256 rateZLT) public onlyOwner {
-        
+
         rateOfZNT = rateZNT;
         rateOfZLT = rateZLT;
     }
-    
+
     // Set token contract addresses of tokens involved in distribution
     function setTokenReward(address _addressZNT, address _addressZLT) public onlyOwner {
-        
+
         tokenZNT = token(_addressZNT);
         tokenZLT = token(_addressZLT);
         setAvailableToken();
     }
-    
+
     // Set the available token balance of this contract
     function setAvailableToken() public onlyOwner {
-        
+
         availableZNT = tokenZNT.balanceOf(this);
         availableZLT = tokenZLT.balanceOf(this);
     }
-    
+
     // Set the available token balance of this contract manually
     function setAvailableTokenManually(uint256 amountZNT, uint256 amountZLT) public onlyOwner {
-        
+
         availableZNT = amountZNT;
         availableZLT = amountZLT;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

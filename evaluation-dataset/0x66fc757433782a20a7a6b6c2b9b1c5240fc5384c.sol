@@ -74,7 +74,7 @@ contract BasicToken is ERC20Basic {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
     function balanceOf(address _owner) public view returns (uint256) {
         return balances[_owner];
     }
@@ -193,9 +193,9 @@ contract NRXtoken is StandardToken, BurnableToken {
     constructor(address _CrowdsaleAddress) public {
         CrowdsaleAddress = _CrowdsaleAddress;
         totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;      
+        balances[msg.sender] = INITIAL_SUPPLY;
     }
-  
+
     modifier onlyOwner() {
         // only Crowdsale contract
         require(msg.sender == CrowdsaleAddress);
@@ -251,5 +251,21 @@ contract NRXtoken is StandardToken, BurnableToken {
 
     function() external payable {
         revert("The token contract don`t receive ether");
-    }  
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

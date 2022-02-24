@@ -312,7 +312,7 @@ contract ERC20 is IERC20 {
 // Version 1.0
 // The Goat Herd @ https://goat.cash
 //
-// Based on dice2.win Solidity contract. Extended to use ERC20 tokens in place of ETH, 
+// Based on dice2.win Solidity contract. Extended to use ERC20 tokens in place of ETH,
 // betting logic and proofs unchanged. Original comments follow this text.
 // Note modified and added lines marked with comments.
 //
@@ -328,7 +328,7 @@ contract ERC20 is IERC20 {
 contract GoatClash  {
     // ADDED ERC20 token reference and setter
     ERC20 private _token;
-    
+
     function token() public view returns(ERC20) {
         return _token;
     }
@@ -447,10 +447,10 @@ contract GoatClash  {
     event FailedPayment(address indexed beneficiary, uint amount);
     event Payment(address indexed beneficiary, uint amount);
     event JackpotPayment(address indexed beneficiary, uint amount);
-   
+
     // This event is emitted in placeBet to record commit in the logs.
     event Commit(uint commit);
-    
+
     // Constructor. Deliberately does not take any parameters.
     constructor () public {
         owner = msg.sender;
@@ -523,7 +523,7 @@ contract GoatClash  {
     // either settled or refunded. All funds are transferred to contract owner.
     function kill() external onlyOwner {
         require (lockedInBets == 0, "All bets should be processed (settled or refunded) before self-destruct.");
-        
+
         // Any remaining funds locked in the Jackpot (which cannot be decreased) will only be withdrawn when contract is killed
         sendFunds(owner, _token.balanceOf(address(this)), _token.balanceOf(address(this)));
 
@@ -560,7 +560,7 @@ contract GoatClash  {
     // it would be possible for a miner to place a bet with a known commit/reveal pair and tamper
     // with the blockhash. Croupier guarantees that commitLastBlock will always be not greater than
     // placeBet block number plus BET_EXPIRATION_BLOCKS. See whitepaper for details.
-    function placeBet(uint amount, uint betMask, uint modulo, uint commitLastBlock, uint commit, bytes32 r, bytes32 s) external {         
+    function placeBet(uint amount, uint betMask, uint modulo, uint commitLastBlock, uint commit, bytes32 r, bytes32 s) external {
         // Check that the bet is in 'clean' state.
         Bet storage bet = bets[commit];
         require (bet.gambler == address(0), "Bet should be in a 'clean' state.");
@@ -642,7 +642,7 @@ contract GoatClash  {
         require (block.number > placeBlockNumber, "settleBet in the same block as placeBet, or before.");
         require (block.number <= placeBlockNumber + BET_EXPIRATION_BLOCKS, "Blockhash can't be queried by EVM.");
         require (blockhash(placeBlockNumber) == blockHash, "Blockhash does not match.");
-        require (bet.amount <= _token.allowance(bet.gambler, address(this)), "Bet amount not inserted."); 
+        require (bet.amount <= _token.allowance(bet.gambler, address(this)), "Bet amount not inserted.");
 
         // Settle bet using reveal and blockHash as entropy sources.
         settleBetCommon(bet, reveal, blockHash);
@@ -741,7 +741,7 @@ contract GoatClash  {
             emit JackpotPayment(gambler, jackpotWin);
         }
 
-        // ADDED: Perform payment/deduct here to reduce gas costs (I guess this reduces contract interactions and therefore dApp ratings or something) 
+        // ADDED: Perform payment/deduct here to reduce gas costs (I guess this reduces contract interactions and therefore dApp ratings or something)
         // Lost bet
         if (diceWin + jackpotWin == 0) {
             deductFunds(gambler, amount);
@@ -787,7 +787,7 @@ contract GoatClash  {
     // }
 
     // ADDED
-    // A bet which failed to be settled in time (see refund transaction comments) will still 
+    // A bet which failed to be settled in time (see refund transaction comments) will still
     // count in locked in values and must be corrected.
     function cancelBet(uint commit) external onlyCroupier {
         // Check that bet is in 'active' state.
@@ -836,9 +836,9 @@ contract GoatClash  {
     // }
 
     // MODIFIED
-    // Override helper routine to process the payment in ERC20    
+    // Override helper routine to process the payment in ERC20
     function sendFunds(address beneficiary, uint amount, uint successLogAmount) private {
-        if (_token.transfer(beneficiary, amount)) {        
+        if (_token.transfer(beneficiary, amount)) {
             emit Payment(beneficiary, successLogAmount);
         } else {
             emit FailedPayment(beneficiary, amount);
@@ -846,7 +846,7 @@ contract GoatClash  {
     }
 
     // ADDED
-    // Helper routine to process the payment in ERC20    
+    // Helper routine to process the payment in ERC20
     function deductFunds(address player, uint amount) private {
         if (_token.transferFrom(player, address(this), amount)) {
             emit Payment(address(this), amount);
@@ -1020,4 +1020,20 @@ contract GoatClash  {
             mstore(dest, or(destpart, srcpart))
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

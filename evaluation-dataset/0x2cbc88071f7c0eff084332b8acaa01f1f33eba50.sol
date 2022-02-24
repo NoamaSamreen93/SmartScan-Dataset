@@ -115,7 +115,7 @@ contract Random is SafeMath {
     // Generates a random number from 1 to max based on the last block hash.
     function getRandomFromBlockHash(uint blockNumber, uint max)
     public
-    constant 
+    constant
     returns(uint) {
         // block.blockhash(uint blockNumber)
         //    returns
@@ -132,7 +132,7 @@ contract Random is SafeMath {
  * Step 1: Call requestNumber with the `cost` as the value
  * Step 2: Wait waitTime in blocks past the block which mines transaction for requestNumber
  * Step 3: Call revealNumber to generate the number, and make it publicly accessable in the UI.
- *         this is required to create the Events which generate the Ledger. 
+ *         this is required to create the Events which generate the Ledger.
  */
 contract LuckyNumber is Owned {
     // ~> cost to generate a random number in Wei.
@@ -157,7 +157,7 @@ contract LuckyNumber is Owned {
     // for Number Ledger
     event EventLuckyNumberRequested(address indexed requestor, uint256 max, uint256 originBlock, uint8 waitTime, address indexed requestProxy);
     event EventLuckyNumberRevealed(address indexed requestor, uint256 originBlock, uint256 renderedNumber, address indexed requestProxy);
-    
+
     mapping (address => PendingNumber) public pendingNumbers;
     mapping (address => bool) public whiteList;
 
@@ -171,7 +171,7 @@ contract LuckyNumber is Owned {
  * on behalf of any other address as a requestProxy.
  */
 contract LuckyNumberService is LuckyNumber, Mortal, Random {
-    
+
     // Initialize state +.+.+.
     function LuckyNumberService() {
         owned();
@@ -243,19 +243,19 @@ contract LuckyNumberService is LuckyNumber, Mortal, Random {
         assert(msg.sender != owner);
         requestNumber(msg.sender, max, waitTime);
     }
-    
+
     // Request a Number ... *~>
     function requestNumber(address _requestor, uint256 _max, uint8 _waitTime)
-    payable 
+    payable
     public {
-        // external requirement: 
+        // external requirement:
         // value must exceed cost
         // unless address is whitelisted
         if (!whiteList[msg.sender]) {
             require(!(msg.value < cost));
         }
 
-        // internal requirement: 
+        // internal requirement:
         // request address must not have pending number
         assert(!checkNumber(_requestor));
         // set pending number
@@ -290,14 +290,14 @@ contract LuckyNumberService is LuckyNumber, Mortal, Random {
     }
 
     // Internal implementation of revealNumber().
-    function _revealNumber(address _requestor) 
+    function _revealNumber(address _requestor)
     internal {
         uint256 luckyBlock = _revealBlock(_requestor);
-        // 
+        //
         // TIME LIMITATION ~> should handle in user interface
-        // blocks older than (currentBlock - 256) 
+        // blocks older than (currentBlock - 256)
         // "expire" and read the same hash as most recent valid block
-        // 
+        //
         uint256 luckyNumber = getRandomFromBlockHash(luckyBlock, pendingNumbers[_requestor].max);
 
         // set new values
@@ -315,7 +315,7 @@ contract LuckyNumberService is LuckyNumber, Mortal, Random {
         return (_canReveal(_requestor, msg.sender), _remainingBlocks(_requestor), _revealBlock(_requestor), _requestor, msg.sender);
     }
 
-    function _canReveal(address _requestor, address _proxy) 
+    function _canReveal(address _requestor, address _proxy)
     internal
     constant
     returns (bool) {
@@ -374,4 +374,15 @@ contract LuckyNumberService is LuckyNumber, Mortal, Random {
         return false;
     }
 // 0xMMWKkk0KN/>HBBi/MASSa/DANTi/LANTen.MI.MI.MI.M+.+.+.M->MMWNKOkOKWJ.J.J.M*~+>
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

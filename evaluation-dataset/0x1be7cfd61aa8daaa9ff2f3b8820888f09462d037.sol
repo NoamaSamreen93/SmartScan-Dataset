@@ -57,32 +57,32 @@ contract GGCToken is ERC20Interface{
     string public symbol;
     string public  name;
     uint8 public decimals;
-    uint8 public ggcFee; 
-    uint8 public ggeFee; 
+    uint8 public ggcFee;
+    uint8 public ggeFee;
     uint8 public maxFee;
     uint256 public _totalSupply;
 
-    bool public feeLocked; 
+    bool public feeLocked;
     bool public transContractLocked;
 
     address public owner;
     address public ggcPoolAddr;
-    address public ggePoolAddr;     
+    address public ggePoolAddr;
     address private ownerContract = address(0x0);
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => bool) public whiteList;
     mapping(address => bool) public allowContractList;
     mapping(address => bool) public blackList;
-    
+
     constructor() public {
         symbol = "GGC";
         name = "GramGold Coin";
         owner = msg.sender;
         decimals = 8;
         ggcFee = 2;
-        ggeFee = 1; 
+        ggeFee = 1;
         maxFee = 3;
         _totalSupply = 600 * 10**uint256(decimals);
         balances[owner] = _totalSupply;
@@ -90,24 +90,24 @@ contract GGCToken is ERC20Interface{
         ggePoolAddr = address(0x0);
         feeLocked = false;
         transContractLocked = true;
-        whiteList[owner] = true; 
+        whiteList[owner] = true;
         emit ListLog(owner, 1, true);
         emit Transfer(address(0x0), owner, _totalSupply);
     }
-    
+
     /**
     * @dev Allow current contract owner transfer ownership to other address
     */
-    function AssignGGCOwner(address _ownerContract) 
-    public 
-    onlyOwner 
-    notNull(_ownerContract) 
+    function AssignGGCOwner(address _ownerContract)
+    public
+    onlyOwner
+    notNull(_ownerContract)
     {
         uint256 remainTokens = balances[owner];
         ownerContract = _ownerContract;
         balances[owner] = 0;
         balances[ownerContract] = balances[ownerContract].add(remainTokens);
-        whiteList[ownerContract] = true; 
+        whiteList[ownerContract] = true;
         emit ListLog(ownerContract, 1, true);
         emit Transfer(owner, ownerContract, remainTokens);
         emit OwnershipTransferred(owner, ownerContract);
@@ -117,10 +117,10 @@ contract GGCToken is ERC20Interface{
     /**
     * @dev Check if the address is a wallet or a contract
     */
-    function isContract(address _addr) 
-    private 
-    view 
-    returns (bool) 
+    function isContract(address _addr)
+    private
+    view
+    returns (bool)
     {
         if(allowContractList[_addr] || !transContractLocked){
             return false;
@@ -131,7 +131,7 @@ contract GGCToken is ERC20Interface{
         assembly {
             codeLength := extcodesize(_addr)
         }
-        
+
         return (codeLength > 0);
     }
 
@@ -140,10 +140,10 @@ contract GGCToken is ERC20Interface{
     * Both sender and receiver pays a transaction fees
     * The transaction fees will be transferred into GGCPool and GGEPool
     */
-    function transfer(address _to, uint256 _value) 
-    public 
-    notNull(_to) 
-    returns (bool success) 
+    function transfer(address _to, uint256 _value)
+    public
+    notNull(_to)
+    returns (bool success)
     {
         uint256 ggcFeeFrom;
         uint256 ggeFeeFrom;
@@ -171,7 +171,7 @@ contract GGCToken is ERC20Interface{
         balances[msg.sender] = balances[msg.sender].sub(_value.add(ggcFeeFrom).add(ggeFeeFrom));
         balances[_to] = balances[_to].add(_value.sub(ggcFeeTo).sub(ggeFeeTo));
         balances[ggcPoolAddr] = balances[ggcPoolAddr].add(ggcFeeFrom).add(ggcFeeTo);
-        balances[ggePoolAddr] = balances[ggePoolAddr].add(ggeFeeFrom).add(ggeFeeTo); 
+        balances[ggePoolAddr] = balances[ggePoolAddr].add(ggeFeeFrom).add(ggeFeeTo);
 
         emit Trans(msg.sender, _to, _value, ggcFeeFrom.add(ggcFeeTo), ggeFeeFrom.add(ggeFeeTo), uint64(now));
         return true;
@@ -179,13 +179,13 @@ contract GGCToken is ERC20Interface{
 
     /**
     * @dev transfer _value from contract owner to receiver
-    * Both contract owner and receiver pay transaction fees 
+    * Both contract owner and receiver pay transaction fees
     * The transaction fees will be transferred into GGCPool and GGEPool
     */
-    function transferFrom(address _from, address _to, uint256 _value) 
-    public 
-    notNull(_to) 
-    returns (bool success) 
+    function transferFrom(address _from, address _to, uint256 _value)
+    public
+    notNull(_to)
+    returns (bool success)
     {
         uint256 ggcFeeFrom;
         uint256 ggeFeeFrom;
@@ -215,7 +215,7 @@ contract GGCToken is ERC20Interface{
         balances[_from] = balances[_from].sub(_value.add(ggcFeeFrom).add(ggeFeeFrom));
         balances[_to] = balances[_to].add(_value.sub(ggcFeeTo).sub(ggeFeeTo));
         balances[ggcPoolAddr] = balances[ggcPoolAddr].add(ggcFeeFrom).add(ggcFeeTo);
-        balances[ggePoolAddr] = balances[ggePoolAddr].add(ggeFeeFrom).add(ggeFeeTo); 
+        balances[ggePoolAddr] = balances[ggePoolAddr].add(ggeFeeFrom).add(ggeFeeTo);
 
         emit Trans(_from, _to, _value, ggcFeeFrom.add(ggcFeeTo), ggeFeeFrom.add(ggeFeeTo), uint64(now));
         return true;
@@ -228,7 +228,7 @@ contract GGCToken is ERC20Interface{
     function feesCal(address _addr, uint256 _value)
     public
     view
-    notNull(_addr) 
+    notNull(_addr)
     returns (uint256 _ggcFee, uint256 _ggeFee)
     {
         if(whiteList[_addr]){
@@ -244,18 +244,18 @@ contract GGCToken is ERC20Interface{
     * @dev both transfer and transferfrom are dispatched here
     * Check blackList
     */
-    function _transfer(address _from, address _to, uint256 _value) 
-    internal 
-    notNull(_from) 
-    notNull(_to) 
-    returns (bool) 
+    function _transfer(address _from, address _to, uint256 _value)
+    internal
+    notNull(_from)
+    notNull(_to)
+    returns (bool)
     {
         require(!blackList[_from]);
-        require(!blackList[_to]);       
+        require(!blackList[_to]);
         require(!isContract(_to));
-        
+
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -264,9 +264,9 @@ contract GGCToken is ERC20Interface{
     * @param _spender The address which will spend the funds.
     * @param _value The amount of tokens to be spent.
     */
-    function approve(address _spender, uint256 _value) 
-    public 
-    returns (bool success) 
+    function approve(address _spender, uint256 _value)
+    public
+    returns (bool success)
     {
         if ((_value != 0) && (allowed[msg.sender][_spender] != 0)) {
             return false;
@@ -283,15 +283,15 @@ contract GGCToken is ERC20Interface{
     * @param _spender address The address which will spend the funds.
     * @return A uint256 specifying the amount of tokens still available for the spender.
     */
-    function allowance(address _tokenOwner, address _spender) 
-    public 
-    view 
-    returns (uint256 remaining) 
+    function allowance(address _tokenOwner, address _spender)
+    public
+    view
+    returns (uint256 remaining)
     {
         return allowed[_tokenOwner][_spender];
     }
-    
-    function() 
+
+    function()
     payable
     {
         if (msg.value > 0)
@@ -304,15 +304,15 @@ contract GGCToken is ERC20Interface{
     * @param value_ uint256 the amount of the specified token
     * @param data_ Bytes The data passed from the caller.
     */
-    function tokenFallback(address from_, uint256 value_, bytes data_) 
-    external 
+    function tokenFallback(address from_, uint256 value_, bytes data_)
+    external
     {
         from_;
         value_;
         data_;
         revert();
     }
-    
+
     // ------------------------------------------------------------------------
     // Modifiers
     // ------------------------------------------------------------------------
@@ -329,166 +329,166 @@ contract GGCToken is ERC20Interface{
     // ------------------------------------------------------------------------
     // onlyOwner API
     // ------------------------------------------------------------------------
-    function setGGCAddress(address _addr) 
-    public 
-    notNull(_addr) 
-    onlyOwner 
+    function setGGCAddress(address _addr)
+    public
+    notNull(_addr)
+    onlyOwner
     {
         if(ggcPoolAddr == address(0x0)){
-            ggcPoolAddr = _addr;    
+            ggcPoolAddr = _addr;
         }else{
             ggcPoolAddr = owner;
         }
-        
+
         emit ListLog(ggcPoolAddr, 6, false);
     }
 
-    function setGGEAddress(address _addr) 
-    public 
-    notNull(_addr) 
-    onlyOwner 
+    function setGGEAddress(address _addr)
+    public
+    notNull(_addr)
+    onlyOwner
     {
         if(ggePoolAddr == address(0x0)){
-            ggePoolAddr = _addr;    
+            ggePoolAddr = _addr;
         }else{
             ggePoolAddr = owner;
         }
-                        
+
         emit ListLog(ggePoolAddr, 7, false);
     }
 
-    function setGGCFee(uint8 _val) 
-    public 
-    onlyOwner 
+    function setGGCFee(uint8 _val)
+    public
+    onlyOwner
     {
         require(ggeFee.add(_val) <= maxFee);
         ggcFee = _val;
     }
 
-    function setGGEFee(uint8 _val) 
-    public 
-    onlyOwner 
+    function setGGEFee(uint8 _val)
+    public
+    onlyOwner
     {
         require(ggcFee.add(_val) <= maxFee);
         ggeFee = _val;
     }
-    
+
     function addBlacklist(address _addr) public notNull(_addr) onlyOwner {
-        blackList[_addr] = true; 
+        blackList[_addr] = true;
         emit ListLog(_addr, 3, true);
     }
-    
+
     function delBlackList(address _addr) public notNull(_addr) onlyOwner {
-        delete blackList[_addr];                
+        delete blackList[_addr];
         emit ListLog(_addr, 3, false);
     }
 
-    function setFeeLocked(bool _lock) 
-    public 
-    onlyOwner 
+    function setFeeLocked(bool _lock)
+    public
+    onlyOwner
     {
-        feeLocked = _lock;    
-        emit ListLog(address(0x0), 4, _lock); 
+        feeLocked = _lock;
+        emit ListLog(address(0x0), 4, _lock);
     }
 
-    function setTransContractLocked(bool _lock) 
-    public 
-    onlyOwner 
+    function setTransContractLocked(bool _lock)
+    public
+    onlyOwner
     {
-        transContractLocked = _lock;                  
-        emit ListLog(address(0x0), 5, _lock); 
+        transContractLocked = _lock;
+        emit ListLog(address(0x0), 5, _lock);
     }
 
-    function transferAnyERC20Token(address _tokenAddress, uint256 _tokens) 
-    public 
-    onlyOwner 
-    returns (bool success) 
+    function transferAnyERC20Token(address _tokenAddress, uint256 _tokens)
+    public
+    onlyOwner
+    returns (bool success)
     {
         return ERC20Interface(_tokenAddress).transfer(owner, _tokens);
     }
 
-    function reclaimEther(address _addr) 
-    external 
-    onlyOwner 
+    function reclaimEther(address _addr)
+    external
+    onlyOwner
     {
         assert(_addr.send(this.balance));
     }
-  
-    function mintToken(address _targetAddr, uint256 _mintedAmount) 
-    public 
-    onlyOwner 
+
+    function mintToken(address _targetAddr, uint256 _mintedAmount)
+    public
+    onlyOwner
     {
         balances[_targetAddr] = balances[_targetAddr].add(_mintedAmount);
         _totalSupply = _totalSupply.add(_mintedAmount);
-        
+
         emit Transfer(address(0x0), _targetAddr, _mintedAmount);
     }
- 
-    function burnToken(uint256 _burnedAmount) 
-    public 
-    onlyOwner 
+
+    function burnToken(uint256 _burnedAmount)
+    public
+    onlyOwner
     {
         require(balances[owner] >= _burnedAmount);
-        
+
         balances[owner] = balances[owner].sub(_burnedAmount);
         _totalSupply = _totalSupply.sub(_burnedAmount);
-        
+
         emit Transfer(owner, address(0x0), _burnedAmount);
     }
 
-    function addWhiteList(address _addr) 
-    public 
-    notNull(_addr) 
-    onlyOwner 
+    function addWhiteList(address _addr)
+    public
+    notNull(_addr)
+    onlyOwner
     {
-        whiteList[_addr] = true; 
+        whiteList[_addr] = true;
         emit ListLog(_addr, 1, true);
     }
-  
-    function delWhiteList(address _addr) 
-    public 
-    notNull(_addr) 
+
+    function delWhiteList(address _addr)
+    public
+    notNull(_addr)
     onlyOwner
     {
         delete whiteList[_addr];
         emit ListLog(_addr, 1, false);
     }
 
-    function addAllowContractList(address _addr) 
-    public 
-    notNull(_addr) 
-    onlyOwner 
+    function addAllowContractList(address _addr)
+    public
+    notNull(_addr)
+    onlyOwner
     {
-        allowContractList[_addr] = true; 
+        allowContractList[_addr] = true;
         emit ListLog(_addr, 2, true);
     }
-  
-    function delAllowContractList(address _addr) 
-    public 
-    notNull(_addr) 
-    onlyOwner 
+
+    function delAllowContractList(address _addr)
+    public
+    notNull(_addr)
+    onlyOwner
     {
         delete allowContractList[_addr];
         emit ListLog(_addr, 2, false);
     }
 
-    function increaseApproval(address _spender, uint256 _addedValue) 
-    public 
-    notNull(_spender) 
-    onlyOwner returns (bool) 
+    function increaseApproval(address _spender, uint256 _addedValue)
+    public
+    notNull(_spender)
+    onlyOwner returns (bool)
     {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
    }
 
-    function decreaseApproval(address _spender, uint256 _subtractedValue) 
-    public 
-    notNull(_spender) 
-    onlyOwner returns (bool) 
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
+    public
+    notNull(_spender)
+    onlyOwner returns (bool)
     {
         uint256 oldValue = allowed[msg.sender][_spender];
-        if (_subtractedValue > oldValue) { 
+        if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
         } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
@@ -497,7 +497,7 @@ contract GGCToken is ERC20Interface{
         return true;
     }
 
-    function changeName(string _name, string _symbol) 
+    function changeName(string _name, string _symbol)
     public
     onlyOwner
     {
@@ -507,19 +507,30 @@ contract GGCToken is ERC20Interface{
     // ------------------------------------------------------------------------
     // Public view API
     // ------------------------------------------------------------------------
-    function balanceOf(address _tokenOwner) 
-    public 
-    view 
-    returns (uint256 balance) 
+    function balanceOf(address _tokenOwner)
+    public
+    view
+    returns (uint256 balance)
     {
         return balances[_tokenOwner];
     }
-    
-    function totalSupply() 
-    public 
-    view 
-    returns (uint256) 
+
+    function totalSupply()
+    public
+    view
+    returns (uint256)
     {
         return _totalSupply.sub(balances[address(0x0)]);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

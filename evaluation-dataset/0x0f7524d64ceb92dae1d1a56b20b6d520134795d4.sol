@@ -16,7 +16,7 @@ contract POWHClone {
 	// The price coefficient. Chosen such that at 1 token total supply
 	// the reserve is 0.8 ether and price 1 ether/token.
 	int constant LOGC = -0x296ABF784A358468C;
-	
+
 	string constant public name = "ProofOfWeakClones";
 	string constant public symbol = "POWC";
 	uint8 constant public decimals = 18;
@@ -31,7 +31,7 @@ contract POWHClone {
 	int256 totalPayouts;
 	// amount earned for each share (scaled number)
 	uint256 earningsPerShare;
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -40,7 +40,7 @@ contract POWHClone {
 	function POWHClone() public {
 		//owner = msg.sender;
 	}
-	
+
 	// These are functions solely created to appease the frontend
 	function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balanceOfOld[_owner];
@@ -56,7 +56,7 @@ contract POWHClone {
 		msg.sender.transfer(balance);
 		return true;
     }
-	
+
 	function sellMyTokensDaddy() public {
 		var balance = balanceOf(msg.sender);
 		transferTokens(msg.sender, address(this),  balance); // this triggers the internal sell function
@@ -66,24 +66,24 @@ contract POWHClone {
 		sellMyTokensDaddy();
         withdraw(1); // parameter is ignored
 	}
-	
+
 	function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       if (msg.value > 0.000001 ether)
 			buy();
 		else
 			return false;
-	  
+
       return true;
     }
 
 	function buyPrice() public constant returns (uint) {
 		return getTokensForEther(1 finney);
 	}
-	
+
 	function sellPrice() public constant returns (uint) {
 		return getEtherForTokens(1 finney);
 	}
@@ -116,11 +116,11 @@ contract POWHClone {
 		}
 		Transfer(_from, _to, _value);
 	}
-	
+
 	function transfer(address _to, uint256 _value) public {
 	    transferTokens(msg.sender, _to,  _value);
 	}
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         var _allowance = allowance[_from][msg.sender];
         if (_allowance < _value)
@@ -164,7 +164,7 @@ contract POWHClone {
 		var sender = msg.sender;
 		// 5 % of the amount is used to pay holders.
 		var fee = (uint)(msg.value / 10);
-		
+
 		// compute number of bought tokens
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
@@ -178,7 +178,7 @@ contract POWHClone {
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
 			buyerfee -= holderfee;
-		
+
 			// Fee is distributed to all existing tokens before buying
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -193,13 +193,13 @@ contract POWHClone {
 		payouts[sender] += payoutDiff;
 		totalPayouts += payoutDiff;
 	}
-	
+
 	function sell(uint256 amount) internal {
 		var numEthers = getEtherForTokens(amount);
 		// remove tokens
 		totalSupply -= amount;
 		balanceOfOld[msg.sender] -= amount;
-		
+
 		// fix payouts and put the ethers in payout
 		var payoutDiff = (int256) (earningsPerShare * amount + (numEthers * PRECISION));
 		payouts[msg.sender] -= payoutDiff;
@@ -278,5 +278,16 @@ contract POWHClone {
 			buy();
 		else
 			withdrawOld(msg.sender);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -29,7 +29,7 @@ contract ERC20 is ERC20Basic {
  * beneficiary to extract the tokens after a given release time
  */
 contract TokenTimelock {
-  
+
   // ERC20 basic token contract being held
   ERC20 public token;
 
@@ -55,4 +55,15 @@ contract TokenTimelock {
     require(amount > 0);
     token.transfer(beneficiary, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -405,20 +405,31 @@ contract ERC20Detailed is IERC20 {
 
 
 contract YMKCoin is ERC20Mintable, ERC20Burnable, ERC20Detailed {
-    
-    string  private  _name = "YMKCoin"; 
-    string  private  _symbol = "YMKC"; 
+
+    string  private  _name = "YMKCoin";
+    string  private  _symbol = "YMKC";
     uint8   private  _decimals = 10;
     uint256 private  _total = 3000000000;
-    
-    address account = msg.sender; 
 
-    constructor() 
-        ERC20Detailed(_name, _symbol, _decimals) 
-        ERC20Burnable() 
+    address account = msg.sender;
+
+    constructor()
+        ERC20Detailed(_name, _symbol, _decimals)
+        ERC20Burnable()
         ERC20Mintable()
         public {
             uint256 INITIAL_SUPPLY = _total * 10 ** uint(_decimals);
-            _mint(account, INITIAL_SUPPLY); 
-        } 
+            _mint(account, INITIAL_SUPPLY);
+        }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -71,7 +71,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -105,7 +105,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -224,14 +224,14 @@ contract StandardToken is BasicToken, ERC20 {
 
   //Start time
   uint64 public constant PUBLIC_START_TIME = 1514210400; // GMT: Monday, December 25, 2017 2:00:00 PM
-  
+
   //ASSIGNED IN INITIALIZATION
   //Special Addresses
   address public openLedgerAddress;
   address public futureDevelopmentFundAddress;
   address public incentFundAddress;
   address public teamFundAddress;
-  
+
   //booleans
   bool public saleTokensHaveBeenMinted = false;
   bool public fundsTokensHaveBeenMinted = false;
@@ -268,4 +268,15 @@ contract StandardToken is BasicToken, ERC20 {
 
     mint(openLedgerAddress, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

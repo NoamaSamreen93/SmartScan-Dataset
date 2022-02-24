@@ -78,7 +78,7 @@ contract Ownable {
    */
   function transferOwnership(address _newOwner) public onlyOwner {
     _transferOwnership(_newOwner);
-  } 
+  }
 
   /**
    * @dev Transfers control of the contract to a newOwner.
@@ -334,4 +334,15 @@ contract ZhiXinToken is PausableToken {
     balances[admin] = totalSupply_;
     emit Transfer(address(0x0), admin, totalSupply_);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

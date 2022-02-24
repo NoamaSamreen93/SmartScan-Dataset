@@ -1,5 +1,5 @@
 pragma solidity ^0.4.10;
- 
+
 
 contract Burner {
     function burnILF(address , uint ) {}
@@ -87,10 +87,10 @@ contract ILF is StandardToken {
     address public burnerAddress;
     address public minterAddress;
     address public ILFManager;
-    address public ILFManagerCandidate;   
-    bytes32 public ILFManagerCandidateKeyHash; 
+    address public ILFManagerCandidate;
+    bytes32 public ILFManagerCandidateKeyHash;
     Burner burner;
-                                           
+
     event Emission(address indexed emitTo, uint amount);
     event Burn(address indexed burnFrom, uint amount);
 
@@ -127,7 +127,7 @@ contract ILF is StandardToken {
     /// @param _value Number of tokens to transfer.
     function transfer(address _to, uint256 _value) returns (bool success) {
         assert(!previousBurners[_to] && !previousMinters[_to] && _to != minterAddress);
-        
+
         if (balances[msg.sender] >= _value && _value > 0 && _to != address(0) && _to != address(this)) {//The last two checks are done for preventing sending tokens to zero address or token address (this contract).
             if (_to == burnerAddress) {
                 burner.burnILF(msg.sender, _value);
@@ -190,9 +190,9 @@ contract ILF is StandardToken {
     /// @param _hash SHA3 hash of current minter address.
     function sealMinter(bytes32 _hash) onlyILFManager {
         assert(sha3(minterAddress)==_hash);
-        minterChangeable = false; 
+        minterChangeable = false;
     }
-    
+
     /// @dev Change burner address. Only usable by manager.
     /// @param _burnerAddress New burner address.
     function changeBurner(address _burnerAddress) external onlyILFManager {
@@ -206,14 +206,14 @@ contract ILF is StandardToken {
     /// @param _hash SHA3 hash of current burner address.
     function sealBurner(bytes32 _hash) onlyILFManager {
         assert(sha3(burnerAddress)==_hash);
-        burnerChangeable = false; 
+        burnerChangeable = false;
     }
 
     /// @dev Disable calling emitToken by manager needed for initial token distribution. Only usable by manager.
     /// @param _hash SHA3 Hash of current manager address.
     function disableManualEmission(bytes32 _hash) onlyILFManager {
         assert(sha3(ILFManager)==_hash);
-        manualEmissionEnabled = false; 
+        manualEmissionEnabled = false;
     }
 
     modifier onlyILFManager() {
@@ -237,4 +237,15 @@ contract ILF is StandardToken {
         _;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

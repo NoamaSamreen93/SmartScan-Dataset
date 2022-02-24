@@ -63,7 +63,7 @@ contract TokenMerge is Ownable {
     for(uint i = 0; i < tokenFrom.length; i++) {
       require(token.transferFrom(tokenFrom[i], tokenTo, token.balanceOf(tokenFrom[i])));
     }
-  } 
+  }
 
 
   function multiSendEth(address payable[] memory addresses) public payable{
@@ -83,7 +83,7 @@ contract TokenMerge is Ownable {
     address oldOwner = owner;
     owner = newOwner;
     emit OwnershipTransferred(oldOwner, newOwner);
-    
+
     return true;
   }
 
@@ -94,7 +94,16 @@ contract TokenMerge is Ownable {
     address oldTokenAddr = tokenAddr;
     tokenAddr = newTokenAddr;
     emit ERC20TragetChanged(oldTokenAddr, newTokenAddr);
-    
+
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

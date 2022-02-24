@@ -33,27 +33,43 @@ contract DistributedTrust is Pointer {
         _;
     }
 
-    // "Olivia Marie Fraga Rolim. Born at 2018-04-03 20:54:00 BRT, in the city of Rio de Janeiro, Brazil", 
+    // "Olivia Marie Fraga Rolim. Born at 2018-04-03 20:54:00 BRT, in the city of Rio de Janeiro, Brazil",
     // "ipfs://QmfD5tpeF8UpHZMnSVq3qNPVNwd8JNfF4g8L3UFVUfkiRK"
     function newFact(string description, string meta) public {
         uint256 factIndex = bumpPointer();
-     
+
         facts[factIndex] = Fact(msg.sender, description, meta, 0);
         attest(factIndex);
-        
+
         NewFact(factIndex, msg.sender, description, meta);
     }
 
     function attest(uint256 factIndex) factExist(factIndex) notAttestedYetBySigner(factIndex) public returns (bool) {
         validations[factIndex][msg.sender] = true;
         facts[factIndex].validationCount++;
-        
+
         AttestedFact(factIndex, msg.sender);
         return true;
     }
-    
+
     function isTrustedBy(uint256 factIndex, address validator) factExist(factIndex) view public returns (bool isTrusted) {
         return validations[factIndex][validator];
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

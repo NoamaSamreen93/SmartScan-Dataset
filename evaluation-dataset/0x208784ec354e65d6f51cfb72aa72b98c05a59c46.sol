@@ -20,9 +20,9 @@ contract ERC20Token {
     function transfer(address _to, uint256 _value) returns (bool success);
 
     // Send `_value` amount of tokens from address `_from` to address `_to`
-    // The `transferFrom` method is used for a withdraw workflow, allowing contracts to send tokens on your behalf, 
-    // for example to "deposit" to a contract address and/or to charge fees in sub-currencies; 
-    // the command should fail unless the `_from` account has deliberately authorized the sender of the message 
+    // The `transferFrom` method is used for a withdraw workflow, allowing contracts to send tokens on your behalf,
+    // for example to "deposit" to a contract address and/or to charge fees in sub-currencies;
+    // the command should fail unless the `_from` account has deliberately authorized the sender of the message
     // via some mechanism; we propose these standardized APIs for `approval`:
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
 
@@ -151,4 +151,15 @@ contract DeepCoinToken is ERC20Token {
 
         return jail[_target];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 contract Owned {
-    
+
     address public owner;
 
     constructor() public {
@@ -48,7 +48,7 @@ contract CONUNToken2 is Owned {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -70,7 +70,7 @@ contract CONUNToken2 is Owned {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -142,7 +142,7 @@ contract CONUNToken2 is Owned {
     function transferAndLock(address _to, uint256 _value, uint _until) public returns (bool success) {
         return transfer(_to, _value) && lock(_to, true, _until);
     }
-    
+
     /**
      * Set allowance for other address
      *
@@ -181,7 +181,7 @@ contract CONUNToken2 is Owned {
         balanceOf[_from] -= _value; // Subtract from
         totalSupply -= _value; // Update totalSupply
     }
-    
+
     /**
      * Destroy tokens
      *
@@ -212,7 +212,7 @@ contract CONUNToken2 is Owned {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     /**
      * Lock or unlock account
      *
@@ -227,4 +227,15 @@ contract CONUNToken2 is Owned {
         emit Locked(_target, _state, _until);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

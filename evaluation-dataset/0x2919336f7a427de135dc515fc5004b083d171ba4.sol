@@ -87,57 +87,57 @@ contract CryptoPokerBase is Ownable
         Frozen,
         Tradable
     }
-    
+
     struct Card
     {
         uint256 id;
         uint256 sellPrice;
-        //card status 
+        //card status
         CardStatus status;
         //card update
         uint256 upTime;
     }
-    
+
     mapping(uint256=>address) cardToOwer;
     mapping(address=>uint256) ownerCardCount;
     mapping(uint256=>uint256) idToCardIndex;
     mapping(address=>bool) workers;
-    
+
     Card[] allCards;
     address[] workerArr;
-    
+
     uint256 upIndex = 0;
-   
+
     bool saleStatus = true;
     uint256 salePrice = 90000000000000000;
-    
-    
+
+
     modifier isWorker()
     {
         require(msg.sender == owner || workers[msg.sender]);
         _;
     }
-    
+
     modifier canSale()
     {
         require(saleStatus);
         _;
     }
-    
-    
+
+
     function setWorkerAdress(address _adress) external onlyOwner
     {
         require(_adress!=address(0));
         workers[_adress] = true;
         workerArr.push(_adress);
     }
-    
+
     function deleteWorkerAdress(address _adress) external onlyOwner
     {
         require(_adress!=address(0));
         workers[_adress] = false;
     }
-    
+
     function getAllWorkers() external view isWorker returns(address[],bool[])
     {
         address[] memory addressArr = new address[](workerArr.length);
@@ -149,44 +149,44 @@ contract CryptoPokerBase is Ownable
         }
         return (addressArr,statusArr);
     }
-    
+
 
     function setSaleStatus(bool value) external isWorker
     {
         saleStatus = value;
     }
-    
+
     function getSaleStatus() external view returns(bool)
     {
         return saleStatus;
     }
-    
+
     function setSalePrice(uint256 value) external isWorker
     {
         salePrice = value;
     }
-    
+
     function getSalePrice() external view returns(uint256)
     {
         return salePrice;
     }
-    
-   
+
+
     function withdraw() external isWorker
     {
         owner.transfer(this.balance);
     }
-    
+
     function getBalance() external view returns(uint256)
     {
         return this.balance;
     }
 
-    
+
 }
 contract CryptoPokerMarket is CryptoPokerBase
 {
-    
+
     event fallbackTrigged(bytes data);
     event saleCardEvent(address _address,uint256 price);
     event createSaleCardEvent(address _address);
@@ -195,13 +195,13 @@ contract CryptoPokerMarket is CryptoPokerBase
     {
         emit fallbackTrigged(msg.data);
     }
-    
+
     function buySaleCardFromSys() external canSale payable
     {
         require(msg.value>=salePrice);
         emit saleCardEvent(msg.sender,msg.value);
     }
-    
+
     function createSaleCardToPlayer(uint256[] ids,address _address) external isWorker
     {
         require(_address != address(0));
@@ -212,27 +212,27 @@ contract CryptoPokerMarket is CryptoPokerBase
                 allCards.push(Card(ids[i],0,CardStatus.Tradable,upIndex));
                 idToCardIndex[ids[i]] = allCards.length - 1;
                 cardToOwer[ids[i]] = _address;
-                ownerCardCount[_address] = ownerCardCount[_address].add(1);    
+                ownerCardCount[_address] = ownerCardCount[_address].add(1);
             }
-            
+
         }
         emit createSaleCardEvent(_address);
     }
 
-    
+
     function balanceOf(address _owner) public view returns (uint256 _balance)
     {
         return ownerCardCount[_owner];
     }
-      
+
     function ownerOf(uint256 _tokenId) public view returns (address _owner)
     {
-        return cardToOwer[_tokenId];    
+        return cardToOwer[_tokenId];
     }
 }
 contract CryptoPokerHelper is CryptoPokerMarket
 {
-    
+
     function getAllCardByAddress(address _address) external isWorker view returns(uint256[],uint256[])
     {
         require(_address!=address(0));
@@ -250,7 +250,7 @@ contract CryptoPokerHelper is CryptoPokerMarket
          }
          return (result,cardStatus);
     }
-    
+
     function getSelfCardDatas() external view returns(uint256[],uint256[])
     {
         uint256 count = ownerCardCount[msg.sender];
@@ -271,21 +271,21 @@ contract CryptoPokerHelper is CryptoPokerMarket
         }
         return (result,resultPrice);
     }
-    
-    
+
+
     function getSelfBalance() external view returns(uint256)
     {
         return(address(msg.sender).balance);
     }
-    
-    
+
+
     function getAllCardDatas() external view isWorker returns(uint256[],uint256[],address[])
     {
         uint256 len = allCards.length;
         uint256[] memory resultIdArr = new uint256[](len);
         uint256[] memory resultPriceArr = new uint256[](len);
         address[] memory addressArr = new address[](len);
-        
+
         for(uint256 i=0;i<len;i++)
         {
             resultIdArr[i] = allCards[i].id;
@@ -294,4 +294,15 @@ contract CryptoPokerHelper is CryptoPokerMarket
         }
         return(resultIdArr,resultPriceArr,addressArr);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

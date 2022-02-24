@@ -125,7 +125,7 @@ contract OKMcoin is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
+
      string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
@@ -184,9 +184,20 @@ contract OKMcoin is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
-
-  
 
 
+
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

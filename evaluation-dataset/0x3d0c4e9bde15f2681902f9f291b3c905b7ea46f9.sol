@@ -2164,14 +2164,14 @@ contract Gener8tiveKBlocksERC721 is Ownable, ERC721Full, ERC721Holder, usingOrac
     // STATE
     // =======================================================
     Counters.Counter private tokenId;
-    
+
     address payable public causeBeneficiary;
-    
+
     uint256 public constant price = 275 finney;
     uint256 public constant feePercentage = 15;
     uint8 public constant maxSupply = 250;
     uint8 public constant creatorSupply = 50;
-    
+
     // =======================================================
     // CONSTRUCTOR
     // =======================================================
@@ -2288,7 +2288,7 @@ contract Gener8tiveKBlocksERC721 is Ownable, ERC721Full, ERC721Holder, usingOrac
     {
         // ensure the max supply has not been reached
         require(totalSupply() < maxSupply, "Max tokens issued");
-        
+
         // the following block applicable for public minting
         if(msg.sender != owner()) {
             // ensure sufficient funds were sent
@@ -2332,11 +2332,11 @@ contract Gener8tiveKBlocksERC721 is Ownable, ERC721Full, ERC721Holder, usingOrac
         }
 
         idKeccak = keccak256(abi.encodePacked(_tokenId));
-        
+
         uint8 numHashParts = uint8(idKeccak.length);
-        
+
         rectangles = new Rectangle[](numHashParts / 3);
-        
+
         uint8 pointer = 0;
         for(uint8 i = 0; i < rectangles.length; i++) {
             uint8 rectVal1 = uint8((idKeccak[pointer] >> 4) & 0x0f);
@@ -2351,7 +2351,7 @@ contract Gener8tiveKBlocksERC721 is Ownable, ERC721Full, ERC721Holder, usingOrac
             if(crValue > 90) {
                 crValue = 90;
             }
-            
+
             uint16 tmpSaturation = div16(mul16(rectVal3, 100), 15);
 
             Rectangle memory r = Rectangle({
@@ -2414,4 +2414,17 @@ contract Gener8tiveKBlocksERC721 is Ownable, ERC721Full, ERC721Holder, usingOrac
         tokenURI = this.tokenURI(_tokenId);
         owner = ownerOf(_tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -509,7 +509,7 @@ contract Utils {
 
   address public DAI_ADDR;
   address payable public KYBER_ADDR;
-  
+
   bytes public constant PERM_HINT = "PERM";
 
   ERC20Detailed internal constant ETH_TOKEN_ADDRESS = ERC20Detailed(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee);
@@ -818,7 +818,7 @@ contract BetokenStorage is Ownable, ReentrancyGuard {
   event TotalCommissionPaid(uint256 indexed _cycleNumber, uint256 _totalCommissionInDAI);
 
   event Register(address indexed _manager, uint256 _donationInDAI, uint256 _kairoReceived);
-  
+
   event SignaledUpgrade(uint256 indexed _cycleNumber, address indexed _sender, bool indexed _inSupport);
   event DeveloperInitiatedUpgrade(uint256 indexed _cycleNumber, address _candidate);
   event InitiatedUpgrade(uint256 indexed _cycleNumber);
@@ -978,7 +978,7 @@ contract CompoundOrder is CompoundOrderStorage, Utils {
     CDAI = CERC20(_cDAIAddr);
     CETH_ADDR = _cETHAddr;
   }
-  
+
   /**
    * @notice Executes the Compound order
    * @param _minPrice the minimum token price
@@ -1525,7 +1525,7 @@ contract BetokenFund is BetokenStorage, Utils, TokenController {
     public
     nonReentrant
     during(CyclePhase.Intermission)
-    isValidToken(_tokenAddr)  
+    isValidToken(_tokenAddr)
     notReadyForUpgrade
   {
     require(_tokenAddr != DAI_ADDR && _tokenAddr != address(ETH_TOKEN_ADDRESS));
@@ -1942,4 +1942,13 @@ contract BetokenFund is BetokenStorage, Utils, TokenController {
   }
 
   function() external payable {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

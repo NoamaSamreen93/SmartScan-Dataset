@@ -31,7 +31,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   /**
   * @dev Adds two numbers, throws on overflow.
   */
@@ -60,7 +60,7 @@ contract AbstractERC20 {
 Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20
 .*/
 contract StandardToken is AbstractERC20 {
-    
+
   using SafeMath for uint256;
 
   mapping (address => uint256) balances;
@@ -158,19 +158,27 @@ contract Token is StandardToken, Owned, Destroyable {
   string constant public name = "TYDO";
   string constant public symbol = "TYD";
   uint8 constant public decimals = 18;
-  
+
   event Burn(address indexed _burner, uint256 _value);
-  
+
   constructor(uint256 _initialSupply) public {
-  
+
     owner = msg.sender;
     balances[owner] = _initialSupply;
     totalSupply = _initialSupply;
   }
-  
+
   function burn(uint256 _amount) external {
 
     _destroy(msg.sender, _amount);
     emit Burn(msg.sender, _amount);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

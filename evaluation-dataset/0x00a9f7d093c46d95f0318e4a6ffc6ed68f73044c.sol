@@ -135,7 +135,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -165,7 +165,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -235,7 +235,7 @@ contract StandardToken is BasicToken, ERC20 {
 
 /**
  * @title SimpleToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator. 
+ * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
@@ -247,7 +247,7 @@ contract AhooleeToken is StandardToken {
   uint256 public INITIAL_SUPPLY = 100000000 * 1 ether;
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function AhooleeToken() {
     totalSupply = INITIAL_SUPPLY;
@@ -354,7 +354,7 @@ contract AhooleeTokenPreSale is Haltable {
     }
 
     function doPurchase(address _owner) private onlyAfter(startTime) onlyBefore(endTime) {
-        
+
         assert(crowdsaleFinished == false);
 
         if (collected.add(msg.value) > hardCap) throw;
@@ -368,7 +368,7 @@ contract AhooleeTokenPreSale is Haltable {
         if (token.balanceOf(msg.sender) + tokens > purchaseLimit) throw;
 
         if (token.balanceOf(msg.sender) == 0) investorCount++;
-      
+
         collected = collected.add(msg.value);
 
         token.transfer(msg.sender, tokens);
@@ -382,4 +382,15 @@ contract AhooleeTokenPreSale is Haltable {
             GoalReached(hardCap);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

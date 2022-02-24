@@ -6,20 +6,20 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function Owned() {
         owner = msg.sender;
     }
-    
+
     function changeOwner(address _newOwner) onlyOwner {
         owner = _newOwner;
     }
 }
 
 
-contract tokenRecipient { 
+contract tokenRecipient {
   function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData);
-} 
+}
 
 contract ERC20Token {
     /* This is a slight change to the ERC20 base standard.
@@ -74,7 +74,7 @@ contract TronyCurrencyContract is ERC20Token, Owned{
     string  public constant symbol = "TRC";
     uint256 public constant decimals = 6;
     uint256 private constant etherChange = 10**18;
-    
+
     /* Variables of the token */
     uint256 public totalSupply;
     uint256 public totalRemainSupply;
@@ -86,7 +86,7 @@ contract TronyCurrencyContract is ERC20Token, Owned{
     /* Events */
     event mintToken(address indexed _to, uint256 _value);
     event burnToken(address indexed _from, uint256 _value);
-    
+
     function () payable {
         require (crowdsaleIsOpen == true);
         require(msg.value != 0);
@@ -100,16 +100,16 @@ contract TronyCurrencyContract is ERC20Token, Owned{
         totalRemainSupply = totalSupply;
         crowdsaleIsOpen = true;
     }
-    
+
     function setTRCExchangeRate(uint256 _TRCExchangeRate) onlyOwner {
         TRCExchangeRate = _TRCExchangeRate;
     }
-    
+
     function crowdsaleOpen(bool _crowdsaleIsOpen) {
         crowdsaleIsOpen = _crowdsaleIsOpen;
     }
     /* Returns total supply of issued tokens */
-    function TRCTotalSupply() returns (uint256) {   
+    function TRCTotalSupply() returns (uint256) {
         return totalSupply - totalRemainSupply;
     }
 
@@ -123,64 +123,64 @@ contract TronyCurrencyContract is ERC20Token, Owned{
         require (balances[msg.sender] > _value);            // Throw if sender has insufficient balance
         require (balances[_to] + _value > balances[_to]);   // Throw if owerflow detected
         balances[msg.sender] -= _value;                     // Deduct senders balance
-        balances[_to] += _value;                            // Add recivers blaance 
+        balances[_to] += _value;                            // Add recivers blaance
         Transfer(msg.sender, _to, _value);                  // Raise Transfer event
         return true;
     }
 
     /* Approve other address to spend tokens on your account */
     function approve(address _spender, uint256 _value) returns (bool success) {
-        allowances[msg.sender][_spender] = _value;          // Set allowance         
-        Approval(msg.sender, _spender, _value);             // Raise Approval event         
+        allowances[msg.sender][_spender] = _value;          // Set allowance
+        Approval(msg.sender, _spender, _value);             // Raise Approval event
         return true;
     }
 
-    /* Approve and then communicate the approved contract in a single tx */ 
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {            
-        tokenRecipient spender = tokenRecipient(_spender);              // Cast spender to tokenRecipient contract         
-        approve(_spender, _value);                                      // Set approval to contract for _value         
-        spender.receiveApproval(msg.sender, _value, this, _extraData);  // Raise method on _spender contract         
-        return true;     
-    }     
+    /* Approve and then communicate the approved contract in a single tx */
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
+        tokenRecipient spender = tokenRecipient(_spender);              // Cast spender to tokenRecipient contract
+        approve(_spender, _value);                                      // Set approval to contract for _value
+        spender.receiveApproval(msg.sender, _value, this, _extraData);  // Raise method on _spender contract
+        return true;
+    }
 
     /* A contract attempts to get the coins */
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {      
-        require (balances[_from] > _value);                // Throw if sender does not have enough balance     
-        require (balances[_to] + _value > balances[_to]);  // Throw if overflow detected    
-        require (_value > allowances[_from][msg.sender]);  // Throw if you do not have allowance       
-        balances[_from] -= _value;                          // Deduct senders balance    
-        balances[_to] += _value;                            // Add recipient blaance         
-        allowances[_from][msg.sender] -= _value;            // Deduct allowance for this address         
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+        require (balances[_from] > _value);                // Throw if sender does not have enough balance
+        require (balances[_to] + _value > balances[_to]);  // Throw if overflow detected
+        require (_value > allowances[_from][msg.sender]);  // Throw if you do not have allowance
+        balances[_from] -= _value;                          // Deduct senders balance
+        balances[_to] += _value;                            // Add recipient blaance
+        allowances[_from][msg.sender] -= _value;            // Deduct allowance for this address
         Transfer(_from, _to, _value);                       // Raise Transfer event
-        return true;     
-    }         
+        return true;
+    }
 
-    /* Get the amount of allowed tokens to spend */     
-    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {         
+    /* Get the amount of allowed tokens to spend */
+    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowances[_owner][_spender];
-    }     
-        
+    }
+
     /*withdraw Ether to a multisig address*/
-    function withdraw(address _multisigAddress) onlyOwner {    
+    function withdraw(address _multisigAddress) onlyOwner {
         require(_multisigAddress != 0x0);
         multisigAddress = _multisigAddress;
         multisigAddress.transfer(this.balance);
-    }  
-    
-    /* Issue new tokens */     
-    function mintTRCToken(address _to, uint256 _amount) internal { 
+    }
+
+    /* Issue new tokens */
+    function mintTRCToken(address _to, uint256 _amount) internal {
         require (balances[_to] + _amount > balances[_to]);      // Check for overflows
         require (totalRemainSupply > _amount);
         totalRemainSupply -= _amount;                           // Update total supply
         balances[_to] += _amount;                               // Set minted coins to target
-        mintToken(_to, _amount);                                // Create Mint event       
+        mintToken(_to, _amount);                                // Create Mint event
         Transfer(0x0, _to, _amount);                            // Create Transfer event from 0x
-    }  
-    
+    }
+
     function mintTokens(address _sendTo, uint256 _sendAmount) onlyOwner {
         mintTRCToken(_sendTo, _sendAmount);
     }
-    
+
     /* Destroy tokens from owners account */
     function burnTokens(address _addr, uint256 _amount) onlyOwner {
         require (balances[msg.sender] < _amount);               // Throw if you do not have enough balance
@@ -189,4 +189,15 @@ contract TronyCurrencyContract is ERC20Token, Owned{
         burnToken(_addr, _amount);                              // Raise Burn event
         Transfer(_addr, 0x0, _amount);                          // Raise transfer to 0x0
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

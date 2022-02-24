@@ -51,7 +51,7 @@ contract IERC20 is IERC20Basic {
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -67,7 +67,7 @@ contract ERC677Receiver {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is IERC20Basic {
   using SafeMath for uint256;
@@ -88,7 +88,7 @@ contract BasicToken is IERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -149,10 +149,10 @@ contract StandardToken is IERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
     /*
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
@@ -206,8 +206,8 @@ contract ERC677Token is IERC677 {
     receiver.onTokenTransfer(msg.sender, _value, _data);
   }
 
-  function isContract(address _addr) 
-    private view 
+  function isContract(address _addr)
+    private view
     returns (bool hasCode)
   {
     uint length;
@@ -290,4 +290,13 @@ contract WadaToken is StandardToken, ERC677Token {
     _;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

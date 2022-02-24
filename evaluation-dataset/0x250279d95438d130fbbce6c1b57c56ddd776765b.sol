@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
     interface IERC20 {
-        
+
         function totalSupply() constant returns (uint256 totalSupply);
         function balanceOf(address _owner) constant returns (uint256 balance);
         function transfer(address _to, uint256 _value) returns (bool success);
@@ -10,7 +10,7 @@ pragma solidity ^0.4.18;
         function allowance(address _owner, address _spender) constant returns (uint256 remaining);
         event Transfer(address indexed _from, address indexed _to, uint256 _value);
         event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-        
+
     }
 
 /**
@@ -47,30 +47,30 @@ library SafeMath {
 }
 
 contract BobCoin is IERC20{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public constant _totalSupply = 10000000000000;
-    
+
     string public constant symbol = "BOB";
     string public constant name = "BobCoin";
     uint8 public constant decimals =6;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function BobCoin(){
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 totalSupply){
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success){
         require(
             balances[msg.sender] >= _value
@@ -81,7 +81,7 @@ contract BobCoin is IERC20{
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
         require(
             allowed[_from][msg.sender] >= _value
@@ -94,17 +94,28 @@ contract BobCoin is IERC20{
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success){
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining){
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

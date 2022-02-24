@@ -371,13 +371,13 @@ contract TUSTOKEN is PausableToken {
         balances[msg.sender] = balances[msg.sender].add(amount);
         totalSupply = totalSupply.add(amount);
     }
-	
+
 	 function decrease(uint amount) public onlyOwner {
         balances[msg.sender] = balances[msg.sender].sub(amount);
         totalSupply = totalSupply.sub(amount);
     }
 
- 
+
 
 
 
@@ -405,4 +405,15 @@ contract TUSTOKEN is PausableToken {
             lockedBalances[receipent] = 0;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

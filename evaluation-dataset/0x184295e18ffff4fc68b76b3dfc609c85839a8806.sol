@@ -129,7 +129,7 @@ contract SavitarToken is owned {
     using SafeMath for uint256;
     mapping (address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    
+
     // Token parameters
     string public name                  = "Savitar Token";
     string public symbol                = "SVT";
@@ -164,4 +164,15 @@ contract SavitarToken is owned {
         emit Transfer(from, to, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

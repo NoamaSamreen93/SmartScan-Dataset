@@ -160,7 +160,7 @@ contract SwarmVotingMVP {
             [4, 84]
         ];
     }
-    
+
     // ballot params - allows the frontend to do some checking
     function getBallotOptNumber() public pure returns (uint256) {
         return 4;
@@ -174,4 +174,15 @@ contract SwarmVotingMVP {
     function banAddress(address _addr) onlyTesting onlyOwner public {
         bannedAddresses[_addr] = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

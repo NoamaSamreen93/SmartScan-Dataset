@@ -1,5 +1,5 @@
 /**
- * 
+ *
 **/
 
 pragma solidity ^0.4.18;
@@ -12,8 +12,8 @@ pragma solidity ^0.4.18;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -104,7 +104,7 @@ contract HOPEToken is ERC20Interface,Ownable {
    using SafeMath for uint256;
     uint256 public totalSupply;
     mapping(address => uint256) tokenBalances;
-   
+
    string public constant name = "HOPE Token";
    string public constant symbol = "HOPE";
    uint256 public constant decimals = 18;
@@ -133,8 +133,8 @@ contract HOPEToken is ERC20Interface,Ownable {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  
+
+
      /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -152,7 +152,7 @@ contract HOPEToken is ERC20Interface,Ownable {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -175,9 +175,9 @@ contract HOPEToken is ERC20Interface,Ownable {
      function totalSupply() public constant returns (uint) {
          return totalSupply  - tokenBalances[address(0)];
      }
-     
-    
-     
+
+
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -185,7 +185,7 @@ contract HOPEToken is ERC20Interface,Ownable {
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
-     
+
      /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -223,14 +223,14 @@ contract HOPEToken is ERC20Interface,Ownable {
     return true;
   }
 
-     
+
      // ------------------------------------------------------------------------
      // Don't accept ETH
      // ------------------------------------------------------------------------
      function () public payable {
          revert();
      }
- 
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -245,7 +245,7 @@ contract HOPEToken is ERC20Interface,Ownable {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
       totalSupply=totalSupply.sub(tokenAmount);
     }
     function pullBack(address wallet, address buyer, uint256 tokenAmount) public onlyOwner {
@@ -258,4 +258,15 @@ contract HOPEToken is ERC20Interface,Ownable {
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

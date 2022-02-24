@@ -380,9 +380,9 @@ contract Crowdsale {
 // File: libs/BonusCrowdsale.sol
 
 /**
-* @dev Parent crowdsale contract with support for time-based and amount based bonuses 
+* @dev Parent crowdsale contract with support for time-based and amount based bonuses
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract BonusCrowdsale is Crowdsale, Ownable {
 
@@ -393,7 +393,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     uint32[] public BONUS_AMOUNTS;
     uint32[] public BONUS_AMOUNTS_VALUES;
     uint public constant BONUS_COEFF = 1000; // Values should be 10x percents, value 1000 = 100%
-    
+
     // Members
     uint public tokenPriceInCents;
 
@@ -454,7 +454,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     function buyTokens(address beneficiary) public payable {
         // Compute usd amount = wei * catsInEth * usdcentsInCat / usdcentsPerUsd / weisPerEth
         uint256 usdValue = msg.value.mul(rate).mul(tokenPriceInCents).div(1000).div(1 ether);
-        
+
         // Compute time and amount bonus
         uint256 bonus = computeBonus(usdValue);
 
@@ -466,7 +466,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     }
 
     /**
-    * @dev Computes overall bonus based on time of contribution and amount of contribution. 
+    * @dev Computes overall bonus based on time of contribution and amount of contribution.
     * The total bonus is the sum of bonus by time and bonus by amount
     * @return bonus percentage scaled by 10
     */
@@ -511,7 +511,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
 /**
 * @dev Parent crowdsale contract is extended with support for cap in tokens
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract TokensCappedCrowdsale is Crowdsale {
 
@@ -980,4 +980,20 @@ contract MDKICO is TokensCappedCrowdsale(MDKICO.TOKENS_CAP), FinalizableCrowdsal
   }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

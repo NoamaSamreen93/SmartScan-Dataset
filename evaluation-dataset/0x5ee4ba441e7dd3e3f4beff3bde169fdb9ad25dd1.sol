@@ -151,7 +151,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -270,7 +270,7 @@ contract BurnableToken is StandardToken {
 
 contract Token is CappedToken, BurnableToken, Withdrawable {
     function Token() CappedToken(2000000000 * 1 ether) StandardToken("GEX", "GEX", 18) public {
-        
+
     }
 }
 
@@ -282,7 +282,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     function Crowdsale() public {
         token = new Token();
         token.mint(0xfd4fA7d9278Df3c80312000760FB6d4ba080D8ab, 200000000 * 1 ether);      // collaboration fund
@@ -308,4 +308,8 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         CrowdsaleClose();
     }
+}
+function() payable external {
+	revert();
+}
 }

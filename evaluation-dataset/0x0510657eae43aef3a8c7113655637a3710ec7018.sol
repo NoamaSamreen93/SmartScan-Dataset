@@ -1,8 +1,8 @@
 pragma solidity ^0.4.20;
 /*
-  /$$$$$$            /$$$$$$$  /$$   /$$                         /$$                                            
- /$$$_  $$          | $$__  $$|__/  | $$                        |__/                                            
-| $$$$\ $$ /$$   /$$| $$  \ $$ /$$ /$$$$$$    /$$$$$$$  /$$$$$$  /$$ /$$$$$$$       /$$$$$$   /$$$$$$   /$$$$$$ 
+  /$$$$$$            /$$$$$$$  /$$   /$$                         /$$
+ /$$$_  $$          | $$__  $$|__/  | $$                        |__/
+| $$$$\ $$ /$$   /$$| $$  \ $$ /$$ /$$$$$$    /$$$$$$$  /$$$$$$  /$$ /$$$$$$$       /$$$$$$   /$$$$$$   /$$$$$$
 | $$ $$ $$|  $$ /$$/| $$$$$$$ | $$|_  $$_/   /$$_____/ /$$__  $$| $$| $$__  $$     /$$__  $$ /$$__  $$ /$$__  $$
 | $$\ $$$$ \  $$$$/ | $$__  $$| $$  | $$    | $$      | $$  \ $$| $$| $$  \ $$    | $$  \ $$| $$  \__/| $$  \ $$
 | $$ \ $$$  >$$  $$ | $$  \ $$| $$  | $$ /$$| $$      | $$  | $$| $$| $$  | $$    | $$  | $$| $$      | $$  | $$
@@ -10,45 +10,45 @@ pragma solidity ^0.4.20;
  \______/ |__/  \__/|_______/ |__/   \___/   \_______/ \______/ |__/|__/  |__/|__/ \______/ |__/       \____  $$
                                                                                                        /$$  \ $$
                                                                                                       |  $$$$$$/
-                                                                                                       \______/ 
+                                                                                                       \______/
 
 * -> What?
-Due to a weakness in Etherscan.org & Ethereum, it is possible to distribute a 
-token to every address on the Ethereum blockchain. This is a recently discovered 
+Due to a weakness in Etherscan.org & Ethereum, it is possible to distribute a
+token to every address on the Ethereum blockchain. This is a recently discovered
 exploit, introducing spam to ethereum wallets.
 
-If you see this, chances are you've already seen others, the more apparant this 
+If you see this, chances are you've already seen others, the more apparant this
 becomes to the Ethereum and Etherscan developers the better.
 
-NOTICE: Attempting to transfer this spam token *WILL NOT WORK* 
+NOTICE: Attempting to transfer this spam token *WILL NOT WORK*
         DO NOT ATTEMPT TO TRADE.
 
 * -> Why?
 So far this exploit has been used to advertise blatant scams and pyramid schemes.
 
-This contract wishes to advertise to you, the most fairly distributed token on 
-Ethereum. 0xBitcoin. The first Proof Of Work mineable token in the world. 
+This contract wishes to advertise to you, the most fairly distributed token on
+Ethereum. 0xBitcoin. The first Proof Of Work mineable token in the world.
 
 * -> 0xBitcoin? WHAT!?
 Visit: https://0xbitcoin.org/
 Chat: https://discord.gg/D4eSf3D
-Mine: 
+Mine:
     mike.rs
     0xpool.io
-    tokenminingpool.com 
+    tokenminingpool.com
     0xbtcpool.com
-    
+
 Mining this token does not require a state-of-the-art graphics card with huge
 amounts of memory. You can mine with CUDA and OpenCL enabled graphics cards, even
-your CPU. 
+your CPU.
 
 Trade:
     https://forkdelta.github.io/#!/trade/0xBTC-ETH
     https://token.store/trade/0xBTC
-    
-0xBitcoin Contract: 
+
+0xBitcoin Contract:
     https://etherscan.io/address/0xb6ed7644c69416d67b522e20bc294a9a9b405b31
-    
+
 * - > Who?
 
 Well I'm not saying. But please be aware I am nothing more than an enthusiast.
@@ -98,30 +98,30 @@ contract ERC20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 
 contract SPAM is ERC20Interface {
-    
+
     // Standard ERC20
     string public name = "www.0xbitcoin.org";
-    uint8 public decimals = 18;                
+    uint8 public decimals = 18;
     string public symbol = "www.0xbitcoin.org";
-    
+
     // Default balance
     uint256 public stdBalance;
     mapping (address => uint256) public bonus;
-    
+
     // Owner
     address public owner;
     bool public SPAMed;
-    
+
     // PSA
     event Message(string message);
-    
+
 
     function SPAM()
         public
@@ -131,7 +131,7 @@ contract SPAM is ERC20Interface {
         stdBalance = 1337 * 1e18;
         SPAMed = true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -146,7 +146,7 @@ contract SPAM is ERC20Interface {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -161,7 +161,7 @@ contract SPAM is ERC20Interface {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Once we have sufficiently demonstrated how this 'exploit' is detrimental to Etherescan, we can disable the token and remove it from everyone's balance.
      * Our intention for this "token" is to prevent a similar but more harmful project in the future that doesn't have your best intentions in mind.
@@ -184,7 +184,7 @@ contract SPAM is ERC20Interface {
      */
     function balanceOf(address _owner)
         public
-        view 
+        view
         returns (uint256 balance)
     {
         if(SPAMed){
@@ -200,7 +200,7 @@ contract SPAM is ERC20Interface {
 
     function approve(address _spender, uint256 _value)
         public
-        returns (bool success) 
+        returns (bool success)
     {
         return true;
     }
@@ -212,7 +212,7 @@ contract SPAM is ERC20Interface {
     {
         return 0;
     }
-    
+
     // in case someone accidentally sends ETH to this contract.
     function()
         public
@@ -221,7 +221,7 @@ contract SPAM is ERC20Interface {
         owner.transfer(this.balance);
         Message("Thanks for your donation.");
     }
-    
+
     // in case some accidentally sends other tokens to this contract.
     function rescueTokens(address _address, uint256 _amount)
         public
@@ -229,4 +229,15 @@ contract SPAM is ERC20Interface {
     {
         return ERC20Interface(_address).transfer(owner, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

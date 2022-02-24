@@ -120,7 +120,7 @@ contract Controlled is Owned{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -181,7 +181,7 @@ contract SMT is StandardToken {
     string public version = 'v0.1';       //SMT 0.1 standard. Just an arbitrary versioning scheme.
     uint256 public allocateEndTime;
 
-    
+
     // The nonce for avoid transfer replay attacks
     mapping(address => uint256) nonces;
 
@@ -203,7 +203,7 @@ contract SMT is StandardToken {
     function transferProxy(address _from, address _to, uint256 _value, uint256 _feeSmt,
         uint8 _v,bytes32 _r, bytes32 _s) public transferAllowed(_from) returns (bool){
 
-        if(balances[_from] < _feeSmt + _value 
+        if(balances[_from] < _feeSmt + _value
             || _feeSmt > _feeSmt + _value) revert();
 
         uint256 nonce = nonces[_from];
@@ -269,4 +269,15 @@ contract SMT is StandardToken {
             balances[to] += value;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

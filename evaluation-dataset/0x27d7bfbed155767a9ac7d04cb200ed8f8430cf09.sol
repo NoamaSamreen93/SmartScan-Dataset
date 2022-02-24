@@ -106,10 +106,10 @@ contract Stoppable is Ownable {
 pragma solidity ^0.4.19;
 
 /* SALE_mtf is the smart contract facilitating MetaFusions first public crowdsale. Created by Iconemy on 11/10/18
- * SALE_mtf allows the owner of the MetaFusion tokens to 'allow' the sale to sell a portion of tokens on his/her behalf, 
- * this will then allow the owner to run further sales in the future by allowing to spend a further portion of tokens. 
- * The sale is stoppable therefore, the owner can stop the sale in an emergency and allow the investors to withdraw their 
- * investments. 
+ * SALE_mtf allows the owner of the MetaFusion tokens to 'allow' the sale to sell a portion of tokens on his/her behalf,
+ * this will then allow the owner to run further sales in the future by allowing to spend a further portion of tokens.
+ * The sale is stoppable therefore, the owner can stop the sale in an emergency and allow the investors to withdraw their
+ * investments.
  */
 contract SALE_mtf is Stoppable {
   using SafeMath for uint256;
@@ -129,7 +129,7 @@ contract SALE_mtf is Stoppable {
   mapping(address => uint256) public tokenBalanceOf;
 
   address public iconemy_wallet;
-  uint256 public commission; 
+  uint256 public commission;
 
   event TokenPurchase(address indexed purchaser, uint256 value, uint256 amount, uint256 datetime);
   event BeneficiaryWithdrawal(address beneficiary, uint256 amount, uint256 datetime);
@@ -150,7 +150,7 @@ contract SALE_mtf is Stoppable {
 
   // Recieve approval is used in the sales interface on the MetaFusion ERC-20 token, allowing the owner to use approveAndCall
   // When this function is called, we check the allowance of the sale the tokens interface and store 1% of that as a maximum commission
-  // We do this to reserve 1% of tokens in the case that the sale sells out, Iconemy will collect the full 1%. 
+  // We do this to reserve 1% of tokens in the case that the sale sells out, Iconemy will collect the full 1%.
   function receiveApproval() onlyOwner external {
     approval = true;
     uint256 allowance = allowanceOf();
@@ -176,7 +176,7 @@ contract SALE_mtf is Stoppable {
   /*
    * This method has taken from Pickeringware ltd
    * We have split this method down into overidable functions which may affect how users purchase tokens
-  */ 
+  */
   function buyTokens() public stopInEmergency payable {
     uint256 weiAmount = msg.value;
 
@@ -234,7 +234,7 @@ contract SALE_mtf is Stoppable {
   }
 
   // Allows someone to check if they are valid for a refund
-  // This can be used front-end to show/hide the collect refund function 
+  // This can be used front-end to show/hide the collect refund function
   function refundAvailable() public view returns(bool) {
     return balanceOf[msg.sender] > 0 && hasHalted();
   }
@@ -269,10 +269,21 @@ contract SALE_mtf is Stoppable {
 
     CommissionCollected(iconemy_wallet, one_percent, now);
   }
-}  
+}
 
 // Token interface used for interacting with the MetaFusion ERC-20 contract
-contract mtfToken { 
-  function transferFrom(address _from, address _to, uint256 _value) public returns (bool success); 
+contract mtfToken {
+  function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
   function allowanceOf(address _owner, address _spender) public constant returns (uint256 remaining);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

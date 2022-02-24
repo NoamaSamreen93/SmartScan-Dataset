@@ -60,7 +60,7 @@ contract Ownable {
     require(newOwner != address(0));
     owner = newOwner;
   }
-  
+
 }
 
 
@@ -69,31 +69,31 @@ contract Ownable {
  * @notice The ERC20 Token for Cove Identity.
  */
 contract Erc20 is IERC20, Ownable {
-    
+
     using SafeMathLib for uint256;
-    
+
     uint256 public constant totalTokenSupply = 100000000 * 10**18;
 
     string public name = "Dontoshi Token";
     string public symbol = "DTD";
     uint8 public constant decimals = 18;
-    
+
     mapping (address => uint256) public balances;
     //approved[owner][spender]
     mapping(address => mapping(address => uint256)) approved;
-    
+
     function Erc20() {
         balances[msg.sender] = totalTokenSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 _totalSupply) {
         return totalTokenSupply;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -113,7 +113,7 @@ contract Erc20 is IERC20, Ownable {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @notice Send `_value` tokens to `_to` on behalf of `_from`
      * @param _from The address of the sender
@@ -126,7 +126,7 @@ contract Erc20 is IERC20, Ownable {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @notice Approve `_value` tokens for `_spender`
      * @param _spender The address of the sender
@@ -140,7 +140,7 @@ contract Erc20 is IERC20, Ownable {
         }
         return false;
     }
-    
+
     /**
      * @notice Check `_value` tokens allowed to `_spender` by `_owner`
      * @param _owner The address of the Owner
@@ -149,9 +149,15 @@ contract Erc20 is IERC20, Ownable {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return approved[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

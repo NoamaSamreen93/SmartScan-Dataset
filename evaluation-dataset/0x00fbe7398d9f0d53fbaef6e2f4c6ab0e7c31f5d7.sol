@@ -331,9 +331,9 @@ contract UAPToken is MintableToken, PausableToken {
   string public constant name = "Auction Universal Program";
   string public constant symbol = "UAP";
   uint8 public constant decimals = 18;
-  
+
   uint256 public initialSuppy = 8680500000 * 10 ** uint256(18);
-  
+
   function UAPToken(address _tokenWallet)  public {
     totalSupply = initialSuppy;
     balances[_tokenWallet] = initialSuppy ;
@@ -374,7 +374,7 @@ contract UAPCrowdsale is Ownable {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   // total tokens to be sold
   uint256 public tokensToSell= 319500000 * 10 ** uint256(18);
 
@@ -404,11 +404,11 @@ contract UAPCrowdsale is Ownable {
 
     mainSaleStartTime = _mainSaleStartTime;
     mainSaleEndTime = _mainSaleEndTime;
-    
+
     rate = _rate;
     wallet = _wallet;
     tokenWallet = _tokenWallet;
-    
+
     isFinalised = false;
   }
 
@@ -435,7 +435,7 @@ contract UAPCrowdsale is Ownable {
 
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
-    
+
     require(tokens <= tokensToSell);
 
     // update state
@@ -468,8 +468,8 @@ contract UAPCrowdsale is Ownable {
     mainSaleEndTime = _mainSaleEndTime;
     return true;
   }
-  
-  // set new Rate  
+
+  // set new Rate
   function setRate(uint256 _rate) public onlyOwner returns(bool){
       require(_rate > 0);
       rate = _rate;
@@ -484,7 +484,7 @@ contract UAPCrowdsale is Ownable {
   function unpauseToken() external onlyOwner {
     UAPToken(token).unpause();
   }
-  
+
   // Transfer token ownership after token sale is completed.
   function transferTokenOwnership(address newOwner) external onlyOwner {
     require(newOwner != 0x0);
@@ -500,10 +500,21 @@ contract UAPCrowdsale is Ownable {
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   // Function to extract funds as required before finalizing
   function fetchFunds() onlyOwner public {
     wallet.transfer(this.balance);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

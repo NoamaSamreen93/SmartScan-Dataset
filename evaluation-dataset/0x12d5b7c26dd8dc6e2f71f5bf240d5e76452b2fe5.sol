@@ -626,7 +626,7 @@ contract DirectCryptTokenPreSale is Haltable, PriceReceiver {
     tokensSold = newTokensSold;
 
     deposited[msg.sender] = deposited[msg.sender].add(msg.value);
-    
+
     NewContribution(_owner, tokens, msg.value);
 
     if (referralBonus > 0 && referral != 0x0) {
@@ -638,4 +638,15 @@ contract DirectCryptTokenPreSale is Haltable, PriceReceiver {
   function calculateReferralBonus(uint tokens) private returns (uint) {
     return tokens.mul(5).div(100);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

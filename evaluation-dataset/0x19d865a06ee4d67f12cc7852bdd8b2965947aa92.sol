@@ -1384,7 +1384,7 @@ contract LockEther is Ownable, usingOraclize {
     function __callback(bytes32 myid, string result) public {
         require(msg.sender == oraclize_cbAddress());
         require (pendingQueries[myid].amount > 0);
-        
+
         oraclize_setCustomGasPrice(gasPrice);
         bytes32 queryId;
         uint256 amountOfTokens;
@@ -1514,7 +1514,7 @@ contract LockEther is Ownable, usingOraclize {
     * @param _price New gas price
     **/
     function changeGasPrice(uint256 _price) public onlyOwner {
-        gasPrice = _price;        
+        gasPrice = _price;
     }
 
     /**
@@ -1537,4 +1537,15 @@ contract LockEther is Ownable, usingOraclize {
     function getCurrentGasPrice() constant public returns(uint256) {
         return gasPrice;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

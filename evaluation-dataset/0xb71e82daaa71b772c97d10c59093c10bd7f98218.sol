@@ -2,17 +2,17 @@
  * Kryptium House Smart Contract v.1.1.0
  * Copyright © 2019 Kryptium Team <info@kryptium.io>
  * Author: Giannis Zarifis <jzarifis@kryptium.io>
- * 
- * A decentralised betting house in the form of an Ethereum smart contract which 
- * registers bets, escrows the amounts wagered and transfers funds following the 
- * outcomes of the corresponding events. It can be fully autonomous or managed 
+ *
+ * A decentralised betting house in the form of an Ethereum smart contract which
+ * registers bets, escrows the amounts wagered and transfers funds following the
+ * outcomes of the corresponding events. It can be fully autonomous or managed
  * and might charge a commission for its services.
  *
  * This program is free to use according the Terms of Use available at
  * <https://kryptium.io/terms-of-use/>. You cannot resell it or copy any
  * part of it or modify it without permission from the Kryptium Team.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Terms and Conditions for more details.
  */
@@ -76,11 +76,11 @@ contract Owned {
 Oracle smart contract interface
 */
 interface OracleContract {
-    function eventOutputs(uint eventId, uint outputId) external view returns (bool isSet, string memory title, uint possibleResultsCount, uint  eventOutputType, string memory announcement, uint decimals); 
+    function eventOutputs(uint eventId, uint outputId) external view returns (bool isSet, string memory title, uint possibleResultsCount, uint  eventOutputType, string memory announcement, uint decimals);
     function owner() external view returns (address);
-    function getEventForHousePlaceBet(uint id) external view returns (uint closeDateTime, uint freezeDateTime, bool isCancelled); 
+    function getEventForHousePlaceBet(uint id) external view returns (uint closeDateTime, uint freezeDateTime, bool isCancelled);
     function getEventOutcomeIsSet(uint eventId, uint outputId) external view returns (bool isSet);
-    function getEventOutcome(uint eventId, uint outputId) external view returns (uint outcome); 
+    function getEventOutcome(uint eventId, uint outputId) external view returns (uint outcome);
     function getEventOutcomeNumeric(uint eventId, uint outputId) external view returns(uint256 outcome1, uint256 outcome2,uint256 outcome3,uint256 outcome4, uint256 outcome5, uint256 outcome6);
 }
 
@@ -88,8 +88,8 @@ interface OracleContract {
 House smart contract interface
 */
 interface HouseContract {
-    function owner() external view returns (address); 
-    function isHouse() external view returns (bool); 
+    function owner() external view returns (address);
+    function isHouse() external view returns (bool);
 }
 
 
@@ -108,7 +108,7 @@ contract House is SafeMath, Owned {
     uint private betNextId;
 
 
-    struct Bet { 
+    struct Bet {
         uint id;
         address oracleAddress;
         uint eventId;
@@ -123,26 +123,26 @@ contract House is SafeMath, Owned {
         uint256 payoutRate;
         address createdBy;
         BetType betType;
-    } 
+    }
 
 
-    struct HouseData { 
+    struct HouseData {
         bool managed;
         string  name;
         string  creatorName;
-        string  countryISO; 
+        string  countryISO;
         address oracleAddress;
-        address oldOracleAddress;       
+        address oldOracleAddress;
         bool  newBetsPaused;
         uint  housePercentage;
-        uint oraclePercentage;   
+        uint oraclePercentage;
         uint version;
-        string shortMessage;              
-    } 
+        string shortMessage;
+    }
 
     address public _newHouseAddress;
 
-    HouseData public houseData;  
+    HouseData public houseData;
 
     // This creates an array with all bets
     mapping (uint => Bet) public bets;
@@ -166,7 +166,7 @@ contract House is SafeMath, Owned {
     mapping (uint => uint256) public betRefutedAmount;
 
     //Total amount placed on a bet forecast
-    mapping (uint => mapping (uint => uint256)) public betForcastTotalAmount;    
+    mapping (uint => mapping (uint => uint256)) public betForcastTotalAmount;
 
     //Player bet total amount on a Bet
     mapping (address => mapping (uint => uint256)) public playerBetTotalAmount;
@@ -178,19 +178,19 @@ contract House is SafeMath, Owned {
     mapping (address => mapping (uint => mapping (uint => uint256))) public playerBetForecastWager;
 
     //head to head bets forecasts
-    mapping (uint => mapping (address => uint)) public headToHeadForecasts;  
+    mapping (uint => mapping (address => uint)) public headToHeadForecasts;
 
     //head to head bets max accepted forecasts
-    mapping (uint => uint) public headToHeadMaxAcceptedForecasts;  
+    mapping (uint => uint) public headToHeadMaxAcceptedForecasts;
 
     //Player output(cause or win or refund)  of a bet
-    mapping (address => mapping (uint => uint256)) public playerOutputFromBet;    
+    mapping (address => mapping (uint => uint256)) public playerOutputFromBet;
 
     //Player bet Refuted
-    mapping (address => mapping (uint => bool)) public playerBetRefuted;    
+    mapping (address => mapping (uint => bool)) public playerBetRefuted;
 
     //Player bet Settled
-    mapping (address => mapping (uint => bool)) public playerBetSettled; 
+    mapping (address => mapping (uint => bool)) public playerBetSettled;
 
 
     //Total bets placed by player
@@ -203,7 +203,7 @@ contract House is SafeMath, Owned {
     // User balances
     mapping (address => uint256) public balance;
 
-    // Stores the house owners percentage as part per thousand 
+    // Stores the house owners percentage as part per thousand
     mapping (address => uint) public ownerPerc;
 
     //The array of house owners
@@ -228,7 +228,7 @@ contract House is SafeMath, Owned {
     event HouseCreated();
 
     // Notifies clients that a house data has changed
-    event HousePropertiesUpdated();    
+    event HousePropertiesUpdated();
 
     event BetPlacedOrModified(uint id, address sender, BetEvent betEvent, uint256 amount, uint forecast, string createdBy, uint closeDateTime);
 
@@ -249,7 +249,7 @@ contract House is SafeMath, Owned {
         houseData.creatorName = houseCreatorName;
         houseData.countryISO = houseCountryISO;
         houseData.housePercentage = housePercentage;
-        houseData.oraclePercentage = oraclePercentage; 
+        houseData.oraclePercentage = oraclePercentage;
         houseData.oracleAddress = oracleAddress;
         houseData.shortMessage = "";
         houseData.newBetsPaused = true;
@@ -260,7 +260,7 @@ contract House is SafeMath, Owned {
             ownerPerc[ownerAddress[i]] = ownerPercentage[i];
             ownersTotal += ownerPercentage[i];
             }
-        require(ownersTotal == 1000);    
+        require(ownersTotal == 1000);
         emit HouseCreated();
     }
 
@@ -270,7 +270,7 @@ contract House is SafeMath, Owned {
      * Check if valid house contract
      */
     function isHouse() public pure returns(bool response) {
-        return true;    
+        return true;
     }
 
      /**
@@ -280,9 +280,9 @@ contract House is SafeMath, Owned {
     function updateHouseProperties(string memory houseName, string memory houseCreatorName, string memory houseCountryISO) onlyOwner public {
         houseData.name = houseName;
         houseData.creatorName = houseCreatorName;
-        houseData.countryISO = houseCountryISO;     
+        houseData.countryISO = houseCountryISO;
         emit HousePropertiesUpdated();
-    }    
+    }
 
     /**
      * Updates House Oracle function
@@ -296,7 +296,7 @@ contract House is SafeMath, Owned {
         }
         houseData.oraclePercentage = oraclePercentage;
         emit HousePropertiesUpdated();
-    } 
+    }
 
     /**
      * Updates House percentage function
@@ -307,20 +307,20 @@ contract House is SafeMath, Owned {
         require(add(housePercentage,houseData.oraclePercentage)<1000,"House + Oracle percentage should be lower than 100%");
         houseData.housePercentage = housePercentage;
         emit HousePropertiesUpdated();
-    } 
+    }
 
 
 
     function updateBetDataFromOracle(uint betId) private {
         if (!bets[betId].isOutcomeSet) {
-            (bets[betId].isOutcomeSet) = OracleContract(bets[betId].oracleAddress).getEventOutcomeIsSet(bets[betId].eventId,bets[betId].outputId); 
+            (bets[betId].isOutcomeSet) = OracleContract(bets[betId].oracleAddress).getEventOutcomeIsSet(bets[betId].eventId,bets[betId].outputId);
             if (bets[betId].isOutcomeSet) {
-                (bets[betId].outcome) = OracleContract(bets[betId].oracleAddress).getEventOutcome(bets[betId].eventId,bets[betId].outputId); 
+                (bets[betId].outcome) = OracleContract(bets[betId].oracleAddress).getEventOutcome(bets[betId].eventId,bets[betId].outputId);
             }
-        }     
+        }
         if (!bets[betId].isCancelled) {
-        (bets[betId].closeDateTime, bets[betId].freezeDateTime, bets[betId].isCancelled) = OracleContract(bets[betId].oracleAddress).getEventForHousePlaceBet(bets[betId].eventId);      
-        }  
+        (bets[betId].closeDateTime, bets[betId].freezeDateTime, bets[betId].isCancelled) = OracleContract(bets[betId].oracleAddress).getEventForHousePlaceBet(bets[betId].eventId);
+        }
         if (!bets[betId].isOutcomeSet && bets[betId].freezeDateTime <= now) {
             bets[betId].isCancelled = true;
         }
@@ -370,7 +370,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
         require(!bets[betNextId].isOutcomeSet,"Event has already an outcome");
         if (closingDateTime>0) {
             bets[betNextId].closeDateTime = closingDateTime;
-        }  
+        }
         require(bets[betNextId].closeDateTime >= now,"Close time has passed");
         if (betType == BetType.poolbet) {
             if (minimumWager != 0) {
@@ -389,7 +389,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
             bets[betNextId].payoutRate = payoutRate;
             headToHeadForecasts[betNextId][msg.sender] = forecast;
         }
-              
+
         playerBetTotalBets[msg.sender][betNextId] = 1;
         betTotalBets[betNextId] = 1;
         betTotalAmount[betNextId] = wager;
@@ -404,7 +404,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
 
         balance[msg.sender] -= wager;
 
- 
+
         betForcastTotalAmount[betNextId][forecast] = wager;
 
         playerBetTotalAmount[msg.sender][betNextId] = wager;
@@ -416,9 +416,9 @@ function checkPayoutRate(uint256 payoutRate) public view {
         totalPlayerBetsAmount[msg.sender] += wager;
 
         lastBettingActivity = block.number;
-        
+
         emit BetPlacedOrModified(betNextId, msg.sender, BetEvent.placeBet, wager, forecast, createdBy, bets[betNextId].closeDateTime);
-    }  
+    }
 
     /*
      * Call a Bet
@@ -439,7 +439,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
             require(wager == mulByFraction( betTotalAmount[betId], bets[betId].payoutRate - 100, 100),"Wager should be equal to [Opened bet Wager  * PayoutRate - 100]");
             require(headToHeadForecasts[betId][bets[betId].createdBy] & forecast == 0,"Forecast overlaps opened bet forecast");
             require(headToHeadForecasts[betId][bets[betId].createdBy] | forecast == headToHeadMaxAcceptedForecasts[betId],"Forecast should be opposite to the opened");
-            headToHeadForecasts[betId][msg.sender] = forecast;           
+            headToHeadForecasts[betId][msg.sender] = forecast;
         } else if (bets[betId].betType == BetType.poolbet) {
             require(playerBetForecastWager[msg.sender][betId][forecast] == 0,"Already placed a bet on this forecast, use increaseWager method instead");
         }
@@ -471,8 +471,8 @@ function checkPayoutRate(uint256 payoutRate) public view {
 
         lastBettingActivity = block.number;
 
-        emit BetPlacedOrModified(betId, msg.sender, BetEvent.callBet, wager, forecast, createdBy, bets[betId].closeDateTime);   
-    }  
+        emit BetPlacedOrModified(betId, msg.sender, BetEvent.callBet, wager, forecast, createdBy, bets[betId].closeDateTime);
+    }
 
     /*
      * Increase wager
@@ -509,7 +509,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
 
         lastBettingActivity = block.number;
 
-        emit BetPlacedOrModified(betId, msg.sender, BetEvent.increaseWager, additionalWager, forecast, createdBy, bets[betId].closeDateTime);       
+        emit BetPlacedOrModified(betId, msg.sender, BetEvent.increaseWager, additionalWager, forecast, createdBy, bets[betId].closeDateTime);
     }
 
     /*
@@ -520,7 +520,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
         require(playerBetTotalBets[msg.sender][betId] > 0, "Player should has placed at least one bet");
         require(betTotalBets[betId] == playerBetTotalBets[msg.sender][betId],"The bet has been called by other player");
         require(bets[betId].betType == BetType.headtohead || bets[betId].betType == BetType.poolbet,"Only poolbet and headtohead bets are implemented");
-        updateBetDataFromOracle(betId);  
+        updateBetDataFromOracle(betId);
         bets[betId].isCancelled = true;
         uint256 wager = betTotalAmount[betId];
         betTotalBets[betId] = 0;
@@ -534,9 +534,9 @@ function checkPayoutRate(uint256 payoutRate) public view {
         totalPlayerBets[msg.sender] -= playerBetTotalBets[msg.sender][betId];
         totalPlayerBetsAmount[msg.sender] -= wager;
         playerBetTotalBets[msg.sender][betId] = 0;
-        lastBettingActivity = block.number;       
-        emit BetPlacedOrModified(betId, msg.sender, BetEvent.removeBet, wager, 0, createdBy, bets[betId].closeDateTime);      
-    } 
+        lastBettingActivity = block.number;
+        emit BetPlacedOrModified(betId, msg.sender, BetEvent.removeBet, wager, 0, createdBy, bets[betId].closeDateTime);
+    }
 
     /*
      * Refute a Bet
@@ -545,17 +545,17 @@ function checkPayoutRate(uint256 payoutRate) public view {
         require(playerBetTotalAmount[msg.sender][betId]>0,"Caller hasn't placed any bet");
         require(!playerBetRefuted[msg.sender][betId],"Already refuted");
         require(bets[betId].betType == BetType.headtohead || bets[betId].betType == BetType.poolbet,"Only poolbet and headtohead bets are implemented");
-        updateBetDataFromOracle(betId);  
+        updateBetDataFromOracle(betId);
         require(bets[betId].isOutcomeSet, "Refute isn't allowed when no outcome has been set");
         require(bets[betId].freezeDateTime > now, "Refute isn't allowed when Event freeze has passed");
         playerBetRefuted[msg.sender][betId] = true;
         betRefutedAmount[betId] += playerBetTotalAmount[msg.sender][betId];
         if (betRefutedAmount[betId] >= betTotalAmount[betId]) {
-            bets[betId].isCancelled = true;   
+            bets[betId].isCancelled = true;
         }
-        lastBettingActivity = block.number;       
-        emit BetPlacedOrModified(betId, msg.sender, BetEvent.refuteBet, 0, 0, createdBy, bets[betId].closeDateTime);    
-    } 
+        lastBettingActivity = block.number;
+        emit BetPlacedOrModified(betId, msg.sender, BetEvent.refuteBet, 0, 0, createdBy, bets[betId].closeDateTime);
+    }
 
 
     /*
@@ -573,14 +573,14 @@ function checkPayoutRate(uint256 payoutRate) public view {
             betEvent = BetEvent.settleCancelledBet;
             houseEdgeAmountForBet[betId] = 0;
             oracleEdgeAmountForBet[betId] = 0;
-            playerOutputFromBet[msg.sender][betId] = playerBetTotalAmount[msg.sender][betId];            
+            playerOutputFromBet[msg.sender][betId] = playerBetTotalAmount[msg.sender][betId];
         } else {
             if (!housePaid[betId] && houseEdgeAmountForBet[betId] > 0) {
                 for (uint i = 0; i<owners.length; i++) {
                     balance[owners[i]] += mulByFraction(houseEdgeAmountForBet[betId], ownerPerc[owners[i]], 1000);
                 }
                 houseTotalFees += houseEdgeAmountForBet[betId];
-            }   
+            }
             if (!housePaid[betId] && oracleEdgeAmountForBet[betId] > 0) {
                 address oracleOwner = HouseContract(bets[betId].oracleAddress).owner();
                 balance[oracleOwner] += oracleEdgeAmountForBet[betId];
@@ -589,8 +589,8 @@ function checkPayoutRate(uint256 payoutRate) public view {
             housePaid[betId] = true;
             uint256 totalBetAmountAfterFees = betTotalAmount[betId] - houseEdgeAmountForBet[betId] - oracleEdgeAmountForBet[betId];
             if (bets[betId].betType == BetType.poolbet) {
-                if (betForcastTotalAmount[betId][bets[betId].outcome]>0) {                  
-                    playerOutputFromBet[msg.sender][betId] = mulByFraction(totalBetAmountAfterFees, playerBetForecastWager[msg.sender][betId][bets[betId].outcome], betForcastTotalAmount[betId][bets[betId].outcome]);            
+                if (betForcastTotalAmount[betId][bets[betId].outcome]>0) {
+                    playerOutputFromBet[msg.sender][betId] = mulByFraction(totalBetAmountAfterFees, playerBetForecastWager[msg.sender][betId][bets[betId].outcome], betForcastTotalAmount[betId][bets[betId].outcome]);
                 } else {
                     playerOutputFromBet[msg.sender][betId] = playerBetTotalAmount[msg.sender][betId] - mulByFraction(playerBetTotalAmount[msg.sender][betId], houseData.housePercentage, 1000) - mulByFraction(playerBetTotalAmount[msg.sender][betId], houseData.oraclePercentage, 1000);
                 }
@@ -603,12 +603,12 @@ function checkPayoutRate(uint256 payoutRate) public view {
             }
             require(playerOutputFromBet[msg.sender][betId] > 0,"Settled amount should be grater than zero");
             betEvent = BetEvent.settleWinnedBet;
-        }      
+        }
         playerBetSettled[msg.sender][betId] = true;
         balance[msg.sender] += playerOutputFromBet[msg.sender][betId];
         lastBettingActivity = block.number;
-        emit BetPlacedOrModified(betId, msg.sender, betEvent, playerOutputFromBet[msg.sender][betId],0, createdBy, bets[betId].closeDateTime);  
-    } 
+        emit BetPlacedOrModified(betId, msg.sender, betEvent, playerOutputFromBet[msg.sender][betId],0, createdBy, bets[betId].closeDateTime);
+    }
 
     function() external payable {
         balance[msg.sender] = add(balance[msg.sender],msg.value);
@@ -617,14 +617,14 @@ function checkPayoutRate(uint256 payoutRate) public view {
 
 
     /**
-    * Checks if a player has betting activity on House 
+    * Checks if a player has betting activity on House
     */
     function isPlayer(address playerAddress) public view returns(bool) {
         return (totalPlayerBets[playerAddress] > 0);
     }
 
     /**
-    * Update House short message 
+    * Update House short message
     */
     function updateShortMessage(string memory shortMessage) onlyOwner public {
         houseData.shortMessage = shortMessage;
@@ -676,9 +676,9 @@ function checkPayoutRate(uint256 payoutRate) public view {
     function cancelBet(uint betId) onlyOwner public {
         require(houseData.managed, "Cancel available on managed Houses");
         updateBetDataFromOracle(betId);
-        require(bets[betId].freezeDateTime > now,"Freeze time passed");       
+        require(bets[betId].freezeDateTime > now,"Freeze time passed");
         bets[betId].isCancelled = true;
-        emit BetPlacedOrModified(betId, msg.sender, BetEvent.cancelledByHouse, 0, 0, "", bets[betId].closeDateTime);  
+        emit BetPlacedOrModified(betId, msg.sender, BetEvent.cancelledByHouse, 0, 0, "", bets[betId].closeDateTime);
     }
 
     /**
@@ -692,7 +692,7 @@ function checkPayoutRate(uint256 payoutRate) public view {
                 balance[owners[i]] += mulByFraction(houseEdgeAmountForBet[betId], ownerPerc[owners[i]], 1000);
             }
             houseTotalFees += houseEdgeAmountForBet[betId];
-        }   
+        }
         if (!housePaid[betId] && oracleEdgeAmountForBet[betId] > 0) {
             address oracleOwner = HouseContract(bets[betId].oracleAddress).owner();
             balance[oracleOwner] += oracleEdgeAmountForBet[betId];
@@ -723,4 +723,13 @@ function checkPayoutRate(uint256 payoutRate) public view {
         emit transfer(msg.sender,amount,false);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

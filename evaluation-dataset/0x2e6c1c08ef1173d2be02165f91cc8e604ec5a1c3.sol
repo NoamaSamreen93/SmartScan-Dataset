@@ -164,11 +164,22 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 /**
-* Special approach to implementing CryptographicCoin (CRTCoin) allowed to create the first world's 
-* cryptocurrency which is ecological, economically beneficial and truly anonymous. 
+* Special approach to implementing CryptographicCoin (CRTCoin) allowed to create the first world's
+* cryptocurrency which is ecological, economically beneficial and truly anonymous.
 */
 contract CRTCoin is MintableToken {
     string public constant name = "CRTCoin";
     string public constant symbol = "CRT";
     uint8 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

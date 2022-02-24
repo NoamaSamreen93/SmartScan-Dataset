@@ -192,7 +192,7 @@ contract EtherShuffle is Operable {
     joinGames(msg.sender, balanceOf);
   }
 
-  
+
 
   function joinGames (address player, uint256 value) private {
 
@@ -203,7 +203,7 @@ contract EtherShuffle is Operable {
       value -= gamePrice;
       joinGame(game, player, gamePrice);
     }
-    
+
     balances[player] += value;
     if (balances[player] < value) revert();
   }
@@ -295,7 +295,7 @@ contract EtherShuffle is Operable {
     Shuffle storage game = games[gameId];
     return game.secret;
   }
-    
+
   function getValue (uint256 gameId) public constant returns (uint256) {
     Shuffle storage game = games[gameId];
     return game.value;
@@ -424,4 +424,12 @@ contract EtherShuffle is Operable {
   function getLowestGameWithoutQuorum () public constant returns (uint256) {
     return lowestGameWithoutQuorum;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

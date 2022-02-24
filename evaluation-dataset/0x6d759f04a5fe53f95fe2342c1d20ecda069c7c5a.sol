@@ -45,7 +45,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -57,7 +57,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -68,7 +68,7 @@ contract ERC20 is ERC20Basic {
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
@@ -112,7 +112,7 @@ contract BasicToken is ERC20Basic {
   }
 
 }
- 
+
 /**
  * @title Standard ERC20 token
  *
@@ -206,7 +206,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
@@ -251,29 +251,29 @@ contract Ownable {
     emit OwnershipRenounced(owner);
     owner = address(0);
   }
-  
+
 }
- 
+
 /**
  * @title Mintable token
  * @dev Simple ERC20 Token example, with mintable token creation
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
+
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event MintStarted();
- 
+
   bool public mintingFinished = false;
- 
+
   modifier canMint() {
     require(!mintingFinished);
     _;
   }
- 
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will recieve the minted tokens.
@@ -287,7 +287,7 @@ contract MintableToken is StandardToken, Ownable {
     emit Transfer(address(0), _to, _amount);
     return true;
   }
- 
+
   /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
@@ -297,7 +297,7 @@ contract MintableToken is StandardToken, Ownable {
     emit MintFinished();
     return true;
   }
-  
+
   /**
    * @dev Function to start minting new tokens.
    * @return True if the operation was successful.
@@ -307,28 +307,28 @@ contract MintableToken is StandardToken, Ownable {
     emit MintStarted();
     return true;
   }
-  
+
 }
 
 contract KassotBasicToken is MintableToken {
-    
-  string public constant name = "Kassot Token";  
-  string public constant symbol = "KATOK";  
+
+  string public constant name = "Kassot Token";
+  string public constant symbol = "KATOK";
   uint8 public constant decimals = 18;
-  
-  uint public constant decimalMultiply = 1000000000000000000;  
-  
+
+  uint public constant decimalMultiply = 1000000000000000000;
+
 }
- 
+
 /*
  * @title KassotToken
  * @dev Kassot token crowdsale contract
  * @dev Author: Alexander Kazorin <akazorin@gmail.com>
- */ 
+ */
 contract KassotToken is ERC20, Ownable {
-  
+
   using SafeMath for uint;
-  
+
   bool public saleFinished = false;
   address internal multisig;
   address internal restricted;
@@ -349,7 +349,7 @@ contract KassotToken is ERC20, Ownable {
   constructor(address _multisig, address _restricted) public {
     multisig = _multisig;
     restricted = _restricted;
-    
+
     // Settings for first round
     restrictedPercent = 10;
     hardcap = 900 * 1 ether;
@@ -370,20 +370,20 @@ contract KassotToken is ERC20, Ownable {
     require(address(this).balance <= hardcap);
     _;
   }
-  
+
   // ERC20 Inteface methods
   function name() public view returns (string) {
     return token.name();
   }
-  
+
   function symbol() public view returns (string) {
     return token.symbol();
   }
-  
+
   function decimals() public view returns (uint8) {
     return token.decimals();
   }
-  
+
   function totalSupply() public view returns (uint256) {
     return token.totalSupply();
   }
@@ -413,57 +413,57 @@ contract KassotToken is ERC20, Ownable {
     multisig = _multisig;
     return true;
   }
-  
+
   function setRestricted(address _restricted) public onlyOwner returns (bool) {
     restricted = _restricted;
     return true;
   }
-  
+
   function setRestrictedPercent(uint _restrictedPercent) public onlyOwner returns (bool) {
     restrictedPercent = _restrictedPercent;
     return true;
   }
-  
+
   function setHardcap(uint _hardcap) public onlyOwner returns (bool) {
     hardcap = _hardcap;
     return true;
   }
-  
+
   function setSoftcap(uint _softcap) public onlyOwner returns (bool) {
     softcap = _softcap;
     return true;
   }
-  
+
   function setRate(uint _rate) public onlyOwner returns (bool) {
     rate = _rate;
     return true;
   }
-  
+
   function setCurrentRound(uint _currentRound) public onlyOwner returns (bool) {
     currentRound = _currentRound;
     return true;
   }
-  
+
   function setFirstBonusPercent(uint _firstBonusPercent) public onlyOwner returns (bool) {
     firstBonusPercent = _firstBonusPercent;
     return true;
   }
-  
+
   function setSecondBonusPercent(uint _secondBonusPercent) public onlyOwner returns (bool) {
     secondBonusPercent = _secondBonusPercent;
     return true;
   }
-  
+
   function setThirdBonusPercent(uint _thirdBonusPercent) public onlyOwner returns (bool) {
     thirdBonusPercent = _thirdBonusPercent;
     return true;
   }
-  
+
   function getMultisig() public view onlyOwner returns (address) {
     // only owner can show address for safety reasons
     return multisig;
   }
-  
+
   function getRestricted() public view onlyOwner returns (address) {
     // only owner can show address for safety reasons
     return restricted;
@@ -471,9 +471,9 @@ contract KassotToken is ERC20, Ownable {
 
   function refund() public {
     require(allowRefund);
-    uint value = balances[currentRound][msg.sender]; 
-    balances[currentRound][msg.sender] = 0; 
-    msg.sender.transfer(value); 
+    uint value = balances[currentRound][msg.sender];
+    balances[currentRound][msg.sender] = 0;
+    msg.sender.transfer(value);
   }
 
   function finishSale() public onlyOwner {
@@ -488,7 +488,7 @@ contract KassotToken is ERC20, Ownable {
     token.finishMinting();
     saleFinished = true;
   }
-  
+
   function startSale() public onlyOwner {
     token.startMinting();
     allowRefund = false;
@@ -500,14 +500,14 @@ contract KassotToken is ERC20, Ownable {
     bonuses[2] = secondBonusPercent;
     bonuses[3] = thirdBonusPercent;
     bonuses[4] = 0;
-    
+
     amounts[1] = 0;
     amounts[2] = 0;
     amounts[3] = 0;
     amounts[4] = 0;
-    
+
     int amount = int(_amount);
-    
+
     uint i = _stage;
     while (amount > 0) {
       if (i > 3) {
@@ -523,7 +523,7 @@ contract KassotToken is ERC20, Ownable {
         break;
       }
     }
-    
+
     uint tokens = 0;
     uint bonusTokens = 0;
     uint _tokens = 0;
@@ -535,15 +535,15 @@ contract KassotToken is ERC20, Ownable {
       bonusTokens = _tokens * bonuses[i] / 100;
       tokens += _tokens + bonusTokens;
     }
-    
+
     return tokens;
   }
-  
+
   function createTokens() public isUnderHardCap saleIsOn payable {
     uint amount = msg.value;
-    uint tokens = 0;    
+    uint tokens = 0;
     uint stageAmount = hardcap.div(4);
-    
+
     if (address(this).balance <= stageAmount) {
       tokens = calculateTokens(amount, 1, stageAmount);
     } else if (address(this).balance <= stageAmount * 2) {
@@ -553,7 +553,7 @@ contract KassotToken is ERC20, Ownable {
     } else {
       tokens = calculateTokens(amount, 4, stageAmount);
     }
-    
+
     token.mint(msg.sender, tokens);
     balances[currentRound][msg.sender] = balances[currentRound][msg.sender].add(amount);
   }
@@ -561,5 +561,13 @@ contract KassotToken is ERC20, Ownable {
   function() external payable {
     createTokens();
   }
-  
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -1268,7 +1268,7 @@ contract AwardsTokensInterface {
 
 contract GAME is GameEventInterface, usingOraclize {
     using SafeMath for uint;
-    
+
     /////////////////////////----- VARIABLES -----////////////////////////////////////
                                                                                     //
     address public owner;                       //Owner of contract                 //
@@ -1297,7 +1297,7 @@ contract GAME is GameEventInterface, usingOraclize {
     }                                                                               //
     //////////////////////////////////////////////////////////////////////////////////
 
-    
+
     /////////////////////////----- CONSTRUCTOR -----//////////////////////////////////
                                                                                     //
     function GAME(                                                                  //
@@ -1338,9 +1338,9 @@ contract GAME is GameEventInterface, usingOraclize {
             queueLength = 0;                                                        // *
     }                                                                               //
     //////////////////////////////////////////////////////////////////////////////////
-    
-    
-    
+
+
+
     ///////////////////////////////  FILL FROM QUEUE    //////////////////////////////
                                                                                     //
     uint    public              queueIndex;                                         //
@@ -1381,7 +1381,7 @@ contract GAME is GameEventInterface, usingOraclize {
                                                                                     //
                 queueFunds = queueFunds.sub(ticketPrice.mul(openTicketsLeft));      //
                                                                                     //
-                BuyTickets(address(this), queueAddress[queueIndex], openTicketsLeft); 
+                BuyTickets(address(this), queueAddress[queueIndex], openTicketsLeft);
                 token.awardToken(queueAddress[queueIndex], openTicketsLeft);        //
                                                                                     //
                 if(ticketsBought >= ticketPool){                                    //
@@ -1406,9 +1406,9 @@ contract GAME is GameEventInterface, usingOraclize {
     }                                                                               //
                                                                                     //
     //////////////////////////////////////////////////////////////////////////////////
-    
-    
-    
+
+
+
     /////////////////////////----- BUY TICKETS -----//////////////////////////////////
                                                                                     //
     function buyTicket(uint in_amount) public payable {                             //
@@ -1422,7 +1422,7 @@ contract GAME is GameEventInterface, usingOraclize {
             queueLength = queueLength.add(1);                                       // *
         }                                                                           // *
                                                                                     //
-        require(msg.value == (ticketPrice.mul(in_amount)));                         //       
+        require(msg.value == (ticketPrice.mul(in_amount)));                         //
         require(amount <= ticketPool.sub(ticketsBought));                           //
         require(in_amount > 0);                                                     //
                                                                                     //
@@ -1531,7 +1531,7 @@ contract GAME is GameEventInterface, usingOraclize {
         }                                                                           // *
     }                                                                               //
     //////////////////////////////////////////////////////////////////////////////////
-    
+
 
     ///////////////////////----- CONTROL FUNCTION -----///////////////////////////////
                                                                                     //
@@ -1545,8 +1545,19 @@ contract GAME is GameEventInterface, usingOraclize {
         msg.sender.transfer(address(this).balance);                                 //
     }                                                                               //
     //////////////////////////////////////////////////////////////////////////////////
-    
+
     function() public payable {
         msg.sender.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

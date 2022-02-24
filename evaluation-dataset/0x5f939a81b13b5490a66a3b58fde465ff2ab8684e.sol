@@ -26,7 +26,7 @@ contract SandwichShop
         string notes;
         uint price;
     }
-    
+
     event NewSandwichTicket( string name, address customer, string sandName, string sandChanges );
 
     Sandwich[5] shopSandwich;
@@ -142,7 +142,7 @@ contract SandwichShop
         {
             if( shopSandwich[ cart[msg.sender][x].sandwichIdNumber ].quantity > 0 )
             {
-                NewSandwichTicket( _firstname, msg.sender, 
+                NewSandwichTicket( _firstname, msg.sender,
                                    shopSandwich[ cart[msg.sender][x].sandwichIdNumber ].sandwichName,
                                    cart[msg.sender][x].notes );
                 decrementQuantity( cart[msg.sender][x].sandwichIdNumber );
@@ -180,4 +180,8 @@ contract SandwichShop
         selfdestruct(owner);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

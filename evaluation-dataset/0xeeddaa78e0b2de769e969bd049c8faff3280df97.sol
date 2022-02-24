@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-interface IERC20 { 
+interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
@@ -10,7 +10,7 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-library SafeMath {    
+library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a, "SafeMath: addition overflow");
@@ -69,7 +69,7 @@ contract ERC20 is IERC20 {
         return _allowances[owner][spender];
     }
 
- 
+
     function approve(address spender, uint256 value) public returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
@@ -134,7 +134,7 @@ contract ERC20Detailed is ERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    
+
     constructor () public ERC20Detailed() {
         _name="Gold Pressed Latinum";
         _symbol="GPL";
@@ -150,4 +150,13 @@ contract ERC20Detailed is ERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

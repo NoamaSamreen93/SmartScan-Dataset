@@ -44,7 +44,7 @@ contract TokenWhitelist is AuctioneerManaged {
 
         return isApproved;
     }
-    
+
     function updateApprovalOfToken(address[] memory token, bool approved) public onlyAuctioneer {
         for (uint i = 0; i < token.length; i++) {
             approvedTokens[token[i]] = approved;
@@ -58,8 +58,8 @@ contract TokenWhitelist is AuctioneerManaged {
 
 /**
  * @title An Ether-ERC20 token price oracle with an unmutable price
- * 
- * @dev The prices are initialized when configuring the contract, then you 
+ *
+ * @dev The prices are initialized when configuring the contract, then you
  *  freeze the contract disallowing any further modification.
  */
 
@@ -137,4 +137,15 @@ contract FixedPriceOracle {
         frozen = true;
         emit Freeze();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

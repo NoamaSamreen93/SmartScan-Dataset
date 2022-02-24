@@ -34,7 +34,7 @@ contract VanityToken is owned, ERC20Interface {
     string  public name = "Vanity Token";
     string  public symbol = "VNT";
     uint8   public decimals = 18;
-    
+
     uint256 public currentSupply = 0;
     uint256 public maxSupply = 1333337;
     uint256 public bonusAmtThreshold = 20000;
@@ -46,7 +46,7 @@ contract VanityToken is owned, ERC20Interface {
     bool    public demo = false;
 
     uint    public windowBonusMax = 43200 seconds;
-    uint    public windowBonusMin = 10800 seconds; 
+    uint    public windowBonusMin = 10800 seconds;
     uint    public windowBonusStep1 = 21600 seconds;
     uint    public windowBonusStep2 = 28800 seconds;
 
@@ -89,7 +89,7 @@ contract VanityToken is owned, ERC20Interface {
         assert(msg.data.length >= size + 4 || msg.data.length == 4);
         _;
     }
- 
+
 
     /**
      * Constrctor function
@@ -99,10 +99,10 @@ contract VanityToken is owned, ERC20Interface {
     function VanityToken() public payable {
         tokenXchangeRate = 300;
         _balanceOf[address(this)] = 0;
-        owner = msg.sender;     
-        setBonuses(false);      
-        //enablePurchasing();              
-        _totalSupply = maxSupply * 10 ** uint256(decimals);  
+        owner = msg.sender;
+        setBonuses(false);
+        //enablePurchasing();
+        _totalSupply = maxSupply * 10 ** uint256(decimals);
     }
 
     function totalSupply() public constant returns (uint) {
@@ -116,7 +116,7 @@ contract VanityToken is owned, ERC20Interface {
     }
 
     function kill() public {
-        if (msg.sender == owner) 
+        if (msg.sender == owner)
             selfdestruct(owner);
     }
 
@@ -126,14 +126,14 @@ contract VanityToken is owned, ERC20Interface {
     function _transfer(address _from, address _to, uint256 _value, uint256 _bonusValue) onlyPayloadSize(4*32) internal returns (bool) {
 
         if (_value == 0 && _bonusValue == 0) {return false;}
-        if (_value!=0&&_bonusValue!=0) {return false;}  
+        if (_value!=0&&_bonusValue!=0) {return false;}
 
         require(_to != 0x0);
-       
-        // Check for overflows[]       
+
+        // Check for overflows[]
         require(_balanceOf[_to] + _value >= _balanceOf[_to]);
         require(bonusOf[_to] + _bonusValue >= bonusOf[_to]);
-        
+
         if (_value > 0) {
             _balanceOf[_from] += _value;
             _balanceOf[_to] += _value;
@@ -142,7 +142,7 @@ contract VanityToken is owned, ERC20Interface {
         } else if (_bonusValue > 0) {
             _balanceOf[_from] += _bonusValue;
             _balanceOf[_to] += _bonusValue;
-            bonusOf[_to] += _bonusValue;     
+            bonusOf[_to] += _bonusValue;
             timeBought[_to] = 0;
             Transfer(_from, _to, _bonusValue);
         }
@@ -177,13 +177,13 @@ contract VanityToken is owned, ERC20Interface {
 
         bool requestedBonus = false;
         uint256 amount = value * tokenXchangeRate;
-        
+
         if (value == bonusSignalValue) {
             require (timeBought[msg.sender] > 0 && transferredAtSupplyValue[msg.sender] > 0);
 
             uint dif = now - timeBought[msg.sender];
             //verify window
-            require (dif <= windowBonusMax && dif >= windowBonusMin); 
+            require (dif <= windowBonusMax && dif >= windowBonusMin);
             requestedBonus = true;
             amount = _balanceOf[msg.sender] - bonusOf[msg.sender];
             assert (amount > 0);
@@ -192,7 +192,7 @@ contract VanityToken is owned, ERC20Interface {
                 amount = amount * 3;
             } else if (dif >= windowBonusStep1) {
                 amount = amount * 2;
-            } 
+            }
 
             if (_balanceOf[address(this)] - transferredAtSupplyValue[msg.sender] < bonusAmtThreshold) {
                 owner.transfer(value);
@@ -201,7 +201,7 @@ contract VanityToken is owned, ERC20Interface {
         }
 
         uint256 newBalance = _balanceOf[address(this)] + amount;
-        require (newBalance <= _totalSupply); 
+        require (newBalance <= _totalSupply);
         owner.transfer(value);
 
         currentSupply = newBalance;
@@ -212,10 +212,10 @@ contract VanityToken is owned, ERC20Interface {
         } else {
             _transfer(address(this), msg.sender, 0, amount);
         }
-       
+
     }
-    
- 
+
+
    /**
      * Transfer tokens
      *
@@ -311,6 +311,12 @@ contract VanityToken is owned, ERC20Interface {
         purchasingAllowed = false;
     }
 
-    
 
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

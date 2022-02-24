@@ -4,12 +4,12 @@ contract StandardERC20Factory {
 
   // index of created contracts
 
-  mapping (address => bool) public validContracts; 
+  mapping (address => bool) public validContracts;
   address[] public contracts;
 
   // useful to know the row count in contracts index
 
-  function getContractCount() 
+  function getContractCount()
     public
     view
     returns(uint contractCount)
@@ -677,7 +677,7 @@ contract StandardERC20 is MinterRole, ERC20Burnable, ERC20Pausable {
         _addMinter(_owner);
         _addPauser(_owner);
     }
-    
+
     /**
      * @dev See `ERC20._mint`.
      *
@@ -689,7 +689,7 @@ contract StandardERC20 is MinterRole, ERC20Burnable, ERC20Pausable {
         _mint(account, amount);
         return true;
     }
-    
+
     /**
      * @dev See `ERC20Mintable.mint`.
      *
@@ -732,11 +732,22 @@ contract StandardERC20 is MinterRole, ERC20Burnable, ERC20Pausable {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     /**
      * @dev Returns the cap on the token's total supply.
      */
     function cap() public view returns (uint256) {
         return _cap;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

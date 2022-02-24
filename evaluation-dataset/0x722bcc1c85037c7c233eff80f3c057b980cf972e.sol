@@ -102,7 +102,7 @@ contract Package is ZOSLibOwnable {
   struct Version {
     uint64[3] semanticVersion;
     address contractAddress;
-    bytes contentURI; 
+    bytes contentURI;
   }
 
   mapping (bytes32 => Version) internal versions;
@@ -116,7 +116,7 @@ contract Package is ZOSLibOwnable {
    */
   function getVersion(uint64[3] memory semanticVersion) public view returns (address contractAddress, bytes memory contentURI) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
-    return (version.contractAddress, version.contentURI); 
+    return (version.contractAddress, version.contentURI);
   }
 
   /**
@@ -132,7 +132,7 @@ contract Package is ZOSLibOwnable {
 
   /**
    * @dev Adds a new version to the package. Only the Owner can add new versions.
-   * Reverts if the specified semver identifier already exists. 
+   * Reverts if the specified semver identifier already exists.
    * Emits a `VersionAdded` event if successful.
    * @param semanticVersion Semver identifier of the version.
    * @param contractAddress Contract address for the version, must be non-zero.
@@ -146,7 +146,7 @@ contract Package is ZOSLibOwnable {
     // Register version
     bytes32 versionId = semanticVersionHash(semanticVersion);
     versions[versionId] = Version(semanticVersion, contractAddress, contentURI);
-    
+
     // Update latest major
     uint64 major = semanticVersion[0];
     if (major > latestMajor) {
@@ -158,9 +158,9 @@ contract Package is ZOSLibOwnable {
     uint64 patch = semanticVersion[2];
     uint64[3] storage latestVersionForMajor = versions[majorToLatestVersion[major]].semanticVersion;
     if (semanticVersionIsZero(latestVersionForMajor) // No latest was set for this major
-       || (minor > latestVersionForMajor[1]) // Or current minor is greater 
+       || (minor > latestVersionForMajor[1]) // Or current minor is greater
        || (minor == latestVersionForMajor[1] && patch > latestVersionForMajor[2]) // Or current patch is greater
-       ) { 
+       ) {
       majorToLatestVersion[major] = versionId;
     }
 
@@ -179,7 +179,7 @@ contract Package is ZOSLibOwnable {
 
   /**
    * @dev Returns the version with the highest semver identifier registered in the package.
-   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless 
+   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless
    * of the order in which they were registered. Returns zero if no versions are registered.
    * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
@@ -189,7 +189,7 @@ contract Package is ZOSLibOwnable {
 
   /**
    * @dev Returns the version with the highest semver identifier for the given major.
-   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will return `1.3.0` for major `1`, 
+   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will return `1.3.0` for major `1`,
    * regardless of the order in which they were registered. Returns zero if no versions are registered
    * for the specified major.
    * @param major Major identifier to query
@@ -197,7 +197,7 @@ contract Package is ZOSLibOwnable {
    */
   function getLatestByMajor(uint64 major) public view returns (uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) {
     Version storage version = versions[majorToLatestVersion[major]];
-    return (version.semanticVersion, version.contractAddress, version.contentURI); 
+    return (version.semanticVersion, version.contractAddress, version.contentURI);
   }
 
   function semanticVersionHash(uint64[3] memory version) internal pure returns (bytes32) {
@@ -207,4 +207,10 @@ contract Package is ZOSLibOwnable {
   function semanticVersionIsZero(uint64[3] memory version) internal pure returns (bool) {
     return version[0] == 0 && version[1] == 0 && version[2] == 0;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

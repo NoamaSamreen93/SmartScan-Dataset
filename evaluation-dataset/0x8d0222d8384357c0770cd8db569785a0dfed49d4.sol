@@ -236,7 +236,7 @@ contract Pausable is Ownable {
  * @dev Token that can be irreversibly burned (destroyed).
  */
 contract BurnableToken is StandardToken {
- 
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -248,9 +248,9 @@ contract BurnableToken is StandardToken {
     totalSupply = totalSupply.sub(_value);
     Burn(burner, _value);
   }
- 
+
   event Burn(address indexed burner, uint indexed value);
- 
+
 }
 
 /**
@@ -430,4 +430,15 @@ contract HamsterMarketplaceToken is BurnableToken, Pausable {
       msg.sender.transfer(amount);
       return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

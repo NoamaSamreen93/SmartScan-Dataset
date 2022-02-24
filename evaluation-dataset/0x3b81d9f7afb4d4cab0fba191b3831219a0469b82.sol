@@ -23,15 +23,15 @@ library SafeMath {
     }
 }
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract Base {
     using SafeMath for uint256;
 
     uint public createDay;
-    
+
     address public owner;
 
     modifier onlyOwner {
@@ -55,21 +55,21 @@ contract Base {
         require(_newAdmin != address(0x0));
         admin = _newAdmin;
     }
-    
-    mapping(address => bool) public blacklistOf;   
+
+    mapping(address => bool) public blacklistOf;
 
     function addBlacklist(address _Addr) external onlyAdmin {
-        require (_Addr != address(0x0));  
+        require (_Addr != address(0x0));
         blacklistOf[_Addr] = true;
-    }  
+    }
 
     function delBlacklist(address _Addr) external onlyAdmin {
-        require (_Addr != address(0x0));  
+        require (_Addr != address(0x0));
         blacklistOf[_Addr] = false;
     }
-    
-    function isBlacklist(address _Addr) public view returns(bool _result) {  
-        require (_Addr != address(0x0));  
+
+    function isBlacklist(address _Addr) public view returns(bool _result) {
+        require (_Addr != address(0x0));
         _result = (now <  (createDay + 90 days) * (1 days)) && blacklistOf[_Addr];
     }
 
@@ -118,7 +118,7 @@ contract TokenERC20 is Base {
         return true;
     }
 
-    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success) 
+    function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -128,9 +128,9 @@ contract TokenERC20 is Base {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);                          
-        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);         
-        totalSupply = totalSupply.sub(_value);                             
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -144,22 +144,22 @@ contract TokenERC20 is Base {
 
 
 contract TokenBNH is TokenERC20 {
-    
+
     function TokenBNH(address _owner, address _admin) public {
- 
+
         require(_owner != address(0x0));
         require(_admin != address(0x0));
         owner = _owner;
         admin = _admin;
 
-        totalSupply = 1000000000 * 10 ** uint256(decimals);    
+        totalSupply = 1000000000 * 10 ** uint256(decimals);
         uint toOwner =  47500000 * 10 ** uint256(decimals);
-        uint toAdmin =   2500000 * 10 ** uint256(decimals);        
-        balanceOf[address(this)] = totalSupply - toOwner - toAdmin;               
-        balanceOf[owner] = toOwner;                            
-        balanceOf[admin] = toAdmin;                        
-        name = "BBB";                                    
-        symbol = "BBB";                                     
+        uint toAdmin =   2500000 * 10 ** uint256(decimals);
+        balanceOf[address(this)] = totalSupply - toOwner - toAdmin;
+        balanceOf[owner] = toOwner;
+        balanceOf[admin] = toAdmin;
+        name = "BBB";
+        symbol = "BBB";
         createDay = now / (1 days);
     }
 
@@ -194,7 +194,7 @@ contract TokenBNH is TokenERC20 {
         _result = true;
     }
 
-    mapping(uint => uint) dayFillOf;    
+    mapping(uint => uint) dayFillOf;
 
     function getDay(uint _time) public pure returns (uint _day)
     {
@@ -206,9 +206,9 @@ contract TokenBNH is TokenERC20 {
         require(_day >= createDay);
         uint AddDays = _day - createDay;
         uint Power = AddDays / 200;
-        
+
         _amount = 400000;
-        _amount = _amount.mul(10 ** uint(decimals));      
+        _amount = _amount.mul(10 ** uint(decimals));
         for(uint i = 0; i < Power; i++)
         {
             require(_amount > 0);
@@ -223,11 +223,11 @@ contract TokenBNH is TokenERC20 {
         require(max >= fill);
         _toUserAmount = (max - fill).mul(95) / 100;
     }
-    
+
     event OnIssue1(uint indexed _day, address[]  _tos, uint256 _amount, address _sender);
 
-    function issue1(uint _day, address[] _tos, uint256 _amount) external onlyOwner 
-    {      
+    function issue1(uint _day, address[] _tos, uint256 _amount) external onlyOwner
+    {
         require(_day * (1 days) <= now);
         require(_amount > 0);
         uint toAdminAmountAll = 0;
@@ -249,9 +249,9 @@ contract TokenBNH is TokenERC20 {
 
     event OnIssue2(uint indexed _day, address[]  _tos, uint256[]  _amounts, address _sender);
 
-    function issue2(uint _day, address[] _tos, uint256[] _amounts) external onlyOwner 
+    function issue2(uint _day, address[] _tos, uint256[] _amounts) external onlyOwner
     {
-      
+
         require(_day * (1 days) <= now);
         require(_tos.length == _amounts.length);
         uint toAdminAmountAll = 0;
@@ -271,9 +271,20 @@ contract TokenBNH is TokenERC20 {
         require(_transfer(address(this), admin, toAdminAmountAll));
         emit OnIssue2(_day, _tos, _amounts, msg.sender);
     }
-    
+
     function() payable external {
-       
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

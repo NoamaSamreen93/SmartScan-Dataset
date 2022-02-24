@@ -99,14 +99,14 @@ contract Operator {
     }
 
     constructor () public { admin = msg.sender; }
-    
+
     modifier mustBeAdmin() {
         require(msg.sender == admin || msg.sender == querierAddress || msg.sender == admin2);
         _;
     }
 
     modifier mustBeImporting() { require(importing); require(msg.sender == querierAddress || msg.sender == admin); _; }
-    
+
     function () payable external { deposit(); }
 
     function getNow() internal view returns(uint256) {
@@ -124,7 +124,7 @@ contract Operator {
         bytes32 id = keccak256(abi.encodePacked(block.number, getNow(), sender, msg.value));
         uint256 investmentValue = investor.depositedAmount + msg.value <= MAX_DEP ? msg.value : MAX_DEP - investor.depositedAmount;
         if (investmentValue == 0) return;
-        bool nextBranch = investors[investor.parent].leftChild == sender; 
+        bool nextBranch = investors[investor.parent].leftChild == sender;
         Investment memory investment = Investment({ id: id, at: getNow(), amount: investmentValue, investor: sender, nextInvestor: investor.parent, nextBranch: nextBranch  });
         investments[id] = investment;
         processInvestments(id);
@@ -138,9 +138,9 @@ contract Operator {
         maxOuts[id] = maxOut;
         investors[investorAddress].minDeposit = depositedAmount;
     }
-    
+
     function deposit() payable public { depositProcess(msg.sender); }
-    
+
     function processInvestments(bytes32 investmentId) internal {
         Investment storage investment = investments[investmentId];
         uint256 amount = investment.amount;
@@ -216,7 +216,7 @@ contract Operator {
         if (investor.reserveCommission > 0) payWithNoMaxOut(investor.reserveCommission, investorAddress, 4, address(0), 0);
         payWithNoMaxOut(value, investorAddress, reason, presentee, times);
     }
-    
+
     function payWithNoMaxOut(uint256 amountToPay, address payable investorAddress, uint256 reason, address presentee, uint256 times) internal {
         investors[investorAddress].withdrewAmount += amountToPay;
         if (reason == 4) investors[investorAddress].reserveCommission = 0;
@@ -224,7 +224,7 @@ contract Operator {
         if (reason == 2) investors[investorAddress].dailyIncomeWithrewAmount += amountToPay;
         pay(amountToPay, investorAddress, reason, presentee, times);
     }
-    
+
     function payWithMaxOut(uint256 totalPaidAfterThisTime, address payable investorAddress, uint256 unpaidSystemCommission) internal {
         Investor storage investor = investors[investorAddress];
         uint256 amountToPay = investor.depositedAmount * 3 - investor.withdrewAmount;
@@ -270,9 +270,9 @@ contract Operator {
             require(presenter.generation != 0);
             require(parent.generation != 0);
             if (isLeft) {
-                require(parent.leftChild == address(0)); 
+                require(parent.leftChild == address(0));
             } else {
-                require(parent.rightChild == address(0)); 
+                require(parent.rightChild == address(0));
             }
         }
         Investor memory investor = Investor({
@@ -299,7 +299,7 @@ contract Operator {
             dailyIncomeWithrewAmount: 0
         });
         investors[presenteeAddress] = investor;
-       
+
         investorAddresses.push(presenteeAddress);
         if (parent.generation == 0) return;
         if (isLeft) {
@@ -315,7 +315,7 @@ contract Operator {
         uint256 dailyIncome = 0;
         for (uint256 i = 0; i < investmentLength; i++) {
             Investment memory investment = investments[investor.investments[i]];
-            if (investment.at < investor.lastMaxOut) continue; 
+            if (investment.at < investor.lastMaxOut) continue;
             if (getNow() - investment.at >= ONE_DAY) {
                 uint256 numberOfDay = (getNow() - investment.at) / ONE_DAY;
                 uint256 totalDailyIncome = numberOfDay * investment.amount / 100 * 2 / 3;
@@ -324,7 +324,7 @@ contract Operator {
         }
         return dailyIncome - investor.dailyIncomeWithrewAmount;
     }
-    
+
     function payDailyIncomeForInvestor(address payable investorAddress, uint256 times) public mustBeAdmin {
         uint256 dailyIncome = getDailyIncomeForUser(investorAddress);
         Investor storage investor = investors[investorAddress];
@@ -338,7 +338,7 @@ contract Operator {
         if (investor.isDisabled) return;
         sendEtherForInvestor(investorAddress, dailyIncome, 2, address(0), times);
     }
-    
+
     function payDailyIncomeByIndex(uint256 from, uint256 to) public mustBeAdmin{
         require(from >= 0 && to < investorAddresses.length);
         for(uint256 i = from; i <= to; i++) {
@@ -357,7 +357,7 @@ contract Operator {
         uint256 commission = sellToPaySystemCommission * getPercentage(depositedAmount, totalSell, sellThisMonth) / 100;
         return commission;
     }
-    
+
     function paySystemCommissionInvestor(address payable investorAddress, uint256 times) public mustBeAdmin {
         Investor storage investor = investors[investorAddress];
         if (investor.isDisabled) return;
@@ -386,17 +386,17 @@ contract Operator {
             paySystemCommissionInvestor(address(uint160(investorAddresses[i])), paySystemCommissionTimes);
         }
     }
-    
+
     function finishPayDailyIncome() public mustBeAdmin {
         lastPayDailyIncome = getNow();
         payDailyIncomeTimes++;
     }
-    
+
     function finishPaySystemCommission() public mustBeAdmin {
         lastPaySystemCommission = getNow();
         paySystemCommissionTimes++;
     }
-    
+
     function resetGame(uint256 from, uint256 to) public mustBeAdmin {
         require(from >= 0 && to < investorAddresses.length);
         require(currentVote.startTime != 0);
@@ -435,7 +435,7 @@ contract Operator {
                 investor.totalSell = 0;
                 investor.sellThisMonth = 0;
             }
-            
+
         }
     }
 
@@ -457,7 +457,7 @@ contract Operator {
             sendEtherForInvestor(investorAddress, depositedAmount * percent / 100 - withdrewAmount, 6, address(0), 0);
         }
     }
-    
+
     function revivalInvestor(address investor) public mustBeAdmin { investors[investor].lastMaxOut = getNow(); }
 
     function payToReachMaxOut(address payable investorAddress) public mustBeAdmin {
@@ -485,12 +485,12 @@ contract Operator {
         Investor storage investor = investors[investorAddress];
         investor.isDisabled = true;
     }
-    
+
     function enableInvestor(address investorAddress) public mustBeAdmin {
         Investor storage investor = investors[investorAddress];
         investor.isDisabled = false;
     }
-    
+
     function donate() payable public { depositedAmountGross += msg.value; }
 
     function getTotalSellLevel(uint256 totalSell) internal pure returns (uint256 level){
@@ -510,7 +510,7 @@ contract Operator {
         if (sellThisMonth < 10 ether) return 4;
         return 5;
     }
-    
+
     function getDepositLevel(uint256 depositedAmount) internal pure returns (uint256 level){
         if (depositedAmount < 2 ether) return 0;
         if (depositedAmount < 4 ether) return 1;
@@ -519,7 +519,7 @@ contract Operator {
         if (depositedAmount < 10 ether) return 4;
         return 5;
     }
-    
+
     function getPercentage(uint256 depositedAmount, uint256 totalSell, uint256 sellThisMonth) internal pure returns(uint256 level) {
         uint256 totalSellLevel = getTotalSellLevel(totalSell);
         uint256 depLevel = getDepositLevel(depositedAmount);
@@ -528,13 +528,13 @@ contract Operator {
         uint256 minLevel = sellThisMonthLevel < min12 ? sellThisMonthLevel : min12;
         return minLevel * 2;
     }
-    
+
     function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) return 0x0;
         assembly { result := mload(add(source, 32)) }
     }
-    
+
     function getInvestor(address investorAddress) view public returns (address[] memory addresses, bool isDisabled, uint256[] memory numbers) {
         addresses = new address[](4);
         numbers = new uint256[](16);
@@ -565,7 +565,7 @@ contract Operator {
     function getInvestorLength() view public returns(uint256) { return investorAddresses.length; }
 
     function getMaxOutsLength() view public returns(uint256) { return maxOutIds.length; }
-    
+
     function getNodesAddresses(address rootNodeAddress) public view returns(address[] memory){
         uint256 maxLength = investorAddresses.length;
         address[] memory nodes = new address[](maxLength);
@@ -579,11 +579,11 @@ contract Operator {
         }
         return nodes;
     }
-    
+
     function getInvestmentsLength () public view returns(uint256 length) { return investmentIds.length; }
-    
+
     function getWithdrawalsLength() public view returns(uint256 length) { return withdrawalIds.length; }
-    
+
     function importInvestor(address[] memory addresses, bool isDisabled, uint256[] memory numbers) public mustBeImporting {
         if (investors[addresses[4]].generation != 0) return;
         Investor memory investor = Investor({
@@ -612,7 +612,7 @@ contract Operator {
         investors[addresses[4]] = investor;
         investorAddresses.push(addresses[4]);
     }
-    
+
     function importInvestments(bytes32 id, uint256 at, uint256 amount, address investorAddress) public mustBeImporting {
         if (investments[id].at != 0) return;
         Investment memory investment = Investment({ id: id, at: at, amount: amount, investor: investorAddress, nextInvestor: address(0), nextBranch: false });
@@ -622,7 +622,7 @@ contract Operator {
         investor.investments.push(id);
         depositedAmountGross += amount;
     }
-    
+
     function importWithdrawals(bytes32 id, uint256 at, uint256 amount, address investorAddress, address presentee, uint256 reason, uint256 times) public mustBeImporting {
         if (withdrawals[id].at != 0) return;
         Withdrawal memory withdrawal = Withdrawal({ id: id, at: at, amount: amount, investor: investorAddress, presentee: presentee, times: times, reason: reason });
@@ -631,7 +631,7 @@ contract Operator {
         investor.withdrawals.push(id);
         withdrawalIds.push(id);
     }
-    
+
     function finishImporting() public mustBeAdmin { importing = false; }
 
     function finalizeVotes(uint256 from, uint256 to, bool isRemoving) public mustBeAdmin {
@@ -671,7 +671,7 @@ contract Operator {
             totalPoint: 0
         });
     }
-    
+
     function sendEtherToNewContract() public mustBeAdmin {
         require(currentVote.startTime != 0);
         require(getNow() - currentVote.startTime > 3 * ONE_DAY);
@@ -697,9 +697,9 @@ contract Operator {
             currentVote.yesPoint -= getVoteShare();
         }
     }
-    
+
     function vote(bool isYes) public { voteProcess(msg.sender, isYes); }
-    
+
     function updateVote(bool isYes) internal {
         currentVote.votes[msg.sender] = isYes ? 2 : 1;
         if (isYes) {
@@ -708,13 +708,13 @@ contract Operator {
             currentVote.noPoint += getVoteShare();
         }
     }
-    
+
     function getVoteShare() public view returns(uint256) {
         if (investors[msg.sender].generation >= 3) return 1;
         if (currentVote.totalPoint > 40) return currentVote.totalPoint / 20;
         return 2;
     }
-    
+
     function setQuerier(address _querierAddress) public mustBeAdmin {
         querierAddress = _querierAddress;
     }
@@ -735,4 +735,10 @@ contract Operator {
     function depositFor(address investor) public payable mustBeAdmin {
         depositProcess(investor);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

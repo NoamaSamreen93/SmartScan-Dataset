@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -68,7 +68,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -76,7 +76,7 @@ contract EtheremonEnum {
         STAT_BASE,
         OBJ_SKILL
     }
-    
+
     enum PropertyType {
         ANCESTOR,
         XFACTOR
@@ -84,15 +84,15 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function addElementToArrayType(EtheremonEnum.ArrayType _type, uint64 _id, uint8 _value) external returns(uint);
     function addMonsterObj(uint32 _classId, address _trainer, string _name) external returns(uint64);
     function removeMonsterIdMapping(address _trainer, uint64 _monsterId) external;
-    
+
     // read
     function getElementInArrayType(EtheremonEnum.ArrayType _type, uint64 _id, uint _index) constant external returns(uint8);
     function getMonsterClass(uint32 _classId) constant external returns(uint32 classId, uint256 price, uint256 returnPrice, uint32 total, bool catchable);
@@ -102,7 +102,7 @@ contract EtheremonDataBase {
 contract EtheremonWorldNFT is BasicAccessControl {
     uint8 constant public STAT_COUNT = 6;
     uint8 constant public STAT_MAX = 32;
-    
+
     struct MonsterClassAcc {
         uint32 classId;
         uint256 price;
@@ -121,26 +121,26 @@ contract EtheremonWorldNFT is BasicAccessControl {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     address public dataContract;
     address public monsterNFT;
-    
+
     mapping(uint32 => bool) classWhitelist;
     mapping(address => bool) addressWhitelist;
-    
+
     uint public gapFactor = 5;
     uint public priceIncreasingRatio = 1000;
-    
+
     function setContract(address _dataContract, address _monsterNFT) onlyModerators external {
         dataContract = _dataContract;
         monsterNFT = _monsterNFT;
     }
-    
+
     function setConfig(uint _gapFactor, uint _priceIncreasingRatio) onlyModerators external {
         gapFactor = _gapFactor;
         priceIncreasingRatio = _priceIncreasingRatio;
     }
-    
+
     function setClassWhitelist(uint32 _classId, bool _status) onlyModerators external {
         classWhitelist[_classId] = _status;
     }
@@ -148,14 +148,14 @@ contract EtheremonWorldNFT is BasicAccessControl {
     function setAddressWhitelist(address _smartcontract, bool _status) onlyModerators external {
         addressWhitelist[_smartcontract] = _status;
     }
-    
+
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public {
         if (_amount > address(this).balance) {
             revert();
         }
         _sendTo.transfer(_amount);
     }
-    
+
     function mintMonster(uint32 _classId, address _trainer, string _name) onlyModerators external returns(uint){
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         // add monster
@@ -168,11 +168,11 @@ contract EtheremonWorldNFT is BasicAccessControl {
             value = uint8(seed % STAT_MAX) + data.getElementInArrayType(EtheremonEnum.ArrayType.STAT_START, uint64(_classId), i);
             data.addElementToArrayType(EtheremonEnum.ArrayType.STAT_BASE, objId, value);
         }
-        
+
         EtheremonMonsterNFTInterface(monsterNFT).triggerTransferEvent(address(0), _trainer, objId);
         return objId;
     }
-    
+
     function burnMonster(uint64 _tokenId) onlyModerators external {
         // need to check condition before calling this function
         EtheremonDataBase data = EtheremonDataBase(dataContract);
@@ -182,35 +182,35 @@ contract EtheremonWorldNFT is BasicAccessControl {
         data.removeMonsterIdMapping(obj.trainer, _tokenId);
         EtheremonMonsterNFTInterface(monsterNFT).triggerTransferEvent(obj.trainer, address(0), _tokenId);
     }
-    
-    // public api 
+
+    // public api
     function getRandom(address _player, uint _block, uint _count) view public returns(uint) {
         return uint(keccak256(abi.encodePacked(blockhash(_block), _player, _count)));
     }
-    
+
     function getMonsterClassBasic(uint32 _classId) constant external returns(uint256, uint256, uint256, bool) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
         return (class.price, class.returnPrice, class.total, class.catchable);
     }
-    
+
     function getPrice(uint32 _classId) constant external returns(bool catchable, uint price) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
-        
+
         price = class.price;
         if (class.total > 0)
             price += class.price*(class.total-1)/priceIncreasingRatio;
-        
+
         if (class.catchable == false) {
             return (classWhitelist[_classId], price);
         } else {
             return (true, price);
         }
     }
-    
+
     function catchMonsterNFT(uint32 _classId, string _name) isActive external payable{
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
@@ -218,15 +218,15 @@ contract EtheremonWorldNFT is BasicAccessControl {
         if (class.classId == 0 || class.catchable == false) {
             revert();
         }
-        
+
         uint price = class.price;
         if (class.total > 0)
             price += class.price*(class.total-1)/priceIncreasingRatio;
         if (msg.value < price) {
             revert();
         }
-        
-        // add new monster 
+
+        // add new monster
         uint64 objId = data.addMonsterObj(_classId, msg.sender, _name);
         uint8 value;
         uint seed = getRandom(msg.sender, block.number-1, objId);
@@ -236,31 +236,31 @@ contract EtheremonWorldNFT is BasicAccessControl {
             value = uint8(seed % STAT_MAX) + data.getElementInArrayType(EtheremonEnum.ArrayType.STAT_START, uint64(_classId), i);
             data.addElementToArrayType(EtheremonEnum.ArrayType.STAT_BASE, objId, value);
         }
-        
+
         EtheremonMonsterNFTInterface(monsterNFT).triggerTransferEvent(address(0), msg.sender, objId);
         // refund extra
         if (msg.value > price) {
             msg.sender.transfer((msg.value - price));
         }
     }
-    
+
     // for whitelist contracts, no refund extra
     function catchMonster(address _player, uint32 _classId, string _name) isActive external payable returns(uint tokenId) {
         if (addressWhitelist[msg.sender] == false) {
             revert();
         }
-        
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
         if (class.classId == 0) {
             revert();
         }
-        
+
         if (class.catchable == false && classWhitelist[_classId] == false) {
             revert();
         }
-        
+
         uint price = class.price;
         if (class.total > gapFactor) {
             price += class.price*(class.total - gapFactor)/priceIncreasingRatio;
@@ -268,8 +268,8 @@ contract EtheremonWorldNFT is BasicAccessControl {
         if (msg.value < price) {
             revert();
         }
-        
-        // add new monster 
+
+        // add new monster
         uint64 objId = data.addMonsterObj(_classId, _player, _name);
         uint8 value;
         uint seed = getRandom(_player, block.number-1, objId);
@@ -279,9 +279,13 @@ contract EtheremonWorldNFT is BasicAccessControl {
             value = uint8(seed % STAT_MAX) + data.getElementInArrayType(EtheremonEnum.ArrayType.STAT_START, uint64(_classId), i);
             data.addElementToArrayType(EtheremonEnum.ArrayType.STAT_BASE, objId, value);
         }
-        
+
         EtheremonMonsterNFTInterface(monsterNFT).triggerTransferEvent(address(0), _player, objId);
-        return objId; 
+        return objId;
     }
-    
+
+}
+function() payable external {
+	revert();
+}
 }

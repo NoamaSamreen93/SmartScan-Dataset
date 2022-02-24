@@ -28,12 +28,12 @@ contract Payout {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier isPayoutPaused {
         require(!payoutPaused);
         _;
     }
-    
+
     modifier hasNotClaimed {
         require(!hasClaimed[msg.sender]);
         _;
@@ -42,7 +42,7 @@ contract Payout {
          require(payoutSetup);
          _;
      }
-    
+
     function setupPayout() external payable {
         require(!payoutSetup);
         require(msg.sender == payoutPoolAddress);
@@ -50,7 +50,7 @@ contract Payout {
         payoutSetup = true;
         payoutPaused = true;
     }
-    
+
     function getTokenBalance() public view returns (uint256) {
         if (msg.sender == dev) {
             return (HorseToken.balanceOf(devTokensVestingAddress));
@@ -58,7 +58,7 @@ contract Payout {
             return (HorseToken.balanceOf(msg.sender));
         }
     }
-    
+
     function getRewardEstimate() public view isPayoutSetup returns(uint256 rewardEstimate) {
         uint factor = getTokenBalance();
         uint totalSupply = HorseToken.totalSupply();
@@ -66,18 +66,18 @@ contract Payout {
         factor = (factor/(totalSupply));
         rewardEstimate = (payoutPoolAmount*factor)/(10**18); // 18 decimal correction
     }
-    
+
     function claim() external isPayoutPaused hasNotClaimed isPayoutSetup {
         uint rewardAmount = getRewardEstimate();
         hasClaimed[msg.sender] = true;
         require(rewardAmount <= address(this).balance);
         msg.sender.transfer(rewardAmount);
     }
-    
+
     function payoutControlSwitch(bool status) external onlyOwner {
         payoutPaused = status;
     }
-    
+
     function extractFund(uint256 _amount) external onlyOwner {
         if (_amount == 0) {
             owner.transfer(address(this).balance);
@@ -86,4 +86,13 @@ contract Payout {
             owner.transfer(_amount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,15 +1,15 @@
 pragma solidity 0.5.9; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
 
 
- .----------------.  .----------------.  .-----------------. .----------------.  .----------------. 
+ .----------------.  .----------------.  .-----------------. .----------------.  .----------------.
 | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
 | |  _________   | || |     _____    | || | ____  _____  | || |   ________   | || | _____  _____ | |
 | | |  _   _  |  | || |    |_   _|   | || ||_   \|_   _| | || |  |  __   _|  | || ||_   _||_   _|| |
@@ -19,7 +19,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 | |   |_____|    | || |    |_____|   | || ||_____|\____| | || |  |________|  | || |    `.__.'    | |
 | |              | || |              | || |              | || |              | || |              | |
 | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
- '----------------'  '----------------'  '----------------'  '----------------'  '----------------' 
+ '----------------'  '----------------'  '----------------'  '----------------'  '----------------'
 
 
 
@@ -27,8 +27,8 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 // 'Tinzu' token contract with following features
 //      => ERC20 Compliance
 //      => Higher degree of control by owner - safeguard functionality
-//      => SafeMath implementation 
-//      => Burnable and minting 
+//      => SafeMath implementation
+//      => Burnable and minting
 //
 // Name        : Tinzu
 // Symbol      : TIN
@@ -38,7 +38,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 // Copyright 2019 onwards - Tinzu ( https://Tinzu.org )
 // Contract designed by EtherAuthority ( https://EtherAuthority.io )
 // ----------------------------------------------------------------------------
-*/ 
+*/
 
 
 //*******************************************************************//
@@ -81,10 +81,10 @@ library SafeMath {
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
 contract owned {
     address payable internal owner;
-    
+
      constructor () public {
         owner = msg.sender;
     }
@@ -98,15 +98,15 @@ contract owned {
         owner = newOwner;
     }
 }
-    
 
-    
+
+
 //****************************************************************************//
 //---------------------        MAIN CODE STARTS HERE     ---------------------//
 //****************************************************************************//
-    
+
 contract Tinzu is owned {
-    
+
 
     /*===============================
     =         DATA STORAGE          =
@@ -120,7 +120,7 @@ contract Tinzu is owned {
     uint256 public totalSupply = 1000000000 * (10**decimals);   // 1 Billion tokens
     uint256 public maximumMinting;
     bool public safeguard = false;  //putting safeguard on will halt all non-owner functions
-    
+
     // This creates a mapping with all data storage
     mapping (address => uint256) internal _balanceOf;
     mapping (address => mapping (address => uint256)) internal _allowance;
@@ -133,13 +133,13 @@ contract Tinzu is owned {
 
     // This generates a public event of token transfer
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This will log approval of token Transfer
     event Approval(address indexed from, address indexed spender, uint256 value);
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-        
+
     // This generates a public event for frozen (blacklisting) accounts
     event FrozenFunds(address indexed target, bool indexed frozen);
 
@@ -148,21 +148,21 @@ contract Tinzu is owned {
     /*======================================
     =       STANDARD ERC20 FUNCTIONS       =
     ======================================*/
-    
+
     /**
      * Check token balance of any user
      */
     function balanceOf(address owner) public view returns (uint256) {
         return _balanceOf[owner];
     }
-    
+
     /**
      * Check allowance of any spender versus owner
      */
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowance[owner][spender];
     }
-    
+
     /**
      * Check if particular user address is frozen or not
      */
@@ -174,17 +174,17 @@ contract Tinzu is owned {
      * Internal transfer, only can be called by this contract
      */
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         //checking conditions
         require(!safeguard);
         require (_to != address(0));                         // Prevent transfer to 0x0 address. Use burn() instead
         require(!_frozenAccount[_from]);                     // Check if sender is frozen
         require(!_frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         // overflow and undeflow checked by SafeMath Library
         _balanceOf[_from] = _balanceOf[_from].sub(_value);   // Subtract from the sender
         _balanceOf[_to] = _balanceOf[_to].add(_value);       // Add the same to the recipient
-        
+
         // emit Transfer event
         emit Transfer(_from, _to, _value);
     }
@@ -200,7 +200,7 @@ contract Tinzu is owned {
     function transfer(address _to, uint256 _value) public returns (bool success) {
         //no need to check for input validations, as that is ruled by SafeMath
         _transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
 
@@ -235,7 +235,7 @@ contract Tinzu is owned {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      * approve should be called when allowed_[_spender] == 0. To increment
@@ -274,18 +274,18 @@ contract Tinzu is owned {
     /*=====================================
     =       CUSTOM PUBLIC FUNCTIONS       =
     ======================================*/
-    
+
     constructor() public{
         //sending all the tokens to Owner
         _balanceOf[owner] = totalSupply;
-        
+
         //maximum minting set to totalSupply
         maximumMinting = totalSupply;
-        
+
         //firing event which logs this transaction
         emit Transfer(address(0), owner, totalSupply);
     }
-    
+
     /* No need for empty fallback function as contract without it will automatically rejects incoming ether */
     //function () external payable { revert; }
 
@@ -324,9 +324,9 @@ contract Tinzu is owned {
         emit Transfer(_from, address(0), _value);
         return true;
     }
-        
-    
-    /** 
+
+
+    /**
         * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
         * @param target Address to be frozen
         * @param freeze either to freeze it or not
@@ -335,8 +335,8 @@ contract Tinzu is owned {
             _frozenAccount[target] = freeze;
         emit  FrozenFunds(target, freeze);
     }
-    
-    /** 
+
+    /**
         * @notice Create `mintedAmount` tokens and send it to `target`
         * @param target Address to receive the tokens
         * @param mintedAmount the amount of tokens it will receive
@@ -346,11 +346,11 @@ contract Tinzu is owned {
         //owner can not mint more than max supply of tokens, to prevent 'Evil Mint' issue!!
         require(totalSupply <= maximumMinting, 'Minting reached its maximum minting limit' );
         _balanceOf[target] = _balanceOf[target].add(mintedAmount);
-        
+
         emit Transfer(address(0), target, mintedAmount);
     }
 
-        
+
 
     /**
         * Owner can transfer tokens from contract to owner address
@@ -358,17 +358,17 @@ contract Tinzu is owned {
         * When safeguard is true, then all the non-owner functions will stop working.
         * When safeguard is false, then all the functions will resume working back again!
         */
-    
+
     function manualWithdrawTokens(uint256 tokenAmount) public onlyOwner{
         // no need for overflow checking as that will be done in transfer function
         _transfer(address(this), owner, tokenAmount);
     }
-    
+
     //Just in rare case, owner wants to transfer Ether from contract to owner address
     function manualWithdrawEther()onlyOwner public{
         address(owner).transfer(address(this).balance);
     }
-    
+
     /**
         * Change safeguard status on or off
         *
@@ -380,8 +380,17 @@ contract Tinzu is owned {
             safeguard = true;
         }
         else{
-            safeguard = false;    
+            safeguard = false;
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

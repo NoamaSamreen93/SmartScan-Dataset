@@ -44,7 +44,7 @@ contract Ownable {
     owner = _newOwner;
   }
 
-  
+
 }
 
 contract Pausable is Ownable {
@@ -75,7 +75,7 @@ contract Pausable is Ownable {
 }
 
 library SafeMath {
-  
+
   function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     require(_b <= _a);
     uint256 c = _a - _b;
@@ -90,7 +90,7 @@ library SafeMath {
     return c;
   }
 
-  
+
 }
 
 contract LOK is ERC20, Pausable {
@@ -156,5 +156,16 @@ contract LOK is ERC20, Pausable {
     return true;
   }
 
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

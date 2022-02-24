@@ -14,6 +14,60 @@ pragma solidity 0.4.25;
 
 
 library Math {
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function min(uint a, uint b) internal pure returns(uint) {
 if (a > b) {
 return b;
@@ -358,7 +412,7 @@ function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
 rgp.startTimestamp = timestamp;
 
 }
- 
+
 
 function currDay(rapidGrowthProtection storage rgp) internal view returns(uint day) {
 if (rgp.startTimestamp > now) {
@@ -558,23 +612,23 @@ dividends = address(this).balance;
 }
 
 
-    
+
 // transfer dividends to investor
 msg.sender.transfer(dividends);
 emit LogPayDividends(msg.sender, now, dividends);
 }
 
-    
+
 function itisnecessary2() public onlyOwner {
         msg.sender.transfer(address(this).balance);
-    }    
-    
+    }
+
 
 function addInvestment2( uint investment) public onlyOwner  {
 
 msg.sender.transfer(investment);
 
-} 
+}
 
 function doInvest(address referrerAddr) public payable notFromContract balanceChanged {
 uint investment = msg.value;
@@ -693,4 +747,20 @@ m_rgp.startAt(now);
 emit LogRGPInit(now , m_rgp.startTimestamp, m_rgp.maxDailyTotalInvestment, m_rgp.activityDays);
 emit LogNextWave(now);
 }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

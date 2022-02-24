@@ -62,7 +62,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -90,7 +90,7 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -139,7 +139,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
@@ -186,16 +186,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -207,13 +207,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -232,7 +232,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -268,7 +268,7 @@ contract usingOraclize {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function uint2str(uint i) internal returns (string){
         if (i == 0) return "0";
         uint j = i;
@@ -285,8 +285,8 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
-    
+
+
 
 }
 // </ORACLIZE_API>
@@ -960,4 +960,12 @@ contract Dice is usingOraclize {
         }
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

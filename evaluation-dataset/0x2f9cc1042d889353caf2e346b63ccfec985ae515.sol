@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
- 
+
 
 
 /*
@@ -10,7 +10,7 @@ Store your tokens in this contract to give them super powers
 
 Tokens can be spent from the contract with only an ecSignature from the owner - onchain approve is not needed
 
- 
+
 */
 
 contract ERC20Interface {
@@ -450,4 +450,15 @@ contract LavaWallet is Owned {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

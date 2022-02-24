@@ -82,7 +82,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -112,7 +112,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -188,10 +188,10 @@ contract BunToken is StandardToken {
     string public constant SYMBOL = "BUN";
     uint public constant DECIMALS = 18;
 
-  
+
 
     /// This is where we hold ETH during this token sale. We will not transfer any Ether
-    /// out of this address before we invocate the `close` function to finalize the sale. 
+    /// out of this address before we invocate the `close` function to finalize the sale.
     /// This promise is not guanranteed by smart contract by can be verified with public
     /// Ethereum transactions data available on several blockchain browsers.
     /// This is the only address from which `start` and `close` can be invocated.
@@ -214,8 +214,8 @@ contract BunToken is StandardToken {
 
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the BUN Token
      * @param _target The escrow account address, all ethers will
      * be sent to this address.
@@ -230,14 +230,14 @@ contract BunToken is StandardToken {
         balances[target] = totalSupply;
     }
 
-  
+
 
     /// sending ether to this smart contract to fund Bun studio.
     function () payable {
        //Thank for your donation
        target.send(msg.value);
     }
-    
+
     // withdraw Other ERC20
     function withdrawOtherERC20Balance(uint256 amount, address _address) external onlyOwner {
     		require(_address != address(this));
@@ -247,6 +247,17 @@ contract BunToken is StandardToken {
         candidateContract.transfer(target, amount);
     }
 
-   
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

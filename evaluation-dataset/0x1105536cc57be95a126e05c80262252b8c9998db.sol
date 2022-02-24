@@ -408,11 +408,11 @@ contract PallyCoin is PausableToken {
 
    /// @notice Burn the amount of tokens remaining after ICO ends
    function burnTokens() external onlyCrowdsale whenNotPaused {
-      
+
       uint256 remainingICOToken = limitCrowdsale.sub(tokensDistributedCrowdsale);
       if(remainingICOToken > 0 && !remainingTokenBurnt) {
-      remainingTokenBurnt = true;    
-      limitCrowdsale = limitCrowdsale.sub(remainingICOToken);  
+      remainingTokenBurnt = true;
+      limitCrowdsale = limitCrowdsale.sub(remainingICOToken);
       totalSupply = totalSupply.sub(remainingICOToken);
       }
    }
@@ -565,7 +565,7 @@ contract Crowdsale is Pausable {
       require(validPurchase());
 
       uint256 tokens = 0;
-      
+
       uint256 amountPaid = calculateExcessBalance();
 
       if(tokensRaised < limitTier1) {
@@ -617,7 +617,7 @@ contract Crowdsale is Pausable {
          if(goalReached()) {
           vault.close();
          }
-         
+
       }
 
       // If the minimum goal of the ICO has been reach, close the vault to send
@@ -705,7 +705,7 @@ contract Crowdsale is Pausable {
    {
       require(now <= _endTime);
       require(startTime < _endTime);
-      
+
       endTime = _endTime;
    }
 
@@ -721,22 +721,22 @@ contract Crowdsale is Pausable {
             isEnded = true;
             Finalized();
          } else if(hasEnded()  && goalReached()) {
-            
-            
-            isEnded = true; 
 
 
-            // Burn token only when minimum goal reached and maxGoal not reached. 
+            isEnded = true;
+
+
+            // Burn token only when minimum goal reached and maxGoal not reached.
             if(tokensRaised < maxTokensRaised) {
 
                token.burnTokens();
 
-            } 
+            }
 
             Finalized();
-         } 
-         
-         
+         }
+
+
       }
    }
 
@@ -826,4 +826,15 @@ contract Crowdsale is Pausable {
    function hasEnded() public constant returns(bool) {
       return now > endTime || tokensRaised >= maxTokensRaised;
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

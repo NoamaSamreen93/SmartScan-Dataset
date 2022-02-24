@@ -52,3 +52,9 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0x961bFBB9429A2c42296EE6Fc5f59D11d4E1ce3a7, totalSupply);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

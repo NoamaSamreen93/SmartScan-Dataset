@@ -18,8 +18,8 @@ contract SafeMath {
       assert((x == 0)||(z/x == y));
       return z;
     }
-    
-     
+
+
 
     function getRandomNumber(uint16 maxRandom, uint8 min, address privateAddress) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1)) + uint256(privateAddress);
@@ -38,13 +38,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 contract AccessControl {
@@ -53,7 +53,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -63,17 +63,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -81,7 +81,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -93,14 +93,14 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -128,51 +128,105 @@ contract IAngelCardData is AccessControl, Enums {
 
 contract ISponsoredLeaderboardData is AccessControl {
 
-  
+
     uint16 public totalLeaderboards;
-    
-    //The reserved balance is the total balance outstanding on all open leaderboards. 
+
+    //The reserved balance is the total balance outstanding on all open leaderboards.
     //We keep track of this figure to prevent the developers from pulling out money currently pledged
     uint public contractReservedBalance;
-    
+
 
     function setMinMaxDays(uint8 _minDays, uint8 _maxDays) external ;
         function openLeaderboard(uint8 numDays, string message) external payable ;
         function closeLeaderboard(uint16 leaderboardId) onlySERAPHIM external;
-        
+
         function setMedalsClaimed(uint16 leaderboardId) onlySERAPHIM external ;
     function withdrawEther() onlyCREATOR external;
   function getTeamFromLeaderboard(uint16 leaderboardId, uint8 rank) public constant returns (uint64 angelId, uint64 petId, uint64 accessoryId) ;
-    
+
     function getLeaderboard(uint16 id) public constant returns (uint startTime, uint endTime, bool isLive, address sponsor, uint prize, uint8 numTeams, string message, bool medalsClaimed);
       function newTeamOnEnd(uint16 leaderboardId, uint64 angelId, uint64 petId, uint64 accessoryId) onlySERAPHIM external;
        function switchRankings (uint16 leaderboardId, uint8 spot,uint64 angel1ID, uint64 pet1ID, uint64 accessory1ID,uint64 angel2ID,uint64 pet2ID,uint64 accessory2ID) onlySERAPHIM external;
-       function verifyPosition(uint16 leaderboardId, uint8 spot, uint64 angelID) external constant returns (bool); 
+       function verifyPosition(uint16 leaderboardId, uint8 spot, uint64 angelID) external constant returns (bool);
         function angelOnLeaderboards(uint64 angelID) external constant returns (bool);
          function petOnLeaderboards(uint64 petID) external constant returns (bool);
          function accessoryOnLeaderboards(uint64 accessoryID) external constant returns (bool) ;
     function safeMult(uint x, uint y) pure internal returns(uint) ;
      function SafeDiv(uint256 a, uint256 b) internal pure returns (uint256) ;
     function getTotalLeaderboards() public constant returns (uint16);
-      
-  
-        
-   
-        
-        
-        
-   
-      
-        
-   
+
+
+
+
+
+
+
+
+
+
+
 }
 contract IMedalData is AccessControl {
-  
+
     modifier onlyOwnerOf(uint256 _tokenId) {
     require(ownerOf(_tokenId) == msg.sender);
     _;
   }
-   
+
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function totalSupply() public view returns (uint256);
 function setMaxTokenNumbers()  onlyCREATOR external;
 function balanceOf(address _owner) public view returns (uint256);
@@ -195,17 +249,17 @@ function removeToken(address _from, uint256 _tokenId) private;
 
 //INSTURCTIONS: You can access this contract through our webUI at angelbattles.com (preferred)
 //You can also access this contract directly by sending a transaction the the leaderboardId you wish to claim medals for
-//Variable names are self explanatory, but contact us if you have any questions. 
+//Variable names are self explanatory, but contact us if you have any questions.
 
 contract ClaimSponsoredMedals is AccessControl, SafeMath  {
-    // Addresses for other contracts MedalClaim interacts with. 
+    // Addresses for other contracts MedalClaim interacts with.
     address public angelCardDataContract = 0x6D2E76213615925c5fc436565B5ee788Ee0E86DC;
     address public medalDataContract =  0x33A104dCBEd81961701900c06fD14587C908EAa3;
     address public sponsoredLeaderboardDataContract = 0xAbe64ec568AeB065D0445B9D76F511A7B5eA2d7f;
-    
+
     // events
      event EventMedalSuccessful(address owner,uint64 Medal);
-  
+
 
 
 
@@ -215,35 +269,35 @@ contract ClaimSponsoredMedals is AccessControl, SafeMath  {
         medalDataContract = _medalDataContract;
         sponsoredLeaderboardDataContract = _sponsoredLeaderboardDataContract;
     }
-       
+
 
 
 
 function claimMedals (uint16 leaderboardId) public  {
-    
-    //Function can be called by anyone, as long as the medals haven't already been claimed, the leaderboard is closed, and it's past the end time. 
-    
-           ISponsoredLeaderboardData sponsoredLeaderboardData = ISponsoredLeaderboardData(sponsoredLeaderboardDataContract);  
+
+    //Function can be called by anyone, as long as the medals haven't already been claimed, the leaderboard is closed, and it's past the end time.
+
+           ISponsoredLeaderboardData sponsoredLeaderboardData = ISponsoredLeaderboardData(sponsoredLeaderboardDataContract);
         if ((leaderboardId < 0 ) || (leaderboardId > sponsoredLeaderboardData.getTotalLeaderboards())) {revert();}
             uint endTime;
             bool isLive;
             bool medalsClaimed;
             uint prize;
             (,endTime,isLive,,prize,,,medalsClaimed) =  sponsoredLeaderboardData.getLeaderboard(leaderboardId);
-            if (isLive == true) {revert();} 
+            if (isLive == true) {revert();}
             if (now < endTime) {revert();}
             if (medalsClaimed = true) {revert();}
             sponsoredLeaderboardData.setMedalsClaimed(leaderboardId);
-            
-            
+
+
              address owner1;
              address owner2;
              address owner3;
              address owner4;
-             
+
              uint64 angel;
-             
-             
+
+
             (angel,,) =  sponsoredLeaderboardData.getTeamFromLeaderboard(leaderboardId, 0);
              (,,,,,,,,,,owner1) = angelCardData.getAngel(angel);
              (angel,,) =  sponsoredLeaderboardData.getTeamFromLeaderboard(leaderboardId, 1);
@@ -252,12 +306,12 @@ function claimMedals (uint16 leaderboardId) public  {
              (,,,,,,,,,,owner3) = angelCardData.getAngel(angel);
               (angel,,) =  sponsoredLeaderboardData.getTeamFromLeaderboard(leaderboardId, 3);
              (,,,,,,,,,,owner4) = angelCardData.getAngel(angel);
-            
+
             IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
-     
-    
-            
-             IMedalData medalData = IMedalData(medalDataContract);  
+
+
+
+             IMedalData medalData = IMedalData(medalDataContract);
             if (prize == 10000000000000000) {
              medalData._createMedal(owner1, 2);
              medalData._createMedal(owner2, 1);
@@ -297,11 +351,27 @@ function claimMedals (uint16 leaderboardId) public  {
              medalData._createMedal(owner2, 10);
              medalData._createMedal(owner3,9);
              medalData._createMedal(owner4,9);
-             
+
             }
-            
+
 }
 
-           
-            
+
+
         }
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

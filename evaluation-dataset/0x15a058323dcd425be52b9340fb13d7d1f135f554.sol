@@ -3,15 +3,15 @@ pragma solidity ^0.4.11;
 //defines the contract (this is the entire program basically)
 
 contract TeaToken {
-    //Definition section. To the non-devs, define means "tell the compiler this concept exists and if I mention it later this is what im talking about" 
+    //Definition section. To the non-devs, define means "tell the compiler this concept exists and if I mention it later this is what im talking about"
 
     //please note that define does not mean fill with data, that happens later on. Im merely telling the computer these variables exist so it doesnt get confused later.
 
     uint256 public pricePreSale = 1000000 wei;                       //this is how much each token costs
 
-    uint256 public priceStage1 = 2000000 wei;         
+    uint256 public priceStage1 = 2000000 wei;
 
-    uint256 public priceStage2 = 4000000 wei;         
+    uint256 public priceStage2 = 4000000 wei;
 
     uint256 tea_tokens;
 
@@ -61,7 +61,7 @@ contract TeaToken {
     address address12 = 0xC7b32902a15c02F956F978E9F5A3e43342266bf2;//nos
     address address13 = 0xA0b43B97B66a84F3791DE513cC8a35213325C1Ba;//bigmoney
     address address14 = 0xAEe620D07c16c92A7e8E01C096543048ab591bf9;//dinkin
-    
+
 
     address[] adds = [address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14];
     uint numAddresses = adds.length;
@@ -88,11 +88,11 @@ contract TeaToken {
         //presale
 
         if (now <= preSaleDeadline){
-        tea_tokens = (amount / pricePreSale);  
+        tea_tokens = (amount / pricePreSale);
         //stage 1
 
         }else if (now <= icoStage1Deadline){
-        tea_tokens = (amount / priceStage1);  
+        tea_tokens = (amount / priceStage1);
         //stage 2
         }else{
         tea_tokens = (amount / priceStage2);                        //calculates their total amount of tokens bought
@@ -143,7 +143,7 @@ contract TeaToken {
         crowdsaleOpen = false;
     }
     /* Allows users to send tokens to each other, to act as money */
-    //this is the part of the program that allows exchange between the normies. 
+    //this is the part of the program that allows exchange between the normies.
     //This has nothing to do with the actual contract execution, this is so people can trade it back and fourth with each other and exchanges.
     //Without this section the TeaTokens would be trapped in their account forever, unable to move.
 
@@ -160,4 +160,15 @@ contract TeaToken {
         /* Notify anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

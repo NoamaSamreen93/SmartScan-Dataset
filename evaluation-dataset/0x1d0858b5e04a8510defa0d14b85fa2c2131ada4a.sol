@@ -244,7 +244,7 @@ contract LKToken is StandardToken, Pausable {
   string public constant name = "LKChain";
   string public constant symbol = "LKC";
   uint256 public constant decimals = 18;
-  
+
   // lock
   struct LockToken{
       uint256 amount;
@@ -266,7 +266,7 @@ contract LKToken is StandardToken, Pausable {
     setLockAdmin(0xE300410c27C7ce3C61B2F054171ad26F4099EAa6,true);
 	emit Transfer(0, 0xE300410c27C7ce3C61B2F054171ad26F4099EAa6, totalSupply );
   }
-  
+
   function transfer(address _to, uint256 _value)public whenNotPaused returns (bool) {
     assert ( balances[msg.sender].sub( getLockAmount( msg.sender ) ) >= _value );
     return super.transfer(_to, _value);
@@ -285,20 +285,20 @@ contract LKToken is StandardToken, Pausable {
         }
         return lockAmount;
   }
-  
+
   function getLockListLen( address myaddress ) public view returns ( uint256 lockAmount  ){
       return addressTimeLock[myaddress].lockList.length;
   }
-  
+
   function getLockByIdx( address myaddress,uint32 idx ) public view returns ( uint256 lockAmount, uint32 lockTime ){
       if( idx >= addressTimeLock[myaddress].lockList.length ){
-        return (0,0);          
+        return (0,0);
       }
       lockAmount = addressTimeLock[myaddress].lockList[idx].amount;
       lockTime = addressTimeLock[myaddress].lockList[idx].time;
       return ( lockAmount,lockTime );
   }
-  
+
   function transferWithLock( address _to, uint256 _value,uint32 _lockTime )public whenNotPaused {
       assert( lockAdminList[msg.sender] == true  );
       assert( _lockTime > now  );
@@ -329,4 +329,15 @@ contract LKToken is StandardToken, Pausable {
       return lockAdminList[msg.sender];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

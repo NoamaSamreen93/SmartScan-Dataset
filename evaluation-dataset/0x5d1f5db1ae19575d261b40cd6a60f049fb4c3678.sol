@@ -100,3 +100,7 @@ contract Sponsify {
     }
 
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

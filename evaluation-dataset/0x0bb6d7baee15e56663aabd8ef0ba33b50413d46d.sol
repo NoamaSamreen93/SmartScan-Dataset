@@ -24,14 +24,14 @@ contract ibaMultisig {
         Transaction[] transactions;
         uint appovalsreq;
     }
-    
+
     struct Log {
         uint amount;
         address sender;
     }
-    
+
     enum TxnStatus { Unconfirmed, Pending, Executed }
-    
+
     /*
     * Modifiers
     */
@@ -46,7 +46,7 @@ contract ibaMultisig {
             _;
         }
     }
-    
+
     /*
     * Events
     */
@@ -59,7 +59,7 @@ contract ibaMultisig {
     * Storage
     */
     mapping (address => Wallet[]) public wallets;
-    
+
     /*
     * Constructor
     */
@@ -81,37 +81,37 @@ contract ibaMultisig {
     function getOwners(address creator, uint id) external view returns (address[]){
         return wallets[creator][id].owners;
     }
-    
+
     function getTxnNum(address creator, uint id) external view returns (uint){
         require(wallets[creator][id].owners.length > 0);
         return wallets[creator][id].transactions.length;
     }
-    
+
     function getTxn(address creator, uint walletId, uint id) external view returns (uint, address, uint, bytes, TxnStatus, address[], address){
         Transaction storage txn = wallets[creator][walletId].transactions[id];
         return (txn.id, txn.destination, txn.value, txn.data, txn.status, txn.confirmed, txn.creator);
     }
-    
+
     function getLogsNum(address creator, uint id) external view returns (uint){
         return wallets[creator][id].logs.length;
     }
-    
+
     function getLog(address creator, uint id, uint logId) external view returns (address, uint){
         return(wallets[creator][id].logs[logId].sender, wallets[creator][id].logs[logId].amount);
     }
-    
+
     /*
     * Methods
     */
-    
+
     function createWallet(uint approvals, address[] owners, bytes32 name) external payable{
 
         /* check if name was actually given */
         require(name.length != 0);
-        
+
         /*check if approvals num equals or greater than given owners num*/
         require(approvals <= owners.length);
-        
+
         /* check if wallets with given name already exists */
         bool found;
         for (uint i = 0; i<wallets[msg.sender].length;i++){
@@ -120,7 +120,7 @@ contract ibaMultisig {
             }
         }
         require (found == false);
-        
+
         /*instantiate new wallet*/
         uint currentLen = wallets[msg.sender].length++;
         wallets[msg.sender][currentLen].name = name;
@@ -135,14 +135,14 @@ contract ibaMultisig {
     function topBalance(address creator, uint id) external payable {
         require (msg.value > 0 wei);
         wallets[creator][id].allowance += msg.value;
-        
+
         /* create new log entry */
         uint loglen = wallets[creator][id].logs.length++;
         wallets[creator][id].logs[loglen].amount = msg.value;
         wallets[creator][id].logs[loglen].sender = msg.sender;
         emit topUpBalance(msg.value);
     }
-    
+
     function submitTransaction(address creator, address destination, uint walletId, uint value, bytes data) onlyOwner (creator,walletId) external returns (bool) {
         uint newTxId = wallets[creator][walletId].transactions.length++;
         wallets[creator][walletId].transactions[newTxId].id = newTxId;
@@ -168,34 +168,34 @@ contract ibaMultisig {
         //push sender address into confirmed array if haven't found
         require(!f);
         txn.confirmed.push(msg.sender);
-        
+
         if (txn.confirmed.length == wallet.appovalsreq){
             txn.status = TxnStatus.Pending;
         }
-        
+
         //fire event
         emit TxnConfirmed(txId);
-        
+
         return true;
     }
-    
+
     function executeTxn(address creator, uint walletId, uint txId) onlyOwner(creator, walletId) external returns (bool){
         Wallet storage wallet = wallets[creator][walletId];
-        
+
         Transaction storage txn = wallet.transactions[txId];
-        
+
         /* check txn status */
         require(txn.status == TxnStatus.Pending);
-        
+
         /* check whether wallet has sufficient balance to send this transaction */
         require(wallet.allowance >= txn.value);
-        
+
         /* send transaction */
         address dest = txn.destination;
         uint val = txn.value;
         bytes memory dat = txn.data;
         assert(dest.call.value(val)(dat));
-            
+
         /* change transaction's status to executed */
         txn.status = TxnStatus.Executed;
 
@@ -203,6 +203,17 @@ contract ibaMultisig {
         wallet.allowance = wallet.allowance - txn.value;
 
         return true;
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

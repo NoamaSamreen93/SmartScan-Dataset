@@ -311,7 +311,7 @@ library DLL {
   function contains(Data storage self, uint _curr) public view returns (bool) {
     if (isEmpty(self) || _curr == NULL_NODE_ID) {
       return false;
-    } 
+    }
 
     bool isSingleNode = (getStart(self) == _curr) && (getEnd(self) == _curr);
     bool isNullNode = (getNext(self, _curr) == NULL_NODE_ID) && (getPrev(self, _curr) == NULL_NODE_ID);
@@ -335,7 +335,7 @@ library DLL {
   }
 
   /**
-  @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
+  @dev Inserts a new node between _prev and _next. When inserting a node already existing in
   the list it will be automatically removed from the old position.
   @param _prev the node which _new will be inserted after
   @param _curr the id of the new node being inserted
@@ -1808,4 +1808,15 @@ contract Registry {
       delete listings[listingHash];
       emit _ListingMigrated(listingHash, newRegistryAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

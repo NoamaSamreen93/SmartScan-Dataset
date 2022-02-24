@@ -1,6 +1,6 @@
 pragma solidity ^0.4.0;
 
-   
+
 
 
 contract PooCoin {
@@ -16,7 +16,7 @@ contract PooCoin {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function PooCoin() {
 
@@ -24,10 +24,10 @@ contract PooCoin {
          name ="PooCoin";
         decimals = 18;
          symbol = "POO";
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     /* Send coins */
@@ -36,17 +36,28 @@ contract PooCoin {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-      
+
     }
 
-   
 
-    
 
-   
+
+
+
 
     /* This unnamed function is called whenever someone tries to send ether to it */
     function () {
         throw;     // Prevents accidental sending of ether
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

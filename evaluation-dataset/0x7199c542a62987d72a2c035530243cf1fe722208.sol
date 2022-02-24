@@ -48,7 +48,7 @@ library SafeMath {
 }
 
 contract KingOfTheEthill {
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
   address public owner;
   address public king;
   string public kingsMessage;
@@ -83,7 +83,7 @@ contract KingOfTheEthill {
     require(owner == msg.sender);
     _;
   }
-  
+
   function setDevFee (uint256 _n) onlyOwner() public {
 	  require(_n >= 0 && _n <= 10);
     devFeePercent = _n;
@@ -107,7 +107,7 @@ contract KingOfTheEthill {
     require(!isContract(msg.sender));
     require(bytes(_message).length <= maxMessageChars);
     require(msg.value > 0);
-    
+
     if (_roundNumber == currentRoundNumber && !roundExpired()) {
       // bid in active round
       require(msg.value > lastBidAmount);
@@ -182,7 +182,7 @@ contract KingOfTheEthill {
   }
 
   function getPastRound(uint256 _roundNum) public view returns (address _kingAddress, uint256 _finalBid, uint256 _kingWinnings, string _finalMessage) {
-    _kingAddress = roundToKing[_roundNum]; 
+    _kingAddress = roundToKing[_roundNum];
     _kingWinnings = roundToWinnings[_roundNum];
     _finalBid = roundToFinalBid[_roundNum];
     _finalMessage = roundToFinalMessage[_roundNum];
@@ -193,4 +193,20 @@ contract KingOfTheEthill {
     assembly { size := extcodesize(addr) }
     return size > 0;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

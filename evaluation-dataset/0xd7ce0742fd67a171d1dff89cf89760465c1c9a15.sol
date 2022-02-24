@@ -1511,14 +1511,14 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
     uint8 public decimals;
 	string public name;
 	string public symbol;
-	
-	uint pubICOStartsAt = 0; 
+
+	uint pubICOStartsAt = 0;
 
     modifier onlyKycTeam {
         require(msg.sender == admin1 || msg.sender == admin2);
         _;
     }
-	
+
 	modifier PubICOstarted {
 		require(now >= pubICOStartsAt && pubICOStartsAt!=0 );
 		_;
@@ -1544,41 +1544,41 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
 		address _accountSalesMgmt,
 		address _accountEasyWorld
 		)
-    public 
+    public
     payable
     {
         admin1 = _admin1;
         admin2 = _admin2;
         accountPubICOSale = _accountPubICOSale;
         decimals = 18; // 10**decimals=1000000000000000000
-		
+
 		_mint(_accountFounder, 1024000000000000000000000000); // 1024000000 * 10**(decimals);
         _mint(_accountPrivPreSale, 1326000000000000000000000000); // 1326000000 * 10**(decimals);
         _mint(_accountPubPreSale, 1500000000000000000000000000); // 1500000000 * 10**(decimals);
 		_mint(_accountPubICOSale, 4150000000000000000000000000); // 4150000000 * 10**(decimals);
         _mint(_accountSalesMgmt, 2000000000000000000000000000); // 2000000000 * 10**(decimals);
         _mint(_accountEasyWorld, 2000000000000000000000000000); // 2000000000 * 10**(decimals);
-		
+
 		name = "easy.world"; // easy
 		symbol = "EAX"; // EAX
     }
 
-	function setIcoStartDate(uint startDate) public // e.g. 1541030400 for 1.11.2018 
+	function setIcoStartDate(uint startDate) public // e.g. 1541030400 for 1.11.2018
 	onlyKycTeam
 	{
 		require( pubICOStartsAt==0 ); // date not yet set
 		pubICOStartsAt = startDate;
 	}
-	
-	
+
+
 	// Buying mechanics
 	mapping(uint256 => uint256) buyQueueValue;
 	mapping(uint256 => address payable) buyQueueSender;
 	uint256 buyLast  = 0;
 	uint256 last_rate_update = 0;
 	bool queryRunning = false;
-	
-    /** 
+
+    /**
      * @dev During the public ICO users can buy EAX tokens by sending ETH to this method.
      *
      * @dev The buyer will receive his tokens after successful KYC approval by the EAX team. In case KYC is refused,
@@ -1590,11 +1590,11 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
 	PubICOstarted
     {
 		require( approvedAccounts[msg.sender] ); // only verified users can take part in the ICO
-		
+
 		buyLast += 1;
 		buyQueueValue[buyLast] = msg.value;
 		buyQueueSender[buyLast] = msg.sender;
-		
+
 		// Exchange rate is up to date
 		if( now < last_rate_update + 60*10 ) {
 			executeBuyQueue();
@@ -1605,53 +1605,53 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
 			oraclize_query(60, "URL", "json(https://api.pro.coinbase.com/products/ETH-EUR/ticker).price");
 		}
     }
-	
+
 	function executeBuyQueue() private {
 		if( buyLast < 1 || balanceOf(accountPubICOSale)==0 ) {
 			return;
 		}
-		
+
 		uint256 bValue;
 		address buyer;
 		uint256 numToken;
-			
+
 		for(uint256 i=1; i<=buyLast; i++ ) {
 			bValue = buyQueueValue[i];
 			buyer = buyQueueSender[i];
-			
+
 			numToken = bValue.mul(ethEaxRate); // 1 = mul 10**decimals divide by wei/eth 1000000000000000000
-			
+
 			if( balanceOf(accountPubICOSale) < numToken ) {
-				buyQueueValue[i] = bValue - (balanceOf(accountPubICOSale) / ethEaxRate); 
+				buyQueueValue[i] = bValue - (balanceOf(accountPubICOSale) / ethEaxRate);
 				// rounding works to the benefit of the customer
-				
+
 				_transfer(accountPubICOSale, buyer, balanceOf(accountPubICOSale));
 				return;
 			}
 			_transfer(accountPubICOSale, buyer, numToken);
-				
+
 			delete buyQueueValue[i];
 			delete buyQueueSender[i];
 		}
-		
+
 		buyLast  = 0;
 	}
-	
+
 	uint256 public kycBonus = 100;
 	function setKycBonus(uint256 bonus) public
 	onlyKycTeam
 	{
 		kycBonus = bonus;
 	}
-	
-	
+
+
 	uint256 public ethEaxRate = 0;
 	event EthRateUpdate(string param, uint256 value);
 	// oraclize callback
 	function __callback(bytes32 myid, string memory result) public
 	{
         require(msg.sender == oraclize_cbAddress());
-		
+
         // Calculating rate
 		ethEaxRate = parseInt(result) * 1000;
 		int dot = indexOf(result, ".");
@@ -1663,12 +1663,12 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
 		string memory cents = substring(result, udot+1, udot+4); // end is not included
 		ethEaxRate = (ethEaxRate + parseInt(cents)) / 3; // 0.003 Euro pro Token
 		emit EthRateUpdate(result, ethEaxRate);
-		
+
 		last_rate_update = now;
 		queryRunning = false;
-		executeBuyQueue(); 
+		executeBuyQueue();
     }
-	
+
 	function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
 		bytes memory strBytes = bytes(str);
 		bytes memory result = new bytes(endIndex-startIndex);
@@ -1690,12 +1690,12 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
     {
         // account is approved
         approvedAccounts[_user] = true;
-		
+
 		// hand out bonus for running through KYC
 		if( balanceOf(accountPubICOSale) == 0 ) {
-			return; 
+			return;
 		}
-		
+
 		uint256 numToken = kycBonus.mul(1000000000000000000); // mul 10**decimals
 		if( balanceOf(accountPubICOSale) < kycBonus ) {
 			numToken = balanceOf(accountPubICOSale);
@@ -1717,25 +1717,25 @@ contract EasyToken is ERC20, Ownable, usingOraclize {
     {
         _safe.transfer(_value);
     }
-	
-	function refundOversold() 
+
+	function refundOversold()
 	external
 	{
 		require( balanceOf(accountPubICOSale)==0 );
 		require( buyLast >= 1);
-		
+
 		uint256 bValue;
 		address payable buyer;
 		for( uint i=1; i<=buyLast; i++ ) {
 			bValue = buyQueueValue[i];
 			buyer = buyQueueSender[i];
-			
+
 			// return funds
 			buyer.transfer(bValue);
 			delete buyQueueValue[i];
 			delete buyQueueSender[i];
 		}
-		
+
 		buyLast  = 0;
 	}
 }
@@ -1746,4 +1746,13 @@ contract OraclizeAddrResolverI {
 
 contract solcChecker {
 /* INCOMPATIBLE SOLC: import the following instead: "github.com/oraclize/ethereum-api/oraclizeAPI_0.4.sol" */ function f(bytes calldata x) external;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

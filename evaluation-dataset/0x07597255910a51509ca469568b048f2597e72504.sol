@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 
 //Decalre all functions to use in Token Smart Contract
 contract EIP20Interface {
-    
+
     /// total amount of tokens
     uint256 public totalSupply;
 
@@ -42,8 +42,8 @@ contract EIP20Interface {
 
 //Main Token Code Starts from here
 contract Uptrennd is EIP20Interface {
-    
-    
+
+
     //Code To Set onlyOwner
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -51,7 +51,7 @@ contract Uptrennd is EIP20Interface {
         require(msg.sender == owner);
         _;
     }
-    
+
     //Code to Transfer the Ownership
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
@@ -68,9 +68,9 @@ contract Uptrennd is EIP20Interface {
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public TokenPrice;
 
-    string public name;                   
-    uint256 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint256 public decimals;
+    string public symbol;
 
     //function to depoly the smart contract with functionality
     function Uptrennd(
@@ -88,7 +88,7 @@ contract Uptrennd is EIP20Interface {
         owner = msg.sender;
         TokenPrice = _price;
     }
-    
+
     //Funtion to Set The Token Price
     function setPrice(uint256 _price) onlyOwner public returns(bool success){
         TokenPrice =  _price;
@@ -100,17 +100,17 @@ contract Uptrennd is EIP20Interface {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     //User can purchase token using this method
     function purchase(address _to, uint256 _value) public payable returns (bool success) {
         uint amount = (msg.value * 1000000000000000000 ) / TokenPrice;
         require(balances[owner] >= amount);
         balances[owner] -= amount;
         balances[_to] += amount;
-        emit Transfer(owner, _to, amount); 
+        emit Transfer(owner, _to, amount);
         return true;
     }
 
@@ -123,7 +123,7 @@ contract Uptrennd is EIP20Interface {
         if (allowance < MAX_UINT256) {
             allowed[_from][msg.sender] -= _value;
         }
-        emit Transfer(_from, _to, _value); 
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -136,7 +136,7 @@ contract Uptrennd is EIP20Interface {
     function approve(address _spender, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value);
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value); 
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -144,7 +144,7 @@ contract Uptrennd is EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     //Code To Burn the token starts from here.
     function _burn(address account, uint256 value) internal {
         require(account != address(0));
@@ -152,7 +152,7 @@ contract Uptrennd is EIP20Interface {
         balances[account] = balances[account] - value;
         emit Transfer(account, address(0), value);
     }
-   
+
     //Admin functionality to burn number of tokens.
     function burn(uint256 value) onlyOwner public {
         _burn(msg.sender, value);
@@ -165,4 +165,15 @@ contract Uptrennd is EIP20Interface {
         emit Transfer(msg.sender, address(0), value); //solhint-disable-line indent, no-unused-vars
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

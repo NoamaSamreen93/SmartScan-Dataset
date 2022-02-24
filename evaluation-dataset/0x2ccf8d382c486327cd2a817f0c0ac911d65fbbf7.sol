@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 library SafeMath {
 
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
         if (a == 0) {
             return 0;
@@ -15,7 +15,7 @@ library SafeMath {
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         return a / b;
     }
- 
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
@@ -29,8 +29,8 @@ library SafeMath {
 }
 
 contract ERC20plus {
-    function totalSupply() public view returns (uint); 
-    function balanceOf(address tokenOwner) public view returns (uint balance);  
+    function totalSupply() public view returns (uint);
+    function balanceOf(address tokenOwner) public view returns (uint balance);
     function allowance(address tokenOwner, address spender) public view returns (uint remaining);
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
@@ -70,7 +70,7 @@ contract Owned {
 
 contract Nakama is ERC20plus, Owned {
     using SafeMath for uint;
- 
+
     string public symbol;
     string public name;
     uint8 public decimals;
@@ -81,7 +81,7 @@ contract Nakama is ERC20plus, Owned {
     mapping(address => mapping(address => uint)) allowed;
 
     constructor() public {
-        symbol = "NKM"; 
+        symbol = "NKM";
         name = "Nakama";
         decimals = 18;
         _totalSupply = 10422698937 * 10**uint(decimals);
@@ -159,4 +159,15 @@ contract Nakama is ERC20plus, Owned {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

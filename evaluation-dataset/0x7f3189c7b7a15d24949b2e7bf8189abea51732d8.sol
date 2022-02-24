@@ -115,53 +115,53 @@ contract StandardToken is Token {
 
    - The owner can also freeze part of his tokens to not be part of the funding procedure.
 
-   - At the creation, a discountMultiplier is saved which can be used later on 
+   - At the creation, a discountMultiplier is saved which can be used later on
      by other contracts (eg to use the tokens as a voucher).
 
 */
 
 
 contract RGXToken is StandardToken {
-    
+
     /* ERC20 */
     string public name;
     string public symbol;
     uint8 public decimals = 0;
     string public version = 'v1';
-    
+
     /* RGX */
-    address owner; 
+    address owner;
     uint public fundingStart;
     uint256 public minContrib = 1;
     uint256 public frozenSupply = 0;
     uint8 public discountMultiplier;
-    
+
     modifier fundingOpen() {
         require(now >= fundingStart);
         _;
     }
-    
+
     modifier onlyBy(address _account) {
         require(msg.sender == _account);
         _;
     }
-    
-    function () payable fundingOpen() { 
+
+    function () payable fundingOpen() {
 
         require(msg.sender != owner);
-        
+
         uint256 _value = msg.value / 1 finney;
 
-        require(_value >= minContrib); 
-        
-        require(balances[owner] >= (_value - frozenSupply) && _value > 0); 
-        
+        require(_value >= minContrib);
+
+        require(balances[owner] >= (_value - frozenSupply) && _value > 0);
+
         balances[owner] -= _value;
         balances[msg.sender] += _value;
         Transfer(owner, msg.sender, _value);
-        
+
     }
-    
+
     function RGXToken (
                        string _name,
                        string _symbol,
@@ -177,20 +177,20 @@ contract RGXToken is StandardToken {
         fundingStart = _fundingStart;                        // timestamp before no funding can occur
         discountMultiplier = _discountMultiplier;
     }
-    
+
     function isFundingOpen() constant returns (bool yes) {
         return (now >= fundingStart);
     }
-    
+
     function freezeSupply(uint256 _value) onlyBy(owner) {
         require(balances[owner] >= _value);
         frozenSupply = _value;
     }
-    
+
     function setMinimum(uint256 _value) onlyBy(owner) {
         minContrib = _value;
     }
-    
+
     function timeFundingStart(uint _fundingStart) onlyBy(owner) {
         fundingStart = _fundingStart;
     }
@@ -198,9 +198,20 @@ contract RGXToken is StandardToken {
     function withdraw() onlyBy(owner) {
         msg.sender.transfer(this.balance);
     }
-    
+
     function kill() onlyBy(owner) {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -205,19 +205,19 @@ contract GigaToken is StandardToken, Contactable {
   string public constant symbol = "GIGA";
   uint8 public constant decimals = 18;
 
-  uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals)); 
- 
-  event IncreaseSupply(uint256 increaseByAmount, uint256 oldAmount, uint256 newAmount);  
-  
+  uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
+
+  event IncreaseSupply(uint256 increaseByAmount, uint256 oldAmount, uint256 newAmount);
+
 
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
   function GigaToken() public {
-   // * (10 ** uint256(decimals));  
- 
-    totalSupply = INITIAL_SUPPLY; 
-    balances[msg.sender] = INITIAL_SUPPLY; 
+   // * (10 ** uint256(decimals));
+
+    totalSupply = INITIAL_SUPPLY;
+    balances[msg.sender] = INITIAL_SUPPLY;
   }
 
   function increaseSupply(uint256 _increaseByAmount) external onlyOwner {
@@ -261,7 +261,7 @@ contract GigaCrowdsale is  Contactable {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   //event DebugOut(string msg);
-  
+
   event SetRate(uint256 oldRate, uint256 newRate);
   event SetEndTime(uint256 oldEndTime, uint256 newEndTime);
 
@@ -270,7 +270,7 @@ contract GigaCrowdsale is  Contactable {
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != 0x0);
-    
+
     contactInformation = _contactInformation;
     token = createTokenContract();
     token.setContactInformation(_contactInformation);
@@ -278,8 +278,8 @@ contract GigaCrowdsale is  Contactable {
     endTime = _endTime;
     rate = _rate;
     wallet = _wallet;
-    
-   
+
+
   }
 
   // creates the token to be sold.
@@ -302,7 +302,7 @@ contract GigaCrowdsale is  Contactable {
 
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
     tokensPurchased = tokensPurchased.add(tokens);
@@ -355,13 +355,24 @@ contract GigaCrowdsale is  Contactable {
 
   function increaseSupply(uint256 _increaseByAmount) external onlyOwner {
     require(_increaseByAmount > 0);
-      
+
     token.increaseSupply(_increaseByAmount);
-   
+
   }
 
   function setTokenContactInformation(string _info) external onlyOwner {
     token.setContactInformation(_info);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

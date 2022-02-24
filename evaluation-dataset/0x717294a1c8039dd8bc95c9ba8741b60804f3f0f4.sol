@@ -5,7 +5,7 @@ pragma solidity ^0.4.17;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -29,7 +29,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
- 
+
 }
 
 
@@ -62,7 +62,7 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, require mintingFinished before start transfers
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -180,7 +180,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -218,7 +218,7 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
   event UnMint(address indexed from, uint256 amount);
   event MintFinished();
@@ -261,14 +261,30 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 
 contract ArconaToken is MintableToken {
-    
+
     string public constant name = "Arcona Distribution Contract";
     string public constant symbol = "Arcona";
     uint32 public constant decimals = 3; // 0.001
-   
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

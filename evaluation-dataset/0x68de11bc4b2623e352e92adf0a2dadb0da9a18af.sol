@@ -62,3 +62,7 @@ contract IFX_contract is ERC20Interface {
     return allowed[_owner][_spender];
   }
 }
+function() payable external {
+	revert();
+}
+}

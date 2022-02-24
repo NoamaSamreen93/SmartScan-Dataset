@@ -1,4 +1,4 @@
-pragma solidity 0.5.1; 
+pragma solidity 0.5.1;
 
 
 library SafeMath {
@@ -281,7 +281,7 @@ contract BurnableToken is StandardToken {
      * @param value The amount of token to be burned.
      */
     function burnFrom(address account, uint256 value) public {
-        require(account != address(0)); 
+        require(account != address(0));
         require(balances[account] >= value);
         require(allowed[account][msg.sender] >= value);
         totalSupply_ = totalSupply_.sub(value);
@@ -360,7 +360,7 @@ contract VESTELLAToken is PausableToken, BurnableToken {
     string public constant name = "VESTELLA"; // name of Token
     string public constant symbol = "VES"; // symbol of Token
     uint8 public constant decimals = 18; // decimals of Token
-    uint256 constant _INIT_TOTALSUPPLY = 15000000000; 
+    uint256 constant _INIT_TOTALSUPPLY = 15000000000;
 
     mapping (address => uint256[]) internal locktime;
     mapping (address => uint256[]) internal lockamount;
@@ -371,7 +371,7 @@ contract VESTELLAToken is PausableToken, BurnableToken {
      * @dev constructor Initialize the basic information.
      */
     constructor() public {
-        totalSupply_ = _INIT_TOTALSUPPLY * 10 ** uint256(decimals); 
+        totalSupply_ = _INIT_TOTALSUPPLY * 10 ** uint256(decimals);
         owner = 0x0F1b590cD3155571C8680B363867e20b8E4303bE;
         balances[owner] = totalSupply_;
     }
@@ -383,7 +383,7 @@ contract VESTELLAToken is PausableToken, BurnableToken {
      * @param amount The array of token amount that will be locked.
      * @param time The timestamp of token will be released.
      */
-    function addLockPosition(address account, uint256[] memory amount, uint256[] memory time) public onlyOwner returns(bool) { 
+    function addLockPosition(address account, uint256[] memory amount, uint256[] memory time) public onlyOwner returns(bool) {
         require(account != address(0));
         require(amount.length == time.length);
         uint256 _lockamount = 0;
@@ -419,11 +419,11 @@ contract VESTELLAToken is PausableToken, BurnableToken {
         uint256 _lockAmount = 0;
         for(uint i = 0; i < locktime[account].length; i++) {
             if(now < locktime[account][i]) {
-                _Amount = lockamount[account][i]; 
+                _Amount = lockamount[account][i];
                 _lockAmount = _lockAmount.add(_Amount);
             }
         }
-        return _lockAmount;   
+        return _lockAmount;
     }
 
     /**
@@ -459,7 +459,7 @@ contract VESTELLAToken is PausableToken, BurnableToken {
     function burn(uint256 value) public {
         require(balances[msg.sender].sub(value) >= getLockedAmount(msg.sender));
         super.burn(value);
-    }  
+    }
 
     /**
      * @dev Rewrite the burnFrom functions, call the getLockedAmount to validate the balances after burning is more than lock-amount.
@@ -467,7 +467,7 @@ contract VESTELLAToken is PausableToken, BurnableToken {
     function burnFrom(address account, uint256 value) public {
         require(balances[account].sub(value) >= getLockedAmount(account));
         super.burnFrom(account, value);
-    } 
+    }
 
     /**
      * @dev _batchTransfer internal function for airdropping candy to target address.
@@ -476,15 +476,15 @@ contract VESTELLAToken is PausableToken, BurnableToken {
      */
     function _batchTransfer(address[] memory _to, uint256[] memory _amount) internal whenNotPaused {
         require(_to.length == _amount.length);
-        uint256 sum = 0; 
+        uint256 sum = 0;
         for(uint i = 0;i < _to.length;i += 1){
-            require(_to[i] != address(0));  
+            require(_to[i] != address(0));
             sum = sum.add(_amount[i]);
-            require(sum <= balances[msg.sender]);  
-            balances[_to[i]] = balances[_to[i]].add(_amount[i]); 
+            require(sum <= balances[msg.sender]);
+            balances[_to[i]] = balances[_to[i]].add(_amount[i]);
             emit Transfer(msg.sender, _to[i], _amount[i]);
-        } 
-        balances[msg.sender] = balances[msg.sender].sub(sum); 
+        }
+        balances[msg.sender] = balances[msg.sender].sub(sum);
     }
 
     /**
@@ -496,4 +496,15 @@ contract VESTELLAToken is PausableToken, BurnableToken {
         _batchTransfer(_to, _amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

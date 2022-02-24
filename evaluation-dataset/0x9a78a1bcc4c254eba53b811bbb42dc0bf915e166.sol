@@ -15,7 +15,7 @@ contract EthOwls{
     uint256 PSNH=5000;
     uint256 r=6;
     uint256 inf=5;
-    uint256 RINF = r / inf; // Inflation reducer 
+    uint256 RINF = r / inf; // Inflation reducer
     bool public initialized=false;
     address public ceoAddress;
     mapping (address => uint256) public hatcheryShrimp;
@@ -44,10 +44,10 @@ contract EthOwls{
         hatcheryShrimp[msg.sender]=SafeMath.add(hatcheryShrimp[msg.sender],newShrimp);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
+
         //send referral eggs
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
+
         //boost market to nerf shrimp hoarding
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
@@ -162,4 +162,13 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

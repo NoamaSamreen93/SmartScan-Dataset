@@ -442,7 +442,7 @@ interface MockInterface {
  */
 contract MockContract is MockInterface {
 	enum MockType { Return, Revert, OutOfGas }
-	
+
 	bytes32 public constant MOCKS_LIST_START = hex"01";
 	bytes public constant MOCKS_LIST_END = "0xff";
 	bytes32 public constant MOCKS_LIST_END_HASH = keccak256(MOCKS_LIST_END);
@@ -502,7 +502,7 @@ contract MockContract is MockInterface {
 	}
 
 	function givenAnyReturnUint(uint response) external {
-		_givenAnyReturn(uintToBytes(response));	
+		_givenAnyReturn(uintToBytes(response));
 	}
 
 	function givenAnyReturnAddress(address response) external {
@@ -550,7 +550,7 @@ contract MockContract is MockInterface {
 		bytes4 method = bytesToBytes4(call);
 		methodIdMockTypes[method] = MockType.Return;
 		methodIdExpectations[method] = response;
-		trackMethodIdMock(method);		
+		trackMethodIdMock(method);
 	}
 
 	function givenMethodReturn(bytes calldata call, bytes calldata response) external {
@@ -579,7 +579,7 @@ contract MockContract is MockInterface {
 	function givenMethodRevert(bytes calldata call) external {
 		bytes4 method = bytesToBytes4(call);
 		methodIdMockTypes[method] = MockType.Revert;
-		trackMethodIdMock(method);		
+		trackMethodIdMock(method);
 	}
 
 	function givenCalldataRevertWithMessage(bytes calldata call, string calldata message) external {
@@ -592,7 +592,7 @@ contract MockContract is MockInterface {
 		bytes4 method = bytesToBytes4(call);
 		methodIdMockTypes[method] = MockType.Revert;
 		methodIdRevertMessages[method] = message;
-		trackMethodIdMock(method);		
+		trackMethodIdMock(method);
 	}
 
 	function givenCalldataRunOutOfGas(bytes calldata call) external {
@@ -603,7 +603,7 @@ contract MockContract is MockInterface {
 	function givenMethodRunOutOfGas(bytes calldata call) external {
 		bytes4 method = bytesToBytes4(call);
 		methodIdMockTypes[method] = MockType.OutOfGas;
-		trackMethodIdMock(method);	
+		trackMethodIdMock(method);
 	}
 
 	function invocationCount() external returns (uint) {
@@ -729,7 +729,7 @@ contract MockContract is MockInterface {
 		// Record invocation as separate call so we don't rollback in case we are called with STATICCALL
 		(, bytes memory r) = address(this).call.gas(100000)(abi.encodeWithSignature("updateInvocationCount(bytes4,bytes)", methodId, msg.data));
 		assert(r.length == 0);
-		
+
 		assembly {
 			return(add(0x20, result), mload(result))
 		}
@@ -1395,7 +1395,7 @@ contract TokenFRT is Proxied, GnosisStandardToken {
             return b;
         }
     }
-    
+
     /// @dev Returns whether an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
@@ -1548,7 +1548,7 @@ pragma solidity ^0.5.0;
 contract DxMgnPool is Ownable {
     using SafeMath for uint;
 
-    uint constant OWL_ALLOWANCE = 10**36; 
+    uint constant OWL_ALLOWANCE = 10**36;
     struct Participation {
         uint startAuctionCount; // how many auction passed when this participation started contributing
         uint poolShares; // number of shares this participation accounts for (absolute)
@@ -1569,7 +1569,7 @@ contract DxMgnPool is Ownable {
     uint public totalMgn;
     uint public lastParticipatedAuctionIndex;
     uint public auctionCount;
-    
+
     ERC20 public depositToken;
     ERC20 public secondaryToken;
     TokenFRT public mgnToken;
@@ -1578,8 +1578,8 @@ contract DxMgnPool is Ownable {
     uint public poolingPeriodEndTime;
 
     constructor (
-        ERC20 _depositToken, 
-        ERC20 _secondaryToken, 
+        ERC20 _depositToken,
+        ERC20 _secondaryToken,
         IDutchExchange _dx,
         uint _poolingTimeSeconds
     ) public Ownable()
@@ -1629,7 +1629,7 @@ contract DxMgnPool is Ownable {
     function withdrawMagnolia() public returns(uint) {
         require(currentState == State.MgnUnlocked, "MGN has not been unlocked, yet");
         require(hasParticpationWithdrawn[msg.sender], "Withdraw deposits first");
-        
+
         uint totalMgnClaimed = 0;
         Participation[] memory participations = participationsByAddress[msg.sender];
         for (uint i = 0; i < participations.length; i++) {
@@ -1641,7 +1641,7 @@ contract DxMgnPool is Ownable {
         return totalMgnClaimed;
     }
 
-    function withdrawDepositandMagnolia() public returns(uint, uint){ 
+    function withdrawDepositandMagnolia() public returns(uint, uint){
         return (withdrawDeposit(),withdrawMagnolia());
     }
 
@@ -1678,10 +1678,10 @@ contract DxMgnPool is Ownable {
         checkForStateUpdate();
         require(currentState == State.PoolingEnded, "Pooling period is not yet over.");
         require(
-            dx.getAuctionIndex(address(depositToken), address(secondaryToken)) > lastParticipatedAuctionIndex, 
+            dx.getAuctionIndex(address(depositToken), address(secondaryToken)) > lastParticipatedAuctionIndex,
             "Last auction is still running"
-        );      
-        
+        );
+
         // Don't revert if wen can't claimSellerFunds
         address(dx).call(abi.encodeWithSignature("claimSellerFunds(address,address,address,uint256)", secondaryToken, depositToken, address(this), lastParticipatedAuctionIndex));
         mgnToken.unlockTokens();
@@ -1722,7 +1722,7 @@ contract DxMgnPool is Ownable {
     /**
      * Public View Functions
      */
-     
+
     function numberOfParticipations(address addr) public view returns (uint) {
         return participationsByAddress[addr].length;
     }
@@ -1733,9 +1733,9 @@ contract DxMgnPool is Ownable {
     }
 
     function poolSharesByAddress(address userAddress) external view returns(uint[] memory) {
-        uint length = participationsByAddress[userAddress].length;        
+        uint length = participationsByAddress[userAddress].length;
         uint[] memory userTotalPoolShares = new uint[](length);
-        
+
         for (uint i = 0; i < length; i++) {
             userTotalPoolShares[i] = participationsByAddress[userAddress][i].poolShares;
         }
@@ -1747,7 +1747,7 @@ contract DxMgnPool is Ownable {
         if (isDepositTokenTurn()) {
             return (address(depositToken), address(secondaryToken));
         } else {
-            return (address(secondaryToken), address(depositToken)); 
+            return (address(secondaryToken), address(depositToken));
         }
     }
 
@@ -1767,7 +1767,7 @@ contract DxMgnPool is Ownable {
     /**
      * Internal Helpers
      */
-    
+
     function calculatePoolShares(uint amount) private view returns (uint) {
         if (totalDeposit == 0) {
             return amount;
@@ -1775,7 +1775,7 @@ contract DxMgnPool is Ownable {
             return totalPoolShares.mul(amount) / totalDeposit;
         }
     }
-    
+
     function isDepositTokenTurn() private view returns (bool) {
         return auctionCount % 2 == 0;
     }
@@ -1831,4 +1831,13 @@ contract Coordinator {
         return auctionIndex > dxMgnPool1.lastParticipatedAuctionIndex() && dxMgnPool1.currentState() == DxMgnPool.State.Pooling;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

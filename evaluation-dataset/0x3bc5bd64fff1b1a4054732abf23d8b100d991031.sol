@@ -186,7 +186,7 @@ contract FootBall is Ownable,ERC721{
         uint8 isSell;
         uint8 isDraw;
     }
-    Player[] public players; 
+    Player[] public players;
     mapping(uint=>address) playerToOwner;
     mapping(address=>uint) ownerPlayerCount;
     mapping (uint => address) playerApprovals;
@@ -201,7 +201,7 @@ contract FootBall is Ownable,ERC721{
     }
     function() payable public{}
     //change fee
-    function changeDrawFee(uint _money)public onlyOwner{ 
+    function changeDrawFee(uint _money)public onlyOwner{
         drawFee = _money;
     }
     function changeDefendFee(uint _money) public onlyOwner{
@@ -214,7 +214,7 @@ contract FootBall is Ownable,ERC721{
         inviteRate = _rate;
     }
     //create player;
-    function createPlayer(uint16 _attack) public onlyOwner{ 
+    function createPlayer(uint16 _attack) public onlyOwner{
       uint id = players.push (Player(0 ether,0,_attack,0,0,0,0)) - 1;
       playerInDraw = playerInDraw.add(1);
       emit newPlayer(id,_attack);
@@ -222,13 +222,13 @@ contract FootBall is Ownable,ERC721{
     //draw card
     function drawPlayer(address _address) public payable returns (uint playerId){
         require(msg.value == drawFee && playerInDraw > 0);
-        for(uint i =0;i < players.length;i++){ 
-            if(players[i].isDraw == 0){ 
+        for(uint i =0;i < players.length;i++){
+            if(players[i].isDraw == 0){
                 players[i].isDraw = 1;
                 playerInDraw  = playerInDraw.sub(1);
                 playerToOwner[i] = msg.sender;
                 ownerPlayerCount[msg.sender] = ownerPlayerCount[msg.sender].add(1);
-                if(_address != 0){ 
+                if(_address != 0){
                  uint inviteFee = msg.value * 5 / 100;
                  _address.transfer(inviteFee);
                  emit inviteBack(msg.sender,_address,inviteFee);
@@ -238,7 +238,7 @@ contract FootBall is Ownable,ERC721{
             }
         }
     }
-    //battle 
+    //battle
     function playerAttack(uint _playerA,uint _playerB) external{
         require(playerToOwner[_playerA] == msg.sender && players[_playerB].isDraw == 1 && playerToOwner[_playerA] != playerToOwner[_playerB]);
         require(now >= players[_playerB].readytime);
@@ -248,7 +248,7 @@ contract FootBall is Ownable,ERC721{
         address ownerOfB = playerToOwner[_playerB];
         if(rdId >= players[_playerA].attack){
             attackA = rdId -  players[_playerA].attack;
-        }else{ 
+        }else{
             attackA =  players[_playerA].attack - rdId;
         }
         if(rdId >= players[_playerB].attack){
@@ -262,7 +262,7 @@ contract FootBall is Ownable,ERC721{
             playerToOwner[_playerB] = msg.sender;
             ownerPlayerCount[msg.sender] = ownerPlayerCount[msg.sender].add(1);
             ownerPlayerCount[playerToOwner[_playerB]] = ownerPlayerCount[playerToOwner[_playerB]].sub(1);
-        }else{ 
+        }else{
             result = 2;
             playerToOwner[_playerA] = playerToOwner[_playerB];
             ownerPlayerCount[msg.sender] = ownerPlayerCount[msg.sender].sub(1);
@@ -278,11 +278,11 @@ contract FootBall is Ownable,ERC721{
     }
     //sendback
     function sendPlayerBack(uint[] _id) public {
-        for(uint i=0;i<_id.length;i++){ 
+        for(uint i=0;i<_id.length;i++){
             uint256 id = _id[i];
             require(playerToOwner[id] == msg.sender);
             uint fee = drawFee * backFee/100;
-            //init player info 
+            //init player info
             players[id].isDraw = 0;
             players[id].isSell = 0;
             players[id].readytime = 0;
@@ -290,9 +290,9 @@ contract FootBall is Ownable,ERC721{
             playerToOwner[id] = 0;
             ownerPlayerCount[msg.sender] = ownerPlayerCount[msg.sender].sub(1);
             playerInDraw  = playerInDraw.add(1);
-            if(address(this).balance >= fee){ 
-                msg.sender.transfer(fee);    
-            }  
+            if(address(this).balance >= fee){
+                msg.sender.transfer(fee);
+            }
             emit playerBack(id,msg.sender);
         }
 
@@ -326,7 +326,7 @@ contract FootBall is Ownable,ERC721{
         _transfer(owner, msg.sender, _tokenId);
     }
     //market functions
-    function setPlayerPrice(uint _id,uint _price) public payable onlyOwnerOf(_id){ 
+    function setPlayerPrice(uint _id,uint _price) public payable onlyOwnerOf(_id){
         require(msg.value == defendFee);
         players[_id].isSell = 1;
         players[_id].sellPrice = _price;
@@ -344,4 +344,15 @@ contract FootBall is Ownable,ERC721{
         owner.transfer(msg.value);
         emit purChase(_id,msg.sender,owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

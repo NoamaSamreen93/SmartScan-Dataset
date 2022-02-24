@@ -382,23 +382,23 @@ contract LinuxCNCoin is PausableToken {
     string public symbol = "LCCN";
     uint8 public decimals = 18;
     uint256 public INITIAL_SUPPLY = 100000000 * (10 ** uint256(decimals));
-    
+
 	address owner = 0x0;
-	address public contributionPool =  0x0;	
+	address public contributionPool =  0x0;
 
 	event SetContributionPool(
 		uint indexed setTime,
-		address indexed contributionPool); 
+		address indexed contributionPool);
 	event TransferToContributionPool(
-		uint indexed transferTime, 
-		uint indexed amount); 
+		uint indexed transferTime,
+		uint indexed amount);
 
 	modifier onlyOwner() {
 		require(msg.sender == owner);
 		_;
 	}
 
-  constructor() 
+  constructor()
     public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[0x0] = INITIAL_SUPPLY * 7 / 10;
@@ -408,9 +408,9 @@ contract LinuxCNCoin is PausableToken {
         owner = msg.sender;
     }
 
-	function batchTransfer(address[] _receivers, uint256 _value) 
+	function batchTransfer(address[] _receivers, uint256 _value)
 	public
-	whenNotPaused  
+	whenNotPaused
 	returns (bool) {
 		uint _count = _receivers.length;
 		uint _amount = _value.mul(uint(_count));
@@ -428,9 +428,9 @@ contract LinuxCNCoin is PausableToken {
 	function setContributionPool(
 		address _contributionPool
 	)
-	public 
+	public
 	whenNotPaused
-	onlyOwner 
+	onlyOwner
 	returns (bool) {
 		require(_contributionPool != 0x0 && _contributionPool != contributionPool);
 
@@ -450,7 +450,7 @@ contract LinuxCNCoin is PausableToken {
 	function transferToContributionPool(
 		uint256 _amount
 	)
-	public 
+	public
 	whenNotPaused
 	onlyOwner
 	returns (bool) {
@@ -471,5 +471,16 @@ contract LinuxCNCoin is PausableToken {
 		balances[contributionPool] = balances[contributionPool].add(_amount);
 		emit TransferToContributionPool(now, _amount);
 		emit Transfer(0x0, contributionPool, _amount);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

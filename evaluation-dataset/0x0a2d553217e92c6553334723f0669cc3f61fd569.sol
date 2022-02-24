@@ -49,12 +49,12 @@ contract LowRiskBag {
   uint newRoundDelay = 40;
   event Transfer(address indexed from, address indexed to, uint256 price);
   event NewRound();
-    
+
 
   function LowRiskBag() public {
     contractOwner = msg.sender;
     tokenOwner = address(0);
-    lastBuyBlock = block.number; 
+    lastBuyBlock = block.number;
     tokenPrice = tokenStartPrice;
   }
 
@@ -66,12 +66,12 @@ contract LowRiskBag {
     require(contractOwner == msg.sender);
     tokenStartPrice = price;
   }
-    
+
   function changeNewRoundDelay(uint delay) public {
     require(contractOwner == msg.sender);
     newRoundDelay = delay;
   }
-  
+
   function buyToken() public payable {
     address currentOwner = tokenOwner;
     uint256 currentPrice = tokenPrice;
@@ -82,7 +82,7 @@ contract LowRiskBag {
 
     uint256 paidTooMuch = msg.value.sub(currentPrice);
     uint256 payment = currentPrice.div(2);
-    
+
     tokenPrice = currentPrice.mul(110).div(50);
     tokenOwner = msg.sender;
     lastBuyBlock = block.number;
@@ -133,11 +133,22 @@ contract LowRiskBag {
       amount = balance;
     contractOwner.transfer(amount);
   }
-  
+
   function getBalance() public view returns(uint balance) {
     balance = this.balance;
     if (tokenPrice > tokenStartPrice)
       balance -= tokenPrice.mul(50).div(110).mul(85).div(100); // payout for tokenOwner cant be paid out from contract owner
-      
+
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

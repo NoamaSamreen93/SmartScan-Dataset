@@ -238,7 +238,7 @@ contract Escrow is Ownable {
       */
     function beneficiaryWithdraw(address _wallet) public onlyOwner {
         uint256 _amount = address(this).balance;
-        
+
         _wallet.transfer(_amount);
 
         emit Withdrawn(_wallet, _amount);
@@ -1219,4 +1219,15 @@ contract DSLACrowdsale is VestedCrowdsale, Whitelist, Pausable, PullPayment {
 
         _token.transfer(_wallet, tokensToWithdraw);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

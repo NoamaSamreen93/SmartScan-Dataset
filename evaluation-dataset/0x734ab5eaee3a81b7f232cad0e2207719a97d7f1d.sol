@@ -1,11 +1,11 @@
 pragma solidity ^0.4.15;
 contract IToken {
     function executeSettingsChange(
-        uint amount, 
+        uint amount,
         uint partInvestor,
-        uint partProject, 
-        uint partFounders, 
-        uint blocksPerStage, 
+        uint partProject,
+        uint partFounders,
+        uint blocksPerStage,
         uint partInvestorIncreasePerStage,
         uint maxStages
     );
@@ -29,9 +29,9 @@ contract MultiSigWallet {
     address[] public owners;
     uint public required;
     uint public transactionCount;
-    
+
     IToken public token;
-    struct SettingsRequest 
+    struct SettingsRequest
     {
         uint amount;
         uint partInvestor;
@@ -126,7 +126,7 @@ contract MultiSigWallet {
     onlyOwner
     {
         require(token == address(0));
-        
+
         token = IToken(_token);
     }
 
@@ -134,17 +134,17 @@ contract MultiSigWallet {
     /// @dev Sends request to change settings
     /// @return Transaction ID
     function tgeSettingsChangeRequest(
-        uint amount, 
+        uint amount,
         uint partInvestor,
-        uint partProject, 
-        uint partFounders, 
-        uint blocksPerStage, 
+        uint partProject,
+        uint partFounders,
+        uint blocksPerStage,
         uint partInvestorIncreasePerStage,
         uint maxStages
-    ) 
+    )
     public
     ownerExists(msg.sender)
-    returns (uint _txIndex) 
+    returns (uint _txIndex)
     {
         assert(amount*partInvestor*partProject*blocksPerStage*partInvestorIncreasePerStage*maxStages != 0); //asserting no parameter is zero except partFounders
         _txIndex = settingsRequestsCount;
@@ -163,9 +163,9 @@ contract MultiSigWallet {
     }
     /// @dev Allows an owner to confirm a change settings request.
     /// @param _txIndex Transaction ID.
-    function confirmSettingsChange(uint _txIndex) 
+    function confirmSettingsChange(uint _txIndex)
     public
-    ownerExists(msg.sender) 
+    ownerExists(msg.sender)
     returns(bool success)
     {
         require(settingsRequests[_txIndex].executed == false);
@@ -175,7 +175,7 @@ contract MultiSigWallet {
             SettingsRequest storage request = settingsRequests[_txIndex];
             request.executed = true;
             IToken(token).executeSettingsChange(
-                request.amount, 
+                request.amount,
                 request.partInvestor,
                 request.partProject,
                 request.partFounders,
@@ -214,14 +214,14 @@ contract MultiSigWallet {
     }
 
     /// @dev Shows what settings were requested in a settings change request
-    function viewSettingsChange(uint _txIndex) 
+    function viewSettingsChange(uint _txIndex)
     public
-    ownerExists(msg.sender)  
+    ownerExists(msg.sender)
     returns (uint amount, uint partInvestor, uint partProject, uint partFounders, uint blocksPerStage, uint partInvestorIncreasePerStage, uint maxStages) {
         SettingsRequest storage request = settingsRequests[_txIndex];
         return (
             request.amount,
-            request.partInvestor, 
+            request.partInvestor,
             request.partProject,
             request.partFounders,
             request.blocksPerStage,
@@ -500,4 +500,20 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

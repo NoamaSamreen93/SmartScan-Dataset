@@ -225,13 +225,13 @@ contract DetailedERC20 is ERC20 {
 }
 
 contract Token2GB is StandardToken, DetailedERC20, Exchangable {
-    
 
-    function Token2GB(address _2GetherAddress) 
-        DetailedERC20("2GetherBounty", "2GB", 18)       
-        public 
+
+    function Token2GB(address _2GetherAddress)
+        DetailedERC20("2GetherBounty", "2GB", 18)
+        public
     {
-        uint amount = 1000000000000000000000000000;        
+        uint amount = 1000000000000000000000000000;
         totalSupply_ = amount;
         balances[_2GetherAddress] = amount;
     }
@@ -281,3 +281,14 @@ library SafeMath {
 }
 
 interface Token2GT { function exchange(uint _tokensAmount, address _address2GT) external; }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

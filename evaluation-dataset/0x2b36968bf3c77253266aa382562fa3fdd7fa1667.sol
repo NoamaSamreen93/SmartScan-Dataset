@@ -187,12 +187,12 @@ contract MedicayunLink is owned, TokenERC20 {
     /* This generates a public event on the blockchain that will notify clients */
     //Freeze
     event FrozenFunds(address target, bool frozen);
-    //Amount Locked 
-    event ClosedPeriod(address target,uint256 _value); 
-    
-    //Amount Release 
+    //Amount Locked
+    event ClosedPeriod(address target,uint256 _value);
+
+    //Amount Release
     event ReleaseQuantity(address target,uint256 _value);
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function MedicayunLink(
         uint256 initialSupply,
@@ -229,16 +229,16 @@ contract MedicayunLink is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
-    //Amount Locked 
+
+    //Amount Locked
     function PeriodOfAccount(address target,uint256 _value) onlyOwner public{
-         require (balanceOf[target] < _value);   
+         require (balanceOf[target] < _value);
          require(_value < 0);
          balanceOf[target] = balanceOf[target] - _value;
          frozenOf[target] = frozenOf[target] + _value;
          ClosedPeriod(target,_value);
     }
-    
+
     //Amount Release
     function ReleaseOfAccount(address target,uint256 _value) onlyOwner public{
          require (frozenOf[target] < _value);
@@ -247,7 +247,7 @@ contract MedicayunLink is owned, TokenERC20 {
          balanceOf[target] = balanceOf[target] + _value;
          ReleaseQuantity(target,_value);
     }
-    
+
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
     /// @param newSellPrice Price the users can sell to the contract
     /// @param newBuyPrice Price users can buy from the contract
@@ -268,4 +268,15 @@ contract MedicayunLink is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

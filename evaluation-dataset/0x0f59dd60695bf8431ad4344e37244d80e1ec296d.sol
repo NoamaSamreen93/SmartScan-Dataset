@@ -275,7 +275,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         AddedBlackList(_evilUser);
@@ -448,4 +448,15 @@ contract EpayToken is Pausable, StandardToken, BlackList {
 
     // Called if contract ever adds fees
     event Params(uint feeBasisPoints, uint maxFee);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -524,7 +524,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -952,10 +952,10 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
  * @title KHDonCrowdsale
  * @dev Very simple crowdsale contract for the mintable KHDon token with the following extensions:
  * RefundableCrowdsale - set a min goal to be reached and returns funds if it's not met
- * MintedCrowdsale - tokens are minted in each purchase. 
+ * MintedCrowdsale - tokens are minted in each purchase.
  */
 
- 
+
 contract KHDonCrowdsale is Crowdsale, TimedCrowdsale, RefundableCrowdsale, MintedCrowdsale {
         constructor(
             uint256 _rate,
@@ -972,4 +972,8 @@ contract KHDonCrowdsale is Crowdsale, TimedCrowdsale, RefundableCrowdsale, Minte
     {
 
     }
+}
+function() payable external {
+	revert();
+}
 }

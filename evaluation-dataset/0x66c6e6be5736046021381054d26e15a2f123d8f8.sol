@@ -429,3 +429,7 @@ contract DeVere is ERC20, MinterRole {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

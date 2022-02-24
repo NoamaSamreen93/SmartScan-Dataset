@@ -1096,7 +1096,7 @@ contract TokenUpgrader {
 contract UpgradeableToken is MintableAndPausableToken {
     // Contract or person who can set the upgrade path.
     address public upgradeMaster;
-    
+
     // Bollean value needs to be true to start upgrades
     bool private upgradesAllowed;
 
@@ -1161,8 +1161,8 @@ contract UpgradeableToken is MintableAndPausableToken {
     // Allow the token holder to upgrade some of their tokens to a new contract.
     function upgrade(uint _value) external {
         UpgradeState state = getUpgradeState();
-        
-        // Check upgrate state 
+
+        // Check upgrate state
         require(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading);
         // Validate input value
         require(_value != 0);
@@ -1530,8 +1530,8 @@ contract BaseCrowdsale is Pausable, Ownable {
     function () external payable {
         buyTokens(msg.sender);
     }
-    
-    
+
+
 
     function transferTokenOwnership(address newOwner)
         external
@@ -1541,9 +1541,9 @@ contract BaseCrowdsale is Pausable, Ownable {
         emit TokenOwnershipTransferred(owner(), newOwner);
         token.transferOwnership(newOwner);
     }
-    
-    function setWallet(address payable _wallet) 
-    external 
+
+    function setWallet(address payable _wallet)
+    external
     onlyOwner
     checkZeroAddress(_wallet)
     {
@@ -1728,14 +1728,14 @@ contract TokenCapCrowdsale is BaseCrowdsale {
     function setIndividualCap(uint256 _newIndividualCap)
         external
         onlyOwner
-    {     
+    {
         individualCap = _newIndividualCap;
     }
 
     function setTokenCap(uint256 _newTokenCap)
         external
         onlyOwner
-    {     
+    {
         tokenCap = _newTokenCap;
     }
 
@@ -1860,4 +1860,13 @@ contract PrivateSale is TokenCapCrowdsale, TokenCapRefund {
     function setHodlStartTime(uint256 _hodlStartTime) onlyOwner external{
         hodlStartTime = _hodlStartTime;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

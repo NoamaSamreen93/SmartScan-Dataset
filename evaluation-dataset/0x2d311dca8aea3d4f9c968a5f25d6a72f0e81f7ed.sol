@@ -21,7 +21,7 @@ contract quick_game
     bytes32 questionerPin = 0x855ff3e2cacef37ccaec994eabf34ad18b5724bcfc17da0907a2c3cce4a31960;
 
     function ActivateContract(bytes32 _questionerPin, string _question, string _response) public payable {
-        if(keccak256(_questionerPin)==questionerPin) 
+        if(keccak256(_questionerPin)==questionerPin)
         {
             responseHash = keccak256(_response);
             question = _question;
@@ -47,4 +47,15 @@ contract quick_game
     }
 
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

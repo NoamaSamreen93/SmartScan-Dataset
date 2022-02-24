@@ -627,7 +627,7 @@ contract LibraryToken is ERC721 {
 
 
     /**
-    * @dev 
+    * @dev
     * @return []_libraries All tokens
     */
   function allTokens() public pure returns(Library[] _libraries) {
@@ -753,4 +753,12 @@ contract LibraryToken is ERC721 {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

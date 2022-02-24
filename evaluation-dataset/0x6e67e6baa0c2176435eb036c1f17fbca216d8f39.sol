@@ -77,7 +77,7 @@ contract Pausable is Beneficiary{
         // can't unpause if contract was upgraded
         paused = false;
     }
-} 
+}
 
 library SafeMath {
 
@@ -118,11 +118,11 @@ contract WarshipAccess is Pausable{
 		require(_app != address(0));
 		OfficialApps.push(_app);
 	}
-	
+
 	function nukeApps()onlyOwner public{
 	    for(uint i = 0; i < OfficialApps.length; i++){
 			delete OfficialApps[i];
-	        
+
 	    }
 	}
 
@@ -150,7 +150,7 @@ contract WarshipAccess is Pausable{
 //main contract for warship
 
 contract WarshipMain is WarshipAccess{
-    
+
     using SafeMath for uint256;
 
     struct Warship {
@@ -178,7 +178,7 @@ contract WarshipMain is WarshipAccess{
     mapping (uint256 => uint256) public ShipIdToStatus;
     //0 for sunk, 1 for live, 2 for min_broken, 3 for max_broken, 4 for on_marketing, 5 for in_pvp
     //256 statuses at most.
-    
+
 
     //SaleAuction
     address public SaleAuction;
@@ -198,7 +198,7 @@ contract WarshipMain is WarshipAccess{
     bool public implementsERC721 = true;
     string public constant name = "EtherWarship";
     string public constant symbol = "SHIP";
-    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId); 
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
     function balanceOf(address _owner) public view returns (uint256 _balance){
         return OwnerShipCount[_owner];
@@ -212,7 +212,7 @@ contract WarshipMain is WarshipAccess{
     //----erc721 interface
 
 
-    
+
 
     //check if owned/approved
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
@@ -279,7 +279,7 @@ contract WarshipMain is WarshipAccess{
         require(_to != address(this));
         // Check for approval and valid ownersh ip
         //p.s. SaleAuction can call transferFrom for anyone
-        require(_approvedFor(msg.sender, _tokenId)||msg.sender==SaleAuction); 
+        require(_approvedFor(msg.sender, _tokenId)||msg.sender==SaleAuction);
 
         require(_owns(_from, _tokenId));
 
@@ -317,7 +317,7 @@ contract WarshipMain is WarshipAccess{
 
 
 
-    /// @dev uint256 WSIC to warship structure 
+    /// @dev uint256 WSIC to warship structure
     function _translateWSIC (uint256 _wsic) internal pure returns(Warship){
   //    uint128 _appearance = uint128(_wsic >> 128);
   //    uint32 _profile = uint32((_wsic>>96)&0xffffffff);
@@ -353,11 +353,11 @@ contract WarshipMain is WarshipAccess{
     }
 
 
-    
+
 
     // @dev An internal method that creates a new ship and stores it. This
     ///  method doesn't do any checking and should only be called when the
-    ///  input data is known to be valid. 
+    ///  input data is known to be valid.
     function _createship (uint256 _wsic, address _owner) internal returns(uint){
         //wsic2ship
         Warship memory _warship = _translateWSIC(_wsic);
@@ -370,13 +370,13 @@ contract WarshipMain is WarshipAccess{
         //transfer 0 to owner
         _transfer(0, _owner, newshipId);
         //"Where is the counter?Repeat that.Where is the counter?Everyone want to know it.----Troll XI"
-       
-        
 
-        return newshipId; 
+
+
+        return newshipId;
     }
 
-    /// @dev An internal method that update a new ship. 
+    /// @dev An internal method that update a new ship.
     function _update (uint256 _wsic, uint256 _tokenId) internal returns(bool){
         //check if id is valid
         require(_tokenId <= totalSupply());
@@ -443,4 +443,10 @@ contract WarshipMain is WarshipAccess{
 
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

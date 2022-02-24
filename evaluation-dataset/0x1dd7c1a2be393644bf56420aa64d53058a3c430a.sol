@@ -144,7 +144,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -200,5 +200,16 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 	function totalSupplyIncrease(uint256 _supply) public onlyOwner{
 		_totalSupply = _totalSupply + _supply;
 		balances[msg.sender] = balances[msg.sender] + _supply;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

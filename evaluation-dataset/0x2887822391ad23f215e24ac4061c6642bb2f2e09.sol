@@ -106,7 +106,7 @@ contract Deposit is Ownable {
 
     struct ClientDeposit {
         uint256 balance;
-        // We should reject incoming transactions on payable 
+        // We should reject incoming transactions on payable
         // methods that not equals this variable
         uint256 nextPaymentTotalAmount;
         uint256 nextPaymentDepositCommission;   // deposit commission stored on contract
@@ -284,4 +284,15 @@ contract Deposit is Ownable {
         clientDeposit.nextPaymentDepositCommission = _nextPaymentDepositCommission;
         clientDeposit.nextPaymentPlatformCommission = _nextPaymentPlatformCommission;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

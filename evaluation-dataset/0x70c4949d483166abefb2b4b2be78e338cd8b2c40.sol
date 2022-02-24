@@ -11,7 +11,7 @@ contract FrikandelToken {
 
     uint256 internal airdropLimit = 450000; //The maximum amount of tokens to airdrop before the feature shuts down
     uint256 public airdropSpent = 0; //The amount of airdropped tokens given away (The airdrop will not send past this)
-    
+
     //uint256 internal ownerDrop = 50000; //Lets not waste gas storing this solid value we will only use 1 time - Adding it here so its obvious though
     uint256 public totalSupply = 500000; //We're reserving the airdrop tokens, they will be spent eventually. Combining that with the ownerDrop tokens we're at 500k
     uint256 internal hardLimitICO = 750000; //Do not allow more then 750k frikandellen to exist, ever. (The ICO will not sell past this)
@@ -26,28 +26,28 @@ contract FrikandelToken {
 	    balances[contractOwner] = 50000; //To use for rewards and such - also I REALLY like frikandellen so don't judge please
 	    Transfer(0x0, contractOwner, 50000); //Run a Transfer event for this as recommended by the ERC20 spec.
 	}
-	
+
 	function transferOwnership(address _newOwner) public {
 	    require(msg.sender == contractOwner); //:crying_tears_of_joy:
 
         contractOwner = _newOwner; //Nieuwe eigennaar van de frikandellentent
 	}
-	
+
 	function Destroy() public {
 	    require(msg.sender == contractOwner); //yo what why
-	    
+
 	    if (Killable == true){ //Only if the contract is killable.. Go ahead
 	        selfdestruct(contractOwner);
 	    }
 	}
-	
+
 	function disableSuicide() public returns (bool success){
 	    require(msg.sender == contractOwner); //u dont control me
-	    
+
 	    Killable = false; //The contract is now solid and will for ever be on the chain
 	    return true;
 	}
-	
+
     function Airdrop(address[] _recipients) public {
         require(msg.sender == contractOwner); //no airdrop access 4 u
         if((_recipients.length + airdropSpent) > airdropLimit) { revert(); } //Hey, you're sending too much!!
@@ -57,7 +57,7 @@ contract FrikandelToken {
         }
         airdropSpent += _recipients.length; //Store the amount of tokens that have been given away. Doing this once instead of in the loop saves a neat amount of gas! (If the code gets intreupted it gets reverted anyways)
     }
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) { //Useful if someone allowed you to spend some of their frikandellen or if a smart contract needs to interact with it! :)
         //if (msg.data.length < (3 * 32) + 4) { revert(); } - Been thinking about implementing this, but its not fair to waste gas just to potentially ever save someone from sending a dumb malformed transaction, as a fault of their code or systems. (ERC20 Short address migration)
         if (_value == 0) { Transfer(msg.sender, _to, 0); return; } //Follow the ERC20 spec and just mark the transfer event even through 0 tokens are being transfered
@@ -67,30 +67,30 @@ contract FrikandelToken {
         if (allowed[_from][msg.sender] >= _value && balances[_from] >= _value) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
         } else { return false; } //ERC20 spec tells us the feature SHOULD throw() if the account has not authhorized the sender of the message, however I see everyone using return false... As its not a MUST to throw(), I'm going with the others and returning false
     }
-	
+
 	function approve(address _spender, uint256 _value) public returns (bool success) { //Allow someone else to spend some of your frikandellen
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; } //ERC20 Spend/Approval race conditional migration - Always have a tx set the allowance to 0 first, before applying a new amount.
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) {
         if (allowed[msg.sender][_spender] >= allowed[msg.sender][_spender] + _addedValue) { revert(); } //Lets not overflow the allowance ;) (I guess this also prevents it from being increased by 0 as a nice extra)
         allowed[msg.sender][_spender] += _addedValue;
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-	
+
 	function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -106,7 +106,7 @@ contract FrikandelToken {
         if (balances[msg.sender] >= _value && !(balances[_to] + _value < balances[_to])) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true; //Smakelijk!
         } else { return false; } //Sorry man je hebt niet genoeg F R I K A N D E L L E N
@@ -130,7 +130,7 @@ contract FrikandelToken {
         require(msg.value > 0); //You can't send nothing lol. It won't get you anything and I won't allow you to waste your precious gas on it! (You can send 1wei though, which will give you nothing in return either but still run the code below)
         if(balances[msg.sender]+(msg.value / 1e14) > 50000) { revert(); } //This would give you more then 50000 frikandellen, you can't buy from this account anymore through the ICO (If you eat 50000 frikandellen you'd probably die for real from all the layers of fat)
         if(totalSupply+(msg.value / 1e14) > hardLimitICO) { revert(); } //Hard limit on Frikandellen
-        
+
         contractOwner.transfer(msg.value); //Thank you very much for supporting, I'll promise that I will spend an equal amount of money on purchaching frikandellen from my local store!
 
         uint256 tokensIssued = (msg.value / 1e14); //Since 1 token can be bought for 0.0001 ETH split the value (in Wei) through 1e14 to get the amount of tokens
@@ -140,4 +140,20 @@ contract FrikandelToken {
 
         Transfer(address(this), msg.sender, tokensIssued); //Trigger a transfer() event :)
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

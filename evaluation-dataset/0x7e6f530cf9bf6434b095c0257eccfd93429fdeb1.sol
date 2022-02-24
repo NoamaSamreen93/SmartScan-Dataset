@@ -98,8 +98,8 @@ contract Ownable {
   address public admin;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
-  
+
+
   constructor() public {
     owner = msg.sender;
   }
@@ -130,7 +130,7 @@ contract Ownable {
 
     admin = newAdmin;
   }
-  
+
 }
 
 contract Pausable is Ownable {
@@ -277,26 +277,26 @@ contract BurnableToken is BasicToken, Ownable {
 contract FreezeToken is BasicToken, Ownable {
   event Freeze(address indexed from, uint256 value);
   event Unfreeze(address indexed from, uint256 value);
-  
+
   function freeze(uint256 _value) public returns (bool success) {
         if (balances[msg.sender] < _value) {
-        
+
         }else{
             if (_value <= 0){}
             else{
                 balances[msg.sender] = balances[msg.sender].sub(_value);
                 freezeOf[msg.sender] = freezeOf[msg.sender].add(_value);
                 emit Freeze(msg.sender, _value);
-                return true;        
+                return true;
             }
-            
+
         }
-		
+
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         if (balances[msg.sender] < _value) {
-        
+
         }else{
             if (_value <= 0){}
             else{
@@ -305,7 +305,7 @@ contract FreezeToken is BasicToken, Ownable {
                 emit Unfreeze(msg.sender, _value);
                 return true;
             }
-            
+
         }
     }
 }
@@ -319,7 +319,7 @@ contract WECCoin is BurnableToken,FreezeToken, DetailedERC20, ERC20Token,Pausabl
   string public constant symbol = "WEC";
   string public constant name = "World Ex Coin";
   uint8 public constant decimals = 18;
-      
+
   uint256 public constant TOTAL_SUPPLY = 100*(10**8)*(10**uint256(decimals));
 
   constructor() DetailedERC20(name, symbol, decimals) public {
@@ -329,7 +329,7 @@ contract WECCoin is BurnableToken,FreezeToken, DetailedERC20, ERC20Token,Pausabl
     emit Transfer(address(0x0), msg.sender, _totalSupply);
   }
 
-  function setAdmin(address newAdmin) onlyOwner public {	
+  function setAdmin(address newAdmin) onlyOwner public {
     address oldAdmin = admin;
     super.setAdmin(newAdmin);
     approve(oldAdmin, 0);
@@ -352,11 +352,22 @@ contract WECCoin is BurnableToken,FreezeToken, DetailedERC20, ERC20Token,Pausabl
     emit Transfer(_from, _to, _value);
 
     return true;
-	
+
   }
-  
+
 
   function() public payable {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

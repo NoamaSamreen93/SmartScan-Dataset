@@ -188,7 +188,7 @@ contract RobotBTC is Owned, TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {
-        
+
     }
 
     /* Internal transfer, only can be called by this contract */
@@ -248,4 +248,13 @@ contract RobotBTC is Owned, TokenERC20 {
     function setExchange(bool istrue) onlyOwner public {
         isOpened = istrue;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

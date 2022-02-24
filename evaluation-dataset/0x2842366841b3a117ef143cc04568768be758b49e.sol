@@ -8,15 +8,26 @@ pragma solidity ^0.4.18;
 */
 contract Charity_For_My_Friend{
     address owner;
-    
+
     function Charity_For_My_Friend() {
         owner = msg.sender;
     }
-    
+
     function kill() {
         require(msg.sender == owner);
         selfdestruct(owner);
     }
-    
+
     function () payable {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -93,7 +93,7 @@ contract TokenERC20 {
         uint256 initialSupply =5500000000;
         string memory tokenName ="GOLDT eXchange Coin";
         string memory tokenSymbol="GOLDTX";
-   
+
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
@@ -214,4 +214,13 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

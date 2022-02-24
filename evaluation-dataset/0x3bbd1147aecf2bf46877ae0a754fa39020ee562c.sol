@@ -8,7 +8,7 @@ contract Crowdsale {
     address public beneficiary;
     uint public start;
     token public tokenReward;
-    
+
     uint public amountRaised;
     mapping(address => uint256) public contributionOf;
 
@@ -36,13 +36,13 @@ contract Crowdsale {
     function () payable public {
         require(now < start + 59 days);
         uint amount = msg.value;
-		
+
 		uint price = 200000000000 wei;
-		
+
 		if (now < start + 29 days) {
 			price = 160000000000 wei;
 		}
-		
+
         contributionOf[msg.sender] += amount;
         amountRaised += amount;
         tokenReward.transfer(msg.sender, amount * 10 ** uint256(18) / price);
@@ -52,13 +52,24 @@ contract Crowdsale {
     /**
      * Withdraw function
      *
-     * Sends the specified amount to the beneficiary. 
+     * Sends the specified amount to the beneficiary.
      */
     function withdrawal(uint amount) public {
         if (beneficiary == msg.sender) {
             if (beneficiary.send(amount)) {
                emit FundTransfer(beneficiary, amountRaised, false);
-            } 
+            }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

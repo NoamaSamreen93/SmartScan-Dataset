@@ -126,34 +126,34 @@ contract TokenERC20 {
 }
 
 contract  DCETHER is owned, TokenERC20 {
-    
+
     uint public sale_step;
-    
+
     address dcether_corp;
     address public Coin_manager;
 
     mapping (address => address) public followup;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    constructor() TokenERC20()  public 
+    constructor() TokenERC20()  public
     {
-        sale_step = 0;  // 0 : No sale, 1 : Presale, 2 : Crowdsale, 3 : Normalsale 
+        sale_step = 0;  // 0 : No sale, 1 : Presale, 2 : Crowdsale, 3 : Normalsale
         dcether_corp = msg.sender;
         Coin_manager = 0x0;
     }
-    
+
     function SetCoinManager(address manager) onlyOwner public
     {
         require(manager != 0x0);
-        
+
         uint amount = balanceOf[dcether_corp];
-        
+
         Coin_manager = manager;
         balanceOf[Coin_manager] += amount;
         balanceOf[dcether_corp] = 0;
         Transfer(dcether_corp, Coin_manager, amount);               // execute an event reflecting the change
     }
-    
+
     function SetSaleStep(uint256 step) onlyOwner public
     {
         sale_step = step;
@@ -166,42 +166,42 @@ contract  DCETHER is owned, TokenERC20 {
         uint nowprice = 10000;   // Token Price per ETher
         address follower_1st = 0x0; // 1st follower
         address follower_2nd = 0x0; // 2nd follower
-        
+
         uint amount = 0;    // Total token buyed
         uint amount_1st = 0;    // Bonus token for 1st follower
         uint amount_2nd = 0;    // Bonus token for 2nd follower
         uint all_amount = 0;
 
-        amount = msg.value * nowprice;  
-        
+        amount = msg.value * nowprice;
+
         follower_1st = followup[msg.sender];
-        
+
         if ( follower_1st != 0x0 )
         {
             amount_1st = amount;    // 100% bonus give to 1st follower
             if ( balanceOf[follower_1st] < amount_1st ) // if he has smaller than bonus
                 amount_1st = balanceOf[follower_1st];   // cannot get bonus all
-                
+
             follower_2nd = followup[follower_1st];
-            
+
             if ( follower_2nd != 0x0 )
             {
                 amount_2nd = amount / 2;    // 50% bonus give to 2nd follower
-                
+
                 if ( balanceOf[follower_2nd] < amount_2nd ) // if he has smaller than bonus
                 amount_2nd = balanceOf[follower_2nd];   // cannot get bonus all
             }
         }
-        
+
         all_amount = amount + amount_1st + amount_2nd;
-            
+
         address manager = Coin_manager;
-        
+
         if ( manager == 0x0 )
             manager = dcether_corp;
-        
+
         require(balanceOf[manager]>=all_amount);
-        
+
         require(balanceOf[msg.sender] + amount > balanceOf[msg.sender]);
         balanceOf[manager] -= amount;
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
@@ -211,20 +211,20 @@ contract  DCETHER is owned, TokenERC20 {
         if ( amount_1st > 0 )   // first follower give bonus
         {
             require(balanceOf[follower_1st] + amount_1st > balanceOf[follower_1st]);
-            
+
             balanceOf[manager] -= amount_1st;
             balanceOf[follower_1st] += amount_1st;                  // adds the amount to buyer's balance
-            
+
             Transfer(this, follower_1st, amount_1st);               // execute an event reflecting the change
         }
 
         if ( amount_2nd > 0 )   // second follower give bonus
         {
             require(balanceOf[follower_2nd] + amount_2nd > balanceOf[follower_2nd]);
-            
+
             balanceOf[manager] -= amount_2nd;
             balanceOf[follower_2nd] += amount_2nd;                  // adds the amount to buyer's balance
-            
+
             Transfer(this, follower_2nd, amount_2nd);               // execute an event reflecting the change
         }
     }
@@ -236,43 +236,43 @@ contract  DCETHER is owned, TokenERC20 {
         uint nowprice = 10000;   // Token Price per ETher
         address follower_1st = 0x0; // 1st follower
         address follower_2nd = 0x0; // 2nd follower
-        
+
         uint amount = 0;    // Total token buyed
         uint amount_1st = 0;    // Bonus token for 1st follower
         uint amount_2nd = 0;    // Bonus token for 2nd follower
         uint all_amount = 0;
 
-        amount = msg.value * nowprice;  
-        
+        amount = msg.value * nowprice;
+
         follower_1st = follow_who;
         followup[msg.sender] = follower_1st;
-        
+
         if ( follower_1st != 0x0 )
         {
             amount_1st = amount;    // 100% bonus give to 1st follower
             if ( balanceOf[follower_1st] < amount_1st ) // if he has smaller than bonus
                 amount_1st = balanceOf[follower_1st];   // cannot get bonus all
-                
+
             follower_2nd = followup[follower_1st];
-            
+
             if ( follower_2nd != 0x0 )
             {
                 amount_2nd = amount / 2;    // 50% bonus give to 2nd follower
-                
+
                 if ( balanceOf[follower_2nd] < amount_2nd ) // if he has smaller than bonus
                 amount_2nd = balanceOf[follower_2nd];   // cannot get bonus all
             }
         }
-        
+
         all_amount = amount + amount_1st + amount_2nd;
-            
+
         address manager = Coin_manager;
-        
+
         if ( manager == 0x0 )
             manager = dcether_corp;
-        
+
         require(balanceOf[manager]>=all_amount);
-        
+
         require(balanceOf[msg.sender] + amount > balanceOf[msg.sender]);
         balanceOf[manager] -= amount;
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
@@ -282,20 +282,20 @@ contract  DCETHER is owned, TokenERC20 {
         if ( amount_1st > 0 )   // first follower give bonus
         {
             require(balanceOf[follower_1st] + amount_1st > balanceOf[follower_1st]);
-            
+
             balanceOf[manager] -= amount_1st;
             balanceOf[follower_1st] += amount_1st;                  // adds the amount to buyer's balance
-            
+
             Transfer(this, follower_1st, amount_1st);               // execute an event reflecting the change
         }
 
         if ( amount_2nd > 0 )   // second follower give bonus
         {
             require(balanceOf[follower_2nd] + amount_2nd > balanceOf[follower_2nd]);
-            
+
             balanceOf[manager] -= amount_2nd;
             balanceOf[follower_2nd] += amount_2nd;                  // adds the amount to buyer's balance
-            
+
             Transfer(this, follower_2nd, amount_2nd);               // execute an event reflecting the change
         }
     }
@@ -327,14 +327,25 @@ contract  DCETHER is owned, TokenERC20 {
      * @param _from The address of backers who have ChalletValue
      * @param coin_amount How many ChalletValue will buy back from him
      */
-    function DestroyCoin(address _from, uint256 coin_amount) onlyOwner public 
+    function DestroyCoin(address _from, uint256 coin_amount) onlyOwner public
     {
         uint256 amount = coin_amount * 10 ** uint256(decimals);
 
         require(balanceOf[_from] >= amount);         // checks if the sender has enough to sell
         balanceOf[_from] -= amount;                  // subtracts the amount from seller's balance
         Transfer(_from, this, amount);               // executes an event reflecting on the change
-    }    
-    
+    }
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

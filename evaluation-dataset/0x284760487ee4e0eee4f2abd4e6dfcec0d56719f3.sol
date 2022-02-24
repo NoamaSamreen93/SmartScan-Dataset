@@ -98,10 +98,10 @@ contract CGE is ERC20,Ownable{
 	mapping(address=>epoch[]) public lockEpochsMap;
 
 
-	 
+
     mapping(address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	
+
 
 	function CGE(){
 		totalSupply = MAX_SUPPLY;
@@ -153,13 +153,13 @@ contract CGE is ERC20,Ownable{
 		return true;
   	}
 
-  	function balanceOf(address _owner) public constant returns (uint256 balance) 
+  	function balanceOf(address _owner) public constant returns (uint256 balance)
   	{
 		return balances[_owner];
   	}
 
 
-  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
   	{
 		require(_to != address(0));
 
@@ -183,17 +183,28 @@ contract CGE is ERC20,Ownable{
 		return true;
   	}
 
-  	function approve(address _spender, uint256 _value) public returns (bool) 
+  	function approve(address _spender, uint256 _value) public returns (bool)
   	{
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
   	}
 
-  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
   	{
 		return allowed[_owner][_spender];
   	}
 
-	  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

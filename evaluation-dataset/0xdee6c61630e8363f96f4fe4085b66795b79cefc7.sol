@@ -81,7 +81,7 @@ contract StandardToken is Token {
             emit Transfer(msg.sender, _to, _value);
             return true;
         } else {
-            return false; 
+            return false;
         }
     }
 
@@ -95,7 +95,7 @@ contract StandardToken is Token {
             emit Transfer(_from, _to, _value);
             return true;
         } else {
-            return false; 
+            return false;
         }
     }
 
@@ -167,4 +167,13 @@ contract SecToken is StandardToken {
 
         TokenRecipient(_spender).receiveApproval(msg.sender, _value, address(this), _extraData);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

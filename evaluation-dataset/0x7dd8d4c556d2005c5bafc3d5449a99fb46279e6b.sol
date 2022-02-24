@@ -25,11 +25,11 @@ contract SmartRouletteToken {
 	mapping( address => mapping( address => uint256 ) ) _approvals;
 
 	bool stop_operation;
-	
+
 	uint256 _supply;
 	uint256 _init_count_tokens;
 	uint256 public costOfOneToken; //the cost of one token in wei
-	
+
 	address wallet_ICO;
 	bool enableICO;
 	uint256 min_value_buyToken; //in wei
@@ -39,7 +39,7 @@ contract SmartRouletteToken {
 	address developer_wallet;
 
 	address divident_contract = address(0x0);
-	
+
 	event TokenBuy(address buyer, uint256 amountOfTokens);
 
     //Contract data
@@ -61,25 +61,25 @@ contract SmartRouletteToken {
 
 		developer_wallet = address(0x8521E1f9220A251dE0ab78f6a2E8754Ca9E75242);
 		_balances[developer_wallet] = holderData((_supply*20)/100, true);
-		
+
 		wallet_ICO = address(0x2dff87f8892d65f7a97b1287e795405098ae7b7f);
 		_balances[wallet_ICO] = holderData((_supply*60)/100, true);
-		
+
 		fond_wallet = address(0x3501DD2B515EDC1920f9007782Da5ac018922502);
 		_balances[fond_wallet] = holderData((_supply*20)/100, true);
-		
+
 		listAddrHolders.push(developer_wallet);
 		listAddrHolders.push(wallet_ICO);
 		listAddrHolders.push(fond_wallet);
-        
-        name = 'Roulette Token';                                   
-        symbol = 'RLT';                               
+
+        name = 'Roulette Token';
+        symbol = 'RLT';
         decimals = 10;
         costOfOneToken = 1500000000000000;
 
 		developer = msg.sender;
-		manager = msg.sender;		
-		
+		manager = msg.sender;
+
 		enableICO = false;
 		min_value_buyToken = 1000000000000000000;
 		max_value_buyToken = 500000000000000000000;
@@ -261,7 +261,7 @@ contract SmartRouletteToken {
 		if( _balances[from].tokens_count < value ) {
 		    throw;
 		}
-		
+
 		if( _approvals[from][msg.sender] < value ) {
 		    throw;
 		}
@@ -277,8 +277,8 @@ contract SmartRouletteToken {
 		else{
 			addUserToList(to);
 			_balances[to] = holderData(value, true);
-		}		
-		
+		}
+
 		Transfer( from, to, value );
 		return true;
 	}
@@ -340,7 +340,7 @@ contract SmartRouletteToken {
 		if(!stop_operation) throw;
 
 		if(count==0 || period==0) throw;
-		
+
 		uint256 decimals_token = 10**uint256(decimals);
 		count = count*decimals_token;
 
@@ -366,11 +366,11 @@ contract SmartRouletteToken {
 
 	function returnTempTokens(address recipient) isManager {
 		if(!stop_operation) throw;
-		
+
 		if(_temp_balance[recipient].tokens_count == 0) throw;
 
 		_balances[fond_wallet].tokens_count += _temp_balance[recipient].tokens_count;
-		_temp_balance[recipient] = tempHolderData(0, 0, 0);		
+		_temp_balance[recipient] = tempHolderData(0, 0, 0);
 	}
 
 	function getListTempHolders() constant returns(address[]){
@@ -393,7 +393,7 @@ contract SmartRouletteToken {
 	event FailProfitSend(address indexed holder, uint value);*/
 
 	function() payable
-	{	
+	{
 		if(!stop_operation) throw;
 		if(msg.sender == developer) throw;
 		if(msg.sender == manager) throw;
@@ -417,9 +417,9 @@ contract SmartRouletteToken {
 		if(listGames[msg.sender].init) throw;
 
 		if(enableICO == false) throw;
-			
+
 		if(msg.value < min_value_buyToken) throw;
-		
+
 		uint256 value_send = msg.value;
 		if(value_send > max_value_buyToken){
 			value_send = max_value_buyToken;
@@ -427,25 +427,25 @@ contract SmartRouletteToken {
 		}
 
 		uint256 decimals_token = 10**uint256(decimals);
-		
+
 		uint256 count_tokens = (value_send*decimals_token)/costOfOneToken;
-		
+
 		if(count_tokens >_balances[wallet_ICO].tokens_count ){
 			count_tokens = _balances[wallet_ICO].tokens_count;
 		}
-		if(value_send > (count_tokens*costOfOneToken)/decimals_token){				
+		if(value_send > (count_tokens*costOfOneToken)/decimals_token){
 			if(msg.sender.send(value_send-((count_tokens*costOfOneToken)/decimals_token))==false) throw;
 			value_send = value_send - ((count_tokens*costOfOneToken)/decimals_token);
 		}
 
 		if(!_balances[msg.sender].init){
 			addUserToList(msg.sender);
-			_balances[wallet_ICO].tokens_count -= count_tokens;			
+			_balances[wallet_ICO].tokens_count -= count_tokens;
 			_balances[msg.sender] = holderData(count_tokens, true);
 		}
 		else{
 			if(((_balances[msg.sender].tokens_count*costOfOneToken)/decimals_token)+((count_tokens*costOfOneToken)/decimals_token)>max_value_buyToken) {
-				count_tokens = ((max_value_buyToken*decimals_token)/costOfOneToken)-_balances[msg.sender].tokens_count;					
+				count_tokens = ((max_value_buyToken*decimals_token)/costOfOneToken)-_balances[msg.sender].tokens_count;
 				if(msg.sender.send(value_send-((count_tokens*costOfOneToken)/decimals_token))==false) throw;
 				value_send = ((count_tokens*costOfOneToken)/decimals_token);
 			}
@@ -478,5 +478,16 @@ contract SmartRouletteToken {
 	function getItemHolders(uint256 index) external constant returns(address){
 		if(index >= listAddrHolders.length) return address(0x0);
 		else return listAddrHolders[index];
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

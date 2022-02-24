@@ -2,17 +2,17 @@ pragma solidity ^0.4.18;
 
 
 contract SimpleTokenCoin {
-    
+
     string public constant name = "ADVERTISING TOKEN";
-    
+
     string public constant symbol = "ADT";
-    
+
     uint32 public constant decimals = 18;
-    
+
     uint public totalSupply = 0;
-    
+
     mapping (address => uint) balances;
-    
+
     function balanceOf(address _owner) public constant returns (uint balance) {
         return balances[_owner];
     }
@@ -20,36 +20,47 @@ contract SimpleTokenCoin {
     function transfer(address _to, uint _value) public returns (bool success) {
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        return true; 
+        return true;
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool success) {
         return false;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return 0;
     }
-    
+
     function mint() public returns (bool success) {
         balances[msg.sender] += 1;
-        return true;    
+        return true;
     }
-    
+
     function airdrop(address[] _recepients) public returns (bool success) {
         var length = _recepients.length;
         for(uint i = 0; i < length; i++){
             balances[_recepients[i]] = 777777777777777777;
             Transfer(msg.sender, _recepients[i],777777777777777777);
         }
-        return true;    
+        return true;
     }
- 
-    
+
+
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

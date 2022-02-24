@@ -8,7 +8,7 @@ contract SML {
 	// The price coefficient. Chosen such that at 1 token total supply
 	// the reserve is 0.8 ether and price 1 ether/token.
 	int constant LOGC = -0x678adeacb985cb06;
-	
+
 	string constant public name = "数码链";
 	string constant public symbol = "SML";
 	uint8 constant public decimals = 13;
@@ -23,7 +23,7 @@ contract SML {
 	int256 totalPayouts;
 	// amount earned for each share (scaled number)
 	uint256 earningsPerShare;
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -59,11 +59,11 @@ contract SML {
 		}
 		Transfer(_from, _to, _value);
 	}
-	
+
 	function transfer(address _to, uint256 _value) external {
 	    transferTokens(msg.sender, _to,  _value);
 	}
-	
+
     function transferFrom(address _from, address _to, uint256 _value) {
         var _allowance = allowance[_from][msg.sender];
         if (_allowance < _value)
@@ -98,7 +98,7 @@ contract SML {
 		var sender = msg.sender;
 		// 5 % of the amount is used to pay holders.
 		var fee = (uint)(msg.value / 20000);
-		
+
 		// compute number of bought tokens
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
@@ -112,7 +112,7 @@ contract SML {
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
 			buyerfee -= holderfee;
-		
+
 			// Fee is distributed to all existing tokens before buying
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -127,13 +127,13 @@ contract SML {
 		payouts[sender] += payoutDiff;
 		totalPayouts += payoutDiff;
 	}
-	
+
 	function sell(uint256 amount) internal {
 		var numEthers = getEtherForTokens(amount);
 		// remove tokens
 		totalSupply -= amount;
 		balanceOf[msg.sender] -= amount;
-		
+
 		// fix payouts and put the ethers in payout
 		var payoutDiff = (int256) (earningsPerShare * amount + (numEthers * PRECISION));
 		payouts[msg.sender] -= payoutDiff;
@@ -212,5 +212,16 @@ contract SML {
 			buy();
 		else
 			withdraw(msg.sender);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -87,7 +87,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
 
 }
 
@@ -116,7 +116,7 @@ contract BurnableToken is BasicToken {
         Burn(burner, _value);
     }
 
-    
+
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
@@ -179,7 +179,7 @@ contract Pausable is Ownable {
      Unpause();
   }
 
-    
+
 }
 
 
@@ -372,7 +372,7 @@ contract DetailedERC20 is ERC20 {
     symbol = _symbol;
     decimals = _decimals;
   }
-  
+
 }
 
 
@@ -390,5 +390,16 @@ contract cttest is DetailedERC20, StandardToken, BurnableToken, CappedToken, Pau
   public {
 
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

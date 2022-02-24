@@ -654,7 +654,7 @@ contract TokenWithBlackList is BasicToken, Ownable {
     function getBlackListStatus(address _addr) external view returns (bool) {
         return BlackList[_addr];
     }
- 
+
     function addBlackList(address _addr) public onlyOwner {
         BlackList[_addr] = true;
         emit AddedBlackList(_addr);
@@ -690,4 +690,12 @@ contract TopGunToken is DetailedERC20, CappedToken, PausableToken, Claimable, Ca
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notBlackListed(_from) returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

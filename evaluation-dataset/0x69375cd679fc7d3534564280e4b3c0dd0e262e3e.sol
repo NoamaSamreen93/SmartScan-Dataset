@@ -44,16 +44,16 @@ library SafeMath {
 
 
 contract ERC20Basic {
-    
+
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 contract ERC20 is ERC20Basic {
-    
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
@@ -81,7 +81,7 @@ contract DetailedERC20 is ERC20 {
 }
 
 /**
- * @title 实现ERC20基本合约的接口 
+ * @title 实现ERC20基本合约的接口
  * @dev 基本的StandardToken，不包含allowances.
  */
 contract BasicToken is ERC20Basic {
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -242,18 +242,34 @@ contract StandardBurnableToken is BurnableToken, StandardToken,MintableToken {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     _burn(_from, _value);
   }
-  
+
 }
 
 contract BHTDToken is StandardBurnableToken {
     string public name = 'Bhtd';
     string public symbol = 'BHTD';
     uint8 public decimals = 8;
-    uint256 public INITIAL_SUPPLY = 32000000000000000; 
-    
+    uint256 public INITIAL_SUPPLY = 32000000000000000;
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

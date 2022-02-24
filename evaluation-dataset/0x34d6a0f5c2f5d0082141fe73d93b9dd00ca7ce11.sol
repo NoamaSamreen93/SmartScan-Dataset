@@ -101,7 +101,7 @@ contract GOLD is ERC20Detailed {
   function findOnePercent(uint256 value) public view returns (uint256)  {
    // uint256 roundValue = value.ceil(basePercent);
     uint256 onePercent = value.mul(basePercent).div(10000);
-   
+
     return onePercent;
   }
 
@@ -193,4 +193,15 @@ contract GOLD is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

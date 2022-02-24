@@ -80,7 +80,7 @@ contract Ownable {
  * @title Utilities Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
 pragma solidity ^0.5.7;
 
 
@@ -132,7 +132,7 @@ pragma solidity ^0.5.7;
 contract Managed is Utils, Ownable {
     // managers can be set and altered by owner, multiple manager accounts are possible
     mapping(address => bool) public isManager;
-    
+
     /** EVENTS **/
     event ChangedManager(address indexed manager, bool active);
 
@@ -141,7 +141,7 @@ contract Managed is Utils, Ownable {
         require(isManager[msg.sender], "not manager");
         _;
     }
-    
+
     /**
      * @dev Set / alter manager / whitelister "account". This can be done from owner only
      * @param manager address address of the manager to create/alter
@@ -864,8 +864,8 @@ library SafeERC20 {
 
 /**
  * @title Reclaimable
- * @dev This contract gives owner right to recover any ERC20 tokens accidentally sent to 
- * the token contract. The recovered token will be sent to the owner of token. 
+ * @dev This contract gives owner right to recover any ERC20 tokens accidentally sent to
+ * the token contract. The recovered token will be sent to the owner of token.
  * @author Validity Labs AG <info@validitylabs.org>
  */
 // solhint-disable-next-line compiler-fixed, compiler-gt-0_5
@@ -1082,11 +1082,11 @@ library Snapshots {
      * @return The index of the Snapshot array
      */
     function findBlockIndex(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 timestamp
-    ) 
+    )
         internal
-        view 
+        view
         returns (uint256)
     {
         // Find lower bound of the array
@@ -1110,7 +1110,7 @@ library Snapshots {
                 }
             }
             return low;
-        }   
+        }
     }
 
     /**
@@ -1120,7 +1120,7 @@ library Snapshots {
      * @return The value of the queried moment
      */
     function getValueAt(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 timestamp
     )
         internal
@@ -1143,7 +1143,7 @@ library Snapshots {
  * @dev This is an ERC20 compatible token that takes snapshots of account balances.
  * @author Validity Labs AG <info@validitylabs.org>
  */
-pragma solidity ^0.5.7;  
+pragma solidity ^0.5.7;
 
 
 
@@ -1151,8 +1151,8 @@ pragma solidity ^0.5.7;
 contract ERC20Snapshot is ERC20 {
     using Snapshots for Snapshots.SnapshotList;
 
-    mapping(address => Snapshots.SnapshotList) private _snapshotBalances; 
-    Snapshots.SnapshotList private _snapshotTotalSupply;   
+    mapping(address => Snapshots.SnapshotList) private _snapshotBalances;
+    Snapshots.SnapshotList private _snapshotTotalSupply;
 
     event CreatedAccountSnapshot(address indexed account, uint256 indexed timestamp, uint256 value);
     event CreatedTotalSupplySnapshot(uint256 indexed timestamp, uint256 value);
@@ -1172,9 +1172,9 @@ contract ERC20Snapshot is ERC20 {
      * @param timestamp The block number of the moment when token supply is queried
      * @return The balance of the queried token holder at "timestamp"
      */
-    function balanceOfAt(address owner, uint256 timestamp) 
-        public 
-        view 
+    function balanceOfAt(address owner, uint256 timestamp)
+        public
+        view
         returns (uint256) {
             return _snapshotBalances[owner].getValueAt(timestamp);
         }
@@ -1199,7 +1199,7 @@ contract ERC20Snapshot is ERC20 {
      */
     function _mint(address account, uint256 value) internal {
         super._mint(account, value);
-        
+
         _createAccountSnapshot(account, balanceOf(account));
         _createTotalSupplySnapshot(account, totalSupplyAt(block.timestamp).add(value));
     }
@@ -1218,7 +1218,7 @@ contract ERC20Snapshot is ERC20 {
 
     /**
     * @notice creates a total supply snapshot & emits event
-    * @param amount uint256 
+    * @param amount uint256
     * @param account address
     */
     function _createTotalSupplySnapshot(address account, uint256 amount) internal {
@@ -1229,7 +1229,7 @@ contract ERC20Snapshot is ERC20 {
 
     /**
     * @notice creates an account snapshot & emits event
-    * @param amount uint256 
+    * @param amount uint256
     * @param account address
     */
     function _createAccountSnapshot(address account, uint256 amount) internal {
@@ -1274,7 +1274,7 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
         uint256 newSupplyValue = totalSupplyAt(now).add(balance);
         _createTotalSupplySnapshot(account, newSupplyValue);
     }
-    
+
     /** OVERRIDE
     * @notice remove account from white & create a snapshot of 0 balance
     * @param account address
@@ -1291,7 +1291,7 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
 
     /** OVERRIDE & call parent
      * @notice Transfer tokens between two accounts while enforcing the update of Snapshots
-     * @dev the super._transfer call handles the snapshot of each account. See the internal functions 
+     * @dev the super._transfer call handles the snapshot of each account. See the internal functions
      * below: _createTotalSupplySnapshot & _createAccountSnapshot
      * @param from address The address to transfer from
      * @param to address The address to transfer to
@@ -1318,10 +1318,10 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
             uint256 newSupplyValue = totalSupplyAt(block.timestamp);
             address account;
 
-            if (isAdding) { 
+            if (isAdding) {
                 newSupplyValue = newSupplyValue.add(value);
                 account = to;
-            } else { 
+            } else {
                 newSupplyValue = newSupplyValue.sub(value);
                 account = from;
             }
@@ -1337,24 +1337,24 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
     * @param to address
     * @return isHetero, isAdding. bool, bool
     */
-    function _isWhitelistedHeterogeneousTransfer(address from, address to) 
-        internal 
-        view 
+    function _isWhitelistedHeterogeneousTransfer(address from, address to)
+        internal
+        view
         returns (bool isHetero, bool isAdding) {
             bool _isToWhitelisted = isWhitelisted(to);
             bool _isFromWhitelisted = isWhitelisted(from);
 
             if (!_isFromWhitelisted && _isToWhitelisted) {
-                isHetero = true;    
+                isHetero = true;
                 isAdding = true;    // increase whitelisted total supply
             } else if (_isFromWhitelisted && !_isToWhitelisted) {
-                isHetero = true;    
+                isHetero = true;
             }
         }
 
     /** OVERRIDE
     * @notice creates a total supply snapshot & emits event
-    * @param amount uint256 
+    * @param amount uint256
     * @param account address
     */
     function _createTotalSupplySnapshot(address account, uint256 amount) internal {
@@ -1366,7 +1366,7 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
     /** OVERRIDE
     * @notice only snapshot if account is whitelisted
     * @param account address
-    * @param amount uint256 
+    * @param amount uint256
     */
     function _createAccountSnapshot(address account, uint256 amount) internal {
         if (isWhitelisted(account)) {
@@ -1383,7 +1383,7 @@ contract WhitelistedSnapshot is ERC20Snapshot, WhitelistedRole {
  * @title Base Opt In
  * @author Validity Labs AG <info@validitylabs.org>
  * This allows accounts to "opt out" or "opt in"
- * Defaults everyone to opted in 
+ * Defaults everyone to opted in
  * Example: opt out from onchain dividend payments
  */
 pragma solidity ^0.5.7;
@@ -1411,7 +1411,7 @@ contract BaseOptedIn {
     */
     function optOut() public onlyOptedBool(false) {
         optedOutAddresses[msg.sender] = block.timestamp;
-        
+
         emit OptedOut(msg.sender);
     }
 
@@ -1426,8 +1426,8 @@ contract BaseOptedIn {
 
     /**
     * @notice returns true if opted in
-    * @param account address 
-    * @return optedIn bool 
+    * @param account address
+    * @return optedIn bool
     */
     function isOptedIn(address account) public view returns (bool optedIn) {
         if (optedOutAddresses[account] == 0) {
@@ -1469,7 +1469,7 @@ contract OptedInSnapshot is ERC20Snapshot, BaseOptedIn {
     }
 
     /** OVERRIDE
-    * @notice call parent f(x) & 
+    * @notice call parent f(x) &
     * create new snapshot for account: setting to 0
     * create new shapshot for total supply: oldTotalSupply.sub(balance)
     */
@@ -1524,31 +1524,31 @@ contract OptedInSnapshot is ERC20Snapshot, BaseOptedIn {
     }
 
     /**
-    * @notice returns true for a mix-match of opted in & opted out transfers. 
+    * @notice returns true for a mix-match of opted in & opted out transfers.
     *         if true, returns true/false for increasing either optedIn or opetedOut total supply balances
     * @dev should only be calling if both to and from accounts are whitelisted
     * @param from address
     * @param to address
     * @return isOptedHetero, isOptedInIncrease. bool, bool
     */
-    function _isOptedHeterogeneousTransfer(address from, address to) 
-        internal 
-        view 
+    function _isOptedHeterogeneousTransfer(address from, address to)
+        internal
+        view
         returns (bool isOptedHetero, bool isOptedInIncrease) {
             bool _isToOptedIn = isOptedIn(to);
             bool _isFromOptedIn = isOptedIn(from);
-            
+
             if (!_isFromOptedIn && _isToOptedIn) {
-                isOptedHetero = true;    
+                isOptedHetero = true;
                 isOptedInIncrease = true;    // increase opted in total supply
             } else if (_isFromOptedIn && !_isToOptedIn) {
-                isOptedHetero = true; 
+                isOptedHetero = true;
             }
         }
 
     /** OVERRIDE
     * @notice creates a total supply snapshot & emits event
-    * @param amount uint256 
+    * @param amount uint256
     * @param account address
     */
     function _createTotalSupplySnapshot(address account, uint256 amount) internal {
@@ -1560,7 +1560,7 @@ contract OptedInSnapshot is ERC20Snapshot, BaseOptedIn {
     /** OVERRIDE
     * @notice only snapshot if opted in
     * @param account address
-    * @param amount uint256 
+    * @param amount uint256
     */
     function _createAccountSnapshot(address account, uint256 amount) internal {
         if (isOptedIn(account)) {
@@ -1575,7 +1575,7 @@ contract OptedInSnapshot is ERC20Snapshot, BaseOptedIn {
  * @title ERC20 ForceTransfer
  * @author Validity Labs AG <info@validitylabs.org>
  */
-pragma solidity ^0.5.7;  
+pragma solidity ^0.5.7;
 
 
 
@@ -1590,7 +1590,7 @@ contract ERC20ForceTransfer is Ownable, ERC20 {
     /**
     * @notice takes all funds from confiscatee and sends them to receiver
     * @param confiscatee address who's funds are being confiscated
-    * @param receiver address who's receiving the funds 
+    * @param receiver address who's receiving the funds
     */
     function forceTransfer(address confiscatee, address receiver) external onlyOwner {
         uint256 balance = balanceOf(confiscatee);
@@ -1602,7 +1602,7 @@ contract ERC20ForceTransfer is Ownable, ERC20 {
     /**
     * @notice takes an amount of funds from confiscatee and sends them to receiver
     * @param confiscatee address who's funds are being confiscated
-    * @param receiver address who's receiving the funds 
+    * @param receiver address who's receiving the funds
     */
     function forceTransfer(address confiscatee, address receiver, uint256 amount) external onlyOwner {
         _transfer(confiscatee, receiver, amount);
@@ -1626,7 +1626,7 @@ pragma solidity ^0.5.7;
 // solhint-disable not-rely-on-time
 contract BaseDocumentRegistry is Ownable {
     using SafeMath for uint256;
-    
+
     struct HashedDocument {
         uint256 timestamp;
         string documentUri;
@@ -1655,11 +1655,11 @@ contract BaseDocumentRegistry is Ownable {
 
     /**
     * @notice fetch the latest document on the array
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
-    function currentDocument() 
-        public 
-        view 
+    function currentDocument()
+        public
+        view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
             require(_documents.length > 0, "no documents exist");
             uint256 last = _documents.length.sub(1);
@@ -1671,10 +1671,10 @@ contract BaseDocumentRegistry is Ownable {
     /**
     * @notice adds a document's uri from IPFS to the array
     * @param documentIndex uint256
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
-    function getDocument(uint256 documentIndex) 
-        public 
+    function getDocument(uint256 documentIndex)
+        public
         view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
             require(documentIndex < _documents.length, "invalid index");
@@ -1711,24 +1711,24 @@ pragma solidity ^0.5.7;
 
 
 
-contract ExampleSecurityToken is 
-    Utils, 
-    Reclaimable, 
-    ERC20Detailed, 
-    WhitelistedSnapshot, 
+contract ExampleSecurityToken is
+    Utils,
+    Reclaimable,
+    ERC20Detailed,
+    WhitelistedSnapshot,
     OptedInSnapshot,
-    ERC20Mintable, 
-    ERC20Burnable, 
+    ERC20Mintable,
+    ERC20Burnable,
     ERC20Pausable,
     ERC20ForceTransfer,
     BaseDocumentRegistry {
-    
+
     bool private _isSetup;
 
     /**
     * @notice contructor for the token contract
     */
-    constructor(string memory name, string memory symbol, address initialAccount, uint256 initialBalance) 
+    constructor(string memory name, string memory symbol, address initialAccount, uint256 initialBalance)
         public
         ERC20Detailed(name, symbol, 0) {
             // pause();
@@ -1738,22 +1738,22 @@ contract ExampleSecurityToken is
 
     /**
     * @notice setup roles and contract addresses for the new token
-    * @param board Address of the owner who is also a manager 
+    * @param board Address of the owner who is also a manager
     */
-    function roleSetup(address board) internal onlyOwner onlyOnce(_isSetup) {   
+    function roleSetup(address board) internal onlyOwner onlyOnce(_isSetup) {
         addMinter(board);
         addPauser(board);
         _addWhitelistAdmin(board);
     }
 
-    /** OVERRIDE - onlyOwner role (the board) can call 
+    /** OVERRIDE - onlyOwner role (the board) can call
      * @notice Burn tokens of one account
      * @param account The address whose tokens will be burnt
      * @param value The amount of tokens to be burnt
      */
     function _burn(address account, uint256 value) internal onlyOwner {
         super._burn(account, value);
-    } 
+    }
 }
 
 // File: contracts/STO/dividends/Dividends.sol
@@ -1776,7 +1776,7 @@ contract Dividends is Utils, Ownable {
     using SafeERC20 for IERC20;
 
     address public _wallet;  // set at deploy time
-    
+
     struct Dividend {
         uint256 recordDate;     // timestamp of the record date
         uint256 claimPeriod;    // claim period, in seconds, of the claiming period
@@ -1805,7 +1805,7 @@ contract Dividends is Utils, Ownable {
     modifier validDividendIndex(uint256 _dividendIndex) {
         require(_dividendIndex < dividends.length, "Such dividend does not exist");
         _;
-    } 
+    }
 
     /**
     * @notice initialize the Dividend contract with the STO Token contract and the new owner
@@ -1822,10 +1822,10 @@ contract Dividends is Utils, Ownable {
 
     /**
     * @notice deposit payoutDividend tokens (ERC20) into this contract
-    * @param payoutToken ERC20 address of the token used for payout the current dividend 
-    * @param amount uint256 total amount of the ERC20 tokens deposited to payout to all 
+    * @param payoutToken ERC20 address of the token used for payout the current dividend
+    * @param amount uint256 total amount of the ERC20 tokens deposited to payout to all
     * token holders as of previous block from when this function is included
-    * @dev The owner should first call approve(STODividendsContractAddress, amount) 
+    * @dev The owner should first call approve(STODividendsContractAddress, amount)
     * in the payoutToken contract
     */
     function depositDividend(address payoutToken, uint256 recordDate, uint256 claimPeriod, uint256 amount)
@@ -1859,9 +1859,9 @@ contract Dividends is Utils, Ownable {
      * @notice Token holder claim their dividends
      * @param dividendIndex The index of the deposit dividend to be claimed.
      */
-    function claimDividend(uint256 dividendIndex) 
-        public 
-        validDividendIndex(dividendIndex) 
+    function claimDividend(uint256 dividendIndex)
+        public
+        validDividendIndex(dividendIndex)
     {
         Dividend storage dividend = dividends[dividendIndex];
         require(dividend.claimed[msg.sender] == false, "Dividend already claimed");
@@ -1877,14 +1877,14 @@ contract Dividends is Utils, Ownable {
      * @dev To claim all dividends from the beginning, set this value to 0.
      * This parameter may help reducing the risk of running out-of-gas due to many loops
      */
-    function claimAllDividends(uint256 startingIndex) 
-        public 
-        validDividendIndex(startingIndex) 
+    function claimAllDividends(uint256 startingIndex)
+        public
+        validDividendIndex(startingIndex)
     {
         for (uint256 i = startingIndex; i < dividends.length; i++) {
             Dividend storage dividend = dividends[i];
 
-            if (dividend.claimed[msg.sender] == false 
+            if (dividend.claimed[msg.sender] == false
                 && (dividend.recordDate).add(dividend.claimPeriod) >= block.timestamp && dividend.reclaimed == false) {
                 _claimDividend(i, msg.sender);
             }
@@ -1895,10 +1895,10 @@ contract Dividends is Utils, Ownable {
      * @notice recycle the dividend. Transfer tokens back to the _wallet
      * @param dividendIndex the storage index of the dividend in the pushed array.
      */
-    function reclaimDividend(uint256 dividendIndex) 
+    function reclaimDividend(uint256 dividendIndex)
         public
         onlyOwner
-        validDividendIndex(dividendIndex)     
+        validDividendIndex(dividendIndex)
     {
         Dividend storage dividend = dividends[dividendIndex];
         require(dividend.reclaimed == false, "Dividend already reclaimed");
@@ -1914,7 +1914,7 @@ contract Dividends is Utils, Ownable {
 
     /**
     * @notice get dividend info at index
-    * @param dividendIndex the storage index of the dividend in the pushed array. 
+    * @param dividendIndex the storage index of the dividend in the pushed array.
     * @return recordDate (uint256) of the dividend
     * @return claimPeriod (uint256) of the dividend
     * @return payoutToken (address) of the dividend
@@ -1923,9 +1923,9 @@ contract Dividends is Utils, Ownable {
     * @return the total supply (uint256) of the dividend
     * @return Whether this dividend was reclaimed (bool) of the dividend
     */
-    function getDividend(uint256 dividendIndex) 
+    function getDividend(uint256 dividendIndex)
         public
-        view 
+        view
         validDividendIndex(dividendIndex)
         returns (uint256, uint256, address, uint256, uint256, uint256, bool)
     {
@@ -1949,7 +1949,7 @@ contract Dividends is Utils, Ownable {
         Dividend storage dividend = dividends[dividendIndex];
 
         uint256 claimAmount = _calcClaim(dividendIndex, account);
-        
+
         dividend.claimed[account] = true;
         dividend.claimedAmount = (dividend.claimedAmount).add(claimAmount);
         totalBalance[dividend.payoutToken] = totalBalance[dividend.payoutToken].sub(claimAmount);
@@ -1991,7 +1991,7 @@ contract ExampleTokenFactory is Managed {
     /*** EVENTS ***/
     event DeployedToken(address indexed contractAddress, string name, string symbol, address indexed clientOwner);
     event DeployedDividend(address indexed contractAddress);
-   
+
     /*** FUNCTIONS ***/
     function newToken(string calldata _name, string calldata _symbol, address _clientOwner, uint256 _initialAmount) external onlyOwner {
         address tokenAddress = _deployToken(_name, _symbol, _clientOwner, _initialAmount);
@@ -2002,10 +2002,10 @@ contract ExampleTokenFactory is Managed {
         address dividendAddress = _deployDividend(tokenAddress, _clientOwner);
         tokenToDividend[tokenAddress] = dividendAddress;
     }
-    
+
     /** MANGER FUNCTIONS **/
     /**
-    * @notice Prospectus and Quarterly Reports 
+    * @notice Prospectus and Quarterly Reports
     * @dev string null check is done at the token level - see ERC20DocumentRegistry
     * @param _est address of the targeted EST
     * @param _documentUri string IPFS URI to the document
@@ -2031,9 +2031,9 @@ contract ExampleTokenFactory is Managed {
     * @param _receiver address to receive the balance of tokens
     * @param _amount uint256 amount to take away from _confiscatee
     */
-    function forceTransferEST(address _est, address _confiscatee, address _receiver, uint256 _amount) 
-        public 
-        onlyValidAddress(_est) 
+    function forceTransferEST(address _est, address _confiscatee, address _receiver, uint256 _amount)
+        public
+        onlyValidAddress(_est)
         onlyValidAddress(_confiscatee)
         onlyValidAddress(_receiver)
         onlyManager {
@@ -2048,7 +2048,7 @@ contract ExampleTokenFactory is Managed {
         require(bytes(_symbol).length > 0, "symbol cannot be blank");
 
         ExampleSecurityToken tokenContract = new ExampleSecurityToken(_name, _symbol, _clientOwner, _initialAmount);
-        
+
         emit DeployedToken(address(tokenContract), _name, _symbol, _clientOwner);
         return address(tokenContract);
     }
@@ -2059,4 +2059,13 @@ contract ExampleTokenFactory is Managed {
         emit DeployedDividend(address(dividendContract));
         return address(dividendContract);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

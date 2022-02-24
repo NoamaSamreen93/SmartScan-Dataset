@@ -2,14 +2,14 @@ pragma solidity 0.4.21;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -19,7 +19,7 @@ contract Ownable {
 
 
   /**
-   * @dev revert()s if called by any account other than the owner. 
+   * @dev revert()s if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -29,7 +29,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     if (newOwner != address(0)) {
@@ -45,8 +45,8 @@ contract Ownable {
  * Math operations with safety checks
  */
 library SafeMath {
-  
-  
+
+
   function mul256(uint256 a, uint256 b) internal returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -69,8 +69,8 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
-  }  
-  
+  }
+
 
   function max64(uint64 a, uint64 b) internal constant returns (uint64) {
     return a >= b ? a : b;
@@ -106,7 +106,7 @@ contract ERC20Basic {
 
 /**
  * @title ERC20 interface
- * @dev ERC20 interface with allowances. 
+ * @dev ERC20 interface with allowances.
  */
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant public returns (uint256);
@@ -120,7 +120,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -148,7 +148,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -222,16 +222,16 @@ contract StandardToken is BasicToken, ERC20 {
 /**
  * @title TeuToken
  * @dev The main TEU token contract
- * 
+ *
  */
- 
+
 contract TeuToken is StandardToken, Ownable{
   string public name = "20-footEqvUnit";
   string public symbol = "TEU";
   uint public decimals = 18;
 
   event TokenBurned(uint256 value);
-  
+
   function TeuToken() public {
     totalSupply = (10 ** 8) * (10 ** decimals);
     balances[msg.sender] = totalSupply;
@@ -251,9 +251,9 @@ contract TeuToken is StandardToken, Ownable{
 }
 
 /**
- * @title teuInitialTokenSale 
+ * @title teuInitialTokenSale
  * @dev The TEU token ICO contract
- * 
+ *
  */
 contract teuInitialTokenSale is Ownable {
 	using SafeMath for uint256;
@@ -286,18 +286,18 @@ contract teuInitialTokenSale is Ownable {
 
     //  ***** private helper functions ***************
 
-    
+
 
     /**
     * @dev get the current datetime
-    */   
+    */
     function getCurrentDatetime() private constant returns (uint) {
-        return now; 
+        return now;
     }
 
     /**
     * @dev get the current sale day
-    */   
+    */
     function getCurrentSaleDay() private saleIsOn returns (uint) {
         return getCurrentDatetime().sub256(saleStart).div256(86400).add256(1);
     }
@@ -305,7 +305,7 @@ contract teuInitialTokenSale is Ownable {
     /**
     * @dev to get the time bonus Percentage based on the no. of sale day(s)
     * @param _days no of sale day to calculate the time bonus
-    */      
+    */
     function getTimeBonusPercent(uint _days) private pure returns (uint) {
         if (_days <= 20)
             return 50;
@@ -315,7 +315,7 @@ contract teuInitialTokenSale is Ownable {
     /**
     * @dev to get the volumne bonus percentage based on the ether amount contributed
     * @param _etherAmount ether amount contributed.
-    */          
+    */
     function getVolumeBonusPercent(uint256 _etherAmount) private pure returns (uint) {
 
         if (_etherAmount < 1 ether)
@@ -346,15 +346,15 @@ contract teuInitialTokenSale is Ownable {
             return 100;
         return 0;
     }
-    
+
     /**
     * @dev to get the time bonus amount given the token amount to be collected from contribution
     * @param _tokenAmount token amount to be collected from contribution
-    */ 
+    */
     function getTimeBonusAmount(uint256 _tokenAmount) private returns (uint256) {
         return _tokenAmount.mul256(getTimeBonusPercent(getCurrentSaleDay())).div256(100);
     }
-    
+
     /**
     * @dev to get the volume bonus amount given the token amount to be collected from contribution and the ether amount contributed
     * @param _tokenAmount token amount to be collected from contribution
@@ -363,7 +363,7 @@ contract teuInitialTokenSale is Ownable {
     function getVolumeBonusAmount(uint256 _tokenAmount, uint256 _etherAmount) private returns (uint256) {
         return _tokenAmount.mul256(getVolumeBonusPercent(_etherAmount)).div256(100);
     }
-    
+
     /**
     * @dev to get the referral bonus amount given the ether amount contributed
     * @param _etherAmount ether amount contributed
@@ -371,7 +371,7 @@ contract teuInitialTokenSale is Ownable {
     function getReferralBonusAmount(uint256 _etherAmount) private returns (uint256) {
         return _etherAmount.mul256(etherToTokenConversionRate).mul256(referralAwardPercent).div256(100);
     }
-    
+
     /**
     * @dev to get the basic amount of token to be collected given the ether amount contributed
     * @param _etherAmount ether amount contributed
@@ -379,8 +379,8 @@ contract teuInitialTokenSale is Ownable {
     function getBasicTokenAmount(uint256 _etherAmount) private returns (uint256) {
         return _etherAmount.mul256(etherToTokenConversionRate);
     }
-  
-  
+
+
     // ****** modifiers  ************
 
     /**
@@ -393,7 +393,7 @@ contract teuInitialTokenSale is Ownable {
 
     /**
     * @dev modifier to check if the sale is ended
-    */    
+    */
     modifier saleIsEnd() {
         require(getCurrentDatetime() >= saleEnd);
         _;
@@ -401,20 +401,20 @@ contract teuInitialTokenSale is Ownable {
 
     /**
     * @dev modifier to check if token is collectable
-    */    
+    */
     modifier tokenIsCollectable() {
         require(isCollectTokenStart);
         _;
     }
-    
+
     /**
     * @dev modifier to check if contribution is over the min. contribution amount
-    */    
+    */
     modifier overMinContribution(uint256 _etherAmount) {
         require(_etherAmount >= minContribution);
         _;
     }
-    
+
     /**
     * @dev modifier to check if max. token pool is not reached
     */
@@ -434,7 +434,7 @@ contract teuInitialTokenSale is Ownable {
 
     //  ***** public transactional functions ***************
     /**
-    * @dev called by owner to set the new sale start date/time 
+    * @dev called by owner to set the new sale start date/time
     * @param _newStart new start date/time
     */
     function setNewStart(uint _newStart) public onlyOwner {
@@ -445,7 +445,7 @@ contract teuInitialTokenSale is Ownable {
     }
 
     /**
-    * @dev called by owner to set the new sale end date/time 
+    * @dev called by owner to set the new sale end date/time
     * @param _newEnd new end date/time
     */
     function setNewEnd(uint _newEnd) public onlyOwner {
@@ -456,7 +456,7 @@ contract teuInitialTokenSale is Ownable {
     }
 
     /**
-    * @dev called by owner to enable / disable contribution 
+    * @dev called by owner to enable / disable contribution
     * @param _isAllow true - allow contribution; false - disallow contribution
     */
     function enableContribution(bool _isAllow) public onlyOwner {
@@ -465,17 +465,17 @@ contract teuInitialTokenSale is Ownable {
 
 
     /**
-    * @dev called by contributors to record a contribution 
+    * @dev called by contributors to record a contribution
     */
     function contribute() public payable saleIsOn overMinContribution(msg.value) underMaxTokenPool contributionAllowed {
         uint256 _basicToken = getBasicTokenAmount(msg.value);
         uint256 _timeBonus = getTimeBonusAmount(_basicToken);
         uint256 _volumeBonus = getVolumeBonusAmount(_basicToken, msg.value);
         uint256 _totalToken = _basicToken.add256(_timeBonus).add256(_volumeBonus);
-        
+
         lastContribitionDate[msg.sender] = getCurrentDatetime();
         referralContribution[msg.sender] = referralContribution[msg.sender].add256(msg.value);
-        
+
         collectableToken[msg.sender] = collectableToken[msg.sender].add256(_totalToken);
         totalCollectableToken = totalCollectableToken.add256(_totalToken);
         assert(etherHolderWallet.send(msg.value));
@@ -497,16 +497,16 @@ contract teuInitialTokenSale is Ownable {
         uint256 _timeBonus = getTimeBonusAmount(_basicToken);
         uint256 _volumeBonus = getVolumeBonusAmount(_basicToken, _etherAmount);
         uint256 _totalToken = _basicToken.add256(_timeBonus).add256(_volumeBonus);
-        
+
 	    if (_contributionDatetime > lastContribitionDate[_contributorWallet])
             lastContribitionDate[_contributorWallet] = _contributionDatetime;
         referralContribution[_contributorWallet] = referralContribution[_contributorWallet].add256(_etherAmount);
-    
+
         collectableToken[_contributorWallet] = collectableToken[_contributorWallet].add256(_totalToken);
         totalCollectableToken = totalCollectableToken.add256(_totalToken);
         LogContributionBitcoin(_contributorWallet, _bitcoinAmount, _etherAmount, _basicToken, _timeBonus, _volumeBonus, _contributionDatetime);
     }
-    
+
     /**
     * @dev called by contract owner to record a off chain contribution by Ether. The token are distributed off chain already.  The contributor can only entitle referral bonus through this smart contract
     * @param _etherAmount ether equivalent amount contributed
@@ -517,7 +517,7 @@ contract teuInitialTokenSale is Ownable {
 
         lastContribitionDate[_contributorWallet] = getCurrentDatetime();
         LogOffChainContribution(_contributorWallet, _etherAmount, _tokenAmount);
-    }    
+    }
 
     /**
     * @dev called by contract owner for migration of contributors from old contract to new contract
@@ -527,7 +527,7 @@ contract teuInitialTokenSale is Ownable {
 	for (uint i = 0; i < _contributorWallets.length; i++) {
         	lastContribitionDate[_contributorWallets[i]] = getCurrentDatetime();
 	}
-    }  
+    }
 
     /**
     * @dev called by contributor to claim the referral bonus
@@ -538,16 +538,16 @@ contract teuInitialTokenSale is Ownable {
         require (referralContribution[msg.sender] > 0);
         require (lastContribitionDate[_referrerWallet] > 0);
         require (getCurrentDatetime() - lastContribitionDate[msg.sender] <= (4 * 24 * 60 * 60));
-        
+
         uint256 _referralBonus = getReferralBonusAmount(referralContribution[msg.sender]);
         referralContribution[msg.sender] = 0;
-        
+
         collectableToken[msg.sender] = collectableToken[msg.sender].add256(_referralBonus);
         collectableToken[_referrerWallet] = collectableToken[_referrerWallet].add256(_referralBonus);
         totalCollectableToken = totalCollectableToken.add256(_referralBonus).add256(_referralBonus);
         LogReferralAward(msg.sender, _referrerWallet, _referralBonus);
     }
-    
+
     /**
     * @dev called by contract owener to register a list of rejected clients who cannot pass the client identification process.
     * @param _clients an array of wallet address clients to be set
@@ -561,7 +561,7 @@ contract teuInitialTokenSale is Ownable {
             }
         }
     }
-    
+
     /**
     * @dev called by contract owner to enable / disable token collection process
     * @param _enable true - enable collection; false - disable collection
@@ -569,7 +569,7 @@ contract teuInitialTokenSale is Ownable {
     function setTokenCollectable(bool _enable) public onlyOwner saleIsEnd {
         isCollectTokenStart = _enable;
     }
-    
+
     /**
     * @dev called by contributor to collect tokens.  If they are rejected by the client identification process, error will be thrown
     */
@@ -589,45 +589,61 @@ contract teuInitialTokenSale is Ownable {
     * @dev Allow owner to transfer out the token left in the contract
     * @param _to address to transfer to
     * @param _amount amount to transfer
-    */  
+    */
     function transferTokenOut(address _to, uint256 _amount) public onlyOwner {
         token.transfer(_to, _amount);
     }
-    
+
     /**
     * @dev Allow owner to transfer out the ether left in the contract
     * @param _to address to transfer to
     * @param _amount amount to transfer
-    */  
+    */
     function transferEtherOut(address _to, uint256 _amount) public onlyOwner {
         assert(_to.send(_amount));
-    }  
-    
+    }
+
 
     //  ***** public constant functions ***************
 
     /**
     * @dev to get the amount of token collectable by any contributor
     * @param _contributor contributor to get amont
-    */  
+    */
     function collectableTokenOf(address _contributor) public constant returns (uint256) {
         return collectableToken[_contributor] ;
     }
-    
+
     /**
     * @dev to get the amount of token collectable by any contributor
     * @param _contributor contributor to get amont
-    */  
+    */
     function isClientIdentRejectedOf(address _contributor) public constant returns (uint8) {
         return clientIdentRejectList[_contributor];
-    }    
-    
+    }
+
     /**
-    * @dev Fallback function which receives ether and create the appropriate number of tokens for the 
+    * @dev Fallback function which receives ether and create the appropriate number of tokens for the
     * msg.sender.
     */
     function() external payable {
         contribute();
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract autumncoin1 is StandardToken {
 
-    function autumncoin1() public { 
+    function autumncoin1() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract autumncoin1 is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,13 @@ contract autumncoin1 is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

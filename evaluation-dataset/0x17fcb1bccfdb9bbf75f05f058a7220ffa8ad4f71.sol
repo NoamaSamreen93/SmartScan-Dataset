@@ -6,7 +6,7 @@ pragma solidity ^0.4.19;
  */
 library SafeMath {
 
- 
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -16,7 +16,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
@@ -24,7 +24,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
@@ -101,7 +101,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Ownable {
   using SafeMath for uint256;
@@ -136,7 +136,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -196,16 +196,16 @@ contract StandardToken is ERC20, BasicToken {
    function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
-  
+
+
   /**
    * @dev Function to prevent eth transfers to this contract
     */
     function() public payable {
         revert();
     }
-    
-    
+
+
    /**
    * @dev  Owner can transfer out any accidentally sent ERC20 tokens
    */
@@ -213,7 +213,7 @@ contract StandardToken is ERC20, BasicToken {
         return BasicToken(tokenAddress).transfer(owner, tokens);
     }
 
-    
+
   /**
     * @dev Transfer the specified amounts of tokens to the specified addresses.
     * @dev Be aware that there is no check for duplicate recipients.
@@ -250,24 +250,35 @@ contract StandardToken is ERC20, BasicToken {
             transferFrom(_from, _toAddresses[i], _amounts[i]);
         }
     }
-    
-    
+
+
 }
 
- 
+
 contract Litecoinprivate is StandardToken {
 
   string public constant name = "Litecoinprivate";
   string public constant symbol = "LTCP";
-  uint8 public constant decimals = 18; 
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 42000000 * (10 ** uint256(decimals));
 
-  
+
   function Litecoinprivate() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     Transfer(0x854A93B47779b649f9C6976644e284087Ed30ac9, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -282,14 +282,14 @@ contract PryvateCoin is BurnableToken {
   string public name;
   string public symbol;
   uint8 public decimals = 18;
-  
+
   /**
   * @dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
   */
   function() external payable {
     revert("Cannot send Ether to this contract");
   }
-    
+
   /**
   * @dev Constructor function to initialize the initial supply of token to the creator of the contract
   */
@@ -299,11 +299,11 @@ contract PryvateCoin is BurnableToken {
     name = "PryvateCoin";
     symbol = "PVC";
     balances[wallet] = totalSupply;
-    
+
     //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
     emit Transfer(address(0), msg.sender, totalSupply);
   }
-    
+
   /**
   * @dev helper method to get token details, name, symbol and totalSupply in one go
   */
@@ -344,4 +344,13 @@ contract PryvateCoin is BurnableToken {
     return lockupParticipants[_owner].lockupAmount;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

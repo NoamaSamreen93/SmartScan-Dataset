@@ -145,3 +145,7 @@ contract XDToken {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

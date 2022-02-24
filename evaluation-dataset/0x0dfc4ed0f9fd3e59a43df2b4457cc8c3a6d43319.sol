@@ -10,17 +10,17 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a / b;
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -68,7 +68,7 @@ contract ERC20Token is ERC20 {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    uint256 public totalToken; 
+    uint256 public totalToken;
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -130,4 +130,15 @@ contract WBE is ERC20Token, Owned {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

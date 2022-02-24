@@ -79,7 +79,7 @@ contract InfiniCoin is ERC20Interface, Owned, SafeMath {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
- 
+
     constructor() public {
         symbol = "INFC";
         name = "InfiniCoin";
@@ -89,7 +89,7 @@ contract InfiniCoin is ERC20Interface, Owned, SafeMath {
         emit Transfer(address(0), 0x70Fe2224D604424e7e574Dc0E0B96DB609Bb40B9, _totalSupply);
     }
 
-   
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
@@ -106,7 +106,7 @@ contract InfiniCoin is ERC20Interface, Owned, SafeMath {
         return true;
     }
 
-   
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -144,4 +144,20 @@ contract InfiniCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

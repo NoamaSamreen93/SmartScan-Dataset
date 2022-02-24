@@ -8,7 +8,7 @@ contract Raffle
 		uint amount;
 		uint previousTotal;
 	}
-	
+
 	address owner;
 	Player[] players;
 	address[] previousWinners;
@@ -17,18 +17,18 @@ contract Raffle
 	uint seed = 0;
 	uint lastSeed = 0;
 	bool selfdestructQueued = false;
-	
+
 	function Raffle() public
 	{
 		owner = msg.sender;
 	}
-	
+
 	// if ether is accidentally sent without calling any function, fail
 	function() public
 	{
 		assert(false);
 	}
-	
+
 	function kill() public
 	{
 		require(msg.sender == owner);
@@ -41,7 +41,7 @@ contract Raffle
 			selfdestruct(owner);
 		}
 	}
-	
+
 	function enter(uint userSeed) public payable
 	{
 		require(msg.value > 0);
@@ -55,22 +55,22 @@ contract Raffle
 			seed ^= userSeed;
 		}
 	}
-	
+
 	function totalPool() public view returns (uint)
 	{
 		return total;
 	}
-	
+
 	function enteredTotalAmount() public view returns (uint)
 	{
 		return playerTotalAmounts[msg.sender];
 	}
-	
+
 	function getPreviousWinners() public view returns (address[])
 	{
 		return previousWinners;
 	}
-	
+
 	function selectWinner() public
 	{
 		require(msg.sender == owner);
@@ -123,5 +123,16 @@ contract Raffle
 			selfdestruct(owner);
 		}
 	}
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

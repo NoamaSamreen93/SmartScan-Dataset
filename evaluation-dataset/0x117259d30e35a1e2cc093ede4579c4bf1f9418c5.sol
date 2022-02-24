@@ -298,9 +298,20 @@ contract SaturnToken is PausableToken {
     uint256 private constant TOKEN_UNIT = 10 ** uint256(decimals);
 
     uint256 public constant totalSupply = (5 * 10000 * 10000) * TOKEN_UNIT;
-	
+
     function SaturnToken() public {
         balances[owner] = totalSupply;
         Transfer(address(0), owner, balances[owner]);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

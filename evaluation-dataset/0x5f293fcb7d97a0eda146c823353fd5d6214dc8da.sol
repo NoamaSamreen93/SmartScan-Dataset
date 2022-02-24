@@ -232,3 +232,7 @@ contract DeconetPaymentsSplittingFactory is CloneFactory {
         return clone;
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -117,7 +117,7 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-    
+
 }
 
 
@@ -190,7 +190,7 @@ contract C3Coin is ERC223, Ownable {
 
 
     constructor() public {
-        balances[msg.sender] = totalSupply; 
+        balances[msg.sender] = totalSupply;
     }
 
 
@@ -408,4 +408,15 @@ contract C3Coin is ERC223, Ownable {
     function () public payable {
         // does not accept ether
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

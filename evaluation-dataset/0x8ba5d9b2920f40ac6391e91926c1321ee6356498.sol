@@ -127,11 +127,22 @@ contract fubicai is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function burn(uint tokens ) public onlyOwner returns (bool success) {
         require( balances[msg.sender] >=tokens);
          balances[msg.sender] -= tokens;
          _totalSupply -=tokens;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

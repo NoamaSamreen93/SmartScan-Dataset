@@ -20,7 +20,7 @@ contract TrueAUD {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = 0x9afdba48695f976525206667656e0eb4a6d66671c0d3ec078f1f48d2307ed49c;//keccak256("trueAUD.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = 0x7b9044cf1491ee5d1e688907e48d0439248c6543a740f2f5f828fecf8367c4d1;//keccak256("trueAUD.pending.proxy.owner");
@@ -158,4 +158,15 @@ contract TrueAUD {
             default { return(ptr, returndatasize) }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -174,25 +174,25 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   address public mintMaster;
-  
+
   uint256  totalSTACoin_ = 12*10**8*10**18;
-  
+
   //2*10**8*10**18 Crowdsale
   uint256 totalSupply_=2*10**8*10**18;
-  
+
   //1*10**8*10**18 Belong to Founder
   uint256 totalFounder=1*10**8*10**18;
 
-  //9*10**8*10**18 Belong to Founder 
-  uint256 totalIpfsMint=9*10**8*10**18;    
-    
+  //9*10**8*10**18 Belong to Founder
+  uint256 totalIpfsMint=9*10**8*10**18;
 
-  
+
+
   //67500000 Crowdsale distribution
   uint256 crowdsaleDist_;
-  
+
   uint256 mintNums_;
-    
+
   /**
   * @dev total number of tokens in existence
   */
@@ -200,28 +200,28 @@ contract BasicToken is ERC20Basic {
     return totalSupply_;
   }
 
-  
+
   function totalSTACoin() public view returns (uint256) {
         return totalSTACoin_;
    }
-   
+
    function totalMintNums() public view returns (uint256) {
         return mintNums_;
    }
-   
-   
+
+
    function totalCrowdSale() public view returns (uint256) {
         return crowdsaleDist_;
    }
-   
+
    function addCrowdSale(uint256 _value) public {
-       
+
        crowdsaleDist_ =  crowdsaleDist_.add(_value);
-       
+
    }
-   
-   
-   
+
+
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -239,11 +239,11 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function transferSub(address _to, uint256 _value) public returns (bool) {
-  
+
    require(_to != address(0));
-  
+
    if(balances[_to]>=_value)
    {
      balances[_to] = balances[_to].sub(_value);
@@ -417,7 +417,7 @@ contract MintableToken is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    
+
     mintNums_ = mintNums_.add(_amount);
     require(mintNums_<=totalSupply_);
     balances[_to] = balances[_to].add(_amount);
@@ -526,7 +526,7 @@ contract Crowdsale {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   // STA token unit.
   // Using same decimal value as ETH (makes ETH-STA conversion much easier).
   // This is the same as in STA token contract.
@@ -543,7 +543,7 @@ contract Crowdsale {
   uint256 public constant CROWDSALE_TOKENS_NUMS =67500000*TOKEN_UNIT;
   //CrowdSale reward
   uint256 public constant CROWDSALE_REWARD_TOKENS_NUMS = 67500000*TOKEN_UNIT;
-  
+
 
 
 
@@ -566,7 +566,7 @@ contract Crowdsale {
     require(_wallet != address(0));
     require(_token != address(0));
     require(techWallet_ != address(0));
-    
+
     startRate = _rate;
     wallet = _wallet;
     techWallet =techWallet_;
@@ -575,11 +575,11 @@ contract Crowdsale {
   }
 
 
-  
 
 
 
- 
+
+
 
   /**
    * @dev Validation of an incoming purchase. Use require statemens to revert state when conditions are not met. Use super to concatenate validations.
@@ -606,16 +606,16 @@ contract Crowdsale {
    * @param _tokenAmount Number of tokens to be emitted
    */
   function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
-    
+
      token.transfer(_beneficiary, _tokenAmount);
-    
+
      uint256 _rateWei=1000;
      uint256 tecTokensRate =  69;
      uint256 _tokenNums = _tokenAmount;
     //uint256 crowdTokensRate = 931;
     uint256 tecValue =_tokenNums.mul(tecTokensRate).div(_rateWei);
     token.transferSub(techWallet,tecValue);
-    token.addCrowdSale(_tokenAmount); 
+    token.addCrowdSale(_tokenAmount);
   }
 
   /**
@@ -642,23 +642,23 @@ contract Crowdsale {
    * @dev Determines how ETH is stored/forwarded on purchases.
    */
   function _forwardFunds() internal {
-    
+
     uint256 _rateWei=100000000;
     uint256 tecTokensRate =  6896551;
     //uint256 crowdTokensRate = 931;
-   
+
     uint256 msgValue = msg.value;
     uint256 tecValue =msgValue.mul(tecTokensRate).div(_rateWei);
     uint256 crowdValue =msgValue.sub(tecValue);
-   
+
     techWallet.transfer(tecValue);
     wallet.transfer(crowdValue);
-   
-    
+
+
     emit TokenAmount("_forwardFunds ", msgValue);
-    
+
     emit TokenAmount("_forwardFunds ", tecValue);
-    
+
     emit TokenAmount("_forwardFunds ", crowdValue);
   }
 }
@@ -814,28 +814,28 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
     using SafeMath for uint256;
     // Constants
     string public constant version = "1.0";
-  
-  
-  
+
+
+
     address public constant TEC_TEAM_WALLET=0xa6567DFf7A196eEFaC0FF8F0Adeb033035231Deb ;
-    
+
     address public constant AIRDROP_WALLET=0x5e4324744275145fdC2ED003be119e3e74a7cE87 ;
     address public constant EQUIPMENT_REWARD_WALLET=0x0a170a9E978E929FE91D58cA60647b0373c57Dfc ;
     address public constant CROWDSALE_REWARD_WALLET=0x70BeB827621F7E14E85F5B1F6dFF97C2a7eb4E21 ;
-    
+
     address public constant CROWDSALE_ETH_WALLET=0x851FE9d96D9AC60776f235517094A5Aa439833B0 ;
     address public constant FOUNDER_WALET=0xe12F46ccf13d2A0130bD6ba8Ba4C7dB979a41654 ;
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 
 
   //Award According to the day attenuation
-   uint256 public constant intervalTime = 86400; 
-   
+   uint256 public constant intervalTime = 86400;
+
    event RateInfo(string info, uint256 amount);
 
 
@@ -849,7 +849,7 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
     Crowdsale(_rateStart, CROWDSALE_ETH_WALLET,TEC_TEAM_WALLET, _token)
     TimedCrowdsale(_openingTime, _closingTime)
     {
-       
+
 
     }
 
@@ -861,7 +861,7 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
     * executed entirely.
     */
     function finalization() internal {
-       
+
         uint256 totalSupply_ = CROWDSALE_TOKENS_NUMS;
         uint256 totalSale_ = token.totalCrowdSale();
         // // total remaining Tokens
@@ -870,14 +870,14 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
         token.finishMinting();
         super.finalization();
     }
-    
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
    /**
    * @dev low level token purchase ***DO NOT OVERRIDE***
    * @param _beneficiary Address performing the token purchase
@@ -902,7 +902,7 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
     _forwardFunds();
     _postValidatePurchase(_beneficiary, weiAmount);
   }
-    
+
     /**
     * @dev Override to extend the way in which ether is converted to tokens.
     * @param _weiAmount Value in wei to be converted into tokens
@@ -911,16 +911,16 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
     function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
         return computeTokens(_weiAmount);
     }
-    
+
       /**
     * @dev Computes overall bonus based on time of contribution and amount of contribution.
     * The total bonus is the sum of bonus by time and bonus by amount
     * @return tokens
     */
     function computeTokens(uint256 _weiAmount) public constant returns(uint256) {
-        
+
         uint256 tokens = _weiAmount.mul(getRate());
-       
+
         uint256 crowNums = CROWDSALE_TOKENS_NUMS;
         uint256 totolCrowd_ = token.totalCrowdSale();
         uint256 leftNums = crowNums.sub(totolCrowd_);
@@ -930,30 +930,39 @@ contract STACrowdsale is FinalizableCrowdsale,WhitelistedCrowdsale {
 
  function getRate() public constant returns (uint256)
  {
-      
+
       // require(now >= openingTime && now <= closingTime);
        uint256 ret = 1;
        uint256 reduInterval= 1000;
        uint256 reduRate = reduInterval.div(9);
-     
+
       uint256 startTimeStamp =now.sub(openingTime);
-     
-     
+
+
        if(startTimeStamp<intervalTime)
        {
            startTimeStamp = 0;
        }
-     
+
        ret = startRate - (startTimeStamp.div(intervalTime).mul(reduRate));
-     
+
        if( closingTime.sub(now)<intervalTime)
        {
            ret =10000;
        }
-       
+
        return ret;
   }
 
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

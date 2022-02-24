@@ -77,7 +77,7 @@ contract TokenControl {
     bool public enablecontrol = true;
 
   /**
-   * @dev 
+   * @dev
    */
     constructor() public {
         ceoAddress = msg.sender;
@@ -89,46 +89,46 @@ contract TokenControl {
         require(msg.sender == ceoAddress);
         _;
     }
-  
+
     modifier onlyCFO() {
         require(msg.sender == cfoAddress);
         _;
     }
-    
+
     modifier onlyCOO() {
         require(msg.sender == cooAddress);
         _;
     }
-    
+
     modifier whenNotPaused() {
         require(enablecontrol);
         _;
     }
-    
+
 
     function setCEO(address _newCEO) external onlyCEO {
         require(_newCEO != address(0));
 
         ceoAddress = _newCEO;
     }
-    
+
     function setCFO(address _newCFO) external onlyCEO {
         require(_newCFO != address(0));
 
         cfoAddress = _newCFO;
     }
-    
+
     function setCOO(address _newCOO) external onlyCEO {
         require(_newCOO != address(0));
 
         cooAddress = _newCOO;
     }
-    
+
     function enableControl(bool _enable) public onlyCEO{
         enablecontrol = _enable;
     }
 
-  
+
 }
 
 /**
@@ -294,7 +294,7 @@ contract BurnableToken is StandardToken, TokenControl {
 
     event Burn(address indexed burner, uint256 value);
 
- 
+
     /**
     * @dev Burns a specific amount of tokens.
     * @param _value The amount of token to be burned.
@@ -317,7 +317,7 @@ contract BurnableToken is StandardToken, TokenControl {
 
 contract MintableToken is StandardToken, TokenControl {
     event Mint(address indexed to, uint256 amount);
-    
+
 
      /**
     * @dev Mints a specific amount of tokens.
@@ -328,7 +328,7 @@ contract MintableToken is StandardToken, TokenControl {
     }
 
     function _mint( uint256 _value) internal {
-        
+
         balances[cfoAddress] = balances[cfoAddress].add(_value);
         totalSupply_ = totalSupply_.add(_value);
         emit Mint(cfoAddress, _value);
@@ -344,21 +344,21 @@ contract MintableToken is StandardToken, TokenControl {
  **/
 
 contract PausableToken is StandardToken, TokenControl {
-    
+
      // Flag that determines if the token is transferable or not.
     bool public transferEnabled = false;
-    
+
     // 控制交易锁
     function enableTransfer(bool _enable) public onlyCEO{
         transferEnabled = _enable;
     }
-    
+
     modifier transferAllowed() {
          // flase抛异常，并扣除gas消耗
         assert(transferEnabled);
         _;
     }
-    
+
 
     function transfer(address _to, uint256 _value) public transferAllowed() returns (bool) {
         return super.transfer(_to, _value);
@@ -374,7 +374,7 @@ contract PausableToken is StandardToken, TokenControl {
 }
 
 contract StoToken is BurnableToken, MintableToken, PausableToken {
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -385,7 +385,7 @@ contract StoToken is BurnableToken, MintableToken, PausableToken {
         name = "AAPL-STO";
         symbol = "T-AAPL";
         decimals = 8;
-        
+
         // 0000000000f
         totalSupply_ = 0;
 
@@ -393,7 +393,18 @@ contract StoToken is BurnableToken, MintableToken, PausableToken {
         balances[cfoAddress] = totalSupply_;
     }
 
-    
+
     // can accept ether
     function() payable public { }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

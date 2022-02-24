@@ -214,7 +214,7 @@ contract RotoToken is StandardToken {
         emit Transfer(0x0, roto, INITIAL_SUPPLY);
     }
 
-    
+
     /**
      *  @dev A function that can only be called by RotoHive, transfers Roto Tokens out of the contract.
         @param _to address, the address that the ROTO will be transferred to
@@ -227,7 +227,7 @@ contract RotoToken is StandardToken {
         require(owner_transfer > 0);
 
         owner_transfer = owner_transfer.sub(_value);
-        
+
         balances[roto] = balances[roto].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
@@ -309,7 +309,7 @@ contract RotoToken is StandardToken {
         emit RotoStaked(_user, _value);
         return true;
     }
-    
+
     /**
       @dev - called by the manager contract, used to reward non-staked submissions by users
       @param _user address, the address that will receive the rewarded ROTO
@@ -359,7 +359,7 @@ contract RotoToken is StandardToken {
 contract RotoBasic {
 
     mapping (bytes32 => Tournament) public tournaments;  // tournamentID
-    
+
     //Instance and Address of the RotoToken contract
     RotoToken token;
     address roto;
@@ -408,7 +408,7 @@ contract RotoBasic {
     event StakeDestroyed(bytes32 indexed tournamentID, address indexed stakerAddress, uint256 rotoLost);
     event StakeReleased(bytes32 indexed tournamentID, address indexed stakerAddress, uint256 etherReward, uint256 rotoStaked);
     event SubmissionRewarded(bytes32 indexed tournamentID, address indexed stakerAddress, uint256 rotoReward);
-    
+
     event TokenChanged(address _contract);
     event TournamentCreated(bytes32 indexed tournamentID, uint256 etherPrize, uint256 rotoPrize);
     event TournamentClosed(bytes32 indexed tournamentID);
@@ -476,7 +476,7 @@ contract RotoManager is RotoBasic {
         Stake storage user_stake = tournament.stakes[_user][_tournamentID];
         uint256 initial_stake = user_stake.amount;
 
-        // prelimiary checks 
+        // prelimiary checks
         require(initial_stake > 0);
         require(user_stake.resolved == false);
 
@@ -488,7 +488,7 @@ contract RotoManager is RotoBasic {
         user_stake.amount = 0;
         assert(token.releaseRoto(_user, _tournamentID)); // calls the token contract releaseRoto function to handle the token accounting
         tournament.stakesResolved = tournament.stakesResolved.add(1);
-        
+
         user_stake.resolved = true;
         user_stake.successful = true;
 
@@ -498,7 +498,7 @@ contract RotoManager is RotoBasic {
         }
 
         emit StakeReleased(_tournamentID, _user, _etherReward, initial_stake);
-        
+
         return true;
     }
     /**
@@ -506,7 +506,7 @@ contract RotoManager is RotoBasic {
         @param _user address, which the ROTO will be sent to
         @param _rotoReward amount of ROTO that the user has won
         @return - a boolean value determining whether the operation was successful
-    
+
      */
     function rewardRoto(address _user, bytes32 _tournamentID, uint256 _rotoReward) external onlyOwner stopInEmergency returns(bool successful) {
       Tournament storage tournament = tournaments[_tournamentID];
@@ -514,7 +514,7 @@ contract RotoManager is RotoBasic {
 
       Stake storage user_stake = tournament.stakes[_user][_tournamentID];
       uint256 initial_stake = user_stake.amount;
-      
+
       require(initial_stake==0);
       require(tournament.rotoLeft >= _rotoReward);
       require(user_stake.resolved == false);
@@ -579,13 +579,13 @@ contract RotoManager is RotoBasic {
         //The User can't submit after tournament closure and the tournament must have begun
         require((tournament.open==true));
         require(tournament.etherPrize>0);
-        
+
         Stake storage user_stake = tournament.stakes[_staker][_tournamentID];
-        
+
         require(user_stake.amount==0); // Users can only stake once
         require(_value>0); // Users must stake at least 1 ROTO
         require(_staker != roto && _staker != owner); //RotoHive can't stake in tournament
-        
+
         //Users must have the necessary balances to submit their stake
         assert(token.canStake(_staker, _value));
 
@@ -610,7 +610,7 @@ contract RotoManager is RotoBasic {
     function createTournament(bytes32 _tournamentID, uint256 _etherPrize, uint256 _rotoPrize) external payable onlyOwner returns(bool successful) {
         Tournament storage newTournament = tournaments[_tournamentID];
         require(newTournament.creationTime==0);
-        
+
         newTournament.open = true;
         newTournament.etherPrize = _etherPrize;
         newTournament.etherLeft = _etherPrize;
@@ -643,4 +643,15 @@ contract RotoManager is RotoBasic {
        emit TournamentClosed(_tournamentID);
        return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

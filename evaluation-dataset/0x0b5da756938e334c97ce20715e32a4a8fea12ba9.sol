@@ -142,7 +142,7 @@ contract F3Dultra is modularShort {
 
     uint256 constant private preIcoMax_ = 50000000000000000000; // max ico num
     uint256 constant private preIcoPerEth_ = 1500000000000000000; // in ico, per addr eth
-    
+
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .  (data used to store game info that changes)
@@ -1926,4 +1926,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

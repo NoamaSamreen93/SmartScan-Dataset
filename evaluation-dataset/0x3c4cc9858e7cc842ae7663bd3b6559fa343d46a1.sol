@@ -150,7 +150,7 @@ contract ERC20 is IERC20 {
     mapping (address => uint256) internal _balances;
     mapping (address => mapping (address => uint256)) internal _allowances;
     uint256 internal _totalSupply;
-    
+
     constructor() internal {
     }
 
@@ -211,7 +211,7 @@ contract Ownable {
         owner = msg.sender;
         startdate = now;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner,"Ownerble: caller is not owner.");
         _;
@@ -263,7 +263,7 @@ contract MinterRole {
 contract Mintable is MinterRole{
      uint256 private _cap;
      event Mint(address indexed minter, address receiver, uint256 value);
-    
+
     constructor (uint256 cap) internal {
         require(cap > 0, "ERC20Capped: cap is 0");
         _cap = cap;
@@ -278,13 +278,13 @@ contract Mintable is MinterRole{
     function cap() public view returns (uint256) {
         return _cap;
     }
-    
+
     function mint(address to, uint256 value) public onlyMinter returns (bool) {
         _mint(to, value);
         emit Mint(msg.sender, to, value);
         return true;
     }
-    
+
     function _mint(address account, uint256 value) internal;
 }
 
@@ -321,7 +321,7 @@ contract Pausable {
         _paused = false;
         emit Unpaused(msg.sender);
     }
-    
+
     function pause() public;
     function unpause() public;
 }
@@ -340,32 +340,32 @@ contract Burnable {
 contract Lockable {
     uint256 internal _totalLocked = 0;
     event Lock(address beneficiary, uint256 amount, uint256 releaseTime);
-    
+
     mapping(address => uint256) internal _lock_list_period;
     mapping(address => bool) internal _lock_list;
     mapping(address => uint256) internal _revocable;
-    
+
     modifier notLocked() {
         require(_lock_list[msg.sender] == true, "Lockable: sender address is locked.");
         _;
     }
-    
+
     function totalLocked() public view returns (uint256){
         return _totalLocked;
     }
-    
+
     function mintLockedToken(address addr, uint256 tokens, uint256 _duration) public;
-    
+
     function releaseLockedToken() public returns (bool);
-    
+
     function isLocked(address addr) public view returns (bool) {
         return _lock_list[addr];
     }
-    
+
     function lockedPeriod(address addr) public view returns (uint256) {
         return _lock_list_period[addr];
     }
-    
+
     function lockedBalance(address addr) public view returns (uint256) {
         return _revocable[addr];
     }
@@ -462,7 +462,7 @@ contract Delegatable is DelegatorRole{
 
         // fee
         uint _fee = _value.mul(_feeRate).div(uint(100000));
-        
+
         if(_from == sender){
             if(_delegatedTransfer(_from, _to, _value, _fee)){
                 uint256 newNonce = nonceOf(_from).add(uint256(1));
@@ -488,7 +488,7 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         _name = name;
         _symbol = symbol;
     }
-    
+
     function name() public view returns (string memory) {
         return _name;
     }
@@ -500,7 +500,7 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     //Override Mintable
     function _mint(address account, uint256 value) internal {
         require(account != address(0), "Mintable: mint to the zero address.");
@@ -510,21 +510,21 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
-    
+
     function renounceMinter() public {
         require(msg.sender != owner, "Mintable: Owner cannot renounce. Transfer owner first.");
         super._removeMinter(msg.sender);
     }
- 
+
     function addMinter(address minter) public onlyOwner{
         super._addMinter(minter);
 
     }
-    
+
     function removeMinter(address minter) public onlyOwner{
         super._removeMinter(minter);
     }
-    
+
     //Override Ownerble
     function transferOwnership(address newOwner) public{
         require(msg.sender == owner, "Ownerble: only owner transfer ownership");
@@ -556,7 +556,7 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         require(value > 0, "transferFrom: value is must be greater than zero.");
         require(balanceOf(from) >= value, "transferFrom: balance of from address is not enough");
         require(_allowances[from][msg.sender] >= value, "transferFrom: sender are not allowed to send.");
-        
+
         return super.transferFrom(from, to, value);
     }
 
@@ -573,7 +573,7 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         super._burn(account, value);
         emit Transfer(account, address(0), value);
     }
-    
+
     //Apply SafeTransfer
     function safeTransfer(address to, uint256 value) public {
         require(!_isContract(to),"SafeTransfer: receiver is contreact");
@@ -605,31 +605,31 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         require(msg.sender == owner, "Lockable: only owner can lock token ");
         require(_totalSupply.add(totalLocked()).add(tokens) <= cap(), "Lockable: locked tokens can not exceed total cap.");
         require(_lock_list[addr] == false, "Lockable: this address is already locked");
-        
+
         uint256 releaseTime = block.timestamp.add(_duration.mul(1 minutes));
-        
+
         //if(_lock_list[addr] == true) {
         //    _totalLocked.sub(_revocable[addr]);
         //}
-        
+
         _lock_list_period[addr] = releaseTime;
         _lock_list[addr] = true;
         _revocable[addr] = tokens;
         _totalLocked = _totalLocked.add(tokens);
-        
+
         emit Lock(addr, tokens, releaseTime);
     }
-    
+
     function releaseLockedToken() public returns (bool) {
         require(_lock_list[msg.sender] == true);
         require(_revocable[msg.sender] > 0);
-        
+
         uint256 releaseTime = _lock_list_period[msg.sender];
         uint256 currentTime = block.timestamp;
-        
+
         if(currentTime > releaseTime) {
             uint256 tokens = _revocable[msg.sender];
-            
+
             _lock_list_period[msg.sender] = 0;
             _lock_list[msg.sender] = false;
             _revocable[msg.sender] = 0;
@@ -674,8 +674,21 @@ contract TrancheToken is ERC20, Ownable, Mintable, Pausable, Burnable, Lockable,
         super._addDelegator(delegator);
 
     }
-    
+
     function removeDelegator(address delegator) public onlyOwner{
         super._removeDelegator(delegator);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

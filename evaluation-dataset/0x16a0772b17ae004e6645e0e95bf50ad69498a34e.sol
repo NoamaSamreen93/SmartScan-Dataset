@@ -204,7 +204,7 @@ contract MultiSigWallet {
     function confirmTransaction(uint transactionId)
         public
         ownerExists(msg.sender)
-        transactionExists(transactionId)    
+        transactionExists(transactionId)
         notConfirmed(transactionId, msg.sender)
     {
         confirmations[transactionId][msg.sender] = true;
@@ -370,4 +370,15 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -180,15 +180,15 @@ contract Crowdsale is ReentrancyGuard {
 
     function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
         if (weiAmount < 5 ether) return weiAmount.mul(_rate);
-        
+
         if (weiAmount >= 5 ether && weiAmount < 10 ether) return weiAmount.mul(1666); //$0.09 per token
-        else if (weiAmount >= 10 ether && weiAmount < 100 ether) return weiAmount.mul(1724); //$0.087 per token   
-        else if (weiAmount >= 100 ether && weiAmount < 500 ether) return weiAmount.mul(1764); //$0.085 per token   
-        else if (weiAmount >= 500 ether && weiAmount < 1000 ether) return weiAmount.mul(1875); //$0.080 per token   
-        else if (weiAmount >= 1000 ether && weiAmount < 10000 ether) return weiAmount.mul(2000); //$0.075 per token   
-        else if (weiAmount >= 10000 ether && weiAmount < 20000 ether) return weiAmount.mul(2307); //$0.065 per token   
-        else if (weiAmount >= 20000 ether && weiAmount < 50000 ether) return weiAmount.mul(2727); //$0.055 per token  
-        else if (weiAmount >= 50000 ether) return weiAmount.mul(3000); //$0.05 per token  
+        else if (weiAmount >= 10 ether && weiAmount < 100 ether) return weiAmount.mul(1724); //$0.087 per token
+        else if (weiAmount >= 100 ether && weiAmount < 500 ether) return weiAmount.mul(1764); //$0.085 per token
+        else if (weiAmount >= 500 ether && weiAmount < 1000 ether) return weiAmount.mul(1875); //$0.080 per token
+        else if (weiAmount >= 1000 ether && weiAmount < 10000 ether) return weiAmount.mul(2000); //$0.075 per token
+        else if (weiAmount >= 10000 ether && weiAmount < 20000 ether) return weiAmount.mul(2307); //$0.065 per token
+        else if (weiAmount >= 20000 ether && weiAmount < 50000 ether) return weiAmount.mul(2727); //$0.055 per token
+        else if (weiAmount >= 50000 ether) return weiAmount.mul(3000); //$0.05 per token
     }
 
     function _forwardFunds() internal {
@@ -444,4 +444,13 @@ contract GRAMSale is CappedCrowdsale, TimedCrowdsale, MintedCrowdsale {
  {
 
  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

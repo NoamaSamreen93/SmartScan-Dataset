@@ -64,12 +64,12 @@ contract DELFINIUMToken is ERC20Interface {
 	address public owner;
 	uint public totalSupply = 210000000 * (10 ** 18);
 	bool public emergencyFreeze;
-	
+
 	// mappings
 	mapping (address => uint) balances;
 	mapping (address => mapping (address => uint) ) allowed;
 	mapping (address => bool) frozen;
-  
+
 
 	// constructor
 	constructor() public {
@@ -81,8 +81,8 @@ contract DELFINIUMToken is ERC20Interface {
 	// events
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 	event Freezed(address targetAddress, bool frozen);
-	event EmerygencyFreezed(bool emergencyFreezeStatus);	
-  
+	event EmerygencyFreezed(bool emergencyFreezeStatus);
+
 
 
 	// Modifiers
@@ -91,16 +91,16 @@ contract DELFINIUMToken is ERC20Interface {
 		_;
 	}
 
-	modifier unfreezed(address _account) { 
+	modifier unfreezed(address _account) {
 		require(!frozen[_account], '2');
-		_;  
+		_;
 	}
-	
-	modifier noEmergencyFreeze() { 
+
+	modifier noEmergencyFreeze() {
 		require(!emergencyFreeze, '3');
-		_; 
+		_;
 	}
-  
+
 
 
 	// functions
@@ -109,10 +109,10 @@ contract DELFINIUMToken is ERC20Interface {
 	// Transfer Token
 	// ------------------------------------------------------------------------
 	function transfer(address _to, uint _value)
-		unfreezed(_to) 
-		unfreezed(msg.sender) 
-		noEmergencyFreeze() 
-		public returns (bool success) 
+		unfreezed(_to)
+		unfreezed(msg.sender)
+		noEmergencyFreeze()
+		public returns (bool success)
 	{
 		require(_to != address(0x0), '4');
 		require(balances[msg.sender] >= _value, '5');
@@ -125,15 +125,15 @@ contract DELFINIUMToken is ERC20Interface {
 	// ------------------------------------------------------------------------
 	// Approve others to spend on your behalf
 	// ------------------------------------------------------------------------
-	/* 
+	/*
 		While changing approval, the allowed must be changed to 0 than then to updated value
 		The smart contract doesn't enforces this due to backward competibility but requires frontend to do the validations
 	*/
 	function approve(address _spender, uint _value)
-		unfreezed(_spender) 
-		unfreezed(msg.sender) 
-		noEmergencyFreeze() 
-		public returns (bool success) 
+		unfreezed(_spender)
+		unfreezed(msg.sender)
+		noEmergencyFreeze()
+		public returns (bool success)
 	{
 		allowed[msg.sender][_spender] = _value;
 		emit Approval(msg.sender, _spender, _value);
@@ -172,10 +172,10 @@ contract DELFINIUMToken is ERC20Interface {
   	// Approve and call : If approve returns true, it calls receiveApproval method of contract
 		// ------------------------------------------------------------------------
   	function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-		unfreezed(_spender) 
-		unfreezed(msg.sender) 
-		noEmergencyFreeze() 
-		public returns (bool success) 
+		unfreezed(_spender)
+		unfreezed(msg.sender)
+		noEmergencyFreeze()
+		public returns (bool success)
 	{
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -188,11 +188,11 @@ contract DELFINIUMToken is ERC20Interface {
 	// Transferred approved amount from other's account
 	// ------------------------------------------------------------------------
 	function transferFrom(address _from, address _to, uint _value)
-		unfreezed(_to) 
-		unfreezed(_from) 
-		unfreezed(msg.sender) 
-		noEmergencyFreeze() 
-		public returns (bool success) 
+		unfreezed(_to)
+		unfreezed(_from)
+		unfreezed(msg.sender)
+		noEmergencyFreeze()
+		public returns (bool success)
 	{
 		require(_value <= allowed[_from][msg.sender], '6');
 		require (balances[_from]>= _value, '5');
@@ -205,7 +205,7 @@ contract DELFINIUMToken is ERC20Interface {
 
 
 	// ------------------------------------------------------------------------
-	//               ONLYOWNER METHODS                             
+	//               ONLYOWNER METHODS
 	// ------------------------------------------------------------------------
 
 
@@ -214,7 +214,7 @@ contract DELFINIUMToken is ERC20Interface {
 	// ------------------------------------------------------------------------
 	function transferOwnership(address _newOwner)
 		onlyOwner
-		public 
+		public
 	{
 		require(_newOwner != address(0), '4');
 		owner = _newOwner;
@@ -240,7 +240,7 @@ contract DELFINIUMToken is ERC20Interface {
 		emit EmerygencyFreezed(_freeze);
 		return true;
 	}
-  
+
 
 	// ------------------------------------------------------------------------
 	//               CONSTANT METHODS
@@ -272,7 +272,7 @@ contract DELFINIUMToken is ERC20Interface {
 	// Get Freeze Status : Constant
 	// ------------------------------------------------------------------------
 	function isFreezed(address _targetAddress) public view returns (bool) {
-		return frozen[_targetAddress]; 
+		return frozen[_targetAddress];
 	}
 
 
@@ -289,5 +289,16 @@ contract DELFINIUMToken is ERC20Interface {
 	// ------------------------------------------------------------------------
 	function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) {
 		return ERC20Interface(_tokenAddress).transfer(owner, _value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

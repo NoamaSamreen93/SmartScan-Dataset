@@ -483,7 +483,7 @@ contract CremanonToken is ERC20 {
         emit CrcTransferred(crc, _newCrc);
         crc = _newCrc;
     }
-    
+
     modifier onlyCrc() {
         require(msg.sender == crc, "Not crc");
         _;
@@ -537,10 +537,10 @@ contract Cremanon is ERC20 {
         mapping (address => bool) agreement;
     }
     mapping (address => ProposalInfo) public proposals;
-    
+
     event AddStakeHolder(address indexed stakeHolder);
     event RemoveStakeHolder(address indexed stakeHolder);
-    
+
     event MakeProposal(address indexed target, uint8 mode, uint256 amount, address token);
     event AgreeProposal(address indexed target, address stakeHolder);
 
@@ -605,7 +605,7 @@ contract Cremanon is ERC20 {
         }
     }
 
-    
+
     function _checkAgreement(address target) internal view returns (bool) {
         uint num = 0;
         for (uint i=0; i < stakeHolders.length; i++){
@@ -693,7 +693,7 @@ contract Cremanon is ERC20 {
     event Unpause();
 
     bool public paused = false;
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -794,7 +794,7 @@ contract Cremanon is ERC20 {
         // crt.call(abi.encodeWithSignature("mint(address,uint256)",_to, _amount*10));
         super._mint(_to, _amount);
         emit Mint(_to, _amount);
-        
+
         return true;
     }
 
@@ -918,4 +918,15 @@ contract Cremanon is ERC20 {
     function afterTime(uint256 _value) public view returns (uint256) {
         return now + _value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

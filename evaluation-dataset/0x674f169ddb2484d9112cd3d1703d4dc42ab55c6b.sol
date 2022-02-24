@@ -149,15 +149,15 @@ contract EthBox is Ownable, AddressBook {
     event InviterRegistered(address indexed inviter, uint value);
     event InviterWithDraw(address indexed inviter, uint value);
 
-    uint INVITER_FEE_PERCENT = 30; 
-    uint constant INVITER_MIN_VALUE = 100 finney; 
+    uint INVITER_FEE_PERCENT = 30;
+    uint constant INVITER_MIN_VALUE = 100 finney;
 
     uint public lockedInBets;
 
     enum RoundState{READY, RUNNING, REMOVED, FINISHED, WITHDRAWED}
 
     struct Round {
-        uint32[] peoples; 
+        uint32[] peoples;
         uint price;
         uint min_amount;
         uint max_amount;
@@ -397,4 +397,20 @@ contract EthBox is Ownable, AddressBook {
         Round storage r = bets[pid][rid];
         return r.state;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

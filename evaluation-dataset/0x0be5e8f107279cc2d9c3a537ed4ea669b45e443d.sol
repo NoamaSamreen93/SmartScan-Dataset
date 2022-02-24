@@ -89,12 +89,12 @@ uint256 internal profitPerShare_;
 =            PUBLIC FUNCTIONS            =
 =======================================*/
 /*
-* -- APPLICATION ENTRY POINTS --  
+* -- APPLICATION ENTRY POINTS --
 */
 function POMDA()
 public
 {
-        
+
 }
 function buy(address _referredBy)
 public
@@ -202,7 +202,7 @@ tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_custom
 
 // update dividends tracker
 int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-payoutsTo_[_customerAddress] -= _updatedPayouts;       
+payoutsTo_[_customerAddress] -= _updatedPayouts;
 
 // dividing by zero is a bad idea
 if (tokenSupply_ > 0) {
@@ -304,11 +304,11 @@ return balanceOf(_customerAddress);
 * Retrieve the dividends owned by the caller.
 * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
 * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-* But in the internal calculations, we want them separate. 
-*/ 
-function myDividends(bool _includeReferralBonus) 
-public 
-view 
+* But in the internal calculations, we want them separate.
+*/
+function myDividends(bool _includeReferralBonus)
+public
+view
 returns(uint256)
 {
 address _customerAddress = msg.sender;
@@ -340,9 +340,9 @@ return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddres
 /**
 * Return the buy price of 1 individual token.
 */
-function sellPrice() 
-public 
-view 
+function sellPrice()
+public
+view
 returns(uint256)
 {
 // our calculation relies on the token supply, so we need supply. Doh.
@@ -359,9 +359,9 @@ return _taxedEthereum;
 /**
 * Return the sell price of 1 individual token.
 */
-function buyPrice() 
-public 
-view 
+function buyPrice()
+public
+view
 returns(uint256)
 {
 // our calculation relies on the token supply, so we need supply. Doh.
@@ -378,9 +378,9 @@ return _taxedEthereum;
 /**
 * Function for the frontend to dynamically retrieve the price scaling of buy orders.
 */
-function calculateTokensReceived(uint256 _ethereumToSpend) 
-public 
-view 
+function calculateTokensReceived(uint256 _ethereumToSpend)
+public
+view
 returns(uint256)
 {
 uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
@@ -393,9 +393,9 @@ return _amountOfTokens;
 /**
 * Function for the frontend to dynamically retrieve the price scaling of sell orders.
 */
-function calculateEthereumReceived(uint256 _tokensToSell) 
-public 
-view 
+function calculateEthereumReceived(uint256 _tokensToSell)
+public
+view
 returns(uint256)
 {
 require(_tokensToSell <= tokenSupply_);
@@ -459,7 +459,7 @@ tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
 profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
 
-// calculate the amount of tokens the customer receives over his purchase 
+// calculate the amount of tokens the customer receives over his purchase
 _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
 
 } else {
@@ -492,7 +492,7 @@ view
 returns(uint256)
 {
 uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-uint256 _tokensReceived = 
+uint256 _tokensReceived =
 (
 (
 // underflow attempts BTFO
@@ -602,4 +602,15 @@ uint256 c = a + b;
 assert(c >= a);
 return c;
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

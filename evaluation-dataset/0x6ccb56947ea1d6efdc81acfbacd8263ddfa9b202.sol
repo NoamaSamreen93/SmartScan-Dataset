@@ -87,7 +87,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint) balances;
 
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
    */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -105,7 +105,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 
@@ -457,4 +457,12 @@ contract RKCToken is StandardToken, Ownable {
         super.transfer(_to, _value);
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

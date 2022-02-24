@@ -62,10 +62,10 @@ contract Ownable {
 
 contract Destructible is Ownable {
 
-  function Destructible() payable { } 
+  function Destructible() payable { }
 
   /**
-   * @dev Transfers the current balance to the owner and terminates the contract. 
+   * @dev Transfers the current balance to the owner and terminates the contract.
    */
   function destroy() onlyOwner {
     selfdestruct(owner);
@@ -152,7 +152,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -233,4 +233,13 @@ contract WIZE is StandardToken, Ownable, Destructible, HasNoEther, HasNoTokens  
 		balances[0xDa8BE6E2F555a753d4B0DfF6B5518F262D097Bc7] = 98000000E6;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

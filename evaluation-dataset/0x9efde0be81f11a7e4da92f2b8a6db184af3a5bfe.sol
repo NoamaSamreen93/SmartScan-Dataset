@@ -29,14 +29,14 @@ library SafeMath {
 }
 
 contract Token {
- 
+
   function transferFrom(address from, address to, uint tokens) public returns (bool success);
 
   function transfer(address to, uint tokens) public returns (bool success);
-     
+
 }
 
-contract BancorKillerContract { 
+contract BancorKillerContract {
 
   using SafeMath for uint256;
 
@@ -45,11 +45,11 @@ contract BancorKillerContract {
   address public base_token;
 
   address public traded_token;
-  
+
   uint public base_token_seed_amount;
 
   uint public traded_token_seed_amount;
-  
+
   uint public commission_ratio;
 
   bool public base_token_is_seeded;
@@ -57,84 +57,84 @@ contract BancorKillerContract {
   bool public traded_token_is_seeded;
 
   mapping (address => uint) public token_balance;
-  
+
   modifier onlyAdmin() {
       msg.sender == admin;
       _;
   }
 
   constructor(address _base_token, address _traded_token,uint _base_token_seed_amount, uint _traded_token_seed_amount, uint _commission_ratio) public {
-      
-    admin = tx.origin;  
-      
+
+    admin = tx.origin;
+
     base_token = _base_token;
-    
+
     traded_token = _traded_token;
-    
+
     base_token_seed_amount = _base_token_seed_amount;
-    
+
     traded_token_seed_amount = _traded_token_seed_amount;
 
     commission_ratio = _commission_ratio;
-    
+
   }
 
   function transferTokensThroughProxy(address _from, address _to, uint256 _amount) private {
 
     require(Token(traded_token).transferFrom(_from,_to,_amount));
-     
+
   }
-  
+
     function transferTokens(address _to, uint256 _amount) private {
 
     require(Token(traded_token).transfer(_to,_amount));
-     
+
   }
 
   function transferETH(address _to, uint256 _amount) private {
-      
+
     _to.transfer(_amount);
-      
+
   }
-  
-  function deposit_token(address _token, uint _amount) private { 
+
+  function deposit_token(address _token, uint _amount) private {
 
     token_balance[_token] = token_balance[_token].add(_amount);
 
     transferTokensThroughProxy(msg.sender, this, _amount);
 
-  }  
+  }
 
-  function deposit_eth() private { 
+  function deposit_eth() private {
 
     token_balance[0] = token_balance[0].add(msg.value);
 
-  }  
-  
-  function withdraw_token(uint _amount) onlyAdmin public {
-      
-      uint currentBalance_ = token_balance[traded_token];
-      
-      require(currentBalance_ >= _amount);
-      
-      transferTokens(msg.sender, _amount);
-      
   }
-  
-  function withdraw_eth(uint _amount) onlyAdmin public {
-      
-      uint currentBalance_ = token_balance[0];
-      
+
+  function withdraw_token(uint _amount) onlyAdmin public {
+
+      uint currentBalance_ = token_balance[traded_token];
+
       require(currentBalance_ >= _amount);
-      
+
+      transferTokens(msg.sender, _amount);
+
+  }
+
+  function withdraw_eth(uint _amount) onlyAdmin public {
+
+      uint currentBalance_ = token_balance[0];
+
+      require(currentBalance_ >= _amount);
+
       transferETH(msg.sender, _amount);
-      
+
   }
 
   function set_traded_token_as_seeded() private {
-   
+
     traded_token_is_seeded = true;
- 
+
   }
 
   function set_base_token_as_seeded() private {
@@ -146,25 +146,25 @@ contract BancorKillerContract {
   function seed_traded_token() public {
 
     require(!market_is_open());
-  
+
     set_traded_token_as_seeded();
 
-    deposit_token(traded_token, traded_token_seed_amount); 
+    deposit_token(traded_token, traded_token_seed_amount);
 
   }
-  
+
   function seed_base_token() public payable {
 
     require(!market_is_open());
 
     set_base_token_as_seeded();
 
-    deposit_eth(); 
+    deposit_eth();
 
   }
 
   function market_is_open() private view returns(bool) {
-  
+
     return (base_token_is_seeded && traded_token_is_seeded);
 
   }
@@ -176,69 +176,69 @@ contract BancorKillerContract {
   }
 
   function get_amount_get_sell(uint256 _amount) private view returns(uint256) {
-   
+
     uint traded_token_balance_ = token_balance[traded_token];
-    
-    uint base_token_balance_ = token_balance[base_token];    
+
+    uint base_token_balance_ = token_balance[base_token];
 
     uint pre_pay_in_price_ = traded_token_balance_.div(base_token_balance_);
 
     uint post_pay_in_price_ = (traded_token_balance_.add(_amount)).div(base_token_balance_);
-   
+
     uint adjusted_price_ = calculate_price(pre_pay_in_price_,post_pay_in_price_);
 
-    return _amount.div(adjusted_price_);   
-      
+    return _amount.div(adjusted_price_);
+
   }
 
   function get_amount_get_buy(uint256 _amount) private view returns(uint256) {
- 
+
     uint traded_token_balance_ = token_balance[traded_token];
-    
-    uint base_token_balance_ = token_balance[base_token];    
+
+    uint base_token_balance_ = token_balance[base_token];
 
     uint pre_pay_in_price_ = traded_token_balance_.div(base_token_balance_);
 
     uint post_pay_in_price_ = traded_token_balance_.div(base_token_balance_.add(_amount));
-   
+
     uint adjusted_price_ = calculate_price(pre_pay_in_price_,post_pay_in_price_);
 
     return _amount.mul(adjusted_price_);
-    
+
   }
 
   function complete_sell_exchange(uint _amount_give) private {
 
     uint amount_get_ = get_amount_get_sell(_amount_give);
-    
+
     uint amount_get_minus_fee_ = (amount_get_.mul(1 ether - commission_ratio)).div(1 ether);
-    
+
     uint admin_fee = amount_get_ - amount_get_minus_fee_;
 
     transferTokensThroughProxy(msg.sender,this,_amount_give);
 
-    transferETH(msg.sender,amount_get_minus_fee_);  
-    
-    transferETH(admin, admin_fee);      
-      
+    transferETH(msg.sender,amount_get_minus_fee_);
+
+    transferETH(admin, admin_fee);
+
   }
-  
+
   function complete_buy_exchange() private {
-    
+
     uint amount_give_ = msg.value;
 
     uint amount_get_ = get_amount_get_buy(amount_give_);
-    
+
     uint amount_get_minus_fee_ = (amount_get_.mul(1 ether - commission_ratio)).div(1 ether);
 
     uint admin_fee = amount_get_ - amount_get_minus_fee_;
 
     transferTokens(msg.sender, amount_get_minus_fee_);
-    
+
     transferETH(admin, admin_fee);
-    
+
   }
-  
+
   function sell_tokens(uint _amount_give) public {
 
     require(market_is_open());
@@ -246,7 +246,7 @@ contract BancorKillerContract {
     complete_sell_exchange(_amount_give);
 
   }
-  
+
   function buy_tokens() private {
 
     require(market_is_open());
@@ -263,18 +263,27 @@ contract BancorKillerContract {
 
 }
 
-contract BancorKiller { 
+contract BancorKiller {
 
   function create_a_new_market(address _base_token, address _traded_token, uint _base_token_seed_amount, uint _traded_token_seed_amount, uint _commission_ratio) public {
 
     new BancorKillerContract(_base_token, _traded_token, _base_token_seed_amount, _traded_token_seed_amount, _commission_ratio);
 
   }
-  
+
   function() public payable {
 
     revert();
 
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -321,8 +321,8 @@ contract PausableToken is StandardToken, Pausable {
  * @dev Standard template for ERC20 Token
  */
 contract Token is PausableToken, BurnableToken {
-    string public name; 
-    string public symbol; 
+    string public name;
+    string public symbol;
     uint8 public decimals;
 
     /**
@@ -362,14 +362,14 @@ contract IOAEX is Token {
     mapping(address => uint256) public totalLockAmount;
     // The released amount of the specified address
     mapping(address => uint256) public releasedAmount;
-    // 
+    //
     mapping(address => timeAndAmount[]) public allocations;
     // Stores the timestamp and the amount of tokens released each time
     struct timeAndAmount {
         uint256 releaseTime;
         uint256 releaseAmount;
     }
-    
+
     // events
     event LockToken(address _beneficiary, uint256 totalLockAmount);
     event ReleaseToken(address indexed user, uint256 releaseAmount, uint256 releaseTime);
@@ -399,15 +399,15 @@ contract IOAEX is Token {
         BDRInstance = BDRContract(BDRAddress);
         emit SetBDRContract(BDRAddress);
     }
-    
+
     /**
      * @dev The owner can call this function to send tokens to the specified address, but these tokens are only available for more than the specified time
      * @param _beneficiary The address to receive tokens
      * @param _releaseTimes Array, the timestamp for releasing token
-     * @param _releaseAmount Array, the amount for releasing token 
+     * @param _releaseAmount Array, the amount for releasing token
      */
     function lockToken(address _beneficiary, uint256[] memory _releaseTimes, uint256[] memory _releaseAmount) public onlyOwner returns(bool) {
-        
+
         require(totalLockAmount[_beneficiary] == 0); // The beneficiary is not in any lock-plans at the current timestamp.
         require(_beneficiary != address(0)); // The beneficiary cannot be an empty address
         require(_releaseTimes.length == _releaseAmount.length); // These two lists are equal in length.
@@ -428,7 +428,7 @@ contract IOAEX is Token {
      * Releases token
      */
     function releaseToken() public returns (bool) {
-        release(msg.sender); 
+        release(msg.sender);
     }
 
     /**
@@ -451,7 +451,7 @@ contract IOAEX is Token {
     }
 
     /**
-     * @dev Gets the amount that can be released at current timestamps 
+     * @dev Gets the amount that can be released at current timestamps
      * @param addr A specified address.
      */
     function releasableAmount(address addr) public view returns (uint256) {
@@ -466,7 +466,7 @@ contract IOAEX is Token {
         }
         return num.sub(releasedAmount[addr]); // the amount of current timestamps that can be released - the released amount.
     }
-    
+
     /**
      * @dev Gets the amount of tokens that are still locked at current timestamp.
      * @param addr A specified address.
@@ -477,11 +477,11 @@ contract IOAEX is Token {
         } else {
             return 0;
         }
-        
+
     }
 
     /**
-     * @dev Transfers token to a specified address. 
+     * @dev Transfers token to a specified address.
      *      If 'msg.sender' has releasable tokens, this part of the token will be released automatically.
      *      If the target address of transferring is BDR contract, the operation of changing BDR tokens will be executed.
      * @param to The target address of transfer, which may be the BDR contract
@@ -525,12 +525,23 @@ contract IOAEX is Token {
     function tokenFallback(address from, uint256 value, bytes calldata) external onlyBDRContract {
         require(from != address(0));
         require(value != uint256(0));
-        
+
         uint256 AbcValue = value.mul(10**uint256(decimals)).div(10**uint256(BDRInstance.decimals())); // Calculates the number of 'Abc' tokens that can be exchanged
         require(AbcValue <= balances[address(BDRInstance)]);
         balances[address(BDRInstance)] = balances[address(BDRInstance)].sub(AbcValue);
         balances[from] = balances[from].add(AbcValue);
         emit Transfer(owner, from, AbcValue);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

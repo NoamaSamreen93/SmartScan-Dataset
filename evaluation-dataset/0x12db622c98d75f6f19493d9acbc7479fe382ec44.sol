@@ -52,7 +52,7 @@ interface Token {
 }
 
 contract TBECrowdsale {
-    
+
     Token public tokenReward;
     uint256 public price;
     address public creator;
@@ -90,29 +90,29 @@ contract TBECrowdsale {
 
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) isCreator public {
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setbonusDate(uint256 _bonusDate) isCreator public {
-        bonusDate = _bonusDate;      
+        bonusDate = _bonusDate;
     }
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
      function settokenCap(uint256 _tokenCap) isCreator public {
-        tokenCap = _tokenCap;      
+        tokenCap = _tokenCap;
     }
 
     function addToWhitelist(address _address) isCreator public {
@@ -128,11 +128,11 @@ contract TBECrowdsale {
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -144,7 +144,7 @@ contract TBECrowdsale {
         require(now > startDate);
         require(now < endDate);
         require(whitelist[msg.sender]);
-        
+
         if (categorie1[msg.sender] == false) {
             require((whitelistedMax[msg.sender] +  msg.value) <= 5000000000000000000);
         }
@@ -162,4 +162,15 @@ contract TBECrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

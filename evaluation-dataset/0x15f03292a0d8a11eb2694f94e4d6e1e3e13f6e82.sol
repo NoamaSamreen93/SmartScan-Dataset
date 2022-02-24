@@ -138,3 +138,14 @@ contract HEStandardToken is StandardToken {
 
 // Creates 20,000,000.000000000000000000 AMIS (AMIS) Tokens
 contract PWC is HEStandardToken(20000000000000000, "PWC", 9, "PWC") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -1,26 +1,26 @@
 /*
- ______   _________  ___   ___   _______    _______             ________  ______      
-/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\     
-\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \    
- \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \   
-  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \  
-   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \ 
-    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/ 
-  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____ 
+ ______   _________  ___   ___   _______    _______             ________  ______
+/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\
+\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \
+ \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \
+  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \
+   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \
+    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/
+  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____
  |  ____|__   __| |  | |  / ____|/ __ \ / __ \|  __ \   / ____|   /\   |  \/  |  ____|/ ____|
- | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___  
- |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \ 
+ | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___
+ |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \
  | |____   | |  | |  | | | |__| | |__| | |__| | |__| | | |__| |/ ____ \| |  | | |____ ____) |
- |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/ 
-                                                                                             
+ |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/
+
                                                          BY : LmsSky@Gmail.com
-*/                            
+*/
 
 pragma solidity ^0.4.25;
 
 
 contract safeApi{
-    
+
    modifier safe(){
         address _addr = msg.sender;
         require (_addr == tx.origin,'Error Action!');
@@ -31,7 +31,7 @@ contract safeApi{
     }
 
 
-    
+
  function toBytes(uint256 _num) internal returns (bytes _ret) {
    assembly {
         _ret := mload(0x10)
@@ -45,14 +45,14 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         string memory copy = new string(end - start);
 //        string memory copy = new string(5);
           uint k = 0;
-        for (uint i = start; i < end; i++){ 
+        for (uint i = start; i < end; i++){
             bytes(copy)[k++] = bytes(_s)[i];
         }
         return copy;
     }
-     
 
- function safePercent(uint256 a,uint256 b) 
+
+ function safePercent(uint256 a,uint256 b)
       internal
       constant
       returns(uint256)
@@ -60,25 +60,25 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         assert(a>0 && a <=100);
         return  div(mul(b,a),100);
       }
-      
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0∂
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -1309,11 +1309,11 @@ mapping(bytes32=>uint256) private validQueryId;
         uint8   diceB;
         mapping(uint8=>uint256) position;
     }
-   
+
    event Bet(
        address indexed _addr,
        uint256 _tableId,
-       uint256 _amount, 
+       uint256 _amount,
        uint8 _position,
        uint8 indexed _status,
        uint8 _posStatus,
@@ -1343,14 +1343,14 @@ mapping(bytes32=>uint256) private validQueryId;
      uint256 private autoPlayId_=123456;
      uint256 private autoTableId_=0;
      uint32 private  CUSTOM_GASLIMIT =150000;//Cost of payment calculation gas
-    
+
      constructor() public {
             admin__ = msg.sender;
             uint256 gasPrice=10100000000;//10.1GWEI
             oraclize_setCustomGasPrice(gasPrice);//Sent to the draw absenteeism Gwei
             gameConfig_=gameConfig(
           3,//Buy a draw bid 1/3
-          60000000000000000,//0.06 eth Minimum 
+          60000000000000000,//0.06 eth Minimum
           12000000000000000000,//12 eth Maximum
           120 seconds,//Delayed Draw 5 minutes
           gasPrice*CUSTOM_GASLIMIT,//Total cost of Mining to be paid
@@ -1359,8 +1359,8 @@ mapping(bytes32=>uint256) private validQueryId;
          );
         getPlayId(admin__);
     }
- 
-   
+
+
  function getMyInfo()external view returns(uint,uint){
        uint _pid =playAddr_[msg.sender];
        player memory _p=player_[_pid];
@@ -1369,7 +1369,7 @@ mapping(bytes32=>uint256) private validQueryId;
             _p.balance
         );
   }
- 
+
  function withdraw(uint256 pid) safe() external{
         require(playAddr_[msg.sender] == pid,'Error Action');
         require(player_[pid].addr == msg.sender,'Error Action');
@@ -1378,7 +1378,7 @@ mapping(bytes32=>uint256) private validQueryId;
         player_[pid].balance=0;
         return player_[pid].addr.transfer(balance);
     }
-    
+
     //Lottery callback
     function __callback(bytes32 myid, string result)safe() public  {
             require (validQueryId[myid] > 0,'Error!');
@@ -1387,9 +1387,9 @@ mapping(bytes32=>uint256) private validQueryId;
             require(msg.sender == oraclize_cbAddress(),'Error 1');
             __lottery(_tableId,result);
     }
-     
-     
-     //Lottery program core code   
+
+
+     //Lottery program core code
       function __lottery(uint256 _tableId,string strNumber) private safe(){
                 table storage _t=tables_[_tableId];
                 require(_t.status==2 || _t.status==3,'Error 2');
@@ -1401,11 +1401,11 @@ mapping(bytes32=>uint256) private validQueryId;
                 _t.status=4;
                 _t.diceA=uint8(diceA);
                 _t.diceB=uint8(diceB);
-               
+
                 openTable_[_t.openIndex]=0;//Mark the table as free
-              
+
             winnerTransfer(_tableId,_t);
-            
+
             emit Finish(
             _tableId,_t.betAmount,
             tables_[_tableId].position[1],
@@ -1414,10 +1414,10 @@ mapping(bytes32=>uint256) private validQueryId;
             getPosStatus(_tableId),_t.diceA,_t.diceB
             );
       }
-      
+
       //Transfer eth to the winner
       function winnerTransfer(uint256 _tableId,table storage _t) private{
-          
+
             uint8 winPos=0;
               //Verification winner
               if(_t.diceA>_t.diceB){
@@ -1427,10 +1427,10 @@ mapping(bytes32=>uint256) private validQueryId;
               }else{
                   winPos=3;
               }
-              
-              //The total prize ETH 
+
+              //The total prize ETH
               uint256 _balance=0;
-                
+
               if(_t.position[1]>0){
                   _balance=_t.betAmount;
               }
@@ -1443,7 +1443,7 @@ mapping(bytes32=>uint256) private validQueryId;
               //winner player
               uint256 _winPid=_t.position[winPos];
               uint256 _systemFee=0;
-         
+
               //Give the winner ETH
               if(_winPid>0){
                _systemFee=safePercent(gameConfig_.winnerFeePct,_balance);
@@ -1463,7 +1463,7 @@ mapping(bytes32=>uint256) private validQueryId;
                  _systemFee=add(_systemFee,_fee);
                  player_[_pos2Pid].balance=add(player_[_pos2Pid].balance,sub(_t.betAmount,_fee));
               }
-              
+
               if(_t.position[3]>0){
                  uint256 _pos3Pid=_t.position[3];
                  uint256 _pos3Amount=div(_t.betAmount,gameConfig_.buyDrawScale);
@@ -1476,7 +1476,7 @@ mapping(bytes32=>uint256) private validQueryId;
               _systemFee=sub(_systemFee,gameConfig_.pushWei);//The admin bears the Fees of the mining
               player_[_adminId].balance= add(player_[_adminId].balance,_systemFee);
       }
-      
+
       //Marked position is occupied
       function getPosStatus(uint256 _tableId) private view returns(uint8){
            table storage  _t=tables_[_tableId];
@@ -1501,10 +1501,10 @@ mapping(bytes32=>uint256) private validQueryId;
              //Must have passed the draw time
              require(now > _t.endTime,'Error 2');
              require(_t.status>=1 && _t.status <=3,'Error 3');
-          
+
                  _t.status=5;//Set to cancel
                 openTable_[_t.openIndex]=0;
-      
+
                 uint256 _fee=0;
                 uint256 _systemFee=0;
               if(_t.position[1]>0){
@@ -1513,14 +1513,14 @@ mapping(bytes32=>uint256) private validQueryId;
                  _systemFee=_fee;
                  player_[_pos1Pid].balance=add(player_[_pos1Pid].balance,sub(_t.betAmount,_fee));
               }
-           
+
               if(_t.position[2]>0){
                  uint256 _pos2Pid=_t.position[2];
                  _fee=safePercent(gameConfig_.cancelFeePct,_t.betAmount);
                  _systemFee=add(_systemFee,_fee);
                  player_[_pos2Pid].balance=add(player_[_pos2Pid].balance,sub(_t.betAmount,_fee));
               }
-              
+
               if(_t.position[3]>0){
                  uint256 _pos3Pid=_t.position[3];
                  uint256 _pos3Amount=div(_t.betAmount,gameConfig_.buyDrawScale);
@@ -1534,8 +1534,8 @@ mapping(bytes32=>uint256) private validQueryId;
               player_[_adminId].balance= add(player_[_adminId].balance,_systemFee);
               emit Cancel(_tableId);
     }
- 
-    
+
+
      //2020.01.01 Used to update the game
 function updateGame() external safe() {
         uint time=1577808000;
@@ -1543,38 +1543,38 @@ function updateGame() external safe() {
         require(msg.sender == admin__,'Error');
         selfdestruct(admin__);
 }
- 
+
 function bet(uint256 _tableId,uint8 _position) safe() external payable{
         uint256 _value=msg.value;
         uint256 _valueTemp=_value;
-        require(_position >=1 && _position<=3,'Error1');   
+        require(_position >=1 && _position<=3,'Error1');
         uint256 _tid=_tableId;
         table storage _t=tables_[_tid];
         uint256 _now=now;
-        
-        //If the location is already or has already won the prize or the number is full, reopen the table. 
+
+        //If the location is already or has already won the prize or the number is full, reopen the table.
         // If there are already 2 people, judge whether the purchase time is exceeded.
          uint256 _pid= getPlayId(msg.sender);
         if(_tid==0 || _tableId>autoTableId_ ||  _t.position[_position] >0  || _t.status >=3 || (_t.status==2 && _now > _t.endTime)){
             //The bid for a draw is 1/3;
             _valueTemp= _position==3?mul(_value,gameConfig_.buyDrawScale):_value;
-            require(_valueTemp >=gameConfig_.minBetWei && 
-            _valueTemp<=gameConfig_.maxBetWei,'The amount of bet is in the range of 0.06-12 ETH');   
+            require(_valueTemp >=gameConfig_.minBetWei &&
+            _valueTemp<=gameConfig_.maxBetWei,'The amount of bet is in the range of 0.06-12 ETH');
             require(_valueTemp%gameConfig_.minBetWei==0,'The amount of bet is in the range of 0.06-12 ETH');
             autoTableId_++;
             _tid=autoTableId_;
             _t=tables_[_tid];
-           
+
            //The first person to bet determines the ETH of the bet
            _t.betAmount=_valueTemp;
            uint8 openIndex= getOpenTableIndex();
            require(openIndex<200,'Error 8');
            openTable_[openIndex]=_tid;
            _t.openIndex=openIndex;
-            
+
        }else{
         //Only one bet is allowed per table per person
-        require(_t.position[1]!=_pid &&  _t.position[2]!=_pid  && _t.position[3]!=_pid,'Error7'); 
+        require(_t.position[1]!=_pid &&  _t.position[2]!=_pid  && _t.position[3]!=_pid,'Error7');
               //Buy flat bid validation
               if(_position==3){
                 require (_value == div(_t.betAmount,gameConfig_.buyDrawScale),'Error5');
@@ -1587,12 +1587,12 @@ function bet(uint256 _tableId,uint8 _position) safe() external payable{
         //A 2-person game starts the countdown.
       if(_t.status==2){
          _t.endTime=add(_now,gameConfig_.countdown);
-         
+
       //Verify that the balance is sufficient for the draw absenteeism lottery
       require(address(this).balance>=gameConfig_.pushWei,'Oraclize query was NOT sent, please add some ETH to cover for the query fee');
       //Countdown Draw
       bytes32 queryId =
-        oraclize_query(gameConfig_.countdown, "URL", 
+        oraclize_query(gameConfig_.countdown, "URL",
         "html(https://www.random.org/dice/?num=2).xpath(concat((//p/img[@alt>0]/@alt)[1],'|',(//p/img[@alt>0]/@alt)[last()]))",
         CUSTOM_GASLIMIT);
        validQueryId[queryId]=_tid;
@@ -1600,8 +1600,8 @@ function bet(uint256 _tableId,uint8 _position) safe() external payable{
         _t.position[_position]=_pid;//Put the user on the seat
         emit Bet(msg.sender,_tid,_value,_position,_t.status,getPosStatus(_tid),_t.endTime);
 }
-    
-    
+
+
     function getTableInfo(uint256 _tableId) view external  returns(
         uint256,uint256,uint256,uint256,uint8,uint8,uint8,uint256
         ){
@@ -1617,7 +1617,7 @@ function bet(uint256 _tableId,uint8 _position) safe() external payable{
            _t.endTime
          );
     }
-    
+
 
   function getOpenTableIndex() view private returns(uint8){
        for(uint8 i=0;i<openTable_.length;i++){
@@ -1626,12 +1626,12 @@ function bet(uint256 _tableId,uint8 _position) safe() external payable{
        }
        return 201;
    }
-   
+
    //Get a list of available tables
     function getOpenTableList() external view  returns(uint256[200]){
        return openTable_;
    }
-  
+
     function getPlayId(address addr) private returns(uint256){
         require (address(0)!=addr,'Error Addr');
         if(playAddr_[addr] >0){
@@ -1647,4 +1647,15 @@ function bet(uint256 _tableId,uint8 _position) safe() external payable{
               return autoPlayId_;
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

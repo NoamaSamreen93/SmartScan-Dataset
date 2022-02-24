@@ -200,7 +200,7 @@ library F3Ddatasets {
         // 31 - airdrop happened bool
         // 32 - airdrop tier
         // 33 - airdrop amount won
-        
+
     //compressedIDs key
     // [77-52][51-26][25-0]
         // 0-25 - pID
@@ -493,7 +493,7 @@ contract FoMo3DFast is modularFast {
     {
     // Team allocation structures
         // 0 = the only team
-        
+
 
     // Team allocation percentages
         // (F3D, P3D) + (Pot , Referrals, Community)  解读:TeamFee, PotSplit 第一个参数都是分给现在key holder的比例, 第二个是给Pow3D的比例
@@ -698,7 +698,7 @@ contract FoMo3DFast is modularFast {
 
         // manage affiliate residuals
         uint256 _affID = 1;
-        
+
         // verify a valid team was selected
         uint256 _team = 0;
 
@@ -1906,3 +1906,9 @@ contract FoMo3DFast is modularFast {
               round_[1].end = now + rndInit_ + rndExtra_;
       }
   }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

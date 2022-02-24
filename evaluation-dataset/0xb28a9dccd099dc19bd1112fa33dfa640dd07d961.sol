@@ -80,7 +80,7 @@ contract Ownable {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
 pragma solidity 0.5.7;
 
 
@@ -98,7 +98,7 @@ contract Utils {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
  pragma solidity 0.5.7;
 
 
@@ -132,7 +132,7 @@ contract Manageable is Ownable, Utils {
         emit ChangedManager(_manager, _active);
     }
 
-    /** OVERRIDE 
+    /** OVERRIDE
     * @notice does not allow owner to give up ownership
     */
     function renounceOwnership() public onlyOwner {
@@ -199,7 +199,7 @@ contract GlobalWhitelist is Ownable, Manageable {
         }
     }
 
-    /** 
+    /**
     * @notice toggle the whitelist by the parent contract; ExporoTokenFactory
     */
     function toggleWhitelist() external onlyOwner {
@@ -211,4 +211,13 @@ contract GlobalWhitelist is Ownable, Manageable {
             emit GlobalWhitelistDisabled(msg.sender);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

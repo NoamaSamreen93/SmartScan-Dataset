@@ -110,7 +110,7 @@ contract SmartEnergy is ERC20Interface, Owned, SafeMath {
         symbol = "SEC";
         name = "SmartEnergy";
         decimals = 18;
-        _totalSupply = 250000000e18; 
+        _totalSupply = 250000000e18;
         balances[0x81C78eA4685B5179D94304C0Ee01052498b97bbE] = _totalSupply;
         emit Transfer(address(0), 0x81C78eA4685B5179D94304C0Ee01052498b97bbE, _totalSupply);
     }
@@ -158,7 +158,7 @@ contract SmartEnergy is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -210,4 +210,10 @@ contract SmartEnergy is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

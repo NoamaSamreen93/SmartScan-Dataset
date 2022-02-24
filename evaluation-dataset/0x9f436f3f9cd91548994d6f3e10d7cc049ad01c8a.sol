@@ -7,26 +7,35 @@ contract ERC20Interface {
 contract DonationWallet {
 
   address public owner = msg.sender;
-  
+
   event Deposit(address sender, uint256 amount);
-  
+
   function() payable public {
     // only process transactions with value
     require(msg.value > 0);
-    
+
     // only log donations larger than 1 szabo to prevent spam
     if(msg.value > 1 szabo) {
-        emit Deposit(msg.sender, msg.value);        
+        emit Deposit(msg.sender, msg.value);
     }
-    
+
     // transfer donation to contract owner
     address(owner).transfer(msg.value);
   }
-  
+
   // method to withdraw ERC20 tokens sent to this contract
   function transferTokens(address tokenAddress, uint256 tokens) public returns(bool success) {
     require(msg.sender == owner);
     return ERC20Interface(tokenAddress).transfer(owner, tokens);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

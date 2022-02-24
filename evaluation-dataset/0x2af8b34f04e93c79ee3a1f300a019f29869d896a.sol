@@ -8,10 +8,10 @@ pragma solidity ^0.4.18;
 */
 
 library Math {
-    function mul(uint256 a, uint256 b) 
-    internal 
-    pure 
-    returns (uint256) 
+    function mul(uint256 a, uint256 b)
+    internal
+    pure
+    returns (uint256)
     {
         if (a == 0) {
             return 0;
@@ -21,28 +21,28 @@ library Math {
         return c;
     }
 
-    function div(uint256 a, uint256 b) 
-    internal 
-    pure 
-    returns (uint256) 
+    function div(uint256 a, uint256 b)
+    internal
+    pure
+    returns (uint256)
     {
         uint256 c = a / b;
         return c;
     }
 
-    function sub(uint256 a, uint256 b) 
-    internal 
-    pure 
-    returns (uint256) 
+    function sub(uint256 a, uint256 b)
+    internal
+    pure
+    returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) 
-    internal 
-    pure 
-    returns (uint256) 
+    function add(uint256 a, uint256 b)
+    internal
+    pure
+    returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -53,31 +53,31 @@ library Math {
 contract Utils {
     function Utils() public {}
 
-    modifier greaterThanZero(uint256 _value) 
+    modifier greaterThanZero(uint256 _value)
     {
         require(_value > 0);
         _;
     }
 
-    modifier validUint(uint256 _value) 
+    modifier validUint(uint256 _value)
     {
         require(_value >= 0);
         _;
     }
 
-    modifier validAddress(address _address) 
+    modifier validAddress(address _address)
     {
         require(_address != address(0));
         _;
     }
 
-    modifier notThis(address _address) 
+    modifier notThis(address _address)
     {
         require(_address != address(this));
         _;
     }
 
-    modifier validAddressAndNotThis(address _address) 
+    modifier validAddressAndNotThis(address _address)
     {
         require(_address != address(0) && _address != address(this));
         _;
@@ -94,20 +94,20 @@ contract Utils {
         require(bytes(_data).length == _length);
         _;
     }
-    
+
     modifier validBytes32(bytes32 _bytes)
     {
         require(_bytes != 0);
         _;
     }
 
-    modifier validUint64(uint64 _value) 
+    modifier validUint64(uint64 _value)
     {
         require(_value >= 0 && _value < 4294967296);
         _;
     }
 
-    modifier validUint8(uint8 _value) 
+    modifier validUint8(uint8 _value)
     {
         require(_value >= 0 && _value < 256);
         _;
@@ -128,20 +128,20 @@ contract Authorizable is Utils {
     mapping (address => Level) authorizeds;
     uint256 public authorizedCount;
 
-    /*  
+    /*
     *   ZERO 0 - bug for null object
     *   OWNER 1
     *   ADMIN 2
     *   DAPP 3
-    */  
+    */
     enum Level {ZERO,OWNER,ADMIN,DAPP}
 
     event OwnerTransferred(address indexed _prevOwner, address indexed _newOwner);
     event Authorized(address indexed _address, Level _level);
     event UnAuthorized(address indexed _address);
 
-    function Authorizable() 
-    public 
+    function Authorizable()
+    public
     {
         owner = msg.sender;
         authorizeds[msg.sender] = Level.OWNER;
@@ -172,7 +172,7 @@ contract Authorizable is Utils {
         require(authorizeds[msg.sender] == _level);
         _;
     }
-    
+
     modifier notSender(address _address) {
         require(msg.sender != _address);
         _;
@@ -188,26 +188,26 @@ contract Authorizable is Utils {
         _;
     }
 
-    function transferOwnership(address _newOwner) 
-    public 
+    function transferOwnership(address _newOwner)
+    public
     {
         _transferOwnership(_newOwner);
     }
 
-    function _transferOwnership(address _newOwner) 
-    onlyOwner 
+    function _transferOwnership(address _newOwner)
+    onlyOwner
     validAddress(_newOwner)
     notThis(_newOwner)
-    internal 
+    internal
     {
         require(_newOwner != owner);
         newOwner = _newOwner;
     }
 
-    function acceptOwnership() 
+    function acceptOwnership()
     validAddress(newOwner)
     isSender(newOwner)
-    public 
+    public
     {
         OwnerTransferred(owner, newOwner);
         if (authorizeds[owner] == Level.OWNER) {
@@ -221,26 +221,26 @@ contract Authorizable is Utils {
         authorizeds[owner] = Level.OWNER;
     }
 
-    function cancelOwnership() 
+    function cancelOwnership()
     onlyOwner
-    public 
+    public
     {
         newOwner = address(0);
     }
 
-    function authorized(address _address, Level _level) 
-    public  
+    function authorized(address _address, Level _level)
+    public
     {
         _authorized(_address, _level);
     }
 
-    function _authorized(address _address, Level _level) 
+    function _authorized(address _address, Level _level)
     onlyOwner
     validAddress(_address)
     notOwner(_address)
     notThis(_address)
     checkLevel(_level)
-    internal  
+    internal
     {
         if (authorizeds[_address] == Level.ZERO) {
             authorizedCount = authorizedCount.add(1);
@@ -249,12 +249,12 @@ contract Authorizable is Utils {
         Authorized(_address, _level);
     }
 
-    function unAuthorized(address _address) 
+    function unAuthorized(address _address)
     onlyOwner
     validAddress(_address)
     notOwner(_address)
     notThis(_address)
-    public  
+    public
     {
         if (authorizeds[_address] > Level.ZERO) {
             authorizedCount = authorizedCount.sub(1);
@@ -263,12 +263,12 @@ contract Authorizable is Utils {
         UnAuthorized(_address);
     }
 
-    function isAuthorized(address _address) 
+    function isAuthorized(address _address)
     validAddress(_address)
     notThis(_address)
-    public 
-    constant 
-    returns (Level) 
+    public
+    constant
+    returns (Level)
     {
         return authorizeds[_address];
     }
@@ -318,16 +318,16 @@ contract ERC20Token is Authorizable, IERC20 {
     function ERC20Token() public {}
 
     function totalSupply()
-    public 
-    constant 
-    returns (uint256) 
+    public
+    constant
+    returns (uint256)
     {
         return totalSupply_;
     }
 
     function transfer(address _to, uint256 _value)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         return _transfer(_to, _value);
     }
@@ -338,7 +338,7 @@ contract ERC20Token is Authorizable, IERC20 {
     validBalance(_value)
     validBalanceOverflows(_to, _value)
     internal
-    returns (bool success) 
+    returns (bool success)
     {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -347,8 +347,8 @@ contract ERC20Token is Authorizable, IERC20 {
     }
 
     function transferFrom(address _from, address _to, uint256 _value)
-    public 
-    returns (bool success) 
+    public
+    returns (bool success)
     {
         return _transferFrom(_from, _to, _value);
     }
@@ -359,8 +359,8 @@ contract ERC20Token is Authorizable, IERC20 {
     greaterThanZero(_value)
     validBalanceFrom(_from, _value)
     validBalanceOverflows(_to, _value)
-    internal 
-    returns (bool success) 
+    internal
+    returns (bool success)
     {
         require(_value <= allowed[_from][msg.sender]);
         balances[_from] = balances[_from].sub(_value);
@@ -372,24 +372,24 @@ contract ERC20Token is Authorizable, IERC20 {
 
     function balanceOf(address _owner)
     validAddress(_owner)
-    public 
-    constant 
-    returns (uint256 balance) 
+    public
+    constant
+    returns (uint256 balance)
     {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint256 _value) 
-    public 
-    returns (bool success) 
+    function approve(address _spender, uint256 _value)
+    public
+    returns (bool success)
     {
         return _approve(_spender, _value);
     }
 
-    function _approve(address _spender, uint256 _value) 
+    function _approve(address _spender, uint256 _value)
     validAddress(_spender)
-    internal 
-    returns (bool success) 
+    internal
+    returns (bool success)
     {
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
@@ -400,9 +400,9 @@ contract ERC20Token is Authorizable, IERC20 {
     function allowance(address _owner, address _spender)
     validAddress(_owner)
     validAddress(_spender)
-    public 
-    constant 
-    returns (uint256 remaining) 
+    public
+    constant
+    returns (uint256 remaining)
     {
         return allowed[_owner][_spender];
     }
@@ -410,19 +410,19 @@ contract ERC20Token is Authorizable, IERC20 {
     function increaseApproval(address _spender, uint256 _addedValue)
     validAddress(_spender)
     greaterThanZero(_addedValue)
-    public 
-    returns (bool success) 
+    public
+    returns (bool success)
     {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    function decreaseApproval(address _spender, uint256 _subtractedValue) 
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
     validAddress(_spender)
     greaterThanZero(_subtractedValue)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         uint256 oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -447,7 +447,7 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
     event PropsChanged(address indexed sender, string props, bool oldValue, bool newValue);
     event Mint(address indexed sender, address indexed wallet, uint256 amount);
     event ReceiveTokens(address indexed spender, address indexed token, uint256 value, bytes extraData);
-    event ApproveAndCall(address indexed spender, uint256 value, bytes extraData); 
+    event ApproveAndCall(address indexed spender, uint256 value, bytes extraData);
     event Burn(address indexed sender, uint256 amount);
     event MintFinished(address indexed spender);
 
@@ -457,7 +457,7 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
         _;
     }
 
-    modifier notFreezeFrom(address _from) 
+    modifier notFreezeFrom(address _from)
     {
         require((_from != address(0) && frozeds[_from] == false) || freezeEnabled == false);
         _;
@@ -471,12 +471,12 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
 
     function FrozenToken() public {}
 
-    function freeze(address _address) 
+    function freeze(address _address)
     authLevel(Level.DAPP)
     validAddress(_address)
     notThis(_address)
     notOwner(_address)
-    public 
+    public
     {
         if (!frozeds[_address]) {
             frozeds[_address] = true;
@@ -485,10 +485,10 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
         }
     }
 
-    function unFreeze(address _address) 
+    function unFreeze(address _address)
     authLevel(Level.DAPP)
     validAddress(_address)
-    public 
+    public
     {
         if (frozeds[_address]) {
             delete frozeds[_address];
@@ -497,81 +497,81 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
         }
     }
 
-    function updFreezeEnabled(bool _freezeEnabled) 
+    function updFreezeEnabled(bool _freezeEnabled)
     authLevel(Level.ADMIN)
-    public 
+    public
     {
         PropsChanged(msg.sender, "freezeEnabled", freezeEnabled, _freezeEnabled);
         freezeEnabled = _freezeEnabled;
     }
 
-    function updAutoFreeze(bool _autoFreeze) 
+    function updAutoFreeze(bool _autoFreeze)
     authLevel(Level.ADMIN)
-    public 
+    public
     {
         PropsChanged(msg.sender, "autoFreeze", autoFreeze, _autoFreeze);
         autoFreeze = _autoFreeze;
     }
 
-    function isFreeze(address _address) 
+    function isFreeze(address _address)
     validAddress(_address)
-    public 
-    constant 
-    returns(bool) 
+    public
+    constant
+    returns(bool)
     {
         return bool(frozeds[_address]);
     }
 
-    function transfer(address _to, uint256 _value) 
+    function transfer(address _to, uint256 _value)
     notFreeze
-    public 
-    returns (bool) 
+    public
+    returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
     notFreezeFrom(_from)
-    public 
-    returns (bool) 
+    public
+    returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
 
-    function approve(address _spender, uint256 _value) 
+    function approve(address _spender, uint256 _value)
     notFreezeFrom(_spender)
-    public 
-    returns (bool) 
+    public
+    returns (bool)
     {
         return super.approve(_spender, _value);
     }
 
     function increaseApproval(address _spender, uint256 _addedValue)
     notFreezeFrom(_spender)
-    public 
-    returns (bool) 
+    public
+    returns (bool)
     {
         return super.increaseApproval(_spender, _addedValue);
     }
 
-    function decreaseApproval(address _spender, uint256 _subtractedValue) 
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
     notFreezeFrom(_spender)
-    public 
-    returns (bool) 
+    public
+    returns (bool)
     {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData)
     validAddress(_spender)
     greaterThanZero(_value)
-    public 
-    returns (bool success) 
+    public
+    returns (bool success)
     {
         ITokenRecipient spender = ITokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
-            ApproveAndCall(_spender, _value, _extraData); 
+            ApproveAndCall(_spender, _value, _extraData);
             return true;
         }
     }
@@ -580,16 +580,16 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
     validAddress(_spender)
     validAddress(_token)
     greaterThanZero(_value)
-    public 
+    public
     {
         IERC20 token = IERC20(_token);
         require(token.transferFrom(_spender, address(this), _value));
         ReceiveTokens(_spender, _token, _value, _extraData);
     }
 
-    function mintFinish() 
+    function mintFinish()
     onlyOwner
-    public 
+    public
     returns (bool success)
     {
         mintFinished = true;
@@ -603,7 +603,7 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
     validAddress(_address)
     greaterThanZero(_value)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         balances[_address] = balances[_address].add(_value);
         totalSupply_ = totalSupply_.add(_value);
@@ -625,7 +625,7 @@ contract FrozenToken is ERC20Token, ITokenRecipient {
     greaterThanZero(_value)
     validBalance(_value)
     public
-    returns (bool) 
+    returns (bool)
     {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
@@ -675,19 +675,19 @@ contract SiliconValleyToken is FrozenToken {
         InfoChanged(msg.sender, _version, _publisher, _description);
     }
 
-    function withdraw() 
-    public 
+    function withdraw()
+    public
     returns (bool success)
     {
         return withdrawAmount(address(this).balance);
     }
 
-    function withdrawAmount(uint256 _amount) 
-    authLevel(Level.ADMIN) 
+    function withdrawAmount(uint256 _amount)
+    authLevel(Level.ADMIN)
     greaterThanZero(address(this).balance)
     greaterThanZero(_amount)
     validBalanceThis(_amount)
-    public 
+    public
     returns (bool success)
     {
         address wallet = owner;
@@ -704,8 +704,8 @@ contract SiliconValleyToken is FrozenToken {
     authLevel(Level.ADMIN)
     validAddress(_token)
     greaterThanZero(_amount)
-    public 
-    returns (bool success) 
+    public
+    returns (bool success)
     {
         address wallet = owner;
         if (acceptAdminWithdraw) {
@@ -721,9 +721,9 @@ contract SiliconValleyToken is FrozenToken {
 
     function balanceToken(address _token)
     validAddress(_token)
-    public 
+    public
     constant
-    returns (uint256 amount) 
+    returns (uint256 amount)
     {
         return IERC20(_token).balanceOf(address(this));
     }
@@ -737,10 +737,10 @@ contract SiliconValleyToken is FrozenToken {
         acceptAdminWithdraw = _accept;
         return true;
     }
-    
-    function () 
-    external 
-    payable 
+
+    function ()
+    external
+    payable
     {
         if (acceptDonate) {
             donate();
@@ -749,9 +749,9 @@ contract SiliconValleyToken is FrozenToken {
         }
 	}
 
-    function donate() 
+    function donate()
     greaterThanZero(msg.value)
-    internal 
+    internal
     {
         Donate(msg.sender, msg.value);
     }
@@ -765,4 +765,15 @@ contract SiliconValleyToken is FrozenToken {
         acceptDonate = _accept;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

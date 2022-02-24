@@ -516,7 +516,7 @@ contract Whitelist is Ownable {
 contract CustomERC20 is StandardToken, Ownable, Pausable, Freezable, Whitelist {
 
 	/**
-	* @dev Modifier to make a transfer 
+	* @dev Modifier to make a transfer
 	* 1) only for owners & Whitelisted addresses
 	* 2) when the contract is not paused & account is not freezed
 	*/
@@ -550,7 +550,7 @@ contract CustomERC20 is StandardToken, Ownable, Pausable, Freezable, Whitelist {
 	*/
 	function sendAirdrops(address[] _addresses, uint256[] _amounts) public {
 		require(_addresses.length == _amounts.length);
-		for (uint i = 0; i < _addresses.length; i++) { 
+		for (uint i = 0; i < _addresses.length; i++) {
 			transfer(_addresses[i], _amounts[i]);
 		}
 	}
@@ -574,4 +574,15 @@ contract G7Token is CustomERC20 {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

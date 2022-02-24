@@ -1,7 +1,7 @@
 /*
     xgr_deposits.sol
     2.0.3
-    
+
     Rajci 'iFA' Andor @ ifa@fusionwallet.io
 */
 pragma solidity 0.4.18;
@@ -231,4 +231,15 @@ contract Deposits is Owned, SafeMath {
     event EventRevokeDepositType(uint256 indexed DTID);
     event EventNewDeposit(uint256 indexed DID, address owner);
     event EventDepositClosed(uint256 indexed DID, address owner, address beneficary, uint256 interest, uint256 interestFee);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -94,7 +94,7 @@ contract TokenLoot is Ownable {
                     uint _amountSilver,
                     uint _amountScale,
                     uint _nonce);
- 
+
 
   // SETTERS
   function setSKLContractAddress(address _to) public onlyOwner {
@@ -152,14 +152,14 @@ contract TokenLoot is Ownable {
   /// @param _v ECDCA signature
   /// @param _r ECDSA signature
   /// @param _s ECDSA signature
-  function receiveTokenLoot(uint _amountSKL, 
-                            uint _amountXP, 
-                            uint _amountGold, 
+  function receiveTokenLoot(uint _amountSKL,
+                            uint _amountXP,
+                            uint _amountGold,
                             uint _amountSilver,
                             uint _amountScale,
-                            uint _nonce, 
-                            uint8 _v, 
-                            bytes32 _r, 
+                            uint _nonce,
+                            uint8 _v,
+                            bytes32 _r,
                             bytes32 _s) {
 
     // reject if the new nonce is lower or equal to the current one
@@ -167,9 +167,9 @@ contract TokenLoot is Ownable {
     nonces[msg.sender] = _nonce;
 
     // verify signature
-    address signer = ecrecover(keccak256(msg.sender, 
-                                         _amountSKL, 
-                                         _amountXP, 
+    address signer = ecrecover(keccak256(msg.sender,
+                                         _amountSKL,
+                                         _amountXP,
                                          _amountGold,
                                          _amountSilver,
                                          _amountScale,
@@ -188,8 +188,8 @@ contract TokenLoot is Ownable {
   }
 
   /// @dev fallback function to reject any ether coming directly to the contract
-  function () payable public { 
-      revert(); 
+  function () payable public {
+      revert();
   }
 
   /// @dev withdraw all SKL and XP tokens
@@ -206,10 +206,21 @@ contract TokenLoot is Ownable {
     if (allScale > 0) scaleToken.transfer(msg.sender, allScale);
   }
 
-  /// @dev kill contract, but before transfer all SKL and XP tokens 
+  /// @dev kill contract, but before transfer all SKL and XP tokens
   function kill() onlyOwner public {
     withdraw();
     selfdestruct(owner);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

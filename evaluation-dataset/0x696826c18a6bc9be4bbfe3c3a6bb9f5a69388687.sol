@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract DecentralizationSmartGames{
     using SafeMath for uint256;
-    
+
     string public constant name   = "Decentralization Smart Games";
     string public constant symbol = "DSG";
     uint8 public constant decimals = 18;
@@ -35,17 +35,17 @@ contract DecentralizationSmartGames{
     /**mapping (address => Account) private account - Investors accounts data
      * uint256 account[address].tokenBalance - Number of DSG tokens on balance
      * uint256 account[address].ethereumBalance - The amount of ETH on balance (dividends)
-     * uint256 account[address].lastDivPerTokenPool - The trigger of last dividend payment upon the "Pool dividends" program 
+     * uint256 account[address].lastDivPerTokenPool - The trigger of last dividend payment upon the "Pool dividends" program
      * uint256 account[address].lastDivPerTokenGaming - The trigger of last dividend payment upon the "Gaming dividends" program
      * uint256 account[address].totalDividendsReferrer - Total amount of dividends upon the "Referrer dividends" program
-     * uint256 account[address].totalDividendsGaming - Total amount of dividends upon the "Gaming dividends" program 
+     * uint256 account[address].totalDividendsGaming - Total amount of dividends upon the "Gaming dividends" program
      * uint256 account[address].totalDividendsPool -Total amount of dividends upon the "Pool dividends" program
      * address[5] account[address].referrer - Array of all the referrers
      * bool account[address].active - True, if the account is active
      */
     mapping (address => Account) public account;
     mapping (address => bool) public games; /* The list of contracts from which dividends are allowed */
-    
+
     struct Account {
         uint256 tokenBalance;
         uint256 ethereumBalance;
@@ -93,7 +93,7 @@ contract DecentralizationSmartGames{
         _;
     }
     /* Allowed if the sale is still active */
-    modifier sellTime() { 
+    modifier sellTime() {
         require(now <= 1560211200, "The sale is over");
         _;
     }
@@ -113,7 +113,7 @@ contract DecentralizationSmartGames{
         _;
 	    account[sender].lastDivPerTokenPool = divPerTokenPool;
         account[sender].lastDivPerTokenGaming = divPerTokenGaming;
-        
+
     }
     /**We assign two contract owners, whose referrers are from the same address
      * In the same manner we activate their accounts
@@ -334,7 +334,7 @@ contract DecentralizationSmartGames{
     /* getAccountData() - the function that returns all the data of the investor */
     function getAccountData() public view returns(
         uint256 tokenBalance,
-        uint256 ethereumBalance, 
+        uint256 ethereumBalance,
         uint256 lastDivPerTokenPool,
         uint256 lastDivPerTokenGaming,
         uint256 totalDividendsPool,
@@ -512,4 +512,20 @@ library SafeMath {
         require(b != 0, "Mod error");
         return a % b;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

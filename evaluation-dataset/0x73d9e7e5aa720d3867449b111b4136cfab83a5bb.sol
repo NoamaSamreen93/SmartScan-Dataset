@@ -3,13 +3,13 @@ pragma solidity 0.4 .19;
 /*
 
 
-███████╗ ██████╗ ███╗   ███╗ ██████╗     ██████╗ ██████╗ 
+███████╗ ██████╗ ███╗   ███╗ ██████╗     ██████╗ ██████╗
 ██╔════╝██╔═══██╗████╗ ████║██╔═══██╗    ╚════██╗██╔══██╗
 █████╗  ██║   ██║██╔████╔██║██║   ██║     █████╔╝██║  ██║
 ██╔══╝  ██║   ██║██║╚██╔╝██║██║   ██║    ██╔═══╝ ██║  ██║
 ██║     ╚██████╔╝██║ ╚═╝ ██║╚██████╔╝    ███████╗██████╔╝
-╚═╝      ╚═════╝ ╚═╝     ╚═╝ ╚═════╝     ╚══════╝╚═════╝ 
-                                                         
+╚═╝      ╚═════╝ ╚═╝     ╚═╝ ╚═════╝     ╚══════╝╚═════╝
+
           +-------------------------------+
           | +---------------------------+ |
           | |                           | |
@@ -21,7 +21,7 @@ pragma solidity 0.4 .19;
           | +---------------------------+ |
           +-------------------------------+
 
-FOMO 2D - Like the original one, buy with more dividends and less complex. 
+FOMO 2D - Like the original one, buy with more dividends and less complex.
 
 We created this one because you were too late for the original one.
 
@@ -164,7 +164,7 @@ contract F2D {
         require(msg.sender == owner);
         _;
     }
-    
+
     // Buy keys
     function bid() public payable advanceRoundIfNeeded {
         uint _minLeaderAmount = pot.mul(MIN_LEADER_FRAC_TOP).div(MIN_LEADER_FRAC_BOT);
@@ -186,7 +186,7 @@ contract F2D {
             NewLeader(now, leader, pot, hasntStarted);
         }
     }
-    
+
     // Withdraw winned pot
     function withdrawEarnings() public advanceRoundIfNeeded { require(earnings[msg.sender] > 0);
         assert(earnings[msg.sender] <= this.balance);
@@ -195,8 +195,8 @@ contract F2D {
         msg.sender.transfer(_amount);
         EarningsWithdrawal(now, msg.sender, _amount);
     }
-    
-    // Sell keys 
+
+    // Sell keys
     function withdrawDividends() public { require(dividendShares[msg.sender] > 0);
         uint _dividendShares = dividendShares[msg.sender];
         assert(_dividendShares <= totalDividendShares);
@@ -258,4 +258,20 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

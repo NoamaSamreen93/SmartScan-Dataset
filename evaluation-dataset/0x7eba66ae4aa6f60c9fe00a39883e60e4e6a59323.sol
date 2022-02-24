@@ -3,11 +3,11 @@ pragma solidity ^0.4.21;
 
 contract EIP20Interface {
     function name() public view returns (string);
-    
+
     function symbol() public view returns (string);
-    
+
     function decimals() public view returns (uint8);
-    
+
     function totalSupply() public view returns (uint256);
 
     /// @param _owner The address from which the balance will be retrieved
@@ -72,19 +72,19 @@ contract EIP20 is EIP20Interface {
         tokenDecimals = _decimalUnits;                            // Amount of decimals for display purposes
         tokenSymbol = _tokenSymbol;                               // Set the symbol for display purposes
     }
-    
+
     function name() public view returns (string) {
         return tokenName;
     }
-    
+
     function symbol() public view returns (string) {
         return tokenSymbol;
     }
-    
+
     function decimals() public view returns (uint8) {
         return tokenDecimals;
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return tokenTotalSupply;
     }
@@ -186,11 +186,11 @@ contract TimeBankToken is EIP20 {
   }
 
   mapping (address => Vesting[]) vestings;
-  
+
   address[] managerList;
   mapping (address => bool) managers;
   mapping (bytes32 => mapping (address => bool)) confirms;
-  
+
   /*
   at least <threshold> confirmations
   */
@@ -210,7 +210,7 @@ contract TimeBankToken is EIP20 {
     require(checkAddress(_master));
     require(_managers.length >= _majorityThreshold);
     require(_managers.length >= _managementThreshold);
-    
+
     paused = false;
     master = _master;
     coinbase = msg.sender;
@@ -397,7 +397,7 @@ contract TimeBankToken is EIP20 {
   function isConfirmedBy(bytes data, address manager) public view returns (bool) {
     bytes32 op = keccak256(data);
     return confirms[op][manager];
-  } 
+  }
 
   function isMajorityConfirmed(bytes data) public view returns (bool) {
     return isEnoughConfirmed(data, majorityThreshold);
@@ -639,4 +639,15 @@ contract TimeBankToken is EIP20 {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return super.allowance(_owner, _spender);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

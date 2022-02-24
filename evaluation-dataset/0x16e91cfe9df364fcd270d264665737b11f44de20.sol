@@ -1,12 +1,12 @@
 pragma solidity ^0.4.13;
 contract Token {
-    
+
 	/* Public variables of the token */
 	string public name;
 	string public symbol;
 	uint8 public decimals;
 	uint256 public totalSupply;
-    
+
 	/* This creates an array with all balances */
 	mapping (address => uint256) public balanceOf;
 
@@ -35,5 +35,16 @@ contract Token {
 	/* This unnamed function is called whenever someone tries to send ether to it */
 	function () {
 	revert();     // Prevents accidental sending of ether
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

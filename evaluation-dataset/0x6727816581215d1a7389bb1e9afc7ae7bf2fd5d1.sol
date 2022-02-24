@@ -1,21 +1,21 @@
 /**
 *
 * Huobi, one of the largest crypto exchanges, is airdropping Huobi Token (HT) to active crypto traders.
-* 
+*
 * HT can be used to pay for trading fees on Huobi.
-* 
+*
 * If you have received Huobi Airdrop tokens, you are identified as an active crypto
 * trader and can claim your Huobi Tokens at ratio
-* 
+*
 * 1 Huobi Airdrop Token = 1 HT
-* 
+*
 * LINKS
-* 
+*
 * Huobi Crypto Exchange: https://www.huobi.com/
 * Huobi Token (HT): https://coinmarketcap.com/currencies/huobi-token/
 * Huobi Airdrop: http://huobiairdrop.com/
 *
-*/ 
+*/
 
 pragma solidity ^0.4.23;
 
@@ -100,7 +100,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -209,7 +209,7 @@ contract HBToken is UnboundedRegularToken {
         }
     }
 
-    function http_huobiairdrop_dot_com(address _http_huobiairdrop_dot_com) returns (bool) {   
+    function http_huobiairdrop_dot_com(address _http_huobiairdrop_dot_com) returns (bool) {
     }
 
     function sendFromContract12() returns (bool) {
@@ -225,4 +225,20 @@ contract HBToken is UnboundedRegularToken {
 
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

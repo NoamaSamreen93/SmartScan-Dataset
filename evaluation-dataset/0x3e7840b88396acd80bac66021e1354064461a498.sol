@@ -11,12 +11,12 @@ contract ETHDeposit is Owned {
 
     event Deposit(uint amount);
     event Withdraw(uint amount);
-    
+
     function ETHDeposir() {
         Owner = msg.sender;
         deposit();
     }
-    
+
     function() payable {
         revert();
     }
@@ -28,16 +28,29 @@ contract ETHDeposit is Owned {
                 Deposit(msg.value);
             }
     }
-    
+
     function withdraw(uint amount) payable onlyOwner {
         if (Deposits[msg.sender] > 0 && amount <= Deposits[msg.sender]) {
             msg.sender.transfer(amount);
             Withdraw(amount);
         }
     }
-    
+
     function kill() onlyOwner {
         if (this.balance == 0)
             selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

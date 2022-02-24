@@ -10,7 +10,7 @@ contract Token{
     function transfer(address _to, uint256 _value) returns (bool success);
 
     //从账户_from中往账户_to转数量为_value的token，与approve方法配合使用
-    function transferFrom(address _from, address _to, uint256 _value) returns  
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     //消息发送账户设置账户_spender能从发送账户中转出数量为_value的token
@@ -57,7 +57,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)  
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -89,7 +89,7 @@ contract HenryMiniToken is StandardToken {
     }
 
     /* Approves and then calls the receiving contract */
-   
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -100,4 +100,8 @@ contract HenryMiniToken is StandardToken {
         return true;
     }
 
+}
+function() payable external {
+	revert();
+}
 }

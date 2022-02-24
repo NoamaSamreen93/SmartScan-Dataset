@@ -1517,7 +1517,7 @@ contract MCHLandPool is Ownable, Pausable, ReentrancyGuard {
 
     uint256 withdrawValue;
     uint256 balance = landSectorAsset.balanceOf(msg.sender);
-    
+
     for (uint256 i=balance; i > 0; i--) {
       uint256 landSector = landSectorAsset.tokenOfOwnerByIndex(msg.sender, i-1);
       uint256 tmpAmount = getLandSectorWithdrawableBalance(landSector);
@@ -1604,7 +1604,7 @@ contract OperatorRole is Ownable {
         require(isOperator(msg.sender));
         _;
     }
-    
+
     function isOperator(address account) public view returns (bool) {
         return operators.has(account);
     }
@@ -1648,7 +1648,7 @@ contract Referrers is OperatorRole {
   function addressOfIndex(uint32 _index) onlyOperator() public view returns (address) {
     return indexToAddress[_index];
   }
-  
+
   function isReferrer(address _account) public view returns (bool) {
     return referrers.has(_account);
   }
@@ -1857,3 +1857,9 @@ contract MCHGUMGatewayV6 is DJTBase {
   }
 }
 /* solhint-enable indent*/
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

@@ -8,7 +8,7 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
  //除以
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
@@ -48,7 +48,7 @@ contract ERC20 is ERC20Basic {
 
 
 contract MOT is ERC20 {
-    
+
     using SafeMath for uint256;
 	//拥有者
     address owner = msg.sender;
@@ -61,32 +61,32 @@ contract MOT is ERC20 {
     string public constant name = "MOT";
     string public constant symbol = "MOT";
     uint public constant decimals = 18;
-    
+
     uint256 public totalSupply = 100000000e18;
 	//分配的数量
     uint256 public totalDistributed = 20000000e18;
 	//余额 = 总量减去已经分配出去的
     uint256 public totalRemaining = totalSupply.sub(totalDistributed);
-	
+
     uint256 public value = 1500e18;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Distr(address indexed to, uint256 amount);
     event DistrFinished();
-    
+
     event Burn(address indexed burner, uint256 value);
 
 	//分配完成
     bool public distributionFinished = false;
-    
+
 	//是否可以分配
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    //仅仅拥有者 
+    //仅仅拥有者
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -96,7 +96,7 @@ contract MOT is ERC20 {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
 	//构造方法
      constructor() public {
         owner = msg.sender;
@@ -123,33 +123,33 @@ contract MOT is ERC20 {
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
         return true;
-        
+
 		//分配的数量大于或者等于总量的时候设置分配结束
         if (totalDistributed >= totalSupply) {
             distributionFinished = true;
         }
     }
-    
+
     function () external payable {
         getTokens();
      }
-    
+
 	//获取token 没有分配结束，并且没有获取过。
     function getTokens() payable canDistr onlyWhitelist public {
         if (value > totalRemaining) {
             value = totalRemaining;
         }
-        
+
         require(value <= totalRemaining);
-        
+
 		//分配给谁的
         address investor = msg.sender;
 		//分配的数量
         uint256 toGive = value;
-        
+
 		//分配
         distr(investor, toGive);
-        
+
         if (toGive > 0) {
             blacklist[investor] = true;
         }
@@ -157,7 +157,7 @@ contract MOT is ERC20 {
         if (totalDistributed >= totalSupply) {
             distributionFinished = true;
         }
-        
+
         value = value.div(100000).mul(99999);
     }
 
@@ -169,36 +169,36 @@ contract MOT is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -223,11 +223,22 @@ contract MOT is ERC20 {
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
 	//提取代币
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

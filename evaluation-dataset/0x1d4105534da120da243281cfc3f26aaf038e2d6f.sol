@@ -94,7 +94,7 @@ contract StandardERC20Token is IERC20Token, Utils {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 
 
     /**
@@ -272,41 +272,41 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
     uint256 constant public YOO_UNIT = 10 ** 18;
     uint256 public totalSupply = 100 * (10**8) * YOO_UNIT;
 
-    //  Constants 
-    uint256 constant public airdropSupply = 20 * 10**8 * YOO_UNIT;           
-    uint256 constant public earlyInvestorSupply = 5 * 10**8 * YOO_UNIT;    
-    uint256 constant public earlyCommunitySupply = 5 * 10**8 * YOO_UNIT;  
+    //  Constants
+    uint256 constant public airdropSupply = 20 * 10**8 * YOO_UNIT;
+    uint256 constant public earlyInvestorSupply = 5 * 10**8 * YOO_UNIT;
+    uint256 constant public earlyCommunitySupply = 5 * 10**8 * YOO_UNIT;
     uint256 constant public icoReservedSupply = 40 * 10**8 * YOO_UNIT;          // ico Reserved,not for other usages.
     uint256 constant public teamSupply = 12 * 10**8 * YOO_UNIT;         // Team,Community,Research，etc.
     uint256 constant public ecosystemSupply = 18 * 10**8 * YOO_UNIT;         // Community,Research，Infrastructure，etc.
-    
+
     uint256  public tokensReleasedToIco = 0;  //the tokens has released for ico.
     uint256  public tokensReleasedToEarlyInvestor = 0;  //the tokens has released for early investor.
     uint256  public tokensReleasedToTeam = 0;  //the tokens has released to team.
     uint256  public tokensReleasedToEcosystem = 0;  //the tokens has released to ecosystem.
     uint256  public currentSupply = 0;  //all tokens released currently.
 
-    
-    
-    address public airdropAddress;                                           
-    address public yoobaTeamAddress;     
+
+
+    address public airdropAddress;
+    address public yoobaTeamAddress;
     address public earlyCommunityAddress;
     address public ecosystemAddress;// use for community,Research，Infrastructure，etc.
     address public backupAddress;
 
 
-    
-    
+
+
     uint256 internal createTime = 1522261875;                                // will be replace by (UTC) contract create time (in seconds)
     uint256 internal teamTranchesReleased = 0;                          // Track how many tranches (allocations of 6.25% teamSupply tokens) have been released，about 4 years,teamSupply tokens will be allocate to team.
-    uint256 internal ecosystemTranchesReleased = 0;                          // Track how many tranches (allocations of 6.25% ecosystemSupply tokens) have been released.About 4 years,that will be release all. 
-    uint256 internal maxTranches = 16;       
+    uint256 internal ecosystemTranchesReleased = 0;                          // Track how many tranches (allocations of 6.25% ecosystemSupply tokens) have been released.About 4 years,that will be release all.
+    uint256 internal maxTranches = 16;
     bool internal isInitAirdropAndEarlyAlloc = false;
 
 
     /**
         @dev constructor
-        
+
     */
     function YOOBAToken(address _airdropAddress, address _ecosystemAddress, address _backupAddress, address _yoobaTeamAddress,address _earlyCommunityAddress)
     StandardERC20Token("Yooba token", "YOO", 18) public
@@ -318,26 +318,26 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
         earlyCommunityAddress = _earlyCommunityAddress;
         createTime = now;
     }
-    
-    
+
+
     /**
-        @dev 
+        @dev
         the tokens at the airdropAddress will be airdroped before 2018.12.31
     */
      function initAirdropAndEarlyAlloc()   public ownerOnly stoppable returns(bool success){
          require(!isInitAirdropAndEarlyAlloc);
          require(airdropAddress != 0x0 && earlyCommunityAddress != 0x0);
          require((currentSupply + earlyCommunitySupply + airdropSupply) <= totalSupply);
-         balanceOf[earlyCommunityAddress] += earlyCommunitySupply; 
+         balanceOf[earlyCommunityAddress] += earlyCommunitySupply;
          currentSupply += earlyCommunitySupply;
          Transfer(0x0, earlyCommunityAddress, earlyCommunitySupply);
-        balanceOf[airdropAddress] += airdropSupply;       
+        balanceOf[airdropAddress] += airdropSupply;
         currentSupply += airdropSupply;
         Transfer(0x0, airdropAddress, airdropSupply);
         isInitAirdropAndEarlyAlloc = true;
         return true;
      }
-    
+
 
 
     /**
@@ -355,7 +355,7 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
     }
 
     /**
-        @dev 
+        @dev
         throws on any error rather then return a false flag to minimize user errors
         in addition to the standard checks, the function throws if transfers are disabled
 
@@ -372,7 +372,7 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
 
     /**
         @dev Release one  tranche of the ecosystemSupply allocation to Yooba team,6.25% every tranche.About 4 years ecosystemSupply release over.
-       
+
         @return true if successful, throws if not
     */
     function releaseForEcosystem()   public ownerOnly stoppable returns(bool success) {
@@ -393,10 +393,10 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
         }
         revert();
     }
-    
+
        /**
         @dev Release one  tranche of the teamSupply allocation to Yooba team,6.25% every tranche.About 4 years Yooba team will get teamSupply Tokens.
-       
+
         @return true if successful, throws if not
     */
     function releaseForYoobaTeam()   public ownerOnly stoppable returns(bool success) {
@@ -418,10 +418,10 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
         revert();
     }
 
-  
-    
+
+
         /**
-        @dev release ico Tokens 
+        @dev release ico Tokens
 
         @return true if successful, throws if not
     */
@@ -435,7 +435,7 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
     }
 
         /**
-        @dev release  earlyInvestor Tokens 
+        @dev release  earlyInvestor Tokens
 
         @return true if successful, throws if not
     */
@@ -448,7 +448,7 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
          return true;
     }
     /**
-     @dev  This only run for urgent situation.Or Yooba mainnet is run well and all tokens release over. 
+     @dev  This only run for urgent situation.Or Yooba mainnet is run well and all tokens release over.
 
         @return true if successful, throws if not
     */
@@ -459,6 +459,17 @@ contract YOOBAToken is StandardERC20Token, Owned,YooStop {
        Transfer(0x0, backupAddress, (totalSupply - currentSupply));
         return true;
     }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

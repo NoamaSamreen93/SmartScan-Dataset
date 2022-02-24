@@ -349,7 +349,7 @@ contract SebastianTokenSale is Ownable {
 
 		startingTimestamp = _startingTimestamp;
 		endingTimestamp = _endingTimestamp;
-		tokenPriceInEth =  1E18 / _tokensPerEth; // Calculating Price of 1 Token in ETH 
+		tokenPriceInEth =  1E18 / _tokensPerEth; // Calculating Price of 1 Token in ETH
 		tokensForSale = _tokensForSale;
 
 		// set wallet
@@ -381,7 +381,7 @@ contract SebastianTokenSale is Ownable {
 		return validTimestamp && validValue && validRate && validAmount && !isClose;
 	}
 
-	
+
 	/**
 	 * @dev Function that accepts ether value and returns the token amount
 	 *
@@ -394,7 +394,7 @@ contract SebastianTokenSale is Ownable {
 		uint256 tokens = value.mul(10 ** tokenDecimals).div(tokenPriceInEth);
 		return tokens;
 	}
-	
+
 	/**
 	 * @dev Default fallback method which will be called when any ethers are sent to contract
 	 */
@@ -426,15 +426,15 @@ contract SebastianTokenSale is Ownable {
 
 		// transfer tokens from contract balance to beneficiary account. calling ERC223 method
 		token.transfer(beneficiary, tokens);
-		
+
 		// log event for token purchase
 		TokenPurchase(msg.sender, beneficiary, value, tokens, now);
 	}
 
 	/**
-	* @dev transmit token for a specified address. 
+	* @dev transmit token for a specified address.
 	* This is owner only method and should be called using web3.js if someone is trying to buy token using bitcoin or any other altcoin.
-	* 
+	*
 	* @param _to The address to transmit to.
 	* @param _value The amount to be transferred.
 	* @param _message message to log after transfer.
@@ -449,13 +449,13 @@ contract SebastianTokenSale is Ownable {
 	}
 
 	/**
-	* @dev withdraw funds 
+	* @dev withdraw funds
 	* This will set the withdrawal wallet
-	* 
+	*
 	* @param _wallet The address to transmit to.
-	*/	
+	*/
 	function setWallet(address _wallet) onlyOwner public returns(bool) {
-		// set wallet 
+		// set wallet
 		wallet = _wallet;
 		WalletChange(_wallet , now);
 		return true;
@@ -469,19 +469,30 @@ contract SebastianTokenSale is Ownable {
 	}
 
 	/**
-	* @dev close contract 
+	* @dev close contract
 	* This will send remaining token balance to owner
 	* This will distribute available funds across team members
-	*/	
+	*/
 	function close() onlyOwner public {
 		// send remaining tokens back to owner.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		token.transfer(owner , tokens);
 
-		// withdraw funds 
+		// withdraw funds
 		withdraw();
 
 		// mark the flag to indicate closure of the contract
 		isClose = true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

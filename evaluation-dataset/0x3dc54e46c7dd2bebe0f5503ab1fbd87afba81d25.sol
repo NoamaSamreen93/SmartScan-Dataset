@@ -46,7 +46,7 @@ pragma solidity ^0.4.10;
 
 contract LiftUpVets is ERC20 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -143,4 +143,17 @@ contract LiftUpVets is ERC20 {
      return true;
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

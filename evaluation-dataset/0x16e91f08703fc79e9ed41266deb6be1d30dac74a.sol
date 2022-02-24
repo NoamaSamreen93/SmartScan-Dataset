@@ -7,21 +7,21 @@ contract MyOwned {
     function transferOwnership(address newOwner) onlyOwner public { owner = newOwner; }
 }
 
-interface recipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+interface recipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
-contract MyToken is MyOwned {   
+contract MyToken is MyOwned {
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target,bool frozen);
     event Transfer(address indexed from,address indexed to,uint256 value);
-    
+
 
     function MyToken(uint256 initialSupply,string tokenName,string tokenSymbol,uint8 decimalUnits){
         balanceOf[msg.sender] = initialSupply;
@@ -49,4 +49,15 @@ contract MyToken is MyOwned {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

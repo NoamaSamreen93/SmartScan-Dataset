@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 contract ERC20 {
-    
+
     function totalSupply() public view returns (uint256);
     function balanceOf(address _owner) public view returns (uint256);
     function transfer(address _to, uint256 _value) public returns (bool);
@@ -37,7 +37,7 @@ contract Ownable {
 
 
 contract Pausable is Ownable {
-    
+
     event Pause();
     event Unpause();
 
@@ -107,7 +107,7 @@ library SafeMath {
 
 contract PCM is ERC20, Ownable, Pausable {
     using SafeMath for uint256;
-    
+
     string public constant name     = "Precium Token";
     uint8 public constant decimals  = 18;
     string public constant symbol   = "PCM";
@@ -133,7 +133,7 @@ contract PCM is ERC20, Ownable, Pausable {
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -150,7 +150,7 @@ contract PCM is ERC20, Ownable, Pausable {
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -165,13 +165,24 @@ contract PCM is ERC20, Ownable, Pausable {
     }
 
     function burn(uint256 _value) public onlyOwner {
-        
+
         require(_value <= balances[msg.sender]);
-    
+
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
 
         Transfer(burner, address(0), _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

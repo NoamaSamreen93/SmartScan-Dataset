@@ -423,7 +423,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of wallet to add.
     * @param _data The checksum of additional wallet data.
-    */  
+    */
     function addWallet(address _wallet, string _data) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(!isWhitelisted(_wallet));
@@ -437,7 +437,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to update.
     * @param _data The checksum of new additional wallet data.
-    */      
+    */
     function updateWallet(address _wallet, string _data) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -448,7 +448,7 @@ contract Whitelist is Ownable {
     * @dev Remove wallet from whitelist.
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to remove.
-    */  
+    */
     function removeWallet(address _wallet) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -459,7 +459,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Check the specified wallet whether it is in the whitelist.
     * @param _wallet The address of wallet to check.
-    */ 
+    */
     function isWhitelisted(address _wallet) constant public returns (bool) {
         return whitelist[_wallet].whitelisted;
     }
@@ -467,7 +467,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Get the checksum of additional data for the specified whitelisted wallet.
     * @param _wallet The address of wallet to get.
-    */ 
+    */
     function walletData(address _wallet) constant public returns (string) {
         return whitelist[_wallet].data;
     }
@@ -657,4 +657,20 @@ contract GiftCrowdsale is Pausable, Whitelistable {
     function updateIcoEnding(uint256 _endTimestamp) onlyOwner public {
         endTimestamp = _endTimestamp;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

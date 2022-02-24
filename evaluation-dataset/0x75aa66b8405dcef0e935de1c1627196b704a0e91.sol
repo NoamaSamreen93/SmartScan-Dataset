@@ -13,21 +13,21 @@ contract DonationGuestbook {
 
     address public owner; // Guestbook creator
     address public donationWallet; // wallet to store donations
-    
+
     uint public running_id = 0; // number of guestbook entries
     mapping(uint=>Entry) public entries; // guestbook entries
     uint public minimum_donation = 0; // to prevent spam in the guestbook
 
-    function DonationGuestbook() public { 
+    function DonationGuestbook() public {
     // called at creation of contract
         owner = msg.sender;
         donationWallet = msg.sender;
     }
-    
+
     function() payable public {
     // fallback function. In case somebody sends ether directly to the contract.
         donationWallet.transfer(msg.value);
-    } 
+    }
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -36,7 +36,7 @@ contract DonationGuestbook {
 
     function changeDonationWallet(address _new_storage) public onlyOwner {
     // in case the donation wallet address ever changes
-        donationWallet = _new_storage; 
+        donationWallet = _new_storage;
     }
 
     function changeOwner(address _new_owner) public onlyOwner {
@@ -67,4 +67,20 @@ contract DonationGuestbook {
         return (entries[entry_id].owner, entries[entry_id].alias, entries[entry_id].blocknumber,  entries[entry_id].timestamp,
                 entries[entry_id].donation, entries[entry_id].message);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

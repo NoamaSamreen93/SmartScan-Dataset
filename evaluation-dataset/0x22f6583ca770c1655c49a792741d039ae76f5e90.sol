@@ -35,23 +35,23 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract Ownable {
     address public owner;
-    
+
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert();
         }
         _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -61,22 +61,22 @@ contract Ownable {
 
 contract Stoppable is Ownable {
     bool public stopped;
-    
+
     constructor() public {
         stopped = false;
     }
-    
+
     modifier stoppable() {
         if (stopped) {
             revert();
         }
         _;
     }
-    
+
     function stop() public onlyOwner {
         stopped = true;
     }
-    
+
     function start() public onlyOwner {
         stopped = false;
     }
@@ -116,7 +116,7 @@ contract StandardToken is Token, Stoppable {
     function allowance(address _owner, address _spender) public stoppable view returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-    
+
     function totalSupply() public view returns (uint256 supply) {
         return _totalSupply;
     }
@@ -148,4 +148,15 @@ contract CCCToken is StandardToken {
         decimals = 18;
         symbol = "CCG";
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

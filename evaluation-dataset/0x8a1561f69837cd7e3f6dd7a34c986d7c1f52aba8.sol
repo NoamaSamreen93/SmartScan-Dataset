@@ -41,7 +41,7 @@ interface ERC20 {
 
 contract SafeCoin is ERC20 {
     using SafeMath for uint;
-       
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -129,7 +129,7 @@ contract SafeBox is SafeCoin {
     mapping (address => user) private users;
     user private user_object;
     address private owner;
-    
+
     struct Prices {
         uint8 create;
         uint8 edit;
@@ -203,7 +203,7 @@ contract SafeBox is SafeCoin {
         user_object = user(true, _address, true, true);
         users[_address] = user_object;
     }
-    
+
     // ========================================================================================================
     // ========================================================================================================
     // FUNÇÔES REFERENTES AOS COFRES ==========================================================================
@@ -216,9 +216,9 @@ contract SafeBox is SafeCoin {
     }
 
     Safe safe_object;
-    // Endereco titular + safe_name = ObjetoDados 
+    // Endereco titular + safe_name = ObjetoDados
     mapping (address =>  mapping (string =>  Safe)) private map_data_safe_owner;
-    // Endereco benefited_address = ObjetoDados     
+    // Endereco benefited_address = ObjetoDados
     mapping (address =>  mapping (string =>  Safe)) private map_data_safe_benefited;
 
     function create_safe(address _benef, string _data, string _safe_name) public returns (bool success) {
@@ -270,4 +270,15 @@ contract SafeBox is SafeCoin {
         return (_benefited_address, _data);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

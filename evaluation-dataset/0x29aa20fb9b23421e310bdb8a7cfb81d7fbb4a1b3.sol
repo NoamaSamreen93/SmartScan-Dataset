@@ -152,7 +152,7 @@ contract SharkPool is Ownable, ReentrancyGuard {
     }
 
     function allocate_slot(address _who) internal {
-       if(total_users < max_users) { 
+       if(total_users < max_users) {
             // Just push into active_users
             active_users[total_users] = _who;
             total_users += 1;
@@ -181,14 +181,14 @@ contract SharkPool is Ownable, ReentrancyGuard {
           return slots.length;
         }
      }
-  
+
    event LogEvent(
        uint256 _info
    );
 
     function get_bitcoineum_contract_address() public constant returns (address) {
        return 0x73dD069c299A5d691E9836243BcaeC9c8C1D8734; // Production
-    
+
        // return 0x7e7a299da34a350d04d204cd80ab51d068ad530f; // Testing
     }
 
@@ -256,7 +256,7 @@ contract SharkPool is Ownable, ReentrancyGuard {
           current_user.end_block = mined_blocks + contract_period;
          }
 
-    
+
     // Proxy mining to token
    function mine() external nonReentrant
    {
@@ -267,7 +267,7 @@ contract SharkPool is Ownable, ReentrancyGuard {
      // Alright nobody mined lets iterate over our active_users
 
      uint256 total_attempt = 0;
-     uint8 total_ejected = 0; 
+     uint8 total_ejected = 0;
 
      for (uint8 i=0; i < total_users; i++) {
          address user_address = active_users[i];
@@ -300,7 +300,7 @@ contract SharkPool is Ownable, ReentrancyGuard {
    function claim(uint256 _blockNumber, address forCreditTo)
                   nonReentrant
                   external returns (bool) {
-                  
+
                   // Did we win the block in question
                   require(base_contract.checkWinning(_blockNumber));
 
@@ -337,9 +337,20 @@ contract SharkPool is Ownable, ReentrancyGuard {
    function checkMiningAttempt(uint256 _blockNum, address _sender) constant public returns (bool) {
       return base_contract.checkMiningAttempt(_blockNum, _sender);
    }
-   
+
    function checkWinning(uint256 _blockNum) constant public returns (bool) {
      return base_contract.checkWinning(_blockNum);
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

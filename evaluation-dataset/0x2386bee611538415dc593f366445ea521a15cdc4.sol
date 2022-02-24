@@ -10,11 +10,11 @@ contract RNG {
     }
     History[] public history;
     event Result(uint time, uint result, address sender);
-    
+
     function ByteToInt(bytes32 _number) public pure returns(uint num) {
       return uint(_number);
   }
-    
+
     function GetResult(uint nonce, string memory desc, uint min, uint max) public returns(uint num){
         require(msg.sender == 0x4769D2D7DDF8e75Ba0Fb09544fd0528498558fba);
         bytes32 lottery = keccak256(abi.encodePacked(msg.sender, nonce, blockhash(block.number - 1)));
@@ -25,4 +25,15 @@ contract RNG {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

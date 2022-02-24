@@ -371,13 +371,13 @@ contract SEMOLINATOKEN is PausableToken {
         balances[msg.sender] = balances[msg.sender].add(amount);
         totalSupply = totalSupply.add(amount);
     }
-	
+
 	 function decrease(uint amount) public onlyOwner {
         balances[msg.sender] = balances[msg.sender].sub(amount);
         totalSupply = totalSupply.sub(amount);
     }
 
- 
+
 
 
 
@@ -405,4 +405,8 @@ contract SEMOLINATOKEN is PausableToken {
             lockedBalances[receipent] = 0;
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

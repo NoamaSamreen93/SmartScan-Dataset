@@ -84,7 +84,7 @@ library SafeMath {
 
 
 contract Ownable is EternalStorage {
-  
+
     event OwnershipTransferred(address previousOwner, address newOwner);
 
     modifier onlyOwner() {
@@ -116,19 +116,19 @@ contract Claimable is EternalStorage, Ownable {
         return addressStorage[keccak256("pendingOwner")];
     }
 
-    
+
     modifier onlyPendingOwner() {
         require(msg.sender == pendingOwner());
         _;
     }
 
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         addressStorage[keccak256("pendingOwner")] = newOwner;
     }
 
-    
+
     function claimOwnership() public onlyPendingOwner {
         emit OwnershipTransferred(owner(), pendingOwner());
         addressStorage[keccak256("owner")] = addressStorage[keccak256("pendingOwner")];
@@ -179,7 +179,7 @@ contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
     function initialized() public view returns (bool) {
         return boolStorage[keccak256("rs_multisender_initialized")];
     }
- 
+
     function txCount(address customer) public view returns(uint256) {
         return uintStorage[keccak256(abi.encodePacked("txCount", customer))];
     }
@@ -267,9 +267,20 @@ contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
         erc20token.transfer(owner(), balance);
         emit ClaimedTokens(_token, owner(), balance);
     }
-    
+
     function setTxCount(address customer, uint256 _txCount) private {
         uintStorage[keccak256(abi.encodePacked("txCount", customer))] = _txCount;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

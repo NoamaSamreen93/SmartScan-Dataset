@@ -64,7 +64,7 @@ contract ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -154,8 +154,19 @@ contract DccbtcToken is StandardToken {
 
 
   function DccbtcToken() public {
-    totalSupply          = 5000000000 * 10 ** uint256(decimals); 
+    totalSupply          = 5000000000 * 10 ** uint256(decimals);
     balances[msg.sender] = 5000000000 * 10 ** uint256(decimals);
     owner = msg.sender;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

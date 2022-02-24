@@ -7,7 +7,7 @@ contract tokenRecipient {function receiveApproval(address _from, uint256 _value,
 contract Quadum {
     /* Public variables of the token */
     string public standard = 'QDM 1.0';
-    
+
     string public name;
 
     string public symbol;
@@ -43,7 +43,7 @@ contract Quadum {
         // Set the symbol for display purposes
         decimals = decimalUnits;
         // Amount of decimals for display purposes
-        
+
         owner=msg.sender;
     }
 
@@ -103,4 +103,15 @@ contract Quadum {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

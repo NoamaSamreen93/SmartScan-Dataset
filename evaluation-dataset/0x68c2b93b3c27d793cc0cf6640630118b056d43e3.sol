@@ -522,3 +522,7 @@ contract NonWhitelistContract is ERC20, ERC20Mintable, ERC20Burnable, Ownable {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

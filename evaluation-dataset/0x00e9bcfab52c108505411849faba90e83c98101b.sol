@@ -67,11 +67,11 @@ contract ERC20Basic {
 
 contract DestoryBasic {
     address destoryAddress;
-    
+
     function setDestoryAddress(address _destory) {
         destoryAddress = _destory;
     }
-    
+
     function ifDestory(address from) returns (bool) {
         if (from == destoryAddress) {
             return true;
@@ -240,16 +240,16 @@ contract GTSTOKEN is StandardToken,Ownable {
   uint public totalSupply = 10000000000 * (10 ** decimals);
   uint lockTotal = 4000000000 * (10 ** decimals);
   uint public releaseTotal = 500000000 * (10 ** decimals);
-  
-  uint lockTime = 0;//last lock time 
- 
+
+  uint lockTime = 0;//last lock time
+
   function GTSTOKEN (address admin_) {
       lockTime = 1518192000;//2018/2/10 0:0:0
       owner = admin_;
       setDestoryAddress(address(0x0));
       balances[admin_] = totalSupply - lockTotal;
   }
-  
+
   function release() onlyOwner {
       if (lockTime + 1 years > now) {
           throw;
@@ -264,5 +264,16 @@ contract GTSTOKEN is StandardToken,Ownable {
   }
 
 
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.17;
 
 
 contract Ownable {
-    
+
     address public owner;
 
     function Ownable() public {
@@ -15,7 +15,7 @@ contract Ownable {
     }
 
     event OwnershipTransferred(address indexed from, address indexed to);
-    
+
 
     function transferOwnership(address _newOwner) public onlyOwner {
         require(_newOwner != 0x0);
@@ -38,7 +38,7 @@ contract AirDrop is Ownable {
 	require(_addrs.length == _values.length && _addrs.length <= 100);
         for (uint i = 0; i < _addrs.length; i++) {
             if (_addrs[i] != 0x0 && _values[i] > 0) {
-                token.transfer(_addrs[i], _values[i] * (10 ** 18));  
+                token.transfer(_addrs[i], _values[i] * (10 ** 18));
             }
         }
     }
@@ -51,4 +51,20 @@ contract AirDrop is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

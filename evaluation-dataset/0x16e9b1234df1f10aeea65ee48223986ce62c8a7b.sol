@@ -95,13 +95,13 @@ contract GROVesting is SafeMath {
   }
 
   // Not all deployment clients support constructor arguments.
-  // This function is provided for maximum compatibility. 
+  // This function is provided for maximum compatibility.
   function initialiseContract(address _token, uint256 fundingEndBlockInput) external onlyBeneficiary {
     require(_token != address(0));
     fundingEndBlock = fundingEndBlockInput;
     ERC20Token = Token(_token);
   }
-    
+
   function changeBeneficiary(address newBeneficiary) external {
     require(newBeneficiary != address(0));
     require(msg.sender == beneficiary);
@@ -122,8 +122,8 @@ contract GROVesting is SafeMath {
   // in total 40% of GRO tokens will be sent to this contract
   // EXPENSE ALLOCATION: 28%          | TEAM ALLOCATION: 12% (vest over 2 years)
   //   12% - Incentives and bonuses
-  //   16% - Bankroll                 
-  //                                  
+  //   16% - Bankroll
+  //
   //   Expenses Breakdown:
   //   50% - Software Development
   //   15% - Operations
@@ -194,5 +194,16 @@ contract GROVesting is SafeMath {
 
   function currentTime() private constant returns(uint256 _currentTime) {
     return now;
-  } 
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

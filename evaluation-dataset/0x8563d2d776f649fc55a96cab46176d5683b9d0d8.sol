@@ -13,7 +13,7 @@ contract Ownable {
     address private _pendingOwner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
      * @dev The constructor sets the original owner of the contract to the sender account.
      */
@@ -44,7 +44,7 @@ contract Ownable {
     function pendingOwner() public view returns (address) {
         return _pendingOwner;
     }
-    
+
     /**
      * @dev Tells the address of the owner
      * @return the address of the owner
@@ -52,7 +52,7 @@ contract Ownable {
     function owner() public view returns (address ) {
         return _owner;
     }
-    
+
     /**
     * @dev Sets a new owner address
     * @param _newOwner The newOwner to set
@@ -75,9 +75,9 @@ contract Ownable {
     function claimOwnership() public onlyPendingOwner {
         emit OwnershipTransferred(_owner, _pendingOwner);
         _owner = _pendingOwner;
-        _pendingOwner = address(0); 
+        _pendingOwner = address(0);
     }
-    
+
 }
 
 // File: contracts/Operable.sol
@@ -87,7 +87,7 @@ pragma solidity 0.5.0;
 
 contract Operable is Ownable {
 
-    address private _operator; 
+    address private _operator;
 
     event OperatorChanged(address indexed previousOperator, address indexed newOperator);
 
@@ -98,7 +98,7 @@ contract Operable is Ownable {
     function operator() external view returns (address) {
         return _operator;
     }
-    
+
     /**
      * @dev Only the operator can operate store
      */
@@ -109,7 +109,7 @@ contract Operable is Ownable {
 
     /**
      * @dev update the storgeOperator
-     * @param _newOperator The newOperator to update  
+     * @param _newOperator The newOperator to update
      */
     function updateOperator(address _newOperator) public onlyOwner {
         require(_newOperator != address(0), "Cannot change the newOperator to the zero address");
@@ -198,7 +198,7 @@ contract TokenStore is Operable {
     using SafeMath for uint256;
 
     uint256 public totalSupply;
-    
+
     string  public name = "PingAnToken";
     string  public symbol = "PAT";
     uint8 public decimals = 18;
@@ -247,4 +247,15 @@ contract TokenStore is Operable {
         totalSupply = _value;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -81,7 +81,7 @@ contract MyToken {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   uint256 private _totalSupply;
-  
+
   string private _name;
   string private _symbol;
   uint8 private _decimals;
@@ -95,7 +95,7 @@ contract MyToken {
     _balances[msg.sender] = _totalSupply;
     emit Transfer(address(0), msg.sender, _totalSupply);
   }
-  
+
   /**
    * @return the name of the token.
    */
@@ -261,7 +261,7 @@ contract MyToken {
     _balances[to] = _balances[to].add(value);
     emit Transfer(from, to, value);
   }
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
@@ -273,4 +273,10 @@ contract MyToken {
     address indexed spender,
     uint256 value
   );
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

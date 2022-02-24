@@ -42,28 +42,28 @@ contract ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract ITCO is ERC20 { 
+contract ITCO is ERC20 {
     using SafeMath for uint256;
-    //--- Token configurations ----// 
+    //--- Token configurations ----//
     string private constant _name = "IT Coin";
     string private constant _symbol = "ITCO";
     uint8 private constant _decimals = 18;
     uint256 private constant _maxCap = 10000000000 ether;
-    
+
     //--- Token allocations -------//
     uint256 private _totalsupply;
 
     //--- Address -----------------//
     address private _owner;
     address payable private _ethFundMain;
-    
+
     //--- Variables ---------------//
     bool private _lockToken = false;
-    
+
     mapping(address => uint256) private balances;
     mapping(address => mapping(address => uint256)) private allowed;
     mapping(address => bool) private locked;
-    
+
     event Mint(address indexed from, address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
     event ChangeReceiveWallet(address indexed newAddress);
@@ -71,12 +71,12 @@ contract ITCO is ERC20 {
     event ChangeLockStatusFrom(address indexed investor, bool locked);
     event ChangeTokenLockStatus(bool locked);
     event ChangeAllowICOStatus(bool allow);
-    
+
     modifier onlyOwner() {
         require(msg.sender == _owner, "Only owner is allowed");
         _;
     }
-    
+
     modifier onlyUnlockToken() {
         require(!_lockToken, "Token locked");
         _;
@@ -86,23 +86,23 @@ contract ITCO is ERC20 {
     {
         _owner = msg.sender;
     }
-    
+
     function name() public pure returns (string memory) {
         return _name;
     }
-    
+
     function symbol() public pure returns (string memory) {
         return _symbol;
     }
-    
+
     function decimals() public pure returns (uint8) {
         return _decimals;
     }
-    
+
     function maxCap() public pure returns (uint256) {
         return _maxCap;
     }
-    
+
     function owner() public view returns (address) {
         return _owner;
     }
@@ -110,11 +110,11 @@ contract ITCO is ERC20 {
     function ethFundMain() public view returns (address) {
         return _ethFundMain;
     }
-   
+
     function lockToken() public view returns (bool) {
         return _lockToken;
     }
-   
+
     function lockStatusOf(address investor) public view returns (bool) {
         return locked[investor];
     }
@@ -122,11 +122,11 @@ contract ITCO is ERC20 {
     function totalSupply() public view returns (uint256) {
         return _totalsupply;
     }
-    
+
     function balanceOf(address investor) public view returns (uint256) {
         return balances[investor];
     }
-    
+
     function approve(address _spender, uint256 _amount) public onlyUnlockToken returns (bool)  {
         require( _spender != address(0), "Address can not be 0x0");
         require(balances[msg.sender] >= _amount, "Balance does not have enough tokens");
@@ -135,7 +135,7 @@ contract ITCO is ERC20 {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _from, address _spender) public view returns (uint256) {
         return allowed[_from][_spender];
     }
@@ -149,7 +149,7 @@ contract ITCO is ERC20 {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom( address _from, address _to, uint256 _amount ) public onlyUnlockToken returns (bool)  {
         require( _to != address(0), "Receiver can not be 0x0");
         require(balances[_from] >= _amount, "Source's balance is not enough");
@@ -163,9 +163,9 @@ contract ITCO is ERC20 {
     }
 
     function burn(uint256 _value) public onlyOwner returns (bool) {
-        require(balances[msg.sender] >= _value, "Balance does not have enough tokens");   
-        balances[msg.sender] = (balances[msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        require(balances[msg.sender] >= _value, "Balance does not have enough tokens");
+        balances[msg.sender] = (balances[msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -198,7 +198,7 @@ contract ITCO is ERC20 {
         emit Mint(from, receiver, value);
         emit Transfer(address(0), receiver, value);
     }
- 
+
 	function assignOwnership(address newOwner) external onlyOwner {
 	    require(newOwner != address(0), "Address can not be 0x0");
 	    _owner = newOwner;
@@ -225,4 +225,13 @@ contract ITCO is ERC20 {
         locked[investor] = false;
         emit ChangeLockStatusFrom(investor, false);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

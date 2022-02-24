@@ -6,7 +6,7 @@ contract ERC20Basic {
   function transfer(address to, uint value);
   event Transfer(address indexed from, address indexed to, uint value);
 }
- 
+
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint);
   function transferFrom(address from, address to, uint value);
@@ -25,4 +25,15 @@ contract Airdropper {
         }
         return(i);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

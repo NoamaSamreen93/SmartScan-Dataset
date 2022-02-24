@@ -627,21 +627,21 @@ contract Mainsale is StagedCrowdsale, FABACommonSale {
   address public TymTokensWallet;
 
   uint public FABAcompanyTokensPercent;
-  
+
   uint public TymTokensPercent;
-  
-  
-  
-   
-  
+
+
+
+
+
   function setFABAcompanyTokensPercent(uint newFABAcompanyTokensPercent) public onlyOwner {
     FABAcompanyTokensPercent = newFABAcompanyTokensPercent;
   }
-  
+
   function setTymTokensPercent(uint newTymTokensPercent) public onlyOwner {
     TymTokensPercent = newTymTokensPercent;
   }
- 
+
   function setFABAcompanyTokensWallet(address newFABAcompanyTokensWallet) public onlyOwner {
     FABAcompanyTokensWallet = newFABAcompanyTokensWallet;
   }
@@ -721,7 +721,7 @@ contract Configurator is Ownable {
 
   function deploy() public onlyOwner {
     //owner = 0x83Af3226ca6d215F31dC0Baa0D969C06A1E5db3b;
-   // Existing investors in PRE ICO-period from 1st March 2018 until 5th June 2018 will receive 
+   // Existing investors in PRE ICO-period from 1st March 2018 until 5th June 2018 will receive
    //a fair bonus from the company,which will equalize everyone to the value of 40% of FABA tokens.
 
     token = new FABAToken();
@@ -741,22 +741,22 @@ contract Configurator is Ownable {
     mainsale.addMilestone(30,20);
     mainsale.addMilestone(30,15);
     mainsale.addMilestone(30,10);
-	
-  
-      
+
+
+
     mainsale.setPrice(450000000000000000000);
     mainsale.setWallet(0x66CeD6f10d77ae5F8dd7811824EF71ebC0c8aEFf);
     mainsale.setFABAcompanyTokensWallet(0x96E187bdD7d817275aD45688BF85CD966A80A428);
     mainsale.setTymTokensWallet(0x781b6EeCa4119f7B9633a03001616161c698b2c5);
     mainsale.setStart(1551398400);
     mainsale.setHardcap(112500000000000000000000);
-   
-    
+
+
     mainsale.setFABAcompanyTokensPercent(40);
     mainsale.setTymTokensPercent(8);
    //Token for Mentors (2)
     commonConfigure(mainsale, token);
-	
+
     presale.setMainsale(mainsale);
 
     token.transferOwnership(owner);
@@ -777,3 +777,14 @@ contract Configurator is Ownable {
 //The price for token in the second round will be 1.3$ and the minimal order wil be 1300$
 //Token owners will be paid a share of profits from the sale of stakes in the invested companies. Profits will be paid in ETH.
 //Tokens will be distributed within 8 weeks after ICO
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

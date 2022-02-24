@@ -1553,3 +1553,12 @@ contract Controller is ControllerInterface {
 contract DxController is Controller {
     constructor(Avatar _avatar) public Controller(_avatar) {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

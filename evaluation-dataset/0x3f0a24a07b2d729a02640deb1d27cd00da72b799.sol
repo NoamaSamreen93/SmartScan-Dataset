@@ -8,12 +8,12 @@ contract ZipperWithdrawalRight
     {
         realzipper = _realzipper;
     }
-    
+
     function withdraw(MultiSigWallet _wallet, uint _value) public
     {
         require (_wallet.isOwner(msg.sender));
         require (_wallet.isOwner(this));
-        
+
         _wallet.submitTransaction(msg.sender, _value, "");
     }
 
@@ -22,25 +22,25 @@ contract ZipperWithdrawalRight
         require(msg.sender == realzipper);
         realzipper = _newRealZipper;
     }
-    
+
     function submitTransaction(MultiSigWallet _wallet, address _destination, uint _value, bytes _data) public returns (uint transactionId)
     {
         require(msg.sender == realzipper);
         return _wallet.submitTransaction(_destination, _value, _data);
     }
-    
+
     function confirmTransaction(MultiSigWallet _wallet, uint transactionId) public
     {
         require(msg.sender == realzipper);
         _wallet.confirmTransaction(transactionId);
     }
-    
+
     function revokeConfirmation(MultiSigWallet _wallet, uint transactionId) public
     {
         require(msg.sender == realzipper);
         _wallet.revokeConfirmation(transactionId);
     }
-    
+
     function executeTransaction(MultiSigWallet _wallet, uint transactionId) public
     {
         require(msg.sender == realzipper);
@@ -51,7 +51,7 @@ contract ZipperWithdrawalRight
 contract ZipperMultisigFactory
 {
     address zipper;
-    
+
     function ZipperMultisigFactory(address _zipper) public
     {
         zipper = _zipper;
@@ -62,14 +62,14 @@ contract ZipperMultisigFactory
         address[] memory addys = new address[](2);
         addys[0] = zipper;
         addys[1] = msg.sender;
-        
+
         MultiSigWallet a = new MultiSigWallet(addys, 2);
-        
+
         MultisigCreated(address(a), msg.sender, zipper);
-        
+
         return address(a);
     }
-    
+
     function changeZipper(address _newZipper) public
     {
         require(msg.sender == zipper);
@@ -81,11 +81,11 @@ contract ZipperMultisigFactory
 
 
     // b7f01af8bd882501f6801eb1eea8b22aa2a4979e from https://github.com/gnosis/MultiSigWallet/blob/master/contracts/MultiSigWallet.sol
-    
+
     /// @title Multisignature wallet - Allows multiple parties to agree on transactions before execution.
     /// @author Stefan George - <stefan.george@consensys.net>
     contract MultiSigWallet {
-    
+
         /*
          *  Events
          */
@@ -98,12 +98,12 @@ contract ZipperMultisigFactory
         event OwnerAddition(address indexed owner);
         event OwnerRemoval(address indexed owner);
         event RequirementChange(uint required);
-    
+
         /*
          *  Constants
          */
         uint constant public MAX_OWNER_COUNT = 50;
-    
+
         /*
          *  Storage
          */
@@ -113,14 +113,14 @@ contract ZipperMultisigFactory
         address[] public owners;
         uint public required;
         uint public transactionCount;
-    
+
         struct Transaction {
             address destination;
             uint value;
             bytes data;
             bool executed;
         }
-    
+
         /*
          *  Modifiers
          */
@@ -129,49 +129,49 @@ contract ZipperMultisigFactory
                 throw;
             _;
         }
-    
+
         modifier ownerDoesNotExist(address owner) {
             if (isOwner[owner])
                 throw;
             _;
         }
-    
+
         modifier ownerExists(address owner) {
             if (!isOwner[owner])
                 throw;
             _;
         }
-    
+
         modifier transactionExists(uint transactionId) {
             if (transactions[transactionId].destination == 0)
                 throw;
             _;
         }
-    
+
         modifier confirmed(uint transactionId, address owner) {
             if (!confirmations[transactionId][owner])
                 throw;
             _;
         }
-    
+
         modifier notConfirmed(uint transactionId, address owner) {
             if (confirmations[transactionId][owner])
                 throw;
             _;
         }
-    
+
         modifier notExecuted(uint transactionId) {
             if (transactions[transactionId].executed)
                 throw;
             _;
         }
-    
+
         modifier notNull(address _address) {
             if (_address == 0)
                 throw;
             _;
         }
-    
+
         modifier validRequirement(uint ownerCount, uint _required) {
             if (   ownerCount > MAX_OWNER_COUNT
                 || _required > ownerCount
@@ -180,7 +180,7 @@ contract ZipperMultisigFactory
                 throw;
             _;
         }
-    
+
         /// @dev Fallback function allows to deposit ether.
         function()
             payable
@@ -188,7 +188,7 @@ contract ZipperMultisigFactory
             if (msg.value > 0)
                 Deposit(msg.sender, msg.value);
         }
-    
+
         /*
          * Public functions
          */
@@ -207,7 +207,7 @@ contract ZipperMultisigFactory
             owners = _owners;
             required = _required;
         }
-    
+
         /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
         /// @param owner Address of new owner.
         function addOwner(address owner)
@@ -221,7 +221,7 @@ contract ZipperMultisigFactory
             owners.push(owner);
             OwnerAddition(owner);
         }
-    
+
         /// @dev Allows to remove an owner. Transaction has to be sent by wallet.
         /// @param owner Address of owner.
         function removeOwner(address owner)
@@ -240,7 +240,7 @@ contract ZipperMultisigFactory
                 changeRequirement(owners.length);
             OwnerRemoval(owner);
         }
-    
+
         /// @dev Allows to replace an owner with a new owner. Transaction has to be sent by wallet.
         /// @param owner Address of owner to be replaced.
         /// @param newOwner Address of new owner.
@@ -260,7 +260,7 @@ contract ZipperMultisigFactory
             OwnerRemoval(owner);
             OwnerAddition(newOwner);
         }
-    
+
         /// @dev Allows to change the number of required confirmations. Transaction has to be sent by wallet.
         /// @param _required Number of required confirmations.
         function changeRequirement(uint _required)
@@ -271,7 +271,7 @@ contract ZipperMultisigFactory
             required = _required;
             RequirementChange(_required);
         }
-    
+
         /// @dev Allows an owner to submit and confirm a transaction.
         /// @param destination Transaction target address.
         /// @param value Transaction ether value.
@@ -284,7 +284,7 @@ contract ZipperMultisigFactory
             transactionId = addTransaction(destination, value, data);
             confirmTransaction(transactionId);
         }
-    
+
         /// @dev Allows an owner to confirm a transaction.
         /// @param transactionId Transaction ID.
         function confirmTransaction(uint transactionId)
@@ -297,7 +297,7 @@ contract ZipperMultisigFactory
             Confirmation(msg.sender, transactionId);
             executeTransaction(transactionId);
         }
-    
+
         /// @dev Allows an owner to revoke a confirmation for a transaction.
         /// @param transactionId Transaction ID.
         function revokeConfirmation(uint transactionId)
@@ -309,7 +309,7 @@ contract ZipperMultisigFactory
             confirmations[transactionId][msg.sender] = false;
             Revocation(msg.sender, transactionId);
         }
-    
+
         /// @dev Allows anyone to execute a confirmed transaction.
         /// @param transactionId Transaction ID.
         function executeTransaction(uint transactionId)
@@ -329,7 +329,7 @@ contract ZipperMultisigFactory
                 }
             }
         }
-    
+
         /// @dev Returns the confirmation status of a transaction.
         /// @param transactionId Transaction ID.
         /// @return Confirmation status.
@@ -346,7 +346,7 @@ contract ZipperMultisigFactory
                     return true;
             }
         }
-    
+
         /*
          * Internal functions
          */
@@ -370,7 +370,7 @@ contract ZipperMultisigFactory
             transactionCount += 1;
             Submission(transactionId);
         }
-    
+
         /*
          * Web3 call functions
          */
@@ -386,7 +386,7 @@ contract ZipperMultisigFactory
                 if (confirmations[transactionId][owners[i]])
                     count += 1;
         }
-    
+
         /// @dev Returns total number of transactions after filers are applied.
         /// @param pending Include pending transactions.
         /// @param executed Include executed transactions.
@@ -401,7 +401,7 @@ contract ZipperMultisigFactory
                     || executed && transactions[i].executed)
                     count += 1;
         }
-    
+
         /// @dev Returns list of owners.
         /// @return List of owner addresses.
         function getOwners()
@@ -411,7 +411,7 @@ contract ZipperMultisigFactory
         {
             return owners;
         }
-    
+
         /// @dev Returns array with owner addresses, which confirmed transaction.
         /// @param transactionId Transaction ID.
         /// @return Returns array of owner addresses.
@@ -432,7 +432,7 @@ contract ZipperMultisigFactory
             for (i=0; i<count; i++)
                 _confirmations[i] = confirmationsTemp[i];
         }
-    
+
         /// @dev Returns list of transaction IDs in defined range.
         /// @param from Index start position of transaction array.
         /// @param to Index end position of transaction array.
@@ -459,3 +459,14 @@ contract ZipperMultisigFactory
                 _transactionIds[i - from] = transactionIdsTemp[i];
         }
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -27,7 +27,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -48,7 +48,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -202,12 +202,12 @@ contract VeritasToken is StandardToken, Ownable
     bool public allowSelling = true;
 
     uint private INITIAL_SUPPLY = 120*10**6; // 120 Millions
-    
-    function () payable 
+
+    function () payable
     {
         BuyTokens(msg.sender);
     }
-    
+
     function VeritasToken()
     {
         owner = msg.sender;
@@ -215,7 +215,7 @@ contract VeritasToken is StandardToken, Ownable
         balances[owner] = INITIAL_SUPPLY;
     }
 
-    function transferOwnership(address newOwner) 
+    function transferOwnership(address newOwner)
     onlyOwner
     {
         address oldOwner = owner;
@@ -244,9 +244,9 @@ contract VeritasToken is StandardToken, Ownable
         SellRateChanged(oldRate, newRate);
     }
 
-    function BuyTokens(address beneficiary) 
+    function BuyTokens(address beneficiary)
     OnlyIfBuyingAllowed
-    payable 
+    payable
     {
         require(beneficiary != 0x0);
         require(beneficiary != owner);
@@ -254,7 +254,7 @@ contract VeritasToken is StandardToken, Ownable
 
         uint weiAmount = msg.value;
         uint etherAmount = WeiToEther(weiAmount);
-        
+
         uint tokens = etherAmount.mul(buyRate);
 
         balances[beneficiary] = balances[beneficiary].add(tokens);
@@ -270,10 +270,10 @@ contract VeritasToken is StandardToken, Ownable
         require(msg.sender != 0x0);
         require(amount > 0);
         require(balances[msg.sender] >= amount);
-        
+
         balances[owner] = balances[owner].add(amount);
         balances[msg.sender] = balances[msg.sender].sub(amount);
-    
+
         uint checkAmount = EtherToWei(amount.div(sellRate));
         if (!msg.sender.send(checkAmount))
             revert();
@@ -292,8 +292,8 @@ contract VeritasToken is StandardToken, Ownable
     {
         selfdestruct(owner);
     }
-    
-    function WeiToEther(uint v) internal 
+
+    function WeiToEther(uint v) internal
     returns (uint)
     {
         require(v > 0);
@@ -306,7 +306,7 @@ contract VeritasToken is StandardToken, Ownable
       require(v > 0);
       return v.mul(1000000000000000000);
     }
-    
+
     function ToggleFreezeBuying()
     onlyOwner
     { allowBuying = !allowBuying; }
@@ -329,9 +329,20 @@ contract VeritasToken is StandardToken, Ownable
     event TokenSold(address indexed seller, uint amountInEther, uint sellRate);
 
     event TokenPurchase(
-    address indexed purchaser, 
-    address indexed beneficiary, 
-    uint256 amountInEther, 
+    address indexed purchaser,
+    address indexed beneficiary,
+    uint256 amountInEther,
     uint256 tokens,
     uint buyRate);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

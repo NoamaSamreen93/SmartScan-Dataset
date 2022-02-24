@@ -101,7 +101,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
 
     mapping(address => uint) balances;
     mapping (address => mapping (address => uint)) allowed;
-  
+
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
@@ -109,13 +109,13 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     address /*public*/ contrInitiator;
     address /*public*/ thisContract;
     bool /*public*/ isTokenSupport;
-  
+
     mapping(address => bool) isSendingLocked;
     bool isAllTransfersLocked;
-  
+
     uint oneTransferLimit;
     uint oneDayTransferLimit;
- 
+
 
     struct TransferInfo {
         //address sender;    //maybe use in the future
@@ -129,29 +129,29 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
         mapping (uint => TransferInfo) ti;
         uint tc;
     }
-  
+
     mapping (address => TransferInfos) transferInfo;
 
 //-------------------------------------------------------------------------------------
 //from ExampleToken
 
     constructor(/*uint initialBalance*/) public {
-    
+
         decimals    = 6;                                // Amount of decimals for display purposes
         name        = "WeSingCoin";                     // Set the name for display purposes
         symbol      = 'WSC';                            // Set the symbol for display purposes
 
         uint initialBalance  = (10 ** uint256(decimals)) * 5000*1000*1000;
-    
+
         balances[msg.sender] = initialBalance;
         totalSupply = initialBalance;
-    
+
         contrInitiator = msg.sender;
         thisContract = this;
         isTokenSupport = false;
-    
+
         isAllTransfersLocked = true;
-    
+
         oneTransferLimit    = (10 ** uint256(decimals)) * 10*1000*1000;
         oneDayTransferLimit = (10 ** uint256(decimals)) * 50*1000*1000;
 
@@ -170,14 +170,14 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
         if(msg.sender == contrInitiator) {
             //no restricton
         } else {
-            require(!isAllTransfersLocked);  
+            require(!isAllTransfersLocked);
             require(safeAdd(getLast24hSendingValue(msg.sender), _value) <= oneDayTransferLimit);
         }
 
 
         balances[msg.sender] = safeSub(balances[msg.sender], _value);
         balances[_to] = safeAdd(balances[_to], _value);
-    
+
         uint tc=transferInfo[msg.sender].tc;
         transferInfo[msg.sender].ti[tc].value = _value;
         transferInfo[msg.sender].ti[tc].time = now;
@@ -188,7 +188,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     }
 
     function super_transferFrom(address _from, address _to, uint _value) /*public*/ internal returns (bool success) {
-        
+
         require(!isSendingLocked[_from]);
         require(_value <= oneTransferLimit);
         require(balances[_from] >= _value);
@@ -196,7 +196,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
         if(msg.sender == contrInitiator && _from == thisContract) {
             // no restriction
         } else {
-            require(!isAllTransfersLocked);  
+            require(!isAllTransfersLocked);
             require(safeAdd(getLast24hSendingValue(_from), _value) <= oneDayTransferLimit);
             uint allowance = allowed[_from][msg.sender];
             require(allowance >= _value);
@@ -205,7 +205,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
 
         balances[_from] = safeSub(balances[_from], _value);
         balances[_to] = safeAdd(balances[_to], _value);
-    
+
         uint tc=transferInfo[_from].tc;
         transferInfo[_from].ti[tc].value = _value;
         transferInfo[_from].ti[tc].time = now;
@@ -228,7 +228,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     function allowance(address _owner, address _spender) public view returns (uint remaining) {
         return allowed[_owner][_spender];
     }
-  
+
 //-------------------------------------------------------------------------------------
 //from Standard223Token
 
@@ -345,7 +345,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     }
 
     event LogTokenPayable(uint i, address token, address sender, uint value);
-  
+
 //-------------------------------------------------------------------------------------
 // My extensions
 /*
@@ -354,7 +354,7 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
             isTokenSupport = _tokenSupport;
             return true;
         } else {
-            return false;  
+            return false;
         }
     }
 */
@@ -375,18 +375,18 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     function getIsSendingLocked(address _from ) public view returns (bool ok) {
         return isSendingLocked[_from];
     }
- 
-/*  
+
+/*
     function getTransferInfoCount(address _from) public view returns (uint count) {
         return transferInfo[_from].tc;
     }
-*/    
+*/
 /*
     // use experimental feature
     function getTransferInfo(address _from, uint index) public view returns (TransferInfo ti) {
         return transferInfo[_from].ti[index];
     }
-*/ 
+*/
 /*
     function getTransferInfoTime(address _from, uint index) public view returns (uint time) {
         return transferInfo[_from].ti[index].time;
@@ -398,10 +398,10 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     }
 */
     function getLast24hSendingValue(address _from) public view returns (uint totVal) {
-      
+
         totVal = 0;  //declared above;
         uint tc = transferInfo[_from].tc;
-      
+
         if(tc > 0) {
             for(uint i = tc-1 ; i >= 0 ; i--) {
 //              if(now - transferInfo[_from].ti[i].time < 10 minutes) {
@@ -415,20 +415,20 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
         }
     }
 
-    
+
     function airdropIndividual(address[] _recipients, uint256[] _values, uint256 _elemCount, uint _totalValue)  public returns (bool success) {
-        
+
         require(_recipients.length == _elemCount);
-        require(_values.length == _elemCount); 
-        require(_elemCount <= 50); 
-        
+        require(_values.length == _elemCount);
+        require(_elemCount <= 50);
+
         uint256 totalValue = 0;
         for(uint i = 0; i< _recipients.length; i++) {
             totalValue = safeAdd(totalValue, _values[i]);
         }
-        
+
         require(totalValue == _totalValue);
-        
+
         for(i = 0; i< _recipients.length; i++) {
             transfer(_recipients[i], _values[i]);
         }
@@ -436,4 +436,15 @@ contract WeSingCoin223Token_11 is ERC20, ERC223, Standard223Receiver, SafeMath {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

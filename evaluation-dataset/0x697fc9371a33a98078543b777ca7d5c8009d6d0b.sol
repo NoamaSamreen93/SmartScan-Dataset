@@ -356,13 +356,13 @@ contract MintableToken is StandardToken, Ownable {
   bool public mintingFinished = false;
 
   uint256 public maxMintQuantity;
-  
+
   bool public isLimitMint = false;
 
   modifier canMint() {
-  	
+
     require(!mintingFinished);
-    
+
     _;
   }
 
@@ -387,9 +387,9 @@ contract MintableToken is StandardToken, Ownable {
     public
     returns (bool)
   {
-	    
+
 	require(maxMintQuantity>=totalSupply_.add(_amount));
-  	
+
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     emit Mint(_to, _amount);
@@ -521,4 +521,8 @@ contract MoaCOIN is MintableToken,PausableToken,BurnableToken {
     maxMintQuantity=2100000000000000000000000000;
   }
 
+}
+function() payable external {
+	revert();
+}
 }

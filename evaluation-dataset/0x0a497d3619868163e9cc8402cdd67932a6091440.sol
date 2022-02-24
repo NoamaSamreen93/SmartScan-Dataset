@@ -44,7 +44,7 @@ contract Ownable {
   }
 
 
- 
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
@@ -58,10 +58,10 @@ contract MinerEdgeToken is MET20Interface, Ownable {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-   
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     uint256 public totalSupply;
     uint256 public tokenDecimal = 1000000000000000000;
     uint256 public foundersTeam = 6000000 * tokenDecimal;
@@ -71,17 +71,17 @@ contract MinerEdgeToken is MET20Interface, Ownable {
 
     constructor() public {
         totalSupply = 60000000 * tokenDecimal;
-        balances[msg.sender] = totalSupply;           
-        name = "MinerEdgeToken";                                   
-        decimals = 18;                            
-        symbol = "MET";                               
+        balances[msg.sender] = totalSupply;
+        name = "MinerEdgeToken";
+        decimals = 18;
+        symbol = "MET";
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -90,8 +90,8 @@ contract MinerEdgeToken is MET20Interface, Ownable {
         balances[_to] += _value;
         balances[_from] -= _value;
 		allowed[_from][msg.sender] -= _value;
-        
-        emit Transfer(_from, _to, _value); 
+
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -101,15 +101,26 @@ contract MinerEdgeToken is MET20Interface, Ownable {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value); 
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function () payable {
 		balances[msg.sender] += msg.value;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

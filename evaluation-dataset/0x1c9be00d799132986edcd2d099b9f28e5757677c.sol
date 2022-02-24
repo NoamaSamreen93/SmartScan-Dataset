@@ -70,10 +70,10 @@ contract _0xEtherToken is ERC20Interface {
     uint8 public decimals = 8;
     uint public _totalSupply = 10000000000000000;
 	uint public maxSupplyForEra = 5000000000000000;
-	
+
     uint public latestDifficultyPeriodStarted;
 	uint public tokensMinted;
-	
+
     uint public epochCount; //number of 'blocks' mined
     uint public _BLOCKS_PER_READJUSTMENT = 1024;
 
@@ -85,7 +85,7 @@ contract _0xEtherToken is ERC20Interface {
     bytes32 public challengeNumber;   //generate a new one when a new reward is minted
 
     uint public rewardEra;
-    
+
     address public lastRewardTo;
     uint public lastRewardAmount;
     uint public lastRewardEthBlockNumber;
@@ -94,15 +94,15 @@ contract _0xEtherToken is ERC20Interface {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     address private owner;
 
     event Mint(address indexed from, uint reward_amount, uint epochCount, bytes32 newChallengeNumber);
 
     function _0xEtherToken() public {
-        
+
         owner = msg.sender;
-        
+
         latestDifficultyPeriodStarted = block.number;
 
         _startNewMiningEpoch();
@@ -126,7 +126,7 @@ contract _0xEtherToken is ERC20Interface {
 		//only allow one reward for each challenge
 		bytes32 solution = solutionForChallenge[challengeNumber];
 		solutionForChallenge[challengeNumber] = digest;
-		if(solution != 0x0) 
+		if(solution != 0x0)
 			revert();  //prevent the same answer from awarding twice
 
 		uint reward_amount = getMiningReward();
@@ -142,7 +142,7 @@ contract _0xEtherToken is ERC20Interface {
 		lastRewardTo = msg.sender;
 		lastRewardAmount = reward_amount;
 		lastRewardEthBlockNumber = block.number;
-		
+
 		_startNewMiningEpoch();
     	emit Mint(msg.sender, reward_amount, epochCount, challengeNumber );
 
@@ -181,7 +181,7 @@ contract _0xEtherToken is ERC20Interface {
     //readjust the target by 5 percent
     function _reAdjustDifficulty() internal {
         uint ethBlocksSinceLastDifficultyPeriod = block.number - latestDifficultyPeriodStarted;
-        
+
         //assume 240 ethereum blocks per hour
         //we want miners to spend ~7,5 minutes to mine each 'block', about 30 ethereum blocks = 1 PoWEth epoch
         uint targetEthBlocksPerDiffPeriod = _BLOCKS_PER_READJUSTMENT * 30; //should be 30 times slower than ethereum
@@ -191,7 +191,7 @@ contract _0xEtherToken is ERC20Interface {
         {
 			uint excess_block_pct = (targetEthBlocksPerDiffPeriod.mul(100)) / ethBlocksSinceLastDifficultyPeriod;
 			uint excess_block_pct_extra = excess_block_pct.sub(100).limitLessThan(1000);
-			
+
 			//make it harder
 			miningTarget = miningTarget.sub((miningTarget/2000).mul(excess_block_pct_extra));
         }else{
@@ -326,7 +326,7 @@ contract _0xEtherToken is ERC20Interface {
         require(msg.sender == owner);
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     //help debug mining software
     function getMintDigest(uint256 nonce, bytes32 challenge_number) public view returns (bytes32 digesttest) {
         bytes32 digest = keccak256(challenge_number,msg.sender,nonce);
@@ -336,8 +336,19 @@ contract _0xEtherToken is ERC20Interface {
 	//help debug mining software
 	function checkMintSolution(uint256 nonce, bytes32 challenge_digest, bytes32 challenge_number, uint testTarget) public view returns (bool success) {
 		bytes32 digest = keccak256(challenge_number,msg.sender,nonce);
-		if(uint256(digest) > testTarget) 
+		if(uint256(digest) > testTarget)
 			revert();
 		return (digest == challenge_digest);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

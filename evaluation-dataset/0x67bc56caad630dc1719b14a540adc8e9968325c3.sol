@@ -87,7 +87,7 @@ contract SPNToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 200000000e18;
-    address public constant WALLET_SPN   = 0xDDD4b9Dc94Eb41969E37EB64baf3C0E1cd959c29; 
+    address public constant WALLET_SPN   = 0xDDD4b9Dc94Eb41969E37EB64baf3C0E1cd959c29;
 
     function SPNToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -95,4 +95,20 @@ contract SPNToken is StandardToken {
 
         transfer(WALLET_SPN, TOTAL_SUPPLY);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

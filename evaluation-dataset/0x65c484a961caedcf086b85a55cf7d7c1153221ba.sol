@@ -2,13 +2,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -293,7 +293,7 @@ contract CardRPS {
             croupierMap[newCroupier] = true;
         }
     }
-    
+
     function deleteCroupier(address newCroupier) external onlyOwner {
         bool isCroupier = croupierMap[newCroupier];
         if (isCroupier == true) {
@@ -418,7 +418,7 @@ contract CardRPS {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         vipLib.addUserExp(msg.sender, amount);
     }
-    
+
     function applyVIPLevel(address payable gambler, uint amount) private {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         uint rate = vipLib.getVIPBounusRate(gambler);
@@ -492,8 +492,8 @@ contract CardRPS {
         // uint mask = 2 ** 8;
         randomNumber.playerNum1 = uint8(seed % 3);
         seed = seed / 2 ** 8;
-        
-        randomNumber.playerNum2 = uint8(seed % 3);        
+
+        randomNumber.playerNum2 = uint8(seed % 3);
         seed = seed / 2 ** 8;
 
         randomNumber.npcNum1 = uint8(seed % 3);
@@ -532,21 +532,21 @@ contract CardRPS {
             // pay 10% of house edge to inviter
             bet.inviter.transfer(amount * HOUSE_EDGE_PERCENT / 100 * 7 /100);
         }
-        
+
         processVIPAndJackpotLogic(bet, amount, houseEdge, randomNumber, seed, jackpotFee);
 
         // Send the funds to gambler.
-        sendFunds(bet.gambler, winAmount == 0 ? 1 wei : winAmount, winAmount, 
-                    randomNumber.playerNum1, 
-                    randomNumber.playerNum2, 
-                    randomNumber.npcNum1, 
-                    randomNumber.npcNum2, 
+        sendFunds(bet.gambler, winAmount == 0 ? 1 wei : winAmount, winAmount,
+                    randomNumber.playerNum1,
+                    randomNumber.playerNum2,
+                    randomNumber.npcNum1,
+                    randomNumber.npcNum2,
                     amount);
     }
 
     function processVIPAndJackpotLogic(Bet memory bet, uint amount, uint houseEdge, RandomNumber memory randomNumber, uint entropy, uint jackpotFee) private{
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
-        
+
         if (jackpotFee > 0){
             VIPLibraryAddress.transfer(jackpotFee);
             vipLib.increaseJackpot(jackpotFee);
@@ -576,12 +576,12 @@ contract CardRPS {
 
         // Log jackpot win.
         if (jackpotWin > 0) {
-            emit JackpotPayment(bet.gambler, 
-                    jackpotWin, 
-                    randomNumber.playerNum1, 
-                    randomNumber.playerNum2, 
-                    randomNumber.npcNum1, 
-                    randomNumber.npcNum2, 
+            emit JackpotPayment(bet.gambler,
+                    jackpotWin,
+                    randomNumber.playerNum1,
+                    randomNumber.playerNum2,
+                    randomNumber.npcNum1,
+                    randomNumber.npcNum2,
                     amount);
         }
     }
@@ -613,7 +613,7 @@ contract CardRPS {
             winValue = 1; // user win
         } else{
             winValue = 2; // npc win
-        } 
+        }
         return winValue;
     }
 
@@ -711,4 +711,8 @@ contract CardRPS {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getRankingRewardSize();
     }
+}
+function() payable external {
+	revert();
+}
 }

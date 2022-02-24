@@ -22,7 +22,7 @@ contract MyAdvancedToken8  {
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
 
     function transferOwnership(address newOwner) public {
         if (msg.sender != owner) revert();
@@ -30,7 +30,7 @@ contract MyAdvancedToken8  {
     }
 
     /* Allow another contract to spend some tokens in your behalf */
-    function approve(address _spender, uint256 _value) public 
+    function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -46,14 +46,14 @@ contract MyAdvancedToken8  {
     ) public
     {
         owner = msg.sender;
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
         if (balanceOf[msg.sender] < _value) revert();           // Check if the sender has enough
@@ -66,7 +66,7 @@ contract MyAdvancedToken8  {
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[_from]) revert();                        // Check if frozen            
+        if (frozenAccount[_from]) revert();                        // Check if frozen
         if (balanceOf[_from] < _value) revert();                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert();   // Check allowance
@@ -79,7 +79,7 @@ contract MyAdvancedToken8  {
 
     function mintToken(address target, uint256 mintedAmount) public {
         if (msg.sender != owner) revert();
-        
+
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
         Transfer(0, this, mintedAmount);
@@ -88,14 +88,14 @@ contract MyAdvancedToken8  {
 
     function freezeAccount(address target, bool freeze) public {
         if (msg.sender != owner) revert();
-        
+
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
 
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) public {
         if (msg.sender != owner) revert();
-        
+
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
@@ -113,22 +113,31 @@ contract MyAdvancedToken8  {
         if (balanceOf[msg.sender] < amount ) revert();        // checks if the sender has enough to sell
         balanceOf[this] += amount;                         // adds the amount to owner's balance
         balanceOf[msg.sender] -= amount;                   // subtracts the amount from seller's balance
-        
-        
+
+
         sendSUCCESS = msg.sender.send(amount * sellPrice);
         if (!sendSUCCESS) {                                     // sends ether to the seller. It's important
             revert();                                           // to do this last to avoid recursion attacks
         } else {
             Transfer(msg.sender, this, amount);                 // executes an event reflecting on the change
-        }               
+        }
     }
-    
+
     // gets called when no other function matches
 	function() payable public {
 		// just being sent some cash?
 		if (msg.value > 0)
 			Deposit(msg.sender, msg.value);
 	}
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

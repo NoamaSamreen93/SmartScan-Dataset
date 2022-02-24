@@ -8,21 +8,21 @@
  *
  * MIT License
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the ""Software""), to 
- * deal in the Software without restriction, including without limitation the 
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom the Software is 
- * furnished to do so, subject to the following conditions: 
- *  The above copyright notice and this permission notice shall be included in 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the ""Software""), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *  The above copyright notice and this permission notice shall be included in
  *  all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
  */
@@ -56,9 +56,9 @@ library SafeMath {
 
 contract Guarded {
 
-    modifier isValidAmount(uint256 _amount) { 
-        require(_amount > 0); 
-        _; 
+    modifier isValidAmount(uint256 _amount) {
+        require(_amount > 0);
+        _;
     }
 
     // ensure address not null, and not this contract address
@@ -72,7 +72,7 @@ contract Guarded {
 contract Ownable {
     address public owner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -81,7 +81,7 @@ contract Ownable {
     }
 
     /**
-     * @dev Throws if called by any account other than the owner. 
+     * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -90,7 +90,7 @@ contract Ownable {
 
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to. 
+     * @param newOwner The address to transfer ownership to.
      */
     function transferOwnership(address newOwner) onlyOwner {
         if (newOwner != address(0)) {
@@ -104,7 +104,7 @@ contract Claimable is Ownable {
     address public pendingOwner;
 
     /**
-     * @dev Modifier throws if called by any account other than the pendingOwner. 
+     * @dev Modifier throws if called by any account other than the pendingOwner.
      */
     modifier onlyPendingOwner() {
         require(msg.sender == pendingOwner);
@@ -112,8 +112,8 @@ contract Claimable is Ownable {
     }
 
     /**
-     * @dev Allows the current owner to set the pendingOwner address. 
-     * @param newOwner The address to transfer ownership to. 
+     * @dev Allows the current owner to set the pendingOwner address.
+     * @param newOwner The address to transfer ownership to.
      */
     function transferOwnership(address newOwner) onlyOwner {
         pendingOwner = newOwner;
@@ -129,7 +129,7 @@ contract Claimable is Ownable {
 }
 
 contract ERC20 {
-    
+
     /// total amount of tokens
     uint256 public totalSupply;
 
@@ -179,7 +179,7 @@ contract ERC20Token is ERC20 {
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
 
-    // our constructor. We have fixed everything above, and not as 
+    // our constructor. We have fixed everything above, and not as
     // parameters in the constructor.
     function ERC20Token(string _name, string _symbol, uint8 _decimals) {
         name = _name;
@@ -188,12 +188,12 @@ contract ERC20Token is ERC20 {
     }
 
     // get token balance
-    function balanceOf(address _owner) 
-        public constant 
-        returns (uint256 balance) 
+    function balanceOf(address _owner)
+        public constant
+        returns (uint256 balance)
     {
         return balances[_owner];
-    }    
+    }
 
     /**
      * make a transfer. This can be called from the token holder.
@@ -201,8 +201,8 @@ contract ERC20Token is ERC20 {
      *      Alice.transfer(Bob, 200);     // to transfer 200 to Bob
      */
     /// Initiate a transfer to `_to` with value `_value`?
-    function transfer(address _to, uint256 _value) 
-        public returns (bool success) 
+    function transfer(address _to, uint256 _value)
+        public returns (bool success)
     {
         // sanity check
         require(_to != address(this));
@@ -212,10 +212,10 @@ contract ERC20Token is ERC20 {
         //   balances[msg.sender] < _value &&
         //   balances[_to] + _value < balances[_to]);
 
-        // 
+        //
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         // emit transfer event
         Transfer(msg.sender, _to, _value);
         return true;
@@ -232,9 +232,9 @@ contract ERC20Token is ERC20 {
      * and Bob's balance shall be 20 in the allowance.
      */
     /// Initiate a transfer of `_value` from `_from` to `_to`
-    function transferFrom(address _from, address _to, uint256 _value)         
-        public returns (bool success) 
-    {    
+    function transferFrom(address _from, address _to, uint256 _value)
+        public returns (bool success)
+    {
         // sanity check
         require(_to != 0x0 && _from != 0x0);
         require(_from != _to && _to != address(this));
@@ -246,7 +246,7 @@ contract ERC20Token is ERC20 {
         //   balances[_to] + _value < balances[_to]);
 
         // update public balance
-        allowed[_from][_to] = allowed[_from][_to].sub(_value);        
+        allowed[_from][_to] = allowed[_from][_to].sub(_value);
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
@@ -261,20 +261,20 @@ contract ERC20Token is ERC20 {
      * drained, before any Alice/Bob can approve each other to
      * transfer on their behalf.
      * @param _spender  - the recipient of the value
-     * @param _value    - the value allowed to be spent 
+     * @param _value    - the value allowed to be spent
      *
      * This can be called by the token holder
      * e.g. Alice can allow Bob to spend 30 on her behalf
      *      Alice.approve(Bob, 30);     // gives 30 to Bob.
      */
     /// Approve `_spender` to claim/spend `_value`?
-    function approve(address _spender, uint256 _value)          
-        public returns (bool success) 
+    function approve(address _spender, uint256 _value)
+        public returns (bool success)
     {
         // sanity check
-        require(_spender != 0x0 && _spender != address(this));            
+        require(_spender != 0x0 && _spender != address(this));
 
-        // if the allowance isn't 0, it can only be updated to 0 to prevent 
+        // if the allowance isn't 0, it can only be updated to 0 to prevent
         // an allowance change immediately after withdrawal
         require(allowed[msg.sender][_spender] == 0);
 
@@ -287,12 +287,12 @@ contract ERC20Token is ERC20 {
      * Check the allowance that has been approved previously by owner.
      */
     /// check allowance approved from `_owner` to `_spender`?
-    function allowance(address _owner, address _spender)          
-        public constant returns (uint remaining) 
+    function allowance(address _owner, address _spender)
+        public constant returns (uint remaining)
     {
         // sanity check
         require(_spender != 0x0 && _owner != 0x0);
-        require(_owner != _spender && _spender != address(this));            
+        require(_owner != _spender && _spender != address(this));
 
         // constant op. Just return the balance.
         return allowed[_owner][_spender];
@@ -305,11 +305,22 @@ contract FaradCryptoken is ERC20Token, Guarded, Claimable {
     uint256 public SUPPLY = 1600000000 ether;   // 1.6b ether;
 
     // our constructor, just supply the total supply.
-    function FaradCryptoken() 
-        ERC20Token('FARAD', 'FRD', 18) 
+    function FaradCryptoken()
+        ERC20Token('FARAD', 'FRD', 18)
     {
         totalSupply = SUPPLY;
         balances[msg.sender] = SUPPLY;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

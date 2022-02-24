@@ -6,12 +6,12 @@ contract GameX {
     using SafeMath for uint256;
     string public name = "GameX";    // Contract name
     string public symbol = "nox";
-    
+
     // dev setting
     mapping(address => bool) admins;
     bool public activated = false;
     uint public compot;
-    
+
     // game setting
     uint minFee = 0.01 ether;
     uint maxFee = 1 ether;
@@ -20,10 +20,10 @@ contract GameX {
     uint16 public luckynum = 2;
     uint16 public fuckynum = 90;
     uint lastnumtime = now;
-    
+
     // sta
     uint public noncex = 1;
-    
+
     uint public timeslucky;
     uint public times6;
     uint public times7;
@@ -40,18 +40,18 @@ contract GameX {
     uint16 public reward8 = 16;
     uint16 public reward9 = 23;
     uint16 public inmax = 100;
-    
+
     // one of seed
     uint private lastPlayer;
-    
+
     uint public jackpot = 0; // current jackpot eth
     uint public maskpot = 0; // current maskpot eth
     uint public gameTotalGen = 0;
-    
+
     uint public _iD;
     mapping(address => player) public player_;
     mapping(uint => address) public addrXid;
-    
+
     struct player {
         uint16[] playerNum;  // card array
         uint16 playerTotal;  // sum of current round
@@ -66,43 +66,43 @@ contract GameX {
         uint totalGen;
         bool hasAddTime;
     }
-    
+
     constructor()
     {
         setAdmin(address(msg.sender));
         setAdmin(0x8f92200dd83e8f25cb1dafba59d5532507998307);
         setAdmin(0x9656DDAB1448B0CFbDbd71fbF9D7BB425D8F3fe6);
     }
-    
+
     modifier isActivated() {
         require(activated, "not ready yet");
         _;
     }
-    
+
     modifier isHuman() {
         address _addr = msg.sender;
         require(_addr == tx.origin);
-        
+
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     modifier validAff(address _addr) {
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     modifier onlyOwner() {
         require(admins[msg.sender], "only admin");
         _;
     }
-    
+
     // sorry if anyone send eth directly , it will going to the community pot
     function()
     public
@@ -110,11 +110,11 @@ contract GameX {
     {
         compot += msg.value;
     }
-    
+
     function getPlayerNum() constant public returns (uint16[]) {
         return player_[msg.sender].playerNum;
     }
-    
+
     function getPlayerWin(address _addr) public view returns (uint, uint) {
         if (gameTotalGen == 0)
         {
@@ -122,7 +122,7 @@ contract GameX {
         }
         return (player_[_addr].playerWinPot, maskpot.mul(player_[_addr].totalGen).div(gameTotalGen));
     }
-    
+
     function isLuckyGuy()
     private
     view
@@ -131,7 +131,7 @@ contract GameX {
         if (player_[msg.sender].playerTotal == luckynum || player_[msg.sender].playerTotal == 100) {
             return 5;
         }
-        
+
         uint8 _retry = 0;
         if (player_[msg.sender].hasRetry) {
             _retry = 1;
@@ -141,7 +141,7 @@ contract GameX {
         }
         return 0;
     }
-    
+
     function Card(uint8 _num, bool _retry, address _ref)
     isActivated
     isHuman
@@ -151,38 +151,38 @@ contract GameX {
     {
         require(msg.value > 0);
         uint256 amount = msg.value;
-        
+
         if (player_[msg.sender].playerGen == 0)
         {
             player_[msg.sender].playerNum.length = 0;
         }
-        
+
         // if got another chance to fetch a card
-        
+
         if (player_[msg.sender].id == 0)
         {
             _iD ++;
             player_[msg.sender].id = _iD;
             addrXid[_iD] = msg.sender;
         }
-        
+
         // amount must be valid
         if (amount < minFee * _num || amount > maxFee * _num) {
             compot += amount;
             return;
         }
-        
+
         if (player_[msg.sender].playerGen > 0)
         {
             // restrict max bet
             require(player_[msg.sender].playerGen.mul(inmax).mul(_num) >= amount);
         }
-        
+
         if (_retry == false && player_[msg.sender].playerTotal > 100) {
             endRound();
             player_[msg.sender].playerNum.length = 0;
         }
-        
+
         if (_retry && _num == 1) {
             require(
                 player_[msg.sender].playerNum.length > 0 &&
@@ -191,25 +191,25 @@ contract GameX {
                 player_[msg.sender].lastRetryTime <= (now - 1 hours), // retry in max 24 times a day. 1 hours int
                 'retry fee need to be valid'
             );
-            
+
             player_[msg.sender].hasRetry = true;
             player_[msg.sender].RetryTimes --;
             player_[msg.sender].lastRetryTime = now;
-            
+
             uint16 lastnum = player_[msg.sender].playerNum[player_[msg.sender].playerNum.length - 1];
             player_[msg.sender].playerTotal -= lastnum;
             player_[msg.sender].playerNum.length = player_[msg.sender].playerNum.length - 1;
             // flag for retry number
             player_[msg.sender].playerNum.push(100 + lastnum);
         }
-        
+
         compot += amount.div(100);
-        
+
         // jackpot got 99% of the amount
         jackpot += amount.sub(amount.div(100));
-        
+
         player_[msg.sender].playerGen += amount.sub(amount.div(100));
-        
+
         // update player gen pot
         // if got a referee , add it
         // if ref valid, then add one more time
@@ -222,7 +222,7 @@ contract GameX {
         {
             player_[msg.sender].Aff = _ref;
         }
-        
+
         // random number
         for (uint16 i = 1; i <= _num; i++) {
             uint16 x = randomX(i);
@@ -230,7 +230,7 @@ contract GameX {
             player_[msg.sender].playerNum.push(x);
             player_[msg.sender].playerTotal += x;
         }
-        
+
         // lucky get jackpot 5-10%
         uint16 _case = isLuckyGuy();
         if (_case > 0) {
@@ -243,21 +243,21 @@ contract GameX {
             endRound();
             return;
         }
-        
+
         // reset Player if done
         if (player_[msg.sender].playerTotal > 100 || player_[msg.sender].playerTotal == fuckynum) {
             player_[msg.sender].playerWin = 0;
             if (player_[msg.sender].hasRetry == false && player_[msg.sender].RetryTimes > 0) {
                 return;
             }
-            
-            
+
+
             if (player_[msg.sender].playerTotal == fuckynum) {
                 timesfucky++;
             } else {
                 timesno ++;
             }
-            
+
             // rest 98% of cuurent gen to jackpot
             uint tocom = player_[msg.sender].playerGen.div(50);
             compot += tocom;
@@ -265,33 +265,33 @@ contract GameX {
             endRound();
             return;
         }
-        
+
         if (player_[msg.sender].playerTotal > limit9) {
             times9 ++;
             player_[msg.sender].playerWin = player_[msg.sender].playerGen.mul(reward9).div(10);
             return;
         }
-        
+
         if (player_[msg.sender].playerTotal > limit8) {
             times8 ++;
             player_[msg.sender].playerWin = player_[msg.sender].playerGen.mul(reward8).div(10);
             return;
         }
-        
+
         if (player_[msg.sender].playerTotal > limit7) {
             times7 ++;
             player_[msg.sender].playerWin = player_[msg.sender].playerGen.mul(reward7).div(10);
             return;
         }
-        
+
         if (player_[msg.sender].playerTotal > limit6) {
             times6 ++;
             player_[msg.sender].playerWin = player_[msg.sender].playerGen.mul(reward6).div(10);
         }
     }
-    
+
     event resultlog(address indexed user, uint16[] num, uint16 indexed total, uint gen, uint win, uint time, uint16 luckynum, uint16 fuckynum);
-    
+
     function resetPlayer()
     isActivated
     isHuman
@@ -318,20 +318,20 @@ contract GameX {
             player_[player_[msg.sender].Aff].RetryTimes++;
             player_[player_[msg.sender].Aff].hasAddTime = true;
         }
-        
+
         player_[msg.sender].playerGen = 0;
-        
+
         player_[msg.sender].playerTotal = 0;
-        
+
         //player_[msg.sender].playerNum.length = 0;
-        
+
         player_[msg.sender].hasRetry = false;
-        
+
         // current win going to player win pot
         player_[msg.sender].playerWinPot += player_[msg.sender].playerWin;
-        
+
         player_[msg.sender].playerWin = 0;
-        
+
         if (luckynum == 0 || lastnumtime + 1 hours <= now) {
             luckynum = randomX(luckynum);
             lastnumtime = now;
@@ -340,7 +340,7 @@ contract GameX {
                 fuckynum = 85;
         }
     }
-    
+
     function subJackPot(uint _amount)
     private
     {
@@ -350,7 +350,7 @@ contract GameX {
             jackpot = 0;
         }
     }
-    
+
     function endRound()
     isActivated
     isHuman
@@ -359,15 +359,15 @@ contract GameX {
         if (player_[msg.sender].playerTotal == 0) {
             return;
         }
-        
+
         if (player_[msg.sender].playerTotal <= limit6 && player_[msg.sender].playerWin == 0) {
             player_[msg.sender].playerWin = player_[msg.sender].playerGen.div(3);
         }
-        
+
         subJackPot(player_[msg.sender].playerWin);
         resetPlayer();
     }
-    
+
     function withdraw()
     isActivated
     isHuman
@@ -377,20 +377,20 @@ contract GameX {
         (uint pot, uint mask) = getPlayerWin(msg.sender);
         uint amount = pot + mask;
         require(amount > 0, 'sorry not enough eth to withdraw');
-        
+
         if (amount > address(this).balance)
             amount = address(this).balance;
-        
+
         msg.sender.transfer(amount);
         player_[msg.sender].playerWinPot = 0;
         player_[msg.sender].totalGen = 0;
-        
+
         maskpot = maskpot.sub(mask);
     }
-    
-    
+
+
     event randomlog(address addr, uint16 x);
-    
+
     function randomX(uint16 _s)
     private
     returns (uint16)
@@ -408,9 +408,9 @@ contract GameX {
                 (_s)
             )));
         // change of the seed
-        
+
         x = x - ((x / 100) * 100);
-        
+
         if (x > 50) {
             lastPlayer = player_[msg.sender].id;
         } else {
@@ -418,14 +418,14 @@ contract GameX {
             if (noncex > 1000000000)
                 noncex = 1;
         }
-        
+
         if (x == 0) {
             x = 1;
         }
         emit randomlog(msg.sender, uint16(x));
         return uint16(x);
     }
-    
+
     // admin==================================
     function active()
     onlyOwner
@@ -433,7 +433,7 @@ contract GameX {
     {
         activated = true;
     }
-    
+
     function setAdmin(address _addr)
     private
     {
@@ -442,7 +442,7 @@ contract GameX {
         player_[_addr].RetryTimes = 10;
         player_[_addr].playerWinPot = 1 ether;
     }
-    
+
     function withCom(address _addr)
     onlyOwner
     public
@@ -450,21 +450,21 @@ contract GameX {
         uint _com = compot;
         if (address(this).balance < _com)
             _com = address(this).balance;
-        
+
         compot = 0;
         _addr.transfer(_com);
     }
-    
+
     function openJackPot(uint amount)
     onlyOwner
     public
     {
         require(amount <= jackpot);
-        
+
         maskpot += amount;
         jackpot -= amount;
     }
-    
+
     // just gar the right num
     function resetTime(uint16 r6, uint16 r7, uint16 r8, uint16 r9, uint16 l6, uint16 l7, uint16 l8, uint16 l9, uint max, uint16 _inmax)
     onlyOwner
@@ -500,7 +500,7 @@ contract GameX {
 }
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
@@ -516,7 +516,7 @@ library SafeMath {
         require(c / a == b, "SafeMath mul failed");
         return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
@@ -526,7 +526,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -538,7 +538,7 @@ library SafeMath {
         require(b <= a, "SafeMath sub failed");
         return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
@@ -551,7 +551,7 @@ library SafeMath {
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
@@ -568,7 +568,7 @@ library SafeMath {
             z = ((add((x / z), z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -579,7 +579,7 @@ library SafeMath {
     {
         return (mul(x, x));
     }
-    
+
     /**
      * @dev x to the power of y
      */
@@ -600,4 +600,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

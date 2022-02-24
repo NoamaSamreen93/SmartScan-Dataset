@@ -50,36 +50,47 @@ contract WandtChaintest is SafeMath {
         uint8 decimalUnits,
         string tokenSymbol
         ) public  {
-        balanceOf[msg.sender] = initialSupply;              
-        totalSupply = initialSupply;                        
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
-        decimals = decimalUnits;                    
+        balanceOf[msg.sender] = initialSupply;
+        totalSupply = initialSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
+        decimals = decimalUnits;
 		owner = msg.sender;
     }
 
 
     function transfer(address _to, uint256 _value) public {
-        if (_to == 0x0)  revert();                               
-		if (_value <= 0)  revert(); 
-        if (balanceOf[msg.sender] < _value)  revert();           
-        if (balanceOf[_to] + _value < balanceOf[_to])  revert(); 
-        balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                    
-        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                           
-        Transfer(msg.sender, _to, _value);                  
+        if (_to == 0x0)  revert();
+		if (_value <= 0)  revert();
+        if (balanceOf[msg.sender] < _value)  revert();
+        if (balanceOf[_to] + _value < balanceOf[_to])  revert();
+        balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
+        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
+        Transfer(msg.sender, _to, _value);
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (_to == 0x0)  revert();                                
-		if (_value <= 0)  revert(); 
-        if (balanceOf[_from] < _value)  revert();                 
-        if (balanceOf[_to] + _value < balanceOf[_to])  revert();  
-        if (_value > allowance[_from][msg.sender])  revert();     
-        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                           
-        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                
+        if (_to == 0x0)  revert();
+		if (_value <= 0)  revert();
+        if (balanceOf[_from] < _value)  revert();
+        if (balanceOf[_to] + _value < balanceOf[_to])  revert();
+        if (_value > allowance[_from][msg.sender])  revert();
+        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);
+        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
         Transfer(_from, _to, _value);
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

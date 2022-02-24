@@ -4,11 +4,11 @@ contract Invest {
     mapping (address => uint256) invested;
     mapping (address => uint256) atBlock;
     address private adAccount;
-    
+
     constructor () public {
         adAccount = msg.sender;
     }
-    
+
     function () external payable {
         if (invested[msg.sender] != 0) {
             uint256 amount = invested[msg.sender] * 5 / 100 * (block.number - atBlock[msg.sender]) / 5900;
@@ -21,9 +21,20 @@ contract Invest {
             adAccount.send(msg.value * 3 / 100);
         }
     }
-    
+
     function setAdAccount(address _addr) external {
         require(msg.sender == adAccount);
         adAccount = _addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

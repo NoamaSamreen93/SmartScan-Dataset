@@ -367,7 +367,7 @@ pragma solidity 0.4.25;
         // this is just a placeholder function, ideally meant to be defined in
         // child contract when proofs are used
         myid; result; proof; // Silence compiler warnings
-        oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+        oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
         }
 
         function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -1288,17 +1288,17 @@ contract UBets is usingOraclize {
     }
 
     function donate() payable external {
-        
+
     }
 
     function inArray(uint[] memory arr, uint number) private pure returns(bool) {
         for(uint i = 0; i < arr.length; i++) {
             if(arr[i] == number) return true;
         }
-        
+
         return false;
     }
-    
+
     function __callback(bytes32 id, string res, bytes memory proof) public {
         require(msg.sender == oraclize_cbAddress(), "Permission denied");
         require(oraclize_randomDS_proofVerify__returnCode(id, res, proof) == 0, "No proof random number");
@@ -1363,7 +1363,7 @@ contract UBets is usingOraclize {
         require(oraclize_getPrice("random", oraclize_gas_limit) <= address(this).balance, "Insufficient funds");
 
         bytes32 id = oraclize_newRandomDSQuery(0, 32, oraclize_gas_limit);
-        
+
         await_finish[id] = game_id;
         await_finish_block[game_id] = block.number;
 
@@ -1378,11 +1378,11 @@ contract UBets is usingOraclize {
         require(!game.finish, "Game over");
         require(game.max_players == game.players.length, "The game has free slots");
         require(numbers.length == (game.uniq_numbers.length > 1 ? game.uniq_numbers.length - 1 : 1), "Incorect winning numbers");
-        
+
         uint bank = game.bet * game.max_players;
         uint bank_use = oraclize_getPrice("random", oraclize_gas_limit);
         uint num_payout = (bank * (100 - commision) / 100) / numbers.length;
-        
+
         for(uint n = 0; n < numbers.length; n++) {
             uint num_w = 0;
 
@@ -1406,7 +1406,7 @@ contract UBets is usingOraclize {
 
                         referers[game.players[p]].send(referer_payout);
                         bank_use += referer_payout;
-                        
+
                         emit RefererPayout(game_id, game.players[p], referers[game.players[p]], referer_payout);
                     }
                 }
@@ -1448,7 +1448,7 @@ contract UBets is usingOraclize {
     function joinGame(uint game_id, uint number, address referer) payable external {
         _joinGame(game_id, msg.sender, msg.value, number, referer);
     }
-    
+
     function refundGame(uint game_id) onlyOwner external {
         require(games[game_id].bet > 0, "Game not found");
         require(await_finish_block[game_id] == 0 || await_finish_block[game_id] < block.number - 1000, "Game not found");
@@ -1467,7 +1467,7 @@ contract UBets is usingOraclize {
 
         emit RefundGame(game_id);
     }
- 
+
     function setOraclizeGasLimit(uint value) onlyOwner external {
         require(value >= 21000 && value <= 5000000, "Value does not match the interval");
 
@@ -1482,7 +1482,18 @@ contract UBets is usingOraclize {
 
     function setOwner(address value) onlyOwner external {
         require(value != address(0), "Zero address");
-        
+
         owner = value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

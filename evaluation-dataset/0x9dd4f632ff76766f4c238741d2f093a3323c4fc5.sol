@@ -60,7 +60,7 @@ contract IB2BKToken {
 /// @title B2BK (B2BX) contract - integration code for KICKICO.
 contract B2BKToken is IB2BKToken, Owned {
     using SafeMath for uint256;
- 
+
     string public constant name = "B2BX KICKICO";
     string public constant symbol = "B2BK";
     uint8 public constant decimals = 18;
@@ -167,4 +167,13 @@ contract B2BKToken is IB2BKToken, Owned {
 
         Burn(msg.sender, _balance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

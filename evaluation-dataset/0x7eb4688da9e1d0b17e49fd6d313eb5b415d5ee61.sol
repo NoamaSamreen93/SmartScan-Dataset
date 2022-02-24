@@ -46,9 +46,9 @@ library SafeMath {
         return c;
     }
 
-     
 
- 
+
+
 
 }
 
@@ -332,13 +332,13 @@ contract  Lock is PausableToken{
     mapping(address => uint256) public teamLockTime; // Lock start time
     mapping(address => uint256) public fundLockTime; // Lock start time
     uint256 public issueDate =0 ;//issueDate
-    mapping(address => uint256) public teamLocked;// Total Team lock 
+    mapping(address => uint256) public teamLocked;// Total Team lock
     mapping(address => uint256) public fundLocked;// Total fund lock
     mapping(address => uint256) public teamUsed;   // Team Used
     mapping(address => uint256) public fundUsed;   // Fund Used
     mapping(address => uint256) public teamReverse;   // Team reserve
     mapping(address => uint256) public fundReverse;   // Fund reserve
-    
+
 
    /**
     * @dev Calculate the number of Tokens available for teamAccount
@@ -346,7 +346,7 @@ contract  Lock is PausableToken{
    */
     function teamAvailable(address _to) internal view returns (uint256) {
         require(teamLockTime[_to]>0);
-    
+
         uint256 now1 = block.timestamp;
         uint256 lockTime = teamLockTime[_to];
         uint256 time = now1.sub(lockTime);
@@ -362,9 +362,9 @@ contract  Lock is PausableToken{
         avail = avail.mul(percent).div(100).sub(teamUsed[_to]);
         return avail ;
     }
-    
+
     /**
-     * @dev Get the number of Tokens available for the current private fund account 
+     * @dev Get the number of Tokens available for the current private fund account
      * @param _to SLGCFundAccount's address
     **/
     function fundAvailable(address _to) internal view returns (uint256) {
@@ -561,7 +561,7 @@ contract  Lock is PausableToken{
               //the number of Tokens available for SLGCFundAccount
              totalAvail = availFund.add(availReverse);
         }
-      
+
         require(_value <= totalAvail);
         bool ret = super.transferFrom(_from,_to,_value);
         if(ret == true && issueDate>0) {
@@ -595,13 +595,13 @@ contract SLGCToken is Lock {
     uint256 public precentDecimal = 2;
 
     // firstFundPrecent
-    uint256 public firstFundPrecent = 500; 
+    uint256 public firstFundPrecent = 500;
     // secondFundPrecent
-    uint256 public secondFundPrecent = 1000; 
+    uint256 public secondFundPrecent = 1000;
     //stableFundPrecent
-    uint256 public stableFundPrecent = 300; 
+    uint256 public stableFundPrecent = 300;
     //ecologyFundPrecent
-    uint256 public ecologyFundPrecent = 1100; 
+    uint256 public ecologyFundPrecent = 1100;
     //devTeamPrecent
     uint256 public devTeamPrecent = 600;
     //SLGCFoundationPrecent
@@ -620,7 +620,7 @@ contract SLGCToken is Lock {
     uint256 public SLGCFoundationBalance;
     //SLGCFundAccount
     address public SLGCFundAccount;
-    
+
 
     /**
      *  @dev Contract constructor
@@ -652,7 +652,7 @@ contract SLGCToken is Lock {
         //Calculate the total value of SLGCFoundationBalance
         SLGCFoundationBalance = totalSupply_.mul(SLGCFoundationPrecent).div(100* 10 ** precentDecimal) ;
         //Initially put the SLGCFoundationBalance into the SLGCFoundationAccount
-        balances[_SLGCFoundationAccount] = SLGCFoundationBalance; 
+        balances[_SLGCFoundationAccount] = SLGCFoundationBalance;
 
         //Initially put the devTeamBalance into the teamAccount
         balances[_teamAccount] = devTeamBalance;
@@ -671,7 +671,7 @@ contract SLGCToken is Lock {
 
         //Initially lock the team account
         teamLock(_teamAccount,devTeamBalance);
-        
+
     }
 
     /**
@@ -702,7 +702,7 @@ contract SLGCToken is Lock {
         }else if(fundLockTime[msg.sender] > 0){
             return super.fundLockTransfer(_to,_value);
         }else {
-            return super.transfer(_to, _value);    
+            return super.transfer(_to, _value);
         }
     }
 
@@ -718,10 +718,10 @@ contract SLGCToken is Lock {
             //the SLGCFundAccounts is not allowed to transfer before issued
             require(_from != SLGCFundAccount);
         }
-      
+
         if(teamLockTime[_from] > 0){
             return super.teamLockTransferFrom(_from,_to,_value);
-        }else if(fundLockTime[_from] > 0 ){  
+        }else if(fundLockTime[_from] > 0 ){
             return super.fundLockTransferFrom(_from,_to,_value);
         }else{
             return super.transferFrom(_from, _to, _value);
@@ -729,7 +729,7 @@ contract SLGCToken is Lock {
     }
 
     /**
-     *  @dev Privately offered Fund 
+     *  @dev Privately offered Fund
      *  @param _to the accept token address
      *  @param _value the number of transfer token
      */
@@ -745,17 +745,28 @@ contract SLGCToken is Lock {
     }
 
     /**
-    * @dev Issue the token 
+    * @dev Issue the token
     */
     function issue() public onlyOwner  returns (uint){
-        //Only one time 
+        //Only one time
         require(issueDate==0);
         issueDate = now;
         return now;
     }
-     
+
      /**avoid mis-transfer*/
      function() external payable{
          revert();
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

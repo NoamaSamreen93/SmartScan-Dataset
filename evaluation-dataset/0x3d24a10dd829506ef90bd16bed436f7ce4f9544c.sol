@@ -92,7 +92,7 @@ contract Manageable is Ownable {
         for(; index < managers.length - 1; index++) {
             managers[index] = managers[index + 1];
         }
-        
+
         managers.length--;
         ManagerRemoved(_manager);
     }
@@ -179,7 +179,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -298,7 +298,7 @@ contract BurnableToken is StandardToken {
 
 contract Token is CappedToken, BurnableToken, Withdrawable {
     function Token() CappedToken(10000000000e8) StandardToken("MIRAMIND Token", "MIRA", 8) public {
-        
+
     }
 }
 
@@ -310,7 +310,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     function Crowdsale() public {
         token = new Token();
 
@@ -334,5 +334,18 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         CrowdsaleClose();
     }
-        
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

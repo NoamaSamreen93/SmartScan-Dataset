@@ -207,8 +207,8 @@ contract HumanStandardToken is PausableToken {
     }
     string public name;
     uint8 public decimals;
-    string public symbol; 
-    // XNE: token version 
+    string public symbol;
+    // XNE: token version
     string public version = '2.0';
 
     constructor (uint256 _initialAmount, string memory _tokenName,uint8 _decimalUnits, string memory _tokenSymbol) internal {
@@ -222,3 +222,14 @@ contract HumanStandardToken is PausableToken {
 }
 
 contract XNEToken is HumanStandardToken(8000000000*(10**18),"Xiuyi Distributed Network",18,"XNE") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

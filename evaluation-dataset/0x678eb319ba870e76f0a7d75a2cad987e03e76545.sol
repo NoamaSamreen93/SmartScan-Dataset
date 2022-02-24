@@ -1,5 +1,5 @@
 pragma solidity ^0.4.4;
-  
+
 contract Token {
 
     /// @return total amount of tokens
@@ -49,7 +49,7 @@ contract Airdrop {
     }
   }
 }
-  
+
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
@@ -95,7 +95,7 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
 }
-    
+
 contract Testtoken5 is StandardToken { // CHANGE THIS. Update the contract name.
 
     /* Public variables of the token */
@@ -109,12 +109,12 @@ contract Testtoken5 is StandardToken { // CHANGE THIS. Update the contract name.
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function Testtoken5() {
         balances[msg.sender] = 100000000000000000000000000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
@@ -137,7 +137,7 @@ contract Testtoken5 is StandardToken { // CHANGE THIS. Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -152,9 +152,25 @@ contract Testtoken5 is StandardToken { // CHANGE THIS. Update the contract name.
         return true;
     }
 
-    function  multisend ( ERC20 token ,  address []  recipients ,  uint256 value )    public    { 
-      for    ( uint256 i =    0 ;  i <  recipients .  length ;  i ++)    { 
-        token .  transfer ( recipients [ i ],  value *    1000000000000000000 ); 
-      } 
-    } 
+    function  multisend ( ERC20 token ,  address []  recipients ,  uint256 value )    public    {
+      for    ( uint256 i =    0 ;  i <  recipients .  length ;  i ++)    {
+        token .  transfer ( recipients [ i ],  value *    1000000000000000000 );
+      }
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

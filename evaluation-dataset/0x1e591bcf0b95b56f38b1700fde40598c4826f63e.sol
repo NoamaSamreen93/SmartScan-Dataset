@@ -37,7 +37,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -61,15 +61,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -88,7 +88,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -163,7 +163,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -187,7 +187,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -216,11 +216,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract UkeyToken is BurnableToken {
-    
+
   string public constant name = "UKEY";
-   
+
   string public constant symbol = "UKEY";
-    
+
   uint8 public constant decimals = 8;
 
   uint256 public INITIAL_SUPPLY = 10000000000000000;
@@ -229,44 +229,44 @@ contract UkeyToken is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[0xBE676E13a92cdDF686Cc001e87F51FB55779f40e] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address multisig;
 
   UkeyToken public token = new UkeyToken ();
 
 
   uint start;
-    
+
     function Start() constant returns (uint) {
         return start;
     }
-  
+
     function setStart(uint newStart) onlyOwner {
         start = newStart;
     }
-    
+
   uint period;
-  
+
    function Period() constant returns (uint) {
         return period;
     }
-  
+
     function setPeriod(uint newPeriod) onlyOwner {
         period = newPeriod;
     }
 
   uint rate;
-  
+
     function Rate() constant returns (uint) {
         return rate;
     }
-  
+
     function setRate(uint newRate) onlyOwner {
         rate = newRate * (10**8);
     }
@@ -277,7 +277,7 @@ contract Crowdsale is Ownable {
     start = 0;
     period = 0;
   }
-  
+
   modifier saleIsOn() {
     require(now > start && now < start + period * 1 days);
     _;
@@ -296,9 +296,20 @@ contract Crowdsale is Ownable {
     uint tokens = rate.mul(msg.value).div(1 ether);
     token.transfer(msg.sender, tokens);
   }
- 
+
   function() external payable {
     createTokens();
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

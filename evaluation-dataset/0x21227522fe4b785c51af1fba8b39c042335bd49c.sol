@@ -151,17 +151,17 @@ contract UniDAG is StandardToken{
 	owner = 0x653859383f60741880f377085Ec44Cf75702C373;
 	CrowdsaleContract = msg.sender;
     balances[msg.sender] = 30300000e18;
-	
+
 	//Airdrop
 	balances[0x1b3481e6c425baD0C8C44e563553BADF8Aca9415] = 6060000e18;
 
 	//Partnership
 	balances[0x174cc6965Dd694f3BCE8B51434b7972ed8497374] = 7575000e18;
 
-	//Marketing 
+	//Marketing
 	balances[0xF4A966739FF81B09CDb075Bf896B5Bd943C50f52] = 7575000e18;
 
-	//Bounty 
+	//Bounty
 	balances[0x42373a7cE8dBF539e0b39D25C3F5064CFabBE227] = 9090000e18;
   }
   modifier onlyOwner() {
@@ -175,33 +175,33 @@ contract UniDAG is StandardToken{
 }
 
 contract UniDAGCrowdsale {
-    using SafeMath for uint256;	
+    using SafeMath for uint256;
     UniDAG public token;
-    address public owner;	
+    address public owner;
     uint256 public rateFirstRound = 4000;
     uint256 public rateSecondRound = 3500;
     uint256 public rateThirdRound = 3000;
 
-	uint256 public openingTime = 1530403200;             
+	uint256 public openingTime = 1530403200;
    	//1.07.2018 0:00:00 GMT+0
 
-	uint256 public secondRoundTime = 1539129600;      
+	uint256 public secondRoundTime = 1539129600;
  	//10.10.2018 0:00:00 GMT+0
 
-	uint256 public thirdRoundTime = 1547856000;        
+	uint256 public thirdRoundTime = 1547856000;
   	//19.01.2019 0:00:00 GMT+0
 
-	uint256 public closingTime = 1556582399;               
+	uint256 public closingTime = 1556582399;
  	 //29.04.2019 23:59:59 GMT +0
-	
+
 	uint256 public weiRaised;
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount, uint256 timestamp);
-	
+
 	modifier onlyWhileOpen {
 		require(block.timestamp >= openingTime && block.timestamp <= closingTime);
 		_;
 	}
-    constructor () public {	
+    constructor () public {
         token = new UniDAG();
         owner = msg.sender;
     }
@@ -219,7 +219,7 @@ contract UniDAGCrowdsale {
     }
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) view internal onlyWhileOpen {
         require(_beneficiary != address(0));
-   
+
  //Minimum 0.01 ETH
 
         require(_weiAmount >= 10e15);
@@ -238,4 +238,15 @@ contract UniDAGCrowdsale {
     function _forwardFunds() internal {
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

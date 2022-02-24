@@ -26,9 +26,9 @@ pragma solidity ^0.4.18;
 
     contract KayoToken is Owned {
 
-        string public name;                
-        uint8 public decimals;             
-        string public symbol;              
+        string public name;
+        uint8 public decimals;
+        string public symbol;
 
         struct  Checkpoint {
 
@@ -52,31 +52,31 @@ pragma solidity ^0.4.18;
         Checkpoint[] totalSupplyHistory;
 
         bool public transfersEnabled;
-        
+
         bool public IsPreSaleEnabled = false;
 
         bool public IsSaleEnabled = false;
 
         bool public IsAirDropEnabled = false;
-        
+
         address public owner;
 
         address public airDropManager;
-        
+
         uint public allowedAirDropTokens;
 
         mapping (address => bool) public frozenAccount;
         event FrozenFunds(address target, bool frozen);
-        
+
         modifier canReleaseToken {
-            if (IsSaleEnabled == true || IsPreSaleEnabled == true) 
+            if (IsSaleEnabled == true || IsPreSaleEnabled == true)
                 _;
             else
                 revert();
         }
 
-        modifier onlyairDropManager { 
-            require(msg.sender == airDropManager); _; 
+        modifier onlyairDropManager {
+            require(msg.sender == airDropManager); _;
         }
 
         function KayoToken(
@@ -89,9 +89,9 @@ pragma solidity ^0.4.18;
             bool _transfersEnabled
         ) public {
             owner = _tokenFactory;
-            name = _tokenName;                                 
-            decimals = _decimalUnits;                          
-            symbol = _tokenSymbol;                             
+            name = _tokenName;
+            decimals = _decimalUnits;
+            symbol = _tokenSymbol;
             parentToken = KayoToken(_parentToken);
             parentSnapShotBlock = _parentSnapShotBlock;
             transfersEnabled = _transfersEnabled;
@@ -132,10 +132,10 @@ pragma solidity ^0.4.18;
         }
 
         function airDrop(address _to, uint256 _amount) onlyairDropManager public returns (bool success){
-            
+
             require((_to != 0) && (_to != address(this)));
             require(IsAirDropEnabled);
-            
+
             require(allowed[owner][msg.sender] >= _amount);
             allowed[owner][msg.sender] -= _amount;
             Transfer(owner, _to, _amount);
@@ -143,7 +143,7 @@ pragma solidity ^0.4.18;
         }
 
         function invest(address _to, uint256 _amount) canReleaseToken onlyOwner public returns (bool success) {
-            
+
             require((_to != 0) && (_to != address(this)));
 
             bool IsTransferAllowed = false;
@@ -277,7 +277,7 @@ pragma solidity ^0.4.18;
             Transfer(_owner, 0, _amount);
             return true;
         }
-        
+
         function destroyAllTokens(address _owner) onlyOwner public returns (bool) {
             updateValueAtNow(totalSupplyHistory, 0);
             updateValueAtNow(balances[_owner], 0);
@@ -290,7 +290,7 @@ pragma solidity ^0.4.18;
         }
 
         function getValueAt(Checkpoint[] storage checkpoints, uint _block) constant internal returns (uint) {
-            
+
             if (checkpoints.length == 0) return 0;
 
             if (_block >= checkpoints[checkpoints.length-1].fromBlock)
@@ -339,3 +339,14 @@ pragma solidity ^0.4.18;
         event Approval(address indexed _owner, address indexed _spender, uint256 _amount);
 
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

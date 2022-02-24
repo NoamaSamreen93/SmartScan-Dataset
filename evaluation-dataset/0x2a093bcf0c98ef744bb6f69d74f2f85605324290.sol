@@ -33,21 +33,21 @@ contract SafeMath {
 }
 
 contract Owner {
-	
+
 	// Token Name
 	string public name = "FoodCoin";
 	// Token Symbol
 	string public symbol = "FOOD";
 	// Decimals
 	uint256 public decimals = 8;
-	// Version 
+	// Version
 	string public version = "v1";
-	
+
 	// Emission Address
 	address public emissionAddress = address(0);
 	// Withdraw address
 	address public withdrawAddress = address(0);
-	
+
 	// Owners Addresses
 	mapping ( address => bool ) public ownerAddressMap;
 	// Owner Address/Number
@@ -62,7 +62,7 @@ contract Owner {
         require( ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// Owner Creation/Activation
 	function ownerOn( address _onOwnerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -91,7 +91,7 @@ contract Owner {
 			retrnVal = true;
 		}
 	}
-	
+
 	// Owner disabled
 	function ownerOff( address _offOwnerAddress ) external isOwner returns (bool retrnVal) {
 		// If owner exist and he is not 0 and active
@@ -106,10 +106,10 @@ contract Owner {
 			retrnVal = false;
 		}
 	}
-	
+
 	// Token name changing function
 	function contractNameUpdate( string _newName, bool updateConfirmation ) external isOwner returns (bool retrnVal) {
-		
+
 		if ( updateConfirmation )
 		{
 			name = _newName;
@@ -120,7 +120,7 @@ contract Owner {
 			retrnVal = false;
 		}
 	}
-	
+
 	// Token symbol changing function
 	function contractSymbolUpdate( string _newSymbol, bool updateConfirmation ) external isOwner returns (bool retrnVal) {
 
@@ -134,10 +134,10 @@ contract Owner {
 			retrnVal = false;
 		}
 	}
-	
+
 	// Token decimals changing function
 	function contractDecimalsUpdate( uint256 _newDecimals, bool updateConfirmation ) external isOwner returns (bool retrnVal) {
-		
+
 		if ( updateConfirmation && _newDecimals != decimals )
 		{
 			decimals = _newDecimals;
@@ -148,12 +148,12 @@ contract Owner {
 			retrnVal = false;
 		}
 	}
-	
-	// New token emission address setting up 
+
+	// New token emission address setting up
 	function emissionAddressUpdate( address _newEmissionAddress ) external isOwner {
 		emissionAddress = _newEmissionAddress;
 	}
-	
+
 	// New token withdrawing address setting up
 	function withdrawAddressUpdate( address _newWithdrawAddress ) external isOwner {
 		withdrawAddress = _newWithdrawAddress;
@@ -179,13 +179,13 @@ contract SpecialManager is Owner {
 	mapping ( uint256 => address ) public specialManagerListMap;
 	// Special Manager Amount
 	uint256 public specialManagerCountInt = 0;
-	
+
 	// Special Manager or Owner modifier
 	modifier isSpecialManagerOrOwner {
         require( specialManagerAddressMap[msg.sender]==true || ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// Special Manager creation/actination
 	function specialManagerOn( address _onSpecialManagerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -214,10 +214,10 @@ contract SpecialManager is Owner {
 			retrnVal = true;
 		}
 	}
-	
+
 	// Special manager disactivation
 	function specialManagerOff( address _offSpecialManagerAddress ) external isOwner returns (bool retrnVal) {
-		// If this special manager exists and he is non-zero and also active 
+		// If this special manager exists and he is non-zero and also active
 		// 0-number manager can`t be disactivated
 		if ( specialManagerAddressNumberMap[ _offSpecialManagerAddress ]>0 && specialManagerAddressMap[ _offSpecialManagerAddress ] )
 		{
@@ -243,7 +243,7 @@ contract SpecialManager is Owner {
 
 
 contract Manager is SpecialManager {
-	
+
 	// Managers addresses
 	mapping ( address => bool ) public managerAddressMap;
 	// Manager Address/Number Mapping
@@ -252,13 +252,13 @@ contract Manager is SpecialManager {
 	mapping ( uint256 => address ) public managerListMap;
 	// Amount of managers
 	uint256 public managerCountInt = 0;
-	
+
 	// Modifier - Manager Or Owner
 	modifier isManagerOrOwner {
         require( managerAddressMap[msg.sender]==true || ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// Owner Creation/Activation
 	function managerOn( address _onManagerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -287,7 +287,7 @@ contract Manager is SpecialManager {
 			retrnVal = true;
 		}
 	}
-	
+
 	// Manager disactivation
 	function managerOff( address _offManagerAddress ) external isOwner returns (bool retrnVal) {
 		// if it's a non-zero manager and already exists and active
@@ -304,7 +304,7 @@ contract Manager is SpecialManager {
 	}
 
 
-	// Constructor adds owner to manager list 
+	// Constructor adds owner to manager list
 	function Manager() public {
 		// manager creation
 		managerAddressMap[ msg.sender ] = true;
@@ -316,11 +316,11 @@ contract Manager is SpecialManager {
 
 
 contract Management is Manager {
-	
+
 	// Description
 	string public description = "";
-	
-	// Current tansaction status 
+
+	// Current tansaction status
 	// TRUE - tansaction available
 	// FALSE - tansaction not available
 	bool public transactionsOn = false;
@@ -329,8 +329,8 @@ contract Management is Manager {
 	// 1 - always "forbidden"
 	// 2 - always "allowed"
 	mapping ( address => uint256 ) public transactionsOnForHolder;
-	
-	
+
+
 	// Displaying tokens in the balanceOf function for all tokens
 	// TRUE - Displaying available
 	// FALSE - Displaying hidden, shows 0. Checking the token balance available in function balanceOfReal
@@ -340,8 +340,8 @@ contract Management is Manager {
 	// 1 - always "forbidden"
 	// 2 - always "allowed"
 	mapping ( address => uint256 ) public balanceOfOnForHolder;
-	
-	
+
+
 	// Current emission status
 	// TRUE - emission is available, managers may add tokens to contract
 	// FALSE - emission isn`t available, managers may not add tokens to contract
@@ -349,7 +349,7 @@ contract Management is Manager {
 
 	// emission cap
 	uint256 public tokenCreationCap = 0;
-	
+
 	// Addresses list for verification of acoounts owners
 	// Addresses
 	mapping ( address => bool ) public verificationAddressMap;
@@ -359,7 +359,7 @@ contract Management is Manager {
 	mapping ( uint256 => address ) public verificationListMap;
 	// Amount of verifications
 	uint256 public verificationCountInt = 1;
-	
+
 	// Verification holding
 	// Verification Holders Timestamp
 	mapping (address => uint256) public verificationHoldersTimestampMap;
@@ -371,26 +371,26 @@ contract Management is Manager {
 	mapping (address => uint256) public verificationAddressHoldersListCountMap;
 	// Verification Address Holders List Number
 	mapping (address => mapping ( uint256 => address )) public verificationAddressHoldersListNumberMap;
-	
+
 	// Modifier - Transactions On
 	modifier isTransactionsOn( address addressFrom ) {
-		
+
 		require( transactionsOnNowVal( addressFrom ) );
 		_;
     }
-	
+
 	// Modifier - Emission On
 	modifier isEmissionOn{
         require( emissionOn );
         _;
     }
-	
-	// Function transactions On now validate for definit address 
+
+	// Function transactions On now validate for definit address
 	function transactionsOnNowVal( address addressFrom ) public view returns( bool )
 	{
 		return ( transactionsOnForHolder[ addressFrom ]==0 && transactionsOn ) || transactionsOnForHolder[ addressFrom ]==2 ;
 	}
-	
+
 	// transaction allow/forbidden for definit token holder
 	function transactionsOnForHolderUpdate( address _to, uint256 _newValue ) external isOwner
 	{
@@ -405,27 +405,27 @@ contract Management is Manager {
 	{
 		transactionsOn = _on;
 	}
-	
+
 	// Function of changing emission status
 	function emissionStatusUpdate( bool _on ) external isOwner
 	{
 		emissionOn = _on;
 	}
-	
+
 	// Emission cap setting up
 	function tokenCreationCapUpdate( uint256 _newVal ) external isOwner
 	{
 		tokenCreationCap = _newVal;
 	}
-	
+
 	// balanceOfOnForHolder; balanceOfOn
-	
+
 	// Function on/off token displaying in function balanceOf
 	function balanceOfOnUpdate( bool _on ) external isOwner
 	{
 		balanceOfOn = _on;
 	}
-	
+
 	// Function on/off token displaying in function balanceOf for definit token holder
 	function balanceOfOnForHolderUpdate( address _to, uint256 _newValue ) external isOwner
 	{
@@ -434,8 +434,8 @@ contract Management is Manager {
 			balanceOfOnForHolder[ _to ] = _newValue;
 		}
 	}
-	
-	
+
+
 	// Function adding of new verification address
 	function verificationAddressOn( address _onVerificationAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -464,7 +464,7 @@ contract Management is Manager {
 			retrnVal = true;
 		}
 	}
-	
+
 	// Function of disactivation of verification address
 	function verificationOff( address _offVerificationAddress ) external isOwner returns (bool retrnVal) {
 		// If this verification address exists and disabled
@@ -478,10 +478,10 @@ contract Management is Manager {
 			retrnVal = false;
 		}
 	}
-	
+
 	// Event "Description updated"
 	event DescriptionPublished( string _description, address _initiator);
-	
+
 	// Description update
 	function descriptionUpdate( string _newVal ) external isOwner
 	{
@@ -492,10 +492,10 @@ contract Management is Manager {
 
 // Token contract FoodCoin Ecosystem
 contract FoodcoinEcosystem is SafeMath, Management {
-	
+
 	// Token total supply
 	uint256 public totalSupply = 0;
-	
+
 	// Balance
 	mapping ( address => uint256 ) balances;
 	// Balances List Address
@@ -506,25 +506,25 @@ contract FoodcoinEcosystem is SafeMath, Management {
 	mapping ( address => string ) public balancesAddressDescription;
 	// Total amount of all balances
 	uint256 balancesCountInt = 1;
-	
+
 	// Forwarding of address managing for definit amount of tokens
 	mapping ( address => mapping ( address => uint256 ) ) allowed;
-	
-	
+
+
 	// Standard ERC-20 events
 	// Event - token transfer
 	event Transfer( address indexed from, address indexed to, uint value );
 	// Event - Forwarding of address managing
     event Approval( address indexed owner, address indexed spender, uint value );
-	
+
 	// Token transfer
 	event FoodTransferEvent( address from, address to, uint256 value, address initiator, uint256 newBalanceFrom, uint256 newBalanceTo );
 	// Event - Emission
 	event FoodTokenEmissionEvent( address initiator, address to, uint256 value, bool result, uint256 newBalanceTo );
 	// Event - Withdraw
 	event FoodWithdrawEvent( address initiator, address to, bool withdrawOk, uint256 withdraw, uint256 withdrawReal, uint256 newBalancesValue );
-	
-	
+
+
 	// Balance View
 	function balanceOf( address _owner ) external view returns ( uint256 )
 	{
@@ -553,7 +553,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 	{
 		return balancesCountInt - 1;
 	}
-	
+
 	// Function of token transaction. For the first transaction will be created the detailed information
 	function _addClientAddress( address _balancesAddress, uint256 _amount ) internal
 	{
@@ -566,7 +566,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			// increment account counter
 			balancesCountInt++;
 		}
-		// add tokens to the account 
+		// add tokens to the account
 		balances[ _balancesAddress ] = safeAdd( balances[ _balancesAddress ], _amount );
 	}
 	// Internal function that performs the actual transfer (cannot be called externally)
@@ -602,7 +602,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		// Regular transfer
 		else
 		{
-			// Call function transfer. 
+			// Call function transfer.
 			return _transfer( msg.sender, _to, _value );
 		}
 	}
@@ -614,7 +614,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		// Check if the transfer initiator has permissions to move funds from the sender's account
 		if ( allowed[_from][msg.sender] >= _value )
 		{
-			// If yes - perform transfer 
+			// If yes - perform transfer
 			if ( _transfer( _from, _to, _value ) )
 			{
 				// Decrease the total amount that initiator has permissions to access
@@ -640,7 +640,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		Approval( msg.sender, _initiator, _value );
 		return true;
 	}
-	
+
 	// The emission function (the manager or contract owner creates tokens and sends them to a specific account)
 	function _emission (address _reciever, uint256 _amount) internal isManagerOrOwner isEmissionOn returns ( bool returnVal )
 	{
@@ -693,7 +693,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		_emission( _reciever_3, _amount_3 );
 		_emission( _reciever_4, _amount_4 );
 	}
-	
+
 	// Function Tokens withdraw
 	function withdraw( address _to, uint256 _amount ) external isSpecialManagerOrOwner returns ( bool returnVal, uint256 withdrawValue, uint256 newBalancesValue )
 	{
@@ -727,7 +727,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			FoodWithdrawEvent( msg.sender, _to, false, _amount, 0, balances[ _to ] );
 		}
 	}
-	
+
 	// Balance description update
 	function balancesAddressDescriptionUpdate( string _newDescription ) external returns ( bool returnVal )
 	{
@@ -742,13 +742,13 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			returnVal = false;
 		}
 	}
-	
+
 	// Recording of verification details
 	function _verification( address _from, address _verificationAddress, uint256 _value) internal
 	{
 		// If verification address is active
 		require( verificationAddressMap[ _verificationAddress ] );
-		
+
 		// If it is updating of already verificated address
 		if ( verificationHoldersVerifierAddressMap[ _from ] == _verificationAddress )
 		{
@@ -758,12 +758,23 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			// Verification Address Holders List Number
 			verificationAddressHoldersListNumberMap[ _verificationAddress ][ tmpNumberVerification ] = _from;
 		}
-		
-		// Verification Holders Timestamp 
+
+		// Verification Holders Timestamp
 		verificationHoldersTimestampMap[ _from ] = now;
 		// Verification Value
 		verificationHoldersValueMap[ _from ] = _value;
 		// Verification Holders Verifier Address
 		verificationHoldersVerifierAddressMap[ _from ] = _verificationAddress;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

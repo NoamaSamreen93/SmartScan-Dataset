@@ -22,7 +22,7 @@ contract CrypteloERC20 {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     event Supply(uint256 supply);
     /**
      * Constrctor function
@@ -38,12 +38,12 @@ contract CrypteloERC20 {
         totalSupplyPrivateSale = 100000000;
         totalSupplyTeamTokens = 125000000;
         totalSupplyExpansionTokens = 125000000;
-        
+
         address privateW = 0xb3d9c613a4B680A5Ffd28E08258dBd7BA77102A2;
         address ICOW = 0xF2b3Fc7196D5Ec9bD9111AF5B6D79c9FE26d729F;
         address companyW = 0xeC23f509E328100C08646389a3b6C45e9290AA42;
         address expansionW = 0xf799aa9cA15D6137eDAEb204016378112064ECa3;
-        
+
         balanceOf[ICOW] = totalSupplyICO * ( 10 ** decimals);
         balanceOf[privateW] = totalSupplyPrivateSale * ( 10 ** decimals);
         balanceOf[companyW] = totalSupplyTeamTokens * ( 10 ** decimals);
@@ -166,4 +166,20 @@ contract CrypteloERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

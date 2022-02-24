@@ -95,7 +95,7 @@ contract Indicoin is StandardToken, SafeMath {
 
     // contracts
     address public ethFundDeposit;      // deposit address for ETH for Indicoin Developers
-    address public indiFundAndSocialVaultDeposit;      // deposit address for indicoin developers use and social vault 
+    address public indiFundAndSocialVaultDeposit;      // deposit address for indicoin developers use and social vault
     address public bountyDeposit; // deposit address for bounty
     address public saleDeposit; //deposit address for preSale
     // crowdsale parameters
@@ -104,7 +104,7 @@ contract Indicoin is StandardToken, SafeMath {
     uint256 public fundingEndTime;
     uint256 public constant indiFundAndSocialVault = 350 * (10**6) * 10**decimals;   // 100m INDI reserved for team use and 250m for social vault
     uint256 public constant bounty = 50 * (10**6) * 10**decimals; // 50m INDI reserved for bounty
-    uint256 public constant sale = 200 * (10**6) * 10**decimals; 
+    uint256 public constant sale = 200 * (10**6) * 10**decimals;
     uint256 public constant tokenExchangeRate = 12500; // 12500 INDI tokens per 1 ETH
     uint256 public constant tokenCreationCap =  1000 * (10**6) * 10**decimals;
     uint256 public constant tokenCreationMin =  600 * (10**6) * 10**decimals;
@@ -113,9 +113,9 @@ contract Indicoin is StandardToken, SafeMath {
     // events
     event LogRefund(address indexed _to, uint256 _value);
     event CreateINDI(address indexed _to, uint256 _value);
-    
 
-    
+
+
     function Indicoin()
     {
       isFinalized = false;                   //controls pre through crowdsale state
@@ -125,7 +125,7 @@ contract Indicoin is StandardToken, SafeMath {
       bountyDeposit = 0xB41A19abF814375D89222834aeE3FB264e4b5e77;
       fundingStartTime = 1507309861;
       fundingEndTime = 1509580799;
-      
+
       totalSupply = indiFundAndSocialVault + bounty + sale;
       balances[indiFundAndSocialVaultDeposit] = indiFundAndSocialVault; // Deposit Indicoin developers share
       balances[bountyDeposit] = bounty; //Deposit bounty Share
@@ -134,8 +134,8 @@ contract Indicoin is StandardToken, SafeMath {
       CreateINDI(bountyDeposit, bounty); // logs bounty fund
       CreateINDI(saleDeposit, sale); // logs preSale fund
     }
-    
-    
+
+
     /// @dev Accepts ether and creates new INDI tokens.
     function createTokens() payable external {
       if (isFinalized) revert();
@@ -176,8 +176,19 @@ contract Indicoin is StandardToken, SafeMath {
       balances[msg.sender] = 0;
       totalSupply = safeSubtract(totalSupply, indiVal); // extra safe
       uint256 ethVal = indiVal / tokenExchangeRate;     // should be safe; previous throws covers edges
-      LogRefund(msg.sender, ethVal);               // log it 
+      LogRefund(msg.sender, ethVal);               // log it
       if (!msg.sender.send(ethVal)) revert();       // if you're using a contract; make sure it works with .send gas limits
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

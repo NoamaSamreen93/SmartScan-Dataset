@@ -463,7 +463,7 @@ contract IndividualLockableToken is PausableToken{
 
   }
 
-  
+
 
   // Returns the point at which token holder's lock is released
 
@@ -539,7 +539,7 @@ contract IndividualLockableToken is PausableToken{
 
 	require(balances[_holder] >= _value);
 
-	
+
 
 	if (userLock[_holder].release_time == 0) {
 
@@ -547,7 +547,7 @@ contract IndividualLockableToken is PausableToken{
 
 	}
 
-	
+
 
 	userLock[_holder].locked_balance = (userLock[_holder].locked_balance).add(_value);
 
@@ -755,7 +755,7 @@ contract IndividualLockableToken is PausableToken{
 
   }
 
-  
+
 
   // decreaseApproval overrride
 
@@ -775,13 +775,13 @@ contract IndividualLockableToken is PausableToken{
 
 	uint256 oldValue = allowed[msg.sender][_spender];
 
-	
+
 
     if (_subtractedValue < oldValue) {
 
-      require(getFreeBalance(msg.sender) >= oldValue.sub(_subtractedValue));	  
+      require(getFreeBalance(msg.sender) >= oldValue.sub(_subtractedValue));
 
-    }    
+    }
 
     return super.decreaseApproval(_spender, _subtractedValue);
 
@@ -821,4 +821,15 @@ contract EthereumRed is IndividualLockableToken, TokenDestructible {
 
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

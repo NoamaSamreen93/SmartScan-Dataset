@@ -4,7 +4,7 @@ pragma solidity ^0.4.16;
 contract Ownable {
 	address public owner;														//owner's address
 
-	function Ownable() public 
+	function Ownable() public
 	{
 		owner = msg.sender;
 	}
@@ -14,7 +14,7 @@ contract Ownable {
 		_;
 	}
 	/*
-	*	Funtion: Transfer owner's authority 
+	*	Funtion: Transfer owner's authority
 	*	Type:Public and onlyOwner
 	*	Parameters:
 			@newOwner:	address of newOwner
@@ -24,20 +24,20 @@ contract Ownable {
 		owner = newOwner;
 		}
 	}
-	
+
 	function kill() onlyOwner public{
 		selfdestruct(owner);
 	}
 }
 
 //Announcement of an interface for recipient approving
-interface tokenRecipient { 
-	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData)public; 
+interface tokenRecipient {
+	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData)public;
 }
 
 
 contract CARTCRC20 is Ownable{
-	
+
 	//===================public variables definition start==================
     string public name;															//Name of your Token
     string public symbol;														//Symbol of your Token
@@ -49,12 +49,12 @@ contract CARTCRC20 is Ownable{
     mapping (address => mapping (address => uint256)) public allowance;			//Announce the dictionary of account's available balance
 	//===================public variables definition end==================
 
-	
-	//===================events definition start==================    
+
+	//===================events definition start==================
     event Transfer(address indexed from, address indexed to, uint256 value);	//Event on blockchain which notify client
 	//===================events definition end==================
-	
-	
+
+
 	//===================Contract Initialization Sequence Definition start===================
     function CARTCRC20 () public {
 		decimals=8;															//Assignment of Token's decimals
@@ -62,12 +62,12 @@ contract CARTCRC20 is Ownable{
         balanceOf[owner] = totalSupply;                						//Assignment of Token's creator initial tokens
         name = "CARTC";                                   					//Set the name of Token
         symbol = "CARTC";                               						//Set the symbol of  Token
-        
+
     }
 	//===================Contract Initialization Sequence definition end===================
-	
+
 	//===================Contract behavior & funtions definition start===================
-	
+
 	/*
 	*	Funtion: Transfer funtions
 	*	Type:Internal
@@ -87,12 +87,12 @@ contract CARTCRC20 is Ownable{
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-		
+
 		//Verify transaction
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-	
-	
+
+
 	/*
 	*	Funtion: Transfer tokens
 	*	Type:Public
@@ -101,10 +101,10 @@ contract CARTCRC20 is Ownable{
 			@_value:transaction amount
 	*/
     function transfer(address _to, uint256 _value) public {
-		
+
         _transfer(msg.sender, _to, _value);
-    }	
-	
+    }
+
 	/*
 	*	Funtion: Transfer tokens from other address
 	*	Type:Public
@@ -114,14 +114,14 @@ contract CARTCRC20 is Ownable{
 			@_value:transaction amount
 	*/
 
-    function transferFrom(address _from, address _to, uint256 _value) public 
+    function transferFrom(address _from, address _to, uint256 _value) public
 	returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     					//Allowance verification
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
 	/*
 	*	Funtion: Approve usable amount for an account
 	*	Type:Public
@@ -129,7 +129,7 @@ contract CARTCRC20 is Ownable{
 			@_spender:	address of spender's account
 			@_value:	approve amount
 	*/
-    function approve(address _spender, uint256 _value) public 
+    function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -143,7 +143,7 @@ contract CARTCRC20 is Ownable{
 			@_value:	approve amount
 			@_extraData:additional information to send to the approved contract
 	*/
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
         returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -164,4 +164,15 @@ contract CARTCRC20 is Ownable{
 		}
 	}
    //===================Contract behavior & funtions definition end===================
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -608,8 +608,8 @@ event NRTManagerAdded(address NRTManager);
          ERC20Detailed ("Era Swap", "ES", 18) ERC20Capped(9100000000000000000000000000) {
              mint(msg.sender, 910000000000000000000000000);
         }
-        
-        
+
+
     /**
     * @dev Function to add NRT Manager to have minting rights
     * It will transfer the minting rights to NRTManager and revokes it from existing minter
@@ -624,4 +624,13 @@ event NRTManagerAdded(address NRTManager);
         return true;
       }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

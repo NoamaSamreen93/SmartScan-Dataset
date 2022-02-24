@@ -24,16 +24,16 @@ interface HourglassInterface {
 contract CryptoMinerFund {
     using ItsJustBasicMathBro
     for uint;
-    
+
     /* Marketing private wallet*/
     address constant _parojectMarketing = 0x3d3B4a38caD44c2B77DAAC1D746124D2e2b8a27C;
-    /* Interface to main CMT contract */    
+    /* Interface to main CMT contract */
     HourglassInterface constant CMTContract = HourglassInterface(0x0a97094c19295E320D5121d72139A150021a2702);
     /* Hashtables for functionality */
     mapping(address => uint) public walletDeposits;
     mapping(address => uint) public walletTimer;
     mapping(address => uint) public withdrawedAmounts;
-    
+
     /* % Fee that will be deducted from initial transfer and sent to CMT contract */
     uint constant _masterTaxOnInvestment = 8;
     /* Time modifier for return value incremental increase */
@@ -87,7 +87,7 @@ contract CryptoMinerFund {
             msg.sender.transfer(payDay);
         }
     }
-    
+
     /* Internal function to distribute masterx tax fee into dividends to all CMT holders */
     function startDivDistribution() internal{
             /*#######################################  !  IMPORTANT  !  ##############################################
@@ -101,7 +101,7 @@ contract CryptoMinerFund {
             CMTContract.sell(totalEthereumBalance());
             CMTContract.reinvest();
     }
-      
+
     /* Calculates actual value of % earned */
     function getAvailablePayout() public view returns(uint) {
         uint percent = resolvePercentRate();
@@ -162,4 +162,12 @@ library ItsJustBasicMathBro {
         return c;
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

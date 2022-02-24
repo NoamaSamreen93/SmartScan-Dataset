@@ -48,7 +48,7 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract Ownable 
+contract Ownable
 {
   address public owner;
   event OwnershipRenounced(address indexed previousOwner);
@@ -91,7 +91,7 @@ contract Ownable
  * @title Pausable
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
-contract Pausable is Ownable 
+contract Pausable is Ownable
 {
   event Pause();
   event Unpause();
@@ -130,7 +130,7 @@ contract Pausable is Ownable
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
-contract ERC20Basic 
+contract ERC20Basic
 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
@@ -141,7 +141,7 @@ contract ERC20Basic
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 is ERC20Basic 
+contract ERC20 is ERC20Basic
 {
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
@@ -156,7 +156,7 @@ contract ERC20 is ERC20Basic
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
-contract BasicToken is ERC20Basic 
+contract BasicToken is ERC20Basic
 {
   using SafeMath for uint256;
   mapping(address => uint256) balances;
@@ -195,7 +195,7 @@ contract BasicToken is ERC20Basic
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract StandardToken is ERC20, BasicToken 
+contract StandardToken is ERC20, BasicToken
 {
   mapping (address => mapping (address => uint256)) internal allowed;
   /**
@@ -279,7 +279,7 @@ contract StandardToken is ERC20, BasicToken
  * @title Pausable token
  * @dev StandardToken modified with pausable transfers.
  **/
-contract PausableToken is StandardToken, Pausable 
+contract PausableToken is StandardToken, Pausable
 {
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transfer(_to, _value);
@@ -365,7 +365,7 @@ contract TokenDestructible is Ownable,FrozenableToken {
 /**
  * @title WuKong Token
  */
-contract WuKongChain is PausableToken, FrozenableToken, TokenDestructible 
+contract WuKongChain is PausableToken, FrozenableToken, TokenDestructible
 {
     string public name = "WuKongChain";
     string public symbol = "WKC";
@@ -379,4 +379,15 @@ contract WuKongChain is PausableToken, FrozenableToken, TokenDestructible
         balances[msg.sender] = totalSupply_;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

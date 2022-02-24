@@ -297,9 +297,17 @@ contract EURO is PausableToken {
     uint256 private constant TOKEN_UNIT = 10 ** uint256(decimals);
 
     uint256 public constant totalSupply = 1000000000 * TOKEN_UNIT;
-	
+
     function EURO() public {
         balances[owner] = totalSupply;
         Transfer(address(0), owner, balances[owner]);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -29,7 +29,7 @@ contract ERC20Interface is SafeMath {
     bool public constant isToken = true;
 
     address public owner;
-    
+
     // Store the token balance for each user
     mapping(address => uint256) balances;
 
@@ -62,13 +62,13 @@ contract ERC20Interface is SafeMath {
         return true;
     }
 
-    function balanceOf(address _owner) 
+    function balanceOf(address _owner)
         constant returns (uint256 balance)
     {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint256 _value) 
+    function approve(address _spender, uint256 _value)
         returns (bool success)
     {
         assert(balances[msg.sender] >= _value);
@@ -81,10 +81,10 @@ contract ERC20Interface is SafeMath {
     {
         return allowed[_owner][_spender];
     }
-  
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-  
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
@@ -95,7 +95,7 @@ contract Iou is ERC20Interface {
     string public constant longDescription = "Buy or trade IOUs from Connor";
 
     // Basically a decorator _; is were the main function will go
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
@@ -103,9 +103,20 @@ contract Iou is ERC20Interface {
 
     function Iou() ERC20Interface() {}
 
-    function changeOwner(address _newOwner) 
+    function changeOwner(address _newOwner)
         onlyOwner()
     {
         owner = _newOwner;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

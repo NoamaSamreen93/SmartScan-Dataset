@@ -79,9 +79,9 @@ contract customTkn {
 }
 
 contract contractDeployer is Ownable {
-	
+
 	event ContractCreated(address newAddress);
-	
+
     address public tokenAddr;
 	uint public tokenFee;
 	uint public crowdsaleFee;
@@ -111,7 +111,7 @@ contract contractDeployer is Ownable {
 		require(token.transferFrom(msg.sender, owner, tokenFee));
 		emit ContractCreated(tdep.deployToken(_tName, _tSymbol, _mint, _owner));
 	}
-	
+
 	function deployCrowdsale(address _tWallet, address _token, address _eWallet, uint _maxETH) public returns (address) {
 		require(token.transferFrom(msg.sender, owner, crowdsaleFee));
 		emit ContractCreated(cdep.deployCrowdsale(_eWallet, _token, _tWallet, _maxETH, msg.sender));
@@ -125,4 +125,15 @@ contract contractDeployer is Ownable {
 		er2.multiTransfer(_to, _amount);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

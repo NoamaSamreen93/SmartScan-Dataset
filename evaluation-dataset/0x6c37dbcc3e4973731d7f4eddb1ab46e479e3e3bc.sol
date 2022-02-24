@@ -9,14 +9,14 @@ pragma solidity ^0.4.22;
   You may obtain a copy of the License at
 
   http://www.apache.org/licenses/LICENSE-2.0
-  
+
 */
- 
- 
+
+
 library SafeMath {
   function mul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
-    assert(a == 0 || c / a == b);  
+    assert(a == 0 || c / a == b);
     return c;
   }
 
@@ -50,7 +50,7 @@ contract ERC20Basic {
   function balanceOf(address who) constant returns (uint);
   function transfer(address to, uint value);
   event Transfer(address indexed from, address indexed to, uint value);
-  
+
   function allowance(address owner, address spender) constant returns (uint);
   function transferFrom(address from, address to, uint value);
   function approve(address spender, uint value);
@@ -60,15 +60,15 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
-    
+
   address public owner;
-  
+
   /// This is a switch to control the liquidity
   bool public transferable = true;
-  
+
   mapping(address => uint) balances;
 
-  //The frozen accounts 
+  //The frozen accounts
   mapping (address => bool) public frozenAccount;
   /**
    * @dev Fix for the ERC20 short address attack.
@@ -79,12 +79,12 @@ contract BasicToken is ERC20Basic {
      }
      _;
   }
-  
+
   modifier unFrozenAccount{
       require(!frozenAccount[msg.sender]);
       _;
   }
-  
+
   modifier onlyOwner {
       if (owner == msg.sender) {
           _;
@@ -93,7 +93,7 @@ contract BasicToken is ERC20Basic {
           throw;
         }
   }
-  
+
   modifier onlyTransferable {
       if (transferable) {
           _;
@@ -102,28 +102,28 @@ contract BasicToken is ERC20Basic {
           throw;
       }
   }
-  
+
   /**
   *EVENTS
   */
   /// Emitted when the target account is frozen
   event FrozenFunds(address target, bool frozen);
-  
+
   /// Emitted when a function is invocated by unauthorized addresses.
   event InvalidCaller(address caller);
 
   /// Emitted when some BODY coins are burn.
   event Burn(address caller, uint value);
-  
+
   /// Emitted when the ownership is transferred.
   event OwnershipTransferred(address indexed from, address indexed to);
-  
+
   /// Emitted if the account is invalid for transaction.
   event InvalidAccount(address indexed addr, bytes msg);
-  
+
   /// Emitted when the liquity of BODY is switched off
   event LiquidityAlarm(bytes msg);
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -137,12 +137,12 @@ contract BasicToken is ERC20Basic {
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
     }
-    
+
   }
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) view returns (uint balance) {
@@ -156,11 +156,11 @@ contract BasicToken is ERC20Basic {
       frozenAccount[target]=freeze;
       FrozenFunds(target, freeze);
     }
-  
+
   function accountFrozenStatus(address target) view returns (bool frozen) {
       return frozenAccount[target];
   }
-  
+
   function transferOwnership(address newOwner) onlyOwner public {
       if (newOwner != address(0)) {
           address oldOwner=owner;
@@ -168,12 +168,12 @@ contract BasicToken is ERC20Basic {
           OwnershipTransferred(oldOwner, owner);
         }
   }
-  
+
   function switchLiquidity (bool _transferable) onlyOwner returns (bool success) {
       transferable=_transferable;
       return true;
   }
-  
+
   function liquidityStatus () view returns (bool _transferable) {
       return transferable;
   }
@@ -196,10 +196,10 @@ contract StandardToken is BasicToken {
 
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
     // if (_value > _allowance) throw;
-    
+
     // Check account _from and _to is not frozen
     require(!frozenAccount[_from]&&!frozenAccount[_to]);
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -232,7 +232,7 @@ contract StandardToken is BasicToken {
   function allowance(address _owner, address _spender) view returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 /// @title BodyOne Protocol Token.
@@ -243,8 +243,8 @@ contract BodyOneToken is StandardToken {
     uint public decimals = 18;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the BODY Coin
      * @param _owner The escrow account address, all ethers will
      * be sent to this address.
@@ -265,4 +265,12 @@ contract BodyOneToken is StandardToken {
     function () public payable {
         revert();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

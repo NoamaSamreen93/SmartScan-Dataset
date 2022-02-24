@@ -29,8 +29,8 @@ contract VRTtoken is ERC20Burnable
     // Public data
     string public constant name = "VRT token";
     string public constant symbol = "VRT";
-    uint256 public constant decimals = 9; 
-    address public owner;  
+    uint256 public constant decimals = 9;
+    address public owner;
 
     // Internal data
     uint256 private constant initialSupply = 100000000; // 100,000,000
@@ -80,19 +80,19 @@ contract VRTtoken is ERC20Burnable
         Transfer(owner, 0xFb8d70B3347f8BdAe3b9e7EAf7d623F721A91fCe, 5866245000000);
     }
 
-    function totalSupply() public constant 
+    function totalSupply() public constant
         returns (uint256)
     {
         return currentSupply;
     }
 
-    function balanceOf(address tokenOwner) public constant 
+    function balanceOf(address tokenOwner) public constant
         returns (uint256)
     {
         return balances[tokenOwner];
     }
-  
-    function transfer(address to, uint256 amount) public 
+
+    function transfer(address to, uint256 amount) public
         returns (bool)
     {
         if (balances[msg.sender] >= amount && // Sender has enough?
@@ -102,14 +102,14 @@ contract VRTtoken is ERC20Burnable
             balances[to] += amount;
             Transfer(msg.sender, to, amount);
             return true;
-        } 
+        }
         else // Invalid transfer
         {
             return false;
         }
     }
-  
-    function transferFrom(address from, address to, uint256 amount) public 
+
+    function transferFrom(address from, address to, uint256 amount) public
         returns (bool)
     {
         if (balances[from] >= amount && // Account has enough?
@@ -128,7 +128,7 @@ contract VRTtoken is ERC20Burnable
         }
     }
 
-    function approve(address spender, uint256 amount) public 
+    function approve(address spender, uint256 amount) public
         returns (bool)
     {
         allowed[msg.sender][spender] = amount;
@@ -136,13 +136,13 @@ contract VRTtoken is ERC20Burnable
         return true;
     }
 
-    function allowance(address tokenOwner, address spender) public constant 
+    function allowance(address tokenOwner, address spender) public constant
         returns (uint256)
     {
         return allowed[tokenOwner][spender];
     }
 
-    function burn(uint256 amount) public 
+    function burn(uint256 amount) public
         returns (bool)
     {
         require(msg.sender == owner); // Only the owner can burn
@@ -159,4 +159,15 @@ contract VRTtoken is ERC20Burnable
             return false;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

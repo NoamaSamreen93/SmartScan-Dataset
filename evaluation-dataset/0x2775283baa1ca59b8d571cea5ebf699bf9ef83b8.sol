@@ -12,7 +12,7 @@ contract DuqueBrewingCompany {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function DuqueBrewingCompany() {
 
@@ -20,10 +20,10 @@ contract DuqueBrewingCompany {
          name ="Duque Brewing Company";
          decimals = 8;
          symbol = "DUQUE";
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     /* Send coins */
@@ -32,7 +32,7 @@ contract DuqueBrewingCompany {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-      
+
     }
 
 
@@ -40,4 +40,15 @@ contract DuqueBrewingCompany {
     function () {
         throw;     // Prevents accidental sending of ether
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

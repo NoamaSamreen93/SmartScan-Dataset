@@ -9,13 +9,13 @@ contract Token {
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
-    /// @notice send a set of token to different address  
+    /// @notice send a set of token to different address
     /// @param _to a set of address token to be transferred
     /// @param _value a set of amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function multiTransfer(address[] _to, uint256[] _value) returns (bool success) {}
 
-    /// @notice send a set of token to different address  
+    /// @notice send a set of token to different address
     /// @param _from The address of the sender
     /// @param _to a set of address token to be transferred
     /// @param _value a set of amount of token to be transferred
@@ -48,12 +48,12 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
 
-contract StandardToken is Token {    
+contract StandardToken is Token {
 
     function multiTransfer(address[] _to, uint256[] _value) returns (bool success) {
         if(_to.length <= 0 || _value.length <=0 || _to.length != _value.length){
@@ -171,4 +171,8 @@ contract YYBToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

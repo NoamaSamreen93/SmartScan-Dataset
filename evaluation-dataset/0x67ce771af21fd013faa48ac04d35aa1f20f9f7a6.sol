@@ -107,14 +107,14 @@ contract StandardToken is Token {
  *  https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20.sol
  *  https://github.com/ConsenSys/Tokens/blob/master/Token_Contracts/contracts/HumanStandardToken.sol
  */
- 
+
 contract NotaryToken is StandardToken{
 
     function () {
         //if ether is sent to this address, send it back.
         throw;
     }
-    
+
     address owner;
     mapping (address => bool) associateContracts;
 
@@ -140,10 +140,10 @@ contract NotaryToken is StandardToken{
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
-        
+
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
-            throw; 
+            throw;
         }
         return true;
     }
@@ -157,7 +157,7 @@ contract NotaryToken is StandardToken{
         }else{
             return false;
         }
-        
+
     }
 
     function newAssociate(address _addressOfAssociate) onlyOwner {
@@ -168,10 +168,10 @@ contract NotaryToken is StandardToken{
     function expireAssociate(address _addressOfAssociate) onlyOwner {
         delete associateContracts[_addressOfAssociate];
     }
-    
+
     /* Verify contract association with NTRY Token*/
     function isAssociated(address _addressOfAssociate) returns(bool){
-        return associateContracts[_addressOfAssociate]; 
+        return associateContracts[_addressOfAssociate];
     }
 
     function transferOwnership(address _newOwner) onlyOwner {
@@ -202,9 +202,9 @@ contract NotaryToken is StandardToken{
         allocations[0xC9856112DCb8eE449B83604438611EdCf61408AF] = 200000 * 1 ether;
         allocations[0x689CCfEABD99081D061aE070b1DA5E1f6e4B9fB2] = 2000000 * 1 ether;
     }
-   
+
     function withDraw(){
-        if(now < unlockedAt){ 
+        if(now < unlockedAt){
             return;
         }
         if(allocations[msg.sender] > 0){
@@ -212,4 +212,20 @@ contract NotaryToken is StandardToken{
             allocations[msg.sender] = 0;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

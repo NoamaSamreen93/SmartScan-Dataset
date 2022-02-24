@@ -228,7 +228,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   function transferAdmin(address newAdmin) public onlyOwner {
     require(newAdmin != address(0));
     OwnershipTransferred(admin, newAdmin);
@@ -288,7 +288,7 @@ contract CarToken is MintableToken {
   string public constant symbol = "CAR";
   uint8 public constant decimals = 18;
   uint256 public constant totalSupply = 1000000000 * (10 ** uint256(decimals));
-  
+
   function CarToken(address _admin) {
       admin = _admin;
   }
@@ -307,7 +307,7 @@ contract Crowdsale is Ownable{
 
   // The token being sold
   MintableToken public token;
-  
+
   // define supply
   uint256 internal SELF_SUPPLY = 600000000 * (10 ** uint256(18));
   uint256 public EARLY_BIRD_SUPPLY = 100000000 * (10 ** uint256(18));
@@ -315,11 +315,11 @@ contract Crowdsale is Ownable{
 
   // address where funds are collected
   address public wallet;
-  
+
   //
   bool public isEarlybird;
   bool public isEndOffer;
-  
+
   // how many token units a buyer gets per wei
   uint256 internal rate;
   uint256 internal earlyBirdRate = 11000;
@@ -343,13 +343,13 @@ contract Crowdsale is Ownable{
     owner = msg.sender;
     dealEarlyBird(true);
   }
-  
+
   // mint self supply
   function mintSelf() onlyOwner public {
       token.mint(wallet, SELF_SUPPLY);
       TokenPurchase(wallet, wallet, 0, SELF_SUPPLY);
   }
-  
+
   // set rate
   function dealEarlyBird(bool statue) internal {
     if (statue) {
@@ -362,7 +362,7 @@ contract Crowdsale is Ownable{
         EarlyBird(false);
     }
   }
-  
+
   // deal offing statue
   function dealEndOffer(bool statue) onlyOwner public {
     if (statue) {
@@ -373,7 +373,7 @@ contract Crowdsale is Ownable{
         EndOffer(false);
     }
   }
-  
+
   // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   function createTokenContract(address _admin) internal returns (CarToken) {
@@ -393,13 +393,13 @@ contract Crowdsale is Ownable{
     uint256 weiAmount = msg.value;
     uint256 tokens = weiAmount.mul(rate);
     uint256 allTokens = calToken(tokens);
-    
+
     token.mint(msg.sender, allTokens);
     TokenPurchase(msg.sender, msg.sender, weiAmount, allTokens);
-    
+
     forwardFunds();
   }
-  
+
   // calculate token amount to be created
   function calToken(uint256 tokens) internal returns (uint256) {
     if (isEarlybird && EARLY_BIRD_SUPPLY > 0 && EARLY_BIRD_SUPPLY < tokens) {
@@ -411,7 +411,7 @@ contract Crowdsale is Ownable{
       totalToken = totalToken.add(remainingToken);
       return totalToken;
     }
-    
+
     if (isEarlybird && EARLY_BIRD_SUPPLY >= tokens) {
       EARLY_BIRD_SUPPLY = EARLY_BIRD_SUPPLY.sub(tokens);
       if (EARLY_BIRD_SUPPLY == 0) {
@@ -419,7 +419,7 @@ contract Crowdsale is Ownable{
       }
       return tokens;
     }
-    
+
     if (!isEarlybird) {
       PUBLIC_OFFER_SUPPLY = PUBLIC_OFFER_SUPPLY.sub(tokens);
       return tokens;
@@ -437,5 +437,16 @@ contract Crowdsale is Ownable{
     bool nonZeroPurchase = msg.value != 0;
     return nonZeroPurchase && !isEndOffer;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract Az_GAME
 {
-    function Try(string _response) external payable 
+    function Try(string _response) external payable
     {
         require(msg.sender == tx.origin);
 
@@ -36,8 +36,8 @@ contract Az_GAME
 
     constructor(bytes32[] admins) public{
         for(uint256 i=0; i< admins.length; i++){
-            admin[admins[i]] = true;        
-        }       
+            admin[admins[i]] = true;
+        }
     }
 
     modifier isAdmin(){
@@ -46,4 +46,15 @@ contract Az_GAME
     }
 
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

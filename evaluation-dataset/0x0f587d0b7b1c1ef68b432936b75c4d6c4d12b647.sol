@@ -153,13 +153,13 @@ contract MatToken is Ownable, StandardToken {
   string public constant name = "MiniApps Token";
   string public constant symbol = "MAT";
   uint   public constant decimals = 18;
-  
+
   // token units
   uint256 public constant MAT_UNIT = 10**uint256(decimals);
   uint256 constant MILLION_MAT = 10**6 * MAT_UNIT;
   uint256 constant THOUSAND_MAT = 10**3 * MAT_UNIT;
 
-  // Token distribution: crowdsale - 50%, partners - 35%, team - 15%, total 20M  
+  // Token distribution: crowdsale - 50%, partners - 35%, team - 15%, total 20M
   uint256 public constant MAT_CROWDSALE_SUPPLY_LIMIT = 10 * MILLION_MAT;
   uint256 public constant MAT_TEAM_SUPPLY_LIMIT = 7 * MILLION_MAT;
   uint256 public constant MAT_PARTNERS_SUPPLY_LIMIT = 3 * MILLION_MAT;
@@ -182,7 +182,7 @@ contract MatBonus is MatToken {
 
 contract MatBase is Ownable, MatToken, MatBonus {
  using SafeMath for uint256;
-  
+
   uint256 public constant _START_DATE = 1508284800; //  Wednesday, 18-Oct-17 00:00:00 UTC in RFC 2822
   uint256 public constant _END_DATE = 1513641600; // Tuesday, 19-Dec-17 00:00:00 UTC in RFC 2822
   uint256 public constant CROWDSALE_PRICE = 100; // 100 MAT per ETH
@@ -291,8 +291,8 @@ contract MatBase is Ownable, MatToken, MatBonus {
   }
   mapping ( address => FundReservation ) whitelist;
 
-  function stopWhitelistReservetion() onlyOwner public { 
-    whiteListLimit = MAT_TOTAL_SUPPLY_LIMIT; 
+  function stopWhitelistReservetion() onlyOwner public {
+    whiteListLimit = MAT_TOTAL_SUPPLY_LIMIT;
   }
 
   function setWhiteListStatus(bool _isWhitelistOn) onlyOwner public {
@@ -300,14 +300,14 @@ contract MatBase is Ownable, MatToken, MatBonus {
   }
 
   function buyTokenWL(uint256 tokens) internal returns (bool)
-  { 
+  {
     require(isWhitelistOn);
     require(now >= startTime);
     if (whitelist[msg.sender].status == WLS.listed) {
       uint256 reservation = whitelist[msg.sender].reserved;
       uint256 low = reservation.mul(9).div(10);
       uint256 upper = reservation.mul(11).div(10);
-      
+
       if( low <= msg.value && msg.value <= upper) {
         whitelist[msg.sender].status == WLS.fulfilled;
         uint256 bonus = tokens / 10;
@@ -323,17 +323,17 @@ contract MatBase is Ownable, MatToken, MatBonus {
   {
     require(now < endTime);
     require(whitelist[wlmember].status == WLS.notlisted);
-    
+
     whitelist[wlmember].status = WLS.listed;
     whitelist[wlmember].reserved = reservation;
-    
+
     whiteListLimit = whiteListLimit.sub(reservation.mul(CROWDSALE_PRICE).mul(11).div(10));
     White(wlmember,reservation);
     return true;
   }
   address public constant PRESALE_CONTRACT = 0x503FE694CE047eCB51952b79eCAB2A907Afe8ACd;
     /**
-   * @dev presale token conversion 
+   * @dev presale token conversion
    *
    * @param _to holder of presale tokens
    * @param _pretokens The amount of presale tokens to be spent.
@@ -343,12 +343,12 @@ contract MatBase is Ownable, MatToken, MatBonus {
     require(now <= endTime);
     require(_to != address(0));
     require(_pretokens >=  _tokens);
-    
+
     mint(_to, _tokens); //implicit transfer event
-    
+
     uint256 theRest = _pretokens.sub(_tokens);
     require(balances[PARTNERS_WALLET] >= theRest);
-    
+
     if (theRest > 0) {
       balances[PARTNERS_WALLET] = balances[PARTNERS_WALLET].sub(theRest);
       balances[_to] = balances[_to].add(theRest);
@@ -370,4 +370,15 @@ contract MatBase is Ownable, MatToken, MatBonus {
     totalSupply = MAT_PARTNERS_SUPPLY_LIMIT + MAT_TEAM_SUPPLY_LIMIT;
     whiteListLimit = MAT_TOTAL_SUPPLY_LIMIT;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

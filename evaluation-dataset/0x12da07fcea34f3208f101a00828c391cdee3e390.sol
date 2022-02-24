@@ -67,7 +67,7 @@ contract KNOWToken is ERC20
     uint256 transferPostDate;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     mapping(address => bool) addOfPrivateSale;
     mapping(address => bool) addOfContributors;
     mapping(address => bool) addOfContributors2;
@@ -75,16 +75,16 @@ contract KNOWToken is ERC20
     mapping(address => bool) addOfMarketingBusinessDev;
     mapping(address => bool) addOfEarlyInvestor;
     mapping(address => bool) addOfOwners;
-    
+
     event EventPrivateSale(address indexed _PrivateSale, bool _status);
     event EventContributors(address indexed _Contributors, bool _status);
     event EventContributors2(address indexed _Contributors2, bool _status);
     event EventTechOperation(address indexed _TechOperation, bool _status);
     event EventMarketingBusinessDev(address indexed _MarketingBusinessDev, bool _status);
     event EventEarlyInvestor(address indexed _EarlyInvestor, bool _status);
-    
+
     mapping(address => LockupHolderDetails) lockupHolderMap;
-    
+
     struct LockupHolderDetails{
       uint transferPercent;
       uint transferDays;
@@ -95,15 +95,15 @@ contract KNOWToken is ERC20
       uint transferPostDate;
       bool reset;
     }
-        
+
     enum Stages {
         LOCKUPNOTSTARTED,
         LOCKUPSTARTED,
         LOCKUPENDED
     }
-    
+
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
@@ -122,45 +122,45 @@ contract KNOWToken is ERC20
     {
         owner = msg.sender;
         stage = Stages.LOCKUPNOTSTARTED;
-        
+
         uint256 _transfertoPrivateSale = 2745000000 * 10 ** 18; // 15% to Private Sale
         uint256 _transfertoContributors = 10980000000 * 10 ** 18; // 60% to Contributors
         uint256 _transfertoContributors2 = 1830000000 * 10 ** 18; // 10% to Contributors 2
         uint256 _transfertoTechOperationExpenses = 915000000 * 10 ** 18; // 5% to Tech & Operation Expenses
         uint256 _transfertoMarketingBusinessDev = 915000000 * 10 ** 18; // 5% to Marketing & Business Development
         uint256 _transfertoEarlyInvestors = 915000000 * 10 ** 18; // 5% to Early Investors
-        
+
         // 15% to Private Sale
         balances[0x8eeC67a193B6B90A4B0047769De8F17a7ee87eB9] = _transfertoPrivateSale;
         Transfer(address(0), 0x8eeC67a193B6B90A4B0047769De8F17a7ee87eB9, _transfertoPrivateSale);
-        
+
         // 60% to Contributors
         balances[0xc7991555F9F2E731bb2013cfB0ac2dcf6dc4A236] = _transfertoContributors;
         Transfer(address(0), 0xc7991555F9F2E731bb2013cfB0ac2dcf6dc4A236, _transfertoContributors);
-        
+
         // 10% to Contributors 2
         balances[0xf26511984b53bf4b96d85355224E06a06180237F] = _transfertoContributors2;
         Transfer(address(0), 0xf26511984b53bf4b96d85355224E06a06180237F, _transfertoContributors2);
-        
+
         // 5% to Tech & Operation Expenses
         balances[0xDd695A5b4594ad79e3D9cE5280f0A36fde72C70A] = _transfertoTechOperationExpenses;
         Transfer(address(0), 0xDd695A5b4594ad79e3D9cE5280f0A36fde72C70A, _transfertoTechOperationExpenses);
-        
+
         // 5% to Marketing & Business Development
         balances[0x84B899f535b7128fEC47e53901cE3242CdC9C06f] = _transfertoMarketingBusinessDev;
         Transfer(address(0), 0x84B899f535b7128fEC47e53901cE3242CdC9C06f, _transfertoMarketingBusinessDev);
-        
+
         // 5% to Early Investors
         balances[0xeD9200CffFBe17af59D288836a9B25520c6CeFa1] = _transfertoEarlyInvestors;
         Transfer(address(0), 0xeD9200CffFBe17af59D288836a9B25520c6CeFa1, _transfertoEarlyInvestors);
     }
-    
-    function () public payable 
+
+    function () public payable
     {
         revert();
-        //Not Applicable   
+        //Not Applicable
     }
-    
+
      // Start lockup periods
      function start_LOCKUP(uint _lockupEndDate) public onlyOwner atStage(Stages.LOCKUPNOTSTARTED)
      {
@@ -176,7 +176,7 @@ contract KNOWToken is ERC20
          require(now > lockup_enddate);
          stage = Stages.LOCKUPENDED;
      }
-     
+
      // Add address to Private Sale
      function addtoPrivateSale(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner {
         addOfPrivateSale[_address] = true;
@@ -192,7 +192,7 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add address to Contributors
      function addtoContributos(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner {
         addOfContributors[_address] = true;
@@ -208,7 +208,7 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add address to Contributors2
      function addtoContributos2(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner {
         addOfContributors2[_address] = true;
@@ -224,7 +224,7 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add address to Tech & Operation
      function addtoTechOperation(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner {
         addOfTechOperation[_address] = true;
@@ -240,7 +240,7 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add address to Marketing & Business Development
      function addtoMarketingBusinessDev(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner {
         addOfMarketingBusinessDev[_address] = true;
@@ -256,7 +256,7 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add address to Early Investors
      function addtoEarlyInvestors(address _address, uint _transferPercent, uint _transferPercentTotal) public onlyOwner{
         addOfEarlyInvestor[_address] = true;
@@ -272,22 +272,22 @@ contract KNOWToken is ERC20
                 reset: true
                 });
      }
-     
+
      // Add owners
      function addtoOwners(address _address) public onlyOwner{
         addOfOwners[_address] = true;
      }
-   
+
      // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalsupply;
      }
-    
+
      // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-     
+
      // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -297,7 +297,7 @@ contract KNOWToken is ERC20
      function transferFrom(address _from, address _to, uint256 _amount)public returns (bool success) {
          require( _to != 0x0);
          checkTransfer = false;
-         
+
          if(addOfOwners[_from]) {
              checkTransfer = true;
          } else
@@ -309,8 +309,8 @@ contract KNOWToken is ERC20
          } else
          if(addOfContributors2[_from] || addOfTechOperation[_from] || addOfMarketingBusinessDev[_from] || addOfEarlyInvestor[_from]) {
              require(checkTransferFunction(_from, _to, _amount));
-         } 
-         
+         }
+
          require(checkTransfer == true);
          require(balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount && _amount >= 0);
          balances[_from] = (balances[_from]).sub(_amount);
@@ -319,19 +319,19 @@ contract KNOWToken is ERC20
          Transfer(_from, _to, _amount);
          return true;
      }
-     
+
      function checkTransferFunction(address _from, address _to, uint256 _amount) internal returns (bool success) {
-             
+
              require(now > lockup_enddate);
-             
+
              transferDaysTotal = lockupHolderMap[_from].transferDaysTotal * 86400;
              transferPostDate = lockupHolderMap[_from].transferPostDate;
-             
+
              if(now >= transferPostDate + transferDaysTotal) {
                  lockupHolderMap[_from].transferPostDate = lockupHolderMap[_from].transferPostDate + transferDaysTotal;
                  lockupHolderMap[_from].transferTotalSpent = 0;
              }
-             
+
              transferPercent = lockupHolderMap[_from].transferPercent;
              transferPercentTotal = lockupHolderMap[_from].transferPercentTotal;
              transferDays = lockupHolderMap[_from].transferDays * 86400;
@@ -339,42 +339,42 @@ contract KNOWToken is ERC20
              transferLastTransaction = lockupHolderMap[_from].transferLastTransaction;
              transferTotalSpent = lockupHolderMap[_from].transferTotalSpent;
              transferPostDate = lockupHolderMap[_from].transferPostDate;
-             
+
              require((_amount * 10 ** 18) <= ((_totalsupply).mul(transferPercent)).div(100));
              require((_amount * 10 ** 18) <= ((_totalsupply).mul(transferPercentTotal)).div(100));
-             
+
              require(now >= transferLastTransaction + transferDays);
              require((transferTotalSpent * 10 ** 18) <= ((_totalsupply).mul(transferPercentTotal)).div(100));
              require(now <= transferPostDate + transferDaysTotal);
-             
+
              lockupHolderMap[_from].transferLastTransaction = now;
              lockupHolderMap[_from].transferTotalSpent += _amount;
-             
+
              checkTransfer = true;
              return true;
      }
-     
+
      function checkTransferFunctionPrivateSale(address _from, address _to, uint256 _amount) internal returns (bool success) {
-             
+
              require(stage == Stages.LOCKUPENDED);
              require(now > lockup_enddate);
-            
+
              transferPercent = lockupHolderMap[_from].transferPercent;
              transferDays = lockupHolderMap[_from].transferDays * 86400;
              transferLastTransaction = lockupHolderMap[_from].transferLastTransaction;
              transferTotalSpent = lockupHolderMap[_from].transferTotalSpent;
-             
+
              require((_amount * 10 ** 18) <= ((_totalsupply).mul(transferPercent)).div(100));
-             
+
              require(now >= transferLastTransaction + transferDays);
-             
+
              lockupHolderMap[_from].transferLastTransaction = now;
-             
+
              checkTransfer = true;
              return true;
      }
-     
-    
+
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool success) {
@@ -383,8 +383,8 @@ contract KNOWToken is ERC20
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-     
-     
+
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
@@ -399,20 +399,31 @@ contract KNOWToken is ERC20
         Transfer(msg.sender, _to, _amount);
              return true;
      }
-    
+
      // Transfer the balance from owner's account to another account
     function transferTokens(address _to, uint256 _amount) private returns(bool success) {
-        require( _to != 0x0);       
+        require( _to != 0x0);
         require(balances[address(this)] >= _amount && _amount > 0);
         balances[address(this)] = (balances[address(this)]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
         Transfer(address(this), _to, _amount);
         return true;
      }
- 
-     // Drain all coins 
+
+     // Drain all coins
      function drain() external onlyOwner {
         owner.transfer(this.balance);
      }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

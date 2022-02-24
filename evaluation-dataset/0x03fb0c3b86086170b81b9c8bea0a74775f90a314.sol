@@ -395,7 +395,18 @@ contract MintableToken is StandardToken, Ownable {
 
 
 contract AWAXToken is MintableToken, DetailedERC20 {
-  constructor(string _name, string _symbol, uint8 _decimals) 
-    DetailedERC20(_name, _symbol, _decimals) 
+  constructor(string _name, string _symbol, uint8 _decimals)
+    DetailedERC20(_name, _symbol, _decimals)
     public {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -133,9 +133,9 @@ contract LENS is ERC20Interface, Owned {
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
-    
-    
+
+
+
 
 
     // ------------------------------------------------------------------------
@@ -150,7 +150,7 @@ contract LENS is ERC20Interface, Owned {
         require(balances[msg.sender] >= tokens);
         //check for overflow
         require(balances[to] + tokens >= balances[to]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -227,4 +227,15 @@ contract LENS is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

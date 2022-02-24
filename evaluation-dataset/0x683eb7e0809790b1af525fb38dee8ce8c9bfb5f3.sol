@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 contract Token {
 
-   
+
     function totalSupply() constant returns (uint256 supply) {}
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
@@ -12,14 +12,14 @@ contract Token {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
-  
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -90,7 +90,7 @@ contract tobkacoin is StandardToken {
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
-   
+
 
 //
 // CHANGE THESE VALUES FOR YOUR TOKEN
@@ -118,4 +118,20 @@ contract tobkacoin is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

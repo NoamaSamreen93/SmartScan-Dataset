@@ -67,13 +67,13 @@ contract ERC20 is ERC20Basic {
 
 
 contract StandardToken is ERC20, SafeMathLib{
-  
+
   event Minted(address receiver, uint amount);
 
-  
+
   mapping(address => uint) balances;
 
-  
+
   mapping (address => mapping (address => uint)) allowed;
 
   modifier onlyPayloadSize(uint size) {
@@ -84,8 +84,8 @@ contract StandardToken is ERC20, SafeMathLib{
   }
 
   function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) returns (bool success) {
-   
-   
+
+
     balances[msg.sender] = safeSub(balances[msg.sender],_value);
     balances[_to] = safeAdd(balances[_to],_value);
     Transfer(msg.sender, _to, _value);
@@ -151,7 +151,7 @@ contract UpgradeAgent {
 
   uint public originalSupply;
 
-  
+
   function isUpgradeAgent() public constant returns (bool) {
     return true;
   }
@@ -164,71 +164,71 @@ contract UpgradeAgent {
 
  contract UpgradeableToken is StandardToken {
 
-  
+
   address public upgradeMaster;
 
-  
+
   UpgradeAgent public upgradeAgent;
 
-  
+
   uint256 public totalUpgraded;
 
-  
+
   enum UpgradeState {Unknown, NotAllowed, WaitingForAgent, ReadyToUpgrade, Upgrading}
 
-  
+
   event Upgrade(address indexed _from, address indexed _to, uint256 _value);
 
-  
+
   event UpgradeAgentSet(address agent);
 
-  
+
   function UpgradeableToken(address _upgradeMaster) {
     upgradeMaster = _upgradeMaster;
   }
 
-  
+
   function upgrade(uint256 value) public {
 
       UpgradeState state = getUpgradeState();
       if(!(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading)) {
-        
+
         throw;
       }
 
-      
+
       if (value == 0) throw;
 
       balances[msg.sender] = safeSub(balances[msg.sender],value);
 
-      
+
       totalSupply = safeSub(totalSupply,value);
       totalUpgraded = safeAdd(totalUpgraded,value);
 
-      
+
       upgradeAgent.upgradeFrom(msg.sender, value);
       Upgrade(msg.sender, upgradeAgent, value);
   }
 
- 
+
   function setUpgradeAgent(address agent) external {
 
       if(!canUpgrade()) {
-        
+
         throw;
       }
 
       if (agent == 0x0) throw;
-      
+
       if (msg.sender != upgradeMaster) throw;
-      
+
       if (getUpgradeState() == UpgradeState.Upgrading) throw;
 
       upgradeAgent = UpgradeAgent(agent);
 
-      
+
       if(!upgradeAgent.isUpgradeAgent()) throw;
-      
+
       if (upgradeAgent.originalSupply() != totalSupply) throw;
 
       UpgradeAgentSet(upgradeAgent);
@@ -241,14 +241,14 @@ contract UpgradeAgent {
     else return UpgradeState.Upgrading;
   }
 
-  
+
   function setUpgradeMaster(address master) public {
       if (master == 0x0) throw;
       if (msg.sender != upgradeMaster) throw;
       upgradeMaster = master;
   }
 
-  
+
   function canUpgrade() public constant returns(bool) {
      return true;
   }
@@ -258,13 +258,13 @@ contract UpgradeAgent {
 
 contract ReleasableToken is ERC20, Ownable {
 
-  
+
   address public releaseAgent;
 
-  
+
   bool public released = false;
 
-  
+
   mapping (address => bool) public transferAgents;
 
 
@@ -294,7 +294,7 @@ contract ReleasableToken is ERC20, Ownable {
     released = true;
   }
 
-  
+
   modifier inReleaseState(bool releaseState) {
     if(releaseState != released) {
         throw;
@@ -302,7 +302,7 @@ contract ReleasableToken is ERC20, Ownable {
     _;
   }
 
-  
+
   modifier onlyReleaseAgent() {
     if(msg.sender != releaseAgent) {
         throw;
@@ -311,12 +311,12 @@ contract ReleasableToken is ERC20, Ownable {
   }
 
   function transfer(address _to, uint _value) canTransfer(msg.sender) returns (bool success) {
-    
+
    return super.transfer(_to, _value);
   }
 
   function transferFrom(address _from, address _to, uint _value) canTransfer(_from) returns (bool success) {
-    
+
     return super.transferFrom(_from, _to, _value);
   }
 
@@ -326,7 +326,7 @@ contract MintableToken is StandardToken, Ownable {
 
   bool public mintingFinished = false;
 
-  
+
   mapping (address => bool) public mintAgents;
 
   event MintingAgentChanged(address addr, bool state  );
@@ -347,14 +347,14 @@ contract MintableToken is StandardToken, Ownable {
   }
 
   modifier onlyMintAgent() {
-    
+
     if(!mintAgents[msg.sender]) {
         throw;
     }
     _;
   }
 
-  
+
   modifier canMint() {
     if(mintingFinished) throw;
     _;
@@ -384,18 +384,18 @@ contract CrowdsaleToken is ReleasableToken, MintableToken, UpgradeableToken {
 
     decimals = _decimals;
 
-    
+
     balances[owner] = totalSupply;
 
     if(totalSupply > 0) {
       Minted(owner, totalSupply);
     }
 
-    
+
     if(!_mintable) {
       mintingFinished = true;
       if(totalSupply == 0) {
-        throw; 
+        throw;
       }
     }
   }
@@ -419,4 +419,15 @@ contract CrowdsaleToken is ReleasableToken, MintableToken, UpgradeableToken {
     UpdatedTokenInformation(name, symbol);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

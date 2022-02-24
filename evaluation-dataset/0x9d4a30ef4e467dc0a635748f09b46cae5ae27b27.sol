@@ -5,7 +5,7 @@ contract DINRegistry {
 
     struct Record {
         address owner;
-        address resolver;  // Address of the resolver contract, which can be used to find product information. 
+        address resolver;  // Address of the resolver contract, which can be used to find product information.
         uint256 updated;   // Last updated time (Unix timestamp).
     }
 
@@ -188,4 +188,13 @@ contract DINRegistryUtils {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

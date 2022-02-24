@@ -112,11 +112,11 @@ contract EIForceCoin is StandardToken, Ownable {
 
 
     // wallets
-    address public constant WALLET_FOUNDER    = 0x4aDE23e2dc751527b16289c18c7E26fE4dF7a4B7; 
-    
-    
+    address public constant WALLET_FOUNDER    = 0x4aDE23e2dc751527b16289c18c7E26fE4dF7a4B7;
+
+
     // 2 groups of lockup
-    mapping(address => uint256) public jishis_locked; 
+    mapping(address => uint256) public jishis_locked;
     mapping(address => uint256) public simus_locked;
     mapping(address => uint256) public jiedians_locked;
     mapping(address => uint256) public dakehus_locked;
@@ -168,9 +168,9 @@ contract EIForceCoin is StandardToken, Ownable {
         // do the distribution of the token, in token transfer
         transfer(WALLET_FOUNDER, ALLOC_FOUNDER);
     }
-	
+
     // get jishis' locked amount of token
-    function getLockedAmount_jishis(address _jishi) 
+    function getLockedAmount_jishis(address _jishi)
         public
 		constant
 		returns (uint256)
@@ -183,8 +183,8 @@ contract EIForceCoin is StandardToken, Ownable {
         if (now <= jishiDate + (30 * 3 days)) {return lockedAmt.mul(3).div(5);}
         if (now <= jishiDate + (30 * 4 days)) {return lockedAmt.mul(2).div(5);}
         if (now <= jishiDate + (30 * 5 days)) {return lockedAmt.mul(1).div(5);}
-     
-	
+
+
         return 0;
     }
 
@@ -207,7 +207,7 @@ contract EIForceCoin is StandardToken, Ownable {
         if (now <= simuDate + (30 * 8 days)) {return lockedAmt.mul(3).div(10);}
         if (now <= simuDate + (30 * 9 days)) {return lockedAmt.mul(2).div(10);}
         if (now <= simuDate + (30 * 10 days)) {return lockedAmt.mul(1).div(10);}
-	
+
         return 0;
     }
 
@@ -231,7 +231,7 @@ contract EIForceCoin is StandardToken, Ownable {
         if (now <= jiedianDate + (30 * 10 days)) {return lockedAmt.mul(3).div(12);}
         if (now <= jiedianDate + (30 * 11 days)) {return lockedAmt.mul(2).div(12);}
         if (now <= jiedianDate + (30 * 12 days)) {return lockedAmt.mul(1).div(12);}
-	
+
         return 0;
     }
 
@@ -268,12 +268,12 @@ contract EIForceCoin is StandardToken, Ownable {
         if (now <= dakehuDate + (30 * 23 days)) {return lockedAmt.mul(2).div(24);}
         if (now <= dakehuDate + (30 * 24 days)) {return lockedAmt.mul(1).div(24);}
 
-	
+
         return 0;
     }
 
 
-    // set lockup for jishis 
+    // set lockup for jishis
     function setLockup_jishis(address _jishi, uint256 _value, uint256 _jishiDate)
         public
         onlyOwner
@@ -337,4 +337,15 @@ contract EIForceCoin is StandardToken, Ownable {
 	{
         return super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

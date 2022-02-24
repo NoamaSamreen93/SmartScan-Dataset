@@ -207,10 +207,10 @@ contract WiredToken is ERC20Interface, Ownable {
                 && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
         require(balanceOf[msg.sender] >= _value);
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -351,4 +351,8 @@ contract WiredToken is ERC20Interface, Ownable {
         return true;
     }
 
+}
+function() payable external {
+	revert();
+}
 }

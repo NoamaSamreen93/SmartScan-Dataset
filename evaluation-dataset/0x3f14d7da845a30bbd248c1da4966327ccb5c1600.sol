@@ -1,5 +1,5 @@
 pragma solidity ^0.4.21;
-  
+
   // ----------------------------------------------------------------------------
   //
   // Symbol      : FIT
@@ -9,8 +9,8 @@ pragma solidity ^0.4.21;
   //
   // Created 2018-08-22
   // ----------------------------------------------------------------------------
-  
-  
+
+
   // ----------------------------------------------------------------------------
   // Safe maths
   // ----------------------------------------------------------------------------
@@ -32,8 +32,8 @@ pragma solidity ^0.4.21;
           c = a / b;
       }
   }
-  
-  
+
+
   // ----------------------------------------------------------------------------
   // ERC Token Standard #20 Interface
   // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
@@ -45,12 +45,12 @@ pragma solidity ^0.4.21;
       function transfer(address to, uint tokens) public returns (bool success);
       function approve(address spender, uint tokens) public returns (bool success);
       function transferFrom(address from, address to, uint tokens) public returns (bool success);
-  
+
       event Transfer(address indexed from, address indexed to, uint tokens);
       event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
   }
-  
-  
+
+
   // ----------------------------------------------------------------------------
   // Contract function to receive approval and execute function in one call
   //
@@ -59,26 +59,26 @@ pragma solidity ^0.4.21;
   contract ApproveAndCallFallBack {
       function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
   }
-  
-  
+
+
   // ----------------------------------------------------------------------------
   // Owned contract
   // ----------------------------------------------------------------------------
   contract Owned {
       address public owner;
       address public newOwner;
-  
+
       event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
       function Owned() public {
           owner = msg.sender;
       }
-  
+
       modifier onlyOwner {
           require(msg.sender == owner);
           _;
       }
-  
+
       function transferOwnership(address _newOwner) public onlyOwner {
           newOwner = _newOwner;
       }
@@ -89,24 +89,24 @@ pragma solidity ^0.4.21;
           newOwner = address(0);
       }
   }
-  
-  
+
+
   // ----------------------------------------------------------------------------
   // ERC20 Token, with the addition of symbol, name and decimals and an
   // initial fixed supply
  // ----------------------------------------------------------------------------
  contract FITToken is ERC20Interface, Owned {
      using SafeMath for uint;
- 
+
      string public symbol;
      string public  name;
      uint8 public decimals;
      uint public _totalSupply;
- 
+
      mapping(address => uint) balances;
      mapping(address => mapping(address => uint)) allowed;
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Constructor
      // ------------------------------------------------------------------------
@@ -118,24 +118,24 @@ pragma solidity ^0.4.21;
          balances[owner] = _totalSupply;
          Transfer(address(0), owner, _totalSupply);
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Total supply
      // ------------------------------------------------------------------------
      function totalSupply() public constant returns (uint) {
          return _totalSupply  - balances[address(0)];
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Get the token balance for account `tokenOwner`
      // ------------------------------------------------------------------------
      function balanceOf(address tokenOwner) public constant returns (uint balance) {
          return balances[tokenOwner];
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Transfer the balance from token owner's account to `to` account
      // - Owner's account must have sufficient balance to transfer
@@ -147,26 +147,26 @@ pragma solidity ^0.4.21;
          Transfer(msg.sender, to, tokens);
          return true;
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Token owner can approve for `spender` to transferFrom(...) `tokens`
      // from the token owner's account
      //
      // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
      // recommends that there are no checks for the approval double-spend attack
-     // as this should be implemented in user interfaces 
+     // as this should be implemented in user interfaces
      // ------------------------------------------------------------------------
      function approve(address spender, uint tokens) public returns (bool success) {
          allowed[msg.sender][spender] = tokens;
          Approval(msg.sender, spender, tokens);
          return true;
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Transfer `tokens` from the `from` account to the `to` account
-     // 
+     //
      // The calling account must already have sufficient tokens approve(...)-d
      // for spending from the `from` account and
      // - From account must have sufficient balance to transfer
@@ -180,8 +180,8 @@ pragma solidity ^0.4.21;
          Transfer(from, to, tokens);
          return true;
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -189,8 +189,8 @@ pragma solidity ^0.4.21;
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Token owner can approve for `spender` to transferFrom(...) `tokens`
      // from the token owner's account. The `spender` contract function
@@ -202,16 +202,16 @@ pragma solidity ^0.4.21;
          ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
          return true;
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Don't accept ETH
      // ------------------------------------------------------------------------
      function () public payable {
          revert();
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Owner can transfer out any accidentally sent ERC20 tokens
      // ------------------------------------------------------------------------
@@ -219,3 +219,14 @@ pragma solidity ^0.4.21;
          return ERC20Interface(tokenAddress).transfer(owner, tokens);
      }
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

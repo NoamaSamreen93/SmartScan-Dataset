@@ -44,11 +44,11 @@ contract DutchAuction {
     uint public finalPrice;
     mapping (address => uint) public bids;
     Stages public stage;
-    
+
     // Bidder whitelist. Entries in the array are whitelisted addresses
     // Entries in the address-keyed map represent the (array_index+1) of
-    // the key. 
-    
+    // the key.
+
     address[] public bidderWhitelist; // allows iteration over whitelisted addresses
     mapping (address => uint ) public whitelistIndexMap;  // allows fast address lookup
 
@@ -146,7 +146,7 @@ contract DutchAuction {
         if (whitelistIndexMap[_bidderAddr] == 0)
         {
             uint idxPlusOne = bidderWhitelist.push(_bidderAddr);
-            whitelistIndexMap[_bidderAddr] = idxPlusOne; 
+            whitelistIndexMap[_bidderAddr] = idxPlusOne;
         }
     }
 
@@ -168,17 +168,17 @@ contract DutchAuction {
     function removeFromWhitelist(address _bidderAddr)
         public
         isOwner
-        atStage(Stages.AuctionSetUp)       
+        atStage(Stages.AuctionSetUp)
     {
         require(_bidderAddr != 0);
-        require( whitelistIndexMap[_bidderAddr] != 0); // throw if not in map             
+        require( whitelistIndexMap[_bidderAddr] != 0); // throw if not in map
         uint idx = whitelistIndexMap[_bidderAddr] - 1;
         bidderWhitelist[idx] = 0;
         whitelistIndexMap[_bidderAddr] = 0;
     }
-    
+
     /// @dev Is this addres in the whitelist?
-    /// @param _addr Bidder Eth address    
+    /// @param _addr Bidder Eth address
     function isInWhitelist(address _addr)
         public
         constant
@@ -186,13 +186,13 @@ contract DutchAuction {
     {
         return (whitelistIndexMap[_addr] != 0);
     }
-    
+
     /// @dev Number of non-zero entries in whitelist
     /// @return number of non-zero entries
     function whitelistCount()
         public
         constant
-        returns (uint)        
+        returns (uint)
     {
         uint count = 0;
         for (uint i = 0; i< bidderWhitelist.length; i++) {
@@ -201,7 +201,7 @@ contract DutchAuction {
         }
         return count;
     }
-    
+
     /// @dev Fetch entries in whitelist
     /// @param _startIdx starting index
     /// @param _count number to fetch. zero for all.
@@ -211,35 +211,35 @@ contract DutchAuction {
     function whitelistEntries(uint _startIdx, uint _count)
         public
         constant
-        returns (address[])        
+        returns (address[])
     {
         uint addrCount = whitelistCount();
         if (_count == 0)
-            _count = addrCount; 
+            _count = addrCount;
         if (_startIdx >= addrCount) {
             _startIdx = 0;
             _count = 0;
         } else if (_startIdx + _count > addrCount) {
-            _count = addrCount - _startIdx;        
+            _count = addrCount - _startIdx;
         }
 
         address[] memory results = new address[](_count);
         // skip to startIdx
-        uint dynArrayIdx = 0; 
+        uint dynArrayIdx = 0;
         while (_startIdx > 0) {
             if (bidderWhitelist[dynArrayIdx++] != 0)
-                _startIdx--;  
-        }   
+                _startIdx--;
+        }
         // copy into results
-        uint resultsIdx = 0; 
+        uint resultsIdx = 0;
         while (resultsIdx < _count) {
             address addr = bidderWhitelist[dynArrayIdx++];
             if (addr != 0)
-                results[resultsIdx++] = addr;      
+                results[resultsIdx++] = addr;
         }
-        return results;    
-    }    
-    
+        return results;
+    }
+
     /// @dev Starts auction and sets startBlock.
     function startAuction()
         public
@@ -298,8 +298,8 @@ contract DutchAuction {
         if (receiver == 0)
             receiver = msg.sender;
 
-        require(isInWhitelist(receiver));         
-            
+        require(isInWhitelist(receiver));
+
         amount = msg.value;
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
         uint maxWei = (MAX_TOKENS_SOLD / 10**18) * calcTokenPrice() - totalReceived;
@@ -374,4 +374,15 @@ contract DutchAuction {
         virtuePlayerPoints.transfer(wallet, MAX_TOKENS_SOLD - soldTokens);
         endTime = now;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

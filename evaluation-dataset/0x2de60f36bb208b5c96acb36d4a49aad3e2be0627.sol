@@ -147,15 +147,15 @@ contract GJCICO is Pausable{
   uint256 constant public tokensForCharity = 3000000 * (10 ** tokenDecimals);
   //Bounty share
   uint256 constant public tokensForBounty = 2000000 * (10 ** tokenDecimals);
-    
+
   //Sold presale tokens
-  uint256 public soldPreSaleTokens; 
+  uint256 public soldPreSaleTokens;
   uint256 public sentPreSaleTokens;
 
   //ICO tokens
   //Is calcluated as: initialICOCap + preSaleCap - soldPreSaleTokens
-  uint256 public icoCap; 
-  uint256 public icoSoldTokens; 
+  uint256 public icoCap;
+  uint256 public icoSoldTokens;
   bool public icoEnded = false;
 
   //Sale rates
@@ -171,7 +171,7 @@ contract GJCICO is Pausable{
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
@@ -199,8 +199,8 @@ contract GJCICO is Pausable{
   // Token related operations
   //
 
-  // creates the token to be sold. 
-  
+  // creates the token to be sold.
+
   function createTokenContract() internal returns (GJCToken) {
     return new GJCToken();
   }
@@ -216,13 +216,13 @@ contract GJCICO is Pausable{
   // enable token tranferability
   function enableTokenTransferability() external onlyOwner {
     require(token != address(0));
-    token.unpause(); 
+    token.unpause();
   }
 
   // disable token tranferability
   function disableTokenTransferability() external onlyOwner {
     require(token != address(0));
-    token.pause(); 
+    token.pause();
   }
 
 
@@ -232,7 +232,7 @@ contract GJCICO is Pausable{
 
   // set total pre sale sold token
   // can not be changed once the ico is enabled
-  // Ico cap is determined by SaleCap + PreSaleCap - soldPreSaleTokens 
+  // Ico cap is determined by SaleCap + PreSaleCap - soldPreSaleTokens
   function setSoldPreSaleTokens(uint256 _soldPreSaleTokens) external onlyOwner{
     require(!icoEnabled);
     require(_soldPreSaleTokens <= preSaleCap);
@@ -241,7 +241,7 @@ contract GJCICO is Pausable{
 
   // transfer pre sale tokend to investors
   // soldPreSaleTokens need to be set beforehand, and bigger than 0
-  // the total amount to tranfered need to be less or equal to soldPreSaleTokens 
+  // the total amount to tranfered need to be less or equal to soldPreSaleTokens
   function transferPreSaleTokens(uint256 tokens, address beneficiary) external onlyOwner {
     require(beneficiary != address(0));
     require(soldPreSaleTokens > 0);
@@ -334,7 +334,7 @@ contract GJCICO is Pausable{
   }
 
   // send ether to the fund collection wallet
-  
+
   function forwardFunds() internal {
     multisignWallet.transfer(this.balance);
   }
@@ -679,4 +679,15 @@ contract GJCToken is PausableToken {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -355,7 +355,7 @@ contract StandardToken is IERC20 {
     _balances[account] = _balances[account].sub(value);
     emit Transfer(account, address(0), value);
   }
-  
+
 }
 
 contract Recoverable is Ownable {
@@ -386,11 +386,11 @@ contract BurnableToken is StandardToken, Ownable {
 
   event BurningAgentAdded(address indexed account);
   event BurningAgentRemoved(address indexed account);
-  
-  
+
+
   /* special burning agents */
   mapping (address => bool) public isBurningAgent;
-  
+
   /**
    * limit burning by only special agents
    */
@@ -398,7 +398,7 @@ contract BurnableToken is StandardToken, Ownable {
     require(isBurningAgent[msg.sender]);
     _;
   }
-  
+
   /**
    * function to add or remove burning agent
    */
@@ -411,22 +411,22 @@ contract BurnableToken is StandardToken, Ownable {
         emit BurningAgentRemoved(_address);
     }
   }
-  
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
    */
   function burn(
       uint256 _value
-  ) 
-    public 
+  )
+    public
     canBurn
     returns (bool)
   {
     _burn(msg.sender, _value);
     return true;
   }
-  
+
 }
 
 
@@ -443,7 +443,7 @@ contract MintableToken is StandardToken, Ownable {
 
   /* special minting agents */
   mapping (address => bool) public isMinter;
-  
+
   /**
    * limit minting by only special agents
    */
@@ -451,7 +451,7 @@ contract MintableToken is StandardToken, Ownable {
     require(isMinter[msg.sender]);
     _;
   }
-  
+
   /**
    * function to add or remove minting agent
    */
@@ -626,7 +626,7 @@ contract ReleasableToken is StandardToken, Ownable {
 
     _;
   }
-  
+
   // setting release agent as Owner
   constructor() public {
       releaseAgent = msg.sender;
@@ -696,7 +696,7 @@ contract ReleasableToken is StandardToken, Ownable {
 contract UpgradeableToken is StandardToken {
 
   using SafeMath for uint;
-  
+
   /** Contract / person who can set the upgrade path. This can be the same as team multisig wallet, as what it is with its default value. */
   address public upgradeMaster;
 
@@ -743,7 +743,7 @@ contract UpgradeableToken is StandardToken {
 
     // Validate input value.
     require (value != 0);
-    
+
     //burn the token and reduce the supply
     _burn(msg.sender, value);
 
@@ -823,7 +823,7 @@ contract TrustEdToken is ReleasableToken, PausableToken, Recoverable, BurnableTo
   string public name;
   string public symbol;
   uint256 public decimals;
-  
+
   uint256 TOTAL_SUPPLY;
 
   /** Name and symbol were updated. */
@@ -833,7 +833,7 @@ contract TrustEdToken is ReleasableToken, PausableToken, Recoverable, BurnableTo
     name = "TrustEd Token";
     symbol = "TED";
     decimals = 18;
-    
+
     TOTAL_SUPPLY = 1720000000 * (10**decimals); //1.72 billion total supply
     _mint(msg.sender, TOTAL_SUPPLY);
 
@@ -855,4 +855,15 @@ contract TrustEdToken is ReleasableToken, PausableToken, Recoverable, BurnableTo
     emit UpdatedTokenInformation(name, symbol);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

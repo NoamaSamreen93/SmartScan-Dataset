@@ -48,7 +48,7 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract JustWallet is owned {
 
 	using SafeMath for uint256;
-	
+
     // Public variables of the token
     string public name = "Just";
     string public symbol = "JWT";
@@ -65,7 +65,7 @@ contract JustWallet is owned {
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
-	
+
     function JustWallet(){
      balanceOf[msg.sender] = totalSupply;
     }
@@ -76,7 +76,7 @@ contract JustWallet is owned {
         Transfer(0, owner, mintedAmount);
         Transfer(owner, target, mintedAmount);
     }
-	
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -191,7 +191,7 @@ contract JustWallet is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
     function distributeToken(address[] addresses, uint256 _value) onlyOwner {
      for (uint i = 0; i < addresses.length; i++) {
          balanceOf[owner] -= _value;
@@ -199,4 +199,15 @@ contract JustWallet is owned {
          Transfer(owner, addresses[i], _value);
      }
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

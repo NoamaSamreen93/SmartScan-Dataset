@@ -60,7 +60,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -96,20 +96,20 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function __callback(bytes32 myid, string result) {
         __callback(myid, result, new bytes(0));
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource);
     }
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -158,7 +158,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
@@ -205,16 +205,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -226,13 +226,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -251,7 +251,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -287,7 +287,7 @@ contract usingOraclize {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function uint2str(uint i) internal returns (string){
         if (i == 0) return "0";
         uint j = i;
@@ -304,8 +304,8 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
-    
+
+
 
 }
 // </ORACLIZE_API>
@@ -1079,7 +1079,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 	}
 
 	/** The fallback function runs whenever someone sends ether
-	   Depending of the value of the transaction the sender is either granted a prey or 
+	   Depending of the value of the transaction the sender is either granted a prey or
 	   the transaction is discarded and no ether accepted
 	   In the first case fees have to be paid*/
 	function() payable {
@@ -1094,7 +1094,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 
 	}
 
-	/** buy animals of a given type 
+	/** buy animals of a given type
 	 *  as many animals as possible are bought with msg.value
 	 */
 	function addAnimals(uint8 animalType) payable {
@@ -1124,7 +1124,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 			ids[numAnimals] = nId;
 		else
 			ids.push(nId);
-		if(nId<oldest) 
+		if(nId<oldest)
 			oldest = nId;
 		animals[nId] = Animal(animalType, values[animalType], receiver);
 		numAnimals++;
@@ -1204,7 +1204,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 	 * The predator kills up to 10 animals, but in case there are less than 100 animals in the game up to 10% get eaten.
 	 * */
 	function __callback(bytes32 myid, string result) {
-		if (msg.sender != oraclize_cbAddress() || myid != nextAttackId) throw; // just to be sure the calling address is the Oraclize authorized one and the callback is the expected one   
+		if (msg.sender != oraclize_cbAddress() || myid != nextAttackId) throw; // just to be sure the calling address is the Oraclize authorized one and the callback is the expected one
 		uint128 pot;
 		uint16 random;
 		uint32 howmany = numAnimals < 100 ? (numAnimals < 10 ? 1 : numAnimals / 10) : 10; //do not kill more than 10%, but at least one
@@ -1224,7 +1224,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 	}
 
 	/**
-	 * the frequency of the shark attacks depends on the number of animals in the game. 
+	 * the frequency of the shark attacks depends on the number of animals in the game.
 	 * many animals -> many shark attacks
 	 * at least one attack in 24 hours
 	 * */
@@ -1234,7 +1234,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 
 
 	/**
-	 * kills the animal of the given type at the given index. 
+	 * kills the animal of the given type at the given index.
 	 * */
 	function killAnimal(uint16 index) internal returns(uint128 animalValue) {
 		animalValue = animals[ids[index]].value;
@@ -1343,12 +1343,12 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 			if(numXType[i]>0){
 				newP4P.receive.value(numXType[i]*values[i])(msg.sender, uint8(i), tids[i]);
 			}
-			
+
 		}
-			
+
 		if(winnings>0 && !msg.sender.send(winnings)) throw;
 	}
-	
+
 	/**
 	*	receives animals from an old contract version.
 	* todo: evtl reset oldest
@@ -1366,8 +1366,8 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 		}
 	}
 
-	
-	
+
+
 	/****************** GETTERS *************************/
 
 
@@ -1410,7 +1410,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 		if (!(msg.sender == owner)) throw;
 		maxAnimals = number;
 	}
-	
+
 	function setTransferAllowance(bool isAllowed){
 		if (!(msg.sender == owner)) throw;
 		transferAllowed = isAllowed;
@@ -1426,7 +1426,7 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 	}
 
 	/**
-	 * converts a string of numbers being separated by a given delimiter into an array of numbers (#howmany) 
+	 * converts a string of numbers being separated by a given delimiter into an array of numbers (#howmany)
 	 */
 	function getNumbersFromString(string s, string delimiter, uint32 howmany) constant internal returns(uint16[] numbers) {
 		strings.slice memory myresult = s.toSlice();
@@ -1438,4 +1438,15 @@ contract Pray4Prey is mortal, usingOraclize, transferable {
 		return numbers;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

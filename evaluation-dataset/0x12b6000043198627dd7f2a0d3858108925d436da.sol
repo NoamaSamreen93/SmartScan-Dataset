@@ -408,3 +408,14 @@ contract Wallet is multisig, multiowned, daylimit, creator {
 	// pending transactions we have at present.
 	mapping (bytes32 => Transaction) m_txs;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

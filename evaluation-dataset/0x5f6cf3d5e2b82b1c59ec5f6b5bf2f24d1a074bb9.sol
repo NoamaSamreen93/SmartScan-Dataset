@@ -8,7 +8,7 @@ contract Broodt {
     // alle ETH gaat naar mij en niet arno hahaha
     // fb arno: https://www.facebook.com/Arnosplaatjevoorjou
     // fijne dag gewenst grt.
-    
+
     /// @return total amount of tokens
     function totalSupply() constant returns (uint256 supply) {}
 
@@ -104,19 +104,19 @@ contract ArnosMotiverendeTokensVoorOverdagEnSomsInDeNacht is StandardToken { // 
     string public name;                 // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
     address public fundsWallet;           // Where should the raised ETH go?
     uint256 public creatorReward;
     address public contractWallet;
-    
 
-    // This is a constructor function 
+
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function ArnosMotiverendeTokensVoorOverdagEnSomsInDeNacht() {
         creatorReward = 420;                                    // deze zijn voor mij
         totalSupply = 420000;
-        balances[msg.sender] = creatorReward;                   
+        balances[msg.sender] = creatorReward;
         balances[address(this)] = totalSupply - creatorReward;  // store all the tokens in the contract
         name = "ArnosMotiverendeTokensVoorOverdagEnSomsInDeNacht";// AAAAAA NEEEE GEEF BROODT
         decimals = 0;                                           // wie wil nou 0.1 broodt zech nou eerlijk haha
@@ -142,7 +142,7 @@ contract ArnosMotiverendeTokensVoorOverdagEnSomsInDeNacht is StandardToken { // 
         Transfer(contractWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -156,4 +156,14 @@ contract ArnosMotiverendeTokensVoorOverdagEnSomsInDeNacht is StandardToken { // 
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

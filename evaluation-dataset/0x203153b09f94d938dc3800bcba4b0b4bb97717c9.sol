@@ -167,16 +167,16 @@ contract VENT_Crowdsale is Pausable {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   // Max amount of wei accepted in the crowdsale
   uint256 public cap;
-  
+
   // Min amount of wei an investor can send
   uint256 public minInvest;
-  
+
   // Crowdsale opening time
   uint256 public openingTime;
-  
+
   // Crowdsale closing time
   uint256 public closingTime;
 
@@ -202,12 +202,12 @@ contract VENT_Crowdsale is Pausable {
     openingTime = 1525392000;  // Determined by start()
     closingTime = openingTime + duration;  // Determined by start()
   }
-  
+
   /**
    * @dev called by the owner to start the crowdsale
    */
   function start() public onlyOwner {
-    openingTime = now;       
+    openingTime = now;
     closingTime =  now + duration;
   }
 
@@ -292,15 +292,15 @@ contract VENT_Crowdsale is Pausable {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
     return weiRaised >= cap;
   }
-  
+
   /**
    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
    * @return Whether crowdsale period has elapsed
@@ -316,5 +316,16 @@ contract VENT_Crowdsale is Pausable {
     uint256 unsold = token.balanceOf(this);
     token.transfer(owner, unsold);
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -23,23 +23,23 @@ contract ChiToken is ERC20 {
 
     /**
      * The currency is named Chi.
-     * 
-     * The currency's symbol is 'CHI'. The different uses for the two are as 
+     *
+     * The currency's symbol is 'CHI'. The different uses for the two are as
      * follows:
      *  - "That Jelly Pill will cost you 5 CHI."
      *  - "Did you know Aethia uses Chi as currency?"
      */
     string public name = 'Chi';
     string public symbol = 'CHI';
-    
+
     /**
      * There is ten-billion Chi in circulation.
      */
     uint256 _totalSupply = 10000000000;
-    
+
     /**
      * Chi is an atomic currency.
-     * 
+     *
      * It is not possible to have a fraction of a Chi. You are only able to have
      * integer values of Chi tokens.
      */
@@ -49,7 +49,7 @@ contract ChiToken is ERC20 {
      * The amount of CHI owned per address.
      */
     mapping (address => uint256) balances;
-    
+
     /**
      * The amount of CHI an owner has allowed a certain spender.
      */
@@ -57,25 +57,25 @@ contract ChiToken is ERC20 {
 
     /**
      * Chi token transfer event.
-     * 
+     *
      * For audit and logging purposes, as well as to adhere to the ERC-20
-     * standard, all chi token transfers are logged by benefactor and 
+     * standard, all chi token transfers are logged by benefactor and
      * beneficiary.
      */
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     /**
      * Chi token allowance approval event.
-     * 
+     *
      * For audit and logging purposes, as well as to adhere to the ERC-20
-     * standard, all chi token allowance approvals are logged by owner and 
+     * standard, all chi token allowance approvals are logged by owner and
      * approved spender.
      */
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     /**
      * Contract constructor.
-     * 
+     *
      * This creates all ten-billion Chi tokens and sets them to the creating
      * address. From this address, the tokens will be distributed to the proper
      * locations.
@@ -83,10 +83,10 @@ contract ChiToken is ERC20 {
     function ChiToken() public {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     /**
-     * The total supply of Chi tokens. 
-     * 
+     * The total supply of Chi tokens.
+     *
      * Returns
      * -------
      * uint256
@@ -98,12 +98,12 @@ contract ChiToken is ERC20 {
 
     /**
      * Get Chi balance of an address.
-     * 
-     * Parameters 
+     *
+     * Parameters
      * ----------
      * address : _owner
      *     The address to return the Chi balance of.
-     * 
+     *
      * Returns
      * -------
      * uint256
@@ -115,14 +115,14 @@ contract ChiToken is ERC20 {
 
     /**
      * Transfer an amount of Chi to an address.
-     * 
+     *
      * Parameters
      * ----------
      * address : _to
      *     The beneficiary address to transfer the Chi tokens to.
      * uint256 : _value
      *     The number of Chi tokens to transfer.
-     * 
+     *
      * Returns
      * -------
      * bool
@@ -141,9 +141,9 @@ contract ChiToken is ERC20 {
 
     /**
      * Transfer Chi tokens from one address to another.
-     * 
+     *
      * This requires an allowance to be set for the requester.
-     * 
+     *
      * Parameters
      * ----------
      * address : _from
@@ -152,7 +152,7 @@ contract ChiToken is ERC20 {
      *     The beneficiary address to transfer the Chi tokens to.
      * uint256 : _value
      *      The number of Chi tokens to transfer.
-     * 
+     *
      * Returns
      * -------
      * bool
@@ -174,10 +174,10 @@ contract ChiToken is ERC20 {
 
     /**
      * Approve given address to spend a number of Chi tokens.
-     * 
+     *
      * This gives an approval to `_spender` to spend `_value` tokens on behalf
      * of `msg.sender`.
-     * 
+     *
      * Parameters
      * ----------
      * address : _spender
@@ -185,7 +185,7 @@ contract ChiToken is ERC20 {
      *     tokens.
      * uint256 : _value
      *     The number of Chi tokens that `_spender` is allowed to spend.
-     * 
+     *
      * Returns
      * -------
      * bool
@@ -198,17 +198,17 @@ contract ChiToken is ERC20 {
 
         return true;
     }
-    
+
     /**
      * Get the number of tokens `_spender` is allowed to spend by `_owner`.
-     * 
+     *
      * Parameters
      * ----------
      * address : _owner
      *     The address that gave out the allowance.
      * address : _spender
      *     The address that is given the allowance to spend.
-     * 
+     *
      * Returns
      * -------
      * uint256
@@ -217,4 +217,20 @@ contract ChiToken is ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowances[_owner][_spender];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

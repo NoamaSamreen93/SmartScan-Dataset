@@ -28,7 +28,7 @@ contract ERC721 {
 
 contract PowZoneToken is ERC721 {
 
-  address cryptoVideoGames = 0xdEc14D8f4DA25108Fd0d32Bf2DeCD9538564D069; 
+  address cryptoVideoGames = 0xdEc14D8f4DA25108Fd0d32Bf2DeCD9538564D069;
   address cryptoVideoGameItems = 0xD2606C9bC5EFE092A8925e7d6Ae2F63a84c5FDEa;
 
   /*** EVENTS ***/
@@ -39,7 +39,7 @@ contract PowZoneToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -244,10 +244,10 @@ contract PowZoneToken is ERC721 {
     if (oldOwner != address(this)) {
       oldOwner.transfer(payment); //(1-0.2)
     }
-    
+
     msg.sender.transfer(purchaseExcess);
     _transferDivs(gameOwnerPayment, gameItemOwnerPayment, _tokenId);
-    
+
   }
 
   /// Divident distributions
@@ -487,11 +487,22 @@ contract CryptoVideoGames {
     // This function will return only the owner address of a specific Video Game
     function getVideoGameOwner(uint _videoGameId) public view returns(address) {
     }
-    
+
 }
 
 
 contract CryptoVideoGameItem {
   function getVideoGameItemOwner(uint _videoGameItemId) public view returns(address) {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

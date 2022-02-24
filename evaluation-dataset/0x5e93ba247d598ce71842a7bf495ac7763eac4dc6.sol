@@ -194,8 +194,8 @@ library Verifier
 
 
     function negateY( uint256 Y )
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         uint q = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
@@ -248,12 +248,12 @@ library Verifier
         assert ok == FQ12.one()
     */
     function verify (uint256[14] memory in_vk, uint256[] memory vk_gammaABC, uint256[8] memory in_proof, uint256[] memory proof_inputs)
-        internal 
-        view 
+        internal
+        view
         returns (bool)
     {
         require( ((vk_gammaABC.length / 2) - 1) == proof_inputs.length );
-        
+
         // Compute the linear combination vk_x
         uint256[3] memory mul_input;
         uint256[4] memory add_input;
@@ -275,14 +275,14 @@ library Verifier
                 success := staticcall(sub(gas, 2000), 7, mul_input, 0x80, add(add_input, 0x40), 0x60)
             }
             require(success);
-            
+
             assembly {
                 // ECADD
                 success := staticcall(sub(gas, 2000), 6, add_input, 0xc0, add_input, 0x60)
             }
             require(success);
         }
-        
+
         uint[24] memory input = [
             // (proof.A, proof.B)
             in_proof[0], in_proof[1],                           // proof.A   (G1)
@@ -311,8 +311,8 @@ library Verifier
 
 
     function verify(VerifyingKey memory vk, ProofWithInput memory pwi)
-        internal 
-        view 
+        internal
+        view
         returns (bool)
     {
         return verify(vk, pwi.proof, pwi.input);
@@ -320,8 +320,8 @@ library Verifier
 
 
     function verify(VerifyingKey memory vk, Proof memory proof, uint256[] memory input)
-        internal 
-        view 
+        internal
+        view
         returns (bool)
     {
         require(input.length + 1 == vk.gammaABC.length);
@@ -350,7 +350,7 @@ library MiMC
 
     /**
     * MiMC-p/p with exponent of 7
-    * 
+    *
     * Recommended at least 46 rounds, for a polynomial degree of 2^126
     */
     function MiMCpe7( uint256 in_x, uint256 in_k, uint256 in_seed, uint256 round_count )
@@ -383,7 +383,7 @@ library MiMC
             out_x := addmod(in_x, in_k, localQ)
         }
     }
-       
+
     function MiMCpe7_mp( uint256[] memory in_x, uint256 in_k, uint256 in_seed, uint256 round_count )
         internal pure returns (uint256)
     {
@@ -405,7 +405,7 @@ library MiMC
         // assembly {
         //     r := addmod(addmod(r, x1, localQ), m1, localQ)
         // }
-        
+
         return r;
     }
 
@@ -504,8 +504,8 @@ library MerkleTree
     * Returns calculated merkle root
     */
     function verifyPath(uint256 leaf, uint256[15] memory in_path, bool[15] memory address_bits)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256 merkleRoot)
     {
         uint256[15] memory IVs;
@@ -524,8 +524,8 @@ library MerkleTree
 
 
     function verifyPath(Data storage self, uint256 leaf, uint256[15] memory in_path, bool[15] memory address_bits)
-        internal 
-        view 
+        internal
+        view
         returns (bool)
     {
         return verifyPath(leaf, in_path, address_bits) == getRoot(self);
@@ -770,3 +770,10 @@ contract Mixer
         return tree.getNextLeafIndex();
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

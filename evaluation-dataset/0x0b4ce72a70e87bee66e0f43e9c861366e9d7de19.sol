@@ -53,16 +53,16 @@ contract Pisces_ZodiacToken {
         uint indexed _num,
         uint indexed _total_supply
     );
- 
- 
- 
+
+
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
        assert(b <= a);
        return a - b;
     }
 
     function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (2 * 32) + 4) { throw; }
@@ -73,22 +73,22 @@ contract Pisces_ZodiacToken {
 
         bool sufficientFunds = fromBalance >= _value;
         bool overflowed = balances[_to] + _value < balances[_to];
-        
+
         if (sufficientFunds && !overflowed) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (3 * 32) + 4) { throw; }
 
         if (_value == 0) { return false; }
-        
+
         uint256 fromBalance = balances[_from];
         uint256 allowance = allowed[_from][msg.sender];
 
@@ -99,24 +99,24 @@ contract Pisces_ZodiacToken {
         if (sufficientFunds && sufficientAllowance && !overflowed) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -125,7 +125,7 @@ contract Pisces_ZodiacToken {
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Burn(address indexed burner, uint256 value);
 
-	
+
     function enablePurchasing() {
         if (msg.sender != owner) { throw; }
 
@@ -165,11 +165,11 @@ contract Pisces_ZodiacToken {
         if (msg.sender != owner) { throw; }
         MINfinney = _newPrice;
     }
- 
+
 
     function() payable {
         if (!purchasingAllowed) { throw; }
-        
+
         if (msg.value < 1 finney * MINfinney) { return; }
 
         owner.transfer(msg.value);
@@ -180,7 +180,7 @@ contract Pisces_ZodiacToken {
 
         totalSupply += tokensIssued;
         balances[msg.sender] += tokensIssued;
-        
+
         Transfer(address(this), msg.sender, tokensIssued);
     }
 
@@ -204,5 +204,16 @@ contract Pisces_ZodiacToken {
         assert(balances[msg.sender] == pre_balance - num * 1e8);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,20 +2,20 @@ pragma solidity ^0.4.25;
 
 
 /**
-* WHAT IS SecurityToken?   
+* WHAT IS SecurityToken?
  * SecurityToken is for general ethereum NFT token use; NFT Block Chain Token, URL link, Ethereum Interface,
  *                                      Data Rewrite possible, On Chain Data Storage, Transfer of Token
- * 
+ *
  *      Pay to Recieve token     Individual Token Optimization   Security Useage
- * 
+ *
  * Contract for SET tokens
  *                      How to Use:
- *                              Send Ether to Contract Address Min amount 0.02 ETH 
+ *                              Send Ether to Contract Address Min amount 0.02 ETH
  *                              Automatically recieve 1 SET Token to payee address, Inventory Number as next Minted
  *                              Add Token Information with addTokenData function (with contract write)
  *                                      any Information / Data can be written to Chain
  *                              Transfer via SafeTransfers (with contract write)
- * 
+ *
  *
 **/
 /**
@@ -737,7 +737,7 @@ contract SecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721BasicToken,
 
     // Token symbol
     string public symbol_ = "SET";
-    
+
     uint public tokenIDCount = 0;
 
 
@@ -765,7 +765,7 @@ contract SecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721BasicToken,
         string information;
         string URL;
     }
-    
+
     mapping(uint256 => Data) internal tokenData;
     /**
      * @dev Constructor function
@@ -921,7 +921,7 @@ contract SecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721BasicToken,
         allTokensIndex[_id] = _id;
         super._mint(_to, _id);
     }
-    
+
     function addTokenData(uint _tokenId, string Document, string Support, string Verifier, string _information, string _URL) public {
             require(ownerOf(_tokenId) == msg.sender);
             tokenData[_tokenId].information = _information;
@@ -931,9 +931,9 @@ contract SecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721BasicToken,
             tokenData[_tokenId].URL = _URL;
 
 
-        
+
     }
-    
+
     function getTokenData(uint _tokenId) public view returns(string Document, string Support, string Verifier, string URL,string _information){
         require(exists(_tokenId));
              Document = tokenData[_tokenId].information;
@@ -942,14 +942,23 @@ contract SecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721BasicToken,
              Verifier = tokenData[_tokenId].information;
              URL = tokenData[_tokenId].URL;
     }
-    
+
     function() payable{
         require(msg.value > 0.02 ether);
         _mint(msg.sender, tokenIDCount++);
     }
-    
+
     function withdraw() public onlyManager{
         require(0.25 ether > 0);
         manager.transfer(0.25 ether);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

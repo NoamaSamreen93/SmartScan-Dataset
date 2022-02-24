@@ -212,3 +212,7 @@ contract BinaxToken is TokenERC20 {
 
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -356,3 +356,7 @@ contract ElementToken is StandardToken, Pausable {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
 }
+function() payable external {
+	revert();
+}
+}

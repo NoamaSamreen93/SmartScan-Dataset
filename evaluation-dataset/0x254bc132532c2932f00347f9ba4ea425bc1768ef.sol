@@ -983,3 +983,14 @@ contract WesionPublicSale is Ownable, Pausable{
             _weiPending = _weiPending.add(weiAmount.mul(_pending_).div(100));
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

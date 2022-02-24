@@ -8,7 +8,7 @@ contract PirateNinjaCoin {
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
     address profit;
     uint256 public buyPrice;
     uint256 public sellPrice;
@@ -36,11 +36,11 @@ contract PirateNinjaCoin {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
-        
+
         buyPrice = initPrice;
         profit = msg.sender;
         maxBuyPrice = finalPrice;
-        
+
         flame = 60000;                                      //set the initial flame to 50%
     }
 
@@ -69,7 +69,7 @@ contract PirateNinjaCoin {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -99,7 +99,7 @@ contract PirateNinjaCoin {
         if (_value > allowance[_from][msg.sender]) throw;    // Check allowance
         balanceOf[_from] -= _value;                          // Subtract from the sender
         totalSupply -= _value;                               // Updates totalSupply
-        profit.transfer((_value * (110000 - flame) / 100000) * sellPrice); 
+        profit.transfer((_value * (110000 - flame) / 100000) * sellPrice);
         setSellPrice();
         Burn(_from, _value);
         return true;
@@ -108,7 +108,7 @@ contract PirateNinjaCoin {
     /* start of pirateNinjaCoin specific function */
     event NewSellPrice(uint256 value);
     event NewBuyPrice(uint256 value);
-    
+
     function setSellPrice(){
         if(totalSupply > 0){
             sellPrice = this.balance / totalSupply;
@@ -117,12 +117,12 @@ contract PirateNinjaCoin {
             NewSellPrice(sellPrice);
         }
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == profit);
         _;
     }
-    
+
     function adjustFlame(uint256 _flame) onlyOwner{
         flame = _flame;
     }
@@ -131,34 +131,45 @@ contract PirateNinjaCoin {
         uint256 fee = (msg.value * 42 / 100000);
         if(msg.value < (buyPrice + fee)) throw; //check if enough ether was send
         uint256 amount = (msg.value - fee) / buyPrice;
-        
+
         if (totalSupply + amount < totalSupply) throw; //check for overflows
         if (balanceOf[msg.sender] + amount < balanceOf[msg.sender]) throw; //check for overflows
         balanceOf[msg.sender] += amount;
-        
+
         profit.transfer(fee);
         msg.sender.transfer(msg.value - fee - (amount * buyPrice)); //send back ethers left
-        
-        totalSupply += amount; 
-        
+
+        totalSupply += amount;
+
         if(buyPrice < maxBuyPrice){
             buyPrice = buyPrice * 100015 / 100000;
             if(buyPrice > maxBuyPrice) buyPrice = maxBuyPrice;
             NewBuyPrice(buyPrice);
         }
-        
+
         setSellPrice();
     }
 
     function sell(uint256 _amount) {
-        if (balanceOf[msg.sender] < _amount) throw;    
-       
+        if (balanceOf[msg.sender] < _amount) throw;
+
         uint256 ethAmount = sellPrice * _amount;
         uint256 fee = (ethAmount * 42 / 100000);
         profit.transfer(fee);
         msg.sender.transfer(ethAmount - fee);
         balanceOf[msg.sender] -= _amount;
-        totalSupply -= _amount; 
+        totalSupply -= _amount;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

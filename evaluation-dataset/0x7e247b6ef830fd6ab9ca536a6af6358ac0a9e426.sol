@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 contract Algo_Exchange_Index_II {
-   
+
     mapping (address => uint256) public balanceOf;
 
     string public name = "Algo Exchange Index II";
@@ -52,4 +52,15 @@ contract Algo_Exchange_Index_II {
         emit Transfer(from, to, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

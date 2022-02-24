@@ -21,7 +21,7 @@ contract ERC20 {
     event Transfer (address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
 }
 
 
@@ -98,7 +98,7 @@ library SafeMath {
  * Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) internal balances;
@@ -221,15 +221,15 @@ contract StandardToken is ERC20 {
  * @title IMPCoin implementation based on ERC20 standard token
  */
 contract IMPERIVMCoin is StandardToken {
-    
+
     using SafeMath for uint;
-    
+
     string public name = "IMPERIVMCoin";
     string public symbol = "IMPCN";
     uint8 public decimals = 6;
-    
+
     address owner;
-    
+
     /**
      *  @dev Contract initiallization
      *  @param _initialSupply total tokens amount
@@ -239,5 +239,16 @@ contract IMPERIVMCoin is StandardToken {
         owner = msg.sender;
         balances[owner] = balances[owner].add(totalSupply_);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -35,10 +35,10 @@ contract ERC20 is ERC20Basic {
  * @dev A contract to depsoit Tokens and get your address registered for bep2 receival
  */
 contract BawSwapContract{
-    
+
     ERC20 public token;
     address public owner;
-    
+
     /**
     * @param _token An address for ERC20 token which would be swaped be bep2
     */
@@ -46,14 +46,14 @@ contract BawSwapContract{
         token = _token;
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not the owner");
         _;
     }
-    
+
     event OwnerChanged(address oldOwner, address newOwner);
-    
+
     /**
     * @dev only to be called by the owner of Swap contract
     * @param _newOwner An address to replace the old owner with.
@@ -62,51 +62,62 @@ contract BawSwapContract{
         owner = _newOwner;
         emit OwnerChanged(msg.sender, owner);
     }
-    
+
     event Swaped(uint tokenAmount, string BNB_Address);
-    
+
     /**
     * @param tokenAmount Amount of tokens to swap with bep2
     * @param BNB_Address address of Binance Chain to which to receive the bep2 tokens
     */
     function swap(uint tokenAmount, string memory BNB_Address) public returns(bool) {
-        
+
         bool success = token.transferFrom(msg.sender, address(this), tokenAmount);
-        
+
         if(!success) {
             revert("Transfer of tokens to Swap contract failed.");
         }
-        
+
         emit Swaped(tokenAmount, BNB_Address);
-        
+
         return true;
-        
+
     }
-    
+
     event TokensWithdrawn(address receiver, uint amount);
-    
+
     /**
     * @dev only to be called by the owner of Swap contract
     */
     function withdrawTokensByOwner() public onlyOwner returns(bool) {
-        
+
         uint balance = token.balanceOf(address(this));
-        
+
         if(balance > 0) {
             bool success = token.transfer(owner, balance);
-            
+
             if(!success) {
                 revert("Transfer of tokens from Swap contract to owner failed.");
             }
-            
+
             emit TokensWithdrawn(owner, balance);
             return true;
-            
+
         } else {
             revert("Swap contract has zero balance");
         }
-        
+
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

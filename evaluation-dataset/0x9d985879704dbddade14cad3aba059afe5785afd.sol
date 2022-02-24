@@ -73,7 +73,7 @@ contract Extradecoin is Owner {
     string public constant symbol = "ETE";
     uint public constant decimals = 18;
     uint256 constant public totalSupply = 250000000 * 10 ** 18; // 250 mil tokens will be supplied
-  
+
     mapping(address => uint256) internal balances;
     mapping(address => mapping (address => uint256)) internal allowed;
 
@@ -81,13 +81,13 @@ contract Extradecoin is Owner {
     address public walletAddress;
     address public founderAddress;
     address public advisorAddress;
-    
+
     mapping(address => uint256) public totalInvestedAmountOf;
 
     uint constant lockPeriod1 = 3 years; // 1st locked period for tokens allocation of founder and team
     uint constant lockPeriod2 = 1 years; // 2nd locked period for tokens allocation of founder and team
     uint constant lockPeriod3 = 90 days; // 3nd locked period for tokens allocation of advisor and ICO partners
-   
+
     uint constant NOT_SALE = 0; // Not in sales
     uint constant IN_ICO = 1; // In ICO
     uint constant END_SALE = 2; // End sales
@@ -96,9 +96,9 @@ contract Extradecoin is Owner {
     uint256 public constant founderAllocation = 37500000 * 10 ** 18; // 37.5 mil tokens allocated for founders
     uint256 public constant advisorAllocation = 25000000 * 10 ** 18; // 25 mil tokens allocated for allocated for ICO partners and bonus fund
     uint256 public constant reservedAllocation = 62500000 * 10 ** 18; // 62.5 mil tokens allocated for reserved, bounty campaigns, ICO partners, and bonus fund
-    uint256 public constant minInvestedCap = 6000 * 10 ** 18; // 2500 ether for softcap 
+    uint256 public constant minInvestedCap = 6000 * 10 ** 18; // 2500 ether for softcap
     uint256 public constant minInvestedAmount = 0.1 * 10 ** 18; // 0.1 ether for mininum ether contribution per transaction
-    
+
     uint saleState;
     uint256 totalInvestedAmount;
     uint public icoStartTime;
@@ -108,7 +108,7 @@ contract Extradecoin is Owner {
     bool public isTransferable;
     uint public founderAllocatedTime = 1;
     uint public advisorAllocatedTime = 1;
-    
+
     uint256 public totalRemainingTokensForSales; // Total tokens remaining for sales
     uint256 public totalAdvisor; // Total tokens allocated for advisor
     uint256 public totalReservedTokenAllocation; // Total tokens allocated for reserved
@@ -118,8 +118,8 @@ contract Extradecoin is Owner {
 
     event StartICO(uint state); // Start ICO sales
     event EndICO(uint state); // End ICO sales
-    
-    
+
+
     event AllocateTokensForFounder(address founderAddress, uint256 founderAllocatedTime, uint256 tokenAmount); // Allocate tokens to founders' address
     event AllocateTokensForAdvisor(address advisorAddress, uint256 advisorAllocatedTime, uint256 tokenAmount); // Allocate tokens to advisor address
     event AllocateReservedTokens(address reservedAddress, uint256 tokenAmount); // Allocate reserved tokens
@@ -154,7 +154,7 @@ contract Extradecoin is Owner {
     function Extradecoin(address _walletAddr, address _adminAddr) public Owner(msg.sender) {
         require(_walletAddr != address(0));
         require(_adminAddr != address(0));
-		
+
         walletAddress = _walletAddr;
         adminAddress = _adminAddr;
         inActive = true;
@@ -192,7 +192,7 @@ contract Extradecoin is Owner {
     function approve(address _spender, uint256 _value) external transferable returns (bool) {
         require(_spender != address(0));
         require(_value > 0);
-		
+
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -246,7 +246,7 @@ contract Extradecoin is Owner {
         require(adminAddress != _newAddress);
         adminAddress = _newAddress;
     }
-  
+
     // Modify founder address to receive founder tokens allocation
     function changeFounderAddress(address _newAddress) external onlyOwnerOrAdmin {
         require(_newAddress != address(0));
@@ -284,7 +284,7 @@ contract Extradecoin is Owner {
         }
         revert();
     }
-    
+
 
     // Allocate tokens for advisor and angel investors vested gradually for 1 year
     function allocateTokensForAdvisor() external isActive onlyOwnerOrAdmin {
@@ -332,13 +332,13 @@ contract Extradecoin is Owner {
         }
         revert();
     }
-    
+
     // Allocate reserved tokens
     function allocateReservedTokens(address _addr, uint _amount) external isActive onlyOwnerOrAdmin {
         require(saleState == END_SALE);
         require(_amount > 0);
         require(_addr != address(0));
-		
+
         balances[_addr] = balances[_addr].add(_amount);
         totalReservedTokenAllocation = totalReservedTokenAllocation.sub(_amount);
         emit AllocateReservedTokens(_addr, _amount);
@@ -348,7 +348,7 @@ contract Extradecoin is Owner {
     function allocateSalesTokens(address _addr, uint _amount) external isActive onlyOwnerOrAdmin {
         require(_amount > 0);
         require(_addr != address(0));
-		
+
         balances[_addr] = balances[_addr].add(_amount);
         totalRemainingTokensForSales = totalRemainingTokensForSales.sub(_amount);
         emit AllocateSalesTokens(_addr, _amount);
@@ -367,4 +367,13 @@ contract Extradecoin is Owner {
     function isSoftCapReached() public view returns (bool) {
         return totalInvestedAmount >= minInvestedCap;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -372,10 +372,10 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  function mul(uint256 a, uint256 b) 
-      internal 
-      pure 
-      returns (uint256 c) 
+  function mul(uint256 a, uint256 b)
+      internal
+      pure
+      returns (uint256 c)
   {
     if (a == 0) {
       return 0;
@@ -391,7 +391,7 @@ library SafeMath {
   function sub(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256) 
+      returns (uint256)
   {
     require(b <= a, "SafeMath sub failed");
     return a - b;
@@ -403,30 +403,30 @@ library SafeMath {
   function add(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256 c) 
+      returns (uint256 c)
   {
     c = a + b;
     require(c >= a, "SafeMath add failed");
     return c;
   }
-  
+
   /**
     * @dev gives square root of given x.
     */
   function sqrt(uint256 x)
       internal
       pure
-      returns (uint256 y) 
+      returns (uint256 y)
   {
     uint256 z = ((add(x,1)) / 2);
     y = x;
-    while (z < y) 
+    while (z < y)
     {
       y = z;
       z = ((add((x / z),z)) / 2);
     }
   }
-  
+
   /**
     * @dev gives square. batchplies x by x
     */
@@ -437,20 +437,20 @@ library SafeMath {
   {
     return (mul(x,x));
   }
-  
+
   /**
-    * @dev x to the power of y 
+    * @dev x to the power of y
     */
   function pwr(uint256 x, uint256 y)
-      internal 
-      pure 
+      internal
+      pure
       returns (uint256)
   {
     if (x==0)
         return (0);
     else if (y==0)
         return (1);
-    else 
+    else
     {
       uint256 z = x;
       for (uint256 i=1; i < y; i++)
@@ -474,7 +474,7 @@ interface ILuckyblock{
     address[],
     uint256[],
     uint256
-  ); 
+  );
 
   function getLuckyblockEarn(
     bytes32 luckyblockId
@@ -504,7 +504,7 @@ interface ILuckyblock{
 
   function updateLuckyblockSpend(
     bytes32 luckyblockId,
-    address[] spendTokenAddresses, 
+    address[] spendTokenAddresses,
     uint256[] spendTokenCount,
     uint256 spendEtherCount
   ) external;
@@ -523,8 +523,8 @@ interface ILuckyblock{
   function withdrawToken(address contractAddress, address to, uint256 balance) external;
   function withdrawEth(address to, uint256 balance) external;
 
-  
-  
+
+
 
   /* Events */
 
@@ -662,7 +662,7 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
       _luckyblockBase.ended
       );
   }
-  
+
   function addLuckyblock(uint256 seed) external onlyOwnerOrSuperuser {
     bytes32 luckyblockId = keccak256(
       abi.encodePacked(block.timestamp, seed)
@@ -688,7 +688,7 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
 
   function updateLuckyblockSpend (
     bytes32 luckyblockId,
-    address[] spendTokenAddresses, 
+    address[] spendTokenAddresses,
     uint256[] spendTokenCount,
     uint256 spendEtherCount
     ) external onlyOwnerOrSuperuser {
@@ -735,17 +735,17 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
     LuckyblockBase storage _luckyblockBase = luckyblockIdToLuckyblockBase[luckyblockId];
     LuckyblockSpend storage _luckyblockSpend = luckyblockIdToLuckyblockSpend[luckyblockId];
     LuckyblockEarn storage _luckyblockEarn = luckyblockIdToLuckyblockEarn[luckyblockId];
-    
+
     require(!_luckyblockBase.ended, "luckyblock is ended");
 
-    // check sender's ether balance 
+    // check sender's ether balance
     require(msg.value >= _luckyblockSpend.spendEtherCount, "sender value not enough");
 
     // check spend
     if (_luckyblockSpend.spendTokenAddresses[0] != address(0x0)) {
       for (uint8 i = 0; i < _luckyblockSpend.spendTokenAddresses.length; i++) {
 
-        // check sender's erc20 balance 
+        // check sender's erc20 balance
         require(
           ERC20Interface(
             _luckyblockSpend.spendTokenAddresses[i]
@@ -763,12 +763,12 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
           .transferFrom(msg.sender, address(this), _luckyblockSpend.spendTokenCount[i]);
         }
     }
-    
+
     // check earn erc20
     if (_luckyblockEarn.earnTokenAddresses[0] !=
       address(0x0)) {
       for (uint8 j= 0; j < _luckyblockEarn.earnTokenAddresses.length; j++) {
-        // check sender's erc20 balance 
+        // check sender's erc20 balance
         uint256 earnTokenCount = _luckyblockEarn.earnTokenCount[j];
         require(
           ERC20Interface(_luckyblockEarn.earnTokenAddresses[j])
@@ -776,7 +776,7 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
         );
       }
     }
-    
+
     // check earn ether
     require(address(this).balance >= _luckyblockEarn.earnEtherCount, "contract value not enough");
 
@@ -796,7 +796,7 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
     }
     uint256 value = msg.value;
     uint256 payExcess = value.sub(_luckyblockSpend.spendEtherCount);
-    
+
     // if win ether
     if (_random + _luckyblockEarn.earnEtherProbability >= 100) {
       uint256 balance = _luckyblockEarn.earnEtherCount.add(payExcess);
@@ -806,7 +806,7 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
     } else if (payExcess > 0) {
       msg.sender.transfer(payExcess);
     }
-    
+
     emit Play(luckyblockId, msg.sender, _random);
   }
 
@@ -835,4 +835,15 @@ contract Luckyblock is Superuser, Pausable, ILuckyblock {
   function random() private view returns (uint8) {
     return Random(randomContract).getRandom(); // random 0-99
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

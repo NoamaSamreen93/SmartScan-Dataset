@@ -1,7 +1,7 @@
 /**
- * ▒█▀▀█ ░▀░ █▀▀█ █▀▀▄ █▀▄▀█ █▀▀█ █▀▀▄ 
- * ▒█▀▀▄ ▀█▀ █▄▄▀ █░░█ █░▀░█ █▄▄█ █░░█ 
- * ▒█▄▄█ ▀▀▀ ▀░▀▀ ▀▀▀░ ▀░░░▀ ▀░░▀ ▀░░▀ 
+ * ▒█▀▀█ ░▀░ █▀▀█ █▀▀▄ █▀▄▀█ █▀▀█ █▀▀▄
+ * ▒█▀▀▄ ▀█▀ █▄▄▀ █░░█ █░▀░█ █▄▄█ █░░█
+ * ▒█▄▄█ ▀▀▀ ▀░▀▀ ▀▀▀░ ▀░░░▀ ▀░░▀ ▀░░▀
  *
  * Birdman helps grow the Microverse community,
  * which is considered the premature version of Mutual Constructor.
@@ -246,7 +246,7 @@ library SafeMath {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -305,7 +305,7 @@ contract Birdman is AdminUtils, ERC223ReceivingContract {
       uint256 nextSharedSentTime;
       bool passed;
     }
-    
+
     uint256[] emptyIndexes;
 
     modifier isValidMC() {
@@ -317,8 +317,8 @@ contract Birdman is AdminUtils, ERC223ReceivingContract {
       require (numMCApplied < maxNumMC);
       // make sure no one cheats
       require (addressToIndex[msg.sender] == 0);
-      
-      _; 
+
+      _;
     }
 
     modifier isEvilMortyToken() {
@@ -595,4 +595,15 @@ contract Birdman is AdminUtils, ERC223ReceivingContract {
         emit SystemChangeVettingTime(vettingTime, _height);
         vettingTime = _height;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -443,7 +443,7 @@ contract CryptoSagaCardSwap is Ownable {
     require(msg.sender == cardAddess);
     _;
   }
-  
+
   // @dev Set the address of the contract that represents ERC721 Card.
   function setCardContract(address _contractAddress)
     public
@@ -456,7 +456,7 @@ contract CryptoSagaCardSwap is Ownable {
   //  This should be implemented by CryptoSagaCore later.
   function swapCardForReward(address _by, uint8 _rank)
     onlyCard
-    public 
+    public
     returns (uint256)
   {
     return 0;
@@ -494,7 +494,7 @@ contract CryptoSagaCard is ERC721Token, Claimable, AccessMint {
     swapContract = CryptoSagaCardSwap(_contractAddress);
   }
 
-  function rankOf(uint256 _tokenId) 
+  function rankOf(uint256 _tokenId)
     public view
     returns (uint8)
   {
@@ -529,4 +529,15 @@ contract CryptoSagaCard is ERC721Token, Claimable, AccessMint {
     return _rewardId;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

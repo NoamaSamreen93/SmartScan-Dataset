@@ -1,7 +1,7 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The CryptoRacing Project.  All rights reserved.
-/* 
-/*   The first idle car race game of blockchain                 
+/*
+/*   The first idle car race game of blockchain
 /* ==================================================================== */
 pragma solidity ^0.4.20;
 
@@ -35,13 +35,13 @@ interface ERC721TokenReceiver {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -107,14 +107,14 @@ contract AccessService is AccessAdmin {
 
 
 /* ==================================================================== */
-/* equipmentId 
+/* equipmentId
 /* 10001	T1
 /* 10002	T2
 /* 10003	T3
 /* 10004	T4
 /* 10005	T5
-/* 10006	T6 
-/* 10007	freeCar          
+/* 10006	T6
+/* 10007	freeCar
 /* ==================================================================== */
 
 contract RaceToken is ERC721, AccessAdmin {
@@ -174,7 +174,7 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @dev This emits when an operator is enabled or disabled for an owner.
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-    /// @dev This emits when the equipment ownership changed 
+    /// @dev This emits when the equipment ownership changed
     event Transfer(address indexed from, address indexed to, uint256 tokenId);
 
     /// @dev This emits when the equipment created
@@ -185,7 +185,7 @@ contract RaceToken is ERC721, AccessAdmin {
 
     /// @dev This emits when the equipment destroyed
     event DeleteFashion(address indexed owner, uint256 tokenId, uint16 deleteType);
-    
+
     function RaceToken() public {
         addrAdmin = msg.sender;
         fashionArray.length += 1;
@@ -195,7 +195,7 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @dev Check if token ID is valid
     modifier isValidToken(uint256 _tokenId) {
         require(_tokenId >= 1 && _tokenId <= fashionArray.length);
-        require(fashionIdToOwner[_tokenId] != address(0)); 
+        require(fashionIdToOwner[_tokenId] != address(0));
         _;
     }
 
@@ -210,7 +210,7 @@ contract RaceToken is ERC721, AccessAdmin {
         // ERC165 || ERC721 || ERC165^ERC721
         return (_interfaceId == 0x01ffc9a7 || _interfaceId == 0x80ac58cd || _interfaceId == 0x8153916a) && (_interfaceId != 0xffffffff);
     }
-        
+
     function name() public pure returns(string) {
         return "Race Token";
     }
@@ -239,7 +239,7 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @param _to The new owner
     /// @param _tokenId The Race to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         external
         whenNotPaused
     {
@@ -250,7 +250,7 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @param _from The current owner of the Race
     /// @param _to The new owner
     /// @param _tokenId The Race to transfer
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
         external
         whenNotPaused
     {
@@ -271,7 +271,7 @@ contract RaceToken is ERC721, AccessAdmin {
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
     }
 
@@ -293,8 +293,8 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @dev Enable or disable approval for a third party ("operator") to manage all your asset.
     /// @param _operator Address to add to the set of authorized operators.
     /// @param _approved True if the operators is approved, false to revoke approval
-    function setApprovalForAll(address _operator, bool _approved) 
-        external 
+    function setApprovalForAll(address _operator, bool _approved)
+        external
         whenNotPaused
     {
         operatorToApprovals[msg.sender][_operator] = _approved;
@@ -325,7 +325,7 @@ contract RaceToken is ERC721, AccessAdmin {
 
     /// @dev Do the real transfer with out any condition checking
     /// @param _from The old owner of this Race(If created: 0x0)
-    /// @param _to The new owner of this Race 
+    /// @param _to The new owner of this Race
     /// @param _tokenId The tokenId of the Race
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         if (_from != address(0)) {
@@ -336,35 +336,35 @@ contract RaceToken is ERC721, AccessAdmin {
             // If the Race is not the element of array, change it to with the last
             if (indexFrom != fsArray.length - 1) {
                 uint256 lastTokenId = fsArray[fsArray.length - 1];
-                fsArray[indexFrom] = lastTokenId; 
+                fsArray[indexFrom] = lastTokenId;
                 fashionIdToOwnerIndex[lastTokenId] = indexFrom;
             }
-            fsArray.length -= 1; 
-            
+            fsArray.length -= 1;
+
             if (fashionIdToApprovals[_tokenId] != address(0)) {
                 delete fashionIdToApprovals[_tokenId];
-            }      
+            }
         }
 
         // Give the Race to '_to'
         fashionIdToOwner[_tokenId] = _to;
         ownerToFashionArray[_to].push(_tokenId);
         fashionIdToOwnerIndex[_tokenId] = ownerToFashionArray[_to].length - 1;
-        
+
         Transfer(_from != address(0) ? _from : this, _to, _tokenId);
     }
 
     /// @dev Actually perform the safeTransferFrom
-    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         internal
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
         canTransfer(_tokenId)
     {
         address owner = fashionIdToOwner[_tokenId];
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
 
         // Do the callback after everything is done to avoid reentrancy attack
@@ -384,8 +384,8 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @param _owner Owner of the equipment created
     /// @param _attrs Attributes of the equipment created
     /// @return Token ID of the equipment created
-    function createFashion(address _owner, uint16[13] _attrs, uint16 _createType) 
-        external 
+    function createFashion(address _owner, uint16[13] _attrs, uint16 _createType)
+        external
         whenNotPaused
         returns(uint256)
     {
@@ -403,19 +403,19 @@ contract RaceToken is ERC721, AccessAdmin {
         if (_attrs[3] != 0) {
             fs.production = _attrs[3];
         }
-        
+
         if (_attrs[4] != 0) {
             fs.attack = _attrs[4];
         }
-		
+
 		if (_attrs[5] != 0) {
             fs.defense = _attrs[5];
         }
-       
+
         if (_attrs[6] != 0) {
             fs.plunder = _attrs[6];
         }
-        
+
         if (_attrs[7] != 0) {
             fs.productionMultiplier = _attrs[7];
         }
@@ -439,7 +439,7 @@ contract RaceToken is ERC721, AccessAdmin {
         if (_attrs[12] != 0) {
             fs.isPercent = _attrs[12];
         }
-        
+
         _transfer(0, _owner, newFashionId);
         CreateFashion(_owner, newFashionId, _attrs[0], _attrs[1], _attrs[2], _attrs[11], _createType);
         return newFashionId;
@@ -465,8 +465,8 @@ contract RaceToken is ERC721, AccessAdmin {
             _fs.plunderMultiplier = _val;
         } else if(_index == 11) {
             _fs.level = _val;
-        } 
-       
+        }
+
     }
 
     /// @dev Equiment attributes modified (max 4 stats modified)
@@ -474,10 +474,10 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @param _idxArray Stats order that must be modified
     /// @param _params Stat value that must be modified
     /// @param _changeType Modification type such as enhance, socket, etc.
-    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType) 
-        external 
+    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType)
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
@@ -505,23 +505,23 @@ contract RaceToken is ERC721, AccessAdmin {
     /// @param _tokenId Equipment Token ID
     /// @param _deleteType Destruction type, such as craft
     function destroyFashion(uint256 _tokenId, uint16 _deleteType)
-        external 
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
         address _from = fashionIdToOwner[_tokenId];
         uint256 indexFrom = fashionIdToOwnerIndex[_tokenId];
-        uint256[] storage fsArray = ownerToFashionArray[_from]; 
+        uint256[] storage fsArray = ownerToFashionArray[_from];
         require(fsArray[indexFrom] == _tokenId);
 
         if (indexFrom != fsArray.length - 1) {
             uint256 lastTokenId = fsArray[fsArray.length - 1];
-            fsArray[indexFrom] = lastTokenId; 
+            fsArray[indexFrom] = lastTokenId;
             fashionIdToOwnerIndex[lastTokenId] = indexFrom;
         }
-        fsArray.length -= 1; 
+        fsArray.length -= 1;
 
         fashionIdToOwner[_tokenId] = address(0);
         delete fashionIdToOwnerIndex[_tokenId];
@@ -533,7 +533,7 @@ contract RaceToken is ERC721, AccessAdmin {
     }
 
     /// @dev Safe transfer by trust contracts
-    function safeTransferByContract(uint256 _tokenId, address _to) 
+    function safeTransferByContract(uint256 _tokenId, address _to)
         external
         whenNotPaused
     {
@@ -567,7 +567,7 @@ contract RaceToken is ERC721, AccessAdmin {
         datas[10] = fs.plunderMultiplier;
         datas[11] = fs.level;
         datas[12] = fs.isPercent;
-        
+
     }
 
 	//单个玩家获得当前所有tokenid和标记
@@ -585,7 +585,7 @@ contract RaceToken is ERC721, AccessAdmin {
         }
     }
 
-	
+
 	/// @dev Race token info returned based on Token ID transfered (64 at most)
     function getFashionsAttrs(uint256[] _tokens) external view returns(uint16[] attrs) {
         uint256 length = _tokens.length;
@@ -610,8 +610,8 @@ contract RaceToken is ERC721, AccessAdmin {
                 attrs[index + 9] = fs.defenseMultiplier;
                 attrs[index + 10] = fs.plunderMultiplier;
                 attrs[index + 11] = fs.level;
-                attrs[index + 12] = fs.isPercent;  
-            }   
+                attrs[index + 12] = fs.isPercent;
+            }
         }
     }
 }
@@ -628,12 +628,12 @@ interface IRaceCoin {
 contract CarsPresell is AccessService {
 
     using SafeMath for uint256;
-    
+
     RaceToken tokenContract;
 
     IRaceCoin public raceCoinContract;
 
-   
+
     //Bonus pool address
     address poolContract;
 
@@ -647,7 +647,7 @@ contract CarsPresell is AccessService {
 	uint16 private carCountsLimit;
 
 
-   
+
 
 
 
@@ -667,7 +667,7 @@ contract CarsPresell is AccessService {
         addrFinance = msg.sender;
 
         tokenContract = RaceToken(_nftAddr);
-		
+
 		//Maximum number of vehicles per class
 		carCountsLimit = 500;
 
@@ -688,15 +688,15 @@ contract CarsPresell is AccessService {
         tokenContract = RaceToken(_nftAddr);
     }
 
-   
+
     //Set up tournament bonus address
     function setRaceCoin(address _addr) external onlyAdmin {
         require(_addr != address(0));
         poolContract = _addr;
         raceCoinContract = IRaceCoin(_addr);
     }
-	
-	
+
+
 	//Increase the number of pre-sale cars, the maximum limit of each vehicle is 500 vehicles.
 	function setCarCounts(uint16 _carId, uint16 _carCounts) external onlyAdmin {
 		require( carPresellCounter[_carId] <= carCountsLimit);
@@ -710,7 +710,7 @@ contract CarsPresell is AccessService {
     function freeCar(uint16 _equipmentId)
         external
         payable
-        whenNotPaused 
+        whenNotPaused
     {
         require(freeCarCount[msg.sender] != 1);
 
@@ -756,16 +756,16 @@ contract CarsPresell is AccessService {
     }
 
 
-    function carPresell(address referer,uint16 _equipmentId) 
+    function carPresell(address referer,uint16 _equipmentId)
         external
         payable
-        whenNotPaused 
+        whenNotPaused
     {
         uint16 curSupply = carPresellCounter[_equipmentId];
         require(curSupply > 0);
         uint16[] storage buyArray = presellLimit[msg.sender];
         uint256 curBuyCnt = buyArray.length;
-		
+
         require(curBuyCnt < 10);
 
         uint256 payBack = 0;
@@ -848,16 +848,16 @@ contract CarsPresell is AccessService {
         }else{
             addrFinance.transfer(ethVal.sub(ethVal.mul(prizeGoldPercent).div(100)));
         }
-        
 
-           
+
+
         if (payBack > 0) {
             msg.sender.transfer(payBack);
         }
     }
 
-    function withdraw() 
-        external 
+    function withdraw()
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         addrFinance.transfer(this.balance);
@@ -869,7 +869,7 @@ contract CarsPresell is AccessService {
         cntArray[2] = carPresellCounter[10003];
         cntArray[3] = carPresellCounter[10004];
         cntArray[4] = carPresellCounter[10005];
-		cntArray[5] = carPresellCounter[10006];  		
+		cntArray[5] = carPresellCounter[10006];
     }
 
     function getBuyCount(address _owner) external view returns (uint32) {
@@ -925,4 +925,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

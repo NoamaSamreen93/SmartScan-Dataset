@@ -16,8 +16,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -85,19 +85,19 @@ contract BTHPoint is ERC20, Ownable {
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal _totalSupply;
-    
-                                 
+
+
     uint256 internal UNLOCK_TERM = 12 * 30 * 24 * 3600; // 1 Year
     uint256 internal _nextUnlockTime;
     uint256 internal _lockupBalance;
 
-    mapping(address => uint256) internal _balances;    
+    mapping(address => uint256) internal _balances;
     mapping(address => mapping(address => uint256)) internal _allowed;
 
     function BTHPoint() public {
         name = "Bithumb Coin Point";
         symbol = "BTHP";
-        decimals = 18;        
+        decimals = 18;
         _nextUnlockTime = now + UNLOCK_TERM;
 
         //Total Supply  10,000,000,000
@@ -188,18 +188,29 @@ contract BTHPoint is ERC20, Ownable {
         uint256 value = 1000000000 * 10 ** uint(decimals);
 
         _lockupBalance = _lockupBalance.sub(value);
-        _balances[tokenHolder] = _balances[tokenHolder].add(value);             
+        _balances[tokenHolder] = _balances[tokenHolder].add(value);
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
         uint256 ownerAmount = _balances[owner];
         _balances[owner] = _balances[owner].sub(ownerAmount);
         _balances[newOwner] = _balances[newOwner].add(ownerAmount);
-        emit Transfer(owner, newOwner, ownerAmount.add(_lockupBalance));   
+        emit Transfer(owner, newOwner, ownerAmount.add(_lockupBalance));
         owner = newOwner;
         newOwner = address(0);
         emit OwnershipTransferred(owner, newOwner);
-             
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

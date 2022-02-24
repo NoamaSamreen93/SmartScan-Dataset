@@ -621,7 +621,7 @@ library CrowdsaleL {
 
         // the start time of crowdsale.
         uint256 startTime;
-        
+
         // the end time of crowdsale
         uint256 endTime;
 
@@ -658,10 +658,10 @@ library CrowdsaleL {
     /// @param _wallet beneficiary wallet on successful crowdsale.
     /// @param _globalIndex the contract holding current contract addresses.
     function configure(
-        Data storage _self, 
-        address payable _wallet, 
+        Data storage _self,
+        address payable _wallet,
         address _globalIndex)
-    public 
+    public
     {
         require(_self.state == CrowdsaleL.State.Draft, "not draft state");
         require(_wallet != address(0), "wallet zero addr");
@@ -679,7 +679,7 @@ library CrowdsaleL {
     function setRoles(Roles storage _self, address _tokenAssignmentControl, address _tokenRescueControl) public {
         require(_tokenAssignmentControl != address(0), "addr0");
         require(_tokenRescueControl != address(0), "addr0");
-        
+
         _self.tokenAssignmentControl = _tokenAssignmentControl;
         _self.tokenRescueControl = _tokenRescueControl;
 
@@ -707,8 +707,8 @@ library CrowdsaleL {
     /// @notice Low level token purchase function with ether.
     /// @param _beneficiary who receives tokens.
     /// @param _investedAmount the invested ETH amount.
-    function buyTokensFor(Data storage _self, address _beneficiary, uint256 _investedAmount) 
-    public 
+    function buyTokensFor(Data storage _self, address _beneficiary, uint256 _investedAmount)
+    public
     returns (uint256)
     {
         require(validPurchasePreCheck(_self), "invalid purchase precheck");
@@ -762,9 +762,9 @@ library CrowdsaleL {
     /// @dev Same code if goal is used.
     /// @return true if crowdsale event has ended
     function hasEnded(Data storage _self) public view returns (bool) {
-        bool capReached = _self.tokensRaised >= _self.cap; 
+        bool capReached = _self.tokensRaised >= _self.cap;
         bool endStateReached = (_self.state == CrowdsaleL.State.Ended || _self.state == CrowdsaleL.State.Finalized || _self.state == CrowdsaleL.State.Closed || _self.state == CrowdsaleL.State.Refunding);
-        
+
         return endStateReached || capReached || now > _self.endTime;
     }
 
@@ -790,7 +790,7 @@ library CrowdsaleL {
     /// @return true if the transaction can buy tokens
     function validPurchasePostCheck(Data storage _self, uint256 _tokensCreated) private view returns (bool) {
         require(_self.state == State.Started, "not in state started");
-        bool withinCap = _self.tokensRaised.add(_tokensCreated) <= _self.cap; 
+        bool withinCap = _self.tokensRaised.add(_tokensCreated) <= _self.cap;
         require(withinCap, "not within cap");
 
         return true;
@@ -798,17 +798,17 @@ library CrowdsaleL {
 
     /// @notice simple token assignment.
     function assignTokens(
-        Data storage _self, 
-        address _beneficiaryWallet, 
-        uint256 _tokenAmount, 
-        bytes8 _tag) 
+        Data storage _self,
+        address _beneficiaryWallet,
+        uint256 _tokenAmount,
+        bytes8 _tag)
         public returns (uint256 _tokensCreated)
     {
         _tokensCreated = getController(_self).assignFromCrowdsale(
-            _beneficiaryWallet, 
+            _beneficiaryWallet,
             _tokenAmount,
             _tag);
-        
+
         emit TokenPurchase(msg.sender, _beneficiaryWallet, _tokensCreated, 0, _tag);
 
         return _tokensCreated;
@@ -1073,7 +1073,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
     function _isActive() internal view returns (bool) {
         return crowdsaleData.state == CrowdsaleL.State.Started;
     }
- 
+
 ///////////////////
 // Status Draft
 ///////////////////
@@ -1085,7 +1085,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
         address payable _wallet,
         address _globalIndex)
     public
-    onlyOwner 
+    onlyOwner
     {
         crowdsaleData.configure(_wallet, _globalIndex);
     }
@@ -1138,7 +1138,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
     /// @notice checks all variables and starts crowdsale
     function startCrowdsale() public onlyDraftState {
         updateFromAssetToken(); //IMPORTANT
-        
+
         require(validStart(), "validStart");
         prepareStart();
         crowdsaleData.state = CrowdsaleL.State.Started;
@@ -1168,7 +1168,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
     function forwardWeiFunds(uint256 _overpaidRefund) internal {
         require(_overpaidRefund <= msg.value, "unrealistic overpay");
         crowdsaleData.wallet.transfer(msg.value.sub(_overpaidRefund));
-        
+
         //send overpayment back to sender. notice: only safe because executed in the end!
         msg.sender.transfer(_overpaidRefund);
     }
@@ -1198,7 +1198,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
         require(crowdsaleData.state == CrowdsaleL.State.Ended || crowdsaleData.state == CrowdsaleL.State.Started, "state");
         require(hasEnded(), "not ended");
         crowdsaleData.state = CrowdsaleL.State.Finalized;
-        
+
         finalization();
         emit Finalized();
     }
@@ -1214,7 +1214,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
     ///  executed entirely.
     function finalization() internal {
     }
-    
+
 ///
 // Status Closed
 ///
@@ -1226,7 +1226,7 @@ contract BasicAssetTokenCrowdsaleNoFeature is Ownable {
     }
 
 ////////////////
-// Rescue Tokens 
+// Rescue Tokens
 ////////////////
 
     /// @dev Can rescue tokens accidentally assigned to this contract
@@ -1278,10 +1278,10 @@ contract AssignTokensOffChainPaymentFeature {
     /// @notice If entitled call this method to assign tokens to beneficiary (use case: off-chain payment)
     /// @dev Token amount is assigned unmodified (no rate etc. on top)
     function assignTokensOffChainPayment(
-        address _beneficiaryWallet, 
+        address _beneficiaryWallet,
         uint256 _tokenAmount,
-        bytes8 _tag) 
-        public 
+        bytes8 _tag)
+        public
         assignTokensPrerequisit
     {
         _assignTokensOffChainPaymentAct(_beneficiaryWallet, _tokenAmount, _tag);
@@ -1297,7 +1297,7 @@ contract AssignTokensOffChainPaymentFeature {
     }
 
     /// @dev Assign tokens act ***MUST OVERRIDE***
-    function _assignTokensOffChainPaymentAct(address /*_beneficiaryWallet*/, uint256 /*_tokenAmount*/, bytes8 /*_tag*/) 
+    function _assignTokensOffChainPaymentAct(address /*_beneficiaryWallet*/, uint256 /*_tokenAmount*/, bytes8 /*_tag*/)
         internal returns (bool)
     {
         revert("override buyTokensWithEtherAct");
@@ -1328,9 +1328,20 @@ contract AssetTokenCrowdsaleT001 is BasicAssetTokenCrowdsaleNoFeature, AssignTok
 
     /// @dev method executed on assign tokens because of off-chain payment (if feature is inherited).
     function _assignTokensOffChainPaymentAct(address _beneficiaryWallet, uint256 _tokenAmount, bytes8 _tag)
-        internal returns (bool) 
+        internal returns (bool)
     {
         crowdsaleData.assignTokens(_beneficiaryWallet, _tokenAmount, _tag);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

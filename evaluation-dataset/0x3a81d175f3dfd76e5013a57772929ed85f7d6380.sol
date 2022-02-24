@@ -702,7 +702,7 @@ contract CryptovoxelsProperty is ERC721Token, Ownable {
 
   function CryptovoxelsProperty (string name, string symbol) public
     ERC721Token(name, symbol)
-  { 
+  {
     creator = msg.sender;
   }
 
@@ -784,11 +784,11 @@ contract CryptovoxelsProperty is ERC721Token, Ownable {
     require(exists(_tokenId));
 
     return (
-      boundingBoxes[_tokenId].x1, 
-      boundingBoxes[_tokenId].y1, 
+      boundingBoxes[_tokenId].x1,
+      boundingBoxes[_tokenId].y1,
       boundingBoxes[_tokenId].z1,
-      boundingBoxes[_tokenId].x2, 
-      boundingBoxes[_tokenId].y2, 
+      boundingBoxes[_tokenId].x2,
+      boundingBoxes[_tokenId].y2,
       boundingBoxes[_tokenId].z2
     );
   }
@@ -805,4 +805,15 @@ contract CryptovoxelsProperty is ERC721Token, Ownable {
     require(exists(_tokenId));
     return contentURIs[_tokenId];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

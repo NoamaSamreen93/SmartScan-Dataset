@@ -413,7 +413,7 @@ contract Controlled is Ownable{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -487,4 +487,15 @@ contract ZOOM is BurnableToken, MintableToken, PausableToken {
             emit Transfer(from, to, value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

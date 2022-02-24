@@ -141,8 +141,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -768,7 +768,7 @@ contract ERC20Burnable is ERC20 {
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction is SignatureBouncer {
     using SafeERC20 for ERC20Burnable;
 
@@ -1053,13 +1053,13 @@ contract ILiability {
 
     /**
      * @dev Objective ROSBAG multihash
-     * @notice ROSBAGv2 is used: http://wiki.ros.org/Bags/Format/2.0 
+     * @notice ROSBAGv2 is used: http://wiki.ros.org/Bags/Format/2.0
      */
     bytes public objective;
 
     /**
-     * @dev Report ROSBAG multihash 
-     * @notice ROSBAGv2 is used: http://wiki.ros.org/Bags/Format/2.0 
+     * @dev Report ROSBAG multihash
+     * @notice ROSBAGv2 is used: http://wiki.ros.org/Bags/Format/2.0
      */
     bytes public result;
 
@@ -1151,7 +1151,7 @@ contract ILiability {
     function offer(
         bytes   _model,
         bytes   _objective,
-        
+
         address _token,
         uint256 _cost,
 
@@ -1247,7 +1247,7 @@ contract ILighthouse {
      * @dev Increase stake and get more quota,
      *      one quota - one transaction in round
      * @param _value in wn
-     * @notice XRT should be approved before call this 
+     * @notice XRT should be approved before call this
      */
     function refill(uint256 _value) external returns (bool);
 
@@ -1282,7 +1282,7 @@ contract ILighthouse {
  */
 contract IFactory {
     /**
-     * @dev New liability created 
+     * @dev New liability created
      */
     event NewLiability(address indexed liability);
 
@@ -1307,7 +1307,7 @@ contract IFactory {
     mapping(address => uint256) public gasConsumedOf;
 
     /**
-     * @dev The count of consumed gas for switch to next epoch 
+     * @dev The count of consumed gas for switch to next epoch
      */
     uint256 public constant gasEpoch = 347 * 10**10;
 
@@ -1522,7 +1522,7 @@ contract Lighthouse is ILighthouse {
             uint256 balance = stakes[msg.sender];
             stakes[msg.sender] = 0;
             xrt.safeTransfer(msg.sender, balance);
-            
+
             uint256 senderIndex = indexOf[msg.sender] - 1;
             uint256 lastIndex = providers.length - 1;
             if (senderIndex < lastIndex)
@@ -1646,7 +1646,7 @@ contract IValidator {
     event Decision(address indexed liability, bool indexed success);
 
     /**
-     * @dev Decision availability marker 
+     * @dev Decision availability marker
      */
     mapping(address => bool) public hasDecision;
 
@@ -1727,7 +1727,7 @@ contract Liability is ILiability {
     function offer(
         bytes   _model,
         bytes   _objective,
-        
+
         address _token,
         uint256 _cost,
 
@@ -1998,4 +1998,15 @@ contract Factory is IFactory, SingletonHash {
         require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[_liability])));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

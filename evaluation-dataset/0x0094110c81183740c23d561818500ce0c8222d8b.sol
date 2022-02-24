@@ -8,7 +8,7 @@ contract Bitscreen {
     }
     event ImageChange(bytes32 _hash,uint8 _hashFunction,uint8 _size, uint _cost);
     event PriceChange(uint price);
-    
+
     struct ScreenData {
     uint currTopBid;
     uint currTopBidTimeStamp;
@@ -20,7 +20,7 @@ contract Bitscreen {
     uint8 widthRatio;
     string country;
     }
-    
+
 
     struct ContentRules {
         bool sexual;
@@ -29,38 +29,38 @@ contract Bitscreen {
         bool controversial;
         bool illegal; //content that goes agaisnt the law of the country it is operating in
     }
-    
+
     event RuleChange(bool _sexual,bool _violent,bool _political,bool _controversial,bool _illegal);
 
     struct AdBuyerInfo{
         uint numberAdBuys;
         bool cashedOut;
     }
-    
+
     struct DividendInfo{
         uint  activeAdBuysForDividend; //gets lowered (according to their numberAdBuys) when someone cashes out
         uint  ownerpool;
         uint  dividendPool;
         mapping(address => AdBuyerInfo) adbuyerMap;
     }
-    
+
 
     //contract variables
 
     //creator of the contract
     address public owner;
-    
+
     //total eth currently in contract
     uint public contractValue;
 
-    //current ipfs hash 
+    //current ipfs hash
     IPFSHash public currPicHash;
-    
+
     //current state of the screen
     ScreenData public screenstate;
     ContentRules public rules;
     address[] private badAddresses;
-    
+
     //current dividend info
     DividendInfo public dividendinfo;
 
@@ -71,7 +71,7 @@ contract Bitscreen {
         rules = ContentRules(false,false,false,false,false);
         dividendinfo=DividendInfo(0,0,0);
     }
-    
+
 
     function withdrawOwnerAmount() external{
         if(msg.sender == owner) { // Only let the contract creator do this
@@ -83,14 +83,14 @@ contract Bitscreen {
             revert();
         }
     }
-    
-    
+
+
     //request to know how much dividend you can get
     function inquireDividentAmount()  view external returns(uint){
         uint dividendToSend=calcuCurrTxDividend(msg.sender);
         return dividendToSend;
     }
-    
+
     function withdrawDividend() external{
         uint dividendToSend=calcuCurrTxDividend(msg.sender);
         if(dividendToSend==0){
@@ -102,22 +102,22 @@ contract Bitscreen {
         contractValue-=dividendToSend;
         dividendinfo.adbuyerMap[msg.sender].cashedOut=true;
         dividendinfo.adbuyerMap[msg.sender].numberAdBuys=0;
-        
+
         //send
         msg.sender.transfer(dividendToSend);
         }
     }
-    
+
     function calcuCurrTxDividend(address dividentRecepient) view private returns(uint) {
         uint totaldividend;
-        if(dividendinfo.activeAdBuysForDividend==0 || dividendinfo.adbuyerMap[dividentRecepient].cashedOut){ 
+        if(dividendinfo.activeAdBuysForDividend==0 || dividendinfo.adbuyerMap[dividentRecepient].cashedOut){
             totaldividend=0;
         }else{
             totaldividend=(dividendinfo.dividendPool*dividendinfo.adbuyerMap[dividentRecepient].numberAdBuys)/(dividendinfo.activeAdBuysForDividend);
         }
         return totaldividend;
     }
-    
+
     function getBadAddresses() external constant returns (address[]) {
         if(msg.sender == owner) {
             return badAddresses;
@@ -133,9 +133,9 @@ contract Bitscreen {
                 rules.political=_political;
                 rules.controversial=_controversial;
                 rules.illegal=_illegal;
-                
+
                 RuleChange(_sexual,_violent,_political,_controversial,_illegal);
-                
+
                 }else{
                 revert();
                 }
@@ -145,19 +145,19 @@ contract Bitscreen {
     function calculateCurrDynamicPrice() public view returns (uint){
         uint currDynamicPrice;
         uint periodLengthSecs=screenstate.PriceDecreasePeriodLengthSecs;
-        
+
         uint ellapsedPeriodsSinceLastBid= (now - screenstate.currTopBidTimeStamp)/periodLengthSecs;
-        
+
         uint totalDecrease=((screenstate.currTopBid*screenstate.periodPercentagePriceDecrease*ellapsedPeriodsSinceLastBid)/100);
-        
+
         if(totalDecrease>screenstate.currTopBid){
             currDynamicPrice=0;
         }else{
             currDynamicPrice= screenstate.currTopBid-totalDecrease;
         }
-        
+
         return currDynamicPrice;
-        
+
     }
 
     function truncToThreeDecimals(uint amount) private pure returns (uint){
@@ -166,45 +166,45 @@ contract Bitscreen {
 
 
     function changeBid(bytes32 _ipfsHash, uint8 _ipfsHashFunc, uint8 _ipfsHashSize) payable external {
-        
+
             uint dynamicPrice=calculateCurrDynamicPrice();
-        
+
             if(msg.value>dynamicPrice) { //prev: msg.value>screenstate.currTopBid
-            
+
                 if(truncToThreeDecimals(msg.value)-truncToThreeDecimals(dynamicPrice)<1000000000000000){
                     revert();
                 }else{
-                    
+
                 screenstate.currTopBid=msg.value;
                 screenstate.currTopBidTimeStamp=now;
                 screenstate.currHolder=msg.sender;
-                
+
                 screenstate.lifetimeValue+=msg.value;
                 contractValue+=msg.value;//total eth CURRENTLY IN contract
                 //store 33% to dividend pool, send 66% to ownerpool
                 dividendinfo.dividendPool+=msg.value/3;
                 dividendinfo.ownerpool+=((msg.value*2)/3);
-                
+
                 currPicHash.hash=_ipfsHash;
                 currPicHash.hashFunction=_ipfsHashFunc;
                 currPicHash.size=_ipfsHashSize;
-                
+
                 dividendinfo.activeAdBuysForDividend++;
                 if(dividendinfo.adbuyerMap[msg.sender].numberAdBuys==0){
                     dividendinfo.adbuyerMap[msg.sender]=AdBuyerInfo(1,false);
                 }else{
                     dividendinfo.adbuyerMap[msg.sender].numberAdBuys++;
                 }
-                
+
                 ImageChange(_ipfsHash,_ipfsHashFunc,_ipfsHashSize,screenstate.currTopBid);
-                
+
                 }
-                
+
             }else {
                 revert();
             }
     }
-    
+
     function emergencyOverwrite(bytes32 _ipfsHash, uint8 _ipfsHashFunc, uint8 _ipfsHashSize) external {
         if(msg.sender == owner) { // Only let the contract creator do this
             badAddresses.push(screenstate.currHolder);
@@ -217,18 +217,29 @@ contract Bitscreen {
             revert();
         }
     }
-    
+
     function changePriceDecreasePeriod(uint newPeriod) public{
         require(msg.sender==owner);
         screenstate.PriceDecreasePeriodLengthSecs=newPeriod;
     }
-    
+
     function changePriceDecreasePercent(uint newPercent) public{
         require(msg.sender==owner);
         screenstate.periodPercentagePriceDecrease=newPercent;
     }
-    
-    
+
+
     function () payable public {}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

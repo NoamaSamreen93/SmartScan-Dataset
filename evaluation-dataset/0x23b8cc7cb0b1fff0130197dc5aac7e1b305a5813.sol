@@ -1,62 +1,62 @@
 pragma solidity ^0.4.4;
 
- 
+
 
 contract Token {
 
     function totalSupply() constant returns (uint256 supply) {}
 
- 
+
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
- 
+
 
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
- 
+
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
- 
+
 
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
- 
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
- 
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
- 
+
 
 }
 
- 
+
 
 contract HashgainsToken is Token {
 
- 
 
- 
 
-    string public name;              
 
-    uint8 public decimals;               
 
-    string public symbol;                
+    string public name;
+
+    uint8 public decimals;
+
+    string public symbol;
 
     string public version = 'H1.0';
 
-    uint256 public unitsOneEthCanBuy;    
+    uint256 public unitsOneEthCanBuy;
 
-    uint256 public totalEthInWei;        
+    uint256 public totalEthInWei;
 
-    address public fundsWallet; 
+    address public fundsWallet;
 
     mapping (address => uint256) balances;
 
@@ -64,7 +64,7 @@ contract HashgainsToken is Token {
 
     uint256 public totalSupply;
 
-   
+
 
     function transfer(address _to, uint256 _value) returns (bool success) {
 
@@ -82,7 +82,7 @@ contract HashgainsToken is Token {
 
     }
 
- 
+
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 
@@ -102,7 +102,7 @@ contract HashgainsToken is Token {
 
     }
 
- 
+
 
     function balanceOf(address _owner) constant returns (uint256 balance) {
 
@@ -110,7 +110,7 @@ contract HashgainsToken is Token {
 
     }
 
- 
+
 
     function approve(address _spender, uint256 _value) returns (bool success) {
 
@@ -122,7 +122,7 @@ contract HashgainsToken is Token {
 
     }
 
- 
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 
@@ -130,29 +130,29 @@ contract HashgainsToken is Token {
 
     }
 
- 
 
-  
+
+
 
     function HashgainsToken() {
 
-        balances[msg.sender] = 50000000000000000000000000;              
+        balances[msg.sender] = 50000000000000000000000000;
 
-        totalSupply = 50000000000000000000000000;                       
+        totalSupply = 50000000000000000000000000;
 
-        name = "HashgainsToken";                                   
+        name = "HashgainsToken";
 
-        decimals = 18;                                              
+        decimals = 18;
 
-        symbol = "HGS";                                            
+        symbol = "HGS";
 
-        unitsOneEthCanBuy = 1000;                                  
+        unitsOneEthCanBuy = 1000;
 
-        fundsWallet = msg.sender;                                  
+        fundsWallet = msg.sender;
 
     }
 
- 
+
 
     function() payable{
 
@@ -166,17 +166,17 @@ contract HashgainsToken is Token {
 
         }
 
- 
+
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
 
         balances[msg.sender] = balances[msg.sender] + amount;
 
- 
+
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
 
     }
 
@@ -186,7 +186,7 @@ contract HashgainsToken is Token {
 
         Approval(msg.sender, _spender, _value);
 
- 
+
 
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
 
@@ -194,8 +194,19 @@ contract HashgainsToken is Token {
 
     }
 
-   
 
-    
 
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

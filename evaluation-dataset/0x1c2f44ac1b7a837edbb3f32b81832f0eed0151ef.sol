@@ -30,7 +30,7 @@ contract Ownable {
     address public owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -47,7 +47,7 @@ contract Ownable {
 }
 
 contract Manager is Ownable {
-    
+
     address[] managers;
 
     modifier onlyManagers() {
@@ -59,11 +59,11 @@ contract Manager is Ownable {
         require(exist);
         _;
     }
-    
+
     function getManagers() public view returns (address[] memory){
         return managers;
     }
-    
+
     function existManager(address _to) private returns (bool, uint) {
         for (uint i = 0 ; i < managers.length; i++) {
             if (managers[i] == _to) {
@@ -76,9 +76,9 @@ contract Manager is Ownable {
         bool exist = false;
         uint index = 0;
         (exist, index) = existManager(_to);
-        
+
         require(!exist);
-        
+
         managers.push(_to);
     }
 
@@ -126,7 +126,7 @@ contract Withdrawable is Manager {
         withdrawable = true;
         emit UnpauseWithdraw();
     }
-    
+
     function isWithdrawable() public view returns (bool)  {
         return withdrawable;
     }
@@ -137,7 +137,7 @@ interface ERC20 {
 }
 
 contract SaleRecord {
-    
+
     using SafeMath for uint256;
 
     struct sProperty {
@@ -147,12 +147,12 @@ contract SaleRecord {
         uint256 priceToken;
         bool withdraw;
     }
-    
+
     sProperty propertyTotal;
 
     mapping (address => sProperty[]) propertyMember;
     address payable[] propertyKeys;
-    
+
     function recordPropertyWithdraw(address _sender, uint256 _token) internal {
         for(uint256 i = 0; i < propertyMember[_sender].length; i++){
             if(propertyMember[_sender][i].withdraw == false && propertyMember[_sender][i].outputToken == _token){
@@ -162,10 +162,10 @@ contract SaleRecord {
         }
     }
     function recordProperty(address payable _sender, uint256 _amount, uint256 _token, uint256 _priceToken, bool _withdraw) internal {
-        
+
         sProperty memory property = sProperty(now, _amount, _token, _priceToken, _withdraw);
         propertyMember[_sender].push(property);
-        
+
         propertyTotal.time = now;
         propertyTotal.inputEther = propertyTotal.inputEther.add(_amount);
         propertyTotal.outputToken = propertyTotal.outputToken.add(_token);
@@ -182,7 +182,7 @@ contract SaleRecord {
         }
         return false;
     }
-    
+
     //get
     function getPropertyKeyCount() public view returns (uint){
         return propertyKeys.length;
@@ -193,17 +193,17 @@ contract SaleRecord {
         uint256[] memory outputToken;
         uint256[] memory priceToken;
         bool[] memory withdraw;
-        
+
         if(contains(_addr)){
-            
+
             uint256 size = propertyMember[_addr].length;
-            
+
             time = new uint256[](size);
             inputEther = new uint256[](size);
             outputToken = new uint256[](size);
             priceToken = new uint256[](size);
             withdraw = new bool[](size);
-            
+
             for (uint i = 0 ; i < size ; i++) {
                 time[i] = propertyMember[_addr][i].time;
                 inputEther[i] = propertyMember[_addr][i].inputEther;
@@ -219,42 +219,42 @@ contract SaleRecord {
             withdraw = new bool[](0);
         }
         return (time, inputEther, outputToken, priceToken, withdraw);
-        
+
     }
     function getPropertyValue(address _addr) public view returns (uint256, uint256){
         uint256 inputEther = 0;
         uint256 outputToken = 0;
-        
+
         if(contains(_addr)){
-            
+
             uint256 size = propertyMember[_addr].length;
 
             for (uint i = 0 ; i < size ; i++) {
                 inputEther = inputEther.add(propertyMember[_addr][i].inputEther);
                 outputToken = outputToken.add(propertyMember[_addr][i].outputToken);
             }
-        } 
-        
+        }
+
         return (inputEther, outputToken);
-        
+
     }
-    
+
     function getPropertyTotal() public view returns (uint256, uint256, uint256){
         return (propertyTotal.time, propertyTotal.inputEther, propertyTotal.outputToken);
     }
-    
+
 }
 
 contract PageViewRecord is SaleRecord, Pausable {
-    
+
     using SafeMath for uint256;
-    
+
     uint16 itemCount = 100;
-    
+
     function setPage(uint16 _itemCount) public onlyManagers {
         itemCount = _itemCount;
     }
-    
+
     //get
     function getPageValueCount() public view returns (uint256) {
         uint256 userSize = propertyKeys.length;
@@ -266,11 +266,11 @@ contract PageViewRecord is SaleRecord, Pausable {
     }
     function getPageItemValue(uint256 _pageIndex) public view returns (address[] memory, uint256[] memory, uint256[] memory){
         require(getPageValueCount()> _pageIndex);
-        
+
         uint256 startIndex =_pageIndex.mul(itemCount);
         uint256 remain = propertyKeys.length - startIndex;
         uint256 loopCount = (remain >= itemCount) ? itemCount : remain;
-        
+
         address[] memory keys = new address[](loopCount);
         uint256[] memory inputEther = new uint256[](loopCount);
         uint256[] memory outputToken = new uint256[](loopCount);
@@ -279,7 +279,7 @@ contract PageViewRecord is SaleRecord, Pausable {
             uint256 index = startIndex + i;
             address key = propertyKeys[index];
             keys[i] = key;
-            
+
             uint256 size = propertyMember[keys[i]].length;
             for (uint256 k = 0 ; k < size ; k++) {
                 inputEther[i] = inputEther[i].add(propertyMember[key][k].inputEther);
@@ -287,10 +287,10 @@ contract PageViewRecord is SaleRecord, Pausable {
             }
 
         }
-        
+
         return (keys, inputEther, outputToken);
     }
-    
+
     function getPageInfoCount() public view returns (uint256) {
         uint256 infoSize = 0;
         for (uint256 i = 0 ; i < propertyKeys.length ; i++) {
@@ -305,27 +305,27 @@ contract PageViewRecord is SaleRecord, Pausable {
     }
     function getPageItemInfo(uint256 _pageIndex) public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory){
         require(getPageInfoCount()> _pageIndex);
-        
+
         uint256 infoSize = 0;
         for (uint256 i = 0 ; i < propertyKeys.length ; i++) {
             infoSize = infoSize.add(propertyMember[propertyKeys[i]].length);
         }
-        
+
         uint256 startIndex =_pageIndex.mul(itemCount);
         uint256 remain = infoSize - startIndex;
         uint256 loopCount = (remain >= itemCount) ? itemCount : remain;
-        
+
         address[] memory keys = new address[](loopCount);
         uint256[] memory time = new uint256[](loopCount);
         uint256[] memory inputEther = new uint256[](loopCount);
         uint256[] memory outputToken = new uint256[](loopCount);
-        
+
         uint256 loopIndex = 0;
         uint256 index = 0;
         for (uint256 i = 0 ; i < propertyKeys.length && loopIndex < loopCount; i++) {
 
             address key = propertyKeys[i];
-            
+
             for (uint256 k = 0 ; k < propertyMember[key].length && loopIndex < loopCount ; k++) {
                 if(index >=startIndex){
                     keys[loopIndex] = key;
@@ -339,10 +339,10 @@ contract PageViewRecord is SaleRecord, Pausable {
             }
 
         }
-        
+
         return (keys, time, inputEther, outputToken);
     }
-    
+
     function getPageNotWithdrawCount() public view returns (uint256) {
         uint256 infoSize = 0;
         for (uint256 i = 0 ; i < propertyKeys.length ; i++) {
@@ -360,7 +360,7 @@ contract PageViewRecord is SaleRecord, Pausable {
     }
     function getPageNotWithdrawInfo(uint256 _pageIndex) public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory){
         require(getPageInfoCount()> _pageIndex);
-        
+
         uint256 infoSize = 0;
         for (uint256 i = 0 ; i < propertyKeys.length ; i++) {
             for (uint256 j = 0 ; j < propertyMember[propertyKeys[i]].length ; j++) {
@@ -368,22 +368,22 @@ contract PageViewRecord is SaleRecord, Pausable {
                     infoSize++;
             }
         }
-        
+
         uint256 startIndex =_pageIndex.mul(itemCount);
         uint256 remain = infoSize - startIndex;
         uint256 loopCount = (remain >= itemCount) ? itemCount : remain;
-        
+
         address[] memory keys = new address[](loopCount);
         uint256[] memory time = new uint256[](loopCount);
         uint256[] memory inputEther = new uint256[](loopCount);
         uint256[] memory outputToken = new uint256[](loopCount);
-        
+
         uint256 loopIndex = 0;
         uint256 index = 0;
         for (uint256 i = 0 ; i < propertyKeys.length && loopIndex < loopCount; i++) {
 
             address key = propertyKeys[i];
-            
+
             for (uint256 k = 0 ; k < propertyMember[key].length && loopIndex < loopCount ; k++) {
                 if(propertyMember[key][k].withdraw)
                     continue;
@@ -399,106 +399,106 @@ contract PageViewRecord is SaleRecord, Pausable {
             }
 
         }
-        
+
         return (keys, time, inputEther, outputToken);
     }
 
 }
 
 contract HenaSale is PageViewRecord, Withdrawable {
-    
+
     using SafeMath for uint256;
-    
-    
+
+
     //wallet(eth)
     address payable walletETH;
-    
+
     //token
     address tokenAddress;
     uint8 tokenDecimal = 18;
-    
+
     uint256 oneEther = 1 * 10 ** uint(18);
     uint256 oneToken = 1 * 10 ** uint(tokenDecimal);
-  
+
     //price
     //(usd decimal 5)
     uint256[] priceTokenUSD;// = {15000, 16000, 17000, 18000};
     uint256[] priceTokenSaleCount;// = {30000 * oneToken, 20000 * oneToken, 10000 * oneToken, 1000 * oneToken};
     uint256 priceEthUSD;// 17111000
-    
+
     //cap
     uint256 capMaximumToken;
 
     //time
     uint256 timeStart;
     uint256 timeEnd;
-    
 
-    
+
+
     event TokenPurchase(address indexed sender, uint256 amount, bool withdraw);
     event WithdrawalEther(address _sender, uint256 _weiEther);
     event WithdrawalToken(address _sender, uint256 _weiToken);
-    
+
     constructor(
-        
-        address _tokenAddress, 
-        
+
+        address _tokenAddress,
+
         uint64[] memory _priceTokenUSD,
         uint64[] memory _priceTokenSaleCount,
-        uint64 _priceEthUSD, 
+        uint64 _priceEthUSD,
 
-        uint64 _capMaximumToken, 
+        uint64 _capMaximumToken,
 
-        uint64 _timeEnd,  
+        uint64 _timeEnd,
         address[] memory _managers
-        
+
         ) public {
-        
+
 
         require(address(0) != _tokenAddress);
-        
+
         require(_priceTokenUSD.length == _priceTokenSaleCount.length);
         require(_priceEthUSD > 0);
-        
+
         require(_capMaximumToken > 0);
-  
+
         require(_timeEnd > 0);
-        
+
         require(_managers.length > 0);
-          
-          
-        
+
+
+
         walletETH = msg.sender;
-        
+
         tokenAddress = _tokenAddress;
-        
+
         priceTokenUSD = _priceTokenUSD;
-        
-     
+
+
         for (uint256 i = 0 ; i < _priceTokenSaleCount.length; i++) {
             require(_priceTokenSaleCount[i] < oneToken);
             priceTokenSaleCount.push(uint256(_priceTokenSaleCount[i]).mul(oneToken));
         }
         priceEthUSD = _priceEthUSD;
-            
+
         capMaximumToken = uint256(_capMaximumToken).mul(oneToken);
 
         timeStart = now;
         timeEnd = _timeEnd;
 
-        
+
         for (uint256 i = 0 ; i < _managers.length; i++) {
             require(address(0) != _managers[i]);
             addManager(_managers[i]);
         }
- 
-    }  
-     
-    
+
+    }
+
+
     function validPurchase(address _sender, uint256 _amount, uint256 _token) internal {
         require(_sender != address(0));
         require(timeStart <= now && now <= timeEnd);
-        
+
         uint256 recordTime;
         uint256 recordETH;
         uint256 recordTOKEN;
@@ -506,7 +506,7 @@ contract HenaSale is PageViewRecord, Withdrawable {
 
         require(capMaximumToken >= recordTOKEN.add(_token));
     }
-    
+
     function () external payable {
         buyToken();
     }
@@ -517,28 +517,28 @@ contract HenaSale is PageViewRecord, Withdrawable {
         uint256 priceToken;
         uint256 countToken;
         (priceToken, countToken) = getEthToToken(amount);
-        
+
         require(priceToken > 0);
 
         validPurchase(sender, amount, countToken);
-            
+
         bool isWithdrawable = isWithdrawable();
-        
+
         recordProperty(sender, amount, countToken, priceToken, isWithdrawable);
-        
+
         if(isWithdrawable) {
             transferToken(sender, countToken);
         }
-        
-        emit TokenPurchase(sender, countToken, isWithdrawable);   
-        
+
+        emit TokenPurchase(sender, countToken, isWithdrawable);
+
     }
 
     function transferToken(address to, uint256 amount) internal {
         ERC20(tokenAddress).transfer(to, amount);
         emit WithdrawalToken(to, amount);
     }
-    
+
     function withdrawEther() onlyOwner public {
         uint256 balanceETH = address(this).balance;
         require(balanceETH > 0);
@@ -552,7 +552,7 @@ contract HenaSale is PageViewRecord, Withdrawable {
     function setTime(uint64 _timeEnd) onlyOwner public {
         timeEnd = _timeEnd;
     }
-    
+
     function setPriceTokenEthUSD(uint64[] memory _priceTokenUSD, uint64[] memory _priceTokenSaleCount, uint64 _priceEthUSD) onlyManagers public {
         require(_priceTokenUSD.length == _priceTokenSaleCount.length);
 
@@ -565,16 +565,16 @@ contract HenaSale is PageViewRecord, Withdrawable {
             require(_priceTokenSaleCount[i] < oneToken);
             priceTokenSaleCount.push(uint256(_priceTokenSaleCount[i]).mul(oneToken));
         }
-        
+
         priceTokenUSD = _priceTokenUSD;
         priceEthUSD = _priceEthUSD;
-        
-    }    
-    
+
+    }
+
     function setEthUSD(uint64 _priceEthUSD) onlyManagers public {
         priceEthUSD = _priceEthUSD;
-    }    
-    
+    }
+
     function setCapMaximumToken(uint256 _capMaximumToken) onlyManagers public {
         require(_capMaximumToken > oneToken);
         capMaximumToken = _capMaximumToken;
@@ -591,15 +591,15 @@ contract HenaSale is PageViewRecord, Withdrawable {
         uint256 balanceETH = address(this).balance;
         return balanceETH;
     }
-    
+
     function getPriceTokenEthUSD() public view returns (uint256[] memory, uint256[] memory, uint256) {
         return (priceTokenUSD, priceTokenSaleCount, priceEthUSD);
     }
-    
+
     function getCapToken() public view returns (uint256) {
         return capMaximumToken;
     }
- 
+
     function getTokenToEth(uint256 amountToken) public view returns (uint256, uint256) {
         for(uint256 i = 0; i < priceTokenSaleCount.length; i++){
             if(priceTokenSaleCount[i] <= amountToken) {
@@ -620,10 +620,10 @@ contract HenaSale is PageViewRecord, Withdrawable {
         return (0, 0);
     }
     function getOneTokenToEth(uint256 _priceUSD) public view returns (uint256) {
-       return _priceUSD.mul(oneEther).div(priceEthUSD); 
+       return _priceUSD.mul(oneEther).div(priceEthUSD);
     }
 
-    
+
     function getTokenInfo() public view returns (address, uint8) {
         return (tokenAddress, tokenDecimal);
     }
@@ -631,4 +631,15 @@ contract HenaSale is PageViewRecord, Withdrawable {
         return (timeStart, timeEnd);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

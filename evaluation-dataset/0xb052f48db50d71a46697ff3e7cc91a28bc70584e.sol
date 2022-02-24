@@ -332,7 +332,7 @@ contract StandardToken is ERC20, BasicToken {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint256 internal constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance, and to add revert reasons.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -365,7 +365,7 @@ contract UnlimitedAllowanceToken is StandardToken {
     function transfer(
         address _to,
         uint256 _value)
-        public 
+        public
         returns (bool)
     {
         require(_value <= balances[msg.sender], "insufficient balance");
@@ -408,7 +408,7 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         public
         DetailedERC20(
             "bZx Protocol Token",
-            "BZRX", 
+            "BZRX",
             18
         )
     {
@@ -443,9 +443,9 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     /// @param _value Amount to transfer.
     /// @return Success of transfer.
     function transfer(
-        address _to, 
-        uint256 _value) 
-        public 
+        address _to,
+        uint256 _value)
+        public
         returns (bool)
     {
         if (lockingFinished || minters[msg.sender]) {
@@ -518,10 +518,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishMinting() 
-        public 
-        onlyOwner 
-        canMint 
+    function finishMinting()
+        public
+        onlyOwner
+        canMint
     {
         mintingFinished = true;
         emit MintFinished();
@@ -531,10 +531,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop locking token.
     * @return True if the operation was successful.
     */
-    function finishLocking() 
-        public 
-        onlyOwner 
-        isLocked 
+    function finishLocking()
+        public
+        onlyOwner
+        isLocked
     {
         lockingFinished = true;
         emit LockingFinished();
@@ -545,10 +545,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function addMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
     {
         minters[_minter] = true;
     }
@@ -558,10 +558,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function removeMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
     {
         minters[_minter] = false;
     }
@@ -579,7 +579,7 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         returns (bool)
     {
         return (
-            balances[_from] >= _value && 
+            balances[_from] >= _value &&
             (_spender == _from || allowed[_from][_spender] >= _value)
         );
     }
@@ -622,7 +622,7 @@ contract BZRxTokenConvert is Ownable {
 
     function()
         external
-        payable 
+        payable
     {
         require(msg.sender == wethContractAddress, "fallback not allowed");
     }
@@ -637,7 +637,7 @@ contract BZRxTokenConvert is Ownable {
         returns (bool)
     {
         require(msg.sender == bZxVaultAddress, "only the bZx vault can call this function");
-        
+
         if (BZRxToken(bZRxTokenContractAddress).canTransfer(msg.sender, _from, _value)) {
             return BZRxToken(bZRxTokenContractAddress).minterTransferFrom(
                 msg.sender,
@@ -669,9 +669,9 @@ contract BZRxTokenConvert is Ownable {
     * @return True if the operation was successful.
     */
     function toggleConversionAllowed(
-        bool _conversionAllowed) 
-        public 
-        onlyOwner 
+        bool _conversionAllowed)
+        public
+        onlyOwner
         returns (bool)
     {
         conversionAllowed = _conversionAllowed;
@@ -679,9 +679,9 @@ contract BZRxTokenConvert is Ownable {
     }
 
     function changeTokenPrice(
-        uint256 _tokenPrice) 
-        public 
-        onlyOwner 
+        uint256 _tokenPrice)
+        public
+        onlyOwner
         returns (bool)
     {
         tokenPrice = _tokenPrice;
@@ -689,9 +689,9 @@ contract BZRxTokenConvert is Ownable {
     }
 
     function changeBZRxTokenContract(
-        address _bZRxTokenContractAddress) 
-        public 
-        onlyOwner 
+        address _bZRxTokenContractAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         bZRxTokenContractAddress = _bZRxTokenContractAddress;
@@ -699,9 +699,9 @@ contract BZRxTokenConvert is Ownable {
     }
 
     function changeBZxVault(
-        address _bZxVaultAddress) 
-        public 
-        onlyOwner 
+        address _bZxVaultAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         bZxVaultAddress = _bZxVaultAddress;
@@ -709,18 +709,18 @@ contract BZRxTokenConvert is Ownable {
     }
 
     function changeWethContract(
-        address _wethContractAddress) 
-        public 
-        onlyOwner 
+        address _wethContractAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         wethContractAddress = _wethContractAddress;
         return true;
     }
 
-    function unwrapEth() 
-        public 
-        onlyOwner 
+    function unwrapEth()
+        public
+        onlyOwner
         returns (bool)
     {
         uint256 balance = StandardToken(wethContractAddress).balanceOf.gas(4999)(address(this));
@@ -767,4 +767,13 @@ contract BZRxTokenConvert is Ownable {
             );
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

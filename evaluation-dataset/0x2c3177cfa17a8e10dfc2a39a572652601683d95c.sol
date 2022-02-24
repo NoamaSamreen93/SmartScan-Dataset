@@ -64,7 +64,7 @@ contract Synvote is Claimable {
 
     string  public constant  VERSION='2018.02';
     uint256 public constant  MINETHVOTE = 1*(10**17);
-    
+
 
     //////////////////////
     // DATA Structures  //
@@ -94,24 +94,24 @@ contract Synvote is Claimable {
     event VoteStarted(uint64 _when);
     event NewBet(address _who, uint256 _wei, string _prj);
     event VoteFinished(address _who, uint64 _when);
-   
-    
+
+
     function() external { }
-    
+
     ///@notice Add item to progject vote list
     /// @dev It must be call from owner before startVote()
     /// @param _prjName   - string, project name for vote.
-    /// @param _prjAddress   - address, only this address can get 
+    /// @param _prjAddress   - address, only this address can get
     /// reward if project will win.
-    function addProjectToVote(string calldata _prjName, address _prjAddress) 
-    external 
-    payable 
+    function addProjectToVote(string calldata _prjName, address _prjAddress)
+    external
+    payable
     onlyOwner
     {
         require(currentStage == StageName.preList, "Can't add item after vote has starting!");
         require(_prjAddress != address(0),"Address must be valid!");
         bytes32 hash = keccak256(bytes(_prjName));
-        require( projects[hash].prjAddress == address(0), 
+        require( projects[hash].prjAddress == address(0),
             "It seems like this item allready exist!"
         );
         projects[hash] = PrjProperties({
@@ -120,7 +120,7 @@ contract Synvote is Claimable {
                 prjWeiRaised: 0
             });
     }
-    
+
     ///@notice Start vote
     /// @dev It must be call from owner when vote list is ready
     /// @param _votefinish   - uint64,end of vote in Unix date format.
@@ -138,12 +138,12 @@ contract Synvote is Claimable {
     function vote(string calldata _prjName) external payable {
         require(currentStage == StageName.inProgress,
             "Vote disable now!"
-        
+
         );
         require(msg.value >= MINETHVOTE, "Please send more ether!");
         bytes32 hash = keccak256(bytes(_prjName));
         PrjProperties memory currentBet = projects[hash];//Storage - or   other place!!!!
-        require(currentBet.prjAddress != address(0), 
+        require(currentBet.prjAddress != address(0),
             "It seems like there is no item with that name"
         );
         projects[hash].voteCount = currentBet.voteCount + 1;
@@ -152,17 +152,17 @@ contract Synvote is Claimable {
         //Check for new winner
         if  (currentBet.voteCount + 1 > projects[keccak256(bytes(currentWinner))].voteCount)
             currentWinner = _prjName;
-        //Check vote end    
+        //Check vote end
         if  (now >= voteFinishDate)
             currentStage = StageName.voteFinished;
             emit VoteFinished(msg.sender, uint64(now));
-        
+
     }
 
     /// @notice Transfer all ether from contract balance(reward found) to winner
     /// @dev New currentStage will be set after successful call
     function withdrawWinner() external {
-        require(currentStage == StageName.voteFinished, 
+        require(currentStage == StageName.voteFinished,
             "Withdraw disable yet/allready!"
         );
         require(msg.sender == projects[keccak256(bytes(currentWinner))].prjAddress,
@@ -171,23 +171,34 @@ contract Synvote is Claimable {
         currentStage = StageName.rewardWithdrawn;
         msg.sender.transfer(address(this).balance);
     }
-    
+
     ///@notice Calculate hash
     /// @dev There is web3py analog exists: Web3.soliditySha3(['string'], ['_hashinput'])
     /// @param _hashinput   - string .
-    /// @return byte32, result of keccak256 (sha3 in old style) 
+    /// @return byte32, result of keccak256 (sha3 in old style)
     function calculateSha3(string memory _hashinput) public pure returns (bytes32){
-        return keccak256(bytes(_hashinput)); 
+        return keccak256(bytes(_hashinput));
     }
-   
-    
+
+
     ///@dev use in case of depricate this contract or for gas reclaiming after vote
     function kill() external onlyOwner {
-        require(currentStage == StageName.rewardWithdrawn, 
+        require(currentStage == StageName.rewardWithdrawn,
             "Withdraw reward first!!!"
         );
         selfdestruct(msg.sender);
     }
-    
-         
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -8,7 +8,7 @@ pragma solidity 0.4.25;
 *
 * Get your profit 7,77% every day  with www.eth777io.com DON'T MISS YOUR CHANCE!
 * No analogues. For real without a fraud. Save and raise your capital
-*/ 
+*/
 
 
 library Math {
@@ -53,7 +53,7 @@ library Percent {
     uint num;
     uint den;
   }
-  
+
   function mul(percent storage p, uint a) internal view returns (uint) {
     if (a == 0) {
       return 0;
@@ -200,12 +200,12 @@ contract Accessibility {
 
 
 contract Rev1Storage {
-  function investorShortInfo(address addr) public view returns(uint value, uint refBonus); 
+  function investorShortInfo(address addr) public view returns(uint value, uint refBonus);
 }
 
 
 contract Rev2Storage {
-  function investorInfo(address addr) public view returns(uint investment, uint paymentTime); 
+  function investorInfo(address addr) public view returns(uint investment, uint paymentTime);
 }
 
 
@@ -236,7 +236,7 @@ library PrivateEntrance {
     maxInvestment = Math.min(maxInvestment, pe.investorMaxInvestment);
 
     (uint currInvestment, ) = pe.rev2Storage.investorInfo(investorAddr);
-    
+
     if (currInvestment >= maxInvestment) {
       return 0;
     }
@@ -307,7 +307,7 @@ contract InvestorsStorage is Accessibility {
 
 library RapidGrowthProtection {
   using RapidGrowthProtection for rapidGrowthProtection;
-  
+
   struct rapidGrowthProtection {
     uint startTimestamp;
     uint maxDailyTotalInvestment;
@@ -343,7 +343,7 @@ library RapidGrowthProtection {
     return true;
   }
 
-  function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal { 
+  function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
     rgp.startTimestamp = timestamp;
 
     // restart
@@ -358,7 +358,7 @@ library RapidGrowthProtection {
     if (rgp.startTimestamp > now) {
       return 0;
     }
-    day = (now - rgp.startTimestamp) / 24 hours + 1; 
+    day = (now - rgp.startTimestamp) / 24 hours + 1;
   }
 }
 
@@ -371,22 +371,22 @@ contract Revolution2 is Accessibility {
 
   // easy read for investors
   using Address for *;
-  using Zero for *; 
-  
+  using Zero for *;
+
   RapidGrowthProtection.rapidGrowthProtection private m_rgp;
   PrivateEntrance.privateEntrance private m_privEnter;
   mapping(address => bool) private m_referrals;
   InvestorsStorage private m_investors;
 
   // automatically generates getters
-  uint public constant minInvesment = 10 finney; 
-  uint public constant maxBalance = 333e5 ether; 
+  uint public constant minInvesment = 10 finney;
+  uint public constant maxBalance = 333e5 ether;
   address public advertisingAddress;
   address public adminsAddress;
   uint public investmentsNumber;
   uint public waveStartup;
 
-  // percents 
+  // percents
   Percent.percent private m_5_percent = Percent.percent(777,10000);            // 777/10000 *100% = 7.77%
   Percent.percent private m_6_percent = Percent.percent(9,100);            // 9/100 *100% = 9%
   Percent.percent private m_7_percent = Percent.percent(10,100);            // 10/100 *100% = 10%
@@ -458,7 +458,7 @@ contract Revolution2 is Accessibility {
     m_rgp.maxDailyTotalInvestment = 500 ether;
     m_rgp.activityDays = 21;
     emit LogRGPInit(
-      now, 
+      now,
       m_rgp.startTimestamp,
       m_rgp.maxDailyTotalInvestment,
       m_rgp.activityDays
@@ -471,10 +471,10 @@ contract Revolution2 is Accessibility {
     m_privEnter.investorMaxInvestment = 50 ether;
     m_privEnter.endTimestamp = timestamp;
     emit LogPEInit(
-      now, 
-      address(m_privEnter.rev1Storage), 
-      address(m_privEnter.rev2Storage), 
-      m_privEnter.investorMaxInvestment, 
+      now,
+      address(m_privEnter.rev1Storage),
+      address(m_privEnter.rev2Storage),
+      m_privEnter.investorMaxInvestment,
       m_privEnter.endTimestamp
     );
   }
@@ -529,7 +529,7 @@ contract Revolution2 is Accessibility {
 
   function getMyDividends() public notFromContract balanceChanged {
     // calculate dividends
-    
+
     //check if 1 day passed after last payment
     require(now.sub(getMemInvestor(msg.sender).paymentTime) > 24 hours);
 
@@ -543,7 +543,7 @@ contract Revolution2 is Accessibility {
     if (address(this).balance <= dividends) {
       nextWave();
       dividends = address(this).balance;
-    } 
+    }
 
     // transfer dividends to investor
     msg.sender.transfer(dividends);
@@ -556,14 +556,14 @@ contract Revolution2 is Accessibility {
     require(investment >= minInvesment, "investment must be >= minInvesment");
     require(address(this).balance <= maxBalance, "the contract eth balance limit");
 
-    if (m_rgp.isActive()) { 
+    if (m_rgp.isActive()) {
       // use Rapid Growth Protection if needed
       uint rpgMaxInvest = m_rgp.maxInvestmentAtNow();
       rpgMaxInvest.requireNotZero();
       investment = Math.min(investment, rpgMaxInvest);
       assert(m_rgp.saveInvestment(investment));
       emit LogRGPInvestment(msg.sender, now, investment, m_rgp.currDay());
-      
+
     } else if (m_privEnter.isActive()) {
       // use Private Entrance if needed
       uint peMaxInvest = m_privEnter.maxInvestmentFor(msg.sender);
@@ -588,14 +588,14 @@ contract Revolution2 is Accessibility {
     // ref system works only once and only on first invest
     if (referrerAddr.notZero() && !senderIsInvestor && !m_referrals[msg.sender] &&
       referrerAddr != msg.sender && m_investors.isInvestor(referrerAddr)) {
-      
+
       m_referrals[msg.sender] = true;
       // add referral bonus to investor`s and referral`s investments
       uint referrerBonus = m_referrer_percent.mmul(investment);
       if (investment > 10 ether) {
         referrerBonus = m_referrer_percentMax.mmul(investment);
       }
-      
+
       uint referalBonus = m_referal_percent.mmul(investment);
       assert(m_investors.addInvestment(referrerAddr, referrerBonus)); // add referrer bonus
       investment += referalBonus;                                    // add referral bonus
@@ -635,7 +635,7 @@ contract Revolution2 is Accessibility {
     if (investor.investment.isZero() || now.sub(investor.paymentTime) < 10 minutes) {
       return 0;
     }
-    
+
     // for prevent burning daily dividends if 24h did not pass - calculate it per 10 min interval
     Percent.percent memory p = dailyPercent();
     dividends = (now.sub(investor.paymentTime) / 10 minutes) * p.mmul(investor.investment) / 144;
@@ -644,23 +644,23 @@ contract Revolution2 is Accessibility {
   function dailyPercent() internal view returns(Percent.percent memory p) {
     uint balance = address(this).balance;
 
-    if (balance < 500 ether) { 
-      p = m_5_percent.toMemory(); 
+    if (balance < 500 ether) {
+      p = m_5_percent.toMemory();
     } else if ( 500 ether <= balance && balance <= 1500 ether) {
-      p = m_6_percent.toMemory();    
+      p = m_6_percent.toMemory();
     } else if ( 1500 ether <= balance && balance <= 5000 ether) {
-      p = m_7_percent.toMemory();   
+      p = m_7_percent.toMemory();
     } else if ( 5000 ether <= balance && balance <= 10000 ether) {
-      p = m_8_percent.toMemory();  
+      p = m_8_percent.toMemory();
     } else if ( 10000 ether <= balance && balance <= 20000 ether) {
-      p = m_9_percent.toMemory();    
+      p = m_9_percent.toMemory();
     } else if ( 20000 ether <= balance && balance <= 30000 ether) {
-      p = m_10_percent.toMemory();  
+      p = m_10_percent.toMemory();
     } else if ( 30000 ether <= balance && balance <= 50000 ether) {
-      p = m_11_percent.toMemory();   
+      p = m_11_percent.toMemory();
     } else {
-      p = m_12_percent.toMemory();    
-    } 
+      p = m_12_percent.toMemory();
+    }
   }
 
   function nextWave() private {
@@ -671,4 +671,15 @@ contract Revolution2 is Accessibility {
     emit LogRGPInit(now , m_rgp.startTimestamp, m_rgp.maxDailyTotalInvestment, m_rgp.activityDays);
     emit LogNextWave(now);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

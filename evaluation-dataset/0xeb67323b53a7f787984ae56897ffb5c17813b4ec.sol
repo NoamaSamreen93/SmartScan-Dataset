@@ -485,10 +485,10 @@ contract FrenchIco_Crowdsale is OwnablePayable, FrenchIco {
     event Copyright(string copyright);
 
    /**
-   * 
+   *
    * @param Investor is the ETH address of the Investor
    * @param tokensBought the quantity of tokens bought by the contributor
-   
+
    */
 
     struct Investor {
@@ -559,4 +559,13 @@ contract FrenchIco_Crowdsale is OwnablePayable, FrenchIco {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

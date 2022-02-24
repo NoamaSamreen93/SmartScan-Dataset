@@ -1,9 +1,9 @@
-pragma solidity ^0.4.24;    
+pragma solidity ^0.4.24;
 ////////////////////////////////////////////////////////////////////////////////
 library     SafeMath
 {
     //------------------
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
     {
         if (a == 0)     return 0;
         uint256 c = a * b;
@@ -11,18 +11,18 @@ library     SafeMath
         return c;
     }
     //--------------------------------------------------------------------------
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a/b;
     }
     //--------------------------------------------------------------------------
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
     //--------------------------------------------------------------------------
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -30,14 +30,14 @@ library     SafeMath
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract    ERC20 
+contract    ERC20
 {
     using SafeMath  for uint256;
 
     //----- VARIABLES
 
     address public              owner;          // Owner of this contract
-    address public              admin;          // The one who is allowed to do changes 
+    address public              admin;          // The one who is allowed to do changes
 
     mapping(address => uint256)                         balances;       // Maintain balance in a mapping
     mapping(address => mapping (address => uint256))    allowances;     // Allowances index-1 = Owner account   index-2 = spender account
@@ -48,9 +48,9 @@ contract    ERC20
     string  public  constant    symbol   = "RDST";
 
     uint256 public  constant    decimals = 18;
-    
+
     uint256 public  constant    initSupply       = 60000000 * 10**decimals;        // 10**18 max
-    uint256 public  constant    supplyReserveVal = 37500000 * 10**decimals;          // if quantity => the ##MACRO## addrs "* 10**decimals" 
+    uint256 public  constant    supplyReserveVal = 37500000 * 10**decimals;          // if quantity => the ##MACRO## addrs "* 10**decimals"
 
     //-----
 
@@ -64,13 +64,13 @@ contract    ERC20
 
     uint256 public              icoDeadLine = 1533513600;     // 2018-08-06 00:00 (GMT+0)   not needed
 
-    bool    public              isIcoPaused            = false; 
+    bool    public              isIcoPaused            = false;
     bool    public              isStoppingIcoOnHardCap = true;
 
     //--------------------------------------------------------------------------
 
     modifier duringIcoOnlyTheOwner()  // if not during the ico : everyone is allowed at anytime
-    { 
+    {
         require( now>icoDeadLine || msg.sender==owner );
         _;
     }
@@ -101,18 +101,18 @@ contract    ERC20
 
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    constructor()   public 
+    constructor()   public
     {
         owner       = msg.sender;
         admin       = owner;
 
         isIcoPaused = false;
-        
+
         //-----
 
         balances[owner] = initSupply;   // send the tokens to the owner
         totalSupply     = initSupply;
-        icoSalesSupply  = totalSupply;   
+        icoSalesSupply  = totalSupply;
 
         //----- Handling if there is a special maximum amount of tokens to spend during the ICO or not
 
@@ -124,24 +124,24 @@ contract    ERC20
     //----- ERC20 FUNCTIONS
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    function balanceOf(address walletAddress) public constant returns (uint256 balance) 
+    function balanceOf(address walletAddress) public constant returns (uint256 balance)
     {
         return balances[walletAddress];
     }
     //--------------------------------------------------------------------------
-    function transfer(address toAddr, uint256 amountInWei)  public   duringIcoOnlyTheOwner   returns (bool)     // don't icoNotPaused here. It's a logic issue. 
+    function transfer(address toAddr, uint256 amountInWei)  public   duringIcoOnlyTheOwner   returns (bool)     // don't icoNotPaused here. It's a logic issue.
     {
         require(toAddr!=0x0 && toAddr!=msg.sender && amountInWei>0);     // Prevent transfer to 0x0 address and to self, amount must be >0
 
         uint256 availableTokens = balances[msg.sender];
 
-        //----- Checking Token reserve first : if during ICO    
+        //----- Checking Token reserve first : if during ICO
 
         if (msg.sender==owner && now <= icoDeadLine)                    // ICO Reserve Supply checking: Don't touch the RESERVE of tokens when owner is selling
         {
             assert(amountInWei<=availableTokens);
 
-            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);      
+            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);
 
             assert(balanceAfterTransfer >= icoReserveSupply);           // We try to sell more than allowed during an ICO
         }
@@ -161,7 +161,7 @@ contract    ERC20
         return allowances[walletAddress][spender];
     }
     //--------------------------------------------------------------------------
-    function transferFrom(address fromAddr, address toAddr, uint256 amountInWei)  public  returns (bool) 
+    function transferFrom(address fromAddr, address toAddr, uint256 amountInWei)  public  returns (bool)
     {
         if (amountInWei <= 0)                                   return false;
         if (allowances[fromAddr][msg.sender] < amountInWei)     return false;
@@ -175,7 +175,7 @@ contract    ERC20
         return true;
     }
     //--------------------------------------------------------------------------
-    function approve(address spender, uint256 amountInWei) public returns (bool) 
+    function approve(address spender, uint256 amountInWei) public returns (bool)
     {
         require((amountInWei == 0) || (allowances[msg.sender][spender] == 0));
         allowances[msg.sender][spender] = amountInWei;
@@ -184,7 +184,7 @@ contract    ERC20
         return true;
     }
     //--------------------------------------------------------------------------
-    function() public                       
+    function() public
     {
         assert(true == false);      // If Ether is sent to this address, don't handle it -> send it back.
     }
@@ -254,9 +254,9 @@ contract    ERC20
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract    DateTime 
+contract    DateTime
 {
-    struct TDateTime 
+    struct TDateTime
     {
         uint16 year;    uint8 month;    uint8 day;
         uint8 hour;     uint8 minute;   uint8 second;
@@ -270,7 +270,7 @@ contract    DateTime
     uint constant MINUTE_IN_SECONDS    = 60;
     uint16 constant ORIGIN_YEAR        = 1970;
     //-------------------------------------------------------------------------
-    function isLeapYear(uint16 year) public pure returns (bool) 
+    function isLeapYear(uint16 year) public pure returns (bool)
     {
         if ((year %   4)!=0)    return false;
         if ( year % 100 !=0)    return true;
@@ -278,13 +278,13 @@ contract    DateTime
         return true;
     }
     //-------------------------------------------------------------------------
-    function leapYearsBefore(uint year) public pure returns (uint) 
+    function leapYearsBefore(uint year) public pure returns (uint)
     {
         year -= 1;
         return year / 4 - year / 100 + year / 400;
     }
     //-------------------------------------------------------------------------
-    function getDaysInMonth(uint8 month, uint16 year) public pure returns (uint8) 
+    function getDaysInMonth(uint8 month, uint16 year) public pure returns (uint8)
     {
         uint8   nDay = 30;
              if (month==1)          nDay++;
@@ -294,7 +294,7 @@ contract    DateTime
         else if (month==8)          nDay++;
         else if (month==10)         nDay++;
         else if (month==12)         nDay++;
-        else if (month==2) 
+        else if (month==2)
         {
                                     nDay = 28;
             if (isLeapYear(year))   nDay++;
@@ -302,7 +302,7 @@ contract    DateTime
         return nDay;
     }
     //-------------------------------------------------------------------------
-    function parseTimestamp(uint timestamp) internal pure returns (TDateTime dt) 
+    function parseTimestamp(uint timestamp) internal pure returns (TDateTime dt)
     {
         uint  secondsAccountedFor = 0;
         uint  buf;
@@ -312,19 +312,19 @@ contract    DateTime
         buf     = leapYearsBefore(dt.year) - leapYearsBefore(ORIGIN_YEAR);
         secondsAccountedFor += LEAP_YEAR_IN_SECONDS * buf;
         secondsAccountedFor += YEAR_IN_SECONDS   * (dt.year - ORIGIN_YEAR - buf);
-        for (i = 1; i <= 12; i++) 
+        for (i = 1; i <= 12; i++)
         {
             secondsInMonth = DAY_IN_SECONDS * getDaysInMonth(i, dt.year);
-            if (secondsInMonth + secondsAccountedFor > timestamp) 
+            if (secondsInMonth + secondsAccountedFor > timestamp)
             {
                 dt.month = i;
                 break;
             }
             secondsAccountedFor += secondsInMonth;
         }
-        for (i=1; i<=getDaysInMonth(dt.month, dt.year); i++) 
+        for (i=1; i<=getDaysInMonth(dt.month, dt.year); i++)
         {
-            if (DAY_IN_SECONDS + secondsAccountedFor > timestamp) 
+            if (DAY_IN_SECONDS + secondsAccountedFor > timestamp)
             {
                 dt.day = i;
                 break;
@@ -337,7 +337,7 @@ contract    DateTime
         dt.weekday = getWeekday(timestamp);
     }
     //-------------------------------------------------------------------------
-    function getYear(uint timestamp) public pure returns (uint16) 
+    function getYear(uint timestamp) public pure returns (uint16)
     {
         uint secondsAccountedFor = 0;
         uint16 year;
@@ -346,7 +346,7 @@ contract    DateTime
         numLeapYears = leapYearsBefore(year) - leapYearsBefore(ORIGIN_YEAR);
         secondsAccountedFor += LEAP_YEAR_IN_SECONDS * numLeapYears;
         secondsAccountedFor += YEAR_IN_SECONDS * (year - ORIGIN_YEAR - numLeapYears);
-        while (secondsAccountedFor > timestamp) 
+        while (secondsAccountedFor > timestamp)
         {
             if (isLeapYear(uint16(year - 1)))   secondsAccountedFor -= LEAP_YEAR_IN_SECONDS;
             else                                secondsAccountedFor -= YEAR_IN_SECONDS;
@@ -355,55 +355,55 @@ contract    DateTime
         return year;
     }
     //-------------------------------------------------------------------------
-    function getMonth(uint timestamp) public pure returns (uint8) 
+    function getMonth(uint timestamp) public pure returns (uint8)
     {
         return parseTimestamp(timestamp).month;
     }
     //-------------------------------------------------------------------------
-    function getDay(uint timestamp) public pure returns (uint8) 
+    function getDay(uint timestamp) public pure returns (uint8)
     {
         return parseTimestamp(timestamp).day;
     }
     //-------------------------------------------------------------------------
-    function getHour(uint timestamp) public pure returns (uint8) 
+    function getHour(uint timestamp) public pure returns (uint8)
     {
         return uint8(((timestamp % 86400) / 3600) % 24);
     }
     //-------------------------------------------------------------------------
-    function getMinute(uint timestamp) public pure returns (uint8) 
+    function getMinute(uint timestamp) public pure returns (uint8)
     {
         return uint8((timestamp % 3600) / 60);
     }
     //-------------------------------------------------------------------------
-    function getSecond(uint timestamp) public pure returns (uint8) 
+    function getSecond(uint timestamp) public pure returns (uint8)
     {
         return uint8(timestamp % 60);
     }
     //-------------------------------------------------------------------------
-    function getWeekday(uint timestamp) public pure returns (uint8) 
+    function getWeekday(uint timestamp) public pure returns (uint8)
     {
         return uint8((timestamp / DAY_IN_SECONDS + 4) % 7);
     }
     //-------------------------------------------------------------------------
-    function toTimestamp(uint16 year, uint8 month, uint8 day) public pure returns (uint timestamp) 
+    function toTimestamp(uint16 year, uint8 month, uint8 day) public pure returns (uint timestamp)
     {
         return toTimestamp(year, month, day, 0, 0, 0);
     }
     //-------------------------------------------------------------------------
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour) public pure returns (uint timestamp) 
+    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour) public pure returns (uint timestamp)
     {
         return toTimestamp(year, month, day, hour, 0, 0);
     }
     //-------------------------------------------------------------------------
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public pure returns (uint timestamp) 
+    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public pure returns (uint timestamp)
     {
         return toTimestamp(year, month, day, hour, minute, 0);
     }
     //-------------------------------------------------------------------------
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute, uint8 second) public pure returns (uint timestamp) 
+    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute, uint8 second) public pure returns (uint timestamp)
     {
         uint16 i;
-        for (i = ORIGIN_YEAR; i < year; i++) 
+        for (i = ORIGIN_YEAR; i < year; i++)
         {
             if (isLeapYear(i))  timestamp += LEAP_YEAR_IN_SECONDS;
             else                timestamp += YEAR_IN_SECONDS;
@@ -421,7 +421,7 @@ contract    DateTime
         monthDayCounts[9]  = 31;
         monthDayCounts[10] = 30;
         monthDayCounts[11] = 31;
-        for (i=1; i<month; i++) 
+        for (i=1; i<month; i++)
         {
             timestamp += DAY_IN_SECONDS * monthDayCounts[i - 1];
         }
@@ -440,7 +440,7 @@ contract    DateTime
         {
             dayCount += getDaysInMonth(iMonth, date.year);
         }
-        dayCount += date.day;   
+        dayCount += date.day;
         return dayCount;        // We have now the amount of days since January 1st of that year
     }
     //-------------------------------------------------------------------------
@@ -461,15 +461,15 @@ contract    DateTime
         {
             monthDayCount = 31;
         }
-        if (iDay<1)           
+        if (iDay<1)
         {
             iDay = 1;
         }
-        else if (iDay>monthDayCount)     
+        else if (iDay>monthDayCount)
         {
             iDay = 1;       // if day is over limit, set the date on the first day of the next month
             iMonth++;
-            if (iMonth>12)  
+            if (iMonth>12)
             {
                 iMonth=1;
                 iYear++;
@@ -514,19 +514,19 @@ contract    CompoundContract  is  ERC20, DateTime
 
     mapping(uint256 => bool)         private    activeContractStatues;      // Use when doing a payEarnings to navigate through all contracts
     mapping(uint => TCompoundItem)   private    contracts;
-    mapping(uint256 => uint32[12])   private    compoundPayTimes;    
-    mapping(uint256 => uint8[12])    private    compoundPayStatus;          // to know if a compound has already been paid or not. So not repaying again    
+    mapping(uint256 => uint32[12])   private    compoundPayTimes;
+    mapping(uint256 => uint8[12])    private    compoundPayStatus;          // to know if a compound has already been paid or not. So not repaying again
 
-    event onCompoundContractCompleted(address investor, uint256 compoundId, 
-                                                        uint256 capital, 
-                                                        uint256 earnedAmount, 
-                                                        uint256 total, 
+    event onCompoundContractCompleted(address investor, uint256 compoundId,
+                                                        uint256 capital,
+                                                        uint256 earnedAmount,
+                                                        uint256 total,
                                                         uint256 timestamp);
 
-    event onCompoundEarnings(address investor,  uint256 compoundId, 
-                                                uint256 capital, 
-                                                uint256 earnedAmount, 
-                                                uint256 earnedSoFarAmount, 
+    event onCompoundEarnings(address investor,  uint256 compoundId,
+                                                uint256 capital,
+                                                uint256 earnedAmount,
+                                                uint256 earnedSoFarAmount,
                                                 uint32  timestamp,
                                                 uint8   paidTermCount,
                                                 uint8   totalTermCount);
@@ -541,10 +541,10 @@ contract    CompoundContract  is  ERC20, DateTime
     function    initCompoundContract(address buyerAddress, uint256 amountInWei, uint256 compoundContractId, uint monthCount)  internal onlyOwner  returns(bool)
     {
         TCompoundItem memory    item;
-        uint                    overallTokensInWei; 
+        uint                    overallTokensInWei;
         uint                    tokenEarningsInWei;
-        uint                    earningPerTermInWei; 
-        uint                    percentToUse; 
+        uint                    earningPerTermInWei;
+        uint                    percentToUse;
         uint                    interestRate;
         uint                    i;
 
@@ -557,10 +557,10 @@ contract    CompoundContract  is  ERC20, DateTime
 
         //----- Calculate the contract revenue generated for the whole monthPeriod
 
-        (overallTokensInWei, 
+        (overallTokensInWei,
          tokenEarningsInWei,
-         earningPerTermInWei, 
-         percentToUse, 
+         earningPerTermInWei,
+         percentToUse,
          interestRate,
          i) = calculateCompoundContract(amountInWei, monthCount);
 
@@ -624,7 +624,7 @@ contract    CompoundContract  is  ERC20, DateTime
                 }
 
                 compoundPayTimes[compoundContractId][i]  = uint32(dateToTimestamp(iYear, iMonth, getDay(now)));
-                compoundPayStatus[compoundContractId][i] = 0;      
+                compoundPayStatus[compoundContractId][i] = 0;
             }
         }
         else
@@ -638,12 +638,12 @@ contract    CompoundContract  is  ERC20, DateTime
                 timeSum += duration;
 
                 compoundPayTimes[compoundContractId][i]  = uint32(timeSum);     // DEBUGING: pay every 3 minutes
-                compoundPayStatus[compoundContractId][i] = 0;      
+                compoundPayStatus[compoundContractId][i] = 0;
             }
         }
     }
     //--------------------------------------------------------------------------
-    function    calculateCompoundContract(uint256 capitalInWei, uint contractMonthCount)   public  constant returns(uint, uint, uint, uint, uint, uint)    // DON'T Set as pure, otherwise it will make investXXMonths function unusable (too much gas) 
+    function    calculateCompoundContract(uint256 capitalInWei, uint contractMonthCount)   public  constant returns(uint, uint, uint, uint, uint, uint)    // DON'T Set as pure, otherwise it will make investXXMonths function unusable (too much gas)
     {
         /*  12 months   Sapphire    From     100 to   1,000     12%
                         Emerald     From   1,000 to  10,000     15%
@@ -684,18 +684,18 @@ contract    CompoundContract  is  ERC20, DateTime
         return (overallTokensInWei,tokenEarningsInWei,earningPerTermInWei, percentToUse, interestRate, plan);
     }
     //--------------------------------------------------------------------------
-    function    lockMoneyOnCompoundCreation(address toAddr, uint compountContractId)  internal  onlyOwner   returns (bool) 
+    function    lockMoneyOnCompoundCreation(address toAddr, uint compountContractId)  internal  onlyOwner   returns (bool)
     {
         require(toAddr!=0x0 && toAddr!=msg.sender);     // Prevent transfer to 0x0 address and to self, amount must be >0
 
-        if (isHardcapReached())                                         
+        if (isHardcapReached())
         {
-            return false;       // an extra check first, who knows. 
+            return false;       // an extra check first, who knows.
         }
 
         TCompoundItem memory item = contracts[compountContractId];
 
-        if (item.tokenCapitalInWei==0 || item.tokenEarningsInWei==0)    
+        if (item.tokenCapitalInWei==0 || item.tokenEarningsInWei==0)
         {
             return false;       // don't valid such invalid contract
         }
@@ -707,7 +707,7 @@ contract    CompoundContract  is  ERC20, DateTime
 
         if (amountToLockInWei <= availableTokens)
         {
-            uint256 balanceAfterTransfer = availableTokens.sub(amountToLockInWei);      
+            uint256 balanceAfterTransfer = availableTokens.sub(amountToLockInWei);
 
             if (balanceAfterTransfer >= icoReserveSupply)       // don't sell more than allowed during ICO
             {
@@ -727,7 +727,7 @@ contract    CompoundContract  is  ERC20, DateTime
         uint                    paidAmount;
         TCompoundItem   memory  item;
 
-        if (!activeContractStatues[contractId])         
+        if (!activeContractStatues[contractId])
         {
             emit log("payCompoundTerm", "Specified contract is not actived (-1)");
             return -1;
@@ -735,7 +735,7 @@ contract    CompoundContract  is  ERC20, DateTime
 
         item = contracts[contractId];
 
-        //----- 
+        //-----
         if (item.isCancelled)   // That contract was never validated!!!
         {
             emit log("payCompoundTerm", "Compound contract already cancelled (-2)");
@@ -744,7 +744,7 @@ contract    CompoundContract  is  ERC20, DateTime
 
         //-----
 
-        if (item.isAllPaid)                             
+        if (item.isAllPaid)
         {
             emit log("payCompoundTerm", "All earnings already paid for this contract (-2)");
             return -4;   // everything was paid already
@@ -752,13 +752,13 @@ contract    CompoundContract  is  ERC20, DateTime
 
         id = item.id;
 
-        if (compoundPayStatus[id][termId]!=0)           
+        if (compoundPayStatus[id][termId]!=0)
         {
             emit log("payCompoundTerm", "Specified contract's term was already paid (-5)");
             return -5;
         }
 
-        if (now < compoundPayTimes[id][termId])         
+        if (now < compoundPayTimes[id][termId])
         {
             emit log("payCompoundTerm", "It's too early to pay this term (-6)");
             return -6;
@@ -794,9 +794,9 @@ contract    CompoundContract  is  ERC20, DateTime
         //---- it's PAY time!!!
 
         contracts[id].termPaidCount++;
-        contracts[id].currentlyEarnedInWei += item.earningPerTermInWei;  
+        contracts[id].currentlyEarnedInWei += item.earningPerTermInWei;
 
-        compoundPayStatus[id][termId] = 1;                          // PAID!!!      meaning not to repay again this revenue term 
+        compoundPayStatus[id][termId] = 1;                          // PAID!!!      meaning not to repay again this revenue term
 
         unlockEarnings(investor, item.earningPerTermInWei);
 
@@ -849,7 +849,7 @@ contract    CompoundContract  is  ERC20, DateTime
     //----- If you use the standard ERC20 balanceOf to check balance of an investor, you will see
     //----- balance = 0, if he just invested. This is normal, since money is locked in other vaults.
     //----- To check the exact money of the investor, use instead :
-    //----- lockedCapitalOf(address investor)  
+    //----- lockedCapitalOf(address investor)
     //----- to see the amount of money he fully invested and which which is still not available to him
     //----- Use also
     //----- locakedEarningsOf(address investor)
@@ -869,7 +869,7 @@ contract    CompoundContract  is  ERC20, DateTime
             lockedCapitals[investor] = lockedCapitals[investor].add(capitalAmountInWei);            /// The capital invested is now locked during the whole contract
             lockedEarnings[investor] = lockedEarnings[investor].add(totalEarningsToReceiveInWei);   /// The whole earnings is full locked also in another vault called lockedEarnings
 
-            emit Transfer(owner, investor, capitalAmountInWei);    // No need to show all locked amounts. Because these locked ones contain capital + future earnings. 
+            emit Transfer(owner, investor, capitalAmountInWei);    // No need to show all locked amounts. Because these locked ones contain capital + future earnings.
         }                                                            // So we just show the capital. the earnings will appear after each payment.
     }
     //--------------------------------------------------------------------------
@@ -903,7 +903,7 @@ contract    CompoundContract  is  ERC20, DateTime
     function    lockedEarningsOf(address investor) public  constant  returns(uint256)
     {
         return lockedEarnings[investor];
-    }  
+    }
     //--------------------------------------------------------------------------
     function    lockedBalanceOf(address investor) public  constant  returns(uint256)
     {
@@ -924,10 +924,10 @@ contract    CompoundContract  is  ERC20, DateTime
         return(uint256(t[0]),uint256(t[1]),uint256(t[2]),uint256(t[3]),uint256(t[4]),uint256(t[5]),uint256(t[6]),uint256(t[7]));
     }
     //-------------------------------------------------------------------------
-    function    getCompoundContract(uint contractId) public constant    returns(address investor, 
-                                                                        uint capital, 
+    function    getCompoundContract(uint contractId) public constant    returns(address investor,
+                                                                        uint capital,
                                                                         uint profitToGenerate,
-                                                                        uint earnedSoFarAmount, 
+                                                                        uint earnedSoFarAmount,
                                                                         uint percent,
                                                                         uint interestRate,
                                                                         uint paidTermCount,
@@ -979,13 +979,13 @@ contract    Token  is  CompoundContract
 
         uint256 availableTokens = balances[msg.sender];
 
-        //----- Checking Token reserve first : if during ICO    
+        //----- Checking Token reserve first : if during ICO
 
         if (msg.sender==owner && !isHardcapReached())              // for RegerDiamond : handle reserved supply while ICO is running
         {
             assert(amountInWei<=availableTokens);
 
-            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);      
+            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);
 
             assert(balanceAfterTransfer >= icoReserveSupply);           // We try to sell more than allowed during an ICO
         }
@@ -1006,7 +1006,7 @@ contract    Token  is  CompoundContract
     //--------------------------------------------------------------------------
     function    investFor12Months(address buyerAddress, uint256  amountInWei,
                                                           uint256  compoundContractId)
-                                                public onlyOwner  
+                                                public onlyOwner
                                                 returns(int)
     {
 
@@ -1021,12 +1021,12 @@ contract    Token  is  CompoundContract
                     return -1;
                 }
             }
-            else 
+            else
             {
-                return -2; 
+                return -2;
             }
         }
-        else        // ICO is over.  Use the ERC20 transfer now. Compound is now forbidden. Nothing more to lock 
+        else        // ICO is over.  Use the ERC20 transfer now. Compound is now forbidden. Nothing more to lock
         {
             Token.transfer(buyerAddress, amountInWei);
             return 2;
@@ -1040,7 +1040,7 @@ contract    Token  is  CompoundContract
     //--------------------------------------------------------------------------
     function    investFor24Months(address buyerAddress, uint256  amountInWei,
                                                         uint256  compoundContractId)
-                                                public onlyOwner 
+                                                public onlyOwner
                                                 returns(int)
     {
 
@@ -1052,12 +1052,12 @@ contract    Token  is  CompoundContract
             {
                 if (!lockMoneyOnCompoundCreation(buyerAddress, compoundContractId))    // Now lock the main capital (amountInWei) until the end of the compound
                 {
-                    return -1; 
+                    return -1;
                 }
             }
             else { return -2; }
         }
-        else        // ICO is over.  Use the ERC20 transfer now. Compound is now forbidden. Nothing more to lock 
+        else        // ICO is over.  Use the ERC20 transfer now. Compound is now forbidden. Nothing more to lock
         {
             Token.transfer(buyerAddress, amountInWei);
             return 2;
@@ -1072,4 +1072,20 @@ contract    Token  is  CompoundContract
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

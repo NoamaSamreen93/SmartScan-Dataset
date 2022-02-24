@@ -19,7 +19,7 @@
 pragma solidity 0.5.2;
 
 contract Pool {
-    
+
     address public owner;
 
     /*
@@ -80,7 +80,7 @@ contract RigoToken {
 
     address public minter;
     uint256 public totalSupply;
-    
+
     function balanceOf(address _who) external view returns (uint256);
 }
 
@@ -357,7 +357,7 @@ contract ProofOfPerformance is
     {
         return poolPrice[_ofPool].highwatermark;
     }
-    
+
     /// @dev Returns the reward factor for a pool.
     /// @param _ofPool Id of the pool.
     /// @return Value of the reward factor.
@@ -379,7 +379,7 @@ contract ProofOfPerformance is
     {
         return getRatioInternal(_ofPool);
     }
-    
+
     /// @dev Returns the proof of performance reward for a pool.
     /// @param _ofPool Id of the pool.
     /// @return Value of the reward in Rigo tokens.
@@ -394,7 +394,7 @@ contract ProofOfPerformance is
     {
         return proofOfPerformanceInternal(_ofPool);
     }
-    
+
     /// @dev Checks whether a pool is registered and active.
     /// @param _ofPool Id of the pool.
     /// @return Bool the pool is active.
@@ -524,7 +524,7 @@ contract ProofOfPerformance is
 
         uint256 epochReward = 0;
         (address thePoolAddress, ) = addressFromIdInternal(_ofPool);
-        uint256 grgBalance = 
+        uint256 grgBalance =
             RigoToken(RIGOTOKENADDRESS)
             .balanceOf(
                 Pool(thePoolAddress)
@@ -615,4 +615,15 @@ contract ProofOfPerformance is
         (uint256 price, uint256 supply) = getPoolPriceInternal(_ofPool);
         return ((aum = (price * supply / 1000000)), true); //1000000 is the base (decimals)
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

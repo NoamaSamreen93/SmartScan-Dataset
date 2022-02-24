@@ -529,7 +529,7 @@ contract Athlon is ERC20Detailed, ERC20Mintable, ERC20Burnable, Ownable
         _;
     }
 
-    constructor( uint256 _totalSupply, string memory _name, string memory _symbol, uint8 _decimals ) 
+    constructor( uint256 _totalSupply, string memory _name, string memory _symbol, uint8 _decimals )
         ERC20Detailed( _name, _symbol, _decimals )
         public
     {
@@ -619,4 +619,15 @@ contract Athlon is ERC20Detailed, ERC20Mintable, ERC20Burnable, Ownable
     // {
     //     msg.sender.transfer(address(this).balance);
     // }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

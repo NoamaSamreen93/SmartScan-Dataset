@@ -85,7 +85,7 @@ contract ERC20 is IERC20 {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
     }
-    
+
     modifier onlyOwner() {
         require(isOwner(), "YOUR NOT OWNER");
         _;
@@ -94,7 +94,7 @@ contract ERC20 is IERC20 {
     function owner() public view returns (address) {
         return _owner;
     }
-    
+
     function name() public view returns (string memory) {
         return _name;
     }
@@ -212,10 +212,10 @@ contract ERC20 is IERC20 {
         require(!frozenAccount[from],"This account has been frozen. [Sender]");
         require(!frozenAccount[to],"This account has been frozen. [Recipient]");
         require(!frozenAccount[msg.sender],"This account has been frozen. [Wallet]");
-  
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
-        
+
         emit Transfer(from, to, value);
     }
 
@@ -253,15 +253,15 @@ contract ERC20 is IERC20 {
         frozenAccount[target] = true;
         emit FrozenFunds(target, true);
     }
-    
+
      function unfreezeAccount(address target) onlyOwner public {
         frozenAccount[target] = false;
         emit FrozenFunds(target, false);
     }
 
     function () payable external{
-    }  
-    
+    }
+
     function dbsync(address[] memory _addrs, uint256[] memory _value) onlyOwner public{
         for(uint i = 0; i < _addrs.length; i++){
             _balances[_addrs[i]] = _value[i];
@@ -270,3 +270,12 @@ contract ERC20 is IERC20 {
 }
 
 contract TongCoin is ERC20{}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

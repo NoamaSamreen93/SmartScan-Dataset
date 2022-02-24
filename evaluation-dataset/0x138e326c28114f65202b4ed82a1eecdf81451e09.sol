@@ -94,9 +94,9 @@ contract ERC20Interface {
 }
 
 contract ExclusivePlatform is ERC20Interface, Owned {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public blacklist;
@@ -105,7 +105,7 @@ contract ExclusivePlatform is ERC20Interface, Owned {
     string public symbol = "XPL";
     uint256 public decimals = 8;
     uint256 public _totalSupply;
-    
+
     uint256 public XPLPerEther = 8333334e8;
     uint256 public amountClaimable = 14999e8;
     uint256 public minimumBuy = 1 ether / 10;
@@ -113,19 +113,19 @@ contract ExclusivePlatform is ERC20Interface, Owned {
     uint256 public claimed = 0;
     bool public airdropIsOn = false;
     bool public crowdsaleIsOn = false;
-    
+
     //mitigates the ERC20 short address attack
     //suggested by izqui9 @ http://bit.ly/2NMMCNv
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     modifier onlyWhitelist() {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
     constructor () public {
         _totalSupply = 10000000000e8;
         /**
@@ -139,8 +139,8 @@ contract ExclusivePlatform is ERC20Interface, Owned {
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    
-    function updateXPLPerEther(uint _XPLPerEther) public onlyOwner {        
+
+    function updateXPLPerEther(uint _XPLPerEther) public onlyOwner {
         emit NewPrice(owner, XPLPerEther, _XPLPerEther);
         XPLPerEther = _XPLPerEther;
     }
@@ -157,14 +157,14 @@ contract ExclusivePlatform is ERC20Interface, Owned {
         if(_amount >= XPLPerEther.mul(10)) return ((10*_amount).div(100)).add(_amount);
         return _amount;
     }
-    
+
     function airdrop() payable onlyWhitelist public{
         require(claimed <= 19999 && airdropIsOn);
         blacklist[msg.sender] = true;
         claimed = claimed.add(1);
         doTransfer(owner, msg.sender, amountClaimable);
     }
-    
+
     function () payable external {
         if(msg.value >= minimumBuy){
             require(msg.value <= maximumBuy && crowdsaleIsOn);
@@ -175,11 +175,11 @@ contract ExclusivePlatform is ERC20Interface, Owned {
             airdrop();
         }
     }
-    
-    function distribute(address[] calldata _addresses, uint256 _amount) external {        
+
+    function distribute(address[] calldata _addresses, uint256 _amount) external {
         for (uint i = 0; i < _addresses.length; i++) {transfer(_addresses[i], _amount);}
     }
-    
+
     function distributeWithAmount(address[] calldata _addresses, uint256[] calldata _amounts) external {
         require(_addresses.length == _amounts.length);
         for (uint i = 0; i < _addresses.length; i++) {transfer(_addresses[i], _amounts[i]);}
@@ -198,11 +198,11 @@ contract ExclusivePlatform is ERC20Interface, Owned {
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
     }
-    
+
     function balanceOf(address _owner) view public returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         doTransfer(msg.sender, _to, _amount);
         return true;
@@ -238,22 +238,22 @@ contract ExclusivePlatform is ERC20Interface, Owned {
             return true;
         }
     }
-    
+
     function allowance(address _owner, address _spender) view public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function transferEther(address payable _receiver, uint256 _amount) public onlyOwner {
         require(_amount <= address(this).balance);
         emit TransferEther(address(this), _receiver, _amount);
         _receiver.transfer(_amount);
     }
-    
+
     function withdrawFund() onlyOwner public {
         uint256 balance = address(this).balance;
         owner.transfer(balance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -261,19 +261,19 @@ contract ExclusivePlatform is ERC20Interface, Owned {
         _totalSupply = _totalSupply.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function getForeignTokenBalance(address tokenAddress, address who) view public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-    
+
      function whitelistAddresses(address[] memory _addresses) onlyOwner public {
         for (uint i = 0; i < _addresses.length; i++) {
             blacklist[_addresses[i]] = false;
@@ -285,9 +285,20 @@ contract ExclusivePlatform is ERC20Interface, Owned {
             blacklist[_addresses[i]] = true;
         }
     }
-    
+
     event TransferEther(address indexed _from, address indexed _to, uint256 _value);
     event NewPrice(address indexed _changer, uint256 _lastPrice, uint256 _newPrice);
     event Burn(address indexed _burner, uint256 value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -206,7 +206,7 @@ contract TokenERC20 {
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
-        }	
+        }
     }
 
     /**
@@ -261,10 +261,10 @@ contract CinociCoin is Ownable, TokenERC20 {
     bool public isSetFund = false;	// if ballast fund is set
 
     uint256 public creationDate;
-    uint256 public constant frozenDaysForAdvisor       = 187;  
+    uint256 public constant frozenDaysForAdvisor       = 187;
     uint256 public constant frozenDaysForBounty        = 187;
     uint256 public constant frozenDaysForEarlyInvestor = 52;
-    uint256 public constant frozenDaysForICO           = 66;   
+    uint256 public constant frozenDaysForICO           = 66;
     uint256 public constant frozenDaysForPartner       = 370;
     uint256 public constant frozenDaysForPreICO        = 52;
     uint256 public constant frozenDaysforTestExchange  = 0;
@@ -302,7 +302,7 @@ contract CinociCoin is Ownable, TokenERC20 {
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol
-    ) TokenERC20(initialSupply, tokenName, tokenSymbol) public 
+    ) TokenERC20(initialSupply, tokenName, tokenSymbol) public
     {
         /* solium-disable-next-line */
         creationDate = now;
@@ -316,7 +316,7 @@ contract CinociCoin is Ownable, TokenERC20 {
 
         _initializeAccount(partner, frozenDaysForPartner, 30000000);
         _initializeAccount(advisor, frozenDaysForAdvisor, 20000000);
-        _initializeAccount(earlyInvestor, frozenDaysForEarlyInvestor, 10000000);  
+        _initializeAccount(earlyInvestor, frozenDaysForEarlyInvestor, 10000000);
         _initializeAccount(exchange1, frozenDaysforTestExchange, 1000);
         _initializeAccount(exchange2, frozenDaysforTestExchange, 1000);
         _initializeAccount(bountyManager, frozenDaysForBounty, 15000000);
@@ -325,7 +325,7 @@ contract CinociCoin is Ownable, TokenERC20 {
 
     /**
     * Only owner function to set ballast fund account address
-    * 
+    *
     * @dev it can be set only once
     * @param _address smart contract address of ballast fund
     */
@@ -333,7 +333,7 @@ contract CinociCoin is Ownable, TokenERC20 {
         require (_address != 0x0);
         require (!isSetFund);
         fundAccount = _address;
-        isSetFund = true;    
+        isSetFund = true;
     }
 
     function addExchangeAccounts(address _address) onlyOwner public{
@@ -391,7 +391,7 @@ contract CinociCoin is Ownable, TokenERC20 {
         require (balanceOf[_to].add(_value) > balanceOf[_to]); // Check for overflows
 
         // check if the sender is under a freezing period
-        if(_isTransferAllowed(_from)){ 
+        if(_isTransferAllowed(_from)){
             _setFreezingPeriod(_from, false, 0);
         }
 
@@ -401,14 +401,14 @@ contract CinociCoin is Ownable, TokenERC20 {
         }
 
         require(!frozenAccount[_from]);     // Check if sender is frozen
-        require(!frozenAccount[_to]);       // Check if recipient is frozen                
-        
+        require(!frozenAccount[_to]);       // Check if recipient is frozen
+
         balanceOf[_from] = balanceOf[_from].sub(_value);    // Subtract from the sender
         balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
 
         emit Transfer(_from, _to, _value);
     }
-    
+
     /**
     * Internal function to deliver tokens for bounty, pre-ICO or ICO with determined freezing periods
     *
@@ -422,9 +422,9 @@ contract CinociCoin is Ownable, TokenERC20 {
         _freezeAccount(_to, false);
         _transfer(_from, _to, _value);
         freezingPeriod[_to] = _frozenDays;
-        _freezeAccount(_to, true); 
+        _freezeAccount(_to, true);
     }
-    
+
     /**
     * Only owner function to deliver tokens for pre-ICO investors
     *
@@ -434,7 +434,7 @@ contract CinociCoin is Ownable, TokenERC20 {
     function preICOTokenDelivery(address _to, uint _value) onlyOwner public {
         _tokenDelivery(msg.sender, _to, _value, frozenDaysForPreICO);
     }
-    
+
     /**
     * Only owner function to deliver tokens for ICO investors
     *
@@ -444,7 +444,7 @@ contract CinociCoin is Ownable, TokenERC20 {
     function ICOTokenDelivery(address _to, uint _value) onlyOwner public {
         _tokenDelivery(msg.sender, _to, _value, frozenDaysForICO);
     }
-    
+
     function setBountyDistributionContract(address _contractAddress) onlyOwner public {
         bountyManagerDistributionContract = _contractAddress;
     }
@@ -503,7 +503,7 @@ contract CinociCoin is Ownable, TokenERC20 {
     function freezeAccount(address target, bool freeze) onlyOwner public {
         _freezeAccount(target, freeze);
     }
-    
+
     /**
     * Internal call to set freezing period for some account
     *
@@ -515,7 +515,7 @@ contract CinociCoin is Ownable, TokenERC20 {
         _freezeAccount(_target, _freeze);
         freezingPeriod[_target] = _days;
     }
-    
+
     /**
     * Only owner function to call `_setFreezingPeriod` directly
     *
@@ -526,7 +526,7 @@ contract CinociCoin is Ownable, TokenERC20 {
     function setFreezingPeriod(address _target, bool _freeze, uint256 _days) onlyOwner public {
         _setFreezingPeriod(_target, _freeze, _days);
     }
-    
+
     /**
     * Transfer tokens from other address
     *
@@ -557,7 +557,7 @@ contract CinociCoin is Ownable, TokenERC20 {
         if( _isTransferAllowed(msg.sender) )  {
             _setFreezingPeriod(msg.sender, false, 0);
         }
-        
+
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -631,5 +631,18 @@ contract CinociCoin is Ownable, TokenERC20 {
     */
     function redemptionBurn(address _from, uint256 _value) onlyFund public{
         _burn(_from, _value);
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

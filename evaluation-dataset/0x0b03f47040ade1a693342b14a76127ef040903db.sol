@@ -118,7 +118,7 @@ contract TES is StandardToken{
     modifier onlyOwner{
       if(msg.sender != owner) throw;
       _;
-    } 
+    }
     function TES(){
         owner = msg.sender;
         totalSupply = 10*(10**8)*(10**decimals);
@@ -133,4 +133,15 @@ contract TES is StandardToken{
     function () payable{
         throw;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

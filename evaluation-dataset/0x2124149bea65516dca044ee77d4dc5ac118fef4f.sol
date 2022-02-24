@@ -125,7 +125,7 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -135,12 +135,12 @@ contract TokenERC20 {
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, target, mintedAmount);
     }
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     /* Internal transfer, only can be called by this contract */
     /* function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -152,7 +152,7 @@ contract TokenERC20 {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     } */
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -160,10 +160,10 @@ contract TokenERC20 {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     uint256 public sellPrice;
     uint256 public buyPrice;
-    
+
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         uint amount = msg.value / buyPrice;               // calculates the amount
@@ -178,4 +178,15 @@ contract TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

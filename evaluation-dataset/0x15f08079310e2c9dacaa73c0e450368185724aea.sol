@@ -13,7 +13,7 @@ contract SafeMath {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function safeSub(int a, int b) pure internal returns(int) {
 		if(b < 0) assert(a - b > a);
 		else assert(a - b <= a);
@@ -92,7 +92,7 @@ contract chargingGas is mortal, SafeMath{
 	uint public gasPrice;
 	/** the amount of gas used per transaction in kGas */
 	mapping(bytes4 => uint) public gasPerTx;
-	
+
 	/**
 	 * sets the amount of gas consumed by methods with the given sigantures.
 	 * only called from the edgeless casino constructor.
@@ -104,7 +104,7 @@ contract chargingGas is mortal, SafeMath{
 	  for(uint8 i = 0; i < signatures.length; i++)
 	    gasPerTx[signatures[i]] = gasNeeded[i];
 	}
-	
+
 	/**
 	 * adds the gas cost of the tx to the given value.
 	 * @param value the value to add the gas cost to
@@ -112,7 +112,7 @@ contract chargingGas is mortal, SafeMath{
 	function addGas(uint value) internal constant returns(uint){
   	return safeAdd(value,getGasCost());
 	}
-	
+
 	/**
 	 * subtracts the gas cost of the tx from the given value.
 	 * @param value the value to subtract the gas cost from
@@ -120,8 +120,8 @@ contract chargingGas is mortal, SafeMath{
 	function subtractGas(uint value) internal constant returns(uint){
   	return safeSub(value,getGasCost());
 	}
-	
-	
+
+
 	/**
 	* updates the price per 1000 gas in EDG.
 	* @param price the new gas price (4 decimals, max 0.0256 EDG)
@@ -129,7 +129,7 @@ contract chargingGas is mortal, SafeMath{
 	function setGasPrice(uint8 price) public onlyOwner{
 		gasPrice = price;
 	}
-	
+
 	/**
 	 * returns the gas cost of the called function.
 	 * */
@@ -160,7 +160,7 @@ contract CasinoBank is chargingGas{
 	uint public maxDeposit;
 	/** waiting time for withdrawal if not requested via the server **/
 	uint public waitingTime;
-	
+
 	/** informs listeners how many tokens were deposited for a player */
 	event Deposit(address _player, uint _numTokens, bool _chargeGas);
 	/** informs listeners how many tokens were withdrawn from the player to the receiver address */
@@ -238,8 +238,8 @@ contract CasinoBank is chargingGas{
 	function bankroll() constant public returns(uint){
 		return safeSub(edg.balanceOf(address(this)), playerBalance/100000);
 	}
-	
-	
+
+
 	/**
 	* updates the maximum deposit.
 	* @param newMax the new maximum deposit (5 decimals)
@@ -247,7 +247,7 @@ contract CasinoBank is chargingGas{
 	function setMaxDeposit(uint newMax) public onlyOwner{
 		maxDeposit = newMax;
 	}
-	
+
 	/**
 	 * sets the time the player has to wait for his funds to be unlocked before withdrawal (if not withdrawing with help of the casino server).
 	 * the time may not be longer than 24 hours.
@@ -277,7 +277,7 @@ contract EdgelessCasino is CasinoBank{
     event StateUpdate(uint128 count, int128 winBalance, int difference, uint gasCost, address player, uint128 lcount);
     /** fired if one of the parties chooses to log the seeds and results */
     event GameData(address player, bytes32[] serverSeeds, bytes32[] clientSeeds, int[] results);
-  
+
 	struct State{
 		uint128 count;
 		int128 winBalance;
@@ -399,7 +399,7 @@ contract EdgelessCasino is CasinoBank{
   	  balanceOf[player] = safeAdd(balanceOf[player], outs);
   	}
   }
-  
+
   /**
    * logs some seeds and game results for players wishing to have their game history logged by the contract
    * @param serverSeeds array containing the server seeds
@@ -417,7 +417,7 @@ contract EdgelessCasino is CasinoBank{
       playerBalance = safeSub(playerBalance, gasCost);
     }
   }
-  
+
   /**
    * determines if the msg.sender or the signer of the passed signature is the player. returns the player's address
    * @param serverSeeds array containing the server seeds
@@ -432,4 +432,15 @@ contract EdgelessCasino is CasinoBank{
   		return msg.sender;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

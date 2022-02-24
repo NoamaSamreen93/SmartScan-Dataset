@@ -8,12 +8,12 @@ contract ARTTOKEN {
     string public symbol = "RORO";
     mapping (address => uint256) balances;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
 
     constructor() public {
         balances[0x020a1817d75f01C8727646863664342967c6c654] = totalSupply;
     }
-    
+
     function() payable {
         revert();
     }
@@ -30,4 +30,15 @@ contract ARTTOKEN {
         return balances[_owner];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

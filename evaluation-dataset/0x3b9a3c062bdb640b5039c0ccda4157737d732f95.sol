@@ -1,9 +1,9 @@
 pragma solidity ^0.4.15;
 
 /**
- * @title MultiSigStub  
+ * @title MultiSigStub
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
- * @dev Contract that delegates calls to a library to build a full MultiSigWallet that is cheap to create. 
+ * @dev Contract that delegates calls to a library to build a full MultiSigWallet that is cheap to create.
  */
 contract MultiSigStub {
 
@@ -19,7 +19,7 @@ contract MultiSigStub {
         bytes data;
         bool executed;
     }
-    
+
     function MultiSigStub(address[] _owners, uint256 _required) {
         //bytes4 sig = bytes4(sha3("constructor(address[],uint256)"));
         bytes4 sig = 0x36756a23;
@@ -34,7 +34,7 @@ contract MultiSigStub {
         }
         _delegatecall(mData, size);
     }
-    
+
     modifier delegated {
         uint size = msg.data.length;
         bytes32 mData = _malloc(size);
@@ -49,7 +49,7 @@ contract MultiSigStub {
             return(mResult, 0x20)
         }
     }
-    
+
     function()
         payable
         delegated
@@ -62,24 +62,24 @@ contract MultiSigStub {
         delegated
         returns (uint)
     {
-        
+
     }
-    
+
     function confirmTransaction(uint transactionId)
         public
         delegated
     {
-        
+
     }
-    
+
     function watch(address _tokenAddr)
         public
         delegated
     {
-        
+
     }
-    
-    function setMyTokenList(address[] _tokenList)  
+
+    function setMyTokenList(address[] _tokenList)
         public
         delegated
     {
@@ -96,14 +96,14 @@ contract MultiSigStub {
     {
 
     }
-    
+
     /*
     * Web3 call functions
     */
-    function tokenBalances(address tokenAddress) 
+    function tokenBalances(address tokenAddress)
         public
-        constant 
-        delegated 
+        constant
+        delegated
         returns (uint)
     {
 
@@ -205,9 +205,9 @@ contract MultiSigStub {
     }
 
 
-    function _malloc(uint size) 
-        private 
-        returns(bytes32 mData) 
+    function _malloc(uint size)
+        private
+        returns(bytes32 mData)
     {
         assembly {
             mData := mload(0x40)
@@ -215,9 +215,9 @@ contract MultiSigStub {
         }
     }
 
-    function _delegatecall(bytes32 mData, uint size) 
-        private 
-        returns(bytes32 mResult) 
+    function _delegatecall(bytes32 mData, uint size)
+        private
+        returns(bytes32 mResult)
     {
         address target = 0xc0FFeEE61948d8993864a73a099c0E38D887d3F4; //Multinetwork
         mResult = _malloc(32);
@@ -229,16 +229,27 @@ contract MultiSigStub {
 
         assert(!failed);
     }
-    
+
 }
 
 contract MultiSigFactory {
-    
+
     event Create(address indexed caller, address createdContract);
 
     function create(address[] owners, uint256 required) returns (address wallet){
-        wallet = new MultiSigStub(owners, required); 
+        wallet = new MultiSigStub(owners, required);
         Create(msg.sender, wallet);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

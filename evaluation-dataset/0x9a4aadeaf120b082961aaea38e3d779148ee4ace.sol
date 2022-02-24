@@ -50,7 +50,7 @@ contract TokenERC20 {
     }
 
     function transfer(address _to, uint256 _value) public {
-        _transfer(msg.sender, _to, _value); 
+        _transfer(msg.sender, _to, _value);
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
@@ -100,4 +100,13 @@ contract TokenERC20 {
         emit AddSupply(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

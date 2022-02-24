@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 /***
  * https://apexONE.io
- * 
+ *
  * No administrators or developers, this contract is fully autonomous
  *
  * 12 % entry fee
@@ -635,4 +635,15 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -234,3 +234,7 @@ contract DroncoinTokenSale is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

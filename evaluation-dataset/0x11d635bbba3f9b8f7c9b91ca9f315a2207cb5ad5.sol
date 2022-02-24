@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
- * Library easily handles the cases of overflow as well as underflow. 
+ * Library easily handles the cases of overflow as well as underflow.
  * Also ensures that balance does nto get naegative
  */
 library SafeMath {
@@ -94,7 +94,7 @@ contract Timestamped is Ownable {
 		if(ts > 0) {
 			return ts + plus;
 		} else {
-			return block.timestamp + plus; 
+			return block.timestamp + plus;
 		}
 	}
 }
@@ -170,7 +170,7 @@ contract BasicToken is ERC20Basic {
  */
 contract StandardToken is ERC20, BasicToken {
 
-	// tracks the allowance of address. 
+	// tracks the allowance of address.
 	mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -264,19 +264,19 @@ contract StandardToken is ERC20, BasicToken {
  * @dev see https://github.com/ethereum/EIPs/issues/223
  */
 contract ERC223Receiver {
-	 
+
 	struct TKN {
 		address sender;
 		uint256 value;
 		bytes data;
 		bytes4 sig;
 	}
-	
+
 	/**
 	 * @dev Fallback function. Our ICO contract should implement this contract to receve ERC23 compatible tokens.
-	 * ERC23 protocol checks if contract has implemented this fallback method or not. 
+	 * ERC23 protocol checks if contract has implemented this fallback method or not.
 	 * If this method is not implemented then tokens are not sent.
-	 * This method is introduced to avoid loss of tokens 
+	 * This method is introduced to avoid loss of tokens
 	 *
 	 * @param _from The address which will transfer the tokens.
 	 * @param _value Amount of tokens received.
@@ -289,7 +289,7 @@ contract ERC223Receiver {
 		tkn.data = _data;
 		// uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
 		// tkn.sig = bytes4(u);
-	  
+
 		/* tkn variable is analogue of msg variable of Ether transaction
 		*  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
 		*  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -343,8 +343,8 @@ contract ERC223Token is ERC223, StandardToken {
 			// SafeMath.sub will throw if there is not enough balance.
 			balances[msg.sender] = balances[msg.sender].sub(_value);
 			balances[_to] = balances[_to].add(_value);
-	
-			// invoke custom fallback function			
+
+			// invoke custom fallback function
 			assert(_to.call.value(0)(bytes4(keccak256(_custom_fallback)), msg.sender, _value, _data));
 			Transfer(msg.sender, _to, _value, _data);
 			return true;
@@ -354,7 +354,7 @@ contract ERC223Token is ERC223, StandardToken {
 			return transferToAddress(_to, _value, _data);
 		}
 	}
-  
+
 
 	/**
 	 * @dev Function that is called when a user or another contract wants to transfer funds .
@@ -376,7 +376,7 @@ contract ERC223Token is ERC223, StandardToken {
 			return transferToAddress(_to, _value, _data);
 		}
 	}
-  
+
 	/**
 	 * @dev Standard function transfer similar to ERC20 transfer with no _data .
 	 * Added due to backwards compatibility reasons .
@@ -434,7 +434,7 @@ contract ERC223Token is ERC223, StandardToken {
 		Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
-  
+
 	/**
 	 * @dev Function that is called when transaction target is a contract. This is private method.
 	 *
@@ -454,7 +454,7 @@ contract ERC223Token is ERC223, StandardToken {
 		// call fallback function of contract
 		ERC223Receiver receiver = ERC223Receiver(_to);
 		receiver.tokenFallback(msg.sender, _value, _data);
-		
+
 		// Log the transfer event
 		Transfer(msg.sender, _to, _value, _data);
 		return true;
@@ -472,7 +472,7 @@ contract dHealthToken is ERC223Token, Ownable {
 	uint256 public constant decimals = 18;
 
 	uint256 constant INITIAL_SUPPLY = 500000000 * 1E18;
-	
+
 	/**
 	* @dev Constructor that gives msg.sender all of existing tokens.
 	*/
@@ -491,7 +491,7 @@ contract dHealthToken is ERC223Token, Ownable {
 
 /**
  * @title dHealthTokenDistributor
- * @dev The Distributor contract has an list of team member addresses and their share, 
+ * @dev The Distributor contract has an list of team member addresses and their share,
  * and provides method which can be called to distribute available smart contract balance across users.
  */
 contract dHealthTokenDistributor is Ownable, Timestamped {
@@ -534,35 +534,35 @@ contract dHealthTokenDistributor is Ownable, Timestamped {
 
 	/**
 	* @dev distribute funds.
-	*/	
+	*/
 	function distribute() onlyOwner public payable {
 		bytes memory empty;
 
-		// distribute funds to community 		
+		// distribute funds to community
 		token.transfer(communityContract, communityAmount, empty);
 
-		// distribute funds to founders 		
+		// distribute funds to founders
 		token.transfer(foundersContract, foundersAmount, empty);
 
-		// distribute funds to technical 		
+		// distribute funds to technical
 		token.transfer(technicalContract, technicalAmount, empty);
 
-		// distribute funds to management 		
+		// distribute funds to management
 		token.transfer(managementContract, managementAmount, empty);
 	}
 }
 
 /**
  * @title dHealthEtherDistributor
- * @dev The Distributor contract has an list of team member addresses and their share, 
+ * @dev The Distributor contract has an list of team member addresses and their share,
  * and provides method which can be called to distribute available smart contract balance across users.
  */
 contract dHealthEtherDistributor is Ownable, Timestamped {
 	using SafeMath for uint256;
 
-	address public projectContract;	
-	address public technologyContract;	
-	address public founderContract;	
+	address public projectContract;
+	address public technologyContract;
+	address public founderContract;
 
 	uint256 public projectShare;
 	uint256 public technologyShare;
@@ -574,9 +574,9 @@ contract dHealthEtherDistributor is Ownable, Timestamped {
 	function dHealthEtherDistributor(address _projectContract, address _technologyContract, address _founderContract) public {
 
 		// initialize contract addresses
-		projectContract = _projectContract;	
-		technologyContract = _technologyContract;	
-		founderContract = _founderContract;	
+		projectContract = _projectContract;
+		technologyContract = _technologyContract;
+		founderContract = _founderContract;
 
 		// initialize precentage share
 		projectShare = 72;
@@ -586,17 +586,17 @@ contract dHealthEtherDistributor is Ownable, Timestamped {
 
 	/**
 	* @dev distribute funds.
-	*/	
+	*/
 	function distribute() onlyOwner public payable {
 		uint256 balance = this.balance;
-		
-		// distribute funds to founders 		
+
+		// distribute funds to founders
 		uint256 founderPart = balance.mul(founderShare).div(100);
 		if(founderPart > 0) {
 			founderContract.transfer(founderPart);
 		}
 
-		// distribute funds to technology 		
+		// distribute funds to technology
 		uint256 technologyPart = balance.mul(technologyShare).div(100);
 		if(technologyPart > 0) {
 			technologyContract.transfer(technologyPart);
@@ -623,13 +623,13 @@ contract dHealthTokenIncentive is dHealthTokenDistributor, ERC223Receiver {
 	// amount of token on hold
 	uint256 public maxTokenForHold = 140000000 * 1E18;
 
-	// contract timeout 
+	// contract timeout
 	uint256 public contractTimeout = 1555286400; // Monday, 15 April 2019 00:00:00
 
 	/**
 	* @dev Constructor that initializes vesting contract with contract addresses in parameter
 	*/
-	function dHealthTokenIncentive(address _token, address _communityContract, address _foundersContract, address _technicalContract, address _managementContract) 
+	function dHealthTokenIncentive(address _token, address _communityContract, address _foundersContract, address _technicalContract, address _managementContract)
 		dHealthTokenDistributor(_token, _communityContract, _foundersContract, _technicalContract, _managementContract)
 		public {
 		// set token
@@ -641,9 +641,9 @@ contract dHealthTokenIncentive is dHealthTokenDistributor, ERC223Receiver {
 	*/
 	function withdraw() onlyOwner public {
 		require(contractTimeout <= getBlockTime());
-		
+
 		// send remaining tokens back to owner.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		bytes memory empty;
 		token.transfer(owner, tokens, empty);
 	}
@@ -686,7 +686,7 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 	uint256 public coindropsLockEndingAt = 1527811200; // Friday, 1 June 2018 00:00:00
 	bool public coindropsStatus = false;
 
-	// contract timeout 
+	// contract timeout
 	uint256 public contractTimeout = 1555286400; // Monday, 15 April 2019 00:00:00
 
 	/**
@@ -711,8 +711,8 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 		require(exchangesLockEndingAt <= getBlockTime());
 		// ensure that tokens are not already transferred
 		require(exchangesStatus == false);
-		
-		// transfer tokens to wallet and change status to prevent double transfer		
+
+		// transfer tokens to wallet and change status to prevent double transfer
 		bytes memory empty;
 		token.transfer(exchangesWallet, exchangesTokens, empty);
 		exchangesStatus = true;
@@ -726,8 +726,8 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 		require(countriesLockEndingAt <= getBlockTime());
 		// ensure that tokens are not already transferred
 		require(countriesStatus == false);
-		
-		// transfer tokens to wallet and change status to prevent double transfer		
+
+		// transfer tokens to wallet and change status to prevent double transfer
 		bytes memory empty;
 		token.transfer(countriesWallet, countriesTokens, empty);
 		countriesStatus = true;
@@ -741,8 +741,8 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 		require(acquisitionsLockEndingAt <= getBlockTime());
 		// ensure that tokens are not already transferred
 		require(acquisitionsStatus == false);
-		
-		// transfer tokens to wallet and change status to prevent double transfer		
+
+		// transfer tokens to wallet and change status to prevent double transfer
 		bytes memory empty;
 		token.transfer(acquisitionsWallet, acquisitionsTokens, empty);
 		acquisitionsStatus = true;
@@ -756,8 +756,8 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 		require(coindropsLockEndingAt <= getBlockTime());
 		// ensure that tokens are not already transferred
 		require(coindropsStatus == false);
-		
-		// transfer tokens to wallet and change status to prevent double transfer		
+
+		// transfer tokens to wallet and change status to prevent double transfer
 		bytes memory empty;
 		token.transfer(coindropsWallet, coindropsTokens, empty);
 		coindropsStatus = true;
@@ -768,9 +768,9 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 	*/
 	function withdraw() onlyOwner public {
 		require(contractTimeout <= getBlockTime());
-		
+
 		// send remaining tokens back to owner.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		bytes memory empty;
 		token.transfer(owner, tokens, empty);
 	}
@@ -779,7 +779,7 @@ contract dHealthTokenGrowth is Ownable, ERC223Receiver, Timestamped {
 
 /**
 * @title dHealthTokenSale
-* @dev This is ICO Contract. 
+* @dev This is ICO Contract.
 * This class accepts the token address as argument to talk with contract.
 * Once contract is deployed, funds are transferred to ICO smart contract address and then distributed with investor.
 * Sending funds to this ensures that no more than desired tokens are sold.
@@ -873,7 +873,7 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 		bool validTimestamp = false;
 		bool validAmount = false;
 
-		// check if phase 1 is running	
+		// check if phase 1 is running
 		if(phase1StartingAt <= getBlockTime() && getBlockTime() <= phase1EndingAt) {
 			// check if tokens is falling in timerange
 			validTimestamp = true;
@@ -882,7 +882,7 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 			validAmount = phase1MaxTokenForSale.sub(totalTokenSold) >= amount;
 		}
 
-		// check if phase 2 is running	
+		// check if phase 2 is running
 		if(phase2StartingAt <= getBlockTime() && getBlockTime() <= phase2EndingAt) {
 			// check if tokens is falling in timerange
 			validTimestamp = true;
@@ -891,7 +891,7 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 			validAmount = phase2MaxTokenForSale.sub(totalTokenSold) >= amount;
 		}
 
-		// check if phase 3 is running	
+		// check if phase 3 is running
 		if(phase3StartingAt <= getBlockTime() && getBlockTime() <= phase3EndingAt) {
 			// check if tokens is falling in timerange
 			validTimestamp = true;
@@ -912,20 +912,20 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 
 	function calculate(uint256 value) internal constant returns (uint256) {
 		uint256 amount = 0;
-			
-		// check if phase 1 is running	
+
+		// check if phase 1 is running
 		if(phase1StartingAt <= getBlockTime() && getBlockTime() <= phase1EndingAt) {
 			// calculate the amount of tokens
 			amount = value.mul(1E18).div(phase1TokenPriceInEth);
 		}
 
-		// check if phase 2 is running	
+		// check if phase 2 is running
 		if(phase2StartingAt <= getBlockTime() && getBlockTime() <= phase2EndingAt) {
 			// calculate the amount of tokens
 			amount = value.mul(1E18).div(phase2TokenPriceInEth);
 		}
 
-		// check if phase 3 is running	
+		// check if phase 3 is running
 		if(phase3StartingAt <= getBlockTime() && getBlockTime() <= phase3EndingAt) {
 			// calculate the amount of tokens
 			amount = value.mul(1E18).div(phase3TokenPriceInEth);
@@ -941,19 +941,19 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 		totalEtherRaised = totalEtherRaised.add(value);
 		etherRaisedPerWallet[msg.sender] = etherRaisedPerWallet[msg.sender].add(value);
 
-		// check if phase 1 is running	
+		// check if phase 1 is running
 		if(phase1StartingAt <= getBlockTime() && getBlockTime() <= phase1EndingAt) {
 			// add tokens to phase1 counts
 			phase1TokenSold = phase1TokenSold.add(amount);
 		}
 
-		// check if phase 2 is running	
+		// check if phase 2 is running
 		if(phase2StartingAt <= getBlockTime() && getBlockTime() <= phase2EndingAt) {
 			// add tokens to phase2 counts
 			phase2TokenSold = phase2TokenSold.add(amount);
 		}
 
-		// check if phase 3 is running	
+		// check if phase 3 is running
 		if(phase3StartingAt <= getBlockTime() && getBlockTime() <= phase3EndingAt) {
 			// add tokens to phase3 counts
 			phase3TokenSold = phase3TokenSold.add(amount);
@@ -987,28 +987,28 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 			msg.sender.transfer(value.sub(maxEthPerTransaction));
 			value = maxEthPerTransaction;
 		}
-		
+
 		// calculate tokens
 		uint256 tokens = calculate(value);
 
 		// validate the purchase
 		require(validate(value , tokens));
 
-		// update current state 
+		// update current state
 		update(value , tokens);
-		
+
 		// transfer tokens from contract balance to beneficiary account. calling ERC223 method
 		bytes memory empty;
 		token.transfer(beneficiary, tokens, empty);
-		
+
 		// log event for token purchase
 		TokenPurchase(msg.sender, beneficiary, value, tokens, now);
 	}
 
 	/**
-	* @dev transmit token for a specified address. 
+	* @dev transmit token for a specified address.
 	* This is owner only method and should be called using web3.js if someone is trying to buy token using bitcoin or any other altcoin.
-	* 
+	*
 	* @param _to The address to transmit to.
 	* @param _value The amount to be transferred.
 	* @param _message message to log after transfer.
@@ -1023,66 +1023,66 @@ contract dHealthTokenSale is dHealthEtherDistributor, ERC223Receiver {
 	}
 
 	/**
-	* @dev sendToGrowthContract  
+	* @dev sendToGrowthContract
 	* This will send remaining tokens to growth contract
-	*/	
+	*/
 	function sendToGrowthContract() onlyOwner public {
 		require(contractTimeout <= getBlockTime());
 
 		// send remaining tokens to growth contract.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		bytes memory empty;
 		token.transfer(growthContract, tokens, empty);
 	}
 
 	/**
-	* @dev sendToVestingContract  
+	* @dev sendToVestingContract
 	* This will transfer any available ethers to vesting contracts
-	*/	
+	*/
 	function sendToVestingContract() onlyOwner public {
-		// distribute funds 
+		// distribute funds
 		distribute();
 	}
 
 	/**
-	* @dev withdraw funds and tokens 
+	* @dev withdraw funds and tokens
 	* This will send remaining token balance to growth contract
 	* This will distribute available funds across team members
-	*/	
+	*/
 	function withdraw() onlyOwner public {
 		require(contractTimeout <= getBlockTime());
 
 		// send remaining tokens to growth contract.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		bytes memory empty;
 		token.transfer(growthContract, tokens, empty);
 
-		// distribute funds 
+		// distribute funds
 		distribute();
 	}
 
 	/**
-	* @dev close contract 
+	* @dev close contract
 	* This will mark contract as closed
-	*/	
+	*/
 	function close() onlyOwner public {
 		// mark the flag to indicate closure of the contract
 		isClose = true;
 	}
 
 	/**
-	* @dev pause contract 
+	* @dev pause contract
 	* This will mark contract as paused
-	*/	
+	*/
 	function pause() onlyOwner public {
 		// mark the flag to indicate pause of the contract
 		isPaused = true;
 	}
 
 	/**
-	* @dev resume contract 
+	* @dev resume contract
 	* This will mark contract as resumed
-	*/	
+	*/
 	function resume() onlyOwner public {
 		// mark the flag to indicate resume of the contract
 		isPaused = false;
@@ -1116,7 +1116,7 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 
 	// mapping that defines vesting structure
 	struct VestingStruct {
-		uint256 period; 
+		uint256 period;
 		bool status;
 		address wallet;
 		uint256 amount;
@@ -1130,7 +1130,7 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 	event Payouts(uint256 indexed period, bool status, address wallet, uint256 amount, uint256 timestamp);
 
 	/**
-	* @dev Constructor that does nothing 
+	* @dev Constructor that does nothing
 	*/
 	function dHealthEtherVesting(address _wallet) public {
 		wallet = _wallet;
@@ -1140,7 +1140,7 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 	* @dev default payable method to receive funds
 	*/
 	function() public payable {
-		
+
 	}
 
 	/**
@@ -1239,8 +1239,8 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 		}
 
 		// get vesting object for period
-		VestingStruct memory vesting = vestings[period];	
-		
+		VestingStruct memory vesting = vestings[period];
+
 		// check if payment is already done
 		if(vesting.status == false) {
 			// payment is not done yet
@@ -1254,12 +1254,12 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 				// calculate percentage and send
 				amount = balance.mul(percentage).div(100);
 			}
-			
+
 			return (period, amount);
 		} else {
-			// payment is already done 
+			// payment is already done
 			return (period, 0);
-		}		
+		}
 	}
 
 	/**
@@ -1275,7 +1275,7 @@ contract dHealthEtherVesting is Ownable, Timestamped {
 	function withdraw() onlyOwner public payable {
 		require(contractTimeout <= getBlockTime());
 		owner.transfer(this.balance);
-	}	
+	}
 }
 
 
@@ -1312,7 +1312,7 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 
 	// mapping that defines vesting structure
 	struct VestingStruct {
-		uint256 period; 
+		uint256 period;
 		bool status;
 		address wallet;
 		uint256 amount;
@@ -1336,8 +1336,8 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 		wallet = _wallet;
 
 		// set parameter specific to contract
-		maxTokenForHold = _maxTokenForHold;	
-		
+		maxTokenForHold = _maxTokenForHold;
+
 		// setup timestamp
 		startingAt = _startingAt;
 		endingAt = startingAt + 540 days;
@@ -1347,7 +1347,7 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 	* @dev default payable method to receive funds
 	*/
 	function() public payable {
-		
+
 	}
 
 	/**
@@ -1358,8 +1358,8 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 		percentage = percentage <= vestingAmount ? percentage : vestingAmount;
 
 		// get current token balance
-		uint256 balance = token.balanceOf(this); 
-		
+		uint256 balance = token.balanceOf(this);
+
 		// calculate amount allowed
 		var (period, amount) = calculate(getBlockTime() , balance , percentage);
 
@@ -1450,8 +1450,8 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 		}
 
 		// get vesting object for period
-		VestingStruct memory vesting = vestings[period];	
-		
+		VestingStruct memory vesting = vestings[period];
+
 		// check if payment is already done
 		if(vesting.status == false) {
 			// payment is not done yet
@@ -1465,12 +1465,12 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 				// calculate percentage and send
 				amount = balance.mul(percentage).div(100);
 			}
-			
+
 			return (period, amount);
 		} else {
-			// payment is already done 
+			// payment is already done
 			return (period, 0);
-		}		
+		}
 	}
 
 	/**
@@ -1485,10 +1485,21 @@ contract dHealthTokenVesting is Ownable, Timestamped {
 	*/
 	function withdraw() onlyOwner public payable {
 		require(contractTimeout <= getBlockTime());
-		
+
 		// send remaining tokens back to owner.
-		uint256 tokens = token.balanceOf(this); 
+		uint256 tokens = token.balanceOf(this);
 		bytes memory empty;
 		token.transfer(owner, tokens, empty);
-	}	
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

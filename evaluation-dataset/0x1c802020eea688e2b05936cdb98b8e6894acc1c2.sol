@@ -79,7 +79,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -356,7 +356,7 @@ contract OrderbookReserve is OrderIdManager, Utils2, KyberReserveInterface, Orde
         limits.maxOrdersPerTrade = maxOrdersPerTrade;
 
         require(setMinOrderSizeEth());
-    
+
         require(contracts.kncToken.approve(contracts.feeBurner, (2**255)));
 
         //can only support tokens with decimals() API
@@ -730,7 +730,7 @@ contract OrderbookReserve is OrderIdManager, Utils2, KyberReserveInterface, Orde
     function withdrawKncFee(uint amount) public {
 
         address maker = msg.sender;
-        
+
         require(makerKnc[maker] >= amount);
         require(makerUnlockedKnc(maker) >= amount);
 
@@ -1175,7 +1175,7 @@ contract OrderbookReserve is OrderIdManager, Utils2, KyberReserveInterface, Orde
         //stakes are returned for unused wei value
         return(takeOrder(maker, userSrc, userPartialSrcAmount, userTakeDstAmount, additionalReleasedWei));
     }
-    
+
     function takeOrder(
         address maker,
         ERC20 userSrc,
@@ -1260,4 +1260,15 @@ contract OrderbookReserve is OrderIdManager, Utils2, KyberReserveInterface, Orde
         if (rate > MAX_RATE) return false;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

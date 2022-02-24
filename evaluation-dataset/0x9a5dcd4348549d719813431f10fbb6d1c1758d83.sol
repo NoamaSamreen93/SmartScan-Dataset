@@ -10,19 +10,19 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -33,7 +33,7 @@ library SafeMath {
 contract StandardToken {
 	//使用SafeMath
     using SafeMath for uint256;
-   
+
     //代币名称
     string public name;
     //代币缩写
@@ -42,7 +42,7 @@ contract StandardToken {
     uint8 public  decimals;
 	//代币总数
 	uint256 public totalSupply;
-   
+
 	//交易的发起方(谁调用这个方法，谁就是交易的发起方)把_value数量的代币发送到_to账户
     function transfer(address _to, uint256 _value) public returns (bool success);
 
@@ -67,7 +67,7 @@ contract Owned {
     // modifier(条件)，表示必须是权力所有者才能do something，类似administrator的意思
     modifier onlyOwner() {
         require(msg.sender == owner);
-        _;//do something 
+        _;//do something
     }
 
 	//权力所有者
@@ -165,7 +165,7 @@ contract LiSaoToken is StandardToken,Controlled {
 	//账户集合
 	mapping (address => uint256) public balanceOf;
 	mapping (address => mapping (address => uint256)) internal allowed;
-	
+
 	constructor() public {
         totalSupply = 1000000000;//10亿
         name = "LiSao Token";
@@ -206,4 +206,13 @@ contract LiSaoToken is StandardToken,Controlled {
       return allowed[_owner][_spender];
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

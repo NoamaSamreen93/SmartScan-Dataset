@@ -25,7 +25,7 @@ contract CryptoIgniterToken {
      */
     function CryptoIgniterToken() public {
         totalSupply = 8000000 * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;            
+        balanceOf[msg.sender] = totalSupply;
         name = 'CryptoIgniter Token';                       // The name for display purposes
         symbol = 'CIT';                               // The symbol for display purposes
     }
@@ -144,4 +144,15 @@ contract CryptoIgniterToken {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

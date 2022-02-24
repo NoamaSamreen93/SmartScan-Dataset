@@ -8,7 +8,7 @@ pragma solidity ^0.4.18;
 // Total supply: 2,500,000,000.000000000000000000
 // Decimals    : 18
 //
-// (c) Nauticus 
+// (c) Nauticus
 // ----------------------------------------------------------------------------
 
 /**
@@ -20,7 +20,7 @@ contract Permission {
         owner = msg.sender;
     }
 
-	modifier onlyOwner() { 
+	modifier onlyOwner() {
 		require(msg.sender == owner);
 		_;
 	}
@@ -30,8 +30,8 @@ contract Permission {
 		owner = newOwner;
         return true;
 	}
-		
-}	
+
+}
 
 /**
  * @dev maintains the safety of mathematical operations.
@@ -72,12 +72,12 @@ contract NauticusToken is Permission {
 
     //implement Math lib for safe mathematical transactions.
     using Math for uint;
-    
+
     //Inception and Termination of Nauticus ICO
     //          DD/MM/YYYY
     // START    18/03/2018 NOON GMT
     // END      18/05/2018 NOON GMT
-    //          
+    //
     uint public constant inception = 1521331200;
     uint public constant termination = 1526601600;
 
@@ -88,20 +88,20 @@ contract NauticusToken is Permission {
 
     //number of tokens that exist, totally.
     uint public totalSupply;
-    
+
     //if the tokens have been minted.
     bool public minted = false;
 
     //hardcap, maximum amount of tokens that can exist
     uint public constant hardCap = 2500000000000000000000000000;
-    
+
     //if if users are able to transfer tokens between each toher.
     bool public transferActive = false;
-    
+
     //mappings for token balances and allowances.
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     /*
         MODIFIERS
     */
@@ -109,28 +109,28 @@ contract NauticusToken is Permission {
 	    require(!minted);
 	    _;
 	}
-	
-	/*modifier ICOActive() { 
-		require(now > inception * 1 seconds && now < termination * 1 seconds); 
-		_; 
+
+	/*modifier ICOActive() {
+		require(now > inception * 1 seconds && now < termination * 1 seconds);
+		_;
 	}*/
-	
+
 	modifier ICOTerminated() {
 	    require(now > termination * 1 seconds);
 	    _;
 	}
 
-	modifier transferable() { 
+	modifier transferable() {
 		//if you are NOT owner
 		if(msg.sender != owner) {
 			require(transferActive);
 		}
 		_;
 	}
-	
+
     /*
         FUNCTIONS
-    */  
+    */
     /**
         @dev approves a spender to spend an amount.
         @param spender address of the spender
@@ -160,7 +160,7 @@ contract NauticusToken is Permission {
 		//give the val to the recipient
 		balances[to] = balances[to] + val;
 
-		//emit transfer event 
+		//emit transfer event
 		Transfer(msg.sender, to, val);
 		return true;
 	}
@@ -193,7 +193,7 @@ contract NauticusToken is Permission {
 		Transfer(from,recipient,val);
         return true;
 	}
-	
+
     /**
         @dev allows Nauticus to toggle disable all inter-user transfers, ICE.
         @param newTransferState whether inter-user transfers are allowed.
@@ -204,7 +204,7 @@ contract NauticusToken is Permission {
 	    transferActive = newTransferState;
 	    return true;
 	}
-	
+
     /**
         @dev mint the appropriate amount of tokens, which is relative to tokens sold, unless hardcap is reached.
         @param tokensToExist the amount of tokens purchased on the Nauticus platform.
@@ -216,7 +216,7 @@ contract NauticusToken is Permission {
         minted = true;
         transferActive = true;
 	    return true;
-	    
+
 	}
     /**
         @dev allocate an allowance to a user
@@ -224,14 +224,25 @@ contract NauticusToken is Permission {
         @param recipient the recipient of a transfer from the holder
         @return remaining tokens left in allowance
      */
-	
+
     function allowance(address holder, address recipient) public constant returns (uint) {
         return allowed[holder][recipient];
     }
-    
+
     /**
         @dev constructor, nothing needs to happen upon contract creation, left blank.
      */
     function NauticusToken () public {}
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

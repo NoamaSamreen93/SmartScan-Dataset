@@ -672,7 +672,7 @@ contract RCContract is ERC1155, Ownable {
     // Creates a new token type and assings _initialSupply to minter
     function create(uint256 _initialSupply, address _to, string calldata _name) external onlyOwner returns (uint256 _id) {
 
-        _id = _create(_initialSupply, _to, _name); 
+        _id = _create(_initialSupply, _to, _name);
 
     }
 
@@ -695,9 +695,9 @@ contract RCContract is ERC1155, Ownable {
 
     // Batch mint tokens. Assign directly to _to[].
     function batchCreate(uint256[] calldata _initialSupplies, address[] calldata _to, string calldata _name) external onlyOwner {
-        
+
         for (uint256 i = 0; i < _to.length; ++i) {
-            _create(_initialSupplies[i], _to[i], _name); 
+            _create(_initialSupplies[i], _to[i], _name);
         }
 
     }
@@ -752,4 +752,13 @@ contract RCContract is ERC1155, Ownable {
     function totalTokenTypes() external view returns (uint256) {
         return nonce;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

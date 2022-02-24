@@ -18,26 +18,26 @@ pragma solidity ^0.4.18;
 // ----------------------------------------------------------------------------
 // Safe maths
 // ----------------------------------------------------------------------------
-contract SafeMath 
+contract SafeMath
 {
-    function safeAdd(uint a, uint b) internal pure returns (uint c) 
+    function safeAdd(uint a, uint b) internal pure returns (uint c)
     {
         c = a + b;
         require(c >= a);
     }
-    
-    function safeSub(uint a, uint b) internal pure returns (uint c) 
+
+    function safeSub(uint a, uint b) internal pure returns (uint c)
     {
         require(b <= a);
         c = a - b;
     }
-    
-    function safeMul(uint a, uint b) internal pure returns (uint c) 
+
+    function safeMul(uint a, uint b) internal pure returns (uint c)
     {
         c = a * b;
         require(a == 0 || c / a == b);
     }
-    
+
     function safeDiv(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
         c = a / b;
@@ -49,7 +49,7 @@ contract SafeMath
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
 // ----------------------------------------------------------------------------
-contract ERC20Interface 
+contract ERC20Interface
 {
     function totalSupply() public constant returns (uint);
     function balanceOf(address tokenOwner) public constant returns (uint balance);
@@ -68,7 +68,7 @@ contract ERC20Interface
 //
 // Borrowed from MiniMeToken
 // ----------------------------------------------------------------------------
-contract ApproveAndCallFallBack 
+contract ApproveAndCallFallBack
 {
     function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
 }
@@ -77,30 +77,30 @@ contract ApproveAndCallFallBack
 // ----------------------------------------------------------------------------
 // Owned contract
 // ----------------------------------------------------------------------------
-contract Owned 
+contract Owned
 {
     address public owner;
     address public newOwner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
-    function Owned() public 
+    function Owned() public
     {
         owner = msg.sender;
     }
 
-    modifier onlyOwner 
+    modifier onlyOwner
     {
         require(msg.sender == owner);
         _;
     }
 
-    function transferOwnership(address _newOwner) public onlyOwner 
+    function transferOwnership(address _newOwner) public onlyOwner
     {
         newOwner = _newOwner;
     }
-    
-    function acceptOwnership() public 
+
+    function acceptOwnership() public
     {
         require(msg.sender == newOwner);
         OwnershipTransferred(owner, newOwner);
@@ -114,7 +114,7 @@ contract Owned
 // ERC20 Token, with the addition of symbol, name and decimals and assisted
 // token transfers
 // ----------------------------------------------------------------------------
-contract subsistanceToken is ERC20Interface, Owned, SafeMath 
+contract subsistanceToken is ERC20Interface, Owned, SafeMath
 {
     string public symbol;
     string public  name;
@@ -132,7 +132,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // Constructor
     // ------------------------------------------------------------------------
     // Code manpualtion block
-    function subsistanceToken() public 
+    function subsistanceToken() public
     {
         symbol = "SBT";
         name = "subsistance Token";
@@ -146,7 +146,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
-    function totalSupply() public constant returns (uint) 
+    function totalSupply() public constant returns (uint)
     {
         return _totalSupply  - balances[address(0)];
     }
@@ -155,7 +155,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
-    function balanceOf(address tokenOwner) public constant returns (uint balance) 
+    function balanceOf(address tokenOwner) public constant returns (uint balance)
     {
         return balances[tokenOwner];
     }
@@ -166,7 +166,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-    function transfer(address to, uint tokens) public returns (bool success) 
+    function transfer(address to, uint tokens) public returns (bool success)
     {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
@@ -183,7 +183,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // recommends that there are no checks for the approval double-spend attack
     // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
-    function approve(address spender, uint tokens) public returns (bool success) 
+    function approve(address spender, uint tokens) public returns (bool success)
     {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
@@ -200,7 +200,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // - Spender must have sufficient allowance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-    function transferFrom(address from, address to, uint tokens) public returns (bool success) 
+    function transferFrom(address from, address to, uint tokens) public returns (bool success)
     {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -214,7 +214,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
     // ------------------------------------------------------------------------
-    function allowance(address tokenOwner, address spender) public constant returns (uint remaining) 
+    function allowance(address tokenOwner, address spender) public constant returns (uint remaining)
     {
         return allowed[tokenOwner][spender];
     }
@@ -225,7 +225,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // from the token owner's account. The `spender` contract function
     // `receiveApproval(...)` is then executed
     // ------------------------------------------------------------------------
-    function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) 
+    function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success)
     {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
@@ -236,7 +236,7 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // ------------------------------------------------------------------------
     // 100,000,000,000 FWD Tokens per 1 ETH
     // ------------------------------------------------------------------------
-    function () public payable 
+    function () public payable
     {
         require(now >= startDate && now <= endDate);
         uint tokens;
@@ -256,8 +256,21 @@ contract subsistanceToken is ERC20Interface, Owned, SafeMath
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
-    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -31,7 +31,7 @@ contract Token {
             return true;
         } else { return false; }
     }
-    
+
      function marketplace( string memory data) public returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -44,14 +44,14 @@ contract Token {
             return true;
         } else { return false; }
     }
-    
-     
+
+
 
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function mybalance() public view returns (uint256 balance) {
         return balances[fundsWallet];
     }
@@ -74,11 +74,11 @@ contract Token {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    string public version = 'H1.0';
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address payable fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     constructor () public {
         balances[msg.sender] = 1000000000000000000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
@@ -89,6 +89,15 @@ contract Token {
         fundsWallet = msg.sender;                                    // The owner of the contract gets ETH
     }
 
-   
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

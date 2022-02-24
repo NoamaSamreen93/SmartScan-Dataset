@@ -1,15 +1,15 @@
 pragma solidity ^0.5.1;
 
 
-/**  
+/**
 @title Gas Refund Token
 Allow any user to sponsor gas refunds for transfer and mints. Utilitzes the gas refund mechanism in EVM
 Each time an non-empty storage slot is set to 0, evm refund 15,000 (19,000 after Constantinople) to the sender
-of the transaction. 
+of the transaction.
 */
 contract GasRefundToken  {
     uint256[] public gasRefundPool;
-    
+
     function sponsorGas() external {
         uint256 len = gasRefundPool.length;
         uint256 refundPrice = 1;
@@ -25,7 +25,7 @@ contract GasRefundToken  {
         gasRefundPool[len + 7] = refundPrice;
         gasRefundPool[len + 8] = refundPrice;
     }
-    
+
     function sponsorGas2() external {
         assembly {
           let len := sload(gasRefundPool_slot)
@@ -39,7 +39,7 @@ contract GasRefundToken  {
           sstore(gasRefundPool_slot, add(len, 3))
         }
     }
-    
+
 
     function minimumGasPriceForRefund() public view returns (uint256) {
         uint256 len = gasRefundPool.length;
@@ -49,7 +49,7 @@ contract GasRefundToken  {
         return uint256(-1);
     }
 
-    /**  
+    /**
     @dev refund 45,000 gas for functions with gasRefund modifier.
     */
     function gasRefund() public {
@@ -59,9 +59,9 @@ contract GasRefundToken  {
             gasRefundPool[--len] = 0;
             gasRefundPool[--len] = 0;
             gasRefundPool.length = len;
-        }   
+        }
     }
-    
+
     function gasRefund2() public {
         assembly {
             let len := sload(gasRefundPool_slot)
@@ -77,22 +77,22 @@ contract GasRefundToken  {
             sstore(gasRefundPool_slot, sub(len, 3))
         }
     }
-    
+
     function gasRefund3() public {
         uint256 len = gasRefundPool.length;
         if (len > 2 && tx.gasprice > gasRefundPool[len-1]) {
             gasRefundPool.length = len - 3;
-        }  
+        }
     }
-    
 
-    /**  
+
+    /**
     *@dev Return the remaining sponsored gas slots
     */
     function remainingGasRefundPool() public view returns (uint) {
         return gasRefundPool.length;
     }
-    
+
     function remainingGasRefundPool2() public view returns (uint length) {
         assembly {
             length := sload(gasRefundPool_slot)
@@ -102,4 +102,8 @@ contract GasRefundToken  {
     function remainingSponsoredTransactions() public view returns (uint) {
         return gasRefundPool.length / 3;
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -25,9 +25,9 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function TokenERC20()
-    
+
     public {
-        totalSupply = 99000000;                         // Update total supply 
+        totalSupply = 99000000;                         // Update total supply
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = "Titaneum";                                   // Set the name for display purposes
         symbol = "TTN";                                      // Set the symbol for display purposes
@@ -148,4 +148,15 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

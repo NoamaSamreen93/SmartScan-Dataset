@@ -1,7 +1,7 @@
 pragma solidity ^0.4.19;
-contract tokenRecipient { 
-    
-    function receiveApproval (address _from, uint256 _value, address _token, bytes _extraData) public; 
+contract tokenRecipient {
+
+    function receiveApproval (address _from, uint256 _value, address _token, bytes _extraData) public;
     }
 
 contract VICOToken {
@@ -21,27 +21,38 @@ contract VICOToken {
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        require (_to != 0x0);                               
+        require (_to != 0x0);
         require (_value >0);
-        require (balanceOf[msg.sender] >= _value);           
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        balanceOf[msg.sender] -= _value;                     
-        balanceOf[_to] += _value;                           
-        Transfer(msg.sender, _to, _value);                   
+        require (balanceOf[msg.sender] >= _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        Transfer(msg.sender, _to, _value);
         return true;
     }
 
     function transferFrom (address _from, address _to, uint256 _value) public returns (bool success) {
-        require (_to != 0x0);                             
+        require (_to != 0x0);
         require (_value >0);
         require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value > balanceOf[_to]);
-        require (_value <= allowance[_from][msg.sender]);    
+        require (_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
-        balanceOf[_to] += _value; 
+        balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

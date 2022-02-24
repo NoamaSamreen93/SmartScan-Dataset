@@ -49,49 +49,49 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 
 contract NamiPool {
     using SafeMath for uint256;
-    
+
     function NamiPool(address _escrow, address _namiMultiSigWallet, address _namiAddress) public {
         require(_namiMultiSigWallet != 0x0);
         escrow = _escrow;
         namiMultiSigWallet = _namiMultiSigWallet;
         NamiAddr = _namiAddress;
     }
-    
+
     string public name = "Nami Pool";
-    
+
     // escrow has exclusive priveleges to call administrative
     // functions on this contract.
     address public escrow;
 
     // Gathered funds can be withdraw only to namimultisigwallet's address.
     address public namiMultiSigWallet;
-    
+
     /// address of Nami token
     address public NamiAddr;
-    
+
     modifier onlyEscrow() {
         require(msg.sender == escrow);
         _;
     }
-    
+
     modifier onlyNami {
         require(msg.sender == NamiAddr);
         _;
     }
-    
+
     modifier onlyNamiMultisig {
         require(msg.sender == namiMultiSigWallet);
         _;
     }
-    
+
     uint public currentRound = 1;
-    
+
     struct ShareHolder {
         uint stake;
         bool isActive;
         bool isWithdrawn;
     }
-    
+
     struct Round {
         bool isOpen;
         uint currentNAC;
@@ -102,11 +102,11 @@ contract NamiPool {
         bool isCompleteActive;
         bool isCloseEthPool;
     }
-    
+
     mapping (uint => mapping (address => ShareHolder)) public namiPool;
     mapping (uint => Round) public round;
-    
-    
+
+
     // Events
     event UpdateShareHolder(address indexed ShareHolderAddress, uint indexed RoundIndex, uint Stake, uint Time);
     event Deposit(address sender,uint indexed RoundIndex, uint value);
@@ -114,8 +114,8 @@ contract NamiPool {
     event UpdateActive(address indexed ShareHolderAddress, uint indexed RoundIndex, bool Status, uint Time);
     event Withdraw(address indexed ShareHolderAddress, uint indexed RoundIndex, uint Ether, uint Nac, uint TimeWithdraw);
     event ActivateRound(uint RoundIndex, uint TimeActive);
-    
-    
+
+
     function changeEscrow(address _escrow)
         onlyNamiMultisig
         public
@@ -123,17 +123,17 @@ contract NamiPool {
         require(_escrow != 0x0);
         escrow = _escrow;
     }
-    
+
     function withdrawEther(uint _amount) public
         onlyEscrow
     {
         require(namiMultiSigWallet != 0x0);
-        // 
+        //
         if (this.balance > 0) {
             namiMultiSigWallet.transfer(_amount);
         }
     }
-    
+
     function withdrawNAC(uint _amount) public
         onlyEscrow
     {
@@ -143,12 +143,12 @@ contract NamiPool {
             namiToken.transfer(namiMultiSigWallet, _amount);
         }
     }
-    
-    
+
+
     /*/
      *  Admin function
     /*/
-    
+
     /*/ process of one round
      * step 1: admin open one round by execute activateRound function
      * step 2: now investor can invest Nac to Nac Pool until round closed
@@ -161,14 +161,14 @@ contract NamiPool {
      * step 9: admin open withdrawable to investor in top
      * step 10: investor in top now can withdraw NAC and ETH for this round
     /*/
-    
-    // ------------------------------------------------ 
+
+    // ------------------------------------------------
     /*
     * Admin function
     * Open and Close Round
     *
     */
-    function activateRound(uint _roundIndex) 
+    function activateRound(uint _roundIndex)
         onlyEscrow
         public
     {
@@ -177,7 +177,7 @@ contract NamiPool {
         currentRound = _roundIndex;
         ActivateRound(_roundIndex, now);
     }
-    
+
     function deactivateRound(uint _roundIndex)
         onlyEscrow
         public
@@ -185,12 +185,12 @@ contract NamiPool {
         require(round[_roundIndex].isOpen == true);
         round[_roundIndex].isOpen = false;
     }
-    
-    // ------------------------------------------------ 
+
+    // ------------------------------------------------
     // this function add stake of ShareHolder
     // investor can execute this function during round open
     //
-    
+
     function tokenFallbackExchange(address _from, uint _value, uint _price) onlyNami public returns (bool success) {
         // only on currentRound and active user can add stake
         require(round[_price].isOpen == true && _value > 0);
@@ -200,8 +200,8 @@ contract NamiPool {
         UpdateShareHolder(_from, _price, namiPool[_price][_from].stake, now);
         return true;
     }
-    
-    
+
+
     /*
     *
     * Activate and deactivate user
@@ -217,7 +217,7 @@ contract NamiPool {
         round[_roundId].finalNAC = round[_roundId].finalNAC.add(namiPool[_roundId][_shareAddress].stake);
         UpdateActive(_shareAddress, _roundId ,namiPool[_roundId][_shareAddress].isActive, now);
     }
-    
+
     function deactivateUser(address _shareAddress, uint _roundId)
         onlyEscrow
         public
@@ -228,11 +228,11 @@ contract NamiPool {
         round[_roundId].finalNAC = round[_roundId].finalNAC.sub(namiPool[_roundId][_shareAddress].stake);
         UpdateActive(_shareAddress, _roundId ,namiPool[_roundId][_shareAddress].isActive, now);
     }
-    
-    
-    // ------------------------------------------------ 
-    // admin close activate phrase to 
-    // 
+
+
+    // ------------------------------------------------
+    // admin close activate phrase to
+    //
     //
     function closeActive(uint _roundId)
         onlyEscrow
@@ -253,9 +253,9 @@ contract NamiPool {
         require(round[_roundIndex].isCompleteActive == true && round[_roundIndex].isOpen == false);
         round[_roundIndex].withdrawable = !round[_roundIndex].withdrawable;
     }
-    
-    
-    
+
+
+
     //
     //
     // change Withdrawable for one round after every month
@@ -268,12 +268,12 @@ contract NamiPool {
         require(round[_roundIndex].isCompleteActive == true && round[_roundIndex].isOpen == false);
         round[_roundIndex].topWithdrawable = !round[_roundIndex].topWithdrawable;
     }
-    
-    
+
+
     //
     //
     // after month admin deposit ETH to ETH Pool
-    // 
+    //
     //
     function depositEthPool(uint _roundIndex)
         payable public
@@ -285,7 +285,7 @@ contract NamiPool {
             Deposit(msg.sender, _roundIndex, msg.value);
         }
     }
-    
+
     //
     //
     function withdrawEthPool(uint _roundIndex, uint _amount)
@@ -294,17 +294,17 @@ contract NamiPool {
     {
         require(round[_roundIndex].isCloseEthPool == false && round[_roundIndex].isOpen == false);
         require(namiMultiSigWallet != 0x0);
-        // 
+        //
         if (_amount > 0) {
             namiMultiSigWallet.transfer(_amount);
             round[_roundIndex].ethBalance = round[_roundIndex].ethBalance.sub(_amount);
             WithdrawPool(_amount, now);
         }
     }
-    
+
     //
     // close phrase deposit ETH to Pool
-    // 
+    //
     function closeEthPool(uint _roundIndex)
         public
         onlyEscrow
@@ -312,12 +312,12 @@ contract NamiPool {
         require(round[_roundIndex].isCloseEthPool == false && round[_roundIndex].isCompleteActive == true && round[_roundIndex].isOpen == false);
         round[_roundIndex].isCloseEthPool = true;
     }
-    
+
     //
     //
     // withdraw NAC for investor
     // internal function only can run by this smartcontract
-    // 
+    //
     //
     function _withdrawNAC(address _shareAddress, uint _roundIndex) internal {
         require(namiPool[_roundIndex][_shareAddress].stake > 0);
@@ -326,16 +326,16 @@ contract NamiPool {
         namiToken.transfer(_shareAddress, namiPool[_roundIndex][_shareAddress].stake);
         // update current Nac pool balance
         round[_roundIndex].currentNAC = round[_roundIndex].currentNAC.sub(namiPool[_roundIndex][_shareAddress].stake);
-        
+
         namiPool[_roundIndex][_shareAddress].stake = 0;
         assert(previousBalances > namiToken.balanceOf(this));
     }
-    
-    
+
+
     //
     //
     // withdraw NAC and ETH for top investor
-    // 
+    //
     //
     function withdrawTopForTeam(address _shareAddress, uint _roundIndex)
         onlyEscrow
@@ -346,28 +346,28 @@ contract NamiPool {
         if(namiPool[_roundIndex][_shareAddress].isActive == true) {
             require(namiPool[_roundIndex][_shareAddress].isWithdrawn == false);
             assert(round[_roundIndex].finalNAC > namiPool[_roundIndex][_shareAddress].stake);
-            
+
             // compute eth for invester
             uint ethReturn = (round[_roundIndex].ethBalance.mul(namiPool[_roundIndex][_shareAddress].stake)).div(round[_roundIndex].finalNAC);
             _shareAddress.transfer(ethReturn);
-            
+
             // set user withdraw
             namiPool[_roundIndex][_shareAddress].isWithdrawn = true;
             Withdraw(_shareAddress, _roundIndex, ethReturn, namiPool[_roundIndex][_shareAddress].stake, now);
-            
+
             // withdraw NAC
             _withdrawNAC(_shareAddress, _roundIndex);
         }
     }
-    
-    
-    
-    
+
+
+
+
     //
     //
     // withdraw NAC and ETH for non top investor
     // execute by admin only
-    // 
+    //
     //
     function withdrawNonTopForTeam(address _shareAddress, uint _roundIndex)
         onlyEscrow
@@ -384,14 +384,14 @@ contract NamiPool {
             _withdrawNAC(_shareAddress, _roundIndex);
         }
     }
-    
-    
-    
+
+
+
     //
     //
     // withdraw NAC and ETH for top investor
     // execute by investor
-    // 
+    //
     //
     function withdrawTop(uint _roundIndex)
         public
@@ -409,12 +409,12 @@ contract NamiPool {
             _withdrawNAC(msg.sender, _roundIndex);
         }
     }
-    
+
     //
     //
     // withdraw NAC and ETH for non top investor
     // execute by investor
-    // 
+    //
     //
     function withdrawNonTop(uint _roundIndex)
         public
@@ -429,7 +429,7 @@ contract NamiPool {
             _withdrawNAC(msg.sender, _roundIndex);
         }
     }
-    
+
 }
 
 contract NamiCrowdSale {
@@ -456,7 +456,7 @@ contract NamiCrowdSale {
     bool public TRANSFERABLE = false; // default not transferable
 
     uint public constant TOKEN_SUPPLY_LIMIT = 1000000000 * (1 ether / 1 wei);
-    
+
     uint public binary = 0;
 
     /*/
@@ -486,34 +486,34 @@ contract NamiCrowdSale {
 
     // Crowdsale manager has exclusive priveleges to burn presale tokens.
     address public crowdsaleManager;
-    
+
     // binary option address
     address public binaryAddress;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
     modifier onlyCrowdsaleManager() {
-        require(msg.sender == crowdsaleManager); 
-        _; 
+        require(msg.sender == crowdsaleManager);
+        _;
     }
 
     modifier onlyEscrow() {
         require(msg.sender == escrow);
         _;
     }
-    
+
     modifier onlyTranferable() {
         require(TRANSFERABLE);
         _;
     }
-    
+
     modifier onlyNamiMultisig() {
         require(msg.sender == namiMultiSigWallet);
         _;
     }
-    
+
     /*/
      *  Events
     /*/
@@ -558,7 +558,7 @@ contract NamiCrowdSale {
     {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * Transfer tokens
      *
@@ -572,7 +572,7 @@ contract NamiCrowdSale {
     {
         _transfer(msg.sender, _to, _value);
     }
-    
+
        /**
      * Transfer tokens from other address
      *
@@ -582,7 +582,7 @@ contract NamiCrowdSale {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
         public
         onlyTranferable
         returns (bool success)
@@ -603,7 +603,7 @@ contract NamiCrowdSale {
      */
     function approve(address _spender, uint256 _value) public
         onlyTranferable
-        returns (bool success) 
+        returns (bool success)
     {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -621,7 +621,7 @@ contract NamiCrowdSale {
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         onlyTranferable
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -636,7 +636,7 @@ contract NamiCrowdSale {
     {
         TRANSFERABLE = !TRANSFERABLE;
     }
-    
+
     // change escrow
     function changeEscrow(address _escrow) public
         onlyNamiMultisig
@@ -644,7 +644,7 @@ contract NamiCrowdSale {
         require(_escrow != 0x0);
         escrow = _escrow;
     }
-    
+
     // change binary value
     function changeBinary(uint _binary)
         public
@@ -652,7 +652,7 @@ contract NamiCrowdSale {
     {
         binary = _binary;
     }
-    
+
     // change binary address
     function changeBinaryAddress(address _binaryAddress)
         public
@@ -661,7 +661,7 @@ contract NamiCrowdSale {
         require(_binaryAddress != 0x0);
         binaryAddress = _binaryAddress;
     }
-    
+
     /*
     * price in ICO:
     * first week: 1 ETH = 2400 NAC
@@ -672,7 +672,7 @@ contract NamiCrowdSale {
     * 6th week: 1 ETH = 1900 NAC
     * 7th week: 1 ETH = 1800 NAC
     * 8th week: 1 ETH = 1700 nac
-    * time: 
+    * time:
     * 1517443200: Thursday, February 1, 2018 12:00:00 AM
     * 1518048000: Thursday, February 8, 2018 12:00:00 AM
     * 1518652800: Thursday, February 15, 2018 12:00:00 AM
@@ -720,8 +720,8 @@ contract NamiCrowdSale {
     function() payable public {
         buy(msg.sender);
     }
-    
-    
+
+
     function buy(address _buyer) payable public {
         // Available only if presale is running.
         require(currentPhase == Phase.Running);
@@ -737,7 +737,7 @@ contract NamiCrowdSale {
         LogBuy(_buyer,newTokens);
         Transfer(this,_buyer,newTokens);
     }
-    
+
 
     /// @dev Returns number of tokens owned by given address.
     /// @param _owner Address of token owner.
@@ -795,7 +795,7 @@ contract NamiCrowdSale {
             namiMultiSigWallet.transfer(_amount);
         }
     }
-    
+
     function safeWithdraw(address _withdraw, uint _amount) public
         onlyEscrow
     {
@@ -844,12 +844,12 @@ contract NamiCrowdSale {
     }
 
     // Nami internal exchange
-    
+
     // event for Nami exchange
     event TransferToBuyer(address indexed _from, address indexed _to, uint _value, address indexed _seller);
     event TransferToExchange(address indexed _from, address indexed _to, uint _value, uint _price);
-    
-    
+
+
     /**
      * @dev Transfer the specified amount of tokens to the NamiExchange address.
      *      Invokes the `tokenFallbackExchange` function.
@@ -861,14 +861,14 @@ contract NamiCrowdSale {
      * @param _value Amount of tokens that will be transferred.
      * @param _price price to sell token.
      */
-     
+
     function transferToExchange(address _to, uint _value, uint _price) public {
         uint codeLength;
-        
+
         assembly {
             codeLength := extcodesize(_to)
         }
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         Transfer(msg.sender,_to,_value);
@@ -878,7 +878,7 @@ contract NamiCrowdSale {
             TransferToExchange(msg.sender, _to, _value, _price);
         }
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the NamiExchange address.
      *      Invokes the `tokenFallbackBuyer` function.
@@ -890,14 +890,14 @@ contract NamiCrowdSale {
      * @param _value Amount of tokens that will be transferred.
      * @param _buyer address of seller.
      */
-     
+
     function transferToBuyer(address _to, uint _value, address _buyer) public {
         uint codeLength;
-        
+
         assembly {
             codeLength := extcodesize(_to)
         }
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         Transfer(msg.sender,_to,_value);
@@ -921,10 +921,10 @@ contract BinaryOption {
     // NamiCrowdSale address
     address public namiCrowdSaleAddr;
     address public escrow;
-    
+
     // namiMultiSigWallet
     address public namiMultiSigWallet;
-    
+
     Session public session;
     uint public timeInvestInMinute = 15;
     uint public timeOneSession = 20;
@@ -969,26 +969,26 @@ contract BinaryOption {
         mapping(uint => bool) win;
         mapping(uint => uint) amountInvest;
     }
-    
+
     function BinaryOption(address _namiCrowdSale, address _escrow, address _namiMultiSigWallet) public {
         require(_namiCrowdSale != 0x0 && _escrow != 0x0);
         namiCrowdSaleAddr = _namiCrowdSale;
         escrow = _escrow;
         namiMultiSigWallet = _namiMultiSigWallet;
     }
-    
-    
+
+
     modifier onlyEscrow() {
         require(msg.sender==escrow);
         _;
     }
-    
-        
+
+
     modifier onlyNamiMultisig() {
         require(msg.sender == namiMultiSigWallet);
         _;
     }
-    
+
     // change escrow
     function changeEscrow(address _escrow) public
         onlyNamiMultisig
@@ -996,15 +996,15 @@ contract BinaryOption {
         require(_escrow != 0x0);
         escrow = _escrow;
     }
-    
+
     // chagne minimunEth
-    function changeMinEth(uint _minimunEth) public 
+    function changeMinEth(uint _minimunEth) public
         onlyEscrow
     {
         require(_minimunEth != 0);
         minimunEth = _minimunEth;
     }
-    
+
     /// @dev Change time for investor can invest in one session, can only change at time not in session
     /// @param _timeInvest time invest in minutes
     ///---------------------------change time function------------------------------
@@ -1016,7 +1016,7 @@ contract BinaryOption {
         timeInvestInMinute = _timeInvest;
     }
 
-    function changeTimeOneSession(uint _timeOneSession) 
+    function changeTimeOneSession(uint _timeOneSession)
         public
         onlyEscrow
     {
@@ -1025,7 +1025,7 @@ contract BinaryOption {
     }
 
     /////------------------------change rate function-------------------------------
-    
+
     function changeRateWin(uint _rateWin)
         public
         onlyEscrow
@@ -1033,7 +1033,7 @@ contract BinaryOption {
         require(!session.isOpen);
         rateWin = _rateWin;
     }
-    
+
     function changeRateLoss(uint _rateLoss)
         public
         onlyEscrow
@@ -1041,7 +1041,7 @@ contract BinaryOption {
         require(!session.isOpen);
         rateLoss = _rateLoss;
     }
-    
+
     function changeRateFee(uint _rateFee)
         public
         onlyEscrow
@@ -1049,8 +1049,8 @@ contract BinaryOption {
         require(!session.isOpen);
         rateFee = _rateFee;
     }
-    
-    
+
+
     /// @dev withdraw ether to nami multisignature wallet, only escrow can call
     /// @param _amount value ether in wei to withdraw
     function withdrawEther(uint _amount) public
@@ -1062,7 +1062,7 @@ contract BinaryOption {
             namiMultiSigWallet.transfer(_amount);
         }
     }
-    
+
     /// @dev safe withdraw Ether to one of owner of nami multisignature wallet
     /// @param _withdraw address to withdraw
     function safeWithdraw(address _withdraw, uint _amount) public
@@ -1073,7 +1073,7 @@ contract BinaryOption {
             _withdraw.transfer(_amount);
         }
     }
-    
+
     // @dev Returns list of owners.
     // @return List of owner addresses.
     // MAX_INVESTOR = 20
@@ -1088,7 +1088,7 @@ contract BinaryOption {
         }
         return listInvestor;
     }
-    
+
     function getChooses()
         public
         view
@@ -1100,7 +1100,7 @@ contract BinaryOption {
         }
         return listChooses;
     }
-    
+
     function getAmount()
         public
         view
@@ -1112,7 +1112,7 @@ contract BinaryOption {
         }
         return listAmount;
     }
-    
+
     /// @dev reset all data of previous session, must run before open new session
     // only escrow can call
     function resetSession()
@@ -1132,7 +1132,7 @@ contract BinaryOption {
             session.amountInvest[i] = 0;
         }
     }
-    
+
     /// @dev Open new session, only escrow can call
     function openSession ()
         public
@@ -1146,7 +1146,7 @@ contract BinaryOption {
         session.isOpen = true;
         SessionOpen(now, sessionId);
     }
-    
+
     /// @dev Fuction for investor, minimun ether send is 0.1, one address can call one time in one session
     /// @param _choose choise of investor, true is call, false is put
     function invest (bool _choose)
@@ -1162,10 +1162,10 @@ contract BinaryOption {
         session.investorCount += 1;
         Invest(msg.sender, _choose, msg.value, now, sessionId);
     }
-    
+
     /// @dev close invest for escrow
     /// @param _priceOpen price ETH in USD
-    function closeInvest (uint _priceOpen) 
+    function closeInvest (uint _priceOpen)
         public
         onlyEscrow
     {
@@ -1175,7 +1175,7 @@ contract BinaryOption {
         session.priceOpen = _priceOpen;
         InvestClose(now, _priceOpen, sessionId);
     }
-    
+
     /// @dev get amount of ether to buy NAC for investor
     /// @param _ether amount ether which investor invest
     /// @param _status true for investor win and false for investor loss
@@ -1222,7 +1222,7 @@ contract BinaryOption {
         session.isOpen = false;
         SessionClose(now, sessionId, _priceClose, price, rateWin, rateLoss, rateFee);
         sessionId += 1;
-        
+
         // require(!session.isReset && !session.isOpen);
         // reset state session
         session.priceOpen = 0;
@@ -1242,11 +1242,11 @@ contract PresaleToken {
  /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
+
 contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -1268,7 +1268,7 @@ contract ERC223ReceivingContract {
 
 contract NamiExchange {
     using SafeMath for uint;
-    
+
     function NamiExchange(address _namiAddress) public {
         NamiAddr = _namiAddress;
     }
@@ -1278,14 +1278,14 @@ contract NamiExchange {
     event BuyHistory(address indexed buyer, address indexed seller, uint price, uint volume, uint time);
     event SellHistory(address indexed seller, address indexed buyer, uint price, uint volume, uint time);
 
-    
+
     mapping(address => OrderBid) public bid;
     mapping(address => OrderAsk) public ask;
     string public name = "NacExchange";
-    
+
     /// address of Nami token
     address public NamiAddr;
-    
+
     /// price of Nac = ETH/NAC
     uint public price = 1;
     // struct store order of user
@@ -1293,27 +1293,27 @@ contract NamiExchange {
         uint price;
         uint eth;
     }
-    
+
     struct OrderAsk {
         uint price;
         uint volume;
     }
-    
-        
+
+
     // prevent lost ether
     function() payable public {
         require(msg.data.length != 0);
         require(msg.value == 0);
     }
-    
+
     modifier onlyNami {
         require(msg.sender == NamiAddr);
         _;
     }
-    
+
     /////////////////
     //---------------------------function about bid Order-----------------------------------------------------------
-    
+
     function placeBuyOrder(uint _price) payable public {
         require(_price > 0 && msg.value > 0 && bid[msg.sender].eth == 0);
         if (msg.value > 0) {
@@ -1322,7 +1322,7 @@ contract NamiExchange {
             UpdateBid(msg.sender, _price, bid[msg.sender].eth);
         }
     }
-    
+
     function sellNac(uint _value, address _buyer, uint _price) public returns (bool success) {
         require(_price == bid[_buyer].price && _buyer != msg.sender);
         NamiCrowdSale namiToken = NamiCrowdSale(NamiAddr);
@@ -1354,7 +1354,7 @@ contract NamiExchange {
             }
         }
     }
-    
+
     function closeBidOrder() public {
         require(bid[msg.sender].eth > 0 && bid[msg.sender].price > 0);
         // transfer ETH
@@ -1363,11 +1363,11 @@ contract NamiExchange {
         bid[msg.sender].eth = 0;
         UpdateBid(msg.sender, bid[msg.sender].price, bid[msg.sender].eth);
     }
-    
+
 
     ////////////////
     //---------------------------function about ask Order-----------------------------------------------------------
-    
+
     // place ask order by send NAC to Nami Exchange contract
     // this function place sell order
     function tokenFallbackExchange(address _from, uint _value, uint _price) onlyNami public returns (bool success) {
@@ -1379,7 +1379,7 @@ contract NamiExchange {
         }
         return true;
     }
-    
+
     function closeAskOrder() public {
         require(ask[msg.sender].volume > 0 && ask[msg.sender].price > 0);
         NamiCrowdSale namiToken = NamiCrowdSale(NamiAddr);
@@ -1392,7 +1392,7 @@ contract NamiExchange {
         // check balance
         assert(previousBalances < namiToken.balanceOf(msg.sender));
     }
-    
+
     function buyNac(address _seller, uint _price) payable public returns (bool success) {
         require(msg.value > 0 && ask[_seller].volume > 0 && ask[_seller].price > 0);
         require(_price == ask[_seller].price && _seller != msg.sender);
@@ -1698,7 +1698,7 @@ contract NamiMultiSigWallet {
     {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
-            destination: destination, 
+            destination: destination,
             value: value,
             data: data,
             executed: false
@@ -1797,4 +1797,15 @@ contract NamiMultiSigWallet {
             _transactionIds[i - from] = transactionIdsTemp[i];
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

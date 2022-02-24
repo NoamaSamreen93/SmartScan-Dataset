@@ -3,8 +3,8 @@ pragma solidity ^0.4.23;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract HammerChainBeta {
-    address  owner;   
-    
+    address  owner;
+
     // Public variables of the token
     string  name;
     string  symbol;
@@ -34,7 +34,7 @@ contract HammerChainBeta {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
- 
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -97,7 +97,7 @@ contract HammerChainBeta {
     function setFOUNDATION_POOL_ADDR(address addr) onlyOwner public{
         FOUNDATION_POOL_ADDR = addr;
     }
-    
+
     function setCOMMUNITY_POOL_ADDR(address addr) onlyOwner public{
         COMMUNITY_POOL_ADDR = addr;
     }
@@ -227,4 +227,15 @@ contract HammerChainBeta {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

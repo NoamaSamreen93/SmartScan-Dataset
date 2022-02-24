@@ -67,9 +67,20 @@ contract AirDropContract {
     function () payable public {
         revert();
     }
-    
+
     // withdraw any ERC20 token in this contract to owner
     function transferAnyERC20Token(address tokenAddress, uint tokens) public returns (bool success) {
         return ERC20(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

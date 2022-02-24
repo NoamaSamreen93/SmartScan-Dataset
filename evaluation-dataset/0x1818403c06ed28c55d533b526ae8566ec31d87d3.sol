@@ -4,12 +4,12 @@ pragma solidity ^0.4.15;
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -31,7 +31,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -63,12 +63,12 @@ contract SafeMath {
 	  assert(z >= x);
 	  return z;
   }
-	
+
   function div(uint256 x, uint256 y) internal constant returns (uint256) {
     uint256 z = x / y;
     return z;
   }
-	
+
   function mul(uint256 x, uint256 y) internal constant returns (uint256) {
     uint256 z = x * y;
     assert(x == 0 || z / x == y);
@@ -111,22 +111,22 @@ contract ERC20 {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, SafeMath, Ownable{
-	
+
   uint256 _totalSupply;
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) approvals;
   address public crowdsaleAgent;
-  bool public released = false;  
-  
+  bool public released = false;
+
   /**
    * @dev Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
-   * @param numwords payload size  
+   * @param numwords payload size
    */
   modifier onlyPayloadSize(uint numwords) {
     assert(msg.data.length == numwords * 32 + 4);
     _;
   }
-  
+
   /**
    * @dev The function can be called only by crowdsale agent.
    */
@@ -142,80 +142,80 @@ contract StandardToken is ERC20, SafeMath, Ownable{
     assert(!released);
     _;
   }
-  
+
   /**
    * @dev Limit token transfer until the crowdsale is over.
    */
   modifier canTransfer() {
     assert(released);
     _;
-  } 
-  
-  /** 
+  }
+
+  /**
    * @dev Total Supply
-   * @return _totalSupply 
-   */  
+   * @return _totalSupply
+   */
   function totalSupply() public constant returns (uint256) {
     return _totalSupply;
   }
-  
-  /** 
+
+  /**
    * @dev Tokens balance
    * @param _owner holder address
-   * @return balance amount 
+   * @return balance amount
    */
   function balanceOf(address _owner) public constant returns (uint256) {
     return balances[_owner];
   }
-  
-  /** 
+
+  /**
    * @dev Token allowance
    * @param _owner holder address
    * @param _spender spender address
    * @return remain amount
-   */   
+   */
   function allowance(address _owner, address _spender) public constant returns (uint256) {
     return approvals[_owner][_spender];
   }
 
-  /** 
+  /**
    * @dev Tranfer tokens to address
    * @param _to dest address
    * @param _value tokens amount
    * @return transfer result
-   */   
+   */
   function transfer(address _to, uint _value) public canTransfer onlyPayloadSize(2) returns (bool success) {
     assert(balances[msg.sender] >= _value);
     balances[msg.sender] = sub(balances[msg.sender], _value);
     balances[_to] = add(balances[_to], _value);
-    
+
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  /**    
+
+  /**
    * @dev Tranfer tokens from one address to other
    * @param _from source address
    * @param _to dest address
    * @param _value tokens amount
    * @return transfer result
-   */    
+   */
   function transferFrom(address _from, address _to, uint _value) public canTransfer onlyPayloadSize(3) returns (bool success) {
     assert(balances[_from] >= _value);
     assert(approvals[_from][msg.sender] >= _value);
     approvals[_from][msg.sender] = sub(approvals[_from][msg.sender], _value);
     balances[_from] = sub(balances[_from], _value);
     balances[_to] = add(balances[_to], _value);
-    
+
     Transfer(_from, _to, _value);
     return true;
   }
-  
-  /** 
+
+  /**
    * @dev Approve transfer
    * @param _spender holder address
    * @param _value tokens amount
-   * @return result  
+   * @return result
    */
   function approve(address _spender, uint _value) public onlyPayloadSize(2) returns (bool success) {
     // To change the approve amount you first have to reduce the addresses`
@@ -224,26 +224,26 @@ contract StandardToken is ERC20, SafeMath, Ownable{
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     assert((_value == 0) || (approvals[msg.sender][_spender] == 0));
     approvals[msg.sender][_spender] = _value;
-    
+
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
-  /** 
+
+  /**
    * @dev Create new tokens and allocate them to an address. Only callably by a crowdsale contract
    * @param _to dest address
    * @param _value tokens amount
    * @return mint result
-   */ 
+   */
   function mint(address _to, uint _value) public onlyCrowdsaleAgent canMint onlyPayloadSize(2) returns (bool success) {
     _totalSupply = add(_totalSupply, _value);
     balances[_to] = add(balances[_to], _value);
-    
+
     Transfer(0, _to, _value);
     return true;
-	
+
   }
-  
+
   /**
    * @dev Set the contract that can call release and make the token transferable.
    * @param _crowdsaleAgent crowdsale contract address
@@ -252,9 +252,9 @@ contract StandardToken is ERC20, SafeMath, Ownable{
     assert(!released);
     crowdsaleAgent = _crowdsaleAgent;
   }
-  
+
   /**
-   * @dev One way function to release the tokens to the wild. Can be called only from the release agent that is the final ICO contract. 
+   * @dev One way function to release the tokens to the wild. Can be called only from the release agent that is the final ICO contract.
    */
   function releaseTokenTransfer() public onlyCrowdsaleAgent {
     released = true;
@@ -262,15 +262,15 @@ contract StandardToken is ERC20, SafeMath, Ownable{
 
 }
 
-/** 
+/**
  * @title DAOPlayMarket2.0 contract - standard ERC20 token with Short Hand Attack and approve() race condition mitigation.
  */
 contract DAOPlayMarketToken is StandardToken {
-  
+
   string public name;
   string public symbol;
   uint public decimals;
-  
+
   /** Name and symbol were updated. */
   event UpdatedTokenInformation(string newName, string newSymbol);
 
@@ -285,19 +285,19 @@ contract DAOPlayMarketToken is StandardToken {
    * @param _decimals Number of decimal places
    * @param _addr Address for team's tokens
    */
-   
+
   function DAOPlayMarketToken(string _name, string _symbol, uint _initialSupply, uint _decimals, address _addr) public {
     require(_addr != 0x0);
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
-	
+
     _totalSupply = _initialSupply*10**_decimals;
 
     // Creating initial tokens
     balances[_addr] = _totalSupply;
-  }   
-  
+  }
+
    /**
    * Owner can update token information here.
    *
@@ -351,7 +351,7 @@ contract Haltable is Ownable {
 }
 
 
-/** 
+/**
  * @title Killable DAOPlayMarketTokenCrowdsale contract
  */
 contract Killable is Ownable {
@@ -360,11 +360,11 @@ contract Killable is Ownable {
   }
 }
 
-/** 
+/**
  * @title DAOPlayMarketTokenCrowdsale contract - contract for token sales.
  */
 contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
-  
+
   /* The token we are selling */
   DAOPlayMarketToken public token;
 
@@ -373,37 +373,37 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
 
   /* the UNIX timestamp start date of the crowdsale */
   uint public startsAt;
-  
+
   /* the UNIX timestamp end date of the crowdsale */
   uint public endsAt;
-  
+
   /* the number of tokens already sold through this contract*/
   uint public tokensSold = 0;
-  
+
   /* How many wei of funding we have raised */
   uint public weiRaised = 0;
-  
+
   /* How many unique addresses that have invested */
   uint public investorCount = 0;
-  
+
   /* Has this crowdsale been finalized */
   bool public finalized;
-  
+
   /* Cap of tokens */
   uint public CAP;
-  
+
   /* How much ETH each address has invested to this crowdsale */
   mapping (address => uint256) public investedAmountOf;
-  
+
   /* How much tokens this crowdsale has credited for each investor address */
   mapping (address => uint256) public tokenAmountOf;
-  
+
   /* Contract address that can call invest other crypto */
   address public cryptoAgent;
-  
+
   /** How many tokens he charged for each investor's address in a particular period */
   mapping (uint => mapping (address => uint256)) public tokenAmountOfPeriod;
-  
+
   struct Stage {
     // UNIX timestamp when the stage begins
     uint start;
@@ -424,12 +424,12 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     // Token sold in period
     uint tokenSold;
   }
-  
+
   /** Stages **/
   Stage[] public stages;
   uint public periodStage;
   uint public stage;
-  
+
   /** State machine
    *
    * - Preparing: All contract initialization calls and variables have not been set yet
@@ -439,27 +439,27 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
    * - Finalized: The finalized has been called and succesfully executed
    */
   enum State{Unknown, Preparing, Funding, Success, Failure, Finalized}
-  
+
   // A new investment was made
   event Invested(address investor, uint weiAmount, uint tokenAmount);
-  
+
   // A new investment was made
   event InvestedOtherCrypto(address investor, uint weiAmount, uint tokenAmount);
 
   // Crowdsale end time has been changed
   event EndsAtChanged(uint _endsAt);
-  
+
   // New distributions were made
   event DistributedTokens(address investor, uint tokenAmount);
-  
-  /** 
+
+  /**
    * @dev Modified allowing execution only if the crowdsale is currently running
    */
   modifier inState(State state) {
     require(getState() == state);
     _;
   }
-  
+
   /**
    * @dev The function can be called only by crowdsale agent.
    */
@@ -467,30 +467,30 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     assert(msg.sender == cryptoAgent);
     _;
   }
-  
+
   /**
    * @dev Constructor
    * @param _token DAOPlayMarketToken token address
    * @param _multisigWallet team wallet
    * @param _start token ICO start date
-   * @param _cap token ICO 
-   * @param _price array of price 
+   * @param _cap token ICO
+   * @param _price array of price
    * @param _periodStage period of stage
    * @param _capPeriod cap of period
    */
   function DAOPlayMarketTokenCrowdsale(address _token, address _multisigWallet, uint _start, uint _cap, uint[20] _price, uint _periodStage, uint _capPeriod) public {
-  
+
     require(_multisigWallet != 0x0);
     require(_start >= block.timestamp);
     require(_cap > 0);
     require(_periodStage > 0);
     require(_capPeriod > 0);
-	
+
     token = DAOPlayMarketToken(_token);
     multisigWallet = _multisigWallet;
     startsAt = _start;
     CAP = _cap*10**token.decimals();
-	
+
     periodStage = _periodStage*1 days;
     uint capPeriod = _capPeriod*10**token.decimals();
     uint j = 0;
@@ -501,7 +501,7 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     endsAt = stages[stages.length-1].end;
     stage = 0;
   }
-  
+
   /**
    * Buy tokens from the contract
    */
@@ -520,12 +520,12 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
    */
   function investInternal(address receiver) private stopInEmergency {
     require(msg.value > 0);
-	
+
     assert(getState() == State.Funding);
 
     // Determine in what period we hit
     stage = getStage();
-	
+
     uint weiAmount = msg.value;
 
     // Account presale sales separately, so that they do not count against pricing tranches
@@ -535,19 +535,19 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
 
 	// Check that we did not bust the cap in the period
     assert(stages[stage].cap >= add(tokenAmount, stages[stage].tokenSold));
-	
+
     tokenAmountOfPeriod[stage][receiver]=add(tokenAmountOfPeriod[stage][receiver],tokenAmount);
-	
+
     stages[stage].tokenSold = add(stages[stage].tokenSold,tokenAmount);
-	
+
     if (stages[stage].cap == stages[stage].tokenSold){
       updateStage(stage);
       endsAt = stages[stages.length-1].end;
     }
-	
+
 	// Check that we did not bust the cap
     //assert(!isBreakingCap(tokenAmount, tokensSold));
-	
+
     if(investedAmountOf[receiver] == 0) {
        // A new investor
        investorCount++;
@@ -568,9 +568,9 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
 
     // Tell us invest was success
     Invested(receiver, weiAmount, tokenAmount);
-	
+
   }
-  
+
   /**
    * Make an investment.
    *
@@ -583,12 +583,12 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
    */
   function investOtherCrypto(address receiver, uint _weiAmount) public onlyCryptoAgent stopInEmergency {
     require(_weiAmount > 0);
-	
+
     assert(getState() == State.Funding);
 
     // Determine in what period we hit
     stage = getStage();
-	
+
     uint weiAmount = _weiAmount;
 
     // Account presale sales separately, so that they do not count against pricing tranches
@@ -598,19 +598,19 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
 
 	// Check that we did not bust the cap in the period
     assert(stages[stage].cap >= add(tokenAmount, stages[stage].tokenSold));
-	
+
     tokenAmountOfPeriod[stage][receiver]=add(tokenAmountOfPeriod[stage][receiver],tokenAmount);
-	
+
     stages[stage].tokenSold = add(stages[stage].tokenSold,tokenAmount);
-	
+
     if (stages[stage].cap == stages[stage].tokenSold){
       updateStage(stage);
       endsAt = stages[stages.length-1].end;
     }
-	
+
 	// Check that we did not bust the cap
     //assert(!isBreakingCap(tokenAmount, tokensSold));
-	
+
     if(investedAmountOf[receiver] == 0) {
        // A new investor
        investorCount++;
@@ -625,18 +625,18 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     tokensSold = add(tokensSold,tokenAmount);
 
     assignTokens(receiver, tokenAmount);
-	
+
     // Tell us invest was success
     InvestedOtherCrypto(receiver, weiAmount, tokenAmount);
   }
-  
+
   /**
    * Create new tokens or transfer issued tokens to the investor depending on the cap model.
    */
   function assignTokens(address receiver, uint tokenAmount) private {
      token.mint(receiver, tokenAmount);
   }
-   
+
   /**
    * Check if the current invested breaks our cap rules.
    *
@@ -669,41 +669,41 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     }
     assert(amount > 0);
     assignTokens(msg.sender, amount);
-	
+
     // Tell us distributed was success
     DistributedTokens(msg.sender, amount);
   }
-  
+
   /**
    * @dev Finalize a succcesful crowdsale.
    */
   function finalize() public inState(State.Success) onlyOwner stopInEmergency {
     require(block.timestamp >= (endsAt+periodStage));
     require(!finalized);
-	
+
     finalizeCrowdsale();
     finalized = true;
   }
-  
+
   /**
    * @dev Finalize a succcesful crowdsale.
    */
   function finalizeCrowdsale() internal {
     token.releaseTokenTransfer();
   }
-  
+
   /**
    * @dev Check if the ICO goal was reached.
    * @return true if the crowdsale has raised enough money to be a success
    */
   function isCrowdsaleFull() public constant returns (bool) {
     if(tokensSold >= CAP || block.timestamp >= endsAt){
-      return true;  
+      return true;
     }
     return false;
   }
-  
-  /** 
+
+  /**
    * @dev Allow crowdsale owner to close early or extend the crowdsale.
    * @param time timestamp
    */
@@ -713,7 +713,7 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     endsAt = time;
     EndsAtChanged(endsAt);
   }
-  
+
    /**
    * @dev Allow to change the team multisig address in the case of emergency.
    */
@@ -721,7 +721,7 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     require(addr != 0x0);
     multisigWallet = addr;
   }
-  
+
   /**
    * @dev Allow crowdsale owner to change the token address.
    */
@@ -729,8 +729,8 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     require(addr != 0x0);
     token = DAOPlayMarketToken(addr);
   }
-  
-  /** 
+
+  /**
    * @dev Crowdfund state machine management.
    * @return State current state
    */
@@ -741,8 +741,8 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     else if (isCrowdsaleFull()) return State.Success;
     else return State.Failure;
   }
-  
-  /** 
+
+  /**
    * @dev Set base price for ICO.
    */
   function setBasePrice(uint[20] _price, uint _startDate, uint _periodStage, uint _cap, uint _decimals) public onlyOwner {
@@ -757,8 +757,8 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     endsAt = stages[stages.length-1].end;
     stage =0;
   }
-  
-  /** 
+
+  /**
    * @dev Updates the ICO steps if the cap is reached.
    */
   function updateStage(uint number) private {
@@ -772,8 +772,8 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
       j++;
     }
   }
-  
-  /** 
+
+  /**
    * @dev Gets the current stage.
    * @return uint current stage
    */
@@ -785,8 +785,8 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     }
     return stages[stages.length-1].period;
   }
-  
-  /** 
+
+  /**
    * @dev Gets the cap of amount.
    * @return uint cap of amount
    */
@@ -801,7 +801,7 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
       return 3;
     }
   }
-  
+
   /**
    * When somebody tries to buy tokens for X eth, calculate how many tokens they get.
    * @param value - The value of the transaction send in as wei
@@ -809,11 +809,11 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
    * @param decimals - How many decimal places the token has
    * @return Amount of tokens the investor receives
    */
-   
+
   function calculateToken(uint value, uint _stage, uint decimals) private constant returns (uint){
     uint tokenAmount = 0;
-    uint saleAmountCap = getAmountCap(value); 
-	
+    uint saleAmountCap = getAmountCap(value);
+
     if(saleAmountCap == 0){
       tokenAmount = div(value*10**decimals,stages[_stage].price1);
     }else if(saleAmountCap == 1){
@@ -825,7 +825,7 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     }
     return tokenAmount;
   }
- 
+
   /**
    * @dev Set the contract that can call the invest other crypto function.
    * @param _cryptoAgent crowdsale contract address
@@ -834,4 +834,15 @@ contract DAOPlayMarketTokenCrowdsale is Haltable, SafeMath, Killable {
     require(!finalized);
     cryptoAgent = _cryptoAgent;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

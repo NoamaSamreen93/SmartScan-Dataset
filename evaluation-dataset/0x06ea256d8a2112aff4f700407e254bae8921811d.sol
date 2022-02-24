@@ -351,7 +351,7 @@ contract DungeonRunBeta is Pausable, Destructible {
         // Dungeon run is ended if either hero is defeated (health exhausted),
         // or hero failed to damage a monster before it flee.
         bool _dungeonRunEnded = monster.level > 0 && (
-            _heroHealth == 0 || 
+            _heroHealth == 0 ||
             now > _monsterCreationTime + monsterFleeTime * 2 ||
             (monster.health == monster.initialHealth && now > monster.creationTime + monsterFleeTime)
         );
@@ -427,7 +427,7 @@ contract DungeonRunBeta is Pausable, Destructible {
             // Throws if not enough fee, and any exceeding fee will be transferred back to the player.
             require(msg.value >= entranceFee);
             entranceFeePool += entranceFee;
-            
+
             // Create level 1 monster, initial health is 1 * monsterHealth.
             heroIdToMonster[_heroId] = Monster(uint64(now), 1, monsterHealth, monsterHealth);
             monster = heroIdToMonster[_heroId];
@@ -443,7 +443,7 @@ contract DungeonRunBeta is Pausable, Destructible {
         } else {
             // If the hero health is 0, the dungeon run has ended.
             require(heroCurrentHealth > 0);
-    
+
             // If a hero failed to damage a monster before it flee, the dungeon run ends,
             // regardless of the remaining hero health.
             dungeonRunEnded = now > monster.creationTime + monsterFleeTime * 2 ||
@@ -452,7 +452,7 @@ contract DungeonRunBeta is Pausable, Destructible {
             if (dungeonRunEnded) {
                 // Add the non-refunded fee to jackpot.
                 uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
                 if (addToJackpot > 0) {
                     jackpot += addToJackpot;
                     entranceFeePool -= addToJackpot;
@@ -462,7 +462,7 @@ contract DungeonRunBeta is Pausable, Destructible {
                 // Sanity check.
                 assert(addToJackpot <= entranceFee);
             }
-            
+
             // Future attack do not require any fee, so refund all ether sent with the transaction.
             msg.sender.transfer(msg.value);
         }
@@ -499,7 +499,7 @@ contract DungeonRunBeta is Pausable, Destructible {
         // Get the hero power.
         uint heroPower;
         (heroPower,,,,) = edCoreContract.getHeroPower(_genes, dungeonDifficulty);
-        
+
         uint damageByMonster;
         uint damageByHero;
 
@@ -523,7 +523,7 @@ contract DungeonRunBeta is Pausable, Destructible {
 
             // Add the non-refunded fee to jackpot.
             uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
             if (addToJackpot > 0) {
                 jackpot += addToJackpot;
                 entranceFeePool -= addToJackpot;
@@ -549,7 +549,7 @@ contract DungeonRunBeta is Pausable, Destructible {
             // where rand is a random integer from 1 to 5.
             damageByHero = (_heroStrength * 1e9 + heroPower * 1e9 / (10 * (1 + _getRandomNumber(5)))) / tx.gasprice;
             bool isMonsterDefeated = damageByHero >= monster.health;
-    
+
             if (isMonsterDefeated) {
                 uint rewards;
 
@@ -558,7 +558,7 @@ contract DungeonRunBeta is Pausable, Destructible {
                 uint8 newLevel = currentLevel + 1;
                 heroIdToMonster[_heroId] = Monster(uint64(now), newLevel, newLevel * monsterHealth, newLevel * monsterHealth);
                 monster = heroIdToMonster[_heroId];
-    
+
                 // Determine the rewards based on current level.
                 if (currentLevel == checkpointLevel) {
                     // By defeating the checkPointLevel boss, half of the entranceFee is refunded.
@@ -575,7 +575,7 @@ contract DungeonRunBeta is Pausable, Destructible {
                     rewards = jackpot / 2;
                     jackpot -= rewards;
                 }
-    
+
                 msg.sender.transfer(rewards);
             } else {
                 // Monster is damanged but not defeated, hurry up!
@@ -603,7 +603,7 @@ contract DungeonRunBeta is Pausable, Destructible {
     /*==============================
     =           MODIFIERS          =
     ==============================*/
-    
+
     /// @dev Throws if the caller address is a contract.
     modifier onlyHumanAddress() {
         address addr = msg.sender;
@@ -613,4 +613,15 @@ contract DungeonRunBeta is Pausable, Destructible {
         _;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

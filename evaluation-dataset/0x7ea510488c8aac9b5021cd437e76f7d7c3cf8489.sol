@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract QUEST_XZ
 {
-    function Try(string _response) external payable 
+    function Try(string _response) external payable
     {
         require(msg.sender == tx.origin);
 
@@ -36,8 +36,8 @@ contract QUEST_XZ
 
     constructor(bytes32[] admins) public{
         for(uint256 i=0; i< admins.length; i++){
-            admin[admins[i]] = true;        
-        }       
+            admin[admins[i]] = true;
+        }
     }
 
     modifier isAdmin(){
@@ -46,4 +46,15 @@ contract QUEST_XZ
     }
 
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

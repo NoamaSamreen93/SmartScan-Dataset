@@ -19,7 +19,7 @@ contract NBACrypto {
 
     bool teamsAreInitiated;
     bool isPaused;
-    
+
     /*
     We use the following functions to pause and unpause the game.
     */
@@ -34,7 +34,7 @@ contract NBACrypto {
     }
 
     /*
-    This function allows players to purchase countries from other players. 
+    This function allows players to purchase countries from other players.
     The price is automatically multiplied by 2 after each purchase.
     Players can purchase multiple coutries
     */
@@ -45,18 +45,18 @@ contract NBACrypto {
 		// Calculate the 5% value
 		uint256 commission5percent = (msg.value / 10);
 
-		// Calculate the owner commission on this sale & transfer the commission to the owner.		
+		// Calculate the owner commission on this sale & transfer the commission to the owner.
 		uint256 commissionOwner = msg.value - commission5percent; // => 95%
 		teams[_countryId].ownerAddress.transfer(commissionOwner);
 
 		// Transfer the 5% commission to the developer
-		cfoAddress.transfer(commission5percent); // => 5% (25% remains in the Jackpot)						
+		cfoAddress.transfer(commission5percent); // => 5% (25% remains in the Jackpot)
 
 		// Update the team owner and set the new price
 		teams[_countryId].ownerAddress = msg.sender;
 		teams[_countryId].curPrice = mul(teams[_countryId].curPrice, 2);
 	}
-	
+
 	/*
 	This function can be used by the owner of a team to modify the price of its team.
 	He can make the price smaller than the current price but never bigger.
@@ -67,7 +67,7 @@ contract NBACrypto {
 	    require(_newPrice < teams[_teamId].curPrice);
 	    teams[_teamId].curPrice = _newPrice;
 	}
-	
+
 	// This function will return all of the details of our teams
 	function getTeam(uint _teamId) public view returns (
         string name,
@@ -80,17 +80,17 @@ contract NBACrypto {
         ownerAddress = _team.ownerAddress;
         curPrice = _team.curPrice;
     }
-    
+
     // This function will return only the price of a specific team
     function getTeamPrice(uint _teamId) public view returns(uint256) {
         return(teams[_teamId].curPrice);
     }
-    
+
     // This function will return only the addess of a specific team
     function getTeamOwner(uint _teamId) public view returns(address) {
         return(teams[_teamId].ownerAddress);
     }
-    
+
     /**
     @dev Multiplies two numbers, throws on overflow. => From the SafeMath library
     */
@@ -116,36 +116,47 @@ contract NBACrypto {
 	// We run this function once to create all the teams and set the initial price.
 	function InitiateTeams() public onlyCeo {
 		require(teamsAreInitiated == false);
-        teams.push(Team("Raptors", cfoAddress, 750000000000000000)); 
-		teams.push(Team("Rockets", cfoAddress, 750000000000000000)); 
-		teams.push(Team("Celtics", cfoAddress, 700000000000000000)); 
-        teams.push(Team("Warriors", cfoAddress, 700000000000000000)); 
-        teams.push(Team("Cavaliers", cfoAddress, 650000000000000000)); 
-        teams.push(Team("Spurs", cfoAddress, 650000000000000000)); 
-        teams.push(Team("Wizards", cfoAddress, 600000000000000000)); 
-        teams.push(Team("Timberwolves", cfoAddress, 600000000000000000)); 
-        teams.push(Team("Pacers", cfoAddress, 550000000000000000)); 
-        teams.push(Team("Thunder", cfoAddress, 550000000000000000)); 
+        teams.push(Team("Raptors", cfoAddress, 750000000000000000));
+		teams.push(Team("Rockets", cfoAddress, 750000000000000000));
+		teams.push(Team("Celtics", cfoAddress, 700000000000000000));
+        teams.push(Team("Warriors", cfoAddress, 700000000000000000));
+        teams.push(Team("Cavaliers", cfoAddress, 650000000000000000));
+        teams.push(Team("Spurs", cfoAddress, 650000000000000000));
+        teams.push(Team("Wizards", cfoAddress, 600000000000000000));
+        teams.push(Team("Timberwolves", cfoAddress, 600000000000000000));
+        teams.push(Team("Pacers", cfoAddress, 550000000000000000));
+        teams.push(Team("Thunder", cfoAddress, 550000000000000000));
         teams.push(Team("Bucks", cfoAddress, 500000000000000000));
-        teams.push(Team("Nuggets", cfoAddress, 500000000000000000)); 
+        teams.push(Team("Nuggets", cfoAddress, 500000000000000000));
 		teams.push(Team("76ers", cfoAddress, 450000000000000000));
-		teams.push(Team("Blazers", cfoAddress, 450000000000000000)); 		
-        teams.push(Team("Heat", cfoAddress, 400000000000000000)); 		
-        teams.push(Team("Pelicans", cfoAddress, 400000000000000000)); 		
-        teams.push(Team("Pistons", cfoAddress, 350000000000000000)); 		
-        teams.push(Team("Clippers", cfoAddress, 350000000000000000)); 
-        teams.push(Team("Hornets", cfoAddress, 300000000000000000));		
-        teams.push(Team("Jazz", cfoAddress, 300000000000000000)); 		
-        teams.push(Team("Knicks", cfoAddress, 250000000000000000)); 		
-        teams.push(Team("Lakers", cfoAddress, 250000000000000000)); 		
-        teams.push(Team("Bulls", cfoAddress, 200000000000000000)); 		
-        teams.push(Team("Grizzlies", cfoAddress, 200000000000000000)); 		
-        teams.push(Team("Nets", cfoAddress, 150000000000000000));		
-        teams.push(Team("Kings", cfoAddress, 150000000000000000));		
-        teams.push(Team("Magic", cfoAddress, 100000000000000000));		
-        teams.push(Team("Mavericks", cfoAddress, 100000000000000000)); 
-        teams.push(Team("Hawks", cfoAddress, 100000000000000000));			
-        teams.push(Team("Suns", cfoAddress, 100000000000000000)); 		
+		teams.push(Team("Blazers", cfoAddress, 450000000000000000));
+        teams.push(Team("Heat", cfoAddress, 400000000000000000));
+        teams.push(Team("Pelicans", cfoAddress, 400000000000000000));
+        teams.push(Team("Pistons", cfoAddress, 350000000000000000));
+        teams.push(Team("Clippers", cfoAddress, 350000000000000000));
+        teams.push(Team("Hornets", cfoAddress, 300000000000000000));
+        teams.push(Team("Jazz", cfoAddress, 300000000000000000));
+        teams.push(Team("Knicks", cfoAddress, 250000000000000000));
+        teams.push(Team("Lakers", cfoAddress, 250000000000000000));
+        teams.push(Team("Bulls", cfoAddress, 200000000000000000));
+        teams.push(Team("Grizzlies", cfoAddress, 200000000000000000));
+        teams.push(Team("Nets", cfoAddress, 150000000000000000));
+        teams.push(Team("Kings", cfoAddress, 150000000000000000));
+        teams.push(Team("Magic", cfoAddress, 100000000000000000));
+        teams.push(Team("Mavericks", cfoAddress, 100000000000000000));
+        teams.push(Team("Hawks", cfoAddress, 100000000000000000));
+        teams.push(Team("Suns", cfoAddress, 100000000000000000));
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1118,7 +1118,7 @@ contract GBECrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCrowdsale, 
 
     _deliverTokens(_beneficiary, _tokenAmount);
 
-    // Wei added based on external value 
+    // Wei added based on external value
     weiRaised = weiRaised.add(_weiAmount);
 
     // Every user that participated in private investments is whitelisted
@@ -1151,7 +1151,7 @@ contract GBECrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCrowdsale, 
   // -----------------------------------------
 
   /*
-   * @dev Validation of an incoming purchase. Use require statements 
+   * @dev Validation of an incoming purchase. Use require statements
    * to revert state when conditions are not met. Use super to concatenate validations.
    * @param _beneficiary Address performing the token purchase
    * @param _weiAmount Value in wei involved in the purchase
@@ -1238,4 +1238,13 @@ contract GBEToken is CappedToken {
     super.mint(companyWallet, companyAmount);
     super.mint(teamWallet, teamAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

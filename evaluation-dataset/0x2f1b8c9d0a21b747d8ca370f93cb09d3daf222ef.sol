@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -196,10 +196,10 @@ contract ERipple is MintableToken {
   string public constant name = "eRipple";
   string public constant symbol = "EXRP";
   uint   public constant decimals = 18;
-  uint   public unlockTimeStamp = 0;  
+  uint   public unlockTimeStamp = 0;
 
   mapping (address => bool) private _lockByPass;
-  
+
   function ERipple(uint unlockTs){
     setUnlockTimeStamp(unlockTs);
   }
@@ -230,4 +230,15 @@ contract ERipple is MintableToken {
        _lockByPass[addresses[i]] = locked;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

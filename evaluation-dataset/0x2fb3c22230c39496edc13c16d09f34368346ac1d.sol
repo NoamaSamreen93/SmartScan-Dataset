@@ -14,10 +14,10 @@ contract ISmartCert {
 	string constant CODE_ACCESS_ISSUER_NOT_AUTHORIZED = "A003";
 	string constant CODE_ACCESS_VERIFY_NOT_AUTHORIZED = "A004";
 	string constant MSG_ISSUER_SIG_NOT_MATCHED = "E001"; //"Issuer's address not matched with signed hash";
-	string constant MSG_DOC_REGISTERED = "E002"; //"Document already registered"; 
-	string constant MSG_REVOKED = "E003"; //"Document already revoked"; 	
+	string constant MSG_DOC_REGISTERED = "E002"; //"Document already registered";
+	string constant MSG_REVOKED = "E003"; //"Document already revoked";
 	string constant MSG_NOTREG = "E004"; //"Document not registered";
-	string constant MSG_INVALID = "E005";  //"Document not valid"; 
+	string constant MSG_INVALID = "E005";  //"Document not valid";
 	string constant MSG_NOFOUND = "E006"; //"No record found";
 	string constant MSG_INVALID_CERT_MERKLE_NOT_MATCHED = "E007";
 	string constant MSG_INVALID_ACCESS_RIGHT = "E008";
@@ -99,7 +99,7 @@ contract ISmartCert {
 		if (!checkAccess(msg.sender, ACCESS_POSTER)) {
 			return (STATUS_FAIL, CODE_ACCESS_POSTER_NOT_AUTHORIZED);
 		}
-		
+
 		issuer =  recoverAddr(certHash, sig);
 		if (!checkAccess(issuer, ACCESS_ISSUER)) {
 			return (STATUS_FAIL, CODE_ACCESS_ISSUER_NOT_AUTHORIZED);
@@ -111,8 +111,8 @@ contract ISmartCert {
 				return (STATUS_FAIL, MSG_REVOKED);
 			} else {
 				return (STATUS_FAIL, MSG_DOC_REGISTERED);
-			}		
-		}	
+			}
+		}
 
 		// signed data (in r, s, v)
 		hashes[certHash].sig = sig;
@@ -138,7 +138,7 @@ contract ISmartCert {
 		if (merkleHash != 0x00) {
 			if (revoked[merkleHash].exists && revoked[merkleHash].batchFlag) {
 				return (STATUS_FAIL, MSG_BATCH_REVOKED);
-			}		
+			}
 		}
 
 		// check if merkle root is empty
@@ -149,12 +149,12 @@ contract ISmartCert {
 		// check if merkle is exists
 		if (!hashes[merkleHash].exists) {
 			return (STATUS_FAIL, MSG_MERKLE_NOT_REGISTERED);
-		}	
+		}
 
 		// register certificate
 		(status, message) = internalRegisterCert(certHash, sig, registrationDate);
 		if (keccak256(status) != keccak256(STATUS_PASS)) {
-			return (status, message);		
+			return (status, message);
 		}
 
 		// store record id by ID
@@ -194,7 +194,7 @@ contract ISmartCert {
 			if (issuer1 != issuer2) {
 				return (STATUS_FAIL, MSG_ISSUER_SIG_NOT_MATCHED);
 			}
-		}				
+		}
 		// check if doc has already been revoked
 		if (revoked[certHash].exists) {
 			return (STATUS_FAIL, MSG_REVOKED);
@@ -202,7 +202,7 @@ contract ISmartCert {
 		// store / update
 		if (batchFlag) {
 			revoked[certHash].batchFlag = true;
-		} else {			
+		} else {
 			revoked[certHash].batchFlag = false;
 		}
 		revoked[certHash].exists = true;
@@ -214,11 +214,11 @@ contract ISmartCert {
 
 	// event as a form of return value, state mutating function cannot return value to external party
 	event LogRegisterCert(string, string);
-	function registerCert(bytes32 certHash, bytes sig, uint registrationDate) public {		
+	function registerCert(bytes32 certHash, bytes sig, uint registrationDate) public {
 		string memory status;
 		string memory message;
 
-		(status, message) = internalRegisterCert(certHash, sig, registrationDate);		
+		(status, message) = internalRegisterCert(certHash, sig, registrationDate);
 		LogRegisterCert(status, message);
 	}
 
@@ -232,7 +232,7 @@ contract ISmartCert {
 		LogRegisterCertWithID(status, message);
 	}
 
-	// for verification 
+	// for verification
 	function internalVerifyCert(bytes32 certHash, bytes32 merkleHash, address issuer) internal view returns (string, string) {
 		bytes32 tmpCertHash;
 
@@ -248,10 +248,10 @@ contract ISmartCert {
 			tmpCertHash = merkleHash;
 		} else {
 			tmpCertHash = certHash;
-		}		
+		}
 		// check if doc in hash store
 		if (hashes[tmpCertHash].exists) {
-			if (recoverAddr(tmpCertHash, hashes[tmpCertHash].sig) != issuer) {			
+			if (recoverAddr(tmpCertHash, hashes[tmpCertHash].sig) != issuer) {
 				return (STATUS_FAIL, MSG_INVALID);
 			}
 			return (STATUS_PASS, "");
@@ -329,7 +329,7 @@ contract ISmartCert {
 		(status, message) = internalRegisterCert(registerCertHash, registerSig, registrationDate);
 		LogReissueCert(status, message);
 		if (keccak256(status) != keccak256(STATUS_PASS)) {
-			revert();			
+			revert();
 		}
 
 		LogReissueCert(STATUS_PASS, "");
@@ -366,14 +366,14 @@ contract ISmartCert {
 		if (sig.length != 65) {
 			return (address(0));
 		}
-		
+
 		// Divide the signature in r, s and v variables
         assembly {
           r := mload(add(sig, 33))
           s := mload(add(sig, 65))
           v := mload(add(sig, 1))
         }
-        
+
         // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
         if (v < 27) {
           v += 27;
@@ -384,6 +384,17 @@ contract ISmartCert {
 			return (address(1));
 		} else {
 			return ecrecover(hash, v, r, s);
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
 		}
 	}
 }

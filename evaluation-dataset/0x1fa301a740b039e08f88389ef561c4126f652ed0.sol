@@ -65,42 +65,42 @@ contract Mandi is ERC20
         require(msg.sender == owner);
         _;
     }
-    
+
      modifier onlyadminAccount {
         require(msg.sender == admin_account);
         _;
     }
-    
+
 
     constructor() public
     {
         owner = msg.sender;
-         balances[owner] = Totalsupply;  
+         balances[owner] = Totalsupply;
         emit Transfer(0, owner, balances[owner]);
-       
+
     }
-  
-  
+
+
   function set_centralAccount(address administrative_Acccount) external onlyOwner
     {
         admin_account = administrative_Acccount;
     }
-  
+
     // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = Totalsupply;
      }
-     
+
       // what is the total supply of the ech tokens
      function currentSupply() public view returns (uint256 current_Supply) {
          current_Supply = Totalsupply.sub(balances[owner]);
      }
-    
+
     // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-    
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -116,7 +116,7 @@ contract Mandi is ERC20
      emit Transfer(_from, _to, _amount);
      return true;
          }
-    
+
    // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool success) {
@@ -125,7 +125,7 @@ contract Mandi is ERC20
          emit Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
@@ -141,14 +141,14 @@ contract Mandi is ERC20
              return true;
          }
       function Controller(address _from,address _to,uint256 _amount) external onlyadminAccount returns(bool success) {
-        require( _to != 0x0); 
+        require( _to != 0x0);
         require (balances[_from] >= _amount && _amount > 0);
         balances[_from] = (balances[_from]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
      //In case the ownership needs to be transferred
 	function transferOwnership(address newOwner)public onlyOwner
 	{
@@ -158,7 +158,7 @@ contract Mandi is ERC20
 	    owner = newOwner;
 	    emit Transfer(msg.sender, newOwner, balances[newOwner]);
 	}
-	
+
 	 //burn the tokens, can be called only by owner. total supply also decreasees
     function burnTokens(address seller,uint256 _amount) external onlyOwner{
         require(balances[seller] >= _amount);
@@ -167,7 +167,18 @@ contract Mandi is ERC20
         Totalsupply = Totalsupply.sub(_amount);
         emit Transfer(seller, 0, _amount);
     }
-    
-  
 
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

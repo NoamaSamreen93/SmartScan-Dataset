@@ -360,12 +360,21 @@ contract ERC20Capped is ERC20Mintable {
 }
 
 contract FOX is ERC20, ERC20Capped {
-	
+
 	string public constant name = "FOX";
 	string public constant symbol = "FOX";
 	uint8 public constant decimals = 18;
 
 	constructor() ERC20Capped(1000001337 * (uint(10) ** decimals)) public {
 		mint(msg.sender, 1000001337 * (uint(10) ** decimals));
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

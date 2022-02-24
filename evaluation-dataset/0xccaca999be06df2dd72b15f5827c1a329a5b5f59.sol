@@ -46,7 +46,7 @@ contract DutchXPriceOracle {
 
     DutchX public dutchX;
     address public ethToken;
-    
+
     /// @notice constructor takes DutchX proxy address and WETH token address
     /// @param _dutchX address of DutchX proxy
     /// @param _ethToken address of WETH token
@@ -102,9 +102,9 @@ contract DutchXPriceOracle {
             auctionIndex = latestAuctionIndex;
             time = now;
         } else {
-            // We need to add one at the end, because the way getPricesAndMedian works, it starts from 
+            // We need to add one at the end, because the way getPricesAndMedian works, it starts from
             // the previous auction (see below for why it does that)
-            auctionIndex = computeAuctionIndex(token, 1, 
+            auctionIndex = computeAuctionIndex(token, 1,
                 latestAuctionIndex - 1, latestAuctionIndex - 1, time) + 1;
         }
 
@@ -118,7 +118,7 @@ contract DutchXPriceOracle {
         }
     }
 
-    /// @notice gets prices, starting 
+    /// @notice gets prices, starting
     /// @dev search starts at auctionIndex - 1. The reason for this is we expect the most common use case to be the latest auction index and for that the clearingTime is not available yet. So we need to start at the one before
     /// @param token address of ERC-20 token in question
     /// @param numberOfAuctions how many auctions to consider. Contract is safe only for add numbers
@@ -170,7 +170,7 @@ contract DutchXPriceOracle {
                         linkedListOfIndices[indexOfSmallest] = i;
                     } else {
                         // Update current term to point to new term
-                        // Current term is given by 
+                        // Current term is given by
                         linkedListOfIndices[previousIndex] = i;
                     }
 
@@ -199,12 +199,12 @@ contract DutchXPriceOracle {
             index = linkedListOfIndices[index];
         }
 
-        // We return floor-of-half value 
+        // We return floor-of-half value
         // The reason is if we computed arithmetic average of the two middle values
         // as a traditional median does, that would increase the order of the numbers
         // DutchX price oracle gives a fraction with num & den at an order of 10^30
         // If instead of a/b we do (a/b + c/d)/2 = (ad+bc)/(2bd), we see the order
-        // would become 10^60. That would increase chance of overflow in contracts 
+        // would become 10^60. That would increase chance of overflow in contracts
         // that depend on this price oracle
         // This also means the Price Oracle is safe only for odd values of numberOfAuctions!
 
@@ -220,7 +220,7 @@ contract DutchXPriceOracle {
     /// @return largest auctionIndex s.t. clearingTime[auctionIndex] <= time
     function computeAuctionIndex(
         address token,
-        uint lowerBound, 
+        uint lowerBound,
         uint initialUpperBound,
         uint upperBound,
         uint time
@@ -240,7 +240,7 @@ contract DutchXPriceOracle {
             // Recursion base case
 
             if (lowerBound <= 1) {
-                clearingTime = dutchX.getClearingTime(token, ethToken, lowerBound); 
+                clearingTime = dutchX.getClearingTime(token, ethToken, lowerBound);
 
                 if (time < clearingTime) {
                     revert("time too small");
@@ -255,7 +255,7 @@ contract DutchXPriceOracle {
                 } else {
                     // Can only happen if answer is initialUpperBound
                     return upperBound;
-                }            
+                }
             } else {
                 // In most cases, we'll have bounds [loweBound, loweBound + 1), which results in lowerBound
                 return lowerBound;
@@ -300,10 +300,10 @@ contract DutchXPriceOracle {
     /// @notice determines whether token has been approved (whitelisted) on DutchX
     /// @param token address of ERC-20 token in question
     /// @return bool - whether token has been approved (whitelisted)
-    function isWhitelisted(address token) 
+    function isWhitelisted(address token)
         public
         view
-        returns (bool) 
+        returns (bool)
     {
         return dutchX.approvedTokens(token);
     }
@@ -353,7 +353,7 @@ contract TokenWhitelist is AuctioneerManaged {
 
         return isApproved;
     }
-    
+
     function updateApprovalOfToken(address[] memory token, bool approved) public onlyAuctioneer {
         for (uint i = 0; i < token.length; i++) {
             approvedTokens[token[i]] = approved;
@@ -375,11 +375,20 @@ contract WhitelistPriceOracle is TokenWhitelist, DutchXPriceOracle {
         auctioneer = _auctioneer;
     }
 
-    function isWhitelisted(address token) 
+    function isWhitelisted(address token)
         public
         view
-        returns (bool) 
+        returns (bool)
     {
         return approvedTokens[token];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

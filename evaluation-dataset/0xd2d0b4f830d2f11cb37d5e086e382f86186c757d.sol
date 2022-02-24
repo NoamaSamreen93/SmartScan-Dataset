@@ -622,3 +622,12 @@ contract ERC20Detailed is IERC20 {
 contract MediciToken is ERC20Detailed, FreezableMintableToken, ERC20Burnable {
     constructor() public ERC20Detailed("Medici Token", "MDI", 18) {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

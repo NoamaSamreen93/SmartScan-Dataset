@@ -408,7 +408,7 @@ contract CryptualProjectToken is StandardToken, Ownable {
 
     if (isCrowdsale) {
       require(crowdsaleContributions[_beneficiary].add(weiAmount) <= getCrowdsaleUserCap());
-      
+
       // calculate token amount to be created
       tokens = _getCrowdsaleTokenAmount(weiAmount);
       require(tokens != 0);
@@ -417,7 +417,7 @@ contract CryptualProjectToken is StandardToken, Ownable {
       crowdsaleWeiRaised = crowdsaleWeiRaised.add(weiAmount);
     } else if (isPresale) {
       require(whitelist[_beneficiary]);
-      
+
       // calculate token amount to be created
       tokens = weiAmount.mul(PRESALE_RATE).div(1 ether);
       require(tokens != 0);
@@ -478,7 +478,7 @@ contract CryptualProjectToken is StandardToken, Ownable {
     for (uint i = 0; i < crowdsaleWeiAvailableLevels.length; i++) {
       uint256 weiAvailable = crowdsaleWeiAvailableLevels[i];
       uint256 rate = crowdsaleRates[i];
-      
+
       if (uncountedWeiRaised < weiAvailable) {
         if (uncountedWeiRaised > 0) {
           weiAvailable = weiAvailable.sub(uncountedWeiRaised);
@@ -510,7 +510,7 @@ contract CryptualProjectToken is StandardToken, Ownable {
     balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
     emit Transfer(0x0, _beneficiary, _tokenAmount);
   }
-  
+
   // Private presale buyer whitelist
   mapping(address => bool) public whitelist;
 
@@ -624,4 +624,13 @@ contract CryptualProjectToken is StandardToken, Ownable {
     return presaleWeiRaised.add(crowdsaleWeiRaised) >= COMBINED_WEI_GOAL;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

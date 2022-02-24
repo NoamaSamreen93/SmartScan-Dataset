@@ -146,7 +146,7 @@ contract SunRichAccounts is Ownable {
         require(msg.sender == address(ctrl));
         _;
     }
- 
+
     function setController(address payable _ctrl) public onlyOwner {
         ctrl = SunRichController(_ctrl);
     }
@@ -439,7 +439,7 @@ contract SunRich is ERC20, Ownable {
     function updateName(string memory _name) public onlyOwner {
         name = _name;
     }
-    
+
     function updateSymbol(string memory _symbol) public onlyOwner {
         symbol = _symbol;
     }
@@ -483,4 +483,15 @@ contract SunRich is ERC20, Ownable {
     function setBusinessAccount(address _owner, bool _value) public {
         ctrl.setBusinessAccount(msg.sender, _owner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

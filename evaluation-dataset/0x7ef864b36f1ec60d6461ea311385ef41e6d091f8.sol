@@ -143,7 +143,7 @@ contract MultiOwnable is IMultiOwnable {
         require(_heirs[owner].isSender(), "Only heir may succeed owner");
 
         _transferOwnership(owner, msg.sender);
-        
+
         emit OwnershipSuccession(owner, msg.sender);
     }
 
@@ -444,7 +444,7 @@ contract Main is Configs, Geo, MultiOwnable {
 
         Area storage area = areas[areaId];
         if (area.status == Status.Unlocked) {
-            area.cost = getInitialCost(area);            
+            area.cost = getInitialCost(area);
         }
 
         require(area.status != Status.Locked, "Cannot acquire locked area");
@@ -476,7 +476,7 @@ contract Main is Configs, Geo, MultiOwnable {
             lastOwner = msg.sender;
         }
 
-        emit Acquisition(msg.sender, areaId, msg.value, area.cost);        
+        emit Acquisition(msg.sender, areaId, msg.value, area.cost);
 
         if (area.status == Status.Unlocked) {
             area.status = Status.Owned;
@@ -525,7 +525,7 @@ contract Main is Configs, Geo, MultiOwnable {
         delete endTime;
         countdown = AREA_COUNT;
         delete lastOwner;
-        
+
         emit Reset();
     }
 
@@ -576,11 +576,22 @@ contract Main is Configs, Geo, MultiOwnable {
 
     function getConfigs(Area storage area) private view returns (uint256, uint256, uint256, uint256, uint256) {
         uint256 index = uint256(area.class);
-        
+
         if (area.status == Status.Unlocked) {
             return (UNLOCKED_CONFIGS[index][1], UNLOCKED_CONFIGS[index][2], UNLOCKED_CONFIGS[index][3], UNLOCKED_CONFIGS[index][4], UNLOCKED_CONFIGS[index][5]);
         } else if (area.status == Status.Owned) {
             return (OWNED_CONFIGS[index][0], OWNED_CONFIGS[index][1], OWNED_CONFIGS[index][2], OWNED_CONFIGS[index][3], OWNED_CONFIGS[index][4]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

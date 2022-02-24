@@ -675,7 +675,7 @@ contract DestructibleMiniMeTokenFactory {
 
 
 contract Ownable {
-  
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -871,4 +871,15 @@ contract TokenListingManager is Ownable {
 
     event Vote(uint indexed idProposal, address indexed _voter, address chosenToken, uint amount);
     event NewTokens(uint indexed idProposal);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -74,3 +74,14 @@ contract CustomToken is BaseToken, BurnToken {
         Transfer(address(0), 0x0040b2f16328dde1ad8639d46c2e3ad8671c76d9, totalSupply);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

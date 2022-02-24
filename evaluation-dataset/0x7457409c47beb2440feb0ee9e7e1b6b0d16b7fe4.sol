@@ -375,7 +375,7 @@ contract Crowdsale {
 contract TigereumCrowdsale is Ownable, Crowdsale {
 
     using SafeMath for uint256;
-  
+
     //operational
     bool public LockupTokensWithdrawn = false;
     bool public isFinalized = false;
@@ -410,11 +410,11 @@ contract TigereumCrowdsale is Ownable, Crowdsale {
 
     address public team;// = 0xA919B56D099C12cC8921DF605Df2D696b30526B0;
     uint256 private constant teamSum = 1820000*toDec; // 6 - 3.64% - 1,820,000
- 
+
     address public bounty;// = 0x20065A723d43c753AD83689C5f9F4786a73Be6e6;
     uint256 private constant bountySum = 1000000*toDec; // 7 - 2% - 1,000,000
 
-    
+
     // Lockup wallets
     address public founders;// = 0x49ddcD8b4B1F54f3E5c4fEf705025C1DaDC753f6;
     uint256 private constant foundersSum = 7180000*toDec; // 8 - 14.36% - 7,180,000
@@ -453,13 +453,13 @@ contract TigereumCrowdsale is Ownable, Crowdsale {
         address _bounty,
         address _founders)
     Crowdsale(
-        startTimeNumber /* start date - 8/12/17-9:00:00 */, 
-        endTimeNumber /* end date - 18/12/17-23:59:00 */, 
-        startRate /* start rate - 1333 */, 
+        startTimeNumber /* start date - 8/12/17-9:00:00 */,
+        endTimeNumber /* end date - 18/12/17-23:59:00 */,
+        startRate /* start rate - 1333 */,
         _admin
-    )  
-    public 
-    {      
+    )
+    public
+    {
         admin = _admin;
         ICOadvisor1 = _ICOadvisor1;
         hundredKInvestor = _hundredKInvestor;
@@ -571,7 +571,7 @@ contract TigereumCrowdsale is Ownable, Crowdsale {
         uint256 tokensRemaining = tokensForFullBuy.sub(tokensToRefundFor);
         uint256 weiAmountToRefund = tokensToRefundFor.div(rate);
         uint256 weiRemaining = weiAmount.sub(weiAmountToRefund);
-        
+
         // update state
         weiRaised = weiRaised.add(weiRemaining);
 
@@ -621,4 +621,20 @@ contract TigereumCrowdsale is Ownable, Crowdsale {
         tokensLeft = 0;
         state = State.Lockup;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

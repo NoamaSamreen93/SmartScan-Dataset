@@ -1,4 +1,4 @@
-// CHAINPAY -- BRINGING CRYPTO TO A [N]eighbor[H]ood NEAR YOU 
+// CHAINPAY -- BRINGING CRYPTO TO A [N]eighbor[H]ood NEAR YOU
 
 
 pragma solidity ^0.4.18;
@@ -12,7 +12,7 @@ contract ERC223Receiver {
 
 library SafeMath {
 
-  
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -51,7 +51,7 @@ contract Ownable {
     owner = msg.sender;
   }
 
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
@@ -74,7 +74,7 @@ contract Claimable is Ownable {
     _;
   }
 
- 
+
   function transferOwnership(address newOwner) onlyOwner public {
     pendingOwner = newOwner;
   }
@@ -102,12 +102,12 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
 
- 
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -118,7 +118,7 @@ contract BasicToken is ERC20Basic {
     return true;
   }
 
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
@@ -151,7 +151,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
@@ -168,7 +168,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
-  
+
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -190,7 +190,7 @@ contract ERC223Token is StandardToken, Claimable {
 
 	mapping (address => bool) public whiteListContracts;
 
-	
+
 	mapping (address => mapping (address => bool) ) public userWhiteListContracts;
 
 	function setERC223Activated(bool _activate) public onlyOwner {
@@ -207,7 +207,7 @@ contract ERC223Token is StandardToken, Claimable {
 		uint codeLength;
 
 		assembly {
-			
+
 			codeLength := extcodesize(_to)
 		}
 
@@ -304,14 +304,14 @@ contract HoldersToken is BurnableToken {
 	}
 
 	function transfer(address _to, uint256 _value, bytes _data) public returns (bool) {
-		require(_to != address(this)); 
+		require(_to != address(this));
 		bool ok = super.transfer(_to, _value, _data);
 		addHolder(_to);
 		return ok;
 	}
 
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-		require(_to != address(this)); 
+		require(_to != address(this));
 		bool ok = super.transferFrom(_from, _to, _value);
 		addHolder(_to);
 		return ok;
@@ -338,7 +338,7 @@ contract MigratoryToken is HoldersToken {
 
 	uint256 public migrationCountComplete;
 
-	
+
 	function setMigrationAgent(address agent) public onlyOwner {
 		migrationAgent = agent;
 	}
@@ -349,7 +349,7 @@ contract MigratoryToken is HoldersToken {
 		balances[msg.sender] = balances[msg.sender].sub(value);
 		totalSupply_ = totalSupply_.sub(value);
 		MigrationAgent(migrationAgent).migrateFrom(msg.sender, value);
-	
+
 		Migrate(msg.sender, value);
 		return true;
 	}
@@ -357,7 +357,7 @@ contract MigratoryToken is HoldersToken {
 	function migrateHolders(uint256 count) public onlyOwner returns (bool) {
 		require(count > 0);
 		require(migrationAgent != 0x0);
-		
+
 		count = migrationCountComplete.add(count);
 		if (count > holders.length) {
 			count = holders.length;
@@ -368,7 +368,7 @@ contract MigratoryToken is HoldersToken {
 			balances[holder] = balances[holder].sub(value);
 			totalSupply_ = totalSupply_.sub(value);
 			MigrationAgent(migrationAgent).migrateFrom(holder, value);
-			
+
 			Migrate(holder, value);
 		}
 		migrationCountComplete = count;
@@ -385,7 +385,7 @@ contract ChainPay is MigratoryToken {
 
 	// TOKEN NAME :: CHAINPAY :: LINKING DIGITAL PAYMENTS + EVERYDAY LIFE
 	string public name;
-	// TOKEN SYMBOL :: CIP :: CR_P IN PEACE NIP 
+	// TOKEN SYMBOL :: CIP :: CR_P IN PEACE NIP
 	string public symbol;
 	//! Token decimals, 18
 	uint8 public decimals;
@@ -396,7 +396,7 @@ contract ChainPay is MigratoryToken {
 		name = "ChainPay";
 		symbol = "CIP";
 		decimals = 18;
-		totalSupply_ = 6060660000000000000000000; //six million, sixty thousand, six hundred sixty 
+		totalSupply_ = 6060660000000000000000000; //six million, sixty thousand, six hundred sixty
 		// SIX-O
 		balances[owner] = totalSupply_;
 		holders[holders.length++] = owner;
@@ -405,7 +405,7 @@ contract ChainPay is MigratoryToken {
 
 	address public migrationGate;
 
-	
+
 	function setMigrationGate(address _addr) public onlyOwner {
 		migrationGate = _addr;
 	}
@@ -438,7 +438,7 @@ contract ChainPay is MigratoryToken {
 		return string(return_values);
 	}
 
-// DONT ACCEPT INCOMMING CRYPTO TO CONTRACT 
+// DONT ACCEPT INCOMMING CRYPTO TO CONTRACT
 
 	function() public payable {
 		revert();
@@ -446,6 +446,17 @@ contract ChainPay is MigratoryToken {
 }
 
 //cryptocurrency allows you to control your wealth usingtechnology, never in history was that possible.
-//we are forever prolific 
+//we are forever prolific
 // (the marathon continues)
 //six million, sixty thousand, six hundred sixty #LLNH
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

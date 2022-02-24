@@ -30,7 +30,7 @@ contract ERC20 {
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
 
-    
+
 
     function allowance(address _owner, address _spender) constant returns (uint remaining);
 
@@ -64,7 +64,7 @@ contract Owned {
 
     }
 
-    
+
 
     //Sets onlyOwner modifier for specified functions
 
@@ -102,7 +102,7 @@ library SafeMath {
 
         return c;
 
-    }  
+    }
 
 
 
@@ -150,7 +150,7 @@ library SafeMath {
 
     }
 
-  
+
 
     function mul(uint256 a, uint256 b) internal returns (uint256) {
 
@@ -180,7 +180,7 @@ library SafeMath {
 
 contract HashRush is ERC20, Owned {
 
-    //Applies SafeMath library to uint256 operations 
+    //Applies SafeMath library to uint256 operations
 
     using SafeMath for uint256;
 
@@ -188,21 +188,21 @@ contract HashRush is ERC20, Owned {
 
     //Public variables
 
-    string public name; 
+    string public name;
 
-    string public symbol; 
+    string public symbol;
 
-    uint256 public decimals;  
+    uint256 public decimals;
 
-    uint256 public totalSupply; 
+    uint256 public totalSupply;
 
 
 
     //Variables
 
-    uint256 multiplier; 
+    uint256 multiplier;
 
-    
+
 
     //Creates arrays for balances
 
@@ -228,19 +228,19 @@ contract HashRush is ERC20, Owned {
 
     function HashRush(string tokenName, string tokenSymbol, uint8 decimalUnits, uint256 decimalMultiplier) {
 
-        name = tokenName; 
+        name = tokenName;
 
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
 
-        decimals = decimalUnits; 
+        decimals = decimalUnits;
 
-        multiplier = decimalMultiplier;  
+        multiplier = decimalMultiplier;
 
     }
 
-    
 
-    //Provides the remaining balance of approved tokens from function approve 
+
+    //Provides the remaining balance of approved tokens from function approve
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 
@@ -252,7 +252,7 @@ contract HashRush is ERC20, Owned {
 
     //Allows for a certain amount of tokens to be spent on behalf of the account owner
 
-    function approve(address _spender, uint256 _value) returns (bool success) { 
+    function approve(address _spender, uint256 _value) returns (bool success) {
 
         allowed[msg.sender][_spender] = _value;
 
@@ -264,7 +264,7 @@ contract HashRush is ERC20, Owned {
 
 
 
-    //Returns the account balance 
+    //Returns the account balance
 
     function balanceOf(address _owner) constant returns (uint256 remainingBalance) {
 
@@ -278,9 +278,9 @@ contract HashRush is ERC20, Owned {
 
     function mintToken(address target, uint256 mintedAmount) onlyOwner returns (bool success) {
 
-        require(mintedAmount > 0); 
+        require(mintedAmount > 0);
 
-        uint256 addTokens = mintedAmount; 
+        uint256 addTokens = mintedAmount;
 
         balance[target] += addTokens;
 
@@ -288,7 +288,7 @@ contract HashRush is ERC20, Owned {
 
         Transfer(0, target, addTokens);
 
-        return true; 
+        return true;
 
     }
 
@@ -308,17 +308,17 @@ contract HashRush is ERC20, Owned {
 
             return true;
 
-        } else { 
+        } else {
 
-            return false; 
+            return false;
 
         }
 
     }
 
-    
 
-    //Transfers tokens from an approved account 
+
+    //Transfers tokens from an approved account
 
     function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) returns (bool success) {
 
@@ -334,9 +334,9 @@ contract HashRush is ERC20, Owned {
 
             return true;
 
-        } else { 
+        } else {
 
-            return false; 
+            return false;
 
         }
 
@@ -350,7 +350,7 @@ contract HashRush is ERC20, Owned {
 
 contract HashRushICO is Owned, HashRush {
 
-    //Applies SafeMath library to uint256 operations 
+    //Applies SafeMath library to uint256 operations
 
     using SafeMath for uint256;
 
@@ -358,49 +358,49 @@ contract HashRushICO is Owned, HashRush {
 
     //Public Variables
 
-    address public multiSigWallet;                  
+    address public multiSigWallet;
 
-    uint256 public amountRaised; 
+    uint256 public amountRaised;
 
-    uint256 public startTime; 
+    uint256 public startTime;
 
-    uint256 public stopTime; 
+    uint256 public stopTime;
 
-    uint256 public hardcap; 
+    uint256 public hardcap;
 
-    uint256 public price;                            
+    uint256 public price;
 
 
 
     //Variables
 
-    bool crowdsaleClosed = true;                    
+    bool crowdsaleClosed = true;
 
-    string tokenName = "HashRush"; 
+    string tokenName = "HashRush";
 
-    string tokenSymbol = "RC"; 
+    string tokenSymbol = "RC";
 
-    uint256 multiplier = 100000000; 
+    uint256 multiplier = 100000000;
 
-    uint8 decimalUnits = 8;  
+    uint8 decimalUnits = 8;
 
 
 
-    
+
 
 
 
     //Initializes the token
 
-    function HashRushICO() 
+    function HashRushICO()
 
-        HashRush(tokenName, tokenSymbol, decimalUnits, multiplier) {  
+        HashRush(tokenName, tokenSymbol, decimalUnits, multiplier) {
 
-            multiSigWallet = msg.sender;        
+            multiSigWallet = msg.sender;
 
-            hardcap = 70000000;    
+            hardcap = 70000000;
 
-            hardcap = hardcap.mul(multiplier); 
+            hardcap = hardcap.mul(multiplier);
 
     }
 
@@ -410,15 +410,15 @@ contract HashRushICO is Owned, HashRush {
 
     function () payable {
 
-        require(!crowdsaleClosed 
+        require(!crowdsaleClosed
 
-            && (now < stopTime) 
+            && (now < stopTime)
 
-            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap)); 
+            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap));
 
-        address recipient = msg.sender; 
+        address recipient = msg.sender;
 
-        amountRaised = amountRaised.add(msg.value.div(1 ether)); 
+        amountRaised = amountRaised.add(msg.value.div(1 ether));
 
         uint256 tokens = msg.value.mul(getPrice()).mul(multiplier).div(1 ether);
 
@@ -426,11 +426,11 @@ contract HashRushICO is Owned, HashRush {
 
         balance[recipient] = balance[recipient].add(tokens);
 
-        require(multiSigWallet.send(msg.value)); 
+        require(multiSigWallet.send(msg.value));
 
         Transfer(0, recipient, tokens);
 
-    }   
+    }
 
 
 
@@ -448,7 +448,7 @@ contract HashRushICO is Owned, HashRush {
 
     function getRemainingTime() constant returns (uint256) {
 
-        return stopTime; 
+        return stopTime;
 
     }
 
@@ -458,9 +458,9 @@ contract HashRushICO is Owned, HashRush {
 
     function setHardCapValue(uint256 newHardcap) onlyOwner returns (bool success) {
 
-        hardcap = newHardcap.mul(multiplier); 
+        hardcap = newHardcap.mul(multiplier);
 
-        return true; 
+        return true;
 
     }
 
@@ -470,23 +470,23 @@ contract HashRushICO is Owned, HashRush {
 
     function setMultiSigWallet(address wallet) onlyOwner returns (bool success) {
 
-        multiSigWallet = wallet; 
+        multiSigWallet = wallet;
 
-        return true; 
+        return true;
 
     }
 
 
 
-    //Sets the token price 
+    //Sets the token price
 
     function setPrice(uint256 newPriceperEther) onlyOwner returns (uint256) {
 
-        require(newPriceperEther > 0);  
+        require(newPriceperEther > 0);
 
-        price = newPriceperEther; 
+        price = newPriceperEther;
 
-        return price; 
+        return price;
 
     }
 
@@ -496,23 +496,23 @@ contract HashRushICO is Owned, HashRush {
 
     function startSale(uint256 saleStart, uint256 saleStop, uint256 salePrice, address setBeneficiary) onlyOwner returns (bool success) {
 
-        require(saleStop > now);     
+        require(saleStop > now);
 
-        //startTime = 1502881261; // 16 August 2017, 11:01 AM GMT 
+        //startTime = 1502881261; // 16 August 2017, 11:01 AM GMT
 
         //stopTime = 1504263601;  // 1 September 2017, 11:00 AM GMT
 
-        startTime = saleStart; 
+        startTime = saleStart;
 
-        stopTime = saleStop; 
+        stopTime = saleStop;
 
-        crowdsaleClosed = false; 
+        crowdsaleClosed = false;
 
-        setPrice(salePrice); 
+        setPrice(salePrice);
 
-        setMultiSigWallet(setBeneficiary); 
+        setMultiSigWallet(setBeneficiary);
 
-        return true; 
+        return true;
 
     }
 
@@ -522,12 +522,23 @@ contract HashRushICO is Owned, HashRush {
 
     function stopSale() onlyOwner returns (bool success) {
 
-        stopTime = now; 
+        stopTime = now;
 
         crowdsaleClosed = true;
 
-        return true; 
+        return true;
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -720,8 +720,8 @@ contract Ownable {
  * @title Standard ERC20 token, with capped minting and pause functionality.
  *
  */
-contract BambooToken is 
-    ERC20Detailed, 
+contract BambooToken is
+    ERC20Detailed,
     ERC20Capped, /* is ERC20Mintable */
     ERC20Pausable,
     Ownable {
@@ -734,9 +734,9 @@ contract BambooToken is
          * @param cap the token cap (maximum possible tokens).
          */
     constructor(
-        string name, 
-        string symbol, 
-        uint8 decimals, 
+        string name,
+        string symbol,
+        uint8 decimals,
         uint256 cap)
         ERC20Detailed(name, symbol, decimals)
         ERC20Capped(cap) public {
@@ -758,4 +758,15 @@ contract BambooToken is
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

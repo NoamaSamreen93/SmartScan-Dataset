@@ -537,3 +537,14 @@ contract Bridge is BasicCrowdsale {
     emit CUSTOM_CROWDSALE_TOKEN_ADDED(address(token), uint8(token.decimals()));
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

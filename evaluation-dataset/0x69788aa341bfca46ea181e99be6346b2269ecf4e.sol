@@ -55,7 +55,7 @@ contract owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-	
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -67,9 +67,9 @@ contract owned {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; }
 
 contract TokenERC20 is owned{
-    
+
     using SafeMath for uint;
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -85,7 +85,7 @@ contract TokenERC20 is owned{
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -301,33 +301,37 @@ contract GenesisToken is owned, TokenERC20 {
         _transfer(msg.sender, address(this), amount);           // makes the transfers
         msg.sender.transfer(amount.div(sellPrice));             // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-    
+
     /// @notice setSaleAgent `_saleAgent` to contract
     /// @param _saleAgent address of new saleAgent
     function setSaleAgent(address _saleAgent) onlyOwner public {
         saleAgent = _saleAgent;
     }
-    
+
     /// @notice setNodeAgent `_nodeAgent` to contract
     /// @param _nodeAgent address of new nodeAgent
     function setNodeAgent(address _nodeAgent) onlyOwner public {
         nodeAgent = _nodeAgent;
     }
-    
+
     /// @notice setExchangeStatus `_exchangeStatus` to contract
     /// @param _exchangeStatus bool of setExchangeStatus
     function setExchangeStatus(bool _exchangeStatus) onlyOwner public {
-        exchangeStatus = _exchangeStatus; 
+        exchangeStatus = _exchangeStatus;
     }
-    
+
     /// @notice Send all tokens to Owner after ICO
     function sendAllTokensToOwner() onlyOwner public {
         _transfer(address(this), owner, balanceOf[address(this)]);
     }
-    
+
     /// @notice Finalization after ICO
     function finalizationAfterICO() onlyOwner public {
         tokenMint = false;
         tokenTransfer = true;
     }
+}
+function() payable external {
+	revert();
+}
 }

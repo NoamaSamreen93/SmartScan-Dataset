@@ -402,10 +402,10 @@ contract ERC721_custom is ERC165, IERC721 {
 
     emit Transfer(from, to, tokenId);
   }
-  
-  
-  
-  
+
+
+
+
     function internal_transferFrom(
         address _from,
         address to,
@@ -414,25 +414,25 @@ contract ERC721_custom is ERC165, IERC721 {
     internal
   {
     // permissions already checked on price basis
-    
+
     require(to != address(0));
 
     if (_tokenApprovals[tokenId] != address(0)) {
       _tokenApprovals[tokenId] = address(0);
     }
-    
+
     //_removeTokenFrom(from, tokenId);
     if(_ownedTokensCount[_from] > 1) {
     _ownedTokensCount[_from] = _ownedTokensCount[_from] -1; //.sub(1); // error here
     // works without .sub()????
-    
+
     }
-    _tokenOwner[tokenId] = address(0); 
-    
+    _tokenOwner[tokenId] = address(0);
+
     _addTokenTo(to, tokenId); // error here?
 
     emit Transfer(_from, to, tokenId);
-    
+
   }
 
   /**
@@ -568,8 +568,8 @@ contract ERC721_custom is ERC165, IERC721 {
     _ownedTokensCount[from] = _ownedTokensCount[from].sub(1);
     _tokenOwner[tokenId] = address(0);
   }
-  
-  
+
+
 
   /**
    * @dev Internal function to invoke `onERC721Received` on a target address
@@ -831,24 +831,24 @@ contract ERC721Metadata_custom is ERC165, ERC721_custom, IERC721Metadata {
     return _name;
   }
 
-  
+
   function symbol() external view returns (string) {
     return _symbol;
   }
 
-  
+
   function tokenURI(uint256 tokenId) external view returns (string) {
     require(_exists(tokenId));
     return _tokenURIs[tokenId];
   }
 
-  
+
   function _setTokenURI(uint256 tokenId, string uri) internal {
     require(_exists(tokenId));
     _tokenURIs[tokenId] = uri;
   }
 
-  
+
   function _burn(address owner, uint256 tokenId) internal {
     super._burn(owner, tokenId);
 
@@ -925,79 +925,79 @@ library Percent {
 
 
 contract PlanetCryptoToken is ERC721Full_custom{
-    
+
     using Percent for Percent.percent;
-    
-    
+
+
     // EVENTS
-        
+
     event referralPaid(address indexed search_to,
                     address to, uint256 amnt, uint256 timestamp);
-    
-    event issueCoinTokens(address indexed searched_to, 
+
+    event issueCoinTokens(address indexed searched_to,
                     address to, uint256 amnt, uint256 timestamp);
-    
-    event landPurchased(uint256 indexed search_token_id, address indexed search_buyer, 
+
+    event landPurchased(uint256 indexed search_token_id, address indexed search_buyer,
             uint256 token_id, address buyer, bytes32 name, int256 center_lat, int256 center_lng, uint256 size, uint256 bought_at, uint256 empire_score, uint256 timestamp);
-    
+
     event taxDistributed(uint256 amnt, uint256 total_players, uint256 timestamp);
-    
+
     event cardBought(
                     uint256 indexed search_token_id, address indexed search_from, address indexed search_to,
-                    uint256 token_id, address from, address to, 
+                    uint256 token_id, address from, address to,
                     bytes32 name,
-                    uint256 orig_value, 
+                    uint256 orig_value,
                     uint256 new_value,
                     uint256 empireScore, uint256 newEmpireScore, uint256 now);
 
     // CONTRACT MANAGERS
     address owner;
     address devBankAddress; // where marketing funds are sent
-    address tokenBankAddress; 
+    address tokenBankAddress;
 
     // MODIFIERS
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier validateLand(int256[] plots_lat, int256[] plots_lng) {
-        
+
         require(planetCryptoUtils_interface.validateLand(msg.sender, plots_lat, plots_lng) == true, "Some of this land already owned!");
 
-        
+
         _;
     }
-    
+
     modifier validatePurchase(int256[] plots_lat, int256[] plots_lng) {
 
         require(planetCryptoUtils_interface.validatePurchase(msg.sender, msg.value, plots_lat, plots_lng) == true, "Not enough ETH!");
         _;
     }
-    
-    
+
+
     modifier validateTokenPurchase(int256[] plots_lat, int256[] plots_lng) {
 
         require(planetCryptoUtils_interface.validateTokenPurchase(msg.sender, plots_lat, plots_lng) == true, "Not enough COINS to buy these plots!");
-        
 
-        
+
+
 
         require(planetCryptoCoin_interface.transferFrom(msg.sender, tokenBankAddress, plots_lat.length) == true, "Token transfer failed");
-        
-        
+
+
         _;
     }
-    
-    
+
+
     modifier validateResale(uint256 _token_id) {
         require(planetCryptoUtils_interface.validateResale(msg.sender, msg.value, _token_id) == true, "Not enough ETH to buy this card!");
         _;
     }
-    
-    
+
+
     modifier updateUsersLastAccess() {
-        
+
         uint256 allPlyersIdx = playerAddressToPlayerObjectID[msg.sender];
         if(allPlyersIdx == 0){
 
@@ -1006,10 +1006,10 @@ contract PlanetCryptoToken is ERC721Full_custom{
         } else {
             all_playerObjects[allPlyersIdx].lastAccess = now;
         }
-        
+
         _;
     }
-    
+
     // STRUCTS
     struct plotDetail {
         bytes32 name;
@@ -1019,47 +1019,47 @@ contract PlanetCryptoToken is ERC721Full_custom{
         int256[] plots_lat;
         int256[] plots_lng;
     }
-    
+
     struct plotBasic {
         int256 lat;
         int256 lng;
     }
-    
+
     struct player {
         address playerAddress;
         uint256 lastAccess;
         uint256 totalEmpireScore;
         uint256 totalLand;
-        
-        
+
+
     }
-    
+
 
     // INTERFACES
     address planetCryptoCoinAddress = 0xa1c8031ef18272d8bfed22e1b61319d6d9d2881b;
     PlanetCryptoCoin_I internal planetCryptoCoin_interface;
-    
+
 
     address planetCryptoUtilsAddress = 0x19BfDF25542F1380790B6880ad85D6D5B02fee32;
     PlanetCryptoUtils_I internal planetCryptoUtils_interface;
-    
-    
+
+
     // settings
     Percent.percent private m_newPlot_devPercent = Percent.percent(75,100); //75/100*100% = 75%
     Percent.percent private m_newPlot_taxPercent = Percent.percent(25,100); //25%
-    
+
     Percent.percent private m_resalePlot_devPercent = Percent.percent(10,100); // 10%
     Percent.percent private m_resalePlot_taxPercent = Percent.percent(10,100); // 10%
     Percent.percent private m_resalePlot_ownerPercent = Percent.percent(80,100); // 80%
-    
-    Percent.percent private m_refPercent = Percent.percent(5,100); // 5% referral 
-    
+
+    Percent.percent private m_refPercent = Percent.percent(5,100); // 5% referral
+
     Percent.percent private m_empireScoreMultiplier = Percent.percent(150,100); // 150%
     Percent.percent private m_resaleMultipler = Percent.percent(200,100); // 200%;
 
-    
-    
-    
+
+
+
     uint256 public devHoldings = 0; // holds dev funds in cases where the instant transfer fails
 
 
@@ -1071,20 +1071,20 @@ contract PlanetCryptoToken is ERC721Full_custom{
     // add in limit of land plots before tokens stop being distributed
     uint256 public tokens_rewards_available;
     uint256 public tokens_rewards_allocated;
-    
+
     // add in spend amount required to earn tokens
     uint256 public min_plots_purchase_for_token_reward = 10;
     uint256 public plots_token_reward_divisor = 10;
-    
-    
+
+
     // GAME SETTINGS
     uint256 public current_plot_price = 20000000000000000;
     uint256 public price_update_amount = 2000000000000;
 
     uint256 public current_plot_empire_score = 100;
 
-    
-    
+
+
     uint256 public tax_fund = 0;
     uint256 public tax_distributed = 0;
 
@@ -1093,48 +1093,48 @@ contract PlanetCryptoToken is ERC721Full_custom{
     uint256 public total_land_sold = 0;
     uint256 public total_trades = 0;
 
-    
-    uint256 public total_empire_score; 
+
+    uint256 public total_empire_score;
     player[] public all_playerObjects;
     mapping(address => uint256) internal playerAddressToPlayerObjectID;
-    
-    
-    
-    
+
+
+
+
     plotDetail[] plotDetails;
     mapping(uint256 => uint256) internal tokenIDplotdetailsIndexId; // e.g. tokenIDplotdetailsIndexId shows us the index of the detail obj for each token
 
 
 
-    
+
     mapping(int256 => mapping(int256 => uint256)) internal latlngTokenID_grids;
     mapping(uint256 => plotBasic[]) internal tokenIDlatlngLookup;
-    
-    
-    
+
+
+
     mapping(uint8 => mapping(int256 => mapping(int256 => uint256))) internal latlngTokenID_zoomAll;
 
     mapping(uint8 => mapping(uint256 => plotBasic[])) internal tokenIDlatlngLookup_zoomAll;
 
 
-   
-    
+
+
     constructor() ERC721Full_custom("PlanetCrypto", "PTC") public {
         owner = msg.sender;
         tokenBankAddress = owner;
         devBankAddress = owner;
         planetCryptoCoin_interface = PlanetCryptoCoin_I(planetCryptoCoinAddress);
         planetCryptoUtils_interface = PlanetCryptoUtils_I(planetCryptoUtilsAddress);
-        
+
         // empty playerAddressToPlayerObjectID player to allow easy checks...
 
         all_playerObjects.push(player(address(0x0),0,0,0));
         playerAddressToPlayerObjectID[address(0x0)] = 0;
     }
 
-    
 
-    
+
+
 
     function getToken(uint256 _tokenId, bool isBasic) public view returns(
         address token_owner,
@@ -1157,8 +1157,8 @@ contract PlanetCryptoToken is ERC721Full_custom{
         } else {
         }
     }
-    
-    
+
+
 
     function taxEarningsAvailable() public view returns(uint256) {
         return playersFundsOwed[msg.sender];
@@ -1168,7 +1168,7 @@ contract PlanetCryptoToken is ERC721Full_custom{
         uint256 taxEarnings = playersFundsOwed[msg.sender];
         playersFundsOwed[msg.sender] = 0;
         tax_fund = tax_fund.sub(taxEarnings);
-        
+
         if(!msg.sender.send(taxEarnings)) {
             playersFundsOwed[msg.sender] = playersFundsOwed[msg.sender] + taxEarnings;
             tax_fund = tax_fund.add(taxEarnings);
@@ -1178,23 +1178,23 @@ contract PlanetCryptoToken is ERC721Full_custom{
     function buyLandWithTokens(bytes32 _name, int256[] _plots_lat, int256[] _plots_lng)
      validateTokenPurchase(_plots_lat, _plots_lng) validateLand(_plots_lat, _plots_lng) updateUsersLastAccess() public {
         require(_name.length > 4);
-        
 
-        processPurchase(_name, _plots_lat, _plots_lng); 
+
+        processPurchase(_name, _plots_lat, _plots_lng);
     }
-    
 
-    
-    function buyLand(bytes32 _name, 
+
+
+    function buyLand(bytes32 _name,
             int256[] _plots_lat, int256[] _plots_lng,
             address _referrer
             )
-                validatePurchase(_plots_lat, _plots_lng) 
-                validateLand(_plots_lat, _plots_lng) 
+                validatePurchase(_plots_lat, _plots_lng)
+                validateLand(_plots_lat, _plots_lng)
                 updateUsersLastAccess()
                 public payable {
        require(_name.length > 4);
-       
+
         // split payment
         uint256 _runningTotal = msg.value;
         uint256 _referrerAmnt = 0;
@@ -1205,44 +1205,44 @@ contract PlanetCryptoToken is ERC721Full_custom{
                 _runningTotal = _runningTotal.sub(_referrerAmnt);
             }
         }
-        
+
         tax_fund = tax_fund.add(m_newPlot_taxPercent.mul(_runningTotal));
-        
-        
-        
+
+
+
         if(!devBankAddress.send(m_newPlot_devPercent.mul(_runningTotal))){
             devHoldings = devHoldings.add(m_newPlot_devPercent.mul(_runningTotal));
         }
-        
-        
-        
+
+
+
 
         processPurchase(_name, _plots_lat, _plots_lng);
-        
+
         calcPlayerDivs(m_newPlot_taxPercent.mul(_runningTotal));
-        
+
         if(_plots_lat.length >= min_plots_purchase_for_token_reward
             && tokens_rewards_available > 0) {
-                
+
             uint256 _token_rewards = _plots_lat.length / plots_token_reward_divisor;
             if(_token_rewards > tokens_rewards_available)
                 _token_rewards = tokens_rewards_available;
-                
-                
+
+
             planetCryptoCoin_interface.transfer(msg.sender, _token_rewards);
-                
+
             emit issueCoinTokens(msg.sender, msg.sender, _token_rewards, now);
             tokens_rewards_allocated = tokens_rewards_allocated + _token_rewards;
             tokens_rewards_available = tokens_rewards_available - _token_rewards;
         }
-    
+
     }
-    
-    
+
+
 
     function buyCard(uint256 _token_id, address _referrer) validateResale(_token_id) updateUsersLastAccess() public payable {
-        
-        
+
+
         // split payment
         uint256 _runningTotal = msg.value;
         uint256 _referrerAmnt = 0;
@@ -1253,76 +1253,76 @@ contract PlanetCryptoToken is ERC721Full_custom{
                 _runningTotal = _runningTotal.sub(_referrerAmnt);
             }
         }
-        
-        
+
+
         tax_fund = tax_fund.add(m_resalePlot_taxPercent.mul(_runningTotal));
-        
-        
-        
+
+
+
         if(!devBankAddress.send(m_resalePlot_devPercent.mul(_runningTotal))){
             devHoldings = devHoldings.add(m_resalePlot_devPercent.mul(_runningTotal));
         }
-        
-        
+
+
 
         address from = ownerOf(_token_id);
-        
+
         if(!from.send(m_resalePlot_ownerPercent.mul(_runningTotal))) {
             playersFundsOwed[from] = playersFundsOwed[from].add(m_resalePlot_ownerPercent.mul(_runningTotal));
         }
-        
-        
+
+
 
         our_transferFrom(from, msg.sender, _token_id);
-        
+
 
         plotDetail memory _plotDetail = plotDetails[tokenIDplotdetailsIndexId[_token_id]];
         uint256 _empireScore = _plotDetail.empire_score;
         uint256 _newEmpireScore = m_empireScoreMultiplier.mul(_empireScore);
         uint256 _origValue = _plotDetail.current_value;
-        
+
         uint256 _playerObject_idx = playerAddressToPlayerObjectID[msg.sender];
-        
+
 
         all_playerObjects[_playerObject_idx].totalEmpireScore
             = all_playerObjects[_playerObject_idx].totalEmpireScore + (_newEmpireScore - _empireScore);
-        
-        
+
+
         plotDetails[tokenIDplotdetailsIndexId[_token_id]].empire_score = _newEmpireScore;
 
         total_empire_score = total_empire_score + (_newEmpireScore - _empireScore);
-        
-        plotDetails[tokenIDplotdetailsIndexId[_token_id]].current_value = 
+
+        plotDetails[tokenIDplotdetailsIndexId[_token_id]].current_value =
             m_resaleMultipler.mul(plotDetails[tokenIDplotdetailsIndexId[_token_id]].current_value);
-        
+
         total_trades = total_trades + 1;
-        
-        
+
+
         calcPlayerDivs(m_resalePlot_taxPercent.mul(_runningTotal));
-        
-        
+
+
         // emit event
         emit cardBought(_token_id, from, msg.sender,
-                    _token_id, from, msg.sender, 
+                    _token_id, from, msg.sender,
                     _plotDetail.name,
-                    _origValue, 
+                    _origValue,
                     msg.value,
                     _empireScore, _newEmpireScore, now);
     }
-    
-    function processPurchase(bytes32 _name, 
+
+    function processPurchase(bytes32 _name,
             int256[] _plots_lat, int256[] _plots_lng) internal {
-    
+
         uint256 _token_id = totalSupply().add(1);
         _mint(msg.sender, _token_id);
-        
 
-        
+
+
 
         uint256 _empireScore =
                     current_plot_empire_score * _plots_lng.length;
-            
-            
+
+
         plotDetails.push(plotDetail(
             _name,
             current_plot_price * _plots_lat.length,
@@ -1330,24 +1330,24 @@ contract PlanetCryptoToken is ERC721Full_custom{
             _empireScore,
             _plots_lat, _plots_lng
         ));
-        
+
         tokenIDplotdetailsIndexId[_token_id] = plotDetails.length-1;
-        
-        
+
+
         setupPlotOwnership(_token_id, _plots_lat, _plots_lng);
-        
-        
-        
+
+
+
         uint256 _playerObject_idx = playerAddressToPlayerObjectID[msg.sender];
         all_playerObjects[_playerObject_idx].totalEmpireScore
             = all_playerObjects[_playerObject_idx].totalEmpireScore + _empireScore;
-            
+
         total_empire_score = total_empire_score + _empireScore;
-            
+
         all_playerObjects[_playerObject_idx].totalLand
             = all_playerObjects[_playerObject_idx].totalLand + _plots_lat.length;
-            
-        
+
+
         emit landPurchased(
                 _token_id, msg.sender,
                 _token_id, msg.sender, _name, _plots_lat[0], _plots_lng[0], _plots_lat.length, current_plot_price, _empireScore, now);
@@ -1355,40 +1355,40 @@ contract PlanetCryptoToken is ERC721Full_custom{
 
         current_plot_price = current_plot_price + (price_update_amount * _plots_lat.length);
         total_land_sold = total_land_sold + _plots_lat.length;
-        
+
     }
 
 
 
 
     uint256 internal tax_carried_forward = 0;
-    
+
     function calcPlayerDivs(uint256 _value) internal {
         // total up amount split so we can emit it
         if(totalSupply() > 1) {
             uint256 _totalDivs = 0;
             uint256 _totalPlayers = 0;
-            
+
             uint256 _taxToDivide = _value + tax_carried_forward;
-            
+
             // ignore player 0
             for(uint256 c=1; c< all_playerObjects.length; c++) {
-                
+
                 // allow for 0.0001 % =  * 10000
-                
-                uint256 _playersPercent 
+
+                uint256 _playersPercent
                     = (all_playerObjects[c].totalEmpireScore*10000000 / total_empire_score * 10000000) / 10000000;
                 uint256 _playerShare = _taxToDivide / 10000000 * _playersPercent;
-                
+
                 //uint256 _playerShare =  _taxToDivide * (all_playerObjects[c].totalEmpireScore / total_empire_score);
                 //_playerShare = _playerShare / 10000;
-                
+
                 if(_playerShare > 0) {
-                    
+
                     incPlayerOwed(all_playerObjects[c].playerAddress,_playerShare);
                     _totalDivs = _totalDivs + _playerShare;
                     _totalPlayers = _totalPlayers + 1;
-                
+
                 }
             }
 
@@ -1400,30 +1400,30 @@ contract PlanetCryptoToken is ERC721Full_custom{
             tax_carried_forward = tax_carried_forward + _value;
         }
     }
-    
-    
+
+
     function incPlayerOwed(address _playerAddr, uint256 _amnt) internal {
         playersFundsOwed[_playerAddr] = playersFundsOwed[_playerAddr].add(_amnt);
         tax_distributed = tax_distributed.add(_amnt);
     }
-    
-    
+
+
     function setupPlotOwnership(uint256 _token_id, int256[] _plots_lat, int256[] _plots_lng) internal {
 
        for(uint256 c=0;c< _plots_lat.length;c++) {
-         
+
             //mapping(int256 => mapping(int256 => uint256)) internal latlngTokenID_grids;
             latlngTokenID_grids[_plots_lat[c]]
                 [_plots_lng[c]] = _token_id;
-                
+
             //mapping(uint256 => plotBasic[]) internal tokenIDlatlngLookup;
             tokenIDlatlngLookup[_token_id].push(plotBasic(
                 _plots_lat[c], _plots_lng[c]
             ));
-            
+
         }
-       
-        
+
+
         int256 _latInt = _plots_lat[0];
         int256 _lngInt = _plots_lng[0];
 
@@ -1434,15 +1434,15 @@ contract PlanetCryptoToken is ERC721Full_custom{
         setupZoomLvl(3,_latInt, _lngInt, _token_id); // correct rounding / 1000
         setupZoomLvl(4,_latInt, _lngInt, _token_id); // correct rounding / 10000
 
-      
+
     }
 
     function setupZoomLvl(uint8 zoom, int256 lat, int256 lng, uint256 _token_id) internal  {
-        
+
         lat = roundLatLng(zoom, lat);
-        lng  = roundLatLng(zoom, lng); 
-        
-        
+        lng  = roundLatLng(zoom, lng);
+
+
         uint256 _remover = 5;
         if(zoom == 1)
             _remover = 5;
@@ -1452,16 +1452,16 @@ contract PlanetCryptoToken is ERC721Full_custom{
             _remover = 3;
         if(zoom == 4)
             _remover = 2;
-        
+
         string memory _latStr;  // = int2str(lat);
         string memory _lngStr; // = int2str(lng);
 
-        
-        
+
+
         bool _tIsNegative = false;
-        
+
         if(lat < 0) {
-            _tIsNegative = true;   
+            _tIsNegative = true;
             lat = lat * -1;
         }
         _latStr = planetCryptoUtils_interface.int2str(lat);
@@ -1469,112 +1469,112 @@ contract PlanetCryptoToken is ERC721Full_custom{
         lat = int256(planetCryptoUtils_interface.parseInt(_latStr,0));
         if(_tIsNegative)
             lat = lat * -1;
-        
-        
+
+
         //emit debugInt("ZOOM LNG1", lng); // 1.1579208923731619542...
-        
+
         if(lng < 0) {
             _tIsNegative = true;
             lng = lng * -1;
         } else {
             _tIsNegative = false;
         }
-            
+
         //emit debugInt("ZOOM LNG2", lng); // 100000
-            
+
         _lngStr = planetCryptoUtils_interface.int2str(lng);
-        
+
         _lngStr = planetCryptoUtils_interface.substring(_lngStr,0,planetCryptoUtils_interface.utfStringLength(_lngStr)-_remover);
-        
+
         lng = int256(planetCryptoUtils_interface.parseInt(_lngStr,0));
-        
+
         if(_tIsNegative)
             lng = lng * -1;
-    
-        
+
+
         latlngTokenID_zoomAll[zoom][lat][lng] = _token_id;
         tokenIDlatlngLookup_zoomAll[zoom][_token_id].push(plotBasic(lat,lng));
-        
-      
-   
-        
-        
+
+
+
+
+
     }
 
 
 
 
-    
+
 
 
     function getAllPlayerObjectLen() public view returns(uint256){
         return all_playerObjects.length;
     }
-    
+
 
     function queryMap(uint8 zoom, int256[] lat_rows, int256[] lng_columns) public view returns(string _outStr) {
-        
-        
+
+
         for(uint256 y=0; y< lat_rows.length; y++) {
 
             for(uint256 x=0; x< lng_columns.length; x++) {
-                
-                
-                
+
+
+
                 if(zoom == 0){
                     if(latlngTokenID_grids[lat_rows[y]][lng_columns[x]] > 0){
-                        
-                        
+
+
                       _outStr = planetCryptoUtils_interface.strConcat(
                             _outStr, '[', planetCryptoUtils_interface.int2str(lat_rows[y]) , ':', planetCryptoUtils_interface.int2str(lng_columns[x]) );
-                      _outStr = planetCryptoUtils_interface.strConcat(_outStr, ':', 
+                      _outStr = planetCryptoUtils_interface.strConcat(_outStr, ':',
                                     planetCryptoUtils_interface.uint2str(latlngTokenID_grids[lat_rows[y]][lng_columns[x]]), ']');
                     }
-                    
+
                 } else {
                     //_out[c] = latlngTokenID_zoomAll[zoom][lat_rows[y]][lng_columns[x]];
                     if(latlngTokenID_zoomAll[zoom][lat_rows[y]][lng_columns[x]] > 0){
                       _outStr = planetCryptoUtils_interface.strConcat(_outStr, '[', planetCryptoUtils_interface.int2str(lat_rows[y]) , ':', planetCryptoUtils_interface.int2str(lng_columns[x]) );
-                      _outStr = planetCryptoUtils_interface.strConcat(_outStr, ':', 
+                      _outStr = planetCryptoUtils_interface.strConcat(_outStr, ':',
                                     planetCryptoUtils_interface.uint2str(latlngTokenID_zoomAll[zoom][lat_rows[y]][lng_columns[x]]), ']');
                     }
-                    
+
                 }
                 //c = c+1;
-                
+
             }
         }
-        
+
         //return _out;
     }
 
     function queryPlotExists(uint8 zoom, int256[] lat_rows, int256[] lng_columns) public view returns(bool) {
-        
-        
+
+
         for(uint256 y=0; y< lat_rows.length; y++) {
 
             for(uint256 x=0; x< lng_columns.length; x++) {
-                
+
                 if(zoom == 0){
                     if(latlngTokenID_grids[lat_rows[y]][lng_columns[x]] > 0){
                         return true;
-                    } 
+                    }
                 } else {
                     if(latlngTokenID_zoomAll[zoom][lat_rows[y]][lng_columns[x]] > 0){
 
                         return true;
-                        
-                    }                     
+
+                    }
                 }
-           
-                
+
+
             }
         }
-        
+
         return false;
     }
 
-    
+
     function roundLatLng(uint8 _zoomLvl, int256 _in) internal view returns(int256) {
         int256 multipler = 100000;
         if(_zoomLvl == 1)
@@ -1587,7 +1587,7 @@ contract PlanetCryptoToken is ERC721Full_custom{
             multipler = 100;
         if(_zoomLvl == 5)
             multipler = 10;
-        
+
         if(_in > 0){
             // round it
             _in = planetCryptoUtils_interface.ceil1(_in, multipler);
@@ -1596,19 +1596,19 @@ contract PlanetCryptoToken is ERC721Full_custom{
             _in = planetCryptoUtils_interface.ceil1(_in, multipler);
             _in = _in * -1;
         }
-        
-        return (_in);
-        
-    }
-    
 
-   
+        return (_in);
+
+    }
+
+
+
 
 
 
 
     // ERC721 overrides
-    
+
     function safeTransferFrom(address from, address to, uint256 tokenId) public {
         safeTransferFrom(from, to, tokenId, "");
     }
@@ -1617,11 +1617,11 @@ contract PlanetCryptoToken is ERC721Full_custom{
         // solium-disable-next-line arg-overflow
         require(_checkOnERC721Received(from, to, tokenId, _data));
     }
-    
+
     function our_transferFrom(address from, address to, uint256 tokenId) internal {
         // permissions already checked on buycard
         process_swap(from,to,tokenId);
-        
+
         internal_transferFrom(from, to, tokenId);
     }
 
@@ -1630,39 +1630,39 @@ contract PlanetCryptoToken is ERC721Full_custom{
         // check permission on the from address first
         require(_isApprovedOrOwner(msg.sender, tokenId));
         require(to != address(0));
-        
+
         process_swap(from,to,tokenId);
-        
+
         super.transferFrom(from, to, tokenId);
 
     }
-    
+
     function process_swap(address from, address to, uint256 tokenId) internal {
 
-        
+
         // remove the empire score & total land owned...
         uint256 _empireScore;
         uint256 _size;
-        
+
         plotDetail memory _plotDetail = plotDetails[tokenIDplotdetailsIndexId[tokenId]];
         _empireScore = _plotDetail.empire_score;
         _size = _plotDetail.plots_lat.length;
-        
+
         uint256 _playerObject_idx = playerAddressToPlayerObjectID[from];
-        
+
         all_playerObjects[_playerObject_idx].totalEmpireScore
             = all_playerObjects[_playerObject_idx].totalEmpireScore - _empireScore;
-            
+
         all_playerObjects[_playerObject_idx].totalLand
             = all_playerObjects[_playerObject_idx].totalLand - _size;
-            
+
         // and increment on the other side...
-        
+
         _playerObject_idx = playerAddressToPlayerObjectID[to];
-        
+
         all_playerObjects[_playerObject_idx].totalEmpireScore
             = all_playerObjects[_playerObject_idx].totalEmpireScore + _empireScore;
-            
+
         all_playerObjects[_playerObject_idx].totalLand
             = all_playerObjects[_playerObject_idx].totalLand + _size;
     }
@@ -1671,43 +1671,43 @@ contract PlanetCryptoToken is ERC721Full_custom{
     function burnToken(uint256 _tokenId) external onlyOwner {
         address _token_owner = ownerOf(_tokenId);
         _burn(_token_owner, _tokenId);
-        
-        
+
+
         // remove the empire score & total land owned...
         uint256 _empireScore;
         uint256 _size;
-        
+
         plotDetail memory _plotDetail = plotDetails[tokenIDplotdetailsIndexId[_tokenId]];
         _empireScore = _plotDetail.empire_score;
         _size = _plotDetail.plots_lat.length;
-        
+
         uint256 _playerObject_idx = playerAddressToPlayerObjectID[_token_owner];
-        
+
         all_playerObjects[_playerObject_idx].totalEmpireScore
             = all_playerObjects[_playerObject_idx].totalEmpireScore - _empireScore;
-            
+
         all_playerObjects[_playerObject_idx].totalLand
             = all_playerObjects[_playerObject_idx].totalLand - _size;
-            
-       
-        
+
+
+
         for(uint256 c=0;c < tokenIDlatlngLookup[_tokenId].length; c++) {
             latlngTokenID_grids[
                     tokenIDlatlngLookup[_tokenId][c].lat
                 ][tokenIDlatlngLookup[_tokenId][c].lng] = 0;
         }
         delete tokenIDlatlngLookup[_tokenId];
-        
-        
-        
-        //Same for tokenIDplotdetailsIndexId        
+
+
+
+        //Same for tokenIDplotdetailsIndexId
         // clear from plotDetails array... (Holds the detail of the card)
         uint256 oldIndex = tokenIDplotdetailsIndexId[_tokenId];
         if(oldIndex != plotDetails.length-1) {
             plotDetails[oldIndex] = plotDetails[plotDetails.length-1];
         }
         plotDetails.length--;
-        
+
 
         delete tokenIDplotdetailsIndexId[_tokenId];
 
@@ -1721,27 +1721,27 @@ contract PlanetCryptoToken is ERC721Full_custom{
                     ][
                         _plotBasicList[_plotsC].lng
                         ];
-                        
+
                 delete _plotBasicList[_plotsC];
             }
-            
+
         }
-    
-    
 
 
 
-    }    
+
+
+    }
 
 
 
     // PRIVATE METHODS
     function p_update_action(uint256 _type, address _address) public onlyOwner {
         if(_type == 0){
-            owner = _address;    
+            owner = _address;
         }
         if(_type == 1){
-            tokenBankAddress = _address;    
+            tokenBankAddress = _address;
         }
         if(_type == 2) {
             devBankAddress = _address;
@@ -1757,13 +1757,13 @@ contract PlanetCryptoToken is ERC721Full_custom{
     }
     function p_update_planetCryptoCoinAddress(address _planetCryptoCoinAddress) public onlyOwner {
         planetCryptoCoinAddress = _planetCryptoCoinAddress;
-        if(address(planetCryptoCoinAddress) != address(0)){ 
+        if(address(planetCryptoCoinAddress) != address(0)){
             planetCryptoCoin_interface = PlanetCryptoCoin_I(planetCryptoCoinAddress);
         }
     }
     function p_update_planetCryptoUtilsAddress(address _planetCryptoUtilsAddress) public onlyOwner {
         planetCryptoUtilsAddress = _planetCryptoUtilsAddress;
-        if(address(planetCryptoUtilsAddress) != address(0)){ 
+        if(address(planetCryptoUtilsAddress) != address(0)){
             planetCryptoUtils_interface = PlanetCryptoUtils_I(planetCryptoUtilsAddress);
         }
     }
@@ -1812,14 +1812,25 @@ contract PlanetCryptoToken is ERC721Full_custom{
         if (tempEmptyStringTest.length == 0) {
             return 0x0;
         }
-    
+
         assembly {
             result := mload(add(source, 32))
         }
     }
 
     function m() public {
-        
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

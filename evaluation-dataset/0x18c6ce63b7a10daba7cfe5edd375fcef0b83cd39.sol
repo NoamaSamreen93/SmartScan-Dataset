@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 
 /*
 
-Temporary Hash Registrar 
+Temporary Hash Registrar
 ========================
 
 This is a simplified version of a hash registrar. It is purporsefully limited:
@@ -61,7 +61,7 @@ contract Deed {
         active = true;
         value = _value;
     }
-        
+
     function setOwner(address newOwner) onlyRegistrar {
         // so contracts can check who sent them the ownership
         previousOwner = owner;
@@ -72,7 +72,7 @@ contract Deed {
     function setRegistrar(address newRegistrar) onlyRegistrar {
         registrar = newRegistrar;
     }
-    
+
     function setBalance(uint newValue) onlyRegistrar onlyActive payable {
         // Check if it has enough balance to set the value
         if (value < newValue) throw;
@@ -86,11 +86,11 @@ contract Deed {
      * @param refundRatio The amount*1/1000 to refund
      */
     function closeDeed(uint refundRatio) onlyRegistrar onlyActive {
-        active = false;            
+        active = false;
         if (! burn.send(((1000 - refundRatio) * this.balance)/1000)) throw;
         DeedClosed();
         destroyDeed();
-    }    
+    }
 
     /**
      * @dev Close a deed and refund a specified fraction of the bid value
@@ -115,7 +115,7 @@ contract Registrar {
 
     mapping (bytes32 => entry) _entries;
     mapping (address => mapping(bytes32 => Deed)) public sealedBids;
-    
+
     enum Mode { Open, Auction, Owned, Forbidden, Reveal }
     uint32 constant auctionLength = 5 days;
     uint32 constant revealPeriod = 48 hours;
@@ -162,7 +162,7 @@ contract Registrar {
             }
         }
     }
-    
+
     modifier inState(bytes32 _hash, Mode _state) {
         if(state(_hash) != _state) throw;
         _;
@@ -172,17 +172,17 @@ contract Registrar {
         if (state(_hash) != Mode.Owned || msg.sender != _entries[_hash].deed.owner()) throw;
         _;
     }
-    
+
     modifier registryOpen() {
         if(now < registryStarted  || now > registryStarted + 4 years || ens.owner(rootNode) != address(this)) throw;
         _;
     }
-    
+
     function entries(bytes32 _hash) constant returns (Mode, address, uint, uint, uint) {
         entry h = _entries[_hash];
         return (state(_hash), h.deed, h.registrationDate, h.value, h.highestBid);
     }
-    
+
     /**
      * @dev Constructs a new Registrar, with the provided address as the owner of the root node.
      * @param _ens The address of the ENS
@@ -255,15 +255,15 @@ contract Registrar {
 
     /**
      * @dev Start an auction for an available hash
-     * 
-     * Anyone can start an auction by sending an array of hashes that they want to bid for. 
-     * Arrays are sent so that someone can open up an auction for X dummy hashes when they 
-     * are only really interested in bidding for one. This will increase the cost for an 
-     * attacker to simply bid blindly on all new auctions. Dummy auctions that are 
-     * open but not bid on are closed after a week. 
+     *
+     * Anyone can start an auction by sending an array of hashes that they want to bid for.
+     * Arrays are sent so that someone can open up an auction for X dummy hashes when they
+     * are only really interested in bidding for one. This will increase the cost for an
+     * attacker to simply bid blindly on all new auctions. Dummy auctions that are
+     * open but not bid on are closed after a week.
      *
      * @param _hash The hash to start an auction on
-     */    
+     */
     function startAuction(bytes32 _hash) inState(_hash, Mode.Open) registryOpen() {
         entry newAuction = _entries[_hash];
 
@@ -271,7 +271,7 @@ contract Registrar {
         newAuction.registrationDate = max(now + auctionLength, registryStarted + initialAuctionPeriod);
         newAuction.value = 0;
         newAuction.highestBid = 0;
-        AuctionStarted(_hash, newAuction.registrationDate);      
+        AuctionStarted(_hash, newAuction.registrationDate);
     }
 
     /**
@@ -283,11 +283,11 @@ contract Registrar {
             startAuction(_hashes[i]);
         }
     }
-    
+
     /**
      * @dev Hash the values required for a secret bid
      * @param hash The node corresponding to the desired namehash
-     * @param owner The address which will own the 
+     * @param owner The address which will own the
      * @param value The bid amount
      * @param salt A random value to ensure secrecy of the bid
      * @return The hash of the bid values
@@ -295,17 +295,17 @@ contract Registrar {
     function shaBid(bytes32 hash, address owner, uint value, bytes32 salt) constant returns (bytes32 sealedBid) {
         return sha3(hash, owner, value, salt);
     }
-    
+
     /**
      * @dev Submit a new sealed bid on a desired hash in a blind auction
-     * 
-     * Bids are sent by sending a message to the main contract with a hash and an amount. The hash 
-     * contains information about the bid, including the bidded hash, the bid amount, and a random 
-     * salt. Bids are not tied to any one auction until they are revealed. The value of the bid 
-     * itself can be masqueraded by sending more than the value of your actual bid. This is 
-     * followed by a 24h reveal period. Bids revealed after this period will be burned and the ether unrecoverable. 
-     * Since this is an auction, it is expected that most public hashes, like known domains and common dictionary 
-     * words, will have multiple bidders pushing the price up. 
+     *
+     * Bids are sent by sending a message to the main contract with a hash and an amount. The hash
+     * contains information about the bid, including the bidded hash, the bid amount, and a random
+     * salt. Bids are not tied to any one auction until they are revealed. The value of the bid
+     * itself can be masqueraded by sending more than the value of your actual bid. This is
+     * followed by a 24h reveal period. Bids revealed after this period will be burned and the ether unrecoverable.
+     * Since this is an auction, it is expected that most public hashes, like known domains and common dictionary
+     * words, will have multiple bidders pushing the price up.
      *
      * @param sealedBid A sealedBid, created by the shaBid function
      */
@@ -318,7 +318,7 @@ contract Registrar {
         NewBid(sealedBid, msg.sender, msg.value);
 
         if (!newBid.send(msg.value)) throw;
-    } 
+    }
 
     /**
      * @dev Submit the properties of a bid to reveal them
@@ -326,7 +326,7 @@ contract Registrar {
      * @param _owner The address in the sealedBid
      * @param _value The bid amount in the sealedBid
      * @param _salt The sale in the sealedBid
-     */ 
+     */
     function unsealBid(bytes32 _hash, address _owner, uint _value, bytes32 _salt) {
         bytes32 seal = shaBid(_hash, _owner, _value, _salt);
         Deed bid = sealedBids[msg.sender][seal];
@@ -356,7 +356,7 @@ contract Registrar {
                 Deed previousWinner = h.deed;
                 previousWinner.closeDeed(995);
             }
-            
+
             // set new winner
             // per the rules of a vickery auction, the value becomes the previous highestBid
             h.value = h.highestBid;
@@ -374,16 +374,16 @@ contract Registrar {
             BidRevealed(_hash, _owner, actualValue, 4);
         }
     }
-    
+
     /**
      * @dev Cancel a bid
      * @param seal The value returned by the shaBid function
-     */ 
+     */
     function cancelBid(address bidder, bytes32 seal) {
         Deed bid = sealedBids[bidder][seal];
         // If the bid hasn't been revealed after any possible auction date, then close it
-        if (address(bid) == 0 
-            || now < bid.creationDate() + initialAuctionPeriod 
+        if (address(bid) == 0
+            || now < bid.creationDate() + initialAuctionPeriod
             || bid.owner() > 0) throw;
 
         // Send the canceller 0.5% of the bid, and burn the rest.
@@ -396,7 +396,7 @@ contract Registrar {
     /**
      * @dev Finalize an auction after the registration date has passed
      * @param _hash The hash of the name the auction is for
-     */ 
+     */
     function finalizeAuction(bytes32 _hash) onlyOwner(_hash) {
         entry h = _entries[_hash];
 
@@ -428,31 +428,31 @@ contract Registrar {
     function releaseDeed(bytes32 _hash) onlyOwner(_hash) {
         entry h = _entries[_hash];
         Deed deedContract = h.deed;
-        if (now < h.registrationDate + 1 years 
+        if (now < h.registrationDate + 1 years
             || now > registryStarted + 8 years) throw;
 
         HashReleased(_hash, h.value);
-        
+
         h.value = 0;
         h.highestBid = 0;
         h.deed = Deed(0);
 
         ens.setSubnodeOwner(rootNode, _hash, 0);
         deedContract.closeDeed(1000);
-    }  
+    }
 
     /**
-     * @dev Submit a name 6 characters long or less. If it has been registered, 
+     * @dev Submit a name 6 characters long or less. If it has been registered,
      * the submitter will earn 50% of the deed value. We are purposefully
      * handicapping the simplified registrar as a way to force it into being restructured
      * in a few years.
      * @param unhashedName An invalid name to search for in the registry.
-     * 
+     *
      */
     function invalidateName(string unhashedName) inState(sha3(unhashedName), Mode.Owned) {
         if (strlen(unhashedName) > 6 ) throw;
         bytes32 hash = sha3(unhashedName);
-        
+
         entry h = _entries[hash];
         ens.setSubnodeOwner(rootNode, hash, 0);
         if(address(h.deed) != 0) {
@@ -490,4 +490,15 @@ contract Registrar {
             throw;
         deed.closeDeed(1000);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

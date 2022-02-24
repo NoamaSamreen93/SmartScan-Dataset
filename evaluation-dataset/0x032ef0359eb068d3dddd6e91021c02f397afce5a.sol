@@ -1061,7 +1061,7 @@ contract DeveryERC721Token is ERC721Enumerable,Admined {
     mapping(address => uint) public totalMintedProducts;
     DeveryRegistry deveryRegistry;
     ERC20Interface public token;
-    
+
     event TokenUpdated(address indexed oldToken, address indexed newToken);
 
 
@@ -1124,7 +1124,7 @@ contract DeveryERC721Token is ERC721Enumerable,Admined {
             uint nextId = tokenIdToProduct.push(_productAddress) - 1;
             _mint(msg.sender,nextId);
         }
-        
+
         totalMintedProducts[_productAddress]+=_quantity;
     }
 
@@ -1142,4 +1142,15 @@ contract DeveryERC721Token is ERC721Enumerable,Admined {
         }
         return products;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

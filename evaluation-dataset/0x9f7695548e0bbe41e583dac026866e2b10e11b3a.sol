@@ -411,7 +411,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -693,9 +693,9 @@ contract NmxCrowdsale is AllowanceCrowdsale, IncreasingPriceCrowdsale {
     IncreasingPriceCrowdsale(_rate, _ratePublic)
   {
     emit CrowdsaleCreated(
-      msg.sender, 
-      _openingTime, 
-      _closingTime, 
+      msg.sender,
+      _openingTime,
+      _closingTime,
       _rate);
   }
 
@@ -712,4 +712,13 @@ contract NmxCrowdsale is AllowanceCrowdsale, IncreasingPriceCrowdsale {
       return finalRate;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

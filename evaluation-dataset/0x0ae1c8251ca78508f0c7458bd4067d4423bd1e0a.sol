@@ -420,7 +420,18 @@ contract PEACECoin is StandardToken  {
       uint premintAmount = 399000000000*10**uint(decimals);
       totalSupply_ = totalSupply_.add(premintAmount);
       balances[msg.sender] = balances[msg.sender].add(premintAmount);
-      Transfer(address(0), msg.sender, premintAmount);   
+      Transfer(address(0), msg.sender, premintAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -558,7 +558,7 @@ contract MetToken is PausableToken, SuccinctWhitelist {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
-  /** 
+  /**
    * @dev Extend parent behavior requiring transfer
    * to respect transferability and receiver's validity.
    */
@@ -574,7 +574,7 @@ contract MetToken is PausableToken, SuccinctWhitelist {
     return super.transfer(_to, _value);
   }
 
-  /** 
+  /**
    * @dev Extend parent behavior requiring transferFrom
    * to respect transferability and receiver's validity.
    */
@@ -591,10 +591,21 @@ contract MetToken is PausableToken, SuccinctWhitelist {
     return super.transferFrom(_from, _to, _value);
   }
 
-  /** 
+  /**
    * @dev Open token transferability.
    */
   function openTransfer() external onlyOwner {
     transferOpened = true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

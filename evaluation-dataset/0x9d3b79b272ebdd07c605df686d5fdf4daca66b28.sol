@@ -6,15 +6,24 @@ contract ERC20BasicCutted {
 }
 
 contract IntermediateWallet {
-    
+
   address public wallet =0x0B18Ed2b002458e297ed1722bc5599E98AcEF9a5;
 
   function () payable public {
     wallet.transfer(msg.value);
   }
-  
+
   function tokenFallback(address _from, uint _value) public {
     ERC20BasicCutted(msg.sender).transfer(wallet, _value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

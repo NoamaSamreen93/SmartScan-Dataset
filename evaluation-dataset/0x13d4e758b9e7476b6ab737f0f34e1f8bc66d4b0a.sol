@@ -177,20 +177,20 @@ contract EtherDelta is SafeMath {
     return tokens[token][user];
   }
 
-  function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive, 
+  function order(address tokenGet, uint amountGet, address tokenGive, uint amountGive,
       uint expires, uint nonce,uint singleTokenValue, string orderType) public{
     bytes32 hash = sha256(abi.encodePacked(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce));
     orders[msg.sender][hash] = true;
     emit Order(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender,singleTokenValue,orderType,block.number);
   }
 
-  function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, 
+  function trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user,
             uint amount, uint oldBlockNumber,string orderId) public {
     //amount is in amountGet terms
     bytes32 hash = sha256(abi.encodePacked(this, tokenGet, amountGet, tokenGive, amountGive, expires, nonce));
- 
+
     require (orders[user][hash] && block.number <= (oldBlockNumber + expires) && safeAdd(orderFills[user][hash], amount) <= amountGet);
-    
+
     tradeBalances(tokenGet, amountGet, tokenGive, amountGive, user, amount);
     orderFills[user][hash] = safeAdd(orderFills[user][hash], amount);
     uint orderFilled = orderFills[user][hash];
@@ -246,4 +246,15 @@ contract EtherDelta is SafeMath {
     orderFills[msg.sender][hash] = amountGet;
     emit Cancel(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender,orderId);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

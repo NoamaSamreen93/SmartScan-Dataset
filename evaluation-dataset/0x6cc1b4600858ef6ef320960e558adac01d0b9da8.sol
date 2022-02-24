@@ -70,7 +70,7 @@ interface ERC223 {
 
 
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -88,7 +88,7 @@ contract ERC223ReceivingContract {
 
 contract StandardToken is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -184,7 +184,7 @@ contract StandardToken is ERC20, ERC223 {
      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
   function transfer(address _to, uint _value, bytes _data) public {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -195,7 +195,7 @@ contract StandardToken is ERC20, ERC223 {
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value, _data);
     }
-    
+
   function isContract(address _addr) private returns (bool is_contract) {
       uint length;
       assembly {
@@ -206,4 +206,12 @@ contract StandardToken is ERC20, ERC223 {
     }
 
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

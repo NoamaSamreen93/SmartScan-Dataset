@@ -99,7 +99,7 @@ contract EtherCityConfig
     address private admin;
 
     mapping(uint256 => BuildingData) private buildingData;
-    
+
     constructor() public payable
     {
         owner = msg.sender;
@@ -112,7 +112,7 @@ contract EtherCityConfig
 
         admin = addr;
     }
-    
+
     function GetVersion() external pure returns(uint256)
     {
         return 1000;
@@ -157,7 +157,7 @@ contract EtherCityConfig
         maxland = maxLandCount;
     }
 
-    function GetBuildingData(uint256 id) external view returns(uint256 bid, uint256 population, uint256 crdtsec, 
+    function GetBuildingData(uint256 id) external view returns(uint256 bid, uint256 population, uint256 crdtsec,
                             uint256 maxupd, uint256 cnstcrdt, uint256 cnsteth, uint256 updcrdt, uint256 dmlcrdt,
                             uint256 cnstcrdtsale, uint256 cnstethsale, uint256 updcrdtsale, uint256 dmlcrdtsale)
     {
@@ -289,7 +289,7 @@ contract EtherCityRank
     address private owner;
     address private admin;
     address private city;
-    
+
     constructor() public payable
     {
         owner = msg.sender;
@@ -419,7 +419,7 @@ contract EtherCityRank
             leafidx = LINK_NULL;
             return;
         }
-            
+
         leafidx = lknode.leafLast;
         for(uint256 index = 0; index < lknode.count; index++)
         {
@@ -440,7 +440,7 @@ contract EtherCityRank
                 leafidx = lfnode.prev;
         }
     }
-    
+
     function InsertRank(uint256 linkidx, uint256 leafidx_before, uint256 leafidx_new) private
     {
         uint256 leafOnLink;
@@ -488,7 +488,7 @@ contract EtherCityRank
         for(uint256 index = linkidx; index < LINK_COUNT; index++)
         {
             LINKNODE storage link = linkNodes[index];
-            
+
             next = leafNodes[link.leafLast].next;
             if (next == LINK_NULL)
             {
@@ -982,7 +982,7 @@ contract EtherCityData
     function ValidateCitySnapshot(address player, uint256 day) external returns(uint256 population, uint256 credits, uint256 shopCredits, uint256 lasttime)
     {
         CITYSNAPSHOT storage css = ValidateCitySnapshotInternal(player, day);
-    
+
         require(owner == msg.sender || admin == msg.sender || (enabled && city == msg.sender));
 
         population = css.population;
@@ -1299,7 +1299,7 @@ contract EtherCityData
             css = citySnapshot[player][sday];
             sday++;
         }
-    
+
         return css;
     }
 
@@ -1435,11 +1435,11 @@ contract EtherCity
         data.SetCityName(msg.sender, name);
     }
 
-    function GetWorldSnapshot() external view returns(uint256 ethFund, uint256 population, uint256 credits, 
+    function GetWorldSnapshot() external view returns(uint256 ethFund, uint256 population, uint256 credits,
                                                     uint256 lasttime, uint256 nexttime, uint256 timestamp)
     {
         WORLDSNAPSHOT memory wss;
-        
+
         (ethFund, wss) = dtTestWorldSnapshot(nowday());
 
         population = wss.population;
@@ -1562,7 +1562,7 @@ contract EtherCity
         uint256 a_crdtsec;
         uint256 updcrdt;
         CITYDATA memory cdata = dtGetCityData(msg.sender);
-        
+
         require(count > 0);
 
         (a_population, a_crdtsec) = UpdateBuildingParam(cdata, id, 0, count);
@@ -1592,7 +1592,7 @@ contract EtherCity
         uint256 a_crdtsec;
         uint256 dmlcrdt;
         CITYDATA memory cdata = dtGetCityData(msg.sender);
-        
+
         require(count > 0);
 
         (a_population, a_crdtsec) = UpdateBuildingParam(cdata, id, -count, 0);
@@ -1714,7 +1714,7 @@ contract EtherCity
         if (a_population != 0)
             rank.UpdateRank(msg.sender, cdata.population, cdata.lasttime);
 
-        return true;            
+        return true;
     }
 
     function UpdateBuildingParam(CITYDATA memory cdata, uint256 id, uint256 cnstcount, uint256 updcount) private returns(uint256 a_population, uint256 a_crdtsec)
@@ -1906,4 +1906,8 @@ contract EtherCity
     {
         (css.population, css.credits, css.shopCredits, css.lasttime) = data.TestCitySnapshot(player, day);
     }
+}
+function() payable external {
+	revert();
+}
 }

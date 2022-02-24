@@ -14,7 +14,7 @@ library SafeMath {
 
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0);
         uint256 c = a / b;
@@ -54,11 +54,11 @@ interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address who) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
-    
-    event Transfer(address indexed from, address indexed to, uint256 value);    
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
     function transfer(address to, uint256 value) external returns (bool);
-    
-    event Approval(address indexed owner, address indexed spender, uint256 value);    
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
     function approve(address spender, uint256 value) external returns (bool);
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
@@ -136,11 +136,11 @@ contract Crowdsale is ReentrancyGuard {
         _rate = 10000000000;
         _wallet = 0x4b09b4aeA5f9C616ebB6Ee0097B62998Cb332275;
         _token = IERC20(0x1a9ECb05376Bf8BB32F7F038A845DbAfb22041cd);
-        
+
         _openingTime = block.timestamp;
         _closingTime = 1567296000;
     }
-    
+
     function isOpen() public view returns (bool) {
         return block.timestamp >= _openingTime && block.timestamp <= _closingTime;
     }
@@ -149,7 +149,7 @@ contract Crowdsale is ReentrancyGuard {
         require(isOpen());
         _;
     }
-    
+
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal onlyWhileOpen view {
         require(beneficiary != address(0));
         require(weiAmount != 0);
@@ -158,15 +158,15 @@ contract Crowdsale is ReentrancyGuard {
     function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
         return weiAmount.div(_rate);
     }
-    
+
     function _deliverTokens(address beneficiary, uint256 tokenAmount) internal {
         _token.safeTransfer(beneficiary, tokenAmount);
     }
-    
+
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
-    
+
     function buyTokens(address beneficiary) public nonReentrant payable {
         uint256 weiAmount = msg.value;
         _preValidatePurchase(beneficiary, weiAmount);
@@ -184,14 +184,14 @@ contract Crowdsale is ReentrancyGuard {
     function () external payable {
         buyTokens(msg.sender);
     }
-    
+
     function token() public view returns (IERC20) {
         return _token;
     }
     function wallet() public view returns (address payable) {
         return _wallet;
     }
-    
+
     function rate() public view returns (uint256) {
         return _rate;
     }
@@ -205,4 +205,10 @@ contract Crowdsale is ReentrancyGuard {
     function closingTime() public view returns (uint256) {
         return _closingTime;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

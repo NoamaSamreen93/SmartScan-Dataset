@@ -51,10 +51,10 @@ contract BOB is SafeMath{
 
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];		
+		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -71,7 +71,7 @@ contract BOB is SafeMath{
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != address(0));
-		require (_value > 0); 
+		require (_value > 0);
         require (balanceOf[_from] >= _value) ;
         require (balanceOf[_to] + _value > balanceOf[_to]);
         require (_value <= allowance[_from][msg.sender]);
@@ -81,22 +81,33 @@ contract BOB is SafeMath{
         emit Transfer(_from, _to, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         require (balanceOf[msg.sender] >= _value);
-		require (_value > 0); 
+		require (_value > 0);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         require (freezeOf[msg.sender] >= _value);
-		require (_value > 0) ; 
+		require (_value > 0) ;
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

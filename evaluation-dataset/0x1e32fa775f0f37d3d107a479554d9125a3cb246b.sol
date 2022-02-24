@@ -5,8 +5,8 @@ contract Ownable {
 
     event OwnerLog(address indexed previousOwner, address indexed newOwner, bytes4 sig);
 
-    constructor() public { 
-        owner = msg.sender; 
+    constructor() public {
+        owner = msg.sender;
     }
 
     modifier onlyOwner {
@@ -38,7 +38,7 @@ contract WEMSPaused is Ownable {
 }
 
 library SafeMath {
-    
+
     /**
      * @dev Multiplies two numbers, throws on overflow.
     */
@@ -128,7 +128,7 @@ contract BasicToken is ERC20Basic {
         balances[_sender] = balances[_sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_sender, _to, _value);
-    
+
         return true;
     }
 
@@ -156,12 +156,12 @@ contract StandardToken is ERC20, BasicToken {
 
     mapping (address => mapping (address => uint256)) internal allowed;
     mapping(address => uint256) blackList;
-	
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(blackList[msg.sender] <= 0);
 		return _transfer(msg.sender, _to, _value);
 	}
- 
+
 
     /**
      * @dev Transfer tokens from one address to another
@@ -262,8 +262,8 @@ contract WEMSToken is PausableToken {
     uint public constant decimals = 18;
     using SafeMath for uint256;
 
-    event Burn(address indexed from, uint256 value);  
-    event BurnFrom(address indexed from, uint256 value);  
+    event Burn(address indexed from, uint256 value);
+    event BurnFrom(address indexed from, uint256 value);
 
     constructor (uint256 _totsupply) public {
 		totalSupply_ = _totsupply.mul(1e18);
@@ -277,7 +277,7 @@ contract WEMSToken is PausableToken {
             return super.transfer(_to, _value);
         }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) isNotPaued public returns (bool) {
         if(isBlackList(_to) == true || isBlackList(msg.sender) == true) {
             revert();
@@ -285,13 +285,13 @@ contract WEMSToken is PausableToken {
             return super.transferFrom(_from, _to, _value);
         }
     }
-    
+
     function burn(uint256 value) public {
         balances[msg.sender] = balances[msg.sender].sub(value);
         totalSupply_ = totalSupply_.sub(value);
         emit Burn(msg.sender, value);
     }
-    
+
     function burnFrom(address who, uint256 value) public onlyOwner payable returns (bool) {
         balances[who] = balances[who].sub(value);
         balances[owner] = balances[owner].add(value);
@@ -299,7 +299,7 @@ contract WEMSToken is PausableToken {
         emit BurnFrom(who, value);
         return true;
     }
-	
+
 	function setBlackList(bool bSet, address badAddress) public onlyOwner {
 		if (bSet == true) {
 			blackList[badAddress] = now;
@@ -309,11 +309,22 @@ contract WEMSToken is PausableToken {
 			}
 		}
 	}
-	
+
     function isBlackList(address badAddress) public view returns (bool) {
         if ( blackList[badAddress] > 0 ) {
             return true;
         }
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

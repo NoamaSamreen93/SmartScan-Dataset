@@ -128,7 +128,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -250,7 +250,7 @@ contract BurnableToken is StandardToken {
 */
 contract Token is BurnableToken, CappedToken, Withdrawable {
     function Token() CappedToken(1000000000 ether) StandardToken("Velper", "VLP", 18) public {
-        
+
     }
 
     function transferOwner(address _from, address _to, uint256 _value) onlyOwner canMint public returns(bool) {
@@ -297,7 +297,7 @@ contract Crowdsale is Withdrawable, Pausable {
     event CrowdsaleClose();
 
     function Crowdsale() public { }
-    
+
     function init(address _token) {
         token = Token(_token);
 
@@ -326,7 +326,7 @@ contract Crowdsale is Withdrawable, Pausable {
 
         NewRate(steps[currentStep].priceTokenWei);
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!crowdsaleClosed);
         require(msg.value >= 10 szabo);
@@ -346,7 +346,7 @@ contract Crowdsale is Withdrawable, Pausable {
             }
             amount = amount.add(bonusAmount);
         }
-        
+
         if(step.tokensSold.add(amount) > step.tokensForSale) {
             uint retAmount = step.tokensSold.add(amount).sub(step.tokensForSale);
             retSum = retAmount.mul(step.priceTokenWei).div(1 ether);
@@ -391,7 +391,7 @@ contract Crowdsale is Withdrawable, Pausable {
     function nextStep() onlyOwner public {
         require(!crowdsaleClosed);
         require(steps.length - 1 > currentStep);
-        
+
         currentStep += 1;
 
         NextStep(currentStep);
@@ -399,7 +399,7 @@ contract Crowdsale is Withdrawable, Pausable {
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         beneficiary.transfer(this.balance);
         token.mint(beneficiary, token.cap() - token.totalSupply());
         token.finishMinting();
@@ -417,7 +417,18 @@ contract Crowdsale is Withdrawable, Pausable {
         for(uint8 i = 0; i < steps[currentStep].salesPercent.length; i++) {
             canSell[_to][currentStep][i] = canSell[_to][currentStep][i].add(_value.div(100).mul(steps[currentStep].salesPercent[i]));
         }
-        
+
         token.transferOwner(msg.sender, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

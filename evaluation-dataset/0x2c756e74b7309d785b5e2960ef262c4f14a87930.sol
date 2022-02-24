@@ -104,7 +104,7 @@ contract StandardToken is Pausable {
     /**
      * Internal transfer, only can be called by this contract
      */
-    function _transfer(address _from, address _to, uint _value) internal { 
+    function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] >= _value);               // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
@@ -126,7 +126,7 @@ contract StandardToken is Pausable {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Transfer tokens from other address
      * Send `_value` tokens to `_to` in behalf of `_from`
@@ -149,7 +149,7 @@ contract StandardToken is Pausable {
         return true;
     }
 
-    function Supplies() view public 
+    function Supplies() view public
         returns (uint256 total, uint256 current) {
         return (totalSupply, currentSupply);
     }
@@ -201,7 +201,7 @@ contract StandardToken is Pausable {
 /******************************************/
 
 contract AdvancedToken is owned, StandardToken {
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
@@ -254,4 +254,15 @@ contract AdvancedToken is owned, StandardToken {
 
     function () payable public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

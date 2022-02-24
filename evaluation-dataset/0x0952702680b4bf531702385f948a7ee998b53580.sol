@@ -25,7 +25,7 @@ contract Crowdsale {
         tokenReward = token(addressOfTokenUsedAsReward);
         deadline = now + durationInMinutes * 1 minutes;
     }
-    
+
     function () public payable {
         require(!crowdsaleClosed);
         balanceOf[msg.sender] += msg.value;
@@ -44,7 +44,18 @@ contract Crowdsale {
          if (payoutAddr == msg.sender) {
             if (payoutAddr.send(amountRaised)) {
                 FundTransfer(payoutAddr, amountRaised, false);
-            } 
+            }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

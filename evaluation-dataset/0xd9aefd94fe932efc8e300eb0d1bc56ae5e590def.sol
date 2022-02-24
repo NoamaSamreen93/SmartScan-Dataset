@@ -2,13 +2,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -150,4 +150,13 @@ contract CryptoTycoonsVIPLib{
     function getRankingRewardSize() external view returns (uint128){
         return rankingRewardSize;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

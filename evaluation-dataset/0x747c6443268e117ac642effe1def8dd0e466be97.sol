@@ -6,7 +6,7 @@ interface DSG {
 
 contract DSG_CoinFlipper{
     using SafeMath for uint256;
-    
+
     address constant public DSG_ADDRESS = 0x696826C18A6Bc9Be4BBfe3c3A6BB9f5a69388687;
     uint256 public totalDividends;
     uint256 public totalWinnings;
@@ -22,15 +22,15 @@ contract DSG_CoinFlipper{
     address[2] public owners;
     address[2] public candidates;
     bool public paused;
-    
+
     mapping (address => Bet) private usersBets;
-    
+
     struct Bet {
         uint256 blockNumber;
         uint8 coin;
         uint256 bet;
     }
-    
+
     modifier onlyOwners() {
         require(msg.sender == owners[0] || msg.sender == owners[1]);
         _;
@@ -220,4 +220,20 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

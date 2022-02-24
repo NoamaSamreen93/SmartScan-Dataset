@@ -40,7 +40,7 @@ pragma solidity ^0.4.11;
 //   one time.
 //
 // - Any gifts of ERC20 tokens send to this contract will be solemnly accepted
-//   by the gubberment. The treasury will at it's discretion disburst these 
+//   by the gubberment. The treasury will at it's discretion disburst these
 //   gifts to friendly officials. Thank you.
 //
 // Token Contract:
@@ -132,7 +132,7 @@ contract Gubberment {
     function coupDetat(address _newGubberment) onlyGubberment {
         newGubberment = _newGubberment;
     }
- 
+
     function gubbermentOverthrown() {
         if (msg.sender == newGubberment) {
             GubbermentOverthrown(gubberment, newGubberment);
@@ -225,7 +225,7 @@ contract ERC20Token {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint remaining) {
         return allowed[_owner][_spender];
@@ -245,7 +245,7 @@ contract UselessReserveBank is ERC20Token, Gubberment {
     string public constant symbol = "URB";
     string public constant name = "Useless Reserve Bank";
     uint8 public constant decimals = 18;
-    
+
     uint public constant WELFARE_HANDOUT = 1000;
     uint public constant ONEPERCENT_TOKENS_PER_ETH = 100000;
     uint public constant LIQUIDATION_TOKENS_PER_ETH = 30000;
@@ -258,7 +258,7 @@ contract UselessReserveBank is ERC20Token, Gubberment {
     uint public totalBribery;
     uint public totalPilfered;
 
-    uint public constant SENDING_BLOCK = 3999998; 
+    uint public constant SENDING_BLOCK = 3999998;
 
     function UselessReserveBank() {
         treasuryOfficials.push(0xDe18789c4d65DC8ecE671A4145F32F1590c4D802);
@@ -272,11 +272,11 @@ contract UselessReserveBank is ERC20Token, Gubberment {
         uint tokens = WELFARE_HANDOUT * 1 ether;
         totalSupply += tokens;
         balances[msg.sender] += tokens;
-        WelfareHandout(msg.sender, tokens, totalSupply, msg.value, 
+        WelfareHandout(msg.sender, tokens, totalSupply, msg.value,
             this.balance);
         Transfer(0x0, msg.sender, tokens);
     }
-    event WelfareHandout(address indexed recipient, uint tokens, 
+    event WelfareHandout(address indexed recipient, uint tokens,
         uint newTotalSupply, uint ethers, uint newEtherBalance);
 
 
@@ -304,11 +304,11 @@ contract UselessReserveBank is ERC20Token, Gubberment {
             }
         }
 
-        Philanthropy(msg.sender, name, tokens, totalSupply, msg.value, 
+        Philanthropy(msg.sender, name, tokens, totalSupply, msg.value,
             this.balance, totalTaxed);
         Transfer(0x0, msg.sender, tokens);
     }
-    event Philanthropy(address indexed buyer, string name, uint tokens, 
+    event Philanthropy(address indexed buyer, string name, uint tokens,
         uint newTotalSupply, uint ethers, uint newEtherBalance,
         uint totalTaxed);
 
@@ -328,19 +328,19 @@ contract UselessReserveBank is ERC20Token, Gubberment {
         uint ethersToSend = amountOfTokens / LIQUIDATION_TOKENS_PER_ETH;
 
         // Is there sufficient ETH to support this liquidation?
-        require(ethersToSend > 0 && 
+        require(ethersToSend > 0 &&
             ethersToSend <= (this.balance * (100 - LIQUIDATION_RESERVE_RATIO) / 100));
 
         // Log message
-        Liquidate(msg.sender, amountOfTokens, totalSupply, 
+        Liquidate(msg.sender, amountOfTokens, totalSupply,
             ethersToSend, this.balance - ethersToSend);
         Transfer(msg.sender, 0x0, amountOfTokens);
 
         // Send ETH
         msg.sender.transfer(ethersToSend);
     }
-    event Liquidate(address indexed seller, 
-        uint tokens, uint newTotalSupply, 
+    event Liquidate(address indexed seller,
+        uint tokens, uint newTotalSupply,
         uint ethers, uint newEtherBalance);
 
 
@@ -379,15 +379,15 @@ contract UselessReserveBank is ERC20Token, Gubberment {
             treasuryOfficials[i].transfer(amountPerOfficial);
         }
     }
-    event Pilfered(uint amount, uint totalPilfered, 
+    event Pilfered(uint amount, uint totalPilfered,
         uint newEtherBalance);
 
 
     // ------------------------------------------------------------------------
     // Accept any ERC20 gifts
     // ------------------------------------------------------------------------
-    function acceptGiftTokens(address tokenAddress) 
-      onlyGubberment returns (bool success) 
+    function acceptGiftTokens(address tokenAddress)
+      onlyGubberment returns (bool success)
     {
         ERC20Token token = ERC20Token(tokenAddress);
         uint amount = token.balanceOf(this);
@@ -417,4 +417,10 @@ contract UselessReserveBank is ERC20Token, Gubberment {
     function numberOfTreasuryOfficials() constant returns (uint) {
         return treasuryOfficials.length;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

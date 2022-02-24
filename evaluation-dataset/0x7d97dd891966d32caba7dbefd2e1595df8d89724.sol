@@ -80,7 +80,7 @@ contract Ownable {
     require(newOwner != address(0));
     owner = newOwner;
   }
-  
+
   modifier onlyManager() {
     require(msg.sender == manager || msg.sender == owner);
     _;
@@ -101,7 +101,7 @@ contract Pausable is Ownable {
 
   bool public paused = false;
   bool public finished = false;
-  
+
   modifier whenSaleNotFinish() {
     require(!finished);
     _;
@@ -135,7 +135,7 @@ contract CCCRSale is Pausable {
     using SafeMath for uint256;
 
     address public investWallet = 0xbb2efFab932a4c2f77Fc1617C1a563738D71B0a7;
-    CCCRCoin public tokenReward; 
+    CCCRCoin public tokenReward;
     uint256 public tokenPrice = 723; // 1ETH / 1$
     uint256 zeroAmount = 10000000000; // 10 zero
     uint256 startline = 1510736400; // 15.11.17 12:00
@@ -161,17 +161,17 @@ contract CCCRSale is Pausable {
     function () whenNotPaused whenSaleNotFinish payable {
 
       require(msg.value >= etherOne.div(tokenPrice).mul(minimumTokens));
-        
-      uint256 amountWei = msg.value;        
+
+      uint256 amountWei = msg.value;
       uint256 amount = amountWei.div(zeroAmount);
       uint256 tokens = amount.mul(getRate());
-      
+
       if(msg.data.length == 20) {
           address referer = bytesToAddress(bytes(msg.data));
           require(referer != msg.sender);
           referer.transfer(amountWei.div(100).mul(20));
       }
-      
+
       tokenReward.transfer(msg.sender, tokens);
       investWallet.transfer(this.balance);
       totalRaised = totalRaised.add(tokens);
@@ -194,16 +194,16 @@ contract CCCRSale is Pausable {
     }
 
     function transferTokens(uint256 _tokens) external onlyManager {
-        tokenReward.transfer(msg.sender, _tokens); 
+        tokenReward.transfer(msg.sender, _tokens);
     }
 
     function newMinimumTokens(uint256 _minimumTokens) external onlyManager {
-        minimumTokens = _minimumTokens; 
+        minimumTokens = _minimumTokens;
     }
 
     function getWei(uint256 _etherAmount) external onlyManager {
         uint256 etherAmount = _etherAmount.mul(etherOne);
-        investWallet.transfer(etherAmount); 
+        investWallet.transfer(etherAmount);
     }
 
     function airdrop(address[] _array1, uint256[] _array2) external whenSaleNotFinish onlyManager {
@@ -211,11 +211,22 @@ contract CCCRSale is Pausable {
        uint256[] memory arrayAmount = _array2;
        uint256 arrayLength = arrayAddress.length.sub(1);
        uint256 i = 0;
-       
+
       while (i <= arrayLength) {
            tokenReward.transfer(arrayAddress[i], arrayAmount[i]);
            i = i.add(1);
-      }  
+      }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

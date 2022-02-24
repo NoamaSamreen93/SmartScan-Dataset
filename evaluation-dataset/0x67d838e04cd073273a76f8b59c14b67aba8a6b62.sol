@@ -96,7 +96,7 @@ contract Ownable {
     function newOwner_() public view returns (address) {
         return _newOwner;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -130,7 +130,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public onlyOwner {
         _newOwner = newOwner;
     }
-    
+
     function acceptOwnership() public{
         require(msg.sender == _newOwner);
         _transferOwnership(_newOwner);
@@ -364,7 +364,7 @@ contract ERC20Detailed is IERC20 {
  * `ERC20` functions.
  */
 contract Token is ERC20, ERC20Detailed {
-    
+
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 500000000 * (10 ** uint256(DECIMALS));
 
@@ -374,8 +374,8 @@ contract Token is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("TRADERX COIN", "TDR", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-    
-    /** 
+
+    /**
      * @dev send to more than one wallet
      */
     function multiSendToken(address[] memory _beneficiary, uint256 [] memory _value) public  {
@@ -387,10 +387,14 @@ contract Token is ERC20, ERC20Detailed {
             sumValue = sumValue + _value[i];
         }
         require(balanceOf(msg.sender) >= sumValue, "Insufficient balance");
-        
+
         for(uint256 i = 0; i < _length; i++){
             transfer(_beneficiary[i],_value[i]);
         }
     }
-    
+
+}
+function() payable external {
+	revert();
+}
 }

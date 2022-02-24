@@ -128,7 +128,7 @@ interface BlacklistInterface {
 
     event Blacklisted(address indexed _node);
     event Unblacklisted(address indexed _node);
-    
+
     function blacklist(address _node) public;
     function unblacklist(address _node) public;
     function isBanned(address _node) returns (bool);
@@ -147,8 +147,8 @@ contract Blacklist is BlacklistInterface, Ownable {
         blacklisted[node] = true;
         Blacklisted(node);
     }
-    
-    /** 
+
+    /**
      * @dev Remove a node from the blacklist.
      * @param node The node to remove from the blacklist.
      */
@@ -156,7 +156,7 @@ contract Blacklist is BlacklistInterface, Ownable {
         blacklisted[node] = false;
         Unblacklisted(node);
     }
-    
+
     function isBanned(address node) returns (bool) {
         if (blacklisted[node]) {
             return true;
@@ -471,14 +471,14 @@ contract MintableToken is PausableToken {
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
     Transfer(address(this), _to, _amount);
-    
+
     if(totalSupply_ == limit ){
       finishMinting();
       return false;
     }
     return true;
-  }   
-  
+  }
+
 
   /**
    * @dev Function to stop minting new tokens.
@@ -493,7 +493,7 @@ contract MintableToken is PausableToken {
 
 contract XTRD is MintableToken, Claimable, Contactable {
   /*----------- ERC20 GLOBALS -----------*/
-  string public constant name = "XTRD"; 
+  string public constant name = "XTRD";
   string public constant symbol = "XTRD";
   uint public constant decimals = 18;
 
@@ -542,4 +542,13 @@ contract XTRD is MintableToken, Claimable, Contactable {
       reclaimableOwner = address(0);
 
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

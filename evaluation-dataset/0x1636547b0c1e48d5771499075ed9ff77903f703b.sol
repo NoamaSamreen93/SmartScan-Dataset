@@ -873,7 +873,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1124,7 +1124,7 @@ contract SevillavsBayern is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function SevillavsBayern() public payable {
     oraclize_setCustomGasPrice(1000000000);
@@ -1246,7 +1246,7 @@ contract SevillavsBayern is usingOraclize {
   function collectionsAvailable() public constant returns(bool) {
     return (completed && winningOption != 2 && now >= (winnerDeterminedDate + 600)); // At least 10 mins has to pass between determining winner and enabling payout, so that we have time to revert the bet in case we detect suspicious betting activty (eg. a hacker bets a lot to steal the entire losing pot, and hacks the oracle)
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES && !canceled && !completed);
@@ -1295,18 +1295,18 @@ contract SevillavsBayern is usingOraclize {
       if (numberOfBets[winningOption] > 0) {
         collectionFees = ((oraclizeFees != 0) ? (oraclizeFees / numberOfBets[winningOption] + 1) : 0); // We add 1 wei to act as a ceil for the integer div -- important because the contract cannot afford to lose that spare change, as it will gaurantee that the final payout collection will fail.
       }
-      
+
       return;
     }
 
     // Calculate total pool of ETH
-    // betted for the two outcomes.    
+    // betted for the two outcomes.
     uint losingChunk = totalAmountsBet[1 - winningOption];
     ownerPayout = (losingChunk - oraclizeFees) / COMMISSION; // Payout to the owner; commission of losing pot, minus the same % of the fees
     if (numberOfBets[winningOption] > 0) {
         collectionFees = ((oraclizeFees != 0) ? ((oraclizeFees - oraclizeFees / COMMISSION) / numberOfBets[winningOption] + 1) : 0); // The fees to be distributed to the collectors, after owner payout. See reasoning above for adding the 1 wei.
     }
-    
+
     // Equal weight payout to the owners
     OWNERS.transfer(ownerPayout);
     ownersPayed = true;
@@ -1365,4 +1365,15 @@ contract SevillavsBayern is usingOraclize {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

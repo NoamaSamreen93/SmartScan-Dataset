@@ -17,7 +17,7 @@ interface ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -108,19 +108,19 @@ contract MyCryptoChampCore{
         uint id;
         uint attackPower;
         uint defencePower;
-        uint cooldownTime; 
+        uint cooldownTime;
         uint readyTime;
         uint winCount;
         uint lossCount;
-        uint position; 
-        uint price; 
-        uint withdrawCooldown; 
-        uint eq_sword; 
-        uint eq_shield; 
-        uint eq_helmet; 
-        bool forSale; 
+        uint position;
+        uint price;
+        uint withdrawCooldown;
+        uint eq_sword;
+        uint eq_shield;
+        uint eq_helmet;
+        bool forSale;
     }
-    
+
     struct AddressInfo {
         uint withdrawal;
         uint champsCount;
@@ -130,17 +130,17 @@ contract MyCryptoChampCore{
 
     struct Item {
         uint id;
-        uint8 itemType; 
-        uint8 itemRarity; 
+        uint8 itemType;
+        uint8 itemRarity;
         uint attackPower;
         uint defencePower;
         uint cooldownReduction;
         uint price;
-        uint onChampId; 
-        bool onChamp; 
+        uint onChampId;
+        bool onChamp;
         bool forSale;
     }
-    
+
     Champ[] public champs;
     Item[] public items;
     mapping (uint => uint) public leaderboard;
@@ -174,7 +174,7 @@ contract MyCryptoChampCore{
     function getTokenCount(bool _isTokenChamp) external view returns(uint);
     function getTokenURIs(uint _tokenId, bool _isTokenChamp) public view returns(string);
     function onlyApprovedOrOwnerOfToken(uint _id, address _msgsender, bool _isTokenChamp) external view returns(bool);
-    
+
 }
 
 /**
@@ -198,7 +198,7 @@ contract Ownable {
     require(msg.sender == contractOwner);
     _;
   }
-  
+
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
@@ -293,7 +293,7 @@ contract ERC721 is Ownable, SupportsInterfaceWithLookup {
    *  which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
    */
   bytes4 private constant ERC721_RECEIVED = 0x150b7a02;
-  
+
   bytes4 constant InterfaceId_ERC721Enumerable = 0x780e9d63;
   /**
       bytes4(keccak256('totalSupply()')) ^
@@ -579,7 +579,7 @@ function checkAndCallSafeTransfer(
     return _index;
   }
 
-  
+
   /// @notice Enumerate NFTs assigned to an owner
   /// @dev Throws if `_index` >= `balanceOf(_owner)` or if
   ///  `_owner` is the zero address, representing invalid NFTs.
@@ -590,27 +590,27 @@ function checkAndCallSafeTransfer(
   function tokenOfOwnerByIndex(address _owner, uint _index) external view returns (uint){
       require(_index >= balanceOf(_owner));
       require(_owner!=address(0));
-      
+
       uint[] memory tokens;
       uint tokenId;
-      
+
       if(tokenIsChamp){
           tokens = core.getChampsByOwner(_owner);
       }else{
           tokens = core.getItemsByOwner(_owner);
       }
-      
+
       for(uint i = 0; i < tokens.length; i++){
           if(i + 1 == _index){
               tokenId = tokens[i];
               break;
           }
       }
-      
+
       return tokenId;
   }
-  
-  
+
+
   ///
   /// ERC721Metadata
   ///
@@ -633,4 +633,15 @@ function checkAndCallSafeTransfer(
     return core.getTokenURIs(_tokenId,tokenIsChamp);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

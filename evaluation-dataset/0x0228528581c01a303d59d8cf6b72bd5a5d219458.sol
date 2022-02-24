@@ -98,8 +98,8 @@ contract OKNC is Token{
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor() public {
         totalSupply = 21000000000 * 10 ** uint256(decimals);                        // Update total supply
-        balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens        
-    
+        balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
+
         owner = msg.sender;
     }
 
@@ -113,30 +113,30 @@ contract OKNC is Token{
     /* Send coins */
     function transfer(address _to, uint256 _value) public returns (bool){
         require(_to != address(0));                              // Prevent transfer to 0x0 address. Use burn() instead
-		
+
         require(_value <= balanceOf[msg.sender]);           // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);                     // Subtract from the sender
         balanceOf[_to] = balanceOf[_to].add(_value);                            // Add the same to the recipient
         emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
-    
+
         return true;
     }
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)public
         returns (bool success) {
-		
+
         allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0));                                // Prevent transfer to 0x0 address. Use burn() instead
-		
+
         require(_value <= balanceOf[_from]);                 // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -145,11 +145,22 @@ contract OKNC is Token{
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
-    }    
-    
+    }
+
     function allowance(address _owner, address _spender)  public view returns (uint256 remaining) {
         return allowance[_owner][_spender];
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

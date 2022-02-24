@@ -18,7 +18,7 @@ contract ERC223 {
 }
 
 
-contract ERC223Receiver { 
+contract ERC223Receiver {
     /**
      * @dev Standard ERC223 function that will handle incoming token transfers.
      *
@@ -73,7 +73,7 @@ contract SafeMath {
         return a < b ? a : b;
     }
 
- 
+
 }
 
 
@@ -82,9 +82,9 @@ contract SafeMath {
  * Standard ERC223
  */
 contract StandardToken is ERC223, SafeMath {
-        
+
     uint256 public supplyNum;
-    
+
     uint256 public decimals;
 
     /* Actual mapBalances of token holders */
@@ -103,7 +103,7 @@ contract StandardToken is ERC223, SafeMath {
         return supplyNum;
     }
 
-    
+
     function transfer(address _to, uint _value, bytes _data) public returns (bool) {
         // Standard function transfer similar to ERC20 transfer with no _data .
         // Added due to backwards compatibility reasons .
@@ -116,7 +116,7 @@ contract StandardToken is ERC223, SafeMath {
 
         mapBalances[msg.sender] = safeSub(mapBalances[msg.sender], _value);
         mapBalances[_to] = safeAdd(mapBalances[_to], _value);
-        
+
         if (codeLength > 0) {
             ERC223Receiver receiver = ERC223Receiver(_to);
             receiver.tokenFallback(msg.sender, _value, _data);
@@ -124,8 +124,8 @@ contract StandardToken is ERC223, SafeMath {
         emit Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
-    
+
+
     function transfer(address _to, uint _value) public returns (bool) {
         uint codeLength;
         bytes memory empty;
@@ -137,7 +137,7 @@ contract StandardToken is ERC223, SafeMath {
 
         mapBalances[msg.sender] = safeSub(mapBalances[msg.sender], _value);
         mapBalances[_to] = safeAdd(mapBalances[_to], _value);
-        
+
         if (codeLength > 0) {
             ERC223Receiver receiver = ERC223Receiver(_to);
             receiver.tokenFallback(msg.sender, _value, empty);
@@ -145,17 +145,17 @@ contract StandardToken is ERC223, SafeMath {
         emit Transfer(msg.sender, _to, _value, empty);
         return true;
     }
-    
-    
+
+
 
     function transferFrom(address _from, address _to, uint _value) public returns (bool) {
         mapApproved[_from][msg.sender] = safeSub(mapApproved[_from][msg.sender], _value);
         mapBalances[_from] = safeSub(mapBalances[_from], _value);
         mapBalances[_to] = safeAdd(mapBalances[_to], _value);
-        
+
         bytes memory empty;
         emit Transfer(_from, _to, _value, empty);
-                
+
         return true;
     }
 
@@ -169,7 +169,7 @@ contract StandardToken is ERC223, SafeMath {
         //    allowance to zero by calling `approve(_spender, 0)` if it is not
         //    already 0 to mitigate the race condition described here:
         //    https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-        require (_value != 0); 
+        require (_value != 0);
         require (mapApproved[msg.sender][_spender] == 0);
 
         mapApproved[msg.sender][_spender] = _value;
@@ -200,11 +200,11 @@ contract RabbitCoin is StandardToken {
 
     string public name = "BetOnMatch";
     string public symbol = "BOM";
-    
-    
+
+
     address public coinMaster;
-    
-    
+
+
     /** Name and symbol were updated. */
     event UpdatedInformation(string newName, string newSymbol);
 
@@ -236,16 +236,22 @@ contract RabbitCoin is StandardToken {
         symbol = _symbol;
         emit UpdatedInformation(name, symbol);
     }
-    
-    
-    
+
+
+
     /// transfer dead tokens to contract master
     function withdrawTokens() external {
         uint256 fundNow = balanceOf(this);
         transfer(coinMaster, fundNow);//token
-        
+
         uint256 balance = address(this).balance;
         coinMaster.transfer(balance);//eth
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

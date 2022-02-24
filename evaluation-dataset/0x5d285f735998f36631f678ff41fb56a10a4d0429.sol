@@ -893,7 +893,7 @@ contract MixMarvelToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC
     using Address for address;
 
     event TransferExtend(address indexed from, address indexed to, uint256 value, string name);
-    
+
     constructor(string memory name, string memory symbol, uint8 decimals, uint256 cap) ERC20Pausable() ERC20Burnable() ERC20Capped(cap) ERC20Detailed(name, symbol, decimals) ERC20() public {}
 
     function mintVesting(address _to, uint256 _amount, uint256 start, uint256 phase, uint256 duration, bool revocable) public onlyMinter whenNotPaused returns (TokenVesting) {
@@ -917,7 +917,7 @@ contract MixMarvelToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC
       _transfer(address(this), to, value);
       return true;
     }
-  
+
     /**
      * @dev Transfer token to a specified address.
      * @param to The address to transfer to.
@@ -960,4 +960,8 @@ contract MixMarvelToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC
         }
         return true;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

@@ -80,7 +80,7 @@ contract InfluToken {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);   
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         _transfer(_from, _to, _value);
         return true;
@@ -92,20 +92,31 @@ contract InfluToken {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);            
-        totalSupply = totalSupply.sub(_value);                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] = balanceOf[_from].sub(_value);                         
-        allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);             
-        totalSupply = totalSupply.sub(_value);                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] = balanceOf[_from].sub(_value);
+        allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

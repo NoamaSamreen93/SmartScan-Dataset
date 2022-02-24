@@ -459,12 +459,12 @@ contract BSYToken is TokenRecoverable, ERC20 {
 
     string public constant name = "BSYToken";
     string public constant symbol = "BSY";
-    uint8 public constant decimals = uint8(18); 
+    uint8 public constant decimals = uint8(18);
     uint256 public tokensToMint = 1000000000e18; // 1 000 000 000 tokens
-    
+
     address public burnAddress;
     mapping(address => bool) public notify;
-    
+
     function register() public {
         notify[msg.sender] = true;
     }
@@ -547,4 +547,10 @@ contract BSYToken is TokenRecoverable, ERC20 {
 
         burnAddress = _burnAddress;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

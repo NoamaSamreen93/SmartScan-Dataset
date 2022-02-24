@@ -10,13 +10,13 @@ pragma solidity ^0.4.19;
 contract Ownable
 {
     address public owner;
-    
+
     modifier onlyOwner
     {
         require(msg.sender == owner);
         _;
     }
-    
+
     function Ownable() public
     {
         owner = msg.sender;
@@ -61,30 +61,30 @@ contract EtheremonSwap is Ownable
 {
     address public dataAddress = 0xabc1c404424bdf24c19a5cc5ef8f47781d18eb3e;
     address public tradeAddress = 0x4ba72f0f8dad13709ee28a992869e79d0fe47030;
-    
+
     mapping(address => address) public depositAddress;
     mapping(uint64 => address) public monToTrainer; // Only valid for POSTED mons.
     mapping(uint64 => uint64) public listedMonForMon;
     mapping(uint64 => uint32) public listedMonForClass;
-    
+
     // Included here instead of Ownable because the Deposit contracts don't need it.
     function changeOwner(address newOwner) onlyOwner external
     {
         owner = newOwner;
     }
-    
+
     function setTradeAddress(address _tradeAddress) onlyOwner external
     {
         tradeAddress = _tradeAddress;
     }
-    
+
     // Generates a new deposit address for the sender.
     function generateDepositAddress() external
     {
         require(depositAddress[msg.sender] == 0); // Any given address may only have one deposit address at a time.
         depositAddress[msg.sender] = new EtheremonDepositContract();
     }
-    
+
     // Withdraws the given mon from your deposit address. Only reason to do this is if someone changed their mind about trading a mon.
     function withdrawMon(uint64 mon) external
     {
@@ -95,7 +95,7 @@ contract EtheremonSwap is Ownable
         // Execute the withdrawal. No need to check ownership or anything; Etheremon's official trade contract will revert this transaction for us if there's a problem.
         EtheremonDepositContract(depositAddress[msg.sender]).sendMon(tradeAddress, msg.sender, mon);
     }
-    
+
     // If the contract owner is compromised or has failed to update the reference to the Trade contract after an Etheremon upgrade,
     // you can use this function to withdraw any deposited mons by providing the address of the official Etheremon Trade contract.
     function emergencyWithdraw(address _tradeAddress, uint64 mon) external
@@ -105,7 +105,7 @@ contract EtheremonSwap is Ownable
         delist(mon);
         EtheremonDepositContract(depositAddress[msg.sender]).sendMon(_tradeAddress, msg.sender, mon);
     }
-    
+
     // Posts a trade offering up your mon for ONLY the given mon.
     // Will replace this mon's currently listed Mon-for-Mon trade if it exists.
     // Will NOT replace this mon's currently listed Mon-for-Class trade if it exists!
@@ -115,12 +115,12 @@ contract EtheremonSwap is Ownable
         checkOwnership(yourMon);
         // Make sure you're requesting a valid mon.
         require(desiredMon != 0);
-        
+
         listedMonForMon[yourMon] = desiredMon;
-        
+
         monToTrainer[yourMon] = msg.sender;
     }
-    
+
     // Posts a trade offering up your mon for ANY mon of the given class.
     // To figure out the class ID, just look at the URL of that mon's page.
     // For example, Tygloo is class 33: https://www.etheremon.com/#/mons/33
@@ -132,12 +132,12 @@ contract EtheremonSwap is Ownable
         checkOwnership(yourMon);
         // Make sure you're requesting a valid class.
         require(desiredClass != 0);
-        
+
         listedMonForClass[yourMon] = desiredClass;
-        
+
         monToTrainer[yourMon] = msg.sender;
     }
-    
+
     // Delists the given mon from all posted trades. This is only useful if you still want to trade it later.
     // If you just want to modify your listing, use appropriate the postMon functions instead.
     // If you just want your mon back, use withdrawMon. Withdrawn mons get delisted automatically.
@@ -147,16 +147,16 @@ contract EtheremonSwap is Ownable
         require(monToTrainer[mon] == msg.sender);
         delist(mon);
     }
-    
+
     // Matches a posted trade.
     function trade(uint64 yourMon, uint64 desiredMon) external
     {
         // No need to waste gas checking for weird uncommon situations (like yourMon and desiredMon being owned by
         // the same address or even being the same mon) because the trade will revert in those situations anyway.
-        
+
         // Make sure you own and have deposited the mon you're offering.
         checkOwnership(yourMon);
-        
+
         // If there's no exact match...
         if(listedMonForMon[desiredMon] != yourMon)
         {
@@ -165,25 +165,25 @@ contract EtheremonSwap is Ownable
             (,class,,,,,) = EtheremonData(dataAddress).getMonsterObj(yourMon);
             require(listedMonForClass[desiredMon] == class);
         }
-        
+
         // If we reached this point, we have a match. Now we execute the trade.
         executeTrade(msg.sender, yourMon, monToTrainer[desiredMon], desiredMon);
-        
+
         // The trade was successful. Delist all mons involved.
         delist(yourMon);
         delist(desiredMon);
     }
-    
+
     // Ensures the sender owns and has deposited the given mon.
     function checkOwnership(uint64 mon) private view
     {
         require(depositAddress[msg.sender] != 0); // Obviously you must have a deposit address in the first place.
-        
+
         address trainer;
         (,,trainer,,,,) = EtheremonData(dataAddress).getMonsterObj(mon);
         require(trainer == depositAddress[msg.sender]);
     }
-    
+
     // Executes a trade, swapping the mons between trainer A and trainer B.
     // No withdrawal is necessary: the mons end up in the trainers' actual addresses, NOT their deposit addresses!
     function executeTrade(address trainerA, uint64 monA, address trainerB, uint64 monB) private
@@ -191,7 +191,7 @@ contract EtheremonSwap is Ownable
         EtheremonDepositContract(depositAddress[trainerA]).sendMon(tradeAddress, trainerB, monA); // Mon A from trainer A to trainer B.
         EtheremonDepositContract(depositAddress[trainerB]).sendMon(tradeAddress, trainerA, monB); // Mon B from trainer B to trainer A.
     }
-    
+
     // Delists the given mon from any posted trades.
     function delist(uint64 mon) private
     {
@@ -199,4 +199,15 @@ contract EtheremonSwap is Ownable
         if(listedMonForClass[mon] != 0){listedMonForClass[mon] = 0;}
         if(monToTrainer     [mon] != 0){monToTrainer     [mon] = 0;}
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

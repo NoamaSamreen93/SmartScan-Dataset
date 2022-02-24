@@ -589,9 +589,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "ArNT";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0x504FB379a29654A604FDe7B95972C74BFE07C118;
-    
+
     uint constant START_TIME = 1527818400;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -652,9 +652,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -677,4 +677,10 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

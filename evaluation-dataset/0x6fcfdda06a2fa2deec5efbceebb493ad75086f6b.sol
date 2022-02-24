@@ -99,7 +99,7 @@ contract TripleROI {
        if (investments[msg.sender] > 0){
            withdraw();
        }
-       
+
        investments[msg.sender] = investments[msg.sender].add(msg.value);
        joined[msg.sender] = block.timestamp;
        ownerWallet.transfer(msg.value.mul(5).div(100));
@@ -112,17 +112,17 @@ contract TripleROI {
     */
     function getBalance(address _address) view public returns (uint256) {
         uint256 minutesCount = now.sub(joined[_address]).div(1 minutes);
-        
+
         // update roi multiplier
         // 4% flat during first 3 hours
         // 12% flat during 6 hours
         // 36% flat during 9 hours
         // 108% flat after 12 hours
         uint256 userROIMultiplier = 3**(minutesCount / 180);
-        
+
         uint256 percent;
         uint256 balance;
-        
+
         for(uint i=1; i<userROIMultiplier; i=i*3){
             // add each percent -
             // 4% flat during first 3 hours
@@ -133,7 +133,7 @@ contract TripleROI {
             percent = investments[_address].mul(step).div(1000) * i;
             balance += percent.mul(60).div(1500);
         }
-        
+
         // Finally, add the balance for the current multiplier
         percent = investments[_address].mul(step).div(1000) * userROIMultiplier;
         balance += percent.mul(minutesCount % 60).div(1500);
@@ -146,12 +146,12 @@ contract TripleROI {
     */
     function withdraw() public returns (bool){
         require(joined[msg.sender] > 0);
-        
+
         uint256 balance = getBalance(msg.sender);
-        
+
         // Reset ROI mulitplier of user
         joined[msg.sender] = block.timestamp;
-        
+
         if (address(this).balance > balance){
             if (balance > 0){
                 msg.sender.transfer(balance);
@@ -240,4 +240,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

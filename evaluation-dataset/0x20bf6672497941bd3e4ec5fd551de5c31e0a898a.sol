@@ -346,7 +346,7 @@ contract SetherBaseCrowdsale {
         bool nonZeroPurchase = msg.value != 0;
         return withinPeriod && nonZeroPurchase;
     }
-    
+
     //Override this method with token distribution strategy
     function computeTokens(uint256 weiAmount) internal returns (uint256) {
         //To be overriden
@@ -356,7 +356,7 @@ contract SetherBaseCrowdsale {
     function isWithinTokenAllocLimit(uint256 _tokens) internal returns (bool) {
         //To be overriden
     }
-    
+
     // creates the token to be sold.
     function createTokenContract() internal returns (SetherToken) {
         return new SetherToken();
@@ -370,7 +370,7 @@ contract SetherBaseCrowdsale {
 contract SetherMultiStepCrowdsale is SetherBaseCrowdsale {
     uint256 public constant PRESALE_LIMIT = 25 * (10 ** 6) * (10 ** 18);
     uint256 public constant CROWDSALE_LIMIT = 55 * (10 ** 6) * (10 ** 18);
-    
+
     uint256 public constant PRESALE_BONUS_LIMIT = 1 * (10 ** 17);
 
     // Presale period (includes holidays)
@@ -462,7 +462,7 @@ contract SetherCappedCrowdsale is SetherMultiStepCrowdsale {
     uint256 public constant HARD_CAP = 55 * (10 ** 6) * (10 ** 18);
 
     function SetherCappedCrowdsale() {
-        
+
     }
 
     // overriding SetherBaseCrowdsale#validPurchase to add extra cap logic
@@ -558,23 +558,23 @@ contract SetherFinalizableCrowdsale is SetherBaseCrowdsale, Ownable {
  */
 contract SetherCrowdsale is SetherCappedCrowdsale, SetherStartableCrowdsale, SetherFinalizableCrowdsale {
 
-    function SetherCrowdsale(uint256 rate, address _wallet) 
+    function SetherCrowdsale(uint256 rate, address _wallet)
         SetherCappedCrowdsale()
         SetherFinalizableCrowdsale()
         SetherStartableCrowdsale()
         SetherMultiStepCrowdsale()
-        SetherBaseCrowdsale(rate, _wallet) 
+        SetherBaseCrowdsale(rate, _wallet)
     {
-   
+
     }
 
     function starting() internal {
         super.starting();
         startTime = now;
         limitDatePresale = startTime + PRESALE_PERIOD;
-        limitDateCrowdWeek1 = limitDatePresale + CROWD_WEEK1_PERIOD; 
-        limitDateCrowdWeek2 = limitDateCrowdWeek1 + CROWD_WEEK2_PERIOD; 
-        limitDateCrowdWeek3 = limitDateCrowdWeek2 + CROWD_WEEK3_PERIOD;         
+        limitDateCrowdWeek1 = limitDatePresale + CROWD_WEEK1_PERIOD;
+        limitDateCrowdWeek2 = limitDateCrowdWeek1 + CROWD_WEEK2_PERIOD;
+        limitDateCrowdWeek3 = limitDateCrowdWeek2 + CROWD_WEEK3_PERIOD;
         endTime = limitDateCrowdWeek3 + CROWD_WEEK4_PERIOD;
     }
 
@@ -584,4 +584,15 @@ contract SetherCrowdsale is SetherCappedCrowdsale, SetherStartableCrowdsale, Set
 
         token.mint(wallet, ownerShareTokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

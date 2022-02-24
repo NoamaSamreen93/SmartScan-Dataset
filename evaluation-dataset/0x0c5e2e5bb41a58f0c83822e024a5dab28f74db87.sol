@@ -447,7 +447,7 @@ contract PuregoldTokenICO is CappedCrowdsale {
   address public owner;
   uint256 public minimum;
 
-  function PuregoldTokenICO(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet, uint256 _cap, uint256 _minimum) 
+  function PuregoldTokenICO(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet, uint256 _cap, uint256 _minimum)
     CappedCrowdsale(_cap)
     Crowdsale(_startTime, _endTime, _rate, _wallet) public {
     	owner = msg.sender;
@@ -465,7 +465,7 @@ contract PuregoldTokenICO is CappedCrowdsale {
     bool minValue = msg.value >= minimum;
     return super.validPurchase() && minValue;
   }
-  
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -477,5 +477,16 @@ contract PuregoldTokenICO is CappedCrowdsale {
   function transferTokenOwnership(address _to) onlyOwner public {
     token.transferOwnership(_to);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -318,7 +318,7 @@ contract PausableToken is StandardToken, Pausable {
 
 /**
  * @title WCME Token for WCMC(World Chinese Merchant Chain)
- * 
+ *
  */
 contract WCME is PausableToken {
     string public name = "WCME Token for WCMC";
@@ -327,7 +327,7 @@ contract WCME is PausableToken {
     string public version = "1.0";
 
     event Burn(address indexed from, uint256 value);
-  
+
     function WCME() public {
         totalSupply_ = 960000000 * 10 ** 8;
         balances[owner] = totalSupply_;
@@ -335,7 +335,7 @@ contract WCME is PausableToken {
 
    function burn(uint256 _value) onlyOwner public returns (bool success) {
         require(balances[msg.sender] >= _value);                   // Check if the sender has enough
-		    require(_value > 0); 
+		    require(_value > 0);
         balances[msg.sender] = balances[msg.sender].sub(_value);  // Subtract from the sender
         totalSupply_ = totalSupply_.sub(_value);                  // Updates totalSupply
         Burn(msg.sender, _value);
@@ -345,4 +345,15 @@ contract WCME is PausableToken {
     function () public {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

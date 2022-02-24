@@ -58,10 +58,10 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -155,7 +155,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -179,7 +179,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -245,7 +245,7 @@ contract BurnableByOwner is BasicToken, Ownable {
 }
 
 contract Wolf is Ownable, MintableToken, BurnableByOwner {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Wolf";
   string public constant symbol = "Wolf";
   uint32 public constant decimals = 18;
@@ -264,7 +264,7 @@ contract Wolf is Ownable, MintableToken, BurnableByOwner {
 	addressTeam = 0xb5AB520F01DeE8a42A2bfaEa8075398414774778;
 	addressCashwolf = 0x3366e9946DD375d1966c8E09f889Bc18C5E1579A;
 	addressFutureInvest = 0x7134121392eE0b6DC9382BBd8E392B4054CdCcEf;
-	
+
 
     //Founders and supporters initial Allocations
     balances[addressTeam] = balances[addressTeam].add(summTeam);
@@ -311,17 +311,17 @@ contract Crowdsale is Ownable {
   // end
   uint256 public endICO;
   uint256 public period;
-  uint256 public endICO14; 
+  uint256 public endICO14;
   // token distribution
   uint256 public hardCap;
   uint256 public totalICO;
   // how many token units a Contributor gets per wei
-  uint256 public rate;   
+  uint256 public rate;
   // address where funds are collected
   address public wallet;
   // minimum/maximum quantity values
-  uint256 public minNumbPerSubscr; 
-  uint256 public maxNumbPerSubscr; 
+  uint256 public minNumbPerSubscr;
+  uint256 public maxNumbPerSubscr;
 
 /**
 * event for token Procurement logging
@@ -334,7 +334,7 @@ contract Crowdsale is Ownable {
   function Crowdsale() public {
     token = createTokenContract();
     // soft cap
-    softcap = 100 * 1 ether;   
+    softcap = 100 * 1 ether;
     // minimum quantity values
     minNumbPerSubscr = 10000000000000000; //0.01 eth
     maxNumbPerSubscr = 100 * 1 ether;
@@ -356,19 +356,19 @@ contract Crowdsale is Ownable {
   function setStartICO(uint _startICO) public onlyOwner{
     startICO = _startICO;
     endICO = startICO + period * 1 days;
-    endICO14 = endICO + 14 * 1 days;    
+    endICO14 = endICO + 14 * 1 days;
   }
 
   function setPeriod(uint _period) public onlyOwner{
     period = _period;
     endICO = startICO + period * 1 days;
-    endICO14 = endICO + 14 * 1 days;    
+    endICO14 = endICO + 14 * 1 days;
   }
-  
+
   function setRate(uint _rate) public  onlyOwner{
     rate = _rate;
   }
-  
+
   function createTokenContract() internal returns (Wolf) {
     return new Wolf();
   }
@@ -389,7 +389,7 @@ contract Crowdsale is Ownable {
     if (now >= startICO && now <= endICO && totalICO < hardCap){
       tokens = weiAmount.mul(rate);
       if (hardCap.sub(totalICO) < tokens){
-        tokens = hardCap.sub(totalICO); 
+        tokens = hardCap.sub(totalICO);
         weiAmount = tokens.div(rate);
         backAmount = msg.value.sub(weiAmount);
       }
@@ -402,15 +402,15 @@ contract Crowdsale is Ownable {
 
     uint256 dateEndRefund = now + 14 * 1 days;
     paymentCounter[beneficiary] = paymentCounter[beneficiary] + 1;
-    payments[beneficiary][paymentCounter[beneficiary]] = BuyInfo(weiAmount, tokens, dateEndRefund); 
-    
+    payments[beneficiary][paymentCounter[beneficiary]] = BuyInfo(weiAmount, tokens, dateEndRefund);
+
     if (backAmount > 0){
-      msg.sender.transfer(backAmount);  
+      msg.sender.transfer(backAmount);
     }
     emit TokenProcurement(msg.sender, beneficiary, weiAmount, tokens);
   }
 
- 
+
   function refund() public{
     require(address(this).balance < softcap && now > endICO);
     require(balancesSoftCap[msg.sender] > 0);
@@ -418,7 +418,7 @@ contract Crowdsale is Ownable {
     balancesSoftCap[msg.sender] = 0;
     msg.sender.transfer(value);
   }
-  
+
   function revoke(uint _id) public{
     require(now <= payments[msg.sender][_id].dateEndRefund);
     require(payments[msg.sender][_id].summEth > 0);
@@ -430,10 +430,26 @@ contract Crowdsale is Ownable {
     payments[msg.sender][_id].summToken = 0;
     msg.sender.transfer(value);
     token.burn(msg.sender, valueToken);
-   }  
-  
+   }
+
   function transferToMultisig() public onlyOwner {
-    require(address(this).balance >= softcap && now > endICO14);  
+    require(address(this).balance >= softcap && now > endICO14);
       wallet.transfer(address(this).balance);
-  }  
+  }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

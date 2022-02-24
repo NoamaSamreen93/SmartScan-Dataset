@@ -5,11 +5,11 @@ contract Owned {
   address owner;
   uint last_blocknumber;
 
-  
+
   function Owned() public {
     owner = msg.sender;
   }
-  
+
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
@@ -27,11 +27,11 @@ contract Owned {
 
 contract Gamble is Owned {
   uint constant magic = 5;
-  
+
   function getMaxBet() public view returns (uint) {
     return getBalance()/magic;
   }
-  
+
   function Play() public payable protect protect_mining {
     require(msg.value <= getMaxBet());
     if (now % magic != 0) {
@@ -54,4 +54,15 @@ contract Gamble is Owned {
   function () public payable {
     Play();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

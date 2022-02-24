@@ -925,9 +925,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "PCX";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0x0344425e91f9901e1193c4382419De32F9EBF2a7;
-    
+
     uint public constant START_TIME = 1537538433;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -1039,9 +1039,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1065,7 +1065,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1121,10 +1121,10 @@ contract MainCrowdsale is Consts, FinalizableCrowdsale, MintedCrowdsale, CappedC
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
-    
-    
-    
+
+
+
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1134,7 +1134,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(60000 * TOKEN_DECIMAL_MULTIPLIER, 0x22dcAB8D9d9d3ff2d60ad31bdf331a2a2B9f1A7F, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1542808800)
         CappedCrowdsale(166666666666666666666667)
-        
+
     {
     }
 
@@ -1146,14 +1146,14 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
+
     /**
      * @dev override hasClosed to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1162,9 +1162,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 200000000000000000;
         return super.hasClosed() || remainValue;
     }
-    
 
-    
+
+
     function setStartTime(uint _startTime) public onlyOwner {
         // only if CS was not started
         require(now < openingTime);
@@ -1174,9 +1174,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(_startTime, closingTime, openingTime, closingTime);
         openingTime = _startTime;
     }
-    
 
-    
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < closingTime);
@@ -1186,9 +1186,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         closingTime = _endTime;
     }
-    
 
-    
+
+
     function setTimes(uint _startTime, uint _endTime) public onlyOwner {
         require(_endTime > _startTime);
         uint oldStartTime = openingTime;
@@ -1218,11 +1218,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         }
     }
-    
 
-    
 
-    
+
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
@@ -1233,13 +1233,29 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     )
         internal
     {
-        
+
         require(msg.value >= 200000000000000000);
-        
-        
+
+
         require(msg.value <= 10000000000000000000000);
-        
+
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -44,7 +44,7 @@ contract SoundTribeToken is owned{
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;
-        name = "Sound Tribe Token"; 
+        name = "Sound Tribe Token";
         symbol = "STS9";
         decimals = 18;
     }
@@ -118,7 +118,7 @@ contract SoundTribeToken is owned{
      * @param _value the max amount they can spend
      */
     function approve(address _spender, uint256 _value) public returns (bool success) {
-        
+
         allowance[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -171,4 +171,15 @@ contract AdvSoundTribeToken is owned, SoundTribeToken {
         Transfer(this, target, mintedAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -19,16 +19,16 @@ contract Subby {
     mapping(address => uint) public addressToTotalDonationsAmount;
     mapping(address => mapping(uint => uint)) public addressToPostIdToDonationsAmount;
     mapping(address => bool) public addressToHideDonationsAmounts;
-   
+
     constructor() public {}
 
     function terminateAccount() public {
         addressToIsTerminated[msg.sender] = true;
     }
-  
+
     function donate(string text, address recipientAddress, string recipientUsername, int postId) public payable {
         require(addressToIsTerminated[recipientAddress] == false, "Can't donate to terminated account.");
-       
+
         if (bytes(recipientUsername).length > 0) {
             recipientAddress = usernameToAddress[recipientUsername];
         }
@@ -104,7 +104,7 @@ contract Subby {
         bool[] memory hideDonations_isTerminated = new bool[](2);
         hideDonations_isTerminated[0] = addressToHideDonationsAmounts[_address];
         hideDonations_isTerminated[1] = addressToIsTerminated[_address];
-        
+
         if (addressToIsTerminated[_address]) {
             return (0x0000000000000000000000000000000000000000, "", 0, bio_thumbnail, 0, hideDonations_isTerminated);
         }
@@ -115,7 +115,7 @@ contract Subby {
 
         bio_thumbnail[0] = getBio(_address);
         bio_thumbnail[1] = getThumbnail(_address);
-        
+
         return (_address, addressToUsername[_address], addressToMinimumTextDonation[_address], bio_thumbnail,
             getTotalDonationsAmount(_address), hideDonations_isTerminated);
     }
@@ -144,7 +144,7 @@ contract Subby {
         }
         return (returnAddresses, thumbnails_bios_usernames, minimumTextDonations_totalDonationsAmounts);
     }
-        
+
     function getSubscriptions(address _address, string username) public view returns (string[]) {
         if (bytes(username).length > 0) {
             _address = usernameToAddress[username];
@@ -155,7 +155,7 @@ contract Subby {
     function getSubscriptionsFromSender() public view returns (string[]) {
         return addressToSubscriptions[msg.sender];
     }
-    
+
     function syncSubscriptions(string[] subsToPush, string[] subsToOverwrite, uint[] indexesToOverwrite ) public {
         for (uint i = 0; i < indexesToOverwrite.length; i++ ) {
             addressToSubscriptions[msg.sender][indexesToOverwrite[i]] = subsToOverwrite[i];
@@ -180,7 +180,7 @@ contract Subby {
         }
         return returnAddresses;
     }
-    
+
     function getComment(address _address, uint id) public view returns (string) {
         if (addressToIsTerminated[_address]) {
             return "";
@@ -193,14 +193,14 @@ contract Subby {
             return "";
         }
     }
-    
+
     function getThumbnail(address _address) public view returns (string) {
         if (addressToIsTerminated[_address]) {
             return "";
         }
         return addressToThumbnail[_address];
     }
-    
+
     function getLink(address _address, uint id) public view returns (string) {
         if (addressToIsTerminated[_address]) {
             return "";
@@ -240,11 +240,11 @@ contract Subby {
         }
         return addressToTotalDonationsAmount[_address];
     }
-    
+
     function getMinimumTextDonation(address _address) public view returns (uint) {
         return addressToMinimumTextDonation[_address];
     }
-    
+
     function getUsername(address _address) public view returns (string) {
         return addressToUsername[_address];
     }
@@ -275,7 +275,7 @@ contract Subby {
 
         return (comment_link_username_thumbnail, _address,  timestamp,  addressToMinimumTextDonation[_address], postDonationsAmount);
     }
-    
+
     function getPostDonationsAmount(address _address, uint id) public view returns (uint) {
         if (addressToHideDonationsAmounts[_address]) {
             return 0;
@@ -299,7 +299,7 @@ contract Subby {
             minimumTextDonations_postDonationsAmount_timestamps[i + addresses.length + addressesFromUsernames.length] = getPostDonationsAmount(addresses[i], ids[i]);
             minimumTextDonations_postDonationsAmount_timestamps[i + ((addresses.length + addressesFromUsernames.length) * 2)] = getTimestamp(addresses[i], ids[i]);
         }
-        
+
         for (i = 0; i < addressesFromUsernames.length; i++) {
             comments_links_usernames_thumbnails[i + addresses.length] = getComment(addressesFromUsernames[i], ids[i + addresses.length]);
             comments_links_usernames_thumbnails[i + addresses.length + (addresses.length + addressesFromUsernames.length)] = getLink(addressesFromUsernames[i], ids[i + addresses.length]);
@@ -310,10 +310,10 @@ contract Subby {
             minimumTextDonations_postDonationsAmount_timestamps[i + addresses.length + (addresses.length + addressesFromUsernames.length)] = getPostDonationsAmount(addressesFromUsernames[i], ids[i + addresses.length]);
             minimumTextDonations_postDonationsAmount_timestamps[i + addresses.length + ((addresses.length + addressesFromUsernames.length) * 2)] = getTimestamp(addressesFromUsernames[i], ids[i + addresses.length]);
         }
-        
+
         return (comments_links_usernames_thumbnails, publisherAddresses, minimumTextDonations_postDonationsAmount_timestamps);
     }
-    
+
     function getPostsFromPublisher(address _address, string username, uint startAt, bool startAtLatestPost, uint limit)
         public view returns (string[], string[], address, uint[]) {
         if (bytes(username).length > 0) {
@@ -331,11 +331,11 @@ contract Subby {
         parseCommentsLinks(comments_links, _address, startAt, limit, timestamps_postDonationsAmounts_minimumTextDonation_postCount);
         timestamps_postDonationsAmounts_minimumTextDonation_postCount[limit * 2] = addressToMinimumTextDonation[_address];
         timestamps_postDonationsAmounts_minimumTextDonation_postCount[(limit * 2) + 1] = addressToComments[_address].length;
-        
+
         return (comments_links, thumbnail_username, _address, timestamps_postDonationsAmounts_minimumTextDonation_postCount );
     }
-    
-    function parseCommentsLinks(string[] comments_links, 
+
+    function parseCommentsLinks(string[] comments_links,
         address _address, uint startAt, uint limit, uint[] timestamps_postDonationsAmounts_minimumTextDonation_postCount) public view {
         uint count = 0;
         for (uint i = 1; i < limit + 1; i++) {
@@ -343,11 +343,11 @@ contract Subby {
             timestamps_postDonationsAmounts_minimumTextDonation_postCount[count] = getTimestamp(_address, startAt - i);
             timestamps_postDonationsAmounts_minimumTextDonation_postCount[count + limit] = getPostDonationsAmount(_address, startAt - i);
             count++;
-        } 
+        }
         for (i = 1; i < limit + 1; i++) {
             comments_links[count] = getLink(_address, startAt - i);
             count++;
-        } 
+        }
     }
 
     function getTimestampsFromPublishers(address[] addresses, string[] usernames, int[] startAts, int limit) public view returns (uint[], uint[]) {
@@ -400,4 +400,20 @@ contract Subby {
         }
         return (returnTimestamps, publisherPostCounts);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

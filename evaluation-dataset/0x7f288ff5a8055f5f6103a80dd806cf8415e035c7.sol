@@ -104,11 +104,11 @@ contract CFC is ERC20,Ownable{
 	mapping(address=>epoch[]) public lockEpochsMap;
 
 
-	 
+
 	//ERC20的余额
     mapping(address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	
+
 
 	function CFC(){
 		totalSupply = MAX_SUPPLY;
@@ -172,14 +172,14 @@ contract CFC is ERC20,Ownable{
 		return true;
   	}
 
-  	function balanceOf(address _owner) public constant returns (uint256 balance) 
+  	function balanceOf(address _owner) public constant returns (uint256 balance)
   	{
 		return balances[_owner];
   	}
 
 
   //从委托人账上转出份额时，还要判断委托人的余额-转出份额是否大于等于锁仓份额
-  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
   	{
 		require(_to != address(0));
 
@@ -205,17 +205,28 @@ contract CFC is ERC20,Ownable{
 		return true;
   	}
 
-  	function approve(address _spender, uint256 _value) public returns (bool) 
+  	function approve(address _spender, uint256 _value) public returns (bool)
   	{
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
   	}
 
-  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
   	{
 		return allowed[_owner][_spender];
   	}
 
-	  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

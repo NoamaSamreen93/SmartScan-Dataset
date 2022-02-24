@@ -62,16 +62,16 @@ contract SMEToken is StandardToken {
         address addr;
         uint amount;
     }
-	
+
     Funder[] funder_list;
-	
+
     // metadata
-	uint256 public constant DURATION = 30 days; 
+	uint256 public constant DURATION = 30 days;
     string public constant name = "SMET";
     string public constant symbol = "SMET";
     uint256 public constant decimals = 0;
     string public version = "1.0";
-	
+
 	address account1 = '0xcD4fC8e4DA5B25885c7d80b6C846afb6b170B49b';  //50%   Use Cases and Business Applications
 	address account2 = '0x005CD1194C1F088d9bd8BF9e70e5e44D2194C029';  //24%   Blockchain Technology
     address account3 = '0x00d0ACA6D3D07B3546Fc76E60a90ccdccC7c0e0C';  //6%    Mobile APP,SDK Technology
@@ -83,41 +83,41 @@ contract SMEToken is StandardToken {
     uint256 val2 = 1 szabo;  // 1 * 10 ** 12
     uint256 val3 = 1 finney; // 1 * 10 ** 15
     uint256 val4 = 1 ether;  // 1 * 10 ** 18
-	
+
 	address public creator;
 	uint256 public sellPrice;
 	uint256 public totalSupply;
 	uint256 public startTime = 0;   // unix timestamp seconds
 	uint256 public endTime = 0;     // unix timestamp seconds
-	
+
     uint256 public constant tokenExchangeRate = 1000; // 1000 SME tokens per 1 ETH
 
     function setPrices(uint256 newSellPrice) {
         if (msg.sender != creator) throw;
         sellPrice = newSellPrice;
     }
-	
+
 	function issue(uint256 amount) {
 	    if (msg.sender != creator) throw;
 		totalSupply += amount;
 	}
-	
+
 	function burn(uint256 amount) {
 	    if (msg.sender != creator) throw;
 		totalSupply -= amount;
 	}
-	
+
 	function getBalance() returns (uint) {
         return this.balance;
-    } 
-	
+    }
+
 	function getFunder(uint index) public constant returns(address, uint) {
         Funder f = funder_list[index];
-        
+
         return (
             f.addr,
             f.amount
-        ); 
+        );
     }
 
     // constructor
@@ -142,23 +142,34 @@ contract SMEToken is StandardToken {
 		if (msg.value % val4 != 0) throw;
 		var new_funder = Funder({addr: msg.sender, amount: msg.value / val4});
 		funder_list.push(new_funder);
-		
+
 	    uint256 smecAmount = msg.value / sellPrice;
         if (totalSupply < smecAmount) throw;
-        if (balances[msg.sender] + smecAmount < balances[msg.sender]) throw; 
-        totalSupply -= smecAmount;                     
+        if (balances[msg.sender] + smecAmount < balances[msg.sender]) throw;
+        totalSupply -= smecAmount;
         balances[msg.sender] += smecAmount;
-		
+
         if(!account1.send(msg.value*50/100)) throw;
 		if(!account2.send(msg.value*24/100)) throw;
 		if(!account3.send(msg.value*6/100)) throw;
 		if(!account4.send(msg.value*10/100)) throw;
 		if(!account5.send(msg.value*10/100)) throw;
     }
-	
+
 	// fallback
     function() payable {
         createTokens();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

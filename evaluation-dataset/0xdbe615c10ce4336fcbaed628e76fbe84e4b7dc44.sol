@@ -358,7 +358,7 @@ contract Joyreum is ERC20Detailed, ERC20, Ownable {
     {
         _mint(_tokenHolder, 100000000000000000000000);
     }
-    
+
     /**
      * @dev Function that mints an amount of the token and assigns it to
      * an contract owner. This encapsulates the modification of balances such that the
@@ -368,4 +368,13 @@ contract Joyreum is ERC20Detailed, ERC20, Ownable {
     function mint( uint256 value ) public onlyOwner  {
         _mint( owner() , value );
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

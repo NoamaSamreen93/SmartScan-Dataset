@@ -128,7 +128,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -318,4 +318,20 @@ contract STBToken is TokenERC20 {
     function STBToken() TokenERC20(970000000, "STBToken", "STB", 18) public {
 
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

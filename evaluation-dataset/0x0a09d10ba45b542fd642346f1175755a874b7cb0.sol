@@ -94,24 +94,24 @@ contract AcornCollectiveToken is StandardToken { // CHANGE THIS. Update the cont
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function AcornCollectiveToken() {
-        balances[msg.sender] = 21000000000000000000000000000;      
-        totalSupply = 21000000000000000000000000000;               
-        name = "Acorn Collective Token";                                   
-        decimals = 18;                                        
-        symbol = "OAK";                                       
-        unitsOneEthCanBuy = 222222222;                        
-        fundsWallet = msg.sender;                             
+        balances[msg.sender] = 21000000000000000000000000000;
+        totalSupply = 21000000000000000000000000000;
+        name = "Acorn Collective Token";
+        decimals = 18;
+        symbol = "OAK";
+        unitsOneEthCanBuy = 222222222;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,7 +125,7 @@ contract AcornCollectiveToken is StandardToken { // CHANGE THIS. Update the cont
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -139,4 +139,15 @@ contract AcornCollectiveToken is StandardToken { // CHANGE THIS. Update the cont
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

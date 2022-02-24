@@ -362,7 +362,7 @@ contract Chromia is ERC20, ERC20Detailed {
         require(isMinter(msg.sender), "caller is not a minter");
         _;
     }
-    
+
     function cap() public view returns (uint256) {
         return _cap;
     }
@@ -388,7 +388,7 @@ contract Chromia is ERC20, ERC20Detailed {
         emit TransferFromChromia(to, refID, value);
         return true;
     }
-    
+
     function _mint(address account, uint256 value) internal {
         require(totalSupply().add(value) <= cap(), "ERC20Capped: cap exceeded");
         super._mint(account, value);
@@ -402,8 +402,19 @@ contract Chromia is ERC20, ERC20Detailed {
         _minter = account;
         emit MinterSet(account);
     }
-    
+
     function changeMinter(address newMinter) public onlyMinter {
         _setMinter(newMinter);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

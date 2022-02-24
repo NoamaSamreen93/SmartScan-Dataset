@@ -40,7 +40,7 @@ contract ERC20 {
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
 }
 
 
@@ -66,7 +66,7 @@ contract BasicToken is ERC20 {
             return false;
         }
     }
-    
+
 
     /**
    * @dev Transfer tokens from one address to another
@@ -91,7 +91,7 @@ contract BasicToken is ERC20 {
 
     /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
 
@@ -132,7 +132,7 @@ using SafeMath for uint256;
 string public name = "Anonium";                                 // Name of the token
 string public symbol = "ANO";                                   // Symbol of the token
 uint8 public decimals = 18;                                     // Decimals
-uint256 public totalSupply = 21000000000 * 10**18;              // Total supply of SPC Tokens  
+uint256 public totalSupply = 21000000000 * 10**18;              // Total supply of SPC Tokens
 
 //Variables
 uint256 public tokensAllocatedToCrowdFund;                      // variable to track the allocations of the token to crowdfund
@@ -163,8 +163,8 @@ event ChangeFoundersWalletAddress(uint256  _blockTimeStamp, address indexed _fou
   }
 
 
-  
-   // creation of the token contract 
+
+   // creation of the token contract
    function ANOToken (address _crowdFundAddress) public {
     crowdFundAddress = _crowdFundAddress;
     founderMultiSigAddress = msg.sender;
@@ -173,7 +173,7 @@ event ChangeFoundersWalletAddress(uint256  _blockTimeStamp, address indexed _fou
 
     // Assigned balances to respective stakeholders
     balances[crowdFundAddress] = tokensAllocatedToCrowdFund;
-  
+
   }
 
 // function to keep track of the total token allocation
@@ -181,7 +181,7 @@ event ChangeFoundersWalletAddress(uint256  _blockTimeStamp, address indexed _fou
     totalAllocatedTokens += _amount;
   }
 
-// function to change founder multisig wallet address            
+// function to change founder multisig wallet address
   function changeFounderMultiSigAddress(address _newFounderMultiSigAddress) public onlyFounders nonZeroAddress(_newFounderMultiSigAddress) {
     founderMultiSigAddress = _newFounderMultiSigAddress;
     ChangeFoundersWalletAddress(now, founderMultiSigAddress);
@@ -189,7 +189,7 @@ event ChangeFoundersWalletAddress(uint256  _blockTimeStamp, address indexed _fou
 
   /**
     @dev `burnToken` used to burn the remianing token after the end of crowdsale
-    it only be called by the crowdfund address only 
+    it only be called by the crowdfund address only
    */
 
   function burnToken() public onlyCrowdFundAddress returns (bool) {
@@ -209,16 +209,16 @@ ANOToken token;                                                  // Token variab
 uint256 public startDate;                                        // Start date of the crowdsale
 uint256 public endDate;                                          // End date of crowdsale
 uint256 private weekNo = 0;                                       // Flag variable to track the week no.
-uint256 public allocatedToken = 21000000000 * 10 ** 18;          // Total tokens allocated to crowdsale 
+uint256 public allocatedToken = 21000000000 * 10 ** 18;          // Total tokens allocated to crowdsale
 uint256 private tokenAllocatedForWeek;                           // Variable to track the allocation per week
 uint256 private tokenSoldForWeek;                                // Token sold per week
 uint256 public ethRaised;                                        // Public variable to track the amount of ETH raised
-uint32 public tokenRate = 6078;                                  // Initialization of token rate 
+uint32 public tokenRate = 6078;                                  // Initialization of token rate
 uint32 public appreciationRate = 1216;                           // The rate of token will increased by that much amount
 bool private isTokenSet = false;                                 // Flag variable to track the token address
 
 address public founderAddress;                                   // Founder address which will control the operations of the crowdsale
-address public beneficiaryAddress;                               // Address where ETH get trasferred  
+address public beneficiaryAddress;                               // Address where ETH get trasferred
 
 /**
     @note structure for keeping the weekly data to track
@@ -233,7 +233,7 @@ struct weeklyData {
 // mapping is used to store the weeklyData corresponds to integer
 mapping(uint256 => weeklyData) public weeklyRate;
 
-//Event 
+//Event
 event LogWeekRate(uint32 _weekRate, uint256 _timestamp);
 
 // Modifier for validating the time lapse should between in start and end date
@@ -248,14 +248,68 @@ modifier onlyFounder() {
     _;
 }
 
-//Event 
+//Event
 event TokenBought(address indexed _investor, uint256 _tokenQuantity);
 
 /**
     @dev Fallback function
-    minimum 2,00,000 gas should be used at the time calling this function 
+    minimum 2,00,000 gas should be used at the time calling this function
  */
 
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function () public payable {
     buyTokens(msg.sender);
 }
@@ -277,7 +331,7 @@ function setWeeklyRate() private returns (bool) {
 }
 
 /**
-    @dev Private function to get the weekly rate 
+    @dev Private function to get the weekly rate
     as per the week no.
     @return uint32
  */
@@ -316,7 +370,7 @@ function setWeeklyAllocation() private {
     @dev ANOCrowdsale constructor to set the founder and beneficiary
     as well as to set start & end date.
     @param _founderAddress address which operates all the admin functionality of the contract
-    @param _beneficiaryAddress address where all invested amount get transferred 
+    @param _beneficiaryAddress address where all invested amount get transferred
  */
 
 function ANOCrowdsale (address _founderAddress, address _beneficiaryAddress) public {
@@ -348,11 +402,11 @@ function setTokenAddress (address _tokenAddress) public onlyFounder returns (boo
     @return bool
  */
 
-function buyTokens(address _investor) 
-public 
+function buyTokens(address _investor)
+public
 isBetween
 payable
-returns (bool) 
+returns (bool)
 {
    require(isTokenSet == true);
    require(_investor != address(0));
@@ -378,7 +432,7 @@ function getWeekNo() public view returns (uint256) {
 
 /**
     @dev `endCrowdfund` function used to end the crowdfund
-    called only by the founder and remiaining tokens get burned 
+    called only by the founder and remiaining tokens get burned
  */
 
 function endCrowdfund() public onlyFounder returns (bool) {
@@ -388,4 +442,20 @@ function endCrowdfund() public onlyFounder returns (bool) {
     return true;
 }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -14,7 +14,7 @@ contract SafeMath{
     assert(a == b * c + a % b);
     return c;
   }
-	
+
 	function safeSub(uint a, uint b) internal returns (uint) {
     	assert(b <= a);
     	return a - b;
@@ -41,7 +41,7 @@ contract ERC20{
 }
 
 contract kkTestCoin1 is ERC20, SafeMath{
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -62,7 +62,7 @@ contract kkTestCoin1 is ERC20, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -95,7 +95,7 @@ contract kkTestCoin1 is ERC20, SafeMath{
 
 contract kkTestICO1 is ERC20, SafeMath{
 
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -116,7 +116,7 @@ contract kkTestICO1 is ERC20, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -184,4 +184,20 @@ contract kkTestICO1 is ERC20, SafeMath{
 		price 	= 5000;
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

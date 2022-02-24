@@ -98,19 +98,19 @@ contract Doge2Token is ERC223BasicToken {
   string public symbol = "DOGE2";
   uint256 public decimals = 8;
   uint256 public INITIAL_SUPPLY = 200000000000000;
-  
+
   address public owner;
   event Buy(address indexed participant, uint tokens, uint eth);
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
     function Doge2Token() {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
         owner = msg.sender;
     }
-    
+
     function () payable {
         //lastDeposit = msg.sender;
         //uint tokens = msg.value / 100000000;
@@ -124,5 +124,13 @@ contract Doge2Token is ERC223BasicToken {
         //if (msg.value < 0.01 * 1 ether) throw;
         //doPurchase(msg.sender);
     }
-    
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

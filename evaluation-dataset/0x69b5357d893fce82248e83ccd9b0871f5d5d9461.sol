@@ -58,7 +58,7 @@ library SafeMath {
 
 contract CardboardUnicorns {
   using SafeMath for uint;
-  
+
   string public name = "HorseWithACheapCardboardHorn";
   string public symbol = "HWACCH";
   uint public decimals = 0;
@@ -80,12 +80,12 @@ contract CardboardUnicorns {
     }
     _;
   }
-  
+
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
    * Change ownership of the token
    */
@@ -118,7 +118,7 @@ contract CardboardUnicorns {
   function balanceOf(address _who) constant returns (uint balance) {
     return balances[_who];
   }
-  
+
   /**
    * Transfer token to another address
    */
@@ -128,8 +128,8 @@ contract CardboardUnicorns {
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
   }
-  
-  
+
+
   /**
    * Transfer tokens from an different address to another address.
    * Need to have been granted an allowance to do this before triggering.
@@ -145,19 +145,19 @@ contract CardboardUnicorns {
     allowed[_from][msg.sender] = _allowance.sub(_value);
     Transfer(_from, _to, _value);
   }
-  
+
   /**
    * Approve the indicated address to spend the specified amount of tokens on the sender's behalf
    */
   function approve(address _spender, uint _value) {
     // Ensure allowance is zero if attempting to set to a non-zero number
-    // This helps manage an edge-case race condition better: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 
+    // This helps manage an edge-case race condition better: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     if ((_value != 0) && (allowed[msg.sender][_spender] != 0)) throw;
-    
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
   }
-  
+
   /**
    * Check how many tokens the indicated address can spend on behalf of the owner
    */
@@ -165,4 +165,20 @@ contract CardboardUnicorns {
     return allowed[_owner][_spender];
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -29,7 +29,7 @@ interface IERC20 {
  * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error
  */
- 
+
 library SafeMath {
     /**
     * @dev Multiplies two unsigned integers, reverts on overflow.
@@ -281,7 +281,7 @@ contract ERC20 is IERC20 {
  * All the operations are done using the smallest and indivisible token unit,
  * just as on Ethereum all the operations are done in wei.
  */
- 
+
 contract ERC20Detailed is  ERC20 {
     string private _name;
     string private _symbol;
@@ -320,9 +320,9 @@ contract ERC20Detailed is  ERC20 {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
- 
+
 contract Ownable {
-    
+
     address private _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -390,7 +390,7 @@ contract Ownable {
 
 
 contract Remote is Ownable, IERC20 {
-    
+
     IERC20 internal _remoteToken;
     address internal _remoteContractAddress;
 
@@ -402,16 +402,16 @@ contract Remote is Ownable, IERC20 {
     @param value The amount of tokens to approve.
     @return success
      */
-    function approveSpenderOnVault (address spender, uint256 value) 
+    function approveSpenderOnVault (address spender, uint256 value)
         external onlyOwner returns (bool success) {
             // NOTE Approve the spender on the Vault address
-            _remoteToken.approve(spender, value);     
+            _remoteToken.approve(spender, value);
             success = true;
         }
 
-   /** 
-    @dev remoteTransferFrom This allows the admin to withdraw tokens from the contract, using an 
-    allowance that has been previously set. 
+   /**
+    @dev remoteTransferFrom This allows the admin to withdraw tokens from the contract, using an
+    allowance that has been previously set.
     @param from address to take the tokens from (allowance)
     @param to the recipient to give the tokens to
     @param value the amount in tokens to send
@@ -428,7 +428,7 @@ contract Remote is Ownable, IERC20 {
      */
     function setRemoteContractAddress (address remoteContractAddress)
         external onlyOwner returns (bool success) {
-            _remoteContractAddress = remoteContractAddress;        
+            _remoteContractAddress = remoteContractAddress;
             _remoteToken = IERC20(_remoteContractAddress);
             success = true;
         }
@@ -451,7 +451,7 @@ contract Remote is Ownable, IERC20 {
     This should be zero. Tokens should come from allowance, not balanceOf.
     @return balance
      */
-    function remoteBalanceOfVault () external view onlyOwner 
+    function remoteBalanceOfVault () external view onlyOwner
         returns(uint256 balance) {
             balance = _remoteToken.balanceOf(address(this));
         }
@@ -463,11 +463,11 @@ contract Remote is Ownable, IERC20 {
     function remoteAllowanceOnMyAddress () public view
         returns(uint256 allowance) {
             allowance = _remoteToken.allowance(msg.sender, address(this));
-        } 
+        }
 
-    /** 
-    @dev _remoteTransferFrom This allows contract to withdraw tokens from an address, using an 
-    allowance that has been previously set. 
+    /**
+    @dev _remoteTransferFrom This allows contract to withdraw tokens from an address, using an
+    allowance that has been previously set.
     @param from address to take the tokens from (allowance)
     @param to the recipient to give the tokens to
     @param value the amount in tokens to send
@@ -481,31 +481,31 @@ contract Remote is Ownable, IERC20 {
 
 
 contract ProofOfTrident is ERC20Detailed, Remote {
-    
-    event SentToStake(address from, address to, uint256 value);  
+
+    event SentToStake(address from, address to, uint256 value);
 
     // max total supply set.
     uint256 private _maxTotalSupply = 100000000000 * 10**uint(18);
-    
+
     // minimum number of tokens that can be staked
-    uint256 internal _stakeMinimum = 100000000 * 10**uint(18); 
+    uint256 internal _stakeMinimum = 100000000 * 10**uint(18);
     // maximum number of tokens that can be staked
-    uint256 internal _stakeMaximum = 500000000 * 10**uint(18); 
-    
-    uint internal _oneDay = 60 * 60 * 24;    
-    uint internal _sixMonths = _oneDay * 182;   
-    uint internal _oneYear = _oneDay * 365; 
+    uint256 internal _stakeMaximum = 500000000 * 10**uint(18);
+
+    uint internal _oneDay = 60 * 60 * 24;
+    uint internal _sixMonths = _oneDay * 182;
+    uint internal _oneYear = _oneDay * 365;
     uint internal _stakeMinimumTimestamp = 1000; // minimum age for coin age: 1000 seconds
 
-    // Stop the maximum stake at this to encourage users to collect regularly. 
+    // Stop the maximum stake at this to encourage users to collect regularly.
     uint internal _stakeMaximumTimestamp = _oneYear + _sixMonths;
     uint256 internal _percentageLower = 2;
     uint256 internal _percentageMiddle = 7;
     uint256 internal _percentageUpper = 13;
     //uint256 internal _percentageOfTokensReturned = 10;
     // These funds will go into a variable, but will be stored at the original owner address
-    uint256 private _treasuryPercentageOfReward = 50;    
-  
+    uint256 private _treasuryPercentageOfReward = 50;
+
     address internal _treasury;
 
     /**
@@ -517,7 +517,7 @@ contract ProofOfTrident is ERC20Detailed, Remote {
         uint256 _amountInVault = _transferIns[msg.sender].amountInVault;
         // Check that there is at least an amount set to stake.
         require(_amountInVault > 0, "You have not staked any tokens.");
-        
+
         // reset values before moving on
         _transferIns[msg.sender].amountInVault = 0;
         _transferIns[msg.sender].tokenTimestamp = block.timestamp;
@@ -538,7 +538,7 @@ contract ProofOfTrident is ERC20Detailed, Remote {
         uint256 _amountInVault = _transferIns[msg.sender].amountInVault;
         // Check that there is at least an amount set to stake.
         require(_amountInVault > 0, "You have not staked any tokens.");
-        
+
         // If the stake age is less than minimum, reject the attempt.
         require(_holdAgeTimestamp(msg.sender) >= _transferIns[msg.sender].stakeMinimumTimestamp,
         "You need to stake for the minimum time of 1000 seconds.");
@@ -555,7 +555,7 @@ contract ProofOfTrident is ERC20Detailed, Remote {
         _transferIns[msg.sender].stakeMinimumTimestamp = _oneDay;
         _transferIns[msg.sender].stakeMaximumTimestamp = _oneYear + _sixMonths;
         // return their stake
-        // DONE the contract needs and allowance inself for all the inputs, make this on 
+        // DONE the contract needs and allowance inself for all the inputs, make this on
         // first set up
         _remoteTransferFrom(address(this), msg.sender, _amountInVault);
 
@@ -588,7 +588,7 @@ contract ProofOfTrident is ERC20Detailed, Remote {
 
     modifier canPoSMint() {
         // This will allow the supply to go slightly over the max total supply (once the last rewards are applied).
-        // Users can collect rewards (and stake) after the closure period. 
+        // Users can collect rewards (and stake) after the closure period.
         // In theory somone could hold for a long time and then receive a very large reward.
         require(_totalSupply < _maxTotalSupply,
         "This operation would take the total supply over the maximum supply.");
@@ -598,15 +598,15 @@ contract ProofOfTrident is ERC20Detailed, Remote {
     /**
     @dev setTridentDetails
 
-    @param stakeMinimumTimestamp The timestamp as the minimum amount of staking 
-    @param stakeMaximumTimestamp The timestamp as the maximum amount of staking 
+    @param stakeMinimumTimestamp The timestamp as the minimum amount of staking
+    @param stakeMaximumTimestamp The timestamp as the maximum amount of staking
     @param stakeMinimumInTokens The minimum amount of tokens to stake
-    @param stakeMaximumInTokens The the maximum amount of tokens to stake 
-    @param percentageTreasury The percentage of the reward that the treasury take 
-    @param percentageLower The lower annual interest rate to pay out to users 
-    @param percentageMiddle The middel annual interest rate to pay out to users 
-    @param percentageUpper The upper annual interest rate to pay out to users 
-    @param maxTotalSupply The maximum supply that can be minted 
+    @param stakeMaximumInTokens The the maximum amount of tokens to stake
+    @param percentageTreasury The percentage of the reward that the treasury take
+    @param percentageLower The lower annual interest rate to pay out to users
+    @param percentageMiddle The middel annual interest rate to pay out to users
+    @param percentageUpper The upper annual interest rate to pay out to users
+    @param maxTotalSupply The maximum supply that can be minted
     @return success
     */
     function setTridentDetails(
@@ -618,15 +618,15 @@ contract ProofOfTrident is ERC20Detailed, Remote {
         uint256 percentageLower,
         uint256 percentageMiddle,
         uint256 percentageUpper,
-        uint256 maxTotalSupply) 
+        uint256 maxTotalSupply)
         external onlyOwner returns (bool success) {
             _stakeMinimum = stakeMinimumInTokens * 10**uint(18);
             _stakeMaximum = stakeMaximumInTokens * 10**uint(18);
             _stakeMinimumTimestamp = stakeMinimumTimestamp;
             _stakeMaximumTimestamp = stakeMaximumTimestamp;
-            _percentageLower = percentageLower;  
-            _percentageMiddle = percentageMiddle;  
-            _percentageUpper = percentageUpper; 
+            _percentageLower = percentageLower;
+            _percentageMiddle = percentageMiddle;
+            _percentageUpper = percentageUpper;
             _treasuryPercentageOfReward = percentageTreasury;
             _maxTotalSupply = maxTotalSupply * 10**uint(18);
             success = true;
@@ -665,12 +665,12 @@ contract ProofOfTrident is ERC20Detailed, Remote {
         percentageLower = _percentageLower;
         percentageMiddle = _percentageMiddle;
         percentageUpper = _percentageUpper;
-        treasuryPercentage = _treasuryPercentageOfReward; 
+        treasuryPercentage = _treasuryPercentageOfReward;
         stakeMinimum = _stakeMinimum;
-        stakeMaximum = _stakeMaximum;     
+        stakeMaximum = _stakeMaximum;
         maxTotalSupply = _maxTotalSupply;
     }
-    
+
     function percentageLower () external view returns (uint256) {
         return _percentageLower;
     }
@@ -726,9 +726,9 @@ contract ProofOfTrident is ERC20Detailed, Remote {
      */
     function tridentReward(address owner) public view returns (uint256 totalReward) {
         require(_transferIns[owner].amountInVault > 0, "You have not sent any tokens into stake.");
-        
+
         uint256 _amountInStake =  _transferIns[owner].amountInVault;//Take from struct
-  
+
         uint _lengthOfHoldInSeconds = _holdAgeTimestamp(owner);//Take from method
 
         if (_lengthOfHoldInSeconds > (_transferIns[owner].stakeMaximumTimestamp)) {
@@ -745,7 +745,7 @@ contract ProofOfTrident is ERC20Detailed, Remote {
             percentage = _transferIns[owner].percentageUpper;
         }
 
-        uint256 reward = 
+        uint256 reward =
         _amountInStake.
         mul(percentage)
         .mul(_lengthOfHoldInSeconds)
@@ -762,23 +762,23 @@ contract ProofOfTrident is ERC20Detailed, Remote {
      @return holdAgeTimestamp The stake age in seconds
      */
     function _holdAgeTimestamp(address owner) internal view returns (uint256 holdAgeTimestamp) {
-        
+
         require(_transferIns[owner].amountInVault > 0,
         "You haven't sent any tokens to stake, so there is no stake age to return.");
-        
+
         uint256 _lengthOfHoldTimestamp = (block.timestamp - _transferIns[owner].tokenTimestamp);
-        
+
         holdAgeTimestamp = _lengthOfHoldTimestamp;
-    }   
+    }
 }
 
 /**
  * @title Burnable Token
  * @dev Token that can be irreversibly burned (destroyed).
  */
- 
+
 contract ERC20Burnable is ERC20 {
-    
+
     /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -809,7 +809,7 @@ contract Vault is ProofOfTrident, ERC20Burnable {
     uint8 private constant DECIMALS = 18;
     uint256 private constant INITIAL_SUPPLY = 0;
     address private _vaultAddress = address(this);
-    
+
     /**
      * @dev Constructor that gives msg.sender all of existing tokens, 0.
      */
@@ -821,7 +821,7 @@ contract Vault is ProofOfTrident, ERC20Burnable {
             _decimals = DECIMALS;
             _treasury = treasury;
             //_percentageOfTokensReturned = percentageOfTokensReturned;
-            
+
             _mint(msg.sender, INITIAL_SUPPLY);
         }
 
@@ -830,32 +830,32 @@ contract Vault is ProofOfTrident, ERC20Burnable {
         // The contracts must be used, not the fallback
         revert();
     }
- 
+
     /**
      * @dev adminDoDestructContract
-     */ 
-    function adminDoDestructContract() external onlyOwner { 
+     */
+    function adminDoDestructContract() external onlyOwner {
         if (msg.sender == owner()) selfdestruct(msg.sender);
     }
 
-    /** 
-    @dev vaultRequestFromUser This allows the contract to transferFrom the user to 
-    themselves using allowance that has been previously set. 
+    /**
+    @dev vaultRequestFromUser This allows the contract to transferFrom the user to
+    themselves using allowance that has been previously set.
     @return string Message
     */
     function vaultRequestFromUser () external canPoSMint returns (string memory message) {
-     
+
         // calculate remote allowance given to the contract on the senders address
         // completed via the wallet
         uint256 amountAllowed = _remoteToken.allowance(msg.sender, _vaultAddress);
-        require(amountAllowed > 0, "No allowance has been set.");        
+        require(amountAllowed > 0, "No allowance has been set.");
         require(amountAllowed <= _stakeMaximum, "The allowance has been set too high.");
         uint256 amountBalance = _remoteToken.balanceOf(msg.sender);
         require(amountBalance >= amountAllowed);
-        
+
         require(_transferIns[msg.sender].amountInVault == 0,
         "You are already staking. Cancel your stake (sacrificing reward), or collect your reward and send again.");
-        
+
         require(amountBalance >= amountAllowed,
         "The sending account balance is lower than the requested value.");
         require(amountAllowed >= _stakeMinimum,
@@ -872,23 +872,23 @@ contract Vault is ProofOfTrident, ERC20Burnable {
         _transferIns[msg.sender].stakeMinimumTimestamp = _stakeMinimumTimestamp;
         _transferIns[msg.sender].stakeMaximumTimestamp = _stakeMaximumTimestamp;
 
-        _remoteToken.approve(_vaultAddress, vaultBalance.add(amountAllowed));  
- 
+        _remoteToken.approve(_vaultAddress, vaultBalance.add(amountAllowed));
+
         return "Vault deposit complete, thank you.";
     }
 
     /**
     * @dev vaultDetails
-    * @return address vaultAddress, 
+    * @return address vaultAddress,
     * @return address remoteContractAddress,
     * @return uint decimals
-     */ 
+     */
     function vaultDetails() external view returns (
-        address vaultAddress,  
-        address remoteContractAddress, 
+        address vaultAddress,
+        address remoteContractAddress,
         uint decimals) {
         vaultAddress = _vaultAddress;
-        remoteContractAddress = _remoteContractAddress;      
+        remoteContractAddress = _remoteContractAddress;
         decimals = _decimals;
     }
 
@@ -901,7 +901,7 @@ contract Vault is ProofOfTrident, ERC20Burnable {
     }
 
     /**
-    @dev myAddress Return address from a sender. 
+    @dev myAddress Return address from a sender.
     Useful for setting allowances
     @return myAddress
      */
@@ -917,4 +917,13 @@ contract Vault is ProofOfTrident, ERC20Burnable {
         balance = _balances[address(this)];
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

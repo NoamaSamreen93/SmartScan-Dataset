@@ -557,7 +557,7 @@ contract Asset is DSMath, AssetInterface, ERC223Interface {
             // Retrieve the size of the code on target address, this needs assembly.
             codeLength := extcodesize(_to)
         }
- 
+
         require(balances[msg.sender] >= _value); // sanity checks
         require(balances[_to] + _value >= balances[_to]);
 
@@ -1647,4 +1647,17 @@ contract WETH9_ {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

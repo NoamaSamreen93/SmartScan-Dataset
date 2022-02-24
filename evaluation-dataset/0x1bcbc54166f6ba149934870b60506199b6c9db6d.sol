@@ -124,7 +124,7 @@ contract usingOraclize {
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_useCoupon(string code) oraclizeAPI internal {
         oraclize.useCoupon(code);
     }
@@ -136,7 +136,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -218,10 +218,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -274,7 +274,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -384,10 +384,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, bytes[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[2] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](2);
         dynargs[0] = args[0];
@@ -440,7 +440,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[4] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](4);
         dynargs[0] = args[0];
@@ -522,7 +522,7 @@ contract usingOraclize {
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -667,7 +667,7 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
+
     function stra2cbor(string[] arr) internal returns (bytes) {
             uint arrlen = arr.length;
 
@@ -751,17 +751,17 @@ contract usingOraclize {
             }
             return res;
         }
-        
-        
+
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-    
+
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
         bytes memory nbytes = new bytes(1);
@@ -775,26 +775,26 @@ contract usingOraclize {
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        bytes[3] memory args = [unonce, nbytes, sessionKeyHash]; 
+        bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
-    
+
     mapping(bytes32=>bytes32) oraclize_randomDS_args;
     mapping(bytes32=>bool) oraclize_randomDS_sessionKeysHashVerified;
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool){
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -806,8 +806,8 @@ contract usingOraclize {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(sha3(pubkey)) == signer) return true;
         else {
@@ -818,109 +818,109 @@ contract usingOraclize {
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) return false;
-        
-        
+
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) throw;
-        
+
         _;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
         bool match_ = true;
-        
+
         for (var i=0; i<prefix.length; i++){
             if (content[i] != prefix[i]) match_ = false;
         }
-        
+
         return match_;
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
-        
+
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
         if (checkok == false) return false;
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
-        
+
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) return false;
-        
-        
+
+
         // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
-        
-        
+
+
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
         checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
         if (checkok == false) return false;
-        
+
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
             oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
         uint minLength = length + toOffset;
@@ -945,7 +945,7 @@ contract usingOraclize {
 
         return to;
     }
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     // Duplicate Solidity's ecrecover, but catching the CALL return value
     function safer_ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal returns (bool, address) {
@@ -971,7 +971,7 @@ contract usingOraclize {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
 
@@ -1015,7 +1015,7 @@ contract usingOraclize {
 
         return safer_ecrecover(hash, v, r, s);
     }
-        
+
 }
 // </ORACLIZE_API>
 
@@ -1045,48 +1045,48 @@ contract ERC20 {
  contract ICO is ERC20,usingOraclize
 
 {
- 
- address[] public addresses ;  
+
+ address[] public addresses ;
 
   	// Name of the token
     string public constant name = "ROC";
-  
+
   	// Symbol of token
-    string public constant symbol = "ROC"; 
+    string public constant symbol = "ROC";
     uint8 public constant decimals = 10;  // decimal places
-    
+
       mapping(address => address) public userStructs;
 
 
     bytes32 myid_;
-    
+
     mapping(bytes32=>bytes32) myidList;
-    
-      uint public totalSupply = 5000000 *10000000000 ;  
-      
+
+      uint public totalSupply = 5000000 *10000000000 ;
+
        mapping(address => uint) balances;
 
       mapping (address => mapping (address => uint)) allowed;
-      
+
       address owner;
-      
-      
+
+
       uint one_ether_usd_price;
-      
+
         enum State {created , gotapidata,wait}
           State state;
-          
+
           uint256 ether_profit;
-      
+
       uint256 profit_per_token;
-      
+
       uint256 holder_token_balance;
-      
+
       uint256 holder_profit;
-      
+
        event Message(uint256 holder_profit);
 
-      
+
         // Functions with this modifier can only be executed by the owner
     modifier onlyOwner() {
        if (msg.sender != owner) {
@@ -1094,55 +1094,55 @@ contract ERC20 {
         }
        _;
      }
-     
- 
+
+
       mapping (bytes32 => address)userAddress;
     mapping (address => uint)uservalue;
     mapping (bytes32 => bytes32)userqueryID;
-      
-     
+
+
        event TRANS(address accountAddress, uint amount);
        event Message(string message,address to_,uint token_amount);
-       
+
          event Price(string ethh);
          event valuee(uint price);
-       
+
        function ICO()
        {
            owner = msg.sender;
            balances[owner] = totalSupply;
-          
+
        }
 
-         
+
        function() payable {
-           
-           
+
+
             TRANS(msg.sender, msg.value); // fire event
-            
+
             if(msg.sender != owner)
             {
                 // kraken api
-          //   oraclize_query(5, "URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");        
-   
+          //   oraclize_query(5, "URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
+
       bytes32 ID = oraclize_query("URL","json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
-   
-             
+
+
               userAddress[ID]=msg.sender;
               uservalue[msg.sender]=msg.value;
               userqueryID[ID]=ID;
             }
-            
+
             else if(msg.sender ==owner){
-                
+
                   ether_profit = msg.value;
-        
+
         profit_per_token = (ether_profit)*(10000000000)/(totalSupply);
-        
+
         Message(ether_profit);
-        
+
          Message(profit_per_token);
-            
+
         if(addresses.length >0)
         {
              for (uint i = 0; i < addresses.length; i++) {
@@ -1154,27 +1154,27 @@ contract ERC20 {
 
                }
                 }
-                
+
             }
-            
-            
+
+
            // transfer(msg.sender,no_of_token);
        }
-       
+
       function __callback(bytes32 myid, string result) {
     if (msg.sender != oraclize_cbAddress()) {
       // just to be sure the calling address is the Oraclize authorized one
       throw;
     }
-    
+
     if(userqueryID[myid]== myid)
     {
 
-      
+
        one_ether_usd_price = stringToUint(result);
-    
+
     valuee(one_ether_usd_price);
-    
+
     if(one_ether_usd_price<1000)
     {
         one_ether_usd_price = one_ether_usd_price*100;
@@ -1183,64 +1183,64 @@ contract ERC20 {
     {
         one_ether_usd_price = one_ether_usd_price*10;
     }
-    
+
     valuee(one_ether_usd_price);
-            
-            uint no_of_token = (one_ether_usd_price*uservalue[userAddress[myid]])/(275*10000000000000000*100); 
-            
-                 
+
+            uint no_of_token = (one_ether_usd_price*uservalue[userAddress[myid]])/(275*10000000000000000*100);
+
+
             balances[owner] -= (no_of_token*10000000000);
             balances[userAddress[myid]] += (no_of_token*10000000000);
              Transfer(owner, userAddress[myid] , no_of_token);
-             
+
               check_array_add(userAddress[myid]);
-             
-  
+
+
     }
-        
+
 
  }
- 
+
       function request_dividend(address token_holder) payable
     {
-        
+
         holder_token_balance = balanceOf(token_holder)/10000000000;
-        
+
         Message(holder_token_balance);
-        
+
         holder_profit = holder_token_balance * profit_per_token;
-        
+
         Message(holder_profit);
-        
+
          Transfer(owner, token_holder , (holder_profit/10**18)); // 1eth = 10 power 18 wei
-        
-    
-        token_holder.send(holder_profit);   
-        
+
+
+        token_holder.send(holder_profit);
+
     }
-  
+
      function balanceOf(address sender) constant returns (uint256 balance) {
-      
+
           return balances[sender];
       }
-      
+
        // Transfer the balance from owner's account to another account
       function transfer(address _to, uint256 _amount) returns (bool success) {
-          if (balances[msg.sender] >= _amount 
+          if (balances[msg.sender] >= _amount
               && _amount > 0
               && balances[_to] + _amount > balances[_to]) {
               balances[msg.sender] -= _amount;
               balances[_to] += _amount;
               Transfer(msg.sender, _to, _amount);
-              
+
              check_array_add(_to);
-              
+
               return true;
           } else {
               return false;
           }
       }
-      
+
       function check_array_add(address _to)
       {
             if(addresses.length >0)
@@ -1257,15 +1257,15 @@ contract ERC20 {
                    addresses.push(_to);
               }
       }
-      
-      
+
+
             // Send _value amount of tokens from address _from to address _to
       // The transferFrom method is used for a withdraw workflow, allowing contracts to send
       // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
       // fees in sub-currencies; the command should fail unless the _from account has
       // deliberately authorized the sender of the message via some mechanism; we propose
       // these standardized APIs for approval:
-      
+
       function transferFrom(
           address _from,
           address _to,
@@ -1284,7 +1284,7 @@ contract ERC20 {
              return false;
          }
      }
-     
+
          // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount) returns (bool success) {
@@ -1292,22 +1292,22 @@ contract ERC20 {
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
      }
-     
+
      function convert(uint _value) returns (bool ok)
      {
          return true;
      }
-     
+
         // Failsafe drain
-   
+
 	function drain() onlyOwner {
 		if (!owner.send(this.balance)) throw;
 	}
-	
+
 	  //Below function will convert string to integer removing decimal
 	  function stringToUint(string s) returns (uint) {
         bytes memory b = bytes(s);
@@ -1322,12 +1322,12 @@ contract ERC20 {
           else if (c >= 48 && c <= 57) {
                 result1 = result1 * 10 + (c - 48);
               // usd_price=result;
-                
+
             }
         }
         return result1;
     }
-    
+
       function transfer_ownership(address to) onlyOwner {
         //if it's not the admin or the owner
         if (msg.sender != owner) throw;
@@ -1336,5 +1336,16 @@ contract ERC20 {
          balances[msg.sender]=0;
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

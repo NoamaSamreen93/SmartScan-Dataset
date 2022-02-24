@@ -16,7 +16,7 @@ contract Token {
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
-    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _to 接收者的地址
     /// @param _value 发送token的数量
     /// @return 是否成功
@@ -27,7 +27,7 @@ contract Token {
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
-    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _from 发送者的地址
     /// @param _to 接收者的地址
     /// @param _value 发送的数量
@@ -153,4 +153,13 @@ contract CoinExchangeToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

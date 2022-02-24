@@ -12,13 +12,13 @@ contract Axioms {
     Airdrop [] public airdrops;
     address owner;
     uint idCounter;
-    
+
     ///@notice  Set the creator of the smart contract to be its sole owner
     constructor () public {
         owner = msg.sender;
     }
-    
-    
+
+
     ///@notice  Modifier to require a minimum amount fo ether for the function to add and airdrop
     modifier minEth {
         require(msg.value >= 2000); //Change this to amount of eth needed for gas fee in GWEI!
@@ -46,7 +46,7 @@ contract Axioms {
    string _name,
    uint _countDown,
    address  _smartContract
-   
+
    )
    public
    minEth
@@ -108,7 +108,7 @@ contract Axioms {
         } else revert("Distribution Failed: Coun Down not gone yet");
     }
 
-// Refound tokens back to the to airdrop creator 
+// Refound tokens back to the to airdrop creator
     function refoundTokens(
         uint index,
         address receiver,
@@ -116,23 +116,23 @@ contract Axioms {
     )
         public
         onlyOwner
-    {   
-        
+    {
+
         Airdrop memory airdrop = airdrops[index];
         if(cheackIfAirDropIsUnique(index,receiver,sc)==true){
         airdrop.tokenSC.transfer(airdrop.distributor,airdrop.tokenAmount);
         }else revert();
-        
+
     }
-    
-    // Refound eth left over from Distribution back to the airdrop creator 
+
+    // Refound eth left over from Distribution back to the airdrop creator
       function refoundLeftOverEth (
     uint index,
     uint amount,
     address receiver,
     address sc
     )
-      public 
+      public
       onlyOwner
    {
        Airdrop memory airdrop = airdrops[index];
@@ -140,7 +140,7 @@ contract Axioms {
       airdrop.distributor.transfer(amount);
        }else revert();
    }
-    
+
     ///@notice  Determines whether an aidrop is due to be distributed or not.
     ///@dev Distribution will only occur when a distribute function is called, and passed the correct parameters, it is not the smart contracts job to produce the addresses or determine the ammount
    function timeGone(uint index) private view returns(bool){
@@ -150,16 +150,24 @@ contract Axioms {
           return (true);
       }else return (false);
     }
-    
+
     function cheackIfAirDropIsUnique(uint index, address receiver, address sc) private view returns(bool){
         Airdrop storage airdrop = airdrops[index];
         if(airdrop.uniqueAirdrop[receiver]==sc){
             return true;
         }else return false;
-    
+
     }
     function transferOwnership(address _newOwner) public onlyOwner(){
         require(_newOwner != address(0));
         owner = _newOwner;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

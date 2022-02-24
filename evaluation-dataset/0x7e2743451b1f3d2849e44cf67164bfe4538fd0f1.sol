@@ -1233,18 +1233,18 @@ contract usingOraclize {
 
 
 contract SafeMath {
-    
+
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 	    uint256 c = a + b;
         assert(c >= a);
         return c;
     }
-	
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
-    } 
-	
+    }
+
 	function percent(uint256 value, uint256 _percent) internal pure returns (uint256) {
 		require(_percent >= 0 && _percent <= 100 && value*_percent >= value);
 		return value*_percent/100;
@@ -1256,15 +1256,15 @@ contract Owned {
 	event OwnerTransfer(address indexed recepient, uint256 indexed value);
 
     address[] public owners;
-    mapping (address => address) voteAddOwner;	
+    mapping (address => address) voteAddOwner;
 	mapping (address => Transfer) voteTransferEther;
 	mapping (address => address) voteSuicideContract;
-	
+
 	struct Transfer {
 		address recepient;
 		uint256 value;
 	}
-	
+
 	modifier onlyOwner {
 		bool isOwner = false;
 		for (uint256 i = 0; i < owners.length; ++i) {
@@ -1276,7 +1276,7 @@ contract Owned {
 		require(isOwner);
 		_;
 	}
-	
+
 	function addOwner(address newOwner) public onlyOwner {
 	    for (uint256 i = 0; i < owners.length; ++i) {
 		    require(newOwner != owners[i]);
@@ -1289,11 +1289,11 @@ contract Owned {
 		}
 		owners.push(newOwner);
 	}
-	
+
 	function transferEther(address recepient, uint256 value) public onlyOwner {
 		voteTransferEther[msg.sender] = Transfer(recepient, value);
 		for (uint256 i = 0; i < owners.length; ++i) {
-			if (recepient != voteTransferEther[owners[i]].recepient 
+			if (recepient != voteTransferEther[owners[i]].recepient
 			 || value != voteTransferEther[owners[i]].value) {
 				return;
 			}
@@ -1301,7 +1301,7 @@ contract Owned {
 		OwnerTransfer(recepient, value);
 		recepient.transfer(value);
 	}
-	
+
 	function suicideContract(address recepient) public onlyOwner {
 		voteSuicideContract[msg.sender] = recepient;
 		for (uint256 i = 0; i < owners.length; ++i) {
@@ -1322,39 +1322,39 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 	uint256 public minBet;
     uint256 public totalBets = 0;
     uint256 public totalWeiWon = 0;
-    uint256 public totalWeiWagered = 0; 
+    uint256 public totalWeiWagered = 0;
     address[] public totalPlayers;
-	
+
 	struct Bet {
 		uint256 number;
 		uint256 value;
 		address player;
 		uint256 index;
 	}
-	
+
 	struct Player {
 		address affiliate;
 		uint256 withdrawal;
 		bytes32[] activeBets;
 	}
-	
+
 	mapping (bytes32 => Bet) bets;
 	mapping (address => Player) players;
-	
+
 	event TransferFail(address indexed playerAddress, uint256 value);
 	event PlayerWithdraw(address indexed playerAddress, uint256 value);
 	event PlayerRefund(bytes32 indexed betId, address indexed playerAddress, uint256 value);
 	event AffiliateResult(address indexed affiliateAddress, address indexed playerAddress, uint256 value);
 	event PlayerBet(bytes32 indexed betId, address indexed playerAddress, uint256 playerValue, uint256 playerNumber);
 	event PlayerResult(bytes32 indexed betId, address indexed playerAddress, uint256 playerValue, uint256 playerNumber, uint256 houseValue, uint256 houseNumber);
-	
+
     /*
      * init
     */
     function BigFishRoll() public
     {
         owners.push(msg.sender);
-		oraclize_setNetwork(networkID_auto); 
+		oraclize_setNetwork(networkID_auto);
 		oraclize_setProof(proofType_Ledger);
 		oraclize_setCustomGasPrice(20000000000 wei);
 		setGasForOraclize(250000);
@@ -1363,12 +1363,12 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		setAffiliateEdge(1);
 		setGameActive(true);
 	}
-	
+
 	function playerRoll(uint256 number, address affiliate) external payable
-    {   
+    {
 		require(gameActive);
 		require(getProfit(msg.value, number) <= getMaxProfit());
-        
+
 		if (players[msg.sender].affiliate == address(0)) {
 			if (affiliate != address(0)) {
 				players[msg.sender] = Player(affiliate, 0, new bytes32[](0));
@@ -1381,26 +1381,26 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 			}
 			totalPlayers.push(msg.sender);
 		}
-		
+
 	    bytes32 queryId = oraclize_newRandomDSQuery(0, 7, totalWeiWon != 0 ? gasForOraclize : add(gasForOraclize, 75000));
 		bets[queryId] = Bet(number, msg.value, msg.sender, sub(players[msg.sender].activeBets.push(queryId),1));
 		PlayerBet(queryId, msg.sender, msg.value, number);
-	}		 
-			 
-    function __callback(bytes32 myid, string result, bytes proof) public 
-	{  
+	}
+
+    function __callback(bytes32 myid, string result, bytes proof) public
+	{
 	    require(msg.sender == oraclize_cbAddress());
 		require(bets[myid].value != 0);
 		Bet memory current = bets[myid];
 		deleteBetFromActive(bets[myid]);
 		delete bets[myid];
-		
-		uint256 houseNumber = uint256(keccak256(result)) % 100 + 1;
-		
-		totalBets += 1;
-        totalWeiWagered += current.value;                                                           
 
-		if(oraclize_randomDS_proofVerify__returnCode(myid, result, proof) != 0 || houseNumber == 0 || current.number == 0) {                                                     
+		uint256 houseNumber = uint256(keccak256(result)) % 100 + 1;
+
+		totalBets += 1;
+        totalWeiWagered += current.value;
+
+		if(oraclize_randomDS_proofVerify__returnCode(myid, result, proof) != 0 || houseNumber == 0 || current.number == 0) {
             PlayerRefund(myid, current.player, current.value);
             if(!current.player.send(current.value)){
 				TransferFail(current.player, current.value);
@@ -1408,43 +1408,43 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
             }
             return;
         }
-        
-		if(houseNumber < current.number){ 
+
+		if(houseNumber < current.number){
             totalWeiWon = add(totalWeiWon, getProfit(current.value, current.number));
             if (players[current.player].affiliate == current.player) {
 				uint256 profit = getProfit(current.value, current.number);
 				PlayerResult(myid, current.player, current.value, current.number, profit, houseNumber);
 				if(!current.player.send(add(profit, current.value))) {
 					TransferFail(current.player, add(profit, current.value));
-					players[current.player].withdrawal = add(players[current.player].withdrawal, add(profit, current.value));					                              
+					players[current.player].withdrawal = add(players[current.player].withdrawal, add(profit, current.value));
 				}
 			} else {
 				profit = percent(getProfit(current.value, current.number), sub(100, affiliateEdge));
 				PlayerResult(myid, current.player, current.value, current.number, profit, houseNumber);
 				if(!current.player.send(add(profit, current.value))) {
 					TransferFail(current.player, add(profit, current.value));
-					players[current.player].withdrawal = add(players[current.player].withdrawal, add(profit, current.value));					                              
+					players[current.player].withdrawal = add(players[current.player].withdrawal, add(profit, current.value));
 				}
 				profit = percent(getProfit(current.value, current.number), affiliateEdge);
 				AffiliateResult(players[current.player].affiliate, current.player, profit);
 				if(!players[current.player].affiliate.send(profit)) {
 					TransferFail(players[current.player].affiliate, profit);
-					players[players[current.player].affiliate].withdrawal = add(players[players[current.player].affiliate].withdrawal, profit);					                              
+					players[players[current.player].affiliate].withdrawal = add(players[players[current.player].affiliate].withdrawal, profit);
 				}
 			}
 			return;
         }
 
 		if(houseNumber >= current.number){
-            PlayerResult(myid, current.player, current.value, current.number, 1, houseNumber);          			
+            PlayerResult(myid, current.player, current.value, current.number, 1, houseNumber);
             if(!current.player.send(1)){
 				TransferFail(current.player, 1);
-                players[current.player].withdrawal = add(players[current.player].withdrawal, 1);                                
-            }                                   
+                players[current.player].withdrawal = add(players[current.player].withdrawal, 1);
+            }
             return;
         }
     }
-	
+
 	function withdrawToPlayer(address player) public returns (bool)
 	{
 		if(players[player].withdrawal == 0) return false;
@@ -1458,21 +1458,21 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return true;
 	}
-	
-    function playerWithdraw() external 
+
+    function playerWithdraw() external
 	{
 		require(withdrawToPlayer(msg.sender));
     }
-	
+
 	function withdrawAllPlayers() external onlyOwner
 	{
 		require(getTotalWithdraws() < address(this).balance);
-		for(uint256 i = 0; i < totalPlayers.length; ++i) 
+		for(uint256 i = 0; i < totalPlayers.length; ++i)
 		{
 			withdrawToPlayer(totalPlayers[i]);
 		}
 	}
-	
+
 	function refundBet(address player, bytes32 betId) internal returns (bool)
 	{
 		if(betId == 0 || bets[betId].value == 0) return false;
@@ -1487,7 +1487,7 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return true;
 	}
-	
+
 	function refundAll(address player) internal returns (bool)
 	{
 		if(players[player].activeBets.length == 0) return false;
@@ -1509,17 +1509,17 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return true;
 	}
-	
+
 	function playerRefundBet(bytes32 betId) external
 	{
 		require(refundBet(msg.sender, betId));
 	}
-	
+
 	function playerRefundAll() external
 	{
 		require(refundAll(msg.sender));
 	}
-	
+
 	function refundAllPlayers() external onlyOwner
 	{
 		require(getTotalRefund() < address(this).balance);
@@ -1527,12 +1527,12 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 			refundAll(totalPlayers[i]);
 		}
 	}
-	
+
 	function refundToPlayer(address player) external onlyOwner
 	{
 		require(refundAll(player));
 	}
-	
+
 	function deleteBetFromActive(Bet bet) internal
 	{
 		players[bet.player].activeBets[bet.index] = players[bet.player].activeBets[players[bet.player].activeBets.length - 1];
@@ -1540,23 +1540,23 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		delete players[bet.player].activeBets[players[bet.player].activeBets.length - 1];
 		--players[bet.player].activeBets.length;
 	}
-	
-	function getProfit(uint256 value, uint256 number) internal constant returns (uint256) 
-	{	
+
+	function getProfit(uint256 value, uint256 number) internal constant returns (uint256)
+	{
 		require(value >= minBet && number >= 2 && number <= 99);
 		return percent(value * (100 - sub(number,1)) / sub(number,1) + value, sub(100, houseEdge)) - value;
 	}
-	
+
 	function getActiveBetsAmount(address player) public constant returns (uint256)
 	{
 		return players[player].activeBets.length;
 	}
-	
+
 	function isBetActive(bytes32 betId) public constant returns (bool)
 	{
 		return players[bets[betId].player].activeBets[bets[betId].index] == betId;
 	}
-	
+
 	function getTotalActiveBets() public constant returns (uint256)
 	{
 		uint256 total = 0;
@@ -1565,7 +1565,7 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return total;
 	}
-	
+
 	function getActiveBetsRefund(address player) public constant returns (uint256)
 	{
 		uint256 total = 0;
@@ -1574,8 +1574,8 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return total;
 	}
-	
-	function getTotalRefund() public constant returns (uint256) 
+
+	function getTotalRefund() public constant returns (uint256)
 	{
 		uint256 total = 0;
 		for(uint256 i = 0; i < totalPlayers.length; ++i) {
@@ -1583,12 +1583,12 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return total;
 	}
-	
-	function getWithdrawAmount(address player) public constant returns (uint256) 
+
+	function getWithdrawAmount(address player) public constant returns (uint256)
 	{
 		return players[player].withdrawal;
 	}
-	
+
 	function getTotalWithdraws() public constant returns (uint256)
 	{
 		uint256 total = 0;
@@ -1597,37 +1597,48 @@ contract BigFishRoll is usingOraclize, SafeMath, Owned {
 		}
 		return total;
 	}
-	
+
 	function getMaxProfit() public constant returns (uint256)
 	{
         return percent(address(this).balance, 1);
-    } 
-    
-	function setMinBet(uint256 newMinBet) public onlyOwner 
+    }
+
+	function setMinBet(uint256 newMinBet) public onlyOwner
 	{
 		minBet = newMinBet;
 	}
-	
-	function setHouseEdge(uint256 newHouseEdge) public onlyOwner 
+
+	function setHouseEdge(uint256 newHouseEdge) public onlyOwner
 	{
 		houseEdge = newHouseEdge;
 	}
-	
-	function setAffiliateEdge(uint256 newAffiliateEdge) public onlyOwner 
+
+	function setAffiliateEdge(uint256 newAffiliateEdge) public onlyOwner
 	{
 		affiliateEdge = newAffiliateEdge;
 	}
-	
+
 	function setGasForOraclize(uint256 newGasForOraclize) public onlyOwner
 	{
     	gasForOraclize = newGasForOraclize;
     }
-	
-    function setGameActive(bool newGameState) public onlyOwner 
+
+    function setGameActive(bool newGameState) public onlyOwner
 	{
 		gameActive = newGameState;
 	}
-	
-	function () public payable 
+
+	function () public payable
 	{}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

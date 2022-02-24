@@ -43,7 +43,7 @@ contract Ownable {
 	* @return True if the address is owner, false if it is not.
 	*/
 	mapping(address => bool) public owners;
-	
+
 	/**
 	* @dev The Ownable constructor adds the sender
 	* account to the owners mapping.
@@ -61,7 +61,7 @@ contract Ownable {
 	}
 
 	/**
-	* @dev Allows the current owners to grant or revoke 
+	* @dev Allows the current owners to grant or revoke
 	* owner-level access rights to the contract.
 	* @param _owner The address to grant or revoke owner rights.
 	* @param _isAllowed Boolean granting or revoking owner rights.
@@ -136,7 +136,7 @@ contract BotOperated is Ownable {
 	}
 
 	/**
-	* @dev Allows the current owners to grant or revoke 
+	* @dev Allows the current owners to grant or revoke
 	* bot-level access rights to the contract.
 	* @param _bot The address to grant or revoke bot rights.
 	* @param _isAllowed Boolean granting or revoking bot rights.
@@ -222,7 +222,7 @@ interface WhitelistData {
  * @notice https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20Standard {
-	
+
 	using SafeMath for uint256;
 
 	EternalDataStorage internal dataStorage;
@@ -296,7 +296,7 @@ contract ERC20Standard {
 	 * @param _to The address of the recipient.
 	 * @param _value The amount to send.
 	 * @return success True if the transfer was successful, or throws.
-	 */    
+	 */
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
 		uint256 allowed = dataStorage.allowed(_from, msg.sender);
 		require(allowed >= _value, 'From account has insufficient balance');
@@ -316,18 +316,18 @@ contract ERC20Standard {
 	 * @param _value The max amount they can spend.
 	 * @return success True if the operation was successful, or false.
 	 */
-	 
+
 	function approve(address _spender, uint256 _value) public returns (bool success) {
 		require
 		(
 			_value == 0 || dataStorage.allowed(msg.sender, _spender) == 0,
 			'Approve value is required to be zero or account has already been approved.'
 		);
-		
+
 		dataStorage.setAllowance(msg.sender, _spender, _value);
-		
+
 		emit Approval(msg.sender, _spender, _value);
-		
+
 		return true;
 	}
 
@@ -341,7 +341,7 @@ contract ERC20Standard {
 	 */
 	function increaseApproval(address _spender, uint256 _addedValue) public {
 		dataStorage.increaseAllowance(msg.sender, _spender, _addedValue);
-		
+
 		emit Approval(msg.sender, _spender, dataStorage.allowed(msg.sender, _spender));
 	}
 
@@ -355,9 +355,9 @@ contract ERC20Standard {
 	 * @param _spender The address which will spend the funds.
 	 * @param _subtractedValue The amount of tokens to decrease the allowance by.
 	 */
-	function decreaseApproval(address _spender, uint256 _subtractedValue) public {		
+	function decreaseApproval(address _spender, uint256 _subtractedValue) public {
 		dataStorage.decreaseAllowance(msg.sender, _spender, _subtractedValue);
-		
+
 		emit Approval(msg.sender, _spender, dataStorage.allowed(msg.sender, _spender));
 	}
 
@@ -417,7 +417,7 @@ contract MintableToken is ERC20Standard, Ownable {
 	bool public mintingFinished = false;
 
 	event Mint(address indexed _to, uint256 _amount);
-	
+
 	event MintFinished();
 
 	modifier canMint() {
@@ -433,9 +433,9 @@ contract MintableToken is ERC20Standard, Ownable {
 	function mint(address _to, uint256 _amount) public onlyOwners canMint() {
 		uint256 totalSupply = dataStorage.totalSupply();
 		totalSupply = totalSupply.add(_amount);
-		
+
 		require(totalSupply <= MINTING_HARDCAP, 'Total supply of token in circulation must be below hardcap.');
-		
+
 		dataStorage.setTotalSupply(totalSupply);
 
 		uint256 toBalance = dataStorage.balances(_to);
@@ -465,7 +465,7 @@ contract MintableToken is ERC20Standard, Ownable {
 contract BurnableToken is ERC20Standard {
 
 	event Burn(address indexed _burner, uint256 _value);
-	
+
 	/**
 	 * @dev Remove tokens from the system irreversibly.
 	 * @notice Destroy tokens from your account.
@@ -519,7 +519,7 @@ contract BurnableToken is ERC20Standard {
  * @dev ERC20Standard modified with pausable transfers.
  **/
 contract PausableToken is ERC20Standard, Pausable {
-	
+
 	function transfer(address _to, uint256 _value) public whenNotPaused returns (bool success) {
 		return super.transfer(_to, _value);
 	}
@@ -545,7 +545,7 @@ contract FreezableToken is ERC20Standard, Ownable {
 	 * @dev Allow or prevent target address from sending & receiving tokens.
 	 * @param _target Address to be frozen or unfrozen.
 	 * @param _isFrozen Boolean indicating freeze or unfreeze operation.
-	 */ 
+	 */
 	function freezeAccount(address _target, bool _isFrozen) public onlyOwners {
 		require(_target != address(0), 'Non-zero to-be-frozen-account address required.');
 		dataStorage.setFrozenAccount(_target, _isFrozen);
@@ -555,7 +555,7 @@ contract FreezableToken is ERC20Standard, Ownable {
 	/**
 	 * @dev Checks whether the target is frozen or not.
 	 * @param _target Address to check.
-	 * @return isFrozen A boolean that indicates whether the account is frozen or not. 
+	 * @return isFrozen A boolean that indicates whether the account is frozen or not.
 	 */
 	function isAccountFrozen(address _target) public view returns (bool isFrozen) {
 		return dataStorage.frozenAccounts(_target);
@@ -568,7 +568,7 @@ contract FreezableToken is ERC20Standard, Ownable {
 		assert(!dataStorage.frozenAccounts(_from));
 
 		assert(!dataStorage.frozenAccounts(_to));
-		
+
 		return super._transfer(_from, _to, _value);
 	}
 }
@@ -620,7 +620,7 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 	address public wallet;
 
 	/**
-	* @dev Constructor function that calculates the total supply of tokens, 
+	* @dev Constructor function that calculates the total supply of tokens,
 	* sets the initial sell and buy prices and
 	* passes arguments to base constructors.
 	* @param _dataStorage Address of the Data Storage Contract.
@@ -634,7 +634,7 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 		address _whitelist
 	)
 		ERC20Standard(_dataStorage, _ledger, _whitelist)
-		public 
+		public
 	{
 	}
 
@@ -669,14 +669,14 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 	*/
 	function buy() public payable whenNotPaused isWhitelisted(msg.sender) {
 		uint256 amount = msg.value.mul(1e18);
-		
+
 		amount = amount.div(sellPrice);
 
 		require(amount >= MINIMUM_BUY_AMOUNT, "Buy amount too small");
-		
+
 		_transfer(this, msg.sender, amount);
 	}
-	
+
 	/**
 	* @dev Sell `_amount` tokens at the current buy price.
 	* @param _amount The amount to sell.
@@ -690,7 +690,7 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 
 		require(address(this).balance >= toBeTransferred, 'Contract has insufficient balance.');
 		_transfer(msg.sender, this, _amount);
-		
+
 		msg.sender.transfer(toBeTransferred);
 	}
 
@@ -720,4 +720,8 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 	function nonEtherPurchaseTransfer(address _to, uint256 _value) public isWhitelisted(_to) onlyBots whenNotPaused returns (bool success) {
 		return _transfer(msg.sender, _to, _value);
 	}
+}
+function() payable external {
+	revert();
+}
 }

@@ -236,7 +236,7 @@ contract GATTokenSale is GATToken, GATTokenSaleConfig {
     event TokenFinalized();
     event ContractTokensReclaimed(uint256 amount);
 
-// "0x1a4FBba7231Ec0707925c52b047b951a0BeAA325", "0xa85b419eee304563d3587fe934e932f056ca3c14", "0xa85b419eee304563d3587fe934e932f056ca3c14", "0x587d06eb855811ee987cc842880b9255a3aab45b", 
+// "0x1a4FBba7231Ec0707925c52b047b951a0BeAA325", "0xa85b419eee304563d3587fe934e932f056ca3c14", "0xa85b419eee304563d3587fe934e932f056ca3c14", "0x587d06eb855811ee987cc842880b9255a3aab45b",
     function GATTokenSale(address _bankAddress, address _fundingAddress, address _reserve1Address, address _reserve2Address) public
         GATToken(SYMBOL, NAME, DECIMALS, 0)
     {
@@ -533,4 +533,20 @@ contract GATTokenSale is GATToken, GATTokenSaleConfig {
 
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

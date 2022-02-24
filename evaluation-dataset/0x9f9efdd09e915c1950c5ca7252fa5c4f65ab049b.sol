@@ -93,7 +93,7 @@ interface IERC20 {
  * All the operations are done using the smallest and indivisible token unit,
  * just as on Ethereum all the operations are done in wei.
  */
- 
+
 contract ERC20Detailed is IERC20 {
     string private _name;
     string private _symbol;
@@ -327,4 +327,13 @@ contract GOLDRUBLE is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("GOLD RUBLE", "GRUB", 18) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

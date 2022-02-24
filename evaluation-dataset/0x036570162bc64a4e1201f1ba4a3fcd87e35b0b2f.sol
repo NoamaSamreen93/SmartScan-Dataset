@@ -939,7 +939,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   function forbidDeploy(address beneficiary) external onlyProxyOwner {
     require(beneficiary != address(0), "invalid address");
     require(authorizedDeploy[beneficiary], "address is already forbidden");
-    
+
     authorizedDeploy[beneficiary] = false;
     emit DeployForbidden(msg.sender, beneficiary);
   }
@@ -1297,4 +1297,15 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     assembly { size := extcodesize(addr) }
     return size > 0;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

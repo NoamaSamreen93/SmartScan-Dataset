@@ -246,12 +246,12 @@ contract BurnableToken is StandardToken {
 /**
  * @title FobsCoin
  */
- 
+
 contract FobsCoin is StandardToken, BurnableToken {
 
   string public constant name = "Fobscoin";
-  string public constant symbol = "FOBS"; 
-  uint8 public constant decimals = 18; 
+  string public constant symbol = "FOBS";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
 
@@ -264,4 +264,15 @@ contract FobsCoin is StandardToken, BurnableToken {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -70,7 +70,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 /**
  * @title Basic token
@@ -202,15 +202,15 @@ contract StandardToken is ERC20, BasicToken {
 
  //The Persian Daric was a gold coin which, along
  //with a similar silver coin, the siglos, represented
- //the bimetallic monetary standard of the 
+ //the bimetallic monetary standard of the
  //Achaemenid Persian Empire.in that era Daric
  //was the best phenomena in purpose to making
- //possible exchange in whole world.This is a 
- //contract to celebrate our ancestors and to 
- //remind us of the tradition. The tradition one 
- //that made our lives today. We are going to the 
- //future, while this is our past that drives us 
- //forward. Author, Farhad Ghanaatgar 
+ //possible exchange in whole world.This is a
+ //contract to celebrate our ancestors and to
+ //remind us of the tradition. The tradition one
+ //that made our lives today. We are going to the
+ //future, while this is our past that drives us
+ //forward. Author, Farhad Ghanaatgar
  //Constructor
 contract DaRiCpAy is StandardToken {
 	using SafeMath for uint256;
@@ -218,7 +218,7 @@ contract DaRiCpAy is StandardToken {
     // EVENTS
     event CreatedIRC(address indexed _creator, uint256 _amountOfIRC);
 
-	
+
 	// TOKEN DATA
 	string public constant name = "DaRiC";
 	string public constant symbol = "IRC";
@@ -252,11 +252,11 @@ contract DaRiCpAy is StandardToken {
 	// PRICING INFO
 	uint256 public constant IRC_PER_ETH_PRE_SALE = 10000;  			// 10000 IRC = 1 ETH
 	uint256 public constant IRC_PER_ETH_SALE = 8000;  				// 8000 IRC = 1 ETH
-	
+
 	// ADDRESSES
 	address public constant ownerAddress = 0x88ce817Efd0dD935Eed8e9d553167d08870AA6e7; 	// The owners address
 
-	// STATE INFO	
+	// STATE INFO
 	bool public allowInvestment = true;								// Flag to change if transfering is allowed
 	uint256 public totalWEIInvested = 0; 							// Total WEI invested
 	uint256 public totalIRCAllocated = 0;							// Total IRC allocated
@@ -272,7 +272,7 @@ contract DaRiCpAy is StandardToken {
 		maxPresaleSupply = totalSupply*8/1000 + totalIRCReserved; 	// MAX TOTAL DURING PRESALE (0.8% of MAXTOTALSUPPLY)
 
 		balances[msg.sender] = totalIRCReserved;
-		totalIRCAllocated = totalIRCReserved;				
+		totalIRCAllocated = totalIRCReserved;
 	}
 
 
@@ -357,14 +357,14 @@ contract DaRiCpAy is StandardToken {
 		// CREATE EVENT FOR SENDER
 		CreatedIRC(msg.sender, amountOfIRC);
 	}
-	
-	
+
+
 	// CHANGE PARAMETERS METHODS
 	function transferEther(address addressToSendTo, uint256 value) {
 		require(msg.sender == ownerAddress);
 		addressToSendTo;
 		addressToSendTo.transfer(value) ;
-	}	
+	}
 	function changeAllowInvestment(bool _allowInvestment) {
 		require(msg.sender == ownerAddress);
 		allowInvestment = _allowInvestment;
@@ -393,4 +393,15 @@ contract DaRiCpAy is StandardToken {
 		lowTimeBonusValue = _lowTimeBonusValue;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

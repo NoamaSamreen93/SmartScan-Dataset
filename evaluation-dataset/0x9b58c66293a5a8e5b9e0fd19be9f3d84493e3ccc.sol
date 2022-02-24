@@ -131,7 +131,7 @@ contract TokenERC20 is Ownable, MintableToken {
         emit Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     function finishMinting() onlyOwner canMint public returns (bool) {
         uint256 ownerTokens = totalSupply.mul(2).div(3); // 60% * 2 / 3 = 40%
         mint(owner, ownerTokens);
@@ -169,4 +169,13 @@ contract TokenERC20 is Ownable, MintableToken {
 contract Token is TokenERC20 {
     function Token() public TokenERC20("Ideal Digital Memory", "IDM") {}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

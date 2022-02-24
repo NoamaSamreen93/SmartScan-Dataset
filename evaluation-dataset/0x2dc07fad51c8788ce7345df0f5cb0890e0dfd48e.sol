@@ -164,7 +164,7 @@ contract Vault is VaultI, Ownable {
     enum State { Active, Success, Refunding, Closed }
 
     // The timestamp of the first deposit
-    uint256 public firstDepositTimestamp; 
+    uint256 public firstDepositTimestamp;
 
     mapping (address => uint256) public deposited;
 
@@ -180,7 +180,7 @@ contract Vault is VaultI, Ownable {
 
     // Timestamp that has to pass before sending funds to the wallet
     uint256 public nextDisbursement;
-    
+
     // Total amount that was deposited
     uint256 public totalDeposited;
 
@@ -203,8 +203,8 @@ contract Vault is VaultI, Ownable {
         uint256 _initialWei,
         uint256 _disbursementWei,
         uint256 _disbursementDuration
-    ) 
-        public 
+    )
+        public
     {
         require(_wallet != address(0), "Wallet address should not be 0.");
         require(_disbursementWei != 0, "Disbursement Wei should be greater than 0.");
@@ -227,8 +227,8 @@ contract Vault is VaultI, Ownable {
 
     /// @dev Sends initial funds to the wallet.
     function saleSuccessful()
-        onlyOwner 
-        external 
+        onlyOwner
+        external
         atState(State.Active)
     {
         state = State.Success;
@@ -401,10 +401,10 @@ contract Whitelistable is WhitelistableI, Ownable {
     /// @dev Constructor for Whitelistable contract
     /// @param _admin the address of the admin that will generate the signatures
     constructor(address _admin) public validAdmin(_admin) {
-        whitelistAdmin = _admin;        
+        whitelistAdmin = _admin;
     }
 
-    /// @dev Updates whitelistAdmin address 
+    /// @dev Updates whitelistAdmin address
     /// @dev Can only be called by the current owner
     /// @param _admin the new admin address
     function changeAdmin(address _admin)
@@ -417,7 +417,7 @@ contract Whitelistable is WhitelistableI, Ownable {
     }
 
     // @dev blacklists the given address to ban them from contributing
-    // @param _contributor Address of the contributor to blacklist 
+    // @param _contributor Address of the contributor to blacklist
     function invalidateHash(bytes32 _hash) external onlyAdmin {
         invalidHash[_hash] = true;
     }
@@ -450,14 +450,14 @@ contract Whitelistable is WhitelistableI, Ownable {
 interface EthPriceFeedI {
     function getUnit() external view returns(string);
     function getRate() external view returns(uint256);
-    function getLastTimeUpdated() external view returns(uint256); 
+    function getLastTimeUpdated() external view returns(uint256);
 }
 
 // File: @tokenfoundry/state-machine/contracts/StateMachine.sol
 
 contract StateMachine {
 
-    struct State { 
+    struct State {
         bytes32 nextStateId;
         mapping(bytes4 => bool) allowedFunctions;
         function() internal[] transitionCallbacks;
@@ -471,7 +471,7 @@ contract StateMachine {
 
     event Transition(bytes32 stateId, uint256 blockNumber);
 
-    /* This modifier performs the conditional transitions and checks that the function 
+    /* This modifier performs the conditional transitions and checks that the function
      * to be executed is allowed in the current State
      */
     modifier checkAllowed {
@@ -481,9 +481,9 @@ contract StateMachine {
     }
 
     ///@dev transitions the state machine into the state it should currently be in
-    ///@dev by taking into account the current conditions and how many further transitions can occur 
+    ///@dev by taking into account the current conditions and how many further transitions can occur
     function conditionalTransitions() public {
-        bool checkNextState; 
+        bool checkNextState;
         do {
             checkNextState = false;
 
@@ -496,7 +496,7 @@ contract StateMachine {
                     checkNextState = true;
                     break;
                 }
-            } 
+            }
         } while (checkNextState);
     }
 
@@ -527,8 +527,8 @@ contract StateMachine {
     /// @dev Allow a function in the given state.
     /// @param _stateId The id of the state
     /// @param _functionSelector A function selector (bytes4[keccak256(functionSignature)])
-    function allowFunction(bytes32 _stateId, bytes4 _functionSelector) 
-        internal 
+    function allowFunction(bytes32 _stateId, bytes4 _functionSelector)
+        internal
     {
         states[_stateId].allowedFunctions[_functionSelector] = true;
     }
@@ -546,32 +546,32 @@ contract StateMachine {
         emit Transition(next, block.number);
     }
 
-    ///@dev Add a function returning a boolean as a start condition for a state. 
+    ///@dev Add a function returning a boolean as a start condition for a state.
     /// If any condition returns true, the StateMachine will transition to the next state.
     /// If s.startConditions is empty, the StateMachine will need to enter state s through invoking
-    /// the goToNextState() function. 
+    /// the goToNextState() function.
     /// A start condition should never throw. (Otherwise, the StateMachine may fail to enter into the
     /// correct state, and succeeding start conditions may return true.)
-    /// A start condition should be gas-inexpensive since every one of them is invoked in the same call to 
-    /// transition the state. 
+    /// A start condition should be gas-inexpensive since every one of them is invoked in the same call to
+    /// transition the state.
     ///@param _stateId The ID of the state to add the condition for
     ///@param _condition Start condition function - returns true if a start condition (for a given state ID) is met
     function addStartCondition(
         bytes32 _stateId,
         function(bytes32) internal returns(bool) _condition
-    ) 
-        internal 
+    )
+        internal
     {
         states[_stateId].startConditions.push(_condition);
     }
 
-    ///@dev Add a callback function for a state. All callbacks are invoked immediately after entering the state. 
+    ///@dev Add a callback function for a state. All callbacks are invoked immediately after entering the state.
     /// Callback functions should never throw. (Otherwise, the StateMachine may fail to enter a state.)
     /// Callback functions should also be gas-inexpensive as all callbacks are invoked in the same call to enter the state.
     ///@param _stateId The ID of the state to add a callback function for
     ///@param _callback The callback function to add
     function addCallback(bytes32 _stateId, function() internal _callback)
-        internal 
+        internal
     {
         states[_stateId].transitionCallbacks.push(_callback);
     }
@@ -593,8 +593,8 @@ contract TimedStateMachine is StateMachine {
         return startTime[_stateId];
     }
 
-    /// @dev Sets the starting timestamp for a state as a startCondition. If other start conditions exist and are 
-    /// met earlier, then the state may be entered into earlier than the specified start time. 
+    /// @dev Sets the starting timestamp for a state as a startCondition. If other start conditions exist and are
+    /// met earlier, then the state may be entered into earlier than the specified start time.
     /// @param _stateId The id of the state for which we want to set the start timestamp.
     /// @param _timestamp The start timestamp for the given state. It should be bigger than the current one.
     function setStateStartTime(bytes32 _stateId, uint256 _timestamp) internal {
@@ -624,7 +624,7 @@ contract TokenControllerI {
     /// @return True if the transfer is allowed
     function transferAllowed(address _from, address _to)
         external
-        view 
+        view
         returns (bool);
 }
 
@@ -839,13 +839,13 @@ contract StandardToken is ERC20, BasicToken {
  * @title Controllable ERC20 token
  *
  * @dev Token that queries a token controller contract to check if a transfer is allowed.
- * @dev controller state var is going to be set with the address of a TokenControllerI contract that has 
+ * @dev controller state var is going to be set with the address of a TokenControllerI contract that has
  * implemented transferAllowed() function.
  */
 contract ControllableToken is Ownable, StandardToken {
     TokenControllerI public controller;
 
-    /// @dev Executes transferAllowed() function from the Controller. 
+    /// @dev Executes transferAllowed() function from the Controller.
     modifier isAllowed(address _from, address _to) {
         require(controller.transferAllowed(_from, _to), "Token Controller does not permit transfer.");
         _;
@@ -859,7 +859,7 @@ contract ControllableToken is Ownable, StandardToken {
 
     /// @dev It calls parent BasicToken.transfer() function. It will transfer an amount of tokens to an specific address
     /// @return True if the token is transfered with success
-    function transfer(address _to, uint256 _value) 
+    function transfer(address _to, uint256 _value)
         isAllowed(msg.sender, _to)
         public
         returns (bool)
@@ -867,11 +867,11 @@ contract ControllableToken is Ownable, StandardToken {
         return super.transfer(_to, _value);
     }
 
-    /// @dev It calls parent StandardToken.transferFrom() function. It will transfer from an address a certain amount of tokens to another address 
-    /// @return True if the token is transfered with success 
+    /// @dev It calls parent StandardToken.transferFrom() function. It will transfer from an address a certain amount of tokens to another address
+    /// @return True if the token is transfered with success
     function transferFrom(address _from, address _to, uint256 _value)
-        isAllowed(_from, _to) 
-        public 
+        isAllowed(_from, _to)
+        public
         returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
@@ -982,7 +982,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
 
     Token public trustedToken;
     Vault public trustedVault;
-    EthPriceFeedI public ethPriceFeed; 
+    EthPriceFeedI public ethPriceFeed;
 
     event Contribution(
         address indexed contributor,
@@ -1008,11 +1008,11 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         uint256 _startTime,
         string _tokenName,
         string _tokenSymbol,
-        uint8 _tokenDecimals, 
+        uint8 _tokenDecimals,
         EthPriceFeedI _ethPriceFeed
-    ) 
+    )
         Whitelistable(_whitelistAdmin)
-        public 
+        public
     {
         require(_totalSaleCapUnits != 0, "Total sale cap units must be > 0");
         require(_maxTokens != 0, "The maximum number of tokens must be > 0");
@@ -1033,12 +1033,12 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
             _tokenDecimals
         );
 
-        ethPriceFeed = _ethPriceFeed; 
+        ethPriceFeed = _ethPriceFeed;
 
         // The token will query the isTransferAllowed function contained in this contract
         trustedToken.setController(this);
 
-        trustedToken.transferOwnership(owner); 
+        trustedToken.transferOwnership(owner);
 
         trustedVault = new Vault(
             _wallet,
@@ -1077,7 +1077,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         goToNextState();
     }
 
-    /// @dev To change the EthPriceFeed contract if needed 
+    /// @dev To change the EthPriceFeed contract if needed
     function changeEthPriceFeed(EthPriceFeedI _ethPriceFeed) external onlyOwner {
         require(_ethPriceFeed != address(0), "ETH price feed address cannot be 0");
         emit EthPriceFeedChanged(ethPriceFeed, _ethPriceFeed);
@@ -1087,30 +1087,30 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
     /// @dev Called by users to contribute ETH to the sale.
     function contribute(
         address _contributor,
-        uint256 _contributionLimitUnits, 
+        uint256 _contributionLimitUnits,
         uint256 _payloadExpiration,
         bytes _sig
-    ) 
-        external 
+    )
+        external
         payable
-        checkAllowed 
+        checkAllowed
         isWhitelisted(keccak256(
             abi.encodePacked(
                 _contributor,
-                _contributionLimitUnits, 
+                _contributionLimitUnits,
                 _payloadExpiration
             )
         ), _sig)
     {
         require(msg.sender == _contributor, "Contributor address different from whitelisted address");
-        require(now < _payloadExpiration, "Payload has expired"); 
+        require(now < _payloadExpiration, "Payload has expired");
 
-        uint256 weiPerUnitRate = ethPriceFeed.getRate(); 
+        uint256 weiPerUnitRate = ethPriceFeed.getRate();
         require(weiPerUnitRate != 0, "Wei per unit rate from feed is 0");
 
         uint256 previouslyContributedUnits = unitContributions[_contributor];
 
-        // Check that the contribution amount doesn't go over the sale cap or personal contributionLimitUnits 
+        // Check that the contribution amount doesn't go over the sale cap or personal contributionLimitUnits
         uint256 currentContributionUnits = min256(
             _contributionLimitUnits.sub(previouslyContributedUnits),
             totalSaleCapUnits.sub(totalContributedUnits),
@@ -1142,10 +1142,10 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         }
 
         emit Contribution(
-            _contributor, 
+            _contributor,
             msg.sender,
-            currentContributionUnits, 
-            currentContributionWei, 
+            currentContributionUnits,
+            currentContributionWei,
             excessWei,
             weiPerUnitRate
         );
@@ -1179,7 +1179,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
     {
         return _from == address(this);
     }
-   
+
     /// @dev Returns true if the cap was reached.
     function wasCapReached(bytes32) internal returns (bool) {
         return totalSaleCapUnits <= totalContributedUnits;
@@ -1191,7 +1191,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         if (totalContributedUnits == 0 && minThresholdUnits == 0) {
             return;
         }
-        
+
         if (totalContributedUnits < minThresholdUnits) {
             trustedVault.enableRefunds();
         } else {
@@ -1217,7 +1217,7 @@ contract CivilSale is Sale {
     uint256 public saleTokensPerUnit = 36000000 * (10**18) / 24000000;
     uint256 public extraTokensPerUnit = 0;
 
-    constructor() 
+    constructor()
         Sale(
             24000000, // Total sale cap (usd)
             10, // Min contribution (usd)
@@ -1234,7 +1234,7 @@ contract CivilSale is Sale {
             18, // Token decimals
             EthPriceFeedI(0x54bF24e1070784D7F0760095932b47CE55eb3A91) // Eth price feed
         )
-        public 
+        public
     {
     }
 
@@ -1246,4 +1246,15 @@ contract CivilSale is Sale {
         return _from == WALLET || _from == address(this);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -439,7 +439,7 @@ contract PriceOracleInterface {
         owner = _owner;
         priceFeedSource = _priceFeedSource;
     }
-    
+
     /// @dev gives the owner the possibility to put the Interface into an emergencyMode, which will
     /// output always a price of 600 USD. This gives everyone time to set up a new pricefeed.
     function raiseEmergency(bool _emergencyMode) public onlyOwner {
@@ -472,8 +472,17 @@ contract PriceOracleInterface {
             return 1;
         }
         if (priceUint > 1000000) {
-            return 1000000; 
+            return 1000000;
         }
         return priceUint;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

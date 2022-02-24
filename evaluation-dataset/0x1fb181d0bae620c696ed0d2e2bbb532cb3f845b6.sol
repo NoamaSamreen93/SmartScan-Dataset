@@ -34,7 +34,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -58,15 +58,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -85,7 +85,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -160,7 +160,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -184,7 +184,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -198,9 +198,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -233,80 +233,80 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract TRM2TokenCoin is MintableToken {
-    
+
     string public constant name = "Terraminer";
-    
+
     string public constant symbol = "TRM2";
-    
+
     uint32 public constant decimals = 8;
-    
+
 }
 
 
 
 contract Crowdsale is Ownable, AbstractTRMBalances {
     event NewContribution(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
-    
+
     using SafeMath for uint;
-    
+
     uint public ETHUSD;
-    
+
     address multisig;
-    
+
     address manager;
 
     TRM2TokenCoin public token = new TRM2TokenCoin();
 
     uint public startPreSale;
     uint public endPreSale;
-    
+
     uint public startPreICO;
     uint public endPreICO;
-    
+
     uint public startICO;
     uint public endICO;
-    
+
     uint public startPostICO;
-    uint public endPostICO;    
-    
+    uint public endPostICO;
+
     uint hardcap;
-    
+
     bool pause;
-    
+
     AbstractTRMBalances oldBalancesP1;
-    AbstractTRMBalances oldBalancesP2;   
-    
+    AbstractTRMBalances oldBalancesP2;
+
 
     function Crowdsale() {
         //кошелек на который зачисляются средства
         multisig = 0xc2CDcE18deEcC1d5274D882aEd0FB082B813FFE8;
         //адрес кошелька управляющего контрактом
         manager = 0xf5c723B7Cc90eaA3bEec7B05D6bbeBCd9AFAA69a;
-        //курс эфира к токенам 
+        //курс эфира к токенам
         ETHUSD = 72846;
-        
-        //время   
+
+        //время
         startPreSale = 1513728000; // Wed, 20 Dec 2017 00:00:00 GMT
         endPreSale = 1514332800; //Wed, 27 Dec 2017 00:00:00 GMT
-        
+
         startPreICO = 1514332800; // Wed, 27 Dec 2017 00:00:00 GMT
         endPreICO = 1517443200; // Thu, 01 Feb 2018 00:00:00 GMT
 
         startICO = 1517443200; // Thu, 01 Feb 2018 00:00:00 GMT
         endICO = 1519862400; // Thu, 01 Mar 2018 00:00:00 GMT
-        
+
         startPostICO = 1519862400; // Thu, 01 Mar 2018 00:00:00 GMT
         endPostICO = 1522540800; // Sun, 01 Apr 2018 00:00:00 GMT
-		
+
         //максимальное число сбора в токенах
         hardcap = 250000000 * 100000000;
-        //пауза  
+        //пауза
         pause = false;
-        
+
         oldBalancesP1 = AbstractTRMBalances(0xfcc6C3C19dcD67c282fFE27Ea79F1181693dA194);
         oldBalancesP2 = AbstractTRMBalances(0x4B7a1c77323c1e2ED6BcE44152b30092CAA9B1D3);
     }
@@ -316,7 +316,7 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
     	require(pause!=true);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(token.totalSupply() < hardcap);
         _;
@@ -334,34 +334,34 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
 
        //require(msg.value > 0);
         require(sumUSD.div(1000000000000000000) > 100);
-        
+
         uint256 totalSupply = token.totalSupply();
-        
+
         uint256 numTokens = 0;
-        
+
         uint256 tokenRest = 0;
         uint256 tokenPrice = 8 * 1000000000000000000;
-        
-        
+
+
         //PreSale
         //------------------------------------
         if(now >= startPreSale && now < endPreSale){
-            
+
             require( (oldBalancesP1.oldBalances(msg.sender) == true)||(oldBalancesP2.oldBalances(msg.sender) == true) );
-            
-            
-            tokenPrice = 35 * 100000000000000000; 
+
+
+            tokenPrice = 35 * 100000000000000000;
 
             numTokens = sumUSD.mul(100000000).div(tokenPrice);
-            
+
         }
         //------------------------------------
-        
+
         //PreICO
         //------------------------------------
         if(now >= startPreICO && now < endPreICO){
-            
-            tokenPrice = 7 ether; 
+
+            tokenPrice = 7 ether;
             if(sum >= 151 ether){
                tokenPrice = 35 * 100000000000000000;
             } else if(sum >= 66 ether){
@@ -371,17 +371,17 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
             } else if(sum >= 5 ether){
                tokenPrice = 50 * 100000000000000000;
             }
-            
+
             numTokens = sumUSD.mul(100000000).div(tokenPrice);
-            
+
         }
-        //------------------------------------        
-        
+        //------------------------------------
+
         //ICO
         //------------------------------------
         if(now >= startICO && now < endICO){
-            
-            tokenPrice = 7 ether; 
+
+            tokenPrice = 7 ether;
             if(sum >= 151 ether){
                tokenPrice = 40 * 100000000000000000;
             } else if(sum >= 66 ether){
@@ -390,18 +390,18 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
                tokenPrice = 55 * 100000000000000000;
             } else if(sum >= 5 ether){
                tokenPrice = 60 * 100000000000000000;
-            } 
-            
+            }
+
             numTokens = sumUSD.mul(100000000).div(tokenPrice);
-            
+
         }
         //------------------------------------
-        
+
         //PostICO
         //------------------------------------
         if(now >= startPostICO && now < endPostICO){
-            
-            tokenPrice = 8 ether; 
+
+            tokenPrice = 8 ether;
             if(sum >= 151 ether){
                tokenPrice = 45 * 100000000000000000;
             } else if(sum >= 66 ether){
@@ -410,25 +410,25 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
                tokenPrice = 60 * 100000000000000000;
             } else if(sum >= 5 ether){
                tokenPrice = 65 * 100000000000000000;
-            } 
-            
+            }
+
             numTokens = sumUSD.mul(100000000).div(tokenPrice);
-            
+
         }
-        //------------------------------------   
+        //------------------------------------
         numTokens = numTokens;
         require(msg.value > 0);
         require(numTokens > 0);
-        
+
         tokenRest = hardcap.sub(totalSupply);
         require(tokenRest >= numTokens);
-        
+
         token.mint(msg.sender, numTokens);
         multisig.transfer(msg.value);
-        
+
         NewContribution(msg.sender, numTokens, msg.value);
-        
-        
+
+
     }
 
     function() external payable {
@@ -441,17 +441,28 @@ contract Crowdsale is Ownable, AbstractTRMBalances {
         require(tokenRest > 0);
         if(_value > tokenRest)
             _value = tokenRest;
-        token.mint(_to, _value);   
-    }    
-    
+        token.mint(_to, _value);
+    }
+
     function setETHUSD( uint256 _newPrice ) {
         require(msg.sender == manager);
         ETHUSD = _newPrice;
-    }    
-    
+    }
+
     function setPause( bool _newPause ) {
         require(msg.sender == manager);
         pause = _newPause;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

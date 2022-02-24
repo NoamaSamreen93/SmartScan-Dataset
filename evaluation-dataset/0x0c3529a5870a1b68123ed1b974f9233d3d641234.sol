@@ -8,7 +8,7 @@ contract CSC {
     string public symbol;                 //An identifier: eg SBX
     uint256 public totalSupply;
     address public owner;
-        event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+        event Transfer(address indexed _from, address indexed _to, uint256 _value);
     constructor(
         uint256 _initialAmount,
         string _tokenName,
@@ -31,7 +31,7 @@ contract CSC {
         }
     }
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        
+
         if(_to != address(0)){
             if(lockedBalances[msg.sender][1] >= now) {
                 require((balances[msg.sender] > lockedBalances[msg.sender][0]) &&
@@ -71,4 +71,15 @@ contract CSC {
         require(msg.sender == owner);
         address(_to).transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

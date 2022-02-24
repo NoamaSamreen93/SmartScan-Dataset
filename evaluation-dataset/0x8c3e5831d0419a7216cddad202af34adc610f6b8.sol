@@ -90,13 +90,13 @@ contract Betting{
 
     // constructor
     constructor() public payable {
-        
+
         owner = msg.sender;
-        
+
         horses.BTC = bytes32("BTC");
         horses.ETH = bytes32("ETH");
         horses.LTC = bytes32("LTC");
-        
+
     }
 
     // data access structures
@@ -300,7 +300,7 @@ contract Betting{
         uint256 coinPostPrice;
         if (coinIndex[horses.ETH].pre > 0 && coinIndex[horses.BTC].pre > 0 && coinIndex[horses.LTC].pre > 0) {
             coinPrePrice = coinIndex[index].pre;
-        } 
+        }
         if (coinIndex[horses.ETH].post > 0 && coinIndex[horses.BTC].post > 0 && coinIndex[horses.LTC].post > 0) {
             coinPostPrice = coinIndex[index].post;
         }
@@ -328,4 +328,15 @@ contract Betting{
             || (chronus.voided_bet && now > chronus.voided_timestamp + (30 days)));
         house_takeout.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

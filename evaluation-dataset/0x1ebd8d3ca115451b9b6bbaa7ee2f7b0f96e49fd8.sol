@@ -78,9 +78,9 @@ contract StandardToken is Token {
 }
 
 contract ArthurStandardToken is StandardToken {
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function ArthurStandardToken(
         uint256 _initialAmount,
@@ -93,7 +93,7 @@ contract ArthurStandardToken is StandardToken {
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
         symbol = _tokenSymbol;                               // Set the symbol for display purposes
-    }	
+    }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -102,4 +102,15 @@ contract ArthurStandardToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

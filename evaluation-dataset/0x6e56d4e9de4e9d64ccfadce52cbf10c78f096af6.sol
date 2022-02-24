@@ -125,7 +125,7 @@ contract SNC is SafeMath, Pausable {
     uint256 public totalSupply;
 
     address public owner;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
@@ -186,4 +186,12 @@ contract SNC is SafeMath, Pausable {
     function() public payable {
         revert();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -49,13 +49,13 @@ contract ProspectorsObligationToken {
         // prospectors_team = _prospectors_team;
         // fundingStartBlock = _fundingStartBlock;
         // fundingEndBlock = _fundingEndBlock;
-        
+
         prospectors_team = 0xCCe6DA2086DD9348010a2813be49E58530852b46;
         migrationMaster = 0xCCe6DA2086DD9348010a2813be49E58530852b46;
         fundingStartBlock = block.number + 10;
         fundingEndBlock = block.number + 50;
         lockedAllocation = new OBGAllocation(prospectors_team);
-        
+
     }
 
     /// @notice Transfer `_value` OBG tokens from sender's account
@@ -205,7 +205,7 @@ contract ProspectorsObligationToken {
         Refund(msg.sender, ethValue);
         if (!msg.sender.send(ethValue)) throw;
     }
-	
+
 	function kill()
 	{
 	    lockedAllocation.kill();
@@ -264,5 +264,16 @@ contract OBGAllocation {
 	function kill()
 	{
 		suicide(0);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

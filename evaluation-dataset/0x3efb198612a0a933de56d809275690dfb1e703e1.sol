@@ -51,7 +51,7 @@ contract ERCX20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract EdelRostenCoin is ERCX20Interface {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -76,11 +76,11 @@ contract EdelRostenCoin is ERCX20Interface {
         balances[owner] = _totalSupply;
         Transfer(address(0), owner, _totalSupply);
     }
-    
+
     function() public payable {
         revert();
     }
-    
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -117,7 +117,7 @@ contract EdelRostenCoin is ERCX20Interface {
     // from the token owner's account
     //
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         if(tokens > 0 && spender != address(0)) {
@@ -130,7 +130,7 @@ contract EdelRostenCoin is ERCX20Interface {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -156,4 +156,15 @@ contract EdelRostenCoin is ERCX20Interface {
         return allowed[tokenOwner][spender];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

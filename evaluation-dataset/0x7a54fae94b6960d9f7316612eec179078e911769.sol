@@ -62,13 +62,13 @@ interface ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
 contract MoviePass is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -164,7 +164,7 @@ contract MoviePass is ERC20, ERC223 {
      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
     function transfer(address _to, uint _value, bytes _data) public {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -185,4 +185,10 @@ contract MoviePass is ERC20, ERC223 {
       return (length>0);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

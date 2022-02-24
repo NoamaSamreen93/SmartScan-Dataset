@@ -244,7 +244,7 @@ contract FTXToken is StandardToken, Ownable {
     address public constant CROSS_RESERVE = 0xED200B7BC7044290c99993341a82a21c4c7725DB;
     address public constant TEAM_RESERVE = 0xfc0Dd77c6bd889819E322FB72D4a86776b1632d5;
 
-    // assuming Feb 28, 2018 5:00 PM UTC(1519837200) + 1 year, may change for production; 
+    // assuming Feb 28, 2018 5:00 PM UTC(1519837200) + 1 year, may change for production;
     uint256 public constant VESTING_DATE = 1519837200 + 1 years;
 
     // minimum FTX token to be transferred to make the gas worthwhile (avoid micro transfer), cannot be higher than minimal subscribed amount in crowd sale.
@@ -261,7 +261,7 @@ contract FTXToken is StandardToken, Ownable {
     event GasRebateFailed(address indexed to, uint256 value);
 
     /**
-    * @dev Contructor that gives msg.sender all existing tokens. 
+    * @dev Contructor that gives msg.sender all existing tokens.
     */
     function FTXToken(address _owner) public {
         require(_owner != address(0));
@@ -294,7 +294,7 @@ contract FTXToken is StandardToken, Ownable {
         }
         return true;
     }
-    
+
     /* When necessary, adjust minimum FTX to transfer to make the gas worthwhile */
     function setToken4Gas(uint256 newFTXAmount) public onlyOwner {
         require(newFTXAmount > 0);                                                  // Upper bound is not necessary.
@@ -325,7 +325,7 @@ contract FTXToken is StandardToken, Ownable {
     }
 
     /*
-        allow everyone to start transferring tokens freely at the same moment. 
+        allow everyone to start transferring tokens freely at the same moment.
     */
     function setAllowTransfers(bool bAllowTransfers) external onlyOwner {
         allowTransfers = bAllowTransfers;
@@ -369,4 +369,15 @@ contract FTXToken is StandardToken, Ownable {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

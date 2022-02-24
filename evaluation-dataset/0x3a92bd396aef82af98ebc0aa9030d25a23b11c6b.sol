@@ -202,7 +202,7 @@ contract TokenboxToken is Token {
      * Token meta data
      */
     string constant public name = "Tokenbox";
- 
+
     string constant public symbol = "TBX";
     uint8 constant public decimals = 18;
 
@@ -342,7 +342,7 @@ contract TokenboxToken is Token {
         public
         migrationIsActive
         onlyOwner
-    {   
+    {
         require(balances[_from] >= amount);
         balances[_from] -= amount;
         balances[_to] += amount;
@@ -410,7 +410,7 @@ contract TokenboxToken is Token {
     function transfer(address _to, uint256 _value)
         public
         migrationIsCompleted
-        returns (bool success) 
+        returns (bool success)
     {
         return super.transfer(_to, _value);
     }
@@ -457,4 +457,15 @@ contract TokenboxToken is Token {
     {
        return div(totalPicoUSD, pow(10, usdDecimals));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

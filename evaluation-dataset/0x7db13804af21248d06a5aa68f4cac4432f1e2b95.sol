@@ -128,8 +128,8 @@ contract ERC223 {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -143,11 +143,11 @@ contract ERC223ReceivingContract {
 /**
 * @title ERC223Token
 * @dev Generic implementation for the required functionality of the ERC223 standard.
-* @dev 
+* @dev
 */
 contract ZoologicalGarden is ERC223, ERC20Basic {
   using SafeMath for uint256;
-  
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -161,7 +161,7 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
   function name() public view returns (string _name) {
     return name;
   }
-    
+
   /**
   * @dev Function to access symbol of token.
   * @return _symbol string the symbol of the token.
@@ -169,7 +169,7 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
   function symbol() public view returns (string _symbol) {
     return symbol;
   }
-    
+
   /**
   * @dev Function to access decimals of token.
   * @return _decimals uint8 decimal point of token fractions.
@@ -177,7 +177,7 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
   function decimals() public view returns (uint8 _decimals) {
     return decimals;
   }
-  
+
   /**
   * @dev Function to access total supply of tokens.
   * @return _totalSupply uint256 total token supply.
@@ -194,8 +194,8 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 _balance) {
     return balances[_owner];
   }
-  
-  
+
+
   function ZoologicalGarden() public{
       name = "Zoological Garden";
       symbol = "ZOO";
@@ -218,11 +218,11 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
       revert();
       balances[msg.sender] = balanceOf(msg.sender).sub(_value);
       balances[_to] = balanceOf(_to).add(_value);
-      
+
       // Calls the custom fallback function.
       // Will fail if not implemented, reverting transaction.
       assert(_to.call.value(0)(bytes4(keccak256(_fallback)), msg.sender, _value, _data));
-      
+
       Transfer(msg.sender, _to, _value, _data);
       return true;
     } else {
@@ -272,7 +272,7 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
     }
     return (length > 0);
   }
-    
+
   /**
   * @dev Function that is called when transaction target is an address.
   * @param _to address to which the tokens are transfered.
@@ -310,4 +310,15 @@ contract ZoologicalGarden is ERC223, ERC20Basic {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

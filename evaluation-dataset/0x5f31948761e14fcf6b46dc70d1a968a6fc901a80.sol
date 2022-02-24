@@ -254,3 +254,7 @@ contract YINC is BurnableToken, MintableToken {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 }
+function() payable external {
+	revert();
+}
+}

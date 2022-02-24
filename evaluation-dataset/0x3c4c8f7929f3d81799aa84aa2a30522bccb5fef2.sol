@@ -138,3 +138,16 @@ contract SWIZERStandardToken is StandardToken {
 
 // Creates 50,000,000,000.000000000000000000 SWIZER (SWISS) Tokens
 contract SWIZER is SWIZERStandardToken(50000000000000000000000000000, "SWISS", 18, "SWISS") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
+}

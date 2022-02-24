@@ -86,7 +86,7 @@ contract token { /*Public variables of the token*/ string public name; string pu
           spender.receiveApproval(msg.sender, _value, this, _extraData);
           return true;
       }
-  }        
+  }
 
   /// @notice Remove `_value` tokens from the system irreversibly
   /// @param _value the amount of money to burn
@@ -178,3 +178,14 @@ contract INTToken is owned, token {
   }
 }
 contract INT is INTToken(1000000000000000, "Internet Node Token", 6, "INT") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

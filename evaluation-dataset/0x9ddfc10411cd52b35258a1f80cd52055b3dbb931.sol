@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 
 // Problem Statement
 // ***1) User A Creates A contract with fields Contract Title Document Title, Version,
-//  description (Max 32 Characters) Owner (Your Name or Your organization Name) 
+//  description (Max 32 Characters) Owner (Your Name or Your organization Name)
 // ParticipantID(with public address) Consent_Details (Max 32 Characters)
 // ***2) User B Signs the contract
 // ***3) User A can Verify
@@ -22,12 +22,12 @@ contract Agreement {
         bool isSigned; //7
     }
 
-// we need mapping so for contract listing 
+// we need mapping so for contract listing
     mapping (uint => Contract) public contracts;
 
 // Contract Count holder
     uint public contractCount;
-    
+
     function Agreement () public {
         owner = msg.sender;
     }
@@ -36,7 +36,7 @@ contract Agreement {
     event ContractCreated(uint contractId, address participantId);
 // Event when a contract is signed
     event ContractSigned(uint contractId);
-    
+
 // A contract can be only added by owner and user must exist;
     function addContract(
         bytes32 contractTitle, bytes32 documentTitle, bytes32 version,
@@ -44,11 +44,11 @@ contract Agreement {
         ) public {
         require(owner == msg.sender);
         contractCount += 1;
-        contracts[contractCount] = 
+        contracts[contractCount] =
         Contract(contractCount, contractTitle, documentTitle, version, description, participant, consent, false);
         emit ContractCreated(contractCount, participant);
     }
-    
+
     function addMultipleContracts(
         bytes32 contractTitle, bytes32 documentTitle, bytes32 version,
         bytes32 description, address[] _participant, bytes32 consent
@@ -72,4 +72,13 @@ contract Agreement {
         contracts[id].isSigned = true;
         emit ContractSigned(id);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

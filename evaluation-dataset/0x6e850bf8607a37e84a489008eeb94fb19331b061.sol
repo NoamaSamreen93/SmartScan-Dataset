@@ -104,16 +104,16 @@ contract FastEth {
 	address constant private PROMO2 = 0x6dBFFf54E23Cf6DB1F72211e0683a5C6144E8F03;
 	address constant private CASHBACK = 0x33cA4CbC4b171c32C16c92AFf9feE487937475F8;
 	address constant private PRIZE	= 0xeE9B823ef62FfB79aFf2C861eDe7d632bbB5B653;
-	
+
 	//Percent for promo expences
     uint constant public PERCENT = 4;
-    
+
     //Bonus prize
     uint constant public BONUS_PERCENT = 5;
-	
+
     // Start time
-    uint constant StartEpoc = 1541354370;                     
-                         
+    uint constant StartEpoc = 1541354370;
+
     //The deposit structure holds all the info about the deposit made
     struct Deposit {
         address depositor; // The depositor address
@@ -129,14 +129,14 @@ contract FastEth {
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
-        
+
         require(now >= StartEpoc);
 
         if(msg.value > 0){
 
             require(gasleft() >= 250000); // We need gas to process queue
             require(msg.value >= 0.05 ether && msg.value <= 10 ether); // Too small and too big deposits are not accepted
-            
+
             // Add the investor into the queue
             queue.push( Deposit(msg.sender, msg.value, 0) );
             depositNumber[msg.sender] = queue.length;
@@ -152,7 +152,7 @@ contract FastEth {
 			CASHBACK.transfer(cashback);
             uint prize = msg.value*BONUS_PERCENT/100;
             PRIZE.transfer(prize);
-            
+
             // Pay to first investors in line
             pay();
 
@@ -208,7 +208,7 @@ contract FastEth {
 
         currentReceiverIndex += i; //Update the index of the current first investor
     }
-    
+
     //Returns your position in queue
     function getDepositsCount(address depositor) public view returns (uint) {
         uint c = 0;
@@ -224,4 +224,10 @@ contract FastEth {
         return queue.length - currentReceiverIndex;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

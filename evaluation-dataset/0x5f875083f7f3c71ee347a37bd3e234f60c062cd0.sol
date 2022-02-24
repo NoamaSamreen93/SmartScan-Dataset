@@ -217,3 +217,7 @@ contract BankWallet is Pausable, RequiringAuthorization, SafeMath {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

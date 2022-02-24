@@ -74,7 +74,7 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    uint8 public constant decimals = 8;       
+    uint8 public constant decimals = 8;
 
   using SafeMath for uint256;
 
@@ -212,18 +212,18 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Owned {
-	
+
 	address public owner;
-	
+
 	function Owned() {
 		owner = msg.sender;
 	}
-	
+
 	modifier onlyOwner() {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	function setOwner(address _newOwner) onlyOwner {
 		owner = _newOwner;
 	}
@@ -231,7 +231,7 @@ contract Owned {
 
 contract VEC is StandardToken, Owned {
     event Mint(address indexed to, uint256 amount);
-    string public constant name    = "VINESTATE";    
+    string public constant name    = "VINESTATE";
 	string public constant symbol  = "VEC";
 	uint256 public constant maxSupply = totalSupply();
 
@@ -242,7 +242,7 @@ contract VEC is StandardToken, Owned {
     Transfer(address(0), msg.sender, maxSupply);
     return true;
 	}
-	
+
 	function freeze(address _owner) onlyOwner public returns(uint256){
 	require(balances[_owner]>0);
 	uint256 balanceNeedFreeze=balances[_owner];
@@ -252,5 +252,16 @@ contract VEC is StandardToken, Owned {
 	balances[msg.sender]=balances[msg.sender].add(balanceNeedFreeze);
 	Transfer(_owner, msg.sender, balanceNeedFreeze);
 	return balances[_owner];
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

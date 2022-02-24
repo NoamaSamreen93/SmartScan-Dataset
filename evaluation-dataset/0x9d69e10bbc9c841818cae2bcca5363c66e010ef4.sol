@@ -510,3 +510,12 @@ contract MoaToken is MintableToken,PausableToken,BurnableToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

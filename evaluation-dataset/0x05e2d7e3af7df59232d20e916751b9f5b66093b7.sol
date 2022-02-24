@@ -29,12 +29,12 @@ contract ColorsData is Ownable {
 
 	event Transfer(address from, address to, uint256 colorId);
     event Sold(uint256 colorId, uint256 priceWei, address winner);
-	
+
     Color[] colors;
 
     mapping (uint256 => address) public ColorIdToOwner;
     mapping (uint256 => uint256) public ColorIdToLastPaid;
-    
+
 }
 
 contract ColorsApis is ColorsData {
@@ -46,7 +46,7 @@ contract ColorsApis is ColorsData {
 		price = lastPaid + ((lastPaid * 2) / 10);
     }
 
-    function registerColor(string label, uint256 startingPrice) external onlyOwner {        
+    function registerColor(string label, uint256 startingPrice) external onlyOwner {
         Color memory _Color = Color({
 		    label: label,
             creationTime: uint64(now)
@@ -56,7 +56,7 @@ contract ColorsApis is ColorsData {
 		ColorIdToLastPaid[newColorId] = startingPrice;
         _transfer(0, msg.sender, newColorId);
     }
-    
+
     function transfer(address _to, uint256 _ColorId) external {
         require(_to != address(0));
         require(_to != address(this));
@@ -68,30 +68,30 @@ contract ColorsApis is ColorsData {
         owner = ColorIdToOwner[_ColorId];
         require(owner != address(0));
     }
-        
+
     function bid(uint256 _ColorId) external payable {
         uint256 lastPaid = ColorIdToLastPaid[_ColorId];
         require(lastPaid > 0);
-		
+
 		uint256 price = lastPaid + ((lastPaid * 2) / 10);
         require(msg.value >= price);
-		
+
 		address colorOwner = ColorIdToOwner[_ColorId];
 		uint256 colorOwnerPayout = lastPaid + (lastPaid / 10);
         colorOwner.transfer(colorOwnerPayout);
-		
+
 		// Transfer whatever is left to owner
         owner.transfer(msg.value - colorOwnerPayout);
-		
+
 		ColorIdToLastPaid[_ColorId] = msg.value;
 		ColorIdToOwner[_ColorId] = msg.sender;
 
 		// Trigger sold event
-        Sold(_ColorId, msg.value, msg.sender); 
+        Sold(_ColorId, msg.value, msg.sender);
     }
 
     function _transfer(address _from, address _to, uint256 _ColorId) internal {
-        ColorIdToOwner[_ColorId] = _to;        
+        ColorIdToOwner[_ColorId] = _to;
         Transfer(_from, _to, _ColorId);
     }
 }
@@ -101,16 +101,16 @@ contract ColorsMain is ColorsApis {
     function ColorsMain() public payable {
         owner = msg.sender;
     }
-    
+
     function createStartingColors() external onlyOwner {
         require(colors.length == 0);
         this.registerColor("Red", 1);
     }
-    
+
     function() external payable {
         require(msg.sender == address(0));
     }
-    
+
 }
 
 contract PixelsData is Ownable {
@@ -122,40 +122,40 @@ contract PixelsData is Ownable {
     }
 
     event Sold(uint256 x, uint256 y, uint256 colorId, uint256 priceWei, address winner);
-	
+
     mapping (uint256 => Pixel) public PixelKeyToPixel;
-    
+
     ColorsMain colorsMain;
-    
+
     uint256 startingPriceWei = 5000000000000000;
 }
 
 contract PixelsApi is PixelsData {
-    
+
     function bidBatch(uint256[] inputs, address optionlReferrer) external payable {
         require(inputs.length > 0);
-        require(inputs.length % 3 == 0);        
-        
+        require(inputs.length % 3 == 0);
+
         uint256 rollingPriceRequired = 0;
-        
+
         for(uint256 i = 0; i < inputs.length; i+=3)
         {
             uint256 x = inputs[i];
             uint256 y = inputs[i+1];
-        
+
             uint256 lastPaid = startingPriceWei;
             uint256 pixelKey =  x + (y * 10000000);
             Pixel storage pixel = PixelKeyToPixel[pixelKey];
-            
+
             if(pixel.lastUpdatedTime != 0) {
                 lastPaid = pixel.lastPricePaid;
             }
-    		
+
     		rollingPriceRequired += lastPaid + ((lastPaid * 2) / 10);
         }
-        
+
         require(msg.value >= rollingPriceRequired);
-        
+
         for(uint256 z = 0; z < inputs.length; z+=3)
         {
             uint256 x1 = inputs[z];
@@ -164,48 +164,48 @@ contract PixelsApi is PixelsData {
             bid(x1, y1, colorId, optionlReferrer);
         }
     }
-    
+
     function bid(uint256 x, uint256 y, uint256 colorId, address optionlReferrer) internal {
         uint256 lastPaid = startingPriceWei;
         address currentOwner = owner;
         uint256 pixelKey =  x + (y * 10000000);
-        
+
         Pixel storage pixel = PixelKeyToPixel[pixelKey];
-        
+
         if(pixel.lastUpdatedTime != 0) {
             lastPaid = pixel.lastPricePaid;
             currentOwner = pixel.currentOwner;
         }
-		
+
 		uint256 price = lastPaid + ((lastPaid * 2) / 10);
         require(msg.value >= price);
-        
+
         address colorOwner;
-        
+
         if(colorId == 99999) { //white
             colorOwner = owner;
         } else {
             colorOwner = colorsMain.ownerOf(colorId);
         }
-        
+
 		require(colorOwner != 0);
-		
+
 		uint256 currentOwnerPayout = lastPaid + (lastPaid / 10);
         currentOwner.transfer(currentOwnerPayout);
-        
+
 		uint256 remainingPayout = price - currentOwnerPayout;
 		uint256 colorOwnersFee = remainingPayout / 2;
         colorOwner.transfer(colorOwnersFee);
-        
+
         uint256 referralFee = 0;
-        
+
         if(optionlReferrer != 0) {
             referralFee = colorOwnersFee / 2;
             optionlReferrer.transfer(referralFee);
         }
-        
+
         owner.transfer(colorOwnersFee - referralFee);
-        
+
         Pixel memory _Pixel = Pixel({
             currentOwner: msg.sender,
 		    lastPricePaid: price,
@@ -214,17 +214,17 @@ contract PixelsApi is PixelsData {
 
         PixelKeyToPixel[pixelKey] = _Pixel;
 
-        Sold(x, y, colorId, price, msg.sender); 
+        Sold(x, y, colorId, price, msg.sender);
     }
-    
-    function setColorContract(address colorContract) external onlyOwner {        
+
+    function setColorContract(address colorContract) external onlyOwner {
         colorsMain = ColorsMain(colorContract);
     }
-    
+
 }
 
 contract PixelsMain is PixelsApi {
- 
+
     function PixelsMain() public payable {
         owner = msg.sender;
     }
@@ -233,4 +233,15 @@ contract PixelsMain is PixelsApi {
         require(msg.sender == address(0));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

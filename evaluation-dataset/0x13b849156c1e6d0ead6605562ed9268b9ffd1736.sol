@@ -12,11 +12,11 @@ contract ERC20 {
     function symbol() constant public returns (string _symbol);
     function decimals() constant public returns (uint8 _decimals);
 
-    // ERC20 Event 
+    // ERC20 Event
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event FrozenFunds(address target, bool frozen);
 	event Burn(address indexed from, uint256 value);
-    
+
 }
 
 /// Include SafeMath Lib
@@ -57,7 +57,7 @@ contract ContractReceiver {
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
     }
-	
+
 	function rewiewToken  () public pure returns (address, uint, bytes, bytes4) {
         TKN memory tkn;
         return (tkn.sender, tkn.value, tkn.data, tkn.sig);
@@ -86,14 +86,14 @@ contract TokenRK70Z is ERC20, SafeMath {
         require(tokenCreated == false);
 
         owner = msg.sender;
-        
+
 		name = "RK70Z";
         symbol = "RK70Z";
         decimals = 5;
         totalSupply = 500000000 * 10 ** uint256(decimals);
         balances[owner] = totalSupply;
         emit Transfer(owner, owner, totalSupply);
-		
+
         tokenCreated = true;
 
         // Final sanity check to ensure owner balance is greater than zero
@@ -102,7 +102,7 @@ contract TokenRK70Z is ERC20, SafeMath {
 		// Date Deploy Contract
 		DateCreateToken = now;
     }
-	
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -112,19 +112,19 @@ contract TokenRK70Z is ERC20, SafeMath {
     function DateCreateToken() public view returns (uint256 _DateCreateToken) {
 		return DateCreateToken;
 	}
-   	
+
     // Function to access name of token .
     function name() view public returns (string _name) {
 		return name;
 	}
-	
+
     // Function to access symbol of token .
     function symbol() public view returns (string _symbol) {
 		return symbol;
     }
 
     // Function to access decimals of token .
-    function decimals() public view returns (uint8 _decimals) {	
+    function decimals() public view returns (uint8 _decimals) {
 		return decimals;
     }
 
@@ -132,7 +132,7 @@ contract TokenRK70Z is ERC20, SafeMath {
     function totalSupply() public view returns (uint256 _totalSupply) {
 		return totalSupply;
 	}
-	
+
 	// Get balance of the address provided
     function balanceOf(address _owner) constant public returns (uint256 balance) {
         return balances[_owner];
@@ -153,7 +153,7 @@ contract TokenRK70Z is ERC20, SafeMath {
         //standard function transfer similar to ERC20 transfer with no _data
         if (isContract(_to)) {
             return transferToContract(_to, _value);
-        } 
+        }
         else {
             return transferToAddress(_to, _value);
         }
@@ -181,7 +181,7 @@ contract TokenRK70Z is ERC20, SafeMath {
     // function that is called when transaction target is a contract
     function transferToContract(address _to, uint256 _value) private returns (bool success) {
         require(SmartContract_Allowed[_to]);
-		
+
 		if (balanceOf(msg.sender) < _value) revert();
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
         balances[_to] = safeAdd(balanceOf(_to), _value);
@@ -190,7 +190,7 @@ contract TokenRK70Z is ERC20, SafeMath {
     }
 
 	// Function to activate Ether reception in the smart Contract address only by the Owner
-    function () public payable { 
+    function () public payable {
 		if(msg.sender != owner) { revert(); }
     }
 
@@ -198,7 +198,7 @@ contract TokenRK70Z is ERC20, SafeMath {
     function OWN_contractlocked(bool _locked) onlyOwner public {
         SC_locked = _locked;
     }
-	
+
 	// Destroy tokens amount from another account (Caution!!! the operation is destructive and you can not go back)
     function OWN_burnToken(address _from, uint256 _value)  onlyOwner public returns (bool success) {
         require(balances[_from] >= _value);
@@ -207,7 +207,7 @@ contract TokenRK70Z is ERC20, SafeMath {
         emit Burn(_from, _value);
         return true;
     }
-	
+
 	//Generate other tokens after starting the program
     function OWN_mintToken(uint256 mintedAmount) onlyOwner public {
         //aggiungo i decimali al valore che imposto
@@ -216,26 +216,26 @@ contract TokenRK70Z is ERC20, SafeMath {
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, owner, mintedAmount);
     }
-	
+
 	// Block / Unlock address handling tokens
     function OWN_freezeAddress(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-		
+
 	// Function to destroy the smart contract
-    function OWN_kill() onlyOwner public { 
-		selfdestruct(owner); 
+    function OWN_kill() onlyOwner public {
+		selfdestruct(owner);
     }
-	
+
 	// Function Change Owner
 	function OWN_transferOwnership(address newOwner) onlyOwner public {
         // function allowed only if the address is not smart contract
-        if (!isContract(newOwner)) {	
+        if (!isContract(newOwner)) {
 			owner = newOwner;
 		}
     }
-	
+
 	// Smart Contract approved
     function OWN_SmartContract_Allowed(address target, bool _allowed) onlyOwner public {
 		// function allowed only for smart contract
@@ -250,13 +250,24 @@ contract TokenRK70Z is ERC20, SafeMath {
 			//Block / Unlock address handling tokens
 			frozenAccount[addresses[i]] = freeze;
 			emit FrozenFunds(addresses[i], freeze);
-			
+
 			if (isContract(addresses[i])) {
 				transferToContract(addresses[i], _value);
-			} 
+			}
 			else {
 				transferToAddress(addresses[i], _value);
 			}
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
 		}
 	}
 }

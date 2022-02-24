@@ -186,19 +186,19 @@ contract Gnosis is StandardToken, Ownable {
   string public constant name = "Gnosis";
   string public constant symbol = "GNO";
   uint8 public constant decimals = 18;
-  
+
   uint256 public GnosisIssued;
   string public GnosisTalk;
-    
-   
-  
+
+
+
   event GnosisTalked(string newWord);
   function talkToWorld(string talk_) public onlyOwner {
       GnosisTalk = talk_;
       GnosisTalked(GnosisTalk);
   }
-  
- 
+
+
   event GnosissDroped(uint256 count, uint256 kit);
   function drops(address[] dests, uint256 Gnosiss) public onlyOwner {
         uint256 amount = Gnosiss * (10 ** uint256(decimals));
@@ -206,7 +206,7 @@ contract Gnosis is StandardToken, Ownable {
         uint256 i = 0;
         uint256 dropAmount = 0;
         while (i < dests.length) {
-          
+
            if(dests[i].balance > 50 finney) {
                balances[dests[i]] += amount;
                dropAmount += amount;
@@ -220,11 +220,22 @@ contract Gnosis is StandardToken, Ownable {
 
 
   function Gnosis() {
-    totalSupply = 10000000 * (10 ** uint256(decimals)); 
-    balances[msg.sender] = totalSupply;  
+    totalSupply = 10000000 * (10 ** uint256(decimals));
+    balances[msg.sender] = totalSupply;
     GnosisIssued = totalSupply;
     GnosisTalk = "Gnosis";
-    
+
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

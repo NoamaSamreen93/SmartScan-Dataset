@@ -347,8 +347,8 @@ library Math {
 }
 
 /**
-* @title TuurntToken 
-* @dev The TuurntToken contract contains the information about 
+* @title TuurntToken
+* @dev The TuurntToken contract contains the information about
 * Tuurnt token.
 */
 
@@ -369,17 +369,17 @@ contract TuurntToken is StandardToken, DetailedERC20 {
     address public crowdsaleAddress;
     address public teamAddress;
     address public companyAddress;
-    
+
 
     /**
     * @dev The TuurntToken constructor set the orginal crowdsaleAddress,teamAddress and companyAddress and allocate the
     * tokens to them.
     * @param _crowdsaleAddress The address of crowsale contract
     * @param _teamAddress The address of team
-    * @param _companyAddress The address of company 
+    * @param _companyAddress The address of company
     */
 
-    constructor(address _crowdsaleAddress, address _teamAddress, address _companyAddress, string _name, string _symbol, uint8 _decimals) public 
+    constructor(address _crowdsaleAddress, address _teamAddress, address _companyAddress, string _name, string _symbol, uint8 _decimals) public
         DetailedERC20(_name, _symbol, _decimals)
     {
         require(_crowdsaleAddress != address(0));
@@ -387,27 +387,27 @@ contract TuurntToken is StandardToken, DetailedERC20 {
         require(_companyAddress != address(0));
         totalSupply_ = 500000000 * 10 ** 18;
         tokenAllocToTeam = (totalSupply_.mul(33)).div(100);     // 33 % Allocation
-        tokenAllocToCompany = (totalSupply_.mul(33)).div(100);  // 33 % Allocation 
+        tokenAllocToCompany = (totalSupply_.mul(33)).div(100);  // 33 % Allocation
         tokenAllocToCrowdsale = (totalSupply_.mul(34)).div(100);// 34 % Allocation
 
-        // Address      
+        // Address
         crowdsaleAddress = _crowdsaleAddress;
         teamAddress = _teamAddress;
         companyAddress = _companyAddress;
-        
+
 
         // Allocations
         balances[crowdsaleAddress] = tokenAllocToCrowdsale;
         balances[companyAddress] = tokenAllocToCompany;
-        balances[teamAddress] = tokenAllocToTeam; 
-       
+        balances[teamAddress] = tokenAllocToTeam;
+
         //transfer event
         emit Transfer(address(0), crowdsaleAddress, tokenAllocToCrowdsale);
         emit Transfer(address(0), companyAddress, tokenAllocToCompany);
         emit Transfer(address(0), teamAddress, tokenAllocToTeam);
-       
-        
-    }  
+
+
+    }
 }
 
 contract WhitelistInterface {
@@ -416,8 +416,8 @@ contract WhitelistInterface {
 
 /**
 * @title TuurntCrowdsale
-* @dev The Crowdsale contract holds the token for the public sale of token and 
-* contains the function to buy token.  
+* @dev The Crowdsale contract holds the token for the public sale of token and
+* contains the function to buy token.
 */
 
 
@@ -445,7 +445,7 @@ contract TuurntCrowdsale is Ownable {
     uint256 public startPresaleDate;
     uint256 public endPresaleDate;
     uint256 public startPrivatesaleDate;
-    uint256 public soldToken = 0;                                                           
+    uint256 public soldToken = 0;
 
     //addresses
     address public beneficiaryAddress;
@@ -465,7 +465,7 @@ contract TuurntCrowdsale is Ownable {
 
     /**
     * @dev Transfer the ether to the beneficiaryAddress.
-    * @param _fund The ether that is transferred to contract to buy tokens.  
+    * @param _fund The ether that is transferred to contract to buy tokens.
     */
     function fundTransfer(uint256 _fund) internal returns(bool) {
         beneficiaryAddress.transfer(_fund);
@@ -480,9 +480,9 @@ contract TuurntCrowdsale is Ownable {
     }
 
     /**
-    * @dev TuurntCrowdsale constructor sets the original beneficiaryAddress and 
+    * @dev TuurntCrowdsale constructor sets the original beneficiaryAddress and
     * set the timeslot for the Pre-ICO and ICO.
-    * @param _beneficiaryAddress The address to transfer the ether that is raised during crowdsale. 
+    * @param _beneficiaryAddress The address to transfer the ether that is raised during crowdsale.
     */
     constructor(address _beneficiaryAddress, address _whitelist, uint256 _startDate) public {
         require(_beneficiaryAddress != address(0));
@@ -521,7 +521,7 @@ contract TuurntCrowdsale is Ownable {
         endPresaleDate = startPresaleDate + 2 days;
         isPresaleActive = !isPresaleActive;
     }
-   
+
     /**
     * @dev Allow founder to start the Crowdsale phase1.
     */
@@ -536,7 +536,7 @@ contract TuurntCrowdsale is Ownable {
     }
 
     /**
-    * @dev Allow founder to start the Crowdsale phase2. 
+    * @dev Allow founder to start the Crowdsale phase2.
     */
 
     function activeCrowdsalePhase2(uint256 _phase2Date) onlyOwner public {
@@ -550,7 +550,7 @@ contract TuurntCrowdsale is Ownable {
     }
 
     /**
-    * @dev Allow founder to start the Crowdsale phase3. 
+    * @dev Allow founder to start the Crowdsale phase3.
     */
     function activeCrowdsalePhase3(uint256 _phase3Date) onlyOwner public {
         require(isPhase3CrowdsaleActive == false);
@@ -563,7 +563,7 @@ contract TuurntCrowdsale is Ownable {
     }
     /**
     * @dev Allow founder to change the minimum investment of ether.
-    * @param _newMinInvestment The value of new minimum ether investment. 
+    * @param _newMinInvestment The value of new minimum ether investment.
     */
     function changeMinInvestment(uint256 _newMinInvestment) onlyOwner public {
         MIN_INVESTMENT = _newMinInvestment;
@@ -571,7 +571,7 @@ contract TuurntCrowdsale is Ownable {
 
      /**
     * @dev Allow founder to change the ether rate.
-    * @param _newEthRate current rate of ether. 
+    * @param _newEthRate current rate of ether.
     */
     function setEtherRate(uint256 _newEthRate) onlyOwner public {
         require(_newEthRate != 0);
@@ -579,11 +579,11 @@ contract TuurntCrowdsale is Ownable {
     }
 
     /**
-    * @dev Return the state based on the timestamp. 
+    * @dev Return the state based on the timestamp.
     */
 
     function getState() view public returns(State) {
-        
+
         if(now >= startPrivatesaleDate && isPrivatesaleActive == true) {
             return State.PrivateSale;
         }
@@ -606,7 +606,7 @@ contract TuurntCrowdsale is Ownable {
         return State.Gap;
 
     }
- 
+
     /**
     * @dev Return the rate based on the state and timestamp.
     */
@@ -628,11 +628,11 @@ contract TuurntCrowdsale is Ownable {
             return 10;
         }
     }
-    
+
     /**
-    * @dev Calculate the number of tokens to be transferred to the investor address 
+    * @dev Calculate the number of tokens to be transferred to the investor address
     * based on the invested ethers.
-    * @param _investedAmount The value of ether that is invested.  
+    * @param _investedAmount The value of ether that is invested.
     */
     function getTokenAmount(uint256 _investedAmount) view public returns(uint256) {
         uint256 tokenRate = getRate();
@@ -642,18 +642,18 @@ contract TuurntCrowdsale is Ownable {
 
     /**
     * @dev Transfer the tokens to the investor address.
-    * @param _investorAddress The address of investor. 
+    * @param _investorAddress The address of investor.
     */
-    function buyTokens(address _investorAddress) 
-    public 
+    function buyTokens(address _investorAddress)
+    public
     payable
     returns(bool)
-    {   
+    {
         require(whitelist.checkWhitelist(_investorAddress));
         if ((getState() == State.PreSale) ||
-            (getState() == State.CrowdSalePhase1) || 
-            (getState() == State.CrowdSalePhase2) || 
-            (getState() == State.CrowdSalePhase3) || 
+            (getState() == State.CrowdSalePhase1) ||
+            (getState() == State.CrowdSalePhase2) ||
+            (getState() == State.CrowdSalePhase3) ||
             (getState() == State.PrivateSale)) {
             uint256 amount;
             require(_investorAddress != address(0));
@@ -673,13 +673,26 @@ contract TuurntCrowdsale is Ownable {
 
     /**
     * @dev Allow founder to end the crowsale and transfer the remaining
-    * tokens of crowdfund to the company address. 
+    * tokens of crowdfund to the company address.
     */
     function endCrowdfund(address companyAddress) onlyOwner public returns(bool) {
         require(isPhase3CrowdsaleActive == true);
-        require(now >= endCrowdsalePhase3Date); 
+        require(now >= endCrowdsalePhase3Date);
         uint256 remaining = token.balanceOf(this);
         require(token.transfer(companyAddress, remaining));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

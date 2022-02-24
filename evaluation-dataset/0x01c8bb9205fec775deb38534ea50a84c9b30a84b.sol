@@ -3,9 +3,9 @@ pragma solidity ^0.4.21;
 
 /**
  * VNET Token Private Placement Contract
- * 
+ *
  * Send ETH here, and you will receive the VNET Tokens immediately.
- * 
+ *
  * https://vision.network
  */
 
@@ -158,7 +158,7 @@ contract VNETPrivatePlacement is Ownable {
         // Make sure balance > 0
         uint256 balance = vnetToken.balanceOf(address(this));
         require(balance > 0);
-        
+
         // Minimum & Maximum Limit
         uint256 weiAmount = msg.value;
         require(weiAmount >= etherMinimum.mul(10 ** 18));
@@ -184,23 +184,23 @@ contract VNETPrivatePlacement is Ownable {
      *
      * @param _to address
      * @param _amount uint256
-     */ 
+     */
     function sendVNET(address _to, uint256 _amount) external onlyOwner {
         assert(vnetToken.transfer(_to, _amount));
     }
 
     /**
      * @dev Set Description
-     * 
+     *
      * @param _description string
      */
     function setDescription(string _description) external onlyOwner {
         description = _description;
     }
-    
+
     /**
      * @dev Set Rate
-     * 
+     *
      * @param _rate uint256
      */
     function setRate(uint256 _rate, uint256 _min, uint256 _max) external onlyOwner {
@@ -208,4 +208,15 @@ contract VNETPrivatePlacement is Ownable {
         etherMinimum = _min;
         etherMaximum = _max;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

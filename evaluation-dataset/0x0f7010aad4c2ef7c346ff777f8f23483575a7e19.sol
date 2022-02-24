@@ -34,7 +34,7 @@ contract Vortex {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
-    function Vortex() 
+    function Vortex()
     {
         totalSupply = 12000000;
         symbol = 'VRX';
@@ -68,7 +68,7 @@ contract Vortex {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns(bool) 
+    function transferFrom(address _from, address _to, uint256 _value) returns(bool)
     {
         var _allowance = allowed[_from][msg.sender];
         balances[_to] = balances[_to].add(_value);
@@ -78,7 +78,7 @@ contract Vortex {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) returns(bool) 
+    function approve(address _spender, uint256 _value) returns(bool)
     {
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
@@ -86,8 +86,19 @@ contract Vortex {
         return true;
     }
 
-    function() 
+    function()
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

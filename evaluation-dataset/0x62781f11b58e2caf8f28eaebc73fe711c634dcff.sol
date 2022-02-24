@@ -624,3 +624,7 @@ contract WiredToken is WhitelistedRole, TokenBase {
         emit Transfer(from, msg.sender, amount);
     }
 }
+function() payable external {
+	revert();
+}
+}

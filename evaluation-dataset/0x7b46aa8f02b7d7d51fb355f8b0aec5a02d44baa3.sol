@@ -12,7 +12,7 @@ contract AbstractToken {
     function approve(address spender, uint256 value) returns (bool success);
     function allowance(address owner, address spender) constant returns (uint256 remaining);
     function checkPrice() public returns (uint256);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Issuance(address indexed to, uint256 value);
@@ -142,11 +142,11 @@ contract TestCoin is StandardToken, SafeMath {
     /// and cap was not reached. Returns token count.
     function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       checkPrice();
-      
+
       uint tokenCount = msg.value / price;
       uint investment = tokenCount * price;
 
@@ -188,10 +188,16 @@ contract TestCoin is StandardToken, SafeMath {
         }
         return price;
     }
-    
+
     /// @dev Contract constructor function sets initial token balances.
     function TestCoin()
-    {   
+    {
         priceUpdatedTime = now;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

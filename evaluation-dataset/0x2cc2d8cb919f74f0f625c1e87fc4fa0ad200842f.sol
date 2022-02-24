@@ -2,9 +2,9 @@ pragma solidity ^0.4.24;
 /**
  * @title POPO v1.3.1
  *
- * This product is protected under license.  Any unauthorized copy, modification, or use without 
+ * This product is protected under license.  Any unauthorized copy, modification, or use without
  * express written consent from the creators is prohibited.
- * 
+ *
  * WARNING:  THIS PRODUCT IS HIGHLY ADDICTIVE.  IF YOU HAVE AN ADDICTIVE NATURE.  DO NOT PLAY.
  */
 // Author: https://playpopo.com
@@ -20,7 +20,7 @@ library PopoDatasets {
     uint256 withdrawn;
     bool hasWithdrawn;
   }
-  
+
   struct Player {
     address addr;
     bytes32 name;
@@ -48,7 +48,7 @@ contract PopoEvents {
     bytes32 pName,
     uint256 timeStamp
   );
-  
+
 
   event onSetInviter
   (
@@ -103,7 +103,7 @@ contract PopoEvents {
     uint256 value,
     uint256 timeStamp
   );
-    
+
 }
 library SafeMath {
 
@@ -151,16 +151,16 @@ library SafeMath {
   }
 }
 library NameFilter {
-  
+
     using SafeMath for *;
 
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -171,7 +171,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -182,10 +182,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i = i.add(1))
         {
@@ -194,7 +194,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -202,7 +202,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -212,15 +212,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require(_temp[i.add(1)] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -238,7 +238,7 @@ contract SafePopo {
   modifier isHuman() {
     address _addr = msg.sender;
     uint256 _codeLength;
-      
+
     assembly {_codeLength := extcodesize(_addr)}
     require (_codeLength == 0, "sorry humans only");
     _;
@@ -247,33 +247,33 @@ contract SafePopo {
   modifier isWithinLimits(uint256 _eth) {
     require (_eth >= 0.1 ether, "0.1 ether at least");
     require (_eth <= 10000000 ether, "no, too much ether");
-    _;    
+    _;
   }
 
   modifier isActivated() {
-    require (activated_ == true, "popo is not activated"); 
+    require (activated_ == true, "popo is not activated");
     _;
   }
 
   modifier onlyCEO() {
-    require 
+    require
     (
-      msg.sender == 0x5927774a0438f452747b847E4e9097884DA6afE9 || 
+      msg.sender == 0x5927774a0438f452747b847E4e9097884DA6afE9 ||
       msg.sender == 0xA2CDecFe929Eccbd519A6c98b1220b16f5b6B0B5
     );
     _;
   }
 
-  modifier onlyCommunityLeader() { 
-    require 
+  modifier onlyCommunityLeader() {
+    require
     (
-      msg.sender == 0xede5Adf9F68C02537Cc1737CFF4506BCfFAAB63d || 
+      msg.sender == 0xede5Adf9F68C02537Cc1737CFF4506BCfFAAB63d ||
       msg.sender == 0x7400A7B7D67814B0d8B27362CC198F4Ae2840e16
     );
     _;
   }
 
-  function activate() 
+  function activate()
     onlyCEO()
     onlyCommunityLeader()
     public
@@ -283,7 +283,7 @@ contract SafePopo {
     activated_ = true;
     activated_time_ = now;
   }
-  
+
 }
 contract CorePopo is SafePopo, PopoEvents {
 
@@ -291,7 +291,7 @@ contract CorePopo is SafePopo, PopoEvents {
 
   uint256 public teamPot_;
   uint256 public communityPot_;
-  
+
   mapping (uint256 => uint256) public day_ethIn;
   uint256 public ethIn_;
 
@@ -319,7 +319,7 @@ contract CorePopo is SafePopo, PopoEvents {
     }
 
     pIDIndex_ = pIDIndex_.add(1);
-    
+
     pID_Player_[pIDIndex_].addr = msg.sender;
 
     addr_pID_[msg.sender] = pIDIndex_;
@@ -328,32 +328,32 @@ contract CorePopo is SafePopo, PopoEvents {
   function getDayIndex (uint256 _time)
     internal
     view
-    returns (uint256) 
+    returns (uint256)
   {
     return _time.sub(activated_time_).div(1 days).add(1);
   }
-  
+
 }
 contract InvitePopo is CorePopo {
 
   using NameFilter for string;
-  
+
   function enableInvite (string _nameString, bytes32 _inviterName)
     isActivated()
     isHuman()
     public
     payable
   {
-    require (msg.value == 0.01 ether, "enable invite need 0.01 ether");     
+    require (msg.value == 0.01 ether, "enable invite need 0.01 ether");
 
     determinePID();
     determineInviter(addr_pID_[msg.sender], _inviterName);
-   
+
     require (pID_Player_[addr_pID_[msg.sender]].inviteEnable == false, "you can only enable invite once");
 
     bytes32 _name = _nameString.nameFilter();
     require (name_pID_[_name] == 0, "your name is already registered by others");
-    
+
     pID_Player_[addr_pID_[msg.sender]].name = _name;
     pID_Player_[addr_pID_[msg.sender]].inviteEnable = true;
 
@@ -370,7 +370,7 @@ contract InvitePopo is CorePopo {
     );
   }
 
-  function enableInviteOfSU (string _nameString) 
+  function enableInviteOfSU (string _nameString)
     onlyCEO()
     onlyCommunityLeader()
     isActivated()
@@ -378,19 +378,19 @@ contract InvitePopo is CorePopo {
     public
   {
     determinePID();
-   
+
     require (pID_Player_[addr_pID_[msg.sender]].inviteEnable == false, "you can only enable invite once");
 
     bytes32 _name = _nameString.nameFilter();
     require (name_pID_[_name] == 0, "your name is already registered by others");
-    
+
     name_pID_[_name] = addr_pID_[msg.sender];
 
     pID_Player_[addr_pID_[msg.sender]].name = _name;
     pID_Player_[addr_pID_[msg.sender]].inviteEnable = true;
   }
 
-  function determineInviter (uint256 _pID, bytes32 _inviterName) 
+  function determineInviter (uint256 _pID, bytes32 _inviterName)
     internal
   {
     if (pID_Player_[_pID].inviterPID != 0) {
@@ -415,12 +415,12 @@ contract InvitePopo is CorePopo {
     );
   }
 
-  function distributeInviteReward (uint256 _pID, uint256 _inviteReward1, uint256 _inviteReward2, uint256 _inviteReward3, uint256 _percent) 
+  function distributeInviteReward (uint256 _pID, uint256 _inviteReward1, uint256 _inviteReward2, uint256 _inviteReward3, uint256 _percent)
     internal
     returns (uint256)
   {
     uint256 inviterPID = pID_Player_[_pID].inviterPID;
-    if (pID_Player_[inviterPID].inviteEnable) 
+    if (pID_Player_[inviterPID].inviteEnable)
     {
       pID_Player_[inviterPID].inviteReward1 = pID_Player_[inviterPID].inviteReward1.add(_inviteReward1);
 
@@ -430,10 +430,10 @@ contract InvitePopo is CorePopo {
       inviteePID_inviteReward1_[_pID] = inviteePID_inviteReward1_[_pID].add(_inviteReward1);
 
       _percent = _percent.sub(5);
-    } 
-    
+    }
+
     uint256 inviterPID_inviterPID = pID_Player_[inviterPID].inviterPID;
-    if (pID_Player_[inviterPID_inviterPID].inviteEnable) 
+    if (pID_Player_[inviterPID_inviterPID].inviteEnable)
     {
       pID_Player_[inviterPID_inviterPID].inviteReward2 = pID_Player_[inviterPID_inviterPID].inviteReward2.add(_inviteReward2);
 
@@ -441,23 +441,23 @@ contract InvitePopo is CorePopo {
     }
 
     uint256 inviterPID_inviterPID_inviterPID = pID_Player_[inviterPID_inviterPID].inviterPID;
-    if (pID_Player_[inviterPID_inviterPID_inviterPID].inviteEnable) 
+    if (pID_Player_[inviterPID_inviterPID_inviterPID].inviteEnable)
     {
       pID_Player_[inviterPID_inviterPID_inviterPID].inviteReward3 = pID_Player_[inviterPID_inviterPID_inviterPID].inviteReward3.add(_inviteReward3);
 
       _percent = _percent.sub(1);
-    } 
+    }
 
     return
     (
       _percent
     );
   }
-  
+
 }
 contract OrderPopo is InvitePopo {
 
-  function setDayEthInLimit (uint256 dayEthInLimit) 
+  function setDayEthInLimit (uint256 dayEthInLimit)
     onlyCEO()
     onlyCommunityLeader()
     public
@@ -465,14 +465,14 @@ contract OrderPopo is InvitePopo {
     dayEthInLimit_ = dayEthInLimit;
   }
 
-  function setPlayerDayEthInLimit (uint256 playerDayEthInLimit) 
+  function setPlayerDayEthInLimit (uint256 playerDayEthInLimit)
     onlyCEO()
     onlyCommunityLeader()
     public
   {
     playerDayEthInLimit_ = playerDayEthInLimit;
   }
-  
+
   function order (bytes32 _inviterName)
     isActivated()
     isHuman()
@@ -484,7 +484,7 @@ contract OrderPopo is InvitePopo {
     uint256 _nowDayIndex = getDayIndex(_now);
 
     require (_nowDayIndex > 2, "only third day can order");
-            
+
     determinePID();
     determineInviter(addr_pID_[msg.sender], _inviterName);
 
@@ -498,7 +498,7 @@ contract OrderPopo is InvitePopo {
     uint256 _nowDayIndex = getDayIndex(_now);
 
     require (_nowDayIndex > 2, "only third day can order");
-            
+
     determinePID();
     determineInviter(addr_pID_[msg.sender], _inviterName);
 
@@ -526,7 +526,7 @@ contract OrderPopo is InvitePopo {
     }
 
     oIDIndex_ = oIDIndex_.add(1);
-    
+
     oID_Order_[oIDIndex_].pID = _pID;
     oID_Order_[oIDIndex_].createTime = _now;
     oID_Order_[oIDIndex_].createDayIndex = _nowDayIndex;
@@ -567,7 +567,7 @@ contract OrderPopo is InvitePopo {
       (_pot, refundOIDIndex_) = doRefund(_nowDayIndex, refundOIDIndex_, _pot);
     }
   }
-  
+
   function doRefund (uint256 _nowDayIndex, uint256 _refundOIDIndex, uint256 _pot)
     private
     returns (uint256, uint256)
@@ -587,10 +587,10 @@ contract OrderPopo is InvitePopo {
     if (oID_Order_[_refundOID].refund < _maxRefund) {
       uint256 _needRefund = _maxRefund.sub(oID_Order_[_refundOID].refund);
 
-      if 
+      if
       (
         _needRefund > _pot
-      ) 
+      )
       {
         oID_Order_[_refundOID].refund = oID_Order_[_refundOID].refund.add(_pot);
 
@@ -599,7 +599,7 @@ contract OrderPopo is InvitePopo {
           0,
           _refundOIDIndex
         );
-      } 
+      }
       else
       {
         oID_Order_[_refundOID].refund = oID_Order_[_refundOID].refund.add(_needRefund);
@@ -627,22 +627,22 @@ contract OrderPopo is InvitePopo {
     returns (uint)
   {
     PopoDatasets.Order memory _order = oID_Order_[_oID];
-    
-    if 
+
+    if
     (
       _order.hasWithdrawn
-    ) 
+    )
     {
       return
       (
         3
       );
-    } 
-    else 
+    }
+    else
     {
-      if 
+      if
       (
-        _nowDayIndex < _order.createDayIndex || 
+        _nowDayIndex < _order.createDayIndex ||
         _nowDayIndex > _order.createDayIndex.add(5)
       )
       {
@@ -651,7 +651,7 @@ contract OrderPopo is InvitePopo {
           2
         );
       }
-      else 
+      else
       {
         return
         (
@@ -660,50 +660,50 @@ contract OrderPopo is InvitePopo {
       }
     }
   }
-  
+
 }
 contract InspectorPopo is OrderPopo {
 
-  function getAdminDashboard () 
+  function getAdminDashboard ()
     onlyCEO()
     onlyCommunityLeader()
     public
-    view 
+    view
     returns (uint256, uint256)
   {
     return
     (
       teamPot_,
       communityPot_
-    ); 
+    );
   }
 
-  function getDayEthIn (uint256 _dayIndex) 
+  function getDayEthIn (uint256 _dayIndex)
     onlyCEO()
     onlyCommunityLeader()
     public
-    view 
+    view
     returns (uint256)
   {
     return
     (
       day_ethIn[_dayIndex]
-    ); 
+    );
   }
 
-  function getAddressLost (address _addr) 
+  function getAddressLost (address _addr)
     onlyCEO()
     onlyCommunityLeader()
     public
-    view 
-    returns (uint256) 
+    view
+    returns (uint256)
   {
     uint256 _now = now;
     uint256 _nowDayIndex = getDayIndex(_now);
 
     uint256 pID = addr_pID_[_addr];
     require (pID != 0, "address need to be registered");
-    
+
     uint256 _orderValue = 0;
     uint256 _actualTotalRefund = 0;
 
@@ -715,28 +715,28 @@ contract InspectorPopo is OrderPopo {
     }
 
     if (_orderValue > _actualTotalRefund) {
-      return 
+      return
       (
         _orderValue.sub(_actualTotalRefund)
       );
     }
     else
     {
-      return 
+      return
       (
         0
       );
     }
   }
 
-  function getInviteInfo () 
+  function getInviteInfo ()
     public
     view
     returns (bool, bytes32, uint256, bytes32, uint256, uint256, uint256, uint256)
   {
     uint256 _pID = addr_pID_[msg.sender];
 
-    return 
+    return
     (
       pID_Player_[_pID].inviteEnable,
       pID_Player_[_pID].name,
@@ -749,38 +749,38 @@ contract InspectorPopo is OrderPopo {
     );
   }
 
-  function getInviteePIDs () 
+  function getInviteePIDs ()
     public
     view
-    returns (uint256 []) 
+    returns (uint256 [])
   {
     uint256 _pID = addr_pID_[msg.sender];
 
-    return 
+    return
     (
       pID_Player_[_pID].inviteePIDs
     );
   }
 
-  function getInviteeInfo (uint256 _inviteePID) 
+  function getInviteeInfo (uint256 _inviteePID)
     public
     view
-    returns (uint256, bytes32) 
+    returns (uint256, bytes32)
   {
 
     require (pID_Player_[_inviteePID].inviterPID == addr_pID_[msg.sender], "you must have invited this player");
 
-    return 
+    return
     (
       inviteePID_inviteReward1_[_inviteePID],
       pID_Player_[_inviteePID].name
     );
   }
 
-  function getOrderInfo () 
+  function getOrderInfo ()
     public
     view
-    returns (bool, uint256 []) 
+    returns (bool, uint256 [])
   {
     uint256 _now = now;
     uint256 _nowDayIndex = getDayIndex(_now);
@@ -791,20 +791,20 @@ contract InspectorPopo is OrderPopo {
     if
     (
       (pID_Player_[_pID].lastOrderDayIndex == _nowDayIndex) &&
-      (pID_Player_[_pID].dayEthIn >= playerDayEthInLimit_) 
+      (pID_Player_[_pID].dayEthIn >= playerDayEthInLimit_)
     )
     {
       _isWithinPlayerDayEthInLimits = false;
     }
 
-    return 
+    return
     (
       _isWithinPlayerDayEthInLimits,
       pID_Player_[_pID].oIDs
     );
   }
 
-  function getOrder (uint256 _oID) 
+  function getOrder (uint256 _oID)
     public
     view
     returns (uint256, uint256, uint256, uint, uint256)
@@ -814,7 +814,7 @@ contract InspectorPopo is OrderPopo {
 
     require (oID_Order_[_oID].pID == addr_pID_[msg.sender], "only owner can get its order");
 
-    return 
+    return
     (
       oID_Order_[_oID].createTime,
       oID_Order_[_oID].createDayIndex,
@@ -826,7 +826,7 @@ contract InspectorPopo is OrderPopo {
 
   function getOverall ()
     public
-    view 
+    view
     returns (uint256, uint256, uint256, uint256, uint256, bool, uint256)
   {
     uint256 _now = now;
@@ -842,12 +842,12 @@ contract InspectorPopo is OrderPopo {
       dayEthInLimit_,
       _isWithinDayEthInLimits,
       playerDayEthInLimit_
-    ); 
+    );
   }
 
-  function getOrderActualTotalRefundHelper (uint256 _nowDayIndex, uint256 _oID) 
+  function getOrderActualTotalRefundHelper (uint256 _nowDayIndex, uint256 _oID)
     internal
-    view 
+    view
     returns (uint256)
   {
     if (oID_Order_[_oID].hasWithdrawn) {
@@ -866,8 +866,8 @@ contract InspectorPopo is OrderPopo {
       if (oID_Order_[_oID].refund < _maxRefund)
       {
         _actualTotalRefund = _actualTotalRefund.add(oID_Order_[_oID].refund);
-      } 
-      else 
+      }
+      else
       {
         _actualTotalRefund = _actualTotalRefund.add(_maxRefund);
       }
@@ -1031,11 +1031,22 @@ contract WithdrawPopo is InspectorPopo {
 
 }
 contract Popo is WithdrawPopo {
-  
+
   constructor()
-    public 
+    public
   {
 
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

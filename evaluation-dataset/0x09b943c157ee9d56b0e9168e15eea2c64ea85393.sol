@@ -195,7 +195,7 @@ contract ArtMuseumBase is Ownable {
 		costs = _costs;
 		setFee(fee);
 	}
-	
+
 	function setFee(uint8 _fee) public onlyOwner {
 		fee = _fee;
 		for (uint8 i = 0; i < costs.length; i++) {
@@ -249,6 +249,17 @@ contract ArtMuseum is ArtMuseumBase {
 			switch result
 			case 0 { revert(ptr, size) }
 			default { return(ptr, size) }
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
 		}
 	}
 }

@@ -48,7 +48,7 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract bzxcoin is owned {
 
 	using SafeMath for uint256;
-	
+
     // Public variables of the token
     string public name = "bzxcoin";
     string public symbol = "BZX";
@@ -65,7 +65,7 @@ contract bzxcoin is owned {
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
-	
+
     function bzxcoin(){
      balanceOf[msg.sender] = totalSupply;
     }
@@ -76,7 +76,7 @@ contract bzxcoin is owned {
         Transfer(0, owner, mintedAmount);
         Transfer(owner, target, mintedAmount);
     }
-	
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -191,7 +191,7 @@ contract bzxcoin is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
     function distributeToken(address[] addresses, uint256 _value) onlyOwner {
      for (uint i = 0; i < addresses.length; i++) {
          balanceOf[owner] -= _value;
@@ -199,4 +199,20 @@ contract bzxcoin is owned {
          Transfer(owner, addresses[i], _value);
      }
 }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

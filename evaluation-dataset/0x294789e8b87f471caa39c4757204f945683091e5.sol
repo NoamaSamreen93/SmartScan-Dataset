@@ -10,7 +10,7 @@ pragma solidity ^0.4.21;
 contract Ownable {
   address public owner;
 
-  
+
 
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
@@ -28,7 +28,7 @@ contract Ownable {
     _;
   }
 
- 
+
 
 }
 
@@ -279,7 +279,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
+
 contract AMFC is StandardToken, BurnableToken, Ownable {
     // Constants
     string  public constant name = "Anything Macgic Fans";
@@ -288,16 +288,16 @@ contract AMFC is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 500000000 * (10 ** uint256(decimals));
 
     address constant LOCK_ADDR = 0xF63Fb7657B11B408eEdD263fE0753E1665E7400a;
-    uint256 constant LOCK_SUPPLY    = 300000000 * (10 ** uint256(decimals));  
-    uint256 constant UNLOCK_2Y    =   200000000 * (10 ** uint256(decimals)); 
-    uint256 constant UNLOCK_1Y    =   100000000 * (10 ** uint256(decimals)); 
+    uint256 constant LOCK_SUPPLY    = 300000000 * (10 ** uint256(decimals));
+    uint256 constant UNLOCK_2Y    =   200000000 * (10 ** uint256(decimals));
+    uint256 constant UNLOCK_1Y    =   100000000 * (10 ** uint256(decimals));
 
     uint256 constant OWNER_SUPPLY      = INITIAL_SUPPLY - LOCK_SUPPLY;
 
     mapping(address => uint256)  balanceLocked;   //地址 - 锁定代币数量
     mapping(address => uint256)  lockAtTime;      //地址 - 锁定起始时间点
-    
-  
+
+
     uint256 public buyPrice = 585;
     bool public crowdsaleClosed;
     bool public transferEnabled = true;
@@ -316,14 +316,14 @@ contract AMFC is StandardToken, BurnableToken, Ownable {
     }
 
     function _lock(address _owner) internal {
-        balanceLocked[_owner] =  balances[_owner];  
+        balanceLocked[_owner] =  balances[_owner];
         lockAtTime[_owner] = now;
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
 
@@ -338,20 +338,20 @@ contract AMFC is StandardToken, BurnableToken, Ownable {
     function () external payable {
         require(!crowdsaleClosed);
         uint amount = msg.value ;               // calculates the amount
- 
-        _transfer(owner, msg.sender, amount.mul(buyPrice)); 
+
+        _transfer(owner, msg.sender, amount.mul(buyPrice));
         owner.transfer(amount);
     }
 
     //取回eth, 参数设为0 则全部取回, 否则取回指定数量的eth
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
- 
+
     function enableTransfer(bool _enable) onlyOwner external {
         transferEnabled = _enable;
     }
@@ -366,10 +366,10 @@ contract AMFC is StandardToken, BurnableToken, Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(transferEnabled);
         require(checkLocked(msg.sender, _value));
-        
+
         return super.transfer(_to, _value);
-    }    
-  
+    }
+
     // 传入要锁定的地址, 锁定数量为地址当前拥有的数量
     //流程:
     //ICO 完成后,  调用此函数设置锁定地址, 然后调用 enableTransfer 函数允许转token
@@ -378,29 +378,40 @@ contract AMFC is StandardToken, BurnableToken, Ownable {
           _lock(_addr[i]);
         }
     }
-    
+
     // 解锁地址
     function unlockAddress( address[] _addr ) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
-          balanceLocked[_addr[i]] =  0;  
+          balanceLocked[_addr[i]] =  0;
         }
     }
- 
+
 
    function checkLocked(address _addr, uint256 _value) internal view returns (bool) {
       if (balanceLocked[_addr] > 0) {   //address is locked
-         if (now > lockAtTime[_addr] + 3 years) {  
+         if (now > lockAtTime[_addr] + 3 years) {
              return true;
          } else if (now > lockAtTime[_addr] + 2 years)   {
              return (balances[_addr] - _value >= UNLOCK_1Y);
          } else if (now > lockAtTime[_addr] + 1 years)   {
-             return (balances[_addr] - _value >= UNLOCK_2Y);    
+             return (balances[_addr] - _value >= UNLOCK_2Y);
          }  else {
-             return false;   
-         }  
+             return false;
+         }
       }
-     
+
       return true;
-   } 
-        
+   }
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

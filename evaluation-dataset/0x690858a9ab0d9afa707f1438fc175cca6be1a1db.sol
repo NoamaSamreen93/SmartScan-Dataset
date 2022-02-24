@@ -72,22 +72,22 @@ library SafeMath {
 contract Ownable {
     //using library SafeMath
     using SafeMath for uint;
-    
+
     enum RequestType {
         None,
         Owner,
         CoOwner1,
         CoOwner2
     }
-    
+
     address public owner;
     address coOwner1;
     address coOwner2;
     RequestType requestType;
     address newOwnerRequest;
-    
+
     mapping(address => bool) voterList;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
@@ -98,7 +98,7 @@ contract Ownable {
       coOwner1 = address(0x625789684cE563Fe1f8477E8B3c291855E3470dF);
       coOwner2 = address(0xe80a08C003b0b601964b4c78Fb757506d2640055);
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      **/
@@ -114,7 +114,7 @@ contract Ownable {
         require(msg.sender == coOwner2);
         _;
     }
-    
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -122,7 +122,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public {
       require(msg.sender == owner || msg.sender == coOwner1 || msg.sender == coOwner2);
       require(newOwner != address(0));
-      
+
       if(msg.sender == owner) {
           requestType = RequestType.Owner;
       }
@@ -135,14 +135,14 @@ contract Ownable {
       newOwnerRequest = newOwner;
       voterList[msg.sender] = true;
     }
-    
+
     function voteChangeOwner(bool isAgree) public {
         require(msg.sender == owner || msg.sender == coOwner1 || msg.sender == coOwner2);
         require(requestType != RequestType.None);
         voterList[msg.sender] = isAgree;
         checkVote();
     }
-    
+
     function checkVote() private {
         uint iYesCount = 0;
         uint iNoCount = 0;
@@ -164,7 +164,7 @@ contract Ownable {
         else {
             iNoCount = iNoCount.add(1);
         }
-        
+
         if(iYesCount >= 2) {
             emit OwnershipTransferred(owner, newOwnerRequest);
             if(requestType == RequestType.Owner) {
@@ -176,7 +176,7 @@ contract Ownable {
             else if(requestType == RequestType.CoOwner2) {
                 coOwner2 = newOwnerRequest;
             }
-            
+
             newOwnerRequest = address(0);
             requestType = RequestType.None;
         }
@@ -194,36 +194,36 @@ contract Ownable {
 contract Configurable {
     uint256 constant cfgPercentDivider = 10000;
     uint256 constant cfgPercentMaxReceive = 30000;
-    
+
     uint256 public cfgMinDepositRequired = 2 * 10**17; //0.2 ETH
     uint256 public cfgMaxDepositRequired = 100*10**18; //100 ETH
-    
+
     uint256 public minReceiveCommission = 2 * 10**16; //0.02 ETH
     uint256 public maxReceiveCommissionPercent = 15000; //150 %
-    
+
     uint256 public supportWaitingTime;
     uint256 public supportPercent;
     uint256 public receiveWaitingTime;
     uint256 public receivePercent;
-    
+
     uint256 public systemFeePercent = 300;          //3%
     address public systemFeeAddress;
-    
+
     uint256 public commissionFeePercent = 300;      //3%
     address public commissionFeeAddress;
-    
+
     uint256 public tokenSupportPercent = 500;       //5%
     address public tokenSupportAddress;
-    
+
     uint256 public directCommissionPercent = 1000;
 }
-    
+
 /**
- * @title EbcFund 
+ * @title EbcFund
  * @dev Contract to create the game
  **/
 contract EbcFund is Ownable, Configurable {
-    
+
     /**
      * @dev enum
      **/
@@ -237,9 +237,9 @@ contract EbcFund is Ownable, Configurable {
         processing,
         completed
     }
-    
+
     /**
-     * @dev Structs 
+     * @dev Structs
      **/
     struct Player {
         address parentAddress;
@@ -251,7 +251,7 @@ contract EbcFund is Ownable, Configurable {
         bool isKyc;
         uint256 directCommission;
     }
-    
+
     struct Game {
         address playerAddress;
         uint256 depositAmount;
@@ -261,25 +261,25 @@ contract EbcFund is Ownable, Configurable {
         uint nextRoundTime;
         uint256 nextRoundAmount;
     }
-    
+
     /**
      * @dev Variables
      **/
     Stages public currentStage;
     address transporter;
-    
+
     /**
      * @dev Events
      **/
     event Logger(string _label, uint256 _note);
-    
+
     /**
      * @dev Mapping
      **/
     mapping(address => bool) public donateList;
     mapping(address => Player) public playerList;
     mapping(uint => Game) public gameList;
-    
+
     /**
      * @dev constructor
      **/
@@ -293,14 +293,14 @@ contract EbcFund is Ownable, Configurable {
         supportPercent = 70;//0.7%
         receiveWaitingTime = 5*86400;//5 days
         receivePercent = 10;//0.1%
-        // 
+        //
         currentStage = Stages.Preparing;
         //
         donateList[owner] = true;
         donateList[commissionFeeAddress] = true;
         donateList[tokenSupportAddress] = true;
     }
-    
+
     /**
      * @dev Modifiers
      **/
@@ -316,7 +316,7 @@ contract EbcFund is Ownable, Configurable {
         require (currentStage == Stages.Paused);
         _;
     }
-    
+
 /* payments */
     /**
      * @dev fallback function to send ether to smart contract
@@ -324,7 +324,7 @@ contract EbcFund is Ownable, Configurable {
     function () public payable {
         require(currentStage == Stages.Started);
         require(cfgMinDepositRequired <= msg.value && msg.value <= cfgMaxDepositRequired);
-        
+
         if(donateList[msg.sender] == false) {
             if(transporter != address(0) && msg.sender == transporter) {
                 //validate msg.data
@@ -345,7 +345,7 @@ contract EbcFund is Ownable, Configurable {
             emit Logger("Thank you for your contribution!", msg.value);
         }
     }
-    
+
 /* administrative functions */
     /**
      * @dev get transporter address
@@ -361,14 +361,14 @@ contract EbcFund is Ownable, Configurable {
         require (_address != address(0));
         transporter = _address;
     }
-    
+
     /**
      * @dev update "donateList"
      **/
     function updateDonator(address _address, bool _isDonator) public onlyOwner{
         donateList[_address] = _isDonator;
     }
-    
+
     /**
      * @dev update config "systemFeeAddress"
      **/
@@ -377,7 +377,7 @@ contract EbcFund is Ownable, Configurable {
         //
         systemFeeAddress = _address;
     }
-    
+
     /**
      * @dev update config "systemFeePercent"
      **/
@@ -385,7 +385,7 @@ contract EbcFund is Ownable, Configurable {
         require(0 < _percent && _percent != systemFeePercent && _percent <= 500); //maximum is 5%
         systemFeePercent = _percent;
     }
-    
+
     /**
      * @dev update config "commissionFeeAddress"
      **/
@@ -394,7 +394,7 @@ contract EbcFund is Ownable, Configurable {
         //
         commissionFeeAddress = _address;
     }
-    
+
     /**
      * @dev update config "commissionFeePercent"
      **/
@@ -402,7 +402,7 @@ contract EbcFund is Ownable, Configurable {
         require(0 < _percent && _percent != commissionFeePercent && _percent <= 500); //maximum is 5%
         commissionFeePercent = _percent;
     }
-    
+
     /**
      * @dev update config "tokenSupportAddress"
      **/
@@ -411,7 +411,7 @@ contract EbcFund is Ownable, Configurable {
         //
         tokenSupportAddress = _address;
     }
-    
+
     /**
      * @dev update config "tokenSupportPercent"
      **/
@@ -419,7 +419,7 @@ contract EbcFund is Ownable, Configurable {
         require(0 < _percent && _percent != tokenSupportPercent && _percent <= 1000); //maximum is 10%
         tokenSupportPercent = _percent;
     }
-    
+
     /**
      * @dev update config "directCommissionPercent"
      **/
@@ -427,7 +427,7 @@ contract EbcFund is Ownable, Configurable {
         require(0 < _percent && _percent != directCommissionPercent && _percent <= 2000); //maximum is 20%
         directCommissionPercent = _percent;
     }
-    
+
     /**
      * @dev update config "cfgMinDepositRequired"
      **/
@@ -437,7 +437,7 @@ contract EbcFund is Ownable, Configurable {
         //
         cfgMinDepositRequired = _amount;
     }
-    
+
     /**
      * @dev update config "cfgMaxDepositRequired"
      **/
@@ -446,7 +446,7 @@ contract EbcFund is Ownable, Configurable {
         //
         cfgMaxDepositRequired = _amount;
     }
-    
+
     /**
      * @dev update config "minReceiveCommission"
      **/
@@ -454,7 +454,7 @@ contract EbcFund is Ownable, Configurable {
         require(0 < _amount && _amount != minReceiveCommission);
         minReceiveCommission = _amount;
     }
-    
+
     /**
      * @dev update config "maxReceiveCommissionPercent"
      **/
@@ -463,7 +463,7 @@ contract EbcFund is Ownable, Configurable {
         //
         maxReceiveCommissionPercent = _percent;
     }
-    
+
     /**
      * @dev update config "supportWaitingTime"
      **/
@@ -473,7 +473,7 @@ contract EbcFund is Ownable, Configurable {
         //
         supportWaitingTime = _time;
     }
-    
+
     /**
      * @dev update config "supportPercent"
      **/
@@ -483,7 +483,7 @@ contract EbcFund is Ownable, Configurable {
         //
         supportPercent = _percent;
     }
-    
+
     /**
      * @dev update config "receiveWaitingTime"
      **/
@@ -493,7 +493,7 @@ contract EbcFund is Ownable, Configurable {
         //
         receiveWaitingTime = _time;
     }
-    
+
     /**
      * @dev update config "receivePercent"
      **/
@@ -503,17 +503,17 @@ contract EbcFund is Ownable, Configurable {
         //
         receivePercent = _percent;
     }
-    
+
     /**
      * @dev update parent address
      **/
     function updatePlayerParent(address[] _address, address[] _parentAddress) public onlyOwner{
-        
+
         for(uint i = 0; i < _address.length; i++) {
             require(_address[i] != address(0));
             require(_parentAddress[i] != address(0));
             require(_address[i] != _parentAddress[i]);
-            
+
             Player storage currentPlayer = playerList[_address[i]];
             //
             currentPlayer.parentAddress = _parentAddress[i];
@@ -526,21 +526,21 @@ contract EbcFund is Ownable, Configurable {
                 _parentAddress[i].transfer(comAmount);
             }
         }
-        
+
     }
-    
+
     /**
      * @dev update kyc
      **/
     function updatePlayerKyc(address[] _address, bool[] _isKyc) public onlyOwner{
-        
+
         for(uint i = 0; i < _address.length; i++) {
             require(_address[i] != address(0));
             //
             playerList[_address[i]].isKyc = _isKyc[i];
         }
     }
-    
+
     /**
      * @dev start game
      **/
@@ -548,67 +548,67 @@ contract EbcFund is Ownable, Configurable {
         require(currentStage == Stages.Preparing || currentStage == Stages.Paused);
         currentStage = Stages.Started;
     }
-    
+
     /**
      * @dev pause game
      **/
     function pauseGame() public onlyOwner onlyStarted {
         currentStage = Stages.Paused;
     }
-    
+
     /**
      * @dev insert multi games
      **/
     function importPlayers(
-        address[] _playerAddress, 
+        address[] _playerAddress,
         address[] _parentAddress,
         uint256[] _totalDeposited,
         uint256[] _totalReceived,
         uint256[] _totalCommissionReceived,
         bool[] _isKyc) public onlyOwner onlyPreparing {
-            
+
             for(uint i = 0; i < _playerAddress.length; i++) {
                 processImportPlayer(
-                    _playerAddress[i], 
+                    _playerAddress[i],
                     _parentAddress[i],
                     _totalDeposited[i],
                     _totalReceived[i],
                     _totalCommissionReceived[i],
                     _isKyc[i]);
             }
-            
+
         }
-    
+
     function importGames(
         address[] _playerAddress,
         uint[] _gameHash,
         uint256[] _gameAmount,
         uint256[] _gameReceived) public onlyOwner onlyPreparing {
-            
+
             for(uint i = 0; i < _playerAddress.length; i++) {
                 processImportGame(
-                    _playerAddress[i], 
+                    _playerAddress[i],
                     _gameHash[i],
                     _gameAmount[i],
                     _gameReceived[i]);
             }
-            
+
         }
-    
+
     /**
      * @dev confirm game information
-     **/  
+     **/
     function confirmGames(address[] _playerAddress, uint[] _gameHash, uint256[] _gameAmount) public onlyCoOwner1 onlyStarted {
-        
+
         for(uint i = 0; i < _playerAddress.length; i++) {
             confirmGame(_playerAddress[i], _gameHash[i], _gameAmount[i]);
         }
-        
+
     }
-    
+
     /**
      * @dev confirm game information
-     **/  
+     **/
     function confirmGame(address _playerAddress, uint _gameHash, uint256 _gameAmount) public onlyCoOwner1 onlyStarted {
         //validate _gameHash
         require(100000000000 <= _gameHash && _gameHash <= 999999999999);
@@ -623,16 +623,16 @@ contract EbcFund is Ownable, Configurable {
         //Logger
         emit Logger("Game started", _gameAmount);
     }
-    
+
     /**
      * @dev process send direct commission missing
      **/
     function sendMissionDirectCommission(address _address) public onlyCoOwner2 onlyStarted {
-        
+
         require(donateList[_address] == false);
         require(playerList[_address].parentAddress != address(0));
         require(playerList[_address].directCommission > 0);
-        
+
         Player memory currentPlayer = playerList[_address];
         if(0 < currentPlayer.directCommission && currentPlayer.directCommission < address(this).balance) {
             uint256 comAmount = currentPlayer.directCommission;
@@ -642,26 +642,26 @@ contract EbcFund is Ownable, Configurable {
             //send direct commission
             currentPlayer.parentAddress.transfer(comAmount);
         }
-        
+
     }
-    
+
     /**
      * @dev process send commission
      **/
     function sendCommission(address _address, uint256 _amountCom) public onlyCoOwner2 onlyStarted {
-        
+
         require(donateList[_address] == false);
         require(minReceiveCommission <= _amountCom && _amountCom < address(this).balance);
         require(playerList[_address].isKyc == true);
         require(playerList[_address].lastReceiveCommission.add(86400) < now);
-        
+
         //current player
         Player storage currentPlayer = playerList[_address];
         //
         uint256 maxCommissionAmount = getMaximumCommissionAmount(
-            currentPlayer.totalAmountInGame, 
-            currentPlayer.totalReceived, 
-            currentPlayer.totalCommissionReceived, 
+            currentPlayer.totalAmountInGame,
+            currentPlayer.totalReceived,
+            currentPlayer.totalCommissionReceived,
             _amountCom);
         if(maxCommissionAmount > 0) {
             //update total receive
@@ -672,7 +672,7 @@ contract EbcFund is Ownable, Configurable {
             uint256 comFee = maxCommissionAmount.mul(commissionFeePercent).div(cfgPercentDivider);
             //Logger
             emit Logger("Send commission successfully", _amountCom);
-            
+
             if(comFee > 0) {
                 maxCommissionAmount = maxCommissionAmount.sub(comFee);
                 //send commission to store address
@@ -683,29 +683,29 @@ contract EbcFund is Ownable, Configurable {
                 _address.transfer(maxCommissionAmount);
             }
         }
-        
+
     }
-    
+
     /**
      * @dev process send profit in game
      **/
     function sendProfits(
         uint[] _gameHash,
         uint256[] _profitAmount) public onlyCoOwner2 onlyStarted {
-            
+
             for(uint i = 0; i < _gameHash.length; i++) {
                 sendProfit(_gameHash[i], _profitAmount[i]);
             }
-            
+
         }
-    
+
     /**
      * @dev process send profit in game
      **/
     function sendProfit(
         uint _gameHash,
         uint256 _profitAmount) public onlyCoOwner2 onlyStarted {
-            
+
             //validate game information
             Game memory game = gameList[_gameHash];
             require(game.status == GameStatus.processing);
@@ -716,30 +716,30 @@ contract EbcFund is Ownable, Configurable {
             assert(currentPlayer.isKyc == true);
             //do sendProfit
             processSendProfit(_gameHash, _profitAmount);
-            
+
         }
-    
+
 /* public functions */
-    
+
 /* private functions */
     /**
      * @dev process new game by deposit
      **/
     function processDeposit(address _address) private {
-        
+
         //update player information
         Player storage currentPlayer = playerList[_address];
         currentPlayer.totalDeposited = currentPlayer.totalDeposited.add(msg.value);
-        
+
         //Logger
         emit Logger("Game deposited", msg.value);
-        
+
         //send token support
         uint256 tokenSupportAmount = tokenSupportPercent.mul(msg.value).div(cfgPercentDivider);
         if(tokenSupportPercent > 0) {
             tokenSupportAddress.transfer(tokenSupportAmount);
         }
-        
+
         //send parent address
         uint256 directComAmount = directCommissionPercent.mul(msg.value).div(cfgPercentDivider);
         if(currentPlayer.parentAddress != address(0)) {
@@ -748,9 +748,9 @@ contract EbcFund is Ownable, Configurable {
         else {
             currentPlayer.directCommission = currentPlayer.directCommission.add(directComAmount);
         }
-        
+
     }
-    
+
     /**
      * @dev convert bytes to address
      **/
@@ -770,20 +770,20 @@ contract EbcFund is Ownable, Configurable {
             }
         }
         return address(result);
-          
+
     }
-    
+
     /**
      * @dev process import player information
-     **/ 
+     **/
     function processImportPlayer(
-        address _playerAddress, 
-        address _parentAddress, 
+        address _playerAddress,
+        address _parentAddress,
         uint256 _totalDeposited,
         uint256 _totalReceived,
         uint256 _totalCommissionReceived,
         bool _isKyc) private {
-            
+
             //update player information
             Player storage currentPlayer = playerList[_playerAddress];
             currentPlayer.parentAddress = _parentAddress;
@@ -791,43 +791,43 @@ contract EbcFund is Ownable, Configurable {
             currentPlayer.totalReceived = _totalReceived;
             currentPlayer.totalCommissionReceived = _totalCommissionReceived;
             currentPlayer.isKyc = _isKyc;
-            
+
             //Logger
             emit Logger("Player imported", _totalDeposited);
-            
+
         }
-     
+
     /**
      * @dev process import game information
-     **/ 
+     **/
     function processImportGame(
-        address _playerAddress, 
+        address _playerAddress,
         uint _gameHash,
         uint256 _gameAmount,
         uint256 _gameReceived) private {
-            
+
             //update player information
             Player storage currentPlayer = playerList[_playerAddress];
             currentPlayer.totalAmountInGame = currentPlayer.totalAmountInGame.add(_gameAmount);
             currentPlayer.totalReceived = currentPlayer.totalReceived.add(_gameReceived);
-            
+
             //init game
             initGame(_playerAddress, _gameHash, _gameAmount, _gameReceived);
-            
+
             //Logger
             emit Logger("Game imported", _gameAmount);
-            
+
         }
-     
+
     /**
      * @dev init new game
-     **/ 
+     **/
     function initGame(
         address _playerAddress,
         uint _gameHash,
         uint256 _gameAmount,
         uint256 _gameReceived) private {
-            
+
             Game storage game = gameList[_gameHash];
             game.playerAddress = _playerAddress;
             game.depositAmount = _gameAmount;
@@ -835,24 +835,24 @@ contract EbcFund is Ownable, Configurable {
             game.status = GameStatus.processing;
             game.nextRoundTime = now.add(supportWaitingTime);
             game.nextRoundAmount = getProfitNextRound(_gameAmount);
-            
+
         }
-    
+
     /**
      * @dev process check & send profit
      **/
     function processSendProfit(
         uint _gameHash,
         uint256 _profitAmount) private {
-        
+
             Game storage game = gameList[_gameHash];
             Player storage currentPlayer = playerList[game.playerAddress];
-            
+
             //total receive by game
             uint256 maxGameReceive = game.depositAmount.mul(cfgPercentMaxReceive).div(cfgPercentDivider);
             //total receive by player
             uint256 maxPlayerReceive = currentPlayer.totalAmountInGame.mul(cfgPercentMaxReceive).div(cfgPercentDivider);
-            
+
             if(maxGameReceive <= game.receiveAmount || maxPlayerReceive <= currentPlayer.totalReceived) {
                 emit Logger("ERR: Player cannot break game's rule [amount].", currentPlayer.totalReceived);
                 game.status = GameStatus.completed;
@@ -864,18 +864,18 @@ contract EbcFund is Ownable, Configurable {
                 if(maxPlayerReceive < currentPlayer.totalReceived.add(_profitAmount)) {
                     _profitAmount = maxPlayerReceive.sub(currentPlayer.totalReceived);
                 }
-                
+
                 //update game totalReceived
                 game.receiveAmount = game.receiveAmount.add(_profitAmount);
                 game.nextRoundTime = now.add(supportWaitingTime);
                 game.nextRoundAmount = getProfitNextRound(game.depositAmount);
-                
+
                 //Logger
                 emit Logger("Info: send profit", _profitAmount);
-                
-                //update player total received 
+
+                //update player total received
                 currentPlayer.totalReceived = currentPlayer.totalReceived.add(_profitAmount);
-                
+
                 //send systemFeeAddress
                 uint256 feeAmount = systemFeePercent.mul(_profitAmount).div(cfgPercentDivider);
                 if(feeAmount > 0) {
@@ -883,26 +883,26 @@ contract EbcFund is Ownable, Configurable {
                     //send fee
                     systemFeeAddress.transfer(feeAmount);
                 }
-                
+
                 //send profit
                 game.playerAddress.transfer(_profitAmount);
             }
-            
+
         }
-    
+
     /**
      * @dev get profit next round
      **/
     function getProfitNextRound(uint256 _amount) private constant returns(uint256) {
-        
+
         uint256 support = supportPercent.mul(supportWaitingTime);
         uint256 receive = receivePercent.mul(receiveWaitingTime);
         uint256 totalPercent = support.add(receive);
         //
         return _amount.mul(totalPercent).div(cfgPercentDivider).div(86400);
-        
+
     }
-    
+
     /**
      * @dev get maximum amount commission avariable
      **/
@@ -911,7 +911,7 @@ contract EbcFund is Ownable, Configurable {
         uint256 _totalReceived,
         uint256 _totalCommissionReceived,
         uint256 _amountCom) private returns(uint256) {
-        
+
         //maximum commission can receive
         uint256 maxCommissionAmount = _totalDeposited.mul(maxReceiveCommissionPercent).div(cfgPercentDivider);
         //check total receive commission
@@ -931,7 +931,23 @@ contract EbcFund is Ownable, Configurable {
         else if(maxProfitCanReceive < _totalReceived.add(_amountCom)) {
             _amountCom = maxProfitCanReceive.sub(_totalReceived);
         }
-        
+
         return _amountCom;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

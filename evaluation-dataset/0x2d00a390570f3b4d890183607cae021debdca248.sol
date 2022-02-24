@@ -50,12 +50,12 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   /**
    * @dev Changes the Coinvest wallet that will receive funds from investment contract.
    * @param _newCoinvest The address of the new wallet.
   **/
-  function transferCoinvest(address _newCoinvest) 
+  function transferCoinvest(address _newCoinvest)
     external
     onlyOwner
   {
@@ -98,7 +98,7 @@ contract ERC20Interface {
  * @dev Bank holds all user funds so Investment contract can easily be replaced.
 **/
 contract Bank is Ownable {
-    
+
     address public investmentAddr;      // Investment contract address used to allow withdrawals
     address public coinToken;           // COIN token address.
     address public cashToken;           // CASH token address.
@@ -115,7 +115,7 @@ contract Bank is Ownable {
     }
 
 /** ****************************** Only Investment ****************************** **/
-    
+
     /**
      * @dev Investment contract needs to be able to disburse funds to users.
      * @param _to Address to send funds to.
@@ -135,9 +135,9 @@ contract Bank is Ownable {
         require(token.transfer(_to, _value));
         return true;
     }
-    
+
 /** ******************************* Only Owner ********************************** **/
-    
+
     /**
      * @dev Owner may change the investment address when contracts are being updated.
      * @param _newInvestment The address of the new investment contract.
@@ -149,7 +149,7 @@ contract Bank is Ownable {
         require(_newInvestment != address(0));
         investmentAddr = _newInvestment;
     }
-    
+
 /** ****************************** Only Coinvest ******************************* **/
 
     /**
@@ -164,10 +164,21 @@ contract Bank is Ownable {
         if (_tokenContract == address(0)) coinvest.transfer(address(this).balance);
         else {
             ERC20Interface lostToken = ERC20Interface(_tokenContract);
-        
+
             uint256 stuckTokens = lostToken.balanceOf(address(this));
             lostToken.transfer(coinvest, stuckTokens);
-        }    
+        }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

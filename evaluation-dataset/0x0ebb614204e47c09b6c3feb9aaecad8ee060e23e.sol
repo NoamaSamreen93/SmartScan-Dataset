@@ -30,7 +30,7 @@ contract CPAYToken is ERC20Interface {
 
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
- 
+
     uint256 public totalPayments;
     mapping(address => uint256) public payments;
 
@@ -225,4 +225,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

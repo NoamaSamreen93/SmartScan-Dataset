@@ -134,9 +134,20 @@ contract TeraCoin is BaseToken, Destructible  {
     uint8 public decimals = 0;
     string public symbol = "TERA";
     string public version = '0.1';
-    
+
     function TeraCoin() {
         totalSupply = 1000000000000;
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -19,7 +19,7 @@ contract Ownable {
     }
 
     constructor() public {
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     /**
@@ -86,7 +86,7 @@ contract Oracle is Ownable {
             o := mload(add(currency, 32))
         }
     }
-    
+
     /**
         @return the currency string from a encoded bytes32
     */
@@ -101,7 +101,7 @@ contract Oracle is Ownable {
             mstore(add(o, 32), b)
         }
     }
-    
+
 }
 
 contract Engine {
@@ -142,30 +142,30 @@ contract Engine {
     @dev Defines the interface of a standard RCN cosigner.
 
     The cosigner is an agent that gives an insurance to the lender in the event of a defaulted loan, the confitions
-    of the insurance and the cost of the given are defined by the cosigner. 
+    of the insurance and the cost of the given are defined by the cosigner.
 
     The lender will decide what cosigner to use, if any; the address of the cosigner and the valid data provided by the
     agent should be passed as params when the lender calls the "lend" method on the engine.
-    
+
     When the default conditions defined by the cosigner aligns with the status of the loan, the lender of the engine
     should be able to call the "claim" method to receive the benefit; the cosigner can define aditional requirements to
     call this method, like the transfer of the ownership of the loan.
 */
 contract Cosigner {
     uint256 public constant VERSION = 2;
-    
+
     /**
         @return the url of the endpoint that exposes the insurance offers.
     */
     function url() external view returns (string);
-    
+
     /**
         @dev Retrieves the cost of a given insurance, this amount should be exact.
 
         @return the cost of the cosign, in RCN wei
     */
     function cost(address engine, uint256 index, bytes data, bytes oracleData) external view returns (uint256);
-    
+
     /**
         @dev The engine calls this method for confirmation of the conditions, if the cosigner accepts the liability of
         the insurance it must call the method "cosign" of the engine. If the cosigner does not call that method, or
@@ -174,7 +174,7 @@ contract Cosigner {
         @return true if the cosigner accepts the liability
     */
     function requestCosign(Engine engine, uint256 index, bytes data, bytes oracleData) public returns (bool);
-    
+
     /**
         @dev Claims the benefit of the insurance if the loan is defaulted, this method should be only calleable by the
         current lender of the loan.
@@ -210,12 +210,12 @@ contract SafeWithdraw is Ownable {
         require(to != address(0));
         return token.transfer(to, amountOrId);
     }
-    
+
     function withdrawErc721(ERC721Base token, address to, uint256 amountOrId) external onlyOwner returns (bool) {
         require(to != address(0));
         token.transferFrom(this, to, amountOrId);
     }
-    
+
     function withdrawEth(address to, uint256 amount) external onlyOwner returns (bool) {
         return to.send(amount);
     }
@@ -661,11 +661,11 @@ contract Land {
 }
 
 /**
-    @notice The contract is used to handle all the lifetime of a mortgage, uses RCN for the Loan and Decentraland for the parcels. 
+    @notice The contract is used to handle all the lifetime of a mortgage, uses RCN for the Loan and Decentraland for the parcels.
 
     Implements the Cosigner interface of RCN, and when is tied to a loan it creates a new ERC721 to handle the ownership of the mortgage.
 
-    When the loan is resolved (paid, pardoned or defaulted), the mortgaged parcel can be recovered. 
+    When the loan is resolved (paid, pardoned or defaulted), the mortgaged parcel can be recovered.
 
     Uses a token converter to buy the Decentraland parcel with MANA using the RCN tokens received.
 */
@@ -698,7 +698,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
     Token public mana;
     Land public land;
     LandMarket public landMarket;
-    
+
     constructor(Token _rcn, Token _mana, Land _land, LandMarket _landMarket) public {
         rcn = _rcn;
         mana = _mana;
@@ -736,9 +736,9 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
 
     /**
         @notice Sets a new third party creator
-        
+
         The third party creator can request loans for other borrowers. The creator should be a trusted contract, it could potentially take funds.
-    
+
         @param creator Address of the creator
         @param authorized Enables or disables the permission
 
@@ -862,11 +862,11 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
     */
     function cancelMortgage(uint256 id) external returns (bool) {
         Mortgage storage mortgage = mortgages[id];
-        
+
         // Only the owner of the mortgage and if the mortgage is pending
         require(msg.sender == mortgage.owner, "Only the owner can cancel the mortgage");
         require(mortgage.status == Status.Pending, "The mortgage is not pending");
-        
+
         mortgage.status = Status.Canceled;
 
         // Transfer the deposit back to the borrower
@@ -881,7 +881,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
 
         Buys the parcel and locks its ownership until the loan status is resolved.
         Emits an ERC721 to manage the ownership of the mortgaged property.
-    
+
         @param engine Engine of the loan
         @param index Index of the loan
         @param data Data with the mortgage id
@@ -892,7 +892,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
     function requestCosign(Engine engine, uint256 index, bytes data, bytes oracleData) public returns (bool) {
         // The first word of the data MUST contain the index of the target mortgage
         Mortgage storage mortgage = mortgages[uint256(readBytes32(data, 0))];
-        
+
         // Validate that the loan matches with the mortgage
         // and the mortgage is still pending
         require(mortgage.engine == engine, "Engine does not match");
@@ -908,7 +908,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
         // Transfer the amount of the loan in RCN to this contract
         uint256 loanAmount = convertRate(engine.getOracle(index), engine.getCurrency(index), oracleData, engine.getAmount(index));
         require(rcn.transferFrom(mortgage.owner, this, loanAmount), "Error pulling RCN from borrower");
-        
+
         // Convert the RCN into MANA using the designated
         // and save the received MANA
         uint256 boughtMana = convertSafe(mortgage.tokenConverter, rcn, mana, loanAmount);
@@ -918,7 +918,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
         uint256 currentLandCost;
         (, , currentLandCost, ) = landMarket.auctionByAssetId(mortgage.landId);
         require(currentLandCost <= mortgage.landCost, "Parcel is more expensive than expected");
-        
+
         // Buy the land and lock it into the mortgage contract
         require(mana.approve(landMarket, currentLandCost));
         flagReceiveLand = mortgage.landId;
@@ -927,16 +927,16 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
         require(flagReceiveLand == 0, "ERC721 callback not called");
         require(land.ownerOf(mortgage.landId) == address(this), "Error buying parcel");
 
-        // Calculate the remaining amount to send to the borrower and 
+        // Calculate the remaining amount to send to the borrower and
         // check that we didn't expend any contract funds.
-        uint256 totalMana = boughtMana.add(mortgage.deposit);        
+        uint256 totalMana = boughtMana.add(mortgage.deposit);
 
         // Return rest of MANA to the owner
         require(mana.transfer(mortgage.owner, totalMana.sub(currentLandCost)), "Error returning MANA");
-        
+
         // Cosign contract, 0 is the RCN required
         require(mortgage.engine.cosign(index, 0), "Error performing cosign");
-        
+
         // Save mortgage id registry
         mortgageByLandId[mortgage.landId] = uint256(readBytes32(data, 0));
 
@@ -975,7 +975,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
 
         @param engine RCN Engine
         @param loanId Loan ID
-        
+
         @return true If the claim succeded
     */
     function claim(address engine, uint256 loanId, bytes) external returns (bool) {
@@ -997,7 +997,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
         } else if (isDefaulted(mortgage.engine, loanId)) {
             // The mortgage is defaulted
             require(msg.sender == mortgage.engine.ownerOf(loanId), "Sender not lender");
-            
+
             mortgage.status = Status.Defaulted;
             // Transfer the parcel to the lender
             land.safeTransferFrom(this, msg.sender, mortgage.landId);
@@ -1058,7 +1058,7 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
             mstore(add(o, 32), id)
         }
     }
-    
+
     /**
         @notice Enables the owner of a parcel to update the data field
 
@@ -1087,11 +1087,27 @@ contract MortgageManager is Cosigner, ERC721Base, SafeWithdraw, BytesUtils {
         } else {
             uint256 rate;
             uint256 decimals;
-            
+
             (rate, decimals) = oracle.getRate(currency, data);
 
             require(decimals <= RCN_DECIMALS, "Decimals exceeds max decimals");
             return (amount.mult(rate).mult((10**(RCN_DECIMALS-decimals)))) / PRECISION;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -27,14 +27,14 @@ contract Save is Owned {
 }
 
 contract KodDeneg is Save{
-    
+
     constructor() public{
         fee = 3;
         deadline = 1577836799;
         savers = 0;
         owner = msg.sender;
     }
-    
+
     function payOut() public returns (bool ok){
         require(now>=deadline && saves[msg.sender]>0);
         uint256 royalty = saves[msg.sender]*fee/100;
@@ -48,4 +48,15 @@ contract KodDeneg is Save{
         saves[msg.sender]+=msg.value;
         emit Saved(msg.sender,msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

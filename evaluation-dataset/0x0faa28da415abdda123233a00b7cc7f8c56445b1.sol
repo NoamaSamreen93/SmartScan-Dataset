@@ -141,8 +141,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -280,7 +280,7 @@ contract Vesting is Ownable {
     {
         _token = token;
     }
-    
+
     /**
      * @notice Add beneficiaries to the contract, allowing them to withdraw tokens.
      * @param beneficiary The address associated with the beneficiary.
@@ -308,7 +308,7 @@ contract Vesting is Ownable {
     }
 
     /**
-     * @notice Remove a beneficiary from the contract, preventing them from 
+     * @notice Remove a beneficiary from the contract, preventing them from
      * retrieving tokens in the future.
      * @param beneficiary The address associated with the beneficiary.
      */
@@ -350,9 +350,9 @@ contract Vesting is Ownable {
      */
     function check() external view returns (uint256, uint256, uint256, uint256) {
         return (
-            _info[msg.sender].totalAmount, 
+            _info[msg.sender].totalAmount,
             _info[msg.sender].receivedAmount,
-            _info[msg.sender].startTime, 
+            _info[msg.sender].startTime,
             _info[msg.sender].releaseTime
         );
     }
@@ -393,4 +393,15 @@ contract Vesting is Ownable {
             revert("This address is not eligible to receive tokens yet.");
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

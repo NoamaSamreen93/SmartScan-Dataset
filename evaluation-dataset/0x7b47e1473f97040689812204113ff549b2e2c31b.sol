@@ -33,7 +33,7 @@ contract Ownable {
    */
   function Ownable() public {
       owner=msg.sender;
-  
+
   }
 
   /**
@@ -514,7 +514,7 @@ contract RefundVault is Ownable {
   }
 
   function close() onlyOwner public {
- 
+
     state = State.Closed;
     Closed();
     wallet.transfer(this.balance);
@@ -575,8 +575,8 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   function finalization() internal {
     if (goalReached()) {
       vault.close();
-    } 
-    
+    }
+
     else {
       vault.enableRefunds();
     }
@@ -639,7 +639,7 @@ contract Mest is MintableToken {
   string public constant name = "Monaco Estate";
   string public constant symbol = "MEST";
   uint8 public constant decimals = 18;
- 
+
   address public admin=0x6bfc645b3fd135f14eed944922157c41dcc5e9ab;
  event Pause();
  event Unpause();
@@ -710,7 +710,7 @@ contract Mest is MintableToken {
   }
 
 
-   
+
 
   /**
    * @dev Transfer tokens from one address to another
@@ -741,25 +741,25 @@ contract FounderAllocation is Ownable {
   Mest mest;
   mapping (address => uint) founderAllocations;
   uint256 tokensCreated = 0;
- 
- 
+
+
 //decimal value
  uint256 public constant decimalFactor = 10 ** uint256(18);
 
   uint256 constant public FounderAllocationTokens = 20000000*decimalFactor;
 
- 
+
   //address of the founder storage vault
   address public founderStorageVault = 0x4cCeF76C9883a4c416DACAA0c0e4f3a47D65883a;
- 
+
   function TeamAllocation() {
     mest = Mest(msg.sender);
-  
+
     unlockedAt = now;
-   
-    // 20% tokens from the FounderAllocation 
+
+    // 20% tokens from the FounderAllocation
     founderAllocations[founderStorageVault] = FounderAllocationTokens;
-   
+
   }
   function getTotalAllocation() returns (uint256){
     return (FounderAllocationTokens);
@@ -769,10 +769,10 @@ contract FounderAllocation is Ownable {
     if (tokensCreated == 0) {
       tokensCreated = mest.balanceOf(this);
     }
-    
+
     //transfer the  tokens to the founderStorageAddress
     mest.transfer(founderStorageVault, tokensCreated);
-  
+
   }
 }
 
@@ -782,7 +782,7 @@ contract MestCrowdsale is RefundableCrowdsale,CappedCrowdsale {
 
 //decimal value
  uint256 public constant decimalFactor = 10 ** uint256(18);
- 
+
 //Available tokens for PublicAllocation
 uint256 public publicAllocation = 80000000 *decimalFactor; //80%
 //Available token for FounderAllocation
@@ -799,7 +799,7 @@ uint256 public minContribAmount = 0.1 ether; // minimum contribution amount is 0
 event Burn(address indexed burner, uint256 value);
 uint256 public whitelistMaxContribAmount = 2.5 ether; // 2.5 ether
 
-  
+
 
 //status to find  whitelist investor's max contribution amount
 struct whiteListInStruct{
@@ -812,7 +812,7 @@ uint256 public refundingStarttime;
 uint256 public refundingEndtime=90 days;
 
 //To store whitelist investors address and status
-  
+
 mapping(address => whiteListInStruct[]) whiteList;
 
 
@@ -863,7 +863,7 @@ function MestCrowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, addr
        weiRaised = weiRaised.add(weiAmount);
        token.mint(beneficiary, tokens);
        TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
-    
+
      }
 
 
@@ -940,62 +940,62 @@ function isVerified(address _address, uint256 _amt)internal  returns  ( bool){
           require(isFinalized);
           vault.close();
      }
-     
-     
+
+
 // if crowdsale is unsuccessful, investors can claim refunds here
   function claimRefund() public {
         require(getNow()<=refundingEndtime);
         require(isFinalized);
         require(!goalReached());
-      
+
          vault.refund(msg.sender);
-      
-      
+
+
   }
-  
-     
- 
+
+
+
   //it will call when   crowdsale unsuccessful  if crowdsale  completed
   function finalization() internal {
         refundingStarttime=getNow();
         refundingEndtime=refundingEndtime.add(getNow());
-       
+
        if(goalReached()){
         founderAllocation = new FounderAllocation();
         token.mint(address(founderAllocation), _founder);
         _founder=_founder.sub(_founder);
        }else if(!goalReached()){
-           
-           
+
+
             Burn(msg.sender, _founder);
              _founder=0;
        }
-        
+
         token.finishMinting();
         super.finalization();
-         
+
   }
 
- 
-  // Change crowdsale Starttime 
+
+  // Change crowdsale Starttime
   function changeStarttime(uint256 _startTime) public onlyOwner {
 
-           
+
             startTime = _startTime;
         }
-        
+
           // Change the changeminContribAmount
       function changeminContribAmount(uint256 _minContribAmount) public onlyOwner {
         require(_minContribAmount != 0);
          minContribAmount = _minContribAmount;
 
       }
-        
-  // Change crowdsale  Endtime 
+
+  // Change crowdsale  Endtime
   function changeEndtime(uint256 _endTime) public onlyOwner {
 
             endTime = _endTime;
-           
+
         }
 
         // Change the token price
@@ -1017,32 +1017,38 @@ function isVerified(address _address, uint256 _amt)internal  returns  ( bool){
      function changeMaximumContribution(uint256 _whitelistMaxContribAmount) public onlyOwner {
        require(_whitelistMaxContribAmount != 0);
         whitelistMaxContribAmount = _whitelistMaxContribAmount;
-        
+
      }
 
 
-  
-            
+
+
       //change  Publicallocation
     function changePublicallocation (uint256  _value) onlyOwner  {
         publicAllocation = _value.mul(decimalFactor);
-       
+
     }
-        
-        
-        
+
+
+
     //change  wallet address
     function changeWallet (address _wallet) onlyOwner  {
         wallet = _wallet;
-       
+
     }
-        
-            
+
+
         //Burns a specific amount of tokens
     function burnToken(uint256 _value) onlyOwner {
         require(_value > 0 &&_value <= publicAllocation);
          publicAllocation = publicAllocation.sub(_value.mul(decimalFactor));
 
-        
+
         Burn(msg.sender, _value);
     }}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

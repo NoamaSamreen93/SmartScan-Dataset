@@ -82,19 +82,19 @@ contract Ownership is IOwnership {
 /**
  * @title Transferable ownership interface
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
  * #author Frank Bonnet
  */
 contract ITransferableOwnership {
-    
+
 
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner);
 }
@@ -103,7 +103,7 @@ contract ITransferableOwnership {
 /**
  * @title Transferable ownership
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
@@ -115,7 +115,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -222,7 +222,7 @@ contract TokenRetriever is ITokenRetriever {
 /**
  * @title Token observer interface
  *
- * Allows a token smart-contract to notify observers 
+ * Allows a token smart-contract to notify observers
  * when tokens are received
  *
  * #created 09/10/2017
@@ -231,7 +231,7 @@ contract TokenRetriever is ITokenRetriever {
 contract ITokenObserver {
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -253,7 +253,7 @@ contract ITokenObserver {
 contract TokenObserver is ITokenObserver {
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -266,7 +266,7 @@ contract TokenObserver is ITokenObserver {
 
     /**
      * Event handler
-     * 
+     *
      * Called by `_token` when a token amount is received
      *
      * @param _token The token contract that received the transaction
@@ -286,28 +286,28 @@ contract TokenObserver is ITokenObserver {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-contract IToken { 
+contract IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() constant returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) constant returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -315,9 +315,9 @@ contract IToken {
     function transfer(address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -326,9 +326,9 @@ contract IToken {
     function transferFrom(address _from, address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -336,9 +336,9 @@ contract IToken {
     function approve(address _spender, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -351,7 +351,7 @@ contract IToken {
  * @title Dcorp Proxy
  *
  * Serves as a placeholder for the Dcorp funds, allowing the community the ability to vote on the acceptance of the VC platform,
- * and the transfer of token ownership. This mechanism is in place to allow the unlocking of the original DRP token, and to allow token 
+ * and the transfer of token ownership. This mechanism is in place to allow the unlocking of the original DRP token, and to allow token
  * holders to convert to DRPU or DRPS.
 
  * This proxy is deployed upon receiving the Ether that is currently held by the DRP Crowdsale contract.
@@ -413,7 +413,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Require that the proxy is in `_stage` 
+     * Require that the proxy is in `_stage`
      */
     modifier only_at_stage(Stages _stage) {
         require(stage == _stage);
@@ -444,7 +444,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Require that sender has more than zero tokens 
+     * Require that sender has more than zero tokens
      */
     modifier only_token_holder() {
         require(allocated[msg.sender].drps > 0 || allocated[msg.sender].drpu > 0);
@@ -495,7 +495,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
         require(isSupported(_proposedAddress, false));
         _;
     }
-    
+
 
     /**
      * Construct the proxy
@@ -524,7 +524,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Returns whether the proxy is deployed. The proxy is deployed 
+     * Returns whether the proxy is deployed. The proxy is deployed
      * when it receives Ether from the drp crowdsale contract
      *
      * @return Whether the proxy is deployed
@@ -535,7 +535,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Returns whether a proposal, and with it the proxy itself, is 
+     * Returns whether a proposal, and with it the proxy itself, is
      * already executed or not
      *
      * @return Whether the proxy is executed
@@ -568,7 +568,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
      * @return The combined total drp supply
      */
     function getTotalSupply() public constant returns (uint) {
-        uint sum = 0; 
+        uint sum = 0;
         sum += drpsToken.totalSupply();
         sum += drpuToken.totalSupply();
         return sum;
@@ -586,9 +586,9 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     }
 
 
-    /** 
+    /**
      * Get the allocated drps token balance of `_owner`
-     * 
+     *
      * @param _token The address to test against
      * @param _owner The address from which the allocated token balance will be retrieved
      * @return The allocated drps token balance
@@ -597,8 +597,8 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
         uint balance = 0;
         if (address(drpsToken) == _token) {
             balance = allocated[_owner].drps;
-        } 
-        
+        }
+
         else if (address(drpuToken) == _token) {
             balance = allocated[_owner].drpu;
         }
@@ -611,7 +611,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
      * Returns true if `_proposedAddress` is already proposed
      *
      * @param _proposedAddress Address that was proposed
-     * @return Whether `_proposedAddress` is already proposed 
+     * @return Whether `_proposedAddress` is already proposed
      */
     function isProposed(address _proposedAddress) public constant returns (bool) {
         return proposalIndex.length > 0 && _proposedAddress == proposalIndex[proposals[_proposedAddress].index];
@@ -629,9 +629,9 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Propose the transfer token ownership and all funds to `_proposedAddress` 
+     * Propose the transfer token ownership and all funds to `_proposedAddress`
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      */
     function propose(address _proposedAddress) public only_owner only_at_stage(Stages.Deployed) {
         require(!isProposed(_proposedAddress));
@@ -644,12 +644,12 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Gets the voting duration, the amount of time voting 
+     * Gets the voting duration, the amount of time voting
      * is allowed
      *
      * @return Voting duration
      */
-    function getVotingDuration() public constant returns (uint) {              
+    function getVotingDuration() public constant returns (uint) {
         return VOTING_DURATION;
     }
 
@@ -657,10 +657,10 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Gets the number of votes towards a proposal
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @return uint Vote count
      */
-    function getVoteCount(address _proposedAddress) public constant returns (uint) {              
+    function getVoteCount(address _proposedAddress) public constant returns (uint) {
         return proposals[_proposedAddress].voteIndex.length;
     }
 
@@ -668,7 +668,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Returns true if `_account` has voted on the proposal
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @param _account The key (address) that maps to the vote
      * @return bool Whether `_account` has voted on the proposal
      */
@@ -684,12 +684,12 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Returns true if `_account` supported the proposal and returns 
+     * Returns true if `_account` supported the proposal and returns
      * false if `_account` is opposed to the proposal
      *
      * Does not check if `_account` had voted, use hasVoted()
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @param _account The key (address) that maps to the vote
      * @return bool Supported
      */
@@ -701,13 +701,13 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Allows a token holder to vote on a proposal
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @param _support True if supported
      */
-    function vote(address _proposedAddress, bool _support) public only_at_stage(Stages.Deployed) only_proposed(_proposedAddress) only_during_voting_period(_proposedAddress) only_token_holder {    
+    function vote(address _proposedAddress, bool _support) public only_at_stage(Stages.Deployed) only_proposed(_proposedAddress) only_during_voting_period(_proposedAddress) only_token_holder {
         Proposal storage p = proposals[_proposedAddress];
         Balance storage b = allocated[msg.sender];
-        
+
         // Register vote
         if (!hasVoted(_proposedAddress, msg.sender)) {
             p.votes[msg.sender] = Vote(
@@ -742,11 +742,11 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Returns the current voting results for a proposal
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @return supported, rejected
      */
-    function getVotingResult(address _proposedAddress) public constant returns (uint, uint) {      
-        Proposal storage p = proposals[_proposedAddress];    
+    function getVotingResult(address _proposedAddress) public constant returns (uint, uint) {
+        Proposal storage p = proposals[_proposedAddress];
         return (p.supportingWeight, p.rejectingWeight);
     }
 
@@ -754,11 +754,11 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Returns true if the proposal is supported
      *
-     * @param _proposedAddress The proposed DCORP address 
+     * @param _proposedAddress The proposed DCORP address
      * @param _strict If set to true the function requires that the voting period is ended
      * @return bool Supported
      */
-    function isSupported(address _proposedAddress, bool _strict) public constant returns (bool) {        
+    function isSupported(address _proposedAddress, bool _strict) public constant returns (bool) {
         Proposal storage p = proposals[_proposedAddress];
         bool supported = false;
 
@@ -769,7 +769,7 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
                 supported = support + reject >= getTotalSupply() * MIN_QUORUM / 100;
             }
         }
-        
+
         return supported;
     }
 
@@ -777,14 +777,14 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
     /**
      * Executes the proposal
      *
-     * Should only be called after the voting period and 
+     * Should only be called after the voting period and
      * when the proposal is supported
      *
-     * @param _acceptedAddress The accepted DCORP address 
+     * @param _acceptedAddress The accepted DCORP address
      * @return bool Success
      */
     function execute(address _acceptedAddress) public only_owner only_at_stage(Stages.Deployed) only_proposed(_acceptedAddress) only_after_voting_period(_acceptedAddress) only_when_supported(_acceptedAddress) {
-        
+
         // Mark as executed
         stage = Stages.Executed;
 
@@ -809,8 +809,8 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
     /**
      * Event handler that initializes the token conversion
-     * 
-     * Called by `_token` when a token amount is received on 
+     *
+     * Called by `_token` when a token amount is received on
      * the address of this token changer
      *
      * @param _token The token contract that received the transaction
@@ -839,9 +839,9 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Withdraw DRPS tokens from the proxy and reduce the 
+     * Withdraw DRPS tokens from the proxy and reduce the
      * owners weight accordingly
-     * 
+     *
      * @param _value The amount of DRPS tokens to withdraw
      */
     function withdrawDRPS(uint _value) public {
@@ -865,9 +865,9 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Withdraw DRPU tokens from the proxy and reduce the 
+     * Withdraw DRPU tokens from the proxy and reduce the
      * owners weight accordingly
-     * 
+     *
      * @param _value The amount of DRPU tokens to withdraw
      */
     function withdrawDRPU(uint _value) public {
@@ -892,8 +892,8 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
     /**
      * Failsafe mechanism
-     * 
-     * Allows the owner to retrieve tokens (other than DRPS and DRPU tokens) from the contract that 
+     *
+     * Allows the owner to retrieve tokens (other than DRPS and DRPU tokens) from the contract that
      * might have been send there by accident
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -904,9 +904,9 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
 
 
     /**
-     * Adjust voting weight in ongoing proposals on which `_owner` 
+     * Adjust voting weight in ongoing proposals on which `_owner`
      * has already voted
-     * 
+     *
      * @param _owner The owner of the weight
      * @param _value The amount of weight that is adjusted
      * @param _increase Indicated whether the weight is increased or decreased
@@ -935,4 +935,15 @@ contract DcorpProxy is TokenObserver, TransferableOwnership, TokenRetriever {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

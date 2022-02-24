@@ -33,7 +33,7 @@ contract PurchasePackInterface {
 
 
 
-contract Vault is Ownable { 
+contract Vault is Ownable {
 
     function () public payable {
 
@@ -69,7 +69,7 @@ contract DiscountPack is Vault {
     }
 
     event PackDiscount(address purchaser, uint16 packs, uint discount);
- 
+
     function() public payable {}
 
     function purchase(uint16 packs) public payable {
@@ -93,6 +93,14 @@ contract DiscountPack is Vault {
 
 contract DiscountShinyLegendaryPack is DiscountPack {
     constructor(PurchasePackInterface packToDiscount) public payable DiscountPack(packToDiscount) {
-        
+
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

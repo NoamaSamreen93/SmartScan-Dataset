@@ -129,7 +129,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -150,7 +150,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -236,11 +236,11 @@ contract StandardToken is ERC20, BasicToken {
  * @dev HoQu.io token contract.
  */
 contract HoQuToken is StandardToken, Pausable {
-    
+
     string public constant name = "HOQU Token";
     string public constant symbol = "HQX";
     uint32 public constant decimals = 18;
-    
+
     /**
      * @dev Give all tokens to msg.sender.
      */
@@ -278,7 +278,7 @@ contract BaseCrowdsale is Pausable {
     uint256 public issuedTokensAmount = 0;
     uint256 public minBuyableAmount;
     uint256 public tokenRate; // amount of HQX per 1 ETH
-    
+
     uint256 endDate;
 
     bool public isFinished = false;
@@ -297,7 +297,7 @@ contract BaseCrowdsale is Pausable {
         require (now <= endDate);
         _;
     }
-    
+
     /**
     * @param _tokenAddress address of a HQX token contract
     * @param _bankAddress address for remain HQX tokens accumulation
@@ -324,7 +324,7 @@ contract BaseCrowdsale is Pausable {
         tokenRate = _tokenRate;
         minBuyableAmount = _minBuyableAmount.mul(1 ether);
         maxTokensAmount = _maxTokensAmount.mul(1 ether);
-    
+
         endDate = _endDate;
     }
 
@@ -350,19 +350,19 @@ contract BaseCrowdsale is Pausable {
      */
     function buyTokens() payable inProgress whenNotPaused {
         require (msg.value >= minBuyableAmount);
-    
+
         uint256 payAmount = msg.value;
         uint256 returnAmount = 0;
 
         // calculate token amount to be transfered to investor
         uint256 tokens = tokenRate.mul(payAmount);
-    
+
         if (issuedTokensAmount + tokens > maxTokensAmount) {
             tokens = maxTokensAmount.sub(issuedTokensAmount);
             payAmount = tokens.div(tokenRate);
             returnAmount = msg.value.sub(payAmount);
         }
-    
+
         issuedTokensAmount = issuedTokensAmount.add(tokens);
         require (issuedTokensAmount <= maxTokensAmount);
 
@@ -373,7 +373,7 @@ contract BaseCrowdsale is Pausable {
 
         // send ethers to special address
         beneficiaryAddress.transfer(payAmount);
-    
+
         if (returnAmount > 0) {
             msg.sender.transfer(returnAmount);
         }
@@ -396,7 +396,7 @@ contract BaseCrowdsale is Pausable {
         token.unpause();
         return true;
     }
-    
+
     /**
      * Finish ICO.
      */
@@ -406,7 +406,7 @@ contract BaseCrowdsale is Pausable {
         isFinished = true;
         token.transfer(bankAddress, token.balanceOf(this));
     }
-    
+
     /**
      * Buy HQX. Check minBuyableAmount and tokenRate.
      */
@@ -434,7 +434,7 @@ contract PrivatePlacement is BaseCrowdsale {
 
     // whether initial token allocations was performed or not
     bool allocatedInternalWallets = false;
-    
+
     /**
     * @param _bankAddress address for remain HQX tokens accumulation
     * @param _foundersAddress founders address
@@ -475,11 +475,22 @@ contract PrivatePlacement is BaseCrowdsale {
         token.transfer(supportAddress, initialSupportAmount);
         token.transfer(bountyAddress, initialBountyAmount);
     }
-    
+
     /*
      * @dev HoQu Token factory.
      */
     function createToken(uint256 _totalSupply) internal returns (HoQuToken) {
         return new HoQuToken(_totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

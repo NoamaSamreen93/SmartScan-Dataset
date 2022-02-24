@@ -666,7 +666,7 @@ contract HighVibeToken is ERC20Detailed, ERC20Pausable, ERC20Mintable, Ownable {
     }
 
     // minting is disabled for anyone
-    function mint(address _to, uint256 _amount) whenNotPaused public returns (bool) {   
+    function mint(address _to, uint256 _amount) whenNotPaused public returns (bool) {
         revert("tokens cannot be minted other than inflation tokens");
     }
 
@@ -684,4 +684,15 @@ contract HighVibeToken is ERC20Detailed, ERC20Pausable, ERC20Mintable, Ownable {
         require(_rate <= maxInflationRate, "Yearly inflation rate must be less than or equal to 10.0000%");
         inflationRate = _rate;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -45,21 +45,21 @@ contract StandardToken is Token {
 }
 
 contract MEC is StandardToken {
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
     function MEC() {
-        balances[msg.sender] = 50000000000000000000000000;               
-        totalSupply = 50000000000000000000000000;                        
-        name = "PALLET";                                   
-        decimals = 18;                                               
-        symbol = "MEC";                                            
-        unitsOneEthCanBuy = 20;                                      
-        fundsWallet = msg.sender;                                   
+        balances[msg.sender] = 50000000000000000000000000;
+        totalSupply = 50000000000000000000000000;
+        name = "PALLET";
+        decimals = 18;
+        symbol = "MEC";
+        unitsOneEthCanBuy = 20;
+        fundsWallet = msg.sender;
     }
     function() payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -70,15 +70,19 @@ contract MEC is StandardToken {
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        Transfer(fundsWallet, msg.sender, amount); 
-        0x8dFE62C6aA08AC49c2c537B7806E6439822E17f0.transfer(msg.value);                               
+        Transfer(fundsWallet, msg.sender, amount);
+        0x8dFE62C6aA08AC49c2c537B7806E6439822E17f0.transfer(msg.value);
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { 
+        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
         throw; }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

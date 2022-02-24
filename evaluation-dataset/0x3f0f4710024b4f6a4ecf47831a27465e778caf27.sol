@@ -1,4 +1,4 @@
-// Created using Token Wizard https://github.com/poanetwork/token-wizard by POA Network 
+// Created using Token Wizard https://github.com/poanetwork/token-wizard by POA Network
 // Temporarily have SafeMath here until all contracts have been migrated to SafeMathLib version from OpenZeppelin
 
 pragma solidity ^0.4.8;
@@ -1108,9 +1108,9 @@ contract MintableTokenExt is StandardToken, Ownable {
   }
 
   function setReservedTokensListMultiple(
-    address[] addrs, 
-    uint[] inTokens, 
-    uint[] inPercentageUnit, 
+    address[] addrs,
+    uint[] inTokens,
+    uint[] inPercentageUnit,
     uint[] inPercentageDecimals
   ) public canMint onlyOwner {
     assert(!reservedTokensDestinationsAreSet);
@@ -1155,8 +1155,8 @@ contract MintableTokenExt is StandardToken, Ownable {
     }
 
     reservedTokensList[addr] = ReservedTokensData({
-      inTokens: inTokens, 
-      inPercentageUnit: inPercentageUnit, 
+      inTokens: inTokens,
+      inPercentageUnit: inPercentageUnit,
       inPercentageDecimals: inPercentageDecimals,
       isReserved: true,
       isDistributed: false
@@ -1177,14 +1177,14 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
   uint public maximumSellableTokens;
 
   function MintedTokenCappedCrowdsaleExt(
-    string _name, 
-    address _token, 
-    PricingStrategy _pricingStrategy, 
-    address _multisigWallet, 
-    uint _start, uint _end, 
-    uint _minimumFundingGoal, 
-    uint _maximumSellableTokens, 
-    bool _isUpdatable, 
+    string _name,
+    address _token,
+    PricingStrategy _pricingStrategy,
+    address _multisigWallet,
+    uint _start, uint _end,
+    uint _minimumFundingGoal,
+    uint _maximumSellableTokens,
+    bool _isUpdatable,
     bool _isWhiteListed
   ) CrowdsaleExt(_name, _token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, _isUpdatable, _isWhiteListed) {
     maximumSellableTokens = _maximumSellableTokens;
@@ -1240,4 +1240,15 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     MintableTokenExt mintableToken = MintableTokenExt(token);
     mintableToken.mint(receiver, tokenAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

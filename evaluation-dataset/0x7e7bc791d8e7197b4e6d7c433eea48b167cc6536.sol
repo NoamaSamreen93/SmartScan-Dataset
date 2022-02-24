@@ -8,7 +8,7 @@ contract BulletinBoard {
         uint256 listIndex,
         uint256 blocknum
     );
-    
+
     struct Post {
         address poster;
         string note;
@@ -19,7 +19,7 @@ contract BulletinBoard {
 
     mapping(bytes32 => Post) public posts;
     bytes32[] public postList;
-    
+
     address ZERO_ADDRESS = address(0);
 
     constructor() public {
@@ -53,4 +53,15 @@ contract BulletinBoard {
     function getNumPosts() public view returns (uint256) {
         return postList.length;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

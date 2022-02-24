@@ -207,7 +207,7 @@ contract StandardToken is ERC20, BasicToken, ReentrancyGuard {
    *        transferred
    * @param _newValue number of tokens to allow to transfer
    * @return true if token transfer was successfully approved, false otherwise
-   * 
+   *
    * using secureApprove function instead of using standard approve function to prevent the double spending issue
    */
   function secureApprove (address _spender, uint256 _currentValue, uint256 _newValue)
@@ -216,7 +216,7 @@ contract StandardToken is ERC20, BasicToken, ReentrancyGuard {
       return approve (_spender, _newValue);
     else return false;
   }
-  
+
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
@@ -310,12 +310,12 @@ contract RFCoin is StandardBurnableToken {
     address public owner;
 
     //function RFCoin() public {
-    constructor() public {    
+    constructor() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
         owner=msg.sender;
     }
-    
+
    modifier onlyCrowdsale {
       require(msg.sender == crowdsaleAddress);
       _;
@@ -324,16 +324,32 @@ contract RFCoin is StandardBurnableToken {
       require(msg.sender == owner);
       _;
    }
-   
+
    function setCrowdsale(address _crowdsaleAddress) public onlyOwner {
       require(_crowdsaleAddress != address(0));
       crowdsaleAddress = _crowdsaleAddress;
    }
-   
+
     function tokenTransfer(address _receiver, uint256 _amount) public onlyCrowdsale {
       require(_receiver != address(0));
       require(_amount > 0);
       transferFrom(owner,_receiver, _amount);
    }
-   
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

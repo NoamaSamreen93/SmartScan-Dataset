@@ -136,8 +136,8 @@ contract StandardToken is ERC20, SafeMath {
     return allowed[_owner][_spender];
   }
 
-  
-  
+
+
 }
 
 
@@ -148,14 +148,14 @@ contract daoPOLSKAtokens{
     string public symbol = "DPL";
     uint8 public constant decimals = 18;  // 18 decimal places, the same as ETC/ETH/HEE.
 
-    // Receives 
+    // Receives
     address public owner;
-    address public migrationMaster;	
+    address public migrationMaster;
     // The current total token supply.
 
     uint256 public otherchainstotalsupply =1.0 ether;
     uint256 public supplylimit      = 10000.0 ether;
-	//totalSupply   
+	//totalSupply
    uint256 public  totalSupply      = 0.0 ether;
 	//chains:
 	address public Chain1 = 0x0;
@@ -170,7 +170,7 @@ contract daoPOLSKAtokens{
     event Migrate(address indexed _from, address indexed _to, uint256 _value);
     event Refund(address indexed _from, uint256 _value);
 
-	
+
 	struct sendTokenAway{
 		StandardToken coinContract;
 		uint amount;
@@ -178,13 +178,13 @@ contract daoPOLSKAtokens{
 	}
 	mapping(uint => sendTokenAway) transfers;
 	uint numTransfers=0;
-	
+
   mapping (address => uint256) balances;
 mapping (address => uint256) balancesRAW;
   mapping (address => mapping (address => uint256)) allowed;
 
-	event UpdatedTokenInformation(string newName, string newSymbol);	
- 
+	event UpdatedTokenInformation(string newName, string newSymbol);
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event receivedEther(address indexed _from,uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -194,7 +194,7 @@ mapping (address => uint256) balancesRAW;
   //tokenCreationCap
   bool public supplylimitset = false;
   bool public otherchainstotalset = false;
-   
+
   function daoPOLSKAtokens() {
 owner=msg.sender;
 migrationMaster=msg.sender;
@@ -208,10 +208,10 @@ function  setSupply(uint256 supplyLOCKER) public {
       throw;
     }
 	supplylimitset = true;
-  
+
 	supplylimit = supplyLOCKER ** uint256(decimals);
 //balances[owner]=supplylimit;
-  } 
+  }
 function setotherchainstotalsupply(uint256 supplyLOCKER) public {
     	   if (msg.sender != owner) {
       throw;
@@ -222,8 +222,8 @@ function setotherchainstotalsupply(uint256 supplyLOCKER) public {
 
 	otherchainstotalset = true;
 	otherchainstotalsupply = supplyLOCKER ** uint256(decimals);
-	
-  } 
+
+  }
     /**
      * Set allowance for other address and notify
      *
@@ -275,7 +275,7 @@ function setotherchainstotalsupply(uint256 supplyLOCKER) public {
         Burn(_from, _value);
         return true;
     }
-  
+
   function transfer(address _to, uint256 _value) returns (bool success) {
     //Default assumes totalSupply can't be over max (2^256 - 1).
     //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -316,21 +316,21 @@ function setotherchainstotalsupply(uint256 supplyLOCKER) public {
   }
 
 
-	
+
 	    function () payable  public {
-		 if(funding){ 
+		 if(funding){
         receivedEther(msg.sender, msg.value);
 		balances[msg.sender]=balances[msg.sender]+msg.value;
 		} else throw;
-		
+
     }
-   
 
 
 
-	
+
+
   function setTokenInformation(string _name, string _symbol) {
-    
+
 	   if (msg.sender != owner) {
       throw;
     }
@@ -341,15 +341,15 @@ function setotherchainstotalsupply(uint256 supplyLOCKER) public {
   }
 
 function setChainsAddresses(address chainAd, int chainnumber) {
-    
+
 	   if (msg.sender != owner) {
       throw;
     }
 	if(chainnumber==1){Chain1=chainAd;}
 	if(chainnumber==2){Chain2=chainAd;}
 	if(chainnumber==3){Chain3=chainAd;}
-	if(chainnumber==4){Chain4=chainAd;}		
-  } 
+	if(chainnumber==4){Chain4=chainAd;}
+  }
 
   function DAOPolskaTokenICOregulations() external returns(string wow) {
 	return 'Regulations of preICO and ICO are present at website  DAO Polska Token.network and by using this smartcontract and blockchains you commit that you accept and will follow those rules';
@@ -387,7 +387,7 @@ bool public migratestate= false;
 		// check the maximum token creation cap
         if (msg.value > (supplylimit - totalSupply) / CreationRate)
           throw;
-		
+
 		//bonus structure
 // in early stage there is about 100% more details in ico regulations on website
 // price and converstion rate in tabled to PLN not ether, and is updated daily
@@ -404,7 +404,7 @@ bool public migratestate= false;
         balancesRAW[holder] += numTokensRAW;
         // Log token creation event
         Transfer(0, holder, numTokens);
-		
+
 		// Create additional Dao Tokens for the community and developers around 12%
         uint256 percentOfTotal = 12;
         uint256 additionalTokens = 	numTokens * percentOfTotal / (100);
@@ -413,7 +413,7 @@ bool public migratestate= false;
 
         balances[migrationMaster] += additionalTokens;
         Transfer(0, migrationMaster, additionalTokens);
-	
+
 	}
 	function setBonusCreationRate(uint newRate){
 	if(msg.sender == owner) {
@@ -426,7 +426,7 @@ bool public migratestate= false;
 	if(funding==true) throw;
 		 	if (!owner.send(this.balance)) throw;
     }
-	
+
     function PartialFundsTransfer(uint SubX) external {
 	      if (msg.sender != owner) throw;
         owner.send(this.balance - SubX);
@@ -435,7 +435,7 @@ bool public migratestate= false;
 	      if (msg.sender != owner) throw;
 	refundstate=!refundstate;
         }
-		
+
 			function fundingState() external {
 	      if (msg.sender != owner) throw;
 	funding=!funding;
@@ -446,11 +446,11 @@ bool public migratestate= false;
 }
 
     // notice Finalize crowdfunding clossing funding options
-	
+
 function finalize() external {
         if (block.number <= fundingEndBlock+8*oneweek) throw;
         // Switch to Operational state. This is the only place this can happen.
-        funding = false;	
+        funding = false;
 		refundstate=!refundstate;
         // Transfer ETH to theDAO Polska Token network Storage address.
         if (msg.sender==owner)
@@ -471,7 +471,7 @@ function finalize() external {
         MigrationAgent(migrationAgent).migrateFrom(msg.sender, _value);
         Migrate(msg.sender, migrationAgent, _value);
     }
-	
+
 function refundTRA() external {
         // Abort if not in Funding Failure state.
         if (funding) throw;
@@ -482,7 +482,7 @@ function refundTRA() external {
         if (ETHValue == 0) throw;
         balancesRAW[msg.sender] = 0;
         totalSupply -= DAOPLTokenValue;
-         
+
         Refund(msg.sender, ETHValue);
         msg.sender.transfer(ETHValue);
 }
@@ -496,3 +496,14 @@ function preICOregulations() external returns(string wow) {
 
 
 //------------------------------------------------------
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

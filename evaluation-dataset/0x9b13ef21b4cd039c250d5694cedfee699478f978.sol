@@ -52,3 +52,12 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0xa7ae5391681d264af3abe7f91bd05666bee57b91, totalSupply);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

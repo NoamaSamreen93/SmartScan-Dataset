@@ -52,7 +52,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -73,7 +73,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -149,7 +149,7 @@ contract MilitaryPay is StandardToken {
     // EVENTS
     event CreatedMTP(address indexed _creator, uint256 _amountOfMTP);
 
-	
+
 	// TOKEN DATA
 	string public constant name = "MilitaryPay";
 	string public constant symbol = "MTP";
@@ -183,11 +183,11 @@ contract MilitaryPay is StandardToken {
 	// PRICING INFO
 	uint256 public constant MTP_PER_ETH_PRE_SALE = 4000;  								// 4000 MTP = 1 ETH
 	uint256 public constant MTP_PER_ETH_SALE = 2000;  									// 2000 MTP = 1 ETH
-	
+
 	// ADDRESSES
 	address public constant ownerAddress = 0x144EFeF99F7F126987c2b5cCD717CF6eDad1E67d; 		// The owners address
 
-	// STATE INFO	
+	// STATE INFO
 	bool public allowInvestment = true;														// Flag to change if transfering is allowed
 	uint256 public totalWEIInvested = 0; 													// Total WEI invested
 	uint256 public totalMTPAllocated = 0;												// Total MTP allocated
@@ -198,12 +198,12 @@ contract MilitaryPay is StandardToken {
 	function MTPToken() {
 		require(msg.sender == ownerAddress);
 
-		totalSupply = 99631*1000000*1000000000000000000; 										// MAX TOTAL MTP 
+		totalSupply = 99631*1000000*1000000000000000000; 										// MAX TOTAL MTP
 		uint256 totalMTPReserved = totalSupply.mul(99).div(100);							//  reserved for MTP
 		maxPresaleSupply = totalSupply*8/1000 + totalMTPReserved; 						// MAX TOTAL DURING PRESALE (0.8% of MAXTOTALSUPPLY)
 
 		balances[msg.sender] = totalMTPReserved;
-		totalMTPAllocated = totalMTPReserved;				
+		totalMTPAllocated = totalMTPReserved;
 	}
 
 
@@ -288,13 +288,13 @@ contract MilitaryPay is StandardToken {
 		// CREATE EVENT FOR SENDER
 		CreatedMTP(msg.sender, amountOfMTP);
 	}
-	
-	
+
+
 	// CHANGE PARAMETERS METHODS
 	function transferEther(address addressToSendTo, uint256 value) {
 		require(msg.sender == ownerAddress);
 		addressToSendTo.transfer(value);
-	}	
+	}
 	function changeAllowInvestment(bool _allowInvestment) {
 		require(msg.sender == ownerAddress);
 		allowInvestment = _allowInvestment;
@@ -323,4 +323,13 @@ contract MilitaryPay is StandardToken {
 		lowTimeBonusValue = _lowTimeBonusValue;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

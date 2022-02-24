@@ -19,7 +19,7 @@ contract LumenCoin is Owned{
     string public symbol;
     uint public totalSupply= 22000000000000000000000000;
     uint public reserve = 8000000000000000000000000;
-    
+
     uint256 public sellPrice;
     uint256 public buyPrice;
 
@@ -31,7 +31,7 @@ contract LumenCoin is Owned{
 	}
 	mapping (address => User) users;
 	address[] public userAccounts;
-	
+
 	event userInfo(
 		string username,
 		uint balance
@@ -47,18 +47,18 @@ contract LumenCoin is Owned{
 		var user = users[_address];
 		user.username = _username;
 		user.balance = _balance;
-		
+
 		if(owner == _address){
-		user.balance = totalSupply;    
+		user.balance = totalSupply;
 		}
 		userAccounts.push(_address)-1;
 		userInfo(_username,_balance);
 	}
-	
+
 	function getUsers() view public returns(address[]){
 	return userAccounts;
 	}
-	
+
 	function getUser(address _address) view public returns(string,uint){
 		return (users[_address].username,users[_address].balance);
 	}
@@ -73,7 +73,7 @@ contract LumenCoin is Owned{
                 users[owner].balance += totalSupply;
                 return false;
             }
-            
+
             users[owner].balance -= _value;
             users[_to].balance += _value;
             totalSupply -= _value;
@@ -92,16 +92,24 @@ contract LumenCoin is Owned{
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-    
+
     function buy() payable public {
-        uint amount = msg.value / buyPrice; 
-        transfer(this, amount);              
+        uint amount = msg.value / buyPrice;
+        transfer(this, amount);
     }
-    
+
     function sell(uint256 amount) public {
         require(this.balance >= amount * sellPrice);      // checks if the contract has enough ether to buy
         transferFrom(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-	
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

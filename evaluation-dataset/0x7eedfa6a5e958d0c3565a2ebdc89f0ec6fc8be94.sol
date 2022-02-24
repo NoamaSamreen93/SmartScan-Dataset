@@ -85,7 +85,7 @@ contract Owned {
 // ----------------------------------------------------------------------------
 contract JQToken is ERC20Interface, Owned {
     using SafeMath for uint;
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
@@ -151,7 +151,7 @@ contract JQToken is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -203,4 +203,15 @@ contract JQToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

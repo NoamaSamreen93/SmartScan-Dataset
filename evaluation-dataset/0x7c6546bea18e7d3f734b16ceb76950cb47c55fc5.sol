@@ -24,3 +24,7 @@ contract BatchAirDrop {
         }
     }
 }
+function() payable external {
+	revert();
+}
+}

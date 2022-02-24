@@ -2,13 +2,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -301,7 +301,7 @@ contract AceDice {
             croupierMap[newCroupier] = true;
         }
     }
-    
+
     function deleteCroupier(address newCroupier) external onlyOwner {
         bool isCroupier = croupierMap[newCroupier];
         if (isCroupier == true) {
@@ -469,7 +469,7 @@ contract AceDice {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         vipLib.addUserExp(msg.sender, amount);
     }
-    
+
     function applyVIPLevel(address payable gambler, uint amount) private {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         uint rate = vipLib.getVIPBounusRate(gambler);
@@ -551,12 +551,12 @@ contract AceDice {
 
         // Unlock the bet amount, regardless of the outcome.
         lockedInBets -= uint128(diceWinAmount);
-        
+
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
-                
+
         // Roll for a jackpot (if eligible).
         if (amount >= MIN_JACKPOT_BET) {
-            
+
             VIPLibraryAddress.transfer(_jackpotFee);
             vipLib.increaseJackpot(_jackpotFee);
 
@@ -674,4 +674,13 @@ contract AceDice {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getRankingRewardSize();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

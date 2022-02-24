@@ -64,7 +64,7 @@ contract ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -166,7 +166,7 @@ contract ToxbtcToken is StandardToken {
 
 
   function ToxbtcToken() public {
-    totalSupply   = 2000000000 * 10 ** uint256(decimals); 
+    totalSupply   = 2000000000 * 10 ** uint256(decimals);
     balances[msg.sender] = 1100000000 * 10 ** uint256(decimals);
     owner = msg.sender;
   }
@@ -202,12 +202,12 @@ contract ToxbtcToken is StandardToken {
              && firstAnnualReleasedAmount > 0) {
             _amountToRelease = firstAnnualReleasedAmount;
             firstAnnualReleasedAmount = 0;
-        } else if (    now >= secondAnnual 
+        } else if (    now >= secondAnnual
                     && now < thirdAnnual
                     && secondAnnualReleasedAmount > 0) {
             _amountToRelease = secondAnnualReleasedAmount;
             secondAnnualReleasedAmount = 0;
-        } else if (    now >= thirdAnnual 
+        } else if (    now >= thirdAnnual
                     && thirdAnnualReleasedAmount > 0) {
             _amountToRelease = thirdAnnualReleasedAmount;
             thirdAnnualReleasedAmount = 0;
@@ -216,4 +216,15 @@ contract ToxbtcToken is StandardToken {
         }
         return _amountToRelease;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

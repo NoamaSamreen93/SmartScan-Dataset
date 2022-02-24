@@ -58,10 +58,10 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -155,7 +155,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -179,7 +179,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -229,7 +229,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract GUT is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Geekz Utility Token";
   string public constant symbol = "GUT";
   uint32 public constant decimals = 18;
@@ -276,7 +276,7 @@ contract Crowdsale is Ownable {
   // The token being offered
   GUT public token;
   // start and end timestamps where investments are allowed (both inclusive)
-  
+
   //Early stage
     //start
   uint256 public startEarlyStage1;
@@ -287,32 +287,32 @@ contract Crowdsale is Ownable {
   uint256 public endEarlyStage1;
   uint256 public endEarlyStage2;
   uint256 public endEarlyStage3;
-  uint256 public endEarlyStage4;   
-  
+  uint256 public endEarlyStage4;
+
   //Final stage
     //start
   uint256 public startFinalStage1;
   uint256 public startFinalStage2;
-    //end 
-  uint256 public endFinalStage1;    
-  uint256 public endFinalStage2;  
-  
+    //end
+  uint256 public endFinalStage1;
+  uint256 public endFinalStage2;
+
   //token distribution
   uint256 public maxEarlyStage;
   uint256 public maxFinalStage;
 
   uint256 public totalEarlyStage;
   uint256 public totalFinalStage;
-  
+
   // how many token units a Contributor gets per wei
   uint256 public rateEarlyStage1;
   uint256 public rateEarlyStage2;
   uint256 public rateEarlyStage3;
   uint256 public rateEarlyStage4;
   uint256 public rateFinalStage1;
-  uint256 public rateFinalStage2;   
-  
-  // Remaining Token Allocation 
+  uint256 public rateFinalStage2;
+
+  // Remaining Token Allocation
   // (after completion of all stages of crowdfunding)
   uint public mintStart; //31 Mar 2018 08:00:00 GMT
 
@@ -320,7 +320,7 @@ contract Crowdsale is Ownable {
   address public wallet;
 
   // minimum quantity values
-  uint256 public minQuanValues; 
+  uint256 public minQuanValues;
 
 /**
 * event for token Procurement logging
@@ -335,7 +335,7 @@ contract Crowdsale is Ownable {
     // total number of tokens
     totalTokens = 25000000 * 1 ether;
     //soft cap
-    softcap = 400 * 1 ether;   
+    softcap = 400 * 1 ether;
     // minimum quantity values
     minQuanValues = 100000000000000000; //0.1 eth
     // start and end timestamps where investments are allowed
@@ -349,14 +349,14 @@ contract Crowdsale is Ownable {
     endEarlyStage1 = startEarlyStage1 + 2 * 1 days;
     endEarlyStage2 = startEarlyStage2 + 2 * 1 days;
     endEarlyStage3 = startEarlyStage3 + 2 * 1 days;
-    endEarlyStage4 = startEarlyStage4 + 2 * 1 days;   
+    endEarlyStage4 = startEarlyStage4 + 2 * 1 days;
     //Final stage
       //start
     startFinalStage1 = 1520582400;//09 Mar 2018 08:00:00 GMT
     startFinalStage2 = startFinalStage1 + 6 * 1 days;
-      //end 
-    endFinalStage1 = startFinalStage1 + 6 * 1 days;    
-    endFinalStage2 = startFinalStage2 + 16 * 1 days;         
+      //end
+    endFinalStage1 = startFinalStage1 + 6 * 1 days;
+    endFinalStage2 = startFinalStage2 + 16 * 1 days;
     // restrictions on amounts during the crowdfunding event stages
     maxEarlyStage = 4000000 * 1 ether;
     maxFinalStage = 16000000 * 1 ether;
@@ -366,35 +366,35 @@ contract Crowdsale is Ownable {
     rateEarlyStage3 = 5000;
     rateEarlyStage4 = 4000;
     rateFinalStage1 = 3000;
-    rateFinalStage2 = 2000; 
-    // Remaining Token Allocation 
+    rateFinalStage2 = 2000;
+    // Remaining Token Allocation
     // (after completion of all stages of crowdfunding event)
     mintStart = endFinalStage2; //31 Mar 2018 08:00:00 GMT
     // address where funds are collected
     wallet = 0x80B48F46CD1857da32dB10fa54E85a2F18B96412;
   }
 
-  
+
   function setRateEarlyStage1(uint _rateEarlyStage1) public {
     rateEarlyStage1 = _rateEarlyStage1;
   }
   function setRateEarlyStage2(uint _rateEarlyStage2) public {
     rateEarlyStage2 = _rateEarlyStage2;
-  }  
+  }
   function setRateEarlyStage3(uint _rateEarlyStage3) public {
     rateEarlyStage3 = _rateEarlyStage3;
-  }  
+  }
   function setRateEarlyStage4(uint _rateEarlyStage4) public {
     rateEarlyStage4 = _rateEarlyStage4;
-  }  
-  
+  }
+
   function setRateFinalStage1(uint _rateFinalStage1) public {
     rateFinalStage1 = _rateFinalStage1;
-  }  
+  }
   function setRateFinalStage2(uint _rateFinalStage2) public {
     rateFinalStage2 = _rateFinalStage2;
-  }   
-  
+  }
+
   function createTokenContract() internal returns (GUT) {
     return new GUT();
   }
@@ -416,7 +416,7 @@ contract Crowdsale is Ownable {
     if (now >= startEarlyStage1 && now < endEarlyStage1 && totalEarlyStage < maxEarlyStage){
       tokens = weiAmount.mul(rateEarlyStage1);
       if (maxEarlyStage.sub(totalEarlyStage) < tokens){
-        tokens = maxEarlyStage.sub(totalEarlyStage); 
+        tokens = maxEarlyStage.sub(totalEarlyStage);
         weiAmount = tokens.div(rateEarlyStage1);
         backAmount = msg.value.sub(weiAmount);
       }
@@ -426,60 +426,60 @@ contract Crowdsale is Ownable {
     if (now >= startEarlyStage2 && now < endEarlyStage2 && totalEarlyStage < maxEarlyStage){
       tokens = weiAmount.mul(rateEarlyStage2);
       if (maxEarlyStage.sub(totalEarlyStage) < tokens){
-        tokens = maxEarlyStage.sub(totalEarlyStage); 
+        tokens = maxEarlyStage.sub(totalEarlyStage);
         weiAmount = tokens.div(rateEarlyStage2);
         backAmount = msg.value.sub(weiAmount);
       }
       totalEarlyStage = totalEarlyStage.add(tokens);
-    }    
+    }
     //EarlyStage3
     if (now >= startEarlyStage3 && now < endEarlyStage3 && totalEarlyStage < maxEarlyStage){
       tokens = weiAmount.mul(rateEarlyStage3);
       if (maxEarlyStage.sub(totalEarlyStage) < tokens){
-        tokens = maxEarlyStage.sub(totalEarlyStage); 
+        tokens = maxEarlyStage.sub(totalEarlyStage);
         weiAmount = tokens.div(rateEarlyStage3);
         backAmount = msg.value.sub(weiAmount);
       }
       totalEarlyStage = totalEarlyStage.add(tokens);
-    }    
+    }
     //EarlyStage4
     if (now >= startEarlyStage4 && now < endEarlyStage4 && totalEarlyStage < maxEarlyStage){
       tokens = weiAmount.mul(rateEarlyStage4);
       if (maxEarlyStage.sub(totalEarlyStage) < tokens){
-        tokens = maxEarlyStage.sub(totalEarlyStage); 
+        tokens = maxEarlyStage.sub(totalEarlyStage);
         weiAmount = tokens.div(rateEarlyStage4);
         backAmount = msg.value.sub(weiAmount);
       }
       totalEarlyStage = totalEarlyStage.add(tokens);
-    }   
+    }
     //FinalStage1
     if (now >= startFinalStage1 && now < endFinalStage1 && totalFinalStage < maxFinalStage){
       tokens = weiAmount.mul(rateFinalStage1);
       if (maxFinalStage.sub(totalFinalStage) < tokens){
-        tokens = maxFinalStage.sub(totalFinalStage); 
+        tokens = maxFinalStage.sub(totalFinalStage);
         weiAmount = tokens.div(rateFinalStage1);
         backAmount = msg.value.sub(weiAmount);
       }
       totalFinalStage = totalFinalStage.add(tokens);
-    }       
-    //FinalStage2    
+    }
+    //FinalStage2
     if (now >= startFinalStage2 && now < endFinalStage2 && totalFinalStage < maxFinalStage){
       tokens = weiAmount.mul(rateFinalStage2);
       if (maxFinalStage.sub(totalFinalStage) < tokens){
-        tokens = maxFinalStage.sub(totalFinalStage); 
+        tokens = maxFinalStage.sub(totalFinalStage);
         weiAmount = tokens.div(rateFinalStage2);
         backAmount = msg.value.sub(weiAmount);
       }
       totalFinalStage = totalFinalStage.add(tokens);
-    }        
-    
+    }
+
     require(tokens > 0);
     token.mint(beneficiary, tokens);
     balances[msg.sender] = balances[msg.sender].add(msg.value);
     //wallet.transfer(weiAmount);
-    
+
     if (backAmount > 0){
-      msg.sender.transfer(backAmount);    
+      msg.sender.transfer(backAmount);
     }
     TokenProcurement(msg.sender, beneficiary, weiAmount, tokens);
   }
@@ -493,7 +493,7 @@ contract Crowdsale is Ownable {
     token.mint(_to, _amount);
     return true;
   }
-  
+
   function refund() public{
     require(this.balance < softcap && now > endFinalStage2);
     require(balances[msg.sender] > 0);
@@ -501,9 +501,17 @@ contract Crowdsale is Ownable {
     balances[msg.sender] = 0;
     msg.sender.transfer(value);
   }
-  
+
   function transferToMultisig() public onlyOwner {
-    require(this.balance >= softcap && now > endFinalStage2);  
+    require(this.balance >= softcap && now > endFinalStage2);
       wallet.transfer(this.balance);
-  }  
+  }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

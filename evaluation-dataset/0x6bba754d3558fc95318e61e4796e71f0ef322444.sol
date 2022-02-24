@@ -87,7 +87,7 @@ contract testmonedafinal {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -108,4 +108,12 @@ contract testmonedafinal {
         Burn(_from, _value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

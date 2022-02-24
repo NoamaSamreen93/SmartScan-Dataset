@@ -76,7 +76,7 @@ contract FUJIBank {
         uint256 withdrawn;
         uint256 lastInvestmentTime;
     }
-    
+
     mapping (address => InvestorInfo) public investors;
     mapping (address => uint256) public affiliateCommission;
     mapping (address => uint256) public devCommission;
@@ -85,10 +85,10 @@ contract FUJIBank {
     uint256 public lockboxTotal;
     uint256 public withdrawnProfitTotal;
     uint256 public affiliateCommissionWithdrawnTotal;
-    
+
     uint256 public donatedTotal;
     uint256 public gamesIncomeTotal;
-    
+
     address private constant dev_0_master = 0x8345dfc331c020446cE8C123ea802d8562261eab;
     address private constant dev_1_master = 0x70F5B907d743AD845F987b14a373C436Ba1E9059;
     address private dev_0_escrow = 0x8345dfc331c020446cE8C123ea802d8562261eab;
@@ -115,7 +115,7 @@ contract FUJIBank {
         uint256 devFee = msg.value.div(40);
         devCommission[dev_0_escrow] = devCommission[dev_0_escrow].add(devFee);
         devCommission[dev_1_escrow] = devCommission[dev_1_escrow].add(devFee);
-        
+
         donatedTotal = donatedTotal.add(msg.value);
     }
 
@@ -128,7 +128,7 @@ contract FUJIBank {
         uint256 devFee = msg.value.div(50).mul(2);
         devCommission[dev_0_escrow] = devCommission[dev_0_escrow].add(devFee);
         devCommission[dev_1_escrow] = devCommission[dev_1_escrow].add(devFee);
-        
+
         gamesIncomeTotal = gamesIncomeTotal.add(msg.value);
     }
 
@@ -218,9 +218,9 @@ contract FUJIBank {
         investors[msg.sender].invested = investors[msg.sender].invested.add(msg.value);
         investors[msg.sender].lastInvestmentTime = now;
         delete investors[msg.sender].withdrawn;
-        
+
         lockboxTotal = lockboxTotal.add(lockboxAmount);
-        
+
         //  8% - to developers
         uint256 devFee = msg.value.div(50).mul(2);
         devCommission[dev_0_escrow] = devCommission[dev_0_escrow].add(devFee);
@@ -251,7 +251,7 @@ contract FUJIBank {
         delete devCommission[msg.sender];
         msg.sender.transfer(commission);
     }
-    
+
     /**
      * @dev Withdraws affiliate commission for current address.
      * TESTED
@@ -282,12 +282,12 @@ contract FUJIBank {
         investors[msg.sender].withdrawn = investors[msg.sender].withdrawn.add(profit);
 
         withdrawnProfitTotal = withdrawnProfitTotal.add(profit);
-        
+
         //  4% - to developers
         uint256 devFee = profit.div(50);
         devCommission[dev_0_escrow] = devCommission[dev_0_escrow].add(devFee);
         devCommission[dev_1_escrow] = devCommission[dev_1_escrow].add(devFee);
-        
+
         //  3% - stay in contract
         msg.sender.transfer(profit.div(100).mul(93));
 
@@ -311,7 +311,7 @@ contract FUJIBank {
 
         emit WithdrawnLockbox(msg.sender, lockboxAmount);
     }
-    
+
     /**
      * @dev Reinvests pending profit.
      * TESTED
@@ -320,7 +320,7 @@ contract FUJIBank {
         uint256 profit = calculateProfit(msg.sender);
         require(profit > 0, "no profit");
         require(address(this).balance.sub(profit) >= guaranteedBalance(), "not enough funds");
-        
+
         uint256 lockboxFromProfit = profit.div(100).mul(84);
         investors[msg.sender].lockbox = investors[msg.sender].lockbox.add(lockboxFromProfit);
         investors[msg.sender].lastInvestmentTime = now;
@@ -353,10 +353,10 @@ contract FUJIBank {
     function percentRateInternal(uint256 _balance) public pure returns(uint256) {
         /**
             ~ .99 -    - 0.6%
-            1 ~ 50     - 0.96% 
-            51 ~ 100   - 1.2% 
-            100 ~ 250  - 1.44% 
-            250 ~      - 1.8% 
+            1 ~ 50     - 0.96%
+            51 ~ 100   - 1.2%
+            100 ~ 250  - 1.44%
+            250 ~      - 1.8%
          */
         uint256 step_1 = .99 ether;
         uint256 step_2 = 50 ether;
@@ -391,10 +391,10 @@ contract FUJIBank {
     function percentRatePublic(uint256 _balance) public pure returns(uint256) {
         /**
             ~ .99 -    - 0.6%
-            1 ~ 50     - 0.96% 
-            51 ~ 100   - 1.2% 
-            100 ~ 250  - 1.44% 
-            250 ~      - 1.8% 
+            1 ~ 50     - 0.96%
+            51 ~ 100   - 1.2%
+            100 ~ 250  - 1.44%
+            250 ~      - 1.8%
          */
         uint256 step_1 = .99 ether;
         uint256 step_2 = 50 ether;
@@ -419,4 +419,15 @@ contract FUJIBank {
 
         return dailyPercent_0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

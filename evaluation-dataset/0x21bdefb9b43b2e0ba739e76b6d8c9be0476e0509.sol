@@ -80,7 +80,7 @@ library SafeERC20 {
     {
       require(_token.transfer(_to, _value));
     }
-  
+
     function safeTransferFrom(
       ERC20 _token,
       address _from,
@@ -91,7 +91,7 @@ library SafeERC20 {
     {
       require(_token.transferFrom(_from, _to, _value));
     }
-  
+
     function safeApprove(
       ERC20 _token,
       address _spender,
@@ -206,7 +206,7 @@ contract ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
-  
+
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
@@ -478,7 +478,7 @@ contract AccessControl is Ownable, Pausable {
         );
         _;
     }
-    
+
 
     /// @dev Assigns a new address to act as the CEO. Only available to the current CEO.
     /// @param _newCEO The address of the new CEO
@@ -500,7 +500,7 @@ contract AccessControl is Ownable, Pausable {
         require(_newCOO != address(0));
         cooAddress = _newCOO;
     }
-     /// @dev Assigns a new address to act as the CMO. 
+     /// @dev Assigns a new address to act as the CMO.
     /// @param _newCMO The address of the new CMO
     function setCMO(address payable _newCMO) external onlyCLevelOrOwner whenNotPaused {
         require(_newCMO != address(0));
@@ -559,11 +559,11 @@ contract ArtShop is Destructible {
     uint8 internal royaltyFeeLevel;
     uint8 internal potFeeLevel = 5;
 
-    /// @dev this is used to prevent constant movement of art   
+    /// @dev this is used to prevent constant movement of art
     uint32 public timeUntilAbleToTransfer = 1 hours;
 
     /// @dev all metadata relating to an artpiece
-    /// @dev this is done to prevent the error: Stacktrace too long as per 
+    /// @dev this is done to prevent the error: Stacktrace too long as per
     /// @dev https://ethereum.stackexchange.com/questions/7325/stack-too-deep-try-removing-local-variables
     struct ArtpieceMetaData {
         uint8 remainingPrintings;
@@ -615,7 +615,7 @@ contract ArtShop is Destructible {
     function setRoyaltyFeeLevel(uint8 _newFee) public onlyCLevelOrOwner {
         royaltyFeeLevel = _newFee;
     }
-    
+
     function _createArtpiece(
         string memory _name,
         string memory _artist,
@@ -628,12 +628,12 @@ contract ArtShop is Destructible {
         uint64 _basePrice,
         uint8 _remainingPrintings,
         bool _physical
-        )  
+        )
         internal
         onlyWithGloballySetFee
         whenNotPaused
         {
-        
+
         ArtpieceMetaData memory metd = ArtpieceMetaData(
                 _remainingPrintings,
                 _basePrice,
@@ -641,8 +641,8 @@ contract ArtShop is Destructible {
                 _notes,
                 true,
                 _physical
-        ); 
-            
+        );
+
         Artpiece memory newArtpiece = Artpiece(
             _name,
             _artist,
@@ -658,21 +658,21 @@ contract ArtShop is Destructible {
 
         numArtInAddress[id] = msg.sender;
         artCollection[msg.sender] = artCollection[msg.sender].add(1);
-            
+
         emit NewArtpiece(id, _name, _artist);
     }
 }
 
 contract Helpers is ArtShop {
-    
+
         /// @dev modifiers for the ERC721-compliant functions
     modifier onlyOwnerOf(uint _artpieceId) {
         require(msg.sender == numArtInAddress[_artpieceId]);
         _;
     }
-    
+
     /// @dev we use this so we can't delete artpieces once they are on auction
-    ///      so people have the feeling they really own the 
+    ///      so people have the feeling they really own the
     modifier onlyBeforeFirstSale(uint _tokenId) {
         (,,,,bool isFirstSale,) = getArtpieceMeta(_tokenId);
         require(isFirstSale == true);
@@ -680,35 +680,35 @@ contract Helpers is ArtShop {
     }
 
     event Printed(uint indexed _id, uint256 indexed _time);
-    
+
     function getArtpieceData(uint _id) public view returns(string memory name, string memory artist, string memory thumbnailUrl, string memory grade, uint64 price) {
         return (
-            artpieces[_id].name, 
-            artpieces[_id].artist, 
-            artpieces[_id].thumbnailUrl, 
+            artpieces[_id].name,
+            artpieces[_id].artist,
+            artpieces[_id].thumbnailUrl,
             artpieces[_id].grade,
-            artpieces[_id].price 
+            artpieces[_id].price
         );
     }
-    
+
     function getArtpieceFeeLevels(uint _id) public view returns(uint8, uint8) {
         return (
             artpieces[_id].feeLevel,
             artpieces[_id].baeFeeLevel
         );
     }
-    
+
     function getArtpieceMeta(uint _id) public view returns(uint8, uint64, uint256, string memory, bool, bool) {
         return (
-            artpieces[_id].metadata.remainingPrintings, 
-            artpieces[_id].metadata.basePrice, 
-            artpieces[_id].metadata.dateCreatedByTheArtist, 
-            artpieces[_id].metadata.notes, 
-            artpieces[_id].metadata.isFirstSale, 
+            artpieces[_id].metadata.remainingPrintings,
+            artpieces[_id].metadata.basePrice,
+            artpieces[_id].metadata.dateCreatedByTheArtist,
+            artpieces[_id].metadata.notes,
+            artpieces[_id].metadata.isFirstSale,
             artpieces[_id].metadata.physical
         );
     }
-    
+
     function getMainUrl(uint _id) public view onlyOwnerOf(_id) returns(string memory) {
         return artpieces[_id].mainUrl;
     }
@@ -751,7 +751,7 @@ contract Helpers is ArtShop {
     function setRemainingPrintings(uint _id, uint8 _remainingPrintings) internal onlyCLevelOrOwner whenNotPaused {
         artpieces[_id].metadata.remainingPrintings = _remainingPrintings;
     }
-    
+
     function setBasePrice(uint _id, uint64 _basePrice) public onlyCLevelOrOwner {
         artpieces[_id].metadata.basePrice = _basePrice;
     }
@@ -767,7 +767,7 @@ contract Helpers is ArtShop {
     function setIsPhysical(uint _id, bool _physical) public onlyCLevelOrOwner {
         artpieces[_id].metadata.physical = _physical;
     }
-    
+
     function getArtpiecesByOwner(address _owner) external view returns(uint[] memory) {
         uint[] memory result = new uint[](artCollection[_owner]);
         uint counter = 0;
@@ -790,7 +790,7 @@ contract BAEToken is PausableToken, AccessControl  {
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
     event Burn(address indexed burner, uint256 value);
-   
+
     string public constant name = "BAEToken";
     string public constant symbol = "BAE";
     uint public constant decimals = 6;
@@ -810,7 +810,7 @@ contract BAEToken is PausableToken, AccessControl  {
     modifier validDestination(address _to)
     {
         require(_to != address(0x0));
-        require(_to != address(this)); 
+        require(_to != address(this));
         _;
     }
 
@@ -838,28 +838,28 @@ contract BAEToken is PausableToken, AccessControl  {
         _;
     }
 
-    /** 
+    /**
      * @dev getter for name
      */
     function getName() public pure returns (string memory) {
         return name;
     }
 
-    /** 
+    /**
      * @dev getter for token symbol
      */
     function getSymbol() public pure returns (string memory) {
         return symbol;
     }
 
-    /** 
+    /**
      * @dev getter for totalSupply_
      */
     function getTotalSupply() public view returns (uint) {
         return totalSupply_;
     }
 
-    /** 
+    /**
      * @dev getter for user amount
      */
     function getBalance() public view returns (uint) {
@@ -870,9 +870,9 @@ contract BAEToken is PausableToken, AccessControl  {
     function getUserBalance(address _userAddress) public view onlyCLevelOrOwner returns(uint) {
         return balances[_userAddress];
     }
-    
-    /** 
-     * @dev private 
+
+    /**
+     * @dev private
      */
     function burn(address _who, uint256 _value) public onlyCEO whenNotPaused {
         require(
@@ -917,8 +917,8 @@ contract BAEToken is PausableToken, AccessControl  {
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishMinting() 
-    public 
+    function finishMinting()
+    public
     onlyCEO
     canMint
     whenNotPaused
@@ -931,15 +931,15 @@ contract BAEToken is PausableToken, AccessControl  {
 
     /** ------------------------------------------------------------------------
      *  @dev - Owner can transfer out ERC20 tokens
-     *  ------------------------------------------------------------------------ 
-    // */    
+     *  ------------------------------------------------------------------------
+    // */
 
     /// @dev - we `override` the ability of calling those methods to be allowed only of the owner
     ///        or the C level as the tokens shouldn't have any money properties.
     function transfer(address _to, uint256 _value) public onlyCLevelOrOwner returns (bool) {
         /// @dev call the super function transfer as is
         super.transfer(_to, _value);
-        
+
         /// @dev and add the required
         totalAllocated = totalAllocated.add(_value);
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -970,16 +970,16 @@ contract BAEToken is PausableToken, AccessControl  {
     function approve(address _spender, uint256 _value) public onlyCLevelOrOwner returns (bool) {
         super.approve(_spender, _value);
     }
-    
+
 
 }
 
 contract Payments is BAEToken {
-    
+
     event PotPayout(address indexed _to, uint256 indexed value);
 
     BAECore public baeInstance;
-    
+
     constructor() public {
         ceoAddress = msg.sender;
     }
@@ -988,24 +988,24 @@ contract Payments is BAEToken {
         BAECore baeCandidate = BAECore(_address);
         baeInstance = baeCandidate;
     }
-    
+
     /// @dev - Update balances - % of ownership
     function addToBAEHolders(address _to) public onlyCLevelOrOwner whenNotPaused {
         mint(_to, currentAmount);
     }
-    
+
     function subToBAEHolders(address _from, address _to, uint _amount) public onlyCLevelOrOwner whenNotPaused {
         transferFrom(_from, _to, _amount);
     }
-    
+
     function setFinalPriceInPounds(uint _finalPrice) public onlyCLevelOrOwner whenNotPaused {
         currentAmount = _finalPrice.mul(10000000);
     }
-    
+
     function withdraw() public onlyCFO {
         cfoAddress.transfer(address(this).balance);
     }
-    
+
     function() external payable { }
 }
 
@@ -1712,7 +1712,7 @@ contract BAE is ERC721Full, Helpers {
     mapping (uint => address) artTransApprovals;
 
    constructor() ERC721Full("BlockchainArtExchange", "BAE") public {}
-    
+
     /// @dev functions affecting ERC20 tokens
     function setPaymentAddress(address payable _newAddress) public onlyCEO whenPaused {
         Payments tokenInterfaceCandidate = Payments(_newAddress);
@@ -1731,14 +1731,14 @@ contract BAE is ERC721Full, Helpers {
         uint64 _basePrice,
         uint8 _remainingPrintings,
         bool _physical
-    ) 
-      public 
+    )
+      public
     {
         super._createArtpiece(_name, _artist, _thumbnailUrl, _mainUrl, _notes, _grade, _dateCreatedByTheArtist, _price, _basePrice, _remainingPrintings, _physical);
-        
+
         _mint(msg.sender, artpieces.length - 1);
     }
-  
+
     function calculateFees(uint _tokenId) public payable whenNotPaused returns (uint baeFee, uint royaltyFee, uint potFee) {
         /// @dev check this will not bring problems in the future or should we be using SafeMath library.
         uint baeFeeAmount = (uint(artpieces[_tokenId].baeFeeLevel) * msg.value) / 100;
@@ -1763,7 +1763,7 @@ contract BAE is ERC721Full, Helpers {
         // we send the value left of the message to the POT contract
         address(tokenInterface).transfer(msg.value);
     }
-    
+
     /// @dev set post-purchase data
     function _postPurchase(address _from, address _to, uint256 _tokenId) internal {
         artCollection[_to] = artCollection[_to].add(1);
@@ -1775,14 +1775,14 @@ contract BAE is ERC721Full, Helpers {
             artpieces[_tokenId].baeFeeLevel = uint8(3);
             /// potFeeLevel is calculated from adding up (baeFeeLevel + royaltyFee) - 100
         }
-        
+
         /// @dev we set this as not being the first sale anymore
         artpieces[_tokenId].metadata.isFirstSale = false;
 
         emit Sold(_tokenId, _from, _to, artpieces[_tokenId].price);
     }
-    
-    
+
+
     /// @dev this method is not part of erc-721 - not yet tested
     function deleteArtpiece(uint256 _tokenId) public onlyCLevelOrOwner whenNotPaused onlyBeforeFirstSale(_tokenId) returns (bool deleted) {
         address _from = numArtInAddress[_tokenId];
@@ -1806,7 +1806,7 @@ contract PerishableSimpleAuction is Destructible {
     event AuctionCreated(uint id, address seller);
     event AuctionWon(uint tokenId, address _who);
     event SellerPaid(bool success, uint amount);
-    
+
     BAECore public baeInstance;
     bool private currentAuction;
 
@@ -1818,7 +1818,7 @@ contract PerishableSimpleAuction is Destructible {
         uint8 paid;
     }
 
-    // When someone wins add it to this mapping 
+    // When someone wins add it to this mapping
     /// @dev address => uint === winnerAddress => tokenId
     mapping (uint => address) public winners;
 
@@ -1839,21 +1839,21 @@ contract PerishableSimpleAuction is Destructible {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyAuctionLord() {
         require(msg.sender == address(baeInstance));
         _;
     }
-    
+
     constructor() public {
         paused = true;
         ceoAddress = msg.sender;
     }
-    
+
     function setIsCurrentAuction(bool _current) external onlyCEO {
         currentAuction = _current;
     }
-    
+
     /// @dev this should be done when paused  as it breaks functionality
     /// @dev changes the current contract interaccting with the auction
     function setBAEAddress(address payable _newAddress) public onlyAuctionOwner whenPaused {
@@ -1877,13 +1877,13 @@ contract PerishableSimpleAuction is Destructible {
             require(tokenIdToAuction[_tokenId].paid == 1);
         }
         require(idx <= 20);
-        
+
         Auction memory newAuction = Auction(_tokenId, _startingPrice, _finalPrice, _seller, 0);
         auctions[idx] = newAuction;
-        tokenIdToAuction[_tokenId] = newAuction; 
+        tokenIdToAuction[_tokenId] = newAuction;
         tokendIdToAuctionId[_tokenId] = idx;
         idx = idx.add(1);
-        
+
         emit AuctionCreated(idx,  _seller);
     }
 
@@ -1905,18 +1905,18 @@ contract PerishableSimpleAuction is Destructible {
         require(_sender == winnerAddress);
         return (seller, tokenId, finalPrice);
     }
-    
+
     function setPaid(uint _auctionId) external whenNotPaused onlyAuctionLord {
         require(auctions[_auctionId].paid == 0);
         auctions[_auctionId].paid = 1;
         emit SellerPaid(true, auctions[_auctionId].finalPrice);
     }
-    
+
     /** Takes an auctionId to get the tokenId for the auction and returns the address of the winner. */
     function getAuctionWinnerAddress(uint _auctionId) external view whenNotPaused returns(address)  {
         return winners[auctions[_auctionId].tokenId];
     }
-    
+
     function getFinalPrice(uint _auctionId) external view whenNotPaused returns(uint)  {
         return auctions[_auctionId].finalPrice;
     }
@@ -1924,27 +1924,27 @@ contract PerishableSimpleAuction is Destructible {
     function getAuctionDetails(uint _auctionId) external view whenNotPaused returns (uint, uint, uint, address, uint) {
         return (auctions[_auctionId].tokenId, auctions[_auctionId].startingPrice, auctions[_auctionId].finalPrice, auctions[_auctionId].seller, auctions[_auctionId].paid);
     }
-    
+
     function getCurrentIndex() external view returns (uint) {
         uint val = idx - 1;
-                
+
         if (val > 20) {
             return 0;
         }
-        
+
         return val;
     }
-    
+
     function getTokenIdToAuctionId(uint _tokenId) external view returns (uint) {
         return tokendIdToAuctionId[_tokenId];
     }
-    
+
     function unpause() public onlyAuctionOwner whenPaused {
         require(address(baeInstance) != address(0));
 
         super.unpause();
     }
-    
+
     function () external payable {
         revert();
     }
@@ -1952,10 +1952,10 @@ contract PerishableSimpleAuction is Destructible {
 
 contract BAECore is BAE {
       using SafeMath for uint256;
- 
+
     /// @dev this will be private so no one can see where it is living and will be deployed by another address
     PerishableSimpleAuction private instanceAuctionAddress;
-    
+
     constructor() public {
         paused = true;
         ceoAddress = msg.sender;
@@ -1965,28 +1965,28 @@ contract BAECore is BAE {
         PerishableSimpleAuction possibleAuctionInstance = PerishableSimpleAuction(_newAddress);
         instanceAuctionAddress = possibleAuctionInstance;
     }
-    
+
     /// @dev we can also charge straight away by charging an amount and making this function payable
     function createAuction(uint _tokenId, uint _startingPrice, uint _finalPrice) external whenNotPaused {
         require(ownerOf( _tokenId) == msg.sender, "You can't transfer an artpiece which is not yours");
         require(_startingPrice >= artpieces[_tokenId].metadata.basePrice);
         instanceAuctionAddress.createAuction(_tokenId, _startingPrice,_finalPrice, msg.sender);
-        
+
         /// @dev - approve the setWinnerAndPrice callers
         setApprovalForAll(owner, true);
         setApprovalForAll(ceoAddress, true);
         setApprovalForAll(cfoAddress, true);
         setApprovalForAll(cooAddress, true);
     }
-    
+
     function getAuctionDetails(uint _auctionId) public view returns (uint) {
         (uint tokenId,,,,) = instanceAuctionAddress.getAuctionDetails(_auctionId);
         return tokenId;
     }
-    
+
     /// @dev this should be cleared from the array if its called on a second time.
-    function setWinnerAndPrice(uint256 _auctionId, address _winner, uint256 _finalPrice, uint256 _currentPrice) external onlyCLevelOrOwner whenNotPaused returns(bool hasWinnerInfo) 
-    {   
+    function setWinnerAndPrice(uint256 _auctionId, address _winner, uint256 _finalPrice, uint256 _currentPrice) external onlyCLevelOrOwner whenNotPaused returns(bool hasWinnerInfo)
+    {
         (uint tokenId,,,,) = instanceAuctionAddress.getAuctionDetails(_auctionId);
         require(_finalPrice >= uint256(artpieces[tokenId].metadata.basePrice));
         approve(_winner, tokenId);
@@ -1994,7 +1994,7 @@ contract BAECore is BAE {
         tokenInterface.setFinalPriceInPounds(_currentPrice);
         return true;
     }
-    
+
     function calculateFees(uint _tokenId, uint _fullAmount) internal view  whenNotPaused returns (uint baeFee, uint royaltyFee, uint potFee) {
         /// @dev check this will not bring problems in the future or should we be using SafeMath library.
         uint baeFeeAmount = (uint(artpieces[_tokenId].baeFeeLevel) * _fullAmount) / 100;
@@ -2006,35 +2006,35 @@ contract BAECore is BAE {
     }
 
     function payAndWithdraw(uint _auctionId) public payable {
-        // calculate the share of each of the stakeholders 
+        // calculate the share of each of the stakeholders
         (address payable seller, uint tokenId, uint finalPrice) = instanceAuctionAddress.winnerCheckWireDetails(_auctionId, msg.sender);
         (uint baeFeeAmount, uint artistFeeAmount,) = calculateFees(tokenId, finalPrice);
-        
+
         // break msg.value it into the rightchunks
         require(msg.value >= finalPrice);
         uint baeFee = msg.value.sub(baeFeeAmount);
         uint artistFee = msg.value.sub(artistFeeAmount);
-        
+
         // do the transfers
         BAEFeeAddress.transfer(msg.value.sub(baeFee));
         seller.transfer(msg.value.sub(artistFee));
         address(tokenInterface).transfer(address(this).balance);
-        
+
         // and when the money is sent, we mark the auccion as completed
         instanceAuctionAddress.setPaid(_auctionId);
-        
+
         // and since it's paid then initiate the transfer mechanism
         transferFrom(seller, msg.sender, tokenId);
     }
-    
+
     function getWinnerAddress(uint _auctionId) public view returns(address)  {
         return instanceAuctionAddress.getAuctionWinnerAddress(_auctionId);
     }
-    
+
     function getHighestBid(uint _auctionId) public view returns(uint)  {
         return instanceAuctionAddress.getFinalPrice(_auctionId);
     }
-    
+
     function getLatestAuctionIndex() public view returns(uint) {
         return instanceAuctionAddress.getCurrentIndex();
     }
@@ -2045,11 +2045,11 @@ contract BAECore is BAE {
         require(paid == 1);
         super.transferFrom(_from, _to, _tokenId);
         _postPurchase(_from, _to, _tokenId);
-        
+
         /// @dev this gets paid even to non artists, if it's a seller he will get the same
         tokenInterface.addToBAEHolders(_from);
     }
-    
+
     function unpause() public onlyCEO whenPaused {
         require(ceoAddress != address(0));
         require(address(instanceAuctionAddress) != address(0));
@@ -2058,11 +2058,22 @@ contract BAECore is BAE {
 
         super.unpause();
     }
-    
+
     /// @dev - we override this so only the CEO can call it.
     function pause() public onlyCEO whenNotPaused {
         super.pause();
     }
-    
+
     function () external payable {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

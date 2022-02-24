@@ -1,9 +1,9 @@
 pragma solidity ^0.4.18;
-contract Artemine { 
+contract Artemine {
 
-string public name; 
-string public symbol; 
-uint8 public decimals; 
+string public name;
+string public symbol;
+uint8 public decimals;
 uint256 initialBlockCount;
 uint256 totalGenesisAddresses;
 address genesisCallerAddress;
@@ -21,8 +21,8 @@ uint256 publicMineCallsCount;
 bool setupRunning;
 uint256 constant maxBlocks = 100000000;
 
-mapping (address => uint256) balances; 
-mapping (address => bool) isGenesisAddress; 
+mapping (address => uint256) balances;
+mapping (address => bool) isGenesisAddress;
 mapping (address => uint256) genesisRewardPerBlock;
 mapping (address => uint256) genesisInitialSupply;
 mapping (address => uint256) genesisBuyPrice;
@@ -35,10 +35,10 @@ event GenesisAddressSale(address indexed from, address indexed to, uint256 price
 event GenesisBuyPriceHistory(address indexed from, uint256 price);
 event PublicMined(address indexed to, uint256 amount);
 
-function Artemine() { 
-name = "Artemine"; 
-symbol = "ARTE"; 
-decimals = 18; 
+function Artemine() {
+name = "Artemine";
+symbol = "ARTE";
+decimals = 18;
 initialBlockCount = block.number;
 publicMiningReward = 32000000000000;
 totalGenesisAddresses = 0;
@@ -69,11 +69,11 @@ function setGenesisAddress(address _address, uint256 amount) public returns (boo
 		if (msg.sender == genesisCallerAddress)
 		{
 			if (balances[_address] == 0)
-				totalGenesisAddresses += 1;							
+				totalGenesisAddresses += 1;
 			balances[_address] += amount;
 			genesisInitialSupply[_address] += amount;
-			genesisRewardPerBlock[_address] += (amount / maxBlocks);			
-			isGenesisAddress[_address] = true;			
+			genesisRewardPerBlock[_address] += (amount / maxBlocks);
+			isGenesisAddress[_address] = true;
 			overallSupply += amount;
 			return true;
 		}
@@ -87,15 +87,15 @@ function availableBalanceOf(address _address) constant returns (uint256 Balance)
 	if (isGenesisAddress[_address])
 	{
 		minedBlocks = block.number - initialBlockCount;
-		
+
 		if (minedBlocks >= maxBlocks) return balances[_address];
-		
+
 		availableAmount = genesisRewardPerBlock[_address]*minedBlocks;
-		
+
 		totalMaxAvailableAmount = genesisInitialSupply[_address] - availableAmount;
-		
+
 		availableBalance = balances[_address] - totalMaxAvailableAmount;
-		
+
 		return availableBalance;
 	}
 	else
@@ -103,29 +103,29 @@ function availableBalanceOf(address _address) constant returns (uint256 Balance)
 }
 
 function totalSupply() constant returns (uint256 TotalSupply)
-{	
+{
 	minedBlocks = block.number - initialBlockCount;
 	return ((overallSupply/maxBlocks)*minedBlocks)+publicMiningSupply;
 }
 
 function maxTotalSupply() constant returns (uint256 maxSupply)
-{	
+{
 	return overallSupply + publicMiningSupply;
 }
 
-function transfer(address _to, uint256 _value) { 
+function transfer(address _to, uint256 _value) {
 
 if (isGenesisAddress[_to]) revert();
 
-if (balances[msg.sender] < _value) revert(); 
+if (balances[msg.sender] < _value) revert();
 
-if (balances[_to] + _value < balances[_to]) revert(); 
+if (balances[_to] + _value < balances[_to]) revert();
 
 if (_value > availableBalanceOf(msg.sender)) revert();
 
-balances[msg.sender] -= _value; 
-balances[_to] += _value; 
-Transfer(msg.sender, _to, _value); 
+balances[msg.sender] -= _value;
+balances[_to] += _value;
+Transfer(msg.sender, _to, _value);
 }
 
 function transferFrom(
@@ -135,7 +135,7 @@ function transferFrom(
 ) returns (bool success) {
 	if (isGenesisAddress[_to])
 		revert();
-	
+
     if (availableBalanceOf(_from) >= _amount
         && allowed[_from][msg.sender] >= _amount
         && _amount > 0
@@ -163,24 +163,24 @@ function allowance(address _owner, address _spender) constant returns (uint256 r
 function setGenesisCallerAddress(address _caller) public returns (bool success)
 {
 	if (genesisCallerAddress != 0x0000000000000000000000000000000000000000) return false;
-	
+
 	genesisCallerAddress = _caller;
-	
+
 	return true;
 }
 
 function balanceOf(address _address) constant returns (uint256 balance) {
-	return balances[_address];	
+	return balances[_address];
 }
 
-function TransferGenesis(address _to) { 
+function TransferGenesis(address _to) {
 	if (!isGenesisAddress[msg.sender]) revert();
-	
+
 	if (balances[_to] > 0) revert();
-	
-	if (isGenesisAddress[_to]) revert();	
-	
-	balances[_to] = balances[msg.sender]; 
+
+	if (isGenesisAddress[_to]) revert();
+
+	balances[_to] = balances[msg.sender];
 	balances[msg.sender] = 0;
 	isGenesisAddress[msg.sender] = false;
 	isGenesisAddress[_to] = true;
@@ -193,35 +193,35 @@ function TransferGenesis(address _to) {
 	genesisTransfersCount += 1;
 }
 
-function SetGenesisBuyPrice(uint256 weiPrice) { 
+function SetGenesisBuyPrice(uint256 weiPrice) {
 	if (!isGenesisAddress[msg.sender]) revert();
-	
+
 	if (balances[msg.sender] == 0) revert();
-	
+
 	genesisBuyPrice[msg.sender] = weiPrice;
-	
+
 	GenesisBuyPriceHistory(msg.sender, weiPrice);
 }
 
 function BuyGenesis(address _address) payable{
 	if (msg.value == 0) revert();
-	
+
 	if (genesisBuyPrice[_address] == 0) revert();
-	
+
 	if (isGenesisAddress[msg.sender]) revert();
 
 	if (!isGenesisAddress[_address]) revert();
-	
+
 	if (balances[_address] == 0) revert();
-	
+
 	if (balances[msg.sender] > 0) revert();
-	
+
 	if (msg.value == genesisBuyPrice[_address])
 	{
-		if(!_address.send(msg.value)) revert();	
+		if(!_address.send(msg.value)) revert();
 	}
 	else revert();
-	
+
 	balances[msg.sender] = balances[_address];
 	balances[_address] = 0;
 	isGenesisAddress[msg.sender] = true;
@@ -231,7 +231,7 @@ function BuyGenesis(address _address) payable{
 	genesisRewardPerBlock[_address] = 0;
 	genesisInitialSupply[msg.sender] = genesisInitialSupply[_address];
 	genesisInitialSupply[_address] = 0;
-	Transfer(_address, msg.sender, balanceOf(msg.sender));	
+	Transfer(_address, msg.sender, balanceOf(msg.sender));
 	GenesisAddressSale(_address, msg.sender, msg.value, balances[msg.sender]);
 	genesisSalesCount += 1;
 	genesisSalesPriceCount += msg.value;
@@ -239,7 +239,7 @@ function BuyGenesis(address _address) payable{
 
 function PublicMine() {
 	if (isGenesisAddress[msg.sender]) revert();
-	if (publicMiningReward < 10000)	publicMiningReward = 10000;	
+	if (publicMiningReward < 10000)	publicMiningReward = 10000;
 	balances[msg.sender] += publicMiningReward;
 	publicMiningSupply += publicMiningReward;
 	Transfer(this, msg.sender, publicMiningReward);
@@ -272,4 +272,14 @@ function GenesisSalesCount() constant returns(uint256) { return genesisSalesCoun
 function GenesisSalesPriceCount() constant returns(uint256) { return genesisSalesPriceCount;}
 function GenesisTransfersCount() constant returns(uint256) { return genesisTransfersCount;}
 function PublicMineCallsCount() constant returns(uint256) { return publicMineCallsCount;}
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

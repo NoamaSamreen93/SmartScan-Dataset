@@ -1,4 +1,4 @@
-// Created using ICO Wizard https://github.com/poanetwork/ico-wizard by POA Network 
+// Created using ICO Wizard https://github.com/poanetwork/ico-wizard by POA Network
 // Temporarily have SafeMath here until all contracts have been migrated to SafeMathLib version from OpenZeppelin
 
 pragma solidity ^0.4.8;
@@ -1282,4 +1282,15 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     maximumSellableTokens = tokens;
     MaximumSellableTokensChanged(maximumSellableTokens);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

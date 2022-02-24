@@ -56,12 +56,12 @@ contract CryptoEngineerInterface {
     address public gameSponsor;
 
     function subVirus(address /*_addr*/, uint256 /*_value*/) public pure {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {}
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/) {}
     function fallback() external payable {}
 }
 contract CryptoMiningWarInterface {
-    uint256 public deadline; 
+    uint256 public deadline;
     function subCrystal( address /*_addr*/, uint256 /*_value*/ ) public pure {}
     function fallback() external payable {}
 }
@@ -76,7 +76,7 @@ contract MemoryFactoryInterface {
 
     function getPrograms(address /*_addr*/) public view returns(uint256[]) {}
     function getLevel(address /*_addr*/) public view returns(uint256 /*_level*/) {}
-    function getData(address /*_addr*/) public view returns(uint256 /*_level*/, uint256 /*_updateTime*/, uint256[] /*_programs*/) {} 
+    function getData(address /*_addr*/) public view returns(uint256 /*_level*/, uint256 /*_updateTime*/, uint256[] /*_programs*/) {}
 }
 interface MiniGameInterface {
     function isContractMiniGame() external pure returns( bool _isContractMiniGame );
@@ -88,18 +88,18 @@ contract CryptoProgramFactory {
 
 	address public administrator;
 
-    uint256 private BASE_PRICE   = 0.1 ether; 
-    uint256 private BASE_TIME    = 4 hours; 
+    uint256 private BASE_PRICE   = 0.1 ether;
+    uint256 private BASE_TIME    = 4 hours;
 
     MemoryFactoryInterface   public Memory;
     CryptoMiningWarInterface public MiningWar;
     CryptoEngineerInterface  public Engineer;
 
     // factory info
-    mapping(uint256 => Factory) public factories; 
+    mapping(uint256 => Factory) public factories;
     // minigame info
-    mapping(address => bool)    public miniGames; 
-   
+    mapping(address => bool)    public miniGames;
+
     struct Factory {
         uint256 level;
         uint256 crystals;
@@ -114,7 +114,7 @@ contract CryptoProgramFactory {
         require(msg.sender == administrator);
         _;
     }
-    modifier onlyContractsMiniGame() 
+    modifier onlyContractsMiniGame()
     {
         require(miniGames[msg.sender] == true);
         _;
@@ -128,9 +128,9 @@ contract CryptoProgramFactory {
         setEngineerInterface(0xb2d6000d4a7fe8b1358d54a9bc21f2badf91d849);
         setMemoryInterface(0x5de9c80c15f39a711e2a6607642820be648e5695);
     }
-    function initFactory() private 
-    {       
-        //                  level crystals programPriceByCrystals programPriceByDarkCrystals programValue ether            time                
+    function initFactory() private
+    {
+        //                  level crystals programPriceByCrystals programPriceByDarkCrystals programValue ether            time
         factories[0] = Factory(1, 100000,         10000,           0,                         10           ,BASE_PRICE * 0, BASE_TIME * 1);
         factories[1] = Factory(2, 500000,         20000,           0,                         15           ,BASE_PRICE * 1, BASE_TIME * 2);
         factories[2] = Factory(3, 1500000,        40000,           0,                         20           ,BASE_PRICE * 4, BASE_TIME * 3);
@@ -140,9 +140,9 @@ contract CryptoProgramFactory {
     }
     function () public payable
     {
-        
+
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -153,7 +153,7 @@ contract CryptoProgramFactory {
     {
         selfdestruct(addr);
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 /*_miningWarDeadline*/ ) public
@@ -162,7 +162,7 @@ contract CryptoProgramFactory {
     // ---------------------------------------------------------------------------------------
     // SET INTERFACE CONTRACT
     // ---------------------------------------------------------------------------------------
-    
+
     function setMemoryInterface(address _addr) public isAdministrator
     {
         Memory = MemoryFactoryInterface(_addr);
@@ -174,15 +174,15 @@ contract CryptoProgramFactory {
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isContractMiniGame() == true);
 
         Engineer = engineerInterface;
-    }    
+    }
     //--------------------------------------------------------------------------
-    // SETTING CONTRACT MINI GAME 
+    // SETTING CONTRACT MINI GAME
     //--------------------------------------------------------------------------
-    function setContractMiniGame( address _contractAddress ) public isAdministrator 
+    function setContractMiniGame( address _contractAddress ) public isAdministrator
     {
         MiniGameInterface MiniGame = MiniGameInterface( _contractAddress );
         if( MiniGame.isContractMiniGame() == false ) { revert(); }
@@ -194,14 +194,14 @@ contract CryptoProgramFactory {
         miniGames[_contractAddress] = false;
     }
     //--------------------------------------------------------------------------
-    // SETTING FACTORY  
+    // SETTING FACTORY
     //--------------------------------------------------------------------------
     function addFactory(
-        uint256 _crystals, 
-        uint256 _programPriceByCrystals,  
-        uint256 _programPriceByDarkCrystals,  
-        uint256 _programValue,  
-        uint256 _eth, 
+        uint256 _crystals,
+        uint256 _programPriceByCrystals,
+        uint256 _programPriceByDarkCrystals,
+        uint256 _programValue,
+        uint256 _eth,
         uint256 _time
     ) public isAdministrator
     {
@@ -231,20 +231,20 @@ contract CryptoProgramFactory {
     /**
     * @dev start the mini game
     */
-    function startGame() public 
+    function startGame() public
     {
         require(msg.sender == administrator);
         require(status == false);
-        
+
         status = true;
 
         initFactory();
     }
-    function updateFactory() public payable 
+    function updateFactory() public payable
     {
 
         Memory.updateLevel(msg.sender);
-        
+
         Factory memory f = factories[uint256(Memory.getLevel(msg.sender))];// factory update
 
         if (msg.value < f.eth) revert();
@@ -277,7 +277,7 @@ contract CryptoProgramFactory {
 
         uint256 factoryLevel = Memory.getLevel(msg.sender);
         uint256 crystals = 0;
-        uint256 darkCrystals =0; 
+        uint256 darkCrystals =0;
 
         for (uint256 idx = 0; idx < _programs.length; idx ++) {
             Factory memory f = factories[idx];
@@ -287,7 +287,7 @@ contract CryptoProgramFactory {
                 crystals     += SafeMath.mul(_programs[idx], f.programPriceByCrystals);
                 darkCrystals += SafeMath.mul(_programs[idx], f.programPriceByDarkCrystals);
                 Memory.addProgram(msg.sender, idx, _programs[idx]);
-            }    
+            }
         }
 
         if (crystals > 0) MiningWar.subCrystal(msg.sender, crystals);
@@ -303,7 +303,7 @@ contract CryptoProgramFactory {
             if (_programs[idx] > 0) Memory.subProgram(_addr, idx, _programs[idx]);
         }
     }
-    function getData(address _addr) 
+    function getData(address _addr)
     public
     view
     returns(
@@ -318,7 +318,7 @@ contract CryptoProgramFactory {
     function getProgramsValue() public view returns(uint256[]) {
         uint256 factoryTotal = Memory.factoryTotal();
         uint256[] memory _programsValue = new uint256[](factoryTotal);
-        
+
         for(uint256 idx = 0; idx < factoryTotal; idx++) {
             Factory memory f    = factories[idx];
             _programsValue[idx] = f.programValue;
@@ -331,5 +331,16 @@ contract CryptoProgramFactory {
     {
         return SafeMath.div(SafeMath.mul(_amount, 5), 100);
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

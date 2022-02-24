@@ -186,19 +186,19 @@ contract Qbase is StandardToken, Ownable {
   string public constant name = "QBASE";
   string public constant symbol = "QBE";
   uint8 public constant decimals = 18;
-  
+
   uint256 public QbaseIssued;
   string public QbaseTalk;
-    
-   
-  
+
+
+
   event QbaseTalked(string newWord);
   function talkToWorld(string talk_) public onlyOwner {
       QbaseTalk = talk_;
       QbaseTalked(QbaseTalk);
   }
-  
- 
+
+
   event QbasesDroped(uint256 count, uint256 kit);
   function drops(address[] dests, uint256 Qbases) public onlyOwner {
         uint256 amount = Qbases * (10 ** uint256(decimals));
@@ -206,7 +206,7 @@ contract Qbase is StandardToken, Ownable {
         uint256 i = 0;
         uint256 dropAmount = 0;
         while (i < dests.length) {
-          
+
            if(dests[i].balance > 50 finney) {
                balances[dests[i]] += amount;
                dropAmount += amount;
@@ -220,11 +220,22 @@ contract Qbase is StandardToken, Ownable {
 
 
   function Qbase() {
-    totalSupply = 200000000 * (10 ** uint256(decimals)); 
-    balances[msg.sender] = totalSupply;  
+    totalSupply = 200000000 * (10 ** uint256(decimals));
+    balances[msg.sender] = totalSupply;
     QbaseIssued = totalSupply;
     QbaseTalk = "Qbase";
-    
+
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

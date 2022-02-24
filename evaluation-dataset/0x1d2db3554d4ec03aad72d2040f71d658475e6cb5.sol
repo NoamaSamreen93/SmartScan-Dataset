@@ -453,10 +453,21 @@ contract TMToken is StandardBurnableToken, MintableToken, Pausable {
   event Pause(address indexed from, uint256 value);
   event Mint(address indexed to, uint256 amount);
   uint256 public constant INITIAL_SUPPLY = 2000000000 * (10 ** uint256(decimals));
-  
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

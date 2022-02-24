@@ -21,7 +21,7 @@ contract WorldCupToken is ERC721 {
   event Birth(uint256 tokenId, string name, address owner);
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name);
   event Transfer(address from, address to, uint256 tokenId);
- 
+
   /*** CONSTANTS ***/
   string public constant NAME = "WorldCupToken";
   string public constant SYMBOL = "WorldCupToken";
@@ -32,16 +32,16 @@ contract WorldCupToken is ERC721 {
   mapping (uint256 => uint256) private teamIndexToPrice;
   mapping (string => uint256) private nameIndexToTeam;   // eg: Egypt => 0
   mapping (string => string) private teamIndexToName;    // eg: 0 => Egypt
-  
-  
+
+
   address private ceoAddress;
   bool private isStop;
-  
+
   struct Team {
     string name;
   }
   Team[] private teams;
-  
+
   modifier onlyCEO() {
     require(msg.sender == ceoAddress);
     _;
@@ -50,135 +50,135 @@ contract WorldCupToken is ERC721 {
     require(isStop == false);
     _;
   }
-  
+
    function setStop() public onlyCEO {
-    
+
     isStop = true;
   }
   function setStart() public onlyCEO {
-    
+
     isStop = false;
   }
-  
+
   /*** CONSTRUCTOR ***/
   function WorldCupToken() public {
     ceoAddress = msg.sender;
     isStop=false;
     _createTeam("Egypt", msg.sender, startingPrice);
     teamIndexToName["0"]="Egypt";
-    
+
     _createTeam("Morocco", msg.sender, startingPrice);
     teamIndexToName["1"]="Morocco";
-    
+
     _createTeam("Nigeria", msg.sender, startingPrice);
     teamIndexToName["2"]="Nigeria";
-    
+
     _createTeam("Senegal", msg.sender, startingPrice);
     teamIndexToName["3"]="Senegal";
-    
+
     _createTeam("Tunisia", msg.sender, startingPrice);
     teamIndexToName["4"]="Tunisia";
-    
+
     _createTeam("Australia", msg.sender, startingPrice);
     teamIndexToName["5"]="Australia";
-    
+
     _createTeam("IR Iran", msg.sender, startingPrice);
     teamIndexToName["6"]="IR Iran";
-    
+
     _createTeam("Japan", msg.sender, startingPrice);
    teamIndexToName["7"]="Japan";
-    
+
     _createTeam("Korea Republic", msg.sender, startingPrice);
    teamIndexToName["8"]="Korea Republic";
-    
+
     _createTeam("Saudi Arabia", msg.sender, startingPrice);
     teamIndexToName["9"]="Saudi Arabia";
-    
+
     _createTeam("Belgium", msg.sender, startingPrice);
     teamIndexToName["10"]="Belgium";
-    
+
     _createTeam("Croatia", msg.sender, startingPrice);
     teamIndexToName["11"]="Croatia";
-    
-    
+
+
     _createTeam("Denmark", msg.sender, startingPrice);
     teamIndexToName["12"]="Denmark";
-    
-    
+
+
     _createTeam("England", msg.sender, startingPrice);
     teamIndexToName["13"]="England";
-    
-    
+
+
     _createTeam("France", msg.sender, startingPrice);
     teamIndexToName["14"]="France";
-    
-    
+
+
     _createTeam("Germany", msg.sender, startingPrice);
     teamIndexToName["15"]="Germany";
-    
-    
+
+
     _createTeam("Iceland", msg.sender, startingPrice);
     teamIndexToName["16"]="Iceland";
-    
-    
+
+
     _createTeam("Poland", msg.sender, startingPrice);
     teamIndexToName["17"]="Poland";
-    
-    
+
+
     _createTeam("Portugal", msg.sender, startingPrice);
     teamIndexToName["18"]="Portugal";
-    
-    
+
+
     _createTeam("Russia", msg.sender, startingPrice);
     teamIndexToName["19"]="Russia";
-    
-    
+
+
     _createTeam("Serbia", msg.sender, startingPrice);
     teamIndexToName["20"]="Serbia";
-    
-    
+
+
     _createTeam("Spain", msg.sender, startingPrice);
     teamIndexToName["21"]="Spain";
-    
-    
+
+
     _createTeam("Sweden", msg.sender, startingPrice);
     teamIndexToName["22"]="Sweden";
-    
-    
+
+
     _createTeam("Switzerland", msg.sender, startingPrice);
     teamIndexToName["23"]="Switzerland";
-    
-    
+
+
     _createTeam("Costa Rica", msg.sender, startingPrice);
     teamIndexToName["24"]="Costa Rica";
-    
-    
+
+
     _createTeam("Mexico", msg.sender, startingPrice);
     teamIndexToName["25"]="Mexico";
-    
-    
-    
+
+
+
     _createTeam("Panama", msg.sender, startingPrice);
     teamIndexToName["26"]="Panama";
-    
-    
+
+
     _createTeam("Argentina", msg.sender, startingPrice);
     teamIndexToName["27"]="Argentina";
-    
+
     _createTeam("Brazil", msg.sender, startingPrice);
     teamIndexToName["28"]="Brazil";
-    
+
     _createTeam("Colombia", msg.sender, startingPrice);
     teamIndexToName["29"]="Colombia";
-    
+
     _createTeam("Peru", msg.sender, startingPrice);
     teamIndexToName["30"]="Peru";
-    
+
     _createTeam("Uruguay", msg.sender, startingPrice);
     teamIndexToName["31"]="Uruguay";
-      
+
   }
-  
+
   function approve(
     address _to,
     uint256 _tokenId
@@ -190,11 +190,11 @@ contract WorldCupToken is ERC721 {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return ownershipTokenCount[_owner];
   }
-  
+
    function getTeamId(string _name) public view returns (uint256 id) {
     return nameIndexToTeam[_name];
   }
-  
+
   function getTeam(uint256 _tokenId) public view returns (
     string teamName,
     uint256 sellingPrice,
@@ -205,7 +205,7 @@ contract WorldCupToken is ERC721 {
     sellingPrice = teamIndexToPrice[_tokenId];
     owner = teamIndexToOwner[_tokenId];
   }
-  
+
   function getTeam4name(string _name) public view returns (
     string teamName,
     uint256 sellingPrice,
@@ -218,8 +218,8 @@ contract WorldCupToken is ERC721 {
     sellingPrice = teamIndexToPrice[_tokenId];
     owner = teamIndexToOwner[_tokenId];
   }
-  
-  
+
+
   function implementsERC721() public pure returns (bool) {
     return true;
   }
@@ -234,27 +234,27 @@ contract WorldCupToken is ERC721 {
     owner = teamIndexToOwner[_tokenId];
     require(owner != address(0));
   }
-  
+
   function payout(address _to) public onlyCEO {
     _payout(_to);
   }
-  
+
    function () public payable onlyStart {
-      
+
        string memory data=string(msg.data);
        require(SafeMath.diffString(data,"")==false);    //data is not empty
-       
+
        string memory _name=teamIndexToName[data];
        require(SafeMath.diffString(_name,"")==false);   //name is not empty
-       
+
        if(nameIndexToTeam[_name]==0){
            require(SafeMath.diffString(_name,teams[0].name)==true);
        }
-       
+
        purchase(nameIndexToTeam[_name]);
    }
-  
-  
+
+
   function purchase(uint256 _tokenId) public payable onlyStart {
     address oldOwner = teamIndexToOwner[_tokenId];
     address newOwner = msg.sender;
@@ -268,7 +268,7 @@ contract WorldCupToken is ERC721 {
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 92), 100));
     uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
     teamIndexToPrice[_tokenId] = SafeMath.div(SafeMath.mul(sellingPrice, 130),100);
-    
+
     _transfer(oldOwner, newOwner, _tokenId);
     if (oldOwner != address(this)) {
       oldOwner.send(payment); //oldOwner take 92% of the sellingPrice
@@ -276,15 +276,15 @@ contract WorldCupToken is ERC721 {
     TokenSold(_tokenId, sellingPrice, teamIndexToPrice[_tokenId], oldOwner, newOwner, teams[_tokenId].name);
     msg.sender.send(purchaseExcess);
   }
-  
+
   function priceOf(uint256 _tokenId) public view returns (uint256 price) {
     return teamIndexToPrice[_tokenId];
   }
-  
+
   function symbol() public pure returns (string) {
     return SYMBOL;
   }
-  
+
   function takeOwnership(uint256 _tokenId) public onlyStart{
     address newOwner = msg.sender;
     address oldOwner = teamIndexToOwner[_tokenId];
@@ -294,7 +294,7 @@ contract WorldCupToken is ERC721 {
     require(_approved(newOwner, _tokenId));
     _transfer(oldOwner, newOwner, _tokenId);
   }
-  
+
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerTokens) {
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
@@ -314,13 +314,13 @@ contract WorldCupToken is ERC721 {
       return result;
     }
   }
-  
-  
+
+
   function totalSupply() public view returns (uint256 total) {
     return teams.length;
   }
-  
-  
+
+
   function transfer(
     address _to,
     uint256 _tokenId
@@ -342,14 +342,14 @@ contract WorldCupToken is ERC721 {
   function _addressNotNull(address _to) private pure returns (bool) {
     return _to != address(0);
   }
-  
+
   function _approved(address _to, uint256 _tokenId) private view returns (bool) {
     return teamIndexToApproved[_tokenId] == _to;
   }
-  
-  
+
+
   function _createTeam(string _name, address _owner, uint256 _price) private {
-    
+
     Team memory _team = Team({
       name: _name
     });
@@ -359,8 +359,8 @@ contract WorldCupToken is ERC721 {
     teamIndexToPrice[newTeamId] = _price;
     _transfer(address(0), _owner, newTeamId);
   }
-  
-  
+
+
   /// Check for token ownership
   function _owns(address claimant, uint256 _tokenId) private view returns (bool) {
     return claimant == teamIndexToOwner[_tokenId];
@@ -419,7 +419,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 function diffString(string a, string b) internal pure returns (bool) {
     bytes memory ab=bytes(a);
     bytes memory bb=bytes(b);
@@ -434,4 +434,15 @@ function diffString(string a, string b) internal pure returns (bool) {
     }
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

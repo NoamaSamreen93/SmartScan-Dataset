@@ -5,7 +5,7 @@ pragma solidity ^0.4.16;
 // Luxreum Symbol: LXR
 
 
-contract LUXREUMToken { 
+contract LUXREUMToken {
     /* This is a slight change to the ERC20 base standard.
     function totalSupply() constant returns (uint256 supply);
     is replaced with:
@@ -14,7 +14,7 @@ contract LUXREUMToken {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -83,7 +83,7 @@ contract Ownable {
     address public owner;
     address public newOwner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -118,14 +118,14 @@ contract Ownable {
 
 
 contract LXRStandardToken is LUXREUMToken, Ownable {
-    
+
     using ABCMaths for uint256;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-     
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -174,7 +174,7 @@ contract LXRStandardToken is LUXREUMToken, Ownable {
          * allowance to zero by calling `approve(_spender, 0)` if it is not
          * already 0 to mitigate the race condition described here:
          * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 */
-        
+
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
 
@@ -182,25 +182,25 @@ contract LXRStandardToken is LUXREUMToken, Ownable {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-  
+
 }
 contract LUXREUM is LXRStandardToken {
 
     /* Public variables of the token */
     /*
     NOTE:
- 
+
     */
-    
+
     uint256 constant public decimals = 18;
     uint256 public totalSupply = 60 * (10**7) * 10**18 ; // 600 million tokens, 16 decimal places
     string constant public name = "Luxreum";
     string constant public symbol = "LXR";
-    
+
     function LUXREUM(){
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
@@ -216,4 +216,15 @@ contract LUXREUM is LXRStandardToken {
         require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

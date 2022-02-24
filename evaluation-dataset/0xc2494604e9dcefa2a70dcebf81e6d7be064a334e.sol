@@ -46,27 +46,27 @@ contract Owned {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
     }
-    
+
     function setNotifyContract(address _newAddress) public onlyOwner {
         notifyAddress[_newAddress] = true;
     }
-    
+
     function removeNotifyContract(address _newAddress) public onlyOwner {
         notifyAddress[_newAddress] = false;
     }
@@ -114,7 +114,7 @@ contract owToken is Owned {
 
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         if(notifyAddress[_to]){
             owContract(_to).notifyBalance(msg.sender, _value);
         }
@@ -133,7 +133,7 @@ contract owToken is Owned {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= balanceOf[_from]);
         require(_value <= allowance[_from][msg.sender]);
-        
+
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
 
@@ -143,12 +143,21 @@ contract owToken is Owned {
 
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
     function () external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

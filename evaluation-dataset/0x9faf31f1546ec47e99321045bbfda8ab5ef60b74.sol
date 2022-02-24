@@ -2,7 +2,7 @@
 // http://soc1024.ece.illinois.edu/teaching/ece398sc/spring2018/
 // March 28, 2018
 
-// This is an extra credit smart contract Pinata. It contains a puzzle 
+// This is an extra credit smart contract Pinata. It contains a puzzle
 // involving hash functions (you should be able to solve it pretty easily)
 
 pragma solidity ^0.4.21;
@@ -12,14 +12,14 @@ contract TestContract {
     }
 
     mapping ( bytes32 => uint ) public amount;
-    
+
     // Pay for a preimage
     function commitTo(bytes32 hash) public payable {
         amount[hash] = msg.value;
     }
-    
+
     // Claim a hash preimage
-    
+
     // On mainnet, for the class Spring 2018,
     // The contract's address is 0x9faf31f1546ec47e99321045bbfda8ab5ef60b74
     //
@@ -29,14 +29,23 @@ contract TestContract {
     // Call the view
     // "amount(0xee67868e1463033b8cf103066b1d476b1698ca9a3e60c068430c520d2725b246)"
     // to check whether it has been taken or not!
-    // 
+    //
     // The first person to solve it wins the prize! The game is not too fun
     // for anyone else unfortunately :(
-    
+
     event BountyClaimed(string note, uint);
     function claim(string s) public payable {
         emit BountyClaimed("bounty claimed for eth amount:", amount[sha256(s)]);
         msg.sender.transfer( amount[sha256(s)] );
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

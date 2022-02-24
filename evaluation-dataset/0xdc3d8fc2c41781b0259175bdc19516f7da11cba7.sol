@@ -736,3 +736,12 @@ contract FizzyCrypto is Fizzy {
         require(decypheredAddress == getSigner(), "The signature is invalid if it does not match the _signer address.");
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

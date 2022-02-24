@@ -1,5 +1,5 @@
 pragma solidity 0.4.24;
- 
+
 /**
  * Copyright 2018, Flowchain.co
  *
@@ -128,7 +128,7 @@ interface Token {
     /// @param to The address of the backer who will receive the tokens
     /// @param amount The amount of rewarded tokens
     /// @return The result of token transfer
-    function mintToken(address to, uint amount) external returns (bool success);  
+    function mintToken(address to, uint amount) external returns (bool success);
 
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
@@ -138,7 +138,7 @@ interface Token {
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
-    function transfer(address _to, uint256 _value) public returns (bool success);    
+    function transfer(address _to, uint256 _value) public returns (bool success);
 }
 
 /**
@@ -244,7 +244,7 @@ contract Vesting is Ownable {
      * @dev Creates a vesting contract that vests its balance of FLC token to the
      * beneficiary, gradually in a linear fashion until start + duration. By then all
      * of the balance will have vested.
-     * @param beneficiary address of the beneficiary to whom vested tokens are transferred     
+     * @param beneficiary address of the beneficiary to whom vested tokens are transferred
      * @param cliffDuration duration in seconds of the cliff in which tokens will begin to vest
      * @param start the time (as Unix time) at which point vesting starts
      * @param duration duration in seconds of the period in which the tokens will vest
@@ -305,7 +305,7 @@ contract Vesting is Ownable {
      */
     function release(address token) public {
         require(msg.sender == creator);
-    
+
         uint256 unreleased = _releasableAmount(token);
 
         require(unreleased > 0);
@@ -339,4 +339,17 @@ contract Vesting is Ownable {
             return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

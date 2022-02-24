@@ -123,7 +123,7 @@ contract StandardToken is IERC20 {
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowed[owner][spender];
     }
-    
+
     function transfer(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
@@ -177,7 +177,7 @@ contract StandardToken is IERC20 {
 
         emit Transfer(address(0), account, value);
     }
-    
+
     function _burn(address account, uint256 value) internal {
         require(account != address(0), "ERC20: burn from the zero address");
 
@@ -186,7 +186,7 @@ contract StandardToken is IERC20 {
 
         emit Transfer(account, address(0), value);
     }
-    
+
     function _approve(address owner, address spender, uint256 value) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
@@ -195,7 +195,7 @@ contract StandardToken is IERC20 {
 
         emit Approval(owner, spender, value);
     }
-    
+
     function _burnFrom(address account, uint256 value) internal {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
@@ -363,7 +363,7 @@ contract Manageable is Ownable {
         for(; index < managers.length - 1; index++) {
             managers[index] = managers[index + 1];
         }
-        
+
         managers.length--;
         emit ManagerRemoved(_manager);
     }
@@ -375,7 +375,7 @@ contract Manageable is Ownable {
 */
 contract Token is CappedToken, BurnableToken, Withdrawable {
     constructor() CappedToken(1000000 * 1e8) StandardToken("Local Credit International", "LCI", 8) public {
-        
+
     }
 }
 
@@ -387,7 +387,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     constructor() public {
         token = new Token();
     }
@@ -411,11 +411,20 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         emit CrowdsaleClose();
     }
-    
+
     function transferTokenOwnership(address _to) onlyOwner external {
         require(crowdsaleClosed);
         require(_to != address(0));
 
         token.transferOwnership(_to);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

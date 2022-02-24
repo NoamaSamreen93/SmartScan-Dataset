@@ -53,7 +53,7 @@ contract Crowdsale {
   token tokenReward;
 
   mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -117,7 +117,7 @@ contract Crowdsale {
     uint256 weiAmount = msg.value;
 
     if(tokensSold < 10000*10**6){
-      price = 300;      
+      price = 300;
     }else if(tokensSold < 20000*10**6){
       price = 284;
     }else if(tokensSold < 30000*10**6){
@@ -259,16 +259,16 @@ contract Crowdsale {
     }
     //the price above is Token per ETH
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount/10**12) * price;//weiamount * price 
-    
-    
+    uint256 tokens = (weiAmount/10**12) * price;//weiamount * price
+
+
 
     require(tokens >= 1 * 10 ** 6); //1 token minimum
 
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
 
     tokenReward.transfer(beneficiary, tokens);
     tokensSold = tokensSold.add(tokens);//now we can track the number of tokens sold.
@@ -296,4 +296,15 @@ contract Crowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

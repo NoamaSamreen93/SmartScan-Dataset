@@ -194,7 +194,7 @@ contract CIBNLiveInteractiveToken is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
 
-	
+
 	function CIBNLiveInteractiveToken() public {
 		owner = msg.sender;
 		totalSupply = 50000000000000000000000000;
@@ -258,7 +258,7 @@ contract CIBNLiveInteractiveToken is owned, TokenERC20 {
     }
 
 
-	/* 设置自动补充gas的阈值信息 201803202232  james */ 
+	/* 设置自动补充gas的阈值信息 201803202232  james */
 	function setMinBalance(uint minimumBalanceInFinney) public onlyOwner {
 		minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
 	}
@@ -281,7 +281,18 @@ contract CIBNLiveInteractiveToken is owned, TokenERC20 {
             i += 1;
         }
         return i;
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

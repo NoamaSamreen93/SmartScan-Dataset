@@ -310,3 +310,7 @@ contract MTMarketplace is Ownable {
         assembly {mstore(add(b, 32), x)}
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

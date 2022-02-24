@@ -22,7 +22,7 @@ contract Ownable {
 
 
 contract ERC721 {
-    
+
     function totalSupply() public view returns (uint256 total);
     function balanceOf(address _owner) public view returns (uint256 balance);
     function ownerOf(uint256 _tokenId) external view returns (address owner);
@@ -38,7 +38,7 @@ contract ERC721 {
 
 
 contract GeneScienceInterface {
-    
+
     function isGeneScience() public pure returns (bool);
 
     function mixGenes(uint256 genes1, uint256 genes2, uint256 targetBlock) public returns (uint256);
@@ -48,24 +48,24 @@ contract GeneScienceInterface {
 contract VariationInterface {
 
     function isVariation() public pure returns(bool);
-    
+
     function createVariation(uint256 _gene, uint256 _totalSupply) public returns (uint8);
-    
+
     function registerVariation(uint256 _dogId, address _owner) public;
 }
 
 
 contract LotteryInterface {
-    
+
     function isLottery() public pure returns (bool);
 
     function checkLottery(uint256 genes) public pure returns (uint8 lotclass);
-    
+
     function registerLottery(uint256 _dogId) public payable returns (uint8);
 
-    function getCLottery() 
-        public 
-        view 
+    function getCLottery()
+        public
+        view
         returns (
             uint8[7]        luckyGenes1,
             uint256         totalAmount1,
@@ -81,7 +81,7 @@ contract LotteryInterface {
 
 
 contract DogAccessControl {
-    
+
     event ContractUpgrade(address newContract);
 
     address public ceoAddress;
@@ -155,7 +155,7 @@ contract DogBase is DogAccessControl {
     event Transfer(address from, address to, uint256 tokenId);
 
     struct Dog {
-        
+
         uint256 genes;
 
         uint256 birthTime;
@@ -217,7 +217,7 @@ contract DogBase is DogAccessControl {
     uint256 public autoBirthFee = 7500 szabo;
 
     uint256 public gen0Profit = 500 szabo;
-    
+
     uint256 public creationProfit = 1000 szabo;
 
     mapping (address => uint256) public profit;
@@ -247,14 +247,14 @@ contract DogBase is DogAccessControl {
 
     uint256 public spendMoney;
 
-    function setGen0Profit(uint256 _value) public onlyCEO {        
+    function setGen0Profit(uint256 _value) public onlyCEO {
         uint256 ration = _value * 100 / autoBirthFee;
         require(ration > 0);
         require(_value <= 100);
         gen0Profit = _value;
     }
 
-    function setCreationProfit(uint256 _value) public onlyCEO {        
+    function setCreationProfit(uint256 _value) public onlyCEO {
         uint256 ration = _value * 100 / autoBirthFee;
         require(ration > 0);
         require(_value <= 100);
@@ -553,7 +553,7 @@ contract DogBreeding is DogOwnership {
         Dog storage sire = dogs[_sireId];
         return _isValidMatingPair(matron, _matronId, sire, _sireId);
     }
-    
+
     function getOwner(uint256 _tokenId) public view returns(address){
         address owner = dogIndexToOwner[_tokenId];
         if(owner == address(saleAuction)){
@@ -569,7 +569,7 @@ contract DogBreeding is DogOwnership {
     function _breedWith(uint256 _matronId, uint256 _sireId) internal {
         require(_matronId > 1);
         require(_sireId > 1);
-        
+
         Dog storage sire = dogs[_sireId];
         Dog storage matron = dogs[_matronId];
 
@@ -618,7 +618,7 @@ contract DogBreeding is DogOwnership {
         external
         payable
         whenNotPaused
-    {        
+    {
         uint256 totalFee = autoBirthFee + creationProfit + creationProfit;
         Dog storage matron = dogs[_matronId];
         if (matron.generation > 0) {
@@ -681,7 +681,7 @@ contract DogBreeding is DogOwnership {
         } else {
             require(msg.sender == ceoAddress || msg.sender == cooAddress || msg.sender == cfoAddress);
         }
-        
+
         address owner = dogIndexToOwner[_matronId];
 
         uint8 _variation = variation.createVariation(childGenes, dogs.length);
@@ -693,9 +693,9 @@ contract DogBreeding is DogOwnership {
         delete matron.siringWithId;
 
         pregnantDogs--;
-       
-        if(_variation != 0){              
-            variation.registerVariation(kittenId, owner);      
+
+        if(_variation != 0){
+            variation.registerVariation(kittenId, owner);
             _transfer(owner, address(variation), kittenId);
         }
 
@@ -707,15 +707,15 @@ contract DogBreeding is DogOwnership {
 contract ClockAuctionBase {
 
     struct Auction {
-        
+
         address seller;
-        
+
         uint128 startingPrice;
-        
+
         uint128 endingPrice;
-        
+
         uint64 duration;
-        
+
         uint64 startedAt;
     }
 
@@ -774,7 +774,7 @@ contract ClockAuctionBase {
         uint256 fee = 0;
         if (_tokenId == 0 || _tokenId == 1) {
             fee = price / 5;
-        }        
+        }
         require((_bidAmount + auctioneerCut + fee) >= price);
 
         address seller = auction.seller;
@@ -1060,14 +1060,14 @@ contract SaleClockAuction is ClockAuction {
     {
         require(msg.sender == address(nonFungibleContract));
 
-        address seller = tokenIdToAuction[_tokenId].seller;  
+        address seller = tokenIdToAuction[_tokenId].seller;
 
         require(seller != _to);
 
         uint256 price = _bid(_tokenId, msg.value, _to);
-        
+
         _transfer(_to, _tokenId);
-   
+
         if (seller == address(nonFungibleContract)) {
             lastGen0SalePrices[gen0SaleCount % 5] = price;
             gen0SaleCount++;
@@ -1134,8 +1134,8 @@ contract DogAuction is DogBreeding {
     )
         external
         whenNotPaused
-    {    
-        Dog storage dog = dogs[_dogId];    
+    {
+        Dog storage dog = dogs[_dogId];
         require(dog.variation == 0);
 
         require(_owns(msg.sender, _dogId));
@@ -1163,12 +1163,12 @@ contract DogAuction is DogBreeding {
         require(_canBreedWithViaAuction(_matronId, _sireId));
 
         uint256 currentPrice = siringAuction.getCurrentPrice(_sireId);
-        
+
         uint256 totalFee = currentPrice + autoBirthFee + creationProfit + creationProfit;
         Dog storage matron = dogs[_matronId];
         if (matron.generation > 0) {
             totalFee += gen0Profit;
-        }        
+        }
         require(msg.value >= totalFee);
 
         uint256 auctioneerCut = saleAuction.computeCut(currentPrice);
@@ -1220,7 +1220,7 @@ contract DogAuction is DogBreeding {
             saleAuction.createAuction(
                 _dogId,
                 nextPrice,
-                nextPrice,                                               
+                nextPrice,
                 GEN0_AUCTION_DURATION,
                 msg.sender);
         }
@@ -1243,9 +1243,9 @@ contract DogMinting is DogAuction {
 
     function createGen0Dog(uint256 _genes) external onlyCLevel returns(uint256) {
         require(gen0CreatedCount < GEN0_CREATION_LIMIT);
-        
+
         uint256 dogId = _createDog(0, 0, 0, _genes, address(this), 0, 0, false);
-        
+
         _approve(dogId, msg.sender);
 
         gen0CreatedCount++;
@@ -1273,16 +1273,16 @@ contract DogCore is DogMinting {
     address public newContractAddress;
 
     function DogCore() public {
-        
+
         paused = true;
 
         ceoAddress = msg.sender;
 
         cooAddress = msg.sender;
 
-        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);   
-        _approve(0, cooAddress);     
-        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);   
+        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);
+        _approve(0, cooAddress);
+        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);
         _approve(1, cooAddress);
     }
 
@@ -1337,7 +1337,7 @@ contract DogCore is DogMinting {
 
         super.unpause();
     }
-      
+
     function setLotteryAddress(address _address) external onlyCEO {
         require(address(lottery) == address(0));
 
@@ -1346,8 +1346,8 @@ contract DogCore is DogMinting {
         require(candidateContract.isLottery());
 
         lottery = candidateContract;
-    }  
-      
+    }
+
     function setVariationAddress(address _address) external onlyCEO {
         require(address(variation) == address(0));
 
@@ -1356,15 +1356,24 @@ contract DogCore is DogMinting {
         require(candidateContract.isVariation());
 
         variation = candidateContract;
-    }  
+    }
 
     function registerLottery(uint256 _dogId) external returns (uint8) {
         require(_owns(msg.sender, _dogId));
-        require(lottery.registerLottery(_dogId) == 0);    
+        require(lottery.registerLottery(_dogId) == 0);
         _transfer(msg.sender, address(lottery), _dogId);
     }
-    
+
     function getAvailableBlance() external view returns(uint256){
         return address(this).balance - spendMoney;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

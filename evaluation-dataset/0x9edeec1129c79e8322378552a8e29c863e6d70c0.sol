@@ -873,7 +873,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1124,7 +1124,7 @@ contract ETHcomeback820 is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function ETHcomeback820() public payable {
     callOracle(EXPECTED_END, ORACLIZE_GAS); // Kickoff Oracle checking for outcome
@@ -1255,7 +1255,7 @@ contract ETHcomeback820 is usingOraclize {
   function collectionsAvailable() public constant returns(bool) {
     return (completed && winningOption != 2 && now >= (winnerDeterminedDate + 600)); // At least 10 mins has to pass between determining winner and enabling payout, so that we have time to revert the bet in case we detect suspicious betting activty (eg. a hacker bets a lot to steal the entire losing pot, and hacks the oracle)
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES && !canceled && !completed);
@@ -1309,7 +1309,7 @@ contract ETHcomeback820 is usingOraclize {
     }
 
     // Calculate total pool of ETH
-    // betted for the two outcomes.    
+    // betted for the two outcomes.
     uint losingChunk = totalAmountsBet[1 - winningOption];
     ownerPayout = (losingChunk - oraclizeFees) / COMMISSION; // Payout to the owner; commission of losing pot, minus the same % of the fees
     if (numberOfBets[winningOption] > 0) {
@@ -1374,4 +1374,13 @@ contract ETHcomeback820 is usingOraclize {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

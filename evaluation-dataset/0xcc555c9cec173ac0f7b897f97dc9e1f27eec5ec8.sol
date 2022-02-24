@@ -74,7 +74,7 @@ contract Authorization {
     {
         owner = newOwner_;
     }
-    
+
     function assignOperator(address user_)
         public
         onlyOwner
@@ -84,7 +84,7 @@ contract Authorization {
             operators.push(user_);
         }
     }
-    
+
     function dismissOperator(address user_)
         public
         onlyOwner
@@ -115,7 +115,7 @@ contract Token is Authorization {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
     function approve(address _spender, uint256 _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -204,11 +204,20 @@ contract SSK is StandardToken {
 
     /* Approve and then communicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes memory _extraData) public
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, address(this), _extraData);
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

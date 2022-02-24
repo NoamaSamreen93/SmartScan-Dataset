@@ -271,7 +271,7 @@ contract ParsecCrowdsale is owned {
     // ----------------------------
     // --- Bonus tier constants ---
     // ----------------------------
-    
+
     uint256 public constant BONUS_TIER_1_LIMIT = 715 ether;     // 30.0 % bonus Parsecs
     uint256 public constant BONUS_TIER_2_LIMIT = 1443 ether;    // 27.5 % bonus Parsecs
     uint256 public constant BONUS_TIER_3_LIMIT = 2434 ether;    // 25.0 % bonus Parsecs
@@ -309,16 +309,16 @@ contract ParsecCrowdsale is owned {
     // --- State parameters ---
     // ---------------------------
 
-    /// @notice Keep track if contract is started (permanently, works if contract is powered up) 
+    /// @notice Keep track if contract is started (permanently, works if contract is powered up)
     bool public contractStarted = false;
 
-    /// @notice Keep track if contract is finished (permanently, works if contract is started) 
+    /// @notice Keep track if contract is finished (permanently, works if contract is started)
     bool public contractFinished = false;
 
-    /// @notice Keep track if contract is paused (transiently, works if contract started and not finished) 
+    /// @notice Keep track if contract is paused (transiently, works if contract started and not finished)
     bool public contractPaused = false;
 
-    /// @notice Keep track if contract is failed (permanently, works if contract started and not finished) 
+    /// @notice Keep track if contract is failed (permanently, works if contract started and not finished)
     bool public contractFailed = false;
 
     /// @notice Keep track if contract refund is started
@@ -333,7 +333,7 @@ contract ParsecCrowdsale is owned {
 
     /// @notice Keep track of total amount of funding raised and passed KYC
     uint256 public raisedFunding;
-       
+
     /// @notice Keep track of funding amount pending KYC check
     uint256 public pendingFunding;
 
@@ -346,7 +346,7 @@ contract ParsecCrowdsale is owned {
 
     /// @notice Keep track of spent Parsecs amount (transferred to participants)
     uint256 public spentParsecs;
-    
+
     /// @notice Keep track of pending Parsecs amount (participant pending KYC)
     uint256 public pendingParsecs;
 
@@ -420,7 +420,7 @@ contract ParsecCrowdsale is owned {
     }
 
     /// @notice A participant sends a contribution to the contract's address
-    ///         when contract is active, not failed and not paused 
+    ///         when contract is active, not failed and not paused
     /// @notice Only contributions above the MINIMUM_PARTICIPATION_AMOUNT are
     ///         accepted. Otherwise the transaction is rejected and contributed
     ///         amount is returned to the participant's account
@@ -488,7 +488,7 @@ contract ParsecCrowdsale is owned {
     function emergencyRefundContract() external payable onlyOwnerOrMultisig {
         // Contract should be failed previously
         require(contractFailed);
-        
+
         // Amount of ETH should be positive
         require(msg.value > 0);
     }
@@ -501,7 +501,7 @@ contract ParsecCrowdsale is owned {
         // Contract refund should be started and finished previously
         require(contractRefundStarted);
         require(contractRefundFinished);
-        
+
         // Amount of ETH should be positive and not exceed current contract balance
         require(value > 0);
         require(value <= address(this).balance);
@@ -643,7 +643,7 @@ contract ParsecCrowdsale is owned {
         // Transfer parsecs
         parsecToken.transfer(owner, value);
     }
- 
+
     /// @dev Accept participant's KYC
     function acceptKyc(address participant) external onlyOwnerOrAuditor {
         // Set participant's KYC status to Accepted
@@ -816,4 +816,17 @@ contract ParsecCrowdsale is owned {
             return 0;       // 0.00 % bonus Parsecs
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

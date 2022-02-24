@@ -5,13 +5,13 @@ contract ERC20token{
     string public name;
     uint8 public decimals;
     string public symbol;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     function ERC20token(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public {
         totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);
         balances[msg.sender] = totalSupply;
@@ -28,7 +28,7 @@ contract ERC20token{
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
@@ -37,19 +37,30 @@ contract ERC20token{
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

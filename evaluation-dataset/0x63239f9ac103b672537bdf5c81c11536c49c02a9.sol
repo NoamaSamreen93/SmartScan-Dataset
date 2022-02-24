@@ -121,3 +121,7 @@ contract PiggyBank {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

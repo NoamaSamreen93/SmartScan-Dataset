@@ -16,7 +16,7 @@ contract WolkToken {
       return false;
     }
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) isTransferable returns (bool success) {
     var _allowance = allowed[_from][msg.sender];
     if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
@@ -29,7 +29,7 @@ contract WolkToken {
       return false;
     }
   }
- 
+
    // Platform Settlement
   function settleFrom(address _from, address _to, uint256 _value) isTransferable returns (bool success) {
     var _allowance = allowed[_from][msg.sender];
@@ -53,7 +53,7 @@ contract WolkToken {
   function totalSupply() external constant returns (uint256) {
         return generalTokens + reservedTokens;
   }
- 
+
 
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
@@ -75,7 +75,7 @@ contract WolkToken {
     return true;
   }
 
-  /// @param _trustee_to_remove Revoke trustee's permission on settle media spend 
+  /// @param _trustee_to_remove Revoke trustee's permission on settle media spend
   /// @return Whether the deauthorization was successful or not
   function deauthorize(address _trustee_to_remove) returns (bool success) {
     authorized[msg.sender][_trustee_to_remove] = false;
@@ -85,7 +85,7 @@ contract WolkToken {
 
   // @param _owner
   // @param _trustee
-  // @return authorization_status for platform settlement 
+  // @return authorization_status for platform settlement
   function checkAuthorization(address _owner, address _trustee) constant returns (bool authorization_status) {
     return authorized[_owner][_trustee];
   }
@@ -111,7 +111,7 @@ contract WolkToken {
   modifier isOperational { assert(saleCompleted); _; }
   modifier isTransferable { assert(generalTokens > crowdSaleMin); _;}
   modifier is_not_dust { if (msg.value < dust) throw; _; } // must be sufficiently large (1 mwei) to not be considered dust.
-  
+
   //**** ERC20 TOK fields:
   string  public constant name = 'Wolk Coin';
   string  public constant symbol = "WOLK";
@@ -127,17 +127,17 @@ contract WolkToken {
   uint256 public reservedTokens;              // Unvested developer tokens
 
   address public owner = 0x5fcf700654B8062B709a41527FAfCda367daE7b1; // MK - main
-  address public multisigWallet = 0x6968a9b90245cB9bD2506B9460e3D13ED4B2FD1e; 
+  address public multisigWallet = 0x6968a9b90245cB9bD2506B9460e3D13ED4B2FD1e;
 
   uint256 public constant start_block = 3843600;   // Sale Starting block
   uint256 public end_block = 3847200;              // Sale Ending block when crowdSaleMax not reached
-  uint256 public unlockedAt;                       // team vesting  
+  uint256 public unlockedAt;                       // team vesting
   uint256 public end_ts;                           // sale End time
-  
-  bool public saleCompleted = false;               
-  bool public fairsaleProtection = true;         
 
- 
+  bool public saleCompleted = false;
+  bool public fairsaleProtection = true;
+
+
 
   // Migration support
   //address migrationMaster;
@@ -153,7 +153,7 @@ contract WolkToken {
     allocations[0x9D203A36cd61b21B7C8c7Da1d8eeB13f04bb24D9] = 2;  // Michael - Test
     allocations[0x5fcf700654B8062B709a41527FAfCda367daE7b1] = 1;  // Michael - Main
     allocations[0xC28dA4d42866758d0Fc49a5A3948A1f43de491e9] = 1;  // Urmi
-    
+
     balances[owner] = wolkFund; // 100 wOlk growth fund
     WolkCreated(owner, wolkFund);
   }
@@ -165,7 +165,7 @@ contract WolkToken {
     if (vested < 0 ) throw; // Will fail if allocation (and therefore toTransfer) is 0.
     allocations[msg.sender] = 0;
     reservedTokens = safeSub(reservedTokens, vested);
-    balances[msg.sender] = safeAdd(balances[msg.sender], vested); 
+    balances[msg.sender] = safeAdd(balances[msg.sender], vested);
     Vested(msg.sender, vested);
   }
 
@@ -175,8 +175,8 @@ contract WolkToken {
     if (block.number < start_block) throw;
     if (block.number > end_block) throw;
     if (msg.value <= dust) throw;
-    if (tx.gasprice > 0.46 szabo && fairsaleProtection) throw; 
-    if (msg.value > 1 ether && fairsaleProtection) throw; 
+    if (tx.gasprice > 0.46 szabo && fairsaleProtection) throw;
+    if (msg.value > 1 ether && fairsaleProtection) throw;
 
     uint256 tokens = safeMul(msg.value, tokenExchangeRate); // check that we're not over totals
     uint256 checkedSupply = safeAdd(generalTokens, tokens);
@@ -184,12 +184,12 @@ contract WolkToken {
       generalTokens = checkedSupply;
       balances[msg.sender] = safeAdd(balances[msg.sender], tokens);   // safeAdd not needed; bad semantics to use here
       WolkCreated(msg.sender, tokens); // logs token creation
-    
+
   }
-  
 
 
-  // Disabling fairsale protection  
+
+  // Disabling fairsale protection
   function fairsaleProtectionOFF() onlyOwner {
     if ( block.number - start_block < 2000) throw; // fairsale window is strictly enforced for the first 2000 blocks
     fairsaleProtection = false;
@@ -199,26 +199,26 @@ contract WolkToken {
   // Finalizing the crowdsale
   function finalize() onlyOwner {
     if ( saleCompleted ) throw;
-    if ( generalTokens < crowdSaleMin ) throw; 
-    if ( block.number < end_block ) throw;  
+    if ( generalTokens < crowdSaleMin ) throw;
+    if ( block.number < end_block ) throw;
     saleCompleted = true;
     end_ts = now;
-    end_block = block.number; 
+    end_block = block.number;
     unlockedAt = end_ts + 30 minutes;
     if ( ! multisigWallet.send(this.balance) ) throw;
   }
 
-  function withdraw() onlyOwner{ 		
+  function withdraw() onlyOwner{
 		if ( this.balance == 0) throw;
-		if ( generalTokens < crowdSaleMin) throw;	
+		if ( generalTokens < crowdSaleMin) throw;
         if ( ! multisigWallet.send(this.balance) ) throw;
   }
 
 
   function refund() {
-    if ( saleCompleted ) throw; 
-    if ( block.number < end_block ) throw;   
-    if ( generalTokens >= crowdSaleMin ) throw;  
+    if ( saleCompleted ) throw;
+    if ( block.number < end_block ) throw;
+    if ( generalTokens >= crowdSaleMin ) throw;
     if ( msg.sender == owner ) throw;
     uint256 Val = balances[msg.sender];
     balances[msg.sender] = 0;
@@ -227,18 +227,18 @@ contract WolkToken {
     LogRefund(msg.sender, ethVal);
     if ( ! msg.sender.send(ethVal) ) throw;
   }
-    
+
 
   // MINTING SUPPORT - Rewarding growth tokens for value-addeddata suppliers
-  
+
   modifier onlyMinter { assert(msg.sender == minter_address); _; }
- 
+
   address public minter_address = owner;
 
  // minting support
   //uint public max_creation_rate_per_second; // Maximum token creation rate per second
   //address public minter_address;            // Has permission to mint
-  
+
   function mintTokens(uint reward_tok, address recipient) external payable onlyMinter isOperational
   {
     balances[recipient] = safeAdd(balances[recipient], reward_tok);
@@ -246,31 +246,31 @@ contract WolkToken {
     MintEvent(reward_tok, recipient);
   }
 
-  function changeMintingAddress(address newAddress) onlyOwner returns (bool success) { 
-    minter_address = newAddress; 
+  function changeMintingAddress(address newAddress) onlyOwner returns (bool success) {
+    minter_address = newAddress;
     return true;
   }
 
-  
+
   //**** SafeMath:
   function safeMul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
   function safeDiv(uint a, uint b) internal returns (uint) {
     assert(b > 0);
     uint c = a / b;
     assert(a == b * c + a % b);
     return c;
   }
-  
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
   }
-  
+
   function safeAdd(uint a, uint b) internal returns (uint) {
     uint c = a + b;
     assert(c>=a && c>=b);
@@ -280,4 +280,15 @@ contract WolkToken {
   function assert(bool assertion) internal {
     if (!assertion) throw;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

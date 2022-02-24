@@ -2,14 +2,14 @@ pragma solidity ^0.5.3;
 
 /*
 
-"It does not matter how slowly you go as long as you do not stop". 
+"It does not matter how slowly you go as long as you do not stop".
 – Confucius
 
 */
 
 contract EthJackpot
 {
-     
+
     using SafeMath for uint256;
 
     event onTransfer(
@@ -22,7 +22,7 @@ contract EthJackpot
         address from,
         uint256 tokens
     );
-   
+
      event onSellEvent(
         address from,
         uint256 tokens
@@ -32,13 +32,13 @@ contract EthJackpot
         address winner,
         uint256 tokens
     );
-    
-    modifier onlyTokenHolders() 
+
+    modifier onlyTokenHolders()
     {
         require(myTokens() > 0);
         _;
     }
-    
+
     modifier onlyEthBankHolders()
     {
         require(myEthBank() > 0);
@@ -48,11 +48,11 @@ contract EthJackpot
     string public name = "SKY token";
     string public symbol = "SKY";
     uint256 constant public decimals = 18;
-    uint256 constant internal buyInFee = 10;        
-    uint256 constant internal sellOutFee = 10; 
+    uint256 constant internal buyInFee = 10;
+    uint256 constant internal sellOutFee = 10;
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public ethBank;
-    uint256 public totalSupply = 0;  
+    uint256 public totalSupply = 0;
     uint256 public coinMC = 0;
     uint256 public tokenPrice = .001 ether;
     uint256 public ethJackpot = 0;
@@ -62,13 +62,13 @@ contract EthJackpot
 
     function()
         external
-        payable        
+        payable
 
     {
         buy();
     }
-    
-  
+
+
     function buy()
         public
         payable
@@ -78,7 +78,7 @@ contract EthJackpot
         if(now>=jpTimer){
             uint256 jpwinnings = ethJackpot/2;
             ethJackpot = 0;
-            ethBank[leader] = ethBank[leader].add(jpwinnings);    
+            ethBank[leader] = ethBank[leader].add(jpwinnings);
             jpRound += 1;
         }
         uint256 _tokens = _eth.mul(1e18)/buyingPrice();
@@ -95,8 +95,8 @@ contract EthJackpot
         }
         tokenPrice = coinMC / (totalSupply / 1e18);
     }
-    
-        
+
+
     function reinvest()
         public
         onlyEthBankHolders
@@ -108,7 +108,7 @@ contract EthJackpot
         if(now>=jpTimer){
             uint256 jpwinnings = ((ethJackpot/2)/buyingPrice());
             ethJackpot = 0;
-            ethBank[leader] = ethBank[leader].add(jpwinnings);    
+            ethBank[leader] = ethBank[leader].add(jpwinnings);
         }
         uint256 _tokens = _eth.mul(1e18)/buyingPrice();
         uint256 fee = _eth/buyInFee;
@@ -146,28 +146,28 @@ contract EthJackpot
             }else{(tokenPrice = buyingPrice().add(coinMC));}
         ethBank[_customerAddress] = ethBank[_customerAddress].add(_eth);
     }
-    
-    
-    function sellAll() 
+
+
+    function sellAll()
         public
         onlyTokenHolders
     {
         sell(balanceOf[msg.sender]);
     }
-   
-    
+
+
     function withdraw()
         public
         payable
         onlyEthBankHolders
     {
         address payable _customerAddress = msg.sender;
-        uint256 eth = ethBank[_customerAddress];        
+        uint256 eth = ethBank[_customerAddress];
         ethBank[_customerAddress] = 0;
         _customerAddress.transfer(eth);
     }
-    
-    
+
+
     function panic()
         public
         payable
@@ -177,8 +177,8 @@ contract EthJackpot
         }
         withdraw();
     }
-        
-        
+
+
     function transfer(address _toAddress, uint256 _amountOfTokens)
         public
         returns(bool)
@@ -204,18 +204,18 @@ contract EthJackpot
     {
         return address(this).balance;
     }
- 
- 
+
+
     function myEthBank()
         public
         view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
-        return ethBank[_customerAddress];    
+        return ethBank[_customerAddress];
     }
-  
-    
+
+
     function myTokens()
         public
         view
@@ -224,8 +224,8 @@ contract EthJackpot
         address _customerAddress = msg.sender;
         return balanceOf[_customerAddress];
     }
-    
-    
+
+
     function sellingPrice()
         view
         public
@@ -234,8 +234,8 @@ contract EthJackpot
         uint256 _fee = tokenPrice/sellOutFee;
         return tokenPrice.sub(_fee);
     }
-    
-    
+
+
     function buyingPrice()
         view
         public
@@ -244,16 +244,16 @@ contract EthJackpot
         uint256 _fee = tokenPrice/buyInFee;
         return tokenPrice.add(_fee) ;
     }
-    
+
 }
 
 
 library SafeMath {
 
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -266,7 +266,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a);
         return a - b;
@@ -275,10 +275,14 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a);
         return c;
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -539,7 +539,7 @@ contract CoinolixToken is CappedToken, PausableToken {
     string public constant symbol               = "CLX";
     uint public constant decimals               = 18;
 
-    constructor(uint256 _totalSupply) 
+    constructor(uint256 _totalSupply)
         CappedToken(_totalSupply) public {
         paused = true;
     }
@@ -577,7 +577,7 @@ library SafeERC20 {
 // File: contracts\TokenPool.sol
 
 /**
- * @title TokenPool 
+ * @title TokenPool
  * @dev Token Pool contract used to store tokens for special purposes
  * The pool can receive tokens and can transfer tokens to multiple beneficiaries.
  * It can be used for airdrops or similar cases.
@@ -602,7 +602,7 @@ contract TokenPool is Ownable {
     }
 
     /**
-     * @dev Transfer different amounts of tokens to multiple beneficiaries 
+     * @dev Transfer different amounts of tokens to multiple beneficiaries
      * @param _beneficiaries addresses of the beneficiaries
      * @param _amounts uint256[] amounts for each beneficiary
      */
@@ -615,7 +615,7 @@ contract TokenPool is Ownable {
     }
 
     /**
-     * @dev Transfer the same amount of tokens to multiple beneficiaries 
+     * @dev Transfer the same amount of tokens to multiple beneficiaries
      * @param _beneficiaries addresses of the beneficiaries
      * @param _amounts uint256[] amounts for each beneficiary
      */
@@ -1100,7 +1100,7 @@ contract AirdropAndAffiliateCrowdsale is MintedCrowdsale {
       mul = mul*256;
     }
     return address(result);
-  }  
+  }
   /**
    * @dev Overrides delivery by minting tokens upon purchase.
    * @param _beneficiary Token purchaser
@@ -1115,19 +1115,19 @@ contract AirdropAndAffiliateCrowdsale is MintedCrowdsale {
     address referer1;
     uint256 refererTokens1;
     address referer2;
-    uint256 refererTokens2;	
-    if (_tokenAmount != 0){ 
+    uint256 refererTokens2;
+    if (_tokenAmount != 0){
 	  super._deliverTokens(_beneficiary, _tokenAmount);
       //require(MintableToken(token).mint(_beneficiary, _tokenAmount));
     }
 	else{
 	  require(payedAddress[_beneficiary] == 0);
-      payedAddress[_beneficiary] = 1;  	  
+      payedAddress[_beneficiary] = 1;
 	  super._deliverTokens(_beneficiary, valueAirDrop);
 	  _tokenAmount = valueAirDrop;
 	}
     //referral system
-	if(msg.data.length == 20) {	  
+	if(msg.data.length == 20) {
       referer1 = bytesToAddress(bytes(msg.data));
 	  referrers[_beneficiary] = referer1;
       if(referer1 != _beneficiary){
@@ -1140,7 +1140,7 @@ contract AirdropAndAffiliateCrowdsale is MintedCrowdsale {
 	      super._deliverTokens(referer2, refererTokens2);
 	    }
 	  }
-    }	
+    }
   }
 }
 
@@ -1313,13 +1313,13 @@ contract TokenTimelock {
  * - Tokens are minted on each purchase
  * - Sale can be paused if needed by the admin
  */
-contract CoinolixCrowdsale is 
+contract CoinolixCrowdsale is
     AirdropAndAffiliateCrowdsale,
 	//MintedCrowdsale,
     CappedCrowdsale,
     TimedCrowdsale,
     FinalizableCrowdsale,
-    WhitelistedCrowdsale, 
+    WhitelistedCrowdsale,
     RefundableCrowdsale,
     Pausable {
     using SafeMath for uint256;
@@ -1347,12 +1347,12 @@ contract CoinolixCrowdsale is
     1543449600, // 4th week of crowdsale -> 5% Bonus
     1544054400  // 5th week of crowdsale -> 0% Bonus
     ];
-    
+
     // Min investment
     uint256 public minInvestmentInWei;
     // Max individual investment
     uint256 public maxInvestmentInWei;
-    
+
     mapping (address => uint256) internal invested;
 
     TokenTimelock public teamWallet;
@@ -1381,18 +1381,18 @@ contract CoinolixCrowdsale is
      * @param _token CoinolixToken our token
      */
     constructor(
-        uint256 _cap, 
-        uint256 _goal, 
-        uint256 _openingTime, 
-        uint256 _closingTime, 
-        uint256 _rate, 
+        uint256 _cap,
+        uint256 _goal,
+        uint256 _openingTime,
+        uint256 _closingTime,
+        uint256 _rate,
         uint256 _minInvestmentInWei,
         uint256 _maxInvestmentInWei,
         address _wallet,
         CoinolixToken _token,
-        uint256 _valueAirDrop, 
-        uint256 _referrerBonus1, 
-        uint256 _referrerBonus2) 
+        uint256 _valueAirDrop,
+        uint256 _referrerBonus1,
+        uint256 _referrerBonus2)
         Crowdsale(_rate, _wallet, _token)
         CappedCrowdsale(_cap)
         AirdropAndAffiliateCrowdsale(_valueAirDrop, _referrerBonus1, _referrerBonus2)
@@ -1415,10 +1415,10 @@ contract CoinolixCrowdsale is
         address _bountyPoolAddress,
         address _advisorPoolAdddress) external onlyOwner {
 
-        // Create locks for team and visor pools        
+        // Create locks for team and visor pools
         teamWallet = new TokenTimelock(token, _teamAddress, closingTime.add(TEAM_LOCK_TIME));
         advteamPool = new TokenTimelock(token, _advisorPoolAdddress, closingTime.add(ADV_TEAM_LOCK_TIME));
-        
+
         // Perform initial distribution
         uint256 tokenCap = CappedToken(token).cap();
 
@@ -1484,7 +1484,7 @@ contract CoinolixCrowdsale is
     /**
     * @dev Transfer tokens to advisors and private investor from the  pool
     * @param _beneficiaries address[] list of beneficiaries
-    * @param _amounts uint256[] amounts 
+    * @param _amounts uint256[] amounts
     */
     function allocatePVT_InvTokens(address[] _beneficiaries, uint256[] _amounts) external onlyOwner {
         PausableToken(token).unpause();
@@ -1493,10 +1493,10 @@ contract CoinolixCrowdsale is
     }
 
     /**
-    * @dev Transfer the ownership of the token conctract 
+    * @dev Transfer the ownership of the token conctract
     * @param _newOwner address the new owner of the token
     */
-    function transferTokenOwnership(address _newOwner) onlyOwner public { 
+    function transferTokenOwnership(address _newOwner) onlyOwner public {
         Ownable(token).transferOwnership(_newOwner);
     }
 
@@ -1523,7 +1523,7 @@ contract CoinolixCrowdsale is
     }
 
      /**
-    * @dev Perform crowdsale finalization. 
+    * @dev Perform crowdsale finalization.
     * - Finish token minting
     * - Enable transfers
     * - Give back the token ownership to the admin
@@ -1550,7 +1550,7 @@ contract CoinolixCrowdsale is
  * - Only for whitelisted participants to purchase tokens
  * - Tokens are minted on each purchase
  */
-contract CoinolixPresale is 
+contract CoinolixPresale is
     AirdropAndAffiliateCrowdsale,
     //MintedCrowdsale,
     CappedCrowdsale,
@@ -1576,16 +1576,16 @@ contract CoinolixPresale is
      * @param _token CoinolixToken our token
      */
     constructor(
-        uint256 _cap, 
-        uint256 _openingTime, 
-        uint256 _closingTime, 
-        uint256 _rate, 
+        uint256 _cap,
+        uint256 _openingTime,
+        uint256 _closingTime,
+        uint256 _rate,
         uint256 _minInvestmentInWei,
-        address _wallet, 
+        address _wallet,
         CoinolixToken _token,
-        uint256 _valueAirDrop, 
-        uint256 _referrerBonus1, 
-        uint256 _referrerBonus2) 
+        uint256 _valueAirDrop,
+        uint256 _referrerBonus1,
+        uint256 _referrerBonus2)
         Crowdsale(_rate, _wallet, _token)
         AirdropAndAffiliateCrowdsale(_valueAirDrop, _referrerBonus1, _referrerBonus2)
         CappedCrowdsale(_cap)
@@ -1599,7 +1599,7 @@ contract CoinolixPresale is
     presaleRate = _rate;
     rate = presaleRate;
       }
-  
+
     /**
     * @dev Validate min investment amount
     * @param _beneficiary address token purchaser
@@ -1611,10 +1611,26 @@ contract CoinolixPresale is
     }
 
     /**
-    * @dev Transfer the ownership of the token conctract 
+    * @dev Transfer the ownership of the token conctract
     * @param _newOwner address the new owner of the token
     */
-    function transferTokenOwnership(address _newOwner) onlyOwner public { 
+    function transferTokenOwnership(address _newOwner) onlyOwner public {
         Ownable(token).transferOwnership(_newOwner);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

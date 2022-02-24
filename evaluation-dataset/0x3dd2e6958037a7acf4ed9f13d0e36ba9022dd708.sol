@@ -106,7 +106,7 @@ contract HTCStandardToken is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show. 
+    uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier
     string public version = 'F0.1';       // Just an arbitrary versioning scheme.
 
@@ -137,3 +137,16 @@ contract HTCStandardToken is StandardToken {
 }
 // Creates 1,000,000,000.000000000000000000 HuiTong Coin (HTC) Tokens
 contract HTC is HTCStandardToken(1000000000000000000000000000, "HuiTong Coin", 18, "HTC") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
+}

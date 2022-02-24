@@ -249,7 +249,7 @@ contract TRYTokenVesting is Ownable {
         addVesting(0xb316fa9Fa91700D7084D377bfdC81Eb9F232f5Ff, now + 0, 3230085552 * SCALING_FACTOR);
         addVesting(0x1FD8DFd8Ee9cE53b62C2d5bc944D5F40DA5330C1, now + 30 * day, 25000000 * SCALING_FACTOR);
         addVesting(0x486E7a308758dc1a7AF00F3bA7B9D79196772D5f, now + 61 * day, 25000000 * SCALING_FACTOR);
-        
+
         addVesting(0xb316fa9Fa91700D7084D377bfdC81Eb9F232f5Ff, now + 1279 * day, 273304816 * SCALING_FACTOR);
     }
 
@@ -309,4 +309,13 @@ contract TRYTokenVesting is Ownable {
         require(_amount <= TRYToken.balanceOf(address(this)).sub(tokensToVest), INSUFFICIENT_BALANCE);
         TRYToken.safeTransfer(owner(), _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

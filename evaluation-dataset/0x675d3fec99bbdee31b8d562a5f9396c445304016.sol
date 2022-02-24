@@ -6,12 +6,12 @@ contract owned {
     function owned() {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address _newOwner) onlyOwner {
         owner = _newOwner;
     }
@@ -26,7 +26,7 @@ contract LuxToken is owned {
     bool public isAllowedToPurchase = false;
 
     uint256 minTokensRequiredForMessage = 10;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => string) messages;
 
@@ -35,7 +35,7 @@ contract LuxToken is owned {
 
     function LuxToken() {
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (_value == 0) { return false; }
 
@@ -48,11 +48,11 @@ contract LuxToken is owned {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function enablePurchasing() onlyOwner {
         isAllowedToPurchase = true;
     }
-    
+
     function disablePurchasing() onlyOwner {
         isAllowedToPurchase = false;
     }
@@ -69,22 +69,38 @@ contract LuxToken is owned {
     function getBalance(address addr) constant returns(uint256) {
         return balanceOf[addr];
     }
-    
+
     function sendFundsTo(address _to, uint256 _amount) onlyOwner {
         _to.transfer(_amount);
     }
-    
+
     function setMinTokensRequiredForMessage(uint256 _newValue) onlyOwner {
         minTokensRequiredForMessage = _newValue;
     }
-    
+
     function setSymbol(string _symbol) onlyOwner {
         symbol = _symbol;
     }
-    
+
     function setMessage(string _message) {
         uint256 tokenBalance = balanceOf[msg.sender];
         require(tokenBalance >= minTokensRequiredForMessage);
         MessageAdded(msg.sender, _message, tokenBalance);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

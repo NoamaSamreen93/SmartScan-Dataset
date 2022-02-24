@@ -145,7 +145,7 @@ contract RefundVault {
     require(vault_state == State.Refunding);
     uint256 depositedValue = vault_deposited[investor];
     require(depositedValue > 0);
-    
+
     vault_deposited[investor] = 0;
     emit Refunded(investor, depositedValue);
     totalDeposited = totalDeposited.sub(depositedValue);
@@ -272,7 +272,7 @@ contract ERC20 is ERC20Basic {
 contract ERC223 is ERC20 {
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transferFrom(address from, address to, uint value, bytes data) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -539,7 +539,7 @@ contract WOLF is BurnableToken, Pausable223Token
     string public constant symbol = "TTK";
     uint8 public constant decimals = 18;
     uint public constant DECIMALS_MULTIPLIER = 10**uint(decimals);
-    
+
     function increaseSupply(uint value, address to) public onlyOwner returns (bool) {
         totalSupply_ = totalSupply_.add(value);
         balances[to] = balances[to].add(value);
@@ -547,7 +547,7 @@ contract WOLF is BurnableToken, Pausable223Token
         return true;
     }
 
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         uint256 localOwnerBalance = balances[owner];
@@ -556,7 +556,7 @@ contract WOLF is BurnableToken, Pausable223Token
         emit Transfer(owner, newOwner, localOwnerBalance);
         super.transferOwnership(newOwner);
     }
-    
+
     constructor () public payable {
       totalSupply_ = 1300000000 * DECIMALS_MULTIPLIER; //1000000000 + 20% bounty + 5% referal bonus + 5% team motivation
       balances[owner] = totalSupply_;
@@ -1807,7 +1807,7 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
 
     uint public  ICOstarttime;
     uint public  ICOendtime;
-    
+
     uint public  minimumInvestmentInWei;
     uint public  maximumInvestmentInWei;
     address saleMainAddress;
@@ -1817,19 +1817,19 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
 
     uint256 public  softcapInTokens;
     uint256 public  hardcapInTokens;
-    
+
     uint256 public totaltokensold = 0;
-    
+
     uint public USDETH = 683;
     uint public PriceOf1000TokensInUSD;
-    
+
     //RefundVault public vault;
     bool public isFinalized = false;
     event Finalized();
-    
+
     event newOraclizeQuery(string description);
     event newETHUSDPrice(string price);
-    
+
     function finalize() public {
         require(!isFinalized);
         require(ICOendtime < now);
@@ -1837,33 +1837,33 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
         emit Finalized();
         isFinalized = true;
     }
-  
+
     function depositFunds() internal {
         vault_deposit(msg.sender, msg.value * 70 / 100);
     }
-    
+
     // if crowdsale is unsuccessful, investors can claim refunds here
     function claimRefund() public {
         require(isFinalized);
         require(!goalReached());
-        
+
         uint256 refundedTokens = token.balanceOf(msg.sender);
         require(token.transferFrom(msg.sender, tokensSaleHolder, refundedTokens));
         totaltokensold = totaltokensold.sub(refundedTokens);
 
         vault_refund(msg.sender);
     }
-    
+
     // vault finalization task, called when owner calls finalize()
     function finalization() internal {
         if (goalReached()) {
             vault_releaseDeposit();
         } else {
             vault_enableRefunds();
-            
+
         }
     }
-    
+
     function releaseUnclaimedFunds() onlyOwner public {
         require(vault_state == State.Refunding && now >= refundDeadline);
         vault_releaseDeposit();
@@ -1871,8 +1871,8 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
 
     function goalReached() public view returns (bool) {
         return totaltokensold >= softcapInTokens;
-    }    
-    
+    }
+
     function __callback(bytes32 /* myid */, string result) public {
         require (msg.sender == oraclize_cbAddress());
 
@@ -1883,33 +1883,33 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
         {
             UpdateUSDETHPriceAfter(day); //update every 24 hours
         }
-        
+
     }
-    
+
 
   function UpdateUSDETHPriceAfter (uint delay) private {
-      
+
     emit newOraclizeQuery("Update of USD/ETH price requested");
     oraclize_query(delay, "URL", "json(https://api.etherscan.io/api?module=stats&action=ethprice&apikey=YourApiKeyToken).result.ethusd");
-       
+
   }
 
 
-  
+
 
   constructor (address _tokenContract, address _tokensSaleHolder,
                 address _saleMainAddress, address _saleSecondAddress,
                 uint _ICOstarttime, uint _ICOendtime,
                 uint _minimumInvestment, uint _maximumInvestment, uint _PriceOf1000TokensInUSD,
                 uint256 _softcapInTokens, uint256 _hardcapInTokens) public payable {
-                    
+
     token = WOLF(_tokenContract);
     tokensSaleHolder = _tokensSaleHolder;
 
     saleMainAddress = _saleMainAddress; /* 0x7CC8DD8F0E62Bb793D072D291134d2cC164AaBb6 */
     saleSecondAddress = _saleSecondAddress; /* 0x3597a7FacD5061F903309E911f2a6E534460b281 */
     vault_wallet = saleMainAddress;
-    
+
     ICOstarttime = _ICOstarttime;
     ICOendtime = _ICOendtime;
 
@@ -1919,10 +1919,10 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
 
     softcapInTokens = _softcapInTokens;
     hardcapInTokens = _hardcapInTokens;
-    
+
     UpdateUSDETHPriceAfter(0);
   }
-  
+
   function RefillOraclize() public payable onlyOwner {
       UpdateUSDETHPriceAfter(0);
   }
@@ -1930,56 +1930,56 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
   function  RedeemOraclize ( uint _amount) public onlyOwner {
       require(address(this).balance > _amount);
       owner.transfer(_amount);
-  } 
+  }
 
-  
+
 
   function () public payable {
        if (msg.sender != owner) {
           buy();
        }
   }
-  
+
   function ICOactive() public view returns (bool success) {
       if (ICOstarttime < now && now < ICOendtime && totaltokensold < hardcapInTokens) {
           return true;
       }
-      
+
       return false;
   }
-  
+
   function buy() internal {
-      
+
       require (msg.value >= minimumInvestmentInWei && msg.value <= maximumInvestmentInWei);
       require (ICOactive());
-      
+
       uint256 NumberOfTokensToGive = msg.value.mul(USDETH).mul(1000).div(PriceOf1000TokensInUSD);
-     
+
       if(now <= ICOstarttime + week) {
 
           NumberOfTokensToGive = NumberOfTokensToGive.mul(120).div(100);
 
       } else if(now <= ICOstarttime + 2*week){
-          
+
           NumberOfTokensToGive = NumberOfTokensToGive.mul(115).div(100);
-      
+
       } else if(now <= ICOstarttime + 3*week){
-          
+
           NumberOfTokensToGive = NumberOfTokensToGive.mul(110).div(100);
-          
+
       } else if(now <= ICOstarttime + 4*week){
 
           NumberOfTokensToGive = NumberOfTokensToGive.mul(105).div(100);
       }
-      
+
       uint256 localTotaltokensold = totaltokensold;
       require(localTotaltokensold + NumberOfTokensToGive <= hardcapInTokens);
       totaltokensold = localTotaltokensold.add(NumberOfTokensToGive);
-      
+
       require(token.transferFrom(tokensSaleHolder, msg.sender, NumberOfTokensToGive));
 
       saleSecondAddress.transfer(msg.value * 30 / 100);
-      
+
       if(!goalReached() && (RefundVault.State.Active == vault_state)) {
           depositFunds();
       } else {
@@ -1987,4 +1987,15 @@ contract WolfSale is usingOraclize, Ownable, RefundVault
           saleMainAddress.transfer(msg.value * 70 / 100);
       }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

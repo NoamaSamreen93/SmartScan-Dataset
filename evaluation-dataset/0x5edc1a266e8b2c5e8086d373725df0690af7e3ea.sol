@@ -95,7 +95,7 @@ library FrozenChecker {
 // File: FrozenValidator.sol
 
 library FrozenValidator {
-    
+
     using SafeMath for uint256;
     using FrozenChecker for FrozenChecker.Rule;
 
@@ -106,14 +106,14 @@ library FrozenValidator {
     }
 
     struct IndexValue {
-        uint256 keyIndex; 
+        uint256 keyIndex;
         FrozenChecker.Rule rule;
         mapping (address => uint256) frozenBalances;
     }
 
-    struct KeyFlag { 
-        address key; 
-        bool deleted; 
+    struct KeyFlag {
+        address key;
+        bool deleted;
     }
 
     function addRule(Validator storage self, address key, uint8 initPercent, uint256[] periods, uint8[] percents) internal returns (bool replaced) {
@@ -243,7 +243,7 @@ contract YottaCoin {
 
 
     //--------------------------  Events & Constructor  ------------------------------//
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -455,4 +455,8 @@ contract YottaCoin {
         selfdestruct(admin);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

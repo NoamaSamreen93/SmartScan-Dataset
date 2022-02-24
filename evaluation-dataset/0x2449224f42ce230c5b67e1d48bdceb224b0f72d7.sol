@@ -7,7 +7,7 @@ contract owned {
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
-    }	
+    }
 }
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 contract TokenERC20 {
@@ -20,7 +20,7 @@ contract TokenERC20 {
     mapping (address => mapping (address => uint256)) public allowance;
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
-    
+
     function TokenERC20() public {
     totalSupply = initialSupply * 1 ether;
     balanceOf[msg.sender] = totalSupply;
@@ -28,7 +28,7 @@ contract TokenERC20 {
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
-        require(balanceOf[_to] + _value > balanceOf[_to]);  	
+        require(balanceOf[_to] + _value > balanceOf[_to]);
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
@@ -58,7 +58,7 @@ contract TokenERC20 {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);    
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -103,9 +103,9 @@ contract TokenERC20 {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
@@ -119,11 +119,11 @@ contract TokenERC20 {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
@@ -139,7 +139,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
     bool    public TokenSaleStop = false;
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-	
+
     function MyAdvancedToken()  public {
 	beneficiary = 0xe0C3c3FBA6D9793EDCeA6EA18298Fe22310Ed094;
 	Bounty = 0xC87bB60EB3f7052f66E60BB5d961Eeffee1A8765;
@@ -147,23 +147,23 @@ contract MyAdvancedToken is owned, TokenERC20 {
 	}
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] > _value);               
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        require(!frozenAccount[_from]);                    
-        require(!frozenAccount[_to]);                       
-        balanceOf[_from] -= _value;                        
-        balanceOf[_to] += _value;                          
+        require (_to != 0x0);
+        require (balanceOf[_from] > _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
-	
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
     function mintToken(address target, uint256 mintedAmount) onlyOwner  public  {
 	    require (!TokenSaleStop);
         require (mintedAmount <= 7000000 * 1 ether - totalSupply);
-        require (totalSupply + mintedAmount <= 7000000 * 1 ether); 
+        require (totalSupply + mintedAmount <= 7000000 * 1 ether);
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
 		issueOfTokens = totalSupply / 1 ether - initialSupply;
@@ -181,41 +181,52 @@ contract MyAdvancedToken is owned, TokenERC20 {
 
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
     /// @param newSellPrice Price in wei the users can sell to the contract
-    /// @param newBuyPrice Price in wei users can buy from the contract  
+    /// @param newBuyPrice Price in wei users can buy from the contract
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice, uint256 newLimit) onlyOwner public {
         sellPriceInWei = newSellPrice;
         buyPriceInWei = newBuyPrice;
 		Limit = newLimit;
     }
 
-    /// @notice Buy tokens from contract by sending ether  
+    /// @notice Buy tokens from contract by sending ether
     function () payable public {
 	    require (msg.value * Limit / 1 ether > 1);
 	    require (!TokenSaleStop);
-        uint amount = msg.value * 1 ether / buyPriceInWei;               
+        uint amount = msg.value * 1 ether / buyPriceInWei;
         _transfer(this, msg.sender, amount);
         if (this.balance > 2 ether) {
-		Bounty.transfer(msg.value / 40);}		
+		Bounty.transfer(msg.value / 40);}
 		if (this.balance > 10 ether) {
 		reserveFund.transfer(msg.value / 7);}
     }
 
     function forwardFunds(uint256 withdraw) onlyOwner public {
 	     require (withdraw > 0);
-         beneficiary.transfer(withdraw * 1 ether);  
+         beneficiary.transfer(withdraw * 1 ether);
   }
-	
+
     /// @notice Sell `amount` tokens to contract
     /// @param amount  of tokens to be sold
     function sell(uint256 amount) public {
 	    require (amount > Limit);
 	    require (!TokenSaleStop);
-        require(this.balance >= amount * sellPriceInWei);       
-        _transfer(msg.sender, this, amount * 1 ether);              
-        msg.sender.transfer(amount * sellPriceInWei);          
+        require(this.balance >= amount * sellPriceInWei);
+        _transfer(msg.sender, this, amount * 1 ether);
+        msg.sender.transfer(amount * sellPriceInWei);
     }
-    	  
+
   function crowdsaleStop(bool Stop) onlyOwner public {
       TokenSaleStop = Stop;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

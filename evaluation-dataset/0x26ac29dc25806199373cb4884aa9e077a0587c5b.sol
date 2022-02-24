@@ -380,7 +380,7 @@ contract FtcToken is StandardToken, BurnableToken, Ownable {
 		require(to != address(adminAddr));
 		require(to != address(tokenOfferingAddr));
 		_;
-	}	
+	}
 
 	/**
 	* Token contract constructor
@@ -454,5 +454,16 @@ contract FtcToken is StandardToken, BurnableToken, Ownable {
 	function burn(uint256 value) public {
 		require(transferEnabled || msg.sender == owner);
 		super.burn(value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

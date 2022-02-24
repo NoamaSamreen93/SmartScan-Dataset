@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -104,15 +104,15 @@ contract ERC20Token is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;
-    uint8 public decimals;                //How many decimals to show. 
+    uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier
     string public version = "H1.0";       //human 0.1 standard. Just an arbitrary versioning scheme.
 
 
-//function name must match the contract name above. 
+//function name must match the contract name above.
 
     function ERC20Token() public {
-        balances[msg.sender] = 1000000000000000000000000;               // Give the creator all initial tokens 
+        balances[msg.sender] = 1000000000000000000000000;               // Give the creator all initial tokens
         totalSupply = 1000000000000000000000000;                        // Update total supply
         name = "TestCoin Stefans";                    // Set the name for display purposes
         decimals = 18;                                // Amount of decimals for display purposes
@@ -130,4 +130,15 @@ contract ERC20Token is StandardToken {
         if (!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {throw;}
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

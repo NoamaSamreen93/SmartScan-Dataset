@@ -472,7 +472,7 @@ contract Crowdsale is Ownable {
 
 // File: contracts/HYCCrowdsaleICO.sol
 
-// because of truffle limitation of deploying 
+// because of truffle limitation of deploying
 // multiple instances of the same contract
 contract HYCCrowdsaleICO is Crowdsale {
   function HYCCrowdsaleICO(
@@ -482,9 +482,20 @@ contract HYCCrowdsaleICO is Crowdsale {
     address _wallet,
     uint256 _hardCap
   )
-    public 
+    public
     Crowdsale(_startTime, _endTime, _rate, _wallet, _hardCap)
   {
 
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

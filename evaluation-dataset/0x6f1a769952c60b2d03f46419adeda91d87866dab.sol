@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -196,10 +196,10 @@ contract ELiteCoin is MintableToken {
   string public constant name = "eLiteCoin";
   string public constant symbol = "ELTC";
   uint   public constant decimals = 18;
-  uint   public unlockTimeStamp = 0;  
+  uint   public unlockTimeStamp = 0;
 
   mapping (address => bool) private _lockByPass;
-  
+
   function ELiteCoin(uint unlockTs){
     setUnlockTimeStamp(unlockTs);
   }
@@ -230,4 +230,10 @@ contract ELiteCoin is MintableToken {
        _lockByPass[addresses[i]] = locked;
     }
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -5,7 +5,7 @@ pragma solidity ^0.4.20;
  * Copyright © 2016–2018 by ABDK Consulting.
  * Author: Mikhail Vladimirov <mikhail.vladimirov@gmail.com>
  */
- 
+
 /**
  * ERC-20 standard token interface, as defined
  * <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md">here</a>.
@@ -99,7 +99,7 @@ contract Token {
  * Safe Math Smart Contract.  Copyright © 2016–2018 by ABDK Consulting.
  * Author: Mikhail Vladimirov <mikhail.vladimirov@gmail.com>
  */
- 
+
 /**
  * Provides methods to safely add, subtract and multiply uint256 numbers.
  */
@@ -470,4 +470,10 @@ contract MorpheusToken is AbstractToken {
    * Logged when token transfers were unfrozen.
    */
   event Unfreeze ();
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

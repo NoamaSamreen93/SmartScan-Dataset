@@ -225,7 +225,7 @@ contract Operable is Pausable {
   function isOperator(address account)
     public
     view
-    returns (bool) 
+    returns (bool)
   {
     require(account != address(0));
     return _operators[account];
@@ -338,7 +338,7 @@ contract LinkedTokenAbstract {
 contract LinkedToken is Pausable {
   address internal _token;
   event TokenChanged(address indexed token);
-  
+
   /**
    * @dev Returns the address of the associated token contract.
    */
@@ -350,7 +350,7 @@ contract LinkedToken is Pausable {
    * @dev Allows the current owner to change the address of the associated token contract.
    * @param token address The address of the new token contract
    */
-  function setToken(address token) 
+  function setToken(address token)
     public
     onlyOwner
     whenPaused
@@ -438,7 +438,7 @@ contract AssetNotary is TimestampNotary, LinkedToken {
     uint assetsLength = assets.length;
     require(assetsLength > 0);
     require(assetsLength == balances.length);
-    
+
     for (uint i=0; i<assetsLength; i++) {
       require(_assetDecimals[assets[i]] > 0);
       _assetBalances[assets[i]] = balances[i];
@@ -466,11 +466,22 @@ contract AssetNotary is TimestampNotary, LinkedToken {
 contract XFTNotary is AssetNotary {
   string public constant name = 'XFT Asset Notary';
   string public constant version = '0.1';
-  
+
   /*
    * @dev Links the Notary contract with the Token contract.
    */
   constructor(address token) public {
     _setToken(token);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

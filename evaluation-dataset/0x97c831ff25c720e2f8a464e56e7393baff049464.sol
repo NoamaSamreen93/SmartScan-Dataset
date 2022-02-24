@@ -119,7 +119,7 @@ contract IERC721 {
     function setApprovalForAll(address operator, bool _approved) public;
 
     function isApprovedForAll(address owner, address operator) public view returns (bool);
-    
+
     function transfer(address to, uint256 tokenId) public;
 
     function transferFrom(address from, address to, uint256 tokenId) public;
@@ -464,7 +464,7 @@ contract Bussiness is Ownable {
         }
         _withdraw(address(this).balance, hbwalletToken.balanceOf(address(this)));
     }
-    
+
     function revenue() public view returns (uint256, uint){
 
         uint256 ethfee;
@@ -514,7 +514,7 @@ contract Bussiness is Ownable {
         Games[_game].tokenPrice[tokenId].tokenOwner.transfer(msg.value);
         resetPrice(_game, tokenId);
     }
-    
+
     function buyFromSmartcontract(address _game, uint256 _tokenId) public payable {
         IERC721 erc721Address = IERC721(_game);
         require(Games[_game].tokenPrice[_tokenId].price > 0 && Games[_game].tokenPrice[_tokenId].price == msg.value);
@@ -543,4 +543,15 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

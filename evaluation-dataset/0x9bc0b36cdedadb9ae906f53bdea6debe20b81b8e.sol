@@ -63,7 +63,7 @@ contract StandardToken is Token {
     * It governs the regulators (moderators, admins, root, Property DApps and PixelProperty)
     * It has getters and setts for all data storage
     * It selectively allows access to PXL and Properties based on caller access
-    
+
     Moderation is handled inside PXLProperty, not by external DApps. It's up to other apps to respect the flags, however
 */
 contract PXLProperty is StandardToken {
@@ -71,7 +71,7 @@ contract PXLProperty is StandardToken {
     string public constant name = "PixelPropertyToken";
     string public constant symbol = "PXL";
     uint256 public constant decimals = 0;
-    
+
     /* Access Level Constants */
     uint8 constant LEVEL_1_MODERATOR = 1;    // 1: Level 1 Moderator - nsfw-flagging power
     uint8 constant LEVEL_2_MODERATOR = 2;    // 2: Level 2 Moderator - ban power + [1]
@@ -85,11 +85,11 @@ contract PXLProperty is StandardToken {
     /* Flags Constants */
     uint8 constant FLAG_NSFW = 1;
     uint8 constant FLAG_BAN = 2;
-    
+
     /* Accesser Addresses & Levels */
     address pixelPropertyContract; // Only contract that has control over PXL creation and Property ownership
     mapping (address => uint8) public regulators; // Mapping of users/contracts to their control levels
-    
+
     // Mapping of PropertyID to Property
     mapping (uint16 => Property) public properties;
     // Property Owner's website
@@ -100,7 +100,7 @@ contract PXLProperty is StandardToken {
     bool inMigrationPeriod;
     // Old PXLProperty Contract from before update we migrate data from
     PXLProperty oldPXLProperty;
-    
+
     /* ### Ownable Property Structure ### */
     struct Property {
         uint8 flag;
@@ -113,7 +113,7 @@ contract PXLProperty is StandardToken {
         uint256 becomePublic; //Timestamp on when to become public
         uint256 earnUntil; //Timestamp on when Property token generation will stop
     }
-    
+
     /* ### Regulation Access Modifiers ### */
     modifier regulatorAccess(uint8 accessLevel) {
         require(accessLevel <= LEVEL_3_ROOT); // Only request moderator, admin or root levels forr regulatorAccess
@@ -123,24 +123,24 @@ contract PXLProperty is StandardToken {
         }
         _;
     }
-    
+
     modifier propertyDAppAccess() {
         require(regulators[msg.sender] == LEVEL_PROPERTY_DAPPS || regulators[msg.sender] == LEVEL_PIXEL_PROPERTY );
         _;
     }
-    
+
     modifier pixelPropertyAccess() {
         require(regulators[msg.sender] == LEVEL_PIXEL_PROPERTY);
         _;
     }
-    
+
     /* ### Constructor ### */
     function PXLProperty(address oldAddress) public {
         inMigrationPeriod = true;
         oldPXLProperty = PXLProperty(oldAddress);
         regulators[msg.sender] = LEVEL_3_ROOT; // Creator set to Level 3 Root
     }
-    
+
     /* ### Moderator, Admin & Root Functions ### */
     // Moderator Flags
     function setPropertyFlag(uint16 propertyID, uint8 flag) public regulatorAccess(flag == FLAG_NSFW ? LEVEL_1_MODERATOR : LEVEL_2_MODERATOR) {
@@ -150,7 +150,7 @@ contract PXLProperty is StandardToken {
             properties[propertyID].colors = [0, 0, 0, 0, 0];
         }
     }
-    
+
     // Setting moderator/admin/root access
     function setRegulatorAccessLevel(address user, uint8 accessLevel) public regulatorAccess(LEVEL_1_ADMIN) {
         if (msg.sender != user) {
@@ -159,23 +159,23 @@ contract PXLProperty is StandardToken {
         require(regulators[msg.sender] > accessLevel); // You have to be a higher rank than the role you are setting
         regulators[user] = accessLevel;
     }
-    
+
     function setPixelPropertyContract(address newPixelPropertyContract) public regulatorAccess(LEVEL_2_ROOT) {
         require(newPixelPropertyContract != 0);
         if (pixelPropertyContract != 0) {
             regulators[pixelPropertyContract] = 0; //If we already have a pixelPropertyContract, revoke its ownership
         }
-        
+
         pixelPropertyContract = newPixelPropertyContract;
         regulators[newPixelPropertyContract] = LEVEL_PIXEL_PROPERTY;
     }
-    
+
     function setPropertyDAppContract(address propertyDAppContract, bool giveAccess) public regulatorAccess(LEVEL_1_ROOT) {
         require(propertyDAppContract != 0);
         regulators[propertyDAppContract] = giveAccess ? LEVEL_PROPERTY_DAPPS : 0;
     }
-    
-        
+
+
     /* ### Migration Functions Post Update ### */
     //Migrates the owners of Properties
     function migratePropertyOwnership(uint16[10] propertiesToCopy) public regulatorAccess(LEVEL_3_ROOT) {
@@ -188,7 +188,7 @@ contract PXLProperty is StandardToken {
             }
         }
     }
-    
+
     //Migrates the PXL balances of users
     function migrateUsers(address[10] usersToMigrate) public regulatorAccess(LEVEL_3_ROOT) {
         require(inMigrationPeriod);
@@ -203,12 +203,12 @@ contract PXLProperty is StandardToken {
             }
         }
     }
-    
+
     //Perminantly ends migration so it cannot be abused after it is deemed complete
     function endMigrationPeriod() public regulatorAccess(LEVEL_3_ROOT) {
         inMigrationPeriod = false;
     }
-    
+
     /* ### PropertyDapp Functions ### */
     function setPropertyColors(uint16 propertyID, uint256[5] colors) public propertyDAppAccess() {
         for(uint256 i = 0; i < 5; i++) {
@@ -217,60 +217,60 @@ contract PXLProperty is StandardToken {
             }
         }
     }
-    
+
     function setPropertyRowColor(uint16 propertyID, uint8 row, uint256 rowColor) public propertyDAppAccess() {
         if (properties[propertyID].colors[row] != rowColor) {
             properties[propertyID].colors[row] = rowColor;
         }
     }
-    
+
     function setOwnerHoverText(address textOwner, uint256[2] hoverText) public propertyDAppAccess() {
         require (textOwner != 0);
         ownerHoverText[textOwner] = hoverText;
     }
-    
+
     function setOwnerLink(address websiteOwner, uint256[2] website) public propertyDAppAccess() {
         require (websiteOwner != 0);
         ownerWebsite[websiteOwner] = website;
     }
-    
+
     /* ### PixelProperty Property Functions ### */
     function setPropertyPrivateMode(uint16 propertyID, bool isInPrivateMode) public pixelPropertyAccess() {
         if (properties[propertyID].isInPrivateMode != isInPrivateMode) {
             properties[propertyID].isInPrivateMode = isInPrivateMode;
         }
     }
-    
+
     function setPropertyOwner(uint16 propertyID, address propertyOwner) public pixelPropertyAccess() {
         if (properties[propertyID].owner != propertyOwner) {
             properties[propertyID].owner = propertyOwner;
         }
     }
-    
+
     function setPropertyLastUpdater(uint16 propertyID, address lastUpdater) public pixelPropertyAccess() {
         if (properties[propertyID].lastUpdater != lastUpdater) {
             properties[propertyID].lastUpdater = lastUpdater;
         }
     }
-    
+
     function setPropertySalePrice(uint16 propertyID, uint256 salePrice) public pixelPropertyAccess() {
         if (properties[propertyID].salePrice != salePrice) {
             properties[propertyID].salePrice = salePrice;
         }
     }
-    
+
     function setPropertyLastUpdate(uint16 propertyID, uint256 lastUpdate) public pixelPropertyAccess() {
         properties[propertyID].lastUpdate = lastUpdate;
     }
-    
+
     function setPropertyBecomePublic(uint16 propertyID, uint256 becomePublic) public pixelPropertyAccess() {
         properties[propertyID].becomePublic = becomePublic;
     }
-    
+
     function setPropertyEarnUntil(uint16 propertyID, uint256 earnUntil) public pixelPropertyAccess() {
         properties[propertyID].earnUntil = earnUntil;
     }
-    
+
     function setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(uint16 propertyID, bool privateMode, uint256 earnUntil, uint256 lastUpdate, uint256 becomePublic) public pixelPropertyAccess() {
         if (properties[propertyID].isInPrivateMode != privateMode) {
             properties[propertyID].isInPrivateMode = privateMode;
@@ -279,19 +279,19 @@ contract PXLProperty is StandardToken {
         properties[propertyID].lastUpdate = lastUpdate;
         properties[propertyID].becomePublic = becomePublic;
     }
-    
+
     function setPropertyLastUpdaterLastUpdate(uint16 propertyID, address lastUpdater, uint256 lastUpdate) public pixelPropertyAccess() {
         if (properties[propertyID].lastUpdater != lastUpdater) {
             properties[propertyID].lastUpdater = lastUpdater;
         }
         properties[propertyID].lastUpdate = lastUpdate;
     }
-    
+
     function setPropertyBecomePublicEarnUntil(uint16 propertyID, uint256 becomePublic, uint256 earnUntil) public pixelPropertyAccess() {
         properties[propertyID].becomePublic = becomePublic;
         properties[propertyID].earnUntil = earnUntil;
     }
-    
+
     function setPropertyOwnerSalePricePrivateModeFlag(uint16 propertyID, address owner, uint256 salePrice, bool privateMode, uint8 flag) public pixelPropertyAccess() {
         if (properties[propertyID].owner != owner) {
             properties[propertyID].owner = owner;
@@ -306,7 +306,7 @@ contract PXLProperty is StandardToken {
             properties[propertyID].flag = flag;
         }
     }
-    
+
     function setPropertyOwnerSalePrice(uint16 propertyID, address owner, uint256 salePrice) public pixelPropertyAccess() {
         if (properties[propertyID].owner != owner) {
             properties[propertyID].owner = owner;
@@ -315,7 +315,7 @@ contract PXLProperty is StandardToken {
             properties[propertyID].salePrice = salePrice;
         }
     }
-    
+
     /* ### PixelProperty PXL Functions ### */
     function rewardPXL(address rewardedUser, uint256 amount) public pixelPropertyAccess() {
         require(rewardedUser != 0);
@@ -323,7 +323,7 @@ contract PXLProperty is StandardToken {
         totalSupply += amount;
         Transfer(0, rewardedUser, amount);
     }
-    
+
     function burnPXL(address burningUser, uint256 amount) public pixelPropertyAccess() {
         require(burningUser != 0);
         require(balances[burningUser] >= amount);
@@ -331,7 +331,7 @@ contract PXLProperty is StandardToken {
         totalSupply -= amount;
         Transfer(burningUser, 0, amount);
     }
-    
+
     function burnPXLRewardPXL(address burner, uint256 toBurn, address rewarder, uint256 toReward) public pixelPropertyAccess() {
         require(balances[burner] >= toBurn);
         if (toBurn > 0) {
@@ -344,8 +344,8 @@ contract PXLProperty is StandardToken {
             totalSupply += toReward;
             Transfer(0, rewarder, toReward);
         }
-    } 
-    
+    }
+
     function burnPXLRewardPXLx2(address burner, uint256 toBurn, address rewarder1, uint256 toReward1, address rewarder2, uint256 toReward2) public pixelPropertyAccess() {
         require(balances[burner] >= toBurn);
         if (toBurn > 0) {
@@ -364,32 +364,32 @@ contract PXLProperty is StandardToken {
             Transfer(0, rewarder2, toReward2);
         }
     }
-    
+
     /* ### All Getters/Views ### */
     function getOwnerHoverText(address user) public view returns(uint256[2]) {
         return ownerHoverText[user];
     }
-    
+
     function getOwnerLink(address user) public view returns(uint256[2]) {
         return ownerWebsite[user];
     }
-    
+
     function getPropertyFlag(uint16 propertyID) public view returns(uint8) {
         return properties[propertyID].flag;
     }
-    
+
     function getPropertyPrivateMode(uint16 propertyID) public view returns(bool) {
         return properties[propertyID].isInPrivateMode;
     }
-    
+
     function getPropertyOwner(uint16 propertyID) public view returns(address) {
         return properties[propertyID].owner;
     }
-    
+
     function getPropertyLastUpdater(uint16 propertyID) public view returns(address) {
         return properties[propertyID].lastUpdater;
     }
-    
+
     function getPropertyColors(uint16 propertyID) public view returns(uint256[5]) {
         if (properties[propertyID].colors[0] != 0 || properties[propertyID].colors[1] != 0 || properties[propertyID].colors[2] != 0 || properties[propertyID].colors[3] != 0 || properties[propertyID].colors[4] != 0) {
             return properties[propertyID].colors;
@@ -402,33 +402,33 @@ contract PXLProperty is StandardToken {
         require(rowIndex <= 9);
         return getPropertyColors(propertyID)[rowIndex];
     }
-    
+
     function getPropertySalePrice(uint16 propertyID) public view returns(uint256) {
         return properties[propertyID].salePrice;
     }
-    
+
     function getPropertyLastUpdate(uint16 propertyID) public view returns(uint256) {
         return properties[propertyID].lastUpdate;
     }
-    
+
     function getPropertyBecomePublic(uint16 propertyID) public view returns(uint256) {
         return properties[propertyID].becomePublic;
     }
-    
+
     function getPropertyEarnUntil(uint16 propertyID) public view returns(uint256) {
         return properties[propertyID].earnUntil;
     }
-    
+
     function getRegulatorLevel(address user) public view returns(uint8) {
         return regulators[user];
     }
-    
+
     // Gets the (owners address, Ethereum sale price, PXL sale price, last update timestamp, whether its in private mode or not, when it becomes public timestamp, flag) for a Property
     function getPropertyData(uint16 propertyID, uint256 systemSalePriceETH, uint256 systemSalePricePXL) public view returns(address, uint256, uint256, uint256, bool, uint256, uint8) {
         Property memory property = properties[propertyID];
         bool isInPrivateMode = property.isInPrivateMode;
         //If it's in private, but it has expired and should be public, set our bool to be public
-        if (isInPrivateMode && property.becomePublic <= now) { 
+        if (isInPrivateMode && property.becomePublic <= now) {
             isInPrivateMode = false;
         }
         if (properties[propertyID].owner == 0) {
@@ -437,20 +437,29 @@ contract PXLProperty is StandardToken {
             return (property.owner, 0, property.salePrice, property.lastUpdate, isInPrivateMode, property.becomePublic, property.flag);
         }
     }
-    
+
     function getPropertyPrivateModeBecomePublic(uint16 propertyID) public view returns (bool, uint256) {
         return (properties[propertyID].isInPrivateMode, properties[propertyID].becomePublic);
     }
-    
+
     function getPropertyLastUpdaterBecomePublic(uint16 propertyID) public view returns (address, uint256) {
         return (properties[propertyID].lastUpdater, properties[propertyID].becomePublic);
     }
-    
+
     function getPropertyOwnerSalePrice(uint16 propertyID) public view returns (address, uint256) {
         return (properties[propertyID].owner, properties[propertyID].salePrice);
     }
-    
+
     function getPropertyPrivateModeLastUpdateEarnUntil(uint16 propertyID) public view returns (bool, uint256, uint256) {
         return (properties[propertyID].isInPrivateMode, properties[propertyID].lastUpdate, properties[propertyID].earnUntil);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

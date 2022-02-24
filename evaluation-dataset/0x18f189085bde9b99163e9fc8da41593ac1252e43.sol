@@ -296,7 +296,7 @@ contract Crowdsale is Pausable, Whitelist {
 
     address public beneficiary;
     address public pool;
-    
+
     uint internal decimals = 10 ** 18;
 
     struct Funding {
@@ -384,7 +384,7 @@ contract Crowdsale is Pausable, Whitelist {
             stages[i].ultimateBonusWinner = EMPTY_ADDRESS;
         }
     }
-    
+
     function getStageAverageBonus(uint8 _index) public view returns(
         uint32 buying,
         uint32 lottery,
@@ -396,7 +396,7 @@ contract Crowdsale is Pausable, Whitelist {
             lottery = stage.bonus.lottery / uint16(stage.winners.length);
             ultimate = stage.bonus.ultimate + (stage.bonus.lottery - lottery * uint16(stage.winners.length));
         }
-    } 
+    }
 
     function getOpenedStageIndex() public view returns(uint8) {
         for (uint8 i = 1; i <= 4; i++) {
@@ -611,13 +611,13 @@ contract Crowdsale is Pausable, Whitelist {
             uint32 _ultimateBonus;
 
             (_buyingBonus, _lotteryBonus, _ultimateBonus) = getStageAverageBonus(i);
-            
+
             buyingBonus[i - 1] = buyerStage.funded * _buyingBonus;
 
             if (buyerStage.lotteryBonusWon == true) {
                 lotteryBonus[i - 1] = _lotteryBonus;
             }
-            
+
             if (buyerStage.ultimateBonusWon == true) {
                 ultimateBonus[i - 1] = _ultimateBonus;
             }
@@ -651,7 +651,7 @@ contract Crowdsale is Pausable, Whitelist {
             if (stageFundGoalReached(i) == false || buyerStage.bonusReleased == true) {
                 continue;
             }
-            
+
             uint32 buyingBonus;
             uint32 lotteryBonus;
             uint32 ultimateBonus;
@@ -665,17 +665,17 @@ contract Crowdsale is Pausable, Whitelist {
             if (buyerStage.ultimateBonusWon == true) {
                 bonus += ultimateBonus;
             }
-            
+
             if (_send == true) {
                 buyerStage.bonusReleased = true;
             }
         }
-        
+
         if (_send == true) {
             require(bonus > 0, "No bonus.");
             token.transferFrom(pool, _buyer, uint256(bonus).mul(decimals));
         }
-        
+
         return bonus;
     }
 
@@ -753,7 +753,7 @@ contract Crowdsale is Pausable, Whitelist {
         if (stage.nextLotteryRaised == 0) {
             stage.nextLotteryRaised = todayLotteryNumber;
         }
-        
+
         uint8 mod;
         if (stage.fundRaised > 10) {
             mod = uint8(stage.fundRaised % 10);
@@ -800,4 +800,15 @@ contract Crowdsale is Pausable, Whitelist {
             buy(msg.sender, msg.value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

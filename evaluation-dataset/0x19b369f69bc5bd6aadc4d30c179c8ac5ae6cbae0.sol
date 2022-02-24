@@ -8,7 +8,7 @@ pragma solidity ^0.4.25;
 * EN  Telegram_chat: https://t.me/club_255eth_en
 * RU  Telegram_chat: https://t.me/club_255eth_ru
 * Email:             mailto:support(at sign)255eth.club
-* 
+*
 *  - GAIN 2,55% PER 24 HOURS (every 5900 blocks)
 *  - Life-long payments
 *  - The revolutionary reliability
@@ -18,57 +18,57 @@ pragma solidity ^0.4.25;
 *    -- 90% payments
 *    -- 5% Referral program (3% first level, 2% second level)
 *    -- 5% (4% Marketing, 1% Operating Expenses)
-* 
+*
 *  - Referral will be rewarded
 *    -- Your referral will receive 3% of his first investment to deposit.
-* 
+*
 *  - HOW TO GET MORE INCOME?
 *    -- Marathon "The Best Investor"
-*       Current winner becomes common referrer for investors without 
-*       referrer and get a lump sum of 3% of their deposits. 
+*       Current winner becomes common referrer for investors without
+*       referrer and get a lump sum of 3% of their deposits.
 *       To become winner you must invest more than previous winner.
-*       
+*
 *       How to check: see bestInvestorInfo in the contract
-* 
+*
 *    -- Marathon "The Best Promoter"
-*       Current winner becomes common referrer for investors without 
-*       referrer and get a lump sum of 2% of their deposits. 
+*       Current winner becomes common referrer for investors without
+*       referrer and get a lump sum of 2% of their deposits.
 *       To become winner you must invite more than previous winner.
 *
 *       How to check: see bestPromouterInfo in the contract
-* 
-*    -- Send advertise tokens with contract method massAdvertiseTransfer or transfer 
+*
+*    -- Send advertise tokens with contract method massAdvertiseTransfer or transfer
 *       and get 1% from first investments of invited wallets.
 *       Advertise tokens free for all but you will pay gas fee for call methods.
 *
 *   ---About the Project
-*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without 
-*  intermediaries. This technology opens incredible financial possibilities. Our automated investment 
-*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be 
-*  freely accessed online. In order to insure our investors' complete security, full control over the 
-*  project has been transferred from the organizers to the smart contract: nobody can influence the 
+*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without
+*  intermediaries. This technology opens incredible financial possibilities. Our automated investment
+*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be
+*  freely accessed online. In order to insure our investors' complete security, full control over the
+*  project has been transferred from the organizers to the smart contract: nobody can influence the
 *  system's permanent autonomous functioning.
-* 
+*
 * ---How to use:
 *  1. Send from ETH wallet to the smart contract address 0x19b369f69bc5bd6aadc4d30c179c8ac5ae6cbae0
 *     any amount from 0.01 ETH.
-*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address 
+*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address
 *     of your wallet.
-*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're 
+*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're
 *      spending too much on GAS). But not early then 24 hours from last time claim or invest.
 *  OR
-*  3b. For reinvest, you need to first remove the accumulated percentage of charges (by sending 0 ether 
+*  3b. For reinvest, you need to first remove the accumulated percentage of charges (by sending 0 ether
 *      transaction), and only after that, deposit the amount that you want to reinvest.
-*  
+*
 * RECOMMENDED GAS LIMIT: 350000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
-* 
+*
 * Main contract - Revolution. Scroll down to find it.
 */
 
@@ -97,9 +97,9 @@ contract InvestorsStorage {
     bestAddress bestPromouter;
   }
   itmap private s;
-  
+
   address private owner;
-  
+
   event LogBestInvestorChanged(address indexed addr, uint when, uint invested);
   event LogBestPromouterChanged(address indexed addr, uint when, uint refs);
 
@@ -121,7 +121,7 @@ contract InvestorsStorage {
     s.data[addr].keyIndex = keyIndex;
     s.keys[keyIndex] = addr;
     updateBestInvestor(addr, s.data[addr].value);
-    
+
     return true;
   }
 
@@ -157,7 +157,7 @@ contract InvestorsStorage {
       s.bestInvestor.addr
     );
   }
-  
+
   function getBestPromouter() public view returns(uint, address) {
     return (
       s.bestPromouter.value,
@@ -170,13 +170,13 @@ contract InvestorsStorage {
     s.data[addr].refBonus += refBonus;
     return true;
   }
-  
+
   function addRefBonusWithRefs(address addr, uint refBonus) public onlyOwner returns (bool) {
     if (s.data[addr].keyIndex == 0) return false;
     s.data[addr].refBonus += refBonus;
     s.data[addr].refs++;
     updateBestPromouter(addr, s.data[addr].refs);
-    
+
     return true;
   }
 
@@ -184,36 +184,36 @@ contract InvestorsStorage {
     if (s.data[addr].keyIndex == 0) return false;
     s.data[addr].value += value;
     updateBestInvestor(addr, s.data[addr].value);
-    
+
     return true;
   }
-  
+
   function updateStats(uint dt, uint invested, uint investors) public {
     s.stats[dt].invested += invested;
     s.stats[dt].investors += investors;
   }
-  
+
   function stats(uint dt) public view returns (uint invested, uint investors) {
-    return ( 
+    return (
       s.stats[dt].invested,
       s.stats[dt].investors
     );
   }
-  
+
   function updateBestInvestor(address addr, uint investorValue) internal {
     if(investorValue > s.bestInvestor.value){
         s.bestInvestor.value = investorValue;
         s.bestInvestor.addr = addr;
         emit LogBestInvestorChanged(addr, now, s.bestInvestor.value);
-    }      
+    }
   }
-  
+
   function updateBestPromouter(address addr, uint investorRefs) internal {
     if(investorRefs > s.bestPromouter.value){
         s.bestPromouter.value = investorRefs;
         s.bestPromouter.addr = addr;
         emit LogBestPromouterChanged(addr, now, s.bestPromouter.value);
-    }      
+    }
   }
 
   function setPaymentTime(address addr, uint paymentTime) public onlyOwner returns (bool) {
@@ -331,7 +331,7 @@ contract DT {
                         secondsAccountedFor += DAY_IN_SECONDS;
                 }
         }
-        
+
         function getYear(uint timestamp) internal pure returns (uint16) {
                 uint secondsAccountedFor = 0;
                 uint16 year;
@@ -376,12 +376,12 @@ contract ERC20AdToken {
     string public  name;
     uint8 public decimals = 0;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping(address => address) public adtransfers;
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -402,7 +402,7 @@ contract ERC20AdToken {
         }
         return true;
     }
-    
+
     function massAdvertiseTransfer(address[] addresses, uint tokens) public returns (bool success) {
         for (uint i = 0; i < addresses.length; i++) {
             if(!adtransfers[addresses[i]].notZero()){
@@ -410,7 +410,7 @@ contract ERC20AdToken {
                 emit Transfer(this, addresses[i], tokens);
             }
         }
-        
+
         return true;
     }
 
@@ -441,7 +441,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
   uint public constant maxBalance = 255e5 ether; // 25,500,000 eth
   uint public constant dividendsPeriod = 24 hours; //24 hours
 
-  // percents 
+  // percents
   Percent.percent private m_dividendsPercent = Percent.percent(255, 10000); // 255/10000*100% = 2.55%
   Percent.percent private m_adminPercent = Percent.percent(5, 100); // 5/100*100% = 5%
   Percent.percent private m_refPercent1 = Percent.percent(3, 100); // 3/100*100% = 3%
@@ -462,7 +462,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
     emit LogBalanceChanged(now, address(this).balance);
   }
 
-  constructor() ERC20AdToken("Earn 2.55% Every Day. https://255eth.club", 
+  constructor() ERC20AdToken("Earn 2.55% Every Day. https://255eth.club",
                             "Send your ETH to this contract and earn 2.55% every day for Live-long. https://255eth.club") public {
     adminAddr = msg.sender;
 
@@ -483,7 +483,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
 
   function investorsNumber() public view returns(uint) {
     return m_investors.size()-1;
-    // -1 because see InvestorsStorage constructor where keys.length++ 
+    // -1 because see InvestorsStorage constructor where keys.length++
   }
 
   function balanceETH() public view returns(uint) {
@@ -501,11 +501,11 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
   function referrer1Percent() public view returns(uint numerator, uint denominator) {
     (numerator, denominator) = (m_refPercent1.num, m_refPercent1.den);
   }
-  
+
   function referrer2Percent() public view returns(uint numerator, uint denominator) {
     (numerator, denominator) = (m_refPercent2.num, m_refPercent2.den);
   }
-  
+
   function stats(uint date) public view returns(uint invested, uint investors) {
     (invested, investors) = m_investors.stats(date);
   }
@@ -514,15 +514,15 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
     (value, paymentTime, refsCount, refBonus) = m_investors.investorBaseInfo(addr);
     isReferral = m_referrals[addr].notZero();
   }
-  
+
   function bestInvestorInfo() public view returns(uint invested, address addr) {
     (invested, addr) = m_investors.getBestInvestor();
   }
-  
+
   function bestPromouterInfo() public view returns(uint refs, address addr) {
     (refs, addr) = m_investors.getBestPromouter();
   }
-  
+
   function _getMyDividents(bool withoutThrow) private {
     // check investor info
     InvestorsStorage.investor memory investor = getMemInvestor(msg.sender);
@@ -530,7 +530,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
         if(withoutThrow){
             return;
         }
-        
+
         revert("sender is not investor");
     }
 
@@ -540,12 +540,12 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
         if(withoutThrow){
             return;
         }
-        
+
         revert("the latest payment was earlier than dividents period");
     }
     assert(m_investors.setPaymentTime(msg.sender, now));
 
-    // check enough eth 
+    // check enough eth
     uint value = m_dividendsPercent.mul(investor.value) * daysAfter;
     if (address(this).balance < value + investor.refBonus) {
       nextWave();
@@ -558,9 +558,9 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
       sendDividendsWithRefBonus(msg.sender, value, investor.refBonus);
     } else {
       sendDividends(msg.sender, value);
-    }      
+    }
   }
-  
+
   function getMyDividends() public balanceChanged {
     _getMyDividents(false);
   }
@@ -578,9 +578,9 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
         assert(m_investors.addRefBonusWithRefs(ref, reward)); // referrer 1 bonus
         m_referrals[msg.sender] = ref;
         value = m_dividendsPercent.add(value); // referral bonus
-        emit LogNewReferral(msg.sender, now, value); 
+        emit LogNewReferral(msg.sender, now, value);
         // level 2
-        if (notZeroNotSender(m_referrals[ref]) && m_investors.contains(m_referrals[ref]) && ref != m_referrals[ref]) { 
+        if (notZeroNotSender(m_referrals[ref]) && m_investors.contains(m_referrals[ref]) && ref != m_referrals[ref]) {
           reward = m_refPercent2.mul(value);
           assert(m_investors.addRefBonus(m_referrals[ref], reward)); // referrer 2 bonus
         }
@@ -596,7 +596,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
           m_referrals[msg.sender] = bestPromouter.addr;
         }
       }
-      
+
       if(notZeroNotSender(adtransfers[msg.sender]) && m_investors.contains(adtransfers[msg.sender])){
           assert(m_investors.addRefBonus(adtransfers[msg.sender], m_adBonus.mul(msg.value) )); // advertise transfer bonud
       }
@@ -606,10 +606,10 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
 
     // commission
     adminAddr.transfer(m_adminPercent.mul(msg.value));
-    
+
     DT.DateTime memory dt = parseTimestamp(now);
     uint today = dt.year.uintToString().strConcat((dt.month<10 ? "0":""), dt.month.uintToString(), (dt.day<10 ? "0":""), dt.day.uintToString()).stringToUint();
-    
+
     // write to investors storage
     if (m_investors.contains(msg.sender)) {
       assert(m_investors.addValue(msg.sender, value));
@@ -617,12 +617,12 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
     } else {
       assert(m_investors.insert(msg.sender, value));
       m_investors.updateStats(today, value, 1);
-      emit LogNewInvestor(msg.sender, now, value); 
+      emit LogNewInvestor(msg.sender, now, value);
     }
-    
+
     assert(m_investors.setPaymentTime(msg.sender, now));
 
-    emit LogNewInvesment(msg.sender, now, value);   
+    emit LogNewInvesment(msg.sender, now, value);
     totalInvestments++;
     totalInvested += msg.value;
   }
@@ -632,12 +632,12 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
     (uint a, uint b, uint c, uint d, uint e) = m_investors.investorFullInfo(addr);
     return InvestorsStorage.investor(a, b, c, d, e);
   }
-  
+
   function getMemBestInvestor() internal view returns(InvestorsStorage.bestAddress) {
     (uint value, address addr) = m_investors.getBestInvestor();
     return InvestorsStorage.bestAddress(value, addr);
   }
-  
+
   function getMemBestPromouter() internal view returns(InvestorsStorage.bestAddress) {
     (uint value, address addr) = m_investors.getBestPromouter();
     return InvestorsStorage.bestAddress(value, addr);
@@ -648,7 +648,7 @@ contract EarnEveryDay_255 is ERC20AdToken, DT {
   }
 
   function sendDividends(address addr, uint value) private {
-    if (addr.send(value)) emit LogPayDividends(addr, now, value); 
+    if (addr.send(value)) emit LogPayDividends(addr, now, value);
   }
 
   function sendDividendsWithRefBonus(address addr, uint value,  uint refBonus) private {
@@ -779,7 +779,7 @@ library Convert {
         }
         return result; // this was missing
     }
-    
+
     function uintToString(uint v) internal pure returns (string) {
         uint maxlength = 100;
         bytes memory reversed = new bytes(maxlength);
@@ -796,7 +796,7 @@ library Convert {
         string memory str = string(s);  // memory isn't implicitly convertible to storage
         return str; // this was missing
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal pure returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
@@ -813,16 +813,27 @@ library Convert {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal pure returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
-    
+
     function strConcat(string _a, string _b, string _c) internal pure returns (string) {
         return strConcat(_a, _b, _c, "", "");
     }
-    
+
     function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -299,7 +299,7 @@ contract TCRToken is StandardToken, BurnableToken, Ownable {
     string  public constant name = "Transboundary Credit Rating";
     string  public constant symbol = "TCR";
     uint8   public constant decimals = 18;
-    string  public constant website = "www.tcr.legal"; 
+    string  public constant website = "www.tcr.legal";
     uint256 public constant INITIAL_SUPPLY      =  280000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  218400000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =   61600000 * (10 ** uint256(decimals));
@@ -310,7 +310,7 @@ contract TCRToken is StandardToken, BurnableToken, Ownable {
     address public crowdSaleAddr;           // the address of a crowdsale currently selling this token
     address public adminAddr;               // the address of a crowdsale currently selling this token
     //bool    public transferEnabled = false; // indicates if transferring tokens is enabled or not
-    bool    public transferEnabled = true;  // Enables everyone to transfer tokens 
+    bool    public transferEnabled = true;  // Enables everyone to transfer tokens
 
     // Modifiers
     modifier onlyWhenTransferEnabled() {
@@ -437,4 +437,16 @@ contract TCRToken is StandardToken, BurnableToken, Ownable {
         super.burn(_value);
         Transfer(msg.sender, address(0x0), _value);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

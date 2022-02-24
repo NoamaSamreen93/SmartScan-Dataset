@@ -11,7 +11,7 @@ contract KnowQuizEth {
     address private riddler;
 
     function () payable public {}
-    
+
     constructor (string _riddle, bytes32 _answerHash) public payable {
         riddler = msg.sender;
         Riddle = _riddle;
@@ -23,23 +23,34 @@ contract KnowQuizEth {
         require(isActive);
         require(msg.value >= 0.25 ether);
         require(bytes(guess).length > 0);
-        
+
         Guess newGuess;
         newGuess.player = msg.sender;
         newGuess.guess = guess;
         PreviousGuesses.push(newGuess);
-        
+
         if (keccak256(guess) == answerHash) {
             Answer = guess;
             isActive = false;
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function end(string _answer) public {
         require(msg.sender == riddler);
         Answer = _answer;
         isActive = false;
         msg.sender.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

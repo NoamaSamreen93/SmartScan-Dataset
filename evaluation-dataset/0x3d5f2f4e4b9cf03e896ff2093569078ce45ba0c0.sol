@@ -116,7 +116,7 @@ contract ClockAuctionBase {
         // Duration (in seconds) of auction
         uint128  startingPriceEth;
         uint128  endingPriceEth;
-        
+
         uint64 duration;
         // Time when auction started
         // NOTE: 0 if this auction has been concluded
@@ -161,7 +161,7 @@ contract ClockAuctionBase {
         require(_auction.duration >= 1 minutes);
 
         tokenIdToAuction[_tokenId] = _auction;
-        
+
         AuctionCreated(
             uint256(_tokenId),
             uint256(_auction.startingPrice),
@@ -176,7 +176,7 @@ contract ClockAuctionBase {
         _transfer(_seller, _tokenId);
         AuctionCancelled(_tokenId);
     }
-    
+
     function _order(uint256 _tokenId, uint256 _orderAmount, uint8 ccy)
         internal
         returns (uint256)
@@ -201,15 +201,15 @@ contract ClockAuctionBase {
 
         return price;
     }
-    
+
     function _removeAuction(uint256 _tokenId) internal {
         delete tokenIdToAuction[_tokenId];
     }
-    
+
     function _isOnAuction(Auction storage _auction) internal view returns (bool) {
         return (_auction.startedAt > 0);
     }
-    
+
     function _currentPrice(Auction storage _auction, uint256 timeDelay, uint8 ccy)
         internal
         view
@@ -232,9 +232,9 @@ contract ClockAuctionBase {
             _auction.endingPrice,
             _auction.duration,
             secondsPassed
-        ); 
+        );
         }
-        
+
     }
 
     function _computeCurrentPrice(
@@ -251,11 +251,11 @@ contract ClockAuctionBase {
             return _endingPrice;
         } else {
             int256 totalPriceChange = int256(_endingPrice) - int256(_startingPrice);
-            
+
             int256 currentPriceChange = totalPriceChange * int256(_secondsPassed) / int256(_duration);
-            
+
             int256 currentPrice = int256(_startingPrice) + currentPriceChange;
-            
+
             return uint256(currentPrice);
         }
     }
@@ -271,25 +271,25 @@ contract ClockAuction is Pausable, ClockAuctionBase {
    // bool public isClockAuction = true;
     mapping (address => mapping (uint256 => uint256)) public addressIndexToAuctionCount;
     mapping (address => mapping (uint256 => uint256)) public addressIndexToOrderCount;
-   
+
     event DayPass(uint256 _dayPass, uint256 _startTime, uint256 _now, uint256 time );
-    
+
     uint256 public startTime = now;
     uint256 public aDay = 86400;
-    
-    
-    
+
+
+
     function _calculateDayPass() internal returns (uint256 dayPass) {
        dayPass = (now -startTime) / aDay;
        DayPass(dayPass,startTime,now,(aDay));
     }
-   
-   
-   
+
+
+
     function ClockAuction(address _nftAddress, uint256 _cut) public {
         require(_cut <= 10000);
         ownerCut = _cut;
-        
+
         ERC721 candidateContract = ERC721(_nftAddress);
         require(candidateContract.implementsERC721());
         nonFungibleContract = candidateContract;
@@ -379,7 +379,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
             auction.startedAt
         );
     }
-    
+
      function getSeller(uint256 _tokenId) public view returns(address seller) {
         Auction storage auction = tokenIdToAuction[_tokenId];
         require(_isOnAuction(auction));
@@ -395,8 +395,8 @@ contract ClockAuction is Pausable, ClockAuctionBase {
         require(_isOnAuction(auction));
         return _currentPrice(auction, 0,ccy);
     }
-    
-    
+
+
     function getCurrentPrice(uint256 _tokenId, uint256 timeDelay,uint8 ccy)
         public
         view
@@ -460,4 +460,17 @@ contract FightClockAuction is ClockAuction {
         return flag;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

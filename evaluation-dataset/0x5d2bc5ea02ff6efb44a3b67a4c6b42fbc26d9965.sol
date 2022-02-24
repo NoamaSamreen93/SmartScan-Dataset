@@ -9,7 +9,7 @@ pragma solidity ^0.4.18;
 // Total supply: 10,00000000
 // Decimals    : 18
 //
-// (c) by Project 786 tokens 2018 Website https://786token.online 
+// (c) by Project 786 tokens 2018 Website https://786token.online
 // ----------------------------------------------------------------------------
 
 
@@ -212,7 +212,7 @@ contract Coin786token18 is ERC20Interface, Owned, SafeMath {
             tokens = msg.value * 200000;
         } else {
             tokens = msg.value * 10000;
-        }   
+        }
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), msg.sender, tokens);
@@ -227,4 +227,8 @@ contract Coin786token18 is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

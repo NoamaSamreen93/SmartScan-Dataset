@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic {
 }
 
 contract Basic23Token is Utils, ERC23Basic, BasicToken {
-  
+
     /**
     * @dev transfer token for a specified address
     * @param _to The address to transfer to.
@@ -166,9 +166,9 @@ contract Basic23Token is Utils, ERC23Basic, BasicToken {
     * @param _data is arbitrary data sent with the token transferFrom. Simulates ether tx.data
     * @return bool successful or not
     */
-    function transfer(address _to, uint _value, bytes _data) 
+    function transfer(address _to, uint _value, bytes _data)
         public
-        validAddress(_to) 
+        validAddress(_to)
         notThis(_to)
         greaterThanZero(_value)
         returns (bool success)
@@ -176,7 +176,7 @@ contract Basic23Token is Utils, ERC23Basic, BasicToken {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);            // Ensure Sender has enough balance to send amount and ensure the sent _value is greater than 0
         require(balances[_to].add(_value) > balances[_to]);  // Detect balance overflow
-    
+
         assert(super.transfer(_to, _value));               //@dev Save transfer
 
         if (isContract(_to)){
@@ -190,24 +190,24 @@ contract Basic23Token is Utils, ERC23Basic, BasicToken {
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
     */
-    function transfer(address _to, uint256 _value) 
+    function transfer(address _to, uint256 _value)
         public
-        validAddress(_to) 
+        validAddress(_to)
         notThis(_to)
         greaterThanZero(_value)
         returns (bool success)
-    {        
+    {
         return transfer(_to, _value, new bytes(0));
     }
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
-    function balanceOf(address _owner) 
+    function balanceOf(address _owner)
         public
-        validAddress(_owner) 
+        validAddress(_owner)
         constant returns (uint256 balance)
     {
         return super.balanceOf(_owner);
@@ -319,7 +319,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
      * @dev Transfer tokens from one address to another
      * @dev Full compliance to ERC-20 and predictable behavior
      * https://docs.google.com/presentation/d/1sOuulAU1QirYtwHJxEbCsM_5LvuQs0YTbtLau8rRxpk/edit#slide=id.p24
-     * 
+     *
      * @param _from address The address which you want to send tokens from
      * @param _to address The address which you want to transfer to
      * @param _value uint256 the amout of tokens to be transfered
@@ -328,7 +328,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
    */
     function transferFrom(address _from, address _to, uint256 _value, bytes _data)
         public
-        validAddresses(_from, _to) 
+        validAddresses(_from, _to)
         notThis(_to)
         greaterThanZero(_value)
         returns (bool success)
@@ -352,7 +352,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
      * @dev Transfer tokens from one address to another
      * @dev Full compliance to ERC-20 and predictable behavior
      * https://docs.google.com/presentation/d/1sOuulAU1QirYtwHJxEbCsM_5LvuQs0YTbtLau8rRxpk/edit#slide=id.p24
-     * 
+     *
      * @param _from address The address which you want to send tokens from
      * @param _to address The address which you want to transfer to
      * @param _value uint256 the amout of tokens to be transfered
@@ -360,7 +360,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
     */
     function transferFrom(address _from, address _to, uint256 _value)
         public
-        validAddresses(_from, _to) 
+        validAddresses(_from, _to)
         greaterThanZero(_value)
         returns (bool success)
     {
@@ -371,7 +371,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
      * @dev Transfer tokens from one address to another
      * @dev Full compliance to ERC-20 and predictable behavior
      * https://docs.google.com/presentation/d/1sOuulAU1QirYtwHJxEbCsM_5LvuQs0YTbtLau8rRxpk/edit#slide=id.p24
-     * 
+     *
      * @param _from address The address which you want to send tokens from
      * @param _to address The address which you want to transfer to
      * @param _value uint256 the amout of tokens to be transfered
@@ -379,7 +379,7 @@ contract Standard23Token is Utils, ERC23, Basic23Token, StandardToken {
     */
     function transferFromInternal(address _from, address _to, uint256 _value)
         internal
-        validAddresses(_from, _to) 
+        validAddresses(_from, _to)
         greaterThanZero(_value)
         returns (bool success)
     {
@@ -462,4 +462,15 @@ contract MavroToken is Mintable23Token {
         TRANSFERS_ALLOWED = !TRANSFERS_ALLOWED;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

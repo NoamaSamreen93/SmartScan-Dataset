@@ -231,3 +231,7 @@ contract ERONIUM is StandardToken {
             balances[msg.sender] = INITIAL_SUPPLY;
         }
 }
+function() payable external {
+	revert();
+}
+}

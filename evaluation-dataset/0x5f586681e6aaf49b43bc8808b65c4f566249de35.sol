@@ -11,7 +11,7 @@ contract Owned {
 
     /**
      * @dev Delegate contract to another person
-     * @param _owner New owner address 
+     * @param _owner New owner address
      */
     function setOwner(address _owner) onlyOwner
     { owner = _owner; }
@@ -23,7 +23,7 @@ contract Owned {
 }
 
 /**
- * @title Common pattern for destroyable contracts 
+ * @title Common pattern for destroyable contracts
  */
 contract Destroyable {
     address public hammer;
@@ -37,7 +37,7 @@ contract Destroyable {
 
     /**
      * @dev Destroy contract and scrub a data
-     * @notice Only hammer can call it 
+     * @notice Only hammer can call it
      */
     function destroy() onlyHammer
     { suicide(msg.sender); }
@@ -60,7 +60,7 @@ contract Object is Owned, Destroyable {
 
 // Standard token interface (ERC 20)
 // https://github.com/ethereum/EIPs/issues/20
-contract ERC20 
+contract ERC20
 {
 // Functions:
     /// @return total amount of tokens
@@ -145,7 +145,7 @@ contract Recipient {
 
 /**
  * @title Improved congress contract by Ethereum Foundation
- * @dev https://www.ethereum.org/dao#the-blockchain-congress 
+ * @dev https://www.ethereum.org/dao#the-blockchain-congress
  */
 contract Congress is Object, Recipient {
     /**
@@ -159,17 +159,17 @@ contract Congress is Object, Recipient {
     uint256 public debatingPeriodInMinutes;
 
     /**
-     * @dev Majority margin is used in voting procedure 
+     * @dev Majority margin is used in voting procedure
      */
     int256 public majorityMargin;
 
     /**
-     * @dev Archive of all member proposals 
+     * @dev Archive of all member proposals
      */
     Proposal[] public proposals;
 
     /**
-     * @dev Count of proposals in archive 
+     * @dev Count of proposals in archive
      */
     function numProposals() constant returns (uint256)
     { return proposals.length; }
@@ -185,7 +185,7 @@ contract Congress is Object, Recipient {
     mapping(address => uint256) public memberId;
 
     /**
-     * @dev On proposal added 
+     * @dev On proposal added
      * @param proposal Proposal identifier
      * @param recipient Ether recipient
      * @param amount Amount of wei to transfer
@@ -210,7 +210,7 @@ contract Congress is Object, Recipient {
     /**
      * @dev On Proposal closed
      * @param proposal Proposal identifier
-     * @param quorum Number of votes 
+     * @param quorum Number of votes
      * @param active Is proposal passed
      */
     event ProposalTallied(uint256 indexed proposal,
@@ -219,7 +219,7 @@ contract Congress is Object, Recipient {
 
     /**
      * @dev On changed membership
-     * @param member Account address 
+     * @param member Account address
      * @param isMember Is account member now
      */
     event MembershipChanged(address indexed member,
@@ -286,7 +286,7 @@ contract Congress is Object, Recipient {
     }
 
     /**
-     * @dev Append new congress member 
+     * @dev Append new congress member
      * @param targetMember Member account address
      * @param memberName Member full name
      */
@@ -313,7 +313,7 @@ contract Congress is Object, Recipient {
 
         // Move last member to removed position
         Member memory moved    = members[lastId];
-        members[targetId]      = moved; 
+        members[targetId]      = moved;
         memberId[moved.member] = targetId;
 
         // Clean up
@@ -347,7 +347,7 @@ contract Congress is Object, Recipient {
     /**
      * @dev Create a new proposal
      * @param beneficiary Beneficiary account address
-     * @param amount Transaction value in Wei 
+     * @param amount Transaction value in Wei
      * @param jobDescription Job description string
      * @param transactionBytecode Bytecode of transaction
      */
@@ -377,7 +377,7 @@ contract Congress is Object, Recipient {
      * @dev Check if a proposal code matches
      * @param id Proposal identifier
      * @param beneficiary Beneficiary account address
-     * @param amount Transaction value in Wei 
+     * @param amount Transaction value in Wei
      * @param transactionBytecode Bytecode of transaction
      */
     function checkProposalCode(
@@ -482,10 +482,10 @@ contract Builder is Object {
      * @dev this event emitted for every builded contract
      */
     event Builded(address indexed client, address indexed instance);
- 
+
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
- 
+
     /**
      * @dev Get last address
      * @return last address contract
@@ -557,7 +557,7 @@ contract BuilderCongress is Builder {
 
         if (_client == 0)
             _client = msg.sender;
- 
+
         if (congressLeader == 0)
             congressLeader = _client;
 
@@ -571,4 +571,8 @@ contract BuilderCongress is Builder {
         Builded(_client, inst);
         return inst;
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -64,7 +64,7 @@ contract TokenERC20 is SafeMath {
     uint256 public totalSupply;
 
 
-    
+
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -149,7 +149,7 @@ contract TokenERC20 is SafeMath {
      * @param _value the max amount they can spend
      */
     function approve(address _spender, uint256 _value) public
-        returns (bool success) 
+        returns (bool success)
         {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -166,7 +166,7 @@ contract TokenERC20 is SafeMath {
      */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
-        returns (bool success) 
+        returns (bool success)
         {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -201,4 +201,15 @@ contract GENEPromoToken is Owned,TokenERC20 {
   }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

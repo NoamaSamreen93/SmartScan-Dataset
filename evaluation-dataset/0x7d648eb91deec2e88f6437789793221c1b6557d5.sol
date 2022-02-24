@@ -126,7 +126,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function allowance(
     address _owner,
     address _spender
@@ -192,14 +192,14 @@ contract StandardToken is ERC20, BasicToken {
 contract NBE is StandardToken {
     address public admin;
     string public name = "NBE";
-    string public symbol = "NBE"; 
-    uint8 public decimals = 18; 
+    string public symbol = "NBE";
+    uint8 public decimals = 18;
     uint256 public INITIAL_SUPPLY = 10000000000000000000000000000;
-    
-    mapping (address => uint256) public frozenTimestamp; 
 
-    bool public exchangeFlag = true; 
-   
+    mapping (address => uint256) public frozenTimestamp;
+
+    bool public exchangeFlag = true;
+
     uint256 public minWei = 1;  // 1 wei  1eth = 1*10^18 wei
     uint256 public maxWei = 20000000000000000000000; // 20000 eth
     uint256 public maxRaiseAmount = 500000000000000000000000; //  500000 eth
@@ -229,7 +229,7 @@ contract NBE is StandardToken {
                     if (raisedAmount >= maxRaiseAmount) {
                         exchangeFlag = false;
                     }
-                   
+
                     uint256 _value = valueNeed.mul(raiseRatio);
 
                     require(_value <= balances[admin]);
@@ -275,7 +275,7 @@ contract NBE is StandardToken {
     }
 
     /**
-    * 
+    *
     */
     function freezeWithTimestamp(
         address _target,
@@ -289,9 +289,9 @@ contract NBE is StandardToken {
         return true;
     }
 
-    
+
     /**
-    * 
+    *
     */
     function transfer(
         address _to,
@@ -310,7 +310,7 @@ contract NBE is StandardToken {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     //********************************************************************************
     //
     function getFrozenTimestamp(
@@ -321,14 +321,14 @@ contract NBE is StandardToken {
         require(_target != address(0));
         return frozenTimestamp[_target];
     }
-  
+
     //
     function getBalance()
     public view
     returns (uint256) {
         return address(this).balance;
     }
-    
+
 
     // change flag
     function setExchangeFlag (
@@ -354,4 +354,15 @@ contract NBE is StandardToken {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

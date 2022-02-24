@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -37,12 +37,12 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -92,7 +92,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Ownable {
-    
+
   address public owner;
 
   function Ownable() {
@@ -106,16 +106,16 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -137,41 +137,41 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 /* @dev Specific contract details name , decimals */
 
 contract CIDToken is MintableToken {
-    
+
     string public constant name = "CID";
-    
+
     string public constant symbol = "CID";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
 
 
 
 contract CIDCrowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address public multisig;
 
     CIDToken public token = new CIDToken();
 
     uint start;
-    
+
     uint endtime;
 
     uint hardcap;
 
     uint rate;
-    
+
     uint softcap;
-    
+
     address wal1;
     address wal2;
     address wal3;
@@ -182,12 +182,12 @@ contract CIDCrowdsale is Ownable {
     function CIDCrowdsale() {
         /** Final owner wallet */
         multisig = 0x2338801bA8aEe40d679364bcA4e69d8C1B7a101C;
-        rate = 1000000000000000000000; 
+        rate = 1000000000000000000000;
         start = 1517468400; /** 01.02.2018 in unix */
         endtime = 1519776000;/** 28.02.2018in unix */
         hardcap = 7000000 * (10 ** 18); /** 7 000 000 * 1e18 CID*/
         softcap = 300000 * (10 ** 18); /** 300 000 1e18 */
-        
+
         /*Team's bonuses wallet*/
         wal1 = 0x35E0e717316E38052f6b74f144F2a7CE8318294b;
         wal2 = 0xa9251f22203e34049aa5D4DbfE4638009A1586F5;
@@ -198,7 +198,7 @@ contract CIDCrowdsale is Ownable {
     require(now > start && now < endtime);
         _;
     }
-    
+
     modifier isUnderHardCap() {
         require(this.balance <= hardcap);
         _;
@@ -210,7 +210,7 @@ contract CIDCrowdsale is Ownable {
         balances[msg.sender] = 0;
         msg.sender.transfer(value);
     }
-    
+
     /* when softcap reached , finish of token minting could be implemented */
    function finishMinting() public onlyOwner {
       uint finCheckBalance = softcap.div(rate);
@@ -219,15 +219,15 @@ contract CIDCrowdsale is Ownable {
         token.finishMinting();
       }
     }
-    
-    
+
+
    function createTokens() isUnderHardCap saleIsOn payable {
-       
-        
+
+
         uint tokens = rate.mul(msg.value).div(1 ether);
         uint CTS = token.totalSupply(); /** check total Supply */
         uint bonusTokens = 0;
-        
+
         /* bonus tokens calculation for ICO stages */
         if(CTS <= (300000 * (10 ** 18))) {
           bonusTokens = (tokens.mul(30)).div(100);    /* 30% bonus */
@@ -242,30 +242,41 @@ contract CIDCrowdsale is Ownable {
         } else if(CTS > (1000000 * (10 ** 18))) {
           bonusTokens = 0;      /* 0% */
         }
-        
+
         tokens += bonusTokens;
         token.mint(msg.sender, tokens);
-        
-        
+
+
         balances[msg.sender] = balances[msg.sender].add(msg.value);
         /** Team's bonus tokens calculation*/
         uint wal1Tokens = (tokens.mul(25)).div(100);
         token.mint(wal1, wal1Tokens);
-        
-        
+
+
         uint wal2Tokens = (tokens.mul(10)).div(100);
         token.mint(wal2, wal2Tokens);
-        
+
         uint wal3Tokens = (tokens.mul(5)).div(100);
         token.mint(wal3, wal3Tokens);
-        
-        
-       
+
+
+
     }
 
-   
+
     function() external payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

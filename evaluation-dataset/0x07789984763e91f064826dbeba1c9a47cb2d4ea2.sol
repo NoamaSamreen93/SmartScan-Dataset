@@ -321,8 +321,8 @@ contract EvaCoin is MintableToken, PullPayment {
     SaleStages public stage = SaleStages.PreSale;
 
     function EvaCoin() public {
-        keeper = msg.sender; 
-    }   
+        keeper = msg.sender;
+    }
 
     modifier onlyKeeper() {
         require(msg.sender == keeper);
@@ -410,18 +410,18 @@ contract EvaCoin is MintableToken, PullPayment {
         activateDividendsFunc(to);
         activateBonusFunc(from);
         activateBonusFunc(to);
-        return super.transferFrom(from, to, value); 
-    }   
-    
+        return super.transferFrom(from, to, value);
+    }
+
     // Override BasicToken#transfer
-    function transfer(address to, uint256 value) 
+    function transfer(address to, uint256 value)
     canTransfer activateDividends(to) activateBonus(to)
     public returns (bool) {
-        return super.transfer(to, value); 
+        return super.transfer(to, value);
     }
 
     function allowTransfer() onlyOwner public {
-        transferAllowed = true; 
+        transferAllowed = true;
         TransferAllowed(true);
     }
 
@@ -432,7 +432,7 @@ contract EvaCoin is MintableToken, PullPayment {
             raisedSale1USD += amount;
         } else if (stage == SaleStages.Sale2) {
             raisedSale2USD += amount;
-        } 
+        }
     }
 
     function canStartSale2() public constant returns (bool) {
@@ -449,8 +449,8 @@ contract EvaCoin is MintableToken, PullPayment {
     }
 
     // Override MintableToken#mint
-    function mint(address _to, uint256 _amount) 
-        onlyOwner canMint activateDividends(_to) activateBonus(_to) 
+    function mint(address _to, uint256 _amount)
+        onlyOwner canMint activateDividends(_to) activateBonus(_to)
         public returns (bool) {
         super.mint(_to, _amount);
 
@@ -460,7 +460,7 @@ contract EvaCoin is MintableToken, PullPayment {
             totalSupplySale1 += _amount;
         } else if (stage == SaleStages.Sale2) {
             totalSupplySale2 += _amount;
-        } 
+        }
     }
 
     // Override PullPayment#withdrawPayments
@@ -493,4 +493,15 @@ contract EvaCoin is MintableToken, PullPayment {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -69,15 +69,24 @@ contract TokenReceiver is Ownable {
 
     function receiveTokenWithInvoiceID(uint _invoiceID, uint _amount) public {
         require(token.transferFrom(msg.sender, address(this), _amount), "");
-        
+
         emit Receive(msg.sender, _invoiceID, _amount);
     }
 
     function changeToken(address _token) public onlyOwner {
         token = IERC20(_token);
     }
-    
+
     function reclaimToken(IERC20 _token, uint _amount) external onlyOwner {
         _token.transfer(owner, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

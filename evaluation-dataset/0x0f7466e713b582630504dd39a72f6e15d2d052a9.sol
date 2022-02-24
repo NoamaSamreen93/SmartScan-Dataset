@@ -117,7 +117,7 @@ contract Multiplier {
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -188,10 +188,21 @@ contract Multiplier {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

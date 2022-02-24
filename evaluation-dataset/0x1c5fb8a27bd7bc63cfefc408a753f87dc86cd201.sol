@@ -2,7 +2,7 @@ pragma solidity ^0.4.13;
 
 library CertsLib {
   struct SignatureData {
-    /* 
+    /*
      * status == 0x0 => UNKNOWN
      * status == 0x1 => PENDING
      * status == 0x2 => SIGNED
@@ -49,7 +49,7 @@ library CertsLib {
    * @param certHash {bytes32} - The sha256 hash of the json certificate
    * @param ipfsDataHash {string} - The ipfs multihash address of the data (0x00 means unkwon)
    * @param ipfsCertHash {string} - The ipfs multihash address of the certificate in json format (0x00 means unkwon)
-   * @return The id of the created certificate     
+   * @return The id of the created certificate
    */
   function createPOECertificate(Data storage self, bytes32 dataHash, bytes32 certHash, string ipfsDataHash, string ipfsCertHash) public returns (uint) {
     require (hasData(dataHash, certHash, ipfsDataHash, ipfsCertHash));
@@ -79,7 +79,7 @@ library CertsLib {
    * @param ipfsDataHash {string} - The ipfs multihash address of the data (0x00 means unkwon)
    * @param ipfsCertHash {string} - The ipfs multihash address of the certificate in json format (0x00 means unkwon)
    * @param entityId {uint} - The entity id which issues the certificate (0 if not issued by an entity)
-   * @return {uint} The id of the created certificate     
+   * @return {uint} The id of the created certificate
    */
   function createCertificate(Data storage self, EntityLib.Data storage ed, bytes32 dataHash, bytes32 certHash, string ipfsDataHash, string ipfsCertHash, uint entityId) senderCanIssueEntityCerts(ed, entityId) public returns (uint) {
     require (hasData(dataHash, certHash, ipfsDataHash, ipfsCertHash));
@@ -143,7 +143,7 @@ library CertsLib {
   function acceptCertificateTransfer(Data storage self, EntityLib.Data storage ed, uint certificateId) canAcceptTransfer(self, ed, certificateId) public {
     TransferData storage reqData = self.transferRequests[certificateId];
     self.certificates[certificateId].owner = reqData.newOwner;
-    self.certificates[certificateId].entityId = reqData.newEntityId;    
+    self.certificates[certificateId].entityId = reqData.newEntityId;
     CertificateTransferAccepted(certificateId, reqData.newOwner, reqData.newEntityId);
     delete self.transferRequests[certificateId];
   }
@@ -193,11 +193,11 @@ library CertsLib {
   }
 
   // MODIFIERS
-  
+
  /**
    * Returns True if msg.sender is the owner of the specified certificate. False otherwise.
    * @param self {object} - The data containing the certificate mappings
-   * @param id {uint} - The id of the certificate 
+   * @param id {uint} - The id of the certificate
    */
   modifier ownsCertificate(Data storage self, uint id) {
     require (self.certificates[id].owner == msg.sender);
@@ -212,15 +212,15 @@ library CertsLib {
    * @param entityId {uint} - The entityId which will issue the certificate
    */
   modifier senderCanIssueEntityCerts(EntityLib.Data storage ed, uint entityId) {
-    require (entityId == 0 
+    require (entityId == 0
      || (EntityLib.isValid(ed, entityId) && ed.entities[entityId].signers[msg.sender].status == 2));
-    _;    
+    _;
   }
 
   /**
    * Returns TRUE if the certificate has data and can be transfered to the new owner:
    * - When the certificate is owned by a peer: the sender must be the owner of the certificate
-   * - When the certificate belongs to an entity: the entity must be valid 
+   * - When the certificate belongs to an entity: the entity must be valid
    *   AND the signer must be a valid signer of the entity
    * @param self {object} - The data containing the certificate mappings
    * @param ed {object} - The data containing the entity mappings
@@ -263,7 +263,7 @@ library CertsLib {
 
     if (reqData.newOwner == msg.sender) {
       _;
-    } else if (reqData.newEntityId != 0) {      
+    } else if (reqData.newEntityId != 0) {
       EntityLib.EntityData storage newEntity = ed.entities[reqData.newEntityId];
       require (EntityLib.isValid(ed, reqData.newEntityId) && newEntity.signers[msg.sender].status == 2);
        _;
@@ -358,13 +358,13 @@ library EntityLib {
   function processValidation(Data storage self, bytes32 queryId, string result) public {
     uint entityId = self.entityIds[queryId];
     self.entityIds[queryId] = 0;
-    
+
     EntityData storage entity = self.entities[entityId];
 
     require (queryId == entity.oraclizeQueryId);
 
     string memory entityIdStr = uintToString(entityId);
-    string memory toCompare = strConcat(entityIdStr, ":", entity.dataHash); 
+    string memory toCompare = strConcat(entityIdStr, ":", entity.dataHash);
 
     if (stringsEqual(result, toCompare)) {
       if (entity.status == 4) { // if entity is waiting for renewal
@@ -392,7 +392,7 @@ library EntityLib {
     entity.expiration = expirationDate;
     EntityExpirationSet(entityId);
   }
-  
+
   /**
    * Sets a new renewal interval
    * @param self {object} - The data containing the entity mappings
@@ -475,7 +475,7 @@ library EntityLib {
       signersArr[i] = signersArr[signersArr.length - 1];
       signersArr[signersArr.length - 1] = 0;
       signersArr.length = signersArr.length - 1;
-      
+
       SignerRemoved(entityId, signerAddress);
     }
   }
@@ -667,7 +667,7 @@ library EntityLib {
   /**
    * Returns True if specified entity is validated or waiting to be renewed. False otherwise.
    * @param self {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    * @return {bool} - True if the entity is validated
    */
   function isValidated(Data storage self, uint id) view public returns (bool) {
@@ -677,7 +677,7 @@ library EntityLib {
  /**
   * Returns True if specified entity is not expired. False otherwise.
   * @param self {object} - The data containing the entity mappings
-  * @param id {uint} - The id of the entity to check 
+  * @param id {uint} - The id of the entity to check
   * @return {bool} - True if the entity is not expired
   */
   function isExpired(Data storage self, uint id) view public returns (bool) {
@@ -687,7 +687,7 @@ library EntityLib {
   /**
   * Returns True if specified entity is closed.
   * @param self {object} - The data containing the entity mappings
-  * @param id {uint} - The id of the entity to check 
+  * @param id {uint} - The id of the entity to check
   * @return {bool} - True if the entity is closed
   */
   function isClosed(Data storage self, uint id) view public returns (bool) {
@@ -697,7 +697,7 @@ library EntityLib {
  /**
    * Returns True if specified entity is validated and not expired
    * @param self {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    * @return {bool} - True if the entity is validated
    */
   function isValid(Data storage self, uint id) view public returns (bool) {
@@ -707,7 +707,7 @@ library EntityLib {
  /**
    * Returns True if specified entity exists
    * @param self {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    * @return {bool} - True if the entity exists
    */
   function exists(Data storage self, uint id) view public returns(bool) {
@@ -716,7 +716,7 @@ library EntityLib {
   }
 
   // MODIFIERS
-  
+
   /**
    * Valid if the renewal period is less than 31 days
    * @param renewalPeriod {uint} - The renewal period to check (in seconds)
@@ -734,11 +734,11 @@ library EntityLib {
     require(expiration - now > 0 && expiration - now <= 32 * 24 * 60 * 60); // Expiration date is in less than 32 days in the future
     _;
   }
-  
+
   /**
    * Returns True if specified entity is validated or waiting to be renewed. False otherwise.
    * @param self {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    */
   modifier isValidatedEntity(Data storage self, uint id) {
     require (isValidated(self, id));
@@ -748,7 +748,7 @@ library EntityLib {
   /**
    * Returns True if specified entity is validated or waiting to be renewed, not expired and not closed. False otherwise.
    * @param self {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    */
   modifier isValidEntity(Data storage self, uint id) {
     require (isValid(self, id));
@@ -758,11 +758,11 @@ library EntityLib {
   /**
   * Returns True if specified entity is validated. False otherwise.
   * @param self {object} - The data containing the entity mappings
-  * @param id {uint} - The id of the entity to check 
+  * @param id {uint} - The id of the entity to check
   */
   modifier notExpired(Data storage self, uint id) {
     require (!isExpired(self, id));
-    _;  
+    _;
   }
 
   /**
@@ -789,7 +789,7 @@ library EntityLib {
   /**
    * Returns True if current time is in renewal period for a valid entity. False otherwise.
    * @param self {object} - The data containing the entity mappings
-   * @param entityId {uint} - The id of the entity to check 
+   * @param entityId {uint} - The id of the entity to check
    */
   modifier isRenewalPeriod(Data storage self, uint entityId) {
     EntityData storage entity = self.entities[entityId];
@@ -800,7 +800,7 @@ library EntityLib {
   /**
    * True if sender is registered in entity. False otherwise.
    * @param self {object} - The data containing the entity mappings
-   * @param entityId {uint} - The id of the entity 
+   * @param entityId {uint} - The id of the entity
    */
   modifier signerBelongsToEntity(Data storage self, uint entityId) {
     EntityData storage entity = self.entities[entityId];
@@ -825,7 +825,7 @@ library EntityLib {
   /**
    * True if the signer was not yet added to an entity.
    * @param self {object} - The data containing the entity mappings
-   * @param entityId {uint} - The id of the entity 
+   * @param entityId {uint} - The id of the entity
    * @param signerAddress {address} - The signer to check
    */
   modifier signerIsNotYetRegistered(Data storage self, uint entityId, address signerAddress) {
@@ -837,7 +837,7 @@ library EntityLib {
   /**
    * True if the entity is validated AND the signer has a pending update with a matching IPFS data hash
    * @param self {object} - The data containing the entity mappings
-   * @param entityId {uint} - The id of the entity 
+   * @param entityId {uint} - The id of the entity
    * @param signerAddress {address} - The signer to check
    * @param signerDataHash {string} - The signer IPFS data pending of confirmation
    */
@@ -884,7 +884,7 @@ library EntityLib {
   event EntityClosed(uint indexed entityId);
   event SignerConfirmed(uint indexed entityId, address signerAddress);
   event EntityExpirationSet(uint indexed entityId);
-  event EntityRenewalSet(uint indexed entityId);  
+  event EntityRenewalSet(uint indexed entityId);
  }
 
 library SignLib {
@@ -1001,7 +1001,7 @@ library SignLib {
   /**
    * Returns True if specified entity is validated or waiting to be renewed, not expired and not closed. False otherwise.
    * @param ed {object} - The data containing the entity mappings
-   * @param id {uint} - The id of the entity to check 
+   * @param id {uint} - The id of the entity to check
    */
   modifier isValid(EntityLib.Data storage ed, uint id) {
     require (EntityLib.isValid(ed, id));
@@ -1016,16 +1016,16 @@ library SignLib {
    */
   modifier notHasSigningRequest(CertsLib.Data storage cd, uint certificateId, uint entityId) {
     require (cd.certificates[certificateId].entities[entityId].status != 0x1);
-    _;    
+    _;
   }
 
   /**
-   * Returns True if specified certificate has not been signed yet. False otherwise;   
+   * Returns True if specified certificate has not been signed yet. False otherwise;
    * @param cd {object} - The data containing the certificate mappings
    * @param certificateId {uint} - The id of the certificate to check
    * @param signerAddress {address} - The id of the certificate to check
    */
-  modifier notHasPeerSignature(CertsLib.Data storage cd, uint certificateId, address signerAddress) {    
+  modifier notHasPeerSignature(CertsLib.Data storage cd, uint certificateId, address signerAddress) {
     require (cd.certificates[certificateId].signatures[signerAddress].status != 0x1);
     _;
   }
@@ -1033,7 +1033,7 @@ library SignLib {
   /**
    * True if sender address is the owner of the entity or is a signer registered in entity. False otherwise.
    * @param ed {object} - The data containing the entity mappings
-   * @param entityId {uint} - The id of the entity 
+   * @param entityId {uint} - The id of the entity
    */
   modifier signerBelongsToEntity(EntityLib.Data storage ed, uint entityId) {
     require (entityId > 0 && (bytes(ed.entities[entityId].signers[msg.sender].signerDataHash).length != 0) && (ed.entities[entityId].signers[msg.sender].status == 0x2));
@@ -2236,7 +2236,7 @@ contract Ethertify is usingOraclize {
   EntityLib.Data ed;
   CertsLib.Data cd;
 
-  /** 
+  /**
    * Creates a contract
    */
   function Ethertify() public {
@@ -2266,7 +2266,7 @@ contract Ethertify is usingOraclize {
    */
   function createSigningEntity(string entityHash, bytes32 urlHash, uint expirationDate, uint renewalPeriod) public returns (uint) {
     uint entityId = ++ed.nEntities;
-    EntityLib.create(ed, entityId, entityHash, urlHash, expirationDate, renewalPeriod);      
+    EntityLib.create(ed, entityId, entityHash, urlHash, expirationDate, renewalPeriod);
     return entityId;
   }
 
@@ -2283,7 +2283,7 @@ contract Ethertify is usingOraclize {
     EntityLib.setExpiration(ed, entityId, expirationDate);
     return validateSigningEntity(entityId, url, oraclizeGas, oraclizeGasPrice);
   }
-  
+
   /**
    * Sets a new renewal interval
    * @param entityId {uint} - The id of the entity
@@ -2304,7 +2304,7 @@ contract Ethertify is usingOraclize {
    */
   function validateSigningEntity(uint entityId, string url, uint oraclizeGas, uint oraclizeGasPrice) public payable returns (bytes32) {
     uint maxGas = oraclizeGas == 0 ? 88000 : oraclizeGas; // 67000 gas from the process validation callback + 21000 for the transfer
-    
+
     if (EntityLib.canValidateSigningEntity(ed, entityId, url)) {
       oraclize_setCustomGasPrice(oraclizeGasPrice);
       uint queryCost = oraclize_getPrice("URL", maxGas);
@@ -2365,7 +2365,7 @@ contract Ethertify is usingOraclize {
   function requestRenewal(uint entityId, string url, uint oraclizeGas, uint oraclizeGasPrice) public payable returns (bytes32) {
     if (EntityLib.canRenew(ed, entityId, url)) {
       ed.entities[entityId].status = 4;
-      return validateSigningEntity(entityId, url, oraclizeGas, oraclizeGasPrice); 
+      return validateSigningEntity(entityId, url, oraclizeGas, oraclizeGasPrice);
     }
   }
 
@@ -2376,7 +2376,7 @@ contract Ethertify is usingOraclize {
   function closeEntity(uint entityId) public {
     EntityLib.closeEntity(ed, entityId);
   }
-  
+
   /**
    * Executes automatically when oraclize query is finished
    * @param queryId {bytes32} - The id of the oraclize query (returned by the call to oraclize_query method)
@@ -2430,12 +2430,12 @@ contract Ethertify is usingOraclize {
    * @param certHash {bytes32} - The sha256 hash of the json certificate
    * @param ipfsDataHash {string} - The ipfs multihash address of the data (0x00 means unkwon)
    * @param ipfsCertHash {string} - The ipfs multihash address of the certificate in json format (0x00 means unkwon)
-   * @return The id of the created certificate     
+   * @return The id of the created certificate
    */
   function createPOECertificate(bytes32 dataHash, bytes32 certHash, string ipfsDataHash, string ipfsCertHash) public returns (uint) {
     return CertsLib.createPOECertificate(cd, dataHash, certHash, ipfsDataHash, ipfsCertHash);
   }
-  
+
   /**
    * Creates a new certificate (with known owner)
    * @param dataHash {bytes32} - The hash of the certified data
@@ -2443,7 +2443,7 @@ contract Ethertify is usingOraclize {
    * @param ipfsDataHash {string} - The ipfs multihash address of the data (0x00 means unkwon)
    * @param ipfsCertHash {string} - The ipfs multihash address of the certificate in json format (0x00 means unkwon)
    * @param entityId {uint} - The entity id which issues the certificate (0 if not issued by an entity)
-   * @return {uint} The id of the created certificate     
+   * @return {uint} The id of the created certificate
    */
   function createCertificate(bytes32 dataHash, bytes32 certHash, string ipfsDataHash, string ipfsCertHash, uint entityId) public returns (uint) {
     return CertsLib.createCertificate(cd, ed, dataHash, certHash, ipfsDataHash, ipfsCertHash, entityId);
@@ -2496,7 +2496,7 @@ contract Ethertify is usingOraclize {
   function setIPFSData(uint certId, string ipfsDataHash, string ipfsCertHash) public {
     CertsLib.setIPFSData(cd, certId, ipfsDataHash, ipfsCertHash);
   }
-  
+
   // SIGNATURE METHODS
 
   /**
@@ -2581,12 +2581,12 @@ contract Ethertify is usingOraclize {
    * @param signerAddress {address} - The address of the signer (if known)
    * @param index {uint} - The index of the signer
    * @return {object} The signer details
-   */  
+   */
   function getSignerData(uint entityId, address signerAddress, uint index) constant public returns (address signer, uint status, string ipfsMultiHash) {
     uint s = 0;
     string memory h = "";
-    
-    if (signerAddress != 0) {      
+
+    if (signerAddress != 0) {
       s = ed.entities[entityId].signers[signerAddress].status;
       h = ed.entities[entityId].signers[signerAddress].signerDataHash;
     } else if (signerAddress == 0 && index < ed.entities[entityId].signersArr.length) {
@@ -2639,7 +2639,7 @@ contract Ethertify is usingOraclize {
       e = cd.certificates[certificateId].entities[entityId].exp;
     } else {
       entityId = 0;
-    }   
+    }
     return (entityId, s, e);
   }
 
@@ -2664,7 +2664,7 @@ contract Ethertify is usingOraclize {
     return (peerAddress, s, e);
   }
 
-  // EVENTS  
+  // EVENTS
   event EntityCreated(uint indexed entityId);
   event EntityValidated(uint indexed entityId);
   event EntityDataUpdated(uint indexed entityId);
@@ -2692,3 +2692,14 @@ contract Ethertify is usingOraclize {
 
   event OraclizeNotEnoughFunds(uint indexed entityId, uint queryCost);
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

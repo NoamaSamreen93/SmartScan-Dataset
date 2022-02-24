@@ -42,7 +42,7 @@ contract NormalToken is ERC20 {
     string public symbol;
     uint256 public totalSupply;
     uint8 public decimals;
-    mapping (address => uint256) private balances;   
+    mapping (address => uint256) private balances;
     mapping (address => mapping (address => uint256)) private allowed;
 
     function NormalToken(string _tokenName, string _tokenSymbol,uint256 _initialSupply,uint8 _decimals) public {
@@ -87,4 +87,13 @@ contract NormalToken is ERC20 {
         return allowed[_owner][_spender];
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

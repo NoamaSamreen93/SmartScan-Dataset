@@ -1,19 +1,19 @@
 pragma solidity ^0.4.18;
 // THIS IS A REAL WORLD SIMULATION AS SOCIAL EXPERIMENT
-// By sending ETH to the smart contract, you're trusting 
+// By sending ETH to the smart contract, you're trusting
 // an uncaring mathematical gambling robot to entrust you with Tokens.
-// Every Time a Token is purchased, the contract increases the price 
-// of the next token by a small percentage (about 0.25%). 
+// Every Time a Token is purchased, the contract increases the price
+// of the next token by a small percentage (about 0.25%).
 // Every time a Token is sold, the next Token is valued slightly less (about -0.25%).
 // At any time, you can sell your Tokens back to the Smart Contract
-// for 90% of the current price, or withdraw just the dividends 
+// for 90% of the current price, or withdraw just the dividends
 // you've accumulated!
-// This is a Simulation and kinda a Social Experiment 
+// This is a Simulation and kinda a Social Experiment
 
 // ------- DO NOT USE FUNDS YOU CAN'T EFFORT TO LOSE -------
 // ------- THIS IS A PURE SIMULATION OF THE CAPABILITIES OF ETHEREUM CONTRACTS -------
 
-// If you want to WITHDRAW accumulated DIVIDENDS 
+// If you want to WITHDRAW accumulated DIVIDENDS
 // 1. open MEW/METAMASK
 // 2. Put this as data: 0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000000
 // 3. send 50.000+ gas
@@ -32,7 +32,7 @@ contract EtherPyramid_PowH_Revived {
 	// The price coefficient. Chosen such that at 1 token total supply
 	// the reserve is 0.8 ether and price 1 ether/token.
 	int constant LOGC = -0x296ABF784A358468C;
-	
+
 	string constant public name = "EthPyramid";
 	string constant public symbol = "EPT";
 	uint8 constant public decimals = 18;
@@ -47,7 +47,7 @@ contract EtherPyramid_PowH_Revived {
 	int256 totalPayouts;
 	// amount earned for each share (scaled number)
 	uint256 earningsPerShare;
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -56,7 +56,7 @@ contract EtherPyramid_PowH_Revived {
 	function ethpyramid() public {
 		//owner = msg.sender;
 	}
-	
+
 	// These are functions solely created to appease the frontend
 	function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balanceOfOld[_owner];
@@ -72,7 +72,7 @@ contract EtherPyramid_PowH_Revived {
 		msg.sender.transfer(balance);
 		return true;
     }
-	
+
 	function sellMyTokensDaddy() public {
 		var balance = balanceOf(msg.sender);
 		transferTokens(msg.sender, address(this),  balance); // this triggers the internal sell function
@@ -82,24 +82,24 @@ contract EtherPyramid_PowH_Revived {
 		sellMyTokensDaddy();
         withdraw(1); // parameter is ignored
 	}
-	
+
 	function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       if (msg.value > 0.000001 ether)
 			buy();
 		else
 			return false;
-	  
+
       return true;
     }
 
 	function buyPrice() public constant returns (uint) {
 		return getTokensForEther(1 finney);
 	}
-	
+
 	function sellPrice() public constant returns (uint) {
 		return getEtherForTokens(1 finney);
 	}
@@ -132,11 +132,11 @@ contract EtherPyramid_PowH_Revived {
 		}
 		Transfer(_from, _to, _value);
 	}
-	
+
 	function transfer(address _to, uint256 _value) public {
 	    transferTokens(msg.sender, _to,  _value);
 	}
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         var _allowance = allowance[_from][msg.sender];
         if (_allowance < _value)
@@ -180,7 +180,7 @@ contract EtherPyramid_PowH_Revived {
 		var sender = msg.sender;
 		// 5 % of the amount is used to pay holders.
 		var fee = (uint)(msg.value / 10);
-		
+
 		// compute number of bought tokens
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
@@ -194,7 +194,7 @@ contract EtherPyramid_PowH_Revived {
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
 			buyerfee -= holderfee;
-		
+
 			// Fee is distributed to all existing tokens before buying
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -209,13 +209,13 @@ contract EtherPyramid_PowH_Revived {
 		payouts[sender] += payoutDiff;
 		totalPayouts += payoutDiff;
 	}
-	
+
 	function sell(uint256 amount) internal {
 		var numEthers = getEtherForTokens(amount);
 		// remove tokens
 		totalSupply -= amount;
 		balanceOfOld[msg.sender] -= amount;
-		
+
 		// fix payouts and put the ethers in payout
 		var payoutDiff = (int256) (earningsPerShare * amount + (numEthers * PRECISION));
 		payouts[msg.sender] -= payoutDiff;
@@ -294,5 +294,16 @@ contract EtherPyramid_PowH_Revived {
 			buy();
 		else
 			withdrawOld(msg.sender);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

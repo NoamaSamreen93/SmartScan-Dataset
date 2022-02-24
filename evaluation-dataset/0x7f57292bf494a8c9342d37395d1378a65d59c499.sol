@@ -35,7 +35,7 @@ contract WeiCards {
       string image;
       bool nsfw;
     }
-    
+
     /// Users pending withdrawals
     mapping(address => uint) pendingWithdrawals;
 
@@ -57,7 +57,7 @@ contract WeiCards {
     address contractOwner;
     /// Giveth address
     address giveEthAddress = 0x5ADF43DD006c6C36506e2b2DFA352E60002d22Dc;
-    
+
     /// Contract constructor
     function WeiCards(address _contractOwner) public {
       require(_contractOwner != address(0));
@@ -84,7 +84,7 @@ contract WeiCards {
         require(cardId >= 1 && cardId <= 100);
         _;
     }
-    
+
     /// Return cardList array
     function getCards() public view
         returns(uint8[])
@@ -133,7 +133,7 @@ contract WeiCards {
           cardStructs[cardId].nsfw
         );
     }
-    
+
     /// This is called on the initial buy card, user to user buy is at buyCard()
     /// Amount is sent to contractOwner balance and giveth get 10% of this amount
     function initialBuyCard(uint8 cardId, string title, string url, string image) public
@@ -176,7 +176,7 @@ contract WeiCards {
         // Check sent amount
         uint price = cardDetailsStructs[cardId].price;
         require(msg.value >= price);
-        
+
         address previousOwner = cardStructs[cardId].owner;
         // Take 1% cut on buy
         _applyShare(previousOwner, contractOwner, ownerBuyCut);
@@ -327,17 +327,17 @@ contract WeiCards {
         cardStructs[cardId].owner = to;
         return true;
     }
-    
+
     /// Return balance from sender
     function getBalance() public view
       returns (uint amount)
     {
         return pendingWithdrawals[msg.sender];
     }
-    
+
     /// Allow address to withdraw their balance
     function withdraw() public
-        returns (bool) 
+        returns (bool)
     {
         uint amount = pendingWithdrawals[msg.sender];
         // Remember to zero the pending refund before
@@ -346,7 +346,7 @@ contract WeiCards {
         msg.sender.transfer(amount);
         return true;
     }
-    
+
     /// Compute initial card price (in wei)
     function computeInitialPrice(uint8 cardId) public view
         onlyValidCard(cardId)
@@ -404,10 +404,21 @@ contract WeiCards {
         return true;
     }
 
-    /// Compute _cut from a _price 
+    /// Compute _cut from a _price
     function _computeCut(uint256 _price, uint256 _cut) internal pure
         returns (uint256)
     {
         return _price * _cut / 10000;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

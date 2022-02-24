@@ -64,7 +64,7 @@ contract Cyle {
     address cyle = 0x0bAFb154b0E48BC9C483B92A0Cf00Cfb3d132EC7;
 
     uint256 blacklistedAmountOfBlocks = 5760;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (uint256 => bool) public blockHasBeenMined;
@@ -116,10 +116,10 @@ contract Cyle {
     }
 
     constructor() public {
-        totalSupply = 450000000 * 10 ** uint256(decimals);  
-        balanceOf[address(this)] = totalSupply;             
-        name = "Cyle";                                   
-        symbol = "CYLE";                               
+        totalSupply = 450000000 * 10 ** uint256(decimals);
+        balanceOf[address(this)] = totalSupply;
+        name = "Cyle";
+        symbol = "CYLE";
         cyleGenesisBlock = block.number;
         lastBlock = block.number;
         publicMineSupply = SafeMath.div(totalSupply,2);
@@ -156,7 +156,7 @@ contract Cyle {
         blockHasBeenMined[getCurrentCyleBlock()] = true;
         blacklistedTillBlock[msg.sender] = SafeMath.add(getCurrentCyleBlock(), blacklistedAmountOfBlocks);
     }
-    
+
     function getRemainingPublicMineSupply() public view returns (uint256 _amount){
         return publicMineSupply;
     }
@@ -316,11 +316,11 @@ contract Cyle {
     }
 
     function getCurrentMasternodeNumerator() public view returns(uint256 _numerator){
-        return masternodeRateNumerator;    
+        return masternodeRateNumerator;
     }
- 
+
     function getCurrentMasternodeDenominator() public view returns(uint256 _denominator){
-        return masternodeRateDenominator;    
+        return masternodeRateDenominator;
     }
 
     function getTotalSupply() public view returns (uint256 _totalSupply){
@@ -416,7 +416,7 @@ contract Cyle {
            masternodeRateDenominator=100000;
         }
     }
-    
+
 }
 
 library SafeMath {
@@ -445,4 +445,13 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -72,7 +72,7 @@ contract Experiment {
         require(administrators[_customerAddress]);
         _;
     }
-    
+
     uint ACTIVATION_TIME = 1540957500;
 
 
@@ -81,7 +81,7 @@ contract Experiment {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -158,7 +158,7 @@ contract Experiment {
     uint256 constant internal tokenPriceIncremental_ = 0.00000008 ether;
     uint256 constant internal magnitude = 2**64;
 
-    
+
     // 80/20 FUND TAX CONTRACT ADDRESS
     address constant public giveEthFundAddress = 0x183feBd8828a9ac6c70C0e27FbF441b93004fC05;
     uint256 public totalEthFundRecieved; // total ETH FUND recieved from this contract
@@ -207,13 +207,13 @@ contract Experiment {
     {
         // add administrators here
         administrators[0x183feBd8828a9ac6c70C0e27FbF441b93004fC05] = true;
-        
+
         // admin
         ambassadors_[0x183feBd8828a9ac6c70C0e27FbF441b93004fC05] = true;
 
-        
-        
-        
+
+
+
     }
 
 
@@ -225,7 +225,7 @@ contract Experiment {
         payable
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseInternal(msg.value, _referredBy);
     }
@@ -238,13 +238,13 @@ contract Experiment {
         payable
         public
     {
-        
+
         require(tx.gasprice <= 0.01 szabo);
         purchaseInternal(msg.value, 0x0);
     }
 
     /**
-   
+
      */
     function payFund() payable public {
       uint256 ethToPay = SafeMath.sub(totalEthFundCollected, totalEthFundRecieved);
@@ -870,4 +870,12 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

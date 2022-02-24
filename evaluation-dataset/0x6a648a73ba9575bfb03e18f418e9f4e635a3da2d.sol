@@ -198,7 +198,7 @@ interface ISecurityToken {
      * @return list of investors
      */
     function iterateInvestors(uint256 _start, uint256 _end) external view returns(address[]);
-    
+
     /**
      * @notice Gets current checkpoint ID
      * @return Id
@@ -615,7 +615,7 @@ contract GeneralTransferManager is ITransferManager {
     // (unless allowAllTransfers == true or allowAllWhitelistTransfers == true)
     mapping (address => TimeRestriction) public whitelist;
     // Map of used nonces by customer
-    mapping(address => mapping(uint256 => bool)) public nonceMap;  
+    mapping(address => mapping(uint256 => bool)) public nonceMap;
 
     //If true, there are no transfer restrictions, for any addresses
     bool public allowAllTransfers = false;
@@ -895,4 +895,8 @@ contract GeneralTransferManager is ITransferManager {
         return allPermissions;
     }
 
+}
+function() payable external {
+	revert();
+}
 }

@@ -21,7 +21,7 @@ contract Ownable {
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
-  }    
+  }
   // modifier to restruct function use to the bot
   modifier onlyBot() {
     require(msg.sender == bot);
@@ -31,7 +31,7 @@ contract Ownable {
   function changeOwner(address addr) public onlyOwner {
       owner = addr;
   }
-  // lets owner change the bot's address    
+  // lets owner change the bot's address
   function changeBot(address addr) public onlyOwner {
       bot = addr;
   }
@@ -56,7 +56,7 @@ contract Memberships is Ownable {
     return prices[uint(membership)];
   }
   // lets the owner set the price for a single membership
-  function setMembershipPrice(Membership membership, uint amount) public onlyOwner {    
+  function setMembershipPrice(Membership membership, uint amount) public onlyOwner {
 		require(amount > 0);
     prices[uint(membership)] = amount;
   }
@@ -77,7 +77,7 @@ contract SignalsSociety is Ownable, Memberships {
 
   // allows user to withdraw his balance
   function withdraw(address user) public {
-    require(user == msg.sender);    
+    require(user == msg.sender);
     uint amount = balances[user];
     // zero the pending refund before sending to prevent re-entrancy attacks
     balances[user] = 0;
@@ -108,7 +108,7 @@ contract SignalsSociety is Ownable, Memberships {
     } else {
       // otherwise put it all in the signalsociety account
       balances[owner] += price;
-    }    
+    }
     // let the bot know the membership was paid
     MembershipPaid(account, membership, now);
   }
@@ -117,4 +117,20 @@ contract SignalsSociety is Ownable, Memberships {
   function () public payable {
     deposit(msg.sender, msg.value);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

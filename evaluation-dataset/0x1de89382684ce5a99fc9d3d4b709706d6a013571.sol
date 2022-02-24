@@ -654,7 +654,7 @@ contract BaseGame is ERC721Token {
         //fire forecast!
         emit NewForecast(tokenOwner[_tokenId], _tokenId, newForecastId, _gameId, _forecastData);
         return newForecastId;
-    }    
+    }
 }
 
 
@@ -1263,4 +1263,15 @@ contract SolutionGame is HWCIntegration {
         }
         return results;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

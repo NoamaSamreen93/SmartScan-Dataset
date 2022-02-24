@@ -12,7 +12,7 @@ library SafeMath {
         // Gas optimization: this is cheaper than asserting 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
         // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
-        if (a == 0) 
+        if (a == 0)
             return 0;
 
         c = a * b;
@@ -52,11 +52,11 @@ contract Crowdsale {
     uint256 public tokensClaimed;               // Total Number of tokens claimed by participants
     uint256 public icoDeadline;                 // Duration this ICO will end
     uint256 public tokensClaimableAfter;        // Duration after tokens will be claimable
-    uint256 public tokensPerWei;                // How many token a buyer gets per wei 
-    Token public tokenReward;                   // Token being distributed 
+    uint256 public tokensPerWei;                // How many token a buyer gets per wei
+    Token public tokenReward;                   // Token being distributed
 
     // Map of crowdsale participants, address as key and Participant structure as value
-    mapping(address => Participant) public participants;    
+    mapping(address => Participant) public participants;
 
     // This is a type for a single Participant
     struct Participant {
@@ -80,7 +80,7 @@ contract Crowdsale {
         uint256 durationTokensClaimableAfterInDays,
         uint256 tokensForOneWei,
         address addressOfToken
-    ) 
+    )
         public
     {
         owner = msg.sender;
@@ -98,53 +98,53 @@ contract Crowdsale {
      * This function is able to buy token when the following four cases are all met:
      *      - Before ICO deadline
      *      - Payer address is whitelisted in this contract
-     *      - Sent ether is equal or bigger than minimum transaction (0.05 ether) 
+     *      - Sent ether is equal or bigger than minimum transaction (0.05 ether)
      *      - There are enough tokens to sell in this contract (tokens balance of contract minus tokensSold)
      */
     function() payable public {
         require(now < icoDeadline);
-        require(participants[msg.sender].whitelisted);             
-        require(msg.value >= 0.01 ether); 
+        require(participants[msg.sender].whitelisted);
+        require(msg.value >= 0.01 ether);
         uint256 tokensToBuy = SafeMath.mul(msg.value, tokensPerWei);
         require(tokensToBuy <= SafeMath.sub(tokenReward.balanceOf(this), tokensSold));
-        participants[msg.sender].tokens = SafeMath.add(participants[msg.sender].tokens, tokensToBuy);      
+        participants[msg.sender].tokens = SafeMath.add(participants[msg.sender].tokens, tokensToBuy);
         amountRaisedInWei = SafeMath.add(amountRaisedInWei, msg.value);
         tokensSold = SafeMath.add(tokensSold, tokensToBuy);
     }
-    
+
     /**
-    * Add single address into the whitelist. 
+    * Add single address into the whitelist.
     * Note: Use this function for a single address to save transaction fee
-    */ 
+    */
     function addToWhitelist(address addr) onlyOwner public {
-        participants[addr].whitelisted = true;   
+        participants[addr].whitelisted = true;
     }
 
     /**
-    * Remove single address from the whitelist. 
+    * Remove single address from the whitelist.
     * Note: Use this function for a single address to save transaction fee
-    */ 
+    */
     function removeFromWhitelist(address addr) onlyOwner public {
-        participants[addr].whitelisted = false;   
+        participants[addr].whitelisted = false;
     }
 
     /**
-    * Add multiple addresses into the whitelist. 
+    * Add multiple addresses into the whitelist.
     * Note: Use this function for more than one address to save transaction fee
-    */ 
+    */
     function addAddressesToWhitelist(address[] addresses) onlyOwner public {
         for (uint i = 0; i < addresses.length; i++) {
-            participants[addresses[i]].whitelisted = true;   
+            participants[addresses[i]].whitelisted = true;
         }
     }
 
     /**
     * Remove multiple addresses from the whitelist
     * Note: Use this function for more than one address to save transaction fee
-    */ 
+    */
     function removeAddressesFromWhitelist(address[] addresses) onlyOwner public {
         for (uint i = 0; i < addresses.length; i++) {
-            participants[addresses[i]].whitelisted = false;   
+            participants[addresses[i]].whitelisted = false;
         }
     }
 
@@ -152,18 +152,18 @@ contract Crowdsale {
 
     /**
     * Fundraiser address claims the raised funds after ICO deadline
-    */ 
+    */
     function withdrawFunds() afterIcoDeadline public {
         require(fundRaiser == msg.sender);
         fundRaiser.transfer(address(this).balance);
-        emit FundTransfer(fundRaiser, address(this).balance);        
+        emit FundTransfer(fundRaiser, address(this).balance);
     }
 
     /**
     * Burn unsold tokens after ICO deadline
     * Note: This function is designed to be used after Final-ICO period to burn unsold tokens
     */
-    function burnUnsoldTokens()  onlyOwner afterIcoDeadline public {  
+    function burnUnsoldTokens()  onlyOwner afterIcoDeadline public {
         uint256 tokensUnclaimed = SafeMath.sub(tokensSold, tokensClaimed);
         uint256 unsoldTokens = SafeMath.sub(tokenReward.balanceOf(this), tokensUnclaimed);
         tokenReward.burn(unsoldTokens);
@@ -173,13 +173,24 @@ contract Crowdsale {
 
     /**
     * Each participant will be able to claim his tokens after duration tokensClaimableAfter
-    */ 
+    */
     function withdrawTokens() afterTokensClaimableDeadline public {
-        require(participants[msg.sender].whitelisted);                
-        require(!participants[msg.sender].tokensClaimed);        
+        require(participants[msg.sender].whitelisted);
+        require(!participants[msg.sender].tokensClaimed);
         participants[msg.sender].tokensClaimed = true;
         uint256 tokens = participants[msg.sender].tokens;
-        tokenReward.transfer(msg.sender, tokens); 
+        tokenReward.transfer(msg.sender, tokens);
         tokensClaimed = SafeMath.add(tokensClaimed, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

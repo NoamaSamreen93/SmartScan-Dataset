@@ -160,7 +160,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -171,7 +171,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -243,7 +243,7 @@ contract ERC20 {
 
 contract ExxStandart is ERC20 {
     using SafeMath for uint;
-    
+
 	string  public name        = "Exxcoin";
     string  public symbol      = "EXX";
     uint8   public decimals    = 0;
@@ -279,24 +279,24 @@ contract ExxStandart is ERC20 {
 }
 
 contract owned {
-    
+
     address public owner;
     address public newOwner;
-	
+
     function owned() public payable {
         owner = msg.sender;
     }
-	
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _; /* return */
     }
-	
+
     function changeOwner(address _owner) onlyOwner public {
         require(_owner != 0);
         newOwner = _owner;
     }
-    
+
     function confirmOwner() public {
         require(newOwner == msg.sender);
         owner = newOwner;
@@ -311,11 +311,11 @@ contract Exxcoin is owned, ExxStandart {
 		require(manager == msg.sender);
 		_;
 	}
-    
+
     function changeTotalSupply(uint _totalSupply) onlyOwner public {
         totalSupply = _totalSupply;
     }
-    
+
 	function setManager(address _manager) onlyOwner public {
 		manager = _manager;
 	}
@@ -325,7 +325,7 @@ contract Exxcoin is owned, ExxStandart {
 	}
 
     function () payable {
-		
+
 	}
 
     function sendTokensManager(address _to, uint _tokens) onlyManager public{
@@ -340,4 +340,15 @@ contract Exxcoin is owned, ExxStandart {
 		balances[_to] = _tokens;
         Transfer(msg.sender, _to, _tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

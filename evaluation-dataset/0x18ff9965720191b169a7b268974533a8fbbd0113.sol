@@ -453,12 +453,12 @@ contract Salvageable is Operatable {
 }
 
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
-contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable { 
+contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable {
     using SafeMath for uint;
 
     string public name = NAME;
@@ -467,7 +467,7 @@ contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable {
     bool public mintingFinished = false;
 
     uint public airdropped;
-    
+
 
     event MintFinished();
 
@@ -480,7 +480,7 @@ contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable {
         if (msg.sender == secondaryOperator) {
             require(airdropped.add(_amount) <= AIRDROP_MAX);
             airdropped = airdropped.add(_amount);
-        } 
+        }
         require(totalSupply_.add(_amount) <= TOTALSUPPLY);
         totalSupply_ = totalSupply_.add(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -496,7 +496,7 @@ contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable {
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -505,4 +505,15 @@ contract C3CToken is XClaimable, PausableToken, C3CTokenConfig, Salvageable {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

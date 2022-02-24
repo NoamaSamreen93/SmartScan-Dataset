@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -194,7 +194,7 @@ contract DBXTTest3 is Ownable,StandardToken {
     uint256 public decimals = 18;
     uint256 public INITIAL_SUPPLY = 20000000 * 1 ether;
 
-    
+
     address public beneficiary;
 
     uint256 public priceETH;
@@ -253,7 +253,7 @@ contract DBXTTest3 is Ownable,StandardToken {
     }
 
     function doPurchase(address _sender, uint256 _value) private onlyAfter(startTime) onlyBefore(endTime) {
-        
+
         require(!crowdsaleFinished);
 
         uint256 dtCount = _value.mul(priceDT).div(priceETH);
@@ -280,4 +280,20 @@ contract DBXTTest3 is Ownable,StandardToken {
         emit Burn(msg.sender, _value);
         return true;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

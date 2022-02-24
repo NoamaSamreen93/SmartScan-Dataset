@@ -39,7 +39,7 @@ contract Whitelisted is Owned {
         whitelist[who] = true;
         emit WhitelistModified(who, true);
     }
-    
+
     function removeFromWhitelist(address who) public onlyOwner {
         whitelist[who] = false;
         emit WhitelistModified(who, false);
@@ -66,7 +66,7 @@ contract TokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -201,7 +201,7 @@ contract Ellobitz is TokenERC20, Owned, Whitelisted {
     uint256 internal activeMine;
     uint256 internal mineSize;
     bool internal firstChip;
-    
+
     mapping(address => uint) public lastChipTime;
 
     event MineFound(address indexed chipper, uint256 activeMine);
@@ -238,7 +238,7 @@ contract Ellobitz is TokenERC20, Owned, Whitelisted {
         _firstChipBonus,
         _chipSpeed
     ) public {
-        
+
         // variable setting
         mineCount = _mineCount;
         minMineSize = _minMineSize;
@@ -260,10 +260,10 @@ contract Ellobitz is TokenERC20, Owned, Whitelisted {
     }
 
     function chip(uint256 mineNumber) public whitelisted {
-        
+
         require(mineNumber == activeMine, "Chipped wrong mine");
         require(now >= lastChipTime[msg.sender] + chipSpeed, "Chipped too fast");
-        
+
         uint256 thisChipNoCap = firstChip ? firstChipBonus + chipSize : chipSize;
         uint256 thisChip = thisChipNoCap > mineSize ? mineSize : thisChipNoCap;
 
@@ -319,4 +319,15 @@ contract Ellobitz is TokenERC20, Owned, Whitelisted {
         ));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

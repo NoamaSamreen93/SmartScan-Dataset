@@ -448,7 +448,7 @@ contract Purpose is StandardToken, BurnableToken, RBAC {
     totalSupply = 1000000000 ether;
     balances[supplier] = totalSupply;
   }
-  
+
   // used by burner contract to burn athenes tokens
   function supplyBurn(uint256 _value) external onlyRole(ROLE_BURN) returns (bool) {
     require(_value > 0);
@@ -506,7 +506,7 @@ contract Burner {
     lastBurn = _start;
     burnPerweiYearly = _burnPerweiYearly;
   }
-  
+
   function burn () external {
     // get how much purpose will be burned
     uint256 amount = burnable();
@@ -534,4 +534,15 @@ contract Burner {
     if (amount > balance) return balance;
     return amount;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -568,7 +568,7 @@ contract Ownable {
 
 // File: contracts/ERC223ReceivingContract.sol
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -599,7 +599,7 @@ contract Carati is ERC20Detailed, ERC20Mintable, ERC20Burnable, Ownable {
         }
         emit Transfer(msg.sender, _to, _value);
     }
-    
+
     // Overridden Backwards compatible transfer method without _data param (ERC223 Specification)
     function transfer(address _to, uint _value) public returns (bool) {
         uint codeLength;
@@ -618,4 +618,15 @@ contract Carati is ERC20Detailed, ERC20Mintable, ERC20Burnable, Ownable {
         }
         emit Transfer(msg.sender, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

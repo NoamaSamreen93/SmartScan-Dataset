@@ -441,15 +441,15 @@ contract IagonToken is Ownable, Claimable, PausableToken, CappedToken {
     bool public fused = false;
 
    /**
-     * @dev Constructor 
+     * @dev Constructor
      */
     function IagonToken() public CappedToken(1) PausableToken() {
         cap = 200000000 * (10 ** uint256(decimals)); // hardcoding cap
     }
 
-    /** 
+    /**
     * @dev function to allow the owner to withdraw any ETH balance associated with this contract address
-    * onlyOwner can call this, so it's safe to initiate a transfer 
+    * onlyOwner can call this, so it's safe to initiate a transfer
     */
     function withdraw() onlyOwner public {
         msg.sender.transfer(this.balance);
@@ -467,8 +467,8 @@ contract IagonToken is Ownable, Claimable, PausableToken, CappedToken {
         return super.pause();
     }
 
- 	 /** 
- 	 * @dev Function to set the value of the fuse internal variable.  Note that there is 
+ 	 /**
+ 	 * @dev Function to set the value of the fuse internal variable.  Note that there is
  	 * no "unfuse" functionality, by design.
  	 */
     function fuse() whenNotFused onlyOwner public {
@@ -476,4 +476,12 @@ contract IagonToken is Ownable, Claimable, PausableToken, CappedToken {
 
         Fused();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

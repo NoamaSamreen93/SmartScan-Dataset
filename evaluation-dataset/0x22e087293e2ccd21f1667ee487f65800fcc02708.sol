@@ -14,9 +14,9 @@ contract AT{
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
-     event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-   
+
     function AT() public {
         balances[msg.sender] = 20000000000000;               // Give the creator all initial tokens
         totalSupply = 20000000000000;                        // Update total supply
@@ -57,5 +57,16 @@ contract AT{
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

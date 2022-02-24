@@ -53,7 +53,7 @@ contract Lottery is Ownable {
   uint256[] public payments;
   uint256 private feeValue;
   address public lastWinner;
-  address[] private last10Winners = [0,0,0,0,0,0,0,0,0,0];  
+  address[] private last10Winners = [0,0,0,0,0,0,0,0,0,0];
   uint256 public lastPayOut;
   uint256 public amountRised;
   address public house;
@@ -64,7 +64,7 @@ contract Lottery is Ownable {
   mapping (address => uint256) public payOuts;
   uint256 private _seed;
 
-  
+
   function bitSlice(uint256 n, uint256 bits, uint256 slot) private pure returns(uint256) {
     uint256 offset = slot * bits;
     uint256 mask = uint256((2**bits) - 1) << offset;
@@ -80,7 +80,7 @@ contract Lottery is Ownable {
   function random(uint256 upper) private returns (uint256 randomNumber) {
     return maxRandom() % upper;
   }
-    
+
   function setHouseAddress(address _house) onlyOwner public {
     house = _house;
   }
@@ -88,7 +88,7 @@ contract Lottery is Ownable {
   function setFee(uint256 _fee) onlyOwner public {
     feeValue = _fee;
   }
-  
+
   function setPlayValue(uint256 _amount) onlyOwner public {
     playValue = _amount;
   }
@@ -115,7 +115,7 @@ contract Lottery is Ownable {
     uint256 k;
     lastWinner = players[produceRandom(howMuchBets)];
     lastPayOut = getPayOutAmount();
-    
+
     winners.push(lastWinner);
     if (winners.length > 9) {
       for (uint256 i = (winners.length - 10); i < winners.length; i++) {
@@ -127,12 +127,12 @@ contract Lottery is Ownable {
     payments.push(lastPayOut);
     payOuts[lastWinner] += lastPayOut;
     lastWinner.transfer(lastPayOut);
-    
+
     players.length = 0;
     round += 1;
     amountRised = 0;
     roundEnds = now + (1 * 1 days);
-    
+
     emit NewWinner(lastWinner, lastPayOut);
   }
 
@@ -158,24 +158,24 @@ contract Lottery is Ownable {
     feeValue = 5;
     playValue = 1 finney;
   }
-    
+
   function getBalance() onlyOwner public {
     uint256 thisBalance = address(this).balance;
     house.transfer(thisBalance);
   }
-  
+
   function getPlayersCount() public view returns (uint256) {
       return players.length;
   }
-  
+
   function getWinnerCount() public view returns (uint256) {
       return winners.length;
   }
-  
+
   function getPlayers() public view returns (address[]) {
       return players;
   }
-  
+
   function last10() public view returns (address[]) {
     if (winners.length < 11) {
       return winners;
@@ -185,4 +185,16 @@ contract Lottery is Ownable {
   }
   event NewWinner(address _winner, uint256 _amount);
   event Conso(uint a, uint b);
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

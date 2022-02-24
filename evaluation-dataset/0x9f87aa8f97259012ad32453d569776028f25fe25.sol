@@ -1,31 +1,31 @@
 pragma solidity ^0.4.24;
 interface Interfacemc {
-  
+
   function balanceOf(address who) external view returns (uint256);
-  
+
   function allowance(address owner, address spender)
     external view returns (uint256);
 
   function transfer(address to, uint256 value) external returns (bool);
-  
+
   function approve(address spender, uint256 value)
     external returns (bool);
 
   function transferFrom(address from, address to, uint256 value)
     external returns (bool);
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
     uint256 value
   );
-  
+
   event Approval(
     address indexed owner,
     address indexed spender,
     uint256 value
   );
-  
+
 }
 
 library SafeMath {
@@ -72,14 +72,14 @@ contract LibraFacebook is Interfacemc{
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
     uint256 public totalSupply;
-    string public name = "Libra Facebook"; 
-    uint8 public decimals = 8; 
+    string public name = "Libra Facebook";
+    uint8 public decimals = 8;
     string public symbol = "LBA";
     address private _owner;
-    
+
     mapping (address => bool) public _notransferible;
-    mapping (address => bool) private _administradores; 
-    
+    mapping (address => bool) private _administradores;
+
     constructor() public{
         _owner = msg.sender;
         totalSupply = 1000000000000000000;
@@ -90,7 +90,7 @@ contract LibraFacebook is Interfacemc{
     function isAdmin(address dir) public view returns(bool){
         return _administradores[dir];
     }
-    
+
     modifier OnlyOwner(){
         require(msg.sender == _owner, "Not an admin");
         _;
@@ -99,7 +99,7 @@ contract LibraFacebook is Interfacemc{
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     function allowance(
         address owner,
         address spender
@@ -125,7 +125,7 @@ contract LibraFacebook is Interfacemc{
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-    
+
     function approve(address spender, uint256 value) public returns (bool) {
         require(spender != address(0), "Invalid account");
 
@@ -141,13 +141,13 @@ contract LibraFacebook is Interfacemc{
     )
       public
       returns (bool)
-    {   
+    {
         require(value <= _allowed[from][msg.sender], "Not enough approved ammount");
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         return true;
     }
-    
+
     function increaseAllowance(
         address spender,
         uint256 addedValue
@@ -202,6 +202,15 @@ contract LibraFacebook is Interfacemc{
     function setNewAdmin(address admin)public OnlyOwner returns(bool){
         _administradores[admin] = true;
         return true;
-    }  
+    }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

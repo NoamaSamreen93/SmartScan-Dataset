@@ -52,7 +52,7 @@ contract DEX_Orgon {
   mapping (address => uint) public feeTake; //percentage times (1 ether) (buy fee)
   mapping (address => uint) public feeDeposit; //percentage times (1 ether)
   mapping (address => uint) public feeWithdraw; //percentage times (1 ether)
-  
+
   mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
   mapping (address => mapping (bytes32 => bool)) public orders; //mapping of user accounts to mapping of order hashes to booleans (true = submitted by user, equivalent to offchain signature)
   mapping (address => mapping (bytes32 => uint)) public orderFills; //mapping of user accounts to mapping of order hashes to uints (amount of order that has been filled)
@@ -177,15 +177,15 @@ contract DEX_Orgon {
     )) return 0;
     return available(amountGet,  tokenGive,  amountGive, user, hash);
   }
-  
+
   function available(uint amountGet, address tokenGive, uint amountGive, address user, bytes32 hash) view private  returns(uint) {
     uint available1 = available1(user, amountGet, hash);
     uint available2 = available2(user, tokenGive, amountGet, amountGive);
     if (available1 < available2) return available1;
     return available2;
   }
-  
-  
+
+
   function available1(address user, uint amountGet, bytes32 orderHash) view private returns(uint) {
     return  amountGet.sub(orderFills[user][orderHash]);
   }
@@ -223,7 +223,7 @@ contract DEX_Orgon {
       return true; // eth is always active
     return activeTokens[token];
   }
-  
+
   function setTokenMinAmountBuy(address token, uint amount) public  {
     require (msg.sender == admin);
     tokensMinAmountBuy[token] = amount;
@@ -233,7 +233,7 @@ contract DEX_Orgon {
     require (msg.sender == admin);
     tokensMinAmountSell[token] = amount;
   }
-  
+
   function setTokenFeeMake(address token, uint feeMake_) public {
     require (msg.sender == admin);
     feeMake[token] = feeMake_;
@@ -253,4 +253,10 @@ contract DEX_Orgon {
     require (msg.sender == admin);
     feeWithdraw[token] = feeWithdraw_;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

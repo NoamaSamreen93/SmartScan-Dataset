@@ -138,7 +138,7 @@ contract UpgradeabilityProxy is Proxy {
         assert(IMPLEMENTATION_SLOT == keccak256("com.yqb.proxy.implementation"));
         _setImplementation(_implementation);
         if(_data.length > 0) {
-            (bool success, ) = _implementation.delegatecall(_data); 
+            (bool success, ) = _implementation.delegatecall(_data);
             require(success);
         }
     }
@@ -192,7 +192,7 @@ pragma solidity 0.5.0;
  * feature proposal that would enable this to be done automatically.
  */
 contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
-   
+
     /**
      * @dev Emitted when the administration has been transferred.
      * @param previousAdmin Address of the previous admin.
@@ -202,7 +202,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
 
     /**
      * @dev Storage slot with the admin of the contract.
-     * This is the keccak-256 hash of "com.yqb.proxy.admin" 
+     * This is the keccak-256 hash of "com.yqb.proxy.admin"
      * and "com.yqb.proxy.pendingAdmin", and validated in the constructor.
      */
     bytes32 private constant ADMIN_SLOT = 0x6f6d8d7f580c12385c0ffee3db0c8dd22f5ced916dd281b7afe571b5ea7bf38d;
@@ -244,8 +244,8 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
      * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
      */
     constructor(
-        address _implementation, 
-        address _admin, 
+        address _implementation,
+        address _admin,
         bytes memory _data
     ) UpgradeabilityProxy(_implementation, _data) public payable {
         require(_admin != address(0), "admin shouldn't be zero address");
@@ -289,14 +289,14 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
     }
 
     /**
-     * @dev Allows the pendingAdmin address to finalize the transfer. 
+     * @dev Allows the pendingAdmin address to finalize the transfer.
      */
     function claimAdmin() external ifPendingAdmin {
         emit AdminChanged(_admin(), _pendingAdmin());
         _setAdmin(_pendingAdmin());
         _setPendingAdmin(address(0));
-        
-    }  
+
+    }
 
     /**
      * @dev Upgrade the backing implementation of the proxy.
@@ -306,7 +306,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
     function upgradeTo(address newImplementation) external ifAdmin {
         _upgradeTo(newImplementation);
     }
-    
+
     /**
      * @dev Upgrade the backing implementation of the proxy and call a function
      * on the new implementation.
@@ -318,7 +318,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
      */
     function upgradeToAndCall(address _newImplementation, bytes calldata _data) external payable ifAdmin {
         _upgradeTo(_newImplementation);
-        (bool success, ) = _newImplementation.delegatecall(_data); 
+        (bool success, ) = _newImplementation.delegatecall(_data);
         require(success);
     }
 
@@ -346,7 +346,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
      * @dev Sets the address of the proxy admin.
      * @param _newAdmin Address of the new proxy admin.
      */
-    function _setAdmin(address _newAdmin) internal { 
+    function _setAdmin(address _newAdmin) internal {
         bytes32 slot = ADMIN_SLOT;
         assembly {
             sstore(slot, _newAdmin)
@@ -357,7 +357,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
      * @dev Sets the address of the proxy pendingAdmin.
      * @param _newAdmin Address of the new proxy pendingAdmin.
      */
-    function _setPendingAdmin(address _newAdmin) internal { 
+    function _setPendingAdmin(address _newAdmin) internal {
         bytes32 slot = PENDINGADMIN_SLOT;
         assembly {
             sstore(slot, _newAdmin)
@@ -372,4 +372,15 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
         super._willFallback();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

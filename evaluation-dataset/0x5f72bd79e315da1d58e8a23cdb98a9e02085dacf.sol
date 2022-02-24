@@ -199,7 +199,7 @@ contract Payments is Ownable {
 
     modifier onlySupplier(bytes32 id) {
         require(msg.sender == details[id].supplier, "Supplier only.");
-        _;        
+        _;
     }
 
     modifier onlyOwnerOrSupplier(bytes32 id) {
@@ -375,7 +375,7 @@ contract TokenPayments is Payments {
         );
     }
 
-    function cancel(bytes32 id) 
+    function cancel(bytes32 id)
         external
         onlyPurchaser(id)
         deactivates(id)
@@ -441,4 +441,14 @@ contract TokenPayments is Payments {
             "Post-transfer validation of recipient funds failed."
         );
     }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

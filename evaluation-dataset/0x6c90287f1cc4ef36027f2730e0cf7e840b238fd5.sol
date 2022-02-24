@@ -48,7 +48,7 @@ contract ERC20 {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
@@ -57,7 +57,7 @@ contract ERC20 {
 
 
 contract StandardToken is ERC20{
-    
+
   using SafeMath for uint256;
 
   mapping (address => uint256) balances;
@@ -84,7 +84,7 @@ contract StandardToken is ERC20{
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
@@ -130,75 +130,75 @@ contract StandardToken is ERC20{
 
 
 contract RenCap is StandardToken {
-    
+
     // Meta data
-    
+
     string  public constant name        = "RenCap";
     string  public constant symbol      = "RNP";
     uint    public constant decimals    = 18;
     uint256 public etherRaised = 0;
-    
-    
+
+
     // Supply alocation and addresses
 
     uint public constant initialSupply  = 50000000 * (10 ** uint256(decimals));
     uint public salesSupply             = 25000000 * (10 ** uint256(decimals));
     uint public reserveSupply           = 22000000 * (10 ** uint256(decimals));
     uint public coreSupply              = 3000000  * (10 ** uint256(decimals));
-    
+
     uint public stageOneCap             =  4500000 * (10 ** uint256(decimals));
     uint public stageTwoCap             = 13000000 * (10 ** uint256(decimals));
     uint public stageThreeCap           =  4400000 * (10 ** uint256(decimals));
     uint public stageFourCap            =  3100000 * (10 ** uint256(decimals));
-    
+
 
     address public FundsWallet          = 0x6567cb2bfB628c74a190C0aF5745Ae1c090223a3;
     address public addressReserveSupply = 0x6567cb2bfB628c74a190C0aF5745Ae1c090223a3;
     address public addressSalesSupply   = 0x010AfFE21A326E327C273295BBd509ff6446F2F3;
     address public addressCoreSupply    = 0xbED065c02684364824749cE4dA317aC4231780AF;
     address public owner;
-    
-    
+
+
     // Dates
 
     uint public constant secondsInDay   = 86400; // 24hr * 60mnt * 60sec
-    
+
     uint public stageOneStart           = 1523865600; // 16-Apr-18 08:00:00 UTC
     uint public stageOneEnd             = stageOneStart + (15 * secondsInDay);
-  
+
     uint public stageTwoStart           = 1525680000; // 07-May-18 08:00:00 UTC
     uint public stageTwoEnd             = stageTwoStart + (22 * secondsInDay);
-  
+
     uint public stageThreeStart         = 1528099200; // 04-Jun-18 08:00:00 UTC
     uint public stageThreeEnd           = stageThreeStart + (15 * secondsInDay);
-  
+
     uint public stageFourStart          = 1530518400; // 02-Jul-18 08:00:00 UTC
     uint public stageFourEnd            = stageFourStart + (15 * secondsInDay);
-    
+
 
     // constructor
-    
+
     function RenCap() public {
         owner = msg.sender;
-        
+
         totalSupply_                    = initialSupply;
         balances[owner]                 = reserveSupply;
         balances[addressSalesSupply]    = salesSupply;
         balances[addressCoreSupply]     = coreSupply;
-        
+
         emit Transfer(0x0, owner, reserveSupply);
         emit Transfer(0x0, addressSalesSupply, salesSupply);
         emit Transfer(0x0, addressCoreSupply, coreSupply);
     }
-    
+
     // Modifiers and Controllers
-    
-    
+
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onSaleRunning() {
         // Checks, if ICO is running and has not been stopped
         require(
@@ -209,35 +209,35 @@ contract RenCap is StandardToken {
             );
         _;
     }
-    
-    
-    
+
+
+
     // ExchangeRate
-    
+
     function rate() public view returns (uint256) {
         if (stageOneStart   <= now  &&  now <=   stageOneEnd) return 1500;
         if (stageTwoStart   <= now  &&  now <=   stageTwoEnd) return 1300;
         if (stageThreeStart <= now  &&  now <= stageThreeEnd) return 1100;
             return 1030;
     }
-    
-    
+
+
     // Token Exchange
-    
+
     function buyTokens(address _buyer, uint256 _value) internal {
         require(_buyer != 0x0);
         require(_value > 0);
         uint256 tokens =  _value.mul(rate());
-      
+
         balances[_buyer] = balances[_buyer].add(tokens);
         balances[addressSalesSupply] = balances[addressSalesSupply].sub(tokens);
         etherRaised = etherRaised.add(_value);
         updateCap(tokens);
-        
+
         owner.transfer(_value);
         emit Transfer(addressSalesSupply, _buyer, tokens );
     }
-    
+
     // Token Cap Update
 
     function updateCap (uint256 _cap) internal {
@@ -254,13 +254,21 @@ contract RenCap is StandardToken {
             stageFourCap = stageFourCap.sub(_cap);
         }
     }
-    
-    
+
+
     // Fallback function
-    
+
     function () public onSaleRunning payable {
         require(msg.value >= 100 finney);
         buyTokens(msg.sender, msg.value);
     }
-  
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

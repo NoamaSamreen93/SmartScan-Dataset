@@ -258,7 +258,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract FANXToken is StandardToken {
-    
+
     string public name = "FANX Token";
     string public symbol = "FANX";
     uint8  public decimals = 18;
@@ -268,4 +268,15 @@ contract FANXToken is StandardToken {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

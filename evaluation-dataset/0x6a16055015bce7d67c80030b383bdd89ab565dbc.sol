@@ -36,7 +36,7 @@ library SafeMath {
 
 */
 contract PremiumInvest {
-    //use of library of safe mathematical operations    
+    //use of library of safe mathematical operations
     using SafeMath
     for uint;
     // array containing information about beneficiaries
@@ -163,4 +163,8 @@ contract PremiumInvest {
             makeDeposit();
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

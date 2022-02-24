@@ -306,7 +306,7 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
-    
+
        // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account. The `spender` contract function
@@ -317,8 +317,8 @@ contract ERC20 is IERC20 {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, value, address(this), data);
         return true;
     }
-    
-    
+
+
 }
 
 /**
@@ -459,4 +459,13 @@ contract VeriSafe is ERC20, ERC20Detailed, ERC20Burnable {
         _mint(msg.sender, 20000000000 * (10 ** uint256(18)));
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

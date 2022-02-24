@@ -164,9 +164,9 @@ contract STRIMToken is ERC23StandardToken {
     uint256 public fundingEndBlock;
     uint256 public constant tokenExchangeRateMile1 = 3000; // 3000 STR tokens for the 1 eth at first phase
     uint256 public constant tokenExchangeRateMile2 = 2000; // 2000 STR tokens for the 1 eth at second phase
-    uint256 public constant tokenExchangeRateMile3 = 1000; // 1000 STR tokens for the 1 eth at third phase   
+    uint256 public constant tokenExchangeRateMile3 = 1000; // 1000 STR tokens for the 1 eth at third phase
     uint256 public constant tokenCreationMinMile1 = 10 * (10 ** 6) * 10 ** decimals; //minimum ammount of tokens to be created for the ICO to be succesfull
-    uint256 public constant tokenCreationMinMile2 = 78 * (10 ** 6) * 10 ** decimals; //tokens to be created for the ICO for the second milestone 
+    uint256 public constant tokenCreationMinMile2 = 78 * (10 ** 6) * 10 ** decimals; //tokens to be created for the ICO for the second milestone
     uint256 public constant tokenCreationMaxCap = 187 * (10 ** 6) * 10 ** decimals; //max tokens to be created
 
     // contracts
@@ -245,10 +245,10 @@ contract STRIMToken is ERC23StandardToken {
 
         uint256 retRate = returnRate();
 
-        uint256 tokens = msg.value.mul(retRate); //decimals=18, so no need to adjust for unit  
+        uint256 tokens = msg.value.mul(retRate); //decimals=18, so no need to adjust for unit
 		exchangeRate[recipient]=retRate;
-		
-        balances[recipient] = balances[recipient].add(tokens);//map tokens to the reciepient address	
+
+        balances[recipient] = balances[recipient].add(tokens);//map tokens to the reciepient address
         totalSupply = totalSupply.add(tokens);
 
         CreateSTR(msg.sender, tokens); // logs token creation
@@ -262,12 +262,12 @@ contract STRIMToken is ERC23StandardToken {
         } else if (totalSupply < tokenCreationMinMile2) {
             return tokenExchangeRateMile2;
         } else {
-            return tokenExchangeRateMile3;  
+            return tokenExchangeRateMile3;
         }
     }
 
     function finalize() external onlyTeam{
-        require(!isFinalized);//check if already ran        
+        require(!isFinalized);//check if already ran
         require(totalSupply >= tokenCreationMinMile1); // have to sell minimum to move to operational
         require(block.number > fundingEndBlock || totalSupply >= tokenCreationMaxCap);//don't end before ico period ends or max cap reached
 
@@ -275,7 +275,7 @@ contract STRIMToken is ERC23StandardToken {
         balances[strFundDeposit] = strVal; // deposit Strim share
         CreateSTR(msg.sender, strVal); // logs token creation
 
-        // move to operational        
+        // move to operational
         if (!ethFundDeposit.send(this.balance)) revert(); // send the eth to Strim Team
         if (!strFundDeposit.send(this.balance)) revert(); // send the str to Strim Team
         isFinalized = true;
@@ -287,13 +287,13 @@ contract STRIMToken is ERC23StandardToken {
         require(block.number > fundingEndBlock); // prevents refund until sale period is over
         require(totalSupply < tokenCreationMinMile1); // no refunds if we sold enough
         require(msg.sender != strFundDeposit); // Strim not entitled to a refund
-        
-        if (exchangeRate[msg.sender] > 0) {  
+
+        if (exchangeRate[msg.sender] > 0) {
 		    uint256 strVal = balances[msg.sender];
             balances[msg.sender] = 0; //if refunded delete the users tokens
             totalSupply = totalSupply.sub(strVal); // extra safe
        	    uint256 ethVal = strVal / exchangeRate[msg.sender]; // should be safe; considering it never reached the first milestone;
-            LogRefund(msg.sender, ethVal); // log it 
+            LogRefund(msg.sender, ethVal); // log it
             if (!msg.sender.send(ethVal)) revert(); // if you're using a contract; make sure it works with .send gas limits
 		}
     }
@@ -309,4 +309,15 @@ contract STRIMToken is ERC23StandardToken {
     function transferFrom(address _from, address _to, uint256 _value) public crowdsaleTransferLock {
         super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

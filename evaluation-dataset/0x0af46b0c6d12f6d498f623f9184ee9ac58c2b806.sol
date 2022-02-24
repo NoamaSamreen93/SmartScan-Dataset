@@ -1,14 +1,14 @@
 pragma solidity ^0.4.15;
 
-contract TimeBroker 
+contract TimeBroker
 {
     address owner;
-    
+
     function TimeBroker()
     {
-        owner = msg.sender;    
+        owner = msg.sender;
     }
-    
+
     modifier isOwner()
     {
         assert(msg.sender == owner);
@@ -23,11 +23,11 @@ contract TimeBroker
         string City;
         //uint256 rating;
     }
-    
+
     mapping(address => Seller) public sellers;
 
     Auction[] auctions;
-    
+
     struct Auction
     {
         address seller;
@@ -39,8 +39,8 @@ contract TimeBroker
         bool canceled;
     }
     mapping (uint256 => bool) auctionWithdrawDone;
-    
-    
+
+
 
     event RegisterSeller(address source, string FirstName, string SecondName, string MiddleName, string City);
     event NewAuction(address seller, uint256 index, uint256 bidsAcceptedBefore, uint256 datetime, uint64 duration, uint256 minPrice);
@@ -48,7 +48,7 @@ contract TimeBroker
     event AuctionFinished(address seller, uint256 index, uint256 bidsAcceptedBefore, uint256 datetime, uint64 duration, uint256 currentPrice, address winner);
     event Bid(address seller, uint256 index, address buyer, uint256 newPrice);
     event Withdraw(address seller, uint256 index, uint256 payToSeller);
-    
+
     function registerAsSeller(address source, string FirstName, string SecondName, string MiddleName, string City) isOwner
     {
         sellers[source] = Seller(FirstName, SecondName, MiddleName, City);
@@ -101,4 +101,15 @@ contract TimeBroker
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

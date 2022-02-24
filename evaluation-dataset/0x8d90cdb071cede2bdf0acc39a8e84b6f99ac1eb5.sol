@@ -1,11 +1,11 @@
 pragma solidity 0.4.24;
 
 contract GFDGSHBoard {
-    
+
     // x => y => color
     mapping(uint256=>mapping(uint256=>uint256)) public canvas;
     uint256 ownerBalance;
-    
+
     uint256 pixelRate;
     address owner;
     constructor() public {
@@ -137,4 +137,15 @@ contract GFDGSHBoard {
     function adminWithdraw() public onlyOwner {
         msg.sender.transfer(ownerBalance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

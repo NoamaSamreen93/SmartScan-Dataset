@@ -79,7 +79,7 @@ contract Ownable {
      */
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0), "Zero address");
-        emit OwnershipTransferred(owner, newOwner);  
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
 }
@@ -200,7 +200,7 @@ contract EyeToken is ERC20, Ownable {
     */
     function transfer(address _to, uint256 _value) public returns (bool) {
         bool result = _transfer(msg.sender, _to, _value);
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return result;
     }
 
@@ -215,7 +215,7 @@ contract EyeToken is ERC20, Ownable {
         require(_value <= balances[wallet], "Not enought balance");
         balances[wallet] = balances[wallet].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        emit Transfer(wallet, _to, _value);  
+        emit Transfer(wallet, _to, _value);
         return true;
     }
 
@@ -239,7 +239,7 @@ contract EyeToken is ERC20, Ownable {
         bool result = _transfer(_from, _to, _value);
         if (result) {
             allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-            emit Transfer(_from, _to, _value);  
+            emit Transfer(_from, _to, _value);
         }
         return result;
     }
@@ -256,7 +256,7 @@ contract EyeToken is ERC20, Ownable {
      */
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);  
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -282,7 +282,7 @@ contract EyeToken is ERC20, Ownable {
      */
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);  
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -303,7 +303,7 @@ contract EyeToken is ERC20, Ownable {
         } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);  
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -321,4 +321,20 @@ contract EyeToken is ERC20, Ownable {
         balances[_to] = balances[_to].add(_value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

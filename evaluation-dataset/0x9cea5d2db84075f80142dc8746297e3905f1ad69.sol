@@ -304,8 +304,8 @@ contract TokenVesting is Ownable {
       return totalBalance.mul(block.timestamp.sub(start)).div(duration);
     }
   }
-  
-  
+
+
   /**
    * @dev Reset backup address for current beneficiary only by current beneficiary
    * @param _backup new backup address for current beneficiary
@@ -315,11 +315,11 @@ contract TokenVesting is Ownable {
     require(_backup != address(0));
     require(_backup != backup);
     require(_backup != beneficiary);
-      
+
     backup = _backup;
   }
-  
-  
+
+
   /**
    * @dev Request an update to current beneficiary only by backup address
    * @param _newBeneficiary new beneficiary
@@ -329,11 +329,11 @@ contract TokenVesting is Ownable {
     require(_newBeneficiary != address(0));
     require(_newBeneficiary != beneficiary);
     require(_newBeneficiary != backup);
-      
+
     __proposedNewBeneficiary = _newBeneficiary;
   }
-  
-  
+
+
     /**
    * @dev Calculates the amount that has already vested.
    * @param _newBeneficiary new beneficiary
@@ -342,8 +342,17 @@ contract TokenVesting is Ownable {
     require(msg.sender == admin);
     require(__proposedNewBeneficiary != address(0));
     require(__proposedNewBeneficiary == _newBeneficiary);
-      
+
     beneficiary = __proposedNewBeneficiary;
     __proposedNewBeneficiary = address(0);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

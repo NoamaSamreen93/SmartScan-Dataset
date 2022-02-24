@@ -10,7 +10,7 @@ contract Kryptos {
 	//*        Kryptos - Secure Communication       *
 	//* Egemen POLAT Tarafindan projelendirilmistir *
     //***********************************************
-    
+
 	bool public transferactive;
 	bool public shareactive;
 	bool public coinsaleactive;
@@ -21,12 +21,12 @@ contract Kryptos {
     uint256 public totalSupply;
     address public owner;
 	address public reserve;
-	
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
-	
+
     function Kryptos(
         uint256 initialSupply,
         string tokenName,
@@ -60,19 +60,19 @@ contract Kryptos {
         Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     function setOwner(uint256 newBuyPrice) public {
         if (msg.sender == owner) {buyPrice = newBuyPrice;}
     }
-		
+
     function setTransferactive(bool newdata) public {
         if (msg.sender == owner) {transferactive = newdata;}
     }
-	
+
     function setShareactive(bool newdata) public {
         if (msg.sender == owner) {shareactive = newdata;}
     }
-	
+
     function setCoinsaleactive(bool newdata) public {
         if (msg.sender == owner) {coinsaleactive = newdata;}
     }
@@ -80,17 +80,17 @@ contract Kryptos {
     function setPrices(uint256 newBuyPrice) public {
         if (msg.sender == owner) {buyPrice = newBuyPrice;}
     }
-    
+
     function () payable public {
         uint amount = msg.value * buyPrice;
         if (coinsaleactive){_transfer(reserve, msg.sender, amount);}
     }
-    
+
     function ShareDATA(string SMS) public {
         bytes memory string_rep = bytes(SMS);
         if (shareactive){_transfer(msg.sender, reserve, string_rep.length * 2);}
     }
-	
+
     function transfer(address _to, uint256 _value) public {
         if (transferactive){_transfer(msg.sender, _to, _value);}
     }
@@ -135,4 +135,13 @@ contract Kryptos {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

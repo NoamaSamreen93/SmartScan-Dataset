@@ -97,21 +97,21 @@ library SafeMath {
 }
 
 contract DAIX is ERC20Interface {
-   
+
     using SafeMath for uint256;
     string public constant symbol = "DAIX";
     string public constant name = "DAIX";
     uint8 public constant decimals = 18;
     uint256 _totalSupply = 3000000000000000000000000;
- 
+
      struct LockAccount{
         uint status;
     }
 
      mapping (address => LockAccount) lockAccount;
      address[] public AllLockAccounts;
-    
-    
+
+
     // Owner of this contract
     address public owner;
 
@@ -132,40 +132,40 @@ contract DAIX is ERC20Interface {
         owner = msg.sender;
         balances[owner] = _totalSupply;
     }
-    
+
 
     function totalSupply() view public returns (uint256) {
         return _totalSupply;
     }
-    
-    
+
+
        function setLockAccount(address _addr) public{
         require(msg.sender == owner);
-       
+
         lockAccount[_addr].status = 1;
         AllLockAccounts.push(_addr) -1;
     }
-    
+
       function getLockAccounts() view public returns (address[] memory){
         return AllLockAccounts;
     }
       function unLockAccount(address _addr) public {
         require(msg.sender == owner);
        lockAccount[_addr].status = 0;
-       
+
     }
-    
+
     function isLock (address _addr) view private returns(bool){
         uint lS = lockAccount[_addr].status;
-        
+
         if(lS == 1){
             return true;
         }
-        
+
         return false;
     }
 
-   
+
      function getLockAccount(address _addr) view public returns (uint){
         return lockAccount[_addr].status;
     }
@@ -229,4 +229,10 @@ contract DAIX is ERC20Interface {
         return allowed[_owner][_spender];
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

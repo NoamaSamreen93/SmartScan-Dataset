@@ -85,7 +85,7 @@ contract ERC20 {
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
@@ -122,7 +122,7 @@ contract CAPToken is ERC20, Ownable, Pausable {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
     require(locks[msg.sender] == false);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -139,7 +139,7 @@ contract CAPToken is ERC20, Ownable, Pausable {
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
     require(locks[_from] == false);
-    
+
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -177,4 +177,13 @@ contract CAPToken is ERC20, Ownable, Pausable {
   function () public payable {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

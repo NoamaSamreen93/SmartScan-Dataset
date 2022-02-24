@@ -55,7 +55,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused {
         paused = false;
         Unpause();
@@ -142,7 +142,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -220,7 +220,7 @@ contract RewardToken is StandardToken, Ownable {
             if(sum > 0) {
                 totalSupply = totalSupply.add(sum);
                 balances[_to] = balances[_to].add(sum);
-                
+
                 Reward(_to, sum);
             }
 
@@ -294,7 +294,7 @@ contract Crowdsale is Pausable {
     function() payable {
         purchase();
     }
-    
+
     function purchase() whenNotPaused payable {
         require(!crowdsaleFinished);
         require((now >= piStartTime && now < piEndTime) || (now >= startTime && now < endTime));
@@ -323,4 +323,17 @@ contract Crowdsale is Pausable {
 
         Withdraw();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

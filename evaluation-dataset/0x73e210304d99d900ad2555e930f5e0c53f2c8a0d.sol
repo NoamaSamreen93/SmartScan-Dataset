@@ -55,7 +55,7 @@ contract StandardToken is ERC20Interface {
         } else { return false; }
     }
 
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -66,7 +66,7 @@ contract StandardToken is ERC20Interface {
       return allowed[_owner][_spender];
     }
 
-    
+
 }
 
 /**
@@ -174,13 +174,13 @@ contract Dainet is BaseToken {
     constructor() public {
         name = "Dainet";
         symbol = "DAIN";
-        decimals = 18;   
+        decimals = 18;
 
-        totalSupply = withDecimals(1300000000, decimals); 
+        totalSupply = withDecimals(1300000000, decimals);
 
-        maxDainSell = withDecimals(845000000, decimals); 
+        maxDainSell = withDecimals(845000000, decimals);
         unitsPerEth = 2000;
-        minEthAmount = withDecimals(5, (18-2)); 
+        minEthAmount = withDecimals(5, (18-2));
 
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
@@ -218,4 +218,20 @@ contract Dainet is BaseToken {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

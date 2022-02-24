@@ -4,7 +4,7 @@ pragma solidity ^0.5.2;
 
     2019 Tether Token - tether.to
     Deployed by Will Harborne - will@ethfinex.com
-    
+
 */
 
 /**
@@ -737,4 +737,12 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     // Called when contract is deprecated
     event Deprecate(address newAddress);
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

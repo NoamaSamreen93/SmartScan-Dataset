@@ -40,9 +40,9 @@ contract ERC20Base {
 
 contract CampaignContract {
 	using SafeMath for uint256;
-	
+
 	address internal owner;
-	
+
 	//Limits are recorded as USD in ether units (1 ether = 1 USD) [this is units not actual price]
 	uint256 public minUSD;
 	uint256 public maxUSD;
@@ -56,7 +56,7 @@ contract CampaignContract {
 		bytes32 addressOne;
 		bytes32 addressTwo;
 	}
-	
+
 	mapping (address => KYCObject) internal contributionKYC;
 
 	mapping (address => uint256) internal amountAttempted;
@@ -77,12 +77,12 @@ contract CampaignContract {
 	event ContributionIncrease(uint256 indexed time, uint256 amount);
 	event ContributionAccepted(address indexed from, uint256 amount, uint256 total);
 	event ContributionReturned(address indexed from, uint256 amount);
-	
+
 	event EtherWithdrawn(address indexed by, uint256 amount, uint256 remaining);
 
 	function CampaignContract() public {
 		owner = msg.sender;
-		
+
 		minUSD = 1 ether;
 		maxUSD = 950 ether;
 		minContribution = .1 ether;
@@ -97,22 +97,22 @@ contract CampaignContract {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	function changeOwner(address addr) external onlyOwner {
 		require(addr != address(0));
 		owner = addr;
-	
+
 		emit OwnerChanged(msg.sender, addr);
 	}
-	
+
 	function changeLimits(uint256 price) external onlyOwner {
 		uint256 adjPrice = price.div(10**9);
 		uint256 adjMin = minUSD.mul(10**9);
 		uint256 adjMax = maxUSD.mul(10**9);
-	
+
 		maxContribution = adjMax.div(adjPrice);
 		minContribution = adjMin.div(adjPrice);
-	
+
 		emit LimitsChanged(minContribution, maxContribution, price);
 	}
 
@@ -121,7 +121,7 @@ contract CampaignContract {
 		require(contributionKYC[addr].name != "");
 		_;
 	}
-	
+
 	function verifyKYC(bytes32 phone, bytes32 name, bytes32 occupation, bytes32 addrOne, bytes32 addrTwo) external {
 		require(contributionKYC[msg.sender].phone == "");
 		require(contributionKYC[msg.sender].name == "");
@@ -130,32 +130,32 @@ contract CampaignContract {
 		require(occupation != "");
 		require(addrOne != "");
 		require(addrTwo != "");
-	
+
 		contributionKYC[msg.sender].phone = phone;
 		contributionKYC[msg.sender].name = name;
 		contributionKYC[msg.sender].occupation = occupation;
 		contributionKYC[msg.sender].addressOne = addrOne;
 		contributionKYC[msg.sender].addressTwo = addrTwo;
-	
+
 		emit KYCSubmitted(msg.sender, phone, name, occupation, addrOne, addrTwo);
 	}
-	
+
 	function getPhone(address addr) external view returns (bytes32 result) {
 		return contributionKYC[addr].phone;
 	}
-	
+
 	function getName(address addr) external view returns (bytes32 result) {
 		return contributionKYC[addr].name;
 	}
-	
+
 	function getOccupation(address addr) external view returns (bytes32 result) {
 		return contributionKYC[addr].occupation;
 	}
-	
+
 	function getAddressOne(address addr) external view returns (bytes32 result) {
 		return contributionKYC[addr].addressOne;
 	}
-	
+
 	function getAddressTwo(address addr) external view returns (bytes32 result) {
 		return contributionKYC[addr].addressTwo;
 	}
@@ -164,33 +164,33 @@ contract CampaignContract {
 		//Make sure they're not attempting to submit more than max.
 		uint256 finalAttempted = amountAttempted[msg.sender].add(msg.value);
 		require(finalAttempted <= maxContribution);
-	
+
 		//Make sure the attempt added with the already submitted amount isn't more than max.
 		uint256 finalAmount = amountContributed[msg.sender].add(finalAttempted);
 		require(finalAmount >= minContribution);
 		require(finalAmount <= maxContribution);
-	
+
 		amountAttempted[msg.sender] = finalAttempted;
 		emit ContributionReceived(msg.sender, msg.value);
 	}
-	
+
 	function withdrawContribution() external hasKYCInfo(msg.sender) {
 		require(amountAttempted[msg.sender] > 0);
 		uint256 amount = amountAttempted[msg.sender];
 		amountAttempted[msg.sender] = 0;
-	
+
 		msg.sender.transfer(amount);
 		emit ContributionWithdrawn(msg.sender, amount);
 	}
-	
+
 	function getAmountAttempted(address addr) external view returns (uint256 amount) {
 		return amountAttempted[addr];
 	}
-	
+
 	function getAmountContributed(address addr) external view returns (uint256 amount) {
 		return amountContributed[addr];
 	}
-	
+
 	function getPotentialAmount(address addr) external view returns (uint256 amount) {
 		return amountAttempted[addr].add(amountContributed[addr]);
 	}
@@ -198,59 +198,70 @@ contract CampaignContract {
 	function resetKYC(address addr) external onlyOwner hasKYCInfo(addr) {
 		//Cant reset KYC for someone who you've accepted from already.
 		require(amountContributed[addr] == 0);
-	
+
 		//Someone having their KYC reset must have withdrawn their attempts.
 		require(amountAttempted[addr] == 0);
-	
+
 		contributionKYC[addr].phone = "";
 		contributionKYC[addr].name = "";
 		contributionKYC[addr].occupation = "";
 		contributionKYC[addr].addressOne = "";
 		contributionKYC[addr].addressTwo = "";
-	
+
 		emit KYCReset(msg.sender, addr);
 	}
-	
+
 	function acceptContribution(address addr) external onlyOwner hasKYCInfo(addr) {
 		require(amountAttempted[addr] >= minContribution);
 		require(amountContributed[addr].add(amountAttempted[addr]) <= maxContribution);
-	
+
 		uint256 amount = amountAttempted[addr];
 		amountAttempted[addr] = 0;
 		amountContributed[addr] = amountContributed[addr].add(amount);
 		amountRaised = amountRaised.add(amount);
 		amountRemaining = amountRemaining.add(amount);
-	
+
 		emit ContributionIncrease(now, amountRaised);
 		emit ContributionAccepted(addr, amount, amountContributed[addr]);
 	}
-	
+
 	function rejectContribution(address addr) external onlyOwner {
 		require(amountAttempted[addr] > 0);
-	
+
 		uint256 amount = amountAttempted[addr];
 		amountAttempted[addr] = 0;
-	
+
 		addr.transfer(amount);
 		emit ContributionReturned(addr, amount);
 	}
-	
+
 	function withdrawToWallet(uint256 amount) external onlyOwner {
 		require(amount <= amountRemaining);
-	
+
 		amountRemaining = amountRemaining.sub(amount);
 		msg.sender.transfer(amount);
 		emit EtherWithdrawn(msg.sender, amount, amountRemaining);
 	}
-	
+
 	function retrieveAssets(address which) external onlyOwner {
 		ERC20Base token = ERC20Base(which);
 		uint256 amount = token.balanceOf(address(this));
 		require(token.transfer(msg.sender, amount));
 	}
-	
+
 	function killContract() external onlyOwner {
 		selfdestruct(msg.sender);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

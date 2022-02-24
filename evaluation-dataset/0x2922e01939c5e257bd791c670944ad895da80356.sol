@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external;
 }
 
 contract TokenERC20 {
@@ -18,7 +18,7 @@ contract TokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -105,7 +105,7 @@ contract TokenERC20 {
      */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-        require((_value == 0) || (allowance[msg.sender][_spender] == 0));    
+        require((_value == 0) || (allowance[msg.sender][_spender] == 0));
         allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -162,4 +162,15 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

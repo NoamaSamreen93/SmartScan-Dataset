@@ -21,7 +21,7 @@ contract Tiptop {
         _;
     }
 
-    
+
 
     /*==============================
     =            EVENTS            =
@@ -63,9 +63,9 @@ contract Tiptop {
     string public name = "Tip Top Universe";
     string public symbol = "FUEL";
     uint8 constant public decimals = 18;
-    uint8 constant internal entryFee_ = 27; 
-    uint8 constant internal refferalFee_ = 20; 
-    uint8 constant internal exitFee_ = 27; 
+    uint8 constant internal entryFee_ = 27;
+    uint8 constant internal refferalFee_ = 20;
+    uint8 constant internal exitFee_ = 27;
     uint256 constant internal tokenPriceInitial_ = 0.000000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint256 constant internal magnitude = 2**64;
@@ -221,7 +221,7 @@ contract Tiptop {
 
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -419,7 +419,7 @@ contract Tiptop {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -585,4 +585,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

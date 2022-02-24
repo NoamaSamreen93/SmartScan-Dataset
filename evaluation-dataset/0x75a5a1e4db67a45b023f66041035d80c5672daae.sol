@@ -205,7 +205,7 @@ contract Crowdsale is GuidedByRoles{
         token = _token;
     }
 
-    // Setting the current rate ETH/USD         
+    // Setting the current rate ETH/USD
 //    function changeExchange(uint256 _ETHUSD) public {
 //        require(rightAndRoles.onlyRoles(msg.sender,18));
 //        require(_ETHUSD >= 1 ether);
@@ -459,11 +459,11 @@ contract Crowdsale is GuidedByRoles{
         }
     }
 
-    // 
-    // @ Do I have to use the function      
-    // @ When it is possible to call        
-    // @ When it is launched automatically  
-    // @ Who can call the function          
+    //
+    // @ Do I have to use the function
+    // @ When it is possible to call
+    // @ When it is launched automatically
+    // @ Who can call the function
     function getPartnerCash(uint8 _user, bool _calc) external {
         if(_calc)
             calcFin();
@@ -884,4 +884,20 @@ contract Crowdsale is GuidedByRoles{
     function () public payable {
         buyTokens(msg.sender);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

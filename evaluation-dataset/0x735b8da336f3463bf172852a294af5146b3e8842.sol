@@ -671,7 +671,7 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "GCT";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0x22384Ca69F2222230adC626B4f43692910787011;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -679,9 +679,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -689,7 +689,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -713,7 +713,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -722,7 +722,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0x22384ca69f2222230adc626b4f43692910787011)];
         uint[1] memory amounts = [uint(200000000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -734,7 +734,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -742,5 +742,21 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

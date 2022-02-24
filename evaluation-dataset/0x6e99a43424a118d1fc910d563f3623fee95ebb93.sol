@@ -45,7 +45,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 
 /**
  * @title ERC20Basic
@@ -57,7 +57,7 @@ contract ERC20Basic {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-} 
+}
 
 /**
  * @title Basic token
@@ -103,7 +103,7 @@ contract BasicToken is ERC20Basic {
   }
 
 }
- 
+
 
 /**
  * @title ERC20 interface
@@ -115,7 +115,7 @@ contract ERC20 is ERC20Basic {
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 
 /**
  * @title Standard ERC20 token
@@ -211,9 +211,9 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
+
 contract LivetradeToken is StandardToken {
-  string public name = "LiveTrade Security Token"; 
+  string public name = "LiveTrade Security Token";
   string public symbol = "LTD";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 1000000000 * (10 ** decimals);
@@ -223,4 +223,10 @@ contract LivetradeToken is StandardToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

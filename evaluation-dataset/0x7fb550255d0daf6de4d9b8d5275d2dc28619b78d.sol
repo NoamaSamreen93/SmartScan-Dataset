@@ -447,7 +447,7 @@ contract _0xZibitToken is ERC20Interface, Owned {
 
 
     //21m coins total
-    //reward begins at 15 and is cut in half every reward era (as tokens are mined) 
+    //reward begins at 15 and is cut in half every reward era (as tokens are mined)
     function getMiningReward() public constant returns (uint) {
         //once we get half way thru the coins, only get 7.5 per block
 
@@ -659,4 +659,15 @@ contract _0xZibitToken is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

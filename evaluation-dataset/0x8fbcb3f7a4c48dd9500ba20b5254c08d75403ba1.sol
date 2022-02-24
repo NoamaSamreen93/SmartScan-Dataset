@@ -349,7 +349,7 @@ contract MobilinkToken is BurnableToken, Owned {
     /// and lock them for 90 days from the day the token is listed on an exchange
     function lockTeamTokens() public onlyOwner afterStageOneClosed {
         require(teamTokensLockAddress == address(0) && totalSupply < HARD_CAP);
- 
+
         /// Team tokens : 1.35 billion
         uint256 teamTokens = 1350000000 * 10**uint256(decimals);
 
@@ -375,4 +375,15 @@ contract MobilinkToken is BurnableToken, Owned {
         }
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

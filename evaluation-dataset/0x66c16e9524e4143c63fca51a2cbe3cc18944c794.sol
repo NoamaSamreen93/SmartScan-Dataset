@@ -64,7 +64,7 @@ contract Transfer {
         address from,
         address to,
         uint256 amount
-    ) 
+    )
         internal
         returns (bool)
     {
@@ -152,7 +152,7 @@ contract Withdrawable is Ownable {
     function withdraw() public onlyOwner {
         owner.transfer(address(this).balance);
     }
-    
+
     // Allow the owner to withdraw tokens
     function withdrawToken(address token) public onlyOwner returns (bool) {
         IERC20 foreignToken = IERC20(token);
@@ -241,7 +241,7 @@ contract TradeExecutor is Transfer, Withdrawable, ExternalCall {
 
         // Execute the second trade to get Ether
         require(execute(wrappers[1], 0, trade2));
-        
+
         // Send the arbitrageur Ether
         msg.sender.transfer(address(this).balance);
     }
@@ -274,4 +274,20 @@ contract TradeExecutor is Transfer, Withdrawable, ExternalCall {
         return external_call(wrapper, value, data.length, data);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

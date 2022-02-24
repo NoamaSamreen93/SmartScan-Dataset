@@ -78,29 +78,29 @@ contract LifeToken is ERC20Interface, Owned, SafeMath {
     uint public bonusEnds;
     uint public endDate;
 
-   
-    
 
-    
+
+
+
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
 
-   
+
     function LifeToken() public {
         symbol = "LFT";
         name = "LifeToken";
         decimals = 18;
         bonusEnds = now + 1 weeks;
         endDate = now + 9 weeks;
-        
-    
+
+
 
     }
 
 
-  
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
@@ -111,8 +111,8 @@ contract LifeToken is ERC20Interface, Owned, SafeMath {
     }
 
 
-  
-   
+
+
 function transfer(address to, uint tokens) public payable returns (bool success) {
     balances[msg.sender] = safeSub(balances[msg.sender], tokens);
     balances[to] = safeAdd(balances[to], tokens);
@@ -144,7 +144,7 @@ function transfer(address to, uint tokens) public payable returns (bool success)
     }
 
 
-  
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -152,8 +152,8 @@ function transfer(address to, uint tokens) public payable returns (bool success)
         return true;
     }
 
-    uint256 public max_contribution = 50 ether; 
-    uint256 public min_contribution = 0.05 ether; 
+    uint256 public max_contribution = 50 ether;
+    uint256 public min_contribution = 0.05 ether;
     function () public payable {
          require(msg.value >= min_contribution);
     require(msg.value <= max_contribution);
@@ -172,10 +172,16 @@ function transfer(address to, uint tokens) public payable returns (bool success)
 
 
 
-  
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
-     
+
     }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

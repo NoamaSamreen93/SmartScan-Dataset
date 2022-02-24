@@ -965,7 +965,7 @@ pragma solidity ^0.5.4;
 contract UniversalSchemeInterface {
 
     function getParametersFromController(Avatar _avatar) internal view returns(bytes32);
-    
+
 }
 
 // File: contracts/globalConstraints/GlobalConstraintInterface.sol
@@ -2738,4 +2738,13 @@ contract SchemeRegistrar is UniversalScheme, VotingMachineCallbacks, ProposalExe
         });
         return proposalId;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

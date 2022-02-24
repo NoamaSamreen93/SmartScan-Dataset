@@ -9,12 +9,12 @@ pragma solidity ^0.4.20;
    Telegram Group: https://t.me/dividends3dgroup
    Telegram Announcement: https://t.me/dividends3dcom
     -------------------------------------------------------------------------------------------------------
-	Dividends3d 
-     Dividends3d Earn Passive Ethereum. 
-	- Buys - 8% fee goes to all current token holders. 
-	- Sells - 2% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more. 
+	Dividends3d
+     Dividends3d Earn Passive Ethereum.
+	- Buys - 8% fee goes to all current token holders.
+	- Sells - 2% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more.
 	- Transfers - 0% fee! We have plans for games and we don't want that to be an obstacle!
-	- Masternode / Referral - you get 4% from deposit of all players who enter using your Masternode . 
+	- Masternode / Referral - you get 4% from deposit of all players who enter using your Masternode .
 */
 
 contract Dividends3d {
@@ -172,8 +172,8 @@ contract Dividends3d {
 		administrators[0xA919a45A60B6dbF7145dC78c138feEe3c6cA9aAd] = true;
 		ambassadors_[0xA919a45A60B6dbF7145dC78c138feEe3c6cA9aAd] = true;
 
-		// clumsier 
-		// Solidity Developer, website,  D3D 
+		// clumsier
+		// Solidity Developer, website,  D3D
 		administrators[msg.sender] = true;
 		ambassadors_[msg.sender] = true;
     }
@@ -561,7 +561,7 @@ contract Dividends3d {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -727,4 +727,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

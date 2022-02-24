@@ -14,7 +14,7 @@ contract BetGame  {
 	bet[] private B;
 	bet[] private D;
 
-	uint private totalA; 
+	uint private totalA;
 	uint private totalB;
 	uint private totalD;
 	uint private betEnd;
@@ -42,15 +42,15 @@ contract BetGame  {
 	function getInfoA(uint index) view onlyowner public returns(address, uint) {
 		return (A[index].player, A[index].deposit);
 	}
-	
+
 	function getInfoB(uint index) view onlyowner public returns(address, uint) {
 		return (B[index].player, B[index].deposit);
 	}
-	
+
 	function getInfoD(uint index) view onlyowner public returns(address, uint) {
 		return (D[index].player, D[index].deposit);
 	}
-	
+
 
 	function winnerIsA() public onlyowner {
 		if (totalA > 0) {
@@ -118,17 +118,17 @@ contract BetGame  {
 		uint a;
 		uint b;
 		uint d;
-		
+
 		if (!open) {
 			return (0,0,0,0,0,0, false);
 		}
-		 
+
 		for (uint p = 0; p < D.length; p++) {
 			if (D[p].player == addr) {
 				d+=D[p].deposit;
 			}
         }
-		
+
 		for (p = 0; p < A.length; p++) {
 			if (A[p].player == addr) {
 				a+=A[p].deposit;
@@ -139,7 +139,7 @@ contract BetGame  {
 				b+=B[p].deposit;
 			}
         }
-		
+
 		return (a,b,d, totalA, totalB, totalD, true);
 	}
 
@@ -183,7 +183,7 @@ contract BetGame  {
 
 		B.push(bet({player:msg.sender, deposit:msg.value}));
 	}
-	
+
 	function betD() public payable {
 		require(
             now <= betEnd,
@@ -201,5 +201,14 @@ contract BetGame  {
 		}
 
 		D.push(bet({player:msg.sender, deposit:msg.value}));
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

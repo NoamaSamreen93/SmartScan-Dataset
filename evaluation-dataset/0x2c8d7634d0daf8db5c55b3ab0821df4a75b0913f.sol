@@ -131,9 +131,9 @@ contract BurnableToken is BasicToken {
 
 contract Daereum is StandardToken, BurnableToken {
 
-  string public constant name = "Daereum"; 
-  string public constant symbol = "DAER"; 
-  uint8 public constant decimals = 8; 
+  string public constant name = "Daereum";
+  string public constant symbol = "DAER";
+  uint8 public constant decimals = 8;
 
   uint256 public constant INITIAL_SUPPLY = 100000000 * (10 ** uint256(decimals));
 
@@ -143,4 +143,15 @@ contract Daereum is StandardToken, BurnableToken {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

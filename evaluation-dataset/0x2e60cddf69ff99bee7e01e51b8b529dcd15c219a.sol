@@ -12,33 +12,33 @@ pragma solidity ^0.4.25;
 *    -- 17% Marketing + Operating Expenses
 *
 *   ---About the Project
-*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without 
-*  intermediaries. This technology opens incredible financial possibilities. Our automated investment 
-*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be 
-*  freely accessed online. In order to insure our investors' complete security, full control over the 
-*  project has been transferred from the organizers to the smart contract: nobody can influence the 
+*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without
+*  intermediaries. This technology opens incredible financial possibilities. Our automated investment
+*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be
+*  freely accessed online. In order to insure our investors' complete security, full control over the
+*  project has been transferred from the organizers to the smart contract: nobody can influence the
 *  system's permanent autonomous functioning.
-* 
+*
 * ---How to use:
-*  1. Send from ETH wallet to the smart contract address 
+*  1. Send from ETH wallet to the smart contract address
 *     any amount from 0.01 ETH.
-*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address 
+*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address
 *     of your wallet.
-*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're 
+*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're
 *      spending too much on GAS)
 *  OR
-*  3b. For reinvest, you need to first remove the accumulated percentage of charges (by sending 0 ether 
+*  3b. For reinvest, you need to first remove the accumulated percentage of charges (by sending 0 ether
 *      transaction), and only after that, deposit the amount that you want to reinvest.
-*  
+*
 * RECOMMENDED GAS LIMIT: 200000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
-* 
+*
 * Main contract - Revolution. Scroll down to find it.
 */
 
@@ -233,7 +233,7 @@ contract Accessibility {
     m_admins[msg.sender] = AccessRank.Full;
     emit LogProvideAccess(msg.sender, now, AccessRank.Full);
   }
-  
+
   function provideAccess(address addr, AccessRank rank) public onlyAdmin(AccessRank.Full) {
     require(rank <= AccessRank.Full, "invalid access rank");
     require(m_admins[addr] != AccessRank.Full, "cannot change full access rank");
@@ -255,7 +255,7 @@ contract PaymentSystem {
   struct PaySys {
     uint latestTime;
     uint latestKeyIndex;
-    Paymode mode; 
+    Paymode mode;
   }
   PaySys internal m_paysys;
 
@@ -264,14 +264,14 @@ contract PaymentSystem {
     _;
   }
   event LogPaymodeChanged(uint when, Paymode indexed mode);
-  
+
   function paymode() public view returns(Paymode mode) {
     mode = m_paysys.mode;
   }
 
   function changePaymode(Paymode mode) internal {
     require(mode <= Paymode.Pull, "invalid pay mode");
-    if (mode == m_paysys.mode ) return; 
+    if (mode == m_paysys.mode ) return;
     if (mode == Paymode.Pull) require(m_paysys.latestTime != 0, "cannot set pull pay mode if latest time is 0");
     if (mode == Paymode.Push) m_paysys.latestTime = 0;
     m_paysys.mode = mode;
@@ -329,9 +329,9 @@ contract Revolution is Accessibility, PaymentSystem {
   uint public investmentsNum;
   uint public constant minInvesment = 10 finney; // 0.01 eth
   uint public constant maxBalance = 333e5 ether; // 33,300,000 eth
-  uint public constant pauseOnNextWave = 168 hours; 
+  uint public constant pauseOnNextWave = 168 hours;
 
-  // percents 
+  // percents
   Percent.percent private m_dividendsPercent = Percent.percent(333, 10000); // 333/10000*100% = 3.33%
   Percent.percent private m_adminPercent = Percent.percent(1, 10); // 1/10*100% = 10%
   Percent.percent private m_payerPercent = Percent.percent(7, 100); // 7/100*100% = 7%
@@ -381,7 +381,7 @@ contract Revolution is Accessibility, PaymentSystem {
     address[3] memory refs;
     if (a.notZero()) {
       refs[0] = a;
-      doInvest(refs); 
+      doInvest(refs);
     } else {
       doInvest(refs);
     }
@@ -389,7 +389,7 @@ contract Revolution is Accessibility, PaymentSystem {
 
   function investorsNumber() public view returns(uint) {
     return m_investors.size()-1;
-    // -1 because see InvestorsStorage constructor where keys.length++ 
+    // -1 because see InvestorsStorage constructor where keys.length++
   }
 
   function balanceETH() public view returns(uint) {
@@ -424,7 +424,7 @@ contract Revolution is Accessibility, PaymentSystem {
   function getMyDividends() public notOnPause atPaymode(Paymode.Pull) balanceChanged {
     // check investor info
     InvestorsStorage.investor memory investor = getMemInvestor(msg.sender);
-    require(investor.keyIndex > 0, "sender is not investor"); 
+    require(investor.keyIndex > 0, "sender is not investor");
     if (investor.paymentTime < m_paysys.latestTime) {
       assert(m_investors.setPaymentTime(msg.sender, m_paysys.latestTime));
       investor.paymentTime = m_paysys.latestTime;
@@ -435,7 +435,7 @@ contract Revolution is Accessibility, PaymentSystem {
     require(daysAfter > 0, "the latest payment was earlier than 24 hours");
     assert(m_investors.setPaymentTime(msg.sender, now));
 
-    // check enough eth 
+    // check enough eth
     uint value = m_dividendsPercent.mul(investor.value) * daysAfter;
     if (address(this).balance < value + investor.refBonus) {
       nextWave();
@@ -466,10 +466,10 @@ contract Revolution is Accessibility, PaymentSystem {
         value = m_dividendsPercent.add(value); // referral bonus
         emit LogNewReferral(msg.sender, now, value);
         // level 2
-        if (notZeroNotSender(refs[1]) && m_investors.contains(refs[1]) && refs[0] != refs[1]) { 
+        if (notZeroNotSender(refs[1]) && m_investors.contains(refs[1]) && refs[0] != refs[1]) {
           assert(m_investors.addRefBonus(refs[1], reward)); // referrer 2 bonus
           // level 3
-          if (notZeroNotSender(refs[2]) && m_investors.contains(refs[2]) && refs[0] != refs[2] && refs[1] != refs[2]) { 
+          if (notZeroNotSender(refs[2]) && m_investors.contains(refs[2]) && refs[0] != refs[2] && refs[1] != refs[2]) {
             assert(m_investors.addRefBonus(refs[2], reward)); // referrer 3 bonus
           }
         }
@@ -478,29 +478,29 @@ contract Revolution is Accessibility, PaymentSystem {
 
     // commission
     adminAddr.transfer(m_adminPercent.mul(msg.value));
-    payerAddr.transfer(m_payerPercent.mul(msg.value));    
-    
+    payerAddr.transfer(m_payerPercent.mul(msg.value));
+
     // write to investors storage
     if (m_investors.contains(msg.sender)) {
       assert(m_investors.addValue(msg.sender, value));
     } else {
       assert(m_investors.insert(msg.sender, value));
-      emit LogNewInvestor(msg.sender, now, value); 
+      emit LogNewInvestor(msg.sender, now, value);
     }
-    
+
     if (m_paysys.mode == Paymode.Pull)
       assert(m_investors.setPaymentTime(msg.sender, now));
 
-    emit LogNewInvesment(msg.sender, now, value);   
+    emit LogNewInvesment(msg.sender, now, value);
     investmentsNum++;
   }
 
   function payout() public notOnPause onlyAdmin(AccessRank.Payout) atPaymode(Paymode.Push) balanceChanged {
     if (m_nextWave) {
-      nextWave(); 
+      nextWave();
       return;
     }
-   
+
     // if m_paysys.latestKeyIndex == m_investors.iterStart() then payout NOT in process and we must check latest time of payment.
     if (m_paysys.latestKeyIndex == m_investors.iterStart()) {
       require(now>m_paysys.latestTime+12 hours, "the latest payment was earlier than 12 hours");
@@ -512,8 +512,8 @@ contract Revolution is Accessibility, PaymentSystem {
     uint refBonus;
     uint size = m_investors.size();
     address investorAddr;
-    
-    // gasleft and latest key index  - prevent gas block limit 
+
+    // gasleft and latest key index  - prevent gas block limit
     for (i; i < size && gasleft() > 50000; i++) {
       investorAddr = m_investors.keyFromIndex(i);
       (value, refBonus) = m_investors.investorShortInfo(investorAddr);
@@ -533,9 +533,9 @@ contract Revolution is Accessibility, PaymentSystem {
       sendDividends(investorAddr, value);
     }
 
-    if (i == size) 
+    if (i == size)
       m_paysys.latestKeyIndex = m_investors.iterStart();
-    else 
+    else
       m_paysys.latestKeyIndex = i;
   }
 
@@ -544,7 +544,7 @@ contract Revolution is Accessibility, PaymentSystem {
     if (adminAddr != addr) {
       adminAddr = addr;
       emit LogAdminAddrChanged(addr, now);
-    }    
+    }
   }
 
   function setPayerAddr(address addr) public onlyAdmin(AccessRank.Full) {
@@ -552,7 +552,7 @@ contract Revolution is Accessibility, PaymentSystem {
     if (payerAddr != addr) {
       payerAddr = addr;
       emit LogPayerAddrChanged(addr, now);
-    }  
+    }
   }
 
   function setPullPaymode() public onlyAdmin(AccessRank.Paymode) atPaymode(Paymode.Push) {
@@ -569,7 +569,7 @@ contract Revolution is Accessibility, PaymentSystem {
   }
 
   function sendDividends(address addr, uint value) private {
-    if (addr.send(value)) emit LogPayDividends(addr, now, value); 
+    if (addr.send(value)) emit LogPayDividends(addr, now, value);
   }
 
   function sendDividendsWithRefBonus(address addr, uint value,  uint refBonus) private {
@@ -588,4 +588,15 @@ contract Revolution is Accessibility, PaymentSystem {
     m_nextWave = false;
     emit LogNextWave(now);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

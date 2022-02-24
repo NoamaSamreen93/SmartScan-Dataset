@@ -145,3 +145,14 @@ contract ENCupExchange is CupExchange {
     address public teamCup = 0x9B03e16382A76481f36860245DAc0f112fd3C4F8;
     constructor() CupExchange(cup, teamCup) public {}
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

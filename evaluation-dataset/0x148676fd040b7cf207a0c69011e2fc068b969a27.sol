@@ -125,7 +125,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 public totalSupply_;
-  
+
   /**
   * @dev total number of tokens in existence
   */
@@ -524,4 +524,15 @@ contract CoinnupToken is StandardToken, Ownable {
     _;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

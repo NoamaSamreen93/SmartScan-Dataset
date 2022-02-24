@@ -43,7 +43,7 @@ contract MOIRAICO {
         Ico,
         Successful
     }
-    
+
     State public state = State.Preico; //Set initial stage
     uint startTime = now; //block-time when it was deployed
 
@@ -63,7 +63,7 @@ contract MOIRAICO {
     uint public completedAt;
     token public tokenReward;
     address public creator;
-    address public beneficiary; 
+    address public beneficiary;
     string public campaignUrl;
     uint constant version = 1;
 
@@ -124,25 +124,25 @@ contract MOIRAICO {
         }
 
         tokenReward.transfer(msg.sender, tokenBought);
-        
+
         LogFundingReceived(msg.sender, msg.value, totalRaised);
         LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
     function checkIfFundingCompleteOrExpired() public {
-        
+
         if(now < ICOdeadline && state!=State.Successful){
             if(now > preICODeadline && state==State.Preico){
-                state = State.Ico;    
+                state = State.Ico;
             }
         }
         else if(now > ICOdeadline && state!=State.Successful) {
             state = State.Successful;
             completedAt = now;
             LogFundingSuccessful(totalRaised);
-            finished();  
+            finished();
         }
     }
 
@@ -164,4 +164,15 @@ contract MOIRAICO {
         require(msg.value > 1 finney);
         contribute();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

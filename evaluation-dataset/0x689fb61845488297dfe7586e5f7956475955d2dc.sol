@@ -1,4 +1,4 @@
-/* 		
+/*
 		https://mycryptochamp.io/
 		hello@mycryptochamp.io
 */
@@ -60,12 +60,12 @@ contract MyCryptoChampCore {
         uint position; //subtract 1 and you get position in leaderboard[]
         uint price; //sale price
         uint withdrawCooldown; //if you one of the 800 best champs and withdrawCooldown is less as block.timestamp then you get ETH reward
-        uint eq_sword; 
-        uint eq_shield; 
-        uint eq_helmet; 
+        uint eq_sword;
+        uint eq_shield;
+        uint eq_helmet;
         bool forSale; //is champ for sale?
     }
-    
+
     struct AddressInfo {
         uint withdrawal;
         uint champsCount;
@@ -83,10 +83,10 @@ contract MyCryptoChampCore {
         uint cooldownReduction;
         uint price;
         uint onChampId; //can not be used to decide if item is on champ, because champ's id can be 0, 'bool onChamp' solves it.
-        bool onChamp; 
+        bool onChamp;
         bool forSale; //is item for sale?
     }
-    
+
     Champ[] public champs;
     Item[] public items;
     mapping (uint => uint) public leaderboard;
@@ -102,12 +102,12 @@ contract MyCryptoChampCore {
     Controller internal controller;
 
 
-    constructor () public 
+    constructor () public
     {
         trusted[msg.sender] = true;
         contractOwner = msg.sender;
     }
-    
+
 
     /*============== MODIFIERS ==============*/
     modifier onlyTrusted(){
@@ -132,7 +132,7 @@ contract MyCryptoChampCore {
         _;
     }
 
-    modifier onlyNotOwnerOfChamp(uint _champId) 
+    modifier onlyNotOwnerOfChamp(uint _champId)
     {
         require(msg.sender != tokenToOwner[true][_champId]);
         _;
@@ -150,26 +150,26 @@ contract MyCryptoChampCore {
         controller = Controller(_address);
     }
 
-    
+
     function setTrusted(address _address, bool _trusted) external onlyTrusted {
         trusted[_address] = _trusted;
     }
-    
+
     function transferOwnership(address newOwner) public onlyTrusted {
         require(newOwner != address(0));
         contractOwner = newOwner;
     }
-    
+
 
     /*============== PRIVATE FUNCTIONS ==============*/
-    function _addWithdrawal(address _address, uint _amount) private 
+    function _addWithdrawal(address _address, uint _amount) private
     {
         addressInfo[_address].withdrawal += _amount;
         pendingWithdrawal += _amount;
     }
 
     /// @notice Distribute input funds between contract owner and players
-    function _distributeNewSaleInput(address _affiliateAddress) private 
+    function _distributeNewSaleInput(address _affiliateAddress) private
     {
         //contract owner
         _addWithdrawal(contractOwner, ((msg.value / 100) * 60)); // 60%
@@ -178,13 +178,13 @@ contract MyCryptoChampCore {
         //checks if _affiliateAddress is set & if affiliate address is not buying player
         if(_affiliateAddress != address(0) && _affiliateAddress != msg.sender){
             _addWithdrawal(_affiliateAddress, ((msg.value / 100) * 25)); //provision is 25%
-            
+
         }
     }
 
-    
+
     /*============== ONLY TRUSTED ==============*/
-    function addWithdrawal(address _address, uint _amount) public onlyTrusted 
+    function addWithdrawal(address _address, uint _amount) public onlyTrusted
     {
         _addWithdrawal(_address, _amount);
     }
@@ -202,7 +202,7 @@ contract MyCryptoChampCore {
         contractOwner.transfer(address(this).balance);
     }
 
-    function setChampsName(uint _champId, string _name) public onlyTrusted 
+    function setChampsName(uint _champId, string _name) public onlyTrusted
     {
         champToName[_champId] = _name;
     }
@@ -227,7 +227,7 @@ contract MyCryptoChampCore {
         tokenToOwner[_isTokenChamp][_id] = _owner;
     }
 
-    function setTokensForSaleCount(uint _value, bool _isTokenChamp) public onlyTrusted 
+    function setTokensForSaleCount(uint _value, bool _isTokenChamp) public onlyTrusted
     {
         tokensForSaleCount[_isTokenChamp] = _value;
     }
@@ -253,9 +253,9 @@ contract MyCryptoChampCore {
         uint _lossCount,
         uint _position,
         uint _price,
-        uint _eq_sword, 
-        uint _eq_shield, 
-        uint _eq_helmet, 
+        uint _eq_sword,
+        uint _eq_shield,
+        uint _eq_helmet,
         bool _forSale,
         address _owner
     ) public onlyTrusted returns (uint){
@@ -278,8 +278,8 @@ contract MyCryptoChampCore {
         });
         champ.attackPower = _attackPower;
 
-        uint id = champs.push(champ) - 1; 
-        champs[id].id = id; 
+        uint id = champs.push(champ) - 1;
+        champs[id].id = id;
         leaderboard[_position] = id;
 
         addressInfo[_owner].champsCount++;
@@ -304,24 +304,24 @@ contract MyCryptoChampCore {
         bool _forSale,
         address _owner
     ) public onlyTrusted returns (uint)
-    { 
+    {
         //create that struct
         Item memory item = Item({
             id: 0,
             itemType: _itemType,
-            itemRarity: _itemRarity, 
+            itemRarity: _itemRarity,
             attackPower: _attackPower,
             defencePower: _defencePower,
             cooldownReduction: _cooldownReduction,
             price: _price,
             onChampId: _onChampId,
-            onChamp: _onChamp, 
+            onChamp: _onChamp,
             forSale: _forSale
 
         });
 
         uint id = items.push(item) - 1;
-        items[id].id = id; 
+        items[id].id = id;
 
         addressInfo[_owner].itemsCount++;
         tokenToOwner[false][id] = _owner;
@@ -334,7 +334,7 @@ contract MyCryptoChampCore {
     }
 
     function updateChamp(
-        uint _champId, 
+        uint _champId,
         uint _attackPower,
         uint _defencePower,
         uint _cooldownTime,
@@ -344,9 +344,9 @@ contract MyCryptoChampCore {
         uint _position,
         uint _price,
         uint _withdrawCooldown,
-        uint _eq_sword, 
-        uint _eq_shield, 
-        uint _eq_helmet, 
+        uint _eq_sword,
+        uint _eq_shield,
+        uint _eq_helmet,
         bool _forSale
     ) public onlyTrusted {
         Champ storage champ = champs[_champId];
@@ -365,8 +365,8 @@ contract MyCryptoChampCore {
         if(champ.eq_sword != _eq_sword){champ.eq_sword = _eq_sword;}
         if(champ.eq_shield != _eq_shield){champ.eq_shield = _eq_shield;}
         if(champ.eq_helmet != _eq_helmet){champ.eq_helmet = _eq_helmet;}
-        if(champ.forSale != _forSale){ 
-            champ.forSale = _forSale; 
+        if(champ.forSale != _forSale){
+            champ.forSale = _forSale;
             if(_forSale){
                 tokensForSaleCount[true]++;
             }else{
@@ -409,10 +409,10 @@ contract MyCryptoChampCore {
 
 
     /*============== CALLABLE BY PLAYER ==============*/
-    function buyItem(uint _id, address _affiliateAddress) external payable 
-    onlyNotOwnerOfItem(_id) 
+    function buyItem(uint _id, address _affiliateAddress) external payable
+    onlyNotOwnerOfItem(_id)
     isItemForSale(_id)
-    isPaid(items[_id].price) 
+    isPaid(items[_id].price)
     {
         if(tokenToOwner[false][_id] == address(this)){
             _distributeNewSaleInput(_affiliateAddress);
@@ -423,9 +423,9 @@ contract MyCryptoChampCore {
     }
 
     function buyChamp(uint _id, address _affiliateAddress) external payable
-    onlyNotOwnerOfChamp(_id) 
-    isChampForSale(_id) 
-    isPaid(champs[_id].price) 
+    onlyNotOwnerOfChamp(_id)
+    isChampForSale(_id)
+    isPaid(champs[_id].price)
     {
         if(tokenToOwner[true][_id] == address(this)){
             _distributeNewSaleInput(_affiliateAddress);
@@ -439,16 +439,16 @@ contract MyCryptoChampCore {
         addressInfo[msg.sender].name = _name;
     }
 
-    function withdrawToAddress(address _address) external 
+    function withdrawToAddress(address _address) external
     {
         address playerAddress = _address;
         if(playerAddress == address(0)){ playerAddress = msg.sender; }
         uint share = addressInfo[playerAddress].withdrawal; //gets pending funds
         require(share > 0); //is it more than 0?
 
-        addressInfo[playerAddress].withdrawal = 0; //set player's withdrawal pendings to 0 
-        pendingWithdrawal = pendingWithdrawal.sub(share); //subtract share from total pendings 
-        
+        addressInfo[playerAddress].withdrawal = 0; //set player's withdrawal pendings to 0
+        pendingWithdrawal = pendingWithdrawal.sub(share); //subtract share from total pendings
+
         playerAddress.transfer(share); //transfer
     }
 
@@ -522,7 +522,7 @@ contract MyCryptoChampCore {
             return items.length - 1 - addressInfo[address(0)].itemsCount;
         }
     }
-    
+
     function getTokenURIs(uint _tokenId, bool _isTokenChamp) public view returns(string)
     {
         return controller.getTokenURIs(_tokenId,_isTokenChamp);
@@ -572,10 +572,26 @@ contract MyCryptoChampCore {
     }
 
     function withdrawChamp(uint _id) external{
-        controller.withdrawChamp(_id, msg.sender); 
+        controller.withdrawChamp(_id, msg.sender);
     }
 
     function getChampReward(uint _position) public view returns(uint){
         return controller.getChampReward(_position);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

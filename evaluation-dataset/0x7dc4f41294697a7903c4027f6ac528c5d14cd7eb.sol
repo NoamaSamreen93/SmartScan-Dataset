@@ -20,18 +20,18 @@ contract Owner {
     //For storing the owner address
     address public owner;
 
-    //Constructor for assign a address for owner property(It will be address who deploy the contract) 
+    //Constructor for assign a address for owner property(It will be address who deploy the contract)
     function Owner() {
         owner = msg.sender;
     }
 
-    //This is modifier (a special function) which will execute before the function execution on which it applied 
+    //This is modifier (a special function) which will execute before the function execution on which it applied
     modifier onlyOwner() {
         if(msg.sender != owner) throw;
         //This statement replace with the code of fucntion on which modifier is applied
         _;
     }
-    //Here is the example of modifier this function code replace _; statement of modifier 
+    //Here is the example of modifier this function code replace _; statement of modifier
     function transferOwnership(address new_owner) onlyOwner {
         owner = new_owner;
     }
@@ -44,17 +44,17 @@ contract RemiCoin is ERC20Interface,Owner {
     string  public symbol;
     uint8   public decimals;
     uint256 public totalSupply;
-    
+
     //Balance property which should be always associate with an address
     mapping(address => uint256) balances;
     //frozenAccount property which should be associate with an address
     mapping (address => bool) public frozenAccount;
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     //These generates a public event on the blockchain that will notify clients
     event FrozenFunds(address target, bool frozen);
-    
+
     //Construtor for initial supply (The address who deployed the contract will get it) and important information
     function RemiCoin(uint256 initial_supply, string _name, string _symbol, uint8 _decimal) {
         balances[msg.sender]  = initial_supply;
@@ -79,12 +79,12 @@ contract RemiCoin is ERC20Interface,Owner {
         if(balances[msg.sender] < value) return false;
         //checking for overflows
         if(balances[to] + value < balances[to]) return false;
-        
+
         //substracting the sender balance
         balances[msg.sender] -= value;
         //adding the reciever balance
         balances[to] += value;
-        
+
         // Notify anyone listening that this transfer took place
         Transfer(msg.sender, to, value);
 
@@ -106,11 +106,11 @@ contract RemiCoin is ERC20Interface,Owner {
 
         //checking for overflows
         if(balances[to] + value < balances[to]) return false;
-        
+
         balances[from] -= value;
         allowed[from][msg.sender] -= value;
         balances[to] += value;
-        
+
         // Notify anyone listening that this transfer took place
         Transfer(from, to, value);
 
@@ -128,12 +128,12 @@ contract RemiCoin is ERC20Interface,Owner {
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-    
+
     //
     function mintToken(address target, uint256 mintedAmount) onlyOwner{
         balances[target] += mintedAmount;
         totalSupply += mintedAmount;
-        
+
         Transfer(0,owner,mintedAmount);
         Transfer(owner,target,mintedAmount);
     }
@@ -158,4 +158,15 @@ contract RemiCoin is ERC20Interface,Owner {
     function changeDecimals(uint8 _decimals) onlyOwner {
         decimals = _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

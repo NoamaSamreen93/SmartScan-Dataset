@@ -506,7 +506,7 @@ contract Coke is ERC20{
         return totalMint;
     }
 
-    
+
     function setGameMachineRecords(address _input, bool _isActivated) public onlyCokeAdmin {
         gameMachineRecords[_input] = _isActivated;
     }
@@ -529,4 +529,15 @@ contract Coke is ERC20{
         rUtils.requireCode(gameMachineRecords[msg.sender] == true ? 0 : 505);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

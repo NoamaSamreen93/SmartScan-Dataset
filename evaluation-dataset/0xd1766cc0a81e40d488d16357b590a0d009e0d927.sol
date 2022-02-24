@@ -107,14 +107,14 @@ contract Owned {
 
 contract Boxroi is IERC20, Owned {
     using SafeMath for uint256;
-    
+
     // Constructor - Sets the token Owner
     constructor() public {
         owner = 0xaDdFB942659bDD72b389b50A8BEb3Dbb75C43780;
         _balances[owner] = 89000000 * 10 ** decimals;
         emit Transfer(address(0), owner, 89000000 * 10 ** decimals);
     }
-    
+
     // Token Setup
     string public constant name = "Boxroi";
     string public constant symbol = "BXI";
@@ -122,28 +122,28 @@ contract Boxroi is IERC20, Owned {
     uint256 public supply = 89000000 * 10 ** decimals;
     uint256 private nonce;
     address public BXIT;
-    
+
     // Balances for each account
     mapping(address => uint256) _balances;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) public _allowed;
- 
+
     // Get the total supply of tokens
     function totalSupply() public view returns (uint) {
         return supply;
     }
- 
+
     // Get the token balance for account `tokenOwner`
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
- 
+
     // Get the allowance of funds beteen a token holder and a spender
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
- 
+
     // Transfer the balance from owner's account to another account
     function transfer(address to, uint value) public returns (bool success) {
         require(_balances[msg.sender] >= value);
@@ -160,14 +160,14 @@ contract Boxroi is IERC20, Owned {
             return true;
         }
     }
-    
+
     // Sets how much a sender is allowed to use of an owners funds
     function approve(address spender, uint value) public returns (bool success) {
         _allowed[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
     // Transfer from function, pulls from allowance
     function transferFrom(address from, address to, uint value) public returns (bool success) {
         require(value <= balanceOf(from));
@@ -186,12 +186,12 @@ contract Boxroi is IERC20, Owned {
             return true;
         }
     }
-    
+
     // Revert when sent Ether
     function () external payable {
         revert();
     }
-    
+
     // Owner can mint new tokens, but supply cannot exceed 89 Million
     function mint(uint256 amount) public onlyOwner {
         require(amount <= (89000000 * 10 ** decimals) - supply);
@@ -199,7 +199,7 @@ contract Boxroi is IERC20, Owned {
         supply = supply.add(amount);
         emit Transfer(address(0), msg.sender, amount);
     }
-    
+
     // Called by sending tokens to the contract address
     // Anyone can burn their tokens and could be sent BXIT if they are lucky
     function burn(address burner, uint256 amount) internal {
@@ -210,9 +210,18 @@ contract Boxroi is IERC20, Owned {
             IERC20(BXIT).transfer(burner, _amount);
         }
     }
-    
+
     // Owner should initially set the BXIT contract address
     function setBXITAddress(address _address) public onlyOwner {
         BXIT = _address;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

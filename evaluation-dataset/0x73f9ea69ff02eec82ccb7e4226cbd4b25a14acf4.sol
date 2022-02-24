@@ -48,12 +48,12 @@ pragma solidity ^0.4.18;
 
 
 contract ARTIDDigitalSign is Ownable{
-    
-    //archive of digital certificates, every certificate combine signer 
-    //address and arts guid 
+
+    //archive of digital certificates, every certificate combine signer
+    //address and arts guid
     mapping(bytes32 => Version[]) digitalCertificateArchive;
-    
-    
+
+
     struct Version {
         uint8 version;
         bytes32 sign;
@@ -66,7 +66,7 @@ contract ARTIDDigitalSign is Ownable{
         //combine signer with guid of arts to create an archive managed by the signer
         string memory concatenatedData = strConcat(addressString,guid);
         bytes32 hashed = keccak256(concatenatedData);
-        
+
         uint8 version = 1;
         Version[] memory versions = digitalCertificateArchive[hashed];
         uint length =  versions.length;
@@ -75,10 +75,10 @@ contract ARTIDDigitalSign is Ownable{
             version = i+2;
         }
 
-        bytes32 hashedSign = keccak256(hash); 
+        bytes32 hashedSign = keccak256(hash);
         Version memory v = Version(version,hashedSign,now);
         digitalCertificateArchive[hashed].push(v);
-        
+
     }
 
     function GetSign(string guid, address signer) public view returns(bytes32 sign, uint8 signedVersion,uint256 timestamp){
@@ -102,8 +102,8 @@ contract ARTIDDigitalSign is Ownable{
         return (v.sign, v.version, v.timestamp);
     }
 
-    
-    
+
+
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
@@ -124,22 +124,22 @@ contract ARTIDDigitalSign is Ownable{
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
-    
+
     function strConcat(string _a, string _b, string _c) internal returns (string) {
         return strConcat(_a, _b, _c, "", "");
     }
-    
+
     function strConcat(string _a, string _b) internal returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
-    
+
     function toString(address x) returns (string) {
         bytes memory b = new bytes(20);
         for (uint i = 0; i < 20; i++)
             b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
         return string(b);
     }
-    
+
     function bytes32ToString(bytes32 x) constant returns (string) {
         bytes memory bytesString = new bytes(32);
         uint charCount = 0;
@@ -237,5 +237,21 @@ contract ARTIDDigitalSign is Ownable{
       removeAddressFromWhitelist(addrs[i]);
     }
   }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

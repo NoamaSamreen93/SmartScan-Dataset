@@ -542,7 +542,7 @@ contract XetherToken is ERC20Detailed("XetherEcosystemToken", "XEET", 18), ERC20
   */
   event TransferSuccessful(address indexed from_, address indexed to_, uint256 amount_);
   event TransferFailed(address indexed from_, address indexed to_, uint256 amount_);
-  
+
   /**
   * @dev fallback function, buy tokens
   */
@@ -828,4 +828,13 @@ contract XetherToken is ERC20Detailed("XetherEcosystemToken", "XEET", 18), ERC20
     (_eth, _newTokenPrice) = showTokensToEth(_tokens);
     actualTokenPrice = _newTokenPrice;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

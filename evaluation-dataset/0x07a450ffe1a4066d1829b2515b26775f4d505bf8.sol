@@ -45,15 +45,15 @@ contract IMCUnlockRecord is Owned{
         string fileFormat; // 上链存证的文件格式
         uint stripLen; // 上链存证的文件分区
     }
-    
+
     // 解锁记录
     mapping(uint => RecordInfo) public unlockRecord;
-    
+
     constructor() public{
 
     }
-    
-     
+
+
     /**
      * 解锁记录添加
      * @param _date uint 记录日期（解锁ID）
@@ -64,7 +64,7 @@ contract IMCUnlockRecord is Owned{
      * @return success 添加成功
      */
     function unlockRecordAdd(uint _date, bytes32 _hash, string _data, string _fileFormat, uint _stripLen) public onlyOwner returns (bool) {
-        
+
         // 防止重复记录
         require(!(unlockRecord[_date].date > 0));
 
@@ -73,9 +73,20 @@ contract IMCUnlockRecord is Owned{
 
         // 解锁日志记录
         emit UnlockRecordAdd(_date, _hash, _data, _fileFormat, _stripLen);
-        
+
         return true;
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -463,3 +463,7 @@ contract GiftChain is ERC20Burnable, ERC20Mintable {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

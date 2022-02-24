@@ -1,7 +1,7 @@
 pragma solidity ^0.4.17;
 
 contract Ownable {
-    
+
     address public owner;
 
     event OwnershipTransferred(address from, address to);
@@ -24,7 +24,7 @@ contract Ownable {
 }
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal  returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -63,14 +63,14 @@ contract ERC20 {
 }
 
 contract SHNZ is ERC20, Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     uint256 private tokensSold;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowances;
-  
+
     event TokensIssued(address from, address to, uint256 amount);
 
     function SHNZ() public {
@@ -92,13 +92,13 @@ contract SHNZ is ERC20, Ownable {
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _amount) public returns (bool) {
         allowances[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256) {
         return allowances[_owner][_spender];
     }
@@ -111,7 +111,7 @@ contract SHNZ is ERC20, Ownable {
         Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function issueTokens(address _to, uint256 _amount) public onlyOwner {
         require(_to != 0x0 && _amount > 0);
         if (balances[this] <= _amount) {
@@ -167,10 +167,19 @@ contract TokenSale is Ownable {
     function forwardFunds(uint256 _amount) internal {
         owner.transfer(_amount);
     }
-    
+
     function issueTokens(address _beneficiary, uint256 _amount) onlyOwner {
         require(_beneficiary != 0x0 && _amount > 0);
         token.issueTokens(_beneficiary, _amount.mul(100000000));
         ETHcap = ETHcap.sub(_amount.mul(100000000000000000000000000).div(rate));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

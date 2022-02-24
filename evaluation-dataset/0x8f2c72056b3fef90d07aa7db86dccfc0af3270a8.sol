@@ -217,10 +217,21 @@ contract EMT is StandardToken {
             uint public INITIAL_SUPPLY = 2000000000e18;
 
              constructor() public {
-                
+
                     totalSupply_ = INITIAL_SUPPLY;
                     balances[msg.sender] = INITIAL_SUPPLY;
-                 
+
             }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

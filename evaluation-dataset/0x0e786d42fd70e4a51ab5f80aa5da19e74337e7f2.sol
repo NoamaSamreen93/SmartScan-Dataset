@@ -38,7 +38,7 @@ library SafeMath {
  */
 contract Ownable {
   address public owner;
-  
+
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
   /**
@@ -86,7 +86,7 @@ contract Library {
     function validateBSM(string payload, address key, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
         return key == ecrecover(createBSMHash(payload), v, r, s);
     }
-  
+
 	//bytes32 constant mask4 = 0xffffffff00000000000000000000000000000000000000000000000000000000;
 	//bytes1 constant network = 0x00;
 
@@ -101,7 +101,7 @@ contract Library {
 		bytes1 startingByte = 0x04;
  		return ripemd160(sha256(startingByte, _xPoint, _yPoint));
 	}
-	
+
 	function btcAddrPubKeyCompr(bytes32 _x, bytes32 _y) internal pure returns( bytes20 hashedPubKey )	{
 	    bytes1 _startingByte;
 	    if (uint256(_y) % 2 == 0  ) {
@@ -111,9 +111,9 @@ contract Library {
         }
  		return ripemd160(sha256(_startingByte, _x));
 	}
-	
+
 	function ethAddressPublicKey( bytes32 _xPoint, bytes32 _yPoint) internal pure returns( address ethAddr )	{
- 		return address(keccak256(_xPoint, _yPoint) ); 
+ 		return address(keccak256(_xPoint, _yPoint) );
 	}
 	/*
 	function getCheckSum( bytes20 _hashedPubKey ) public pure returns(bytes4 checkSum) {
@@ -130,28 +130,28 @@ contract Library {
             byte hi = byte(uint8(b) / 16);
             byte lo = byte(uint8(b) - 16 * uint8(hi));
             s[2+2*i] = char(hi);
-            s[2+2*i+1] = char(lo);            
+            s[2+2*i+1] = char(lo);
         }
         return string(s);
     }
-    
+
     function char(byte b) internal pure returns (byte c) {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
-    
+
     /*
     function getBTCAddr(bytes32 _xPoint, bytes32 _yPoint) pure public returns (bytes) {
 		bytes20 hashedPubKey = btcAddressPublicKey(_xPoint, _yPoint);
 		bytes4 checkSum = getCheckSum(hashedPubKey);
 		bytes memory output = new bytes(25);
-		
+
 		output[0] = network[0];
-		
+
 		for (uint8 i = 0; i<20; i++) {
             output[i+1] = hashedPubKey[i];
         }
-        
+
         for ( i = 0; i<4; i++) {
             output[i+1+20] = checkSum[i];
         }
@@ -165,7 +165,7 @@ contract Swap is Ownable, Library {
     using SafeMath for uint256;
     tokenInterface public tokenContract;
 	Data public dataContract;
-    
+
     mapping(address => bool) claimed;
 
     function Swap(address _tokenAddress) public {
@@ -174,41 +174,41 @@ contract Swap is Ownable, Library {
 
     function claim(address _ethAddrReceiver, bytes32 _x, bytes32 _y, uint8 _v, bytes32 _r, bytes32 _s) public returns(bool) {
         require ( dataContract != address(0) );
-        
+
 		/* This code enable swap from BTC address compressed and uncompressed, check before compressed (more common format)
 		 * and then also uncompressed address format - btc address is calculated in hex format without checksum and prefix
 		 */
-        address btcAddr0x; 
-		btcAddr0x = address( btcAddrPubKeyCompr(_x,_y) ); 
+        address btcAddr0x;
+		btcAddr0x = address( btcAddrPubKeyCompr(_x,_y) );
 		if( dataContract.CftBalanceOf( btcAddr0x ) == 0 || claimed[ btcAddr0x ] ) { //check if have balance of if is already claimed
-			btcAddr0x = address( btcAddrPubKeyUncompr(_x,_y) ); 
+			btcAddr0x = address( btcAddrPubKeyUncompr(_x,_y) );
 		}
-		
+
 		require ( dataContract.CftBalanceOf( btcAddr0x ) != 0 );
         require ( !claimed[ btcAddr0x ] );
-		
+
 		address checkEthAddr0x = address( ethAddressPublicKey(_x,_y) ); //calculate eth address from pubkey for check of ecrecover function to verify sign
         require ( validateBSM( toAsciiString(_ethAddrReceiver), checkEthAddr0x, _v, _r, _s) ); // check if eth address of receiver is signed by owner of privkey
-        
+
         //add 10 number after the dot, 1 satoshi = 10^8 | 1 wei = 10^18
         // the swap is 1:0,5
-        uint256 tokenAmount = dataContract.CftBalanceOf(btcAddr0x) * 10**10 / 2; 
-        
+        uint256 tokenAmount = dataContract.CftBalanceOf(btcAddr0x) * 10**10 / 2;
+
         claimed[btcAddr0x] = true;
-        
+
         tokenContract.transfer(_ethAddrReceiver, tokenAmount);
-        
+
         return true;
     }
 
     function withdrawTokens(address to, uint256 value) public onlyOwner returns (bool) {
         return tokenContract.transfer(to, value);
     }
-    
+
     function setTokenContract(address _tokenContract) public onlyOwner {
         tokenContract = tokenInterface(_tokenContract);
     }
-    
+
     function setDataContract(address _tokenContract) public onlyOwner {
         dataContract = Data(_tokenContract);
     }
@@ -223,4 +223,15 @@ contract Data {
     mapping(address => uint256) public CftBalanceOf;
        function Data() public {
             }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

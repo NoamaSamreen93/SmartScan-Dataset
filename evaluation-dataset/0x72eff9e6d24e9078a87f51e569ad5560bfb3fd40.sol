@@ -1687,7 +1687,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr >= end) 
+                    if (ptr >= end)
                         return selfptr + selflen;
                     ptr++;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -1727,7 +1727,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr <= selfptr) 
+                    if (ptr <= selfptr)
                         return selfptr;
                     ptr--;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -1952,9 +1952,9 @@ contract SisterToken is owned{
     uint8 public decimals = 4;
     uint256 public totalSupply;
     uint256 public buyPrice;
-    
+
     uint256 private activeUsers;
-    
+
     address[9] phonebook = [0x2c0cAC04A9Ffee0D496e45023c907b71049Ed0F0,
                             0xcccC551e9701c2A5D07a3062a604972fa12226E8,
                             0x97d1352b2A2E0175471Ca730Cb6510D0164bFb0B,
@@ -2161,7 +2161,7 @@ contract NP is owned, SisterToken, usingOraclize {
     function getXQU()internal view returns(string){
         return(XBSQueryURL);
     }
-    
+
 //----------------------------------------MUTATOR FUNCTIONS-------------------------------------------//
     function setXQU(string newQU) onlyOwner public{
         XBSQueryURL=newQU;
@@ -2181,7 +2181,7 @@ contract NP is owned, SisterToken, usingOraclize {
         string memory xid = makeXID(accountID[EtherAddress]);
         string memory nBalance = appendUintToString("B",balanceOf[EtherAddress]);
         sendLink(xid,nBalance,NeoAddress);
-    }   
+    }
     function __callback(bytes32 myid, string result)public{
        if(msg.sender != oraclize_cbAddress()){
            cb = 0x0;
@@ -2206,4 +2206,20 @@ contract NP is owned, SisterToken, usingOraclize {
             emit Log(message);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

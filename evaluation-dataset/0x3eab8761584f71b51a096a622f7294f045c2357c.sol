@@ -69,7 +69,7 @@ contract Owned {
     }
 
 
-  
+
 }
 
 
@@ -99,7 +99,7 @@ contract Token is ERC20Interface, Owned, SafeMath {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -192,12 +192,12 @@ contract Token is ERC20Interface, Owned, SafeMath {
         revert();
     }
 
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         owner = _newOwner;
     }
-    
-    
+
+
      /**
      * @dev Internal function that mints an amount of the token and assigns it to
      * an account. This encapsulates the modification of balances such that the
@@ -226,4 +226,17 @@ contract Token is ERC20Interface, Owned, SafeMath {
         balances[account] = safeSub(balances[account], value);
         emit Transfer(account, address(0), value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -36,11 +36,11 @@ contract ERC223 {
   function totalSupply() public constant returns (uint256 _supply);
 
   function approve(address _spender, uint _value) external returns (bool);
-  function allowance(address _owner, address _spender) external constant returns (uint); 
+  function allowance(address _owner, address _spender) external constant returns (uint);
   function transfer(address to, uint value) public returns (bool ok);
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transferFrom(address _from, address _to, uint _value) external returns (bool);
-  
+
   event Approval(address indexed _owner, address indexed _spender, uint _value);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event ERC223Transfer(address indexed _from, address indexed _to, uint256 _value, bytes _data);
@@ -62,14 +62,14 @@ contract Tacoin is ERC223 {
   uint256 public totalSupply = 10000000000000000000000000;
 
 function Tacoin (
-        uint256 initialSupply, 
+        uint256 initialSupply,
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10000000000000000000000000  ** uint256(18);  
-        balances[msg.sender] = totalSupply = 10000000000000000000000000;                
-        name = tokenName = "Tacoin";                                   
-        symbol = tokenSymbol = "TACO";                               
+        totalSupply = initialSupply * 10000000000000000000000000  ** uint256(18);
+        balances[msg.sender] = totalSupply = 10000000000000000000000000;
+        name = tokenName = "Tacoin";
+        symbol = tokenSymbol = "TACO";
     }
 
   // Function to access name of token .
@@ -88,12 +88,12 @@ function Tacoin (
   function totalSupply() public constant returns (uint256 _totalSupply) {
       return totalSupply;
   }
-  
+
   function approve(address _spender, uint _value) external returns (bool) {
         _allowances[msg.sender][_spender] = _allowances[msg.sender][_spender].add(_value);
         Approval(msg.sender, _spender, _value);
         return true;
-  
+
   }
   function allowance(address _owner, address _spender) external constant returns (uint) {
         return _allowances[_owner][_spender];
@@ -161,7 +161,7 @@ function Tacoin (
   function balanceOf(address _owner) public constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
   function transferFrom(address _from, address _to, uint _value) external returns (bool) {
         if (_allowances[_from][msg.sender] > 0 &&
             _value > 0 &&
@@ -175,5 +175,16 @@ function Tacoin (
         }
         return false;
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

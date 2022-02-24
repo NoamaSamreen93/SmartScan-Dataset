@@ -67,7 +67,7 @@ library SafeMath {
 /**
  * @title BlockportDistributor
  * @dev This contract can be used to distribute ether to multiple addresses
- * at once. 
+ * at once.
  */
 contract BlockportDistributor {
     using SafeMath for uint256;
@@ -103,4 +103,8 @@ contract BlockportDistributor {
         emit Distributed(receivers, amount);
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

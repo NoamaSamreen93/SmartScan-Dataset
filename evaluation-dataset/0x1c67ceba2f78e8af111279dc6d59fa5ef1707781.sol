@@ -4,42 +4,42 @@ pragma solidity ^0.4.21;
 
 
 contract AllForOne {
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     mapping (address => uint) private playerKey;
     mapping (address => uint) public playerCount;
     mapping (address => uint) public currentGame;
     mapping (address => uint) public currentPlayersRequired;
-    
+
     mapping (address => uint) private playerRegistrationStatus;
     mapping (address => uint) private playerNumber;
     mapping (uint => address) private numberToAddress;
-    
+
     uint public currentBet = 0.005 ether;
     address public contractAddress;
     address public owner;
     address public lastWinner;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
-    
+
     modifier noPendingBets {
         require(playerCount[contractAddress] == 0);
         _;
     }
-    
+
     function changeBet(uint _newBet) public noPendingBets onlyOwner {
         currentBet = _newBet;
     }
-    
+
     function AllForOne() {
         contractAddress = this;
         currentGame[contractAddress]++;
@@ -48,7 +48,7 @@ contract AllForOne {
         currentBet = 0.005 ether;
         lastWinner = msg.sender;
     }
-    
+
     function canBet() view public returns (uint, uint, address) {
         uint _status = 0;
         uint _playerCount = playerCount[contractAddress];
@@ -58,7 +58,7 @@ contract AllForOne {
         }
         return (_status, _playerCount, _lastWinner);
     }
-    
+
     modifier betCondition(uint _input) {
         require (playerRegistrationStatus[msg.sender] < currentGame[contractAddress]);
         require (playerCount[contractAddress] < 100);
@@ -66,7 +66,7 @@ contract AllForOne {
         require (_input > 0 && _input != 0);
         _;
     }
-    
+
     function placeBet (uint _input) payable betCondition(_input) {
         playerNumber[msg.sender] = 0;
         playerCount[contractAddress]++;
@@ -86,4 +86,15 @@ contract AllForOne {
                 playerCount[contractAddress] = 0;
             }
         }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

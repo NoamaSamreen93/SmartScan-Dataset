@@ -9,7 +9,7 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
-    }  
+    }
 
     function div(uint256 a, uint256 b) internal returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -17,7 +17,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-  
+
     function mul(uint256 a, uint256 b) internal returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -31,49 +31,49 @@ library SafeMath {
 }
 
 contract GigsToken {
-    
+
     using SafeMath for uint256;
-    
-    /**For unlimited supply set _totalSupply to 0, delete the word "constant", 
+
+    /**For unlimited supply set _totalSupply to 0, delete the word "constant",
      *and uncomment "_totalSupply" in createTokens()
      */
-    uint public constant _totalSupply = 16000000; 
-    
+    uint public constant _totalSupply = 16000000;
+
     string public constant symbol = "GIX";
     string public constant name = "Blockchain Gigs";
     uint8 public constant decimals = 18;
 	uint256 public constant totalSupply = _totalSupply * 10 ** uint256(decimals);
-    
+
     // 1 ether = 500 gigs
     uint256 public constant RATE = 500;
-    
-    address public owner; 
-    
+
+    address public owner;
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     function () public payable {
         createTokens();
     }
-    
+
     function GigsToken() {
         balances[msg.sender] = totalSupply;
         owner = msg.sender;
     }
-    
+
     function createTokens() payable {
         require(msg.value > 0);
         uint256 tokens = msg.value.mul(RATE);
         balances[msg.sender] = balances[msg.sender].add(tokens);
-        
+
         //_totalSupply = _totalSupply.add(tokens);
-        
+
         owner.transfer(msg.value);
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
@@ -93,7 +93,7 @@ contract GigsToken {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         Transfer(_from, _to, _value);
         return true;
-        
+
     }
     function approve(address _spender, uint256 _value) returns (bool success){
         allowed[msg.sender][_spender] = _value;
@@ -103,6 +103,17 @@ contract GigsToken {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining){
         return allowed[_owner][_spender];
     }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

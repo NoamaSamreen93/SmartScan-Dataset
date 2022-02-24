@@ -1,9 +1,9 @@
 pragma solidity ^0.5.7;
 
 /**
- * 
+ *
  * ERC-20 Source: https://github.com/OpenZeppelin/openzeppelin-solidity/tree/master/contracts/token/ERC20
- * 
+ *
  * @title ERC20 interface
  * @dev see https://eips.ethereum.org/EIPS/eip-20
  *
@@ -24,7 +24,7 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     event Burn(address indexed from, uint256 value);
 }
 
@@ -99,13 +99,13 @@ contract TestAK is IERC20 {
     string public symbol;
     uint8 public decimals;
     uint256 private _totalSupply;
-    
+
     constructor() public {
         name = "Test Akoya";
         symbol = "TESTAK";
         decimals = 18;
         _totalSupply = 10000000 * 10 ** uint256(decimals);
-        
+
         // Assign entire AKYE supply to the contract creator
         _balances[msg.sender] = _totalSupply;
     }
@@ -203,7 +203,7 @@ contract TestAK is IERC20 {
         _approve(msg.sender, spender, _allowed[msg.sender][spender].sub(subtractedValue));
         return true;
     }
-    
+
      /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -276,9 +276,18 @@ contract TestAK is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
-    
+
     // Rejects ETH deposits
     function () external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

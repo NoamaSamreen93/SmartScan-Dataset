@@ -159,7 +159,7 @@ contract Rainmaker is Ownable, ReentrancyGuard {
         }
         return true;
     }
-    
+
     //If accidentally tokens are transferred to this
     //contract. They can be withdrawn by the following interface.
     function withdrawERC20Token(ERC20 anyToken) public onlyOwner nonReentrant returns(bool){
@@ -174,7 +174,18 @@ contract Rainmaker is Ownable, ReentrancyGuard {
     function withdrawEther() public onlyOwner nonReentrant returns(bool){
         if(address(this).balance > 0){
             owner.transfer(address(this).balance);
-        }        
+        }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

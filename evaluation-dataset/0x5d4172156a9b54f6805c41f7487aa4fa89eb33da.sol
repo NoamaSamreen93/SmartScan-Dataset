@@ -56,7 +56,7 @@ contract RgiftTokenSale {
         require(msg.value == (1 ether / 2) || msg.value == 1 ether  || msg.value == (1 ether + (1 ether / 2)) || msg.value == 2 ether || msg.value >= 3 ether);
         require(now > startDate);
         uint amount = 0;
-        if (msg.value < 1 ether){ 
+        if (msg.value < 1 ether){
             amount = msg.value * price;
         } else if (msg.value >= 1 ether && msg.value < 2 ether){
             amount = msg.value * price;
@@ -71,10 +71,14 @@ contract RgiftTokenSale {
              _amount = amount / 5;
             amount += _amount * 3;
         }
-        
+
 
         tokenReward.transferFrom(owner, msg.sender, amount);
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

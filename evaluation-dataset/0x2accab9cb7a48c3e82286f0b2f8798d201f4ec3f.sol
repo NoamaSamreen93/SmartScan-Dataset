@@ -3,7 +3,7 @@ pragma solidity ^0.4.15;
 contract Owned {
 
     address owner;
-    
+
     function Owned() { owner = msg.sender; }
 
     modifier onlyOwner {
@@ -22,7 +22,7 @@ contract TokenEIP20 {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract TokenNotifier {
@@ -118,10 +118,10 @@ library SafeMathLib {
 
 contract BattleToken is Owned, TokenEIP20 {
     using SafeMathLib for uint256;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     string  public constant name        = "Battle";
     string  public constant symbol      = "BTL";
     uint256 public constant decimals    = 18;
@@ -152,7 +152,7 @@ contract BattleToken is Owned, TokenEIP20 {
         assert(balances[_from] >= 0);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        assert(balances[_to] <= totalSupply);        
+        assert(balances[_to] <= totalSupply);
         Transfer(_from, _to, _value);
         return true;
     }
@@ -178,4 +178,15 @@ contract BattleToken is Owned, TokenEIP20 {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

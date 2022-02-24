@@ -121,3 +121,12 @@ function add(uint256 a, uint256 b) internal pure returns (uint256) {
     return c;
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

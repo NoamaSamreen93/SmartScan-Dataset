@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 //
 // Deployed to : 0x17F28BD2c1B22c07899cA7EF7Bf586B7A4e6fCf4
 // Symbol      : CTLX
-// Name        : Cash Telex 
+// Name        : Cash Telex
 // Total supply: 1 billion
 // Total supply: Generated from contributions
 // Decimals    : 18
@@ -231,4 +231,15 @@ contract CashTelexToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

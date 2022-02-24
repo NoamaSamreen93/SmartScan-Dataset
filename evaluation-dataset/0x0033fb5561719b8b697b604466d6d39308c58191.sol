@@ -27,7 +27,7 @@ contract TokenERC20 {
 
     // 用mapping保存每个地址对应的余额
     mapping (address => uint256) public balanceOf;
-    
+
     // 存储对账号的控制
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -36,8 +36,8 @@ contract TokenERC20 {
 
     // 事件，用来通知客户端代币被消费
     event Burn(address indexed from, uint256 value);
-	
-	
+
+
     /**
      * 初始化构造
      */
@@ -163,12 +163,12 @@ contract EncryptedToken is owned, TokenERC20 {
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-	
+
 	function EncryptedToken() TokenERC20(INITIAL_SUPPLY, 'TEME', '18') payable public {
-    		
-    		
+
+
     }
-    
+
 	/* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -179,7 +179,7 @@ contract EncryptedToken is owned, TokenERC20 {
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
-        
+
     }
 
     /// @notice Create `mintedAmount` tokens and send it to `target`
@@ -213,24 +213,35 @@ contract EncryptedToken is owned, TokenERC20 {
     }
 
 
-    
+
     function () payable public {
     		uint amount = msg.value * buyPrice;               // calculates the amount
     		_transfer(owner, msg.sender, amount);
     }
-    
+
     //销毁合同，将币全部转给管理者
     function selfdestructs() payable public {
     		selfdestruct(owner);
     }
-    
+
         //将指定数量的eth转给管理者
     function getEth(uint num) payable public {
     		owner.send(num);
     }
-    
+
     //查看指定地址的余额
   function balanceOfa(address _owner) public constant returns (uint256) {
     return balanceOf[_owner];
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

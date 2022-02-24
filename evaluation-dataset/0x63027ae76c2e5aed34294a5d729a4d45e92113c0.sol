@@ -851,8 +851,8 @@ contract CommemorativeToken is ERC721Full, Ownable, Batcher {
     uint nextToken;
 
 
-    constructor(address newOwner) 
-        public 
+    constructor(address newOwner)
+        public
         ERC721Full(name,symbol)
     {
         batcher = 0xB6f9E6D9354b0c04E0556A168a8Af07b2439865E;
@@ -864,4 +864,8 @@ contract CommemorativeToken is ERC721Full, Ownable, Batcher {
         _setTokenURI(nextToken, uri);
         nextToken++;
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -35,7 +35,7 @@ contract MyCoin{
     uint8 constant public decimals = 18;
     string constant public name = "Payment Alliance chain";
     string constant public symbol = "PAC";
-    
+
     address public owner;
 
 
@@ -75,7 +75,7 @@ contract MyCoin{
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /// @param _from The address of the sender
     /// @param _to The address of the recipient
@@ -103,7 +103,7 @@ contract MyCoin{
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /// @param _value The amount of token to be freeze
     /// @return Is it successfully froze
     function freeze(uint256 _value) public returns (bool) {
@@ -114,7 +114,7 @@ contract MyCoin{
         emit Freeze(msg.sender, _value);
         return true;
     }
-    
+
     /// @param _value The amount of token to be unfreeze
     /// @return Is it successfully unfroze
     function unfreeze(uint256 _value) public returns (bool) {
@@ -125,8 +125,24 @@ contract MyCoin{
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-    
+
     function() payable public {
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

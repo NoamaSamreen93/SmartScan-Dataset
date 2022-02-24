@@ -385,7 +385,7 @@ contract ERC20Mintable is ERC20 {
     }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, bytes calldata _extraData) external;
 }
 
@@ -403,7 +403,7 @@ contract AIRWALLET is ERC20Mintable, ERC20Burnable {
 
     function approveAndCall(address _spender, uint256 _value, bytes calldata _extraData)
         external
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -411,4 +411,15 @@ contract AIRWALLET is ERC20Mintable, ERC20Burnable {
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

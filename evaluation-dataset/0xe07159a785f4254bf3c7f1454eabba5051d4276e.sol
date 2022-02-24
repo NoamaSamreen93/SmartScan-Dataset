@@ -128,12 +128,12 @@ contract Bussiness is Ownable {
         delete arrayTokenIdSale[arrayTokenIdSale.length-1];
         arrayTokenIdSale.length--;
     }
-    
+
     function _burnArrayTokenIdSaleByArr(uint[] memory arr) internal {
         for(uint i; i<arr.length; i++){
             _burnArrayTokenIdSale(i);
         }
-       
+
     }
     function ownerOf(uint256 _tokenId) public view returns (address){
         return erc721Address.ownerOf(_tokenId);
@@ -168,7 +168,7 @@ contract Bussiness is Ownable {
                     ethNeed = limitETHFee + _hightLightFee;
                 }
             }
-            
+
         }
         return (ethNeed, _hightLightFee);
     }
@@ -288,7 +288,7 @@ contract Bussiness is Ownable {
                     if(prices[arrayTokenIdSale[i]].isHightlight == true) eth += hightLightFee;
                     if(address(this).balance >= eth) {
                         prices[arrayTokenIdSale[i]].tokenOwner.transfer(eth);
-                    } 
+                    }
                 }
                 else if (prices[arrayTokenIdSale[i]].hbfee > 0) {
                     uint256 hb = prices[arrayTokenIdSale[i]].hbfee;
@@ -301,7 +301,7 @@ contract Bussiness is Ownable {
         }
         _withdraw(msg.sender, address(this).balance, hbwalletToken.balanceOf(address(this)));
     }
-    
+
     function revenue() public view returns (uint256, uint256){
         uint256 ethfee = 0;
         uint256 hbfee = 0;
@@ -319,7 +319,7 @@ contract Bussiness is Ownable {
         uint256 hb = hbwalletToken.balanceOf(address(this)) - hbfee;
         return (eth, hb);
     }
-    
+
     function changeCeo(address _address) public onlyCeoAddress {
         require(_address != address(0));
         ceoAddress = _address;
@@ -349,4 +349,13 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

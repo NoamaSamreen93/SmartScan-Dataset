@@ -148,14 +148,14 @@ contract ScamCoin is StandardToken, SafeMath {
     /// and cap was not reached. Returns token count.
     function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       uint tokenCount = msg.value / buyPrice;
       if (tokenCount > tierBudget) {
         tokenCount = tierBudget;
       }
-      
+
       uint investment = tokenCount * buyPrice;
 
       balances[msg.sender] += tokenCount;
@@ -191,9 +191,20 @@ contract ScamCoin is StandardToken, SafeMath {
 
     /// @dev Contract constructor function sets initial token balances.
     function ScamCoin()
-    {   
+    {
         // Only 20 coins premined
         balances[founder] = 20000;
         totalSupply += 20000;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -916,3 +916,12 @@ contract SocialGoodToken is CappedToken(210000000e18), PausableToken, Superuser 
         emit Transfer(_who, address(0), _value);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

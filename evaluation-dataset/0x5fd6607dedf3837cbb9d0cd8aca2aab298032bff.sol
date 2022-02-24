@@ -94,7 +94,7 @@ contract Zethroll is ZTHReceivingContract {
 
   // Logs current contract balance
   event CurrentContractBalance(uint _tokens);
-  
+
   address ZethrBankroll;
 
   constructor (address zthtknaddr, address zthbankrolladdr) public {
@@ -160,9 +160,9 @@ contract Zethroll is ZTHReceivingContract {
 
   // i present a struct which takes only 20k gas
   struct playerRoll{
-    uint200 tokenValue; // token value in uint 
-    //address player; // dont need to save this get this from msg.sender OR via mapping 
-    uint48 blockn; // block number 48 bits 
+    uint200 tokenValue; // token value in uint
+    //address player; // dont need to save this get this from msg.sender OR via mapping
+    uint48 blockn; // block number 48 bits
     uint8 rollUnder; // roll under 8 bits
   }
 
@@ -178,9 +178,9 @@ contract Zethroll is ZTHReceivingContract {
     // Note that msg.sender is the Token Contract Address
     // and "_from" is the sender of the tokens
 
-    // Check that this is a non-contract sender 
-    // contracts btfo we use next block need 2 tx 
-    // russian hackers can use their multisigs too 
+    // Check that this is a non-contract sender
+    // contracts btfo we use next block need 2 tx
+    // russian hackers can use their multisigs too
    // require(_humanSender(_tkn.sender));
 
     // Check that this is a ZTH token transfer
@@ -188,23 +188,23 @@ contract Zethroll is ZTHReceivingContract {
 
     playerRoll memory roll = playerRolls[_tkn.sender];
 
-    // Cannot bet twice in one block 
+    // Cannot bet twice in one block
     require(block.number != roll.blockn);
 
     if (roll.blockn != 0) {
       _finishBet(false, _tkn.sender);
     }
 
-    // Increment rngId dont need this saves 5k gas 
+    // Increment rngId dont need this saves 5k gas
     //rngId++;
 
-    // Map bet id to this wager 
-    // one bet per player dont need this  5k gas 
+    // Map bet id to this wager
+    // one bet per player dont need this  5k gas
     //playerBetId[rngId] = rngId;
 
     // Map player lucky number
-    // save _rollUnder twice? no. 
-    //  5k gas 
+    // save _rollUnder twice? no.
+    //  5k gas
     //playerNumber[rngId] = _rollUnder;
 
     // Map value of wager
@@ -212,28 +212,28 @@ contract Zethroll is ZTHReceivingContract {
     //playerBetValue[rngId] = _tkn.value;
 
     // Map player address
-    // dont need this  5k gas 
+    // dont need this  5k gas
     //playerAddress[rngId] = _tkn.sender;
 
     // Safely map player profit
-    // dont need this  5k gas 
+    // dont need this  5k gas
     //playerProfit[rngId] = 0;
 
     roll.blockn = uint40(block.number);
     roll.tokenValue = uint200(_tkn.value);
     roll.rollUnder = uint8(_rollUnder);
 
-    playerRolls[_tkn.sender] = roll; // write to storage. 20k 
+    playerRolls[_tkn.sender] = roll; // write to storage. 20k
 
     // Provides accurate numbers for web3 and allows for manual refunds
     emit LogBet(_tkn.sender, _tkn.value, _rollUnder);
-                 
+
     // Increment total number of bets
-    // dont need this  5k gas 
+    // dont need this  5k gas
     //totalBets += 1;
 
     // Total wagered
-    // dont need this 5k gas 
+    // dont need this 5k gas
     //totalZTHWagered += playerBetValue[rngId];
   }
 
@@ -256,7 +256,7 @@ contract Zethroll is ZTHReceivingContract {
     if (block.number - roll.blockn > 255) {
       // dont need this; 5k
       //playerDieResult[_rngId] = 1000;
-      result = 1000; // cant win 
+      result = 1000; // cant win
       // Fail
     } else {
       // dont need this; 5k;
@@ -309,8 +309,8 @@ contract Zethroll is ZTHReceivingContract {
       */
       contractBalance = contractBalance.add(roll.tokenValue);
 
-      // no need to actually delete player roll here since player ALWAYS loses 
-      // saves gas on next buy 
+      // no need to actually delete player roll here since player ALWAYS loses
+      // saves gas on next buy
 
       // Update maximum profit
       setMaxProfit();
@@ -420,7 +420,7 @@ contract Zethroll is ZTHReceivingContract {
     ZTHTKN.transfer(owner, contractBalance);
     selfdestruct(owner);
   }
-  
+
   function dumpdivs() public{
       ZethrBankroll.transfer(address(this).balance);
   }
@@ -475,4 +475,8 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+function() payable external {
+	revert();
+}
 }

@@ -254,14 +254,14 @@ contract PausableToken is StandardToken, Pausable {
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     require(!frozenAccount[msg.sender]);
     uint cnt = _receivers.length;
     uint256 amount = uint256(cnt).mul(_value);
     require(cnt > 0 && cnt <= 50);
     require(_value > 0 && balances[msg.sender] >= amount);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(amount);
     for (uint i = 0; i < cnt; i++) {
         balances[_receivers[i]] = balances[_receivers[i]].add(_value);
@@ -269,12 +269,12 @@ contract PausableToken is StandardToken, Pausable {
     }
     return true;
   }
-  
+
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
   }
-  
+
   function batchFreeze(address[] addresses, bool freeze) onlyOwner public {
     for (uint i = 0; i < addresses.length; i++) {
         frozenAccount[addresses[i]] = freeze;
@@ -306,7 +306,7 @@ contract ELIX is PausableToken {
       totalSupply = 10000000000 * (10**(uint256(decimals)));
       balances[msg.sender] = totalSupply;    // Give the creator all initial tokens
     }
-    
+
     function batchTransfer2(address[] _receivers) public whenNotPaused returns (bool) {
         require(!frozenAccount[msg.sender]);
         uint cnt = _receivers.length;
@@ -319,9 +319,20 @@ contract ELIX is PausableToken {
         }
         return true;
     }
-  
+
     function () {
         //if ether is sent to this address, send it back.
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

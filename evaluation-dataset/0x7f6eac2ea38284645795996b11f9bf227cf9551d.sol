@@ -41,7 +41,7 @@ contract Ownable {
 
 
 contract CryptoTask is Ownable {
-   
+
     uint MAX_UINT32 = 4294967295;
     uint public MIN_TASK_VALUE = 200000000000000000000;
     uint public CLIENT_TIME_TO_DECIDE = 3 days;
@@ -49,7 +49,7 @@ contract CryptoTask is Ownable {
     /*uint public MIN_TASK_VALUE = 2000000000000000000;
     uint public CLIENT_TIME_TO_DECIDE = 15 minutes;
     uint public VOTING_PERIOD = 15 minutes;*/
-    
+
     struct Task {
         address client;
         address fl;
@@ -64,7 +64,7 @@ contract CryptoTask is Ownable {
         mapping(uint32 => address) voters;
         uint32 votesTotal;
         uint32 votesClient;
-        uint32 votesFl;        
+        uint32 votesFl;
         uint32 stage;
         uint prev;
         uint next;
@@ -74,52 +74,52 @@ contract CryptoTask is Ownable {
     mapping(uint => string) public descriptions;
     mapping(uint => string) public solutions;
     mapping(uint => uint) public disputeBlockNos;
-    
-    
+
+
     ERC20 public tokenContract = ERC20(0x4545750F39aF6Be4F237B6869D4EccA928Fd5A85);
-    
+
     //owner can prevent new task submissions if platform is to be moved to a new contract
     //apart from this and airdrops, owner has no other privileges
     bool public migrating;
     mapping(address => uint32) public ADs;
-    
+
     mapping(uint => Task) public tasks;
     uint public tasksSize;
     uint public lastTaskIndex;
     mapping(address => uint) public stakes;
     mapping(address => uint) public lastStakings;
     uint public totalStake;
-    
-    
+
+
     function setMigrating(bool willMigrate) onlyOwner {
         migrating = willMigrate;
     }
-    
+
     function setMinTaskValue(uint minTaskValue) onlyOwner {
         MIN_TASK_VALUE = minTaskValue;
     }
-    
+
     function postTask(string title, string description, uint taskValue, uint workTime) {
         require(!migrating && taskValue > MIN_TASK_VALUE);
-        
+
         tasksSize++;
-        
+
         tasks[tasksSize].client = msg.sender;
         titles[tasksSize] = title;
         tasks[tasksSize].workTime = workTime;
         tasks[tasksSize].taskValue = taskValue;
         descriptions[tasksSize] = description;
-        
+
         //linked list connecting
         tasks[tasksSize].prev = lastTaskIndex;
         if(lastTaskIndex > 0) {
             tasks[lastTaskIndex].next = tasksSize;
         }
         lastTaskIndex = tasksSize;
-        
+
         tokenContract.transferFrom(msg.sender, this, taskValue + taskValue/10);
     }
-    
+
     function applyForTask(uint taskID) {
         require(tasks[taskID].stage == 0 && tasks[taskID].client != address(0));
         tasks[taskID].fl = msg.sender;
@@ -127,20 +127,20 @@ contract CryptoTask is Ownable {
         tasks[taskID].stage = 1;
         tokenContract.transferFrom(msg.sender, this, tasks[taskID].taskValue/10);
     }
-    
+
     function submitSolution(uint taskID, string solution) {
         require(tasks[taskID].stage == 1 && msg.sender == tasks[taskID].fl && now < tasks[taskID].applyTime + tasks[taskID].workTime);
         solutions[taskID] = solution;
         tasks[taskID].solutionSubmittedTime = now;
         tasks[taskID].stage = 2;
     }
-    
+
     function startDispute(uint taskID) {
         require(tasks[taskID].stage == 2 && tasks[taskID].client == msg.sender && now < tasks[taskID].solutionSubmittedTime + CLIENT_TIME_TO_DECIDE);
         disputeBlockNos[taskID] = block.number;
         tasks[taskID].stage = 3;
     }
-    
+
     //commitDispute and startDispute need to be separate stages to ensure blockHash randomness
     function commitDispute(uint taskID) {
         require(tasks[taskID].stage == 3 && tasks[taskID].client == msg.sender && now < tasks[taskID].solutionSubmittedTime + CLIENT_TIME_TO_DECIDE && block.number > disputeBlockNos[taskID]+5);
@@ -148,12 +148,12 @@ contract CryptoTask is Ownable {
         tasks[taskID].disputeStartedTime = now;
         tasks[taskID].stage = 4;
     }
-    
+
     function commitVote(uint taskID, bytes32 voteHash) {
         require(tasks[taskID].stage == 4 && now < tasks[taskID].disputeStartedTime + VOTING_PERIOD && tasks[taskID].voteCommits[msg.sender] == bytes32(0));
         tasks[taskID].voteCommits[msg.sender] = voteHash;
     }
-    
+
     function revealVote(uint taskID, uint8 v, bytes32 r, bytes32 s, uint32 vote, bytes32 salt) {
         //100 sec buffer between commit and reveal vote stages
         require(tasks[taskID].stage == 4 && now > tasks[taskID].disputeStartedTime + VOTING_PERIOD+100 && now < tasks[taskID].disputeStartedTime + 2*VOTING_PERIOD && tasks[taskID].voteCommits[msg.sender] != bytes32(0));
@@ -173,12 +173,12 @@ contract CryptoTask is Ownable {
             tasks[taskID].voteCommits[msg.sender] = bytes32(0);
         }
     }
-    
+
     function finalizeTask(uint taskID) {
         uint taskValueTenth = tasks[taskID].taskValue/10;
         uint reviewerReward;
         uint32 i;
-        
+
         //cancel posted task no has applied for yet
         if(tasks[taskID].stage == 0 && msg.sender == tasks[taskID].client) {
             tokenContract.transfer(tasks[taskID].client, tasks[taskID].taskValue + taskValueTenth);
@@ -231,7 +231,7 @@ contract CryptoTask is Ownable {
         } else {
             throw;
         }
-        
+
         //connect linked list after the task removal
         if(tasks[taskID].prev > 0) {
             tasks[tasks[taskID].prev].next = tasks[taskID].next;
@@ -242,7 +242,7 @@ contract CryptoTask is Ownable {
         if(taskID == lastTaskIndex) {
             lastTaskIndex = tasks[taskID].prev;
         }
-        
+
         //if users who received airdrops
         if(ADs[tasks[taskID].client] > 0) {
             ADs[tasks[taskID].client]++;
@@ -251,8 +251,8 @@ contract CryptoTask is Ownable {
             ADs[tasks[taskID].fl]++;
         }
     }
-    
-    
+
+
     function addStake(uint value) {
         if(value > 0) {
             stakes[msg.sender] += value;
@@ -261,7 +261,7 @@ contract CryptoTask is Ownable {
             tokenContract.transferFrom(msg.sender, this, value);
         }
     }
-    
+
     function withdrawStake(uint value) {
         if(value > 0 && stakes[msg.sender] >= value) {
             //received airdrop but completed less than 10 tasks
@@ -274,7 +274,7 @@ contract CryptoTask is Ownable {
             tokenContract.transfer(msg.sender, value);
         }
     }
-    
+
     //airdrop
     function addStakeAD(uint value, address recipient) onlyOwner {
         //prevent owner from adding a small value to set regular user to airdropped user
@@ -286,18 +286,29 @@ contract CryptoTask is Ownable {
             tokenContract.transferFrom(msg.sender, this, value);
         }
     }
-    
-    
+
+
     function getVoteCommit(uint taskID, address commiter) constant returns (bytes32 commit) {
         return tasks[taskID].voteCommits[commiter];
     }
-    
+
     function getVote(uint taskID, uint32 index) constant returns (uint32 vote) {
         return tasks[taskID].votes[index];
     }
-    
+
     function getVoter(uint taskID, uint32 index) constant returns (address voter) {
         return tasks[taskID].voters[index];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

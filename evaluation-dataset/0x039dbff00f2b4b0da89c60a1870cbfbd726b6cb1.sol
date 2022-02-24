@@ -5,10 +5,10 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract TokenERC20 {
     string public name;         //世界佛福链 WORLD FOFU BLOCKCHAIN
     string public symbol;
-    uint8 public decimals = 18;  
-    uint256 public totalSupply;  
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf; 
+    mapping (address => uint256) public balanceOf;
 
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -78,4 +78,15 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

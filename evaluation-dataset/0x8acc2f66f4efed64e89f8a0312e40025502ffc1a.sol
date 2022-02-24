@@ -375,8 +375,8 @@ contract Ownable {
 
 /**
  * @title UpdatableCrowdsale
- * @dev Extension of AllowanceCrowdsale contract that allows updates to the exchange rate used to 
- * calculate the token sale price (rate of tokens to issue per wei contributed).  
+ * @dev Extension of AllowanceCrowdsale contract that allows updates to the exchange rate used to
+ * calculate the token sale price (rate of tokens to issue per wei contributed).
  * Note that what should be provided to the constructor is the _initialRate (price per token in wei),
  * and the _tokenWallet that is going to provide an allowance from which the token sale can distribute
  * the tokent.
@@ -406,11 +406,11 @@ contract UpdatableCrowdsale is AllowanceCrowdsale, Ownable {
   }
 
   /**
-   * @dev Returns the rate of tokens per wei at the present time. 
+   * @dev Returns the rate of tokens per wei at the present time.
    * @return The number of tokens a buyer gets per wei at a given time
    */
   function setCurrentRate(uint256 _newRate) public onlyOwner returns (uint256) {
-    require(_newRate > 0); 
+    require(_newRate > 0);
     uint256 oldRate_ = rate;
     rate = _newRate;
     emit RateUpdated(oldRate_, rate);
@@ -428,9 +428,20 @@ contract UpdatableCrowdsale is AllowanceCrowdsale, Ownable {
   /**
    * @dev Get token estimate based on current rate
    * @param _weiAmount The amount of wei that will be sent
-   */ 
+   */
   function estimate(uint256 _weiAmount) public view returns (uint256) {
     return _getTokenAmount(_weiAmount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

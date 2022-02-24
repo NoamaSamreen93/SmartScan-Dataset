@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20; 
+pragma solidity ^0.4.20;
 
 contract FairyFarmer{
 
@@ -34,11 +34,11 @@ contract FairyFarmer{
         hatcheryFairy[msg.sender]=SafeMath.add(hatcheryFairy[msg.sender],newFairy);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
-		
+
+
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
-		
+
+
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
     function sellEggs() public{
@@ -46,7 +46,7 @@ contract FairyFarmer{
         uint256 hasEggs=getMyEggs();
         uint256 eggValue=calculateEggSell(hasEggs);
         uint256 fee=devFee(eggValue);
-		
+
         hatcheryFairy[msg.sender]=SafeMath.mul(SafeMath.div(hatcheryFairy[msg.sender],3),2);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
@@ -62,7 +62,7 @@ contract FairyFarmer{
         claimedEggs[msg.sender]=SafeMath.add(claimedEggs[msg.sender],eggsBought);
     }
     function calculateTrade(uint256 rt,uint256 rs, uint256 bs) public view returns(uint256){
-      
+
         return SafeMath.div(SafeMath.mul(PSN,bs),SafeMath.add(PSNH,SafeMath.div(SafeMath.add(SafeMath.mul(PSN,rs),SafeMath.mul(PSNH,rt)),rt)));
     }
     function calculateEggSell(uint256 eggs) public view returns(uint256){
@@ -84,8 +84,8 @@ contract FairyFarmer{
     }
     function getFreeFairy() public payable{
         require(initialized);
-        require(msg.value==0.001 ether); 
-        ceoAddress.transfer(msg.value); 
+        require(msg.value==0.001 ether);
+        ceoAddress.transfer(msg.value);
         require(hatcheryFairy[msg.sender]==0);
         lastHatch[msg.sender]=now;
         hatcheryFairy[msg.sender]=STARTING_FAIRY;
@@ -141,4 +141,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

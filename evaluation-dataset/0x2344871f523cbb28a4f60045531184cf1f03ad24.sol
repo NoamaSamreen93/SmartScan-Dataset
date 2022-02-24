@@ -22,7 +22,7 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract Robet is owned {
     // Public variables of the token
     string public name;
-    string public symbol; 
+    string public symbol;
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
@@ -31,14 +31,14 @@ contract Robet is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-    
+
 
     // This generates a public event on the blockchain that will notify clients
     event FrozenFunds(address target, bool frozen);
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -72,9 +72,9 @@ contract Robet is owned {
         // Check for overflows
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         // Check if sender is frozen
-        require(!frozenAccount[_from]); 
-        // Check if recipient is frozen                   
-        require(!frozenAccount[_to]);                       
+        require(!frozenAccount[_from]);
+        // Check if recipient is frozen
+        require(!frozenAccount[_to]);
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         // Subtract from the sender
@@ -169,7 +169,7 @@ contract Robet is owned {
      * Freeze tokens
      *
      * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
-     * 
+     *
      * @param target Address to be frozen
      * @param freeze either to freeze it or not
      */
@@ -195,4 +195,15 @@ contract Robet is owned {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -56,7 +56,7 @@ contract Owned {
     function transferOwnership(address _newOwner) onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     function acceptOwnership() {
         if (msg.sender == newOwner) {
             OwnershipTransferred(owner, newOwner);
@@ -170,7 +170,7 @@ contract ERC20Token {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -228,8 +228,19 @@ contract DaoCasinoToken is ERC20Token, Owned {
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint amount)
-      onlyOwner returns (bool success) 
+      onlyOwner returns (bool success)
     {
         return ERC20Token(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

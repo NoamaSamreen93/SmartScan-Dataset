@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-// great wall token 
+// great wall token
 // power by great wall exchange
 
 contract Token{
@@ -10,15 +10,15 @@ contract Token{
 
     function balanceOf(address _owner) constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
     function approve(address _spender, uint256 _value) returns (bool success);
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -32,9 +32,9 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-      
+
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
         balances[_from] -= _value; //支出账户_from减去token数量_value
@@ -47,7 +47,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -62,13 +62,13 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract gwtoken is StandardToken { 
+contract gwtoken is StandardToken {
 
     /* Public variables of the token */
-    string public name;                   
-    uint8 public decimals;               
+    string public name;
+    uint8 public decimals;
     string public symbol;               //token
-    string public version = 'v1.0';    
+    string public version = 'v1.0';
 
     function gwtoken(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) {
         balances[msg.sender] = 2000000000000000000000000000; // 初始token数量给予消息发送者
@@ -79,7 +79,7 @@ contract gwtoken is StandardToken {
     }
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -90,4 +90,15 @@ contract gwtoken is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

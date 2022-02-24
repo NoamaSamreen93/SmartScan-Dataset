@@ -113,24 +113,24 @@ contract Freezable is Ownable {
 
   /**
   * @dev freeze an account
-  * @param _target Address to be change frozen status. 
-  */    
-  
+  * @param _target Address to be change frozen status.
+  */
+
   function freezeAccount(address _target) public onlyOwner {
       frozenAccount[_target] = true;
       FrozenFunds(_target, true);
-  }  
-  
+  }
+
   /**
   * @dev unfreeze an account
-  * @param _target Address to be change frozen status.  
-  */    
-  
+  * @param _target Address to be change frozen status.
+  */
+
   function unfreezeAccount(address _target) public onlyOwner {
       frozenAccount[_target] = false;
       FrozenFunds(_target, false);
   }
-  
+
 }
 
 contract ERC20Basic {
@@ -321,11 +321,22 @@ contract PuJaDaToken is PausableToken, BurnableToken {
   string public symbol = "PJD";
   uint public decimals = 18;
   uint256 public INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
-  
-  
+
+
   function PuJaDaToken() public {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -47,7 +47,7 @@ contract ERC is ERCBasic {
 }
 
 contract Ownable {
-        
+
         address payable internal owner;
         address internal foundationOwner;
 
@@ -66,7 +66,7 @@ contract Ownable {
                 _;
         }
 
-      
+
 }
 
 contract Pausable is Ownable {
@@ -159,7 +159,7 @@ contract CappedToken is Ownable {
         function canMint (uint256 amount) public view returns (bool) {
                 return (token_cap == 0) || (token_created.add(amount) <= token_cap);
         }
-        
+
         function canMintFoundation(uint256 amount) internal view returns(bool) {
                 return(token_foundation_created.add(amount) <= token_foundation_cap);
         }
@@ -232,7 +232,7 @@ contract LockableProtocol is BasicToken {
 
 contract MintAndBurnToken is TokenForge, CappedToken, LockableProtocol {
         using SafeMath for uint256;
-        
+
         event Mint(address indexed user, uint256 amount);
         event Burn(address indexed user, uint256 amount);
 
@@ -260,7 +260,7 @@ contract MintAndBurnToken is TokenForge, CappedToken, LockableProtocol {
                 require(canMintFoundation(amount));
                 token_foundation_created = token_foundation_created.add(amount);
         }
-        
+
         token_created = token_created.add(amount);
         wallets[target] = wallets[target].add(amount);
 
@@ -655,9 +655,18 @@ contract DaacToken is LockableToken {
         constructor () public LockableToken(TOKEN_INITIAL, TOKEN_CAP, TOKEN_FOUNDATION_CAP) {
         }
 
-        
+
  	    function suicideQent () public onlyOwner{
              selfdestruct(owner);
         }
-        
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

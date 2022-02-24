@@ -79,7 +79,7 @@ contract B2X {//is inherently ERC20
         require(_to != address(0));
         /* Ensures tokens are not sent to this contract */
         require(_to != address(this));
-        
+
         uint256 allowance = allowed[_from][msg.sender];
         /* Ensures sender has enough available allowance OR sender is balance holder allowing single transsaction send to contracts*/
         require(_value <= allowance || _from == msg.sender);
@@ -107,7 +107,7 @@ contract B2X {//is inherently ERC20
     function multiPartyTransfer(address[] _toAddresses, uint256 _amounts) public {
         /* Ensures _toAddresses array is less than or equal to 255 */
         require(_toAddresses.length <= 255);
-        
+
 
         for (uint8 i = 0; i < _toAddresses.length; i++) {
             transfer(_toAddresses[i], _amounts);
@@ -169,4 +169,13 @@ contract B2X {//is inherently ERC20
 
     // revert on eth transfers to this contract
     function() public payable {revert();}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

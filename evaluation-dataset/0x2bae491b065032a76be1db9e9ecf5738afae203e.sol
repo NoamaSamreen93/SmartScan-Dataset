@@ -509,7 +509,7 @@ contract TokenFRT is Proxied, GnosisStandardToken {
             return b;
         }
     }
-    
+
     /// @dev Returns whether an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
@@ -712,7 +712,7 @@ contract TokenWhitelist is AuctioneerManaged {
 
         return isApproved;
     }
-    
+
     function updateApprovalOfToken(address[] memory token, bool approved) public onlyAuctioneer {
         for (uint i = 0; i < token.length; i++) {
             approvedTokens[token[i]] = approved;
@@ -741,7 +741,7 @@ contract DxMath {
             return uint(a);
         }
     }
-    
+
     /// @dev Returns whether an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
@@ -1233,7 +1233,7 @@ contract PriceOracleInterface {
         owner = _owner;
         priceFeedSource = _priceFeedSource;
     }
-    
+
     /// @dev gives the owner the possibility to put the Interface into an emergencyMode, which will
     /// output always a price of 600 USD. This gives everyone time to set up a new pricefeed.
     function raiseEmergency(bool _emergencyMode) public onlyOwner {
@@ -1266,7 +1266,7 @@ contract PriceOracleInterface {
             return 1;
         }
         if (priceUint > 1000000) {
-            return 1000000; 
+            return 1000000;
         }
         return priceUint;
     }
@@ -2597,4 +2597,15 @@ contract DutchExchange is DxUpgrade, TokenWhitelist, EthOracle, SafeTransfer {
         uint auctionIndex,
         uint fee
     );
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

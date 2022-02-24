@@ -61,7 +61,7 @@ contract NeutrinoTokenStandard {
     uint8 constant internal ownerFee2 = 25;
     uint32 holdTimeInBlocks = 558000;
     uint256 constant internal tokenPrice = 0.001 ether;
-    
+
     uint256 constant internal magnitude = 2 ** 64;
     uint256 public stakingRequirement = 50e18;
     mapping(address => uint256) internal tokenBalanceLedger_;
@@ -190,7 +190,7 @@ contract NeutrinoTokenStandard {
         uint256 _ethereum = tokensToEthereum_(_tokensToSell);
         uint8 applyFee = exitFee_;
         if (since[msg.sender] + holdTimeInBlocks > block.number) applyFee = 20;
-        
+
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, applyFee), 100);
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
         return _taxedEthereum;
@@ -287,4 +287,16 @@ library SafeMath {
         require(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

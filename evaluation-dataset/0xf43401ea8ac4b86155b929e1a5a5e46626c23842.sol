@@ -627,7 +627,7 @@ contract MigrationAgent {
 }
 
 /// @title BlackList
-/// @dev Smart contract to enable blacklisting of token holders. 
+/// @dev Smart contract to enable blacklisting of token holders.
 contract BlackList is Ownable {
 
     mapping (address => bool) public blacklist;
@@ -651,7 +651,7 @@ contract BlackList is Ownable {
     function isBlacklisted(address _user) public view returns (bool) {
         return blacklist[_user];
     }
-    
+
     /// @dev add user to black list
     /// @param _user to blacklist
     function addBlackList (address _user) public onlyOwner {
@@ -675,7 +675,7 @@ contract BlackList is Ownable {
  * `ERC20` functions.
  */
 contract Token is Pausable, ERC20Detailed, ERC20Capped, Ownable, ERC20Burnable, BlackList {
-    uint8 public constant DECIMALS = 18;    
+    uint8 public constant DECIMALS = 18;
     uint256 public constant MAX_SUPPLY = 5000000000 * (10 ** uint256(DECIMALS));
     address public migrationAgent;
     uint256 public totalMigrated;
@@ -690,20 +690,20 @@ contract Token is Pausable, ERC20Detailed, ERC20Capped, Ownable, ERC20Burnable, 
         _;
     }
 
-    /// @dev Constructor which initiates name, ticker and max supply for the token. 
-    constructor () public ERC20Detailed("CannDollar", "CDAG", DECIMALS) ERC20Capped(MAX_SUPPLY) {           
+    /// @dev Constructor which initiates name, ticker and max supply for the token.
+    constructor () public ERC20Detailed("CannDollar", "CDAG", DECIMALS) ERC20Capped(MAX_SUPPLY) {
     }
-   
+
 
     /// @notice Migrate tokens to the new token contract.
     /// @param _value The amount of token to be migrated
-    function migrate(uint256 _value) external whenNotPaused() {       
+    function migrate(uint256 _value) external whenNotPaused() {
         require(migrationAgent != address(0), "Enter migration agent address");
-        
+
         // Validate input value.
         require(_value > 0, "Amount of tokens is required");
         require(_value <= balanceOf(msg.sender), "You entered more tokens than available");
-       
+
         burn(balanceOf(msg.sender));
         totalMigrated += _value;
         MigrationAgent(migrationAgent).migrateFrom(msg.sender, _value);
@@ -713,9 +713,9 @@ contract Token is Pausable, ERC20Detailed, ERC20Capped, Ownable, ERC20Burnable, 
     /// @notice Set address of migration target contract and enable migration
     /// process.
     /// @param _agent The address of the MigrationAgent contract
-    function setMigrationAgent(address _agent) external onlyOwner() {        
-        
-        require(migrationAgent == address(0), "Migration agent can't be 0");       
+    function setMigrationAgent(address _agent) external onlyOwner() {
+
+        require(migrationAgent == address(0), "Migration agent can't be 0");
         migrationAgent = _agent;
     }
 
@@ -724,55 +724,64 @@ contract Token is Pausable, ERC20Detailed, ERC20Capped, Ownable, ERC20Burnable, 
     function burnBlacklistedFunds (address _blacklistedUser) public onlyOwner {
         require(blacklist[_blacklistedUser], "These user is not blacklisted");
         uint dirtyFunds = balanceOf(_blacklistedUser);
-        _burn(_blacklistedUser, dirtyFunds);        
+        _burn(_blacklistedUser, dirtyFunds);
         emit BlacklistedFundsBurned(_blacklistedUser, dirtyFunds);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted modifier
-    function transfer(address to, uint256 value) public 
-                                                    isNotBlacklisted(msg.sender, to) 
-                                                    notSelf(to) 
+    function transfer(address to, uint256 value) public
+                                                    isNotBlacklisted(msg.sender, to)
+                                                    notSelf(to)
                                                     returns (bool) {
         return super.transfer(to, value);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted and notSelf modifiers
-    function transferFrom(address from, address to, uint256 value) public 
-                                                                    isNotBlacklisted(from, to) 
-                                                                    notSelf(to) 
+    function transferFrom(address from, address to, uint256 value) public
+                                                                    isNotBlacklisted(from, to)
+                                                                    notSelf(to)
                                                                     returns (bool) {
         return super.transferFrom(from, to, value);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted and notSelf modifiers
-    function approve(address spender, uint256 value) public 
-                                                        isNotBlacklisted(msg.sender, spender) 
-                                                        notSelf(spender) 
+    function approve(address spender, uint256 value) public
+                                                        isNotBlacklisted(msg.sender, spender)
+                                                        notSelf(spender)
                                                         returns (bool) {
         return super.approve(spender, value);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted and notSelf modifiers
-    function increaseAllowance(address spender, uint addedValue) public 
-                                                                isNotBlacklisted(msg.sender, spender) 
-                                                                notSelf(spender) 
+    function increaseAllowance(address spender, uint addedValue) public
+                                                                isNotBlacklisted(msg.sender, spender)
+                                                                notSelf(spender)
                                                                 returns (bool success) {
         return super.increaseAllowance(spender, addedValue);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted and notSelf modifiers
-    function decreaseAllowance(address spender, uint subtractedValue) public 
-                                                                        isNotBlacklisted(msg.sender, spender) 
-                                                                        notSelf(spender) 
+    function decreaseAllowance(address spender, uint subtractedValue) public
+                                                                        isNotBlacklisted(msg.sender, spender)
+                                                                        notSelf(spender)
                                                                         returns (bool success) {
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
     /// @notice Overwrite parent implementation to add blacklisted check and notSelf modifiers
-    function mint(address to, uint256 value) public onlyOwner() notSelf(to) returns (bool) {       
+    function mint(address to, uint256 value) public onlyOwner() notSelf(to) returns (bool) {
 
-        require(!isBlacklisted(to), "User is blacklisted"); 
+        require(!isBlacklisted(to), "User is blacklisted");
         return super.mint(to, value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

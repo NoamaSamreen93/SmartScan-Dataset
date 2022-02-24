@@ -267,12 +267,12 @@ contract SedoPoWToken is ERC20Interface, Owned {
 
     mapping(bytes32 => bytes32) solutionForChallenge;
 
-    uint public tokensMinted; 
+    uint public tokensMinted;
     address public parentAddress; //address of 0xbtc
     uint public miningReward; //initial reward
 
     mapping(address => uint) balances;
-    
+
     mapping(address => uint) merge_mint_ious;
     mapping(address => uint) merge_mint_payout_threshold;
 
@@ -292,7 +292,7 @@ contract SedoPoWToken is ERC20Interface, Owned {
 
         name = "SEDO PoW Token";
 
-        decimals = 8; 
+        decimals = 8;
 
         _totalSupply = 50000000 * 10**uint(decimals);
 
@@ -300,9 +300,9 @@ contract SedoPoWToken is ERC20Interface, Owned {
         locked = true;
 
         tokensMinted = 1000000 * 10**uint(decimals);
-        
+
         miningReward = 25; //initial Mining reward for 1st half of totalSupply (50 000 000 / 2)
- 
+
         rewardEra = 0;
         maxSupplyForEra = _totalSupply.div(2);
 
@@ -316,18 +316,18 @@ contract SedoPoWToken is ERC20Interface, Owned {
        //0xB6eD7644C69416d67B522e20bC294A9a9B405B31 - production
 
         balances[owner] = balances[owner].add(tokensMinted);
-        Transfer(address(this), owner, tokensMinted); 
+        Transfer(address(this), owner, tokensMinted);
 
 
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
 
     // Parent contract changing (it can be useful if parent will make a swap or in some other cases)
 
     // ------------------------------------------------------------------------
-    
+
 
     function ParentCoinAddress(address parent) public onlyOwner{
         parentAddress = parent;
@@ -373,18 +373,18 @@ contract SedoPoWToken is ERC20Interface, Owned {
             lastRewardTo = msg.sender;
             lastRewardAmount = reward_amount;
             lastRewardEthBlockNumber = block.number;
-            
+
             _startNewMiningEpoch();
 
             Mint(msg.sender, reward_amount, epochCount, challengeNumber );
-              
+
             emit Transfer(address(this), msg.sender, reward_amount); //we need add it to show token transfers in the etherscan
 
            return true;
 
     }
 
-    
+
     // ------------------------------------------------------------------------
 
     // merge mint function
@@ -395,7 +395,7 @@ contract SedoPoWToken is ERC20Interface, Owned {
 
             // Function for the Merge mining (0xbitcoin as a parent coin)
             // original idea by 0xbitcoin developers
-            // the idea is that the miner uses https://github.com/0xbitcoin/mint-helper/blob/master/contracts/MintHelper.sol 
+            // the idea is that the miner uses https://github.com/0xbitcoin/mint-helper/blob/master/contracts/MintHelper.sol
             // to call mint() and then mergeMint() in the same transaction
             // hard code a reference to the "Parent" ERC918 Contract ( in this case 0xBitcoin)
             // Verify that the Parent contract was minted in this block, by the same person calling this contract
@@ -418,7 +418,7 @@ contract SedoPoWToken is ERC20Interface, Owned {
             if(ERC918Interface(parentAddress).lastRewardTo() != msg.sender){
                 return false; // a different address called mint last so return false ( don't revert)
             }
-            
+
 
             if(ERC918Interface(parentAddress).lastRewardEthBlockNumber() != block.number){
                 return false; // parent::mint() was called in a different block number so return false ( don't revert)
@@ -428,23 +428,23 @@ contract SedoPoWToken is ERC20Interface, Owned {
             // the challenge is not the challenge that will be set by _startNewMiningEpoch
             //we have verified that this is the same block as a call to Parent::mint() and that the sender
             // is the sender that has called mint
-            
+
             //SEDO will have the same challenge numbers as 0xBitcoin, this means that mining for one is literally the same process as mining for the other
-            // we want to make sure that one can't use a combination of merge and mint to get two blocks of SEDO for each valid nonce, since the same solution 
+            // we want to make sure that one can't use a combination of merge and mint to get two blocks of SEDO for each valid nonce, since the same solution
             //    applies to each coin
             // for this reason, we update the solutionForChallenge hashmap with the value of parent::challengeNumber when a solution is merge minted.
             // when a miner finds a valid solution, if they call this::mint(), without the next few lines of code they can then subsequently use the mint helper and in one transaction
-            //   call parent::mint() this::merge(). the following code will ensure that this::merge() does not give a block reward, because the challenge number will already be set in the 
+            //   call parent::mint() this::merge(). the following code will ensure that this::merge() does not give a block reward, because the challenge number will already be set in the
             //   solutionForChallenge map
             //only allow one reward for each challenge based on parent::challengeNumber
-            
+
             bytes32 parentChallengeNumber = ERC918Interface(parentAddress).challengeNumber();
             bytes32 solution = solutionForChallenge[parentChallengeNumber];
             if(solution != 0x0) return false;  //prevent the same answer from awarding twice
 
-            //now that we've checked that the next challenge wasn't reused, apply the current SEDO challenge 
+            //now that we've checked that the next challenge wasn't reused, apply the current SEDO challenge
             //this will prevent the 'previous' challenge from being reused
-            
+
             bytes32 digest = 'merge';
             solutionForChallenge[challengeNumber] = digest;
 
@@ -476,7 +476,7 @@ contract SedoPoWToken is ERC20Interface, Owned {
 
 
     //a new 'block' to be mined
-    
+
     function _startNewMiningEpoch() internal {
 
       //if max supply for the era will be exceeded next reward round then enter the new era before that happens
@@ -512,7 +512,7 @@ contract SedoPoWToken is ERC20Interface, Owned {
     //as of 2017 the bitcoin difficulty was up to 17 zeroes, it was only 8 in the early days
 
     //readjust the target by 5 percent
-    
+
     function _reAdjustDifficulty() internal {
 
 
@@ -775,4 +775,15 @@ contract SedoPoWToken is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

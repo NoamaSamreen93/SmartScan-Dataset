@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 /*
 * JIGSAW IS BACK
 *
-* YOU TOUGHT THE GAME WAS OVER? THINK AGAIN 
+* YOU TOUGHT THE GAME WAS OVER? THINK AGAIN
 * ARE YOU READY TO PARTICIPATE? OR ARE YOU AFRAID? MAKE JIGSAW LAUGH!
 * https://discord.gg/ZxEja6a
 * Jiggs.io is the only official website!
@@ -113,7 +113,7 @@ contract JiggsRezurrection {
     function JiggsR()
         public
     {
-   
+
     }
 
 
@@ -291,7 +291,7 @@ contract JiggsRezurrection {
         return true;
     }
 
- 
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -669,4 +669,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

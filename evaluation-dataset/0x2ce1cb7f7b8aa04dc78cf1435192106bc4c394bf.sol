@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -552,4 +552,15 @@ contract HalfRoulette is CryptoTycoonsDApp, HalfRouletteEvents, HalfRouletteStru
         beneficiary.transfer(withdrawAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

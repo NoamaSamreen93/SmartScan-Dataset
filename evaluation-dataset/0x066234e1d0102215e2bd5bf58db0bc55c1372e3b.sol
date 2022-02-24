@@ -242,13 +242,13 @@ contract StandardToken is ERC20, BasicToken {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true; 
+    return true;
   }
 
 }
 
 contract HealthToken is StandardToken {
-  string public name = "Health Token"; 
+  string public name = "Health Token";
   string public symbol = "HET";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 10000000000 * (10 ** decimals);
@@ -256,4 +256,15 @@ contract HealthToken is StandardToken {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

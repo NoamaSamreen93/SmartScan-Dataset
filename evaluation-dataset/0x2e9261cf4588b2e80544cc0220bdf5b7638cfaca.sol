@@ -29,7 +29,7 @@ contract TokenERC20 {
     // quemamos?
     event Burn(address indexed from, uint256 value);
      /**
-     * 
+     *
      * Funcion constructor
      *
      **/
@@ -141,7 +141,7 @@ contract TokenERC20 {
      *
      * destruye `_value` tokens del sistema irreversiblemente desde la cuenta `_from`.
      *
-     * @param _from el address del usuario 
+     * @param _from el address del usuario
      * @param _value la cantidad de monedas a quemar
 **/
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
@@ -169,13 +169,13 @@ mapping (address => bool) public frozenAccount;
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
 /* solo puede ser llamado desde este contrato */
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);               
-        require (balanceOf[_to] + _value >= balanceOf[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                      
-        balanceOf[_from] -= _value;                        
-        balanceOf[_to] += _value;                          
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value >= balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
     }
 
@@ -215,4 +215,15 @@ mapping (address => bool) public frozenAccount;
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

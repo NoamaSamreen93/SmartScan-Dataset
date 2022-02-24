@@ -71,7 +71,7 @@ contract BondageInterface {
 
 // File: contracts/platform/bondage/currentCost/CurrentCostInterface.sol
 
-contract CurrentCostInterface {    
+contract CurrentCostInterface {
     function _currentCostOfDot(address, bytes32, uint256) public view returns (uint256);
     function _dotLimit(address, bytes32) public view returns (uint256);
     function _costOfNDots(address, bytes32, uint256, uint256) public view returns (uint256);
@@ -116,37 +116,37 @@ contract TokenDotFactory is Ownable {
     event DotTokenCreated(address tokenAddress);
 
     constructor(
-        address coordinator, 
+        address coordinator,
         address factory,
         uint256 providerPubKey,
-        bytes32 providerTitle 
+        bytes32 providerTitle
     ){
-        coord = ZapCoordinatorInterface(coordinator); 
+        coord = ZapCoordinatorInterface(coordinator);
         reserveToken = FactoryTokenInterface(coord.getContract("ZAP_TOKEN"));
         //always allow bondage to transfer from wallet
         reserveToken.approve(coord.getContract("BONDAGE"), ~uint256(0));
         tokenFactory = TokenFactoryInterface(factory);
 
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         registry.initiateProvider(providerPubKey, providerTitle);
     }
 
     function initializeCurve(
-        bytes32 specifier, 
-        bytes32 symbol, 
+        bytes32 specifier,
+        bytes32 symbol,
         int256[] curve
     ) public returns(address) {
-        
+
         require(curves[specifier] == 0, "Curve specifier already exists");
-        
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         require(registry.isProviderInitiated(address(this)), "Provider not intiialized");
 
         registry.initiateProviderCurve(specifier, curve, address(this));
         curves[specifier] = newToken(bytes32ToString(specifier), bytes32ToString(symbol));
-        
+
         registry.setProviderParameter(specifier, toBytes(curves[specifier]));
-        
+
         DotTokenCreated(curves[specifier]);
         return curves[specifier];
     }
@@ -192,9 +192,9 @@ contract TokenDotFactory is Ownable {
     function newToken(
         string name,
         string symbol
-    ) 
+    )
         public
-        returns (address tokenAddress) 
+        returns (address tokenAddress)
     {
         FactoryTokenInterface token = tokenFactory.create(name, symbol);
         tokenAddress = address(token);
@@ -202,7 +202,7 @@ contract TokenDotFactory is Ownable {
     }
 
     function getTokenAddress(bytes32 specifier) public view returns(address) {
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         return bytesToAddr(registry.getProviderParameter(address(this), specifier));
     }
 
@@ -234,4 +234,15 @@ contract TokenDotFactory is Ownable {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -7,25 +7,25 @@ pragma solidity 0.4.25;
 ////////////////////////////////////////////////////////////////////////////////
 
 contract Master {
-    
+
     address public admin;
     address public thisContractAddress;
     address public factoryContractAddress;
-    
+
     // MODIFIERS
-    modifier onlyAdmin { 
+    modifier onlyAdmin {
         require(msg.sender == admin
-        ); 
-        _; 
+        );
+        _;
     }
-    
+
     // MODIFIERS
-    modifier onlyAdminOrFactory { 
+    modifier onlyAdminOrFactory {
         require(
             msg.sender == admin ||
             msg.sender == factoryContractAddress
-        ); 
-        _; 
+        );
+        _;
     }
 
     constructor() public payable {
@@ -35,7 +35,7 @@ contract Master {
 
     // FALLBACK
     function () private payable {}
-    
+
     function setAdmin(address _address) onlyAdmin public {
         admin = address(_address);
     }
@@ -60,4 +60,15 @@ contract Master {
         return address(this).balance;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

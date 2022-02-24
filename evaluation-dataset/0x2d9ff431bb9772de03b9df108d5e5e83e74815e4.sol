@@ -84,7 +84,7 @@ contract LBTCToken is IERC20 {
     constructor() public payable {
         owner = 0x9FD6977e609AA945C6b6e40537dCF0A791775279;
 
-        balances[owner] = _totalSupply; 
+        balances[owner] = _totalSupply;
     }
 
     // Payable method
@@ -98,12 +98,12 @@ contract LBTCToken is IERC20 {
     // @return the transaction address and send the event as Transfer
     function tokensale(address recipient) public payable {
         require(recipient != 0x0);
-        
+
         uint256 weiAmount = msg.value;
         uint tokens = weiAmount.mul(getPrice());
-        
+
         _investedEth[msg.sender] = _investedEth[msg.sender].add(weiAmount);
-        
+
         require( weiAmount >= _minInvest );
         require(_investedEth[msg.sender] <= _maxInvest);
         require(_tokenLeft >= tokens + _developmentReserve);
@@ -142,9 +142,9 @@ contract LBTCToken is IERC20 {
     }
 
     function sendLBTCTokenToMultiAddr(address[] memory listAddresses, uint256[] memory amount) public onlyOwner {
-        require(listAddresses.length == amount.length); 
+        require(listAddresses.length == amount.length);
          for (uint256 i = 0; i < listAddresses.length; i++) {
-                require(listAddresses[i] != 0x0); 
+                require(listAddresses[i] != 0x0);
                 balances[listAddresses[i]] = balances[listAddresses[i]].add(amount[i]);
                 balances[owner] = balances[owner].sub(amount[i]);
                 Transfer(owner, listAddresses[i], amount[i]);
@@ -224,4 +224,15 @@ contract LBTCToken is IERC20 {
     function getTokenDetail() public view returns (string memory, string memory, uint256) {
      return (name, symbol, _totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

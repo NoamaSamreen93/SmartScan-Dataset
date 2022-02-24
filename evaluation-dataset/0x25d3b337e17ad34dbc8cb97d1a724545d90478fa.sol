@@ -6,7 +6,7 @@ interface Token {
 }
 
 contract AirdropiRide {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xd430B6C9706345760D94c4A8A14Cfa0164B04167;
@@ -29,23 +29,23 @@ contract AirdropiRide {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
-    
+
     function setAmount(uint256 _amount) isCreator public {
-        amount = _amount;      
+        amount = _amount;
     }
-    
+
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function kill() isCreator public {
@@ -68,4 +68,15 @@ contract AirdropiRide {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

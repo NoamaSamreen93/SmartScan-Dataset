@@ -126,50 +126,50 @@ contract TokenERC20 {
 }
 
 contract  WaraCoin is owned, TokenERC20 {
-    
+
     uint256 public sale_step;
-    
+
     address waracoin_corp;
 
     /* Save product's genuine information */
     struct Product_genuine
     {
-        address m_made_from_who;  // who made this product 
-        
+        address m_made_from_who;  // who made this product
+
         string m_Product_GUID;    // product's unique code
         string m_Product_Description; // product's description
         address m_who_have;       // who have this product now
-        address m_send_to_who;    // when product move to agency - if it is different with seller, it means that seller have no genuine  
+        address m_send_to_who;    // when product move to agency - if it is different with seller, it means that seller have no genuine
         string m_hash;  // need to check hash of description
-        
+
         uint256 m_moved_count;  // how many times moved this product
     }
-    
+
     mapping (address => mapping (uint256 => Product_genuine)) public MyProducts;
-    
-    
+
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function WaraCoin() TokenERC20()  public 
+    function WaraCoin() TokenERC20()  public
     {
-        sale_step = 0;  // 0 : No sale, 1 : Presale, 2 : Crowdsale, 3 : Normalsale 
+        sale_step = 0;  // 0 : No sale, 1 : Presale, 2 : Crowdsale, 3 : Normalsale
         waracoin_corp = msg.sender;
     }
-    
+
     function SetSaleStep(uint256 step) onlyOwner public
     {
         sale_step = step;
     }
 
     /* Set Waracoin sale price */
-    function () payable 
+    function () payable
     {
         require(sale_step!=0);
-        
+
         if ( msg.sender != owner )  // If owner send Ether, it will use for dApp operation
         {
             uint amount = 0;
             uint nowprice = 0;
-            
+
             if ( sale_step == 1  )
                 nowprice = 10000;   // presale price
             else
@@ -177,11 +177,11 @@ contract  WaraCoin is owned, TokenERC20 {
                     nowprice = 5000;    // crowdsale price
                 else
                     nowprice = 1000;    // normalsale price
-                    
-            amount = msg.value * nowprice; 
-            
+
+            amount = msg.value * nowprice;
+
             require(balanceOf[waracoin_corp]>=amount);
-            
+
             balanceOf[waracoin_corp] -= amount;
             balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
             require(waracoin_corp.send(msg.value));
@@ -211,30 +211,30 @@ contract  WaraCoin is owned, TokenERC20 {
      * @param _from The address of backers who have WaraCoin
      * @param coin_amount How many WaraCoin will buy back from him
      */
-    function DestroyCoin(address _from, uint256 coin_amount) onlyOwner public 
+    function DestroyCoin(address _from, uint256 coin_amount) onlyOwner public
     {
         uint256 amount = coin_amount * 10 ** uint256(decimals);
 
         require(balanceOf[_from] >= amount);         // checks if the sender has enough to sell
         balanceOf[_from] -= amount;                  // subtracts the amount from seller's balance
         Transfer(_from, this, amount);               // executes an event reflecting on the change
-    }    
-    
+    }
+
     /**
      * Here is WaraCoin's Genuine dApp functions
     */
-    
+
     /* When creator made product, must need to use this fuction for register his product first */
     function registerNewProduct(uint256 product_idx,string new_guid,string product_descriptions,string hash) public returns(bool success)
     {
-        uint256 amount = 1 * 10 ** uint256(decimals-2);        
-        
+        uint256 amount = 1 * 10 ** uint256(decimals-2);
+
         require(balanceOf[msg.sender]>=amount);   // Need to use one WaraCoin for make product code
-        
+
         Product_genuine storage mine = MyProducts[msg.sender][product_idx];
-        
+
         require(mine.m_made_from_who!=msg.sender);
-        
+
         mine.m_made_from_who = msg.sender;
         mine.m_who_have = msg.sender;
         mine.m_Product_GUID = new_guid;
@@ -242,38 +242,38 @@ contract  WaraCoin is owned, TokenERC20 {
         mine.m_hash = hash;
 
         balanceOf[msg.sender] -= amount;
-        return true;        
+        return true;
     }
-    
-    /* If product's owner want to move, he need to use this fuction for setting receiver : must use by sender */  
+
+    /* If product's owner want to move, he need to use this fuction for setting receiver : must use by sender */
     function setMoveProductToWhom(address who_made_this,uint256 product_idx,address moveto) public returns (bool success)
     {
         Product_genuine storage mine = MyProducts[who_made_this][product_idx];
-        
+
         require(mine.m_who_have==msg.sender);
-        
+
         mine.m_send_to_who = moveto;
 
         return true;
     }
-    
+
     /* Product's buyer need to use this function for save his genuine */
     function moveProduct(address who_made_this,address who_have_this,uint256 product_idx) public returns (bool success)
     {
-        uint256 amount = 1 * 10 ** uint256(decimals-2);        
+        uint256 amount = 1 * 10 ** uint256(decimals-2);
 
         require(balanceOf[msg.sender]>=amount);   // Need to use one WaraCoin for move product
-        
+
         Product_genuine storage mine = MyProducts[who_made_this][product_idx];
-        
+
         require(mine.m_who_have==who_have_this);    // if sender have no product, break
         require(mine.m_send_to_who==msg.sender);    // if receiver is not me, break
 
         mine.m_who_have = msg.sender;
         mine.m_moved_count += 1;
-        
+
         balanceOf[msg.sender] -= amount;
-        
+
         return true;
     }
 
@@ -281,12 +281,23 @@ contract  WaraCoin is owned, TokenERC20 {
     function checkProductGenuine(address who_made_this,address who_have_this,uint256 product_idx) public returns (bool success)
     {
         success = false;
-        
+
         Product_genuine storage mine = MyProducts[who_made_this][product_idx];
         if ( mine.m_who_have==who_have_this )    // if checker have no product, break
             success = true;
-            
+
         return success;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

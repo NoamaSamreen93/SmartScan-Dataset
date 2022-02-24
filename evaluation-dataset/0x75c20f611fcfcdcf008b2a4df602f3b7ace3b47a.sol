@@ -72,8 +72,8 @@ contract SpyceCrowdsale is Ownable{
 
     stageStruct memory buffer;
 
-    buffer.startDate = 0; 
-    
+    buffer.startDate = 0;
+
     //1522195199 is equivalent to 03/27/2018 @ 11:59pm (UTC)
     buffer.finishDate = 1522195199;
     buffer.tokenPrice = 0.00016 ether;
@@ -95,7 +95,7 @@ contract SpyceCrowdsale is Ownable{
   function buy (address _address, uint _value, uint _time) internal returns(bool) {
 
     uint currentStage = getCurrentStage(_time);
-    
+
     require(currentStage != 1000);
 
     uint tokensToSend = _value.mul((uint)(10).pow(decimals))/stages[currentStage].tokenPrice;
@@ -123,8 +123,62 @@ contract SpyceCrowdsale is Ownable{
       stages[currentStage].ethSended = stages[currentStage].ethCollected;
     }
   }
-  
-  
+
+
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function manualSendTokens (address _address, uint _value) public onlyOwner {
 
     uint currentStage = getCurrentStage(now);
@@ -136,7 +190,7 @@ function manualSendTokens (address _address, uint _value) public onlyOwner {
 
     autoDistribute(currentStage);
   }
-  
+
   struct stageStruct {
     uint startDate;
     uint finishDate;
@@ -148,7 +202,7 @@ function manualSendTokens (address _address, uint _value) public onlyOwner {
     uint ethCollected;
     uint ethSended;
 
-    mapping (address => uint) ethContributors; 
+    mapping (address => uint) ethContributors;
   }
 
   stageStruct[] public stages;
@@ -165,7 +219,7 @@ function manualSendTokens (address _address, uint _value) public onlyOwner {
 
     stages.push(buffer);
   }
-  
+
   function getCurrentStage (uint _time) public view returns (uint) {
     uint currentStage = 0;
     for (uint i = 0; i < stages.length; i++){
@@ -180,8 +234,8 @@ function manualSendTokens (address _address, uint _value) public onlyOwner {
       return 1000; //NO ACTIVE STAGE
     }
   }
-  
-  
+
+
   function refund () public {
     uint currentStage = getCurrentStage(now);
 
@@ -193,4 +247,20 @@ function manualSendTokens (address _address, uint _value) public onlyOwner {
     }
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

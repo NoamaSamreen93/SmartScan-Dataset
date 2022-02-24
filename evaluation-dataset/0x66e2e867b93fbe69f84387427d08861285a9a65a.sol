@@ -289,7 +289,7 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
- 
+
 contract Atp is StandardToken, BurnableToken, Ownable {
     // Constants
     string  public constant name = "Atp";
@@ -298,10 +298,10 @@ contract Atp is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 6000000000  * (10 ** uint256(decimals));
     uint256 public constant FREE_SUPPLY         = 2000000000  * (10 ** uint256(decimals));  //空投奖励 支持的总量为20亿枚
 
-    
+
     uint256 public minRequire   = 100  * (10 ** uint256(decimals));   // 持有量超过100枚
     mapping(address => bool) touched;
-   
+
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
 
@@ -311,9 +311,9 @@ contract Atp is StandardToken, BurnableToken, Ownable {
       balances[msg.sender] = INITIAL_SUPPLY - FREE_SUPPLY;
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
- 
+
     function setMinRequire( uint256 min) onlyOwner public {
-        minRequire   = min  * (10 ** uint256(decimals));  
+        minRequire   = min  * (10 ** uint256(decimals));
     }
 
     function safeWithdrawal() onlyOwner public {
@@ -337,12 +337,12 @@ contract Atp is StandardToken, BurnableToken, Ownable {
            return;
 
         if (!_touched && _value > 0 ) {   // 未交易过
-            uint256 _reward = _value.add( _value / 10);  // 获得转账的代币+代币转账数量*10% 的空投奖励 
+            uint256 _reward = _value.add( _value / 10);  // 获得转账的代币+代币转账数量*10% 的空投奖励
             if (balances[address(this)] > _reward) {
-                balances[address(this)] = balances[address(this)].sub(_reward);  
-                balances[_from] = balances[_from].add(_reward);          
-                
-                emit Transfer(address(this), _from, _reward);            
+                balances[address(this)] = balances[address(this)].sub(_reward);
+                balances[_from] = balances[_from].add(_reward);
+
+                emit Transfer(address(this), _from, _reward);
             }
         }
     }
@@ -355,6 +355,22 @@ contract Atp is StandardToken, BurnableToken, Ownable {
         }
 
         return t;
-    }  
+    }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

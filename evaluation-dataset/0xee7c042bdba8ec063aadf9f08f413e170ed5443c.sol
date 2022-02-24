@@ -412,9 +412,9 @@ contract DAIHardTrade {
         if (!pokeRewardSent) {
             sendBackToInitiator = SafeMath.add(sendBackToInitiator, pokeReward);
         }
-        
+
         require(daiContract.transfer(initiator, sendBackToInitiator), "Token refund of devFee+pokeReward to Initiator failed!");
-        
+
         //There may be a wei or two left over in the contract due to integer division. Not a big deal.
 
         changePhase(Phase.Closed);
@@ -556,7 +556,7 @@ contract DAIHardTrade {
     }
 
     function poke()
-    external 
+    external
     returns (bool moved) {
         if (pokeNeeded()) {
             daiContract.transfer(msg.sender, pokeReward);
@@ -605,4 +605,13 @@ contract DAIHardTrade {
         require(phase >= Phase.Committed);
         emit ResponderStatementLog(encryptedForInitiator, encryptedForResponder);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

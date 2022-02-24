@@ -794,7 +794,7 @@ contract WorldCupPlayerToken is ERC721Token("WWWorld Cup", "WWWC"), Ownable {
     * @param playerId Player Id to be created.
     */
   function _mintToken(uint256 playerId, string tokenURI, address owner) internal {
-    
+
     // Mint new token:
     uint256 tokenId = allTokens.length + 1;
     super._mint(owner, tokenId);
@@ -1014,4 +1014,15 @@ contract AuctionableWorldCupPlayerToken is WorldCupPlayerToken {
     emit BidReturned(auctionIndex, bidder);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

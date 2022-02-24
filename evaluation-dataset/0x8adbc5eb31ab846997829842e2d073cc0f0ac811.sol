@@ -1,10 +1,10 @@
 pragma solidity ^0.4.25;
 
 /*
-Name: DGT Coin 
+Name: DGT Coin
 Symbol: DGT
 
-Website: https://dgt.co.uk 
+Website: https://dgt.co.uk
 
 Company: Florere Capital LTD
 20-22 Wenlock Road
@@ -413,4 +413,15 @@ contract DGTCoin is DSTokenBase , DSStop {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

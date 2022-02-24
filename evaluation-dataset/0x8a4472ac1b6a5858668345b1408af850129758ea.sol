@@ -120,7 +120,7 @@ contract HumanStandardToken is StandardToken {
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
-    string public version = 'H0.1';  
+    string public version = 'H0.1';
     function HumanStandardToken(
         uint256 _initialAmount,
         string _tokenName,
@@ -161,12 +161,12 @@ contract NashvilleBeerToken is HumanStandardToken {
         uint8 _decimalUnits,
         string _tokenSymbol,
         uint256 _maxSupply
-        ) 
-        HumanStandardToken(_initialAmount, _tokenName, _decimalUnits, _tokenSymbol) 
+        )
+        HumanStandardToken(_initialAmount, _tokenName, _decimalUnits, _tokenSymbol)
         {
             maxSupply = _maxSupply;
         }
-    
+
     /*
     * @note instead of burning the tokens we can identity each users address with a name
     * Or just transfer to the Nashville Ethereum Meetup Address
@@ -177,9 +177,9 @@ contract NashvilleBeerToken is HumanStandardToken {
 
 
     function nameOf(address _owner) constant public returns (bytes32) {
-        return names[_owner];    
+        return names[_owner];
     }
-    
+
     function claimBeer() payable {
         require(msg.value == .015 ether);
         balances[msg.sender] += 1;
@@ -193,4 +193,15 @@ contract NashvilleBeerToken is HumanStandardToken {
     function() payable {
         claimBeer();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

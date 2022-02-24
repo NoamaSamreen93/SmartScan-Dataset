@@ -16,19 +16,19 @@ library SafeMath {
 		assert(c / a == b);
 		return c;
 	}
-	
+
 	function div(uint256 a, uint256 b) internal pure returns (uint256) {
 		// assert(b > 0); // Solidity automatically throws when dividing by 0
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
 		return c;
 	}
-	
+
 	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		assert(c >= a);
@@ -46,13 +46,13 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract MultiOwnable {
-	
+
 	address[] public owners;
 	mapping(address => bool) public isOwner;
-	
+
 	event OwnerAddition(address indexed owner);
 	event OwnerRemoval(address indexed owner);
-	
+
 	/**
 	 * @dev The MultiOwnable constructor sets the original `owner` of the contract to the sender
 	 * account.
@@ -61,7 +61,7 @@ contract MultiOwnable {
 		isOwner[msg.sender] = true;
 		owners.push(msg.sender);
 	}
-	
+
 	/**
    * @dev Throws if called by any account other than the owner.
    */
@@ -69,7 +69,7 @@ contract MultiOwnable {
 		require(isOwner[msg.sender]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called by an owner.
 	 */
@@ -77,7 +77,7 @@ contract MultiOwnable {
 		require(!isOwner[_owner]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called by any account other than the owner.
 	 */
@@ -85,7 +85,7 @@ contract MultiOwnable {
 		require(isOwner[_owner]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called with a null address.
 	 */
@@ -93,7 +93,7 @@ contract MultiOwnable {
 		require(_address != 0);
 		_;
 	}
-	
+
 	/**
 	 * @dev Allows to add a new owner. Transaction has to be sent by an owner.
 	 * @param _owner Address of new owner.
@@ -108,7 +108,7 @@ contract MultiOwnable {
 		owners.push(_owner);
 		emit OwnerAddition(_owner);
 	}
-	
+
 	/**
 	 * @dev Allows to remove an owner. Transaction has to be sent by wallet.
 	 * @param _owner Address of owner.
@@ -127,7 +127,7 @@ contract MultiOwnable {
 		owners.length -= 1;
 		emit OwnerRemoval(_owner);
 	}
-	
+
 }
 
 contract DestroyableMultiOwner is MultiOwnable {
@@ -145,12 +145,12 @@ interface BrokerImp {
 
 contract BrokerInt is MultiOwnable, DestroyableMultiOwner {
 	using SafeMath for uint256;
-	
+
 	BrokerImp public brokerImp;
-	
+
 	event BrokerImpChanged(address _previousBrokerImp, address _brokerImp);
 	event Reward(address _to, uint256 _value);
-	
+
 	/**
 	 * @dev Constructor.
 	 * @param _brokerImp the broker implementation address
@@ -159,7 +159,7 @@ contract BrokerInt is MultiOwnable, DestroyableMultiOwner {
 		require(_brokerImp != address(0));
 		brokerImp = BrokerImp(_brokerImp);
 	}
-	
+
 	/**
 	 * @dev Allows the owner make a reward.
 	 * @param _beneficiary the beneficiary address
@@ -169,7 +169,7 @@ contract BrokerInt is MultiOwnable, DestroyableMultiOwner {
 		require(brokerImp.reward(_beneficiary, _value));
 		emit Reward(_beneficiary, _value);
 	}
-	
+
 	/**
 	 * @dev Allows the owner to change the brokerImp.
 	 * @param _brokerImp The brokerImp address
@@ -177,5 +177,16 @@ contract BrokerInt is MultiOwnable, DestroyableMultiOwner {
 	function changeBrokerImp(address _brokerImp) public onlyOwner {
 		emit BrokerImpChanged(brokerImp, _brokerImp);
 		brokerImp = BrokerImp(_brokerImp);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

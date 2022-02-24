@@ -22,7 +22,7 @@ library SafeMathLib{
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -72,15 +72,15 @@ contract Ownable {
  * @dev Contract used to deploy COIN V2 and allow users to swap V1 for V2.
 **/
 contract TokenSwap {
-    
+
     // Address of the old Coinvest COIN token.
     address public constant OLD_TOKEN = 0x4306ce4a5d8b21ee158cb8396a4f6866f14d6ac8;
-    
+
     // Address of the new COINVEST COIN V2 token (to be launched on construction).
     CoinvestToken public newToken;
 
-    constructor() 
-      public 
+    constructor()
+      public
     {
         newToken = new CoinvestToken();
     }
@@ -91,15 +91,15 @@ contract TokenSwap {
      * @param _value The amount of tokens that have been transferred.
      * @param _data The extra data sent with transfer (should be nothing).
     **/
-    function tokenFallback(address _from, uint _value, bytes _data) 
+    function tokenFallback(address _from, uint _value, bytes _data)
       external
     {
         require(msg.sender == OLD_TOKEN);          // Ensure caller is old token contract.
         require(newToken.transfer(_from, _value)); // Transfer new tokens to sender.
     }
-    
+
 }
-    
+
 /**
  * @dev Abstract contract for approveAndCall.
 **/
@@ -114,13 +114,13 @@ contract ApproveAndCallFallBack {
 **/
 contract CoinvestToken is Ownable {
     using SafeMathLib for uint256;
-    
+
     string public constant symbol = "COIN";
     string public constant name = "Coinvest COIN V2 Token";
-    
+
     uint8 public constant decimals = 18;
     uint256 private _totalSupply = 107142857 * (10 ** 18);
-    
+
     // Function sigs to be used within contract for signature recovery.
     bytes4 internal constant transferSig = 0xa9059cbb;
     bytes4 internal constant approveSig = 0x095ea7b3;
@@ -134,10 +134,10 @@ contract CoinvestToken is Ownable {
 
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     // Keeps track of the last nonce sent from user. Used for delegated functions.
     mapping (address => uint256) nonces;
-    
+
     // Mapping of past used hashes: true if already used.
     mapping (address => mapping (bytes => bool)) invalidSignatures;
 
@@ -147,7 +147,7 @@ contract CoinvestToken is Ownable {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed from, address indexed spender, uint tokens);
     event SignatureRedeemed(bytes _sig, address indexed from);
-    
+
     /**
      * @dev Set owner and beginning balance.
     **/
@@ -156,23 +156,23 @@ contract CoinvestToken is Ownable {
     {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     /**
      * @dev This code allows us to redirect pre-signed calls with different function selectors to our own.
     **/
-    function () 
+    function ()
       public
     {
         bytes memory calldata = msg.data;
         bytes4 new_selector = standardSigs[msg.sig];
         require(new_selector != 0);
-        
+
         assembly {
            mstore(add(0x20, calldata), new_selector)
         }
-        
+
         require(address(this).delegatecall(calldata));
-        
+
         assembly {
             if iszero(eq(returndatasize, 0x20)) { revert(0, 0) }
             returndatacopy(0, 0, returndatasize)
@@ -187,14 +187,14 @@ contract CoinvestToken is Ownable {
      * @param _to The recipient of the transfer amount.
      * @param _amount The amount of tokens to transfer.
     **/
-    function transfer(address _to, uint256 _amount) 
+    function transfer(address _to, uint256 _amount)
       public
     returns (bool success)
     {
         require(_transfer(msg.sender, _to, _amount));
         return true;
     }
-    
+
     /**
      * @dev An allowed address can transfer tokens from another's address.
      * @param _from The owner of the tokens to be transferred.
@@ -211,55 +211,55 @@ contract CoinvestToken is Ownable {
         require(_transfer(_from, _to, _amount));
         return true;
     }
-    
+
     /**
      * @dev Approves a wallet to transfer tokens on one's behalf.
      * @param _spender The wallet approved to spend tokens.
      * @param _amount The amount of tokens approved to spend.
     **/
-    function approve(address _spender, uint256 _amount) 
+    function approve(address _spender, uint256 _amount)
       public
     returns (bool success)
     {
         require(_approve(msg.sender, _spender, _amount));
         return true;
     }
-    
+
     /**
      * @dev Increases the allowed amount for spender from msg.sender.
      * @param _spender The address to increase allowed amount for.
      * @param _amount The amount of tokens to increase allowed amount by.
     **/
-    function increaseApproval(address _spender, uint256 _amount) 
+    function increaseApproval(address _spender, uint256 _amount)
       public
     returns (bool success)
     {
         require(_increaseApproval(msg.sender, _spender, _amount));
         return true;
     }
-    
+
     /**
      * @dev Decreases the allowed amount for spender from msg.sender.
      * @param _spender The address to decrease allowed amount for.
      * @param _amount The amount of tokens to decrease allowed amount by.
     **/
-    function decreaseApproval(address _spender, uint256 _amount) 
+    function decreaseApproval(address _spender, uint256 _amount)
       public
     returns (bool success)
     {
         require(_decreaseApproval(msg.sender, _spender, _amount));
         return true;
     }
-    
+
     /**
      * @dev Used to approve an address and call a function on it in the same transaction.
      * @dev _spender The address to be approved to spend COIN.
      * @dev _amount The amount of COIN to be approved to spend.
      * @dev _data The data to send to the called contract.
     **/
-    function approveAndCall(address _spender, uint256 _amount, bytes _data) 
+    function approveAndCall(address _spender, uint256 _amount, bytes _data)
       public
-    returns (bool success) 
+    returns (bool success)
     {
         require(_approve(msg.sender, _spender, _amount));
         ApproveAndCallFallBack(_spender).receiveApproval(msg.sender, _amount, address(this), _data);
@@ -267,7 +267,7 @@ contract CoinvestToken is Ownable {
     }
 
 /** ****************************** Internal ******************************** **/
-    
+
     /**
      * @dev Internal transfer for all functions that transfer.
      * @param _from The address that is transferring coins.
@@ -280,21 +280,21 @@ contract CoinvestToken is Ownable {
     {
         require (_to != address(0));
         require(balances[_from] >= _amount);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
-        
+
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     /**
      * @dev Internal approve for all functions that require an approve.
      * @param _owner The owner who is allowing spender to use their balance.
      * @param _spender The wallet approved to spend tokens.
      * @param _amount The amount of tokens approved to spend.
     **/
-    function _approve(address _owner, address _spender, uint256 _amount) 
+    function _approve(address _owner, address _spender, uint256 _amount)
       internal
     returns (bool success)
     {
@@ -302,7 +302,7 @@ contract CoinvestToken is Ownable {
         emit Approval(_owner, _spender, _amount);
         return true;
     }
-    
+
     /**
      * @dev Increases the allowed by "_amount" for "_spender" from "owner"
      * @param _owner The address that tokens may be transferred from.
@@ -317,7 +317,7 @@ contract CoinvestToken is Ownable {
         emit Approval(_owner, _spender, allowed[_owner][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Decreases the allowed by "_amount" for "_spender" from "_owner"
      * @param _owner The owner of the tokens to decrease allowed for.
@@ -330,11 +330,11 @@ contract CoinvestToken is Ownable {
     {
         if (allowed[_owner][_spender] <= _amount) allowed[_owner][_spender] = 0;
         else allowed[_owner][_spender] = allowed[_owner][_spender].sub(_amount);
-        
+
         emit Approval(_owner, _spender, allowed[_owner][_spender]);
         return true;
     }
-    
+
 /** ************************ Delegated Functions *************************** **/
 
     /**
@@ -348,41 +348,41 @@ contract CoinvestToken is Ownable {
     **/
     function transferPreSigned(
         bytes _signature,
-        address _to, 
-        uint256 _value, 
-        uint256 _gasPrice, 
-        uint256 _nonce) 
+        address _to,
+        uint256 _value,
+        uint256 _gasPrice,
+        uint256 _nonce)
       public
       validPayload(292)
-    returns (bool) 
+    returns (bool)
     {
         // Log starting gas left of transaction for later gas price calculations.
         uint256 gas = gasleft();
-        
+
         // Recover signer address from signature; ensure address is valid.
         address from = recoverPreSigned(_signature, transferSig, _to, _value, "", _gasPrice, _nonce);
         require(from != address(0));
-        
+
         // Require the hash has not been used, declare it used, increment nonce.
         require(!invalidSignatures[from][_signature]);
         invalidSignatures[from][_signature] = true;
         nonces[from]++;
-        
+
         // Internal transfer.
         require(_transfer(from, _to, _value));
 
         // If the delegate is charging, pay them for gas in COIN.
         if (_gasPrice > 0) {
-            
+
             // 35000 because of base fee of 21000 and ~14000 for the fee transfer.
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
-    
+
     /**
      * @dev Called by a delegate with signed hash to approve a transaction for user.
      * @dev All variables equivalent to transfer except _to:
@@ -390,98 +390,98 @@ contract CoinvestToken is Ownable {
     **/
     function approvePreSigned(
         bytes _signature,
-        address _to, 
-        uint256 _value, 
-        uint256 _gasPrice, 
-        uint256 _nonce) 
+        address _to,
+        uint256 _value,
+        uint256 _gasPrice,
+        uint256 _nonce)
       public
       validPayload(292)
-    returns (bool) 
+    returns (bool)
     {
         uint256 gas = gasleft();
         address from = recoverPreSigned(_signature, approveSig, _to, _value, "", _gasPrice, _nonce);
         require(from != address(0));
         require(!invalidSignatures[from][_signature]);
-        
+
         invalidSignatures[from][_signature] = true;
         nonces[from]++;
-        
+
         require(_approve(from, _to, _value));
 
         if (_gasPrice > 0) {
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
-    
+
     /**
      * @dev Used to increase the amount allowed for "_to" to spend from "from"
      * @dev A bare approve allows potentially nasty race conditions when using a delegate.
     **/
     function increaseApprovalPreSigned(
         bytes _signature,
-        address _to, 
-        uint256 _value, 
-        uint256 _gasPrice, 
+        address _to,
+        uint256 _value,
+        uint256 _gasPrice,
         uint256 _nonce)
       public
       validPayload(292)
-    returns (bool) 
+    returns (bool)
     {
         uint256 gas = gasleft();
         address from = recoverPreSigned(_signature, increaseApprovalSig, _to, _value, "", _gasPrice, _nonce);
         require(from != address(0));
         require(!invalidSignatures[from][_signature]);
-        
+
         invalidSignatures[from][_signature] = true;
         nonces[from]++;
-        
+
         require(_increaseApproval(from, _to, _value));
 
         if (_gasPrice > 0) {
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
-    
+
     /**
      * @dev Added for the same reason as increaseApproval. Decreases to 0 if "_value" is greater than allowed.
     **/
     function decreaseApprovalPreSigned(
         bytes _signature,
-        address _to, 
-        uint256 _value, 
-        uint256 _gasPrice, 
-        uint256 _nonce) 
+        address _to,
+        uint256 _value,
+        uint256 _gasPrice,
+        uint256 _nonce)
       public
       validPayload(292)
-    returns (bool) 
+    returns (bool)
     {
         uint256 gas = gasleft();
         address from = recoverPreSigned(_signature, decreaseApprovalSig, _to, _value, "", _gasPrice, _nonce);
         require(from != address(0));
         require(!invalidSignatures[from][_signature]);
-        
+
         invalidSignatures[from][_signature] = true;
         nonces[from]++;
-        
+
         require(_decreaseApproval(from, _to, _value));
 
         if (_gasPrice > 0) {
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
-    
+
     /**
      * @dev approveAndCallPreSigned allows a user to approve a contract and call a function on it
      * @dev in the same transaction. As with the other presigneds, a delegate calls this with signed data from user.
@@ -491,23 +491,23 @@ contract CoinvestToken is Ownable {
     **/
     function approveAndCallPreSigned(
         bytes _signature,
-        address _to, 
+        address _to,
         uint256 _value,
         bytes _extraData,
-        uint256 _gasPrice, 
-        uint256 _nonce) 
+        uint256 _gasPrice,
+        uint256 _nonce)
       public
       validPayload(356)
-    returns (bool) 
+    returns (bool)
     {
         uint256 gas = gasleft();
         address from = recoverPreSigned(_signature, approveAndCallSig, _to, _value, _extraData, _gasPrice, _nonce);
         require(from != address(0));
         require(!invalidSignatures[from][_signature]);
-        
+
         invalidSignatures[from][_signature] = true;
         nonces[from]++;
-        
+
         require(_approve(from, _to, _value));
         ApproveAndCallFallBack(_to).receiveApproval(from, _value, address(this), _extraData);
 
@@ -515,13 +515,13 @@ contract CoinvestToken is Ownable {
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
 
 /** *************************** Revoke PreSigned ************************** **/
-    
+
     /**
      * @dev Revoke signature without going through a delegate.
      * @param _sigToRevoke The signature that you no longer want to be used.
@@ -531,11 +531,11 @@ contract CoinvestToken is Ownable {
     returns (bool)
     {
         invalidSignatures[msg.sender][_sigToRevoke] = true;
-        
+
         emit SignatureRedeemed(_sigToRevoke, msg.sender);
         return true;
     }
-    
+
     /**
      * @dev Revoke signature through a delegate.
      * @param _signature The signature allowing this revocation.
@@ -554,18 +554,18 @@ contract CoinvestToken is Ownable {
         address from = recoverRevokeHash(_signature, _sigToRevoke, _gasPrice);
         require(!invalidSignatures[from][_signature]);
         invalidSignatures[from][_signature] = true;
-        
+
         invalidSignatures[from][_sigToRevoke] = true;
-        
+
         if (_gasPrice > 0) {
             gas = 35000 + gas.sub(gasleft());
             require(_transfer(from, msg.sender, _gasPrice.mul(gas)));
         }
-        
+
         emit SignatureRedeemed(_signature, from);
         return true;
     }
-    
+
     /**
      * @dev Get hash for a revocation.
      * @param _sigToRevoke The signature to be revoked.
@@ -592,7 +592,7 @@ contract CoinvestToken is Ownable {
     {
         return ecrecoverFromSig(getSignHash(getRevokeHash(_sigToRevoke, _gasPrice)), _signature);
     }
-    
+
 /** ************************** PreSigned Constants ************************ **/
 
     /**
@@ -606,18 +606,18 @@ contract CoinvestToken is Ownable {
     **/
     function getPreSignedHash(
         bytes4 _function,
-        address _to, 
+        address _to,
         uint256 _value,
         bytes _extraData,
         uint256 _gasPrice,
         uint256 _nonce)
       public
       view
-    returns (bytes32 txHash) 
+    returns (bytes32 txHash)
     {
         return keccak256(address(this), _function, _to, _value, _extraData, _gasPrice, _nonce);
     }
-    
+
     /**
      * @dev Recover an address from a signed pre-signed hash.
      * @param _sig The signed hash.
@@ -635,14 +635,14 @@ contract CoinvestToken is Ownable {
         uint256 _value,
         bytes _extraData,
         uint256 _gasPrice,
-        uint256 _nonce) 
+        uint256 _nonce)
       public
       view
     returns (address recovered)
     {
         return ecrecoverFromSig(getSignHash(getPreSignedHash(_function, _to, _value, _extraData, _gasPrice, _nonce)), _sig);
     }
-    
+
     /**
      * @dev Add signature prefix to hash for recovery à la ERC191.
      * @param _hash The hashed transaction to add signature prefix to.
@@ -660,10 +660,10 @@ contract CoinvestToken is Ownable {
      * @param hash The hash of signed data for the transaction.
      * @param sig Contains r, s, and v for recovery of address from the hash.
     **/
-    function ecrecoverFromSig(bytes32 hash, bytes sig) 
-      public 
-      pure 
-    returns (address recoveredAddress) 
+    function ecrecoverFromSig(bytes32 hash, bytes sig)
+      public
+      pure
+    returns (address recoveredAddress)
     {
         bytes32 r;
         bytes32 s;
@@ -698,15 +698,15 @@ contract CoinvestToken is Ownable {
     {
         return nonces[_owner];
     }
-    
+
 /** ****************************** Constants ******************************* **/
-    
+
     /**
      * @dev Return total supply of token.
     **/
-    function totalSupply() 
+    function totalSupply()
       external
-      view 
+      view
      returns (uint256)
     {
         return _totalSupply;
@@ -718,27 +718,27 @@ contract CoinvestToken is Ownable {
     **/
     function balanceOf(address _owner)
       external
-      view 
-    returns (uint256) 
+      view
+    returns (uint256)
     {
         return balances[_owner];
     }
-    
+
     /**
      * @dev Allowed amount for a user to spend of another's tokens.
      * @param _owner The owner of the tokens approved to spend.
      * @param _spender The address of the user allowed to spend the tokens.
     **/
-    function allowance(address _owner, address _spender) 
+    function allowance(address _owner, address _spender)
       external
-      view 
-    returns (uint256) 
+      view
+    returns (uint256)
     {
         return allowed[_owner][_spender];
     }
-    
+
 /** ****************************** onlyOwner ******************************* **/
-    
+
     /**
      * @dev Allow the owner to take ERC20 tokens off of this contract if they are accidentally sent.
     **/
@@ -747,11 +747,11 @@ contract CoinvestToken is Ownable {
       onlyOwner
     {
         CoinvestToken lostToken = CoinvestToken(_tokenContract);
-        
+
         uint256 stuckTokens = lostToken.balanceOf(address(this));
         lostToken.transfer(owner, stuckTokens);
     }
-    
+
     /**
      * @dev Owner may set the standard sig to redirect to one of our pre-signed functions.
      * @dev Added in order to prepare for the ERC865 standard function names to be different from ours.
@@ -769,9 +769,9 @@ contract CoinvestToken is Ownable {
         standardSigs[_standardSig] = _ourSig;
         return true;
     }
-    
+
 /** ***************************** Modifiers ******************************** **/
-    
+
     modifier validPayload(uint _size) {
         uint payload_size;
         assembly {
@@ -780,5 +780,12 @@ contract CoinvestToken is Ownable {
         require(payload_size >= _size);
         _;
     }
-    
+
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

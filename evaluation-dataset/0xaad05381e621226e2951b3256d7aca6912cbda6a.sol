@@ -54,7 +54,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function ceil(uint256 a, uint256 m) internal pure returns (uint256 ) {
         return ((a + m - 1) / m) * m;
   }
@@ -324,7 +324,7 @@ contract DOG is StandardBurnableToken, Ownable {
   uint256 public startTime;
   uint256 public weiRaised;
   uint256 public tokensSold;
-    
+
   bool public isFinished = false;
 
     modifier onlyAfter(uint256 time) {
@@ -336,19 +336,19 @@ contract DOG is StandardBurnableToken, Ownable {
         assert(now <= time);
         _;
     }
-    
+
     modifier checkAmount(uint256 amount) {
         uint256 tokens = amount.div(price);
         assert(totalSupply_.sub(tokensSold.add(tokens)) >= 0);
         _;
     }
-    
+
     modifier notNull(uint256 amount) {
         assert(amount >= price);
         _;
     }
-    
-        
+
+
     modifier checkFinished() {
         assert(!isFinished);
         _;
@@ -358,31 +358,31 @@ contract DOG is StandardBurnableToken, Ownable {
     totalSupply_ = INITIAL_SUPPLY;
     balances[tokenOwner] = INITIAL_SUPPLY;
     emit Transfer(0x0000000000000000000000000000000000000000, tokenOwner, INITIAL_SUPPLY);
-    
-    price = 0.0035 ether;    
+
+    price = 0.0035 ether;
     startTime = 1561975200;
   }
-    
+
     function () external payable onlyAfter(startTime) checkFinished() checkAmount(msg.value) notNull(msg.value) {
         doPurchase(msg.value, msg.sender);
     }
-    
+
     function doPurchase(uint256 amount, address sender) private {
-        
+
         uint256 tokens = amount.div(price);
-        
+
         balances[tokenOwner] = balances[tokenOwner].sub(tokens);
         balances[sender] = balances[sender].add(tokens);
-        
+
         collectedTokens = collectedTokens.add(tokens);
         collectedEthers = collectedEthers.add(amount);
-        
+
         weiRaised = weiRaised.add(amount);
         tokensSold = tokensSold.add(tokens);
-        
+
         emit Transfer(tokenOwner, sender, tokens);
     }
-    
+
     function withdraw() onlyOwner public returns (bool) {
         if (!tokenOwner.send(collectedEthers)) {
             return false;
@@ -390,13 +390,22 @@ contract DOG is StandardBurnableToken, Ownable {
         collectedEthers = 0;
         return true;
     }
-    
+
     function stop() onlyOwner public returns (bool) {
         isFinished = true;
         return true;
     }
-    
+
     function changePrice(uint256 amount) onlyOwner public {
         price = amount;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

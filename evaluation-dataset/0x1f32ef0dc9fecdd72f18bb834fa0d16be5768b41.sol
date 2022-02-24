@@ -17,7 +17,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -37,7 +37,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
 
   /**
   * @dev Adds two numbers, throws on overflow.
@@ -58,7 +58,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -130,13 +130,13 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
 
   /**
   * @dev total number of tokens in existence
@@ -144,7 +144,7 @@ contract BasicToken is ERC20Basic {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
 
   /**
   * @dev transfer token for a specified address
@@ -221,7 +221,7 @@ contract StandardToken is ERC20, BasicToken {
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
 
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -232,7 +232,7 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
@@ -281,7 +281,7 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
   event Unpause();
 
@@ -296,7 +296,7 @@ contract Pausable is Ownable {
     require(!paused || msg.sender == owner);
     _;
   }
-  
+
 
   /**
    * @dev Modifier to make a function callable only when the contract is paused.
@@ -314,7 +314,7 @@ contract Pausable is Ownable {
     paused = true;
     Pause();
   }
-  
+
 
   /**
    * @dev called by the owner to unpause, returns to normal state
@@ -342,17 +342,17 @@ contract PausableToken is StandardToken, Pausable {
   function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transferFrom(_from, _to, _value);
   }
-  
+
 
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
 
   function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
     return super.increaseApproval(_spender, _addedValue);
   }
-  
+
 
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
@@ -363,7 +363,7 @@ contract PausableToken is StandardToken, Pausable {
 
 
 contract LMDA is PausableToken {
-    
+
     string public  name;
     string public symbol;
     uint8 public decimals;
@@ -371,17 +371,28 @@ contract LMDA is PausableToken {
 
 
     /**
-     * Constructor initializes the name, symbol, decimals and total 
-     * supply of the token. The owner of the contract which is initially 
-     * the ICO contract will receive the entire total supply. 
+     * Constructor initializes the name, symbol, decimals and total
+     * supply of the token. The owner of the contract which is initially
+     * the ICO contract will receive the entire total supply.
      * */
     function LMDA() public {
         name = "LaMonedaCoin";
         symbol = "LMDA";
         decimals = 18;
         totalSupply = 500000000e18;
-        
+
         balances[owner] = totalSupply;
         Transfer(address(this), owner, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

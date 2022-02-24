@@ -569,13 +569,13 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
     address _from,
     address _to,
     uint256 _value
-  ) public returns (bool) 
+  ) public returns (bool)
   {
     bytes memory empty;
     return transferFrom(
-      _from, 
-      _to, 
-      _value, 
+      _from,
+      _to,
+      _value,
       empty
     );
   }
@@ -591,16 +591,16 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     if (isContract(_to)) {
       return transferToContract(
-        _from, 
-        _to, 
-        _value, 
+        _from,
+        _to,
+        _value,
         _data
-      ); 
+      );
     } else {
       return transferToAddress(
-        _from, 
-        _to, 
-        _value, 
+        _from,
+        _to,
+        _value,
         _data
       );
     }
@@ -635,7 +635,7 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
     assembly {
       //retrieve the size of the code on target address, this needs assembly
       length := extcodesize(_addr)
-    } 
+    }
     return (length>0);
   }
 
@@ -652,7 +652,7 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
     address _to,
     uint256 _value,
     bytes _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value), "Tokens movement was failed");
     emit Transfer(_from, _to, _value);
@@ -664,14 +664,14 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
     );
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(
     address _from,
     address _to,
     uint256 _value,
     bytes _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value), "Tokens movement was failed");
     IERC223Receiver(_to).tokenFallback(_from, _value, _data);
@@ -690,9 +690,9 @@ contract SmartToken is BurnableToken, CappedToken, PausableToken {
 
 contract SmartMultichainToken is SmartToken {
   event BlockchainExchange(
-    address indexed from, 
-    uint256 value, 
-    uint256 indexed newNetwork, 
+    address indexed from,
+    uint256 value,
+    uint256 indexed newNetwork,
     bytes32 adr
   );
 
@@ -702,17 +702,17 @@ contract SmartMultichainToken is SmartToken {
   /// @param _network The index of target network.
   /// @param _adr The address in new network
   function blockchainExchange(
-    uint256 _amount, 
-    uint256 _network, 
+    uint256 _amount,
+    uint256 _network,
     bytes32 _adr
-  ) public 
+  ) public
   {
     burn(_amount);
     cap.sub(_amount);
     emit BlockchainExchange(
-      msg.sender, 
-      _amount, 
-      _network, 
+      msg.sender,
+      _amount,
+      _network,
       _adr
     );
   }
@@ -724,17 +724,17 @@ contract SmartMultichainToken is SmartToken {
   /// @param _adr The address in new network
   function blockchainExchangeFrom(
     address _from,
-    uint256 _amount, 
-    uint256 _network, 
+    uint256 _amount,
+    uint256 _network,
     bytes32 _adr
-  ) public 
+  ) public
   {
     require(_amount <= allowed[_from][msg.sender], "Used didn't allow sender to interact with balance");
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
     _burn(_from, _amount);
     emit BlockchainExchange(
-      msg.sender, 
-      _amount, 
+      msg.sender,
+      _amount,
       _network,
       _adr
     );
@@ -842,7 +842,7 @@ contract DetailedERC20 is ERC20 {
 // File: contracts/DucatToken.sol
 
 contract DucatToken is TransferTokenPolicy, SmartMultichainToken, Blacklist, DetailedERC20 {
-  uint256 private precision = 4; 
+  uint256 private precision = 4;
   constructor() public
     DetailedERC20(
       "Ducat",
@@ -857,4 +857,15 @@ contract DucatToken is TransferTokenPolicy, SmartMultichainToken, Blacklist, Det
   function _allowTransfer(address _from, address _to, uint256) internal returns(bool) {
     return !isBlacklisted(_from) && !isBlacklisted(_to);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

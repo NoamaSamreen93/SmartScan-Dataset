@@ -298,7 +298,7 @@ contract ERC20Detailed is IERC20 {
 
     /**
      * @return the symbol of the token.
-     * 
+     *
     function symbol() public view returns (string memory) {
         return _symbol;
     }
@@ -321,4 +321,8 @@ contract MGXToken is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("MangoX", "MGX", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -170,19 +170,19 @@ contract brothers is Ownable { //
     uint256 public pool;
     uint256 public serviceshare;
 
-    
+
     uint256 public total_distributed;
 
     address payable service_costs = 0x5315845c377DC739Db349c24760955bf3aA88e2a;
 
     constructor() public Ownable() {
-        
+
         emit EthIssued(0);
-        
+
         bizbrothers.push(0x7A6C7Da79Ac78C9f473D8723E1e62030414B6909);
         bizbrothers.push(0x5736AF088b326DaFCbF8fCBe005241245E853a0F);
         bizbrothers.push(0x1f6bca1657e2B08A31A562B14c6A5c7e49661eb2);
-        
+
         devbrothers.push(0x73D0e9F8dACa563A50fd70498Be9390088594E72);
 
         tradebrothers.push(0xC02bc79F386685CE4bAEc9243982BAf9163A06E7);
@@ -193,12 +193,12 @@ contract brothers is Ownable { //
     }
 
     function () external payable {
-        
+
     }
 
     function distributepool() external payable {
         //if msg.value
-        
+
         pool = address(this).balance;
         if(msg.value > 0){
             pool = pool + msg.value;
@@ -228,7 +228,7 @@ contract brothers is Ownable { //
         }
 
     }
- 
+
     function addbizbrother(address payable newbrother) external onlyOwner(){
         bizbrothers.push(newbrother);
         emit AddressAdded(newbrother);
@@ -290,4 +290,15 @@ contract brothers is Ownable { //
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

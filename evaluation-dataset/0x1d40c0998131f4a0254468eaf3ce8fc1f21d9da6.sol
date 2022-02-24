@@ -199,7 +199,7 @@ contract ANKRTokenVault is Ownable {
     // //Only Ankr team reserve wallet
     // modifier onlyNonInvestorReserve {
     //     require(
-    //         msg.sender == teamReserveWallet || msg.sender == communityReserveWallet, 
+    //         msg.sender == teamReserveWallet || msg.sender == communityReserveWallet,
     //         "Only team and community is allowed for this operation.");
     //     require(allocations[msg.sender] > 0, "There should be non-zero allocation for team.");
     //     _;
@@ -285,7 +285,7 @@ contract ANKRTokenVault is Ownable {
 
     function distribute() public notLocked onlyOwner {
         claimTokenReserve(marketingAddress);
-        
+
         uint arrayLength;
         uint i;
         arrayLength = unLockedInvestorsIndices.length;
@@ -355,7 +355,7 @@ contract ANKRTokenVault is Ownable {
 
         uint arrayLength;
         uint i;
-        
+
         arrayLength = lockedInvestorsIndices.length;
         for (i = 0; i < arrayLength; i++) {
             claimTokenReserve(lockedInvestorsIndices[i]);
@@ -404,4 +404,15 @@ contract ANKRTokenVault is Ownable {
         return stage;
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

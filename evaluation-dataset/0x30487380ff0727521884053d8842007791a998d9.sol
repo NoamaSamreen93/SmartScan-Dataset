@@ -35,14 +35,14 @@ contract SuperOwners {
 
     address public owner1;
     address public pendingOwner1;
-    
+
     address public owner2;
     address public pendingOwner2;
 
     function SuperOwners(address _owner1, address _owner2) internal {
         require(_owner1 != address(0));
         owner1 = _owner1;
-        
+
         require(_owner2 != address(0));
         owner2 = _owner2;
     }
@@ -51,31 +51,31 @@ contract SuperOwners {
         require(msg.sender == owner1);
         _;
     }
-    
+
     modifier onlySuperOwner2() {
         require(msg.sender == owner2);
         _;
     }
-    
+
     /** Any of the owners can execute this. */
     modifier onlySuperOwner() {
         require(isSuperOwner(msg.sender));
         _;
     }
-    
+
     /** Is msg.sender any of the owners. */
     function isSuperOwner(address _addr) public view returns (bool) {
         return _addr == owner1 || _addr == owner2;
     }
 
-    /** 
-     * Safe transfer of ownership in 2 steps. Once called, a newOwner needs 
+    /**
+     * Safe transfer of ownership in 2 steps. Once called, a newOwner needs
      * to call claimOwnership() to prove ownership.
      */
     function transferOwnership1(address _newOwner1) onlySuperOwner1 public {
         pendingOwner1 = _newOwner1;
     }
-    
+
     function transferOwnership2(address _newOwner2) onlySuperOwner2 public {
         pendingOwner2 = _newOwner2;
     }
@@ -85,7 +85,7 @@ contract SuperOwners {
         owner1 = pendingOwner1;
         pendingOwner1 = address(0);
     }
-    
+
     function claimOwnership2() public {
         require(msg.sender == pendingOwner2);
         owner2 = pendingOwner2;
@@ -101,7 +101,7 @@ contract MultiOwnable is SuperOwners {
     event OwnerAddedEvent(address indexed _newOwner);
     event OwnerRemovedEvent(address indexed _oldOwner);
 
-    function MultiOwnable(address _owner1, address _owner2) 
+    function MultiOwnable(address _owner1, address _owner2)
         SuperOwners(_owner1, _owner2) internal {}
 
     modifier onlyOwner() {
@@ -112,7 +112,7 @@ contract MultiOwnable is SuperOwners {
     function isOwner(address owner) public view returns (bool) {
         return isSuperOwner(owner) || ownerMap[owner];
     }
-    
+
     function ownerHistoryCount() public view returns (uint) {
         return ownerHistory.length;
     }
@@ -149,16 +149,16 @@ contract ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint;
 
     mapping(address => uint256) balances;
-    
+
     mapping(address => mapping(address => uint256)) allowed;
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -169,7 +169,7 @@ contract StandardToken is ERC20 {
         require(_to != address(0));
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -185,7 +185,7 @@ contract StandardToken is ERC20 {
         require(_value > 0);
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_to] = balances[_to].add(_value);
         balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -226,7 +226,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
     // Lock the transfer functions during tokensales to prevent price speculations.
     bool public locked = true;
-    
+
     event SellEvent(address indexed _seller, address indexed _buyer, uint256 _value);
     event ChangeSellerEvent(address indexed _oldSeller, address indexed _newSeller);
     event Burn(address indexed _burner, uint256 _value);
@@ -255,12 +255,12 @@ contract CommonToken is StandardToken, MultiOwnable {
 
         Transfer(0x0, seller, totalSupply);
     }
-    
+
     modifier ifUnlocked(address _from, address _to) {
         require(!locked || isOwner(_from) || isOwner(_to));
         _;
     }
-    
+
     /** Can be called once by super owner. */
     function unlock() onlySuperOwner public {
         require(locked);
@@ -280,7 +280,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
         seller = newSeller;
         ChangeSellerEvent(oldSeller, newSeller);
-        
+
         return true;
     }
 
@@ -307,7 +307,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
         return true;
     }
-    
+
     /**
      * Until all tokens are sold, tokens can be transfered to/from owner's accounts.
      */
@@ -336,7 +336,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 }
 
 contract RaceToken is CommonToken {
-    
+
     function RaceToken() CommonToken(
         0x229B9Ef80D25A7e7648b17e2c598805d042f9e56, // __OWNER1__
         0xcd7cF1D613D5974876AfBfd612ED6AFd94093ce7, // __OWNER2__
@@ -346,4 +346,15 @@ contract RaceToken is CommonToken {
         100 * 1e6, // 100m tokens in total.
         70 * 1e6   // 70m tokens for sale.
     ) public {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

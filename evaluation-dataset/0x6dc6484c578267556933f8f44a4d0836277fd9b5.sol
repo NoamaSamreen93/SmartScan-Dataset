@@ -13,14 +13,14 @@ contract Partner {
     uint256 private ether60;
     uint256 private ether40;
     token public tokenReward;
-    
+
     function Partner() public {
         tokenReward = token(maintoken);
     }
-    
+
     function() external payable {
         cost1token = 0.0000056 ether;
-        
+
         if ( now > 1547586000 ) {
             cost1token = 0.0000195 ether;
         }
@@ -31,10 +31,18 @@ contract Partner {
 
         sendtoken = (msg.value)/cost1token;
         tokenReward.transferFrom(owner, msg.sender, sendtoken);
-        
+
         ether40 = (msg.value)*40/100;
         ether60 = (msg.value)-ether40;
         owner.transfer(ether60);
         partner.transfer(ether40);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

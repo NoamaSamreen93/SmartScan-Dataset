@@ -17,7 +17,7 @@ contract Ownable {
 
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
-    }    
+    }
 
     function owner() public view returns (address) {
         return _owner;
@@ -89,7 +89,7 @@ contract Pausable is Ownable {
     function unpause() public onlyOwner whenPaused {
         _paused = false;
         emit Unpaused(msg.sender);
-    }    
+    }
 }
 
 contract EIP20Interface {
@@ -99,7 +99,7 @@ contract EIP20Interface {
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
     function allowance(address owner, address spender) public view returns (uint256);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -107,13 +107,13 @@ contract EIP20Interface {
 
 contract ERC20 is Ownable, Pausable, EIP20Interface {
     using SafeMath for uint256;
-    
+
     uint256 private _totalSupply;
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    
-    
+
+
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
 
@@ -124,7 +124,7 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
         _totalSupply = 1500000000 * 10 ** uint256(_decimals);
         _balances[msg.sender] = _totalSupply;
     }
-    
+
     // erc20
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
@@ -136,7 +136,7 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
 
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowed[owner][spender];
-    }    
+    }
 
     function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
         _transfer(msg.sender, to, value);
@@ -147,7 +147,7 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
         require(value > 0);
         _approve(msg.sender, spender, value);
         return true;
-    }    
+    }
 
     function transferFrom(address from, address to, uint256 value) public whenNotPaused returns (bool) {
         _transfer(from, to, value);
@@ -163,11 +163,11 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
     function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
         _approve(msg.sender, spender, _allowed[msg.sender][spender].sub(subtractedValue));
         return true;
-    }    
-    
+    }
+
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0), "ERC20: transfer to the zero address");
-        
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
@@ -179,8 +179,8 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
 
         _allowed[owner][spender] = value;
         emit Approval(owner, spender, value);
-    }    
-    
+    }
+
     // details
     function name() public view returns (string memory) {
         return _name;
@@ -193,4 +193,13 @@ contract ERC20 is Ownable, Pausable, EIP20Interface {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -17,22 +17,22 @@ pragma solidity ^0.4.11;
 		- Set a new owner
 		- Control the assets of the Registrar (withdraw ETH, transfer, sell, burn pieces owned by the Registrar)
 		- The plan is to have the controller contract be a DAO in preparation for a possible ICO
-	
+
 	Registrar:
 		- The Registrar contract acts as the central registry for all sha256 hashes in the Ethart factory contract network.
 		- Approved Factory Contracts can register sha256 hashes using the Registrar interface.
 		- ethartArtReward of the art produced and ethartRevenueReward of turnover of the contract network will be awarded to the Registrar.
-	
+
 	Factory Contracts:
 		- Factory Contracts can spawn Artwork Contracts in line with artists specifications
 		- Factory Contracts will only spawn Artwork Contracts who's sha256 hashes are unique per the Registrar's sha256 registry
 		- Factory Contracts will register every new Artwork Contract with it's details with the Registrar contract
-	
+
 	Artwork Contracts:
 		- Artwork Contracts act as minimalist decentralised exchanges for their pieces in line with specified conditions
-		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value 
+		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value
 		- Artwork Contracts can be interacted with by the Controller via the Registrar using their interfaces to transfer, sell, burn etc pieces
-	
+
 	(c) Stefan Pernar 2017 - all rights reserved
 	(c) ERC20 functions BokkyPooBah 2017. The MIT Licence.
 */
@@ -81,11 +81,11 @@ contract Interface {
 	function burn(uint256 _amount) returns (bool success);										// Burns (removes from circulation) unindexed pieces of art or tokens.
 																								// In the case of 'ouroboros' pieces this function also returns the piece's
 																								// components to the message sender
-	
+
 	function burnFrom(address _from, uint256 _amount) returns (bool success);					// Burns (removes from circulation) unindexed pieces of art or tokens
 																								// owned by another address. In the case of 'ouroboros' pieces this
 																								// function also returns the piece's components to the message sender
-	
+
 	// Extended ERC20 interface for indexed pieces
 	function transferIndexed (address _to, uint256 __index) returns (bool success);				// Transfers an indexed piece of art
 	function transferFromIndexed (address _from, address _to, uint256 _index) returns (bool success);	// Transfers an indexed piece of art from another address
@@ -93,7 +93,7 @@ contract Interface {
 	function burnIndexed (uint256 _index);														// Burns (removes from circulation) indexed pieces of art or tokens.
 																								// In the case of 'ouroboros' pieces this function also returns the
 																								// piece's components to the message sender
-	
+
 	function burnIndexedFrom (address _owner, uint256 _index);									// Burns (removes from circulation) indexed pieces of art or tokens
 																								// owned by another address. In the case of 'ouroboros' pieces this
 																								// function also returns the piece's components to the message sender
@@ -119,14 +119,14 @@ contract Registrar {
 
 	// Owner of account approves the transfer of an amount of Patron tokens to another account
 	mapping(address => mapping (address => uint256)) allowed;			// Patron token allowances
-	
+
 	// Mitigating ERC20 short address attacks (http://vessenes.com/the-erc20-short-address-attack-explained/)
 	modifier onlyPayloadSize(uint size)
 	{
 		require(msg.data.length >= size + 4);
 		_;
 	}
-	
+
 	// BEGIN ERC20 functions (c) BokkyPooBah 2017. The MIT Licence.
 
 	function totalSupply() constant returns (uint256 totalPatronSupply) {
@@ -140,7 +140,7 @@ contract Registrar {
 
 	// Transfer the balance from owner's account to another account
 	function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) returns (bool success) {
-		if (balances[msg.sender] >= _amount 
+		if (balances[msg.sender] >= _amount
 			&& _amount > 0
  		   	&& balances[_to] + _amount > balances[_to]
 			&& _to != 0x0)										// use burn() instead
@@ -190,9 +190,9 @@ contract Registrar {
 		}
 
 	// END ERC20 functions (c) BokkyPooBah 2017. The MIT Licence.
-	
+
 	// Additional Patron token functions
-	
+
 	function burn(uint256 _amount) returns (bool success) {
 			if (balances[msg.sender] >= _amount) {
 				balances[msg.sender] -= _amount;
@@ -244,21 +244,21 @@ contract Registrar {
 	// END safe math functions by Open Zeppelin
 
 	// Ethart variables
-	
+
 	// Register of all SHA256 Hashes
     mapping (bytes32 => address) public SHA256HashRegister;
-	
+
 	// Register of all approved factory contracts
 	mapping (address => bool) public approvedFactories;
-	
+
 	// Register of all approved artwork contracts
-	
+
 	// Register of all approved contracts for amending pending withdrawals and issuing Patron tokens
 	mapping (address => bool) public approvedContracts;
-	
+
 	// Register of all referrers (referee => referrer) used for the affiliate program
 	mapping (address => address) public referred;
-	
+
 	// Referrer for an artist has to be set _before_ the first piece has been created by an address
 	mapping (address => bool) public cantSetReferrer;
 
@@ -273,7 +273,7 @@ contract Registrar {
 		address factory;
 		bool isIndexed;
 		bool isOuroboros;}
-	
+
 	mapping (address => artwork) public artworkRegister;
 
 	// An indexed register of all of an artist's artworks
@@ -282,7 +282,7 @@ contract Registrar {
 	mapping(address => mapping (uint256 => address)) public artistsArtworks;
 
 	// A running number counting an artist's artworks
-	mapping(address => uint256) public artistsArtworkCount;						
+	mapping(address => uint256) public artistsArtworkCount;
 
 	// Keeps track of the number of artwork contracts in the network
 	uint256 public artworkCount;
@@ -296,17 +296,17 @@ contract Registrar {
 
 	// The address of the Registrar's owner
 	address public owner;
-	
+
 	// Determines how many Patrons are issues per donation
 	uint256 public donationMultiplier;
-	
+
 	// Determines how many Patrons are issues per purchase of an artwork in basis points (10,000 = 100%)
 	uint256 public patronRewardMultiplier;
-	
+
 	// Determines how much Ethart is entitled to artworks/revenue percentages in basis points (10,000 = 100%)
 	uint256 public ethartRevenueReward;
 	uint256 public ethartArtReward;
-	
+
 	// Determines how much of a percentage a referrer get of ethartRevenueReward
 	uint256 public referrerReward;
 
@@ -344,7 +344,7 @@ contract Registrar {
 		{
 			return referred[_artist];
 		}
-	
+
 	function setReferrerReward (uint256 _referrerReward) onlyBy (owner)
 		{
 			uint a;
@@ -354,7 +354,7 @@ contract Registrar {
 			if (a * _referrerReward != 10000) {throw;}
 			referrerReward = _referrerReward;
 		}
-	
+
 	function getReferrerReward () returns (uint256 _referrerReward)
 		{
 			return referrerReward;
@@ -363,19 +363,19 @@ contract Registrar {
 	// Constructor
 	function Registrar () {
 		owner = msg.sender;
-		
+
 		// Donors receive 100 Patrons per 1 wei donation
 		donationMultiplier = 100;
-		
+
 		// Patrons receive 2.5 Patrons (25,000 basis points) per 1 wei purchases
 		patronRewardMultiplier = 25000;
-		
+
 		// Ethart receives 2.5% of revenues and artwork's edition sizes
 		ethartRevenueReward = 250;
 		ethartArtReward = 250;
-		
+
 		// For balanced figures patronRewardMultiplier / donationMultiplier <= ethartRevenueReward
-		
+
 		// Referrers receive 10% of ethartRevenueReward
 		referrerReward = 1000;
 	}
@@ -397,7 +397,7 @@ contract Registrar {
 			if (a * _ethartRevenueReward < 10000) {throw;}
 			ethartRevenueReward = _ethartRevenueReward;
 		}
-	
+
 	function getEthartRevenueReward () returns (uint256 _ethartRevenueReward)
 		{
 			return ethartRevenueReward;
@@ -420,7 +420,7 @@ contract Registrar {
 		}
 
 	// Allows the current owner to assign a new owner
-	function changeOwner (address newOwner) onlyBy (owner) 
+	function changeOwner (address newOwner) onlyBy (owner)
 		{
 			owner = newOwner;
 		}
@@ -484,7 +484,7 @@ contract Registrar {
 		{
 			approvedFactories[_factoryContractAddress] = _approved;
 		}
-	
+
 	// Open Zeppelin asyncSend function for pull payments
 	function asyncSend (address _payee, uint256 _amount) approvedContractsOnly
 		{
@@ -501,7 +501,7 @@ contract Registrar {
 			if (this.balance < _payment) {
 				throw;
 			}
-			
+
 			totalPendingWithdrawals = sub(totalPendingWithdrawals, _payment);
 			pendingWithdrawals[this] = sub(pendingWithdrawals[this], _payment);
 
@@ -530,7 +530,7 @@ contract Registrar {
 		}
 	}
 
-	function transferByAddress (address _contract, uint256 _amount, address _to) onlyBy (owner) 
+	function transferByAddress (address _contract, uint256 _amount, address _to) onlyBy (owner)
 		{
 			Interface c = Interface(_contract);
 			c.transfer(_to, _amount);
@@ -546,7 +546,7 @@ contract Registrar {
 		{
 			Interface c = Interface(_contract);
 			c.approve(_spender, _amount);
-		}	
+		}
 
 	function approveIndexedByAddress (address _contract, address _spender, uint256 _index) onlyBy (owner)
 		{
@@ -592,7 +592,7 @@ contract Registrar {
 		}
 
 	// Cancel the sale of an unindexed piece owned by the registrar
-	function cancelSaleByAddress (address _contract) onlyBy (owner)	
+	function cancelSaleByAddress (address _contract) onlyBy (owner)
 		{
 			Interface c = Interface(_contract);
 			c.cancelSale();
@@ -606,7 +606,7 @@ contract Registrar {
 		}
 
 	// Fill a bid with an indexed piece owned by the registrar
-	function fillIndexedBidByAddress (address _contract, uint256 _index) onlyBy (owner)	
+	function fillIndexedBidByAddress (address _contract, uint256 _index) onlyBy (owner)
 		{
 			Interface c = Interface(_contract);
 			c.fillIndexedBid(_index);
@@ -618,10 +618,20 @@ contract Registrar {
 			Interface c = Interface(_contract);
 			c.cancelIndexedSale();
 		}
-	
+
 	// use donate () for donations and you will get donationMultiplier * your donation in Patron tokens. Yay!
 	function() payable
 		{
 			if (!approvedContracts[msg.sender]) {throw;}
 		}
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

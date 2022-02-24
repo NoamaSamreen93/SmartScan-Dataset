@@ -2,7 +2,7 @@ pragma solidity 0.4.20;
 
 /*
 * Team AppX presents - Moon, Inc. | Competitive Ethereum Idle Pyramid
-* 
+*
 * - You can buy workers with ETH to increase your cookies production.
 * - You can sell your cookies and claim a proportion of the cookie fund.
 * - You cannot sell cookies within the first hour of a new production unit launch.
@@ -57,7 +57,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract ProductionUnitToken {
@@ -628,7 +628,7 @@ contract MoonInc {
     uint256[] public tokenContractStartTime;
 
     uint256 public constant firstUnitStartTime = 1526763600; // TODO: change this in main launch contract
-    
+
     // ERC20 events
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
@@ -671,7 +671,7 @@ contract MoonInc {
     }
 
     function createProductionUnitTokenContract(
-        uint8 _entryFee, uint8 _transferFee, uint8 _exitFee, uint256 _tokenPriceInitial, 
+        uint8 _entryFee, uint8 _transferFee, uint8 _exitFee, uint256 _tokenPriceInitial,
         uint256 _tokenPriceIncremental, uint256 _cookieProductionMultiplier, uint256 _startTime
     ) internal {
         ProductionUnitToken newContract = new ProductionUnitToken(address(this),
@@ -713,7 +713,7 @@ contract MoonInc {
     }
 
     function getState() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256) {
-        return (totalCookieProduction, cookieProduction[msg.sender], totalSupply(), balanceOf(msg.sender), 
+        return (totalCookieProduction, cookieProduction[msg.sender], totalSupply(), balanceOf(msg.sender),
             totalEtherCookieResearchPool, lastTotalCookieSaveTime, computeSellPrice());
     }
 
@@ -834,4 +834,15 @@ contract MoonInc {
         return 1 ether * totalEtherCookieResearchPool / supply * multiplier / 10000;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

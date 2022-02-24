@@ -50,19 +50,19 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract FairDinkums is StandardToken { 
+contract FairDinkums is StandardToken {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals the token has
     string public symbol;                 // Token identifier
     uint256 public tokensPerEth;          // How many tokens purchased per eth in ICO
-    uint256 public totalEthInWei;         // Total ethereum raised in ICO (in Wei)  
+    uint256 public totalEthInWei;         // Total ethereum raised in ICO (in Wei)
     address public fundsWallet;           // Wallet which manages the contract
     uint public startTime;                // Start time of the ICO
     bool public tokenReleased;
     uint256 public totalDividends;
     mapping (address => uint256) public lastDividends;
     event TokensSold(address Buyer, uint256 Qty);
-    
+
     function FairDinkums() public {
         balances[msg.sender] = 20000 * 1e18;    // 20'000 max for ICO participants
         totalSupply = 20000 * 1e18;             // 20'000 max for ICO participants
@@ -91,9 +91,9 @@ contract FairDinkums is StandardToken {
             TokensSold(msg.sender,amount);
             balances[fundsWallet] = balances[fundsWallet] - amount;
             balances[msg.sender] = balances[msg.sender] + amount;
-    
+
             Transfer(fundsWallet, msg.sender, amount);
-    
+
             fundsWallet.transfer(msg.value);
         } else {
             // If the ico is over, then the value must be zero and the updateDivs function will be called.
@@ -119,12 +119,12 @@ contract FairDinkums is StandardToken {
         // ICO will be open for the sooner of 2 weeks or the token is declared released by the manager
         return ((now < (startTime + 4 weeks)) && !tokenReleased);
     }
-    
+
     modifier released {
         require(tokenReleased);
         _;
     }
-    
+
     modifier isOwner {
         require(msg.sender == fundsWallet);
         _;
@@ -140,7 +140,7 @@ contract FairDinkums is StandardToken {
             return 0;
         }
     }
-    
+
     function updateDivs(address _who, uint256 _owing) internal {
         if (_owing > 0){
             if(_owing<=this.balance){
@@ -151,11 +151,11 @@ contract FairDinkums is StandardToken {
         }
         lastDividends[_who] = totalDividends;
     }
-    
+
     function remainingTokens() public view returns(uint256 remaining){
         return balances[fundsWallet];
     }
-    
+
     function releaseToken() public isOwner {
         require(!tokenReleased);
         tokenReleased = true;
@@ -163,12 +163,25 @@ contract FairDinkums is StandardToken {
         totalSupply -= balances[fundsWallet];
         balances[fundsWallet] = 0;
     }
-    
+
     function payDividends() public payable isOwner {
         totalDividends += msg.value;
     }
-    
+
     function withdrawDividends() public {
         updateDivs(msg.sender,dividendsOwing(msg.sender));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

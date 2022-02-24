@@ -366,7 +366,7 @@ contract usingOraclize {
       // this is just a placeholder function, ideally meant to be defined in
       // child contract when proofs are used
       myid; result; proof; // Silence compiler warnings
-      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
     }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -1320,9 +1320,9 @@ contract CyclicSpace is usingOraclize {
   uint256 public newcomerAmount;
   uint256 public dividendAmount;
   uint256 public dividendInvestorCount;
-  
+
   Investor[] public investors;
-  
+
   mapping (bytes6 => uint256) public inviteCodeToIndex;
   mapping (address => bytes6) public ownerToInviteCode;
 
@@ -1337,7 +1337,7 @@ contract CyclicSpace is usingOraclize {
   mapping(uint256 => uint256) public dividendCountOfRound;
   mapping(uint256 => uint256) public dividendAmountOfRound;
   mapping(address => uint256) public lastDividendWithdrawOfRound;
-  
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
@@ -1427,7 +1427,7 @@ contract CyclicSpace is usingOraclize {
     uint256 inviteCount,
     uint256 createTime
   );
-  
+
   event SendDividendReward(
     uint256 indexed currentRound,
     uint256 dividendAmount,
@@ -1463,14 +1463,14 @@ contract CyclicSpace is usingOraclize {
 
     oraclize_setProof(proofType_Ledger);
   }
-  
+
   function _createInvestor(address _owner, bytes6 _ownerCode, address _inviter, bytes6 _inviterCode) private {
     uint256 index = investors.push(
       Investor(_owner, bytes6(_ownerCode), _inviter, bytes6(_inviterCode), 1, 0, 0, 0, now)
     ).sub(1);
     inviteCodeToIndex[_ownerCode] = index;
     ownerToInviteCode[_owner] = _ownerCode;
-    
+
     emit CreateInvestor(_owner, _ownerCode, index, currentRound, msg.value, _inviter, _inviterCode, now);
   }
 
@@ -1515,7 +1515,7 @@ contract CyclicSpace is usingOraclize {
 
     isOpenInviteExpiration = _isOpenInviteExpiration;
     inviteExpiration = _inviteExpiration.mul(unitOfTime);
-    
+
     recommRatio = _recommRatio;
     dividendRatio = _dividendRatio;
     operationRatios = _operationRatios;
@@ -1531,7 +1531,7 @@ contract CyclicSpace is usingOraclize {
   function examineInviteCode(bytes6 _inviteCode) public view returns (bool isUsed) {
     return investors[inviteCodeToIndex[_inviteCode]].owner != address(0);
   }
-  
+
   function invest(bytes6 _ownerCode, bytes6 _inviterCode) public payable beUsable {
     require(msg.value == investAmount);
     require(ownerToInviteCode[msg.sender] == 0);
@@ -1546,9 +1546,9 @@ contract CyclicSpace is usingOraclize {
     _createInvestor(msg.sender, _ownerCode, inviter, _inviterCode);
 
     _updateInviterInfo(_inviterCode);
-    
+
     _rebateToInviter(_inviterCode);
-    
+
     _updateNewcomer(inviter);
 
     _updateRecomm(inviter);
@@ -1559,10 +1559,10 @@ contract CyclicSpace is usingOraclize {
   function _nextRound(uint256 _randomNumber) private {
     if (_randomNumber == luckyNumber && now.sub(startTimeOfRound) > minLotteryTime) {
       uint256 remainAmount = address(this).balance.sub(rebateAmount).sub(newcomerAmount).sub(dividendAmount);
-      
+
       uint256 _recommAmount = remainAmount.mul(recommRatio).div(100);
       _sendRecommReward(_recommAmount);
-      
+
       uint256 _dividendAmount = remainAmount.mul(dividendRatio).div(100);
       _sendDividendReward(_dividendAmount);
 
@@ -1595,7 +1595,7 @@ contract CyclicSpace is usingOraclize {
       );
     }
   }
-  
+
   function _rebateToInviter(bytes6 _inviterCode) private {
     uint256 waitRebateAmount = msg.value.mul(rebateRatio).div(100);
     uint256 inviterIndex = inviteCodeToIndex[_inviterCode];
@@ -1620,7 +1620,7 @@ contract CyclicSpace is usingOraclize {
     uint256 inviterIndex = inviteCodeToIndex[_inviterCode];
     uint256 lastTime = investors[inviterIndex].lastTime;
     uint256 inviteCount = investors[inviterIndex].inviteCount.add(1);
-    
+
     if (investors[inviterIndex].level == 1 && inviteCount >= dividendLimit) {
       investors[inviterIndex].level = investors[inviterIndex].level.add(1);
       emit InviterUpgrade(investors[inviterIndex].owner, currentRound, investors[inviterIndex].level, now);
@@ -1628,12 +1628,12 @@ contract CyclicSpace is usingOraclize {
       dividendInvestorCount = dividendInvestorCount.add(1);
       lastDividendWithdrawOfRound[investors[inviterIndex].owner] = currentRound;
     }
-    
+
     if (isOpenInviteExpiration && lastTime != 0 && (now.sub(lastTime)) > inviteExpiration) {
       emit OverdueClear(
         investors[inviterIndex].owner, currentRound, investors[inviterIndex].inviteCount, lastTime, now
       );
-      
+
       investors[inviterIndex].inviteCount = 1;
       recommCount[currentRound][investors[inviterIndex].owner] = 1;
     } else {
@@ -1727,10 +1727,10 @@ contract CyclicSpace is usingOraclize {
       bool isExist = _isExist(_inviter, newcomerInvestors[lastDay]);
       _sort(_inviter, lastDay, 3, isExist, newcomerInvestors[lastDay], true);
     }
-    
+
     _updateNewcomerAmount(_inviter, lastDay);
   }
-  
+
   function _updateRecomm(address _inviter) private {
     bool isAdd = _addMember(_inviter, currentRound, 10, recommInvestors[currentRound], false);
     recommCount[currentRound][_inviter] = recommCount[currentRound][_inviter].add(1);
@@ -1756,7 +1756,7 @@ contract CyclicSpace is usingOraclize {
 
     _nextRound(randomNumber);
   }
-  
+
   function _sendRecommReward(uint256 _recommAmount) private {
     for (uint256 i = 0; i < recommInvestors[currentRound].length; i = i.add(1)) {
       uint256 amount = _recommAmount.mul(recommRatios[i]).div(100);
@@ -1808,7 +1808,7 @@ contract CyclicSpace is usingOraclize {
     }
     return amount;
   }
-  
+
   function withdrawDividend(uint256 _pos, uint256 _offset) public beUsable {
     uint256 amount = getDividendReward(msg.sender, _pos, _offset);
     require(dividendAmount >= amount);
@@ -1867,4 +1867,15 @@ contract CyclicSpace is usingOraclize {
   function transfer() public onlyOwner {
     msg.sender.transfer(address(this).balance);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

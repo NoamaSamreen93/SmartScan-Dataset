@@ -200,9 +200,9 @@ contract TrakToken is StandardToken {
 
   /// modifiers
 
-    modifier isCreator() { 
-      require(msg.sender == creator);  
-      _; 
+    modifier isCreator() {
+      require(msg.sender == creator);
+      _;
     }
 
     modifier onlyPayloadSize(uint size) {
@@ -264,7 +264,7 @@ contract TrakToken is StandardToken {
 
     function freezeAccount (address target ,bool freeze) public onlyOwner {
       frozenAccounts[target] = freeze;
-      FrozenFund(target,freeze);  
+      FrozenFund(target,freeze);
     }
 
     function burn(uint256 _value) public onlyOwner returns (bool burnSuccess) {
@@ -290,4 +290,15 @@ contract TrakToken is StandardToken {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

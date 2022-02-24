@@ -20,7 +20,7 @@ contract TrueHKD {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = 0x694c83c02d0f62c26352cb2d947e2f3d43c28959df09aa728c1937be0db4f629;//keccak256("trueHKD.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = 0x6dd3140f324ae1c14ee501ef56b899935ef394e2a1b2a0e41ec6b40fd725799c;//keccak256("trueHKD.pending.proxy.owner");
@@ -148,7 +148,7 @@ contract TrueHKD {
     */
     function() external payable {
         bytes32 position = implementationPosition;
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, returndatasize, calldatasize)
@@ -160,4 +160,15 @@ contract TrueHKD {
             default { return(ptr, returndatasize) }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

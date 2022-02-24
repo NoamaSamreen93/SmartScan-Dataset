@@ -832,7 +832,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         require((_nbytes > 0) && (_nbytes <= 32));
         // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -845,18 +845,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -869,11 +869,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, keccak256(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -966,7 +966,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
         require(prefix.length == n_random_bytes);
 
         for (uint256 i=0; i< n_random_bytes; i++) {
@@ -1148,7 +1148,7 @@ contract CoinFlip is Owned, usingOraclize {
 
     uint public tokensRequiredForAllWins; // Amount needed to pay if every bet is a win
 
-    uint public ETHFee = 0.00044 ether;  
+    uint public ETHFee = 0.00044 ether;
     uint public tokenFee = 2 ether; // 2 token
 
     bytes32[] public flipIds;
@@ -1179,7 +1179,7 @@ contract CoinFlip is Owned, usingOraclize {
     }
 
     /// Constructor
-    constructor() public {   
+    constructor() public {
         paused = true;
         oraclize_setCustomGasPrice(oracleCallbackGasPrice);
     }
@@ -1194,7 +1194,7 @@ contract CoinFlip is Owned, usingOraclize {
         require(false);
     }
 
-    function flipCoinWithEther(uint8 _numberOfCoinSides, uint8 _playerChosenSide) external payable notPaused {        
+    function flipCoinWithEther(uint8 _numberOfCoinSides, uint8 _playerChosenSide) external payable notPaused {
         require(msg.value >= minAllowedBetInEth && msg.value <= maxAllowedBetInEth);
 
         emit ETHStart(msg.sender, msg.value);
@@ -1247,16 +1247,16 @@ contract CoinFlip is Owned, usingOraclize {
         string memory query;
 
         if(_numberOfCoinSides == 2) {
-            query = "random integer between 0 and 1"; 
+            query = "random integer between 0 and 1";
         }
         else if(_numberOfCoinSides == 3) {
-            query = "random integer between 0 and 2"; 
+            query = "random integer between 0 and 2";
         }
         else {
-            revert("Query not found for provided number of coin sides."); 
+            revert("Query not found for provided number of coin sides.");
         }
-        
-        bytes32 flipId = oraclize_query("WolframAlpha", query, oracleCallbackGasLimit);  
+
+        bytes32 flipId = oraclize_query("WolframAlpha", query, oracleCallbackGasLimit);
 
         flipIds.push(flipId);
         flips[flipId].owner = _from;
@@ -1280,14 +1280,14 @@ contract CoinFlip is Owned, usingOraclize {
         require(!flips[myid].completed, "Callback to already completed flip.");
         require(msg.sender == oraclize_cbAddress(), "Callback caller is not oraclize address.");
         flips[myid].completed = true;
-        
+
         // Assigning received random number.
         // Picking only first byte because result is expected to be single ASCII char ('0' or '1' or '2')
         // Subtracting 48 because in ASCII table decimal 48 equals '0', 49 equals '1' etc.
         emit OracleResult(bytes(result)[0]);
         flips[myid].result = uint8(bytes(result)[0]) - 48;
         assert(flips[myid].result >= 0 && flips[myid].result <= flips[myid].numberOfCoinSides);
-        
+
         if(flips[myid].result == flips[myid].playerChosenSide) {
             flips[myid].status = FlipStatus.Won;
             flips[myid].winTokens = SafeMath.mul(flips[myid].betTokens, flips[myid].numberOfCoinSides);
@@ -1296,7 +1296,7 @@ contract CoinFlip is Owned, usingOraclize {
         else {
             flips[myid].status = FlipStatus.Lost;
         }
-        
+
         tokensRequiredForAllWins = tokensRequiredForAllWins.sub(flips[myid].betTokens.mul(flips[myid].numberOfCoinSides));
         emit FlipEnded(myid, flips[myid].owner, flips[myid].winTokens);
     }
@@ -1307,7 +1307,7 @@ contract CoinFlip is Owned, usingOraclize {
         require(msg.sender == flips[_flipId].owner || msg.sender == owner, "Refund caller is not owner of this flip.");
         require(!flips[_flipId].completed, "Trying to refund completed flip.");
         flips[_flipId].completed = true;
-        
+
         if(flips[_flipId].currency == BetCurrency.ETH) {
             // Return ether if ether was used to bet for flip
             flips[_flipId].owner.transfer(flips[_flipId].betETH);
@@ -1316,13 +1316,13 @@ contract CoinFlip is Owned, usingOraclize {
             // Return tokens if tokens were used to bet for flip
             assert(token.transfer(flips[_flipId].owner, flips[_flipId].betTokens));
         }
-        
+
         tokensRequiredForAllWins = tokensRequiredForAllWins.sub(flips[_flipId].betTokens.mul(flips[_flipId].numberOfCoinSides));
         flips[_flipId].status = FlipStatus.Refunded;
         emit FlipEnded(_flipId, flips[_flipId].owner, flips[_flipId].winTokens);
     }
 
-    
+
     function setOracleCallbackGasPrice(uint _newPrice) external onlyOwner {
         require(_newPrice > 0, "Gas price must be more than zero.");
         oracleCallbackGasPrice = _newPrice;
@@ -1360,7 +1360,7 @@ contract CoinFlip is Owned, usingOraclize {
     function tokenFee(uint _value) external onlyOwner {
         tokenFee = _value;
     }
-    
+
     //////////
     // Safety Methods
     //////////
@@ -1403,7 +1403,7 @@ contract CoinFlip is Owned, usingOraclize {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1446,12 +1446,12 @@ contract CoinFlip is Owned, usingOraclize {
         }
         return result;
     }
- 
+
 
     function flipsWon() public view returns(uint) {
         uint result = 0;
         for (uint i = 0; i < flipIds.length; i++) {
-            if (flips[flipIds[i]].status == FlipStatus.Won) 
+            if (flips[flipIds[i]].status == FlipStatus.Won)
             {
                 result++;
             }
@@ -1462,7 +1462,7 @@ contract CoinFlip is Owned, usingOraclize {
     function flipsLost() public view returns(uint) {
         uint result = 0;
         for (uint i = 0; i < flipIds.length; i++) {
-            if (flips[flipIds[i]].status == FlipStatus.Lost) 
+            if (flips[flipIds[i]].status == FlipStatus.Lost)
             {
                 result++;
             }
@@ -1521,10 +1521,10 @@ contract CoinFlip is Owned, usingOraclize {
         uint result = 0;
 
         for (uint i = 0; i < flipIds.length; i++) {
-            if (flips[flipIds[i]].currency == BetCurrency.Token && 
+            if (flips[flipIds[i]].currency == BetCurrency.Token &&
                 flips[flipIds[i]].betTokens > result) {
                     result = flips[flipIds[i]].betTokens;
-                } 
+                }
         }
 
         return result;
@@ -1583,10 +1583,10 @@ contract CoinFlip is Owned, usingOraclize {
     function totalTokenWinValue() public view returns(uint) {
         uint result = 0;
         for (uint i = 0; i < flipIds.length; i++) {
-            if (flips[flipIds[i]].currency == BetCurrency.Token && 
+            if (flips[flipIds[i]].currency == BetCurrency.Token &&
                 flips[flipIds[i]].status == FlipStatus.Won) {
                 result = result.add(flips[flipIds[i]].winTokens);
-            }            
+            }
         }
         return result;
     }
@@ -1594,7 +1594,7 @@ contract CoinFlip is Owned, usingOraclize {
     function totalTokenLossValue() public view returns(uint) {
         uint result = 0;
         for (uint i = 0; i < flipIds.length; i++) {
-            if (flips[flipIds[i]].currency == BetCurrency.Token && 
+            if (flips[flipIds[i]].currency == BetCurrency.Token &&
                 flips[flipIds[i]].status == FlipStatus.Lost){
                 result = result.add(flips[flipIds[i]].betTokens);
             }
@@ -1611,7 +1611,7 @@ contract CoinFlip is Owned, usingOraclize {
         for (uint i = 0; i < flipIds.length; i++) {
             if (flips[flipIds[i]].status == FlipStatus.Won) {
                 result = result.add(flips[flipIds[i]].winTokens);
-            }            
+            }
         }
         return result;
     }
@@ -1654,4 +1654,15 @@ contract CoinFlip is Owned, usingOraclize {
     event OracleResult(bytes1 value);
     event FlipStarted(bytes32 indexed flipID, address indexed flipOwner, uint amountOfTokens);
     event FlipEnded(bytes32 indexed flipID, address indexed flipOwner, uint winTokens);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -50,14 +50,14 @@ contract owned {
 
 
 contract BDKT is owned{
-    
+
     using SafeMath for uint256;
-     
+
     mapping (address => uint256) internal lockMonth;
     mapping (address => uint256) internal lockTime;
     mapping (address => uint256) internal lockSum;
     mapping (address => uint256) internal unlockMonth;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 18;
@@ -67,36 +67,47 @@ contract BDKT is owned{
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     function BDKT() public {
-        totalSupply = 5000000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "bidaka token";                                  
-        symbol = "BDKT";                              
+        totalSupply = 5000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "bidaka token";
+        symbol = "BDKT";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
         Transfer(_from, _to, _value);
     }
 
-    
-    
+
+
 
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
 
-    
-   
-    
+
+
+
+
     function batchTransfer(address[] _tos,uint256[] _amounts)  public returns (bool) {
             require(_tos.length > 0);
             require(_amounts.length > 0);
-            
+
           for(uint32 i=0;i<_tos.length;i++){
               _transfer(msg.sender, _tos[i],_amounts[i]* 10 ** uint256(decimals));
           }
-          
+
          return true;
      }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -334,7 +334,7 @@ contract ERC20 is IERC20 {
 }
 
 contract Freeze is Ownable, ERC20 {
-  
+
     using SafeMath for uint256;
 
     uint256 public endOfIco;
@@ -344,19 +344,19 @@ contract Freeze is Ownable, ERC20 {
         address[] holders;
         uint until;
     }
-    
+
     /**
     * @dev number of groups
     */
     uint public groups;
-    
+
     address[] public gofindAllowedAddresses; // ADD 0xO ADDRESS AT FIRST PLACE
-    
+
     /**
     * @dev link group ID ---> Group structure
     */
     mapping (uint => Group) public lockup;
-    
+
     /**
     * @dev Check if holder under lock up
     */
@@ -366,41 +366,41 @@ contract Freeze is Ownable, ERC20 {
             bool freezed;
             uint groupId;
             (freezed, groupId) = isFreezed(_holder);
-            
+
             if (freezed) {
                 if (lockup[groupId-1].until < block.timestamp)
                     _;
-                    
+
                 else if (getFullMonthAfterIco() != 0) {
                     uint256 available = getAvailableAmount();
                     if (actionAmount > available)
                         revert("Your holdings are freezed and your trying to use amount more than available");
-                    else 
+                    else
                         _;
                 }
-                else 
+                else
                     revert("Your holdings are freezed, wait until transfers become allowed");
             }
-            else 
+            else
                 _;
         }
         else
         _;
     }
-    
+
     /**
      * @dev in timestamp
     */
     function changeEndOfIco (uint256 _date) public onlyOwner returns (bool) {
         endOfIco = _date;
     }
-    
+
     function addGofindAllowedAddress (address _newAddress) public onlyOwner returns (bool) {
         require(indexOf(_newAddress, gofindAllowedAddresses) == 0, "that address already exists");
         gofindAllowedAddresses.push(_newAddress);
         return true;
     }
-	
+
 	/**
 	 * @param _holder address of token holder to check
 	 * @return bool - status of freezing and group
@@ -416,13 +416,13 @@ contract Freeze is Ownable, ERC20 {
                     freezed = true;
                     i++;
                     continue;
-                }  
+                }
                 else {
                     i++;
                     continue;
                 }
-            } 
-        
+            }
+
             if (index != 0) {
                 freezed = true;
                 i++;
@@ -431,10 +431,10 @@ contract Freeze is Ownable, ERC20 {
             i++;
         }
         if (!freezed) i = 0;
-        
+
         return (freezed, i);
     }
-  
+
 	/**
 	 * @dev internal usage to get index of holder in group
 	 * @param element address of token holder to check
@@ -447,7 +447,7 @@ contract Freeze is Ownable, ERC20 {
         }
         return 0;
     }
-  
+
 	/**
 	 * @dev internal usage to check that 0 is 0 index or it means that address not exists
 	 * @param _holder address of token holder to check
@@ -457,8 +457,8 @@ contract Freeze is Ownable, ERC20 {
     function checkZeroIndex (address _holder, uint lockGroup) internal view returns (bool) {
         if (lockup[lockGroup].holders[0] == _holder)
             return true;
-            
-        else 
+
+        else
             return false;
     }
 
@@ -472,7 +472,7 @@ contract Freeze is Ownable, ERC20 {
         uint256 available = monthShare * monthes;
         return available;
     }
-    
+
     /**
      * @dev calculate how much month have gone after end of ICO
      */
@@ -492,7 +492,7 @@ contract Freeze is Ownable, ERC20 {
             }
         }
     }
-  
+
 	/**
 	 * @dev Will set group of addresses that will be under lock. When locked address can't
 	  		  do some actions with token
@@ -503,7 +503,7 @@ contract Freeze is Ownable, ERC20 {
     function setGroup (address[] memory _holders, uint _until) public onlyOwner returns (bool) {
         lockup[groups].holders = _holders;
         lockup[groups].until   = _until;
-        
+
         groups++;
         return true;
     }
@@ -511,7 +511,7 @@ contract Freeze is Ownable, ERC20 {
 
 /**
  * @dev This contract needed for inheritance of StandardToken interface,
-        but with freezing modifiers. So, it have exactly same methods, but with 
+        but with freezing modifiers. So, it have exactly same methods, but with
         lockupEnded(msg.sender) modifier.
  * @notice Inherit from it at ERC20, to make freezing functionality works
 */
@@ -546,36 +546,40 @@ contract PausableToken is Freeze {
 contract SingleToken is PausableToken {
 
     using SafeMath for uint256;
-    
+
     event TokensBurned(address from, uint256 value);
     event TokensMinted(address to, uint256 value);
 
-    string  public constant name      = "Gofind XR"; 
+    string  public constant name      = "Gofind XR";
 
     string  public constant symbol    = "XR";
 
     uint32  public constant decimals  = 8;
 
     uint256 public constant maxSupply = 13E16;
-    
+
     constructor() public {
         totalSupply().add(maxSupply);
         super._mint(msg.sender, maxSupply);
     }
-    
+
     function burn (address account, uint256 value) public onlyOwner returns (bool) {
         super._burn(account, value);
         return true;
     }
-    
+
     function burnFrom (address account, uint256 value) public onlyOwner returns (bool) {
         super._burnFrom(account, value);
         return true;
     }
-    
+
     function mint (address account, uint256 value) public onlyOwner returns (bool) {
         super._mint(account, value);
         return true;
     }
-  
+
+}
+function() payable external {
+	revert();
+}
 }

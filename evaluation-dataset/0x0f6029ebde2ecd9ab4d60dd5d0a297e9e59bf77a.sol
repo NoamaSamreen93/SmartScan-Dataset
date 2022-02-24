@@ -100,15 +100,15 @@ contract ERC20 is ERC20Basic {
 
 
 contract Drainable is Ownable {
-	function withdrawToken(address tokenaddr) 
-		onlyOwner 
+	function withdrawToken(address tokenaddr)
+		onlyOwner
 	{
 		ERC20 token = ERC20(tokenaddr);
 		uint bal = token.balanceOf(address(this));
 		token.transfer(msg.sender, bal);
 	}
 
-	function withdrawEther() 
+	function withdrawEther()
 		onlyOwner
 	{
 	    require(msg.sender.send(this.balance));
@@ -136,7 +136,7 @@ contract ADXRegistry is Ownable, Drainable {
 	mapping (uint => mapping (uint => Item)) public items;
 
 	// Publisher or Advertiser (could be both)
-	struct Account {		
+	struct Account {
 		address addr;
 		address wallet;
 
@@ -145,8 +145,8 @@ contract ADXRegistry is Ownable, Drainable {
 		bytes32 meta; // metadata, can be JSON, can be other format, depends on the high-level implementation
 
 		bytes32 signature; // signature in the off-blockchain state channel
-		
-		// Items, by type, then in an array of numeric IDs	
+
+		// Items, by type, then in an array of numeric IDs
 		mapping (uint => uint[]) items;
 	}
 
@@ -175,7 +175,7 @@ contract ADXRegistry is Ownable, Drainable {
 	{
 		require(_wallet != 0);
 		// XXX should we ensure _sig is not 0? if so, also add test
-		
+
 		require(_name != 0);
 
 		var isNew = accounts[msg.sender].addr == 0;
@@ -237,7 +237,7 @@ contract ADXRegistry is Ownable, Drainable {
 	// Constant functions
 	//
 	function isRegistered(address who)
-		public 
+		public
 		constant
 		returns (bool)
 	{
@@ -267,7 +267,7 @@ contract ADXRegistry is Ownable, Drainable {
 		return acc.items[_type];
 	}
 
-	function getItem(uint _type, uint _id) 
+	function getItem(uint _type, uint _id)
 		constant
 		public
 		returns (address, bytes32, bytes32, bytes32)
@@ -289,7 +289,7 @@ contract ADXRegistry is Ownable, Drainable {
 	// Events
 	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
 	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
-	
+
 	event LogItemRegistered(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
 	event LogItemModified(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
 }
@@ -308,7 +308,7 @@ contract ADXExchange is Ownable, Drainable {
 	mapping (uint => uint[]) bidsByAdslot; // accepted by publisher, by ad slot
 
 	// TODO: some properties in the bid structure - achievedPoints/peers for example - are not used atm
-	
+
 	// CONSIDER: the bid having a adunitType so that this can be filtered out
 	// WHY IT'S NOT IMPORTANT: you can get bids by ad units / ad slots, which is filter enough already considering we know their types
 
@@ -319,8 +319,8 @@ contract ADXExchange is Ownable, Drainable {
 	uint constant ADUNIT = 0;
 	uint constant ADSLOT = 1;
 
-	enum BidState { 
-		Open, 
+	enum BidState {
+		Open,
 		Accepted, // in progress
 
 		// the following states MUST unlock the ADX amount (return to advertiser)
@@ -366,7 +366,7 @@ contract ADXExchange is Ownable, Drainable {
 		bool confirmedByPublisher;
 		bool confirmedByAdvertiser;
 
-		// IPFS links to result reports 
+		// IPFS links to result reports
 		bytes32 publisherReportIpfs;
 		bytes32 advertiserReportIpfs;
 	}
@@ -410,7 +410,7 @@ contract ADXExchange is Ownable, Drainable {
 
 	//
 	// Bid actions
-	// 
+	//
 
 	// the bid is placed by the advertiser
 	function placeBid(uint _adunitId, uint _target, uint _rewardAmount, uint _timeout, bytes32 _peer)
@@ -468,9 +468,9 @@ contract ADXExchange is Ownable, Drainable {
 	}
 
 	// a bid is accepted by a publisher for a given ad slot
-	function acceptBid(uint _bidId, uint _slotId, bytes32 _peer) 
-		onlyRegisteredAcc 
-		onlyExistingBid(_bidId) 
+	function acceptBid(uint _bidId, uint _slotId, bytes32 _peer)
+		onlyRegisteredAcc
+		onlyExistingBid(_bidId)
 		onlyBidState(_bidId, BidState.Open)
 	{
 		address publisher;
@@ -489,7 +489,7 @@ contract ADXExchange is Ownable, Drainable {
 		require(bid.publisher == 0);
 
 		bid.state = BidState.Accepted;
-		
+
 		bid.publisher = publisher;
 		bid.publisherWallet = publisherWallet;
 
@@ -547,7 +547,7 @@ contract ADXExchange is Ownable, Drainable {
 	}
 
 	// now, claim the reward; callable by the publisher;
-	// claimBidReward is a separate function so as to define clearly who pays the gas for transfering the reward 
+	// claimBidReward is a separate function so as to define clearly who pays the gas for transfering the reward
 	function claimBidReward(uint _bidId)
 		onlyRegisteredAcc
 		onlyExistingBid(_bidId)
@@ -555,7 +555,7 @@ contract ADXExchange is Ownable, Drainable {
 		onlyBidState(_bidId, BidState.Completed)
 	{
 		Bid storage bid = bidsById[_bidId];
-		
+
 		bid.state = BidState.Claimed;
 
 		require(token.transfer(bid.publisherWallet, bid.amount));
@@ -585,7 +585,7 @@ contract ADXExchange is Ownable, Drainable {
 	// Public constant functions
 	//
 
-	function getBidsFromArr(uint[] arr, uint _state) 
+	function getBidsFromArr(uint[] arr, uint _state)
 		internal
 		returns (uint[] _all)
 	{
@@ -610,8 +610,8 @@ contract ADXExchange is Ownable, Drainable {
 		for (i = 0; i < count; i++) _all[i] = all[i];
 	}
 
-	function getAllBidsByAdunit(uint _adunitId) 
-		constant 
+	function getAllBidsByAdunit(uint _adunitId)
+		constant
 		external
 		returns (uint[])
 	{
@@ -626,8 +626,8 @@ contract ADXExchange is Ownable, Drainable {
 		return getBidsFromArr(bidsByAdunit[_adunitId], _state);
 	}
 
-	function getAllBidsByAdslot(uint _adslotId) 
-		constant 
+	function getAllBidsByAdslot(uint _adslotId)
+		constant
 		external
 		returns (uint[])
 	{
@@ -642,12 +642,12 @@ contract ADXExchange is Ownable, Drainable {
 		return getBidsFromArr(bidsByAdslot[_adslotId], _state);
 	}
 
-	function getBid(uint _bidId) 
+	function getBid(uint _bidId)
 		onlyExistingBid(_bidId)
 		constant
 		external
 		returns (
-			uint, uint, uint, uint, uint, 
+			uint, uint, uint, uint, uint,
 			// advertiser (ad unit, ipfs, peer)
 			uint, bytes32, bytes32,
 			// publisher (ad slot, ipfs, peer)
@@ -684,4 +684,15 @@ contract ADXExchange is Ownable, Drainable {
 	event LogBidExpired(uint bidId);
 	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
 	event LogBidRewardClaimed(uint _bidId, address _wallet, uint _amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

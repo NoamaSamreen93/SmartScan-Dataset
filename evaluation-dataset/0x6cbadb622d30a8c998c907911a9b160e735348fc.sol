@@ -80,11 +80,11 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         OwnershipTransferred(owner, newOwner);
@@ -158,7 +158,7 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -169,7 +169,7 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -179,7 +179,7 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
 	    require(to != 0x0);
 	    require(_balances[from] >= tokens);
-	   
+
         _balances[from] = safeSub(_balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
         _balances[to] = safeAdd(_balances[to], tokens);
@@ -216,7 +216,7 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
     function () public payable {
         revert();
     }
-	
+
 	function transferMany(address[] dests, uint256[] values) public
     onlyOwner
     returns (uint256) {
@@ -227,7 +227,7 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
         }
         return(i);
     }
-	
+
 	 function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(_balances[msg.sender] >= _value);   // Check if the sender has enough
         _balances[msg.sender] -= _value;            // Subtract from the sender
@@ -235,4 +235,12 @@ contract BitEspritCoin is ERC20Interface, Owned, SafeMath {
         Burn(msg.sender, _value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

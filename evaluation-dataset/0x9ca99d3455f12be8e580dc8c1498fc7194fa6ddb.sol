@@ -218,16 +218,16 @@ contract Ownable {
  * Simple ERC20 Token example, with crowdsale token creation
  */
 contract ChargCoinContract is StandardToken, Ownable {
-    
+
   string public standard = "Charg Coin";
   string public name = "Charg Coin";
   string public symbol = "CHARG";
   uint public decimals = 18;
   address public multisig = 0x0fA3d47B2F9C01396108D81aa63e4F20d4cd7994;
-  
+
   // 1 ETH = 500 CHARG tokens (1 CHARG = 0.59 USD)
   uint PRICE = 500;
-  
+
   struct ContributorData {
     uint contributionAmount;
     uint tokensIssued;
@@ -240,29 +240,29 @@ contract ChargCoinContract is StandardToken, Ownable {
   mapping(address => ContributorData) public contributorList;
   uint nextContributorIndex;
   mapping(uint => address) contributorIndexes;
-  
+
   state public crowdsaleState = state.pendingStart;
   enum state { pendingStart, crowdsale, crowdsaleEnded }
-  
+
   event CrowdsaleStarted(uint blockNumber);
   event CrowdsaleEnded(uint blockNumber);
   event ErrorSendingETH(address to, uint amount);
   event MinCapReached(uint blockNumber);
   event MaxCapReached(uint blockNumber);
-  
+
   uint public constant BEGIN_TIME = 1506406004;
-  
+
   uint public constant END_TIME = 1510790400;
 
   uint public minCap = 1 ether;
   uint public maxCap = 70200 ether;
   uint public ethRaised = 0;
   uint public tokenTotalSupply = 90000000 * 10**decimals;
-  
+
   uint crowdsaleTokenCap =            35100000 * 10**decimals; // 39%
   uint foundersAndTeamTokens =        9000000 * 10**decimals; // 10%
   uint slushFundTokens =    45900000 * 10**decimals; // 51%
-  
+
   bool foundersAndTeamTokensClaimed = false;
   bool slushFundTokensClaimed = false;
 
@@ -272,16 +272,16 @@ contract ChargCoinContract is StandardToken, Ownable {
   function() payable {
   require(msg.value != 0);
   require(crowdsaleState != state.crowdsaleEnded);// Check if crowdsale has ended
-  
+
   bool stateChanged = checkCrowdsaleState();      // Check blocks and calibrate crowdsale state
-  
+
   if(crowdsaleState == state.crowdsale) {
       createTokens(msg.sender);             // Process transaction and issue tokens
     } else {
       refundTransaction(stateChanged);              // Set state and return funds or throw
     }
   }
-  
+
   //
   // Check crowdsale state and calibrate it
   //
@@ -291,8 +291,8 @@ contract ChargCoinContract is StandardToken, Ownable {
       CrowdsaleEnded(block.number); // Raise event
       return true;
     }
-    
-    if(now >= END_TIME) {   
+
+    if(now >= END_TIME) {
       crowdsaleState = state.crowdsaleEnded;
       CrowdsaleEnded(block.number); // Raise event
       return true;
@@ -305,10 +305,10 @@ contract ChargCoinContract is StandardToken, Ownable {
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   //
   // Decide if throw or only return ether
   //
@@ -319,14 +319,14 @@ contract ChargCoinContract is StandardToken, Ownable {
       revert();
     }
   }
-  
+
   function createTokens(address _contributor) payable {
-  
+
     uint _amount = msg.value;
-  
+
     uint contributionAmount = _amount;
     uint returnAmount = 0;
-    
+
     if (_amount > (maxCap - ethRaised)) {                                          // Check if max contribution is lower than _amount sent
       contributionAmount = maxCap - ethRaised;                                     // Set that user contibutes his maximum alowed contribution
       returnAmount = _amount - contributionAmount;                                 // Calculate how much he must get back
@@ -344,7 +344,7 @@ contract ChargCoinContract is StandardToken, Ownable {
         contributorIndexes[nextContributorIndex] = _contributor;
         nextContributorIndex += 1;
     }
-  
+
     contributorList[_contributor].contributionAmount += contributionAmount;
     ethRaised += contributionAmount;                                              // Add to eth raised
 
@@ -364,23 +364,23 @@ contract ChargCoinContract is StandardToken, Ownable {
     balances[owner] = balances[owner].sub(_value);
     balances[_to] = balances[_to].add(_value);
   }
-  
+
   function calculateEthToChargcoin(uint _eth) constant returns(uint256) {
-  
+
     uint tokens = _eth.mul(getPrice());
     uint percentage = 0;
-    
+
     if (ethRaised > 0)
     {
         percentage = ethRaised * 100 / maxCap;
     }
-    
+
     return tokens + getStageBonus(percentage, tokens) + getAmountBonus(_eth, tokens);
   }
 
   function getStageBonus(uint percentage, uint tokens) constant returns (uint) {
     uint stageBonus = 0;
-      
+
     if (percentage <= 10) stageBonus = tokens * 60 / 100; // Stage 1
     else if (percentage <= 50) stageBonus = tokens * 30 / 100;
     else if (percentage <= 70) stageBonus = tokens * 20 / 100;
@@ -391,8 +391,8 @@ contract ChargCoinContract is StandardToken, Ownable {
   }
 
   function getAmountBonus(uint _eth, uint tokens) constant returns (uint) {
-    uint amountBonus = 0;  
-      
+    uint amountBonus = 0;
+
     if (_eth >= 3000 ether) amountBonus = tokens * 13 / 100;
     else if (_eth >= 2000 ether) amountBonus = tokens * 12 / 100;
     else if (_eth >= 1500 ether) amountBonus = tokens * 11 / 100;
@@ -413,15 +413,15 @@ contract ChargCoinContract is StandardToken, Ownable {
     else if (_eth >= 5 ether) amountBonus = tokens * 15 / 1000;
     else if (_eth >= 3 ether) amountBonus = tokens * 1 / 100;
     else if (_eth >= 2 ether) amountBonus = tokens * 5 / 1000;
-    
+
     return amountBonus;
   }
-  
+
   // replace this with any other price function
   function getPrice() constant returns (uint result) {
     return PRICE;
   }
-  
+
   //
   // Owner can batch return contributors contributions(eth)
   //
@@ -444,12 +444,21 @@ contract ChargCoinContract is StandardToken, Ownable {
       nextContributorToClaim += 1;                                                    // Repeat
     }
   }
-  
+
     //
   // Owner can set multisig address for crowdsale
   //
   function setMultisigAddress(address _newAddress) onlyOwner {
     multisig = _newAddress;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

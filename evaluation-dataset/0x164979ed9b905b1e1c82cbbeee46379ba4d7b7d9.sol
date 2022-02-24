@@ -126,7 +126,7 @@ contract Finalizable is Ownable {
 
 contract Shared is Ownable, Finalizable {
   uint internal constant DECIMALS = 8;
-  
+
   address internal constant REWARDS_WALLET = 0x30b002d3AfCb7F9382394f7c803faFBb500872D8;
   address internal constant FRIENDS_FAMILY_WALLET = 0xd328eF879f78cDa773a3dFc79B4e590f20C22223;
   address internal constant CROWDSALE_WALLET = 0x028e1Ce69E379b1678278640c7387ecc40DAa895;
@@ -248,7 +248,7 @@ contract Controller is Shared, Pausable {
   function withdrawVested(address _withdrawTo) returns (uint amountWithdrawn) {
     require(msg.sender == LIFE_CHANGE_VESTING_WALLET);
     require(vestingAmount > 0);
-    
+
     uint _elapsed = now.sub(vestingStart);
     uint _rate = vestingAmount.div(vestingDuration);
     uint _unlocked = _rate.mul(_elapsed);
@@ -400,7 +400,7 @@ contract Crowdsale is Shared, Pausable {
   uint public constant START = 1506945600;                          // October 2, 2017 7:00:00 AM CST
   uint public constant END = 1512133200;                            // December 1, 2017 7:00:00 AM CST
   uint public constant CAP = 375 * (10 ** (6 + DECIMALS));          // 375 million tokens
-  
+
   uint public weiRaised;
   uint public tokensDistributed;
   uint public bonusTokensDistributed;
@@ -446,7 +446,7 @@ contract Crowdsale is Shared, Pausable {
     require(validPurchase());
 
     processPurchase(msg.sender, _beneficiary, msg.value);
-    LIFE_CHANGE_WALLET.transfer(msg.value);  
+    LIFE_CHANGE_WALLET.transfer(msg.value);
   }
 
   function processPurchase(address _from, address _beneficiary, uint _weiAmount) internal returns (Purchase purchase) {
@@ -465,7 +465,7 @@ contract Crowdsale is Shared, Pausable {
     uint _roundWeiRemaining = _roundTokensRemaining.mul(currentRound.rate).div(10 ** DECIMALS);
     uint _tokens = _weiAmount.div(currentRound.rate).mul(10 ** DECIMALS);
     uint _incentiveDivisor = currentRound.incentiveDivisor;
-    
+
     if (_tokens <= _roundTokensRemaining) {
       purchase.tokens = _tokens;
 
@@ -479,7 +479,7 @@ contract Crowdsale is Shared, Pausable {
       if (_incentiveDivisor > 0) {
         _roundBonus = _roundTokensRemaining.div(_incentiveDivisor);
       }
-      
+
       purchase = getPurchase(_weiAmount.sub(_roundWeiRemaining), _tokensDistributed.add(_roundTokensRemaining));
       purchase.tokens = purchase.tokens.add(_roundTokensRemaining);
       purchase.bonus = purchase.bonus.add(_roundBonus);
@@ -501,7 +501,7 @@ contract Crowdsale is Shared, Pausable {
   function finalizeCrowdsale() onlyOwner {
     require(!crowdsaleFinalized);
     require(hasEnded());
-    
+
     uint _toVest = controller.balanceOf(CROWDSALE_WALLET);
     if (tokensDistributed == CAP) {
       _toVest = _toVest.sub(CAP.div(4)); // 25% bonus to token holders if sold out
@@ -512,4 +512,15 @@ contract Crowdsale is Shared, Pausable {
 
     crowdsaleFinalized = true;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

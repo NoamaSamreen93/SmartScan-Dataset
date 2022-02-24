@@ -108,7 +108,7 @@ contract Opennity is ERC20Interface, Owned {
     uint exchangerToken;
     uint reservedToken;
     uint developedToken;
-    
+
     address public constant developed1Address     = 0xcFCb491953Da1d10D037165dFa1298D00773fcA7;
     address public constant developed2Address     = 0xA123BceDB9d2E4b09c8962C62924f091380E1Ad7;
     address public constant developed3Address     = 0x51aeD4EDC28aad15C353D958c5A813aa21F351b6;
@@ -123,11 +123,11 @@ contract Opennity is ERC20Interface, Owned {
         decimals = 18;
         _initialTokenNumber = 1000000000;
         _totalSupply = _initialTokenNumber * 10 ** uint(decimals);
-        
+
         reservedToken = _totalSupply * 40 / 100;  // 40%
-        
+
         developedToken = _totalSupply * 10 / 100; //30% 3 Address
-        
+
         exchangerToken = _totalSupply * 30 / 100; // 30%
 
         balances[owner] = reservedToken;
@@ -135,14 +135,14 @@ contract Opennity is ERC20Interface, Owned {
 
         balances[exchangedAddress] = exchangerToken;
         emit Transfer(address(0), exchangedAddress, exchangerToken);
-        
+
         balances[developed1Address] = developedToken;
         emit Transfer(address(0), developed1Address, developedToken);
         balances[developed2Address] = developedToken;
         emit Transfer(address(0), developed2Address, developedToken);
         balances[developed3Address] = developedToken;
         emit Transfer(address(0), developed3Address, developedToken);
-        
+
     }
 
 
@@ -203,10 +203,10 @@ contract Opennity is ERC20Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        require(_to != address(0)); 
+        require(_to != address(0));
         require(balances[_from] >= _value);
         require(allowed[_from][msg.sender] >= _value);
-        
+
         balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -251,4 +251,13 @@ contract Opennity is ERC20Interface, Owned {
     function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) {
         return ERC20Interface(_tokenAddress).transfer(owner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

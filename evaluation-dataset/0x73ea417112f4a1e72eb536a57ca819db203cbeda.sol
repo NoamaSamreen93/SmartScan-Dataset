@@ -1,5 +1,5 @@
 pragma solidity ^0.4.19;
-// ECE 398 SC - Smart Contracts and Blockchain Security 
+// ECE 398 SC - Smart Contracts and Blockchain Security
 // http://soc1024.ece.illinois.edu/teaching/ece398sc/spring2018/
 
 contract ClassSize {
@@ -13,7 +13,7 @@ contract ClassSize {
         if (votesYes >= votesNo) {
             return 0; // yes
         } else  {
-            return 1; // no 
+            return 1; // no
         }
     }
     function voteYes(string note) public {
@@ -24,4 +24,20 @@ contract ClassSize {
         votesNo = 0;
         VoteNo(note);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

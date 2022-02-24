@@ -106,7 +106,7 @@ contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -302,7 +302,7 @@ contract CIFCoin is PausableToken {
 
     function CIFCoin() public
     {
-        
+
         // assign the total tokens to CrowdIF
         supply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
@@ -312,16 +312,16 @@ contract CIFCoin is PausableToken {
     function totalSupply() constant public returns (uint256) {
         return supply;
     }
-    
 
-    function transfer(address _to, uint _value) validDestination(_to) public returns (bool) 
+
+    function transfer(address _to, uint _value) validDestination(_to) public returns (bool)
     {
       require(!isFrozen(msg.sender));
       require(!isFrozen(_to));
       return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool)
     {
       require(!isFrozen(msg.sender));
       require(!isFrozen(_from));
@@ -331,7 +331,7 @@ contract CIFCoin is PausableToken {
 
     event Burn(address indexed _burner, uint _value);
 
-    function burn(uint _value) public returns (bool) 
+    function burn(uint _value) public returns (bool)
     {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         supply = supply.sub(_value);
@@ -341,7 +341,7 @@ contract CIFCoin is PausableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -351,12 +351,12 @@ contract CIFCoin is PausableToken {
         require(_to != address(0));
         require(balances[_from] >= _value);
         require(balances[_to].add(_value) >= balances[_to]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -368,7 +368,7 @@ contract CIFCoin is PausableToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -377,11 +377,11 @@ contract CIFCoin is PausableToken {
         token.transfer( owner, amount );
     }
 
-    
+
 
     /* This notifies clients about the amount frozen */
     event Freeze(address indexed addr);
-  
+
   /* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed addr);
 
@@ -436,9 +436,25 @@ contract CIFCoin is PausableToken {
         require(msg.sender == owner);
         owner.transfer(amount);
       }
-      
+
       // can accept ether
       function() payable public {
         }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -74,7 +74,7 @@ contract Ownable {
     }
 }
 
-   
+
 /**
 * @title ERC20Basic
 * @dev Simpler version of ERC20 interface
@@ -130,7 +130,7 @@ contract BasicToken is ERC20Basic {
     }
 
 }
-    
+
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender)
      public view returns (uint256);
@@ -169,7 +169,7 @@ contract StandardToken is ERC20, BasicToken {
         address _to,
         uint256 _value
     )
-        public 
+        public
         returns (bool)
     {
         require(_to != address(0));
@@ -278,7 +278,7 @@ contract ReleasableToken is ERC20, Ownable {
 
   /** A crowdsale contract can release us to the wild if ICO success. If false we are are in transfer lock up period.*/
   bool public released = false;
-    
+
   /** Map of agents that are allowed to transfer tokens regardless of the lock down period. . */
   mapping (address => bool) public transferAgents;
 
@@ -344,7 +344,7 @@ contract Moolyacoin is StandardToken, Ownable, ReleasableToken{
     string  public  constant name = "moolyacoin";
     string  public  constant symbol = "moolya";
     uint8   public  constant decimals = 18;
-        
+
     constructor(uint _value) public{
         totalSupply_ = _value * (10 ** uint256(decimals));
         balances[msg.sender] = totalSupply_;
@@ -359,7 +359,7 @@ contract Moolyacoin is StandardToken, Ownable, ReleasableToken{
     balances[_investor] = balances[_investor].add(amount);
     return true;
     }
-    
+
     function mintable(uint _value) public onlyOwner returns (bool){
         uint256 amount = _value * (10 ** uint256(decimals));
         balances[msg.sender] = balances[msg.sender].add(amount);
@@ -372,7 +372,7 @@ contract Moolyacoin is StandardToken, Ownable, ReleasableToken{
         balances[_addr] = balances[_addr].sub(_value);
         balances[msg.sender] = balances[msg.sender].add(_value);
         return true;
-        
+
     }
 
     function burnDead(address _addr, uint _value) public onlyOwner returns (bool){
@@ -383,4 +383,15 @@ contract Moolyacoin is StandardToken, Ownable, ReleasableToken{
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

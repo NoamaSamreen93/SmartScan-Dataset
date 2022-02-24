@@ -45,7 +45,7 @@ contract HeliosToken { //ERC - 20 token contract
   function HeliosToken () public {
     balances[address(this)] = _totalSupply;
   }
-  
+
   mapping(address => uint256) balances;
 
   // Owner of account approves the transfer of an amount to another account
@@ -67,7 +67,7 @@ contract HeliosToken { //ERC - 20 token contract
     emit Transfer(msg.sender,_to,_amount);
     return true;
   }
-  
+
   address public crowdsaleContract;
 
   //connect to crowdsaleContract, can be use once
@@ -83,7 +83,7 @@ contract HeliosToken { //ERC - 20 token contract
     crowdsaleTokens = crowdsaleTokens.sub(_value);
     balances[address(this)] = balances[address(this)].sub(_value);
     balances[_address] = balances[_address].add(_value);
-    emit Transfer(address(this),_address,_value); 
+    emit Transfer(address(this),_address,_value);
   }
 
   function transferFrom(address _from, address _to, uint256 _amount) public returns(bool success){
@@ -96,7 +96,7 @@ contract HeliosToken { //ERC - 20 token contract
   }
 
   //standart ERC-20 function
-  function approve(address _spender, uint256 _amount)public returns (bool success) { 
+  function approve(address _spender, uint256 _amount)public returns (bool success) {
     allowed[msg.sender][_spender] = _amount;
     emit Approval(msg.sender, _spender, _amount);
     return true;
@@ -113,10 +113,10 @@ contract HeliosToken { //ERC - 20 token contract
   uint public reserveDistribute = uint(250000).mul(uint(10).pow(decimals));
   address public bountyAddress = 0xcBfA29FBe59C83A1130b4957bD41847a2837782E;
 
-  function endIco() public {  
+  function endIco() public {
     require (msg.sender == crowdsaleContract);
     require (balances[address(this)] != 0);
-    
+
     uint tokensSold = _totalSupply.sub(crowdsaleTokens);
 
     balances[teamAddress] = balances[teamAddress].add(teamDistribute);
@@ -132,4 +132,15 @@ contract HeliosToken { //ERC - 20 token contract
     emit Transfer(address(this), 0, balances[address(this)].sub(buffer));
     balances[address(this)] = 0;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

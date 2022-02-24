@@ -125,16 +125,16 @@ contract Owned {
 }
 
 /**
- * Safe Math Smart Contract.  
+ * Safe Math Smart Contract.
  */
- 
+
 pragma solidity ^0.4.11;
 
 /**
  * Provides methods to safely add, subtract and multiply uint256 numbers.
  */
 contract SafeMath {
- 
+
   /**
    * @dev Add two uint256 values, throw in case of overflow.
    *
@@ -346,4 +346,15 @@ contract ExpandT is ERC20Interface, SafeMath, Owned {
 
     event Freeze (address indexed owner);
     event Unfreeze (address indexed owner);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

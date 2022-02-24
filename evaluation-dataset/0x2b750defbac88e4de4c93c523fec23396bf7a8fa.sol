@@ -290,9 +290,9 @@ contract StandardToken is ERC20, BasicToken {
 // File: contracts\YamatoCoinCrowdSale.sol
 
 contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
-    
+
      using SafeMath for uint256;
-     
+
      // token infomation
      string public symbol = "YMT";
      string public name = "Yamato Token";
@@ -302,19 +302,19 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
      uint256 public constant INITIAL_SAPLLY = 20000000000e18; //wei 2000000YMT
      uint256 public constant CAP = 15000000000e18;            //wei 1500000YMT
      uint256 public constant GOAL = 200000000e18;             //wei 200000000YMT
-    
+
      bool public availableFlg = true;
-     
-    
+
+
 
     uint256 constant START_TIME = 1520319600;         //2018/03/06 16:00:00
     uint256 constant END_TIME = 1527786000;           //2018/06/01 02:00:00
-    
-    uint256 constant REST_START_TIME = 1523811600;    //2018/04/16 02:00:00    
-    uint256 constant REST_END_TIME = 1525107600;      //2018/05/01 02:00:00  
+
+    uint256 constant REST_START_TIME = 1523811600;    //2018/04/16 02:00:00
+    uint256 constant REST_END_TIME = 1525107600;      //2018/05/01 02:00:00
 
 
-    // bonus base time    
+    // bonus base time
     uint256 constant DATE_DATE_PS1 = 1520960400;      //2018/03/14 02:00:00
     uint256 constant DATE_DATE_PS2 = 1521219600;      //2018/03/17 02:00:00
     uint256 constant DATE_DATE_PS3 = 1523811600;      //2018/04/16 02:00:00
@@ -342,25 +342,25 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
          owner = msg.sender;
          balances[owner] = INITIAL_SAPLLY;
      }
-     
+
     /**
      * fallback
      * 20eth over is not buy from fallback.
      * you need entry.
      * */
-     function() public payable {  
-         require(20e18 > msg.value); 
+     function() public payable {
+         require(20e18 > msg.value);
          buyTokens(msg.sender);
      }
 
     /**
      * Buy tokens.
-     * 
+     *
      * */
      function buyTokens(address addr) buyTokensLimits public payable {
 
         uint256 rate = 1000000;
-        
+
         if (1e18 <= msg.value) {
             rate = culcurateBonusRate();
         }
@@ -370,12 +370,12 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
 
         balances[owner] = balances[owner].sub(tokens);
         balances[addr] = balances[addr].add(tokens);
-        
+
         Transfer(owner, addr, tokens);
         owner.transfer(msg.value);
 
      }
-     
+
 
 
     /**
@@ -384,7 +384,7 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
      function culcurateBonusRate() public view returns (uint256 rate) {
       if (now < DATE_DATE_PS1) {
           return 1500000;
-      } 
+      }
       if (now < DATE_DATE_PS2) {
         return 1300000;
       }
@@ -394,7 +394,7 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
 
       return 1050000;
      }
-     
+
      /**
       * contract status change to [Unavailable].
       **/
@@ -403,6 +403,17 @@ contract YamatoCoinCrowdSale is BurnableToken,StandardToken,Ownable {
      }
 
 
- 
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

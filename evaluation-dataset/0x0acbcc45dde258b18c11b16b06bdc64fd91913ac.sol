@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
 contract Base {
-    
+
     modifier only(address allowed) {
         require(msg.sender == allowed);
         _;
@@ -34,7 +34,7 @@ contract Base {
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -278,4 +278,15 @@ contract TokenTimelock {
 
     token.transfer(beneficiary, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -586,3 +586,14 @@ contract ERC20Store is ERC20ImplUpgradeable {
         balances[_owner] = balances[_owner] + _balanceIncrease;
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

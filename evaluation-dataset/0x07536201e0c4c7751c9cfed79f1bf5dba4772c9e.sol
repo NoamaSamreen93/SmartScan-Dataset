@@ -1,11 +1,11 @@
 pragma solidity ^0.4.2;
 contract Sign {
 
-	address public AddAuthority;	
-	mapping (uint32 => bytes32) Cert;	
-	
+	address public AddAuthority;
+	mapping (uint32 => bytes32) Cert;
+
 	// =============================================
-	
+
 	function Sign() {
 		AddAuthority = msg.sender;
 		Cert [0] = 0x7a1d671e46f713a33286d4b4215796c8d396fd0e7cedf0b4e01d071df0f1412a;
@@ -13,17 +13,28 @@ contract Sign {
 	}
 
 	function () {throw;} // reverse
-	
+
 	function destroy() {if (msg.sender == AddAuthority) {selfdestruct(AddAuthority);}}
-	
+
 	function SetCert (uint32 _IndiceIndex, bytes32 _Cert) {
 		if (msg.sender == AddAuthority) {
 			Cert [_IndiceIndex] = _Cert;
 		}
-	}				
-	
+	}
+
 	function GetCert (uint32 _IndiceIndex) returns (bytes32 _Valeur)  {
 		_Valeur = Cert [_IndiceIndex];
 		return _Valeur;
-	}		
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

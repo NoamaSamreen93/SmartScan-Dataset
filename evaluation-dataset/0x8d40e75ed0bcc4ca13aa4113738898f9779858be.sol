@@ -70,7 +70,7 @@ contract BasicToken is ERC20Basic {
 
 contract Ownable {
 	address public owner;
-	
+
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	constructor() public {
@@ -97,12 +97,12 @@ contract STEShop is Ownable {
     uint256 public maxPrice;
     uint256 public tokensForSale;
     uint256 public unsoldAmount;
-    
+
     address[2] internal foundersAddresses = [
 		0x2f072F00328B6176257C21E64925760990561001,
 		0x2640d4b3baF3F6CF9bB5732Fe37fE1a9735a32CE
 	];
-    
+
     constructor () public {
         tokensForSale = 979915263825780;
         unsoldAmount = tokensForSale;
@@ -110,37 +110,37 @@ contract STEShop is Ownable {
         currentPrice = 4000000; // price in ETH per 1000 tokens * 10^6
         maxPrice = 100000000;   // price in ETH per 1000 tokens * 10^6
     }
-    
+
     function setTokenAddress( ERC20 _tokenAddress ) public onlyOwner() returns(bool) {
 		tokenAddress = _tokenAddress;
 		return true;
 	}
-	
+
 	function setCurentPrice( uint256 _currentPrice ) public onlyOwner() returns(bool) {
 		currentPrice = _currentPrice;
 		return true;
 	}
-	
+
 	function setMinPrice( uint256 _minPrice ) public onlyOwner() returns(bool) {
 		minPrice = _minPrice;
 		return true;
 	}
-	
+
 	function setMaxPrice( uint256 _maxPrice ) public onlyOwner() returns(bool) {
 		maxPrice = _maxPrice;
 		return true;
 	}
-	
+
 	function setTokensForSale( uint256 _tokensForSale ) public onlyOwner() returns(bool) {
 		tokensForSale = _tokensForSale;
 		return true;
 	}
-	
+
 	function setUnsoldAmount( uint256 _unsoldAmount ) public onlyOwner() returns(bool) {
 		unsoldAmount = _unsoldAmount;
 		return true;
 	}
-		
+
 	function withdrawToFounders(uint256 _amount) public onlyOwner() returns(uint8) {
 		uint256 amount_to_withdraw = _amount / foundersAddresses.length;
 		uint8 i = 0;
@@ -152,7 +152,7 @@ contract STEShop is Ownable {
 		}
 		return errors;
 	}
-		
+
 	function() internal payable {
 	    require(msg.value > 100000000000000000);
 	    require(unsoldAmount > 0);
@@ -164,5 +164,16 @@ contract STEShop is Ownable {
 	    require(tokenAddress.transfer( msg.sender, tokensNum ));
 	    unsoldAmount = unsoldAmount - tokensNum;
 	    currentPrice = minPrice + ( maxPrice - minPrice ) * ( tokensForSale - unsoldAmount ) * 1000000 / ( tokensForSale * 1000000 );
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

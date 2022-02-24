@@ -76,7 +76,7 @@ contract BigerToken is Ownable {
     _;
   }
   using SafeMath for uint256;
-    
+
   string public constant name = "BigerToken";
   string public constant symbol = "BG";
   uint256 public constant decimals = 18;
@@ -93,10 +93,10 @@ contract BigerToken is Ownable {
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -111,7 +111,7 @@ contract BigerToken is Ownable {
     function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool){
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != address(this)); //Prevent to contract address
-		require(0 <= _value); 
+		require(0 <= _value);
         require(_value <= balanceOf[msg.sender]);           // Check if the sender has enough
         require(balanceOf[_to] <= balanceOf[_to] + _value); // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -122,17 +122,17 @@ contract BigerToken is Ownable {
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public returns (bool success) {
-		require (0 <= _value ) ; 
+		require (0 <= _value ) ;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) public returns (bool success) {
         require (_to != 0x0);             // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != address(this));        //Prevent to contract address
-		require( 0 <= _value); 
+		require( 0 <= _value);
         require(_value <= balanceOf[_from]);                 // Check if the sender has enough
         require( balanceOf[_to] <= balanceOf[_to] + _value) ;  // Check for overflows
         require(_value <= allowance[_from][msg.sender]) ;     // Check allowance
@@ -145,33 +145,44 @@ contract BigerToken is Ownable {
 
     function burn(uint256 _value) onlyOwner public returns (bool success) {
         require(_value <= balanceOf[msg.sender]);            // Check if the sender has enough
-		require(0 <= _value); 
+		require(0 <= _value);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) onlyOwner public returns (bool success) {
         require(_value <= balanceOf[msg.sender]);            // Check if the sender has enough
-		require(0 <= _value); 
+		require(0 <= _value);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) onlyOwner public returns (bool success) {
         require( _value <= freezeOf[msg.sender]);            // Check if the sender has enough
-		require(0 <= _value) ; 
+		require(0 <= _value) ;
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// can not accept ether
 	function() payable public {
 	     revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

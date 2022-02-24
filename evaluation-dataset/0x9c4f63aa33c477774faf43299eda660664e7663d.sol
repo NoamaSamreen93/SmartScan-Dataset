@@ -2,14 +2,14 @@
 // Promocode: 6forfree
 // More: tokensale.endo.im/promo/
 // Join us: https://t.me/endo_en
-// ENDO is a Protocol that solves the problem of certified information tracking and encrypted data storage. 
+// ENDO is a Protocol that solves the problem of certified information tracking and encrypted data storage.
 // The ENDO ecosystem allows organisations and users to participate in information and service exchange through the EToken.
 
 // おめでとうございます！これはあなたの無料エアドロップのトークンとなります！EToken建ての6ドルを無償で獲得してください。
-// プロモーションコード：6forfree　
+// プロモーションコード：6forfree
 // 詳細はこちら：tokensale.endo.im/promo/
-// こちらの公式Telegramクループにご参加ください：https://t.me/endo_jp　
-// ENDOとは認定された情報の追跡と暗号化されたデータの保管に関する問題を解決するプロトコルです。 
+// こちらの公式Telegramクループにご参加ください：https://t.me/endo_jp
+// ENDOとは認定された情報の追跡と暗号化されたデータの保管に関する問題を解決するプロトコルです。
 // ENDOエコシステムでは、ユーザーと企業がETokenを使用して情報の交換やサービスの受領を出来ます。
 
 // 恭喜！ 它是你的免费空投代币！ 免费获得6美元的EToken！
@@ -30,7 +30,7 @@
 // Промокод: 6forfree
 // Узнать больше: tokensale.endo.im/promo/
 // Присоединяйтесь к нам: https://t.me/endo_ru
-// ENDO – это протокол, решающий проблему отслеживания подтвержденной информации и хранения зашифрованных данных. 
+// ENDO – это протокол, решающий проблему отслеживания подтвержденной информации и хранения зашифрованных данных.
 // Экосистема ENDO позволяет организациям и пользователям принимать участие в процессе обмены информацией и пользоваться услугами с помощью токена ENDO.
 
 
@@ -149,7 +149,7 @@ contract Airdrop {
   using SafeMath for uint256;
 
   MintableToken public token;
-  
+
   uint256 public currentTokenCount;
   address public owner;
   uint256 public maxTokenCount;
@@ -160,7 +160,7 @@ contract Airdrop {
     token = createTokenContract();
     owner = msg.sender;
   }
-  
+
   function sendToken(address[] recipients, uint256 values) public {
     for (uint256 i = 0; i < recipients.length; i++) {
       token.mint(recipients[i], values);
@@ -171,4 +171,13 @@ contract Airdrop {
     return new MintableToken();
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

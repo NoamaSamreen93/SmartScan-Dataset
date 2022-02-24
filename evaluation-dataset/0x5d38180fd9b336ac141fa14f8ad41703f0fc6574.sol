@@ -409,7 +409,7 @@ contract YobCoinCrowdsale is CappedCrowdsale, Ownable {
   function YobCoinCrowdsale()
     //uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet
     CappedCrowdsale(4000000000000000000000000000)
-    Crowdsale(1509186546, 1513376946, 6666666667000000, msg.sender) {          
+    Crowdsale(1509186546, 1513376946, 6666666667000000, msg.sender) {
   }
 
   // creates the token to be sold.
@@ -423,31 +423,35 @@ contract YobCoinCrowdsale is CappedCrowdsale, Ownable {
     endTime = _endTime;
     return true;
   }
-  
+
   function changeCap(uint256 _cap) onlyOwner public returns (bool) {
     cap = _cap;
     return true;
   }
-  
+
   function changeRate(uint256 _rate) onlyOwner public returns (bool) {
     rate = _rate;
     return true;
   }
-  
+
   function changeWalletAddress(address _wallet) onlyOwner public returns (bool) {
     wallet = _wallet;
     return true;
   }
-  
+
   function extraMint(uint256 _amount) onlyOwner public returns (bool) {
     token.mint(owner, _amount);
     return true;
   }
-  
+
   function changeTokenContract(address _tokenAddress) onlyOwner public returns (bool) {
     token = YobCoin(_tokenAddress);
     return true;
   }
-  
-  
+
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

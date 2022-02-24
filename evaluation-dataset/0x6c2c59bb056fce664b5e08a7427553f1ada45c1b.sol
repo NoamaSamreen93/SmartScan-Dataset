@@ -216,3 +216,11 @@ contract BitNineToken is StandardToken {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

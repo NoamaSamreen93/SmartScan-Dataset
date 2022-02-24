@@ -279,10 +279,10 @@ contract HelloGoldRound1Point5 is Ownable {
 
 //////   //    /////     BIG BLOODY REMINDER   The code below is for testing purposes
 //   //  //   //   //    BIG BLOODY REMINDER   If you are not the developer of this code
-/////    //   //         BIG BLOODY REMINDER   And you can see this, SHOUT coz it should 
+/////    //   //         BIG BLOODY REMINDER   And you can see this, SHOUT coz it should
 //  ///  //   //  ///    BIG BLOODY REMINDER   Not be here in production and all hell will
 //  ///  //   //   //    BIG BLOODY REMINDER   Break loose, the gates of hell will open and
-//////   //    //////    BIG BLOODY REMINDER   Winged monstors and daemons will roam free  
+//////   //    //////    BIG BLOODY REMINDER   Winged monstors and daemons will roam free
 
     // bool testing = true;
 
@@ -298,10 +298,10 @@ contract HelloGoldRound1Point5 is Ownable {
 
 //////   //    /////     BIG BLOODY REMINDER   The code above is for testing purposes
 //   //  //   //   //    BIG BLOODY REMINDER   If you are not the developer of this code
-/////    //   //         BIG BLOODY REMINDER   And you can see this, SHOUT coz it should 
+/////    //   //         BIG BLOODY REMINDER   And you can see this, SHOUT coz it should
 //  ///  //   //  ///    BIG BLOODY REMINDER   Not be here in production and all hell will
 //  ///  //   //   //    BIG BLOODY REMINDER   Break loose, the gates of hell will open and
-//////   //    //////    BIG BLOODY REMINDER   Winged monstors and daemons will roam free  
+//////   //    //////    BIG BLOODY REMINDER   Winged monstors and daemons will roam free
 
 
 
@@ -317,7 +317,7 @@ contract HelloGoldRound1Point5 is Ownable {
         require (started || (now > startTime));
         require (now <= endTime);
         require (hgtSold < lastSaleInHGT);
-        (passedKYC,blocked) = hgs.permissions(msg.sender); 
+        (passedKYC,blocked) = hgs.permissions(msg.sender);
         require (passedKYC);
         require (!blocked);
 
@@ -325,7 +325,7 @@ contract HelloGoldRound1Point5 is Ownable {
         _;
     }
 
- 
+
     function HelloGoldRound1Point5() {
         // handle the guy who had three proxy accounts
         deposits[0xA3f59EbC3bf8Fa664Ce12e2f841Fe6556289F053] = 30 ether; // so sum balance = 40 ether
@@ -386,7 +386,7 @@ contract HelloGoldRound1Point5 is Ownable {
             r15Backers++;
         upgradeOnePointZeroBalances();
         deposits[msg.sender] = deposits[msg.sender].add(msg.value);
-        
+
         buyTokens(msg.sender,msg.value);
     }
 
@@ -402,4 +402,13 @@ contract HelloGoldRound1Point5 is Ownable {
         token.transfer(owner, amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

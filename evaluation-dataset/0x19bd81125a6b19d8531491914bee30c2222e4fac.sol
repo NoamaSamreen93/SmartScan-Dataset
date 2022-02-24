@@ -18,7 +18,7 @@ contract owned {
     /* 修改管理员账户， onlyOwner代表只能是用户管理员来修改 */
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
-    }   
+    }
 }
 
 /* receiveApproval服务合约指示代币合约将代币从发送者的账户转移到服务合约的账户（通过调用服务合约的 */
@@ -201,4 +201,15 @@ contract SECoin is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

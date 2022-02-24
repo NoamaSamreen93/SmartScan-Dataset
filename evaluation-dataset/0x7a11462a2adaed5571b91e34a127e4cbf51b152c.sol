@@ -868,3 +868,9 @@ contract LandSale is Pausable, Withdrawable, KyberCustomTokenRates, IERC20Receiv
     }
   }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

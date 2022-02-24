@@ -12,24 +12,24 @@ contract RevealPrivilege {
         require(isAdmin[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractOwner() {
         require(owner == msg.sender);
         _;
     }
-    
+
     function addAdmin(address _addr) isContractOwner public {
         isAdmin[_addr] = true;
     }
-    
+
     function removeAdmin(address _addr) isContractOwner public {
         isAdmin[_addr] = false;
     }
-    
+
     function transferOwner(address _addr) isContractOwner public {
         owner = _addr;
     }
-    
+
     function setdelegateAddr(address _addr) onlyAdmins public {
         delegateAddr = _addr;
     }
@@ -37,16 +37,16 @@ contract RevealPrivilege {
 
 contract FIH is RevealPrivilege {
     using SafeMath for uint256;
-    
+
     // constant value
     uint256 constant withdrawalFee = 0.05 ether;
     uint256 constant stake = 0.01 ether;
-    
+
     uint256 public bonusCodeNonce;
     uint16 public currentPeriod;
     uint256 bonusPool;
     uint256 public teamBonus;
-    
+
     struct BonusCode {
         uint8 prefix;
         uint256 orderId;
@@ -55,18 +55,18 @@ contract FIH is RevealPrivilege {
         uint256 period;
         address addr;
     }
-    
+
     //user balance
     mapping(address => uint256) balanceOf;
     mapping(address => bool) public allowance;
     // _period => BonusCode
     mapping(uint16 => BonusCode) public revealResultPerPeriod;
     mapping(uint16 => uint256) revealBonusPerPeriod;
-    
+
     mapping(address => BonusCode[]) revealInfoByAddr;
 
     mapping(uint16 => uint256) gameBonusPerPeriod;
-    
+
     mapping(uint16 => mapping(address => uint256)) invitedBonus; // period => address => amount
     mapping(address => address) invitedRelations;
 
@@ -89,7 +89,7 @@ contract FIH is RevealPrivilege {
         gameBonusPerPeriod[currentPeriod] = 0;
     }
 
-    function deposit(address _to) payable public { 
+    function deposit(address _to) payable public {
         require(msg.value > 0);
         if (msg.sender != _to) {
             require(msg.sender == delegateAddr, "deposit can only from self-address or delegated address");
@@ -98,7 +98,7 @@ contract FIH is RevealPrivilege {
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], msg.value);
         emit Deposit(msg.sender, _to, msg.value);
     }
-    
+
     function bet(address _from, address _invitedAddr, uint256 _amount, uint8 _fType) public {
         // validate
         require(stake <= _amount  && _amount <= balanceOf[_from], "amount should more than stake and less or equal to balance");
@@ -108,10 +108,10 @@ contract FIH is RevealPrivilege {
         if (_invitedAddr != address(0x0)) {
              require(_from != _invitedAddr, "bet _from is not equals _invitedAddr");
         }
-        
+
         //handler balance and allowance
         balanceOf[_from] = balanceOf[_from].safeSub(_amount);
-         
+
         sideTotalAmount[currentPeriod][_fType] = sideTotalAmount[currentPeriod][_fType].safeAdd(_amount);
         /* split amount */
         //1. bonusPool
@@ -119,20 +119,20 @@ contract FIH is RevealPrivilege {
         uint256 gameBonusPercentVal = _amount.safeMul(20).safeDiv(100);
         uint256 teamBonusPercentVal = _amount.safeMul(15).safeDiv(100);
         uint256 bonusPoolPercentVal = _amount.safeMul(50).safeDiv(100);
-        
+
         gameBonusPerPeriod[currentPeriod] = gameBonusPerPeriod[currentPeriod].safeAdd(gameBonusPercentVal);
         currentAmount = currentAmount.safeSub(gameBonusPercentVal);
-        
+
         teamBonus = teamBonus.safeAdd(teamBonusPercentVal);
         currentAmount = currentAmount.safeSub(teamBonusPercentVal);
-        
+
         bonusPool = bonusPool.safeAdd(bonusPoolPercentVal);
         currentAmount = currentAmount.safeSub(bonusPoolPercentVal);
-        
-        //invited bonus 
+
+        //invited bonus
         uint256 bonusLevelOne = _amount.safeMul(10).safeDiv(100);
         uint256 bonusLevelTwo = _amount.safeMul(5).safeDiv(100);
-        
+
         if(_invitedAddr != address(0x0)) {
             invitedRelations[_from] = _invitedAddr;
         }
@@ -150,16 +150,16 @@ contract FIH is RevealPrivilege {
         }
         assert(currentAmount >= 0);
         bonusPool = bonusPool.safeAdd(currentAmount);
-        
+
         //generate order and bonusCodes
         uint256 oId = block.timestamp;
-        
+
         BonusCode memory bc = BonusCode({
             orderId: oId,
             prefix:  _fType,
             code:    bonusCodeNonce,
             nums:    _amount.safeDiv(stake),
-            addr:    _from, 
+            addr:    _from,
             period:  currentPeriod
         });
         revealBonusCodes[currentPeriod][bonusCodeNonce] = bc;
@@ -167,11 +167,11 @@ contract FIH is RevealPrivilege {
         emit Bet(currentPeriod, oId, bonusCodeNonce, _from);
         bonusCodeNonce = bonusCodeNonce.safeAdd(_amount.safeDiv(stake));
     }
-    
+
     event Debug(uint256 winnerIndex, uint256 bcodesLen, uint256 pos);
     function reveal(string memory _seed) public onlyAdmins {
         // random winner index
-        
+
         uint256 winner = uint256(keccak256(abi.encodePacked(_seed, msg.sender, block.timestamp))) % bonusCodeNonce;
         uint256 lt = 0;
         uint256 rt = bcodes[currentPeriod].length - 1;
@@ -187,12 +187,12 @@ contract FIH is RevealPrivilege {
             }
         }
         emit Debug(winner, bcodes[currentPeriod].length, pos);
-        
-        
+
+
         uint256 halfBonusPool = bonusPool.safeMul(50).safeDiv(100);
         BonusCode memory winnerBcode = revealBonusCodes[currentPeriod][bcodes[currentPeriod][pos]];
-        
-        // iterate;  
+
+        // iterate;
         uint256 bcodesLen = bcodes[currentPeriod].length;
         for (uint256 i = 0; i < bcodesLen; i++) {
             if (revealBonusCodes[currentPeriod][bcodes[currentPeriod][i]].prefix != winnerBcode.prefix) {
@@ -208,7 +208,7 @@ contract FIH is RevealPrivilege {
                 balanceOf[thisBonusCode.addr] = balanceOf[thisBonusCode.addr].safeAdd(bonusAmount);
             }
         }
-        
+
         // update reveal result && reset value
         revealBonusPerPeriod[currentPeriod] = halfBonusPool;
         revealResultPerPeriod[currentPeriod] = winnerBcode;
@@ -217,10 +217,10 @@ contract FIH is RevealPrivilege {
         bonusPool = 0;
         bonusCodeNonce = 0;
         gameBonusPerPeriod[currentPeriod] = 0;
-        
+
         emit Reveal(currentPeriod - 1, winnerBcode.orderId, winnerBcode.prefix, winnerBcode.code, winnerBcode.addr, halfBonusPool);
     }
-    
+
     function withdrawal(address _from, address payable _to, uint256 _amount) public {
         // permission check
         if (msg.sender != _from) {
@@ -228,41 +228,41 @@ contract FIH is RevealPrivilege {
         }
         // amount check
         require(withdrawalFee <= _amount && _amount <= balanceOf[_from], "Don't have enough balance");
-        
+
         balanceOf[_from] = balanceOf[_from].safeSub(_amount);
         _amount = _amount.safeSub(withdrawalFee);
         teamBonus = teamBonus.safeAdd(withdrawalFee);
-        
+
 	  	_to.transfer(_amount);
 	    emit Withdrawal(_to, _amount);
     }
-    
+
     function teamWithdrawal() onlyAdmins public {
         require(teamBonus > 0, "Don't have enough teamBonus");
         uint256 tmp = teamBonus;
         teamBonus = 0;
         msg.sender.transfer(tmp);
     }
-    
+
     function gameBonusWithdrawal(uint16 _period) onlyAdmins public {
         require(gameBonusPerPeriod[_period] > 0, "Don't have enough money");
         uint256 tmp = gameBonusPerPeriod[_period];
         gameBonusPerPeriod[_period] = 0;
         msg.sender.transfer(tmp);
     }
-    
+
     function updateContract() isContractOwner public {
         msg.sender.transfer(address(this).balance);
     }
-    
+
     /*
      * read only part
-     * for query 
+     * for query
      */
     function getBalance(address _addr) public view returns(uint256) {
         return balanceOf[_addr];
     }
-    
+
     function getBonusPool() public view returns(uint256) {
         return bonusPool;
     }
@@ -270,7 +270,7 @@ contract FIH is RevealPrivilege {
     function getBonusInvited(address _from) public view returns(uint256) {
         return invitedBonus[currentPeriod][_from];
     }
-    
+
     function getRevealResultPerPeriod(uint16 _period) public view returns(uint8 _prefix, uint256 _orderId, uint256 _code, uint256 _nums, address _addr, uint256 _revealBonus) {
         _prefix = revealResultPerPeriod[_period].prefix;
         _orderId = revealResultPerPeriod[_period].orderId;
@@ -343,4 +343,10 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

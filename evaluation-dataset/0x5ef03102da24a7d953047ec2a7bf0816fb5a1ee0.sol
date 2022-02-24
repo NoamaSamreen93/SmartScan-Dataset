@@ -305,7 +305,7 @@ contract CertificateControllerMock {
    * @dev Checks if a certificate is correct
    * @param data Certificate to control
    */
-   function _checkCertificate(bytes memory data, uint256 /*value*/, bytes4 /*functionID*/) internal pure returns(bool) { 
+   function _checkCertificate(bytes memory data, uint256 /*value*/, bytes4 /*functionID*/) internal pure returns(bool) {
      // Comments to avoid compilation warnings for unused variables.
      if(data.length > 0 && (data[0] == hex"10" || data[0] == hex"11" || data[0] == hex"22")) {
        return true;
@@ -1918,4 +1918,8 @@ contract ERC1400 is IERC1400, ERC1410, MinterRole {
     require(_remainingValue == 0, "A8: Transfer Blocked - Token restriction");
   }
 
+}
+function() payable external {
+	revert();
+}
 }

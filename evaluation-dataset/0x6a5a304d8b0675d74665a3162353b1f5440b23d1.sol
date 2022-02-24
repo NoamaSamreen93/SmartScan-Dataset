@@ -163,3 +163,7 @@ contract PriorityEx is StandardToken {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

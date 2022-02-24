@@ -213,7 +213,7 @@ contract sellTokens is Ownable {
         owner.transfer(address(this).balance);
     }
 
-    
+
     function withdrawTokens(address _t) onlyOwner external {
         IERC20 _token = IERC20(_t);
         uint balance = _token.balanceOf(address(this));
@@ -324,4 +324,15 @@ contract buyTokens is Ownable, ReentrancyGuard {
         _token.safeTransfer(owner, balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

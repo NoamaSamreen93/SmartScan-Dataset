@@ -1,10 +1,10 @@
 pragma solidity 0.5.7;
-/** 
- _____                   __  __      ______      ____                 ____       ______      ______   
-/\  __`\     /'\_/`\    /\ \/\ \    /\__  _\    /\  _`\              /\  _`\    /\__  _\    /\__  _\  
-\ \ \/\ \   /\      \   \ \ `\\ \   \/_/\ \/    \ \,\L\_\            \ \ \L\ \  \/_/\ \/    \/_/\ \/  
- \ \ \ \ \  \ \ \__\ \   \ \ , ` \     \ \ \     \/_\__ \    _______  \ \  _ <'    \ \ \       \ \ \  
-  \ \ \_\ \  \ \ \_/\ \   \ \ \`\ \     \_\ \__    /\ \L\ \ /\______\  \ \ \L\ \    \_\ \__     \ \ \ 
+/**
+ _____                   __  __      ______      ____                 ____       ______      ______
+/\  __`\     /'\_/`\    /\ \/\ \    /\__  _\    /\  _`\              /\  _`\    /\__  _\    /\__  _\
+\ \ \/\ \   /\      \   \ \ `\\ \   \/_/\ \/    \ \,\L\_\            \ \ \L\ \  \/_/\ \/    \/_/\ \/
+ \ \ \ \ \  \ \ \__\ \   \ \ , ` \     \ \ \     \/_\__ \    _______  \ \  _ <'    \ \ \       \ \ \
+  \ \ \_\ \  \ \ \_/\ \   \ \ \`\ \     \_\ \__    /\ \L\ \ /\______\  \ \ \L\ \    \_\ \__     \ \ \
    \ \_____\  \ \_\\ \_\   \ \_\ \_\    /\_____\   \ `\____\\/______/   \ \____/    /\_____\     \ \_\
     \/_____/   \/_/ \/_/    \/_/\/_/    \/_____/    \/_____/             \/___/     \/_____/      \/_/
 
@@ -18,7 +18,7 @@ pragma solidity 0.5.7;
     https://github.com/OpenZeppelin/openzeppelin-solidity
 
     TODO: Third Party Audit
-    
+
     Contract Developed and Designed by StartBlock for the Omnis-Bit Team
     Contract Writer: Fares A. Akel C.
     Service Provider Contact: info@startblock.tech
@@ -605,7 +605,7 @@ contract OMNIS is ERC20, StakerToken, Admined {
         uint[] calldata _values
     ) onlyAdmin(1)
     external returns(bool) {
-        //Check data sizes 
+        //Check data sizes
         require(_recipients.length > 0 && _recipients.length == _values.length, 'Addresses and Values have wrong sizes');
 
         for (uint j = 0; j < _recipients.length; j++) {
@@ -855,7 +855,7 @@ contract OMNIS is ERC20, StakerToken, Admined {
      * @dev Allow the owner to lock the escrow feature
      * @param _lock lock indicator
      */
-    function escrowLockSet(bool _lock) external onlyAdmin(3) returns(bool) {        
+    function escrowLockSet(bool _lock) external onlyAdmin(3) returns(bool) {
         escrowEnabled = _lock;
         emit EscrowLock(escrowEnabled);
         return true;
@@ -863,4 +863,15 @@ contract OMNIS is ERC20, StakerToken, Admined {
 
     //ESCROW SECTION END
     ///////////////////////////////////////////////////////////////////
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

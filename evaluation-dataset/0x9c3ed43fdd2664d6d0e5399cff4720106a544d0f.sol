@@ -31,7 +31,7 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 
 contract ThreadCore {
     // Public variables of the token
-    string public version = "1.0.0";    
+    string public version = "1.0.0";
     string public name;
     string public symbol;
     uint8 public decimals = 18;
@@ -253,4 +253,13 @@ contract Thread is owned, mortal, ThreadCore {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

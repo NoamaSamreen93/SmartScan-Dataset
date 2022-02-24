@@ -42,13 +42,13 @@ contract Random {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     constructor() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -119,7 +119,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
         uint16 attrExt1;    // 5  future stat 1
         uint16 attrExt2;    // 6  future stat 2
     }
-    
+
     /// @dev All card tokenArray (not exceeding 2^32-1)
     Card[] public cardArray;
 
@@ -131,7 +131,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
 
     /// @dev cards owner by the owner (array)
     mapping (address => uint256[]) ownerToCardArray;
-    
+
     /// @dev card token ID search in owner array
     mapping (uint256 => uint256) cardIdToOwnerIndex;
 
@@ -158,11 +158,11 @@ contract ELHeroToken is ERC721,AccessAdmin{
     event CreateCard(address indexed owner, uint256 tokenId, uint16 protoId, uint16 hero, uint16 quality, uint16 createType);
     event DeleteCard(address indexed owner, uint256 tokenId, uint16 deleteType);
     event ChangeCard(address indexed owner, uint256 tokenId, uint16 changeType);
-    
+
 
     modifier isValidToken(uint256 _tokenId) {
         require(_tokenId >= 1 && _tokenId <= cardArray.length);
-        require(cardIdToOwner[_tokenId] != address(0)); 
+        require(cardIdToOwner[_tokenId] != address(0));
         _;
     }
 
@@ -233,10 +233,10 @@ contract ELHeroToken is ERC721,AccessAdmin{
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
     }
-    
+
 
     /// @dev Set or reaffirm the approved address for an ELHT
     /// @param _approved The new approved ELHT controller
@@ -285,7 +285,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
 
         // Do the callback after everything is done to avoid reentrancy attack
@@ -301,7 +301,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
 
     /// @dev Do the real transfer with out any condition checking
     /// @param _from The old owner of this ELHT(If created: 0x0)
-    /// @param _to The new owner of this ELHT 
+    /// @param _to The new owner of this ELHT
     /// @param _tokenId The tokenId of the ELHT
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         if (_from != address(0)) {
@@ -312,21 +312,21 @@ contract ELHeroToken is ERC721,AccessAdmin{
             // If the ELHT is not the element of array, change it to with the last
             if (indexFrom != cdArray.length - 1) {
                 uint256 lastTokenId = cdArray[cdArray.length - 1];
-                cdArray[indexFrom] = lastTokenId; 
+                cdArray[indexFrom] = lastTokenId;
                 cardIdToOwnerIndex[lastTokenId] = indexFrom;
             }
-            cdArray.length -= 1; 
-            
+            cdArray.length -= 1;
+
             if (cardIdToApprovals[_tokenId] != address(0)) {
                 delete cardIdToApprovals[_tokenId];
-            }      
+            }
         }
 
         // Give the ELHT to '_to'
         cardIdToOwner[_tokenId] = _to;
         ownerToCardArray[_to].push(_tokenId);
         cardIdToOwnerIndex[_tokenId] = ownerToCardArray[_to].length - 1;
-        
+
         emit Transfer(_from != address(0) ? _from : this, _to, _tokenId);
     }
 
@@ -387,7 +387,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
         if (_idxArray[2] > 0) _changeAttrByIndex(cd, _idxArray[2], _params[2]);
         if (_idxArray[3] > 0) _changeAttrByIndex(cd, _idxArray[3], _params[3]);
         if (_idxArray[4] > 0) _changeAttrByIndex(cd, _idxArray[4], _params[4]);
-        
+
         emit ChangeCard(cardIdToOwner[_tokenId], _tokenId, _changeType);
     }
 
@@ -399,15 +399,15 @@ contract ELHeroToken is ERC721,AccessAdmin{
 
         address _from = cardIdToOwner[_tokenId];
         uint256 indexFrom = cardIdToOwnerIndex[_tokenId];
-        uint256[] storage cdArray = ownerToCardArray[_from]; 
+        uint256[] storage cdArray = ownerToCardArray[_from];
         require(cdArray[indexFrom] == _tokenId);
 
         if (indexFrom != cdArray.length - 1) {
             uint256 lastTokenId = cdArray[cdArray.length - 1];
-            cdArray[indexFrom] = lastTokenId; 
+            cdArray[indexFrom] = lastTokenId;
             cardIdToOwnerIndex[lastTokenId] = indexFrom;
         }
-        cdArray.length -= 1; 
+        cdArray.length -= 1;
 
         cardIdToOwner[_tokenId] = address(0);
         delete cardIdToOwnerIndex[_tokenId];
@@ -475,7 +475,7 @@ contract ELHeroToken is ERC721,AccessAdmin{
                 attrs[index + 3] = cd.level;
                 attrs[index + 4] = cd.attrExt1;
                 attrs[index + 5] = cd.attrExt2;
-            }   
+            }
         }
     }
 
@@ -608,4 +608,20 @@ contract Presale is AccessService, Random {
         buyArray.push(_id);
         cardPresaleCounter[_id] = curSupply - 1;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

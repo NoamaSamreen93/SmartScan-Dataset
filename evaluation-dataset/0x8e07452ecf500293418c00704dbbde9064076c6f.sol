@@ -222,3 +222,14 @@ contract MintedCrowdsale is Crowdsale {
 contract CrowdsaleConstructor is MintedCrowdsale {
   constructor(uint256 _rate, address _wallet, MintableToken _token) public Crowdsale(_rate, _wallet, _token){}
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

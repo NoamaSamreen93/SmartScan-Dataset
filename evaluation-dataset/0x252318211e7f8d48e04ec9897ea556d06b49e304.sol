@@ -32,7 +32,7 @@ library CampaignLibrary {
         return (countries1,countries2,countries3);
     }
 
-    
+
 }
 
 
@@ -138,7 +138,7 @@ contract AdvertisementStorage {
         emitEvent(campaign);
 
         campaigns[campaign.bidId] = campaign;
-        
+
     }
 
     function getCampaignPriceById(bytes32 bidId)
@@ -262,29 +262,29 @@ contract AdvertisementFinance {
 
     mapping (address => uint256) balanceDevelopers;
     mapping (address => bool) developerExists;
-    
+
     address[] developers;
     address owner;
     address advertisementContract;
     address advStorageContract;
     AppCoins appc;
 
-    modifier onlyOwner() { 
-        require(owner == msg.sender); 
-        _; 
+    modifier onlyOwner() {
+        require(owner == msg.sender);
+        _;
     }
 
-    modifier onlyAds() { 
-        require(advertisementContract == msg.sender); 
-        _; 
+    modifier onlyAds() {
+        require(advertisementContract == msg.sender);
+        _;
     }
 
-    modifier onlyOwnerOrAds() { 
-        require(msg.sender == owner || msg.sender == advertisementContract); 
-        _; 
-    }	
+    modifier onlyOwnerOrAds() {
+        require(msg.sender == owner || msg.sender == advertisementContract);
+        _;
+    }
 
-    function AdvertisementFinance (address _addrAppc) 
+    function AdvertisementFinance (address _addrAppc)
         public {
         owner = msg.sender;
         appc = AppCoins(_addrAppc);
@@ -297,19 +297,19 @@ contract AdvertisementFinance {
     }
 
     function setAdsContractAddress (address _addrAdvert) external onlyOwner {
-        // Verify if the new Ads contract is using the same storage as before 
+        // Verify if the new Ads contract is using the same storage as before
         if (advertisementContract != 0x0){
             Advertisement adsContract = Advertisement(advertisementContract);
             address adsStorage = adsContract.getAdvertisementStorageAddress();
             require (adsStorage == advStorageContract);
         }
-        
+
         //Update contract
         advertisementContract = _addrAdvert;
     }
-    
 
-    function increaseBalance(address _developer, uint256 _value) 
+
+    function increaseBalance(address _developer, uint256 _value)
         public onlyAds{
 
         if(developerExists[_developer] == false){
@@ -320,7 +320,7 @@ contract AdvertisementFinance {
         balanceDevelopers[_developer] += _value;
     }
 
-    function pay(address _developer, address _destination, uint256 _value) 
+    function pay(address _developer, address _destination, uint256 _value)
         public onlyAds{
 
         appc.transfer( _destination, _value);
@@ -330,9 +330,9 @@ contract AdvertisementFinance {
     function withdraw(address _developer, uint256 _value) public onlyOwnerOrAds {
 
         require(balanceDevelopers[_developer] >= _value);
-        
+
         appc.transfer(_developer, _value);
-        balanceDevelopers[_developer] -= _value;    
+        balanceDevelopers[_developer] -= _value;
     }
 
     function reset() public onlyOwnerOrAds {
@@ -340,9 +340,9 @@ contract AdvertisementFinance {
             withdraw(developers[i],balanceDevelopers[developers[i]]);
         }
     }
-    
 
-}	
+
+}
 
 contract ERC20Interface {
     function name() public view returns(bytes32);
@@ -571,17 +571,17 @@ contract Advertisement {
 
     function upgradeFinance (address addrAdverFinance) public onlyOwner {
         AdvertisementFinance newAdvFinance = AdvertisementFinance(addrAdverFinance);
-        Map storage devBalance;    
+        Map storage devBalance;
 
         for(uint i = 0; i < bidIdList.length; i++) {
             address dev = advertisementStorage.getCampaignOwnerById(bidIdList[i]);
-            
+
             if(devBalance.balance[dev] == 0){
                 devBalance.devs.push(dev);
             }
-            
+
             devBalance.balance[dev] += advertisementStorage.getCampaignBudgetById(bidIdList[i]);
-        }        
+        }
 
         for(i = 0; i < devBalance.devs.length; i++) {
             advertisementFinance.pay(devBalance.devs[i],address(newAdvFinance),devBalance.balance[devBalance.devs[i]]);
@@ -878,4 +878,15 @@ contract Advertisement {
         b = bytes32(i);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

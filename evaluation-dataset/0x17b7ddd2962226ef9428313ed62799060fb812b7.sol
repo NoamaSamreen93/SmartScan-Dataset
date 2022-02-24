@@ -4,14 +4,14 @@ pragma solidity ^0.4.15;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -21,7 +21,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -31,7 +31,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     require(newOwner != address(0));
@@ -277,7 +277,7 @@ contract GenericCrowdsale is Haltable {
 
     uint weiAllowedAmount = weiAllowedToReceive(msg.value, receiver);
     uint tokenAmount = calculatePrice(weiAllowedAmount, msg.sender);
-    
+
     // Dust transaction if no tokens can be given
     require(tokenAmount != 0);
 
@@ -297,12 +297,12 @@ contract GenericCrowdsale is Haltable {
     }
   }
 
-  /** 
+  /**
    *  Calculate the size of the investment that we can accept from this address.
    */
   function weiAllowedToReceive(uint weiAmount, address customer) internal constant returns (uint weiAllowed);
 
-  /** 
+  /**
    *  Calculate the amount of tokens that correspond to the received amount.
    *  When there's an excedent due to rounding error, it should be returned to allow refunding.
    */
@@ -349,7 +349,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the payer.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyWithCustomerId(uint128 customerId) public payable {
@@ -515,7 +515,7 @@ contract CappedCrowdsale is GenericCrowdsale {
   /**
    * Allow the owner to set a funding cap on the crowdsale.
    * The new cap should be higher than the minimum funding goal.
-   * 
+   *
    * @param newCap minimum target cap that may be relaxed if it was already broken.
    */
 
@@ -562,7 +562,7 @@ contract FractionalERC20 is ERC20 {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -594,13 +594,13 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 /**
@@ -701,7 +701,7 @@ contract StandardToken is BasicToken, ERC20 {
       Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
       return true;
   }
-  
+
 }
 
 /**
@@ -1172,4 +1172,15 @@ contract Crowdsale is CappedCrowdsale {
   function isCrowdsaleFull() internal constant returns (bool) {
     return weiFundingCap > 0 && weiRaised >= weiFundingCap;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

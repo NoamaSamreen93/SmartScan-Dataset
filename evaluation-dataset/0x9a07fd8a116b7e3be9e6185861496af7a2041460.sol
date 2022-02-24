@@ -454,7 +454,7 @@ contract EmcoToken is StandardToken, Ownable {
     }
 
 	/**
-	* @dev Gets the balance of specified address (amount of tokens on main balance 
+	* @dev Gets the balance of specified address (amount of tokens on main balance
 	* plus amount of tokens on mining balance).
 	* @param _owner The address to query the balance of.
 	* @return An uint256 representing the amount owned by the passed address.
@@ -473,7 +473,7 @@ contract EmcoToken is StandardToken, Ownable {
     }
 
 	/**
-	* @dev Moves specified amount of tokens from main balance to mining balance 
+	* @dev Moves specified amount of tokens from main balance to mining balance
 	* @param _amount An uint256 representing the amount of tokens to transfer to main balance
 	*/
     function depositToMiningBalance(uint _amount) public {
@@ -506,10 +506,10 @@ contract EmcoToken is StandardToken, Ownable {
     }
 
 	/**
-	* @dev Mine tokens. For every 24h for each user�s token on mining balance, 
-	* 1% is burnt on mining balance and Reward % is minted to the main balance. 15% fee of difference 
+	* @dev Mine tokens. For every 24h for each user�s token on mining balance,
+	* 1% is burnt on mining balance and Reward % is minted to the main balance. 15% fee of difference
 	* between minted coins and burnt coins goes to system address.
-	*/ 
+	*/
     function mine() public {
         require(totalSupply_ < MAX_SUPPLY, "mining is over");
         uint reward = getReward(totalSupply_);
@@ -615,7 +615,7 @@ contract EmcoToken is StandardToken, Ownable {
             return 1041666666;
         } else {
             return 1000000000;
-        } 
+        }
     }
 
     function updateCurrentDayDeposited(uint _addedTokens) private {
@@ -626,4 +626,13 @@ contract EmcoToken is StandardToken, Ownable {
             currentDayDeposited = _addedTokens;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

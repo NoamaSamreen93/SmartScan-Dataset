@@ -1,8 +1,8 @@
 pragma solidity ^0.4.13;
 
-contract owned { 
+contract owned {
     address public owner;
-    
+
     function owned() {
         owner = msg.sender;
     }
@@ -16,9 +16,9 @@ contract owned {
         owner = newOwner;
     }
 }
-contract doftManaged { 
+contract doftManaged {
     address public doftManager;
-    
+
     function doftManaged() {
         doftManager = msg.sender;
     }
@@ -45,9 +45,9 @@ contract ERC20 {
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
 
-contract BasicToken is ERC20 { 
+contract BasicToken is ERC20 {
     uint256 _totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -106,7 +106,7 @@ contract BasicToken is ERC20 {
 	    Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @return Amount of remaining tokens allowed to spent
@@ -115,14 +115,14 @@ contract BasicToken is ERC20 {
     }
 }
 
-contract Doftcoin is BasicToken, owned, doftManaged { 
-    string public name; 
-    string public symbol; 
-    uint256 public decimals; 
+contract Doftcoin is BasicToken, owned, doftManaged {
+    string public name;
+    string public symbol;
+    uint256 public decimals;
     uint256 public sellPrice;
     uint256 public buyPrice;
     uint256 public miningStorage;
-    string public version; 
+    string public version;
 
     event Mine(address target, uint256 minedAmount);
 
@@ -189,5 +189,16 @@ contract Doftcoin is BasicToken, owned, doftManaged {
 	    miningStorage -= _minedAmount;
 
 	    Mine(_target, _minedAmount);
-    } 
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

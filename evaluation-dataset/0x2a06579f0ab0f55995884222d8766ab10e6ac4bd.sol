@@ -133,8 +133,8 @@ contract DragonKingConfig is Ownable {
     purchaseRequirements[18].tokens = [tokens[2], tokens[3], tokens[4]]; // 25 SKL & 50 XP & 10 MAG
     purchaseRequirements[18].amounts = [25*(10**18), 50*(10**2), 10*(10**2)];
     purchaseRequirements[19].tokens = [tokens[2], tokens[3], tokens[4]]; // 50 SKL & 100 XP & 20 MAG
-    purchaseRequirements[19].amounts = [50*(10**18), 100*(10**2), 20*(10**2)]; 
-    purchaseRequirements[20].tokens = [tokens[2], tokens[3], tokens[4]]; // 100 SKL & 200 XP & 50 MAG 
+    purchaseRequirements[19].amounts = [50*(10**18), 100*(10**2), 20*(10**2)];
+    purchaseRequirements[20].tokens = [tokens[2], tokens[3], tokens[4]]; // 100 SKL & 200 XP & 50 MAG
     purchaseRequirements[20].amounts = [100*(10**18), 200*(10**2), 50*(10**2)];
     // archers
     purchaseRequirements[21].tokens = [tokens[2], tokens[3]]; // 2.5 SKL & 5 XPER
@@ -146,8 +146,8 @@ contract DragonKingConfig is Ownable {
     purchaseRequirements[24].tokens = [tokens[2], tokens[3], tokens[6]]; // 25 SKL & 50 XP & 10 DEX
     purchaseRequirements[24].amounts = [25*(10**18), 50*(10**2), 10*(10**2)];
     purchaseRequirements[25].tokens = [tokens[2], tokens[3], tokens[6]]; // 50 SKL & 100 XP & 20 DEX
-    purchaseRequirements[25].amounts = [50*(10**18), 100*(10**2), 20*(10**2)]; 
-    purchaseRequirements[26].tokens = [tokens[2], tokens[3], tokens[6]]; // 100 SKL & 200 XP & 50 DEX 
+    purchaseRequirements[25].amounts = [50*(10**18), 100*(10**2), 20*(10**2)];
+    purchaseRequirements[26].tokens = [tokens[2], tokens[3], tokens[6]]; // 100 SKL & 200 XP & 50 DEX
     purchaseRequirements[26].amounts = [100*(10**18), 200*(10**2), 50*(10**2)];
   }
 
@@ -156,7 +156,7 @@ contract DragonKingConfig is Ownable {
   /** amount of gift tokens to send **/
   uint256 public giftTokenAmount;
   /** purchase requirements for each type of character **/
-  PurchaseRequirement[30] purchaseRequirements; 
+  PurchaseRequirement[30] purchaseRequirements;
   /** the cost of each character type */
   uint128[] public costs;
   /** the value of each character type (cost - fee), so it's not necessary to compute it each time*/
@@ -196,7 +196,7 @@ contract DragonKingConfig is Ownable {
   function setPurchaseRequirements(uint8 characterType, address[] tokens, uint256[] amounts) external {
     purchaseRequirements[characterType].tokens = tokens;
     purchaseRequirements[characterType].amounts = amounts;
-  } 
+  }
 
   function getPurchaseRequirements(uint8 characterType) view external returns (address[] tokens, uint256[] amounts) {
     tokens = purchaseRequirements[characterType].tokens;
@@ -303,4 +303,15 @@ contract DragonKingConfig is Ownable {
   }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

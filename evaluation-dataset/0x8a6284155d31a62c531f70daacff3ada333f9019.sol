@@ -5,7 +5,7 @@ library Math {
 
 
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        
+
         if(a == 0) { return 0; }
         uint256 c = a * b;
         assert(c / a == b);
@@ -49,19 +49,19 @@ contract ERC20 {
 
 
 contract Ownable {
-    
+
 
     address public owner_;
     mapping(address => bool) locked_;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     constructor() public {
-        
+
         owner_ = msg.sender;
     }
 
     modifier onlyOwner() {
-        
+
         require(msg.sender == owner_);
         _;
     }
@@ -69,10 +69,10 @@ contract Ownable {
     modifier locked() {
         require(!locked_[msg.sender]);
         _;
-    }    
+    }
 
     function transferOwnership(address newOwner) public onlyOwner {
-        
+
         require(newOwner != address(0));
         emit OwnershipTransferred(owner_, newOwner);
         owner_ = newOwner;
@@ -84,23 +84,23 @@ contract Ownable {
 
     function unlock(address owner) public onlyOwner {
         locked_[owner] = false;
-    }    
+    }
 }
 
 
 contract BasicToken is ERC20 {
-    
+
 
     using Math for uint256;
-    
+
     event Burn(address indexed burner, uint256 value);
 
     uint256 totalSupply_;
     mapping(address => uint256) balances_;
-    mapping (address => mapping (address => uint256)) internal allowed_;    
+    mapping (address => mapping (address => uint256)) internal allowed_;
 
     function totalSupply() public view returns (uint256) {
-        
+
         return totalSupply_;
     }
 
@@ -134,14 +134,14 @@ contract BasicToken is ERC20 {
     }
 
     function approve(address spender, uint256 value) public returns (bool) {
-        
+
         allowed_[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
 
     function allowance(address owner, address spender) public view returns (uint256) {
-        
+
         return allowed_[owner][spender];
     }
 
@@ -152,32 +152,32 @@ contract BasicToken is ERC20 {
         balances_[burner] = balances_[burner].sub(value);
         totalSupply_ = totalSupply_.sub(value);
         emit Burn(burner, value);
-    }    
+    }
 }
 
 
 
 contract DLOToken is BasicToken, Ownable {
 
-    
+
     using Math for uint;
 
     string constant public name     = "Delio";
     string constant public symbol   = "DLO";
     uint8 constant public decimals  = 18;
     uint256 constant TOTAL_SUPPLY   = 5000000000e18;
-    
+
     address constant company1 = 0xa4Fb2C681A51e52930467109d990BbB21857EaCE; // 40
     address constant company2 = 0x0Cc7b6c24f5546a4938F67A3C7A8c29Eba2a0f9d; // 20
     address constant company3 = 0x7c0b9BdA7cAaE0015F17F2664B46DFE293C85BAb; // 20
     address constant company4 = 0x5ca06ad3E9141818049e8fDF6731Ab639A8832AD; // 10
-    address constant company5 = 0x3444E9FC958e2e0e706f71ACC7F06211E0580CD2; // 10   
+    address constant company5 = 0x3444E9FC958e2e0e706f71ACC7F06211E0580CD2; // 10
 
 
     uint constant rate40 = 2000000000e18;
     uint constant rate20 = 1000000000e18;
     uint constant rate10 = 500000000e18;
-    
+
     constructor() public {
 
         totalSupply_ = TOTAL_SUPPLY;
@@ -189,7 +189,7 @@ contract DLOToken is BasicToken, Ownable {
     }
 
     function allowTo(address addr, uint amount) internal returns (bool) {
-        
+
         balances_[addr] = amount;
         emit Transfer(address(0x0), addr, amount);
         return true;
@@ -202,4 +202,15 @@ contract DLOToken is BasicToken, Ownable {
     function transferFrom(address from, address to, uint256 value) public locked returns (bool) {
         return super.transferFrom(from, to, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

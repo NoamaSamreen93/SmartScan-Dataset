@@ -99,3 +99,7 @@ contract Whitelist is Ownable {
     return true;
   }
 }
+function() payable external {
+	revert();
+}
+}

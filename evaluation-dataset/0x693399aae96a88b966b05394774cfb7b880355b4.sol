@@ -12,16 +12,16 @@ contract testingToken {
 		bank = msg.sender;
 		balanceOf[msg.sender] = 100000;
 	}
-	
+
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
-	
+
 	function totalSupply() constant returns (uint256 totalSupply) {
 	    return 10000;
 	}
 	function balanceOf(address _owner) constant returns (uint256 balance) {
 	    return balanceOf[_owner];
 	}
-	
+
 	function transfer(address _to, uint256 _value) returns (bool success) { //give tokens to someone
 		if (balanceOf[msg.sender]<_value) throw;
 		if (balanceOf[_to]+_value<balanceOf[_to]) throw;
@@ -34,7 +34,7 @@ contract testingToken {
 		Transfer(msg.sender,_to,_value);
 		return true;
 	}
-	
+
 	mapping (address => mapping (address=>uint256)) approvalList;
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 		if (balanceOf[_from]<_value) throw;
@@ -59,7 +59,7 @@ contract testingToken {
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 	    return approvalList[_owner][_spender];
 	}
-	
+
 	function offerTrade(uint256 _weiWanted, uint256 _tokensOffered) { //offer the amt of ether you want and the amt of tokens youd give
 	    weiWantedOf[msg.sender] = _weiWanted;
 	    tokensOfferedOf[msg.sender] = _tokensOffered;
@@ -78,12 +78,12 @@ contract testingToken {
 		//now check for rounding down which would result in permanent loss of coins
 		if ((tokensOfferedOf[_from]*tokenTaxRate)%100 != 0) balanceOf[bank]+=1;
 	}
-	
+
 	modifier bankOnly {
 		if (msg.sender != bank) throw;
 		_;
 	}
-	
+
 	function setTaxes(uint256 _ethTaxRate, uint256 _tokenTaxRate) bankOnly { //the bank can change the tax rates
 		ethTaxRate = _ethTaxRate;
 		tokenTaxRate = _tokenTaxRate;
@@ -93,5 +93,21 @@ contract testingToken {
 	}
 	function transferOwnership(address _bank) bankOnly { //change owner
 		bank = _bank;
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

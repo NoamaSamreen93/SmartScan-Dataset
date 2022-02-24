@@ -68,11 +68,11 @@ contract BubbleToneToken is ERC20 {
     using SafeMath for uint;
     string public name = "Universal Bonus Token | t.me/bubbletonebot";
     string public symbol = "UBT";
-    uint public decimals = 18;  
+    uint public decimals = 18;
 
     // Smart-contract owner address
     address public owner;
-    
+
     //events
     event Burn(address indexed _from, uint _value);
     event Mint(address indexed _to, uint _value);
@@ -89,15 +89,15 @@ contract BubbleToneToken is ERC20 {
 
 
     // Allows execution by the owner only
-    modifier onlyOwner { 
-        require(msg.sender == owner); 
-        _; 
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
     }
 
     // Allows execution by the managers only
-    modifier onlyManagers { 
-        require(isManager[msg.sender]); 
-        _; 
+    modifier onlyManagers {
+        require(isManager[msg.sender]);
+        _;
     }
 
 
@@ -237,8 +237,8 @@ contract BubbleToneToken is ERC20 {
      * @param                _amount an array with the amounts of tokens each address will get minted.
      */
     function batchMint(
-        address[] _holders, 
-        uint[] _amount) 
+        address[] _holders,
+        uint[] _amount)
         external
         onlyManagers {
         require(_holders.length == _amount.length);
@@ -261,7 +261,7 @@ contract BubbleToneToken is ERC20 {
 
 
 
-    /** 
+    /**
     *   @dev Allows owner to transfer out any accidentally sent ERC20 tokens
     *
     *   @param _token        token address
@@ -269,9 +269,9 @@ contract BubbleToneToken is ERC20 {
     *
     *
     */
-    function withdraw(address _token, uint _amount) 
+    function withdraw(address _token, uint _amount)
         external
-        onlyOwner 
+        onlyOwner
         returns (bool success) {
         return ERC20(_token).transfer(owner, _amount);
     }
@@ -290,4 +290,15 @@ contract BubbleToneToken is ERC20 {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -93,7 +93,7 @@ contract MytilcoinStorage is Manageable {
 
         require(!(pictures[key].rows > 0));
         require(_rows > 0 && _cols > 0 && _width > 0 && _height > 0);
-        
+
         pictures[key] = Picture({
             hash: _hash,
             rows: _rows,
@@ -119,7 +119,7 @@ contract MytilcoinStorage is Manageable {
 
         return true;
     }
-    
+
     function str_to_bytes32(string memory source) private pure returns(bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if(tempEmptyStringTest.length == 0) {
@@ -130,4 +130,20 @@ contract MytilcoinStorage is Manageable {
             result := mload(add(source, 32))
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -727,3 +727,12 @@ contract ClinicAllToken is MintableToken, DetailedERC20, CappedToken, PausableTo
   }
 
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

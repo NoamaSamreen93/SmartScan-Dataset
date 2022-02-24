@@ -930,7 +930,7 @@ contract Pausable is Ownable {
 // File: contracts/common/IDatabase.sol
 
 interface IDatabase {
-    
+
     function createEntry() external payable returns (uint256);
     function auth(uint256, address) external;
     function deleteEntry(uint256) external;
@@ -973,7 +973,7 @@ interface IDatabase {
 // File: contracts/common/IDatabaseBuilder.sol
 
 interface IDatabaseBuilder {
-    
+
     function deployDatabase(
         address[],
         uint256[],
@@ -993,7 +993,7 @@ interface IDatabaseBuilder {
 * @notice not audited, not recommend to use in mainnet
 */
 contract Safe {
-    
+
     address private owner;
 
     constructor() public
@@ -1014,7 +1014,7 @@ contract Safe {
         require(msg.sender == owner);
         require(_amount <= address(this).balance);
         require(_entryOwner != address(0));
-        
+
         _entryOwner.transfer(_amount);
     }
 
@@ -1030,7 +1030,7 @@ contract Safe {
 // File: contracts/common/IChaingear.sol
 
 interface IChaingear {
-    
+
     function addDatabaseBuilderVersion(
         string,
         IDatabaseBuilder,
@@ -1084,7 +1084,7 @@ interface IChaingear {
  * of people and split proportionately to some number of shares they own.
  */
 contract PaymentSplitter {
-    
+
     using SafeMath for uint256;
 
     uint256 internal totalShares;
@@ -1093,7 +1093,7 @@ contract PaymentSplitter {
     mapping(address => uint256) internal shares;
     mapping(address => uint256) internal released;
     address[] internal payees;
-    
+
     event PayeeAdded(address account, uint256 shares);
     event PaymentReleased(address to, uint256 amount);
     event PaymentReceived(address from, uint256 amount);
@@ -1151,16 +1151,16 @@ contract PaymentSplitter {
     {
         return payees[_index];
     }
-    
-    function getPayeesCount() 
+
+    function getPayeesCount()
         external
         view
         returns (uint256)
-    {   
+    {
         return payees.length;
     }
 
-    function release(address _account) 
+    function release(address _account)
         public
     {
         require(shares[_account] > 0);
@@ -1174,10 +1174,10 @@ contract PaymentSplitter {
         totalReleased = totalReleased.add(payment);
 
         _account.transfer(payment);
-        
+
         emit PaymentReleased(_account, payment);
     }
-    
+
     function _initializePayess(address[] _payees, uint256[] _shares)
         internal
     {
@@ -1193,7 +1193,7 @@ contract PaymentSplitter {
     function _addPayee(
         address _account,
         uint256 _shares
-    ) 
+    )
         internal
     {
         require(_account != address(0));
@@ -1203,7 +1203,7 @@ contract PaymentSplitter {
         payees.push(_account);
         shares[_account] = _shares;
         totalShares = totalShares.add(_shares);
-        
+
         emit PayeeAdded(_account, _shares);
     }
 }
@@ -1211,10 +1211,10 @@ contract PaymentSplitter {
 // File: contracts/chaingear/FeeSplitterChaingear.sol
 
 contract FeeSplitterChaingear is PaymentSplitter, Ownable {
-    
+
     event PayeeAddressChanged(
-        uint8 payeeIndex, 
-        address oldAddress, 
+        uint8 payeeIndex,
+        address oldAddress,
         address newAddress
     );
 
@@ -1223,14 +1223,14 @@ contract FeeSplitterChaingear is PaymentSplitter, Ownable {
         payable
         PaymentSplitter(_payees, _shares)
     { }
-    
+
     function changePayeeAddress(uint8 _payeeIndex, address _newAddress)
         external
         onlyOwner
     {
         require(_payeeIndex < 12);
         require(payees[_payeeIndex] != _newAddress);
-        
+
         address oldAddress = payees[_payeeIndex];
         shares[_newAddress] = shares[oldAddress];
         released[_newAddress] = released[oldAddress];
@@ -1248,7 +1248,7 @@ contract FeeSplitterChaingear is PaymentSplitter, Ownable {
 
 library ERC721MetadataValidation {
 
-    function validateName(string _base) 
+    function validateName(string _base)
         internal
         pure
     {
@@ -1258,7 +1258,7 @@ library ERC721MetadataValidation {
         }
     }
 
-    function validateSymbol(string _base) 
+    function validateSymbol(string _base)
         internal
         pure
     {
@@ -1320,10 +1320,10 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
     uint256 private databaseCreationFeeWei = 10 ether;
 
     string private constant CHAINGEAR_DESCRIPTION = "The novel Ethereum database framework";
-    bytes4 private constant INTERFACE_CHAINGEAR_EULER_ID = 0xea1db66f; 
+    bytes4 private constant INTERFACE_CHAINGEAR_EULER_ID = 0xea1db66f;
     bytes4 private constant INTERFACE_DATABASE_V1_EULER_ID = 0xf2c320c4;
     bytes4 private constant INTERFACE_DATABASE_BUILDER_EULER_ID = 0xce8bbf93;
-    
+
     /*
     *  Events
     */
@@ -1356,7 +1356,7 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         uint256 databaseID,
         address claimer,
         uint256 amount
-    );    
+    );
     event CreationFeeUpdated(uint256 newFee);
 
     /*
@@ -1409,7 +1409,7 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         }));
         buildersVersionIndex[amountOfBuilders] = _version;
         amountOfBuilders = amountOfBuilders.add(1);
-        
+
         emit DatabaseBuilderAdded(
             _version,
             _builderAddress,
@@ -1424,10 +1424,10 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         whenNotPaused
     {
         require(buildersVersion[_version].builderAddress != address(0));
-        buildersVersion[_version].description = _description;    
+        buildersVersion[_version].description = _description;
         emit DatabaseDescriptionUpdated(_version, _description);
     }
-    
+
     function depricateDatabaseBuilder(string _version)
         external
         onlyOwner
@@ -1477,13 +1477,13 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         IDatabase database = databases[databaseIndex].databaseContract;
         require(database.getSafeBalance() == uint256(0));
         require(database.getPaused() == true);
-        
+
         string memory databaseName = ERC721(database).name();
         string memory databaseSymbol = ERC721(database).symbol();
-        
+
         delete databasesNamesIndex[databaseName];
         delete databasesSymbolsIndex[databaseSymbol];
-        delete databasesIDsByAddressesIndex[database];  
+        delete databasesIDsByAddressesIndex[database];
         delete databasesIDsBySymbolIndex[databaseSymbol];
         delete databasesSymbolsByIDIndex[_databaseID];
 
@@ -1495,7 +1495,7 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
 
         super._burn(msg.sender, _databaseID);
         database.transferOwnership(msg.sender);
-        
+
         emit DatabaseDeleted(
             databaseName,
             database,
@@ -1601,7 +1601,7 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         uint256 databaseID = databasesIDsByAddressesIndex[_databaseAddress];
         return databaseID;
     }
-    
+
     function getDatabaseAddressByName(string _name)
         external
         view
@@ -1731,7 +1731,7 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         require(address(database).balance == 0);
         require(database.getPaused() == true);
         super.transferFrom(_from, _to, _tokenId);
-        
+
         IDatabase databaseAddress = databases[databaseIndex].databaseContract;
         databaseAddress.deletePayees();
         databaseAddress.transferAdminRights(_to);
@@ -1838,4 +1838,15 @@ contract Chaingear is IChaingear, Ownable, SupportsInterfaceWithLookup, Pausable
         return (databaseAddress, newTokenID);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

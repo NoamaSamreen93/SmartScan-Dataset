@@ -82,11 +82,11 @@ contract Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -96,11 +96,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -125,9 +125,9 @@ contract BasicToken is ERC20Basic {
       LockupType lockType;
   }
   Lockup lockup;
-  mapping(address=>Lockup) lockupParticipants;  
-  
-  
+  mapping(address=>Lockup) lockupParticipants;
+
+
   uint256 startTime;
   function release() public {
       require(ownerWallet == msg.sender);
@@ -168,12 +168,12 @@ contract BasicToken is ERC20Basic {
       } else {
         // do something to the banned
         return false;
-      } 
+      }
     } else { // after changed
       if (lockupParticipants[msg.sender].lockType == LockupType.BLACK ) {
         // do something to the banned
         return false;
-      } else 
+      } else
         if (lockupParticipants[msg.sender].lockupAmount>0) {
             uint timePassed = now - startTime;
             if (timePassed < lockupParticipants[msg.sender].lockupTime)
@@ -216,8 +216,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -232,7 +232,7 @@ contract StandardToken is ERC20, BasicToken {
     require(balances[_from] >= _amount);
     require(allowed[_from][msg.sender] >= _amount);
     require(_amount > 0 && balances[_to].add(_amount) > balances[_to]);
-    
+
     if (lockupParticipants[_from].lockupAmount>0)
     {
         uint timePassed = now - startTime;
@@ -307,19 +307,19 @@ contract BurnableToken is StandardToken, Ownable {
      string public symbol ;
      uint8 public decimals;
 
-   
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
       function () external payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      */
-     //constructor(address wallet) public 
-     constructor() public 
+     //constructor(address wallet) public
+     constructor() public
      {
          owner = msg.sender;
          ownerWallet = owner;
@@ -330,16 +330,16 @@ contract BurnableToken is StandardToken, Ownable {
          symbol = "SOSO";
          balances[owner] = totalSupply;
          startTime = now;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          emit Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
     function lockTokensForFoundation(address foundation, uint256 daysafter) public onlyOwner
     {
         lockup = Lockup({
                           lockupTime:daysafter * 1 days,
-                          lockupAmount:10000000000 * 10 ** uint256(decimals), 
+                          lockupAmount:10000000000 * 10 ** uint256(decimals),
                           lockType:LockupType.FOUNDATION
                           });
         lockupParticipants[foundation] = lockup;
@@ -349,7 +349,7 @@ contract BurnableToken is StandardToken, Ownable {
     {
         lockup = Lockup({
                           lockupTime:daysafter * 1 days,
-                          lockupAmount:amount * 10 ** uint256(decimals), 
+                          lockupAmount:amount * 10 ** uint256(decimals),
                           lockType:LockupType.CONSORTIUM
                           });
         lockupParticipants[consortium] = lockup;
@@ -359,7 +359,7 @@ contract BurnableToken is StandardToken, Ownable {
     {
         lockup = Lockup({
                           lockupTime:daysafter * 1 days,
-                          lockupAmount:amount * 10 ** uint256(decimals), 
+                          lockupAmount:amount * 10 ** uint256(decimals),
                           lockType:LockupType.TEAM
                           });
         lockupParticipants[team] = lockup;
@@ -369,7 +369,7 @@ contract BurnableToken is StandardToken, Ownable {
     {
         lockup = Lockup({
                           lockupTime:9999999999 days,
-                          lockupAmount:20000000000 * 10 ** uint256(decimals), 
+                          lockupAmount:20000000000 * 10 ** uint256(decimals),
                           lockType:LockupType.BLACK
                           });
         lockupParticipants[black] = lockup;
@@ -379,7 +379,7 @@ contract BurnableToken is StandardToken, Ownable {
     {
         lockup = Lockup({
                           lockupTime:0 days,
-                          lockupAmount:0 * 10 ** uint256(decimals), 
+                          lockupAmount:0 * 10 ** uint256(decimals),
                           lockType:LockupType.PARTNER
                           });
         lockupParticipants[partner] = lockup;
@@ -387,12 +387,21 @@ contract BurnableToken is StandardToken, Ownable {
 
     function lockTokensUpdate(address addr, uint daysafter, uint256 amount, uint256 l_type) public onlyOwner
     {
-        
+
         lockup = Lockup({
                           lockupTime:daysafter *  1 days,
-                          lockupAmount:amount * 10 ** uint256(decimals), 
+                          lockupAmount:amount * 10 ** uint256(decimals),
                           lockType: BasicToken.LockupType(l_type)
                           });
         lockupParticipants[addr] = lockup;
     }
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

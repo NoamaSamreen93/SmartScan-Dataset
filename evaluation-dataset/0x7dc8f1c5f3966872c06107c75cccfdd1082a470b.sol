@@ -327,7 +327,7 @@ contract RegulatorService is RegulatorServiceI, Ownable {
     if (_reason == CHECK_ELOCKED) {
       return ELOCKED_MESSAGE;
     }
-    
+
     if (_reason == CHECK_ESEND) {
       return ESEND_MESSAGE;
     }
@@ -353,4 +353,15 @@ contract RegulatorService is RegulatorServiceI, Ownable {
   function _wholeToken(address _token) view private returns (uint256) {
     return uint256(10)**DetailedERC20(_token).decimals();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

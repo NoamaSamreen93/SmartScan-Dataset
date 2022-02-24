@@ -1554,7 +1554,7 @@ contract Sale is Ownable, usingOraclize {
 
         address(_to).transfer(_amount);
     }
-    
+
     function changeWallet(address payable _wallet) public onlyOwner {
         require(_wallet != address(0));
         wallet = _wallet;
@@ -1568,4 +1568,13 @@ contract Sale is Ownable, usingOraclize {
         gasLimit = _gasLimit;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

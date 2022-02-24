@@ -1339,10 +1339,10 @@ contract Adminstrator {
   address public admin;
   address payable public owner;
 
-  modifier onlyAdmin() { 
-        require(msg.sender == admin || msg.sender == owner,"Not authorized"); 
+  modifier onlyAdmin() {
+        require(msg.sender == admin || msg.sender == owner,"Not authorized");
         _;
-  } 
+  }
 
   constructor() public {
     admin = msg.sender;
@@ -1350,7 +1350,7 @@ contract Adminstrator {
   }
 
   /*function transferAdmin(address newAdmin) public onlyAdmin {
-    admin = newAdmin; 
+    admin = newAdmin;
   }*/
 }
 contract TokenERC20 {
@@ -1389,7 +1389,7 @@ contract TokenSales is Adminstrator,usingOraclize {
 	mapping (bytes32 => rewardNode) public oraclizeCallbacks;
 	mapping (address => tempLevel) public savedLevels;
 	mapping (address => tempAddress) public savedParents;
-	
+
 	//Purchase and distribution related
 	address public tokenAddr = 0x500Df47E1dF0ef06039218dCF0960253D89D6658;
 	TokenERC20 public AUPC = TokenERC20(tokenAddr);
@@ -1408,7 +1408,7 @@ contract TokenSales is Adminstrator,usingOraclize {
 	event distributeETH(address indexed _to, address _from, uint _amount);
 	event distributeAUPC(address indexed _to, address _from, uint _amount);
 	event shouldBurn(address _from, uint _amount);
-	
+
 	//Statistic issue
 	uint256 public receivedAmount;
 	uint256 public sentAmount;
@@ -1425,9 +1425,9 @@ contract TokenSales is Adminstrator,usingOraclize {
 	mapping (address => uint) public payedETHSettled;
 	mapping (address => uint) public sentAwayETH;
 	mapping (address => uint) public sentAwayAUPC;
-	
+
 	//event DebugLog(address addr, string msg, uint amount);
-	
+
 	//Setting the variables
 	function setWebsite(string memory addr, string memory level) public onlyAdmin{
 		require(paused,"The contract is still running");
@@ -1459,8 +1459,8 @@ contract TokenSales is Adminstrator,usingOraclize {
 		emit MasterWithdraw(balanceOld);
         return true;
     }
-	
-	function() external payable { 
+
+	function() external payable {
 		require(msg.sender != address(0)); //Cannot buy AUPC by empty address
 		if(msg.sender == owner) return;
 		require(!paused,"The contract is paused");
@@ -1476,7 +1476,7 @@ contract TokenSales is Adminstrator,usingOraclize {
 			//Problem: How to make sure all pending ETH and AUPC are sent out before burning all AUPC?
 			//AUPC.burnFrom(owner,AUPC.allowance(address(this)));
 			return;
-		}		
+		}
 		receivedAmount += msg.value;
 		payedETH[msg.sender] += msg.value;
 		//The discount info is queried in the previous one day.
@@ -1527,12 +1527,12 @@ contract TokenSales is Adminstrator,usingOraclize {
 		require((basePrice * (100 - discount)) > basePrice);
 		uint currentPrice = (basePrice * (100 - discount)) / 100;
 		require(currentPrice <= basePrice); //There should be discount
-		require(currentPrice > 0, "AUPC price becomes 0"); 
+		require(currentPrice > 0, "AUPC price becomes 0");
 		uint amountAUPC = amount * (10 ** uint256(18)) / currentPrice;
 		require(amountAUPC > 0, "No AUPC purchased");
 		//There should be a round down issue, correct to 18 significant figure only
 		require((amount * (10 ** uint256(18)) - (amountAUPC * currentPrice)) >=0);
-		
+
 		uint oldBalance = AUPC.allowance(owner,address(this));
 		require(AUPC.transferFrom(owner, buyer, amountAUPC)); //Pay out AUPC
 		//We have settled this amount of ETH to AUPC and sent out
@@ -1541,9 +1541,9 @@ contract TokenSales is Adminstrator,usingOraclize {
 		sentAUPC += amountAUPC;
 		emit distributeAUPC(buyer, owner, amountAUPC);
 		assert(oldBalance == (AUPC.allowance(owner,address(this)) + amountAUPC)); //It should never fail
-		
+
 		if(levels ==0) return true; //There is no upline
-		if(savedParents[buyer].timeStamp >0 
+		if(savedParents[buyer].timeStamp >0
 			&& savedParents[buyer].timeStamp + oneDayTime >now){
 			require(sendUpline(buyer,amount,amountAUPC,savedParents[buyer].addr,1));
 		}else{
@@ -1573,8 +1573,8 @@ contract TokenSales is Adminstrator,usingOraclize {
 		}else if(levels ==3){
 			aupcRate = aupcRate * thirdLevelAUPC;
 			ethRate = ethRate * thirdLevelETH;
-		}else return true;			
-		
+		}else return true;
+
 		//require(aupcRate > amountAUPC);
 		//require(ethRate > amount);
 		require(aupcRate <= 10*amountAUPC); //We send out max 10%
@@ -1584,10 +1584,10 @@ contract TokenSales is Adminstrator,usingOraclize {
 		require(aupcRate > 0, "No AUPC send out");
 		require(ethRate > 0, "No ETH award send out");
 		require(ethRate < address(this).balance, "No ETH for award");
-		
+
 		uint oldBalance = AUPC.allowance(owner,address(this));
 		uint oldETHBalance = address(this).balance;
-		
+
 		if(AUPC.balanceOf(dad) >0){
     		require(AUPC.transferFrom(owner, dad, aupcRate)); //Pay out AUPC
     		dad.transfer(ethRate); //Pay out ETH
@@ -1603,8 +1603,8 @@ contract TokenSales is Adminstrator,usingOraclize {
     		assert(oldBalance == (AUPC.allowance(owner,address(this)) + aupcRate)); //It should never fail
     		assert(oldETHBalance == (address(this).balance + ethRate)); //It should never fail
 		}
-		
-		if(savedParents[dad].timeStamp >0 
+
+		if(savedParents[dad].timeStamp >0
 			&& savedParents[dad].timeStamp + oneDayTime >now){
 			require(sendUpline(buyer,amount,amountAUPC,savedParents[dad].addr,levels+1));
 		}else{
@@ -1637,7 +1637,7 @@ contract TokenSales is Adminstrator,usingOraclize {
     }
     function addressToString(address _addr) public pure returns(string memory) {
         bytes32 value = bytes32(uint256(_addr));
-        bytes memory alphabet = "0123456789abcdef";    
+        bytes memory alphabet = "0123456789abcdef";
         bytes memory str = new bytes(42);
         str[0] = '0';
         str[1] = 'x';
@@ -1665,4 +1665,10 @@ contract TokenSales is Adminstrator,usingOraclize {
          }
          return address(iaddr);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

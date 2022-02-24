@@ -127,7 +127,7 @@ contract EIP20Interface {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
     function approve(address _spender, uint256 _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -142,9 +142,9 @@ contract DSTokenBase is EIP20Interface, DSMath {
     function transfer(address _to, uint256 _value) public returns (bool success){
         _balances[msg.sender] = sub(_balances[msg.sender], _value);
         _balances[_to] = add(_balances[_to], _value);
-        
+
         Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
 
@@ -154,17 +154,17 @@ contract DSTokenBase is EIP20Interface, DSMath {
         }
         _balances[_from] = sub(_balances[_from], _value);
         _balances[_to] = add(_balances[_to], _value);
-        
+
         Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool success){
         _approvals[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
-        
+
         return true;
     }
 
@@ -186,14 +186,25 @@ contract DSTokenBase is EIP20Interface, DSMath {
      function transfer(address dst, uint wad) public stoppable note returns (bool) {
          return super.transfer(dst, wad);
      }
-     
+
      function transferFrom(
          address src, address dst, uint wad
      ) public stoppable note returns (bool) {
          return super.transferFrom(src, dst, wad);
      }
-     
+
      function approve(address guy, uint wad) public stoppable note returns (bool) {
          return super.approve(guy, wad);
      }
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

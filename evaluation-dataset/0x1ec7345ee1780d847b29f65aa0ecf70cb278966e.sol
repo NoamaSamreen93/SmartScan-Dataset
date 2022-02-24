@@ -48,7 +48,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -94,7 +94,7 @@ contract EtherTv is Ownable {
   function createShow(uint256 _payoutPercentage) onlyOwner() public {
     // payout must be greater than 0
     require(_payoutPercentage > 0);
-    
+
     // create new token
     var show = Show({
       price: 0.005 ether,
@@ -176,7 +176,7 @@ contract EtherTv is Ownable {
     uint256 purchaseExcess = msg.value.sub(price);
 
     // Calculate pool cut for taxes.
-    
+
     // 4% goes to developers
     uint256 devCut = price.mul(4).div(100);
     devOwed = devOwed.add(devCut);
@@ -246,4 +246,15 @@ contract EtherTv is Ownable {
     msg.sender.transfer(dividends);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

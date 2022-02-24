@@ -2,7 +2,7 @@
  * Copyright 2017–2018, bZeroX, LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0.
  */
- 
+
 pragma solidity 0.5.2;
 
 
@@ -249,7 +249,7 @@ contract OracleRegistry is Ownable {
 
         if (oracleAddresses.length == 0)
             return (addresses,nameLengths,allStrings);
-        
+
         for (uint256 i = 0; i < oracleAddresses.length; i++) {
             string memory tmp = oracles[oracleAddresses[i]].name;
             nameLengths[i] = bytes(tmp).length;
@@ -278,7 +278,18 @@ contract OracleRegistry is Ownable {
             bab[k++] = _ba[i];
         for (i = 0; i < _bb.length; i++)
             bab[k++] = _bb[i];
-        
+
         return string(bab);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

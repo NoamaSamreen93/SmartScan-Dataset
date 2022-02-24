@@ -259,7 +259,7 @@ contract ERC20 is IERC20 {
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
-    
+
     /**
      * @dev Approve an address to spend another addresses' tokens.
      * @param owner The address that owns the tokens.
@@ -281,47 +281,47 @@ contract CSCToken is ERC20, Ownable {
     string public constant name     = "Crypto Service Capital Token";
     string public constant symbol   = "CSCT";
     uint8  public constant decimals = 18;
-    
+
     bool public mintingFinished = false;
     mapping (address => bool) private _minters;
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
-    
+
     modifier canMint() {
         require(!mintingFinished);
         _;
     }
-    
+
     function isMinter(address minter) public view returns (bool) {
         if (owner() == minter) {
             return true;
         }
         return _minters[minter];
     }
-    
+
     modifier onlyMinter() {
         require(isMinter(msg.sender), "Minter: caller is not the minter");
         _;
     }
-    
+
     function addMinter(address _minter) external onlyOwner returns (bool) {
         require(_minter != address(0));
         _minters[_minter] = true;
         return true;
     }
-    
+
     function removeMinter(address _minter) external onlyOwner returns (bool) {
         require(_minter != address(0));
         _minters[_minter] = false;
         return true;
     }
-    
+
     function mint(address to, uint256 value) public onlyMinter returns (bool) {
         _mint(to, value);
         emit Mint(to, value);
         return true;
     }
-    
+
     function finishMinting() onlyOwner canMint external returns (bool) {
         mintingFinished = true;
         emit MintFinished();
@@ -368,12 +368,12 @@ contract Crowdsale is Ownable {
 
         return true;
     }
-    
+
     function tokensForWei(uint weiAmount) public view returns (uint tokens) {
         tokens = weiAmount.mul(rate);
         tokens = tokens.add(getBonus(tokens, weiAmount));
     }
-    
+
     function getBonus(uint256 _tokens, uint256 _weiAmount) public view returns (uint256) {
         if (_weiAmount >= 30 ether) {
             return _tokens.mul(secondBonus).div(100);
@@ -422,3 +422,10 @@ contract Crowdsale is Ownable {
         return now > endTime;
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

@@ -328,9 +328,9 @@ contract StandardToken is ERC20, BasicToken {
 
 contract StrayToken is StandardToken, BurnableToken, Ownable {
 	using SafeERC20 for ERC20;
-	
+
 	uint256 public INITIAL_SUPPLY = 1000000000;
-	
+
 	string public name = "Stray";
 	string public symbol = "ST";
 	uint8 public decimals = 18;
@@ -338,7 +338,7 @@ contract StrayToken is StandardToken, BurnableToken, Ownable {
 	address public companyWallet;
 	address public privateWallet;
 	address public fund;
-	
+
 	/**
 	 * @param _companyWallet The company wallet which reserves 15% of the token.
 	 * @param _privateWallet Private wallet which reservers 25% of the token.
@@ -346,23 +346,23 @@ contract StrayToken is StandardToken, BurnableToken, Ownable {
 	constructor(address _companyWallet, address _privateWallet) public {
 		require(_companyWallet != address(0));
 		require(_privateWallet != address(0));
-		
+
 		totalSupply_ = INITIAL_SUPPLY * (10 ** uint256(decimals));
 		companyWallet = _companyWallet;
 		privateWallet = _privateWallet;
-		
+
 		// 15% of tokens for company reserved.
 		_preSale(companyWallet, totalSupply_.mul(15).div(100));
-		
+
 		// 25% of tokens for private funding.
 		_preSale(privateWallet, totalSupply_.mul(25).div(100));
-		
+
 		// 60% of tokens for crowdsale.
 		uint256 sold = balances[companyWallet].add(balances[privateWallet]);
 	    balances[msg.sender] = balances[msg.sender].add(totalSupply_.sub(sold));
 	    emit Transfer(address(0), msg.sender, balances[msg.sender]);
 	}
-	
+
 	/**
 	 * @param _fund The DAICO fund contract address.
 	 */
@@ -371,10 +371,10 @@ contract StrayToken is StandardToken, BurnableToken, Ownable {
 	    //require(_fund != owner);
 	    //require(_fund != msg.sender);
 	    require(_fund != address(this));
-	    
+
 	    fund = _fund;
 	}
-	
+
 	/**
 	 * @dev The DAICO fund contract calls this function to burn the user's token
 	 * to avoid over refund.
@@ -383,10 +383,10 @@ contract StrayToken is StandardToken, BurnableToken, Ownable {
 	function burnAll(address _from) public {
 	    require(fund == msg.sender);
 	    require(0 != balances[_from]);
-	    
+
 	    _burn(_from, balances[_from]);
 	}
-	
+
 	/**
 	 * @param _to The address which will get the token.
 	 * @param _value The token amount.
@@ -395,7 +395,7 @@ contract StrayToken is StandardToken, BurnableToken, Ownable {
 		balances[_to] = _value;
 		emit Transfer(address(0), _to, _value);
 	}
-	
+
 }
 
 contract Crowdsale {
@@ -722,46 +722,46 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
 
 contract StrayCrowdsale is FinalizableCrowdsale {
     using SafeMath for uint256;
-    
+
     // Soft cap and hard cap in distributed token.
     uint256 public softCapInToken;
     uint256 public hardCapInToken;
     uint256 public soldToken = 0;
-    
+
     // Bouns stage time.
     uint256 public bonusClosingTime0;
     uint256 public bonusClosingTime1;
-    
+
     // Bouns rate.
     uint256 public bonusRateInPercent0 = 33;
     uint256 public bonusRateInPercent1 = 20;
-    
+
     // Mininum contribute: 100 USD.
     uint256 public mininumContributeUSD = 100;
-    
+
     // The floating exchange rate from external API.
     uint256 public decimalsETHToUSD;
     uint256 public exchangeRateETHToUSD;
-   
+
    // The mininum purchase token quantity.
     uint256 public mininumPurchaseTokenQuantity;
-    
+
     // The calculated mininum contribute Wei.
     uint256 public mininumContributeWei;
-    
+
     // The exchange rate from USD to Token.
     // 1 USD => 100 Token (0.01 USD => 1 Token).
     uint256 public exchangeRateUSDToToken = 100;
-    
+
     // Stray token contract.
     StrayToken public strayToken;
-    
+
     // Refund vault used to hold funds while crowdsale is running
     RefundVault public vault;
-    
-    // Event 
+
+    // Event
     event RateUpdated(uint256 rate, uint256 mininumContributeWei);
-    
+
     /**
      * @param _softCapInUSD Minimal funds to be collected.
      * @param _hardCapInUSD Maximal funds to be collected.
@@ -780,41 +780,41 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         , uint256 _closingTime
         , uint256 _bonusClosingTime0
         , uint256 _bonusClosingTime1
-        ) 
+        )
         Crowdsale(1, _fund, _token)
         TimedCrowdsale(_openingTime, _closingTime)
-        public 
+        public
     {
         // Validate ico stage time.
         require(_bonusClosingTime0 >= _openingTime);
         require(_bonusClosingTime1 >= _bonusClosingTime0);
         require(_closingTime >= _bonusClosingTime1);
-        
+
         bonusClosingTime0 = _bonusClosingTime0;
         bonusClosingTime1 = _bonusClosingTime1;
-        
+
         // Create the token.
         strayToken = StrayToken(token);
-        
+
         // Set soft cap and hard cap.
         require(_softCapInUSD > 0 && _softCapInUSD <= _hardCapInUSD);
-        
+
         softCapInToken = _softCapInUSD * exchangeRateUSDToToken * (10 ** uint256(strayToken.decimals()));
         hardCapInToken = _hardCapInUSD * exchangeRateUSDToToken * (10 ** uint256(strayToken.decimals()));
-        
+
         require(strayToken.balanceOf(owner) >= hardCapInToken);
-        
+
         // Create the refund vault.
         vault = new RefundVault(_fund);
-        
+
         // Calculate mininum purchase token.
-        mininumPurchaseTokenQuantity = exchangeRateUSDToToken * mininumContributeUSD 
+        mininumPurchaseTokenQuantity = exchangeRateUSDToToken * mininumContributeUSD
             * (10 ** (uint256(strayToken.decimals())));
-        
+
         // Set default exchange rate ETH => USD: 400.00
         setExchangeRateETHToUSD(40000, 2);
     }
-    
+
     /**
      * @dev Set the exchange rate from ETH to USD.
      * @param _rate The exchange rate.
@@ -828,9 +828,9 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         // If _rate = 1, wei = 1,
         // Then  amount = 1e(token.decimals + 2 - 18 - _decimals).
         // We need amount >= 1 to ensure the precision.
-        
+
         require(uint256(strayToken.decimals()).add(2) >= _decimals.add(18));
-        
+
         exchangeRateETHToUSD = _rate;
         decimalsETHToUSD = _decimals;
         rate = _rate.mul(exchangeRateUSDToToken);
@@ -839,16 +839,16 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         } else {
             rate = rate.div(10 ** (_decimals.add(18).sub(uint256(strayToken.decimals()))));
         }
-        
-        mininumContributeWei = mininumPurchaseTokenQuantity.div(rate); 
-        
+
+        mininumContributeWei = mininumPurchaseTokenQuantity.div(rate);
+
         // Avoid rounding error.
         if (mininumContributeWei * rate < mininumPurchaseTokenQuantity)
             mininumContributeWei += 1;
-            
+
         emit RateUpdated(rate, mininumContributeWei);
     }
-    
+
     /**
      * @dev Investors can claim refunds here if crowdsale is unsuccessful
      */
@@ -858,7 +858,7 @@ contract StrayCrowdsale is FinalizableCrowdsale {
 
         vault.refund(msg.sender);
     }
-    
+
     /**
      * @dev Checks whether funding goal was reached.
      * @return Whether funding goal was reached
@@ -866,28 +866,28 @@ contract StrayCrowdsale is FinalizableCrowdsale {
     function softCapReached() public view returns (bool) {
         return soldToken >= softCapInToken;
     }
-    
+
     /**
      * @dev Validate if it is in ICO stage 1.
      */
     function isInStage1() view public returns (bool) {
         return now <= bonusClosingTime0 && now >= openingTime;
     }
-    
+
     /**
      * @dev Validate if it is in ICO stage 2.
      */
     function isInStage2() view public returns (bool) {
         return now <= bonusClosingTime1 && now > bonusClosingTime0;
     }
-    
+
     /**
      * @dev Validate if crowdsale has started.
      */
     function hasStarted() view public returns (bool) {
         return now >= openingTime;
     }
-    
+
     /**
      * @dev Validate the mininum contribution requirement.
      */
@@ -897,7 +897,7 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         super._preValidatePurchase(_beneficiary, _weiAmount);
         require(_weiAmount >= mininumContributeWei);
     }
-    
+
     /**
      * @dev Executed when a purchase has been validated and is ready to be executed. Not necessarily emits/sends tokens.
      * @param _beneficiary Address receiving the tokens
@@ -906,12 +906,12 @@ contract StrayCrowdsale is FinalizableCrowdsale {
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         soldToken = soldToken.add(_tokenAmount);
         require(soldToken <= hardCapInToken);
-        
+
        _tokenAmount = _addBonus(_tokenAmount);
-        
+
         super._processPurchase(_beneficiary, _tokenAmount);
     }
-    
+
     /**
      * @dev Finalization task, called when owner calls finalize()
      */
@@ -921,10 +921,10 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         } else {
             vault.enableRefunds();
         }
-        
+
         // Burn all the unsold token.
         strayToken.burn(token.balanceOf(address(this)));
-        
+
         super.finalization();
     }
 
@@ -934,7 +934,7 @@ contract StrayCrowdsale is FinalizableCrowdsale {
     function _forwardFunds() internal {
         vault.deposit.value(msg.value)(msg.sender);
     }
-    
+
     /**
      * @dev Calculate the token amount and add bonus if needed.
      */
@@ -944,9 +944,20 @@ contract StrayCrowdsale is FinalizableCrowdsale {
         } else if (bonusClosingTime1 >= now) {
             _tokenAmount = _tokenAmount.mul(100 + bonusRateInPercent1).div(100);
         }
-        
+
         require(_tokenAmount <= token.balanceOf(address(this)));
-        
+
         return _tokenAmount;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

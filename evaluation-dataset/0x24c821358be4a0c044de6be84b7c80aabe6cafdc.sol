@@ -150,7 +150,7 @@ contract CGCXMarchMassLock is Ownable {
     for (uint256 i = 0; i < _addresses.length; i++) {
       releaseFrom(_addresses[i]);
     }
-  } 
+  }
 
   function submit(address[] _addresses, uint256[] _amounts) public onlyOwner {
     for (uint256 i = 0; i < _addresses.length; i++) {
@@ -158,4 +158,15 @@ contract CGCXMarchMassLock is Ownable {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

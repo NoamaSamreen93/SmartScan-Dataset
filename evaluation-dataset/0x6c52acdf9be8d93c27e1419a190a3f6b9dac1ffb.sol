@@ -40,9 +40,9 @@ contract UNBInterface {
 contract UNB is UNBInterface {
 
     uint256 constant private MAX_UINT256 = 2**256 - 1;
-    
+
     mapping (address => uint256) public balances;
-    
+
     mapping (address => mapping (address => uint256)) public allowed;
 
     /*
@@ -50,8 +50,8 @@ contract UNB is UNBInterface {
     The following variables are OPTIONAL vanities. One does not have to include them.
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/
-    
-    
+
+
      might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
@@ -124,4 +124,12 @@ contract UNB is UNBInterface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

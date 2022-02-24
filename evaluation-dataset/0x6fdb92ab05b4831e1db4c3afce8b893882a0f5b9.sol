@@ -59,13 +59,13 @@ contract TOSPrivateIncentiveContract {
     ];
 
     uint256 public unlocked = 0;
-    uint256 public totalLockAmount = 0; 
+    uint256 public totalLockAmount = 0;
 
     address public constant beneficiary = 0xbd9d16f47F061D9c6b1C82cb46f33F0aC3dcFB87;
     ERC20 public constant tosToken = ERC20(0xFb5a551374B656C6e39787B1D3A03fEAb7f3a98E);
     uint256 public constant UNLOCKSTART               = 1541347200; //2018/11/5 0:0:0
     uint256 public constant UNLOCKINTERVAL            = 30 days; // 30 days
-    
+
 
     function TOSPrivateIncentiveContract() public {}
     function unlock() public {
@@ -85,4 +85,10 @@ contract TOSPrivateIncentiveContract {
             unlocked = unlockePercentages[num];
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

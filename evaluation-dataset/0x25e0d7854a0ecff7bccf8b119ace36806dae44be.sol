@@ -59,7 +59,7 @@ contract Ownable {
             owner = newOwner;
         }
     }
-    
+
     function withdrawAll() public onlyOwner{
         owner.transfer(address(this).balance);
     }
@@ -139,7 +139,7 @@ contract WWC is Pausable {
 
 contract Champion is WWC {
     event VoteSuccessful(address user,uint256 team, uint256 amount);
-    
+
     using SafeMath for uint256;
     struct Vote {
         mapping(address => uint256) amounts;
@@ -152,13 +152,13 @@ contract Champion is WWC {
     Vote[33] votes;
     uint256 public voteCut = 5;
     uint256 public poolCut = 30;
-    
+
     uint256 public teamWon;
     uint256 public voteStopped;
-    
+
     uint256 public minVote = 0.05 ether;
     uint256 public voteWeight = 4;
-    
+
     mapping(address=>uint256) public alreadyWithdraw;
 
     modifier validTeam(uint256 _teamno) {
@@ -170,7 +170,7 @@ contract Champion is WWC {
         require(_w>0&& _w<voteWeight);
         voteWeight = _w;
     }
-    
+
     function setMinVote(uint256 _min) public onlyOwner{
         require(_min>=0.01 ether);
         minVote = _min;
@@ -179,7 +179,7 @@ contract Champion is WWC {
         require(_cut>=0&&_cut<=100);
         voteCut = _cut;
     }
-    
+
     function setPoolCut(uint256 _cut) public onlyOwner{
         require(_cut>=0&&_cut<=100);
         poolCut = _cut;
@@ -216,7 +216,7 @@ contract Champion is WWC {
         _v.totalAmount = _v.totalAmount.add(voteVal);
         _v.amounts[_user] = _v.amounts[_user].add(voteVal);
         _v.weightedTotalAmount = _v.weightedTotalAmount.add(voteVal.mul(voteWeight));
-        _v.weightedAmounts[_user] = _v.weightedAmounts[_user].add(voteVal.mul(voteWeight)); 
+        _v.weightedAmounts[_user] = _v.weightedAmounts[_user].add(voteVal.mul(voteWeight));
         emit VoteSuccessful(_user,_team,_amount);
     }
 
@@ -224,12 +224,12 @@ contract Champion is WWC {
         require(voteStopped == 0);
         voteStopped = 1;
     }
-    
+
     function setWonTeam(uint256 _team) validTeam(_team) public onlyOwner{
         require(voteStopped == 1);
         teamWon = _team;
     }
-    
+
     function myBonus() public view returns(uint256 _bonus,bool _isTaken){
         if (teamWon==0){
             return (0,false);
@@ -247,7 +247,7 @@ contract Champion is WWC {
         uint256 _amount = _v.weightedAmounts[_who].mul(_poolAmount).div(_v.weightedTotalAmount);
         return _amount;
     }
-    
+
     function withdrawBonus() public whenNotPaused{
         require(teamWon>0);
         require(alreadyWithdraw[msg.sender]==0);
@@ -258,4 +258,15 @@ contract Champion is WWC {
             msg.sender.transfer(_amount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

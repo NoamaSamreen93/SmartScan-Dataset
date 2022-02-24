@@ -14,11 +14,11 @@ library SafeMath {
         return c;
     }
 
-   
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-       
+
         uint256 c = a / b;
-       
+
         return c;
     }
 
@@ -27,7 +27,7 @@ library SafeMath {
         return a - b;
     }
 
-   
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -68,12 +68,12 @@ contract BasicToken is ERC20Basic {
 
     uint256 public totalSupply_;
 
-  
+
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
     }
 
-  
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(msg.data.length>=(2*32)+4);
         require(_to != address(0));
@@ -85,7 +85,7 @@ contract BasicToken is ERC20Basic {
         return true;
     }
 
-   
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
@@ -110,7 +110,7 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-   
+
     function approve(address _spender, uint256 _value) public returns (bool) {
         require(_value==0||allowed[msg.sender][_spender]==0);
         require(msg.data.length>=(2*32)+4);
@@ -119,19 +119,19 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-    
+
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
 
-  
+
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-   
+
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -149,42 +149,42 @@ contract OpenDAOToken is StandardToken {
     string public symbol;
     uint8 public decimals;
     uint256 public precentDecimal=2;
-    
+
     // miner and developer percent
     uint256 public minerAndDeveloperPercent=70;
-    
+
     //open dao fund percent
     uint256 public openDaoFundPercent=10;
-    
+
     //codecoin core team percent
     uint256 public codeCoinCoreTeamPercent=10;
-    
+
     //cloudmine precent
     uint256 public mineralcloudFundPercent=10;
-     
-    
+
+
     // miner and developer Account
     address public minerAndDeveloperFundAccount;
-    
+
     //open dao fund Account
     address public openDaoFundAccount;
-    
+
     //codecoin core team Account
     address public codeCoinCoreTeamAccount;
-    
+
     //cloudmine Account
     address public mineralcloudFundAccount;
-    
-    
+
+
     // miner and developer fund Balnace
     uint256 public minerAndDeveloperFundBalnace;
-    
+
     //open dao fund Balnace
     uint256 public openDaoFundBalnace;
-    
+
     //codecoin core team Balnace
     uint256 public codeCoinCoreTeamBalnace;
-    
+
     //cloudmine Balnace
     uint256 public mineralcloudFundBalnace;
 
@@ -197,40 +197,56 @@ contract OpenDAOToken is StandardToken {
         symbol = _symbol;
         decimals = _decimals;
         totalSupply_ = _initialSupply*10**uint256(_decimals);
-        
+
         //init account
         minerAndDeveloperFundAccount=_minerAndDeveloperFundAccount;
         openDaoFundAccount=_openDaoFundAccount;
         codeCoinCoreTeamAccount=_codeCoinCoreTeamAccount;
         mineralcloudFundAccount=_mineralcloudFundAccount;
-        
+
 
         //compute balance
         minerAndDeveloperFundBalnace=totalSupply_.mul(minerAndDeveloperPercent).div(10 ** precentDecimal);
         openDaoFundBalnace=totalSupply_.mul(openDaoFundPercent).div(10 ** precentDecimal);
         codeCoinCoreTeamBalnace=totalSupply_.mul(codeCoinCoreTeamPercent).div(10 ** precentDecimal);
         mineralcloudFundBalnace=totalSupply_.mul(mineralcloudFundPercent).div(10 ** precentDecimal);
-    
-    
+
+
         //evaluate balanace for account
         balances[_minerAndDeveloperFundAccount]=minerAndDeveloperFundBalnace;
         balances[_openDaoFundAccount]=openDaoFundBalnace;
         balances[_codeCoinCoreTeamAccount]=codeCoinCoreTeamBalnace;
         balances[_mineralcloudFundAccount]=mineralcloudFundBalnace;
-        
+
     }
-    
-    
+
+
     function transfer(address _to, uint256 _value) public returns (bool) {
        return super.transfer(_to, _value);
-    } 
-    
-   
+    }
+
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-     
+
      function() public payable{
          revert();
      }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

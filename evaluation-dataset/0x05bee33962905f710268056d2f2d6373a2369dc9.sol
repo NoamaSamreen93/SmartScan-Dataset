@@ -1,7 +1,7 @@
 /*
     xgr_token_db.sol
     2.0.0
-    
+
     Rajci 'iFA' Andor @ ifa@fusionwallet.io
 */
 pragma solidity 0.4.18;
@@ -158,4 +158,15 @@ contract TokenDB is SafeMath, Owned {
         require( msg.sender == depositsAddress );
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

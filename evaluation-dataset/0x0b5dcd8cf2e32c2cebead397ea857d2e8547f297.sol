@@ -3,7 +3,7 @@ pragma solidity ^0.4.11;
 contract accessControlled {
     address public owner;
     mapping (address => bool) public registrator;
-    
+
     function accessControlled() {
         registrator[msg.sender] = true;
         owner = msg.sender;
@@ -18,7 +18,7 @@ contract accessControlled {
         if ( !registrator[msg.sender] ) throw;
         _;
     }
-    
+
     function transferOwnership( address newOwner ) onlyOwner {
         owner = newOwner;
     }
@@ -31,16 +31,27 @@ contract accessControlled {
 
 
 contract OriginalMyDocAuthenticity is accessControlled {
-    
+
   mapping (string => uint) private authenticity;
 
   function storeAuthenticity(string sha256) onlyRegistrator {
     if (checkAuthenticity(sha256) == 0) {
         authenticity[sha256] = now;
-    }   
+    }
   }
 
   function checkAuthenticity(string sha256) constant returns (uint) {
     return authenticity[sha256];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

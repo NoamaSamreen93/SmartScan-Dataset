@@ -80,7 +80,7 @@ contract ReentrancyGuard {
 
 contract Map is PullPayment, Destructible, ReentrancyGuard {
     using SafeMath for uint256;
-    
+
     // STRUCTS
 
     struct Transaction {
@@ -96,7 +96,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         string key;
         uint kingdomTier;
         uint kingdomType;
-        uint minimumPrice; 
+        uint minimumPrice;
         uint lastTransaction;
         uint transactionCount;
         uint returnPrice;
@@ -136,7 +136,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
     Transaction[] public kingdomTransactions;
     uint public currentRound;
     address public bookerAddress;
-    
+
     mapping(uint => Round) rounds;
 
     uint constant public ACTION_TAX = 0.02 ether;
@@ -173,7 +173,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         require (kingdoms[rounds[currentRound].kingdomsKeys[_key]].owner == _sender);
         _;
     }
-    
+
     // EVENTS
 
     event LandCreatedEvent(string kingdomKey, address monarchAddress);
@@ -202,8 +202,8 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         for (uint i = 1; i < 8; i++) {
             if (now < rounds[currentRound].startTime + (i * 1 days)) {
                 uint result = (10 * i);
-                if (result > 70) { 
-                    return 70; 
+                if (result > 70) {
+                    return 70;
                 } else {
                     return result;
                 }
@@ -248,8 +248,8 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
     //
     //  This is the main function. It is called to buy a kingdom
     //
-    function purchaseKingdom(string _key, string _title, bool _locked) public 
-    payable 
+    function purchaseKingdom(string _key, string _title, bool _locked) public
+    payable
     nonReentrant()
     checkKingdomExistence(_key)
     checkIsNotLocked(_key)
@@ -280,10 +280,10 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
             } else if (kingdom.kingdomType == 5) {
                 round.nbKingdomsType5[kingdom.owner]--;
             }
-            
+
             compensateLatestMonarch(kingdom.lastTransaction, kingdom.returnPrice);
         }
-        
+
         uint jackpotSplitted = jackpotCommission.mul(50).div(100);
         round.globalJackpot.balance = round.globalJackpot.balance.add(jackpotSplitted);
 
@@ -304,7 +304,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         kingdomTransactions[transactionId].kingdomKey = _key;
         kingdom.transactionCount++;
         kingdom.lastTransaction = transactionId;
-        
+
         setNewJackpot(kingdom.kingdomType, jackpotSplitted, msg.sender);
         LandPurchasedEvent(_key, msg.sender);
     }
@@ -379,7 +379,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
     //     uint kingdomType = kingdoms[rounds[currentRound].kingdomsKeys[_key]].kingdomType;
     //     setNbKingdomsType(kingdomType, msg.sender, false);
 
-        
+
     //     setNbKingdomsType(_type, msg.sender, true);
     //     setTypedJackpotWinner(msg.sender, _type);
 
@@ -402,7 +402,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         uint refundPrice = STARTING_CLAIM_PRICE_WEI.mul(2);
         uint nextMinimumPrice = STARTING_CLAIM_PRICE_WEI.add(refundPrice);
         uint kingdomId = kingdoms.push(Kingdom("", "", 1, _type, 0, 0, 1, refundPrice, address(0), false)) - 1;
-        
+
         kingdoms[kingdomId].title = _title;
         kingdoms[kingdomId].owner = owner;
         kingdoms[kingdomId].key = _key;
@@ -411,14 +411,14 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
 
         rounds[currentRound].kingdomsKeys[_key] = kingdomId;
         rounds[currentRound].kingdomsCreated[_key] = true;
-        
+
         uint jackpotSplitted = requiredPrice.mul(50).div(100);
         rounds[currentRound].globalJackpot.balance = rounds[currentRound].globalJackpot.balance.add(jackpotSplitted);
 
         uint transactionId = kingdomTransactions.push(Transaction("", msg.sender, msg.value, 0, jackpotSplitted)) - 1;
         kingdomTransactions[transactionId].kingdomKey = _key;
         kingdoms[kingdomId].lastTransaction = transactionId;
-       
+
         setNewJackpot(_type, jackpotSplitted, msg.sender);
         LandCreatedEvent(_key, msg.sender);
     }
@@ -558,4 +558,15 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         return (kingdom.title, kingdom.minimumPrice, kingdom.lastTransaction, kingdom.transactionCount, kingdom.owner, kingdom.locked);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

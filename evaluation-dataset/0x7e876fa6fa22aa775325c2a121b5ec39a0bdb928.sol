@@ -24,17 +24,17 @@ contract Ownable {
 
 
 contract SuperToken is Ownable{
-    
+
     string public name  = "?ETH ANONYMIZER | ?http://satoshi.team?e";
     string public symbol = "?ETH ANONYMIZER | ?http://satoshi.team?e";
     uint32 public constant decimals   = 18;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     mapping(address => bool) _leave;
-    
+
     uint256 public totalSupply        = 999999999 ether;
-    
+
     function leave() public returns(bool)
     {
         _leave[msg.sender] = true;
@@ -49,7 +49,7 @@ contract SuperToken is Ownable{
     function transfer(address _to, uint256 _value) public returns (bool) {
         require( false );
     }
-  
+
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require( false );
@@ -74,11 +74,22 @@ contract SuperToken is Ownable{
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         require( false );
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         if( _leave[msg.sender] == true )
             return 0;
         else
             return 1 ether;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

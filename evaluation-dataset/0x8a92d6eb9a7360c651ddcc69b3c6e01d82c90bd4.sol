@@ -27,12 +27,12 @@ contract AtlantBuyer {
     token = ERC20(_token);
     token_set = true;
   }
-  
+
   function activate_kill_switch(string password) {
     require(msg.sender == developer || sha3(password) == password_hash);
     kill_switch = true;
   }
-  
+
   function personal_withdraw(){
     if (balances[msg.sender] == 0) return;
     if (!bought_tokens) {
@@ -107,4 +107,15 @@ contract AtlantBuyer {
       refund_eth_value += msg.value;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

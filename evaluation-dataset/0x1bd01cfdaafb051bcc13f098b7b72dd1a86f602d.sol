@@ -11,8 +11,8 @@ contract RobocallsTokenSale  {
     uint   public endDate;
     address public main_addr;
     Robocalls r;
-    
-    
+
+
     constructor() public {
         owner = msg.sender;
         bonusEnds = now + 8 weeks;
@@ -21,18 +21,18 @@ contract RobocallsTokenSale  {
         main_addr = 0xAD7615B0524849918AEe77e6c2285Dd7e8468650;
         r = Robocalls(main_addr);
     }
-    
-    
+
+
     function setEndDate(uint _newEndDate ) public {
         require(msg.sender==owner);
         endDate =  _newEndDate;
-    } 
-    
+    }
+
     function setBonusEndDate(uint _newBonusEndDate ) public {
         require(msg.sender==owner);
         bonusEnds =  _newBonusEndDate;
-    } 
-    
+    }
+
     // ------------------------------------------------------------------------
     // CrowdSale Function 10,000,000 RCALLS Tokens per 1 ETH
     // ------------------------------------------------------------------------
@@ -48,4 +48,15 @@ contract RobocallsTokenSale  {
         owner.transfer(msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -14,7 +14,7 @@ contract ERC20 {
 	//Sets events and functions for ERC20 token
 	event Approval(address indexed _owner, address indexed _spender, uint _value);
 	event Transfer(address indexed _from, address indexed _to, uint _value);
-	
+
     function allowance(address _owner, address _spender) constant returns (uint remaining);
 	function approve(address _spender, uint _value) returns (bool success);
     function balanceOf(address _owner) constant returns (uint balance);
@@ -31,7 +31,7 @@ contract Owned {
     function Owned() {
         owner = msg.sender;
     }
-	
+
 	//Sets onlyOwner modifier for specified functions
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -50,7 +50,7 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
-    }  
+    }
 
     function div(uint256 a, uint256 b) internal returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -74,7 +74,7 @@ library SafeMath {
     function min256(uint256 a, uint256 b) internal constant returns (uint256) {
         return a < b ? a : b;
     }
-  
+
     function mul(uint256 a, uint256 b) internal returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -89,19 +89,19 @@ library SafeMath {
 
 
 contract ASStoken is ERC20, Owned {
-    //Applies SafeMath library to uint256 operations 
+    //Applies SafeMath library to uint256 operations
     using SafeMath for uint256;
 
 	//Public variables
-	string public name; 
-	string public symbol; 
-	uint256 public decimals;  
-    uint256 public initialSupply; 
-	uint256 public totalSupply; 
+	string public name;
+	string public symbol;
+	uint256 public decimals;
+    uint256 public initialSupply;
+	uint256 public totalSupply;
 
     //Variables
-    uint256 multiplier; 
-	
+    uint256 multiplier;
+
 	//Creates arrays for balances
     mapping (address => uint256) balance;
     mapping (address => mapping (address => uint256)) allowed;
@@ -114,39 +114,39 @@ contract ASStoken is ERC20, Owned {
 
 	//Constructor
 	function ASStoken(string tokenName, string tokenSymbol, uint8 decimalUnits, uint256 decimalMultiplier, uint256 initialAmount) {
-		name = tokenName; 
-		symbol = tokenSymbol; 
-		decimals = decimalUnits; 
-        multiplier = decimalMultiplier; 
-        initialSupply = initialAmount; 
-		totalSupply = initialSupply;  
+		name = tokenName;
+		symbol = tokenSymbol;
+		decimals = decimalUnits;
+        multiplier = decimalMultiplier;
+        initialSupply = initialAmount;
+		totalSupply = initialSupply;
 	}
-	
-	//Provides the remaining balance of approved tokens from function approve 
+
+	//Provides the remaining balance of approved tokens from function approve
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
 
 	//Allows for a certain amount of tokens to be spent on behalf of the account owner
-    function approve(address _spender, uint256 _value) returns (bool success) { 
+    function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
-	//Returns the account balance 
+	//Returns the account balance
     function balanceOf(address _owner) constant returns (uint256 remainingBalance) {
         return balance[_owner];
     }
 
     //Allows contract owner to mint new tokens, prevents numerical overflow
 	function mintToken(address target, uint256 mintedAmount) onlyOwner returns (bool success) {
-		require(mintedAmount > 0); 
-        uint256 addTokens = mintedAmount; 
+		require(mintedAmount > 0);
+        uint256 addTokens = mintedAmount;
 		balance[target] += addTokens;
 		totalSupply += addTokens;
 		Transfer(0, target, addTokens);
-		return true; 
+		return true;
 	}
 
 	//Sends tokens from sender's account
@@ -156,12 +156,12 @@ contract ASStoken is ERC20, Owned {
             balance[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
-        } else { 
-			return false; 
+        } else {
+			return false;
 		}
     }
-	
-	//Transfers tokens from an approved account 
+
+	//Transfers tokens from an approved account
     function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) returns (bool success) {
         if ((balance[_from] >= _value) && (allowed[_from][msg.sender] >= _value) && (balance[_to] + _value > balance[_to])) {
             balance[_to] += _value;
@@ -169,58 +169,58 @@ contract ASStoken is ERC20, Owned {
             allowed[_from][msg.sender] -= _value;
             Transfer(_from, _to, _value);
             return true;
-        } else { 
-			return false; 
+        } else {
+			return false;
 		}
     }
 }
 
 
 contract ASStokenICO is Owned, ASStoken {
-    //Applies SafeMath library to uint256 operations 
+    //Applies SafeMath library to uint256 operations
     using SafeMath for uint256;
 
     //Public Variables
-    address public multiSigWallet;                  
-    uint256 public amountRaised; 
-    uint256 public deadline; 
-    uint256 public hardcap; 
-    uint256 public price;                            
+    address public multiSigWallet;
+    uint256 public amountRaised;
+    uint256 public deadline;
+    uint256 public hardcap;
+    uint256 public price;
 
     //Variables
-    bool crowdsaleClosed = true;                    
-    string tokenName = "ASStoken"; 
-    string tokenSymbol = "ASS"; 
-    uint256 initialTokens = 150000000000; 
-    uint256 multiplier = 10000; 
-    uint8 decimalUnits = 4;  
+    bool crowdsaleClosed = true;
+    string tokenName = "ASStoken";
+    string tokenSymbol = "ASS";
+    uint256 initialTokens = 150000000000;
+    uint256 multiplier = 10000;
+    uint8 decimalUnits = 4;
 
-    
+
 
    	//Initializes the token
-	function ASStokenICO(address beneficiaryAccount) 
+	function ASStokenICO(address beneficiaryAccount)
     	ASStoken(tokenName, tokenSymbol, decimalUnits, multiplier, initialTokens) {
-            balance[msg.sender] = initialTokens;     
-            Transfer(0, msg.sender, initialTokens);    
-            multiSigWallet = beneficiaryAccount;        
-            hardcap = 55000000;    
-            hardcap = hardcap.mul(multiplier); 
-            setPrice(40000); 
+            balance[msg.sender] = initialTokens;
+            Transfer(0, msg.sender, initialTokens);
+            multiSigWallet = beneficiaryAccount;
+            hardcap = 55000000;
+            hardcap = hardcap.mul(multiplier);
+            setPrice(40000);
     }
 
     //Fallback function creates tokens and sends to investor when crowdsale is open
     function () payable {
-        require(!crowdsaleClosed 
-            && (now < deadline) 
-            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap)); 
-        address recipient = msg.sender; 
-        amountRaised = amountRaised.add(msg.value.div(1 ether)); 
+        require(!crowdsaleClosed
+            && (now < deadline)
+            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap));
+        address recipient = msg.sender;
+        amountRaised = amountRaised.add(msg.value.div(1 ether));
         uint256 tokens = msg.value.mul(getPrice()).mul(multiplier).div(1 ether);
         totalSupply = totalSupply.add(tokens);
         balance[recipient] = balance[recipient].add(tokens);
-        require(multiSigWallet.send(msg.value)); 
+        require(multiSigWallet.send(msg.value));
         Transfer(0, recipient, tokens);
-    }   
+    }
 
     //Returns the current price of the token for the crowdsale
     function getPrice() returns (uint256 result) {
@@ -229,28 +229,41 @@ contract ASStokenICO is Owned, ASStoken {
 
     //Sets the multisig wallet for a crowdsale
     function setMultiSigWallet(address wallet) onlyOwner returns (bool success) {
-        multiSigWallet = wallet; 
-        return true; 
+        multiSigWallet = wallet;
+        return true;
     }
 
-    //Sets the token price 
+    //Sets the token price
     function setPrice(uint256 newPriceperEther) onlyOwner returns (uint256) {
-        require(newPriceperEther > 0); 
-        price = newPriceperEther; 
-        return price; 
+        require(newPriceperEther > 0);
+        price = newPriceperEther;
+        return price;
     }
 
     //Allows owner to start the crowdsale from the time of execution until a specified deadline
     function startSale(uint256 lengthOfSale) onlyOwner returns (bool success) {
-        deadline = now + lengthOfSale * 1 days; 
-        crowdsaleClosed = false; 
-        return true; 
+        deadline = now + lengthOfSale * 1 days;
+        crowdsaleClosed = false;
+        return true;
     }
 
     //Allows owner to stop the crowdsale immediately
     function stopSale() onlyOwner returns (bool success) {
-        deadline = now; 
+        deadline = now;
         crowdsaleClosed = true;
-        return true; 
+        return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

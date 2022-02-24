@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 contract Roulette {
-  
+
   uint betAmount;
   uint necessaryBalance;
   uint nextRoundTimestamp;
@@ -10,7 +10,7 @@ contract Roulette {
   mapping (address => uint256) winnings;
   uint8[] payouts;
   uint8[] numberRange;
-  
+
   /*
     BetTypes are as follow:
       0: color
@@ -19,7 +19,7 @@ contract Roulette {
       3: eighteen
       4: modulus
       5: number
-      
+
     Depending on the BetType, number will be:
       color: 0 for black, 1 for red
       column: 0 for left, 1 for middle, 2 for right
@@ -28,14 +28,14 @@ contract Roulette {
       modulus: 0 for even, 1 for odd
       number: number
   */
-  
+
   struct Bet {
     address player;
     uint8 betType;
     uint8 number;
   }
   Bet[] public bets;
-  
+
   constructor() public payable {
     creator = msg.sender;
     necessaryBalance = 0;
@@ -47,7 +47,7 @@ contract Roulette {
   }
 
   event RandomNumber(uint256 number);
-  
+
   function getStatus() public view returns(uint, uint, uint, uint, uint) {
     return (
       bets.length,             // number of active bets
@@ -55,13 +55,13 @@ contract Roulette {
       nextRoundTimestamp,      // when can we play again
       address(this).balance,   // roulette balance
       winnings[msg.sender]     // winnings of player
-    ); 
+    );
   }
-    
+
   function addEther() payable public {}
 
   function bet(uint8 number, uint8 betType) payable public {
-    /* 
+    /*
        A bet is valid when:
        1 - the value of the bet is correct (=betAmount)
        2 - betType is known (between 0 and 5)
@@ -102,19 +102,19 @@ contract Roulette {
       if (number == 0) {
         won = (b.betType == 5 && b.number == 0);                   /* bet on 0 */
       } else {
-        if (b.betType == 5) { 
+        if (b.betType == 5) {
           won = (b.number == number);                              /* bet on number */
         } else if (b.betType == 4) {
           if (b.number == 0) won = (number % 2 == 0);              /* bet on even */
           if (b.number == 1) won = (number % 2 == 1);              /* bet on odd */
-        } else if (b.betType == 3) {            
+        } else if (b.betType == 3) {
           if (b.number == 0) won = (number <= 18);                 /* bet on low 18s */
           if (b.number == 1) won = (number >= 19);                 /* bet on high 18s */
-        } else if (b.betType == 2) {                               
+        } else if (b.betType == 2) {
           if (b.number == 0) won = (number <= 12);                 /* bet on 1st dozen */
           if (b.number == 1) won = (number > 12 && number <= 24);  /* bet on 2nd dozen */
           if (b.number == 2) won = (number > 24);                  /* bet on 3rd dozen */
-        } else if (b.betType == 1) {               
+        } else if (b.betType == 1) {
           if (b.number == 0) won = (number % 3 == 1);              /* bet on left column */
           if (b.number == 1) won = (number % 3 == 2);              /* bet on middle column */
           if (b.number == 2) won = (number % 3 == 0);              /* bet on right column */
@@ -148,7 +148,7 @@ contract Roulette {
     /* returns 'random' number to UI */
     emit RandomNumber(number);
   }
-  
+
   function cashOut() public {
     address player = msg.sender;
     uint256 amount = winnings[player];
@@ -157,15 +157,31 @@ contract Roulette {
     winnings[player] = 0;
     player.transfer(amount);
   }
-  
+
   function takeProfits() internal {
     uint amount = address(this).balance - maxAmountAllowedInTheBank;
     if (amount > 0) creator.transfer(amount);
   }
-  
+
   function creatorKill() public {
     require(msg.sender == creator);
     selfdestruct(creator);
   }
- 
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

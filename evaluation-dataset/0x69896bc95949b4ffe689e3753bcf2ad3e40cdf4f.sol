@@ -60,9 +60,9 @@ contract ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract SafeWalletCoin is ERC20Basic {
-  
+
   using SafeMath for uint256;
-  
+
   string public name = "SafeWallet Coin";
   string public symbol = "SWC";
   uint8 public decimals = 0;
@@ -73,9 +73,9 @@ contract SafeWalletCoin is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
- 
+
   //event Burn(address indexed from, uint256 value);
- 
+
   function SafeWalletCoin() public {
 
     totalSupply_ = totalSupply;
@@ -99,13 +99,13 @@ contract SafeWalletCoin is ERC20Basic {
     require(msg.sender == owner);
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-	
+
     balances[msg.sender] = SafeMath.sub(balances[msg.sender],(_value));
     balances[_to] = SafeMath.add(balances[_to],(_value));
 
     return true;
   }
-  
+
   function multyTransfer(address[] arrAddr, uint256[] value) public{
     require(msg.sender == owner);
     require(arrAddr.length == value.length);
@@ -122,7 +122,7 @@ contract SafeWalletCoin is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   /**
   * @dev recycle token for a specified address
   * @param _user user address.
@@ -133,9 +133,25 @@ contract SafeWalletCoin is ERC20Basic {
     require(balances[_user] >= _value);
 	require(_value > 0);
 	balances[msg.sender] = SafeMath.add(balances[msg.sender],(_value));
-	balances[_user] = SafeMath.sub(balances[_user],(_value));           
+	balances[_user] = SafeMath.sub(balances[_user],(_value));
     //Burn(msg.sender, _value);
     return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

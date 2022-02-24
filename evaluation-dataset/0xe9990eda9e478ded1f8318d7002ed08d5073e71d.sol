@@ -496,7 +496,7 @@ library AssetTokenL {
         // Then update the balance array with the new value for the address
         //  receiving the tokens
         uint256 previousBalanceTo = balanceOfNow(_self, _to);
-        
+
         updateValueAtNow(_self, _self.balances[_to], previousBalanceTo.add(_amount));
 
         //info: don't move this line inside updateValueAtNow (because transfer is 2 actions)
@@ -566,9 +566,9 @@ library AssetTokenL {
     /// @param _to The address of the recipient
     /// @param _amount The amount of tokens to be transferred
     /// @return True if the transfer was successful
-    function transferFrom(Supply storage _supply, Availability storage _availability, address _from, address _to, uint256 _amount) 
-    public 
-    returns (bool success) 
+    function transferFrom(Supply storage _supply, Availability storage _availability, address _from, address _to, uint256 _amount)
+    public
+    returns (bool success)
     {
         // The standard ERC 20 transferFrom functionality
         require(_supply.allowed[_from][msg.sender] >= _amount, "allowance");
@@ -585,14 +585,14 @@ library AssetTokenL {
     /// @param _fullAmountRequired Full amount required (causes revert if not).
     /// @return True if the transfer was successful
     function enforcedTransferFrom(
-        Supply storage _self, 
-        Availability storage _availability, 
-        address _from, 
-        address _to, 
-        uint256 _amount, 
-        bool _fullAmountRequired) 
-    public 
-    returns (bool success) 
+        Supply storage _self,
+        Availability storage _availability,
+        address _from,
+        address _to,
+        uint256 _amount,
+        bool _fullAmountRequired)
+    public
+    returns (bool success)
     {
         if(_fullAmountRequired && _amount != balanceOfNow(_self, _from))
         {
@@ -607,7 +607,7 @@ library AssetTokenL {
     }
 
 ////////////////
-// Miniting 
+// Miniting
 ////////////////
 
     /// @notice Function to mint tokens
@@ -672,8 +672,8 @@ library AssetTokenL {
     /// @param checkpoints The history of values being queried
     /// @param _specificTransfersAndMintsIndex The index to retrieve the history checkpoint value at
     /// @return The number of tokens being queried
-    function getValueAt(Checkpoint[] storage checkpoints, uint256 _specificTransfersAndMintsIndex) private view returns (uint256) { 
-        
+    function getValueAt(Checkpoint[] storage checkpoints, uint256 _specificTransfersAndMintsIndex) private view returns (uint256) {
+
         //  requested before a check point was ever created for this token
         if (checkpoints.length == 0 || checkpoints[0].currentTokenActionIndex > _specificTransfersAndMintsIndex) {
             return 0;
@@ -741,7 +741,7 @@ library AssetTokenL {
     function setRoles(Roles storage _self, address _pauseControl, address _tokenRescueControl) public {
         require(_pauseControl != address(0), "addr0");
         require(_tokenRescueControl != address(0), "addr0");
-        
+
         _self.pauseControl = _pauseControl;
         _self.tokenRescueControl = _tokenRescueControl;
 
@@ -794,7 +794,7 @@ library AssetTokenL {
 
     /// @notice Receives ether to be distriubted to all token owners
     function depositDividend(Supply storage _self, uint256 msgValue)
-    public 
+    public
     {
         require(msgValue > 0, "amount0");
 
@@ -844,8 +844,8 @@ library AssetTokenL {
             Dividend(
                 _self.tokenActionIndex, // index that counts up on transfers and mints
                 block.timestamp, // Timestamp of the distribution
-                DividendType.ERC20, 
-                _dividendToken, 
+                DividendType.ERC20,
+                _dividendToken,
                 _amount, // Total amount that has been distributed
                 0, // amount that has been claimed
                 currentSupply, // Total supply now
@@ -968,15 +968,15 @@ library AssetTokenL {
     }
 
     /// @dev the core claim function of single dividend.
-    function claimThis(DividendType _dividendType, uint256 _dividendIndex, address payable _beneficiary, uint256 _claim, address _dividendToken) 
-    private 
+    function claimThis(DividendType _dividendType, uint256 _dividendIndex, address payable _beneficiary, uint256 _claim, address _dividendToken)
+    private
     {
         // transfer the dividends to the token holder
         if (_claim > 0) {
-            if (_dividendType == DividendType.Ether) { 
+            if (_dividendType == DividendType.Ether) {
                 _beneficiary.transfer(_claim);
-            } 
-            else if (_dividendType == DividendType.ERC20) { 
+            }
+            else if (_dividendType == DividendType.ERC20) {
                 require(ERC20(_dividendToken).transfer(_beneficiary, _claim), "transfer");
             }
             else {
@@ -1029,15 +1029,15 @@ contract IBasicAssetTokenFull {
     function getEnd() public view returns (uint256);
     function getLimits() public view returns (uint256, uint256, uint256, uint256);
     function setMetaData(
-        string calldata _name, 
-        string calldata _symbol, 
-        address _tokenBaseCurrency, 
-        uint256 _cap, 
-        uint256 _goal, 
-        uint256 _startTime, 
-        uint256 _endTime) 
+        string calldata _name,
+        string calldata _symbol,
+        address _tokenBaseCurrency,
+        uint256 _cap,
+        uint256 _goal,
+        uint256 _startTime,
+        uint256 _endTime)
         external;
-    
+
     function getTokenRescueControl() public view returns (address);
     function getPauseControl() public view returns (address);
     function isTransfersPaused() public view returns (bool);
@@ -1072,7 +1072,7 @@ contract IBasicAssetTokenFull {
 
     function pauseTransfer(bool _transfersEnabled) public;
 
-    function pauseCapitalIncreaseOrDecrease(bool _mintingEnabled) public;    
+    function pauseCapitalIncreaseOrDecrease(bool _mintingEnabled) public;
 
     function isMintingPaused() public view returns (bool);
 
@@ -1257,14 +1257,14 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
     }
 
     modifier onlyOwnerOrOverruled() {
-        if(_canDoAnytime() == false) { 
+        if(_canDoAnytime() == false) {
             require(isOwner(), "only owner");
         }
         _;
     }
 
     modifier canMint() {
-        if(_canDoAnytime() == false) { 
+        if(_canDoAnytime() == false) {
             require(canMintLogic(), "canMint");
         }
         _;
@@ -1319,15 +1319,15 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
     /// @param _startTime Time when crowdsale should start.
     /// @param _endTime Time when crowdsale should end.
     function setMetaData(
-        string calldata _nameParam, 
-        string calldata _symbolParam, 
-        address _tokenBaseCurrency, 
-        uint256 _cap, 
-        uint256 _goal, 
-        uint256 _startTime, 
-        uint256 _endTime) 
-        external 
-    canSetMetadata 
+        string calldata _nameParam,
+        string calldata _symbolParam,
+        address _tokenBaseCurrency,
+        uint256 _cap,
+        uint256 _goal,
+        uint256 _startTime,
+        uint256 _endTime)
+        external
+    canSetMetadata
     {
         require(_cap >= _goal, "cap higher goal");
 
@@ -1352,13 +1352,13 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
     /// @notice Set roles.
     /// @param _pauseControl address that is allowed to pause.
     /// @param _tokenRescueControl address that is allowed rescue tokens.
-    function setRoles(address _pauseControl, address _tokenRescueControl) public 
+    function setRoles(address _pauseControl, address _tokenRescueControl) public
     canSetMetadata
     {
         roles.setRoles(_pauseControl, _tokenRescueControl);
     }
 
-    function setTokenAlive() public 
+    function setTokenAlive() public
     onlyOwnerOrOverruled
     {
         availability.setTokenAlive();
@@ -1451,7 +1451,7 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
     }
 
 ////////////////
-// Miniting 
+// Miniting
 ////////////////
 
     /// @dev Can rescue tokens accidentally assigned to this contract
@@ -1468,7 +1468,7 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
     }
 
 ////////////////
-// Rescue Tokens 
+// Rescue Tokens
 ////////////////
 
     /// @dev Can rescue tokens accidentally assigned to this contract
@@ -1512,8 +1512,8 @@ contract BasicAssetToken is IBasicAssetTokenFull, Ownable {
 
     /// @notice Enables token holders to transfer their tokens freely if true
     /// @param _transfersEnabled True if transfers are allowed
-    function enableTransfers(bool _transfersEnabled) public 
-    onlyOwnerOrOverruled 
+    function enableTransfers(bool _transfersEnabled) public
+    onlyOwnerOrOverruled
     {
         enableTransferInternal(_transfersEnabled);
     }
@@ -1664,7 +1664,7 @@ contract CRWDAssetToken is BasicAssetToken, ICRWDAssetToken {
 
 /** @title FeatureCapitalControl. */
 contract FeatureCapitalControl is ICRWDAssetToken {
-    
+
 ////////////////
 // Variables
 ////////////////
@@ -1701,7 +1701,7 @@ contract FeatureCapitalControl is ICRWDAssetToken {
 
     /// @notice set capitalControl
     /// @dev this looks unprotected but has a checkCanSetMetadata check.
-    ///  depending on inheritance this can be done 
+    ///  depending on inheritance this can be done
     ///  before alive and any time by capitalControl
     function setCapitalControl(address _capitalControl) public {
         require(checkCanSetMetadata(), "forbidden");
@@ -1720,7 +1720,7 @@ contract FeatureCapitalControl is ICRWDAssetToken {
 ////////////////
 
     /// @notice capitalControl can reopen the crowdsale.
-    function reopenCrowdsale() public onlyCapitalControl returns (bool) {        
+    function reopenCrowdsale() public onlyCapitalControl returns (bool) {
         return reopenCrowdsaleInternal();
     }
 }
@@ -1782,6 +1782,15 @@ contract FeatureCapitalControlWithForcedTransferFrom is FeatureCapitalControl {
 
 /** @title AssetTokenT001 Token. A CRWDAssetToken with CapitalControl and LostWallet feature */
 contract AssetTokenT001 is CRWDAssetToken, FeatureCapitalControlWithForcedTransferFrom
-{    
+{
     constructor(address _capitalControl) FeatureCapitalControlWithForcedTransferFrom(_capitalControl) public {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

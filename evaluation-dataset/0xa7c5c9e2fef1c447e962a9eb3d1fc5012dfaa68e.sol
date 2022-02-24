@@ -823,38 +823,38 @@ contract ERC721Full is ERC721, ERC721Enumerable, ERC721Metadata {
 }
 
 contract ChainmonstersCoreV2 is ERC721Full, Ownable{
-    
+
     address public GameContract;
     string baseAPI = "http://chainmonsters.appspot.com/api/GetMonster/";
     uint256 public offset = 100000;
-    
 
-    
+
+
     constructor() ERC721Full("ChainmonstersV2", "CHMONV2") public {
-        
+
     }
-    
-    
-    
-    
+
+
+
+
     function mintToken(address _to) public {
         require(msg.sender == GameContract);
         uint256 newTokenId = _getNextTokenId();
         _mint(_to, newTokenId);
     }
-    
+
     function setGameContract(address _contract) public onlyOwner {
         GameContract = _contract;
     }
-    
+
     function setOffset(uint256 _offset) public onlyOwner {
         offset = _offset;
     }
-    
+
     function setBaseAPI(string memory _api) public onlyOwner {
         baseAPI = _api;
     }
-    
+
     function tokenURI(uint256 _tokenId) public view returns (string memory) {
         uint256 _id = offset+_tokenId;
     return append(baseTokenURI(), uint2str(_id));
@@ -865,19 +865,19 @@ contract ChainmonstersCoreV2 is ERC721Full, Ownable{
     * @return uint256 for the next token ID
     */
     function _getNextTokenId() private view returns (uint256) {
-        return totalSupply().add(1); 
+        return totalSupply().add(1);
     }
-    
+
     function baseTokenURI() public view returns (string memory) {
         return baseAPI;
     }
-    
+
     function append(string memory a, string memory b) internal pure returns (string memory) {
 
     return string(abi.encodePacked(a, b));
 
 }
-    
+
     function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
     if (_i == 0) {
         return "0";
@@ -896,5 +896,14 @@ contract ChainmonstersCoreV2 is ERC721Full, Ownable{
     }
     return string(bstr);
 }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

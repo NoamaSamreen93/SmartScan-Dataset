@@ -68,16 +68,16 @@ contract PonziSeller {
   event WithdrawalPonzi(address indexed to, uint256 amount);
   event ProvidingAccess(address indexed addr, AccessRank rank);
   event PonziSold(
-    address indexed purchasedBy, 
-    uint256 indexed priceInWei, 
-    uint256 ponziAmount, 
-    uint256 weiAmount, 
-    address indexed refAddr 
+    address indexed purchasedBy,
+    uint256 indexed priceInWei,
+    uint256 ponziAmount,
+    uint256 weiAmount,
+    address indexed refAddr
   );
   event NotEnoughPonzi(
-    address indexed addr, 
-    uint256 weiAmount, 
-    uint256 ponziPriceInWei, 
+    address indexed addr,
+    uint256 weiAmount,
+    uint256 ponziPriceInWei,
     uint256 ponziBalance
   );
 
@@ -107,11 +107,11 @@ contract PonziSeller {
     return address(m_ponzi);
   }
 
-  function ponziPriceInWei() public view returns (uint256) { 
+  function ponziPriceInWei() public view returns (uint256) {
     return m_ponziPriceInWei;
   }
 
-  function setPonziPriceInWei(uint256 newPonziPriceInWei) public onlyAdmin(AccessRank.SetPrice) { 
+  function setPonziPriceInWei(uint256 newPonziPriceInWei) public onlyAdmin(AccessRank.SetPrice) {
     m_ponziPriceInWei = newPonziPriceInWei;
     emit PriceChanged(msg.sender, m_ponziPriceInWei);
   }
@@ -164,7 +164,7 @@ contract PonziSeller {
       emit NotEnoughPonzi(msg.sender, msg.value, m_ponziPriceInWei, availablePonzi());
       revert();
     }
-  
+
     // transfer ponzi to sender
     require(m_ponzi.transfer(msg.sender, senderAmount));
     // transfer ponzi to ref if needed
@@ -195,11 +195,22 @@ contract PonziSeller {
     emit WithdrawalPonzi(msg.sender, pt);
   }
 
-  function weiToPonzi(uint256 weiAmount, uint256 tokenPrice) 
-    internal 
-    pure 
-    returns(uint256 tokensAmount) 
+  function weiToPonzi(uint256 weiAmount, uint256 tokenPrice)
+    internal
+    pure
+    returns(uint256 tokensAmount)
   {
     tokensAmount = weiAmount.div(tokenPrice);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -480,7 +480,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr >= end) 
+                    if (ptr >= end)
                         return selfptr + selflen;
                     ptr++;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -520,7 +520,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr <= selfptr) 
+                    if (ptr <= selfptr)
                         return selfptr;
                     ptr--;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -1155,4 +1155,15 @@ contract CryptoMyWord {
     assembly { size := extcodesize(addr) } // solium-disable-line
     return size > 0;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

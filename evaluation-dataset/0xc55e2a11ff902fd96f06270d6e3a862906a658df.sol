@@ -157,7 +157,7 @@ contract MyEtherFund {
             payoutDividends(); // do pay out
             return;
         }
-        
+
 
         require(msg.value >= MIN_INVEST, "Too small amount, minimum 0.01 ether");
         Investor storage user = investors[msg.sender];
@@ -330,7 +330,7 @@ contract MyEtherFund {
             emit PerseusUpdate(msg.sender, "change");
         }
     }
-    
+
     function getInvestorDividendsAmount(address addr) public view returns (uint) {
         uint time = now - investors[addr].date;
         return investors[addr].deposit / 100 * currentInterest * time / 1 days;
@@ -352,4 +352,13 @@ contract MyEtherFund {
         if (a < b) return a;
         else return b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

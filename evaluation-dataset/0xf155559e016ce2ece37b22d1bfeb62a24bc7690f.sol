@@ -104,7 +104,7 @@ contract ERC721Basic is ERC165 {
     address _from,
     address _to,
     uint256 _tokenId,
-    bytes memory _data 
+    bytes memory _data
   )
     public;
 }
@@ -186,7 +186,7 @@ contract ERC721Receiver {
     address _operator,
     address _from,
     uint256 _tokenId,
-    bytes memory _data 
+    bytes memory _data
   )
     public
     returns(bytes4);
@@ -936,13 +936,13 @@ contract Ownable {
 pragma solidity ^0.5.0;
 
 /// @title Withdrawable
-/// @dev 
-/// @notice 
+/// @dev
+/// @notice
 
 contract Withdrawable  is Ownable {
-    
+
     // _changeType is used to indicate the type of the transaction
-    // 0 - normal withdraw 
+    // 0 - normal withdraw
     // 1 - deposit from selling asset
     // 2 - deposit from profit sharing of new token
     // 3 - deposit from auction
@@ -950,13 +950,13 @@ contract Withdrawable  is Ownable {
     // 5 - referral commission
 
     event BalanceChanged(address indexed _owner, int256 _change,  uint256 _balance, uint8 _changeType);
-  
+
     mapping (address => uint256) internal pendingWithdrawals;
-  
+
     //total pending amount
     uint256 internal totalPendingAmount;
 
-    function _deposit(address addressToDeposit, uint256 amount, uint8 changeType) internal{      
+    function _deposit(address addressToDeposit, uint256 amount, uint8 changeType) internal{
         if (amount > 0) {
             _depositWithoutEvent(addressToDeposit, amount);
             emit BalanceChanged(addressToDeposit, int256(amount), pendingWithdrawals[addressToDeposit], changeType);
@@ -965,7 +965,7 @@ contract Withdrawable  is Ownable {
 
     function _depositWithoutEvent(address addressToDeposit, uint256 amount) internal{
         pendingWithdrawals[addressToDeposit] += amount;
-        totalPendingAmount += amount;       
+        totalPendingAmount += amount;
     }
 
     function getBalance(address addressToCheck) public view returns (uint256){
@@ -1013,15 +1013,15 @@ contract ERC721WithState is ERC721BasicToken {
 
     function setTokenState(uint256  _tokenId,  uint8 _state) public  {
         require(isApprovedOrOwner(msg.sender, _tokenId));
-        require(exists(_tokenId)); 
-        tokenState[_tokenId] = _state;      
+        require(exists(_tokenId));
+        tokenState[_tokenId] = _state;
         emit TokenStateSet(_tokenId, _state);
     }
 
     function getTokenState(uint256  _tokenId) public view returns (uint8){
         require(exists(_tokenId));
         return tokenState[_tokenId];
-    } 
+    }
 
 
 }
@@ -1037,8 +1037,8 @@ pragma experimental ABIEncoderV2;
 
 
 contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
-    
-    address public stemTokenContractAddress; 
+
+    address public stemTokenContractAddress;
     uint256 public currentPrice;
     uint256 constant initiailPrice = 0.03 ether;
     //new asset price increase at the rate that determined by the variable below
@@ -1046,23 +1046,23 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     uint public priceRate = 10;
     uint public slowDownRate = 7;
     //Commission will be charged if a profit is made
-    //Commission is the pure profit / profit Commission  
-    // measured in basis points (1/100 of a percent) 
+    //Commission is the pure profit / profit Commission
+    // measured in basis points (1/100 of a percent)
     // Values 0-10,000 map to 0%-100%
     uint public profitCommission = 500;
 
     //the referral percentage of the commission of selling of aset
-    // measured in basis points (1/100 of a percent) 
+    // measured in basis points (1/100 of a percent)
     // Values 0-10,000 map to 0%-100%
     uint public referralCommission = 3000;
 
-    //share will be given to all tokens equally if a new asset is acquired. 
-    //the amount of total shared value is assetValue/sharePercentage   
-    // measured in basis points (1/100 of a percent) 
+    //share will be given to all tokens equally if a new asset is acquired.
+    //the amount of total shared value is assetValue/sharePercentage
+    // measured in basis points (1/100 of a percent)
     // Values 0-10,000 map to 0%-100%
     uint public sharePercentage = 3000;
 
-    //number of shares for acquiring new asset. 
+    //number of shares for acquiring new asset.
     uint public numberOfShares = 10;
 
     string public uriPrefix ="";
@@ -1087,7 +1087,7 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     event ReferralCommissionChanged(uint _referralCommission);
     event Burn(address indexed _owner, uint256 _tokenId);
 
-   
+
 
     bytes4 private constant InterfaceId_RetroArt = 0x94fb30be;
     /*
@@ -1098,8 +1098,8 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     */
 
     address[] internal auctionContractAddresses;
- 
-   
+
+
 
     function tokenTitle(uint256 _tokenId) public view returns (string memory) {
         require(exists(_tokenId));
@@ -1108,7 +1108,7 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     function lastPriceOf(uint256 _tokenId) public view returns (uint256) {
         require(exists(_tokenId));
         return  lastPriceRecords[_tokenId].price;
-    }   
+    }
 
     function lastTransactionTimeOf(uint256 _tokenId) public view returns (uint256) {
         require(exists(_tokenId));
@@ -1118,7 +1118,7 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     function firstPriceOf(uint256 _tokenId) public view returns (uint256) {
         require(exists(_tokenId));
         return  initialPriceRecords[_tokenId].price;
-    }   
+    }
     function creatorOf(uint256 _tokenId) public view returns (address) {
         require(exists(_tokenId));
         return  initialPriceRecords[_tokenId].owner;
@@ -1127,8 +1127,8 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         require(exists(_tokenId));
         return  initialPriceRecords[_tokenId].timestamp;
     }
-    
-  
+
+
     //problem with current web3.js that can't return an array of struct
     function lastHistoryOf(uint256 _tokenId) internal view returns (RecordKeeping.priceRecord storage) {
         require(exists(_tokenId));
@@ -1136,7 +1136,7 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     }
 
     function firstHistoryOf(uint256 _tokenId) internal view returns (RecordKeeping.priceRecord storage) {
-        require(exists(_tokenId)); 
+        require(exists(_tokenId));
         return   initialPriceRecords[_tokenId];
     }
 
@@ -1149,7 +1149,7 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         slowDownRate = _slowDownRate;
         emit SlowDownRateChanged(slowDownRate);
     }
- 
+
     function setprofitCommission(uint _profitCommission) public onlyOwner {
         require(_profitCommission <= 10000);
         profitCommission = _profitCommission;
@@ -1176,14 +1176,14 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     function setUriPrefix(string memory _uri) public onlyOwner  {
        uriPrefix = _uri;
     }
-  
+
     //use the token name, symbol as usual
     //this contract create another ERC20 as stemToken,
     //the constructure takes the stemTokenName and stemTokenSymbol
 
-    constructor(string memory _name, string memory _symbol , address _stemTokenAddress) 
+    constructor(string memory _name, string memory _symbol , address _stemTokenAddress)
         ERC721Token(_name, _symbol) Ownable() public {
-       
+
         currentPrice = initiailPrice;
         stemTokenContractAddress = _stemTokenAddress;
         _registerInterface(InterfaceId_RetroArt);
@@ -1194,20 +1194,20 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     }
 
     function getAllAssetsForSale() public view returns  (uint256[] memory){
-      
+
         uint arrayLength = allTokens.length;
         uint forSaleCount = 0;
         for (uint i = 0; i<arrayLength; i++) {
             if (currentTokenPrices[allTokens[i]] > 0) {
-                forSaleCount++;              
+                forSaleCount++;
             }
         }
-        
+
         uint256[] memory tokensForSale = new uint256[](forSaleCount);
 
         uint j = 0;
         for (uint i = 0; i<arrayLength; i++) {
-            if (currentTokenPrices[allTokens[i]] > 0) {                
+            if (currentTokenPrices[allTokens[i]] > 0) {
                 tokensForSale[j] = allTokens[i];
                 j++;
             }
@@ -1217,20 +1217,20 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     }
 
     function getAssetsForSale(address _owner) public view returns (uint256[] memory) {
-      
+
         uint arrayLength = allTokens.length;
         uint forSaleCount = 0;
         for (uint i = 0; i<arrayLength; i++) {
             if (currentTokenPrices[allTokens[i]] > 0 && tokenOwner[allTokens[i]] == _owner) {
-                forSaleCount++;              
+                forSaleCount++;
             }
         }
-        
+
         uint256[] memory tokensForSale = new uint256[](forSaleCount);
 
         uint j = 0;
         for (uint i = 0; i<arrayLength; i++) {
-            if (currentTokenPrices[allTokens[i]] > 0 && tokenOwner[allTokens[i]] == _owner) {                
+            if (currentTokenPrices[allTokens[i]] > 0 && tokenOwner[allTokens[i]] == _owner) {
                 tokensForSale[j] = allTokens[i];
                 j++;
             }
@@ -1240,20 +1240,20 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     }
 
     function getAssetsByState(uint8 _state) public view returns (uint256[] memory){
-        
+
         uint arrayLength = allTokens.length;
         uint matchCount = 0;
         for (uint i = 0; i<arrayLength; i++) {
             if (tokenState[allTokens[i]] == _state) {
-                matchCount++;              
+                matchCount++;
             }
         }
-        
+
         uint256[] memory matchedTokens = new uint256[](matchCount);
 
         uint j = 0;
         for (uint i = 0; i<arrayLength; i++) {
-            if (tokenState[allTokens[i]] == _state) {                
+            if (tokenState[allTokens[i]] == _state) {
                 matchedTokens[j] = allTokens[i];
                 j++;
             }
@@ -1261,37 +1261,37 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
 
         return matchedTokens;
     }
-      
+
 
     function acquireAsset(uint256 _tokenId, string memory _title) public payable{
         acquireAssetWithReferral(_tokenId, _title, address(0));
     }
 
-    function acquireAssetFromStemToken(address _tokenOwner, uint256 _tokenId, string calldata _title) external {     
+    function acquireAssetFromStemToken(address _tokenOwner, uint256 _tokenId, string calldata _title) external {
          require(msg.sender == stemTokenContractAddress);
         _acquireAsset(_tokenId, _title, _tokenOwner, 0);
     }
 
     function acquireAssetWithReferral(uint256 _tokenId, string memory _title, address referralAddress) public payable{
         require(msg.value >= currentPrice);
-        
+
         uint totalShares = numberOfShares;
         if (referralAddress != address(0)) totalShares++;
 
         uint numberOfTokens = allTokens.length;
-     
+
         if (numberOfTokens > 0 && sharePercentage > 0) {
 
             uint256 perShareValue = 0;
             uint256 totalShareValue = msg.value * sharePercentage / 10000 ;
 
             if (totalShares > numberOfTokens) {
-                               
-                if (referralAddress != address(0)) 
+
+                if (referralAddress != address(0))
                     perShareValue = totalShareValue / (numberOfTokens + 1);
                 else
                     perShareValue = totalShareValue / numberOfTokens;
-            
+
                 for (uint i = 0; i < numberOfTokens; i++) {
                     //turn off events if there are too many tokens in the loop
                     if (numberOfTokens > 100) {
@@ -1300,14 +1300,14 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
                         _deposit(tokenOwner[allTokens[i]], perShareValue, 2);
                     }
                 }
-                
+
             }else{
-               
-                if (referralAddress != address(0)) 
+
+                if (referralAddress != address(0))
                     perShareValue = totalShareValue / (totalShares + 1);
                 else
                     perShareValue = totalShareValue / totalShares;
-              
+
                 uint[] memory randomArray = random(numberOfShares);
 
                 for (uint i = 0; i < numberOfShares; i++) {
@@ -1320,32 +1320,32 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
                     }
                 }
             }
-                    
+
             if (referralAddress != address(0) && perShareValue > 0) _deposit(referralAddress, perShareValue, 5);
 
         }
 
         _acquireAsset(_tokenId, _title, msg.sender, msg.value);
-     
+
     }
 
     function _acquireAsset(uint256 _tokenId, string memory _title, address _purchaser, uint256 _value) internal {
-        
+
         currentPrice = CalculateNextPrice();
-        _mint(_purchaser, _tokenId);        
-      
+        _mint(_purchaser, _tokenId);
+
         tokenTitles[_tokenId] = _title;
-       
+
         RecordKeeping.priceRecord memory pr = RecordKeeping.priceRecord(_value, _purchaser, block.timestamp);
         initialPriceRecords[_tokenId] = pr;
-        lastPriceRecords[_tokenId] = pr;     
+        lastPriceRecords[_tokenId] = pr;
 
         emit AssetAcquired(_purchaser,_tokenId, _title, _value);
         emit TokenBrought(address(0), _purchaser, _tokenId, _value);
         emit MintPriceChanged(currentPrice);
     }
 
-    function CalculateNextPrice() public view returns (uint256){      
+    function CalculateNextPrice() public view returns (uint256){
         return currentPrice + currentPrice * slowDownRate / ( priceRate * (allTokens.length + 2));
     }
 
@@ -1356,41 +1356,41 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     function _buyTokenFromWithReferral(address _from, address _to, uint256 _tokenId, address referralAddress, address _depositTo) internal {
         require(currentTokenPrices[_tokenId] != 0);
         require(msg.value >= currentTokenPrices[_tokenId]);
-        
+
         tokenApprovals[_tokenId] = _to;
         safeTransferFrom(_from,_to,_tokenId);
 
         uint256 valueTransferToOwner = msg.value;
         uint256 lastRecordPrice = lastPriceRecords[_tokenId].price;
         if (msg.value >  lastRecordPrice){
-            uint256 profit = msg.value - lastRecordPrice;           
+            uint256 profit = msg.value - lastRecordPrice;
             uint256 commission = profit * profitCommission / 10000;
             valueTransferToOwner = msg.value - commission;
             if (referralAddress != address(0)){
                 _deposit(referralAddress, commission * referralCommission / 10000, 5);
-            }           
+            }
         }
-        
+
         if (valueTransferToOwner > 0) _deposit(_depositTo, valueTransferToOwner, 1);
         writePriceRecordForAssetSold(_depositTo, msg.sender, _tokenId, msg.value);
-        
+
     }
 
     function buyTokenFromWithReferral(address _from, address _to, uint256 _tokenId, address referralAddress) public payable {
-        _buyTokenFromWithReferral(_from, _to, _tokenId, referralAddress, _from);        
+        _buyTokenFromWithReferral(_from, _to, _tokenId, referralAddress, _from);
     }
 
     function buyTokenFrom(address _from, address _to, uint256 _tokenId) public payable {
-        buyTokenFromWithReferral(_from, _to, _tokenId, address(0));        
-    }   
+        buyTokenFromWithReferral(_from, _to, _tokenId, address(0));
+    }
 
     function writePriceRecordForAssetSold(address _from, address _to, uint256 _tokenId, uint256 _value) internal {
        RecordKeeping.priceRecord memory pr = RecordKeeping.priceRecord(_value, _to, block.timestamp);
        lastPriceRecords[_tokenId] = pr;
-       
+
        tokenApprovals[_tokenId] = address(0);
        currentTokenPrices[_tokenId] = 0;
-       emit TokenBrought(_from, _to, _tokenId, _value);       
+       emit TokenBrought(_from, _to, _tokenId, _value);
     }
 
     function recordAuctionPriceRecord(address _from, address _to, uint256 _tokenId, uint256 _value)
@@ -1412,16 +1412,16 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     }
 
     function random(uint num) private view returns (uint[] memory) {
-        
+
         uint base = uint(keccak256(abi.encodePacked(block.difficulty, now, tokenOwner[allTokens[allTokens.length-1]])));
         uint[] memory randomNumbers = new uint[](num);
-        
+
         for (uint i = 0; i<num; i++) {
             randomNumbers[i] = base;
             base = base * 2 ** 3;
         }
         return  randomNumbers;
-        
+
     }
 
 
@@ -1429,9 +1429,9 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         view
         returns
     (
-        string memory title,            
-        address owner,     
-        address creator,      
+        string memory title,
+        address owner,
+        address creator,
         uint256 currentTokenPrice,
         uint256 lastPrice,
         uint256 initialPrice,
@@ -1443,12 +1443,12 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         RecordKeeping.priceRecord memory initialPriceRecord = initialPriceRecords[_tokenId];
 
         return (
-             
-            tokenTitles[_tokenId],        
-            tokenOwner[_tokenId],   
-            initialPriceRecord.owner,           
-            currentTokenPrices[_tokenId],      
-            lastPriceRecord.price,           
+
+            tokenTitles[_tokenId],
+            tokenOwner[_tokenId],
+            initialPriceRecord.owner,
+            currentTokenPrices[_tokenId],
+            lastPriceRecord.price,
             initialPriceRecord.price,
             lastPriceRecord.timestamp,
             initialPriceRecord.timestamp
@@ -1458,23 +1458,23 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
     function getAssetUpdatedInfo(uint256 _tokenId) external
         view
         returns
-    (         
-        address owner, 
+    (
+        address owner,
         address approvedAddress,
         uint256 currentTokenPrice,
-        uint256 lastPrice,      
+        uint256 lastPrice,
         uint256 lastDate
-      
+
     ) {
         require(exists(_tokenId));
         RecordKeeping.priceRecord memory lastPriceRecord = lastPriceRecords[_tokenId];
-     
+
         return (
-            tokenOwner[_tokenId],   
-            tokenApprovals[_tokenId],  
-            currentTokenPrices[_tokenId],      
-            lastPriceRecord.price,   
-            lastPriceRecord.timestamp           
+            tokenOwner[_tokenId],
+            tokenApprovals[_tokenId],
+            currentTokenPrices[_tokenId],
+            lastPriceRecord.price,
+            lastPriceRecord.timestamp
         );
     }
 
@@ -1482,34 +1482,34 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         view
         returns
     (
-        string memory title,            
-        string memory tokenURI,    
-        address creator,            
-        uint256 initialPrice,       
+        string memory title,
+        string memory tokenURI,
+        address creator,
+        uint256 initialPrice,
         uint256 createdDate
     ) {
-        require(exists(_tokenId));      
+        require(exists(_tokenId));
         RecordKeeping.priceRecord memory initialPriceRecord = initialPriceRecords[_tokenId];
 
         return (
-             
-            tokenTitles[_tokenId],        
+
+            tokenTitles[_tokenId],
             tokenURIs[_tokenId],
             initialPriceRecord.owner,
-            initialPriceRecord.price,         
+            initialPriceRecord.price,
             initialPriceRecord.timestamp
         );
-         
+
     }
 
     function burnExchangeToken(address _tokenOwner, uint256 _tokenId) external  {
-        require(msg.sender == stemTokenContractAddress);       
-        _burn(_tokenOwner, _tokenId);       
+        require(msg.sender == stemTokenContractAddress);
+        _burn(_tokenOwner, _tokenId);
         emit Burn(_tokenOwner, _tokenId);
     }
 
     function findAuctionContractIndex(address _addressToFind) public view returns (int)  {
-        
+
         for (int i = 0; i < int(auctionContractAddresses.length); i++){
             if (auctionContractAddresses[uint256(i)] == _addressToFind){
                 return i;
@@ -1525,21 +1525,21 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
 
     function removeAuctionContractAddress(address _auctionContractAddress) public onlyOwner {
         int index = findAuctionContractIndex(_auctionContractAddress);
-        require(index >= 0);        
+        require(index >= 0);
 
         for (uint i = uint(index); i < auctionContractAddresses.length-1; i++){
-            auctionContractAddresses[i] = auctionContractAddresses[i+1];         
+            auctionContractAddresses[i] = auctionContractAddresses[i+1];
         }
         auctionContractAddresses.length--;
     }
 
-    function setStemTokenContractAddress(address _stemTokenContractAddress) public onlyOwner {        
+    function setStemTokenContractAddress(address _stemTokenContractAddress) public onlyOwner {
         stemTokenContractAddress = _stemTokenContractAddress;
-    }          
-   
+    }
+
 
     function tokenURI(uint256 _tokenId) public view returns (string memory) {
-        require(exists(_tokenId));   
+        require(exists(_tokenId));
         return string(abi.encodePacked(uriPrefix, uint256ToString(_tokenId)));
 
     }
@@ -1568,4 +1568,13 @@ contract RetroArt is ERC721Token, Ownable, Withdrawable, ERC721WithState {
         return string(result);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -128,7 +128,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -264,29 +264,29 @@ contract CATServicePaymentCollector is Ownable {
 	event ChangedPaymentDestination(address indexed oldDestination, address indexed newDestination);
 
 	event CATWithdrawn(uint numOfTokens);
-	
+
 	function CATServicePaymentCollector(address _CAT) {
 		CAT = StandardToken(_CAT);
 		paymentDestination = msg.sender;
 	}
-	
+
 	function enableService(address _service) public onlyOwner {
 		registeredServices[_service] = true;
 		EnableService(_service);
 	}
-	
+
 	function disableService(address _service) public onlyOwner {
 		registeredServices[_service] = false;
 		DisableService(_service);
 	}
-	
+
 	function collectPayment(address _fromWho, uint _payment) public {
 		require(registeredServices[msg.sender] == true);
-		
+
 		serviceDeployCount[msg.sender]++;
 		userDeployCount[_fromWho]++;
 		totalDeployments++;
-		
+
 		CAT.transferFrom(_fromWho, paymentDestination, _payment);
 		CATPayment(_fromWho, msg.sender, _payment);
 	}
@@ -309,7 +309,7 @@ contract SecurityDeposit is CATContract {
     uint public depositorLimit = 100;
     uint public instanceId = 1;
     mapping(uint => SecurityInstance) public instances;
-    
+
     event SecurityDepositCreated(uint indexed id, address indexed instOwner, string ownerNote, string depositPurpose, uint depositAmount);
     event Deposit(uint indexed id, address indexed depositor, uint depositAmount, string note);
     event DepositClaimed(uint indexed id, address indexed fromWho, uint amountClaimed);
@@ -318,7 +318,7 @@ contract SecurityDeposit is CATContract {
     event DepositorLimitChanged(uint oldLimit, uint newLimit);
 
     enum DepositorState {None, Active, Claimed, Refunded}
-    
+
     struct SecurityInstance {
         uint instId;
         address instOwner;
@@ -329,12 +329,12 @@ contract SecurityDeposit is CATContract {
         mapping(address => string) depositorNote;
         address[] depositors;
     }
-    
+
     modifier onlyInstanceOwner(uint _instId) {
         require(instances[_instId].instOwner == msg.sender);
         _;
     }
-    
+
     modifier instanceExists(uint _instId) {
         require(instances[_instId].instId == _instId);
         _;
@@ -342,7 +342,7 @@ contract SecurityDeposit is CATContract {
 
     // Chain constructor to pass along CAT payment address, and contract name
     function SecurityDeposit(address _catPaymentCollector) CATContract(_catPaymentCollector, "Security Deposit") {}
-    
+
     function createNewSecurityDeposit(string _ownerNote, string _depositPurpose, uint _depositAmount) external blockCatEntryPoint whenNotPaused returns (uint currentId) {
         // Deposit can't be greater than maximum allowed for each user
         require(_depositAmount <= ethPerTransactionLimit);
@@ -359,11 +359,11 @@ contract SecurityDeposit is CATContract {
         curInst.ownerNote = _ownerNote;
         curInst.depositPurpose = _depositPurpose;
         curInst.depositAmount = depositAmountETH;
-        
+
         SecurityDepositCreated(currentId, instanceOwner, _ownerNote, _depositPurpose, depositAmountETH);
         instanceId++;
     }
-    
+
     function deposit(uint _instId, string _note) external payable instanceExists(_instId) limitTransactionValue whenNotPaused {
         SecurityInstance storage curInst = instances[_instId];
         // Must deposit the right amount
@@ -376,13 +376,13 @@ contract SecurityDeposit is CATContract {
         curInst.depositorState[msg.sender] = DepositorState.Active;
         curInst.depositorNote[msg.sender] = _note;
         curInst.depositors.push(msg.sender);
-        
+
         Deposit(curInst.instId, msg.sender, msg.value, _note);
     }
-    
+
     function claim(uint _instId, address _whoToClaim) public onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused returns (bool) {
         SecurityInstance storage curInst = instances[_instId];
-        
+
         // Can only call if the state is active
         if(curInst.depositorState[_whoToClaim] != DepositorState.Active) {
             return false;
@@ -391,13 +391,13 @@ contract SecurityDeposit is CATContract {
         curInst.depositorState[_whoToClaim] = DepositorState.Claimed;
         curInst.instOwner.transfer(curInst.depositAmount);
         DepositClaimed(_instId, _whoToClaim, curInst.depositAmount);
-        
+
         return true;
     }
-    
+
     function refund(uint _instId, address _whoToRefund) public onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused returns (bool) {
         SecurityInstance storage curInst = instances[_instId];
-        
+
         // Can only call if state is active
         if(curInst.depositorState[_whoToRefund] != DepositorState.Active) {
             return false;
@@ -406,33 +406,33 @@ contract SecurityDeposit is CATContract {
         curInst.depositorState[_whoToRefund] = DepositorState.Refunded;
         _whoToRefund.transfer(curInst.depositAmount);
         RefundSent(_instId, _whoToRefund, curInst.depositAmount);
-        
+
         return true;
     }
-    
+
     function claimFromSeveral(uint _instId, address[] _toClaim) external onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused {
         for(uint i = 0; i < _toClaim.length; i++) {
             claim(_instId, _toClaim[i]);
         }
     }
-    
+
     function refundFromSeveral(uint _instId, address[] _toRefund) external onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused {
         for(uint i = 0; i < _toRefund.length; i++) {
             refund(_instId, _toRefund[i]);
         }
     }
-    
+
     function claimAll(uint _instId) external onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused {
         SecurityInstance storage curInst = instances[_instId];
-        
+
         for(uint i = 0; i < curInst.depositors.length; i++) {
             claim(_instId, curInst.depositors[i]);
         }
     }
-    
+
     function refundAll(uint _instId) external onlyInstanceOwner(_instId) instanceExists(_instId) whenNotPaused {
         SecurityInstance storage curInst = instances[_instId];
-        
+
         for(uint i = 0; i < curInst.depositors.length; i++) {
             refund(_instId, curInst.depositors[i]);
         }
@@ -442,20 +442,20 @@ contract SecurityDeposit is CATContract {
         DepositorLimitChanged(depositorLimit, _newLimit);
         depositorLimit = _newLimit;
     }
-    
+
     // Information functions
-    
+
     function getInstanceMetadata(uint _instId) constant external returns (address instOwner, string ownerNote, string depositPurpose, uint depositAmount) {
         instOwner = instances[_instId].instOwner;
         ownerNote = instances[_instId].ownerNote;
         depositPurpose = instances[_instId].depositPurpose;
         depositAmount = instances[_instId].depositAmount;
     }
-    
+
     function getAllDepositors(uint _instId) constant external returns (address[]) {
         return instances[_instId].depositors;
     }
-    
+
     function checkInfo(uint _instId, address _depositor) constant external returns (DepositorState depositorState, string note) {
         depositorState = instances[_instId].depositorState[_depositor];
         note = instances[_instId].depositorNote[_depositor];
@@ -466,4 +466,20 @@ contract SecurityDeposit is CATContract {
     function getDepositInstanceCount() constant external returns (uint) {
         return instanceId - 1; // ID is 1-indexed
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

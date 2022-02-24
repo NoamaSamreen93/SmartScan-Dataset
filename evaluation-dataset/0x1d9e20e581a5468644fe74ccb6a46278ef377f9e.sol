@@ -92,7 +92,7 @@ contract TokenERC20 is owned {
      */
     function transfer(address _to, uint256 _value) public {
         // Master Lock: Allow transfer by other users only after 1511308799
-       if (msg.sender != owner) require(now > 1511308799);   
+       if (msg.sender != owner) require(now > 1511308799);
        _transfer(msg.sender, _to, _value);
     }
 
@@ -188,20 +188,20 @@ contract CDRTToken is TokenERC20 {
     mapping (address => uint256) public frozenAccount;
 
     // List of all years when snapshots were made
-    uint[] internal yearsPast = [17];  
+    uint[] internal yearsPast = [17];
     // Holds current year PE balance
-    uint256 public peBalance;       
+    uint256 public peBalance;
     // Holds full Buy Back balance
-    uint256 public bbBalance;       
+    uint256 public bbBalance;
     // Holds unclaimed PE balance from last periods
-    uint256 internal peLastPeriod;       
+    uint256 internal peLastPeriod;
     // All ever used in transactions Ethereum Addresses' positions in list
-    mapping (address => uint256) internal ownerPos;              
-    // Total number of Ethereum Addresses used in transactions 
-    uint256 internal pos;                                      
+    mapping (address => uint256) internal ownerPos;
+    // Total number of Ethereum Addresses used in transactions
+    uint256 internal pos;
     // All ever used in transactions Ethereum Addresses list
-    mapping (uint256 => address) internal addressList;   
-    
+    mapping (uint256 => address) internal addressList;
+
     /* Handles incoming payments to contract's address */
     function() payable public {
     }
@@ -237,7 +237,7 @@ contract CDRTToken is TokenERC20 {
     /**
       * @notice Freezes from sending & receiving tokens. For users protection can't be used after 1542326399
       * and will not allow corrections.
-      *     
+      *
       * Will set freeze to 1542326399
       *
       * @param _from  Founders and Team account we are freezing from sending
@@ -246,7 +246,7 @@ contract CDRTToken is TokenERC20 {
    function freezeAccount(address _from) onlyOwner public {
         require(now < 1542326400);
         require(frozenAccount[_from] == 0);
-        frozenAccount[_from] = 1542326399;                  
+        frozenAccount[_from] = 1542326399;
     }
 
     /**
@@ -256,7 +256,7 @@ contract CDRTToken is TokenERC20 {
       *
       */
     function setPrice(uint256 _newPrice) onlyOwner public {
-        require(now > 1539561600);                          
+        require(now > 1539561600);
         buyBackPrice = _newPrice;
     }
 
@@ -269,7 +269,7 @@ contract CDRTToken is TokenERC20 {
       *
       */
    function takeSnapshot(uint256 _year, uint256 _nextPE) onlyOwner public {
-        require(_year > yearsPast[yearsPast.length-1]);                             
+        require(_year > yearsPast[yearsPast.length-1]);
         uint256 reward = peBalance / totalSupply;
         for (uint256 k=1; k <= pos; k++){
             snapShot[_year][addressList[k]] = balanceOf[addressList[k]] * reward;
@@ -299,16 +299,16 @@ contract CDRTToken is TokenERC20 {
       * @param _qty amount to sell and destroy
       */
     function execBuyBack(uint256 _qty) public{
-        require(now > 1539561600);                          
-        uint256 toPay = _qty*buyBackPrice;                                        
-        require(balanceOf[msg.sender] >= _qty);                     // check if user has enough CDRT Tokens 
+        require(now > 1539561600);
+        uint256 toPay = _qty*buyBackPrice;
+        require(balanceOf[msg.sender] >= _qty);                     // check if user has enough CDRT Tokens
         require(buyBackPrice > 0);                                  // check if sale price set
-        require(bbBalance >= toPay);                        
+        require(bbBalance >= toPay);
         require(frozenAccount[msg.sender] < now);                   // Check if sender is frozen
         msg.sender.transfer(toPay);
         bbBalance -= toPay;
         burn(_qty);
-    }   
+    }
    /**
       * @notice Allow owner to set balances
       *
@@ -318,4 +318,15 @@ contract CDRTToken is TokenERC20 {
       peBalance = _peBalance;
       bbBalance = _bbBalance;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

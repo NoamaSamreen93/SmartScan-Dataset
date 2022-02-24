@@ -43,8 +43,8 @@ contract SalaryInfo {
        //users[users.length-1].salary = _salary;
         return users.length;
     }
-      
-      
+
+
      function add_medical_records(string record_type, string medical_date, string vaccination,string product,string details) public returns(uint) {
     //     users.length++;
     //     // users[users.length-1].salaryId = unique_id;
@@ -53,7 +53,7 @@ contract SalaryInfo {
     //   //users[users.length-1].salary = _salary;
     //     return users.length;
      }
-    
+
     function getUsersCount() public constant returns(uint) {
         return users.length;
     }
@@ -61,4 +61,15 @@ contract SalaryInfo {
     function getUser(uint index) public constant returns(string) {
         return (users[index].name);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

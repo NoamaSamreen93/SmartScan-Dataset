@@ -71,7 +71,7 @@ contract ApproveAndCallFallBack {
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     address public ownerAPI;
     address public newOwnerAPI;
 
@@ -187,10 +187,10 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     uint256 public soldSupply;
     uint256 public maxSellable;
     uint8 private teamWOVestingPercentage = 5;
-    
+
     uint256 public minAmountETH;
     uint256 public maxAmountETH;
-    
+
     address public currentRunningAddress;
 
     mapping(address => uint256) balances; //keeps ERC20 balances, in Symbol
@@ -200,17 +200,17 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     mapping(address => uint256) burnedBalances; //keeps ERC20 balances, in Symbol
 
     //event KYCStateUpdate(address indexed addr, bool state);
-    
+
     event MintingFinished(uint indexed moment);
     bool isMintingFinished = false;
-    
+
     event OwnBlockchainLaunched(uint indexed moment);
     event TokensBurned(address indexed exOwner, uint256 indexed amount, uint indexed moment);
     bool isOwnBlockchainLaunched = false;
     uint momentOwnBlockchainLaunched = 0;
-    
+
     uint8 public versionIndex = 1;
-    
+
     address addrUniversity;
     address addrEarlySkills;
     address addrHackathons;
@@ -223,58 +223,58 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     constructor() public {
         maxSupply = 500000000 * (10 ** 18);
         maxSellable = maxSupply * 60 / 100;
-        
+
         currentRunningAddress = address(this);
-        
+
         soldSupply = 0;
-        
+
         startDate = 1535760000;  // September 1st
         bonusEnd20 = 1536969600; // September 15th
         bonusEnd10 = 1538179200; // September 29th
         bonusEnd05 = 1539388800; // October 13th
         endDate = 1542240000;    // November 15th
         tradingDate = 1543536000;// November 30th
-        
+
         minAmountETH = safeDiv(1 ether, 10);
         maxAmountETH = safeMul(1 ether, 5000);
-        
+
         uint256 teamAmount = maxSupply * 150 / 1000;
-        
+
         balances[address(this)] = teamAmount * (100 - teamWOVestingPercentage) / 100; //team with vesting
         emit Transfer(address(0), address(this), balances[address(this)]);
-        
+
         balances[owner] = teamAmount * teamWOVestingPercentage / 100; //team without vesting
         kycAddressState[owner] = true;
         emit Transfer(address(0), owner, balances[owner]);
-        
+
         addrUniversity = 0x7a0De4748E5E0925Bf80989A7951E15a418e4326;
         balances[addrUniversity] =  maxSupply * 50 / 1000; //univ
         kycAddressState[addrUniversity] = true;
         emit Transfer(address(0), addrUniversity, balances[addrUniversity]);
-        
+
         addrEarlySkills = 0xe1e0769b37c1C66889BdFE76eaDfE878f98aa4cd;
         balances[addrEarlySkills] = maxSupply * 50 / 1000; //skills
         kycAddressState[addrEarlySkills] = true;
         emit Transfer(address(0), addrEarlySkills, balances[addrEarlySkills]);
-        
+
         addrHackathons = 0xe9486863859b0facB9C62C46F7e3B70C476bc838;
         balances[addrHackathons] =  maxSupply * 45 / 1000; //hackathons and bug bounties
         kycAddressState[addrHackathons] = true;
         emit Transfer(address(0), addrHackathons, balances[addrHackathons]);
-        
+
         addrLegal = 0xDcdb9787ead2E0D3b12ED0cf8200Bc91F9Aaa045;
         balances[addrLegal] =       maxSupply * 30 / 1000; //legal fees & backup
         kycAddressState[addrLegal] = true;
         emit Transfer(address(0), addrLegal, balances[addrLegal]);
-        
+
         addrMarketing = 0x4f11859330D389F222476afd65096779Eb1aDf25;
         balances[addrMarketing] =   maxSupply * 75 / 1000; //marketing
         kycAddressState[addrMarketing] = true;
         emit Transfer(address(0), addrMarketing, balances[addrMarketing]);
-        
+
         _totalSupply = maxSupply * 40 / 100;
-        
-        
+
+
     }
 
     // ------------------------------------------------------------------------
@@ -286,49 +286,49 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
             msg.sender.transfer(msg.value); //return this transfer, as it is too late.
         } else {
             require(now >= startDate && now <= endDate && isMintingFinished == false);
-            
+
             require(msg.value >= minAmountETH && msg.value <= maxAmountETH);
             require(msg.value + ethDeposits[msg.sender] <= maxAmountETH);
-            
+
             require(kycAddressState[msg.sender] == true);
-            
+
             uint tokens = getAmountToIssue(msg.value);
             require(safeAdd(soldSupply, tokens) <= maxSellable);
-            
+
             soldSupply = safeAdd(soldSupply, tokens);
             _totalSupply = safeAdd(_totalSupply, tokens);
             balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
             ethDeposits[msg.sender] = safeAdd(ethDeposits[msg.sender], msg.value);
             emit Transfer(address(0), msg.sender, tokens);
-            
+
             owner.transfer(msg.value * 15 / 100);   //transfer 15% of the ETH now, the other 85% at the end of the ICO process
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Burns tokens of `msg.sender` and sets them as redeemable on KAASY blokchain
     // ------------------------------------------------------------------------
     function BurnMyTokensAndSetAmountForNewBlockchain() public  {
         require(isOwnBlockchainLaunched);
-        
+
         uint senderBalance = balances[msg.sender];
         burnedBalances[msg.sender] = safeAdd(burnedBalances[msg.sender], senderBalance);
         balances[msg.sender] = 0;
         emit TokensBurned(msg.sender, senderBalance, now);
     }
-    
+
     // ------------------------------------------------------------------------
     // Burns tokens of `exOwner` and sets them as redeemable on KAASY blokchain
     // ------------------------------------------------------------------------
     function BurnTokensAndSetAmountForNewBlockchain(address exOwner) onlyOwnerOrOwnerAPI public {
         require(isOwnBlockchainLaunched);
-        
+
         uint exBalance = balances[exOwner];
         burnedBalances[exOwner] = safeAdd(burnedBalances[exOwner], exBalance);
         balances[exOwner] = 0;
         emit TokensBurned(exOwner, exBalance, now);
     }
-    
+
     // ------------------------------------------------------------------------
     // Enables the burning of tokens to move to the new KAASY blockchain
     // ------------------------------------------------------------------------
@@ -355,10 +355,10 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         }
         return false;
     }
-    
+
     // ------------------------------------------------------------------------
-    // Actually executes the finish of the ICO, 
-    //  no longer minting tokens, 
+    // Actually executes the finish of the ICO,
+    //  no longer minting tokens,
     //  releasing the 85% of ETH kept by contract and
     //  enables trading 2 weeks after this moment
     // ------------------------------------------------------------------------
@@ -380,39 +380,39 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         ret = ret * (uint256)(10) ** (uint256)(decimals);
         if(now < bonusEnd20) {
             ret = euroAmount * 12;          //first week, 20% bonus
-            
+
         } else if(now < bonusEnd10) {
             ret = euroAmount * 11;          //second week, 10% bonus
-            
+
         } else if(now < bonusEnd05) {
             ret = euroAmount * 105 / 10;    //third week, 5% bonus
-            
+
         }
-        
+
         if(euroAmount >= 50000) {
             ret = ret * 13 / 10;
-            
+
         } else if(euroAmount >= 10000) {
             ret = ret * 12 / 10;
         }
-        
+
         return ret;
     }
-    
+
     // ------------------------------------------------------------------------
     // Calculates EUR amount for ethAmount
     // ------------------------------------------------------------------------
     function exchangeEthToEur(uint256 ethAmount) internal view returns(uint256 rate) {
         return safeDiv(safeMul(ethAmount, exchangeRate), 1 ether);
     }
-    
+
     // ------------------------------------------------------------------------
     // Calculates KAAS amount for eurAmount
     // ------------------------------------------------------------------------
     function exchangeEurToEth(uint256 eurAmount) internal view returns(uint256 rate) {
         return safeDiv(safeMul(safeDiv(safeMul(eurAmount, 1000000000000000000), exchangeRate), 1 ether), 1000000000000000000);
     }
-    
+
     // ------------------------------------------------------------------------
     // Calculates and transfers monthly vesting amount to founders, into the balance of `owner` address
     // ------------------------------------------------------------------------
@@ -421,16 +421,16 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         uint monthsSinceLaunch = (now - tradingDate) / 3600 / 24 / 30;
         uint256 totalAmountInVesting = maxSupply * 15 / 100 * (100 - teamWOVestingPercentage) / 100; //15% of total, of which 5% instant and 95% with vesting
         uint256 releaseableUpToToday = (monthsSinceLaunch + 1) * totalAmountInVesting / 24; // 15% of total, across 24 months
-        
+
         //address(this) holds the vestable amount left
         uint256 alreadyReleased = totalAmountInVesting - balances[address(this)];
         uint256 releaseableNow = releaseableUpToToday - alreadyReleased;
         require (releaseableNow > 0);
         transferFrom(address(this), destination, releaseableNow);
-        
+
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Set KYC state for `depositer` to `isAllowed`, by admins
     // ------------------------------------------------------------------------
@@ -439,28 +439,28 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         //emit KYCStateUpdate(depositer, isAllowed);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get an addresses KYC state
     // ------------------------------------------------------------------------
     function getAddressKYCState(address depositer) public view returns (bool) {
         return kycAddressState[depositer];
     }
-    
+
     // ------------------------------------------------------------------------
     // Token name, as seen by the network
     // ------------------------------------------------------------------------
     function name() public view returns (string) {
         return name;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token symbol, as seen by the network
     // ------------------------------------------------------------------------
     function symbol() public view returns (string) {
         return symbol;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token decimals
     // ------------------------------------------------------------------------
@@ -474,7 +474,7 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)]; //address(0) represents burned tokens
     }
-    
+
     // ------------------------------------------------------------------------
     // Circulating supply
     // ------------------------------------------------------------------------
@@ -488,14 +488,14 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the total ETH deposited by `depositer`
     // ------------------------------------------------------------------------
     function depositsOf(address depositer) public constant returns (uint balance) {
         return ethDeposits[depositer];
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the total KAAS burned by `exOwner`
     // ------------------------------------------------------------------------
@@ -527,11 +527,11 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
     // as this should be implemented in user interfaces
-    
+
     // !!! When called, the amount of tokens DESTINATION can retrieve from MSG.SENDER is set to AMOUNT
     // !!! This is used when another account C calls and pays gas for the transfer between A and B, like bank cheques
     // !!! meaning: Allow DESTINATION to transfer a total AMOUNT from ME=callerOfThisFunction, from this point on, ignoring previous allows
-    
+
     // ------------------------------------------------------------------------
     function approve(address destination, uint amount) public returns (bool success) {
         allowed[msg.sender][destination] = amount;
@@ -579,21 +579,21 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         ApproveAndCallFallBack(requester).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out `tokens` amount of accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAllERC20Token(address tokenAddress, uint tokens) public onlyOwnerOrOwnerAPI returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out all accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress) public onlyOwnerOrOwnerAPI returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, ERC20Interface(tokenAddress).balanceOf(this));
     }
-    
+
     // ------------------------------------------------------------------------
     // Set the new ETH-EUR exchange rate, in cents
     // ------------------------------------------------------------------------
@@ -601,26 +601,26 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         exchangeRate = newEthEurRate;
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the current ETH-EUR exchange rate, in cents
     // ------------------------------------------------------------------------
     function getExchangeRate() public view returns (uint256 rate) {
         return exchangeRate;
     }
-    
+
     // ------------------------------------------------------------------------
     // Set the new EndDate
     // ------------------------------------------------------------------------
     function updateEndDate(uint256 newDate) public onlyOwnerOrOwnerAPI returns (bool success) {
         require(!isMintingFinished);
         require(!isOwnBlockchainLaunched);
-        
+
         endDate = newDate;
-        
+
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Set the new Token name, Symbol, Contract address when updating
     // ------------------------------------------------------------------------
@@ -628,8 +628,19 @@ contract KaasyToken is ERC20Interface, Pausable, SafeMath {
         name = newTokenName;
         symbol = newSymbol;
         currentRunningAddress = newContractAddress;
-        
+
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

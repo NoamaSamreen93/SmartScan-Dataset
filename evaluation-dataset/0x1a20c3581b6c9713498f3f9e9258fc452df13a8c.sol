@@ -330,7 +330,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
     goal = _goal;
   }
   // We're overriding the fund forwarding from Crowdsale.
-  // If the goal is reached forward the fund to the wallet, 
+  // If the goal is reached forward the fund to the wallet,
   // otherwise in addition to sending the funds, we want to
   // call the RefundVault deposit function
   function forwardFunds(uint256 weiAmount) internal {
@@ -443,7 +443,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     uint256 public tokenBalance;
     // total token sold
     uint256 public tokenSold;
-    // contributing above {maxGasPrice} results in 
+    // contributing above {maxGasPrice} results in
     // calculating stakes on {maxGasPricePenalty} / 100
     // eg. 80 {maxGasPricePenalty} means 80%, sending 5 ETH with more than 100gwei gas price will be calculated as 4 ETH
     uint256 public maxGasPrice = 100 * 10**9;
@@ -456,12 +456,12 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     uint8 public whitelistDayCount;
     mapping (address => bool) public whitelist;
     mapping (uint8 => uint256) public whitelistDayMaxStake;
-    
+
     // stakes contains contribution stake in wei
     // contributed ETH is calculated on 80% when sending funds with gasprice above maxGasPrice
     mapping (address => uint256) public stakes;
     // addresses of contributors to handle finalization after token sale end (refunds or token claims)
-    address[] public contributorsKeys; 
+    address[] public contributorsKeys;
     // events for token purchase during sale and claiming tokens after sale
     event TokenClaimed(address indexed _claimer, address indexed _beneficiary, uint256 _stake, uint256 _amount);
     event TokenPurchase(address indexed _purchaser, address indexed _beneficiary, uint256 _value, uint256 _stake, uint256 _amount, uint256 _participants, uint256 _weiRaised);
@@ -481,7 +481,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     /// @param _minContribution The minimum contribution per transaction in wei (0.1 ETH)
     /// @param _rate Number of HEAL tokens per 1 ETH
     /// @param _goal Minimum funding in wei, below that EVERYONE gets back ALL their
-    ///  contributions regardless of maxGasPrice penalty. 
+    ///  contributions regardless of maxGasPrice penalty.
     ///  Eg. someone contributes with 5 ETH, but gets only 4 ETH stakes because
     ///  sending funds with gasprice over 100Gwei, he will still get back >>5 ETH<<
     ///  in case of unsuccessful token sale
@@ -489,21 +489,21 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     /// @param _softCapTime Seconds until the sale remains open after reaching _softCap
     /// @param _cap Maximum cap in wei, we can't raise more funds
     /// @param _gasPrice Maximum gas price
-    /// @param _gasPenalty Penalty in percentage points for calculating stakes, eg. 80 means calculating 
+    /// @param _gasPenalty Penalty in percentage points for calculating stakes, eg. 80 means calculating
     ///  stakes on 80% if gasprice was higher than _gasPrice
     /// @param _wallet Address of multisig wallet, which will get all the funds after successful sale
     function EthealPreSale(
         address _ethealController,
-        uint256 _startTime, 
-        uint256 _endTime, 
-        uint256 _minContribution, 
-        uint256 _rate, 
-        uint256 _goal, 
-        uint256 _softCap, 
-        uint256 _softCapTime, 
-        uint256 _cap, 
-        uint256 _gasPrice, 
-        uint256 _gasPenalty, 
+        uint256 _startTime,
+        uint256 _endTime,
+        uint256 _minContribution,
+        uint256 _rate,
+        uint256 _goal,
+        uint256 _softCap,
+        uint256 _softCapTime,
+        uint256 _cap,
+        uint256 _gasPrice,
+        uint256 _gasPenalty,
         address _wallet
     )
         CappedCrowdsale(_cap)
@@ -526,7 +526,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         maxGasPricePenalty = _gasPenalty;
         minContribution = _minContribution;
     }
-    /// @dev Overriding Crowdsale#buyTokens to add partial refund and softcap logic 
+    /// @dev Overriding Crowdsale#buyTokens to add partial refund and softcap logic
     /// @param _beneficiary Beneficiary of the token purchase
     function buyTokens(address _beneficiary) public payable whenNotPaused {
         require(_beneficiary != address(0));
@@ -590,7 +590,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         // if token sale was successful send back excess funds
         if (goalReached()) {
             // saving token balance for future reference
-            tokenSold = tokenBalance; 
+            tokenSold = tokenBalance;
             // send back the excess token to ethealController
             if (_balance > tokenBalance) {
                 ethealController.ethealToken().transfer(ethealController.SALE(), _balance.sub(tokenBalance));
@@ -611,7 +611,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         _;
     }
     /// @notice Sets whitelist
-    /// @dev The length of _whitelistLimits says that the first X days of token sale is 
+    /// @dev The length of _whitelistLimits says that the first X days of token sale is
     ///  closed, meaning only for whitelisted addresses.
     /// @param _add Array of addresses to add to whitelisted ethereum accounts
     /// @param _remove Array of addresses to remove to whitelisted ethereum accounts
@@ -636,7 +636,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         // adding whitelist addresses
         for (i = 0; i < _add.length; i++) {
             require(_add[i] != address(0));
-            
+
             if (!whitelist[_add[i]]) {
                 whitelist[_add[i]] = true;
                 WhitelistAddressAdded(msg.sender, _add[i]);
@@ -645,7 +645,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         // removing whitelist addresses
         for (i = 0; i < _remove.length; i++) {
             require(_remove[i] != address(0));
-            
+
             if (whitelist[_remove[i]]) {
                 whitelist[_remove[i]] = false;
                 WhitelistAddressRemoved(msg.sender, _remove[i]);
@@ -691,7 +691,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     }
     /// @notice Modifier for cases where sale is closed and was successful.
     /// @dev It checks whether
-    ///  the sale has ended 
+    ///  the sale has ended
     ///  and we have reached our goal
     ///  AND whether the contract is finalized
     modifier afterSaleSuccess() {
@@ -703,7 +703,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
         require(isFinalized);
         _;
     }
-    
+
     /// @notice Refund an ethereum address
     /// @param _beneficiary Address we want to refund
     function claimRefundFor(address _beneficiary) public afterSaleFail whenNotPaused {
@@ -794,7 +794,7 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     }
     /// @notice For a give date how many 24 hour blocks have ellapsed since token sale start
     /// @dev _time has to be bigger than the startTime of token sale, otherwise SafeMath's div will throw.
-    ///  Within 24 hours of token sale it will return 1, 
+    ///  Within 24 hours of token sale it will return 1,
     ///  between 24 and 48 hours it will return 2, etc.
     /// @param _time Date in seconds for which we want to know which sale day it is
     /// @return Number of 24 hour blocks ellapsing since token sale start starting from 1
@@ -864,10 +864,21 @@ contract EthealPreSale is Pausable, CappedCrowdsale, RefundableCrowdsale {
     function getHealBalance() view public returns (uint256) {
         return ethealController.ethealToken().balanceOf(address(this));
     }
-    
-    
+
+
     /// @notice Get current date for web3
     function getNow() view public returns (uint256) {
         return now;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

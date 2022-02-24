@@ -10,19 +10,19 @@ contract Play2LivePromo {
     string public constant name  = "Level Up Coin Diamond | play2live.io";
     string public constant symbol = "LUCD";
     uint8 public constant decimals = 18;
-    uint public totalSupply = 0; 
+    uint public totalSupply = 0;
     uint256 promoValue = 777 * 1e18;
     mapping(address => uint) balances;
     mapping(address => mapping (address => uint)) allowed;
     // Events Log
-    event Transfer(address _from, address _to, uint256 amount); 
+    event Transfer(address _from, address _to, uint256 amount);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     // Modifiers
     // Allows execution by the contract owner only
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
-    }  
+    }
 
    /**
     *   @dev Contract constructor function sets owner address
@@ -33,7 +33,7 @@ contract Play2LivePromo {
 
     /**
     *   @dev Allows owner to change promo value
-    *   @param _newValue      new   
+    *   @param _newValue      new
     */
     function setPromo(uint256 _newValue) external onlyOwner {
         promoValue = _newValue;
@@ -57,7 +57,7 @@ contract Play2LivePromo {
         balances[_investor] +=  promoValue;
         totalSupply += promoValue;
         Transfer(0x0, _investor, promoValue);
-        
+
     }
 
 
@@ -128,4 +128,15 @@ contract Play2LivePromo {
     function allowance(address _owner, address _spender) constant returns (uint) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

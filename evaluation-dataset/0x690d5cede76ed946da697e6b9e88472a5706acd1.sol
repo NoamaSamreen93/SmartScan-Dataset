@@ -77,7 +77,7 @@ contract EIP20Interface {
     function approve(address _spender, uint256 _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -88,7 +88,7 @@ contract GTBC is Owned, SafeMath, Pausable, EIP20Interface {
     uint8 public decimals;
 
     uint8 public version = 1;
-    
+
     mapping (address => uint256) public balances;
     mapping (address => uint256) public frozen;
     mapping (address => mapping (address => uint256)) public allowed;
@@ -113,7 +113,7 @@ contract GTBC is Owned, SafeMath, Pausable, EIP20Interface {
         emit Freeze(_addr, _value);
         return true;
     }
-    
+
     function unfreeze(address _addr, uint256 _value) public onlyOwner returns (bool success) {
         require(frozen[_addr] >= _value);
         require(_value > 0);
@@ -126,7 +126,7 @@ contract GTBC is Owned, SafeMath, Pausable, EIP20Interface {
     function frozenOf(address _owner) public view returns (uint256 balance) {
         return frozen[_owner];
     }
-    
+
     // erc20 part
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
@@ -161,5 +161,21 @@ contract GTBC is Owned, SafeMath, Pausable, EIP20Interface {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    } 
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

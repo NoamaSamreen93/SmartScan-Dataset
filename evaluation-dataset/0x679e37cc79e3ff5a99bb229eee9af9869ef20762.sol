@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 // ----------------------------------------------------------------------------
-//   _   _   _   _   _   _   _   _   _   _   _   _   _  
-//  / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ 
+//   _   _   _   _   _   _   _   _   _   _   _   _   _
+//  / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \
 // ( G | A | M | E | I | N | V | E | S | T | - | I | O )
-//  \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ 
+//  \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/
 //
 // ----------------------------------------------------------------------------
 contract SafeMath {
@@ -86,9 +86,9 @@ contract GameInvestToken is ERC20Interface, Owned, SafeMath {
         name = "GAMEINVEST.IO";
         decimals = 18;
         _totalSupply = (980000000) * (10 **18);
-        
+
         owner = msg.sender;
-        
+
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
@@ -194,6 +194,22 @@ contract GameInvestToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
 
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

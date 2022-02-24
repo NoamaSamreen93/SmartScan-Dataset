@@ -46,8 +46,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 contract VID is EIP20Interface {
@@ -110,5 +110,11 @@ contract VID is EIP20Interface {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

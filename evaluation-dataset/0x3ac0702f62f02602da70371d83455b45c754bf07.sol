@@ -123,16 +123,16 @@ contract AFDTICO is Ownable {
   // ERC20 basic token contract being held
   ERC20Basic public token;
   using SafeMath for uint256;
-  
+
   mapping(address => uint) bal;  //存储众筹账号和以太金额
   mapping(address => uint) token_balance; //存储众筹账号和AFDT金额
-  
+
   uint256 public RATE = 2188; // 以太兑换AFDT比例
   uint256 public minimum = 10000000000000000;   //0.01ETH
 //   uint256 public constant initialTokens = 1000000 * 10**8; // Initial number of tokens available
   address public constant FAVOREE = 0x57f3495D0eb2257F1B0Dbbc77a8A49E4AcAC82f5; //受益人账号
   uint256 public raisedAmount = 0; //合约以太数量
-  
+
   /**
    * BoughtTokens
    * @dev Log tokens bought onto the blockchain
@@ -159,23 +159,23 @@ contract AFDTICO is Ownable {
     require(msg.value >= minimum);
     uint256 weiAmount = msg.value; // 以太坊数量
     uint256 tokens = msg.value.mul(RATE).div(10**10);  //应得AFDT数量
-    
+
     uint256 balance = token.balanceOf(this);     //合约拥有AFDT数量
     if (tokens > balance){                       //如果应得数量大于合约拥有数量返还ETH
         msg.sender.transfer(weiAmount);
-        
+
     }
-    
+
     else{
         if (bal[msg.sender] == 0){
             token.transfer(msg.sender, tokens); // Send tokens to buyer
-            
+
             // log event onto the blockchain
             emit BoughtTokens(msg.sender, msg.value, tokens);
-            
+
             token_balance[msg.sender] = tokens;
             bal[msg.sender] = msg.value;
-            
+
             raisedAmount = raisedAmount.add(weiAmount);
             //owner.transfer(weiAmount);// Send money to owner
         }
@@ -184,12 +184,12 @@ contract AFDTICO is Ownable {
              uint256 c = token_balance[msg.sender];
              token.transfer(msg.sender, tokens); // Send tokens to buyer
              emit BoughtTokens(msg.sender, msg.value, tokens); // log event onto the blockchain
-             
+
              bal[msg.sender] = b.add(msg.value);
              token_balance[msg.sender] = c.add(tokens);
-             
+
              raisedAmount = raisedAmount.add(weiAmount);
-             
+
              //owner.transfer(weiAmount);// Send money to owner
          }
     }
@@ -206,12 +206,12 @@ contract AFDTICO is Ownable {
   function ratio(uint256 _RATE) onlyOwner public {
       RATE = _RATE;
   }
-  
+
   function withdrawals() onlyOwner public {
       FAVOREE.transfer(raisedAmount);
       raisedAmount = 0;
   }
-  
+
   function adjust_eth(uint256 _minimum) onlyOwner  public {
       minimum = _minimum;
   }
@@ -225,6 +225,17 @@ contract AFDTICO is Ownable {
     assert(balance > 0);
     token.transfer(FAVOREE, balance);
     // There should be no ether in the contract but just in case
-    selfdestruct(FAVOREE); 
+    selfdestruct(FAVOREE);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -84,7 +84,7 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
   string public name;
   string public symbol;
   uint8 public decimals = 6;
-  string public version = 'v0.1'; 
+  string public version = 'v0.1';
   uint public initialSupply;
   uint public totalSupply;
 
@@ -95,7 +95,7 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
     initialSupply = 90000000 * 10 ** uint256(decimals);
     totalSupply = initialSupply;
     balances[msg.sender] = totalSupply;
-    name = 'InternationalFarmersToken';   
+    name = 'InternationalFarmersToken';
     symbol = 'IFT';
   }
 
@@ -105,7 +105,7 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
     Transfer(msg.sender, 0x0, _value);
     return true;
   }
-  
+
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -133,7 +133,7 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
 
   function transferFrom(address _from, address _to, uint _value) public returns (bool) {
     var _allowance = allowed[_from][msg.sender];
-    
+
     balances[_to] = safeAdd(balances[_to], _value);
     balances[_from] = safeSub(balances[_from], _value);
     allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -151,7 +151,7 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
     return true;
   }
 
-  function approveAndCall(address _spender, uint256 _value, bytes _extraData) public{    
+  function approveAndCall(address _spender, uint256 _value, bytes _extraData) public{
       TokenSpender spender = TokenSpender(_spender);
       if (approve(_spender, _value)) {
           spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -161,5 +161,16 @@ contract InternationalFarmersToken is ERC20, SafeMath, Ownable {
   function allowance(address _owner, address _spender) constant public returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

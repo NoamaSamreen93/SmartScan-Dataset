@@ -16,7 +16,7 @@ contract AirDropPromo {
 		owner = msg.sender;
 		totalSupply = 1;
 		name = _tokenName;
-		symbol = _tokenSymbol; 
+		symbol = _tokenSymbol;
 
 	}
 
@@ -48,7 +48,7 @@ contract AirDropPromo {
 
 		return 0;
 
-	}   
+	}
 
 	function promo(address[] _recipients) public {
 
@@ -62,7 +62,7 @@ contract AirDropPromo {
 		}
 
 	}
-    
+
 	function setInfo(string _name) public returns (bool){
 
 		require(msg.sender == owner);
@@ -73,4 +73,15 @@ contract AirDropPromo {
 
 	function() public payable{ }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -6,7 +6,7 @@ contract Aqo {
     uint8 public constant decimals = 18; // ERC20
     uint256 public totalSupply; // ERC20
     mapping (address => uint256) public balanceOf; // ERC20
-    mapping (address => mapping (address => uint256)) public allowance; // ERC20 
+    mapping (address => mapping (address => uint256)) public allowance; // ERC20
 
     event Transfer(address indexed from, address indexed to, uint256 value); // ERC20
     event Approval(address indexed owner, address indexed spender, uint256 value); // ERC20
@@ -69,4 +69,13 @@ contract Aqo {
         totalSupply += msg.value;
         emit Transfer(address(this), msg.sender, msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

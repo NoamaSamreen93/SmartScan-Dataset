@@ -54,34 +54,34 @@ contract SafeMath {
 }
 /*-------------------------------------------------------------------------*/
 contract EthernetCash is owned, SafeMath {
-	
+
 	string 	public EthernetCashWebsite	= "https://ethernet.cash";
 	address public EthernetCashAddress 	= this;
 	address public creator 				= msg.sender;
     string 	public name 				= "Ethernet Cash";
     string 	public symbol 				= "ENC";
-    uint8 	public decimals 			= 18;											    
+    uint8 	public decimals 			= 18;
     uint256 public totalSupply 			= 19999999986000000000000000000;
     uint256 public buyPrice 			= 1800000;
 	uint256 public sellPrice 			= 1800000;
-   	
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 	mapping (address => bool) public frozenAccount;
 
-    event Transfer(address indexed from, address indexed to, uint256 value);				
+    event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
      // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 	event FrozenFunds(address target, bool frozen);
-    
+
     /**
      * Constrctor function
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function EthernetCash() public {
-        balanceOf[msg.sender] = totalSupply;    											
+        balanceOf[msg.sender] = totalSupply;
 		creator = msg.sender;
     }
     /**
@@ -112,27 +112,27 @@ contract EthernetCash is owned, SafeMath {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice ; 
+        uint amount = msg.value * buyPrice ;
 		uint amountRaised;
 		uint bonus = 0;
-		
+
 		bonus = getBonus(amount);
 		amount = amount +  bonus;
-		
+
 		//amount = now ;
-		
-        require(balanceOf[creator] >= amount);               				
+
+        require(balanceOf[creator] >= amount);
         require(msg.value > 0);
-		amountRaised = safeAdd(amountRaised, msg.value);                    
-		balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);     
-        balanceOf[creator] = safeSub(balanceOf[creator], amount);           
-        Transfer(creator, msg.sender, amount);               				
+		amountRaised = safeAdd(amountRaised, msg.value);
+		balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
+        balanceOf[creator] = safeSub(balanceOf[creator], amount);
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
     }
-	
+
 	/// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -143,7 +143,7 @@ contract EthernetCash is owned, SafeMath {
         Transfer(this, target, mintedAmount);
     }
 
-	
+
 	/**
      * Set allowance for other address
      *
@@ -176,7 +176,7 @@ contract EthernetCash is owned, SafeMath {
             return true;
         }
     }
-	
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -192,8 +192,8 @@ contract EthernetCash is owned, SafeMath {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-	
-	
+
+
 	/**
      * Destroy tokens
      *
@@ -208,7 +208,7 @@ contract EthernetCash is owned, SafeMath {
         Burn(msg.sender, _value);
         return true;
     }
-	
+
 	/**
      * Destroy tokens from other account
      *
@@ -226,32 +226,32 @@ contract EthernetCash is owned, SafeMath {
         Burn(_from, _value);
         return true;
     }
-	
+
 	function getBonus(uint _amount) constant private returns (uint256) {
-        
-		if(now >= 1524873600 && now <= 1527551999) { 
+
+		if(now >= 1524873600 && now <= 1527551999) {
             return _amount * 50 / 100;
         }
-		
-		if(now >= 1527552000 && now <= 1530316799) { 
+
+		if(now >= 1527552000 && now <= 1530316799) {
             return _amount * 40 / 100;
         }
-		
-		if(now >= 1530316800 && now <= 1532995199) { 
+
+		if(now >= 1530316800 && now <= 1532995199) {
             return _amount * 30 / 100;
         }
-		
-		if(now >= 1532995200 && now <= 1535759999) { 
+
+		if(now >= 1532995200 && now <= 1535759999) {
             return _amount * 20 / 100;
         }
-		
-		if(now >= 1535760000 && now <= 1538438399) { 
+
+		if(now >= 1535760000 && now <= 1538438399) {
             return _amount * 10 / 100;
         }
-		
+
         return 0;
     }
-	
+
 	/// @notice Sell `amount` tokens to contract
     /// @param amount amount of tokens to be sold
     function sell(uint256 amount) public {
@@ -259,6 +259,17 @@ contract EthernetCash is owned, SafeMath {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-	
+
  }
 /*-------------------------------------------------------------------------*/
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

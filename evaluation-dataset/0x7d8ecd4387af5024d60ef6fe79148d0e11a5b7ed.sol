@@ -143,7 +143,7 @@ contract PublicMxResolver {
     function name(bytes32 node) constant returns (string ret) {
         ret = records[node].name;
     }
-    
+
     /**
      * Sets the name associated with an ENS node, for reverse records.
      * May only be called by the owner of that node in the ENS registry.
@@ -185,11 +185,11 @@ contract PublicMxResolver {
     function setABI(bytes32 node, uint256 contentType, bytes data) only_owner(node) {
         // Content types must be powers of 2
         if (((contentType - 1) & contentType) != 0) throw;
-        
+
         records[node].abis[contentType] = data;
         ABIChanged(node, contentType);
     }
-    
+
     /**
      * Returns the SECP256k1 public key associated with an ENS node.
      * Defined in EIP 619.
@@ -199,7 +199,7 @@ contract PublicMxResolver {
     function pubkey(bytes32 node) constant returns (bytes32 x, bytes32 y) {
         return (records[node].pubkey.x, records[node].pubkey.y);
     }
-    
+
     /**
      * Sets the SECP256k1 public key associated with an ENS node.
      * @param node The ENS node to query
@@ -252,4 +252,15 @@ contract PublicMxResolver {
         records[node].mx = mx;
         MxRecordChanged(node, mx);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -174,7 +174,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
     mapping (address => uint256) balances; //A mapping of all balances per address
     mapping (address => mapping (address => uint256)) allowed; //A mapping of all allowances
     uint256 public totalSupply;
-    
+
     /**
     * @notice Get the balance of an _owner address.
     * @param _owner The address to be query.
@@ -191,7 +191,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
     */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0)); //If you dont want that people destroy token
-        
+
         if(_to == address(this)){
         	burnToken(msg.sender, _value);
         	sell(msg.sender,_value);
@@ -365,7 +365,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 	function changeBuyFlag(bool _flag) public onlyAdmin {
 		buyFlag = _flag;
 	}
-	
+
 	function updateRate(uint256 _rate) public onlyAdmin {
 	    rate = _rate;
 	}
@@ -397,7 +397,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 	            _amount = converter.getReturn(_fromToken, toToken, _amount);
 	            _fromToken = toToken;
 	        }
-	        
+
 	        sumUp += _amount;
         }
 
@@ -421,13 +421,13 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 				tokenBuy = msg.value.mul(tempRate); // Eth * Tok / Eth = Tok
 
 			} else {
-				
+
 				uint256 tempPrice = valueStored.div(totalSupply); // Must be > 0 Eth/Tok
 				tokenBuy = msg.value.div(tempPrice); // Eth / Eth / Tok = Tok
 
 			}
 		}
-		
+
 
 		uint256 ethFee = msg.value.mul(5)/1000; //5/1000 => 0.5%
 		uint256 ethToInvest = msg.value.sub(ethFee);
@@ -442,7 +442,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 	function invest(uint256 _amount) private {
 		uint256 standarValue = _amount.div(8);
 
-		for(uint8 i=0; i<8; i++){ 
+		for(uint8 i=0; i<8; i++){
 			Bancor.convertForPrioritized.value(standarValue)(paths[i],standarValue,1,address(this),0,0,0,0x0,0x0);
 		}
 
@@ -455,13 +455,13 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 		uint256 dividedSupply = totalSupply.div(1e5); //ethereum is not decimals friendly
 
 		if(dividedSupply == 0 || _amount < dividedSupply) revert();
-		
+
 		uint256 factor = _amount.div(dividedSupply);
 
 		if( factor == 0) revert();
 
-		for(uint8 i=0; i<8; i++){ 
-	
+		for(uint8 i=0; i<8; i++){
+
 			tempToken = reversePaths[i][0];
 			tempBalance = tempToken.balanceOf(this);
 			tempBalance = tempBalance.mul(factor);
@@ -474,14 +474,14 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 
 		}
 	}
-	
+
 	function emergency() onlyAdmin public{
 	    uint256 tempBalance;
 		uint256 tempFee;
 		IERC20Token tempToken;
 	    msg.sender.transfer(address(this).balance);
-	    for(uint8 i=0; i<8; i++){ 
-	
+	    for(uint8 i=0; i<8; i++){
+
 			tempToken = reversePaths[i][0];
 			tempBalance = tempToken.balanceOf(this);
 			tempBalance = tempBalance.sub(tempFee);
@@ -489,7 +489,7 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 
 		}
 	}
-	
+
     function claimTokens(IERC20Token _address, address _to) onlyAdmin public  {
         require(_to != address(0));
         uint256 remainder = _address.balanceOf(this); //Check remainder tokens
@@ -500,4 +500,15 @@ contract MEGA is admined,IERC20Token { //Standar definition of an ERC20Token
 		buy();
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

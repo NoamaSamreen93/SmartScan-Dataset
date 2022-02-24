@@ -33,10 +33,10 @@ contract TokenERC20 {
     event Burn(address indexed from, uint256 value);
 
     constructor () public {
-        totalSupply = 100000000000000000000000000;  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "SensusNetwork";                                 
-        symbol = "SENX";                             
+        totalSupply = 100000000000000000000000000;
+        balanceOf[msg.sender] = totalSupply;
+        name = "SensusNetwork";
+        symbol = "SENX";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -81,11 +81,22 @@ contract TokenERC20 {
 contract SensusNetwork is owned, TokenERC20 {
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);              
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value >= balanceOf[_to]);
-        balanceOf[_from] -= _value;                       
-        balanceOf[_to] += _value;                         
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

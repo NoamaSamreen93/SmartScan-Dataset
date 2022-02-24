@@ -16,7 +16,7 @@ contract UserAuth {
         require(msg.sender == owner, "permission-denied");
         _;
     }
-    
+
     /**
      * @dev sets new owner
      * @param _owner is the new owner of this proxy contract
@@ -50,11 +50,11 @@ contract UserNote {
             bar := calldataload(36)
         }
         emit LogNote(
-            msg.sig, 
-            msg.sender, 
-            foo, 
-            bar, 
-            msg.value, 
+            msg.sig,
+            msg.sender,
+            foo,
+            bar,
+            msg.value,
             msg.data
         );
         _;
@@ -83,7 +83,7 @@ contract UserWallet is UserAuth, UserNote {
      * @param _target logic proxy address
      * @param _data delegate call data
      */
-    function execute(address _target, bytes memory _data) 
+    function execute(address _target, bytes memory _data)
         public
         payable
         note
@@ -92,7 +92,7 @@ contract UserWallet is UserAuth, UserNote {
     {
         require(_target != address(0), "invalid-logic-proxy-address");
         emit LogExecute(_target);
-        
+
         // call contract in current context
         assembly {
             let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 0)
@@ -118,7 +118,7 @@ contract UserWallet is UserAuth, UserNote {
  * @title User Wallet Registry
  */
 contract WalletRegistry {
-    
+
     event Created(address indexed sender, address indexed owner, address proxy);
     mapping(address => UserWallet) public proxies;
 
@@ -134,4 +134,13 @@ contract WalletRegistry {
         proxies[msg.sender] = proxy;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

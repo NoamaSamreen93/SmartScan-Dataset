@@ -3,7 +3,7 @@ pragma solidity ^0.5.4;
 // ----------------------------------------------------------------------------
 // 'RNBW' token contract
 //
-// Deployed to : 
+// Deployed to :
 // Symbol      : RNBW
 // Name        : RNBW Token
 // Description : Virtual Geospatial Networking Asset
@@ -18,7 +18,7 @@ contract SafeMath {
     function safeAdd(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
         require(c >= a);
-        
+
     }
     function safeSub(uint a, uint b) internal pure returns (uint c) {
         require(b <= a);
@@ -99,11 +99,11 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     string public symbol;
     string public name;
     string public description;
-    uint8 public decimals;    
+    uint8 public decimals;
     uint private _startDate;
     uint private _bonusEnds;
     uint private _endDate;
-    
+
     uint256 private _internalCap;
     uint256 private _softCap;
     uint256 private _totalSupply;
@@ -118,19 +118,19 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     constructor(
         address payable minter) public {
-        
+
         name   = "RNBW Token";
         description = "Virtual Geospatial Networking Asset";
         symbol = "RNBW";
         decimals = 18;
         _internalCap = 25000000 * 1000000000000000000;
         _softCap     = _internalCap * 2;
-        
+
         _bonusEnds = now + 3 days;
         _endDate = now + 1 weeks;
-            
+
         _owner = minter;
-        _balances[_owner] = _internalCap;  
+        _balances[_owner] = _internalCap;
         _totalSupply = _internalCap;
         emit Transfer(address(0), _owner, _internalCap);
     }
@@ -156,7 +156,7 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
-    
+
     function isFreezed(address tokenOwner) public view returns (bool freezed) {
         return _freezeState[tokenOwner];
     }
@@ -169,13 +169,13 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     function transfer(address to, uint256 tokens) public IcoSuccessful returns (bool success) {
         require(_freezeState[msg.sender] == false);
-        
+
         _balances[msg.sender] = safeSub(_balances[msg.sender], tokens);
         _balances[to] = safeAdd(_balances[to], tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
@@ -204,7 +204,7 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public IcoSuccessful returns (bool success) {
         require( _freezeState[from] == false && _freezeState[to] == false);
-        
+
         _balances[from] = safeSub(_balances[from], tokens);
         _allowed[from][msg.sender] = safeSub(_allowed[from][msg.sender], tokens);
         _balances[to] = safeAdd(_balances[to], tokens);
@@ -239,26 +239,26 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     // 1 RNBW Tokens per 1 Wei
     // ------------------------------------------------------------------------
     function buy() public payable {
-    
+
         require(msg.value >= 1 finney);
         require(now >= _startDate && now <= _endDate);
 
         uint256 weiValue = msg.value;
         uint256 tokens = 0;
-        
+
         if (now <= _bonusEnds) {
             tokens = safeMul(weiValue, 2);
         } else {
             tokens = safeMul(weiValue, 1);
         }
-        
+
         _freezeState[msg.sender] = true;
         _balances[msg.sender] = safeAdd(_balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
         emit Transfer(address(0), msg.sender, tokens);
         _owner.transfer(address(this).balance);
     }
-    
+
     function () payable external {
         buy();
     }
@@ -271,7 +271,7 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
         emit Transfer(burner, address(0), tokens);
         return true;
     }
-    
+
     function burnFrom(address account, uint256 tokens) public onlyOwner returns (bool success) {
         require(_balances[account] >= tokens);   // Check if the sender has enough
         address burner = account;
@@ -280,19 +280,19 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
         emit Transfer(burner, address(0), tokens);
         return true;
     }
-    
+
     function freeze(address account) public onlyOwner returns (bool success) {
         require(account != _owner && account != address(0));
         _freezeState[account] = true;
         return true;
     }
-    
+
     function unfreeze(address account) public onlyOwner returns (bool success) {
         require(account != _owner && account != address(0));
         _freezeState[account] = false;
         return true;
     }
-    
+
     function mint(uint256 tokens) public onlyOwner returns (bool success)
     {
         require(now >= _startDate && now <= _endDate);
@@ -308,4 +308,15 @@ contract RNBW is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(_owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

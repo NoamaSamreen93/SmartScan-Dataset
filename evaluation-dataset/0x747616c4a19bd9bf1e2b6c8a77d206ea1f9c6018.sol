@@ -34,7 +34,7 @@ contract CityToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name, uint256 parentId);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including create event.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -141,7 +141,7 @@ contract CityToken is ERC721 {
     if (tokenOwner == address(0)) {
       tokenOwner = cooAddress;
     }
-    
+
     if (_price <= 0) {
       _price = startingPrice;
     }
@@ -196,10 +196,10 @@ contract CityToken is ERC721 {
   function withdrawFunds(address _to, uint256 amount) public onlyCLevel {
     _withdrawFunds(_to, amount);
   }
-  
+
   // Allows someone to send ether and obtain the token
   function purchase(uint256 _tokenId) public payable {
-    
+
     // Token IDs above 999 are for countries
     if (_tokenId > 999) {
       _purchaseCountry(_tokenId);
@@ -361,12 +361,12 @@ contract CityToken is ERC721 {
 
       // Send 2% dividends to owner of parent
       ownerOfParent.transfer(paymentToOwnerOfParent);
-      
+
     } else {
 
       // If no parent owner then update payment to previous owner to include paymentToOwnerOfParent
       payment = SafeMath.add(payment, paymentToOwnerOfParent);
-     
+
     }
 
     // Get amount over purchase price they paid so that we can send it back to them
@@ -375,14 +375,14 @@ contract CityToken is ERC721 {
     // Update price so that when 8% is taken out (dev fee + Country dividend) ...
     // ... the owner gets 20% over their investment
     tokenIndexToPrice[_tokenId] = SafeMath.div(SafeMath.mul(sellingPrice, 120), 92);
-    
+
     _transfer(oldOwner, msg.sender, _tokenId);
 
     // Pay previous tokenOwner if owner is not contract
     if (oldOwner != address(this)) {
       oldOwner.transfer(payment);
     }
-    
+
     TokenSold(_tokenId, sellingPrice, tokenIndexToPrice[_tokenId], oldOwner, msg.sender, tokenIndexToToken[_tokenId].name, parentId);
 
     msg.sender.transfer(purchaseExcess);
@@ -404,7 +404,7 @@ contract CityToken is ERC721 {
     require(msg.value >= sellingPrice);
 
     // Payment to previous owner should be 96% of sellingPrice
-    // The other 4% is the dev fee (stays in contract) 
+    // The other 4% is the dev fee (stays in contract)
     // Formula: sellingPrice * 96 / 10
     // Same as: sellingPrice * .96 / 1
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 96), 100));
@@ -415,14 +415,14 @@ contract CityToken is ERC721 {
     // Update price so that when 4% is taken out (dev fee) ...
     // ... the owner gets 15% over their investment
     tokenIndexToPrice[_tokenId] = SafeMath.div(SafeMath.mul(sellingPrice, 115), 96);
-    
+
     _transfer(oldOwner, msg.sender, _tokenId);
 
     // Pay previous tokenOwner if owner is not contract
     if (oldOwner != address(this)) {
       oldOwner.transfer(payment);
     }
-    
+
     TokenSold(_tokenId, sellingPrice, tokenIndexToPrice[_tokenId], oldOwner, msg.sender, tokenIndexToToken[_tokenId].name, 0);
 
     msg.sender.transfer(purchaseExcess);
@@ -442,7 +442,7 @@ contract CityToken is ERC721 {
 
   /// For creating City
   function _createToken(uint256 _tokenId, string _name, uint256 _parentId, address _owner, uint256 _price) private {
-    
+
     Token memory _token = Token({
       name: _name,
       parentId: _parentId
@@ -457,7 +457,7 @@ contract CityToken is ERC721 {
 
     // NOTE: Now that we don't autoincrement tokenId should we ...
     // ... check to make sure passed _tokenId arg doesn't already exist?
-    
+
     // It's probably never going to happen, 4 billion tokens are A LOT, but
     // let's just be 100% sure we never let this happen.
     require(newTokenId == uint256(uint32(newTokenId)));
@@ -553,4 +553,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

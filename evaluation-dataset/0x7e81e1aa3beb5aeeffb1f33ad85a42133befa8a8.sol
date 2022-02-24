@@ -210,7 +210,7 @@ contract ABChainTestToken1 is StandardToken {
   uint256 public burnedCount = 0;
 
   event Burn(address indexed burner, uint256 value);
-  
+
   function ABChainTestToken1() {
       burnedCount = 0;
       totalSupply = INITIAL_SUPPLY;
@@ -232,4 +232,15 @@ contract ABChainTestToken1 is StandardToken {
     burnedCount = burnedCount.add(_value);
     Burn(burner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

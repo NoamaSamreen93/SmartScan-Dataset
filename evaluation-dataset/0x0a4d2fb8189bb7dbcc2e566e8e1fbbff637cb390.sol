@@ -1,7 +1,7 @@
 pragma solidity ^0.4.9;
 
 contract Token {
-  
+
   /// @param _owner The address from which the balance will be retrieved
   /// @return The balance
   function balanceOf(address _owner) constant returns (uint256 balance) {}
@@ -45,7 +45,7 @@ contract BMT is Token {
     mapping (address => mapping (address => uint256)) allowed;
 
     uint256 public totalSupply;
-  
+
     mapping(address => uint256) freezeAccount;
 
     address public minter;
@@ -105,4 +105,15 @@ contract BMT is Token {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

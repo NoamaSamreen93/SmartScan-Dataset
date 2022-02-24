@@ -74,3 +74,11 @@ contract CustomToken is BaseToken, BurnToken {
         Transfer(address(0), 0x4debd47d7185ba8d6e96388db61c528baa866fcc, totalSupply);
     }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

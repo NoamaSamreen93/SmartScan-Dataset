@@ -74,14 +74,14 @@ contract Verify_U42 {
 	//for each balance address, map allowed addresses to amount allowed
 	mapping (address => mapping (address => uint256)) internal allowed;
 
-	//methods emit the following events (note that these are a subset 
+	//methods emit the following events (note that these are a subset
 	event Transfer (
-		address indexed from, 
-		address indexed to, 
+		address indexed from,
+		address indexed to,
 		uint256 value );
 
 	event TokensBurned (
-		address indexed burner, 
+		address indexed burner,
 		uint256 value );
 
 	event Approval (
@@ -101,7 +101,7 @@ contract Verify_U42 {
 		emit Transfer(address(0), msg.sender, totalSupply_);
 	}
 
-	function ownerBurn ( 
+	function ownerBurn (
 			uint256 _value )
 		public returns (
 			bool success) {
@@ -125,8 +125,8 @@ contract Verify_U42 {
 		return true;
 
 	}
-	
-	
+
+
 	function totalSupply ( ) public view returns (
 		uint256 ) {
 
@@ -134,7 +134,7 @@ contract Verify_U42 {
 	}
 
 	function balanceOf (
-			address _owner ) 
+			address _owner )
 		public view returns (
 			uint256 ) {
 
@@ -142,8 +142,8 @@ contract Verify_U42 {
 	}
 
 	function transfer (
-			address _to, 
-			uint256 _value ) 
+			address _to,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -161,8 +161,8 @@ contract Verify_U42 {
    	//in that transaction order can be modified in a block to spend, change approval, spend again
    	//the method is kept for ERC-20 compatibility, but a set to zero, set again or use of the below increase/decrease should be used instead
 	function approve (
-			address _spender, 
-			uint256 _value ) 
+			address _spender,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -173,8 +173,8 @@ contract Verify_U42 {
 	}
 
 	function increaseApproval (
-			address _spender, 
-			uint256 _addedValue ) 
+			address _spender,
+			uint256 _addedValue )
 		public returns (
 			bool ) {
 
@@ -186,7 +186,7 @@ contract Verify_U42 {
 
 	function decreaseApproval (
 			address _spender,
-			uint256 _subtractedValue ) 
+			uint256 _subtractedValue )
 		public returns (
 			bool ) {
 
@@ -203,8 +203,8 @@ contract Verify_U42 {
 	}
 
 	function allowance (
-			address _owner, 
-			address _spender ) 
+			address _owner,
+			address _spender )
 		public view returns (
 			uint256 remaining ) {
 
@@ -212,9 +212,9 @@ contract Verify_U42 {
 	}
 
 	function transferFrom (
-			address _from, 
-			address _to, 
-			uint256 _value ) 
+			address _from,
+			address _to,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -229,4 +229,15 @@ contract Verify_U42 {
 		return true;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

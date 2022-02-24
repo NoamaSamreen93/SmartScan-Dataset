@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
- 
+
 
 contract Lottery{
 
@@ -20,7 +20,7 @@ contract Lottery{
     {
         require(aContract != address(poohContract));
         _;
-    } 
+    }
 
     modifier isOpenToPublic()
     {
@@ -95,7 +95,7 @@ contract Lottery{
         if(msg.value > 1000000000000000)
         {
             uint extraTickets = SafeMath.div(msg.value, 1000000000000000); //each additional entry is 0.001 ETH
-            
+
             //Compute how many positions they get by how many POOH they transferred in.
             ticketNumber += extraTickets;
         }
@@ -111,7 +111,7 @@ contract Lottery{
 
             //payout winner
             payWinner(customerAddress);
-            
+
             //buy more POOH tokens with the remaining balance
             poohContract.buy.value(address(this).balance)(customerAddress);
 
@@ -220,12 +220,12 @@ library SafeMath {
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a / b;
         return c;
     }
-    
+
      /**
     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -233,4 +233,15 @@ library SafeMath {
         assert(b <= a);
         return a - b;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

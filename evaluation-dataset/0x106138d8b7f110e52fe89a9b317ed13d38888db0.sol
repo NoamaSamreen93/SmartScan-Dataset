@@ -608,9 +608,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "DISC";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xBdDcCf71a2557A14d87d16cf554d5544CEBFc1DF;
-    
+
     uint constant START_TIME = 1528208460;
-    
+
     bool constant CONTINUE_MINTING = true;
 }
 
@@ -671,9 +671,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -696,4 +696,15 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

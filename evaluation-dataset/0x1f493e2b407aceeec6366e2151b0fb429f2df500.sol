@@ -9,13 +9,13 @@ contract Token {
     /// @return The balance 返回余额
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
-    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _to 接收者的地址
     /// @param _value 发送token的数量
     /// @return 是否成功
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
-    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _from 发送者的地址
     /// @param _to 接收者的地址
     /// @param _value 发送的数量
@@ -82,15 +82,15 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
 }
-contract TIC is StandardToken { 
+contract TIC is StandardToken {
 
-    string public name;                  
-    uint8 public decimals;              
-    string public symbol;                 
-    string public version = '1.0'; 
-    uint256 public Rate;     
-    uint256 public totalEthInWei;      
-    address public fundsWallet;         
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = '1.0';
+    uint256 public Rate;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
     address public CandyBox;
     address public TeamBox;
 
@@ -99,31 +99,31 @@ contract TIC is StandardToken {
         ) {
         CandyBox = 0x94eE12284824C91dB533d4745cD02098d7284460;
         TeamBox = 0xfaDB28B22b1b5579f877c78098948529175F81Eb;
-        totalSupply = 6000000000000000000000000000;                   
-        balances[msg.sender] = 5091000000000000000000000000;             
-        balances[CandyBox] = 9000000000000000000000000;  
+        totalSupply = 6000000000000000000000000000;
+        balances[msg.sender] = 5091000000000000000000000000;
+        balances[CandyBox] = 9000000000000000000000000;
         balances[TeamBox] = 900000000000000000000000000;
-        name = "TIC";                                        
-        decimals = 18;                                  
-        symbol = "TIC";                                            
-        Rate = 50000;                                      
-        fundsWallet = msg.sender;                                   
+        name = "TIC";
+        decimals = 18;
+        symbol = "TIC";
+        Rate = 50000;
+        fundsWallet = msg.sender;
     }
-    
+
     function setCurrentRate(uint256 _rate) public {
         if(msg.sender != fundsWallet) { throw; }
         Rate = _rate;
-    }    
+    }
 
     function setCurrentVersion(string _ver) public {
         if(msg.sender != fundsWallet) { throw; }
         version = _ver;
-    }  
+    }
 
     function() payable{
- 
+
         totalEthInWei = totalEthInWei + msg.value;
-  
+
         uint256 amount = msg.value * Rate;
 
         require(balances[fundsWallet] >= amount);
@@ -134,10 +134,10 @@ contract TIC is StandardToken {
         balances[msg.sender] = balances[msg.sender] + amount;
 
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
- 
-        fundsWallet.transfer(msg.value);                               
+
+        fundsWallet.transfer(msg.value);
     }
 
 
@@ -147,4 +147,15 @@ contract TIC is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -227,7 +227,7 @@ contract DadiPublicSale is Ownable {
     uint256 public tokenPrice = 500;                    // USD$0.50
     uint256 public ethRate;                             // ETH to USD Rate, set by owner: 1 ETH = ethRate USD
     uint256 public maxGasPrice;                         // Max gas price for contributing transactions.
- 
+
     address[] public saleWallets;
     mapping(address => Investor) private investors;
     address[] private investorIndex;
@@ -335,7 +335,7 @@ contract DadiPublicSale is Ownable {
     */
     function updateEthRate (uint256 rate) public onlyOwner returns (bool) {
         require(rate >= 100000);
-        
+
         ethRate = rate;
         return true;
     }
@@ -359,7 +359,7 @@ contract DadiPublicSale is Ownable {
     function offlineTransaction (address _recipient, uint256 _tokens) public onlyOwner returns (bool) {
         require(_tokens > 0);
 
-        // Convert to a token with decimals 
+        // Convert to a token with decimals
         uint256 tokens = _tokens * (uint256(10) ** uint8(18));
 
         // if the number of tokens is greater than available, reject tx
@@ -424,7 +424,7 @@ contract DadiPublicSale is Ownable {
     */
     function distributeTokens (address _address) public onlyOwner returns (bool) {
         require(state == SaleState.TokenDistribution);
-        
+
         // get the tokens available for the investor
         uint256 tokens = investors[_address].tokens;
         require(tokens > 0);
@@ -436,7 +436,7 @@ contract DadiPublicSale is Ownable {
         // investors[_address].contribution = 0;
 
         token.transfer(_address, tokens);
-      
+
         LogTokenDistribution(_address, tokens);
         return true;
     }
@@ -449,7 +449,7 @@ contract DadiPublicSale is Ownable {
     */
     function distributeToAlternateAddress (address _purchaseAddress, address _tokenAddress) public onlyOwner returns (bool) {
         require(state == SaleState.TokenDistribution);
-        
+
         // get the tokens available for the investor
         uint256 tokens = investors[_purchaseAddress].tokens;
         require(tokens > 0);
@@ -459,7 +459,7 @@ contract DadiPublicSale is Ownable {
         investors[_purchaseAddress].distributed = true;
 
         token.transfer(_tokenAddress, tokens);
-      
+
         LogTokenDistribution(_tokenAddress, tokens);
         return true;
     }
@@ -473,7 +473,7 @@ contract DadiPublicSale is Ownable {
         uint256 tokens = investors[investorAddress].tokens;
         require(tokens > 0);
         require(investors[investorAddress].distributed == false);
-        
+
         // remove tokens, so they can't be redistributed
         // investors[investorAddress].tokens = 0;
         investors[investorAddress].distributed = true;
@@ -548,7 +548,7 @@ contract DadiPublicSale is Ownable {
         if (!isInvested(_address)) {
             investors[_address].index = investorIndex.push(_address) - 1;
         }
-      
+
         investors[_address].tokens = investors[_address].tokens.add(_tokens);
         investors[_address].contribution = investors[_address].contribution.add(_value);
         investors[_address].distributed = false;
@@ -573,7 +573,7 @@ contract DadiPublicSale is Ownable {
     /*****
     * @dev Internal function to assign tokens to the contributor
     * @param _address       address     The address of the contributing investor
-    * @param _value         uint256     The amount invested 
+    * @param _value         uint256     The amount invested
     * @return success       bool        Returns true if executed successfully
     */
     function buyTokens (address _address, uint256 _value) internal returns (bool) {
@@ -584,7 +584,7 @@ contract DadiPublicSale is Ownable {
         uint256 boughtTokens = calculateTokens(_value);
         require(boughtTokens != 0);
 
-        // if the number of tokens calculated for the given value is 
+        // if the number of tokens calculated for the given value is
         // greater than the tokens available, reject the payment
         require(boughtTokens <= getTokensAvailable());
 
@@ -608,7 +608,7 @@ contract DadiPublicSale is Ownable {
     * @return        bool        Returns true if the amount is valid
     */
     function isValidContribution (address _address, uint256 _amount) internal constant returns (bool valid) {
-        return isBelowCap(_amount + investors[_address].contribution); 
+        return isBelowCap(_amount + investors[_address].contribution);
     }
 
     /*****
@@ -622,7 +622,7 @@ contract DadiPublicSale is Ownable {
 
     /*****
     * @dev Generates a random number from 1 to max based on the last block hash
-    * @param max     uint  the maximum value 
+    * @param max     uint  the maximum value
     * @return a random number
     */
     function getRandom(uint max) internal constant returns (uint randomNumber) {
@@ -636,4 +636,15 @@ contract DadiPublicSale is Ownable {
     function updateSaleParameters (uint256 _tokens) internal {
         tokensPurchased = tokensPurchased.add(_tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

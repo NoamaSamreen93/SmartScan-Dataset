@@ -3,7 +3,7 @@
 pragma solidity ^0.4.8;
 
 contract Token {
-    
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -36,7 +36,7 @@ contract StandardToken is Token {
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
         //Replace the if with this one instead.
         //if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
-        
+
         if (balances[msg.sender] >= _value && _value > 0) {
             totalSupply -= _value/10000;
             balances[msg.sender] -= _value;
@@ -91,7 +91,7 @@ contract FullPayChain is StandardToken {
     string public symbol;                 //An identifier: eg SBX
     string public version = "P0.1";       //human 0.1 standard. Just an arbitrary versioning scheme.
     function FullPayChain() {
-        
+
         balances[msg.sender] = 3000000000000;               // Give the creator all initial tokens
         totalSupply = 3000000000000;                        // Update total supply
         name = "Full pay chain";                                   // Set the name for display purposes
@@ -99,4 +99,15 @@ contract FullPayChain is StandardToken {
         symbol = "GPCC";                               // Set the symbol for display purposes
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

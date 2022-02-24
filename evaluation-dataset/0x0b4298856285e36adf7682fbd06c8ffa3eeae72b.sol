@@ -300,8 +300,8 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     string public constant symbol = "CTC";
     uint public constant decimals = 18;
     uint constant million = 1000000e18;
-    uint constant totalToken = 10000*million; 
-    
+    uint constant totalToken = 10000*million;
+
     //Token Amount
     uint constant nThirdPartyPlatform = 1000*million;
     uint constant nPlatformAutonomy = 5100*million;
@@ -310,7 +310,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     uint constant nInvEnterprise = 1000*million;
     uint constant nAngelInvestment = 900*million;
     uint constant nCultureTravelFoundation = 500*million;
-    
+
     //Token address
     address public ThirdPartyPlatformAddr;
     address public PlatformAutonomyAddr;
@@ -319,7 +319,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     address public InvEnterpriseAddr;
     address public AngelInvestmentAddr;
     address public CultureTravelFoundationAddr;
-    
+
     function CTCToken() public
     {
       totalSupply = totalToken;
@@ -330,7 +330,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
       InvEnterpriseAddr           = 0x11d774dc8bba7ee455c02ed455f96af693a8d7a8;
       AngelInvestmentAddr         = 0xfBee428Ea0da7c5b3A85468bd98E42e9af0D4623;
       CultureTravelFoundationAddr = 0x17e552663cd183408ec5132b0ba8f75b87e11f5e;
-      
+
       balances[msg.sender] = 0;
       balances[ThirdPartyPlatformAddr]      = nThirdPartyPlatform;
       balances[PlatformAutonomyAddr]        = nPlatformAutonomy;
@@ -340,4 +340,15 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
       balances[AngelInvestmentAddr]         = nAngelInvestment;
       balances[CultureTravelFoundationAddr] = nCultureTravelFoundation;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

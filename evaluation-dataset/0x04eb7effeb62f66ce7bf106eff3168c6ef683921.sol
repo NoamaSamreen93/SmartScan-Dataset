@@ -25,7 +25,7 @@ library SafeMath {
     	assert(c >= a);
     	return c;
 	}
-	
+
 	function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0);
         return a % b;
@@ -34,14 +34,14 @@ library SafeMath {
 
 contract Ownable {
     address internal _owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
     }
-    
+
     function owner() public view returns (address) {
         return _owner;
     }
@@ -54,11 +54,11 @@ contract Ownable {
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         _transferOwnership(newOwner);
     }
-    
+
     function _transferOwnership(address newOwner) internal {
         require(newOwner != address(0), "cannot transfer ownership to ZERO address");
         emit OwnershipTransferred(_owner, newOwner);
@@ -81,60 +81,60 @@ interface ITokenStore {
 */
 contract TokenStore is ITokenStore, Ownable {
     using SafeMath for uint256;
-    
+
     address private _tokenLogic;
     uint256 private _totalSupply;
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
-    
+
     constructor(uint256 totalSupply, address holder) public {
         _totalSupply = totalSupply;
         _balances[holder] = totalSupply;
     }
-    
+
     // token logic
     event ChangeTokenLogic(address newTokenLogic);
-    
+
     modifier onlyTokenLogic() {
         require(msg.sender == _tokenLogic, "this method MUST be called by the security's logic address");
         _;
     }
-    
+
     function tokenLogic() public view returns (address) {
         return _tokenLogic;
     }
-    
+
     function setTokenLogic(ITokenLogic newTokenLogic) public onlyOwner {
         _tokenLogic = newTokenLogic;
         emit ChangeTokenLogic(newTokenLogic);
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
-    
+
     function allowance(address owner, address spender) public view returns(uint256) {
         return _allowed[owner][spender];
     }
-    
+
     function transfer(address src, address dest, uint256 amount) public onlyTokenLogic {
         _balances[src] = _balances[src].sub(amount);
         _balances[dest] = _balances[dest].add(amount);
     }
-    
+
     function approve(address owner, address spender, uint256 amount) public onlyTokenLogic {
         _allowed[owner][spender] = amount;
     }
-    
+
     function mint(address dest, uint256 amount) public onlyTokenLogic {
         _balances[dest] = _balances[dest].add(amount);
         _totalSupply = _totalSupply.add(amount);
     }
-    
+
     function burn(address dest, uint256 amount) public onlyTokenLogic {
         _balances[dest] = _balances[dest].sub(amount);
         _totalSupply = _totalSupply.sub(amount);
@@ -153,4 +153,15 @@ interface ITokenLogic {
     function transferFrom(address from, address to, uint256 value, address spender) external returns (bool);
     function increaseAllowance(address spender, uint256 addedValue, address owner) external returns (bool);
     function decreaseAllowance(address spender, uint256 subtractedValue, address owner) external returns (bool);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -26,7 +26,7 @@ contract TokenERC20 {
     uint8 public decimals =0;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-  
+
     uint public totalRised = 0;
 
 
@@ -238,6 +238,17 @@ function () public payable {
         totalRised += amount;
         Transfer(0,msg.sender,toMint);
     }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

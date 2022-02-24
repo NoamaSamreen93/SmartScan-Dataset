@@ -33,7 +33,7 @@ contract owned {
     address public owner;
 
     function owned () public {
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     modifier onlyOwner {
@@ -46,28 +46,28 @@ contract owned {
     }
 }
 
-contract tokenRecipient { 
-    function receiveApproval (address _from, uint256 _value, address _token, bytes _extraData) public; 
-    
+contract tokenRecipient {
+    function receiveApproval (address _from, uint256 _value, address _token, bytes _extraData) public;
+
 }
 
 contract RewardsCoin is owned {
     using SafeMath for uint256;
 
-    uint256 internal maxSupply;  
-    string public name; 
-    string public symbol; 
-    uint256 public decimals;  
-    uint256 public totalSupply; 
+    uint256 internal maxSupply;
+    string public name;
+    string public symbol;
+    uint256 public decimals;
+    uint256 public totalSupply;
     address public beneficiary;
-    address public dev1; 
+    address public dev1;
     address public dev2;
     address public market1;
-    address public market2; 
+    address public market2;
     address public bounty;
     address public lockedTokens;
     uint256 public burnt;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
@@ -79,12 +79,12 @@ contract RewardsCoin is owned {
     event Burnfrom(address indexed _from, uint256 value);
 
     function RewardsCoin() public {
-            
-        name = "Rewards Coin";    
-        symbol = "REW";    
+
+        name = "Rewards Coin";
+        symbol = "REW";
         decimals = 18;
         burnt = 0;
-        maxSupply = 25000000 * (10 ** decimals);   
+        maxSupply = 25000000 * (10 ** decimals);
         totalSupply = totalSupply.add(maxSupply);
         beneficiary = 0x89F2843837Ba5363b3550560184AC181924aCE4E;
 
@@ -114,21 +114,21 @@ contract RewardsCoin is owned {
         balanceOf[lockedTokens] = balanceOf[lockedTokens].add(maxSupply.sub(20000000 * (10 ** decimals))); //5,000,000
 
     }
-    
+
     function nameChange(string _name, string _symbol) public onlyOwner {
         name = _name;
         symbol = _symbol;
     }
 
     function transfer(address _to, uint256 _value) public {
-        if (frozenAccount[msg.sender]) revert(); 
-        if (balanceOf[msg.sender] < _value) revert() ;           
-        if (balanceOf[_to] + _value < balanceOf[_to]) revert(); 
-        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value); 
+        if (frozenAccount[msg.sender]) revert();
+        if (balanceOf[msg.sender] < _value) revert() ;
+        if (balanceOf[_to] + _value < balanceOf[_to]) revert();
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        emit Transfer(msg.sender, _to, _value);          
+        emit Transfer(msg.sender, _to, _value);
     }
-    
+
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
@@ -138,7 +138,7 @@ contract RewardsCoin is owned {
 
     /* Approve and then communicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -147,17 +147,17 @@ contract RewardsCoin is owned {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[_from]) revert();                        // Check if frozen  
-        if (balanceOf[_from] < _value) revert();                
-        if (balanceOf[_to] + _value < balanceOf[_to]) revert(); 
-        if (_value > allowance[_from][msg.sender]) revert(); 
-        balanceOf[_to] = balanceOf[_to].sub(_value);                     
-        balanceOf[_to] = balanceOf[_to].add(_value);                          
+        if (frozenAccount[_from]) revert();                        // Check if frozen
+        if (balanceOf[_from] < _value) revert();
+        if (balanceOf[_to] + _value < balanceOf[_to]) revert();
+        if (_value > allowance[_from][msg.sender]) revert();
+        balanceOf[_to] = balanceOf[_to].sub(_value);
+        balanceOf[_to] = balanceOf[_to].add(_value);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function burn(uint256 _value) public {
         require(_value <= balanceOf[msg.sender]);
         address burner = msg.sender;
@@ -167,23 +167,23 @@ contract RewardsCoin is owned {
         emit Burn(burner, _value);
         emit Transfer(burner, address(0), _value);
     }
-  
+
     function burnFrom(address _from, uint256 _value) public onlyOwner returns  (bool success) {
-        require (balanceOf[_from] >= _value);            
-        require (msg.sender == owner);   
+        require (balanceOf[_from] >= _value);
+        require (msg.sender == owner);
         totalSupply = totalSupply.sub(_value);
         burnt = burnt.add(_value);
-        balanceOf[_from] = balanceOf[_from].sub(_value);                      
+        balanceOf[_from] = balanceOf[_from].sub(_value);
         emit Burnfrom(_from, _value);
         return true;
     }
-    
+
     function freezeAccount(address target) public onlyOwner {
         require (msg.sender == owner);   // Check allowance
         frozenAccount[target] = true;
         emit FrozenFunds(target, true);
     }
-    
+
     function unFreezeAccount(address target) public onlyOwner {
         require (msg.sender == owner);   // Check allowance
         require(frozenAccount[target]);
@@ -192,6 +192,22 @@ contract RewardsCoin is owned {
     }
 
     function () private {
-        revert();  
+        revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

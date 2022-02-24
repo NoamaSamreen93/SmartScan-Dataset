@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract twodayprofits{
-    
+
     using SafeMath for uint256;
 
     mapping(address => uint256) investments;
@@ -19,11 +19,11 @@ contract twodayprofits{
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
-     * @dev Сonstructor Sets the original roles of the contract 
+     * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor(address _bountyManager) public {
         owner = msg.sender;
         ownerWallet = msg.sender;
@@ -33,7 +33,7 @@ contract twodayprofits{
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -102,7 +102,7 @@ contract twodayprofits{
             return false;
         }
     }
-    
+
     /**
     * @dev Bounty reward
     */
@@ -151,16 +151,16 @@ contract twodayprofits{
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-    
+
     /**
-    * @dev Updates referrer balance 
+    * @dev Updates referrer balance
     * @param _hunter The address of the referrer
     * @param _amount An uint256 representing the referral earnings.
     */
     function updateReferral(address _hunter, uint256 _amount) onlyBountyManager public {
         referrer[_hunter] = referrer[_hunter].add(_amount);
     }
-    
+
 }
 
 /**
@@ -194,4 +194,13 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

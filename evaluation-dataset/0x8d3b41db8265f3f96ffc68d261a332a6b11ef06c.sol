@@ -26,7 +26,7 @@ contract Topscoin {
 	string public standard = "Topscoin v1.0";
 	string public name;
 	string public symbol;
-	uint8 public decimals; 
+	uint8 public decimals;
 	uint256 public totalSupply;
 	event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -77,13 +77,13 @@ contract TopscoinAdvanced is admined, Topscoin{
 	event FrozenFund(address target, bool frozen);
 
 	function TopscoinAdvanced(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits, address centralAdmin) Topscoin (0, tokenName, tokenSymbol, decimalUnits ) public {
-		
+
 		if(centralAdmin != 0)
 			admin = centralAdmin;
 		else
 			admin = msg.sender;
 		balanceOf[admin] = initialSupply;
-		totalSupply = initialSupply;	
+		totalSupply = initialSupply;
 	}
 
 	function mintToken(address target, uint256 mintedAmount) onlyAdmin public {
@@ -174,4 +174,15 @@ contract TopscoinAdvanced is admined, Topscoin{
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

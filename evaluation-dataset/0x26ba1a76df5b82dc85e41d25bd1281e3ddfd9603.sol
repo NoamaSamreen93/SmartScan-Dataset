@@ -4,7 +4,7 @@ pragma solidity 0.4.19;
 
 /**
  * FEATURE 2): MultiOwnable implementation
- * Transactions approved by _multiRequires of _multiOwners' addresses will be executed. 
+ * Transactions approved by _multiRequires of _multiOwners' addresses will be executed.
 
  * All functions needing unit-tests cannot be INTERNAL
  */
@@ -17,7 +17,7 @@ contract MultiOwnable {
     mapping (bytes32 => uint) internal m_pendings;
 
     event AcceptConfirm(bytes32 operation, address indexed who, uint confirmTotal);
-    
+
     // constructor is given number of sigs required to do protected "multiOwner" transactions
     function MultiOwnable (address[] _multiOwners, uint _multiRequires) public {
         require(0 < _multiRequires && _multiRequires <= _multiOwners.length);
@@ -64,7 +64,7 @@ contract MultiOwnable {
         if (ownerIndex == m_numOwners) {
             return false;  // Not Owner
         }
-        
+
         uint newBitFinger = (m_pendings[operation] | (2 ** ownerIndex));
 
         uint confirmTotal = 0;
@@ -73,7 +73,7 @@ contract MultiOwnable {
                 confirmTotal ++;
             }
         }
-        
+
         AcceptConfirm(operation, currentUser, confirmTotal);
 
         if (confirmTotal >= m_multiRequires) {
@@ -165,19 +165,19 @@ library SafeMath {
 
 /**
  * The updated body of smart contract.
- * %6 fund will be transferred to ParcelX advisors automatically. 
+ * %6 fund will be transferred to ParcelX advisors automatically.
  */
 contract AdvisorGPX is MultiOwnable, Pausable {
 
     using SafeMath for uint256;
-    
+
     address internal advisor = 0xd173bdd2f4ccd88b35b83a8bc35dd05a3b5a3c79;
     uint internal payAdvisorFlag = 0;
 
-    function AdvisorGPX(address[] _multiOwners, uint _multiRequires) 
+    function AdvisorGPX(address[] _multiOwners, uint _multiRequires)
         MultiOwnable(_multiOwners, _multiRequires) public {
     }
-    
+
     event Deposit(address indexed who, uint256 value);
     event Withdraw(address indexed who, uint256 value, address indexed lastApprover, string extra);
     event AdviseFee(address advisor, uint256 advfee);
@@ -189,11 +189,11 @@ contract AdvisorGPX is MultiOwnable, Pausable {
     function getBalance() public view returns (uint256) {
         return this.balance;
     }
-    
+
     /**
      * FEATURE : Buyable
      * minimum of 0.001 ether for purchase in the public, pre-ico, and private sale
-     * Code caculates the endtime via python: 
+     * Code caculates the endtime via python:
      *   d1 = datetime.datetime.strptime("2018-10-31 23:59:59", '%Y-%m-%d %H:%M:%S')
      *   t = time.mktime(d1.timetuple())
      *   d2 = datetime.datetime.fromtimestamp(t)
@@ -203,11 +203,11 @@ contract AdvisorGPX is MultiOwnable, Pausable {
     function buy() payable whenNotPaused public returns (bool) {
         Deposit(msg.sender, msg.value);
         require(msg.value >= 0.001 ether);
-        
+
         // Fee to advisors
         if (now > 1541001599 && payAdvisorFlag == 0) {
             payAdvisorFlag = payAdvisorFlag + 1;
-            uint256 advfee = this.balance.div(20) + this.balance.div(100);  // = 6.0 %, Not float in Solidity, So use INT/div to approach. 
+            uint256 advfee = this.balance.div(20) + this.balance.div(100);  // = 6.0 %, Not float in Solidity, So use INT/div to approach.
             if (advfee > 0) {
                 advisor.transfer(advfee);   // Prevent using call() or send()
             }
@@ -233,4 +233,15 @@ contract AdvisorGPX is MultiOwnable, Pausable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

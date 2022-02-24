@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
 /**
- * 
+ *
  * World War Goo - Competitive Idle Game
- * 
+ *
  * https://ethergoo.io
- * 
+ *
  */
- 
+
  interface ERC20 {
     function totalSupply() external constant returns (uint);
     function balanceOf(address tokenOwner) external constant returns (uint balance);
@@ -27,22 +27,22 @@ interface ApproveAndCallFallBack {
 
 contract WoodMaterial is ERC20 {
     using SafeMath for uint;
-    
+
     string public constant name  = "Goo Material - Wood";
     string public constant symbol = "WOOD";
     uint8 public constant decimals = 0;
-    
+
     uint256 public totalSupply;
     address owner; // Minor management
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => bool) operator;
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     function setOperator(address gameContract, bool isOperator) external {
         require(msg.sender == owner);
         operator[gameContract] = isOperator;
@@ -51,18 +51,18 @@ contract WoodMaterial is ERC20 {
     function totalSupply() external view returns (uint) {
         return totalSupply.sub(balances[address(0)]);
     }
-    
+
     function balanceOf(address tokenOwner) external view returns (uint256) {
         return balances[tokenOwner];
     }
-    
+
     function transfer(address to, uint tokens) external returns (bool) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
     function transferFrom(address from, address to, uint tokens) external returns (bool) {
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -70,20 +70,20 @@ contract WoodMaterial is ERC20 {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
+
     function approve(address spender, uint tokens) external returns (bool) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
+
     function approveAndCall(address spender, uint tokens, bytes data) external returns (bool) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
     function allowance(address tokenOwner, address spender) external view returns (uint256) {
         return allowed[tokenOwner][spender];
     }
@@ -93,14 +93,14 @@ contract WoodMaterial is ERC20 {
         require(tokenAddress != address(this));
         ERC20(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function mintWood(uint256 amount, address player) external {
         require(operator[msg.sender]);
         balances[player] += amount;
         totalSupply += amount;
         emit Transfer(address(0), player, amount);
     }
-    
+
     function burn(uint256 amount, address player) public {
         require(operator[msg.sender]);
         balances[player] = balances[player].sub(amount);
@@ -149,4 +149,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

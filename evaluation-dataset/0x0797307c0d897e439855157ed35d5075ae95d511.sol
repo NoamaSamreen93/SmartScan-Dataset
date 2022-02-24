@@ -252,7 +252,7 @@ contract Burnable is ERC20, BasicToken {
    * @param account The account whose tokens will be burnt.
    * @param value The amount that will be burnt.
    */
-   
+
   function burnFrom(address account, uint256 value) internal {
     allowed[account][msg.sender] = allowed[account][msg.sender].sub(value);
     burn(account, value);
@@ -302,7 +302,7 @@ contract MSG is Ownable, Pausable, Burnable, CrowdsaleToken {
     // amount of raised in wei
     uint256 public weiRaised;
     uint256 public tokensSold;
-    
+
     //token allocation addresses
     address STRATEGIC_PARTNERS_WALLET = 0x19CFB0E3F83831b726273b81760AE556600785Ec;
 
@@ -311,14 +311,14 @@ contract MSG is Ownable, Pausable, Burnable, CrowdsaleToken {
 
     uint256 public contributors = 0;
     mapping(address => uint256) public contributions;
-    
+
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    constructor() 
+    constructor()
         CrowdsaleToken(name, symbol, decimals) public {
-    
+
         totalSupply_ = 156970000E18;
-        
-        //crowdsale allocation 
+
+        //crowdsale allocation
         balances[this] = totalSupply_;
 
         startTime = 1543622400;
@@ -382,7 +382,7 @@ contract MSG is Ownable, Pausable, Burnable, CrowdsaleToken {
         //transfer purchased tokens
         this.transfer(beneficiary, tokens);
 
-        //forwardFunds(weiAmount); //manual withdraw 
+        //forwardFunds(weiAmount); //manual withdraw
         emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
         return (tokens);
     }
@@ -507,19 +507,19 @@ contract MSG is Ownable, Pausable, Burnable, CrowdsaleToken {
 
     function getCurrentMinimum() public view returns (uint256) {
         if(now >= startTime && now <= switchTime) return minimumInvestPreSale;
-        if(now >= switchTime && now <= endTime) return minimumInvestCrowdSale;        
-        return 0;        
+        if(now >= switchTime && now <= endTime) return minimumInvestCrowdSale;
+        return 0;
     }
 
     function getCurrentRate() public view returns (uint256) {
         if(now >= startTime && now <= switchTime) return preSaleRate;
-        if(now >= switchTime && now <= endTime) return crowdSaleRate;        
+        if(now >= switchTime && now <= endTime) return crowdSaleRate;
         return 0;
     }
 
     function getCurrentBonus() public view returns (uint256) {
         if(now >= startTime && now <= switchTime) return preSaleBonus;
-        if(now >= switchTime && now <= endTime) return crowdSaleBonus;        
+        if(now >= switchTime && now <= endTime) return crowdSaleBonus;
         return 0;
     }
 
@@ -532,4 +532,15 @@ contract MSG is Ownable, Pausable, Burnable, CrowdsaleToken {
     function hasEnoughTokensLeft(uint256 _weiAmount) public payable returns (bool) {
         return tokensLeft().sub(_weiAmount) >= getBaseAmount(_weiAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

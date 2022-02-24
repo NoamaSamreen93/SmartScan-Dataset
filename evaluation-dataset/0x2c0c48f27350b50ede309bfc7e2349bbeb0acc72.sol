@@ -23,7 +23,7 @@ contract PlayerBook {
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (uint256 => Player) public plyr_;               // (pID => data) player data
     mapping (uint256 => uint256) public refIDxpID_;
-    
+
     struct Player {
         address addr;
     }
@@ -248,4 +248,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

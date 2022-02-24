@@ -3,15 +3,15 @@ pragma solidity ^0.4.24;
 /*
 *　　　　　　　　　　　　　　　　　　　　 　 　 ＿＿＿
 *　　　　　　　　　　　　　　　　　　　　　　　|三三三i
-*　　　　　　　　　　　　　　　　　　　　　　　|三三三|  
-*　　神さま　かなえて　happy-end　　　　　　ノ三三三.廴        
+*　　　　　　　　　　　　　　　　　　　　　　　|三三三|
+*　　神さま　かなえて　happy-end　　　　　　ノ三三三.廴
 *　　　　　　　　　　　　　　　　　　　　　　从ﾉ_八ﾑ_}ﾉ
-*　　　＿＿}ヽ__　　　　　　　　　　 　 　 　 ヽ‐个‐ｱ.     © Team EC Present. 
-*　　 　｀ﾋｙ　　ﾉ三ﾆ==ｪ- ＿＿＿ ｨｪ=ｧ='ﾌ)ヽ-''Lヽ         
-*　　　　 ｀‐⌒L三ﾆ=ﾆ三三三三三三三〈oi 人 ）o〉三ﾆ、　　　 
-*　　　　　　　　　　 　 ｀￣￣￣￣｀弌三三}. !　ｒ三三三iｊ　　　　　　
+*　　　＿＿}ヽ__　　　　　　　　　　 　 　 　 ヽ‐个‐ｱ.     © Team EC Present.
+*　　 　｀ﾋｙ　　ﾉ三ﾆ==ｪ- ＿＿＿ ｨｪ=ｧ='ﾌ)ヽ-''Lヽ
+*　　　　 ｀‐⌒L三ﾆ=ﾆ三三三三三三三〈oi 人 ）o〉三ﾆ、
+*　　　　　　　　　　 　 ｀￣￣￣￣｀弌三三}. !　ｒ三三三iｊ
 *　　　　　　　　　　 　 　 　 　 　 　,': ::三三|. ! ,'三三三刈、
-*　　　　　　　　　 　 　 　 　 　 　 ,': : :::｀i三|人|三三ﾊ三j: ;　　　　　
+*　　　　　　　　　 　 　 　 　 　 　 ,': : :::｀i三|人|三三ﾊ三j: ;
 *　                  　　　　　　 ,': : : : : 比|　 |三三i |三|: ',
 *　　　　　　　　　　　　　　　　　,': : : : : : :Vi|　 |三三i |三|: : ',
 *　　　　　　　　　　　　　　　　, ': : : : : : : ﾉ }乂{三三| |三|: : :;
@@ -34,7 +34,7 @@ pragma solidity ^0.4.24;
 *           　　　　　　　　　　　　　　   ｒ'三三jiY, : : : : : ::|三ij : : : : : : : : : : : ',
 *　 　 　 　 　 　      　　                |三 j´　　　　　　　　｀',    signature:
 *　　　　　　　　　　　　 　 　 　 　 　 　 　  |三三k、
-*                            　　　　　　　　｀ー≠='.  93511761c3aa73c0a197c55537328f7f797c4429 
+*                            　　　　　　　　｀ー≠='.  93511761c3aa73c0a197c55537328f7f797c4429
 */
 
 
@@ -105,12 +105,12 @@ contract BigOne is BigOneEvents {
     address private shareCom2 = 0xaF63842fb4A9B3769E0e1b7DAb9C5068dB78d3d3;
 
     string constant public name = "bigOne";
-    string constant public symbol = "bigOne";   
+    string constant public symbol = "bigOne";
 
     //****************
     // var
     //****************
-    uint256 public rID_;    
+    uint256 public rID_;
     uint256 public rTypeID_;
 
     //****************
@@ -119,7 +119,7 @@ contract BigOne is BigOneEvents {
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (bytes32 => uint256) public pIDxName_;          // (name => pID) returns player id by name
     mapping (uint256 => BigOneData.Player) public plyr_;   // (pID => data) player data
-    mapping (uint256 => mapping (uint256 => BigOneData.PlayerRoundData)) public plyrRnds_;   // (pID => rID => data) 
+    mapping (uint256 => mapping (uint256 => BigOneData.PlayerRoundData)) public plyrRnds_;   // (pID => rID => data)
     mapping (uint256 => uint256) private playerSecret_;
 
     //****************
@@ -385,7 +385,7 @@ contract BigOne is BigOneEvents {
         // setup temp var for player eth
         uint256 _eth;
         uint256 _withdrawFee;
-    
+
         // get their earnings
         _eth = withdrawEarnings(_pID);
 
@@ -522,7 +522,7 @@ contract BigOne is BigOneEvents {
     function getPlayerKeys(address _addr,uint256 _mode)
         public
         view
-        returns(uint256[]) 
+        returns(uint256[])
     {
         uint256 _rID = currentRoundxType_[_mode];
 
@@ -585,7 +585,7 @@ contract BigOne is BigOneEvents {
             if (round_[_rID].keyCount >= rSettingXTypeID_[_mode].shareMax && round_[_rID].plyr == 0 && round_[_rID].ended == false)
             {
                 round_[_rID].ended = true;
-                endRound(_mode); 
+                endRound(_mode);
             }
             //directly refund player
             plyr_[_pID].addr.transfer(msg.value);
@@ -602,10 +602,10 @@ contract BigOne is BigOneEvents {
             plyr_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
             core(_rID, _pID, _eth, _affID,_mode);
         } else {
-            if (round_[_rID].keyCount >= rSettingXTypeID_[_mode].shareMax && round_[_rID].plyr == 0 && round_[_rID].ended == false) 
+            if (round_[_rID].keyCount >= rSettingXTypeID_[_mode].shareMax && round_[_rID].plyr == 0 && round_[_rID].ended == false)
             {
                 round_[_rID].ended = true;
-                endRound(_mode);      
+                endRound(_mode);
             }
         }
     }
@@ -613,7 +613,7 @@ contract BigOne is BigOneEvents {
     function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _mode)
         private
     {
-        if (plyrRnds_[_pID][_rID].keyCount == 0) 
+        if (plyrRnds_[_pID][_rID].keyCount == 0)
         {
             managePlayer(_pID,_rID);
         }
@@ -622,14 +622,14 @@ contract BigOne is BigOneEvents {
         {
             uint256 _ethAdd = ((rSettingXTypeID_[_mode].shareMax).sub(round_[_rID].keyCount)).mul(rSettingXTypeID_[_mode].perShare);
             if(_eth > _ethAdd) {
-                plyr_[_pID].gen = plyr_[_pID].gen.add(_eth.sub(_ethAdd)); 
+                plyr_[_pID].gen = plyr_[_pID].gen.add(_eth.sub(_ethAdd));
             } else {
                 _ethAdd = _eth;
             }
 
             uint256 _keyAdd = _ethAdd.div(rSettingXTypeID_[_mode].perShare);
             uint256 _keyEnd = (round_[_rID].keyCount).add(_keyAdd);
-            
+
             BigOneData.PurchaseRecord memory _pr;
             _pr.plyr = _pID;
             _pr.start = round_[_rID].keyCount;
@@ -645,10 +645,10 @@ contract BigOne is BigOneEvents {
 
             distributeExternal(_rID, _pID, _ethAdd, _affID);
 
-            if (round_[_rID].keyCount >= rSettingXTypeID_[_mode].shareMax && round_[_rID].plyr == 0 && round_[_rID].ended == false) 
+            if (round_[_rID].keyCount >= rSettingXTypeID_[_mode].shareMax && round_[_rID].plyr == 0 && round_[_rID].ended == false)
             {
                 round_[_rID].ended = true;
-                endRound(_mode); 
+                endRound(_mode);
             }
 
             emit BigOneEvents.onEndTx
@@ -662,7 +662,7 @@ contract BigOne is BigOneEvents {
 
         } else {
             // put back eth in players vault
-            plyr_[_pID].gen = plyr_[_pID].gen.add(_eth);    
+            plyr_[_pID].gen = plyr_[_pID].gen.add(_eth);
         }
 
     }
@@ -707,7 +707,7 @@ contract BigOne is BigOneEvents {
                 plyr_[_pID].name = _name;
             }
 
-            if (_laff != 0 && _laff != _pID) 
+            if (_laff != 0 && _laff != _pID)
             {
                 plyr_[_pID].laff = _laff;
             }
@@ -741,7 +741,7 @@ contract BigOne is BigOneEvents {
     {
          // pay community rewards
         // uint256 _com = _eth / 50;
-        
+
 
         // if (address(admin).call.value((_com / 2))() == false)
         // {
@@ -916,15 +916,15 @@ library BigOneData {
         uint256 laffID;   // last affiliate id unaffected
     }
     struct PlayerRoundData {
-        uint256 eth;    // eth player has added to round 
+        uint256 eth;    // eth player has added to round
         uint256[] purchaseIDs;   // keys
         uint256 keyCount;
     }
     struct RoundSetting {
         uint256 id;
-        uint256 limit;   
-        uint256 perShare; 
-        uint256 shareMax;   
+        uint256 limit;
+        uint256 perShare;
+        uint256 shareMax;
         bool isValue;
     }
     struct Round {
@@ -934,7 +934,7 @@ library BigOneData {
         uint256 start;   // time round started
 
         uint256 keyCount;   // keys
-        BigOneData.PurchaseRecord[] purchases;  
+        BigOneData.PurchaseRecord[] purchases;
         uint256 eth;    // total eth in
         uint256 pot;    // eth to pot (during round) / final amount paid to winner (after round ends)
 
@@ -942,7 +942,7 @@ library BigOneData {
         uint256 count;
     }
     struct PurchaseRecord {
-        uint256 plyr;   
+        uint256 plyr;
         uint256 start;
         uint256 end;
     }
@@ -1018,7 +1018,7 @@ library NameFilter {
 }
 
 
-library SafeMath 
+library SafeMath
 {
     /**
     * @dev Multiplies two numbers, reverts on overflow.
@@ -1076,4 +1076,15 @@ library SafeMath
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

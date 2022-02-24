@@ -4,10 +4,10 @@
  * @dev Implementation of the basic standard token.
  * @dev https://github.com/OpenZeppelin/openzeppelin-solidity
  *
- * The AFW token contract bases on the ERC20 standard token contracts 
+ * The AFW token contract bases on the ERC20 standard token contracts
  * Company Optimum Consulting - Courbevoie
  * */
- 
+
 pragma solidity ^0.4.21;
 
 /**
@@ -304,7 +304,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
   }
 
   }
- 
+
 
 /**
  * @title Burnable Token
@@ -327,96 +327,96 @@ contract BurnableToken is StandardToken {
         emit Burn(burner, _value);
     }
     event Burn(address indexed burner, uint256  indexed value);
-} 
-   
+}
+
 contract AFWToken is StandardToken , BurnableToken  {
     using SafeMath for uint256;
     string public constant name = "All4FW";
     string public constant symbol = "AFW";
-    uint8 public constant decimals = 18;	
-	
-	// wallets address for allocation	
+    uint8 public constant decimals = 18;
+
+	// wallets address for allocation
 	address public Bounties_Wallet = 0xA7135CbD1281d477eef4FC7F0AB19566A47bE759; // 5% : Bounty
 	address public Team_Wallet = 0xaA1582A5b00fDEc47FeD1CcDDe7e5fA3652B456b; // 8% : Equity & Team
 	address public OEM_Wallet = 0x51e32712C65AEFAAea9d0b7336A975f400825309; // 10% : Community Builting, Biz Dev
 	address public LA_wallet = 0xBaC4B80b6C74518bF31b5cE1be80926ffEEBB4db; //8% : Legal & advisors
-    
-	address public tokenWallet = 0x4CE38c5f44794d6173Dd3BBaf208EeEf2033370A;    
-	uint256 public constant INITIAL_SUPPLY = 100000000 ether;	
-	
-	
+
+	address public tokenWallet = 0x4CE38c5f44794d6173Dd3BBaf208EeEf2033370A;
+	uint256 public constant INITIAL_SUPPLY = 100000000 ether;
+
+
 	/// Base exchange rate is set to 1 ETH = 650 AFW.
-	uint256 tokenRate = 650; 
-	
-	
+	uint256 tokenRate = 650;
+
+
     function AFWToken() public {
         totalSupply_ = INITIAL_SUPPLY;
-		
+
 		// InitialDistribution
 		// 31% ---> 31000000
 		balances[Bounties_Wallet] = INITIAL_SUPPLY.mul(5).div(100) ;
 		balances[Team_Wallet] = INITIAL_SUPPLY.mul(8).div(100);
 		balances[OEM_Wallet] = INITIAL_SUPPLY.mul(10).div(100) ;
 		balances[LA_wallet] = INITIAL_SUPPLY.mul(8).div(100) ;
-		
+
 		// 69% ---> 69000000
         balances[tokenWallet] = INITIAL_SUPPLY.mul(69).div(100);
-		
+
         endDate = _endDate;
-				
+
         emit Transfer(0x0, Bounties_Wallet, balances[Bounties_Wallet]);
         emit Transfer(0x0, Team_Wallet, balances[Team_Wallet]);
 		emit Transfer(0x0, OEM_Wallet, balances[OEM_Wallet]);
         emit Transfer(0x0, LA_wallet, balances[LA_wallet]);
-				
+
 		emit Transfer(0x0, tokenWallet, balances[tokenWallet]);
     }
 
-	///-------------------------------------- Pres-Sale / Main Sale	
+	///-------------------------------------- Pres-Sale / Main Sale
     ///
     /// startTime                                                      												endTime
-    ///     
-	///		2 Days		  	5 Days				6 Days			6 Days								1 Month				
+    ///
+	///		2 Days		  	5 Days				6 Days			6 Days								1 Month
 	///	    750 000 AFW		900 000 AFW1		500 000 AFW		1 850 000 AFW						69 000 000 AFW
     ///  O--------------O-----------------O------------------O-------------------O--------O------------------------->
     ///     Disc 20 %     	Disc 10 %          	Disc 5 %        Disc 3 %           Closed            Main Sale 0%			Finalized
-    
+
 
 	/**
 	******** DATE PReICO - ICO */
     uint public constant startDate = 1524866399; /// Start Pre-sale - Friday 27 April 2018 23:59:59
     uint public constant endPreICO = 1526680799;/// Close Pre-Sale - Friday 18 May 2018 23:59:59
-	
+
 	/// HOT sale start time
     uint constant preSale20 = startDate ; /// Start Pre-sale 20% - Friday 27 April 2018 23:59:59
     uint constant preSale10 = 1525039200; /// Start Pre-sale 10% - Monday 30 April 2018 00:00:00
     uint constant preSale5 = 1525471200; /// Start Pre-sale 5% - Saturday 5 May 2018 00:00:00
-	uint constant preSale3 = 1525989600; /// Start Pre-sale 3% - Friday 11 May 2018 00:00:00  
-			
+	uint constant preSale3 = 1525989600; /// Start Pre-sale 3% - Friday 11 May 2018 00:00:00
+
     uint public constant startICO = 1526680800; /// Start Main Sale - Saturday 19 May 2018 00:00:00
-    uint public constant _endDate = 1529186399; /// Close Main Sale - Saturday 16 June 2018 23:59:59 
+    uint public constant _endDate = 1529186399; /// Close Main Sale - Saturday 16 June 2018 23:59:59
 
     struct Stat {
         uint currentFundraiser;
         uint btcAmount;
         uint ethAmount;
         uint txCounter;
-    }    
-    Stat public stat;    
-	
+    }
+    Stat public stat;
+
 	/// Maximum tokens to be allocated on the sale (69% of the hard cap)
     uint public constant preIcoCap = 5000000 ether;
     uint public constant IcoCap = 64000000 ether;
 
 	/// token caps for each round
 	uint256[4] private StepCaps = [
-        750000 ether, 	/// 20% 
+        750000 ether, 	/// 20%
         900000 ether, 	/// 10%
         1500000 ether, 	/// 5%
         1850000 ether 	/// 3%
-    ];	
+    ];
 	uint8[4] private StepDiscount = [20, 10, 5, 3];
-		
+
     /**
      * @dev modifier to allow actions only when Pre-ICO end date is now
      */
@@ -424,17 +424,17 @@ contract AFWToken is StandardToken , BurnableToken  {
         require(now >= endDate);
         _;
     }
-	
+
 	/// @return the index of the current discount by date.
     function currentStepIndexByDate() internal view returns (uint8 roundNum) {
-        require(now <= endPreICO); 
+        require(now <= endPreICO);
         if(now > preSale3) return 3;
         if(now > preSale5) return 2;
         if(now > preSale10) return 1;
         if(now > preSale20) return 0;
         else return 0;
     }
-	
+
 
     /// @return integer representing the index of the current sale round
     function currentStepIndex() internal view returns (uint8 roundNum) {
@@ -455,7 +455,7 @@ contract AFWToken is StandardToken , BurnableToken  {
 		return tokens;
     }
 
-	
+
 	/// @dev Returns is Pre-Sale.
     function isPreSale() internal view returns (bool) {
         if (now >= startDate && now < endPreICO && preIcoCap.sub(stat.currentFundraiser) > 0) {
@@ -479,7 +479,7 @@ contract AFWToken is StandardToken , BurnableToken  {
         if (msg.value < 0.001 ether || (!isPreSale() && !isMainSale())) revert();
         buyTokens();
     }
-	
+
 	/// @return integer representing the index of the current sale round
     function currentStepIndexAll() internal view returns (uint8 roundNum) {
         roundNum = currentStepIndexByDate();
@@ -488,14 +488,14 @@ contract AFWToken is StandardToken , BurnableToken  {
             roundNum++;
         }
     }
-	
+
 	/// @dev Compute the amount of AFW token that can be purchased.
     /// @param ethAmount Amount of Ether to purchase AFW.
 	function computeTokenAmountAll(uint256 ethAmount) internal returns (uint256) {
         uint256 tokenBase = ethAmount.mul(tokenRate);
 		uint8 roundNum = currentStepIndexAll();
 		uint256 tokens = tokenBase.mul(100)/(100 - (StepDiscount[roundNum]));
-				
+
 		if (roundNum == 3 && (StepCaps[0] > 0 || StepCaps[1] > 0 || StepCaps[2] > 0))
 		{
 			/// All unsold pre-sale tokens are made available at the last pre-sale period (3% discount rate)
@@ -503,28 +503,28 @@ contract AFWToken is StandardToken , BurnableToken  {
 			StepCaps[0] = 0;
 			StepCaps[1] = 0;
 			StepCaps[2] = 0;
-		}				
-		uint256 balancePreIco = StepCaps[roundNum];		
-		
+		}
+		uint256 balancePreIco = StepCaps[roundNum];
+
 		if (balancePreIco == 0 && roundNum == 3) {
 
 		} else {
 			/// If tokens available on the pre-sale run out with the order, next pre-sale discount is applied to the remaining ETH
-			if (balancePreIco < tokens) {			
-				uint256 toEthCaps = (balancePreIco.mul((100 - (StepDiscount[roundNum]))).div(100)).div(tokenRate);			
+			if (balancePreIco < tokens) {
+				uint256 toEthCaps = (balancePreIco.mul((100 - (StepDiscount[roundNum]))).div(100)).div(tokenRate);
 				uint256 toReturnEth = ethAmount - toEthCaps ;
 				tokens= balancePreIco;
-				StepCaps[roundNum]=StepCaps[roundNum]-balancePreIco;		
-				tokens = tokens + computeTokenAmountAll(toReturnEth);			
+				StepCaps[roundNum]=StepCaps[roundNum]-balancePreIco;
+				tokens = tokens + computeTokenAmountAll(toReturnEth);
 			} else {
 				StepCaps[roundNum] = StepCaps[roundNum] - tokens;
-			}	
-		}		
+			}
+		}
 		return tokens ;
     }
-	
+
     /// @notice Buy tokens from contract by sending ether
-    function buyTokens() internal {		
+    function buyTokens() internal {
 		/// only accept a minimum amount of ETH?
         require(msg.value >= 0.001 ether);
         uint256 tokens ;
@@ -532,30 +532,30 @@ contract AFWToken is StandardToken , BurnableToken  {
 		uint256 toReturnEth;
 		uint256 toTokensReturn;
 		uint256 balanceIco ;
-		
-		if(isPreSale()){	
+
+		if(isPreSale()){
 			balanceIco = preIcoCap.sub(stat.currentFundraiser);
 			tokens =computeTokenAmountAll(xAmount);
-			if (balanceIco < tokens) {	
+			if (balanceIco < tokens) {
 				uint8 roundNum = currentStepIndexAll();
-				toTokensReturn = tokens.sub(balanceIco);	 
-				toReturnEth = (toTokensReturn.mul((100 - (StepDiscount[roundNum]))).div(100)).div(tokenRate);			
-			}			
+				toTokensReturn = tokens.sub(balanceIco);
+				toReturnEth = (toTokensReturn.mul((100 - (StepDiscount[roundNum]))).div(100)).div(tokenRate);
+			}
 		} else if (isMainSale()) {
 			balanceIco = IcoCap.add(preIcoCap);
- 			balanceIco = balanceIco.sub(stat.currentFundraiser);	
+ 			balanceIco = balanceIco.sub(stat.currentFundraiser);
 			tokens = xAmount.mul(tokenRate);
 			if (balanceIco < tokens) {
 				toTokensReturn = tokens.sub(balanceIco);
 				toReturnEth = toTokensReturn.mul(tokenRate);
-			}			
+			}
 		} else {
             revert();
         }
 
 		if (tokens > 0 )
 		{
-			if (balanceIco < tokens) {	
+			if (balanceIco < tokens) {
 				/// return  ETH
 				msg.sender.transfer(toReturnEth);
 				_EnvoisTokens(balanceIco, xAmount - toReturnEth);
@@ -580,7 +580,7 @@ contract AFWToken is StandardToken , BurnableToken  {
         stat.ethAmount += _ethers;
         stat.txCounter += 1;
     }
-    
+
 	/// @dev issue tokens for a single buyer
 	/// @dev Issue token based on Ether received.
     /// @param _to address to send to
@@ -603,23 +603,23 @@ contract AFWToken is StandardToken , BurnableToken  {
         stat.btcAmount += _btcAmount;
         stat.txCounter += 1;
     }
-	
+
 	/// @dev modify Base exchange rate.
-	/// @param newTokenRate the new rate. 
+	/// @param newTokenRate the new rate.
     function setTokenRate(uint newTokenRate) public onlyOwner {
         tokenRate = newTokenRate;
     }
-	
+
 	/// @dev Returns the current rate.
 	function getTokenRate() public constant returns (uint) {
         return (tokenRate);
-    }    
-	
+    }
+
 	/// @dev Returns the current price for 1 ether.
     function price() public view returns (uint256 tokens) {
 		uint _amount = 1 ether;
-		
-		if(isPreSale()){	
+
+		if(isPreSale()){
 			return computeTokenAmount(_amount);
 		} else if (isMainSale()) {
 			return _amount.mul(tokenRate);
@@ -630,52 +630,52 @@ contract AFWToken is StandardToken , BurnableToken  {
 	/// @dev Returns the current price.
 	/// @param _amount the amount of ether
     function EthToAFW(uint _amount) public view returns (uint256 tokens) {
-		if(isPreSale()){	
+		if(isPreSale()){
 			return computeTokenAmount(_amount);
 		} else if (isMainSale()) {
 			return _amount.mul(tokenRate);
 		} else {
             return 0;
         }
-    }      
+    }
 
 	/// @dev Returns the current Sale.
     function GetSale() public constant returns (uint256 tokens) {
-		if(isPreSale()){	
+		if(isPreSale()){
 			return 1;
 		} else if (isMainSale()) {
 			return 2;
 		} else {
             return 0;
         }
-    }        
-	
+    }
+
 	/// @dev Returns the current Cap preIco.
-	/// @param _roundNum the caps 
-	function getCapTab(uint _roundNum) public view returns (uint) {			
+	/// @param _roundNum the caps
+	function getCapTab(uint _roundNum) public view returns (uint) {
 		return (StepCaps[_roundNum]);
     }
-	
+
 	/// @dev modify Base exchange rate.
 	/// @param _roundNum pre-sale round
 	/// @param _value initialize the number of tokens for the indicated pre-sale round
     function setCapTab(uint _roundNum,uint _value) public onlyOwner {
         require(_value > 0);
 		StepCaps[_roundNum] = _value;
-    }	
+    }
 
 	/// @dev Returns the current Balance of Main Sale.
 	function getBalanceIco() public constant returns (uint) {
 		uint balanceIco = IcoCap.add(preIcoCap);
-		balanceIco = balanceIco.sub(stat.currentFundraiser);	
+		balanceIco = balanceIco.sub(stat.currentFundraiser);
         return(balanceIco);
-    } 
-	
+    }
+
 	 /**
      * Overrides the burn function so that it cannot be called until after
      * transfers have been enabled.
      *
-     * @param _value    The amount of tokens to burn  
+     * @param _value    The amount of tokens to burn
      */
    // burn(uint256 _value) public whenNotPaused {
     function AFWBurn(uint256 _value) public onlyOwner {
@@ -684,4 +684,15 @@ contract AFWToken is StandardToken , BurnableToken  {
         super.burn(_value *10**18);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

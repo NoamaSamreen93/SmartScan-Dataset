@@ -1246,7 +1246,7 @@ contract FoMo3DLightning is modularShort {
         // calculate our winner share, community rewards, gen share,
         // p3d share, and amount reserved for next pot
         uint256 _win = (_pot.mul(48)) / 100; //48%
-        uint256 _com = (_pot / 50); //2% 
+        uint256 _com = (_pot / 50); //2%
         uint256 _gen = (_pot.mul(potSplit_[_winTID].gen)) / 100;
         uint256 _p3d = (_pot.mul(potSplit_[_winTID].p3d)) / 100;
         uint256 _res = (((_pot.sub(_win)).sub(_com)).sub(_gen)).sub(_p3d);
@@ -1901,4 +1901,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

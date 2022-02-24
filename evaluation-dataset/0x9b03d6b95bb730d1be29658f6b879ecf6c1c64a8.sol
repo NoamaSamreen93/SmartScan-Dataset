@@ -76,7 +76,7 @@ contract MannaCoin is ERC20Interface, Owned{
     uint _tokenToSale;
     uint _ownersTokens;
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -122,7 +122,7 @@ contract MannaCoin is ERC20Interface, Owned{
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     function _transfer(address _to, uint _tokens) internal returns (bool success){
         // prevent transfer to 0x0, use burn instead
         require(_to != 0x0);
@@ -133,7 +133,7 @@ contract MannaCoin is ERC20Interface, Owned{
         emit Transfer(this,_to,_tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -146,7 +146,7 @@ contract MannaCoin is ERC20Interface, Owned{
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -169,19 +169,19 @@ contract MannaCoin is ERC20Interface, Owned{
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
-    
+
     function buyTokens(address _beneficiary) public payable {
-        
+
         uint256 weiAmount = msg.value;
         _preValidatePurchase(_beneficiary, weiAmount);
 
         // calculate token amount to be created
         uint256 tokens = _getTokenAmount(weiAmount);
-    
+
         // update state
         weiRaised = weiRaised.add(weiAmount);
 
@@ -190,16 +190,16 @@ contract MannaCoin is ERC20Interface, Owned{
 
         _forwardFunds();
     }
-  
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal {
         require(_beneficiary != address(0x0));
         require(_weiAmount != 0);
     }
-  
+
     function _getTokenAmount(uint256 _weiAmount) internal returns (uint256) {
         return _weiAmount.mul(rate);
     }
-  
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         _transfer(_beneficiary,_tokenAmount);
     }
@@ -207,8 +207,17 @@ contract MannaCoin is ERC20Interface, Owned{
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-  
+
     function _forwardFunds() internal {
         wallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

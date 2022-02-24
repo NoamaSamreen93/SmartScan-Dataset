@@ -399,7 +399,7 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
    * @param _tokenId uint256 ID of the token to be approved
    */
   function approve(address _to, uint256 _tokenId) public {
-    require(isPaused == false, "transactions on pause");    
+    require(isPaused == false, "transactions on pause");
     address owner = ownerOf(_tokenId);
     require(_to != owner, "can't approve to yourself");
     require(msg.sender == owner || isApprovedForAll(owner, msg.sender));
@@ -848,38 +848,38 @@ contract FabgToken is ERC721Token, Ownable {
         bytes32 url;
         bool isSnatchable;
     }
-    
+
     mapping(uint256 => data) internal tokens;
     mapping(uint256 => uint256) internal pricesForIncreasingAuction;
-    
+
     address presale;
 
     enum tokenType{MASK, LAND}
-    
+
     event TokenCreated(
-        address Receiver, 
-        tokenType Type, 
-        bytes32 Name, 
-        bytes32 URL, 
-        uint256 TokenId, 
+        address Receiver,
+        tokenType Type,
+        bytes32 Name,
+        bytes32 URL,
+        uint256 TokenId,
         bool IsSnatchable
     );
     event TokenChanged(
-        address Receiver, 
-        tokenType Type, 
-        bytes32 Name, 
-        bytes32 URL, 
-        uint256 TokenId, 
+        address Receiver,
+        tokenType Type,
+        bytes32 Name,
+        bytes32 URL,
+        uint256 TokenId,
         bool IsSnatchable
     );
     event Paused();
     event Unpaused();
-    
+
     modifier onlySaleAgent {
         require(msg.sender == saleAgent);
         _;
     }
-    
+
     /**
      * @dev constructor which calling parent's constructor with params
      */
@@ -895,7 +895,7 @@ contract FabgToken is ERC721Token, Ownable {
 
     /**
      * @dev onlyOwner func for stopping all operations with contract
-     */ 
+     */
     function setPauseForAll() public onlyOwner {
         require(isPaused == false, "transactions on pause");
         isPaused = true;
@@ -906,7 +906,7 @@ contract FabgToken is ERC721Token, Ownable {
 
     /**
      * @dev onlyOwner func for unpausing all operations with contract
-     */ 
+     */
     function setUnpauseForAll() public onlyOwner {
         require(isPaused == true, "transactions isn't on pause");
         isPaused = false;
@@ -922,9 +922,9 @@ contract FabgToken is ERC721Token, Ownable {
     function setSaleAgent(address _saleAgent) public onlyOwner {
         saleAgent = _saleAgent;
     }
-    
+
     /**
-     * @dev process of creation of card 
+     * @dev process of creation of card
      * @param _receiver address of token receiver
      * @param _type type of token from enum
      * @param _name bytes32 name of token
@@ -936,7 +936,7 @@ contract FabgToken is ERC721Token, Ownable {
     }
 
     /**
-     * @dev process of creation of card 
+     * @dev process of creation of card
      * @param _receiver address of token receiver
      * @param _type type of token from enum
      * @param _name bytes32 name of token
@@ -946,14 +946,14 @@ contract FabgToken is ERC721Token, Ownable {
     function tokenCreation(address _receiver, uint256 _price, tokenType _type, bytes32 _name, bytes32 _url, bool _isSnatchable) internal {
         require(isPaused == false, "transactions on pause");
         uint256 tokenId = totalSupply();
-        
+
         data memory info = data(_type, _name, _url, _isSnatchable);
         tokens[tokenId] = info;
-        
+
         if(_isSnatchable == true) {
             pricesForIncreasingAuction[tokenId] = _price;
         }
-        
+
         _mint(_receiver, tokenId);
 
         emit TokenCreated(_receiver, _type, _name, _url, tokenId, _isSnatchable);
@@ -1007,9 +1007,9 @@ contract FabgToken is ERC721Token, Ownable {
      * @return isSnatchable type of auction
      */
     function getTokenById(uint256 _tokenId) public view returns (
-        tokenType typeOfToken, 
-        bytes32 name, 
-        bytes32 URL, 
+        tokenType typeOfToken,
+        bytes32 name,
+        bytes32 URL,
         bool isSnatchable
     ) {
         typeOfToken = tokens[_tokenId].typeOfToken;
@@ -1017,7 +1017,7 @@ contract FabgToken is ERC721Token, Ownable {
         URL = tokens[_tokenId].url;
         isSnatchable = tokens[_tokenId].isSnatchable;
     }
-        
+
     /**
      * @dev token price for increasing auction
      * @param _tokenId Id of token for selling
@@ -1037,46 +1037,46 @@ contract FabgToken is ERC721Token, Ownable {
     function allTokensOfUsers(address _owner) public view returns(uint256[]) {
         return ownedTokens[_owner];
     }
-    
+
     /**
      * @dev store information about presale contract
      * @param _presale address of presale contract
-     */ 
+     */
     function setPresaleAddress(address _presale) public onlyOwner {
         presale = _presale;
     }
 
     /**
-     * @dev process of changing information of card 
+     * @dev process of changing information of card
      * @param _receiver address of token receiver
      * @param _type type of token from enum
      * @param _name bytes32 name of token
      * @param _url bytes32 url of token
      * @param _isSnatchable type of market for trading
-     */    
+     */
     function rewriteTokenFromPresale(
         uint256 _tokenId,
-        address _receiver, 
-        uint256 _price, 
-        tokenType _type, 
-        bytes32 _name, 
-        bytes32 _url, 
+        address _receiver,
+        uint256 _price,
+        tokenType _type,
+        bytes32 _name,
+        bytes32 _url,
         bool _isSnatchable
     ) public onlyOwner {
         require(ownerOf(_tokenId) == presale);
         data memory info = data(_type, _name, _url, _isSnatchable);
         tokens[_tokenId] = info;
-        
+
         if(_isSnatchable == true) {
             pricesForIncreasingAuction[_tokenId] = _price;
         }
-        
+
         emit TokenChanged(_receiver, _type, _name, _url, _tokenId, _isSnatchable);
     }
 }
 contract PreSale is Ownable {
     using SafeMath for uint;
-    
+
     FabgToken token;
     /**
      * @notice address of wallet for comission payment. can be hardcoded
@@ -1084,11 +1084,11 @@ contract PreSale is Ownable {
     address adminsWallet;
     bool public isPaused;
     uint256 totalMoney;
-    
+
     event TokenBought(address Buyer, uint256 tokenID, uint256 price);
     event Payment(address payer, uint256 weiAmount);
     event Withdrawal(address receiver, uint256 weiAmount);
-    
+
     modifier onlyToken() {
         require(msg.sender == address(token), "called not from token");
         _;
@@ -1103,17 +1103,17 @@ contract PreSale is Ownable {
         token = _tokenAddress;
         adminsWallet = _walletForEth;
     }
-    
+
     /**
      * @dev fallback function which can receive ether with no actions
      */
     function() public payable {
        emit Payment(msg.sender, msg.value);
     }
-    
+
     /**
      * @dev only token func for stopping all operations with contract
-     */ 
+     */
     function setPauseForAll() public onlyToken {
         require(isPaused == false, "transactions on pause");
         isPaused = true;
@@ -1121,12 +1121,12 @@ contract PreSale is Ownable {
 
     /**
      * @dev only token func for unpausing all operations with contract
-     */ 
+     */
     function setUnpauseForAll() public onlyToken {
         require(isPaused == true, "transactions on pause");
         isPaused = false;
-    }   
-    
+    }
+
     /**
      * @dev buy token, owner of which is market. contract will send back change
      * @param _tokenId id of token for buying
@@ -1136,10 +1136,10 @@ contract PreSale is Ownable {
         require(token.exists(_tokenId), "token doesn't exist");
         require(token.ownerOf(_tokenId) == address(this), "contract isn't owner of token");
         require(msg.value >= token.getTokenPriceForIncreasing(_tokenId), "was sent not enough ether");
-        
+
         token.transferFrom(address(this), msg.sender, _tokenId);
         (msg.sender).transfer(msg.value.sub(token.getTokenPriceForIncreasing(_tokenId)));
-        
+
         totalMoney = totalMoney.add(token.getTokenPriceForIncreasing(_tokenId));
 
         emit TokenBought(msg.sender, _tokenId, token.getTokenPriceForIncreasing(_tokenId));
@@ -1151,16 +1151,24 @@ contract PreSale is Ownable {
      */
     function setAddressForPayment(address _newMultisig) public onlyOwner {
         adminsWallet = _newMultisig;
-    }    
-    
+    }
+
     /**
      * @dev withdraw all ether from this contract to sender's wallet
      */
     function withdraw() public onlyOwner {
         require(adminsWallet != address(0), "admins wallet couldn't be 0x0");
 
-        uint256 amount = address(this).balance;  
+        uint256 amount = address(this).balance;
         (adminsWallet).transfer(amount);
         emit Withdrawal(adminsWallet, amount);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

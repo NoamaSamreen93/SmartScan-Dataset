@@ -97,7 +97,7 @@ interface IERC20 {
 }
 
 contract ERC20 is IERC20, SafeMath ,Ownable {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -108,20 +108,20 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
-    
+
     event UserAdedd(uint vestedAmount,uint vestingDuration,uint vestingPercentage,uint releasedAmount,string vesterType,uint tokenUsed,uint startTime,uint month);
-    
+
     constructor() public {
-         
+
          name = "Hartanah Dcom Token";
          symbol = "HADT";
          decimals = 10;
          startTime = now;
          _totalSupply = 10000000000000000000;
          _balances[msg.sender] = _totalSupply;
-         
+
      }
-    
+
     struct User {
         uint vestedAmount;
         uint vestingDuration;
@@ -132,13 +132,13 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
         uint startTime;
         uint vestingMonth;
     }
-    
+
     mapping(address => User) vestInfo;
     mapping(string => address) addressMap;
-    
+
     modifier checkReleasable(uint value) {
         address sender = msg.sender;
-        
+
         if(vestInfo[sender].vestedAmount == 0 || sender == owner()) {
             _;
         }
@@ -160,9 +160,9 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
             require((vestInfo[sender].releasedAmount - vestInfo[sender].tokenUsed) >= value);
             _;
         }
-        
-    } 
-    
+
+    }
+
     function addUser(address _account,uint _vestingDuration,uint _vestingPercentage,string memory _vesterType) public onlyOwner {
       uint vestedAmount;
       uint releasedAmount;
@@ -178,9 +178,9 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
       _transfer(owner(),_account,vestedAmount);
       emit UserAdedd(vestedAmount,_vestingDuration,_vestingPercentage,releasedAmount,_vesterType,0,now,1);
     }
-  
+
     function getReleasedAmount(address _account) public view returns(uint){
-        
+
       uint release = vestInfo[_account].releasedAmount;
       if(keccak256(abi.encodePacked(vestInfo[_account].vesterType)) == keccak256(abi.encodePacked("Public Sales"))) {
           uint current = ((now - vestInfo[_account].startTime)/31536000)+1;
@@ -195,47 +195,47 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
        }
         return(release);
     }
-  
+
     function FoundersVestedAmount() public view returns(uint){
       address account = addressMap["Founders"];
       return vestInfo[account].vestedAmount;
-    } 
-    
+    }
+
     function ManagementVestedAmount() public view returns(uint){
       address account = addressMap["Management"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function TechnologistVestedAmount() public view returns(uint){
       address account = addressMap["Technologist"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function LegalAndFinanceVestedAmount() public view returns(uint){
       address account = addressMap["Legal & Finance"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function MarketingVestedAmount() public view returns(uint){
       address account = addressMap["Marketing"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function PublicSalesVestedAmount() public view returns(uint){
       address account = addressMap["Public Sales"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function AirdropVestedAmount() public view returns(uint){
       address account = addressMap["Airdrop"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function PromotionVestedAmount() public view returns(uint){
       address account = addressMap["Promotion"];
       return vestInfo[account].vestedAmount;
     }
-    
+
     function RewardsVestedAmount() public view returns(uint){
       address account = addressMap["Rewards"];
       return vestInfo[account].vestedAmount;
@@ -244,48 +244,48 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
     function FoundersReleasedAmount() public view returns(uint){
       address account = addressMap["Founders"];
       return getReleasedAmount(account);
-    } 
-    
+    }
+
     function ManagementReleasedAmount() public view returns(uint){
       address account = addressMap["Management"];
       return getReleasedAmount(account);
     }
-    
+
     function TechnologistReleasedAmount() public view returns(uint){
       address account = addressMap["Technologist"];
       return getReleasedAmount(account);
     }
-    
+
     function LegalAndFinanceReleasedAmount() public view returns(uint){
       address account = addressMap["Legal & Finance"];
       return getReleasedAmount(account);
     }
-    
+
     function MarketingReleasedAmount() public view returns(uint){
       address account = addressMap["Marketing"];
       return getReleasedAmount(account);
     }
-    
+
     function PublicSalesReleasedAmount() public view returns(uint){
       address account = addressMap["Public Sales"];
       return getReleasedAmount(account);
     }
-    
+
     function AirdropReleasedAmount() public view returns(uint){
       address account = addressMap["Airdrop"];
       return getReleasedAmount(account);
     }
-    
+
     function PromotionReleasedAmount() public view returns(uint){
       address account = addressMap["Promotion"];
       return getReleasedAmount(account);
     }
-    
+
     function RewardsReleasedAmount() public view returns(uint){
       address account = addressMap["Rewards"];
       return getReleasedAmount(account);
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -313,7 +313,7 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
         _approve(from, msg.sender, sub(_allowed[from][msg.sender],value));
         return true;
     }
-     
+
     function _transfer(address from, address to, uint256 value) internal  {
         require(to != address(0));
 
@@ -331,4 +331,13 @@ contract ERC20 is IERC20, SafeMath ,Ownable {
         emit Approval(owner, spender, value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

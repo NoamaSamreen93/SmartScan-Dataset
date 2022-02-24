@@ -415,3 +415,14 @@ contract ELToken is ERC20Detailed, ERC20Burnable, ERC20Mintable, ERC20Pausable, 
     emit Transfer(address(0), msg.sender, totalSupply * 10 ** uint(decimals)); // ERC20Basic.sol
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

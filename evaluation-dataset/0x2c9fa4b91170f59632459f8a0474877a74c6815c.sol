@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24; 
+pragma solidity ^0.4.24;
 
 interface IToken {
   function name() external view returns(string);
@@ -704,4 +704,15 @@ contract Tokensale is Crowdsale, MintedCrowdsale, CappedCrowdsale, TimedCrowdsal
     SharesCrowdsale(wallets)
   {
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

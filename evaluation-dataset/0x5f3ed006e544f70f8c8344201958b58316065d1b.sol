@@ -133,3 +133,7 @@ contract InitialToken is StandardToken {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

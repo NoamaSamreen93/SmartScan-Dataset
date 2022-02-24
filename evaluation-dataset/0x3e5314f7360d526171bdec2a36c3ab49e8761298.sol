@@ -10,9 +10,9 @@ pragma solidity ^0.4.24;
 // Concept:
 // buy a raffle ticket
 // => lifetime possible to win a round payout and a chance to win the jackpot
-// 
+//
 // Have fun, these games are purely intended for fun.
-// 
+//
 
 // ----------------------------------------------------------------------------
 // Safe maths
@@ -82,7 +82,7 @@ interface HourglassInterface  {
 }
 contract P3DRaffle is  Owned {
     using SafeMath for uint;
-    HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe); 
+    HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
    function harvestabledivs()
         view
         public
@@ -142,12 +142,12 @@ contract P3DRaffle is  Owned {
     uint256 public rafflepot;
     uint256 public jackpot;
     SPASMInterface constant SPASM_ = SPASMInterface(0xfaAe60F2CE6491886C9f7C9356bd92F688cA66a1);
-    
+
     constructor() public{
     Raffles[0].validation = true;
-    nextrafflenr++;    
+    nextrafflenr++;
 }
-    
+
     function buytickets(uint256 amount ,address masternode) public payable{
     require(msg.value >= 10 finney * amount);
     require(amount > 0);
@@ -178,7 +178,7 @@ function startraffle () public{
     require(Raffles[nextrafflenr - 1].validation == true);
     require(rafflepot >= 103 finney);
     Raffles[nextrafflenr].drawblock = block.number;
-    
+
     Raffles[nextrafflenr].ticketssold = nextlotnr-1;
     nextrafflenr++;
 }
@@ -188,7 +188,7 @@ function validateraffle () public{
     uint256 drawblock = Raffles[rafnr].drawblock;
     require(val != true);
     require(drawblock < block.number);
-    
+
     //check if blockhash can be determined
         if(block.number - 256 > drawblock) {
             // can not be determined
@@ -213,7 +213,20 @@ function validateraffle () public{
             msg.sender.transfer(3 finney);
             rafflepot = rafflepot.sub(103 finney);
         }
-    
+
 }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -56,7 +56,7 @@ interface RigoToken {
     function mintToken(address _recipient, uint256 _amount) external;
     function changeMintingAddress(address _newAddress) external;
     function changeRigoblockAddress(address _newAddress) external;
-    
+
     function balanceOf(address _who) external view returns (uint256);
 }
 
@@ -391,4 +391,15 @@ contract Inflation is
     {
         return Owned(_ofPool).owner();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

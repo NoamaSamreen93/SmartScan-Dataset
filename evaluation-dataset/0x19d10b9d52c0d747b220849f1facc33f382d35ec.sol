@@ -59,10 +59,10 @@ contract QPSEToken is IERC20 {
     uint public _presaleSupply = 8000000e18;
     uint public _mainsaleSupply = 12000000e18;
     uint public _futureSupply = 13000000e18;
-                                    
+
 //    uint256 public pre_startTime = 1522904400;  //2018/04/08 00:00:00 UTC + 8
     uint256 public pre_endTime = 1523854800;    //2018/04/16 00:00:00 UTC + 8
-	
+
     uint256 public ico_startTime = 1523854800;  //2018/04/16 00:00:00 UTC + 8
 //    uint256 public ico_endTime = 1533074400;    //2018/08/01 00:00:00 UTC + 8
 
@@ -103,7 +103,7 @@ contract QPSEToken is IERC20 {
     function QPSEToken() public payable {
         owner = msg.sender;
 	    fundRaised = 0;
-        balances[token_addr] = _totalSupply; 
+        balances[token_addr] = _totalSupply;
     }
 
     // Payable method
@@ -128,7 +128,7 @@ contract QPSEToken is IERC20 {
         if ( fundRaised >= _presaleSupply ) {
             ico_stage = STAGE_MAIN_ICO;
         }
-	
+
         uint256 weiAmount = msg.value;
         uint tokens = weiAmount.mul(getPrice());
 
@@ -144,7 +144,7 @@ contract QPSEToken is IERC20 {
         if ( tokens == 0 ) {
             recipient.transfer(msg.value);
         } else {
-            eth_addr.transfer(msg.value);    
+            eth_addr.transfer(msg.value);
         }
     }
 
@@ -233,4 +233,15 @@ contract QPSEToken is IERC20 {
     	    return ico_PRICE;
     	}
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

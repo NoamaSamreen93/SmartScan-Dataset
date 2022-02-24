@@ -9,17 +9,17 @@ contract playFive {
   address private creator;
   string private referal;
   string private try_userhash;
-  uint private totalBalance; 
+  uint private totalBalance;
   uint public totalwin;
-  
+
   //ENG::Сonstructor
   //Конструктор
-  
+
   constructor() public {
 
-    creator = tx.origin;   
+    creator = tx.origin;
   }
-  
+
 
   //ENG::Function that show Creator adress
   //RUS::Функция которая отобразит адресс создателя контракта
@@ -31,8 +31,8 @@ contract playFive {
   //Функция которая отобразит Баланс СмартКонтракта
   function getTotalBalance() public constant returns(uint) {
     return address(this).balance;
-  }  
-  
+  }
+
 
 //ENG::One of the best way to compare two strings converted to bytes
 //ENG::Function will check length and if bytes length is same then calculate hash of strings and compare it, (a1)
@@ -51,7 +51,7 @@ function hashCompareWithLengthCheck(string a, string b) internal pure returns (b
 
 //ENG::Function that calculate Wining points
 //ENG::After we get our *play ticket* hash, we take 5 chars in middle of it and game is on
-//ENG::PlayFiveChain - main game function, send to this function *play ticket* code and player entered symbols 
+//ENG::PlayFiveChain - main game function, send to this function *play ticket* code and player entered symbols
 //ENG::Then converting strings to bytes, so we can run throung each symbol (b2)
 //ENG::Also we set initial winpoint to 0 (b3)
 //ENG::Then we run throught each symbol in *play ticket* and compare it with player entered symbols
@@ -73,9 +73,9 @@ function hashCompareWithLengthCheck(string a, string b) internal pure returns (b
 //RUS::Заменяет найденные символы в *билете* и *ключе* на X и Y и они более не участвуют в игре (b5)
 //RUS::Увеличивает количество баллов winpoint на 1 (b6)
 //RUS::По звыершению, возвращает значение winpoint от 0 до 5 (b7)
-function check_result(string ticket, string check) public pure returns (uint) {  
+function check_result(string ticket, string check) public pure returns (uint) {
     bytes memory ticketBytes = bytes(ticket); //(b2)
-    bytes memory checkBytes = bytes(check);   //(b2) 
+    bytes memory checkBytes = bytes(check);   //(b2)
     uint winpoint = 0; //(b3)
 
 
@@ -88,17 +88,17 @@ function check_result(string ticket, string check) public pure returns (uint) {
           ticketBytes[j] ="X"; //(b5)
           checkBytes[i] = "Y"; //(b5)
 
-          winpoint = winpoint+1; //(b6)         
+          winpoint = winpoint+1; //(b6)
         }
-       
+
       }
 
-    }    
+    }
     return uint(winpoint); //(b7)
   }
 
 //ENG::Function destroy this smartContract
-//ENG::Thats needed in case if we create new game, to take founds from it and add to new game 
+//ENG::Thats needed in case if we create new game, to take founds from it and add to new game
 //ENG::Or also it need if we see that current game not so actual, and we need to transfer founds to a new game, that more popular
 //ENG::Or in case if we found any critical bug, to take founds in safe place, while fixing bugs.
 //RUS::Функция для уничтожения смарт контракта
@@ -106,8 +106,8 @@ function check_result(string ticket, string check) public pure returns (uint) {
 //RUS::Или если при создании новых игр, эта потеряет свою актуальность
 //RUS::Либо при обнаружении критических багое, перевести средства в безопастное место на время исправления ошибок
   function resetGame () public {
-    if (msg.sender == address(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3)) { 
-      selfdestruct(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3); 
+    if (msg.sender == address(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3)) {
+      selfdestruct(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3);
       return;
     }
   }
@@ -149,14 +149,14 @@ function substring(string str, uint startIndex, uint endIndex) public pure retur
   //ENG::Standart Function to receive founds
   //RUS::Стандартная функция для приёма средств
   function () payable public {
-    //RECEIVED    
+    //RECEIVED
   }
 
   //ENG::Converts adress type into string
   //ENG::Used to convert *TICKET* adress into string
   //RUS::Конвертирует переменную типа adress в строку string
   //RUS::Используется для конвертации адреса *билета* в строку string
-  
+
 function addressToString(address _addr) public pure returns(string) {
     bytes32 value = bytes32(uint256(_addr));
     bytes memory alphabet = "0123456789abcdef";
@@ -243,8 +243,8 @@ function isContract(address _addr) private view returns (bool OKisContract){
 //ENG::when win amount was calculated it automatically sends to player adress (c10)
 //ENG::After all steps completed, SmartContract will generate message for EVENT,
 //ENG::EVENT Message will have description of current game, and will have those fields which will be displayed on website:
-//ENG::Player Address/ Player provided symbols / Player BET / Block Number Transaction played / Partner id / Little ticket / Player score / Player Win amount / 
-//ENG::Полный адресс *игрока* / Символы введенные игроком / Ставку / Номер блока в котором играли / Ид партнёра / Укороченный билет / Очки игрока / Суммы выйгрыша / 
+//ENG::Player Address/ Player provided symbols / Player BET / Block Number Transaction played / Partner id / Little ticket / Player score / Player Win amount /
+//ENG::Полный адресс *игрока* / Символы введенные игроком / Ставку / Номер блока в котором играли / Ид партнёра / Укороченный билет / Очки игрока / Суммы выйгрыша /
 //RUS::Главная функция которая вызывается непосредственно с сайта.
 //RUS::Чтобы обеспечивать качественный сервис, развивать и создавать новые игры, мы берем комиссию 13,3% от размера ставки (c1)
 //RUS::Используем для добычи хеша несколько переменных, (c2)
@@ -261,24 +261,24 @@ function isContract(address _addr) private view returns (bool OKisContract){
 //RUS::После завершения всех шагов, смарт контракт генерирует сообщение для ЭВЕНТА
 //RUS::Сообщение ЭВЕНТА хранит в себе ключевые показатели сыграной игры, и красиво в понятной форме будут отображены на сайте
 //RUS::Что содержит сообщение ЭВЕНТА:
-//RUS::Полный адресс *игрока* / Символы введенные игроком / Ставку / Номер блока / Ид партнёра / Укороченный билет / Очки игрока / Суммы выйгрыша / 
+//RUS::Полный адресс *игрока* / Символы введенные игроком / Ставку / Номер блока / Ид партнёра / Укороченный билет / Очки игрока / Суммы выйгрыша /
 
 
   function PlayFiveChain(string _u_key, string _u_ref ) public payable {
-    
+
     //ENG::AntiRobot Captcha
-    //RUS::Капча против ботов 
+    //RUS::Капча против ботов
     require(tx.origin == msg.sender);
     if(isContract(msg.sender))
     {
       return;
-    }    
+    }
 
 
-      address(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3).transfer((msg.value/1000)*133); //(c1)     
-            
-      try_userhash =       blockhashToString(keccak256(abi.encodePacked(_u_key,"-",now,"-", 
-      blockhashToString(blockhash(block.number-1)),      
+      address(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3).transfer((msg.value/1000)*133); //(c1)
+
+      try_userhash =       blockhashToString(keccak256(abi.encodePacked(_u_key,"-",now,"-",
+      blockhashToString(blockhash(block.number-1)),
       addressToString(msg.sender),
       uint2str(gasleft()),
       address(msg.sender).balance,
@@ -288,11 +288,11 @@ function isContract(address _addr) private view returns (bool OKisContract){
 
       string memory calculate_userhash = substring(try_userhash,2,7); //(c2)
 
-      
-          
+
+
 
       uint winpoint = check_result(_toLower(calculate_userhash),_toLower(_u_key));//(c3)
-      
+
 
     if(winpoint == 0)
     {
@@ -309,7 +309,7 @@ function isContract(address _addr) private view returns (bool OKisContract){
     if(winpoint == 3)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*315; //(c6)
-    }            
+    }
     if(winpoint == 4)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*515; //(c7)
@@ -317,19 +317,30 @@ function isContract(address _addr) private view returns (bool OKisContract){
     if(winpoint == 5)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*3333; //(c8)
-    } 
+    }
 
-    if(totalwin > 0)    
+    if(totalwin > 0)
     {
       if(totalwin > address(this).balance)
       {
         totalwin = ((address(this).balance/100)*90); //(c9)
       }
-       msg.sender.transfer(totalwin); //(c10)         
+       msg.sender.transfer(totalwin); //(c10)
     }
-      emit ok_statusGame(msg.sender, _u_key, msg.value, block.number, _u_ref, calculate_userhash,winpoint,totalwin);                                      
+      emit ok_statusGame(msg.sender, _u_key, msg.value, block.number, _u_ref, calculate_userhash,winpoint,totalwin);
 
     return;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

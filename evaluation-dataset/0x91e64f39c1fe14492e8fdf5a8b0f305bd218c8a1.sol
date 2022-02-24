@@ -125,7 +125,7 @@ contract ERC20 is Ownable, IERC20 {
     event Mint(address indexed to, uint256 amount);
     event Log(address to);
     event MintToggle(bool status);
-    
+
     // Constant Functions
     function balanceOf(address _owner) public view returns (uint256) {
         return IController(owner()).balanceOf(_owner);
@@ -162,7 +162,7 @@ contract ERC20 is Ownable, IERC20 {
         emit Approval(msg.sender, spender, allowed);
         return true;
     }
-    
+
     function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
         uint256 allowed = IController(owner()).decreaseAllowance(msg.sender, spender, subtractedValue);
         emit Approval(msg.sender, spender, allowed);
@@ -223,4 +223,15 @@ contract VodiX is ERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

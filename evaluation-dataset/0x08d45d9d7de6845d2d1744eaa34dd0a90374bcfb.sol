@@ -266,8 +266,8 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update a single rate.
-   * @param _symbol The symbol to be updated. 
-   * @param _rate the rate for the symbol. 
+   * @param _symbol The symbol to be updated.
+   * @param _rate the rate for the symbol.
    */
   function updateRate(string _symbol, uint _rate) public onlyOwner {
     rates[keccak256(_symbol)] = _rate;
@@ -276,11 +276,11 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update multiple rates.
-   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate . 
+   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate .
    */
   function updateRates(uint[] data) public onlyOwner {
-    
-    require(data.length % 2 <= 0);      
+
+    require(data.length % 2 <= 0);
     uint i = 0;
     while (i < data.length / 2) {
       bytes32 symbol = bytes32(data[i * 2]);
@@ -293,10 +293,21 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the anyone to read the current rate.
-   * @param _symbol the symbol to be retrieved. 
+   * @param _symbol the symbol to be retrieved.
    */
   function getRate(string _symbol) public constant returns(uint) {
     return rates[keccak256(_symbol)];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -91,19 +91,19 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     /// add new pool address to pools
     function addPool(address newPool) onlyOwner {
         assert (newPool != 0);
         if (isPool(newPool)) throw;
         pools.push(newPool);
     }
-    
+
     /// remove a address from pools
     function removePool(address pool) onlyOwner{
         assert (pool != 0);
         if (!isPool(pool)) throw;
-        
+
         for (uint i=0; i<pools.length - 1; i++) {
             if (pools[i] == pool) {
                 pools[i] = pools[pools.length - 1];
@@ -120,7 +120,7 @@ contract Owned {
         }
         return false;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         removePool(owner);
         addPool(newOwner);
@@ -134,7 +134,7 @@ contract Owned {
 contract BPToken is SafeMath, Owned, ERC20 {
     string public constant name = "Backpack Token";
     string public constant symbol = "BP";
-    uint256 public constant decimals = 18;  
+    uint256 public constant decimals = 18;
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
@@ -152,7 +152,7 @@ contract BPToken is SafeMath, Owned, ERC20 {
 
     /// per month seconds
     uint perMonthSecond = 2592000;
-    
+
     /// calc the balance that the user shuold hold
     function shouldHadBalance(address who) constant returns (uint256){
         if (isPool(who)) return 0;
@@ -177,12 +177,12 @@ contract BPToken is SafeMath, Owned, ERC20 {
             return 0;
         }
 
-        // base lock amount 
+        // base lock amount
         uint256 baseLockAmount = safeDiv(safeMul(baseAmount, ap.getBaseLockPercent()),100);
         if (block.timestamp < startLockTime) {
             return baseLockAmount;
         }
-        
+
         /// will not linear release
         if (ap.getLinearRelease() == 0) {
             if (block.timestamp < stopLockTime) {
@@ -191,9 +191,9 @@ contract BPToken is SafeMath, Owned, ERC20 {
                 return 0;
             }
         }
-        /// will linear release 
+        /// will linear release
 
-        /// now timestamp before start lock time 
+        /// now timestamp before start lock time
         if (block.timestamp < startLockTime + perMonthSecond) {
             return baseLockAmount;
         }
@@ -210,7 +210,7 @@ contract BPToken is SafeMath, Owned, ERC20 {
         // unlock amount of every month
         uint256 monthUnlockAmount = safeDiv(baseLockAmount,lockMonth);
 
-        // current timestamp passed month 
+        // current timestamp passed month
         uint hadPassMonth = safeDiv(safeSub(block.timestamp,startLockTime),perMonthSecond);
 
         return safeSub(baseLockAmount,safeMul(hadPassMonth,monthUnlockAmount));
@@ -234,7 +234,7 @@ contract BPToken is SafeMath, Owned, ERC20 {
         if (owner == who) {
             return true;
         }
-        
+
         address apAddress = getAssetPoolAddress(who);
         uint256 baseAmount = getBaseAmount(who);
 
@@ -304,7 +304,7 @@ contract BPToken is SafeMath, Owned, ERC20 {
     /// @return Whether the approval was successful or not
     function approve(address spender, uint256 value) returns (bool) {
         if (safeSub(balances[msg.sender],value) < shouldHadBalance(msg.sender)) throw;
-        
+
         // Abort if not in Success state.
         allowed[msg.sender][spender] = value;
         Approval(msg.sender, spender, value);
@@ -353,7 +353,7 @@ contract AssetPool is ownedPool {
 
     function AssetPool(address _bpTokenAddress, uint _baseLockPercent, uint _startLockTime, uint _stopLockTime, uint _linearRelease) {
         assert(_stopLockTime > _startLockTime);
-        
+
         baseLockPercent = _baseLockPercent;
         startLockTime = _startLockTime;
         stopLockTime = _stopLockTime;
@@ -364,11 +364,11 @@ contract AssetPool is ownedPool {
 
         owner = msg.sender;
     }
-    
+
     /// set role value
     function setRule(uint _baseLockPercent, uint _startLockTime, uint _stopLockTime, uint _linearRelease) onlyOwner {
         assert(_stopLockTime > _startLockTime);
-       
+
         baseLockPercent = _baseLockPercent;
         startLockTime = _startLockTime;
         stopLockTime = _stopLockTime;
@@ -380,7 +380,7 @@ contract AssetPool is ownedPool {
     //     bpTokenAddress = _bpTokenAddress;
     //     bp = BPToken(bpTokenAddress);
     // }
-    
+
     /// assign BP token to another address
     function assign(address to, uint256 amount) onlyOwner returns (bool) {
         if (bp.setPoolAndAmount(to,amount)) {
@@ -395,20 +395,31 @@ contract AssetPool is ownedPool {
     function getPoolBalance() constant returns (uint) {
         return bp.getBalance();
     }
-    
+
     function getStartLockTime() constant returns (uint) {
         return startLockTime;
     }
-    
+
     function getStopLockTime() constant returns (uint) {
         return stopLockTime;
     }
-    
+
     function getBaseLockPercent() constant returns (uint) {
         return baseLockPercent;
     }
-    
+
     function getLinearRelease() constant returns (uint) {
         return linearRelease;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

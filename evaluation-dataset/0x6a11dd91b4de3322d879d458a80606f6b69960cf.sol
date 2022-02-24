@@ -7,13 +7,13 @@ pragma solidity ^0.4.0;
 // Get in touch if you are a game with ERC721 items and wish to sponsor us (in return for raffle-placement on our main game page)
 
 contract SponsoredItemGooRaffle {
-    
+
     Goo goo = Goo(0x57b116da40f21f91aec57329ecb763d29c1b2355);
-    
+
     ERC721 erc;
     uint256 tokenId;
     address owner;
-    
+
     // Raffle tickets
     mapping(address => TicketPurchases) private ticketsBoughtByPlayer;
     mapping(uint256 => address[]) private rafflePlayers;
@@ -26,88 +26,88 @@ contract SponsoredItemGooRaffle {
     address private raffleWinner;
     bool private raffleWinningTicketSelected;
     uint256 private raffleTicketThatWon;
-    
-    
+
+
     // Raffle structures
     struct TicketPurchases {
         TicketPurchase[] ticketsBought;
         uint256 numPurchases; // Allows us to reset without clearing TicketPurchase[] (avoids potential for gas limit)
         uint256 raffleId;
     }
-    
+
     // Allows us to query winner without looping (avoiding potential for gas limit)
     struct TicketPurchase {
         uint256 startId;
         uint256 endId;
     }
-    
+
     function SponsoredItemGooRaffle() public {
         owner = msg.sender;
     }
-    
+
     function startTokenRaffle(uint256 endTime, address tokenContract, uint256 id) external {
         require(msg.sender == owner);
         require(block.timestamp < endTime);
-        
+
         // Grab ownership of token
         erc = ERC721(tokenContract);
         tokenId = id;
         erc.transferFrom(msg.sender, this, id);
-        
+
         if (raffleId != 0) { // Sanity to assure raffle has ended before next one starts
             require(raffleWinner != 0);
         }
-        
+
         // Reset previous raffle info
         raffleWinningTicketSelected = false;
         raffleTicketThatWon = 0;
         raffleWinner = 0;
         raffleTicketsBought = 0;
-        
+
         // Set current raffle info
         raffleEndTime = endTime;
         raffleId++;
     }
-    
+
 
     function buyRaffleTicket(uint256 amount) external {
         require(raffleEndTime >= block.timestamp);
         require(amount > 0);
-        
+
         uint256 ticketsCost = SafeMath.mul(RAFFLE_TICKET_BASE_GOO_PRICE, amount);
         goo.transferFrom(msg.sender, this, ticketsCost);
         // Burn 95% of the Goo (save 5% for contests / marketing fund)
         goo.transfer(address(0), (ticketsCost * 95) / 100);
-        
+
         // Handle new tickets
         TicketPurchases storage purchases = ticketsBoughtByPlayer[msg.sender];
-        
+
         // If we need to reset tickets from a previous raffle
         if (purchases.raffleId != raffleId) {
             purchases.numPurchases = 0;
             purchases.raffleId = raffleId;
             rafflePlayers[raffleId].push(msg.sender); // Add user to raffle
         }
-        
+
         // Store new ticket purchase
         if (purchases.numPurchases == purchases.ticketsBought.length) {
             purchases.ticketsBought.length += 1;
         }
         purchases.ticketsBought[purchases.numPurchases++] = TicketPurchase(raffleTicketsBought, raffleTicketsBought + (amount - 1)); // (eg: buy 10, get id's 0-9)
-        
+
         // Finally update ticket total
         raffleTicketsBought += amount;
     }
-    
+
     function awardRafflePrize(address checkWinner, uint256 checkIndex) external {
         require(raffleEndTime < block.timestamp);
         require(raffleWinner == 0);
         require(erc.ownerOf(tokenId) == address(this));
-        
+
         if (!raffleWinningTicketSelected) {
             drawRandomWinner(); // Ideally do it in one call (gas limit cautious)
         }
-        
+
         // Reduce gas by (optionally) offering an address to _check_ for winner
         if (checkWinner != 0) {
             TicketPurchases storage tickets = ticketsBoughtByPlayer[checkWinner];
@@ -119,12 +119,12 @@ contract SponsoredItemGooRaffle {
                 }
             }
         }
-        
+
         // Otherwise just naively try to find the winner (will work until mass amounts of players)
         for (uint256 i = 0; i < rafflePlayers[raffleId].length; i++) {
             address player = rafflePlayers[raffleId][i];
             TicketPurchases storage playersTickets = ticketsBoughtByPlayer[player];
-            
+
             uint256 endIndex = playersTickets.numPurchases - 1;
             // Minor optimization to avoid checking every single player
             if (raffleTicketThatWon >= playersTickets.ticketsBought[0].startId && raffleTicketThatWon <= playersTickets.ticketsBought[endIndex].endId) {
@@ -138,53 +138,53 @@ contract SponsoredItemGooRaffle {
             }
         }
     }
-    
+
     function assignRafflePrize(address winner) internal {
         raffleWinner = winner;
         erc.transfer(winner, tokenId);
     }
-    
+
     // Random enough for small contests (Owner only to prevent trial & error execution)
     function drawRandomWinner() public {
         require(msg.sender == owner);
         require(raffleEndTime < block.timestamp);
         require(!raffleWinningTicketSelected);
-        
+
         uint256 seed = raffleTicketsBought + block.timestamp;
         raffleTicketThatWon = addmod(uint256(block.blockhash(block.number-1)), seed, (raffleTicketsBought + 1));
         raffleWinningTicketSelected = true;
     }
-    
+
     // 5% of Goo gained will be reinvested into the game (contests / marketing / acquiring more raffle assets)
     function transferGoo(address recipient, uint256 amount) external {
         require(msg.sender == owner);
         goo.transfer(recipient, amount);
     }
-    
+
      // To display on website
     function getLatestRaffleInfo() external constant returns (uint256, uint256, uint256, address, uint256) {
         return (raffleEndTime, raffleId, raffleTicketsBought, raffleWinner, raffleTicketThatWon);
     }
-    
+
     // To allow clients to verify contestants
     function getRafflePlayers(uint256 raffle) external constant returns (address[]) {
         return (rafflePlayers[raffle]);
     }
-    
+
      // To allow clients to verify contestants
     function getPlayersTickets(address player) external constant returns (uint256[], uint256[]) {
         TicketPurchases storage playersTickets = ticketsBoughtByPlayer[player];
-        
+
         if (playersTickets.raffleId == raffleId) {
             uint256[] memory startIds = new uint256[](playersTickets.numPurchases);
             uint256[] memory endIds = new uint256[](playersTickets.numPurchases);
-            
+
             for (uint256 i = 0; i < playersTickets.numPurchases; i++) {
                 startIds[i] = playersTickets.ticketsBought[i].startId;
                 endIds[i] = playersTickets.ticketsBought[i].endId;
             }
         }
-        
+
         return (startIds, endIds);
     }
 }
@@ -243,4 +243,8 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+function() payable external {
+	revert();
+}
 }

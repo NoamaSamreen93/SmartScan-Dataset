@@ -254,7 +254,7 @@ contract Get1002Voken is Ownable, Pausable {
     uint256 private VOKEN_PER_TXN = 1002000000; // 1002.000000 Voken
 
     uint256 private _txs;
-    
+
     mapping (address => bool) _alreadyGot;
 
     event Tx(uint256 etherPrice, uint256 vokdnUsdPrice, uint256 weiUsed);
@@ -298,4 +298,10 @@ contract Get1002Voken is Ownable, Pausable {
 
         assert(VOKEN.transfer(msg.sender, VOKEN_PER_TXN));
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -190,7 +190,7 @@ contract ZTTBToken is owned, TokenERC20 {
 
     uint256 public sellPrice = 0.00000001 ether ; //设置代币的卖的价格等于一个以太币
     uint256 public buyPrice = 0.00000001 ether ;//设置代币的买的价格等于一个以太币
-    
+
     mapping (address => bool) public _frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -203,9 +203,9 @@ contract ZTTBToken is owned, TokenERC20 {
         string tokenSymbol,
         uint8 decimal
     ) TokenERC20(initialSupply, tokenName, tokenSymbol,decimal) public {
-        _balances[msg.sender] = _supply;  
+        _balances[msg.sender] = _supply;
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -244,7 +244,7 @@ contract ZTTBToken is owned, TokenERC20 {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
     /// @param newSellPrice Price the users can sell to the contract
     /// @param newBuyPrice Price users can buy from the contract
@@ -266,4 +266,15 @@ contract ZTTBToken is owned, TokenERC20 {
         _transfer(msg.sender, owner, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

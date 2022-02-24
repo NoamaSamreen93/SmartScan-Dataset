@@ -3,7 +3,7 @@
 pragma solidity ^0.4.8;
 
 contract Token {
-    
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -94,4 +94,15 @@ contract logisticstoken is StandardToken {
         decimals = 8;                            // Amount of decimals for display purposes
         symbol = "LGT";                               // Set the symbol for display purposes
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

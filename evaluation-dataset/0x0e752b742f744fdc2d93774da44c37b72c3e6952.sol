@@ -127,7 +127,7 @@ contract ERC20Basic {
 
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -176,7 +176,7 @@ contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
     function approve(address spender, uint256 value) public returns (bool);
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -409,10 +409,10 @@ contract CraftyCrowdsale is Pausable {
     modifier saleIsOn() {
         require(
             (
-                (now >= preSaleStart && now < preSaleEnd) || 
+                (now >= preSaleStart && now < preSaleEnd) ||
                 (now >= saleStart && now < saleEnd)
-            ) && 
-            issuedTokens < hardCap && 
+            ) &&
+            issuedTokens < hardCap &&
             currentState == State.SALE
         );
         _;
@@ -478,7 +478,7 @@ contract CraftyCrowdsale is Pausable {
         uint256 newTokens = weiAmount.mul(currentRate).div(10**18);
 
         require(issuedTokens.add(newTokens) <= hardCap);
-        
+
         issuedTokens = issuedTokens.add(newTokens);
         received[msg.sender] = received[msg.sender].add(weiAmount);
         token.mint(msg.sender, newTokens);
@@ -629,4 +629,15 @@ contract CraftyCrowdsale is Pausable {
 
         return rate;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

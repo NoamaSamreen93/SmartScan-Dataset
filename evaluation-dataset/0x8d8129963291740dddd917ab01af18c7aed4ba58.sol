@@ -282,7 +282,7 @@ contract MineBee is ERC20 {
     string public constant symbol = "MB"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
     uint256 public constant initialSupply = 5000000000 * (10 ** uint256(decimals));
-    
+
     constructor() public {
         super._mint(msg.sender, initialSupply);
         owner = msg.sender;
@@ -336,7 +336,7 @@ contract MineBee is ERC20 {
     event Unpause();
 
     bool public paused = false;
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -555,4 +555,15 @@ contract MineBee is ERC20 {
     function afterTime(uint256 _value) public view returns (uint256) {
         return now + _value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

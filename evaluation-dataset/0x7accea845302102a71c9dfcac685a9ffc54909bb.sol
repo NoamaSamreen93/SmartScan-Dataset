@@ -211,9 +211,9 @@ contract StandardToken is ERC20, BasicToken {
 
 contract JoyToken is StandardToken {
 
-  string public constant name = "JoyToken"; 
-  string public constant symbol = "JOY"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "JoyToken";
+  string public constant symbol = "JOY";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 1000 * 10000 * 10000 * (10 ** uint256(decimals));
 
@@ -226,4 +226,10 @@ contract JoyToken is StandardToken {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

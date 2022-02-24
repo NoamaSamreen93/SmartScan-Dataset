@@ -1,10 +1,10 @@
 pragma solidity ^0.4.18;        // v0.4.18 was the latest possible version. 0.4.19 and above were not allowed
 
 ////////////////////////////////////////////////////////////////////////////////
-library SafeMath 
+library SafeMath
 {
     //--------------------------------------------------------------------------
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
     {
         if (a == 0)     return 0;
         uint256 c = a * b;
@@ -12,19 +12,19 @@ library SafeMath
         return c;
     }
     //--------------------------------------------------------------------------
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a / b;
         return c;
     }
     //--------------------------------------------------------------------------
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
     //--------------------------------------------------------------------------
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -32,7 +32,7 @@ library SafeMath
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-library StringLib 
+library StringLib
 {
     function concat(string strA, string strB) internal pure returns (string)
     {
@@ -60,7 +60,7 @@ library StringLib
         return keccak256(strA)==keccak256(strB);
     }
     //-------------------------------------------------------------------------
-    function uintToAscii(uint number) internal pure returns(byte) 
+    function uintToAscii(uint number) internal pure returns(byte)
     {
              if (number < 10)         return byte(48 + number);
         else if (number < 16)         return byte(87 + number);
@@ -68,7 +68,7 @@ library StringLib
         revert();
     }
     //-------------------------------------------------------------------------
-    function asciiToUint(byte char) internal pure returns (uint) 
+    function asciiToUint(byte char) internal pure returns (uint)
     {
         uint asciiNum = uint(char);
 
@@ -78,11 +78,11 @@ library StringLib
         revert();
     }
     //-------------------------------------------------------------------------
-    function bytes32ToString (bytes32 data) internal pure returns (string) 
+    function bytes32ToString (bytes32 data) internal pure returns (string)
     {
         bytes memory bytesString = new bytes(64);
 
-        for (uint j=0; j < 32; j++) 
+        for (uint j=0; j < 32; j++)
         {
             byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
 
@@ -92,14 +92,14 @@ library StringLib
         return string(bytesString);
     }
     //-------------------------------------------------------------------------
-    function stringToBytes32(string str) internal pure returns (bytes32) 
+    function stringToBytes32(string str) internal pure returns (bytes32)
     {
         bytes memory bString = bytes(str);
         uint uintString;
 
         if (bString.length != 64) { revert(); }
 
-        for (uint i = 0; i < 64; i++) 
+        for (uint i = 0; i < 64; i++)
         {
             uintString = uintString*16 + uint(asciiToUint(bString[i]));
         }
@@ -107,7 +107,7 @@ library StringLib
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract ERC20 
+contract ERC20
 {
     function balanceOf(   address _owner)                               public constant returns (uint256 balance);
     function transfer(    address toAddr,  uint256 amount)              public returns (bool success);
@@ -121,31 +121,31 @@ contract ERC20
     uint256 public totalSupply;
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract Ownable 
+contract Ownable
 {
     address public owner;
 
     //-------------------------------------------------------------------------- @dev The Ownable constructor sets the original `owner` of the contract to the sender account
-    function Ownable() public 
+    function Ownable() public
     {
         owner = msg.sender;
     }
     //-------------------------------------------------------------------------- @dev Throws if called by any account other than the owner.
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract Lockable is Ownable 
+contract Lockable is Ownable
 {
     uint256 internal constant lockedUntil = 1527811200;     // 2018-06-01 00:00 (GMT+0)
 
-    address internal allowedSender;     // the address that can make transactions when the transaction is locked 
+    address internal allowedSender;     // the address that can make transactions when the transaction is locked
 
     //-------------------------------------------------------------------------- @dev Allow access only when is unlocked. This function is good when you make crowdsale to avoid token expose in exchanges
-    modifier unlocked() 
+    modifier unlocked()
     {
         require((now > lockedUntil) || (allowedSender == msg.sender));
         _;
@@ -160,7 +160,7 @@ contract Lockable is Ownable
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract Token is ERC20, Lockable 
+contract Token is ERC20, Lockable
 {
     using SafeMath for uint256;
 
@@ -178,9 +178,9 @@ contract Token is ERC20, Lockable
     uint256 public constant     initSupply = 1100000000 * 10**decimals;        // 10**18 max
 
     //-------------------------------------------------------------------------- Functions with this modifier can only be executed by the owner
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
-        if (msg.sender != owner) 
+        if (msg.sender != owner)
         {
             //----> (Jean) deprecated       throw;
             assert(true==false);
@@ -188,7 +188,7 @@ contract Token is ERC20, Lockable
         _;
     }
     //-------------------------------------------------------------------------- Constructor
-    function Token() public 
+    function Token() public
     {
         owner           = msg.sender;
         totalSupply     = initSupply;
@@ -199,7 +199,7 @@ contract Token is ERC20, Lockable
         allowedSender = owner;          // In this contract, only the contract owner can send token while ICO is active.
     }
     //--------------------------------------------------------------------------
-    function transfer(address toAddr, uint256 amount)  public   unlocked returns (bool success) 
+    function transfer(address toAddr, uint256 amount)  public   unlocked returns (bool success)
     {
         require(toAddr!=0x0 && toAddr!=msg.sender && amount>0);         // Prevent transfer to 0x0 address and to self, amount must be >0
 
@@ -212,7 +212,7 @@ contract Token is ERC20, Lockable
         return true;
     }
     //--------------------------------------------------------------------------
-    function transferFrom(address fromAddr, address toAddr, uint256 amount)  public   unlocked returns (bool) 
+    function transferFrom(address fromAddr, address toAddr, uint256 amount)  public   unlocked returns (bool)
     {
         if (amount <= 0)                                return false;
         if (fromAddr==toAddr)                           return false;
@@ -230,12 +230,12 @@ contract Token is ERC20, Lockable
         return true;
     }
     //--------------------------------------------------------------------------
-    function balanceOf(address _owner)  public   constant returns (uint256 balance) 
+    function balanceOf(address _owner)  public   constant returns (uint256 balance)
     {
         return balances[_owner];
     }
     //--------------------------------------------------------------------------
-    function approve(address _spender, uint256 amount)  public   returns (bool) 
+    function approve(address _spender, uint256 amount)  public   returns (bool)
     {
         require((amount == 0) || (allowances[msg.sender][_spender] == 0));
 
@@ -252,7 +252,7 @@ contract Token is ERC20, Lockable
         return allowances[_owner][_spender];    // Return the allowance for _spender approved by _owner
     }
     //--------------------------------------------------------------------------
-    function() public                       
+    function() public
     {
         assert(true == false);      // If Ether is sent to this address, don't handle it -> send it back.
     }
@@ -264,4 +264,15 @@ contract Token is ERC20, Lockable
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

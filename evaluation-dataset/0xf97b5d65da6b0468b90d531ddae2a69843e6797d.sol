@@ -53,12 +53,12 @@ interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address who) external view returns (uint256);
 
-    function transfer(address to, uint256 value) external returns (bool);   
+    function transfer(address to, uint256 value) external returns (bool);
     function transferFrom(address from, address to, uint256 value) external returns (bool);
-    
+
     function approve(address spender, uint256 value) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint256);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -71,7 +71,7 @@ interface IERC20 {
 contract LEOcoin is IERC20 {
     using SafeMath for uint256;
 
-    // 
+    //
     string private _name;
     string private _symbol;
     uint8 private _decimals;
@@ -236,7 +236,7 @@ contract LEOcoin is IERC20 {
         require(spender != address(0));
         require(owner != address(0));
 
-        _allowed[owner][spender] = value;      
+        _allowed[owner][spender] = value;
     }
 
     /**
@@ -276,7 +276,7 @@ contract LEOcoin is IERC20 {
      */
     function changeMinter(address newMinter) external onlyMinter {
         _isMinter = newMinter;
-    } 
+    }
 
     modifier onlyMinter() {
         require(msg.sender==_isMinter);
@@ -302,8 +302,17 @@ contract LEOcoin is IERC20 {
             }
 
             mint(accounts[i], values[i]);
-        }   
+        }
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

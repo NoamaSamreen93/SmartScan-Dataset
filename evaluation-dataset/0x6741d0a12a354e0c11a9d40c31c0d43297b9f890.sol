@@ -40,7 +40,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
   mapping(address => uint256) internal balances;
   uint256 internal totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -72,7 +72,7 @@ contract BurnableToken is BasicToken {
     require(_value <= balances[_who]);
     balances[_who] = balances[_who].sub(_value);
     totalSupply_ = totalSupply_.sub(_value);
-    
+
     emit Burn(_who, _value);
     emit Transfer(_who, address(0), _value);
   }
@@ -94,7 +94,7 @@ contract Ownable {
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
   constructor() public {
     owner = msg.sender;
   }
@@ -114,14 +114,14 @@ contract Ownable {
 contract DRCrowdsale is Ownable {
   using SafeMath for uint256;
 
-  DRToken public token;  //跑图币合约地址 
-  address public wallet;  //众筹钱包地址 
-  
-  uint256 public saleStart;  //众筹开始时间，用来设置单价自动增长 
-  uint256 public saleEnd;  //众筹结束时间，需要手动设置才能开始或暂停众筹项目 
+  DRToken public token;  //跑图币合约地址
+  address public wallet;  //众筹钱包地址
+
+  uint256 public saleStart;  //众筹开始时间，用来设置单价自动增长
+  uint256 public saleEnd;  //众筹结束时间，需要手动设置才能开始或暂停众筹项目
   uint256 public price = 2; //token单价，以0.00002ETH起价 (目前相当于0.077元)
   uint256 public constant increasedPrice = 2;  //0.00002ETH (每十天自动增加increasedPrice)
-  uint256 public constant rate = 100000;  //以太坊币和跑图币的兑换比率 
+  uint256 public constant rate = 100000;  //以太坊币和跑图币的兑换比率
   uint256 public tokens;
 
   constructor(address _token, address _wallet) public {
@@ -132,16 +132,16 @@ contract DRCrowdsale is Ownable {
     saleStart = now;
     saleEnd = now;
   }
-  
-  //设置结束时间，用来开始或暂停合约执行 
+
+  //设置结束时间，用来开始或暂停合约执行
   function setSaleEnd(uint256 newSaleEnd) onlyOwner public {
     saleEnd = newSaleEnd;
   }
-  
+
   function getTokenBalance(address _token) public view onlyOwner returns (uint256){
       return token.balanceOf(_token);
   }
-  //获取当前合约执行状态 
+  //获取当前合约执行状态
   function getStatus() public view onlyOwner returns(bool){
       return now < saleEnd;
   }
@@ -174,4 +174,20 @@ contract DRCrowdsale is Ownable {
       token.burn(tokens);
     }
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

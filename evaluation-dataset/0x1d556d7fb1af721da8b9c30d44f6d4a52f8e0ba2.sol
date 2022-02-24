@@ -42,9 +42,9 @@ contract ApproveAndCallReceiver {
 contract ERC20Token {
 
     using SafeMath for uint256;
-    
+
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
 
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -61,9 +61,9 @@ contract ERC20Token {
 
 contract TokenI is ERC20Token {
 
-    string public name;                
-    uint8 public decimals;             
-    string public symbol;              
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function approveAndCall(
     address _spender,
@@ -279,14 +279,14 @@ contract Token is TokenI {
 
     /**
      * 修改每个账户可获得的空投量
-     */   
+     */
     function changeAirdropQty(uint256 _airdropQty) onlyOwner public {
         airdropQty = _airdropQty;
     }
 
     /**
      * 修改空投总量
-     */   
+     */
     function changeAirdropTotalQty(uint256 _airdropTotalQty) onlyOwner public {
         uint256 _token =_airdropTotalQty*10**uint256(decimals);
         require(balanceOf[owner] >= _token);
@@ -299,7 +299,7 @@ contract Token is TokenI {
     function changePaused(bool _paused) onlyOwner public {
         paused = _paused;
     }
-    
+
     function changePauseTranfser(bool _paused) onlyOwner public {
         pauseTransfer = _paused;
     }
@@ -334,4 +334,15 @@ contract Token is TokenI {
 
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

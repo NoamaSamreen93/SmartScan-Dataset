@@ -83,46 +83,46 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
     struct LockAccount{
         uint status;
     }
-    
+
     struct Reward{
         uint amount;
     }
-    
+
     mapping (address => LockAccount) lockAccounts;
     address[] public AllLockAccounts;
-    
+
     mapping (address => Reward) rewards;
     address[] public rewardsAccounts;
-    
+
     using SafeMath for uint;
-    
- 
-    
+
+
+
     function Bitsense() public {
         _balanceOf[msg.sender] = _totalSupply;
         _owner = msg.sender;
     }
-   
-    
+
+
        function setLockAccount(address _addr) public{
         require(msg.sender == _owner);
         var lock_account = lockAccounts[_addr];
         lock_account.status = 1;
         AllLockAccounts.push(_addr) -1;
     }
-    
+
         function setReward(address _addr, uint _amount) public{
         require(msg.sender == _owner);
         var reward = rewards[_addr];
         reward.amount +=  _amount;
         rewardsAccounts.push(_addr) -1;
     }
-  
+
     function claimReward(address _addr) public returns (bool){
         var addressTo = _addr;
         uint amount = rewards[_addr].amount;
-       
-     
+
+
           if (amount > 0 &&
             amount <= _balanceOf[_owner] &&
             !isContract(addressTo)) {
@@ -132,17 +132,17 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
             return true;
         }
           rewards[_addr].amount = 0;
-        
+
     }
-    
+
     function getLockAccounts() view public returns (address[]){
         return AllLockAccounts;
     }
-    
+
      function getLockAccount(address _addr) view public returns (uint){
         return lockAccounts[_addr].status;
     }
-    
+
     function getReward(address _addr) view public returns (uint){
         return rewards[_addr].amount;
     }
@@ -166,8 +166,8 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
         }
         return false;
     }
-    
-    
+
+
 
     function transfer(address _to, uint _value, bytes _data) public returns (bool) {
         if (_value > 0 &&
@@ -182,19 +182,19 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
         }
         return false;
     }
-    
+
     function unLockAccount(address _addr) public {
         require(msg.sender == _owner);
        lockAccounts[_addr].status = 0;
-       
+
     }
     function isLock (address _addr) private constant returns(bool){
         var lS = lockAccounts[_addr].status;
-        
+
         if(lS == 1){
             return true;
         }
-        
+
         return false;
     }
 
@@ -219,9 +219,9 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
         }
         return false;
     }
-    
 
-   
+
+
     function approve(address _spender, uint _value) public returns (bool) {
         _allowances[msg.sender][_spender] = _allowances[msg.sender][_spender].add(_value);
         Approval(msg.sender, _spender, _value);
@@ -231,4 +231,15 @@ contract Bitsense is BitsenseToken("BINS", "Bitsense", 8, 1000000000000000), ERC
     function allowance(address _owner, address _spender) public constant returns (uint) {
         return _allowances[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

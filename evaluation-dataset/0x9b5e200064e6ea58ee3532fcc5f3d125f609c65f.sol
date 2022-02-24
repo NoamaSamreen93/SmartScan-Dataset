@@ -4,17 +4,17 @@ UCS Gambling (Cryptocurrency Casino)
 UCS Dapps (Game Applications)
 UCS Bet (Sports Betting)
     The platform will provide access to the three most popular destinations in the niche, using a single cryptocurrency and wallet.
-    The United Crypto System is an unique system, the first and only in the world, which will bring dividends to each investor (100% of net profit is subject to distribution throughout the project's lifetime) and an additional percentage (from 3% to 150%) for each month ownership investment token. 
-    The United Crypto System is an issuer of 2 (Two) types of tokens: 
+    The United Crypto System is an unique system, the first and only in the world, which will bring dividends to each investor (100% of net profit is subject to distribution throughout the project's lifetime) and an additional percentage (from 3% to 150%) for each month ownership investment token.
+    The United Crypto System is an issuer of 2 (Two) types of tokens:
   UBS Token - Investment Security token, which will allow you to receive a guaranteed income over the long period of investor investment.
-  UCS Token - Utility token to be used on the platform as a means of payment. 
-  
-    The sooner you join our United Crypto System Token Sale, the more you will earn. 
-For example, if you invest in pre-ICO or ICO, then in September after IEO you will be able to get more than 10000% of profit.
-    IEO (Initial Exchange Offering) of the United Crypto System tokens is scheduled for August-September 2019. 
+  UCS Token - Utility token to be used on the platform as a means of payment.
 
-Our website https://casinosinvest.com 
-Our telegram channel https://t.me//Unitedsystem 
+    The sooner you join our United Crypto System Token Sale, the more you will earn.
+For example, if you invest in pre-ICO or ICO, then in September after IEO you will be able to get more than 10000% of profit.
+    IEO (Initial Exchange Offering) of the United Crypto System tokens is scheduled for August-September 2019.
+
+Our website https://casinosinvest.com
+Our telegram channel https://t.me//Unitedsystem
 Our telegram chat https://t.me//Casinosystem
 
 */
@@ -242,4 +242,13 @@ contract UBS is ERC20Mintable {
   string public constant name = "United Crypto System";
   string public constant symbol = "UBS";
   uint8 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

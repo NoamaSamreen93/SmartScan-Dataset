@@ -63,8 +63,8 @@ library SafeMath {
 */
 
 /**
- * @title 
- * @dev 
+ * @title
+ * @dev
  */
 contract ERC20Interface {
   function totalSupply() external view returns (uint256);
@@ -109,8 +109,8 @@ contract TimeLockPool{
         uint256 amount
     );
 
-    /// @dev Constructor. 
-    /// @return 
+    /// @dev Constructor.
+    /// @return
     constructor() public {}
 
     /// @dev Deposit tokens to specific account with time-lock.
@@ -195,7 +195,7 @@ contract TimeLockPool{
     /// @param account An account to receive tokens.
     /// @param tokenAddr An address of ERC20/ERC223 token.
     /// @return Available balance of specified token.
-    function getAvailableBalanceOf (address account, address tokenAddr) 
+    function getAvailableBalanceOf (address account, address tokenAddr)
         external
         view
         returns (uint256)
@@ -218,7 +218,7 @@ contract TimeLockPool{
     function getLockedBalanceOf (address account, address tokenAddr)
         external
         view
-        returns (uint256) 
+        returns (uint256)
     {
         require(account != address(0x0));
 
@@ -238,7 +238,7 @@ contract TimeLockPool{
     function getNextReleaseTimeOf (address account, address tokenAddr)
         external
         view
-        returns (uint256) 
+        returns (uint256)
     {
         require(account != address(0x0));
 
@@ -257,4 +257,13 @@ contract TimeLockPool{
         }
         return nextRelease;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

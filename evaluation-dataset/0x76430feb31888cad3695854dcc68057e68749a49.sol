@@ -468,7 +468,7 @@ contract HashRegistrar is Registrar {
      */
     function cancelBid(address bidder, bytes32 seal) external {
         Deed bid = sealedBids[bidder][seal];
-        
+
         // If a sole bidder does not `unsealBid` in time, they have a few more days
         // where they can call `startAuction` (again) and then `unsealBid` during
         // the revealPeriod to get back their bid value.
@@ -491,7 +491,7 @@ contract HashRegistrar is Registrar {
      */
     function finalizeAuction(bytes32 _hash) external onlyOwner(_hash) {
         Entry storage h = _entries[_hash];
-        
+
         // Handles the case when there's only a single bidder (h.value is zero)
         h.value = max(h.value, minPrice);
         h.deed.setBalance(h.value, true);
@@ -532,14 +532,14 @@ contract HashRegistrar is Registrar {
 
         _tryEraseSingleNode(_hash);
         deedContract.closeDeed(1000);
-        emit HashReleased(_hash, h.value);        
+        emit HashReleased(_hash, h.value);
     }
 
     /**
      * @dev Submit a name 6 characters long or less. If it has been registered,
-     *      the submitter will earn 50% of the deed value. 
-     * 
-     * We are purposefully handicapping the simplified registrar as a way 
+     *      the submitter will earn 50% of the deed value.
+     *
+     * We are purposefully handicapping the simplified registrar as a way
      * to force it into being restructured in a few years.
      *
      * @param unhashedName An invalid name to search for in the registry.
@@ -577,7 +577,7 @@ contract HashRegistrar is Registrar {
      *      the owner and resolver fields on 'foo.bar.eth' and 'bar.eth' will all be cleared.
      *
      * @param labels A series of label hashes identifying the name to zero out, rooted at the
-     *        registrar's root. Must contain at least one element. For instance, to zero 
+     *        registrar's root. Must contain at least one element. For instance, to zero
      *        'foo.bar.eth' on a registrar that owns '.eth', pass an array containing
      *        [keccak256('foo'), keccak256('bar')].
      */
@@ -845,7 +845,7 @@ contract CustodialContract is WhitelistAdminRole {
     event DomainWithdrawal(bytes32 indexed labelHash, address indexed recipient);
 
     function() external payable {}
-    
+
     constructor(address _registrar) public {
         registrar = HashRegistrar(_registrar);
     }
@@ -927,4 +927,10 @@ contract CustodialContract is WhitelistAdminRole {
         (bool success,) = _to.call.value(msg.value)(_data);
         require(success);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

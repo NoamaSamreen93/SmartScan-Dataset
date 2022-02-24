@@ -54,7 +54,7 @@ contract hopay is SafeMath {
     ) public {
         owner = msg.sender;
         name = tokenName;
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;
@@ -69,7 +69,7 @@ contract hopay is SafeMath {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -79,7 +79,7 @@ contract hopay is SafeMath {
             owner = newOwner;
         }
     }
- 
+
 
     function _transfer(address _from, address _to, uint _value) isLock internal {
         require (_to != 0x0);
@@ -114,4 +114,20 @@ contract hopay is SafeMath {
         }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

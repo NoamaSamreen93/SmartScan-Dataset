@@ -54,7 +54,7 @@ contract BitEyeEx is SafeMath {
   address public BEY;
   mapping (address => uint256) public miningRate;
   bool public paused = false;
-  
+
 
   event Deposit(address token, address user, uint256 amount, uint256 balance);
   event Withdraw(address token, address user, uint256 amount, uint256 balance);
@@ -104,7 +104,7 @@ contract BitEyeEx is SafeMath {
 
   modifier onlySigner() {
     require(signers[msg.sender]);
-    _; 
+    _;
   }
 
   modifier onlyNotPaused() {
@@ -194,10 +194,10 @@ contract BitEyeEx is SafeMath {
 
     bytes32 tradeHash = keccak256(this, buyHash, sellHash, addrs[4], vals[6], vals[7], vals[8], vals[9], vals[10]);
     require(isValidSignature(addrs[4], tradeHash, v[2], rs[4], rs[5]));
-    
+
     require(!traded[tradeHash]);
     traded[tradeHash] = true;
-    
+
     require(safeAdd(orderFills[buyHash], vals[6]) <= vals[0]);
     require(safeAdd(orderFills[sellHash], vals[6]) <= vals[3]);
     require(balances[addrs[1]][addrs[2]] >= vals[7]);
@@ -207,7 +207,7 @@ contract BitEyeEx is SafeMath {
     balances[addrs[0]][addrs[3]] = safeSub(balances[addrs[0]][addrs[3]], vals[6]);
     balances[addrs[0]][addrs[2]] = safeAdd(balances[addrs[0]][addrs[2]], safeSub(vals[6], (safeMul(vals[6], vals[9]) / 1 ether)));
     balances[addrs[1]][addrs[3]] = safeAdd(balances[addrs[1]][addrs[3]], safeSub(vals[7], (safeMul(vals[7], vals[10]) / 1 ether)));
-    
+
     balances[addrs[0]][feeAccount] = safeAdd(balances[addrs[0]][feeAccount], safeMul(vals[6], vals[9]) / 1 ether);
     balances[addrs[1]][feeAccount] = safeAdd(balances[addrs[1]][feeAccount], safeMul(vals[7], vals[10]) / 1 ether);
 
@@ -255,8 +255,8 @@ contract BitEyeEx is SafeMath {
   }
 
   function cancel(
-    address baseToken, 
-    address quoteToken, 
+    address baseToken,
+    address quoteToken,
     address user,
     uint volume,
     uint fund,
@@ -272,7 +272,7 @@ contract BitEyeEx is SafeMath {
     Cancel(user, hash, nonce);
     return true;
   }
-  
+
   function isValidSignature(
         address signer,
         bytes32 hash,
@@ -290,4 +290,13 @@ contract BitEyeEx is SafeMath {
       s
     );
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

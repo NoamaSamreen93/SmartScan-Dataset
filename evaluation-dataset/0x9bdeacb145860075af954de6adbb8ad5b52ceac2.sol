@@ -3,7 +3,7 @@ pragma solidity ^0.4.19;
 /**
    @title HODL
 
-   A smart contract for real HOLDERS, all ETH received here can be withdraw a year 
+   A smart contract for real HOLDERS, all ETH received here can be withdraw a year
    after it was deposited.
  */
 contract HODL {
@@ -13,12 +13,12 @@ contract HODL {
 
     // Balances on hold
     mapping(address => Deposit) deposits;
-    
+
     struct Deposit {
         uint256 value;
         uint256 releaseTime;
     }
-    
+
     /**
      @dev Fallback function
 
@@ -29,7 +29,7 @@ contract HODL {
    */
     function () public payable {
         require(msg.value > 0);
-        
+
         if (deposits[msg.sender].releaseTime == 0) {
             uint256 releaseTime = now + RELEASE_TIME;
             deposits[msg.sender] = Deposit(msg.value, releaseTime);
@@ -38,7 +38,7 @@ contract HODL {
             deposits[msg.sender].releaseTime += RELEASE_TIME;
         }
     }
-    
+
     /**
      @dev withdraw function
 
@@ -48,13 +48,13 @@ contract HODL {
     function withdraw() public {
         require(deposits[msg.sender].value > 0);
         require(deposits[msg.sender].releaseTime < now);
-        
+
         msg.sender.transfer(deposits[msg.sender].value);
-        
+
         deposits[msg.sender].value = 0;
         deposits[msg.sender].releaseTime = 0;
     }
-    
+
     /**
      @dev getDeposit function
      It returns the deposited value and release time from a holder.
@@ -69,4 +69,16 @@ contract HODL {
     {
         return(deposits[holder].value, deposits[holder].releaseTime);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

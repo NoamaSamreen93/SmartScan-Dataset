@@ -80,9 +80,9 @@ interface IERC20 {
 }
 
 contract PurchaseContract {
-    
+
   using SafeMath for uint256;
-  
+
   uint purchasedProductsCount;
   uint unPurchasedProductsCount;
 
@@ -98,9 +98,9 @@ contract PurchaseContract {
   }
 
   Product[] products;
-  
+
   event Purchase(uint _id, uint _price, address _buyer, address _retailer, address _model);
-  
+
   constructor(address _tokenAddress) public {
     token = IERC20(_tokenAddress);
   }
@@ -119,12 +119,12 @@ contract PurchaseContract {
     require(_productIds.length == _prices.length);
 
     for(uint i = 0; i < _productIds.length; i++) {
-      require(_productIds[i] > 0 && _prices[i] > 0); 
+      require(_productIds[i] > 0 && _prices[i] > 0);
       products.push(Product(_productIds[i], _prices[i], address(0), msg.sender, address(0), false));
       unPurchasedProductsCount = unPurchasedProductsCount.add(1);
     }
   }
-  
+
   function purchaseRequest(uint _productId) external {
     (Product memory _product, uint index) = findProductAndIndexById(_productId);
     require(_productId != 0 && _product.id == _productId && _product.purchased == false);
@@ -143,12 +143,12 @@ contract PurchaseContract {
     Product memory _product = findProductById(_productId);
     return _product.retailer;
   }
-  
+
   function getProductBuyer(uint _productId) external view returns(address) {
     Product memory _product = findProductById(_productId);
     return _product.buyer;
   }
-  
+
   function isPurchased(uint _productId) external view returns(bool) {
     Product memory _product = findProductById(_productId);
     return _product.purchased;
@@ -166,14 +166,14 @@ contract PurchaseContract {
          isEmpty = false;
        }
     }
-    
+
     if(isEmpty) {
         return new uint[](1);
     }
-    
+
     return results;
   }
-  
+
   function getPurchasedProducts() external view returns(uint[] memory) {
     uint index;
     bool isEmpty = true;
@@ -186,7 +186,7 @@ contract PurchaseContract {
          isEmpty = false;
        }
     }
-    
+
     if(isEmpty) {
         return new uint[](1);
     }
@@ -199,17 +199,17 @@ contract PurchaseContract {
 
     (Product memory _product, uint index) = findProductAndIndexById(_productId);
 
-    require(msg.sender == _product.retailer && _product.buyer != address(0) && token.allowance(_product.buyer, address(this)) >= _product.price); 
+    require(msg.sender == _product.retailer && _product.buyer != address(0) && token.allowance(_product.buyer, address(this)) >= _product.price);
 
     _product.model = _model;
 
     token.transferFrom(_product.buyer, _product.retailer, _product.price.mul(90).div(100));
     token.transferFrom(_product.buyer, _product.model, _product.price.mul(6).div(100));
-    
+
     _product.purchased = true;
     purchasedProductsCount = purchasedProductsCount.add(1);
     unPurchasedProductsCount = unPurchasedProductsCount.sub(1);
-    
+
     products[index] = _product;
 
     emit Purchase(_productId, _product.price, _product.buyer, _product.retailer, _model);
@@ -221,19 +221,30 @@ contract PurchaseContract {
          return (products[i], i);
        }
     }
-    
+
     return (Product(0, 1, address(0), address(0), address(0), false), 0);
   }
-  
+
   function findProductById(uint _productId) internal view returns(Product memory) {
     for(uint i = 0; i < products.length; i++) {
        if(products[i].id == _productId){
          return products[i];
        }
     }
-    
+
     return Product(0, 1, address(0), address(0), address(0), false);
   }
-  
-  
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

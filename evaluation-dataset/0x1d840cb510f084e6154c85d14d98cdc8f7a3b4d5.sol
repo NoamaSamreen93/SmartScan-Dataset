@@ -19,9 +19,9 @@ contract DYLC_ERC20Token {
     uint256 public thirdTime = 1527665400;
     uint256 public endTime = 1529047800;
 
-    uint256 public constant earlyExchangeRate = 83054;  
-    uint256 public constant baseExchangeRate = 55369; 
-    
+    uint256 public constant earlyExchangeRate = 83054;
+    uint256 public constant baseExchangeRate = 55369;
+
     uint8 public constant rewardAngel = 20;
     uint8 public constant rewardPrivate = 20;
     uint8 public constant rewardOne = 15;
@@ -100,27 +100,27 @@ contract DYLC_ERC20Token {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
-    
+
     function () payable public{
           buyTokens(msg.sender);
     }
-    
+
     function buyTokens(address beneficiary) public payable {
       require(beneficiary != 0x0);
       require(validPurchase());
@@ -130,7 +130,7 @@ contract DYLC_ERC20Token {
       uint256 weiAmount = msg.value;
       balanceOf[beneficiary] += weiAmount * rRate;
       currentSupply += balanceOf[beneficiary];
-      forwardFunds();           
+      forwardFunds();
     }
 
     function rewardRate() internal constant returns (uint256) {
@@ -169,10 +169,21 @@ contract DYLC_ERC20Token {
 
 
       function hasEnded() public constant returns (bool) {
-            return (now > endTime); 
+            return (now > endTime);
       }
 
       function isSoleout() public constant returns (bool) {
         return (currentSupply >= CROWD_SUPPLY);
       }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

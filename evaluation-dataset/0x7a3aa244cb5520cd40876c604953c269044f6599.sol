@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 
 contract NewToken {
 	uint public totalSupply = 2300000000000000;
-	
+
 	string public name = "TTInvest";
 	uint8 public decimals = 8;
 	string public symbol = "TTInvest";
@@ -19,7 +19,7 @@ function NewToken(){
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -29,7 +29,7 @@ function NewToken(){
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -55,7 +55,7 @@ function NewToken(){
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -63,4 +63,10 @@ function NewToken(){
 		uint _value
 		);
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

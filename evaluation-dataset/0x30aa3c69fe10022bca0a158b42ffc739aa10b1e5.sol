@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 /*
  * -PlayerBook - v0.3.14
-    
+
  */
 
 interface BTBPlayerBook {
@@ -30,14 +30,14 @@ contract PlayerBook {
     // this is now the BreakTheBank Playerbook
     address constant private Jekyll_Island_Inc = address(0x1c7584476a8d586c3dd8f83864d0d5cd214492e9);
     //TeamJustInterface constant private TeamJust = TeamJustInterface(0x464904238b5CdBdCE12722A7E6014EC1C0B66928);
-    
+
 
 
 
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .
-//=============================|================================================    
+//=============================|================================================
     uint256 public registrationFee_ = 10 finney;            // price to register a name
     mapping(uint256 => PlayerBookReceiverInterface) public games_;  // mapping of our game interfaces for sending your account info to games
     mapping(address => bytes32) public gameNames_;          // lookup a games name
@@ -49,7 +49,7 @@ contract PlayerBook {
     mapping (uint256 => Player) public plyr_;               // (pID => data) player data
     mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_; // (pID => name => bool) list of names a player owns.  (used so you can change your display name amoungst any name you own)
     mapping (uint256 => mapping (uint256 => bytes32)) public plyrNameList_; // (pID => nameNum => name) list of names a player owns
-    
+
     mapping(address => bool) devs;
 
     struct Player {
@@ -61,7 +61,7 @@ contract PlayerBook {
 //==============================================================================
 //     _ _  _  __|_ _    __|_ _  _  .
 //    (_(_)| |_\ | | |_|(_ | (_)|   .  (initial data setup upon contract deploy)
-//==============================================================================    
+//==============================================================================
     constructor()
         public
     {
@@ -70,21 +70,21 @@ contract PlayerBook {
 //==============================================================================
 //     _ _  _  _|. |`. _  _ _  .
 //    | | |(_)(_||~|~|(/_| _\  .  (these are safety checks)
-//==============================================================================    
+//==============================================================================
     /**
-     * @dev prevents contracts from interacting with fomo3d 
+     * @dev prevents contracts from interacting with fomo3d
      */
     modifier isHuman() {
         require(msg.sender==tx.origin);
         _;
     }
-    
-    modifier onlyDevs() 
+
+    modifier onlyDevs()
     {
         require(devs[msg.sender]); //require(TeamJust.isDev(msg.sender) == true, "msg sender is not a dev");
         _;
     }
-    
+
     modifier isRegisteredGame()
     {
         //require(gameIDs_[msg.sender] != 0);
@@ -93,7 +93,7 @@ contract PlayerBook {
 //==============================================================================
 //     _    _  _ _|_ _  .
 //    (/_\/(/_| | | _\  .
-//==============================================================================    
+//==============================================================================
     // fired whenever a player registers a name
     event onNewName
     (
@@ -119,24 +119,24 @@ contract PlayerBook {
         bytes32 _name = _nameStr.nameFilter();
         if (pIDxName_[_name] == 0)
             return (true);
-        else 
+        else
             return (false);
     }
 //==============================================================================
 //     _    |_ |. _   |`    _  __|_. _  _  _  .
 //    |_)|_||_)||(_  ~|~|_|| |(_ | |(_)| |_\  .  (use these to interact with contract)
-//====|=========================================================================    
+//====|=========================================================================
     /**
      * @dev registers a name.  UI will always display the last name you registered.
-     * but you will still own all previously registered names to use as affiliate 
+     * but you will still own all previously registered names to use as affiliate
      * links.
      * - must pay a registration fee.
      * - name must be unique
      * - names will be converted to lowercase
-     * - name cannot start or end with a space 
+     * - name cannot start or end with a space
      * - cannot have more than 1 space in a row
      * - cannot be only numbers
-     * - cannot start with 0x 
+     * - cannot start with 0x
      * - name must be at least 1 char
      * - max length of 32 characters long
      * - allowed characters: a-z, 0-9, and space
@@ -145,131 +145,131 @@ contract PlayerBook {
      * -functionhash- 0x685ffd83 (using name for affiliate)
      * @param _nameString players desired name
      * @param _affCode affiliate ID, address, or name of who refered you
-     * @param _all set to true if you want this to push your info to all games 
+     * @param _all set to true if you want this to push your info to all games
      * (this might cost a lot of gas)
      */
     function registerNameXID(string _nameString, uint256 _affCode, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
-        // if no affiliate code was given, no new affiliate code was given, or the 
+        // if no affiliate code was given, no new affiliate code was given, or the
         // player tried to use their own pID as an affiliate code, lolz
-        if (_affCode != 0 && _affCode != plyr_[_pID].laff && _affCode != _pID) 
+        if (_affCode != 0 && _affCode != plyr_[_pID].laff && _affCode != _pID)
         {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affCode;
         } else if (_affCode == _pID) {
             _affCode = 0;
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affCode, _name, _isNewPlayer, _all);
     }
-    
+
     function registerNameXaddr(string _nameString, address _affCode, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         uint256 _affID;
         if (_affCode != address(0) && _affCode != _addr)
         {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affID, _name, _isNewPlayer, _all);
     }
-    
+
     function registerNameXname(string _nameString, bytes32 _affCode, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         uint256 _affID;
         if (_affCode != "" && _affCode != _name)
         {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affID, _name, _isNewPlayer, _all);
     }
-    
+
     /**
      * @dev players, if you registered a profile, before a game was released, or
      * set the all bool to false when you registered, use this function to push
      * your profile to a single game.  also, if you've  updated your name, you
      * can use this to push your name to games of your choosing.
      * -functionhash- 0x81c5b206
-     * @param _gameID game id 
+     * @param _gameID game id
      */
     function addMeToGame(uint256 _gameID)
         isHuman()
@@ -280,16 +280,16 @@ contract PlayerBook {
         uint256 _pID = pIDxAddr_[_addr];
         require(_pID != 0, "hey there buddy, you dont even have an account");
         uint256 _totalNames = plyr_[_pID].names;
-        
+
         // add players profile and most recent name
         games_[_gameID].receivePlayerInfo(_pID, _addr, plyr_[_pID].name, plyr_[_pID].laff);
-        
+
         // add list of all names
         if (_totalNames > 1)
             for (uint256 ii = 1; ii <= _totalNames; ii++)
                 games_[_gameID].receivePlayerNameList(_pID, plyrNameList_[_pID][ii]);
     }
-    
+
     /**
      * @dev players, use this to push your player profile to all registered games.
      * -functionhash- 0x0c6940ea
@@ -304,7 +304,7 @@ contract PlayerBook {
         uint256 _laff = plyr_[_pID].laff;
         uint256 _totalNames = plyr_[_pID].names;
         bytes32 _name = plyr_[_pID].name;
-        
+
         for (uint256 i = 1; i <= gID_; i++)
         {
             games_[i].receivePlayerInfo(_pID, _addr, _name, _laff);
@@ -312,41 +312,41 @@ contract PlayerBook {
                 for (uint256 ii = 1; ii <= _totalNames; ii++)
                     games_[i].receivePlayerNameList(_pID, plyrNameList_[_pID][ii]);
         }
-                
+
     }
-    
+
     /**
      * @dev players use this to change back to one of your old names.  tip, you'll
      * still need to push that info to existing games.
      * -functionhash- 0xb9291296
-     * @param _nameString the name you want to use 
+     * @param _nameString the name you want to use
      */
     function useMyOldName(string _nameString)
         isHuman()
-        public 
+        public
     {
         // filter name, and get pID
         bytes32 _name = _nameString.nameFilter();
         uint256 _pID = pIDxAddr_[msg.sender];
-        
-        // make sure they own the name 
+
+        // make sure they own the name
         require(plyrNames_[_pID][_name] == true, "umm... thats not a name you own");
-        
-        // update their current name 
+
+        // update their current name
         plyr_[_pID].name = _name;
     }
-    
+
 //==============================================================================
 //     _ _  _ _   | _  _ . _  .
-//    (_(_)| (/_  |(_)(_||(_  . 
-//=====================_|=======================================================    
+//    (_(_)| (/_  |(_)(_||(_  .
+//=====================_|=======================================================
     function registerNameCore(uint256 _pID, address _addr, uint256 _affID, bytes32 _name, bool _isNewPlayer, bool _all)
         private
     {
         // if names already has been used, require that current msg sender owns the name
         if (pIDxName_[_name] != 0)
             require(plyrNames_[_pID][_name] == true, "sorry that names already taken");
-        
+
         // add name to player profile, registry, and name book
         plyr_[_pID].name = _name;
         pIDxName_[_name] = _pID;
@@ -356,22 +356,22 @@ contract PlayerBook {
             plyr_[_pID].names++;
             plyrNameList_[_pID][plyr_[_pID].names] = _name;
         }
-        
+
         // registration fee goes directly to community rewards
         Jekyll_Island_Inc.transfer(address(this).balance);
-        
+
         // push player info to games
         if (_all == true)
             for (uint256 i = 1; i <= gID_; i++)
                 games_[i].receivePlayerInfo(_pID, _addr, _name, _affID);
-        
+
         // fire event
         emit onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, msg.value, now);
     }
 //==============================================================================
 //    _|_ _  _ | _  .
 //     | (_)(_)|_\  .
-//==============================================================================    
+//==============================================================================
     function determinePID(address _addr)
         private
         returns (bool)
@@ -381,7 +381,7 @@ contract PlayerBook {
             pID_++;
             pIDxAddr_[_addr] = pID_;
             plyr_[pID_].addr = _addr;
-            
+
             // set the new player bool to true
             return (true);
         } else {
@@ -436,28 +436,28 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
-        // if no affiliate code was given, no new affiliate code was given, or the 
+        // if no affiliate code was given, no new affiliate code was given, or the
         // player tried to use their own pID as an affiliate code, lolz
         uint256 _affID = _affCode;
-        if (_affID != 0 && _affID != plyr_[_pID].laff && _affID != _pID) 
+        if (_affID != 0 && _affID != plyr_[_pID].laff && _affID != _pID)
         {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affID;
         } else if (_affID == _pID) {
             _affID = 0;
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affID, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer, _affID);
     }
     function registerNameXaddrFromDapp(address _addr, bytes32 _name, address _affCode, bool _all)
@@ -468,32 +468,32 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         uint256 _affID;
         if (_affCode != address(0) && _affCode != _addr)
         {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affID, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer, _affID);
     }
     function registerNameXnameFromDapp(address _addr, bytes32 _name, bytes32 _affCode, bool _all)
@@ -504,35 +504,35 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         uint256 _affID;
         if (_affCode != "" && _affCode != _name)
         {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _affID, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer, _affID);
     }
-    
+
 //==============================================================================
 //   _ _ _|_    _   .
 //  _\(/_ | |_||_)  .
@@ -542,31 +542,31 @@ contract PlayerBook {
         public
     {
         require(gameIDs_[_gameAddress] == 0, "derp, that games already been registered");
-        
+
 
             gID_++;
             bytes32 _name = _gameNameStr.nameFilter();
             gameIDs_[_gameAddress] = gID_;
             gameNames_[_gameAddress] = _name;
             games_[gID_] = PlayerBookReceiverInterface(_gameAddress);
-        
+
             games_[gID_].receivePlayerInfo(1, plyr_[1].addr, plyr_[1].name, 0);
             games_[gID_].receivePlayerInfo(2, plyr_[2].addr, plyr_[2].name, 0);
             games_[gID_].receivePlayerInfo(3, plyr_[3].addr, plyr_[3].name, 0);
             games_[gID_].receivePlayerInfo(4, plyr_[4].addr, plyr_[4].name, 0);
-        
+
     }
-    
+
     function setRegistrationFee(uint256 _fee)
         onlyDevs()
         public
     {
 
             registrationFee_ = _fee;
-        
+
     }
-        
-} 
+
+}
 
 /**
 * @title -Name Filter- v0.1.9
@@ -577,13 +577,13 @@ contract PlayerBook {
 *                                 (, /     /)       /) /)    (, /      /)          /)
 *          ┌─┐                      /   _ (/_      // //       /  _   // _   __  _(/
 *          ├─┤                  ___/___(/_/(__(_/_(/_(/_   ___/__/_)_(/_(_(_/ (_(_(_
-*          ┴ ┴                /   /          .-/ _____   (__ /                               
-*                            (__ /          (_/ (, /                                      /)™ 
+*          ┴ ┴                /   /          .-/ _____   (__ /
+*                            (__ /          (_/ (, /                                      /)™
 *                                                 /  __  __ __ __  _   __ __  _  _/_ _  _(/
 * ┌─┐┬─┐┌─┐┌┬┐┬ ┬┌─┐┌┬┐                          /__/ (_(__(_)/ (_/_)_(_)/ (_(_(_(__(/_(_(_
 * ├─┘├┬┘│ │ │││ ││   │                      (__ /              .-/  © Jekyll Island Inc. 2018
 * ┴  ┴└─└─┘─┴┘└─┘└─┘ ┴                                        (_/
-*              _       __    _      ____      ____  _   _    _____  ____  ___  
+*              _       __    _      ____      ____  _   _    _____  ____  ___
 *=============| |\ |  / /\  | |\/| | |_ =====| |_  | | | |    | |  | |_  | |_)==============*
 *=============|_| \| /_/--\ |_|  | |_|__=====|_|   |_| |_|__  |_|  |_|__ |_| \==============*
 *
@@ -592,14 +592,14 @@ contract PlayerBook {
 * ╚═╝└─┘┘└┘ ┴ ┴└─┴ ┴└─┘ ┴   ╚═╝└─┘─┴┘└─┘ └──────────┘
 */
 library NameFilter {
-    
+
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -610,7 +610,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -621,10 +621,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -633,7 +633,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -641,7 +641,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -651,15 +651,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -674,19 +674,19 @@ library NameFilter {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -702,7 +702,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -714,30 +714,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -748,20 +748,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -769,4 +769,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

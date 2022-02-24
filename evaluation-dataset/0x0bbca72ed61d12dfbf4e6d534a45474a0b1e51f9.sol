@@ -1,5 +1,5 @@
 pragma solidity ^0.4.19;
- 
+
 contract SafeMath{
   function safeMul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
@@ -13,7 +13,7 @@ contract SafeMath{
     assert(a == b * c + a % b);
     return c;
   }
-	
+
 	function safeSub(uint a, uint b) internal returns (uint) {
     	assert(b <= a);
     	return a - b;
@@ -46,7 +46,7 @@ contract ERC20{
 }
 
 contract Foodtoken is ERC20, SafeMath{
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -67,7 +67,7 @@ contract Foodtoken is ERC20, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -118,5 +118,16 @@ contract Foodtoken is ERC20, SafeMath{
 		owner 	= msg.sender;
 		price 	= 3200;
 
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

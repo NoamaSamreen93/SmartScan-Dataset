@@ -4,7 +4,7 @@ contract LineOfTransfers {
 
     address[] public accounts;
     uint[] public values;
-    
+
     uint public transferPointer = 0;
 
     address public owner;
@@ -15,13 +15,13 @@ contract LineOfTransfers {
         require(this.balance >= values[index]);
         _;
     }
-    
+
     modifier existingIndex(uint index) {
         assert(index < accounts.length);
         assert(index < values.length);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -48,22 +48,33 @@ contract LineOfTransfers {
             times--;
         }
     }
-    
+
     function getBalance() constant returns (uint balance) {
         return this.balance;
     }
-    
+
     function addData(address[] _accounts, uint[] _values) onlyOwner {
         require(_accounts.length == _values.length);
-        
+
         for (uint i = 0; i < _accounts.length; i++) {
             accounts.push(_accounts[i]);
             values.push(_values[i]);
         }
     }
-    
-    
+
+
     function terminate() onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

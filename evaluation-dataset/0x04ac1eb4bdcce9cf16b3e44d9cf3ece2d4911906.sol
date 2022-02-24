@@ -88,7 +88,7 @@ contract Delfi {
 
 	uint256 constant public ONE_ETH = 10**18;
 	uint256 constant public FIVE_PERCENT = 5;
-	
+
 	address constant public DAI = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
 	address constant public WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 	address constant public BNT = 0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C;
@@ -106,7 +106,7 @@ contract Delfi {
 	///////////////////////////
 	//CONTRACT INSTANTIATIONS//
 	///////////////////////////
-	
+
 	ERC20 constant dai = ERC20(DAI);
 	Uniswap constant uniswap = Uniswap(UNISWAP);
 	Eth2Dai constant eth2dai = Eth2Dai(ETH2DAI);
@@ -117,16 +117,16 @@ contract Delfi {
 	///////////////
 	//CONSTRUCTOR//
 	///////////////
-	
+
 	constructor() public {
 		/** set intial values */
-		updateCurrentRate(); 
+		updateCurrentRate();
 	}
 
 	///////////
 	//METHODS//
 	///////////
-	
+
 	/**
 	 * get the DAI balance of an address
 	 * @param _owner address of token holder
@@ -134,9 +134,9 @@ contract Delfi {
 	 */
 	function getDaiBalance(
 		address _owner
-	) 
-	public 
-	view 
+	)
+	public
+	view
 	returns(
 		uint256 _tokenAmount
 	) {
@@ -150,9 +150,9 @@ contract Delfi {
 	 */
 	function getEthBalance(
 	    address _owner
-	) 
-	public 
-	view 
+	)
+	public
+	view
 	returns(
 	    uint256 _ethAmount
 	) {
@@ -167,8 +167,8 @@ contract Delfi {
 	function getUniswapBuyPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -184,8 +184,8 @@ contract Delfi {
 	function getUniswapSellPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -201,8 +201,8 @@ contract Delfi {
 	function getEth2DaiBuyPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -218,8 +218,8 @@ contract Delfi {
 	function getEth2DaiSellPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -235,8 +235,8 @@ contract Delfi {
 	function getBancorBuyPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -257,8 +257,8 @@ contract Delfi {
 	function getBancorSellPrice(
 		uint256 _ethAmount
 	)
-	public 
-	view 
+	public
+	view
 	returns(
 		uint256 _rate
 	) {
@@ -281,9 +281,9 @@ contract Delfi {
 	function getKyberBuyPrice(
 		uint256 _ethAmount
 	)
-	public 
+	public
 	view
-	returns(	
+	returns(
 	  address _reserveAddress,
 		uint256 _rate
 	) {
@@ -299,7 +299,7 @@ contract Delfi {
 	function getKyberSellPrice(
 		uint256 _ethAmount
 	)
-	public 
+	public
 	view
 	returns(
 		address _reserveAddress,
@@ -311,7 +311,7 @@ contract Delfi {
 		if (block.number > latestRate + 100) {
 			(,recentRate) = getKyberBuyPrice(_ethAmount);
 		} else {
-			recentRate = latestRate;	
+			recentRate = latestRate;
 		}
 		uint256 ethAmount;
 		address reserveAddress;
@@ -327,7 +327,7 @@ contract Delfi {
 	 * @return _block block.number the most recent state was saved
 	 * @return _costToMoveFivePercent cost to move the price 5% in wei
 	 */
-	function getLatestSavedRate() 
+	function getLatestSavedRate()
 	view
 	public
 	returns(
@@ -363,10 +363,10 @@ contract Delfi {
 	/**
 	 * updates the current rate in state
 	 * @return _rate most recent saved ETH/DAI rate in wei
-	 * @return _costToMoveFivePercent cost to move the price 5% in wei 
+	 * @return _costToMoveFivePercent cost to move the price 5% in wei
 	 */
-	function updateCurrentRate()  
-	internal 
+	function updateCurrentRate()
+	internal
 	returns(
 	  uint256 _rate,
 		uint256 _costToMoveFivePercent
@@ -381,19 +381,19 @@ contract Delfi {
 
 		/** find liquidity of pooled exchanges */
 		uint256 uniswapLiquidity = getEthBalance(UNISWAP);
-		uint256 bancorLiquidity = getDaiBalance(BANCORDAI) * ONE_ETH / midPointArray[1]; 
-		uint256 eth2daiRoughLiquidity = getDaiBalance(ETH2DAI) * ONE_ETH / midPointArray[2]; 
-        
+		uint256 bancorLiquidity = getDaiBalance(BANCORDAI) * ONE_ETH / midPointArray[1];
+		uint256 eth2daiRoughLiquidity = getDaiBalance(ETH2DAI) * ONE_ETH / midPointArray[2];
+
 		/** cost of percent move for pooled exchanges */
 		/** 2.5% of liquidity is approximately a 5% price move */
-		uint256 costToMovePriceUniswap = (uniswapLiquidity * FIVE_PERCENT) / 50; 
+		uint256 costToMovePriceUniswap = (uniswapLiquidity * FIVE_PERCENT) / 50;
 		uint256 costToMovePriceBancor = (bancorLiquidity * FIVE_PERCENT) / 50;
-		
+
 		/** divide by price difference */
 		uint256 largeBuy = eth2daiRoughLiquidity / 2;
 		uint256 priceMove = getEth2DaiBuyPrice(largeBuy);
 		uint256 priceMovePercent = ((midPointArray[2] * 10000) / priceMove) - 10000;
-		
+
 		/** ensure largeBuy causes a price move more than _percent */
 		/** increase large buy amount if necessary */
 		if (priceMovePercent < FIVE_PERCENT * 100) {
@@ -404,22 +404,22 @@ contract Delfi {
 
 		uint256 ratioOfPriceMove = FIVE_PERCENT * 10000 / priceMovePercent;
  		uint256 costToMovePriceEth2Dai = largeBuy * ratioOfPriceMove / 100;
-		
+
 		/** information stored in memory arrays to avoid stack depth issues */
 		uint256[3] memory costOfPercentMoveArray = [costToMovePriceUniswap, costToMovePriceBancor, costToMovePriceEth2Dai];
-        
+
     return calcRatio(midPointArray, costOfPercentMoveArray);
 	}
-	
+
 	/**
 	 * extension of previous method used to update state
 	 * @return _rate most recent saved ETH/DAI rate in wei
-	 * @return _costToMoveFivePercent cost to move the price 5% in wei 
+	 * @return _costToMoveFivePercent cost to move the price 5% in wei
 	 */
 	function calcRatio(
 		uint256[3] memory _midPointArray,
 		uint256[3] memory _costOfPercentMoveArray
-	) 
+	)
 	internal
 	returns(
 		uint256 _rate,
@@ -427,22 +427,22 @@ contract Delfi {
 	)
 	{
 		uint256 totalCostOfPercentMove = _costOfPercentMoveArray[0] + _costOfPercentMoveArray[1] + _costOfPercentMoveArray[2];
-		
+
 		/** calculate proportion of each exchange in the formula */
 		/** precise to two decimals */
-		uint256 precision = 10000; 
+		uint256 precision = 10000;
 		uint256[3] memory propotionArray;
 		propotionArray[0] = (_costOfPercentMoveArray[0] * precision) / totalCostOfPercentMove;
 		propotionArray[1] = (_costOfPercentMoveArray[1] * precision) / totalCostOfPercentMove;
 		propotionArray[2] = (_costOfPercentMoveArray[2] * precision) / totalCostOfPercentMove;
 
 		/** balance prices */
-		uint256 balancedRate = 
+		uint256 balancedRate =
 			(
-				(_midPointArray[0] * propotionArray[0]) + 
-				(_midPointArray[1] * propotionArray[1]) + 
+				(_midPointArray[0] * propotionArray[0]) +
+				(_midPointArray[1] * propotionArray[1]) +
 				(_midPointArray[2] * propotionArray[2])
-			) 
+			)
 			/ precision;
 
 		latestRate = balancedRate;
@@ -460,11 +460,11 @@ contract Delfi {
 	 * @return _midpoint average value
 	 */
 	function findMidPoint(
-		uint256 _a, 
+		uint256 _a,
 		uint256 _b
-	) 
-	internal 
-	pure 
+	)
+	internal
+	pure
 	returns(
 		uint256 _midpoint
 		) {
@@ -482,4 +482,15 @@ contract Delfi {
 	 */
 	function() external {}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

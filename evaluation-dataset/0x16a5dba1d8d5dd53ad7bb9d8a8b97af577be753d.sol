@@ -28,7 +28,7 @@ contract EthereumHole {
 
     // Minimum countdown duration
     uint public constant MINIMUM_DURATION = 5 minutes;
-    
+
      // Minimum fraction of the pot required by a bidder to become the new leader
     uint public constant min_bid = 10000000000000 wei;
 
@@ -40,7 +40,7 @@ contract EthereumHole {
 
     // Time at which the current round expires
     uint public deadline;
-    
+
     // Is the game over?
     bool public gameIsOver;
 
@@ -129,4 +129,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

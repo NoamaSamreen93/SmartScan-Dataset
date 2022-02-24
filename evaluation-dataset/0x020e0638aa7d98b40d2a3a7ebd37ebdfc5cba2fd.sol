@@ -112,7 +112,7 @@ contract EtherBags {
 
     // Safety check to prevent against an unexpected 0x0 default.
     require(_addressNotNull(newOwner));
-    
+
     uint256 sellingPrice = getBagSellingPrice(bag);
 
     // Making sure sent amount is greater than or equal to the sellingPrice
@@ -220,4 +220,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

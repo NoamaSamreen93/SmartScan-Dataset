@@ -53,47 +53,47 @@ contract owned {
 }
 
 contract HashBux is owned,IERC20{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public _totalSupply = 80000000;
- 
+
     string public symbol = 'HASH';
 
     string public name = 'HashBux';
-    
+
     uint8 public decimals = 0;
-    
+
     mapping(address => uint256) public balances;
     mapping (address => mapping (address => uint256)) allowed;
 
     function HashBux() {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     // HashBux-specific
    function mine( uint256 newTokens ) public onlyOwner {
         require(newTokens + _totalSupply <= 4000000000);
-    
+
         _totalSupply = _totalSupply.add(newTokens);
         balances[owner] = balances[owner].add(newTokens);
         Transfer(this, owner, newTokens);
    }
-    
+
     function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
-   
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
             && _value > 0
         );
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -104,7 +104,7 @@ contract HashBux is owned,IERC20{
         require(
             allowed[_from][msg.sender] >= _value
             && balances[_from] >= _value
-            && _value > 0  
+            && _value > 0
         );
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -122,8 +122,19 @@ contract HashBux is owned,IERC20{
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

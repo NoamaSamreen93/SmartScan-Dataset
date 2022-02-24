@@ -4,7 +4,7 @@ pragma solidity ^0.4.19;
 * LooksCoin token sale contract
 *
 * Refer to https://lookscoin.com for more information.
-* 
+*
 * Developer: LookRev
 *
 */
@@ -206,7 +206,7 @@ contract StandardToken is ERC20 {
      *        recipient
      * @return true if tokens were transferred successfully, false otherwise
      */
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
         returns (bool success) {
         require(_to != 0x0);
         if(_from == _to) return false;
@@ -256,7 +256,7 @@ contract StandardToken is ERC20 {
      * @return number of tokens given spender is currently allowed to transfer
      *         from given owner
      */
-     function allowance(address _owner, address _spender) constant 
+     function allowance(address _owner, address _spender) constant
         returns (uint256 remaining) {
        return allowed[_owner][_spender];
      }
@@ -270,13 +270,13 @@ contract StandardToken is ERC20 {
  * LookRev platform.
  *
  * VIP rank is used to calculate priority when competing with other bids
- * for the same product or service on the platform. 
+ * for the same product or service on the platform.
  * Higher VIP rank (with earlier timestamp) has higher priority.
  * Higher VIP rank wallet address owner can outbid other lower ranking owners only once
  * per selling window or promotion period.
- * VIP rank is recorded at the time when the wallet address first reach VIP LooksCoin 
+ * VIP rank is recorded at the time when the wallet address first reach VIP LooksCoin
  * holding level for a token purchaser.
- * VIP rank is valid for the lifetime of a wallet address on the platform, as long as it 
+ * VIP rank is valid for the lifetime of a wallet address on the platform, as long as it
  * meets the VIP holding level.
 
  * Usage of the LooksCoin, VIP rank and token utilities are described on the website
@@ -353,7 +353,7 @@ contract LooksCoin is StandardToken, Ownable {
 
     /**
      * Get VIP rank of a given owner.
-     * VIP rank is valid for the lifetime of a token wallet address, 
+     * VIP rank is valid for the lifetime of a token wallet address,
      * as long as it meets VIP holding level.
      *
      * @param _to participant address to get the vip rank
@@ -388,7 +388,7 @@ contract LooksCoin is StandardToken, Ownable {
     /**
      * Reward participant the tokens they purchased or earned
      *
-     * @param _to address to credit tokens to the 
+     * @param _to address to credit tokens to the
      * @param _value number of tokens to transfer to given recipient
      *
      * @return true if tokens were transferred successfully, false otherwise
@@ -442,7 +442,7 @@ contract LooksCoin is StandardToken, Ownable {
         assert(burner != 0x0);
         if (_value > totalSupply) return false;
         if (_value > balances[burner]) return false;
-        
+
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
@@ -486,4 +486,15 @@ contract LooksCoin is StandardToken, Ownable {
     function getPatronsCount() constant returns (uint256 count) {
         return patrons.length;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,6 +1,6 @@
 /**
 *   Prod Ethereum Contract for AFTK Token
-*   Developed By: AiFinTek    
+*   Developed By: AiFinTek
 *   Author: AiFinTek Dev Team
 *   Desc: 25 Mil Max Supply - Not Mintable
 *   Ver 1.2
@@ -145,7 +145,7 @@ contract BasicToken is ERC20Basic {
         return true;
     }
 
-    
+
 }
 
 /**
@@ -181,14 +181,14 @@ contract AFTKBurnableToken is BasicToken, Ownable {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) onlyOwner public returns (bool success) {
-        
+
         address burner = _from;
 
         require(_value <= balances[burner]);
         // no need to require value <= totalSupply, since that would imply the
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
-        
+
         balances[burner] = balances[burner].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
         Burn(burner, _value);
@@ -362,7 +362,7 @@ contract MintableToken is StandardToken, Ownable {
 
 /**
 *   Prod Ethereum Contract for AFTK Token
-*   Developed By: AiFinTek    
+*   Developed By: AiFinTek
 *   Author: AiFinTek Dev Team
 *   Desc: 25 Mil Max Supply - Not Mintable
 *   Ver 1.2
@@ -371,4 +371,15 @@ contract AFTKToken is MintableToken, AFTKBurnableToken {
     string public constant name = 'AFTK Token';
     string public constant symbol = 'AFTK';
     uint8 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -701,3 +701,11 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         super.operatorBurn(_tokenHolder, _amount, _holderData, _operatorData);
     }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

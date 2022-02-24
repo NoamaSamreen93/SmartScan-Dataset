@@ -7,7 +7,7 @@ contract ERC20Interface {
 }
 
 // ----------------------------------------------------------------------------
-// Four Leaf clover (FLC) Token interface 
+// Four Leaf clover (FLC) Token interface
 // ----------------------------------------------------------------------------
 contract FLC {
     function create(uint units) public;
@@ -18,13 +18,13 @@ contract FLC {
 // contract WhiteListAccess
 // ----------------------------------------------------------------------------
 contract WhiteListAccess {
-    
+
     function WhiteListAccess() public {
         owner = msg.sender;
         whitelist[owner] = true;
-        whitelist[address(this)] = true;        
+        whitelist[address(this)] = true;
     }
-    
+
     address public owner;
     mapping (address => bool) whitelist;
 
@@ -46,10 +46,10 @@ contract WhiteListAccess {
 // NRB_Common contract
 // ----------------------------------------------------------------------------
 contract NRB_Common is WhiteListAccess {
-    
-    // Ownership    
+
+    // Ownership
     bool _init;
-    
+
     function NRB_Common() public { ETH_address = 0x1; }
 
     // Deployment
@@ -88,7 +88,7 @@ contract NRB_Tokens is NRB_Common {
     mapping(address => Token) public tokens;
     mapping(uint => address) public tokenlist;
     uint public tokenlenth;
-    
+
     struct Token {
         bool registered;
         bool validated;
@@ -186,4 +186,15 @@ contract NRB_Tokens is NRB_Common {
         return (flc, next);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
 contract ProofOfLove {
-    
+
     uint public count = 0;
 
     event Love(string name1, string name2);
@@ -13,4 +13,15 @@ contract ProofOfLove {
         emit Love(name1, name2);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

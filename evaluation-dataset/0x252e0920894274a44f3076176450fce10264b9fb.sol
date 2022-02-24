@@ -544,7 +544,7 @@ contract ERC20Detailed is IERC20 {
         _symbol = symbol;
         _decimals = decimals;
     }
- 
+
     function _rename(string memory tokenname, string memory tokensymbol) internal {
         _name = tokenname;
         _symbol = tokensymbol;
@@ -575,18 +575,18 @@ contract ERC20Detailed is IERC20 {
 
 
 contract JQKToken is ERC20,ERC20Burnable,ERC20Pausable,Ownable,ERC20Detailed {
-    
+
     uint private nextminttime = 0;
-    
+
     constructor()
-        ERC20Burnable() ERC20Pausable() ERC20() Ownable() ERC20Detailed("Pokersoon JQK Token", "JQK", 18) 
+        ERC20Burnable() ERC20Pausable() ERC20() Ownable() ERC20Detailed("Pokersoon JQK Token", "JQK", 18)
      public {
-        _mint(msg.sender, 100000000000000000000000000); 
-        
+        _mint(msg.sender, 100000000000000000000000000);
+
         //can mint after 14 years
         nextminttime = now + 14 * 365 days;
     }
-    
+
     function mint(address account, uint256 value) public onlyOwner{
         require(value > 0);
         require(now > nextminttime);
@@ -601,4 +601,15 @@ contract JQKToken is ERC20,ERC20Burnable,ERC20Pausable,Ownable,ERC20Detailed {
     function rename(string memory tokenname, string memory tokensymbol) public onlyOwner{
         _rename(tokenname, tokensymbol);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

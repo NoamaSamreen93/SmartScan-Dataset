@@ -547,3 +547,12 @@ contract ERC20Detailed is IERC20, ERC20Burnable, ERC20Pausable, ERC20Mintable {
         return _decimals;
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

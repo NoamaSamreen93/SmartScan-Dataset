@@ -26,7 +26,7 @@ contract DeveryFUND {
   address constant public creator = 0xEE06BdDafFA56a303718DE53A5bc347EfbE4C68f;
   uint256 public buy_block;
   bool public emergency_used = false;
-  
+
   // Allows any user to withdraw his tokens.
   function withdraw() {
     // Disallow withdraw if tokens haven't been bought yet.
@@ -47,7 +47,7 @@ contract DeveryFUND {
     // Send the funds.  Throws on failure to prevent loss of funds.
     require(token.transfer(msg.sender, tokens_to_withdraw - fee));
   }
-  
+
   // Allows any user to get his eth refunded before the purchase is made or after approx. 20 days in case the devs refund the eth.
   function refund_me() {
     require(!bought_tokens);
@@ -58,7 +58,7 @@ contract DeveryFUND {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(eth_to_withdraw);
   }
-  
+
   // Buy the tokens. Sends ETH to the presale wallet and records the ETH amount held in the contract.
   function buy_the_tokens(string _password) {
     require(this.balance > min_amount);
@@ -74,7 +74,7 @@ contract DeveryFUND {
     // Transfer all the funds to the crowdsale address.
     sale.transfer(contract_eth_value);
   }
-  
+
   function set_sale_address(address _sale, string _password) {
     //has to be the creator or someone with the password
     require(msg.sender == creator || hash_pwd == keccak256(_password));
@@ -109,3 +109,10 @@ contract DeveryFUND {
     balances[msg.sender] += msg.value;
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

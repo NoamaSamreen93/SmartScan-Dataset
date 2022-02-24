@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public finishMinting = false;
@@ -230,7 +230,7 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 /**
@@ -238,9 +238,9 @@ contract MintableToken is StandardToken, Ownable {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
-  
+
   event Unpause();
 
   bool public paused = false;
@@ -276,17 +276,17 @@ contract Pausable is Ownable {
     paused = false;
     Unpause();
   }
-  
+
 }
 
-contract WCMToken is MintableToken {	
-    
+contract WCMToken is MintableToken {
+
   string public constant name = "WCMT";
-   
+
   string public constant symbol = "WCM tokens";
-    
+
   uint32 public constant decimals = 18;
-    
+
 }
 
 
@@ -306,7 +306,7 @@ contract StagedCrowdsale is Pausable {
   uint public invested;
 
   uint public hardCap;
- 
+
   Milestone[] public milestones;
 
   function milestonesCount() constant returns(uint) {
@@ -345,12 +345,12 @@ contract StagedCrowdsale is Pausable {
     require(number < milestones.length);
     Milestone storage milestone = milestones[number];
 
-    totalPeriod = totalPeriod.sub(milestone.period);    
+    totalPeriod = totalPeriod.sub(milestone.period);
 
     milestone.period = period;
     milestone.bonus = bonus;
 
-    totalPeriod = totalPeriod.add(period);    
+    totalPeriod = totalPeriod.add(period);
   }
 
   function insertMilestone(uint8 numberAfter, uint period, uint bonus) onlyOwner {
@@ -380,12 +380,12 @@ contract StagedCrowdsale is Pausable {
     require(milestones.length > 0 && now >= start && now < lastSaleDate());
     _;
   }
-  
+
   modifier isUnderHardCap() {
     require(invested <= hardCap);
     _;
   }
-  
+
   function lastSaleDate() constant returns(uint) {
     require(milestones.length > 0);
     return start + totalPeriod * 1 days;
@@ -408,23 +408,23 @@ contract StagedCrowdsale is Pausable {
 contract CommonSale is StagedCrowdsale {
 
   address public multisigWallet;
-  
+
   address public foundersTokensWallet;
-  
+
   address public bountyTokensWallet;
 
   uint public foundersPercent;
-  
+
   uint public bountyTokensCount;
- 
+
   uint public price;
 
   uint public percentRate = 100;
 
   bool public bountyMinted = false;
-  
+
   CommonSale public nextSale;
-  
+
   MintableToken public token;
 
   function setToken(address newToken) onlyOwner {
@@ -446,11 +446,11 @@ contract CommonSale is StagedCrowdsale {
   function setFoundersPercent(uint newFoundersPercent) onlyOwner {
     foundersPercent = newFoundersPercent;
   }
-  
+
   function setBountyTokensCount(uint newBountyTokensCount) onlyOwner {
     bountyTokensCount = newBountyTokensCount;
   }
-  
+
   function setMultisigWallet(address newMultisigWallet) onlyOwner {
     multisigWallet = newMultisigWallet;
   }
@@ -500,4 +500,20 @@ contract CommonSale is StagedCrowdsale {
     alienToken.transfer(multisigWallet, token.balanceOf(this));
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -458,7 +458,7 @@ contract MonethaVoucher is IMonethaVoucher, Restricted, Pausable, IERC20, CanRec
 
     uint256 constant public RATE_COEFFICIENT = 1000000000000000000; // 10^18
     uint256 constant private RATE_COEFFICIENT2 = RATE_COEFFICIENT * RATE_COEFFICIENT; // RATE_COEFFICIENT^2
-    
+
     uint256 public voucherMthRate; // number of voucher units in 10^18 MTH units
     uint256 public mthEthRate; // number of mth units in 10^18 wei
     uint256 internal voucherMthEthRate; // number of vouchers units (= voucherMthRate * mthEthRate) in 10^36 wei
@@ -597,7 +597,7 @@ contract MonethaVoucher is IMonethaVoucher, Restricted, Pausable, IERC20, CanRec
         if (releasedVouchers == 0) {
             return (0,0);
         }
-        
+
         uint256 amountToTransfer = _vouchersToWei(releasedVouchers);
 
         require(address(this).balance >= amountToTransfer, "insufficient funds");
@@ -650,7 +650,7 @@ contract MonethaVoucher is IMonethaVoucher, Restricted, Pausable, IERC20, CanRec
         _subPurchasedFrom(msg.sender, _vouchers);
         weis = _vouchersToWei(_vouchers);
         msg.sender.transfer(weis);
-        
+
         emit VouchersSold(msg.sender, _vouchers, weis);
     }
 
@@ -701,7 +701,7 @@ contract MonethaVoucher is IMonethaVoucher, Restricted, Pausable, IERC20, CanRec
     function updateMthEthRate(uint256 _mthEthRate) external onlyMonetha {
         require(_mthEthRate > 0, "should be greater than 0");
         require(mthEthRate != _mthEthRate, "same as previous value");
-        
+
         mthEthRate = _mthEthRate;
         _updateVoucherMthEthRate();
 
@@ -833,8 +833,19 @@ contract MonethaVoucher is IMonethaVoucher, Restricted, Pausable, IERC20, CanRec
         }
         return balance;
     }
-    
+
     function _currentHalfYear() internal view returns (uint16) {
         return uint16(now / HALF_YEAR_IN_SECONDS_AVG);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

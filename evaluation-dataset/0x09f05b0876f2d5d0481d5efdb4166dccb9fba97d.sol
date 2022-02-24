@@ -22,7 +22,7 @@ contract VoterFactory is Ownable{
     using SafeMath for uint256; //uint256 library
     mapping(address=>uint) total; //player total Voter
     mapping(address=>mapping(uint=>uint)) totalForVoter;
-    mapping(address=>uint) balances;//player gamcoin 
+    mapping(address=>uint) balances;//player gamcoin
     mapping(address=>uint) playerP;//player PID
     mapping(uint=>address) playerA;//PID to player address
     mapping(address=>mapping(uint=>uint)) playerV;//player=>voterID=>voters
@@ -30,8 +30,8 @@ contract VoterFactory is Ownable{
     mapping(address=>address) referees;//player=>referees
     mapping(address=>address[]) totalReferees;//referees=>totalplayer
     mapping(address=>uint) isCreated;
-    
-    
+
+
     event NewVoter(uint _id,uint256 _name,uint _value,uint _vectoryvalue);// new model event
     event GiveVoter(address indexed _fromaddress,uint _toid,uint _number);// voter event
     event gameover(bool isReady);//gameover
@@ -43,7 +43,7 @@ contract VoterFactory is Ownable{
     event EsetFee(uint _time,uint _fee);
     event Ebuygamecoin(uint _time,uint _number,address indexed _address);
     event EgetEveryDayEarnings(uint _time,uint _number,uint _totalplayers,address _address);
-    
+
     struct Voter{
         uint id;
         uint256 name;
@@ -65,7 +65,7 @@ contract VoterFactory is Ownable{
     uint public fee = 340000000000000;//gamcoin fee
     uint public createTime = now;//create Time
     uint public shutTime = 0 minutes;//shutdown time
-    uint public decimals = 18; 
+    uint public decimals = 18;
     bool public started = false;
     uint public EthOther = 100000000000000000000;
     uint public EthOtherfee = 10000;
@@ -183,7 +183,7 @@ contract Voterplayer is VoterServiceImpl{
     }
     function getTotalForVoter(address _address,uint _id) view public returns(uint){
         return totalForVoter[_address][_id];
-    } 
+    }
     function getTotalVoter(address _address) view public returns(uint totals){
         return total[_address];
     }
@@ -275,7 +275,7 @@ contract Voterplayer is VoterServiceImpl{
         decimals=_decimals;
         CDS=ERC20Interface(_address);
     }
-    
+
     function getEveryDayEarnings(address _address,uint256 _number) public onlyOwner{
         require(balances[owner]>=_number);
         totalRef=totalRef.add(_number.mul(2));
@@ -290,7 +290,7 @@ contract Voterplayer is VoterServiceImpl{
             }
         emit EgetEveryDayEarnings(now,_number,totalplayers,_address);
     }
-    
+
 }
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -314,4 +314,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1395,7 +1395,7 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
     uint256 private maxSupply;
     uint256 private circulatingSupply;
     uint256 public totalReleased;
-    
+
     // Treasure Setup
     uint256 public activeAccounts = 0;
     mapping(uint256 => uint256) internal closingAccounts;
@@ -1404,19 +1404,19 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
     address public worldTreasuryAddress;
     address public freeFloat;
     address public anticipationAddress;
-    
+
     uint256 public currentMonth = 1;
     uint256 internal timestampOfNextMonth;
 
     // Demurrage Global variables
     mapping(uint256 => uint256) public undermurraged;
     mapping(uint256 => uint256) public claimedTokens;
-    
+
     uint256 public totalMonthlyAnticipation;
     mapping(uint256 => uint256) public monthlyClaimAnticipationEnd;
-    
+
     bool internal pendingOracle = false;
-    
+
     // Events
     event ClaimDemurrage(address to, uint256 amount);
     event PayDemurrage(address from, uint256 amount);
@@ -1424,13 +1424,13 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
     event CloseTreasury(address account);
     event Unlock(address account, uint256 amount);
     event NewAnticipation(address account, uint256 amount);
-    
+
     // Accounts and Balances
     mapping(address => uint256) private _balances;
     mapping(address => mapping(uint256 => uint256)) private monthsLowestBalance;
     mapping(address => mapping(uint256 => bool)) private transacted;
     mapping(address => mapping (address => uint256)) public _allowed;
-    
+
     // Treasure Account
     struct TreasureStruct {
         uint256 balance;
@@ -1442,10 +1442,10 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
         uint256 endMonth;
         uint256 monthlyAnticipation;
     }
-    
+
     mapping(address => TreasureStruct) public treasury;
     mapping(address => bool) public activeTreasury;
-    
+
     // Calculate Demurrage
     function calcUnrealisedDemurrage(address account, uint256 month) public view returns(uint256) {
         if (transacted[account][month] == true) {
@@ -1461,7 +1461,7 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
             return 0;
         }
     }
-    
+
     // Pay Demurrage
     function payDemurrage(address account) public {
         while (treasury[account].lastUpdate < currentMonth - 1) {
@@ -1475,14 +1475,14 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
             treasury[account].lastUpdate++;
         }
     }
-    
+
     // Get the total supply of tokens
     function totalSupply() public view returns (uint) {
         return maxSupply;
     }
 
     string public oraclizeURL = "https://paxco.in:10101/date";
-    
+
     function setOraclizeURL(string memory _newURL) public onlyOwner {
         oraclizeURL = _newURL;
     }
@@ -1490,36 +1490,36 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
-    
+
     // Get the allowance of funds beteen a token holder and a spender
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
-    
+
     // Sets how much a sender is allowed to use of an owners funds
     function approve(address spender, uint value) public returns (bool success) {
         payDemurrage(spender);
         payDemurrage(msg.sender);
-        
+
         _allowed[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
     // Transfer the balance from owner's account to another account
     function transfer(address to, uint value) public returns (bool success) {
         if (now >= timestampOfNextMonth && pendingOracle == false) {
             pendingOracle = true;
             oraclize_query("URL", oraclizeURL);
         }
-        
+
         if (treasury[msg.sender].endMonth <= currentMonth) {
             activeTreasury[msg.sender] = false;
         }
         if (treasury[to].endMonth <= currentMonth) {
             activeTreasury[to] = false;
         }
-        
+
         payDemurrage(msg.sender);
         payDemurrage(to);
         if (_balances[msg.sender] >= value) {
@@ -1549,25 +1549,25 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
             return false;
         }
     }
-    
+
     string public oraclizeUrl = '';
-    
-    
-    
+
+
+
     // Transfer from function, pulls from allowance
     function transferFrom(address from, address to, uint value) public returns (bool success) {
         if (now >= timestampOfNextMonth && pendingOracle == false) {
             pendingOracle = true;
             oraclize_query("URL", oraclizeUrl);
         }
-        
+
         if (treasury[to].endMonth <= currentMonth) {
             activeTreasury[to] = false;
         }
         if (treasury[to].endMonth <= currentMonth) {
             activeTreasury[to] = false;
         }
-        
+
         payDemurrage(from);
         payDemurrage(to);
         if (value <= balanceOf(from) && value <= allowance(from, msg.sender)) {
@@ -1599,7 +1599,7 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
             return false;
         }
     }
-    
+
     // Unlocks tokens from treasury
     function unlockTreasure(address account, address to, uint256 value) private {
         if (to != account) {
@@ -1643,14 +1643,14 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
             }
         }
     }
-    
+
     // World treasury
     function setWorldTreasuryAddress(address newWorldTreasuryAddress) public onlyOwner {
         circulatingSupply = circulatingSupply.sub(_balances[worldTreasuryAddress]);
         circulatingSupply = circulatingSupply.sub(_balances[newWorldTreasuryAddress]);
         worldTreasuryAddress = newWorldTreasuryAddress;
     }
-    
+
     // Minting
     function setMinter(address newMinter) public onlyOwner {
         minterAddress = newMinter;
@@ -1687,30 +1687,30 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
         emit Transfer(address(0), freeFloat, 44500000000);
         emit Unlock(account, 50000000);
     }
-    
+
     // Oraclize Callback function
     function __callback(bytes32 queryID, string memory result) public {
         require(msg.sender == oraclize_cbAddress());
         require(pendingOracle == true);
-      
+
         uint256 unspentTokens = circulatingSupply.sub(undermurraged[currentMonth]);
         uint256 unspentDemurrage =  (unspentTokens.mul(118511851)).div(100000000000);
         uint256 unclaimedTokens = ((activeAccounts.mul(monthlyClaim)).sub(claimedTokens[currentMonth])).sub(totalMonthlyAnticipation);
         uint256 totalDemurrage = unspentDemurrage.add(unclaimedTokens);
-        
+
         circulatingSupply = circulatingSupply.sub(unspentDemurrage);
         _balances[worldTreasuryAddress] = _balances[worldTreasuryAddress].add(totalDemurrage);
         emit Transfer(address(this), worldTreasuryAddress, totalDemurrage);
         emit ClaimDemurrage(worldTreasuryAddress, totalDemurrage);
-      
+
         activeAccounts = activeAccounts.sub(closingAccounts[currentMonth]);
         totalMonthlyAnticipation = totalMonthlyAnticipation.sub(monthlyClaimAnticipationEnd[currentMonth]);
-        
+
         currentMonth++;
         timestampOfNextMonth = parseInt(result);
         pendingOracle = false;
     }
-    
+
     // Force new Oracle
     function resetOracle() public onlyOwner {
         pendingOracle = true;
@@ -1720,14 +1720,14 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
         require(address(this).balance >= amount);
         msg.sender.transfer(amount);
     }
-    
+
     // Artificialy jump to next month
     // @Dev - remove this on the mainnet release
     function insertMonth() public onlyOwner {
         pendingOracle = true;
         oraclize_query("URL", "http://pax-api.herokuapp.com/");
     }
-    
+
     // Lifetime Anticipation
     function setAnticipationAddress(address newAnticipationAddress) public onlyOwner {
         anticipationAddress = newAnticipationAddress;
@@ -1742,12 +1742,12 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
         totalMonthlyAnticipation = totalMonthlyAnticipation.add(newMonthlyAnticipation);
         monthlyClaimAnticipationEnd[treasury[account].endMonth] = monthlyClaimAnticipationEnd[treasury[account].endMonth].add(newMonthlyAnticipation);
         _balances[anticipationAddress] = _balances[anticipationAddress].add(amount);
-        
+
         emit Transfer(address(this), anticipationAddress, amount);
         emit NewAnticipation(account, amount);
-        
+
     }
-    
+
     // Public Getters for implementing with DAPP (For some data in treasury mapping to stuct)
     function getReferrals(address account) public view returns (uint256 total, uint256 monthly) {
         return (treasury[account].totalRefferals, treasury[account].monthsRefferals[currentMonth]);
@@ -1755,9 +1755,18 @@ contract PAXTokenReserve is IERC20, Owned, usingOraclize {
     function tresureBalance(address account) public view returns (uint256 balance, uint256 remainingClaim, uint256 claimed) {
         return (treasury[account].balance, monthlyClaim - treasury[account].monthsClaim[currentMonth], treasury[account].claimed);
     }
-    
+
     // Makes Deposit Possible
     function () external payable {}
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

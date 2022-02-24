@@ -501,7 +501,7 @@ contract RefundableBeforeSoftCapCrowdsale is Ownable, FinalizableCrowdsale {
   function goalReached() public view returns (bool) {
     return weiRaised >= goal;
   }
-  
+
   function updateEscrowGoalReached() onlyOwner public {
     require(!isFinalized);
     require(goalReached());
@@ -899,4 +899,17 @@ contract PreICOCrowdsale is TimedCrowdsale, PostDeliveryCrowdsale, RefundableBef
     function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
       return _weiAmount.mul(10**2).div(rate);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

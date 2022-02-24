@@ -57,7 +57,7 @@ contract Ownable {
 
 contract Authorizable is Ownable {
     mapping(address => bool) public authorized;
-  
+
     event AuthorizationSet(address indexed addressAuthorized, bool indexed authorization);
 
     constructor() public {
@@ -73,9 +73,9 @@ contract Authorizable is Ownable {
         emit AuthorizationSet(addressAuthorized, authorization);
         authorized[addressAuthorized] = authorization;
     }
-  
+
 }
- 
+
 contract tokenInterface {
     function transfer(address _to, uint256 _value) public returns (bool);
 }
@@ -83,15 +83,15 @@ contract tokenInterface {
 contract MultiSender is Authorizable {
 	tokenInterface public tokenContract;
 	mapping( bytes32 => bool) public txDone;
-	
+
 	constructor(address _tokenAddress) public {
 	    tokenContract = tokenInterface(_tokenAddress);
 	}
-	
+
 	function updateTokenContract(address _tokenAddress) public onlyAuthorized {
         tokenContract = tokenInterface(_tokenAddress);
     }
-	
+
     function multiSend(address[] memory _dests, uint256[] memory _values, bytes32[] memory _id) public onlyAuthorized {
         require(_dests.length == _values.length, "_dests.length == _values.length");
         require(_dests.length == _id.length, "_dests.length == _id.length");
@@ -102,13 +102,24 @@ contract MultiSender is Authorizable {
             }
         }
     }
-	
+
 	function withdrawTokens(address to, uint256 value) public onlyAuthorized returns (bool) {
         return tokenContract.transfer(to, value);
     }
-    
+
     function withdrawEther() public onlyAuthorized returns (bool) {
         msg.sender.transfer(address(this).balance);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

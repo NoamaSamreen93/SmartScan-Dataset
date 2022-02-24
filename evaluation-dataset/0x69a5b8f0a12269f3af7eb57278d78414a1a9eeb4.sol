@@ -19,11 +19,11 @@ pragma solidity ^0.4.11;
 
 contract owned {
     address public owner;
-  
-	
+
+
     function owned() {
         owner = msg.sender;
-        
+
     }
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -71,11 +71,11 @@ contract StandardToken is owned, safeMath {
 }
 
 contract BetstreakICO is owned, safeMath {
-    
+
   // owner/admin & token reward
   address        public admin = owner;      // admin address
   StandardToken  public tokenReward;        // address of the token used as reward
-  
+
 
   // deployment variables for static supply sale
   uint256 public initialSupply;
@@ -85,8 +85,8 @@ contract BetstreakICO is owned, safeMath {
   // multi-sig addresses and price variable
   address public beneficiaryWallet;
   // beneficiaryMultiSig (founder group) or wallet account, live is 0x361e14cC5b3CfBa5D197D8a9F02caf71B3dca6Fd
-  
-  
+
+
   uint256 public tokensPerEthPrice;                           // set initial value floating priceVar 1,300 tokens per Eth
 
   // uint256 values for min,max,caps,tracking
@@ -117,7 +117,7 @@ contract BetstreakICO is owned, safeMath {
 
   // total number of tokens initially
   function initialBSTSupply() constant returns (uint256 tokenTotalSupply) {
-      tokenTotalSupply = safeDiv(initialSupply,100); 
+      tokenTotalSupply = safeDiv(initialSupply,100);
   }
 
   // remaining number of tokens
@@ -127,34 +127,34 @@ contract BetstreakICO is owned, safeMath {
 
   // setup the CrowdSale parameters
   function SetupCrowdsale(uint256 _fundingStartBlock, uint256 _fundingEndBlock) onlyOwner returns (bytes32 response) {
-      
+
       if ((msg.sender == admin)
-      && (!(isCrowdSaleSetup))  
+      && (!(isCrowdSaleSetup))
       && (!(beneficiaryWallet > 0))){
-      
+
           // init addresses
-          tokenReward                             = StandardToken(0xA7F40CCD6833a65dD514088F4d419Afd9F0B0B52);  
-          
-          
-          
+          tokenReward                             = StandardToken(0xA7F40CCD6833a65dD514088F4d419Afd9F0B0B52);
+
+
+
           beneficiaryWallet                       = 0x361e14cC5b3CfBa5D197D8a9F02caf71B3dca6Fd;
-          
-         
-          tokensPerEthPrice                       = 1300;                                         
+
+
+          tokensPerEthPrice                       = 1300;
           // set day1 initial value floating priceVar 1,300 tokens per Eth
 
           // funding targets
-          fundingMinCapInWei                      = 1000000000000000000000;                          
-          //300000000000000000000 =  1000 Eth (min cap) - crowdsale is considered success after this value  
+          fundingMinCapInWei                      = 1000000000000000000000;
+          //300000000000000000000 =  1000 Eth (min cap) - crowdsale is considered success after this value
           //testnet 5000000000000000000 = 5Eth
 
 
           // update values
           amountRaisedInWei                       = 0;
-          initialSupply                           = 20000000000;                                      
-          //   200,000,000 + 2 decimals = 200,000,000,00 
+          initialSupply                           = 20000000000;
+          //   200,000,000 + 2 decimals = 200,000,000,00
           //testnet 1100000 = 11,000
-          
+
           tokensRemaining                         = safeDiv(initialSupply,100);
 
           fundingStartBlock                       = _fundingStartBlock;
@@ -168,62 +168,62 @@ contract BetstreakICO is owned, safeMath {
           //gas reduction experiment
           setPrice();
           return "Crowdsale is setup";
-          
+
       } else if (msg.sender != admin) {
           return "not authorized";
-          
+
       } else  {
           return "campaign cannot be changed";
       }
     }
 
-    
-    
+
+
     function SetupPreSale(bool _isCrowdSaleSetup) onlyOwner returns (bytes32 response) {
-      
+
       if ((msg.sender == admin))
       {
       isCrowdSaleSetup = _isCrowdSaleSetup;
-          
+
       return "Executed.";
-          
+
         }
     }
-    
+
 
 
     function setPrice() {
-        
+
         // ICO configuration:
         // Presale Bonus      +30% = 1,300 BST   = 1 ETH       [blocks: start   -> s+25200]
         // First Week Bonus   +20% = 1,200 BST  = 1 ETH       [blocks: s+25201  -> s+50400]
         // Second Week Bonus  +10% = 1,100 BST  = 1 ETH       [blocks: s+50401 -> s+75600]
         // Third Week Bonus   +5% = 1,050 BST   = 1 ETH       [blocks: s+75601 -> s+100800]
         // Final Week         +0% = 1,000 BST   = 1 ETH       [blocks: s+100801 -> end]
-        
-      if (block.number >= fundingStartBlock && block.number <= fundingStartBlock+25200) { 
+
+      if (block.number >= fundingStartBlock && block.number <= fundingStartBlock+25200) {
           // Presale Bonus      +30% = 1,300 BST   = 1 ETH       [blocks: start   -> s+25200]
-          
+
         tokensPerEthPrice=1300;
-        
-      } else if (block.number >= fundingStartBlock+25201 && block.number <= fundingStartBlock+50400) { 
+
+      } else if (block.number >= fundingStartBlock+25201 && block.number <= fundingStartBlock+50400) {
           // First Week Bonus   +20% = 1,200 BST  = 1 ETH       [blocks: s+25201  -> s+50400]
-          
+
         tokensPerEthPrice=1200;
-        
-      } else if (block.number >= fundingStartBlock+50401 && block.number <= fundingStartBlock+75600) { 
+
+      } else if (block.number >= fundingStartBlock+50401 && block.number <= fundingStartBlock+75600) {
           // Second Week Bonus  +10% = 1,100 BST  = 1 ETH       [blocks: s+50401 -> s+75600]
-          
+
         tokensPerEthPrice=1100;
-        
-      } else if (block.number >= fundingStartBlock+75601 && block.number <= fundingStartBlock+100800) { 
+
+      } else if (block.number >= fundingStartBlock+75601 && block.number <= fundingStartBlock+100800) {
           // Third Week Bonus   +5% = 1,050 BST   = 1 ETH       [blocks: s+75601 -> s+100800]
-          
+
         tokensPerEthPrice=1050;
-        
-      } else if (block.number >= fundingStartBlock+100801 && block.number <= fundingEndBlock) { 
+
+      } else if (block.number >= fundingStartBlock+100801 && block.number <= fundingEndBlock) {
           // Final Week         +0% = 1,000 BST   = 1 ETH       [blocks: s+100801 -> end]
-          
+
         tokensPerEthPrice=1000;
       }
     }
@@ -235,8 +235,8 @@ contract BetstreakICO is owned, safeMath {
     }
 
     function BuyBSTtokens() payable {
-        
-      // 0. conditions (length, crowdsale setup, zero check, 
+
+      // 0. conditions (length, crowdsale setup, zero check,
       //exceed funding contrib check, contract valid check, within funding block range check, balance overflow check etc)
       require(!(msg.value == 0)
       && (isCrowdSaleSetup)
@@ -253,7 +253,7 @@ contract BetstreakICO is owned, safeMath {
       rewardTransferAmount            = safeDiv(safeMul(msg.value,tokensPerEthPrice),10000000000000000);
 
       // 3. interaction
-      tokensRemaining                 = safeSub(tokensRemaining, safeDiv(rewardTransferAmount,100));  
+      tokensRemaining                 = safeSub(tokensRemaining, safeDiv(rewardTransferAmount,100));
       // will cause throw if attempt to purchase over the token limit in one tx or at all once limit reached
       tokenReward.transfer(msg.sender, rewardTransferAmount);
 
@@ -262,7 +262,7 @@ contract BetstreakICO is owned, safeMath {
       Transfer(this, msg.sender, msg.value);
       Buy(msg.sender, msg.value, rewardTransferAmount);
     }
-    
+
 
     function beneficiaryMultiSigWithdraw(uint256 _amount) onlyOwner {
       require(areFundsReleasedToBeneficiary && (amountRaisedInWei >= fundingMinCapInWei));
@@ -270,65 +270,65 @@ contract BetstreakICO is owned, safeMath {
     }
 
     function checkGoalReached() onlyOwner returns (bytes32 response) {
-        
+
         // return crowdfund status to owner for each result case, update public constant
         // update state & status variables
       require (isCrowdSaleSetup);
-      
-      if ((amountRaisedInWei < fundingMinCapInWei) && (block.number <= fundingEndBlock && block.number >= fundingStartBlock)) { 
+
+      if ((amountRaisedInWei < fundingMinCapInWei) && (block.number <= fundingEndBlock && block.number >= fundingStartBlock)) {
         // ICO in progress, under softcap
         areFundsReleasedToBeneficiary = false;
         isCrowdSaleClosed = false;
         CurrentStatus = "In progress (Eth < Softcap)";
         return "In progress (Eth < Softcap)";
-        
+
       } else if ((amountRaisedInWei < fundingMinCapInWei) && (block.number < fundingStartBlock)) { // ICO has not started
         areFundsReleasedToBeneficiary = false;
         isCrowdSaleClosed = false;
         CurrentStatus = "Presale is setup";
         return "Presale is setup";
-        
-        
+
+
       } else if ((amountRaisedInWei < fundingMinCapInWei) && (block.number > fundingEndBlock)) { // ICO ended, under softcap
         areFundsReleasedToBeneficiary = false;
         isCrowdSaleClosed = true;
         CurrentStatus = "Unsuccessful (Eth < Softcap)";
         return "Unsuccessful (Eth < Softcap)";
-        
+
       } else if ((amountRaisedInWei >= fundingMinCapInWei) && (tokensRemaining == 0)) { // ICO ended, all tokens gone
           areFundsReleasedToBeneficiary = true;
           isCrowdSaleClosed = true;
           CurrentStatus = "Successful (BST >= Hardcap)!";
           return "Successful (BST >= Hardcap)!";
-          
-          
-      } else if ((amountRaisedInWei >= fundingMinCapInWei) && (block.number > fundingEndBlock) && (tokensRemaining > 0)) { 
-          
+
+
+      } else if ((amountRaisedInWei >= fundingMinCapInWei) && (block.number > fundingEndBlock) && (tokensRemaining > 0)) {
+
           // ICO ended, over softcap!
           areFundsReleasedToBeneficiary = true;
           isCrowdSaleClosed = true;
           CurrentStatus = "Successful (Eth >= Softcap)!";
           return "Successful (Eth >= Softcap)!";
-          
-          
-      } else if ((amountRaisedInWei >= fundingMinCapInWei) && (tokensRemaining > 0) && (block.number <= fundingEndBlock)) { 
-          
+
+
+      } else if ((amountRaisedInWei >= fundingMinCapInWei) && (tokensRemaining > 0) && (block.number <= fundingEndBlock)) {
+
           // ICO in progress, over softcap!
         areFundsReleasedToBeneficiary = true;
         isCrowdSaleClosed = false;
         CurrentStatus = "In progress (Eth >= Softcap)!";
         return "In progress (Eth >= Softcap)!";
       }
-      
+
       setPrice();
     }
 
-    function refund() { 
-        
-        // any contributor can call this to have their Eth returned. 
+    function refund() {
+
+        // any contributor can call this to have their Eth returned.
         // user's purchased BST tokens are burned prior refund of Eth.
         //require minCap not reached
-        
+
       require ((amountRaisedInWei < fundingMinCapInWei)
       && (isCrowdSaleClosed)
       && (block.number > fundingEndBlock)
@@ -344,4 +344,20 @@ contract BetstreakICO is owned, safeMath {
       msg.sender.transfer(ethRefund);
       Refund(msg.sender, ethRefund);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

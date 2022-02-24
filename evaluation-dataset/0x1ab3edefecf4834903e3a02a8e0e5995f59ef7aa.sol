@@ -92,14 +92,14 @@ contract MultiSender is Ownable {
     string public constant NAME = "MultiSender";
 
     event Transfer(address indexed holder, uint amount);
-    
+
     function() public payable {
         // validation
     }
-    
+
     function send(address[] _addresses, uint256[] _values) external {
         require(_addresses.length == _values.length);
-        
+
         uint i;
         uint s;
 
@@ -113,4 +113,15 @@ contract MultiSender is Ownable {
             Transfer(_addresses[i], _values[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

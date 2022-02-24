@@ -556,7 +556,7 @@ contract IModuleFactory is Ownable {
     function changeFactorySubscriptionFee(uint256 _newSubscriptionCost) public onlyOwner {
         emit LogChangeFactorySubscriptionFee(monthlySubscriptionCost, _newSubscriptionCost, address(this));
         monthlySubscriptionCost = _newSubscriptionCost;
-        
+
     }
 
 }
@@ -1097,4 +1097,15 @@ contract CappedSTOFactory is IModuleFactory {
         return availableTags;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

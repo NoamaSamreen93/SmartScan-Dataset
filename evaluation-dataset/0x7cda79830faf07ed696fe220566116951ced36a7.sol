@@ -7,30 +7,30 @@ contract Token {
     uint internal _totalSupply = 200000000;
     mapping (address => uint) internal _balanceOf;
     mapping (address => mapping (address => uint)) internal _allowances;
-    
+
     function Token(string symbol, string name, uint8 decimals, uint totalSupply) public {
         _symbol = symbol;
         _name = name;
         _decimals = decimals;
         _totalSupply = totalSupply;
     }
-    
+
     function name() public constant returns (string) {
         return _name;
     }
-    
+
     function symbol() public constant returns (string) {
         return _symbol;
     }
-    
+
     function decimals() public constant returns (uint8) {
         return _decimals;
     }
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _addr) public constant returns (uint);
     function transfer(address _to, uint _value) public returns (bool);
     event Transfer(address indexed _from, address indexed _to, uint _value);
@@ -57,17 +57,17 @@ contract Maya_Preferred is Token("MAYP", "Maya Preferred", 18, 200000000 * 10 **
     function Maya_Preferred() public {
         _balanceOf[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _addr) public constant returns (uint) {
         return _balanceOf[_addr];
     }
 
     function transfer(address _to, uint _value) public returns (bool) {
-        if (_value > 0 && 
+        if (_value > 0 &&
             _value <= _balanceOf[msg.sender] &&
             !isContract(_to)) {
             _balanceOf[msg.sender] -= _value;
@@ -79,7 +79,7 @@ contract Maya_Preferred is Token("MAYP", "Maya Preferred", 18, 200000000 * 10 **
     }
 
     function transfer(address _to, uint _value, bytes _data) public returns (bool) {
-        if (_value > 0 && 
+        if (_value > 0 &&
             _value <= _balanceOf[msg.sender] &&
             isContract(_to)) {
             _balanceOf[msg.sender] -= _value;
@@ -113,14 +113,25 @@ contract Maya_Preferred is Token("MAYP", "Maya Preferred", 18, 200000000 * 10 **
         }
         return false;
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool) {
         _allowances[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint) {
         return _allowances[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

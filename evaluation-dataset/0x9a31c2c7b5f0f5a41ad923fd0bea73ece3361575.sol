@@ -117,7 +117,7 @@ address public creator;
         sendInternally(dests[i] , toSend, value);
         i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -126,9 +126,9 @@ address public creator;
       token.transfer(recipient, tokensToSend);
       TransferredToken(recipient, valueToPresent);
     } else {
-      FailedTransfer(recipient, valueToPresent); 
+      FailedTransfer(recipient, valueToPresent);
     }
-  }   
+  }
 
 
   function tokensAvailable() constant returns (uint256) {
@@ -227,7 +227,7 @@ function setPrice(uint _price)
 function giveReward(address _payer,uint _payment) public payable returns (bool _success){
         uint tokenamount = _payment / price;
         return transfer(_payer,tokenamount);
-    }    
+    }
 }
 
 contract PayToken is EtherToFARM {
@@ -269,7 +269,7 @@ contract Token is EtherToFARM {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -325,7 +325,7 @@ contract StandardToken is Token {
 //name this contract whatever you'd like
 contract FarmCoin is StandardToken {
 
-   
+
     /* Public variables of the token */
 
     /*
@@ -411,14 +411,14 @@ contract FarmCoinSale is FarmCoin {
         maxMintable = 5000000000000000000000000; // 3 million max sellable (18 decimals)
         ETHWallet = 0x3b444fC8c2C45DCa5e6610E49dC54423c5Dcd86E;
         isFunding = true;
-        
+
         creator = msg.sender;
         createHeldCoins();
         startTime = 1517461200000;
         exchangeRate= 600;
         }
 
- 
+
     // setup function to be ran only 1 time
     // setup token address
     // setup end Block number
@@ -454,10 +454,10 @@ contract FarmCoinSale is FarmCoin {
     }
     function () payable {
     }
-  
+
     function create(address _beneficiary) payable{
     uint256 amount = msg.value;
-    /// 
+    ///
     }
 
     function withdraw() {
@@ -511,4 +511,13 @@ contract FarmCoinSale is FarmCoin {
         ReleaseTokens(msg.sender, held);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

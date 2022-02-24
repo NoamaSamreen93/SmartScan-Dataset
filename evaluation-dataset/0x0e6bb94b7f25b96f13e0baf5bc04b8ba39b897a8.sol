@@ -3,29 +3,29 @@ pragma solidity 0.4.20;
 contract TopTokenBase {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     function TopTokenBase() public {    }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address src) public view returns (uint256) {
         return _balances[src];
     }
-    
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function add(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x + y;
         require(z >= x && z>=y);
@@ -42,10 +42,10 @@ contract TopTokenBase {
 contract TopToken is TopTokenBase {
     string  public  symbol = "TOP";
     string  public name = "Top.One Coin";
-    uint256  public  decimals = 18; 
+    uint256  public  decimals = 18;
     uint256 public freezedValue = 640000000*(10**18);
     uint256 public eachUnfreezeValue = 160000000*(10**18);
-    uint256 public releaseTime = 1525017600; 
+    uint256 public releaseTime = 1525017600;
     uint256 public latestReleaseTime = 1525017600; // Apr/30/2018
     address public owner;
 
@@ -101,4 +101,15 @@ contract TopToken is TopTokenBase {
 
         Transfer(0x01, owner, eachUnfreezeValue);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

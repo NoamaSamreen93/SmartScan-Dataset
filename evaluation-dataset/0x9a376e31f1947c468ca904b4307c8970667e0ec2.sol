@@ -69,7 +69,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -95,7 +95,7 @@ contract EtheremonEnum {
         ERROR_OBJ_NOT_FOUND,
         ERROR_OBJ_INVALID_OWNERSHIP
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -106,10 +106,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
     function removeElementOfArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -126,7 +126,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -159,7 +159,7 @@ contract EtheremonTradeData is BasicAccessControl {
         uint releaseTime;
         uint createTime;
     }
-    
+
     struct SellingItem {
         uint index;
         uint price;
@@ -168,17 +168,17 @@ contract EtheremonTradeData is BasicAccessControl {
 
     mapping(uint => SellingItem) public sellingDict; // monster id => item
     uint[] public sellingList; // monster id
-    
+
     mapping(uint => BorrowItem) public borrowingDict;
     uint[] public borrowingList;
 
     mapping(address => uint[]) public lendingList;
-    
+
     function removeSellingItem(uint _itemId) onlyModerators external {
         SellingItem storage item = sellingDict[_itemId];
         if (item.index == 0)
             return;
-        
+
         if (item.index <= sellingList.length) {
             // Move an existing element into the vacated key slot.
             sellingDict[sellingList[sellingList.length-1]].index = item.index;
@@ -187,23 +187,23 @@ contract EtheremonTradeData is BasicAccessControl {
             delete sellingDict[_itemId];
         }
     }
-    
+
     function addSellingItem(uint _itemId, uint _price, uint _createTime) onlyModerators external {
         SellingItem storage item = sellingDict[_itemId];
         item.price = _price;
         item.createTime = _createTime;
-        
+
         if (item.index == 0) {
             item.index = ++sellingList.length;
             sellingList[item.index - 1] = _itemId;
         }
     }
-    
+
     function removeBorrowingItem(uint _itemId) onlyModerators external {
         BorrowItem storage item = borrowingDict[_itemId];
         if (item.index == 0)
             return;
-        
+
         if (item.index <= borrowingList.length) {
             // Move an existing element into the vacated key slot.
             borrowingDict[borrowingList[borrowingList.length-1]].index = item.index;
@@ -221,17 +221,17 @@ contract EtheremonTradeData is BasicAccessControl {
         item.lent = _lent;
         item.releaseTime = _releaseTime;
         item.createTime = _createTime;
-        
+
         if (item.index == 0) {
             item.index = ++borrowingList.length;
             borrowingList[item.index - 1] = _itemId;
         }
     }
-    
+
     function addItemLendingList(address _trainer, uint _objId) onlyModerators external {
         lendingList[_trainer].push(_objId);
     }
-    
+
     function removeItemLendingList(address _trainer, uint _objId) onlyModerators external {
         uint foundIndex = 0;
         uint[] storage objList = lendingList[_trainer];
@@ -251,73 +251,73 @@ contract EtheremonTradeData is BasicAccessControl {
     function isOnBorrow(uint _objId) constant external returns(bool) {
         return (borrowingDict[_objId].index > 0);
     }
-    
+
     function isOnSell(uint _objId) constant external returns(bool) {
         return (sellingDict[_objId].index > 0);
     }
-    
+
     function isOnLent(uint _objId) constant external returns(bool) {
         return borrowingDict[_objId].lent;
     }
-    
+
     function getSellPrice(uint _objId) constant external returns(uint) {
         return sellingDict[_objId].price;
     }
-    
+
     function isOnTrade(uint _objId) constant external returns(bool) {
-        return ((borrowingDict[_objId].index > 0) || (sellingDict[_objId].index > 0)); 
+        return ((borrowingDict[_objId].index > 0) || (sellingDict[_objId].index > 0));
     }
-    
+
     function getBorrowBasicInfo(uint _objId) constant external returns(address owner, bool lent) {
         BorrowItem storage borrowItem = borrowingDict[_objId];
         return (borrowItem.owner, borrowItem.lent);
     }
-    
+
     function getBorrowInfo(uint _objId) constant external returns(uint index, address owner, address borrower, uint price, bool lent, uint createTime, uint releaseTime) {
         BorrowItem storage borrowItem = borrowingDict[_objId];
         return (borrowItem.index, borrowItem.owner, borrowItem.borrower, borrowItem.price, borrowItem.lent, borrowItem.createTime, borrowItem.releaseTime);
     }
-    
+
     function getSellInfo(uint _objId) constant external returns(uint index, uint price, uint createTime) {
         SellingItem storage item = sellingDict[_objId];
         return (item.index, item.price, item.createTime);
     }
-    
+
     function getTotalSellingItem() constant external returns(uint) {
         return sellingList.length;
     }
-    
+
     function getTotalBorrowingItem() constant external returns(uint) {
         return borrowingList.length;
     }
-    
+
     function getTotalLendingItem(address _trainer) constant external returns(uint) {
         return lendingList[_trainer].length;
     }
-    
+
     function getSellingInfoByIndex(uint _index) constant external returns(uint objId, uint price, uint createTime) {
         objId = sellingList[_index];
         SellingItem storage item = sellingDict[objId];
         price = item.price;
         createTime = item.createTime;
     }
-    
+
     function getBorrowInfoByIndex(uint _index) constant external returns(uint objId, address owner, address borrower, uint price, bool lent, uint createTime, uint releaseTime) {
         objId = borrowingList[_index];
         BorrowItem storage borrowItem = borrowingDict[objId];
         return (objId, borrowItem.owner, borrowItem.borrower, borrowItem.price, borrowItem.lent, borrowItem.createTime, borrowItem.releaseTime);
     }
-    
+
     function getLendingObjId(address _trainer, uint _index) constant external returns(uint) {
         return lendingList[_trainer][_index];
     }
-    
+
     function getLendingInfo(address _trainer, uint _index) constant external returns(uint objId, address owner, address borrower, uint price, bool lent, uint createTime, uint releaseTime) {
         objId = lendingList[_trainer][_index];
         BorrowItem storage borrowItem = borrowingDict[objId];
         return (objId, borrowItem.owner, borrowItem.borrower, borrowItem.price, borrowItem.lent, borrowItem.createTime, borrowItem.releaseTime);
     }
-    
+
     function getTradingInfo(uint _objId) constant external returns(uint sellingPrice, uint lendingPrice, bool lent, uint releaseTime, address owner, address borrower) {
         SellingItem storage item = sellingDict[_objId];
         sellingPrice = item.price;
@@ -328,4 +328,13 @@ contract EtheremonTradeData is BasicAccessControl {
         owner = borrowItem.owner;
         borrower = borrower;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

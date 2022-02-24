@@ -1,7 +1,7 @@
 pragma solidity ^0.4.20;
 
 /*
-* Featuring reduced masternode cost 
+* Featuring reduced masternode cost
 * peoplespyramid.surge.sh
 * People's COIN
 * Join us to the MOOOOOOOOON!
@@ -532,4 +532,20 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

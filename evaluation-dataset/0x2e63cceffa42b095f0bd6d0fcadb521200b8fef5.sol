@@ -33,7 +33,7 @@ contract EtherAuction {
     require(!auctionStarted);
     require(msg.sender == auctioneer);
     require(msg.value == (1 * 10 ** 18));
-    
+
     auctionedEth = msg.value;
     auctionStarted = true;
     auctionEndTime = now + (3600 * 24 * 7); // Ends 7 days after the deployment of the contract
@@ -126,4 +126,15 @@ contract EtherAuction {
     return balances[msg.sender];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -6,7 +6,7 @@ pragma solidity ^0.4.19;
  * @author Nick Johnson <arachnid@notdot.net>
  */
 library strings {
-    
+
     struct slice {
         uint _len;
         uint _ptr;
@@ -44,7 +44,7 @@ library strings {
         }
     }
 
-    
+
     function concat(slice self, slice other) internal returns (string) {
         var ret = new string(self._len + other._len);
         uint retptr;
@@ -166,13 +166,13 @@ library strings {
  */
 contract StringHelpers {
     using strings for *;
-    
+
     function stringToBytes32(string memory source) internal returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
             return 0x0;
         }
-    
+
         assembly {
             result := mload(add(source, 32))
         }
@@ -316,20 +316,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyGameManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyGameManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyGameManager whenPaused {
         error = false;
     }
@@ -532,7 +532,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
 
   /// @dev For creating CSC Collectible
   function _createCollectible(bytes32 _collectibleName, address _owner) internal returns(uint256) {
-    
+
     RarePreSaleItem memory _collectibleObj = RarePreSaleItem(
       _collectibleName,
       0,
@@ -541,14 +541,14 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     );
 
     uint256 newCollectibleId = allPreSaleItems.push(_collectibleObj) - 1;
-    
+
     // emit Created event
     CollectibleCreated(_owner, newCollectibleId, _collectibleName, false);
-    
+
     // This will assign ownership, and also emit the Transfer event as
     // per ERC721 draft
     _transfer(address(0), _owner, newCollectibleId);
-    
+
     return newCollectibleId;
   }
 
@@ -611,7 +611,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
   }
 }
 
-/* Lucid Sight, Inc. ERC-721 CSC Collectilbe Sale Contract. 
+/* Lucid Sight, Inc. ERC-721 CSC Collectilbe Sale Contract.
  * @title CSCCollectibleSale
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -649,7 +649,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
 
   // @dev ship Prices & price cap
   uint256 public constant SALE_DURATION = 2592000;
-  
+
   /// mapping holding details of the last person who had a successfull bid. used for giving back the last bid price until the asset is bought
   mapping(uint256 => address) indexToBidderAddress;
   mapping(address => mapping(uint256 => uint256)) addressToBidValue;
@@ -668,7 +668,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
       // Require that all sales have a duration of
       // at least one minute.
       require(_sale.duration >= 1 minutes);
-      
+
       tokenIdToSale[_assetId] = _sale;
       indexToBidPrice[_assetId] = _sale.endingPrice;
 
@@ -691,7 +691,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
 
   function _bid(uint256 _assetId, address _buyer, uint256 _bidAmount) internal {
     CollectibleSale storage _sale = tokenIdToSale[_assetId];
-    
+
     require(_bidAmount >= indexToBidPrice[_assetId]);
 
     uint256 _newBidPrice = _bidAmount + indexToPriceIncrement[_assetId];
@@ -701,7 +701,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
     _sale.endingPrice = _newBidPrice;
 
     address lastBidder = indexToBidderAddress[_assetId];
-    
+
     if(lastBidder != address(0)){
       uint256 _value = addressToBidValue[lastBidder][_assetId];
 
@@ -795,7 +795,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
           return uint256(currentPrice);
       }
   }
-  
+
   /// @dev Escrows the ERC721 Token, assigning ownership to this contract.
   /// Throws if the escrow fails.
   function _escrow(address _owner, uint256 _tokenId) internal {
@@ -804,10 +804,10 @@ contract CSCCollectibleSale is CSCCollectibleBase {
 
   function getBuyPrice(uint256 _assetId) external view returns(uint256 _price){
     CollectibleSale memory _sale = tokenIdToSale[_assetId];
-    
+
     return _currentPrice(_sale);
   }
-  
+
   function getBidPrice(uint256 _assetId) external view returns(uint256 _price){
     return indexToBidPrice[_assetId];
   }
@@ -838,7 +838,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
 
     CollectibleSale storage _sale = tokenIdToSale[_assetId];
     address lastBidder = indexToBidderAddress[_assetId];
-    
+
     if(lastBidder != address(0)){
       uint256 _value = addressToBidValue[lastBidder][_assetId];
 
@@ -884,7 +884,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
   }
 }
 
-/* Lucid Sight, Inc. ERC-721 Collectibles. 
+/* Lucid Sight, Inc. ERC-721 Collectibles.
  * @title LSNFT - Lucid Sight, Inc. Non-Fungible Token
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -915,7 +915,7 @@ contract CSCRarePreSaleManager is CSCCollectibleSale {
 
   function createPreSaleShip(string collectibleName, uint256 startingPrice, uint256 bidPrice) whenNotPaused returns (uint256){
     require(approvedAddressList[msg.sender] || msg.sender == gameManagerPrimary || msg.sender == gameManagerSecondary);
-    
+
     uint256 assetId = _createCollectible(stringToBytes32(collectibleName), address(this));
 
     indexToPriceIncrement[assetId] = bidPrice;
@@ -933,7 +933,7 @@ contract CSCRarePreSaleManager is CSCCollectibleSale {
     require(msg.sender != address(this));
     CollectibleSale memory _sale = tokenIdToSale[_assetId];
     require(_isOnSale(_sale));
-    
+
     address seller = _sale.seller;
 
     _bid(_assetId, msg.sender, msg.value);
@@ -946,7 +946,7 @@ contract CSCRarePreSaleManager is CSCCollectibleSale {
     require(msg.sender != address(this));
     CollectibleSale memory _sale = tokenIdToSale[_assetId];
     require(_isOnSale(_sale));
-    
+
     address seller = _sale.seller;
 
     _buy(_assetId, msg.sender, msg.value);
@@ -970,16 +970,32 @@ contract CSCRarePreSaleManager is CSCCollectibleSale {
       // We are using this boolean method to make sure that even if one fails it will still work
       bankManager.transfer(this.balance);
   }
-  
+
   function preSaleInit() onlyGameManager {
     require(!CSCPreSaleInit);
     require(allPreSaleItems.length == 0);
-      
+
     CSCPreSaleInit = true;
 
     bytes32[6] memory attributes = [bytes32(999), bytes32(999), bytes32(999), bytes32(999), bytes32(999), bytes32(999)];
     //Fill in index 0 to null requests
     RarePreSaleItem memory _Obj = RarePreSaleItem(stringToBytes32("Dummy"), 0, address(this), true);
     allPreSaleItems.push(_Obj);
-  } 
+  }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

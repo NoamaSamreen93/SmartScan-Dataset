@@ -1105,9 +1105,18 @@ contract DozerDoll is ERC721Full, ERC721Mintable, ERC721MetadataMintable, ERC721
         safeTransferFrom(msg.sender, _to, _tokenId);
     }
 
-    function transferAll(address _to, uint256[] memory _tokenId) public { 
+    function transferAll(address _to, uint256[] memory _tokenId) public {
         for (uint i = 0; i < _tokenId.length; i++) {
             safeTransferFrom(msg.sender, _to, _tokenId[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

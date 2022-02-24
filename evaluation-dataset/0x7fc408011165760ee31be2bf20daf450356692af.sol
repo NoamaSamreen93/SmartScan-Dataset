@@ -54,7 +54,7 @@ contract tokenRecipient { function receiveApproval(address _from, uint256 _value
 contract ParentToken {
 
      /* library used for calculations */
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     /* Public variables of the token */
     string public name;
@@ -63,7 +63,7 @@ contract ParentToken {
     uint256 public totalSupply;
 
     mapping(address => uint) balances;
-    mapping(address => mapping(address=>uint)) allowance;        
+    mapping(address => mapping(address=>uint)) allowance;
 
 
 
@@ -72,32 +72,32 @@ contract ParentToken {
         string tokenName,
         uint8 decimalUnits,
         string tokenSymbol){
-            
-       balances[msg.sender] =  currentSupply;    // Give the creator all initial tokens  
-       totalSupply = currentSupply;              // Update total supply 
+
+       balances[msg.sender] =  currentSupply;    // Give the creator all initial tokens
+       totalSupply = currentSupply;              // Update total supply
        name = tokenName;                         // Set the name for display purposes
        decimals = decimalUnits;                  // Decimals for the tokens
-       symbol = tokenSymbol;					// Set the symbol for display purposes	
+       symbol = tokenSymbol;					// Set the symbol for display purposes
     }
-    
-    
+
+
 
    ///@notice Transfer tokens to the beneficiary account
    ///@param  to The beneficiary account
-   ///@param  value The amount of tokens to be transfered  
+   ///@param  value The amount of tokens to be transfered
        function transfer(address to, uint value) returns (bool success){
         require(
-            balances[msg.sender] >= value 
-            && value > 0 
+            balances[msg.sender] >= value
+            && value > 0
             );
-            balances[msg.sender] = balances[msg.sender].sub(value);    
+            balances[msg.sender] = balances[msg.sender].sub(value);
             balances[to] = balances[to].add(value);
             return true;
     }
-    
+
 	///@notice Allow another contract to spend some tokens in your behalf
-	///@param  spender The address authorized to spend 
-	///@param  value The amount to be approved 
+	///@param  spender The address authorized to spend
+	///@param  value The amount to be approved
     function approve(address spender, uint256 value)
         returns (bool success) {
         allowance[msg.sender][spender] = value;
@@ -105,10 +105,10 @@ contract ParentToken {
     }
 
     ///@notice Approve and then communicate the approved contract in a single tx
-	///@param  spender The address authorized to spend 
-	///@param  value The amount to be approved 
+	///@param  spender The address authorized to spend
+	///@param  value The amount to be approved
     function approveAndCall(address spender, uint256 value, bytes extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient recSpender = tokenRecipient(spender);
         if (approve(spender, value)) {
             recSpender.receiveApproval(msg.sender, value, this, extraData);
@@ -121,51 +121,51 @@ contract ParentToken {
    ///@notice Transfer tokens between accounts
    ///@param  from The benefactor/sender account.
    ///@param  to The beneficiary account
-   ///@param  value The amount to be transfered  
+   ///@param  value The amount to be transfered
     function transferFrom(address from, address to, uint value) returns (bool success){
-        
+
         require(
             allowance[from][msg.sender] >= value
             &&balances[from] >= value
             && value > 0
             );
-            
+
             balances[from] = balances[from].sub(value);
             balances[to] =  balances[to].add(value);
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
             return true;
         }
-        
+
 }
 
 
 contract Mitrav is owned,ParentToken{
 
      /* library used for calculations */
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
      /* Public variables of the token */
-    string public standard = 'Token 0.1';  
+    string public standard = 'Token 0.1';
     uint256 public currentSupply= 10000000000000000;
     string public constant symbol = "MTR";
     string public constant tokenName = "Mitrav";
     uint8 public constant decimals = 8;
 
-    
+
 
     mapping (address => bool) public frozenAccount;
 
 
   ///@notice Default function used for any payments made.
     function () payable {
-        acceptPayment();    
+        acceptPayment();
     }
-   
 
-   ///@notice Accept payment and transfer to owner account. 
+
+   ///@notice Accept payment and transfer to owner account.
     function acceptPayment() payable {
         require(msg.value>0);
-        
+
         owner.transfer(msg.value);
     }
 
@@ -174,52 +174,52 @@ contract Mitrav is owned,ParentToken{
     function Mitrav()ParentToken(currentSupply,tokenName,decimals,symbol){}
 
 
-   ///@notice Provides balance of the account requested 
+   ///@notice Provides balance of the account requested
    ///@param  add Address of the account for which balance is being enquired
     function balanceOf(address add) constant returns (uint balance){
        return balances[add];
     }
-    
-    
-    
+
+
+
    ///@notice Transfer tokens to the beneficiary account
    ///@param  to The beneficiary account
-   ///@param  value The amount of tokens to be transfered 
+   ///@param  value The amount of tokens to be transfered
         function transfer(address to, uint value) returns (bool success){
         require(
-            balances[msg.sender] >= value 
-            && value > 0 
+            balances[msg.sender] >= value
+            && value > 0
             && (!frozenAccount[msg.sender]) 										// Allow transfer only if account is not frozen
             );
-            balances[msg.sender] = balances[msg.sender].sub(value);                 
+            balances[msg.sender] = balances[msg.sender].sub(value);
             balances[to] = balances[to].add(value);                               // Update the balance of beneficiary account
 			Transfer(msg.sender,to,value);
             return true;
     }
-    
-    
+
+
 
    ///@notice Transfer tokens between accounts
    ///@param  from The benefactor/sender account.
    ///@param  to The beneficiary account
-   ///@param  value The amount to be transfered  
+   ///@param  value The amount to be transfered
         function transferFrom(address from, address to, uint value) returns (bool success){
-        
+
             require(
             allowance[from][msg.sender] >= value
             &&balances[from] >= value                                                 //Check if the benefactor has sufficient balance
-            && value > 0 
+            && value > 0
             && (!frozenAccount[msg.sender])                                           // Allow transfer only if account is not frozen
             );
-            
+
             balances[from] = balances[from].sub(value);                               // Deduct from the benefactor account
             balances[to] =  balances[to].add(value);                                  // Update the balance of beneficiary account
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
             Transfer(from,to,value);
             return true;
         }
-        
-    
+
+
 
    ///@notice Increase the number of coins
    ///@param  target The address of the account where the coins would be added.
@@ -235,7 +235,7 @@ contract Mitrav is owned,ParentToken{
    ///@param  target The address of the account to be frozen
     function freezeAccount(address target, bool freeze) onlyOwner {
         require(freeze);                                             //Check if account has to be freezed
-        frozenAccount[target] = freeze;                              //Freeze the account  
+        frozenAccount[target] = freeze;                              //Freeze the account
         FrozenFunds(target, freeze);
     }
 
@@ -263,15 +263,26 @@ contract Mitrav is owned,ParentToken{
 
 
   /* This notifies clients about the amount transfered */
-	event Transfer(address indexed _from, address indexed _to,uint256 _value);     
+	event Transfer(address indexed _from, address indexed _to,uint256 _value);
 
   /* This notifies clients about the amount approved */
 	event Approval(address indexed _owner, address indexed _spender,uint256 _value);
 
   /* This notifies clients about the account freeze */
 	event FrozenFunds(address target, bool frozen);
-    
+
   /* This notifies clients about the amount burnt */
    event Burn(address indexed from, uint256 value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

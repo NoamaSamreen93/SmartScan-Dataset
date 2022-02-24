@@ -6,10 +6,10 @@ pragma solidity ^0.4.8;
 // Name        : The Bazeries Cylinder
 // Decimals    : 18
 //
-// Never forget: 
+// Never forget:
 // The Times 03/Jan/2009 Chancellor on brink of second bailout for banks
 // BTC must always thrive
-// 
+//
 // ----------------------------------------------------------------------------
 /**
  * Math operations with safety checks
@@ -403,4 +403,15 @@ contract Bazeries is PausableToken, MintableToken {
     return timelock;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

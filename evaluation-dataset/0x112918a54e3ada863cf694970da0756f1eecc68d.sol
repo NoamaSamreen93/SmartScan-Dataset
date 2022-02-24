@@ -97,9 +97,9 @@ contract MultiSigWallet {
     /// @param _owners List of initial owners.
     /// @param _required Number of required confirmations.
     constructor(
-        address[] _owners, 
+        address[] _owners,
         uint _required
-    ) public validRequirement(_owners.length, _required) 
+    ) public validRequirement(_owners.length, _required)
     {
         for (uint i = 0; i<_owners.length; i++) {
             require(!isOwner[_owners[i]] && _owners[i] != 0);
@@ -287,13 +287,13 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Total number of transactions after filters are applied.
     function getTransactionCount(
-        bool pending, 
+        bool pending,
         bool executed
     ) public view returns (uint count) {
         for (uint i = 0; i < transactionCount; i++) {
-            if (pending && 
-                !transactions[i].executed || 
-                executed && 
+            if (pending &&
+                !transactions[i].executed ||
+                executed &&
                 transactions[i].executed
             ) {
                 count += 1;
@@ -333,18 +333,18 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Returns array of transaction IDs.
     function getTransactionIds(
-        uint from, 
-        uint to, 
-        bool pending, 
+        uint from,
+        uint to,
+        bool pending,
         bool executed
     ) public view returns (uint[] _transactionIds) {
         uint[] memory transactionIdsTemp = new uint[](transactionCount);
         uint count = 0;
         uint i;
         for (i = 0; i < transactionCount; i++)
-            if (pending && 
-                !transactions[i].executed || 
-                executed && 
+            if (pending &&
+                !transactions[i].executed ||
+                executed &&
                 transactions[i].executed
             ) {
                 transactionIdsTemp[count] = i;
@@ -358,9 +358,20 @@ contract MultiSigWallet {
 
 contract JavvyMultiSig is MultiSigWallet {
     constructor(
-        address[] _owners, 
+        address[] _owners,
         uint _required
     )
     MultiSigWallet(_owners, _required)
     public {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

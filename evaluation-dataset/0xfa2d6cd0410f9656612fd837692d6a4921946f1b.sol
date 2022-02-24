@@ -420,3 +420,12 @@ contract DAOToken is ERC20, ERC20Burnable, Ownable {
 contract DxToken is DAOToken {
     constructor(string memory _name, string memory _symbol, uint _cap) public DAOToken(_name, _symbol, _cap) {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

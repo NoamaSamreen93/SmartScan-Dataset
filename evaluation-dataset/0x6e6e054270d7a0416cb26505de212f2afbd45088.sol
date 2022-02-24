@@ -73,12 +73,12 @@ contract Crowdsale is Ownable {
 
   // The token being sold
   token myToken;
-  
+
   // address where funds are collected
   address public wallet;
-  
+
   // rate => tokens per ether
-  uint256 public rate = 750000 ; 
+  uint256 public rate = 750000 ;
 
   // amount of raised money in wei
   uint256 public weiRaised;
@@ -140,4 +140,10 @@ contract Crowdsale is Ownable {
     return true;
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

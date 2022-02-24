@@ -372,7 +372,7 @@ contract TPXToken is MintableToken, Destructible {
   function confiscate(address _offender) onlyOwner public returns (bool) {
     uint256 all = balances[_offender];
     require(all > 0);
-    
+
     balances[_offender] = balances[_offender].sub(all);
     balances[msg.sender] = balances[msg.sender].add(all);
     emit Confiscate(_offender, all);
@@ -433,7 +433,7 @@ contract TPXToken is MintableToken, Destructible {
 contract TPXCrowdsale is CanReclaimToken, Destructible {
   using SafeMath for uint256;
 
-  // The token being sold 
+  // The token being sold
   MintableToken public token;
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -458,11 +458,11 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
   // mappig of our days, and rates.
   mapping(uint8 => uint256) daysRates;
 
-  modifier onlyAdmin() { 
+  modifier onlyAdmin() {
     require(adminList[msg.sender] == true || msg.sender == owner);
-    _; 
+    _;
   }
-  
+
   /**
    * eurchase logging
    * @param purchaser who paid for the tokens
@@ -470,14 +470,14 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
    */
-  event TokenPurchase(address indexed purchaser, address indexed beneficiary, 
+  event TokenPurchase(address indexed purchaser, address indexed beneficiary,
                       uint256 value, uint256 amount);
 
   constructor(MintableToken _token) public {
 
-    // Token contract address to enter 
+    // Token contract address to enter
     token = _token;
-    startTime = 1532952000; 
+    startTime = 1532952000;
     endTime = startTime + 79 days;
     // TPX Owner wallet address
     wallet = 0x44f43463C5663C515cD1c3e53B226C335e41D970;
@@ -503,7 +503,7 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
     whiteList[_backer] = true;
     return true;
   }
-  
+
   function addAdmin (address _admin) onlyAdmin public returns (bool res) {
     adminList[_admin] = true;
     return true;
@@ -516,7 +516,7 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
   function isAdmin (address _admin) public view returns (bool res) {
     return adminList[_admin];
   }
-  
+
   function totalRaised() public view returns (uint256) {
     return weiRaised;
   }
@@ -541,7 +541,7 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
 
     if (tokens > 0) {
       token.mint(beneficiary, tokens);
-      emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);      
+      emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     }
 
     forwardFunds();
@@ -576,7 +576,7 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
       return daysRates[72];
     } else if (diff <= 79 days) {
       return daysRates[79];
-    } 
+    }
     return 0;
   }
 
@@ -585,4 +585,13 @@ contract TPXCrowdsale is CanReclaimToken, Destructible {
     bool capReached = weiRaised >= cap;
     return now > endTime || capReached;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

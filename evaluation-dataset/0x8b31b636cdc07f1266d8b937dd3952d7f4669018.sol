@@ -65,7 +65,7 @@ contract MytilcoinStorage is Manageable {
         string email;
         string login;
     }
-    
+
     mapping(bytes32 => Picture) public pictures;
     mapping(bytes32 => mapping(uint32 => mapping(uint32 => Segment))) public segments;
 
@@ -83,7 +83,7 @@ contract MytilcoinStorage is Manageable {
 
         require(!(pictures[key].rows > 0));
         require(_rows > 0 && _cols > 0 && _width > 0 && _height > 0);
-        
+
         pictures[key] = Picture({
             hash: _hash,
             rows: _rows,
@@ -106,7 +106,7 @@ contract MytilcoinStorage is Manageable {
         require(pictures[key].rows > 0);
         require(_row > 0 && _col > 0 && _row <= pictures[key].rows && _col <= pictures[key].cols);
         require(!(segments[key][_row][_col].row > 0));
-        
+
         segments[key][_row][_col] = Segment({
             row: _row,
             col: _col,
@@ -128,7 +128,7 @@ contract MytilcoinStorage is Manageable {
         require(pictures[key].rows > 0);
         require(_row > 0 && _col > 0 && _row <= pictures[key].rows && _col <= pictures[key].cols);
         require(segments[key][_row][_col].row > 0);
-        
+
         segments[key][_row][_col].email = _email;
         segments[key][_row][_col].login = _login;
 
@@ -147,4 +147,15 @@ contract MytilcoinStorage is Manageable {
             result := mload(add(source, 32))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

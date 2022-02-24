@@ -75,11 +75,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -126,12 +126,23 @@ contract Zigger is ZGR, Ownable {
   string public constant symbol = "ZGR";
   uint public constant decimals = 8;
   uint256 public initialSupply;
-    
-  function Zigger () { 
+
+  function Zigger () {
      totalSupply = 30000000 * 10 ** decimals;
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

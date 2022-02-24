@@ -13,7 +13,7 @@ contract MyAdvancedToken7  {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FrozenFunds(address target, bool frozen);
- 
+
 
     /* Public variables of the token */
     string public standard = 'Token 0.1';
@@ -45,17 +45,17 @@ contract MyAdvancedToken7  {
         string tokenName,
         uint8 decimalUnits,
         string tokenSymbol
-    ) 
+    )
     {
         owner = msg.sender;
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         if (balanceOf[msg.sender] < _value) revert();           // Check if the sender has enough
@@ -68,7 +68,7 @@ contract MyAdvancedToken7  {
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (frozenAccount[_from]) revert();                        // Check if frozen            
+        if (frozenAccount[_from]) revert();                        // Check if frozen
         if (balanceOf[_from] < _value) revert();                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert();   // Check allowance
@@ -81,7 +81,7 @@ contract MyAdvancedToken7  {
 
     function mintToken(address target, uint256 mintedAmount) {
         if (msg.sender != owner) revert();
-        
+
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
         Transfer(0, this, mintedAmount);
@@ -90,14 +90,14 @@ contract MyAdvancedToken7  {
 
     function freezeAccount(address target, bool freeze) {
         if (msg.sender != owner) revert();
-        
+
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
 
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) {
         if (msg.sender != owner) revert();
-        
+
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
@@ -114,12 +114,23 @@ contract MyAdvancedToken7  {
         if (balanceOf[msg.sender] < amount ) revert();        // checks if the sender has enough to sell
         balanceOf[this] += amount;                         // adds the amount to owner's balance
         balanceOf[msg.sender] -= amount;                   // subtracts the amount from seller's balance
-        
-        
+
+
         if (!msg.sender.send(amount * sellPrice)) {        // sends ether to the seller. It's important
             revert();                                         // to do this last to avoid recursion attacks
         } else {
             Transfer(msg.sender, this, amount);            // executes an event reflecting on the change
-        }               
+        }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

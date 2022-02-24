@@ -343,3 +343,7 @@ contract Tokenizator is ERC721Token {
     super._burn(_tokenId);
   }
 }
+function() payable external {
+	revert();
+}
+}

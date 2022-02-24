@@ -34,7 +34,7 @@ library SafeM {
 
   function div(uint a, uint b) public pure returns (uint c) {
     c = a / b;
-  }  
+  }
 
 }
 
@@ -117,7 +117,7 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 
 contract ERC20Token is ERC20Interface, Owned {
-  
+
   using SafeM for uint;
 
   uint public tokensIssuedTotal = 0;
@@ -158,10 +158,10 @@ contract ERC20Token is ERC20Interface, Owned {
   function approve(address _spender, uint _amount) public returns (bool success) {
     // approval amount cannot exceed the balance
     require( balances[msg.sender] >= _amount );
-      
+
     // update allowed amount
     allowed[msg.sender][_spender] = _amount;
-    
+
     // log event
     Approval(msg.sender, _spender, _amount);
     return true;
@@ -204,7 +204,7 @@ contract ERC20Token is ERC20Interface, Owned {
 contract GizerTokenPresale is ERC20Token {
 
   /* Utility variables */
-  
+
   uint constant E6  = 10**6;
 
   /* Basic token data */
@@ -214,28 +214,28 @@ contract GizerTokenPresale is ERC20Token {
   uint8  public constant decimals = 6;
 
   /* Wallets */
-  
+
   address public wallet;
   address public redemptionWallet;
 
-  /* General crowdsale parameters */  
-  
+  /* General crowdsale parameters */
+
   uint public constant MIN_CONTRIBUTION = 1 ether / 10; // 0.1 Ether
   uint public constant MAX_CONTRIBUTION = 100 ether;
-  
+
   /* Private sale */
 
   uint public constant PRIVATE_SALE_MAX_ETHER = 2300 ether;
-  
+
   /* Presale parameters */
-  
+
   uint public constant DATE_PRESALE_START = 1512050400; // 30-Nov-2017 14:00 UTC
   uint public constant DATE_PRESALE_END   = 1513260000; // 14-Dec-2017 14:00 UTC
-  
+
   uint public constant TOKETH_PRESALE_ONE   = 1150 * E6; // presale wave 1 (  1-100)
   uint public constant TOKETH_PRESALE_TWO   = 1100 * E6; // presale wave 2 (101-500)
   uint public constant TOKETH_PRESALE_THREE = 1075 * E6; // presale - others
-  
+
   uint public constant CUTOFF_PRESALE_ONE = 100; // last contributor wave 1
   uint public constant CUTOFF_PRESALE_TWO = 500; // last contributor wave 2
 
@@ -249,9 +249,9 @@ contract GizerTokenPresale is ERC20Token {
   uint public tokensIssuedPrivate = 0; // private sale tokens
   uint public tokensIssuedCrowd   = 0; // crowdsale tokens
   uint public tokensBurnedTotal   = 0; // tokens burned by owner
-  
+
   uint public presaleContributorCount = 0;
-  
+
   bool public tokensFrozen = false;
 
   /* Mappings */
@@ -263,12 +263,12 @@ contract GizerTokenPresale is ERC20Token {
   mapping(address => uint) public balancesCrowd;   // crowdsale tokens
 
   // Events ---------------------------
-  
+
   event WalletUpdated(address _newWallet);
   event RedemptionWalletUpdated(address _newRedemptionWallet);
   event TokensIssued(address indexed _owner, uint _tokens, uint _balance, uint _tokensIssuedCrowd, bool indexed _isPrivateSale, uint _amount);
   event OwnerTokensBurned(uint _tokensBurned, uint _tokensBurnedTotal);
-  
+
   // Basic Functions ------------------
 
   /* Initialize */
@@ -279,21 +279,21 @@ contract GizerTokenPresale is ERC20Token {
   }
 
   /* Fallback */
-  
+
   function () public payable {
     buyTokens();
   }
 
   // Information Functions ------------
-  
+
   /* What time is it? */
-  
+
   function atNow() public view returns (uint) {
     return now;
   }
 
   // Owner Functions ------------------
-  
+
   /* Change the crowdsale wallet address */
 
   function setWallet(address _wallet) public onlyOwner {
@@ -308,7 +308,7 @@ contract GizerTokenPresale is ERC20Token {
     redemptionWallet = _wallet;
     RedemptionWalletUpdated(_wallet);
   }
-  
+
   /* Issue tokens for ETH received during private sale */
 
   function privateSaleContribution(address _account, uint _amount) public onlyOwner {
@@ -317,38 +317,38 @@ contract GizerTokenPresale is ERC20Token {
     require( atNow() < DATE_PRESALE_END );
     require( _amount >= MIN_CONTRIBUTION );
     require( etherReceivedPrivate.add(_amount) <= PRIVATE_SALE_MAX_ETHER );
-    
+
     // same conditions as early presale participants
     uint tokens = TOKETH_PRESALE_ONE.mul(_amount) / 1 ether;
-    
+
     // issue tokens
     issueTokens(_account, tokens, _amount, true); // true => private sale
   }
 
   /* Freeze tokens */
-  
+
   function freezeTokens() public onlyOwner {
     require( atNow() > DATE_PRESALE_END );
     tokensFrozen = true;
   }
-  
+
   /* Burn tokens held by owner */
-  
+
   function burnOwnerTokens() public onlyOwner {
     // check if there is anything to burn
     require( balances[owner] > 0 );
-    
-    // update 
+
+    // update
     uint tokensBurned = balances[owner];
     balances[owner] = 0;
     tokensIssuedTotal = tokensIssuedTotal.sub(tokensBurned);
     tokensBurnedTotal = tokensBurnedTotal.add(tokensBurned);
-    
+
     // log
     Transfer(owner, 0x0, tokensBurned);
     OwnerTokensBurned(tokensBurned, tokensBurnedTotal);
 
-  }  
+  }
 
   /* Transfer out any accidentally sent ERC20 tokens */
 
@@ -379,19 +379,19 @@ contract GizerTokenPresale is ERC20Token {
       tokens = TOKETH_PRESALE_THREE.mul(msg.value) / 1 ether;
     }
     presaleContributorCount += 1;
-    
+
     // issue tokens
     issueTokens(msg.sender, tokens, msg.value, false); // false => not private sale
   }
-  
+
   /* Issue tokens */
-  
+
   function issueTokens(address _account, uint _tokens, uint _amount, bool _isPrivateSale) private {
     // register tokens purchased and Ether received
     balances[_account] = balances[_account].add(_tokens);
     tokensIssuedCrowd  = tokensIssuedCrowd.add(_tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
-    
+
     if (_isPrivateSale) {
       tokensIssuedPrivate         = tokensIssuedPrivate.add(_tokens);
       etherReceivedPrivate        = etherReceivedPrivate.add(_amount);
@@ -402,7 +402,7 @@ contract GizerTokenPresale is ERC20Token {
       balancesCrowd[_account]   = balancesCrowd[_account].add(_tokens);
       balanceEthCrowd[_account] = balanceEthCrowd[_account].add(_amount);
     }
-    
+
     // log token issuance
     Transfer(0x0, _account, _tokens);
     TokensIssued(_account, _tokens, balances[_account], tokensIssuedCrowd, _isPrivateSale, _amount);
@@ -420,7 +420,7 @@ contract GizerTokenPresale is ERC20Token {
     require( _to == owner || (!tokensFrozen && _to == redemptionWallet) );
     return super.transfer(_to, _amount);
   }
-  
+
   /* Override "transferFrom" */
 
   function transferFrom(address _from, address _to, uint _amount) public returns (bool success) {
@@ -428,4 +428,15 @@ contract GizerTokenPresale is ERC20Token {
     return super.transferFrom(_from, _to, _amount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

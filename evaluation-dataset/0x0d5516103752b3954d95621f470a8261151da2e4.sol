@@ -55,7 +55,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused {
         paused = false;
         Unpause();
@@ -142,7 +142,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -247,7 +247,7 @@ contract Crowdsale is Pausable {
     function() payable {
         purchase();
     }
-    
+
     function purchase() whenNotPaused payable {
         require(!crowdsaleFinished);
         require((now >= piStartTime && now < piEndTime && tokensSold < piTokensForSale) || (now >= startTime && now < endTime));
@@ -276,8 +276,8 @@ contract Crowdsale is Pausable {
                 // Amount bonus
                 if(amount >= 3000 * 1 ether) {
                     bonus.add(
-                        amount > 15000 * 1 ether ? 10 : 
-                            (amount > 10000 * 1 ether ? 7 : 
+                        amount > 15000 * 1 ether ? 10 :
+                            (amount > 10000 * 1 ether ? 7 :
                                 (amount > 5000 * 1 ether ? 5 : 3
                     )));
                 }
@@ -299,7 +299,7 @@ contract Crowdsale is Pausable {
         else {
             uint price = priceTokenWei.mul(100).div(150);
             amount = sum.div(price).mul(1 ether);
-            
+
             if(tokensSold.add(amount) > piTokensForSale) {
                 retAmount = tokensSold.add(amount).sub(piTokensForSale);
                 retSum = retAmount.mul(price).div(1 ether);
@@ -337,7 +337,7 @@ contract Crowdsale is Pausable {
 
     function withdraw() onlyOwner {
         require(!crowdsaleFinished);
-        
+
         token.finishMinting();
         token.transferOwnership(beneficiary);
 
@@ -345,4 +345,15 @@ contract Crowdsale is Pausable {
 
         Withdraw();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

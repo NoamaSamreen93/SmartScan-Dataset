@@ -2,20 +2,20 @@ pragma solidity 0.4.24;
 
 
 contract OraclizeI {
-    
+
     address public cbAddress;
     function setProofType(byte _proofType) external;
-    
+
     function setCustomGasPrice(uint _gasPrice) external;
-    
+
     function getPrice(string _datasource, uint gaslimit) public returns (uint _dsprice);
     function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit) external payable returns (bytes32 _id);
-    
+
     function query(uint _timestamp, string _datasource, string _arg)
         external
         payable
         returns (bytes32 _id);
-        
+
     function getPrice(string _datasource) public returns (uint _dsprice);
 }
 
@@ -26,7 +26,7 @@ contract OraclizeAddrResolverI {
 
 
 contract UsingOraclize {
-    
+
     byte constant internal proofType_Ledger = 0x30;
     byte constant internal proofType_Android = 0x40;
     byte constant internal proofStorage_IPFS = 0x01;
@@ -85,7 +85,7 @@ contract UsingOraclize {
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource);
     }
-    
+
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
@@ -95,7 +95,7 @@ contract UsingOraclize {
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
         return oraclize.query.value(price)(0, datasource, arg);
     }
-    
+
     function oraclize_query(uint timestamp, string datasource, string arg, uint gaslimit) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource, gaslimit);
         if (price > 1 ether + tx.gasprice*gaslimit) return 0; // unexpectedly high price
@@ -119,7 +119,7 @@ contract UsingOraclize {
     function oraclize_setProof(byte proofP) internal oraclizeAPI {
         return oraclize.setProofType(proofP);
     }
-    
+
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
     }
@@ -215,7 +215,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
     address public owner;
     address public pendingOwner;
 
@@ -266,13 +266,13 @@ contract Ownable {
  * @dev This simplifies the implementation of "user permissions".
  */
 contract Accessable is Ownable {
-    
+
     uint256 public billingPeriod = 28 days;
-    
+
     uint256 public oneTimePrice = 200 szabo;
-    
+
     uint256 public billingAmount = 144 finney;
-    
+
     mapping(address => uint256) public access;
 
     event AccessGranted(address addr, uint256 expired);
@@ -284,26 +284,26 @@ contract Accessable is Ownable {
         require(access[msg.sender] > now || msg.value == oneTimePrice);
         _;
     }
-    
+
     function () external payable {
         processPurchase(msg.sender);
     }
-    
+
     //we need to increase the price when the network is under heavy load
     function setOneTimePrice(uint256 _priceInWei) external onlyOwner {
-        require(_priceInWei < 2000 szabo); 
+        require(_priceInWei < 2000 szabo);
         oneTimePrice = _priceInWei;
     }
-    
+
     function setbillingAmount(uint256 _priceInWei) external onlyOwner {
         require(_priceInWei < oneTimePrice * 24 * billingPeriod);
         billingAmount = _priceInWei;
     }
-    
+
     function hasAccess(address _who) external returns(bool) {
         return access[_who] > now;
     }
-    
+
     function processPurchase(address _beneficiary) public payable {
         require(_beneficiary != address(0));
         uint256 _units = msg.value / billingAmount;
@@ -333,20 +333,20 @@ contract Reoraclizer is UsingOraclize, Accessable {
     using SafeMath for uint256;
 
     string internal response; //price in cents
-    
+
     uint256 internal CALLBACK_GAS_LIMIT = 90000;
-    
+
     // will rewritten after deploying
     // needs to prevent high gas price at first oraclize response
     uint256 internal price = 999999;
-    
+
     event NewOraclizeQuery(string description);
 
     constructor() public {
         oraclize_setProof(proofType_Android | proofStorage_IPFS);
         oraclize_setCustomGasPrice(10000000000);
     }
-    
+
     /**
     * @dev Receives the response from oraclize.
     */
@@ -355,32 +355,43 @@ contract Reoraclizer is UsingOraclize, Accessable {
         price = parseInt(_result, 4);
         _update(3600);
     }
-    
+
     function getEthUsdPrice() external onlyPayed payable returns(uint256) {
         return price;
     }
-    
+
     /**
      * @dev Cyclic query to update ETHUSD price. Period is one hour.
      */
     function _update(uint256 _timeout) internal {
         oraclize_query(_timeout, "URL", "json(https://api.coinmarketcap.com/v2/ticker/1027).data.quotes.USD.price", CALLBACK_GAS_LIMIT);
     }
-    
+
     function update(uint256 _timeout) public payable onlyOwner {
         _update(_timeout);
     }
-    
+
     function setOraclizeGasLimit (uint256 _gasLimit) external onlyOwner {
         CALLBACK_GAS_LIMIT = _gasLimit;
     }
-    
+
     function setGasPrice(uint256 _gasPrice) external onlyOwner {
         oraclize_setCustomGasPrice(_gasPrice);
     }
-    
+
     function withdrawEth(uint256 _value) external onlyOwner {
         require(address(this).balance > _value.add(3 ether));
         owner.transfer(_value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

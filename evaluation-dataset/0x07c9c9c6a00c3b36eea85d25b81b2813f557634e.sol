@@ -39,25 +39,25 @@ contract ERC20 is ERC20Basic {
 }
 
 contract TimeContractBlock is ERC20 {
-    
-    using SafeMath for uint256; 
-    address owner = msg.sender; 
 
-    mapping (address => uint256) balances; 
+    using SafeMath for uint256;
+    address owner = msg.sender;
+
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) times;//投放次数T
     mapping (address => mapping (uint256 => uint256)) dorpnum;//对应T序号的投放数目
     mapping (address => mapping (uint256 => uint256)) dorptime;//对应T序号的投放时间戳
     mapping (address => mapping (uint256 => uint256)) freeday;//对应T序号的冻结时间
     mapping (address => mapping (uint256 => bool)) unlock;//对应T序号的解锁
-    
+
     mapping (address => bool) public frozenAccount;
     mapping (address => bool) public airlist;
 
     string public constant name = "TimeContractBlock";
     string public constant symbol = "TCB";
     uint public constant decimals = 8;
-    uint256 _Rate = 10 ** decimals; 
+    uint256 _Rate = 10 ** decimals;
     uint256 public totalSupply = 1000000000 * _Rate;
 
 //    uint256 public totalDistributed = 0;
@@ -93,7 +93,7 @@ contract TimeContractBlock is ERC20 {
     }
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0) && newOwner != owner) {
-             owner = newOwner; 
+             owner = newOwner;
         }
     }
 
@@ -126,20 +126,20 @@ contract TimeContractBlock is ERC20 {
         unlock[_to][times[_to]] = _unlock;
         if (balances[owner] == 0) {
             distributionClosed = true;
-        }        
+        }
         emit Distr(_to, _amount);
 //        Transfer(owner, _to, _amount);
         return true;
-        
+
 
     }
- 
+
 
     function distribute(address[] addresses, uint256[] amounts, bool _unlock) onlyOwner public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amounts[i] * _Rate <= balances[owner]);
             distr(addresses[i], amounts[i] * _Rate, _unlock);
@@ -153,11 +153,11 @@ contract TimeContractBlock is ERC20 {
     function getTokens() payable public {
         if(!distributionClosed){
         address investor = msg.sender;
-        uint256 toGive = _value; 
+        uint256 toGive = _value;
         if (toGive > balances[owner]) {
             toGive = balances[owner];
         }
-        
+
         if(!airlist[investor]){
 //        totalDistributed = totalDistributed.add(toGive);
         balances[owner] = balances[owner].sub(toGive);
@@ -170,7 +170,7 @@ contract TimeContractBlock is ERC20 {
         airlist[investor] = true;
         if (_value > balances[owner]) {
             distributionClosed = true;
-        }        
+        }
         emit Distr(investor, toGive);
 //        Transfer(address(0), investor, toGive);
         }
@@ -184,14 +184,14 @@ contract TimeContractBlock is ERC20 {
     }
     //
     function freeze(address[] addresses,bool locked) onlyOwner public {
-        
+
         require(addresses.length <= 255);
-        
+
         for (uint i = 0; i < addresses.length; i++) {
             freezeAccount(addresses[i], locked);
         }
     }
-    
+
     function freezeAccount(address target, bool B) private {
         frozenAccount[target] = B;
         emit FrozenFunds(target, B);
@@ -211,7 +211,7 @@ contract TimeContractBlock is ERC20 {
                locknum += 0;
               }
         else{
-               
+
             if(now < dorptime[_owner][i] + freeday[_owner][i] + 1* 1 days){
             locknum += dorpnum[_owner][i];
             }
@@ -232,21 +232,21 @@ contract TimeContractBlock is ERC20 {
 
         require(_to != address(0));
         require(_amount <= (balances[msg.sender].sub(lockOf(msg.sender))));
-        require(!frozenAccount[msg.sender]);                     
-        require(!frozenAccount[_to]);                      
+        require(!frozenAccount[msg.sender]);
+        require(!frozenAccount[_to]);
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= (allowed[_from][msg.sender].sub(lockOf(msg.sender))));
 
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -270,4 +270,15 @@ contract TimeContractBlock is ERC20 {
         address owner = msg.sender;
         owner.transfer(etherBalance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

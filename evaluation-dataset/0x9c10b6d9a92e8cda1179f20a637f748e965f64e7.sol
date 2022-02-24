@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 contract owned {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     function owned() public {
@@ -58,9 +58,9 @@ library SafeMath {
 
 
 contract TokenERC20 {
-    
+
     using SafeMath for uint256;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -72,7 +72,7 @@ contract TokenERC20 {
      * Internal transfer, only can be called by this contract
      */
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
         // Check if the sender has enough
@@ -81,11 +81,11 @@ contract TokenERC20 {
         require(balanceOf[_to] + _value > balanceOf[_to]);
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from].add(balanceOf[_to]);
-        
+
         // Subtract from the sender .. Add the same to the recipient
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
@@ -139,9 +139,9 @@ contract KoniosToken is owned, TokenERC20 {
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-    
+
     uint256 public soldTokens ;
-    
+
     uint256 public remainingTokens ;
 
     uint256 startBlock; //crowdsale start block (set in constructor)
@@ -158,7 +158,7 @@ contract KoniosToken is owned, TokenERC20 {
 
     /* This notifies clients about the amount allocated to team fund */
     event AllocateTeamTokens(address indexed from, uint256 value);
-    
+
      /* This notifies clients about the amount burned */
     event Burn(address indexed from, uint256 value);
 
@@ -168,13 +168,13 @@ contract KoniosToken is owned, TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) public {
-            
+
             totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
             balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
             name = tokenName;                                   // Set the name for display purposes
             symbol = tokenSymbol;                               // Set the symbol for display purposes
             startBlock = block.number;
-            
+
             remainingTokens = totalSupply ; //set the initial value of remainingTokens as totalSupply in the constructor
 
     }
@@ -225,8 +225,8 @@ contract KoniosToken is owned, TokenERC20 {
         AllocateTeamTokens(msg.sender, teamAllocation);
         return true;
     }
-    
-    
+
+
     /**
      * Destroy tokens
      *
@@ -261,4 +261,16 @@ contract KoniosToken is owned, TokenERC20 {
     }
 
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

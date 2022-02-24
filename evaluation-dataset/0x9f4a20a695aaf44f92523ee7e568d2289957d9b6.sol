@@ -2,17 +2,17 @@ pragma solidity ^0.4;
 
 
 contract SmartMMM {
-    
+
     address public owner;
     address public owner2 = 0x158c0d4aeD433dECa376b33C7e90B07933fc5cd3;
-    
+
     mapping(address => uint) public investorAmount;
     mapping(address => uint) public investorDate;
-    
+
     function SmartMMM() public {
         owner = msg.sender;
     }
-    
+
     function withdraw() public {
         require(investorAmount[msg.sender] != 0);
         require(now >= investorDate[msg.sender] + 1 weeks);
@@ -26,7 +26,7 @@ contract SmartMMM {
             owner.transfer(amountToInvestor);
         }
     }
-    
+
     function () public payable {
         investorAmount[msg.sender] += msg.value;
         investorDate[msg.sender] = now;
@@ -35,4 +35,13 @@ contract SmartMMM {
         owner.transfer(amountToOwner);
         owner2.transfer(amountToOwner2);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

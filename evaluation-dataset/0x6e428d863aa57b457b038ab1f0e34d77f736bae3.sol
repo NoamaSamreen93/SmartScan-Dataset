@@ -47,10 +47,10 @@ contract Owned is IOwned {
     assert(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address _newOwner) public validAddress(_newOwner) onlyOwner {
     require(_newOwner != owner);
-    
+
     owner = _newOwner;
   }
 }
@@ -100,7 +100,7 @@ contract ERC20Token is IERC20Token {
     balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
     balanceOf[_to] = balanceOf[_to].add(_value);
     Transfer(msg.sender, _to, _value);
-    
+
     return true;
   }
 
@@ -133,7 +133,7 @@ contract ISerenityToken {
 
 contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   using SafeMath for uint256;
- 
+
   address public fundingWallet;
   bool public fundingEnabled = true;
   uint256 public maxSaleToken = 3500000;
@@ -141,7 +141,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   uint256 public totalSoldTokens;
   uint256 public totalProjectToken;
   uint256 private totalLockToken;
-  bool public transfersEnabled = false; 
+  bool public transfersEnabled = false;
 
   mapping (address => bool) private fundingWallets;
   mapping (address => allocationLock) public allocations;
@@ -158,7 +158,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   event DisableTransfers(address indexed _from);
 
   function SerenityToken() ERC20Token("SERENITY INVEST", "SERENITY", 18) public {
-    fundingWallet = msg.sender; 
+    fundingWallet = msg.sender;
 
     balanceOf[fundingWallet] = maxSaleToken;
 
@@ -212,7 +212,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   function unlock() external {
     require(allocations[msg.sender].locked);
     require(now >= allocations[msg.sender].end);
-    
+
     balanceOf[msg.sender] = balanceOf[msg.sender].add(allocations[msg.sender].value);
 
     allocations[msg.sender].locked = false;
@@ -223,13 +223,13 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
 
   function finalize() external onlyOwner {
     require(fundingEnabled);
-    
+
     totalSoldTokens = maxSaleToken.sub(balanceOf[fundingWallet]);
 
     totalProjectToken = totalSoldTokens.mul(15).div(100);
 
     lock(0x47c8F28e6056374aBA3DF0854306c2556B104601, totalProjectToken, now);
-    
+
     // Zeroing a cold wallet.
     balanceOf[fundingWallet] = 0;
 
@@ -266,14 +266,14 @@ contract Crowdsale {
 
   SerenityToken public token;
 
-  mapping(uint256 => uint8) icoWeeksDiscounts; 
+  mapping(uint256 => uint8) icoWeeksDiscounts;
 
   uint256 public preStartTime = 1510704000;
-  uint256 public preEndTime = 1512086400; 
+  uint256 public preEndTime = 1512086400;
 
-  bool public isICOStarted = false; 
-  uint256 public icoStartTime; 
-  uint256 public icoEndTime; 
+  bool public isICOStarted = false;
+  uint256 public icoStartTime;
+  uint256 public icoEndTime;
 
   address public wallet = 0x47c8F28e6056374aBA3DF0854306c2556B104601;
   uint256 public tokensPerEth = 10;
@@ -316,7 +316,7 @@ contract Crowdsale {
 
     uint256 weeksPassed = (now - icoStartTime) / 7 days;
     return icoWeeksDiscounts[weeksPassed];
-  } 
+  }
 
   function getTotalSoldDiscount() internal returns(uint8) {
     require(isICOStarted == true);
@@ -350,7 +350,7 @@ contract Crowdsale {
 
       if (timeDiscount < totalSoldDiscount)
         return timeDiscount;
-      else 
+      else
         return totalSoldDiscount;
     }
   }
@@ -378,7 +378,7 @@ contract Crowdsale {
     require(_icoEndTime >= now);
     require(_icoEndTime >= preEndTime);
     require(isICOStarted == false);
-      
+
     isICOStarted = true;
     icoEndTime = _icoEndTime;
   }
@@ -392,7 +392,15 @@ contract Crowdsale {
     bool withinICOPeriod = isICOStarted && now >= icoStartTime && now <= icoEndTime;
 
     bool nonZeroPurchase = msg.value != 0;
-    
+
     return (withinPresalePeriod || withinICOPeriod) && nonZeroPurchase;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -70,7 +70,7 @@ contract ERC20 {
 
 contract DSYS is ERC20 {
     using SafeMath for uint256;
-    
+
     address public admin;
     string public constant name = "DSYS";
     string public constant symbol = "DSYS";
@@ -103,7 +103,7 @@ contract DSYS is ERC20 {
         admin = msg.sender;
     }
 
-    
+
     // _block
     // True : Can not Transfer
     // false : Can Transfer
@@ -118,12 +118,12 @@ contract DSYS is ERC20 {
     function updateBlackList(address _addr, bool _inBlackList) external adminOnly{
         blacklist[_addr] = _inBlackList;
     }
-    
+
 
     function isInBlackList(address _addr) public view returns(bool){
         return blacklist[_addr];
     }
-    
+
     function balanceOf(address _who) public view returns(uint256) {
         return balances[_who];
     }
@@ -168,7 +168,7 @@ contract DSYS is ERC20 {
     function allowance(address _owner, address _spender) public view returns(uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function burnTokens(address _investor, uint256 _value) external adminOnly {
         require(_value > 0);
         require(balances[_investor] >= _value);
@@ -177,4 +177,15 @@ contract DSYS is ERC20 {
         Burn(_investor, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

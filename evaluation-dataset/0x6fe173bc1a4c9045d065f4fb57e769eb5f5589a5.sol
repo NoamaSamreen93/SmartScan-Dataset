@@ -330,16 +330,22 @@ contract AEBTToken is PausableToken {
         revert();
     }
 
-    
+
     string public name = "ArcheBlockchainToken";
     uint8 public decimals = 8;
     string public symbol = "AEBT";
     string public version = '1.0.0';
     uint256 public constant INITIAL_SUPPLY = 500000000 * (10 ** uint256(decimals));
 
-    
+
     function AEBTToken() public {
         balances[msg.sender] = INITIAL_SUPPLY;    // Give the creator all initial tokens
         totalSupply_ = INITIAL_SUPPLY;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -93,7 +93,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   modifier onlyPayloadSize(uint numwords) {
       assert(msg.data.length >= numwords * 32 + 4);
       _;
@@ -272,7 +272,7 @@ contract Token is BurnableToken, Ownable {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
@@ -332,7 +332,7 @@ contract DMSCOIN is Token {
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount/10**(18-decimals)) * price; //weiamount * price 
+    uint256 tokens = (weiAmount/10**(18-decimals)) * price; //weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
@@ -358,4 +358,10 @@ contract DMSCOIN is Token {
   function withdrawTokens(uint256 _amount) onlyOwner public {
     tokenReward.transfer(owner,_amount);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

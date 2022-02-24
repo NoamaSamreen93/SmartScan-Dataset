@@ -407,21 +407,21 @@ contract airDrop is Ownable {
     ERC20 public token;
     uint public createdAt;
     address public owner;
-    
+
     constructor(address _target, ERC20 _token) public {
         owner = _target;
         token = _token;
         createdAt = block.number;
     }
 
-    
+
     function transfer(address[] _addresses, uint[] _amounts) external onlyOwner {
         require(_addresses.length == _amounts.length);
 
         for (uint i = 0; i < _addresses.length; i ++) {
             token.transfer(_addresses[i], _amounts[i]);
         }
-        
+
     }
 
     function transferFrom(address _from, address[] _addresses, uint[] _amounts) external onlyOwner {
@@ -437,12 +437,23 @@ contract airDrop is Ownable {
         // receive tokens
     }
 
-    function withdraw(uint _value) public onlyOwner 
+    function withdraw(uint _value) public onlyOwner
     {
        token.transfer(owner, _value);
-    }  
+    }
 
     function withdrawToken(address _token, uint _value) public onlyOwner {
         ERC20(_token).transfer(owner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

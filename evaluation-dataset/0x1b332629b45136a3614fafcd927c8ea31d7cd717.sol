@@ -1950,7 +1950,7 @@ contract DSSafeAddSub {
     function safeSub(uint a, uint b) internal returns (uint) {
         if (!safeToSubtract(a, b)) throw;
         return a - b;
-    } 
+    }
 }
 
 contract Bandit is usingOraclize, DSSafeAddSub {
@@ -1961,7 +1961,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 	function () public payable {}
 
     using strings for *;
-	
+
 	/*
      * checks game is currently active
     */
@@ -1969,15 +1969,15 @@ contract Bandit is usingOraclize, DSSafeAddSub {
         if(gamePaused == true) throw;
 		_;
     }
-	
+
 	/*
      * checks player bet size is within range
     */
-    modifier betIsValid(uint _betSize) {      
+    modifier betIsValid(uint _betSize) {
 		if(_betSize < minBet || _betSize > maxBet) throw;
 		_;
     }
-	
+
 	/*
      * checks only Oraclize address is calling
     */
@@ -1985,8 +1985,8 @@ contract Bandit is usingOraclize, DSSafeAddSub {
         if (msg.sender != oraclize_cbAddress()) throw;
         _;
     }
-	
-	
+
+
 	/*
      * checks only owner address is calling
     */
@@ -1994,8 +1994,8 @@ contract Bandit is usingOraclize, DSSafeAddSub {
          if (msg.sender != owner) throw;
          _;
     }
-	
-	
+
+
 	/*
      * game vars
     */
@@ -2008,7 +2008,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 	uint public totalWeiWagered = 0;
 	uint public totalWeiWon = 0;
 	uint public randomQueryID;
-	
+
 	/*
      * player vars
     */
@@ -2016,141 +2016,141 @@ contract Bandit is usingOraclize, DSSafeAddSub {
     mapping (bytes32 => address) playerTempAddress;
     mapping (bytes32 => bytes32) playerBetId;
     mapping (bytes32 => uint) playerBetValue;
-    mapping (bytes32 => uint) playerTempBetValue;       
+    mapping (bytes32 => uint) playerTempBetValue;
     mapping (bytes32 => string) public playerDieResult;
-    mapping (address => uint) playerPendingWithdrawals;      
+    mapping (address => uint) playerPendingWithdrawals;
     mapping (bytes32 => uint) playerTempReward;
-	
-	
+
+
 	/*
      * events
     */
     /* log bets + output to web3 for precise 'payout on win' field in UI */
-    event LogBet(bytes32 indexed BetID, address indexed PlayerAddress, uint BetValue);      
+    event LogBet(bytes32 indexed BetID, address indexed PlayerAddress, uint BetValue);
     /* output to web3 UI on bet result*/
     /* Status: 0=lose, 1=win, 2=win + failed send, 3=refund, 4=refund + failed send*/
-	event LogResult(uint indexed ResultSerialNumber, bytes32 indexed BetID, address indexed PlayerAddress, string DiceResult, uint Value, uint Multiplier, int Status, bytes Proof);   
+	event LogResult(uint indexed ResultSerialNumber, bytes32 indexed BetID, address indexed PlayerAddress, string DiceResult, uint Value, uint Multiplier, int Status, bytes Proof);
     /* log manual refunds */
     event LogRefund(bytes32 indexed BetID, address indexed PlayerAddress, uint indexed RefundValue);
     /* log owner transfers */
     event LogOwnerTransfer(address indexed SentToAddress, uint indexed AmountTransferred);
-	
-	
+
+
 	/*
      * init
     */
     function Bandit() {
 
-        owner = msg.sender;     
+        owner = msg.sender;
         /* use TLSNotary for oraclize call */
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
         /* init min bet (0.1 ether) */
         ownerSetMinBet(50000000000000000);
 		ownerSetMaxBet(1000000000000000000);
-        /* init gas for oraclize */        
+        /* init gas for oraclize */
         gasForOraclize = 220000;
         /* init gas price for callback (default 20 gwei)*/
-        oraclize_setCustomGasPrice(20000000000 wei);		
+        oraclize_setCustomGasPrice(20000000000 wei);
 
     }
-	
-	
+
+
 	/*
      * public function
      * player submit bet
-     * only if game is active & bet is valid can query oraclize and set player vars     
+     * only if game is active & bet is valid can query oraclize and set player vars
     */
-    function playerPull() public 
+    function playerPull() public
         payable
         gameIsActive
         betIsValid(msg.value)
-	{       
+	{
 
         /*
         * assign partially encrypted query to oraclize
-        * only the apiKey is encrypted 
+        * only the apiKey is encrypted
         * integer query is in plain text
-        */               
+        */
 		randomQueryID += 1;
         string memory queryString1 = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"serialNumber\",\"data\"]', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateSignedIntegers\",\"params\":{\"apiKey\":${[decrypt] BMQPRXLz2Bxhv0qE0MZIob4wmCLWdSLuzN2uUn7KFIdAmCmnHt9OS30dR9x9BuSWkqrej3SOVxxICyePvRqiEZ6RHRrCON++Ene7jEA1ddNjS+YIg9FEu5iVIN+QXklmoL5ugZG0wpkKcA8L5MLgXDmajYuBSP4=},\"n\":3,\"min\":1,\"max\":20,\"replacement\":true,\"base\":10${[identity] \"}\"},\"id\":";
         string memory queryString2 = uint2str(randomQueryID);
         string memory queryString3 = "${[identity] \"}\"}']";
-		
+
 		string memory queryString1_2 = queryString1.toSlice().concat(queryString2.toSlice());
 
         string memory queryString1_2_3 = queryString1_2.toSlice().concat(queryString3.toSlice());
 
         bytes32 rngId = oraclize_query("nested", queryString1_2_3, gasForOraclize);
-		
-		
-		
+
+
+
         /* map bet id to this oraclize query */
 		playerBetId[rngId] = rngId;
         /* map value of wager to this oraclize query */
         playerBetValue[rngId] = msg.value;
         /* map player address to this oraclize query */
         playerAddress[rngId] = msg.sender;
-		
-		
+
+
         /* provides accurate numbers for web3 and allows for manual refunds in case of no oraclize __callback */
-        LogBet(playerBetId[rngId], playerAddress[rngId], playerBetValue[rngId]);          
+        LogBet(playerBetId[rngId], playerAddress[rngId], playerBetValue[rngId]);
 
     }
-	
-	
+
+
 	/*
     * semi-public function - only oraclize can call
     */
     /*TLSNotary for oraclize call */
-	function __callback(bytes32 myid, string result, bytes proof) public   
+	function __callback(bytes32 myid, string result, bytes proof) public
 		onlyOraclize
-	{  
+	{
 
         /* player address mapped to query id does not exist */
-        if (playerAddress[myid]==0x0) throw;	
-		
-        
+        if (playerAddress[myid]==0x0) throw;
+
+
         /* keep oraclize honest by retrieving the serialNumber from random.org result */
         var sl_result = result.toSlice();
         sl_result.beyond("[".toSlice()).until("]".toSlice());
-        uint serialNumberOfResult = parseInt(sl_result.split(', '.toSlice()).toString());      
-		
-		
+        uint serialNumberOfResult = parseInt(sl_result.split(', '.toSlice()).toString());
+
+
 
 	    /* map result to player */
         playerDieResult[myid] = sl_result.beyond("[".toSlice()).until("]".toSlice()).toString();
-		
+
 		/* parse a number for each barrel */
 		var first_barrel = parseInt(sl_result.split(', '.toSlice()).toString());
 		var second_barrel = parseInt(sl_result.split(', '.toSlice()).toString());
 		var third_barrel = parseInt(sl_result.split(', '.toSlice()).toString());
-        
+
         /* get the playerAddress for this query id */
         playerTempAddress[myid] = playerAddress[myid];
         /* delete playerAddress for this query id */
-        delete playerAddress[myid];         
+        delete playerAddress[myid];
 
         /* map the playerBetValue for this query id */
         playerTempBetValue[myid] = playerBetValue[myid];
         /* set  playerBetValue for this query id to 0 */
         playerBetValue[myid] = 0;
 		/* set  miltiplier for this query 0 */
-		var miltiplier = 0;		
+		var miltiplier = 0;
 
         /* total number of bets */
         totalBets += 1;
 
         /* total wagered */
-        totalWeiWagered += playerTempBetValue[myid];                                                           
+        totalWeiWagered += playerTempBetValue[myid];
 
         /*
         * refund
         * if result is 0 result is empty or no proof refund original bet value
         * if refund fails save refund value to playerPendingWithdrawals
         */
-        if(parseInt(playerDieResult[myid])==0 || bytes(result).length == 0 || bytes(proof).length == 0){                                                     
+        if(parseInt(playerDieResult[myid])==0 || bytes(result).length == 0 || bytes(proof).length == 0){
 
-             LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 3, proof);            
+             LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 3, proof);
 
             /*
             * send refund - external call to an untrusted contract
@@ -2158,20 +2158,20 @@ contract Bandit is usingOraclize, DSSafeAddSub {
             * for withdrawal later via playerWithdrawPendingTransactions
             */
             if(!playerTempAddress[myid].send(playerTempBetValue[myid])){
-                LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 4, proof);              
+                LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 4, proof);
                 /* if send failed let player withdraw via playerWithdrawPendingTransactions */
-                playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], playerTempBetValue[myid]);                        
+                playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], playerTempBetValue[myid]);
             }
 
             return;
         }
 
-		
-		
+
+
 		/*
 		*Count miltiplier
 		*/
-		
+
 		/*
 		Cast Jackpot - 777
 		*/
@@ -2179,7 +2179,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 20;
 		}
-		
+
 		/*
 		Any Cherry
 		*/
@@ -2187,7 +2187,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 2;
 		}
-		
+
 		/*
 		3 Cherry
 		*/
@@ -2195,7 +2195,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 7;
 		}
-		
+
 		/*
 		3 Bananas
 		*/
@@ -2203,7 +2203,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 3;
 		}
-		
+
 		/*
 		3 Any bars
 		*/
@@ -2211,7 +2211,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 5;
 		}
-		
+
 		/*
 		3 One bars
 		*/
@@ -2219,7 +2219,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 10;
 		}
-		
+
 		/*
 		3 Two bars
 		*/
@@ -2227,7 +2227,7 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 12;
 		}
-		
+
 		/*
 		3 Three bars
 		*/
@@ -2235,33 +2235,33 @@ contract Bandit is usingOraclize, DSSafeAddSub {
 		{
 			miltiplier = 15;
 		}
-		
-		
+
+
         /*
 		* count profit
         * pay winner
         * send reward
-        * if send of reward fails save value to playerPendingWithdrawals        
+        * if send of reward fails save value to playerPendingWithdrawals
         */
-        if(miltiplier > 0){ 
+        if(miltiplier > 0){
 
 			playerTempReward[myid] = playerTempBetValue[myid] * miltiplier;
 
             /* update total wei won */
-            totalWeiWon = safeAdd(totalWeiWon, playerTempReward[myid]);              
+            totalWeiWon = safeAdd(totalWeiWon, playerTempReward[myid]);
 
-            LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempReward[myid], miltiplier, 1, proof);                            
+            LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempReward[myid], miltiplier, 1, proof);
 
-            
+
             /*
             * send win - external call to an untrusted contract
             * if send fails map reward value to playerPendingWithdrawals[address]
             * for withdrawal later via playerWithdrawPendingTransactions
             */
             if(!playerTempAddress[myid].send(playerTempReward[myid])){
-                LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempReward[myid], miltiplier, 2, proof);                   
+                LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempReward[myid], miltiplier, 2, proof);
                 /* if send failed let player withdraw via playerWithdrawPendingTransactions */
-                playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], playerTempReward[myid]);                               
+                playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], playerTempReward[myid]);
             }
 
             return;
@@ -2275,15 +2275,15 @@ contract Bandit is usingOraclize, DSSafeAddSub {
         */
         if(miltiplier == 0){
 
-            LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 0, proof);                                                                                                      
+            LogResult(serialNumberOfResult, playerBetId[myid], playerTempAddress[myid], playerDieResult[myid], playerTempBetValue[myid], miltiplier, 0, proof);
 
             /*
-            * send 1 wei - external call to an untrusted contract                  
+            * send 1 wei - external call to an untrusted contract
             */
             if(!playerTempAddress[myid].send(1)){
-                /* if send failed let player withdraw via playerWithdrawPendingTransactions */                
-               playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], 1);                                
-            }                                   
+                /* if send failed let player withdraw via playerWithdrawPendingTransactions */
+               playerPendingWithdrawals[playerTempAddress[myid]] = safeAdd(playerPendingWithdrawals[playerTempAddress[myid]], 1);
+            }
 
             return;
 
@@ -2292,13 +2292,13 @@ contract Bandit is usingOraclize, DSSafeAddSub {
     }
 
 
-	
-	
+
+
 	/*
     * public function
     * in case of a failed refund or win send
     */
-    function playerWithdrawPendingTransactions() public 
+    function playerWithdrawPendingTransactions() public
         returns (bool)
      {
         uint withdrawAmount = playerPendingWithdrawals[msg.sender];
@@ -2313,87 +2313,98 @@ contract Bandit is usingOraclize, DSSafeAddSub {
             return false;
         }
     }
-	
-	
+
+
 	/* check for pending withdrawals  */
     function playerGetPendingTxByAddress(address addressToCheck) public constant returns (uint) {
         return playerPendingWithdrawals[addressToCheck];
     }
-	
-	
+
+
 	/*
     * internal function
     */
-	
-	
+
+
     /* Only owner address can do manual refund
     * used only if bet placed + oraclize failed to __callback
     * filter LogBet by address and/or playerBetId:
     * LogBet(playerBetId[rngId], playerAddress[rngId], safeAdd(playerBetValue[rngId], playerBetValue[rngId], playerNumber[rngId]);
     * check the following logs do not exist for playerBetId and/or playerAddress[rngId] before refunding:
     * LogResult or LogRefund
-    * if LogResult exists player should use the withdraw pattern playerWithdrawPendingTransactions 
+    * if LogResult exists player should use the withdraw pattern playerWithdrawPendingTransactions
     */
-    function ownerRefundPlayer(bytes32 originalPlayerBetId, address sendTo, uint originalPlayerProfit, uint originalPlayerBetValue) public 
+    function ownerRefundPlayer(bytes32 originalPlayerBetId, address sendTo, uint originalPlayerProfit, uint originalPlayerBetValue) public
 		onlyOwner
     {
         /* send refund */
         if(!sendTo.send(originalPlayerBetValue)) throw;
         /* log refunds */
-        LogRefund(originalPlayerBetId, sendTo, originalPlayerBetValue);        
-    }  	
-	
+        LogRefund(originalPlayerBetId, sendTo, originalPlayerBetValue);
+    }
+
 	/*set gas for oraclize query */
-    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public 
+    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public
 		onlyOwner
 	{
     	gasForOraclize = newSafeGasToOraclize;
     }
-	
+
 	/* only owner address can set minBet */
-    function ownerSetMinBet(uint newMinimumBet) public 
+    function ownerSetMinBet(uint newMinimumBet) public
 		onlyOwner
     {
         minBet = newMinimumBet;
     }
-	
+
 	/* only owner address can set maxBet */
-    function ownerSetMaxBet(uint newMaxBet) public 
+    function ownerSetMaxBet(uint newMaxBet) public
 		onlyOwner
     {
         maxBet = newMaxBet;
-    } 
-	
-	
+    }
+
+
 	/* only owner address can set emergency pause #1 */
-    function ownerPauseGame(bool newStatus) public 
+    function ownerPauseGame(bool newStatus) public
 		onlyOwner
     {
 		gamePaused = newStatus;
     }
-	
+
 	/* only owner address can set owner address */
-    function ownerChangeOwner(address newOwner) public 
+    function ownerChangeOwner(address newOwner) public
 		onlyOwner
 	{
         owner = newOwner;
     }
-	
+
 	/* only owner address can suicide - emergency */
-    function ownerkill() public 
+    function ownerkill() public
 		onlyOwner
 	{
 		suicide(owner);
 	}
-	
+
 	/* only owner address can withdraw */
-    function withdrawBalance(uint256 cash) public 
+    function withdrawBalance(uint256 cash) public
 		onlyOwner
 	{
 		uint256 balance = this.balance;
         if (balance > cash) {
             owner.send(cash);
         }
-	} 
-	
+	}
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

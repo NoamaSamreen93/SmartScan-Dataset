@@ -28,7 +28,7 @@ contract EToken2Interface {
 contract AssetInterface {
     function _performTransferWithReference(address _to, uint _value, string _reference, address _sender) returns(bool);
     function _performTransferToICAPWithReference(bytes32 _icap, uint _value, string _reference, address _sender) returns(bool);
-    function _performApprove(address _spender, uint _value, address _sender) returns(bool);    
+    function _performApprove(address _spender, uint _value, address _sender) returns(bool);
     function _performTransferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) returns(bool);
     function _performTransferFromToICAPWithReference(address _from, bytes32 _icap, uint _value, string _reference, address _sender) returns(bool);
     function _performGeneric(bytes, address) payable {
@@ -600,4 +600,15 @@ contract GloboX is ERC20Interface, AssetProxyInterface, Bytes32, ReturnData {
     function multiAsset() constant returns(EToken2Interface) {
         return etoken2;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

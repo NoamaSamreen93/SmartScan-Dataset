@@ -325,7 +325,7 @@ contract ERC20Detailed is IERC20 {
 
 
 contract Axiscoin is ERC20, ERC20Detailed {
-    
+
     string private _name = "AxisCoin";
     string private _symbol = "AXIS";
     uint8 private _decimals = 3;
@@ -336,4 +336,15 @@ contract Axiscoin is ERC20, ERC20Detailed {
     constructor() ERC20Detailed(_name, _symbol, _decimals) public {
         _mint(account, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

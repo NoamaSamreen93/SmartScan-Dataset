@@ -31,7 +31,7 @@ contract Lister {
     function list(address reserve, address token) internal {
         require(NETWORK.listPairForReserve(reserve,token,true,true,true));
     }
-    
+
     function listPrycto1() onlyListers public {
         // OMG
         list(PRYCTO,0xd26114cd6EE289AccF82350c8d8487fedB8A0C07);
@@ -64,7 +64,7 @@ contract Lister {
         // AST
         list(PRYCTO,0x27054b13b1B798B345b591a4d22e6562d47eA75a);
     }
-    
+
     function listPrycto4() onlyListers public {
         // DAI
         list(PRYCTO,0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359);
@@ -74,8 +74,8 @@ contract Lister {
         list(PRYCTO,0xD0a4b8946Cb52f0661273bfbC6fD0E0C75Fc6433);
         // LEND
         list(PRYCTO,0x80fB784B7eD66730e8b1DBd9820aFD29931aab03);
-    }    
-    
+    }
+
     function listPrycto5() onlyListers public {
         // WINGS
         list(PRYCTO,0x667088b212ce3d06a1b553a7221E1fD19000d9aF);
@@ -85,15 +85,15 @@ contract Lister {
         list(PRYCTO,0x286BDA1413a2Df81731D4930ce2F862a35A609fE);
         // OCN
         list(PRYCTO,0x4092678e4E78230F46A1534C0fbc8fA39780892B);
-    }        
-    
+    }
+
     function listPrycto6() onlyListers public {
         // PRO
         list(PRYCTO,0x226bb599a12C826476e3A771454697EA52E9E220);
         // SSP
         list(PRYCTO,0x624d520BAB2E4aD83935Fa503fB130614374E850);
-    }            
-    
+    }
+
     function listMOT() onlyListers public {
         list(0x6f50e41885fdc44dbdf7797df0393779a9c0a3a6,0x263c618480DBe35C300D8d5EcDA19bbB986AcaeD);
     }
@@ -126,4 +126,10 @@ contract Lister {
         list(0xa9312cb86d1e532b7c21881ce03a1a9d52f6adb1,0x9389434852b94bbaD4c8AfEd5B7BDBc5Ff0c2275);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

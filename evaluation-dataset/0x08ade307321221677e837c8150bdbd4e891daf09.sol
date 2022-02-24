@@ -1,11 +1,11 @@
 pragma solidity ^0.4.15;
 
 contract Vault {
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event TransferOwnership(address indexed from, address indexed to);
-    
+
     address Owner;
     mapping (address => uint) public Deposits;
     uint minDeposit;
@@ -29,7 +29,7 @@ contract Vault {
     }
 
     function withdraw(uint amount) payable onlyOwner { withdrawTo(msg.sender, amount); }
-    
+
     function withdrawTo(address to, uint amount) onlyOwner {
         if (WithdrawalEnabled()) {
             uint max = Deposits[msg.sender];
@@ -54,4 +54,15 @@ contract Vault {
         if (size > 0) return;
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

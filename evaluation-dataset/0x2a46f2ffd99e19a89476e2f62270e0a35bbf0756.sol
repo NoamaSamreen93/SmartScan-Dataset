@@ -55,7 +55,7 @@ pragma solidity ^0.4.22;
 
 
 /**
- * Interface to the digital media store external contract that is 
+ * Interface to the digital media store external contract that is
  * responsible for storing the common digital media and collection data.
  * This allows for new token contracts to be deployed and continue to reference
  * the digital media and collection data.
@@ -76,7 +76,7 @@ pragma solidity 0.4.25;
 
 
 /**
- * Interface to the digital media store external contract that is 
+ * Interface to the digital media store external contract that is
  * responsible for storing the common digital media and collection data.
  * This allows for new token contracts to be deployed and continue to reference
  * the digital media and collection data.
@@ -99,10 +99,10 @@ contract DigitalMediaStoreInterface {
      * @return the id of the new digital media created
      */
     function createDigitalMedia(
-                address _creator, 
-                uint32 _printIndex, 
-                uint32 _totalSupply, 
-                uint256 _collectionId, 
+                address _creator,
+                uint32 _printIndex,
+                uint32 _totalSupply,
+                uint256 _collectionId,
                 string _metadataPath) external returns (uint);
 
     /**
@@ -111,7 +111,7 @@ contract DigitalMediaStoreInterface {
      * @param  _increment uint32 the amount to increment by
      */
     function incrementDigitalMediaPrintIndex(
-                uint256 _digitalMediaId, 
+                uint256 _digitalMediaId,
                 uint32 _increment)  external;
 
     /**
@@ -247,7 +247,7 @@ pragma solidity 0.4.25;
 
 
 /**
- * A special control class that is used to configure and manage a token contract's 
+ * A special control class that is used to configure and manage a token contract's
  * different digital media store versions.
  *
  * Older versions of token contracts had the ability to increment the digital media's
@@ -255,7 +255,7 @@ pragma solidity 0.4.25;
  * upgradeability and flexibility.
  *
  * New verions will get rid of this ability now that token contract logic
- * is more stable and we've built in burn capabilities.  
+ * is more stable and we've built in burn capabilities.
  *
  * In order to support the older tokens, we need to be able to look up the appropriate digital
  * media store associated with a given digital media id on the latest token contract.
@@ -280,11 +280,11 @@ contract MediaStoreVersionControl is Pausable {
     }
 
     /**
-     * Sets a digital media store address upon construction.  
+     * Sets a digital media store address upon construction.
      * Once set it's immutable, so that a token contract is always
      * tied to one digital media store.
      */
-    function setDigitalMediaStoreAddress(address _dmsAddress)  
+    function setDigitalMediaStoreAddress(address _dmsAddress)
             internal {
         DigitalMediaStoreInterface candidateDigitalMediaStore = DigitalMediaStoreInterface(_dmsAddress);
         require(candidateDigitalMediaStore.getDigitalMediaStoreVersion() == 2, "Incorrect version.");
@@ -294,7 +294,7 @@ contract MediaStoreVersionControl is Pausable {
     }
 
     /**
-     * Publicly callable by the owner, but can only be set one time, so don't make 
+     * Publicly callable by the owner, but can only be set one time, so don't make
      * a mistake when setting it.
      *
      * Will also check that the version on the other end of the contract is in fact correct.
@@ -311,8 +311,8 @@ contract MediaStoreVersionControl is Pausable {
      * Depending on the digital media id, determines whether to return the previous
      * version of the digital media manager.
      */
-    function _getDigitalMediaStore(uint256 _digitalMediaId) 
-            internal 
+    function _getDigitalMediaStore(uint256 _digitalMediaId)
+            internal
             view
             managersInitialized
             returns (DigitalMediaStoreInterface) {
@@ -321,7 +321,7 @@ contract MediaStoreVersionControl is Pausable {
         } else {
             return currentDigitalMediaStore;
         }
-    }  
+    }
 }
 
 // File: REMIX_FILE_SYNC/DigitalMediaManager.sol
@@ -374,10 +374,10 @@ contract DigitalMediaManager is MediaStoreVersionControl {
     /**
      * Retrieves a collection object by id.
      */
-    function _getCollection(uint256 _id) 
-            internal 
-            view 
-            managersInitialized 
+    function _getCollection(uint256 _id)
+            internal
+            view
+            managersInitialized
             returns(DigitalMediaCollection) {
         uint256 id;
         address creator;
@@ -394,10 +394,10 @@ contract DigitalMediaManager is MediaStoreVersionControl {
     /**
      * Retrieves a digital media object by id.
      */
-    function _getDigitalMedia(uint256 _id) 
-            internal 
-            view 
-            managersInitialized 
+    function _getDigitalMedia(uint256 _id)
+            internal
+            view
+            managersInitialized
             returns(DigitalMedia) {
         uint256 id;
         uint32 totalSupply;
@@ -421,8 +421,8 @@ contract DigitalMediaManager is MediaStoreVersionControl {
     /**
      * Increments the print index of a digital media object by some increment.
      */
-    function _incrementDigitalMediaPrintIndex(DigitalMedia _dm, uint32 _increment) 
-            internal 
+    function _incrementDigitalMediaPrintIndex(DigitalMedia _dm, uint32 _increment)
+            internal
             managersInitialized {
         DigitalMediaStoreInterface _digitalMediaStore = _getDigitalMediaStore(_dm.id);
         _digitalMediaStore.incrementDigitalMediaPrintIndex(_dm.id, _increment);
@@ -430,7 +430,7 @@ contract DigitalMediaManager is MediaStoreVersionControl {
 
     // Check if the token operator is approved for the owner address
     function isOperatorApprovedForCustodialAccount(
-        address _operator, 
+        address _operator,
         address _owner) internal view registryInitialized returns(bool) {
         return creatorRegistryStore.isOperatorApprovedForCustodialAccount(
             _operator, _owner);
@@ -444,7 +444,7 @@ pragma solidity 0.4.25;
 
 /**
  * A special control class that's used to help enforce that a DigitalMedia contract
- * will service only a single creator's address.  This is used when deploying a 
+ * will service only a single creator's address.  This is used when deploying a
  * custom token contract owned and managed by a single creator.
  */
 contract SingleCreatorControl {
@@ -454,7 +454,7 @@ contract SingleCreatorControl {
 
     // The single creator has changed.
     event SingleCreatorChanged(
-        address indexed previousCreatorAddress, 
+        address indexed previousCreatorAddress,
         address indexed newCreatorAddress);
 
     /**
@@ -1126,7 +1126,7 @@ contract ERC721Safe is ERC721Token {
         bytes4(keccak256('ownerOf(uint256)')) ^
         bytes4(keccak256('approve(address,uint256)')) ^
         bytes4(keccak256('safeTransferFrom(address,address,uint256)'));
-	
+
    function supportsInterface(bytes4 _interfaceID) external view returns (bool);
 }
 
@@ -1294,7 +1294,7 @@ contract HelperUtils {
     //         bytesStringTrimmed[j] = bytesString[j];
     //     }
     //     return string(bytesStringTrimmed);
-    // } 
+    // }
 
     /**
      * Concatenates two strings
@@ -1325,39 +1325,39 @@ pragma solidity 0.4.25;
 /**
  * The DigitalMediaToken contract.  Fully implements the ERC721 contract
  * from OpenZeppelin without any modifications to it.
- * 
+ *
  * This contract allows for the creation of:
  *  1. New Collections
  *  2. New DigitalMedia objects
  *  3. New DigitalMediaRelease objects
- * 
- * The primary piece of logic is to ensure that an ERC721 token can 
+ *
+ * The primary piece of logic is to ensure that an ERC721 token can
  * have a supply and print edition that is enforced by this contract.
  */
 contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, SingleCreatorControl {
 
     event DigitalMediaReleaseCreateEvent(
-        uint256 id, 
+        uint256 id,
         address owner,
         uint32 printEdition,
-        string tokenURI, 
+        string tokenURI,
         uint256 digitalMediaId);
 
     // Event fired when a new digital media is created
     event DigitalMediaCreateEvent(
-        uint256 id, 
+        uint256 id,
         address storeContractAddress,
-        address creator, 
-        uint32 totalSupply, 
-        uint32 printIndex, 
-        uint256 collectionId, 
+        address creator,
+        uint32 totalSupply,
+        uint32 printIndex,
+        uint256 collectionId,
         string metadataPath);
 
-    // Event fired when a digital media's collection is 
+    // Event fired when a digital media's collection is
     event DigitalMediaCollectionCreateEvent(
-        uint256 id, 
+        uint256 id,
         address storeContractAddress,
-        address creator, 
+        address creator,
         string metadataPath);
 
     // Event fired when a digital media is burned
@@ -1368,7 +1368,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
 
     // Event fired when burning a token
     event DigitalMediaReleaseBurnEvent(
-        uint256 tokenId, 
+        uint256 tokenId,
         address owner);
 
     event UpdateDigitalMediaPrintIndexEvent(
@@ -1398,7 +1398,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
     // Token ID counter
     uint256 internal tokenIdCounter = 0;
 
-    constructor (string _tokenName, string _tokenSymbol, uint256 _tokenIdStartingCounter) 
+    constructor (string _tokenName, string _tokenSymbol, uint256 _tokenIdStartingCounter)
             public ERC721Token(_tokenName, _tokenSymbol) {
         tokenIdCounter = _tokenIdStartingCounter;
     }
@@ -1412,15 +1412,15 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
      * @return uint the new digital media id
      */
     function _createDigitalMedia(
-          address _creator, uint32 _totalSupply, uint256 _collectionId, string _metadataPath) 
-          internal 
+          address _creator, uint32 _totalSupply, uint256 _collectionId, string _metadataPath)
+          internal
           returns (uint) {
 
         require(_validateCollection(_collectionId, _creator), "Creator for collection not approved.");
 
         uint256 newDigitalMediaId = currentDigitalMediaStore.createDigitalMedia(
             _creator,
-            0, 
+            0,
             _totalSupply,
             _collectionId,
             _metadataPath);
@@ -1444,8 +1444,8 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
      */
     function _burnToken(uint256 _tokenId, address _caller) internal {
         address owner = ownerOf(_tokenId);
-        require(_caller == owner || 
-                getApproved(_tokenId) == _caller || 
+        require(_caller == owner ||
+                getApproved(_tokenId) == _caller ||
                 isApprovedForAll(owner, _caller),
                 "Failed token burn.  Caller is not approved.");
         _burn(owner, _tokenId);
@@ -1455,15 +1455,15 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
 
     /**
      * Burns a digital media.  Once this function succeeds, this digital media
-     * will no longer be able to mint any more tokens.  Existing tokens need to be 
+     * will no longer be able to mint any more tokens.  Existing tokens need to be
      * burned individually though.
      * @param  _digitalMediaId the id of the digital media to burn
      * @param  _caller the address of the caller.
      */
     function _burnDigitalMedia(uint256 _digitalMediaId, address _caller) internal {
         DigitalMedia memory _digitalMedia = _getDigitalMedia(_digitalMediaId);
-        require(_checkApprovedCreator(_digitalMedia.creator, _caller) || 
-                isApprovedForAll(_digitalMedia.creator, _caller), 
+        require(_checkApprovedCreator(_digitalMedia.creator, _caller) ||
+                isApprovedForAll(_digitalMedia.creator, _caller),
                 "Failed digital media burn.  Caller not approved.");
 
         uint32 increment = _digitalMedia.totalSupply - _digitalMedia.printIndex;
@@ -1480,8 +1480,8 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
      * @return uint the new collection id
      */
     function _createCollection(
-          address _creator, string _metadataPath) 
-          internal 
+          address _creator, string _metadataPath)
+          internal
           returns (uint) {
         uint256 newCollectionId = currentDigitalMediaStore.createCollection(
             _creator,
@@ -1497,7 +1497,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
     }
 
     /**
-     * Creates _count number of new digital media releases (i.e a token).  
+     * Creates _count number of new digital media releases (i.e a token).
      * Bumps up the print index by _count.
      * @param  _owner address the owner of the digital media object
      * @param  _digitalMediaId uint256 the digital media id
@@ -1513,7 +1513,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
         require(_checkApprovedCreator(_digitalMedia.creator, _owner), "Creator not approved.");
         require(isAllowedSingleCreator(_owner), "Creator must match single creator address.");
         require(_count + currentPrintIndex <= _digitalMedia.totalSupply, "Total supply exceeded.");
-        
+
         string memory tokenURI = HelperUtils.strConcat("ipfs://ipfs/", _digitalMedia.metadataPath);
 
         for (uint32 i=0; i < _count; i++) {
@@ -1525,7 +1525,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
 
             uint256 newDigitalMediaReleaseId = _getNextTokenId();
             tokenIdToDigitalMediaRelease[newDigitalMediaReleaseId] = _digitalMediaRelease;
-        
+
             emit DigitalMediaReleaseCreateEvent(
                 newDigitalMediaReleaseId,
                 _owner,
@@ -1550,9 +1550,9 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
      * @param  _caller the calling address
      * @return bool allowed or not
      */
-    function _checkApprovedCreator(address _creator, address _caller) 
-            internal 
-            view 
+    function _checkApprovedCreator(address _creator, address _caller)
+            internal
+            view
             returns (bool) {
         address approvedCreator = approvedCreators[_creator];
         if (approvedCreator != address(0)) {
@@ -1566,9 +1566,9 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
      * Validates the an address is allowed to create a digital media on a
      * given collection.  Collections are tied to addresses.
      */
-    function _validateCollection(uint256 _collectionId, address _address) 
-            private 
-            view 
+    function _validateCollection(uint256 _collectionId, address _address)
+            private
+            view
             returns (bool) {
         if (_collectionId == 0 ) {
             return true;
@@ -1582,7 +1582,7 @@ contract DigitalMediaToken is DigitalMediaManager, ERC721Safe, HelperUtils, Sing
     * Generates a new token id.
     */
     function _getNextTokenId() private view returns (uint256) {
-        return tokenIdCounter.add(1); 
+        return tokenIdCounter.add(1);
     }
 
     /**
@@ -1730,7 +1730,7 @@ contract DigitalMediaSaleBase is ERC721Holder, Pausable, OBOControl, WithdrawFun
     /**
      * Adds a new token contract address to be approved to be called.
      */
-    function addApprovedTokenContract(address _tokenContractAddress) 
+    function addApprovedTokenContract(address _tokenContractAddress)
             public onlyOwner {
         approvedTokenContracts[_tokenContractAddress] = true;
     }
@@ -1738,15 +1738,15 @@ contract DigitalMediaSaleBase is ERC721Holder, Pausable, OBOControl, WithdrawFun
     /**
      * Remove an approved token contract address from the list of approved addresses.
      */
-    function removeApprovedTokenContract(address _tokenContractAddress) 
-            public onlyOwner {            
+    function removeApprovedTokenContract(address _tokenContractAddress)
+            public onlyOwner {
         delete approvedTokenContracts[_tokenContractAddress];
     }
 
     /**
      * Checks that a particular token contract address is a valid address.
      */
-    function _isValidTokenContract(address _tokenContractAddress) 
+    function _isValidTokenContract(address _tokenContractAddress)
             internal view returns (bool) {
         return approvedTokenContracts[_tokenContractAddress];
     }
@@ -1777,11 +1777,11 @@ contract DigitalMediaSaleBase is ERC721Holder, Pausable, OBOControl, WithdrawFun
     }
 
     /**
-     * Checks to ensure that the token owner has approved the escrow contract 
+     * Checks to ensure that the token owner has approved the escrow contract
      */
     function _approvedForEscrow(address _seller, uint256 _tokenId, address _tokenContractAddress) internal view returns (bool) {
         ERC721Safe tokenContract = _getTokenContract(_tokenContractAddress);
-        return (tokenContract.isApprovedForAll(_seller, this) || 
+        return (tokenContract.isApprovedForAll(_seller, this) ||
                 tokenContract.getApproved(_tokenId) == address(this));
     }
 
@@ -1830,15 +1830,15 @@ pragma solidity 0.4.25;
 
 
 /**
- * This is the main driver contract that is used to control and run the service. Funds 
- * are managed through this function, underlying contracts are also updated through 
+ * This is the main driver contract that is used to control and run the service. Funds
+ * are managed through this function, underlying contracts are also updated through
  * this contract.
  *
  * This class also exposes a set of creation methods that are allowed to be created
  * by an approved token creator, on behalf of a particular address.  This is meant
- * to simply the creation flow for MakersToken users that aren't familiar with 
- * the blockchain.  The ERC721 tokens that are created are still fully compliant, 
- * although it is possible for a malicious token creator to mint unwanted tokens 
+ * to simply the creation flow for MakersToken users that aren't familiar with
+ * the blockchain.  The ERC721 tokens that are created are still fully compliant,
+ * although it is possible for a malicious token creator to mint unwanted tokens
  * on behalf of a creator.  Worst case, the creator can burn those tokens.
  */
 contract DigitalMediaCore is DigitalMediaToken {
@@ -1855,21 +1855,21 @@ contract DigitalMediaCore is DigitalMediaToken {
 
     // OboApproveAll Event
     event OboApprovalForAll(
-        address _owner, 
-        address _operator, 
+        address _owner,
+        address _operator,
         bool _approved);
 
     // Fired when disbaling obo capability.
     event OboDisabledForAll(address _operator);
 
     constructor (
-        string _tokenName, 
-        string _tokenSymbol, 
-        uint256 _tokenIdStartingCounter, 
+        string _tokenName,
+        string _tokenSymbol,
+        uint256 _tokenIdStartingCounter,
         address _dmsAddress,
         address _crsAddress)
             public DigitalMediaToken(
-                _tokenName, 
+                _tokenName,
                 _tokenSymbol,
                 _tokenIdStartingCounter) {
         paused = true;
@@ -1880,9 +1880,9 @@ contract DigitalMediaCore is DigitalMediaToken {
     /**
      * Retrieves a Digital Media object.
      */
-    function getDigitalMedia(uint256 _id) 
-            external 
-            view 
+    function getDigitalMedia(uint256 _id)
+            external
+            view
             returns (
             uint256 id,
             uint32 totalSupply,
@@ -1904,9 +1904,9 @@ contract DigitalMediaCore is DigitalMediaToken {
     /**
      * Retrieves a collection.
      */
-    function getCollection(uint256 _id) 
-            external 
-            view 
+    function getCollection(uint256 _id)
+            external
+            view
             returns (
             uint256 id,
             address creator,
@@ -1921,9 +1921,9 @@ contract DigitalMediaCore is DigitalMediaToken {
     /**
      * Retrieves a Digital Media Release (i.e a token)
      */
-    function getDigitalMediaRelease(uint256 _id) 
-            external 
-            view 
+    function getDigitalMediaRelease(uint256 _id)
+            external
+            view
             returns (
             uint256 id,
             uint32 printEdition,
@@ -1940,8 +1940,8 @@ contract DigitalMediaCore is DigitalMediaToken {
      *
      * No creations of any kind are allowed when the contract is paused.
      */
-    function createCollection(string _metadataPath) 
-            external 
+    function createCollection(string _metadataPath)
+            external
             whenNotPaused {
         _createCollection(msg.sender, _metadataPath);
     }
@@ -1949,8 +1949,8 @@ contract DigitalMediaCore is DigitalMediaToken {
     /**
      * Creates a new digital media object.
      */
-    function createDigitalMedia(uint32 _totalSupply, uint256 _collectionId, string _metadataPath) 
-            external 
+    function createDigitalMedia(uint32 _totalSupply, uint256 _collectionId, string _metadataPath)
+            external
             whenNotPaused {
         _createDigitalMedia(msg.sender, _totalSupply, _collectionId, _metadataPath);
     }
@@ -1965,7 +1965,7 @@ contract DigitalMediaCore is DigitalMediaToken {
                 uint256 _collectionId,
                 string _metadataPath,
                 uint32 _numReleases)
-            external 
+            external
             whenNotPaused {
         uint256 digitalMediaId = _createDigitalMedia(msg.sender, _totalSupply, _collectionId, _metadataPath);
         _createDigitalMediaReleases(msg.sender, digitalMediaId, _numReleases);
@@ -1978,11 +1978,11 @@ contract DigitalMediaCore is DigitalMediaToken {
      * No creations of any kind are allowed when the contract is paused.
      */
     function createDigitalMediaAndReleasesInNewCollection(
-                uint32 _totalSupply, 
+                uint32 _totalSupply,
                 string _digitalMediaMetadataPath,
                 string _collectionMetadataPath,
                 uint32 _numReleases)
-            external 
+            external
             whenNotPaused {
         uint256 collectionId = _createCollection(msg.sender, _collectionMetadataPath);
         uint256 digitalMediaId = _createDigitalMedia(msg.sender, _totalSupply, collectionId, _digitalMediaMetadataPath);
@@ -1994,15 +1994,15 @@ contract DigitalMediaCore is DigitalMediaToken {
      *
      * No creations of any kind are allowed when the contract is paused.
      */
-    function createDigitalMediaReleases(uint256 _digitalMediaId, uint32 _numReleases) 
-            external 
+    function createDigitalMediaReleases(uint256 _digitalMediaId, uint32 _numReleases)
+            external
             whenNotPaused {
         _createDigitalMediaReleases(msg.sender, _digitalMediaId, _numReleases);
     }
 
     /**
      * Deletes a token / digital media release. Doesn't modify the current print index
-     * and total to be printed. Although dangerous, the owner of a token should always 
+     * and total to be printed. Although dangerous, the owner of a token should always
      * be able to burn a token they own.
      *
      * Only the owner of the token or accounts approved by the owner can burn this token.
@@ -2020,8 +2020,8 @@ contract DigitalMediaCore is DigitalMediaToken {
      * Ends the production run of a digital media.  Afterwards no more tokens
      * will be allowed to be printed for this digital media.  Used when a creator
      * makes a mistake and wishes to burn and recreate their digital media.
-     * 
-     * When a contract is paused we do not allow new tokens to be created, 
+     *
+     * When a contract is paused we do not allow new tokens to be created,
      * so stopping the production of a token doesn't have much purpose.
      */
     function burnDigitalMedia(uint256 _digitalMediaId) external whenNotPaused {
@@ -2036,8 +2036,8 @@ contract DigitalMediaCore is DigitalMediaToken {
     }
 
     /**
-     * Changes the creator for the current sender, in the event we 
-     * need to be able to mint new tokens from an existing digital media 
+     * Changes the creator for the current sender, in the event we
+     * need to be able to mint new tokens from an existing digital media
      * print production. When changing creator, the old creator will
      * no longer be able to mint tokens.
      *
@@ -2053,9 +2053,9 @@ contract DigitalMediaCore is DigitalMediaToken {
     }
 
     /**********************************************************************/
-    /**Calls that are allowed to be called by approved creator addresses **/ 
+    /**Calls that are allowed to be called by approved creator addresses **/
     /**********************************************************************/
-    
+
     /**
      * Add a new approved token creator.
      *
@@ -2080,8 +2080,8 @@ contract DigitalMediaCore is DigitalMediaToken {
     */
     modifier isApprovedCreator() {
         require(
-            (approvedTokenCreators[msg.sender] == true && 
-             disabledOboOperators[msg.sender] != true), 
+            (approvedTokenCreators[msg.sender] == true &&
+             disabledOboOperators[msg.sender] != true),
             "Unapproved OBO address.");
         _;
     }
@@ -2103,10 +2103,10 @@ contract DigitalMediaCore is DigitalMediaToken {
     }
 
     /**
-     * Only called in a disaster scenario if the account has been compromised.  
-     * There's no turning back from this and the oboAddress will no longer be 
-     * able to be given approval rights or perform obo functions.  
-     * 
+     * Only called in a disaster scenario if the account has been compromised.
+     * There's no turning back from this and the oboAddress will no longer be
+     * able to be given approval rights or perform obo functions.
+     *
      * Only the owner of this contract is allowed to disable an Obo address.
      *
      */
@@ -2143,11 +2143,11 @@ contract DigitalMediaCore is DigitalMediaToken {
      */
     function oboCreateDigitalMediaAndReleases(
                 address _owner,
-                uint32 _totalSupply, 
-                uint256 _collectionId, 
+                uint32 _totalSupply,
+                uint256 _collectionId,
                 string _metadataPath,
                 uint32 _numReleases)
-            external 
+            external
             whenNotPaused
             isApprovedCreator {
         uint256 digitalMediaId = _createDigitalMedia(_owner, _totalSupply, _collectionId, _metadataPath);
@@ -2165,11 +2165,11 @@ contract DigitalMediaCore is DigitalMediaToken {
      */
     function oboCreateDigitalMediaAndReleasesInNewCollection(
                 address _owner,
-                uint32 _totalSupply, 
+                uint32 _totalSupply,
                 string _digitalMediaMetadataPath,
                 string _collectionMetadataPath,
                 uint32 _numReleases)
-            external 
+            external
             whenNotPaused
             isApprovedCreator {
         uint256 collectionId = _createCollection(_owner, _collectionMetadataPath);
@@ -2188,11 +2188,22 @@ contract DigitalMediaCore is DigitalMediaToken {
     function oboCreateDigitalMediaReleases(
                 address _owner,
                 uint256 _digitalMediaId,
-                uint32 _numReleases) 
-            external 
+                uint32 _numReleases)
+            external
             whenNotPaused
             isApprovedCreator {
         _createDigitalMediaReleases(_owner, _digitalMediaId, _numReleases);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

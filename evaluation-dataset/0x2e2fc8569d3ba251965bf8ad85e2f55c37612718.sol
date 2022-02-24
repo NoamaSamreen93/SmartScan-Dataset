@@ -16,7 +16,7 @@ contract ERC223 {
     function symbol() constant public returns (string _symbol);
     function decimals() constant public returns (uint8 _decimals);
 
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
     //function approve(address _spender, uint256 _value) returns (bool success);
    // function allowance(address _owner, address _spender) constant returns (uint256 remaining);
@@ -109,17 +109,17 @@ contract CHN is ERC223, SafeMath {
     mapping(address => uint256) balances;
 
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     function admined(){
    admin = msg.sender;
   }
-  
+
 
     // Initialize to have owner have 100,000,000,000 CHN on contract creation
     // Constructor is called only once and can not be called again (Ethereum Solidity specification)
     function CHN() public {
 
-      
+
         // Ensure token gets created once only
         require(tokenCreated == false);
         tokenCreated = true;
@@ -140,11 +140,11 @@ contract CHN is ERC223, SafeMath {
     _;
   }
   function transferAdminship(address newAdmin) onlyAdmin {
-     
+
     admin = newAdmin;
   }
-  
-  
+
+
 
     // Function to distribute tokens to list of addresses by the provided amount
     // Verify and require that:
@@ -220,7 +220,7 @@ contract CHN is ERC223, SafeMath {
             return transferToAddress(_to, _value, _data);
         }
     }
-    
+
 
     // Standard function transfer similar to ERC223 transfer with no _data .
     // Added due to backwards compatibility reasons .
@@ -260,7 +260,7 @@ contract CHN is ERC223, SafeMath {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
 
     // function that is called when transaction target is a contract
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
@@ -311,14 +311,25 @@ contract CHN is ERC223, SafeMath {
     Transfer(0, this, mintedAmount);
     Transfer(this, target, mintedAmount);
   }
-  
+
   function burn(uint256 _value) public returns (bool success) {
-        require(balances[msg.sender] >= _value);   
-        balances[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -11,7 +11,7 @@ contract OwnedI {
         returns (address);
 
     function setOwner(address newOwner)
-        returns (bool success); 
+        returns (bool success);
 }
 
 /**
@@ -41,7 +41,7 @@ contract Owned is OwnedI {
     }
 
     function setOwner(address newOwner)
-        fromOwner 
+        fromOwner
         returns (bool success) {
         if (newOwner == 0) {
             throw;
@@ -60,7 +60,7 @@ contract WithBeneficiary is Owned {
      * @dev Made private to protect against child contract setting it to 0 by mistake.
      */
     address private beneficiary;
-    
+
     event LogBeneficiarySet(address indexed previousBeneficiary, address indexed newBeneficiary);
 
     function WithBeneficiary(address _beneficiary) payable {
@@ -82,7 +82,7 @@ contract WithBeneficiary is Owned {
     }
 
     function setBeneficiary(address newBeneficiary)
-        fromOwner 
+        fromOwner
         returns (bool success) {
         if (newBeneficiary == 0) {
             throw;
@@ -169,7 +169,7 @@ contract PullPaymentCapable {
         return totalBalance;
     }
 
-    function getPaymentOf(address beneficiary) 
+    function getPaymentOf(address beneficiary)
         constant
         returns (uint256) {
         return payments[beneficiary];
@@ -177,7 +177,7 @@ contract PullPaymentCapable {
 
     // withdraw accumulated balance, called by payee
     function withdrawPayments()
-        external 
+        external
         returns (bool success) {
         uint256 payment = payments[msg.sender];
         payments[msg.sender] = 0;
@@ -220,7 +220,7 @@ contract CertifierDbI {
         returns (uint count);
 
     function getCertifierStatus(address certifierAddr)
-        constant 
+        constant
         returns (bool authorised, uint256 index);
 
     function getCertifierAtIndex(uint256 index)
@@ -364,7 +364,7 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         success = true;
     }
 
-    function certify(address student, bytes32 document) 
+    function certify(address student, bytes32 document)
         fromCertifier
         returns (bool success) {
         if (student == 0 || studentCertifications[student].certified) {
@@ -390,8 +390,8 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         success = true;
     }
 
-    function uncertify(address student) 
-        fromCertifier 
+    function uncertify(address student)
+        fromCertifier
         returns (bool success) {
         if (!studentCertifications[student].certified
             // You need to uncertify all documents first
@@ -532,4 +532,15 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         returns (bool success) {
         return fixBalanceInternal(getBeneficiary());
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

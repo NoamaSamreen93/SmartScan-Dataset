@@ -187,7 +187,7 @@ interface IPyroToken {
 contract Furance is Ownable {
   event Burn(address indexed sender, address indexed token, uint value, uint pyroValue);
   using SafeMath for uint;
-  
+
   bool public extinguished;
   uint public ashes;
   IPyroToken public pyro;
@@ -219,7 +219,7 @@ contract Furance is Ownable {
       if (bit == 1)
         res = res.mul(x).div(DECIMAL_MULTIPLIER);
       if (t==0) break;
-      z = t; 
+      z = t;
       x = x.mul(x).div(DECIMAL_MULTIPLIER);
     }
     return res;
@@ -297,10 +297,21 @@ contract Furance is Ownable {
     pyro.mint(msg.sender, c_i);
     emit Burn(msg.sender, token_, b_i, c_i);
     return true;
-  } 
+  }
 
   function addFuel(address token_, uint a, uint kappa0, uint w) public onlyOwner notExitgushed returns (bool) {
     tokens[token_] = token(true, a, 0, 0, 0, kappa0, w, block.number);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

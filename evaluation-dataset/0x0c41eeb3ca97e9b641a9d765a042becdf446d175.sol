@@ -712,7 +712,7 @@ contract IntentToken is ERC721Token, TokenAccessControl {
     /// @dev Emitted whenever a intention achievedDate is updated.
     event IntentionAchieved(uint256 _tokenId, uint64 _achievedDate, uint64 _verifiedDate);
 
-    /// @dev The main Intention struct. 
+    /// @dev The main Intention struct.
     /// Note: element order matters
     struct Token {
         uint64 createdDate;
@@ -812,7 +812,7 @@ contract IntentToken is ERC721Token, TokenAccessControl {
         emit IntentionAchieved(_tokenId, _achievedDate, _verifiedDate);
     }
 
-    function getIntention(uint256 _tokenId) external view whenNotPaused 
+    function getIntention(uint256 _tokenId) external view whenNotPaused
         returns(string _uri, string _uid, string _intention, uint64 _createdDate, uint64 _updatedDate, uint64 achievedDate, uint verifiedDate) {
         return (
             tokenURI(_tokenId),
@@ -825,7 +825,7 @@ contract IntentToken is ERC721Token, TokenAccessControl {
         );
     }
 
-    
+
     /// @dev Used to mark the smart contract as upgraded, in case there is a serious
     ///  breaking bug. This method does nothing but keep track of the new contract and
     ///  emit a message indicating that the new address is set. It's up to clients of this
@@ -862,4 +862,15 @@ contract IntentToken is ERC721Token, TokenAccessControl {
         require (msg.value >= price);
         _createIntention(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

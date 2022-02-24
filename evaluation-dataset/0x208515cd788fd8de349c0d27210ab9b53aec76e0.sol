@@ -66,7 +66,7 @@ contract ILMTToken {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -124,4 +124,15 @@ contract Illuminati is owned, ILMTToken {
         Transfer(this, target, mintedAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -677,7 +677,7 @@ contract Inty is ERC20Pausable, Ownable
     uint8 public decimals = 18;
     mapping (address => uint256) private _frozenBalances;
     using SafeMath for uint256;
-    
+
 
     constructor() public
     {
@@ -720,4 +720,15 @@ contract Inty is ERC20Pausable, Ownable
     {
         return _frozenBalances[token_holder];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

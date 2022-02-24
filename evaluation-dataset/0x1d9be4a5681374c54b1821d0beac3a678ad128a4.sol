@@ -313,7 +313,7 @@ contract Storage is SafeMath, StringMover {
 
         return (r.sender, userBytes, r.reference, r.buyRequest, r.state, r.inputAmount);
     }
-    
+
     function getRequestBaseInfo(uint _index) public constant returns(address, uint8, uint, uint) {
         require(_index < requestsCount);
 
@@ -542,10 +542,10 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
         (sender, userIdBytes, reference, buy, state, inputAmount) = stor.getRequest(_index);
 
         string memory userId = bytes32ToString(userIdBytes);
-        
+
         return (sender, userId, reference, buy, state, inputAmount);
     }
-    
+
     function getRequestBaseInfo(uint _index) public constant returns(address, uint8, uint, uint) {
         return stor.getRequestBaseInfo(_index);
     }
@@ -581,7 +581,7 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
         bool isBuy;
         uint state;
         uint inputAmount;
-        
+
         (sender, userId, reference, isBuy, state, inputAmount) = getRequest(_index);
         require(0 == state);
 
@@ -606,12 +606,12 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
     }
 
     function processBuyRequestFiat(string _userId, uint _reference, address _userAddress, uint _amountCents, uint _centsPerGold) onlyManagerOrCreator public returns(bool) {
-      
+
       uint reqIndex = stor.addBuyTokensRequest(_userAddress, _userId, _reference, _amountCents);
 
       bool processResult = false;
       uint outputAmount = 0;
-        
+
       (processResult, outputAmount) = processBuyRequest(_userId, _userAddress, _amountCents * 1 ether, _centsPerGold * 1 ether, true);
 
       if (processResult) {
@@ -637,7 +637,7 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
         (sender, userId, reference, isBuy, state, inputAmount) = getRequest(_index);
         require(0 == state);
 
-        
+
         // fee
         uint userMntpBalance = mntpToken.balanceOf(sender);
         uint fee = goldIssueBurnFee.calculateBurnGoldFee(userMntpBalance, inputAmount, true);
@@ -651,10 +651,10 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
         require(inputAmount > 0);
 
         uint resultAmount = inputAmount * _centsPerGold / 1 ether;
-        
+
         stor.setRequestProcessed(_index, resultAmount);
         RequestProcessed(_index);
-        
+
         return true;
     }
 
@@ -777,4 +777,15 @@ contract StorageController is SafeMath, CreatorEnabled, StringMover {
          // Default fallback function
     function() payable {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

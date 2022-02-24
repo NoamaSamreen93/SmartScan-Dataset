@@ -136,10 +136,10 @@ contract Queue {
 	address constant private PROMO2 = 0xF892380E9880Ad0843bB9600D060BA744365EaDf;
 	address constant private PROMO3	= 0x35aAF2c74F173173d28d1A7ce9d255f639ac1625;
 	address constant private PRIZE	= 0xa93E50526B63760ccB5fAD6F5107FA70d36ABC8b;
-	
+
 	//Percent for promo expences
     uint constant public PROMO_PERCENT = 2;
-		
+
     //The deposit structure holds all the info about the deposit made
     struct Deposit {
         address depositor; // The depositor address
@@ -155,14 +155,14 @@ contract Queue {
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
-        
+
         require(block.number >= 6612602);
 
         if(msg.value > 0){
 
             require(gasleft() >= 250000); // We need gas to process queue
             require(msg.value >= 0.15 ether && msg.value <= calcMaxDeposit()); // Too small and too big deposits are not accepted
-            
+
             // Add the investor into the queue
             queue.push( Deposit(msg.sender, msg.value, 0) );
             depositNumber[msg.sender] = queue.length;
@@ -178,7 +178,7 @@ contract Queue {
             PROMO3.send(promo3);
             uint prize = msg.value*1/100;
             PRIZE.send(prize);
-            
+
             // Pay to first investors in line
             pay();
 
@@ -282,4 +282,15 @@ contract Queue {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -128,7 +128,16 @@ contract soowhat is StandardToken {
   uint8 public constant decimals = 0;
 
   function soowhat() public {
-    totalSupply = 10000000000;  
+    totalSupply = 10000000000;
     balances[msg.sender] = totalSupply;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -139,10 +139,10 @@ contract TempleOfETH {
     address public fuse;
 
     /// @dev starting
-    uint256 public startTime = 0; 
+    uint256 public startTime = 0;
 
     /// @dev one shot
-    bool public startCalled = false; 
+    bool public startCalled = false;
 
 
    /*=================================
@@ -171,7 +171,7 @@ contract TempleOfETH {
      //cadmael
      ambassadors_[0x5aFa2A530B83E239261Aa46C6c29c9dF371FAA62]=true;
      ambassadors_[0x2fB1163A439fb5FC3a3b169E9519EAbd92E9fef2]=true;
-     
+
    }
 
     /*=======================================
@@ -638,4 +638,13 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

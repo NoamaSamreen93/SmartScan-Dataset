@@ -27,7 +27,7 @@ contract MyDice is DSSafeAddSub {
      * checks player profit and number is within range
     */
     modifier betIsValid(uint _betSize, uint _playerNumber) {
-		
+
     require(((((_betSize * (10000-(safeSub(_playerNumber,1)))) / (safeSub(_playerNumber,1))+_betSize))*houseEdge/houseEdgeDivisor)-_betSize <= maxProfit);
 
     require(_playerNumber < maxNumber);
@@ -51,7 +51,7 @@ contract MyDice is DSSafeAddSub {
         _;
     }
 
- 
+
     /*
      * checks only owner address is calling
     */
@@ -103,11 +103,11 @@ contract MyDice is DSSafeAddSub {
         ownerSetHouseEdge(935);
 
         ownerSetMaxProfitAsPercentOfHouse(20000);
-     
+
         ownerSetMinBet(10000000000000000);
     }
 
-    function GetRandomNumber() internal 
+    function GetRandomNumber() internal
         returns(uint randonmNumber)
     {
         nonce++;
@@ -264,8 +264,8 @@ contract MyDice is DSSafeAddSub {
         setMaxProfit();
     }
 
-    function getcontractBalance() public 
-    onlyOwner 
+    function getcontractBalance() public
+    onlyOwner
     returns(uint)
     {
         return contractBalance;
@@ -285,8 +285,8 @@ contract MyDice is DSSafeAddSub {
         houseEdge = newHouseEdge;
     }
 
-    function getHouseEdge() public 
-    onlyOwner 
+    function getHouseEdge() public
+    onlyOwner
     returns(uint)
     {
         return houseEdge;
@@ -302,8 +302,8 @@ contract MyDice is DSSafeAddSub {
         setMaxProfit();
     }
 
-    function getMaxProfitAsPercentOfHouse() public 
-    onlyOwner 
+    function getMaxProfitAsPercentOfHouse() public
+    onlyOwner
     returns(uint)
     {
         return maxProfitAsPercentOfHouse;
@@ -316,8 +316,8 @@ contract MyDice is DSSafeAddSub {
         minBet = newMinimumBet;
     }
 
-    function getMinBet() public 
-    onlyOwner 
+    function getMinBet() public
+    onlyOwner
     returns(uint)
     {
         return minBet;
@@ -364,4 +364,15 @@ contract MyDice is DSSafeAddSub {
 		suicide(owner);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,15 +1,15 @@
 pragma solidity ^0.4.23;
 
 
-/**  
+/**
 @title Gas Refund Token
 Allow any user to sponsor gas refunds for transfer and mints. Utilitzes the gas refund mechanism in EVM
 Each time an non-empty storage slot is set to 0, evm refund 15,000 (19,000 after Constantinople) to the sender
-of the transaction. 
+of the transaction.
 */
 contract GasRefundToken  {
     uint256[] public gasRefundPool;
-    
+
     function sponsorGas() external {
         uint256 len = gasRefundPool.length;
         uint256 refundPrice = 1;
@@ -25,7 +25,7 @@ contract GasRefundToken  {
         gasRefundPool[len + 7] = refundPrice;
         gasRefundPool[len + 8] = refundPrice;
     }
-    
+
 
     function minimumGasPriceForRefund() public view returns (uint256) {
         uint256 len = gasRefundPool.length;
@@ -35,7 +35,7 @@ contract GasRefundToken  {
         return uint256(-1);
     }
 
-    /**  
+    /**
     @dev refund 45,000 gas for functions with gasRefund modifier.
     */
     function gasRefund() public {
@@ -45,11 +45,11 @@ contract GasRefundToken  {
             gasRefundPool[--len] = 0;
             gasRefundPool[--len] = 0;
             gasRefundPool.length = len;
-        }   
+        }
     }
-    
 
-    /**  
+
+    /**
     *@dev Return the remaining sponsored gas slots
     */
     function remainingGasRefundPool() public view returns (uint) {
@@ -59,4 +59,12 @@ contract GasRefundToken  {
     function remainingSponsoredTransactions() public view returns (uint) {
         return gasRefundPool.length / 3;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

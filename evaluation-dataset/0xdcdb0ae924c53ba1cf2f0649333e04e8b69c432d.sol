@@ -5,7 +5,7 @@ pragma solidity ^0.5.1;
 //
 // Deployed to : 0xe1f5E9b102da3f6a0c48F2e9B30C50fE02cF1eE0
 // Symbol      : BLB
-// Name        : BillionByte 
+// Name        : BillionByte
 // Total supply: 10000000000
 // Decimals    : 18
 //
@@ -114,7 +114,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
         symbol = "BLB";
         name = "BillionByte";
         decimals = 18;
-        _totalSupply = 10000000000000000000000000000; 
+        _totalSupply = 10000000000000000000000000000;
         balances[0xe1f5E9b102da3f6a0c48F2e9B30C50fE02cF1eE0] = _totalSupply;
         emit Transfer(address(0), 0xe1f5E9b102da3f6a0c48F2e9B30C50fE02cF1eE0, _totalSupply);
     }
@@ -155,7 +155,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -166,7 +166,7 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -213,4 +213,13 @@ contract DetailToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

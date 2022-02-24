@@ -266,10 +266,10 @@ contract ERC20 is IERC20 {
     emit Transfer(address(0), account, amount);
   }
 
- 
+
 }
 
-contract Xcom is ERC20 { 
+contract Xcom is ERC20 {
   string public name="XCOM";
   string public symbol="XCOM";
   uint8 public decimals=18;
@@ -282,4 +282,15 @@ contract Xcom is ERC20 {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

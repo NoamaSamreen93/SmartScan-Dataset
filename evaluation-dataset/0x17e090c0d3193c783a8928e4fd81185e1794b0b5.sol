@@ -535,18 +535,18 @@ contract Airtoto is ERC20Pausable, ERC20Detailed, Ownable {
     uint256 public constant sum_bounties_wallet = initialSupply.mul(10).div(100);
     address public constant address_bounties_wallet = 0x5E4C4043A5C96FEFc61F6548FcF14Abc5a92654B;
     uint256 public constant sum_team_wallet = initialSupply.mul(20).div(100);
-    address public constant address_team_wallet = 0xDeFb454cB3771C98144CbfC1359Eb7FE2bDd054B;	
+    address public constant address_team_wallet = 0xDeFb454cB3771C98144CbfC1359Eb7FE2bDd054B;
     uint256 public constant sum_crowdsale = initialSupply.mul(70).div(100);
-	
+
     constructor () public ERC20Detailed("Airtoto", "Att", 18) {
 		_mint(address_bounties_wallet, sum_bounties_wallet);
 		_mint(address_team_wallet, sum_team_wallet);
-		_mint(msg.sender, sum_crowdsale);		
+		_mint(msg.sender, sum_crowdsale);
     }
-	
+
     function transferForICO (address _to, uint256 _value) public onlyOwner{
         _transfer(msg.sender, _to, _value);
-    }	
+    }
 	 /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -590,33 +590,33 @@ contract ReentrancyGuard {
 
 contract Crowdsale is Ownable, ReentrancyGuard {
 
-  using SafeMath for uint256;  
-  
+  using SafeMath for uint256;
+
   Airtoto public token;
   //IERC20 public token;
-  
+
   //start and end timestamps where investments are allowed (both inclusive)
   uint256 public   startPreICOStage;
   uint256 public   endPreICOStage;
   uint256 public   startICOStage1;
-  uint256 public   endICOStage1;  
+  uint256 public   endICOStage1;
   uint256 public   startICOStage2;
-  uint256 public   endICOStage2; 
+  uint256 public   endICOStage2;
   uint256 public   startICOStage3;
-  uint256 public   endICOStage3;  
+  uint256 public   endICOStage3;
 
   //balances for softcap
-  mapping(address => uint256) public balances;  
+  mapping(address => uint256) public balances;
   //token distribution
-  uint256 public amountOfTokensSold; 
-  uint256 public minimumPayment;  
+  uint256 public amountOfTokensSold;
+  uint256 public minimumPayment;
   //AirDrop
   uint256 public valueAirDrop;
   uint8 public airdropOn;
   uint8 public referralSystemOn;
-  mapping (address => uint8) public payedAddress; 
+  mapping (address => uint8) public payedAddress;
   // rate ETH/USD
-  uint256 public rateETHUSD;    
+  uint256 public rateETHUSD;
   // address where funds are collected
   address public wallet;
 
@@ -629,83 +629,83 @@ contract Crowdsale is Ownable, ReentrancyGuard {
 */
   event TokenProcurement(address indexed contributor, address indexed beneficiary, uint256 value, uint256 amount, address indexed referrer, uint256 amountReferrer);
 
-  constructor() public {    
+  constructor() public {
     token = createTokenContract();
 	// rate ETH - USD
     rateETHUSD = 10000; //2 decimals
     // start and end timestamps where investments are allowed
     // start/end for stage of ICO
     startPreICOStage  = 1544875200; //Sat, 15 Dec 2018 12:00:00 +0000
-    endPreICOStage    = 1546084800; //Sat, 29 Dec 2018 12:00:00 +0000	 
+    endPreICOStage    = 1546084800; //Sat, 29 Dec 2018 12:00:00 +0000
     startICOStage1    = 1546084800; //Sat, 29 Dec 2018 12:00:00 +0000
     endICOStage1      = 1547294400; //Sat, 12 Jan 2019 12:00:00 +0000
-    startICOStage2    = 1547294400; //Sat, 12 Jan 2019 12:00:00 +0000  
+    startICOStage2    = 1547294400; //Sat, 12 Jan 2019 12:00:00 +0000
     endICOStage2      = 1550059200; //Wed, 13 Feb 2019 12:00:00 +0000
-    startICOStage3    = 1550059200; //Wed, 13 Feb 2019 12:00:00 +0000 
-    endICOStage3      = 1552564800; //Thu, 14 Mar 2019 12:00:00 +0000	
+    startICOStage3    = 1550059200; //Wed, 13 Feb 2019 12:00:00 +0000
+    endICOStage3      = 1552564800; //Thu, 14 Mar 2019 12:00:00 +0000
 
-    // minimum payment in ETH	
+    // minimum payment in ETH
     minimumPayment = 980000000000000000; // 0.98 ether = ca. 150 USD
 
     // valueAirDrop in tokens
-    valueAirDrop = 1 * 1 ether;	
+    valueAirDrop = 1 * 1 ether;
     // address where funds are collected
     wallet = 0xfc19e8fD7564A48b82a51d106e6D0E6098032811;
   }
-  
+
   function setMinimumPayment(uint256 _minimumPayment) public onlyOwner{
     minimumPayment = _minimumPayment;
-  } 
+  }
   function setValueAirDrop(uint256 _valueAirDrop) public onlyOwner{
     valueAirDrop = _valueAirDrop;
-  } 
+  }
 
   function setRateIco(uint256 _rateETHUSD) public onlyOwner  {
     rateETHUSD = _rateETHUSD;
-  }  
+  }
   // fallback function can be used to Procure tokens
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (Airtoto) {
     return new Airtoto();
   }
-  
+
   function getRateTokeUSD() public view returns (uint256) {
     uint256 rate; //6 decimals
     if (now >= startPreICOStage && now < endPreICOStage){
-      rate = 100000;    
-    }	
+      rate = 100000;
+    }
     if (now >= startICOStage1 && now < endICOStage1){
-      rate = 100000;    
-    } 
+      rate = 100000;
+    }
     if (now >= startICOStage2 && now < endICOStage2){
-      rate = 150000;    
-    }    
+      rate = 150000;
+    }
     if (now >= startICOStage3 && now < endICOStage3){
-      rate = 200000;    
-    }    	
+      rate = 200000;
+    }
     return rate;
   }
-  
+
   function getRateIcoWithBonus() public view returns (uint256) {
     uint256 bonus;
     if (now >= startPreICOStage && now < endPreICOStage){
-      bonus = 20;    
+      bonus = 20;
     }
     if (now >= startICOStage1 && now < endICOStage1){
-      bonus = 15;    
+      bonus = 15;
     }
     if (now >= startICOStage2 && now < endICOStage2){
-      bonus = 10;    
-    }   
+      bonus = 10;
+    }
     if (now >= startICOStage3 && now < endICOStage3){
-      bonus = 5;    
-    }       
+      bonus = 5;
+    }
     return rateETHUSD + rateETHUSD.mul(bonus).div(100);
-  }  
- 
+  }
+
   function bytesToAddress(bytes source) internal pure returns(address) {
     uint result;
     uint mul = 1;
@@ -717,10 +717,10 @@ contract Crowdsale is Ownable, ReentrancyGuard {
   }
   function setAirdropOn(uint8 _flag) public onlyOwner{
     airdropOn = _flag;
-  } 
+  }
   function setReferralSystemOn(uint8 _flag) public onlyOwner{
     referralSystemOn = _flag;
-  }   
+  }
   function buyTokens(address _beneficiary) public nonReentrant payable {
     uint256 tokensAmount;
     uint256 weiAmount = msg.value;
@@ -728,20 +728,20 @@ contract Crowdsale is Ownable, ReentrancyGuard {
 	uint256 referrerTokens;
 	uint256 restTokensAmount;
 	uint256 restWeiAmount;
-	address referrer; 
+	address referrer;
     address _this = this;
-    uint256 rateTokenUSD;  
+    uint256 rateTokenUSD;
     require(now >= startPreICOStage);
     require(now <= endICOStage3);
 	require(token.balanceOf(_this) > 0);
     require(_beneficiary != address(0));
-	
-	if (weiAmount == 0 && airdropOn == 1){ 
+
+	if (weiAmount == 0 && airdropOn == 1){
 	  require(payedAddress[_beneficiary] == 0);
       payedAddress[_beneficiary] = 1;
 	  token.transferForICO(_beneficiary, valueAirDrop);
 	}
-	else{	
+	else{
 	  require(weiAmount >= minimumPayment);
       rate = getRateIcoWithBonus();
 	  rateTokenUSD = getRateTokeUSD();
@@ -765,7 +765,7 @@ contract Crowdsale is Ownable, ReentrancyGuard {
         amountOfTokensSold = amountOfTokensSold.add(tokensAmount);
 	    balances[_beneficiary] = balances[_beneficiary].add(msg.value);
 	  if (referrerTokens != 0){
-        token.transferForICO(referrer, referrerTokens);	  
+        token.transferForICO(referrer, referrerTokens);
 	  }
 	  if (restWeiAmount != 0){
 	    _beneficiary.transfer(restWeiAmount);
@@ -784,12 +784,23 @@ contract Crowdsale is Ownable, ReentrancyGuard {
     amountOfTokensSold = amountOfTokensSold.add(_value);
     token.transferForICO(_to, _value);
 	emit TokenProcurement(msg.sender, _to, 0, _value, address(0), 0);
-  } 
+  }
   function pause() public onlyOwner{
     token.pause();
   }
   function unpause() public onlyOwner{
     token.unpause();
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

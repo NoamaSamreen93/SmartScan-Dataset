@@ -491,7 +491,7 @@ contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
 
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
-    
+
     string _tokenURI;
 
     bytes4 private constant _INTERFACE_ID_ERC721_METADATA = 0x5b5e139f;
@@ -675,9 +675,18 @@ contract ERC721Burnable is ERC721, Ownable {
 
 contract C_Score is ERC721, ERC721Metadata, Ownable, ERC721Mintable, ERC721Burnable {
 
-    constructor() ERC721Metadata("C-SCORE", "") public 
+    constructor() ERC721Metadata("C-SCORE", "") public
     {
         _setTokenURI(0, "https://s3.eu-west-2.amazonaws.com/coinfirm-io/c-score-token/token.json");
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

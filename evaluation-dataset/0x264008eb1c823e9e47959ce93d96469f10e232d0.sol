@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract IRideFoundersAdvisors {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xBeDF65990326Ed2236C5A17432d9a30dbA3aBFEe;
@@ -28,23 +28,23 @@ contract IRideFoundersAdvisors {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
-    
+
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function kill() isCreator public {
@@ -59,4 +59,15 @@ contract IRideFoundersAdvisors {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

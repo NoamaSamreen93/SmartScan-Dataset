@@ -108,7 +108,7 @@ contract Owned {
 
 contract BITFRIENDZ is IERC20, Owned {
     using SafeMath for uint256;
-    
+
     // Constructor - Sets the token Owner
     constructor() public {
         owner = msg.sender;
@@ -121,39 +121,39 @@ contract BITFRIENDZ is IERC20, Owned {
         _balances[address(this)] = 15000000000 * 10 ** decimals;
         emit Transfer(address(0), address(this), 15000000000 * 10 ** decimals);
     }
-    
+
     // Events
     event Error(string err);
-    
+
     // Token Setup
     string public constant name = "BITFRIENDZ";
     string public constant symbol = "BFRN";
     uint256 public constant decimals = 18;
     uint256 public supply = 20000000000 * 10 ** decimals;
-    
+
     uint256 public tokenPrice = 50000000000;
-    
+
     // Balances for each account
     mapping(address => uint256) _balances;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) public _allowed;
- 
+
     // Get the total supply of tokens
     function totalSupply() public view returns (uint) {
         return supply;
     }
- 
+
     // Get the token balance for account `tokenOwner`
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
- 
+
     // Get the allowance of funds beteen a token holder and a spender
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
- 
+
     // Transfer the balance from owner's account to another account
     function transfer(address to, uint value) public returns (bool success) {
         require(_balances[msg.sender] >= value);
@@ -167,14 +167,14 @@ contract BITFRIENDZ is IERC20, Owned {
             return true;
         }
     }
-    
+
     // Sets how much a sender is allowed to use of an owners funds
     function approve(address spender, uint value) public returns (bool success) {
         _allowed[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
     // Transfer from function, pulls from allowance
     function transferFrom(address from, address to, uint value) public returns (bool success) {
         require(value <= balanceOf(from));
@@ -185,7 +185,7 @@ contract BITFRIENDZ is IERC20, Owned {
         emit Transfer(from, to, value);
         return true;
     }
-    
+
     function () external payable {
         require(msg.value >= tokenPrice);
         uint256 amount = (msg.value * 10 ** decimals) / tokenPrice;
@@ -206,7 +206,7 @@ contract BITFRIENDZ is IERC20, Owned {
         _balances[msg.sender] = _balances[msg.sender].add(amount + bonus);
         emit Transfer(address(this), msg.sender, amount + bonus);
     }
-    
+
     function BuyTokens() public payable {
         require(msg.value >= tokenPrice);
         uint256 amount = (msg.value * 10 ** decimals) / tokenPrice;
@@ -227,16 +227,25 @@ contract BITFRIENDZ is IERC20, Owned {
         _balances[msg.sender] = _balances[msg.sender].add(amount + bonus);
         emit Transfer(address(this), msg.sender, amount + bonus);
     }
-    
+
     function endICO() public onlyOwner {
         _balances[msg.sender] = _balances[msg.sender].sub(_balances[address(this)]);
         msg.sender.transfer(address(this).balance);
     }
-    
+
     function burn(uint256 amount) public {
         require(_balances[msg.sender] >= amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
         supply = supply.sub(amount);
         emit Transfer(msg.sender, address(0), amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

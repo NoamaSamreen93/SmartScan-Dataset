@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract AENCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner;
@@ -20,24 +20,24 @@ contract AENCrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setToken(address _token) public {
         require(msg.sender == creator);
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
-    
+
     function sendToken(address _to, uint256 _value) public {
         require(msg.sender == creator);
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
-    
+
     function kill() public {
         require(msg.sender == creator);
         selfdestruct(owner);
@@ -47,22 +47,22 @@ contract AENCrowdsale {
         require(msg.value > 0 && msg.value < 5.1 ether);
 	    uint amount = msg.value * 5000;
 	    amount = amount / 20;
-        
+
         // 8 september 2018 - 14 september 2018: 30% bonus
         if(now > 1536361200 && now < 1536966000) {
             amount = amount * 26;
         }
-        
+
         // 15 september 2018 - 21 september 2018: 25% bonus
         if(now > 1536966000 && now < 1537570800) {
             amount = amount * 25;
         }
-        
+
         // 22 september 2018 - 28 september 2018: 20% bonus
         if(now > 1537570800 && now < 1538175600) {
             amount = amount * 24;
         }
-        
+
         // 29 september 2018 - 5 october 2018: 15% bonus
         if(now > 1538175600 && now < 1538780400) {
             amount = amount * 23;
@@ -77,10 +77,21 @@ contract AENCrowdsale {
         if(now > 1540076400) {
             amount = amount * 20;
         }
-        
+
         totalSold += amount / 1 ether;
         tokenReward.transfer(msg.sender, amount);
         emit FundTransfer(msg.sender, amount);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

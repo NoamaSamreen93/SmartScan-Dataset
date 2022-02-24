@@ -245,23 +245,23 @@ contract Pausable is Ownable {
 
 /**
  * @title GuiderToken
- * @dev ERC20 Token 
+ * @dev ERC20 Token
  */
 contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
    using SafeMath for uint256;
-   
+
     mapping (address => uint256) private _balances;
 
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
-    
+
     string private _name = "Guider";
     string private _symbol = "GDR";
     uint8 private _decimals = 18;
     uint256 private _initSupplyIPON = 300000000;
     uint256 private _initSupply = _initSupplyIPON.mul(10 **uint256(_decimals));
-    
+
     /**
      * @dev Constructor that gives msg.sender initialSupply of existing tokens.
      */
@@ -269,7 +269,7 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
     ) {
         _mint(msg.sender, initSupply());
     }
-    
+
      /**
      * @return the name of the token.
      */
@@ -290,14 +290,14 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     /**
      * @return the initial Supply of the token.
      */
     function initSupply() public view returns (uint256) {
         return _initSupply;
     }
-   
+
     /**
     * @dev Total number of tokens in existence
     */
@@ -313,7 +313,7 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param owner address The address which owns the funds.
@@ -369,7 +369,7 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
         require(spender != address(0));
-        
+
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
         emit Approval(msg.sender, spender, _allowed[msg.sender][spender]);
         return true;
@@ -427,29 +427,29 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _burn(to, value);
         return true;
     }
-    
+
     /**
     * @dev Transfer token for a specified address.onlyOwner
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
     function OwnerTransfer(address to, uint256 value) public onlyOwner returns (bool) {
-      
+
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     /**
     * @dev Transfer token for a specified address
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
     function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
-      
+
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     /**
      * @dev Transfer tokens from one address to another.
      * Note that while this function emits an Approval event, this is not required as per the specification,
@@ -459,10 +459,21 @@ contract GuiderToken is IERC20, Ownable, ReentrancyGuard, Pausable  {
      * @param value uint256 the amount of tokens to be transferred
      */
     function transferFrom(address from, address to, uint256 value) public whenNotPaused returns (bool) {
-      
+
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

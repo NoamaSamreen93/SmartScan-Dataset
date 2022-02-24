@@ -63,21 +63,21 @@ contract owned {
  */
 contract BasicToken {
     using SafeMath for uint256;
-    
+
     uint256       _supply;
     mapping (address => uint256)    _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     function BasicToken() public {    }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address _owner) public view returns (uint256) {
         return _balances[_owner];
     }
-    
+
     /**
      * @dev transfer token for a specified address
      * @param _to The address to transfer to.
@@ -85,21 +85,21 @@ contract BasicToken {
      */
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_balances[msg.sender] >= _value);
-        
+
         _balances[msg.sender] =_balances[msg.sender].sub(_value);
         _balances[_to] =_balances[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
-  
+
 }
 
 contract DBToken is BasicToken,owned {
     string  constant public symbol = "DB";
     string  constant public name = "Digital Block";
-    uint256 constant public decimals =6; 
+    uint256 constant public decimals =6;
     uint256 public lockedCounts = 8*(10**8)*(10**6);
     uint256 public eachUnlockCounts = 2*(10**8)*(10**6);
     //crowdSale end time, May/10/2018
@@ -118,13 +118,13 @@ contract DBToken is BasicToken,owned {
          _balances[msg.sender] =_supply.sub(lockedCounts);
 
         // November/10/2018
-        unlockTimeMap.push(LockStruct({unlockTime:1541779200, locked: true})); 
+        unlockTimeMap.push(LockStruct({unlockTime:1541779200, locked: true}));
         // May/10/2019
-        unlockTimeMap.push(LockStruct({unlockTime:1557417600, locked: true})); 
+        unlockTimeMap.push(LockStruct({unlockTime:1557417600, locked: true}));
         // November/10/2019
-        unlockTimeMap.push(LockStruct({unlockTime:1573315200, locked: true})); 
+        unlockTimeMap.push(LockStruct({unlockTime:1573315200, locked: true}));
         // May/10/2020
-        unlockTimeMap.push(LockStruct({unlockTime:1589040000, locked: true})); 
+        unlockTimeMap.push(LockStruct({unlockTime:1589040000, locked: true}));
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
@@ -154,4 +154,15 @@ contract DBToken is BasicToken,owned {
 
         emit Transfer(0x01, owner, eachUnlockCounts);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

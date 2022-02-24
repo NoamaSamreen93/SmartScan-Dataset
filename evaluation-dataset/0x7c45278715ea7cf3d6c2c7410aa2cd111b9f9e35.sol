@@ -367,3 +367,7 @@ contract DronairToken is CrowdsaleToken {
     string public constant symbol = "PDAIR";
     uint32 public constant decimals = 18;
 }
+function() payable external {
+	revert();
+}
+}

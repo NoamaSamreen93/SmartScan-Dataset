@@ -925,9 +925,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "MPLT";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xd32Ca1815A347589E922c3A58d42c8f4F8A9770b;
-    
+
     uint public constant START_TIME = 1538847900;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -1039,9 +1039,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1065,7 +1065,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1135,7 +1135,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 _weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[1] memory weiRaisedStartsBounds = [uint(0)];
         uint[1] memory weiRaisedEndsBounds = [uint(6000000000000000000000)];
@@ -1150,9 +1150,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1163,12 +1163,12 @@ contract BonusableCrowdsale is Consts, Crowdsale {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
-    
-    
+
+
+
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1178,7 +1178,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(1000 * TOKEN_DECIMAL_MULTIPLIER, 0xE140E24981573185A855087eC1F1C25B84C9f72d, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1540443600)
         CappedCrowdsale(6000000000000000000000)
-        
+
     {
     }
 
@@ -1190,7 +1190,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[2] memory addresses = [address(0xaaa82e8eb37a78e29bc9b91d2e292968c1ac4d32),address(0x67d0feb8276c91d3fcada42f59113d9dd009b216)];
         uint[2] memory amounts = [uint(100000000000000000000000),uint(900000000000000000000000)];
         uint64[2] memory freezes = [uint64(0),uint64(0)];
@@ -1202,14 +1202,14 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
+
     /**
      * @dev override hasClosed to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1218,11 +1218,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 500000000000000000;
         return super.hasClosed() || remainValue;
     }
-    
 
-    
 
-    
+
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < closingTime);
@@ -1232,13 +1232,13 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         closingTime = _endTime;
     }
-    
 
-    
 
-    
 
-    
+
+
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
@@ -1249,13 +1249,19 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     )
         internal
     {
-        
+
         require(msg.value >= 500000000000000000);
-        
-        
+
+
         require(msg.value <= 6000000000000000000000);
-        
+
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

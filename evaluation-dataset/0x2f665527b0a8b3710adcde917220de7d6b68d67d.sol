@@ -49,7 +49,7 @@ contract BasicToken is ERC20 {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
 /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -64,7 +64,7 @@ contract BasicToken is ERC20 {
         }
         return false;
     }
-    
+
 
   /**
    * @dev Transfer tokens from one address to another
@@ -87,7 +87,7 @@ contract BasicToken is ERC20 {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
     function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -578,4 +578,15 @@ contract BiQCrowdFund {
     function() public payable {
         buyTokens(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

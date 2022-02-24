@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-/* 
+/*
  * CodeOfTalent Token Contract
  * =======================
- * 
+ *
  * BASED on the OpenZeppelin Contracts Library.
  * ASSEMBLED & MODIFIED by Codemelt.
  * FOR Code Of Talent.
@@ -266,4 +266,15 @@ contract CodeOfTalentToken is BurnableToken {
       revert("This contract does not accept Ethereum!");
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

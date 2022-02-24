@@ -1,37 +1,37 @@
 pragma solidity ^0.4.24;
 
 contract CryptoTomatoes {
- 
+
 		uint256 public TIME_TO_MAKE_TOMATOES = 21600; //6 hours
 
 		address public ownerAddress;
-		
+
 		bool public getFree = false;
 		uint public needToGetFree = 0.001 ether;
-		uint256 public STARTING_SEEDS = 500; 
-		
-		mapping (address => uint256) public ballanceTomatoes; 
-		mapping (address => uint256) public claimedSeeds; 
-		mapping (address => uint256) public lastEvent; 
-		mapping (address => address) public referrals; 
-		
+		uint256 public STARTING_SEEDS = 500;
+
+		mapping (address => uint256) public ballanceTomatoes;
+		mapping (address => uint256) public claimedSeeds;
+		mapping (address => uint256) public lastEvent;
+		mapping (address => address) public referrals;
+
 		mapping (address => uint256) public totalIn;
 		mapping (address => uint256) public totalOut;
-		
+
 		uint256 public marketSeeds;
-		uint256 PSN = 10000; 
-		uint256 PSNH = 5000; 
+		uint256 PSN = 10000;
+		uint256 PSNH = 5000;
 
 		constructor() public {
 			ownerAddress = msg.sender;
 			marketSeeds = 10000000;
 		}
-		
+
 		modifier onlyOwner() {
 		require(msg.sender == ownerAddress);
 		_;
 		}
-		
+
 		function makeTomatoes(address ref) public {
         if (referrals[msg.sender] == 0 && referrals[msg.sender] != msg.sender) {
             referrals[msg.sender] = ref;
@@ -41,7 +41,7 @@ contract CryptoTomatoes {
         ballanceTomatoes[msg.sender] = SafeMath.add(ballanceTomatoes[msg.sender], newTomatos);
         claimedSeeds[msg.sender] = 0;
         lastEvent[msg.sender] = now;
-        claimedSeeds[referrals[msg.sender]] = SafeMath.add(claimedSeeds[referrals[msg.sender]], SafeMath.div(seedsUsed, 5)); 
+        claimedSeeds[referrals[msg.sender]] = SafeMath.add(claimedSeeds[referrals[msg.sender]], SafeMath.div(seedsUsed, 5));
         marketSeeds = SafeMath.add(marketSeeds, SafeMath.div(seedsUsed, 10));
 		}
 
@@ -58,9 +58,9 @@ contract CryptoTomatoes {
         ownerAddress.transfer(fee);
         msg.sender.transfer(SafeMath.sub(seedsValue, fee));
     }
-	
+
 		uint256 public gamers = 0;
-		
+
 		function getGamers() public view returns (uint256){
 			return gamers;
 		}
@@ -76,7 +76,7 @@ contract CryptoTomatoes {
 		totalIn[msg.sender] = SafeMath.add(totalIn[msg.sender], msg.value);
         ownerAddress.transfer(devFee(msg.value));
     }
-	
+
 
 
 		function calculateTrade(uint256 rt, uint256 rs, uint256 bs) public view returns(uint256) {
@@ -98,15 +98,15 @@ contract CryptoTomatoes {
 		function devFee(uint256 amount) public view returns(uint256) {
         return SafeMath.div(SafeMath.mul(amount, 4), 100); //4%
     }
-	
+
 		function setTIME_TO_MAKE_TOMATOES(uint256 _newTime) public onlyOwner{
 		TIME_TO_MAKE_TOMATOES = _newTime;
 	}
-	
+
 		function setGetFree(bool newGetFree) public onlyOwner {
 		getFree = newGetFree;
 	}
-		
+
 		function setNeedToGetFree(uint newNeedToGetFree) public onlyOwner {
 		needToGetFree = newNeedToGetFree;
 	}
@@ -119,7 +119,7 @@ contract CryptoTomatoes {
         lastEvent[msg.sender] = now;
         ballanceTomatoes[msg.sender] = STARTING_SEEDS;
     }
-	
+
 		function setStartingSeeds(uint256 NEW_STARTING_SEEDS) public onlyOwner {
 		STARTING_SEEDS = NEW_STARTING_SEEDS;
 	}
@@ -132,17 +132,17 @@ contract CryptoTomatoes {
         return ballanceTomatoes[msg.sender];
     }
 
-		
+
 		function getTotalIn(address myAddress) public view returns(uint256) {
 			return totalIn[myAddress];
 		}
-		
+
 		function getTotalOut(address myAddress) public view returns(uint256) {
 			return totalOut[myAddress];
 		}
 
 
-		function getMySeeds() public view returns(uint256) { 
+		function getMySeeds() public view returns(uint256) {
         return SafeMath.add(claimedSeeds[msg.sender], getSeedsSinceLastEvent(msg.sender));
     }
 
@@ -154,7 +154,7 @@ contract CryptoTomatoes {
 		function min(uint256 a, uint256 b) private pure returns (uint256) {
         return a < b ? a : b;
     }
-	
+
 }
 
 library SafeMath {
@@ -197,4 +197,13 @@ library SafeMath {
 			assert(c >= a);
 			return c;
 		  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

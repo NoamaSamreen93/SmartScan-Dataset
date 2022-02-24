@@ -444,7 +444,7 @@ contract BOBPToken is MintableToken, NoOwner, Destructible { //MintableToken is 
     function setTransfersEnabled(bool enable) onlyOwner public {
         transfersEnabled = enable;
     }
-    
+
     function transfer(address _to, uint256 _value) canTransfer public returns (bool) {
         notifyICO(msg.sender, _to, _value);
         return super.transfer(_to, _value);
@@ -463,4 +463,15 @@ contract BOBPToken is MintableToken, NoOwner, Destructible { //MintableToken is 
             require(ico.tokenTransferNotify(address(this), _from, _value));
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

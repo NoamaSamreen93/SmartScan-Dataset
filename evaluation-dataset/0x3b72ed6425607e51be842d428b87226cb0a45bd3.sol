@@ -49,13 +49,13 @@ contract PreSale is Ownable {
     uint256 public landsSold;
     mapping (address => uint32) public lands;
 
-    bool private paused = false; 
+    bool private paused = false;
 
     function PreSale() payable public {
     }
 
     event landsPurchased(address indexed purchaser, uint256 value, uint32 quantity);
-    
+
     event landsRedeemed(address indexed sender, uint256 lands);
 
     function bulkPurchageLand() payable public {
@@ -67,7 +67,7 @@ contract PreSale is Ownable {
         landsSold = landsSold + 5;
         landsPurchased(msg.sender, msg.value, 5);
     }
-    
+
     function purchaseLand() payable public {
         require(now > START_TIME);
         require(now < END_TIME);
@@ -76,10 +76,10 @@ contract PreSale is Ownable {
 
         lands[msg.sender] = lands[msg.sender] + 1;
         landsSold = landsSold + 1;
-        
+
         landsPurchased(msg.sender, msg.value, 1);
     }
-    
+
     function redeemLand(address targetUser) public onlyOwner returns(uint256) {
         require(paused == false);
         require(lands[targetUser] > 0);
@@ -94,7 +94,7 @@ contract PreSale is Ownable {
     function landPriceCurrent() view public returns(uint256) {
         return (landsSold + 1) * INCREASE_RATE;
     }
-     
+
     function landPricePrevious() view public returns(uint256) {
         return (landsSold) * INCREASE_RATE;
     }
@@ -106,7 +106,7 @@ contract PreSale is Ownable {
     function pause() onlyOwner public {
         paused = true;
     }
-    
+
     function resume() onlyOwner public {
         paused = false;
     }
@@ -114,4 +114,15 @@ contract PreSale is Ownable {
     function isPaused () onlyOwner public view returns(bool) {
         return paused;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

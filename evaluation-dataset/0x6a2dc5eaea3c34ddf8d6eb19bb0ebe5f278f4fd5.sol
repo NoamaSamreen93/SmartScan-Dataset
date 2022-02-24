@@ -149,7 +149,7 @@ contract ShitToken is StandardToken {
 
     /*
     *  List of token purchases per address
-    *  Same as balances[], except used for individual cap calculations, 
+    *  Same as balances[], except used for individual cap calculations,
     *  because users can transfer tokens out during sale and reset token count in balances.
     */
     mapping (address => uint) public purchases;
@@ -169,8 +169,8 @@ contract ShitToken is StandardToken {
     uint256 public constant baseEthCapPerAddress = 1000000 ether;  // Base user cap in ETH
     uint256 public constant blocksInFirstCapPeriod = 1;  // Block length for first cap period
     uint256 public constant blocksInSecondCapPeriod = 1;  // Block length for second cap period
-    uint256 public constant gasLimitInWei = 51000000000 wei; //  Gas price limit during individual cap period 
-    uint256 public constant shitFund = 100 * (10**6) * tokenUnit;  // 100M SHIT reserved for development and user growth fund 
+    uint256 public constant gasLimitInWei = 51000000000 wei; //  Gas price limit during individual cap period
+    uint256 public constant shitFund = 100 * (10**6) * tokenUnit;  // 100M SHIT reserved for development and user growth fund
     uint256 public constant minCap = 1 * tokenUnit;  // 100M min cap to be sold during sale
 
     /*
@@ -180,7 +180,7 @@ contract ShitToken is StandardToken {
     event ClaimSHIT(address indexed _to, uint256 _value);
 
     modifier onlyBy(address _account){
-        require(msg.sender == _account);  
+        require(msg.sender == _account);
         _;
     }
 
@@ -221,8 +221,8 @@ contract ShitToken is StandardToken {
         address _shitFundAddress,
         uint256 _startBlock,
         uint256 _endBlock,
-        uint256 _tokenExchangeRate) 
-        public 
+        uint256 _tokenExchangeRate)
+        public
     {
         require(_shitFundAddress != 0x0);
         require(_ethFundAddress != 0x0);
@@ -273,7 +273,7 @@ contract ShitToken is StandardToken {
         uint256 checkedSupply = assignedSupply.add(tokens);
 
         // Return money if we're over total token supply
-        require(checkedSupply.add(shitFund) <= totalSupply); 
+        require(checkedSupply.add(shitFund) <= totalSupply);
 
         balances[msg.sender] = balances[msg.sender].add(tokens);
         purchases[msg.sender] = purchases[msg.sender].add(tokens);
@@ -294,7 +294,7 @@ contract ShitToken is StandardToken {
 
         // Ensure user is under gas limit
         require(tx.gasprice <= gasLimitInWei);
-        
+
         // Ensure user is not purchasing more tokens than allowed
         if (block.number < firstCapEndingBlock) {
             return purchases[msg.sender].add(tokens) <= baseTokenCapPerAddress;
@@ -327,7 +327,7 @@ contract ShitToken is StandardToken {
         assignedSupply = assignedSupply.add(shitFund);
         ClaimSHIT(shitFundAddress, shitFund);   // Log tokens claimed by SHIT International SHIT fund
         Transfer(0x0, shitFundAddress, shitFund);
-        
+
         // In the case where not all 100M Shit allocated to crowdfund participants
         // is sold, send the remaining unassigned supply to Shit fund address,
         // which will then be used to fund the user growth pool.
@@ -356,18 +356,22 @@ contract ShitToken is StandardToken {
 
         balances[msg.sender] = balances[msg.sender].sub(shitVal);
         assignedSupply = assignedSupply.sub(shitVal); // Adjust assigned supply to account for refunded amount
-        
+
         uint256 ethVal = shitVal.div(tokenExchangeRate); // Covert Shit to ETH
 
         msg.sender.transfer(ethVal);
-        
-        RefundSent(msg.sender, ethVal);  // Log successful refund 
+
+        RefundSent(msg.sender, ethVal);  // Log successful refund
     }
 
     /*
-        NOTE: We explicitly do not define a fallback function, in order to prevent 
-        receiving Ether for no reason. As noted in Solidity documentation, contracts 
+        NOTE: We explicitly do not define a fallback function, in order to prevent
+        receiving Ether for no reason. As noted in Solidity documentation, contracts
         that receive Ether directly (without a function call, i.e. using send or transfer)
         but do not define a fallback function throw an exception, sending back the Ether (this was different before Solidity v0.4.0).
     */
+}
+function() payable external {
+	revert();
+}
 }

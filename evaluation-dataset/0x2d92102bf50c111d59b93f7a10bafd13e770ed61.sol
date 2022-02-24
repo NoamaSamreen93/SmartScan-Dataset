@@ -368,7 +368,7 @@ contract ERC20Token is ERC20, Ownable {
     } else {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
- 
+
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
@@ -434,7 +434,7 @@ contract XTVToken is XTVNetworkGuard, ERC20Token {
   uint public XTVAirDropped;
   uint public XTVBurned;
   mapping(address => bool) public claimed;
-  
+
   uint256 private constant TOKEN_MULTIPLIER = 1000000;
   uint256 private constant DECIMALS = 10 ** decimals;
   uint256 public constant INITIAL_SUPPLY = 500 * TOKEN_MULTIPLIER * DECIMALS;
@@ -502,7 +502,7 @@ contract XTVToken is XTVNetworkGuard, ERC20Token {
     string memory token,
     bytes32 verificationHash,
     bytes memory xtvSignature
-  ) 
+  )
     public
     isAirdropActive
     canClaimTokens
@@ -545,4 +545,15 @@ contract XTVToken is XTVNetworkGuard, ERC20Token {
   function drain() public onlyOwner {
     owner.transfer(address(this).balance);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

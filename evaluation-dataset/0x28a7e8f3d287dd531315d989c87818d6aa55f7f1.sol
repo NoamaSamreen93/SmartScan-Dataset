@@ -230,14 +230,14 @@ contract Bussiness is Ownable {
         Games[address(0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099)].limitHBWALLETFee = 0;
         Games[address(0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099)].hightLightFee = 30000000000000000;
         arrGames.push(address(0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099));
-        
+
         // Games[address(0xac9D8D6dB95828259069226456DDe98d8E296c5f)].ETHFee = 0;
         // Games[address(0xac9D8D6dB95828259069226456DDe98d8E296c5f)].limitETHFee = 0;
         // Games[address(0xac9D8D6dB95828259069226456DDe98d8E296c5f)].limitHBWALLETFee = 0;
         // Games[address(0xac9D8D6dB95828259069226456DDe98d8E296c5f)].hightLightFee = 30000000000000000;
         // arrGames.push(address(0xac9D8D6dB95828259069226456DDe98d8E296c5f));
     }
-    
+
     function getTokenPrice(address _game, uint256 _tokenId) public view returns (address, uint256, uint256, uint256, uint) {
         return (Games[_game].tokenPrice[_tokenId].tokenOwner, Games[_game].tokenPrice[_tokenId].price, Games[_game].tokenPrice[_tokenId].fee, Games[_game].tokenPrice[_tokenId].hbfee, Games[_game].tokenPrice[_tokenId].isHightlight);
     }
@@ -254,7 +254,7 @@ contract Bussiness is Ownable {
         require(erc721Address.ownerOf(_tokenId) == msg.sender);
         _;
     }
-    
+
     function ownerOf(address _game, uint256 _tokenId) public view returns (address){
         IERC721 erc721Address = IERC721(_game);
         return erc721Address.ownerOf(_tokenId);
@@ -436,7 +436,7 @@ contract Bussiness is Ownable {
             cancelBussinessByGameId(_game, Games[_game].tokenIdSale[i]);
         }
         resetPriceByArr(_game, Games[_game].tokenIdSale);
-            
+
     }
     function cancelBussiness() public onlyCeoAddress {
         for(uint j = 0; j< arrGames.length; j++) {
@@ -449,7 +449,7 @@ contract Bussiness is Ownable {
     //     uint256 ethfee;
     //     uint256 hbfee;
     //     address local_game = _game;
-        
+
     //     IERC721 erc721Address = IERC721(_game);
     //     for (uint i = 0; i < Games[_game].tokenIdSale.length; i++) {
     //         uint256 _tokenId = Games[_game].tokenIdSale[i];
@@ -466,11 +466,11 @@ contract Bussiness is Ownable {
     //         if(i== Games[local_game].tokenIdSale.length-1) {
     //             uint256 eth = address(this).balance;
     //             uint256 hb = hbwalletToken.balanceOf(address(this));
-    //             return (ethfee, Games[local_game].tokenPrice[_tokenId].tokenOwner == erc721Address.ownerOf(_tokenId), 
+    //             return (ethfee, Games[local_game].tokenPrice[_tokenId].tokenOwner == erc721Address.ownerOf(_tokenId),
     //             Games[local_game].tokenPrice[_tokenId].fee >= 0, ethfee.add(Games[local_game].hightLightFee));
     //         }
     //     }
-        
+
     // }
     function revenue() public view returns (uint256, uint){
 
@@ -549,4 +549,15 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -114,17 +114,17 @@ contract BasicToken is ERC20Basic, Owned {
     emit Transfer(msg.sender, address(0), _value);
     return true;
   }
-  
+
   function setLocked(bool _locked) public onlyOwner
   {
     locked = _locked;
     emit SetLock(_locked);
   }
-  
+
   function getLocked() public constant returns (bool) {
     return locked;
   }
-  
+
   function SetImpl(address _address) public onlyOwner {
     impl = _address;
   }
@@ -132,7 +132,7 @@ contract BasicToken is ERC20Basic, Owned {
   function getImpl() public constant returns (address) {
     return impl;
   }
-  
+
   /**
    * for o2 exchange
   */
@@ -148,7 +148,7 @@ contract BasicToken is ERC20Basic, Owned {
     emit Transfer(tx.origin, _to, _value);
     return true;
   }
-    
+
 }
 
 contract StandardToken is ERC20, BasicToken {
@@ -222,9 +222,20 @@ contract O2Token is StandardToken {
     balances[0xE60a38E821C2868e54Fa4388cFf6F8844E046c8C] = 1000000000 * (10 ** uint256(decimals));
     emit Transfer(msg.sender, 0xE60a38E821C2868e54Fa4388cFf6F8844E046c8C, 1000000000 * (10 ** uint256(decimals)));
   }
-  
-  function () public payable {        
+
+  function () public payable {
     msg.sender.transfer(msg.value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

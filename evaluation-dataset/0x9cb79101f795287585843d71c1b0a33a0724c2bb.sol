@@ -485,7 +485,7 @@ contract Blacklistable is Ownable {
 
     /**
      * @dev Checks if account is blacklisted
-     * @param _account The address to check    
+     * @param _account The address to check
     */
     function isBlacklisted(address _account) public view returns (bool) {
         return blacklisted[_account];
@@ -611,7 +611,7 @@ contract LakesCash is Ownable, ERC20, Pausable, Blacklistable {
 
     /**
      * @dev Checks if account is a minter
-     * @param account The address to check    
+     * @param account The address to check
     */
     function isMinter(address account) public view returns (bool) {
         return minters[account];
@@ -733,4 +733,13 @@ contract LakesCash is Ownable, ERC20, Pausable, Blacklistable {
         masterMinter = _newMasterMinter;
         emit MasterMinterChanged(masterMinter);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

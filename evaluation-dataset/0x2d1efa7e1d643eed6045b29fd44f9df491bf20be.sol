@@ -364,7 +364,7 @@ contract ERC1132 {
         bytes32 indexed _reason,
         uint256 _amount
     );
-    
+
     /**
      * @dev Locks a specified amount of tokens against an address,
      *      for a specified reason and time
@@ -374,7 +374,7 @@ contract ERC1132 {
      */
     function lock(bytes32 _reason, uint256 _amount, uint256 _time)
         public returns (bool);
-  
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason
@@ -384,7 +384,7 @@ contract ERC1132 {
      */
     function tokensLocked(address _of, bytes32 _reason)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason at a specific time
@@ -395,14 +395,14 @@ contract ERC1132 {
      */
     function tokensLockedAtTime(address _of, bytes32 _reason, uint256 _time)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns total tokens held by an address (locked + transferable)
      * @param _of The address to query the total balance of
      */
     function totalBalanceOf(address _of)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Extends lock for a specified reason and time
      * @param _reason The reason to lock tokens
@@ -410,7 +410,7 @@ contract ERC1132 {
      */
     function extendLock(bytes32 _reason, uint256 _time)
         public returns (bool);
-    
+
     /**
      * @dev Increase number of tokens locked for a specified reason
      * @param _reason The reason to lock tokens
@@ -426,7 +426,7 @@ contract ERC1132 {
      */
     function tokensUnlockable(address _of, bytes32 _reason)
         public view returns (uint256 amount);
- 
+
     /**
      * @dev Unlocks the unlockable tokens of a specified address
      * @param _of Address of user, claiming back unlockable tokens
@@ -444,7 +444,7 @@ contract ERC1132 {
 }
 
 contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
-    
+
     string public constant name = "BITROZEX";
     string public constant symbol = "BTZ";
     uint8 public constant decimals = 8;
@@ -455,13 +455,13 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
     string internal constant ALREADY_LOCKED = 'Tokens already locked';
     string internal constant NOT_LOCKED = 'No tokens locked';
     string internal constant AMOUNT_ZERO = 'Amount can not be 0';
-   
+
    /**
     * @dev constructor to mint initial tokens
     * Shall update to _mint once openzepplin updates their npm package.
     */
     constructor() public {
-        
+
         owner=0x788622aE0633DB0fB25701FdDd66EfAE6f7e08af;
         totalSupply_ =42100000*10**8;
         balances[owner] = totalSupply_;
@@ -502,7 +502,7 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
         emit Locked(msg.sender, _reason, _amount, validUntil);
         return true;
     }
-    
+
     /**
      * @dev Transfers and Locks a specified amount of tokens,
      *      for a specified reason and time
@@ -526,7 +526,7 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
         transfer(address(this), _amount);
 
         locked[_to][_reason] = lockToken(_amount, validUntil, false);
-        
+
         emit Locked(_to, _reason, _amount, validUntil);
         return true;
     }
@@ -546,7 +546,7 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
         if (!locked[_of][_reason].claimed)
             amount = locked[_of][_reason].amount;
     }
-    
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason at a specific time
@@ -577,9 +577,9 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
 
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             amount = amount.add(tokensLocked(_of, lockReason[_of][i]));
-        }   
-    }    
-    
+        }
+    }
+
     /**
      * @dev Extends lock for a specified reason and time
      * @param _reason The reason to lock tokens
@@ -596,7 +596,7 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
         emit Locked(msg.sender, _reason, locked[msg.sender][_reason].amount, locked[msg.sender][_reason].validity);
         return true;
     }
-    
+
     /**
      * @dev Increase number of tokens locked for a specified reason
      * @param _reason The reason to lock tokens
@@ -646,7 +646,7 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
                 locked[_of][lockReason[_of][i]].claimed = true;
                 emit Unlocked(_of, lockReason[_of][i], lockedTokens);
             }
-        }  
+        }
 
         if (unlockableTokens > 0)
             this.transfer(_of, unlockableTokens);
@@ -663,6 +663,17 @@ contract LockableToken is ERC1132, StandardToken ,BurnableToken ,MintableToken{
     {
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             unlockableTokens = unlockableTokens.add(tokensUnlockable(_of, lockReason[_of][i]));
-        }  
+        }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

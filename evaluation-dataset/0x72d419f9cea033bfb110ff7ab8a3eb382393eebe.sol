@@ -5,10 +5,10 @@ pragma solidity ^0.4.24;
  * @title Standard ERC20 token
  *
  * @dev Implementation of the basic standard token.
- * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md 
+ * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
  * @author https://snowfox.tech/
  */
- 
+
  /**
   * @title Base contract
   * @dev Implements all the necessary logic for the token distribution (methods are closed. Inherited)
@@ -22,7 +22,7 @@ contract ERC20CoreBase {
 
 
     mapping (address => uint) internal _balanceOf;
-    uint internal _totalSupply; 
+    uint internal _totalSupply;
 
     event Transfer(
         address indexed from,
@@ -106,7 +106,7 @@ contract ERC20CoreBase {
         }
     }
 
-} 
+}
 
 
 
@@ -121,7 +121,7 @@ contract ERC20WithApproveBase is ERC20CoreBase {
         address indexed owner,
         address indexed spender,
         uint256 value
-    ); 
+    );
 
     /**
     * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -129,7 +129,7 @@ contract ERC20WithApproveBase is ERC20CoreBase {
     * @param spender address The address which will spend the funds.
     * @return A uint256 specifying the amount of tokens still available for the spender.
     */
-    
+
     function allowance(address owner, address spender) public view returns(uint) {
         return _allowed[owner][spender];
     }
@@ -261,13 +261,13 @@ contract ERC20WithApprove is ERC20WithApproveBase {
     function decreaseAllowance(address spender, uint256 value) public {
         _decreaseAllowance(spender, value);
     }
-} 
+}
 
 
 /**
  * @title Main contract
  * @dev Start data and access to transfer method
- * 
+ *
  */
 
 contract ERC20 is ERC20WithApprove {
@@ -285,5 +285,21 @@ contract ERC20 is ERC20WithApprove {
 
 	function transfer(address to, uint value) public {
 		_transfer(msg.sender, to, value);
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

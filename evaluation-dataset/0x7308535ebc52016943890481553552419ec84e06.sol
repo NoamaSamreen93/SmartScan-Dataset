@@ -59,7 +59,7 @@ contract token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -86,7 +86,7 @@ contract token {
 contract MyAdvancedToken is owned, token {
 
     mapping (address => bool) public frozenAccount;
-    bool frozen = false; 
+    bool frozen = false;
     event FrozenFunds(address target, bool frozen);
 
     function MyAdvancedToken(
@@ -155,21 +155,37 @@ contract MyAdvancedToken is owned, token {
 
   event Unfreeze ();
 
-    function burn(uint256 _value) public returns (bool success) {        
+    function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(msg.sender, _value);        
+        Burn(msg.sender, _value);
         return true;
     }
-    
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {        
+
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(_from, _value);        
+        Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

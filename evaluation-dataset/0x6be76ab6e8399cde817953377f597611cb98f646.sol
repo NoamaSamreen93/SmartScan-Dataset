@@ -54,7 +54,7 @@ contract ERC20 is BasicERC20 {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is BasicERC20 {
   using SafeMath for uint256;
@@ -75,7 +75,7 @@ contract BasicToken is BasicERC20 {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -167,4 +167,12 @@ contract PDPCoin is StandardToken {
     Burn(msg.sender, _value);
     return true;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

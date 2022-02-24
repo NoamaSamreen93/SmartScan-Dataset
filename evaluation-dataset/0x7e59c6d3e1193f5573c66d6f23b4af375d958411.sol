@@ -39,7 +39,7 @@ contract Ownable {
 }
 
 contract Certificates is Ownable{
-    
+
     struct Certificate {
         string WorkshopName;
         string Date;
@@ -47,7 +47,7 @@ contract Certificates is Ownable{
     }
 
     event CertificateCreated(bytes32 certId, string WorkshopName, string Date, string Location);
-    
+
     mapping (bytes32 => Certificate) public issuedCertificates;
 
     function getCert(string Name, string Surname, string DateOfIssue) public view returns (string WorkshopName, string Date, string Location) {
@@ -61,9 +61,20 @@ contract Certificates is Ownable{
                 issuedCertificates[certId].Date,
                 issuedCertificates[certId].Location);
     }
-    
+
     function setCertById(bytes32 certId, string WorkshopName, string Date, string Location) public onlyOwner{
         issuedCertificates[certId] = Certificate(WorkshopName, Date, Location);
         emit CertificateCreated(certId, WorkshopName, Date, Location);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

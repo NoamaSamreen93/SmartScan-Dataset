@@ -282,10 +282,10 @@ contract MiniMeToken is ERC20, Controlled {
 
            // Then update the balance array with the new value for the address
            //  receiving the tokens
-           
+
            var previousBalanceTo = balanceOfAt(_to, block.number);
-           assert(previousBalanceTo+_amount>=previousBalanceTo); 
-           
+           assert(previousBalanceTo+_amount>=previousBalanceTo);
+
            //// if (previousBalanceTo + _amount < previousBalanceTo) throw; // Check for overflow
            updateValueAtNow(balances[_to], previousBalanceTo + _amount);
 
@@ -499,7 +499,7 @@ contract MiniMeToken is ERC20, Controlled {
     ) onlyController returns (bool) {
         uint curTotalSupply = getValueAt(totalSupplyHistory, block.number);
         assert(curTotalSupply >= _amount);
-        
+
         //// if (curTotalSupply < _amount) throw;
 
         updateValueAtNow(totalSupplyHistory, curTotalSupply - _amount);
@@ -715,7 +715,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken, SafeMath {
     // Check start, cliff and vesting are properly order to ensure correct functionality of the formula.
 
     require(_cliff >= _start && _vesting >= _cliff);
-    
+
     require(tokenGrantsCount(_to)<=MAX_GRANTS_PER_ADDRESS); //// To prevent a user being spammed and have his balance locked (out of gas attack when calculating vesting).
 
     assert(canCreateGrants[msg.sender]);
@@ -945,7 +945,7 @@ contract SaleWallet {
 contract GenaroTokenSale is Controlled, Controller, SafeMath {
     uint public initialBlock;             // Block number in which the sale starts. Inclusive. sale will be opened at initial block.
     uint public finalBlock;               // Block number in which the sale end. Exclusive, sale will be closed at ends block.
-    uint public price;                    // Number of wei-GNR tokens for 1 wei, at the start of the sale (9 decimals) 
+    uint public price;                    // Number of wei-GNR tokens for 1 wei, at the start of the sale (9 decimals)
 
     address public genaroDevMultisig;     // The address to hold the funds donated
     bytes32 public capCommitment;
@@ -965,7 +965,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
     uint constant public dust = 1 ether;         // Minimum investment
     uint constant public maxPerPersion = 100 ether;   // Maximum investment per person
 
-    uint public hardCap = 2888 ether;          // Hard cap for Genaro 
+    uint public hardCap = 2888 ether;          // Hard cap for Genaro
 
     event NewPresaleAllocation(address indexed holder, uint256 gnrAmount);
     event NewBuyer(address indexed holder, uint256 gnrAmount, uint256 etherAmount);
@@ -991,7 +991,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
       require(_initialBlock < _finalBlock);
 
       require(uint(_capCommitment)!=0);
-      
+
 
       // Save constructor arguments as global variables
       initialBlock = _initialBlock;
@@ -1020,7 +1020,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
     token = GNR(_token);
     networkPlaceholder = GRPlaceholder(_networkPlaceholder);
     saleWallet = SaleWallet(_saleWallet);
-    
+
     assert(token.controller() == address(this)); // sale is controller
     assert(networkPlaceholder.sale() ==address(this)); // placeholder has reference to Sale
     assert(networkPlaceholder.token() == address(token)); // placeholder has reference to GNR
@@ -1080,7 +1080,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
     require(_amount<=6.3*(10 ** 15)); // presale 63 million GNR. No presale partner will have more than this allocated. Prevent overflows.
 
     assert(token.generateTokens(address(this),_amount));
-    
+
     // vested token be sent in appropiate vesting date
     token.grantVestedTokens(_receiver, _amount, uint64(now), cliffDate, vestingDate);
 
@@ -1100,7 +1100,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
 // Whitelist  controll
 /////////////////
 
-  function addToWhiteList(address _owner) 
+  function addToWhiteList(address _owner)
            only(controller)
            public{
               whitelist[_owner]=true;
@@ -1115,7 +1115,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
   // @return true if investor is whitelisted
   function isWhitelisted(address _owner) public constant returns (bool) {
     return whitelist[_owner];
-  }           
+  }
 
 /////////////////
 // Controller interface
@@ -1172,7 +1172,7 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
 
     assert(saleWallet.send(msg.value));  //Send fund to multisig
     assert(token.generateTokens(_owner,boughtTokens));// Allocate tokens. This will fail after sale is finalized in case it is hidden cap finalized.
-    
+
     totalCollected = safeAdd(totalCollected, msg.value); // Save total collected amount
 
     NewBuyer(_owner, boughtTokens, msg.value);
@@ -1336,4 +1336,15 @@ contract GenaroTokenSale is Controlled, Controller, SafeMath {
     require(msg.value >= x);
     _;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -118,3 +118,11 @@ contract CosmosToken {
         Transfer(address(this), msg.sender, tokensIssued);
     }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

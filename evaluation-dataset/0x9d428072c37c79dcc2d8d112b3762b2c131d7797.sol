@@ -50,7 +50,7 @@ interface Token {
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
 
- 
+
 
 contract MRT is ERC20 {
     using SafeMath for uint256;
@@ -229,7 +229,7 @@ contract MRT is ERC20 {
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
@@ -257,4 +257,13 @@ contract MRT is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

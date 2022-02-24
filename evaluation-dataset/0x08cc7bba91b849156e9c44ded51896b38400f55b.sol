@@ -965,7 +965,7 @@ pragma solidity ^0.5.4;
 contract UniversalSchemeInterface {
 
     function getParametersFromController(Avatar _avatar) internal view returns(bytes32);
-    
+
 }
 
 // File: contracts/globalConstraints/GlobalConstraintInterface.sol
@@ -2991,4 +2991,15 @@ contract ContributionReward is UniversalScheme, VotingMachineCallbacks, Proposal
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

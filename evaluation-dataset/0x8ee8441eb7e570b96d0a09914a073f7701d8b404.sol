@@ -187,11 +187,22 @@ contract CrosspaysToken is BurnableToken, StandardToken {
     string public constant name = "Crosspays Token";
     string public constant symbol = "CPS";
     uint8 public constant decimals = 18;
-    
+
     uint public constant INITIAL_SUPPLY = 999000000 * (uint(10) ** decimals);
-    
+
     function CrosspaysToken() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

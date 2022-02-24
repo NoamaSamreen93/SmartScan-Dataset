@@ -2,16 +2,16 @@
  * Kryptium Tracker Smart Contract v.1.0.0
  * Copyright © 2018 Kryptium Team <info@kryptium.io>
  * Author: Giannis Zarifis <jzarifis@kryptium.io>
- * 
+ *
  * A registry of betting houses based on the Ethereum blockchain. It keeps track
- * of users' upvotes/downvotes for specific houses and can be fully autonomous 
+ * of users' upvotes/downvotes for specific houses and can be fully autonomous
  * or managed.
  *
  * This program is free to use according the Terms of Use available at
  * <https://kryptium.io/terms-of-use/>. You cannot resell it or copy any
  * part of it or modify it without permission from the Kryptium Team.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Terms and Conditions for more details.
  */
@@ -76,13 +76,13 @@ contract Owned {
  * House smart contract interface
  */
 interface HouseContract {
-     function owner() external view returns (address); 
+     function owner() external view returns (address);
      function isHouse() external view returns (bool);
      function isPlayer(address playerAddress) external view returns(bool);
 }
 
 /*
- * Kryptium Tracker Smart Contract.  
+ * Kryptium Tracker Smart Contract.
  */
 contract Tracker is SafeMath, Owned {
 
@@ -91,20 +91,20 @@ contract Tracker is SafeMath, Owned {
 
     enum Action { added, updated}
 
-    struct House {            
-        uint upVotes;             
+    struct House {
+        uint upVotes;
         uint downVotes;
         bool isActive;
         address oldAddress;
         address owner;
     }
 
-    struct TrackerData { 
+    struct TrackerData {
         string  name;
         string  creatorName;
         bool  managed;
         uint trackerVersion;
-    }    
+    }
 
 
     TrackerData public trackerData;
@@ -125,7 +125,7 @@ contract Tracker is SafeMath, Owned {
     event TrackerCreated();
 
     // Notifies clients that the Tracker's name was changed
-    event TrackerNamesUpdated();    
+    event TrackerNamesUpdated();
 
 
     /**
@@ -149,7 +149,7 @@ contract Tracker is SafeMath, Owned {
         trackerData.name = newName;
         trackerData.creatorName = newCreatorName;
         emit TrackerNamesUpdated();
-    }    
+    }
 
      /**
      * Add House function
@@ -158,7 +158,7 @@ contract Tracker is SafeMath, Owned {
      */
     function addHouse(address houseAddress) public {
         require(!trackerData.managed || msg.sender==owner,"Tracker is managed");
-        require(!houses[houseAddress].isActive,"There is a new version of House already registered");    
+        require(!houses[houseAddress].isActive,"There is a new version of House already registered");
         HouseContract houseContract = HouseContract(houseAddress);
         require(houseContract.isHouse(),"Invalid House");
         houses[houseAddress].isActive = true;
@@ -169,12 +169,12 @@ contract Tracker is SafeMath, Owned {
     /**
      * Update House function
      *
-     * Updates a house 
+     * Updates a house
      */
     function updateHouse(address newHouseAddress,address oldHouseAddress) public {
         require(!trackerData.managed || msg.sender==owner,"Tracker is managed");
         require(houses[oldHouseAddress].owner==msg.sender || houses[oldHouseAddress].owner==oldHouseAddress,"Caller isn't the owner of old House");
-        require(!houses[newHouseAddress].isActive,"There is a new version of House already registered");  
+        require(!houses[newHouseAddress].isActive,"There is a new version of House already registered");
         HouseContract houseContract = HouseContract(newHouseAddress);
         require(houseContract.isHouse(),"Invalid House");
         houses[oldHouseAddress].isActive = false;
@@ -194,7 +194,7 @@ contract Tracker is SafeMath, Owned {
      */
     function removeHouse(address houseAddress) public {
         require(!trackerData.managed || msg.sender==owner,"Tracker is managed");
-        require(houses[houseAddress].owner==msg.sender,"Caller isn't the owner of House");  
+        require(houses[houseAddress].owner==msg.sender,"Caller isn't the owner of House");
         houses[houseAddress].isActive = false;
         emit TrackerChanged(houseAddress,Action.updated);
     }
@@ -223,7 +223,7 @@ contract Tracker is SafeMath, Owned {
         playerDownvoted[msg.sender][houseAddress] = true;
         houses[houseAddress].downVotes += 1;
         emit TrackerChanged(houseAddress,Action.updated);
-    }    
+    }
 
     /**
      * Kill function
@@ -231,7 +231,11 @@ contract Tracker is SafeMath, Owned {
      * Contract Suicide
      */
     function kill() onlyOwner public {
-        selfdestruct(owner); 
+        selfdestruct(owner);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

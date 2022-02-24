@@ -181,16 +181,16 @@ contract LULUToken is StandardToken {
   string public name = "LULU Token";
   string public symbol = "LULU";
   string public releaseArr = '0000000000000000000';
- 
+
   uint public decimals = 18;
-  
+
   function LULUToken() {
     totalSupply = 100000000000 * 1000000000000000000;
     balances[msg.sender] = totalSupply / 5;
   }
 
   function tokenRelease() public returns (string) {
-     
+
     uint256 y2019 = 1557936000;
     uint256 y2020 = 1589558400;
     uint256 y2021 = 1621094400;
@@ -206,7 +206,7 @@ contract LULUToken is StandardToken {
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
         return releaseArr;
     }
-    
+
     if (now > y2020 && now <= 1605456000 && bytes(releaseArr)[2] == '0') {
         bytes(releaseArr)[2] = '1';
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
@@ -216,7 +216,7 @@ contract LULUToken is StandardToken {
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
         return releaseArr;
     }
-    
+
     if (now > y2021 && now <= 1636992000 && bytes(releaseArr)[4] == '0') {
         bytes(releaseArr)[4] = '1';
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
@@ -226,7 +226,7 @@ contract LULUToken is StandardToken {
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
         return releaseArr;
     }
-    
+
     if (now > y2022 && now <= 1668528000 && bytes(releaseArr)[6] == '0') {
         bytes(releaseArr)[6] = '1';
         balances[msg.sender] = balances[msg.sender] + totalSupply / 10;
@@ -239,4 +239,15 @@ contract LULUToken is StandardToken {
 
     return releaseArr;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

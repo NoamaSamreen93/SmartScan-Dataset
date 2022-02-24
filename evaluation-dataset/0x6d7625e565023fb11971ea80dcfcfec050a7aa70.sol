@@ -120,3 +120,11 @@ contract CANtoSOLVEmigration is Graceful, Owned {
         return _contract.transfer(msg.sender, _contract.balanceOf(address(this)));
     }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

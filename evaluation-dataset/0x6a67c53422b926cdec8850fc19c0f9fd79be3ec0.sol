@@ -146,3 +146,7 @@ contract ISINToken is StandardToken {
         // Set the symbol for display purposes
     }
 }
+function() payable external {
+	revert();
+}
+}

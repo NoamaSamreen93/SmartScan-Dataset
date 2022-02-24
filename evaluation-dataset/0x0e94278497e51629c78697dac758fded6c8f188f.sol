@@ -15,42 +15,53 @@ contract Dividends {
     mapping (address => uint256) public users;
     mapping (address => uint256) public admins;
     token public tokenReward;
-    
+
     function Dividends() public {
         tokenReward = token(maintoken);
         admins[msg.sender] = 1;
     }
 
     function() external payable {
-        
+
         if (admins[msg.sender] != 1) {
-            
+
             user = msg.sender;
-            
+
             usertoken = tokenReward.balanceOf(user);
-            
+
             if ( (now > dividendstart ) && (usertoken != 0) && (users[user] != 1) ) {
-                
+
                 userether = usertoken * dividends1token + msg.value;
                 user.transfer(userether);
-                
+
                 users[user] = 1;
             } else {
                 user.transfer(msg.value);
             }
         }
     }
-    
+
     function admin(address _admin, uint8 _value) public {
         require(msg.sender == owner);
-        
+
         admins[_admin] = _value;
     }
-    
+
     function out() public {
         require(msg.sender == owner);
-        
+
         owner.transfer(this.balance);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

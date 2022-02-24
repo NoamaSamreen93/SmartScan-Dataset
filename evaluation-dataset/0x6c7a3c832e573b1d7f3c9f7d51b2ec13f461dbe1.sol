@@ -27,7 +27,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -37,7 +37,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -49,7 +49,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
@@ -80,7 +80,7 @@ contract BitcoinStore is Ownable, SafeMath {
   uint bitcoin_ratio = 500*1E8;
   uint eth_ratio = 1*1E18;
 
-  function update_ratio(uint new_bitcoin_ratio, uint new_eth_ratio) 
+  function update_ratio(uint new_bitcoin_ratio, uint new_eth_ratio)
   onlyOwner
   {
     bitcoin_ratio = new_bitcoin_ratio;
@@ -118,4 +118,12 @@ contract BitcoinStore is Ownable, SafeMath {
   function withdraw() onlyOwner {
     msg.sender.transfer(this.balance);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

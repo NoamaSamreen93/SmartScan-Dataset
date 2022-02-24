@@ -93,7 +93,7 @@ contract TokenERC20 {
         uint256 initialSupply =10000000000;
         string memory tokenName ="AllPetCoin";
         string memory tokenSymbol="APC";
-   
+
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
@@ -214,4 +214,10 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

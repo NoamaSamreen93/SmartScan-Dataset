@@ -91,24 +91,24 @@ contract GeneScienceInterface {
 contract VariationInterface {
 
     function isVariation() public pure returns(bool);
-    
+
     function createVariation(uint256 _gene, uint256 _totalSupply) public returns (uint8);
-    
+
     function registerVariation(uint256 _dogId, address _owner) public;
 }
 
 
 contract LotteryInterface {
-    
+
     function isLottery() public pure returns (bool);
 
     function checkLottery(uint256 genes) public pure returns (uint8 lotclass);
-    
+
     function registerLottery(uint256 _dogId) public payable returns (uint8);
 
-    function getCLottery() 
-        public 
-        view 
+    function getCLottery()
+        public
+        view
         returns (
             uint8[7]        luckyGenes1,
             uint256         totalAmount1,
@@ -375,7 +375,7 @@ contract DogBase is DogAccessControl {
     ///  auctions. Needs to be separate from saleAuction because the actions taken on success
     ///  after a sales and siring auction are quite different.
     SiringClockAuction public siringAuction;
-  
+
     uint256 public autoBirthFee = 5000 szabo;
 
     //zhangyong
@@ -384,7 +384,7 @@ contract DogBase is DogAccessControl {
 
     //zhangyong
     //0代狗获取繁殖收益的系数，可以动态调整，取值范围0到100
-    function setGen0Profit(uint256 _value) public onlyCOO{        
+    function setGen0Profit(uint256 _value) public onlyCOO{
         uint256 ration = _value * 100 / autoBirthFee;
         require(ration > 0);
         require(_value <= 100);
@@ -810,7 +810,7 @@ contract DogBreeding is DogOwnership {
     /// @dev The address of the sibling contract that is used to implement the sooper-sekret
     ///  genetic combination algorithm.
     GeneScienceInterface public geneScience;
-    
+
     VariationInterface public variation;
 
     LotteryInterface public lottery;
@@ -1001,7 +1001,7 @@ contract DogBreeding is DogOwnership {
         //创世狗不能繁殖
         require(_matronId > 1);
         require(_sireId > 1);
-        
+
         // Grab a reference to the dogs from storage.
         Dog storage sire = dogs[_sireId];
         Dog storage matron = dogs[_matronId];
@@ -1056,7 +1056,7 @@ contract DogBreeding is DogOwnership {
         external
         payable
         whenNotPaused
-    {        
+    {
         // zhangyong
         // 如果不是0代狗繁殖，则多收0代狗的繁殖收益
         uint256 totalFee = autoBirthFee;
@@ -1171,9 +1171,9 @@ contract DogBreeding is DogOwnership {
         pregnantDogs--;
 
         // Send the balance fee to the person who made birth happen.
-       
+
         if(_variation != 0){
-            variation.registerVariation(kittenId, owner);      
+            variation.registerVariation(kittenId, owner);
             _transfer(owner, address(variation), kittenId);
         }
 
@@ -1295,7 +1295,7 @@ contract ClockAuctionBase {
         uint256 fee = 0;
         if (_tokenId == 0 || _tokenId == 1) {
             fee = price / 5;
-        }        
+        }
         require((_bidAmount + auctioneerCut + fee) >= price);
 
         // Grab a reference to the seller before the auction struct
@@ -1785,18 +1785,18 @@ contract SaleClockAuction is ClockAuction {
         require(msg.sender == address(nonFungibleContract));
 
         // _bid verifies token ID size
-        address seller = tokenIdToAuction[_tokenId].seller;  
+        address seller = tokenIdToAuction[_tokenId].seller;
 
         // zhangyong
         // 自己不能买自己卖的同一只狗
         require(seller != _to);
 
         uint256 price = _bid(_tokenId, msg.value, _to);
-        
+
         //zhangyong
         //当狗被拍卖后，主人变成拍卖合约，主合约并不是狗的购买人，需要额外传入
         _transfer(_to, _tokenId);
-   
+
         // If not a gen0 auction, exit
         if (seller == address(nonFungibleContract)) {
             // Track gen0 sale prices
@@ -1894,9 +1894,9 @@ contract DogAuction is DogBreeding {
     )
         external
         whenNotPaused
-    {    
+    {
         //zhangyong
-        Dog storage dog = dogs[_dogId];    
+        Dog storage dog = dogs[_dogId];
         //变异狗不能繁殖
         require(dog.variation == 0);
 
@@ -1936,14 +1936,14 @@ contract DogAuction is DogBreeding {
 
         // Define the current price of the auction.
         uint256 currentPrice = siringAuction.getCurrentPrice(_sireId);
-        
+
         // zhangyong
         // 如果不是0代狗繁殖，则多收0代狗的繁殖收益
         uint256 totalFee = currentPrice + autoBirthFee;
         Dog storage matron = dogs[_matronId];
         if (matron.generation > 0) {
             totalFee += gen0Profit;
-        }        
+        }
         require(msg.value >= totalFee);
 
         uint256 auctioneerCut = saleAuction.computeCut(currentPrice);
@@ -2006,7 +2006,7 @@ contract DogAuction is DogBreeding {
             saleAuction.createAuction(
                 _dogId,
                 nextPrice,
-                nextPrice,                                               
+                nextPrice,
                 GEN0_AUCTION_DURATION,
                 msg.sender);
         }
@@ -2063,7 +2063,7 @@ contract DogMinting is DogAuction {
         //zhangyong
         //增加变异系数与0代狗祖先作为参数
         uint256 dogId = _createDog(0, 0, 0, _genes, address(this), 0, 0, false);
-        
+
         _approve(dogId, msg.sender);
 
         gen0CreatedCount++;
@@ -2168,9 +2168,9 @@ contract DogCore is DogMinting {
         // start with the mythical kitten 0 - so we don't have generation-0 parent issues
         //zhangyong
         //增加变异系数与0代狗祖先作为参数
-        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);   
-        _approve(0, cooAddress);     
-        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);   
+        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);
+        _approve(0, cooAddress);
+        _createDog(0, 0, 0, uint256(0), address(this), 0, 0, false);
         _approve(1, cooAddress);
     }
 
@@ -2245,26 +2245,26 @@ contract DogCore is DogMinting {
         // Actually unpause the contract.
         super.unpause();
     }
-      
+
     function setLotteryAddress(address _address) external onlyCEO {
         LotteryInterface candidateContract = LotteryInterface(_address);
 
         require(candidateContract.isLottery());
 
         lottery = candidateContract;
-    }  
-      
+    }
+
     function setVariationAddress(address _address) external onlyCEO {
         VariationInterface candidateContract = VariationInterface(_address);
 
         require(candidateContract.isVariation());
 
         variation = candidateContract;
-    }  
+    }
 
     function registerLottery(uint256 _dogId) external returns (uint8) {
         require(_owns(msg.sender, _dogId));
-        require(lottery.registerLottery(_dogId) == 0);    
+        require(lottery.registerLottery(_dogId) == 0);
         _transfer(msg.sender, address(lottery), _dogId);
     }
 
@@ -2274,4 +2274,20 @@ contract DogCore is DogMinting {
         _to.transfer(_money);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

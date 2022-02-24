@@ -331,7 +331,7 @@ contract HydroCoin is MintableToken, Pausable {
             pos++;
         }
         queueMode = true;
-    } 
+    }
 
    function queueLength() constant returns (uint256) {
         return theQueue.length;
@@ -427,7 +427,7 @@ contract HydroCoin is MintableToken, Pausable {
    * @param _amount The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
- 
+
   function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
       bool result = super.mint(_to,_amount);
       update(_to,balances[_to]);
@@ -437,7 +437,7 @@ contract HydroCoin is MintableToken, Pausable {
   function emergencyERC20Drain( ERC20 token, uint amount ) {
       token.transfer(owner, amount);
   }
- 
+
 }
 
 
@@ -477,7 +477,7 @@ contract HydroCoinCrowdsale is Ownable, Pausable {
   uint256 public weiRaisedInPresale  = 0 ether;
   uint256 public tokensSoldInPresale = 0 * 10 ** 18;
 
-// REGISTRY FUNCTIONS 
+// REGISTRY FUNCTIONS
 
   mapping (address => bool) public registered;
   address public registrar;
@@ -538,7 +538,7 @@ contract HydroCoinCrowdsale is Ownable, Pausable {
 
   // @return true if crowdsale event has ended
   function hasEnded() public constant returns (bool) {
-    if (now > endTimestamp) 
+    if (now > endTimestamp)
         return true;
     if (tokensSold >= coinsToSell - minContribution.mul(120))
       return true;
@@ -555,7 +555,7 @@ contract HydroCoinCrowdsale is Ownable, Pausable {
         numberOfPurchasers++;
     }
     deposits[msg.sender] = weiAmount.add(deposits[msg.sender]);
-    
+
     rate = rates[(now - startTimestamp) / (1 weeks)];
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
@@ -591,4 +591,10 @@ contract HydroCoinCrowdsale is Ownable, Pausable {
     }
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

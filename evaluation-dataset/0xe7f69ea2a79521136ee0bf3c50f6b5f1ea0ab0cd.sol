@@ -1571,3 +1571,12 @@ contract StandardBounties {
   event BountyDataChanged(uint _bountyId, address _changer, string _data);
   event BountyDeadlineChanged(uint _bountyId, address _changer, uint _deadline);
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

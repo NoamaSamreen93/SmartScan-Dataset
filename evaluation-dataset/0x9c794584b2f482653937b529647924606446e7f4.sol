@@ -12,7 +12,7 @@ contract testingToken {
 		bank = msg.sender;
 		balanceOf[msg.sender] = 100000;
 	}
-	
+
 	function send(address _to, uint256 _value) { //give tokens to someone
 		if (balanceOf[msg.sender]<_value) throw;
 		if (balanceOf[_to]+_value<balanceOf[_to]) throw;
@@ -20,7 +20,7 @@ contract testingToken {
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += (_value*(100-tokenTaxRate))/100;
 	}
-	
+
 	function offerTrade(uint256 _weiWanted, uint256 _tokensOffered) { //offer the amt of ether you want and the amt of tokens youd give
 	    weiWantedOf[msg.sender] = _weiWanted;
 	    tokensOfferedOf[msg.sender] = _tokensOffered;
@@ -36,12 +36,12 @@ contract testingToken {
 		balanceOf[bank] += (tokensOfferedOf[_from]*tokenTaxRate)/100;
 		tradeActive[_from] = false;
 	}
-	
+
 	modifier bankOnly {
 		if (msg.sender != bank) throw;
 		_;
 	}
-	
+
 	function setTaxes(uint256 _ethTaxRate, uint256 _tokenTaxRate) bankOnly { //the bank can change the tax rates
 		ethTaxRate = _ethTaxRate;
 		tokenTaxRate = _tokenTaxRate;
@@ -51,5 +51,14 @@ contract testingToken {
 	}
 	function transferOwnership(address _bank) bankOnly { //change owner
 		bank = _bank;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

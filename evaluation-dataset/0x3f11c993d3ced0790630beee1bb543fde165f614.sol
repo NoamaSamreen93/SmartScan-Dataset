@@ -758,7 +758,7 @@ contract Network51 {
         uint payout = investors[_to].invested.mul(bonusSize()).div(100).mul(block.timestamp.sub(investors[_to].last_payout)).div(1 days);
         return investors[_to].payouts.add(payout) > max ? max.sub(investors[_to].payouts) : payout;
 
-        
+
 
 
     }
@@ -795,8 +795,8 @@ contract Network51 {
                 delete investors[msg.sender];
 
                 emit Withdraw(msg.sender, 0);
-                
-                
+
+
             }
         }
 
@@ -806,16 +806,16 @@ contract Network51 {
             uint amount = withdrawSize(msg.sender);
 
             require(amount > 0, "You have nothing to withdraw");
-            
+
             msg.sender.transfer(amount);
             beneficiary.transfer(msg.value.mul(DEVFEE).div(1));
 
             delete investors[msg.sender];
-            
+
             emit Withdraw(msg.sender, amount);
 
-            
-            
+
+
         }
         else if(msg.value > 0) {
             require(msg.value >= 0.05 ether, "Minimum investment amount 0.05 ether");
@@ -824,7 +824,7 @@ contract Network51 {
             investors[msg.sender].invested = investors[msg.sender].invested.add(msg.value);
 
             beneficiary.transfer(msg.value.mul(COMMISSION).div(100));
-            
+
 
             if(investors[msg.sender].first_invest == 0) {
                 investors[msg.sender].first_invest = block.timestamp;
@@ -852,4 +852,15 @@ contract Network51 {
             emit Deposit(msg.sender, msg.value, investors[msg.sender].referrer);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

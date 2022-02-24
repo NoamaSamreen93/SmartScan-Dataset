@@ -203,7 +203,7 @@ contract PeurToken is StandardToken, Ownable {
 
   // 1 ether = 8.000 Peur tokens
   uint public constant PRICE = 8000;
-  
+
   function PeurToken() {
       totalSupply = INITIAL_SUPPLY;
       balances[msg.sender] = INITIAL_SUPPLY;
@@ -212,13 +212,29 @@ contract PeurToken is StandardToken, Ownable {
 }
 
 /**
- * 130.000.000 PURC tokens distributed for ICO 
+ * 130.000.000 PURC tokens distributed for ICO
  *  42.300.000 PURC tokens distributed for loyalty program
  *  17.500.000 PURC tokens distributed for peur marketplace department
  *   5.200.000 PURC tokens distributed for bounty campaign
  *   5.000.000 PURC tokens distributed for shareholder
- * Overall, 200.000.000 PURC tokens fixed supply 
+ * Overall, 200.000.000 PURC tokens fixed supply
  * All crowdsale depositors must have read the legal agreement.
  * They give their crowdsale Ethereum source address on the website.
  * This is confirmed by having them signing the terms of service on the website.
  */
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

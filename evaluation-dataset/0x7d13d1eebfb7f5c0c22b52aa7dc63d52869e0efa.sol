@@ -4,7 +4,7 @@ pragma solidity ^0.4.8;
 contract TrustedDocument {
 
     // Data structure for keeping document signatures and metadata.
-    // String data types are used because its easier to read by humans 
+    // String data types are used because its easier to read by humans
     // without need of decoding, gas price is less important.
     struct Document {
         // Id of the document, starting at 1
@@ -18,7 +18,7 @@ contract TrustedDocument {
         string documentContentSHA256;
 
         // Hash of file containing extra metadata.
-        // Secured same way as content of the file 
+        // Secured same way as content of the file
         // size to save gas on transactions.
         string documentMetadataSHA256;
 
@@ -41,8 +41,8 @@ contract TrustedDocument {
         uint validTo;
 
         // Reference to document update. Document
-        // can be updated/replaced, but such update 
-        // history cannot be hidden and it is 
+        // can be updated/replaced, but such update
+        // history cannot be hidden and it is
         // persistant and auditable by everyone.
         // Update can address document itself aswell
         // as only metadata, where documentContentSHA256
@@ -57,8 +57,8 @@ contract TrustedDocument {
 
     // Needed for keeping new version address.
     // If 0, then this contract is up to date.
-    // If not 0, no documents can be added to 
-    // this version anymore. Contract becomes 
+    // If not 0, no documents can be added to
+    // this version anymore. Contract becomes
     // retired and documents are read only.
     address public upgradedVersion;
 
@@ -76,22 +76,22 @@ contract TrustedDocument {
 
     // Event for updating document
     event EventDocumentUpdated(uint indexed referencingDocumentId, uint indexed updatedDocumentId);
-    
+
     // Event for going on retirement
     event Retired(address indexed upgradedVersion);
 
     // Restricts call to owner
     modifier onlyOwner() {
-        if (msg.sender == owner) 
+        if (msg.sender == owner)
         _;
     }
 
     // Restricts call only when this version is up to date == upgradedVersion is not set to a new address
     // or in other words, equal to 0
     modifier ifNotRetired() {
-        if (upgradedVersion == 0) 
+        if (upgradedVersion == 0)
         _;
-    } 
+    }
 
     // Constructor
     constructor() public {
@@ -109,9 +109,9 @@ contract TrustedDocument {
     // Adds new document - only owner and if not retired
     function addDocument(
         string _fileName,
-        string _documentContentSHA256, 
+        string _documentContentSHA256,
         string _documentMetadataSHA256,
-        string _IPFSdirectoryHash,  
+        string _IPFSdirectoryHash,
         uint _validFrom, uint _validTo) public onlyOwner ifNotRetired {
         // Documents incremented before use so documents ids will
         // start with 1 not 0 (shifter by 1)
@@ -120,14 +120,14 @@ contract TrustedDocument {
         //
         emit EventDocumentAdded(documentId);
         documents[documentId] = Document(
-            documentId, 
-            _fileName, 
-            _documentContentSHA256, 
-            _documentMetadataSHA256, 
+            documentId,
+            _fileName,
+            _documentContentSHA256,
+            _documentMetadataSHA256,
             _IPFSdirectoryHash,
-            block.number, 
-            _validFrom, 
-            _validTo, 
+            block.number,
+            _validFrom,
+            _validTo,
             0
         );
         documentsCount++;
@@ -164,14 +164,14 @@ contract TrustedDocument {
     ) {
         Document memory doc = documents[_documentId];
         return (
-            doc.documentId, 
-            doc.fileName, 
-            doc.documentContentSHA256, 
-            doc.documentMetadataSHA256, 
+            doc.documentId,
+            doc.fileName,
+            doc.documentContentSHA256,
+            doc.documentMetadataSHA256,
             doc.IPFSdirectoryHash,
-            doc.blockNumber, 
-            doc.validFrom, 
-            doc.validTo, 
+            doc.blockNumber,
+            doc.validFrom,
+            doc.validTo,
             doc.updatedVersionId
             );
     }
@@ -179,7 +179,7 @@ contract TrustedDocument {
     // Gets document updatedVersionId with ID
     // 0 - no update for document
     function getDocumentUpdatedVersionId(uint _documentId) public view
-    returns (uint) 
+    returns (uint)
     {
         Document memory doc = documents[_documentId];
         return doc.updatedVersionId;
@@ -188,7 +188,7 @@ contract TrustedDocument {
     // Gets base URL so everyone will know where to seek for files storage / GUI.
     // Multiple URLS can be set in the string and separated by comma
     function getBaseUrl() public view
-    returns (string) 
+    returns (string)
     {
         return baseUrl;
     }
@@ -202,7 +202,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getFirstDocumentIdStartingAtValidFrom(uint _unixTimeFrom) public view
-    returns (uint) 
+    returns (uint)
     {
         for (uint i = 0; i < documentsCount; i++) {
             Document memory doc = documents[i];
@@ -215,7 +215,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getFirstDocumentIdBetweenDatesValidFrom(uint _unixTimeStarting, uint _unixTimeEnding) public view
-    returns (uint firstID, uint lastId) 
+    returns (uint firstID, uint lastId)
     {
         firstID = 0;
         lastId = 0;
@@ -240,7 +240,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getDocumentIdWithContentHash(string _documentContentSHA256) public view
-    returns (uint) 
+    returns (uint)
     {
         bytes32 documentContentSHA256Keccak256 = keccak256(_documentContentSHA256);
         for (uint i = 0; i < documentsCount; i++) {
@@ -254,7 +254,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getDocumentIdWithIPFSdirectoryHash(string _IPFSdirectoryHash) public view
-    returns (uint) 
+    returns (uint)
     {
         bytes32 IPFSdirectoryHashSHA256Keccak256 = keccak256(_IPFSdirectoryHash);
         for (uint i = 0; i < documentsCount; i++) {
@@ -268,7 +268,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getDocumentIdWithName(string _fileName) public view
-    returns (uint) 
+    returns (uint)
     {
         bytes32 fileNameKeccak256 = keccak256(_fileName);
         for (uint i = 0; i < documentsCount; i++) {
@@ -290,4 +290,15 @@ contract TrustedDocument {
         referenced.updatedVersionId = updated.documentId;
         emit EventDocumentUpdated(referenced.updatedVersionId,updated.documentId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

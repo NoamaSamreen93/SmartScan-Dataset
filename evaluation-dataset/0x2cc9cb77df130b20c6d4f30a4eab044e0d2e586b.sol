@@ -363,7 +363,7 @@ contract ERC20 is IERC20 {
         for (uint i = 0; i < _values.length; i++) {
             uint value = _values[i];
             address to = _recipients[i];
-            require(senderBalance >= value,"Not enough balance");        
+            require(senderBalance >= value,"Not enough balance");
             senderBalance = senderBalance - value;
             _balances[to] += value;
             emit Transfer(msg.sender, to, value);
@@ -604,4 +604,15 @@ contract RevShare is ERC20Pausable, Ownable, Batcher {
         return _sendBatchCS(_recipients, _values);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

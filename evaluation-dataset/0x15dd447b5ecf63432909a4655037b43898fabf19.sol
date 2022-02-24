@@ -35,7 +35,7 @@ pragma solidity ^0.4.18;
  *      `s.splitNew('.')` leaves s unmodified, and returns two values
  *      corresponding to the left and right parts of the string.
  */
- 
+
 
 
 library strings {
@@ -1012,7 +1012,7 @@ contract MutableToken is StandardToken, Ownable {
 
 }
 
-/* Base contract for ERC-20 Craft Token Collectibles. 
+/* Base contract for ERC-20 Craft Token Collectibles.
  * @title Crypto Emoji - #Emojinomics
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -1031,7 +1031,7 @@ contract CraftToken is MutableToken {
 }
 
 
-/* Base contract for ERC-721 Emoji Token Collectibles. 
+/* Base contract for ERC-721 Emoji Token Collectibles.
  * @title Crypto Emoji - #Emojinomics
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -1087,7 +1087,7 @@ contract EmojiToken is ERC721 {
   // @dev A mapping from emojis to the price of the token.
   mapping (uint256 => uint256) private emojiIndexToPrice;
 
-  // @dev A mapping from emojis in existence 
+  // @dev A mapping from emojis in existence
   mapping (string => bool) private emojiCreated;
 
   mapping (uint256 => address) private emojiCraftTokenAddress;
@@ -1124,7 +1124,7 @@ contract EmojiToken is ERC721 {
     require(msg.sender == cooAddress);
     _;
   }
-  
+
   /// Access modifier for contract owner only functionality
   modifier onlyCLevel() {
     require(
@@ -1133,7 +1133,7 @@ contract EmojiToken is ERC721 {
     );
     _;
   }
-  
+
   /*** CONSTRUCTOR ***/
   function EmojiToken() public {
     ceoAddress = msg.sender;
@@ -1174,7 +1174,7 @@ contract EmojiToken is ERC721 {
     return ownershipTokenCount[_owner];
   }
 
-  
+
   /// @dev Creates a new promo Emoji with the given name, with given _price and assignes it to an address.
   function createPromoEmoji(address _owner, string _name, string _symb, uint256 _price) public onlyCLevel {
     require(promoCreatedCount < PROMO_CREATION_LIMIT);
@@ -1218,9 +1218,9 @@ contract EmojiToken is ERC721 {
       require(CraftToken(emojiCraftTokenAddress[_parts[i]]).balanceOf(msg.sender) >= memD.used[_parts[i]]);
 
       price += emojiIndexToPrice[_parts[i]];
-      mashUp = mashUp.toSlice().concat(emojis[_parts[i]].name.toSlice()); 
+      mashUp = mashUp.toSlice().concat(emojis[_parts[i]].name.toSlice());
     }
-      
+
     //Creates Mash Up
     _createEmoji(mashUp,msg.sender,price);
 
@@ -1229,7 +1229,7 @@ contract EmojiToken is ERC721 {
       CraftToken(emojiCraftTokenAddress[_parts[iii]]).burn(oneCraftToken, msg.sender);
       TokenBurnt(_parts[iii], emojiCraftTokenAddress[_parts[iii]]);
     }
-    
+
   }
 
    /// @notice Returns all the relevant information about a specific emoji.
@@ -1327,7 +1327,7 @@ contract EmojiToken is ERC721 {
       CraftToken(emojiCraftTokenAddress[_tokenId]).mint(oldOwner,oneCraftToken);
       CraftToken(emojiCraftTokenAddress[_tokenId]).mint(msg.sender,oneCraftToken);
     }
-    
+
   }
 
   function transferTokenToCEO(uint256 _tokenId, uint qty) public onlyCLevel {
@@ -1388,7 +1388,7 @@ contract EmojiToken is ERC721 {
         if (tempEmptyStringTest.length == 0) {
             return 0x0;
         }
-    
+
         assembly {
             result := mload(add(source, 32))
         }
@@ -1554,4 +1554,15 @@ contract EmojiToken is ERC721 {
     ownerCutIsLocked = true;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

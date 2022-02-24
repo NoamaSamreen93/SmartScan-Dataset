@@ -6,16 +6,16 @@ contract MB {
   string public symbol = "MB";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 100000000000000000000000000000;
-    
+
   mapping(address => uint) balances;
   mapping (address => mapping (address => uint)) allowed;
   uint256 public _totalSupply;
   address public _creator;
   bool bIsFreezeAll = false;
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
   event Approval(address indexed owner, address indexed spender, uint value);
-  
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
@@ -26,7 +26,7 @@ contract MB {
     assert(c>=a && c>=b);
     return c;
   }
-  
+
   function totalSupply() public constant returns (uint256 total) {
 	total = _totalSupply;
   }
@@ -64,22 +64,28 @@ contract MB {
     return allowed[_owner][_spender];
   }
 
-  function freezeAll() public 
+  function freezeAll() public
   {
 	require(msg.sender == _creator);
 	bIsFreezeAll = !bIsFreezeAll;
   }
-  
+
   function MB() public {
     _totalSupply = INITIAL_SUPPLY;
 	_creator = 0xf2F91C1C681816eE275ce9b4366D5a906da6eBf5;
 	balances[_creator] = INITIAL_SUPPLY;
 	bIsFreezeAll = false;
   }
-  
+
   function destroy() public  {
 	require(msg.sender == _creator);
 	selfdestruct(_creator);
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

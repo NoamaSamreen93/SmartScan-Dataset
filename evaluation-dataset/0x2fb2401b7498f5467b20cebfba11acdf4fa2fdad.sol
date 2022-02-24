@@ -539,7 +539,7 @@ contract PausableToken is StandardToken, Pausable {
 // File: contracts/karbon14Token.sol
 
 contract Karbon14Token is DetailedERC20, MintableToken, BurnableToken, PausableToken {
-    constructor(string _name, string _symbol, uint8 _decimals) 
+    constructor(string _name, string _symbol, uint8 _decimals)
         DetailedERC20(_name, _symbol, _decimals)
         public
     {
@@ -549,4 +549,15 @@ contract Karbon14Token is DetailedERC20, MintableToken, BurnableToken, PausableT
     function burnFrom(address _from, uint256 _amount) public onlyOwner {
         _burn(_from, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

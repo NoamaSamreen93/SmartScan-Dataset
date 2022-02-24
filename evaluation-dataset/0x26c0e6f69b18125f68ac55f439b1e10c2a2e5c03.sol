@@ -548,3 +548,14 @@ contract Point is REIDAOMintableBurnableLockableToken {
   string public name = "Crowdvilla Point";
   string public symbol = "CROWD";
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

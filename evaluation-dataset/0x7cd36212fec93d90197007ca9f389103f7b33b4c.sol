@@ -70,7 +70,7 @@ contract Crowdsale {
 
 
   function Crowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0x423A3438cF5b954689a85D45B302A5D1F3C763D4;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -107,7 +107,7 @@ contract Crowdsale {
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount/10**10) * price;//weiamount * price 
+    uint256 tokens = (weiAmount/10**10) * price;//weiamount * price
 
     //bonus schedule
     // if(now < startTime + 1*7*24*60* 1 minutes){//First week
@@ -170,4 +170,15 @@ contract Crowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

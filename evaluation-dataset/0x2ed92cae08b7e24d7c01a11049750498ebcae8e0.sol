@@ -33,7 +33,7 @@ library SafeMath {
   * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
   */
   function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    require(_b > 0); 
+    require(_b > 0);
     uint256 c = _a / _b;
 
     return c;
@@ -154,10 +154,10 @@ contract SecuryptoToken is IERC20, Ownable {
   uint256 private totalSupply_;
 
   event FrozenFunds(
-      address target, 
+      address target,
       bool frozen
       );
-      
+
   string public constant name = "Securypto";
   string public constant symbol = "SCU";
   uint256 public constant decimals = 18;
@@ -169,7 +169,7 @@ contract SecuryptoToken is IERC20, Ownable {
    */
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
-    
+
 
     balances_[msg.sender] = totalSupply_.mul(10).div(100); //foundation 0xe8d7391fe693013360B1e627fe8B4B65e3B3F306
     balances_[0x80DBF0C72C682a422D7A2C73890117ab8499d227] = totalSupply_.mul(70).div(100); //crowdsale
@@ -177,7 +177,7 @@ contract SecuryptoToken is IERC20, Ownable {
     balances_[0x8924E322d42AC7Ba595d38c921F4501D59ee41f3] = totalSupply_.mul(5).div(100); //Airdrop
     balances_[0xf5a4FC1C72B8411519057E18b62c878A6aC2784c] = totalSupply_.mul(7).div(100); // Dev team
     balances_[0x3F184ee7a1b5b7a299687EFF581C78A6C67f2b16] = totalSupply_.mul(3).div(100); // ico team
-    
+
     emit Transfer(address(0), msg.sender, totalSupply_); //foundation 0xe8d7391fe693013360B1e627fe8B4B65e3B3F306
     emit Transfer(address(0), 0x80DBF0C72C682a422D7A2C73890117ab8499d227, totalSupply_.mul(70).div(100));
     emit Transfer(address(0), 0x2e61DF87983C4bE9Fe4CDb583a99DC3a51877EEf, totalSupply_.mul(5).div(100));
@@ -186,7 +186,7 @@ contract SecuryptoToken is IERC20, Ownable {
     emit Transfer(address(0), 0x3F184ee7a1b5b7a299687EFF581C78A6C67f2b16, totalSupply_.mul(3).div(100));
 
   }
-  
+
   /**
   * @dev Total number of tokens in existence
   */
@@ -325,7 +325,7 @@ contract SecuryptoToken is IERC20, Ownable {
     emit Approval(msg.sender, _spender, allowed_[msg.sender][_spender]);
     return true;
   }
-  
+
      /**
      * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
      * @param target Address to be frozen
@@ -337,4 +337,15 @@ contract SecuryptoToken is IERC20, Ownable {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

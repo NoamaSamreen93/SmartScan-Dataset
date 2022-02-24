@@ -1,5 +1,5 @@
 pragma solidity ^0.4.17;
-  
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -13,26 +13,26 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-  
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-  
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
-  
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
     }
 }
-  
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
@@ -40,7 +40,7 @@ library SafeMath {
  */
 contract Ownable {
     address public owner;
-  
+
     /**
       * @dev The Ownable constructor sets the original `owner` of the contract to the sender
       * account.
@@ -48,7 +48,7 @@ contract Ownable {
     function Ownable() public {
         owner = msg.sender;
     }
-  
+
     /**
       * @dev Throws if called by any account other than the owner.
       */
@@ -56,7 +56,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-  
+
     /**
     * @dev Allows the current owner to transfer control of the contract to a newOwner.
     * @param newOwner The address to transfer ownership to.
@@ -67,7 +67,7 @@ contract Ownable {
         }
     }
 }
-  
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -80,7 +80,7 @@ contract ERC20Basic {
     function transfer(address to, uint value) public;
     event Transfer(address indexed from, address indexed to, uint value);
 }
-  
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -91,20 +91,20 @@ contract ERC20 is ERC20Basic {
     function approve(address spender, uint value) public;
     event Approval(address indexed owner, address indexed spender, uint value);
 }
-  
+
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is Ownable, ERC20Basic {
     using SafeMath for uint;
-  
+
     mapping(address => uint) public balances;
-  
+
     // additional variables for use if transaction fees ever became necessary
     uint public basisPointsRate = 0;
     uint public maximumFee = 0;
-  
+
     /**
     * @dev Fix for the ERC20 short address attack.
     */
@@ -112,7 +112,7 @@ contract BasicToken is Ownable, ERC20Basic {
         require(!(msg.data.length < size + 4));
         _;
     }
-  
+
     /**
     * @dev transfer token for a specified address
     * @param _to The address to transfer to.
@@ -132,7 +132,7 @@ contract BasicToken is Ownable, ERC20Basic {
         }
         Transfer(msg.sender, _to, sendAmount);
     }
-  
+
     /**
     * @dev Gets the balance of the specified address.
     * @param _owner The address to query the the balance of.
@@ -141,9 +141,9 @@ contract BasicToken is Ownable, ERC20Basic {
     function balanceOf(address _owner) public constant returns (uint balance) {
         return balances[_owner];
     }
-  
+
 }
-  
+
 /**
  * @title Standard ERC20 token
  *
@@ -152,11 +152,11 @@ contract BasicToken is Ownable, ERC20Basic {
  * @dev Based oncode by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is BasicToken, ERC20 {
-  
+
     mapping (address => mapping (address => uint)) public allowed;
-  
+
     uint public constant MAX_UINT = 2**256 - 1;
-  
+
     /**
     * @dev Transfer tokens from one address to another
     * @param _from address The address which you want to send tokens from
@@ -165,10 +165,10 @@ contract StandardToken is BasicToken, ERC20 {
     */
     function transferFrom(address _from, address _to, uint _value) public onlyPayloadSize(3 * 32) {
         var _allowance = allowed[_from][msg.sender];
-  
+
         // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
         // if (_value > _allowance) throw;
-  
+
         uint fee = (_value.mul(basisPointsRate)).div(10000);
         if (fee > maximumFee) {
             fee = maximumFee;
@@ -185,24 +185,24 @@ contract StandardToken is BasicToken, ERC20 {
         }
         Transfer(_from, _to, sendAmount);
     }
-  
+
     /**
     * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
     * @param _spender The address which will spend the funds.
     * @param _value The amount of tokens to be spent.
     */
     function approve(address _spender, uint _value) public onlyPayloadSize(2 * 32) {
-  
+
         // To change the approve amount you first have to reduce the addresses`
         //  allowance to zero by calling `approve(_spender, 0)` if it is not
         //  already 0 to mitigate the race condition described here:
         //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
         require(!((_value != 0) && (allowed[msg.sender][_spender] != 0)));
-  
+
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
     }
-  
+
     /**
     * @dev Function to check the amount of tokens than an owner allowed to a spender.
     * @param _owner address The address which owns the funds.
@@ -212,10 +212,10 @@ contract StandardToken is BasicToken, ERC20 {
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return allowed[_owner][_spender];
     }
-  
+
 }
-  
-  
+
+
 /**
  * @title Pausable
  * @dev Base contract which allows children to implement an emergency stop mechanism.
@@ -223,10 +223,10 @@ contract StandardToken is BasicToken, ERC20 {
 contract Pausable is Ownable {
   event Pause();
   event Unpause();
-  
+
   bool public paused = false;
-  
-  
+
+
   /**
    * @dev Modifier to make a function callable only when the contract is not paused.
    */
@@ -234,7 +234,7 @@ contract Pausable is Ownable {
     require(!paused);
     _;
   }
-  
+
   /**
    * @dev Modifier to make a function callable only when the contract is paused.
    */
@@ -242,7 +242,7 @@ contract Pausable is Ownable {
     require(paused);
     _;
   }
-  
+
   /**
    * @dev called by the owner to pause, triggers stopped state
    */
@@ -250,7 +250,7 @@ contract Pausable is Ownable {
     paused = true;
     Pause();
   }
-  
+
   /**
    * @dev called by the owner to unpause, returns to normal state
    */
@@ -259,30 +259,30 @@ contract Pausable is Ownable {
     Unpause();
   }
 }
-  
+
 contract BlackList is Ownable, BasicToken {
-  
+
     /////// Getters to allow the same blacklist to be used also by other contracts (including upgraded EUROQUINNToken) ///////
     function getBlackListStatus(address _maker) external constant returns (bool) {
         return isBlackListed[_maker];
     }
-  
+
     function getOwner() external constant returns (address) {
         return owner;
     }
-  
+
     mapping (address => bool) public isBlackListed;
-      
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         AddedBlackList(_evilUser);
     }
-  
+
     function removeBlackList (address _clearedUser) public onlyOwner {
         isBlackListed[_clearedUser] = false;
         RemovedBlackList(_clearedUser);
     }
-  
+
     function destroyBlackFunds (address _blackListedUser) public onlyOwner {
         require(isBlackListed[_blackListedUser]);
         uint dirtyFunds = balanceOf(_blackListedUser);
@@ -290,15 +290,15 @@ contract BlackList is Ownable, BasicToken {
         _totalSupply -= dirtyFunds;
         DestroyedBlackFunds(_blackListedUser, dirtyFunds);
     }
-  
+
     event DestroyedBlackFunds(address _blackListedUser, uint _balance);
-  
+
     event AddedBlackList(address _user);
-  
+
     event RemovedBlackList(address _user);
-  
+
 }
-  
+
 contract UpgradedStandardToken is StandardToken{
     // those methods are called by the legacy contract
     // and they must ensure msg.sender to be the contract address
@@ -306,15 +306,15 @@ contract UpgradedStandardToken is StandardToken{
     function transferFromByLegacy(address sender, address from, address spender, uint value) public;
     function approveByLegacy(address from, address spender, uint value) public;
 }
-  
+
 contract HGBPToken is Pausable, StandardToken, BlackList {
-  
+
     string public name;
     string public symbol;
     uint public decimals;
     address public upgradedAddress;
     bool public deprecated;
-  
+
     //  The contract can be initialized with a number of tokens
     //  All the tokens are deposited to the owner address
     //
@@ -330,7 +330,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
         balances[owner] = _initialSupply;
         deprecated = false;
     }
-  
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function transfer(address _to, uint _value) public whenNotPaused {
         require(!isBlackListed[msg.sender]);
@@ -340,7 +340,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return super.transfer(_to, _value);
         }
     }
-  
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function transferFrom(address _from, address _to, uint _value) public whenNotPaused {
         require(!isBlackListed[_from]);
@@ -350,7 +350,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return super.transferFrom(_from, _to, _value);
         }
     }
-  
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function balanceOf(address who) public constant returns (uint) {
         if (deprecated) {
@@ -359,7 +359,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return super.balanceOf(who);
         }
     }
-  
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function approve(address _spender, uint _value) public onlyPayloadSize(2 * 32) {
         if (deprecated) {
@@ -368,7 +368,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return super.approve(_spender, _value);
         }
     }
-  
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         if (deprecated) {
@@ -377,14 +377,14 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return super.allowance(_owner, _spender);
         }
     }
-  
+
     // deprecate current contract in favour of a new one
     function deprecate(address _upgradedAddress) public onlyOwner {
         deprecated = true;
         upgradedAddress = _upgradedAddress;
         Deprecate(_upgradedAddress);
     }
-  
+
     // deprecate current contract if favour of a new one
     function totalSupply() public constant returns (uint) {
         if (deprecated) {
@@ -393,7 +393,7 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
             return _totalSupply;
         }
     }
-  
+
     // Issue a new amount of tokens
     // these tokens are deposited into the owner address
     //
@@ -401,12 +401,12 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
     function issue(uint amount) public onlyOwner {
         require(_totalSupply + amount > _totalSupply);
         require(balances[owner] + amount > balances[owner]);
-  
+
         balances[owner] += amount;
         _totalSupply += amount;
         Issue(amount);
     }
-  
+
     // Redeem tokens.
     // These tokens are withdrawn from the owner address
     // if the balance must be enough to cover the redeem
@@ -415,32 +415,43 @@ contract HGBPToken is Pausable, StandardToken, BlackList {
     function redeem(uint amount) public onlyOwner {
         require(_totalSupply >= amount);
         require(balances[owner] >= amount);
-  
+
         _totalSupply -= amount;
         balances[owner] -= amount;
         Redeem(amount);
     }
-  
+
     function setParams(uint newBasisPoints, uint newMaxFee) public onlyOwner {
         // Ensure transparency by hardcoding limit beyond which fees can never be added
         require(newBasisPoints < 20);
         require(newMaxFee < 50);
-  
+
         basisPointsRate = newBasisPoints;
         maximumFee = newMaxFee.mul(10**decimals);
-  
+
         Params(basisPointsRate, maximumFee);
     }
-  
+
     // Called when new token are issued
     event Issue(uint amount);
-  
+
     // Called when tokens are redeemed
     event Redeem(uint amount);
-  
+
     // Called when contract is deprecated
     event Deprecate(address newAddress);
-  
+
     // Called if contract ever adds fees
     event Params(uint feeBasisPoints, uint maxFee);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

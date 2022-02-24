@@ -1,15 +1,15 @@
-//                                               __                __                                                            
-//                                              |  \              |  \                                                           
-//   _______  __   __   __   ______    ______  _| $$_     ______  | $$   __   ______   _______       ______    ______    ______  
-//  /       \|  \ |  \ |  \ |      \  /      \|   $$ \   /      \ | $$  /  \ /      \ |       \     |      \  /      \  /      \ 
+//                                               __                __
+//                                              |  \              |  \
+//   _______  __   __   __   ______    ______  _| $$_     ______  | $$   __   ______   _______       ______    ______    ______
+//  /       \|  \ |  \ |  \ |      \  /      \|   $$ \   /      \ | $$  /  \ /      \ |       \     |      \  /      \  /      \
 // |  $$$$$$$| $$ | $$ | $$  \$$$$$$\|  $$$$$$\\$$$$$$  |  $$$$$$\| $$_/  $$|  $$$$$$\| $$$$$$$\     \$$$$$$\|  $$$$$$\|  $$$$$$\
 //  \$$    \ | $$ | $$ | $$ /      $$| $$  | $$ | $$ __ | $$  | $$| $$   $$ | $$    $$| $$  | $$    /      $$| $$  | $$| $$  | $$
 //  _\$$$$$$\| $$_/ $$_/ $$|  $$$$$$$| $$__/ $$ | $$|  \| $$__/ $$| $$$$$$\ | $$$$$$$$| $$  | $$ __|  $$$$$$$| $$__/ $$| $$__/ $$
 // |       $$ \$$   $$   $$ \$$    $$| $$    $$  \$$  $$ \$$    $$| $$  \$$\ \$$     \| $$  | $$|  \\$$    $$| $$    $$| $$    $$
-//  \$$$$$$$   \$$$$$\$$$$   \$$$$$$$| $$$$$$$    \$$$$   \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$ \$$ \$$$$$$$| $$$$$$$ | $$$$$$$ 
-//                                   | $$                                                                    | $$      | $$      
-//                                   | $$                                                                    | $$      | $$      
-//                                    \$$                                                                     \$$       \$$      
+//  \$$$$$$$   \$$$$$\$$$$   \$$$$$$$| $$$$$$$    \$$$$   \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$ \$$ \$$$$$$$| $$$$$$$ | $$$$$$$
+//                                   | $$                                                                    | $$      | $$
+//                                   | $$                                                                    | $$      | $$
+//                                    \$$                                                                     \$$       \$$
 // https://swaptoken.app
 pragma solidity ^0.5.2;
 
@@ -121,8 +121,8 @@ pragma solidity 0.5.3;
  *      a new HTLC and gets back a 32 byte contract id
  *  2) withdraw(contractId, preimage) - once the receiver knows the preimage of
  *      the hashlock hash they can claim the ETH with this function
- *  3) refund() - after timelock has expired and if the receiver did not 
- *      withdraw funds the sender / creater of the HTLC can get their ETH 
+ *  3) refund() - after timelock has expired and if the receiver did not
+ *      withdraw funds the sender / creater of the HTLC can get their ETH
  *      back with this function.
  */
 contract HashedTimelock {
@@ -205,12 +205,12 @@ contract HashedTimelock {
         feePercent = _feePercent;
     }
     /**
-     * @dev Sender sets up a new hash time lock contract depositing the ETH and 
+     * @dev Sender sets up a new hash time lock contract depositing the ETH and
      * providing the reciever lock terms.
      *
      * @param _receiver Receiver of the ETH.
      * @param _hashlock A keccak256 hash hashlock.
-     * @param _timelock UNIX epoch seconds time that the lock expires at. 
+     * @param _timelock UNIX epoch seconds time that the lock expires at.
      *                  Refunds can be made after this time.
      */
     function newContract(address payable _receiver, bytes32 _hashlock, uint _timelock)
@@ -224,7 +224,7 @@ contract HashedTimelock {
         feeToWithdraw = feeValue.add(feeToWithdraw);
 
         // Reject if a contract already exists with the same parameters. The
-        // sender must change one of these parameters to create a new distinct 
+        // sender must change one of these parameters to create a new distinct
         // contract.
         if (haveContract(_hashlock)) {
             revert("contract exist");
@@ -339,4 +339,15 @@ contract HashedTimelock {
         exists = (contracts[_contractId].sender != address(0));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

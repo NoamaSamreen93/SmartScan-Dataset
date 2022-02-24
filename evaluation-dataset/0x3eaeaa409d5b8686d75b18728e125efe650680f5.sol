@@ -51,7 +51,7 @@ contract MakroCoin is SafeMath {
 
     function transfer(address _to, uint256 _value) public {
         require(_to != 0x0);
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
@@ -60,7 +60,7 @@ contract MakroCoin is SafeMath {
     }
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
-		require(_value > 0); 
+		require(_value > 0);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -92,7 +92,7 @@ contract MakroCoin is SafeMath {
         for (uint8 i = 0; i < _toAddresses.length; i++) {
             transferFrom(_from, _toAddresses[i], _amounts[i]);
         }
-    }	
+    }
 
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
@@ -114,7 +114,7 @@ contract MakroCoin is SafeMath {
 
 	function unfreeze(uint256 _value) public returns (bool success) {
         require(freezeOf[msg.sender] >= _value);
-		require(_value > 0); 
+		require(_value > 0);
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
@@ -128,4 +128,17 @@ contract MakroCoin is SafeMath {
 
 	function() payable public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -28,12 +28,12 @@ contract MultiSender {
     address public pendingOwner;
     uint16 public arrayLimit = 150;
     uint256 public fee = 0.05 ether;
-    
+
     modifier onlyOwner(){
         assert(msg.sender == owner);
         _;
     }
-    
+
     modifier hasFee(){
         // uint256 fee = txCount[msg.sender]
         require(msg.value >= fee - discountRate(msg.sender));
@@ -43,33 +43,33 @@ contract MultiSender {
         owner = _owner;
         pendingOwner = _pendingOwner;
     }
-    
+
     function discountRate(address _customer) public view returns(uint256) {
         uint256 count = txCount[_customer];
         return count / (10) * 0.005 ether;
     }
-    
+
     function currentFee(address _customer) public view returns(uint256) {
         return fee - discountRate(_customer);
     }
-    
+
     function claimOwner(address _newPendingOwner) public {
         require(msg.sender == pendingOwner);
         owner = pendingOwner;
         pendingOwner = _newPendingOwner;
     }
-    
+
     function changeTreshold(uint16 _newLimit) public onlyOwner {
         arrayLimit = _newLimit;
     }
-    
+
     function changeFee(uint256 _newFee) public onlyOwner {
         fee = _newFee;
     }
-    
+
     function() payable {
     }
-    
+
     function multisendToken(address token, address[] _contributors, uint256[] _balances) public hasFee payable {
         require(_contributors.length <= arrayLimit);
         ERC20 erc20token = ERC20(token);
@@ -80,7 +80,7 @@ contract MultiSender {
         }
         txCount[msg.sender]++;
     }
-    
+
     function multisendEther(address[] _contributors, uint256[] _balances) public hasFee payable{
         // this function is always free, however if there is anything left over, I will keep it.
         require(_contributors.length <= arrayLimit);
@@ -90,7 +90,7 @@ contract MultiSender {
         }
         txCount[msg.sender]++;
     }
-    
+
     event ClaimedTokens(address token, address owner, uint256 balance);
     function claimTokens(address _token) public onlyOwner {
         if (_token == 0x0) {
@@ -102,4 +102,15 @@ contract MultiSender {
         erc20token.transfer(owner, balance);
         ClaimedTokens(_token, owner, balance);
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

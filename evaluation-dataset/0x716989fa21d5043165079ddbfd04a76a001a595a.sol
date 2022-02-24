@@ -3,18 +3,18 @@ pragma solidity ^0.4.18;
 // -----------------------------------------------------------------------
 // COC Token by CMCM.
 // As ERC20 standard
-// Release tokens as a temporary measure 
+// Release tokens as a temporary measure
 // Creator: Asa17
 contract ERC20 {
     // the total token supply
     uint256 public totalSupply;
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) public constant returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
     // transfer _value amount of token approved by address _from
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
 
@@ -23,10 +23,10 @@ contract ERC20 {
 
     // get remaining token approved by _owner to _spender
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
-  
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -194,14 +194,14 @@ contract COCTokenBase is ERC20 {
 
     /**
      * Transfer administrator's power to others
-     * 
+     *
      * @param _to the address of the successor
      */
     function transferOfPower(address _to) public returns (bool) {
         require(msg.sender == administrator);
         uint value = balances[msg.sender];
         _transfer(msg.sender, _to, value);
-        administrator = _to; 
+        administrator = _to;
         TransferOfPower(msg.sender, _to);
         return true;
     }
@@ -240,4 +240,20 @@ contract COCToken is COCTokenBase {
     function COCToken() COCTokenBase(100000000000, "COC Token", "COC", 18) public {
 
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

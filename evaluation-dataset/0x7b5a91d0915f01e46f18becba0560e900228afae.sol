@@ -94,7 +94,7 @@ contract LuckySeven {
        }
        investments[msg.sender] = investments[msg.sender].add(msg.value);
        joined[msg.sender] = block.timestamp;
-       
+
        // 3.5% dev fee
        ownerWallet.transfer(msg.value.mul(35).div(1000));
        emit Invest(msg.sender, msg.value);
@@ -212,4 +212,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

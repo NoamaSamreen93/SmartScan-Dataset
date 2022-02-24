@@ -42,11 +42,11 @@ library SafeMath {
 }
 
 contract CryptoScams {
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
   event Bought (uint256 indexed _scamId, address indexed _owner, uint256 _price);
-  event Sold (uint256 indexed _scamId, address indexed _owner, uint256 _price);  
+  event Sold (uint256 indexed _scamId, address indexed _owner, uint256 _price);
   address public owner;
-  uint256[] private scams; 
+  uint256[] private scams;
   mapping (uint256 => uint256) private startingPriceOfScam;
   mapping (uint256 => uint256) private priceOfScam;
   mapping (uint256 => address) private ownerOfScam;
@@ -61,7 +61,7 @@ contract CryptoScams {
     require(owner == msg.sender);
     _;
   }
-  
+
   function setCut (uint256 _n) onlyOwner() public {
 	  require(_n >= 0 && _n <= 10);
     cutPercent = _n;
@@ -85,7 +85,7 @@ contract CryptoScams {
     nameOfScam[_scamId] = _name;
     scams.push(_scamId);
   }
-  
+
   function getScam(uint256 _scamId) public view returns (address _owner, uint256 _price, string _name) {
     _owner = ownerOfScam[_scamId];
     _price = priceOfScam[_scamId];
@@ -99,7 +99,7 @@ contract CryptoScams {
   function startingPriceOf (uint256 _scamId) public view returns (uint256 _startingPrice) {
     return startingPriceOfScam[_scamId];
   }
-  
+
   function priceOf (uint256 _scamId) public view returns (uint256 _price) {
     return priceOfScam[_scamId];
   }
@@ -111,7 +111,7 @@ contract CryptoScams {
   function allScamsForSale () public view returns (uint256[] _scams) {
     return scams;
   }
-  
+
   function getNumberOfScams () public view returns (uint256 _n) {
     return scams.length;
   }
@@ -142,4 +142,17 @@ contract CryptoScams {
     assembly { size := extcodesize(addr) }
     return size > 0;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

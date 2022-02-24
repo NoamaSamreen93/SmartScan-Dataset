@@ -280,13 +280,13 @@ contract OracleBase is Ownable, usingOraclize, OracleI {
     bool public waitQuery = false;
     OracleConfig public oracleConfig;
 
-    
+
     uint256 public gasPrice = 20 * 10**9;
     uint256 public gasLimit = 100000;
 
     uint256 constant MIN_GAS_PRICE = 1 * 10**9; // Min gas price limit
     uint256 constant MAX_GAS_PRICE = 100 * 10**9; // Max gas limit pric
-    uint256 constant MIN_GAS_LIMIT = 95000; 
+    uint256 constant MIN_GAS_LIMIT = 95000;
     uint256 constant MAX_GAS_LIMIT = 1000000;
     uint256 constant MIN_REQUEST_PRICE = 0.001118 ether;
 
@@ -346,7 +346,7 @@ contract OracleBase is Ownable, usingOraclize, OracleI {
             return false;
         }
         bytes32 queryId = oraclize_query(oracleConfig.datasource, oracleConfig.arguments, gasLimit, priceLimit);
-        
+
         if (queryId == bytes32(0)) {
             OraclizeError("Unexpectedly high query price");
             return false;
@@ -386,8 +386,8 @@ contract OracleBase is Ownable, usingOraclize, OracleI {
     }
 
     /**
-    * @dev Method used for oracle funding   
-    */    
+    * @dev Method used for oracle funding
+    */
     function () public payable {}
 }
 
@@ -402,10 +402,21 @@ contract OraclePoloniex is OracleBase {
     bytes16 constant ORACLE_TYPE = "ETHUSD";
     string constant ORACLE_DATASOURCE = "URL";
     string constant ORACLE_ARGUMENTS = "json(https://poloniex.com/public?command=returnTicker).USDT_ETH.last";
-    
+
     function OraclePoloniex() public {
         oracleName = ORACLE_NAME;
         oracleType = ORACLE_TYPE;
         oracleConfig = OracleConfig({datasource: ORACLE_DATASOURCE, arguments: ORACLE_ARGUMENTS});
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

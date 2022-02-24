@@ -5,7 +5,7 @@ pragma solidity ^0.4.4;
 // Symbol: OOST
 // Status: ERC20 Verified
 
-contract OOSTToken { 
+contract OOSTToken {
     /* This is a slight change to the ERC20 base standard.
     function totalSupply() constant returns (uint256 supply);
     is replaced with:
@@ -17,7 +17,7 @@ contract OOSTToken {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) public constant returns (uint256 balance);
@@ -86,7 +86,7 @@ contract Ownable {
     address public owner;
     address public newOwner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -121,14 +121,14 @@ contract Ownable {
 
 
 contract OostStandardToken is OOSTToken, Ownable {
-    
+
     using OOSTMaths for uint256;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-     
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -139,7 +139,7 @@ contract OostStandardToken is OOSTToken, Ownable {
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[msg.sender]) 
+        if (frozenAccount[msg.sender])
             return false;
         require(
             (balances[msg.sender] >= _value) // Check if the sender has enough
@@ -156,7 +156,7 @@ contract OostStandardToken is OOSTToken, Ownable {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[msg.sender]) 
+        if (frozenAccount[msg.sender])
             return false;
         require(
             (allowed[_from][msg.sender] >= _value) // Check allowance
@@ -179,7 +179,7 @@ contract OostStandardToken is OOSTToken, Ownable {
          * allowance to zero by calling `approve(_spender, 0)` if it is not
          * already 0 to mitigate the race condition described here:
          * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 */
-        
+
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
 
@@ -187,11 +187,11 @@ contract OostStandardToken is OOSTToken, Ownable {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-  
+
 }
 contract OOST is OostStandardToken {
 
@@ -202,13 +202,13 @@ contract OOST is OostStandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    
+
     uint256 constant public DECIMALS = 8;               //How many decimals to show.
     uint256 public totalSupply = 24 * (10**7) * 10**8 ; // 240 million tokens, 8 decimal places
     string constant public NAME = "OOST";               //fancy name
     string constant public SYMBOL = "OOST";             //An identifier
     string constant public VERSION = "v1";              //Version 2 standard. Just an arbitrary versioning scheme.
-    
+
     function OOST() public {
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
@@ -224,4 +224,15 @@ contract OOST is OostStandardToken {
         require(_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,9 +2,9 @@ pragma solidity ^0.3.5;
 
 contract DepositHolder {
     uint constant GUARANTEE_PERIOD = 365 days;
-    
+
     event Claim(address addr, uint amount);
-    
+
     struct Entry {
         bytes16 next;
         uint64 deposit;
@@ -13,25 +13,25 @@ contract DepositHolder {
 
     address owner;
     address auditor;
-    
+
     mapping(bytes16=>Entry) entries;
     bytes16 oldestHash;
     bytes16 newestHash;
-    
+
     uint public paidOut;
     uint public totalPaidOut;
     uint public depositCount;
-    
+
     function DepositHolder() {
         owner = msg.sender;
         auditor = owner;
     }
-    
+
     modifier owner_only {
         if(msg.sender != owner) throw;
         _;
     }
-    
+
     modifier auditor_only {
         if(msg.sender != auditor) throw;
         _;
@@ -66,18 +66,18 @@ contract DepositHolder {
         } else {
             entries[newestHash].next = values[0];
         }
-        
+
         for(uint i = 0; i < values.length - 1; i++) {
             if(entries[values[i]].expires != 0)
                 throw;
             entries[values[i]] = Entry(values[i + 1], deposit, expires);
         }
-        
+
         newestHash = values[values.length - 1];
         if(entries[newestHash].expires != 0)
             throw;
         entries[newestHash] = Entry(0, deposit, expires);
-        
+
         depositCount += values.length;
     }
 
@@ -105,7 +105,7 @@ contract DepositHolder {
         oldestHash = ptr;
         if(oldestHash == 0)
             newestHash = 0;
-        
+
         // Deduct any outstanding payouts from the recovered funds
         if(paidOut > 0) {
             if(recovered > paidOut) {
@@ -116,7 +116,7 @@ contract DepositHolder {
                 recovered = 0;
             }
         }
-        
+
         depositCount -= count;
     }
 
@@ -153,7 +153,7 @@ contract DepositHolder {
         expires = entry.expires;
         deposit = entry.deposit;
     }
-    
+
     /**
      * @dev Pays out a claim.
      * @param addr The address to pay.
@@ -166,7 +166,7 @@ contract DepositHolder {
         if(!addr.send(amount))
             throw;
     }
-    
+
     /**
      * @dev Deletes the contract, if no deposits are held.
      */
@@ -175,4 +175,15 @@ contract DepositHolder {
             throw;
         selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

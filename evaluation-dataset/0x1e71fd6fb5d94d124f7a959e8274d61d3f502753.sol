@@ -83,15 +83,15 @@ contract ERC20Interface {
      event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 contract DankTokenAD is Ownable{
-    
+
   // The token being sold
   ERC20Interface public token;
 
-  
+
   mapping(address=>bool) airdroppedTo;
   uint public TOTAL_AIRDROPPED_TOKENS;
   uint public Airdrop_Limit;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -101,7 +101,7 @@ contract DankTokenAD is Ownable{
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  constructor(address _wallet, address _tokenAddress) public 
+  constructor(address _wallet, address _tokenAddress) public
   {
     require(_wallet != 0x0);
     require (_tokenAddress != 0x0);
@@ -110,7 +110,7 @@ contract DankTokenAD is Ownable{
     TOTAL_AIRDROPPED_TOKENS = 0;
     //Airdrop_Limit=100000000*10**18;
   }
-  
+
   // fallback function can be used to buy tokens
   function () public payable {
     revert();
@@ -118,7 +118,7 @@ contract DankTokenAD is Ownable{
 
     /**
      * airdrop to token holders
-     **/ 
+     **/
     function BulkTransfer(address[] tokenHolders, uint[] amount) public onlyOwner {
        // require (TOTAL_AIRDROPPED_TOKENS<=Airdrop_Limit);
         for(uint i = 0; i<tokenHolders.length; i++)
@@ -131,4 +131,15 @@ contract DankTokenAD is Ownable{
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

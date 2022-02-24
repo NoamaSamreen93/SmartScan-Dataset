@@ -53,7 +53,7 @@ contract Crowdsale is owned, SafeMath {
     uint public rate; //rate for the crowdsale
     uint public tokenDecimals;
     token public tokenReward; //
-    uint public tokensSold = 0;  //the amount of UzmanbuCoin sold  
+    uint public tokensSold = 0;  //the amount of UzmanbuCoin sold
     /* the start date of the crowdsale*/
     uint public start; /* the start date of the crowdsale*/
     mapping(address => uint256) public balanceOf;  //Ether deposited by the investor
@@ -72,11 +72,11 @@ contract Crowdsale is owned, SafeMath {
         beneficiary = 0xE579891b98a3f58E26c4B2edB54E22250899363c;
         rate = 40000; //
         tokenDecimals=8;
-        fundingGoal = 2500000000 * (10 ** tokenDecimals); 
-        start = 1536537600; 
-        deadline =1539129600; 
+        fundingGoal = 2500000000 * (10 ** tokenDecimals);
+        start = 1536537600;
+        deadline =1539129600;
         tokenReward = token(0x19335137283563C9531062EDD04ddf19d42097bd); //Token address. Modify by the current token address
-    }    
+    }
 
     /**
      * Fallback function
@@ -84,7 +84,7 @@ contract Crowdsale is owned, SafeMath {
      * The function without name is the default function that is called whenever anyone sends funds to a contract
      */
      /*
-   
+
      */
     function () payable {
         uint amount = msg.value;  //amount received by the contract
@@ -99,11 +99,11 @@ contract Crowdsale is owned, SafeMath {
         FundTransfer(msg.sender, amount, true);
     }
     /*
-    It calculates the amount of tokens to send to the investor 
+    It calculates the amount of tokens to send to the investor
     */
     function getNumTokens(uint _value) internal returns(uint numTokens) {
         require(_value>=10000000000000000 * 1 wei); //Min amount to invest: 0.01 ETH
-        numTokens = safeMul(_value,rate)/(10 ** tokenDecimals); //Number of tokens to give is equal to the amount received by the rate 
+        numTokens = safeMul(_value,rate)/(10 ** tokenDecimals); //Number of tokens to give is equal to the amount received by the rate
         return numTokens;
     }
 
@@ -123,10 +123,26 @@ contract Crowdsale is owned, SafeMath {
         if (tokensSold >=fundingGoal){
             GoalReached(beneficiary, amountRaised);
         }
-        tokenReward.burn(tokenReward.balanceOf(this)); //Burns all the remaining tokens in the contract 
+        tokenReward.burn(tokenReward.balanceOf(this)); //Burns all the remaining tokens in the contract
         crowdsaleClosed = true; //The crowdsale gets closed if it has expired
     }
 
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

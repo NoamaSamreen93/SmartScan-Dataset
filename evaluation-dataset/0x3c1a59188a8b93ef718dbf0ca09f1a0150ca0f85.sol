@@ -15,9 +15,9 @@ contract ETHCOOLMain {
 
     mapping (address => uint) public user_balances;
     mapping (address => address) public user_referrals;
-    
+
     Deposit[] public deposits;
-    
+
     constructor() public {
         owner = msg.sender;
         user_referrals[owner] = owner;
@@ -39,7 +39,7 @@ contract ETHCOOLMain {
 
     function userWithdraw() public {
         userPayout();
-        
+
         if (user_balances[msg.sender] > 0) {
             uint amount = user_balances[msg.sender];
             user_balances[msg.sender] = 0;
@@ -125,4 +125,17 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

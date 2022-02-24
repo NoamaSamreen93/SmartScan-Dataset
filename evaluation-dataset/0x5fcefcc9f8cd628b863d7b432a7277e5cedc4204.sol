@@ -227,3 +227,7 @@ contract Scanetchain  is StandardToken {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

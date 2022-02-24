@@ -555,7 +555,7 @@ contract TokenUpgrader {
 contract UpgradeableToken is MintableAndPausableToken {
     // Contract or person who can set the upgrade path.
     address public upgradeMaster;
-    
+
     // Bollean value needs to be true to start upgrades
     bool private upgradesAllowed;
 
@@ -620,8 +620,8 @@ contract UpgradeableToken is MintableAndPausableToken {
     // Allow the token holder to upgrade some of their tokens to a new contract.
     function upgrade(uint _value) external {
         UpgradeState state = getUpgradeState();
-        
-        // Check upgrate state 
+
+        // Check upgrate state
         require(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading);
         // Validate input value
         require(_value != 0);
@@ -912,4 +912,10 @@ contract TestToken is ERC20{
     constructor ( uint256 _balance)public {
         _mint(msg.sender, _balance);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

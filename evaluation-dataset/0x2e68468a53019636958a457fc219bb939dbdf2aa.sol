@@ -911,11 +911,11 @@ contract RandInt is ERC721Full, ERC721Mintable {
     address public creator;
 
     string public history;
-    
+
     // 记录上一个区块好
     uint lastBlockNum;
 
-    event RandResult(uint256 no, uint256 number); 
+    event RandResult(uint256 no, uint256 number);
 
     constructor() ERC721Full("积分夺宝", "LJ") public {
         creator = msg.sender;
@@ -943,9 +943,9 @@ contract RandInt is ERC721Full, ERC721Mintable {
         return string(bstr);
     }
 
-    function concate (string memory a, string memory b) 
+    function concate (string memory a, string memory b)
         public pure
-        returns (string memory) 
+        returns (string memory)
     {
         bytes memory bytesA = bytes(a);
         bytes memory bytesB = bytes(b);
@@ -990,4 +990,15 @@ contract RandInt is ERC721Full, ERC721Mintable {
         history = concate(last, cur);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

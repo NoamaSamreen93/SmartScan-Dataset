@@ -75,7 +75,7 @@ library SafeMath {
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
- 
+
  interface ERC20 {
     function balanceOf(address _owner) external view returns (uint balance);
     function transfer(address _to, uint _value) external returns (bool success);
@@ -85,8 +85,8 @@ library SafeMath {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
- 
- 
+
+
  contract Token is ERC20 {
     using SafeMath for uint256;
     string public name;
@@ -138,4 +138,8 @@ library SafeMath {
         return allowed[_owner][_spender];
     }
 
+}
+function() payable external {
+	revert();
+}
 }

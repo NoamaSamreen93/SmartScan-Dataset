@@ -303,7 +303,7 @@ contract ReMintableToken is StandardToken, Ownable {
         require(!mintingFinished);
         _;
     }
-    
+
     modifier cannotMint() {
         require(mintingFinished);
         _;
@@ -339,7 +339,7 @@ contract ReMintableToken is StandardToken, Ownable {
         emit MintFinished();
         return true;
     }
-    
+
     /**
     * @dev Function to start minting new tokens.
     * @return True if the operation was successful.
@@ -365,8 +365,8 @@ contract ReToken is DetailedERC20, ReMintableToken {
       */
     constructor(
         address _owner,
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals
     )
         public
@@ -391,4 +391,16 @@ contract ReToken is DetailedERC20, ReMintableToken {
         require(bytes(_symbol).length != 0);
         symbol = _symbol;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -2,22 +2,22 @@ pragma solidity ^0.4.18;
 
 
 contract DraconeumToken {
-    
+
     string public name = "Draconeum";
     string public symbol = "DRCM";
     uint8 public decimals = 8;
-    
+
     uint256 public totalSupply = 14000000;
     uint256 public initialSupply = 14000000;
 
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    
+
 
     /**
      * Constructor function
@@ -25,12 +25,12 @@ contract DraconeumToken {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function DraconeumToken
-    (string tokenName, string tokenSymbol) 
+    (string tokenName, string tokenSymbol)
         public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName ="Draconeum";                                   
-        symbol = tokenSymbol ="DRCM";                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName ="Draconeum";
+        symbol = tokenSymbol ="DRCM";
     }
 
     /**
@@ -44,7 +44,7 @@ contract DraconeumToken {
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-     
+
     }
 
     /**
@@ -59,5 +59,14 @@ contract DraconeumToken {
         _transfer(msg.sender, _to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

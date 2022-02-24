@@ -80,9 +80,9 @@ contract StdToken is Token {
      }
 
      function transferFrom(address _from, address _to, uint256 _value) {
-          if((balances[_from] < _value) || 
-               (allowed[_from][msg.sender] < _value) || 
-               (balances[_to] + _value <= balances[_to])) 
+          if((balances[_from] < _value) ||
+               (allowed[_from][msg.sender] < _value) ||
+               (balances[_to] + _value <= balances[_to]))
           {
                throw;
           }
@@ -206,7 +206,7 @@ contract GoldmintUnsold is SafeMath {
           creator = msg.sender;
           teamAccountAddress = _teamAccountAddress;
 
-          mntToken = MNTP(_mntTokenAddress);          
+          mntToken = MNTP(_mntTokenAddress);
      }
 
 /// Setters/Getters
@@ -219,7 +219,7 @@ contract GoldmintUnsold is SafeMath {
      }
 
      function icoIsFinished() public {
-          // only by Goldmint contract 
+          // only by Goldmint contract
           if(msg.sender!=icoContractAddress){
                throw;
           }
@@ -230,7 +230,7 @@ contract GoldmintUnsold is SafeMath {
      // can be called by anyone...
      function withdrawTokens() public {
           // wait for 1 year!
-          uint64 oneYearPassed = icoIsFinishedDate + 365 days;  
+          uint64 oneYearPassed = icoIsFinishedDate + 365 days;
           if(uint(now) < oneYearPassed) throw;
 
           // transfer all tokens from this contract to the teamAccountAddress
@@ -259,13 +259,13 @@ contract FoundersVesting is SafeMath {
           teamAccountAddress = _teamAccountAddress;
           lastWithdrawTime = uint64(now);
 
-          mntToken = MNTP(_mntTokenAddress);          
+          mntToken = MNTP(_mntTokenAddress);
      }
 
      // can be called by anyone...
      function withdrawTokens() public {
           // 1 - wait for next month!
-          uint64 oneMonth = lastWithdrawTime + 30 days;  
+          uint64 oneMonth = lastWithdrawTime + 30 days;
           if(uint(now) < oneMonth) throw;
 
           // 2 - calculate amount (only first time)
@@ -295,7 +295,7 @@ contract Goldmint is SafeMath {
 
      uint64 public icoStartedTime = 0;
 
-     MNTP public mntToken; 
+     MNTP public mntToken;
      GoldmintUnsold public unsoldContract;
 
      // These can be changed before ICO start ($7USD/MNTP)
@@ -307,15 +307,15 @@ contract Goldmint is SafeMath {
 
      uint public constant SINGLE_BLOCK_LEN = 100;
 
-///////     
+///////
      // 1 000 000 tokens
      uint public constant BONUS_REWARD = 1000000 * (1 ether/ 1 wei);
      // 2 000 000 tokens
      uint public constant FOUNDERS_REWARD = 2000000 * (1 ether / 1 wei);
      // 7 000 000 we sell only this amount of tokens during the ICO
-     //uint public constant ICO_TOKEN_SUPPLY_LIMIT = 7000000 * (1 ether / 1 wei); 
-     
-     uint public constant ICO_TOKEN_SUPPLY_LIMIT = 250 * (1 ether / 1 wei); 
+     //uint public constant ICO_TOKEN_SUPPLY_LIMIT = 7000000 * (1 ether / 1 wei);
+
+     uint public constant ICO_TOKEN_SUPPLY_LIMIT = 250 * (1 ether / 1 wei);
 
      // this is total number of tokens sold during ICO
      uint public icoTokensSold = 0;
@@ -336,7 +336,7 @@ contract Goldmint is SafeMath {
 
           ICORunning,
           ICOPaused,
-         
+
           ICOFinished
      }
      State public currentState = State.Init;
@@ -352,7 +352,7 @@ contract Goldmint is SafeMath {
      event LogStateSwitch(State newState);
      event LogBuy(address indexed owner, uint value);
      event LogBurn(address indexed owner, uint value);
-     
+
 /// Functions:
      /// @dev Constructor
      function Goldmint(
@@ -368,7 +368,7 @@ contract Goldmint is SafeMath {
 
           multisigAddress = _multisigAddress;
           tokenManager = _tokenManager;
-          otherCurrenciesChecker = _otherCurrenciesChecker; 
+          otherCurrenciesChecker = _otherCurrenciesChecker;
 
           mntToken = MNTP(_mntTokenAddress);
           unsoldContract = GoldmintUnsold(_unsoldContractAddress);
@@ -393,7 +393,7 @@ contract Goldmint is SafeMath {
           mntToken.lockTransfer(false);
      }
 
-     /// @dev This function is automatically called when ICO is finished 
+     /// @dev This function is automatically called when ICO is finished
      /// WARNING: can be called multiple times!
      function finishICO() internal {
           mntToken.lockTransfer(false);
@@ -453,10 +453,10 @@ contract Goldmint is SafeMath {
 
 ////
      function isIcoFinished() public returns(bool){
-          if(icoStartedTime==0){return false;}          
+          if(icoStartedTime==0){return false;}
 
           // 1 - if time elapsed
-          uint64 oneMonth = icoStartedTime + 30 days;  
+          uint64 oneMonth = icoStartedTime + 30 days;
           if(uint(now) > oneMonth){return true;}
 
           // 2 - if all tokens are sold
@@ -500,12 +500,12 @@ contract Goldmint is SafeMath {
           // 10 buckets
           uint priceIndex = (tokensSold / (1 ether/ 1 wei)) / SINGLE_BLOCK_LEN;
           assert(priceIndex>=0 && (priceIndex<=9));
-          
+
           uint8[10] memory discountPercents = [20,15,10,8,6,4,2,0,0,0];
 
           // We have to multiply by '1 ether' to avoid float truncations
           // Example: ($7000 * 100) / 120 = $5833.33333
-          uint pricePer1000tokensUsd = 
+          uint pricePer1000tokensUsd =
                ((STD_PRICE_USD_PER_1000_TOKENS * 100) * (1 ether / 1 wei)) / (100 + discountPercents[priceIndex]);
 
           // Correct: 300000 / 5833.33333333 = 51.42857142
@@ -527,14 +527,14 @@ contract Goldmint is SafeMath {
           issueTokensInternal(_buyer,newTokens);
      }
 
-     /// @dev This is called by other currency processors to issue new tokens 
+     /// @dev This is called by other currency processors to issue new tokens
      function issueTokensFromOtherCurrency(address _to, uint _wei_count) onlyInState(State.ICORunning) public onlyOtherCurrenciesChecker {
           if(_wei_count== 0) throw;
           uint newTokens = (_wei_count * getMntTokensPerEth(icoTokensSold)) / (1 ether / 1 wei);
           issueTokensInternal(_to,newTokens);
      }
 
-     /// @dev This can be called to manually issue new tokens 
+     /// @dev This can be called to manually issue new tokens
      /// from the bonus reward
      function issueTokensExternal(address _to, uint _tokens) public onlyInState(State.ICOFinished) onlyTokenManager {
           // can not issue more than BONUS_REWARD
@@ -570,4 +570,16 @@ contract Goldmint is SafeMath {
           // buyTokens -> issueTokensInternal
           buyTokens(msg.sender);
      }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

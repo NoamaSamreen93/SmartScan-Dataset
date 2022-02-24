@@ -169,8 +169,8 @@ contract MineBlocks is Ownable {
     uint256 public tokenReward = 0;
     // constant to simplify conversion of token amounts into integer form
     uint256 private constant tokenUnit = uint256(10)**decimals;
-    
-    // Spread in parts per 100 millions, such that expressing percentages is 
+
+    // Spread in parts per 100 millions, such that expressing percentages is
     // just to append the postfix 'e6'. For example, 4.53% is: spread = 4.53e6
     address public MineBlocksAddr = 0x0d518b5724C6aee0c7F1B2eB1D89d62a2a7b1b58;
 
@@ -189,7 +189,7 @@ contract MineBlocks is Ownable {
     function () public payable {
         buy();   // Allow to buy tokens sending ether direcly to contract
     }
-    
+
 
     modifier status() {
         _;  // modified function code should go before prices update
@@ -209,7 +209,7 @@ contract MineBlocks is Ownable {
 
       buyPrice=2500000000000000;
     }
-        
+
     }
 
     function deposit() public payable status returns(bool success) {
@@ -218,13 +218,13 @@ contract MineBlocks is Ownable {
       tokenReward=this.balance/totalSupply;
         //executes event to reflect the changes
         LogDeposit(msg.sender, msg.value);
-        
+
         return true;
     }
 
   function withdrawReward() public status{
 
-    
+
       if(block.number-holded[msg.sender]>172800){ //1 month
      //// if(block.number-holded[msg.sender]>10){
 
@@ -232,7 +232,7 @@ contract MineBlocks is Ownable {
 
       //send eth to owner address
       msg.sender.transfer(tokenReward*balances[msg.sender]);
-      
+
       //executes event ro register the changes
       LogWithdrawal(msg.sender, tokenReward*balances[msg.sender]);
 
@@ -241,7 +241,7 @@ contract MineBlocks is Ownable {
 
 
   event LogWithdrawal(address receiver, uint amount);
-  
+
   function withdraw(uint value) public onlyOwner {
     //send eth to owner address
     msg.sender.transfer(value);
@@ -260,24 +260,24 @@ contract MineBlocks is Ownable {
       balances[_to] = balances[_to].add(_value);
       Transfer(this, _to, _value);
       return true;
-      
+
     }
 
 
     function buy() public payable status{
       require (msg.sender.balance >= msg.value);  // Check if the sender has enought eth to buy
       assert (msg.sender.balance + msg.value >= msg.sender.balance); //check for overflows
-         
+
       uint256 tokenAmount = (msg.value / buyPrice)*tokenUnit ;  // calculates the amount
 
       transferBuy(msg.sender, tokenAmount);
       MineBlocksAddr.transfer(msg.value);
-    
+
     }
 
 
     /* Approve and then communicate the approved contract in a single tx */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public onlyOwner returns (bool success) {    
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public onlyOwner returns (bool success) {
 
         tokenRecipient spender = tokenRecipient(_spender);
 
@@ -290,5 +290,16 @@ contract MineBlocks is Ownable {
 
 
 contract tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public ; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public ;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

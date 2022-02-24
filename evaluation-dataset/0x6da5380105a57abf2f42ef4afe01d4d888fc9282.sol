@@ -79,7 +79,7 @@ contract EthStar {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     bool lock = false;
 
     constructor(
@@ -94,10 +94,10 @@ contract EthStar {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
-	
+
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -107,7 +107,7 @@ contract EthStar {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -117,10 +117,10 @@ contract EthStar {
             owner = newOwner;
         }
     }
-	
-	
-	
-	
+
+
+
+
 
     function transfer(
         address _to,
@@ -173,4 +173,12 @@ contract EthStar {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

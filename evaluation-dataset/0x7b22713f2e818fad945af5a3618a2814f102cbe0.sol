@@ -91,7 +91,7 @@ contract Token {
 
 contract LRCFoundationIceboxContract {
     using SafeMath for uint;
-    
+
     uint public constant FREEZE_PERIOD = 720 days; // = 2 years
 
     address public lrcTokenAddress  = 0x0;
@@ -102,7 +102,7 @@ contract LRCFoundationIceboxContract {
     uint public lrcUnlockPerMonth   = 0;
     uint public startTime           = 0;
 
-    /* 
+    /*
      * EVENTS
      */
 
@@ -178,4 +178,10 @@ contract LRCFoundationIceboxContract {
         else return unlockable;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

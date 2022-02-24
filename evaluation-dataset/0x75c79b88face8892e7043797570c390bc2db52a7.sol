@@ -53,38 +53,38 @@ contract owned {
 }
 
 contract GasFiles is owned,IERC20{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public constant _totalSupply = 10000000000000000;
- 
+
     string public constant symbol = 'GAS';
 
     string public constant name = 'Gas Files';
-    
+
     uint8 public constant decimals = 8;
-    
+
     mapping(address => uint256) public balances;
     mapping (address => mapping (address => uint256)) allowed;
 
     function GasFiles() {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
-   
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
             && _value > 0
         );
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -95,7 +95,7 @@ contract GasFiles is owned,IERC20{
         require(
             allowed[_from][msg.sender] >= _value
             && balances[_from] >= _value
-            && _value > 0  
+            && _value > 0
         );
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -113,8 +113,24 @@ contract GasFiles is owned,IERC20{
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

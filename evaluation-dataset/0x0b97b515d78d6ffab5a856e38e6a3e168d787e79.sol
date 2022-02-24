@@ -414,7 +414,7 @@ contract SaleFix is Ownable, ServiceRole, ReentrancyGuard, CanReclaimToken {
     affLevelReward.push(AffiliateReward({coins : 2, percent : 0})); // level 0 - player self, 2CHR
     affLevelReward.push(AffiliateReward({coins : 1, percent : 1000})); // level 1, 1CHR, 10%
     affLevelReward.push(AffiliateReward({coins : 0, percent : 500})); // level 2, 0CHR, 5%
-  
+
     vipAffLevelReward.push(AffiliateReward({coins : 2, percent : 0})); // level 0 - player self, 2CHR
     vipAffLevelReward.push(AffiliateReward({coins : 1, percent : 2000})); // level 1, 1CHR, 20%
     vipAffLevelReward.push(AffiliateReward({coins : 0, percent : 1000})); // level 2, 0CHR, 10%
@@ -689,4 +689,15 @@ contract SaleFix is Ownable, ServiceRole, ReentrancyGuard, CanReclaimToken {
   function _getPercent(uint256 _v, uint256 _p) internal pure returns (uint)    {
     return _v.mul(_p).div(10000);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

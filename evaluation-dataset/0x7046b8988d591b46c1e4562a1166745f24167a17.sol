@@ -99,7 +99,7 @@ contract BasicToken is ERC20, ERC223, UserTokensControl {
         assembly {
             codeLength := extcodesize(_to)
         }
-    
+
         if(codeLength > 0) {
             return transferToContract(_to, _value, _data);
         } else {
@@ -146,11 +146,27 @@ contract Deedcoin is StandardToken {
         companyReserve = 0xbBE0805F7660aE0C4C7484dBee097398329eD5f2;
         founderReserve = 0x63547A5423652ABaF323c5B4fae848C7686B28Bf;
         balances[msg.sender] = 20866667 * (10**decimals);
-        balances[companyReserve] = 4471429 * (10**decimals); 
+        balances[companyReserve] = 4471429 * (10**decimals);
         balances[founderReserve] = 4471429 * (10**decimals);
     }
 
     function() public {
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

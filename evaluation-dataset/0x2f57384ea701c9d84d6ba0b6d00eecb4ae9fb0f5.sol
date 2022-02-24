@@ -46,7 +46,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -67,7 +67,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -270,7 +270,7 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-/** 
+/**
  * @title TokenDestructible:
  * @author Remco Bloemen <remco@2π.com>
  * @dev Base contract that can be destroyed by owner. All funds in contract including
@@ -278,9 +278,9 @@ contract MintableToken is StandardToken, Ownable {
  */
 contract TokenDestructible is Ownable {
 
-  function TokenDestructible() payable { } 
+  function TokenDestructible() payable { }
 
-  /** 
+  /**
    * @notice Terminate contract and refund to owner
    * @param tokens List of addresses of ERC20 or ERC20Basic token contracts to
    refund.
@@ -307,7 +307,7 @@ contract TokenDestructible is Ownable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
+
 contract StupidCoin is StandardToken, Ownable, TokenDestructible {
 
   string public name = "StupidCoin";
@@ -342,11 +342,11 @@ contract StupidCoin is StandardToken, Ownable, TokenDestructible {
 
 
 /**
- * @title Crowdsale 
+ * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end block, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract StupidCrowdsale is Ownable, Pausable, TokenDestructible {
@@ -390,12 +390,12 @@ contract StupidCrowdsale is Ownable, Pausable, TokenDestructible {
     uint256 tokens = weiAmount.mul(getRate() * 4);
 
     if (tokensLeft.sub(tokens) < 0) revert();
-    
+
     tokensLeft = tokensLeft.sub(tokens);
 
     uint256 weiAmount = msg.value;
     weiRaised = weiRaised.add(weiAmount);
-    
+
     token.mint(beneficiary, tokens);
 
     wallet.transfer(msg.value);
@@ -408,10 +408,10 @@ contract StupidCrowdsale is Ownable, Pausable, TokenDestructible {
     // calculate token amount to be minted for bounty
     uint256 amount = weiRaised.div(100).mul(10); // 10% of all tokens
     token.mint(bountyWallet, amount);
-    
+
     bountyDistributed = true;
   }
-  
+
   /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
@@ -423,4 +423,15 @@ contract StupidCrowdsale is Ownable, Pausable, TokenDestructible {
     return token.finishMinting();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

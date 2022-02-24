@@ -112,7 +112,7 @@ contract ClockAuctionBase {
         require(_auction.duration >= 1 minutes);
 
         nftToTokenIdToAuction[_nft][_tokenId] = _auction;
-        
+
         AuctionCreated(
             address(_nft),
             uint256(_tokenId),
@@ -204,7 +204,7 @@ contract ClockAuctionBase {
         returns (uint256)
     {
         uint256 secondsPassed = 0;
-        
+
         // A bit of insurance against negative values (or wraparound).
         // Probably not necessary (since Ethereum guarnatees that the
         // now variable doesn't ever go backwards).
@@ -247,16 +247,16 @@ contract ClockAuctionBase {
             // Starting price can be higher than ending price (and often is!), so
             // this delta can be negative.
             int256 totalPriceChange = int256(_endingPrice) - int256(_startingPrice);
-            
+
             // This multiplication can't overflow, _secondsPassed will easily fit within
             // 64-bits, and totalPriceChange will easily fit within 128-bits, their product
             // will always fit within 256-bits.
             int256 currentPriceChange = totalPriceChange * int256(_secondsPassed) / int256(_duration);
-            
+
             // currentPriceChange can be negative, but if so, will have a magnitude
             // less that _startingPrice. Thus, this result will always end up positive.
             int256 currentPrice = int256(_startingPrice) + currentPriceChange;
-            
+
             return uint256(currentPrice);
         }
     }
@@ -562,4 +562,15 @@ contract SaleClockAuction is ClockAuction {
         uint256 price = _bid(_nftAddress, _tokenId, msg.value);
         _transfer(_nftAddress, msg.sender, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

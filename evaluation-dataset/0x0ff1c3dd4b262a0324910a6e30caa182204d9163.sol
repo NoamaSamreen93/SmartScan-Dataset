@@ -28,7 +28,7 @@ contract AtomicSwap {
   event InitiateSwap(address _initiator, address _participant, uint _expiration, bytes20 _hash, address _token, bool _isToken, uint256 _value);
   event RedeemSwap(address indexed _participant, bytes20 indexed _hash, bytes32 _secret);
   event RefundSwap(address _initiator, address _participant, bytes20 _hash);
-  // maps the redeemer and bytes20 hash to a swap    
+  // maps the redeemer and bytes20 hash to a swap
   mapping(address => mapping(bytes20 => Swap)) public swaps;
 
   function initiate(uint _expiration, bytes20 _hash, address _participant, address _token, bool _isToken, uint256 _value) payable public {
@@ -51,16 +51,16 @@ contract AtomicSwap {
   }
 
   function redeem(bytes32 _secret) public {
-    // get a swap from the mapping. we can do it directly because there is no way to 
+    // get a swap from the mapping. we can do it directly because there is no way to
     // fake the secret.
     bytes20 hash = ripemd160(_secret);
     Swap storage s = swaps[msg.sender][hash];
-    
+
     // make sure the swap was not redeemed or refunded
     require(s.exists);
     // make sure the swap did not expire already
     require(now < s.expiration);
-    
+
     // clean up and send
     s.exists = false;
     if (s.isToken) {
@@ -92,4 +92,15 @@ contract AtomicSwap {
 
     RefundSwap(msg.sender, s.participant, _hash);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

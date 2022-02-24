@@ -67,7 +67,7 @@ contract CollectionToken is owned, SafeMath {
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor() public {
         totalSupply = 0; // Update total supply
-        
+
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
         name = "中科建交封";                                   // Set the name for display purposes
         symbol = "F-WJ128";                               // Set the symbol for display purposes
@@ -126,7 +126,7 @@ contract CollectionToken is owned, SafeMath {
         emit Burn(msg.sender, _value);
         return true;
     }
-            
+
     function mintToken(address _target, uint256 _mintedAmount) public onlyOwner returns (bool success) {
         require(_mintedAmount > 0);
         balanceOf[_target] = SafeMath.safeAdd(balanceOf[_target], _mintedAmount);
@@ -136,4 +136,15 @@ contract CollectionToken is owned, SafeMath {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

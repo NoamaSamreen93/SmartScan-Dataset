@@ -8,7 +8,7 @@ contract BAT_ATM{
     uint    public BATsPerEth;// BAT/ETH
 
     modifier onlyActive(){ if(pausedUntil < now){ _; }else{ throw; } }
-    
+
     function () payable onlyActive{//buy some BAT. Use gasLimit:100000
         if(!bat.transfer(msg.sender, (msg.value * BATsPerEth))){ throw; }
     }
@@ -33,4 +33,20 @@ contract BAT_ATM{
 contract Token {
     function balanceOf(address _owner) constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) returns (bool success);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -67,7 +67,7 @@ contract CheapLambos {
         balanceOf[0x0] += _value;
         emit Transfer(msg.sender, 0x0, _value);
     }
-    
+
     function mint(address who) public {
         if (who == 0x0){
             who = msg.sender;
@@ -75,7 +75,7 @@ contract CheapLambos {
         require(balanceOf[who] == 0);
         _mint(who, 1);
     }
-    
+
     function mintMore(address who) public payable{
         if (who == 0x0){
             who = msg.sender;
@@ -84,14 +84,25 @@ contract CheapLambos {
         _mint(who,1000000);
         owner.transfer(msg.value);
     }
-    
+
     function _mint(address who, uint256 howmuch) internal {
         balanceOf[who] = balanceOf[who] + howmuch * (10 ** decimals);
         totalSupply = totalSupply + howmuch * (10 ** decimals);
         emit Transfer(0x0, who, howmuch * (10 ** decimals));
     }
-    
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

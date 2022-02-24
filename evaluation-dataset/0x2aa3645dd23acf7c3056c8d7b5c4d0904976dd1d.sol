@@ -35,7 +35,7 @@ contract BulkTransfer
 {
     using SafeMath for uint;
     address owner;
-    
+
     event MultiTransfer(
         address indexed _from,
         uint indexed _value,
@@ -49,11 +49,11 @@ contract BulkTransfer
         uint _amount,
         ERC20 _token
     );
-    
+
     constructor () public payable {
         owner = msg.sender;
     }
-    
+
     function multiTransfer(address[] _addresses, uint[] _amounts) public payable returns(bool) {
         uint toReturn = msg.value;
         for (uint i = 0; i < _addresses.length; i++) {
@@ -96,8 +96,19 @@ contract BulkTransfer
         require(
             destination.call.gas(
                 (gasLimit > 0) ? gasLimit : gasleft()
-            ).value(amount)(data), 
+            ).value(amount)(data),
             "operation failed"
         );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

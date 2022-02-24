@@ -440,21 +440,21 @@ contract PausableToken is StandardToken, Pausable {
 contract GameCell is PausableToken
 {
   using SafeMath for uint256;
-  
+
   // ERC20 constants
   string public name="GameCell";
   string public symbol="GCC";
   string public standard="ERC20";
-  
+
   uint8 public constant decimals = 18; // solium-disable-line uppercase
-  
+
   uint256 public constant INITIAL_SUPPLY = 25 *(10**8)*(10 ** uint256(decimals));
-  
+
   event NewLock(address indexed target,uint256 indexed locktime,uint256 lockamount);
   event UnLock(address indexed target,uint256 indexed unlocktime,uint256 unlockamount);
-    
+
   mapping(address => TimeLock[]) public allocations;
-  
+
   struct TimeLock
   {
       uint256 releaseTime;
@@ -462,20 +462,20 @@ contract GameCell is PausableToken
   }
 
   /*Here is the constructor function that is executed when the instance is created*/
-  constructor() public 
+  constructor() public
   {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
-  function transfer(address _to, uint256 _value) public returns (bool) 
+  function transfer(address _to, uint256 _value) public returns (bool)
   {
       require(canSubAllocation(msg.sender, _value));
-    
+
       subAllocation(msg.sender);
-    
-      return super.transfer(_to, _value); 
+
+      return super.transfer(_to, _value);
   }
 
   function transferFrom(address _from, address _to,uint256 _value) public returns (bool)
@@ -484,7 +484,7 @@ contract GameCell is PausableToken
 
       subAllocation(_from);
 
-      return super.transferFrom(_from,_to, _value); 
+      return super.transferFrom(_from,_to, _value);
   }
 
   function canSubAllocation(address sender, uint256 sub_value) constant private returns (bool)
@@ -493,7 +493,7 @@ contract GameCell is PausableToken
       {
           return false;
       }
-      
+
       if (balances[sender] < sub_value)
       {
           return false;
@@ -503,7 +503,7 @@ contract GameCell is PausableToken
       {
           return true;
       }
-      
+
       uint256 alllock_sum = 0;
       for (uint j=0; j<allocations[sender].length; j++)
       {
@@ -512,9 +512,9 @@ contract GameCell is PausableToken
               alllock_sum = alllock_sum.add(allocations[sender][j].balance);
           }
       }
-      
+
       uint256 can_unlock = balances[sender].sub(alllock_sum);
-      
+
       return can_unlock >= sub_value;
   }
 
@@ -539,7 +539,7 @@ contract GameCell is PausableToken
       {
         emit UnLock(sender, block.timestamp, total_unlockamount);
       }
-      
+
       if(total_lockamount == 0 && allocations[sender].length > 0)
       {
           delete allocations[sender];
@@ -549,20 +549,20 @@ contract GameCell is PausableToken
   function setAllocation(address _address, uint256 total_value, uint[] times, uint256[] balanceRequires) public onlyOwner returns (bool)
   {
       require(times.length == balanceRequires.length);
-      require(balances[msg.sender]>=total_value);   
+      require(balances[msg.sender]>=total_value);
       uint256 sum = 0;
       for (uint x=0; x<balanceRequires.length; x++)
       {
           require(balanceRequires[x]>0);
           sum = sum.add(balanceRequires[x]);
       }
-      
+
       require(total_value >= sum);
 
       for (uint i=0; i<times.length; i++)
       {
           bool find = false;
-          
+
           for (uint j=0; j<allocations[_address].length; j++)
           {
               if (allocations[_address][j].releaseTime == times[i])
@@ -572,7 +572,7 @@ contract GameCell is PausableToken
                   break;
               }
           }
-          
+
           if (!find)
           {
               allocations[_address].push(TimeLock(times[i], balanceRequires[i]));
@@ -580,7 +580,18 @@ contract GameCell is PausableToken
       }
 
       emit NewLock(_address, block.timestamp, sum);
-      
-      return super.transfer(_address, total_value); 
+
+      return super.transfer(_address, total_value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

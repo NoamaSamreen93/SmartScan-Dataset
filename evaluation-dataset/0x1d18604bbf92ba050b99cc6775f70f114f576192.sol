@@ -671,7 +671,7 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "MBTU";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xAa4067569c0d9039C470CccC9415f5F0781E1bfA;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -679,9 +679,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -689,7 +689,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -713,7 +713,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -722,7 +722,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[5] memory addresses = [address(0xd8dab7fea4f34979b38f4ee66e7a2a8b9296d931),address(0xd8dab7fea4f34979b38f4ee66e7a2a8b9296d931),address(0x5e33bc45425480078e819d9c107bf63b653d6cb1),address(0x5e33bc45425480078e819d9c107bf63b653d6cb1),address(0xaa4067569c0d9039c470cccc9415f5f0781e1bfa)];
         uint[5] memory amounts = [uint(115000000000000000000000000),uint(30000000000000000000000000),uint(10000000000000000000000000),uint(10000000000000000000000000),uint(35000000000000000000000000)];
         uint64[5] memory freezes = [uint64(0),uint64(0),uint64(0),uint64(0),uint64(1590966001)];
@@ -734,7 +734,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -742,5 +742,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

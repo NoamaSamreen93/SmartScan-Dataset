@@ -32,17 +32,17 @@ contract OysterPrePearl {
         owner = msg.sender;
         partner = 0x997c48CE1AF0CE2658D3E4c0bea30a0eB9c98382;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyAuth {
         require(msg.sender == owner || msg.sender == partner);
         _;
     }
-    
+
     function closeSale() onlyOwner {
         saleClosed = true;
     }
@@ -50,7 +50,7 @@ contract OysterPrePearl {
     function openSale() onlyOwner {
         saleClosed = false;
     }
-    
+
     function () payable {
         require(!saleClosed);
         require(msg.value >= 1 ether);
@@ -68,12 +68,12 @@ contract OysterPrePearl {
         else buyPrice = 10000;//100% bonus
         uint amount;
         amount = msg.value * buyPrice;                    // calculates the amount
-        totalSupply += amount;                            // increases the total supply 
+        totalSupply += amount;                            // increases the total supply
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
         funds += msg.value;                               // track eth amount raised
         Transfer(this, msg.sender, amount);               // execute an event reflecting the change
     }
-    
+
     function withdrawFunds() onlyAuth {
         uint256 payout = (this.balance/2) - 2;
         owner.transfer(payout);
@@ -194,4 +194,15 @@ contract OysterPrePearl {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

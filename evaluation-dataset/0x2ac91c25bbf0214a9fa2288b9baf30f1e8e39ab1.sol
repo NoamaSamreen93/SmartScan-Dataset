@@ -13,7 +13,7 @@ contract InputValidator {
 
 contract Owned {
 
-    // The address of the account that is the current owner 
+    // The address of the account that is the current owner
     address internal owner;
 
 
@@ -81,7 +81,7 @@ contract ITransferableOwnership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner);
 }
@@ -92,7 +92,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -109,28 +109,28 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-contract IToken { 
+contract IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() constant returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) constant returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -138,9 +138,9 @@ contract IToken {
     function transfer(address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -149,9 +149,9 @@ contract IToken {
     function transferFrom(address _from, address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -159,9 +159,9 @@ contract IToken {
     function approve(address _spender, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -183,7 +183,7 @@ contract Token is IToken, InputValidator {
 
     // Ethereum token standard
     string public standard = "Token 0.3";
-    string public name;        
+    string public name;
     string public symbol;
     uint8 public decimals = 8;
 
@@ -201,9 +201,9 @@ contract Token is IToken, InputValidator {
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 
-    /** 
-     * Construct 
-     * 
+    /**
+     * Construct
+     *
      * @param _name The full token name
      * @param _symbol The token symbol (aberration)
      */
@@ -215,9 +215,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Get the total token supply
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() public constant returns (uint) {
@@ -225,9 +225,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
@@ -236,9 +236,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -246,7 +246,7 @@ contract Token is IToken, InputValidator {
     function transfer(address _to, uint _value) public safe_arguments(2) returns (bool) {
 
         // Check if the sender has enough tokens
-        require(balances[msg.sender] >= _value);   
+        require(balances[msg.sender] >= _value);
 
         // Check for overflows
         require(balances[_to] + _value >= balances[_to]);
@@ -261,13 +261,13 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
-     * @return Whether the transfer was successful or not 
+     * @return Whether the transfer was successful or not
      */
     function transferFrom(address _from, address _to, uint _value) public safe_arguments(3) returns (bool) {
 
@@ -293,9 +293,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -311,9 +311,9 @@ contract Token is IToken, InputValidator {
     }
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -334,18 +334,18 @@ contract Token is IToken, InputValidator {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-contract IManagedToken is IToken { 
+contract IManagedToken is IToken {
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() constant returns (bool);
 
 
     /**
-     * Unlocks the token so that the transferring of value is enabled 
+     * Unlocks the token so that the transferring of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -389,9 +389,9 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
     }
 
 
-    /** 
-     * Construct 
-     * 
+    /**
+     * Construct
+     *
      * @param _name The full token name
      * @param _symbol The token symbol (aberration)
      * @param _locked Whether the token should be locked initially
@@ -401,9 +401,9 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -413,9 +413,9 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -426,9 +426,9 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
     }
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -438,9 +438,9 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
     }
 
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Wheter the token is locked
      */
     function isLocked() public constant returns (bool) {
@@ -449,7 +449,7 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
 
 
     /**
-     * Unlocks the token so that the transferring of value is enabled 
+     * Unlocks the token so that the transferring of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -467,7 +467,7 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
      * @return Whether the approval was successful or not
      */
     function issue(address _to, uint _value) public only_owner safe_arguments(2) returns (bool) {
-        
+
         // Check for overflows
         require(balances[_to] + _value >= balances[_to]);
 
@@ -475,7 +475,7 @@ contract ManagedToken is IManagedToken, Token, TransferableOwnership {
         balances[_to] += _value;
         totalTokenSupply += _value;
 
-        // Notify listeners 
+        // Notify listeners
         Transfer(0, this, _value);
         Transfer(this, _to, _value);
 
@@ -512,7 +512,7 @@ contract NUToken is ManagedToken, ITokenRetreiver {
 
 
     /**
-     * Starts with a total supply of zero and the creator starts with 
+     * Starts with a total supply of zero and the creator starts with
      * zero tokens (just like everyone else)
      */
     function NUToken() ManagedToken("Network Units Token", "NU", true) {}
@@ -520,7 +520,7 @@ contract NUToken is ManagedToken, ITokenRetreiver {
 
     /**
      * Failsafe mechanism
-     * 
+     *
      * Allows owner to retreive tokens from the contract
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -540,4 +540,15 @@ contract NUToken is ManagedToken, ITokenRetreiver {
     function () payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

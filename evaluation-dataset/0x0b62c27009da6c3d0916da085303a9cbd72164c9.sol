@@ -1,6 +1,6 @@
 pragma solidity ^0.4.2;
 
-//  import "./IERC20.sol"; 
+//  import "./IERC20.sol";
 //  import "./SafeMath.sol";
 
 pragma solidity ^0.4.2;
@@ -23,7 +23,7 @@ library SafeMath {
        return c;
    }
 
- 
+
    function div(uint256 a, uint256 b) internal pure returns (uint256) {
        // Solidity only automatically asserts when dividing by 0
        require(b > 0);
@@ -33,7 +33,7 @@ library SafeMath {
        return c;
    }
 
- 
+
    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
        require(b <= a);
        uint256 c = a - b;
@@ -51,7 +51,7 @@ library SafeMath {
        return c;
    }
 
- 
+
    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
        require(b != 0);
        return a % b;
@@ -88,12 +88,12 @@ contract ERC20 is IERC20 {
        return _totalSupply;
    }
 
- 
+
    function balanceOf(address owner) public view returns (uint256) {
        return _balances[owner];
    }
 
- 
+
    function allowance(address owner, address spender) public view returns (uint256) {
        return _allowed[owner][spender];
    }
@@ -256,4 +256,15 @@ contract BettingZone is ERC20, ERC20Detailed, ERC20Burnable {
    constructor () public ERC20Detailed("BettingZone", "BZT", 18) {
        _mint(msg.sender, INITIAL_SUPPLY);
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

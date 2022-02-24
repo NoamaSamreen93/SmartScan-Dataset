@@ -4,7 +4,7 @@ pragma solidity ^0.4.0;
  *
  * Inspired by https://github.com/MakerDAO/maker-otc/blob/master/contracts/simple_market.sol
  */
- 
+
  contract SafeMath {
   //internals
 
@@ -112,7 +112,7 @@ contract StandardToken is Token {
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-	
+
 
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -140,19 +140,30 @@ contract StandardToken is Token {
  */
 
  contract ServiceChainToken is StandardToken, SafeMath {
-	 
+
     string public constant symbol ="SER";
     string public constant name = "Service Chain Token";
     uint256 public constant decimals = 18;
-		
+
 	uint256 public constant _totalSupply = 200000000 * 10**18;
-	
-	   
+
+
 	function ServiceChainToken(){
         balances[msg.sender] = _totalSupply;
     }
-	
+
 	function totalSupply() constant returns (uint256 supply) {
 		return _totalSupply;
 	}
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

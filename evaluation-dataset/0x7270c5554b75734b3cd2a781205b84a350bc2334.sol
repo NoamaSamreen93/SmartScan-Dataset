@@ -18,9 +18,9 @@ contract Manageable {
   /**
    * @dev Checks if the msg.sender is the manager.
    */
-  modifier onlyManager() { 
+  modifier onlyManager() {
     require (msg.sender == manager && manager != 0x0);
-    _; 
+    _;
   }
 }
 
@@ -31,9 +31,9 @@ contract Activatable is Manageable {
   event DeactivatedContract(uint256 deactivatedAt);
 
   bool public active;
-  
+
   /**
-   * @dev Check if the contract is active. 
+   * @dev Check if the contract is active.
    */
   modifier isActive() {
     require(active);
@@ -41,7 +41,7 @@ contract Activatable is Manageable {
   }
 
   /**
-   * @dev Check if the contract is not active. 
+   * @dev Check if the contract is not active.
    */
   modifier isNotActive() {
     require(!active);
@@ -170,7 +170,7 @@ contract ContractManagementSystem is Ownable {
   {
     // Validate the function arguments.
     require(contractIdentifier != 0x0);
-    
+
     // Get the active contract for the given identifier.
     activeContract = activeContracts[contractIdentifier];
 
@@ -208,7 +208,7 @@ contract ContractManagementSystem is Ownable {
   {
     // Validate the function arguments.
     require(contractIdentifier != 0x0 && newContractAddress != 0x0);
-    
+
     // Lock the contractIdentifier.
     migrationLocks[contractIdentifier] = true;
 
@@ -237,7 +237,7 @@ contract ContractManagementSystem is Ownable {
 
     // Unlock the contractIdentifier.
     migrationLocks[contractIdentifier] = false;
-    
+
     // Trigger event.
     UpgradedContract(contractIdentifier, oldContractAddress, newContractAddress);
   }
@@ -277,7 +277,7 @@ contract ContractManagementSystem is Ownable {
     // Trigger event.
     RollbackedContract(contractIdentifier, fromContractAddress, toContractAddress);
   }
-  
+
   /**
    * @dev Swap the given contracts states as defined:
    *        - newContractAddress will be activated
@@ -371,8 +371,8 @@ contract SwissCryptoExchangeToken is ERC20Basic, Versionable {
 
   /**
    * Create a new instance of the SwissCryptoExchangeToken contract.
-   * @param initialShareholderAddress address 
-   * @param initialAmount             uint256 
+   * @param initialShareholderAddress address
+   * @param initialAmount             uint256
    */
   function SwissCryptoExchangeToken (address initialShareholderAddress, uint256 initialAmount, address _manager)
     public
@@ -455,7 +455,7 @@ contract SwissCryptoExchangeToken is ERC20Basic, Versionable {
 
 contract BaseCompany is Versionable {
   using SafeMath for uint256;
-  
+
   uint256 internal constant TOKEN_CONTRACT_ID = 1;
 
   /**
@@ -503,7 +503,7 @@ contract BaseCompany is Versionable {
   function isShareholder(address _addr) public constant returns (bool) {
     return token().balanceOf(_addr) > 0 && _addr != address(this);
   }
-    
+
   /**
    * @dev Check if the given address is a majority company shareholder.
    * @param _addr address
@@ -539,7 +539,7 @@ contract SwissCryptoExchangeCompany is BaseCompany {
     bool ended;
     bool exists;
   }
-  
+
   /**
    * @dev Create a new instance of the company contract.
    * @param _manager address
@@ -551,9 +551,9 @@ contract SwissCryptoExchangeCompany is BaseCompany {
    */
   modifier onlyShareholder() {
     require(isShareholder(msg.sender));
-    _; 
+    _;
   }
-  
+
   /**
    * @dev Ensure the msg.sender is has over 50% of the company shares.
    */
@@ -567,26 +567,26 @@ contract SwissCryptoExchangeCompany is BaseCompany {
    */
   modifier onlySaleCreator() {
     require(msg.sender == currentSale.creator);
-    _; 
+    _;
   }
-  
+
   /**
    * @dev Ensure there is no sale in progress.
    */
-  modifier onlyWhenNotSelling() { 
+  modifier onlyWhenNotSelling() {
     require(!currentSale.exists);
-    _; 
+    _;
   }
-  
+
   /**
    * @dev Ensure there is a sale in progress.
    */
-  modifier onlyWhenSelling() { 
+  modifier onlyWhenSelling() {
     require(currentSale.exists);
-    _; 
+    _;
   }
 
-  
+
   /**
    * @dev Handle an incoming ether transfer.
    */
@@ -607,8 +607,8 @@ contract SwissCryptoExchangeCompany is BaseCompany {
    * @dev Initialize a new sale.
    * @param rate         uint256
    * @param sharesCap    uint256
-   * @param beneficiary  address 
-   * @param investor     address 
+   * @param beneficiary  address
+   * @param investor     address
    */
   function initializeNewSale(
     uint256 rate,
@@ -663,7 +663,7 @@ contract SwissCryptoExchangeCompany is BaseCompany {
 
     // If the after this investment the cap will be reached
     // the sale will end and the excess wei will be sent
-    // back to the investor. 
+    // back to the investor.
     if (sharesSold.add(shares) > sharesCap) {
       excessWei = sharesSold.add(shares).sub(sharesCap).mul(1 ether).div(rate);
       weiAmount = weiAmount.sub(excessWei);
@@ -711,11 +711,11 @@ contract SwissCryptoExchangeCompany is BaseCompany {
     require(currentSale.sharesSold == currentSale.sharesCap);
 
     // Send wei to the beneficiary.
-    currentSale.beneficiary.transfer(currentSale.weiRaised); 
+    currentSale.beneficiary.transfer(currentSale.weiRaised);
 
     // Trigger event.
     SaleCompleted(currentSale.beneficiary, currentSale.weiRaised, currentSale.sharesSold);
-    
+
     // Reset sale.
     currentSale.exists = false;
   }
@@ -750,4 +750,20 @@ contract SwissCryptoExchangeCompany is BaseCompany {
     // Reset sale state.
     currentSale.exists = false;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

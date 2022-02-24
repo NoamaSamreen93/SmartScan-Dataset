@@ -88,7 +88,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Ujillvon is StandardToken { 
+contract Ujillvon is StandardToken {
 
     /* Public variables of the token */
 
@@ -101,9 +101,9 @@ contract Ujillvon is StandardToken {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
 
@@ -117,34 +117,34 @@ contract Ujillvon is StandardToken {
         unitsOneEthCanBuy = 20000;
         fundsWallet = msg.sender;
     }
-    /** 
-   *  sale start 
+    /**
+   *  sale start
     * ---------------------
-    
+
     * presale
 	uint public presaleStartTime = 1537876800; // Saturday, 01 June 2019 19:00:00 GMT+07:00
     uint256 public presalePerEth = 1075268;
-    
+
     * ico
     uint public icoStartTime = 1539190800; // Saturday, 15 June 2019 00:00:00 GMT+07:00
     uint256 public icoPerEth = 1075268;
-    
+
     * ico1
     uint public ico1StartTime = 1540573200; // Monday, 01 July 2019 00:00:00 GMT+07:00
     uint256 public ico1PerEth = 1075268;
-    
+
     * ico2
     uint public ico2StartTime = 1541955600; // Monday, 15 July 2019 00:00:00 GMT+07:00
     uint256 public ico2PerEth = 1075268;
-    
+
     * ico start and end
     uint public icoOpenTime = presaleStartTime;
     uint public icoEndTime = 1543251600; // Thursday, 01 August 2019 00:00:00 GMT+07:00
-    
+
 	*/
-    
-    
-    
+
+
+
 
     function() payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -157,7 +157,7 @@ contract Ujillvon is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -171,4 +171,15 @@ contract Ujillvon is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

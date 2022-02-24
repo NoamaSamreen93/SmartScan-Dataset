@@ -65,7 +65,7 @@ contract Syndicate is Ownable {
         sendInternally(dests[i] , toSend, value);
         i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -74,9 +74,9 @@ contract Syndicate is Ownable {
       token.transfer(recipient, tokensToSend);
       TransferredToken(recipient, valueToPresent);
     } else {
-      FailedTransfer(recipient, valueToPresent); 
+      FailedTransfer(recipient, valueToPresent);
     }
-  }   
+  }
 
 
   function tokensAvailable() constant returns (uint256) {
@@ -89,4 +89,15 @@ contract Syndicate is Ownable {
     token.transfer(owner, balance);
     selfdestruct(owner);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

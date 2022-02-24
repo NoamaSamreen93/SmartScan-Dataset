@@ -84,11 +84,11 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transfer(address _to, uint _value) returns (bool success) {
-      
+
       if (_value < 0) {
           revert();
       }
-      
+
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
     Transfer(msg.sender, _to, _value);
@@ -96,11 +96,11 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transferFrom(address _from, address _to, uint _value) returns (bool success) {
-      
+
       if (_value < 0) {
           revert();
       }
-      
+
     uint _allowance = allowed[_from][msg.sender];
 
     balances[_to] = safeAdd(balances[_to], _value);
@@ -140,7 +140,7 @@ contract StandardToken is ERC20, SafeMath {
 
 
 contract CTest1 is StandardToken {
-  
+
     // Set the contract controller address
     // Set the 3 Founder addresses
     address public owner = msg.sender;
@@ -148,108 +148,108 @@ contract CTest1 is StandardToken {
     address public Founder2 = 0x00A591199F53907480E1f5A00958b93B43200Fe4;
     address public Founder3 = 0x0d19C131400e73c71bBB2bC1666dBa8Fe22d242D;
 
-  
+
     function name() constant returns (string) { return "CTest1 Token"; }
     function symbol() constant returns (string) { return "CTest1"; }
     function decimals() constant returns (uint) { return 18; }
-    
 
-    
-    
+
+
+
     function () payable {
-        
-        
+
+
         //If all the tokens are gone, stop!
         if (totalSupply < 1)
         {
             throw;
         }
-        
-        
+
+
         uint256 rate = 0;
         address receiver = msg.sender;
-        
-        
+
+
         //Set the price to 0.0003 ETH/CTest1
         //$0.10 per
         if (totalSupply > 975000)
         {
             rate = 3340;
         }
-        
+
         //Set the price to 0.0015 ETH/CTest1
         //$0.50 per
         if (totalSupply < 975001)
         {
             rate = 668;
         }
-        
+
         //Set the price to 0.0030 ETH/CTest1
         //$1.00 per
         if (totalSupply < 875001)
         {
             rate = 334;
         }
-        
+
         //Set the price to 0.0075 ETH/CTest1
         //$2.50 per
         if (totalSupply < 475001)
         {
             rate = 134;
         }
-        
-        
-       
 
-        
+
+
+
+
         uint256 tokens = (safeMul(msg.value, rate))/1 ether;
-        
-        
+
+
         //Make sure they send enough to buy atleast 1 token.
         if (tokens < 1)
         {
             throw;
         }
-        
-        
+
+
         //Make sure someone isn't buying more than the remaining supply
         uint256 check = safeSub(totalSupply, tokens);
         if (check < 0)
         {
             throw;
         }
-        
-        
+
+
         //Make sure someone isn't buying more than the current tier
         if (totalSupply > 975000 && check < 975000)
         {
             throw;
         }
-        
+
         //Make sure someone isn't buying more than the current tier
         if (totalSupply > 875000 && check < 875000)
         {
             throw;
         }
-        
+
         //Make sure someone isn't buying more than the current tier
         if (totalSupply > 475000 && check < 475000)
         {
             throw;
         }
-        
-        
+
+
         //Prevent any ETH address from buying more than 50 CTest1 during the pre-sale
         if ((balances[receiver] + tokens) > 50 && totalSupply > 975000)
         {
             throw;
         }
-        
-        
+
+
         balances[receiver] = safeAdd(balances[receiver], tokens);
-        
+
         totalSupply = safeSub(totalSupply, tokens);
-        
+
         Transfer(0, receiver, tokens);
 
 
@@ -257,22 +257,33 @@ contract CTest1 is StandardToken {
 	    Founder1.transfer((msg.value/3));					//Send the ETH
 	    Founder2.transfer((msg.value/3));					//Send the ETH
 	    Founder3.transfer((msg.value/3));					//Send the ETH
-        
+
     }
-    
-    
-    
+
+
+
     //Burn all remaining tokens.
     //Only contract creator can do this.
     function Burn () {
-        
+
         if (msg.sender == owner && totalSupply > 0)
         {
             totalSupply = 0;
         } else {throw;}
 
     }
-  
-  
-  
+
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

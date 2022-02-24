@@ -394,7 +394,7 @@ contract IsraCoin is ERC20, Ownable{
     string public symbol = "ILSX";
 
     /** @dev basically like cents in USD
-     **      in the following comments will be referencing the smallest units as cents 
+     **      in the following comments will be referencing the smallest units as cents
      **/
     uint public decimals = 2;
 
@@ -437,4 +437,15 @@ contract IsraCoin is ERC20, Ownable{
     {
         _transfer(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

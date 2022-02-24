@@ -44,7 +44,7 @@ contract EToken2Interface {
 
     function proxyApprove(address _spender, uint _value, bytes32 _symbol, address _sender)
     public returns(bool);
-    
+
     function allowance(address _from, address _spender, bytes32 _symbol) public view returns(uint);
 
     function proxyTransferFromWithReference(
@@ -807,4 +807,10 @@ contract AVtest is ERC20Interface, AssetProxyInterface, Bytes32, ReturnData {
     function multiAsset() public view returns(EToken2Interface) {
         return etoken2;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

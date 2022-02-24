@@ -84,19 +84,19 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract GoodLuckCoin is StandardToken { 
+contract GoodLuckCoin is StandardToken {
 
     /* Public variables of the token */
 
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
-    uint256 public totalEthInWei; 
+    uint256 public totalEthInWei;
     address public fundsWallet;
 
-    //constructor function 
+    //constructor function
     function GoodLuckCoin() {
         balances[msg.sender] = 100000000;
         totalSupply = 100000000;
@@ -118,7 +118,7 @@ contract GoodLuckCoin is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -132,4 +132,15 @@ contract GoodLuckCoin is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

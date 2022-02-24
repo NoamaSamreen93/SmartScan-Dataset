@@ -28,14 +28,14 @@ contract NobleAssetsCoin {
     string public name;
     string public symbol;
     uint8 public decimals;
-   
+
     uint256 public totalSupply;
 
-   
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     function NobleAssetsCoin(
@@ -44,10 +44,10 @@ contract NobleAssetsCoin {
         string Symbol
     ) public {
         decimals = _myDecimal;
-        totalSupply = _myinitialSupply * (10 ** uint256(_myDecimal)); 
-        balanceOf[msg.sender] = initialSupply;               
-        name = TokeName;                                   
-        symbol = Symbol;                               
+        totalSupply = _myinitialSupply * (10 ** uint256(_myDecimal));
+        balanceOf[msg.sender] = initialSupply;
+        name = TokeName;
+        symbol = Symbol;
     }
 
 
@@ -74,7 +74,7 @@ contract NobleAssetsCoin {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -95,4 +95,10 @@ contract NobleAssetsCoin {
             return true;
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

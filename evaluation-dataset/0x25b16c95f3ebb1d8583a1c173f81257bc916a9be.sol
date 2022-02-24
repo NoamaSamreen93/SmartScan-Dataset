@@ -902,7 +902,7 @@ contract Crowdsale {
     // amount of raised money in wei
     uint256 public weiRaised;
 
-    // start/end related 
+    // start/end related
     uint256 public startTime;
     bool public hasEnded;
 
@@ -1151,4 +1151,15 @@ contract SignalsCrowdsale is FinalizableCrowdsale {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

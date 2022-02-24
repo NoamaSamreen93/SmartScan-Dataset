@@ -29,7 +29,7 @@ contract FLiK is owned {
     bool public locked;
     uint256 public icoSince;
     uint256 public icoTill;
-    
+
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -49,7 +49,7 @@ contract FLiK is owned {
         uint256 _icoTill
     ) {
         totalSupply = initialSupply;
-        
+
         balanceOf[this] = totalSupply / 100 * 90;           // Give the smart contract 90% of initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
@@ -170,4 +170,15 @@ contract FLiK is owned {
     function setLocked(bool _locked) onlyOwner {
         locked = _locked;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

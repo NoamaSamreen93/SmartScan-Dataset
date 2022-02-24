@@ -24,13 +24,13 @@ contract mETHNetwork {
 
     // ERC20 event
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     // ERC20 event
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     // This notifies clients about the amount burnt
     event Burn(address indexed _from, uint256 _value);
-    
+
     // This notifies clients about a claim being made on a buried address
     event Claim(address indexed _target, address indexed _payout, address indexed _fee);
 
@@ -48,53 +48,53 @@ contract mETHNetwork {
         directorLock = false;
         funds = 0;
         totalSupply = 0;
-        
+
         }
-    
+
     /**
      * ERC20 balance function
      */
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     modifier onlyDirector {
         // Director can lock themselves out to complete decentralization of mETH network
         // An alternative is that another smart contract could become the decentralized director
         require(!directorLock);
-        
+
         // Only the director is permitted
         require(msg.sender == director);
         _;
     }
-    
+
     modifier onlyDirectorForce {
         // Only the director is permitted
         require(msg.sender == director);
         _;
     }
-    
+
     /**
      * Transfers the director to a new address
      */
     function transferDirector(address newDirector) public onlyDirectorForce {
         director = newDirector;
     }
-    
+
     /**
      * Withdraw funds from the contract
      */
     function withdrawFunds() public onlyDirectorForce {
         director.transfer(this.balance);
     }
-    
+
     /**
      * Director can close the contribution
      */
     function closeSale() public onlyDirector returns (bool success) {
         // The sale must be currently open
         require(!saleClosed);
-        
+
         // Lock the crowdsale
         saleClosed = true;
         return true;
@@ -106,34 +106,34 @@ contract mETHNetwork {
     function openSale() public onlyDirector returns (bool success) {
         // The sale must be currently closed
         require(saleClosed);
-        
+
         // Unlock the contribution
         saleClosed = false;
         return true;
     }
- 
+
     /**
      * contribution function
      */
     function () public payable {
         // Check if contribution is still active
         require(!saleClosed);
-        
+
         // Price is 1 ETH = 100000000 mETH
         uint256 amount = msg.value * 100000000;
-        
+
         // totalSupply limit is 9 billion mETH
         require(totalSupply + amount <= (9000000000 * 10 ** uint256(decimals)));
-        
+
         // Increases the total supply
         totalSupply += amount;
-        
+
         // Adds the amount to the balance
         balances[msg.sender] += amount;
-        
+
         // Track ETH amount raised
         funds += msg.value;
-        
+
         // Execute an event reflecting the change
         Transfer(this, msg.sender, amount);
     }
@@ -144,28 +144,28 @@ contract mETHNetwork {
     function _transfer(address _from, address _to, uint _value) internal {
         // Sending addresses cannot be buried
         require(!buried[_from]);
-        
 
-        
+
+
         // Prevent transfer to 0x0 address, use burn() instead
         require(_to != 0x0);
-        
+
         // Check if the sender has enough
         require(balances[_from] >= _value);
-        
+
         // Check for overflows
         require(balances[_to] + _value > balances[_to]);
-        
+
         // Save this for an assertion in the future
         uint256 previousBalances = balances[_from] + balances[_to];
-        
+
         // Subtract from the sender
         balances[_from] -= _value;
-        
+
         // Add the same to the recipient
         balances[_to] += _value;
         Transfer(_from, _to, _value);
-        
+
         // Failsafe logic that should never be false
         assert(balances[_from] + balances[_to] == previousBalances);
     }
@@ -210,7 +210,7 @@ contract mETHNetwork {
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // Buried addresses cannot be approved
         require(!buried[msg.sender]);
-        
+
         allowance[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -243,13 +243,13 @@ contract mETHNetwork {
     function burn(uint256 _value) public returns (bool success) {
         // Buried addresses cannot be burnt
         require(!buried[msg.sender]);
-        
+
         // Check if the sender has enough
         require(balances[msg.sender] >= _value);
-        
+
         // Subtract from the sender
         balances[msg.sender] -= _value;
-        
+
         // Updates totalSupply
         totalSupply -= _value;
         Burn(msg.sender, _value);
@@ -263,22 +263,34 @@ contract mETHNetwork {
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         // Buried addresses cannot be burnt
         require(!buried[_from]);
-        
+
         // Check if the targeted balance is enough
         require(balances[_from] >= _value);
-        
+
         // Check allowance
         require(_value <= allowance[_from][msg.sender]);
-        
+
         // Subtract from the targeted balance
         balances[_from] -= _value;
-        
+
         // Subtract from the sender's allowance
         allowance[_from][msg.sender] -= _value;
-        
+
         // Update totalSupply
         totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

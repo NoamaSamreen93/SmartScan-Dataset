@@ -81,7 +81,7 @@ contract StandardToken is Token {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -112,11 +112,22 @@ contract UnlimitedAllowanceToken is StandardToken {
 contract BullToken is UnlimitedAllowanceToken {
 
     uint8 constant public decimals = 18;
-    uint public totalSupply               = 10**28; 
+    uint public totalSupply               = 10**28;
     string constant public name     = "Bull Token";
     string constant public symbol  = "BULL";
 
     function BullToken() {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

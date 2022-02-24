@@ -10,14 +10,14 @@ library SafeMath {
         require(b <= a);
         c = a - b;
     }
-    function mul(uint a, uint b) internal pure returns (uint c) { 
+    function mul(uint a, uint b) internal pure returns (uint c) {
         c = a * b;
         require(a == 0 || c / a == b);
     }
     function div(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
         c = a / b;
-    } 
+    }
 }
 
  library SafeMath8{
@@ -26,7 +26,7 @@ library SafeMath {
         require(c >= a);
 
         return c;
-    } 
+    }
 
     function sub(uint8 a, uint8 b) internal pure returns (uint8) {
         require(b <= a);
@@ -80,17 +80,17 @@ interface master{
     function inquire_slave_address(uint16 _slave) external view returns(address);
     function inquire_land_info(uint16 _city, uint16 _id) external view returns(uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8,uint8);
     function domain_attribute(uint16 _city,uint16 _id, uint8 _index) external;
-    
+
     function inquire_tot_attribute(uint16 _slave, uint16 _domain) external view returns(uint8[5]);
-     
+
     function inquire_owner(uint16 _city, uint16 id) external view returns(address);
-    
+
 }
 
  interface material{
      function control_burn(uint8 boxIndex, uint8 materialIndex, address target, uint256 amount) external;
  }
- 
+
 
 contract owned{
 
@@ -103,7 +103,7 @@ contract owned{
     modifier onlymanager{
         require(msg.sender == manager);
         _;
-    } 
+    }
 
     function transferownership(address _new_manager) public onlymanager {
         manager = _new_manager;
@@ -111,64 +111,64 @@ contract owned{
 
 }
 
-contract mix is owned{   
-    
-    event mix_result(address indexed player, bool result, uint16 rate); 
+contract mix is owned{
+
+    event mix_result(address indexed player, bool result, uint16 rate);
 
     address arina_address = 0xe6987cd613dfda0995a95b3e6acbabececd41376;
     address master_address = 0x0ac10bf0342fa2724e93d250751186ba5b659303;
-    
-    address material_contract = 0x65844f2e98495b6c8780f689c5d13bb7f4975d65;  
-    
+
+    address material_contract = 0x65844f2e98495b6c8780f689c5d13bb7f4975d65;
+
     uint16[5] paramA;
-    uint16[5] paramB; 
-    uint16[5] paramC; 
+    uint16[5] paramB;
+    uint16[5] paramC;
     uint16[5] paramD;
-    uint16[5] paramE; 
+    uint16[5] paramE;
     uint16[5] paramF;
 
-    
+
     constructor() public{
         paramA=[50,30,10,5,1];
-        paramB=[100,50,30,10,5]; 
+        paramB=[100,50,30,10,5];
         paramC=[200,100,50,30,10];
         paramD=[300,150,100,50,30];
         paramE=[400,200,150,100,50];
-        paramF=[500,300,200,150,100]; 
+        paramF=[500,300,200,150,100];
 
-    } 
-     
+    }
+
     using SafeMath for uint256;
     using SafeMath16 for uint16;
     using SafeMath8 for uint8;
     using Address for address;
-    
+
     function set_material_contract(address _material_contract) public onlymanager{
         material_contract = _material_contract;
     }
-    
+
     function set_master(address _new_master) public onlymanager {
         master_address = _new_master;
-    } 
-    
-     
-    
+    }
+
+
+
     function materialMix(uint16 city,uint16 id,uint8 proIndex, uint8[] mixArray) public {
-    
+
         require(msg.sender == master(master_address).inquire_owner(city,id));
         (uint16 _city,uint16 _id) = master(master_address).inquire_location(msg.sender);
         require(city == _city && id == _id);
-         
-        uint8 produce;        
-        uint8 attribute; 
-        uint8 index2;         
-        uint16 total = 0;     
+
+        uint8 produce;
+        uint8 attribute;
+        uint8 index2;
+        uint16 total = 0;
         uint16 random = uint16((keccak256(abi.encodePacked(now, mixArray.length))));
-  
-         
+
+
         if(proIndex == 1){
             (produce,,,,,,,,,) = master(master_address).inquire_land_info(city,id);
-             
+
         }else if(proIndex == 2){
             (,produce,,,,,,,,) = master(master_address).inquire_land_info(city,id);
         }else if(proIndex == 3){
@@ -180,27 +180,27 @@ contract mix is owned{
         }
 
         attribute = produce.add(master(master_address).inquire_tot_attribute(city,id)[(proIndex-1)]);
-        
+
         require(attribute>=0 && attribute < 10);
-         
-        
+
+
         if( attribute < 2)
             index2 = 0;
         else if(attribute > 1 && attribute < 4)
-            index2 = 1; 
+            index2 = 1;
         else if(attribute > 3 && attribute < 6)
             index2 = 2;
         else if(attribute > 5 && attribute < 8)
             index2 = 3;
         else
-            index2 = 4; 
-            
-        for( i=0;i<mixArray.length;i++){          
+            index2 = 4;
+
+        for( i=0;i<mixArray.length;i++){
             total = total.add(getParam(mixArray[i],index2));
-        }    
-  
-        for(uint8 i=0;i < mixArray.length; i++){                        
-            
+        }
+
+        for(uint8 i=0;i < mixArray.length; i++){
+
             if(proIndex == 2){
                 mixArray[i] = mixArray[i]%30;
             }else if(proIndex == 3){
@@ -213,25 +213,25 @@ contract mix is owned{
 
 
              material(material_contract).control_burn((proIndex-1),(mixArray[i]-1),msg.sender,1);
-        }  
+        }
 
-        
+
 
 
         if((random%1000) <= total){
-            
+
             master(master_address).domain_attribute(city, id, (proIndex-1));
             emit mix_result(msg.sender,true,total);
-            
+
         } else{
             emit mix_result(msg.sender,false,total);
         }
-    
+
     }
-    
-     
-    function getParam(uint index1,uint16 index2) private view returns(uint16){     
-           
+
+
+    function getParam(uint index1,uint16 index2) private view returns(uint16){
+
            if(index1<6 || index1==31 || index1==32 || (index1>40 && index1<46) || index1==61 || index1==62 || (index1>68 && index1<74)){
                return paramA[index2];
            }else if((index1>5 && index1<11) || index1==33 || index1==34 || (index1>45 && index1<51) || index1==63 || index1==64 || (index1>73 && index1<79)){
@@ -246,9 +246,15 @@ contract mix is owned{
                return paramE[index2];
            }
     }
-    
 
-    
-    
-    
+
+
+
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

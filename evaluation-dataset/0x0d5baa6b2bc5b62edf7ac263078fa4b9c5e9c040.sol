@@ -44,7 +44,7 @@ library SafeMath {
 }
 
 /**
- * DreamTeam tokens vesting smart contract. 
+ * DreamTeam tokens vesting smart contract.
  * This vesting smart contracts unlocks 50% of the tokens for `withdrawalAddress` on December 25, 2018.
  * Other 50% are unlocked on 30 June, 2019.
  * The withdrawal address is set during the initialization (initializeVestingFor function).
@@ -213,4 +213,15 @@ contract OneYearDreamTokensVestingAdvisors {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

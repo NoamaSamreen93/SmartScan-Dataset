@@ -58,13 +58,13 @@ contract Guardian is IERC20 {
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function Guardian() public {
         initialSupply = 10000000000 * (10 ** uint256(decimals));
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-        Transfer(0x0, msg.sender, initialSupply);                           
+        Transfer(0x0, msg.sender, initialSupply);
     }
 
     function totalSupply() public view returns (uint256) {
@@ -121,4 +121,15 @@ contract Guardian is IERC20 {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

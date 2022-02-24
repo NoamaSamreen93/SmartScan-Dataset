@@ -65,7 +65,7 @@ library SafeMath {
 }
 
 library StringUtils {
-    
+
     function toAsciiString(address x) internal pure returns (string memory) {
         bytes memory s = new bytes(40);
         for (uint i = 0; i < 20; i++) {
@@ -73,28 +73,28 @@ library StringUtils {
             byte hi = byte(uint8(b) / 16);
             byte lo = byte(uint8(b) - 16 * uint8(hi));
             s[2*i] = _char(hi);
-            s[2*i+1] = _char(lo);            
+            s[2*i+1] = _char(lo);
         }
         return string(s);
     }
-    
+
     function _char(byte b) internal pure returns (byte c) {
         if (uint8(b) < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
-    
+
     function append(string memory a, string memory b) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b));
     }
-    
+
     function append3(string memory a, string memory b, string memory c) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b, c));
     }
-    
+
     function append4(string memory a, string memory b, string memory c, string memory d) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b, c, d));
     }
-    
+
     function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
         if (_i == 0) {
             return "0";
@@ -116,73 +116,73 @@ library StringUtils {
 }
 
 library IterableMap {
-    
+
     struct IMap {
         mapping(address => uint256) mapToData;
         mapping(address => uint256) mapToIndex; // start with index 1
         address[] indexes;
     }
-    
+
     function insert(IMap storage self, address _address, uint256 _value) internal returns (bool replaced) {
-      
+
         require(_address != address(0));
-        
+
         if(self.mapToIndex[_address] == 0){
-            
+
             // add new
             self.indexes.push(_address);
             self.mapToIndex[_address] = self.indexes.length;
             self.mapToData[_address] = _value;
             return false;
         }
-        
+
         // replace
         self.mapToData[_address] = _value;
         return true;
     }
-    
+
     function remove(IMap storage self, address _address) internal returns (bool success) {
-       
+
         require(_address != address(0));
-        
+
         // not existing
         if(self.mapToIndex[_address] == 0){
-            return false;   
+            return false;
         }
-        
+
         uint256 deleteIndex = self.mapToIndex[_address];
         if(deleteIndex <= 0 || deleteIndex > self.indexes.length){
             return false;
         }
-       
+
          // if index to be deleted is not the last index, swap position.
         if (deleteIndex < self.indexes.length) {
-            // swap 
+            // swap
             self.indexes[deleteIndex-1] = self.indexes[self.indexes.length-1];
             self.mapToIndex[self.indexes[deleteIndex-1]] = deleteIndex;
         }
         self.indexes.length -= 1;
         delete self.mapToData[_address];
         delete self.mapToIndex[_address];
-       
+
         return true;
     }
-  
+
     function contains(IMap storage self, address _address) internal view returns (bool exists) {
         return self.mapToIndex[_address] > 0;
     }
-      
+
     function size(IMap storage self) internal view returns (uint256) {
         return self.indexes.length;
     }
-  
+
     function get(IMap storage self, address _address) internal view returns (uint256) {
         return self.mapToData[_address];
     }
 
     // start with index 0
     function getKey(IMap storage self, uint256 _index) internal view returns (address) {
-        
+
         if(_index < self.indexes.length){
             return self.indexes[_index];
         }
@@ -440,11 +440,11 @@ contract ERC20Detailed is IERC20 {
 
 
 contract ERC20Votable is ERC20{
-    
+
     // Use itmap for all functions on the struct
     using IterableMap for IterableMap.IMap;
     using SafeMath for uint256;
-    
+
     // event
     event MintToken(uint256 sessionID, address indexed beneficiary, uint256 amount);
     event MintFinished(uint256 sessionID);
@@ -452,18 +452,18 @@ contract ERC20Votable is ERC20{
     event AddAuthority(uint256 sessionID, address indexed authority);
     event RemoveAuthority(uint256 sessionID, address indexed authority);
     event ChangeRequiredApproval(uint256 sessionID, uint256 from, uint256 to);
-    
+
     event VoteAccept(uint256 sessionID, address indexed authority);
     event VoteReject(uint256 sessionID, address indexed authority);
-    
+
     // constant
     uint256 constant NUMBER_OF_BLOCK_FOR_SESSION_EXPIRE = 5760;
 
     // Declare an iterable mapping
     IterableMap.IMap authorities;
-    
+
     bool public isMintingFinished;
-    
+
     struct Topic {
         uint8 BURN;
         uint8 MINT;
@@ -472,7 +472,7 @@ contract ERC20Votable is ERC20{
         uint8 REMOVE_AUTHORITY;
         uint8 CHANGE_REQUIRED_APPROVAL;
     }
-    
+
     struct Session {
         uint256 id;
         uint8 topic;
@@ -484,25 +484,25 @@ contract ERC20Votable is ERC20{
        // number of approval from authories to accept the current session
         uint256 requireAccept;
     }
-    
+
     ERC20Votable.Topic topic;
     ERC20Votable.Session session;
-    
+
     constructor() public {
-        
+
         topic.BURN = 1;
         topic.MINT = 2;
         topic.MINT_FINISHED = 3;
         topic.ADD_AUTHORITY = 4;
         topic.REMOVE_AUTHORITY = 5;
         topic.CHANGE_REQUIRED_APPROVAL = 6;
-        
+
         session.id = 1;
         session.requireAccept = 1;
-    
+
         authorities.insert(msg.sender, session.id);
     }
-    
+
     /**
      * @dev modifier
      */
@@ -510,17 +510,17 @@ contract ERC20Votable is ERC20{
         require(authorities.contains(msg.sender));
         _;
     }
-    
+
     modifier onlySessionAvailable() {
         require(_isSessionAvailable());
         _;
     }
-    
+
      modifier onlyHasSession() {
         require(!_isSessionAvailable());
         _;
     }
-    
+
     function isAuthority(address _address) public view returns (bool){
         return authorities.contains(_address);
     }
@@ -529,118 +529,118 @@ contract ERC20Votable is ERC20{
      * @dev get session detail
      */
     function getSessionName() public view returns (string memory){
-        
+
         bool isSession = !_isSessionAvailable();
-        
+
         if(isSession){
             return (_getSessionName());
         }
-        
+
         return "None";
     }
-    
+
     function getSessionExpireAtBlockNo() public view returns (uint256){
-        
+
         bool isSession = !_isSessionAvailable();
-        
+
         if(isSession){
             return (session.blockNo.add(NUMBER_OF_BLOCK_FOR_SESSION_EXPIRE));
         }
-        
+
         return 0;
     }
-    
+
     function getSessionVoteAccept() public view returns (uint256){
-      
+
         bool isSession = !_isSessionAvailable();
-        
+
         if(isSession){
             return session.countAccept;
         }
-        
+
         return 0;
     }
-    
+
     function getSessionVoteReject() public view returns (uint256){
-      
+
         bool isSession = !_isSessionAvailable();
-        
+
         if(isSession){
             return session.countReject;
         }
-        
+
         return 0;
     }
-    
+
     function getSessionRequiredAcceptVote() public view returns (uint256){
-      
+
         return session.requireAccept;
     }
-    
+
     function getTotalAuthorities() public view returns (uint256){
-      
+
         return authorities.size();
     }
-    
 
-    
+
+
     /**
      * @dev create session
      */
-     
+
     function createSessionMintToken(address _beneficiary, uint256 _amount) public onlyAuthority onlySessionAvailable {
-        
+
         require(!isMintingFinished);
         require(_amount > 0);
         require(_beneficiary != address(0));
-       
+
         _createSession(topic.MINT);
         session.referNumber = _amount;
         session.referAddress = _beneficiary;
     }
-    
+
     function createSessionMintFinished() public onlyAuthority onlySessionAvailable {
-        
+
         require(!isMintingFinished);
         _createSession(topic.MINT_FINISHED);
         session.referNumber = 0;
         session.referAddress = address(0);
     }
-    
+
     function createSessionBurnAuthorityToken(address _authority, uint256 _amount) public onlyAuthority onlySessionAvailable {
-        
+
         require(_amount > 0);
         require(_authority != address(0));
         require(isAuthority(_authority));
-       
+
         _createSession(topic.BURN);
         session.referNumber = _amount;
         session.referAddress = _authority;
     }
-    
+
     function createSessionAddAuthority(address _authority) public onlyAuthority onlySessionAvailable {
-        
+
         require(!authorities.contains(_authority));
-        
+
         _createSession(topic.ADD_AUTHORITY);
         session.referNumber = 0;
         session.referAddress = _authority;
     }
-    
+
     function createSessionRemoveAuthority(address _authority) public onlyAuthority onlySessionAvailable {
-        
+
         require(authorities.contains(_authority));
-        
+
         // at least 1 authority remain
         require(authorities.size() > 1);
-      
+
         _createSession(topic.REMOVE_AUTHORITY);
         session.referNumber = 0;
         session.referAddress = _authority;
     }
-    
+
     function createSessionChangeRequiredApproval(uint256 _to) public onlyAuthority onlySessionAvailable {
-        
+
         require(_to != session.requireAccept);
         require(_to <= authorities.size());
 
@@ -648,129 +648,129 @@ contract ERC20Votable is ERC20{
         session.referNumber = _to;
         session.referAddress = address(0);
     }
-    
+
     /**
      * @dev vote
      */
     function voteAccept() public onlyAuthority onlyHasSession {
-        
+
         // already vote
         require(authorities.get(msg.sender) != session.id);
-        
+
         authorities.insert(msg.sender, session.id);
         session.countAccept = session.countAccept.add(1);
-        
+
         emit VoteAccept(session.id, session.referAddress);
-        
+
         // execute
         if(session.countAccept >= session.requireAccept){
-            
+
             if(session.topic == topic.BURN){
-                
+
                 _burnToken();
-                
+
             }else if(session.topic == topic.MINT){
-                
+
                 _mintToken();
-                
+
             }else if(session.topic == topic.MINT_FINISHED){
-                
+
                 _finishMinting();
-                
+
             }else if(session.topic == topic.ADD_AUTHORITY){
-                
-                _addAuthority();    
-            
+
+                _addAuthority();
+
             }else if(session.topic == topic.REMOVE_AUTHORITY){
-                
-                _removeAuthority();  
-                
+
+                _removeAuthority();
+
             }else if(session.topic == topic.CHANGE_REQUIRED_APPROVAL){
-                
-                _changeRequiredApproval();  
-                
+
+                _changeRequiredApproval();
+
             }
         }
     }
-    
+
     function voteReject() public onlyAuthority onlyHasSession {
-        
+
         // already vote
         require(authorities.get(msg.sender) != session.id);
-        
+
         authorities.insert(msg.sender, session.id);
         session.countReject = session.countReject.add(1);
-        
+
         emit VoteReject(session.id, session.referAddress);
     }
-    
+
     /**
      * @dev private
      */
     function _createSession(uint8 _topic) internal {
-        
+
         session.topic = _topic;
         session.countAccept = 0;
         session.countReject = 0;
         session.id = session.id.add(1);
         session.blockNo = block.number;
     }
-    
+
     function _getSessionName() internal view returns (string memory){
-        
+
         string memory topicName = "";
-        
+
         if(session.topic == topic.BURN){
-          
+
            topicName = StringUtils.append3("Burn ", StringUtils.uint2str(session.referNumber) , " token(s)");
-           
+
         }else if(session.topic == topic.MINT){
-          
+
            topicName = StringUtils.append4("Mint ", StringUtils.uint2str(session.referNumber) , " token(s) to address 0x", StringUtils.toAsciiString(session.referAddress));
-         
+
         }else if(session.topic == topic.MINT_FINISHED){
-          
+
            topicName = "Finish minting";
-         
+
         }else if(session.topic == topic.ADD_AUTHORITY){
-          
+
            topicName = StringUtils.append3("Add 0x", StringUtils.toAsciiString(session.referAddress), " to authorities");
-           
+
         }else if(session.topic == topic.REMOVE_AUTHORITY){
-            
+
             topicName = StringUtils.append3("Remove 0x", StringUtils.toAsciiString(session.referAddress), " from authorities");
-            
+
         }else if(session.topic == topic.CHANGE_REQUIRED_APPROVAL){
-            
+
             topicName = StringUtils.append4("Change approval from ", StringUtils.uint2str(session.requireAccept), " to ", StringUtils.uint2str(session.referNumber));
-            
+
         }
-        
+
         return topicName;
     }
-    
+
     function _isSessionAvailable() internal view returns (bool){
-        
+
         // vote result accept
         if(session.countAccept >= session.requireAccept) return true;
-        
+
          // vote result reject
         if(session.countReject > authorities.size().sub(session.requireAccept)) return true;
-        
+
         // vote expire (1 day)
         if(block.number.sub(session.blockNo) > NUMBER_OF_BLOCK_FOR_SESSION_EXPIRE) return true;
-        
+
         return false;
-    }   
-    
+    }
+
     function _addAuthority() internal {
-        
+
         authorities.insert(session.referAddress, session.id);
         emit AddAuthority(session.id, session.referAddress);
     }
-    
+
     function _removeAuthority() internal {
-        
+
         authorities.remove(session.referAddress);
         if(authorities.size() < session.requireAccept){
             emit ChangeRequiredApproval(session.id, session.requireAccept, authorities.size());
@@ -778,30 +778,30 @@ contract ERC20Votable is ERC20{
         }
         emit RemoveAuthority(session.id, session.referAddress);
     }
-    
+
     function _changeRequiredApproval() internal {
-        
+
         emit ChangeRequiredApproval(session.id, session.requireAccept, session.referNumber);
         session.requireAccept = session.referNumber;
         session.countAccept = session.requireAccept;
     }
-    
+
     function _mintToken() internal {
-        
+
         require(!isMintingFinished);
         _mint(session.referAddress, session.referNumber);
         emit MintToken(session.id, session.referAddress, session.referNumber);
     }
-    
+
     function _finishMinting() internal {
-        
+
         require(!isMintingFinished);
         isMintingFinished = true;
         emit MintFinished(session.id);
     }
-    
+
     function _burnToken() internal {
-        
+
         _burn(session.referAddress, session.referNumber);
         emit BurnToken(session.id, session.referAddress, session.referNumber);
     }
@@ -812,6 +812,15 @@ contract WorldClassSmartFarmToken is ERC20Detailed, ERC20Votable {
         public
         ERC20Detailed(name, symbol, decimals)
     {
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

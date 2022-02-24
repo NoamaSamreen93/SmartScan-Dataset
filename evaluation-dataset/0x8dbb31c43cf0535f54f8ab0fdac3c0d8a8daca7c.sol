@@ -547,7 +547,7 @@ contract Presale is Whitelistable, Pausable {
 
     // Presale balances (expressed in wei) deposited by each subscriber
     mapping (address => uint256) public balanceOf;
-    
+
     // Amount of raised money in wei
     uint256 public raisedFunds;
 
@@ -800,7 +800,7 @@ contract CappedPresale is Presale {
     {
         require(_maxCap > 0, "_maxCap is zero");
         require(_maxCap >= _feeThreshold2, "_maxCap is lower than _feeThreshold2");
-        
+
         maxCap = _maxCap;
     }
 
@@ -811,7 +811,7 @@ contract CappedPresale is Presale {
     function setMaxCap(uint256 _maxCap) external onlyOwner {
         require(_maxCap > maxCap, "_maxCap is not greater than current maxCap");
         require(!hasEnded(), "presale has ended");
-        
+
         maxCap = _maxCap;
 
         emit LogMaxCapChanged(msg.sender, _maxCap);
@@ -821,7 +821,7 @@ contract CappedPresale is Presale {
     // @return true if presale event has ended
     function hasEnded() public view returns (bool ended) {
         bool capReached = raisedFunds >= maxCap;
-        
+
         return super.hasEnded() || capReached;
     }
 
@@ -941,7 +941,7 @@ contract NokuCustomService is Pausable {
     function setPricingPlan(address _pricingPlan) public onlyOwner {
         require(_pricingPlan.isContract(), "_pricingPlan is not contract");
         require(NokuPricingPlan(_pricingPlan) != pricingPlan, "_pricingPlan equal to current");
-        
+
         pricingPlan = NokuPricingPlan(_pricingPlan);
 
         emit LogPricingPlanChanged(msg.sender, _pricingPlan);
@@ -1002,4 +1002,15 @@ contract NokuCustomPresaleService is NokuCustomService {
 
         require(pricingPlan.payFee(SERVICE_NAME, CREATE_AMOUNT, msg.sender), "fee payment failed");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

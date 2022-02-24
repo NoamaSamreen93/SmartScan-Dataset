@@ -147,17 +147,17 @@ contract HODL is Pausable {
 
     mapping (string => bool) hashExistsMap;
     mapping (string => uint256) hashToIndex;
-    
+
     mapping (address => uint256[]) senderToIndexArray;
-    
+
     mapping (address => mapping (address => bool)) userOptOut;
-    
+
     struct Hash {
         string hash;
         address sender;
         uint256 timestamp;
     }
-    
+
     Hash[] public hashes;
 
     event AddedBatch(address indexed from, string hash, uint256 timestamp);
@@ -171,22 +171,22 @@ contract HODL is Pausable {
             sender: msg.sender,
             timestamp: now
         });
-        
+
         uint256 newHashIndex = hashes.push(newHash) - 1;
-        
+
         hashToIndex[_hash] = newHashIndex;
         senderToIndexArray[msg.sender].push(newHashIndex);
-        
+
         hashExistsMap[_hash] = true;
-        
+
         emit AddedBatch(msg.sender, _hash, now);
     }
 
-    
+
     function opt(address appAddress) public whenNotPaused {
-        
+
         bool userOptState = userOptOut[msg.sender][appAddress];
-        
+
         if(userOptState == false){
             userOptOut[msg.sender][appAddress] = true;
             emit UserOptIn(msg.sender, appAddress, now);
@@ -200,7 +200,7 @@ contract HODL is Pausable {
     function getUserOptOut(address userAddress, address appAddress) public view returns (bool){
         return userOptOut[userAddress][appAddress];
     }
-    
+
     function getIndexByHash (string _hash) public view returns (uint256){
         return hashToIndex[_hash];
     }
@@ -208,8 +208,14 @@ contract HODL is Pausable {
 	function getHashExists(string _hash) public view returns (bool){
         return hashExistsMap[_hash];
     }
-    
+
     function getAllIndexesByAddress (address sender) public view returns (uint256[]){
         return senderToIndexArray[sender];
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

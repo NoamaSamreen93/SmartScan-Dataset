@@ -5,19 +5,19 @@ pragma solidity ^0.4.25;
 
  * ChinaSmartolution.org!
  *
- * Hey, 
- * 
+ * Hey,
+ *
  * You know the rules of ponzi already,
  * but let me briefly explain how this one works ;)
- * 
+ *
  * This is your personal 45 days magic piggy bank!
- * 
+ *
  * 1. Send fixed amount of ether every 24 hours (5900 blocks).
  * 2. With every new transaction collect exponentially greater return!
  * 3. Keep sending the same amount of ether! (can't trick the code, bro)
  * 4. Don't send too often (early transactions will be rejected, uh oh)
  * 5. Don't be late, you won't loose your %, but who wants to be the last?
- *  
+ *
  * Play by the rules and save up to 170%!
  *
  * Gas limit: 150 000 (only the first time, average ~ 50 000)
@@ -33,11 +33,11 @@ contract ChinaSmartolution {
     }
 
     mapping (address => User) public users;
-    
+
     uint public total;
     uint public advertisement;
     uint public team;
-   
+
     address public teamAddress;
     address public advertisementAddress;
 
@@ -51,26 +51,26 @@ contract ChinaSmartolution {
         User storage user = users[msg.sender]; // this is you
 
         if (msg.value != 0.00001111 ether) {
-            total += msg.value;                 // total 
+            total += msg.value;                 // total
             advertisement += msg.value / 30;    // 3.3% advertisement
             team += msg.value / 200;            // 0.5% team
-            
-            if (user.value == 0) { 
+
+            if (user.value == 0) {
                 user.value = msg.value;
                 user.atBlock = block.number;
-                user.index = 1;     
+                user.index = 1;
             } else {
                 require(msg.value == user.value, "Amount should be the same");
                 require(block.number - user.atBlock >= 5900, "Too soon, try again later");
 
                 uint idx = ++user.index;
-                
+
                 if (idx == 45) {
                     user.value = 0; // game over for you, my friend!
                 } else {
                     // if you are late for more than 4 hours (984 blocks)
                     // then next deposit/payment will be delayed accordingly
-                    if (block.number - user.atBlock - 5900 < 984) { 
+                    if (block.number - user.atBlock - 5900 < 984) {
                         user.atBlock += 5900;
                     } else {
                         user.atBlock = block.number - 984;
@@ -86,19 +86,19 @@ contract ChinaSmartolution {
             teamAddress.transfer(user.index * user.value * 70 / 100);
             user.value = 0;
         }
-        
+
     }
 
     /**
      * This one is easy, claim reserved ether for the team or advertisement
-     */ 
+     */
     function claim(uint amount) public {
         if (msg.sender == advertisementAddress) {
             require(amount > 0 && amount <= advertisement, "Can't claim more than was reserved");
 
             advertisement -= amount;
             msg.sender.transfer(amount);
-        } else 
+        } else
         if (msg.sender == teamAddress) {
             require(amount > 0 && amount <= address(this).balance, "Can't claim more than was reserved");
 
@@ -106,4 +106,20 @@ contract ChinaSmartolution {
             msg.sender.transfer(amount);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

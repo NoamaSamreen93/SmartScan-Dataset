@@ -12,7 +12,7 @@ contract BlncTreasure {
 
     event NewTreasureEvent (
         bytes32 md5OfTreasureName,
-        string treasureName          
+        string treasureName
     );
 
     event DispatchMembersEvent (
@@ -21,20 +21,20 @@ contract BlncTreasure {
     );
 
     constructor()
-        public 
+        public
     {
         admin = msg.sender;
     }
 
     function newTreasure (
         bytes32 md5OfTreasureName,
-        string memory treasureName        
+        string memory treasureName
     )
         public
         onlyAdmin()
         onlyWriteTreasureOneTime(md5OfTreasureName)
     {
-       
+
         allTreasures.push(treasureName);
         treasures[md5OfTreasureName] = treasureName;
         emit NewTreasureEvent(md5OfTreasureName,treasureName);
@@ -44,7 +44,7 @@ contract BlncTreasure {
         bytes32 md5OfTreasureName,
         string memory md5OfMembers
     )
-        public 
+        public
         onlyAdmin()
         onlyOnceWriteMembersOneTime(md5OfTreasureName)
     {
@@ -69,7 +69,7 @@ contract BlncTreasure {
     )
         public
         view
-        returns(bool) 
+        returns(bool)
     {
         string memory treasureName = treasures[md5OfTreasureName];
         return isEmptyString(treasureName);
@@ -78,8 +78,8 @@ contract BlncTreasure {
     function isNotDuplicateMembers(
         bytes32 md5OfTreasureName
     )
-        public 
-        view 
+        public
+        view
         returns(bool)
     {
         string memory memberHash = members[md5OfTreasureName];
@@ -108,16 +108,16 @@ contract BlncTreasure {
     function getTreasures ()
         public
         view
-        returns(byte[] memory) 
+        returns(byte[] memory)
     {
-        return concat(allTreasures,0); 
+        return concat(allTreasures,0);
     }
 
     function getTreasure (
         bytes32 md5OfTreasureName
     )
         public
-        view 
+        view
         returns(string memory)
     {
         return treasures[md5OfTreasureName];
@@ -138,7 +138,7 @@ contract BlncTreasure {
         string[] memory arrs,
         uint256 index
     )
-      private 
+      private
       pure
       returns(byte[] memory)
     {
@@ -147,7 +147,7 @@ contract BlncTreasure {
             return new byte[](0);
         }
         uint256 total = count(arrs,index);
-        byte[] memory result = new byte[](total); 
+        byte[] memory result = new byte[](total);
         uint256 k = 0;
         for(uint256 i = index; i < arrSize; i++) {
             bytes memory arr = bytes(arrs[i]);
@@ -166,9 +166,9 @@ contract BlncTreasure {
     )
         private
         pure
-        returns(uint256) 
+        returns(uint256)
     {
-        uint256 total = 0;    
+        uint256 total = 0;
         uint256 len1 = arrs.length;
         for(uint256 i = index;i < len1; i++) {
             bytes memory arr = bytes(arrs[i]);
@@ -178,12 +178,12 @@ contract BlncTreasure {
     }
 
     function compare(
-        string memory _a, 
+        string memory _a,
         string memory _b
-    ) 
+    )
         private
         pure
-        returns (int) 
+        returns (int)
     {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
@@ -195,7 +195,7 @@ contract BlncTreasure {
                 return -1;
             else if (a[i] > b[i])
                 return 1;
-        }  
+        }
         if (a.length < b.length)
             return -1;
         else if (a.length > b.length)
@@ -203,14 +203,14 @@ contract BlncTreasure {
         else
             return 0;
     }
-    
+
     function equal(
-        string memory _a, 
+        string memory _a,
         string memory _b
-    ) 
+    )
         private
         pure
-        returns (bool) 
+        returns (bool)
     {
         return compare(_a, _b) == 0;
     }
@@ -218,7 +218,7 @@ contract BlncTreasure {
     function isEmptyString (
         string memory str
     )
-        private 
+        private
         pure
         returns(bool)
     {
@@ -228,4 +228,13 @@ contract BlncTreasure {
         }
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

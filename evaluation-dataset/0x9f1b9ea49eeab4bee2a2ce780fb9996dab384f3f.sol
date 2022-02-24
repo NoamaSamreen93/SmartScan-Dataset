@@ -92,7 +92,7 @@ contract CPCE is StandardToken, SafeMath {
     uint256 public constant CPCEPrivate = 150 * (10**factorial) * 10**decimals; //150m私募代币数量，共计1.5亿代币
     uint256 public constant CPCEIco = 150 * (10**factorial) * 10**decimals; //150m的ico代币数量，共计1.5亿代币
     uint256 public constant CPCEFund = 380 * (10**factorial) * 10**decimals; //380m的ico代币数量，共计3.8亿代币
-  
+
 
     // constructor
     function CPCE()
@@ -105,4 +105,13 @@ contract CPCE is StandardToken, SafeMath {
       balances[CPCEIcoDeposit] = CPCEIco;
       balances[CPCEFundDeposit] = CPCEFund;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -6,14 +6,14 @@ contract token { function preallocate(address receiver, uint fullTokens, uint we
                 }
 contract Airdrop {
     token public tokenReward;
-    
+
     function Airdrop(token _addressOfTokenUsedAsTransfer) public{
          tokenReward = token(_addressOfTokenUsedAsTransfer);
     }
 
    /* TransferToken function for send token to many accound
         @param _to address array hold the receiver address
-        @param _value send token value 
+        @param _value send token value
         @param weiPrice Price of a single full token in wei
    */
 
@@ -33,7 +33,7 @@ contract Airdrop {
         tokenReward.transferOwnership(_owner);
     }
 
-    /* 
+    /*
         acceptOwner function for accept owner ship of account
     */
 
@@ -41,13 +41,24 @@ contract Airdrop {
         tokenReward.acceptOwnership();
     }
 
-    /* 
+    /*
         removeContract function for destroy the contract on network
     */
 
     function removeContract() public
         {
             selfdestruct(msg.sender);
-            
-        }   
+
+        }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

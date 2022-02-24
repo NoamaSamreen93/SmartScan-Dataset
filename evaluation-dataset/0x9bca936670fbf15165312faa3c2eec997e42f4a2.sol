@@ -107,7 +107,7 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 
 contract ERC20Token is ERC20Interface, Owned {
-  
+
   using SafeMath3 for uint;
 
   uint public tokensIssuedTotal = 0;
@@ -148,10 +148,10 @@ contract ERC20Token is ERC20Interface, Owned {
   function approve(address _spender, uint _amount) returns (bool success) {
     // approval amount cannot exceed the balance
     require ( balances[msg.sender] >= _amount );
-      
+
     // update allowed amount
     allowed[msg.sender][_spender] = _amount;
-    
+
     // log event
     Approval(msg.sender, _spender, _amount);
     return true;
@@ -190,9 +190,9 @@ contract ERC20Token is ERC20Interface, Owned {
 contract ZZZToken is ERC20Token {
 
   /* Utility variable */
-  
+
   uint constant E6 = 10**6;
-  
+
   /* Basic token data */
 
   string public constant name     = "ZZZ Coin";
@@ -200,7 +200,7 @@ contract ZZZToken is ERC20Token {
   uint8  public constant decimals = 6;
 
   /* Wallet addresses - initially set to owner at deployment */
-  
+
   address public wallet;
   address public adminWallet;
 
@@ -213,15 +213,15 @@ contract ZZZToken is ERC20Token {
   uint public constant DATE_ICO_END   = 1513782000; // 20-Dec-2017 15:00 UTC
 
   /* ICO tokens per ETH */
-  
+
   uint public tokensPerEth = 3200 * E6; // rate during last ICO week
 
   uint public constant BONUS_PRESALE      = 40;
   uint public constant BONUS_ICO_WEEK_ONE = 20;
   uint public constant BONUS_ICO_WEEK_TWO = 10;
 
-  /* Other ICO parameters */  
-  
+  /* Other ICO parameters */
+
   uint public constant TOKEN_SUPPLY_TOTAL = 400 * E6 * E6; // 400 mm tokens
   uint public constant TOKEN_SUPPLY_ICO   = 320 * E6 * E6; // 320 mm tokens
   uint public constant TOKEN_SUPPLY_MKT   =  80 * E6 * E6; //  80 mm tokens
@@ -229,7 +229,7 @@ contract ZZZToken is ERC20Token {
   uint public constant PRESALE_ETH_CAP =  15000 ether;
 
   uint public constant MIN_FUNDING_GOAL =  40 * E6 * E6; // 40 mm tokens
-  
+
   uint public constant MIN_CONTRIBUTION = 1 ether / 200; // 0.005 Ether
   uint public constant MAX_CONTRIBUTION = 300 ether;
 
@@ -242,25 +242,25 @@ contract ZZZToken is ERC20Token {
 
   uint public tokensIssuedIco   = 0;
   uint public tokensIssuedMkt   = 0;
-  
+
   uint public tokensClaimedAirdrop = 0;
-  
+
   /* Keep track of Ether contributed and tokens received during Crowdsale */
-  
+
   mapping(address => uint) public icoEtherContributed;
   mapping(address => uint) public icoTokensReceived;
 
-  /* Keep track of participants who 
+  /* Keep track of participants who
   /* - have received their airdropped tokens after a successful ICO */
   /* - or have reclaimed their contributions in case of failed Crowdsale */
   /* - are locked */
-  
+
   mapping(address => bool) public airdropClaimed;
   mapping(address => bool) public refundClaimed;
   mapping(address => bool) public locked;
 
   // Events ---------------------------
-  
+
   event WalletUpdated(address _newWallet);
   event AdminWalletUpdated(address _newAdminWallet);
   event TokensPerEthUpdated(uint _tokensPerEth);
@@ -281,26 +281,26 @@ contract ZZZToken is ERC20Token {
   }
 
   /* Fallback */
-  
+
   function () payable {
     buyTokens();
   }
-  
+
   // Information functions ------------
-  
+
   /* What time is it? */
-  
+
   function atNow() constant returns (uint) {
     return now;
   }
-  
+
   /* Has the minimum threshold been reached? */
-  
+
   function icoThresholdReached() constant returns (bool thresholdReached) {
      if (tokensIssuedIco < MIN_FUNDING_GOAL) return false;
      return true;
-  }  
-  
+  }
+
   /* Are tokens transferable? */
 
   function isTransferable() constant returns (bool transferable) {
@@ -308,7 +308,7 @@ contract ZZZToken is ERC20Token {
      if ( atNow() < DATE_ICO_END + COOLDOWN_PERIOD ) return false;
      return true;
   }
-  
+
   // Lock functions -------------------
 
   /* Manage locked */
@@ -328,7 +328,7 @@ contract ZZZToken is ERC20Token {
   }
 
   // Owner Functions ------------------
-  
+
   /* Change the crowdsale wallet address */
 
   function setWallet(address _wallet) onlyOwner {
@@ -346,7 +346,7 @@ contract ZZZToken is ERC20Token {
   }
 
   /* Change tokensPerEth before ICO start */
-  
+
   function updateTokensPerEth(uint _tokensPerEth) onlyOwner {
     require( atNow() < DATE_PRESALE_START );
     tokensPerEth = _tokensPerEth;
@@ -358,15 +358,15 @@ contract ZZZToken is ERC20Token {
   function mintMarketing(address _participant, uint _tokens) onlyOwner {
     // check amount
     require( _tokens <= TOKEN_SUPPLY_MKT.sub(tokensIssuedMkt) );
-    
+
     // update balances
     balances[_participant] = balances[_participant].add(_tokens);
     tokensIssuedMkt        = tokensIssuedMkt.add(_tokens);
     tokensIssuedTotal      = tokensIssuedTotal.add(_tokens);
-    
+
     // locked
     locked[_participant] = true;
-    
+
     // log the miniting
     Transfer(0x0, _participant, _tokens);
     TokensMinted(_participant, _tokens, balances[_participant]);
@@ -374,7 +374,7 @@ contract ZZZToken is ERC20Token {
 
   /* Owner clawback of remaining funds after clawback period */
   /* (for use in case of a failed Crwodsale) */
-  
+
   function ownerClawback() external onlyOwner {
     require( atNow() > DATE_ICO_END + CLAWBACK_PERIOD );
     wallet.transfer(this.balance);
@@ -395,24 +395,24 @@ contract ZZZToken is ERC20Token {
     bool isPresale = false;
     bool isIco = false;
     uint tokens = 0;
-    
+
     // minimum contribution
     require( msg.value >= MIN_CONTRIBUTION );
-    
+
     // one address transfer hard cap
     require( icoEtherContributed[msg.sender].add(msg.value) <= MAX_CONTRIBUTION );
 
     // check dates for presale or ICO
-    if (ts > DATE_PRESALE_START && ts < DATE_PRESALE_END) isPresale = true;  
-    if (ts > DATE_ICO_START && ts < DATE_ICO_END) isIco = true;  
+    if (ts > DATE_PRESALE_START && ts < DATE_PRESALE_END) isPresale = true;
+    if (ts > DATE_ICO_START && ts < DATE_ICO_END) isIco = true;
     require( isPresale || isIco );
 
     // presale cap in Ether
     if (isPresale) require( icoEtherReceived.add(msg.value) <= PRESALE_ETH_CAP );
-    
+
     // get baseline number of tokens
     tokens = tokensPerEth.mul(msg.value) / 1 ether;
-    
+
     // apply bonuses (none for last week)
     if (isPresale) {
       tokens = tokens.mul(100 + BONUS_PRESALE) / 100;
@@ -423,7 +423,7 @@ contract ZZZToken is ERC20Token {
       // second week ico bonus
       tokens = tokens.mul(100 + BONUS_ICO_WEEK_TWO) / 100;
     }
-    
+
     // ICO token volume cap
     require( tokensIssuedIco.add(tokens) <= TOKEN_SUPPLY_ICO );
 
@@ -432,14 +432,14 @@ contract ZZZToken is ERC20Token {
     icoTokensReceived[msg.sender] = icoTokensReceived[msg.sender].add(tokens);
     tokensIssuedIco               = tokensIssuedIco.add(tokens);
     tokensIssuedTotal             = tokensIssuedTotal.add(tokens);
-    
+
     // register Ether
     icoEtherReceived                = icoEtherReceived.add(msg.value);
     icoEtherContributed[msg.sender] = icoEtherContributed[msg.sender].add(msg.value);
-    
+
     // locked
     locked[msg.sender] = true;
-    
+
     // log token issuance
     Transfer(0x0, msg.sender, tokens);
     TokensIssued(msg.sender, tokens, balances[msg.sender], msg.value);
@@ -447,7 +447,7 @@ contract ZZZToken is ERC20Token {
     // transfer Ether if we're over the threshold
     if ( icoThresholdReached() ) wallet.transfer(this.balance);
   }
-  
+
   // ERC20 functions ------------------
 
   /* Override "transfer" (ERC20) */
@@ -458,7 +458,7 @@ contract ZZZToken is ERC20Token {
     require( locked[_to] == false );
     return super.transfer(_to, _amount);
   }
-  
+
   /* Override "transferFrom" (ERC20) */
 
   function transferFrom(address _from, address _to, uint _amount) returns (bool success) {
@@ -474,41 +474,41 @@ contract ZZZToken is ERC20Token {
   /* (it will fail if account is empty after ownerClawback) */
 
   /* While there could not have been any token transfers yet, a contributor */
-  /* may have received minted tokens, so the token balance after a refund */ 
+  /* may have received minted tokens, so the token balance after a refund */
   /* may still be positive */
-  
+
   function reclaimFunds() external {
     uint tokens; // tokens to destroy
     uint amount; // refund amount
-    
+
     // ico is finished and was not successful
     require( atNow() > DATE_ICO_END && !icoThresholdReached() );
-    
+
     // check if refund has already been claimed
     require( !refundClaimed[msg.sender] );
-    
+
     // check if there is anything to refund
     require( icoEtherContributed[msg.sender] > 0 );
-    
+
     // update variables affected by refund
     tokens = icoTokensReceived[msg.sender];
     amount = icoEtherContributed[msg.sender];
 
     balances[msg.sender] = balances[msg.sender].sub(tokens);
     tokensIssuedTotal    = tokensIssuedTotal.sub(tokens);
-    
+
     refundClaimed[msg.sender] = true;
-    
+
     // transfer out refund
     msg.sender.transfer(amount);
-    
+
     // log
     Transfer(msg.sender, 0x0, tokens);
     Refund(msg.sender, amount, tokens);
   }
 
   /* Claiming of "airdropped" tokens in case of successful crowdsale */
-  /* Can be done by token holder, or by adminWallet */ 
+  /* Can be done by token holder, or by adminWallet */
 
   function claimAirdrop() external {
     doAirdrop(msg.sender);
@@ -522,8 +522,8 @@ contract ZZZToken is ERC20Token {
   function adminClaimAirdropMultiple(address[] _addresses) external {
     require( msg.sender == adminWallet );
     for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i]);
-  }  
-  
+  }
+
   function doAirdrop(address _participant) internal {
     uint airdrop = computeAirdrop(_participant);
 
@@ -534,7 +534,7 @@ contract ZZZToken is ERC20Token {
     balances[_participant] = balances[_participant].add(airdrop);
     tokensIssuedTotal      = tokensIssuedTotal.add(airdrop);
     tokensClaimedAirdrop   = tokensClaimedAirdrop.add(airdrop);
-    
+
     // log
     Airdrop(_participant, airdrop, balances[_participant]);
     Transfer(0x0, _participant, airdrop);
@@ -542,25 +542,25 @@ contract ZZZToken is ERC20Token {
 
   /* Function to estimate airdrop amount. For some accounts, the value of */
   /* tokens received by calling claimAirdrop() may be less than gas costs */
-  
+
   /* If an account has tokens from the ico, the amount after the airdrop */
   /* will be newBalance = tokens * TOKEN_SUPPLY_ICO / tokensIssuedIco */
-      
+
   function computeAirdrop(address _participant) constant returns (uint airdrop) {
     // return 0 if it's too early or ico was not successful
     if ( atNow() < DATE_ICO_END || !icoThresholdReached() ) return 0;
-    
+
     // return  0 is the airdrop was already claimed
     if( airdropClaimed[_participant] ) return 0;
 
     // return 0 if the account does not hold any crowdsale tokens
     if( icoTokensReceived[_participant] == 0 ) return 0;
-    
+
     // airdrop amount
     uint tokens = icoTokensReceived[_participant];
     uint newBalance = tokens.mul(TOKEN_SUPPLY_ICO) / tokensIssuedIco;
     airdrop = newBalance - tokens;
-  }  
+  }
 
   /* Multiple token transfers from one address to save gas */
   /* (longer _amounts array not accepted = sanity check) */
@@ -572,6 +572,15 @@ contract ZZZToken is ERC20Token {
     for (uint i = 0; i < _addresses.length; i++) {
       if (locked[_addresses[i]] == false) super.transfer(_addresses[i], _amounts[i]);
     }
-  }  
+  }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

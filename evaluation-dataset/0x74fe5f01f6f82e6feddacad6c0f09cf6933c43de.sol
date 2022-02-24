@@ -36,26 +36,26 @@ contract TokenERC20 {
     /// @notice `msg.sender` approves `_addr` to spend `_value` tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @param _value The amount of wei to be approved for transfer
-    /// @return Whether the approval was successful or not	
+    /// @return Whether the approval was successful or not
     function approve(address _spender, uint256 _value) returns (bool success);
 
 	// Returns the amount which _spender is still allowed to withdraw from _owner
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
-    /// @return Amount of remaining tokens allowed to spent	
+    /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) constant returns (uint256 remaining);
-	
-	
+
+
 	// Get the account balance of another account with address _owner
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
 	function balanceOf(address _owner) constant returns (uint256 balance);
-	
+
 	 // Triggered when tokens are transferred.
     /// @notice send `_value` token to `_to` from `msg.sender`
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
-    /// @return Whether the transfer was successful or not   
+    /// @return Whether the transfer was successful or not
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	// Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -93,7 +93,7 @@ contract StandardToken is TokenERC20, SafeMath {
     mapping (address => uint256) balances;
     // Owner of account approves the transfer of an amount to another account
 	mapping (address => mapping (address => uint256)) allowed;
-  
+
 
 	  // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _value) returns (bool success) {
@@ -108,7 +108,7 @@ contract StandardToken is TokenERC20, SafeMath {
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
      // fees in sub-currencies; the command should fail unless the _from account has
-     // deliberately authorized the sender of the message via some mechanism; 
+     // deliberately authorized the sender of the message via some mechanism;
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 		uint256 allowance = allowed[_from][msg.sender];
         require(balances[_from] >= _value && allowance >= _value);
@@ -135,17 +135,17 @@ contract StandardToken is TokenERC20, SafeMath {
 	// Returns the amount which _spender is still allowed to withdraw from _owner based on the approve function
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }	
+    }
 }
 
-//final implementation 
+//final implementation
 contract COGNXToken is StandardToken {
     uint8 public constant decimals = 18;
     string public constant name = 'COGNX';
     string public constant symbol = 'COGNX';
     string public constant version = '1.0.0';
     uint256 public totalSupply = 15000000 * 10 ** uint256(decimals);
-		
+
 	//Constructor
     function COGNXToken() public {
         balances[msg.sender] = totalSupply;
@@ -163,4 +163,20 @@ contract COGNXToken is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

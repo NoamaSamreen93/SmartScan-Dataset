@@ -97,5 +97,14 @@ contract TSPToken is ContractTokenERC20 {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

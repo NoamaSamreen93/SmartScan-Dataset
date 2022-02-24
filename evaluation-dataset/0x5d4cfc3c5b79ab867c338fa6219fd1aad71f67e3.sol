@@ -218,3 +218,7 @@ contract DonavanTrust is ERC20Interface, Owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

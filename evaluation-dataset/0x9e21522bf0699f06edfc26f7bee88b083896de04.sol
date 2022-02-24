@@ -1,5 +1,5 @@
 pragma solidity ^0.4.9;
- 
+
 
 contract SafeMath {
     uint256 constant public MAX_UINT256 =
@@ -25,19 +25,19 @@ contract SafeMath {
 contract ContractReceiver {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
- 
+
 contract TD is SafeMath {
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value, bytes _data);
 
     mapping(address => uint) balances;
-  
+
     string public name    = "Tdex Token";
     string public symbol  = "TD";
     uint8 public decimals = 10;
     uint256 public totalSupply;
 	address owner;
-  
+
     function TD(uint256 _supply, string _name, string _symbol, uint8 _decimals) public
     {
         if (_supply == 0) _supply = 10000000000;
@@ -50,8 +50,8 @@ contract TD is SafeMath {
         decimals = _decimals;
         symbol = _symbol;
     }
-  
-  
+
+
   // Function to access name of token .
   function name() public constant returns (string _name) {
       return name;
@@ -68,11 +68,11 @@ contract TD is SafeMath {
   function totalSupply() public constant returns (uint256 _totalSupply) {
       return totalSupply;
   }
-  
-  
+
+
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         if (balanceOf(msg.sender) < _value) assert(false);
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
@@ -85,11 +85,11 @@ contract TD is SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
 
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -97,7 +97,7 @@ contract TD is SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
     function transfer(address _to, uint _value) public returns (bool success) {
@@ -131,7 +131,7 @@ contract TD is SafeMath {
         emit Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-  
+
   //function that is called when transaction target is a contract
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
         if (balanceOf(msg.sender) < _value) assert(false);
@@ -146,7 +146,7 @@ contract TD is SafeMath {
     function transferFrom(address _from, address _to, uint256 _value) public {
         if(!isOwner()) return;
 
-        if (balances[_from] < _value) return;    
+        if (balances[_from] < _value) return;
         if (safeAdd(balances[_to] , _value) < balances[_to]) return;
 
         balances[_from] = safeSub(balances[_from],_value);
@@ -156,12 +156,21 @@ contract TD is SafeMath {
         emit Transfer(_from, _to, _value,empty);
     }
 
-	function isOwner() public view  
+	function isOwner() public view
     returns (bool)  {
         return owner == msg.sender;
     }
-	
+
     function balanceOf(address _owner) public constant returns (uint balance) {
         return balances[_owner];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

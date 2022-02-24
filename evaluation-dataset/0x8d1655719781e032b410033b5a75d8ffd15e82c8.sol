@@ -134,7 +134,7 @@ contract StandardToken is ERC20, BasicToken {
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-    
+
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
 
     allowed[msg.sender][_spender] = _value;
@@ -187,7 +187,7 @@ contract MoyToken is StandardToken {
   string public constant symbol = "MOY";
   uint8 public constant decimals = 18; // 18 decimal to fully comply with exchanges and wallets.
 
-  uint256 public constant totalSupplyWithDecimals = 60000000000000000000000000; //60 million unique tokens for a single distribution and 18 decimal places to fully comply on exchanges and wallets. 
+  uint256 public constant totalSupplyWithDecimals = 60000000000000000000000000; //60 million unique tokens for a single distribution and 18 decimal places to fully comply on exchanges and wallets.
   uint256 public constant openSaleSupply = 30000000000000000000000000;
   uint256 public constant mineableSupply = 30000000000000000000000000;
   //string public constant tokenIssueDate = "12-27-2017"
@@ -196,8 +196,19 @@ contract MoyToken is StandardToken {
    * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function MoyToken()public {
-    
+
     balances[msg.sender] = totalSupplyWithDecimals;
 
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

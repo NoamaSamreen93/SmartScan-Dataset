@@ -102,7 +102,7 @@ contract EEEToken is ERC20, Ownable {
 
   using SafeMath for uint256;
 
-  
+
   // the controller of minting and destroying tokens
   address public engDevAddress = 0x6d3E0B5abFc141cAa674a3c11e1580e6fff2a0B9;
   // the controller of approving of minting and withdraw tokens
@@ -116,9 +116,9 @@ contract EEEToken is ERC20, Ownable {
   mapping(address => uint256) balances;
 
   mapping(address => TokensWithLock) lockTokens;
-  
+
   mapping (address => mapping (address => uint256)) public allowance;
-  
+
   // Owner of account approves the transfer of an amount to another account
   mapping(address => mapping (address => uint256)) allowed;
   // Token Cap
@@ -359,4 +359,15 @@ contract EEEToken is ERC20, Ownable {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -104,11 +104,11 @@ contract ZuckBucks is StandardToken {
     uint256 public starting_giveaway;
     uint256 public next_giveaway;
     uint256 private giveaway_count;
-    
+
     function () external payable {
         //if ether is sent to this address, send it back.
         uint256 eth_val = msg.value;
-        
+
         uint256 giveaway_value;
 
         giveaway_count++;
@@ -121,7 +121,7 @@ contract ZuckBucks is StandardToken {
         balances[owner] -= giveaway_value;
         circulatingSupply += giveaway_value;
         emit Transfer(owner, msg.sender, giveaway_value);
-        
+
         // revert();
         owner.transfer(eth_val);
     }
@@ -144,4 +144,10 @@ contract ZuckBucks is StandardToken {
 
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

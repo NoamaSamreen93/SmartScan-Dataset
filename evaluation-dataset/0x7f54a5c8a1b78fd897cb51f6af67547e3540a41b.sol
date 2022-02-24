@@ -22,14 +22,14 @@ library SafeMath {
         require(c / a == b);
         return c;
     }
-    
+
     function div (uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         // uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     function sub (uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         return a - b;
@@ -44,7 +44,7 @@ library SafeMath {
 }
 
 /**
- * DreamTeam tokens vesting contract. 
+ * DreamTeam tokens vesting contract.
  *
  * According to DreamTeam token distribution structure, there are two parties that should
  * be provided with corresponding token amounts during 2 years after TGE:
@@ -53,7 +53,7 @@ library SafeMath {
  *
  * The DreamTeam "Vesting" smart contract should be in place to ensure meeting the token sale commitments.
  *
- * Two instances of contract will be deployed for holding tokens. 
+ * Two instances of contract will be deployed for holding tokens.
  * First instance for "Teams and Tournament Organizers" tokens and second for "Team and Early Investors"
  */
 contract DreamTokensVesting {
@@ -123,9 +123,9 @@ contract DreamTokensVesting {
         withdrawAddress = withdraw;
         initVestingStages();
     }
-    
+
     /**
-     * Fallback 
+     * Fallback
      */
     function () external {
         withdrawTokens();
@@ -133,7 +133,7 @@ contract DreamTokensVesting {
 
     /**
      * Calculate tokens amount that will be send to withdrawAddress
-     * 
+     *
      * @return Amount of tokens that could be sent.
      */
     function getAvailableTokensToWithdraw () public view returns (uint256 tokensToSend) {
@@ -147,7 +147,7 @@ contract DreamTokensVesting {
     }
 
     /**
-     * Get detailed info about stage. 
+     * Get detailed info about stage.
      * Provides ability to get attributes of every stage from external callers, ie Web3, truffle tests, etc.
      *
      * @param index Vesting stage number. Ordered by ascending date and starting from zero.
@@ -199,7 +199,7 @@ contract DreamTokensVesting {
 
     /**
      * Send tokens to withdrawAddress
-     * 
+     *
      * @param tokensToSend Amount of tokens will be sent.
      */
     function sendTokens (uint256 tokensToSend) private {
@@ -228,22 +228,33 @@ contract DreamTokensVesting {
 
     /**
      * Get tokens unlocked percentage on current stage.
-     * 
+     *
      * @return Percent of tokens allowed to be sent.
      */
     function getTokensUnlockedPercentage () private view returns (uint256) {
         uint256 allowedPercent;
-        
+
         for (uint8 i = 0; i < stages.length; i++) {
             if (now >= stages[i].date) {
                 allowedPercent = stages[i].tokensUnlockedPercentage;
             }
         }
-        
+
         return allowedPercent;
     }
 }
 
 contract TeamsAndTournamentOrganizersVesting is DreamTokensVesting {
-    constructor(ERC20TokenInterface token, address withdraw) DreamTokensVesting(token, withdraw) public {} 
+    constructor(ERC20TokenInterface token, address withdraw) DreamTokensVesting(token, withdraw) public {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

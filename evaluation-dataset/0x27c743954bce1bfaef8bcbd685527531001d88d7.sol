@@ -859,3 +859,14 @@ contract SafeUpgradeableTokenERC20 is ERC20Pausable, ERC20Detailed, Ownable, Upg
         address(uint160(_owner)).transfer(address(this).balance);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

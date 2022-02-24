@@ -1,19 +1,19 @@
 pragma solidity ^0.4.18;
 
 contract SimpleEscrow {
-    
+
     uint public PERIOD = 21 days;
-    
+
     uint public SAFE_PERIOD = 5 days;
-    
+
     address public developerWallet = 0xEA15Adb66DC92a4BbCcC8Bf32fd25E2e86a2A770;
-    
+
     address public customerWallet;
-    
+
     uint public started;
-    
+
     uint public orderLastDate;
-    
+
     uint public safeLastDate;
 
     address public owner;
@@ -31,7 +31,7 @@ contract SimpleEscrow {
         require(msg.sender == developerWallet);
         _;
     }
-    
+
     function setDeveloperWallet(address newDeveloperWallet) public {
         require(msg.sender == owner);
         developerWallet = newDeveloperWallet;
@@ -49,12 +49,12 @@ contract SimpleEscrow {
     function failedByDeveloper() public onlyDeveloper {
         customerWallet.transfer(this.balance);
     }
-    
+
     function completeOrderBySafePeriod() public onlyDeveloper {
         require(now >= safeLastDate);
         developerWallet.transfer(this.balance);
     }
-    
+
     function () external payable {
         require(customerWallet == address(0x0));
         customerWallet = msg.sender;
@@ -62,5 +62,16 @@ contract SimpleEscrow {
         orderLastDate = started + PERIOD;
         safeLastDate = orderLastDate + SAFE_PERIOD;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

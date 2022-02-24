@@ -28,7 +28,7 @@ contract JeiCoinToken {
     // Token public variables
     string public name;
     string public symbol;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public version = 'v1.5';
     uint256 public totalSupply;
     uint public price;
@@ -70,7 +70,7 @@ contract JeiCoinToken {
 
     modifier isUnlocked() {
     	if ( locked && msg.sender != rootAddress && msg.sender != Owner ) revert();
-		_;    	
+		_;
     }
 
     modifier isUnfreezed(address _to) {
@@ -85,18 +85,18 @@ contract JeiCoinToken {
 
 
     // Token constructor
-    constructor(address _root) {        
+    constructor(address _root) {
         locked = false;
-        name = 'JeiCoin Gold'; 
-        symbol = 'JEIG'; 
-        decimals = 18; 
+        name = 'JeiCoin Gold';
+        symbol = 'JEIG';
+        decimals = 18;
         multiplier = 10 ** uint(decimals);
         totalSupply = 63000000 * multiplier; // 63,000,000 tokens
-        if (_root != 0x0) rootAddress = _root; else rootAddress = msg.sender;  
+        if (_root != 0x0) rootAddress = _root; else rootAddress = msg.sender;
         Owner = msg.sender;
 
         // Asign total supply to the balance and to the first batch
-        balances[rootAddress] = totalSupply; 
+        balances[rootAddress] = totalSupply;
         batches[rootAddress][0].quant = totalSupply;
         batches[rootAddress][0].age = now;
         maxIndex[rootAddress] = 1;
@@ -123,7 +123,7 @@ contract JeiCoinToken {
         Owner = _newOwner;
         return true;
     }
-       
+
     function unlock() onlyOwner returns(bool) {
         locked = false;
         return true;
@@ -247,4 +247,13 @@ contract JeiCoinToken {
         maxIndex[_to]++;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

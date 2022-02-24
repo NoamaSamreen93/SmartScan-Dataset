@@ -464,3 +464,11 @@ contract CMT is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
     }
 
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

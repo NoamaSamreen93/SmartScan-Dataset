@@ -47,7 +47,7 @@ contract LiteRheumToken is ERC20 {
     string public constant symbol = 'LRT';
     uint public constant decimals = 18;
     uint256 public totalSupply = 50000000e18;
-    uint256 public totalDistributed =  200000000e18;    
+    uint256 public totalDistributed =  200000000e18;
     uint256 public constant MIN_CONTRIBUTION = 1 ether / 100;
     uint256 public tokensPerEth = 500000e18;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -81,14 +81,14 @@ contract LiteRheumToken is ERC20 {
         return true;
     }
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
-        totalDistributed = totalDistributed.add(_amount);        
+        totalDistributed = totalDistributed.add(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
         return true;
     }
     function doAirdrop(address _participant, uint _amount) internal {
-        require(_amount > 0);      
+        require(_amount > 0);
         require(totalDistributed < totalSupply);
         balances[_participant] = balances[_participant].add(_amount);
         totalDistributed = totalDistributed.add(_amount);
@@ -98,14 +98,14 @@ contract LiteRheumToken is ERC20 {
         emit Airdrop(_participant, _amount, balances[_participant]);
         emit Transfer(address(0), _participant, _amount);
     }
-    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {        
+    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {
         doAirdrop(_participant, _amount);
     }
     function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public
-onlyOwner {        
+onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i], _amount);
     }
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
@@ -117,7 +117,7 @@ onlyOwner {
         uint256 bonus = 0;
         require(msg.value >= MIN_CONTRIBUTION);
         require(msg.value > 0);
-        tokens = tokensPerEth.mul(msg.value) / 1 ether;        
+        tokens = tokensPerEth.mul(msg.value) / 1 ether;
         address investor = msg.sender;
         if (msg.value >= 0.05 ether) {
             bonus = (tokens * 5) / 100;
@@ -228,4 +228,15 @@ onlyOwner {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -333,7 +333,7 @@ contract StandardToken is ERC20, BasicToken {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint internal constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance, and to add revert reasons.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -366,7 +366,7 @@ contract UnlimitedAllowanceToken is StandardToken {
     function transfer(
         address _to,
         uint256 _value)
-        public 
+        public
         returns (bool)
     {
         require(_value <= balances[msg.sender], "insufficient balance");
@@ -409,7 +409,7 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         public
         DetailedERC20(
             "bZx Protocol Token",
-            "BZRX", 
+            "BZRX",
             18
         )
     {
@@ -444,9 +444,9 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     /// @param _value Amount to transfer.
     /// @return Success of transfer.
     function transfer(
-        address _to, 
-        uint256 _value) 
-        public 
+        address _to,
+        uint256 _value)
+        public
         returns (bool)
     {
         if (lockingFinished || minters[msg.sender]) {
@@ -519,10 +519,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishMinting() 
-        public 
-        onlyOwner 
-        canMint 
+    function finishMinting()
+        public
+        onlyOwner
+        canMint
     {
         mintingFinished = true;
         emit MintFinished();
@@ -532,10 +532,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop locking token.
     * @return True if the operation was successful.
     */
-    function finishLocking() 
-        public 
-        onlyOwner 
-        isLocked 
+    function finishLocking()
+        public
+        onlyOwner
+        isLocked
     {
         lockingFinished = true;
         emit LockingFinished();
@@ -546,10 +546,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function addMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
     {
         minters[_minter] = true;
     }
@@ -559,10 +559,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function removeMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
     {
         minters[_minter] = false;
     }
@@ -580,8 +580,19 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         returns (bool)
     {
         return (
-            balances[_from] >= _value && 
+            balances[_from] >= _value &&
             (_spender == _from || allowed[_from][_spender] >= _value)
         );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

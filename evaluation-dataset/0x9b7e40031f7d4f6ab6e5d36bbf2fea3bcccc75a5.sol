@@ -1,6 +1,6 @@
 /* ===============================================
 * Flattened with Solidifier by Coinage
-* 
+*
 * https://solidifier.coina.ge
 * ===============================================
 */
@@ -113,7 +113,7 @@ underlying target contract.
 This proxy has the capacity to toggle between DELEGATECALL
 and CALL style proxy functionality.
 
-The former executes in the proxy's context, and so will preserve 
+The former executes in the proxy's context, and so will preserve
 msg.sender and store data at the proxy address. The latter will not.
 Therefore, any contract the proxy wraps in the CALL style must
 implement the Proxyable interface, in order that it can pass msg.sender
@@ -141,7 +141,7 @@ contract Proxy is Owned {
         emit TargetUpdated(_target);
     }
 
-    function setUseDELEGATECALL(bool value) 
+    function setUseDELEGATECALL(bool value)
         external
         onlyOwner
     {
@@ -156,7 +156,7 @@ contract Proxy is Owned {
         bytes memory _callData = callData;
 
         assembly {
-            /* The first 32 bytes of callData contain its length (as specified by the abi). 
+            /* The first 32 bytes of callData contain its length (as specified by the abi).
              * Length is assumed to be a uint256 and therefore maximum of 32 bytes
              * in length. It is also leftpadded to be a multiple of 32 bytes.
              * This means moving call_data across 32 bytes guarantees we correctly access
@@ -164,7 +164,7 @@ contract Proxy is Owned {
             switch numTopics
             case 0 {
                 log0(add(_callData, 32), size)
-            } 
+            }
             case 1 {
                 log1(add(_callData, 32), size, topic1)
             }
@@ -199,7 +199,7 @@ contract Proxy is Owned {
                 return(free_ptr, returndatasize)
             }
         } else {
-            /* Here we are as above, but must send the messageSender explicitly 
+            /* Here we are as above, but must send the messageSender explicitly
              * since we are using CALL rather than DELEGATECALL. */
             target.setMessageSender(msg.sender);
             assembly {
@@ -258,8 +258,8 @@ contract Proxyable is Owned {
 
     /* The caller of the proxy, passed through to this contract.
      * Note that every function using this member must apply the onlyProxy or
-     * optionalProxy modifiers, otherwise their invocations can use stale values. */ 
-    address messageSender; 
+     * optionalProxy modifiers, otherwise their invocations can use stale values. */
+    address messageSender;
 
     constructor(address _proxy, address _owner)
         Owned(_owner)
@@ -338,7 +338,7 @@ is forwarded to a nominated beneficiary upon destruction.
  * @title A contract that can be destroyed by its owner after a delay elapses.
  */
 contract SelfDestructible is Owned {
-    
+
     uint public initiationTime;
     bool public selfDestructInitiated;
     address public selfDestructBeneficiary;
@@ -534,7 +534,7 @@ library SafeDecimalMath {
     uint public constant PRECISE_UNIT = 10 ** uint(highPrecisionDecimals);
     uint private constant UNIT_TO_HIGH_PRECISION_CONVERSION_FACTOR = 10 ** uint(highPrecisionDecimals - decimals);
 
-    /** 
+    /**
      * @return Provides an interface to UNIT.
      */
     function unit()
@@ -545,12 +545,12 @@ library SafeDecimalMath {
         return UNIT;
     }
 
-    /** 
+    /**
      * @return Provides an interface to PRECISE_UNIT.
      */
     function preciseUnit()
         external
-        pure 
+        pure
         returns (uint)
     {
         return PRECISE_UNIT;
@@ -559,7 +559,7 @@ library SafeDecimalMath {
     /**
      * @return The result of multiplying x and y, interpreting the operands as fixed-point
      * decimals.
-     * 
+     *
      * @dev A unit factor is divided out after the product of x and y is evaluated,
      * so that product must be less than 2**256. As this is an integer division,
      * the internal division always rounds down. This helps save on gas. Rounding
@@ -644,7 +644,7 @@ library SafeDecimalMath {
     /**
      * @return The result of safely dividing x and y. The return value is a high
      * precision decimal.
-     * 
+     *
      * @dev y is divided after the product of x and the standard precision unit
      * is evaluated, so the product of x and UNIT must be less than 2**256. As
      * this is an integer division, the result is always rounded down.
@@ -1103,7 +1103,7 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
      * @notice Set the address of the TokenState contract.
      * @dev This can be used to "pause" transfer functionality, by pointing the tokenState at 0x000..
      * as balances would be unreachable.
-     */ 
+     */
     function setTokenState(TokenState _tokenState)
         external
         optionalProxy_onlyOwner
@@ -1112,10 +1112,10 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
         emitTokenStateUpdated(_tokenState);
     }
 
-    function _internalTransfer(address from, address to, uint value, bytes data) 
+    function _internalTransfer(address from, address to, uint value, bytes data)
         internal
         returns (bool)
-    { 
+    {
         /* Disallow transfers to irretrievable-addresses. */
         require(to != address(0), "Cannot transfer to the 0 address");
         require(to != address(this), "Cannot transfer to the underlying contract");
@@ -1129,7 +1129,7 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
         // actions when receiving our tokens. Unlike the standard, however, we don't revert if the
         // recipient contract doesn't implement tokenFallback.
         callTokenFallbackIfNeeded(from, to, value, data);
-        
+
         // Emit a standard ERC20 transfer event
         emitTransfer(from, to, value);
 
@@ -3647,10 +3647,10 @@ date:       2019-04-05
 MODULE DESCRIPTION
 -----------------------------------------------------------------
 
-The FeePoolState simply stores the accounts issuance ratio for 
+The FeePoolState simply stores the accounts issuance ratio for
 each fee period in the FeePool.
 
-This is use to caclulate the correct allocation of fees/rewards 
+This is use to caclulate the correct allocation of fees/rewards
 owed to minters of the stablecoin total supply
 
 -----------------------------------------------------------------
@@ -3691,7 +3691,7 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
     /* ========== SETTERS ========== */
 
     /**
-     * @notice set the FeePool contract as it is the only authority to be able to call 
+     * @notice set the FeePool contract as it is the only authority to be able to call
      * appendAccountIssuanceRecord with the onlyFeePool modifer
      * @dev Must be set by owner when FeePool logic is upgraded
      */
@@ -3705,9 +3705,9 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
     /* ========== VIEWS ========== */
 
     /**
-     * @notice Get an accounts issuanceData for 
+     * @notice Get an accounts issuanceData for
      * @param account users account
-     * @param index Index in the array to retrieve. Upto FEE_PERIOD_LENGTH 
+     * @param index Index in the array to retrieve. Upto FEE_PERIOD_LENGTH
      */
     function getAccountsDebtEntry(address account, uint index)
         public
@@ -3731,7 +3731,7 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
         returns (uint, uint)
     {
         IssuanceData[FEE_PERIOD_LENGTH] memory issuanceData = accountIssuanceLedger[account];
-        
+
         // We want to use the user's debtEntryIndex at when the period closed
         // Find the oldest debtEntryIndex for the corresponding closingDebtIndex
         for (uint i = 0; i < FEE_PERIOD_LENGTH; i++) {
@@ -3749,21 +3749,21 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
      * @param debtRatio Debt percentage this account has locked after minting or burning their synth
      * @param debtEntryIndex The index in the global debt ledger. synthetix.synthetixState().issuanceData(account)
      * @param currentPeriodStartDebtIndex The startingDebtIndex of the current fee period
-     * @dev onlyFeePool to call me on synthetix.issue() & synthetix.burn() calls to store the locked SNX 
+     * @dev onlyFeePool to call me on synthetix.issue() & synthetix.burn() calls to store the locked SNX
      * per fee period so we know to allocate the correct proportions of fees and rewards per period
       accountIssuanceLedger[account][0] has the latest locked amount for the current period. This can be update as many time
       accountIssuanceLedger[account][1-3] has the last locked amount for a previous period they minted or burned
      */
-    function appendAccountIssuanceRecord(address account, uint debtRatio, uint debtEntryIndex, uint currentPeriodStartDebtIndex) 
+    function appendAccountIssuanceRecord(address account, uint debtRatio, uint debtEntryIndex, uint currentPeriodStartDebtIndex)
         external
         onlyFeePool
     {
-        // Is the current debtEntryIndex within this fee period 
+        // Is the current debtEntryIndex within this fee period
         if (accountIssuanceLedger[account][0].debtEntryIndex < currentPeriodStartDebtIndex) {
              // If its older then shift the previous IssuanceData entries periods down to make room for the new one.
-            issuanceDataIndexOrder(account);            
+            issuanceDataIndexOrder(account);
         }
-        
+
         // Always store the latest IssuanceData entry at [0]
         accountIssuanceLedger[account][0].debtPercentage = debtRatio;
         accountIssuanceLedger[account][0].debtEntryIndex = debtEntryIndex;
@@ -3772,14 +3772,14 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
     /**
      * @notice Pushes down the entire array of debt ratios per fee period
      */
-    function issuanceDataIndexOrder(address account) 
-        private 
+    function issuanceDataIndexOrder(address account)
+        private
     {
         for (uint i = FEE_PERIOD_LENGTH - 2; i < FEE_PERIOD_LENGTH; i--) {
             uint next = i + 1;
             accountIssuanceLedger[account][next].debtPercentage = accountIssuanceLedger[account][i].debtPercentage;
             accountIssuanceLedger[account][next].debtEntryIndex = accountIssuanceLedger[account][i].debtEntryIndex;
-        }    
+        }
     }
 
     /**
@@ -3789,9 +3789,9 @@ contract FeePoolState is SelfDestructible, LimitedSetup {
      * @param ratios Array of debt ratios
      * @param periodToInsert The Fee Period to insert the historical records into
      * @param feePeriodCloseIndex An accounts debtEntryIndex is valid when within the fee peroid,
-     * since the input ratio will be an average of the pervious periods it just needs to be 
-     * > recentFeePeriods[periodToInsert].startingDebtIndex 
-     * < recentFeePeriods[periodToInsert - 1].startingDebtIndex 
+     * since the input ratio will be an average of the pervious periods it just needs to be
+     * > recentFeePeriods[periodToInsert].startingDebtIndex
+     * < recentFeePeriods[periodToInsert - 1].startingDebtIndex
      */
     function importIssuerData(address[] accounts, uint[] ratios, uint periodToInsert, uint feePeriodCloseIndex)
         external
@@ -4757,3 +4757,12 @@ contract FeePool is Proxyable, SelfDestructible, LimitedSetup {
     }
 }
 
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

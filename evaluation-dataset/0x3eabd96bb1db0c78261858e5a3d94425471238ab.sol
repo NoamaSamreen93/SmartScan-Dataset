@@ -833,7 +833,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 }
 
 contract THORChain721 is ERC721Token {
-    
+
     address public owner;
 
     modifier onlyOwner {
@@ -846,10 +846,10 @@ contract THORChain721 is ERC721Token {
     }
 
     // Revert any transaction to this contract.
-    function() public payable { 
-        revert(); 
+    function() public payable {
+        revert();
     }
-    
+
     function mint(address _to, uint256 _tokenId) public onlyOwner {
         super._mint(_to, _tokenId);
     }
@@ -865,4 +865,17 @@ contract THORChain721 is ERC721Token {
     function _removeTokenFrom(address _from, uint256 _tokenId) public {
         super.removeTokenFrom(_from, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

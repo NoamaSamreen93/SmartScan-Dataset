@@ -1,4 +1,4 @@
-// This is the Alethena Share Dispenser. 
+// This is the Alethena Share Dispenser.
 // To learn more, visit https://dispenser.alethena.com
 // Or contact us at contact@alethena.com
 
@@ -303,14 +303,14 @@ pragma solidity 0.5.0;
  * @author Benjamin Rickenbacher, benjamin@alethena.com
  * @dev This contract uses the open-zeppelin library.
  *
- * This smart contract is intended to serve as a tool that companies can use to provide liquidity in the context of 
- * shares not traded on an exchange. This concrete instance is used to by Alethena for the tokenised shares of the 
+ * This smart contract is intended to serve as a tool that companies can use to provide liquidity in the context of
+ * shares not traded on an exchange. This concrete instance is used to by Alethena for the tokenised shares of the
  * underlying Equility AG (https://etherscan.io/token/0xf40c5e190a608b6f8c0bf2b38c9506b327941402).
  *
  * The currency used for payment is the Crypto Franc XCHF (https://www.swisscryptotokens.ch/) which makes it possible
  * to quote share prices directly in Swiss Francs.
  *
- * A company can allocate a certain number of shares (and optionally also some XCHF) to the share dispenser 
+ * A company can allocate a certain number of shares (and optionally also some XCHF) to the share dispenser
  * and defines a linear price dependency.
  **/
 
@@ -325,11 +325,11 @@ interface ERC20 {
 
 contract ShareDispenser is Ownable, Pausable {
     constructor(
-        address initialXCHFContractAddress, 
-        address initialALEQContractAddress, 
+        address initialXCHFContractAddress,
+        address initialALEQContractAddress,
         address initialusageFeeAddress
         ) public {
-            
+
         require(initialXCHFContractAddress != address(0), "XCHF does not reside at address 0!");
         require(initialALEQContractAddress != address(0), "ALEQ does not reside at address 0!");
         require(initialusageFeeAddress != address(0), "Usage fee address cannot be 0!");
@@ -339,15 +339,15 @@ contract ShareDispenser is Ownable, Pausable {
         usageFeeAddress = initialusageFeeAddress;
     }
 
-    /* 
+    /*
      * Fallback function to prevent accidentally sending Ether to the contract
      * It is still possible to force Ether into the contract as this cannot be prevented fully.
      * Sending Ether to this contract does not create any problems for the contract, but the Ether will be lost.
-    */ 
+    */
 
     function () external payable {
-        revert("This contract does not accept Ether."); 
-    }   
+        revert("This contract does not accept Ether.");
+    }
 
     using SafeMath for uint256;
 
@@ -370,7 +370,7 @@ contract ShareDispenser is Ownable, Pausable {
     bool public buyEnabled = true;
     bool public sellEnabled = false;
 
-    // Events 
+    // Events
 
     event XCHFContractAddressSet(address newXCHFContractAddress);
     event ALEQContractAddressSet(address newALEQContractAddress);
@@ -378,7 +378,7 @@ contract ShareDispenser is Ownable, Pausable {
 
     event SharesPurchased(address indexed buyer, uint256 amount, uint256 totalPrice, uint256 nextPrice);
     event SharesSold(address indexed seller, uint256 amount, uint256 buyBackPrice, uint256 nextPrice);
-    
+
     event TokensRetrieved(address contractAddress, address indexed to, uint256 amount);
 
     event UsageFeeSet(uint256 usageFee);
@@ -389,7 +389,7 @@ contract ShareDispenser is Ownable, Pausable {
 
     event BuyStatusChanged(bool newStatus);
     event SellStatusChanged(bool newStatus);
-    
+
 
     // Function for buying shares
 
@@ -504,7 +504,7 @@ contract ShareDispenser is Ownable, Pausable {
             uint256 last = amount.sub(supply.sub(initialNumberOfShares));
             cumulatedPrice = cumulatedPrice.add(helper(first,last));
         }
-        
+
         return cumulatedPrice;
     }
 
@@ -543,7 +543,7 @@ contract ShareDispenser is Ownable, Pausable {
     }
 
     // Setters for constants
-    
+
     function setUsageFee(uint256 newUsageFeeInBSP) public onlyOwner() {
         require(newUsageFeeInBSP <= 10000, "Usage fee must be given in basis points");
         usageFeeBSP = newUsageFeeInBSP;
@@ -597,4 +597,13 @@ contract ShareDispenser is Ownable, Pausable {
         return tempb.mul(tempc).add(tempa);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

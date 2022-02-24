@@ -39,24 +39,24 @@ contract TokenERC20 {
      event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
-contract MMMToken is SafeMath, TokenERC20{ 
+contract MMMToken is SafeMath, TokenERC20{
     string public name = "MMM";
     string public symbol = "MMM";
     uint8 public decimals = 18;
     uint256 public totalSupply = 4204800;
 	address public owner = 0x0;
-	string  public version = "1.0";	
-	
-    bool public locked = false;	
-    uint256 public currentSupply;           
-    uint256 public tokenRaised = 0;    
-    uint256 public tokenExchangeRate = 500; 
+	string  public version = "1.0";
+
+    bool public locked = false;
+    uint256 public currentSupply;
+    uint256 public tokenRaised = 0;
+    uint256 public tokenExchangeRate = 500;
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
 	mapping (address => uint256) public freezeOf;
     mapping (address => mapping (address => uint256)) public allowance;
-	
+
 	/* IssueToken*/
     event IssueToken(address indexed to, uint256 value);
 
@@ -73,26 +73,26 @@ contract MMMToken is SafeMath, TokenERC20{
         symbol = tokenSymbol;                                        //  Set the symbol for display purposes
 		owner = msg.sender;
     }
-	
-	modifier onlyOwner()  { 
-		require(msg.sender == owner); 
-		_; 
+
+	modifier onlyOwner()  {
+		require(msg.sender == owner);
+		_;
 	}
-	
+
 	modifier validAddress()  {
         require(address(0) != msg.sender);
         _;
     }
-	
+
     modifier unlocked() {
         require(!locked);
         _;
     }
-	
+
     function formatDecimals(uint256 _value) internal returns (uint256 ) {
         return _value * 10 ** uint256(decimals);
 	}
-	
+
 	function balanceOf(address _owner) constant returns (uint256 balance) {
         return balanceOf[_owner];
     }
@@ -104,11 +104,11 @@ contract MMMToken is SafeMath, TokenERC20{
 		Approval(msg.sender, _spender, _value);
         return true;
     }
-	
+
 	/*Function to check the amount of tokens that an owner allowed to a spender.*/
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 		return allowance[_owner][_spender];
-	}	
+	}
 
 	  /**
 	   * @dev Increase the amount of tokens that an owner allowance to a spender.
@@ -146,10 +146,10 @@ contract MMMToken is SafeMath, TokenERC20{
 	  }
 
     /* Send coins */
-    function transfer(address _to, uint256 _value) validAddress unlocked returns (bool success) {	
+    function transfer(address _to, uint256 _value) validAddress unlocked returns (bool success) {
         _transfer(msg.sender, _to, _value);
     }
-	
+
 	/**
      * Internal transfer, only can be called by this contract
      */
@@ -171,11 +171,22 @@ contract MMMToken is SafeMath, TokenERC20{
     }
 
     /* A contract attempts to get the coins */
-    function transferFrom(address _from, address _to, uint256 _value) validAddress unlocked returns (bool success) {	
+    function transferFrom(address _from, address _to, uint256 _value) validAddress unlocked returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     		// Check allowance
         require(_value > 0);
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
         _transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -499,7 +499,7 @@ contract URACCrowdSale is Pausable {
     mapping (address => bool) public fullWhiteList;
 
     mapping (address => uint) public firstStageFund;
- 
+
     /*
      * EVENTS
      */
@@ -718,3 +718,10 @@ contract URACCrowdSale is Pausable {
         return size > 0;
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

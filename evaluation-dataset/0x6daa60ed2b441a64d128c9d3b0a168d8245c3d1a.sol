@@ -46,7 +46,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool success);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) public constant returns (uint256 remaining);
   function transferFrom(address from, address to, uint256 value) public returns (bool success);
@@ -55,11 +55,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
- 
+
   mapping (address => uint256) public balances;
- 
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to] && _value > 0 && _to != address(this) && _to != address(0)) {
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) allowed;
- 
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to] && _value > 0 && _to != address(this) && _to != address(0)) {
         var _allowance = allowed[_from][msg.sender];
@@ -100,19 +100,19 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
- 
+
 }
 
 contract UNICToken is owned, StandardToken {
-    
+
     string public constant name = 'UNICToken';
     string public constant symbol = 'UNIC';
     uint8 public constant decimals = 18;
-    
+
     uint256 public initialSupply = 250000000 * 10 ** uint256(decimals);
-    
+
     address public icoManager;
-    
+
     mapping (address => uint256) public WhiteList;
 
     modifier onlyManager() {
@@ -129,7 +129,7 @@ contract UNICToken is owned, StandardToken {
       assert(_newIcoManager != 0x0);
       icoManager = _newIcoManager;
     }
-    
+
     function setWhiteList(address _contributor) public onlyManager {
       if(_contributor != 0x0){
         WhiteList[_contributor] = 1;
@@ -138,14 +138,14 @@ contract UNICToken is owned, StandardToken {
 }
 
 contract Crowdsale is owned, UNICToken {
-    
+
   using SafeMath for uint;
-  
+
   UNICToken public token = new UNICToken();
-  
+
   address constant multisig = 0xDE4951a749DE77874ee72778512A2bA1e9032e7a;
   uint constant rate = 3400 * 1000000000000000000;
-  
+
   uint public constant presaleStart = 1518084000;   /** 08.02 */
   uint public presaleEnd = 1520244000;              /** 05.03 */
   uint public presaleDiscount = 30;
@@ -179,7 +179,7 @@ contract Crowdsale is owned, UNICToken {
     tokensSold = 0;
     tokensSoldWhitelist = 0;
   }
-  
+
   function() external payable {
     buyTokens(msg.sender);
   }
@@ -202,7 +202,7 @@ contract Crowdsale is owned, UNICToken {
       }
 
       uint tokensWithBonus = tokens.add(discountTokens);
-      
+
       if(
           (now >= presaleStart && now <= presaleEnd && presaleTokensLimit > tokensSold + tokensWithBonus &&
             ((WhiteList[_buyer]==1 && presaleWhitelistTokensLimit > tokensSoldWhitelist + tokensWithBonus) || WhiteList[_buyer]!=1)
@@ -210,7 +210,7 @@ contract Crowdsale is owned, UNICToken {
           (now >= firstRoundICOStart && now <= firstRoundICOEnd && firstRoundICOTokensLimit > tokensSold + tokensWithBonus) ||
           (now >= secondRoundICOStart && now <= secondRoundICOEnd && secondRoundICOTokensLimit > tokensSold + tokensWithBonus)
       ){
-      
+
         multisig.transfer(msg.value);
         etherRaised = etherRaised.add(msg.value);
         token.transfer(msg.sender, tokensWithBonus);
@@ -221,4 +221,12 @@ contract Crowdsale is owned, UNICToken {
       }
     }
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

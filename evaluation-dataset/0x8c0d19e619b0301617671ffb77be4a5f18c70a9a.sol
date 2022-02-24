@@ -43,13 +43,13 @@ contract MarmoRelayerHelper {
             )
         );
     }
-    
+
     function _isNotContract(address _address) internal view returns (bool v) {
         assembly {
             v := iszero(extcodesize(_address))
         }
     }
-    
+
     function wasRelayed(
         address _signer,
         bytes32 _id
@@ -59,10 +59,10 @@ contract MarmoRelayerHelper {
         if (_isNotContract(address(marmo))) {
             return false;
         }
-        
+
         return marmo.relayedBy(_id) != address(0);
     }
-    
+
     function depsReady(
         bytes calldata _data
     ) external view returns (bool) {
@@ -70,7 +70,7 @@ contract MarmoRelayerHelper {
         (bytes memory dependency) = abi.decode(_data, (bytes));
         return _checkDependency(dependency);
     }
-    
+
     function revealAndRelay(
         address _signer,
         address _implementation,
@@ -82,16 +82,16 @@ contract MarmoRelayerHelper {
         if (_isNotContract(address(marmo))) {
             stork.reveal(_signer);
         }
-        
+
         marmo.relay(
             _implementation,
             _data,
             _signature
         );
     }
-    
+
     // internal
-    
+
     // The dependency is a 'staticcall' to a 'target'
     //  when the call succeeds and it does not return false, the dependency is satisfied.
     // [160 bits (target) + n bits (data)]
@@ -114,4 +114,15 @@ contract MarmoRelayerHelper {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

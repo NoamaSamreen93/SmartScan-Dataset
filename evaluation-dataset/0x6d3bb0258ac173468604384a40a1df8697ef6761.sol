@@ -105,7 +105,7 @@ contract PluginInterface
         uint40 _cutieId,
         uint256 _parameter,
         address _seller
-    ) 
+    )
     public
     payable;
 
@@ -135,11 +135,11 @@ contract ConfigInterface
     function isConfig() public pure returns (bool);
 
     function getCooldownIndexFromGeneration(uint16 _generation) public view returns (uint16);
-    
+
     function getCooldownEndTimeFromIndex(uint16 _cooldownIndex) public view returns (uint40);
 
     function getCooldownIndexCount() public view returns (uint256);
-    
+
     function getBabyGen(uint16 _momGen, uint16 _dadGen) public pure returns (uint16);
 
     function getTutorialBabyGen(uint16 _dadGen) public pure returns (uint16);
@@ -281,7 +281,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         require(_fee <= 10000);
         require(msg.sender == owner);
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -354,7 +354,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         uint40,
         uint256,
         address
-    ) 
+    )
         public
         payable
         onlyCore
@@ -387,4 +387,12 @@ contract CreateEosAccount is CutiePluginBase
     {
         // just accept payments
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

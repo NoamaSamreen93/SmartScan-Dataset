@@ -13,8 +13,8 @@ pragma solidity ^0.4.21;
 * [x] Unlike similar projects the developers are only allowing 3 ETH to be purchased by Developers at deployment as opposed to 22 ETH – Fair for the Public!
 * - 33% Reward of dividends if someone signs up using your Masternode link
 * -  You earn by others depositing or withdrawing ETH and this passive ETH earnings can either be reinvested or you can withdraw it at any time without penalty.
-* Upon entry into the contract it will automatically deduct your 10% entry and exit fees so the longer you remain and the higher the volume the more you earn and the more that people join or leave you also earn more.  
-* You are able to withdraw your entire balance at any time you so choose. 
+* Upon entry into the contract it will automatically deduct your 10% entry and exit fees so the longer you remain and the higher the volume the more you earn and the more that people join or leave you also earn more.
+* You are able to withdraw your entire balance at any time you so choose.
 */
 
 
@@ -41,7 +41,7 @@ contract PowerofBubble {
         address _customerAddress = msg.sender;
 
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if( onlyDevs && ((totalEthereumBalance() - _amountOfEthereum) <= devsQuota_ )){
             require(
                 // is the customer in the ambassador list?
@@ -51,7 +51,7 @@ contract PowerofBubble {
                 (devsAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= devsMaxPurchase_
             );
 
-            // updated the accumulated quota    
+            // updated the accumulated quota
             devsAccumulatedQuota_[_customerAddress] = SafeMath.add(devsAccumulatedQuota_[_customerAddress], _amountOfEthereum);
 
             // execute
@@ -59,7 +59,7 @@ contract PowerofBubble {
         } else {
             // in case the ether count drops low, the ambassador phase won't reinitiate
             onlyDevs = false;
-            _;    
+            _;
         }
 
     }
@@ -140,14 +140,14 @@ contract PowerofBubble {
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     function PowerofBubble()
         public
     {
         // add developers here
         developers_[0xE18e877A0e35dF8f3d578DacD252B8435318D027] = true;
-        
+
         developers_[0xD6d3955714C8ffdc3f236e66Af065f2E9B10706a] = true;
 
     }
@@ -262,7 +262,7 @@ contract PowerofBubble {
 
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;       
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
 
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
@@ -363,11 +363,11 @@ contract PowerofBubble {
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
@@ -399,9 +399,9 @@ contract PowerofBubble {
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
         {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -421,9 +421,9 @@ contract PowerofBubble {
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -440,9 +440,9 @@ contract PowerofBubble {
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
@@ -455,9 +455,9 @@ contract PowerofBubble {
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -521,7 +521,7 @@ contract PowerofBubble {
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
 
-            // calculate the amount of tokens the customer receives over his purchase 
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
 
         } else {
@@ -553,7 +553,7 @@ contract PowerofBubble {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
         (
             (
                 // underflow attempts BTFO
@@ -589,7 +589,7 @@ contract PowerofBubble {
 
         uint256 tokens_ = (_tokens + 1e18);
         uint256 _tokenSupply = (tokenSupply_ + 1e18);
-        uint256 _etherReceived = 
+        uint256 _etherReceived =
         (
             // underflow attempts BTFO
             SafeMath.sub(
@@ -659,4 +659,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

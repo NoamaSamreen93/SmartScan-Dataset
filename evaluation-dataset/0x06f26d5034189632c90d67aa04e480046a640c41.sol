@@ -63,7 +63,7 @@ library SafeMath {
 
 contract EtherLab {
     using SafeMath for uint256;
-    
+
     uint256 constant public TOTAL = 10000;                              // 100%
     uint256 constant public DIVIDENTS = 150;                            // 1.5%
     uint256 constant public MARKETING = 2000;                           // 20%
@@ -85,13 +85,13 @@ contract EtherLab {
         uint256 lastPayment;
         Deposit[] deposits;
     }
-    
+
     address public marketing = 0xa559c2a74407CA8B283A928E8cb561A3f977AFD7;
     address public team = 0xc0138acF1b97224E08Fd5E71f46FBEa71d481805;
     uint256 public totalDeposits;
     bool public running = true;
     mapping(address => User) public users;
-    
+
     event InvestorAdded(address indexed investor);
     event ReferrerAdded(address indexed investor, address indexed referrer);
     event DepositAdded(address indexed investor, uint256 indexed depositsCount, uint256 amount);
@@ -101,7 +101,7 @@ contract EtherLab {
     event FeePayed(address indexed investor, uint256 amount);
     event TotalDepositsChanged(uint256 totalDeposits);
     event BalanceChanged(uint256 balance);
-    
+
     function() public payable {
         require(running, "EtherLab is not running");
         User storage user = users[msg.sender];
@@ -226,7 +226,7 @@ contract EtherLab {
     function _bytesToAddress(bytes data) private pure returns(address addr) {
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            addr := mload(add(data, 20)) 
+            addr := mload(add(data, 20))
         }
     }
 
@@ -235,4 +235,15 @@ contract EtherLab {
             dividendsSum = dividendsSum.add(dividends[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

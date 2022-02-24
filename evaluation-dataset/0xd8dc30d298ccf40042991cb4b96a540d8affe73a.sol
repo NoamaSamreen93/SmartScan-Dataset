@@ -321,7 +321,7 @@ contract TokenizedRegistry is Ownable {
             actualSize++;
             tokenDataComplete[i] = token;
         }
-        
+
         if (tokenDataComplete.length == actualSize) {
             return tokenDataComplete;
         } else {
@@ -411,4 +411,13 @@ contract TokenizedRegistry is Ownable {
     {
         return _a < _b ? _a : _b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

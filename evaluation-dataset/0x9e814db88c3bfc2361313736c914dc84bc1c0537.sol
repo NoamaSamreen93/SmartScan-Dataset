@@ -54,7 +54,7 @@ contract IERC20{
   function totalSupply() external view returns (uint);
   function balanceOf(address who) external view returns (uint);
   function transfer(address to, uint value) external returns (bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
   event Approval(address indexed owner, address indexed spender, uint value);
 }
@@ -214,7 +214,7 @@ contract ERC20 is IERC20{
 contract ICassette {
   uint8 constant CT_ETHER = 0x01;
   uint8 constant CT_TOKEN = 0x02;
-  
+
 
   function getCassetteSize_() internal view returns(uint);
   function acceptAbstractToken_(uint _value) internal returns(bool);
@@ -286,10 +286,10 @@ contract ERC20Sec is IERC20, IERC20Sec, ERC20, ICassette {
       uint _dividendsPerToken = dividendsPerToken;
       uint _balanceFrom = balances[_from];
       uint _balanceTo = balances[_to];
-      dividendsRightsFix[_from] += _dividendsPerToken * _balanceFrom / DECIMAL_MULTIPLIER - 
+      dividendsRightsFix[_from] += _dividendsPerToken * _balanceFrom / DECIMAL_MULTIPLIER -
         _dividendsPerToken * (_balanceFrom - _value) / DECIMAL_MULTIPLIER;
-      dividendsRightsFix[_to] += _dividendsPerToken * _balanceTo / DECIMAL_MULTIPLIER - 
-        _dividendsPerToken * (_balanceTo + _value) / DECIMAL_MULTIPLIER; 
+      dividendsRightsFix[_to] += _dividendsPerToken * _balanceTo / DECIMAL_MULTIPLIER -
+        _dividendsPerToken * (_balanceTo + _value) / DECIMAL_MULTIPLIER;
     }
   }
 
@@ -359,7 +359,7 @@ contract MultiOwnable{
     require(owners[msg.sender]);
     _;
   }
-  
+
   event AddOwner(address indexed sender, address indexed owner);
   event RemoveOwner(address indexed sender, address indexed owner);
 
@@ -434,10 +434,10 @@ contract TechHives is ERC20Sec, EtherCassette, MultiOwnable {
   function dividendsRightsFixUpdate_(address _for, uint _value) private {
     uint _dividendsPerToken = dividendsPerToken;
     uint _balanceFor = balances[_for];
-    dividendsRightsFix[_for] += _dividendsPerToken * _balanceFor / DECIMAL_MULTIPLIER - 
-      _dividendsPerToken * (_balanceFor + _value) / DECIMAL_MULTIPLIER; 
+    dividendsRightsFix[_for] += _dividendsPerToken * _balanceFor / DECIMAL_MULTIPLIER -
+      _dividendsPerToken * (_balanceFor + _value) / DECIMAL_MULTIPLIER;
   }
-  
+
   function mint_(address _for, uint _value) internal returns(bool) {
     require (mintSupply_ >= _value);
     dividendsRightsFixUpdate_(_for, _value);
@@ -451,8 +451,8 @@ contract TechHives is ERC20Sec, EtherCassette, MultiOwnable {
   function mint(address _for, uint _value) external onlyOwner returns(bool) {
     return mint_(_for, _value);
   }
-  
-  
+
+
   function mintSupply() external view returns(uint) {
       return mintSupply_;
   }
@@ -463,4 +463,13 @@ contract TechHives is ERC20Sec, EtherCassette, MultiOwnable {
     mint_(0x47FC2e245b983A92EB3359F06E31F34B107B6EF6, 10000e18);
     addOwner_(msg.sender);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

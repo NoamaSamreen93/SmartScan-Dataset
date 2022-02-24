@@ -87,45 +87,56 @@ contract Ownable {
 
 contract GECO is Ownable {
   using SafeMath for uint256;
-  
+
   event IncomingTransfer(address indexed to, uint256 amount);
   event ContractFinished();
-    
+
   address public wallet;
   uint256 public endTime;
   uint256 public totalSupply;
   mapping(address => uint256) balances;
   bool public contractFinished = false;
-  
+
   function GECO(address _wallet, uint256 _endTime) public {
     require(_wallet != address(0));
     require(_endTime >= now);
-    
+
     wallet = _wallet;
     endTime = _endTime;
   }
-  
+
   function () external payable {
     require(!contractFinished);
     require(now <= endTime);
-      
+
     totalSupply = totalSupply.add(msg.value);
     balances[msg.sender] = balances[msg.sender].add(msg.value);
     wallet.transfer(msg.value);
     IncomingTransfer(msg.sender, msg.value);
   }
-  
+
   function finishContract() onlyOwner public returns (bool) {
     contractFinished = true;
     ContractFinished();
     return true;
   }
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   function changeEndTime(uint256 _endTime) onlyOwner public {
     endTime = _endTime;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

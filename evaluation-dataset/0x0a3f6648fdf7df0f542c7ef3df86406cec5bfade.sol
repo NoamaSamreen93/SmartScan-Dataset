@@ -17,7 +17,7 @@ contract owned {
     }
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
   function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -45,7 +45,7 @@ contract ERC20CompatibleToken is owned {
   constructor(
       uint256 initialSupply,
       string memory tokenName,
-      string memory tokenSymbol, 
+      string memory tokenSymbol,
       address owner
   ) public {
       totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
@@ -198,7 +198,7 @@ contract MangoCoin is owned, ERC223Interface, ERC20CompatibleToken {
     constructor(
         uint256 initialSupply,
         string memory tokenName,
-        string memory tokenSymbol, 
+        string memory tokenSymbol,
         address owner
     ) ERC20CompatibleToken(initialSupply, tokenName, tokenSymbol, owner) public {}
 
@@ -290,4 +290,15 @@ contract MangoCoin is owned, ERC223Interface, ERC20CompatibleToken {
         return ;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

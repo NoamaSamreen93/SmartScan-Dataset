@@ -97,12 +97,12 @@ contract FPCOIN is ERC223, Ownable {
     uint256 public totalSupply = 8e8 * 1e18;
     uint256 public distributeAmount = 0;
     bool public mintingFinished = false;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
-    
+
     event FrozenFunds(address indexed target, bool frozen);
     event LockedFunds(address indexed target, uint256 locked);
     event Burn(address indexed from, uint256 amount);
@@ -146,7 +146,7 @@ contract FPCOIN is ERC223, Ownable {
     function lockupAccounts(address[] targets, uint[] unixTimes) onlyOwner public {
         require(targets.length > 0
                 && targets.length == unixTimes.length);
-                
+
         for(uint j = 0; j < targets.length; j++){
             require(unlockUnixTime[targets[j]] < unixTimes[j]);
             unlockUnixTime[targets[j]] = unixTimes[j];
@@ -156,9 +156,9 @@ contract FPCOIN is ERC223, Ownable {
 
     function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -176,9 +176,9 @@ contract FPCOIN is ERC223, Ownable {
 
     function transfer(address _to, uint _value, bytes _data) public  returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -190,9 +190,9 @@ contract FPCOIN is ERC223, Ownable {
 
     function transfer(address _to, uint _value) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         bytes memory empty;
@@ -237,9 +237,9 @@ contract FPCOIN is ERC223, Ownable {
                 && _value > 0
                 && balanceOf[_from] >= _value
                 && allowance[_from][msg.sender] >= _value
-                && frozenAccount[_from] == false 
+                && frozenAccount[_from] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[_from] 
+                && now > unlockUnixTime[_from]
                 && now > unlockUnixTime[_to]);
 
         balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -275,7 +275,7 @@ contract FPCOIN is ERC223, Ownable {
 
     function mint(address _to, uint256 _unitAmount) onlyOwner canMint public returns (bool) {
         require(_unitAmount > 0);
-        
+
         totalSupply = totalSupply.add(_unitAmount);
         balanceOf[_to] = balanceOf[_to].add(_unitAmount);
         Mint(_to, _unitAmount);
@@ -290,7 +290,7 @@ contract FPCOIN is ERC223, Ownable {
     }
 
     function airdropDistribute(address[] addresses, uint256 amount) public returns (bool) {
-        require(amount > 0 
+        require(amount > 0
                 && addresses.length > 0
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
@@ -298,7 +298,7 @@ contract FPCOIN is ERC223, Ownable {
         amount = amount.mul(1e18);
         uint256 totalAmount = amount.mul(addresses.length);
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
@@ -316,20 +316,20 @@ contract FPCOIN is ERC223, Ownable {
                 && addresses.length == amounts.length
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
-                
+
         uint256 totalAmount = 0;
-        
+
         for(uint j = 0; j < addresses.length; j++){
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e18);
             totalAmount = totalAmount.add(amounts[j]);
         }
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (j = 0; j < addresses.length; j++) {
             balanceOf[addresses[j]] = balanceOf[addresses[j]].add(amounts[j]);
             Transfer(msg.sender, addresses[j], amounts[j]);
@@ -343,13 +343,13 @@ contract FPCOIN is ERC223, Ownable {
                 && addresses.length == amounts.length);
 
         uint256 totalAmount = 0;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e18);
             require(balanceOf[addresses[j]] >= amounts[j]);
             balanceOf[addresses[j]] = balanceOf[addresses[j]].sub(amounts[j]);
@@ -363,14 +363,14 @@ contract FPCOIN is ERC223, Ownable {
     function setDistributeAmount(uint256 _unitAmount) onlyOwner public {
         distributeAmount = _unitAmount;
     }
-    
+
     function autoDistribute() payable public {
         require(distributeAmount > 0
                 && balanceOf[owner] >= distributeAmount
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
         if(msg.value > 0) owner.transfer(msg.value);
-        
+
         balanceOf[owner] = balanceOf[owner].sub(distributeAmount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(distributeAmount);
         Transfer(owner, msg.sender, distributeAmount);
@@ -379,4 +379,10 @@ contract FPCOIN is ERC223, Ownable {
     function() payable public {
         autoDistribute();
      }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

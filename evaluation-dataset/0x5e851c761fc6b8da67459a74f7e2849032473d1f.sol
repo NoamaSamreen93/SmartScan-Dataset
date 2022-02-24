@@ -352,7 +352,7 @@ contract EMACToken is CappedToken, BurnableToken {
 
     function EMACToken(uint256 _cap) CappedToken(_cap) public {
     }
-    
+
     function burn(uint256 _value) public {
         super.burn(_value);
     }
@@ -381,7 +381,7 @@ contract EMACCrowdsale is Ownable {
 
   // address where funds are collected
   address public wallet;
-  
+
   // Team, advisors etc. wallet
   address public teamWallet;
 
@@ -390,26 +390,26 @@ contract EMACCrowdsale is Ownable {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   // 454m
   uint256 public constant INIT_TOKENS = 454 * (10 ** 6) * (10 ** 18);
-  
+
   // 20% of tokens are going for the team, advisors etc.
   uint256 public TEAM_TOKENS = INIT_TOKENS.mul(20).div(100);
-  
+
   // 32000 eth
   uint256 public constant HARD_CAP = 32000 * (10**18);
-  
+
   // 18000 eth
   uint256 public constant PRE_SALE_CAP = 18000 * (10**18);
-  
+
   // set bonuses
   uint256 public constant PRE_SALE_BONUS_PERCENTAGE = 120;
   uint256 public constant MAIN_SALE_BONUS_PERCENTAGE_PHASE1 = 115;
   uint256 public constant MAIN_SALE_BONUS_PERCENTAGE_PHASE2 = 110;
   uint256 public constant MAIN_SALE_BONUS_PERCENTAGE_PHASE3 = 105;
   uint256 public constant MAIN_SALE_BONUS_PERCENTAGE_PHASE4 = 100;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -432,11 +432,11 @@ contract EMACCrowdsale is Ownable {
     wallet = _wallet;
     token = new EMACToken(INIT_TOKENS);
     teamWallet = _teamWallet;
-    
+
     token.mint(_teamWallet, TEAM_TOKENS);
     depositTokens();
   }
-  
+
   function depositTokens() public payable {
     EMACTokenPurchase(msg.sender, teamWallet, msg.value, TEAM_TOKENS);
   }
@@ -464,7 +464,7 @@ contract EMACCrowdsale is Ownable {
 
     forwardFunds();
   }
-  
+
   function finalize() onlyOwner public {
     require(hasEnded());
 
@@ -517,3 +517,10 @@ contract EMACCrowdsale is Ownable {
     return withinPeriod && nonZeroPurchase && notReachedHardCap;
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

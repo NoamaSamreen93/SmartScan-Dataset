@@ -90,9 +90,9 @@ library SafeMath {
 
 contract System {
 	using SafeMath for uint256;
-	
+
 	address owner;
-	
+
 	// **** MODIFIERS
 
 	// @notice To limit functions usage to contract owner
@@ -105,7 +105,7 @@ contract System {
 	}
 
 	// **** FUNCTIONS
-	
+
 	// @notice Calls whenever an error occurs, logs it or reverts transaction
 	function error(string _error) internal {
 		revert(_error);
@@ -118,26 +118,26 @@ contract System {
 	function whoAmI() public constant returns (address) {
 		return msg.sender;
 	}
-	
+
 	// @notice Get the current timestamp from last mined block
 	function timestamp() public constant returns (uint256) {
 		return block.timestamp;
 	}
-	
+
 	// @notice Get the balance in weis of this contract
 	function contractBalance() public constant returns (uint256) {
 		return address(this).balance;
 	}
-	
+
 	// @notice System constructor, defines owner
 	constructor() public {
 		// This is the constructor, so owner should be equal to msg.sender, and this method should be called just once
 		owner = msg.sender;
-		
+
 		// make sure owner address is configured
 		if(owner == 0x0) error('System constructor: Owner address is 0x0'); // Never should happen, but just in case...
 	}
-	
+
 	// **** EVENTS
 
 	// @notice A generic error log
@@ -273,8 +273,8 @@ contract RefundVault is HardcodedWallets, System {
 
 	// Circular reference to ICO contract
 	address public addressSCICO;
-	
-	
+
+
 
 	// **** MODIFIERS
 
@@ -406,7 +406,7 @@ contract RefundVault is HardcodedWallets, System {
 
 contract Haltable is System {
 	bool public halted;
-	
+
 	// **** MODIFIERS
 
 	modifier stopInEmergency {
@@ -426,7 +426,7 @@ contract Haltable is System {
 	}
 
 	// **** FUNCTIONS
-	
+
 	// called by the owner on emergency, triggers stopped state
 	function halt() external onlyOwner {
 		halted = true;
@@ -438,7 +438,7 @@ contract Haltable is System {
 		halted = false;
 		emit Halt(false, msg.sender, timestamp()); // Event log
 	}
-	
+
 	// **** EVENTS
 	// @notice Triggered when owner halts contract
 	event Halt(bool _switch, address _halter, uint256 _timestamp);
@@ -480,14 +480,14 @@ contract ICO is HardcodedWallets, Haltable {
 
 	// **** MODIFIERS
 
-	
+
 	// **** FUNCTIONS
 
 	// fallback function can be used to buy tokens
 	function () payable public {
 		buyTokens();
 	}
-	
+
 
 	/**
 	 * @notice Token purchase function direclty through ICO Smart Contract. Beneficiary = msg.sender
@@ -724,11 +724,11 @@ contract ICOPreSale is ICO {
 		if (_SCRefundVault == 0x0) {
 			revert('Tokens Constructor: _SCRefundVault == 0x0');
 		}
-		
+
 		SCTokens = Tokens(_SCTokens);
 		SCWhitelist = Whitelist(_SCWhitelist);
 		SCRefundVault = RefundVault(_SCRefundVault);
-		
+
 		weisPerEther = 1 ether; // 10e^18 multiplier
 
 		// Deadline
@@ -777,7 +777,7 @@ contract Tokens is HardcodedWallets, ERC20, Haltable {
 
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	uint256 public _totalSupply; 
+	uint256 public _totalSupply;
 
 	// Public variables of the token, all used for display
 	string public name;
@@ -873,9 +873,9 @@ contract Tokens is HardcodedWallets, ERC20, Haltable {
 
 	/**
 	 * @notice Send _amount amount of tokens from address _from to address _to
- 	 * @notice The transferFrom method is used for a withdraw workflow, allowing contracts to send 
- 	 * @notice tokens on your behalf, for example to "deposit" to a contract address and/or to charge 
- 	 * @notice fees in sub-currencies; the command should fail unless the _from account has 
+ 	 * @notice The transferFrom method is used for a withdraw workflow, allowing contracts to send
+ 	 * @notice tokens on your behalf, for example to "deposit" to a contract address and/or to charge
+ 	 * @notice fees in sub-currencies; the command should fail unless the _from account has
  	 * @notice deliberately authorized the sender of the message via some mechanism
  	 */
 	function transferFrom(address _from, address _to, uint256 _amount) public notTimeLocked stopInEmergency returns (bool success) {
@@ -902,7 +902,7 @@ contract Tokens is HardcodedWallets, ERC20, Haltable {
 	}
 
 	/**
-	 * @notice Allow _spender to withdraw from your account, multiple times, up to the _amount amount. 
+	 * @notice Allow _spender to withdraw from your account, multiple times, up to the _amount amount.
  	 * @notice If this function is called again it overwrites the current allowance with _amount.
 	 */
 	function approve(address _spender, uint256 _amount) public returns (bool success) {
@@ -955,7 +955,7 @@ contract Tokens is HardcodedWallets, ERC20, Haltable {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
+
 	/**
 	 * @notice This is out of ERC20 standard but it is necessary to build market escrow contracts of assets
 	 * @notice Send _amount amount of tokens to from tx.origin to address _to
@@ -1091,4 +1091,15 @@ contract Whitelist is HardcodedWallets, System {
 	event AddManager(address indexed _managerAddr, uint256 _timestamp);
 	// Triggered when a manager is removed
 	event DelManager(address indexed _managerAddr, uint256 _timestamp);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

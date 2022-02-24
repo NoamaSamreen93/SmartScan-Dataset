@@ -165,14 +165,14 @@ contract Winner is WinnerEvents {
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
      /*
-      * @dev check if admin or not 
+      * @dev check if admin or not
       */
     modifier isAdmin() {
         require( msg.sender == 0x74B25afBbd16Ef94d6a32c311d5c184a736850D3, "sorry admins only");
@@ -180,12 +180,12 @@ contract Winner is WinnerEvents {
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 10000000000, "eth too small");
         require(_eth <= 100000000000000000000000, "eth too huge");
-        _;    
+        _;
     }
 
 //==============================================================================
@@ -232,7 +232,7 @@ contract Winner is WinnerEvents {
      *  @dev buy key use balance
      */
 
-    function buyKeyUseBalance(uint256 keys) 
+    function buyKeyUseBalance(uint256 keys)
     isActivated()
     isHuman()
     public {
@@ -240,11 +240,11 @@ contract Winner is WinnerEvents {
         uint256 pID = address2PID_[msg.sender];
         require(pID > 0, "cannot find player");
 
-        // fire buy  event 
+        // fire buy  event
         emit WinnerEvents.onBuyUseBalance
         (
-            msg.sender, 
-            keys, 
+            msg.sender,
+            keys,
             now
         );
     }
@@ -278,22 +278,22 @@ contract Winner is WinnerEvents {
 
         pID2Player_[pID].pname = pname.nameFilter();
 
-        // fire buy  event 
+        // fire buy  event
         emit WinnerEvents.onBuyName
         (
-            msg.sender, 
-            pID2Player_[pID].pname, 
-            msg.value, 
+            msg.sender,
+            pID2Player_[pID].pname,
+            msg.value,
             now
         );
-        
+
     }
 
 //==============================================================================
 // private functions
-//==============================================================================    
+//==============================================================================
 
-    function buyCore(address addr, uint256 eth, string reff) 
+    function buyCore(address addr, uint256 eth, string reff)
     private {
         uint256 pID = address2PID_[addr];
 
@@ -311,25 +311,25 @@ contract Winner is WinnerEvents {
             address2PID_[addr] = pID;
         }
 
-        // fire buy  event 
+        // fire buy  event
         emit WinnerEvents.onBuy
         (
-            addr, 
-            eth, 
+            addr,
+            eth,
             reff,
             now
         );
     }
 
-    
+
 //==============================================================================
 // admin functions
-//==============================================================================    
+//==============================================================================
 
     /*
      * @dev activate the contract
      */
-    function activate() 
+    function activate()
     isAdmin()
     public {
 
@@ -356,9 +356,9 @@ contract Winner is WinnerEvents {
      *  @dev user withdraw
      */
     function withdraw(address addr, uint256 eth)
-    isActivated() 
-    isAdmin() 
-    isWithinLimits(eth) 
+    isActivated()
+    isAdmin()
+    isWithinLimits(eth)
     public {
 
         uint pID = address2PID_[addr];
@@ -369,8 +369,8 @@ contract Winner is WinnerEvents {
         // fire the withdraw event
         emit WinnerEvents.onWithdraw
         (
-            msg.sender, 
-            eth, 
+            msg.sender,
+            eth,
             now
         );
     }
@@ -378,7 +378,7 @@ contract Winner is WinnerEvents {
     /*
      *  @dev update round id
      */
-    function upRoundID(uint256 roundID) 
+    function upRoundID(uint256 roundID)
     isAdmin()
     isActivated()
     public {
@@ -431,9 +431,9 @@ contract Winner is WinnerEvents {
 
     function upPlayerRound(address addr, uint256 roundID, uint256 eth, uint256 keys, uint256 interest, uint256 win, uint256 reff)
     isAdmin()
-    isActivated() 
+    isActivated()
     public {
-        
+
         uint256 pID = address2PID_[addr];
 
         require( pID != 0, "cannot find the player");
@@ -466,7 +466,7 @@ contract Winner is WinnerEvents {
     /*
      *  @dev add player order
      */
-    function addPlayerOrder(address addr, uint256 roundID, uint256 keys, uint256 eth, uint256 otype, uint256 keysAvailable, uint256 keysEth) 
+    function addPlayerOrder(address addr, uint256 roundID, uint256 keys, uint256 eth, uint256 otype, uint256 keysAvailable, uint256 keysEth)
     isAdmin()
     isActivated()
     public {
@@ -578,7 +578,7 @@ library WinnerDatasets {
     struct PlayerOrder {
         uint256 keys;       // keys buy
         uint256 eth;        // eth
-        uint256 otype;       // buy or sell       
+        uint256 otype;       // buy or sell
     }
 
     struct Round {
@@ -608,7 +608,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -619,10 +619,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -631,7 +631,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -639,7 +639,7 @@ library NameFilter {
                require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -649,15 +649,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -671,14 +671,14 @@ library NameFilter {
  * @dev safe math
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -694,7 +694,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -706,30 +706,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -740,20 +740,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -761,4 +761,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

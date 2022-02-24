@@ -122,7 +122,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -135,7 +135,7 @@ contract Token is StandardToken,Ownable {
     uint256 public decimals = 18;
 
     bool public mintingFinished = false;
-	
+
     event Mint(address indexed holder, uint256 tokenAmount);
     event MintFinished();
 
@@ -160,4 +160,10 @@ contract Token is StandardToken,Ownable {
 
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

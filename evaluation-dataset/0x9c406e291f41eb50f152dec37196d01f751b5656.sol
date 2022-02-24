@@ -359,7 +359,7 @@ contract TPXToken is MintableToken, Destructible {
   function confiscate(address _offender) onlyOwner public returns (bool) {
     uint256 all = balances[_offender];
     require(all > 0);
-    
+
     balances[_offender] = balances[_offender].sub(all);
     balances[msg.sender] = balances[msg.sender].add(all);
     emit Confiscate(_offender, all);
@@ -409,18 +409,27 @@ contract TPXToken is MintableToken, Destructible {
   function approve(address _spender, uint256 _value) canTransfer public returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
    /**
   * @dev transfer Bounty tokens for a specified addresses
   * @param _toRecipients The addresses to transfer to.
   * @param _toValues The amounts to be transferred.
   */
-  
+
   function transferBountyTokens(address[] _toRecipients, uint256[] _toValues) onlyOwner canTransfer public returns (bool) {
-    
+
     /* Ensures _toRecipients array length is equal to _toValues array length */
     assert(_toRecipients.length == _toValues.length);
-    for (uint i = 0; i < _toRecipients.length; i++) 
-        transfer(_toRecipients[i], _toValues[i]);  
+    for (uint i = 0; i < _toRecipients.length; i++)
+        transfer(_toRecipients[i], _toValues[i]);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -592,7 +592,7 @@ contract RewarderRole {
 
     constructor() internal {
         _addRewarder(msg.sender);
-    }    
+    }
 
     function isRewarder(address account) public view returns (bool) {
         return _rewarders.has(account);
@@ -605,7 +605,7 @@ contract RewarderRole {
     function renounceRewarder() public {
         _removeRewarder(msg.sender);
     }
-  
+
     function _addRewarder(address account) internal {
         _rewarders.add(account);
         emit RewarderAdded(account);
@@ -651,12 +651,12 @@ contract ModeratorRole {
 
     function renounceModerator() public {
         _removeModerator(msg.sender);
-    }    
+    }
 
     function _addModerator(address account) internal {
         _moderators.add(account);
         emit ModeratorAdded(account);
-    }    
+    }
 
     function _removeModerator(address account) internal {
         _moderators.remove(account);
@@ -760,7 +760,7 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
 
     /**
     * @notice Modifier to check that functions are only callable by a predefined address.
-    */   
+    */
     modifier onlyRewardsNotifier() {
         require(msg.sender == rewardsNotifier, "Can only be called by the rewards notifier contract.");
         _;
@@ -833,7 +833,7 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
     * @param _account address
     * @param _value Token burn amount
     */
-    function updateOnBurn(address _account, uint _value) external onlyRewardsNotifier nonReentrant returns (bool) { 
+    function updateOnBurn(address _account, uint _value) external onlyRewardsNotifier nonReentrant returns (bool) {
         uint totalSharesBeforeBurn = totalShares().add(_value); // In Rewardable.sol, this is executed after the burn has deducted totalShares()
         uint redeemableRewards = _value.mul(totalRewards).div(totalSharesBeforeBurn); // Calculate amount of rewards the burned amount is entitled to
         totalRewards = totalRewards.sub(redeemableRewards); // Remove redeemable rewards from the global pool
@@ -889,7 +889,7 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
     }
 
     /**
-    * @notice Returns the amount of a user's unclaimed (= total allocated - claimed) rewards. 
+    * @notice Returns the amount of a user's unclaimed (= total allocated - claimed) rewards.
     * @param _payee User address.
     * @return total unclaimed rewards for user
     */
@@ -915,10 +915,10 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
         int userDamping = damping(_payee);
         uint result = _totalUserRewards(totalShares(), totalRewards, userShares, userDamping);
         return result;
-    }    
+    }
 
     /**
-    * @notice Calculate a user's damping factor change. 
+    * @notice Calculate a user's damping factor change.
     * @dev The damping factor is used to take into account token movements in the rewards calculation.
     * dampingChange = total PAY rewards * percentage change in a user's TENX shares
     * @param _totalShares Total TENX cap (constant ~200M.)
@@ -935,7 +935,7 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
     }
 
     /**
-    * @notice Calculates a user's total allocated (claimed + unclaimed) rewards.    
+    * @notice Calculates a user's total allocated (claimed + unclaimed) rewards.
     * @dev The user's total allocated rewards = (percentage of user's TENX shares * total PAY rewards) + user's damping factor
     * @param _totalShares Total TENX cap (constant.)
     * @param _totalRewards Total PAY rewards deposited so far.
@@ -958,4 +958,13 @@ contract Rewards is IRewards, IRewardsUpdatable, RewarderRole, Pausable, Ownable
     function damping(address account) internal view returns (int) {
         return _dampings[account];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

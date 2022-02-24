@@ -50,7 +50,7 @@ contract PNC {
         _transfer(msg.sender, _to, _value);
     }
 
-     
+
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
     function burn(uint256 _value) returns (bool success) {
@@ -60,4 +60,17 @@ contract PNC {
         Burn(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -175,7 +175,7 @@ contract Deed {
      */
     function destroyDeed() {
         if (active) throw;
-        
+
         // Instead of selfdestruct(owner), invoke owner fallback function to allow
         // owner to log an event if desired; but owner should also be aware that
         // its fallback function can also be invoked by setBalance
@@ -191,7 +191,7 @@ contract Registrar {
 
     mapping (bytes32 => entry) _entries;
     mapping (address => mapping(bytes32 => Deed)) public sealedBids;
-    
+
     enum Mode { Open, Auction, Owned, Forbidden, Reveal, NotYetAvailable }
 
     uint32 constant totalAuctionLength = 5 seconds;
@@ -223,7 +223,7 @@ contract Registrar {
     //   Owned -> Open (releaseDeed or invalidateName)
     function state(bytes32 _hash) constant returns (Mode) {
         var entry = _entries[_hash];
-        
+
         if(!isAllowed(_hash, now)) {
             return Mode.NotYetAvailable;
         } else if(now < entry.registrationDate) {
@@ -330,24 +330,24 @@ contract Registrar {
         }
         return len;
     }
-    
-    /** 
+
+    /**
      * @dev Determines if a name is available for registration yet
-     * 
-     * Each name will be assigned a random date in which its auction 
+     *
+     * Each name will be assigned a random date in which its auction
      * can be started, from 0 to 13 weeks
-     * 
+     *
      * @param _hash The hash to start an auction on
      * @param _timestamp The timestamp to query about
      */
-     
+
     function isAllowed(bytes32 _hash, uint _timestamp) constant returns (bool allowed){
         return _timestamp > getAllowedTime(_hash);
     }
 
-    /** 
+    /**
      * @dev Returns available date for hash
-     * 
+     *
      * @param _hash The hash to start an auction on
      */
     function getAllowedTime(bytes32 _hash) constant returns (uint timestamp) {
@@ -361,7 +361,7 @@ contract Registrar {
      */
     function trySetSubnodeOwner(bytes32 _hash, address _newOwner) internal {
         if(ens.owner(rootNode) == address(this))
-            ens.setSubnodeOwner(rootNode, _hash, _newOwner);        
+            ens.setSubnodeOwner(rootNode, _hash, _newOwner);
     }
 
     /**
@@ -502,7 +502,7 @@ contract Registrar {
      */
     function cancelBid(address bidder, bytes32 seal) {
         Deed bid = sealedBids[bidder][seal];
-        
+
         // If a sole bidder does not `unsealBid` in time, they have a few more days
         // where they can call `startAuction` (again) and then `unsealBid` during
         // the revealPeriod to get back their bid value.
@@ -525,7 +525,7 @@ contract Registrar {
      */
     function finalizeAuction(bytes32 _hash) onlyOwner(_hash) {
         entry h = _entries[_hash];
-        
+
         // handles the case when there's only a single bidder (h.value is zero)
         h.value =  max(h.value, minPrice);
         h.deed.setBalance(h.value, true);
@@ -563,7 +563,7 @@ contract Registrar {
 
         _tryEraseSingleNode(_hash);
         deedContract.closeDeed(1000);
-        HashReleased(_hash, h.value);        
+        HashReleased(_hash, h.value);
     }
 
     /**
@@ -603,7 +603,7 @@ contract Registrar {
      *      name that is not currently owned in the registrar. If passing, eg, 'foo.bar.eth',
      *      the owner and resolver fields on 'foo.bar.eth' and 'bar.eth' will all be cleared.
      * @param labels A series of label hashes identifying the name to zero out, rooted at the
-     *        registrar's root. Must contain at least one element. For instance, to zero 
+     *        registrar's root. Must contain at least one element. For instance, to zero
      *        'foo.bar.eth' on a registrar that owns '.eth', pass an array containing
      *        [sha3('foo'), sha3('bar')].
      */
@@ -627,7 +627,7 @@ contract Registrar {
         // Take ownership of the node
         ens.setSubnodeOwner(node, labels[idx], address(this));
         node = sha3(node, labels[idx]);
-        
+
         // Recurse if there's more labels
         if(idx > 0)
             _eraseNodeHierarchy(idx - 1, labels, node);
@@ -709,7 +709,7 @@ contract Ownable {
 
 contract Whitelist is Ownable {
   mapping(address => bool) public whitelist;
-  
+
   event WhitelistedAddressAdded(address addr);
   event WhitelistedAddressRemoved(address addr);
 
@@ -724,21 +724,21 @@ contract Whitelist is Ownable {
   /**
    * @dev add an address to the whitelist
    * @param addr address
-   * @return true if the address was added to the whitelist, false if the address was already in the whitelist 
+   * @return true if the address was added to the whitelist, false if the address was already in the whitelist
    */
   function addAddressToWhitelist(address addr) onlyOwner public returns(bool success) {
     if (!whitelist[addr]) {
       whitelist[addr] = true;
       WhitelistedAddressAdded(addr);
-      success = true; 
+      success = true;
     }
   }
 
   /**
    * @dev add addresses to the whitelist
    * @param addrs addresses
-   * @return true if at least one address was added to the whitelist, 
-   * false if all addresses were already in the whitelist  
+   * @return true if at least one address was added to the whitelist,
+   * false if all addresses were already in the whitelist
    */
   function addAddressesToWhitelist(address[] addrs) onlyOwner public returns(bool success) {
     for (uint256 i = 0; i < addrs.length; i++) {
@@ -751,8 +751,8 @@ contract Whitelist is Ownable {
   /**
    * @dev remove an address from the whitelist
    * @param addr address
-   * @return true if the address was removed from the whitelist, 
-   * false if the address wasn't in the whitelist in the first place 
+   * @return true if the address was removed from the whitelist,
+   * false if the address wasn't in the whitelist in the first place
    */
   function removeAddressFromWhitelist(address addr) onlyOwner public returns(bool success) {
     if (whitelist[addr]) {
@@ -765,7 +765,7 @@ contract Whitelist is Ownable {
   /**
    * @dev remove addresses from the whitelist
    * @param addrs addresses
-   * @return true if at least one address was removed from the whitelist, 
+   * @return true if at least one address was removed from the whitelist,
    * false if all addresses weren't in the whitelist in the first place
    */
   function removeAddressesFromWhitelist(address[] addrs) onlyOwner public returns(bool success) {
@@ -796,7 +796,7 @@ contract BedOracleV1 is Whitelist {
     event Withdrawn(address indexed to, uint value);
 
     function() external payable {}
-    
+
     constructor(address _registrar) public {
         registrar_ = Registrar(_registrar);
     }
@@ -847,7 +847,7 @@ contract BedOracleV1 is Whitelist {
     function finalize(bytes32 _shaBid) external {
         Bid storage b = bids_[_shaBid];
         bytes32 node = keccak256(registrar_.rootNode(), b.hash);
-        
+
         registrar_.finalizeAuction(b.hash);
 
         // set the resolver to zero in order to make sure no dead data is read.
@@ -900,4 +900,13 @@ contract BedOracleV1 is Whitelist {
         emit Withdrawn(msg.sender, balance_);
         balance_ = 0;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -91,7 +91,7 @@ contract TraxionWallet is Ownable {
 
     // Address where funds are collectedt
     address public wallet = 0x6163286bA933d8a007c02DB6b0fd5A08629d23f8;
-  
+
     // How many token units a buyer gets per wei
     uint256 public rate = 1000;
 
@@ -99,16 +99,16 @@ contract TraxionWallet is Ownable {
     uint256 public minInvestment = 4E17;
 
     // Invesstment upper bound per investor in wei (2,000 ETH)
-    uint256 public investmentUpperBounds = 2E21;        
+    uint256 public investmentUpperBounds = 2E21;
 
     // Hard cap in wei (100,000 ETH)
-    uint256 public hardcap = 1E23;    
+    uint256 public hardcap = 1E23;
 
     // Amount of wei raised
     uint256 public weiRaised;
 
     event TokenPurchase(address indexed beneficiary, uint256 value, uint256 amount);
-  
+
     // -----------------------------------------
     // Crowdsale external interface
     // -----------------------------------------
@@ -123,20 +123,20 @@ contract TraxionWallet is Ownable {
     /** Whitelist an address and set max investment **/
     mapping (address => bool) public whitelistedAddr;
     mapping (address => uint256) public totalInvestment;
-  
+
     /** @dev whitelist an Address */
     function whitelistAddress(address[] buyer) external onlyOwner {
         for (uint i = 0; i < buyer.length; i++) {
             whitelistedAddr[buyer[i]] = true;
         }
     }
-  
+
     /** @dev black list an address **/
     function blacklistAddr(address[] buyer) external onlyOwner {
         for (uint i = 0; i < buyer.length; i++) {
             whitelistedAddr[buyer[i]] = false;
         }
-    }    
+    }
 
     /**
      * @dev low level token purchase ***DO NOT OVERRIDE***
@@ -170,9 +170,9 @@ contract TraxionWallet is Ownable {
      * @param _weiAmount Value in wei involved in the purchase
      */
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal view {
-        require(_beneficiary != address(0)); 
+        require(_beneficiary != address(0));
         require(_weiAmount != 0);
-    
+
         require(_weiAmount > minInvestment); // Revert if payment is less than 0.40 ETH
         require(whitelistedAddr[_beneficiary]); // Revert if investor is not whitelisted
         require(totalInvestment[_beneficiary].add(_weiAmount) <= investmentUpperBounds); // Revert if the investor already spent over 2k ETH investment or payment is greater than 2k ETH
@@ -206,3 +206,19 @@ contract TraxionWallet is Ownable {
     }
 }
 //Github: @AlvinVeroy
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

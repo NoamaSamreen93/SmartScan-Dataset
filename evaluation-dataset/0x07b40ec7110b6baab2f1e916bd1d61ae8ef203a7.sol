@@ -21,7 +21,7 @@ contract CryptoRoses {
       name = _name;
   }
 
-  function addAddWhitelist(address s) public {      
+  function addAddWhitelist(address s) public {
       require(msg.sender == owner);
 
       addrWhitelist[s] = true;
@@ -52,7 +52,7 @@ contract CryptoRoses {
 
       Rose roseType;
 
-      // Assign rose 
+      // Assign rose
       if (amntSent >= ETH_GOLD_ROSE_PRICE) {
           roseType = Rose.Gold;
       } else if (amntSent >= ETH_WHITE_ROSE_PRICE) {
@@ -90,7 +90,7 @@ contract CryptoRoses {
 
       Rose roseType;
 
-      // Assign rose 
+      // Assign rose
       if (amntSent >= GRLC_GOLD_ROSE_PRICE) {
           roseType = Rose.Gold;
       } else if (amntSent >= GRLC_WHITE_ROSE_PRICE) {
@@ -99,12 +99,12 @@ contract CryptoRoses {
           roseType = Rose.Pink;
       } else if (amntSent >= GRLC_RED_ROSE_PRICE) {
           roseType = Rose.Pink;
-      } else {          
+      } else {
           return;
       }
 
       // No double buying roses
-      if (roseOwners[gaddrHash].hasRose) {          
+      if (roseOwners[gaddrHash].hasRose) {
           return;
       }
 
@@ -117,4 +117,15 @@ contract CryptoRoses {
   function checkRose(bytes32 h) public constant returns (bool, uint, string) {
       return (roseOwners[h].hasRose, uint(roseOwners[h].roseType), roseOwners[h].memo);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

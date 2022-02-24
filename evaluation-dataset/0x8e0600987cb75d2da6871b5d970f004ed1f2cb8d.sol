@@ -23,7 +23,7 @@ contract FourWaySplit {
 
   // send ETH
 
-  function pay() 
+  function pay()
     public
     payable
     returns(bool success)
@@ -54,4 +54,15 @@ contract FourWaySplit {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

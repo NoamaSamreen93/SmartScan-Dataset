@@ -325,7 +325,7 @@ contract Authorizable is Ownable {
 
     /**
      * @dev Authorize given address
-     * @param _who address Address to authorize 
+     * @param _who address Address to authorize
      */
     function authorize(address _who) public onlyOwner {
         require(_who != address(0), "Address can't be zero.");
@@ -337,7 +337,7 @@ contract Authorizable is Ownable {
 
     /**
      * @dev unAuthorize given address
-     * @param _who address Address to unauthorize 
+     * @param _who address Address to unauthorize
      */
     function unAuthorize(address _who) public onlyOwner {
         require(_who != address(0), "Address can't be zero.");
@@ -351,12 +351,12 @@ contract Authorizable is Ownable {
 /**
  * @title PlatinTGE
  * @dev Platin Token Generation Event contract. It holds token economic constants and makes initial token allocation.
- * Initial token allocation function should be called outside the blockchain at the TGE moment of time, 
+ * Initial token allocation function should be called outside the blockchain at the TGE moment of time,
  * from here on out, Platin Token and other Platin contracts become functional.
  */
 contract PlatinTGE {
     using SafeMath for uint256;
-    
+
     // Token decimals
     uint8 public constant decimals = 18; // solium-disable-line uppercase
 
@@ -377,13 +377,13 @@ contract PlatinTGE {
     address public PRE_ICO_POOL; // solium-disable-line mixedcase
     address public LIQUID_POOL; // solium-disable-line mixedcase
     address public ICO; // solium-disable-line mixedcase
-    address public MINING_POOL; // solium-disable-line mixedcase 
+    address public MINING_POOL; // solium-disable-line mixedcase
     address public FOUNDERS_POOL; // solium-disable-line mixedcase
-    address public EMPLOYEES_POOL; // solium-disable-line mixedcase 
-    address public AIRDROPS_POOL; // solium-disable-line mixedcase 
-    address public RESERVES_POOL; // solium-disable-line mixedcase 
+    address public EMPLOYEES_POOL; // solium-disable-line mixedcase
+    address public AIRDROPS_POOL; // solium-disable-line mixedcase
+    address public RESERVES_POOL; // solium-disable-line mixedcase
     address public ADVISORS_POOL; // solium-disable-line mixedcase
-    address public ECOSYSTEM_POOL; // solium-disable-line mixedcase 
+    address public ECOSYSTEM_POOL; // solium-disable-line mixedcase
 
     // HOLDER AMOUNT AS PART OF SUPPLY
     // SALES_SUPPLY = PRE_ICO_POOL_AMOUNT + LIQUID_POOL_AMOUNT + ICO_AMOUNT
@@ -399,9 +399,9 @@ contract PlatinTGE {
 
     // Tokens ico sale with lockup period
     uint256 public constant ICO_LOCKUP_PERIOD = 182 days;
-    
+
     // Platin Token ICO rate, regular
-    uint256 public constant TOKEN_RATE = 1000; 
+    uint256 public constant TOKEN_RATE = 1000;
 
     // Platin Token ICO rate with lockup, 20% bonus
     uint256 public constant TOKEN_RATE_LOCKUP = 1200;
@@ -419,7 +419,7 @@ contract PlatinTGE {
     /**
      * @dev Constructor
      * @param _tgeTime uint256 TGE moment of time
-     * @param _token address Address of the Platin Token contract       
+     * @param _token address Address of the Platin Token contract
      * @param _preIcoPool address Address of the Platin PreICO Pool
      * @param _liquidPool address Address of the Platin Liquid Pool
      * @param _ico address Address of the Platin ICO contract
@@ -429,12 +429,12 @@ contract PlatinTGE {
      * @param _airdropsPool address Address of the Platin Airdrops Pool
      * @param _reservesPool address Address of the Platin Reserves Pool
      * @param _advisorsPool address Address of the Platin Advisors Pool
-     * @param _ecosystemPool address Address of the Platin Ecosystem Pool  
-     * @param _unsoldReserve address Address of the Platin Unsold Reserve                                 
-     */  
+     * @param _ecosystemPool address Address of the Platin Ecosystem Pool
+     * @param _unsoldReserve address Address of the Platin Unsold Reserve
+     */
     constructor(
         uint256 _tgeTime,
-        PlatinToken _token, 
+        PlatinToken _token,
         address _preIcoPool,
         address _liquidPool,
         address _ico,
@@ -480,7 +480,7 @@ contract PlatinTGE {
         ECOSYSTEM_POOL = _ecosystemPool;
 
         // Setup unsold reserve address
-        UNSOLD_RESERVE = _unsoldReserve; 
+        UNSOLD_RESERVE = _unsoldReserve;
     }
 
     /**
@@ -495,11 +495,11 @@ contract PlatinTGE {
         // Should not be allocated already
         require(token.totalSupply() == 0, "Allocation is already done.");
 
-        // SALES          
+        // SALES
         token.allocate(PRE_ICO_POOL, PRE_ICO_POOL_AMOUNT);
         token.allocate(LIQUID_POOL, LIQUID_POOL_AMOUNT);
         token.allocate(ICO, ICO_AMOUNT);
-      
+
         // MINING POOL
         token.allocate(MINING_POOL, MINING_POOL_SUPPLY);
 
@@ -520,7 +520,7 @@ contract PlatinTGE {
         token.allocate(ECOSYSTEM_POOL, ECOSYSTEM_POOL_SUPPLY);
 
         // Check Token Total Supply
-        require(token.totalSupply() == TOTAL_SUPPLY, "Total supply check error.");   
+        require(token.totalSupply() == TOTAL_SUPPLY, "Total supply check error.");
     }
 }
 
@@ -737,7 +737,7 @@ contract StandardToken is ERC20, BasicToken {
  * Only holders with the non-zero balance are listed.
  */
 contract HoldersToken is StandardToken {
-    using SafeMath for uint256;    
+    using SafeMath for uint256;
 
     // holders list
     address[] public holders;
@@ -797,11 +797,11 @@ contract HoldersToken is StandardToken {
 
         holderNumber[_holder] = 0;
         holders.length = _lastIndex;
-    } 
+    }
 
     /**
      * @dev Add holder to the holders list
-     * @param _holder address Address of the holder to add   
+     * @param _holder address Address of the holder to add
      */
     function _addHolder(address _holder) internal {
         if (holderNumber[_holder] == 0) {
@@ -817,8 +817,8 @@ contract HoldersToken is StandardToken {
      * @param _value uint256 the amount of tokens to be transferred
      */
     function _preserveHolders(address _from, address _to, uint256 _value) internal {
-        _addHolder(_to);   
-        if (balanceOf(_from).sub(_value) == 0) 
+        _addHolder(_to);
+        if (balanceOf(_from).sub(_value) == 0)
             _removeHolder(_from);
     }
 }
@@ -829,7 +829,7 @@ contract HoldersToken is StandardToken {
  * Token contract is a standard ERC20 token with additional capabilities: TGE allocation, holders tracking and lockup.
  * Initial allocation should be invoked by the TGE contract at the TGE moment of time.
  * Token contract holds list of token holders, the list includes holders with positive balance only.
- * Authorized holders can transfer token with lockup(s). Lockups can be refundable. 
+ * Authorized holders can transfer token with lockup(s). Lockups can be refundable.
  * Lockups is a list of releases dates and releases amounts.
  * In case of refund previous holder can get back locked up tokens. Only still locked up amounts can be transferred back.
  */
@@ -839,7 +839,7 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
     string public constant name = "Platin Token"; // solium-disable-line uppercase
     string public constant symbol = "PTNX"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
- 
+
     // lockup sruct
     struct Lockup {
         uint256 release; // release timestamp
@@ -852,8 +852,8 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
     // list of lockups that can be refunded
     mapping (address => mapping (address => Lockup[])) public refundable;
 
-    // idexes mapping from refundable to lockups lists 
-    mapping (address => mapping (address => mapping (uint256 => uint256))) public indexes;    
+    // idexes mapping from refundable to lockups lists
+    mapping (address => mapping (address => mapping (uint256 => uint256))) public indexes;
 
     // Platin TGE contract
     PlatinTGE public tge;
@@ -881,24 +881,24 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
 
     /**
      * @dev Set TGE contract
-     * @param _tge address PlatinTGE contract address    
+     * @param _tge address PlatinTGE contract address
      */
     function setTGE(PlatinTGE _tge) external onlyOwner {
         require(tge == address(0), "TGE is already set.");
         require(_tge != address(0), "TGE address can't be zero.");
         tge = _tge;
         authorize(_tge);
-    }        
+    }
 
     /**
      * @dev Allocate tokens during TGE
      * @param _to address Address gets the tokens
      * @param _amount uint256 Amount to allocate
-     */ 
+     */
     function allocate(address _to, uint256 _amount) external onlyTGE {
         require(_to != address(0), "Allocate To address can't be zero");
         require(_amount > 0, "Allocate amount should be > 0.");
-       
+
         totalSupply_ = totalSupply_.add(_amount);
         balances[_to] = balances[_to].add(_amount);
 
@@ -908,7 +908,7 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
 
         emit Allocate(_to, _amount);
         emit Transfer(address(0), _to, _amount);
-    }  
+    }
 
     /**
      * @dev Transfer tokens from one address to another
@@ -938,20 +938,20 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
      * @param _lockupReleases uint256[] List of lockup releases
      * @param _lockupAmounts uint256[] List of lockup amounts
      * @param _refundable bool Is locked up amount refundable
-     * @return bool Returns true if the transfer was succeeded     
+     * @return bool Returns true if the transfer was succeeded
      */
     function transferWithLockup(
-        address _to, 
-        uint256 _value, 
+        address _to,
+        uint256 _value,
         uint256[] _lockupReleases,
         uint256[] _lockupAmounts,
         bool _refundable
-    ) 
+    )
     public onlyAuthorized returns (bool)
-    {        
+    {
         transfer(_to, _value);
-        _lockup(_to, _value, _lockupReleases, _lockupAmounts, _refundable); // solium-disable-line arg-overflow     
-    }       
+        _lockup(_to, _value, _lockupReleases, _lockupAmounts, _refundable); // solium-disable-line arg-overflow
+    }
 
     /**
      * @dev Transfer tokens from one address to another with lockup
@@ -960,27 +960,27 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
      * @param _value uint256 The amount of tokens to be transferred
      * @param _lockupReleases uint256[] List of lockup releases
      * @param _lockupAmounts uint256[] List of lockup amounts
-     * @param _refundable bool Is locked up amount refundable      
-     * @return bool Returns true if the transfer was succeeded     
+     * @param _refundable bool Is locked up amount refundable
+     * @return bool Returns true if the transfer was succeeded
      */
     function transferFromWithLockup(
-        address _from, 
-        address _to, 
-        uint256 _value, 
+        address _from,
+        address _to,
+        uint256 _value,
         uint256[] _lockupReleases,
         uint256[] _lockupAmounts,
         bool _refundable
-    ) 
+    )
     public onlyAuthorized returns (bool)
     {
         transferFrom(_from, _to, _value);
-        _lockup(_to, _value, _lockupReleases, _lockupAmounts, _refundable); // solium-disable-line arg-overflow  
-    }     
+        _lockup(_to, _value, _lockupReleases, _lockupAmounts, _refundable); // solium-disable-line arg-overflow
+    }
 
     /**
      * @dev Refund refundable locked up amount
      * @param _from address The address which you want to refund tokens from
-     * @return uint256 Returns amount of refunded tokens   
+     * @return uint256 Returns amount of refunded tokens
      */
     function refundLockedUp(
         address _from
@@ -999,8 +999,8 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
                     refundable[_from][_sender][i].amount = 0;
                     _lockupIdx = indexes[_from][_sender][i];
                     lockups[_from][_lockupIdx].release = 0;
-                    lockups[_from][_lockupIdx].amount = 0;       
-                }    
+                    lockups[_from][_lockupIdx].amount = 0;
+                }
             }
 
             if (_balanceRefundable > 0) {
@@ -1082,15 +1082,15 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
      * @param _amount uint256 Amount to lockup
      * @param _lockupReleases uint256[] List of lockup releases
      * @param _lockupAmounts uint256[] List of lockup amounts
-     * @param _refundable bool Is locked up amount refundable     
-     */     
+     * @param _refundable bool Is locked up amount refundable
+     */
     function _lockup(
-        address _who, 
-        uint256 _amount, 
+        address _who,
+        uint256 _amount,
         uint256[] _lockupReleases,
         uint256[] _lockupAmounts,
-        bool _refundable) 
-    internal 
+        bool _refundable)
+    internal
     {
         require(_lockupReleases.length == _lockupAmounts.length, "Length of lockup releases and amounts lists should be equal.");
         require(_lockupReleases.length.add(lockups[_who].length) <= 1000, "Can't be more than 1000 lockups per address.");
@@ -1116,13 +1116,13 @@ contract PlatinToken is HoldersToken, NoOwner, Authorizable, Pausable {
 
             require(_balanceLokedUp <= _amount, "Can't lockup more than transferred amount.");
             emit SetLockups(_who, _amount, _fromIdx, _toIdx); // solium-disable-line arg-overflow
-        }            
-    }      
+        }
+    }
 }
 
 /**
  * @title PlatinPool
- * @dev Pool contract holds a pool distribution table and provide pool distribution logic. 
+ * @dev Pool contract holds a pool distribution table and provide pool distribution logic.
  * Distribution itself is a public function.
  * Distribution can have lockups, lockups can be refundable.
  * Adding of distribution records is limited to the pool balance, or, if there no balance yet, initial supply.
@@ -1132,7 +1132,7 @@ contract PlatinPool is HasNoEther, Authorizable {
     using SafeMath for uint256;
 
     // Platin Token contract
-    PlatinToken public token;  
+    PlatinToken public token;
 
     // initial supply
     uint256 public initial;
@@ -1148,8 +1148,8 @@ contract PlatinPool is HasNoEther, Authorizable {
         uint256 amount; // amount of distribution
         uint256[] lockupReleases; // lockup releases dates (if there is lockups for amount)
         uint256[] lockupAmounts; // lockup amounts (if there is lockups for amount)
-        uint256 refunded; // refunded from distribution (if applicable and happened)       
-        bool refundable; // is locked up amounts refundable        
+        uint256 refunded; // refunded from distribution (if applicable and happened)
+        bool refundable; // is locked up amounts refundable
         bool distributed; // is amount already distributed
     }
 
@@ -1164,38 +1164,38 @@ contract PlatinPool is HasNoEther, Authorizable {
 
     // distribute event logging
     event Distribute(address indexed to, uint256 amount);
-    
+
 
     /**
      * @dev Constructor
-     * @param _token address PlatinToken contract address  
-     * @param _initial uint256 Initial distribution 
+     * @param _token address PlatinToken contract address
+     * @param _initial uint256 Initial distribution
      */
     constructor(PlatinToken _token, uint256 _initial) public {
         require(_token != address(0), "Token address can't be zero.");
-        token = _token;    
-        initial = _initial;   
+        token = _token;
+        initial = _initial;
     }
 
     /**
      * @dev Add distribution record
      * @param _beneficiary address Address who gets the tokens
      * @param _amount uint256 Amount of the distribution
-     * @param _lockupReleases uint256[] List of lockup releases   
+     * @param _lockupReleases uint256[] List of lockup releases
      * @param _lockupAmounts uint256[] List of lockup amounts
      * @param _refundable bool Is lockuped amount refundable
      */
     function addDistribution(
-        address _beneficiary, 
-        uint256 _amount, 
+        address _beneficiary,
+        uint256 _amount,
         uint256[] _lockupReleases,
         uint256[] _lockupAmounts,
         bool _refundable
-    ) 
+    )
     external onlyAuthorized
     {
-        require(_beneficiary != address(0), "Beneficiary address can't be zero.");      
-        require(_amount > 0, "Amount can't be zero.");            
+        require(_beneficiary != address(0), "Beneficiary address can't be zero.");
+        require(_amount > 0, "Amount can't be zero.");
         require(distribution[_beneficiary].amount == 0, "Beneficiary is already listed.");
         require(_lockupReleases.length == _lockupAmounts.length, "Length of lockup releases and amounts lists should be equal.");
 
@@ -1204,7 +1204,7 @@ contract PlatinPool is HasNoEther, Authorizable {
 
         if (_balance > 0) {
             initial = 0;
-        }    
+        }
 
         if (initial > 0) {
             _distributable = initial.sub(allocated);
@@ -1212,8 +1212,8 @@ contract PlatinPool is HasNoEther, Authorizable {
             _distributable = _balance.sub(allocated.sub(distributed));
         }
 
-        require(_amount <= _distributable, "Amount isn't distributible.");        
-        
+        require(_amount <= _distributable, "Amount isn't distributible.");
+
         uint256 _amountLokedUp = 0;
         for (uint256 i = 0; i < _lockupAmounts.length; i++) {
             _amountLokedUp = _amountLokedUp.add(_lockupAmounts[i]);
@@ -1231,15 +1231,15 @@ contract PlatinPool is HasNoEther, Authorizable {
         members.push(_beneficiary);
 
         emit AddDistribution(
-            _beneficiary, 
-            _amount, 
-            _lockupReleases.length > 0, 
+            _beneficiary,
+            _amount,
+            _lockupReleases.length > 0,
             _refundable);
-    }    
+    }
 
     /**
      * @dev Distribute amount to the beneficiary
-     * @param _beneficiary address Address who gets the tokens     
+     * @param _beneficiary address Address who gets the tokens
      */
     function distribute(address _beneficiary) public {
         require(distribution[_beneficiary].amount > 0, "Can't find distribution record for the beneficiary.");
@@ -1251,8 +1251,8 @@ contract PlatinPool is HasNoEther, Authorizable {
         bool _refundable = distribution[_beneficiary].refundable;
 
         token.transferWithLockup(
-            _beneficiary, 
-            _amount, 
+            _beneficiary,
+            _amount,
             _lockupReleases,
             _lockupAmounts,
             _refundable);
@@ -1263,7 +1263,7 @@ contract PlatinPool is HasNoEther, Authorizable {
         distributed = distributed.add(_amount);
         distribution[_beneficiary].distributed = true;
 
-        emit Distribute(_beneficiary, _amount);  
+        emit Distribute(_beneficiary, _amount);
     }
 
     /**
@@ -1286,28 +1286,28 @@ contract PlatinPool is HasNoEther, Authorizable {
     /**
      * @dev Get members count
      * @return uint256 Members count
-     */   
+     */
     function membersCount() public view returns (uint256) {
         return members.length;
     }
 
     /**
      * @dev Get list of lockup releases dates from the distribution record
-     * @param _beneficiary address Address who has a distribution record    
+     * @param _beneficiary address Address who has a distribution record
      * @return uint256 Members count
-     */   
+     */
     function getLockupReleases(address _beneficiary) public view returns (uint256[]) {
         return distribution[_beneficiary].lockupReleases;
     }
 
     /**
      * @dev Get list of lockup amounts from the distribution record
-     * @param _beneficiary address Address who has a distribution record    
+     * @param _beneficiary address Address who has a distribution record
      * @return uint256 Members count
-     */   
+     */
     function getLockupAmounts(address _beneficiary) public view returns (uint256[]) {
         return distribution[_beneficiary].lockupAmounts;
-    }    
+    }
 }
 
 /**
@@ -1319,8 +1319,20 @@ contract AdvisorsPool is PlatinPool {
 
     /**
      * @dev Constructor
-     * @param _token address Address of the Platin Token contract                              
-     */  
+     * @param _token address Address of the Platin Token contract
+     */
     constructor(PlatinToken _token, uint256 _initial) public PlatinPool(_token, _initial) {}
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

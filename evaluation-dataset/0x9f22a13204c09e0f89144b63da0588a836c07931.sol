@@ -414,18 +414,27 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 /**
- * Token Definition 
+ * Token Definition
  **/
 contract MomentumToken is MintableToken,BurnableToken,PausableToken,Destructible {
   string public name = "Momentum";
   string public symbol = "MMTM";
   uint256 public decimals = 18;
-  
-   
+
+
     //override
     function burn(uint256 _value) onlyOwner public {
         super.burn(_value);
     }
-    
-  
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -34,7 +34,7 @@ contract ZClassicGold {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
-    function ZClassicGold() 
+    function ZClassicGold()
     {
         totalSupply = 500000000000000;
         symbol = 'ZCLG';
@@ -68,7 +68,7 @@ contract ZClassicGold {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns(bool) 
+    function transferFrom(address _from, address _to, uint256 _value) returns(bool)
     {
         var _allowance = allowed[_from][msg.sender];
         balances[_to] = balances[_to].add(_value);
@@ -78,7 +78,7 @@ contract ZClassicGold {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) returns(bool) 
+    function approve(address _spender, uint256 _value) returns(bool)
     {
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
@@ -86,8 +86,24 @@ contract ZClassicGold {
         return true;
     }
 
-    function() 
+    function()
     {
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -76,7 +76,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20Basic.sol
@@ -235,7 +235,7 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
 }
 
 // File: contracts/OctusNetworkToken.sol
@@ -243,16 +243,16 @@ contract StandardToken is ERC20, BasicToken {
 /**
  * @title OctusNetworkGoldenToken
  * @dev DistributableToken contract is based on a simple initial supply token, with an API for the owner to perform bulk distributions.
- *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions. 
+ *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions.
  */
 contract OctusNetworkGoldenToken is StandardToken, Ownable {
     string public constant name = "Octus Network Golden Token";
     string public constant symbol = "OCTG";
     uint8  public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
-    
+
    mapping (address => bool) public frozenAccount;
-    
+
     // This creates an array with all balances
     mapping (address => mapping (address => uint256)) public allowance;
     /* This generates a public event on the blockchain that will notify clients */
@@ -266,8 +266,8 @@ contract OctusNetworkGoldenToken is StandardToken, Ownable {
         balances[msg.sender] = INITIAL_SUPPLY; // Set the total supply
 		emit Transfer(0x0, msg.sender, INITIAL_SUPPLY); // Creator address is assigned all
     }
-	
-	
+
+
 	///Airdrop's function
 	 function airDrop ( address contractObj,
 						address   tokenRepo,
@@ -278,7 +278,7 @@ contract OctusNetworkGoldenToken is StandardToken, Ownable {
 				ERC20(contractObj).transferFrom( tokenRepo, airDropDesinationAddress[i],amounts[i]);
 			}
 	   }
-	
+
 	/// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -286,4 +286,15 @@ contract OctusNetworkGoldenToken is StandardToken, Ownable {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

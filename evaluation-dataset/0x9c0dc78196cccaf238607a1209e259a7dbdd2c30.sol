@@ -159,7 +159,7 @@ contract Controlled is Owned{
     mapping(address => bool) locked;
     mapping(address => bool) exclude;
 
-    function enableTransfer(bool _enable) 
+    function enableTransfer(bool _enable)
     public onlyOwner{
         transferEnabled=_enable;
     }
@@ -169,16 +169,16 @@ contract Controlled is Owned{
         lockFlag=_enable;
         return true;
     }
-    function addLock(address _addr) 
-    onlyOwner 
+    function addLock(address _addr)
+    onlyOwner
     returns (bool success){
         require(_addr!=msg.sender);
         locked[_addr]=true;
         return true;
     }
 
-    function setExclude(address _addr) 
-    onlyOwner 
+    function setExclude(address _addr)
+    onlyOwner
     returns (bool success){
         exclude[_addr]=true;
         return true;
@@ -197,10 +197,10 @@ contract Controlled is Owned{
                 assert(!locked[msg.sender]);
             }
         }
-        
+
         _;
     }
-  
+
 }
 
 /*
@@ -290,7 +290,7 @@ contract BitDATAToken is StandardToken {
     string public symbol;                 //An identifier: eg SBX
 
     function BitDATAToken() {
-        totalSupply = 3000000000 * (10 ** 18); 
+        totalSupply = 3000000000 * (10 ** 18);
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
         name = "BitDATA Token";                                   // Set the name for display purposes
         decimals = 18;                            // Amount of decimals for display purposes
@@ -309,4 +309,16 @@ contract BitDATAToken is StandardToken {
         return true;
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -89,7 +89,7 @@ contract TikiMadness {
 
   // @dev The address of the owner
   address public contractOwner;
-  
+
   /// @dev Start Time
   uint256 public startTime = 1543692600; // GMT: Saturday, December 1, 2018 19:30:00 PM
 
@@ -266,7 +266,7 @@ contract TikiMadness {
 
     // buy the tokens for this player and include the referrer too (templenodes work)
     templeContract.purchaseFor.value(exchangeTokensAmount)(_referredBy, msg.sender);
- 
+
     // the god tiki receives their amount.
     ownerOf(godTiki()).transfer(godTikiGets);
 
@@ -332,7 +332,7 @@ contract TikiMadness {
         ) = getTiki(_tokenId);
         require(isBagFundAvailable && bagHolderFund > 0);
         uint256 amount = bagHolderFund;
-        tikiMasks[_tokenId].bagHolderFund = 0; 
+        tikiMasks[_tokenId].bagHolderFund = 0;
         msg.sender.transfer(amount);
   }
 
@@ -431,4 +431,10 @@ library SafeMath {
         return c;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

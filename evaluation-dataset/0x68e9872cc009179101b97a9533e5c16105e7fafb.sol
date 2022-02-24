@@ -74,30 +74,30 @@ contract BondToken is ERC20 {
     address public owner;
     address public controller;
     address public airDropManager;
-    
+
     event LogBuyForInvestor(address indexed investor, uint value, string txHash);
     event Burn(address indexed from, uint value);
     event Mint(address indexed to, uint value);
-    
+
     // Tokens transfer ability status
     bool public tokensAreFrozen = true;
 
     // Allows execution by the owner only
-    modifier onlyOwner { 
-        require(msg.sender == owner); 
-        _; 
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
     }
 
     // Allows execution by the controller only
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     // Allows execution by the air drop manager only
-    modifier onlyAirDropManager { 
-        require(msg.sender == airDropManager); 
-        _; 
+    modifier onlyAirDropManager {
+        require(msg.sender == airDropManager);
+        _;
     }
 
    /**
@@ -109,7 +109,7 @@ contract BondToken is ERC20 {
     function BondToken(address _owner, address _controller, address _airDropManager) public {
        owner = _owner;
        controller = _controller;
-       airDropManager = _airDropManager; 
+       airDropManager = _airDropManager;
     }
 
    /**
@@ -117,7 +117,7 @@ contract BondToken is ERC20 {
     *   @param _holder       beneficiary address the tokens will be issued to
     *   @param _value        number of tokens to issue
     */
-    function mint(address _holder, uint _value) 
+    function mint(address _holder, uint _value)
         private
         returns (bool) {
         require(_value > 0);
@@ -134,9 +134,9 @@ contract BondToken is ERC20 {
     *   @param _value        number of tokens to issue
     */
     function mintTokens(
-        address _holder, 
-        uint _value) 
-        external 
+        address _holder,
+        uint _value)
+        external
         onlyOwner {
         require(mint(_holder, _value));
         Mint(_holder, _value);
@@ -149,11 +149,11 @@ contract BondToken is ERC20 {
     *   @param _txHash       transaction hash of investor's payment
     */
     function buyForInvestor(
-        address _holder, 
-        uint _value, 
+        address _holder,
+        uint _value,
         string _txHash
-    ) 
-        external 
+    )
+        external
         onlyController {
         require(mint(_holder, _value));
         LogBuyForInvestor(_holder, _value, _txHash);
@@ -168,8 +168,8 @@ contract BondToken is ERC20 {
      * @return A boolean that indicates whether the operation was successful.
      */
     function batchDrop(
-        address[] _to, 
-        uint[] _amount) 
+        address[] _to,
+        uint[] _amount)
         external
         onlyAirDropManager {
         require(_to.length == _amount.length);
@@ -286,7 +286,7 @@ contract BondToken is ERC20 {
         return allowed[_owner][_spender];
     }
 
-        /** 
+        /**
     *   @dev Allows owner to transfer out any accidentally sent ERC20 tokens
     *
     *   @param tokenAddress  token address
@@ -294,10 +294,26 @@ contract BondToken is ERC20 {
     *
     *
     */
-    function transferAnyTokens(address tokenAddress, uint tokens) 
+    function transferAnyTokens(address tokenAddress, uint tokens)
         public
-        onlyOwner 
+        onlyOwner
         returns (bool success) {
         return ERC20(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

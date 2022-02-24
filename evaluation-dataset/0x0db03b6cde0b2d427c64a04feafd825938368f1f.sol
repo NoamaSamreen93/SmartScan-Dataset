@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
 
-// ----------------- 
+// -----------------
 //begin Ownable.sol
 
 /**
@@ -66,7 +66,7 @@ contract Ownable {
 }
 
 //end Ownable.sol
-// ----------------- 
+// -----------------
 //begin ERC20Basic.sol
 
 /**
@@ -82,7 +82,7 @@ contract ERC20Basic {
 }
 
 //end ERC20Basic.sol
-// ----------------- 
+// -----------------
 //begin SafeMath.sol
 
 /**
@@ -136,7 +136,7 @@ library SafeMath {
 }
 
 //end SafeMath.sol
-// ----------------- 
+// -----------------
 //begin Pausable.sol
 
 
@@ -186,7 +186,7 @@ contract Pausable is Ownable {
 }
 
 //end Pausable.sol
-// ----------------- 
+// -----------------
 //begin BasicToken.sol
 
 
@@ -236,7 +236,7 @@ contract BasicToken is ERC20Basic {
 }
 
 //end BasicToken.sol
-// ----------------- 
+// -----------------
 //begin ERC20.sol
 
 
@@ -260,7 +260,7 @@ contract ERC20 is ERC20Basic {
 }
 
 //end ERC20.sol
-// ----------------- 
+// -----------------
 //begin StandardToken.sol
 
 
@@ -384,7 +384,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 //end StandardToken.sol
-// ----------------- 
+// -----------------
 //begin MintableToken.sol
 
 
@@ -444,7 +444,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 //end MintableToken.sol
-// ----------------- 
+// -----------------
 //begin PausableToken.sol
 
 
@@ -512,7 +512,7 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 //end PausableToken.sol
-// ----------------- 
+// -----------------
 //begin OpiriaToken.sol
 
 
@@ -523,3 +523,14 @@ contract OpiriaToken is MintableToken, PausableToken {
 }
 
 //end OpiriaToken.sol
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

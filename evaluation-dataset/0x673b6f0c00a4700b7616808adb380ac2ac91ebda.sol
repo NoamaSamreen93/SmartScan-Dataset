@@ -139,3 +139,7 @@ contract ServiceRegistry is CustodianUpgradeable {
         _;
     }
 }
+function() payable external {
+	revert();
+}
+}

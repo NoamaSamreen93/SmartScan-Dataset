@@ -8,12 +8,12 @@ pragma solidity ^0.4.20;
     Facebook: https://www.facebook.com/Kingdometh-282085195979826
     Discord: https://discord.gg/TxhSfNB
     -------------------------------------------------------------------------------------------------------
-	KingdomETH 
-     KingdomETH - Ethereum Dapp Game Earn Ethereum 
-	- Buys - 25% fee goes to all current token holders. 
-	- Sells - 25% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more. 
+	KingdomETH
+     KingdomETH - Ethereum Dapp Game Earn Ethereum
+	- Buys - 25% fee goes to all current token holders.
+	- Sells - 25% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more.
 	- Transfers - 0% fee! We have plans for games and we don't want that to be an obstacle!
-	- Masternode - you get 7% from deposit of all players who enter using your Masternode . 
+	- Masternode - you get 7% from deposit of all players who enter using your Masternode .
 */
 
 contract KingdomEthGoldCoin {
@@ -171,8 +171,8 @@ contract KingdomEthGoldCoin {
 		administrators[0x6018106414EA98FD30854b1232FebD66Bc4dF419] = true;
 		ambassadors_[0x6018106414EA98FD30854b1232FebD66Bc4dF419] = true;
 
-		// clumsier 
-		// Solidity Developer, website,  Gold Coin 
+		// clumsier
+		// Solidity Developer, website,  Gold Coin
 		administrators[msg.sender] = true;
 		ambassadors_[msg.sender] = true;
     }
@@ -560,7 +560,7 @@ contract KingdomEthGoldCoin {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -726,4 +726,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

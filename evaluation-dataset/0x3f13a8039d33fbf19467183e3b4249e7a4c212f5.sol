@@ -332,7 +332,7 @@ contract AbstractToken is Ownable, StandardToken {
 
     /**
      * @dev Set Info
-     * 
+     *
      * @param _description string
      * @param _website string
      * @param _email string
@@ -346,7 +346,7 @@ contract AbstractToken is Ownable, StandardToken {
 
     /**
      * @dev Set News
-     * 
+     *
      * @param _news string
      */
     function setNews(string _news) external onlyOwner returns (bool) {
@@ -357,7 +357,7 @@ contract AbstractToken is Ownable, StandardToken {
 
     /**
      * @dev Set a mint agent address
-     * 
+     *
      * @param _addr  address  The address that will receive the minted tokens.
      * @param _state bool     The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
@@ -441,4 +441,15 @@ contract VNETToken is Ownable, AbstractToken {
         emit BalanceLocked(_to, _lockedAmount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

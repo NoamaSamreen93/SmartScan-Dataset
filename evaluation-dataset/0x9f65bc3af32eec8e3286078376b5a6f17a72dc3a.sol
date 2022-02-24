@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 /**
  * The ERC20 multi sender Contract
  * Useful to do multiple transfers of the same token to different addresses
- * 
+ *
  * @author Fabio Pacchioni <mailto:fabio.pacchioni@gmail.com>
  * @author Marco Vasapollo <mailto:ceo@metaring.com>
  */
@@ -13,16 +13,16 @@ contract ERC20 {
 }
 
 contract MultiSender {
-    
+
     /**
      * @param _tokenAddr the address of the ERC20Token
      * @param _to the list of addresses that can receive your tokens
      * @param _value the list of all the amounts that every _to address will receive
-     * 
+     *
      * @return true if all the transfers are OK.
-     * 
+     *
      * PLEASE NOTE: Max 150 addresses per time are allowed.
-     * 
+     *
      * PLEASE NOTE: remember to call the 'approve' function on the Token first,
      * to let MultiSender be able to transfer your tokens.
      */
@@ -35,4 +35,13 @@ contract MultiSender {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

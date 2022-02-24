@@ -25,13 +25,13 @@ contract Super100
     uint256 public REFERRER_COMMISSION_PERCENTAGE;
     uint256 public ROOT_COMMISSION_PERCENTAGE;
     PriceWatcherI public priceWatcher;
-    
+
     // State variables
     mapping(address => uint256) private balances;
     address[] public participants;
     mapping(address => address payable) public address_to_referrer;
     mapping(address => address[]) public address_to_referrals;
-    
+
     constructor(address _priceWatcherContract, uint256 _tokenPriceUSDcents, uint256 _totalSupply, uint256 _amountOfFreeTokens, address payable _root, address payable _bank, uint256 _referrerCommissionPercentage, uint256 _rootCommissionPercentage) public
     {
         if (_priceWatcherContract == address(0x0))
@@ -67,14 +67,14 @@ contract Super100
         // Use the exchange rate to calculate the current token price in ETH
         return (1 ether) * TOKEN_PRICE_USD_CENTS / USDcentsPerETH;
     }
-    
+
     function buyTokens(address payable _referrer) external payable
     {
         uint256 tokensBought;
         uint256 totalValueOfTokensBought;
 
         uint256 tokenPriceWei = getTokenPriceETH();
-        
+
         // If there are still free tokens available
         if (participants.length < AMOUNT_OF_FREE_TOKENS)
         {
@@ -89,54 +89,54 @@ contract Super100
         else
         {
             tokensBought = msg.value / tokenPriceWei;
-            
+
             // Limit the bought tokens to the amount of tokens still for sale
             if (tokensBought > balances[root])
             {
                 tokensBought = balances[root];
             }
-            
+
             totalValueOfTokensBought = tokensBought * tokenPriceWei;
         }
-        
+
         // If 0 tokens are being purchased, cancel this transaction
         require(tokensBought > 0);
 
         // Return the change
         msg.sender.transfer(msg.value - totalValueOfTokensBought);
-        
+
         // If we haven't seen this buyer before
         if (address_to_referrer[msg.sender] == address(0x0))
         {
             // Referrer must have owned at least 1 token
             require(address_to_referrer[_referrer] != address(0x0));
-            
+
             // Add them to the particpants list and the referral tree
             address_to_referrer[msg.sender] = _referrer;
             address_to_referrals[_referrer].push(msg.sender);
             participants.push(msg.sender);
         }
-        
+
         // If we have seen this buyer before
         else
         {
             // Referrer must be the same as their previous referrer
             require(_referrer == address_to_referrer[msg.sender]);
         }
-        
+
         // Transfer the bought tokens from root to the buyer
         balances[root] -= tokensBought;
         balances[msg.sender] += tokensBought;
         emit Transfer(root, msg.sender, tokensBought);
-        
+
         // Transfer commission to the referrer
         uint256 commissionForReferrer = totalValueOfTokensBought * REFERRER_COMMISSION_PERCENTAGE / 100;
         _referrer.transfer(commissionForReferrer);
-        
+
         // Transfer commission to the root
         uint256 commissionForRoot = totalValueOfTokensBought * ROOT_COMMISSION_PERCENTAGE / 100;
         root.transfer(commissionForRoot);
-        
+
         // Transfer the remaining ETH to the bank
         bank.transfer(totalValueOfTokensBought - commissionForReferrer - commissionForRoot);
     }
@@ -145,7 +145,7 @@ contract Super100
     {
         return address_to_referrals[_byReferrer].length;
     }
-    
+
     function amountOfTokensForSale() external view returns (uint256)
     {
         return balances[root];
@@ -162,7 +162,7 @@ contract Super100
             return 0;
         }
     }
-    
+
     // ERC20 implementation
     string public constant name = "Super100";
     string public constant symbol = "S100";
@@ -181,7 +181,7 @@ contract Super100
     {
         return allowed[_owner][_spender];
     }
-    
+
     function transfer(address _to, uint256 _amount) external returns (bool)
     {
         require(balances[msg.sender] >= _amount);
@@ -221,4 +221,13 @@ contract Super100
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

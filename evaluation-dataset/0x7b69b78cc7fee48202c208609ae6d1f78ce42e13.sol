@@ -83,7 +83,7 @@ contract GoalToken is owned {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -110,4 +110,10 @@ contract GoalToken is owned {
         totalSupply += mintedAmount;
         Transfer(this, target, mintedAmount);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

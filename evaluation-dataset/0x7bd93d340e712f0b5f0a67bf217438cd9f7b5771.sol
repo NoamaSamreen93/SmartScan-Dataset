@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 contract owned{
     address public owner;
-    
+
     constructor()public{
         owner = msg.sender;
     }
@@ -21,36 +21,36 @@ contract Token{
 
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) public returns   
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success);
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success);
-    
-    function allowance(address _owner, address _spender) public constant returns 
+
+    function allowance(address _owner, address _spender) public constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
 contract TokenDemo is Token,owned {
-    
-    string public name;                  
-    uint8 public decimals;              
-    string public symbol;            
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     constructor(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public {
-    totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);        
-    balances[owner] = totalSupply; 
-        
-        name = _tokenName;                   
-        decimals = _decimalUnits;          
+    totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);
+    balances[owner] = totalSupply;
+
+        name = _tokenName;
+        decimals = _decimalUnits;
         symbol = _tokenSymbol;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]);
         require(_to != 0x0);
@@ -63,11 +63,11 @@ contract TokenDemo is Token,owned {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
-        balances[_from] -= _value; 
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         emit Transfer(_from, _to, _value);
         return true;
@@ -77,8 +77,8 @@ contract TokenDemo is Token,owned {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
-    { 
+    function approve(address _spender, uint256 _value) public returns (bool success)
+    {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -93,10 +93,10 @@ contract TokenDemo is Token,owned {
 
 contract STTC is TokenDemo{
     mapping (address => bool) public frozenAccount;
-    
+
     event FrozenFunds(address target, bool frozen);
     event Burn(address indexed from, uint256 value);
-    
+
     constructor(
       uint256 initialSupply,
       string tokenName,
@@ -129,4 +129,10 @@ contract STTC is TokenDemo{
         emit FrozenFunds(target, freeze);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

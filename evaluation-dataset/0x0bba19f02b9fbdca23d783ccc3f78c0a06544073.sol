@@ -8,7 +8,7 @@ contract ERC20 {
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
-    event Transfer(address indexed from, address indexed to, uint256 value);    
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     function allowance(address owner, address spender)
         public view returns (uint256);
@@ -157,7 +157,7 @@ contract MyanmarGoldCoin is ERC20 {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -266,4 +266,15 @@ contract MyanmarGoldCoin is ERC20 {
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

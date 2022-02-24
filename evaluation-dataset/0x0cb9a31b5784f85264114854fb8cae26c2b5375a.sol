@@ -96,12 +96,12 @@ contract BTYCToken is ERC20Interface, Owned {
 	uint256 public buyPrice; //购买价格 多少以太可购买1枚代币 /1000
 	uint256 public sysPrice; //挖矿的衡量值
 	uint256 public sysPer; //挖矿的增量百分比 /100
-	
-	uint256 public onceOuttime; //增量的时间 测试  
+
+	uint256 public onceOuttime; //增量的时间 测试
 	uint256 public onceAddTime; //挖矿的时间 测试
 	uint256 public onceoutTimePer; //增量的百分比 测试
-	
-	
+
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -115,31 +115,31 @@ contract BTYCToken is ERC20Interface, Owned {
 	mapping(address => uint) public cronoutOf;
 	// 记录各个账户的增量时间
 	mapping(address => uint) public cronaddOf;
-	
+
 	 /* 通知 */
 	event FrozenFunds(address target, bool frozen);
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
     constructor() public{
-       
-        
+
+
         sellPrice = 510; //出售价格 1枚代币换多少以太 /1000000
     	buyPrice =  526; //购买价格 多少以太可购买1枚代币 /1000000
     	sysPrice = 766; //挖矿的衡量值
     	sysPer = 225; //挖矿的增量百分比 /100
-    	
-    	onceOuttime = 86400; //增量的时间 正式 
+
+    	onceOuttime = 86400; //增量的时间 正式
     	onceAddTime = 864000; //挖矿的时间 正式
     	onceoutTimePer = 8640000; //增量的百分比 正式
-    	
-    	//onceOuttime = 600; //增量的时间 测试  
+
+    	//onceOuttime = 600; //增量的时间 测试
     	//onceAddTime = 1800; //挖矿的时间 测试
     	//onceoutTimePer = 60000; //增量的百分比 测试
-	
-	
-        
-       
+
+
+
+
     }
 
 
@@ -147,11 +147,11 @@ contract BTYCToken is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
-    
+
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     function canuseOf(address tokenOwner) public view returns (uint balance) {
         return canOf[tokenOwner];
     }
@@ -195,14 +195,14 @@ contract BTYCToken is ERC20Interface, Owned {
         //buyeth(amount);
         emit Transfer(address(0), user, amount);
     }*/
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -213,7 +213,7 @@ contract BTYCToken is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -278,7 +278,7 @@ contract BTYCToken is ERC20Interface, Owned {
 		emit Transfer(this, msg.sender, mintAmount);
 
 	}
-    
+
 	/// 冻结 or 解冻账户
 	function freezeAccount(address target, bool freeze) onlyOwner public {
 		frozenAccount[target] = freeze;
@@ -291,17 +291,17 @@ contract BTYCToken is ERC20Interface, Owned {
 		sysPrice = systyPrice;
 		sysPer = sysPermit;
 	}
-	// 获取价格 
+	// 获取价格
 	function getprice()  public view returns (uint256 bprice,uint256 spice,uint256 sprice,uint256 sper) {
           bprice = buyPrice;
           spice = sellPrice;
           sprice = sysPrice;
           sper = sysPer;
    }
-   
 
 
-    
+
+
 }
 contract BTYC is BTYCToken{
   string public symbol;
@@ -353,15 +353,26 @@ contract BTYC is BTYCToken{
         //address user = msg.sender;
         //canOf[msg.sender] = myuseOf(msg.sender);
         //require(!frozenAccount[msg.sender]);
-        require(canOf[msg.sender] >= amount ); 
+        require(canOf[msg.sender] >= amount );
         balances[msg.sender] -= amount;
         canOf[msg.sender] -= amount;
         uint moneys = amount / sellPrice;
         msg.sender.transfer(moneys);
         //canOf[user] -= amount;
-        return true;              
+        return true;
     }*/
-    
 
-  
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

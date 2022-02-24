@@ -274,7 +274,7 @@ contract NXMToken is IERC20 {
     }
 
     /**
-    * @dev change operator address 
+    * @dev change operator address
     * @param _newOperator address of new operator
     */
     function changeOperator(address _newOperator) public onlyOperator returns (bool) {
@@ -321,7 +321,7 @@ contract NXMToken is IERC20 {
 
         require(isLockedForMV[msg.sender] < now); // if not voted under governance
         require(value <= _balances[msg.sender]);
-        _transfer(to, value); 
+        _transfer(to, value);
         return true;
     }
 
@@ -359,7 +359,7 @@ contract NXMToken is IERC20 {
     }
 
     /**
-     * @dev Lock the user's tokens 
+     * @dev Lock the user's tokens
      * @param _of user's address.
      */
     function lockForMemberVote(address _of, uint _days) public onlyOperator {
@@ -441,4 +441,13 @@ contract NXMToken is IERC20 {
         value);
         _burn(account, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

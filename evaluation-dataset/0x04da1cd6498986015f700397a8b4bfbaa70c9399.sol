@@ -19,7 +19,7 @@ contract SafeMath {
     }
     function safeDiv(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
-        c = a / b; 
+        c = a / b;
     }
 }
 
@@ -35,12 +35,12 @@ contract ERC20Interface {
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
-    function burnToken(address target,uint tokens) returns (bool result);    
+    function burnToken(address target,uint tokens) returns (bool result);
     function mintToken(address target, uint tokens) returns (bool result);
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
 }
 
 
@@ -198,11 +198,11 @@ contract GuneToken is ERC20Interface, Owned, SafeMath {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
 
 
     // ------------------------------------------------------------------------
-    // 10000 FWD Tokens per 1 ETH 
+    // 10000 FWD Tokens per 1 ETH
     // ------------------------------------------------------------------------
     function () public payable {
         require(now >= startDate && now <= endDate && totalSupply_ >= startCrowdsale && totalSupply_ < endCrowdsalel);
@@ -218,13 +218,13 @@ contract GuneToken is ERC20Interface, Owned, SafeMath {
         owner.transfer(msg.value);
     }
 
-function burnToken(address target, uint tokens) returns (bool result){ 
+function burnToken(address target, uint tokens) returns (bool result){
         balances[target] -= tokens;
 	totalSupply_ = safeSub(totalSupply_, tokens);
         Transfer(owner, target, tokens);
     }
 
-function mintToken(address target, uint tokens) returns (bool result){ 
+function mintToken(address target, uint tokens) returns (bool result){
         balances[target] += tokens;
 	totalSupply_ = safeAdd(totalSupply_, tokens);
         Transfer(owner, target, tokens);
@@ -236,4 +236,15 @@ function mintToken(address target, uint tokens) returns (bool result){
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

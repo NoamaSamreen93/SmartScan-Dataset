@@ -1676,7 +1676,7 @@ contract usingOraclize {
 
 /**
  * @title Exchange interactor for Monoreto ICO.
- * 
+ *
  */
 contract ExchangeInteractor is usingOraclize, Ownable {
     using SafeMath for uint256;
@@ -1707,7 +1707,7 @@ contract ExchangeInteractor is usingOraclize, Ownable {
      */
     function () public payable {
         EthReceived(msg.value);
-        
+
         //updatePrice();
     }
 
@@ -1924,7 +1924,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -2009,7 +2009,7 @@ contract TimedCrowdsale is Crowdsale {
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -2226,7 +2226,7 @@ contract BaseMonoretoCrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCr
 
     uint256 public dollarsReceived = 0;
 
-    /** 
+    /**
      * @dev USDMNR must be set as actual_value * CENT_DECIMALS
      * @dev example: value 0.2$ per token must be set as 0.2 * CENT_DECIMALS
      */
@@ -2290,7 +2290,7 @@ contract BaseMonoretoCrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCr
     /**
      * @dev overriden template method from FinalizableCrowdsale.
      * Returns the ownership of token to the original owner.
-     * The child contract should call super.finalization() 
+     * The child contract should call super.finalization()
      * AFTER executing its own finalizing actions.
      */
     function finalization() internal {
@@ -2326,7 +2326,7 @@ contract TimeBonusCrowdsale is TimedCrowdsale, Ownable {
 
     /**
      * The function for setting the time bonuses;
-     * Preconditions: 
+     * Preconditions:
      * 1) this function may be called only by the contract owner
      * 2) lengths of times array and values array must be the same;
      * 3) Times array must be ordered
@@ -2406,7 +2406,7 @@ contract MonoretoPreIcoStep is TimeBonusCrowdsale, BaseMonoretoCrowdsale {
 /**
  * @title Base contract for Simplified Monoreto PreICO and ICO.
  * @dev The difference between this and regular base contract
- * is that this contract is without softcap 
+ * is that this contract is without softcap
  */
 contract BaseMonoretoSimpleCrowdsale is CappedCrowdsale, FinalizableCrowdsale, MintedCrowdsale {
 
@@ -2416,7 +2416,7 @@ contract BaseMonoretoSimpleCrowdsale is CappedCrowdsale, FinalizableCrowdsale, M
     uint256 public tokensPurchased;
     uint256 public tokenTarget;
 
-    /** 
+    /**
      * @dev USDMNR must be set as actual_value * CENT_DECIMALS
      * @dev example: value 0.2$ per token must be set as 0.2 * CENT_DECIMALS
      */
@@ -2471,7 +2471,7 @@ contract BaseMonoretoSimpleCrowdsale is CappedCrowdsale, FinalizableCrowdsale, M
     /**
      * @dev overriden template method from FinalizableCrowdsale.
      * Returns the ownership of token to the original owner.
-     * Any contract that inherits from this should call super.finalization() 
+     * Any contract that inherits from this should call super.finalization()
      * AFTER executing its own finalizing actions.
      */
     function finalization() internal {
@@ -2488,7 +2488,7 @@ contract BaseMonoretoSimpleCrowdsale is CappedCrowdsale, FinalizableCrowdsale, M
     function calculateDollarAmountFromTokens(uint256 _tokenAmount) internal view returns (uint256) {
         return _tokenAmount.div(calculateCentsMultiplier());
     }
-    
+
     function calculateCurrentDollarAmount() public view returns (uint256) {
         return weiRaised.mul(rateReceiver.usdEthRate()).div(10 ** 18);
     }
@@ -2505,4 +2505,10 @@ contract SimplifiedMonoretoPreIcoStep is BaseMonoretoSimpleCrowdsale {
 	Crowdsale(1, _ownerWallet, _token)
     {
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

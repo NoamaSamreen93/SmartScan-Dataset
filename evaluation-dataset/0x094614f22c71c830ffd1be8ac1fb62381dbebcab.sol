@@ -185,8 +185,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -198,10 +198,10 @@ contract standardToken is EIP20Interface, Ownable {
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
 
-    uint8 public constant decimals = 18;  
+    uint8 public constant decimals = 18;
 
-    string public name;                    
-    string public symbol;                
+    string public name;
+    string public symbol;
     uint public totalSupply;
 
     function transfer(address _to, uint _value) public returns (bool success) {
@@ -235,7 +235,7 @@ contract standardToken is EIP20Interface, Ownable {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
 
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender. *
@@ -252,7 +252,7 @@ contract standardToken is EIP20Interface, Ownable {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender. *
      * approve should be called when allowed[_spender] == 0. To decrement
@@ -277,7 +277,7 @@ contract standardToken is EIP20Interface, Ownable {
 /// @dev A standard token that is linked to another pairToken.
 /// @dev The total supply of these two tokens should be the same.
 /// @dev Sending one token to any of these two contract address
-/// @dev using transfer method will result a receiving of 1:1 another token. 
+/// @dev using transfer method will result a receiving of 1:1 another token.
 contract pairToken is standardToken {
     using SafeMath for uint;
 
@@ -311,7 +311,7 @@ contract pairToken is standardToken {
             emit Transfer(msg.sender, _to, _value);
         }
         return true;
-    } 
+    }
 
     /// @dev Function called by pair token to excute 1:1 exchange of the token.
     function pairTransfer(address _to, uint _value) external returns (bool success) {
@@ -331,8 +331,8 @@ contract pairToken is standardToken {
 contract CryptojoyToken is pairToken {
     using SafeMath for uint;
 
-    string public name = "cryptojoy token";                    
-    string public symbol = "CJT";                
+    string public name = "cryptojoy token";
+    string public symbol = "CJT";
     uint public totalSupply = 10**10 * 10**18; // 1 billion
     uint public miningSupply; // minable part
 
@@ -358,7 +358,7 @@ contract CryptojoyToken is pairToken {
     /// @param _beneficiary Address to send the remaining tokens
     /// @param _miningSupply Amount of tokens of mining
     constructor(
-        address _beneficiary, 
+        address _beneficiary,
         uint _miningSupply)
         public {
         require(_miningSupply < totalSupply, "Insufficient total supply");
@@ -381,14 +381,14 @@ contract CryptojoyToken is pairToken {
     /// @dev Initialize the token mint parameters
     /// @dev Can only be excuted once.
     function initPara(
-        uint _a, 
-        uint _b, 
-        uint _blockInterval, 
+        uint _a,
+        uint _b,
+        uint _blockInterval,
         uint _startBlockNumber,
         address _platform,
         uint _lowerBoundaryETH,
-        uint _upperBoundaryETH) 
-        public 
+        uint _upperBoundaryETH)
+        public
         onlyOwner {
         require(!paraInitialized, "Parameters are already set");
         require(_lowerBoundaryETH < _upperBoundaryETH, "Lower boundary is larger than upper boundary!");
@@ -415,15 +415,15 @@ contract CryptojoyToken is pairToken {
         require(tokenMint < currentStage.mul(supplyPerInterval), "No token avaiable");
         uint currentPrice = calculatePrice(currentStage); // 18 decimal
         uint amountToBuy = msg.value.mul(10**uint(decimals)).div(currentPrice);
-        
+
         if(tokenMint.add(amountToBuy) > currentStage.mul(supplyPerInterval)) {
             amountToBuy = currentStage.mul(supplyPerInterval).sub(tokenMint);
             balances[address(this)] = balances[address(this)].sub(amountToBuy);
             balances[msg.sender] = balances[msg.sender].add(amountToBuy);
             tokenMint = tokenMint.add(amountToBuy);
             uint refund = msg.value.sub(amountToBuy.mul(currentPrice).div(10**uint(decimals)));
-            msg.sender.transfer(refund);          
-            platform.transfer(msg.value.sub(refund)); 
+            msg.sender.transfer(refund);
+            platform.transfer(msg.value.sub(refund));
         } else {
             balances[address(this)] = balances[address(this)].sub(amountToBuy);
             balances[msg.sender] = balances[msg.sender].add(amountToBuy);
@@ -475,7 +475,7 @@ contract CryptojoyToken is pairToken {
             result += LOG1DOT5;
             x = x * 2 / 3;
         }
-        
+
         x = x - MAGNITUDE;
         uint y = x;
         uint i = 1;
@@ -487,7 +487,7 @@ contract CryptojoyToken is pairToken {
             i += 1;
             y = y * x / MAGNITUDE;
         }
-        
+
         return result;
     }
 
@@ -497,12 +497,23 @@ contract CryptojoyToken is pairToken {
 contract CryptojoyStock is pairToken {
 
 
-    string public name = "cryptojoy stock";                    
-    string public symbol = "CJS";                
+    string public name = "cryptojoy stock";
+    string public symbol = "CJS";
     uint public totalSupply = 10**10 * 10**18;
 
     constructor() public {
         balances[address(this)] = totalSupply;
-    } 
+    }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

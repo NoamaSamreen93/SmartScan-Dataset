@@ -15,22 +15,22 @@ pragma solidity ^0.4.11;
 		- Set a new owner
 		- Controll the assets of the Registrar (withdraw ETH, transfer, sell, burn pieces owned by the Registrar)
 		- The plan is to replace the controller contract with a DAO in preperation for a possible ICO
-	
+
 	Registrar:
 		- The Registrar contract atcs as the central registry for all sha256 hashes in the Ethart factory contract network.
 		- Approved Factory Contracts can register sha256 hashes using the Registrar interface.
 		- 2.5% of the art produced and 2.5% of turnover of the contract network will be transfered to the Registrar.
-	
+
 	Factory Contracts:
 		- Factory Contracts can spawn Artwork Contracts in line with artists specifications
 		- Factory Contracts will only spawn Artwork Contracts who's sha256 hashes are unique per the Registrar's sha256 registry
 		- Factory Contracts will register every new Artwork Contract with it's details with the Registrar contract
-	
+
 	Artwork Contracts:
 		- Artwork Contracts act as minimalist decentralized exchanges for their pieces in line with specified conditions
-		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value 
+		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value
 		- Artwork Contracts can be interacted with by the Controller via the Registrar using their interfaces to transfer, sell, burn etc pieces
-	
+
 	(c) Stefan Pernar 2017 - all rights reserved
 	(c) ERC20 functions BokkyPooBah 2017. The MIT Licence.
 
@@ -72,7 +72,7 @@ contract Factory {
 
   // useful to know the row count in artworks index
 
-  function getContractCount() 
+  function getContractCount()
     public
     constant
     returns(uint contractCount)
@@ -197,7 +197,7 @@ The owner of a piece can burn it, removing it permanently from the pool of avail
 	string public proofLink;					// Link to the creation proof by the artist -> this has to be done after contract creation
 	string public customText;					// Custom text
 	uint256 public ownerCommission;				// Percent given to the contract owner for every sale - must be >=0 && <=975 1000 = 100%.
-	
+
 	uint256 public lowestAskPrice;				// The lowest price an owner of a piece is willing to sell it for.
 	address public lowestAskAddress;			// The address of the lowest ask.
 	uint256 public lowestAskTime;				// The time by which the ask can be withdrawn.
@@ -244,7 +244,7 @@ The owner of a piece can burn it, removing it permanently from the pool of avail
 		fileLink = _fileLink;
 		customText = _customText;
 		ownerCommission = _ownerCommission;
-		activationTime = now;	
+		activationTime = now;
 	}
 
     modifier onlyBy(address _account)
@@ -291,7 +291,7 @@ The owner of a piece can burn it, removing it permanently from the pool of avail
 		}
 
 	function transfer(address _to, uint256 _amount) notLocked(msg.sender, _amount) returns (bool success) {
-		if (piecesOwned[msg.sender] >= _amount 
+		if (piecesOwned[msg.sender] >= _amount
 			&& _amount > 0
 			&& piecesOwned[_to] + _amount > piecesOwned[_to]
 			&& _to != 0x0)																// use burn() instead
@@ -429,7 +429,7 @@ The owner of a piece can burn it, removing it permanently from the pool of avail
 			piecesOwned[highestBidAddress]++;
 			Interface a = Interface(registrar);
 			patronReward = highestBidPrice  / 5 * 2;
-			a.issuePatrons(highestBidAddress, patronReward);				
+			a.issuePatrons(highestBidAddress, patronReward);
 			piecesOwned[msg.sender]--;
 			pieceSold (msg.sender, highestBidAddress, highestBidPrice);
 			pieceWanted = false;
@@ -462,4 +462,15 @@ The owner of a piece can burn it, removing it permanently from the pool of avail
 		else {throw;}
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

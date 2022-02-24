@@ -918,7 +918,7 @@ contract IWasFirstFungibleToken is ERC721Token("IWasFirstFungible", "IWX"), Owna
     mapping (string => uint256) internal tokenIdOfHash;
     uint256 internal tokenIdSeq = 1;
     mapping (uint256 => TokenMetaData[]) internal tokenMetaData;
-    
+
     function hashExists(string hash) public view returns (bool) {
         return tokenIdOfHash[hash] != 0;
     }
@@ -1072,7 +1072,7 @@ contract IWasFirstShareToken is StandardToken, Ownable{
         uint256 _value = getWithdrawAmount(msg.sender);
         IWasFirstServiceToken serviceToken = IWasFirstServiceToken(_serviceTokenAddress);
         require(_value <= serviceToken.balanceOf(address(this)));
-        
+
         delete txStates[msg.sender];
         serviceToken.transferByRelatedToken(address(this), msg.sender, _value);
 
@@ -1083,4 +1083,15 @@ contract IWasFirstShareToken is StandardToken, Ownable{
         IWasFirstFungibleToken fToken = IWasFirstFungibleToken(fungibleTokenAddress);
         return fToken.getNumberOfTokens()*(10**18);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

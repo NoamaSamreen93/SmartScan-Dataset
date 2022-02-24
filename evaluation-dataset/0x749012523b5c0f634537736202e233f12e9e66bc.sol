@@ -83,7 +83,7 @@ contract ERC20 is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
@@ -123,7 +123,7 @@ contract ERC20 is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyCLevel returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(ceoAddress, tokens);
     }
-    
+
     // Payout
     function payout(uint amount) public onlyCLevel {
         if (amount > this.balance)
@@ -150,27 +150,27 @@ contract ERC721 is ERC20 {
     }
 
     uint[] public tokenList;
-    
+
     struct TOKEN {
-        
+
         address owner;
         address approved;
-        
+
         uint price;
         uint lastPrice;
-        
+
         uint mSpeed;
 
         uint mLastPayoutBlock;
     }
 
     mapping(uint => TOKEN) public token;
-    
+
     event Birth(uint indexed tokenId, uint startPrice);
     event TokenSold(uint indexed tokenId, uint price, address indexed prevOwner, address indexed winner);
     event TransferToken(address indexed from, address indexed to, uint indexed tokenId);
     event ApprovalToken(address indexed owner, address indexed approved, uint indexed tokenId);
-    
+
     function approveToken(address _to, uint _tokenId) public {
         require(_ownsToken(msg.sender, _tokenId));
         token[_tokenId].approved = _to;
@@ -220,7 +220,7 @@ contract ERC721 is ERC20 {
     }
     function tokensOfOwner(address _owner) public view returns(uint[] ownerTokens) {
         uint tokenCount = tokenBalanceOf(_owner);
-        
+
         if (tokenCount == 0) return new uint[](0);
 
         uint[] memory result = new uint[](tokenCount);
@@ -228,7 +228,7 @@ contract ERC721 is ERC20 {
         uint resultIndex = 0;
         uint tokenIndex;
         uint tokenId;
-        
+
         for (tokenIndex = 0; tokenIndex < totalTokens; tokenIndex++) {
             tokenId = tokenList[tokenIndex];
             if (token[tokenId].owner == _owner) {
@@ -243,17 +243,17 @@ contract ERC721 is ERC20 {
     }
 
     // MIN(A * PRICE, MAX(B * PRICE, 100*PRICE + C)) / 100
-    
+
     uint public priceFactorA = 200;
     uint public priceFactorB = 120;
     uint public priceFactorC = 16 * (10**18);
-    
+
     function changePriceFactor(uint a_, uint b_, uint c_) public onlyCLevel {
         priceFactorA = a_;
         priceFactorB = b_;
         priceFactorC = c_;
     }
-    
+
     function getMaxPrice(uint _tokenId) public view returns (uint) {
         uint price = token[_tokenId].lastPrice.mul(priceFactorB);
         uint priceLow = token[_tokenId].lastPrice.mul(100).add(priceFactorC);
@@ -262,23 +262,23 @@ contract ERC721 is ERC20 {
             price = priceLow;
         if (price > priceHigh)
             price = priceHigh;
-            
+
         price = price / (10**18);
         price = price.mul(10**16); // round to x.xx ETH
-        
+
         return price;
     }
-    
+
     function changeTokenPrice(uint newPrice, uint _tokenId) public {
         require(
             (_ownsToken(msg.sender, _tokenId))
-            || 
+            ||
             ((_ownsToken(address(0), _tokenId)) && ((msg.sender == ceoAddress) || (msg.sender == cooAddress)))
         );
-        
+
         newPrice = newPrice / (10**16);
         newPrice = newPrice.mul(10**16); // round to x.xx ETH
-        
+
         require(newPrice > 0);
 
         require(newPrice <= getMaxPrice(_tokenId));
@@ -287,37 +287,37 @@ contract ERC721 is ERC20 {
 }
 
 contract GodPowerCoin is ERC721 {
-    
+
     function GodPowerCoin() public {
         balances[msg.sender] = _totalSupply;
         Transfer(address(0), msg.sender, _totalSupply);
     }
-    
+
     uint public divCutPool = 0;
     uint public divCutMaster = 10; // to master card
     uint public divCutAdmin = 30;
-    
+
     uint public divPoolAmt = 0;
     uint public divMasterAmt = 0;
-    
+
     mapping(address => uint) public dividend;
-    
+
     function withdrawDividend() public {
         require(dividend[msg.sender] > 0);
         msg.sender.transfer(dividend[msg.sender]);
         dividend[msg.sender] = 0;
     }
-    
+
     function setCut(uint admin_, uint pool_, uint master_) public onlyCLevel {
         divCutAdmin = admin_;
         divCutPool = pool_;
         divCutMaster = master_;
     }
-    
+
     function purchase(uint _tokenId, uint _newPrice) public payable {
         address oldOwner = token[_tokenId].owner;
         uint sellingPrice = token[_tokenId].price;
-        
+
         require(oldOwner != msg.sender);
         require(msg.sender != address(0));
 
@@ -331,24 +331,24 @@ contract GodPowerCoin is ERC721 {
         uint payment = sellingPrice.mul(1000 - divCutPool - divCutAdmin - divCutMaster) / 1000;
         if (divCutPool > 0)
             divPoolAmt = divPoolAmt.add(sellingPrice.mul(divCutPool) / 1000);
-        
+
         divMasterAmt = divMasterAmt.add(sellingPrice.mul(divCutMaster) / 1000);
-        
+
         token[_tokenId].lastPrice = sellingPrice;
 
         uint maxPrice = getMaxPrice(_tokenId);
         if ((_newPrice > maxPrice) || (_newPrice == 0))
             _newPrice = maxPrice;
-            
+
         token[_tokenId].price = _newPrice;
 
         _transferToken(oldOwner, msg.sender, _tokenId);
-        
+
         if (_tokenId % 10000 > 0) {
             address MASTER = token[(_tokenId / 10000).mul(10000)].owner;
             dividend[MASTER] = dividend[MASTER].add(sellingPrice.mul(divCutMaster) / 1000);
         }
-        
+
         oldOwner.transfer(payment);
 
         if (purchaseExcess > 0)
@@ -356,19 +356,19 @@ contract GodPowerCoin is ERC721 {
 
         TokenSold(_tokenId, sellingPrice, oldOwner, msg.sender);
     }
-    
+
     function _createToken(uint tokenId, uint _price, address _owner, uint _mBaseSpeed) internal {
-        
+
         token[tokenId].owner = _owner;
         token[tokenId].price = _price;
         token[tokenId].lastPrice = _price;
-        
+
         token[tokenId].mSpeed = _mBaseSpeed;
 
         token[tokenId].mLastPayoutBlock = block.number;
-        
+
         mSumRawSpeed = mSumRawSpeed.add(getMiningRawSpeed(tokenId));
-        
+
         Birth(tokenId, _price);
         tokenList.push(tokenId);
     }
@@ -403,24 +403,24 @@ contract GodPowerCoin is ERC721 {
             TransferToken(0, _owner, tokenId[i]);
         }
     }
-    
+
     event MiningUpgrade(address indexed sender, uint indexed token, uint newLevelSpeed);
 
     // ETH: 6000 blocks per day, 5 ETH per block
-    
+
     uint public mSumRawSpeed = 0;
 
     uint public mCoinPerBlock = 50;
-    
+
     uint public mUpgradeCostFactor = mCoinPerBlock * 6000 * WAD;
     uint public mUpgradeSpeedup = 1040; // = * 1.04
-    
+
     function adminSetMining(uint mCoinPerBlock_, uint mUpgradeCostFactor_, uint mUpgradeSpeedup_) public onlyCLevel {
         mCoinPerBlock = mCoinPerBlock_;
         mUpgradeCostFactor = mUpgradeCostFactor_;
         mUpgradeSpeedup = mUpgradeSpeedup_;
     }
-    
+
     function getMiningRawSpeed(uint id) public view returns (uint) {
         return token[id].mSpeed;
     }
@@ -434,11 +434,11 @@ contract GodPowerCoin is ERC721 {
         uint cost = getMiningUpgradeCost(id);
         balances[msg.sender] = balances[msg.sender].sub(cost);
         _totalSupply = _totalSupply.sub(cost);
-        
+
         mSumRawSpeed = mSumRawSpeed.sub(getMiningRawSpeed(id));
         token[id].mSpeed = token[id].mSpeed.mul(mUpgradeSpeedup) / 1000;
         mSumRawSpeed = mSumRawSpeed.add(getMiningRawSpeed(id));
-        
+
         MiningUpgrade(msg.sender, id, token[id].mSpeed);
     }
     function upgradeMiningMultipleTimes(uint id, uint n) public {
@@ -446,7 +446,7 @@ contract GodPowerCoin is ERC721 {
             uint cost = getMiningUpgradeCost(id);
             balances[msg.sender] = balances[msg.sender].sub(cost);
             _totalSupply = _totalSupply.sub(cost);
-        
+
             mSumRawSpeed = mSumRawSpeed.sub(getMiningRawSpeed(id));
             token[id].mSpeed = token[id].mSpeed.mul(mUpgradeSpeedup) / 1000;
             mSumRawSpeed = mSumRawSpeed.add(getMiningRawSpeed(id));
@@ -471,8 +471,24 @@ contract GodPowerCoin is ERC721 {
         token[id].mLastPayoutBlock = block.number;
         address owner = token[id].owner;
         uint coinsMined = getMiningRawSpeed(id).mul(mCoinPerBlock).mul(blocks).mul(WAD) / mSumRawSpeed; // mul WAD !
-        
+
         balances[owner] = balances[owner].add(coinsMined);
         _totalSupply = _totalSupply.add(coinsMined);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

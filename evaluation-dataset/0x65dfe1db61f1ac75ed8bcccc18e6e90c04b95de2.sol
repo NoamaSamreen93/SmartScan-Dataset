@@ -138,12 +138,12 @@ library SafeMath {
 }
 
 contract distribution is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     event OnDepositeReceived(address investorAddress, uint value);
     event OnPaymentSent(address investorAddress, uint value);
-    
+
     uint public minDeposite = 10000000000000000; // 0.01 eth
     uint public maxDeposite = 10000000000000000000000; // 10000 eth
     uint public currentPaymentIndex = 0;
@@ -151,54 +151,54 @@ contract distribution is Ownable {
     uint public amountRaised;
     uint public depositorsCount;
     uint public percent = 120;
-    
+
     address distributorWallet;    // wallet for initialize distribution
-    address promoWallet;    
+    address promoWallet;
     address wallet1;
     address wallet2;
     address wallet3;
-    
+
     struct Deposite {
         address depositor;
         uint amount;
         uint depositeTime;
         uint paimentTime;
     }
-    
+
     // list of all deposites
     Deposite[] public deposites;
     // list of deposites for 1 user
     mapping ( address => uint[]) public depositors;
-    
+
     modifier onlyDistributor () {
         require (msg.sender == distributorWallet);
         _;
     }
-    
+
     function setDistributorAddress(address newDistributorAddress) public onlyOwner {
         require (newDistributorAddress!=address(0));
         distributorWallet = newDistributorAddress;
     }
-    
+
     function setNewMinDeposite(uint newMinDeposite) public onlyOwner {
         minDeposite = newMinDeposite;
     }
-    
+
     function setNewMaxDeposite(uint newMaxDeposite) public onlyOwner {
         maxDeposite = newMaxDeposite;
     }
-    
+
     function setNewWallets(address newWallet1, address newWallet2, address newWallet3) public onlyOwner {
         wallet1 = newWallet1;
         wallet2 = newWallet2;
         wallet3 = newWallet3;
     }
-    
+
     function setPromoWallet(address newPromoWallet) public onlyOwner {
         require (newPromoWallet != address(0));
         promoWallet = newPromoWallet;
     }
-    
+
 
     constructor () public {
         distributorWallet = address(0x494A7A2D0599f2447487D7fA10BaEAfCB301c41B);
@@ -206,7 +206,7 @@ contract distribution is Ownable {
         wallet1 = address(0xBaa2CB97B6e28ef5c0A7b957398edf7Ab5F01A1B);
         wallet2 = address(0xFDd46866C279C90f463a08518e151bC78A1a5f38);
         wallet3 = address(0xdFa5662B5495E34C2aA8f06Feb358A6D90A6d62e);
-        
+
     }
 
 
@@ -218,40 +218,40 @@ contract distribution is Ownable {
         depositors[msg.sender].push(deposites.length - 1);
         amountForDistribution = amountForDistribution.add(msg.value);
         amountRaised = amountRaised.add(msg.value);
-        
+
         emit OnDepositeReceived(msg.sender,msg.value);
     }
-    
+
     function distribute (uint numIterations) public onlyDistributor {
-        
+
         promoWallet.transfer(amountForDistribution.mul(6).div(100));
         distributorWallet.transfer(amountForDistribution.mul(1).div(100));
         wallet1.transfer(amountForDistribution.mul(1).div(100));
         wallet2.transfer(amountForDistribution.mul(1).div(100));
         wallet3.transfer(amountForDistribution.mul(1).div(100));
-        
+
         uint i = 0;
         uint toSend = deposites[currentPaymentIndex].amount.mul(percent).div(100);    // 120% of user deposite
-        
+
         while ( (i <= numIterations) && ( address(this).balance > toSend)  ) {
             deposites[currentPaymentIndex].depositor.transfer(toSend);
             deposites[currentPaymentIndex].paimentTime = now;
             emit OnPaymentSent(deposites[currentPaymentIndex].depositor,toSend);
-            
+
             //amountForDistribution = amountForDistribution.sub(toSend);
             currentPaymentIndex = currentPaymentIndex.add(1);
             i = i.add(1);
             toSend = deposites[currentPaymentIndex].amount.mul(percent).div(100);    // 120% of user deposite
         }
-        
+
         amountForDistribution = 0;
     }
-    
+
     // get all depositors count
     function getAllDepositorsCount() public view returns(uint) {
         return depositorsCount;
     }
-    
+
     function getAllDepositesCount() public view returns (uint) {
         return deposites.length;
     }
@@ -268,12 +268,12 @@ contract distribution is Ownable {
     function getDepositesCount(address depositor) public view returns (uint) {
         return depositors[depositor].length;
     }
-    
+
     // how much raised
     function getAmountRaised() public view returns (uint) {
         return amountRaised;
     }
-    
+
     // lastIndex from the end of payments lest (0 - last payment), returns: address of depositor, payment time, payment amount
     function getLastPayments(uint lastIndex) public view returns (address, uint, uint) {
         uint depositeIndex = currentPaymentIndex.sub(lastIndex).sub(1);
@@ -291,13 +291,29 @@ contract distribution is Ownable {
     function getDepositeTime(address depositor, uint depositeNumber) public view returns(uint) {
         return deposites[depositors[depositor][depositeNumber]].depositeTime;
     }
-    
+
     function getPaimentTime(address depositor, uint depositeNumber) public view returns(uint) {
         return deposites[depositors[depositor][depositeNumber]].paimentTime;
     }
-    
+
     function getPaimentStatus(address depositor, uint depositeNumber) public view returns(bool) {
         if ( deposites[depositors[depositor][depositeNumber]].paimentTime == 0 ) return false;
         else return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -217,7 +217,7 @@ contract ProvenanceDocuments is Ownable, SuperOwner{
     function typeExist(bytes32 hash_) public view returns (bool){
         return document_types_[hash_].exist;
     }
-    
+
     function typeNameExist(string memory name) public view returns (bool){
         bytes32 hash_ = keccak256(abi.encodePacked(name));
         return typeExist(hash_);
@@ -248,8 +248,8 @@ contract ProvenanceDocuments is Ownable, SuperOwner{
 
     function getDocumentVersion(
         bytes32 type_,
-        uint256 version) 
-        public view onlyExistentType(type_) onlyExistentTypeVersion(type_, version) 
+        uint256 version)
+        public view onlyExistentType(type_) onlyExistentTypeVersion(type_, version)
     returns(
         string memory name,
         bytes32 hash_,
@@ -276,7 +276,7 @@ contract ProvenanceDocuments is Ownable, SuperOwner{
         hash_ = document.hash_;
         createdAt = document.createdAt;
     }
-    
+
     // Public
 
     function addType(string memory name) public onlyOwner onlyNonexistentTypeName(name){
@@ -310,4 +310,13 @@ contract ProvenanceDocuments is Ownable, SuperOwner{
         );
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

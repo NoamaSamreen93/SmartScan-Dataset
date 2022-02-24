@@ -117,7 +117,7 @@ contract ERC20Interface {
 
 contract Crowdsale is ReentrancyGuard {
     using SafeMath for uint256;
-    
+
     address public manager;
     address payable public returnWallet;
     uint256 public etherEuroRate;
@@ -126,9 +126,9 @@ contract Crowdsale is ReentrancyGuard {
     uint256 public minWeiValue = 10**17;
 
     constructor (
-            uint256 rate, 
-            address payable wallet, 
-            address contractManager, 
+            uint256 rate,
+            address payable wallet,
+            address contractManager,
             ERC20Interface token
                 ) public {
         require(rate > 0);
@@ -141,13 +141,13 @@ contract Crowdsale is ReentrancyGuard {
         returnWallet = wallet;
         _token = token;
     }
-    
+
     modifier restricted(){
         require(msg.sender == manager );
         _;
     }
 
-    
+
     function buyTokens(address beneficiary) public nonReentrant payable {
         uint256 weiAmount = msg.value;
         _preValidatePurchase(beneficiary, weiAmount);
@@ -173,12 +173,12 @@ contract Crowdsale is ReentrancyGuard {
         require(newManager != address(0));
         manager=newManager;
     }
-    
+
     function updateRate(uint256 newEtherEuroRate) public restricted{
         require(newEtherEuroRate > 0);
         etherEuroRate=newEtherEuroRate;
     }
-    
+
     /**
      * set the limiti in ether
     */
@@ -186,38 +186,47 @@ contract Crowdsale is ReentrancyGuard {
         require(limitEther>0);
         safetyLimit=limitEther.mul(10**18);
     }
-    
+
     function getNumberOfWeiTokenPerWei(uint256 weiToConvert) public view returns(uint256){
         require(weiToConvert > 0);
         require(weiToConvert < safetyLimit);
         return weiToConvert.mul(etherEuroRate.div(2));
     }
-    
+
     function setMinWeiValue(uint256 minWei) public restricted{
         require(minWei > 10);
         minWeiValue = minWei;
     }
-    
+
     function _forwardFunds() internal {
         returnWallet.transfer(msg.value);
     }
-    
+
     function setReturnWallet(address payable _wallet) public restricted{
         require(_wallet != address(0));
         returnWallet=_wallet;
     }
-    
+
     function reclaimToken() public restricted{
         require(manager!=address(0));
         _token.transfer(manager,_token.balanceOf(address(this)));
     }
-    
+
     function getContractBalance() public view returns(uint256){
         return (_token.balanceOf(address(this)));
     }
-    
+
     function getCurrentTokenContract() public view returns(address){
         return address(_token);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

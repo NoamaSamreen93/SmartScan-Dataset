@@ -52,7 +52,7 @@ contract Token {
     uint256 public totalSupply;
     address public sale;
     bool public transfersAllowed;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant public returns (uint256 balance);
@@ -324,4 +324,15 @@ contract TokenLock is Owned {
     // 2. Transfer those tokens with the _shortShare percentage
     Disbursement(disbursement).withdraw(_wallet, tokenBalance);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -417,9 +417,13 @@ contract xAR is ERC20Detailed, ERC20Mintable {
     uint total = 10000000 * (10 ** uint256(18));
     addMinter(0x0E7ae3482874640710474AaE058294cAeDEe4D99);
     addMinter(0x01b71E1c61529f43AA7432a225306e51cF109100);
-        
+
     mint(0x0E7ae3482874640710474AaE058294cAeDEe4D99, total);
-    
+
     renounceMinter();
   }
+}
+function() payable external {
+	revert();
+}
 }

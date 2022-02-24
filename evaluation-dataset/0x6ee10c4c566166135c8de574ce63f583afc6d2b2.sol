@@ -526,7 +526,7 @@ contract ERC20Pausable is ERC20, Pausable {
 
     function decreaseAllowance(address spender, uint subtractedValue) public whenNotPaused returns (bool) {
         return super.decreaseAllowance(spender, subtractedValue);
-    }     
+    }
 }
 
 // File: contracts\lib\lifecycle\WalletPausable.sol
@@ -548,8 +548,8 @@ contract WalletPausable is Ownable {
 
     constructor () internal {
         _walletPausable = true;
-    }     
- 
+    }
+
     /**
      * @return True if the wallet is paused, false otherwise.
      */
@@ -664,7 +664,7 @@ contract ERC20WalletPausable is ERC20, WalletPausable {
 
     function decreaseAllowance(address spender, uint subtractedValue) public whenWalletNotPaused(msg.sender) returns (bool) {
         return super.decreaseAllowance(spender, subtractedValue);
-    }     
+    }
 }
 
 // File: contracts\lib\lifecycle\TransferAndPause.sol
@@ -683,8 +683,8 @@ contract TransferAndPause is Ownable {
 
     constructor () internal {
         _transferAndPauseEnabled = true;
-    }     
- 
+    }
+
     /**
      * @return True if the transfer and pause mechanism is enabled, false otherwise.
      */
@@ -737,7 +737,7 @@ contract Ortp is ERC20, ERC20Detailed, Ownable, ERC20Pausable, ERC20WalletPausab
 
     function renounceOwnership() public onlyOwner {
         revert();
-    } 
+    }
 
     function transferAndPause(address to, uint256 value) public whenNotPaused whenWalletNotPaused(msg.sender) whenTransferAndPauseEnabled returns (bool) {
         require(value > 0);
@@ -752,4 +752,10 @@ contract Ortp is ERC20, ERC20Detailed, Ownable, ERC20Pausable, ERC20WalletPausab
         _pauseWallet(to);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

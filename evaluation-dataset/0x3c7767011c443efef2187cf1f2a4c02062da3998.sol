@@ -41,27 +41,27 @@ contract Ownable {
 }
 
 contract CratePreSale is Ownable {
-    
-    // ------ STATE ------ 
+
+    // ------ STATE ------
     uint256 constant public MAX_CRATES_TO_SELL = 3900; // Max no. of robot crates to ever be sold
     uint256 constant public PRESALE_END_TIMESTAMP = 1518699600; // End date for the presale - no purchases can be made after this date - Midnight 16 Feb 2018 UTC
 
-    uint256 public appreciationRateWei = 400000000000000;  
+    uint256 public appreciationRateWei = 400000000000000;
     uint256 public currentPrice = appreciationRateWei; // initalise the price to the appreciation rate
     uint32 public cratesSold;
-    
+
     mapping (address => uint32) public userCrateCount; // store how many crates a user has bought
     mapping (address => uint[]) public userToRobots; // store the DNA/robot information of bought crates
-    
-    // ------ EVENTS ------ 
-    event LogCratePurchase( 
+
+    // ------ EVENTS ------
+    event LogCratePurchase(
         address indexed _from,
         uint256 _value,
         uint32 _quantity
         );
 
 
-    // ------ FUNCTIONS ------ 
+    // ------ FUNCTIONS ------
     function getPrice() view public returns (uint256) {
         return currentPrice;
     }
@@ -70,7 +70,7 @@ contract CratePreSale is Ownable {
         return userToRobots[_user];
     }
 
-    function incrementPrice() private { 
+    function incrementPrice() private {
         // Decrease the rate of increase of the crate price
         // as the crates become more expensive
         // to avoid runaway pricing
@@ -120,4 +120,17 @@ contract CratePreSale is Ownable {
     function withdraw() onlyOwner public {
         owner.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

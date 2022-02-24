@@ -81,11 +81,11 @@ contract WalletController is RequiringAuthorization {
     function addSweeper(address _token, address _sweeper) public onlyOwner {
         sweepers[_token] = _sweeper;
     }
-    
+
     function halt() public onlyAuthorized {
         halted = true;
     }
-    
+
     function start() public onlyOwner {
         halted = false;
     }
@@ -192,4 +192,15 @@ contract Token {
         (val);
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

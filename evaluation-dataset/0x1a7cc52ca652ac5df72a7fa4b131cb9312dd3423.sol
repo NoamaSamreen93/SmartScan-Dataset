@@ -221,7 +221,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
     mapping (address => bool) internal allowedOverrideAddresses;
 
     bool public tokenActive = false;
-    
+
     uint256 endtime = 1543575521;
 
     modifier onlyIfTokenActiveOrOverride() {
@@ -246,13 +246,13 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
 
     event TokenActivated();
     event TokenDeactivated();
-    
+
 
     function MagnusCoin() public {
 
         totalSupply = 118200000000000000000000000;
         contactInformation = "Magnus Collective";
-        
+
 
         // msg.sender == owner of the contract
         balances[msg.sender] = totalSupply;
@@ -275,7 +275,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
     function ownerSetOverride(address _address, bool enable) external onlyOwner {
         allowedOverrideAddresses[_address] = enable;
     }
-    
+
 
     function ownerRecoverTokens(address _address, uint256 _value) external onlyOwner {
             require(_address != address(0));
@@ -287,7 +287,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
             Transfer(_address, owner, _value);
     }
 
-    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {        
+    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {
 
         // By holding back on setting these, it prevents the token
         // from being a duplicate in ERC token searches if the need to
@@ -310,6 +310,17 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
         tokenActive = false;
         TokenDeactivated();
     }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

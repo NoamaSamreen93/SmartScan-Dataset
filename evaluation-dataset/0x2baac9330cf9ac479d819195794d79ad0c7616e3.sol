@@ -52,7 +52,7 @@ contract AdBank is ERC20
    string public constant name = "AdBank";
    uint8 public constant decimals = 18;
    uint256 _totalSupply = (1000000000) * (10 **18); //1 billion total supply
-      
+
      // Owner of this contract
     address public owner;
     bool stopped = true;
@@ -62,20 +62,20 @@ contract AdBank is ERC20
     uint256 startdate;
     //ico enddate;
     uint256 enddate;
-  
+
      // Balances for each account
      mapping(address => uint256) balances;
-  
+
      // Owner of account approves the transfer of an amount to another account
      mapping(address => mapping (address => uint256)) allowed;
- 
+
       enum Stages {
         NOTSTARTED,
         ICO,
         PAUSED,
         ENDED
     }
-    
+
     Stages public stage;
     uint256 received;
     uint256 refund;
@@ -86,12 +86,12 @@ contract AdBank is ERC20
          require (msg.sender == owner);
           _;
      }
-     
+
     modifier atStage(Stages _stage) {
         require(stage == _stage);
         _;
     }
-  
+
      // Constructor
      function AdBank() public {
          owner = msg.sender;
@@ -99,11 +99,11 @@ contract AdBank is ERC20
          stage = Stages.NOTSTARTED;
          Transfer(0, owner, balances[owner]);
      }
-     
-     
+
+
      function () public payable atStage(Stages.ICO)
     {
-       
+
         require(received < 44000 ether);
         require(!ico_ended && !stopped && now <= enddate);
         received = (eth_received).add(msg.value);
@@ -115,36 +115,36 @@ contract AdBank is ERC20
         else {
             eth_received = (eth_received).add(msg.value);
         }
-        
+
     }
-   
-    function StartICO() external onlyOwner atStage(Stages.NOTSTARTED) 
+
+    function StartICO() external onlyOwner atStage(Stages.NOTSTARTED)
     {
         stage = Stages.ICO;
         stopped = false;
         startdate = now;
         enddate = now.add(39 days);
     }
-    
+
     function EmergencyStop() external onlyOwner atStage(Stages.ICO)
     {
         stopped = true;
         stage = Stages.PAUSED;
     }
-    
+
     function ResumeEmergencyStop() external onlyOwner atStage(Stages.PAUSED)
     {
         stopped = false;
         stage = Stages.ICO;
     }
-    
+
      function end_ICO() external onlyOwner atStage(Stages.ICO)
      {
          require(now > enddate);
          ico_ended = true;
          stage = Stages.ENDED;
      }
-  
+
    function drain() external onlyOwner {
         owner.transfer(this.balance);
     }
@@ -153,12 +153,12 @@ contract AdBank is ERC20
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalSupply;
      }
-  
+
      // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-  
+
      // Transfer the balance from owner's account to another account
      function transfer(address _to, uint256 _amount)public returns (bool ok) {
         require( _to != 0x0);
@@ -168,7 +168,7 @@ contract AdBank is ERC20
         Transfer(msg.sender, _to, _amount);
              return true;
          }
-  
+
      // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -184,7 +184,7 @@ contract AdBank is ERC20
      Transfer(_from, _to, _amount);
      return true;
          }
- 
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool ok) {
@@ -193,12 +193,12 @@ contract AdBank is ERC20
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
    }
-   
+
    //In case the ownership needs to be transferred
 	function transferOwnership(address newOwner)public onlyOwner
 	{
@@ -208,4 +208,15 @@ contract AdBank is ERC20
 	    owner = newOwner;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

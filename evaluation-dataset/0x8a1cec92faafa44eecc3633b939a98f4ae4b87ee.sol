@@ -1,6 +1,6 @@
 /**
-* The OGX token contract bases on the ERC20 standard token contracts 
-* Author : Gordon T. Arsiranawin 
+* The OGX token contract bases on the ERC20 standard token contracts
+* Author : Gordon T. Arsiranawin
 * @ 22.22.22
 * Orgura Inc. &
 * Green The World Network Association for Environment of Thailand
@@ -420,7 +420,7 @@ contract OGX is PausableToken, MintableToken, BurnableToken {
   uint public decimals = 18;
 
   /// Maximum tokens to be allocated.
-  uint256 public constant HARD_CAP = 224115116  * 10**uint256(decimals);  
+  uint256 public constant HARD_CAP = 224115116  * 10**uint256(decimals);
   /* Initial supply is  224,115,116 OGX */
 
   /**
@@ -435,4 +435,15 @@ contract OGX is PausableToken, MintableToken, BurnableToken {
     return timelock;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

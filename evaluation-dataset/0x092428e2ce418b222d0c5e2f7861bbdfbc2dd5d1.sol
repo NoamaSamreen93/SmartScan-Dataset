@@ -116,7 +116,7 @@ contract UNOCALL is ERC20Interface, Owned, SafeMath {
         return true;
     }
 
-    
+
     function allowance(address Owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[Owner][_spender];
     }
@@ -135,4 +135,15 @@ contract UNOCALL is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address Address, uint256 _value) public onlyOwner returns (bool success) {
         return ERC20Interface(Address).transfer(owner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

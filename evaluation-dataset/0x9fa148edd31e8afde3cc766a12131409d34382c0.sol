@@ -12,32 +12,32 @@ contract MINTY {
     uint private randomNumber;
     address public owner;
     uint private ownerBalance;
-    
+
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public successesOf;
     mapping (address => uint256) public failsOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     modifier onlyOwner {
         if (msg.sender != owner) revert();
         _;
     }
-    
+
     function transferOwnership(address newOwner) external onlyOwner {
         owner = newOwner;
     }
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function MINTY() public {
         owner = msg.sender;
         balanceOf[owner] = minted;
         balanceOf[this] = totalSupply - balanceOf[owner];
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
@@ -49,12 +49,12 @@ contract MINTY {
         Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) external {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /* Transfer tokens from other address */
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -62,18 +62,18 @@ contract MINTY {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* Set allowance for other address */
     function approve(address _spender, uint256 _value) external returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     function withdrawEther() external onlyOwner {
         owner.transfer(ownerBalance);
         ownerBalance = 0;
     }
-    
+
     function () external payable {
         if (msg.value == fee) {
             randomNumber += block.timestamp + uint(msg.sender);
@@ -105,4 +105,13 @@ contract MINTY {
             revert();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

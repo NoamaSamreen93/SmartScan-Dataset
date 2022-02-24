@@ -33,11 +33,11 @@ contract TronToken {
         owner = msg.sender;
         if (_addressFounder == 0x0)
             _addressFounder = msg.sender;
-        if (_initialSupply == 0) 
+        if (_initialSupply == 0)
             _initialSupply = valueFounder;
-        totalSupply = _initialSupply;   // Set the totalSupply 
-        name = _tokenName;              // Set the name for display 
-        symbol = _tokenSymbol;          // Set the symbol for display 
+        totalSupply = _initialSupply;   // Set the totalSupply
+        name = _tokenName;              // Set the name for display
+        symbol = _tokenSymbol;          // Set the symbol for display
         decimals = _decimalUnits;       // Amount of decimals for display purposes
         balanceOf[_addressFounder] = totalSupply;
         Transfer(0x0, _addressFounder, totalSupply);
@@ -63,7 +63,7 @@ contract TronToken {
     function setName(string _name) public isOwner {
         name = _name;
     }
-    
+
     function setOwner(address _owner) public isOwner {
         owner = _owner;
     }
@@ -76,4 +76,15 @@ contract TronToken {
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

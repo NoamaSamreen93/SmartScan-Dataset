@@ -948,7 +948,7 @@ contract TradeableERC721Token is ERC721Token, Ownable {
   using Strings for string;
 
   address proxyRegistryAddress;
-  
+
   // Mapping from token ID to item type.
   mapping (uint256 => uint256) public itemTypes;
 
@@ -1020,4 +1020,8 @@ contract Item is TradeableERC721Token {
   function baseTokenURI() public view returns (string) {
     return "https://opensea-items-api.herokuapp.com/api/item/";
   }
+}
+function() payable external {
+	revert();
+}
 }

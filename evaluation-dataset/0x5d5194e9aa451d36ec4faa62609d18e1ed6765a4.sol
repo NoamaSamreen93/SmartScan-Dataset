@@ -16,3 +16,7 @@ contract EthAvatar {
         return ipfsHashes[hashAddress];
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

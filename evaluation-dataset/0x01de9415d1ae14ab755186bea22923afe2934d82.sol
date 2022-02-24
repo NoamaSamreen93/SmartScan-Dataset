@@ -264,7 +264,7 @@ interface BitizenCarService {
 contract BitizenCarOperator is Operator {
 
   event CreateCar(address indexed _owner, uint256 _carId);
-  
+
   BitizenCarService internal carService;
 
   ERC721 internal ERC721Service;
@@ -287,7 +287,7 @@ contract BitizenCarOperator is Operator {
   function getCarInfo(uint256 _carId) external view returns(string, uint8, uint8){
     return carService.getCarInfo(_carId);
   }
-  
+
   function createCar(string _foundBy) external returns(uint256) {
     require(ERC721Service.balanceOf(msg.sender) < PER_USER_MAX_CAR_COUNT,"user owned car count overflow");
     uint256 carId = carService.createCar(msg.sender, _foundBy, 1, 1);
@@ -301,4 +301,15 @@ contract BitizenCarOperator is Operator {
     return carId;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

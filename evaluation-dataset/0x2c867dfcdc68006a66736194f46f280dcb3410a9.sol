@@ -32,7 +32,7 @@ contract Sansara {
         uint investDate;
         address referrer;
     }
-    
+
     event Invest(address addr, uint amount, address referrer);
     event Payout(address addr, uint amount, string eventType, address from);
     event NextRoundStarted(uint round, uint date, uint deposit);
@@ -48,7 +48,7 @@ contract Sansara {
     function transferOwnership(address addr) onlyOwner public {
         owner = addr;
     }
-    
+
     function setProvisionAddresses(address tech, address sal, address adv, address comm) onlyOwner public {
         techSupport = tech;
         salary = sal;
@@ -211,4 +211,15 @@ contract Sansara {
             addr := mload(add(bys, 20))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

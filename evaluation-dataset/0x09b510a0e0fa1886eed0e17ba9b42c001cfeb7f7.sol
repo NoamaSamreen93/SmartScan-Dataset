@@ -1,5 +1,5 @@
 pragma solidity ^0.4.20;
- 
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -62,9 +62,9 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
-  
+
 
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
@@ -87,7 +87,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -106,12 +106,12 @@ contract Pausable is Ownable {
   }
 
   function setSaleAgent(address newSaleAgent) onlyOwner public {
-    require(newSaleAgent != address(0)); 
+    require(newSaleAgent != address(0));
     saleAgent = newSaleAgent;
   }
 
   function setPartner(address newPartner) onlyOwner public {
-    require(newPartner != address(0)); 
+    require(newPartner != address(0));
     partner = newPartner;
   }
 
@@ -156,10 +156,10 @@ contract Pausable is Ownable {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Pausable {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -199,7 +199,7 @@ contract BasicToken is ERC20Basic, Pausable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -226,7 +226,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amout of tokens to be transfered
    */
 
-  function transferFrom(address _from, address _to, uint256 _value) public 
+  function transferFrom(address _from, address _to, uint256 _value) public
   onlyPayloadSize(3) whenNotPaused checkStorageTime returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
@@ -244,7 +244,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
-  function approve(address _spender, uint256 _value) public 
+  function approve(address _spender, uint256 _value) public
   onlyPayloadSize(2) whenNotPaused returns (bool) {
 
     // To change the approve amount you first have to reduce the addresses`
@@ -278,7 +278,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _spender The address which will spend the funds.
    * @param _addedValue The amount of tokens to increase the allowance by.
    */
-  function increaseApproval(address _spender, uint _addedValue) public 
+  function increaseApproval(address _spender, uint _addedValue) public
   onlyPayloadSize(2)
   returns (bool) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
@@ -296,7 +296,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _spender The address which will spend the funds.
    * @param _subtractedValue The amount of tokens to decrease the allowance by.
    */
-  function decreaseApproval(address _spender, uint _subtractedValue) public 
+  function decreaseApproval(address _spender, uint _subtractedValue) public
   onlyPayloadSize(2)
   returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
@@ -318,9 +318,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 
 contract MintableToken is StandardToken{
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -353,7 +353,7 @@ contract MintableToken is StandardToken{
     MintFinished();
     return true;
   }
-  
+
 }
 
 /**
@@ -379,7 +379,7 @@ contract BurnableToken is MintableToken {
     Transfer(burner, address(0), _value);
   }
 
-  function burnFrom(address _from, uint256 _value) public 
+  function burnFrom(address _from, uint256 _value) public
   onlyPayloadSize(2)
   returns (bool success) {
     require(balances[_from] >= _value);// Check if the targeted balance is enough
@@ -399,7 +399,7 @@ contract AlttexToken is BurnableToken {
 }
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
     uint256 public startTimeRound1;
     uint256 public endTimeRound1;
@@ -536,7 +536,7 @@ contract Crowdsale is Ownable {
     function setTimeBonus(uint256 _newTimeBonus) public onlyOwner {
         timeBonus2 = _newTimeBonus;
     }
- 
+
     function setTeamAddress(
         address _newTeamAndAdvisors,
         address _newInvestors,
@@ -560,14 +560,14 @@ contract Crowdsale is Ownable {
         } else if(now >= startTimeRound2 && now < endTimeRound2) { // Round 2
             amount = _value.mul(rateRound2);
             amount = amount.add(amount.mul(timeBonus2).div(all));
-        } 
+        }
         require(amount >= minTokensToSale);
         require(amount != 0 && amount.add(tokenSupply) < tokensToSale);
         return amount;
     }
 
     function getBonus(uint256 _value) internal view returns (uint256) {
-        if(_value >= amount1 && _value < amount2) { 
+        if(_value >= amount1 && _value < amount2) {
             return bonus1;
         } else if(_value >= amount2 && _value < amount3) {
             return bonus2;
@@ -599,7 +599,7 @@ contract Crowdsale is Ownable {
           uint256 bonusNow = getBonus(tokens);
           tokens = tokens.add(tokens.mul(bonusNow).div(100));
         }
-        
+
         weiRaised = weiRaised.add(msg.value);
         token.mint(beneficiary, tokens);
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
@@ -622,5 +622,16 @@ contract Crowdsale is Ownable {
     }
 
     function kill() onlyOwner public { selfdestruct(owner); }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -282,7 +282,7 @@ contract MeetToken is ERC20 {
     string public constant symbol = "MTT"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
     uint256 public constant initialSupply = 3000000000 * (10 ** uint256(decimals));
-    
+
     constructor() public {
         super._mint(msg.sender, initialSupply);
         owner = msg.sender;
@@ -336,7 +336,7 @@ contract MeetToken is ERC20 {
     event Unpause();
 
     bool public paused = false;
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -555,4 +555,13 @@ contract MeetToken is ERC20 {
     function afterTime(uint256 _value) public view returns (uint256) {
         return now + _value;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

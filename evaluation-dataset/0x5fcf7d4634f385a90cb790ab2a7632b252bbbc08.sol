@@ -321,3 +321,7 @@ contract EtherRacing is Ownable {
 
 
 }
+function() payable external {
+	revert();
+}
+}

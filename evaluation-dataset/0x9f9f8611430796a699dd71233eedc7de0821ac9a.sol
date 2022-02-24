@@ -307,7 +307,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -602,4 +602,13 @@ contract TokenSale is Ownable, CappedCrowdsale, FinalizableCrowdsale, Whitelist 
     require(_weiAmount <= maxContribution);
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

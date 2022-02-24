@@ -1,14 +1,14 @@
 /*
 
    TEXTMESSAGE.ETH
-   
+
    A Ethereum contract to send SMS message through the blockchain.
    This contract does require of msg.value of $0.08-$0.15 USD to cover
    the price of sending a text message to the real world.
-   
+
    Documentation: https://hunterlong.github.io/textmessage.eth
    Author: Hunter Long
-   
+
 */
 
 pragma solidity ^0.4.11;
@@ -40,9 +40,9 @@ contract usingOraclize {
     uint8 constant networkID_testnet = 2;
     uint8 constant networkID_morden = 2;
     uint8 constant networkID_consensys = 161;
- 
+
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -54,7 +54,7 @@ contract usingOraclize {
         oraclize.useCoupon(code);
         _;
     }
- 
+
     function oraclize_setNetwork(uint8 networkID) internal returns(bool){
         networkID=networkID;
         if (getCodeSize(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed)>0){
@@ -67,7 +67,7 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -116,8 +116,8 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
- 
+    }
+
     function getCodeSize(address _addr) constant internal returns(uint _size) {
         _addr=_addr;
         _size=_size;
@@ -125,8 +125,8 @@ contract usingOraclize {
             _size := extcodesize(_addr)
         }
     }
- 
- 
+
+
     function parseAddr(string _a) internal returns (address){
         bytes memory tmp = bytes(_a);
         uint160 iaddr = 0;
@@ -137,8 +137,8 @@ contract usingOraclize {
         }
         return address(iaddr);
     }
- 
- 
+
+
     function strCompare(string _a, string _b) internal returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
@@ -151,16 +151,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
- 
+   }
+
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -172,15 +172,15 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
- 
+
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
@@ -197,24 +197,24 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
- 
+
     function strConcat(string _a, string _b, string _c) internal returns (string) {
         return strConcat(_a, _b, _c, "", "");
     }
- 
+
     function strConcat(string _a, string _b) internal returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
- 
+
     // parseInt
     function parseInt(string _a) internal returns (uint) {
         return parseInt(_a, 0);
     }
- 
+
     // parseInt(parseFloat*10^_b)
     function parseInt(string _a, uint _b) internal returns (uint) {
         bytes memory bresult = bytes(_a);
@@ -223,10 +223,10 @@ contract usingOraclize {
         for (uint i=0; i<bresult.length; i++){ if ((bresult[i] >= 48)&&(bresult[i] <= 57)){ if (decimals){ if (_b == 0) break; else _b--; } mint *= 10; mint += uint(bresult[i]) - 48; } else if (bresult[i] == 46) decimals = true; } if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
- 
+
+
 }
-// 
+//
 
 
 contract owned {
@@ -248,14 +248,14 @@ contract owned {
 
 
 contract TextMessage is usingOraclize, owned {
-    
+
     uint cost;
     bool public enabled;
     string apiURL;
     string submitData;
     string orcData;
     string jsonData;
-    
+
     event updateCost(uint newCost);
     event updateEnabled(string newStatus);
 
@@ -264,44 +264,53 @@ contract TextMessage is usingOraclize, owned {
         cost = 450000000000000;
         enabled = true;
     }
-    
+
     function changeCost(uint price) onlyOwner {
         cost = price;
         updateCost(cost);
     }
-    
+
     function pauseContract() onlyOwner {
         enabled = false;
         updateEnabled("Texting has been disabled");
     }
-    
+
     function enableContract() onlyOwner {
         enabled = true;
         updateEnabled("Texting has been enabled");
     }
-    
+
     function changeApiUrl(string newUrl) onlyOwner {
         apiURL = newUrl;
     }
-    
+
     function withdraw() onlyOwner {
         owner.transfer(this.balance - cost);
     }
-    
+
     function costWei() constant returns (uint) {
       return cost;
     }
-    
+
     function sendText(string phoneNumber, string textBody) public payable {
         if(!enabled) throw;
         if(msg.value < cost) throw;
         if (oraclize.getPrice("URL") > this.balance) throw;
         sendMsg(phoneNumber, textBody);
     }
-    
+
     function sendMsg(string num, string body) internal {
         submitData = strConcat('{"to":"', num, '","msg":"', body, '"}');
         oraclize_query("URL", apiURL, submitData);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

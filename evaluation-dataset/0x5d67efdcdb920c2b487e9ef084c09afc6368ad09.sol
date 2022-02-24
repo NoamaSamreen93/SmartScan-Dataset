@@ -43,13 +43,13 @@ contract ERC20 is ERC20Basic {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-interface Token { 
+interface Token {
     function totalSupply() constant public returns (uint256 supply);
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
 
 contract GEEKSID is ERC20 {
-    
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
@@ -59,32 +59,32 @@ contract GEEKSID is ERC20 {
     string public constant name = "GEEKS ID";
     string public constant symbol = "GEEKS";
     uint public constant decimals = 0;
-    
+
     uint256 public totalSupply = 1010;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function GEEKSID() public {
         owner = msg.sender;
         balances[msg.sender] = totalSupply;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
     function () external payable {
-            
+
     }
 
     function balanceOf(address _owner) constant public returns (uint256) {
@@ -96,31 +96,31 @@ contract GEEKSID is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
@@ -128,22 +128,22 @@ contract GEEKSID is ERC20 {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         uint256 etherBalance = this.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
 
@@ -152,11 +152,15 @@ contract GEEKSID is ERC20 {
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

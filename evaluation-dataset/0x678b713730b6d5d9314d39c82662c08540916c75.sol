@@ -443,7 +443,7 @@ contract CryptoSagaCardSwap is Ownable {
     require(msg.sender == cardAddess);
     _;
   }
-  
+
   // @dev Set the address of the contract that represents ERC721 Card.
   function setCardContract(address _contractAddress)
     public
@@ -456,7 +456,7 @@ contract CryptoSagaCardSwap is Ownable {
   //  This should be implemented by CryptoSagaCore later.
   function swapCardForReward(address _by, uint8 _rank)
     onlyCard
-    public 
+    public
     returns (uint256)
   {
     return 0;
@@ -494,7 +494,7 @@ contract CryptoSagaCard is ERC721Token, Claimable, AccessMint {
     swapContract = CryptoSagaCardSwap(_contractAddress);
   }
 
-  function rankOf(uint256 _tokenId) 
+  function rankOf(uint256 _tokenId)
     public view
     returns (uint8)
   {
@@ -562,8 +562,8 @@ contract Presale is Pausable {
 
   // Event that is fired when purchase transaction is made.
   event TokenPurchase(
-    address indexed purchaser, 
-    address indexed beneficiary, 
+    address indexed purchaser,
+    address indexed beneficiary,
     uint256 value,
     uint256 amount
   );
@@ -588,7 +588,7 @@ contract Presale is Pausable {
     require(_price >= 0);
     require(_priceIncrease >= 0);
     require(_wallet != address(0));
-    
+
     wallet = _wallet;
     cardContract = CryptoSagaCard(_cardAddress);
     startTime = _startTime;
@@ -599,7 +599,7 @@ contract Presale is Pausable {
 
   // @return true if the transaction can buy tokens
   function validPurchase()
-    internal view 
+    internal view
     returns (bool)
   {
     bool withinPeriod = now >= startTime && now <= endTime;
@@ -620,8 +620,8 @@ contract Presale is Pausable {
 
   // @return true if crowdsale event has ended
   function hasEnded()
-    public view 
-    returns (bool) 
+    public view
+    returns (bool)
   {
     return now > endTime;
   }
@@ -686,14 +686,14 @@ contract Presale is Pausable {
   }
 
   // @dev Set price increase of token per transaction.
-  //  Note that this will never become below 0, 
+  //  Note that this will never become below 0,
   //  which means early buyers will always buy tokens at lower price than later buyers.
   function setPriceIncrease(uint256 _priceIncrease)
     onlyOwner
     public
   {
     require(priceIncrease >= 0);
-    
+
     // Set price increase per transaction.
     priceIncrease = _priceIncrease;
   }
@@ -706,4 +706,20 @@ contract Presale is Pausable {
     wallet.transfer(this.balance);
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

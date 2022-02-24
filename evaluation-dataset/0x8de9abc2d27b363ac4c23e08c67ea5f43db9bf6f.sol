@@ -17,22 +17,22 @@ pragma solidity ^0.4.11;
 		- Set a new owner
 		- Control the assets of the Registrar (withdraw ETH, transfer, sell, burn pieces owned by the Registrar)
 		- The plan is to have the controller contract be a DAO in preparation for a possible ICO
-	
+
 	Registrar:
 		- The Registrar contract acts as the central registry for all sha256 hashes in the Ethart factory contract network.
 		- Approved Factory Contracts can register sha256 hashes using the Registrar interface.
 		- ethartArtReward of the art produced and ethartRevenueReward of turnover of the contract network will be awarded to the Registrar.
-	
+
 	Factory Contracts:
 		- Factory Contracts can spawn Artwork Contracts in line with artists specifications
 		- Factory Contracts will only spawn Artwork Contracts who's sha256 hashes are unique per the Registrar's sha256 registry
 		- Factory Contracts will register every new Artwork Contract with it's details with the Registrar contract
-	
+
 	Artwork Contracts:
 		- Artwork Contracts act as minimalist decentralised exchanges for their pieces in line with specified conditions
-		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value 
+		- Artwork Contracts will interact with the Registrar to issue buyers of pieces a predetermined amount of Patron tokens based on the transaction value
 		- Artwork Contracts can be interacted with by the Controller via the Registrar using their interfaces to transfer, sell, burn etc pieces
-	
+
 	(c) Stefan Pernar 2017 - all rights reserved
 	(c) ERC20 functions BokkyPooBah 2017. The MIT Licence.
 
@@ -52,13 +52,13 @@ contract Interface {
 
 	// Registers a new artwork.
 	function registerArtwork (address _contract, bytes32 _SHA256Hash, uint256 _editionSize, string _title, string _fileLink, uint256 _ownerCommission, address _artist, bool _indexed, bool _ouroboros);
-	
+
 	// Check if a sha256 hash is registered
 	function isSHA256HashRegistered (bytes32 _SHA256Hash) returns (bool _registered);
-	
+
 	// Check if an address is a registered factory contract
 	function isFactoryApproved (address _factory) returns (bool _approved);
-	
+
 	// Issues Patron tokens according to conditions specified in factory contracts
 	function issuePatrons (address _to, uint256 _amount);
 
@@ -197,7 +197,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 	string public proofLink;					// Link to the creation proof by the artist -> this has to be done after contract creation
 	string public customText;					// Custom text
 	uint256 public ownerCommission;				// Percent given to the contract owner for every sale - must be >=0 && <=975 1000 = 100%.
-	
+
 	uint256 public lowestAskPrice;				// The lowest price an owner of a piece is willing to sell it for.
 	address public lowestAskAddress;			// The address of the lowest ask.
 	uint256 public lowestAskTime;				// The time by which the ask can be withdrawn.
@@ -210,16 +210,16 @@ The factory contract this contract has been spawned from has a standing bug boun
 	bool public pieceWanted;					// Is a buyer interested in a piece?
 
 	/* Events */
-	
+
 	// Informs watchers of the contract when a new lowest ask price has been set. (price, seller)
 	event NewLowestAsk (uint256 price, address seller);
-	
+
 	// Informs watchers of the contract when a new highest bid price has been placed. (price, bidder)
 	event NewHighestBid (uint256 price, address bidder);
-	
+
 	// Informs watchers of the contract when a piece has been transferred. (amount, from, to)
 	event PieceTransferred (uint256 amount, address from, address to);
-	
+
 	// Informs watchers of the contract when a piece has been sold. (from, to, price)
 	event PieceSold (address from, address to, uint256 price);
 
@@ -228,27 +228,27 @@ The factory contract this contract has been spawned from has a standing bug boun
 	event Burn (address indexed _owner, uint256 _amount);
 
 	/* Other variables */
-	
+
 	// Has the proof been set yet?
 	bool public proofSet;
-	
+
 	// # of pieces awarded to Ethart.
 	uint256 public ethartArtAwarded;
 
 	// Maps the number of pieces owned by an address
 	mapping (address => uint256) public piecesOwned;
-	
+
 	// Used in burnFrom and transferFrom
  	mapping (address => mapping (address => uint256)) allowed;
-	
+
 	// set after deployment of Registrar contract
     address registrar = 0xC636277B8250e62632467B7Db19ed9111E25EB99;
-	
+
 	// Ethart reward variables - fixed after contract creation
 	uint256 public ethartRevenueReward;
 	uint256 public ethartArtReward;
 	address public referrer;
-	
+
 	// Referrer receives referrerReward basis points of ethartRevenueReward
 	uint256 public referrerReward;
 
@@ -276,7 +276,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 		fileLink = _fileLink;
 		customText = _customText;
 		ownerCommission = _ownerCommission;
-		activationTime = now;	
+		activationTime = now;
 	}
 
 	modifier onlyBy(address _account)
@@ -327,7 +327,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 		}
 
 	function transfer(address _to, uint256 _amount) notLocked(msg.sender, _amount) onlyPayloadSize(2 * 32) returns (bool success) {
-		if (piecesOwned[msg.sender] >= _amount 
+		if (piecesOwned[msg.sender] >= _amount
 			&& _amount > 0
 			&& piecesOwned[_to] + _amount > piecesOwned[_to]
 			// use burn() instead
@@ -457,7 +457,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 	// place a bid for a piece - bid has to be higher than current highest bid
 	function placeBid () payable {
 		if (msg.value > highestBidPrice || (pieceForSale && msg.value >= lowestAskPrice)) {
-			if (pieceWanted) 
+			if (pieceWanted)
 				{
 					Interface a = Interface(registrar);
 					a.asyncSend(highestBidAddress, highestBidPrice);
@@ -480,7 +480,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 	// fill the bid or lower the lowest ask price to be equal or lower than the highest bid.
 	function fillBid () ethArtOnlyAfterOneYear notLocked(msg.sender, 1) {
 		if (pieceWanted && piecesOwned[msg.sender] >= 1) {
-			uint256 _amountOwner;														
+			uint256 _amountOwner;
 			uint256 _amountEthart;
 			uint256 _amountSeller;
 			uint256 _amountReferrer;
@@ -496,7 +496,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 				}
 			piecesOwned[highestBidAddress]++;
 			// Reward the buyer with Patron tokens
-			a.issuePatrons(highestBidAddress, highestBidPrice);				
+			a.issuePatrons(highestBidAddress, highestBidPrice);
 			piecesOwned[msg.sender]--;
 			PieceSold (msg.sender, highestBidAddress, highestBidPrice);
 			pieceWanted = false;
@@ -520,7 +520,7 @@ The factory contract this contract has been spawned from has a standing bug boun
 			highestBidAddress = 0x0;
 			NewHighestBid (0, 0x0);
 			Interface a = Interface(registrar);
-			a.asyncSend(msg.sender, highestBidPrice);			
+			a.asyncSend(msg.sender, highestBidPrice);
 		}
 		else {throw;}
 	}
@@ -536,4 +536,15 @@ The factory contract this contract has been spawned from has a standing bug boun
 		else {throw;}
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

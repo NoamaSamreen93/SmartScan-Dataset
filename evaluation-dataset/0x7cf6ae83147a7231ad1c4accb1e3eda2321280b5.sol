@@ -434,7 +434,7 @@ contract CES_Token is BurnableToken, Owned {
         require(totalSupply_ <= HARD_CAP);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function createReserveTokensVault() external onlyOwner {
         require(reserveTokensVault == address(0));
 
@@ -485,7 +485,7 @@ contract CES_Token is BurnableToken, Owned {
 
     /// @dev vest StartAt : day unit
     function vestTokensStartAtInt(
-                            address _beneficiary, 
+                            address _beneficiary,
                             uint256 _tokensAmountInt,
                             uint256 _startS,
                             uint256 _afterDay,
@@ -511,7 +511,7 @@ contract CES_Token is BurnableToken, Owned {
         vestTokensStartAtInt(_beneficiary, _tokensAmountInt, now, _afterDay, _cliffDay, _durationDay);
     }
 
-    /// @dev vest the sale contributor tokens for 100 days, 1% gradual release 
+    /// @dev vest the sale contributor tokens for 100 days, 1% gradual release
     function vestCmdNow1PercentInt(address _beneficiary, uint256 _tokensAmountInt) external onlyOwner {
         vestTokensFromNowInt(_beneficiary, _tokensAmountInt, 0, 0, unlock100Days);
     }
@@ -556,10 +556,21 @@ contract CES_Token is BurnableToken, Owned {
         TokenVesting(vestingOf[_owner]).revoke(this);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function makeReserveToVault() external onlyOwner {
         require(reserveTokensVault != address(0));
         reserveTokensVault.fillUpAllowance();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

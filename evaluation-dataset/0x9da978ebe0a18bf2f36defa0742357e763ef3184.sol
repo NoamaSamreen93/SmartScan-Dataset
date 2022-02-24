@@ -209,7 +209,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Liv is StandardToken {
-    
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -224,4 +224,13 @@ contract Liv is StandardToken {
     balances[msg.sender] = initialSupply;
     emit Transfer(0x0, msg.sender, initialSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

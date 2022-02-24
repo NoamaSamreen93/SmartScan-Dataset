@@ -8,7 +8,7 @@ contract OasisInterface {
 
 
 contract testExchange {
-    
+
     OasisInterface public exchange;
     event DaiDeposited(address indexed sender, uint amount);
 
@@ -17,6 +17,17 @@ contract testExchange {
       amount =  exchange.buyAllAmountPayEth(0x14FBCA95be7e99C15Cc2996c6C9d841e54B79425, 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359, buyAmt, 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
       emit DaiDeposited(msg.sender, amount);
 
-    } 
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

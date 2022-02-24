@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
- 
+
 library SafeMath {
   function mul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
-    assert(a == 0 || c / a == b);  
+    assert(a == 0 || c / a == b);
     return c;
   }
 
@@ -36,7 +36,7 @@ contract ERC20Basic {
   function balanceOf(address who) constant returns (uint);
   function transfer(address to, uint value);
   event Transfer(address indexed from, address indexed to, uint value);
-  
+
   function allowance(address owner, address spender) constant returns (uint);
   function transferFrom(address from, address to, uint value);
   function approve(address spender, uint value);
@@ -46,15 +46,15 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
-    
+
   address public owner;
-  
+
   /// This is a switch to control the liquidity
   bool public transferable = true;
-  
+
   mapping(address => uint) balances;
 
-  //The frozen accounts 
+  //The frozen accounts
   mapping (address => bool) public frozenAccount;
 
   modifier onlyPayloadSize(uint size) {
@@ -63,12 +63,12 @@ contract BasicToken is ERC20Basic {
      }
      _;
   }
-  
+
   modifier unFrozenAccount{
       require(!frozenAccount[msg.sender]);
       _;
   }
-  
+
   modifier onlyOwner {
       if (owner == msg.sender) {
           _;
@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
           throw;
         }
   }
-  
+
   modifier onlyTransferable {
       if (transferable) {
           _;
@@ -86,25 +86,25 @@ contract BasicToken is ERC20Basic {
           throw;
       }
   }
-  
+
   /// Emitted when the target account is frozen
   event FrozenFunds(address target, bool frozen);
-  
+
   /// Emitted when a function is invocated by unauthorized addresses.
   event InvalidCaller(address caller);
 
   /// Emitted when some TOKEN coins are burn.
   event Burn(address caller, uint value);
-  
+
   /// Emitted when the ownership is transferred.
   event OwnershipTransferred(address indexed from, address indexed to);
-  
+
   /// Emitted if the account is invalid for transaction.
   event InvalidAccount(address indexed addr, bytes msg);
-  
+
   /// Emitted when the liquity of TOKEN is switched off
   event LiquidityAlarm(bytes msg);
-  
+
   function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) unFrozenAccount onlyTransferable {
     if (frozenAccount[_to]) {
         InvalidAccount(_to, "The receiver account is frozen");
@@ -112,7 +112,7 @@ contract BasicToken is ERC20Basic {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
-    } 
+    }
   }
 
   function balanceOf(address _owner) view returns (uint balance) {
@@ -126,11 +126,11 @@ contract BasicToken is ERC20Basic {
       frozenAccount[target]=freeze;
       FrozenFunds(target, freeze);
     }
-  
+
   function accountFrozenStatus(address target) view returns (bool frozen) {
       return frozenAccount[target];
   }
-  
+
   function transferOwnership(address newOwner) onlyOwner public {
       if (newOwner != address(0)) {
           address oldOwner=owner;
@@ -138,12 +138,12 @@ contract BasicToken is ERC20Basic {
           OwnershipTransferred(oldOwner, owner);
         }
   }
-  
+
   function switchLiquidity (bool _transferable) onlyOwner returns (bool success) {
       transferable=_transferable;
       return true;
   }
-  
+
   function liquidityStatus () view returns (bool _transferable) {
       return transferable;
   }
@@ -159,7 +159,7 @@ contract StandardToken is BasicToken {
 
     // Check account _from and _to is not frozen
     require(!frozenAccount[_from]&&!frozenAccount[_to]);
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -176,7 +176,7 @@ contract StandardToken is BasicToken {
   function allowance(address _owner, address _spender) view returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 
@@ -196,4 +196,15 @@ contract ZeusToken is StandardToken {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

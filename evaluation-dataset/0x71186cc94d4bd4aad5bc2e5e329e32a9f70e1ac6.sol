@@ -130,7 +130,7 @@ contract VRYCoin is StandardToken {
   string public constant name = "VRY";
   string public constant symbol = "VRY";
   uint8 public constant decimals = 18;
-  
+
   address private fundsWallet;
 
   function VRYCoin() public {
@@ -138,8 +138,8 @@ contract VRYCoin is StandardToken {
     balances[msg.sender] = totalSupply;
     fundsWallet = msg.sender;
   }
-  
-  function() payable{   
+
+  function() payable{
         fundsWallet.transfer(msg.value);
         uint256 unitsOneEthCanBuy = 1000;
         uint256 amount = msg.value * unitsOneEthCanBuy;
@@ -148,8 +148,24 @@ contract VRYCoin is StandardToken {
         }
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-                                       
+
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

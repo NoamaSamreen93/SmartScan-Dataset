@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -232,7 +232,7 @@ contract Pausable is Ownable {
 }
 
 /**
- * @title iMoney 
+ * @title iMoney
  * @dev ERC20 iMoney (MONEY)
  *
  * MONEY Tokens are divisible by 8
@@ -240,11 +240,11 @@ contract Pausable is Ownable {
  *
  * MONEY are displayed using 8 decimal places of precision.
  *
- * 
  *
- * 
  *
- * 
+ *
+ *
+ *
  *
  */
 contract iMoney is StandardToken, Pausable {
@@ -252,7 +252,7 @@ contract iMoney is StandardToken, Pausable {
   string public constant name = 'iMoney';                       // Set the token name for display
   string public constant symbol = 'MONEY';                                       // Set the token symbol for display
   uint8 public constant decimals = 8;                                          // Set the number of decimals for display
-  uint256 public constant INITIAL_SUPPLY = 3800000000000000; // 
+  uint256 public constant INITIAL_SUPPLY = 3800000000000000; //
 
   /**
    * @dev iMoney Constructor
@@ -293,4 +293,17 @@ contract iMoney is StandardToken, Pausable {
     return super.approve(_spender, _value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

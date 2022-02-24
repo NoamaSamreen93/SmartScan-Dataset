@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 /*
-* Pantheon China 第一份智能合約提供穩定的收入。 
+* Pantheon China 第一份智能合約提供穩定的收入。
 * 智能合約可確保您的資金免遭盜竊和黑客攻擊
 * 不要投入超過你可以輸的
 * 我們正在等待一場大型比賽
@@ -240,22 +240,22 @@ contract PantheonEcoSystemChina {
         emit Donation(msg.sender, msg.value, now);
     }
 
-    
+
     function totalSupply() public view returns (uint) {
         return total_supply;
     }
 
-   
+
     function balanceOf(address addr) public view returns (uint) {
         return user_data[addr].tokens;
     }
 
-   
+
     function dividendsOf(address addr) public view returns (uint) {
 
         UserRecord memory user = user_data[addr];
 
-       
+
         int d = int(user.gained_funds.add(user.ref_funds));
         require(d >= 0);
 
@@ -275,7 +275,7 @@ contract PantheonEcoSystemChina {
         return uint(d);
     }
 
-   
+
     function expectedTokens(uint funds, bool apply_fee) public view returns (uint) {
         if (funds == 0) {
             return 0;
@@ -483,4 +483,20 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -96,8 +96,8 @@ contract BitSTDData {
     function getOldBalanceOf(address addr) constant  public returns(uint256) {
        return bit.balanceOf(addr);
     }
-   
-    
+
+
     function getOldAllowance(address authorizer, address sender) constant  public returns(uint256) {
         return bit.allowance(authorizer, sender);
     }
@@ -105,7 +105,7 @@ contract BitSTDData {
     function getOldFrozenAccount(address addr) constant public returns(bool) {
         return bit.frozenAccount(addr);
     }
-   
+
 }
 
 
@@ -121,7 +121,7 @@ contract BitSTDLogic {
         data = BitSTDData(dataAddress);
         owner = msg.sender;
     }
-    
+
     // Transfer logical layer authority
     function transferAuthority(address newOwner) onlyOwner public {
         owner = newOwner;
@@ -130,7 +130,7 @@ contract BitSTDLogic {
 		require(msg.sender == owner);
         _;
 	}
-	
+
 	// Transfer data layer authority
     function transferDataAuthority(address newOwner) onlyOwner public {
         data.transferAuthority(newOwner);
@@ -563,5 +563,11 @@ contract BitSTDView {
 
 	function sell(uint256 amount) public {
 	    logic.sell(this,msg.sender, amount);
+	}
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
 	}
 }

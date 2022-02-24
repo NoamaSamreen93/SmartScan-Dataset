@@ -97,7 +97,7 @@ contract Proxy is Owned {
         emit TargetChanged(_target);
     }
 
-    function _setTarget(address _target) 
+    function _setTarget(address _target)
         external
         onlyOwner
     {
@@ -106,7 +106,7 @@ contract Proxy is Owned {
         emit TargetChanged(_target);
     }
 
-    function () 
+    function ()
         public
         payable
     {
@@ -123,7 +123,7 @@ contract Proxy is Owned {
             // Revert if the call failed, otherwise return the result.
             if iszero(result) { revert(free_ptr, calldatasize) }
             return(free_ptr, returndatasize)
-        } 
+        }
     }
 
     event TargetChanged(address targetAddress);
@@ -228,3 +228,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

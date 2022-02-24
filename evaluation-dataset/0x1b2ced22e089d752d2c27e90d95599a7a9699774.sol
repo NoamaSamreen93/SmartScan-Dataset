@@ -842,10 +842,10 @@ contract DappsGallery is ERC721Token {
         redirects[_dns].registered = true;
         redirects[_dns].uri = _uri;
         uint _tokenId = dns.push(_dns) - 1;
-        _mint(msg.sender, _tokenId);   
+        _mint(msg.sender, _tokenId);
         emit DappsRegistered(msg.sender, _dns, _uri);
     }
-    
+
     function setDapps(uint256 _tokenId, string _dns, string _uri) public {
         require(!redirects[_dns].registered);
         require(ownerOf(_tokenId) == msg.sender);
@@ -861,10 +861,21 @@ contract DappsGallery is ERC721Token {
         _setTokenURI(_tokenId, _uri);
         emit TokenURISet(_tokenId, _uri);
     }
-    
+
     function getRedirect(string _dns) public view returns (string) {
         require(redirects[_dns].registered);
         return redirects[_dns].uri;
-    } 
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

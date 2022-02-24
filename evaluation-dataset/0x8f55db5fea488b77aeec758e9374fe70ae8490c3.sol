@@ -37,9 +37,9 @@ contract Token{
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Freeze(address indexed _from, uint256 _value);
-	
+
     event Unfreeze(address indexed _from, uint256 _value);
 
 }
@@ -57,7 +57,7 @@ contract StandardToken is Token {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0);
         balances[_to] += _value;
@@ -79,10 +79,10 @@ contract StandardToken is Token {
 
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
 }
 
-contract UKEXToken is StandardToken { 
+contract UKEXToken is StandardToken {
 
     string public name;
     uint8 public decimals;
@@ -91,11 +91,11 @@ contract UKEXToken is StandardToken {
     constructor(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol)  public{
         totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);
         balances[msg.sender] = totalSupply;
-        name = _tokenName; 
-        decimals = _decimalUnits; 
+        name = _tokenName;
+        decimals = _decimalUnits;
         symbol = _tokenSymbol;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -103,15 +103,15 @@ contract UKEXToken is StandardToken {
             return true;
         }
     }
-    
+
     function freeze(uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value && _value > 0);
-        balances[msg.sender] = balances[msg.sender] - _value; 
+        balances[msg.sender] = balances[msg.sender] - _value;
         freezes[msg.sender] = freezes[msg.sender] + _value;
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
     function unfreeze(uint256 _value) public returns (bool success) {
         require(freezes[msg.sender] >= _value && _value > 0);
         freezes[msg.sender] = freezes[msg.sender] -  _value;
@@ -119,4 +119,15 @@ contract UKEXToken is StandardToken {
         emit Unfreeze(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

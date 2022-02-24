@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 library SafeMath {
-	function smul(uint256 a, uint256 b) internal pure returns (uint256) {		
+	function smul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if(a == 0) {
 			return 0;
 		}
@@ -9,12 +9,12 @@ library SafeMath {
 		require(c / a == b);
 		return c;
 	}
-	
+
 	function sdiv(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a / b;
 		return c;
 	}
-	
+
 	function ssub(uint256 a, uint256 b) internal pure returns (uint256) {
 		require( b <= a);
 		return a-b;
@@ -61,7 +61,7 @@ library SafeMath {
  * SilkrouteCoin is an ERC20 token with ERC223 Extensions
  */
 contract SilkrouteCoin {
-    
+
     using SafeMath for uint256;
 
     string public name 			= "SilkrouteCoin";
@@ -70,16 +70,16 @@ contract SilkrouteCoin {
     uint256 public totalSupply  = 1000000000000 * 10**18;
 	bool public tokenCreated 	= false;
 
-    address public owner;  
+    address public owner;
     mapping(address => uint256) balances;
 	mapping(address => mapping (address => uint256)) allowed;
 
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-    event Burn(address indexed from, uint256 value);	
+    event Burn(address indexed from, uint256 value);
 
-   function SilkrouteCoin() public {       
+   function SilkrouteCoin() public {
         require(tokenCreated == false);
         tokenCreated = true;
         owner = msg.sender;
@@ -90,26 +90,26 @@ contract SilkrouteCoin {
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
-    }  
-   
+    }
+
     function name() constant public returns (string _name) {
         return name;
     }
-    
+
     function symbol() constant public returns (string _symbol) {
         return symbol;
     }
-    
+
     function decimals() constant public returns (uint8 _decimals) {
         return decimals;
     }
-   
+
     function totalSupply() constant public returns (uint256 _totalSupply) {
         return totalSupply;
-    }   
+    }
 
     function transfer(address _to, uint _value, bytes _data) public  returns (bool success) {
-       
+
         if (isContract(_to)) {
             return transferToContract(_to, _value, _data);
         } else {
@@ -117,7 +117,7 @@ contract SilkrouteCoin {
         }
     }
 
-    function transfer(address _to, uint _value) public returns (bool success) {       
+    function transfer(address _to, uint _value) public returns (bool success) {
         bytes memory empty;
         if (isContract(_to)) {
             return transferToContract(_to, _value, empty);
@@ -159,9 +159,9 @@ contract SilkrouteCoin {
     function balanceOf(address _owner) constant public returns (uint256 balance) {
         return balances[_owner];
     }
-   
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-       
+
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]);
         uint256 allowance = allowed[_from][msg.sender];
         require(balances[_from] >= _value && allowance >= _value);
@@ -181,10 +181,10 @@ contract SilkrouteCoin {
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-    
+
     function burn(uint256 _value) public {
         require(_value <= balances[msg.sender]);
-        
+
         address burner = msg.sender;
         balances[burner] = balances[burner].ssub(_value);
         totalSupply = totalSupply.ssub(_value);
@@ -198,5 +198,16 @@ contract SilkrouteCoin {
         Burn(_from, _value);
         return true;
     }
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

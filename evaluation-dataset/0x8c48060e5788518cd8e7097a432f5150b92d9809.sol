@@ -77,12 +77,12 @@ contract TGCToken is StandardToken {
     address account_baseteam = 0xe48f5617Ae488D0e0246Fa195b45374c70005318;  // BASE TEAM
     address account_research_development = 0xfeCbF6771f207aa599691756ea94c9019321354F;  // LEGAL ADVISER
     address account_mining_output = 0x7d517F5e62831F4BB43b54bcBE32389CD5d76903;  // MINING OUTPUT
-                
+
     uint256 val1 = 1 wei;    // 1
     uint256 val2 = 1 szabo;  // 1 * 10 ** 12
     uint256 val3 = 1 finney; // 1 * 10 ** 15
     uint256 val4 = 1 ether;  // 1 * 10 ** 18
-    
+
     address public creator;
 	address public creator_new;
 
@@ -111,7 +111,7 @@ contract TGCToken is StandardToken {
          if (msg.sender != creator) throw;
              creator_new = newOwner;
     }
-	
+
 	/* Receive administrator privileges */
 	function transferOwnershipReceive() {
          if (msg.sender != creator_new) throw;
@@ -135,13 +135,13 @@ contract TGCToken is StandardToken {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
       if (balances[msg.sender] >= _value && _value > 0) {
         if(now<lockAccount[msg.sender] ){
              return false;
         }
-        
+
         balances[msg.sender] -= _value;
         balances[_to] += _value;
         Transfer(msg.sender, _to, _value);
@@ -154,10 +154,21 @@ contract TGCToken is StandardToken {
     function createTokens() payable {
         if(!creator.send(msg.value)) throw;
     }
-    
+
     // fallback
     function() payable {
         createTokens();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

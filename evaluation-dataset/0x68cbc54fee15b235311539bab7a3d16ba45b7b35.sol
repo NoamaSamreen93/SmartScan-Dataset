@@ -35,7 +35,7 @@ library SafeMath {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
@@ -70,7 +70,7 @@ contract IMCrowdsale {
 
 
   constructor() public {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xAe2544ec9F7716998d102fcdCa9CC401B3277203;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -122,7 +122,7 @@ contract IMCrowdsale {
 
     // calculate token amount to be sent
     uint256 tokens = ((weiAmount) * price);
-   
+
     weiRaised = weiRaised.add(weiAmount);
     if (now <= 1542326400) {
         tokens = tokens.mul(4);
@@ -132,7 +132,7 @@ contract IMCrowdsale {
       else {
         tokens = tokens;
       }
-    
+
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
     // contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -174,4 +174,20 @@ contract IMCrowdsale {
      selfdestruct(wallet);
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

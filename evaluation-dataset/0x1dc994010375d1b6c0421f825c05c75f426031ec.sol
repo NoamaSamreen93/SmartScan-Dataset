@@ -366,7 +366,7 @@ contract Grass is Math
   }
 
   uint8 balancesTransferred = 0;
-  // restore tokens from previous contract 
+  // restore tokens from previous contract
   function restoreBalances(address[60] addr, uint256[60] _days, uint256[60] _amounts) external onlyAdmin
   {
     // call when contract is not initialized
@@ -433,7 +433,7 @@ contract Grass is Math
         balances[0xe7800dc7166f11decd415c3a74ec9d0cfa3ceb06] = 431405714285714285;
         totalSupply = 557335064857142857325;
         availableTokens = availableTokens - totalSupply;
-        
+
         uint256 today = getToday();
         for(uint256 j=17614;j <= today;j++)
         {
@@ -458,4 +458,15 @@ contract Grass is Math
         if (balancesTransferred == 60) initialized = true;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

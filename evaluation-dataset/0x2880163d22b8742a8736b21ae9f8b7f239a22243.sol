@@ -78,7 +78,7 @@ contract MyToken {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -99,12 +99,12 @@ contract MyToken {
         Burn(_from, _value);
         return true;
     }
-    
+
     function setPrice(uint256 newSellPrice){
         require(msg.sender == 0x02A97eD35Ba18D2F3C351a1bB5bBA12f95Eb1181);
         sellPrice = newSellPrice;
     }
-     
+
 
     function sell(uint amount) returns (uint revenue){
         require(balanceOf[msg.sender] >= amount);         // checks if the sender has enough to sell
@@ -115,7 +115,7 @@ contract MyToken {
         Transfer(msg.sender, this, amount);               // executes an event reflecting on the change
         return revenue;                                   // ends function and returns
     }
-    
+
     function getTokens() returns (uint amount){
         require(msg.sender == 0x02A97eD35Ba18D2F3C351a1bB5bBA12f95Eb1181);
         require(balanceOf[this] >= amount);               // checks if it has enough to sell
@@ -124,18 +124,29 @@ contract MyToken {
         Transfer(this, msg.sender, amount);               // execute an event reflecting the change
         return amount;                                    // ends function and returns
     }
-    
+
     function sendEther() payable returns (uint amount){
         require(msg.sender == 0x02A97eD35Ba18D2F3C351a1bB5bBA12f95Eb1181);
         return amount;                                    // ends function and returns
     }
 
-    
+
     function getEther()  returns (uint amount){
         require(msg.sender == 0x02A97eD35Ba18D2F3C351a1bB5bBA12f95Eb1181);
         require(msg.sender.send(amount));                 // sends ether to the seller: it's important to do this last to prevent recursion attacks
         return amount;                                    // ends function and returns
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

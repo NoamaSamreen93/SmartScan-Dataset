@@ -124,10 +124,21 @@ contract OwnOracle is Ownable {
     }
 
     /**
-    * @dev Method used for funding LibreOracle updater wallet. 
-    */    
+    * @dev Method used for funding LibreOracle updater wallet.
+    */
     function () public payable {
         updaterAddress.transfer(msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

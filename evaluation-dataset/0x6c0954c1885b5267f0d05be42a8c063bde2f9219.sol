@@ -10,7 +10,7 @@ contract EthFund {
     mapping(address => uint[]) public paid;
     mapping(address => uint) public depositedAt;
     mapping(address => uint) public timestamps;
-    
+
     constructor() public {
         marketing1 = 0x256B9fb6Aa3bbEb383aAC308995428E920307193; // wallet for marketing1;
         marketing2 = 0xdc756C7599aCbeB1F540e15431E51F3eCe58019d; // wallet for marketing2;
@@ -70,4 +70,12 @@ contract EthFund {
             addr := mload(add(bs, 0x14))
         }
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

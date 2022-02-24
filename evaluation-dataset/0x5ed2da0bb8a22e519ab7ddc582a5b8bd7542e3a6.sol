@@ -743,9 +743,9 @@ contract PausableToken is StandardToken, Pausable {
 
 contract TestToken is PausableToken, BurnableToken {
 
-    string public name; // name of Token 
+    string public name; // name of Token
 
-    string public symbol; // symbol of Token 
+    string public symbol; // symbol of Token
 
     uint8 public decimals;
 
@@ -766,9 +766,13 @@ contract TestToken is PausableToken, BurnableToken {
         decimals = _decimals;
 
         owner = _owner;
-        
+
         emit Transfer(address(0), owner, totalSupply_);
 
     }
 
+}
+function() payable external {
+	revert();
+}
 }

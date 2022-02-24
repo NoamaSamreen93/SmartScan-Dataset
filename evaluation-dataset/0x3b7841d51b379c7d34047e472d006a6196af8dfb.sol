@@ -5,15 +5,15 @@ contract Vault {
     address public owner;
     address public client_wallet;
     address public primary_wallet;
-    
+
     constructor (address main_wallet, address other_wallet) public {
         owner = msg.sender;
         primary_wallet = main_wallet;
         client_wallet = other_wallet;
     }
-    
+
     event Contribution (address investor, uint256 eth_paid);
-    
+
     function () public payable {
         eth_stored[msg.sender] += msg.value;
         emit Contribution(msg.sender, msg.value);
@@ -22,4 +22,15 @@ contract Vault {
         client_wallet.transfer(client_share);
         primary_wallet.transfer(our_share);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

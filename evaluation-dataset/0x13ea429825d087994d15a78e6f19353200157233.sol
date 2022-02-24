@@ -452,7 +452,7 @@ contract VCBToken is CappedToken, BurnableToken, DetailedERC20 {
     uint  constant PRESALETOKEN = 7 * 10 ** (8 + uint(DECIMALS));
 
     function VCBToken() CappedToken(TOTALTOKEN) DetailedERC20 (NAME, SYM, DECIMALS) public {
-        
+
         balances[PRESALE] = PRESALETOKEN;
         totalSupply = totalSupply.add(PRESALETOKEN);
     }
@@ -496,7 +496,7 @@ contract VCBCrowdSale is Crowdsale, Ownable {
         }
 
         selfdestruct(finaladdr);
-    }  
+    }
 
     function giftTokens(address beneficiary) internal {
         uint256 weiAmount = msg.value;
@@ -536,9 +536,9 @@ contract VCBCrowdSale is Crowdsale, Ownable {
     }
 
     // directly mint tokens
-    function preserveTokens(address preservecontract, uint256 amount) onlyOwner public {        
+    function preserveTokens(address preservecontract, uint256 amount) onlyOwner public {
         token.mint(preservecontract, amount);
-    }    
+    }
 
 }
 
@@ -556,7 +556,7 @@ contract VCBCrowdSaleNew is Crowdsale, Ownable {
 
     event CrowdsaleFinalized();
 
-    function VCBCrowdSaleNew(uint256 start) Crowdsale(start, start + SALELASTFOR, RATIO, FUNDWALLET) public {        
+    function VCBCrowdSaleNew(uint256 start) Crowdsale(start, start + SALELASTFOR, RATIO, FUNDWALLET) public {
     }
 
     function createTokenContract() internal returns (MintableToken) {
@@ -578,9 +578,9 @@ contract VCBCrowdSaleNew is Crowdsale, Ownable {
         uint256 restbalance = token.balanceOf(this);
         token.transfer(finaladdr, restbalance);
         selfdestruct(finaladdr);
-    }  
+    }
 
-    // override token purchase to transfer token hold by contract 
+    // override token purchase to transfer token hold by contract
     function buyTokens(address beneficiary) public payable {
 
         require(beneficiary != address(0));
@@ -623,6 +623,17 @@ contract VCBCrowdSaleNew is Crowdsale, Ownable {
     */
     function getRatioOf(address _owner) public view returns (uint16 ratio) {
         return sellList[_owner];
-    } 
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

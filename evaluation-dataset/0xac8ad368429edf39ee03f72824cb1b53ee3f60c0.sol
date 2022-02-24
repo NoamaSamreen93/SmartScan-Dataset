@@ -96,12 +96,12 @@ contract Token is ERC20Interface, Owned, SafeMath {
         name = "E-INDIAN RUPEE";
         decimals = 2;
         _totalSupply = 20000000000000;
-        _totalSupply = _totalSupply * 10 ** decimals;        
+        _totalSupply = _totalSupply * 10 ** decimals;
         balances[owner] = _totalSupply;
-        emit Transfer(address(0), owner, _totalSupply);   
+        emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -191,7 +191,7 @@ contract Token is ERC20Interface, Owned, SafeMath {
     function () external payable {
         revert();
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -199,4 +199,13 @@ contract Token is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

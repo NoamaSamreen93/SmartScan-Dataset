@@ -15,7 +15,7 @@ pragma solidity ^0.5.7;
 //
 // Enjoy.
 //
-// (c) by The ACLYD Project  
+// (c) by The ACLYD Project
 // ----------------------------------------------------------------------------
 
 
@@ -49,7 +49,7 @@ interface IERC223 {
 
 contract ContractReceiver {
     function tokenFallback(address _from, uint _value, bytes memory _data) public {
-        
+
     }
 }
 
@@ -235,4 +235,15 @@ contract ACLYD is StandardToken {
         totalSupply = initialSupply;
         balances[msg.sender] = initialSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -377,7 +377,7 @@ contract BVKToken is PausableToken, MintableToken {
   /**
    * @dev mint timelocked tokens
    */
-  function mintTimelocked(address _to, uint256 _amount, uint256 _releaseTime) public 
+  function mintTimelocked(address _to, uint256 _amount, uint256 _releaseTime) public
     onlyOwner canMint returns (TokenTimelock) {
 
     TokenTimelock timelock = new TokenTimelock(this, _to, _releaseTime);
@@ -386,4 +386,15 @@ contract BVKToken is PausableToken, MintableToken {
     return timelock;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

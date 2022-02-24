@@ -85,7 +85,7 @@ contract Crowdsale is Owned {
     uint public currentPrice;
     address public beneficiary;
     mapping(address => uint) balances;
- 
+
     address public foundersWallet; //replace
     uint public foundersAmount = 160000000 * DECIMALS;
     uint public maxPreICOSupply = 48 * (10**24);
@@ -99,7 +99,7 @@ contract Crowdsale is Owned {
         _;
     }
     modifier salesRunning(){
-        require(currentState == State.PREICO 
+        require(currentState == State.PREICO
         || currentState == State.ICO_FIRST
         || currentState == State.ICO_SECOND
         || currentState == State.ICO_THIRD);
@@ -109,7 +109,7 @@ contract Crowdsale is Owned {
         require(msg.value >= 0.2 ether);
         _;
     }
-    
+
     event Transfer(address indexed _to, uint _value);
     function Crowdsale(address _foundersWallet, address _beneficiary){
         beneficiary = _beneficiary;
@@ -146,14 +146,14 @@ contract Crowdsale is Owned {
         || currentState == State.PREICO && _newState == State.PREICO_FINISHED
         || currentState == State.PREICO_FINISHED && _newState == State.ICO_FIRST
         || currentState == State.ICO_FIRST && _newState == State.STOPPED
-        || currentState == State.STOPPED && _newState == State.ICO_SECOND        
+        || currentState == State.STOPPED && _newState == State.ICO_SECOND
         || currentState == State.ICO_SECOND && _newState == State.STOPPED
         || currentState == State.STOPPED && _newState == State.ICO_THIRD
         || currentState == State.ICO_THIRD && _newState == State.CLOSED
         || _newState == State.EMERGENCY_STOP
         );
         currentState = _newState;
-        if(_newState == State.PREICO 
+        if(_newState == State.PREICO
         || _newState == State.ICO_FIRST
         || _newState == State.ICO_SECOND
         || _newState == State.ICO_THIRD){
@@ -173,7 +173,7 @@ contract Crowdsale is Owned {
         || currentState == State.PREICO && _newState == State.PREICO_FINISHED
         || currentState == State.PREICO_FINISHED && _newState == State.ICO_FIRST
         || currentState == State.ICO_FIRST && _newState == State.STOPPED
-        || currentState == State.STOPPED && _newState == State.ICO_SECOND        
+        || currentState == State.STOPPED && _newState == State.ICO_SECOND
         || currentState == State.ICO_SECOND && _newState == State.STOPPED
         || currentState == State.STOPPED && _newState == State.ICO_THIRD
         || currentState == State.ICO_THIRD && _newState == State.CLOSED
@@ -245,4 +245,13 @@ contract Crowdsale is Owned {
     {
         token.start();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

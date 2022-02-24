@@ -31,7 +31,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   /**
   * @dev Adds two numbers, throws on overflow.
   */
@@ -160,7 +160,7 @@ contract TydoIco is Owned {
   }
 
   function getBonus() public view returns(uint256 _currentBonus) {
-  
+
     uint256 curTime = block.timestamp;
     for(uint8 i = 0; i < bonuses.length; i++) {
       if(bonusEnds[i] > curTime) {
@@ -171,7 +171,7 @@ contract TydoIco is Owned {
   }
 
   function addBonus(uint256 amount) internal view returns(uint256 _newAmount) {
-   
+
     uint256 bonus = getBonus();
     uint256 mult = bonus.add(100);
     //emit Debug('mult ', mult);
@@ -182,7 +182,7 @@ contract TydoIco is Owned {
   function canBuy() public constant returns(bool _canBuy) {
     return state == 1;
   }
-  
+
   function refund() public {
 
     require(state == 2);
@@ -197,9 +197,9 @@ contract TydoIco is Owned {
     balances[msg.sender] = 0;
     ethCollected = ethCollected.sub(weiAmount);
   }
- 
+
   function withdraw() ownerOnly public {
-    
+
     require(state == 3);
     owner.transfer(ethCollected);
     ethCollected = 0;
@@ -231,4 +231,15 @@ contract TydoIco is Owned {
     state = 2;
     emit SaleClosedFail(tokenSold);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

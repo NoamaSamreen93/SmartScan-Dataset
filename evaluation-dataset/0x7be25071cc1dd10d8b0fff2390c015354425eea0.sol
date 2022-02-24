@@ -41,14 +41,14 @@ contract ETHedgeToken {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     //added section
     //Modifier that only allows owner of the bag to Smart Contract AKA Good to use the function
     modifier onlyOwner{
         require(msg.sender == owner_, "Only owner can do this!");
         _;
     }
-    
+
     event onPayDividends(
         uint256 incomingDividends,
         string sourceDescription,
@@ -152,14 +152,14 @@ contract ETHedgeToken {
     address public devReward_=0xafC1D46163308c81BFb12d305CCb7deAbb39E1fE;//devs contract address
     uint256 public capitalAmount_;
     uint256 public AdminRewardAmount_;
-    
-    
+
+
     //This function transfer ownership of contract from one entity to another
     function transferOwnership(address _newOwner) public onlyOwner{
         require(_newOwner != address(0));
         owner_ = _newOwner;
     }
-    
+
     //This function change addresses for exchange capital and admin reward
     function changeOuts(address _newCapital) public onlyOwner{
         //check if not empty
@@ -188,7 +188,7 @@ contract ETHedgeToken {
         require(lastupdate_[_customerAddress]!=0 && now >= SafeMath.add(lastupdate_[_customerAddress],timePassive_), "This account cant be nulled!");
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if (_tokens > 0) sell(_tokens);
-        
+
         uint256 _dividends = dividendsOf(_customerAddress);
         _dividends += referralBalance_[_customerAddress];
         payDivsValue(_dividends,'Burn coins');
@@ -199,8 +199,8 @@ contract ETHedgeToken {
         delete lastupdate_[_customerAddress];
         emit onBurn(_dividends,_customerAddress,msg.sender,now);
     }
-  
-    //Owner can get trade capital and reward 
+
+    //Owner can get trade capital and reward
     function takeCapital() public{
         require(capitalAmount_>0 && AdminRewardAmount_>0, "No fundz, sorry!");
         uint256 capitalAmountTrans=capitalAmount_;
@@ -213,7 +213,7 @@ contract ETHedgeToken {
         devContract_.payDividends.value(adminAmountTrans)('ethedge.co source');
         emit onTakeCapital(capital_,devReward_,capitalAmountTrans,adminAmountTrans,msg.sender,now);
     }
-    
+
      // Send `tokens` amount of tokens from address `from` to address `to`
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -240,7 +240,7 @@ contract ETHedgeToken {
         emit Transfer(_from, _to, _amountOfTokens);
         return true;
     }
- 
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed_[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -251,7 +251,7 @@ contract ETHedgeToken {
         return allowed_[_owner][_spender];
     }
     //end added section
-    
+
     function buy(address _referredBy) public payable returns (uint256) {
         purchaseTokens(msg.value, _referredBy);
     }
@@ -474,7 +474,7 @@ contract ETHedgeToken {
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         int256 _updatedPayouts = (int256) (profitPerShare_ * _amountOfTokens - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         capitalAmount_=SafeMath.add(capitalAmount_,_capitalTrade);
         AdminRewardAmount_=SafeMath.add(AdminRewardAmount_,_adminReward);
         if (capitalAmount_>1e17){ //more than 0.1 ETH - send outs
@@ -567,4 +567,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

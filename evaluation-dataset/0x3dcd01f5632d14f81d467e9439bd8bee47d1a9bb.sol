@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,13 +79,13 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
 }
 
 /**
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -226,28 +226,28 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract SimpleTokenCoin is MintableToken {
-    
+
     string public constant name = "Coal Coin";
-    
+
     string public constant symbol = "CC2";
-    
+
     uint32 public constant decimals = 18;
-    
+
     function SimpleTokenCoin (){
         totalSupply = 0;
     }
-    
+
 }
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
 
     uint restrictedPercent;
@@ -257,52 +257,52 @@ contract Crowdsale is Ownable {
     SimpleTokenCoin public token = new SimpleTokenCoin();
 
     uint start;
-    
+
     uint period;
 
     uint hardcap;
 
     uint public rate;
-    
+
 
     function Crowdsale() {
         // адресс, который будет получать эфир, за который покупают токены
     	multisig = 0x262C53E519eCD2D2bbAEcc12f7a31847bd33B969;
-    	
+
     	// адрес, на который будут капать проценты от купленных токенов
     	restricted = 0x262C53E519eCD2D2bbAEcc12f7a31847bd33B969;
-    	
+
     	// процент монет, которые пойдут на кошелек restrictedPercent
     	restrictedPercent = 0;
-    	
+
     	// стоимость 1 эфира в нашем токене (уч 18 знаков, после запятой)
     	rate = 100000000*(1000000000000000000);
-    	
+
     	// unix-время начала ico и количество дней до его завершения
     	start = 1505865600; //09/20/2017 @ 12:00am (UTC)
     	period = 128;
-    	
+
     	// лимит монет для покупки через контракт (~1000 ефиров)
         hardcap = 9500000*(1000000000000000000);
     }
-    
+
     // модификатор определяет доступна ли покупка монет (по времени  ICO)
     modifier saleIsOn() {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-	
+
 	// модификатор определяет доступна ли покупка монет (по количеству монет)
     modifier isUnderHardCap() {
         require(token.totalSupply() <= hardcap);
         _;
     }
-    
+
     // установка новой цены
     function setRate(uint _rate) onlyOwner {
         rate = _rate;
     }
-    
+
     // функция окончания ICO
     function finishMinting() onlyOwner {
 	uint issuedTokenSupply = token.totalSupply();
@@ -313,15 +313,28 @@ contract Crowdsale is Ownable {
 
     // создание монет
     function createTokens() isUnderHardCap saleIsOn payable {
-        
+
         multisig.transfer(msg.value);
         uint tokens = rate.mul(msg.value).div(1 ether);
-        
+
         token.mint(msg.sender, tokens);
     }
 
     function() external payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

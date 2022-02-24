@@ -331,8 +331,8 @@ contract JavvyToken is DetailedERC20, StandardToken, Ownable, Config {
     address public multiSigAddress;
 
     constructor(
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals
     ) public
     DetailedERC20(_name, _symbol, _decimals) {
@@ -347,7 +347,7 @@ contract JavvyToken is DetailedERC20, StandardToken, Ownable, Config {
         address _crowdsaleAddress,
         address _bonusAddress,
         address _multiSigAddress
-    ) public 
+    ) public
     onlyOwner() {
         crowdsaleAddress = _crowdsaleAddress;
         bonusAddress = _bonusAddress;
@@ -373,4 +373,15 @@ contract JavvyToken is DetailedERC20, StandardToken, Ownable, Config {
         return balanceOf(crowdsaleAddress);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

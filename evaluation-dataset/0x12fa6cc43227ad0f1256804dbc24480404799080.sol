@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // ERC Token Standard #20 Interface
-// ODIN token contract 
+// ODIN token contract
 // ----------------------------------------------------------------------------
 pragma solidity ^0.4.21;
 
@@ -51,7 +51,7 @@ contract ERC20Interface {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
 }
 
 contract Owned {
@@ -78,7 +78,7 @@ contract OdinToken is ERC20Interface, Owned {
 //    uint private totalSupply;
     bool private _whitelistAll;
 
-    struct balanceData {  
+    struct balanceData {
        bool locked;
        uint balance;
        uint airDropQty;
@@ -93,7 +93,7 @@ contract OdinToken is ERC20Interface, Owned {
   * @dev Initially assigns the totalSupply to the contract creator
   */
     function OdinToken() public {
-        
+
         // owner of this contract
         owner = msg.sender;
         symbol = "ODIN";
@@ -151,7 +151,7 @@ contract OdinToken is ERC20Interface, Owned {
     }
     }
   }
-  
+
     function canSpend(address tokenOwner, uint _value) public constant returns (bool success) {
 
         if (_value > balances[tokenOwner].balance) {return false;}     // do they have enough to spend?
@@ -184,7 +184,7 @@ contract OdinToken is ERC20Interface, Owned {
         if (block.timestamp < 1569974400 && (balances[tokenOwner].balance - _value) < balances[tokenOwner].airDropQty / 4) {
             return false;
         }
-        
+
         return true;
 
     }
@@ -226,7 +226,7 @@ contract OdinToken is ERC20Interface, Owned {
           require(false);
         }
       }
-    
+
 
     // ------------------------------------------------------------------------
     // not implemented
@@ -235,7 +235,7 @@ contract OdinToken is ERC20Interface, Owned {
         return allowed[tokenOwner][spender];
     }
 
-    
+
     // ------------------------------------------------------------------------
     // Used to burn unspent tokens in the contract
     // ------------------------------------------------------------------------
@@ -247,4 +247,15 @@ contract OdinToken is ERC20Interface, Owned {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -382,13 +382,13 @@ pragma solidity ^0.5.7;
 
 contract Initable {
     bool public inited;
-    
+
     modifier initer() {
         require(inited == false, "Already inited");
         _;
         inited = true;
     }
-    
+
     function init() public initer { }
 }
 
@@ -1204,4 +1204,15 @@ contract InstallmentsModel is ProxyStorage, Initable, ERC165, BytesUtils, Ownabl
         ) = decode(_data, 16, 32, 3, 5, 4);
         return (uint128(uint256(cuota)), uint256(interestRate), uint24(uint256(installments)), uint40(uint256(duration)), uint32(uint256(timeUnit)));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

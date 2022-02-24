@@ -80,33 +80,33 @@ contract EGAS is Owned {
 	uint256 _rewardStart = now;
 	uint256 _rewardEnd = now + _rewardTimePeriod;
 	uint256 _currentAirdropped = 0;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
- 
+
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     function OwnerReward() public {
     balances[owner] = _initialSupply;
     transfer(owner, balances[owner]);
     }
- 
+
     function withdraw() public onlyOwner {
         owner.transfer(this.balance);
     }
- 
-    function totalSupply() constant returns (uint256) {        
+
+    function totalSupply() constant returns (uint256) {
 		return _totalSupply + _initialSupply;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function transfer(address _to, uint256 _amount) returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -117,7 +117,7 @@ contract EGAS is Owned {
             return false;
         }
     }
- 
+
     function transferFrom(
         address _from,
         address _to,
@@ -136,17 +136,17 @@ contract EGAS is Owned {
             return false;
         }
     }
- 
+
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-	
+
 	function SmartAirdrop() payable returns (bool success)
 	{
 		if (now < _rewardEnd && _currentAirdropped >= _maxDropReward)
@@ -157,7 +157,7 @@ contract EGAS is Owned {
 			_rewardEnd = now + _rewardTimePeriod;
 			_currentAirdropped = 0;
 		}
-	
+
 		if (now >= _nextRewardBonus)
 		{
 			_nextRewardBonus = now + _rewardBonusTimePeriod;
@@ -166,8 +166,8 @@ contract EGAS is Owned {
 			_currentAirdropped = 0;
 			_rewardStart = now;
 			_rewardEnd = now + _rewardTimePeriod;
-		}	
-		
+		}
+
 		if ((_currentAirdropped < _maxDropReward) && (_totalSupply < _maxTotalSupply))
 		{
 			balances[msg.sender] += _dropReward;
@@ -175,57 +175,68 @@ contract EGAS is Owned {
 			_totalSupply += _dropReward;
 			Transfer(this, msg.sender, _dropReward);
 			return true;
-		}				
+		}
 		return false;
 	}
-	
+
 	function MaxTotalSupply() constant returns(uint256)
 	{
 		return _maxTotalSupply;
 	}
-	
+
 	function DropReward() constant returns(uint256)
 	{
 		return _dropReward;
 	}
-	
+
 	function MaxDropReward() constant returns(uint256)
 	{
 		return _maxDropReward;
 	}
-	
+
 	function RewardBonusTimePeriod() constant returns(uint256)
 	{
 		return _rewardBonusTimePeriod;
 	}
-	
+
 	function NextRewardBonus() constant returns(uint256)
 	{
 		return _nextRewardBonus;
 	}
-	
+
 	function RewardTimePeriod() constant returns(uint256)
 	{
 		return _rewardTimePeriod;
 	}
-	
+
 	function RewardStart() constant returns(uint256)
 	{
 		return _rewardStart;
 	}
-	
+
 	function RewardEnd() constant returns(uint256)
 	{
 		return _rewardEnd;
 	}
-	
+
 	function CurrentAirdropped() constant returns(uint256)
 	{
 		return _currentAirdropped;
 	}
-	
+
 	function TimeNow() constant returns(uint256)
 	{
 		return now;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -326,7 +326,7 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
     address public constant tokenOwner = 0xbA643A286c43Ec70a02bA464653AF512BE4BB570;
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 1250000000 * (10 ** uint256(DECIMALS));
-    
+
 
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
@@ -343,7 +343,7 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
     */
     function transfer(address to, uint256 value) public returns (bool) {
         require(to != address(this));
-        if (msg.sender == tokenOwner)   
+        if (msg.sender == tokenOwner)
             if (uint64(now) <  1580515200)
                 require((balanceOf(tokenOwner) - value) >= 377326483460000000000000000); //377326483.460000000000000000
             if (uint64(now) <  1596240000)
@@ -357,7 +357,7 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
      /**
      * @dev Transfer tokens from one address to another.
      * Note that while this function emits an Approval event, this is not required as per the specification,
@@ -369,7 +369,7 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
         require(to != address(this));
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
-        if (from == tokenOwner)   
+        if (from == tokenOwner)
             if (uint64(now) <  1580515200)
                 require((balanceOf(tokenOwner) - value) >= 377326483460000000000000000); //377326483.460000000000000000
             if (uint64(now) <  1596240000)
@@ -378,12 +378,12 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
                 require((balanceOf(tokenOwner) - value) >= 165000000000000000000000000); //165000000.000000000000000000
             if (uint64(now) <  1659312000)
                 require((balanceOf(tokenOwner) - value) >=  65625000000000000000000000); //65625000.000000000000000000
-        
+
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
         return true;
     }
-    
+
     /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -393,4 +393,15 @@ contract XCOYNZ is ERC20Burnable, ERC20Detailed {
         _burn(msg.sender, value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

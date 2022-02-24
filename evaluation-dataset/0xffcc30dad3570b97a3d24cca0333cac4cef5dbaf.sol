@@ -80,7 +80,7 @@ contract WipeProxy is DSMath {
     function wipe(
         uint cdpNum,
         uint _wad
-    ) public 
+    ) public
     {
         require(_wad > 0, "no-wipe-no-dai");
 
@@ -124,4 +124,13 @@ contract WipeProxy is DSMath {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

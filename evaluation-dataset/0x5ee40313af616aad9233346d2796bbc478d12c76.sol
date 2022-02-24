@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 /* ==================================================================== */
 /* Copyright (c) 2018 The MagicAcademy Project.  All rights reserved.
-/* 
-/* https://www.magicacademy.io One of the world's first idle strategy games of blockchain 
-/*  
+/*
+/* https://www.magicacademy.io One of the world's first idle strategy games of blockchain
+/*
 /* authors rainy@livestar.com/Jony.Fu@livestar.com
-/*                 
+/*
 /* ==================================================================== */
 /**
  * @title Ownable
@@ -58,7 +58,7 @@ contract AccessAdmin is Ownable {
   }
 
   modifier onlyAdmin {
-    require(adminContracts[msg.sender]); 
+    require(adminContracts[msg.sender]);
     _;
   }
 
@@ -92,7 +92,7 @@ contract JadeCoin is ERC20, AccessAdmin {
   uint256 public totalJadeProduction;
 
   uint256[] public totalJadeProductionSnapshots; // The total goo production for each prior day past
-     
+
   uint256 public nextSnapshotTime;
   uint256 public researchDivPercent = 10;
 
@@ -100,15 +100,15 @@ contract JadeCoin is ERC20, AccessAdmin {
   mapping(address => uint256) public jadeBalance;
   mapping(address => mapping(uint8 => uint256)) public coinBalance;
   mapping(uint8 => uint256) totalEtherPool; //Total Pool
-  
+
   mapping(address => mapping(uint256 => uint256)) public jadeProductionSnapshots; // Store player's jade production for given day (snapshot)
- 
+
   mapping(address => mapping(uint256 => bool)) private jadeProductionZeroedSnapshots; // This isn't great but we need know difference between 0 production and an unused/inactive day.
-    
+
   mapping(address => uint256) public lastJadeSaveTime; // Seconds (last time player claimed their produced jade)
   mapping(address => uint256) public lastJadeProductionUpdate; // Days (last snapshot player updated their production)
   mapping(address => uint256) private lastJadeResearchFundClaim; // Days (snapshot number)
-  
+
   mapping(address => uint256) private lastJadeDepositFundClaim; // Days (snapshot number)
   uint256[] private allocatedJadeResearchSnapshots; // Div pot #1 (research eth allocated to each prior day past)
 
@@ -129,7 +129,7 @@ contract JadeCoin is ERC20, AccessAdmin {
   function tweakDailyDividends(uint256 newResearchPercent) external {
     require(msg.sender == owner);
     require(newResearchPercent > 0 && newResearchPercent <= 10);
-        
+
     researchDivPercent = newResearchPercent;
   }
 
@@ -144,7 +144,7 @@ contract JadeCoin is ERC20, AccessAdmin {
   /// unclaimed jade
   function balanceOfUnclaimed(address player) public constant returns (uint256) {
     uint256 lSave = lastJadeSaveTime[player];
-    if (lSave > 0 && lSave < block.timestamp) { 
+    if (lSave > 0 && lSave < block.timestamp) {
       return SafeMath.mul(getJadeProduction(player),SafeMath.div(SafeMath.sub(block.timestamp,lSave),100));
     }
     return 0;
@@ -163,7 +163,7 @@ contract JadeCoin is ERC20, AccessAdmin {
   function getlastJadeProductionUpdate(address player) public view returns (uint256) {
     return lastJadeProductionUpdate[player];
   }
-    /// increase prodution 
+    /// increase prodution
   function increasePlayersJadeProduction(address player, uint256 increase) public onlyAccess {
     jadeProductionSnapshots[player][allocatedJadeResearchSnapshots.length] = SafeMath.add(getJadeProduction(player),increase);
     lastJadeProductionUpdate[player] = allocatedJadeResearchSnapshots.length;
@@ -175,12 +175,12 @@ contract JadeCoin is ERC20, AccessAdmin {
     uint256 previousProduction = getJadeProduction(player);
     uint256 newProduction = SafeMath.sub(previousProduction, decrease);
 
-    if (newProduction == 0) { 
+    if (newProduction == 0) {
       jadeProductionZeroedSnapshots[player][allocatedJadeResearchSnapshots.length] = true;
       delete jadeProductionSnapshots[player][allocatedJadeResearchSnapshots.length]; // 0
     } else {
       jadeProductionSnapshots[player][allocatedJadeResearchSnapshots.length] = newProduction;
-    }   
+    }
     lastJadeProductionUpdate[player] = allocatedJadeResearchSnapshots.length;
     totalJadeProduction = SafeMath.sub(totalJadeProduction,decrease);
   }
@@ -189,16 +189,16 @@ contract JadeCoin is ERC20, AccessAdmin {
   function updatePlayersCoin(address player) internal {
     uint256 coinGain = balanceOfUnclaimed(player);
     lastJadeSaveTime[player] = block.timestamp;
-    roughSupply = SafeMath.add(roughSupply,coinGain);  
-    jadeBalance[player] = SafeMath.add(jadeBalance[player],coinGain);  
+    roughSupply = SafeMath.add(roughSupply,coinGain);
+    jadeBalance[player] = SafeMath.add(jadeBalance[player],coinGain);
   }
 
   /// update player's jade balance
   function updatePlayersCoinByOut(address player) external onlyAccess {
     uint256 coinGain = balanceOfUnclaimed(player);
     lastJadeSaveTime[player] = block.timestamp;
-    roughSupply = SafeMath.add(roughSupply,coinGain);  
-    jadeBalance[player] = SafeMath.add(jadeBalance[player],coinGain);  
+    roughSupply = SafeMath.add(roughSupply,coinGain);
+    jadeBalance[player] = SafeMath.add(jadeBalance[player],coinGain);
   }
   /// transfer
   function transfer(address recipient, uint256 amount) public returns (bool) {
@@ -214,29 +214,29 @@ contract JadeCoin is ERC20, AccessAdmin {
   function transferFrom(address player, address recipient, uint256 amount) public returns (bool) {
     updatePlayersCoin(player);
     require(amount <= allowed[player][msg.sender] && amount <= jadeBalance[player]);
-        
-    jadeBalance[player] = SafeMath.sub(jadeBalance[player],amount); 
-    jadeBalance[recipient] = SafeMath.add(jadeBalance[recipient],amount); 
-    allowed[player][msg.sender] = SafeMath.sub(allowed[player][msg.sender],amount); 
-        
-    Transfer(player, recipient, amount);  
+
+    jadeBalance[player] = SafeMath.sub(jadeBalance[player],amount);
+    jadeBalance[recipient] = SafeMath.add(jadeBalance[recipient],amount);
+    allowed[player][msg.sender] = SafeMath.sub(allowed[player][msg.sender],amount);
+
+    Transfer(player, recipient, amount);
     return true;
   }
-  
+
   function approve(address approvee, uint256 amount) public returns (bool) {
-    allowed[msg.sender][approvee] = amount;  
+    allowed[msg.sender][approvee] = amount;
     Approval(msg.sender, approvee, amount);
     return true;
   }
-  
+
   function allowance(address player, address approvee) public constant returns(uint256) {
-    return allowed[player][approvee];  
+    return allowed[player][approvee];
   }
-  
+
   /// update Jade via purchase
   function updatePlayersCoinByPurchase(address player, uint256 purchaseCost) public onlyAccess {
     uint256 unclaimedJade = balanceOfUnclaimed(player);
-        
+
     if (purchaseCost > unclaimedJade) {
       uint256 jadeDecrease = SafeMath.sub(purchaseCost, unclaimedJade);
       require(jadeBalance[player] >= jadeDecrease);
@@ -247,7 +247,7 @@ contract JadeCoin is ERC20, AccessAdmin {
       roughSupply = SafeMath.add(roughSupply,jadeGain);
       jadeBalance[player] = SafeMath.add(jadeBalance[player],jadeGain);
     }
-        
+
     lastJadeSaveTime[player] = block.timestamp;
   }
 
@@ -271,7 +271,7 @@ contract JadeCoin is ERC20, AccessAdmin {
       jadeBalance[player] = SafeMath.sub(jadeBalance[player],coin);
     }
   }
-  
+
   function setCoinBalance(address player, uint256 eth, uint8 itype, bool iflag) external onlyAccess {
     if (iflag) {
       coinBalance[player][itype] = SafeMath.add(coinBalance[player][itype],eth);
@@ -303,15 +303,15 @@ contract JadeCoin is ERC20, AccessAdmin {
   function getNextSnapshotTime() external view returns(uint256) {
     return nextSnapshotTime;
   }
-  
+
   // To display on website
   function viewUnclaimedResearchDividends() external constant returns (uint256, uint256, uint256) {
     uint256 startSnapshot = lastJadeResearchFundClaim[msg.sender];
     uint256 latestSnapshot = allocatedJadeResearchSnapshots.length - 1; // No snapshots to begin with
-        
+
     uint256 researchShare;
     uint256 previousProduction = jadeProductionSnapshots[msg.sender][lastJadeResearchFundClaim[msg.sender] - 1]; // Underflow won't be a problem as gooProductionSnapshots[][0xfffffffffffff] = 0;
-    for (uint256 i = startSnapshot; i <= latestSnapshot; i++) {     
+    for (uint256 i = startSnapshot; i <= latestSnapshot; i++) {
     // Slightly complex things by accounting for days/snapshots when user made no tx's
       uint256 productionDuringSnapshot = jadeProductionSnapshots[msg.sender][i];
       bool soldAllProduction = jadeProductionZeroedSnapshots[msg.sender][i];
@@ -320,21 +320,21 @@ contract JadeCoin is ERC20, AccessAdmin {
       } else {
         previousProduction = productionDuringSnapshot;
     }
-            
+
       researchShare += (allocatedJadeResearchSnapshots[i] * productionDuringSnapshot) / totalJadeProductionSnapshots[i];
     }
     return (researchShare, startSnapshot, latestSnapshot);
   }
-      
+
   function claimResearchDividends(address referer, uint256 startSnapshot, uint256 endSnapShot) external {
     require(startSnapshot <= endSnapShot);
     require(startSnapshot >= lastJadeResearchFundClaim[msg.sender]);
     require(endSnapShot < allocatedJadeResearchSnapshots.length);
-        
+
     uint256 researchShare;
     uint256 previousProduction = jadeProductionSnapshots[msg.sender][lastJadeResearchFundClaim[msg.sender] - 1]; // Underflow won't be a problem as gooProductionSnapshots[][0xffffffffff] = 0;
     for (uint256 i = startSnapshot; i <= endSnapShot; i++) {
-            
+
     // Slightly complex things by accounting for days/snapshots when user made no tx's
       uint256 productionDuringSnapshot = jadeProductionSnapshots[msg.sender][i];
       bool soldAllProduction = jadeProductionZeroedSnapshots[msg.sender][i];
@@ -343,17 +343,17 @@ contract JadeCoin is ERC20, AccessAdmin {
       } else {
         previousProduction = productionDuringSnapshot;
       }
-            
+
       researchShare += (allocatedJadeResearchSnapshots[i] * productionDuringSnapshot) / totalJadeProductionSnapshots[i];
       }
-        
-        
+
+
     if (jadeProductionSnapshots[msg.sender][endSnapShot] == 0 && !jadeProductionZeroedSnapshots[msg.sender][endSnapShot] && previousProduction > 0) {
       jadeProductionSnapshots[msg.sender][endSnapShot] = previousProduction; // Checkpoint for next claim
     }
-        
+
     lastJadeResearchFundClaim[msg.sender] = endSnapShot + 1;
-        
+
     uint256 referalDivs;
     if (referer != address(0) && referer != msg.sender) {
       referalDivs = researchShare / 100; // 1%
@@ -361,13 +361,13 @@ contract JadeCoin is ERC20, AccessAdmin {
       ReferalGain(referer, msg.sender, referalDivs);
     }
     coinBalance[msg.sender][1] += SafeMath.sub(researchShare,referalDivs);
-  }    
-    
+  }
+
   // Allocate pot divs for the day (00:00 cron job)
   function snapshotDailyGooResearchFunding() external onlyAdmin {
     uint256 todaysGooResearchFund = (totalEtherPool[1] * researchDivPercent) / 100; // 10% of pool daily
     totalEtherPool[1] -= todaysGooResearchFund;
-        
+
     totalJadeProductionSnapshots.push(totalJadeProduction);
     allocatedJadeResearchSnapshots.push(todaysGooResearchFund);
     nextSnapshotTime = block.timestamp + 24 hours;
@@ -390,14 +390,14 @@ contract CardsBase is JadeCoin {
     setAdminContract(msg.sender,true);
     setActionContract(msg.sender,true);
   }
-  // player  
+  // player
   struct Player {
     address owneraddress;
   }
 
   Player[] players;
   bool gameStarted;
-  
+
   GameConfigInterface public schema;
 
   // Stuff owned by each player
@@ -405,7 +405,7 @@ contract CardsBase is JadeCoin {
   mapping(address => mapping(uint256 => uint256)) public upgradesOwned;  //Lv of upgrade card
 
   mapping(address => uint256) public uintsOwnerCount; // total number of cards
-  mapping(address=> mapping(uint256 => uint256)) public uintProduction;  //card's production 
+  mapping(address=> mapping(uint256 => uint256)) public uintProduction;  //card's production
 
   // Rares & Upgrades (Increase unit's production / attack etc.)
   mapping(address => mapping(uint256 => uint256)) public unitCoinProductionIncreases; // Adds to the coin per second
@@ -428,7 +428,7 @@ contract CardsBase is JadeCoin {
     require(!gameStarted);
     gameStarted = true;
     nextSnapshotTime = firstDivsTime;
-    totalEtherPool[1] = msg.value;  // Seed pot 
+    totalEtherPool[1] = msg.value;  // Seed pot
   }
 
   function endGame() external payable onlyOwner {
@@ -439,7 +439,7 @@ contract CardsBase is JadeCoin {
   function getGameStarted() external constant returns (bool) {
     return gameStarted;
   }
-  function AddPlayers(address _address) external onlyAccess { 
+  function AddPlayers(address _address) external onlyAccess {
     Player memory _player= Player({
       owneraddress: _address
     });
@@ -453,7 +453,7 @@ contract CardsBase is JadeCoin {
     uint256[] memory arr = new uint256[](len);
     address[] memory arr_addr = new address[](len);
     uint256[] memory arr_def = new uint256[](len);
-  
+
     uint counter =0;
     for (uint k=0;k<len; k++){
       arr[counter] =  getJadeProduction(players[k].owneraddress);
@@ -491,13 +491,13 @@ contract CardsBase is JadeCoin {
 
   /// UnitsProuction
   function getUnitsProduction(address player, uint256 unitId, uint256 amount) external constant returns (uint256) {
-    return (amount * (schema.unitCoinProduction(unitId) + unitCoinProductionIncreases[player][unitId]) * (10 + unitCoinProductionMultiplier[player][unitId])); 
-  } 
+    return (amount * (schema.unitCoinProduction(unitId) + unitCoinProductionIncreases[player][unitId]) * (10 + unitCoinProductionMultiplier[player][unitId]));
+  }
 
   /// one card's production
   function getUnitsInProduction(address player, uint256 unitId, uint256 amount) external constant returns (uint256) {
     return SafeMath.div(SafeMath.mul(amount,uintProduction[player][unitId]),unitsOwned[player][unitId]);
-  } 
+  }
 
   /// UnitsAttack
   function getUnitsAttack(address player, uint256 unitId, uint256 amount) internal constant returns (uint256) {
@@ -511,11 +511,11 @@ contract CardsBase is JadeCoin {
   function getUnitsStealingCapacity(address player, uint256 unitId, uint256 amount) internal constant returns (uint256) {
     return (amount * (schema.unitStealingCapacity(unitId) + unitJadeStealingIncreases[player][unitId]) * (10 + unitJadeStealingMultiplier[player][unitId])) / 10;
   }
- 
+
   // player's attacking & defending & stealing & battle power
   function getPlayersBattleStats(address player) public constant returns (
-    uint256 attackingPower, 
-    uint256 defendingPower, 
+    uint256 attackingPower,
+    uint256 defendingPower,
     uint256 stealingPower,
     uint256 battlePower) {
 
@@ -528,7 +528,7 @@ contract CardsBase is JadeCoin {
       attackingPower = SafeMath.add(attackingPower,getUnitsAttack(player, startId, unitsOwned[player][startId]));
       stealingPower = SafeMath.add(stealingPower,getUnitsStealingCapacity(player, startId, unitsOwned[player][startId]));
       defendingPower = SafeMath.add(defendingPower,getUnitsDefense(player, startId, unitsOwned[player][startId]));
-      battlePower = SafeMath.add(attackingPower,defendingPower); 
+      battlePower = SafeMath.add(attackingPower,defendingPower);
       startId++;
     }
   }
@@ -599,7 +599,7 @@ contract CardsBase is JadeCoin {
 
   function getUnitAttackIncreases(address _address, uint256 cardId) external view returns (uint256) {
     return unitAttackIncreases[_address][cardId];
-  } 
+  }
   function setUnitAttackMultiplier(address _address, uint256 cardId, uint256 iValue,bool iflag) external onlyAccess {
     if (iflag) {
       unitAttackMultiplier[_address][cardId] = SafeMath.add(unitAttackMultiplier[_address][cardId],iValue);
@@ -609,7 +609,7 @@ contract CardsBase is JadeCoin {
   }
   function getUnitAttackMultiplier(address _address, uint256 cardId) external view returns (uint256) {
     return unitAttackMultiplier[_address][cardId];
-  } 
+  }
 
   function setUnitDefenseIncreases(address _address, uint256 cardId, uint256 iValue,bool iflag) external onlyAccess {
     if (iflag) {
@@ -640,7 +640,7 @@ contract CardsBase is JadeCoin {
   }
   function getUnitJadeStealingIncreases(address _address, uint256 cardId) external view returns (uint256) {
     return unitJadeStealingIncreases[_address][cardId];
-  } 
+  }
 
   function setUnitJadeStealingMultiplier(address _address, uint256 cardId, uint256 iValue,bool iflag) external onlyAccess {
     if (iflag) {
@@ -651,7 +651,7 @@ contract CardsBase is JadeCoin {
   }
   function getUnitJadeStealingMultiplier(address _address, uint256 cardId) external view returns (uint256) {
     return unitJadeStealingMultiplier[_address][cardId];
-  } 
+  }
 
   function setUintCoinProduction(address _address, uint256 cardId, uint256 iValue, bool iflag) external onlyAccess {
     if (iflag) {
@@ -691,7 +691,7 @@ contract CardsBase is JadeCoin {
       unitMaxCap[player][unitId] = upgradeValue; // Housing upgrade (new capacity)
     }
   }
-    
+
   function removeUnitMultipliers(address player, uint256 upgradeClass, uint256 unitId, uint256 upgradeValue) external onlyAccess {
     uint256 productionLoss;
     if (upgradeClass == 0) {
@@ -758,4 +758,8 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+function() payable external {
+	revert();
+}
 }

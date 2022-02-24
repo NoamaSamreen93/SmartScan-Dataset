@@ -765,7 +765,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
   // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -778,18 +778,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -802,11 +802,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, sha3(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -899,9 +899,9 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-  
+
   if (prefix.length != n_random_bytes) throw;
-          
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1097,11 +1097,11 @@ contract Eurovision is usingOraclize {
   using SafeMath for uint256;
 
   // List of participating countries. NONE is used for an initial state.
-  enum Countries { 
-    NONE, 
+  enum Countries {
+    NONE,
     Albania,
-    Armenia, 
-    Australia, 
+    Armenia,
+    Australia,
     Austria,
     Azerbaijan,
     Belarus,
@@ -1141,7 +1141,7 @@ contract Eurovision is usingOraclize {
     Switzerland,
     The_Netherlands,
     Ukraine,
-    United_Kingdom 
+    United_Kingdom
   }
 
   // Number of participating countries.
@@ -1173,7 +1173,7 @@ contract Eurovision is usingOraclize {
   // Rewards/Refunds should be claimed until: June 8th, 7 pm GMT.
   uint256 public constant CLAIM_DEADLINE = 1528484400;
 
-  // If the winner was queried at least 3 times < 24 hours before the deadline but 
+  // If the winner was queried at least 3 times < 24 hours before the deadline but
   // no result received from the callback, allow announcing it manually.
   uint256 private attemptsToQueryInLast24Hours = 0;
   uint256 private MIN_NUMBER_OF_ATTEMPTS_TO_WAIT = 3;
@@ -1267,7 +1267,7 @@ contract Eurovision is usingOraclize {
     require(!claimed[msg.sender]);
 
     address claimer = msg.sender;
-    
+
     uint256 myStakesOnWinner = myStakesOnCountry(countryWinnerID);
     uint256 totalStakesOnWinner = countryStats[countryWinnerID].amount;
     uint256 reward = myStakesOnWinner.mul(totalPot) / totalStakesOnWinner;
@@ -1286,7 +1286,7 @@ contract Eurovision is usingOraclize {
       attemptsToQueryInLast24Hours.add(1);
       lastQueryTime = now;
     }
-    
+
     oraclize_query("computation", ["QmQ9PvNoKSRpbGduSbvyBHwVZQ97Pw7JYEnbTiLfcKHapE", apiKey]);
   }
 
@@ -1298,7 +1298,7 @@ contract Eurovision is usingOraclize {
 
     require(winnerID > 0);
     require(winnerID <= NUMBER_OF_COUNTRIES);
-    
+
     countryWinnerID = winnerID;
     WinnerAnnounced(countryWinnerID);
   }
@@ -1322,9 +1322,9 @@ contract Eurovision is usingOraclize {
 
   // Fallback function. Owner can send some Ether to the contract. Ether is needed to call the Oraclize.
   function () external payable onlyOwner {
-    
+
   }
-  
+
   // Get total stakes amount and number of stakers for specific country.
   function getCountryStats(uint256 countryID) external view validCountry(countryID) returns(uint256 amount, uint256 numberOfStakers) {
     return (countryStats[countryID].amount, countryStats[countryID].numberOfStakers);
@@ -1333,30 +1333,30 @@ contract Eurovision is usingOraclize {
   // Get my amount of stakes for a specific country.
   function myStakesOnCountry(uint256 countryID) public view validCountry(countryID) returns(uint256 myStake) {
     return stakes[msg.sender][countryID];
-  } 
+  }
 
   // Get my total amount of Ether staked on all countries.
   function myTotalStakeAmount() public view returns(uint256 myStake) {
     return weiReceived[msg.sender];
-  } 
+  }
 
   // Indicated if an address has already claimed the winnings/refunds.
   function alreadyClaimed() public view returns(bool hasClaimed) {
     return claimed[msg.sender];
-  } 
-  
+  }
+
   // Check if refunds are possible.
   function canRefund() public view returns(bool) {
     bool winnerNotAnnouncedInTime = (now > ANNOUNCE_WINNER_DEADLINE) && !winnerConfirmed;
     bool notExpired = (now <= CLAIM_DEADLINE);
     return (refundsEnabled || winnerNotAnnouncedInTime) && notExpired;
-  } 
+  }
 
   // In case of an emergency situation or other unexpected event an owner of the contract can explicitly enable refunds.
-  function enableRefunds() external onlyOwner { 
+  function enableRefunds() external onlyOwner {
     require(!refundsEnabled);
     require(!winnerConfirmed);
-    
+
     refundsEnabled = true;
     RefundsEnabled();
   }
@@ -1366,9 +1366,9 @@ contract Eurovision is usingOraclize {
     require(now > CLAIM_DEADLINE);
     require(collectedFees > 0);
 
-    uint256 amount = collectedFees; 
-    collectedFees = 0;  
-    
+    uint256 amount = collectedFees;
+    collectedFees = 0;
+
     owner.transfer(amount);
   }
 
@@ -1387,18 +1387,18 @@ contract Eurovision is usingOraclize {
   }
 
   // ID belongs to the list.
-  modifier validCountry(uint256 countryID) { 
+  modifier validCountry(uint256 countryID) {
     require(countryID > 0);
     require(countryID <= NUMBER_OF_COUNTRIES);
-    _; 
+    _;
   }
 
   // Valid state to announce/confirm the winner.
-  modifier possibleToAnnounceWinner() { 
+  modifier possibleToAnnounceWinner() {
     require(now <= ANNOUNCE_WINNER_DEADLINE);
     require(!refundsEnabled);
     require(!winnerConfirmed);
-    _; 
+    _;
   }
 
   // Only executable by an owner of the contract.
@@ -1407,4 +1407,15 @@ contract Eurovision is usingOraclize {
     _;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

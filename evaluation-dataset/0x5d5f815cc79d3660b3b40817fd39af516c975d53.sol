@@ -465,3 +465,7 @@ contract URAToken is PausableToken {
   }
 
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

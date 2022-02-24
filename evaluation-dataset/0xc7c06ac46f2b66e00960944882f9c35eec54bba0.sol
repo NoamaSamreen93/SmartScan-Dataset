@@ -20,9 +20,9 @@ contract DeadTokens is IDeadTokens {
     mapping (address => TokenState) internal dead;
     IOracle public oracle;
     address internal owner;
-    
+
     enum TokenState {UNKNOWN, SHIT, FAKE}
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -33,21 +33,30 @@ contract DeadTokens is IDeadTokens {
 
     function buried(IERC20 token) public view returns (bool) {
         TokenState state = dead[address(token)];
-        
+
         if (state == TokenState.SHIT) {
             return true;
         }
         return false;
     }
-    
+
     function setOracle(IOracle _oracle) external {
         require(msg.sender == owner);
         oracle = _oracle;
     }
-        
+
     function callback(IERC20 token, bool valid) external {
         require(msg.sender == address(oracle));
         TokenState state = valid ? TokenState.SHIT : TokenState.FAKE;
         dead[address(token)] = state;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

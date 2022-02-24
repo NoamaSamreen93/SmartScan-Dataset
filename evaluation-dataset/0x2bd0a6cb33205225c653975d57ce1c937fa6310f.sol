@@ -27,7 +27,7 @@ contract SGEPreICO {
         endDate = 1536969600;
         price = 2500;
         tokenReward = Token(0x40489719E489782959486A04B765E1E93E5B221a);
-    } 
+    }
 
     function setOwner(address _owner) isCreator public {
         owner = _owner;
@@ -67,4 +67,15 @@ contract SGEPreICO {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

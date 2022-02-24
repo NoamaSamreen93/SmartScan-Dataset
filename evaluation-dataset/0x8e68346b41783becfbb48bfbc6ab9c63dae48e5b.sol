@@ -12,13 +12,13 @@ contract WhitelistInterface {
     }
 
     function register(address[] newUsers) public onlyAdmins {}
-  
+
     function isAdmin(address _admin) public view returns(bool) {}
 
 }
 
 contract NecFunnel {
-    
+
     ERC20Interface token = ERC20Interface(0xCc80C051057B774cD75067Dc48f8987C4Eb97A5e);
     WhitelistInterface list = WhitelistInterface(0x0E55c54249F25f70D519b7Fb1c20e3331e7Ba76d);
 
@@ -26,7 +26,7 @@ contract NecFunnel {
         require(list.isAdmin(msg.sender));
         _;
     }
-  
+
 	event PaymentFailure(
 		address payee,
 		uint value
@@ -39,5 +39,16 @@ contract NecFunnel {
 	            emit PaymentFailure(receivers[i], values[i]);
 	        }
 	    }
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

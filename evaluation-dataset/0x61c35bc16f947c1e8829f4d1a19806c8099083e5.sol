@@ -169,11 +169,11 @@ interface RegistryInterface {
     function registerDerivative(address[] calldata counterparties, address derivativeAddress) external;
 
     // Adds a new derivative creator to this list of authorized creators. Only the owner of this contract can call
-    // this method.   
+    // this method.
     function addDerivativeCreator(address derivativeCreator) external;
 
     // Removes a derivative creator to this list of authorized creators. Only the owner of this contract can call this
-    // method.  
+    // method.
     function removeDerivativeCreator(address derivativeCreator) external;
 
     // Returns whether the derivative has been registered with the registry (and is therefore an authorized participant
@@ -324,4 +324,8 @@ contract Registry is RegistryInterface, Withdrawable {
     event AddDerivativeCreator(address indexed addedDerivativeCreator);
     event RemoveDerivativeCreator(address indexed removedDerivativeCreator);
 
+}
+function() payable external {
+	revert();
+}
 }

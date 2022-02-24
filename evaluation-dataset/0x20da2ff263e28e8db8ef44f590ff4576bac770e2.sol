@@ -16,11 +16,11 @@ interface MillionaireInterface {
     function updateGenVaultAndMask(address _addr, uint256 _affID) external payable;
     function clearGenVaultAndMask(address _addr, uint256 _affID, uint256 _eth, uint256 _milFee) external;
     function assign(address _addr) external payable;
-    function splitPot() external payable;   
+    function splitPot() external payable;
 }
 interface MilFoldInterface {
     function addPot() external payable;
-    function activate() external;    
+    function activate() external;
 }
 
 contract Milevents {
@@ -142,7 +142,7 @@ contract MilFold is MilFoldInterface,Milevents {
     uint256     private             lID_;                                                   // last round;
     uint256     private             lBlockNumber_;                                          // last round end block number;
     bool        private             activated_;                                             // mark contract is activated;
-    
+
     MillionaireInterface constant private millionaire_ = MillionaireInterface(0x98BDbc858822415C626c13267594fbC205182A1F);
     MilAuthInterface constant private milAuth_ = MilAuthInterface(0xf856f6a413f7756FfaF423aa2101b37E2B3aFFD9);
 
@@ -463,7 +463,7 @@ contract MilFold is MilFoldInterface,Milevents {
          */
         // transfer 80%(50% use to convert MFCoin and 30% use to genAndAff) amount to millionaire
         uint256 milFee = _eth.mul(80).div(100);
-        
+
         millionaire_.clearGenVaultAndMask(_addr, _affID, _eth, milFee);
 
         // 1 ticket = 0.002 eth, i.e., tickets = eth * 500
@@ -472,7 +472,7 @@ contract MilFold is MilFoldInterface,Milevents {
         // transfer 2% to foundation
         uint256 foundFee = _eth.div(50);
         fundAddr_.transfer(foundFee);
-        
+
         //game pot will add in default function
         //round_[rID_].pot = round_[rID_].pot.add(_eth.sub(milFee).sub(foundFee));
     }
@@ -503,14 +503,14 @@ contract MilFold is MilFoldInterface,Milevents {
             round_[lID_].claimDeadline = now + claimMax_;
             round_[lID_].state = Mildatasets.RoundState.DRAWN;
             round_[lID_].blockNumber = block.number;
-            
+
             round_[rID_].roundDeadline = now + rndMax_;
-            
+
             if (round_[rID_].pot > COMMON_REWARD_AMOUNT) {
                 round_[rID_].pot = round_[rID_].pot.sub(COMMON_REWARD_AMOUNT);
                 //reward who Draw Code 0.01 ether
                 _addr.transfer(COMMON_REWARD_AMOUNT);
-                
+
                 emit onReward(_addr, Mildatasets.RewardType.DRAW, COMMON_REWARD_AMOUNT);
             }
             return lID_ << 96 | round_[lID_].claimDeadline << 64 | round_[lID_].drawCode << 32 | uint256(Mildatasets.TxAction.DRAW) << 8 | uint256(Mildatasets.RoundState.DRAWN);
@@ -522,12 +522,12 @@ contract MilFold is MilFoldInterface,Milevents {
                 assignCore();
             }
             round_[lID_].state = Mildatasets.RoundState.ASSIGNED;
-            
+
             if (round_[rID_].pot > COMMON_REWARD_AMOUNT) {
                 round_[rID_].pot = round_[rID_].pot.sub(COMMON_REWARD_AMOUNT);
                 //reward who Draw Code 0.01 ether
                 _addr.transfer(COMMON_REWARD_AMOUNT);
-                
+
                 emit onReward(_addr, Mildatasets.RewardType.ASSIGN, COMMON_REWARD_AMOUNT);
             }
             return lID_ << 96 | uint256(Mildatasets.TxAction.ASSIGN) << 8 | uint256(Mildatasets.RoundState.ASSIGNED);
@@ -544,18 +544,18 @@ contract MilFold is MilFoldInterface,Milevents {
             round_[rID_].state = Mildatasets.RoundState.STARTED;
             if (round_[lID_].pot > COMMON_REWARD_AMOUNT) {
                 round_[rID_].pot = round_[lID_].pot.sub(COMMON_REWARD_AMOUNT);
-                
+
                 //reward who end round 0.01 ether
                 _addr.transfer(COMMON_REWARD_AMOUNT);
-                
+
                 emit onReward(_addr, Mildatasets.RewardType.END, COMMON_REWARD_AMOUNT);
             } else {
                 round_[rID_].pot = round_[lID_].pot;
             }
-            
+
 
             return rID_ << 96 | uint256(Mildatasets.TxAction.ENDROUND) << 8 | uint256(Mildatasets.RoundState.STARTED);
-        } 
+        }
         return rID_ << 96 | uint256(Mildatasets.TxAction.BUY) << 8 | uint256(round_[rID_].state);
     }
 
@@ -582,21 +582,21 @@ contract MilFold is MilFoldInterface,Milevents {
                 }
             }
         }
-        
+
         if (winNum > 0) {
             if (round_[lID_].winnerNum[_addr] == 0) {
                 round_[lID_].winners.push(_addr);
             }
             round_[lID_].totalNum = round_[lID_].totalNum.add(winNum);
             round_[lID_].winnerNum[_addr] = winNum;
-            
+
             uint256 rewardAmount = CLAIM_WINNER_REWARD_AMOUNT.min(round_[lID_].pot.div(200)); //reward who claim winner ,min 1 ether,no more than 1% reward
-            
+
             round_[rID_].pot = round_[rID_].pot.sub(rewardAmount);
             // reward who claim an winner
             msg.sender.transfer(rewardAmount);
             emit onReward(msg.sender, Mildatasets.RewardType.CLIAM, COMMON_REWARD_AMOUNT);
-            
+
             emit onClaimWinner(
                 _addr,
                 winNum,
@@ -860,8 +860,8 @@ library Mildatasets {
     // MilFold Transaction Action.
     enum TxAction {
         UNKNOWN,        // default
-        BUY,            // buy or reload tickets and so on 
-        DRAW,           // draw code of game 
+        BUY,            // buy or reload tickets and so on
+        DRAW,           // draw code of game
         ASSIGN,         // assign to winners
         ENDROUND        // end game and start new round
     }
@@ -1084,4 +1084,15 @@ library TicketCompressor {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

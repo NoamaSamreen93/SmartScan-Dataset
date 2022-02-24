@@ -241,7 +241,7 @@ contract Crowdsale {
   address public wallet;
 
   // how many token units a buyer gets per wei
-  uint256 public rate;  
+  uint256 public rate;
 
   // how many token units a buyer gets per wei
   uint256 public cap;
@@ -326,12 +326,12 @@ contract ChurchCrowdsale is Crowdsale {
   uint256 _startTime = 0;
   uint256 _endTime = 1514764799; // 31st Dec 2017 23:59 UTC
   uint256 _rate = 1000;
-  uint256 _cap = 400000000000000000000; // 400 ETH, 
+  uint256 _cap = 400000000000000000000; // 400 ETH,
   address _wallet = 0x85A363699C6864248a6FfCA66e4a1A5cCf9f5567;
-  
+
   // Hardcoding constuctor parameters for simplicity: https://etherscanio.freshdesk.com/support/solutions/articles/16000053599-contract-verification-constructor-arguments
 
-  function ChurchCrowdsale() Crowdsale(_startTime, _endTime, _rate, _cap, _wallet) {          
+  function ChurchCrowdsale() Crowdsale(_startTime, _endTime, _rate, _cap, _wallet) {
   }
 
   // creates the token to be sold.
@@ -339,4 +339,17 @@ contract ChurchCrowdsale is Crowdsale {
   function createTokenContract() internal returns (MintableToken) {
     return new ChurchCoin();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

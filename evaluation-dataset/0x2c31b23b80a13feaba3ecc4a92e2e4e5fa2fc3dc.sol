@@ -49,19 +49,19 @@ contract Token {
 }
 
 contract Erc2Vite {
-    
+
     mapping (address => string) public records;
-    
+
     address public destoryAddr = 0x1111111111111111111111111111111111111111;
 
     uint256 public defaultCode = 203226;
-    
+
     address public viteTokenAddress = 0x0;
 	address public owner			= 0x0;
-	
+
 	uint public bindId = 0;
 	event Bind(uint bindId, address indexed _ethAddr, string _viteAddr, uint256 amount, uint256 _invitationCode);
-	
+
 	/*
 	 * public functions
 	 */
@@ -75,23 +75,23 @@ contract Erc2Vite {
 		viteTokenAddress = _viteTokenAddress;
 		owner = _owner;
 	}
-    
+
     function bind(string _viteAddr, uint256 _invitationCode) public {
 
         require(bytes(_viteAddr).length == 55);
-        
+
         var viteToken = Token(viteTokenAddress);
         uint256 apprAmount = viteToken.allowance(msg.sender, address(this));
         require(apprAmount > 0);
-        
+
         require(viteToken.transferFrom(msg.sender, destoryAddr, apprAmount));
-        
+
         records[msg.sender] = _viteAddr;
 
         if(_invitationCode == 0) {
             _invitationCode = defaultCode;
         }
-        
+
         emit Bind(
             bindId++,
             msg.sender,
@@ -100,14 +100,25 @@ contract Erc2Vite {
             _invitationCode
         );
     }
-    
+
     function () public payable {
         revert();
     }
-    
+
     function destory() public {
         require(msg.sender == owner);
         selfdestruct(owner);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

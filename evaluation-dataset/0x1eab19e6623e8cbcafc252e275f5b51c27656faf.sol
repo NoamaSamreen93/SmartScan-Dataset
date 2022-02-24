@@ -15,7 +15,7 @@ contract ERC20 {
 	//Sets events and functions for ERC20 token
 	event Approval(address indexed _owner, address indexed _spender, uint _value);
 	event Transfer(address indexed _from, address indexed _to, uint _value);
-	
+
     function allowance(address _owner, address _spender) constant returns (uint remaining);
 	function approve(address _spender, uint _value) returns (bool success);
     function balanceOf(address _owner) constant returns (uint balance);
@@ -32,7 +32,7 @@ contract Owned {
     function Owned() {
         owner = msg.sender;
     }
-	
+
 	//Sets onlyOwner modifier for specified functions
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -51,7 +51,7 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
-    }  
+    }
 
     function div(uint256 a, uint256 b) internal returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -75,7 +75,7 @@ library SafeMath {
     function min256(uint256 a, uint256 b) internal constant returns (uint256) {
         return a < b ? a : b;
     }
-  
+
     function mul(uint256 a, uint256 b) internal returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -90,19 +90,19 @@ library SafeMath {
 
 
 contract Spank is ERC20, Owned {
-     //Applies SafeMath library to uint256 operations 
+     //Applies SafeMath library to uint256 operations
     using SafeMath for uint256;
 
 	//Public variables
-	string public name; 
-	string public symbol; 
-	uint256 public decimals;  
-    uint256 public initialSupply; 
-	uint256 public totalSupply; 
+	string public name;
+	string public symbol;
+	uint256 public decimals;
+    uint256 public initialSupply;
+	uint256 public totalSupply;
 
     //Variables
-    uint256 multiplier; 
-	
+    uint256 multiplier;
+
 	//Creates arrays for balances
     mapping (address => uint256) balance;
     mapping (address => mapping (address => uint256)) allowed;
@@ -115,39 +115,39 @@ contract Spank is ERC20, Owned {
 
 	//Constructor
 	function Spank(string tokenName, string tokenSymbol, uint8 decimalUnits, uint256 decimalMultiplier, uint256 initialAmount) {
-		name = tokenName; 
-		symbol = tokenSymbol; 
-		decimals = decimalUnits; 
-        multiplier = decimalMultiplier; 
-        initialSupply = initialAmount; 
-		totalSupply = initialSupply;  
+		name = tokenName;
+		symbol = tokenSymbol;
+		decimals = decimalUnits;
+        multiplier = decimalMultiplier;
+        initialSupply = initialAmount;
+		totalSupply = initialSupply;
 	}
-	
-	//Provides the remaining balance of approved tokens from function approve 
+
+	//Provides the remaining balance of approved tokens from function approve
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
 
 	//Allows for a certain amount of tokens to be spent on behalf of the account owner
-    function approve(address _spender, uint256 _value) returns (bool success) { 
+    function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
 
-	//Returns the account balance 
+	//Returns the account balance
     function balanceOf(address _owner) constant returns (uint256 remainingBalance) {
         return balance[_owner];
     }
 
     //Allows contract owner to mint new tokens, prevents numerical overflow
 	function mintToken(address target, uint256 mintedAmount) onlyOwner returns (bool success) {
-		require(mintedAmount > 0); 
-        uint256 addTokens = mintedAmount; 
+		require(mintedAmount > 0);
+        uint256 addTokens = mintedAmount;
 		balance[target] += addTokens;
 		totalSupply += addTokens;
 		Transfer(0, target, addTokens);
-		return true; 
+		return true;
 	}
 
 	//Sends tokens from sender's account
@@ -157,12 +157,12 @@ contract Spank is ERC20, Owned {
             balance[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
-        } else { 
-			return false; 
+        } else {
+			return false;
 		}
     }
-	
-	//Transfers tokens from an approved account 
+
+	//Transfers tokens from an approved account
     function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) returns (bool success) {
         if ((balance[_from] >= _value) && (allowed[_from][msg.sender] >= _value) && (balance[_to] + _value > balance[_to])) {
             balance[_to] += _value;
@@ -170,103 +170,103 @@ contract Spank is ERC20, Owned {
             allowed[_from][msg.sender] -= _value;
             Transfer(_from, _to, _value);
             return true;
-        } else { 
-			return false; 
+        } else {
+			return false;
 		}
     }
 }
 
 
 contract SpankICO is Owned, Spank {
-    //Applies SafeMath library to uint256 operations 
+    //Applies SafeMath library to uint256 operations
     using SafeMath for uint256;
 
     //Public Variables
-    address public multiSigWallet;                  
-    uint256 public amountRaised; 
+    address public multiSigWallet;
+    uint256 public amountRaised;
     uint256 public dividendPayment;
-    uint256 public numberOfRecordEntries; 
-    uint256 public numberOfTokenHolders; 
-    uint256 public startTime; 
-    uint256 public stopTime; 
-    uint256 public hardcap; 
-    uint256 public price;                            
+    uint256 public numberOfRecordEntries;
+    uint256 public numberOfTokenHolders;
+    uint256 public startTime;
+    uint256 public stopTime;
+    uint256 public hardcap;
+    uint256 public price;
 
     //Variables
-    address[] recordTokenHolders; 
-    address[] tokenHolders; 
-    bool crowdsaleClosed = true; 
-    mapping (address => uint256) recordBalance; 
-    mapping (address => uint256) recordTokenHolderID;      
-    mapping (address => uint256) tokenHolderID;               
-    string tokenName = "Spank"; 
-    string tokenSymbol = "SPNK"; 
-    uint256 initialTokens = 20000000000000000; 
-    uint256 multiplier = 100000000; 
-    uint8 decimalUnits = 8;  
+    address[] recordTokenHolders;
+    address[] tokenHolders;
+    bool crowdsaleClosed = true;
+    mapping (address => uint256) recordBalance;
+    mapping (address => uint256) recordTokenHolderID;
+    mapping (address => uint256) tokenHolderID;
+    string tokenName = "Spank";
+    string tokenSymbol = "SPNK";
+    uint256 initialTokens = 20000000000000000;
+    uint256 multiplier = 100000000;
+    uint8 decimalUnits = 8;
 
    	//Initializes the token
-	function SpankICO() 
+	function SpankICO()
     	Spank(tokenName, tokenSymbol, decimalUnits, multiplier, initialTokens) {
-            balance[msg.sender] = initialTokens;     
-            Transfer(0, msg.sender, initialTokens);    
-            multiSigWallet = msg.sender;        
-            hardcap = 30000000000000000;    
-            setPrice(3000); 
-            dividendPayment = 50000000000000; 
-            recordTokenHolders.length = 2; 
-            tokenHolders.length = 2; 
-            tokenHolders[1] = msg.sender; 
-            numberOfTokenHolders++; 
+            balance[msg.sender] = initialTokens;
+            Transfer(0, msg.sender, initialTokens);
+            multiSigWallet = msg.sender;
+            hardcap = 30000000000000000;
+            setPrice(3000);
+            dividendPayment = 50000000000000;
+            recordTokenHolders.length = 2;
+            tokenHolders.length = 2;
+            tokenHolders[1] = msg.sender;
+            numberOfTokenHolders++;
     }
 
     //Fallback function creates tokens and sends to investor when crowdsale is open
     function () payable {
-        require((!crowdsaleClosed) 
-            && (now < stopTime) 
-            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap)); 
-        address recipient = msg.sender; 
-        amountRaised = amountRaised.add(msg.value.div(1 ether)); 
+        require((!crowdsaleClosed)
+            && (now < stopTime)
+            && (totalSupply.add(msg.value.mul(getPrice()).mul(multiplier).div(1 ether)) <= hardcap));
+        address recipient = msg.sender;
+        amountRaised = amountRaised.add(msg.value.div(1 ether));
         uint256 tokens = msg.value.mul(getPrice()).mul(multiplier).div(1 ether);
         totalSupply = totalSupply.add(tokens);
         balance[recipient] = balance[recipient].add(tokens);
-        require(multiSigWallet.send(msg.value)); 
+        require(multiSigWallet.send(msg.value));
         Transfer(0, recipient, tokens);
         if (tokenHolderID[recipient] == 0) {
-            addTokenHolder(recipient); 
+            addTokenHolder(recipient);
         }
-    }   
+    }
 
     //Adds an address to the recorrdEntry list
     function addRecordEntry(address account) internal {
         if (recordTokenHolderID[account] == 0) {
-            recordTokenHolderID[account] = recordTokenHolders.length; 
-            recordTokenHolders.length++; 
-            recordTokenHolders[recordTokenHolders.length.sub(1)] = account; 
+            recordTokenHolderID[account] = recordTokenHolders.length;
+            recordTokenHolders.length++;
+            recordTokenHolders[recordTokenHolders.length.sub(1)] = account;
             numberOfRecordEntries++;
         }
     }
 
-    //Adds an address to the tokenHolders list 
+    //Adds an address to the tokenHolders list
     function addTokenHolder(address account) returns (bool success) {
-        bool status = false; 
+        bool status = false;
         if (balance[account] != 0) {
             tokenHolderID[account] = tokenHolders.length;
             tokenHolders.length++;
-            tokenHolders[tokenHolders.length.sub(1)] = account; 
+            tokenHolders[tokenHolders.length.sub(1)] = account;
             numberOfTokenHolders++;
-            status = true; 
+            status = true;
         }
-        return status; 
-    }  
+        return status;
+    }
 
     //Allows the owner to create an record of token owners and their balances
     function createRecord() internal {
         for (uint i = 0; i < (tokenHolders.length.sub(1)); i++ ) {
             address holder = getTokenHolder(i);
-            uint256 holderBal = balanceOf(holder); 
-            addRecordEntry(holder); 
-            recordBalance[holder] = holderBal; 
+            uint256 holderBal = balanceOf(holder);
+            addRecordEntry(holder);
+            recordBalance[holder] = holderBal;
         }
     }
 
@@ -277,17 +277,17 @@ contract SpankICO is Owned, Spank {
 
     //Returns record contents
     function getRecordBalance(address record) constant returns (uint256) {
-        return recordBalance[record]; 
+        return recordBalance[record];
     }
 
     //Returns the address of a specific index value
     function getRecordHolder(uint256 index) constant returns (address) {
-        return address(recordTokenHolders[index.add(1)]); 
+        return address(recordTokenHolders[index.add(1)]);
     }
 
     //Returns time remaining on crowdsale
     function getRemainingTime() constant returns (uint256) {
-        return stopTime; 
+        return stopTime;
     }
 
     //Returns the address of a specific index value
@@ -296,47 +296,58 @@ contract SpankICO is Owned, Spank {
 	}
 
     //Pays out dividends to tokens holders of record, based on 500,000 token payment
-    function payOutDividend() onlyOwner returns (bool success) { 
-        createRecord(); 
-        uint256 volume = totalSupply; 
+    function payOutDividend() onlyOwner returns (bool success) {
+        createRecord();
+        uint256 volume = totalSupply;
         for (uint i = 0; i < (tokenHolders.length.sub(1)); i++) {
-            address payee = getTokenHolder(i); 
-            uint256 stake = volume.div(dividendPayment.div(multiplier));    
-            uint256 dividendPayout = balanceOf(payee).div(stake).mul(multiplier); 
+            address payee = getTokenHolder(i);
+            uint256 stake = volume.div(dividendPayment.div(multiplier));
+            uint256 dividendPayout = balanceOf(payee).div(stake).mul(multiplier);
             balance[payee] = balance[payee].add(dividendPayout);
-            totalSupply = totalSupply.add(dividendPayout); 
+            totalSupply = totalSupply.add(dividendPayout);
             Transfer(0, payee, dividendPayout);
         }
-        return true; 
+        return true;
     }
 
     //Sets the multisig wallet for a crowdsale
     function setMultiSigWallet(address wallet) onlyOwner returns (bool success) {
-        multiSigWallet = wallet; 
-        return true; 
+        multiSigWallet = wallet;
+        return true;
     }
 
-    //Sets the token price 
+    //Sets the token price
     function setPrice(uint256 newPriceperEther) onlyOwner returns (uint256) {
-        require(newPriceperEther > 0); 
-        price = newPriceperEther; 
-        return price; 
+        require(newPriceperEther > 0);
+        price = newPriceperEther;
+        return price;
     }
 
     //Allows owner to start the crowdsale from the time of execution until a specified stopTime
     function startSale(uint256 saleStart, uint256 saleStop) onlyOwner returns (bool success) {
-        require(saleStop > now);     
-        startTime = saleStart; 
-        stopTime = saleStop; 
-        crowdsaleClosed = false; 
-        return true; 
+        require(saleStop > now);
+        startTime = saleStart;
+        stopTime = saleStop;
+        crowdsaleClosed = false;
+        return true;
     }
 
     //Allows owner to stop the crowdsale immediately
     function stopSale() onlyOwner returns (bool success) {
-        stopTime = now; 
+        stopTime = now;
         crowdsaleClosed = true;
-        return true; 
+        return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

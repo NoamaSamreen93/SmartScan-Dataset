@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 
 interface tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
 contract ERC20 {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 2;
@@ -13,7 +13,7 @@ contract ERC20 {
 
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     /**
@@ -123,5 +123,21 @@ contract TestRushCoin is ERC20 {
         }
         return(i);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

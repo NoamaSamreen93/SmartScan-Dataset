@@ -44,7 +44,7 @@ contract Ownable {
     owner = _newOwner;
   }
 
-  
+
 }
 
 contract Pausable is Ownable {
@@ -75,7 +75,7 @@ contract Pausable is Ownable {
 }
 
 library SafeMath {
-  
+
   function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     require(_b <= _a);
     uint256 c = _a - _b;
@@ -90,7 +90,7 @@ library SafeMath {
     return c;
   }
 
-  
+
 }
 
 contract TESTABC is ERC20, Pausable {
@@ -156,5 +156,16 @@ contract TESTABC is ERC20, Pausable {
     return true;
   }
 
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -114,33 +114,33 @@ contract Ownable {
 
 /**
  * @title Administator
- * @dev  This contract has a group of administrators who can add/remove any account to/from blacklist. 
+ * @dev  This contract has a group of administrators who can add/remove any account to/from blacklist.
 */
 contract Administrator is Ownable {
     mapping (address=>bool) public admin;
-    
+
     // Current number of members of the administrator group
-    uint    public   adminLength;   
+    uint    public   adminLength;
     // The maximum number of members of the administrator group, which is specified in the constructor
-    uint    public   adminMaxLength;      
-    
+    uint    public   adminMaxLength;
+
     event   AddAdmin(address indexed _address);
     event   RemoveAdmin(address indexed _address);
-    
-    constructor (uint _len) public {        
+
+    constructor (uint _len) public {
         adminMaxLength = _len;
     }
-    
+
     modifier isAdmin(address _addr) {
         require(admin[_addr], "Not administrator");
         _;
     }
-    
+
     modifier isNotAdmin(address _addr) {
         require(!admin[_addr], "Is administrator");
-        _;        
+        _;
     }
-    
+
     /**
      * @dev Modifier: Limit that only the contract owner or administrator can execute the function
     */
@@ -148,7 +148,7 @@ contract Administrator is Ownable {
 		require(msg.sender == owner || admin[msg.sender], "msg.sender is nether owner nor administator");
 		_;
 	}
-    
+
     /**
      * @dev Add a member to the Administrators group
     */
@@ -156,21 +156,21 @@ contract Administrator is Ownable {
         require(_addr != address(0), "Administrator cannot be address(0)");
         require(_addr != owner, "Administrator cannot be owner");
         require(adminLength < adminMaxLength, "Exceeded the maximum number of administrators");
-        
+
         admin[_addr] = true;
-        adminLength++; 
-        
+        adminLength++;
+
         emit AddAdmin(_addr);
         return true;
-    } 
-    
+    }
+
     /**
      * @dev Remove a member from the Administrators group
     */
     function removeAdmin(address _addr) onlyOwner isAdmin(_addr) public returns (bool) {
         delete admin[_addr];
         adminLength--;
-        
+
         emit RemoveAdmin(_addr);
         return true;
     }
@@ -198,13 +198,13 @@ contract Blacklisted is Administrator {
 	*/
 	function setBlacklist(address _address, bool _bool) public onlyOwnerOrAdmin {
 		require(_address != address(0));
-		
+
 		if(_bool) {
 		    require(!blacklist[_address], "Already in blacklist");
 		} else {
 		    require(blacklist[_address], "Not in blacklist yet");
 		}
-		
+
 		blacklist[_address] = _bool;
 		emit SetBlacklist(_address, _bool);
 	}
@@ -383,17 +383,26 @@ contract StandardToken is ERC20, Pausable, Blacklisted {
 
 /**
 * @title GomicsToken
-* @dev	GomicsToken main contract 
+* @dev	GomicsToken main contract
 */
 contract GomicsToken is StandardToken {
     string public constant name = "Gomics";
     string public constant symbol = "GOM";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 75000000;
-    
+
     constructor() Administrator(3) public {
         totalSupply_ = INITIAL_SUPPLY * (10 ** uint256(decimals));
         balances[msg.sender] = totalSupply_;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

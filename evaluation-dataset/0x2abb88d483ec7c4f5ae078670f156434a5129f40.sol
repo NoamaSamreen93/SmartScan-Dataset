@@ -24,7 +24,7 @@ contract Admin {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier AirdropStatus() {
         require(ClaimAmount != 0);
         _;
@@ -67,7 +67,7 @@ contract Admin {
     function ChangeClaimAmount(uint256 NewAmount) public OnlyAdmin() returns (bool success) {
 
         ClaimAmount = NewAmount;
-        
+
         return true;
 
     }
@@ -159,11 +159,11 @@ contract KoveredPay is Admin {
         TransfersEnabled = true;
 
     }
-    
+
     function AirdropClaim() public AirdropStatus returns (uint256 AmountClaimed) {
-        
+
         require(Claims[msg.sender] == false);
-        require(ClaimedAmount < 35000000000000000000000000);   
+        require(ClaimedAmount < 35000000000000000000000000);
         require(TransferValidation(owner, msg.sender, ClaimAmount) == true);
         ClaimedAmount = ClaimedAmount + ClaimAmount;
         UserBalances[msg.sender] = add(UserBalances[msg.sender], ClaimAmount);
@@ -172,7 +172,7 @@ contract KoveredPay is Admin {
         Transfer(msg.sender, owner, ClaimAmount);
 
         return ClaimAmount;
-        
+
     }
 
     function AlterMediatorSettings(address _newAddress, uint128 _fees) public OnlyAdmin returns (bool success) {
@@ -511,4 +511,15 @@ contract KoveredPay is Admin {
         return TotalSupply;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

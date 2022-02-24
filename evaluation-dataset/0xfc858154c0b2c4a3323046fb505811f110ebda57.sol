@@ -687,7 +687,7 @@ contract NOIAToken is TokenRecoverable, ERC20 {
 
     string public constant name = "NOIA Token";
     string public constant symbol = "NOIA";
-    uint8 public constant decimals = uint8(18); 
+    uint8 public constant decimals = uint8(18);
     uint256 public tokensToMint = 1000000000e18; // 1 000 000 000 tokens
     address public burnAddress;
     mapping(address => bool) public notify;
@@ -858,4 +858,13 @@ contract NOIAToken is TokenRecoverable, ERC20 {
     {
         return keccak256(abi.encodePacked(_selector, _token, _to, _value, _fee, _nonce));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -443,3 +443,14 @@ contract CSTKDropToken is ERC20, Owned {
 contract CSTK_CLT is CSTKDropToken('CSTK_CLT', 'CryptoStock CLT Promo Token', 100000 * 10**8, 8, 0x2001f2A0Cf801EcFda622f6C28fb6E10d803D969) {
 
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

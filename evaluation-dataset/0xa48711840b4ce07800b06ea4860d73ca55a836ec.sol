@@ -8,13 +8,13 @@ contract EdosTokenSender {
         require(_beneficiary.length == _amount.length, "beneficiary and amount length do not match");
         require(_token.allowance(msg.sender, address(this)) >= _totalAmount, "not enough allowance");
         uint distributedTokens;
-        
+
         for(uint256 i = 0; i < _beneficiary.length; i++){
             require(_beneficiary[i] != address(0), "beneficiary address is 0x0");
             require(_token.transferFrom(msg.sender,_beneficiary[i],_amount[i]), "transfer from failed");
             distributedTokens += _amount[i];
         }
-        
+
         assert(distributedTokens == _totalAmount);
         emit SendingCompleted(msg.sender, address(_token), _totalAmount);
     }
@@ -270,4 +270,13 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -10,7 +10,7 @@ contract Ownable {
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
   function Ownable() {
     owner = msg.sender;
   }
@@ -41,12 +41,12 @@ contract LemonSelfDrop is Ownable {
     uint256 public holderReward;
     uint8 public totalDropTransactions;
     mapping (address => uint8) participants;
-    
-    
+
+
     // Initialize the cutest contract in the world
     function LemonSelfDrop () {
         address c = 0x2089899d03607b2192afb2567874a3f287f2f1e4; // set Lemon Coin contract address
-        LemonContract = LemonToken(c); 
+        LemonContract = LemonToken(c);
         dropNumber = 1;
         LemonsDroppedToTheWorld = 0;
         LemonsRemainingToDrop = 0;
@@ -56,8 +56,8 @@ contract LemonSelfDrop is Ownable {
         holderAmount = 50000; // set initial hold amount to 50000 Lemon Tokens for extra reward
         totalDropTransactions = 0;
     }
-    
-    
+
+
     // Drop some wonderful cutest Lemon Tokens to sender every time contract is called without function
     function() payable {
         require (participants[msg.sender] < dropNumber && LemonsRemainingToDrop > basicReward);
@@ -71,7 +71,7 @@ contract LemonSelfDrop is Ownable {
         // Check if number of Lemon Tokens to issue is higher than coins remaining for airdrop (last transaction of airdrop)
         if (tokensIssued > LemonsRemainingToDrop)
             tokensIssued = LemonsRemainingToDrop;
-        
+
         // Give away these so cute Lemon Token to contributor
         LemonContract.transfer(msg.sender, tokensIssued);
         participants[msg.sender] = dropNumber;
@@ -79,50 +79,58 @@ contract LemonSelfDrop is Ownable {
         LemonsDroppedToTheWorld += tokensIssued;
         totalDropTransactions += 1;
     }
-    
-    
+
+
     function participant(address part) public constant returns (uint8 participationCount) {
         return participants[part];
     }
-    
-    
+
+
     // Increase the airdrop count to allow sweet humans asking for more beautiful Lemon Tokens
     function setDropNumber(uint8 dropN) public onlyOwner {
         dropNumber = dropN;
         LemonsRemainingToDrop = LemonContract.balanceOf(this);
     }
-    
-    
+
+
     // Define amount of Lemon Tokens to hold in order to get holder reward
     function setHolderAmount(uint256 amount) public onlyOwner {
         holderAmount = amount;
     }
-    
-    
+
+
     // Define how many wonderful Lemon Tokens contributors will receive for participating the selfdrop
     function setRewards(uint256 basic, uint256 donator, uint256 holder) public onlyOwner {
         basicReward = basic;
         donatorReward = donator;
         holderReward = holder;
     }
-    
-    
+
+
     // Sends all ETH contributions to lovely Lemon owner
     function withdrawAll() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
-    
+
+
     // Sends all remaining Lemon Tokens to owner, just in case of emergency
     function withdrawLemonCoins() public onlyOwner {
         LemonContract.transfer(owner, LemonContract.balanceOf(this));
         LemonsRemainingToDrop = 0;
     }
-    
-    
+
+
     // Update number of Lemon Tokens remaining for drop, just in case it is needed
     function updateLemonCoinsRemainingToDrop() public {
         LemonsRemainingToDrop = LemonContract.balanceOf(this);
     }
-    
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

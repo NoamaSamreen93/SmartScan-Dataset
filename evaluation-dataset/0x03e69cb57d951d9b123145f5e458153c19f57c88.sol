@@ -15,7 +15,7 @@ contract TokenContract{
  *@dev using multisig access to call another contract functions
 */
 contract GangMultisig {
-  
+
   /**
    *@dev token contract variable, contains token address
    *can use abstract contract functions
@@ -25,11 +25,11 @@ contract GangMultisig {
   //@dev Variable to check multisig functions life time.
   //change it before deploy in main network
   uint public lifeTime = 86400; // seconds;
-  
+
   //@dev constructor
   constructor (address _token, uint _needApprovesToConfirm, address[] _owners) public{
     require (_needApprovesToConfirm > 1 && _needApprovesToConfirm <= _owners.length);
-    
+
     //@dev setup GangTokenContract by contract address
     token = TokenContract(_token);
 
@@ -42,7 +42,7 @@ contract GangMultisig {
      *This function can be call once.
     */
     token.setupMultisig(address(this));
-    
+
     ownersCount = _owners.length;
   }
 
@@ -66,24 +66,24 @@ contract GangMultisig {
 
   //@dev Owner can add new proposal 1 time at each lifeTime cycle
   mapping (address => uint32) public lastOwnersAction;
-  
-  modifier canCreate() { 
+
+  modifier canCreate() {
     require (lastOwnersAction[msg.sender] + lifeTime < now);
     lastOwnersAction[msg.sender] = uint32(now);
-    _; 
+    _;
   }
-  
+
 
   //@dev Modifier to check is message sender contains in mapping 'owners'.
-  modifier onlyOwners() { 
-    require (owners[msg.sender]); 
-    _; 
+  modifier onlyOwners() {
+    require (owners[msg.sender]);
+    _;
   }
 
   //@dev current owners count
   uint public ownersCount;
 
-  //@dev current approves need to confirm for any function. Can't be less than 2. 
+  //@dev current approves need to confirm for any function. Can't be less than 2.
   uint public needApprovesToConfirm;
 
   //Start Minting Tokens
@@ -103,7 +103,7 @@ contract GangMultisig {
 
   event NewMintRequestSetup(address indexed initiator, address indexed spender, uint value);
   event NewMintRequestUpdate(address indexed owner, uint8 indexed confirms, bool isExecute);
-  event NewMintRequestCanceled();  
+  event NewMintRequestCanceled();
 
   /**
    * @dev Set new mint request, can be call only by owner
@@ -136,14 +136,14 @@ contract GangMultisig {
     for (uint i = 0; i < setNewMint.confirmators.length; i++){
       require(setNewMint.confirmators[i] != msg.sender);
     }
-      
+
     setNewMint.confirms++;
     setNewMint.confirmators.push(msg.sender);
 
     if(setNewMint.confirms >= needApprovesToConfirm){
       setNewMint.isExecute = true;
 
-      token.mint(setNewMint.spender, setNewMint.value); 
+      token.mint(setNewMint.spender, setNewMint.value);
     }
     emit NewMintRequestUpdate(msg.sender, setNewMint.confirms, setNewMint.isExecute);
   }
@@ -153,7 +153,7 @@ contract GangMultisig {
    * which created this mint request.
    */
   function cancelMintRequest () public {
-    require (msg.sender == setNewMint.initiator);    
+    require (msg.sender == setNewMint.initiator);
     require (!setNewMint.isCanceled && !setNewMint.isExecute);
 
     setNewMint.isCanceled = true;
@@ -184,7 +184,7 @@ contract GangMultisig {
    */
   function finishMintingRequestSetup () public onlyOwners canCreate{
     require ((finishMintingStruct.creationTimestamp + lifeTime < uint32(now) || finishMintingStruct.isCanceled) && !finishMintingStruct.isExecute);
-    
+
     require (!mintingFinished);
 
     address[] memory addr;
@@ -218,10 +218,10 @@ contract GangMultisig {
       finishMintingStruct.isExecute = true;
       mintingFinished = true;
     }
-    
+
     emit FinishMintingRequestUpdate(msg.sender, finishMintingStruct.confirms, finishMintingStruct.isExecute);
   }
-  
+
   /**
    * @dev Cancel finish minting request, can be call only by owner
    * which created this finish minting request.
@@ -277,20 +277,20 @@ contract GangMultisig {
   function approveNewOwnersCount () public onlyOwners {
     require (setNewApproves.count <= ownersCount);
     require (setNewApproves.creationTimestamp + lifeTime >= uint32(now));
-    
+
     for (uint i = 0; i < setNewApproves.confirmators.length; i++){
       require(setNewApproves.confirmators[i] != msg.sender);
     }
-    
+
     require (!setNewApproves.isExecute && !setNewApproves.isCanceled);
-    
+
     setNewApproves.confirms++;
     setNewApproves.confirmators.push(msg.sender);
 
     if(setNewApproves.confirms >= needApprovesToConfirm){
       setNewApproves.isExecute = true;
 
-      needApprovesToConfirm = setNewApproves.count;   
+      needApprovesToConfirm = setNewApproves.count;
     }
     emit NewNeedApprovesToConfirmRequestUpdate(msg.sender, setNewApproves.confirms, setNewApproves.isExecute);
   }
@@ -300,13 +300,13 @@ contract GangMultisig {
    * which created this owners count request.
    */
   function cancelNewOwnersCountRequest () public {
-    require (msg.sender == setNewApproves.initiator);    
+    require (msg.sender == setNewApproves.initiator);
     require (!setNewApproves.isCanceled && !setNewApproves.isExecute);
 
     setNewApproves.isCanceled = true;
     emit NewNeedApprovesToConfirmRequestCanceled();
   }
-  
+
   //Finish change approves count
 
   //Start add new owner
@@ -333,7 +333,7 @@ contract GangMultisig {
    */
   function setAddOwnerRequest (address _newOwner) public onlyOwners canCreate {
     require (addOwner.creationTimestamp + lifeTime < uint32(now) || addOwner.isExecute || addOwner.isCanceled);
-    
+
     address[] memory addr;
 
     addOwner = NewOwner(_newOwner, 1, false, msg.sender, false, uint32(now), addr);
@@ -358,7 +358,7 @@ contract GangMultisig {
     for (uint i = 0; i < addOwner.confirmators.length; i++){
       require(addOwner.confirmators[i] != msg.sender);
     }
-    
+
     addOwner.confirms++;
     addOwner.confirmators.push(msg.sender);
 
@@ -401,7 +401,7 @@ contract GangMultisig {
     require (removeOwners.creationTimestamp + lifeTime < uint32(now) || removeOwners.isExecute || removeOwners.isCanceled);
 
     address[] memory addr;
-    
+
     removeOwners = NewOwner(_removeOwner, 1, false, msg.sender, false, uint32(now), addr);
     removeOwners.confirmators.push(msg.sender);
 
@@ -416,14 +416,14 @@ contract GangMultisig {
     require (ownersCount - 1 >= needApprovesToConfirm && ownersCount > 2);
 
     require (owners[removeOwners.newOwner]);
-    
+
     require (!removeOwners.isExecute && !removeOwners.isCanceled);
     require (removeOwners.creationTimestamp + lifeTime >= uint32(now));
 
     for (uint i = 0; i < removeOwners.confirmators.length; i++){
       require(removeOwners.confirmators[i] != msg.sender);
     }
-    
+
     removeOwners.confirms++;
     removeOwners.confirmators.push(msg.sender);
 
@@ -439,13 +439,13 @@ contract GangMultisig {
     emit RemoveOwnerRequestUpdate(msg.sender, removeOwners.confirms, removeOwners.isExecute);
   }
 
-  
+
   /**
    * @dev Cancel remove owner request, can be call only by owner
    * which created this remove owner request.
    */
   function cancelRemoveOwnerRequest () public {
-    require (msg.sender == removeOwners.initiator);    
+    require (msg.sender == removeOwners.initiator);
     require (!removeOwners.isCanceled && !removeOwners.isExecute);
 
     removeOwners.isCanceled = true;
@@ -469,7 +469,7 @@ contract GangMultisig {
     require (removeOwners2.creationTimestamp + lifeTime < uint32(now) || removeOwners2.isExecute || removeOwners2.isCanceled);
 
     address[] memory addr;
-    
+
     removeOwners2 = NewOwner(_removeOwner, 1, false, msg.sender, false, uint32(now), addr);
     removeOwners2.confirmators.push(msg.sender);
 
@@ -484,14 +484,14 @@ contract GangMultisig {
     require (ownersCount - 1 >= needApprovesToConfirm && ownersCount > 2);
 
     require (owners[removeOwners2.newOwner]);
-    
+
     require (!removeOwners2.isExecute && !removeOwners2.isCanceled);
     require (removeOwners2.creationTimestamp + lifeTime >= uint32(now));
 
     for (uint i = 0; i < removeOwners2.confirmators.length; i++){
       require(removeOwners2.confirmators[i] != msg.sender);
     }
-    
+
     removeOwners2.confirms++;
     removeOwners2.confirmators.push(msg.sender);
 
@@ -512,7 +512,7 @@ contract GangMultisig {
    * which created this remove owner request.
    */
   function cancelRemoveOwnerRequest2 () public {
-    require (msg.sender == removeOwners2.initiator);    
+    require (msg.sender == removeOwners2.initiator);
     require (!removeOwners2.isCanceled && !removeOwners2.isExecute);
 
     removeOwners2.isCanceled = true;
@@ -578,7 +578,7 @@ contract GangMultisig {
               break;
             }
           }
-        }     
+        }
       }
     }
 
@@ -668,4 +668,15 @@ contract GangMultisig {
       }
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

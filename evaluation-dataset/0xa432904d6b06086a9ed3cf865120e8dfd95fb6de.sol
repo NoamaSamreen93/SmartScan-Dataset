@@ -439,3 +439,12 @@ contract Citizen is Manageable, ERC721 {
     event SpecChanged(uint256 _tokenId, uint8 _specId, uint8 _value);
 
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

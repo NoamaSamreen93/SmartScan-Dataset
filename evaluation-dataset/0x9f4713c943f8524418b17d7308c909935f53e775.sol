@@ -1346,9 +1346,9 @@ contract MintableTokenExt is StandardToken, Ownable {
   }
 
   function setReservedTokensListMultiple(
-    address[] addrs, 
-    uint[] inTokens, 
-    uint[] inPercentageUnit, 
+    address[] addrs,
+    uint[] inTokens,
+    uint[] inPercentageUnit,
     uint[] inPercentageDecimals
   ) public canMint onlyOwner {
     assert(!reservedTokensDestinationsAreSet);
@@ -1393,8 +1393,8 @@ contract MintableTokenExt is StandardToken, Ownable {
     }
 
     reservedTokensList[addr] = ReservedTokensData({
-      inTokens: inTokens, 
-      inPercentageUnit: inPercentageUnit, 
+      inTokens: inTokens,
+      inPercentageUnit: inPercentageUnit,
       inPercentageDecimals: inPercentageDecimals,
       isReserved: true,
       isDistributed: false
@@ -1607,4 +1607,13 @@ contract ReservedTokensFinalizeAgent is FinalizeAgent {
     token.releaseTokenTransfer();
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

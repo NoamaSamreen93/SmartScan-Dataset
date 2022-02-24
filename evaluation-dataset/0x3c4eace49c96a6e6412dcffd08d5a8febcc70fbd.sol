@@ -47,7 +47,7 @@ contract Utils {
         }
         return result;
     }
-    
+
     function validateCompanyName(bytes32 name) public pure returns (bool) {
         for (uint i = 0; i < 32; i++) {
             if (uint(name[i]) != 0 && (uint(name[i]) < 32 || uint(name[i]) > 126)) {
@@ -146,7 +146,7 @@ contract Ethecom is Ownable {
     // The last time a user claim their ECOM token so that it will be transferred to their eth account
     mapping(address => uint256) public lastTokenClaimedBlock;
 
-    // Number of super privileges an account has 
+    // Number of super privileges an account has
     mapping (address => uint256) public superPrivilegeCount;
 
     // Minimum random value required to get a super privilege
@@ -220,7 +220,7 @@ contract Ethecom is Ownable {
         c.owner = msg.sender;
         c.lastPrice = c.price;
         c.price = costContract.calculateNextPrice(c.price);
-        
+
         emit CompanyTransferred(c.name, c.price, oldOwner, msg.sender);
 
         claimToken(oldOwner);
@@ -312,7 +312,7 @@ contract Ethecom is Ownable {
         require(c.owner != address(0));
         require(c.owner == msg.sender);
         require(c.isOnsale == true);
-        
+
         c.isOnsale = false;
         superPrivilegeCount[msg.sender]--;
 
@@ -476,4 +476,17 @@ contract Ethecom is Ownable {
         }
         lastTokenClaimedBlock[receiver] = block.number;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -95,7 +95,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -116,7 +116,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -189,7 +189,7 @@ contract StandardToken is ERC20, BasicToken {
 contract Auction is Ownable {
   using SafeMath for uint256;
   enum States { Setup, AcceptingBids, Paused, Ended }
-  
+
   // Current state of the auction which starts at Setup.
   States public currentState = States.Setup;
 
@@ -283,9 +283,13 @@ contract TulipToken is Auction, StandardToken {
     }
 
     /// Override Auction.endAuction to transfer
-    /// The Tulip Token in the same transaction. 
+    /// The Tulip Token in the same transaction.
     function endAuction() {
       transfer(highestBidder, 1);
       Auction.endAuction();
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

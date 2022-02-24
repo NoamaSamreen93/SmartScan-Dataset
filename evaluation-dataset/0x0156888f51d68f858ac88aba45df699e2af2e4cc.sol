@@ -111,18 +111,18 @@ contract VRToken is StandardToken {
         require(false);
     }
 
-    string public constant name = "VRToken";   
+    string public constant name = "VRToken";
     string public constant symbol = "VRT";
     uint256 private constant _INITIAL_SUPPLY = 25*10**26;
-    uint8 public decimals = 18;         
-    uint256 public totalSupply;            
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
 
     function VRToken(
     ) public {
         // init
         balances[msg.sender] = _INITIAL_SUPPLY;
         totalSupply = _INITIAL_SUPPLY;
-       
+
     }
 
     /* Approves and then calls the receiving contract */
@@ -133,4 +133,15 @@ contract VRToken is StandardToken {
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

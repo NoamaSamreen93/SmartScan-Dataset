@@ -5,25 +5,25 @@ pragma solidity ^0.4.18;
 // Decentralized art on the Ethereum blockchain!
 // (https://limeeyes.com/)
 /*
-             ___                  ___        
-         .-''   ''-.          .-''   ''-.    
-       .'           '.      .'           '.  
-      /   . -  ;  - . \    /   . -  ;  - . \ 
+             ___                  ___
+         .-''   ''-.          .-''   ''-.
+       .'           '.      .'           '.
+      /   . -  ;  - . \    /   . -  ;  - . \
      (  ' `-._|_,'_,.- )  (  ' `-._|_,'_,.- )
-      ',,.--_,4"-;_  ,'    ',,.--_,4"-;_  ,' 
-        '-.;   \ _.-'        '-.;   \ _.-'   
-            '''''                '''''       
+      ',,.--_,4"-;_  ,'    ',,.--_,4"-;_  ,'
+        '-.;   \ _.-'        '-.;   \ _.-'
+            '''''                '''''
 */
 // Welcome to LimeEyes!
 //
 // This smart contract allows users to purchase shares of any artwork that's
 // been added to the system and it will pay dividends to all shareholders
 // upon the purchasing of new shares! It's special in the way it works because
-// the shares can only be bought in certain amounts and the price of those 
+// the shares can only be bought in certain amounts and the price of those
 // shares is dependant on how many other shares there are already. Each
 // artwork starts with 1 share available for purchase and upon each sale,
 // the number of shares for purchase will increase by one (1 -> 2 -> 3...),
-// each artwork also has an owner and they will always get the dividends from 
+// each artwork also has an owner and they will always get the dividends from
 // the number of shares up for purchase, for example;
 /*
     If the artwork has had shares purchased 4 times, the next purchase will
@@ -32,14 +32,14 @@ pragma solidity ^0.4.18;
     value. It's also important to note that the artwork owner cannot purchase
     shares of their own art, instead they just inherit the shares for purchase
     and pass it onto the next buyer at each sale.
-*/ 
+*/
 // The price of the shares also follows a special formula in order to maintain
-// stability over time, it uses the base price of an artwork (set by the dev 
+// stability over time, it uses the base price of an artwork (set by the dev
 // upon the creation of the artwork) and the total number of shares purchased
 // of the artwork. From here you simply treat the number of shares as a percentage
 // and add that much on top of your base price, for example;
 /*
-    If the artwork has a base price of 0.01 ETH and there have been 250 shares 
+    If the artwork has a base price of 0.01 ETH and there have been 250 shares
     purchased so far, it would mean that the base price will gain 250% of it's
     value which comes to 0.035 ETH (100% + 250% of the base price).
 */
@@ -51,9 +51,9 @@ pragma solidity ^0.4.18;
 /*
     If the artwork has a base price of 0.01 ETH and you own 5 shares, in the long run
     you should expect to see 5% * 0.01 ETH = 0.0005 ETH each time the artwork has any
-    shares purchased. In contrast, if you own 250 shares of the artwork, you should 
+    shares purchased. In contrast, if you own 250 shares of the artwork, you should
     expect to see 250% * 0.01 ETH = 0.025 ETH each time the artwork has shares bought.
-  
+
     It's good to point out that if you were the first buyer and owned 1 share, the next
     buyer is going to be purchasing 2 shares which means you have 1 out of the 3 shares
     total and hence you will receive 33% of that sale, at the next step there will be
@@ -142,7 +142,7 @@ contract LimeEyes {
 	// keep in mind that when the website syncs with the blockchain,
 	// any titles over 32 characters will be clipped.
 	function renameArtwork(uint256 artworkId, string newTitle) public onlyDev {
-		
+
 		require(_exists(artworkId));
 		Artwork storage artwork = _artworks[artworkId];
 		artwork._title = newTitle;
@@ -156,7 +156,7 @@ contract LimeEyes {
 	// This is exclusively reserved for copyright cases should any
 	// artworks be flagged as such.
 	function toggleArtworkVisibility(uint256 artworkId) public onlyDev {
-		
+
 		require(_exists(artworkId));
 		Artwork storage artwork = _artworks[artworkId];
 		artwork._visible = !artwork._visible;
@@ -241,7 +241,7 @@ contract LimeEyes {
 		artwork._shares[artwork._owner] = artwork._purchases + 1; // set the owners next shares
 
 		ArtworkSharesPurchased(artworkId, artwork._title, msg.sender, artwork._purchases);
-		
+
 	}
 
 
@@ -254,7 +254,7 @@ contract LimeEyes {
 	}
 
 	function getArtwork(uint256 artworkId) public view returns (string artworkTitle, address ownerAddress, bool isVisible, uint256[3] artworkPrices, uint256 artworkShares, uint256 artworkPurchases, uint256 artworkShareholders) {
-		
+
 		require(_exists(artworkId));
 
 		Artwork memory artwork = _artworks[artworkId];
@@ -363,7 +363,18 @@ contract LimeEyes {
 		}
 	}
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

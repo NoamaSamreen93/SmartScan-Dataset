@@ -1,9 +1,9 @@
 /*
-    
+
      5%   fee purchase
      10%  fee selling
      1%   fee transfer
-     3,3% Referal 
+     3,3% Referal
 */
 
 pragma solidity 0.4.25;
@@ -28,7 +28,7 @@ contract PantheonEcoSystemRestart {
     string constant public name = "Pantheon Restart";
     string constant public symbol = "PANR";
     uint8 constant public decimals = 18;
-    
+
 
     // Fees
     Fee.fee private fee_purchase = Fee.fee(1, 10); // 10%
@@ -591,4 +591,15 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

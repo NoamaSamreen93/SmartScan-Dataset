@@ -333,3 +333,10 @@ contract MultiBuyer is CanReclaimToken {
         }
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

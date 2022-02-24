@@ -7,7 +7,7 @@ contract owned {
     function owned() payable {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -19,7 +19,7 @@ contract owned {
 }
 
 contract TraceCrowdsale is owned {
-    
+
     uint256 public totalSupply;
     mapping (address => uint256) public balanceOf;
 
@@ -49,7 +49,7 @@ contract TraceCrowdsale is owned {
 }
 
 contract TraceToken is TraceCrowdsale {
-    
+
     string  public standard    = 'Token 0.1';
     string  public name        = 'TraceToken';
     string  public symbol      = "TACE";
@@ -68,12 +68,23 @@ contract TraceToken is TraceCrowdsale {
 contract TokenCrowdsale is TraceToken {
 
     function TokenCrowdsale() payable TraceToken() {}
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
     function killMe() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -103,7 +103,7 @@ contract Package is Ownable {
   struct Version {
     uint64[3] semanticVersion;
     address contractAddress;
-    bytes contentURI; 
+    bytes contentURI;
   }
 
   mapping (bytes32 => Version) internal versions;
@@ -117,7 +117,7 @@ contract Package is Ownable {
    */
   function getVersion(uint64[3] semanticVersion) public view returns (address contractAddress, bytes contentURI) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
-    return (version.contractAddress, version.contentURI); 
+    return (version.contractAddress, version.contentURI);
   }
 
   /**
@@ -133,7 +133,7 @@ contract Package is Ownable {
 
   /**
    * @dev Adds a new version to the package. Only the Owner can add new versions.
-   * Reverts if the specified semver identifier already exists. 
+   * Reverts if the specified semver identifier already exists.
    * Emits a `VersionAdded` event if successful.
    * @param semanticVersion Semver identifier of the version.
    * @param contractAddress Contract address for the version, must be non-zero.
@@ -147,7 +147,7 @@ contract Package is Ownable {
     // Register version
     bytes32 versionId = semanticVersionHash(semanticVersion);
     versions[versionId] = Version(semanticVersion, contractAddress, contentURI);
-    
+
     // Update latest major
     uint64 major = semanticVersion[0];
     if (major > latestMajor) {
@@ -159,9 +159,9 @@ contract Package is Ownable {
     uint64 patch = semanticVersion[2];
     uint64[3] latestVersionForMajor = versions[majorToLatestVersion[major]].semanticVersion;
     if (semanticVersionIsZero(latestVersionForMajor) // No latest was set for this major
-       || (minor > latestVersionForMajor[1]) // Or current minor is greater 
+       || (minor > latestVersionForMajor[1]) // Or current minor is greater
        || (minor == latestVersionForMajor[1] && patch > latestVersionForMajor[2]) // Or current patch is greater
-       ) { 
+       ) {
       majorToLatestVersion[major] = versionId;
     }
 
@@ -180,7 +180,7 @@ contract Package is Ownable {
 
   /**
    * @dev Returns the version with the highest semver identifier registered in the package.
-   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless 
+   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless
    * of the order in which they were registered. Returns zero if no versions are registered.
    * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
@@ -190,7 +190,7 @@ contract Package is Ownable {
 
   /**
    * @dev Returns the version with the highest semver identifier for the given major.
-   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will return `1.3.0` for major `1`, 
+   * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will return `1.3.0` for major `1`,
    * regardless of the order in which they were registered. Returns zero if no versions are registered
    * for the specified major.
    * @param major Major identifier to query
@@ -198,7 +198,7 @@ contract Package is Ownable {
    */
   function getLatestByMajor(uint64 major) public view returns (uint64[3] semanticVersion, address contractAddress, bytes contentURI) {
     Version storage version = versions[majorToLatestVersion[major]];
-    return (version.semanticVersion, version.contractAddress, version.contentURI); 
+    return (version.semanticVersion, version.contractAddress, version.contentURI);
   }
 
   function semanticVersionHash(uint64[3] version) internal pure returns (bytes32) {
@@ -645,4 +645,13 @@ contract App is Ownable {
      emit ProxyCreated(proxy);
      return proxy;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

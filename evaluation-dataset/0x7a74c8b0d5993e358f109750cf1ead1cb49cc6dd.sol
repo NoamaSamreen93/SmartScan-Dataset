@@ -17,9 +17,9 @@ contract WeaponTokenize {
     mapping (uint => string) publicDataOf;
     mapping (uint => string) ownerDataOf;
     mapping (uint => address) ownerOf;
-    
+
     mapping (address => bool) isAuthorizedOwner;
-    
+
 
 
     /* Events */
@@ -28,20 +28,20 @@ contract WeaponTokenize {
     event OwnershipTransferred(address indexed _oldOwner, address indexed _newOwner);
     event WeaponOwnerUpdated (uint indexed  _weaponId, address indexed  _oldOwner, address indexed  _newOwner);
     event AuthorizedOwnerAdded(address indexed _addeduthorizedOwner);
-    event AuthorizedOwnerRemoved(address indexed _removedAuthorizedOwner);  
-    
-    /* Modifiers */    
-    modifier onlyOwnerOfContract() { 
+    event AuthorizedOwnerRemoved(address indexed _removedAuthorizedOwner);
+
+    /* Modifiers */
+    modifier onlyOwnerOfContract() {
       require(msg.sender == owner);
-      _; 
+      _;
     }
 
-    modifier onlyAuthorizedOwner() { 
+    modifier onlyAuthorizedOwner() {
      require(isAuthorizedOwner[msg.sender]);
      _;
     }
-    
-     
+
+
     /*  constructor */
     function WeaponTokenize () public {
       owner = msg.sender;
@@ -62,7 +62,7 @@ contract WeaponTokenize {
       emit AuthorizedOwnerAdded(_newAuthorizedUser);
       return true;
     }
-    
+
     /*  Remove authorized users */
     function removeAuthorizeduser(address _authorizedUser) public onlyOwnerOfContract returns(bool res){
         require(isAuthorizedOwner[_authorizedUser]);
@@ -91,8 +91,8 @@ contract WeaponTokenize {
     function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwnerOfContract returns (bool success) {
         return ERC20Interface(_tokenAddress).transfer(owner, _value);
     }
-    
-    
+
+
 
     //////////////////////////////////////////
     // AUTHORIZEED USERS FUNCTIONALITY
@@ -146,7 +146,7 @@ contract WeaponTokenize {
       emit WeaponOwnerUpdated(_id, oldOwner, _newOwner);
       return true;
     }
-    
+
 
     //////////////////////////////////////////
     // PUBLICLY ACCESSIBLE METHODS (CONSTANT)
@@ -180,7 +180,7 @@ contract WeaponTokenize {
     function getAuthorizedOwners () public view returns(address[] authorizedUsers) {
       return authorizedOwners;
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Prevents contract from accepting ETH
@@ -189,4 +189,10 @@ contract WeaponTokenize {
       revert();
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

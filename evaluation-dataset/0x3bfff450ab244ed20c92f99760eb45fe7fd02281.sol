@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
 
-/* 
+/*
 This contract stores the memories of GuaGua and MiaoMiao.
 Long last our love and the blockchain.
 */
@@ -77,5 +77,16 @@ contract GuaGuaMiaoMiaoMemories {
     function viewNumberOfMemories() public view returns(uint256) {
         return memories.length;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

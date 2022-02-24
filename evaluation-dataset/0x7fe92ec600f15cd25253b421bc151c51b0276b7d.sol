@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic {
     function balanceOf(address _owner) public view returns (uint256) {
 		return balances[_owner];
 	}
-	
+
 }
 
 contract StandardToken is ERC20, BasicToken {
@@ -111,25 +111,36 @@ contract StandardToken is ERC20, BasicToken {
     	emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     	return true;
   	}
-  
+
 }
 
 
 contract Token is StandardToken {
-	
+
 	string public name;
-	string public symbol; 
-	uint8 public decimals; 
+	string public symbol;
+	uint8 public decimals;
 
   	constructor (string _name, string _symbol, uint8 _decimals, uint256 _total) public {
 		name = _name;
 		symbol = _symbol;
 		decimals = _decimals;
 		totalSupply_ = _total.mul(10 ** uint256(_decimals));
-	
+
     	balances[msg.sender] = totalSupply_;
-	
+
     	emit Transfer(address(0), msg.sender, totalSupply_);
   	}
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

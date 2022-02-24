@@ -45,8 +45,8 @@ contract TokenERC20 {
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol
-    ) 
-    public 
+    )
+    public
     {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                     // Give the creator all initial tokens
@@ -79,7 +79,7 @@ contract TokenERC20 {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0));
         require(_value <= balances[_from]);
-        require(_value <= allowed[_from][msg.sender]);        
+        require(_value <= allowed[_from][msg.sender]);
         balances[_to] = SafeMath.add(balances[_to], _value);
         balances[_from] = SafeMath.sub(balances[_from], _value);
         allowed[_from][msg.sender] = SafeMath.sub(allowed[_from][msg.sender], _value);
@@ -97,7 +97,7 @@ contract TokenERC20 {
         // To prevent attack vectors problem discussed in the following comment
         // https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-        
+
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -125,7 +125,7 @@ contract TokenERC20 {
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
-    }   
+    }
 
     /**
     * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -136,4 +136,15 @@ contract TokenERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

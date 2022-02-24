@@ -114,7 +114,7 @@ contract E2D {
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
 
     constructor() public {
@@ -206,7 +206,7 @@ contract E2D {
 
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;      
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
 
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
@@ -238,7 +238,7 @@ contract E2D {
         uint256 _tokenFee = SafeMath.div(_amountOfTokens, dividendFee_);
         uint256 _taxedTokens = SafeMath.sub(_amountOfTokens, _tokenFee);
         uint256 _dividends = tokensToEthereum_(_tokenFee);
-  
+
         // burn the fee tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokenFee);
 
@@ -343,7 +343,7 @@ contract E2D {
 
     /**
      * Retrieve the dividends owned by the caller.
-     */ 
+     */
     function myDividends() public view returns(uint256) {
         address _customerAddress = msg.sender;
         return dividendsOf(_customerAddress) ;
@@ -432,11 +432,11 @@ contract E2D {
 
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
 
-            // calculate the amount of tokens the customer receives over his purchase 
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
         } else {
             // add tokens to the pool
@@ -471,7 +471,7 @@ contract E2D {
      */
     function ethereumToTokens_(uint256 _ethereum) internal view returns(uint256) {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -602,7 +602,7 @@ contract InvestorsStorage {
     itmap private s;
 
     address private owner;
-    
+
     Percent.percent private _percent = Percent.percent(1,100);
 
     event LogOwnerForInvestorContract(address addr);
@@ -617,7 +617,7 @@ contract InvestorsStorage {
         emit LogOwnerForInvestorContract(msg.sender);
         s.keys.length++;
     }
-    
+
     function getDividendsPercent(address addr) public view returns(uint num, uint den) {
         uint amount = s.data[addr].value.add(s.data[addr].refBonus);
         if(amount <= 10*10**18) { //10 ETH
@@ -758,7 +758,7 @@ contract InvestorsStorage {
 
     function addValue(address addr, uint value) public onlyOwner returns (bool) {
         if (s.data[addr].keyIndex == 0) return false;
-        s.data[addr].value += value;       
+        s.data[addr].value += value;
         return true;
     }
 
@@ -766,9 +766,9 @@ contract InvestorsStorage {
         s.stats[dt].invested += invested;
         s.stats[dt].investors += investors;
     }
-    
+
     function stats(uint dt) public view returns (uint invested, uint investors) {
-        return ( 
+        return (
         s.stats[dt].invested,
         s.stats[dt].investors
         );
@@ -791,7 +791,7 @@ contract InvestorsStorage {
         s.data[addr].pendingPayout = payout;
         return true;
     }
-    
+
     function contains(address addr) public view returns (bool) {
         return s.data[addr].keyIndex > 0;
     }
@@ -885,7 +885,7 @@ contract DT {
         }
     }
 
-        
+
     function getYear(uint timestamp) internal pure returns (uint16) {
         uint secondsAccountedFor = 0;
         uint16 year;
@@ -952,7 +952,7 @@ contract _200eth is DT, Constants {
     //Pyramid Coin instance required to send dividends to coin holders.
     E2D public e2d;
 
-    // percents 
+    // percents
     Percent.percent private m_companyPercent = Percent.percent(10, 100); // 10/100*100% = 10%
     Percent.percent private m_refPercent1 = Percent.percent(3, 100); // 3/100*100% = 3%
     Percent.percent private m_refPercent2 = Percent.percent(2, 100); // 2/100*100% = 2%
@@ -1021,7 +1021,7 @@ contract _200eth is DT, Constants {
 
     function investorsNumber() public view returns(uint) {
         return m_investors.size() - 1;
-        // -1 because see InvestorsStorage constructor where keys.length++ 
+        // -1 because see InvestorsStorage constructor where keys.length++
     }
 
     function balanceETH() public view returns(uint) {
@@ -1168,7 +1168,7 @@ contract _200eth is DT, Constants {
         require(!m_nextWave, "no further investment in this pool");
         uint value = msg.value;
         //ref system works only once for sender-referral
-        if ((!m_isInvestor[msg.sender] && !m_referrals[msg.sender].notZero()) || 
+        if ((!m_isInvestor[msg.sender] && !m_referrals[msg.sender].notZero()) ||
         (m_isInvestor[msg.sender] && m_referrals[msg.sender].notZero())) {
             address ref = m_referrals[msg.sender].notZero() ? m_referrals[msg.sender] : _ref;
             // level 1
@@ -1181,9 +1181,9 @@ contract _200eth is DT, Constants {
                     assert(m_investors.addRefBonusWithRefs(ref, reward, dividendsPeriod));
                     m_referrals[msg.sender] = ref;
                 }
-                emit LogNewReferral(msg.sender, now, value); 
+                emit LogNewReferral(msg.sender, now, value);
                 // level 2
-                if (notZeroNotSender(m_referrals[ref]) && m_isInvestor[m_referrals[ref]] && ref != m_referrals[ref]) { 
+                if (notZeroNotSender(m_referrals[ref]) && m_isInvestor[m_referrals[ref]] && ref != m_referrals[ref]) {
                     reward = m_refPercent2.mul(value);
                     assert(m_investors.addRefBonus(m_referrals[ref], reward, dividendsPeriod)); // referrer 2 bonus
                 }
@@ -1214,18 +1214,18 @@ contract _200eth is DT, Constants {
             assert(m_investors.insert(msg.sender, value));
             m_isInvestor[msg.sender] = true;
             m_investors.updateStats(today, value, 1);
-            emit LogNewInvestor(msg.sender, now, value); 
+            emit LogNewInvestor(msg.sender, now, value);
         }
 
         assert(m_investors.setPaymentTime(msg.sender, now));
 
-        emit LogNewInvesment(msg.sender, now, value);   
+        emit LogNewInvesment(msg.sender, now, value);
         totalInvestments++;
         totalInvested += msg.value;
     }
 
     function checkLast10(uint value) internal {
-        //check if value is >= 2 then add to last 10 
+        //check if value is >= 2 then add to last 10
         if(value >= LAST_10_MIN_INVESTMENT) {
             if(m_last10Investor[msg.sender].index != 0) {
                 uint index = m_last10Investor[msg.sender].index;
@@ -1284,7 +1284,7 @@ contract _200eth is DT, Constants {
         }
 
         last10 = last10.sub(distributed);
-        //check if amount is left in last10 and transfer 
+        //check if amount is left in last10 and transfer
         if(last10 > 0) {
             LAST10_WALLET_ADDR.transfer(last10);
             last10 = 0;
@@ -1317,7 +1317,7 @@ contract _200eth is DT, Constants {
 
     function nextWave() private {
         if(m_nextWave) {
-            return; 
+            return;
         }
         m_nextWave = true;
         sendToLast10();
@@ -1342,7 +1342,7 @@ library Percent {
         }
         return a*p.num/p.den;
     }
-    
+
     function div(percent storage p, uint a) internal view returns (uint) {
         return a/p.num*p.den;
     }
@@ -1432,16 +1432,27 @@ library Convert {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal pure returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
-    
+
     function strConcat(string _a, string _b, string _c) internal pure returns (string) {
         return strConcat(_a, _b, _c, "", "");
     }
-    
+
     function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

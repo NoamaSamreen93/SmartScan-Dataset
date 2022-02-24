@@ -231,3 +231,10 @@ contract DABANKING is ERC20 {
     emit Transfer(address(0x0), _daBank, totalSupply);
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

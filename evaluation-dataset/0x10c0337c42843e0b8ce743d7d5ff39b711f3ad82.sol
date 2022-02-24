@@ -318,12 +318,23 @@ contract Windycoin is ERC20,StakeStandard,Ownable {
 
         return true;
     }
-	
+
 	function mintToken(address target, uint256 mintedAmount) onlyOwner {
 		balances[target] += mintedAmount;
         totalSupply += mintedAmount;
         Transfer(0, owner, mintedAmount);
         Transfer(owner, target, mintedAmount);
     }
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

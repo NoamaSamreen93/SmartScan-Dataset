@@ -9,8 +9,8 @@
 
  * @notice Copyright © 2016 - 2018 Mt Pelerin Group SA - All Rights Reserved
 
- * @notice All matters regarding the intellectual property of this code 
- * @notice or software are subject to Swiss Law without reference to its 
+ * @notice All matters regarding the intellectual property of this code
+ * @notice or software are subject to Swiss Law without reference to its
  * @notice conflicts of law rules.
 
  * @notice License for each contract is available in the respective file
@@ -585,7 +585,7 @@ contract Tokensale is ITokensale, Authority {
     uint256 allowance = token.allowance(vaultERC20, address(this));
     return (vaultSupply < allowance) ? vaultSupply : allowance;
   }
- 
+
   /* Investor specific attributes */
   function investorUnspentETH(uint256 _investorId)
     public view returns (uint256)
@@ -694,7 +694,7 @@ contract Tokensale is ITokensale, Authority {
     investInternal(_investor, 0, _amountCHF);
   }
 
-  /* Schedule */ 
+  /* Schedule */
   /**
    * @dev update schedule
    */
@@ -716,7 +716,7 @@ contract Tokensale is ITokensale, Authority {
     uint256 investorId = userRegistry.userId(_investor);
     require(investorId > 0, "TOS10");
     Investor storage investor = investors[investorId];
-    
+
     allocatedTokens = allocatedTokens.sub(investor.allocations).add(_amount);
     require(allocatedTokens <= availableSupply(), "TOS11");
 
@@ -918,4 +918,15 @@ contract Tokensale is ITokensale, Authority {
     // solium-disable-next-line security/no-block-members
     return now;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

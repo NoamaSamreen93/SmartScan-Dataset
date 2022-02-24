@@ -104,11 +104,11 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   function getOwner() view public returns (address){
     return owner;
   }
-  
+
 
 }
 
@@ -129,9 +129,9 @@ contract Kodobit is StandardToken, Ownable{ // CHANGE THIS. Update the contract 
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
     uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
-    uint256 public _totalSupply = 350000000e18; 
-    uint256 public _initialSupply = 240000000e18; 
-    uint256 public _totalTokenSold = 0; 
+    uint256 public _totalSupply = 350000000e18;
+    uint256 public _initialSupply = 240000000e18;
+    uint256 public _totalTokenSold = 0;
     bool private reserve_activated = false;
 
     // This is a constructor function
@@ -160,7 +160,7 @@ contract Kodobit is StandardToken, Ownable{ // CHANGE THIS. Update the contract 
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -177,7 +177,18 @@ contract Kodobit is StandardToken, Ownable{ // CHANGE THIS. Update the contract 
 
     function activate_reserve() public onlyOwner{
       require(!reserve_activated );
-      balances[owner] = balances[owner] + (_totalSupply - _initialSupply);  
+      balances[owner] = balances[owner] + (_totalSupply - _initialSupply);
       reserve_activated = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

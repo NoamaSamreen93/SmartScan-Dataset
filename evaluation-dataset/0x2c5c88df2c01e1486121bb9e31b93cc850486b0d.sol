@@ -37,7 +37,7 @@ contract EtherDrugs is ERC721 {
   /*** CONSTANTS ***/
   string public constant NAME = "EtherDrugs";
   string public constant SYMBOL = "DRUG";
-  
+
   bool public gameOpen = false;
 
   /*** STORAGE ***/
@@ -46,9 +46,9 @@ contract EtherDrugs is ERC721 {
 
   address public ceoAddress;
   mapping (uint256 => address) public extra;
-  
+
   uint256 drug_count;
- 
+
   mapping (uint256 => Drug) private drugs;
 
   /*** ACCESS MODIFIERS ***/
@@ -126,7 +126,7 @@ contract EtherDrugs is ERC721 {
     price = drugs[_drug_id].price;
     last_price = drugs[_drug_id].last_price;
   }
-  
+
   function getDrugs() public view returns (uint256[], bytes32[], address[], uint256[]) {
     uint256[] memory ids = new uint256[](drug_count);
     bytes32[] memory names = new bytes32[](drug_count);
@@ -140,19 +140,19 @@ contract EtherDrugs is ERC721 {
     }
     return (ids, names, owners, prices);
   }
-  
+
   function purchase(uint256 _drug_id) public payable {
     require(gameOpen == true);
     Drug storage drug = drugs[_drug_id];
 
     require(drug.owner != msg.sender);
-    require(msg.sender != address(0));  
+    require(msg.sender != address(0));
     require(msg.value >= drug.price);
 
     uint256 excess = SafeMath.sub(msg.value, drug.price);
     uint256 half_diff = SafeMath.div(SafeMath.sub(drug.price, drug.last_price), 2);
     uint256 reward = SafeMath.add(half_diff, drug.last_price);
-  
+
     lastBuyer[1].send(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 69))); //69% goes to last buyer
     lastBuyer[6].send(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 2)));  //2% goes to 6th last buyer, else ceo
     lastBuyer[9].send(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 2)));  //2% goes to 9th last buyer, else ceo
@@ -162,11 +162,11 @@ contract EtherDrugs is ERC721 {
     } else {
       drug.owner.send(reward);
     }
-    
-    
+
+
     drug.last_price = drug.price;
     address _old_owner = drug.owner;
-    
+
     if(drug.price < 1690000000000000000){ // 1.69 eth
         drug.price = SafeMath.mul(SafeMath.div(drug.price, 100), 169); // 1.69x
     } else {
@@ -251,9 +251,9 @@ contract EtherDrugs is ERC721 {
       last_price: _last_price,
       approve_transfer_to: address(0)
     });
-    
+
     Drug storage drug = drugs[drug_count];
-    
+
     Birth(drug_count, _name, _owner);
     Transfer(address(this), _owner, drug_count);
     drug_count++;
@@ -290,4 +290,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

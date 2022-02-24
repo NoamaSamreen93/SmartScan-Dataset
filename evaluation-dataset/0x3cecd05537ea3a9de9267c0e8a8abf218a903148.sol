@@ -11,7 +11,7 @@ pragma solidity ^0.4.18;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
 	function mul(uint256 a, uint256 b) internal constant returns (uint256) {
 		uint256 c = a * b;
 		assert(a == 0 || c / a == b);
@@ -35,7 +35,7 @@ library SafeMath {
 		assert(c >= a);
 		return c;
 	}
-  
+
 }
 
 /**
@@ -63,10 +63,10 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
 	using SafeMath for uint256;
 
 	mapping(address => uint256) balances;
@@ -85,7 +85,7 @@ contract BasicToken is ERC20Basic {
 
 	/**
 	* @dev Gets the balance of the specified address.
-	* @param _owner The address to query the the balance of. 
+	* @param _owner The address to query the the balance of.
 	* @return An uint256 representing the amount owned by the passed address.
 	*/
 	function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -111,7 +111,7 @@ contract StandardToken is ERC20, BasicToken {
 	* @param _value uint256 the amout of tokens to be transfered
 	*/
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
-	  
+
 		var _allowance = allowed[_from][msg.sender];
 
 		// Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
@@ -160,7 +160,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
 	address public owner;
 	address public ownerCandidat;
 
@@ -170,7 +170,7 @@ contract Ownable {
 	*/
 	function Ownable() {
 		owner = msg.sender;
-		
+
 	}
 
 	/**
@@ -186,14 +186,14 @@ contract Ownable {
 	* @param newOwner The address to transfer ownership to.
 	*/
 	function transferOwnership(address newOwner) onlyOwner {
-		require(newOwner != address(0));      
+		require(newOwner != address(0));
 		ownerCandidat = newOwner;
 	}
 	/**
 	* @dev Allows safe change current owner to a newOwner.
 	*/
 	function confirmOwnership()  {
-		require(msg.sender == ownerCandidat);      
+		require(msg.sender == ownerCandidat);
 		owner = msg.sender;
 	}
 
@@ -204,7 +204,7 @@ contract Ownable {
  * @dev Token that can be irreversibly burned (destroyed).
  */
 contract BurnableToken is StandardToken, Ownable {
- 
+
 	/**
 	* @dev Burns a specific amount of tokens.
 	* @param _value The amount of token to be burned.
@@ -212,8 +212,8 @@ contract BurnableToken is StandardToken, Ownable {
 	function burn(uint256 _value) public onlyOwner {
 		require(_value > 0);
 
-		address burner = msg.sender;    
-										
+		address burner = msg.sender;
+
 
 		balances[burner] = balances[burner].sub(_value);
 		totalSupply = totalSupply.sub(_value);
@@ -221,100 +221,100 @@ contract BurnableToken is StandardToken, Ownable {
 	}
 
 	event Burn(address indexed burner, uint indexed value);
- 
+
 }
- 
+
 contract MettaCoin is BurnableToken {
- 
-	string public constant name = "TOKEN METTA";   
-	string public constant symbol = "METTA";   
-	uint32 public constant decimals = 18;    
+
+	string public constant name = "TOKEN METTA";
+	string public constant symbol = "METTA";
+	uint32 public constant decimals = 18;
 	uint256 public constant initialSupply = 300000000 * 1 ether;
 
 	function MettaCoin() {
 		totalSupply = initialSupply;
 		balances[msg.sender] = initialSupply;
-	}    
-  
+	}
+
 }
 
 
 contract MettaCrowdsale is Ownable {
-    
+
     using SafeMath for uint;
 	//
     MettaCoin public token = new MettaCoin();
 	//
-    uint public start;    
+    uint public start;
     //
 	uint public period;
 	//
     uint public rate;
-	//  
+	//
     uint public softcap;
     //
     uint public availableTokensforPreICO;
     //
     uint public countOfSaleTokens;
-    //    
+    //
     uint public currentPreICObalance;
     //
     uint public refererPercent;
     //
 	mapping(address => uint) public balances;
-    
+
     // preICO manager data//////////////
      address public managerETHaddress;
      address public managerETHcandidatAddress;
      uint public managerETHbonus;
-    
+
     /////////////////////////////////
-   
+
     function MettaCrowdsale() {
-     
+
 		// 1 METTACOIN = 0.00027 ETH
-		rate = 270000000000000; 
+		rate = 270000000000000;
 		//Mon, 20 Nov 2017 00:00:00 GMT
 		start = 1511136000;
 		// preICO period is 20 of november - 19 of december (include 19)
-		period = 30; //  
+		period = 30; //
 		// minimum attracted ETH during preICO - 409
 		softcap = 409 * 1 ether;
 		// maximum number mettacoins for preICO
 		availableTokensforPreICO = 8895539 * 1 ether;
 		// current ETH balance of preICO
-		currentPreICObalance = 0; 
+		currentPreICObalance = 0;
 		// how much mettacoins are sold
-		countOfSaleTokens = 0; 
+		countOfSaleTokens = 0;
 		//percent for referer bonus program
 		refererPercent = 15;
-		
+
 		//data of manager of company
-		managerETHaddress = 0x0;   
-		managerETHbonus = 27 * 1 ether;  
+		managerETHaddress = 0x0;
+		managerETHbonus = 27 * 1 ether;
 
     }
     /**
 	 * @dev Initially safe sets preICO manager address
 	 */
-    function setPreIcoManager(address _addr) public onlyOwner {   
+    function setPreIcoManager(address _addr) public onlyOwner {
         require(managerETHaddress == 0x0) ;//only once
 			managerETHcandidatAddress = _addr;
-        
+
     }
 	/**
 	 * @dev Allows safe confirm of manager address
 	 */
     function confirmManager() public {
-        require(msg.sender == managerETHcandidatAddress); 
+        require(msg.sender == managerETHcandidatAddress);
 			managerETHaddress = managerETHcandidatAddress;
     }
-    
+
     	/**
 	 * @dev Allows safe changing of manager address
 	 */
     function changeManager(address _addr) public {
-        require(msg.sender == managerETHaddress); 
+        require(msg.sender == managerETHaddress);
 			managerETHcandidatAddress = _addr;
     }
 	/**
@@ -324,24 +324,24 @@ contract MettaCrowdsale is Ownable {
 		require(now > start && now < start + period * 1 days);
 		_;
     }
-	
+
 	/**
 	 * @dev Indicates that we have available tokens for sale
 	 */
     modifier issetTokensForSale() {
-		require(countOfSaleTokens < availableTokensforPreICO); 
+		require(countOfSaleTokens < availableTokensforPreICO);
 		_;
     }
-  
+
 	/**
 	 * @dev Tokens ans ownership will be transfered from preICO contract to ICO contract after preICO period.
 	 */
     function TransferTokenToIcoContract(address ICOcontract) public onlyOwner {
-        
+
 		require(now > start + period * 1 days && token.owner()==ICOcontract);
 		token.transfer(ICOcontract, token.balanceOf(this));
     }
-    
+
     /**
     * @dev Transfer ownershop to ICO contract after pre ICO
     */
@@ -349,7 +349,7 @@ contract MettaCrowdsale is Ownable {
         require(now > start + period * 1 days);
 		token.transferOwnership(ICOcontract);
     }
-    
+
 	/**
 	 * @dev Investments will be refunded if preICO not hits the softcap.
 	 */
@@ -361,7 +361,7 @@ contract MettaCrowdsale is Ownable {
 	/**
 	 * @dev Manager can get his/shes bonus after preICO reaches it's softcap
 	 */
-    function withdrawManagerBonus() public {    
+    function withdrawManagerBonus() public {
         if(currentPreICObalance > softcap && managerETHbonus > 0 && managerETHaddress!=0x0){
             managerETHaddress.transfer(managerETHbonus);
             managerETHbonus = 0;
@@ -370,7 +370,7 @@ contract MettaCrowdsale is Ownable {
 	/**
 	 * @dev If ICO reached owner can withdrow ETH for ICO comping managment
 	 */
-    function withdrawPreIcoFounds() public onlyOwner {  
+    function withdrawPreIcoFounds() public onlyOwner {
 		if(currentPreICObalance > softcap) {
 			// send all current ETH from contract to owner
 			uint availableToTranser = this.balance-managerETHbonus;
@@ -389,7 +389,7 @@ contract MettaCrowdsale is Ownable {
         }
         return address(result);
     }
-   function buyTokens() issetTokensForSale saleIsOn payable {   
+   function buyTokens() issetTokensForSale saleIsOn payable {
         require(msg.value >= rate);// minimum 0,00022 eth for investment
          uint tokens = msg.value.mul(1 ether).div(rate);
              address referer = 0x0;
@@ -402,11 +402,11 @@ contract MettaCrowdsale is Ownable {
             } else if(now >= start.add(14* 1 days) && now < start.add(21 * 1 days)) { // 3th week
     			bonusTokens = tokens.mul(35).div(100); //+35%
             } else if(now >= start.add(21* 1 days) && now < start.add(28 * 1 days)) { // 4th week
-    			bonusTokens = tokens.mul(30).div(100); //+30% 
-            } 
+    			bonusTokens = tokens.mul(30).div(100); //+30%
+            }
             tokens = tokens.add(bonusTokens);
             //---------END-BONUSES-------------//
-    		
+
     		//---------referal program--------- //abailable after 3th week only
     		if(now >= start.add(14* 1 days) && now < start.add(28 * 1 days)) {
                 if(msg.data.length == 20) {
@@ -416,26 +416,26 @@ contract MettaCrowdsale is Ownable {
                 }
     		}
     		//---------end referal program---------//
-    		
-    		if(availableTokensforPreICO > countOfSaleTokens.add(tokens)) {  
+
+    		if(availableTokensforPreICO > countOfSaleTokens.add(tokens)) {
     			token.transfer(msg.sender, tokens);
-    			currentPreICObalance = currentPreICObalance.add(msg.value); 
-    			countOfSaleTokens = countOfSaleTokens.add(tokens); 
+    			currentPreICObalance = currentPreICObalance.add(msg.value);
+    			countOfSaleTokens = countOfSaleTokens.add(tokens);
     			balances[msg.sender] = balances[msg.sender].add(msg.value);
     			if(availableTokensforPreICO > countOfSaleTokens.add(tokens).add(refererTokens)){
     			     // send token to referrer
     			     if(referer !=0x0 && refererTokens >0){
     			        token.transfer(referer, refererTokens);
-    			        	countOfSaleTokens = countOfSaleTokens.add(refererTokens); 
+    			        	countOfSaleTokens = countOfSaleTokens.add(refererTokens);
     			     }
     			}
     		} else {
     			// changes to buyer
-    
+
     	    	uint availabeTokensToSale = availableTokensforPreICO.sub(countOfSaleTokens);
-    			countOfSaleTokens = countOfSaleTokens.add(availabeTokensToSale); 
+    			countOfSaleTokens = countOfSaleTokens.add(availabeTokensToSale);
     			token.transfer(msg.sender, availabeTokensToSale);
-    			
+
     			uint changes = msg.value.sub(availabeTokensToSale.mul(rate).div(1 ether));
     			balances[msg.sender] = balances[msg.sender].add(msg.value.sub(changes));
     			currentPreICObalance = currentPreICObalance.add(msg.value.sub(changes));
@@ -444,7 +444,20 @@ contract MettaCrowdsale is Ownable {
     }
 
     function() external payable {
-		buyTokens();  
+		buyTokens();
     }
-      
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

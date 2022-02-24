@@ -81,8 +81,8 @@ contract BaseLBSCSale {
 
     // Modifiers
     modifier onlyOwner() {
-        require(msg.sender == owner,"Only the owner is allowed to call this."); 
-        _; 
+        require(msg.sender == owner,"Only the owner is allowed to call this.");
+        _;
     }
 
     modifier onlyOwnerOrManager{
@@ -95,16 +95,16 @@ contract BaseLBSCSale {
         _;
     }
     modifier afterDeadline(){
-        require (currentTime() >= endTime, "Validation: After endtime"); 
+        require (currentTime() >= endTime, "Validation: After endtime");
         _;
     }
     modifier afterStartTime(){
-        require (currentTime() >= startTime, "Validation: After starttime"); 
+        require (currentTime() >= startTime, "Validation: After starttime");
         _;
     }
 
     modifier saleNotClosed(){
-        require (!saleClosed, "Sale is not yet ended"); 
+        require (!saleClosed, "Sale is not yet ended");
         _;
     }
 
@@ -233,7 +233,7 @@ contract BaseLBSCSale {
     }
 
     /**
-     * These helper functions are exposed for changing the start and end time dynamically   
+     * These helper functions are exposed for changing the start and end time dynamically
      */
     function changeStartTime(uint256 _startTime) external onlyOwnerOrManager {startTime = _startTime;}
     function changeEndTime(uint256 _endTime) external onlyOwnerOrManager {endTime = _endTime;}
@@ -263,8 +263,8 @@ contract BaseLBSCToken {
 
     // Modifiers
     modifier onlyOwner() {
-        require(msg.sender == owner,"Only the owner is allowed to call this."); 
-        _; 
+        require(msg.sender == owner,"Only the owner is allowed to call this.");
+        _;
     }
 
     constructor() public{
@@ -432,7 +432,7 @@ contract BaseLBSCToken {
 }
 
 contract LBSCToken is BaseLBSCToken {
-    
+
     // Constants
     string  public constant name = "LabelsCoin";
     string  public constant symbol = "LBSC";
@@ -441,7 +441,7 @@ contract LBSCToken is BaseLBSCToken {
     uint256 public constant INITIAL_SUPPLY      =  30000000 * (10 ** uint256(decimals));
     //uint256 public constant CROWDSALE_ALLOWANCE =  1000000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  30000000 * (10 ** uint256(decimals));
-    
+
     // Properties
     //uint256 public totalSupply;
     //uint256 public crowdSaleAllowance;      // the number of tokens available for crowdsales
@@ -527,7 +527,7 @@ contract LBSCSale is BaseLBSCSale {
      * @param end                           the end time (UNIX timestamp)
      * @param rateLBSCToEther                 the conversion rate from LBSC to Ether
      * @param addressOfTokenUsedAsReward    address of the token being sold
-     * @param _manager                      Address that will manage the crowdsale 
+     * @param _manager                      Address that will manage the crowdsale
      */
     constructor(
         address ifSuccessfulSendTo,
@@ -569,7 +569,7 @@ contract LBSCSale is BaseLBSCSale {
     function () public payable whenNotPaused beforeDeadline afterStartTime saleNotClosed nonReentrant {
         require(msg.value >= minContribution, "Value should be greater than minimum contribution");
         require(isApprovedUser(msg.sender), "Only the approved users are allowed to participate in ICO");
-        
+
         // Update the sender's balance of wei contributed and the amount raised
         uint amount = msg.value;
         uint currentBalance = balanceOf[msg.sender];
@@ -654,7 +654,7 @@ contract LBSCSale is BaseLBSCSale {
             }
         }
     }
-    
+
     function convertToMini(uint amount) internal view returns (uint) {
         return amount * (10 ** decimals);
     }
@@ -678,4 +678,15 @@ contract LBSCSale is BaseLBSCSale {
     function changeTokenAddress(address _address) external onlyOwnerOrManager {
         tokenReward = LBSCToken(_address);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

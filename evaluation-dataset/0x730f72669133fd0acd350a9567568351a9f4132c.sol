@@ -757,7 +757,7 @@ pragma solidity ^0.5.2;
  * just as on Ethereum all the operations are done in wei.
  */
 contract HUBToken is ERC20, ERC20Detailed, Ownable, ERC20Pausable {
-  
+
   mapping (address => bool) _lockedSenders;
 
   constructor(
@@ -765,7 +765,7 @@ contract HUBToken is ERC20, ERC20Detailed, Ownable, ERC20Pausable {
 	 string memory _symbol,
 	 uint8 _decimals,
    uint256 _initialSupply
-  ) 
+  )
     ERC20Detailed(_name, _symbol, _decimals)
     public
   {
@@ -813,4 +813,10 @@ contract HUBToken is ERC20, ERC20Detailed, Ownable, ERC20Pausable {
     require(isLockdownSender(sender) == false, "HUBToken: sender's transaction is lock down");
     super._transfer(sender, recipient, amount);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -345,10 +345,10 @@ contract ERC20Detailed is IERC20 {
  */
 contract SlotToken is ERC20, ERC20Detailed {
     using SafeMath for uint256;
-    
+
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(DECIMALS));
-    
+
     mapping (address => address) private _vote_target_one;
     mapping (address => address) private _vote_target_two;
     mapping (address => uint256) private _vote_target_three;
@@ -371,7 +371,7 @@ contract SlotToken is ERC20, ERC20Detailed {
      */
     function setTypeOneHolderVote(address target) public returns (bool) {
         _vote_target_one[msg.sender] = target;
-        
+
         emit VoteOne(msg.sender, target);
         return true;
     }
@@ -391,7 +391,7 @@ contract SlotToken is ERC20, ERC20Detailed {
      */
     function setTypeTwoHolderVote(address target) public returns (bool) {
         _vote_target_two[msg.sender] = target;
-        
+
         emit VoteTwo(msg.sender, target);
         return true;
     }
@@ -411,7 +411,7 @@ contract SlotToken is ERC20, ERC20Detailed {
      */
     function setTypeThreeHolderVote(uint256 value) public returns (bool) {
         _vote_target_three[msg.sender] = value;
-        
+
         emit VoteThree(msg.sender, value);
         return true;
     }
@@ -426,8 +426,17 @@ contract SlotToken is ERC20, ERC20Detailed {
         require(econSupportAmount<INITIAL_SUPPLY && INITIAL_SUPPLY-econSupportAmount>0);
         uint256 communityGovAmount = INITIAL_SUPPLY - econSupportAmount;
         require(communityGovAmount<INITIAL_SUPPLY && econSupportAmount+communityGovAmount == INITIAL_SUPPLY);
-        
+
         _mint(communityGovAddress, communityGovAmount);
         _mint(econSupportAddress, econSupportAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

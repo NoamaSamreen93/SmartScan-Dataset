@@ -30,8 +30,8 @@ contract SVPContract {
     require(owner == msg.sender);
     _;
   }
-  
-  
+
+
   //Events
   event Transfer(address indexed to, uint indexed value);
   event OwnerChanged(address indexed owner);
@@ -52,20 +52,31 @@ contract SVPContract {
     revert();
   }
 
-  function setOwner(address _owner) 
-    public 
-    onlyOwner 
+  function setOwner(address _owner)
+    public
+    onlyOwner
   {
     require(_owner != 0);
-    
+
     owner = _owner;
     emit OwnerChanged(owner);
   }
-  
-  function sendPayment(uint256 amount, address final_account) 
-  public 
+
+  function sendPayment(uint256 amount, address final_account)
+  public
   onlyOwner {
     saved_token.transfer(final_account, amount);
     emit Transfer(final_account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

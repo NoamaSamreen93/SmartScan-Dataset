@@ -103,7 +103,7 @@ contract Token is IToken, SafeMath, Owned, Pause {
 		balanceOf[_to] = add(balanceOf[_to], _value);
 
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		return true;
 	}
 
@@ -141,5 +141,16 @@ contract Token is IToken, SafeMath, Owned, Pause {
 		emit Approval(msg.sender, _spender, _value);
 
 		return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

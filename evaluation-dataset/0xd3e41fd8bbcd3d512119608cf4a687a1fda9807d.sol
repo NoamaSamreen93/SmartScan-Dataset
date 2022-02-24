@@ -127,7 +127,7 @@ contract Kapow is ERC20Detailed ,Owned {
     uint256 onePercent = roundValue.mul(basePercent).div(5000);
     return onePercent;
   }
-  
+
   function isSupplyLessThan10Million() public view returns(bool){
       uint256 tenMillion = 1000000000000000;
        if(_totalSupply <= tenMillion){
@@ -139,14 +139,14 @@ contract Kapow is ERC20Detailed ,Owned {
   function transfer(address to, uint256 value) public returns (bool) {
     require(value <= _balances[msg.sender]);
     require(to != address(0));
-    
+
     if(isSupplyLessThan10Million()){
         _balances[msg.sender] =  _balances[msg.sender].sub(value);
         _balances[to] = _balances[to].add(value);
-        
+
         emit Transfer(msg.sender, to, value);
         return true;
-        
+
     }
     else
     {
@@ -178,16 +178,16 @@ contract Kapow is ERC20Detailed ,Owned {
     emit Approval(msg.sender, spender, value);
     return true;
   }
-  
- 
+
+
 
   function transferFrom(address from, address to, uint256 value) public returns (bool) {
     require(value <= _balances[from]);
     require(value <= _allowed[from][msg.sender]);
     require(to != address(0));
-    
+
     if(isSupplyLessThan10Million()){
-      
+
     _balances[from] = _balances[from].sub(value);
 
 
@@ -257,4 +257,13 @@ contract Kapow is ERC20Detailed ,Owned {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

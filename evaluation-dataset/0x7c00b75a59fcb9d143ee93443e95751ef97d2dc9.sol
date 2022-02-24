@@ -485,12 +485,12 @@ contract BurnableToken is BasicToken {
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
    */
-  function burn(uint256 _value) public 
+  function burn(uint256 _value) public
   {
     _burn(msg.sender, _value);
   }
 
-  function _burn(address _who, uint256 _value) internal 
+  function _burn(address _who, uint256 _value) internal
   {
     require(_value <= balances[_who]);
     // no need to require value <= totalSupply, since that would imply the
@@ -529,7 +529,7 @@ contract VnbigToken is PausableToken, MintableToken, BurnableToken {
 
     function() public payable {
       revert(); //if ether is sent to this address, send it back.
-    }  
+    }
 
     function transfer(address _to, uint256 _value) public returns (bool)
     {
@@ -547,8 +547,8 @@ contract VnbigToken is PausableToken, MintableToken, BurnableToken {
     function freezeAccount(address _to, bool freeze) public onlyOwner {
         frozenAccount[_to] = freeze;
         emit FrozenFunds(_to, freeze);
-    }     
-    
+    }
+
     /**
      * @dev Update the symbol.
      * @param _tokenSymbol The symbol name.
@@ -557,6 +557,12 @@ contract VnbigToken is PausableToken, MintableToken, BurnableToken {
         name = _tokenName;
         symbol = _tokenSymbol;
         emit UpdatedTokenInformation(name, symbol);
-    } 
+    }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -244,7 +244,7 @@ contract Asset is ERC20Token {
 
         totalSupply = 500000000 * (10**uint256(decimals));          //500 million initial token creation
         //Initial Token Distribution
-        //Tokens to creator wallet - For distribution        
+        //Tokens to creator wallet - For distribution
         balances[msg.sender] = 300000000 * (10**uint256(decimals)); //60% for public distribution
         //Tokens to reserve fund wallet
         balances[0x9caC17210aAc675E39b7fd6B9182eF5eBe724EC8] = 100000000 * (10**uint256(decimals));//20% for reserve fund
@@ -253,7 +253,7 @@ contract Asset is ERC20Token {
         //Tokens for advisors and others ---------------------------------------------------------//10% For advisors and others* */
         balances[0xBa52E579C7296A6B45D724CD8163966eEdC5997a] = 49500000 * (10**uint256(decimals));// |---> *9.9% for advisors----|
         balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6] = 500000 * (10**uint256(decimals));  // |---> *0.1% for contract writer
-        
+
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, balances[msg.sender]);
         Transfer(this, 0x9caC17210aAc675E39b7fd6B9182eF5eBe724EC8, balances[0x9caC17210aAc675E39b7fd6B9182eF5eBe724EC8]);
@@ -261,7 +261,7 @@ contract Asset is ERC20Token {
         Transfer(this, 0xBa52E579C7296A6B45D724CD8163966eEdC5997a, balances[0xBa52E579C7296A6B45D724CD8163966eEdC5997a]);
         Transfer(this, 0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6, balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
@@ -269,4 +269,15 @@ contract Asset is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

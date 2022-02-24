@@ -498,10 +498,10 @@ contract TutellusVestingFactory is Authorizable {
 
     function TutellusVestingFactory(
         address _token
-    ) public 
+    ) public
     {
         require(_token != address(0));
-        
+
         token = TutellusToken(_token);
     }
 
@@ -764,7 +764,7 @@ contract TutellusPartnerCrowdsale is CappedCrowdsale, Pausable {
     function TutellusPartnerCrowdsale(
         uint256 _startTime,
         uint256 _endTime,
-        uint256 _cap, 
+        uint256 _cap,
         uint256 _cliff,
         uint256 _duration,
         uint256 _rate,
@@ -831,4 +831,20 @@ contract TutellusPartnerCrowdsale is CappedCrowdsale, Pausable {
             Withdrawal(msg.sender, amount);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

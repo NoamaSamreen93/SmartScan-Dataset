@@ -50,7 +50,7 @@ contract Ownable {
 }
 
 contract ETHStvo is Ownable {
-    
+
     event Register(uint indexed _user, uint indexed _referrer, uint indexed _introducer, uint _time);
     event SponsorChange(uint indexed _user, uint indexed _referrer, uint indexed _introducer, uint _time);
     event Upgrade(uint indexed _user, uint _star, uint _price, uint _time);
@@ -140,7 +140,7 @@ contract ETHStvo is Ownable {
     function setMainAddress(address _mainAddress) public onlyOwner {
 
         require(userList[_mainAddress] == 0, 'Address is already in use by another user');
-        
+
         delete userList[mainAddress];
         userList[_mainAddress] = uint(1);
         mainAddress = _mainAddress;
@@ -195,7 +195,7 @@ contract ETHStvo is Ownable {
             introducerID : _introducerID,
             referral : new address[](0)
         });
-    
+
         users[_userID] = userStruct;
         userList[_wallet] = _userID;
 
@@ -210,7 +210,7 @@ contract ETHStvo is Ownable {
         if(_referral1 != address(0)){
             users[_userID].referral.push(_referral1);
         }
-           
+
         if(_referral2 != address(0)){
             users[_userID].referral.push(_referral2);
         }
@@ -397,11 +397,11 @@ contract ETHStvo is Ownable {
 
         uint previousStar = SafeMath.sub(_star,uint(1));
         require(users[userList[msg.sender]].starActive[previousStar] == true, 'Buy the previous star first');
-        
+
         users[userList[msg.sender]].starActive[_star] = true;
 
         upgradePayment(userList[msg.sender], _star);
-        
+
         emit Upgrade(userList[msg.sender], _star, STAR_PRICE[_star], now);
     }
 
@@ -439,7 +439,7 @@ contract ETHStvo is Ownable {
         }
 
         money = STAR_PRICE[_star];
-                
+
         if(STAR_FEE[_star] > 0){
             bool result;
             result = address(uint160(mainAddress)).send(STAR_FEE[_star]);
@@ -464,7 +464,7 @@ contract ETHStvo is Ownable {
 
             bool result_two;
             result_two = address(uint160(introducer)).send(money);
-            
+
         } else {
             bool result_three;
             result_three = address(uint160(referrer)).send(money);
@@ -487,7 +487,7 @@ contract ETHStvo is Ownable {
         }
 
         address[] memory referrals = new address[](363);
-        referrals[0] = users[_user].referral[0]; 
+        referrals[0] = users[_user].referral[0];
         referrals[1] = users[_user].referral[1];
         referrals[2] = users[_user].referral[2];
 
@@ -525,4 +525,15 @@ contract ETHStvo is Ownable {
             addr := mload(add(bys, 20))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

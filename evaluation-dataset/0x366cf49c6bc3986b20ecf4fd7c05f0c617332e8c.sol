@@ -306,7 +306,7 @@ contract IERC721Metadata is IERC721 {
 
 contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
 
-    // Token class name e.g. "2019 Coachella Gathering Trophies" 
+    // Token class name e.g. "2019 Coachella Gathering Trophies"
     string internal _name;
 
     // Token class symbol e.g. "CGT19"
@@ -388,9 +388,9 @@ contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
     /**
      * @dev Internal function that extracts the part of a string based on the desired length and offset. The
      *      offset and length must not exceed the lenth of the base string.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
-     *              otherwise this is the string that will be used for 
+     *              otherwise this is the string that will be used for
      *              extracting the sub string from
      * @param _length The length of the sub string to extract
      * @param _offset The starting point to extract the sub string from
@@ -414,7 +414,7 @@ contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
 }
 
 /**
- * @title Gather Standard Trophies - Gathering-based Non-Fungible ERC721 Tokens 
+ * @title Gather Standard Trophies - Gathering-based Non-Fungible ERC721 Tokens
  * @author Victor Rortvedt (@vrortvedt)
  * This implementation includes all the required and some optional functionality of the ERC721 standard
  * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -443,7 +443,7 @@ contract GatherStandardTrophies is ERC721, ERC721Metadata {
 
     /**
      * @dev Mints six standard trophies at conclusion of gathering
-     * @param winners Array containing six addresses of trophy winners 
+     * @param winners Array containing six addresses of trophy winners
      * @param uri String containing ordered list of all trophies' URI info, in 59 character length chunks pointing to ipfs URL
      */
     function mintStandardTrophies(address[] memory winners, string memory uri) public onlyCreator {
@@ -457,7 +457,7 @@ contract GatherStandardTrophies is ERC721, ERC721Metadata {
 
     /**
      * @dev Public function that mints Schmoozer trophy at conclusion of gathering to gatherNode with most connections made
-     * @param winner Address of trophy winner 
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
      */
     function mintSchmoozerTrophy(address winner, string memory uri) public onlyCreator {
@@ -468,29 +468,29 @@ contract GatherStandardTrophies is ERC721, ERC721Metadata {
 
     /**
      * @dev Public function that mints Cupid trophy at conclusion of gathering to gatherNode with most matches made
-     * @param winner Address of trophy winner 
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
      */
     function mintCupidTrophy(address winner, string memory uri) public onlyCreator  {
         _mint(winner, 2);
         _tokenNames[2] = "Cupid Trophy";
         _tokenURIs[2] = uri;
-    } 
-    
+    }
+
     /**
      * @dev Public function that mints  MVP trophy at conclusion of gathering to gatherNode with most total points
-     * @param winner Address of trophy winner 
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
-     */ 
+     */
     function mintMVPTrophy(address winner, string memory uri) public onlyCreator {
         _mint(winner, 3);
         _tokenNames[3] = "MVP Trophy";
         _tokenURIs[3] = uri;
-    } 
+    }
 
     /**
      * @dev Public function that mints Human Router trophy at conclusion of gathering to gatherNode with most recommendations made
-     * @param winner Address of trophy winner 
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
      */
     function mintHumanRouterTrophy(address winner, string memory uri) public onlyCreator {
@@ -498,29 +498,40 @@ contract GatherStandardTrophies is ERC721, ERC721Metadata {
         _tokenNames[4] = "Human Router Trophy";
         _tokenURIs[4] = uri;
     }
-    
+
     /**
-     * @dev Public function that mints Oracle trophy at conclusion of gathering to gatherNode with most supermatches 
-     * @param winner Address of trophy winner 
+     * @dev Public function that mints Oracle trophy at conclusion of gathering to gatherNode with most supermatches
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
      */
     function mintOracleTrophy(address winner, string memory uri) public onlyCreator {
         _mint(winner, 5);
         _tokenNames[5] = "Oracle Trophy";
         _tokenURIs[5] = uri;
-    } 
+    }
 
 
     /**
-     * @dev Public function that mints Kevin Bacon trophy at conclusion of gathering 
+     * @dev Public function that mints Kevin Bacon trophy at conclusion of gathering
      * to gatherNode with fewest average degrees of separation from all other gatherNodes
-     * @param winner Address of trophy winner 
+     * @param winner Address of trophy winner
      * @param uri String containing IPFS link to URI info
      */
     function mintKevinBaconTrophy(address winner, string memory uri) public onlyCreator {
         _mint(winner, 6);
         _tokenNames[6] = "Kevin Bacon Trophy";
         _tokenURIs[6] = uri;
-    }   
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -84,17 +84,17 @@ contract ERC20Interface {
 }
 
 contract Swidex is ERC20Interface, Owned {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     string public name = "Swidex";
     string public symbol = "SWDX";
     uint256 public decimals = 8;
     uint256 public _totalSupply;
-    
+
     uint256 public SWDXPerEther = 2000000e8;
     uint256 public maximumSale = 2000000000e8;
     uint256 public totalSold = 0;
@@ -107,8 +107,8 @@ contract Swidex is ERC20Interface, Owned {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
-    
+
+
     constructor () public {
         _totalSupply = 5000000000e8;
         /**
@@ -122,14 +122,14 @@ contract Swidex is ERC20Interface, Owned {
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    
+
     function () payable external {
         require(msg.value >= minimumBuy && msg.value <= maximumBuy && totalSold <= maximumSale);
         uint256 totalBuy =  (SWDXPerEther.mul(msg.value)).div(1 ether);
         totalSold = totalSold.add(totalBuy);
         doTransfer(owner, msg.sender, totalBuy);
     }
-    
+
     /// @dev This is the actual transfer function in the token contract, it can
     ///  only be called by other functions in this contract.
     /// @param _from The address holding the tokens being transferred
@@ -144,11 +144,11 @@ contract Swidex is ERC20Interface, Owned {
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
     }
-    
+
     function balanceOf(address _owner) view public returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         doTransfer(msg.sender, _to, _amount);
         return true;
@@ -184,16 +184,16 @@ contract Swidex is ERC20Interface, Owned {
             return true;
         }
     }
-    
+
     function allowance(address _owner, address _spender) view public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function withdrawFund() onlyOwner public {
         uint256 balance = address(this).balance;
         owner.transfer(balance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -201,17 +201,26 @@ contract Swidex is ERC20Interface, Owned {
         _totalSupply = _totalSupply.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function getForeignTokenBalance(ERC20Interface _tokenContract, address who) view public returns (uint) {
         return _tokenContract.balanceOf(who);
     }
-    
+
     function withdrawForeignTokens(ERC20Interface _tokenContract) onlyOwner public returns (bool) {
         uint256 amount = _tokenContract.balanceOf(address(this));
         return _tokenContract.transfer(owner, amount);
     }
-    
+
     event TransferEther(address indexed _from, address indexed _to, uint256 _value);
     event NewPrice(address indexed _changer, uint256 _lastPrice, uint256 _newPrice);
     event Burn(address indexed _burner, uint256 value);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

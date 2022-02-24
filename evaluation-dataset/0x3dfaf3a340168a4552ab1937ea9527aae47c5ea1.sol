@@ -46,7 +46,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -67,7 +67,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -270,7 +270,7 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-/** 
+/**
  * @title TokenDestructible:
  * @author Remco Bloemen <remco@2π.com>
  * @dev Base contract that can be destroyed by owner. All funds in contract including
@@ -278,9 +278,9 @@ contract MintableToken is StandardToken, Ownable {
  */
 contract TokenDestructible is Ownable {
 
-  function TokenDestructible() payable { } 
+  function TokenDestructible() payable { }
 
-  /** 
+  /**
    * @notice Terminate contract and refund to owner
    * @param tokens List of addresses of ERC20 or ERC20Basic token contracts to
    refund.
@@ -351,11 +351,11 @@ contract StopIcoCoin is StandardToken, Ownable, TokenDestructible {
 
 
 /**
- * @title Crowdsale 
+ * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end block, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
@@ -365,12 +365,12 @@ contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
   StopIcoCoin public token;
 
   // start and end dates where donation are allowed (both inclusive)
-    uint256 constant public START = 151340000000; //Start Date(2017, 11, 16) 
+    uint256 constant public START = 151340000000; //Start Date(2017, 11, 16)
   uint256 constant public END = 1517500000; // end date (2017, 12, 21)
 
   // address where funds are collected
   address public wallet = 0x5fa4Fc122aB7d6d20A3E07d6Df507C9288f293dC;
-  
+
 
   // amount of raised money in wei
   uint256 public weiRaised;
@@ -383,7 +383,7 @@ contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   event BountyDistributed(address indexed bountyAddress, uint256 amount);
 
@@ -400,8 +400,8 @@ contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
     else if (now <= START + 20 days) return 150; // day 14 to 20, 25% bonus
     else if (now <= START + 27 days) return 144; // day 21 to 27, 20% bonus
     else if (now <= START + 35 days) return 138; // day 28 to 35, 15% bonus
-    
-   
+
+
     return 120; // no bonus
   }
 
@@ -420,7 +420,7 @@ contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
 
     // calculate token amount to be minted
     uint256 tokens = weiAmount.mul(getRate()).div(10);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
@@ -433,3 +433,16 @@ contract StopIcoDonation is Ownable, Pausable, TokenDestructible {
 
 
   }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
+}

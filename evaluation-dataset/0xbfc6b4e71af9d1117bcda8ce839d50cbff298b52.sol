@@ -490,3 +490,12 @@ contract TestToken is ERC20Burnable, ERC20Mintable {
 contract CallReceiver {
     function approvalFallback(address _from, uint256 _value, address _token, string memory _extraData) public ;
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

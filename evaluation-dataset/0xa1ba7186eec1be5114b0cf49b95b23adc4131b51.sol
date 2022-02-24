@@ -422,7 +422,7 @@ contract FTIToken is ERC20Burnable, ERC20Mintable {
   string public constant symbol = "TECH";
   uint8 public constant decimals = 10;
 
-  uint256 public constant initialSupply = 299540000 * (10 ** uint256(decimals)); 
+  uint256 public constant initialSupply = 299540000 * (10 ** uint256(decimals));
 
   constructor () public {
     _totalSupply = initialSupply;
@@ -621,7 +621,16 @@ contract FTICrowdsale is Ownable {
     wallet.transfer(cleanWei);
 
     if (change > 0) {
-      inv.transfer(change); 
+      inv.transfer(change);
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

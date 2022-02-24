@@ -1,11 +1,11 @@
 pragma solidity ^0.4.25;
 
 /**
-  
+
   EN:
-  
+
   Multiplier contract: returns 120% of each investment!
-  
+
   Automatic payouts!
   No bugs, no backdoors, NO OWNER - fully automatic!
   Made and checked by professionals!
@@ -45,15 +45,15 @@ pragma solidity ^0.4.25;
 
 /**
 
-  RU:    
+  RU:
 
   Контракт Умножитель: возвращает 120% от вашего депозита!
-  
+
   Автоматические выплаты, каждый пятый в !
   Без ошибок, дыр, автоматический - для выплат НЕ НУЖНА администрация!
   Создан и проверен профессионалами!
 
-  1. Пошлите любую фиксированную сумму на адрес контракта 
+  1. Пошлите любую фиксированную сумму на адрес контракта
      - сумма 0.1 ETH
      - gas limit минимум 250000
      - вы встанете в очередь
@@ -109,13 +109,13 @@ contract FastBetMultiplier01eth {
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
-        
+
         // You can not send 0.5% to support the project. To disable this feature, send 0.0000001 ether
         if (msg.value == 0.0000001 ether) {
             notSupport[msg.sender] = true;
             return;
         }
-        
+
         if(msg.value > 0){
             require(gasleft() >= 220000, "We require more gas!"); //We need gas to process queue
             require(msg.value == 0.1 ether); // deposits are not accepted
@@ -127,14 +127,14 @@ contract FastBetMultiplier01eth {
             if (!notSupport[msg.sender]) {
                  support.transfer(msg.value * 5 / 1000); // 0.5%
             }
-            
+
             //Pay to first investors in line
             pay();
         }
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -205,10 +205,21 @@ contract FastBetMultiplier01eth {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

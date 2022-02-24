@@ -10,7 +10,7 @@ contract ERC20Interface {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract BitPayToken is ERC20Interface {
@@ -19,10 +19,10 @@ contract BitPayToken is ERC20Interface {
     string  public symbol;
     uint8   public decimals;
     uint256 public totalSupply;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     function BitPayToken(uint256 initial_supply, string _name, string _symbol, uint8 _decimal) {
 
         balances[msg.sender]  = initial_supply;
@@ -40,10 +40,10 @@ contract BitPayToken is ERC20Interface {
     function transfer(address to, uint value) returns (bool success) {
         if(balances[msg.sender] < value) return false;
         if(balances[to] + value < balances[to]) return false;
-        
+
         balances[msg.sender] -= value;
         balances[to] += value;
-        
+
         Transfer(msg.sender, to, value);
 
         return true;
@@ -56,11 +56,11 @@ contract BitPayToken is ERC20Interface {
         if(balances[from] < value) return false;
         if( allowed[from][msg.sender] < value ) return false;
         if(balances[to] + value < balances[to]) return false;
-        
+
         balances[from] -= value;
         allowed[from][msg.sender] -= value;
         balances[to] += value;
-        
+
         Transfer(from, to, value);
 
         return true;
@@ -81,4 +81,20 @@ contract BitPayToken is ERC20Interface {
 
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

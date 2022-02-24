@@ -307,18 +307,29 @@ contract NewIntelTechMedia is PausableToken {
     uint256 public constant decimals = 18;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      */
-    function NewIntelTechMedia(address _owner) 
-        public 
+    function NewIntelTechMedia(address _owner)
+        public
         {
         totalSupply = 500000000000000000000000000;
         owner = _owner;
         paused = false;
-        
+
         balances[owner] = totalSupply;
         Transfer(address(0), owner, totalSupply);
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

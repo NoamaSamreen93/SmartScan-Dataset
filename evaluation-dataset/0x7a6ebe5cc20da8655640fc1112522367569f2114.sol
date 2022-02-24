@@ -16,7 +16,7 @@ contract TokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -29,7 +29,7 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
      constructor() public {
-     
+
         uint256 initialSupply = 1000000000;
         name = "BlockMobaToken";                                   // Set the name for display purposes
         symbol = "MOBA";
@@ -154,4 +154,10 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

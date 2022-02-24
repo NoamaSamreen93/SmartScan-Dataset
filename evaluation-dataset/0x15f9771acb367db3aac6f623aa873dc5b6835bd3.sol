@@ -5,7 +5,7 @@ pragma solidity ^0.4.18;
 //
 // Deployed to : 0x15f9771acb367db3aac6f623aa873dc5b6835bd3
 // Symbol      : CLTN
-// Name        : CHLORINE TOKEN 
+// Name        : CHLORINE TOKEN
 // Total supply: 1000000000000000000000000000
 // Decimals    : 18
 //
@@ -233,4 +233,15 @@ contract CHLORINETOKEN is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

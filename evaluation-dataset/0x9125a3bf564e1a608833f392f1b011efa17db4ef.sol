@@ -339,11 +339,22 @@ pragma solidity ^0.5.0;
  * @title CryptoBrothersToken
  */
 contract CryptoBrothersToken is ERC20, ERC20Detailed {
-    constructor() 
+    constructor()
     ERC20Detailed("CryptoBrothersCoin","CBRC",18)
-    
+
     public {
         _mint(msg.sender,10000000*(10**18));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

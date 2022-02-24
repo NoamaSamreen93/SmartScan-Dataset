@@ -28,10 +28,10 @@ contract BancorMarketMaker {
     // sell dai price, will be less than normal conversion, _minReturn should be 1/(Dai/Eth price) * .95
     function sellDaiForEth(uint256 _amountDai, uint256 _minReturn) external returns (uint256) {
         require(_amountDai > 0);
-        
+
         IERC20Token(dai).transferFrom(msg.sender, address(this), _amountDai);
         require(IERC20Token(dai).approve(address(bancorConverterAddress), _amountDai));
-        
+
         IERC20Token[] memory daiToEthConversionPath;
         daiToEthConversionPath[0] = dai;
         daiToEthConversionPath[1] = bancorDaiSmartTokenRelay;
@@ -42,7 +42,7 @@ contract BancorMarketMaker {
         daiToEthConversionPath[6] = bancorErc20Eth;
         bancorConverterAddress.quickConvert(daiToEthConversionPath, _amountDai, _minReturn);
         msg.sender.transfer(this.balance);
-        
+
     }
 
     // buy dai price, will be more than normal conversion, _minReturn should be 1/(Dai/Eth price) * 1.05
@@ -58,6 +58,15 @@ contract BancorMarketMaker {
         ethToDaiConversionPath[6] = dai;
         bancorConverterAddress.quickConvert.value(msg.value)(ethToDaiConversionPath, msg.value, _minReturn);
         dai.transfer(msg.sender, dai.balanceOf(address(this)));
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

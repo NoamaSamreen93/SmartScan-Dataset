@@ -125,17 +125,17 @@ contract MyWishChain is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
+
      string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
 
    function MyWishChain() public {
         decimals = 18;
-        totalSupply_ = 10000000000 * 10 ** uint(decimals);   
-        balances[msg.sender] = totalSupply_;               
-        name = "My Wish Chain";                                  
-        symbol = "Wish";                               
+        totalSupply_ = 10000000000 * 10 ** uint(decimals);
+        balances[msg.sender] = totalSupply_;
+        name = "My Wish Chain";
+        symbol = "Wish";
    }
    /**
    * @dev Transfer tokens from one address to another
@@ -180,9 +180,25 @@ contract MyWishChain is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
-
-  
 
 
+
+
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

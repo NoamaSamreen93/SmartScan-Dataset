@@ -68,7 +68,7 @@ contract TokenERC20 is SafeMath {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -102,7 +102,7 @@ contract TokenERC20 is SafeMath {
         // Check for overflows
         require(SafeMath.safeAdd(balanceOf[_to], _value) > balanceOf[_to]);
         // Save this for an assertion in the future
-        uint previousBalances = SafeMath.safeAdd(balanceOf[_from], balanceOf[_to]); 
+        uint previousBalances = SafeMath.safeAdd(balanceOf[_from], balanceOf[_to]);
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                     // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -212,12 +212,12 @@ contract TokenERC20 is SafeMath {
 /******************************************/
 
 contract ClubToken is owned, TokenERC20 {
-    
+
     /// The full name of the CLUB token.
     string public constant tokenName = "GranTurismoClub";
     /// Symbol of the CLUB token.
     string public constant tokenSymbol = "CLUB";
-    
+
     uint256 public initialSupply = 100000000;
 
     mapping (address => bool) public frozenAccount;
@@ -248,4 +248,13 @@ contract ClubToken is owned, TokenERC20 {
         emit FrozenFunds(target, freeze);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

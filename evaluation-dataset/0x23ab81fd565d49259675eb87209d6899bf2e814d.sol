@@ -213,44 +213,44 @@ contract NomToken is StandardToken {
 	event Mint(address indexed to, uint256 amount);
 
 	address public owner;
-	
-	string public constant name = "NOM Token"; 
+
+	string public constant name = "NOM Token";
 	string public constant symbol = "NOM";
-	uint8 public constant decimals = 18;	
-	
+	uint8 public constant decimals = 18;
+
 	uint256 public constant totalTokens = 5650000000 * (10 ** uint256(decimals));
-	
+
 	uint256 public initialIssueMinting = totalTokens.mul(60).div(100);	//60% of tokens
 	uint public constant initialIssueMintingDate = 1524873600;			//28.04.2018 UTC
 	bool public initialIssueMinted = false;
-		
+
 	uint256 public firstStageMinting = totalTokens.mul(10).div(100);	//10% of tokens
 	uint public constant firstStageMintingDate = 1532736000;			//28.07.2018 UTC
 	bool public firstStageMinted = false;
-		
+
 	uint256 public secondStageMinting = totalTokens.mul(10).div(100);	//10% of tokens
 	uint public constant secondStageMintingDate = 1540684800;			//28.10.2018 UTC
 	bool public secondStageMinted = false;
-	
+
 	uint256 public thirdStageMinting = totalTokens.mul(10).div(100);	//10% of tokens
 	uint public constant thirdStageMintingDate = 1548633600;			//28.01.2019 UTC
 	bool public thirdStageMinted = false;
-	
+
 	uint256 public fourthStageMinting = totalTokens.mul(10).div(100);	//10% of tokens
 	uint public constant fourthStageMintingDate = 1556409600;			//28.04.2019 UTC
 	bool public fourthStageMinted = false;
-		
+
 	function NomToken() public {
 		owner = msg.sender;
 	}
-	
+
 	 /**
 	 * @dev Function to mint tokens
 	 * @return A boolean that indicates if the operation was successful.
 	 */
 	function mint() public returns (bool) {
 		require(msg.sender == owner);
-		
+
 		uint256 tokensToMint = 0;
 		if (now > initialIssueMintingDate && !initialIssueMinted) {
 				tokensToMint = tokensToMint.add(initialIssueMinting);
@@ -275,11 +275,22 @@ contract NomToken is StandardToken {
 		require(tokensToMint > 0);
 		uint256 newTotalSupply = totalSupply_.add(tokensToMint);
 		require(newTotalSupply <= totalTokens);
-		
+
 		totalSupply_ = totalSupply_.add(tokensToMint);
 		balances[owner] = balances[owner].add(tokensToMint);
 		emit Mint(owner, tokensToMint);
 		emit Transfer(0x0, owner, tokensToMint);
 		return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

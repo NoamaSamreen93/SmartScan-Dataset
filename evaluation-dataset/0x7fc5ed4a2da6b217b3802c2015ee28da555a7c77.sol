@@ -46,7 +46,7 @@ contract Registry {
         address adminAddr;
         uint256 timestamp;
     }
-    
+
     // never remove any storage variables
     address public owner;
     address public pendingOwner;
@@ -66,7 +66,7 @@ contract Registry {
         owner = msg.sender;
         initialized = true;
     }
-    
+
     // Stores arbitrary attributes for users. An example use case is an ERC20
     // token that requires its users to go through a KYC/AML check - in this case
     // a validator can set an account's "hasPassedKYC/AML" attribute to 1 to indicate
@@ -395,12 +395,12 @@ contract ProxyStorage {
     address public pendingOwner;
 
     bool initialized;
-    
+
     BalanceSheet balances_Deprecated;
     AllowanceSheet allowances_Deprecated;
 
     uint256 totalSupply_;
-    
+
     bool private paused_Deprecated = false;
     address private globalPause_Deprecated;
 
@@ -425,8 +425,8 @@ contract ProxyStorage {
 
 /**
  * @title HasOwner
- * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin. 
- and provides basic authorization control functions. Inherits storage layout of 
+ * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin.
+ and provides basic authorization control functions. Inherits storage layout of
  ProxyStorage.
  */
 contract HasOwner is ProxyStorage {
@@ -438,7 +438,7 @@ contract HasOwner is ProxyStorage {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -482,14 +482,14 @@ contract HasOwner is ProxyStorage {
 // File: contracts/ReclaimerToken.sol
 
 contract ReclaimerToken is HasOwner {
-    /**  
+    /**
     *@dev send all eth balance in the contract to another address
     */
     function reclaimEther(address _to) external onlyOwner {
         _to.transfer(address(this).balance);
     }
 
-    /**  
+    /**
     *@dev send all token balance of an arbitary erc20 token
     in the contract to another address
     */
@@ -498,7 +498,7 @@ contract ReclaimerToken is HasOwner {
         token.transfer(_to, balance);
     }
 
-    /**  
+    /**
     *@dev allows owner of the contract to gain ownership of any contract that the contract currently owns
     */
     function reclaimContract(Ownable _ownable) external onlyOwner {
@@ -560,9 +560,9 @@ contract ModularBasicToken is HasOwner {
  */
 contract ModularStandardToken is ModularBasicToken {
     using SafeMath for uint256;
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -710,7 +710,7 @@ contract BurnableTokenWithBounds is ModularBurnableToken {
 
 // File: contracts/GasRefundToken.sol
 
-/**  
+/**
 @title Gas Refund Token
 Allow any user to sponsor gas refunds for transfer and mints. Utilitzes the gas refund mechanism in EVM
 Each time an non-empty storage slot is set to 0, evm refund 15,000 to the sender
@@ -811,7 +811,7 @@ contract GasRefundToken is ProxyStorage {
         }
     }
 
-    /**  
+    /**
     @dev refund 30,000 gas
     @dev costs slightly more than 15,400 gas
     */
@@ -830,7 +830,7 @@ contract GasRefundToken is ProxyStorage {
         }
     }
 
-    /**  
+    /**
     @dev refund 15,000 gas
     @dev costs slightly more than 10,200 gas
     */
@@ -847,7 +847,7 @@ contract GasRefundToken is ProxyStorage {
         }
     }
 
-    /**  
+    /**
     *@dev Return the remaining sponsored gas slots
     */
     function remainingGasRefundPool() public view returns (uint length) {
@@ -1138,12 +1138,12 @@ contract CompliantDepositTokenWithHook is ReclaimerToken, RegistryClone, Burnabl
 
 /** @title DelegateERC20
 Accept forwarding delegation calls from the old TrueUSD (V1) contract. This way the all the ERC20
-functions in the old contract still works (except Burn). 
+functions in the old contract still works (except Burn).
 */
 contract DelegateERC20 is CompliantDepositTokenWithHook {
 
     address constant DELEGATE_FROM = 0x8dd5fbCe2F6a956C3022bA3663759011Dd51e73E;
-    
+
     modifier onlyDelegateFrom() {
         require(msg.sender == DELEGATE_FROM);
         _;
@@ -1196,7 +1196,7 @@ contract DelegateERC20 is CompliantDepositTokenWithHook {
 contract SGDC is CompliantDepositTokenWithHook {
     uint8 constant DECIMALS = 18;
     uint8 constant ROUNDING = 2;
-    
+
     constructor(address initialAccount, uint256 initialBalance) public {
         _setBalance(initialAccount, initialBalance * (10 ** uint256(DECIMALS)));
         totalSupply_ = initialBalance * (10 ** uint256(DECIMALS));
@@ -1231,4 +1231,15 @@ contract SGDC is CompliantDepositTokenWithHook {
     function canBurn() internal pure returns (bytes32) {
         return "canBurn";
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

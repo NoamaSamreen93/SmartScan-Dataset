@@ -125,25 +125,25 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   address public mintMaster;
-  
+
   uint256  totalSTACoin_ = 12*10**8*10**18;
-  
+
   //2*10**8*10**18 Crowdsale
   uint256 totalSupply_=2*10**8*10**18;
-  
+
   //1*10**8*10**18 Belong to Founder
   uint256 totalFounder=1*10**8*10**18;
 
-  //9*10**8*10**18 Belong to Founder 
-  uint256 totalIpfsMint=9*10**8*10**18;    
-    
+  //9*10**8*10**18 Belong to Founder
+  uint256 totalIpfsMint=9*10**8*10**18;
 
-  
+
+
   //67500000 Crowdsale distribution
   uint256 crowdsaleDist_;
-  
+
   uint256 mintNums_;
-    
+
   /**
   * @dev total number of tokens in existence
   */
@@ -151,28 +151,28 @@ contract BasicToken is ERC20Basic {
     return totalSupply_;
   }
 
-  
+
   function totalSTACoin() public view returns (uint256) {
         return totalSTACoin_;
    }
-   
+
    function totalMintNums() public view returns (uint256) {
         return mintNums_;
    }
-   
-   
+
+
    function totalCrowdSale() public view returns (uint256) {
         return crowdsaleDist_;
    }
-   
+
    function addCrowdSale(uint256 _value) public {
-       
+
        crowdsaleDist_ =  crowdsaleDist_.add(_value);
-       
+
    }
-   
-   
-   
+
+
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -190,7 +190,7 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function transferSub(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     address addr = msg.sender;
@@ -338,7 +338,7 @@ contract MintableToken is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    
+
     mintNums_ = mintNums_.add(_amount);
     require(mintNums_<=totalSupply_);
     balances[_to] = balances[_to].add(_amount);
@@ -488,4 +488,16 @@ contract STA is MintableToken, PausableToken {
     }
 
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

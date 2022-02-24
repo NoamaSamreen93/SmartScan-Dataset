@@ -1,7 +1,7 @@
 pragma solidity 0.5.7;
 
 
-library SafeMath 
+library SafeMath
 {
     /**
     * @dev Multiplies two unsigned integers, reverts on overflow.
@@ -71,7 +71,7 @@ contract nerveShares {
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint256) internal lastDividends;
     mapping (address => bool) public tradables;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Claim(address indexed _to, uint256 value);
@@ -80,7 +80,7 @@ contract nerveShares {
 
     constructor() public
     {
-        decimals = 18;                              // decimals  
+        decimals = 18;                              // decimals
         totalSupply = 1000000*10**18;               // initialSupply
         name = "Nerve";                             // Set the name for display purposes
         symbol = "NRV";                             // Set the symbol for display purposes
@@ -93,28 +93,28 @@ contract nerveShares {
     * @dev Get the dividends of a user. Take prior payoffs into account.
     * @param account The address of the user.
     */
-    function dividendBalanceOf(address account) public view returns (uint256) 
+    function dividendBalanceOf(address account) public view returns (uint256)
     {
         uint256 newDividends = totalDividends.sub(lastDividends[account]);
         uint256 product = balanceOf[account].mul(newDividends);
         return product.div(totalSupply);
-    }   
+    }
 
     /**
     * @dev Get the dividends of a user. Take prior payoffs into account.
     * @param account The address of the user.
     */
-    function internalDividendBalanceOf(address account, uint256 tempLastDividends) internal view returns (uint256) 
+    function internalDividendBalanceOf(address account, uint256 tempLastDividends) internal view returns (uint256)
     {
         uint256 newDividends = totalDividends.sub(tempLastDividends);
         uint256 product = balanceOf[account].mul(newDividends);
         return product.div(totalSupply);
-    }   
+    }
 
     /**
     * @dev Claim dividends. Restrict dividends to new income.
     */
-    function claimDividend() external 
+    function claimDividend() external
     {
         uint256 tempLastDividends = lastDividends[msg.sender];
         lastDividends[msg.sender] = totalDividends;
@@ -123,14 +123,14 @@ contract nerveShares {
         require(owing > 0, "No dividends to claim.");
 
         msg.sender.transfer(owing);
-        
+
         emit Claim(msg.sender, owing);
     }
 
     /**
     * @dev Claim dividends internally. Get called on addresses opened for trade.
     */
-    function internalClaimDividend(address payable from) internal 
+    function internalClaimDividend(address payable from) internal
     {
         uint256 tempLastDividends = lastDividends[from];
         lastDividends[from] = totalDividends;
@@ -170,30 +170,30 @@ contract nerveShares {
     * @param value The amount to be transferred.
     */
     function _transfer(address payable from, address payable to, uint256 value) internal
-    {   
+    {
         require(value > 0, "Transferred value has to be grater than 0.");
         require(to != address(0), "0x00 address not allowed.");
         require(value <= balanceOf[from], "Not enough funds on sender address.");
         require(balanceOf[to] + value >= balanceOf[to], "Overflow protection.");
- 
+
         uint256 fromOwing = dividendBalanceOf(from);
         uint256 toOwing = dividendBalanceOf(to);
 
-        if (tradables[from] == true && (tradables[to] == true || toOwing == 0)) 
+        if (tradables[from] == true && (tradables[to] == true || toOwing == 0))
         {
 
             internalClaimDividend(from);
             internalClaimDividend(to);
         } else {
-            
+
             require(fromOwing == 0 && toOwing == 0, "Unclaimed dividends on sender and/or receiver");
         }
-        
+
         balanceOf[from] -= value;
         balanceOf[to] += value;
- 
+
         lastDividends[to] = lastDividends[from];    // In case of new account, set lastDividends of receiver to totalDividends.
- 
+
         emit Transfer(from, to, value);
     }
 
@@ -207,16 +207,16 @@ contract nerveShares {
     function transferFrom(address payable from, address payable to, uint value) external returns (bool success)
     {
         uint256 allowanceTemp = allowance[from][msg.sender];
-        
-        require(allowanceTemp >= value, "Funds not approved."); 
+
+        require(allowanceTemp >= value, "Funds not approved.");
         require(balanceOf[from] >= value, "Not enough funds on sender address.");
         require(balanceOf[to] + value >= balanceOf[to], "Overflow protection.");
 
-        if (allowanceTemp < MAX_UINT) 
+        if (allowanceTemp < MAX_UINT)
         {
             allowance[from][msg.sender] -= value;
         }
-        
+
         _transfer(from, to, value);
 
         return true;
@@ -227,7 +227,7 @@ contract nerveShares {
     * @param spender The address of the account able to transfer the tokens.
     * @param value The amount of wei to be approved for transfer.
     */
-    function approve(address spender, uint value) external returns (bool) 
+    function approve(address spender, uint value) external returns (bool)
     {
         allowance[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
@@ -237,7 +237,7 @@ contract nerveShares {
     /**
     * @dev Set unlimited allowance for other address
     * @param target The address authorized to spend
-    */   
+    */
     function giveAccess(address target) external
     {
         require(target != address(0), "0x00 address not allowed.");
@@ -248,21 +248,21 @@ contract nerveShares {
     /**
     * @dev Set allowance for other address to 0
     * @param target The address authorized to spend
-    */   
+    */
     function revokeAccess(address target) external
     {
         require(target != address(0), "0x00 address not allowed.");
         allowance[msg.sender][target] = 0;
     }
-    
+
     /**
-    * @dev Get contract ETH amount. 
-    */ 
+    * @dev Get contract ETH amount.
+    */
     function contractBalance() external view returns(uint256 amount)
     {
         return (address(this).balance);
     }
-    
+
     /**
     * @dev Receive ETH from CONTRACT and increase the total historic amount of dividend eligible earnings.
     */
@@ -270,13 +270,24 @@ contract nerveShares {
     {
         totalDividends = totalDividends.add(msg.value);
     }
-    
+
     /**
     * @dev Receive ETH and increase the total historic amount of dividend eligible earnings.
     */
-    function () external payable 
+    function () external payable
     {
         totalDividends = totalDividends.add(msg.value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

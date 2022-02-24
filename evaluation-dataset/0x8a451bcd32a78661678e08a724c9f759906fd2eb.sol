@@ -142,7 +142,7 @@ contract IVerificationList is IOwnable {
     event Reject(address _address);
     event SendToCheck(address _address);
     event RemoveFromList(address _address);
-    
+
     function isAccepted(address _address) public view returns (bool);
     function isRejected(address _address) public view returns (bool);
     function isOnCheck(address _address) public view returns (bool);
@@ -150,7 +150,7 @@ contract IVerificationList is IOwnable {
     function isNotInList(address _address) public view returns (bool);
     function isAcceptedOrNotInList(address _address) public view returns (bool);
     function getState(address _address) public view returns (uint8);
-    
+
     function accept(address _address) public;
     function reject(address _address) public;
     function toCheck(address _address) public;
@@ -196,7 +196,7 @@ contract ITap is IOwnable {
 }
 
 contract IRefund is IOwnable {
-    
+
     ITap public tap;
     uint public refundedTokens;
     uint public tokensBase;
@@ -533,4 +533,15 @@ contract PreDAICO is Ownable, WinbixPayable, SafeMath {
         }
         winbixToken.burn(_value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

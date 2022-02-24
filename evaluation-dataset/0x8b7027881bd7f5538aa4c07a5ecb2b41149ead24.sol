@@ -69,7 +69,7 @@ contract WWNCoin {
         return true;
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -79,4 +79,15 @@ contract WWNCoin {
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

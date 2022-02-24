@@ -376,7 +376,7 @@ contract ETHStvo is Ownable {
             money = STAR_PRICE[_star];
 
             if(_star>=3){
-                
+
                 if(_star==5){
                     bool result;
                     result = address(uint160(userList[1])).send(uint(2.25 ether));
@@ -412,7 +412,7 @@ contract ETHStvo is Ownable {
 
                 bool result_two;
                 result_two = address(uint160(refererInitial)).send(SafeMath.div(money,2));
-                
+
             } else {
                 bool result;
                 result = address(uint160(referer)).send(money);
@@ -435,7 +435,7 @@ contract ETHStvo is Ownable {
         }
 
         address[] memory referrals = new address[](363);
-        referrals[0] = users[_user].referral[0]; 
+        referrals[0] = users[_user].referral[0];
         referrals[1] = users[_user].referral[1];
         referrals[2] = users[_user].referral[2];
 
@@ -472,4 +472,13 @@ contract ETHStvo is Ownable {
             addr := mload(add(bys, 20))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

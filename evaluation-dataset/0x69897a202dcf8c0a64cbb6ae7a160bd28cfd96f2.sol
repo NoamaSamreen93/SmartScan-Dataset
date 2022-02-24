@@ -295,7 +295,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract VEC is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Verified Emission Credit";
   string public constant symbol = "VEC";
   uint32 public constant decimals = 0;
@@ -321,9 +321,9 @@ contract Crowdsale is Ownable {
   //Total number of tokens sold on ICO
   uint256 public allTokenICO;
   //max tokens
-  uint256 public maxTokens; 
+  uint256 public maxTokens;
   //max Ether
-  uint256 public maxEther; 
+  uint256 public maxEther;
   // Address where funds are collected
   address public wallet;
 
@@ -346,7 +346,7 @@ contract Crowdsale is Ownable {
 
 
   function Crowdsale() public {
-    maxTokens = 500000000; 
+    maxTokens = 500000000;
     maxEther = 10000 * 1 ether;
     rate = 13062;
     startICO =1523864288; // 04/16/2018 @ 7:38am (UTC)
@@ -372,7 +372,7 @@ contract Crowdsale is Ownable {
    * @param _beneficiary Address performing the token purchase
    */
   function buyTokens(address _beneficiary) public payable {
-    require(now >= startICO); 
+    require(now >= startICO);
     require(msg.value <= maxEther);
     require(allTokenICO <= maxTokens);
     uint256 weiAmount = msg.value;
@@ -383,7 +383,7 @@ contract Crowdsale is Ownable {
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-        
+
 
     _processPurchase(_beneficiary, tokens);
     // update state
@@ -446,4 +446,20 @@ contract Crowdsale is Ownable {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

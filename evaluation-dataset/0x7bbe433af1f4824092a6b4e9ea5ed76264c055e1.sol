@@ -26,3 +26,9 @@ function addRecord(bytes32 shasum,string remarks) public returns (uint256 record
 event LogRebalance(address Creator, bytes32 sha256sum, string Remarks, uint256 time, uint256 blocknum, uint256 indexed RecordID );
 
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

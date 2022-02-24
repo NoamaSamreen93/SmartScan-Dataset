@@ -140,7 +140,7 @@ contract Meritocracy {
     // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
         // Locals
-        
+
         // Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
         // require(cAllocator.addr != address(0)); // is sender a Contributor? TODO maybe relax this restriction.
@@ -148,9 +148,9 @@ contract Meritocracy {
 
         // removing decimals
         individualAmount = (individualAmount / 1000000000000000000 * 1000000000000000000);
-        
+
         uint amount = individualAmount * registry.length;
-        
+
         require(token.transferFrom(msg.sender, address(this), amount));
         // Body
         // cAllocator.inPot = true;
@@ -189,7 +189,7 @@ contract Meritocracy {
         Contributor storage cReceiver = contributors[_contributor];
         // Requirements
         require(_amount > 0); // Allow Non-Zero amounts only
-        require(cSender.addr == msg.sender); // Ensure Contributors both exist, and isn't the same address 
+        require(cSender.addr == msg.sender); // Ensure Contributors both exist, and isn't the same address
         require(cReceiver.addr == _contributor);
         require(cSender.addr != cReceiver.addr); // cannot send to self
         require(cSender.allocation >= _amount); // Ensure Sender has enough tokens to allocate
@@ -225,7 +225,7 @@ contract Meritocracy {
         time = contributors[_contributor].status[_index].time;
     }
 
-    // Allow Contributor to award multiple Contributors 
+    // Allow Contributor to award multiple Contributors
     function awardContributors(address[] calldata _contributors, uint256 _amountEach,  string calldata _praise) external {
         // Locals
         Contributor storage cSender = contributors[msg.sender];
@@ -297,7 +297,7 @@ contract Meritocracy {
         // Requirements
         require(block.timestamp >= lastForfeit + 1 weeks); // prevents admins accidently calling too quickly.
         // Body
-        lastForfeit = block.timestamp; 
+        lastForfeit = block.timestamp;
         for (uint256 i = 0; i < registryLength; i++) { // should never be longer than maxContributors, see addContributor
                 Contributor storage c = contributors[registry[i]];
                 c.totalForfeited += c.allocation; // Shaaaaame!
@@ -340,8 +340,8 @@ contract Meritocracy {
                 uint256 r =  c.received;
                 c.received = 0;
                 c.allocation = 0;
-                // WARN: Should totalReceived and totalForfeited be zeroed-out? 
-                token.transfer(c.addr, r); // Transfer any owed tokens to contributor 
+                // WARN: Should totalReceived and totalForfeited be zeroed-out?
+                token.transfer(c.addr, r); // Transfer any owed tokens to contributor
         }
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
@@ -376,7 +376,7 @@ contract Meritocracy {
     // Constructor ------------------------------------------------------------------------------------------
 
     // constructor(address _token, uint256 _maxContributors, address _previousMeritocracy) public {
-        
+
     // }
 
     // Set Owner, Token address,  initial maxContributors
@@ -390,4 +390,17 @@ contract Meritocracy {
         // previousMeritocracy = Meritocracy(_previousMeritocracy);
         // importPreviousMeritocracyData() TODO
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

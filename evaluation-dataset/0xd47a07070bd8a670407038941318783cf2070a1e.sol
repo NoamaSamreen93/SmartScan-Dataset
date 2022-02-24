@@ -4,9 +4,9 @@
 
     MoonTrader is a successor of the  MoonBot project, https://moon-bot.com/en/
 
-    Mail us to: info@moontrader.io 
+    Mail us to: info@moontrader.io
 
-    Join the Telegram channel https://t.me/moontrader_news_en, 
+    Join the Telegram channel https://t.me/moontrader_news_en,
     Visit BTT forum thread https://bitcointalk.org/index.php?topic=5143969 for more information.
 
  */
@@ -449,9 +449,9 @@ pragma solidity ^0.5.2;
 
     MoonTrader is a successor of the  MoonBot project, https://moon-bot.com/en/
 
-    Mail us to: info@moontrader.io 
+    Mail us to: info@moontrader.io
 
-    Join the Telegram channel https://t.me/moontrader_news_en, 
+    Join the Telegram channel https://t.me/moontrader_news_en,
     Visit BTT forum thread https://bitcointalk.org/index.php?topic=5143969 for more information.
 
  */
@@ -467,4 +467,13 @@ contract Moon_Token is ERC20Capped {
     {
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

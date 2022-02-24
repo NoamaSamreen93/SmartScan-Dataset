@@ -796,7 +796,7 @@ contract TokenContribution is Owned, TokenController {
     function onTransfer(address _from, address, uint256) public returns (bool) {
         return transferable(_from);
     }
-    
+
     function onApprove(address _from, address, uint256) public returns (bool) {
         return transferable(_from);
     }
@@ -1130,4 +1130,15 @@ contract AdvisorsTokensHolder is Owned {
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint256 _amount);
     event TokensWithdrawn(address indexed _holder, uint256 _amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

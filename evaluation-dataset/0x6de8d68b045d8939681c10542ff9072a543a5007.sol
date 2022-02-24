@@ -65,7 +65,7 @@ contract BasicToken is ERC20Basic {
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    if(1 <= usedTokens[msg.sender]) { 
+    if(1 <= usedTokens[msg.sender]) {
         usedTokens[msg.sender] = usedTokens[msg.sender].sub(_value);
         usedTokens[_to] = usedTokens[_to].add(_value);
     }
@@ -176,7 +176,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract XmasCoin is StandardToken {
-  
+
   using SafeMath for uint;
 
   string public constant name = "XmasCoin";
@@ -185,9 +185,9 @@ contract XmasCoin is StandardToken {
   uint public constant totalSupply = 100;
 
   address public owner = msg.sender;
-  //Ether that will be gifted to all token holders after the deadline passes 
+  //Ether that will be gifted to all token holders after the deadline passes
   uint public giftPool;
-  //Ether that will be used for the next holiday gift pool after the deadline passes 
+  //Ether that will be used for the next holiday gift pool after the deadline passes
   uint public timeToOpenPresents;
 
   event GiftPoolContribution(address giver, uint amountContributed);
@@ -204,7 +204,7 @@ contract XmasCoin is StandardToken {
 
     //gift time set to Christmas Day, December 25, 2017 12:00:00 AM GMT
     timeToOpenPresents = 1514160000;
-  } 
+  }
 
   function claimXmasGift(address claimant)
     public
@@ -212,19 +212,19 @@ contract XmasCoin is StandardToken {
   {
     require(now > timeToOpenPresents);
     require(1 <= validTokenBalance(claimant));
-    
+
     uint amount = giftBalance(claimant);
     uint tokenBalance = validTokenBalance(claimant);
     usedTokens[claimant] += tokenBalance;
-    
+
     claimant.transfer(amount);
     GiftClaimed(claimant, amount, tokenBalance);
-    
+
     return true;
   }
 
   //all eth sent to fallback is added to the gift pool, stops accepting when presents open
-  function () 
+  function ()
     public
     payable
   {
@@ -232,8 +232,8 @@ contract XmasCoin is StandardToken {
     require(now < timeToOpenPresents);
     giftPool += msg.value;
     GiftPoolContribution(msg.sender, msg.value);
-  } 
-  
+  }
+
   function validTokenBalance (address _owner)
     public
     constant
@@ -241,7 +241,7 @@ contract XmasCoin is StandardToken {
   {
       return balances[_owner].sub(usedTokens[_owner]);
   }
-  
+
   function usedTokenBalance (address _owner)
     public
     constant
@@ -249,20 +249,28 @@ contract XmasCoin is StandardToken {
   {
       return usedTokens[_owner];
   }
-  
+
   function giftBalance(address claimant)
     public
     constant
     returns (uint)
   {
-    return giftPool.div(totalSupply).mul(validTokenBalance(claimant));    
+    return giftPool.div(totalSupply).mul(validTokenBalance(claimant));
   }
-  
+
   function selfDestruct()
     public
     onlyOwner
   {
      suicide(owner);
   }
-  
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

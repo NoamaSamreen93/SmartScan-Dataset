@@ -35,7 +35,7 @@ contract EthBet {
 
   mapping(address => uint) balances;
   mapping(address => address) referrers;
-  address[] playerAddresses; 
+  address[] playerAddresses;
 
   modifier ownerOnly {
     require(msg.sender == owner, "Ownly Owner");
@@ -130,14 +130,14 @@ contract EthBet {
       balances[address(this)],
       totalPlayableFunds
     );
-  } 
+  }
 
   /**
    * Editable
    */
-  
+
   function editBetData(
-    uint _houseEdgePercent, 
+    uint _houseEdgePercent,
     uint _houseEdgeMin,
     uint _refererBonusPercent,
     uint _referreeFirstTimeBonus,
@@ -158,33 +158,33 @@ contract EthBet {
    */
 
   function playBalance(
-    uint betValue, 
-    uint betMask, 
-    uint modulo, 
-    uint commitLastBlock, 
-    bytes32 commit, 
-    bytes32 r, 
-    bytes32 s, 
+    uint betValue,
+    uint betMask,
+    uint modulo,
+    uint commitLastBlock,
+    bytes32 commit,
+    bytes32 r,
+    bytes32 s,
     uint8 v) external runWhenActiveOnly validBetAmountOnly(betValue) {
 
     validateCommit(commitLastBlock, commit, r, s, v);
-    
+
     uint _possibleWinAmount;
     uint _referrerBonus;
     uint _houseEdge;
     bool _isWin;
-    
+
     (_possibleWinAmount, _referrerBonus, _houseEdge, _isWin) = play(msg.sender, betValue, betMask, modulo, commit);
     settleBet(msg.sender, betValue, _possibleWinAmount, _referrerBonus, _houseEdge, _isWin, true);
   }
 
   function playTopUp(
-    uint betMask, 
-    uint modulo, 
-    uint commitLastBlock, 
-    bytes32 commit, 
-    bytes32 r, 
-    bytes32 s, 
+    uint betMask,
+    uint modulo,
+    uint commitLastBlock,
+    bytes32 commit,
+    bytes32 r,
+    bytes32 s,
     uint8 v) external payable  runWhenActiveOnly validBetAmountOnly(msg.value) {
 
     validateCommit(commitLastBlock, commit, r, s, v);
@@ -199,13 +199,13 @@ contract EthBet {
   }
 
   function playFirstTime(
-    address referrer, 
-    uint betMask, 
-    uint modulo, 
-    uint commitLastBlock, 
-    bytes32 commit, 
-    bytes32 r, 
-    bytes32 s, 
+    address referrer,
+    uint betMask,
+    uint modulo,
+    uint commitLastBlock,
+    bytes32 commit,
+    bytes32 r,
+    bytes32 s,
     uint8 v) external payable runWhenActiveOnly validBetAmountOnly(msg.value) {
 
     validateCommit(commitLastBlock, commit, r, s, v);
@@ -213,7 +213,7 @@ contract EthBet {
 
     uint _betAmount = msg.value;
     if(referrer != address(0) && referrer != msg.sender && referrers[msg.sender] == address(0)) {
-      _betAmount += REFEREE_FIRST_TIME_BONUS; 
+      _betAmount += REFEREE_FIRST_TIME_BONUS;
       setReferrer(msg.sender, referrer);
     }
     else
@@ -229,12 +229,12 @@ contract EthBet {
   }
 
   function playSitAndGo(
-    uint betMask, 
-    uint modulo, 
-    uint commitLastBlock, 
-    bytes32 commit, 
-    bytes32 r, 
-    bytes32 s, 
+    uint betMask,
+    uint modulo,
+    uint commitLastBlock,
+    bytes32 commit,
+    bytes32 r,
+    bytes32 s,
     uint8 v) external payable  runWhenActiveOnly validBetAmountOnly(msg.value) {
 
     validateCommit(commitLastBlock, commit, r, s, v);
@@ -291,12 +291,12 @@ contract EthBet {
   }
 
   function settleBet(
-    address beneficiary, 
+    address beneficiary,
     uint betAmount,
     uint possibleWinAmount,
     uint referrerBonus,
     uint houseEdge,
-    bool isWin, 
+    bool isWin,
     bool playedFromBalance) internal {
 
     lockFunds(possibleWinAmount);
@@ -305,14 +305,14 @@ contract EthBet {
     settleHouseEdge(houseEdge);
 
     if(isWin) {
-      if(playedFromBalance) 
+      if(playedFromBalance)
         balances[beneficiary] += possibleWinAmount - betAmount;
       else
         balances[beneficiary] += possibleWinAmount;
       totalPlayableFunds -= possibleWinAmount - betAmount;
       emit WinBet(beneficiary, betAmount, possibleWinAmount, balances[beneficiary]);
     } else {
-      if(playedFromBalance) 
+      if(playedFromBalance)
         balances[beneficiary] -= betAmount;
 
       totalPlayableFunds += betAmount;
@@ -323,7 +323,7 @@ contract EthBet {
   }
 
   function settleBetAutoWithdraw(
-    address beneficiary, 
+    address beneficiary,
     uint betAmount,
     uint possibleWinAmount,
     uint referrerBonus,
@@ -358,7 +358,7 @@ contract EthBet {
     if(referrerBonus > 0) {
       totalPlayableFunds -= referrerBonus;
       if(referrer != address(this)) {
-        if(!referrer.send(referrerBonus)) 
+        if(!referrer.send(referrerBonus))
           balances[address(this)] += referrerBonus;
       } else {
         balances[address(this)] += referrerBonus;
@@ -372,7 +372,7 @@ contract EthBet {
   }
 
   function setupFirstTimePlayer(address newPlayer) internal {
-    if(referrers[newPlayer] == address(0)) 
+    if(referrers[newPlayer] == address(0))
       playerAddresses.push(newPlayer);
   }
 
@@ -384,15 +384,15 @@ contract EthBet {
       if(_playerBalance > 0) {
         if(!_player.send(_playerBalance))
           emit DestroyFailedPayout(_player, _playerBalance);
-      } 
+      }
     }
   }
 
   function play(
-    address player, 
+    address player,
     uint betValue,
-    uint betMask, 
-    uint modulo, 
+    uint betMask,
+    uint modulo,
     bytes32 commit) internal view returns(uint, uint, uint, bool) {
 
     uint _possibleWinAmount;
@@ -405,18 +405,18 @@ contract EthBet {
   }
 
   function calculatePayouts(
-    address player, 
-    uint betAmount, 
-    uint modulo, 
+    address player,
+    uint betAmount,
+    uint modulo,
     uint rollUnder,
     bool isWin) internal view returns(uint, uint, uint) {
     require(0 < rollUnder && rollUnder <= modulo, "Win probability out of range.");
 
     uint _referrerBonus = 0;
-    uint _multiplier = modulo / rollUnder; 
+    uint _multiplier = modulo / rollUnder;
     uint _houseEdge = betAmount * HOUSE_EDGE_PERCENT / 100;
     if(referrers[player] != address(0)) {
-      _referrerBonus = _houseEdge * REFERRER_BONUS_PERCENT / HOUSE_EDGE_PERCENT; 
+      _referrerBonus = _houseEdge * REFERRER_BONUS_PERCENT / HOUSE_EDGE_PERCENT;
     }
     if(isWin)
       _houseEdge = _houseEdge * (_multiplier - 1);
@@ -430,8 +430,8 @@ contract EthBet {
   }
 
   function roll(
-    uint betMask, 
-    uint modulo, 
+    uint betMask,
+    uint modulo,
     bytes32 commit) internal view returns(bool) {
 
     // Validate input data ranges.
@@ -445,7 +445,7 @@ contract EthBet {
     // are not aware of "reveal" and cannot deduce it from "commit" (as Keccak256
     // preimage is intractable), and house is unable to alter the "reveal" after
     // placeBet have been mined (as Keccak256 collision finding is also intractable).
-    bytes32 entropy = keccak256(abi.encodePacked(commit, blockhash(block.number)));    
+    bytes32 entropy = keccak256(abi.encodePacked(commit, blockhash(block.number)));
 
     // Do a roll by taking a modulo of entropy. Compute winning amount.
     uint dice = uint(entropy) % modulo;
@@ -459,7 +459,7 @@ contract EthBet {
     return diceWin > 0;
   }
 
-  function lockFunds(uint lockAmount) internal 
+  function lockFunds(uint lockAmount) internal
   {
     lockedFunds += lockAmount;
     assert(lockedFunds <= totalPlayableFunds);
@@ -470,4 +470,15 @@ contract EthBet {
     lockedFunds -= unlockAmount;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

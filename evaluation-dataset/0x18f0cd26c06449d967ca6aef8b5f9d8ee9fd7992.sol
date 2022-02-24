@@ -64,7 +64,7 @@ contract Exch is SafeMath {
     event Trade(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give);
     event Deposit(address token, address user, uint amount, uint balance);
     event Withdraw(address token, address user, uint amount, uint balance);
-    
+
     modifier onlyAdmin() {
         require(msg.sender==admin);
         _;
@@ -73,11 +73,11 @@ contract Exch is SafeMath {
     // Constructor
 
     constructor(
-        address admin_, 
-        address feeAccount_, 
-        address accountLevelsAddr_, 
-        uint feeMake_, 
-        uint feeTake_, 
+        address admin_,
+        address feeAccount_,
+        address accountLevelsAddr_,
+        uint feeMake_,
+        uint feeTake_,
         uint feeRebate_) public {
 
         admin = admin_;
@@ -248,5 +248,16 @@ contract Exch is SafeMath {
         orderFills[msg.sender][hash] = amountGet;
         emit Cancel(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender, v, r, s);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

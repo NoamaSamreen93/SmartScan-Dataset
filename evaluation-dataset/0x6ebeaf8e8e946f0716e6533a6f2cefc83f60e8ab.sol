@@ -13,11 +13,11 @@ interface ERC165 {
    * uses less than 30,000 gas.
    */
   function supportsInterface(bytes4 _interfaceId) external view returns (bool);
-  
+
 }
 
 contract ERC721Basic is ERC165 {
-    
+
     event Transfer(
         address indexed _from,
         address indexed _to,
@@ -173,14 +173,14 @@ contract CardBase is Governable {
     }
 
     Card[] public cards;
-    
+
 }
 
 contract CardProto is CardBase {
 
     event NewProtoCard(
-        uint16 id, uint8 season, uint8 god, 
-        Rarity rarity, uint8 mana, uint8 attack, 
+        uint16 id, uint8 season, uint8 god,
+        Rarity rarity, uint8 mana, uint8 attack,
         uint8 health, uint8 cardType, uint8 tribe, bool packable
     );
 
@@ -233,7 +233,7 @@ contract CardProto is CardBase {
 
     function nextSeason() public onlyGovernor {
         //Seasons shouldn't go to 0 if there is more than the uint8 should hold, the governor should know this ¯\_(ツ)_/¯ -M
-        require(currentSeason <= 255); 
+        require(currentSeason <= 255);
 
         currentSeason++;
         mythic.length = 0;
@@ -247,7 +247,7 @@ contract CardProto is CardBase {
         Common,
         Rare,
         Epic,
-        Legendary, 
+        Legendary,
         Mythic
     }
 
@@ -275,7 +275,7 @@ contract CardProto is CardBase {
     // rather than 1 byte per instance
 
     uint16 public protoCount;
-    
+
     mapping(uint16 => ProtoCard) protos;
 
     uint16[] public mythic;
@@ -285,7 +285,7 @@ contract CardProto is CardBase {
     uint16[] public common;
 
     function addProtos(
-        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks, 
+        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks,
         uint8[] healths, uint8[] cardTypes, uint8[] tribes, bool[] packable
     ) public onlyGovernor returns(uint16) {
 
@@ -305,7 +305,7 @@ contract CardProto is CardBase {
 
             _addProto(externalIDs[i], card, packable[i]);
         }
-        
+
     }
 
     function addProto(
@@ -392,8 +392,8 @@ contract CardProto is CardBase {
         protoCount++;
 
         emit NewProtoCard(
-            externalID, currentSeason, card.god, 
-            card.rarity, card.mana, card.attack, 
+            externalID, currentSeason, card.god,
+            card.rarity, card.mana, card.attack,
             card.health, card.cardType, card.tribe, packable
         );
 
@@ -497,7 +497,7 @@ contract ERC721Receiver {
     * @notice Handle the receipt of an NFT
     * @dev The ERC721 smart contract calls this function on the recipient
     * after a `safetransfer`. This function MAY throw to revert and reject the
-    * transfer. Return of other than the magic value MUST result in the 
+    * transfer. Return of other than the magic value MUST result in the
     * transaction being reverted.
     * Note: the contract address is always the message sender.
     * @param _operator The address which called `safeTransferFrom` function
@@ -959,7 +959,7 @@ contract ERC721 is ERC721Basic, ERC721Enumerable, ERC721Metadata {
 
 
 library Strings {
-    
+
   // via https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol
   function strConcat(string _a, string _b, string _c, string _d, string _e) internal pure returns (string) {
       bytes memory _ba = bytes(_a);
@@ -1190,10 +1190,10 @@ contract CardOwnershipTwo is ERC721Token {
     function transfer(address to, uint id) public payable onlyOwnerOf(id) {
         require(isTradable(cards[id].proto));
         require(to != address(0));
-        
+
         _transfer(msg.sender, to, id);
     }
-    
+
     function _transfer(address from, address to, uint id) internal {
 
         clearApproval(from, id);
@@ -1218,7 +1218,7 @@ contract CardOwnershipTwo is ERC721Token {
     /**
     * @param proposed : the claimed owner of the cards
     * @param ids : the ids of the cards to check
-    * @return whether proposed owns all of the cards 
+    * @return whether proposed owns all of the cards
     */
     function ownsAll(address proposed, uint[] ids) public view returns (bool) {
         require(ids.length > 0);
@@ -1301,7 +1301,7 @@ contract CardOwnershipTwo is ERC721Token {
 }
 
 contract CardIntegrationTwo is CardOwnershipTwo {
-    
+
     address[] public packs;
 
     event CardCreated(uint indexed id, uint16 proto, uint16 purity, address owner);
@@ -1346,7 +1346,7 @@ contract CardIntegrationTwo is CardOwnershipTwo {
         uint id = cards.push(card) - 1;
 
         _mint(owner, id);
-        
+
         emit CardCreated(id, proto, purity, owner);
 
         return id;
@@ -1379,7 +1379,7 @@ contract CardIntegrationTwo is CardOwnershipTwo {
     // this is enforced by the restriction in the create-card function
     // no cards above this point can be found in packs
 
-    
+
 
 }
 
@@ -1409,14 +1409,14 @@ contract CardMigration is CardIntegrationTwo {
     function migrate(uint id) public {
 
         require(!migrated[id]);
-        
+
         migrated[id] = true;
 
         address owner = old.ownerOf(id);
 
         uint16 proto;
         uint16 purity;
-    
+
         (proto, purity) = old.getCard(id);
 
         _createCard(owner, proto, purity);
@@ -1430,4 +1430,10 @@ contract CardMigration is CardIntegrationTwo {
 
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

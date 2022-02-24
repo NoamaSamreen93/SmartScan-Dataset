@@ -109,7 +109,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -256,4 +256,12 @@ contract PowerToken is TokenERC20 {
     function PowerToken() TokenERC20(20000000, "Capricorn Coin", "CCC", 18) public {
 
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

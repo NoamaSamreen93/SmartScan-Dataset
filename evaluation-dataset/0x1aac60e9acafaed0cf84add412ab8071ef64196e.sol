@@ -426,9 +426,20 @@ contract SphinxToken is PausableToken {
   string public constant name = "SphinxToken";
   string public constant symbol = "SPX";
   uint8 public constant decimals = 18;
-  
+
   constructor(uint256 initialSupply) public {
     totalSupply_ = initialSupply;
     balances[msg.sender] = totalSupply_;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

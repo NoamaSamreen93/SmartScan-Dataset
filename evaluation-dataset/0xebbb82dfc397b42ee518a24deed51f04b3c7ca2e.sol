@@ -80,11 +80,11 @@ library Strings {
         }
         return string(bstr);
     }
-    
+
     function strConcat(string memory _a, string memory _b) internal pure returns (string memory _concatenatedString) {
         return strConcat(_a, _b, "", "", "");
     }
-    
+
     function strConcat(string memory _a, string memory _b, string memory _c, string memory _d, string memory _e) internal pure returns (string memory _concatenatedString) {
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
@@ -827,7 +827,7 @@ contract IERC721Metadata is IERC721 {
 contract ProductInventory is MinterRole {
     using SafeMath for uint256;
     using Address for address;
-    
+
     event ProductCreated(
         uint256 id,
         uint256 price,
@@ -951,7 +951,7 @@ contract ProductInventory is MinterRole {
     * @param _activationPrice - price of activation
     * @param _initialAvailable - the initial amount available for sale
     * @param _supply - total supply - `0` means unlimited (immutable)
-    * @param _interval - interval - period of time, in seconds, users can subscribe 
+    * @param _interval - interval - period of time, in seconds, users can subscribe
     * for. If set to 0, it's not a subscription product (immutable)
     * @param _minterOnly - if true, purchase is only available to minter
     */
@@ -978,7 +978,7 @@ contract ProductInventory is MinterRole {
     }
 
     /**
-    * @notice incrementAvailability - increments the 
+    * @notice incrementAvailability - increments the
     * @param _productId - product id
     * @param _increment - amount to increment
     */
@@ -1158,7 +1158,7 @@ contract ERC721ProductKey is IERC721ProductKey, ERC721Enumerable, ReentrancyGuar
         uint256 issuedTime;
         uint256 expirationTime;
     }
-    
+
     // Map from keyid to ProductKey
     mapping (uint256 => ProductKey) public productKeys;
 
@@ -1224,7 +1224,7 @@ contract ERC721ProductKey is IERC721ProductKey, ERC721Enumerable, ReentrancyGuar
             _baseMetadataURI,
             Strings.uint2str(tokenId));
     }
-    
+
     /**
      * @notice activates access key
      * Throws if not approved or owner or key already active
@@ -1259,12 +1259,12 @@ contract ERC721ProductKey is IERC721ProductKey, ERC721Enumerable, ReentrancyGuar
         ProductKey memory _productKey = ProductKey({
             productId: _productId,
             attributes: 0,
-            issuedTime: now, 
+            issuedTime: now,
             expirationTime: 0
         });
 
         uint256 newKeyId = totalSupply();
-            
+
         productKeys[newKeyId] = _productKey;
         emit KeyIssued(
             _beneficiary,
@@ -1391,4 +1391,13 @@ contract ERC721ProductKey is IERC721ProductKey, ERC721Enumerable, ReentrancyGuar
         _activate(_tokenId);
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

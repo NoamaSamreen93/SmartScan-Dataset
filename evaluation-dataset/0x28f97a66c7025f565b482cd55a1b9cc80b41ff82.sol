@@ -443,7 +443,7 @@ contract EscrowAccountCrowdsale is TimedCrowdsale {
   function afterWhtelisted(address _beneficiary) internal onlyOwner{
       vault.closeAfterWhitelisted(_beneficiary);
   }
-  
+
   function afterWhtelistedBuy(address _beneficiary) internal {
       vault.closeAfterWhitelisted(_beneficiary);
   }
@@ -473,7 +473,7 @@ contract EscrowVault is Ownable {
    */
   function EscrowVault(address _wallet) public {
     require(_wallet != address(0));
-    wallet = _wallet;   
+    wallet = _wallet;
   }
   /**
    * @param investor Investor address
@@ -481,17 +481,17 @@ contract EscrowVault is Ownable {
   function deposit(address investor) onlyOwner  payable {
     deposited[investor] = deposited[investor].add(msg.value);
   }
-  
+
   /**
    * @dev Transfers deposited amount to wallet address after verification is completed.
    * @param _beneficiary depositor address.
    */
-  function closeAfterWhitelisted(address _beneficiary) onlyOwner public { 
+  function closeAfterWhitelisted(address _beneficiary) onlyOwner public {
     uint256 depositedValue = deposited[_beneficiary];
     deposited[_beneficiary] = 0;
     wallet.transfer(depositedValue);
   }
-  
+
   /**
    * @param investor Investor address
    */
@@ -501,9 +501,9 @@ contract EscrowVault is Ownable {
      wallet.transfer(_debit);
      deposited[investor] = depositedValue;
   }
-   
+
   /**
-   * @dev 
+   * @dev
    * @param investor Investor address
    */
   function refund(address investor)public onlyOwner  {
@@ -533,19 +533,19 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
     _balances[msg.sender] = 0;
     _deliverTokens(msg.sender, amount);
   }
-  
+
    /**
     * @dev Debits token for the failed verification
     * @param _beneficiary address from which tokens debited
     * @param _token amount of tokens to be debited
     */
-    
+
    function failedWhitelistForDebit(address _beneficiary,uint256 _token) internal  {
     require(_beneficiary != address(0));
     uint256 amount = _balances[_beneficiary];
     _balances[_beneficiary] = amount.sub(_token);
   }
-  
+
    /**
     * @dev debits entire tokens after refund, if verification completely failed
     * @param _beneficiary address from which tokens debited
@@ -555,7 +555,7 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
     uint256 amount = _balances[_beneficiary];
     _balances[_beneficiary] = 0;
   }
-  
+
   function getInvestorDepositAmount(address _investor) public constant returns(uint256 paid){
      return _balances[_investor];
   }
@@ -574,12 +574,12 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
 
 contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDeliveryCrowdsale {
 
- enum Stage {KYC_FAILED, KYC_SUCCESS,AML_FAILED, AML_SUCCESS} 	
+ enum Stage {KYC_FAILED, KYC_SUCCESS,AML_FAILED, AML_SUCCESS}
   //stage PreSale or PublicSale
   enum Phase {PRESALE, PUBLICSALE}
   //stage ICO
   Phase public phase;
- 
+
   uint256 private constant DECIMALFACTOR = 10**uint256(18);
   uint256 public _totalSupply=200000000 * DECIMALFACTOR;
   uint256 public presale=5000000* DECIMALFACTOR;
@@ -587,7 +587,7 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
   uint256 public teamAndAdvisorsAndBountyAllocation = 12000000 * DECIMALFACTOR;
   uint256 public operatingBudgetAllocation = 5000000 * DECIMALFACTOR;
   uint256 public tokensVested = 28000000 * DECIMALFACTOR;
- 
+
   struct whitelisted{
        Stage  stage;
  }
@@ -599,9 +599,9 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
     // How many distinct addresses have invested
   uint256 public investorCount;
     // decimalFactor
- 
+
   event updateRate(uint256 tokenRate, uint256 time);
-  
+
    /**
  	* @dev BitcoinageCrowdsale is a base contract for managing a token crowdsale.
  	* BitcoinageCrowdsale have a start and end timestamps, where investors can make
@@ -609,20 +609,20 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
  	* on a token per ETH rate. Funds collected are forwarded to a wallet
  	* as they arrive.
  	*/
-  
+
  function BitcoinageCrowdsale(uint256 _starttime, uint256 _endTime, uint256 _rate, address _wallet,IERC20 _token)
   TimedCrowdsale(_starttime,_endTime)Crowdsale(_rate, _wallet,_token)
   {
       phase = Phase.PRESALE;
   }
-    
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
   /**
    * @dev token purchased on sending ether
    * @param _beneficiary Address performing the token purchase
@@ -630,7 +630,7 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
   function buyTokens(address _beneficiary) public payable onlyWhileOpen{
     require(_beneficiary != address(0));
     require(validPurchase());
-  
+
     uint256 weiAmount = msg.value;
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(_rate);
@@ -641,7 +641,7 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
         assert(publicsale>=tokens);
         publicsale=publicsale.sub(tokens);
     }
-    
+
      _forwardFunds();
          _processPurchase(_beneficiary, tokens);
     if(investedAmountOf[msg.sender] == 0) {
@@ -650,18 +650,18 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
         }
         // Update investor
       investedAmountOf[msg.sender] = investedAmountOf[msg.sender].add(weiAmount);
-        
+
       if(whitelist[_beneficiary].stage==Stage.AML_SUCCESS){
                 afterWhtelistedBuy(_beneficiary);
       }
-      
+
   }
-   
+
     function validPurchase() internal constant returns (bool) {
     bool minContribution = minContribAmount <= msg.value;
     return  minContribution;
   }
-  
+
 
 
  /**
@@ -679,33 +679,33 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
   function addToWhitelist(address _beneficiary,uint256 _stage) external onlyOwner {
      require(_beneficiary != address(0));
      if(_stage==1){
-         
+
          failedWhitelistForDebit(_beneficiary,_rate.mul(adminCharge));
          adminChargeForDebit(_beneficiary,adminCharge);
          whitelist[_beneficiary].stage=Stage.KYC_FAILED;
          uint256 value=investedAmountOf[_beneficiary];
          value=value.sub(adminCharge);
          investedAmountOf[_beneficiary]=value;
-         
+
      }else if(_stage==2){
-         
+
          whitelist[_beneficiary].stage=Stage.KYC_SUCCESS;
-         
+
      }else if(_stage==3){
-         
+
          whitelist[_beneficiary].stage=Stage.AML_FAILED;
          returnInvestoramount(_beneficiary,adminCharge);
          failedWhitelist(_beneficiary);
          investedAmountOf[_beneficiary]=0;
-         
+
      }else if(_stage==4){
-         
+
          whitelist[_beneficiary].stage=Stage.AML_SUCCESS;
-         afterWhtelisted( _beneficiary); 
-    
+         afterWhtelisted( _beneficiary);
+
      }
   }
- 
+
   /**
    * @dev Withdraw tokens only after Investors added into whitelist .
    */
@@ -715,25 +715,25 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
     _deliverTokens(msg.sender, amount);
     _balances[msg.sender] = 0;
   }
-  
+
  /**
  * @dev Change crowdsale ClosingTime
  * @param  _endTime is End time in Seconds
  */
   function changeEndtime(uint256 _endTime) public onlyOwner {
-    require(_endTime > 0); 
+    require(_endTime > 0);
     _closingTime = _endTime;
   }
-    
+
     /**
  * @dev Change crowdsale OpeningTime
  * @param  _startTime is End time in Seconds
  */
   function changeStarttime(uint256 _startTime) public onlyOwner {
-    require(_startTime > 0); 
+    require(_startTime > 0);
     _openingTime = _startTime;
   }
-    
+
  /**
    * @dev Change Stage.
    * @param _rate for ETH Per Token
@@ -749,11 +749,11 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
  * @param  _rate is set the current rate of AND Token
  */
   function changeRate(uint256 _rate) public onlyOwner {
-    require(_rate > 0); 
+    require(_rate > 0);
     _rate = _rate;
     emit updateRate(_rate,block.timestamp);
   }
-  
+
  /**
    * @dev Change adminCharge Amount.
    * @param _adminCharge for debit ETH amount
@@ -762,14 +762,14 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
      require(_adminCharge > 0);
      adminCharge=_adminCharge;
   }
-  
-    
+
+
  /**
    * @dev transfer tokens to advisor and bounty team.
    * @param to for recipiant address
    * @param tokens is amount of tokens
    */
-  
+
     function transferTeamAndAdvisorsAndBountyAllocation  (address to, uint256 tokens) public onlyOwner {
          require (
             to != 0x0 && tokens > 0 && teamAndAdvisorsAndBountyAllocation >= tokens
@@ -777,13 +777,13 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
         _deliverTokens(to, tokens);
          teamAndAdvisorsAndBountyAllocation = teamAndAdvisorsAndBountyAllocation.sub(tokens);
     }
-     
+
      /**
    * @dev transfer vested tokens.
    * @param to for recipiant address
    * @param tokens is amount of tokens
    */
-     
+
      function transferTokensVested(address to, uint256 tokens) public onlyOwner {
          require (
             to != 0x0 && tokens > 0 && tokensVested >= tokens
@@ -791,13 +791,13 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
         _deliverTokens(to, tokens);
          tokensVested = tokensVested.sub(tokens);
      }
-     
+
       /**
    * @dev transfer tokens to operating team.
    * @param to for recipiant address
    * @param tokens is amount of tokens
    */
-     
+
      function transferOperatingBudgetAllocation(address to, uint256 tokens) public onlyOwner {
          require (
             to != 0x0 && tokens > 0 && operatingBudgetAllocation >= tokens
@@ -805,4 +805,15 @@ contract BitcoinageCrowdsale is TimedCrowdsale,EscrowAccountCrowdsale,PostDelive
         _deliverTokens(to, tokens);
          operatingBudgetAllocation = operatingBudgetAllocation.sub(tokens);
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

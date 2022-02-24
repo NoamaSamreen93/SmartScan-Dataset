@@ -28,7 +28,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function mulByFraction(uint256 number, uint256 numerator, uint256 denominator) pure internal returns (uint256) {
       return div(mul(number, numerator), denominator);
   }
@@ -803,7 +803,7 @@ contract ImmlaDistribution is Ownable {
         require(availableEmission > 0);
         require(_amount > 0);
         require(_wallet != 0x0);
-        
+
         if (proposals[_wallet].amount > 0) {
             require(proposals[_wallet].voted[msg.sender] != true); // If has already voted, cancel
             require(proposals[_wallet].amount == _amount); // If amounts is equal
@@ -856,4 +856,15 @@ contract ImmlaDistribution is Ownable {
 
         token.transferByOwner(_from, _to, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

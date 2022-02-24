@@ -3,12 +3,12 @@ pragma solidity ^0.5.7;
 
 library SigUtils {
     /**
-      @dev Recovers address who signed the message 
+      @dev Recovers address who signed the message
       @param _hash operation ethereum signed message hash
-      @param _signature message `hash` signature  
+      @param _signature message `hash` signature
     */
     function ecrecover2 (
-        bytes32 _hash, 
+        bytes32 _hash,
         bytes memory _signature
     ) internal pure returns (address) {
         bytes32 r;
@@ -76,7 +76,7 @@ contract Marmo {
     function signer() public view returns (address _signer) {
         bytes32 signerSlot = SIGNER_SLOT;
         assembly { _signer := sload(signerSlot) }
-    } 
+    }
 
     // Address that relayed the `_id` intent
     // address(0) if the intent was not relayed
@@ -194,7 +194,7 @@ contract Marmo {
             _receipt := or(shl(255, _canceled), or(shl(160, _block), _relayer))
         }
     }
-    
+
     // Decodes an Intent receipt
     // reverse of _encodeReceipt(bool,uint256,address)
     function _decodeReceipt(bytes32 _receipt) internal pure returns (
@@ -281,10 +281,10 @@ library Bytes {
     }
 
     // Returns the most significant bit of a given uint256
-    function mostSignificantBit(uint256 x) internal pure returns (uint256) {        
+    function mostSignificantBit(uint256 x) internal pure returns (uint256) {
         uint8 o = 0;
         uint8 h = 255;
-        
+
         while (h > o) {
             uint8 m = uint8 ((uint16 (o) + uint16 (h)) >> 1);
             uint256 t = x >> m;
@@ -292,7 +292,7 @@ library Bytes {
             else if (t > 1) o = m + 1;
             else return m;
         }
-        
+
         return h;
     }
 
@@ -390,7 +390,7 @@ contract MarmoStork {
 
         // Precalculate init_code hash
         hash = keccak256(bytecode);
-        
+
         // Destroy the '_source' provided, if is not disabled
         Marmo marmoc = Marmo(_source);
         if (marmoc.signer() == address(0)) {
@@ -403,7 +403,7 @@ contract MarmoStork {
         // Save the _source address, casting to address (160 bits)
         marmo = address(marmoc);
     }
-    
+
     // Calculates the Marmo wallet for a given signer
     // the wallet contract will be deployed in a deterministic manner
     function marmoOf(address _signer) external view returns (address) {
@@ -439,4 +439,8 @@ contract MarmoStork {
         // and forward all Ether
         p.init.value(msg.value)(_signer);
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -28,25 +28,25 @@ contract Ownable {
     function owner() public view returns (address) {
         return _owner;
     }
-    
+
     modifier onlyOwner() {
         require(isOwner());
         _;
     }
-    
+
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
-    
+
     function renounceOwnership() public onlyOwner {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         _transferOwnership(newOwner);
     }
-   
+
     function _transferOwnership(address newOwner) internal {
         require(newOwner != address(0));
         emit OwnershipTransferred(_owner, newOwner);
@@ -98,15 +98,15 @@ contract ERC20TOKEN is Ownable, SafeMath, IERC20{
         name = "DU";
         symbol = "DU";
         decimals = 18;
-		
+
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];		
+		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -123,7 +123,7 @@ contract ERC20TOKEN is Ownable, SafeMath, IERC20{
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != address(0));
-		require (_value > 0); 
+		require (_value > 0);
         require (balanceOf[_from] >= _value) ;
         require (balanceOf[_to] + _value > balanceOf[_to]);
         require (_value <= allowance[_from][msg.sender]);
@@ -133,4 +133,13 @@ contract ERC20TOKEN is Ownable, SafeMath, IERC20{
         emit Transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

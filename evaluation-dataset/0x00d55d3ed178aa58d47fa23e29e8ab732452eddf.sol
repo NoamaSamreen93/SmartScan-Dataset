@@ -86,7 +86,7 @@ contract Crowdsale {
 
     uint256 weiAmount = msg.value;
     uint256 kweiAmount = weiAmount/1000;
-    
+
 
     // calculate token amount to be created
     uint256 tokens = kweiAmount.mul(rate);
@@ -473,4 +473,15 @@ contract ACNNIco is Ownable, Crowdsale {
     function hasStarted() public constant returns (bool) {
         return now >= startTime && now < endTime;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

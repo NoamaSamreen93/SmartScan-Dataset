@@ -234,7 +234,7 @@ contract Crowdsale is Ownable, Pausable {
   function changeRate(uint256 _purposeWeiRate, uint256 _etherWeiRate) public onlyOwner {
     require(_purposeWeiRate > 0);
     require(_etherWeiRate > 0);
-    
+
     purposeWeiRate = _purposeWeiRate;
     etherWeiRate = _etherWeiRate;
   }
@@ -274,4 +274,15 @@ contract Crowdsale is Ownable, Pausable {
     bool nonZeroPurchase = msg.value != 0;
     return !paused && nonZeroPurchase;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

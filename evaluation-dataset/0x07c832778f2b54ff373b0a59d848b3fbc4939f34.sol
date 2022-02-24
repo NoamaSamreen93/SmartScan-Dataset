@@ -35,7 +35,7 @@ contract TokenGTH {
         string tokenSymbol
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
-        balanceOf[msg.sender] = totalSupply; 
+        balanceOf[msg.sender] = totalSupply;
         name = tokenName;
         symbol = tokenSymbol;
     }
@@ -89,7 +89,7 @@ contract TokenGTH {
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(_value <= allowance[_from][msg.sender]);
-        balanceOf[_from] -= _value; 
+        balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;
         Burn(_from, _value);
@@ -117,7 +117,7 @@ contract AdvancedTokenGTH is owned, TokenGTH {
         require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value > balanceOf[_to]);
         require(!frozenAccount[_from]);
-        require(!frozenAccount[_to]); 
+        require(!frozenAccount[_to]);
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
@@ -156,8 +156,19 @@ contract AdvancedTokenGTH is owned, TokenGTH {
 
     function sell(uint256 amount) public {
 
-        require(this.balance >= amount * sellPrice); 
+        require(this.balance >= amount * sellPrice);
         _transfer(msg.sender, this, amount);
         msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -6,20 +6,20 @@ contract Prosperity {
      * Withdraws all of the callers earnings.
      */
 	function withdraw() public;
-	
+
 	/**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
+     * But in the internal calculations, we want them separate.
+     */
     function myDividends(bool _includeReferralBonus) public view returns(uint256);
 }
 
 
 contract Fund {
     using SafeMath for *;
-    
+
     /*=================================
     =            MODIFIERS            =
     =================================*/
@@ -35,8 +35,8 @@ contract Fund {
         require(administrator_ == _customerAddress);
         _;
     }
-    
-    
+
+
     /*================================
     =            DATASETS            =
     ================================*/
@@ -44,39 +44,39 @@ contract Fund {
     address internal lending_;
     address internal freeFund_;
     address[] public devs_;
-	
+
 	// token exchange contract
 	Prosperity public tokenContract_;
-    
+
     // distribution percentages
     uint8 internal lendingShare_ = 50;
     uint8 internal freeFundShare_ = 20;
     uint8 internal devsShare_ = 30;
-    
-    
+
+
     /*=======================================
     =            PUBLIC FUNCTIONS           =
     =======================================*/
     constructor()
-        public 
+        public
     {
         // set addresses
         administrator_ = 0x28436C7453EbA01c6EcbC8a9cAa975f0ADE6Fff1;
         lending_ = 0x961FA070Ef41C2b68D1A50905Ea9198EF7Dbfbf8;
         freeFund_ = 0x0cCA1e8Db144d2E4a8F2A80828E780a1DC9C5112;
-        
+
         // Add devs
         devs_.push(0x28436C7453EbA01c6EcbC8a9cAa975f0ADE6Fff1); // Tobi
         devs_.push(0x92be79705F4Fab97894833448Def30377bc7267A); // Fabi
         devs_.push(0x000929719742ec6E0bFD0107959384F7Acd8F883); // Lukas
         devs_.push(0x5289f0f0E8417c7475Ba33E92b1944279e183B0C); // Julian
     }
-	
+
 	function() payable external {
 		// prevent invalid or unintentional calls
 		//require(msg.data.length == 0);
 	}
-    
+
     /**
      * Distribute ether to lending, freeFund and devs
      */
@@ -87,19 +87,19 @@ contract Fund {
 		if (myDividends(true) > 0) {
 			tokenContract_.withdraw();
 		}
-		
+
 		// current balance (after withdraw)
         uint256 _balance = getTotalBalance();
-        
+
 		// distributed reinvestments
         if (_balance > 0) {
             uint256 _ethDevs      = _balance.mul(devsShare_).div(100);          // total of 30%
             uint256 _ethFreeFund  = _balance.mul(freeFundShare_).div(100);      // total of 20%
             uint256 _ethLending   = _balance.sub(_ethDevs).sub(_ethFreeFund);   // approx. 50%
-            
+
             lending_.transfer(_ethLending);
             freeFund_.transfer(_ethFreeFund);
-            
+
             uint256 _devsCount = devs_.length;
             for (uint8 i = 0; i < _devsCount; i++) {
                 uint256 _ethDevPortion = _ethDevs.div(_devsCount);
@@ -108,7 +108,7 @@ contract Fund {
             }
         }
     }
-    
+
     /**
      * Add a dev to the devs fund pool.
      */
@@ -118,10 +118,10 @@ contract Fund {
     {
         // address must not be dev before, we do not want duplicates
         require(!isDev(_dev), "address is already dev");
-        
+
         devs_.push(_dev);
     }
-    
+
     /**
      * Remove a dev from the devs fund pool.
      */
@@ -131,10 +131,10 @@ contract Fund {
     {
         // address must be dev before, we need a dev address to be able to remove him
         require(isDev(_dev), "address is not a dev");
-        
+
         // get index and delte dev
         uint8 index = getDevIndex(_dev);
-        
+
         // close gap in dev list
         uint256 _devCount = getTotalDevs();
         for (uint8 i = index; i < _devCount - 1; i++) {
@@ -143,45 +143,45 @@ contract Fund {
         delete devs_[devs_.length-1];
         devs_.length--;
     }
-    
-    
+
+
     /**
      * Check if given address is dev or not
      */
-    function isDev(address _dealer) 
+    function isDev(address _dealer)
         public
         view
         returns(bool)
     {
         uint256 _devsCount = devs_.length;
-        
+
         for (uint8 i = 0; i < _devsCount; i++) {
             if (devs_[i] == _dealer) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
-    
+
+
     // VIEW FUNCTIONS
-    function getTotalBalance() 
+    function getTotalBalance()
         public
         view
         returns(uint256)
     {
         return address(this).balance;
     }
-    
+
     function getTotalDevs()
-        public 
-        view 
+        public
+        view
         returns(uint256)
     {
         return devs_.length;
     }
-	
+
 	function myDividends(bool _includeReferralBonus)
 		public
 		view
@@ -189,8 +189,8 @@ contract Fund {
 	{
 		return tokenContract_.myDividends(_includeReferralBonus);
 	}
-    
-    
+
+
     // INTERNAL FUNCTIONS
     /**
      * Check index of given address
@@ -201,14 +201,14 @@ contract Fund {
         returns(uint8)
     {
         uint256 _devsCount = devs_.length;
-        
+
         for (uint8 i = 0; i < _devsCount; i++) {
             if (devs_[i] == _dev) {
                 return i;
             }
         }
     }
-	
+
 	// SETTER
 	/**
 	 * Set the token contract
@@ -284,4 +284,15 @@ library SafeMath {
     require(b != 0);
     return a % b;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

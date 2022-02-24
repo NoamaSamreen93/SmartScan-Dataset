@@ -32,7 +32,7 @@ contract GoldmintVote1 {
 // Fields:
      address public creator = 0x0;
      bool public stopped = false;
-     StdToken mntpToken; 
+     StdToken mntpToken;
 
      mapping(address => bool) isVoted;
      mapping(address => bool) votes;
@@ -50,12 +50,12 @@ contract GoldmintVote1 {
      function vote(bool _answer) public {
           require(!stopped);
 
-          // 1 - should be Goldmint MNTP token holder 
+          // 1 - should be Goldmint MNTP token holder
           // with >1 MNTP token balance
           uint256 balance = mntpToken.balanceOf(msg.sender);
           require(balance>=10 ether);
 
-          // 2 - can vote only once 
+          // 2 - can vote only once
           require(isVoted[msg.sender]==false);
 
           // save vote
@@ -77,4 +77,15 @@ contract GoldmintVote1 {
           require(msg.sender==creator);
           stopped = true;
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -12,7 +12,7 @@ contract owned {
         if (msg.sender != centralAuthority) revert();
         _;
     }
-	
+
     modifier onlyPlutocrat {
         if (msg.sender != plutocrat) revert();
         _;
@@ -21,7 +21,7 @@ contract owned {
     function transfekbolOwnership(address newOwner) onlyPlutocrat {
         centralAuthority = newOwner;
     }
-	
+
     function transfekbolPlutocrat(address newPlutocrat) onlyPlutocrat {
         plutocrat = newPlutocrat;
     }
@@ -53,7 +53,7 @@ contract token {
     event EconomyTaxed(string base_value, string target_value, string tax_rate, string taxed_value, string notes);
     event EconomyRebated(string base_value, string target_value, string rebate_rate, string rebated_value, string notes);
     event PlutocracyAchieved(string value, string notes);
-	
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function token(
         uint256 initialSupply,
@@ -77,7 +77,7 @@ contract token {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                      // Notify anyone listening that this transfer took place
     }
-  
+
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
@@ -88,7 +88,7 @@ contract token {
 
     /* Approve and then comunicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -151,8 +151,8 @@ contract Krown is owned, token {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                      // Notify anyone listening that this transfer took place
     }
-	
-	
+
+
     /* Lend coins */
 	function lend(address _to, uint256 _value, uint256 _duration_in_days) {
         if (_to == 0x0) revert();                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -164,7 +164,7 @@ contract Krown is owned, token {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         InterestFreeLending(msg.sender, _to, _value, _duration_in_days);    // Notify anyone listening that this transfer took place
     }
-    
+
     /* Send coins */
     function repayLoan(address _to, uint256 _value, string _reference) {
         if (_to == 0x0) revert();                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -205,7 +205,7 @@ contract Krown is owned, token {
     function taxlvlEconomy(string _base_value, string _target_value, string _tax_rate, string _taxed_value, string _notes) onlyOwner {
         EconomyTaxed( _base_value, _target_value, _tax_rate, _taxed_value, _notes);
     }
-	
+
     function rebatelvlEconomy(string _base_value, string _target_value, string _rebate_rate, string _rebated_value, string _notes) onlyOwner {
         EconomyRebated( _base_value, _target_value, _rebate_rate, _rebated_value, _notes);
     }
@@ -216,7 +216,7 @@ contract Krown is owned, token {
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) revert();                                  // Prevent transfer to 0x0 address. Use burn() instead
-        if (frozenAccount[_from]) revert();                        // Check if frozen            
+        if (frozenAccount[_from]) revert();                        // Check if frozen
         if (balanceOf[_from] < _value) revert();                   // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();    // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert();       // Check allowance
@@ -268,4 +268,15 @@ contract Krown is owned, token {
         notificationFee = newFee;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -13,7 +13,7 @@ contract EC {
     function _jAdd(
         uint256 x1, uint256 z1,
         uint256 x2, uint256 z2)
-        public 
+        public
         pure
         returns(uint256 x3, uint256 z3)
     {
@@ -30,7 +30,7 @@ contract EC {
     function _jSub(
         uint256 x1, uint256 z1,
         uint256 x2, uint256 z2)
-        public 
+        public
         pure
         returns(uint256 x3, uint256 z3)
     {
@@ -47,7 +47,7 @@ contract EC {
     function _jMul(
         uint256 x1, uint256 z1,
         uint256 x2, uint256 z2)
-        public 
+        public
         pure
         returns(uint256 x3, uint256 z3)
     {
@@ -59,8 +59,8 @@ contract EC {
 
     function _jDiv(
         uint256 x1, uint256 z1,
-        uint256 x2, uint256 z2) 
-        public 
+        uint256 x2, uint256 z2)
+        public
         pure
         returns(uint256 x3, uint256 z3)
     {
@@ -90,8 +90,8 @@ contract EC {
 
     function _ecAdd(
         uint256 x1, uint256 y1, uint256 z1,
-        uint256 x2, uint256 y2, uint256 z2) 
-        public 
+        uint256 x2, uint256 y2, uint256 z2)
+        public
         pure
         returns(uint256 x3, uint256 y3, uint256 z3)
     {
@@ -349,7 +349,7 @@ contract Upgradable is Ownable {
         if (msg.sender != owner) {
             require(upgradableState.nextVersion == msg.sender);
             emit Upgraded(upgradableState.nextVersion);
-        } 
+        }
         else  {
             if (upgradableState.prevVersion != address(0)) {
                 Upgradable(upgradableState.prevVersion).endUpgrade();
@@ -375,7 +375,7 @@ contract VanityLib {
         }
         return true;
     }
-    
+
     function bytesToBytes32(bytes source) public pure returns(bytes32 result) {
         assembly {
             result := mload(add(source, 32))
@@ -391,7 +391,7 @@ contract VanityLib {
         uint256 remainder = 0;
         bool needBreak = false;
         bytes memory bytesReversed = bytes(new string(32));
-        
+
         for (uint8 i = 0; true; i++) {
             if (_value < base) {
                 needBreak = true;
@@ -410,14 +410,14 @@ contract VanityLib {
                 break;
             }
         }
-        
+
         // Reverse
         bytes memory result = bytes(new string(32));
         result[0] = appCode;
         for (i = 0; i < 31; i++) {
             result[i + 1] = bytesReversed[len - 1 - i];
         }
-        
+
         return bytesToBytes32(result);
     }
 
@@ -425,7 +425,7 @@ contract VanityLib {
     function createBtcAddressHex(uint256 publicXPoint, uint256 publicYPoint) public pure returns(uint256) {
         bytes20 publicKeyPart = ripemd160(abi.encodePacked(sha256(abi.encodePacked(byte(0x04), publicXPoint, publicYPoint))));
         bytes32 publicKeyCheckCode = sha256(abi.encodePacked(sha256(abi.encodePacked(byte(0x00), publicKeyPart))));
-        
+
         bytes memory publicKey = new bytes(32);
         for (uint i = 0; i < 7; i++) {
             publicKey[i] = 0x00;
@@ -438,10 +438,10 @@ contract VanityLib {
         publicKey[29] = publicKeyCheckCode[1];
         publicKey[30] = publicKeyCheckCode[2];
         publicKey[31] = publicKeyCheckCode[3];
-        
+
         return uint256(bytesToBytes32(publicKey));
     }
-    
+
     function createBtcAddress(uint256 publicXPoint, uint256 publicYPoint) public pure returns(bytes32) {
         return toBase58Checked(createBtcAddressHex(publicXPoint, publicYPoint), "1");
     }
@@ -453,13 +453,13 @@ contract VanityLib {
     // https://bitcoin.stackexchange.com/questions/48586
     function complexityForBtcAddressPrefixWithLength(bytes prefix, uint length) public pure returns(uint) {
         require(prefix.length >= length);
-        
+
         uint8[128] memory unbase58 = [
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-            255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 255, 255, 255, 255, 255, 255, 
-            255, 9, 10, 11, 12, 13, 14, 15, 16, 255, 17, 18, 19, 20, 21, 255, 
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 255, 255, 255, 255, 255, 255,
+            255, 9, 10, 11, 12, 13, 14, 15, 16, 255, 17, 18, 19, 20, 21, 255,
             22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 255, 255, 255, 255, 255,
             255, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 255, 44, 45, 46,
             47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 255, 255, 255, 255, 255
@@ -492,7 +492,7 @@ contract VanityLib {
             if (prefixMin < (top >> 8)) {
                 diff += (top >> 8) - prefixMin;
             }
-            
+
             if ((58 ** digits) >= diff) {
                 total += (58 ** digits) - diff;
             }
@@ -520,7 +520,7 @@ contract VanityLib {
         if (prefixArg[0] != "1" && prefixArg[0] != "3") {
             return false;
         }
-        
+
         for (uint i = 0; i < prefixArg.length; i++) {
             byte ch = prefixArg[i];
             if (ch == "0" || ch == "O" || ch == "I" || ch == "l") {
@@ -804,7 +804,7 @@ contract TaskRegister is Upgradable, VanityLib {
 
         uint index = allTasks.length;
         uint tasksLength = prev.tasksCount();
-        
+
         // Migrate tasks
 
         for (uint i = index; i < index + _size && i < tasksLength; i++) {
@@ -911,7 +911,7 @@ contract TaskRegister is Upgradable, VanityLib {
         uint taskIndex = indexOfTaskId[_taskId].sub(1);
         Task storage task = allTasks[taskIndex];
         require(task.answerPrivateKey == 0, "solveTask: task is already solved");
-        
+
         // Require private key to be part of address to prevent front-running attack
         require(_answerPrivateKey >> 128 == uint256(msg.sender) >> 32, "solveTask: this solution does not match miner address");
 
@@ -983,4 +983,10 @@ contract TaskRegister is Upgradable, VanityLib {
         }
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

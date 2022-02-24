@@ -35,7 +35,7 @@ contract ERC165 is ERC165Interface {
 }
 
 // Every ERC-721 compliant contract must implement the ERC721 and ERC165 interfaces.
-/** 
+/**
  * @title ERC-721 Non-Fungible Token Standard
  * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  * Note: the ERC-165 identifier for this interface is 0x80ac58cd.
@@ -164,7 +164,7 @@ contract ERC721Basic is ERC165 {
 
     // ERC721Metadata
     // The metadata extension is OPTIONAL for ERC-721 smart contracts (see "caveats", below). This allows your smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
-    
+
     /**
      * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
      * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -373,7 +373,7 @@ contract AuctionBase is ERC721Holder {
     }
 
     /**
-     * @dev Adds an auction to the list of open auctions. 
+     * @dev Adds an auction to the list of open auctions.
      * @param _tokenId ID of the token to be put on auction.
      * @param _auction Auction information of this token to open.
      */
@@ -425,7 +425,7 @@ contract AuctionBase is ERC721Holder {
             seller.transfer(sellerProceeds);
         }
 
-        // Computes the excess funds included with the bid and transfers it back to bidder. 
+        // Computes the excess funds included with the bid and transfers it back to bidder.
         uint256 bidExcess = _bidAmount - price;
 
         // Returns the exceeded funds.
@@ -601,7 +601,7 @@ contract Auction is Pausable, AuctionBase {
 
     /**
      * @dev Cancels an auction when the contract is paused.
-     * Only the owner may do this, and NFTs are returned to the seller. 
+     * Only the owner may do this, and NFTs are returned to the seller.
      * @param _tokenId ID of the token on auction to cancel.
      */
     function cancelAuctionWhenPaused(uint256 _tokenId)
@@ -658,13 +658,13 @@ contract Auction is Pausable, AuctionBase {
 contract SaleAuction is Auction {
 
     /**
-     * @dev To make sure we are addressing to the right auction. 
+     * @dev To make sure we are addressing to the right auction.
      */
     bool public isSaleAuction = true;
 
     // Last 5 sale price of Generation 0 Kydys.
     uint256[5] public lastGen0SalePrices;
-    
+
     // Total number of Generation 0 Kydys sold.
     uint256 public gen0SaleCount;
 
@@ -706,7 +706,7 @@ contract SaleAuction is Auction {
     }
 
     /**
-     * @dev Updates lastSalePrice only if the seller is nonFungibleContract. 
+     * @dev Updates lastSalePrice only if the seller is nonFungibleContract.
      */
     function bid(uint256 _tokenId)
         external
@@ -733,4 +733,15 @@ contract SaleAuction is Auction {
         }
         return sum / 5;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

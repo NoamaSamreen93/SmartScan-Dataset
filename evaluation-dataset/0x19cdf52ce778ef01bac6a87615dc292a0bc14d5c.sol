@@ -29,7 +29,7 @@ library SafeMath {
 }
 
 interface RTCoinInterface {
-    
+
 
     /** Functions - ERC20 */
     function transfer(address _recipient, uint256 _amount) external returns (bool);
@@ -51,7 +51,7 @@ interface RTCoinInterface {
     function stakeContractAddress() external view returns (address);
 
     function mergedMinerValidatorAddress() external view returns (address);
-    
+
     /** Functions - Custom */
     function freezeTransfers() external returns (bool);
 
@@ -65,7 +65,7 @@ interface RTCoinInterface {
 contract MergedMinerValidator {
 
     using SafeMath for uint256;
-    
+
     // 0.5
     uint256 constant public SUBMISSIONREWARD = 500000000000000000;
     // 0.3
@@ -73,7 +73,7 @@ contract MergedMinerValidator {
     string  constant public VERSION = "production";
     address constant public TOKENADDRESS = 0xecc043b92834c1ebDE65F2181B59597a6588D616;
     RTCoinInterface constant public RTI = RTCoinInterface(TOKENADDRESS);
-    
+
     address public tokenAddress;
     address public admin;
     uint256 public lastBlockSet;
@@ -136,7 +136,7 @@ contract MergedMinerValidator {
         });
         lastBlockSet = block.number;
         blocks[block.number] = b;
-        // we use address(0) and don't mint any tokens, since "we are submitting the information" 
+        // we use address(0) and don't mint any tokens, since "we are submitting the information"
         emit BlockInformationSubmitted(block.coinbase, block.number, address(0));
     }
 
@@ -156,16 +156,16 @@ contract MergedMinerValidator {
         require(RTI.mint(msg.sender, SUBMISSIONREWARD), "failed to transfer reward to block submitter");
         return true;
     }
-    
+
 
     /** @notice Used by a miner to claim their merged mined RTC
         * @param _blockNumber The block number of the block that the person mined
      */
-    function claimReward(uint256 _blockNumber) 
+    function claimReward(uint256 _blockNumber)
         internal
-        isCoinbase(_blockNumber) 
+        isCoinbase(_blockNumber)
         submittedBlock(_blockNumber)
-        returns (uint256) 
+        returns (uint256)
     {
         // mark the reward as claimed
         blocks[_blockNumber].state = BlockStateEnum.claimed;
@@ -197,4 +197,15 @@ contract MergedMinerValidator {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

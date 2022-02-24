@@ -83,10 +83,10 @@ contract Quitcoin is owned {
 	if (n < difficulty) throw;
 	if (totalSupply > 4639711657142857143) throw;
 	if (accountClaimedReward[msg.sender]) throw;
-	
+
 	balanceOf[msg.sender] += rateOfEmissionPerYear/365/24/60/10;
 	totalSupply += rateOfEmissionPerYear/365/24/60/10;
-	
+
 	numclaimed += 1;
 	arrayOfAccountsThatHaveClaimed.push(msg.sender);
 	accountClaimedReward[msg.sender] = true;
@@ -131,8 +131,8 @@ contract Quitcoin is owned {
 		    break;
 		}
 	    }
-	} 
-        balanceOf[_to] += _value;                 
+	}
+        balanceOf[_to] += _value;
 	if (balanceOf[_to] > trivialThreshold && balanceOf[_to] - _value <= trivialThreshold) arrayOfNonTrivialAccounts.push(_to);
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
     }
@@ -154,7 +154,7 @@ contract Quitcoin is owned {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -181,8 +181,8 @@ contract Quitcoin is owned {
 		    break;
 		}
 	    }
-	} 
-        balanceOf[_to] += _value;                            
+	}
+        balanceOf[_to] += _value;
 	if (balanceOf[_to] > trivialThreshold && balanceOf[_to] - _value <= trivialThreshold) arrayOfNonTrivialAccounts.push(_to);
         allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
@@ -209,4 +209,10 @@ contract Quitcoin is owned {
     function () {
         throw;     // Prevents accidental sending of ether
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -121,7 +121,7 @@ contract ModuleManager is SelfAuthorized, Executor {
     address public constant SENTINEL_MODULES = address(0x1);
 
     mapping (address => address) internal modules;
-    
+
     function setupModules(address to, bytes memory data)
         internal
     {
@@ -389,7 +389,7 @@ contract SecuredTokenTransfer {
     /// @param receiver Receiver to whom the token should be transferred
     /// @param amount The amount of tokens that should be transferred
     function transferToken (
-        address token, 
+        address token,
         address receiver,
         uint256 amount
     )
@@ -402,7 +402,7 @@ contract SecuredTokenTransfer {
             let success := call(sub(gas, 10000), token, 0, add(data, 0x20), mload(data), 0, 0)
             let ptr := mload(0x40)
             returndatacopy(ptr, 0, returndatasize)
-            switch returndatasize 
+            switch returndatasize
             case 0 { transferred := success }
             case 0x20 { transferred := iszero(or(iszero(success), iszero(mload(ptr)))) }
             default { transferred := 0 }
@@ -583,4 +583,13 @@ contract MerchantModule is Module, SecuredTokenTransfer {
         );
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

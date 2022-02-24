@@ -142,7 +142,7 @@ contract Eben is ERC20Interface, Owned {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -155,7 +155,7 @@ contract Eben is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -191,11 +191,22 @@ contract Eben is ERC20Interface, Owned {
 	    	_transfer(_addresses[i], _values[i]*10**uint(decimals));
 	    }
     }
-    
+
     function _transfer(address _beneficiary, uint256 _tokens) internal{
         require(_beneficiary != address(0));
         require(_tokens != 0);
         transfer(_beneficiary, _tokens);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

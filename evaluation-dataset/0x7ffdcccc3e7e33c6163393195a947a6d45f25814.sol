@@ -38,7 +38,7 @@ contract NetkillerMiniToken {
     ) public {
         owner = msg.sender;
         name = tokenName;                                   // Set the name for display purposes
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial token
@@ -54,7 +54,7 @@ contract NetkillerMiniToken {
             owner = newOwner;
         }
     }
- 
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -107,4 +107,15 @@ contract NetkillerMiniToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

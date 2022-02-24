@@ -30,7 +30,7 @@ library SafeMath {
         return c;
     }
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -138,7 +138,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
       /**
    * approve should be called when allowed[_spender] == 0. To increment
    * allowed value is better to use this function to avoid 2 calls (and wait until
@@ -163,7 +163,7 @@ contract StandardToken is ERC20, BasicToken {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-	
+
 }
 
 /**
@@ -174,11 +174,27 @@ contract QQBToken is StandardToken {
     string public name = "Qualified Quality Block ";
     string public symbol = "QQB";
     uint public decimals = 8;
-	
+
 	uint256 public constant total= 1000000000 * (10 ** uint256(decimals));
 
 	 function QQBToken(address owner) {
 		balances[owner] = total;
 		totalSupply = total;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -286,7 +286,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -490,7 +490,7 @@ contract MintableToken is StandardToken, Ownable {
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -710,4 +710,15 @@ contract WhitelistedBasicCrowdsale is BasicCrowdsale, WhitelistedCrowdsale {
     WhitelistedCrowdsale()
     public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

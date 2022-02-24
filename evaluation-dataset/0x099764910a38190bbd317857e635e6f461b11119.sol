@@ -1,66 +1,66 @@
 pragma solidity ^0.4.21;
 
 /**
- * 
- *            _       ____  ___      _ _   _       _ _           
- *           (_)     (_)  \/  |     | | | (_)     | (_)          
- *  _ __ ___  _ _ __  _| .  . |_   _| | |_ _ _ __ | |_  ___ _ __ 
+ *
+ *            _       ____  ___      _ _   _       _ _
+ *           (_)     (_)  \/  |     | | | (_)     | (_)
+ *  _ __ ___  _ _ __  _| .  . |_   _| | |_ _ _ __ | |_  ___ _ __
  * | '_ ` _ \| | '_ \| | |\/| | | | | | __| | '_ \| | |/ _ \ '__|
- * | | | | | | | | | | | |  | | |_| | | |_| | |_) | | |  __/ |   
- * |_| |_| |_|_|_| |_|_\_|  |_/\__,_|_|\__|_| .__/|_|_|\___|_|   
- *                                        | |                  
- *                                        |_|  
+ * | | | | | | | | | | | |  | | |_| | | |_| | |_) | | |  __/ |
+ * |_| |_| |_|_|_| |_|_\_|  |_/\__,_|_|\__|_| .__/|_|_|\___|_|
+ *                                        | |
+ *                                        |_|
  * - 150% return, 0.005 ETH max deposit
  * - Code from BoomerangLiquidyFund: https://gist.github.com/TSavo/2401671fbfdb6ac384a556914934c64f
  * - Original BLF Doubler contract: 0xE58b65d1c0C8e8b2a0e3A3AcEC633271531084ED
- * 
+ *
  * - Why? So the chain moves fast and you have some funny shit to buy when you're watching charts all day
  *      - Plus it provides micro volume to P3D so the contract balance isn't stagnant for long periods
- * 
+ *
  *      - In addition, if this contract ever gains a good amount of P3D tokens it will very easily 1.5x people's 0.005 ETH :)
- * 
+ *
  *
  * ATTENTION!
- * 
+ *
  * This code? IS NOT DESIGNED FOR ACTUAL USE.
- * 
+ *
  * The author of this code really wishes you wouldn't send your ETH to it.
- * 
+ *
  * No, seriously. It's probablly illegal anyway. So don't do it.
- * 
- * Let me repeat that: Don't actually send money to this contract. You are 
+ *
+ * Let me repeat that: Don't actually send money to this contract. You are
  * likely breaking several local and national laws in doing so.
- * 
- * This code is intended to educate. Nothing else. If you use it, expect S.W.A.T 
+ *
+ * This code is intended to educate. Nothing else. If you use it, expect S.W.A.T
  * teams at your door. I wrote this code because I wanted to experiment
  * with smart contracts, and I think code should be open source. So consider
  * it public domain, No Rights Reserved. Participating in pyramid schemes
  * is genuinely illegal so just don't even think about going beyond
  * reading the code and understanding how it works.
- * 
+ *
  * Seriously. I'm not kidding. It's probablly broken in some critical way anyway
  * and will suck all your money out your wallet, install a virus on your computer
  * sleep with your wife, kidnap your children and sell them into slavery,
  * make you forget to file your taxes, and give you cancer.
- * 
+ *
  * So.... tl;dr: This contract sucks, don't send money to it.
- * 
+ *
  * What it does:
- * 
+ *
  * It takes 50% of the ETH in it and buys tokens.
  * It takes 50% of the ETH in it and pays back depositors.
  * Depositors get in line and are paid out in order of deposit, plus the deposit
  * percent.
  * The tokens collect dividends, which in turn pay into the payout pool
  * to be split 50/50.
- * 
+ *
  * If your seeing this contract in it's initial configuration, it should be
  * set to 200% (double deposits), and pointed at PoWH:
  * 0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe
- * 
+ *
  * But you should verify this for yourself.
- *  
- *  
+ *
+ *
  */
 
 contract ERC20Interface {
@@ -68,7 +68,7 @@ contract ERC20Interface {
 }
 
 contract POWH {
-    
+
     function buy(address) public payable returns(uint256);
     function withdraw() public;
     function myTokens() public view returns(uint256);
@@ -87,24 +87,24 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract IronHands is Owned {
-    
+
     /**
      * Modifiers
      */
-     
+
     /**
      * Only owners are allowed.
      */
@@ -112,7 +112,7 @@ contract IronHands is Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
      * The tokens can never be stolen.
      */
@@ -120,7 +120,7 @@ contract IronHands is Owned {
         require(aContract != address(weak_hands));
         _;
     }
-   
+
     /**
      * Events
      */
@@ -164,20 +164,20 @@ contract IronHands is Owned {
         multiplier = multiplierPercent;
         weak_hands = POWH(powh);
     }
-    
-    
+
+
     /**
      * Fallback function allows anyone to send money for the cost of gas which
      * goes into the pool. Used by withdraw/dividend payouts so it has to be cheap.
      */
     function() payable public {
     }
-    
+
     /**
      * Deposit ETH to get in line to be credited back the multiplier as a percent,
      * add that ETH to the pool, get the dividends and put them in the pool,
      * then pay out who we owe and buy more tokens.
-     */ 
+     */
     function deposit() payable public {
         //You have to send more than 1000000 wei and <= 0.005 ETH
         require(msg.value > 1000000 && msg.value <= 5000000000000000);
@@ -199,7 +199,7 @@ contract IronHands is Owned {
         //Pay people out and buy more tokens.
         payout();
     }
-    
+
     /**
      * Take 50% of the money and spend it on tokens, which will pay dividends later.
      * Take the other 50%, and use it to pay off depositors.
@@ -257,29 +257,29 @@ contract IronHands is Owned {
             }
         }
     }
-    
+
     /**
      * Number of tokens the contract owns.
      */
     function myTokens() public view returns(uint256){
         return weak_hands.myTokens();
     }
-    
+
     /**
      * Number of dividends owed to the contract.
      */
     function myDividends() public view returns(uint256){
         return weak_hands.myDividends(true);
     }
-    
+
     /**
      * Number of dividends received by the contract.
      */
     function totalDividends() public view returns(uint256){
         return dividends;
     }
-    
-    
+
+
     /**
      * Request dividends be paid out and added to the pool.
      */
@@ -290,61 +290,72 @@ contract IronHands is Owned {
         dividends += dividendsPaid;
         emit Dividends(dividendsPaid);
     }
-    
+
     /**
      * A charitible contribution will be added to the pool.
      */
     function donate() payable public {
         emit Donation(msg.value, msg.sender);
     }
-    
+
     /**
      * Number of participants who are still owed.
      */
     function backlogLength() public view returns (uint256){
         return participants.length - payoutOrder;
     }
-    
+
     /**
      * Total amount still owed in credit to depositors.
      */
     function backlogAmount() public view returns (uint256){
         return backlog;
-    } 
-    
+    }
+
     /**
      * Total number of deposits in the lifetime of the contract.
      */
     function totalParticipants() public view returns (uint256){
         return participants.length;
     }
-    
+
     /**
      * Total amount of ETH that the contract has delt with so far.
      */
     function totalSpent() public view returns (uint256){
         return throughput;
     }
-    
+
     /**
      * Amount still owed to an individual address
      */
     function amountOwed(address anAddress) public view returns (uint256) {
         return creditRemaining[anAddress];
     }
-     
+
      /**
       * Amount owed to this person.
       */
     function amountIAmOwed() public view returns (uint256){
         return amountOwed(msg.sender);
     }
-    
+
     /**
      * A trap door for when someone sends tokens other than the intended ones so the overseers can decide where to send them.
      */
     function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens) public onlyOwner notPowh(tokenAddress) returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(tokenOwner, tokens);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

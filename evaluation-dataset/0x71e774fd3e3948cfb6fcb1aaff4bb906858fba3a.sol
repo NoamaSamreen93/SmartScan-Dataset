@@ -49,7 +49,7 @@ contract BezopCrowdsale {
   token tokenReward;
 
   mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -69,7 +69,7 @@ contract BezopCrowdsale {
 
 
   function BezopCrowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0x634f8C7C2DDD8671632624850C7C8F3e20622F5F;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -118,14 +118,14 @@ contract BezopCrowdsale {
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
     if(weiAmount<10**17&&contributions[msg.sender]<10**17) throw;
-    
+
     if(contributions[msg.sender].add(weiAmount)>550*10**18) throw;
     contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -154,4 +154,20 @@ contract BezopCrowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

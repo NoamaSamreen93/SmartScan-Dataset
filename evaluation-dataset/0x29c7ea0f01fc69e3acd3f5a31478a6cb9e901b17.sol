@@ -69,11 +69,22 @@ contract Ownable {
 
 contract IEOResolver is Ownable {
     mapping(uint=>address) public ieoAddress; // mapping from id to address
-    
+
     event IEOAddressSet(uint id, address addr);
-    
+
     function setIEOAddress(uint id, address addr) public onlyOwner {
         emit IEOAddressSet(id,addr);
         ieoAddress[id] = addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

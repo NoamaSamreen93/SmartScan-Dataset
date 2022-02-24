@@ -134,7 +134,7 @@ contract LgcToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 200000000e18;
-    address public constant WALLET_Lgc   = 0x732F9D548183C7133A9bf76b4e9d217A20092b9d; 
+    address public constant WALLET_Lgc   = 0x732F9D548183C7133A9bf76b4e9d217A20092b9d;
 
     function LgcToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -149,4 +149,13 @@ contract LgcToken is StandardToken {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

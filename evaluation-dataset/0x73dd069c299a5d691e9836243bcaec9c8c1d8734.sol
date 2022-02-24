@@ -29,7 +29,7 @@ library SafeMath {
 contract ReentrancyGuard {
 
   /**
-   * @dev We use a single lock for the whole contract. 
+   * @dev We use a single lock for the whole contract.
    */
   bool private rentrancy_lock = false;
 
@@ -84,7 +84,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -201,7 +201,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
 
    // Reward adjustment period in Bitcoineum native blocks
 
-   uint256 public rewardAdjustmentPeriod; 
+   uint256 public rewardAdjustmentPeriod;
 
    // Total amount of Wei put into mining during current period
    uint256 public totalWeiCommitted;
@@ -385,7 +385,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
      /* If the Ether for this mining attempt is less than minimum
      * 0.0000001 % of total difficulty
      */
-     uint256 minimum_wei = currentDifficultyWei / divisible_units; 
+     uint256 minimum_wei = currentDifficultyWei / divisible_units;
      require (msg.value >= minimum_wei);
 
      /* Let's bound the value to guard against potential overflow
@@ -397,11 +397,11 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
    }
 
    modifier alreadyMined(uint256 blockNumber, address sender) {
-     require(blockNumber != current_external_block()); 
+     require(blockNumber != current_external_block());
     /* We are only going to allow one mining attempt per block per account
     *  This prevents stuffing and make it easier for us to track boundaries
     */
-    
+
     // This user already made a mining attempt for this block
     require(!checkMiningAttempt(blockNumber, sender));
     _;
@@ -447,7 +447,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
    * Invalidate this mining attempt if the block has been paid out
    */
 
-   function mine() external payable 
+   function mine() external payable
                            nonReentrant
                            isValidAttempt
                            isMiningActive
@@ -493,7 +493,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
       require(checkMiningAttempt(_blockNum, _user));
       _;
    }
-   
+
    modifier isBlockMature(uint256 _blockNumber) {
       require(_blockNumber != current_external_block());
       require(checkBlockMature(_blockNumber, current_external_block()));
@@ -519,7 +519,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
       if (totalMiningWei > targetDifficultyWei) {
          selectedDifficultyWei = totalMiningWei;
       } else {
-         selectedDifficultyWei = targetDifficultyWei; 
+         selectedDifficultyWei = targetDifficultyWei;
       }
 
       /* normalize the value against the entire key space
@@ -577,7 +577,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
 
       // Again we have to do this iteratively because of floating
       // point limitations in solidity.
-      uint256 total_reward = initial_reward * (10 ** decimals); 
+      uint256 total_reward = initial_reward * (10 ** decimals);
       uint256 i = 1;
       uint256 rewardperiods = mined_block_period / 210000;
       if (mined_block_period % 210000 > 0) {
@@ -596,7 +596,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
                                         uint256 _minimumDifficultyThresholdWei,
                                         uint256 _difficultyScaleMultiplierLimit) public constant
                                         returns (uint256) {
-          
+
           /* The adjustment window has been fulfilled
           *  The new difficulty should be bounded by the total wei actually spent
           * capped at difficultyScaleMultiplierLimit times
@@ -624,7 +624,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
     }
 
    function adjust_difficulty() internal {
-      /* Total blocks mined might not be increasing if the 
+      /* Total blocks mined might not be increasing if the
       *  difficulty is too high. So we should instead base the adjustment
       * on the progression of the Ethereum network.
       * So that the difficulty can increase/deflate regardless of sparse
@@ -662,10 +662,10 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
 
    // Helper function to avoid stack issues
    function calculate_reward(uint256 _totalBlocksMined, address _sender, uint256 _blockNumber) public constant returns (uint256) {
-      return calculate_proportional_reward(calculate_base_mining_reward(_totalBlocksMined), miningAttempts[_blockNumber][_sender].value, blockData[_blockNumber].totalMiningWei); 
+      return calculate_proportional_reward(calculate_base_mining_reward(_totalBlocksMined), miningAttempts[_blockNumber][_sender].value, blockData[_blockNumber].totalMiningWei);
    }
 
-   /** 
+   /**
    * @dev Claim the mining reward for a given block
    * @param _blockNumber The internal block that the user is trying to claim
    * @param forCreditTo When the miner account is different from the account
@@ -701,7 +701,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
       return true;
    }
 
-   /** 
+   /**
    * @dev Claim the mining reward for a given block
    * @param _blockNum The internal block that the user is trying to claim
    */
@@ -713,17 +713,17 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
      }
    }
 
-   /** 
-   * @dev Get the target block in the winning equation 
+   /**
+   * @dev Get the target block in the winning equation
    * @param _blockNum is the internal block number to get the target block for
    */
    function targetBlockNumber(uint256 _blockNum) constant public returns (uint256) {
       return ((_blockNum + 1) * blockCreationRate);
    }
 
-   /** 
-   * @dev Check whether a given block is mature 
-   * @param _blockNum is the internal block number to check 
+   /**
+   * @dev Check whether a given block is mature
+   * @param _blockNum is the internal block number to check
    */
    function checkBlockMature(uint256 _blockNum, uint256 _externalblock) constant public returns (bool) {
      return (_externalblock >= targetBlockNumber(_blockNum));
@@ -739,7 +739,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
        return _externalblock >= _targetblock && _externalblock < (_targetblock + 256);
    }
 
-   /** 
+   /**
    * @dev Check whether a mining attempt was made by sender for this block
    * @param _blockNum is the internal block number to check
    */
@@ -747,7 +747,7 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
        return miningAttempts[_blockNum][_sender].isCreated;
    }
 
-   /** 
+   /**
    * @dev Did the user win a specific block and can claim it?
    * @param _blockNum is the internal block number to check
    */
@@ -764,19 +764,19 @@ contract ERC20Mineable is StandardToken, ReentrancyGuard  {
       uint256 targetBlockHashInt;
 
       (beginRange, endRange) = calculate_range_attempt(difficultyAttempt,
-          calculate_difficulty_attempt(iBlock.targetDifficultyWei, iBlock.totalMiningWei, attempt.projectedOffset)); 
+          calculate_difficulty_attempt(iBlock.targetDifficultyWei, iBlock.totalMiningWei, attempt.projectedOffset));
       targetBlockHashInt = uint256(keccak256(resolve_block_hash(targetBlockNum)));
-   
+
       // This is the winning condition
       if ((beginRange < targetBlockHashInt) && (endRange >= targetBlockHashInt))
       {
         return true;
       }
-     
+
      }
 
      return false;
-     
+
    }
 
 }
@@ -792,7 +792,7 @@ contract Bitcoineum is ERC20Mineable, Transmutable {
 
  // 21 Million coins at 8 decimal places
  uint256 public constant MAX_SUPPLY = 21000000 * (10**8);
- 
+
  function Bitcoineum() {
 
     totalSupply = INITIAL_SUPPLY;
@@ -803,7 +803,7 @@ contract Bitcoineum is ERC20Mineable, Transmutable {
     // gas prices for execution
     currentDifficultyWei = 100 szabo;
     minimumDifficultyThresholdWei = 100 szabo;
-    
+
     // Ethereum blocks to internal blocks
     // Roughly 10 minute windows
     blockCreationRate = 50;
@@ -824,7 +824,7 @@ contract Bitcoineum is ERC20Mineable, Transmutable {
     // not including fees spent.
     burnAddress = 0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD;
 
-    lastDifficultyAdjustmentEthereumBlock = block.number; 
+    lastDifficultyAdjustmentEthereumBlock = block.number;
  }
 
 
@@ -851,3 +851,19 @@ contract Bitcoineum is ERC20Mineable, Transmutable {
   }
 
  }
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

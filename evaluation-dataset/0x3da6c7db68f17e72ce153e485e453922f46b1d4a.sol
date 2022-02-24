@@ -1,10 +1,10 @@
 /*
 
-Quadrant Assets Official Token Contract 
+Quadrant Assets Official Token Contract
 
 QuadrantAssets – it is an open ecosystem for more effective interaction the ICO with funds, investors, experts, and traders.
-We believe in this crypto-community, now divided into 4 large groups: ICO projects, investors, traders and experts. 
-These 4 groups we want to connect in one service, for faster and more effective interaction between them. 
+We believe in this crypto-community, now divided into 4 large groups: ICO projects, investors, traders and experts.
+These 4 groups we want to connect in one service, for faster and more effective interaction between them.
 
 Website: https://quadrantassets.solutons/
 
@@ -19,7 +19,7 @@ contract QuadrantAssets {
     string public symbol = "QDA";
     string public name = "Quadrant Assets";
     uint8 public constant decimals = 18;
-    uint256 _totalSupply = 0;	
+    uint256 _totalSupply = 0;
 	uint256 _FreeQDA = 250;
     uint256 _ML1 = 2;
     uint256 _ML2 = 3;
@@ -29,14 +29,14 @@ contract QuadrantAssets {
 	uint256 _LimitML3 = 9e15;
 	uint256 _MaxDistribPublicSupply = 1000000000;
     uint256 _OwnerDistribSupply = 0;
-    uint256 _CurrentDistribPublicSupply = 0;	
+    uint256 _CurrentDistribPublicSupply = 0;
     uint256 _ExtraTokensPerETHSended = 2500000;
-    
+
 	address _DistribFundsReceiverAddress = 0;
     address _remainingTokensReceiverAddress = 0;
     address owner = 0;
-	
-	
+
+
     bool setupDone = false;
     bool IsDistribRunning = false;
     bool DistribStarted = false;
@@ -72,7 +72,7 @@ contract QuadrantAssets {
                 Claimed[msg.sender] = true;
             }
 
-           
+
 
             if (msg.value >= 9e15) {
             _amount = msg.value * _ExtraTokensPerETHSended * 4;
@@ -90,12 +90,12 @@ contract QuadrantAssets {
 
                 }
             }
-			 
+
 			 _CurrentDistribPublicSupply += _amount;
                 balances[msg.sender] += _amount;
                 _totalSupply += _amount;
                 Transfer(this, msg.sender, _amount);
-        
+
 
 
 
@@ -131,7 +131,7 @@ contract QuadrantAssets {
         _ML2 = ML2inX;
         _LimitML1 = LimitML1inWei;
         _LimitML2 = LimitML2inWei;
-        
+
     }
 
     function SetExtra(uint256 ExtraTokensPerETHSended) onlyOwner public {
@@ -314,4 +314,17 @@ contract QuadrantAssets {
     function allowance(address _owner, address _spender) public constant returns(uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

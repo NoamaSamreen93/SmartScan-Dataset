@@ -71,7 +71,7 @@ contract ERC20Token is IERC20Token {
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
 
@@ -111,7 +111,7 @@ contract Owned is IOwned {
     }
     function transferOwnership(address _newOwner) validAddress(_newOwner) onlyOwner {
         require(_newOwner != owner);
-        
+
         owner = _newOwner;
     }
 }
@@ -130,7 +130,7 @@ contract ISmartToken {
 /// @title B2BX contract - crowdfunding code for B2BX Project
 contract SmartToken is ISmartToken, ERC20Token, Owned {
     using SafeMath for uint256;
- 
+
     // The current initial token supply.
     uint256 public initialSupply = 50000000 ether;
 
@@ -150,7 +150,7 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
     uint256 private totalLockToken;
 
     // The flag indicates if the B2BX contract is in eneble / disable transfers.
-    bool public transfersEnabled = true; 
+    bool public transfersEnabled = true;
 
     // Wallets, which allowed the transaction during the crowdfunding.
     mapping (address => bool) private fundingWallets;
@@ -172,12 +172,12 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
     /// @dev Constructor.
     function SmartToken() ERC20Token("B2BX", "B2BX", 18) {
         // The main, cold wallet for the distribution of tokens.
-        fundingWallet = msg.sender; 
+        fundingWallet = msg.sender;
 
         // Initializing 80% of tokens for sale.
         // maxSaleToken = initialSupply * 80 / 100 (80% this is maxSaleToken & 100% this is initialSupply)
         // totalProjectToken will be calculated in function finalize()
-        // 
+        //
         // |------------maxSaleToken------totalProjectToken|
         // |================80%================|====20%====|
         // |-----------------initialSupply-----------------|
@@ -260,7 +260,7 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
     function unlock() external {
         require(allocations[msg.sender].locked);
         require(now >= allocations[msg.sender].end);
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].add(allocations[msg.sender].value);
 
         allocations[msg.sender].locked = false;
@@ -294,7 +294,7 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
         lock(0x6653f5e04ED6Ec6f004D345868f47f4CebAA095e, totalProjectToken.mul(40).div(100), (now + 6 * 30 days));
         // 10% of the totalProjectToken tokens (== 2% totalSupply) go to bounty program.
         lock(0x591e7CF52D6b3ccC452Cd435E3eA88c1032b0DE3, totalProjectToken.mul(10).div(100), now);
-        
+
         // Zeroing a cold wallet.
         balanceOf[fundingWallet] = 0;
 
@@ -325,4 +325,8 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
 
         fundingWallets[_address] = false;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

@@ -252,7 +252,7 @@ contract Ballot {
 
     event FinishBallot(uint256 _time);
     event Vote(address indexed sender, bytes vote);
-    
+
     modifier onlyWhenBallotStarted {
         require(ballotStarted != 0);
         _;
@@ -264,7 +264,7 @@ contract Ballot {
         ballotStarted = getTime();
         isVotingActive = true;
     }
-    
+
     function getQuorumPercent() public constant returns (uint256) {
         require(isVotingActive);
         // find number of full weeks alapsed since voting started
@@ -308,7 +308,7 @@ contract Ballot {
             (data[1] == 0x4f || data[1] == 0x6f)
         );
     }
-    
+
     function processVote(bool isYes) internal {
         require(isVotingActive);
         require(!votesByAddress[msg.sender]);
@@ -346,7 +346,7 @@ contract Ballot {
                 FinishBallot(now);
             }
         }
-        
+
     }
 
     function getTime() internal returns (uint256) {
@@ -355,7 +355,7 @@ contract Ballot {
         // to allow testing contract behaviour at different time moments
         return now;
     }
-    
+
 }
 
 contract LockableToken is StandardToken, Ownable {
@@ -410,7 +410,7 @@ contract LockableToken is StandardToken, Ownable {
             owner.transfer(this.balance);
             return;
         }
-    
+
         ERC20Basic token = ERC20Basic(_token);
         uint256 balance = token.balanceOf(this);
         token.transfer(owner, balance);
@@ -523,7 +523,7 @@ contract EthearnalRepTokenCrowdsale is MultiOwnable {
     /* *******
      * Events
      */
-    
+
     event ChangeReturn(address indexed recipient, uint256 amount);
     event TokenPurchase(address indexed buyer, uint256 weiAmount, uint256 tokenAmount);
     /* **************
@@ -744,7 +744,7 @@ contract EthearnalRepTokenCrowdsale is MultiOwnable {
             _to.transfer(this.balance);
             return;
         }
-    
+
         ERC20Basic token = ERC20Basic(_token);
         uint256 balance = token.balanceOf(this);
         token.transfer(_to, balance);
@@ -782,7 +782,7 @@ contract RefundInvestorsBallot {
 
     event FinishBallot(uint256 _time);
     event Vote(address indexed sender, bytes vote);
-    
+
     modifier onlyWhenBallotStarted {
         require(ballotStarted != 0);
         _;
@@ -817,7 +817,7 @@ contract RefundInvestorsBallot {
             (data[1] == 0x4f || data[1] == 0x6f)
         );
     }
-    
+
     function processVote(bool isYes) internal {
         require(isVotingActive);
         require(!votesByAddress[msg.sender]);
@@ -869,7 +869,7 @@ contract RefundInvestorsBallot {
             }
         }
     }
-    
+
     function getQuorumPercent() public constant returns (uint256) {
         uint256 isMonthPassed = getTime().sub(ballotStarted).div(5 weeks);
         if(isMonthPassed == 1){
@@ -877,7 +877,7 @@ contract RefundInvestorsBallot {
         }
         return initialQuorumPercent;
     }
-    
+
 }
 
 contract Treasury is MultiOwnable {
@@ -934,7 +934,7 @@ contract Treasury is MultiOwnable {
         // Could be set only once
         require(crowdsaleContract == address(0x0));
         require(_address != 0x0);
-        crowdsaleContract = EthearnalRepTokenCrowdsale(_address); 
+        crowdsaleContract = EthearnalRepTokenCrowdsale(_address);
     }
 
     function setTokenContract(address _address) public onlyOwner {
@@ -985,7 +985,7 @@ contract Treasury is MultiOwnable {
         require(msg.sender == address(votingProxyContract));
         isRefundsEnabled = true;
     }
-    
+
     function refundInvestor(uint256 _tokensToBurn) public {
         require(isRefundsEnabled);
         require(address(tokenContract) != address(0x0));
@@ -994,7 +994,7 @@ contract Treasury is MultiOwnable {
         }
         uint256 tokenRate = crowdsaleContract.getTokenRateEther();
         uint256 toRefund = tokenRate.mul(_tokensToBurn).div(1 ether);
-        
+
         toRefund = toRefund.mul(percentLeft).div(100*1000);
         require(toRefund > 0);
         tokenContract.burnFrom(msg.sender, _tokensToBurn);
@@ -1015,7 +1015,7 @@ contract Treasury is MultiOwnable {
         return ( _quotient);
     }
 
-    function claimTokens(address _token, address _to) public onlyOwner {    
+    function claimTokens(address _token, address _to) public onlyOwner {
         ERC20Basic token = ERC20Basic(_token);
         uint256 balance = token.balanceOf(this);
         token.transfer(_to, balance);
@@ -1023,7 +1023,7 @@ contract Treasury is MultiOwnable {
 }
 
 contract VotingProxy is Ownable {
-    using SafeMath for uint256;    
+    using SafeMath for uint256;
     Treasury public treasuryContract;
     EthearnalRepToken public tokenContract;
     Ballot public currentIncreaseWithdrawalTeamBallot;
@@ -1090,10 +1090,21 @@ contract VotingProxy is Ownable {
             owner.transfer(this.balance);
             return;
         }
-    
+
         ERC20Basic token = ERC20Basic(_token);
         uint256 balance = token.balanceOf(this);
         token.transfer(owner, balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

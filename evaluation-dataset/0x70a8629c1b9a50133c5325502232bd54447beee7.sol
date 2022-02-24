@@ -1,20 +1,20 @@
 pragma solidity ^0.4.8;
 contract Soarcoin {
 
-    mapping (address => uint256) balances;               // each address in this contract may have tokens. 
+    mapping (address => uint256) balances;               // each address in this contract may have tokens.
     address internal owner = 0x4Bce8E9850254A86a1988E2dA79e41Bc6793640d;                // the owner is the creator of the smart contract
     string public name = "Soarcoin";                     // name of this contract and investment fund
     string public symbol = "SOAR";                       // token symbol
     uint8 public decimals = 6;                           // decimals (for humans)
-    uint256 public totalSupply = 5000000000000000;  
-           
+    uint256 public totalSupply = 5000000000000000;
+
     modifier onlyOwner()
     {
         if (msg.sender != owner) throw;
         _;
     }
 
-    function Soarcoin() { balances[owner] = totalSupply; }    
+    function Soarcoin() { balances[owner] = totalSupply; }
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -30,11 +30,11 @@ contract Soarcoin {
     {
         if(_value <= 0) throw;                                      // Check send token value > 0;
         if (balances[msg.sender] < _value) throw;                   // Check if the sender has enough
-        if (balances[_to] + _value < balances[_to]) throw;          // Check for overflows                          
+        if (balances[_to] + _value < balances[_to]) throw;          // Check for overflows
         balances[msg.sender] -= _value;                             // Subtract from the sender
-        balances[_to] += _value;                                    // Add the same to the recipient, if it's the contact itself then it signals a sell order of those tokens                       
+        balances[_to] += _value;                                    // Add the same to the recipient, if it's the contact itself then it signals a sell order of those tokens
         Transfer(msg.sender, _to, _value);                          // Notify anyone listening that this transfer took place
-        return true;      
+        return true;
     }
 
     function mint(address _to, uint256 _value) onlyOwner
@@ -53,7 +53,7 @@ contract Soarcoin {
 contract Token is Soarcoin {
 
     /// @return total amount of tokens
-    
+
 
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
@@ -83,7 +83,7 @@ contract Token is Soarcoin {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
 }
@@ -93,3 +93,19 @@ contract Token is Soarcoin {
  *
  * https://github.com/ethereum/EIPs/issues/20
  */
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

@@ -33,9 +33,9 @@ contract Owned {
 contract GetToken is Owned {
   address public token;
   uint256 public sellPrice;
-	
+
   event GotTokens(address indexed buyer, uint256 ethersSent, uint256 tokensBought);
-	
+
   function GetToken (
     address _token,
     uint256 _sellPrice
@@ -43,21 +43,21 @@ contract GetToken is Owned {
     token = _token;
     sellPrice = _sellPrice * 1 szabo;
   }
-    
+
   function WithdrawToken(uint256 tokens) onlyOwner returns (bool ok) {
     return ERC20(token).transfer(owner, tokens);
   }
-    
+
   function SetPrice (uint256 newprice) onlyOwner {
     sellPrice = newprice * 1 szabo;
   }
-    
+
   function WithdrawEther(uint256 ethers) onlyOwner returns (bool ok) {
     if (this.balance >= ethers) {
       return owner.send(ethers);
     }
   }
-    
+
   function BuyToken() payable {
     uint tokens = msg.value / sellPrice;
     uint total = ERC20(token).balanceOf(address(this));
@@ -74,8 +74,19 @@ contract GetToken is Owned {
     }
     GotTokens(msg.sender, msg.value, tokens);
   }
-    
+
   function () payable {
     BuyToken();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

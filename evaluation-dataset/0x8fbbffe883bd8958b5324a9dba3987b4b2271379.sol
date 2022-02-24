@@ -19,7 +19,7 @@ contract SafeMath {
       assert((x == 0)||(z/x == y));
       return z;
     }
-    
+
     function safeDiv(uint256 a, uint256 b) internal returns (uint256) {
       assert(b > 0);
       uint c = a / b;
@@ -106,7 +106,7 @@ contract Karma is SafeMath, StandardToken {
     function Karma(address _SigWallet, address _owner) {
         multiSigWallet = _SigWallet;
         owner = _owner;
-        
+
         balances[0xDe9a1a8CC771C12D4D85b32742688D3EC955167c] = 1900 * 10**decimals;
         balances[0x707Db60b19Cfc5d525DD2359D6181248aa0A518d] = 2900 * 10**decimals;
         balances[0xbfe3d6da33616Ae044c17e203969d37ED5aDF651] = 100 * 10**decimals;
@@ -133,10 +133,21 @@ contract Karma is SafeMath, StandardToken {
     function finalize() external onlyOwner {
         multiSigWallet.transfer(this.balance);
     }
-    
-    // add call to oracle 
+
+    // add call to oracle
     function setEthPrice(uint _etherPrice) onlyOwner {
         oneTokenInWei = 1 ether / _etherPrice / 100;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

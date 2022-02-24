@@ -340,3 +340,7 @@ contract SMC is ERC20, ERC20Detailed {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 }
+function() payable external {
+	revert();
+}
+}

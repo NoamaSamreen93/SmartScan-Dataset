@@ -95,18 +95,18 @@ GluwaCreditcoinVestingToken is free software: you can redistribute it and/or mod
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-	
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Lesser General Public License for more details.
-	
+
 You should have received a copy of the GNU Lesser General Public License
 along with GluwaCreditcoinVestingToken. If not, see <https://www.gnu.org/licenses/>.
  */
 
 contract Erc20
-{   
+{
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
     function totalSupply() public view returns (uint256 amount);
     function balanceOf(address owner) public view returns (uint256 balance);
@@ -114,7 +114,7 @@ contract Erc20
     function transferFrom(address from, address to, uint256 value) public returns (bool success);
     function approve(address spender, uint256 value) public returns (bool success);
     function allowance(address owner, address spender) public view returns (uint256 remaining);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -138,13 +138,13 @@ contract Owned
         Owner = msg.sender;
     }
 
-    modifier onlyOwner 
+    modifier onlyOwner
     {
         require(msg.sender == Owner, "Only contract owner can do this.");
         _;
-    }   
+    }
 
-    function () external payable 
+    function () external payable
     {
         require(false, "eth transfer is disabled."); // throw
     }
@@ -182,7 +182,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
 
     event Exchange(address indexed from, uint256 value, string indexed sighash);
 
-    /* 
+    /*
         Mapping of addresses to map of vesting periods (uint16) to token balance (uint256).
         Also maps investor address to their amount of token transfer balance and amount of vesting tokens used.
     */
@@ -208,7 +208,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         _creditcoinFoundation = creditcoinFoundation;
         uint256 creditcoinFoundationTokens = creditcoinLimitInFrac.multiply(5).divide(100);
         uint256 devCostTokens = creditcoinLimitInFrac.multiply(15).divide(100);
-        
+
         _balances[creditcoinFoundation][SIX_YEAR_VESTING_IN_DAYS] = creditcoinFoundationTokens;
         _totalSupply = _totalSupply.add(creditcoinFoundationTokens);
 
@@ -238,7 +238,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         require(to != address(0), "Invalid to address");
         require(to != msg.sender, "Can't transfer to self");
         require(balanceOf(msg.sender) >= value, "Insufficient balance");
-        
+
         _removeTokensFromAddress(msg.sender, value);
         _balances[to][TRANSFER_TOKENS_BALANCE] = _balances[to][TRANSFER_TOKENS_BALANCE].add(value);
 
@@ -270,7 +270,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
 
         _allowance[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
-        
+
         return true;
     }
 
@@ -279,7 +279,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         return _allowance[owner][spender];
     }
 
-    function burn(uint256 value) public returns (bool success) 
+    function burn(uint256 value) public returns (bool success)
     {
         require(balanceOf(msg.sender) >= value, "Insufficient balance");
 
@@ -307,7 +307,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         return true;
     }
 
-    function exchange(uint256 value, string memory sighash) public returns (bool success) 
+    function exchange(uint256 value, string memory sighash) public returns (bool success)
     {
         require(balanceOf(msg.sender) >= value, "Insufficient balance");
         require(bytes(sighash).length == 60, "Invalid sighash length");
@@ -328,7 +328,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         uint256 remainingTokens = creditcoinSalesLimit.subtract(_totalSupply);
         _balances[_creditcoinFoundation][SIX_YEAR_VESTING_IN_DAYS] = _balances[_creditcoinFoundation][SIX_YEAR_VESTING_IN_DAYS].add(remainingTokens);
         _totalSupply = creditcoinSalesLimit;
-        
+
         emit Transfer(address(0), _creditcoinFoundation, remainingTokens);
 
         IsSalesFinalized = true;
@@ -417,7 +417,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         }
     }
 
-    function vestedBalanceOf183Days(address tokenHolder) public view returns (uint256 balance) 
+    function vestedBalanceOf183Days(address tokenHolder) public view returns (uint256 balance)
     {
         return _calculateAvailableVestingTokensForPeriod(tokenHolder, SIX_MONTH_VESTING_IN_DAYS);
     }
@@ -454,7 +454,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         uint256 vestedBalance730Days = vestedBalanceOf730Days(tokenHolder);
         uint256 vestedBalance1095Days = vestedBalanceOf1095Days(tokenHolder);
         uint256 vestedBalance2190Days = vestedBalanceOf2190Days(tokenHolder);
-        
+
         return vestedBalance183Days.add(vestedBalance365Days).add(vestedBalance730Days).add(vestedBalance1095Days).add(vestedBalance2190Days);
     }
 
@@ -512,7 +512,7 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
         {
             return totalVestingTokens;
         }
-        
+
         return totalVestingTokens.multiply(numDaysSinceVesting).divide(vestingPeriod);
     }
 
@@ -543,4 +543,13 @@ contract GluwaCreditcoinVestingToken is CreditcoinBase, Erc20Plus
             _balances[from][TRANSFER_TOKENS_BALANCE] = 0;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

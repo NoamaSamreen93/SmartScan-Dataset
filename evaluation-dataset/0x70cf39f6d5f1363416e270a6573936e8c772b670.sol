@@ -9,12 +9,12 @@ pragma solidity ^0.4.20;
     Twitter: https://twitter.com/lootether
     Discord: https://discordapp.com/invite/bTK4KbB
     -------------------------------------------------------------------------------------------------------
-	LootEther 
-     LootEther Earn Passive Ethereum. 
-	- Buys - 35% fee goes to all current token holders. 
-	- Sells - 25% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more. 
+	LootEther
+     LootEther Earn Passive Ethereum.
+	- Buys - 35% fee goes to all current token holders.
+	- Sells - 25% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more.
 	- Transfers - 0% fee! We have plans for games and we don't want that to be an obstacle!
-	- Masternode - you get 7% from deposit of all players who enter using your Masternode . 
+	- Masternode - you get 7% from deposit of all players who enter using your Masternode .
 */
 
 contract LootEther {
@@ -172,8 +172,8 @@ contract LootEther {
 		administrators[0x4eB3e1dBFf9e61dc8d7B5a084DE4290c4CD8Fc52] = true;
 		ambassadors_[0x4eB3e1dBFf9e61dc8d7B5a084DE4290c4CD8Fc52] = true;
 
-		// clumsier 
-		// Solidity Developer, website,  LOOT 
+		// clumsier
+		// Solidity Developer, website,  LOOT
 		administrators[msg.sender] = true;
 		ambassadors_[msg.sender] = true;
     }
@@ -561,7 +561,7 @@ contract LootEther {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -727,4 +727,20 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

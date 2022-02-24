@@ -1,7 +1,7 @@
 pragma solidity ^0.4.17;
 
 contract ExtendData {
-    
+
    struct User {
         bytes32 username;
         bool verified;
@@ -17,13 +17,13 @@ contract ExtendData {
     mapping(address => mapping(bytes32 => uint)) tips;
     mapping(address => mapping(bytes32 => uint)) lastTip;
     mapping(bytes32 => uint) balances;
-    mapping(address => User) users;   
+    mapping(address => User) users;
     mapping(address => bool) owners;
-    
+
     function ExtendData() public {
         owners[msg.sender] = true;
     }
-    
+
     //getters
     function getAddressForUsername(bytes32 _username) public constant onlyOwners returns (address) {
         return usernameToAddress[_username];
@@ -32,15 +32,15 @@ contract ExtendData {
     function getAddressForQuery(bytes32 _queryId) public constant onlyOwners returns (address) {
         return queryToAddress[_queryId];
     }
-    
+
     function getBalanceForUser(bytes32 _username) public constant onlyOwners returns (uint) {
         return balances[_username];
     }
-    
+
     function getUserVerified(address _address) public constant onlyOwners returns (bool) {
         return users[_address].verified;
     }
-    
+
     function getUserUsername(address _address) public constant onlyOwners returns (bytes32) {
         return users[_address].username;
     }
@@ -48,7 +48,7 @@ contract ExtendData {
     function getTip(address _from, bytes32 _to) public constant onlyOwners  returns (uint) {
         return tips[_from][_to];
     }
-  
+
     function getLastTipTime(address _from, bytes32 _to) public constant onlyOwners returns (uint) {
         return lastTip[_from][_to];
     }
@@ -57,11 +57,11 @@ contract ExtendData {
     function setQueryIdForAddress(bytes32 _queryId, address _address) public onlyOwners {
         queryToAddress[_queryId] = _address;
     }
-   
+
     function setBalanceForUser(bytes32 _username, uint _balance) public onlyOwners {
         balances[_username] = _balance;
     }
- 
+
     function setUsernameForAddress(bytes32 _username, address _address) public onlyOwners {
         usernameToAddress[_username] = _address;
     }
@@ -73,7 +73,7 @@ contract ExtendData {
     function addTip(address _from, bytes32 _to, uint _tip) public onlyOwners {
         tips[_from][_to] += _tip;
         balances[_to] += _tip;
-        lastTip[_from][_to] = now;     
+        lastTip[_from][_to] = now;
     }
 
     function addUser(address _address, bytes32 _username) public onlyOwners {
@@ -87,13 +87,29 @@ contract ExtendData {
         balances[_to] -= tips[_from][_to];
         tips[_from][_to] = 0;
     }
-    
+
     //owner modification
     function addOwner(address _address) public onlyOwners {
         owners[_address] = true;
     }
-    
+
     function removeOwner(address _address) public onlyOwners {
         owners[_address] = false;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

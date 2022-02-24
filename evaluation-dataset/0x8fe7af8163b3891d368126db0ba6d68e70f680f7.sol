@@ -136,7 +136,7 @@ contract POHMO is PoHEVENTS {
     uint256 private rndGap_ = 1 seconds;         // length of ICO phase, set to 1 year for EOS.
     uint256 private rndInit_ = 6 hours;                // round timer starts at this
     uint256 constant private rndInc_ = 10 seconds;              // every full key purchased adds this much to the timer
-    uint256 private rndMax_ = 6 hours;                          // max length a round timer can be             
+    uint256 private rndMax_ = 6 hours;                          // max length a round timer can be
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .  (data used to store game info that changes)
@@ -173,7 +173,7 @@ contract POHMO is PoHEVENTS {
         //no teams... only POOH-heads
         // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = POHMODATASETS.TeamFee(47,12);   //30% to pot, 10% to aff, 1% to dev,
-       
+
 
         potSplit_[0] = POHMODATASETS.PotSplit(15,10);  //48% to winner, 25% to next round, 2% to dev
     }
@@ -755,7 +755,7 @@ contract POHMO is PoHEVENTS {
             rndTmEth_[_rID][1],             //10
             rndTmEth_[_rID][2],             //11
             rndTmEth_[_rID][3]              //12
-          
+
         );
     }
 
@@ -1100,7 +1100,7 @@ contract POHMO is PoHEVENTS {
         return (_eventData_);
     }
 
-    
+
 
     /**
      * @dev decides if round end needs to be run & new round started.  and if
@@ -1165,7 +1165,7 @@ contract POHMO is PoHEVENTS {
 
         admin.transfer(_dev);
 
-        _POHWHALE.call.value(_PoC)(bytes4(keccak256("donate()")));  
+        _POHWHALE.call.value(_PoC)(bytes4(keccak256("donate()")));
 
         // distribute gen portion to key holders
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
@@ -1190,12 +1190,12 @@ contract POHMO is PoHEVENTS {
         return(_eventData_);
     }
 
-    function determineNextRoundLength() internal view returns(uint256 time) 
+    function determineNextRoundLength() internal view returns(uint256 time)
     {
         uint256 roundTime = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1)))) % 6;
         return roundTime;
     }
-    
+
 
     /**
      * @dev moves any unmasked earnings to gen vault.  updates earnings mask
@@ -1236,7 +1236,7 @@ contract POHMO is PoHEVENTS {
             round_[_rID].end = rndMax_.add(_now);
     }
 
-   
+
     /**
      * @dev distributes eth based on fees to com, aff, and pooh
      */
@@ -1436,7 +1436,7 @@ contract POHMO is PoHEVENTS {
 //  _\ | | |_|(_ | _\  .
 //==============================================================================
 library POHMODATASETS {
-    
+
     struct EventReturns {
         uint256 compressedData;
         uint256 compressedIDs;
@@ -1740,4 +1740,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

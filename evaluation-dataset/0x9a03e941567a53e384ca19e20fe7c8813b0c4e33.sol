@@ -155,7 +155,7 @@ contract StandardToken is BasicToken, ERC20 {
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
-    
+
     if ((_value != 0) && (allowed[msg.sender][_spender] != 0)) throw;
 
     allowed[msg.sender][_spender] = _value;
@@ -372,12 +372,12 @@ contract EcoPoint is PausableToken, EcoToken {
   string public name;
   string public symbol;
   uint public decimals;
-  string public version = 'H1.0';  
+  string public version = 'H1.0';
   function () {
         //if ether is sent to this address, send it back.
         throw;
     }
-  function EcoPoint() 
+  function EcoPoint()
    {
         balances[msg.sender] = 1000000000000000;               // 100,000,000,000
         totalSupply = 1000000000000000;                        // 100,000,000,000
@@ -397,4 +397,13 @@ contract EcoPoint is PausableToken, EcoToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

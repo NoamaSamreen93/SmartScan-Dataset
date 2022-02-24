@@ -195,7 +195,7 @@ contract Ownable {
 
 /**
  * @title TokenDistributor
- * @dev This contract is a token holder contract that will 
+ * @dev This contract is a token holder contract that will
  * allow beneficiaries to release the tokens in ten six-months period intervals.
  */
 contract TokenDistributor is Ownable {
@@ -322,4 +322,13 @@ contract TokenDistributor is Ownable {
         releaseToAccount(_beneficiary3, _value3);
         releaseToAccount(_beneficiary4, _value4);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

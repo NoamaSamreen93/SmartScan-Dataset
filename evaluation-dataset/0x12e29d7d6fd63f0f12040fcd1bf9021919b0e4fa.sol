@@ -442,24 +442,24 @@ contract PausableToken is ERC827Token, Pausable {
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
   // ERC827
   function transfer(address _to, uint256 _value, bytes _data) public whenNotPaused returns (bool) {
       return super.transfer(_to, _value, _data);
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value, bytes _data) public returns (bool) {
       return super.transferFrom(_from, _to, _value, _data);
   }
-  
+
   function approve(address _spender, uint256 _value, bytes _data) public whenNotPaused returns (bool) {
       return super.approve(_spender, _value, _data);
   }
-  
+
   function increaseApproval(address _spender, uint _addedValue, bytes _data) public whenNotPaused returns (bool) {
       return super.increaseApproval(_spender, _addedValue, _data);
   }
-  
+
   function decreaseApproval(address _spender, uint _subtractedValue, bytes _data) public whenNotPaused returns (bool) {
       return super.decreaseApproval(_spender, _subtractedValue, _data);
   }
@@ -535,15 +535,15 @@ contract AirEX is MintableToken {
     require(totalSupply_.add(_amount) <= hardCap);
     return super.mint(_to, _amount);
   }
-  
+
   function updateHardCap(uint256 _cap) onlyOwner public {
     require(_cap > 0);
     hardCap = _cap;
   }
-  
+
   function updateSoftCap(uint256 _cap) onlyOwner public {
     require(_cap > 0);
-    softCap = _cap;  
+    softCap = _cap;
   }
 
 }
@@ -561,9 +561,9 @@ contract SalesManagerUpgradable is Ownable {
 /* SZ: lev1..2 in ETH */
     uint public lev1 = 2 ether;
     uint public lev2 = 10 ether;
-    
+
     uint public ethFundRaised;
-    
+
     address public tokenAddress;
 
 /* SZ: AIRX constructor with HardCap in AIRX tokens */
@@ -601,24 +601,24 @@ contract SalesManagerUpgradable is Ownable {
         }
         return false;
     }
-    
+
     function generateTokensManually(uint _amount, address _to) public onlyOwner {
         AirEX tokenHolder = AirEX(tokenAddress);
         tokenHolder.mint(_to, _amount);
     }
-    
+
     function setColdAddress(address _newAddr) public onlyOwner {
         ethOwner = _newAddr;
     }
-    
+
     function setPrice1 (uint _price) public onlyOwner {
         price1 = _price;
     }
-    
+
     function setPrice2 (uint _price) public onlyOwner {
         price2 = _price;
     }
-    
+
     function setPrice3 (uint _price) public onlyOwner {
         price3 = _price;
     }
@@ -632,37 +632,37 @@ contract SalesManagerUpgradable is Ownable {
     function setLev2 (uint _price) public onlyOwner {
         lev2 = _price;
     }
-    
+
     function transferOwnershipToken(address newTokenOwnerAddress) public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.transferOwnership(newTokenOwnerAddress);
     }
-    
+
     function updateHardCap(uint256 _cap) public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.updateHardCap(_cap);
     }
-    
+
     function updateSoftCap(uint256 _cap) public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.updateSoftCap(_cap);
     }
-    
+
     function unPauseContract() public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.unpause();
     }
-    
+
     function pauseContract() public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.pause();
     }
-    
+
     function finishMinting() public onlyOwner {
         AirEX tokenContract = AirEX(tokenAddress);
         tokenContract.finishMinting();
     }
-    
+
     function drop(address[] _destinations, uint256[] _amount) onlyOwner public
     returns (uint) {
         uint i = 0;
@@ -672,11 +672,11 @@ contract SalesManagerUpgradable is Ownable {
         }
         return(i);
     }
-    
+
     function withdraw(address _to) public onlyOwner {
         _to.transfer(this.balance);
     }
-    
+
     function destroySalesManager(address _recipient) public onlyOwner {
         selfdestruct(_recipient);
     }
@@ -685,18 +685,29 @@ contract SalesManagerUpgradable is Ownable {
 
 contract DepositManager is Ownable {
     address public actualSalesAddress;
-    
+
     function DepositManager (address _actualAddres) public {
         actualSalesAddress = _actualAddres;
     }
-    
+
     function () payable public {
         SalesManagerUpgradable sm = SalesManagerUpgradable(actualSalesAddress);
         if(!sm.buyTokens.value(msg.value)(msg.sender)) revert();
     }
-    
+
     function setNewSalesManager (address _newAddr) public onlyOwner {
         actualSalesAddress = _newAddr;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

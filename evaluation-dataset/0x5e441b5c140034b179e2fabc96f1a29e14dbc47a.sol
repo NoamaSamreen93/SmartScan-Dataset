@@ -1,7 +1,7 @@
 pragma solidity ^0.4.8;
 
 /**
- * Climatecoin extended ERC20 token contract created on February the 17th, 2018 by Rincker Productions in the Netherlands 
+ * Climatecoin extended ERC20 token contract created on February the 17th, 2018 by Rincker Productions in the Netherlands
  *
  * For terms and conditions visit https://climatecoin.eu
  */
@@ -158,14 +158,14 @@ contract ClimateCoinToken is owned, SafeMath, StandardToken {
     uint256 public gasReserve = 0.2 ether;                                    // Eth amount that remains in the contract for gas and can't be sold
     uint256 public minBalanceForAccounts = 10 finney;                       // Minimal eth balance of sender and recipient
     bool public directTradeAllowed = false;                                 // Halt trading CLI by sending to the contract directly
-    
+
     /* include mintable */
-    
+
     event Mint(address indexed to, uint value);
     event MintFinished();
 
     bool public mintingFinished = false;
-    
+
      modifier canMint() {
     if(mintingFinished) revert();
     _;
@@ -193,7 +193,7 @@ contract ClimateCoinToken is owned, SafeMath, StandardToken {
     MintFinished();
     return true;
   }
-  
+
   /* end mintable */
 
 
@@ -313,3 +313,10 @@ contract ClimateCoinToken is owned, SafeMath, StandardToken {
         }
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

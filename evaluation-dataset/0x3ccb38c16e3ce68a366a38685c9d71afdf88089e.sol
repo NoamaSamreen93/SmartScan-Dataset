@@ -170,7 +170,7 @@ contract ERC20Distributor {
 
     using SafeMath for uint256;
 
-    address public owner;   
+    address public owner;
     address public newOwnerCandidate;
 
     ERC20 public token;
@@ -187,9 +187,9 @@ contract ERC20Distributor {
     //
     */
     //address public dateTimeAddr = 0xF0847087aAf608b4732be58b63151bDf4d548612;
-    //DateTime public dateTime = DateTime(dateTimeAddr);    
+    //DateTime public dateTime = DateTime(dateTimeAddr);
     DateTime public dateTime;
-    
+
     /*
     //  events
     */
@@ -197,7 +197,7 @@ contract ERC20Distributor {
     event OwnershipTransferRequsted(address indexed previousOwner, address indexed newOwner);
 
     event BountyDistributed(uint listCount, uint amount);
-   
+
    /*
    //   modifiers
    */
@@ -205,12 +205,12 @@ contract ERC20Distributor {
         require(msg.sender == owner);
         _;
     }
-    
+
     /* constructor */
     function ERC20Distributor(ERC20 _tokenAddr, address _dateTimeAddr, address _approver) public {
         owner = msg.sender;
         token = _tokenAddr;
-        dateTime = DateTime(_dateTimeAddr); 
+        dateTime = DateTime(_dateTimeAddr);
         approver = _approver;
     }
 
@@ -225,27 +225,27 @@ contract ERC20Distributor {
         emit OwnershipTransferred(owner, newOwnerCandidate);
         owner = newOwnerCandidate;
     }
-    
+
     function transfer(address _to, uint _amount) public onlyOwner {
         require(neededAmountTotal.add(_amount) <= token.balanceOf(this) && token.balanceOf(this) > 0);
         token.transfer(_to, _amount);
     }
-    
-    //should be set for distributeBounty function. and set appropriate approve amount for bounty. 
+
+    //should be set for distributeBounty function. and set appropriate approve amount for bounty.
     function setApprover(address _approver) public onlyOwner {
         approver = _approver;
     }
-    
+
     //change processing ERC20 address
     function changeTokenAddress(ERC20 _tokenAddr) public onlyOwner {
         token = _tokenAddr;
     }
-    
+
     //should be checked approved amount and the sum of _amount
     function distributeBounty(address[] _receiver, uint[] _amount) public payable onlyOwner {
         require(_receiver.length == _amount.length);
         uint bountyAmount;
-        
+
         for (uint i = 0; i < _amount.length; i++) {
             distributedBountyTotal += _amount[i];
             bountyAmount += _amount[i];
@@ -259,4 +259,17 @@ contract ERC20Distributor {
         return (token.balanceOf(this));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

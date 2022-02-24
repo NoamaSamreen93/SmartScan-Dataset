@@ -3,31 +3,31 @@ pragma solidity ^0.4.21;
 // Owned contract
 // ----------------------------------------------------------------------------
 contract Owned {
-    
-    /// 'owner' is the only address that can call a function with 
+
+    /// 'owner' is the only address that can call a function with
     /// this modifier
     address public owner;
     address internal newOwner;
-    
+
     ///@notice The constructor assigns the message sender to be 'owner'
     function Owned() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     event updateOwner(address _oldOwner, address _newOwner);
-    
+
     ///change the owner
     function changeOwner(address _newOwner) public onlyOwner returns(bool) {
         require(owner != _newOwner);
         newOwner = _newOwner;
         return true;
     }
-    
+
     /// accept the ownership
     function acceptNewOwner() public returns(bool) {
         require(msg.sender == newOwner);
@@ -125,9 +125,9 @@ contract standardToken is ERC20Token {
     }
 
     /* Transfers tokens from your address to other */
-    function transfer(address _to, uint256 _value) 
-        public 
-        returns (bool success) 
+    function transfer(address _to, uint256 _value)
+        public
+        returns (bool success)
     {
         require (balances[msg.sender] >= _value);           // Throw if sender has insufficient balance
         require (balances[_to] + _value >= balances[_to]);  // Throw if owerflow detected
@@ -174,7 +174,7 @@ contract standardToken is ERC20Token {
 
 contract OpticalNetwork is standardToken, Owned {
     using SafeMath for uint;
-    
+
     string public name="Optical Network";
     string public symbol="OPTC";
     uint256 public decimals=18;
@@ -184,12 +184,23 @@ contract OpticalNetwork is standardToken, Owned {
     function() public payable {
         revert();
     }
-    
+
     /// @dev initial function
     function OpticalNetwork(address _tokenAlloc) public {
         owner=msg.sender;
         balances[_tokenAlloc] = topTotalSupply;
         totalSupply = topTotalSupply;
-        emit Transfer(0x0, _tokenAlloc, topTotalSupply); 
+        emit Transfer(0x0, _tokenAlloc, topTotalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

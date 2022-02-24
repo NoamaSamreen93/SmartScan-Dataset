@@ -64,7 +64,7 @@ contract BonusStrategy {
         uint[] _startTimes,
         uint[] _endTimes,
         uint[] _amounts
-        ) public 
+        ) public
     {
         require(_startTimes.length == _endTimes.length && _endTimes.length == _amounts.length);
         startTimes = _startTimes;
@@ -354,4 +354,15 @@ contract DecenturionToken is InfoBurnableToken {
         balances[manager] = managerAmount;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

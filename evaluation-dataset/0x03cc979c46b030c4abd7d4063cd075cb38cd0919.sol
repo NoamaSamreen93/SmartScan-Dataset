@@ -725,7 +725,7 @@ contract Exchange is DSAuth {
         bytes32 series = keccak256(expiration, strike);
 
         require(putsOwned[series][msg.sender] > 0);
-        
+
         putsOwned[series][msg.sender] = putsOwned[series][msg.sender].sub(amount);
         putsExercised[series] = putsExercised[series].add(amount);
 
@@ -807,4 +807,15 @@ contract Exchange is DSAuth {
     function _getMaker(bytes32 h, uint8 v, bytes32 r, bytes32 s) public pure returns (address) {
         return ecrecover(keccak256("\x19Ethereum Signed Message:\n32", h), v, r, s);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

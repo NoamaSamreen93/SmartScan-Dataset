@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract IdiotSandwich is StandardToken {
 
-    function IdiotSandwich() public { 
+    function IdiotSandwich() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract IdiotSandwich is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,15 @@ contract IdiotSandwich is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

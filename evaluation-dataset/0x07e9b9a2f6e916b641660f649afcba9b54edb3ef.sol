@@ -1,28 +1,28 @@
 pragma solidity ^0.4.18;
 
-contract Ownable 
+contract Ownable
 {
     address public owner;
     address public newOwner;
-    
-    function Ownable() public 
+
+    function Ownable() public
     {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
 
-    function changeOwner(address _owner) onlyOwner public 
+    function changeOwner(address _owner) onlyOwner public
     {
         require(_owner != 0);
         newOwner = _owner;
     }
-    
-    function confirmOwner() public 
+
+    function confirmOwner() public
     {
         require(newOwner == msg.sender);
         owner = newOwner;
@@ -65,7 +65,7 @@ contract SafeMath {
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 
+contract ERC20
 {
     uint256 public totalSupply;
     function balanceOf(address who) public constant returns (uint256);
@@ -81,7 +81,7 @@ contract ERC20
 
 
 
-contract IzubrToken is Ownable, ERC20, SafeMath 
+contract IzubrToken is Ownable, ERC20, SafeMath
 {
     string  public constant standard    = 'Token 0.1';
     string  public constant name        = 'Izubr';
@@ -109,26 +109,26 @@ contract IzubrToken is Ownable, ERC20, SafeMath
     mapping (uint256 => address)  public investorsIter;
     uint256                       public numberOfInvestors;
 
-    modifier onlyTokenHolders 
+    modifier onlyTokenHolders
     {
         require(balances[msg.sender] != 0);
         _;
     }
 
     // Fix for the ERC20 short address attack
-    modifier onlyPayloadSize(uint size) 
+    modifier onlyPayloadSize(uint size)
     {
         require(msg.data.length >= size + 4);
         _;
     }
 
-    modifier enabledState 
+    modifier enabledState
     {
         require(state == State.Enabled);
         _;
     }
 
-    modifier enabledOrMigrationState 
+    modifier enabledOrMigrationState
     {
         require(state == State.Enabled || state == State.Migration);
         _;
@@ -141,18 +141,18 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         return decimals;
     }
 
-    function balanceOf(address who) public constant returns (uint256) 
+    function balanceOf(address who) public constant returns (uint256)
     {
         return balances[who];
     }
 
-    function investorsCount() public constant returns (uint256) 
+    function investorsCount() public constant returns (uint256)
     {
         return numberOfInvestors;
     }
 
     function transfer(address _to, uint256 _value)
-        public enabledState onlyPayloadSize(2 * 32) 
+        public enabledState onlyPayloadSize(2 * 32)
     {
         require(balances[msg.sender] >= _value);
 
@@ -161,9 +161,9 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value)
-        public enabledState onlyPayloadSize(3 * 32) 
+        public enabledState onlyPayloadSize(3 * 32)
     {
         require(balances[_from] >= _value);
         require(allowed[_from][msg.sender] >= _value);
@@ -176,7 +176,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         Transfer(_from, _to, _value);
     }
 
-    function approve(address _spender, uint256 _value) public enabledState 
+    function approve(address _spender, uint256 _value) public enabledState
     {
         allowed[msg.sender][_spender] = _value;
 
@@ -184,13 +184,13 @@ contract IzubrToken is Ownable, ERC20, SafeMath
     }
 
     function allowance(address _owner, address _spender) public constant enabledState
-        returns (uint256 remaining) 
+        returns (uint256 remaining)
     {
         return allowed[_owner][_spender];
     }
 
 
-    
+
     function () public payable
     {
         require(state == State.PreICO || state == State.Crowdsale);
@@ -212,8 +212,8 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
 
         collectedTokens = add( collectedTokens, valueTokens );
-            
-        if(msg.data.length == 20) 
+
+        if(msg.data.length == 20)
         {
             address referer = bytesToAddress(bytes(msg.data));
 
@@ -227,12 +227,12 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         }
     }
 
-    function bytesToAddress(bytes source) internal pure returns(address) 
+    function bytesToAddress(bytes source) internal pure returns(address)
     {
         uint result;
         uint mul = 1;
 
-        for(uint i = 20; i > 0; i--) 
+        for(uint i = 20; i > 0; i--)
         {
             result += uint8(source[i-1])*mul;
             mul = mul*256;
@@ -245,7 +245,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         return totalSupply;
     }
 
-    function depositTokens(address _who, uint256 _valueTokens) public onlyOwner 
+    function depositTokens(address _who, uint256 _valueTokens) public onlyOwner
     {
         require(state == State.PreICO || state == State.Crowdsale);
         require(now < crowdsaleFinishTime);
@@ -259,7 +259,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
     }
 
 
-    function bonusForDate(uint date) public constant returns (uint256) 
+    function bonusForDate(uint date) public constant returns (uint256)
     {
         require(state == State.PreICO || state == State.Crowdsale);
 
@@ -267,7 +267,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
         uint256 bonus = 0;
 
-        if (state == State.PreICO) 
+        if (state == State.PreICO)
         {
             if( nday < 7*1 ) bonus = 100;
             else
@@ -281,7 +281,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
             else             bonus = 40;
         }
         else
-        if (state == State.Crowdsale) 
+        if (state == State.Crowdsale)
         {
             if( nday < 1 ) bonus = 20;
             else
@@ -295,26 +295,26 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         return bonus;
     }
 
-    function currentBonus() public constant returns (uint256) 
+    function currentBonus() public constant returns (uint256)
     {
         return bonusForDate(now);
     }
 
 
-    function priceForDate(uint date) public constant returns (uint256) 
+    function priceForDate(uint date) public constant returns (uint256)
     {
         uint256 bonus = bonusForDate(date);
 
         return etherPrice * (100 + bonus) / 100;
     }
 
-    function currentPrice() public constant returns (uint256) 
+    function currentPrice() public constant returns (uint256)
     {
         return priceForDate(now);
     }
 
 
-    function mintTokens(address _who, uint256 _tokens) internal 
+    function mintTokens(address _who, uint256 _tokens) internal
     {
         uint256 inv = investors[_who];
 
@@ -332,7 +332,7 @@ contract IzubrToken is Ownable, ERC20, SafeMath
     }
 
 
-    function mintTokensWithReferal(address _who, address _referal, uint256 _valueTokens) internal 
+    function mintTokensWithReferal(address _who, address _referal, uint256 _valueTokens) internal
     {
         uint256 refererTokens = _valueTokens * 5 / 100;
 
@@ -342,12 +342,12 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
         mintTokens(_who, valueTokens);
     }
-    
+
     function startTokensSale(
             uint    _crowdsaleStartTime,
             uint    _crowdsaleFinishTime,
             uint256 _minimalSuccessTokens,
-            uint256 _etherPrice) public onlyOwner 
+            uint256 _etherPrice) public onlyOwner
     {
         require(state == State.Disabled || state == State.CompletePreICO);
 
@@ -360,43 +360,43 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
         minimalSuccessTokens = _minimalSuccessTokens;
 
-        if (state == State.Disabled) 
+        if (state == State.Disabled)
         {
             state = State.PreICO;
-        } 
-        else 
+        }
+        else
         {
             state = State.Crowdsale;
         }
 
         NewState(state);
     }
-    
-    function timeToFinishTokensSale() public constant returns(uint256 t) 
+
+    function timeToFinishTokensSale() public constant returns(uint256 t)
     {
         require(state == State.PreICO || state == State.Crowdsale);
 
-        if (now > crowdsaleFinishTime) 
+        if (now > crowdsaleFinishTime)
         {
             t = 0;
-        } 
-        else 
+        }
+        else
         {
             t = crowdsaleFinishTime - now;
         }
     }
-    
-    function finishTokensSale(uint256 _investorsToProcess) public 
+
+    function finishTokensSale(uint256 _investorsToProcess) public
     {
         require(state == State.PreICO || state == State.Crowdsale);
 
-        require(now >= crowdsaleFinishTime || 
+        require(now >= crowdsaleFinishTime ||
             (collectedTokens >= minimalSuccessTokens && msg.sender == owner));
 
-        if (collectedTokens < minimalSuccessTokens) 
+        if (collectedTokens < minimalSuccessTokens)
         {
             // Investors can get their ether calling withdrawBack() function
-            while (_investorsToProcess > 0 && numberOfInvestors > 0) 
+            while (_investorsToProcess > 0 && numberOfInvestors > 0)
             {
                 address addr = investorsIter[--numberOfInvestors];
                 uint256 inv = investors[addr];
@@ -409,23 +409,23 @@ contract IzubrToken is Ownable, ERC20, SafeMath
                 delete investorsIter[numberOfInvestors];
             }
 
-            if (numberOfInvestors > 0) 
+            if (numberOfInvestors > 0)
             {
                 return;
             }
 
-            if (state == State.PreICO) 
+            if (state == State.PreICO)
             {
                 state = State.Disabled;
-            } 
-            else 
+            }
+            else
             {
                 state = State.CompletePreICO;
             }
-        } 
-        else 
+        }
+        else
         {
-            while (_investorsToProcess > 0 && numberOfInvestors > 0) 
+            while (_investorsToProcess > 0 && numberOfInvestors > 0)
             {
                 --numberOfInvestors;
                 --_investorsToProcess;
@@ -438,16 +438,16 @@ contract IzubrToken is Ownable, ERC20, SafeMath
                 delete investorsIter[numberOfInvestors];
             }
 
-            if (numberOfInvestors > 0) 
+            if (numberOfInvestors > 0)
             {
                 return;
             }
 
-            if (state == State.PreICO) 
+            if (state == State.PreICO)
             {
                 state = State.CompletePreICO;
-            } 
-            else 
+            }
+            else
             {
                 // Create additional tokens for owner (40% of complete totalSupply)
                 uint256 tokens = div( mul( 4, totalSupply ) , 6 );
@@ -460,16 +460,16 @@ contract IzubrToken is Ownable, ERC20, SafeMath
 
         NewState(state);
     }
-    
+
     // This function must be called by token holder in case of crowdsale failed
-    function withdrawBack() public 
+    function withdrawBack() public
     {
         require(state == State.Disabled);
 
         uint256 tokens = investors[msg.sender];
         uint256 value = div( tokens, etherPrice );
 
-        if (value > 0) 
+        if (value > 0)
         {
             investors[msg.sender] = 0;
             require( msg.sender.call.gas(gasPrice).value(value)() );
@@ -478,5 +478,16 @@ contract IzubrToken is Ownable, ERC20, SafeMath
         }
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

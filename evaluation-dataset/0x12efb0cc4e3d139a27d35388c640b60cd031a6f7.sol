@@ -49,7 +49,7 @@ contract EtherSmart {
         advertising.transfer(value * advertisingPercent / 100);
     }
 
-    // convert bytes to eth address 
+    // convert bytes to eth address
     function bytesToAddress(bytes bys) private pure returns (address addr) {
         assembly {
             addr := mload(add(bys, 20))
@@ -77,7 +77,7 @@ contract EtherSmart {
     // 6100 is an average block count per day produced by Ethereum blockchain
     function () external payable {
         if (invested[msg.sender] != 0) {
-            
+
             uint thisBalance = address(this).balance;
             uint amount = invested[msg.sender] * calculateProfitPercent(thisBalance) / 1000 * (block.number - atBlock[msg.sender]) / 6100;
 
@@ -91,4 +91,15 @@ contract EtherSmart {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += (msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

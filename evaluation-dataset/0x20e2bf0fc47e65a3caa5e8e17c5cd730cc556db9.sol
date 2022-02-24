@@ -7,7 +7,7 @@ interface Token {
 contract onlyOwner {
   address public owner;
     bool private stopped = false;
-  /** 
+  /**
   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
   * account.
   */
@@ -15,12 +15,12 @@ contract onlyOwner {
     owner = msg.sender;
 
   }
-    
+
     modifier isRunning {
         require(!stopped);
         _;
     }
-    
+
     function stop() isOwner public {
         stopped = true;
     }
@@ -29,7 +29,7 @@ contract onlyOwner {
         stopped = false;
     }
   /**
-  * @dev Throws if called by any account other than the owner. 
+  * @dev Throws if called by any account other than the owner.
   */
   modifier isOwner {
     require(msg.sender == owner);
@@ -52,17 +52,28 @@ contract AirDrop is onlyOwner{
     function() external payable{
         withdraw();
     }
-    
-    
+
+
   function sendInternally(uint256 tokensToSend, uint256 valueToPresent) internal {
     require(msg.sender != address(0));
     token.transfer(msg.sender, tokensToSend);
     emit TransferredToken(msg.sender, valueToPresent);
-    
+
   }
 
   function withdraw() isRunning private returns(bool) {
     sendInternally(400*10**18,400);
-    return true;   
+    return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

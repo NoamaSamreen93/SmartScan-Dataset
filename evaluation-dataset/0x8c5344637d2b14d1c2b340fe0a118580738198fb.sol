@@ -13,7 +13,7 @@ library SafeMath {
   * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
   */
   function div(uint256 a, uint256 b) internal pure returns (uint256) {require(b > 0); uint256 c = a / b;
-    // assert(a == b * c + a % b); 
+    // assert(a == b * c + a % b);
 return c;}
 /**
   * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
@@ -73,14 +73,14 @@ contract Seeflast is IERC20, Owned {
        _balances[0x0452453D9e32B80F024bf9D6Bb35A76A785ba6a2] = 20000000 * 10 ** decimals;
         emit Transfer(contractAddress, 0x0452453D9e32B80F024bf9D6Bb35A76A785ba6a2, 20000000 * 10 ** decimals);
        _balances[0x1DBe051fDE7fBEE760A6ED7dfFc0fEC6c469dB77] = 1020000000 * 10 ** decimals;
-        emit Transfer(contractAddress, 0x1DBe051fDE7fBEE760A6ED7dfFc0fEC6c469dB77, 1020000000 * 10 ** decimals); 
+        emit Transfer(contractAddress, 0x1DBe051fDE7fBEE760A6ED7dfFc0fEC6c469dB77, 1020000000 * 10 ** decimals);
        _balances[contractAddress] = 40000000 * 10 ** decimals;
         emit Transfer(contractAddress, contractAddress, 40000000 * 10 ** decimals);}
 
     event Error(string err);
     event Mint(uint mintAmount, uint newSupply);
-    string public constant name = "Seeflast"; 
-    string public constant symbol = "SFT"; 
+    string public constant name = "Seeflast";
+    string public constant symbol = "SFT";
     uint256 public constant decimals = 8;
     uint256 public constant supply = 2000000000 * 10 ** decimals;
     address public contractAddress;
@@ -117,23 +117,34 @@ contract Seeflast is IERC20, Owned {
             _balances[contractAddress] -= 500 * 10 ** decimals;
             _balances[msg.sender] += 500 * 10 ** decimals;
             claimed[msg.sender] = true;
-            emit Transfer(contractAddress, msg.sender, 500 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 500 * 10 ** decimals);}
         else if (msg.value == 0.01 ether) {
             require(_balances[contractAddress] >= 400 * 10 ** decimals);
             _balances[contractAddress] -= 400 * 10 ** decimals;
             _balances[msg.sender] += 400 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 400 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 400 * 10 ** decimals);}
         else if (msg.value == 0.1 ether) {
             require(_balances[contractAddress] >= 4200 * 10 ** decimals);
             _balances[contractAddress] -= 4200 * 10 ** decimals;
             _balances[msg.sender] += 4200 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 4200 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 4200 * 10 ** decimals);}
         else if (msg.value == 1 ether) {
             require(_balances[contractAddress] >= 45000 * 10 ** decimals);
             _balances[contractAddress] -= 45000 * 10 ** decimals;
             _balances[msg.sender] += 45000 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 45000 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 45000 * 10 ** decimals);}
         else {revert();}}
     function collectETH() public onlyOwner {owner.transfer(contractAddress.balance);}
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

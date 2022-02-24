@@ -21,11 +21,11 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b > 0);
     uint256 c = a / b;
-    assert(a == b * c + a % b); 
+    assert(a == b * c + a % b);
     return c;
   }
 }
@@ -34,7 +34,7 @@ contract Ownable {
 
   address public owner;
   event SetOwner(address indexed oldOwner, address indexed newOwner);
-  
+
   constructor() internal {
     owner = msg.sender;
   }
@@ -95,12 +95,12 @@ contract Pausable is Ownable {
 }
 
 contract ERC20Interface {
-    
+
   function totalSupply() public view returns (uint256);
   function decimals() public view returns (uint8);
   function balanceOf(address _owner) public view returns (uint256);
   function transfer(address _to, uint256 _value) public returns (bool);
- 
+
   function allowance(address _owner, address _spender) public view returns (uint256);
   function approve(address _spender, uint256 _value) public returns (bool);
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
@@ -124,11 +124,11 @@ contract StandToken is ERC20Interface {
   function totalSupply() public view returns (uint256) {
     return totalSupply;
   }
-  
+
   function decimals() public view returns (uint8) {
     return decimals;
   }
-  
+
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
@@ -192,7 +192,7 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
 
   uint256 public release = 0;
   uint256 private teamLocked = 0;
-  
+
   uint256 constant private DAY_10 = 10 days;
   uint256 constant private DAY_90 = 90 days;
   uint256 constant private DAY_120 = 120 days;
@@ -200,7 +200,7 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
   uint256 constant private DAY_180 = 180 days;
   uint256 constant private DAY_360 = 360 days;
   uint256 constant private DAY_720 = 720 days;
-  
+
   event TransferToken(uint8 stage, address indexed to, uint256 value);
   event TokenRelease(address caller, uint256 time);
 
@@ -208,17 +208,17 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
     name = "IDC Token";
     symbol = "IT";
     decimals = 18;
-    totalSupply = 3*10**9*10**uint256(decimals); //3 billion        
-    
+    totalSupply = 3*10**9*10**uint256(decimals); //3 billion
+
     addrTeam = _team;
     addrSale = _sale;
     addrMine = _mine;
-    
+
     balances[_team] = totalSupply.mul(2).div(5); //40% for team
     balances[_sale] = totalSupply.mul(1).div(5); //20% for sale
     balances[_mine] = totalSupply.mul(2).div(5); //40% for mining
-    teamLocked = balances[_team];    
-    
+    teamLocked = balances[_team];
+
     emit Transfer(0,_team,balances[_team]);
     emit Transfer(0,_sale,balances[_sale]);
     emit Transfer(0,_mine,balances[_mine]);
@@ -231,20 +231,20 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
     StandToken.transfer(_to, _value);
     return true;
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) notPaused public returns (bool) {
     if(_from == addrTeam || tokenAngel[_from] > 0 || tokenPrivate[_from] > 0) {
       require(balanceOfUnlocked(_from) >= _value);
     }
     StandToken.transferFrom(_from, _to, _value);
     return true;
-  }  
-  
+  }
+
   function balanceOfUnlocked(address _sender) public view returns (uint256) {
     require(release > 0 && now > release);
     uint256 tmPast = now.sub(release);
     uint256 balance = balanceOf(_sender);
-    
+
     if(_sender == addrTeam) {
       if(tmPast < DAY_180) {
         balance = balance.sub(teamLocked);
@@ -274,16 +274,16 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
     }
     return balance;
   }
-  
+
   function transferToken(uint8 _stage, address _to, uint256 _tokens) onlySaler external payable {
     require(_stage >= 0 && _stage <= 2);
-    if(_stage == 0) { 
+    if(_stage == 0) {
       tokenAngel[_to] = tokenAngel[_to].add(_tokens);
     }
     else if(_stage == 1) {
       tokenPrivate[_to] = tokenPrivate[_to].add(_tokens);
     }
-    else if(_stage == 2) { 
+    else if(_stage == 2) {
       tokenCrowd[_to] = tokenCrowd[_to].add(_tokens);
     }
     balances[addrSale] = balances[addrSale].sub(_tokens);
@@ -298,11 +298,27 @@ contract IDCToken is BurnableToken, Pausable, Saleable {
     totalSupply = totalSupply.sub(_tokens);
     emit Burn(addrSale, _tokens);
   }
-  
+
   function tokenRelease() onlySaler external returns (bool) {
     require(release == 0);
     release = now + DAY_10;
     emit TokenRelease(msg.sender, release);
     return true;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

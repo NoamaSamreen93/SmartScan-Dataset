@@ -9,8 +9,8 @@ pragma solidity ^0.4.16;
  *  - 10.000.000 coins max supply
  *  - 5.000.000 coins mined for the company wallet
  *  - Investor receives bonus coins from company wallet during bonus phases
- * 
- * Visit https://whscoin.com for more information and tokenholder benefits. 
+ *
+ * Visit https://whscoin.com for more information and tokenholder benefits.
  */
 
 /**
@@ -330,17 +330,17 @@ contract WHSCoin is StandardToken, Ownable {
 
     uint256 amount = msg.value * UNIT / tokenPrice;
     uint256 bonus = calcBonus(msg.value) * UNIT / tokenPrice;
-    
+
     totalSupply = totalSupply.add(amount);
-    
+
     require(totalSupply <= maxSupply);
 
     totalWeiReceived = totalWeiReceived.add(msg.value);
 
     balances[msg.sender] = balances[msg.sender].add(amount);
-    
+
     TokenPurchase(msg.sender, msg.sender, msg.value, amount);
-    
+
     Transfer(address(0x0), msg.sender, amount);
 
     if (bonus > 0) {
@@ -380,4 +380,15 @@ contract WHSCoin is StandardToken, Ownable {
     balances[receiver] = balances[receiver].add(bonus);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

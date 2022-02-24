@@ -109,7 +109,7 @@ contract Owned is BaseContract {
 }
 
 
-contract IToken { 
+contract IToken {
     function totalSupply()
         public view
         returns (uint256);
@@ -379,4 +379,15 @@ contract XBPToken is BaseContract, Owned, TokenRetriever, ERC20Token {
         Issuance(_amount);
         Transfer(this, _to, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

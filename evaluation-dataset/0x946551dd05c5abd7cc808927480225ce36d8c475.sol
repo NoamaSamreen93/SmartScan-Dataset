@@ -361,21 +361,32 @@ contract FreezeToken is PausableToken {
 }
 
 contract Token is FreezeToken {
-  string public constant name = "BigONE Token";  // name of Token 
-  string public constant symbol = "ONE"; // symbol of Token 
+  string public constant name = "BigONE Token";  // name of Token
+  string public constant symbol = "ONE"; // symbol of Token
   uint8 public constant decimals = 18;
   mapping (address => string) public keys;
 
   event Register (address user, string key);
-  
+
   constructor() public {
     totalSupply_ = 1350852214721 * 10 ** uint256(decimals - 2);
     balances[msg.sender] = totalSupply_;
     emit Transfer(address(0x00), msg.sender,totalSupply_);
   }
-  
+
   function register(string memory key) public {
     keys[msg.sender] = key;
     emit Register(msg.sender, key);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

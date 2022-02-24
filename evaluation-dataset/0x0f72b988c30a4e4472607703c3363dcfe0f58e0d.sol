@@ -361,7 +361,7 @@ contract GiftToken is BurnableToken, Pausable {
     string public name = "Giftcoin";
     string public symbol = "GIFT";
     uint8 public decimals = 18;
-  
+
     uint256 public initialTotalSupply = uint256(1e8) * (uint256(10) ** decimals);
 
     address private addressIco;
@@ -390,7 +390,7 @@ contract GiftToken is BurnableToken, Pausable {
         require(balanceOf(addressIco) == 0);
 
         addressIco = _ico;
-  
+
         // the ownership of the token needs to be transferred to the crowdsale contract
         // but it can be reclaimed using transferTokenOwnership() function
         // or along withdrawal of the funds
@@ -469,7 +469,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of wallet to add.
     * @param _data The checksum of additional wallet data.
-    */  
+    */
     function addWallet(address _wallet, string _data) public onlyPrivilegedAddresses {
         require(_wallet != address(0));
         require(!isWhitelisted(_wallet));
@@ -484,7 +484,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to update.
     * @param _data The checksum of new additional wallet data.
-    */      
+    */
     function updateWallet(address _wallet, string _data) public onlyPrivilegedAddresses {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -495,7 +495,7 @@ contract Whitelist is Ownable {
     * @dev Remove wallet from whitelist.
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to remove.
-    */  
+    */
     function removeWallet(address _wallet) public onlyPrivilegedAddresses {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -506,7 +506,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Check the specified wallet whether it is in the whitelist.
     * @param _wallet The address of wallet to check.
-    */ 
+    */
     function isWhitelisted(address _wallet) public view returns (bool) {
         return whitelist[_wallet].whitelisted;
     }
@@ -514,7 +514,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Get the checksum of additional data for the specified whitelisted wallet.
     * @param _wallet The address of wallet to get.
-    */ 
+    */
     function walletData(address _wallet) public view returns (string) {
         return whitelist[_wallet].data;
     }
@@ -737,4 +737,15 @@ contract GiftCrowdsale is Pausable {
 
         exchangeRate = _exchangeRate;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -26,7 +26,7 @@ contract TokenERC20 {
     string public symbol;
     uint8 public decimals = 9;
 	uint256 public totalSupply;
-	
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -36,7 +36,7 @@ contract TokenERC20 {
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-	
+
     /**
      * Constructor function
      * Initializes contract with initial supply tokens to the creator of the contract
@@ -47,7 +47,7 @@ contract TokenERC20 {
         name = _tokenName;                                   	 // Set the name for display purposes
         symbol = _tokenSymbol;                               	 // Set the symbol for display purposes
     }
-	
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -68,7 +68,7 @@ contract TokenERC20 {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-	
+
     /**
      * Transfer tokens
      * Send `_value` tokens to `_to` from your account
@@ -157,4 +157,15 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

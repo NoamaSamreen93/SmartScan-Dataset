@@ -269,7 +269,7 @@ contract TokensPurchased is ReentrancyGuard,Ownable  {
         public
     {
         _owner = msg.sender;
-        token = IERC20(_token); 
+        token = IERC20(_token);
     }
 
     //contract에 eth가 전송되면 실행된다.
@@ -282,7 +282,7 @@ contract TokensPurchased is ReentrancyGuard,Ownable  {
         validateCheck(_to, _amount*10000);
 
         //비율에 해당하여 token 전달 1eth = 10000 pla
-        token.safeTransfer(_to, _amount*10000); 
+        token.safeTransfer(_to, _amount*10000);
 
         //owner에게 eth 전송
         _owner.transfer(address(this).balance);
@@ -293,7 +293,7 @@ contract TokensPurchased is ReentrancyGuard,Ownable  {
     function airDrop(address _to, uint256 _amount) public nonReentrant onlyOwner { //whenNotPaused
         validateCheck(_to, _amount);
 
-        token.safeTransfer(_to, _amount); 
+        token.safeTransfer(_to, _amount);
         emit EventAirdrop(_to, _amount);
     }
 
@@ -310,4 +310,13 @@ contract TokensPurchased is ReentrancyGuard,Ownable  {
     //     address _contract = this;
     //     return _contract.balance;
     // }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

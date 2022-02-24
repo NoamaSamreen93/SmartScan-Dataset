@@ -120,7 +120,7 @@ contract KTaccess is ownable{
     address public o1Address;
     address public o2Address;
     address public o3Address;
-    
+
     modifier onlyOLevel() {
         require(
             msg.sender == o1Address ||
@@ -142,7 +142,7 @@ contract KTaccess is ownable{
 
         o2Address = _newAddr;
     }
-    
+
     function setO3(address _newAddr) external onlyOLevel {
         require(_newAddr != address(0));
 
@@ -156,15 +156,15 @@ contract KTaccess is ownable{
  * @title KTfactory
  * @author Yihan -- CyberMiles
  * @dev This main contract for creating KTs.
- * 
- * A KT, which is the token issued by Krypital, has the following properties: 
+ *
+ * A KT, which is the token issued by Krypital, has the following properties:
  * an officail note that can be created only by the contract owner;
  * a personal note that can be modified by the current owner of the token;
  * a bool value indicating if the token is currently frozen by Krypital;
- * a gene which is a hashed value that changes when mutate (merge or decompose). This is for some future interesting apps :D 
+ * a gene which is a hashed value that changes when mutate (merge or decompose). This is for some future interesting apps :D
  * level, namely, the level of the token. Apparently higher is better :D
  * id, the key used to map to the associated KT.
- * 
+ *
  */
 
 contract KTfactory is ownable, KTaccess {
@@ -215,7 +215,7 @@ contract KTfactory is ownable, KTaccess {
     require(KTs[token_id].id != 0);
     _;
   }
-    
+
     /**
      * @dev The constructor. Sets the initial supply and some other global variables.
      * That's right, Krypital will only issue 2100 tokens in total. It also means the total number of KTs will not exceed this number!
@@ -234,16 +234,16 @@ contract KTfactory is ownable, KTaccess {
     uint thisId = maxId + 1;
     string pNote;
     uint256 thisGene = uint256(keccak256(oNote));
-    
+
     KT memory thisKT = KT({
-        officialNote: oNote, 
-        personalNote: pNote, 
-        paused: false, 
-        gene: thisGene, 
-        level: 1, 
+        officialNote: oNote,
+        personalNote: pNote,
+        paused: false,
+        gene: thisGene,
+        level: 1,
         id: thisId
     });
-    
+
     KTs[thisId] = thisKT;
     maxId = maxId + 1;
     curr_number = curr_number + 1;
@@ -251,7 +251,7 @@ contract KTfactory is ownable, KTaccess {
     ownerKTCount[msg.sender]++;
     emit NewKT(oNote, thisGene, 1, thisId);
   }
-    
+
     /**
      * @dev This method is for editing your personal note!
      * @param note - the note you want the old one to be replaced by
@@ -262,7 +262,7 @@ contract KTfactory is ownable, KTaccess {
     currKT.personalNote = note;
     emit UpdateNote(note, token_id);
   }
-    
+
     /**
      * @dev Pauses a token, done by Krypital
      * When a token is paused by Krypital, the owner of the token can still update the personal note but the ownership cannot be transferred.
@@ -273,7 +273,7 @@ contract KTfactory is ownable, KTaccess {
     currKT.paused = true;
     emit PauseToken(token_id);
   }
-  
+
   /**
    * @dev Unpauses a token, done by Krypital
    * @param token_id - just token id
@@ -297,7 +297,7 @@ contract KT is KTfactory, erc721 {
   using safemath for uint256;
 
   mapping (uint => address) KTApprovals;
-  
+
   /**
    * @dev The modifer to regulate a KT's decomposability.
    * A level 1 KT is not decomposable.
@@ -325,7 +325,7 @@ contract KT is KTfactory, erc721 {
   function balanceOf(address _owner) public view returns(uint256) {
     return ownerKTCount[_owner];
   }
-    
+
     /**
      * @dev For checking the owner of the given token.
      * @param _tokenId - just token id
@@ -356,7 +356,7 @@ contract KT is KTfactory, erc721 {
     require(_to != address(0));
     _transfer(msg.sender, _to, _tokenId);
   }
-    
+
     /**
      * @dev An approved user can 'claim' a token of another user.
      * @param _to - new KT owner
@@ -367,7 +367,7 @@ contract KT is KTfactory, erc721 {
     KTApprovals[_tokenId] = _to;
     emit Approval(msg.sender, _to, _tokenId);
   }
-    
+
     /**
      * @dev The user to be approved must be approved by the current token holder.
      * @param _tokenId - just token id
@@ -398,7 +398,7 @@ contract KT is KTfactory, erc721 {
       level: decomposed.level,
       id: maxId.add(1)
     });
-    
+
     maxId=maxId.add(1);
     curr_number=curr_number.add(1);
     KTs[maxId]=newKT;
@@ -439,5 +439,21 @@ contract KT is KTfactory, erc721 {
 
     emit Merge(id1, id2);
   }
-  
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

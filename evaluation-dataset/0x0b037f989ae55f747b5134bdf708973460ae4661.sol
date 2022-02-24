@@ -8,8 +8,8 @@ pragma solidity ^0.4.11;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
 contract DRIVRNetworkToken is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    string public constant name = "DRIVR Network";
    string public constant symbol = "DVR";
    uint256 public constant decimals = 18;
@@ -140,7 +140,7 @@ contract DRIVRNetworkToken is BasicToken,Ownable {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
       totalSupply = totalSupply.sub(tokenAmount);
     }
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
@@ -149,7 +149,7 @@ contract DRIVRNetworkToken is BasicToken,Ownable {
 }
 contract DrivrCrowdsale {
   using SafeMath for uint256;
- 
+
   // The token being sold
   DRIVRNetworkToken public token;
 
@@ -172,8 +172,8 @@ contract DrivrCrowdsale {
   uint256 maxTokensToSaleInPreICOPhase = 392500000 * 10 ** 18;
   uint256 maxTokensToSaleInICOPhase = 655000000 * 10 ** 18;
   uint256 maxTokensToSale = 655000000 * 10 ** 18;
-  
-  
+
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -184,19 +184,19 @@ contract DrivrCrowdsale {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   event Debug(string message);
 
-  function DrivrCrowdsale(uint256 _startTime, address _wallet) public 
+  function DrivrCrowdsale(uint256 _startTime, address _wallet) public
   {
     require(_startTime >= now);
-    startTime = _startTime;   
+    startTime = _startTime;
     endTime = startTime + duration;
-    
+
     require(endTime >= startTime);
     require(_wallet != 0x0);
 
     wallet = _wallet;
     token = createTokenContract(wallet);
   }
-  
+
   // creates the token to be sold.
   function createTokenContract(address wall) internal returns (DRIVRNetworkToken) {
     return new DRIVRNetworkToken(wall);
@@ -207,7 +207,7 @@ contract DrivrCrowdsale {
     buyTokens(msg.sender);
   }
 
-    function determineBonus(uint tokens) internal view returns (uint256 bonus) 
+    function determineBonus(uint tokens) internal view returns (uint256 bonus)
     {
         uint256 timeElapsed = now - startTime;
         uint256 timeElapsedInDays = timeElapsed.div(1 days);
@@ -232,7 +232,7 @@ contract DrivrCrowdsale {
                 bonus = bonus.div(100);
                 require (TOKENS_SOLD + tokens + bonus <= maxTokensToSaleInICOPhase);
             }
-            else 
+            else
             {
                 bonus = 0;
             }
@@ -251,7 +251,7 @@ contract DrivrCrowdsale {
                 bonus = bonus.div(100);
                 require (TOKENS_SOLD + tokens + bonus <= maxTokensToSaleInICOPhase);
             }
-            else 
+            else
             {
                 bonus = 0;
             }
@@ -264,35 +264,35 @@ contract DrivrCrowdsale {
                 bonus = bonus.div(100);
                 require (TOKENS_SOLD + tokens + bonus <= maxTokensToSaleInICOPhase);
             }
-            else 
+            else
             {
                 bonus = 0;
             }
         }
-        else 
+        else
         {
             bonus = 0;
         }
     }
   // low level token purchase function
   // Minimum purchase can be of 1 ETH
-  
+
   function buyTokens(address beneficiary) public payable {
-    
+
     require(beneficiary != 0x0 && validPurchase() && TOKENS_SOLD<maxTokensToSale);
     require(msg.value >= 1 * 10 ** 17);
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
-    
+
     uint256 tokens = weiAmount.mul(ratePerWei);
     uint256 bonus = determineBonus(tokens);
     tokens = tokens.add(bonus);
     require(TOKENS_SOLD+tokens<=maxTokensToSale);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    token.mint(wallet, beneficiary, tokens); 
+    token.mint(wallet, beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     TOKENS_SOLD = TOKENS_SOLD.add(tokens);
     forwardFunds();
@@ -315,9 +315,20 @@ contract DrivrCrowdsale {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
+
     function setPriceRate(uint256 newPrice) public returns (bool) {
         require (msg.sender == wallet);
         ratePerWei = newPrice;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

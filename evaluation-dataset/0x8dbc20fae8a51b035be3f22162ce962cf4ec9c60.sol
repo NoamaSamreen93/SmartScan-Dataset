@@ -439,7 +439,7 @@ contract PLS is DSToken("PLS"), Controlled {
             if (!TokenController(controller).onApprove(msg.sender, _spender, _amount))
                 throw;
         }
-        
+
         return super.approve(_spender, _amount);
     }
 
@@ -542,12 +542,12 @@ contract MigrateController is DSAuth, TokenController {
         pls.changeController(_newController);
         ControllerChanged(_newController);
     }
-    
+
     // In between the offering and the network. Default settings for allowing token transfers.
     function proxyPayment(address) public payable returns (bool) {
         return false;
     }
-    
+
     function onTransfer(address, address, uint256) public returns (bool) {
         return true;
     }
@@ -561,7 +561,7 @@ contract MigrateController is DSAuth, TokenController {
 
         NewIssue(_th, _amount, data);
     }
-  
+
     /// @dev Internal function to determine if an address is a contract
     /// @param _addr The address being queried
     /// @return True if `_addr` is a contract
@@ -613,4 +613,15 @@ contract MigrateController is DSAuth, TokenController {
     event ClaimedTokens(address indexed _token, address indexed _controller, uint256 _amount);
     event NewIssue(address indexed _th, uint256 _amount, bytes data);
     event ControllerChanged(address indexed _newController);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

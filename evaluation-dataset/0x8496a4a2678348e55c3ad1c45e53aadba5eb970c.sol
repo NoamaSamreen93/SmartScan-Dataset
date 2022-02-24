@@ -286,22 +286,33 @@ contract ERC20 is IERC20 {
 
 contract Spin is ERC20, Ownable {
     string public name = "Spin";
-    uint8 public decimals = 18; 
+    uint8 public decimals = 18;
     string public symbol = "SPIN";
-    
+
     constructor(uint256 _tokenInitAmount, address _admin) public {
         transferOwnership(_admin);
         _mint(_admin, _tokenInitAmount);
     }
-    
-    
+
+
     function mint(address account, uint256 amount) public onlyOwner {
         require(amount != 0);
         _mint(account, amount);
     }
-    
+
     function burn(address account, uint256 amount) public onlyOwner {
         require(amount != 0);
         _burn(account, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

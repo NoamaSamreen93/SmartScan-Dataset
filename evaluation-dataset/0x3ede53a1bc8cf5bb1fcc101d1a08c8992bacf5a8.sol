@@ -23,13 +23,13 @@ contract T1WinTokenConfig {
 
     uint constant internal  configEthSpent       = 1   ether;
 
-    
-    address[] configUserList; 
+
+    address[] configUserList;
 
     T1Wdatasets.TokenConfiguration[] public tokenListArray;
-    //token address -> token object map 
+    //token address -> token object map
     mapping (address => T1Wdatasets.TokenConfiguration) public tokenListMap;
-    //address -> add config user map  
+    //address -> add config user map
     mapping (address => T1Wdatasets.AddConfigurationUser) public configurationUserMap;
     mapping (address => uint256) public configurationUserCheck;
    address private adminAddress;
@@ -41,44 +41,44 @@ contract T1WinTokenConfig {
     modifier isWithinETHLimits(uint256 _eth) {
         // add a configuration need 1 ETH
         require(_eth == 1000000000000000000);
-        _;    
+        _;
     }
     //get token array lenght
-    function getTokenArrayLength() 
+    function getTokenArrayLength()
         public
         view
-        returns(uint) 
+        returns(uint)
     {
         return tokenListArray.length;
-    }    
+    }
     //get token from array
     function getToken(uint n)
-        public 
+        public
         view
         returns (address, string,uint8,bool ) {
         return (tokenListArray[n].tokenAddress, tokenListArray[n].tokenName,tokenListArray[n].tokenDecimals,tokenListArray[n].used);
-    }  
+    }
     function getTokenByAddress(address a)
-        public 
+        public
         view
         returns (address, string,uint8,bool ) {
         T1Wdatasets.TokenConfiguration token = tokenListMap[a];
         return (token.tokenAddress, token.tokenName,token.tokenDecimals,token.used);
-    } 
+    }
     function getTokenNameByAddress(address a)
-        public 
+        public
         view
         returns (string ) {
              T1Wdatasets.TokenConfiguration token = tokenListMap[a];
              return(token.tokenName);
         }
       function getTokenDecimalsByAddress(address a)
-        public 
+        public
         view
         returns (uint8 ) {
              T1Wdatasets.TokenConfiguration token = tokenListMap[a];
              return(token.tokenDecimals);
-        }   
+        }
      //add new token by admin
     function addNewTokenByAdmin(address _tokenAddress, string _tokenName,uint8 decimal)
             onlyAuthorizedAdmin()
@@ -90,14 +90,14 @@ contract T1WinTokenConfig {
              tokenListArray.push(tokenListMap[_tokenAddress]);
              emit addToken(_tokenAddress, _tokenName);
         }
-     //remove token by admin    
+     //remove token by admin
     function removeNewTokenByAdmin(address _tokenAddress)
             onlyAuthorizedAdmin()
             public
         {
             //remove from map
             delete tokenListMap[_tokenAddress];
-            //remove from array 
+            //remove from array
             for (uint i = 0; i < tokenListArray.length; i++) {
                 if (tokenListArray[i].tokenAddress == _tokenAddress) {
                     tokenListArray[i] = tokenListArray[tokenListArray.length - 1];
@@ -105,7 +105,7 @@ contract T1WinTokenConfig {
                     break;
                 }
             }
-          
+
         }
     function addNewToken(address _tokenAddress, bytes32 _tokenName)
             isWithinETHLimits(msg.value)
@@ -114,22 +114,22 @@ contract T1WinTokenConfig {
         {
           uint256 checkUserStatu = configurationUserCheck[msg.sender];
             //1 . chcke if the address already existin the config address array
-            
+
             if(checkUserStatu == 0){
                 //this is new user, change the user statu to 1.
                 configurationUserCheck[msg.sender]=1;
                 // inital a  new configuration user
-                T1Wdatasets.AddConfigurationUser memory configurationUser ; 
+                T1Wdatasets.AddConfigurationUser memory configurationUser ;
                 configurationUser.addr = msg.sender;
                 configurationUser.ethTotalAmount += msg.value;
                 configurationUserMap[msg.sender] = configurationUser;
                 emit addConfigUser(msg.sender , msg.value);
-               
+
             }
-    
+
             //2. add new Token
-            
-              
+
+
         }
 
 }
@@ -148,14 +148,14 @@ library T1Wdatasets {
 
     struct TokenConfiguration{
         address tokenAddress; //round play token address
-        string tokenName;  //round play token name 
+        string tokenName;  //round play token name
         uint8 tokenDecimals; //Token decimals
         bool used;
-      
+
     }
-    
-    
-    
+
+
+
     /*
      * What address can work with this configuration
      */
@@ -164,6 +164,19 @@ library T1Wdatasets {
         uint256 ethTotalAmount; //eth total amount
         bool used;
     }
-  
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -409,7 +409,7 @@ contract RESTOToken is ERC20Pausable {
 
 
     constructor(address _CrowdsaleAddress) public {
-    
+
         CrowdsaleAddress = _CrowdsaleAddress;
         _mint(_CrowdsaleAddress, INITIAL_SUPPLY);
     }
@@ -425,20 +425,20 @@ contract RESTOToken is ERC20Pausable {
         require(msg.sender == CrowdsaleAddress,"Only CrowdSale contract can run this");
         _;
     }
-    
+
     modifier validDestination( address to ) {
         require(to != address(0x0),"Empty address");
         require(to != address(this),"RESTO Token address");
         _;
     }
-    
+
     modifier isICOover {
         if (msg.sender != CrowdsaleAddress){
             require(now > crowdSaleEndTime,"Transfer of tokens is prohibited until the end of the ICO");
         }
         _;
     }
-    
+
     /**
      * @dev Override for testing address destination
      */
@@ -449,13 +449,13 @@ contract RESTOToken is ERC20Pausable {
     /**
      * @dev Override for testing address destination
      */
-    function transferFrom(address _from, address _to, uint256 _value) 
-    public validDestination(_to) kyc_passed(msg.sender) isICOover returns (bool) 
+    function transferFrom(address _from, address _to, uint256 _value)
+    public validDestination(_to) kyc_passed(msg.sender) isICOover returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
 
-    
+
     /**
      * @dev function set kyc bool to true
      * can run only from crowdsale contract
@@ -476,12 +476,12 @@ contract RESTOToken is ERC20Pausable {
         require (value >= 1,"Min value is 1");
         value = value.mul(1 ether);
         require (balances_[_from] >= value,"Decrease value");
-        
+
         balances_[_from] = balances_[_from].sub(value);
         balances_[_to] = balances_[_to].add(value);
-        
+
         emit Transfer(_from, _to, value);
-        
+
         return true;
     }
 
@@ -505,7 +505,7 @@ contract RESTOToken is ERC20Pausable {
 
     function() external payable {
         revert("The token contract don`t receive ether");
-    }  
+    }
 }
 
 
@@ -558,42 +558,42 @@ contract Ownable {
 contract TeamAddress1 {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
 contract TeamAddress2 {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
 contract MarketingAddress {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
 contract RetailersAddress {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
 contract ReserveAddress {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
 contract BountyAddress {
     function() external payable {
         revert("The contract don`t receive ether");
-    } 
+    }
 }
 
 
@@ -618,7 +618,7 @@ contract Crowdsale is Ownable {
     RetailersAddress public retailersAddress = new RetailersAddress();
     ReserveAddress public reserveAddress = new ReserveAddress();
     BountyAddress public bountyAddress = new BountyAddress();
-      
+
     // How many token units a buyer gets per wei.
     uint256 public rate;
 
@@ -626,8 +626,8 @@ contract Crowdsale is Ownable {
     uint256 public weiRaised;
 
     event Withdraw(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 amount
     );
 
@@ -686,7 +686,7 @@ contract Crowdsale is Ownable {
         weiRaised = weiRaised.add(weiAmount);
 
         _processPurchase(_beneficiary, tokens);
-        
+
         emit TokensPurchased(
             msg.sender,
             _beneficiary,
@@ -728,9 +728,9 @@ contract Crowdsale is Ownable {
      * @param _value is entered in whole tokens (1 = 1 token)
      */
     function transferTokensFromTeamAddress1(address _investor, uint256 _value) public restricted returns(bool){
-        token.transferTokensFromSpecialAddress(address(teamAddress1), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(teamAddress1), _investor, _value);
         return true;
-    } 
+    }
 
     /**
      * @dev the function tranfer tokens from TeamAddress1 to investor
@@ -739,48 +739,48 @@ contract Crowdsale is Ownable {
      */
     function transferTokensFromTeamAddress2(address _investor, uint256 _value) public restricted returns(bool){
         require (now >= (crowdSaleEndTime + 365 days), "Only after 1 year");
-        token.transferTokensFromSpecialAddress(address(teamAddress2), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(teamAddress2), _investor, _value);
         return true;
-    } 
-    
+    }
+
     /**
      * @dev the function tranfer tokens from MarketingAddress to investor
      * @param _value is entered in whole tokens (1 = 1 token)
      */
     function transferTokensFromMarketingAddress(address _investor, uint256 _value) public restricted returns(bool){
-        token.transferTokensFromSpecialAddress(address(marketingAddress), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(marketingAddress), _investor, _value);
         return true;
-    } 
-    
+    }
+
     /**
      * @dev the function tranfer tokens from RetailersAddress to investor
      * @param _value is entered in whole tokens (1 = 1 token)
      */
     function transferTokensFromRetailersAddress(address _investor, uint256 _value) public restricted returns(bool){
-        token.transferTokensFromSpecialAddress(address(retailersAddress), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(retailersAddress), _investor, _value);
         return true;
-    } 
+    }
 
     /**
      * @dev the function tranfer tokens from ReserveAddress to investor
      * @param _value is entered in whole tokens (1 = 1 token)
      */
     function transferTokensFromReserveAddress(address _investor, uint256 _value) public restricted returns(bool){
-        token.transferTokensFromSpecialAddress(address(reserveAddress), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(reserveAddress), _investor, _value);
         return true;
-    } 
+    }
 
     /**
      * @dev the function tranfer tokens from BountyAddress to investor
      * @param _value is entered in whole tokens (1 = 1 token)
      */
     function transferTokensFromBountyAddress(address _investor, uint256 _value) public restricted returns(bool){
-        token.transferTokensFromSpecialAddress(address(bountyAddress), _investor, _value); 
+        token.transferTokensFromSpecialAddress(address(bountyAddress), _investor, _value);
         return true;
-    } 
-    
+    }
+
     /**
-    * @dev Validation of an incoming purchase. 
+    * @dev Validation of an incoming purchase.
     * @param _beneficiary Address performing the token purchase
     * @param _weiAmount Value in wei involved in the purchase
     * Start Crowdsale 20/09/2018       - 1537401600
@@ -807,11 +807,11 @@ contract Crowdsale is Ownable {
     /**
      * @dev Function transfer token to new investors
      * Access restricted owner and manager
-     */ 
+     */
     function transferTokens(address _newInvestor, uint256 _tokenAmount) public restricted {
         uint256 value = _tokenAmount;
         require (value >= 1,"Min _tokenAmount is 1");
-        value = value.mul(1 ether);        
+        value = value.mul(1 ether);
         _deliverTokens(_newInvestor, value);
     }
 
@@ -835,8 +835,8 @@ contract Crowdsale is Ownable {
         uint256 resultAmount = _weiAmount;
         /**
         * Start PreSale      20/09/2018      - 1537401600
-        * Start ICO          10/10/2018      - 1539129600 
-        * Finish ICO         14/12/2018      - 1544745600    
+        * Start ICO          10/10/2018      - 1539129600
+        * Finish ICO         14/12/2018      - 1544745600
         */
         if (now < 1539129600) {
             // Calculating bonus for PreSale period
@@ -851,7 +851,7 @@ contract Crowdsale is Ownable {
                 bonus = 200;
             } else {
                 /**
-                * ICO bonus                        UnisTimeStamp 
+                * ICO bonus                        UnisTimeStamp
                 *                                  Start date      End date
                 * 10.10.2018-16.10.2018 - 40%      1539129600
                 * 17.10.2018-23.10.2018 - 30%      1539734400
@@ -903,7 +903,7 @@ contract Crowdsale is Ownable {
         wallet7.transfer(transferValue);
         wallet8.transfer(myAddress.balance);
     }
-    
+
     function withdrawFunds (address _to, uint256 _value) public onlyOwner {
         require (now > crowdSaleEndTime, "CrowdSale is not finished yet. Access denied.");
         require (myAddress.balance >= _value,"Value is more than balance");
@@ -912,4 +912,15 @@ contract Crowdsale is Ownable {
         emit Withdraw(msg.sender, _to, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

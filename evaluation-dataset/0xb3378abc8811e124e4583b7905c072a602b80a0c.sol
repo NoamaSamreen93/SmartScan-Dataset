@@ -56,7 +56,7 @@ contract ERC20 is IERC20 {
     string public  name;
     uint8 public decimals;
     uint _totalSupply;
-    
+
     constructor() public {
         symbol = "BPK";
         name = "Bitpacket Token";
@@ -230,4 +230,13 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowances[account][msg.sender].sub(value));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

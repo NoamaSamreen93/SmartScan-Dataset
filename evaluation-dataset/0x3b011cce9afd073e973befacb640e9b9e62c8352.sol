@@ -63,52 +63,52 @@ contract Filler is ERC20 {
     uint256 public _totalSupply = 2000000000 * (10 ** decimals);
     address public beneficiary = 0x9AaA7CAf1961E14F08ca2266190C5fF6Ab485Ae4;
 
-    mapping (address => uint256) public funds; 
+    mapping (address => uint256) public funds;
     mapping(address => mapping(address => uint256)) allowed;
 
     constructor() public {
-        funds[beneficiary] = _totalSupply; 
+        funds[beneficiary] = _totalSupply;
     }
-     
+
     function totalSupply() public constant returns (uint256 totalsupply) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
-        return funds[_owner];  
+        return funds[_owner];
     }
-        
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
-   
+
     require(funds[msg.sender] >= _value && funds[_to].add(_value) >= funds[_to]);
-    funds[msg.sender] = funds[msg.sender].sub(_value); 
-    funds[_to] = funds[_to].add(_value);       
-    emit Transfer(msg.sender, _to, _value); 
+    funds[msg.sender] = funds[msg.sender].sub(_value);
+    funds[_to] = funds[_to].add(_value);
+    emit Transfer(msg.sender, _to, _value);
     return true;
     }
-	
+
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        require (allowed[_from][msg.sender] >= _value);   
-        require (_to != 0x0);                            
-        require (funds[_from] >= _value);               
-        require (funds[_to].add(_value) > funds[_to]); 
-        funds[_from] = funds[_from].sub(_value);   
-        funds[_to] = funds[_to].add(_value);        
+        require (allowed[_from][msg.sender] >= _value);
+        require (_to != 0x0);
+        require (funds[_from] >= _value);
+        require (funds[_to].add(_value) > funds[_to]);
+        funds[_from] = funds[_from].sub(_value);
+        funds[_to] = funds[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        emit Transfer(_from, _to, _value);                 
-        return true;                                      
+        emit Transfer(_from, _to, _value);
+        return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
-         allowed[msg.sender][_spender] = _value;    
-         emit Approval (msg.sender, _spender, _value);   
-         return true;                               
+         allowed[msg.sender][_spender] = _value;
+         emit Approval (msg.sender, _spender, _value);
+         return true;
      }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
-      return allowed[_owner][_spender];   
-    } 
-    
+      return allowed[_owner][_spender];
+    }
+
     /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -145,7 +145,7 @@ contract Filler is ERC20 {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-    
+
 }
 
 contract Ownable is Filler {
@@ -182,4 +182,15 @@ contract Ownable is Filler {
 }
 
 contract Texochat is Ownable {
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -45,7 +45,7 @@ contract Claimable is Ownable {
     require(msg.sender == pendingOwner);
     _;
   }
-}  
+}
 
 /// @title Synpatreg smart conract for synpat service
 /// @author Telegram: @msmobile, IBerGroup
@@ -55,16 +55,16 @@ contract Claimable is Ownable {
 contract Synpatreg is Claimable {
     string public version = '1.1.0';
     mapping(bytes32 => bool) public permlinkSaved;
-    
+
     event SynpatRecord(string indexed permlinkSaved_permlink, bytes32 _hashSha);
-    
-    function() external { } 
- 
+
+    function() external { }
+
     ///@notice Make event record in Ethereumblockchain
     /// @dev Implied that _hashSha is hash of steemet post title+body
     /// @param _permlink  string, _permlink of steem post.
     /// @param _hashSha   - result of Keccak SHA256 function.
-    /// @return true if ok, false otherwise 
+    /// @return true if ok, false otherwise
     function writeSha3(string calldata _permlink, bytes32 _hashSha) external  returns (bool){
         bytes32 hash = calculateSha3(_permlink);
         require(!permlinkSaved[hash],"Permalink already exist!");
@@ -72,18 +72,29 @@ contract Synpatreg is Claimable {
         emit SynpatRecord(_permlink, _hashSha);
         return true;
     }
-    
+
     ///@notice Calculate hash
     /// @dev There is web3py analog exists: Web3.soliditySha3(['string'], ['_hashinput'])
     /// @param _hashinput   - string .
-    /// @return byte32, result of keccak256 (sha3 in old style) 
+    /// @return byte32, result of keccak256 (sha3 in old style)
     function calculateSha3(string memory _hashinput) public pure returns (bytes32){
-        return keccak256(bytes(_hashinput)); 
+        return keccak256(bytes(_hashinput));
     }
-   
-    
+
+
     ///@dev use in case of depricate this contract
     function kill() external onlyOwner {
         selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

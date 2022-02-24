@@ -1129,7 +1129,7 @@ contract JustPriceProtocol is SafeMath {
 
   /**
    * Logged when investor voted for new K1 address.
-   * 
+   *
    * @param investor investor who voted for new K1 address
    * @param newK1 new K1 address investor voted for
    * @param votes number of votes investor has
@@ -1138,7 +1138,7 @@ contract JustPriceProtocol is SafeMath {
 
   /**
    * Logged when investor revoked vote for new K1 address.
-   * 
+   *
    * @param investor investor who revoked vote for new K1 address
    * @param newK1 new K1 address investor revoked vote for
    * @param votes number of votes investor has
@@ -1152,4 +1152,15 @@ contract JustPriceProtocol is SafeMath {
    * @param fee new fee numerator
    */
   event FeeChange (uint256 fee);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

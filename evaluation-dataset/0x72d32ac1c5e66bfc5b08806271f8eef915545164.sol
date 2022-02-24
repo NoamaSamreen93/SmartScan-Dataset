@@ -97,7 +97,7 @@ contract KeeToken is ERC20, Ownable {
         // 0x148D3436a6A024d432bD5277EcF6B98407D46a2F,
         // 0x10Cc6a61b75363789d38ea8A101A51C36C507DEf,
         // 0x81154d24f4de069d1f0c16E3a52e1Ef68714daD9
-        
+
 
     mapping (address => bool) public tokenIncluded;
     mapping (address => uint256) public bitRegisters;
@@ -168,11 +168,11 @@ contract KeeToken is ERC20, Ownable {
         }
         temp.add = newToken;
         temp.decimals = decimalPlaces;
-        
+
         eligible.push(temp);
         tokenIncluded[newToken] = true;
     }
-    
+
     function updateToken(uint tokenPos, address newToken, uint8 decimalPlaces)  public onlyOwner {
         require(tokenPos < eligible.length);
         eligible[tokenPos].decimals = decimalPlaces;
@@ -205,9 +205,9 @@ contract KeeToken is ERC20, Ownable {
     }
 
     function icoNumberBalanceOf(address from, uint icoMaskPtr) public view returns (uint) {
-        if (icoMaskPtr == 0) 
+        if (icoMaskPtr == 0)
             return 0;
-        if (icoMaskPtr >= icoArray.length) 
+        if (icoMaskPtr >= icoArray.length)
             return 0;
         uint icoRegister = icoArray[icoMaskPtr];
         return internalBalanceOf(from,icoRegister);
@@ -228,13 +228,13 @@ contract KeeToken is ERC20, Ownable {
         }
         if (added > 0) {
             bitRegisters[from] = myRegister;
-        }      
+        }
         if ((myRegister & ~yourRegister) > 0) {
             sent = 1;
             bitRegisters[to] = yourRegister | myRegister;
         }
         Transfer(from,to,sent);
-        return true;        
+        return true;
     }
 
     function internalBalanceOf(address from, uint icoRegister) internal view returns (uint) {
@@ -249,7 +249,7 @@ contract KeeToken is ERC20, Ownable {
                 continue;
             }
             uint coins = coinBal(eligible[i], from);
-            if (coins > 100) 
+            if (coins > 100)
                 bal++;
         }
         return bal;
@@ -262,4 +262,20 @@ contract KeeToken is ERC20, Ownable {
         return bal / (10 ** uint(ico.decimals));
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

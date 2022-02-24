@@ -355,7 +355,7 @@ contract IEscrow is Withdrawable {
 
     //SIGNED status kept for backward compatibility
     enum PaymentStatus {NONE/*code=0*/, CREATED/*code=1*/, SIGNED/*code=2*/, CONFIRMED/*code=3*/, RELEASED/*code=4*/, RELEASED_BY_DISPUTE /*code=5*/, CLOSED/*code=6*/, CANCELED/*code=7*/}
-    
+
     /*----------------------EVENTS----------------------*/
 
     event PaymentCreated(bytes32 paymentId, address depositor, address beneficiary, address token, bytes32 deal, uint256 amount, uint8 fee);
@@ -433,7 +433,7 @@ contract IEscrow is Withdrawable {
       */
     function acceptOffer(address[3] addresses, bytes32 deal, uint256 amount) external;
 
-   
+
     /** @dev Depositor or beneficiary withdraw amounts.
       * @param addresses [depositor, beneficiary, token]
       */
@@ -493,7 +493,7 @@ contract PaymentHolder is Ownable {
 
     /*-----------------OWNER FLOW------------------*/
 
-    function allow(address to) 
+    function allow(address to)
     external onlyOwner { allowed[to] = true; }
 
     function prohibit(address to)
@@ -563,7 +563,7 @@ library EscrowConfigLib {
 }
 contract ICourt is Ownable {
 
-    function getCaseId(address applicant, address respondent, bytes32 deal, uint256 date, bytes32 title, uint256 amount) 
+    function getCaseId(address applicant, address respondent, bytes32 deal, uint256 date, bytes32 title, uint256 amount)
         public pure returns(bytes32);
 
     function getCaseStatus(bytes32 caseId) public view returns(uint8);
@@ -826,7 +826,7 @@ contract Escrow is IEscrow {
             setPaymentStatus(paymentId, PaymentStatus.RELEASED_BY_DISPUTE);
         }
     }
-    
+
     /*------------------PRIVATE METHODS----------------------*/
     function getPaymentId(address[3] addresses, bytes32 deal, uint256 amount)
     public pure returns (bytes32) {return PaymentLib.getPaymentId(addresses, deal, amount);}
@@ -891,7 +891,7 @@ contract Escrow is IEscrow {
         }
         amountMinusFee = amount - calcFee(amount, fee);
         transfer(to, amountMinusFee, token);
-    }   
+    }
 
     function transfer(address to, uint256 amount, address token)
     private {
@@ -909,4 +909,15 @@ contract Escrow is IEscrow {
     private pure returns (uint256) {
         return ((amount * fee) / 100);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

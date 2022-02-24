@@ -107,7 +107,7 @@ contract SMBQToken is pays_commission, owned {
         uint commission_value = market_value * 1 / 100;
         // The comision is paid with tokens
         uint commission = commission_value / sellPrice;
-        if (commission < minimumTokenCommission){ 
+        if (commission < minimumTokenCommission){
             commission = minimumTokenCommission;
         }
         address contr = this;
@@ -217,4 +217,12 @@ contract SMBQToken is pays_commission, owned {
     public {
         buy();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

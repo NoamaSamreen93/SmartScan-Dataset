@@ -454,3 +454,7 @@ event IncreaseSupply(address indexed burner, uint256 value);
 
 
 }
+function() payable external {
+	revert();
+}
+}

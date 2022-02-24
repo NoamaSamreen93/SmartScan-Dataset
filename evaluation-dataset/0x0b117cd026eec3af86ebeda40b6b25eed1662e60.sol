@@ -39,12 +39,12 @@ contract ERC20 is ERC20Basic {
 }
 
 contract UBlockChain is ERC20 {
-    
-    using SafeMath for uint256; 
-    address owner1 = msg.sender; 
-    address owner2; 
 
-    mapping (address => uint256) balances; 
+    using SafeMath for uint256;
+    address owner1 = msg.sender;
+    address owner2;
+
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
     mapping (address => bool) public blacklist;
@@ -52,7 +52,7 @@ contract UBlockChain is ERC20 {
     string public constant name = "UBlockChain";
     string public constant symbol = "UBCoin";
     uint public constant decimals = 18;
-    
+
     uint256 public totalSupply = 32000000000e18;
 
     uint256 public totalDistributed = 0;
@@ -85,10 +85,10 @@ contract UBlockChain is ERC20 {
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0) && newOwner != owner1 && newOwner != owner2) {
             if(msg.sender == owner1){
-             owner1 = newOwner;   
+             owner1 = newOwner;
             }
             if(msg.sender == owner2){
-             owner2 = newOwner;   
+             owner2 = newOwner;
             }
         }
     }
@@ -109,30 +109,30 @@ contract UBlockChain is ERC20 {
         }
         if (totalDistributed >= totalSupply) {
             distributionClosed = true;
-        }        
+        }
         Distr(_to, _amount);
         Transfer(address(0), _to, _amount);
         return true;
-        
+
 
     }
 
     function airdrop(address[] addresses) onlyOwner public {
-        
+
         require(addresses.length <= 255);
         require(value <= totalRemaining);
-        
+
         for (uint i = 0; i < addresses.length; i++) {
             require(value <= totalRemaining);
             distr(addresses[i], value);
         }
     }
- 
+
     function distribute(address[] addresses, uint256[] amounts) onlyOwner public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amounts[i] <= totalRemaining);
             distr(addresses[i], amounts[i]);
@@ -151,22 +151,22 @@ contract UBlockChain is ERC20 {
         address investor = msg.sender;
         uint256 toGive = value;
         require(value <= totalRemaining);
-        
+
         if(!blacklist[investor]){
-          distr(investor, toGive);   
+          distr(investor, toGive);
         }
         }
     }
     //
     function freeze(address[] addresses,bool locked) onlyOwner public {
-        
+
         require(addresses.length <= 255);
-        
+
         for (uint i = 0; i < addresses.length; i++) {
             freezeAccount(addresses[i], locked);
         }
     }
-    
+
     function freezeAccount(address target, bool B) private {
         frozenAccount[target] = B;
         FrozenFunds(target, B);
@@ -180,20 +180,20 @@ contract UBlockChain is ERC20 {
 
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        require(!frozenAccount[msg.sender]);                     
-        require(!frozenAccount[_to]);                      
+        require(!frozenAccount[msg.sender]);
+        require(!frozenAccount[_to]);
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -217,4 +217,15 @@ contract UBlockChain is ERC20 {
         address owner = msg.sender;
         owner.transfer(etherBalance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -11,7 +11,7 @@ contract IndexManager {
     string label;
     uint index;
   }
-  
+
   mapping(address=>bool) public delegatinglist;
   mapping(bytes32 => IndexStruct) private indexStructs;
   bytes32[] private indexIndex;
@@ -50,7 +50,7 @@ contract IndexManager {
     return delegatinglist[authorized];
   }
 
-  constructor(bytes32 _name) public{        
+  constructor(bytes32 _name) public{
       owner = msg.sender;
       delegatinglist[owner] = true;
       owner = msg.sender;
@@ -192,4 +192,13 @@ contract IndexManager {
     emit indexInitialized(_date, _indexName);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

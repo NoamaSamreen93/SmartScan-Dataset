@@ -170,7 +170,7 @@ contract ERC20Token is admined, ERC20TokenInterface { //Standar definition of an
     */
     function decreaseSupply(uint _amount, address _from) public onlyAdmin lock returns (bool success) {
       balances[_from] = balances[_from].sub(_amount);
-      totalSupply = totalSupply.sub(_amount);  
+      totalSupply = totalSupply.sub(_amount);
       Transfer(_from, 0, _amount);
       return true;
     }
@@ -207,4 +207,12 @@ contract AssetMoira is admined, ERC20Token {
     function() public {
         revert();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

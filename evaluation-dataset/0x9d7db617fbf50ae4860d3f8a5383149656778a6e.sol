@@ -680,10 +680,10 @@ contract Gold is StandardToken, Claimable, AccessMint {
   );
 
   // @dev Mint tokens with _amount to the address.
-  function mint(address _to, uint256 _amount) 
+  function mint(address _to, uint256 _amount)
     onlyAccessMint
-    public 
-    returns (bool) 
+    public
+    returns (bool)
   {
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
@@ -725,7 +725,7 @@ contract CryptoSagaCard is ERC721Token, Claimable, AccessMint {
     swapContract = CryptoSagaCardSwap(_contractAddress);
   }
 
-  function rankOf(uint256 _tokenId) 
+  function rankOf(uint256 _tokenId)
     public view
     returns (uint8)
   {
@@ -778,7 +778,7 @@ contract CryptoSagaCardSwap is Ownable {
     require(msg.sender == cardAddess);
     _;
   }
-  
+
   // @dev Set the address of the contract that represents ERC721 Card.
   function setCardContract(address _contractAddress)
     public
@@ -791,7 +791,7 @@ contract CryptoSagaCardSwap is Ownable {
   //  This should be implemented by CryptoSagaCore later.
   function swapCardForReward(address _by, uint8 _rank)
     onlyCard
-    public 
+    public
     returns (uint256);
 
 }
@@ -807,7 +807,7 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
 
   string public constant name = "CryptoSaga Hero";
   string public constant symbol = "HERO";
-  
+
   struct HeroClass {
     // ex) Soldier, Knight, Fighter...
     string className;
@@ -815,37 +815,37 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
     uint8 classRank;
     // 0: Human, 1: Celestial, 2: Demon, 3: Elf, 4: Dark Elf, 5: Yogoe, 6: Furry, 7: Dragonborn, 8: Undead, 9: Goblin, 10: Troll, 11: Slime, and more to come.
     uint8 classRace;
-    // How old is this hero class? 
+    // How old is this hero class?
     uint32 classAge;
     // 0: Fighter, 1: Rogue, 2: Mage.
     uint8 classType;
 
     // Possible max level of this class.
-    uint32 maxLevel; 
+    uint32 maxLevel;
     // 0: Water, 1: Fire, 2: Nature, 3: Light, 4: Darkness.
-    uint8 aura; 
+    uint8 aura;
 
-    // Base stats of this hero type. 
+    // Base stats of this hero type.
     // 0: ATK	1: DEF 2: AGL	3: LUK 4: HP.
     uint32[5] baseStats;
-    // Minimum IVs for stats. 
+    // Minimum IVs for stats.
     // 0: ATK	1: DEF 2: AGL	3: LUK 4: HP.
     uint32[5] minIVForStats;
     // Maximum IVs for stats.
     // 0: ATK	1: DEF 2: AGL	3: LUK 4: HP.
     uint32[5] maxIVForStats;
-    
+
     // Number of currently instanced heroes.
     uint32 currentNumberOfInstancedHeroes;
   }
-    
+
   struct HeroInstance {
     // What is this hero's type? ex) John, Sally, Mark...
     uint32 heroClassId;
-    
+
     // Individual hero's name.
     string heroName;
-    
+
     // Current level of this hero.
     uint32 currentLevel;
     // Current exp of this hero.
@@ -856,10 +856,10 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
     // When a hero is deployed, it takes time for the hero to return to the base. This is in Unix epoch.
     uint256 availableAt;
 
-    // Current stats of this hero. 
+    // Current stats of this hero.
     // 0: ATK	1: DEF 2: AGL	3: LUK 4: HP.
     uint32[5] currentStats;
-    // The individual value for this hero's stats. 
+    // The individual value for this hero's stats.
     // This will affect the current stats of heroes.
     // 0: ATK	1: DEF 2: AGL	3: LUK 4: HP.
     uint32[5] ivForStats;
@@ -918,7 +918,7 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
   // @dev Get the class's entire infomation.
   function getClassInfo(uint32 _classId)
     external view
-    returns (string className, uint8 classRank, uint8 classRace, uint32 classAge, uint8 classType, uint32 maxLevel, uint8 aura, uint32[5] baseStats, uint32[5] minIVs, uint32[5] maxIVs) 
+    returns (string className, uint8 classRank, uint8 classRace, uint32 classAge, uint8 classType, uint32 maxLevel, uint8 aura, uint32[5] baseStats, uint32[5] minIVs, uint32[5] maxIVs)
   {
     var _cl = heroClasses[_classId];
     return (_cl.className, _cl.classRank, _cl.classRace, _cl.classAge, _cl.classType, _cl.maxLevel, _cl.aura, _cl.baseStats, _cl.minIVForStats, _cl.maxIVForStats);
@@ -981,7 +981,7 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
   {
     return tokenIdToHeroInstance[_tokenId].currentLevel;
   }
-  
+
   // @dev Get the hero's location.
   function getHeroLocation(uint256 _tokenId)
     external view
@@ -1197,7 +1197,7 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
 
     var _heroInstance = tokenIdToHeroInstance[_tokenId];
 
-    // The character should be avaiable. 
+    // The character should be avaiable.
     require(_heroInstance.availableAt <= now);
 
     _heroInstance.lastLocationId = _locationId;
@@ -1279,7 +1279,7 @@ contract CryptoSagaHero is ERC721Token, Claimable, Pausable, AccessMint, AccessD
     for (uint8 i = 0; i < 5; i++) {
       _heroInstance.currentStats[i] = _heroClassInfo.baseStats[i] + (_heroInstance.currentLevel - 1) * _heroInstance.ivForStats[i];
     }
-    
+
     // Deduct exp.
     _heroInstance.currentExp -= requiredExp;
 
@@ -1353,7 +1353,7 @@ contract CryptoSagaCorrectedHeroStats {
     returns (uint32 currentLevel, uint32 currentExp, uint32[5] currentStats, uint32[5] ivs, uint32 bp)
   {
     var (, , _currentLevel, _currentExp, , , _currentStats, _ivs, ) = heroContract.getHeroInfo(_tokenId);
-    
+
     if (_currentLevel != 1) {
       for (uint8 i = 0; i < 5; i ++) {
         _currentStats[i] += _ivs[i];
@@ -1482,7 +1482,7 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
   // @dev Get current number of players in the recently played players queue.
   function getRecentPlayersCount()
     public view
-    returns (uint256) 
+    returns (uint256)
   {
     return recentPlayersBack - recentPlayersFront;
   }
@@ -1490,8 +1490,8 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
   // @dev Constructor.
   function CryptoSagaArenaRecord(
     address _firstPlayerAddress,
-    uint32 _firstPlayerElo, 
-    uint8 _numberOfLeaderboardPlayers, 
+    uint32 _firstPlayerElo,
+    uint8 _numberOfLeaderboardPlayers,
     uint8 _numberOfRecentPlayers)
     public
   {
@@ -1503,9 +1503,9 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
     leaderBoardPlayers.push(_firstPlayerAddress);
     addressToIsInLeaderboard[_firstPlayerAddress] = true;
 
-    // The initial player pushed into the recent players queue. 
+    // The initial player pushed into the recent players queue.
     pushPlayer(_firstPlayerAddress);
-    
+
     // The initial player's Elo.
     addressToElo[_firstPlayerAddress] = _firstPlayerElo;
   }
@@ -1517,7 +1517,7 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
   {
     address _winnerAddress = _didWin? _myAddress: _enemyAddress;
     address _loserAddress = _didWin? _enemyAddress: _myAddress;
-    
+
     // Initial value of Elo.
     uint32 _winnerElo = addressToElo[_winnerAddress];
     if (_winnerElo == 0)
@@ -1565,11 +1565,11 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
 
     // Update recent players list.
     if (!isPlayerInQueue(_myAddress)) {
-      
+
       // If the queue is full, pop a player.
       if (getRecentPlayersCount() >= numberOfRecentPlayers)
         popPlayer();
-      
+
       // Push _myAddress to the queue.
       pushPlayer(_myAddress);
     }
@@ -1594,7 +1594,7 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
       // Do nothing.
     } else {
       if (leaderBoardPlayers.length >= numberOfLeaderboardPlayers) {
-        
+
         // Need to replace existing player.
         // First, we need to find the player with miminum Elo value.
         uint32 _minimumElo = 99999;
@@ -1614,7 +1614,7 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
           isChanged = true;
         }
       } else {
-        // The list is not full yet. 
+        // The list is not full yet.
         // Just add the player to the list.
         leaderBoardPlayers.push(_addressToUpdate);
         addressToIsInLeaderboard[_addressToUpdate] = true;
@@ -1635,7 +1635,7 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
       }
     }
   }
-    
+
   // @dev Push a new player into the queue.
   function pushPlayer(address _player)
     private
@@ -1643,9 +1643,9 @@ contract CryptoSagaArenaRecord is Pausable, AccessDeploy {
     recentPlayers.push(_player);
     recentPlayersBack++;
   }
-    
+
   // @dev Pop the oldest player in this queue.
-  function popPlayer() 
+  function popPlayer()
     private
     returns (address player)
   {
@@ -1863,15 +1863,15 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
     _playRecord.tokenIds[2] = 3;
     _playRecord.tokenIds[3] = 4;
     addressToPlayRecord[_firstPlayerAddress] = _playRecord;
-    
+
     locationId = _locationId;
     coolHero = _coolHero;
     expReward = _expReward;
     goldReward = _goldReward;
-    
+
     isTurnDataSaved = _isTurnDataSaved;
   }
-  
+
   // @dev Enter this arena.
   function enterArena(uint256[4] _tokenIds, address _enemyAddress)
     whenNotPaused
@@ -1960,14 +1960,14 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
     }
 
     // Step 2. Run the battle logic.
-    
+
     // Firstly, we need to assign the unit's turn order with AGLs of the units.
     uint32[8] memory _unitAGLs;
     for (uint8 i = 0; i < 8; i ++) {
       _unitAGLs[i] = _unitStats[i][2];
     }
     _turnInfo.turnOrder = getOrder(_unitAGLs);
-    
+
     // Fight for 24 turns. (8 units x 3 rounds.)
     _turnInfo.turnLength = 24;
     for (i = 0; i < 24; i ++) {
@@ -1978,7 +1978,7 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
         _turnInfo.turnLength = i;
         break;
       }
-      
+
       var _slotId = _turnInfo.turnOrder[(i % 8)];
       if (_slotId < 4 && _tokenIds[_slotId] == 0) {
         // This means the slot is empty.
@@ -2010,10 +2010,10 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
           else if (_unitStats[3][4] > 0)
             _targetSlotId = 3;
         }
-        
+
         // Target is the defender.
         _turnInfo.defenderList[i] = _targetSlotId;
-        
+
         // Base damage. (Attacker's ATK * 1.5 - Defender's DEF).
         uint32 _damage = 10;
         if ((_unitStats[_slotId][0] * 150 / 100) > _unitStats[_targetSlotId][1])
@@ -2060,7 +2060,7 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
           _damage = _damage * 150 / 100;
         else if (_unitTypesAuras[_slotId][1] == 4 && _unitTypesAuras[_targetSlotId][1] == 3) // Darkness > Light
           _damage = _damage * 150 / 100;
-        
+
         // Apply damage so that reduce hp of defender.
         if(_unitStats[_targetSlotId][4] > _damage)
           _unitStats[_targetSlotId][4] -= _damage;
@@ -2071,7 +2071,7 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
         _turnInfo.damageList[i] = _damage;
       }
     }
-    
+
     // Step 3. Apply the result of this battle.
 
     // Set heroes deployed.
@@ -2104,11 +2104,11 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
       _deadEnemies ++;
     if (_unitStats[7][4] == 0)
       _deadEnemies ++;
-      
+
     if (_deadEnemies > _deadHeroes) { // Win
       // Fire TryArena event.
       TryArena(msg.sender, _enemyAddress, true);
-      
+
       // Give reward.
       (_playRecord.expReward, _playRecord.goldReward) = giveReward(_tokenIds, true, _turnInfo.originalExps);
 
@@ -2150,7 +2150,7 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
     returns(bool)
   {
     if ((_tokenIds[0] == 0 || heroContract.ownerOf(_tokenIds[0]) == _playerAddress) && (_tokenIds[1] == 0 || heroContract.ownerOf(_tokenIds[1]) == _playerAddress) && (_tokenIds[2] == 0 || heroContract.ownerOf(_tokenIds[2]) == _playerAddress) && (_tokenIds[3] == 0 || heroContract.ownerOf(_tokenIds[3]) == _playerAddress)) {
-      
+
       // Retrieve avail time of heroes.
       uint256[4] memory _heroAvailAts;
       if (_tokenIds[0] != 0)
@@ -2190,7 +2190,7 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
 
     // Give reward Gold.
     goldContract.mint(msg.sender, goldRewardGiven);
-    
+
     // Give reward EXP.
     if(_heroes[0] != 0)
       heroContract.addExp(_heroes[0], uint32(2)**32 - _originalExps[0] + expRewardGiven);
@@ -2257,9 +2257,9 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
   }
 
   // @return Square root of the given value.
-  function sqrt(uint32 _value) 
+  function sqrt(uint32 _value)
     private pure
-    returns (uint32) 
+    returns (uint32)
   {
     uint32 z = (_value + 1) / 2;
     uint32 y = _value;
@@ -2270,4 +2270,13 @@ contract CryptoSagaArenaVer1 is Claimable, Pausable {
     return y;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

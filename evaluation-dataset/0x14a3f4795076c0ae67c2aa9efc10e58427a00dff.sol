@@ -12,7 +12,7 @@ pragma solidity ^0.4.0;
       \___________________________________________________________/
   wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-   wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww 
+   wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 
 */
 
@@ -93,7 +93,7 @@ contract EtherShipsCore {
         uint256 duration,
         uint256 currentTime
         ); // ;-)
-        
+
     event EventCancelAuction (
         uint32 shipID
         ); // ;-)
@@ -135,14 +135,14 @@ contract EtherShipsCore {
 
         // Creating ship types
         //name, armor, speed, minDamage, maxDamage, attackSpeed, league, start price, earning, release time
-        
+
         newShipProduct("L-Raz", 50, 5, 5, 40, 5, 1, 50000000000000000, 500000000000000, now);
         newShipProduct("L-Vip", 50, 4, 6, 35, 6, 1, 50000000000000000, 500000000000000, now+(60*60*3));
         newShipProduct("L-Rapt", 50, 5, 5, 35, 5, 1, 50000000000000000, 500000000000000, now+(60*60*6));
         newShipProduct("L-Slash", 50, 5, 5, 30, 6, 1, 50000000000000000, 500000000000000, now+(60*60*12));
         newShipProduct("L-Stin", 50, 5, 5, 40, 5, 1, 50000000000000000, 500000000000000, now+(60*60*24));
         newShipProduct("L-Scor", 50, 4, 5, 35, 5, 1, 50000000000000000, 500000000000000, now+(60*60*48));
-        
+
         newShipProduct("Sub-Sc", 60, 5, 45, 115, 4, 2, 100000000000000000, 1000000000000000, now);
         newShipProduct("Sub-Cycl", 70, 4, 40, 115, 4, 2, 100000000000000000, 1000000000000000, now+(60*60*6));
         newShipProduct("Sub-Deep", 80, 5, 45, 120, 4, 2, 100000000000000000, 1000000000000000, now+(60*60*12));
@@ -427,3 +427,14 @@ contract EtherShipsCore {
     Ethertanks.com
     Etheretanks.com
 */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

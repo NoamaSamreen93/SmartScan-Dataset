@@ -1,28 +1,28 @@
 pragma solidity 0.4.25;
 
 /*
- __      __          ___                                          ______                     
-/\ \  __/\ \        /\_ \                                        /\__  _\                    
-\ \ \/\ \ \ \     __\//\ \     ___    ___     ___ ___      __    \/_/\ \/   ___              
- \ \ \ \ \ \ \  /'__`\\ \ \   /'___\ / __`\ /' __` __`\  /'__`\     \ \ \  / __`\            
-  \ \ \_/ \_\ \/\  __/ \_\ \_/\ \__//\ \L\ \/\ \/\ \/\ \/\  __/      \ \ \/\ \L\ \__  __  __ 
+ __      __          ___                                          ______
+/\ \  __/\ \        /\_ \                                        /\__  _\
+\ \ \/\ \ \ \     __\//\ \     ___    ___     ___ ___      __    \/_/\ \/   ___
+ \ \ \ \ \ \ \  /'__`\\ \ \   /'___\ / __`\ /' __` __`\  /'__`\     \ \ \  / __`\
+  \ \ \_/ \_\ \/\  __/ \_\ \_/\ \__//\ \L\ \/\ \/\ \/\ \/\  __/      \ \ \/\ \L\ \__  __  __
    \ `\___x___/\ \____\/\____\ \____\ \____/\ \_\ \_\ \_\ \____\      \ \_\ \____/\_\/\_\/\_\
     '\/__//__/  \/____/\/____/\/____/\/___/  \/_/\/_/\/_/\/____/       \/_/\/___/\/_/\/_/\/_/
-                                                                                             
 
 
-__/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____        
- _\/\\\///////////__\///////\\\/////__\/\\\_____/\\\//____/\\\\\\\\\\\\\__       
-  _\/\\\___________________\/\\\_______\/\\\__/\\\//______/\\\/////////\\\_      
-   _\/\\\\\\\\\\\___________\/\\\_______\/\\\\\\//\\\_____\/\\\_______\/\\\_     
-    _\/\\\///////____________\/\\\_______\/\\\//_\//\\\____\/\\\\\\\\\\\\\\\_    
-     _\/\\\___________________\/\\\_______\/\\\____\//\\\___\/\\\/////////\\\_   
-      _\/\\\___________________\/\\\_______\/\\\_____\//\\\__\/\\\_______\/\\\_  
-       _\/\\\___________________\/\\\_______\/\\\______\//\\\_\/\\\_______\/\\\_ 
-        _\///____________________\///________\///________\///__\///________\///__                                                                                             
-                                                                                             
-                               
-                                                                                             
+
+__/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
+ _\/\\\///////////__\///////\\\/////__\/\\\_____/\\\//____/\\\\\\\\\\\\\__
+  _\/\\\___________________\/\\\_______\/\\\__/\\\//______/\\\/////////\\\_
+   _\/\\\\\\\\\\\___________\/\\\_______\/\\\\\\//\\\_____\/\\\_______\/\\\_
+    _\/\\\///////____________\/\\\_______\/\\\//_\//\\\____\/\\\\\\\\\\\\\\\_
+     _\/\\\___________________\/\\\_______\/\\\____\//\\\___\/\\\/////////\\\_
+      _\/\\\___________________\/\\\_______\/\\\_____\//\\\__\/\\\_______\/\\\_
+       _\/\\\___________________\/\\\_______\/\\\______\//\\\_\/\\\_______\/\\\_
+        _\///____________________\///________\///________\///__\///________\///__
+
+
+
 // ----------------------------------------------------------------------------
 // 'FTKA' token contract, having Crowdsale and Reward functionality
 //
@@ -37,7 +37,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
 // Copyright © 2018 onwards FTKA. (https://ftka.io)
 // Contract designed by EtherAuthority (https://EtherAuthority.io)
 // ----------------------------------------------------------------------------
-    
+
     /**
      * @title SafeMath
      * @dev Math operations with safety checks that throw on error
@@ -51,45 +51,45 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
       }
     }
-    
+
     contract owned {
         address public owner;
-    	
+
          constructor () public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
+
     interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
@@ -98,17 +98,17 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
         uint8 public decimals = 8;      // 18 decimals is the strongly suggested default, avoid changing it
         uint256 public totalSupply;
         uint256 public reservedForICO;
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
@@ -127,7 +127,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             name = tokenName;                                   // Set the name for display purposes
             symbol = tokenSymbol;                               // Set the symbol for display purposes
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -148,7 +148,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -160,7 +160,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
         function transfer(address _to, uint256 _value) public {
             _transfer(msg.sender, _to, _value);
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -176,7 +176,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -190,7 +190,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
+
         /**
          * Set allowance for other address and notify
          *
@@ -209,7 +209,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
                 return true;
             }
         }
-    
+
         /**
          * Destroy tokens
          *
@@ -224,7 +224,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
            emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -243,38 +243,38 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             return true;
         }
     }
-    
+
     /****************************************************/
     /*       MAIN FTKA TOKEN CONTRACT STARTS HERE       */
     /****************************************************/
-    
+
     contract FTKA is owned, TokenERC20 {
-        
+
         //**************************************************//
         //------------- Code for the FTKA Token -------------//
         //**************************************************//
-        
+
         // Public variables of the token
     	string internal tokenName = "FTKA";
         string internal tokenSymbol = "FTKA";
-        uint256 internal initialSupply = 1000000000; 	 // 1 Billion   
+        uint256 internal initialSupply = 1000000000; 	 // 1 Billion
         uint256 private allocatedForICO = 800000000;     // 800 Million
-	
-    	// Records for the fronzen accounts 
+
+    	// Records for the fronzen accounts
         mapping (address => bool) public frozenAccount;
-    
-        // This generates a public event on the blockchain that will notify clients 
+
+        // This generates a public event on the blockchain that will notify clients
         event FrozenFunds(address target, bool frozen);
-    
-        // Initializes contract with initial supply of tokens sent to the creator as well as contract 
+
+        // Initializes contract with initial supply of tokens sent to the creator as well as contract
         constructor () TokenERC20(initialSupply, allocatedForICO, tokenName, tokenSymbol) public { }
-    
-         
+
+
         /**
          * Transfer tokens - Internal transfer, only can be called by this contract
-         * 
+         *
          * This checks if the sender or recipient is not fronzen
-         * 
+         *
          * This keeps the track of total token holders and adds new holders as well.
          *
          * Send `_value` tokens to `_to` from your account
@@ -293,10 +293,10 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
             emit Transfer(_from, _to, _value);
         }
-    
+
         /**
          * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
-         * 
+         *
          * @param target Address to be frozen
          * @param freeze either to freeze it or not
          */
@@ -304,25 +304,25 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             frozenAccount[target] = freeze;
           emit  FrozenFunds(target, freeze);
         }
-    
+
         //**************************************************//
         //------------- Code for the Crowdsale -------------//
         //**************************************************//
-    
+
         //public variables for the Crowdsale
         uint256 public icoStartDate = 1542326400 ;      // 16 November 2018 00:00:00 - GMT
         uint256 public icoEndDate   = 1554076799 ;      // 31 March 2019 23:59:59 - GMT
         uint256 public exchangeRate = 5000;             // 1 ETH = 5000 Tokens
         uint256 public tokensSold = 0;                  // How many tokens sold in crowdsale
         bool internal withdrawTokensOnlyOnce = true;    // Admin can withdraw unsold tokens after ICO only once
-        
-        //public variables of reward distribution 
+
+        //public variables of reward distribution
         mapping(address => uint256) public investorContribution; //Track record whether token holder exist or not
         address[] public icoContributors;                   //Array of addresses of ICO contributors
         uint256 public tokenHolderIndex = 0;                //To split the iterations of For Loop
         uint256 public totalContributors = 0;               //Total number of ICO contributors
-        
-        
+
+
         /**
          * @dev Fallback function, it accepts Ether from owner address as well as non-owner address
          * @dev If ether came from owner address, then it will consider as reward payment to ICO contributors
@@ -336,7 +336,7 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
 		        processICO();       //This function will process ICO and sends tokens to contributor
 		    }
 		}
-        
+
         /**
          * @dev Function which processes ICO contributions
          * @dev It calcualtes token amount from exchangeRate and also adds Bonuses if applicable
@@ -357,9 +357,9 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
                 totalContributors++;
             }
             investorContribution[msg.sender] = investorContribution[msg.sender].add(totalTokens);
-            
+
          }
-         
+
          /**
          * @dev Function which processes ICO contributions
          * @dev It calcualtes token amount from exchangeRate and also adds Bonuses if applicable
@@ -382,22 +382,22 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
                     }
                 }
          }
-        
+
         /**
          * Automatocally forwards ether from smart contract to owner address.
          */
 		function forwardEherToOwner() internal {
-			owner.transfer(msg.value); 
+			owner.transfer(msg.value);
 		}
-		
+
 		/**
          * @dev Calculates purchase bonus according to the schedule.
          * @dev SafeMath at some place is not used intentionally as overflow is impossible, and that saves gas cost
-         * 
-         * @param _tokenAmount calculating tokens from amount of tokens 
-         * 
+         *
+         * @param _tokenAmount calculating tokens from amount of tokens
+         *
          * @return bonus amount in wei
-         * 
+         *
          */
 		function purchaseBonus(uint256 _tokenAmount) public view returns(uint256){
 		    uint256 week1 = icoStartDate + 604800;    //25% token bonus
@@ -425,22 +425,22 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
 		        return 0;
 		    }
 		}
-        
-        
+
+
         /**
-         * Function to check wheter ICO is running or not. 
-         * 
+         * Function to check wheter ICO is running or not.
+         *
          * @return bool for whether ICO is running or not
          */
         function isICORunning() public view returns(bool){
             if(icoEndDate > now && icoStartDate < now){
-                return true;                
+                return true;
             }else{
                 return false;
             }
         }
-        
-        
+
+
         /**
          * Just in case, owner wants to transfer Tokens from contract to owner address
          */
@@ -448,12 +448,23 @@ __/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\________/\\\_____/\\\\\\\\\____
             uint256 tokenAmount = _amount.mul(1 ether);
             _transfer(this, msg.sender, tokenAmount);
         }
-          
+
         /**
          * Just in case, owner wants to transfer Ether from contract to owner address
          */
         function manualWithdrawEther()onlyOwner public{
             address(owner).transfer(address(this).balance);
         }
-        
+
     }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

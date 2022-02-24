@@ -60,7 +60,7 @@ contract DayTrader {
   function setTimeout(uint256 _timeout) public onlyContractOwner {
     timeout = _timeout;
   }
-  
+
   function setStartingPrice(uint256 _startingPrice) public onlyContractOwner {
     startingPrice = _startingPrice;
   }
@@ -107,7 +107,7 @@ contract DayTrader {
 
     // Safety check to prevent against an unexpected 0x0 default.
     require(_addressNotNull(newOwner));
-    
+
     uint256 sellingPrice = getBagSellingPrice(bag);
 
     // Making sure sent amount is greater than or equal to the sellingPrice
@@ -122,11 +122,11 @@ contract DayTrader {
     bag.owner = newOwner;
     bag.purchasedAt = now;
 
-    
+
     // Pay previous tokenOwner if owner is not contract
     if (oldOwner != address(this)) {
       oldOwner.transfer(payment);
-      
+
     }
 
     // Trigger BagSold event
@@ -150,7 +150,7 @@ contract DayTrader {
       return 0;
     }
   }
-  
+
    function getOwner(Bag bag) private view returns (address) {
     if (now <= (SafeMath.add(bag.purchasedAt, timeout))) {
       return bag.owner;
@@ -225,4 +225,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

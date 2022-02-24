@@ -46,15 +46,15 @@ interface TokenController {
 contract Controlled {
     /// @notice The address of the controller is the only address that can call
     ///  a function with this modifier
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     address public controller;
 
-    constructor() internal { 
-        controller = msg.sender; 
+    constructor() internal {
+        controller = msg.sender;
     }
 
     /// @notice Changes the controller of the contract
@@ -166,11 +166,11 @@ contract MiniMeTokenInterface is ERC20Token {
         address _spender,
         uint256 _amount,
         bytes _extraData
-    ) 
-        external 
+    )
+        external
         returns (bool success);
 
-    /**    
+    /**
      * @notice Creates a new clone token with the initial distribution being
      *  this token at `_snapshotBlock`
      * @param _cloneTokenName Name of the clone token
@@ -188,11 +188,11 @@ contract MiniMeTokenInterface is ERC20Token {
         string _cloneTokenSymbol,
         uint _snapshotBlock,
         bool _transfersEnabled
-    ) 
+    )
         public
         returns(address);
 
-    /**    
+    /**
      * @notice Generates `_amount` tokens that are assigned to `_owner`
      * @param _owner The address that will be assigned the new tokens
      * @param _amount The quantity of tokens generated
@@ -214,17 +214,17 @@ contract MiniMeTokenInterface is ERC20Token {
     function destroyTokens(
         address _owner,
         uint _amount
-    ) 
+    )
         public
         returns (bool);
 
-    /**        
+    /**
      * @notice Enables token holders to transfer their tokens freely if true
      * @param _transfersEnabled True if transfers are allowed in the clone
      */
     function enableTransfers(bool _transfersEnabled) public;
 
-    /**    
+    /**
      * @notice This method can be used by the controller to extract mistakenly
      *  sent tokens to this contract.
      * @param _token The address of the token contract that you want to recover
@@ -241,7 +241,7 @@ contract MiniMeTokenInterface is ERC20Token {
     function balanceOfAt(
         address _owner,
         uint _blockNumber
-    ) 
+    )
         public
         constant
         returns (uint);
@@ -329,7 +329,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
 
     // `balances` is the map that tracks the balance of each address, in this
     //  contract when the balance changes the block number that the change
-    //  occurred is also included in the map 
+    //  occurred is also included in the map
     mapping (address => Checkpoint[]) balances;
 
     // `allowed` tracks any extra transfer rights as in all ERC20 tokens
@@ -348,7 +348,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
 // Constructor
 ////////////////
 
-    /** 
+    /**
      * @notice Constructor to create a MiniMeToken
      * @param _tokenFactory The address of the MiniMeTokenFactory contract that
      *  will create the Clone token contracts, the token factory needs to be
@@ -371,7 +371,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) 
+    )
         public
     {
         require(_tokenFactory != address(0)); //if not set, clone feature will not work properly
@@ -413,8 +413,8 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         address _from,
         address _to,
         uint256 _amount
-    ) 
-        public 
+    )
+        public
         returns (bool success)
     {
 
@@ -426,7 +426,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
             require(transfersEnabled);
 
             // The standard ERC 20 transferFrom functionality
-            if (allowed[_from][msg.sender] < _amount) { 
+            if (allowed[_from][msg.sender] < _amount) {
                 return false;
             }
             allowed[_from][msg.sender] -= _amount;
@@ -446,7 +446,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         address _from,
         address _to,
         uint _amount
-    ) 
+    )
         internal
         returns(bool)
     {
@@ -493,7 +493,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         address _spender,
         uint256 _amount
     )
-        internal 
+        internal
         returns (bool)
     {
         require(transfersEnabled);
@@ -544,7 +544,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
     function allowance(
         address _owner,
         address _spender
-    ) 
+    )
         external
         view
         returns (uint256 remaining)
@@ -564,8 +564,8 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         address _spender,
         uint256 _amount,
         bytes _extraData
-    ) 
-        external 
+    )
+        external
         returns (bool success)
     {
         require(doApprove(msg.sender, _spender, _amount));
@@ -602,10 +602,10 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
     function balanceOfAt(
         address _owner,
         uint _blockNumber
-    ) 
+    )
         public
         view
-        returns (uint) 
+        returns (uint)
     {
 
         // These next few lines are used when the balance of the token is
@@ -674,7 +674,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         string _cloneTokenSymbol,
         uint _snapshotBlock,
         bool _transfersEnabled
-        ) 
+        )
             public
             returns(address)
         {
@@ -701,7 +701,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
 ////////////////
 // Generate and destroy tokens
 ////////////////
-    
+
     /**
      * @notice Generates `_amount` tokens that are assigned to `_owner`
      * @param _owner The address that will be assigned the new tokens
@@ -735,7 +735,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
     function destroyTokens(
         address _owner,
         uint _amount
-    ) 
+    )
         public
         onlyController
         returns (bool)
@@ -775,7 +775,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
     function getValueAt(
         Checkpoint[] storage checkpoints,
         uint _block
-    ) 
+    )
         view
         internal
         returns (uint)
@@ -815,7 +815,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
     function updateValueAtNow(Checkpoint[] storage checkpoints, uint _value) internal {
         if (
             (checkpoints.length == 0) ||
-            (checkpoints[checkpoints.length - 1].fromBlock < block.number)) 
+            (checkpoints[checkpoints.length - 1].fromBlock < block.number))
         {
             Checkpoint storage newCheckPoint = checkpoints[checkpoints.length++];
             newCheckPoint.fromBlock = uint128(block.number);
@@ -835,7 +835,7 @@ contract MiniMeToken is MiniMeTokenInterface, Controlled {
         uint size;
         if (_addr == 0) {
             return false;
-        }    
+        }
         assembly {
             size := extcodesize(_addr)
         }
@@ -939,4 +939,15 @@ contract MiniMeTokenFactory {
         newToken.changeController(msg.sender);
         return newToken;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

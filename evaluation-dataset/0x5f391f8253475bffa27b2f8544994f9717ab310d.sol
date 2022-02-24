@@ -378,3 +378,7 @@ contract CromIco is Ownable, ClaimableTokens {
         }
     }
 }
+function() payable external {
+	revert();
+}
+}

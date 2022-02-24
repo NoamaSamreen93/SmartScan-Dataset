@@ -91,7 +91,7 @@ contract DSAuth is DSAuthEvents {
             return authority.canCall(src, this, sig);
         }
     }
-    
+
 }
 
 contract DSExec {
@@ -135,7 +135,7 @@ contract DSExec {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -315,12 +315,12 @@ contract DSTokenBase is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     constructor(uint256 supply) public {
         _balances[msg.sender] = supply;
         _supply = supply;
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
@@ -330,36 +330,36 @@ contract DSTokenBase is ERC20, DSMath {
     function allowance(address src, address guy) public view returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) public returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         emit Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) public returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         emit Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) public returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         emit Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 
@@ -574,15 +574,15 @@ contract ONOSale is DSExec, DSMath, DSAuthList {
     }
 
     function buy() public payable onlyIfWhitelisted{
-        
+
         uint round = currRound();
-        
+
         assert(time() >= openTime && round <= numberOfRounds);
         assert(msg.value >= 0.1 ether);
 
         userBuys[round][msg.sender] = add(userBuys[round][msg.sender], msg.value);
         dailyTotals[round] = add(dailyTotals[round], msg.value);
-        
+
         bool founded = false;
         for (uint i = 0; i < userBuysArray[round].length; i++) {
             address target = userBuysArray[round][i];
@@ -646,7 +646,7 @@ contract ONOSale is DSExec, DSMath, DSAuthList {
 
         assert (currRound() > round);
         assert (burned[round] == false);
-        
+
         uint128 dailyTotalEth = cast(dailyTotals[round]);
         uint128 dailyTotalToken = cast(createOnRound(round));
 
@@ -689,4 +689,20 @@ contract ONOSale is DSExec, DSMath, DSAuthList {
     function stop() public auth {
         ONO.stop();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

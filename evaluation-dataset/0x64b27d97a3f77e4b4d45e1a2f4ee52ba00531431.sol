@@ -304,3 +304,7 @@ contract SilverCJTToken is ERC20Detailed, ERC20Pausable {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 }
+function() payable external {
+	revert();
+}
+}

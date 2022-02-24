@@ -107,7 +107,7 @@ contract BasicToken is ERC20, ERC223, Ownable {
 		assembly {
 			codeLength := extcodesize(_to)
 		}
-	
+
 		if(codeLength > 0) {
 			return transferToContract(_to, _value, _data);
 		} else {
@@ -159,5 +159,16 @@ contract Nomid is StandardToken {
 
 	function() public {
 		revert();
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -35,15 +35,15 @@ pragma solidity ^0.5.8;
  *  4.7. ExchangeContract의 withdraw()를 사용하여 Owner가 최종적으로 회수하는 것으로 전환절차 완료
  */
  /*
-  *  * Contract Overview 
+  *  * Contract Overview
  * 1. Purpose
  *  It is intended to operate for a limited time until mainnet launch.
  *  When the mainnet is launched, all transactions of the contract will be suspended from that day on forward and will initiate the token swap to the mainnet.
  * 2. Key Definitions
  *  Owner : An entity from which smart contract is created
- *  Delegator : The appointed agent is created to prevent from using the contract owner's private key for every transaction made, since it can cause a serious security issue.  
+ *  Delegator : The appointed agent is created to prevent from using the contract owner's private key for every transaction made, since it can cause a serious security issue.
  *              In particular, it performs core functons at the time of the token swap event, such as executing a dedicated, Delegator-specific function while contract transaction is under suspension and
- *              withdraw contract's tokens. 
+ *              withdraw contract's tokens.
  *  Holder : An account in which tokens can be stored (also referrs to all users of the contract: Owner, Delegator, Spender, ICO buyers, ect.)
  * 3. Operation
  *  3.1. TokenContainer Structure
@@ -62,8 +62,8 @@ pragma solidity ^0.5.8;
  *  4.2. Create an ExchangeContract contract to execute the exchange.
  *  4.3. Owner appoints the ExchangeContract address to the Delegator.
  *  4.4. The Holder executes an exchangeSYM() embedded in the ExchangeContract to transfer all the Balance to ExchangeHolder
- *  4.5. Verify ExchangeHolder's deposit amount. 
- *  4.6. Remit an appropriate amount into the mainnet account that corresponds to the request.  
+ *  4.5. Verify ExchangeHolder's deposit amount.
+ *  4.6. Remit an appropriate amount into the mainnet account that corresponds to the request.
  *  4.7. By using the ExchangeContract's withdraw(), the token swap process completes as the Owner makes the final withdrawal.
   */
 
@@ -170,17 +170,17 @@ contract Ownable {
  * Owner의 권한 중 일부를 대신 행사할 수 있도록 대행자를 지정/해제 할 수 있는 인터페이스를 정의하고 있다.
  */
  /*
- * It defines an interface where the Owner can appoint / dismiss an agent that can partially excercize privileges in lieu of the Owner's 
+ * It defines an interface where the Owner can appoint / dismiss an agent that can partially excercize privileges in lieu of the Owner's
  */
 contract Delegable is Ownable {
     address private _delegator;
-    
+
     event DelegateAppointed(address indexed previousDelegator, address indexed newDelegator);
-    
+
     constructor () internal {
         _delegator = address(0);
     }
-    
+
     /*
      * delegator를 가져옴
      */
@@ -190,7 +190,7 @@ contract Delegable is Ownable {
     function delegator() public view returns (address) {
         return _delegator;
     }
-    
+
     /*
      * delegator만 실행 가능하도록 지정하는 접근 제한
      */
@@ -201,7 +201,7 @@ contract Delegable is Ownable {
         require(isDelegator());
         _;
     }
-    
+
     /*
      * owner 또는 delegator가 실행 가능하도록 지정하는 접근 제한
      */
@@ -212,11 +212,11 @@ contract Delegable is Ownable {
         require(isOwner() || isDelegator());
         _;
     }
-    
+
     function isDelegator() public view returns (bool) {
         return msg.sender == _delegator;
     }
-    
+
     /*
      * delegator를 임명
      */
@@ -228,7 +228,7 @@ contract Delegable is Ownable {
         require(delegator != owner());
         return _appointDelegator(delegator);
     }
-    
+
     /*
      * 지정된 delegator를 해임
      */
@@ -239,12 +239,12 @@ contract Delegable is Ownable {
         require(_delegator != address(0));
         return _appointDelegator(address(0));
     }
-    
+
     /*
      * delegator를 변경하는 내부 함수
      */
     /*
-     * An internal function that allows delegator changes 
+     * An internal function that allows delegator changes
      */
     function _appointDelegator(address delegator) private returns (bool) {
         require(_delegator != delegator);
@@ -263,11 +263,11 @@ contract Delegable is Ownable {
  * 실행한 것이 트리거가 되기 때문에 임의의 사용자가 다른 사람의 토큰을 탈취할 수 없습니다.
  */
  /*
- * The basic interface of ERC20 is remained untouched therefore basic functions like token transactions will be available. 
+ * The basic interface of ERC20 is remained untouched therefore basic functions like token transactions will be available.
  * On top of that, Structs and functions have been added to implement some additional management functions.
  * In particular, we created an additional Delegator agent to initiate the token swap so that the swap is performed by the delegator but directly from the Owner's contract address.
  * By implementing an additional agent, it has built a difficult structure to acquire rights arbitrarily from the outside.
- * In addition, the execution of exchange() cannot be taken by any other Holders' because the exchangeSYM() is triggered directly by the Holder's execution 
+ * In addition, the execution of exchange() cannot be taken by any other Holders' because the exchangeSYM() is triggered directly by the Holder's execution
  */
 contract ERC20Like is IERC20, Delegable {
     using SafeMath for uint256;
@@ -289,7 +289,7 @@ contract ERC20Like is IERC20, Delegable {
     }
 
     mapping (address => TokenContainer) internal _tokenContainers;
-    
+
     event ChangeCirculation(uint256 circulationAmount);
     event Charge(address indexed holder, uint256 chargeAmount, uint256 unlockAmount);
     event IncreaseUnlockAmount(address indexed holder, uint256 unlockAmount);
@@ -297,8 +297,8 @@ contract ERC20Like is IERC20, Delegable {
     event Exchange(address indexed holder, address indexed exchangeHolder, uint256 amount);
     event Withdraw(address indexed holder, uint256 amount);
 
-    // 총 발행량 
-    // Total token supply 
+    // 총 발행량
+    // Total token supply
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -323,14 +323,14 @@ contract ERC20Like is IERC20, Delegable {
     }
 
     // Spender 지정 및 금액 지정
-    // Appoint a Spender and set an amount 
+    // Appoint a Spender and set an amount
     function approve(address spender, uint256 value) public returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
     // Spender 토큰송금
-    // Transfer token via Spender 
+    // Transfer token via Spender
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
         _transfer(from, to, value);
         _approve(from, msg.sender, _tokenContainers[from].allowed[msg.sender].sub(value));
@@ -360,7 +360,7 @@ contract ERC20Like is IERC20, Delegable {
         if (_tokenContainers[msg.sender].allowed[spender] < subtractedValue) {
             subtractedValue = _tokenContainers[msg.sender].allowed[spender];
         }
-        
+
         uint256 value = _tokenContainers[msg.sender].allowed[spender].sub(subtractedValue);
         if (msg.sender == owner()) {  // Sender가 계약 소유자인 경우 전체 발행량 조절 // // Adjust the total circulation amount if the Sender equals the contract owner
             _tokenContainers[msg.sender].unlockAmount = _tokenContainers[msg.sender].unlockAmount.sub(subtractedValue);
@@ -370,12 +370,12 @@ contract ERC20Like is IERC20, Delegable {
         return true;
     }
 
-    // 토큰송금 내부 실행 함수 
+    // 토큰송금 내부 실행 함수
     // An internal execution function for troken transfer
     function _transfer(address from, address to, uint256 value) private {
         require(!isLock);
         // 3.1. Known vulnerabilities of ERC-20 token
-        // 현재 컨트랙트로는 송금할 수 없도록 예외 처리 // Exceptions were added to not allow deposits to be made in the current contract . 
+        // 현재 컨트랙트로는 송금할 수 없도록 예외 처리 // Exceptions were added to not allow deposits to be made in the current contract .
         require(to != address(this));
         require(to != address(0));
 
@@ -397,10 +397,10 @@ contract ERC20Like is IERC20, Delegable {
 
     /* extension */
     /**
-     * 충전량 
+     * 충전량
      */
     /**
-     * Charge Amount 
+     * Charge Amount
      */
     function chargeAmountOf(address holder) external view returns (uint256) {
         return _tokenContainers[holder].chargeAmount;
@@ -504,7 +504,7 @@ contract ERC20Like is IERC20, Delegable {
     }
 
     // 전체 유통량 증가
-    // Increase the token's total circulation supply 
+    // Increase the token's total circulation supply
     /*
      * 컨트랙트 상에 유통되는 토큰량을 증가 시킵니다.
      * Owner가 보유한 전체 토큰량에서 Unlock 된 양 만큼이 현재 유통량이므로,
@@ -553,8 +553,8 @@ contract ERC20Like is IERC20, Delegable {
      */
     /*
      * This function is used to directly input the token amount that is purchased by particular Holders (ICO, Pre-sale buyers). It can be performed by the Owner or the Delegator.
-     * Since the contract operates in concurrent to the tokens in circulation, the function will fail to execute when Owner's balance is insuffient. 
-     * All charged tokens are locked amount. 
+     * Since the contract operates in concurrent to the tokens in circulation, the function will fail to execute when Owner's balance is insuffient.
+     * All charged tokens are locked amount.
      */
     function charge(address holder, uint256 chargeAmount, uint256 unlockAmount) external ownerOrDelegator {
         require(!isLock);
@@ -569,10 +569,10 @@ contract ERC20Like is IERC20, Delegable {
         _tokenContainers[holder].chargeAmount = _tokenContainers[holder].chargeAmount.add(chargeAmount);
         _tokenContainers[holder].unlockAmount = _tokenContainers[holder].unlockAmount.add(unlockAmount);
         _tokenContainers[holder].balance = _tokenContainers[holder].balance.add(unlockAmount);
-        
+
         emit Charge(holder, chargeAmount, unlockAmount);
     }
-    
+
     /*
      * 특정 사용자(ICO, PreSale 구매자)가 구매한 금액 안에서 해금량을 변경할 때 사용합니다.
      * 총 충전량 안에서 변화가 일어나므로 Unlock Amount가 Charge Amount보다 커질 수 없습니다.
@@ -589,10 +589,10 @@ contract ERC20Like is IERC20, Delegable {
 
         _tokenContainers[holder].unlockAmount = _tokenContainers[holder].unlockAmount.add(unlockAmount);
         _tokenContainers[holder].balance = _tokenContainers[holder].balance.add(unlockAmount);
-        
+
         emit IncreaseUnlockAmount(holder, unlockAmount);
     }
-    
+
     /*
      * 특정 사용자(ICO, PreSale 구매자)가 구매한 금액 안에서 해금량을 변경할 때 사용합니다.
      * Balance를 Lock 상태로 전환하는 것이므로 Lock Amount의 값은 Balance보다 커질 수 없습니다.
@@ -609,7 +609,7 @@ contract ERC20Like is IERC20, Delegable {
 
         _tokenContainers[holder].unlockAmount = _tokenContainers[holder].unlockAmount.sub(lockAmount);
         _tokenContainers[holder].balance = _tokenContainers[holder].balance.sub(lockAmount);
-        
+
         emit DecreaseUnlockAmount(holder, lockAmount);
     }
 
@@ -619,7 +619,7 @@ contract ERC20Like is IERC20, Delegable {
      */
     /*
      * This function is used to change the Unlock Amount of tokens that is purchased by particular Holders (ICO, Pre-sale buyers).
-     * It unlocks all locked tokens in the Charge Amount, other than tokens already unlocked. 
+     * It unlocks all locked tokens in the Charge Amount, other than tokens already unlocked.
      */
     function unlockAmountAll(address holder) external ownerOrDelegator {
         require(!isLock);
@@ -629,7 +629,7 @@ contract ERC20Like is IERC20, Delegable {
         uint256 unlockAmount = _tokenContainers[holder].chargeAmount.sub(_tokenContainers[holder].unlockAmount);
 
         require(unlockAmount > 0);
-        
+
         _tokenContainers[holder].unlockAmount = _tokenContainers[holder].unlockAmount.add(unlockAmount);
         _tokenContainers[holder].balance = _tokenContainers[holder].balance.add(unlockAmount);
     }
@@ -648,7 +648,7 @@ contract ERC20Like is IERC20, Delegable {
      * If the contract is locked, all transactions will be suspended.
      * All Holders including Owner and Delegator will not be able to make transaction during suspension.
      * After all transactions have been stopped and all Holders have not changed their status
-     * This function is created primarily for the token swap event. 
+     * This function is created primarily for the token swap event.
      * In this process, it's important to note that the Owner of the Exchange contract should directly appoint a delegator when handling Holders' requests.
      * Only the exchange () and withdraw () are allowed to be executed for token swap.
      */
@@ -663,13 +663,13 @@ contract ERC20Like is IERC20, Delegable {
      */
     /*
      * Release contract lock
-     * The function is used to revert a locked contract to a normal state. 
+     * The function is used to revert a locked contract to a normal state.
      */
     function unlock() external onlyOwner returns (bool) {
         isLock = false;
         return isLock;
     }
-    
+
     /*
      * 토큰 교환 처리용 외부 호출 함수
      * 계약 전체가 잠긴 상태일 때(교환 처리 중 계약 중단),
@@ -683,15 +683,15 @@ contract ERC20Like is IERC20, Delegable {
     function exchange(address holder) external onlyDelegator returns (bool) {
         require(isLock);    // lock state only
         require((delegator() == msg.sender) && isContract(msg.sender));    // contract delegator only
-        
+
         uint256 balance = _tokenContainers[holder].balance;
         _tokenContainers[holder].balance = 0;
         _tokenContainers[msg.sender].balance = _tokenContainers[msg.sender].balance.add(balance);
-        
+
         emit Exchange(holder, msg.sender, balance);
         return true;
     }
-    
+
     /*
      * 토큰 교환 처리 후 회수된 토큰을 Owner한테 돌려주는 함수
      * 계약 전체가 잠긴 상태일 때(교환 처리 중 계약 중단),
@@ -705,14 +705,14 @@ contract ERC20Like is IERC20, Delegable {
     function withdraw() external onlyDelegator returns (bool) {
         require(isLock);    // lock state only
         require((delegator() == msg.sender) && isContract(msg.sender));    // contract delegator only
-        
+
         uint256 balance = _tokenContainers[msg.sender].balance;
         _tokenContainers[msg.sender].balance = 0;
         _tokenContainers[owner()].balance = _tokenContainers[owner()].balance.add(balance);
-        
+
         emit Withdraw(msg.sender, balance);
     }
-    
+
     /*
      * 현재의 주소가 엔진내에 차지하고 있는 코드의 크기를 계산하여 컨트랙트인지 확인하는 도구
      * 컨트랙트인 경우에만 저장된 코드의 크기가 존재하므로 코드의 크기가 존재한다면
@@ -739,4 +739,15 @@ contract SymToken is ERC20Like {
         _tokenContainers[msg.sender].chargeAmount = _totalSupply;
         emit Charge(msg.sender, _tokenContainers[msg.sender].chargeAmount, _tokenContainers[msg.sender].unlockAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -36,7 +36,7 @@ contract Base
         if (IsLimitPart(level, part)) return PARTWEIGHT_LIMIT;
         return PARTWEIGHT_NORMAL;
     }
-    
+
     function GetPartNum(uint8 level) internal pure returns(uint)
     {
         if (level <= 2) return 3;
@@ -79,7 +79,7 @@ contract BasicAuth is Base
         require(tx.origin==creator || msg.sender==creator);
         _;
     }
-   
+
     function SetAuth(address target) external ValidHandleAuth
     {
         auth_list[target] = true;
@@ -423,7 +423,7 @@ library ItemList {
         }
         else if (num == 0) {
             delete self.m_Maps[key];
-        } 
+        }
         else {
             uint old = self.m_Maps[key];
             if (old == num) return;
@@ -1599,4 +1599,20 @@ contract Production is Child {
         CollectChips(idx);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

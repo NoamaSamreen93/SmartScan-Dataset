@@ -229,7 +229,7 @@ contract TobkaCoin is ERC20Interface, Owned {
 
 
 
-    
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
 
         return allowed[tokenOwner][spender];
@@ -272,4 +272,15 @@ contract TobkaCoin is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

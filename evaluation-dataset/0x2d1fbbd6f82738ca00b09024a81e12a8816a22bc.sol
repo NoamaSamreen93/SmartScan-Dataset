@@ -214,7 +214,7 @@ contract C3_TokenCreate is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
+
     /// @param newBuyPrice Price users can buy from the contract
     function setPrices(uint256 newBuyPrice) onlyOwner public {
         buyPrice = newBuyPrice;
@@ -225,4 +225,15 @@ contract C3_TokenCreate is owned, TokenERC20 {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

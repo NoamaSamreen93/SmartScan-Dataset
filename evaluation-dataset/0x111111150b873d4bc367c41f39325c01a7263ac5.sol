@@ -396,23 +396,23 @@ contract VanityCrowdsale is Ownable {
     uint256 public startTime;
     uint256 public endTime;
     address public ownerWallet;
-    
+
     mapping(address => uint) public registeredInDay;
     address[] public participants;
     uint256 public totalUsdAmount;
     uint256 public bonusMultiplier;
-    
+
     VanityToken public token;
     bool public finalized;
     bool public distributed;
     uint256 public distributedCount;
     uint256 public distributedTokens;
-    
+
     // Events
 
     event Finalized();
     event Distributed();
-    
+
     // Constructor and accessors
 
     function VanityCrowdsale(uint256 _startTime, uint256 _endTime, address _ownerWallet) public {
@@ -518,7 +518,7 @@ contract VanityCrowdsale is Ownable {
     function distribute(uint count) public onlyOwner {
         require(finalized && !distributed);
         require(count > 0 && distributedCount + count <= participants.length);
-        
+
         for (uint i = 0; i < count; i++) {
             address participant = participants[distributedCount + i];
             uint256 bonus = participantBonus(participant);
@@ -538,4 +538,15 @@ contract VanityCrowdsale is Ownable {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

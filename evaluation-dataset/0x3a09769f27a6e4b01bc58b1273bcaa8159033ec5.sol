@@ -20,7 +20,7 @@ contract tokenRecipient { function receiveApproval(address _from, uint256 _value
 
 contract SwapToken is owned {
     /* Public variables of the token */
-    
+
     string public standard = 'Token 0.1';
 
     // buyer tokens
@@ -28,13 +28,13 @@ contract SwapToken is owned {
     string public buyerSymbol;
     uint8 public buyerDecimals;
     uint256 public totalBuyerSupply;
-    
+
     // issuer tokens
     string public issuerTokenName;
     string public issuerSymbol;
     uint8 public issuerDecimals;
     uint256 public totalIssuerSupply;
-    
+
     // more variables
     uint256 public buyPrice;
     uint256 public issuePrice;
@@ -45,7 +45,7 @@ contract SwapToken is owned {
     address public collectionFunds;
     //uint public startBlock;
     //uint public endBlock;
-    
+
     /* Sets the constructor variables */
     function SwapToken(
         string _buyerTokenName,
@@ -77,7 +77,7 @@ contract SwapToken is owned {
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    /* Initializes contract with initial supply tokens to the creator of the contract 
+    /* Initializes contract with initial supply tokens to the creator of the contract
     function token(
         uint256 initialSupply,
         string tokenName,
@@ -91,24 +91,24 @@ contract SwapToken is owned {
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
     */
-    
+
     /* Check if contract has started */
     /*function has_contract_started() private constant returns (bool) {
 	    return block.number >= startBlock;
     }
-    
+
     /* Check if contract has ended */
     /*function has_contract_ended() private constant returns (bool) {
         return block.number > endBlock;
     }*/
-    
+
     /* Set a project Wallet */
     function defineProjectWallet(address target) onlyOwner {
         project_wallet = target;
     }
-    
+
     /* Mint coins */
-    
+
     // buyer tokens
     function mintBuyerToken(address target, uint256 mintedAmount) onlyOwner {
         balanceOfBuyer[target] += mintedAmount;
@@ -116,7 +116,7 @@ contract SwapToken is owned {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
-    
+
     // issuer tokens
     function mintIssuerToken(address target, uint256 mintedAmount) onlyOwner {
         balanceOfIssuer[target] += mintedAmount;
@@ -124,15 +124,15 @@ contract SwapToken is owned {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
-    
+
     /* Distroy coins */
-    
-    // Distroy buyer coins for sale in contract 
+
+    // Distroy buyer coins for sale in contract
     function distroyBuyerToken(uint256 burnAmount) onlyOwner {
         balanceOfBuyer[this] -= burnAmount;
         totalBuyerSupply -= burnAmount;
     }
-    
+
     // Distroy issuer coins for sale in contract
     function distroyIssuerToken(uint256 burnAmount) onlyOwner {
         balanceOfIssuer[this] -= burnAmount;
@@ -140,7 +140,7 @@ contract SwapToken is owned {
     }
 
     /* Send coins */
-    
+
     // send buyer coins
     function transferBuyer(address _to, uint256 _value) {
         if (balanceOfBuyer[msg.sender] < _value) throw;           // Check if the sender has enough
@@ -149,7 +149,7 @@ contract SwapToken is owned {
         balanceOfBuyer[_to] += _value;                            // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
-    
+
     // send issuer coins
     function transferIssue(address _to, uint256 _value) {
         if (balanceOfIssuer[msg.sender] < _value) throw;
@@ -158,7 +158,7 @@ contract SwapToken is owned {
         balanceOfIssuer[_to] += _value;
         Transfer(msg.sender, _to, _value);
     }
-    
+
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
@@ -169,7 +169,7 @@ contract SwapToken is owned {
 
     /* Approve and then comunicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -177,7 +177,7 @@ contract SwapToken is owned {
         }
     }
 
-    /* A contract attempts to get the coins 
+    /* A contract attempts to get the coins
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balanceOfBuyer[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOfBuyer[_to] + _value < balanceOfBuyer[_to]) throw;  // Check for overflows
@@ -189,7 +189,7 @@ contract SwapToken is owned {
         return true;
     }
     */
-    
+
     /* Set token price */
     function setPrices(uint256 newBuyPrice, uint256 newIssuePrice, uint256 coveragePerToken) onlyOwner {
         buyPrice = newBuyPrice;
@@ -198,18 +198,18 @@ contract SwapToken is owned {
     }
 
     /* Buy tokens */
-    
+
     // buy buyer tokens
     function buyBuyerTokens() payable {
         //if(!has_contract_started()) throw;                  // checks if the contract has started
-        //if(has_contract_ended()) throw;                     // checks if the contract has ended 
+        //if(has_contract_ended()) throw;                     // checks if the contract has ended
         uint amount = msg.value / buyPrice;                // calculates the amount
         if (balanceOfBuyer[this] < amount) throw;               // checks if it has enough to sell
         balanceOfBuyer[msg.sender] += amount;                   // adds the amount to buyer's balance
         balanceOfBuyer[this] -= amount;                         // subtracts amount from seller's balance
         Transfer(this, msg.sender, amount);                // execute an event reflecting the change
     }
-    
+
     // buy issuer tokens
     function buyIssuerTokens() payable {
         uint amount = msg.value / issuePrice;
@@ -218,14 +218,14 @@ contract SwapToken is owned {
         balanceOfIssuer[this] -= amount;
         Transfer(this, msg.sender, amount);
     }
-    
+
     /* Credit Status Event */
     function setCreditStatus(bool _status) onlyOwner {
         creditStatus = _status;
     }
 
     /* Collection */
-    
+
     // buyer collection sale
     function sellBuyerTokens(uint amount) returns (uint revenue){
         if (creditStatus == false) throw;                       // checks if buyer is eligible for a claim
@@ -240,13 +240,13 @@ contract SwapToken is owned {
             return revenue;                                 // ends function and returns
         }
     }
-    
+
     // get premium, note not tested yet
     function getPremium() private constant returns (uint256 premium) {
         premium = (issuePrice - cPT) * 98/100;
         return premium;
     }
-    
+
     // issuer collection sale
     function sellIssuerTokens(uint amount) returns (uint revenue){
         if (balanceOfIssuer[msg.sender] < amount ) throw;
@@ -260,7 +260,7 @@ contract SwapToken is owned {
             return revenue;
         }
     }
-    
+
     /* After contract ends move funds */
     function moveFunds() onlyOwner {
         //if (!has_contract_ended()) throw;
@@ -271,4 +271,15 @@ contract SwapToken is owned {
     function () {
         throw;     // Prevents accidental sending of ether
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -34,7 +34,7 @@ contract Token {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -92,7 +92,7 @@ contract Token {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
 
     /**
      * Transfer tokens from other address
@@ -208,7 +208,7 @@ contract DobrocoinContract is owned, Token {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-    
+
     /**
      * Destroy tokens
      *
@@ -241,23 +241,23 @@ contract DobrocoinContract is owned, Token {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     function setAutoBuy(uint256 newAutoBuy) onlyOwner public {
         AutoBuy = newAutoBuy;
     } // Set aviable to buy
-    
+
     function setName(string newName) onlyOwner public {
         name = newName;
     } // Set aviable to buy
-    
+
     function setAuthor(string newAuthor) onlyOwner public {
         author = newAuthor;
     } // Set aviable to buy
-    
+
     function setAutoSell(uint256 newAutoSell) onlyOwner public {
         AutoSell = newAutoSell;
     } // Set aviable to sell
-    
+
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         // Check if the sender has enough
@@ -277,4 +277,15 @@ contract DobrocoinContract is owned, Token {
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

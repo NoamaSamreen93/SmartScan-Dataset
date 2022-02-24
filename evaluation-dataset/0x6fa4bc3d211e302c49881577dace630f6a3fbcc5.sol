@@ -49,28 +49,28 @@ contract Ownable {
 interface token {
     function transfer(address _to, uint256 _amount);
 }
- 
+
 contract Crowdsale is Ownable {
-    
+
     address public beneficiary = msg.sender;
     token public epm;
-    
+
     uint256 public constant EXCHANGE_RATE = 100; // 100 TKN for ETH
     uint256 public constant DURATION = 30 days;
     uint256 public startTime = 0;
     uint256 public endTime = 0;
-    
+
     uint public amount = 0;
 
     mapping(address => uint256) public balanceOf;
-    
+
     event FundTransfer(address backer, uint amount, bool isContribution);
 
     /**
      * Constructor function
      *
      */
-     
+
     function Crowdsale() {
         epm = token(0xA81b980c9FAAFf98ebA21DC05A9Be63f4C733979);
         startTime = now;
@@ -82,7 +82,7 @@ contract Crowdsale is Ownable {
      *
      * The function without name is the default function that is called whenever anyone sends funds to a contract
      */
-     
+
     function () payable onlyDuringSale() {
         uint SenderAmount = msg.value;
         balanceOf[msg.sender] += SenderAmount;
@@ -99,7 +99,7 @@ contract Crowdsale is Ownable {
 
         _;
     }
-    
+
     function Withdrawal()  {
             if (amount > 0) {
                 if (beneficiary.send(amount)) {
@@ -110,4 +110,10 @@ contract Crowdsale is Ownable {
             }
 
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

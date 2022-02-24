@@ -12,7 +12,7 @@ interface Snip3DInterface  {
         function myEarnings()
         external
         view
-       
+
         returns(uint256);
         function tryFinalizeStage()
         external;
@@ -42,7 +42,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         owner = _newOwner;
     }
-    
+
 }
 // ----------------------------------------------------------------------------
 // Safe maths
@@ -86,7 +86,7 @@ contract Slaughter3D is  Owned {
         return ( Snip3Dcontract_.myEarnings())  ;
     }
     function sacUp ()  public payable {
-       
+
         toSlaughter = toSlaughter.add(msg.value);
     }
     function sacUpto (address masternode)  public {
@@ -95,11 +95,11 @@ contract Slaughter3D is  Owned {
         Snip3Dcontract_.offerAsSacrifice.value(0.1 ether)(masternode);
     }
     function validate ()  public {
-       
+
         Snip3Dcontract_.tryFinalizeStage();
     }
     function fetchvault () public {
-      
+
         Snip3Dcontract_.withdraw();
     }
     function fetchBalance () onlyOwner public {
@@ -107,4 +107,17 @@ contract Slaughter3D is  Owned {
         msg.sender.transfer(tosend);
     }
     function () external payable{} // needs for divs
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

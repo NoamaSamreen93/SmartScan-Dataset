@@ -79,11 +79,11 @@ contract Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -93,11 +93,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -146,8 +146,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -228,29 +228,29 @@ contract BurnableToken is StandardToken, Ownable {
      string public name ;
      string public symbol ;
      uint8 public decimals = 18;
-     
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
      function ()public payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      */
-     constructor(address wallet) public 
+     constructor(address wallet) public
      {
          owner = wallet;
          totalSupply = uint(15000000000).mul( 10 ** uint256(decimals)); //Update total supply with the decimal amount
          name = "ezcash";
          symbol = "EZE";
          balances[wallet] = totalSupply;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          emit Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
@@ -258,3 +258,14 @@ contract BurnableToken is StandardToken, Ownable {
 	    return (name, symbol, totalSupply);
     }
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

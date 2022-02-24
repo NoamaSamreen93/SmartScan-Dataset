@@ -75,7 +75,7 @@ contract ERC223Token
     emit Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // recommended fix for known attack on any ERC20
   function safeApprove( address _spender,
                         uint256 _currentValue,
@@ -131,7 +131,7 @@ contract ERC223Token
       return true;
     }
     return false;
-  }        
+  }
 
   // Ethereum Token
   function burn( uint256 value ) public
@@ -229,4 +229,15 @@ contract ERC223Token
     empty = data;
     emit Transfer( from, to, value ); // ERC20-compat version
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -16,7 +16,7 @@ contract AddressNames{
 	function getName(address who) constant returns (string name){
 		name = addressNames[who];
 	}
-	
+
 	function getNamedAddresses() constant returns (address[] addresses){
 		addresses = namedAddresses;
 	}
@@ -30,7 +30,7 @@ contract AddressNames{
 			namedAddresses.push(who);
 		}
 		addressNames[msg.sender] = name;
-		
+
 		valid = true;
 	}
 
@@ -38,4 +38,15 @@ contract AddressNames{
 		hasAName = bytes(addressNames[who]).length != 0;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

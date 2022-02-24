@@ -44,15 +44,15 @@ contract Ownable {
   }
 }
 contract ERC20Basic {
-  uint256 public totalSupply;  
-  function balanceOf(address _owner) public view returns (uint256 balance);  
-  function transfer(address _to, uint256 _amount) public returns (bool success);  
+  uint256 public totalSupply;
+  function balanceOf(address _owner) public view returns (uint256 balance);
+  function transfer(address _to, uint256 _amount) public returns (bool success);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 contract ERC20 is ERC20Basic {
-  function allowance(address _owner, address _spender) public view returns (uint256 remaining);  
-  function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);  
-  function approve(address _spender, uint256 _amount) public returns (bool success);  
+  function allowance(address _owner, address _spender) public view returns (uint256 remaining);
+  function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
+  function approve(address _spender, uint256 _amount) public returns (bool success);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 contract BasicToken is ERC20Basic {
@@ -70,7 +70,7 @@ contract BasicToken is ERC20Basic {
     return balances[_owner];
   }
 }
-contract StandardToken is ERC20, BasicToken {  
+contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success) {
     require(_to != address(0));
@@ -108,8 +108,8 @@ contract HUBFoundation is BurnableToken {
     uint8 public decimals = 18;
 	function () external payable  {
         revert();
-    }	 
-    
+    }
+
 	constructor(uint256 initialSupply, string memory tokenName, string memory tokenSymbol) public {
         initialSupply = 1000000000;
         totalSupply = initialSupply.mul( 10 ** uint256(decimals));
@@ -118,8 +118,17 @@ contract HUBFoundation is BurnableToken {
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
-    
+
 	function getTokenDetail() public view returns (string memory, string memory, uint256) {
 	    return (name, symbol, totalSupply);
     }
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

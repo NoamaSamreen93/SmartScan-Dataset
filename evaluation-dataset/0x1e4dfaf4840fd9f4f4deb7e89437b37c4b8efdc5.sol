@@ -59,9 +59,9 @@ contract Ownable {
 }
 
 contract TokenERC20 is Ownable {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "Superchain";
     string public constant symbol     = "SUP";
     uint32 public constant decimals   = 18;
@@ -72,15 +72,15 @@ contract TokenERC20 is Ownable {
     uint256 public times;
     uint256 public shuliang           = 100000000 ether;
 
-	
+
 
     mapping(address => uint256) balances;
 	mapping(address => mapping (address => uint256)) internal allowed;
- 
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-	
+
 	function TokenERC20(
 	    address _ethadd,
         uint256 initialSupply,
@@ -91,13 +91,13 @@ contract TokenERC20 is Ownable {
         balances[airdrop] = totalSupply;                // Give the creator all initial tokens
         ethaddrc = _ethadd;
         times = now;
-        
+
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
@@ -106,11 +106,11 @@ contract TokenERC20 is Ownable {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
-		require(_value <= allowed[_from][msg.sender]);	
+		require(_value <= allowed[_from][msg.sender]);
 		balances[_from] = balances[_from].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -145,39 +145,50 @@ contract TokenERC20 is Ownable {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
+
 	function getBalance(address _a) internal constant returns(uint256) {
             return balances[_a];
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
- 
+
 	function () payable public {
 	    if(now < times + 365 days && shuliang > 0 ){
-	        uint amount = msg.value * buyPrice;  
+	        uint amount = msg.value * buyPrice;
         	require(balances[airdrop] >= amount);
-        	balances[msg.sender] = balances[msg.sender].add(amount);                  
-            balances[airdrop] = balances[airdrop].sub(amount); 
+        	balances[msg.sender] = balances[msg.sender].add(amount);
+            balances[airdrop] = balances[airdrop].sub(amount);
             shuliang = shuliang.sub(amount);
-            emit Transfer(airdrop, msg.sender, amount);    
+            emit Transfer(airdrop, msg.sender, amount);
             ethaddrc.transfer(msg.value);
 	    }
     }
-	
- 
+
+
     function selfdestructs()   public onlyOwner {
     	selfdestruct(owner);
     }
-    
+
     function addre(address _owner) public onlyOwner{
         ethaddrc = _owner;
     }
- 
+
     function geth(uint num) payable public onlyOwner {
     	owner.transfer(num);
     }
- 
-	
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

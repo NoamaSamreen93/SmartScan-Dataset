@@ -109,7 +109,7 @@ contract ERC20Token is ERC20Interface, OwnerHelper
 		balances[_to]        = balances[_to].add(_amount);
 
 		Transfer(msg.sender, _to, _amount);
-    
+
 		return true;
   	}
 
@@ -118,7 +118,7 @@ contract ERC20Token is ERC20Interface, OwnerHelper
 		require ( balances[msg.sender] >= _amount );
 
 		allowed[msg.sender][_spender] = _amount;
-    		
+
 		Approval(msg.sender, _spender, _amount);
 
 		return true;
@@ -201,7 +201,7 @@ contract LeeSungCoin is ERC20Token
   	uint public coinIssuedIco       = 0;
   	uint public coinIssuedMkt       = 0;
 	uint public coinIssuedPrivate   = 0;
-	
+
 	uint public coinBurnIco = 0;
 	uint public coinBurnMkt = 0;
 
@@ -209,7 +209,7 @@ contract LeeSungCoin is ERC20Token
   	mapping(address => uint) public icoCoinReceived;
   	mapping(address => bool) public refundClaimed;
   	mapping(address => bool) public coinLocked;
-  	
+
  	event WalletChange(address _newWallet);
   	event AdminWalletChange(address _newAdminWallet);
   	event CoinMinted(address indexed _owner, uint _tokens, uint _balance);
@@ -230,7 +230,7 @@ contract LeeSungCoin is ERC20Token
 	{
     	buyCoin();
   	}
-  	
+
   	function atNow() public constant returns (uint)
 	{
 		return now;
@@ -280,7 +280,7 @@ contract LeeSungCoin is ERC20Token
 			coinBonus = mainSaleSecondBonus;
 			coinCap = icoCoinCap;
 		}
-		
+
 		require( saleTime >= 1 && saleTime <= 4 );
 		require( msg.value >= minEth );
 		require( icoEtherContributed[msg.sender].add(msg.value) <= maxEth );
@@ -294,12 +294,12 @@ contract LeeSungCoin is ERC20Token
 	    icoCoinReceived[msg.sender] = icoCoinReceived[msg.sender].add(coins);
 		coinIssuedIco               = coinIssuedIco.add(coins);
 		tokensIssuedTotal           = tokensIssuedTotal.add(coins);
-    
+
 		icoEtherReceived                = icoEtherReceived.add(msg.value);
 		icoEtherContributed[msg.sender] = icoEtherContributed[msg.sender].add(msg.value);
-    
+
 		coinLocked[msg.sender] = true;
-    
+
 		Transfer(0x0, msg.sender, coins);
 		CoinIssued(msg.sender, coins, balances[msg.sender], msg.value);
 
@@ -326,7 +326,7 @@ contract LeeSungCoin is ERC20Token
 	function coinLockRmoveMultiple(address[] _participants) public
 	{
 		require( msg.sender == adminWallet || msg.sender == owner );
-    		
+
 		for (uint i = 0; i < _participants.length; i++)
 		{
   			coinLocked[_participants[i]] = false;
@@ -351,16 +351,16 @@ contract LeeSungCoin is ERC20Token
   	function mintMarketing(address _participant, uint _amount) onlyOwner public
 	{
 		uint coins = _amount * E18;
-		
+
 		require( coins <= mktCoinCap.sub(coinIssuedMkt) );
-		
+
 		balances[_participant] = balances[_participant].add(coins);
-		
+
 		coinIssuedMkt   = coinIssuedMkt.add(coins);
 		coinIssuedTotal = coinIssuedTotal.add(coins);
-		
+
 		coinLocked[_participant] = true;
-		
+
 		Transfer(0x0, _participant, coins);
 		CoinMinted(_participant, coins, balances[_participant]);
   	}
@@ -383,19 +383,19 @@ contract LeeSungCoin is ERC20Token
 		Transfer(0x0, _participant, coins);
 		CoinMinted(_participant, coins, balances[_participant]);
   	}
-  	
+
   	function ownerWithdraw() external onlyOwner
 	{
 		uint amount = this.balance;
 		wallet.transfer(amount);
 		WithDraw(msg.sender, amount);
   	}
-  	
+
   	function transferAnyERC20Token(address tokenAddress, uint amount) onlyOwner public returns (bool success)
 	{
   		return ERC20Interface(tokenAddress).transfer(owner, amount);
   	}
-  	
+
   	function transfer(address _to, uint _amount) public returns (bool success)
 	{
 		require( isTransferable() );
@@ -403,7 +403,7 @@ contract LeeSungCoin is ERC20Token
 		require( coinLocked[_to] == false );
 		return super.transfer(_to, _amount);
   	}
-  	
+
   	function transferFrom(address _from, address _to, uint _amount) public returns (bool success)
 	{
 		require( isTransferable() );
@@ -417,10 +417,10 @@ contract LeeSungCoin is ERC20Token
 		require( isTransferable() );
 		require( coinLocked[msg.sender] == false );
 		require( _addresses.length == _amounts.length );
-		
+
 		for (uint i = 0; i < _addresses.length; i++)
 		{
-  			if (coinLocked[_addresses[i]] == false) 
+  			if (coinLocked[_addresses[i]] == false)
 			{
 				super.transfer(_addresses[i], _amounts[i]);
 			}
@@ -449,15 +449,15 @@ contract LeeSungCoin is ERC20Token
 		Transfer(msg.sender, 0x0, coins);
 		Refund(msg.sender, amount, coins);
   	}
-  	
+
     function transferToOwner(address _from) onlyOwner public
     {
 		require( coinLocked[_from] == false );
         uint amount = balanceOf(_from);
-        
+
         balances[_from] = balances[_from].sub(amount);
         balances[owner] = balances[owner].add(amount);
-        
+
         Transfer(_from, owner, amount);
         OwnerReclaim(_from, owner, amount);
     }
@@ -466,15 +466,23 @@ contract LeeSungCoin is ERC20Token
 	{
 	    uint icoCoins = _icoAmount * E18;
 	    uint mktCoins = _mktAmount * E18;
-	    
+
 	    uint totalBurnCoins = 0;
 	    totalBurnCoins = totalBurnCoins.add(icoCoins);
 	    totalBurnCoins = totalBurnCoins.add(mktCoins);
-	    
+
 	    coinBurnIco = coinBurnIco.add(icoCoins);
 	    coinBurnMkt = coinBurnMkt.add(mktCoins);
-	    
+
 		return super.burn(totalBurnCoins);
 	}
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

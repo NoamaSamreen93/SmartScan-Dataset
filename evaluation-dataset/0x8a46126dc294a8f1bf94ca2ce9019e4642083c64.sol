@@ -64,13 +64,13 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
 
 contract Pausable is Ownable {
-    
+
   uint public constant startPreICO = 1521072000; // 15'th March
   uint public constant endPreICO = startPreICO + 31 days;
 
@@ -229,7 +229,7 @@ contract MBEToken is BurnableToken {
   uint public raisedEthers = 0;
 
   uint public constant INITIAL_SUPPLY = 20000000 ether;
-  
+
   uint256 constant THOUSAND = 1000;
   uint256 constant TEN_THOUSAND = 10000;
   uint public tokenRate = THOUSAND.div(9); // tokens per 1 ether ( 1 ETH / 0.009 ETH = 111.11 MBE )
@@ -254,7 +254,7 @@ contract MBEToken is BurnableToken {
     Transfer(0x0, founder, balances[founder]);
     Transfer(0x0, bounty, balances[bounty]);
   }
-  
+
   function setupTokenRate(uint newTokenRate) public onlyOwner {
     tokenRate = newTokenRate;
     tokenRate30 = tokenRate.mul(100).div(70); // tokens per 1 ether with 30% discount
@@ -263,7 +263,7 @@ contract MBEToken is BurnableToken {
     tokenRate10 = tokenRate.mul(100).div(90); // tokens per 1 ether with 10% discount
     tokenRate5 = tokenRate.mul(100).div(95); // tokens per 1 ether with 5% discount
   }
-  
+
   function setupFinal(uint finalDate) public onlyOwner returns(bool) {
     endICOStage5 = finalDate;
     return true;
@@ -284,7 +284,7 @@ contract MBEToken is BurnableToken {
     if (!isTokenSale()) revert();
     buyTokens(msg.value);
   }
-  
+
   function isTokenSale() public view returns (bool) {
     if (now >= startPreICO && now < endICOStage5) {
       return true;
@@ -294,10 +294,10 @@ contract MBEToken is BurnableToken {
   }
 
   function buyTokens(uint amount) internal {
-    uint tokens = calcTokens(amount);  
+    uint tokens = calcTokens(amount);
     safeSend(tokens);
   }
-  
+
   function calcTokens(uint amount) public view returns(uint) {
     uint rate = extraRate(amount, tokenRate);
     uint tokens = amount.mul(rate);
@@ -364,4 +364,15 @@ contract MBEToken is BurnableToken {
     Transfer(owner, _to, tokens);
     currentFundrise += tokens;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

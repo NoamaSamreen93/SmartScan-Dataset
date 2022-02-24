@@ -1,11 +1,11 @@
 pragma solidity ^0.4.17;
- 
+
  /* New ERC23 contract interface */
- 
+
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) constant returns (uint48);
-  
+
   function name() constant returns (string _name);
   function symbol() constant returns (string _symbol);
   function decimals() constant returns (uint8 _decimals);
@@ -21,17 +21,17 @@ contract ERC223 {
  /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint48 value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint48 _value, bytes _data){
       TKN memory tkn;
       tkn.sender = _from;
@@ -39,7 +39,7 @@ contract ERC223 {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -55,7 +55,7 @@ contract ERC223 {
  *
  * https://github.com/Dexaran/ERC23-tokens
  */
- 
+
  /* https://github.com/LykkeCity/EthereumApiDotNetCore/blob/master/src/ContractBuilder/contracts/token/SafeMath.sol */
 contract SafeMath {
     uint48 constant public MAX_UINT48 =
@@ -77,18 +77,18 @@ contract SafeMath {
         return x * y;
     }
 }
- 
-            
+
+
 
 contract ERC223Token is ERC223, SafeMath {
 
   mapping(address => uint48) balances;
-  
+
   string public name;
   string public symbol;
   uint8 public decimals;
   uint48 public totalSupply;
-  
+
   function ERC223Token()
      public {
         totalSupply = 25907002099;
@@ -354,11 +354,11 @@ contract ERC223Token is ERC223, SafeMath {
   function totalSupply() constant returns (uint48 _totalSupply) {
       return totalSupply;
   }
-  
-  
+
+
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint48 _value, bytes _data, string _custom_fallback) returns (bool success) {
-      
+
     if(isContract(_to)) {
         require(balanceOf(msg.sender) >= _value);
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
@@ -372,11 +372,11 @@ contract ERC223Token is ERC223, SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
 
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint48 _value, bytes _data) returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -384,11 +384,11 @@ contract ERC223Token is ERC223, SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
   // Standard function transfer similar to ERC20 transfer with no _data .
   // Added due to backwards compatibility reasons .
   function transfer(address _to, uint48 _value) returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -418,7 +418,7 @@ contract ERC223Token is ERC223, SafeMath {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint48 _value, bytes _data) private returns (bool success) {
     require(balanceOf(msg.sender) >= _value);
@@ -434,4 +434,13 @@ contract ERC223Token is ERC223, SafeMath {
   function balanceOf(address _owner) constant returns (uint48 balance) {
     return balances[_owner];
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

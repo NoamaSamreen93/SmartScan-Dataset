@@ -795,7 +795,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -828,14 +828,14 @@ contract SHP is MiniMeToken {
 
 contract AffiliateUtility is Owned {
     using SafeMath for uint256;
-    
+
     uint256 public tierTwoMin;
     uint256 public tierThreeMin;
 
     uint256 public constant TIER1_PERCENT = 3;
     uint256 public constant TIER2_PERCENT = 4;
     uint256 public constant TIER3_PERCENT = 5;
-    
+
     mapping (address => Affiliate) private affiliates;
 
     event AffiliateReceived(address affiliateAddress, address investorAddress, bool valid);
@@ -870,12 +870,12 @@ contract AffiliateUtility is Owned {
     /// @param _contributionValue amount of ETH contributed
     /// @return tuple of two values (affiliateBonus, contributorBouns)
     function applyAffiliate(
-        address _investor, 
-        uint256 _contributorTokens, 
+        address _investor,
+        uint256 _contributorTokens,
         uint256 _contributionValue
     )
-        public 
-        returns(uint256, uint256) 
+        public
+        returns(uint256, uint256)
     {
         if (getAffiliate(_investor) == address(0)) {
             return (0, 0);
@@ -929,7 +929,7 @@ contract SCD is MiniMeToken {
 
 contract TokenSale is Owned, TokenController {
     using SafeMath for uint256;
-    
+
     SHP public shp;
     AffiliateUtility public affiliateUtility;
     Trustee public trustee;
@@ -956,7 +956,7 @@ contract TokenSale is Owned, TokenController {
     event Contribution(uint256 etherAmount, address _caller);
     event NewSale(address indexed caller, uint256 etherAmount, uint256 tokensGenerated);
     event SaleClosed(uint256 when);
-    
+
     modifier notPaused() {
         require(!paused);
         _;
@@ -975,7 +975,7 @@ contract TokenSale is Owned, TokenController {
     modifier isValidated() {
         require(msg.sender != 0x0);
         require(msg.value > 0);
-        require(!isContract(msg.sender)); 
+        require(!isContract(msg.sender));
         require(tx.gasprice <= MAX_GAS_PRICE);
         _;
     }
@@ -1036,7 +1036,7 @@ contract TokenSale is Owned, TokenController {
     /// @notice Updates the counters for the amount of Ether paid
     /// @param _etherAmount the amount of Ether paid
     function updateCounters(uint256 _etherAmount) internal;
-    
+
     /// @notice Parent constructor. This needs to be extended from the child contracts
     /// @param _etherEscrowAddress the address that will hold the crowd funded Ether
     /// @param _bountyAddress the address that will hold the bounty scheme SHP
@@ -1126,7 +1126,7 @@ contract TokenSale is Owned, TokenController {
     }
 }
 
-/*    
+/*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -1141,13 +1141,13 @@ contract TokenSale is Owned, TokenController {
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
+
 
 contract SharpePresale is TokenSale {
     using SafeMath for uint256;
- 
+
     mapping(address => uint256) public whitelist;
-    
+
     uint256 public preSaleEtherPaid = 0;
     uint256 public totalContributions = 0;
     uint256 public whitelistedPlannedContributions = 0;
@@ -1167,7 +1167,7 @@ contract SharpePresale is TokenSale {
     uint256 public honourWhitelistEnd;
 
     address public presaleAddress;
-    
+
     enum ContributionState {Paused, Resumed}
     event ContributionStateChanged(address caller, ContributionState contributionState);
     enum AllowedContributionState {Whitelisted, NotWhitelisted, AboveWhitelisted, BelowWhitelisted, WhitelistClosed}
@@ -1231,7 +1231,7 @@ contract SharpePresale is TokenSale {
     /// @param _plannedContribution The planned contribution (WEI)
     function addToWhitelist(address _sender, uint256 _plannedContribution) public onlyOwner {
         require(whitelist[_sender] == 0);
-        
+
         whitelist[_sender] = _plannedContribution;
         whitelistedPlannedContributions = whitelistedPlannedContributions.add(_plannedContribution);
     }
@@ -1266,7 +1266,7 @@ contract SharpePresale is TokenSale {
     }
 
     /// @notice Returns true if the whitelist period is still active, false otherwise.
-    /// When whitelist period ends, it will transfer any unclaimed planned contributions to the pre-sale cap. 
+    /// When whitelist period ends, it will transfer any unclaimed planned contributions to the pre-sale cap.
     function honourWhitelist() private returns (bool) {
         bool honourWhitelist = true;
         if (honourWhitelistEnd <= now) {
@@ -1280,7 +1280,7 @@ contract SharpePresale is TokenSale {
 
     event PresaleCapUpdated(uint256 newPresaleCap);
 
-    /// @notice Returns the contribution to be used as part of the transaction, and any refund value if expected.  
+    /// @notice Returns the contribution to be used as part of the transaction, and any refund value if expected.
     function processContribution() private isValidContribution returns (uint256, uint256) {
         if (!honourWhitelist()) {
             var (allowedContribution, refundAmount) = getAllowedContribution();
@@ -1289,11 +1289,11 @@ contract SharpePresale is TokenSale {
             PresaleCapUpdated(preSaleCap);
             return (allowedContribution, refundAmount);
         }
-        
+
         var (whiteListedAllowedContribution, whiteListedRefundAmount) = getAllowedContribution();
         if (whitelist[msg.sender] > 0) {
             return processWhitelistedContribution(whiteListedAllowedContribution, whiteListedRefundAmount);
-        } 
+        }
 
         // TODO: revert
         revert();
@@ -1304,18 +1304,18 @@ contract SharpePresale is TokenSale {
     /// @notice Returns the contribution to be used for a sender that had previously been whitelisted, and any refund value if expected.
     function processWhitelistedContribution(uint256 allowedContribution, uint256 refundAmount) private returns (uint256, uint256) {
         uint256 plannedContribution = whitelist[msg.sender];
-        
+
         whitelist[msg.sender] = 0;
         WhitelistedUpdated(plannedContribution, true);
-        
+
         if (msg.value > plannedContribution) {
             return handleAbovePlannedWhitelistedContribution(allowedContribution, plannedContribution, refundAmount);
         }
-        
+
         if (msg.value < plannedContribution) {
             return handleBelowPlannedWhitelistedContribution(plannedContribution);
         }
-        
+
         return handlePlannedWhitelistedContribution(plannedContribution);
     }
 
@@ -1326,7 +1326,7 @@ contract SharpePresale is TokenSale {
         AllowedContributionCheck(plannedContribution, AllowedContributionState.Whitelisted);
         return (plannedContribution, 0);
     }
-    
+
     /// @notice Returns the contribution and refund value to be used when the transaction value is higher than the whitelisted contribution for the sender.
     /// Note that only in this case, the refund value will not be 0.
     function handleAbovePlannedWhitelistedContribution(uint256 allowedContribution, uint256 plannedContribution, uint256 refundAmount) private returns (uint256, uint256) {
@@ -1337,7 +1337,7 @@ contract SharpePresale is TokenSale {
 
     /// @notice Returns the contribution and refund value to be used when the transaction value is lower than the whitelisted contribution for the sender.
     /// Note that refund value will always be 0 in this case, as transaction value is below the planned contribution for this sender.
-    function handleBelowPlannedWhitelistedContribution(uint256 plannedContribution) private returns (uint256, uint256) {    
+    function handleBelowPlannedWhitelistedContribution(uint256 plannedContribution) private returns (uint256, uint256) {
         updateWhitelistedContribution(msg.value);
         AllowedContributionCheck(msg.value, AllowedContributionState.BelowWhitelisted);
         return (msg.value, 0);
@@ -1393,7 +1393,7 @@ contract SharpePresale is TokenSale {
     /// @param _etherAmount The amount of ether used to evaluate the tier the contribution lies within
     /// @param _contributorTokens The tokens allocated based on the contribution
     function applyDiscount(
-        uint256 _etherAmount, 
+        uint256 _etherAmount,
         uint256 _contributorTokens
     )
         internal
@@ -1422,4 +1422,15 @@ contract SharpePresale is TokenSale {
         totalContributions = totalContributions.add(1);
         CountersUpdated(preSaleEtherPaid, _etherAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

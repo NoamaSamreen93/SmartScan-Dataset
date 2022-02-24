@@ -104,16 +104,27 @@ contract Token is ERC20 {
     function transferToken_toBalance(address _user, uint256 _amount) public onlyOwner {
         investBalances[_user] -= _amount;
         balances[_user] += _amount;
-    } 
+    }
 
     // Transfer toknes from Balncec to investBalance
     function transferToken_toInvestBalance(address _user, uint256 _amount) public onlyOwner {
         balances[_user] -= _amount;
         investBalances[_user] += _amount;
-    }  
+    }
 
 
     function addOwner2(address _owner2) public onlyOwner {
         owner2 = _owner2;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

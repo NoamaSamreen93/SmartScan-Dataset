@@ -1,11 +1,11 @@
 pragma solidity ^0.4.25;
 
 interface IERC20 {
-    
+
   function name() external view returns (string);
-  
+
   function symbol() external view returns (string);
-  
+
   function decimals() external view returns (uint8);
 
   function totalSupply() external view returns (uint256);
@@ -84,25 +84,25 @@ contract QCH is IERC20 {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   string private _name = 'QChi';
-  
+
   string private _symbol = 'QCH　';
-  
+
   uint8 private _decimals = 18;
 
   uint256 private _totalSupply;
-  
+
   constructor () public {
       _mint(msg.sender, 92000000 ether);
   }
-  
+
   function name() public view returns (string) {
       return _name;
   }
-  
+
   function symbol() public view returns (string) {
       return _symbol;
   }
-  
+
   function decimals() public view returns (uint8) {
       return _decimals;
   }
@@ -210,4 +210,13 @@ contract QCH is IERC20 {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
     _burn(account, value);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

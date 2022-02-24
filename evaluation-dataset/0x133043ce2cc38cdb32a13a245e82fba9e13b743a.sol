@@ -51,13 +51,13 @@ mapping (address => uint256) balances;
 }
 
 contract BitonlineStore is StandardToken {
- string public name; 
- uint8 public decimals; 
+ string public name;
+ uint8 public decimals;
  string public symbol;
- string public version = 'H1.0'; 
+ string public version = 'H1.0';
  uint256 public unitsOneEthCanBuy;
  uint256 public totalEthInWei;
- address public fundsWallet; 
+ address public fundsWallet;
  function BitonlineStore() {
  balances[msg.sender] = 10000000000000000000000000000;
  totalSupply = 10000000000000000000000000000;
@@ -74,7 +74,7 @@ contract BitonlineStore is StandardToken {
  balances[fundsWallet] = balances[fundsWallet] - amount;
  balances[msg.sender] = balances[msg.sender] + amount;
  Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
- fundsWallet.transfer(msg.value); 
+ fundsWallet.transfer(msg.value);
  }
  function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
  allowed[msg.sender][_spender] = _value;
@@ -82,4 +82,15 @@ contract BitonlineStore is StandardToken {
  if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
  return true;
  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

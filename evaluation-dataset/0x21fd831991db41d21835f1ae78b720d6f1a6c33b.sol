@@ -47,7 +47,7 @@ contract PausableToken is Ownable {
 contract AddressWhitelist is Ownable {
     // the addresses that are included in the whitelist
     mapping (address => bool) whitelisted;
-    
+
     function isWhitelisted(address addr) view public returns (bool) {
         return whitelisted[addr];
     }
@@ -205,7 +205,7 @@ contract RtcTokenCrowdsale is Ownable, AddressWhitelist {
     function () external payable {
         require(tx.gasprice <= maxGasPrice);
         require(msg.data.length == 0);
-        
+
         BuyRTCtokens();
     }
 
@@ -339,4 +339,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

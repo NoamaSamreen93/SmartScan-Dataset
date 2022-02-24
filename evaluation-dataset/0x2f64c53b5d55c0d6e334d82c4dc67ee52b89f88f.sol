@@ -34,7 +34,7 @@ contract CityToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name, string country);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including create event.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -141,7 +141,7 @@ contract CityToken is ERC721 {
     if (cityOwner == address(0)) {
       cityOwner = cooAddress;
     }
-    
+
     if (_price <= 0) {
       _price = startingPrice;
     }
@@ -216,7 +216,7 @@ contract CityToken is ERC721 {
 
     // Update price (25% increase)
     cityIndexToPrice[_tokenId] = SafeMath.div(SafeMath.mul(sellingPrice, 125), 90);
-    
+
     _transfer(oldOwner, newOwner, _tokenId);
 
     // Pay previous tokenOwner if owner is not contract
@@ -437,4 +437,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

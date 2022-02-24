@@ -22,7 +22,7 @@ contract TwoCoinsOneMoonGame {
 
     uint256 public marketCapBlue;
     uint256 public marketCapRed;
-    
+
     uint256 public startBetBlue;
     uint256 public startBetRed;
 
@@ -40,10 +40,10 @@ contract TwoCoinsOneMoonGame {
     constructor() public {
         marketCapBlue = 0;
         marketCapRed = 0;
-        
+
         startBetBlue = 0;
         startBetRed = 0;
-        
+
         feeCollector = 0xfd4e7b9f4f97330356f7d1b5ddb9843f2c3e9d87;
         discountToken = DiscountToken(0x40430713e9fa954cf33562b8469ad94ab3e14c10);
         lastLevelChangeBlock = block.number;
@@ -132,7 +132,7 @@ contract TwoCoinsOneMoonGame {
 
         marketCapBlue = 0;
         marketCapRed = 0;
-        
+
         startBetBlue = bettorsBlue.length;
         startBetRed = bettorsRed.length;
     }
@@ -146,4 +146,15 @@ contract TwoCoinsOneMoonGame {
             burstBubble();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

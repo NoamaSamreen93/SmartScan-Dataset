@@ -35,9 +35,9 @@ library SafeMath {
 }
 
 contract Token {
-    
+
     function balanceOf(address _owner) public constant returns (uint balance);
-    
+
     function transfer(address _to, uint _value) public returns (bool success);
 }
 
@@ -83,7 +83,7 @@ contract TimelockedSafe {
     	startTime = now;
     }
 
-    function withdraw(uint _withdrawAmountInWei) public returns (bool) {    	
+    function withdraw(uint _withdrawAmountInWei) public returns (bool) {
     	uint timeElapsed = now.sub(startTime);
     	uint monthsElapsed = (timeElapsed.div(oneMonth)).add(1);
     	require(monthsElapsed >= lockingPeriodInMonths);
@@ -129,7 +129,7 @@ contract TimelockedSafe {
     }
 
     function finalizeConfig() public only(adminAddress) {
-        adminAddress = 0x0; // config finalized, give up control 
+        adminAddress = 0x0; // config finalized, give up control
     }
 
     modifier only(address x) {
@@ -137,4 +137,15 @@ contract TimelockedSafe {
         _;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

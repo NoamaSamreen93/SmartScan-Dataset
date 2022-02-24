@@ -273,7 +273,7 @@ contract Sales is Owned {
     freezeBlock = _newFreezeBlock;
   }
 
-  function changePrice(uint _newPrice) 
+  function changePrice(uint _newPrice)
     onlyOwner {
     require(_newPrice > 0);
     price = _newPrice;
@@ -295,4 +295,15 @@ contract Sales is Owned {
     onlyOwner {
       frozen = !frozen;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

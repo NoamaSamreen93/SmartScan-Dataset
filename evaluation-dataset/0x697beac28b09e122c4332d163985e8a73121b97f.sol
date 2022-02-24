@@ -44,8 +44,8 @@ contract StdToken is Token {
                balances[_to] += _value;
                Transfer(msg.sender, _to, _value);
                return true;
-          } else { 
-               return false; 
+          } else {
+               return false;
           }
      }
      function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -55,8 +55,8 @@ contract StdToken is Token {
                allowed[_from][msg.sender] -= _value;
                Transfer(_from, _to, _value);
                return true;
-          } else { 
-               return false; 
+          } else {
+               return false;
           }
      }
      function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -106,8 +106,8 @@ contract QRL_Token is StdToken {
                balances[_to] += _value;
                Transfer(msg.sender, _to, _value);
                return true;
-          } else { 
-               return false; 
+          } else {
+               return false;
           }
      }
      function transferFrom(address _from, address _to, uint256 _value) notFrozen onlyPayloadSize(2) returns (bool success) {
@@ -117,8 +117,8 @@ contract QRL_Token is StdToken {
                allowed[_from][msg.sender] -= _value;
                Transfer(_from, _to, _value);
                return true;
-          } else { 
-               return false; 
+          } else {
+               return false;
           }
      }
      function approve(address _spender, uint256 _value) returns (bool success) {
@@ -143,7 +143,7 @@ contract QRL_Token is StdToken {
      }
      function issueTokens(address forAddress, uint tokenCount) onlyInState(State.Start) onlyByCreator{
           balances[forAddress]=tokenCount;
-          
+
           // This is removed for optimization (lower gas consumption for each call)
           // Please see 'setAllSupply' function
           //
@@ -159,4 +159,20 @@ contract QRL_Token is StdToken {
      function changeCreator(address newCreator) onlyByCreator{
           creator = newCreator;
      }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

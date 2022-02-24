@@ -104,7 +104,7 @@ contract PrivateCityTokens is StandardToken {
   string public symbol = "PCT";
   uint256 public decimals = 18;
   uint256 public INITIAL_SUPPLY = 16000000 * 1 ether;
-  
+
 
   /**
    * @dev Contructor that gives msg.sender all of existing tokens.
@@ -114,4 +114,15 @@ contract PrivateCityTokens is StandardToken {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -334,7 +334,7 @@ contract RAID is ERC20Pausable, ERC20Detailed {
         transfer(address(this), _amount);
 
         locked[_to][_reason] = lockToken(_amount, validUntil, false);
-        
+
         emit Locked(_to, _reason, _amount, validUntil);
         return true;
     }
@@ -344,7 +344,7 @@ contract RAID is ERC20Pausable, ERC20Detailed {
         require(!locked[_of][_reason].claimed, EXPIRED_ADDRESS);
         this.transfer(_of, locked[_of][_reason].amount);
         delete locked[_of][_reason];
-        
+
         emit RemoveLock(_of, _reason, locked[_of][_reason].amount, locked[_of][_reason].validity);
         return true;
     }
@@ -398,8 +398,8 @@ contract RAID is ERC20Pausable, ERC20Detailed {
 
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             amount = amount.add(tokensLocked(_of, lockReason[_of][i]));
-        }   
-    }    
+        }
+    }
 
     // 사유에 대한 락업 기간을 연장
     function extendLock(bytes32 _reason, uint256 _time, address _of) public onlyOwner returns (bool) {
@@ -439,7 +439,7 @@ contract RAID is ERC20Pausable, ERC20Detailed {
                 locked[_of][lockReason[_of][i]].claimed = true;
                 emit Unlocked(_of, lockReason[_of][i], lockedTokens);
             }
-        }  
+        }
 
         if (unlockableTokens > 0)
             this.transfer(_of, unlockableTokens);
@@ -449,6 +449,12 @@ contract RAID is ERC20Pausable, ERC20Detailed {
     function getUnlockableTokens(address _of) public view returns (uint256 unlockableTokens) {
         for (uint256 i = 0; i < lockReason[_of].length; i++) {
             unlockableTokens = unlockableTokens.add(tokensUnlockable(_of, lockReason[_of][i]));
-        }  
+        }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

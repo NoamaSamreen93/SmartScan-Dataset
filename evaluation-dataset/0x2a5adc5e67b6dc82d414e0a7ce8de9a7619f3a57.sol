@@ -26,7 +26,7 @@ contract Manageable {
   address public owner;
   address public manager;
   bool public contractLock;
-  
+
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   event ContractLockChanged(address admin, bool state);
 
@@ -98,7 +98,7 @@ contract InvitherA is Manageable {
     userCount=1;
     emit Init();
   }
-    
+
   function _addUser(address user_address) private returns (uint256) {
     for (uint256 i=0; i<userCount; i++){
       if (!usersMap[i].isFull){
@@ -141,7 +141,7 @@ contract InvitherA is Manageable {
   }
 
   function addUser(uint256 parent_id) public payable isUnlocked{
-    require(parent_id < userCount);  
+    require(parent_id < userCount);
     require(msg.value >= price);
     uint256 fee = msg.value.mul(4) / 100;
     uint256 reward_amount = msg.value - fee;
@@ -162,9 +162,9 @@ contract InvitherA is Manageable {
           break;
         }
       }
-    } 
+    }
   }
-  
+
   function addUserAuto() public payable isUnlocked{
     require(msg.value >= price);
     uint256 fee = msg.value.mul(4) / 100;
@@ -176,4 +176,15 @@ contract InvitherA is Manageable {
     usersMap[rewarder].user_address.transfer(reward_amount);
     emit Reward(usersMap[rewarder].user_address, rewarder, reward_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

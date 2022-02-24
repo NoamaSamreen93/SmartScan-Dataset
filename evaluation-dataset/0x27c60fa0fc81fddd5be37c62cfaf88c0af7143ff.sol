@@ -2,10 +2,10 @@ pragma solidity ^0.4.18;
 // **-----------------------------------------------
 // POWToken Storage.
 // Contract in address PowerLineUpStorage.eth
-// Storage for 30,000,000 in-platform MOYTokens. 
+// Storage for 30,000,000 in-platform MOYTokens.
 // Tokens only available through mining, stacking and tournaments in-platform through smart contracts.
-// Proyect must have enough funds provided by PowerLineUp and partners to realease tokens. 
-// This Contract stores the token and keeps record of own funding by PowerLineUp and partners. 
+// Proyect must have enough funds provided by PowerLineUp and partners to realease tokens.
+// This Contract stores the token and keeps record of own funding by PowerLineUp and partners.
 // For Open Distribution refer to contract at powcrowdsale.eth (will be launched only if own funding (PreSale) of proyect succeeds.)
 // All operations can be monitored at etherscan.io
 
@@ -76,13 +76,13 @@ contract MoyTokenStorage is owned, safeMath {
   uint256 public fundingStartBlock;                           // preSale start block#
   uint256 public fundingEndBlock;                             // preSale end block#
   uint256 public successAtBlock;                              // the private funding succeed at this block. All in-platform tokens backed.
-  uint256 public amountRaisedInUsd;                           //amount raised in USD for tokens backing. 
-  uint256 public tokensPerEthAtRegularPrice; 
-  bool public successfulPreSale; 
-         
-  
+  uint256 public amountRaisedInUsd;                           //amount raised in USD for tokens backing.
+  uint256 public tokensPerEthAtRegularPrice;
+  bool public successfulPreSale;
 
-  event Transfer(address indexed from, address indexed to, uint256 value); 
+
+
+  event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Buy(address indexed _sender, uint256 _eth, uint256 _MOY);
   mapping(address => uint256) balancesArray;
@@ -94,10 +94,10 @@ contract MoyTokenStorage is owned, safeMath {
     CurrentStatus = "In-Platform POW Tokens Storage Released";
   }
 
-  
+
   // setup the PreSale parameters
   function setupStorage(uint256 _fundingStartBlock, uint256 _fundingEndBlock) public onlyOwner returns (bytes32 response) {
-      
+
       if (msg.sender == admin)
       {
           tokenContract = StandardToken(0x2ea1EA9419A126673D1bBFdfE82524ea9E6F848B);  //MOYtoken Smart Contract.
@@ -106,10 +106,10 @@ contract MoyTokenStorage is owned, safeMath {
 
           fundingStartBlock = _fundingStartBlock;
           fundingEndBlock = _fundingEndBlock;
-                
+
           CurrentStatus = "Fundind of Proyect in Process";
-          //PowerLineUp is funding the proyect to be able to launch the tokens. 
-          
+          //PowerLineUp is funding the proyect to be able to launch the tokens.
+
           return "Storage is setup.";
 
       } else if (msg.sender != admin) {
@@ -119,17 +119,17 @@ contract MoyTokenStorage is owned, safeMath {
       }
     }
 
-  // setup success parameters if proyect funding succeed. 
+  // setup success parameters if proyect funding succeed.
   function FundingCompleted(uint256 _amountRaisedInUsd, uint256 _successAtBlock) public onlyOwner returns (bytes32 response) {
       if (msg.sender == admin)
       {
           // Funding is the capital invested by PowerLineUp and partners to back the whole proyect and the tokens released.
           amountRaisedInUsd = _amountRaisedInUsd; //amount raised includes development, human resources, infraestructure, design and marketing achieved by the proyect founders and partners.
           successAtBlock = _successAtBlock;       //Block when goal reached.
-          successfulPreSale = true;       
+          successfulPreSale = true;
           CurrentStatus = "Funding Successful, in-platform tokens ready to use.";
 
-          
+
           return "All in-platform tokens backed.";
       } else if (msg.sender != admin) {
           return "Not Authorized";
@@ -142,6 +142,17 @@ contract MoyTokenStorage is owned, safeMath {
     // only owner (PowerLineUp) can send ether to this address.
     function () public payable {
       require(msg.sender == admin);
-      Transfer(this, msg.sender, msg.value); 
+      Transfer(this, msg.sender, msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

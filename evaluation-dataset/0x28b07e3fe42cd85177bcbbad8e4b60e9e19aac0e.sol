@@ -50,7 +50,7 @@ contract TokenERC20 {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
-	
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balanceOf[_owner];
     }
@@ -136,7 +136,7 @@ contract TokenERC20 {
             return true;
         }
     }
-	
+
 	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowance[_owner][_spender];
     }
@@ -174,4 +174,15 @@ contract MyAdvancedToken is owned, TokenERC20 {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

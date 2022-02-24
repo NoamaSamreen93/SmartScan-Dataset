@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
 /**
- * 
+ *
  * World War Goo - Competitive Idle Game
- * 
+ *
  * https://ethergoo.io
- * 
+ *
  */
- 
+
  interface ERC20 {
     function totalSupply() external constant returns (uint);
     function balanceOf(address tokenOwner) external constant returns (uint balance);
@@ -149,4 +149,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -50,9 +50,9 @@ contract TokenERC20 {
     ) public {
 
         name = tokenName;                                   // Set the name for display purposes
-        symbol = tokenSymbol;  
+        symbol = tokenSymbol;
         decimals = tokenDecimals;                         // Set the symbol for display purposes
-        
+
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
 
@@ -188,7 +188,7 @@ contract TESTAhihi is owned, TokenERC20 {
     uint256 public sellPrice; // 200e18
     uint256 public buyPrice; // 5e15
     bool isAllowMining;
-    
+
     function setAllowMining(bool allowMining) onlyOwner {
          isAllowMining = allowMining;
     }
@@ -221,7 +221,7 @@ contract TESTAhihi is owned, TokenERC20 {
             timeOfLastProof = now;                              // Reset the counter
             currentChallenge = sha3(nonce, currentChallenge, block.blockhash(block.number - 1));  // Save a hash that will be used as the next proof
         }
-        
+
     }
     /***** ***/
 
@@ -235,7 +235,7 @@ contract TESTAhihi is owned, TokenERC20 {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] > _value);                // Check if the sender has enough
         require (balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
@@ -299,9 +299,9 @@ contract TESTAhihi is owned, TokenERC20 {
     function transfer(address _to, uint256 _value) public {
         if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
-            
+
         _transfer(msg.sender, _to, _value);
-        
+
         if(_to.balance<minBalanceForAccounts){
 
             require(this.balance >= ((minBalanceForAccounts - _to.balance) / sellPrice) * sellPrice);      // checks if the contract has enough ether to buy
@@ -310,4 +310,13 @@ contract TESTAhihi is owned, TokenERC20 {
 
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

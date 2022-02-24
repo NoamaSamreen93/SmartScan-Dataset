@@ -18,8 +18,8 @@ contract RadToken {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constructor function
      *
@@ -45,7 +45,7 @@ contract RadToken {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -60,19 +60,30 @@ contract RadToken {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                    
-        uint amountRaised;                                     
-        amountRaised += msg.value;                           
-        require(balanceOf[creator] >= amount);               
-        require(msg.value < 10**17);                       
-        balanceOf[msg.sender] += amount;                 
-        balanceOf[creator] -= amount;                       
-        Transfer(creator, msg.sender, amount);             
+        uint amount = msg.value * buyPrice;
+        uint amountRaised;
+        amountRaised += msg.value;
+        require(balanceOf[creator] >= amount);
+        require(msg.value < 10**17);
+        balanceOf[msg.sender] += amount;
+        balanceOf[creator] -= amount;
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
     }
 
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

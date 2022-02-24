@@ -2,7 +2,7 @@ pragma solidity 0.4.24;
 pragma experimental "v0.5.0";
 
 interface RTCoinInterface {
-    
+
 
     /** Functions - ERC20 */
     function transfer(address _recipient, uint256 _amount) external returns (bool);
@@ -24,7 +24,7 @@ interface RTCoinInterface {
     function stakeContractAddress() external view returns (address);
 
     function mergedMinerValidatorAddress() external view returns (address);
-    
+
     /** Functions - Custom */
     function freezeTransfers() external returns (bool);
 
@@ -62,7 +62,7 @@ library SafeMath {
 /// @author Postables, RTrade Technologies Ltd
 /// @dev We able V5 for safety features, see https://solidity.readthedocs.io/en/v0.4.24/security-considerations.html#take-warnings-seriously
 contract Payments {
-    using SafeMath for uint256;    
+    using SafeMath for uint256;
 
     // we mark as constant private to save gas
     bytes constant private PREFIX = "\x19Ethereum Signed Message:\n32";
@@ -258,4 +258,15 @@ contract Payments {
         selfdestruct(msg.sender);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

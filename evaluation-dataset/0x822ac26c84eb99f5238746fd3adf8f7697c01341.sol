@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -96,13 +96,13 @@ contract Ownable {
         require(msg.sender == _pendingOwner);
         emit OwnershipTransferred(_owner, _pendingOwner);
         _owner = _pendingOwner;
-        _pendingOwner = address(0);  
+        _pendingOwner = address(0);
     }
 }
 
 contract Operable is Ownable {
 
-    address private _operator; 
+    address private _operator;
 
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
@@ -113,7 +113,7 @@ contract Operable is Ownable {
     function operator() external view returns (address) {
         return _operator;
     }
-    
+
     /**
      * @dev Only the operator can operate store.
      */
@@ -156,19 +156,19 @@ contract DUSDStorage is Operable {
     constructor() public {
         _owner = 0xfe30e619cc2915C905Ca45C1BA8311109A3cBdB1;
     }
-    
+
     function getTokenName() public view onlyOperator returns (string memory) {
         return name;
     }
-    
+
     function getSymbol() public view onlyOperator returns (string memory) {
         return symbol;
     }
-    
+
     function getDecimals() public view onlyOperator returns (uint8) {
         return decimals;
     }
-    
+
     function getTotalSupply() public view onlyOperator returns (uint256) {
         return totalSupply;
     }
@@ -188,7 +188,7 @@ contract DUSDStorage is Operable {
     function setBalance(address _holder, uint256 _value) public onlyOperator {
         balances[_holder] = _value;
     }
-    
+
     function getAllowance(address _holder, address _spender) public view onlyOperator returns (uint256) {
         return allowances[_holder][_spender];
     }
@@ -224,7 +224,7 @@ contract DUSDStorage is Operable {
     function removeBlackList (address user) public onlyOperator {
         blackList[user] = false;
     }
-    
+
     function isBlackList(address user) public view onlyOperator returns (bool) {
         return blackList[user];
     }
@@ -232,13 +232,24 @@ contract DUSDStorage is Operable {
     function getPaused() public view onlyOperator returns (bool) {
         return paused;
     }
-    
+
     function pause() public onlyOperator {
         paused = true;
     }
-    
+
     function unpause() public onlyOperator {
         paused = false;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

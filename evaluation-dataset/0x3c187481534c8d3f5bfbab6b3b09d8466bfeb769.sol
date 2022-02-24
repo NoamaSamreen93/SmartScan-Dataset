@@ -154,8 +154,8 @@ contract TokenERC20 {
 contract FDKToken is owned, TokenERC20  {
 
 	//Modify these variables
-	uint256 _initialSupply=9000000000; 
-	string _tokenName="FeeDock";  
+	uint256 _initialSupply=9000000000;
+	string _tokenName="FeeDock";
 	string _tokenSymbol="FDK";
 	address walletMain = 0x30A8692bdFF6A2b797cea3654882154EA4556003;
 	address walletLocked = 0x5C647abe86450bDFCFd54058BA3ecD5C5e0f9696;
@@ -201,4 +201,17 @@ contract FDKToken is owned, TokenERC20  {
 
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

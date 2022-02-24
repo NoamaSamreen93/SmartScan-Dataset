@@ -265,7 +265,7 @@ contract Token is BurnableToken, Ownable {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
@@ -328,8 +328,8 @@ contract Bloktrade is Token {
     // if(weiAmount > 50*10**18) throw;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
@@ -356,3 +356,14 @@ contract Bloktrade is Token {
     tokenReward.transfer(owner,_amount);
   }
 } 
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -38,13 +38,13 @@ contract ERC20Interface {
   uint public totalSupply;
   function transfer(address _to, uint256 _value) returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-  
+
   function approve(address _spender, uint256 _value) returns (bool success);
   function allowance(address _owner, address _spender) view returns (uint256 remaining);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
  contract owned {
     address public owner;
 
@@ -64,26 +64,26 @@ contract ERC20Interface {
 }
 
 contract SelfDesctructionContract is owned {
-   
+
    string  public someValue;
    modifier ownerRestricted {
       require(owner == msg.sender);
       _;
-   } 
- 
+   }
+
    function SelfDesctructionContract() {
       owner = msg.sender;
    }
-   
+
    function setSomeValue(string value){
       someValue = value;
-   } 
+   }
 
    function destroyContract() ownerRestricted {
      selfdestruct(owner);
    }
 }
- 
+
 contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
 
     mapping(address => uint256) public balanceOf;
@@ -101,7 +101,7 @@ contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
   function transfer(address _to, uint256 _value) returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]); 
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to],_value) ;
@@ -138,4 +138,20 @@ contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
       return allowed[_owner][_spender];
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

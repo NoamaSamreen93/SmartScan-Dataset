@@ -73,17 +73,17 @@ contract StandardToken is Token {
 
 contract ZelaaCoin is StandardToken,Ownable {
 
- 
-    string public name;           
-    uint256 public decimals;      
-    string public symbol;         
+
+    string public name;
+    uint256 public decimals;
+    string public symbol;
 
     address owner;
     address tokenwallet;//= 0xbB502303929607bf3b5D8B968066bf8dd275720d;
     address etherwallet;//= 0xdBfC66799F2f381264C4CaaE9178680E4cCE80B5;
 
     function changeEtherWallet(address _newwallet) onlyOwner() public returns (address) {
-    
+
     etherwallet = _newwallet ;
     Changeethereallet(etherwallet,_newwallet);
     return ( _newwallet) ;
@@ -94,24 +94,24 @@ contract ZelaaCoin is StandardToken,Ownable {
         tokenwallet= 0xbB502303929607bf3b5D8B968066bf8dd275720d;
         etherwallet= 0xdBfC66799F2f381264C4CaaE9178680E4cCE80B5;
         name = "ZelaaCoin";
-        decimals = 18;            
-        symbol = "ZLC";          
-        totalSupply = 100000000 * (10**decimals);        
-        balances[tokenwallet] = totalSupply;               // Give the creator all initial tokens 
+        decimals = 18;
+        symbol = "ZLC";
+        totalSupply = 100000000 * (10**decimals);
+        balances[tokenwallet] = totalSupply;               // Give the creator all initial tokens
     }
 
 
     function getOwner() constant public returns(address){
         return(owner);
     }
-    
-    
+
+
 }
-    
+
 contract sendETHandtransferTokens is ZelaaCoin {
-    
+
         mapping(address => uint256) balances;
-    
+
         uint256 public totalETH;
         event FundTransfer(address user, uint amount, bool isContribution);
 
@@ -119,8 +119,16 @@ contract sendETHandtransferTokens is ZelaaCoin {
        function () payable public {
         uint amount = msg.value;
         totalETH += amount;
-        etherwallet.transfer(amount); 
+        etherwallet.transfer(amount);
         FundTransfer(msg.sender, amount, true);
     }
-    
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -23,7 +23,7 @@ contract EToken2 {
 contract Asset {
     function _performTransferWithReference(address _to, uint _value, string _reference, address _sender) returns(bool);
     function _performTransferToICAPWithReference(bytes32 _icap, uint _value, string _reference, address _sender) returns(bool);
-    function _performApprove(address _spender, uint _value, address _sender) returns(bool);    
+    function _performApprove(address _spender, uint _value, address _sender) returns(bool);
     function _performTransferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) returns(bool);
     function _performTransferFromToICAPWithReference(address _from, bytes32 _icap, uint _value, string _reference, address _sender) returns(bool);
     function _performGeneric(bytes _data, address _sender) payable returns(bytes32) {
@@ -45,7 +45,7 @@ contract ERC20 {
 }
 
 contract AssetProxyInterface {
-    function _forwardApprove(address _spender, uint _value, address _sender) returns(bool);    
+    function _forwardApprove(address _spender, uint _value, address _sender) returns(bool);
     function _forwardTransferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) returns(bool);
     function _forwardTransferFromToICAPWithReference(address _from, bytes32 _icap, uint _value, string _reference, address _sender) returns(bool);
 }
@@ -560,4 +560,20 @@ contract AssetProxy is ERC20, AssetProxyInterface, Bytes32 {
     function multiAsset() constant returns(EToken2) {
         return etoken2;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 
 library SafeMath {
 
- 
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
     // benefit is lost if 'b' is also tested.
@@ -18,7 +18,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b > 0); // Solidity only automatically asserts when dividing by 0
     uint256 c = a / b;
@@ -27,7 +27,7 @@ library SafeMath {
     return c;
   }
 
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
@@ -35,7 +35,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
@@ -43,7 +43,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function mod(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b != 0);
     return a % b;
@@ -65,7 +65,7 @@ contract HTCoin {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     bool lock = false;
 
     constructor(
@@ -80,10 +80,10 @@ contract HTCoin {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
-	
+
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -93,7 +93,7 @@ contract HTCoin {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -103,8 +103,8 @@ contract HTCoin {
             owner = newOwner;
         }
     }
-	
-	
+
+
 
     function transfer(
         address _to,
@@ -157,4 +157,15 @@ contract HTCoin {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

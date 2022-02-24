@@ -32,7 +32,7 @@ library CampaignLibrary {
         return (countries1,countries2,countries3);
     }
 
-    
+
 }
 
 contract AdvertisementStorage {
@@ -137,7 +137,7 @@ contract AdvertisementStorage {
         emitEvent(campaign);
 
         campaigns[campaign.bidId] = campaign;
-        
+
     }
 
     function getCampaignPriceById(bytes32 bidId)
@@ -254,4 +254,15 @@ contract AdvertisementStorage {
             );
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

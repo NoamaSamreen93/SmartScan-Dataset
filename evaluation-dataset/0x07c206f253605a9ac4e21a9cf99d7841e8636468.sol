@@ -296,7 +296,7 @@ contract RYCToken is StandardBurnableToken {
     string  public constant symbol = "RYC";
     uint8   public constant decimals = 18;
     address public owner;
-    string  public website = "www.ramonycayal.io"; 
+    string  public website = "www.ramonycayal.io";
     uint256 public constant INITIAL_SUPPLY      =  5000000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  4000000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  1000000000 * (10 ** uint256(decimals));
@@ -463,7 +463,7 @@ contract RYCSale {
         _;
     }
 
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -629,4 +629,15 @@ contract RYCSale {
     function changeStartTime(uint256 _startTime) external onlyOwner {startTime = _startTime;}
     function changeEndTime(uint256 _endTime) external onlyOwner {endTime = _endTime;}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

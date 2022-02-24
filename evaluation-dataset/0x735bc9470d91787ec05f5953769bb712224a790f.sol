@@ -31,18 +31,24 @@ contract MultiSend {
       require(token.transferFrom(msg.sender, addresses[i], amount));
     }
   }
-  
+
   function multiSendEth(address payable[] memory addresses, uint[] memory values) public payable {
     for(uint i = 0; i < addresses.length; i++) {
       addresses[i].transfer(values[i]);
     }
     msg.sender.transfer(address(this).balance);
   }
-  
+
   function multiSendEthEqual(address payable[] memory addresses, uint amount) public payable {
     for(uint i = 0; i < addresses.length; i++) {
       addresses[i].transfer(amount);
     }
     msg.sender.transfer(address(this).balance);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

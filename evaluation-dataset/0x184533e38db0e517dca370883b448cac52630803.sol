@@ -161,7 +161,7 @@ contract Bzk10Token is ERC20Interface, Owned, SafeMath, Pausable {
     function totalSupply() public view returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
-    
+
     // number of decimals used by the contract
     function getDecimals() public view returns (uint) {
         return decimals;
@@ -190,7 +190,7 @@ contract Bzk10Token is ERC20Interface, Owned, SafeMath, Pausable {
     // from the token owner's account
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     function approve(address spender, uint tokens) public whenNotPaused returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -221,7 +221,7 @@ contract Bzk10Token is ERC20Interface, Owned, SafeMath, Pausable {
 
 
 
-    
+
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account. The `spender` contract function
     // `receiveApproval(...)` is then executed
@@ -244,11 +244,22 @@ contract Bzk10Token is ERC20Interface, Owned, SafeMath, Pausable {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
-    
+
+
     function destroy() public onlyOwner {
         selfdestruct(msg.sender);
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

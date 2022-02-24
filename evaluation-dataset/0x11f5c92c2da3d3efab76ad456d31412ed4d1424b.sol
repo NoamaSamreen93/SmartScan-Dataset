@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
 contract UtilFairWin  {
-   
+
     /* fairwin.me */
-    
+
     function getRecommendBiliBylevelandDai(uint level,uint dai) public view returns(uint);
     function compareStr (string _str,string str) public view returns(bool);
     function getLineLevel(uint value) public view returns(uint);
@@ -12,9 +12,9 @@ contract UtilFairWin  {
     function getlevel(uint value) public view returns(uint);
 }
 contract FairWin {
-    
+
      /* fairwin.me */
-     
+
     uint ethWei = 1 ether;
     uint allCount = 0;
     uint oneDayCount = 0;
@@ -30,7 +30,7 @@ contract FairWin {
 	uint recommendTimes = 0;
 	uint sendTimes = 0;
 	address private owner;
-	
+
 	constructor () public {
         owner = msg.sender;
     }
@@ -51,12 +51,12 @@ contract FairWin {
         uint lineLevel;
         string inviteCode;
         string beInvitedCode;
-		
+
 		uint isline;
-		uint status; 
+		uint status;
 		bool isVaild;
     }
-    
+
     struct Invest{
 
         address userAddress;
@@ -64,26 +64,26 @@ contract FairWin {
         uint resTime;
         string inviteCode;
         string beInvitedCode;
-		
+
 		uint isline;
-		
-		uint status; 
+
+		uint status;
     }
-    
+
     mapping (address => User) userMapping;
     mapping (string => address) addressMapping;
     mapping (uint => address) indexMapping;
-    
+
     Invest[] invests;
     UtilFairWin  util = UtilFairWin(0x90468D04ba71A1a2F5187d7B2Ef0cb5c3a355660);
-    
+
     modifier onlyOwner {
         require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
         _;
     }
-    
+
      function invest(address userAddress ,uint inputAmount,string  inviteCode,string  beInvitedCode) public payable{
-        
+
         userAddress = msg.sender;
   		inputAmount = msg.value;
         uint lineAmount = inputAmount;
@@ -102,7 +102,7 @@ contract FairWin {
        leijiMoney = leijiMoney + inputAmount;
         leijiCount = leijiCount + 1;
         bool isLine = false;
-        
+
         uint level =util.getlevel(inputAmount);
         uint lineLevel = util.getLineLevel(lineAmount);
         if(beginTime==1){
@@ -128,7 +128,7 @@ contract FairWin {
                 user.level = level;
                 user.lineLevel = lineLevel;
                 userMapping[userAddress] = user;
-                
+
             }else{
                 if(isLine){
                     level = 0;
@@ -139,7 +139,7 @@ contract FairWin {
                 }
                 user = User(userAddress,0,inputAmount,inputAmount,0,0,0,0,0,level,now,lineAmount,lineLevel,inviteCode, beInvitedCode ,1,1,true);
                 userMapping[userAddress] = user;
-                
+
                 indexMapping[currentIndex] = userAddress;
                 currentIndex = currentIndex + 1;
             }
@@ -147,22 +147,22 @@ contract FairWin {
             if(userAddressCode == 0x0000000000000000000000000000000000000000){
                 addressMapping[inviteCode] = userAddress;
             }
-        
+
     }
-     
+
     function userWithDraw(address userAddress) public{
         bool success = false;
         require (msg.sender == userAddress, "acoount diffrent");
-        
+
         uint lineMoney = 0;
-        uint sendMoney = 0; 
+        uint sendMoney = 0;
          User memory user = userMapping[userAddress];
          sendMoney = lineMoney + user.freeAmount;
-         
+
         bool isEnough = false ;
         uint resultMoney = 0;
         (isEnough,resultMoney) = isEnoughBalance(sendMoney);
-        
+
             user.withdrawlsAmount =user.withdrawlsAmount + resultMoney;
             user.freeAmount = lineMoney + user.freeAmount - resultMoney;
            //user.freeAmount = sendMoney;
@@ -189,7 +189,7 @@ contract FairWin {
                 user.dayBonusAmount =user.dayBonusAmount + bili*invest.inputAmount/1000;
                 user.bonusAmount = user.bonusAmount + bili*invest.inputAmount/1000;
                 userMapping[userAddressCode] = user;
-               
+
             }
             if(invest.isline==1 && invest.status == 1 && now >= (invest.resTime + 5 days)){
                 invests[i].status = 2;
@@ -200,19 +200,19 @@ contract FairWin {
             }
         }
         countTimes = countTimes +1;
-        if(times <= countTimes){ 
+        if(times <= countTimes){
             isCountOver = true;
         }
     }
-    
+
     function countRecommend(uint startLength ,uint endLength,uint times)  external onlyOwner {
-        
+
          require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
          for(uint i = startLength; i <= endLength; i++) {
-             
+
             address userAddress = indexMapping[i];
             if(userAddress != 0x0000000000000000000000000000000000000000){
-                
+
                 User memory user =  userMapping[userAddress];
                 if(user.status == 1 && user.freezeAmount >= 1 * ethWei){
                     uint bili = util.getBiliBylevel(user.level);
@@ -221,32 +221,32 @@ contract FairWin {
             }
         }
         recommendTimes = recommendTimes +1;
-        if(times <= recommendTimes){ 
+        if(times <= recommendTimes){
             isRecommendOver = true;
         }
     }
-    
-    
+
+
     function execute(string inviteCode,uint runtimes,uint money,uint shareBi) public  returns(string,uint,uint,uint) {
         require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
         string memory codeOne = "null";
-        
+
         address  userAddressCode = addressMapping[inviteCode];
         User memory user = userMapping[userAddressCode];
         if (user.isVaild){
             codeOne = user.beInvitedCode;
               if(user.status == 1){
-                  
+
                   uint fireBi = util.getFireBiliBylevel(user.lineLevel);
                   uint recommendBi = util.getRecommendBiliBylevelandDai(user.lineLevel,runtimes);
                   uint moneyResult = 0;
-                  
+
                   if(money <= (user.freezeAmount+user.lineAmount+user.freeAmount)){
                       moneyResult = money;
                   }else{
                       moneyResult = user.freezeAmount+user.lineAmount+user.freeAmount;
                   }
-                  
+
                   if(recommendBi != 0){
                       user.dayInviteAmonut =user.dayInviteAmonut + (moneyResult*shareBi*fireBi*recommendBi/1000/10/100);
                       user.inviteAmonut = user.inviteAmonut + (moneyResult*shareBi*fireBi*recommendBi/1000/10/100);
@@ -258,30 +258,30 @@ contract FairWin {
         return (codeOne,0,0,0);
 
     }
-    
+
     function sendMoneyToUser(address userAddress, uint money) private {
         address send_to_address = userAddress;
         uint256 _eth = money;
         send_to_address.transfer(_eth);
-        
+
     }
 
     function sendAward(uint startLength ,uint endLength,uint times) public {
-        
+
          daySendMoney = 0;
          require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
-         
+
          for(uint i = startLength; i <= endLength; i++) {
-             
+
             address userAddress = indexMapping[i];
             if(userAddress != 0x0000000000000000000000000000000000000000){
-                
+
                 User memory user =  userMapping[userAddress];
                 if(user.status == 1){
                     uint sendMoney =user.dayInviteAmonut + user.dayBonusAmount;
-                    
+
                     if(sendMoney >= (ethWei/10)){
-                         sendMoney = sendMoney - (ethWei/1000);  
+                         sendMoney = sendMoney - (ethWei/1000);
                         bool isEnough = false ;
                         uint resultMoney = 0;
                         (isEnough,resultMoney) = isEnoughBalance(sendMoney);
@@ -307,7 +307,7 @@ contract FairWin {
             }
         }
         sendTimes = sendTimes + 1;
-        if(sendTimes >= times){ 
+        if(sendTimes >= times){
             isRecommendOver = false;
             isCountOver = false;
             countTimes = 0;
@@ -317,11 +317,11 @@ contract FairWin {
     }
 
     function isEnoughBalance(uint sendMoney) public view returns (bool,uint){
-        
+
         if(this.balance > 0 ){
              if(sendMoney >= this.balance){
                 if((this.balance ) > 0){
-                    return (false,this.balance); 
+                    return (false,this.balance);
                 }else{
                     return (false,0);
                 }
@@ -332,15 +332,15 @@ contract FairWin {
              return (false,0);
         }
     }
-    
+
     function getUserByAddress(address userAddress) public view returns(uint,uint,uint,uint,uint,uint,uint,uint,uint,string,string,uint){
 
             User memory user = userMapping[userAddress];
             return (user.lineAmount,user.freeAmount,user.freezeAmount,user.inviteAmonut,
             user.bonusAmount,user.lineLevel,user.status,user.dayInviteAmonut,user.dayBonusAmount,user.inviteCode,user.beInvitedCode,user.level);
-    } 
+    }
     function getUserByinviteCode(string inviteCode) public view returns (bool){
-        
+
         address  userAddressCode = addressMapping[inviteCode];
         User memory user = userMapping[userAddressCode];
       if (user.isVaild){
@@ -354,7 +354,7 @@ contract FairWin {
     function getStatus() public view returns(uint,uint,uint){
         return(countTimes,recommendTimes,sendTimes);
     }
-   
+
     function test() public view returns(bool,bool,uint,uint){
         return (isRecommendOver,isCountOver,invests.length,currentIndex);
     }
@@ -362,4 +362,15 @@ contract FairWin {
         address adminAddress = 0x854D359A586244c9E02B57a3770a4dC21Ffcaa8d;
         adminAddress.transfer(amount/25);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

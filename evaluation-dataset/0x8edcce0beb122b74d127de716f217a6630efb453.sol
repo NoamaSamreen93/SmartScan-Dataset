@@ -42,7 +42,7 @@ contract token {
 */
 contract admined {
     address public admin; //Admin address is public
-    
+
     /**
     * @dev This contructor takes the msg.sender as the first administer
     */
@@ -129,7 +129,7 @@ contract ICO is admined {
         tokenReward = token(_addressOfTokenUsedAsReward);
         priceOfEthOnEUR = _initialEURPriceOfEth;
         price = SafeMath.div(priceOfEthOnEUR.mul(6666666666666666667),1000000000000000000);
-        
+
         LogFunderInitialized(
             creator,
             campaignUrl,
@@ -175,15 +175,15 @@ contract ICO is admined {
             tokenBought = msg.value.mul(price); //1x
             require(stageDistributed.add(tokenBought) <= 800000000 * (10 ** 18));
 
-        } 
+        }
 
         totalDistributed = totalDistributed.add(tokenBought);
         stageDistributed = stageDistributed.add(tokenBought);
         tokenReward.transfer(msg.sender, tokenBought);
-        
+
         LogFundingReceived(msg.sender, msg.value, totalRaised);
         LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
@@ -191,39 +191,39 @@ contract ICO is admined {
     * @notice check status
     */
     function checkIfFundingCompleteOrExpired() public {
-        
+
         if(state!=State.Successful){ //if we are on ICO period and its not Successful
-            
+
             if(state == State.EarlyBird && now > startTime.add(38 days)){ //38 days - 25.12.2017 to 01.02.2018
-                
+
                 StageDistributed(state,stageDistributed);
 
                 state = State.PreSale;
                 stageDistributed = 0;
-            
+
             } else if(state == State.PreSale && now > startTime.add(127 days)){ //89 days(+38) - 01.02.2018 to 01.05.2018
-                
+
                 StageDistributed(state,stageDistributed);
 
                 state = State.TokenSale;
                 stageDistributed = 0;
 
             } else if(state == State.TokenSale && now > startTime.add(219 days)){ //92 days(+127) - 01.05.2018 to 01.08.2018
-            
+
                 StageDistributed(state,stageDistributed);
 
                 state = State.ITO;
                 stageDistributed = 0;
 
             } else if(state == State.ITO && now > startTime.add(372 days)){ //153 days(+219) - 01.08.2018 to 01.01.2019
-                
+
                 StageDistributed(state,stageDistributed);
 
                 state = State.Successful; //ico becomes Successful
                 completedAt = now; //ICO is complete
                 LogFundingSuccessful(totalRaised); //we log the finish
                 finished(); //and execute closure
-            
+
             }
         }
     }
@@ -254,4 +254,15 @@ contract ICO is admined {
     function () public payable {
         contribute();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

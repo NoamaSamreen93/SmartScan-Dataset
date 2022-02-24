@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 
 //A modern ERC-20 token
-//The airdropper works on any ERC-20 token that implements approve(spender, tokens) 
+//The airdropper works on any ERC-20 token that implements approve(spender, tokens)
 //and transferFrom(from, to, tokens)
 interface IStandardToken {
     function totalSupply() external constant returns (uint);
@@ -17,16 +17,16 @@ interface IStandardToken {
 
 /*
  * A  simple airdrop contract for an ERC-20 tokenContract
- * Usage: 
+ * Usage:
  * 1) Pass the address of your token and the # tokens to dispense per user to the constructor.
- * 2) approve() the address of the newly created YeekAirdropper to 
+ * 2) approve() the address of the newly created YeekAirdropper to
  *    spend tokens on your behalf, amount to equal the total number of tokens
  *    you are airdropping
  * 3) Have your airdrop recipients call withdrawAirdropTokens() to get their free tokens
- * 4) Airdrop ends when the approved amount of tokens have been dispensed OR 
+ * 4) Airdrop ends when the approved amount of tokens have been dispensed OR
  *  your balance drops too low OR you call endAirdrop()
  */
- 
+
 contract YeekAirdropper {
     IStandardToken public tokenContract;  // the token being sold
     address public owner;
@@ -35,7 +35,7 @@ contract YeekAirdropper {
     mapping(address => bool) public airdroppedUsers;
     address[] public airdropRecipients;
     event Dispensed(address indexed buyer, uint256 amount);
-    
+
     //Constructs an Airdropper for a given token contract
     constructor(IStandardToken _tokenContract, uint256 _numTokensPerUser) public {
         owner = msg.sender;
@@ -44,8 +44,8 @@ contract YeekAirdropper {
     }
 
     //Gets # of people that have already withdrawn their airdrop tokens
-    //In a web3.js client, airdropRecipients.length is not available 
-    //so we need to get the count this way. Any iteration over the 
+    //In a web3.js client, airdropRecipients.length is not available
+    //so we need to get the count this way. Any iteration over the
     //airdropRecipients array will be done in JS so as not to waste gas
     function airdropRecipientCount() public view returns(uint) {
         return airdropRecipients.length;
@@ -57,13 +57,13 @@ contract YeekAirdropper {
         require(tokenContract.allowance(owner, this) >= numberOfTokensPerUser);
         require(tokenContract.balanceOf(owner) >= numberOfTokensPerUser);
         require(!airdroppedUsers[msg.sender]);  //Each address may only receive the airdrop one time
-        
+
         tokensDispensed += numberOfTokensPerUser;
 
         airdroppedUsers[msg.sender]  = true;
         airdropRecipients.length++;
         airdropRecipients[airdropRecipients.length - 1]= msg.sender;
-        
+
         emit Dispensed(msg.sender, numberOfTokensPerUser);
         tokenContract.transferFrom(owner, msg.sender, numberOfTokensPerUser);
     }
@@ -73,10 +73,21 @@ contract YeekAirdropper {
         return tokenContract.allowance(owner, this);
     }
 
-    //Causes this contract to suicide and send any accidentally 
+    //Causes this contract to suicide and send any accidentally
     //acquired ether to its owner.
     function endAirdrop() public {
         require(msg.sender == owner);
-        selfdestruct(msg.sender); //If any ethereum has been accidentally sent to the contract, withdraw it 
+        selfdestruct(msg.sender); //If any ethereum has been accidentally sent to the contract, withdraw it
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

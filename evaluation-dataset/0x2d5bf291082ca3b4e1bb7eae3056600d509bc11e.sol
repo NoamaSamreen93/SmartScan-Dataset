@@ -242,12 +242,23 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract ANTCO is StandardToken {
-    string public name = "ANTCO"; 
+    string public name = "ANTCO";
     string public symbol = "ANTCO";
     uint public decimals = 8;
     uint public totalSupply = 500000000 * (10 ** decimals);
-    
+
     constructor() public {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

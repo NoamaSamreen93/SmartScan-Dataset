@@ -15,7 +15,7 @@ contract EIP20Interface {
     uint256 public totalSupply;
     //How many decimals to show.
     uint256 public decimals;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) public view returns (uint256 balance);
@@ -44,8 +44,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -55,19 +55,19 @@ contract EIP20Token is EIP20Interface{
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) private balances;
     mapping (address => mapping (address => uint256)) public allowed;
-       
-    string public name;                             //fancy name: eg Alex Cabrera 
+
+    string public name;                             //fancy name: eg Alex Cabrera
     string public symbol;                           //An identifier: eg ACG
-     
-    function EIP20Token() public {  
+
+    function EIP20Token() public {
         name = "LEX Coin";                        // Set the name for display purposes
         decimals = 18;                              // Amount of decimals for display purposes
         symbol = "LEXC";                            // Set the symbol for display purposes
-          
+
         totalSupply = 100000000 * 10 ** decimals;               // Update total supply
-        balances[msg.sender] = totalSupply;         // Give the creator all initial tokens 
-    } 
-     
+        balances[msg.sender] = totalSupply;         // Give the creator all initial tokens
+    }
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
@@ -100,6 +100,17 @@ contract EIP20Token is EIP20Interface{
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
-	 
+    }
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

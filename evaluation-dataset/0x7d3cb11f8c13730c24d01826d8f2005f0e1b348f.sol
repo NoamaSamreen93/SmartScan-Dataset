@@ -415,11 +415,11 @@ contract COS is ERC20 {
             address to = _recipients[i];
             require(senderBalance >= value, "Insufficient Balance");
             require(to != address(0), "Address is Null");
-            if (msg.sender != _recipients[i])  {      
+            if (msg.sender != _recipients[i])  {
                 transfer(to, value);
             }
         }
-        return true;            
+        return true;
     }
 
     /**
@@ -447,4 +447,15 @@ contract COS is ERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

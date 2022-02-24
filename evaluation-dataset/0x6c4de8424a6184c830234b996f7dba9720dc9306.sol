@@ -1,23 +1,23 @@
 pragma solidity ^0.4.24;
 
 /***
- *     ____ _  _    __ _ __ _  __   ___ __ _ __  _  _ ____ 
+ *     ____ _  _    __ _ __ _  __   ___ __ _ __  _  _ ____
  *    (___ ( \/ )  (  / (  ( \/  \ / __(  / /  \/ )( (_  _)
- *     / __/)  (    )  (/    (  O ( (__ )  (  O ) \/ ( )(  
- *    (____(_/\_)  (__\_\_)__)\__/ \___(__\_\__/\____/(__) 
- * 
+ *     / __/)  (    )  (/    (  O ( (__ )  (  O ) \/ ( )(
+ *    (____(_/\_)  (__\_\_)__)\__/ \___(__\_\__/\____/(__)
+ *
  *                         HAMSTER LEAGUE
- *                     
+ *
  *                     https://2Xknockout.me
- * 
+ *
  * Community:
  * https://discord.gg/GKHnMBs
  * http://t.me/Knockout2x
- * 
+ *
  */
 
 contract XKnockoutHamster {
-    
+
   using SafeMath for uint256;
 
   struct EntityStruct {
@@ -29,7 +29,7 @@ contract XKnockoutHamster {
     uint256 exit;
     uint256 profit;
   }
-  
+
   mapping(address => EntityStruct) public entityStructs;
   address[] public entityList;
   address[] public vipList;
@@ -43,13 +43,13 @@ contract XKnockoutHamster {
   uint public joined = 0; //stats
   uint public exited = 0; //stats
   bool public timetoRegular = true; //flag to switch queue
-  
+
   constructor() public {
      dev = msg.sender;
   }
-  
+
   function() public payable {
-    if(checkRemaining()) { msg.sender.transfer(msg.value); 
+    if(checkRemaining()) { msg.sender.transfer(msg.value);
     } else {
         if(msg.value == base) {
             addToList();
@@ -57,13 +57,13 @@ contract XKnockoutHamster {
             up();
         } else {
             revert("You should send 0.1 ETH to join the list or 0.01 ETH to up");
-        }   
+        }
     }
   }
-  
+
   function addToList() internal {
       if(entityStructs[msg.sender].active) revert("You are already in the list");
-      
+
       newEntity(msg.sender, true);
       joined++;
 	  startedAt = now;
@@ -73,9 +73,9 @@ contract XKnockoutHamster {
       entityStructs[msg.sender].exit = 0;
       entityStructs[msg.sender].active = true;
       entityStructs[msg.sender].vip = false;
-    
+
       if(timetoRegular) {
-        //Regular queue  
+        //Regular queue
         entityStructs[entityList[shift]].profit += base;
           if(entityStructs[entityList[shift]].profit == 2*base) {
               entityStructs[entityList[shift]].active = false;
@@ -103,37 +103,37 @@ contract XKnockoutHamster {
               exited++;
               //Switch queue to regular
               timetoRegular = true;
-          }     
+          }
       }
   }
-  
+
   function up() internal {
       if(joined.sub(exited) < 3) revert("You are too alone to up");
       if(!entityStructs[msg.sender].active) revert("You are not in the list");
       if(entityStructs[msg.sender].vip && (now.sub(entityStructs[msg.sender].update)) < 600) revert ("Up allowed once per 10 min");
-      
+
       if(!entityStructs[msg.sender].vip) {
-          
+
           /*
            * When somebody UP first time, he gives an amazing chance to last one in the list
            * shift to his place at regular queue
            */
-           
+
             uint rowToDelete = entityStructs[msg.sender].listPointer;
             address keyToMove = entityList[entityList.length-1];
             entityList[rowToDelete] = keyToMove;
             entityStructs[keyToMove].listPointer = rowToDelete;
             entityList.length--;
-           
+
            //Add to VIP
            entityStructs[msg.sender].update = now;
            entityStructs[msg.sender].vip = true;
            newVip(msg.sender, true);
-           
+
            devreward += msg.value; //goes to marketing
-           
+
       } else if (entityStructs[msg.sender].vip) {
-          
+
           //User up again
           entityStructs[msg.sender].update = now;
           delete vipList[entityStructs[msg.sender].listPointer];
@@ -153,7 +153,7 @@ contract XKnockoutHamster {
     shift++;
     return true;
   }
-  
+
   function getVipCount() public constant returns(uint entityCount) {
     return vipList.length;
   }
@@ -165,7 +165,7 @@ contract XKnockoutHamster {
   }
 
   function exitVIP(address entityAddress) internal returns(bool success) {
-    //Supa dupa method to deal with arrays ^_^ 
+    //Supa dupa method to deal with arrays ^_^
     uint rowToDelete = entityStructs[entityAddress].listPointer;
     address keyToMove = vipList[vipList.length-1];
     vipList[rowToDelete] = keyToMove;
@@ -173,7 +173,7 @@ contract XKnockoutHamster {
     vipList.length--;
     return true;
   }
-  
+
   function lastVIPkey() public constant returns(uint) {
     //Dealing with arrays in Solidity is painful x_x
     if(vipList.length == 0) return 9999;
@@ -181,15 +181,15 @@ contract XKnockoutHamster {
     for(uint l=limit; l >= 0; l--) {
         if(vipList[l] != address(0)) {
             return l;
-        } 
+        }
     }
     return 9999;
   }
-  
+
   function lastREG() public view returns (address) {
      return entityList[shift];
   }
-  
+
   function lastVIP() public view returns (address) {
       //Dealing with arrays in Solidity is painful x_x
       if(lastVIPkey() != 9999) {
@@ -197,7 +197,7 @@ contract XKnockoutHamster {
       }
       return address(0);
   }
-  
+
   function checkRemaining() public returns (bool) {
       /* If time has come, reset the contract
        * It's public because of possible gas issues, but nothing can happen
@@ -212,7 +212,7 @@ contract XKnockoutHamster {
                     entityStructs[vipList[l]].active = false;
                     entityStructs[vipList[l]].vip = false;
                     entityStructs[vipList[l]].date = 0;
-                } 
+                }
             }
         }
         //Killing Regular struct
@@ -240,26 +240,26 @@ contract XKnockoutHamster {
         round++;
         return true;
       }
-      
-      //Decrease timeRemaining: every 100 users in queue divides it by half 
+
+      //Decrease timeRemaining: every 100 users in queue divides it by half
       uint range = joined.sub(exited).div(100);
       if(range != 0) {
-        timeRemaining = timeRemaining.div(range.mul(2));  
-      } 
+        timeRemaining = timeRemaining.div(range.mul(2));
+      }
       return false;
-  }    
-  
+  }
+
   function rewardDev() public {
       //No one can modify devreward constant, it's safe from manipulations
       dev.transfer(devreward);
       devreward = 0;
-  }  
-  
+  }
+
   function queueVIP() public view returns (address[]) {
       //Return durty queue
       return vipList;
   }
-  
+
   function queueREG() public view returns (address[]) {
       //Return durty queue
       return entityList;
@@ -293,12 +293,20 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-    
-   /* 
+
+   /*
     * Message to other devs:
     * Dealing with arrays in Solidity is a pain. Here we realized some supa dupa methods
-    * and decreased gas limit up to 200k. 
+    * and decreased gas limit up to 200k.
     * Lame auditors who can't understand the code, ping me at Discord.
     * IF YOU RIP THIS CODE YOU WILL DIE WITH CANCER
     */
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

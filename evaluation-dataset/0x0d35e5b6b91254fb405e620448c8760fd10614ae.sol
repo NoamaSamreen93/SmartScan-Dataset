@@ -27,7 +27,7 @@ pragma solidity ^0.4.25;
  *    all the money are immediately go to payouts
  *
  *
- * So the last pays to the first (or to several first ones if the deposit big enough) 
+ * So the last pays to the first (or to several first ones if the deposit big enough)
  * and the investors paid 115%-120% are removed from the queue
  *
  *               new investor --|               brand new investor --|
@@ -48,7 +48,7 @@ pragma solidity ^0.4.25;
  * 2. Немного подождите
  * 3. ...
  * 4. PROFIT! Вам пришло 115%-120% от вашего депозита.
- * 
+ *
  * Как это возможно?
  * 1. Первый инвестор в очереди (вы станете первым очень скоро) получает выплаты от
  *    новых инвесторов до тех пор, пока не получит 115%-120% от своего депозита
@@ -58,7 +58,7 @@ pragma solidity ^0.4.25;
  * 5. Баланс этого контракта должен обычно быть в районе 0, потому что все поступления
  *    сразу же направляются на выплаты
  *
- * Таким образом, последние платят первым, и инвесторы, достигшие выплат 115%-120% от 
+ * Таким образом, последние платят первым, и инвесторы, достигшие выплат 115%-120% от
  * депозита, удаляются из очереди, уступая место остальным
  *
  *             новый инвестор --|            совсем новый инвестор --|
@@ -103,7 +103,7 @@ contract EthmoonV3 {
     function () public payable {
         require(gasleft() >= 220000, "We require more gas!"); // we need gas to process queue
         require((msg.sender == STARTER) || (started));
-        
+
         if (msg.sender != STARTER) {
             require((msg.value >= MIN_DEPOSIT) && (msg.value <= MAX_DEPOSIT)); // do not allow too big investments to stabilize payouts
             uint multiplier = percentRate(msg.sender);
@@ -115,7 +115,7 @@ contract EthmoonV3 {
             PROMO.transfer(promo);
             uint smartcontract = msg.value * SMARTCONTRACT_PERCENT/100;
             SMARTCONTRACT.transfer(smartcontract);
-    
+
             // pay to first investors in line
             pay();
         } else {
@@ -124,7 +124,7 @@ contract EthmoonV3 {
     }
 
     // used to pay to current investors
-    // each new transaction processes 1 - 4+ investors in the head of queue 
+    // each new transaction processes 1 - 4+ investors in the head of queue
     // depending on balance and gas left
     function pay() private {
         // try to send all the money on contract to the first investors in line
@@ -194,12 +194,12 @@ contract EthmoonV3 {
             }
         }
     }
-    
+
     // get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
-    
+
     // get persent rate
     function percentRate(address depositor) public view returns(uint) {
         uint persent = START_MULTIPLIER;
@@ -208,7 +208,18 @@ contract EthmoonV3 {
         }
         if (persent > 120) {
             persent = 120;
-        } 
+        }
         return persent;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

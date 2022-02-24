@@ -281,7 +281,7 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Adds burnFrom method to ERC20 implementations
  */
 contract StandardBurnableToken is BurnableToken, StandardToken {
-  
+
   /**
    * @dev Burns a specific amount of tokens from the target address and decrements allowance
    * @param _from address The address which you want to send tokens from
@@ -302,7 +302,7 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
  */
 
 contract DavidLearningToken is StandardBurnableToken {
-using SafeERC20 for ERC20; 
+using SafeERC20 for ERC20;
 
 string public name = 'DavidLearningToken';
 string public symbol = 'DLT';
@@ -342,4 +342,15 @@ library SafeERC20 {
   function safeApprove(ERC20 token, address spender, uint256 value) internal {
     require(token.approve(spender, value));
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

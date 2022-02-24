@@ -67,7 +67,7 @@ pragma solidity ^0.5.3;
     // ----------------------------------------------------------------------------
     contract MPAY is ERC20Interface, Owned{
         using SafeMath for uint;
-        
+
         string public symbol;
         string public name;
         uint8 public decimals;
@@ -127,7 +127,7 @@ pragma solidity ^0.5.3;
             emit Transfer(msg.sender,to,tokens);
             return true;
         }
-        
+
         // ------------------------------------------------------------------------
         // Token owner can approve for `spender` to transferFrom(...) `tokens`
         // from the token owner's account
@@ -140,7 +140,7 @@ pragma solidity ^0.5.3;
 
         // ------------------------------------------------------------------------
         // Transfer `tokens` from the `from` account to the `to` account
-        // 
+        //
         // The calling account must already have sufficient tokens approve(...)
         // for spending from the `from` account and
         // - From account must have sufficient balance to transfer
@@ -169,13 +169,13 @@ pragma solidity ^0.5.3;
         function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
             return allowed[tokenOwner][spender];
         }
-        
+
         // ------------------------------------------------------------------------
         // Transfer the balance from token owner's account to `to` account
         // - Owner's account must have sufficient balance to transfer
         // - 0 value transfers are allowed
         // - takes in locking Period to lock the tokens to be used
-        // - if want to transfer without locking enter 0 in lockingPeriod argument 
+        // - if want to transfer without locking enter 0 in lockingPeriod argument
         // ------------------------------------------------------------------------
         function distributeTokens(address to, uint tokens, uint256 lockingPeriod) onlyOwner public returns (bool success) {
             // transfer tokens to the "to" address
@@ -188,14 +188,14 @@ pragma solidity ^0.5.3;
                 _addRecord(to, tokens, lockingPeriod);
             return true;
         }
-        
+
         // ------------------------------------------------------------------------
         // Adds record of addresses with locking period and coins to lock
         // ------------------------------------------------------------------------
         function _addRecord(address to, uint tokens, uint256 lockingPeriod) private {
                 record[to].push(PC(lockingPeriod,tokens, false));
         }
-        
+
         // ------------------------------------------------------------------------
         // Checks if there is any uunLockedCoins available
         // ------------------------------------------------------------------------
@@ -217,7 +217,7 @@ pragma solidity ^0.5.3;
                 }
             }
         }
-        
+
         // ------------------------------------------------------------------------
         // Unlock the coins if lockingPeriod is expired
         // ------------------------------------------------------------------------
@@ -234,5 +234,16 @@ pragma solidity ^0.5.3;
             unLockedCoins[_address] = unLockedCoins[_address].add(tempCount);
             return true;
         }
-        
+
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

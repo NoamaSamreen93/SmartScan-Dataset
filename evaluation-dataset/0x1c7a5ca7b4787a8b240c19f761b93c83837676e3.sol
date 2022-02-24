@@ -42,7 +42,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -117,7 +117,7 @@ contract Art_MuYiChen_No2 is StandardToken {
         totalSupply = 4410;
         balances[msg.sender] = 441000000000;
     }
-    
+
     function getIssuer() public view returns(string) { return "LIN, FANG-PAN"; }
     function getImage() public view returns(string) { return "https://swarm-gateways.net/bzz:/7c44b84838f56dbfabbeb940e3812973f08623eb0b56b8b8c5722badd5248768/"; }
     function getArtist() public view returns(string) { return "MuYiChen"; }
@@ -133,4 +133,15 @@ contract Art_MuYiChen_No2 is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

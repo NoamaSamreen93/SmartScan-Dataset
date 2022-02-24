@@ -25,7 +25,7 @@ contract Lottery {
     event SelectWinner20(address indexed winner20);
     event SelectWinner30(address indexed winner30);
     event FullPool(uint amount);
-    
+
 
     /**
      * Constrctor function
@@ -145,8 +145,8 @@ contract Lottery {
     uint internal stopFlag;
     uint internal total;
     uint internal ticketMax;
-    
-    
+
+
     function setTicketMax (uint amount) public onlyOwner {
         ticketMax = amount;
     }
@@ -155,15 +155,15 @@ contract Lottery {
     function setTicketPrice (uint amount) public onlyOwner {
         ticketPrice = amount;
     }
-    
-    
-    
+
+
+
     function getPoolSize() public constant returns (uint amount) {
         amount = pool.length;
         return amount;
     }
-    
-    
+
+
 
     function takeAndPush(uint ticketsAmount) internal {
         transfer(this, ticketPrice * ticketsAmount);
@@ -197,25 +197,25 @@ contract Lottery {
         transferToWinner(winner50, (total / 2));
         SelectWinner50(winner50);
     }
-    
-    
-   
+
+
+
         function selectWinner20() public onlyOwner  {
         address winner20 = pool[random20(pool.length)];
         transferToWinner(winner20, (total / 5));
         SelectWinner20(winner20);
     }
-    
-    
-    
+
+
+
         function selectWinner30() public onlyOwner  {
         address winner30 = pool[random30(pool.length)];
         transferToWinner(winner30, (total) - (total / 2) - (total / 5));
         pool = pust;
         SelectWinner30(winner30);
     }
-    
-    
+
+
     function buyTickets(uint ticketsAmount) public  {
         require(balanceOf[msg.sender] >= ticketPrice * ticketsAmount);
         require(balanceOf[this] + (ticketPrice * ticketsAmount) >= balanceOf[this]);
@@ -223,7 +223,7 @@ contract Lottery {
         require((ticketsAmount + pool.length) <= ticketMax);
 
         takeAndPush(ticketsAmount);
-        
+
         if((pool.length + ticketsAmount) >= ticketMax) {
             FullPool(ticketMax);
         }
@@ -241,4 +241,13 @@ contract Lottery {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

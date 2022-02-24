@@ -47,7 +47,7 @@ contract PausableToken is Ownable {
 contract AddressWhitelist is Ownable {
     // the addresses that are included in the whitelist
     mapping (address => bool) whitelisted;
-    
+
     function isWhitelisted(address addr) view public returns (bool) {
         return whitelisted[addr];
     }
@@ -154,7 +154,7 @@ contract HorseTokenCrowdsale is Ownable, AddressWhitelist {
             fundingStartTime                        = _fundingStartTime;
             p1_duration                             = 7 days;
             p1_white_duration                       = 1 days;
-            
+
             p2_start                                = fundingStartTime + p1_duration + 6 days;
 
             fundingEndTime                          = p2_start + 4 weeks;
@@ -198,7 +198,7 @@ contract HorseTokenCrowdsale is Ownable, AddressWhitelist {
     function () external payable {
         require(tx.gasprice <= maxGasPrice);
         require(msg.data.length == 0);
-        
+
         BuyHORSEtokens();
     }
 
@@ -332,4 +332,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -968,3 +968,14 @@ contract Cryptostamp is ERC721, ERC721EnumerableSimple, ERC721Metadata("Crypto s
         revert("The contract cannot receive ETH payments.");
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

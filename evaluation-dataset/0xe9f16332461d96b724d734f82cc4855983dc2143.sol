@@ -50,7 +50,7 @@ interface ERC223 {
 
 pragma solidity ^0.5.0;
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
 
@@ -58,7 +58,7 @@ pragma solidity ^0.5.0;
 
 contract bitcoinTwo is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -154,7 +154,7 @@ contract bitcoinTwo is ERC20, ERC223 {
      emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
    function transfer(address _to, uint _value, bytes calldata _data) external {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -165,7 +165,7 @@ contract bitcoinTwo is ERC20, ERC223 {
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value, _data);
     }
-    
+
     function isContract(address _addr) private view returns (bool is_contract) {
       uint length;
       assembly {
@@ -175,4 +175,13 @@ contract bitcoinTwo is ERC20, ERC223 {
       return (length>0);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

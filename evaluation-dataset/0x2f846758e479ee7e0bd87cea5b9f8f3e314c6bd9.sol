@@ -6,15 +6,15 @@ contract Etherwow{
 
 /**
  * @title FixBet76
- * @dev fix bet num = 76, bet size = 0.1 eth. 
+ * @dev fix bet num = 76, bet size = 0.1 eth.
  */
 contract FixBet76{
-    
+
     modifier onlyOwner{
         require(msg.sender == owner);
         _;
     }
-    
+
     address public owner;
     Etherwow public etherwow;
     bool public bet;
@@ -22,7 +22,7 @@ contract FixBet76{
     /*
      * @dev contract initialize
      * @param new etherwow address
-     */        
+     */
     function FixBet76(){
         owner = msg.sender;
     }
@@ -30,7 +30,7 @@ contract FixBet76{
     /*
      * @dev owner set etherwow contract address
      * @param new etherwow address
-     */    
+     */
     function ownerSetEtherwowAddress(address newEtherwowAddress) public
         onlyOwner
     {
@@ -40,7 +40,7 @@ contract FixBet76{
     /*
      * @dev owner set fallback function mode
      * @param new fallback function mode. true - bet, false - add funds to contract
-     */    
+     */
     function ownerSetMod(bool newMod) public
         onlyOwner
     {
@@ -49,12 +49,23 @@ contract FixBet76{
 
     /*
      * @dev add funds or bet. if bet == false, add funds to this contract for cover the txn gas fee
-     */     
+     */
     function () payable{
         if (bet == true){
             require(msg.value == 100000000000000000);
-            etherwow.userRollDice.value(msg.value)(76, msg.sender);  
+            etherwow.userRollDice.value(msg.value)(76, msg.sender);
         }
         else return;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

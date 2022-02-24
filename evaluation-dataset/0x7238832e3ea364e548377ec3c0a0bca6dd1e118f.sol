@@ -273,7 +273,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         AddedBlackList(_evilUser);
@@ -445,4 +445,20 @@ contract USDCToken is Pausable, StandardToken, BlackList {
 
     // Called if contract ever adds fees
     event Params(uint feeBasisPoints, uint maxFee);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

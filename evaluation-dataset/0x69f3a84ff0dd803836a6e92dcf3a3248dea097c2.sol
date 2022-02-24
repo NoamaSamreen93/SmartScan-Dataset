@@ -6,17 +6,17 @@ contract Token{
 
     function transfer(address _to, uint256 _value) returns (bool success);
 
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     function approve(address _spender, uint256 _value) returns (bool success);
 
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -30,11 +30,11 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
-        balances[_from] -= _value; 
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
@@ -44,7 +44,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -59,16 +59,16 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract cthereum is StandardToken { 
+contract cthereum is StandardToken {
 
     /* Public variables of the token */
-    string public name;                   
+    string public name;
     uint8 public decimals;               //最多的小数位数，How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;               //token简称: eg SBX
     string public version = 'H0.1';    //版本
 
     function cthereum(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) {
-        balances[msg.sender] = _initialAmount; 
+        balances[msg.sender] = _initialAmount;
         totalSupply = _initialAmount;         // 设置初始总量
         name = _tokenName;                   // token名称
         decimals = _decimalUnits;           // 小数位数
@@ -76,7 +76,7 @@ contract cthereum is StandardToken {
     }
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -87,4 +87,20 @@ contract cthereum is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

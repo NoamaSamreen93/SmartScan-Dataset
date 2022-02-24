@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract ETHFlow {
     using SafeMath for uint256;
-    
+
     struct Tariff {
         uint256 id;
         string name;
@@ -29,7 +29,7 @@ contract ETHFlow {
     uint256 private percentFromEachProfit = 20;
 
     event Deposit(
-        address Investor, 
+        address Investor,
         uint256 Amount
     );
 
@@ -101,19 +101,19 @@ contract ETHFlow {
 
     function activate(address _referrer) public {
         require(myReferrer[msg.sender] == address(0));
-        
+
         active[msg.sender] = true;
         time[msg.sender] = now;
         tariffOf[msg.sender] = 1;
-        
+
         address referrer = _referrer;
 
         if(referrer == address(0)) {
             referrer = admin;
         }
-    
+
         myReferrer[msg.sender] = referrer;
-            
+
         referals[referrer].push(msg.sender);
     }
 
@@ -124,7 +124,7 @@ contract ETHFlow {
         uint256 value;
 
         //tariff expire
-        if(userTariff > 1 && 
+        if(userTariff > 1 &&
             now > tariffTime[msg.sender].add(tariffs[userTariff].duration)
         ) {
             uint256 expire = tariffTime[msg.sender].add(tariffs[userTariff].duration);
@@ -149,18 +149,18 @@ contract ETHFlow {
         }
 
         uint256 sum = value;
-        
+
         if (myReferrer[msg.sender] != address(0)) {
             uint256 refSum = sum.mul(percentFromEachProfit).div(100);
-            balanceUser[myReferrer[msg.sender]] = 
+            balanceUser[myReferrer[msg.sender]] =
                 balanceUser[myReferrer[msg.sender]].add(refSum);
-                
+
             statistic[myReferrer[msg.sender]][msg.sender] =
                 statistic[myReferrer[msg.sender]][msg.sender].add(refSum);
-            referalsEarning[myReferrer[msg.sender]] = 
+            referalsEarning[myReferrer[msg.sender]] =
                 referalsEarning[myReferrer[msg.sender]].add(refSum);
         }
-        
+
         balanceUser[msg.sender] = balanceUser[msg.sender].add(sum);
         time[msg.sender] = now;
     }
@@ -174,18 +174,18 @@ contract ETHFlow {
                 .mul(tariffs[tariffOf[msg.sender]].value
                     .div(tariffs[tariffOf[msg.sender]].time));
         }
-        
+
         return value;
     }
-    
+
     function getStatistic(address _refer, address _referal) public view returns (uint256) {
         return statistic[myReferrer[_refer]][_referal];
     }
-    
+
     function getAmountOfReferals() public view returns (uint256) {
         return referals[msg.sender].length;
     }
-    
+
     function getEarnedMonetFromReferals() public view returns (uint256) {
         return referalsEarning[msg.sender];
     }
@@ -215,7 +215,7 @@ contract ETHFlow {
     function bytesToAddress(bytes memory bys) private pure returns (address addr) {
         assembly {
             addr := mload(add(bys,20))
-        } 
+        }
     }
 
     function detectTariffId() public payable returns (uint256) {
@@ -223,7 +223,7 @@ contract ETHFlow {
 
         uint256 found = 0;
         for(uint256 i = 1; i < 8; i++) {
-            if(msg.value >= getPriceForNewTariff(i) && 
+            if(msg.value >= getPriceForNewTariff(i) &&
             msg.value < getPriceForNewTariff(i+1)) {
                 found = i;
             }
@@ -231,35 +231,35 @@ contract ETHFlow {
         if(msg.value >= getPriceForNewTariff(8)) {
             found = 8;
         }
-        
+
         return found;
     }
-    
+
     function getPriceForNewTariff(uint256 _newTariff) public view returns (uint256) {
         if(tariffOf[msg.sender] == 1) {
             return tariffs[_newTariff].price;
         }
-        
+
         uint256 duration = now - time[msg.sender];
         uint256 timeLeft = tariffs[tariffOf[msg.sender]].duration
                     - duration;
-                    
+
         if(timeLeft == 0) {
             return tariffs[_newTariff].price;
         }
-        
+
         uint256 pricePerOneSec = tariffs[tariffOf[msg.sender]].price
                     / tariffs[tariffOf[msg.sender]].duration;
         uint256 moneyLeft = pricePerOneSec * timeLeft * 90 / 100;
-        
+
         return tariffs[_newTariff].price - moneyLeft;
     }
- 
+
     function changeTariff() public payable {
         uint256 id = detectTariffId();
 
         require(id >= tariffOf[msg.sender]);
-        
+
         uint256 commission = getPriceForNewTariff(id).mul(adminPercent).div(100);
         commission = commission.add(tariffs[id].price
                         .sub(getPriceForNewTariff(id)).mul(100).div(90)
@@ -271,7 +271,7 @@ contract ETHFlow {
         if(!active[msg.sender]) {
             active[msg.sender] = true;
         }
-        
+
         time[msg.sender] = now;
         tariffOf[msg.sender] = id;
         tariffTime[msg.sender] = now;
@@ -303,4 +303,13 @@ library SafeMath {
     assert(c >= _a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

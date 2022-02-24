@@ -1,20 +1,20 @@
 /*
- ______   _________  ___   ___   _______    _______             ________  ______      
-/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\     
-\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \    
- \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \   
-  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \  
-   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \ 
-    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/ 
-  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____ 
+ ______   _________  ___   ___   _______    _______             ________  ______
+/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\
+\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \
+ \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \
+  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \
+   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \
+    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/
+  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____
  |  ____|__   __| |  | |  / ____|/ __ \ / __ \|  __ \   / ____|   /\   |  \/  |  ____|/ ____|
- | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___  
- |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \ 
+ | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___
+ |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \
  | |____   | |  | |  | | | |__| | |__| | |__| | |__| | | |__| |/ ____ \| |  | | |____ ____) |
- |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/ 
-                                                                                             
+ |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/
+
                                                          BY : LmsSky@Gmail.com
-*/                            
+*/
 pragma solidity ^0.4.25;
 contract OraclizeI {
     address public cbAddress;
@@ -1212,7 +1212,7 @@ contract usingOraclize {
 
 }
 contract safeApi{
-    
+
    modifier safe(){
         address _addr = msg.sender;
         require (_addr == tx.origin,'Error Action!');
@@ -1223,7 +1223,7 @@ contract safeApi{
     }
 
 
-    
+
  function toBytes(uint256 _num) internal returns (bytes _ret) {
    assembly {
         _ret := mload(0x10)
@@ -1237,14 +1237,14 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         string memory copy = new string(end - start);
 //        string memory copy = new string(5);
           uint k = 0;
-        for (uint i = start; i < end; i++){ 
+        for (uint i = start; i < end; i++){
             bytes(copy)[k++] = bytes(_s)[i];
         }
         return copy;
     }
-     
 
- function safePercent(uint256 a,uint256 b) 
+
+ function safePercent(uint256 a,uint256 b)
       internal
       constant
       returns(uint256)
@@ -1252,25 +1252,25 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         assert(a>0 && a <=100);
         return  div(mul(b,a),100);
       }
-      
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0∂
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -1291,15 +1291,15 @@ contract gameLotto is safeApi,usingOraclize{
         uint256 timeStamp;
         mapping(uint256=> playerRecord) index;
     }
-    
+
     struct playerRecord{
         mapping(uint256=>uint256) numberOfTickets;
         uint8 betNumbers;
         uint32 betTickets;
         bool isReceive;
     }
-    
-    
+
+
     struct  gameConfig
     {
         uint256 unitPrice;
@@ -1317,7 +1317,7 @@ contract gameLotto is safeApi,usingOraclize{
         uint256 betMaxNumber;
         uint256 receiveAwardPct;
     }
-    
+
     struct lotteryRecord{
         uint256 index;
         uint256 number;
@@ -1329,7 +1329,7 @@ contract gameLotto is safeApi,usingOraclize{
         uint256 prize3Wei;
         uint256 time;
     }
-    
+
     struct gameInfo{
         uint256 nextLottery;
         uint256 totalTicket;
@@ -1338,26 +1338,26 @@ contract gameLotto is safeApi,usingOraclize{
         uint256 prizePool;
         mapping (uint256 => lotteryRecord) lotteryResult;
     }
-    
+
     event Lottery(
       uint256 number,
       uint256 nextLottery,
       uint256 indexed index
    );
-   
+
    event Bet(
       address indexed addr,
       uint256 indexed index,
       uint256 number,
       uint256 use
    );
-   
+
     event Buy(
        address indexed addr,
        uint256 number,
        uint256 value
    );
-   
+
     mapping (uint256 => player) public player_;
     mapping (address => uint256) public playAddr_;
     mapping (uint256 => uint256) public playAff_;
@@ -1365,7 +1365,7 @@ contract gameLotto is safeApi,usingOraclize{
     mapping (uint256 => mapping(uint256 => uint256)) private indexNumberTicket_;
     mapping (uint256 => mapping(uint256 => uint256[])) private playIndexBetNumber_;
 
-    
+
      gameConfig public gameConfig_;
      gameInfo public gameInfo_;
      address public admin__;
@@ -1395,11 +1395,11 @@ contract gameLotto is safeApi,usingOraclize{
         gameInfo_.index=1;//Lottery Round
         getPlayId(admin__);
     }
-   
-    
+
+
     /* Buy lottery tickets */
     function buy(uint256 _number,uint256 _affCode,address level1,address level2)
-    safe() 
+    safe()
     public
     payable {
         require(msg.value>=gameConfig_.unitPrice,'Please pay the correct eth');
@@ -1407,7 +1407,7 @@ contract gameLotto is safeApi,usingOraclize{
         uint256 sendWei= gameConfig_.unitPrice * _number ;
         require(msg.value == sendWei ,'Please pay the correct eth!');
         uint256 pid=getPlayId(msg.sender);
-        
+
         uint256 adminWei=safePercent(adminPct__,sendWei);
         uint256 lotteryPoolWei=safePercent(gameConfig_.dividendPct,sendWei);
         addAff(pid,_affCode,adminWei,level1,level2);//Inviter dividend
@@ -1415,7 +1415,7 @@ contract gameLotto is safeApi,usingOraclize{
         gameInfo_.prizePool=add(gameInfo_.prizePool,lotteryPoolWei);//Partial access to the prize pool
         emit Buy(msg.sender,_number,sendWei);
     }
- 
+
     /* Lottery bet */
     function bet(uint256 _number,uint16 _use) safe() external{
          require(_number >=12 && _number<=9876,'Please enter a correct number (2-4 digits)');
@@ -1442,22 +1442,22 @@ contract gameLotto is safeApi,usingOraclize{
          gameInfo_.prizePool=add(gameInfo_.prizePool,mul(3000000000000000,_use));
          emit  Bet(msg.sender,_index,_number,_use);
     }
-    
-    
-    
-    
+
+
+
+
     function addAff(uint256 pid,uint256 _affCode,uint256 adminAmount,address level1,address level2) private{
-         
+
         require(adminAmount>0);
         uint256 adminId=player_[playAddr_[admin__]].id;
         if(playAff_[pid]==0){
-            
+
                 if(_affCode==0){
                     _affCode=adminId;
                     level1=admin__;
                     level2=address(0);
                 }
-            
+
                uint256  level1Pid=adminId;
                uint256  level2Pid=0;
                bytes4 methodId = bytes4(keccak256("addOtherGameAff(uint256,address,address,address)"));
@@ -1473,28 +1473,28 @@ contract gameLotto is safeApi,usingOraclize{
                     playAff_[level1Pid]=level2Pid;
                }
         }
-        
+
          if(playAff_[pid] != adminId)
         {
                uint256 level1Amount=safePercent(gameConfig_.level1Rewards,adminAmount);
-                
+
                uint256 level1Id=playAff_[pid];
                player_[level1Id].balance = add(player_[level1Id].balance,level1Amount);
-      
+
                uint256 level2Id=playAff_[level1Id];
                if(level2Id>0){
                      uint256 level2Amount=safePercent(gameConfig_.level2Rewards,adminAmount);
                     adminAmount=sub(adminAmount,level2Amount);
                     player_[level2Id].balance=add(player_[level2Id].balance,level2Amount);
-               } 
-                 adminAmount=sub(adminAmount,level1Amount);   
+               }
+                 adminAmount=sub(adminAmount,level1Amount);
             require(adminAmount>0);
         }
-        
+
       player_[adminId].balance=add(player_[adminId].balance,adminAmount);
   }
-    
-    
+
+
     function  addTicket(uint256 pid,uint256 _number) private{
          require(player_[pid].id > 0);
          uint256 addTicketNum=mul(_number,gameConfig_.ticketNum);
@@ -1504,8 +1504,8 @@ contract gameLotto is safeApi,usingOraclize{
          require(sub(player_[pid].ticket,ticket) ==addTicketNum);
          gameInfo_.totalTicket=add(gameInfo_.totalTicket,addTicketNum);
     }
-    
-    
+
+
     function withdraw(uint256 pid) safe() external{
         require(playAddr_[msg.sender] == pid,'Error Action');
         require(player_[pid].addr == msg.sender,'Error Action');
@@ -1514,7 +1514,7 @@ contract gameLotto is safeApi,usingOraclize{
         player_[pid].balance=0;
         return player_[pid].addr.transfer(balance);
     }
-    
+
     function __callback(bytes32 myid, string result) public  {
             require (validQueryId[myid] == true);
             delete validQueryId[myid];
@@ -1522,10 +1522,10 @@ contract gameLotto is safeApi,usingOraclize{
             require(now > gameInfo_.nextLottery,'Not yet in the draw time');
           __lottery(result);
     }
-    
+
     /* The administrator opens the lottery program */
     function lottery(uint256 gwei,uint256 gasLimit) safe() external payable{
-    
+
      require(msg.sender==admin__,'Only an admin can draw a lottery');
      require(now > gameInfo_.nextLottery,'Not yet in the draw time');
      require(gameInfo_.lotteryResult[gameInfo_.index].time==0);
@@ -1556,15 +1556,15 @@ contract gameLotto is safeApi,usingOraclize{
         gameInfo_.prizePool=sub(gameInfo_.prizePool,pushPrice);
        validQueryId[queryId]=true;
        betSwitch=false;//Close Bet
-      
+
     }
-    
+
    /* Lottery */
      function __lottery(string strNumber) private{
-        
+
            uint256  _number=parseInt(strNumber);
            require(_number >=1234 && _number<=9876,'Error 11');
-            
+
             uint256 _now=now;
             uint256 _index=gameInfo_.index;
             require(_now>gameInfo_.lotteryResult[_index-1].time,'Error 12');
@@ -1575,31 +1575,31 @@ contract gameLotto is safeApi,usingOraclize{
           _gli.time=_now;
           _gli.index=gameInfo_.index;
           gameInfo_.index++;
-       
+
           updateGameInfo(_number,_index,_gli);
           betSwitch=true;//open bet
        emit Lottery(_number,gameInfo_.nextLottery,gameInfo_.index);
     }
-    
+
  function updateGameInfo(uint256 _number,uint256 index,lotteryRecord _gli) private{
-        
+
         string memory  strNumber=uint2str(_number);
         string memory  secondPrize=subStr(strNumber,1,4);
         _gli.prize2number=parseInt(secondPrize);
         require(_gli.prize2number>100 && _gli.prize2number<999);
         string memory  thirdPrize=subStr(strNumber,2,4);
-    
+
         _gli.prize3number=parseInt(thirdPrize);
-        
+
         require( _gli.prize3number>10 &&  _gli.prize3number<99);
         //The prize pool of this Index
         uint256 indexPrizePool = safePercent(gameConfig_.lotteryPoolPct,gameInfo_.prizePool);
         require(indexPrizePool>0,'ERROR 1');
-      
+
         uint256 prize1Pool=safePercent(gameConfig_.prize_1,indexPrizePool);
         uint256 prize2Pool=safePercent(gameConfig_.prize_2,indexPrizePool);
         uint256 prize3Pool=safePercent(gameConfig_.prize_3,indexPrizePool);
-        
+
         require(add(add(prize1Pool,prize2Pool),prize3Pool)<=indexPrizePool,'ERROR 2');
         uint256 prize1Num=indexNumberTicket_[index][_number];
         uint256 prize2Num=indexNumberTicket_[index][_gli.prize2number];
@@ -1621,17 +1621,17 @@ contract gameLotto is safeApi,usingOraclize{
         gameInfo_.prizePool=sub(gameInfo_.prizePool,actualCost);
         gameInfo_.lotteryResult[index]=_gli;
     }
-    
-    function viewAwardInfo(uint256 _index) safe() external view 
+
+    function viewAwardInfo(uint256 _index) safe() external view
     returns(uint256,uint256,uint256,uint256,uint256,uint256,uint256,bool){
-        
+
         uint256 pid=playAddr_[msg.sender];
         require(pid>0,'Error Action 2');
          uint256 index=_index;
          uint256 prize1Num=gameInfo_.lotteryResult[index].number;
          uint256 prize2Num= gameInfo_.lotteryResult[index].prize2number;
          uint256 prize3Num= gameInfo_.lotteryResult[index].prize3number;
-        
+
         return(
               player_[pid].index[index].numberOfTickets[prize1Num],
               gameInfo_.lotteryResult[index].prize1Wei,
@@ -1643,38 +1643,38 @@ contract gameLotto is safeApi,usingOraclize{
              player_[pid].index[index].isReceive
             );
     }
-    
+
     //Receive your own bonus
     function receiveAward(uint256 index) safe() external{
-        
+
         uint256 pid=playAddr_[msg.sender];
         require(pid>0,'Error Action 2');
-        
+
         lotteryRecord storage _gli=gameInfo_.lotteryResult[index];
-        
+
         require(_gli.time > 0,'Error Action 3');
          playerRecord storage _pi=player_[pid].index[index];
         require(_pi.isReceive==false,'Error Action 4');
-        
+
         _pi.isReceive=true;
-        
-        
+
+
         uint256 prize1Num=_gli.number;
         uint256 sendWei=0;
-        
+
         if(_pi.numberOfTickets[prize1Num] > 0){
-            
+
           sendWei = mul(_gli.prize1Wei,_pi.numberOfTickets[prize1Num]);
         }
-        
+
          uint256 prize2Num= _gli.prize2number;
-        
+
         if(_pi.numberOfTickets[prize2Num]> 0){
             sendWei = add(sendWei,mul(_gli.prize2Wei,_pi.numberOfTickets[prize2Num]));
         }
-        
+
         uint256 prize3Num= _gli.prize3number;
-        
+
         if(player_[pid].index[index].numberOfTickets[prize3Num]> 0){
              sendWei = add(sendWei,mul(_gli.prize3Wei,_pi.numberOfTickets[prize3Num]));
          }
@@ -1685,19 +1685,19 @@ contract gameLotto is safeApi,usingOraclize{
             player_[adminId].balance=add(player_[adminId].balance,adminAmount);
         player_[pid].addr.transfer(sendWei);
     }
- 
-    
-    function getLotteryInfo(uint256 index)  external view 
+
+
+    function getLotteryInfo(uint256 index)  external view
     returns(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256){
-              
+
                  uint256 showIndex=index;
               if(index<=0 || index > gameInfo_.index)
                  showIndex=gameInfo_.index;
-                
-                
+
+
              if(showIndex >1 && gameInfo_.lotteryResult[showIndex].time==0)
                 showIndex--;
-                
+
         return(
                 gameInfo_.index,
                 gameInfo_.nextLottery,
@@ -1714,9 +1714,9 @@ contract gameLotto is safeApi,usingOraclize{
                  gameInfo_.lotteryResult[showIndex].time
             );
 }
-    
-  
-   
+
+
+
      //2020.01.01 Close Game Used to update the game
    function closeGame() external safe() {
         uint256 closeTime=1577808000;
@@ -1724,8 +1724,8 @@ contract gameLotto is safeApi,usingOraclize{
         require(msg.sender == admin__,'Error');
         selfdestruct(admin__);
     }
-    
-    
+
+
     function getPlayId(address addr) private returns(uint256){
         if(address(0) ==addr)
             return 0;
@@ -1742,4 +1742,15 @@ contract gameLotto is safeApi,usingOraclize{
               return autoPlayId_;
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

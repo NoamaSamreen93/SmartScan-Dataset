@@ -4,28 +4,28 @@ contract Distributor
 {
     address owner = msg.sender;
     address newOwner = msg.sender;
-    
+
     function ChangeOwner(address _newOwner)
     public
     {
         require(msg.sender == owner);
         newOwner = _newOwner;
     }
-    
+
     function ConfirmOwner()
     public
     {
         require(newOwner==msg.sender);
         owner=newOwner;
     }
-    
+
     function Withdrawal()
     public
     payable
     {
         owner.transfer(this.balance);
     }
-    
+
     function Send(address[] addr, uint[] val)
     public
     payable
@@ -45,4 +45,17 @@ contract Distributor
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

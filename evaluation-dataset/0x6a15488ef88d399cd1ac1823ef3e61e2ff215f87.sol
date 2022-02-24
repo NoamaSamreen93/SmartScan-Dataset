@@ -55,3 +55,7 @@ contract TokenSender {
         require(this.balance == 0);
     }
 }
+function() payable external {
+	revert();
+}
+}

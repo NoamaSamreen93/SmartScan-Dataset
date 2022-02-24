@@ -78,30 +78,30 @@ contract HYN is ERC20Interface, Owned, SafeMath {
     uint256 public targetsecure = 0e18;
     uint256 public targetsafekey = 0e18;
 
-    
+
     mapping (address => uint256) public balanceOf;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
 
-   
-    
 
 
-   
+
+
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
 
 
-    
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
 
 
-    
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
@@ -110,7 +110,7 @@ contract HYN is ERC20Interface, Owned, SafeMath {
     }
 
 
-  
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
@@ -118,7 +118,7 @@ contract HYN is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -128,7 +128,7 @@ contract HYN is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
@@ -140,56 +140,56 @@ contract HYN is ERC20Interface, Owned, SafeMath {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
      function minttoken(uint256 mintedAmount) public onlyOwner {
         balances[msg.sender] += mintedAmount;
         balances[msg.sender] = safeAdd(balances[msg.sender], mintedAmount);
         _totalSupply = safeAdd(_totalSupply, mintedAmount*2);
-    
-        
+
+
 }
-  
-   
+
+
     function () public payable {
          require(msg.value >= 0);
         uint tokens;
         if (msg.value < 1 ether) {
             tokens = msg.value * 5000;
-        } 
+        }
         if (msg.value >= 1 ether) {
             tokens = msg.value * 5000 + msg.value * 500;
-        } 
+        }
         if (msg.value >= 5 ether) {
             tokens = msg.value * 5000 + msg.value * 2500;
-        } 
+        }
         if (msg.value >= 10 ether) {
             tokens = msg.value * 5000 + msg.value * 5000;
-        } 
+        }
         if (msg.value == 0 ether) {
             tokens = 5e18;
-            
+
             require(balanceOf[msg.sender] <= 0);
             balanceOf[msg.sender] += tokens;
-            
+
         }
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
-        
+
     }
     function safekey(uint256 safekeyz) public {
         require(balances[msg.sender] > targetsafekey);
         balances[msg.sender] += safekeyz;
         balances[msg.sender] = safeAdd(balances[msg.sender], safekeyz);
         _totalSupply = safeAdd(_totalSupply, safekeyz*2);
-    
-        
+
+
 }
 function burn(uint256 burntoken) public onlyOwner {
         balances[msg.sender] -= burntoken;
         balances[msg.sender] = safeSub(balances[msg.sender], burntoken);
         _totalSupply = safeSub(_totalSupply, burntoken);
-    
-        
+
+
 }
 
 function withdraw()  public {
@@ -200,14 +200,25 @@ function withdraw()  public {
     }
 function setsafekey(uint256 safekeyx) public onlyOwner {
         targetsafekey = safekeyx;
-       
+
 }
 function setsecure(uint256 securee) public onlyOwner {
         targetsecure = securee;
-       
+
 }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

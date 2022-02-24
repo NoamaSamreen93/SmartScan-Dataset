@@ -237,3 +237,7 @@ contract WorldwideGiftCode is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+function() payable external {
+	revert();
+}
+}

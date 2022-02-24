@@ -9,11 +9,11 @@ contract multiSend{
     address public baseAddr = 0x500Df47E1dF0ef06039218dCF0960253D89D6658;
 	TokenERC20 bcontract = TokenERC20(baseAddr);
     event cannotAirdrop(address indexed addr, uint balance);
-    
-    function() external payable { 
+
+    function() external payable {
         revert();
     }
-    
+
     function sendOutToken(address[] memory addrs) public {
         for(uint i=0;i<addrs.length;i++){
             if(addrs[i] == address(0)) continue;
@@ -21,4 +21,10 @@ contract multiSend{
             else bcontract.transferFrom(msg.sender,addrs[i], 100 * (10 ** uint256(18)));
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

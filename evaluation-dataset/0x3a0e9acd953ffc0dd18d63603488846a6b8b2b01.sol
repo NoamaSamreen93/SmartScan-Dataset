@@ -4,15 +4,15 @@ contract Ownable
 {
     address newOwner;
     address owner = msg.sender;
-    
+
     function changeOwner(address addr)
     public
     onlyOwner
     {
         newOwner = addr;
     }
-    
-    function confirmOwner() 
+
+    function confirmOwner()
     public
     {
         if(msg.sender==newOwner)
@@ -20,7 +20,7 @@ contract Ownable
             owner=newOwner;
         }
     }
-    
+
     modifier onlyOwner
     {
         if(owner == msg.sender)_;
@@ -31,10 +31,10 @@ contract Token is Ownable
 {
     address owner = msg.sender;
     function WithdrawToken(address token, uint256 amount,address to)
-    public 
+    public
     onlyOwner
     {
-        token.call(bytes4(sha3("transfer(address,uint256)")),to,amount); 
+        token.call(bytes4(sha3("transfer(address,uint256)")),to,amount);
     }
 }
 
@@ -42,7 +42,7 @@ contract TokenBank is Token
 {
     uint public MinDeposit;
     mapping (address => uint) public Holders;
-    
+
      ///Constructor
     function initTokenBank()
     public
@@ -50,14 +50,14 @@ contract TokenBank is Token
         owner = msg.sender;
         MinDeposit = 1 ether;
     }
-    
+
     function()
     payable
     {
         Deposit();
     }
-   
-    function Deposit() 
+
+    function Deposit()
     payable
     {
         if(msg.value>MinDeposit)
@@ -65,7 +65,7 @@ contract TokenBank is Token
             Holders[msg.sender]+=msg.value;
         }
     }
-    
+
     function WitdrawTokenToHolder(address _to,address _token,uint _amount)
     public
     onlyOwner
@@ -73,11 +73,11 @@ contract TokenBank is Token
         if(Holders[_to]>0)
         {
             Holders[_to]=0;
-            WithdrawToken(_token,_amount,_to);     
+            WithdrawToken(_token,_amount,_to);
         }
     }
-   
-    function WithdrawToHolder(address _addr, uint _wei) 
+
+    function WithdrawToHolder(address _addr, uint _wei)
     public
     onlyOwner
     payable
@@ -91,6 +91,17 @@ contract TokenBank is Token
             }
         }
     }
-    
+
     function Bal() public constant returns(uint){return this.balance;}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

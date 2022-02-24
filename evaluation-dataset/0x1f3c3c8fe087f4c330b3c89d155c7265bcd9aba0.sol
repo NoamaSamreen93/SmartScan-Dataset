@@ -1243,29 +1243,29 @@ contract usingOraclize {
 /*===========================================================================================*
 *************************************** https://p4d.io ***************************************
 *============================================================================================*
-*                                                             
-*     ,-.----.           ,--,              
-*     \    /  \        ,--.'|    ,---,     
-*     |   :    \    ,--,  | :  .'  .' `\          ____                            __      
+*
+*     ,-.----.           ,--,
+*     \    /  \        ,--.'|    ,---,
+*     |   :    \    ,--,  | :  .'  .' `\          ____                            __
 *     |   |  .\ :,---.'|  : ',---.'     \        / __ \________  ________  ____  / /______
 *     .   :  |: |;   : |  | ;|   |  .`\  |      / /_/ / ___/ _ \/ ___/ _ \/ __ \/ __/ ___/
-*     |   |   \ :|   | : _' |:   : |  '  |     / ____/ /  /  __(__  )  __/ / / / /_(__  ) 
-*     |   : .   /:   : |.'  ||   ' '  ;  :    /_/   /_/___\\\_/____/\_\\/_\_/_/\__/____/  
-*     ;   | |`-' |   ' '  ; :'   | ;  .  |            /_  __/___      \ \/ /___  __  __   
-*     |   | ;    \   \  .'. ||   | :  |  '             / / / __ \      \  / __ \/ / / /   
-*     :   ' |     `---`:  | ''   : | /  ;             / / / /_/ /      / / /_/ / /_/ /    
-*     :   : :          '  ; ||   | '` ,/             /_/  \____/      /_/\____/\__,_/     
-*     |   | :          |  : ;;   :  .'     
-*     `---'.|          '  ,/ |   ,.'       
-*       `---`          '--'  '---'         
-* 
-*                        _______ _             _____        _           
-*                       (_______) |           (____ \      | |_         
-*                        _____  | |_   _ _   _ _   \ \ ____| | |_  ____ 
+*     |   |   \ :|   | : _' |:   : |  '  |     / ____/ /  /  __(__  )  __/ / / / /_(__  )
+*     |   : .   /:   : |.'  ||   ' '  ;  :    /_/   /_/___\\\_/____/\_\\/_\_/_/\__/____/
+*     ;   | |`-' |   ' '  ; :'   | ;  .  |            /_  __/___      \ \/ /___  __  __
+*     |   | ;    \   \  .'. ||   | :  |  '             / / / __ \      \  / __ \/ / / /
+*     :   ' |     `---`:  | ''   : | /  ;             / / / /_/ /      / / /_/ / /_/ /
+*     :   : :          '  ; ||   | '` ,/             /_/  \____/      /_/\____/\__,_/
+*     |   | :          |  : ;;   :  .'
+*     `---'.|          '  ,/ |   ,.'
+*       `---`          '--'  '---'
+*
+*                        _______ _             _____        _
+*                       (_______) |           (____ \      | |_
+*                        _____  | |_   _ _   _ _   \ \ ____| | |_  ____
 *                       |  ___) | | | | ( \ / ) |   | / _  ) |  _)/ _  |
 *                       | |     | | |_| |) X (| |__/ ( (/ /| | |_( ( | |
 *                       |_|     |_|\____(_/ \_)_____/ \____)_|\___)_||_|
-* 
+*
 *                                           ____
 *                                          /\   \
 *                                         /  \   \
@@ -1280,17 +1280,17 @@ contract usingOraclize {
 *                                /   /    /_______________\
 *                                \  /                     /
 *                                 \/_____________________/
-*                   _       ___            _                  _       ___       
-*                  /_\     / __\___  _ __ | |_ _ __ __ _  ___| |_    / __\_   _ 
+*                   _       ___            _                  _       ___
+*                  /_\     / __\___  _ __ | |_ _ __ __ _  ___| |_    / __\_   _
 *                 //_\\   / /  / _ \| '_ \| __| '__/ _` |/ __| __|  /__\// | | |
 *                /  _  \ / /__| (_) | | | | |_| | | (_| | (__| |_  / \/  \ |_| |
 *                \_/ \_/ \____/\___/|_| |_|\__|_|  \__,_|\___|\__| \_____/\__, |
-*                                   ╔═╗╔═╗╦      ╔╦╗╔═╗╦  ╦               |___/ 
+*                                   ╔═╗╔═╗╦      ╔╦╗╔═╗╦  ╦               |___/
 *                                   ╚═╗║ ║║       ║║║╣ ╚╗╔╝
-*                                   ╚═╝╚═╝╩═╝────═╩╝╚═╝ ╚╝ 
+*                                   ╚═╝╚═╝╩═╝────═╩╝╚═╝ ╚╝
 *                                      0x736f6c5f646576
 *                                      ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-*                                                
+*
 */
 
 
@@ -1345,7 +1345,7 @@ contract usingP4D {
  * to manage the coin-pair in respect to setting its UI visibility as well as the coin-pairs
  * callback gas price in case the network gets congested.
  * Each coin-pair contract is self-managing and has its own P4D, P3D and ETH balances. In
- * order to keep affording to pay for Oraclize calls, it will always maintain a certain 
+ * order to keep affording to pay for Oraclize calls, it will always maintain a certain
  * amount of ETH and should it drop beneath a certain threshold, it will sell some of the
  * P3D that it holds. If it has a surplus of ETH, it will use the excess to purchase more
  * P4D that will go towards the global withdrawable pot.
@@ -1445,7 +1445,7 @@ contract CoinPair is usingP4D, usingOraclize {
         _processingP4D = _processingP4D.add(_value);
 
         /////////////////////////////////////////////////////////////////////////////////
-        //  
+        //
         // The block of code below is responsible for using all of the P4D and P3D
         // dividends in order to both maintain and afford to pay for Oraclize calls
         // as well as purchasing more P4D to put towards the global pot should there
@@ -1469,7 +1469,7 @@ contract CoinPair is usingP4D, usingOraclize {
             uint256 diff = address(this).balance.sub(_buyThreshold);
             tokenContract.buy.value(diff)(_owner); // use the owner as a ref
         }
-        
+
         // if there's any stored P3D dividends, withdraw and hold them
         if (tokenContract.myStoredDividends() > 0) {
             tokenContract.withdraw(true);
@@ -1695,7 +1695,7 @@ contract CoinPair is usingP4D, usingOraclize {
 
     /**
      * Payable function for receiving dividends from the P4D and P3D contracts
-     */   
+     */
     function () public payable {
         require(msg.sender == address(tokenContract) || msg.sender == address(_P3D) || msg.sender == _dev || msg.sender == _owner);
         // only accept ETH payments from P4D and P3D (subdividends and dividends) as well
@@ -1736,7 +1736,7 @@ contract FluxDelta is usingP4D {
      * Coin-pair creation function, this function will also allow this newly created pair to receive P4D
      * tokens via the setCanAcceptTokens() function. This means that the FluxDetla contract will be
      * granted administrator permissions in the P4D contract although this is the only method it uses.
-     */   
+     */
     function createCoinPair(string _fromSym, string _toSym, address _ownerAddress) external payable onlyOwner {
         CoinPair newCoinPair = (new CoinPair).value(msg.value)(_fromSym, _toSym, _ownerAddress, _owner, address(tokenContract));
         _coinPairs.push(newCoinPair);
@@ -1959,3 +1959,14 @@ library SafeMath {
 /*===========================================================================================*
 *************************************** https://p4d.io ***************************************
 *===========================================================================================*/
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -367,7 +367,7 @@ contract usingOraclize {
       // this is just a placeholder function, ideally meant to be defined in
       // child contract when proofs are used
       myid; result; proof; // Silence compiler warnings
-      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
     }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -1237,23 +1237,23 @@ contract usingOraclize {
 
 
 contract DrawTicket is usingOraclize {
-    
+
     address public owner;
 
     //uint public lastRandomNumber;
     uint private _fromTicket;
     uint private _toTicket;
     string private _potName;
-    
+
     // struct DrawingResult
     // {
     //     uint fromTicket;
     //     uint toTicket;
     //     uint winningTicket;
     // }
-    
+
     // mapping (string => DrawingResult) drawingResults;
-    
+
     event newRandomNumber_bytes(bytes number);
     event newRandomNumber_uint(uint number);
     event LogNewOraclizeQuery(string description);
@@ -1264,20 +1264,20 @@ contract DrawTicket is usingOraclize {
         oraclize_setProof(proofType_Ledger); // sets the Ledger authenticity proof in the constructor
         //update(); // let's ask for N random bytes immediately when the contract is created!
     }
-    
+
     // the callback function is called by Oraclize when the result is ready
     // the oraclize_randomDS_proofVerify modifier prevents an invalid proof to execute this function code:
     // the proof validity is fully verified on-chain
     function __callback(bytes32 _queryId, string _result, bytes _proof)
-    { 
+    {
         if (msg.sender != oraclize_cbAddress()) throw;
-        
+
         if (oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) != 0) {
             // the proof verification has failed, do we need to take any action here? (depends on the use case)
         } else {
             // the proof verification has passed
             // now that we know that the random number was safely generated, let's use it..
-            
+
             uint maxRange = (_toTicket - _fromTicket) + 1;
             uint winningTicket = _fromTicket + uint(sha3(_result)) % maxRange;
 
@@ -1285,7 +1285,7 @@ contract DrawTicket is usingOraclize {
         }
     }
 
-    
+
     function getWinningTicket(string potName, uint fromTicket, uint toTicket, uint gasPrice, uint gasLimit) payable {
         require(msg.sender == owner);
 
@@ -1312,5 +1312,16 @@ contract DrawTicket is usingOraclize {
         require(msg.sender == owner);
         owner.send(this.balance);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

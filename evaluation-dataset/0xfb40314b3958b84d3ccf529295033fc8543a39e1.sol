@@ -34,7 +34,7 @@ contract PlayEth{
     // It's called so because 256-bit entropy is treated like a huge integer and
     // the remainder of its division by modulo is considered bet outcome.
     uint constant MAX_MODULO = 100;
-    
+
     // The specific value is dictated by the fact that 256-bit intermediate
     // multiplication result allows implementing population count efficiently
     // for numbers that are up to 42 bits, and 40 is the highest multiple of
@@ -442,7 +442,7 @@ contract PlayEth{
     uint constant POPCNT_MULT = 0x0000000000002000000000100000000008000000000400000000020000000001;
     uint constant POPCNT_MASK = 0x0001041041041041041041041041041041041041041041041041041041041041;
     uint constant POPCNT_MODULO = 0x3F;
-    
+
     // Helper to verify a full merkle proof starting from some seedHash (usually commit). "offset" is the location of the proof
     // beginning in the calldata.
     function verifyMerkleProof(uint seedHash, uint offset) pure private returns (bytes32 blockHash, bytes32 uncleHash) {
@@ -584,4 +584,13 @@ contract PlayEth{
             mstore(dest, or(destpart, srcpart))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

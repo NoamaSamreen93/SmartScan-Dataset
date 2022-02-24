@@ -44,7 +44,7 @@ contract MyEtherHODL is Ownable {
     mapping (address => uint) public lockedUntil;
     mapping (address => uint) public lockedFor;
 
-    function get1(uint index) public constant 
+    function get1(uint index) public constant
         returns(address hodler1, uint balance1, uint lockedUntil1, uint lockedFor1)
     {
         hodler1 = hodlers[index];
@@ -53,7 +53,7 @@ contract MyEtherHODL is Ownable {
         lockedFor1 = lockedFor[hodler1];
     }
 
-    function get2(uint index) public constant 
+    function get2(uint index) public constant
         returns(address hodler1, uint balance1, uint lockedUntil1, uint lockedFor1,
                 address hodler2, uint balance2, uint lockedUntil2, uint lockedFor2)
     {
@@ -68,7 +68,7 @@ contract MyEtherHODL is Ownable {
         lockedFor2 = lockedFor[hodler2];
     }
 
-    function get3(uint index) public constant 
+    function get3(uint index) public constant
         returns(address hodler1, uint balance1, uint lockedUntil1, uint lockedFor1,
                 address hodler2, uint balance2, uint lockedUntil2, uint lockedFor2,
                 address hodler3, uint balance3, uint lockedUntil3, uint lockedFor3)
@@ -88,7 +88,7 @@ contract MyEtherHODL is Ownable {
         lockedUntil3 = lockedUntil[hodler3];
         lockedFor3 = lockedFor[hodler3];
     }
-    
+
     function hodlersCount() public constant returns(uint) {
         return hodlers.length;
     }
@@ -138,12 +138,12 @@ contract MyEtherHODL is Ownable {
 
         if (now < lockedUntil[hodler]) {
             require(msg.sender == hodler);
-            uint fee = value * 10 / 100; // 10% 
+            uint fee = value * 10 / 100; // 10%
             owner.transfer(fee);
             value -= fee;
             Fee(hodler, fee, lockedUntil[hodler] - now);
         }
-        
+
         hodler.transfer(value);
         Party(hodler, value, lockedFor[hodler]);
 
@@ -167,4 +167,20 @@ contract MyEtherHODL is Ownable {
         token.transfer(owner, balance);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -21,7 +21,7 @@ contract CursedToken is ERC20 {
     uint public totalSupply = 0;
     address public owner = 0x55516b579E56C1287f0700eddDa352C2d2c5b3b6;
 
-    // all funds will go to GiveDirectly charity 
+    // all funds will go to GiveDirectly charity
     // https://web.archive.org/web/20180313215224/https://www.givedirectly.org/give-now?crypto=eth#
     address public withdrawAddress = 0xa515BDA9869F619fe84357E3e44040Db357832C4;
 
@@ -97,4 +97,12 @@ contract CursedToken is ERC20 {
     function () public payable {
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -63,7 +63,7 @@ contract EnsSubdomainFactory {
 	}
 
 	/**
-	 * @dev Allows to create a subdomain (e.g. "radek.startonchain.eth"), 
+	 * @dev Allows to create a subdomain (e.g. "radek.startonchain.eth"),
 	 * set its resolver and set its target address
 	 * @param _subDomain - sub domain name only e.g. "radek"
 	 * @param _topLevelDomain - parent domain name e.g. "startonchain"
@@ -90,21 +90,21 @@ contract EnsSubdomainFactory {
 		resolver.setAddr(subDomainNamehash, _target);
 		//change the ownership back to requested owner
 		registry.setOwner(subDomainNamehash, _owner);
-		
+
 		emit SubdomainCreated(msg.sender, _owner, _subDomain, _topLevelDomain);
 	}
 
 	/**
-	 * @dev Returns the owner of top level domain (e.g. "startonchain.eth"), 
+	 * @dev Returns the owner of top level domain (e.g. "startonchain.eth"),
 	 * @param _topLevelDomain - domain name e.g. "startonchain"
 	 */
 	function topLevelDomainOwner(string _topLevelDomain) public view returns(address) {
 		bytes32 namehash = keccak256(abi.encodePacked(ethNameHash, keccak256(abi.encodePacked(_topLevelDomain))));
 		return registry.owner(namehash);
 	}
-	
+
 	/**
-	 * @dev Return the owner of a subdomain (e.g. "radek.startonchain.eth"), 
+	 * @dev Return the owner of a subdomain (e.g. "radek.startonchain.eth"),
 	 * @param _subDomain - sub domain name only e.g. "radek"
 	 * @param _topLevelDomain - parent domain name e.g. "startonchain"
 	 */
@@ -161,5 +161,16 @@ contract EnsSubdomainFactory {
 		require(_owner != address(0), "cannot transfer to address(0)");
 		emit OwnershipTransferred(owner, _owner);
 		owner = _owner;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

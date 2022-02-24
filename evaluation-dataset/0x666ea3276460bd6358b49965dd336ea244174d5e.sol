@@ -241,11 +241,11 @@ contract Cryphos is StandardToken
         balances[ABDEL_ADDRESS]  = ABDEL_ALLOCATION;
         balances[ASHLEY_ADDRESS] = ASHLEY_ALLOCATION;
     }
-    
+
     // Stop transactions from team member allocations during lock period
     function isAllocationLocked(address _spender) constant returns (bool)
     {
-        return inAllocationLockPeriod() && 
+        return inAllocationLockPeriod() &&
         (isTeamMember(_spender) || isTeamMember(msg.sender));
     }
 
@@ -302,4 +302,20 @@ contract Cryphos is StandardToken
             super.transferFrom(from, to, tokens);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

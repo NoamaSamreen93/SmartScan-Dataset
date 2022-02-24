@@ -12,7 +12,7 @@ contract OwnedI {
 
     function setOwner(address newOwner)
         public
-        returns (bool success); 
+        returns (bool success);
 }
 
 /**
@@ -57,7 +57,7 @@ contract WithBeneficiary is Owned {
      * @dev Made private to protect against child contract setting it to 0 by mistake.
      */
     address private beneficiary;
-    
+
     event LogBeneficiarySet(address indexed previousBeneficiary, address indexed newBeneficiary);
 
     constructor(address _beneficiary) payable public {
@@ -160,7 +160,7 @@ contract PullPaymentCapable {
         return totalBalance;
     }
 
-    function getPaymentOf(address beneficiary) 
+    function getPaymentOf(address beneficiary)
         view public
         returns (uint256) {
         return payments[beneficiary];
@@ -168,7 +168,7 @@ contract PullPaymentCapable {
 
     // withdraw accumulated balance, called by payee
     function withdrawPayments()
-        external 
+        external
         returns (bool success) {
         uint256 payment = payments[msg.sender];
         payments[msg.sender] = 0;
@@ -212,7 +212,7 @@ contract CertifierDbI {
         returns (uint count);
 
     function getCertifierStatus(address certifierAddr)
-        view public 
+        view public
         returns (bool authorised, uint256 index);
 
     function getCertifierAtIndex(uint256 index)
@@ -355,7 +355,7 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         success = true;
     }
 
-    function certify(address student, bytes32 document) 
+    function certify(address student, bytes32 document)
         fromCertifier public
         returns (bool success) {
         require(student != 0);
@@ -380,7 +380,7 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         success = true;
     }
 
-    function uncertify(address student) 
+    function uncertify(address student)
         fromCertifier public
         returns (bool success) {
         require(studentCertifications[student].certified);
@@ -519,4 +519,15 @@ contract CertificationDb is CertificationDbI, WithFee, PullPaymentCapable {
         returns (bool success) {
         return fixBalanceInternal(getBeneficiary());
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

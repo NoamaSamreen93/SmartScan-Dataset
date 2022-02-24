@@ -16,7 +16,7 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     /**
      * @dev Integer division of two numbers, truncating the quotient.
      **/
@@ -26,7 +26,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     /**
      * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
      **/
@@ -34,7 +34,7 @@ library SafeMath {
         assert(b <= a);
         return a - b;
     }
-    
+
     /**
      * @dev Adds two numbers, throws on overflow.
      **/
@@ -75,14 +75,14 @@ contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
     uint256 totalSupply_;
-    
+
     /**
      * @dev total number of tokens in existence
      **/
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
     }
-    
+
     /**
      * @dev transfer token for a specified address
      * @param _to The address to transfer to.
@@ -91,13 +91,13 @@ contract BasicToken is ERC20Basic {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Gets the balance of the specified address.
      * @param _owner The address to query the the balance of.
@@ -120,15 +120,15 @@ contract StandardToken is ERC20, BasicToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        
+
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -144,7 +144,7 @@ contract StandardToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param _owner address The address which owns the funds.
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      *
@@ -170,7 +170,7 @@ contract StandardToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      *
@@ -208,7 +208,7 @@ contract Ownable {
    constructor() public {
       owner = msg.sender;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      **/
@@ -216,7 +216,7 @@ contract Ownable {
       require(msg.sender == owner);
       _;
     }
-    
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -235,7 +235,7 @@ contract Ownable {
 contract Pausable is Ownable {
     event Pause();
     event Unpause();
-    
+
     bool public canPause = true;
     bool public paused = false;
 
@@ -247,7 +247,7 @@ contract Pausable is Ownable {
         require(!paused || msg.sender == owner);
         _;
     }
-    
+
     /**
      * @dev Modifier to make a function callable only when the contract is paused.
      **/
@@ -255,7 +255,7 @@ contract Pausable is Ownable {
         require(paused);
         _;
     }
-    
+
     /**
      * @dev called by the owner to pause, triggers stopped state
      **/
@@ -264,7 +264,7 @@ contract Pausable is Ownable {
         paused = true;
         emit Pause();
     }
-    
+
     /**
      * @dev called by the owner to unpause, returns to normal state
      **/
@@ -272,7 +272,7 @@ contract Pausable is Ownable {
         paused = false;
         emit Unpause();
     }
-    
+
     /**
      * @dev Prevent the token from ever being paused again
      **/
@@ -293,28 +293,28 @@ contract PausableToken is StandardToken, Pausable {
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
     /**
      * @dev transferFrom function to tansfer tokens when token is not paused
      **/
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     /**
      * @dev approve spender when not paused
      **/
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
         return super.approve(_spender, _value);
     }
-    
+
     /**
      * @dev increaseApproval of spender when not paused
      **/
     function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     /**
      * @dev decreaseApproval of spender when not paused
      **/
@@ -342,17 +342,17 @@ contract Configurable {
     uint256 public constant preSaleFourthPrice = 3472222222222222222222; // pre sale 4 stage discount 20%, tokens per 1 ether
     uint256 public constant privateDiscountPrice = 7936507936507936507937; // sale private discount 65%, tokens per 1 ether
     uint256 public privateSold = 0;
-    
+
     uint256 public icoStartDate = 0;
     uint256 public constant timeToBeBurned = 1 years;
     uint256 public constant companyReserve = 1000000000*10**18;
     uint256 public remainingTokens = 0;
     bool public icoFinalized = false;
-    uint256 public icoEnd = 0; 
+    uint256 public icoEnd = 0;
     uint256 public maxAmmount = 1000 ether; // maximum investment allowed
     uint256 public minContribute = 0.1 ether; // Minimum investment allowed
     uint256 public constant preSaleStartDate = 1525046400; // 30/04/2018 00:00:00
-    
+
     //custom variables for private and public events
     uint256 public privateEventTokens = 0;
     uint256 public publicEventTokens = 0;
@@ -365,7 +365,7 @@ contract Configurable {
 }
 
 /**
- * @title CrowdsaleToken 
+ * @title CrowdsaleToken
  * @dev Contract to preform crowd sale with token
  **/
 contract CrowdsaleToken is PausableToken, Configurable {
@@ -373,16 +373,16 @@ contract CrowdsaleToken is PausableToken, Configurable {
      * @dev enum of current crowd sale state
      **/
      enum Stages {
-        preSale, 
-        pause, 
-        sale, 
+        preSale,
+        pause,
+        sale,
         icoEnd
     }
-  
+
     Stages currentStage;
     mapping(address => bool) saleDiscountList; // 65% private discount
     mapping(address => bool) customPrivateSale; // Private discount for events
-    
+
     /**
      * @dev constructor of CrowdsaleToken
      **/
@@ -393,7 +393,7 @@ contract CrowdsaleToken is PausableToken, Configurable {
         totalSupply_ = totalSupply_.add(companyReserve);
         emit Transfer(address(this), owner, companyReserve);
     }
-    
+
     /**
      * @dev fallback function to send ether to for Crowd sale
      **/
@@ -416,10 +416,10 @@ contract CrowdsaleToken is PausableToken, Configurable {
             emit Transfer(address(this), msg.sender, tokens[1]);
         }
     }
-    
-    
+
+
     /**
-     * @dev tokensAmount calculates the amount of tokens the sender is purchasing 
+     * @dev tokensAmount calculates the amount of tokens the sender is purchasing
      **/
     function tokensAmount (uint256 _wei) internal returns (uint256[]) {
         uint256[] memory tokens = new uint256[](7);
@@ -430,27 +430,27 @@ contract CrowdsaleToken is PausableToken, Configurable {
         uint256 totalSold = totalSupply_.sub(companyReserve);
         uint256 extraWei = 0;
         bool ismember = false;
-        
+
         // if sender sent more then maximum spending amount
         if(_wei > maxAmmount){
             extraWei = _wei.sub(maxAmmount);
             _wei = maxAmmount;
         }
-        
+
         // if member is part of a private sale event
        if(customPrivateSale[msg.sender] == true && msg.value >= privateMin && privateEventActive == true && privateEventTokens > 0){
             stagePrice = privateRate;
             stageTokens = _wei.mul(stagePrice).div(1 ether);
-           
+
             if(stageTokens <= privateEventTokens){
                 tokens[0] = tokens[0].add(stageTokens);
                 privateEventTokens = privateEventTokens.sub(tokens[0]);
-                
+
                 if(extraWei > 0){
                     tokens[1] = extraWei;
                     //emit Transfer(address(this), msg.sender, extraWei);
                 }
-                
+
                 return tokens;
             } else {
                 stageTokens = privateEventTokens;
@@ -461,16 +461,16 @@ contract CrowdsaleToken is PausableToken, Configurable {
                 _wei = _wei.sub(stageWei);
             }
         }
-        
-        // private member 
+
+        // private member
         if (totalSold > preSaleFirstCap && privateSold <= privateLimit && saleDiscountList[msg.sender]) {
             stagePrice = privateDiscountPrice; // private member %65 discount
-          
+
           stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (privateSold.add(tokens[0]).add(stageTokens) <= privateLimit) {
             tokens[0] = tokens[0].add(stageTokens);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
@@ -485,21 +485,21 @@ contract CrowdsaleToken is PausableToken, Configurable {
             _wei = _wei.sub(stageWei);
           }
         }
-        
+
          // if public event is active and tokens available
         if(publicEventActive == true && publicEventTokens > 0 && msg.value >= publicMin) {
             stagePrice = publicRate;
             stageTokens = _wei.mul(stagePrice).div(1 ether);
-           
+
             if(stageTokens <= publicEventTokens){
                 tokens[0] = tokens[0].add(stageTokens);
                 publicEventTokens = publicEventTokens.sub(tokens[0]);
-                
+
                 if(extraWei > 0){
                     tokens[1] = stageWei;
                     //emit Transfer(address(this), msg.sender, extraWei);
                 }
-                
+
                 return tokens;
             } else {
                 stageTokens = publicEventTokens;
@@ -510,11 +510,11 @@ contract CrowdsaleToken is PausableToken, Configurable {
                 _wei = _wei.sub(stageWei);
             }
         }
-        
-        
+
+
         // 75% discount
         if (currentStage == Stages.preSale && totalSold <= preSaleFirstCap) {
-          if (msg.value >= 10 ether) 
+          if (msg.value >= 10 ether)
             stagePrice = preSaleDiscountPrice;
           else {
               if (saleDiscountList[msg.sender]) {
@@ -524,12 +524,12 @@ contract CrowdsaleToken is PausableToken, Configurable {
             else
                 stagePrice = preSaleFirstPrice;
           }
-            
+
             stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (totalSold.add(stageTokens) <= preSaleFirstCap) {
             tokens[0] = tokens[0].add(stageTokens);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
@@ -538,12 +538,12 @@ contract CrowdsaleToken is PausableToken, Configurable {
             else if( ismember && totalSold.add(stageTokens) <= privateLimit) {
                 tokens[0] = tokens[0].add(stageTokens);
                 privateSold = privateSold.sub(tokens[0]);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
             return tokens;
-            
+
           } else {
             stageTokens = preSaleFirstCap.sub(totalSold);
             stageWei = stageTokens.mul(1 ether).div(stagePrice);
@@ -553,20 +553,20 @@ contract CrowdsaleToken is PausableToken, Configurable {
             _wei = _wei.sub(stageWei);
           }
         }
-        
+
         // 50% discount
         if (currentStage == Stages.preSale && totalSold.add(tokens[0]) <= preSaleSecondCap) {
-              stagePrice = preSaleSecondPrice; 
+              stagePrice = preSaleSecondPrice;
 
           stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (totalSold.add(tokens[0]).add(stageTokens) <= preSaleSecondCap) {
             tokens[0] = tokens[0].add(stageTokens);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
-        
+
             return tokens;
           } else {
             stageTokens = preSaleSecondCap.sub(totalSold).sub(tokens[0]);
@@ -575,19 +575,19 @@ contract CrowdsaleToken is PausableToken, Configurable {
             _wei = _wei.sub(stageWei);
           }
         }
-        
+
         // 35% discount
         if (currentStage == Stages.preSale && totalSold.add(tokens[0]) <= preSaleThirdCap) {
             stagePrice = preSaleThirdPrice;
           stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (totalSold.add(tokens[0]).add(stageTokens) <= preSaleThirdCap) {
             tokens[0] = tokens[0].add(stageTokens);
-           
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
-        
+
             return tokens;
           } else {
             stageTokens = preSaleThirdCap.sub(totalSold).sub(tokens[0]);
@@ -599,16 +599,16 @@ contract CrowdsaleToken is PausableToken, Configurable {
         // 20% discount
         if (currentStage == Stages.preSale && totalSold.add(tokens[0]) <= preSaleFourthCap) {
             stagePrice = preSaleFourthPrice;
-          
+
           stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (totalSold.add(tokens[0]).add(stageTokens) <= preSaleFourthCap) {
             tokens[0] = tokens[0].add(stageTokens);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
-        
+
             return tokens;
           } else {
             stageTokens = preSaleFourthCap.sub(totalSold).sub(tokens[0]);
@@ -616,7 +616,7 @@ contract CrowdsaleToken is PausableToken, Configurable {
             tokens[0] = tokens[0].add(stageTokens);
             _wei = _wei.sub(stageWei);
             currentStage = Stages.pause;
-            
+
             if(_wei > 0 || extraWei > 0){
                 _wei = _wei.add(extraWei);
                 tokens[1] = _wei;
@@ -624,33 +624,33 @@ contract CrowdsaleToken is PausableToken, Configurable {
             return tokens;
           }
         }
-        
+
         // 0% discount
         if (currentStage == Stages.sale) {
           if (privateSold > privateLimit && saleDiscountList[msg.sender]) {
             stagePrice = privateDiscountPrice; // private member %65 discount
             stageTokens = _wei.mul(stagePrice).div(1 ether);
             uint256 ceil = totalSold.add(privateLimit);
-            
+
             if (ceil > cap) {
               ceil = cap;
             }
-            
+
             if (totalSold.add(stageTokens) <= ceil) {
               tokens[0] = tokens[0].add(stageTokens);
-             
+
               if(extraWei > 0){
                tokens[1] = extraWei;
             }
             privateSold = privateSold.sub(tokens[0]);
-              return tokens;          
+              return tokens;
             } else {
               stageTokens = ceil.sub(totalSold);
               tokens[0] = tokens[0].add(stageTokens);
               stageWei = stageTokens.mul(1 ether).div(stagePrice);
               _wei = _wei.sub(stageWei);
             }
-            
+
             if (ceil == cap) {
               endIco();
               if(_wei > 0 || extraWei > 0){
@@ -661,18 +661,18 @@ contract CrowdsaleToken is PausableToken, Configurable {
               return tokens;
             }
           }
-          
+
           stagePrice = basePrice;
           stageTokens = _wei.mul(stagePrice).div(1 ether);
-          
+
           if (totalSold.add(tokens[0]).add(stageTokens) <= cap) {
             tokens[0] = tokens[0].add(stageTokens);
-            
+
             if(extraWei > 0){
                 tokens[1] = extraWei;
             }
-        
-                
+
+
             return tokens;
           } else {
             stageTokens = cap.sub(totalSold).sub(tokens[0]);
@@ -680,13 +680,13 @@ contract CrowdsaleToken is PausableToken, Configurable {
             tokens[0] = tokens[0].add(stageTokens);
             _wei = _wei.sub(stageWei);
             endIco();
-            
+
             if(_wei > 0 || extraWei > 0){
                 _wei = _wei.add(extraWei);
                 tokens[1] = _wei;
             }
             return tokens;
-          }      
+          }
         }
     }
 
@@ -698,9 +698,9 @@ contract CrowdsaleToken is PausableToken, Configurable {
         currentStage = Stages.sale;
         icoStartDate = now;
     }
-    
+
     /**
-     * @dev Sets either custom public or private sale events. 
+     * @dev Sets either custom public or private sale events.
      * @param tokenCap : the amount of toknes to cap the event with
      * @param eventRate : the discounted price of the event given in amount per ether
      * @param isActive : boolean that stats is the event is active or not
@@ -710,7 +710,7 @@ contract CrowdsaleToken is PausableToken, Configurable {
         require(tokenCap > 0);
         require(eventRate > 0);
         require(minAmount > 0);
-        
+
         if(compareStrings(eventType, "private")){
             privateEventTokens = tokenCap;
             privateRate = eventRate;
@@ -726,14 +726,14 @@ contract CrowdsaleToken is PausableToken, Configurable {
         else
             require(1==2);
     }
-    
+
     /**
      * @dev function to compare two strings for equality
      **/
     function compareStrings (string a, string b) internal pure returns (bool){
        return keccak256(a) == keccak256(b);
    }
-    
+
     /**
      * @dev setEventActive sets the private presale discount members address
      **/
@@ -749,7 +749,7 @@ contract CrowdsaleToken is PausableToken, Configurable {
     }
 
     /**
-     * @dev setMinMax function to set the minimum or maximum investment amount 
+     * @dev setMinMax function to set the minimum or maximum investment amount
      **/
     function setMinMax (uint256 minMax, string eventType) public onlyOwner {
         require(minMax >= 0);
@@ -770,7 +770,7 @@ contract CrowdsaleToken is PausableToken, Configurable {
      * @param isActiveMember : bool to set the member at active or not
      **/
     function setDiscountMember(address _address, string memberType, bool isActiveMember) public onlyOwner {
-        // Set discount sale member    
+        // Set discount sale member
         if(compareStrings(memberType, "preSale"))
             saleDiscountList[_address] = isActiveMember;
         // Set private event member
@@ -779,14 +779,14 @@ contract CrowdsaleToken is PausableToken, Configurable {
         else
             require(1==2);
     }
-    
+
     /**
      * @dev checks if an address is a member of a specific address
      * @param _address : address of member to check
      * @param memberType : member type to check: preSlae, privateEvent
      **/
     function isMemberOf(address _address, string memberType) public view returns (bool){
-        // Set discount sale member    
+        // Set discount sale member
         if(compareStrings(memberType, "preSale"))
             return saleDiscountList[_address];
         // Set private event member
@@ -797,25 +797,25 @@ contract CrowdsaleToken is PausableToken, Configurable {
     }
 
     /**
-     * @dev endIco closes down the ICO 
+     * @dev endIco closes down the ICO
      **/
     function endIco() internal {
         currentStage = Stages.icoEnd;
     }
 
     /**
-     * @dev withdrawFromRemainingTokens allows the owner of the contract to withdraw 
+     * @dev withdrawFromRemainingTokens allows the owner of the contract to withdraw
      * remaining unsold tokens for acquisitions. Any remaining tokens after 1 year from
      * ICO end time will be burned.
      **/
     function withdrawFromRemainingTokens(uint256 _value) public onlyOwner returns(bool) {
         require(currentStage == Stages.icoEnd);
         require(remainingTokens > 0);
-        
+
         // if 1 year after ICO, Burn all remaining tokens
-        if (now > icoEnd.add(timeToBeBurned)) 
+        if (now > icoEnd.add(timeToBeBurned))
             remainingTokens = 0;
-        
+
         // If tokens remain, withdraw
         if (_value <= remainingTokens) {
             balances[owner] = balances[owner].add(_value);
@@ -833,16 +833,16 @@ contract CrowdsaleToken is PausableToken, Configurable {
     function finalizeIco() public onlyOwner {
         require(!icoFinalized);
             icoFinalized = true;
-        
+
         if (currentStage != Stages.icoEnd){
              endIco();
              icoEnd = now;
         }
-        
+
         remainingTokens = cap.add(companyReserve).sub(totalSupply_);
         owner.transfer(address(this).balance);
     }
-    
+
     /**
      * @dev function to get the current discount rate
      **/
@@ -861,11 +861,22 @@ contract CrowdsaleToken is PausableToken, Configurable {
 }
 
 /**
- * @title KimeraToken 
+ * @title KimeraToken
  * @dev Contract to create the Kimera Token
  **/
 contract KimeraToken is CrowdsaleToken {
     string public constant name = "KIMERACoin";
     string public constant symbol = "KIMERA";
     uint32 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

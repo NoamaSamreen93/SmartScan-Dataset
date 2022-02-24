@@ -21,7 +21,7 @@ pragma solidity ^0.5.0;
  *
  * Game at https://skullys.co/
  **/
- 
+
  library SafeMath {
     /**
     * @dev Multiplies two unsigned integers, reverts on overflow.
@@ -116,7 +116,7 @@ contract Ownable {
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
-    
+
      /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -134,7 +134,7 @@ contract Ownable {
         emit UpdaterTransferred(updater, newUpdater);
         updater = newUpdater;
     }
-    
+
     /// @dev Assigns a new address to act as the captain.
     /// @param _newCaptain The address of the new Captain
     function setCaptain(address payable _newCaptain) external onlyOwner {
@@ -214,10 +214,10 @@ contract SalePO8 is Pausable {
 
     uint256 public exchangeRate; // 1 ether == 20000 PO8 for example
     uint256 public cut;
-    
+
     event ExchangeRateUpdated(uint256 newExchangeRate);
     event PO8Bought(address indexed buyer, uint256 ethValue, uint256 po8Receive);
-    
+
     // Delegate constructor
     constructor(uint256 _exchangeRate, uint256 _cut, address po8Address, address payable captainAddress) public {
         exchangeRate = _exchangeRate;
@@ -226,13 +226,13 @@ contract SalePO8 is Pausable {
         cut = _cut;
         captain = captainAddress;
     }
-    
+
     function setPO8TokenContractAdress(address po8Address) external onlyOwner returns (bool) {
         ERC20 po8 = ERC20(po8Address);
         po8Token = po8;
         return true;
     }
-    
+
     // @dev The Owner can set the new exchange rate between ETH and PO8 token.
     function setExchangeRate(uint256 _newExchangeRate) external onlyUpdater returns (uint256) {
         exchangeRate = _newExchangeRate;
@@ -241,33 +241,44 @@ contract SalePO8 is Pausable {
 
         return _newExchangeRate;
     }
-    
+
     function buyPO8() external payable whenNotPaused {
         require(msg.value >= 1e4 wei);
-        
+
         uint256 totalTokenTransfer = msg.value.mul(exchangeRate);
-        
+
         po8Token.transferFrom(owner, msg.sender, totalTokenTransfer);
         captain.transfer(msg.value*cut/1e4); // cut by captain
-        
+
         emit PO8Bought(msg.sender, msg.value, totalTokenTransfer);
     }
-    
+
     // @dev Allows the owner to capture the balance available to the contract.
     function withdrawBalance() external onlyOwner {
         uint256 balance = address(this).balance;
 
         owner.transfer(balance);
     }
-    
+
     //@dev contract prevent transfer accident ether from user.
     function () external {
         revert();
     }
-    
+
     function getBackERC20Token(address tokenAddress) external onlyOwner {
         ERC20 token = ERC20(tokenAddress);
         token.transfer(owner, token.balanceOf(address(this)));
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

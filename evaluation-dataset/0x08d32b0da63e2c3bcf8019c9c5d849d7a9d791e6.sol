@@ -3,7 +3,7 @@ pragma solidity ^0.4.8;
 
 
 /**
- * Dentacoin extended ERC20 token contract created on February the 14th, 2017 by Dentacoin B.V. in the Netherlands 
+ * Dentacoin extended ERC20 token contract created on February the 14th, 2017 by Dentacoin B.V. in the Netherlands
  *
  * For terms and conditions visit https://dentacoin.com
  */
@@ -298,3 +298,14 @@ contract DentacoinToken is owned, SafeMath, StandardToken {
 }
 
 /* JJG */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

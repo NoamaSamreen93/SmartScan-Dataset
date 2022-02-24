@@ -7,7 +7,7 @@ pragma solidity ^0.4.23;
  * @dev Gives the possibility to delegate any call to a foreign implementation.
  */
 contract Proxy {
-    
+
     /**
     * @dev Tells the address of the implementation where every call will be delegated.
     * @return address of the implementation to which it will be delegated
@@ -20,7 +20,7 @@ contract Proxy {
     */
     function() external payable {
         address _impl = implementation();
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)
@@ -105,7 +105,7 @@ contract TGBPController is UpgradeabilityProxy {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = 0x58709042d6c9a2b64c8e7802bfedabdcd2eaecc68e15ef2e896a5970c608cd16;//keccak256("trueGBP.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = 0xa6933dbb41d1bc3d681619c11234027db3b75954220aa88dfdc74750053ed30c;//keccak256("trueGBP.pending.proxy.owner");
@@ -202,4 +202,15 @@ contract TGBPController is UpgradeabilityProxy {
     function upgradeTo(address implementation) external onlyProxyOwner {
         _upgradeTo(implementation);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -22,11 +22,11 @@ contract Utils {
         assert(_x == 0 || _z / _x == _y);
         return _z;
     }
-    
+
     function safeDiv(uint256 _x, uint256 _y) internal pure returns (uint256) {
-        assert(_y != 0); 
+        assert(_y != 0);
         uint256 _z = _x / _y;
-        assert(_x == _y * _z + _x % _y); 
+        assert(_x == _y * _z + _x % _y);
         return _z;
     }
 
@@ -56,9 +56,9 @@ contract ERC20Token {
 }
 
 contract StandardToken is ERC20Token, Utils, Ownable {
- 
-    bool public transfersEnabled = true;  
-    
+
+    bool public transfersEnabled = true;
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowed;
 
@@ -70,10 +70,10 @@ contract StandardToken is ERC20Token, Utils, Ownable {
     function disableTransfers(bool _disable) public onlyOwner {
         transfersEnabled = !_disable;
     }
-    
+
     function transfer(address _to, uint256 _value) public validAddress(_to) transfersAllowed returns (bool success){
-        require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value > balanceOf[_to]); 
-        
+        require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value > balanceOf[_to]);
+
         balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = safeAdd(balanceOf[_to], _value);
         Transfer(msg.sender, _to, _value);
@@ -89,14 +89,25 @@ contract StandardToken is ERC20Token, Utils, Ownable {
 contract ONECToken is StandardToken {
 
     string public constant name = "One Coin";
-    string public constant symbol = "ONEC"; 
+    string public constant symbol = "ONEC";
     uint8 public constant decimals = 18;
     uint256 public constant totalSupply = 5.2 * 10**26;
-    
+
     function ONECToken(){
         balanceOf[owner] = totalSupply;
-        
+
         Transfer(0x0, owner, balanceOf[owner]);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

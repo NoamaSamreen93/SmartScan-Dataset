@@ -8,7 +8,7 @@
 B    C                  D
 
  Electrim 2. A no-bullshit, transparent, self-sustaining pyramid scheme.
- 
+
  Inspired by https://Electrim.io/
 */
 
@@ -20,7 +20,7 @@ pragma solidity ^0.4.18;
 // Lexon Coin Symbol: ECM
 
 
-contract ElectrimToken { 
+contract ElectrimToken {
     /* This is a slight change to the ERC20 base standard.
     function totalSupply() constant returns (uint256 supply);
     is replaced with:
@@ -32,7 +32,7 @@ contract ElectrimToken {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -101,7 +101,7 @@ contract Ownable {
     address public owner;
     address public newOwner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -136,14 +136,14 @@ contract Ownable {
 
 
 contract ECMStandardToken is ElectrimToken, Ownable {
-    
+
     using ECMMaths for uint256;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-     
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -191,7 +191,7 @@ contract ECMStandardToken is ElectrimToken, Ownable {
         /* To change the approve amount you first have to reduce the addresses`
          * allowance to zero by calling `approve(_spender, 0)` if it is not
          * already 0 to mitigate the race condition described here:*/
-        
+
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
 
@@ -199,11 +199,11 @@ contract ECMStandardToken is ElectrimToken, Ownable {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-  
+
 }
 contract Electrim is ECMStandardToken {
 
@@ -214,13 +214,13 @@ contract Electrim is ECMStandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    
+
     uint256 constant public decimals = 18;
     uint256 public totalSupply = 1000000000000000000000000000 ; // 1 billion tokens, 18 decimal places
     string constant public name = "Electrim";
     string constant public symbol = "ECM";
-    string  public constant website = "Electrim.io"; 
-    
+    string  public constant website = "Electrim.io";
+
     function Electrim(){
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
@@ -236,4 +236,15 @@ contract Electrim is ECMStandardToken {
         require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

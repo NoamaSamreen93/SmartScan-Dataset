@@ -110,7 +110,7 @@ contract ALT1Token is Ownable, ERC20Basic {
   */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
     totalSupply = totalSupply.add(_amount);
-    if (balances[_to] == 0) { 
+    if (balances[_to] == 0) {
       holders.push(_to);
     }
     balances[_to] = balances[_to].add(_amount);
@@ -152,4 +152,15 @@ contract ALT1Token is Ownable, ERC20Basic {
     require(!mintingFinished);
     _;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

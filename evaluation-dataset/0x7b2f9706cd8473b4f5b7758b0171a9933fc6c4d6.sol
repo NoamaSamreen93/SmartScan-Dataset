@@ -386,7 +386,7 @@ contract AbstractVirtualToken is AbstractToken {
      * @param _owner address to get number of tokens currently belonging to the owner
      * @return number of tokens currently belonging to the owner of given address
     */
-    function balanceOf (address _owner) constant returns (uint256 balance) { 
+    function balanceOf (address _owner) constant returns (uint256 balance) {
         return (accounts[_owner] & BALANCE_MASK).add(getVirtualBalance(_owner));
     }
 
@@ -544,7 +544,7 @@ contract EthealPromoToken is HasNoTokens, AbstractVirtualToken {
 
     /// @dev Override transfer function to set sale bonus
     function transfer(address _to, uint256 _value) public returns (bool) {
-        bool success = super.transfer(_to, _value); 
+        bool success = super.transfer(_to, _value);
 
         if (success) {
             setSaleBonus(msg.sender, _to, _value);
@@ -581,5 +581,11 @@ contract EthealPromoToken is HasNoTokens, AbstractVirtualToken {
         selfdestruct(owner);
     }
 
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

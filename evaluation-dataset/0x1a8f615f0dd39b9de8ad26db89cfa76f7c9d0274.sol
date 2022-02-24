@@ -98,7 +98,7 @@ contract UTOToken {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {   
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         // Check allowance
         allowance[_from][msg.sender] = SafeMath.sub(allowance[_from][msg.sender], _value);
         _transfer(_from, _to, _value);
@@ -140,7 +140,7 @@ contract UTOToken {
         allowance[msg.sender][_spender] = SafeMath.add(allowance[msg.sender][_spender], _addedValue);
         emit Approval(msg.sender, _spender, allowance[msg.sender][_spender]);
         return true;
-    } 
+    }
 
     function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowance[msg.sender][_spender];
@@ -160,11 +160,11 @@ contract UTOToken {
      *
      * @param _value the amount of money to burn
      */
-    function burn(uint256 _value) public returns (bool success) { 
-        // Subtract from the sender 
-        balanceOf[msg.sender] = SafeMath.sub(balanceOf[msg.sender], _value); 
-        // Updates totalSupply         
-        totalSupply = SafeMath.sub(totalSupply, _value);                    
+    function burn(uint256 _value) public returns (bool success) {
+        // Subtract from the sender
+        balanceOf[msg.sender] = SafeMath.sub(balanceOf[msg.sender], _value);
+        // Updates totalSupply
+        totalSupply = SafeMath.sub(totalSupply, _value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -177,14 +177,25 @@ contract UTOToken {
      * @param _from the address of the sender
      * @param _value the amount of money to burn
      */
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {  
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
         // Subtract from the targeted balance
-        balanceOf[_from] = SafeMath.sub(balanceOf[_from], _value);  
+        balanceOf[_from] = SafeMath.sub(balanceOf[_from], _value);
         // Subtract from the sender's allowance
         allowance[_from][msg.sender] = SafeMath.sub(allowance[_from][msg.sender], _value);
-        // Update totalSupply         
-        totalSupply = SafeMath.sub(totalSupply, _value);                           
+        // Update totalSupply
+        totalSupply = SafeMath.sub(totalSupply, _value);
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

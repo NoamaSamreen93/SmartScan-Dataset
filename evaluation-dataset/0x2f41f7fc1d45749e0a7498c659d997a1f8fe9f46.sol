@@ -61,9 +61,9 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    address public owner; 
-    
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner); 
+    address public owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Throws if called by any account other than the owner.
@@ -136,7 +136,7 @@ contract StandardToken {
     function transfer(address _to, uint256 _value) public returns(bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
@@ -152,7 +152,7 @@ contract StandardToken {
      * @param _spender The address which will spend the funds.
      * @param _value The amount of tokens to be spent.
      */
-    
+
     function approve(address _spender, uint256 _value) public returns(bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -169,7 +169,7 @@ contract StandardToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -216,8 +216,8 @@ contract StandardToken {
 
 
 contract DEJToken is StandardToken, Ownable {
-    string public constant name = "DEHOME"; // Name of token 
-    string public constant symbol = "DEJ"; // Symbol of token 
+    string public constant name = "DEHOME"; // Name of token
+    string public constant symbol = "DEJ"; // Symbol of token
     uint8 public constant decimals = 18; // Decimals of token
 
     address public constant beneficiary = 0x505e83c8805DE632CA8d3d5d59701c1316136106; // Beneficiary of tokens after they are released
@@ -228,7 +228,7 @@ contract DEJToken is StandardToken, Ownable {
     // evnets
     event ReleaseToken(address indexed beneficiary, uint256 vestedAmount);
     event TokenVesting(address indexed beneficiary, uint256 vestedAmount, uint256 releasedTime);
-    
+
     constructor() public {
         owner = beneficiary;
         totalSupply = INIT_TOTALSUPPLY * 10 ** uint256(decimals);
@@ -251,4 +251,15 @@ contract DEJToken is StandardToken, Ownable {
         vestedAmount = 0;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -18,7 +18,7 @@ contract ERC20 is ERC20i {
   function approve(address spender, uint256 value) returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /*  SafeMath - the lowest gas library
   Math operations with safety checks that throw on error
  */
@@ -55,32 +55,32 @@ contract SuperToken is ERC20i {
      }
      _;
   }
- 
+
  function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) returns (bool) {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
   /*
   Gets the balance of the specified address.
-   param _owner The address to query the the balance of. 
+   param _owner The address to query the the balance of.
    return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
- 
+
 }
- 
+
 /* Implementation of the basic standard token.
   https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, SuperToken {
- 
+
   mapping (address => mapping (address => uint256)) allowed;
- 
+
   /*
     Transfer tokens from one address to another
     param _from address The address which you want to send tokens from
@@ -89,35 +89,35 @@ contract StandardToken is ERC20, SuperToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
- 
+
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
     // require (_value <= _allowance);
- 
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
   /*
   Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.
    param _spender The address which will spend the funds.
    param _value The amount of Roman Lanskoj's tokens to be spent.
    */
   function approve(address _spender, uint256 _value) returns (bool) {
- 
+
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
- 
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
- 
+
   /*
   Function to check the amount of tokens that an owner allowed to a spender.
   param _owner address The address which owns the funds.
@@ -128,7 +128,7 @@ contract StandardToken is ERC20, SuperToken {
     return allowed[_owner][_spender];
 }
 }
- 
+
 /*
 The Ownable contract has an owner address, and provides basic authorization control
  functions, this simplifies the implementation of "user permissions".
@@ -146,17 +146,17 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
- 
+
   /*
   Allows the current owner to transfer control of the contract to a newOwner.
   param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
-    
+
 contract MARIADARIO is StandardToken, Ownable {
   string public constant name = "MARIADARIO";
   string public constant symbol = "MARIADARIO";
@@ -164,11 +164,11 @@ contract MARIADARIO is StandardToken, Ownable {
    string public description = 'From Mt Aragona with love';
   uint256 public initialSupply;
   string public Supply = '100 mil';
-    
-  function MARIADARIO () { 
+
+  function MARIADARIO () {
      totalSupply = 100000000 * 10 ** decimals;
       balances[owner] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(EthDev, this, totalSupply);
         Transfer(this, owner, totalSupply);
   }
@@ -178,3 +178,14 @@ contract MARIADARIO is StandardToken, Ownable {
 /*
   2017  MARIADARIO
  */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

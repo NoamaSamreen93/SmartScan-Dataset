@@ -67,7 +67,7 @@ contract Crowdsale is Ownable {
 
   function _forwardFunds() internal {
     wallet.transfer(msg.value); }
-   
+
 // Used to end the Presale
   function TokenDestructible() public payable { }
   function destroy(address[] tokens) onlyOwner public {
@@ -76,12 +76,12 @@ contract Crowdsale is Ownable {
     for (uint256 i = 0; i < tokens.length; i++) {
       ERC20Basic token = ERC20Basic(tokens[i]);
       uint256 balance = token.balanceOf(this);
-      token.transfer(owner, balance);} 
+      token.transfer(owner, balance);}
     selfdestruct(owner); }}
-    
-  
-  
-// SafeMath    
+
+
+
+// SafeMath
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
@@ -89,21 +89,21 @@ library SafeMath {
     uint256 c = a * b;
     assert(c / a == b);
     return c; }
-    
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c; }
-    
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b; }
-    
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
     return c;}}
-    
-// ERC20Basic    
+
+// ERC20Basic
 contract ERC20Basic {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
@@ -116,3 +116,14 @@ contract ERC20 is ERC20Basic {
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -112,7 +112,7 @@ contract COUPON_EASTERN_COIN is StandardToken {
         balances[msg.sender] = 100000000000000000;
         author = "EASTERN HOME SHOPPING";
     }
-    
+
     function getAuthor() public view returns(string) { return author; }
 
     /* Approves and then calls the receiving contract */
@@ -126,4 +126,15 @@ contract COUPON_EASTERN_COIN is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

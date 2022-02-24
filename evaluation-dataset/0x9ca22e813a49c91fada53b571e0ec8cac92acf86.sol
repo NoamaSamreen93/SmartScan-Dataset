@@ -78,7 +78,7 @@ contract Token {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -102,7 +102,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -112,16 +112,16 @@ contract MetadollarStoreGateway is Ownable{
     address public feeAccount1 = 0xeaBB4013f179E42c41468DB81eB1Bd420Da6cC47; //the account1 that will receive fees
     address public feeAccount2 = 0xEB53fF97ae33B0733CE14E7FDd3C4F90c1c4709b; //the account2 that will receive fees
     address public feeAccountToken = 0xeaBB4013f179E42c41468DB81eB1Bd420Da6cC47;//the account that will receive fees tokens
-    
+
     struct BuyInfo {
-      address buyerAddress; 
+      address buyerAddress;
       address sellerAddress;
       uint value;
       address currency;
     }
-    
+
     mapping(address => mapping(uint => BuyInfo)) public payment;
-   
+
     uint balanceFee;
     uint public feePercent;
     uint public maxFee;
@@ -129,40 +129,40 @@ contract MetadollarStoreGateway is Ownable{
        feePercent = 1500000; // decimals 6. 1,5% fee by default
        maxFee = 10000000; // fee can not exceed 10%
     }
-    
-    
+
+
     function getBuyerAddressPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].buyerAddress;
-    }    
+    }
     function getSellerAddressPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].sellerAddress;
-    }    
-    
+    }
+
     function getValuePayment(address _sellerAddress, uint _orderId) public constant returns(uint){
       return  payment[_sellerAddress][_orderId].value;
-    }    
-    
+    }
+
     function getCurrencyPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].currency;
     }
-    
-    
+
+
     function setFeeAccount1(address _feeAccount1) onlyOwner public{
-      feeAccount1 = _feeAccount1;  
+      feeAccount1 = _feeAccount1;
     }
     function setFeeAccount2(address _feeAccount2) onlyOwner public{
-      feeAccount2 = _feeAccount2;  
+      feeAccount2 = _feeAccount2;
     }
     function setFeeAccountToken(address _feeAccountToken) onlyOwner public{
-      feeAccountToken = _feeAccountToken;  
-    }    
+      feeAccountToken = _feeAccountToken;
+    }
     function setFeePercent(uint _feePercent) onlyOwner public{
       require(_feePercent <= maxFee);
-      feePercent = _feePercent;  
-    }    
+      feePercent = _feePercent;
+    }
     function payToken(address _tokenAddress, address _sellerAddress, uint _orderId,  uint _value) public returns (bool success){
       require(_tokenAddress != address(0));
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       Token token = Token(_tokenAddress);
       require(token.allowance(msg.sender, this) >= _value);
@@ -172,12 +172,12 @@ contract MetadollarStoreGateway is Ownable{
       success = true;
     }
     function payEth(address _sellerAddress, uint _orderId, uint _value) internal returns  (bool success){
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       uint fee = _value.mul(feePercent).div(100000000);
       _sellerAddress.transfer(_value.sub(fee));
       balanceFee = balanceFee.add(fee);
-      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);    
+      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);
       success = true;
     }
     function transferFee() onlyOwner public{
@@ -204,7 +204,7 @@ contract MetadollarStoreGateway is Ownable{
       return address(result);
     }
     function() external payable {
-      require(msg.data.length == 20); 
+      require(msg.data.length == 20);
       require(msg.value > 99999999999);
       address sellerAddress = bytesToAddress(bytes(msg.data));
       uint value = msg.value.div(10000000000).mul(10000000000);
@@ -212,4 +212,13 @@ contract MetadollarStoreGateway is Ownable{
       balanceFee = balanceFee.add(orderId);
       payEth(sellerAddress, orderId, value);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

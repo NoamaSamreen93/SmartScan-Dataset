@@ -192,7 +192,7 @@ contract ERC721Base is AssetRegistryStorage, IERC721Base, ERC165 {
     function isApprovedForAll(address assetHolder, address operator) external view returns (bool) {
         return _isApprovedForAll(assetHolder, operator);
     }
-    
+
     function _isApprovedForAll(address assetHolder, address operator) internal view returns (bool) {
         return _operators[assetHolder][operator];
     }
@@ -377,7 +377,7 @@ contract ERC721Base is AssetRegistryStorage, IERC721Base, ERC165 {
         if (_interfaceID == 0xffffffff) {
             return false;
         }
-        
+
         return _interfaceID == InterfaceId_ERC165 || _interfaceID == Old_InterfaceId_ERC721 || _interfaceID == InterfaceId_ERC721;
     }
 
@@ -429,4 +429,15 @@ contract JZToken is FullAssetRegistry {
     function safeTransfer(address from, address to, uint256 assetId, bytes data) public {
         return _doTransferFrom(from, to, assetId, data, true);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

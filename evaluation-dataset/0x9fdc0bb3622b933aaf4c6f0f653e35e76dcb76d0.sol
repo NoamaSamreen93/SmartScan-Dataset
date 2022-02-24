@@ -41,7 +41,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -60,23 +60,23 @@ contract EmontFrenzyInterface {
 
 
 contract EmontFrenzyTool is BasicAccessControl {
-    
+
     // address
     address public frenzyContract;
-    
+
     function EmontFrenzyTool(address _frenzyContract) public {
         frenzyContract = _frenzyContract;
     }
-    
+
     function updateContract(address _frenzyContract) onlyModerators external {
         frenzyContract = _frenzyContract;
     }
-    
-    function addBonus(uint _pos1, uint _pos2, uint _pos3, uint _pos4, uint _pos5, 
+
+    function addBonus(uint _pos1, uint _pos2, uint _pos3, uint _pos4, uint _pos5,
         uint _pos6, uint _pos7, uint _pos8, uint _pos9, uint _pos10, uint _amount) onlyModerators external {
-            
+
         EmontFrenzyInterface frenzy = EmontFrenzyInterface(frenzyContract);
-        
+
         if (_pos1 > 0) {
             frenzy.addBonus(_pos1, _amount);
         }
@@ -108,4 +108,13 @@ contract EmontFrenzyTool is BasicAccessControl {
             frenzy.addBonus(_pos10, _amount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

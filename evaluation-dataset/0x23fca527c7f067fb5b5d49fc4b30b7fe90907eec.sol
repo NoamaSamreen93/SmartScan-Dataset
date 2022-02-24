@@ -62,13 +62,13 @@ contract PresaleToken {
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public isSaler;
 
-    modifier onlyTokenManager() { 
-        require(msg.sender == tokenManager); 
-        _; 
+    modifier onlyTokenManager() {
+        require(msg.sender == tokenManager);
+        _;
     }
     modifier onlyCrowdsaleManager() {
-        require(msg.sender == crowdsaleManager); 
-        _; 
+        require(msg.sender == crowdsaleManager);
+        _;
     }
 
     modifier onlyEscrow() {
@@ -131,7 +131,7 @@ contract PresaleToken {
     function() payable public {
         buy(msg.sender);
     }
-    
+
     function buy(address _buyer) payable public {
         // Available only if presale is running.
         require(currentPhase == Phase.Running);
@@ -142,7 +142,7 @@ contract PresaleToken {
         totalSupply += newTokens;
         LogBuy(_buyer, newTokens);
     }
-    
+
     function buyTokens(address _saler) payable public {
         // Available only if presale is running.
         require(isSaler[_saler] == true);
@@ -151,15 +151,15 @@ contract PresaleToken {
         require(msg.value != 0);
         uint newTokens = msg.value * PRICE + getBonus(msg.value);
         uint tokenForSaler = newTokens / 20;
-        
+
         require(totalSupply + newTokens + tokenForSaler <= TOKEN_SUPPLY_LIMIT);
-        
+
         balanceOf[_saler] += tokenForSaler;
         balanceOf[msg.sender] += newTokens;
 
         totalSupply += newTokens;
         totalSupply += tokenForSaler;
-        
+
         LogBuy(msg.sender, newTokens);
     }
 
@@ -242,4 +242,15 @@ contract PresaleToken {
         require(currentPhase != Phase.Migrating);
         isSaler[_mgr] = false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

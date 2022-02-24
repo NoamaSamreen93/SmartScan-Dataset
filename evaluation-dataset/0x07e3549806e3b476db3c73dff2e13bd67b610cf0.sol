@@ -105,7 +105,7 @@ contract EthWebATM is Ownable {
     require(msg.value > adminFee.mul(shares.length));
     uint256 _eth = msg.value;
     uint256 totalshares = 0;
-    
+
     for (uint256 i = 0; i < receivers.length; i++){
       require(shares[i] > 0);
       totalshares = totalshares.add(shares[i]);
@@ -129,8 +129,19 @@ contract EthWebATM is Ownable {
   function updatefee(uint256 _eth) external onlyOwner{
     adminFee = _eth;
   }
-  
+
   function updateWallet(address _address) external onlyOwner{
     feeWallet = _address;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

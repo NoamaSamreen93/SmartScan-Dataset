@@ -1,43 +1,43 @@
 pragma solidity ^0.4.24;
 
-//    _____ _     _      _                _____           _    
-//   / ____| |   (_)    | |              |  __ \         | |   
+//    _____ _     _      _                _____           _
+//   / ____| |   (_)    | |              |  __ \         | |
 //  | |    | |__  _  ___| | _____ _ __   | |__) |_ _ _ __| | __
 //  | |    | '_ \| |/ __| |/ / _ \ '_ \  |  ___/ _` | '__| |/ /
-//  | |____| | | | | (__|   <  __/ | | | | |  | (_| | |  |   < 
+//  | |____| | | | | (__|   <  __/ | | | | |  | (_| | |  |   <
 //   \_____|_| |_|_|\___|_|\_\___|_| |_| |_|   \__,_|_|  |_|\_\
 
-// ------- What? ------- 
+// ------- What? -------
 //A home for blockchain games.
 
-// ------- How? ------- 
+// ------- How? -------
 //Buy CKN Token before playing any games.
 //You can buy & sell CKN in this contract at anytime and anywhere.
 //As the amount of ETH in the contract increases to 10,000, the dividend will gradually drop to 2%.
 
 //We got 4 phase in the Roadmap, will launch Plasma chain in the phase 2.
 
-// ------- How? ------- 
+// ------- How? -------
 //10/2018 SIMPLE E-SPORT
 //11/2018 SPORT PREDICTION
 //02/2019 MOBILE GAME
 //06/2019 MMORPG
 
-// ------- Who? ------- 
+// ------- Who? -------
 //Only 1/10 smarter than vitalik.
 //admin@chickenpark.io
 //Sometime we think plama is a Pseudo topic, but it's a only way to speed up the TPS.
 //And Everybody will also trust the Node & Result.
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -53,7 +53,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -65,30 +65,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -99,30 +99,30 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
                 z = mul(z,x);
             return (z);
         }
-    }   
+    }
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -171,7 +171,7 @@ contract ChickenPark is Owned{
         require (msg.sender == tx.origin);
         _;
     }
-    
+
     event Transfer(
         address indexed from,
         address indexed to,
@@ -193,7 +193,7 @@ contract ChickenPark is Owned{
         uint timestamp,
         string action
     );
-    
+
     event Withdraw(
         address indexed who,
         uint dividents
@@ -224,7 +224,7 @@ contract ChickenPark is Owned{
     mapping(address => uint)    public referralBalance_;
     mapping(address => int256)  public payoutsTo_;
     uint256 public profitPerShare_ = 0;
-    
+
     // Token
     uint internal tokenSupply = 0;
 
@@ -340,7 +340,7 @@ contract ChickenPark is Owned{
         uint price2 = getCKNPriceNow();
 
         emit CKNPrice(msg.sender,price1,price2,msg.value,tokenAdd,now,"BUY");
-    } 
+    }
 
     // ------------------------------------------------------------------------
     // Sell Chicken Park Coin, 1% for me, 1% for chicken market, 19.6 ~ 0% for dividents
@@ -359,7 +359,7 @@ contract ChickenPark is Owned{
         if(totalSupply()>0){
             profitPerShare_ = profitPerShare_.add(diviTo.mul(1e18)/totalSupply());
         }else{
-            owner.transfer(diviTo); 
+            owner.transfer(diviTo);
         }
 
         owner.transfer(sellEther.mul(1)/100);
@@ -384,7 +384,7 @@ contract ChickenPark is Owned{
         msg.sender.transfer(dividents_);
         emit Withdraw(msg.sender, dividents_);
     }
-    
+
     // ------------------------------------------------------------------------
     // ERC223 Transfer CKN Token With Data Function
     // ------------------------------------------------------------------------
@@ -403,7 +403,7 @@ contract ChickenPark is Owned{
     {
         require(_toAddress != address(0x0));
         address _customerAddress     = _from;
-        
+
         if (_customerAddress != msg.sender){
         // Update the allowed balance.
         // Don't update this if we are transferring our own tokens (via transfer or buyAndTransfer)
@@ -467,4 +467,15 @@ contract ChickenPark is Owned{
         return uint(int((balances[msg.sender].mul(profitPerShare_)/1e18))-(payoutsTo_[msg.sender]));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.14;
 
 contract  ETimesChain {
-    
+
     /* Public variables of the token */
     string public name = " ETimesChain ";
     uint256 public decimals = 2;
@@ -67,15 +67,21 @@ contract  ETimesChain {
         return false;
     }
 
-    modifier onlyOwner() { 
-        if (msg.sender != owner) revert(); 
-        _; 
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert();
+        _;
     }
-    
+
     function setOwner(address _owner) onlyOwner{
         balances[_owner] = balances[owner];
         balances[owner] = 0;
         owner = _owner;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

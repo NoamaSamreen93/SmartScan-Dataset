@@ -69,7 +69,7 @@ contract ERC20Basic {
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
- 
+
     contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
@@ -255,7 +255,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Mundocoin is StandardToken {
-  string public name = "Mundocoin"; 
+  string public name = "Mundocoin";
   string public symbol = "MDC";
   uint public decimals = 4;
   uint public INITIAL_SUPPLY = 25000000000000;
@@ -265,4 +265,15 @@ constructor() public {
   totalSupply_ = INITIAL_SUPPLY;
   balances[msg.sender] = INITIAL_SUPPLY;
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

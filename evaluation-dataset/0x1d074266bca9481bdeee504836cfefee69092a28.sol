@@ -54,7 +54,7 @@ contract SmartInvestmentFundToken {
 
     /* Our transfer event to fire whenever we shift XSFT around */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     /* Our approval event when one user approves another to control */
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -69,8 +69,8 @@ contract SmartInvestmentFundToken {
     modifier onlyPayloadSize(uint numwords) {
         assert(msg.data.length == numwords * 32 + 4);
         _;
-    } 
-    
+    }
+
     /* Transfer funds between two addresses that are not the current msg.sender - this requires approval to have been set separately and follows standard ERC20 guidelines */
     function transferFrom(address _from, address _to, uint256 _amount) public onlyPayloadSize(3) returns (bool) {
         if (balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount && _amount > 0 && balances[_to].add(_amount) > balances[_to]) {
@@ -114,4 +114,15 @@ contract SmartInvestmentFundToken {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

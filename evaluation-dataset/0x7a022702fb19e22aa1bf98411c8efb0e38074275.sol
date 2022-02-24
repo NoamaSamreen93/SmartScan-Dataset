@@ -338,7 +338,7 @@ contract BetrCrowdsale is Ownable {
         bool nonZeroPurchase = msg.value != 0;
         return nonZeroPurchase;
     }
-    
+
     //Override this method with token distribution strategy
     function computeTokens(uint256 weiAmount) internal returns (uint256) {
         //To be overriden
@@ -367,10 +367,16 @@ contract BetrCrowdsale is Ownable {
     */
     function finalize() onlyOwner public {
         require(!isFinalized);
-    
+
         uint256 ownerShareTokens = TEAM_LIMIT;
         token.mint(wallet, ownerShareTokens);
-        
+
         isFinalized = true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

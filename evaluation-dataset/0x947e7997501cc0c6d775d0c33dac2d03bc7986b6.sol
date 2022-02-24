@@ -1,10 +1,10 @@
 pragma solidity 0.5.5; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
 
@@ -14,20 +14,20 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 ██╔══╝  ██║╚██╗██║╚██╗ ██╔╝██║   ██║  ╚██╔╝      ██║     ██╔══██║██╔══██║██║██║╚██╗██║
 ███████╗██║ ╚████║ ╚████╔╝ ╚██████╔╝   ██║       ╚██████╗██║  ██║██║  ██║██║██║ ╚████║
 ╚══════╝╚═╝  ╚═══╝  ╚═══╝   ╚═════╝    ╚═╝        ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
-                                                                                      
-                                                                                        
-  
+
+
+
 // ----------------------------------------------------------------------------
 // 'Envoy' Token contract with following features
 //      => ERC20 Compliance
 //      => Higher degree of control by owner - safeguard functionality
-//      => SafeMath implementation 
-//      => Burnable and minting 
-//      => user whitelisting 
+//      => SafeMath implementation
+//      => Burnable and minting
+//      => user whitelisting
 //      => air drop (active and passive)
-//      => in-built buy/sell functions 
-//      => in-built ICO simple phased 
-//      => upgradibilitiy 
+//      => in-built buy/sell functions
+//      => in-built ICO simple phased
+//      => upgradibilitiy
 //
 // Name        : Envoy
 // Symbol      : NVOY
@@ -35,10 +35,10 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 // Decimals    : 18
 //
 // Copyright 2019 onwards - Envoy Group ( http://envoychain.io )
-// Special thanks to openzeppelin for inspiration: 
+// Special thanks to openzeppelin for inspiration:
 // https://github.com/zeppelinos/labs/tree/master/upgradeability_using_unstructured_storage
 // ----------------------------------------------------------------------------
-*/ 
+*/
 
 //*******************************************************************//
 //------------------------ SafeMath Library -------------------------//
@@ -80,10 +80,10 @@ library SafeMath {
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
 contract owned {
     address payable public owner;
-    
+
      constructor () public {
         owner = msg.sender;
     }
@@ -97,15 +97,15 @@ contract owned {
         owner = newOwner;
     }
 }
-    
 
-    
+
+
 //****************************************************************************//
 //---------------------        MAIN CODE STARTS HERE     ---------------------//
 //****************************************************************************//
-    
+
 contract EnvoyChain_v1 is owned {
-    
+
 
     /*===============================
     =         DATA STORAGE          =
@@ -134,7 +134,7 @@ contract EnvoyChain_v1 is owned {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-        
+
     // This generates a public event for frozen (blacklisting) accounts
     event FrozenFunds(address target, bool frozen);
 
@@ -146,17 +146,17 @@ contract EnvoyChain_v1 is owned {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         //checking conditions
         require(!safeguard);
         require (_to != address(0));                      // Prevent transfer to 0x0 address. Use burn() instead
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         // overflow and undeflow checked by SafeMath Library
         balanceOf[_from] = balanceOf[_from].sub(_value);    // Subtract from the sender
         balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
-        
+
         // emit Transfer event
         emit Transfer(_from, _to, _value);
     }
@@ -209,17 +209,17 @@ contract EnvoyChain_v1 is owned {
     /*=====================================
     =       CUSTOM PUBLIC FUNCTIONS       =
     ======================================*/
-    
+
     constructor() public{
         //sending all the tokens to Owner
         balanceOf[owner] = totalSupply;
-        
+
         //firing event which logs this transaction
         emit Transfer(address(0), owner, totalSupply);
     }
-    
+
     function () external payable {
-        
+
         buyTokens();
     }
 
@@ -256,9 +256,9 @@ contract EnvoyChain_v1 is owned {
         emit  Burn(_from, _value);
         return true;
     }
-        
-    
-    /** 
+
+
+    /**
         * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
         * @param target Address to be frozen
         * @param freeze either to freeze it or not
@@ -267,8 +267,8 @@ contract EnvoyChain_v1 is owned {
             frozenAccount[target] = freeze;
         emit  FrozenFunds(target, freeze);
     }
-    
-    /** 
+
+    /**
         * @notice Create `mintedAmount` tokens and send it to `target`
         * @param target Address to receive the tokens
         * @param mintedAmount the amount of tokens it will receive
@@ -279,7 +279,7 @@ contract EnvoyChain_v1 is owned {
         emit Transfer(address(0), target, mintedAmount);
     }
 
-        
+
 
     /**
         * Owner can transfer tokens from contract to owner address
@@ -287,17 +287,17 @@ contract EnvoyChain_v1 is owned {
         * When safeguard is true, then all the non-owner functions will stop working.
         * When safeguard is false, then all the functions will resume working back again!
         */
-    
+
     function manualWithdrawTokens(uint256 tokenAmount) public onlyOwner{
         // no need for overflow checking as that will be done in transfer function
         _transfer(address(this), owner, tokenAmount);
     }
-    
+
     //Just in rare case, owner wants to transfer Ether from contract to owner address
     function manualWithdrawEther()onlyOwner public{
         address(owner).transfer(address(this).balance);
     }
-    
+
     /**
         * Change safeguard status on or off
         *
@@ -309,14 +309,14 @@ contract EnvoyChain_v1 is owned {
             safeguard = true;
         }
         else{
-            safeguard = false;    
+            safeguard = false;
         }
     }
-    
+
     /*************************************/
     /*    Section for User Air drop      */
     /*************************************/
-    
+
     bool public passiveAirdropStatus;
     uint256 public passiveAirdropTokensAllocation;
     uint256 public airdropAmount;  //in wei
@@ -324,7 +324,7 @@ contract EnvoyChain_v1 is owned {
     mapping(uint256 => mapping(address => bool)) public airdropClaimed;
     uint256 internal airdropClaimedIndex;
     uint256 public airdropFee = 0.05 ether;
-    
+
     /**
      * This function to start a passive air drop by admin only
      * Admin have to put airdrop amount (in wei) and total toens allocated for it.
@@ -334,8 +334,8 @@ contract EnvoyChain_v1 is owned {
         passiveAirdropTokensAllocation = passiveAirdropTokensAllocation_;
         airdropAmount = airdropAmount_;
         passiveAirdropStatus = true;
-    } 
-    
+    }
+
     /**
      * This function will stop any ongoing passive airdrop
      */
@@ -345,7 +345,7 @@ contract EnvoyChain_v1 is owned {
         airdropClaimedIndex++;
         passiveAirdropStatus = false;
     }
-    
+
     /**
      * This function called by user who want to claim passive air drop.
      * He can only claim air drop once, for current air drop. If admin stop an air drop and start fresh, then users can claim again (once only).
@@ -357,17 +357,17 @@ contract EnvoyChain_v1 is owned {
         require(!airdropClaimed[airdropClaimedIndex][msg.sender], 'user claimed air drop already');
         require(!isContract(msg.sender),  'No contract address allowed to claim air drop');
         require(msg.value >= airdropFee, 'Not enough ether to claim this airdrop');
-        
+
         _transfer(address(this), msg.sender, airdropAmount);
         passiveAirdropTokensSold += airdropAmount;
-        airdropClaimed[airdropClaimedIndex][msg.sender] = true; 
+        airdropClaimed[airdropClaimedIndex][msg.sender] = true;
         return true;
     }
-    
+
     function changePassiveAirdropAmount(uint256 newAmount) public onlyOwner{
         airdropAmount = newAmount;
     }
-    
+
     function isContract(address _address) public view returns (bool){
         uint32 size;
         assembly {
@@ -375,11 +375,11 @@ contract EnvoyChain_v1 is owned {
         }
         return (size > 0);
     }
-    
+
     function updateAirdropFee(uint256 newFee) public onlyOwner{
         airdropFee = newFee;
     }
-    
+
     /**
      * Run an ACTIVE Air-Drop
      *
@@ -396,16 +396,16 @@ contract EnvoyChain_v1 is owned {
           _transfer(address(this), recipients[i], tokenAmount);
         }
     }
-    
-    
-    
-    
+
+
+
+
     /*************************************/
     /*  Section for User whitelisting    */
     /*************************************/
     bool public whitelistingStatus;
     mapping (address => bool) public whitelisted;
-    
+
     /**
      * Change whitelisting status on or off
      *
@@ -416,10 +416,10 @@ contract EnvoyChain_v1 is owned {
             whitelistingStatus = true;
         }
         else{
-            whitelistingStatus = false;    
+            whitelistingStatus = false;
         }
     }
-    
+
     /**
      * Whitelist any user address - only Owner can do this
      *
@@ -430,7 +430,7 @@ contract EnvoyChain_v1 is owned {
         require(userAddress != address(0));
         whitelisted[userAddress] = true;
     }
-    
+
     /**
      * Whitelist Many user address at once - only Owner can do this
      * It will require maximum of 150 addresses to prevent block gas limit max-out and DoS attack
@@ -445,16 +445,16 @@ contract EnvoyChain_v1 is owned {
             whitelisted[userAddresses[i]] = true;
         }
     }
-    
-    
+
+
     /*************************************/
     /*  Section for Buy/Sell of tokens   */
     /*************************************/
-    
+
     uint256 public sellPrice;
     uint256 public buyPrice;
-    
-    /** 
+
+    /**
      * Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
      * newSellPrice Price the users can sell to the contract
      * newBuyPrice Price users can buy from the contract
@@ -468,7 +468,7 @@ contract EnvoyChain_v1 is owned {
      * Buy tokens from contract by sending ether
      * buyPrice is 1 ETH = ?? Tokens
      */
-    
+
     function buyTokens() payable public {
         uint amount = msg.value * buyPrice;                 // calculates the amount
         _transfer(address(this), msg.sender, amount);       // makes the transfers
@@ -484,12 +484,12 @@ contract EnvoyChain_v1 is owned {
         _transfer(msg.sender, address(this), amount);           // makes the transfers
         msg.sender.transfer(etherAmount);                // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-    
-    
+
+
     /********************************************/
     /* Custom Code for the contract Upgradation */
     /********************************************/
-    
+
     bool internal initialized;
     function initialize(
         address payable _owner
@@ -502,16 +502,16 @@ contract EnvoyChain_v1 is owned {
         decimals = 18;
         totalSupply = 250000000 * (10**decimals);
         owner = _owner;
-        
+
         //sending all the tokens to Owner
         balanceOf[owner] = totalSupply;
-        
+
         //firing event which logs this transaction
         emit Transfer(address(0), owner, totalSupply);
-        
+
         initialized = true;
     }
-    
+
 
 }
 
@@ -703,11 +703,11 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
     (bool success,) = address(this).call.value(msg.value).gas(200000)(data);
     require(success,'initialize function errored');
   }
-  
+
   function generateData() public view returns(bytes memory){
-        
+
     return abi.encodeWithSignature("initialize(address)",msg.sender);
-      
+
   }
 }
 
@@ -719,8 +719,19 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
 /**
  * @title EnvoyChain_proxy
  * @dev This contract proxies FiatToken calls and enables FiatToken upgrades
-*/ 
+*/
 contract EnvoyChain_proxy is OwnedUpgradeabilityProxy {
     constructor() public OwnedUpgradeabilityProxy() {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

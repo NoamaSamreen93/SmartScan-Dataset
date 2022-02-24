@@ -88,7 +88,7 @@ contract Ownable {
 
 /**
  * @title Token
- * @dev API interface for interacting with the DSGT contract 
+ * @dev API interface for interacting with the DSGT contract
  */
 interface Token {
   function transfer(address _to, uint256 _value)external returns (bool);
@@ -108,28 +108,28 @@ contract CLTSaleContract is Ownable {
 
   address public beneficiary;
 
-  // They'll be represented by their index numbers i.e 
-  // if the state is Dormant, then the value should be 0 
+  // They'll be represented by their index numbers i.e
+  // if the state is Dormant, then the value should be 0
   // Dormant:0, Active:1, , Successful:2
   enum State {Dormant, Active,  Successful }
 
   State public state;
- 
+
   event ActiveState();
   event DormantState();
   event SuccessfulState();
 
   event BoughtTokens(
-      address indexed who, 
-      uint256 tokensBought, 
+      address indexed who,
+      uint256 tokensBought,
       uint256 investedETH
       );
-  
+
   constructor() public {
 
-      token =Token(0x848c71FfE323898B03f58c66C9d14766EA4C1DA3); 
+      token =Token(0x848c71FfE323898B03f58c66C9d14766EA4C1DA3);
       beneficiary = 0xdE6F3798B6364eAF3FCCD73c84d10871c9e6fa8C;
-      
+
       saleMinimum = 5 * 1 ether;
       state = State.Active;
       price = 1330;
@@ -145,7 +145,7 @@ contract CLTSaleContract is Ownable {
         require(msg.value >= saleMinimum);
         require(state == State.Active);
         require(token.balanceOf(this) > 0);
-        
+
         buyTokens(msg.value);
       }
 
@@ -158,27 +158,27 @@ contract CLTSaleContract is Ownable {
 
     uint256 invested = _invested;
     uint256 numberOfTokens;
-    
+
     numberOfTokens = invested.mul(price);
 
-    
+
     beneficiary.transfer(msg.value);
     token.transfer(msg.sender, numberOfTokens);
-    
+
     raisedETH = raisedETH.add(msg.value);
     soldTokens = soldTokens.add(numberOfTokens);
 
     emit BoughtTokens(msg.sender, numberOfTokens, invested);
-    
+
     }
-    
+
 
   /**
    * @dev Change the price during the different rounds
    */
   function changeRate(uint256 _newPrice) public onlyOwner {
       price = _newPrice;
-  }    
+  }
 
   /**
    *  @dev Change the sale minimum
@@ -192,39 +192,39 @@ contract CLTSaleContract is Ownable {
    */
   function endSale() public onlyOwner {
     require(state == State.Active || state == State.Dormant);
-    
+
     state = State.Successful;
     emit SuccessfulState();
   }
-  
+
 
    /**
    * @dev Makes the sale dormant, no deposits are allowed
    */
   function pauseSale() public onlyOwner {
       require(state == State.Active);
-      
+
       state = State.Dormant;
       emit DormantState();
   }
-  
+
   /**
    * @dev Makes the sale active, thus funds can be received
    */
   function openSale() public onlyOwner {
       require(state == State.Dormant);
-      
+
       state = State.Active;
       emit ActiveState();
   }
-  
+
   /**
-   * @dev [!!ALERT!!] USE THIS ONLY IN EMERGENCY 
+   * @dev [!!ALERT!!] USE THIS ONLY IN EMERGENCY
    */
   function emergencyFlush() public onlyOwner {
       token.transfer(owner, token.balanceOf(this));
   }
-  
+
 
   /**
    * @notice Terminate contract and send any ETH left in contract to owner
@@ -235,4 +235,17 @@ contract CLTSaleContract is Ownable {
     selfdestruct(owner);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

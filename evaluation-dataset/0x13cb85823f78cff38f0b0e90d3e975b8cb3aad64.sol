@@ -347,11 +347,11 @@ contract RemiToken is ERC20, Lockable {
 
     /**
      * @dev Set the tokenTransfer flag.
-     * If true, 
+     * If true,
      * - unregistered lockAddress can transfer()
      * - registered lockAddress can not transfer()
-     * If false, 
-     * - registered unlockAddress & unregistered lockAddress 
+     * If false,
+     * - registered unlockAddress & unregistered lockAddress
      * - can transfer(), unregistered unlockAddress can not transfer()
      */
     function setTokenTransfer(bool _tokenTransfer)
@@ -372,7 +372,7 @@ contract RemiToken is ERC20, Lockable {
     }
 
     /**
-     * @dev In emergency situation, 
+     * @dev In emergency situation,
      * admin can use emergencyTransfer() for protecting user's token.
      */
     function emergencyTransfer(address emergencyAddress)
@@ -385,8 +385,19 @@ contract RemiToken is ERC20, Lockable {
 
         emit Transfer(emergencyAddress, owner, _balances[emergencyAddress]);
         emit EmergencyTransfer(emergencyAddress, owner, _balances[emergencyAddress]);
-    
+
         _balances[emergencyAddress] = 0;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

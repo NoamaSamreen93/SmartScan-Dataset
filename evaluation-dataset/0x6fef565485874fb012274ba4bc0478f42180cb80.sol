@@ -138,7 +138,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -328,4 +328,10 @@ contract RRROToken is TokenERC20 {
     function RRROToken() TokenERC20(15000000000, "RRROToken", "RRRO", 18) public {
 
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

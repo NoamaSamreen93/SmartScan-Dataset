@@ -194,7 +194,7 @@ contract TokenTimelock is Ownable {
     function getCurrentStep(address _user) public view returns (uint) {
         require(users[_user].deposit != 0);
         uint _id;
-        
+
         if (users[_user].releaseTime >= now) {
             uint _count = (users[_user].releaseTime - now) / releaseStep;
             _count = _count == releaseStepCount ? _count : _count + 1;
@@ -203,9 +203,9 @@ contract TokenTimelock is Ownable {
 
         return _id;
     }
-    
- 
-     
+
+
+
 
     //1% - 1000, 10% - 10000 50% - 50000
     function _valueFromPercent(uint _value, uint _percent) internal pure returns (uint amount)    {
@@ -216,4 +216,15 @@ contract TokenTimelock is Ownable {
     function getUser(address _user) public view returns(uint, uint, uint, uint){
         return (users[_user].deposit, users[_user].balance, users[_user].step, users[_user].releaseTime);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.4.15;
  *********************************************************************************
  *
  * Name of the project: ERC20 Basic Token
- * Author: Juan Livingston 
+ * Author: Juan Livingston
  *
  *********************************************************************************
  ********************************************************************************/
@@ -25,7 +25,7 @@ contract Token {
     // Token public variables
     string public name;
     string public symbol;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public version = 'v1';
     uint256 public totalSupply;
     uint public price;
@@ -58,7 +58,7 @@ contract Token {
 
     modifier isUnlocked() {
     	if ( locked && msg.sender != rootAddress && msg.sender != Owner ) revert();
-		_;    	
+		_;
     }
 
     modifier isUnfreezed(address _to) {
@@ -77,16 +77,16 @@ contract Token {
 
 
     // Token constructor
-    function Token() {        
+    function Token() {
         locked = false;
-        name = 'Token name'; 
-        symbol = 'SYMBOL'; 
-        decimals = 18; 
+        name = 'Token name';
+        symbol = 'SYMBOL';
+        decimals = 18;
         multiplier = 10 ** uint(decimals);
         totalSupply = 1000000 * multiplier; // 1,000,000 tokens
-        rootAddress = msg.sender;        
+        rootAddress = msg.sender;
         Owner = msg.sender;
-        balances[rootAddress] = totalSupply; 
+        balances[rootAddress] = totalSupply;
     }
 
 
@@ -110,7 +110,7 @@ contract Token {
         Owner = _newOwner;
         return true;
     }
-       
+
     function unlock() onlyOwner returns(bool) {
         locked = false;
         return true;
@@ -150,7 +150,7 @@ contract Token {
 
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool) {
 
-        if ( locked && msg.sender != Owner && msg.sender != rootAddress ) return false; 
+        if ( locked && msg.sender != Owner && msg.sender != rootAddress ) return false;
         if ( freezed[_from] || freezed[_to] ) return false; // Check if destination address is freezed
         if ( balances[_from] < _value ) return false; // Check if the sender has enough
     	if ( _value > allowed[_from][msg.sender] ) return false; // Check allowance
@@ -180,4 +180,15 @@ contract Token {
     function allowance(address _owner, address _spender) constant returns(uint256) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

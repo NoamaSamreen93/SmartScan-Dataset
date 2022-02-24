@@ -1030,10 +1030,19 @@ pragma solidity ^0.5.2;
 contract NMSST is ERC721Full, ERC721Mintable, ERC721MetadataMintable {
   constructor() ERC721Full("Noah Melvin Schumer-Shaprio", "NMSST") public {
   }
-  
+
   string public childName = "Noah Melvin Schumer-Shapiro";
 
   // Nov 24 2018, 5:23 am EST
   uint public childBirthday = 11543054980;
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -26,12 +26,12 @@ library SafeMath {
 
 contract Moneda {
     using SafeMath for uint256;
-    
+
     string constant public standard = "ERC20";
     string constant public name = "Moneda Token";
     string constant public symbol = "MND";
     uint8 constant public decimals = 18;
-    
+
     uint256 private _totalSupply = 400000000e18; // Total supply tokens 400mil
     uint256 constant public preICOLimit = 20000000e18; // Pre-ICO limit 5%, 20mil
     uint256 constant public icoLimit = 250000000e18; // ICO limit 62.5%, 250mil
@@ -42,7 +42,7 @@ contract Moneda {
     uint256 public preICOEnds = 1525132799; // Monday, April 30, 2018 11:59:59 PM
     uint256 public icoStarts = 1526342400; // Tuesday, May 15, 2018 12:00:00 AM
     uint256 public icoEnds = 1531699199; // Sunday, July 15, 2018 11:59:59 PM
-    
+
     uint256 constant public startTime = 1532822400; // Two weeks after ICO ends, Sunday, July 29, 2018 12:00:00 AM
     uint256 constant public teamCompanyLock = 1563148800; // One Year after ICO Ends, Reserve Tokens of company and team becomes transferable.  Monday, July 15, 2019 12:00:00 AM
 
@@ -59,7 +59,7 @@ contract Moneda {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burned(uint256 amount);
-    
+
     // Initializes contract with initial supply tokens to the creator of the contract
     function Moneda(address _ownerAddr, address _companyAddr, address _giveawayAddr) public {
         ownerAddr = _ownerAddr;
@@ -67,7 +67,7 @@ contract Moneda {
         giveawayAddr = _giveawayAddr;
         balances[ownerAddr] = _totalSupply; // Give the owner all initial tokens
     }
-    
+
     // Gets the total token supply
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
@@ -77,12 +77,12 @@ contract Moneda {
     function balanceOf(address who) public view returns (uint256) {
         return balances[who];
     }
-    
+
     // Function to check the amount of tokens that an owner allowed to a spender.
     function allowance(address owner, address spender) public view returns (uint256) {
         return allowed[owner][spender];
     }
-    
+
     // Transfer some of your tokens to another address
     function transfer(address to, uint256 value) public returns (bool) {
         require(now >= startTime); // Check if one month lock is passed
@@ -90,33 +90,33 @@ contract Moneda {
 
         if (msg.sender == ownerAddr || msg.sender == companyAddr)
                 require(now >= teamCompanyLock);
-                
+
         balances[msg.sender] = balances[msg.sender].sub(value);
         balances[to] = balances[to].add(value);
         emit Transfer(msg.sender, to, value);
         return true;
     }
-    
+
     // Transfer tokens from one address to another
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
         require(value > 0);
         require(to != address(0));
         require(value <= balances[from]);
         require(value <= allowed[from][msg.sender]);
-        
+
         if (now < icoEnds)  // Check if the crowdsale is already over
             require(from == ownerAddr);
 
         if (msg.sender == ownerAddr || msg.sender == companyAddr)
             require(now >= teamCompanyLock);
-            
+
         balances[from] = balances[from].sub(value);
         balances[to] = balances[to].add(value);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
         emit Transfer(from, to, value);
         return true;
     }
-    
+
     //Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
     function approve(address spender, uint256 value) public returns (bool) {
         require((value == 0) || (allowed[msg.sender][spender] == 0));
@@ -140,4 +140,8 @@ contract Moneda {
         burned = true;
         emit Burned(difference);
     }
+}
+function() payable external {
+	revert();
+}
 }

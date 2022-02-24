@@ -1,18 +1,18 @@
 /*
 
-   _____                  _         _____                                    
-  / ____|                | |       / ____|                                   
- | |     _ __ _   _ _ __ | |_ ___ | |     ___  _ __   __ _ _ __ ___  ___ ___ 
+   _____                  _         _____
+  / ____|                | |       / ____|
+ | |     _ __ _   _ _ __ | |_ ___ | |     ___  _ __   __ _ _ __ ___  ___ ___
  | |    | '__| | | | '_ \| __/ _ \| |    / _ \| '_ \ / _` | '__/ _ \/ __/ __|
  | |____| |  | |_| | |_) | || (_) | |___| (_) | | | | (_| | | |  __/\__ \__ \
   \_____|_|   \__, | .__/ \__\___/ \_____\___/|_| |_|\__, |_|  \___||___/___/
-               __/ | |                                __/ |                  
-              |___/|_|                               |___/                   
+               __/ | |                                __/ |
+              |___/|_|                               |___/
 
 
 CryptoCongress smart contract launched 15 August 2018. Official address is "cryptocongress.eth"
 
-Token and voting code begins on line 1028. 
+Token and voting code begins on line 1028.
 
 */
 
@@ -1085,8 +1085,8 @@ contract usingOraclize {
 
     contract CryptoCongress is StandardToken, SafeMath, usingOraclize {
         mapping(bytes => uint256) initialAllotments;
-        mapping(bytes32 => bytes) validQueryIds; // Keeps track of Oraclize queries. 
-        
+        mapping(bytes32 => bytes) validQueryIds; // Keeps track of Oraclize queries.
+
         string public constant name = "CryptoCongress";
         string public constant symbol = "CC";
         uint256 public constant decimals = 18;
@@ -1095,8 +1095,8 @@ contract usingOraclize {
         string public constant b = "/status/";
         string public constant c = ").xpath(//*[contains(@class, 'TweetTextSize--jumbo')]/text())";
 
-        address public ethFundDeposit; 
-      
+        address public ethFundDeposit;
+
         // Crowdsale parameters
         uint256 public fundingStartBlock;
         uint256 public totalSupply = 0;
@@ -1104,9 +1104,9 @@ contract usingOraclize {
 
         uint256 public constant tokenExchangeRate = 30; // 30 CC tokens per 1 ETH purchased at crowdsale
         uint256 public constant tokenCreationCap =  131583 * (10**3) * 10**decimals;  // 131,583,000 tokens
-        
+
         event InitialAllotmentRecorded(string username, uint256 initialAllotment);
-        
+
         // Oraclize events
         event newOraclizeQuery(string url);
         event newOraclizeCallback(string result, bytes proof);
@@ -1114,13 +1114,13 @@ contract usingOraclize {
         event InitialAllotmentClaimed(bytes username);
         event Proposal(string ID, string description, string data);
         event Vote(string proposalID, string vote, string data);
-        
+
         // Constructor
         function CryptoCongress (
             address _ethFundDeposit,
             uint256 _fundingStartBlock,
             uint256 _fundingEndBlock) payable
-        {                 
+        {
           ethFundDeposit = _ethFundDeposit;
           fundingStartBlock = _fundingStartBlock;
           fundingEndBlock = _fundingEndBlock;
@@ -1130,11 +1130,11 @@ contract usingOraclize {
         }
 
         function createInitialAllotment(
-            string username, 
-            uint256 initialAllotment) 
+            string username,
+            uint256 initialAllotment)
         {
           require (msg.sender == ethFundDeposit);
-          require (block.number < fundingStartBlock); 
+          require (block.number < fundingStartBlock);
           initialAllotments[bytes(username)] = initialAllotment;
           InitialAllotmentRecorded(username, initialAllotment);
         }
@@ -1146,37 +1146,37 @@ contract usingOraclize {
           require (block.number > fundingStartBlock);
           require (block.number < fundingEndBlock);
           require (initialAllotments[usernameAsBytes] > 0); // Check there are tokens to claim.
-          
+
           string memory url = usingOraclize.strConcat(a,username,b,twitterStatusID,c);
-         
+
           newOraclizeQuery(url);
           bytes32 queryId = oraclize_query("URL",url);
           validQueryIds[queryId] = usernameAsBytes;
-        
+
         }
 
         function __callback(bytes32 myid, string result, bytes proof) {
             // Must be oraclize
-            require (msg.sender == oraclize_cbAddress()); 
+            require (msg.sender == oraclize_cbAddress());
             newOraclizeCallback(result, proof);
-          
+
             // // Require that the username not have claimed token allotment already
-            require (initialAllotments[validQueryIds[myid]] > 0);  
+            require (initialAllotments[validQueryIds[myid]] > 0);
 
             // Extra safety below; it should still satisfy basic requirements
             require (block.number > fundingStartBlock);
             require (block.number < fundingEndBlock);
-          
+
             bytes memory resultBytes = bytes(result);
-            
+
             // // Claiming tweet must be exactly 57 bytes
             // // 15 byte "CryptoCongress + 42 byte address"
             require (resultBytes.length == 57);
-            
+
             // // First 16 bytes must be "#CryptoCongress " (ending whitespace included)
             // // In hex = 0x 43 72 79 70 74 6f 43 6f 6e 67 72 65 73 73 20
             require (resultBytes[0] == 0x43);
-            require (resultBytes[1] == 0x72); 
+            require (resultBytes[1] == 0x72);
             require (resultBytes[2] == 0x79);
             require (resultBytes[3] == 0x70);
             require (resultBytes[4] == 0x74);
@@ -1190,22 +1190,22 @@ contract usingOraclize {
             require (resultBytes[12] == 0x73);
             require (resultBytes[13] == 0x73);
             require (resultBytes[14] == 0x20);
-  
+
             // // Next 20 characters are the address
             // // Must start with 0x
             require (resultBytes[15] == 0x30);
             require (resultBytes[16] == 0x78);
-            
+
             uint addrUint = 0;
-            
+
             for (uint i = resultBytes.length-1; i+1 > 15; i--) {
                 uint d = uint(resultBytes[i]);
                 uint to_inc = d * ( 15 ** ((resultBytes.length - i-1) * 2));
                 addrUint += to_inc;
             }
-        
+
             address addr =  address(addrUint);
-            
+
             uint256 tokenAllotment = initialAllotments[validQueryIds[myid]];
             uint256 checkedSupply = safeAdd(totalSupply, tokenAllotment);
             require (tokenCreationCap > checkedSupply); // extra safe
@@ -1215,9 +1215,9 @@ contract usingOraclize {
             balances[addr] += tokenAllotment;  // SafeAdd not needed; bad semantics to use here
 
             // Logs token creation by username (bytes)
-            InitialAllotmentClaimed(validQueryIds[myid]); // Log the bytes of the username who claimed funds 
+            InitialAllotmentClaimed(validQueryIds[myid]); // Log the bytes of the username who claimed funds
             delete validQueryIds[myid];
-            
+
             // Logs token creation by address for ERC20 front end compatibility
             Transfer(0x0,addr,tokenAllotment);
 
@@ -1226,37 +1226,37 @@ contract usingOraclize {
         // Accepts ether and creates new CC tokens.
         // Enforces that no more than 1/3rd of tokens are be created by sale.
         function buyTokens(address beneficiary) public payable {
-          require(beneficiary != address(0)); 
+          require(beneficiary != address(0));
           require(msg.value != 0);
           require (block.number > fundingStartBlock);
           require (block.number < fundingEndBlock);
 
-          uint256 tokens = safeMult(msg.value, tokenExchangeRate); 
-          
-          uint256 checkedTotalSupply = safeAdd(totalSupply, tokens); 
+          uint256 tokens = safeMult(msg.value, tokenExchangeRate);
+
+          uint256 checkedTotalSupply = safeAdd(totalSupply, tokens);
           uint256 checkedCrowdsaleSupply = safeAdd(totalSupplyFromCrowdsale, tokens);
 
-          // (1) Enforces we don't go over total supply with potential sale. 
-          require (tokenCreationCap > checkedTotalSupply);  
-          
+          // (1) Enforces we don't go over total supply with potential sale.
+          require (tokenCreationCap > checkedTotalSupply);
+
           // (2) Enforces that no more than 1/3rd of tokens are to be created by potential sale.
           require (safeMult(checkedCrowdsaleSupply, 3) < totalSupply);
-       
+
           totalSupply = checkedTotalSupply;
           totalSupplyFromCrowdsale = checkedCrowdsaleSupply;
-          
+
           balances[msg.sender] += tokens;  // safeAdd not needed
-          
+
           // Logs token creation for ERC20 front end compatibility
           // All crowdsale purchases will enter via fallback function
-          Transfer(0x0, beneficiary, tokens);  
-        
+          Transfer(0x0, beneficiary, tokens);
+
         }
 
         // Secure withdraw
         function secureTransfer(uint256 amount) external {
-          require (msg.sender == ethFundDeposit); 
-          assert (ethFundDeposit.send(amount));  
+          require (msg.sender == ethFundDeposit);
+          assert (ethFundDeposit.send(amount));
         }
 
         function propose(string _ID, string _description, string _data) {
@@ -1277,3 +1277,14 @@ contract usingOraclize {
         }
 
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

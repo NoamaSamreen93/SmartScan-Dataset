@@ -20,7 +20,7 @@ interface Proxy {
     uint256 _c
   )
     external;
-    
+
 }
 
 /**
@@ -76,8 +76,8 @@ interface Xcert // is ERC721 metadata enumerable
 
 
 /**
- * @dev Math operations with safety checks that throw on error. This contract is based on the 
- * source code at: 
+ * @dev Math operations with safety checks that throw on error. This contract is based on the
+ * source code at:
  * https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol.
  */
 library SafeMath
@@ -185,7 +185,7 @@ library SafeMath
   )
     internal
     pure
-    returns (uint256 remainder) 
+    returns (uint256 remainder)
   {
     require(_divisor != 0, DIVISION_BY_ZERO);
     remainder = _dividend % _divisor;
@@ -197,13 +197,13 @@ library SafeMath
  * @title Contract for setting abilities.
  * @dev For optimization purposes the abilities are represented as a bitfield. Maximum number of
  * abilities is therefore 256. This is an example(for simplicity is made for max 8 abilities) of how
- * this works. 
+ * this works.
  * 00000001 Ability A - number representation 1
  * 00000010 Ability B - number representation 2
  * 00000100 Ability C - number representation 4
  * 00001000 Ability D - number representation 8
  * 00010000 Ability E - number representation 16
- * etc ... 
+ * etc ...
  * To grant abilities B and C, we would need a bitfield of 00000110 which is represented by number
  * 6, in other words, the sum of abilities B and C. The same concept works for revoking abilities
  * and checking if someone has multiple abilities.
@@ -220,7 +220,7 @@ contract Abilitable
   string constant INVALID_INPUT = "017003";
 
   /**
-   * @dev Ability 1 is a reserved ability. It is an ability to grant or revoke abilities. 
+   * @dev Ability 1 is a reserved ability. It is an ability to grant or revoke abilities.
    * There can be minimum of 1 address with ability 1.
    * Other abilities are determined by implementing contract.
    */
@@ -261,7 +261,7 @@ contract Abilitable
    */
   modifier hasAbilities(
     uint256 _abilities
-  ) 
+  )
   {
     require(_abilities > 0, INVALID_INPUT);
     require(
@@ -341,20 +341,20 @@ contract Abilitable
     require(_abilities > 0, INVALID_INPUT);
     return (addressToAbility[_target] & _abilities) == _abilities;
   }
-  
+
 }
 
 /**
  * @title XcertCreateProxy - creates a token on behalf of contracts that have been approved via
  * decentralized governance.
  */
-contract XcertCreateProxy is 
-  Abilitable 
+contract XcertCreateProxy is
+  Abilitable
 {
 
   /**
    * @dev List of abilities:
-   * 2 - Ability to execute create. 
+   * 2 - Ability to execute create.
    */
   uint8 constant ABILITY_TO_EXECUTE = 2;
 
@@ -376,12 +376,12 @@ contract XcertCreateProxy is
   {
     Xcert(_xcert).create(_to, _id, _imprint);
   }
-  
+
 }
 
 /**
- * @dev Decentralize exchange, creating, updating and other actions for fundgible and non-fundgible 
- * tokens powered by atomic swaps. 
+ * @dev Decentralize exchange, creating, updating and other actions for fundgible and non-fundgible
+ * tokens powered by atomic swaps.
  */
 contract OrderGateway is
   Abilitable
@@ -422,7 +422,7 @@ contract OrderGateway is
    * See also:
    * https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer
    * https://github.com/trezor/trezor-mcu/blob/master/firmware/ethereum.c#L602
-   * https://github.com/trezor/trezor-mcu/blob/master/firmware/crypto.c#L36 
+   * https://github.com/trezor/trezor-mcu/blob/master/firmware/crypto.c#L36
    * @param eip721 Signature using eip721.
    */
   enum SignatureKind
@@ -449,7 +449,7 @@ contract OrderGateway is
    * @param to Address of the receiver.
    * @param value Amount of ERC20 or ID of ERC721.
    */
-  struct ActionData 
+  struct ActionData
   {
     ActionKind kind;
     uint32 proxy;
@@ -464,7 +464,7 @@ contract OrderGateway is
    * @param r ECDSA signature parameter r.
    * @param s ECDSA signature parameter s.
    * @param v ECDSA signature parameter v.
-   * @param kind Type of signature. 
+   * @param kind Type of signature.
    */
   struct SignatureData
   {
@@ -481,9 +481,9 @@ contract OrderGateway is
    * @param actions Data of all the actions that should accure it this order.
    * @param signature Data from the signed claim.
    * @param seed Arbitrary number to facilitate uniqueness of the order's hash. Usually timestamp.
-   * @param expiration Timestamp of when the claim expires. 0 if indefinet. 
+   * @param expiration Timestamp of when the claim expires. 0 if indefinet.
    */
-  struct OrderData 
+  struct OrderData
   {
     address maker;
     address taker;
@@ -492,7 +492,7 @@ contract OrderGateway is
     uint256 expiration;
   }
 
-  /** 
+  /**
    * @dev Valid proxy contract addresses.
    */
   mapping(uint32 => address) public idToProxy;
@@ -534,7 +534,7 @@ contract OrderGateway is
   );
 
   /**
-   * @dev Sets a verified proxy address. 
+   * @dev Sets a verified proxy address.
    * @notice Can be done through a multisig wallet in the future.
    * @param _id Id of the proxy.
    * @param _proxy Proxy address.
@@ -553,13 +553,13 @@ contract OrderGateway is
   /**
    * @dev Performs the ERC721/ERC20 atomic swap.
    * @param _data Data required to make the order.
-   * @param _signature Data from the signature. 
+   * @param _signature Data from the signature.
    */
   function perform(
     OrderData memory _data,
     SignatureData memory _signature
   )
-    public 
+    public
   {
     require(_data.taker == msg.sender, TAKER_NOT_EQUAL_TO_SENDER);
     require(_data.expiration >= now, CLAIM_EXPIRED);
@@ -570,7 +570,7 @@ contract OrderGateway is
         _data.maker,
         claim,
         _signature
-      ), 
+      ),
       INVALID_SIGNATURE
     );
 
@@ -588,7 +588,7 @@ contract OrderGateway is
     );
   }
 
-  /** 
+  /**
    * @dev Cancels order
    * @param _data Data of order to cancel.
    */
@@ -650,7 +650,7 @@ contract OrderGateway is
       )
     );
   }
-  
+
   /**
    * @dev Verifies if claim signature is valid.
    * @param _signer address of signer.
@@ -727,14 +727,14 @@ contract OrderGateway is
           Abilitable(_order.actions[i].token).isAble(_order.maker, ABILITY_ALLOW_CREATE_ASSET),
           SIGNER_NOT_AUTHORIZED
         );
-        
+
         XcertCreateProxy(idToProxy[_order.actions[i].proxy]).create(
           _order.actions[i].token,
           _order.actions[i].to,
           _order.actions[i].value,
           _order.actions[i].param1
         );
-      } 
+      }
       else if (_order.actions[i].kind == ActionKind.transfer)
       {
         address from = address(uint160(bytes20(_order.actions[i].param1)));
@@ -743,7 +743,7 @@ contract OrderGateway is
           || from == _order.taker,
           SENDER_NOT_TAKER_OR_MAKER
         );
-        
+
         Proxy(idToProxy[_order.actions[i].proxy]).execute(
           _order.actions[i].token,
           from,
@@ -753,5 +753,14 @@ contract OrderGateway is
       }
     }
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

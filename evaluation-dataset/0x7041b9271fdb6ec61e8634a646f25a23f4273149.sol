@@ -47,13 +47,13 @@ contract GCRTokenERC20 {
      function GCRTokenERC20() {
         totalSupply = 100000000 * 10 ** uint256(decimals);
         balanceOf[msg.sender] = 210000000000;
-        name = "GlobalChemicalResearch Token";                                 
-        symbol = "GCR";                            
+        name = "GlobalChemicalResearch Token";
+        symbol = "GCR";
 }
-     
 
 
- 
+
+
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
@@ -72,7 +72,7 @@ contract GCRTokenERC20 {
 
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);    
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -98,20 +98,20 @@ contract GCRTokenERC20 {
 
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);  
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                    
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;            
-        totalSupply -= _value;                             
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
@@ -130,17 +130,17 @@ contract MyAdvancedToken is owned, GCRTokenERC20 {
     event FrozenFunds(address target, bool frozen);
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);               
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                       
-        balanceOf[_from] -= _value;                         
-        balanceOf[_to] += _value;                           
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
 
- 
+
     function mintToken(address target, uint256 mintedAmount) onlyOwner public {
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
@@ -148,27 +148,43 @@ contract MyAdvancedToken is owned, GCRTokenERC20 {
         Transfer(this, target, mintedAmount);
     }
 
-  
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
 
-  
+
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
 
     function buy() payable public {
-        uint amount = msg.value / buyPrice;             
-        _transfer(this, msg.sender, amount);             
+        uint amount = msg.value / buyPrice;
+        _transfer(this, msg.sender, amount);
     }
 
-   
+
     function sell(uint256 amount) public {
-        require(this.balance >= amount * sellPrice);     
-        _transfer(msg.sender, this, amount);             
-        msg.sender.transfer(amount * sellPrice);         
+        require(this.balance >= amount * sellPrice);
+        _transfer(msg.sender, this, amount);
+        msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

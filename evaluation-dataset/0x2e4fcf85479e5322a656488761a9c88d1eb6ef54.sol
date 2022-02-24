@@ -153,7 +153,7 @@ contract WorldByEth {
         require(id>0 && id <= ctnum, "CountryNum should be within ctnum.");
         buy(id, memo, msg.value);
     }
-    
+
     function buyManyCountries(uint[] countryIds) isHuman
     external
     payable {
@@ -212,16 +212,16 @@ contract WorldByEth {
             pot_[rID_] += gamepot;
 
             devi(id,_price);
-            
+
             if (ctry_[rID_][id].owner != address(0x0)) {
-                ctry_[rID_][id].owner.transfer((_price).mul(88).div(100)); 
+                ctry_[rID_][id].owner.transfer((_price).mul(88).div(100));
             } else {
                 validplayers.push(id);
             }
 
             ctry_[rID_][id].owner = msg.sender;
             ctry_[rID_][id].price = (_price).mul(14).div(10);
-            
+
         } else {
             rID_++;
             validplayers.length = 0;
@@ -308,4 +308,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

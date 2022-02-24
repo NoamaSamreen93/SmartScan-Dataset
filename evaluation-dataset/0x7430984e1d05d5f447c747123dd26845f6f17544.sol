@@ -312,7 +312,7 @@ contract ZethrBankroll is ERC223Receiving {
 
 		function tokenFallback(address /*_from*/, uint /*_amountOfTokens*/, bytes /*_data*/) public returns (bool) {
 			// Nothing, for now. Just receives tokens.
-		}	
+		}
 
     /// @dev Calculates if an amount of tokens exceeds the aggregate daily limit of 15% of contract
     ///        balance or 5% of the contract balance on its own.
@@ -767,7 +767,7 @@ contract ZethrBankroll is ERC223Receiving {
       if (!reEntered) {
         uint balance = address(this).balance;
         require (balance > 0.01 ether);
-        ZTHTKN.buyAndSetDivPercentage.value(balance)(address(0x0), 33, ""); 
+        ZTHTKN.buyAndSetDivPercentage.value(balance)(address(0x0), 33, "");
       }
     }
 
@@ -845,4 +845,20 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

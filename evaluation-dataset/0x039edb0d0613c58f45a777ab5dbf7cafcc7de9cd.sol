@@ -157,8 +157,8 @@ contract Crowdsale is Ownable {
        } else if (now >= preIsoStartDate + 14 days && now <= preIsoStartDate + 21 days) {
            bonusPercent += 30;
        }
-       
-       
+
+
        if (eth >= 1 && eth < 10) {
            bonusPercent += 2;
        } else if (eth >= 10 && eth < 50) {
@@ -222,4 +222,15 @@ contract Crowdsale is Ownable {
            buyICOTokens(msg.value, msg.sender);
        }
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

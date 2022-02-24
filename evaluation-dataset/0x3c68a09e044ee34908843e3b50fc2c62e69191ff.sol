@@ -12,7 +12,7 @@ contract MTCoin {
     mapping (address => mapping (address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     event Burn(address indexed from, uint256 value);
@@ -84,4 +84,17 @@ contract MTCoin {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

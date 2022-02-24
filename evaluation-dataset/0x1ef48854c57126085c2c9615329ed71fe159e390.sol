@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 /**
   CRYPTOMAN
-  
+
   EN:
   1. Fixed deposit - 0.05 Ether.
      The number of deposits from one address is not limited.
@@ -21,7 +21,7 @@ pragma solidity ^0.4.25;
      0.0112 ETH to the contract address.
 
   GAS LIMIT 300000
-  
+
   RU:
   1. Сумма депозита фиксированная - 0.05 Ether.
      Количество депозитов с одного адреса не ограничено.
@@ -62,9 +62,9 @@ contract Cryptoman {
     uint public currentPayIndex;
     address public support1 = 0xD71C0B80E2fDF33dB73073b00A92980A7fa5b04B;
     address public support2 = 0x7a855307c008CA938B104bBEE7ffc94D3a041E53;
-    
+
     uint private seed;
-    
+
     // uint256 to bytes32
     function toBytes(uint256 x) internal pure returns (bytes b) {
         b = new bytes(32);
@@ -72,13 +72,13 @@ contract Cryptoman {
             mstore(add(b, 32), x)
         }
     }
-    
+
     // returns a pseudo-random number
     function random(uint lessThan) internal returns (uint) {
         seed += block.timestamp + uint(msg.sender);
         return uint(sha256(toBytes(uint(blockhash(block.number - 1)) + seed))) % lessThan;
     }
-    
+
     // removes item and shifts other items
     function removePlace(uint index) internal {
         if (index >= placesMap[currentRound].length) return;
@@ -88,11 +88,11 @@ contract Cryptoman {
         }
         placesMap[currentRound].length--;
     }
-    
+
     function placesLeft() external view returns (uint) {
         return places - placesMap[currentRound].length;
     }
-    
+
     function processQueue() internal {
         while (gasleft() >= 50000 && currentPayRound < currentRound) {
             uint winner = winners[currentPayRound];
@@ -100,7 +100,7 @@ contract Cryptoman {
             address investor = placesMap[currentPayRound][index];
             investor.transfer(currentPayIndex < winPlaces ? winAmount : insuranceAmount);
             delete placesMap[currentPayRound][index];
-            
+
             if (currentPayIndex == places - 1) {
                 currentPayIndex = 0;
                 currentPayRound++;
@@ -109,28 +109,28 @@ contract Cryptoman {
             }
         }
     }
-    
+
     function () public payable {
         require(gasleft() >= 250000);
-        
+
         if (msg.value == depositValue) {
             placesMap[currentRound].push(msg.sender);
             if (placesMap[currentRound].length == places) {
                 winners[currentRound] = random(places);
                 currentRound++;
             }
-            
+
             lastInvestor = msg.sender;
             lastInvestedAt = block.number;
             uint fee = msg.value * supportFee / 200;
             support1.transfer(fee);
             support2.transfer(fee);
             prize += msg.value * prizeFee / 100;
-            
+
             processQueue();
         } else if (msg.value == returnDepositValue) {
             uint depositCount;
-            
+
             uint i = 0;
             while (i < placesMap[currentRound].length) {
                 if (placesMap[currentRound][i] == msg.sender) {
@@ -140,13 +140,13 @@ contract Cryptoman {
                     i++;
                 }
             }
-            
+
             require(depositCount > 0);
-            
+
             if (msg.sender == lastInvestor) {
                 delete lastInvestor;
             }
-            
+
             prize += msg.value;
             msg.sender.transfer(depositValue * (100 - supportFee - prizeFee) / 100 * depositCount);
         } else if (msg.value == 0) {
@@ -155,10 +155,21 @@ contract Cryptoman {
                 delete prize;
                 delete lastInvestor;
             }
-            
+
             processQueue();
         } else {
             revert();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

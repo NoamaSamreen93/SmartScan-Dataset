@@ -81,3 +81,7 @@ contract GlitchGoonsProxy is Ownable {
         emit Transfer(msg.sender, _to, msg.value);
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -11,7 +11,7 @@ library SafeMath {
         require(c / a == b, "Assertion Failed");
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0, "Assertion Failed");
         uint256 c = a / b;
@@ -86,7 +86,7 @@ contract Trade is Registry {
         address src,
         address dest,
         uint srcAmt
-    ) public view returns (uint, uint) 
+    ) public view returns (uint, uint)
     {
         Kyber kyberFunctions = Kyber(getAddress("kyber"));
         return kyberFunctions.getExpectedRate(
@@ -120,7 +120,7 @@ contract Trade is Registry {
             srcAmt,
             eth
         );
-        
+
         // Interacting with Kyber Proxy Contract
         Kyber kyberFunctions = Kyber(getAddress("kyber"));
         destAmt = kyberFunctions.trade.value(ethQty)(
@@ -184,4 +184,15 @@ contract InstaKyber is Trade {
 
     function () public payable {}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

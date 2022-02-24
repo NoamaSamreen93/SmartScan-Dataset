@@ -36,7 +36,7 @@ library SafeMath {
 // _newOwner is address of new owner
 // ----------------------------------------------------------------------------
 contract Owned {
-    
+
     address public owner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
@@ -56,7 +56,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -64,10 +64,10 @@ contract Owned {
 // BlupassToken interface
 // ----------------------------------------------------------------------------
 contract BlupassToken {
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
 }
 
 
@@ -77,14 +77,14 @@ contract BlupassToken {
 contract BlupassICO is Owned {
 
     using SafeMath for uint256;
-    
+
     // public Variables
     uint256 public totalRaised; //eth in wei
     uint256 public totalDistributed; //tokens distributed
     uint256 public RATE; // RATE of the BLU
     BlupassToken public BLU; // BLU token address
     bool public isStopped = false; // ICO start/stop
-    
+
     mapping(address => bool) whitelist; // whitelisting for KYC verified users
 
     // events for log
@@ -95,19 +95,19 @@ contract BlupassICO is Owned {
     event LogFundingSuccessful(uint _totalRaised);
     event LogFunderInitialized(address _creator);
     event LogContributorsPayout(address _addr, uint _amount);
-    
+
     // To determine whether the ICO is running or stopped
     modifier onlyWhenRunning {
         require(!isStopped);
         _;
     }
-    
-    // To determine whether the user is whitelisted 
+
+    // To determine whether the user is whitelisted
     modifier onlyifWhiteListed {
         require(whitelist[msg.sender]);
         _;
     }
-    
+
     // ----------------------------------------------------------------------------
     // BlupassICO constructor
     // _addressOfToken is the token totalDistributed
@@ -118,8 +118,8 @@ contract BlupassICO is Owned {
         BLU = BlupassToken(_addressOfToken);
         emit LogFunderInitialized(owner);
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // Function to handle eth transfers
     // It invokes when someone sends ETH to this contract address.
@@ -137,26 +137,26 @@ contract BlupassICO is Owned {
     // Acceptes ETH and send equivalent BLU with bonus if any.
     // NOTE: Add user to whitelist by invoking addToWhiteList() function.
     // Only whitelisted users can buy tokens.
-    // For Non-whitelisted/Blacklisted users transaction will be reverted. 
+    // For Non-whitelisted/Blacklisted users transaction will be reverted.
     // ----------------------------------------------------------------------------
     function contribute() onlyWhenRunning onlyifWhiteListed public payable {
-        
+
         require(msg.value >= 1 ether); // min 1 ETH investment
-        
+
         uint256 tokenBought; // Variable to store amount of tokens bought
         uint256 bonus; // Variable to store bonus if any
 
         totalRaised = totalRaised.add(msg.value); // Save the total eth totalRaised (in wei)
         tokenBought = msg.value.mul(RATE); // Token calculation according to RATE
-        
+
         // Bonus for  5+ ETH investment
-        
+
         // 20 % bonus for 5 to 9 ETH investment
         if (msg.value >= 5 ether && msg.value <= 9 ether) {
             bonus = (tokenBought.mul(20)).div(100); // 20 % bonus
             tokenBought = tokenBought.add(bonus);
-        } 
-        
+        }
+
         // 40 % bonus for 10+ ETH investment
         if (msg.value >= 10 ether) {
             bonus = (tokenBought.mul(40)).div(100); // 40 % bonus
@@ -165,11 +165,11 @@ contract BlupassICO is Owned {
 
         // this smart contract should have enough tokens to distribute
         require(BLU.balanceOf(this) >= tokenBought);
-        
+
         totalDistributed = totalDistributed.add(tokenBought); //Save to total tokens distributed
         BLU.transfer(msg.sender,tokenBought); //Send Tokens to user
         owner.transfer(msg.value); // Send ETH to owner
-        
+
         //LOGS
         emit LogContributorsPayout(msg.sender,tokenBought); // Log investor paid event
         emit LogBeneficiaryPaid(owner); // Log owner paid event
@@ -192,8 +192,8 @@ contract BlupassICO is Owned {
             return false;
         }
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to remove user from whitelist
     // ----------------------------------------------------------------------------
@@ -201,32 +201,32 @@ contract BlupassICO is Owned {
         require(_userAddress != address(0)); // user address must be valid
         // if in the whitelist
         if(whitelist[_userAddress]) {
-           whitelist[_userAddress] = false; 
+           whitelist[_userAddress] = false;
            emit LogBlackListed(_userAddress); // Log blacklist event
            return true;
         } else {
             return false;
         }
-        
+
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to check if user is whitelisted
     // ----------------------------------------------------------------------------
     function checkIfWhiteListed(address _userAddress) view public returns(bool) {
         return whitelist[_userAddress];
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to stop the ICO
     // ----------------------------------------------------------------------------
     function stopICO() onlyOwner public {
         isStopped = true;
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to resume the ICO
     // ----------------------------------------------------------------------------
@@ -242,5 +242,21 @@ contract BlupassICO is Owned {
         uint256 remainder = BLU.balanceOf(this); //Check remainder tokens
         BLU.transfer(owner,remainder); //Transfer tokens to owner
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

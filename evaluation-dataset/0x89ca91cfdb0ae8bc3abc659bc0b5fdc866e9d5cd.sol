@@ -89,15 +89,15 @@ contract Owned {
 
 
 // ----------------------------------------------------------------------------
-/// @notice This contract is a proof of concept only. I appreciate anyone who wants to test it, but the transfer of 
+/// @notice This contract is a proof of concept only. I appreciate anyone who wants to test it, but the transfer of
 ///         is real. I am not responsible for lost funds, so please use only small test amounts with this contract
 /// @dev    The INCH0 token itself is a completely boilerplate ERC20 implementation. All functionality comes from the
 ///         vaultPOC concract
 //
-// InchWorm 300 allows peer to peer betting on the price of Ethereum at 350 Dai. INCH tokens can be traded in 
-// at a constant ratio of ETH/Dai. Buying INCH with Dai is equivalent of shorting, as tokens can always be 
-// traded in for ETH at the same ratio. Unlike Dai, INCH is deflationary, and will always yield the same or 
-// more than the original value in the target token. 
+// InchWorm 300 allows peer to peer betting on the price of Ethereum at 350 Dai. INCH tokens can be traded in
+// at a constant ratio of ETH/Dai. Buying INCH with Dai is equivalent of shorting, as tokens can always be
+// traded in for ETH at the same ratio. Unlike Dai, INCH is deflationary, and will always yield the same or
+// more than the original value in the target token.
 // ----------------------------------------------------------------------------
 contract InchWormPOC is ERC20Interface, Owned {
     using SafeMath for uint;
@@ -123,7 +123,7 @@ contract InchWormPOC is ERC20Interface, Owned {
         emit Transfer(address(0), owner, _totalSupply);
     }
 
-    
+
     // ------------------------------------------------------------------------
     // returns total supply, not counting what has been sent to the burn address, 0x0
     // ------------------------------------------------------------------------
@@ -160,7 +160,7 @@ contract InchWormPOC is ERC20Interface, Owned {
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
     // as this should be implemented in user interfaces
-    /// @notice This function has been modified to only allow tho approval of 100 INCH tokens. This is to encourage 
+    /// @notice This function has been modified to only allow tho approval of 100 INCH tokens. This is to encourage
     ///         the use of small amounts when testing the contract
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns(bool success) {
@@ -225,4 +225,15 @@ contract InchWormPOC is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns(bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

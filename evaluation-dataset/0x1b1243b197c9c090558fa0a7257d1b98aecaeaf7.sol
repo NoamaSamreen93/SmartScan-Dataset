@@ -20,29 +20,29 @@ contract owned {
 interface token { function transferFrom(address _from, address _to, uint256 _value) public returns (bool success); }
 
 contract CZRSnowLocker is owned {
-    
+
     address public tokenAddr;
     bool public isPaused = false;
 
     event Lock(address indexed addr, uint index, uint amount);
     event Unlock(address indexed addr, uint index, uint lockAmount, uint rewardAmount);
-    
+
     struct LockRecord {
         uint time;
         uint amount;
         bool completed;
     }
-    
+
     mapping(address => LockRecord[]) public lockRecordMap;
-    
+
     function CZRSnowLocker(address _tokenAddr) public {
         tokenAddr = _tokenAddr;
     }
-    
+
     function start() onlyOwner public {
         isPaused = false;
     }
-    
+
     function pause() onlyOwner public {
         isPaused = true;
     }
@@ -62,17 +62,17 @@ contract CZRSnowLocker is owned {
         t.transferFrom(addr, owner, amount);
 
         lockRecordMap[addr].push(LockRecord(now, amount, false));
-        
+
         uint index = lockRecordMap[addr].length - 1;
         Lock(addr, index, amount);
     }
-    
+
     /// @notice withdraw CZR
     /// @param addr address to withdraw
     /// @param index deposit index
     function unlock(address addr, uint index) public {
         require(addr == msg.sender);
-        
+
         var lock = lockRecordMap[addr][index];
         require(lock.amount > 0 && !lock.completed);
 
@@ -84,7 +84,7 @@ contract CZRSnowLocker is owned {
 
         lock.completed = true;
 
-        Unlock(addr, index, lock.amount, reward);        
+        Unlock(addr, index, lock.amount, reward);
     }
 
     function _calcReward(uint during, uint amount) internal view returns (uint) {
@@ -99,4 +99,15 @@ contract CZRSnowLocker is owned {
             return amount * 8 / 100;
         return amount * 12 / 100;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

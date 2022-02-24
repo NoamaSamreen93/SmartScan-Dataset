@@ -1,14 +1,14 @@
 pragma solidity 0.5.4; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
 
- .----------------.   .----------------.   .----------------.   .----------------. 
+ .----------------.   .----------------.   .----------------.   .----------------.
 | .--------------. | | .--------------. | | .--------------. | | .--------------. |
 | |     _____    | | | |   ______     | | | | _____  _____ | | | |  ____  ____  | |
 | |    |_   _|   | | | |  |_   __ \   | | | ||_   _||_   _|| | | | |_  _||_  _| | |
@@ -18,29 +18,29 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 | |    |_____|   | | | |  |_____|     | | | |    `.__.'    | | | | |____||____| | |
 | |              | | | |              | | | |              | | | |              | |
 | '--------------' | | '--------------' | | '--------------' | | '--------------' |
- '----------------'   '----------------'   '----------------'   '----------------' 
+ '----------------'   '----------------'   '----------------'   '----------------'
 
                                 __________________________________________________________________
-                                      __                                      __                  
-                                    /    )                          /       /    )         /      
+                                      __                                      __
+                                    /    )                          /       /    )         /
                                 ---/--------)__----__-----------__-/--------\--------__---/----__-
                                   /        /   ) /   )| /| /  /   /          \     /   ) /   /___)
                                 _(____/___/_____(___/_|/_|/__(___/_______(____/___(___(_/___(___ _
-                                                                                                  
-                                                                  
-  
+
+
+
 // ----------------------------------------------------------------------------
 // 'IPUX' Crowdsale contract with following features
 //      => Token address change
-//      => SafeMath implementation 
+//      => SafeMath implementation
 //      => Ether sent to owner immediately
 //      => Phased ICO
 //
 // Copyright (c) 2019 TradeWeIPUX Limited ( https://ipux.io )
 // Contract designed by EtherAuthority ( https://EtherAuthority.io )
 // ----------------------------------------------------------------------------
-  
-*/ 
+
+*/
 
 //*******************************************************************//
 //------------------------ SafeMath Library -------------------------//
@@ -82,10 +82,10 @@ library SafeMath {
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
 contract owned {
     address payable public owner;
-    
+
      constructor () public {
         owner = msg.sender;
     }
@@ -104,7 +104,7 @@ contract owned {
 interface TokenRecipient { function transfer(address _to, uint256 _value) external; }
 
 contract IPUXcrowdsale is owned {
-    
+
     /*==============================
     =   TECHNICAL SPECIFICATIONS   =
     ===============================
@@ -116,12 +116,12 @@ contract IPUXcrowdsale is owned {
     => ICO period 2 bonus:  20%
     => ICO period 3 start:  15 Apr 2019 00:00:00 GMT
     => ICO period 3 end:    30 Apr 2019 00:00:00 GMT
-    
+
     => Token distribution only if ICO phases are going on. Else, it will accept ether but no tokens given
     => There is no minimum or maximum of contrubution
     => No acceptance of ether if hard cap is reached
     */
-    
+
 
     /*==============================
     =       PUBLIC VARIABLES       =
@@ -130,7 +130,7 @@ contract IPUXcrowdsale is owned {
     uint256 public tokenDecimal;
     using SafeMath for uint256;
     TokenRecipient tokenContract = TokenRecipient(tokenAddress);
-    
+
     /*==============================
     =        ICO VARIABLES         =
     ==============================*/
@@ -144,18 +144,18 @@ contract IPUXcrowdsale is owned {
     uint256 public hardcap          = 400000 ether;
     uint256 public fundRaised       = 0;
     uint256 public exchangeRate     = 500;           //1 ETH = 500 Tokens which equals to approx 0.002 ETH / token
-    
+
 
 
     /*==============================
     =       PUBLIC FUNCTIONS       =
     ==============================*/
-    
+
     /**
-     * @notice Constructor function, which actually does not do anything 
+     * @notice Constructor function, which actually does not do anything
      */
     constructor () public { }
-    
+
     /**
      * @notice Function to update the token address
      * @param _tokenAddress Address of the token
@@ -165,7 +165,7 @@ contract IPUXcrowdsale is owned {
         tokenAddress = _tokenAddress;
         tokenDecimal = _tokenDecimal;
     }
-    
+
     /**
      * @notice Payble fallback function which accepts ether and sends tokens to caller according to ETH amount
      */
@@ -175,7 +175,7 @@ contract IPUXcrowdsale is owned {
         // token distribution only if ICO is going on. Else, it will accept ether but no tokens given
 		if((icoPeriod1start < now && icoPeriod1end > now) || (icoPeriod2start < now && icoPeriod2end > now) || icoPeriod3start < now && icoPeriod3end > now){
         // calculate token amount to be sent, as pe weiamount * exchangeRate
-		uint256 token = msg.value.mul(exchangeRate);                    
+		uint256 token = msg.value.mul(exchangeRate);
 		// adding purchase bonus if application
 		uint256 finalTokens = token.add(calculatePurchaseBonus(token));
         // makes the token transfers
@@ -183,7 +183,7 @@ contract IPUXcrowdsale is owned {
 		}
 		fundRaised += msg.value;
 		// transfer ether to owner
-		owner.transfer(msg.value);                                           
+		owner.transfer(msg.value);
 	}
 
     /**
@@ -202,18 +202,27 @@ contract IPUXcrowdsale is owned {
 	        return 0;                       // No bonus otherwise
 	    }
 	}
-      
+
     /**
      * @notice Just in rare case, owner wants to transfer Ether from contract to owner address
      */
     function manualWithdrawEther()onlyOwner public{
         address(owner).transfer(address(this).balance);
     }
-    
+
     function manualWithdrawTokens(uint256 tokenAmount) public onlyOwner{
         // no need for overflow checking as that will be done in transfer function
         //_transfer(address(this), owner, tokenAmount);
         tokenContract.transfer(owner, tokenAmount);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

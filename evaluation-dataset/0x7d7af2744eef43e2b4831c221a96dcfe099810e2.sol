@@ -224,7 +224,7 @@ contract Donate is YouCollectBase {
   uint256 lastBuyBlock;
   uint256 roundDelay = 1999;
   bool started = false;
-    
+
   event TokenSold(uint256 indexed tokenId, uint256 price, address prevOwner, address winner);
 
   /*** CONSTRUCTOR ***/
@@ -252,14 +252,14 @@ contract Donate is YouCollectBase {
     started = true;
     startNextRound();
   }
-  
+
   function startNextRound() public {
     require(started);
     require(lastBuyBlock+roundDelay<block.number);
     tokenIndexToPrice[0] = highestPrice;
     tokenIndexToOwner[0] = nextRoundWinner;
     tokenWinner[0] = tokenIndexToOwner[0];
-    
+
     for (uint index = 1; index <= donateTokenCount; index++) {
       tokenIndexToPrice[index] = 0.001 ether;
       tokenWinner[index] = tokenIndexToOwner[index];
@@ -303,7 +303,7 @@ contract Donate is YouCollectBase {
     }
     // Donation
     donateAddress[_tokenId].transfer(feeThree);
-    // Taxes for last round token winner 
+    // Taxes for last round token winner
     if (tokenWinner[_tokenId]!=address(0))
       tokenWinner[_tokenId].transfer(feeThree);
     // Taxes for universe
@@ -326,9 +326,20 @@ contract Donate is YouCollectBase {
     sellingPrice = tokenIndexToPrice[tokenId];
     owner = tokenIndexToOwner[tokenId];
     nextSellingPrice = getNextPrice(sellingPrice);
-    
+
     _tokenWinner = tokenWinner[tokenId];
     _donateAddress = donateAddress[tokenId];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -249,19 +249,19 @@ interface Provider {
     function getBrickSize() external view returns(uint);
     function getBrick(uint _brickId) external view returns(
         string title,
-        string url, 
+        string url,
         address owner,
         uint value,
         uint32 dateCreated,
-        uint32 dateCompleted, 
+        uint32 dateCompleted,
         uint32 expired,
         uint status
     );
 
     function getBrickDetail(uint _brickId) external view returns(
-        bytes32[] tags, 
-        string description, 
-        uint32 builders, 
+        bytes32[] tags,
+        string description,
+        uint32 builders,
         address[] winners
     );
 
@@ -273,9 +273,9 @@ interface Provider {
     );
 
     function filterBrick(
-        uint _brickId, 
-        bytes32[] _tags, 
-        uint _status, 
+        uint _brickId,
+        bytes32[] _tags,
+        uint _status,
         uint _started,
         uint _expired
         ) external view returns (
@@ -283,12 +283,12 @@ interface Provider {
     );
 
 
-    function participated( 
+    function participated(
         uint _brickId,
         address _builder
         ) external view returns (
         bool
-    ); 
+    );
 }
 
 // solhint-disable-next-line compiler-fixed, compiler-gt-0_4
@@ -301,7 +301,7 @@ interface Provider {
 
 
 contract WeBuildWorldImplementation is Ownable, Provider {
-    using SafeMath for uint256;	
+    using SafeMath for uint256;
     using Dictionary for Dictionary.Data;
 
     enum BrickStatus { Inactive, Active, Completed, Cancelled }
@@ -312,7 +312,7 @@ contract WeBuildWorldImplementation is Ownable, Provider {
         bytes32 key;
         bytes32 nickName;
     }
-    
+
     struct Brick {
         string title;
         string url;
@@ -343,13 +343,13 @@ contract WeBuildWorldImplementation is Ownable, Provider {
 
     function () public payable {
         revert();
-    }    
+    }
 
     function isBrickOwner(uint _brickId, address _address) external view returns (bool success) {
         return bricks[_brickId].owner == _address;
-    }    
+    }
 
-    function addBrick(uint _brickId, string _title, string _url, uint32 _expired, string _description, bytes32[] _tags, uint _value) 
+    function addBrick(uint _brickId, string _title, string _url, uint32 _expired, string _description, bytes32[] _tags, uint _value)
         external onlyMain
         returns (bool success)
     {
@@ -361,13 +361,13 @@ contract WeBuildWorldImplementation is Ownable, Provider {
         Brick memory brick = Brick({
             title: _title,
             url: _url,
-            description: _description,   
+            description: _description,
             tags: _tags,
             // solhint-disable-next-line
             owner: tx.origin,
             status: BrickStatus.Active,
             value: _value,
-            // solhint-disable-next-line 
+            // solhint-disable-next-line
             dateCreated: uint32(now),
             dateCompleted: 0,
             expired: _expired,
@@ -384,9 +384,9 @@ contract WeBuildWorldImplementation is Ownable, Provider {
         return true;
     }
 
-    function changeBrick(uint _brickId, string _title, string _url, string _description, bytes32[] _tags, uint _value) 
+    function changeBrick(uint _brickId, string _title, string _url, string _description, bytes32[] _tags, uint _value)
         external onlyMain
-        returns (bool success) 
+        returns (bool success)
     {
         require(bricks[_brickId].status == BrickStatus.Active);
 
@@ -404,9 +404,9 @@ contract WeBuildWorldImplementation is Ownable, Provider {
     }
 
     // msg.value is tip.
-    function accept(uint _brickId, address[] _winners, uint[] _weights, uint _value) 
+    function accept(uint _brickId, address[] _winners, uint[] _weights, uint _value)
         external onlyMain
-        returns (uint) 
+        returns (uint)
     {
         require(bricks[_brickId].status == BrickStatus.Active);
         require(_winners.length == _weights.length);
@@ -441,9 +441,9 @@ contract WeBuildWorldImplementation is Ownable, Provider {
         return bricks[_brickId].value;
     }
 
-    function cancel(uint _brickId) 
+    function cancel(uint _brickId)
         external onlyMain
-        returns (uint value) 
+        returns (uint value)
     {
         require(bricks[_brickId].status != BrickStatus.Completed);
         require(bricks[_brickId].status != BrickStatus.Cancelled);
@@ -453,7 +453,7 @@ contract WeBuildWorldImplementation is Ownable, Provider {
         return bricks[_brickId].value;
     }
 
-    function startWork(uint _brickId, bytes32 _builderId, bytes32 _nickName, address _builderAddress) 
+    function startWork(uint _brickId, bytes32 _builderId, bytes32 _nickName, address _builderAddress)
         external onlyMain returns(bool success)
     {
         require(_builderAddress != 0x0);
@@ -486,7 +486,7 @@ contract WeBuildWorldImplementation is Ownable, Provider {
 
     function getBrickIds() external view returns(uint[]) {
         return brickIds.keys();
-    }    
+    }
 
     function getBrickSize() external view returns(uint) {
         return brickIds.getSize();
@@ -504,47 +504,47 @@ contract WeBuildWorldImplementation is Ownable, Provider {
             return false;
         }else{
             return true;
-        } 
+        }
     }
 
     function participated(
-        uint _brickId,   
+        uint _brickId,
         address _builder
         )
         external view returns (bool) {
- 
+
         for (uint j = 0; j < bricks[_brickId].numBuilders; j++) {
             if (bricks[_brickId].builders[j].addr == _builder) {
                 return true;
             }
-        } 
+        }
 
         return false;
     }
 
-    
+
     function filterBrick(
-        uint _brickId, 
-        bytes32[] _tags, 
-        uint _status, 
+        uint _brickId,
+        bytes32[] _tags,
+        uint _status,
         uint _started,
         uint _expired
         )
-        external view returns (bool) {  
-        Brick memory brick = bricks[_brickId];  
+        external view returns (bool) {
+        Brick memory brick = bricks[_brickId];
 
-        bool satisfy = _matchedTags(_tags, brick.tags);  
+        bool satisfy = _matchedTags(_tags, brick.tags);
 
         if(_started > 0){
             satisfy = brick.dateCreated >= _started;
         }
-        
+
         if(_expired > 0){
             satisfy = brick.expired >= _expired;
         }
- 
+
         return satisfy && (uint(brick.status) == _status
-            || uint(BrickStatus.Cancelled) < _status 
+            || uint(BrickStatus.Cancelled) < _status
             || uint(BrickStatus.Inactive) > _status);
     }
 
@@ -570,17 +570,17 @@ contract WeBuildWorldImplementation is Ownable, Provider {
             uint(brick.status)
         );
     }
-    
+
     function getBrickDetail(uint _brickId) external view returns (
         bytes32[] tags,
-        string description, 
+        string description,
         uint32 builders,
         address[] winners
     ) {
         Brick memory brick = bricks[_brickId];
-        return ( 
-            brick.tags, 
-            brick.description, 
+        return (
+            brick.tags,
+            brick.description,
             brick.numBuilders,
             brick.winners
         );
@@ -605,10 +605,26 @@ contract WeBuildWorldImplementation is Ownable, Provider {
             keys[i] = bricks[_brickId].builders[i].key;
             names[i] = bricks[_brickId].builders[i].nickName;
         }
-    }    
+    }
 
     function setMain(address _address) public onlyOwner returns(bool) {
         main = _address;
         return true;
-    }     
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

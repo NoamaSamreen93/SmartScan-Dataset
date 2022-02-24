@@ -1,27 +1,27 @@
 pragma solidity ^0.4.11;
 
 interface IERC20{
-    
+
 function totalSupply() constant returns (uint256 totalSupply);
 
 function CirculatingSupply() constant returns (uint256 _CirculatingSupply);
-    
-function balanceOf(address _owner) constant returns (uint256 balance);
-   
-function transfer(address _to, uint256 _value) returns (bool success);
-   
-function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-    
-function approve(address _spender, uint256 _value) returns (bool success);
-    
-function allowance(address _owner, address _spender) constant returns (uint256 remaining);
-   
-event Transfer(address indexed _from, address indexed _to, uint256 _value);
-  
-event Approval(address indexed _owner, address indexed _spender, uint256 _value);
- 
 
-} 
+function balanceOf(address _owner) constant returns (uint256 balance);
+
+function transfer(address _to, uint256 _value) returns (bool success);
+
+function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
+
+function approve(address _spender, uint256 _value) returns (bool success);
+
+function allowance(address _owner, address _spender) constant returns (uint256 remaining);
+
+event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
+event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
+
+}
 
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -50,7 +50,7 @@ library SafeMath {
 }
 
 contract NewYearToken is IERC20{
-    
+
     using SafeMath for uint256;
     string public constant symbol = "NYT";
     string public constant name = "New Year Token";
@@ -58,38 +58,38 @@ contract NewYearToken is IERC20{
     uint private supplay= 0;
     uint private _CirculatingSupply = 0;
     uint private _MaxSupply=1000000000000000000000000;
-    
-   
+
+
     uint256 private constant RATE1 = 2000;
     uint256 private constant RATE2 = 1000;
     address public owner=0xC6D3a0704c169344c758915ed406eBA707DB1e76;
-    
+
     uint private constant preicot=1513765800;
     uint private constant preicote=1514242799;
-    
+
     uint private constant icot=1514370600;
     uint private constant icote=1515020399;
-    
-    
+
+
     mapping(address=> uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function () payable{
-    
+
     if(now<=preicote){
-     createTokens();  
+     createTokens();
     }
     else {
         createTokens1();
     }
-    
-      
+
+
     }
-   
+
     function NewYearToken(){
         supplay = supplay.add(200000000000000000000000);
     }
-  
+
     function createTokens() payable{
          uint tokens = msg.value.mul(RATE1);
             require(msg.value > 0 && supplay+tokens<=_MaxSupply && now>=preicot && now<=preicote);
@@ -98,7 +98,7 @@ contract NewYearToken is IERC20{
             supplay = supplay.add(tokens);
             owner.transfer(msg.value);
     }
-    
+
     function createTokens1() payable{
          uint tokens = msg.value.mul(RATE2);
             require(msg.value > 0 && supplay+tokens<=_MaxSupply && now>=icot && now<=icote);
@@ -107,13 +107,13 @@ contract NewYearToken is IERC20{
             supplay = supplay.add(tokens);
             owner.transfer(msg.value);
     }
-    
-    
+
+
     function totalSupply() constant returns (uint256 totalSupply){
-       return _MaxSupply;  
+       return _MaxSupply;
      }
       function CirculatingSupply() constant returns (uint256 CirculatingSupply){
-       return _CirculatingSupply;  
+       return _CirculatingSupply;
      }
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
@@ -128,7 +128,7 @@ contract NewYearToken is IERC20{
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function withdrawfunds() returns (bool seccess){
         require(owner==msg.sender);
         balances[owner] = balances[owner].add(200000000000000000000000);
@@ -146,7 +146,7 @@ contract NewYearToken is IERC20{
         owner=_owner;
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
         require(
             allowed[_from][msg.sender] >= _value
@@ -169,5 +169,16 @@ contract NewYearToken is IERC20{
     }
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -436,3 +436,9 @@ pragma solidity ^0.4.21;
             return super.mint(_to, _amount);
         }
     }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

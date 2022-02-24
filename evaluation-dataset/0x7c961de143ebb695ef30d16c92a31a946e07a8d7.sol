@@ -134,3 +134,7 @@ contract GYUToken is StandardToken {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

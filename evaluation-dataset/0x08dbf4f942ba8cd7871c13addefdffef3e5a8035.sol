@@ -19,7 +19,7 @@ contract Ownable {
 
 }
 
-contract Vault is Ownable { 
+contract Vault is Ownable {
 
     function () public payable {
 
@@ -40,7 +40,7 @@ contract Vault is Ownable {
 }
 
 
-contract CappedVault is Vault { 
+contract CappedVault is Vault {
 
     uint public limit;
     uint withdrawn = 0;
@@ -79,7 +79,7 @@ contract PreviousInterface {
 }
 
 contract Pausable is Ownable {
-    
+
     event Pause();
     event Unpause();
 
@@ -192,14 +192,14 @@ contract CardBase is Governable {
     }
 
     Card[] public cards;
-    
+
 }
 
 contract CardProto is CardBase {
 
     event NewProtoCard(
-        uint16 id, uint8 season, uint8 god, 
-        Rarity rarity, uint8 mana, uint8 attack, 
+        uint16 id, uint8 season, uint8 god,
+        Rarity rarity, uint8 mana, uint8 attack,
         uint8 health, uint8 cardType, uint8 tribe, bool packable
     );
 
@@ -252,7 +252,7 @@ contract CardProto is CardBase {
 
     function nextSeason() public onlyGovernor {
         //Seasons shouldn't go to 0 if there is more than the uint8 should hold, the governor should know this ¯\_(ツ)_/¯ -M
-        require(currentSeason <= 255); 
+        require(currentSeason <= 255);
 
         currentSeason++;
         mythic.length = 0;
@@ -266,7 +266,7 @@ contract CardProto is CardBase {
         Common,
         Rare,
         Epic,
-        Legendary, 
+        Legendary,
         Mythic
     }
 
@@ -294,7 +294,7 @@ contract CardProto is CardBase {
     // rather than 1 byte per instance
 
     uint16 public protoCount;
-    
+
     mapping(uint16 => ProtoCard) protos;
 
     uint16[] public mythic;
@@ -304,7 +304,7 @@ contract CardProto is CardBase {
     uint16[] public common;
 
     function addProtos(
-        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks, 
+        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks,
         uint8[] healths, uint8[] cardTypes, uint8[] tribes, bool[] packable
     ) public onlyGovernor returns(uint16) {
 
@@ -324,7 +324,7 @@ contract CardProto is CardBase {
 
             _addProto(externalIDs[i], card, packable[i]);
         }
-        
+
     }
 
     function addProto(
@@ -411,8 +411,8 @@ contract CardProto is CardBase {
         protoCount++;
 
         emit NewProtoCard(
-            externalID, currentSeason, card.god, 
-            card.rarity, card.mana, card.attack, 
+            externalID, currentSeason, card.god,
+            card.rarity, card.mana, card.attack,
             card.health, card.cardType, card.tribe, packable
         );
 
@@ -621,7 +621,7 @@ contract PresalePackThree is CardPackThree, Pausable {
 
     function basePrice() public returns (uint);
     function getCardDetails(uint16 packIndex, uint8 cardIndex, uint result) public view returns (uint16 proto, uint16 purity);
-    
+
     function packSize() public view returns (uint8) {
         return 5;
     }
@@ -662,8 +662,8 @@ contract PresalePackThree is CardPackThree, Pausable {
             price -= commission;
             emit Referral(referrer, commission, msg.sender);
         }
-        
-        address(vault).transfer(price); 
+
+        address(vault).transfer(price);
     }
 
     // can be called by anybody
@@ -696,7 +696,7 @@ contract PresalePackThree is CardPackThree, Pausable {
     }
 
     function claim(uint id) public {
-        
+
         Purchase storage p = purchases[id];
 
         require(canClaim);
@@ -786,7 +786,7 @@ contract PresalePackThree is CardPackThree, Pausable {
             return CardProto.Rarity.Epic;
         } else {
             return CardProto.Rarity.Rare;
-        } 
+        }
     }
 
     function _getEpicPlusRarity(uint32 rand) internal pure returns (CardProto.Rarity) {
@@ -804,7 +804,7 @@ contract PresalePackThree is CardPackThree, Pausable {
             return CardProto.Rarity.Mythic;
         } else {
             return CardProto.Rarity.Legendary;
-        } 
+        }
     }
 
     bool public canClaim = true;
@@ -841,8 +841,8 @@ contract PackMultiplier is PresalePackThree {
 
     uint16 public packLimit = 5;
 
-    constructor(PreviousInterface _old, address[] _packs, MigrationInterface _core, CappedVault vault, FirstPheonix _pheonix) 
-        public PresalePackThree(_core, vault) 
+    constructor(PreviousInterface _old, address[] _packs, MigrationInterface _core, CappedVault vault, FirstPheonix _pheonix)
+        public PresalePackThree(_core, vault)
     {
         packs = _packs;
         pheonix = _pheonix;
@@ -920,14 +920,14 @@ contract PackMultiplier is PresalePackThree {
 
 }
 contract RarePackThree is PackMultiplier {
-    
+
     function basePrice() public returns (uint) {
         return 12 finney;
     }
 
-    constructor(PreviousInterface _old, address[] _packs, MigrationInterface _core, CappedVault vault, FirstPheonix _pheonix) 
+    constructor(PreviousInterface _old, address[] _packs, MigrationInterface _core, CappedVault vault, FirstPheonix _pheonix)
         public PackMultiplier(_old, _packs, _core, vault, _pheonix) {
-        
+
     }
 
     function getCardDetails(uint16 packIndex, uint8 cardIndex, uint result) public view returns (uint16 proto, uint16 purity) {
@@ -947,9 +947,20 @@ contract RarePackThree is PackMultiplier {
         }
 
         purity = _getPurity(purityOne, purityTwo);
-    
+
         proto = migration.getRandomCard(rarity, protoRandom);
         return (proto, purity);
-    }  
-    
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

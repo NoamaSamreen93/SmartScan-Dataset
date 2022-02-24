@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a * b;
-        assert(a == 0 || c / a == b); 
+        assert(a == 0 || c / a == b);
         return c;
     }
 
@@ -30,7 +30,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -40,7 +40,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(owner==msg.sender);
@@ -49,14 +49,14 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
       owner = newOwner;
   }
- 
+
 }
-  
+
 contract ERC20 {
 
     function totalSupply() public constant returns (uint256);
@@ -96,9 +96,9 @@ contract CBITToken is Ownable, ERC20 {
 
     // Owner of account approves the transfer of an amount to another account
     mapping (address => mapping(address => uint256)) allowed;
-    
+
     // start and end timestamps where investments are allowed (both inclusive)
-    uint256 public startTime; 
+    uint256 public startTime;
 
     // Wallet Address of Token
     address public multisig;
@@ -110,8 +110,8 @@ contract CBITToken is Ownable, ERC20 {
 
     uint256 public maxCap = 81000 ether;
     uint256 public minCap = 450 ether;
-    
-    //number of total tokens sold 
+
+    //number of total tokens sold
     uint256 public totalNumberTokenSold=0;
 
     bool public tradable = false;
@@ -138,7 +138,7 @@ contract CBITToken is Ownable, ERC20 {
     // Payable method
     // @notice Anyone can buy the tokens on tokensale by paying ether
     function () external payable {
-        
+
         tokensale(msg.sender);
     }
 
@@ -151,20 +151,20 @@ contract CBITToken is Ownable, ERC20 {
         price = getPrice();
         uint256 weiAmount = msg.value;
         uint256 tokenToSend = weiAmount.mul(price);
-        
+
         require(tokenToSend > 0);
         require(_icoSupply >= tokenToSend);
-        
+
         balances[multisig] = balances[multisig].sub(tokenToSend);
         balances[recipient] = balances[recipient].add(tokenToSend);
-        
+
         totalNumberTokenSold=totalNumberTokenSold.add(tokenToSend);
         _icoSupply = _icoSupply.sub(tokenToSend);
 
 	    multisig.transfer(msg.value);
         TokenPurchase(msg.sender, recipient, weiAmount, tokenToSend);
     }
-    
+
     // Token distribution to Team
     function sendICOSupplyToken(address to, uint256 value) public onlyOwner {
         require (
@@ -190,7 +190,7 @@ contract CBITToken is Ownable, ERC20 {
         _teamSupply = _teamSupply.sub(value);
         Transfer(multisig, to, value);
     }
-    
+
     // Token distribution to Community
     function sendCommunitySupplyToken(address to, uint256 value) public onlyOwner {
         require (
@@ -203,7 +203,7 @@ contract CBITToken is Ownable, ERC20 {
         _communitySupply = _communitySupply.sub(value);
         Transfer(multisig, to, value);
     }
-    
+
     // Token distribution to Bounty
     function sendBountySupplyToken(address to, uint256 value) public onlyOwner {
         require (
@@ -216,7 +216,7 @@ contract CBITToken is Ownable, ERC20 {
         _bountySupply = _bountySupply.sub(value);
         Transfer(multisig, to, value);
     }
-    
+
     // Token distribution to Ecosystem
     function sendEcosysSupplyToken(address to, uint256 value) public onlyOwner {
         require (
@@ -229,7 +229,7 @@ contract CBITToken is Ownable, ERC20 {
         _ecosysSupply = _ecosysSupply.sub(value);
         Transfer(multisig, to, value);
     }
-    
+
     // Start or pause tradable to Transfer token
     function startTradable(bool _tradable) public onlyOwner {
         tradable = _tradable;
@@ -239,7 +239,7 @@ contract CBITToken is Ownable, ERC20 {
     function totalSupply() public constant returns (uint256) {
         return _totalSupply;
     }
-    
+
     // @return total tokens supplied
     function totalNumberTokenSold() public view returns (uint256) {
         return totalNumberTokenSold;
@@ -303,7 +303,7 @@ contract CBITToken is Ownable, ERC20 {
     function allowance(address _owner, address spender) public constant returns (uint256) {
         return allowed[_owner][spender];
     }
-    
+
         // Get current price of a Token
     // @return the price or token value for a ether
     function getPrice() public view returns (uint result) {
@@ -319,9 +319,18 @@ contract CBITToken is Ownable, ERC20 {
             return 0;
         }
     }
-    
+
     function getTokenDetail() public view returns (string, string, uint256, uint256, uint256, uint256, uint256, uint256, uint256) {
         return (name, symbol, _totalSupply, totalNumberTokenSold, _icoSupply, _teamSupply, _communitySupply, _bountySupply, _ecosysSupply);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

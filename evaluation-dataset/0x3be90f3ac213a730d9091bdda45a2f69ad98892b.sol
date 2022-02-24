@@ -505,7 +505,7 @@ contract MiniMeToken is Controlled {
                oldCheckPoint.value = uint128(_value);
            }
     }
-    
+
     /// @dev Internal function to determine if an address is a contract
     /// @param _addr The address being queried
     /// @return True if `_addr` is a contract
@@ -673,4 +673,15 @@ contract HEX is MiniMeToken {
     }
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

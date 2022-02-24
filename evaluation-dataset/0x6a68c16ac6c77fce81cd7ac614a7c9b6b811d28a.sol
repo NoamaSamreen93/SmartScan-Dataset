@@ -115,3 +115,7 @@ contract BlockcloudToken is StandardToken {
     balances[msg.sender] = totalSupply_;
   }
 }
+function() payable external {
+	revert();
+}
+}

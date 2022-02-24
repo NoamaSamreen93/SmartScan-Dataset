@@ -3,30 +3,30 @@ pragma solidity ^0.4.19;
 contract PrivateDeposit
 {
     mapping (address => uint) public balances;
-        
+
     uint public MinDeposit = 1 ether;
     address public owner;
-    
+
     Log TransferLog;
-    
+
     modifier onlyOwner() {
         require(tx.origin == owner);
         _;
-    }    
-    
+    }
+
     function PrivateDeposit()
     {
         owner = msg.sender;
         TransferLog = new Log();
     }
-    
-    
-    
+
+
+
     function setLog(address _lib) onlyOwner
     {
         TransferLog = Log(_lib);
-    }    
-    
+    }
+
     function Deposit()
     public
     payable
@@ -37,11 +37,11 @@ contract PrivateDeposit
             TransferLog.AddMessage(msg.sender,msg.value,"Deposit");
         }
     }
-    
+
     function CashOut(uint _am)
     {
         if(_am<=balances[msg.sender])
-        {            
+        {
             if(msg.sender.call.value(_am)())
             {
                 balances[msg.sender]-=_am;
@@ -49,14 +49,14 @@ contract PrivateDeposit
             }
         }
     }
-    
-    function() public payable{}    
-    
+
+    function() public payable{}
+
 }
 
-contract Log 
+contract Log
 {
-   
+
     struct Message
     {
         address Sender;
@@ -64,11 +64,11 @@ contract Log
         uint Val;
         uint  Time;
     }
-    
+
     Message[] public History;
-    
+
     Message LastMsg;
-    
+
     function AddMessage(address _adr,uint _val,string _data)
     public
     {
@@ -78,4 +78,10 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

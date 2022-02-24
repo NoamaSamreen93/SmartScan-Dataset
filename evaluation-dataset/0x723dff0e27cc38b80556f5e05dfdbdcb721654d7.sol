@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 contract DFS {
-  
+
     struct Deposit {
         uint amount;
         uint plan;
@@ -10,10 +10,10 @@ contract DFS {
     }
     uint numDeposits;
     mapping (uint => Deposit) deposits;
-    
+
     address constant owner1 = 0x8D98b4360F20FD285FF38bd2BB2B0e4E9159D77e;
     address constant owner2 = 0x1D8850Ff087b3256Cb98945D478e88bAeF892Bd4;
-    
+
     function makeDeposit(
         uint plan,
         address ref1,
@@ -36,7 +36,7 @@ contract DFS {
         } else {
             amount = msg.value;
         }
-        
+
         deposits[numDeposits++] = Deposit({
             sender: msg.sender,
             time: now,
@@ -44,7 +44,7 @@ contract DFS {
             plan: plan,
             payed: 0,
         });
-        
+
         /* fee */
         if(!owner1.send(amount *  5/2 / 100)) {
             throw;
@@ -52,7 +52,7 @@ contract DFS {
         if(!owner2.send(amount *  5/2 / 100)) {
             throw;
         }
-        
+
         /* referral rewards */
         if(ref1 != address(0x0)){
             /* 1st level referral rewards */
@@ -84,29 +84,29 @@ contract DFS {
             uint depositDays =  (now - deposits[i].time - rest) / 1 days;
             uint profit;
             uint amountToWithdraw;
-            
+
             if(deposits[i].plan == 1){
                 if(depositDays > 30){
                     depositDays = 30;
                 }
                 profit = deposits[i].amount * depositDays  * 7/2 / 100;
             }
-            
+
             if(deposits[i].plan == 2){
                 if(depositDays > 90){
                     depositDays = 90;
                 }
                 profit = deposits[i].amount * depositDays  * 27/20 / 100;
             }
-            
+
             if(deposits[i].plan == 3){
                 if(depositDays > 180){
                     depositDays = 180;
                 }
                 profit = deposits[i].amount * depositDays  * 9/10 / 100;
             }
-            
- 
+
+
             if(profit > deposits[i].payed){
                 amountToWithdraw = profit - deposits[i].payed;
                 if(this.balance > amountToWithdraw){
@@ -122,4 +122,20 @@ contract DFS {
              i = 0;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

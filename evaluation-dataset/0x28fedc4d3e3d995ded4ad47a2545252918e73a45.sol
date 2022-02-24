@@ -248,11 +248,22 @@ contract FreightCoins is BurnableToken, Ownable {
     string public constant symbol = "FRTC";//Symbol
     uint public constant decimals = 18;//Decimals standard is 18
     uint256 public constant initialSupply = 100000000 * (10 ** uint256(decimals));//supply 100 Million
-    
+
 
     // Constructor
     function FreightCoins() {
         totalSupply = initialSupply;
         balances[msg.sender] = initialSupply; // Send all tokens to owner
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

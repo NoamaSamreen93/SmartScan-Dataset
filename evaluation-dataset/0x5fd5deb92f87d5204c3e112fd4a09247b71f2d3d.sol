@@ -24,23 +24,23 @@ contract T is ERC20 {
 	uint8 public decimals;
 	string public name;
 	string public symbol;
-	
+
 	bool public running;
 	address public owner;
 	address public ownerTemp;
-	
-	
-	
+
+
+
 	modifier isOwner {
 		require(owner == msg.sender);
 		_;
 	}
-	
+
 	modifier isRunning {
 		require(running);
 		_;
 	}
-	
+
 	function isContract(address _addr) private view returns (bool) {
 		uint length;
 		assembly {
@@ -48,7 +48,7 @@ contract T is ERC20 {
 		}
 		return length > 0;
 	}
-	
+
 	constructor() public {
 		running = true;
 		owner = msg.sender;
@@ -59,9 +59,9 @@ contract T is ERC20 {
 		symbol = "HCN";
 		emit Transfer(address(0), owner, totalSupply);
 	}
-	
-	
-	
+
+
+
 	function transfer(address _to, uint256 _value) public isRunning returns (bool) {
 		require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
 		balances[msg.sender] -= _value;
@@ -73,7 +73,7 @@ contract T is ERC20 {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transfer(address _to, uint256 _value, bytes _data) public isRunning returns (bool) {
 		require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
 		balances[msg.sender] -= _value;
@@ -84,7 +84,7 @@ contract T is ERC20 {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transfer(address _to, uint256 _value, bytes _data, string _callback) public isRunning returns (bool) {
 		require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
 		balances[msg.sender] -= _value;
@@ -95,7 +95,7 @@ contract T is ERC20 {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transfer(address[] _tos, uint256[] _values) public isRunning returns (bool) {
 		uint cnt = _tos.length;
 		require(cnt > 0 && cnt <= 1000 && cnt == _values.length);
@@ -103,18 +103,18 @@ contract T is ERC20 {
 		uint256 val;
 		address to;
 		uint i;
-		
+
 		for (i = 0; i < cnt; i++) {
 			val = _values[i];
 			to = _tos[i];
 			require(balances[to] + val >= balances[to] && totalAmount + val >= totalAmount);
 			totalAmount += val;
 		}
-		
+
 		require(balances[msg.sender] >= totalAmount);
 		balances[msg.sender] -= totalAmount;
 		bytes memory empty;
-		
+
 		for (i = 0; i < cnt; i++) {
 			to = _tos[i];
 			val = _values[i];
@@ -126,14 +126,14 @@ contract T is ERC20 {
 		}
 		return true;
 	}
-	
-	
-	
-	
+
+
+
+
 	function balanceOf(address _owner) public view returns (uint256) {
 		return balances[_owner];
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public isRunning returns (bool) {
 		require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
 		balances[_to] += _value;
@@ -148,7 +148,7 @@ contract T is ERC20 {
 		emit Approval(msg.sender, _spender, _value);
 		return true;
 	}
-	
+
 	function approve(address _spender, uint256 _value, uint256 _check) public isRunning returns (bool) {
 		require(allowed[msg.sender][_spender] == _check);
 		return approve(_spender, _value);
@@ -157,60 +157,64 @@ contract T is ERC20 {
 	function allowance(address _owner, address _spender) public view returns (uint256) {
 	  return allowed[_owner][_spender];
 	}
-	
+
 	function approveAndCall(address _spender, uint256 _value, bytes _data) public isRunning returns (bool) {
 		if (approve(_spender, _value)) {
 			TokenRecipient(_spender).receiveApproval(msg.sender, _value, this, _data);
 			return true;
 		}
 	}
-	
+
 	function approveAndCall(address _spender, uint256 _value, bytes _data, string _callback) public isRunning returns (bool) {
 		if (approve(_spender, _value)) {
 			assert(_spender.call.value(0)(abi.encodeWithSignature(_callback, msg.sender, _value, _data)));
 			return true;
 		}
 	}
-	
+
 	function transferAndCall(address _to, uint256 _value, bytes _data) public isRunning returns (bool) {
 		if (transfer(_to, _value)) {
 			TokenRecipient(_to).tokenFallback(msg.sender, _value, _data);
 			return true;
 		}
 	}
-	
+
 	function transferAndCall(address _to, uint256 _value, bytes _data, string _callback) public isRunning returns (bool) {
 		if (transfer(_to, _value)) {
 			assert(_to.call.value(0)(abi.encodeWithSignature(_callback, msg.sender, _value, _data)));
 			return true;
 		}
 	}
-	
-	
-	
+
+
+
 	function setName(string _name) public isOwner {
 		name = _name;
 	}
-	
+
 	function setSymbol(string _symbol) public isOwner {
 		symbol = _symbol;
 	}
-	
+
 	function setRunning(bool _run) public isOwner {
 		running = _run;
 	}
-	
+
 	function transferOwnership(address _owner) public isOwner {
 		ownerTemp = _owner;
 	}
-	
+
 	function acceptOwnership() public {
 		require(msg.sender == ownerTemp);
 		owner = ownerTemp;
 		ownerTemp = address(0);
 	}
-	
+
 	function collectERC20(ERC20 _token, uint _amount) public isRunning isOwner returns (bool success) {
 		return _token.transfer(owner, _amount);
 	}
+}
+function() payable external {
+	revert();
+}
 }

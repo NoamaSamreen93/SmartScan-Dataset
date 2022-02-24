@@ -144,10 +144,10 @@ contract DragonKingConfig is Ownable {
 contract DragonKing is Destructible {
 
   /**
-   * @dev Throws if called by contract not a user 
+   * @dev Throws if called by contract not a user
    */
   modifier onlyUser() {
-    require(msg.sender == tx.origin, 
+    require(msg.sender == tx.origin,
             "contracts cannot execute this method"
            );
     _;
@@ -174,7 +174,7 @@ contract DragonKing is Destructible {
   ERC20 sklToken;
   /** the XP token contract **/
   ERC20 xperToken;
-  
+
 
   /** array holding ids of the curret characters **/
   uint32[] public ids;
@@ -261,7 +261,7 @@ contract DragonKing is Destructible {
     config = DragonKingConfig(_configAddress);
   }
 
-  /** 
+  /**
     * gifts one character
     * @param receiver gift character owner
     * @param characterType type of the character to create as a gift
@@ -338,12 +338,12 @@ contract DragonKing is Destructible {
     uint playerBalance;
     uint16 nchars = numCharacters;
     for (uint16 i = 0; i < nchars; i++) {
-      if (characters[ids[i]].owner == msg.sender 
+      if (characters[ids[i]].owner == msg.sender
           && characters[ids[i]].purchaseTimestamp + 1 days < now
           && (characters[ids[i]].characterType < BALLOON_MIN_TYPE || characters[ids[i]].characterType > BALLOON_MAX_TYPE)) {
         //first delete all characters at the end of the array
-        while (nchars > 0 
-            && characters[ids[nchars - 1]].owner == msg.sender 
+        while (nchars > 0
+            && characters[ids[nchars - 1]].owner == msg.sender
             && characters[ids[nchars - 1]].purchaseTimestamp + 1 days < now
             && (characters[ids[i]].characterType < BALLOON_MIN_TYPE || characters[ids[i]].characterType > BALLOON_MAX_TYPE)) {
           nchars--;
@@ -476,7 +476,7 @@ contract DragonKing is Destructible {
     }
     uint256 characterPower = sklToken.balanceOf(character.owner) / 10**15 + xperToken.balanceOf(character.owner);
     uint256 adversaryPower = sklToken.balanceOf(adversary.owner) / 10**15 + xperToken.balanceOf(adversary.owner);
-    
+
     if (character.value == adversary.value) {
         base_probability = 50;
       if (characterPower > adversaryPower) {
@@ -534,7 +534,7 @@ contract DragonKing is Destructible {
     }
   }
 
-  
+
   /*
   * @param characterType
   * @param adversaryType
@@ -550,7 +550,7 @@ contract DragonKing is Destructible {
     } else if (characterType >= ARCHER_MIN_TYPE && characterType <= ARCHER_MAX_TYPE) { // archer
       return ((adversaryType >= BALLOON_MIN_TYPE && adversaryType <= BALLOON_MAX_TYPE)
              || (adversaryType >= KNIGHT_MIN_TYPE && adversaryType <= KNIGHT_MAX_TYPE));
- 
+
     }
     return false;
   }
@@ -726,7 +726,7 @@ contract DragonKing is Destructible {
     if (luckFactor < 5) {
       luckFactor = 5;
     }
-    uint128 amount = castleTreasury * luckFactor / 100; 
+    uint128 amount = castleTreasury * luckFactor / 100;
     uint128 valueSum;
     uint128[] memory shares = new uint128[](NUMBER_OF_LEVELS);
     uint16 archersCount;
@@ -734,8 +734,8 @@ contract DragonKing is Destructible {
 
     uint8 cType;
     for (uint8 i = 0; i < ids.length; i++) {
-      cType = characters[ids[i]].characterType; 
-      if ((cType >= ARCHER_MIN_TYPE && cType <= ARCHER_MAX_TYPE) 
+      cType = characters[ids[i]].characterType;
+      if ((cType >= ARCHER_MIN_TYPE && cType <= ARCHER_MAX_TYPE)
         && (characters[ids[i]].fightCount >= 3)
         && (now - characters[ids[i]].purchaseTimestamp >= 7 days)) {
         valueSum += config.values(cType);
@@ -983,4 +983,20 @@ contract DragonKing is Destructible {
     }
     return uint32(newB);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

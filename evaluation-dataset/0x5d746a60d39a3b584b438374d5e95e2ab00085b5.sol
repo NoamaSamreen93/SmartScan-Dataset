@@ -403,3 +403,7 @@ contract SLSToken is FinalizableToken, TokenConfig {
     }
 
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

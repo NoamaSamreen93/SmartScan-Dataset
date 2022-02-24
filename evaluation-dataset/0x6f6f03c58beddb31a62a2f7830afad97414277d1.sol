@@ -113,8 +113,8 @@ library SafeMath {
  * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
  * Originally based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
- 
- 
+
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -371,7 +371,7 @@ contract ERC20Mintable is ERC20, Ownable {
         _mint(to, value);
         return true;
     }
-	
+
 	function transferInvestingContract(address newContract) public onlyOwner {
         require(newContract != address(0));
         investingContract = newContract;
@@ -393,4 +393,10 @@ contract LoanyToken is ERC20, ERC20Detailed, ERC20Mintable {
     {
 
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

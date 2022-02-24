@@ -174,33 +174,42 @@ pragma solidity 0.5.4;
 
 
 contract Airdrop is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     IERC20 public token;
-    
+
     constructor(address _tokenAddress)public {
         require(_tokenAddress != address(0));
-        
+
         token = IERC20(_tokenAddress);
     }
-    
+
     function multisend(
-        address[] calldata dests, 
+        address[] calldata dests,
         uint256[] calldata values
-    ) 
-        external 
-        onlyOwner 
+    )
+        external
+        onlyOwner
     {
         require(
-            dests.length == values.length, 
+            dests.length == values.length,
             "Number of addresses and values should be same"
         );
-                
+
         for(uint256 i = 0; i<dests.length; i = i.add(1)) {
             require(
                 token.transferFrom(msg.sender, dests[i], values[i])
             );
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

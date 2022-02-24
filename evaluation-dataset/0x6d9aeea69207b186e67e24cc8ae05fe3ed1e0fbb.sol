@@ -216,8 +216,8 @@ contract DateTime {
 
 // Copyrobo contract for notarization
 contract ProofOfExistence {
-    
-    
+
+
     function uintToBytes(uint v) constant returns (bytes32 ret) {
         if (v == 0) {
             ret = '0';
@@ -231,7 +231,7 @@ contract ProofOfExistence {
         }
         return ret;
     }
-    
+
     function bytes32ToString(bytes32 x) constant returns (string) {
         bytes memory bytesString = new bytes(32);
         uint charCount = 0;
@@ -248,12 +248,12 @@ contract ProofOfExistence {
         }
         return string(bytesStringTrimmed);
     }
-    
+
     function uintToString(uint16 x) constant returns (string) {
         bytes32 a = uintToBytes(x);
         return bytes32ToString(a);
     }
-    
+
 function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
     bytes memory _ba = bytes(_a);
     bytes memory _bb = bytes(_b);
@@ -282,14 +282,14 @@ function strConcat(string _a, string _b, string _c) internal returns (string) {
 function strConcat(string _a, string _b) internal returns (string) {
     return strConcat(_a, _b, "", "", "");
 }
-   
+
   // string: sha256 of document
-  // unit : timestamp 
+  // unit : timestamp
   mapping (string => uint) private proofs;
 
   function notarize(string sha256) {
     // validate it has 64 characters
-    
+
     if ( bytes(sha256).length == 64 ){
       // check if it is existing, don't save it
       if ( proofs[sha256] == 0 ){
@@ -297,7 +297,7 @@ function strConcat(string _a, string _b) internal returns (string) {
       }
     }
   }
-  
+
   // Input sha256 hash string to check
   function verify(string sha256) constant returns (uint16,uint16,uint16,uint16,uint16,uint16) {
     var timestamp =  proofs[sha256];
@@ -305,7 +305,7 @@ function strConcat(string _a, string _b) internal returns (string) {
         return (0,0,0,0,0,0);
     }else{
         DateTime dt = DateTime(msg.sender);
-        
+
         uint16 year = dt.getYear(timestamp);
         uint16 month = dt.getMonth(timestamp);
         uint16 day = dt.getDay(timestamp);
@@ -313,15 +313,15 @@ function strConcat(string _a, string _b) internal returns (string) {
         uint16 minute = dt.getMinute(timestamp);
         uint16 second = dt.getSecond(timestamp);
         return  (year, month,day,hour,minute,second);
-        
+
         // string  memory result = strConcat(bytes32ToString(year) , "-" , bytes32ToString(month),"-",bytes32ToString(day));
         // result = strConcat(result," ");
         // result = strConcat( bytes32ToString(hour) , ":" , bytes32ToString(minute),":",bytes32ToString(second));
         // result = strConcat(result," UTC") ;
-        
-        
-        
-        
+
+
+
+
 
 
         // //UTC Format: 2013-10-26 14:37:48 UTC
@@ -329,5 +329,13 @@ function strConcat(string _a, string _b) internal returns (string) {
         // return result;
     }
   }
-  
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

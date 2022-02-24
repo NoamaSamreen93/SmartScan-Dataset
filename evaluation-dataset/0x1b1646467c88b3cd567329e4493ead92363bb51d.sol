@@ -14,8 +14,8 @@ contract Pedro_ERC20Token {
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
     */
-    constructor() 
-    public 
+    constructor()
+    public
     {
         owner = msg.sender;
         totalSupply_ = INITIAL_SUPPLY;
@@ -37,7 +37,7 @@ contract Pedro_ERC20Token {
     * `private` function doing the actual work, and a `external`
     * wrapper marked as `nonReentrant`.
     */
-    modifier nonReentrant() 
+    modifier nonReentrant()
     {
         require(!reentrancyLock);
         reentrancyLock = true;
@@ -48,10 +48,10 @@ contract Pedro_ERC20Token {
     /**
     * @dev Total number of tokens in existence
     */
-    function totalSupply() 
-    public 
-    view 
-    returns (uint256) 
+    function totalSupply()
+    public
+    view
+    returns (uint256)
     {
         return totalSupply_;
     }
@@ -62,22 +62,22 @@ contract Pedro_ERC20Token {
     * @param _value The amount to be transferred.
     */
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         _transfer(_to, _value);
     }
-    
+
     function _transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
+    )
     internal
     nonReentrant
-    returns (bool) 
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
@@ -88,10 +88,10 @@ contract Pedro_ERC20Token {
         emit Transfer(msg.sender, msg.sender, _to, _value);
         return true;
     }
-    
+
     event Transfer(
-        address indexed _from, 
-        address indexed _to, 
+        address indexed _from,
+        address indexed _to,
         uint256 value
     );
     event Transfer(
@@ -108,10 +108,10 @@ contract Pedro_ERC20Token {
     */
     function balanceOf(
         address _owner
-    ) 
-    public 
-    view 
-    returns (uint256) 
+    )
+    public
+    view
+    returns (uint256)
     {
         return balances[_owner];
     }
@@ -167,12 +167,12 @@ contract Pedro_ERC20Token {
     * @param _value The amount of tokens to be spent.
     */
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _currentValue,
         uint256 _value
-    ) 
-    public 
-    returns(bool) 
+    )
+    public
+    returns(bool)
     {
         require(_currentValue == allowed[msg.sender][_spender]);
         allowed[msg.sender][_spender] = _value;
@@ -271,7 +271,7 @@ contract Pedro_ERC20Token {
     /**
     * @dev Throws if called by any account other than the owner.
     */
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
@@ -283,9 +283,9 @@ contract Pedro_ERC20Token {
     * It will not be possible to call the functions with the `onlyOwner`
     * modifier anymore.
     */
-    function renounceOwnership() 
-    public 
-    onlyOwner 
+    function renounceOwnership()
+    public
+    onlyOwner
     {
         emit OwnershipRenounced(owner);
         owner = address(0);
@@ -297,9 +297,9 @@ contract Pedro_ERC20Token {
     */
     function transferOwnership(
         address _newOwner
-    ) 
-    public 
-    onlyOwner 
+    )
+    public
+    onlyOwner
     {
         _transferOwnership(_newOwner);
     }
@@ -310,8 +310,8 @@ contract Pedro_ERC20Token {
     */
     function _transferOwnership(
         address _newOwner
-    ) 
-    internal 
+    )
+    internal
     {
         require(_newOwner != address(0));
         emit OwnershipTransferred(owner, _newOwner);
@@ -324,13 +324,13 @@ contract Pedro_ERC20Token {
     bool public mintingFinished = false;
 
 
-    modifier canMint() 
+    modifier canMint()
     {
         require(!mintingFinished);
         _;
     }
 
-    modifier hasMintPermission() 
+    modifier hasMintPermission()
     {
         require(msg.sender == owner);
         _;
@@ -361,16 +361,16 @@ contract Pedro_ERC20Token {
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishMinting() 
-    public  
+    function finishMinting()
+    public
     onlyOwner canMint
-    returns (bool) 
+    returns (bool)
     {
         mintingFinished = true;
         emit MintFinished();
         return true;
     }
-    
+
     event Burn(address indexed burner, uint256 value);
 
     /**
@@ -379,17 +379,17 @@ contract Pedro_ERC20Token {
     */
     function burn(
         uint256 _value
-    ) 
-    public 
+    )
+    public
     {
         _burn(msg.sender, _value);
     }
 
     function _burn(
-        address _who, 
+        address _who,
         uint256 _value
-    ) 
-    internal 
+    )
+    internal
     {
         require(_value <= balances[_who]);
         // no need to require value <= totalSupply, since that would imply the
@@ -416,12 +416,12 @@ library SafeMath {
     * @dev Multiplies two numbers, throws on overflow.
     */
     function mul(
-        uint256 a, 
+        uint256 a,
         uint256 b
-    ) 
-    internal 
-    pure 
-    returns(uint256 c) 
+    )
+    internal
+    pure
+    returns(uint256 c)
     {
         // Gas optimization: this is cheaper than asserting 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
@@ -441,12 +441,12 @@ library SafeMath {
     function div(
         uint256 a,
         uint256 b
-    ) 
-    internal 
-    pure 
-    returns(uint256) 
+    )
+    internal
+    pure
+    returns(uint256)
     {
-        // assert(b > 0); 
+        // assert(b > 0);
         // Solidity automatically throws when dividing by 0
         // uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
@@ -457,12 +457,12 @@ library SafeMath {
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(
-        uint256 a, 
+        uint256 a,
         uint256 b
-    ) 
-    internal 
-    pure 
-    returns(uint256) 
+    )
+    internal
+    pure
+    returns(uint256)
     {
         assert(b <= a);
         return a - b;
@@ -472,15 +472,26 @@ library SafeMath {
     * @dev Adds two numbers, throws on overflow.
     */
     function add(
-        uint256 a, 
+        uint256 a,
         uint256 b
-    ) 
-    internal 
-    pure 
-    returns(uint256 c) 
+    )
+    internal
+    pure
+    returns(uint256 c)
     {
         c = a + b;
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

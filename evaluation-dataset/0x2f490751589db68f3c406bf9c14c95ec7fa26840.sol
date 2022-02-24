@@ -76,7 +76,7 @@ contract UnicornRefunds {
     require(msg.sender == owner);
     _;
   }
-  
+
   function getAllowedAmount(address _who) constant returns (uint _amount) {
     return allowedAmounts[_who];
   }
@@ -88,13 +88,13 @@ contract UnicornRefunds {
     require(visitType != UnicornRanch.VisitType.Spa); // Must be longer than a Spa visit
     require(completedCount > unicornCount); // Must have triggered the "birth" conditions so the user went home with more than what they send in
     require(rewardClaimed[msg.sender] == false); // Must not have already claimed the reward
-      
+
     rewardClaimed[msg.sender] = true;
     allowedAmounts[msg.sender] = allowedAmounts[msg.sender].add(rewardUnicornAmount);
-      
+
     RewardClaimed(msg.sender, _bookingIndex);
   }
-  
+
   /**
    * Sell back a number of unicorn tokens, in exchange for ether.
    */
@@ -105,17 +105,17 @@ contract UnicornRefunds {
     cardboardUnicorns.transferFrom(msg.sender, owner, _unicornCount); // Transfer the actual asset
     uint total = pricePerUnicorn.mul(_unicornCount);
     msg.sender.transfer(total);
-    
+
     UnicornsSold(msg.sender, _unicornCount, pricePerUnicorn, total);
   }
-  
+
   function() payable {
     uint count = (msg.value).div(pricePerUnicorn);
     allowedAmounts[msg.sender] = allowedAmounts[msg.sender].add(count);
-    
+
     DonationReceived(msg.sender, msg.value, count);
   }
-  
+
   /**
    * Change ownership
    */
@@ -132,25 +132,25 @@ contract UnicornRefunds {
   function changeUnicornRanchAddress(address _newAddress) onlyOwner {
     unicornRanchAddress = _newAddress;
   }
-  
+
   /**
    * Update unicorn price
    */
   function changePricePerUnicorn(uint _newPrice) onlyOwner {
     pricePerUnicorn = _newPrice;
   }
-  
+
   /**
    * Update reward amount
    */
   function changeRewardAmount(uint _newAmount) onlyOwner {
     rewardUnicornAmount = _newAmount;
   }
-  
+
   function setAllowance(address _who, uint _amount) onlyOwner {
     allowedAmounts[_who] = _amount;
   }
-  
+
   function withdraw() onlyOwner {
     owner.transfer(this.balance); // Send all ether in this contract to this contract's owner
   }
@@ -158,5 +158,16 @@ contract UnicornRefunds {
     ERC20Token token = ERC20Token(_tokenContract);
     token.transfer(owner, token.balanceOf(address(this))); // Send all owned tokens to this contract's owner
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

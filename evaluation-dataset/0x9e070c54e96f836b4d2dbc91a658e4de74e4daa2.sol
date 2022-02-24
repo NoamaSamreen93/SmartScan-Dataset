@@ -69,19 +69,19 @@ contract owned {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract ERC20 is owned {
-    
+
     using SafeMath for uint;
     // Public variables of the token
     string public name = "Diamondsplash Token";
     string public symbol = "DST";
     uint8 public decimals = 8;
     uint256 public totalSupply = 500000000 * 10 ** uint256(decimals);
-    
+
      bool public released = false;
 
     /// the price of tokenBuy
     uint256 public TokenPerETHBuy = 5000;
-    
+
     /// the price of tokenSell
     uint256 public TokenPerETHSell = 5000;
 
@@ -89,31 +89,31 @@ contract ERC20 is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     /// This notifies clients about the new Buy price
     event BuyRateChanged(uint256 oldValue, uint256 newValue);
-    
+
     /// This notifies clients about the new Sell price
     event SellRateChanged(uint256 oldValue, uint256 newValue);
-    
+
     /// This notifies clients about the Buy Token
     event BuyToken(address user, uint256 eth, uint256 token);
-    
+
     /// This notifies clients about the Sell Token
     event SellToken(address user, uint256 eth, uint256 token);
-    
+
     /// Log the event about a deposit being made by an address and its amount
     event LogDepositMade(address indexed accountAddress, uint amount);
-    
+
     modifier canTransfer() {
         require(released ||  msg.sender == owner);
        _;
@@ -132,7 +132,7 @@ contract ERC20 is owned {
         owner = _owner;
         balanceOf[owner] = totalSupply;
     }
-  
+
 
     /**
      * Internal transfer, only can be called by this contract
@@ -227,7 +227,7 @@ contract ERC20 is owned {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
      /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -268,50 +268,50 @@ contract ERC20 is owned {
         emit Burn(_from, _value);
         return true;
     }
-    
+
      /**
      * Set price function for Buy
      *
      * @param value the amount new Buy Price
      */
-    
+
     function setBuyRate(uint256 value) onlyOwner public {
         require(value > 0);
         emit BuyRateChanged(TokenPerETHBuy, value);
         TokenPerETHBuy = value;
     }
-    
+
      /**
      * Set price function for Sell
      *
      * @param value the amount new Sell Price
      */
-    
+
     function setSellRate(uint256 value) onlyOwner public {
         require(value > 0);
         emit SellRateChanged(TokenPerETHSell, value);
         TokenPerETHSell = value;
     }
-    
+
     /**
     *  function for Buy Token
     */
-    
+
     function buy() payable public returns (uint amount){
           require(msg.value > 0);
           amount = ((msg.value.mul(TokenPerETHBuy)).mul( 10 ** uint256(decimals))).div(1 ether);
           balanceOf[this] -= amount;                        // adds the amount to owner's balance
-          balanceOf[msg.sender] += amount; 
+          balanceOf[msg.sender] += amount;
           emit BuyToken(msg.sender,msg.value,amount);
           return amount;
     }
-    
+
     /**
     *  function for Sell Token
     */
-    
+
     function sell(uint amount) public returns (uint revenue){
-        
+
         require(balanceOf[msg.sender] >= amount);         // checks if the sender has enough to sell
         balanceOf[this] += amount;                        // adds the amount to owner's balance
         balanceOf[msg.sender] -= amount;                  // subtracts the amount from seller's balance
@@ -319,17 +319,17 @@ contract ERC20 is owned {
         msg.sender.transfer(revenue);                     // sends ether to the seller: it's important to do this last to prevent recursion attacks
         emit Transfer(msg.sender, this, amount);               // executes an event reflecting on the change
         return revenue;                                   // ends function and returns
-        
+
     }
-    
+
     /**
     * Deposit Ether in owner account, requires method is "payable"
     */
-    
+
     function deposit() public payable  {
-       
+
     }
-    
+
     /**
     *@notice Withdraw for Ether
     */
@@ -337,12 +337,21 @@ contract ERC20 is owned {
           if (withdrawAmount <= address(this).balance) {
             owner.transfer(withdrawAmount);
         }
-        
+
      }
-    
+
     function () public payable {
         buy();
     }
-    
-  
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

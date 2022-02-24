@@ -74,9 +74,9 @@ contract Owned {
     }
     function acceptOwnership() public {
         require(msg.sender == newOwner);
-        
+
         emit OwnershipTransferred(owner, newOwner);
-        
+
         owner = newOwner;
         newOwner = address(0);
     }
@@ -187,7 +187,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
         decimals = 18;
         _totalSupply = 2000000000000000000000000000;
         _owner = 0xa45760889D1c27804Dc6D6B89D4095e8Eb99ab72;
-        
+
         balances[_owner] = _totalSupply;
         emit Transfer(address(0), _owner, _totalSupply);
     }
@@ -214,7 +214,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
-        
+
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
@@ -226,11 +226,11 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
-       
+
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
@@ -238,7 +238,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -249,7 +249,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
-        
+
         emit Transfer(from, to, tokens);
         return true;
     }
@@ -270,7 +270,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
     // ------------------------------------------------------------------------
     // function approveAndCall(address spender, uint tokens, bytes memory data) public returns (bool success) {
     //     allowed[msg.sender][spender] = tokens;
-        
+
     //     emit Approval(msg.sender, spender, tokens);
     //     ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
     //     return true;
@@ -322,7 +322,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
      * @return A boolean that indicates if the operation was successful.
      */
     function mint(address account, uint256 value) public onlyMinter returns (bool) {
-        
+
         require(account != address(0), "");
         require(account != _owner, "");
 
@@ -341,7 +341,7 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
      * @return A boolean that indicates if the operation was successful.
      */
     function mintOwner(uint256 value) public onlyMinter returns (bool) {
-        
+
         require(msg.sender != address(0), "");
         require(msg.sender == _owner, "");
 
@@ -381,4 +381,13 @@ contract FCS is ERC20Interface, Owned, SafeMath, MinterRole {
         _burn(account, value);
         emit Approval(account, msg.sender, allowed[account][msg.sender]);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -162,12 +162,12 @@ contract TokenVesting is Ownable {
         token = _token;
     }
 
-    function addVesting( address[] _beneficiary, uint256[] _token, uint256[] _vestingTime) 
-        external 
+    function addVesting( address[] _beneficiary, uint256[] _token, uint256[] _vestingTime)
+        external
         onlyOwner
     {
         require((_beneficiary.length == _token.length) && (_beneficiary.length == _vestingTime.length));
-        
+
         for (uint i = 0; i < _beneficiary.length; i++) {
             require(_vestingTime[i] > now);
             require(checkZeroValue(_token[i]));
@@ -200,8 +200,19 @@ contract TokenVesting is Ownable {
     function getBalance() public view returns (uint256) {
         return token.balanceOf(address(this));
     }
-    
+
     function checkZeroValue(uint256 value) internal pure returns(bool){
         return value > 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

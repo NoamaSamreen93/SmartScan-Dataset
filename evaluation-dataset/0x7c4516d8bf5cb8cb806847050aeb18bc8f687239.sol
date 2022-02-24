@@ -559,3 +559,7 @@ contract Cogenero is Crowdsale, Ownable {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

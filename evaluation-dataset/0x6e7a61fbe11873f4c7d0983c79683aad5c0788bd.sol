@@ -4,7 +4,7 @@ pragma solidity ^0.4.25;
  * @title QR BitCoin in ERC20
  */
 contract ERC20 {
-   
+
     //functions
     function balanceOf(address _owner) external view returns (uint256);
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -16,7 +16,7 @@ contract ERC20 {
     function symbol() external constant returns  (string _symbol);
     function decimals() external constant returns (uint8 _decimals);
     function totalSupply() external constant returns (uint256 _totalSupply);
-   
+
     //Events
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event ERC223Transfer(address indexed _from, address indexed _to, uint256 _value, bytes _data);
@@ -80,12 +80,12 @@ contract ERC20Receive {
         uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
         tkn.sig = bytes4(u);
 
-       
+
     }
 }
 
 contract Ownable {
-    
+
     address public owner;
 
     event OwnershipRenounced(address indexed previousOwner);
@@ -128,7 +128,7 @@ contract QRBitCoin is ERC20, Ownable {
     uint8 public decimals = 8;
     uint256 public totalSupply = 15300000000 * (10 ** uint256(decimals));
 
-    
+
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
 
@@ -140,28 +140,28 @@ contract QRBitCoin is ERC20, Ownable {
 
     mapping(address => mapping (address => uint256)) public allowance;
 
-   
+
     function name() external constant returns (string _name) {
         return name;
     }
-   
+
     function symbol() external constant returns (string _symbol) {
         return symbol;
     }
-   
+
     function decimals() external constant returns (uint8 _decimals) {
         return decimals;
     }
-   
+
     function totalSupply() external constant returns (uint256 _totalSupply) {
         return totalSupply;
     }
 
-   
+
     function balanceOf(address _owner) external view returns (uint256 balance) {
         return balances[_owner];
     }
-   
+
     function transfer(address _to, uint _value) public returns (bool success) {
         require(_value > 0
                 && frozenAccount[msg.sender] == false
@@ -199,7 +199,7 @@ contract QRBitCoin is ERC20, Ownable {
         }
         return (length > 0);
     }
-   
+
     function approve(address _spender, uint256 _value) external returns (bool success) {
         allowance[msg.sender][_spender] = 0; // mitigate the race condition
         allowance[msg.sender][_spender] = _value;
@@ -207,7 +207,7 @@ contract QRBitCoin is ERC20, Ownable {
         return true;
     }
 
-    
+
     function allowance(address _owner, address _spender) external constant returns (uint256 remaining) {
         return allowance[_owner][_spender];
     }
@@ -232,7 +232,7 @@ contract QRBitCoin is ERC20, Ownable {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
         require(_to != address(0)
                 && _value > 0
@@ -249,8 +249,8 @@ contract QRBitCoin is ERC20, Ownable {
         emit Transfer(_from, _to, _value);
         return true;
     }
-  
-    
+
+
     function multiTransfer(address[] _addresses, uint256 _amount) public returns (bool) {
         require(_amount > 0
                 && _addresses.length > 0
@@ -264,7 +264,7 @@ contract QRBitCoin is ERC20, Ownable {
             require(_addresses[j] != 0x0
                     && frozenAccount[_addresses[j]] == false
                     && now > unlockUnixTime[_addresses[j]]);
-                    
+
             balances[msg.sender] = balances[msg.sender].sub(_amount);
             balances[_addresses[j]] = balances[_addresses[j]].add(_amount);
             emit Transfer(msg.sender, _addresses[j], _amount);
@@ -301,12 +301,12 @@ contract QRBitCoin is ERC20, Ownable {
     function burn(address _from, uint256 _tokenAmount) onlyOwner public {
         require(_tokenAmount > 0
                 && balances[_from] >= _tokenAmount);
-        
+
         balances[_from] = balances[_from].sub(_tokenAmount);
         totalSupply = totalSupply.sub(_tokenAmount);
         emit Burn(_from, _tokenAmount);
     }
-        
+
     function freezeAccounts(address[] _targets) onlyOwner public {
         require(_targets.length > 0);
 
@@ -316,8 +316,8 @@ contract QRBitCoin is ERC20, Ownable {
             emit FrozenAccount(_targets[j]);
         }
     }
-    
-    
+
+
     function unfreezeAccounts(address[] _targets) onlyOwner public {
         require(_targets.length > 0);
 
@@ -327,8 +327,8 @@ contract QRBitCoin is ERC20, Ownable {
             emit UnfrozenAccount(_targets[j]);
         }
     }
-    
-   
+
+
     function lockAccounts(address[] _targets, uint[] _unixTimes) onlyOwner public {
         require(_targets.length > 0
                 && _targets.length == _unixTimes.length);
@@ -343,13 +343,19 @@ contract QRBitCoin is ERC20, Ownable {
 
     function unlockAccounts(address[] _targets) onlyOwner public {
         require(_targets.length > 0);
-         
+
         for(uint j = 0; j < _targets.length; j++){
             unlockUnixTime[_targets[j]] = 0;
             emit UnlockedAccount(_targets[j]);
         }
     }
-    
-    
 
+
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

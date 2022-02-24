@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 //p3Dank.io
-//send 0.25 ETH to contract to purchase 3 plants. 
+//send 0.25 ETH to contract to purchase 3 plants.
 //you can only rebuy when you have ZERO plants
 //contract will take all ether sent and add it to the pot >>>NO REFUNDS<<<
 //only send 0.25 ether, no more, no less
@@ -8,12 +8,12 @@ pragma solidity ^0.5.0;
 //BLOCK smashes fork
 //FORK forks the chain
 //CHAIN adds the block
-//plants automatically grow over time 
+//plants automatically grow over time
 //the older the plants get a bigger % bonus for selling
-//choose to sell 1 plant or attack at random every 7 hours 
+//choose to sell 1 plant or attack at random every 7 hours
 //if your random attack wins the rock paper scissors, you sell the targets house for 50% its base value(no bonus)
 //sucessful attacks raise the value of every other plant, >>DONT MISS ATTACKS<<
-//sold plants have a bonus and reduce the value of every other plant. 
+//sold plants have a bonus and reduce the value of every other plant.
 //Sell bonus is 2x after 42000 blocks, Max bonus of 4x after 69420 blocks
 //sell price = (total eth in contract) * (growth of plant being sold) / (total growth in game) + (big plant bonus)
 //1.2% dev cut 2% buys p3d. 96.8% back to players. p3d divs go to pot
@@ -144,7 +144,7 @@ contract p3Dank  {
     uint256 lastupdateblock;
     uint256 totaldivpts;
 
-    function updateglobal() internal {                       
+    function updateglobal() internal {
         totaldivpts = gametotaldivs();
         lastupdateblock = block.number;//updated
         lastmove[msg.sender] = block.number; // reset lastmove of attacker
@@ -200,14 +200,14 @@ contract p3Dank  {
             }
             totaldivpts = totaldivpts.sub(playerdivpts); //adjust total div points
             sender.transfer(sold);//payout
-            } } 
+            } }
 
     //p3d section
     HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
         function P3DDivstocontract() public{
             address newref = msg.sender;
             p3dref = newref;
-            P3Dcontract_.withdraw(); //withdraw p3d divs into contract 
+            P3Dcontract_.withdraw(); //withdraw p3d divs into contract
         }
         function amountofp3d() external view returns(uint256){//balanceof = Retrieve the tokens owned by the caller.
             return ( P3Dcontract_.balanceOf(address(this)))  ;
@@ -215,7 +215,7 @@ contract p3Dank  {
         function harvestabledivs() view  public returns(uint256){//dividendsof = Retrieve the dividend balance of any single address.
             return ( P3Dcontract_.dividendsOf(address(this)))  ;
         }
-        
+
 
     //view functions
     function singleplantdivs ()public view returns(uint256){ //how many blocks old are my plants?
@@ -249,4 +249,15 @@ contract p3Dank  {
     }
 
 //thanks for playing
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

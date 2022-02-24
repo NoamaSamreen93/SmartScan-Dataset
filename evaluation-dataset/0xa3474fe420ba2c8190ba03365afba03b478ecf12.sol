@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 /**
- * @notes All the credits go to the fantastic OpenZeppelin project and its community, see 
+ * @notes All the credits go to the fantastic OpenZeppelin project and its community, see
 
 https://github.com/OpenZeppelin/openzeppelin-solidity
  * This contract was generated and deployed using https://tokens.kawatta.com
@@ -35,7 +35,7 @@ interface IERC20 {
  */
 library SafeMath {
     /**
-     * @dev Subtracts two unsigned integers, reverts on overflow (i.e. if subtrahend is greater 
+     * @dev Subtracts two unsigned integers, reverts on overflow (i.e. if subtrahend is greater
 
 than minuend).
      */
@@ -65,10 +65,10 @@ than minuend).
  * Originally based on code by FirstBlood:
  * https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  *
- * This implementation emits additional Approval events, allowing applications to reconstruct the 
+ * This implementation emits additional Approval events, allowing applications to reconstruct the
 
 allowance status for
- * all accounts just by listening to said events. Note that this isn't required by the 
+ * all accounts just by listening to said events. Note that this isn't required by the
 
 specification, and other
  * compliant implementations may not do it.
@@ -119,16 +119,16 @@ contract ERC20 is IERC20 {
     }
 
     /**
-     * @dev Approve the passed address to spend the specified amount of tokens on behalf of 
+     * @dev Approve the passed address to spend the specified amount of tokens on behalf of
 
 msg.sender.
-     * Beware that changing an allowance with this method brings the risk that someone may use 
+     * Beware that changing an allowance with this method brings the risk that someone may use
 
 both the old
-     * and the new allowance by unfortunate transaction ordering. One possible solution to 
+     * and the new allowance by unfortunate transaction ordering. One possible solution to
 
 mitigate this
-     * race condition is to first reduce the spender's allowance to 0 and set the desired value 
+     * race condition is to first reduce the spender's allowance to 0 and set the desired value
 
 afterwards:
      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
@@ -142,7 +142,7 @@ afterwards:
 
     /**
      * @dev Transfer tokens from one address to another.
-     * Note that while this function emits an Approval event, this is not required as per the 
+     * Note that while this function emits an Approval event, this is not required as per the
 
 specification,
      * and other compliant implementations may not emit the event.
@@ -385,4 +385,13 @@ contract ERC20Token is ERC20, ERC20Detailed, Ownable {
   constructor () public ERC20Detailed("777 COIN", "777", DECIMALS) {
       _mint(msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

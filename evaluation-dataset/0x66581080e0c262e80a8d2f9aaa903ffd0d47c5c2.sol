@@ -136,7 +136,7 @@ contract RPSCore is AccessControl {
     struct GameInfo {
         uint id;
         uint valueBet;
-        address addressHost;  
+        address addressHost;
     }
 
     struct GameSecret {
@@ -153,7 +153,7 @@ contract RPSCore is AccessControl {
                                     uint _valuePlayerLose,
                                     uint _gesturePlayerWin,
                                     uint _gesturePlayerLose);
- 
+
     uint public totalCreatedGame;
     uint public totalAvailableGames;
     GameInfo[] public arrAvailableGames;
@@ -197,7 +197,7 @@ contract RPSCore is AccessControl {
 
     function joinGameAndBattle(uint _id, uint _gestureGuest)
         external
-        payable 
+        payable
         verifiedGesture(_gestureGuest)
         verifiedValueBet(msg.value)
         verifiedGameAvailable(_id)
@@ -206,10 +206,10 @@ contract RPSCore is AccessControl {
         uint gestureHostCached = 0;
 
         GameInfo memory gameInfo = arrAvailableGames[idToIndexAvailableGames[_id]];
-       
+
         require(gameInfo.addressHost != msg.sender, "Don't play with yourself");
         require(msg.value == gameInfo.valueBet, "Value bet to battle not extractly with value bet of host");
-        
+
         gestureHostCached = idToGameSecret[gameInfo.id].gestureHost;
 
         //Result: [Draw] => Return money to host and guest players (No fee)
@@ -224,26 +224,26 @@ contract RPSCore is AccessControl {
                                             msg.sender,
                                             0,
                                             0,
-                                            gestureHostCached, 
+                                            gestureHostCached,
                                             _gestureGuest);
         }
         else {
-            if(gestureHostCached == ROCK) 
+            if(gestureHostCached == ROCK)
                 result = _gestureGuest == SCISSOR ? GAME_RESULT_HOST_WIN : GAME_RESULT_GUEST_WIN;
             else
-                if(gestureHostCached == PAPER) 
+                if(gestureHostCached == PAPER)
                     result = (_gestureGuest == ROCK ? GAME_RESULT_HOST_WIN : GAME_RESULT_GUEST_WIN);
                 else
-                    if(gestureHostCached == SCISSOR) 
+                    if(gestureHostCached == SCISSOR)
                         result = (_gestureGuest == PAPER ? GAME_RESULT_HOST_WIN : GAME_RESULT_GUEST_WIN);
 
             //Result: [Win] => Return money to winner (Winner will pay 1% fee)
             uint valueTip = getValueTip(gameInfo.valueBet);
             addTipForDeveloper(valueTip);
-            
+
             if(result == GAME_RESULT_HOST_WIN) {
                 sendPayment(gameInfo.addressHost, gameInfo.valueBet * 2 - valueTip);
-                destroyGame(_id);    
+                destroyGame(_id);
                 emit LogJoinAndBattleSuccessed(_id,
                                                 result,
                                                 gameInfo.addressHost,
@@ -264,7 +264,7 @@ contract RPSCore is AccessControl {
                                                 gameInfo.valueBet,
                                                 _gestureGuest,
                                                 gestureHostCached);
-            }          
+            }
         }
 
     }
@@ -337,4 +337,20 @@ contract RPSCore is AccessControl {
         _;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

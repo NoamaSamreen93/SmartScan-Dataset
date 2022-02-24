@@ -52,7 +52,7 @@ contract Owned {
     function transferOwnership(address _newOwner) onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     function acceptOwnership() {
         if (msg.sender == newOwner) {
             OwnershipTransferred(owner, newOwner);
@@ -159,7 +159,7 @@ contract ERC20Token is Owned {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -294,8 +294,8 @@ contract DaoCasinoToken is ERC20Token {
         // Move the funds to a safe wallet
         multisig.transfer(msg.value);
     }
-    event TokensBought(address indexed buyer, uint256 ethers, 
-        uint256 newEtherBalance, uint256 tokens, uint256 multisigTokens, 
+    event TokensBought(address indexed buyer, uint256 ethers,
+        uint256 newEtherBalance, uint256 tokens, uint256 multisigTokens,
         uint256 newTotalSupply, uint256 buyPrice);
 
 
@@ -329,7 +329,7 @@ contract DaoCasinoToken is ERC20Token {
     // balance to another account, with a check that the crowdsale is
     // finalised
     // ------------------------------------------------------------------------
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
         returns (bool success)
     {
         // Cannot transfer before crowdsale ends or cap reached
@@ -343,8 +343,24 @@ contract DaoCasinoToken is ERC20Token {
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint amount)
-      onlyOwner returns (bool success) 
+      onlyOwner returns (bool success)
     {
         return ERC20Token(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

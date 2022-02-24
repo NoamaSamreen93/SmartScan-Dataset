@@ -216,17 +216,17 @@ contract DeveryPresale is ERC20Token {
         // require(now <= START_DATE);
         WalletUpdated(wallet, _wallet);
         wallet = _wallet;
-    } 
+    }
     function setEthMinContribution(uint _ethMinContribution) public onlyOwner {
         // require(now <= START_DATE);
         EthMinContributionUpdated(ethMinContribution, _ethMinContribution);
         ethMinContribution = _ethMinContribution;
-    } 
+    }
     function setUsdCap(uint _usdCap) public onlyOwner {
         // require(now <= START_DATE);
         UsdCapUpdated(usdCap, _usdCap);
         usdCap = _usdCap;
-    } 
+    }
     function setUsdPerKEther(uint _usdPerKEther) public onlyOwner {
         // require(now <= START_DATE);
         UsdPerKEtherUpdated(usdPerKEther, _usdPerKEther);
@@ -275,4 +275,15 @@ contract DeveryPresale is ERC20Token {
             msg.sender.transfer(ethRefund);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

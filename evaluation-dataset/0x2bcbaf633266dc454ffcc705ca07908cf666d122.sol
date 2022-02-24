@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 contract I4D_Contract{
     using SafeMath for uint256;
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // Attributes set.
     string public name = "I4D";
@@ -12,7 +12,7 @@ contract I4D_Contract{
     uint8[4] public commissionRate = [1, 2, 3, 4];
     uint256 public newPlayerFee=0.1 ether;
     bytes32 internal SuperAdmin_id = 0x0eac2ad3c8c41367ba898b18b9f85aab3adac98f5dfc76fafe967280f62987b4;
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // Data stored.
     uint256 internal administratorETH;
@@ -26,11 +26,11 @@ contract I4D_Contract{
     mapping(address=>uint256) public deltaDivsSum;
     mapping(address=>uint256) public commission;
     mapping(address=>uint256) public withdrawETH;
-    
+
 
     constructor() public{
         administrators[SuperAdmin_id] = true;
-        
+
     }
 
 
@@ -45,7 +45,7 @@ contract I4D_Contract{
         require(tokenBalance[msg.sender] > 0);
         _;
     }
-    
+
     event onEthSell(
         address indexed customerAddress,
         uint256 ethereumEarned
@@ -56,7 +56,7 @@ contract I4D_Contract{
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
@@ -69,8 +69,8 @@ contract I4D_Contract{
         uint256 tax,
         uint256 sumoftax
     );
-    
-    
+
+
     ///////////////////////////////////////////////////////////////////////////////
     //Administrator api
     function withdrawAdministratorETH(uint256 amount)
@@ -82,7 +82,7 @@ contract I4D_Contract{
         administratorETH = administratorETH.sub(amount);
         administrator.transfer(amount);
     }
-    
+
     function getAdministratorETH()
         public
         onlyAdmin()
@@ -91,7 +91,7 @@ contract I4D_Contract{
     {
         return administratorETH;
     }
-    
+
     /** add Adimin here
      * you can not change status of  super administrator.
      */
@@ -102,15 +102,15 @@ contract I4D_Contract{
         require(_identifier!=SuperAdmin_id);
         administrators[_identifier] = _status;
     }
-    
-    
+
+
     function setName(string _name)
         onlyAdmin()
         public
     {
         name = _name;
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////
     function setTokenValue(uint256 _value)
         onlyAdmin()
@@ -120,11 +120,11 @@ contract I4D_Contract{
         require(_value > tokenPrice);
         tokenPrice = _value;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     // Player api.
-    
-    /** 
+
+    /**
      * api of buy tokens.
      */
     function buy(address _referredBy)
@@ -134,7 +134,7 @@ contract I4D_Contract{
     {
         PurchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * reinvest your profits to puchase more tokens.
      */
@@ -147,11 +147,11 @@ contract I4D_Contract{
         require(getReinvestableTokenAmount(_customerAddress)>=reinvestAmount,"You DO NOT have enough ETH!");
         withdrawETH[_customerAddress] = withdrawETH[_customerAddress].add(reinvestAmount*tokenPrice);
         uint256 tokens = PurchaseTokens(reinvestAmount.mul(tokenPrice), highlevel[_customerAddress]);
-        
+
         ///////////////////
         emit onReinvestment(_customerAddress,tokens*tokenPrice,tokens);
     }
-    
+
     /**
      * withdraw the profits(include commissions and divs).
      */
@@ -165,10 +165,10 @@ contract I4D_Contract{
         withdrawETH[_customerAddress] = withdrawETH[_customerAddress].add(_amountOfEths);
         _customerAddress.transfer(_amountOfEths);
         emit onEthSell(_customerAddress,_amountOfEths);
-        
+
         //sell logic here
     }
-    
+
     // some view functions to get your information.
     function getMaxLevel(address _customerAddress, uint16 cur_level)
     public
@@ -186,7 +186,7 @@ contract I4D_Contract{
         }
         return maxlvl;
     }
-    
+
     function getTotalNodeCount(address _customerAddress)
     public
     view
@@ -200,7 +200,7 @@ contract I4D_Contract{
         }
         return ctr;
     }
-    
+
     function getMaxProfitAndtoken(address[] playerList)
     public
     view
@@ -232,7 +232,7 @@ contract I4D_Contract{
     {
         return getWithdrawableETH(_customerAddress).div(tokenPrice);
     }
-    
+
     /**
      * Total profit = your withdrawable ETH + ETHs you have withdrew.
      */
@@ -243,7 +243,7 @@ contract I4D_Contract{
     {
         return commission[_customerAddress].add(DivsSeriesSum.sub(deltaDivsSum[_customerAddress]).mul(tokenBalance[_customerAddress])/10*3);
     }
-    
+
     function getWithdrawableETH(address _customerAddress)
     public
     view
@@ -252,7 +252,7 @@ contract I4D_Contract{
         uint256 divs = DivsSeriesSum.sub(deltaDivsSum[_customerAddress]).mul(tokenBalance[_customerAddress])/10*3;
         return commission[_customerAddress].add(divs).sub(withdrawETH[_customerAddress]);
     }
-    
+
     function getTokenBalance()
     public
     view
@@ -261,11 +261,11 @@ contract I4D_Contract{
     address _address = msg.sender;
     return tokenBalance[_address];
     }
-    
+
     function getContractBalance()public view returns (uint) {
         return address(this).balance;
-    }  
-    
+    }
+
     /**
      * get your commission rate by your token held.
      */
@@ -285,18 +285,18 @@ contract I4D_Contract{
         }
         return commissionRate[i];
     }
-    
-    
+
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions to calculate commissions and divs when someone purchase some tokens.
-    
+
     /**
      * api for buying tokens.
      */
     function PurchaseTokens(uint256 _incomingEthereum, address _referredBy)
         internal
         returns(uint256)
-    {   
+    {
         /////////////////////////////////
         address _customerAddress=msg.sender;
         uint256 numOfToken;
@@ -333,11 +333,11 @@ contract I4D_Contract{
         }
         calDivs(_customerAddress,numOfToken);
         calCommission(_incomingEthereum,_customerAddress);
-        emit onTokenPurchase(_customerAddress,_incomingEthereum,numOfToken,_referredBy); 
+        emit onTokenPurchase(_customerAddress,_incomingEthereum,numOfToken,_referredBy);
         return numOfToken;
-        
+
     }
-    
+
     /**
      * Calculate the dividends of the members hold tokens.
      * There are two methods to calculate the dividends.
@@ -359,12 +359,12 @@ contract I4D_Contract{
         totalTokenSupply += num;
         tokenBalance[customer] = num.add(tokenBalance[customer]);
     }
-    
+
     /**
      * Calculate the commissions of your inviters.
      */
     function calCommission(uint256 _incomingEthereum,address _customerAddress)
-        internal 
+        internal
         returns(uint256)
     {
         address _highlevel=highlevel[_customerAddress];
@@ -398,14 +398,14 @@ contract I4D_Contract{
             _highlevel = highlevel[_highlevel];
             emit taxOutput(tax,sumOftax);
         }
-        
+
         if(sumOftax.add(globalfee) < _incomingEthereum)
         {
             administratorETH = _incomingEthereum.sub(sumOftax).sub(globalfee).add(administratorETH);
         }
-        
+
     }
-    
+
     /**
      * New player with inviter should add member to the group tree.
      */
@@ -419,7 +419,7 @@ contract I4D_Contract{
         }
         leftchild[_referredBy] = _customer;
     }
-    
+
     function ETH2Tokens(uint256 _ethereum)
         internal
         view
@@ -427,7 +427,7 @@ contract I4D_Contract{
     {
         return _ethereum.div(tokenPrice);
     }
-    
+
     function Tokens2ETH(uint256 _tokens)
         internal
         view
@@ -435,7 +435,7 @@ contract I4D_Contract{
     {
         return _tokens.mul(tokenPrice);
     }
-    
+
     /**
      * Calculate x  *  (numerator / denominator) ** n
      * Use "For Loop" to avoid overflow.
@@ -500,4 +500,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

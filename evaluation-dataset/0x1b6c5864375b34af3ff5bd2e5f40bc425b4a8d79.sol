@@ -576,7 +576,7 @@ contract TopChainCoin is MintableToken {
     uint public decimals = 6;
 
     /**
-     * @dev Allows anyone to transfer 
+     * @dev Allows anyone to transfer
      * @param _to the recipient address of the tokens.
      * @param _value number of tokens to be transfered.
      */
@@ -585,7 +585,7 @@ contract TopChainCoin is MintableToken {
     }
 
     /**
-    * @dev Allows anyone to transfer 
+    * @dev Allows anyone to transfer
     * @param _from address The address which you want to send tokens from
     * @param _to address The address which you want to transfer to
     * @param _value uint the amout of tokens to be transfered
@@ -643,13 +643,13 @@ contract TopChainCoinDistribution is Ownable, Authorizable {
     //year => token
     mapping(uint16 => uint) public gameMiningToken; //游戏挖矿已发行数量
 
-    uint public firstYearGameMiningTokenCap = 577500000 * (10 ** 6); //2018年5.775亿(21亿*0.55*0.5)，以后逐年减半 
+    uint public firstYearGameMiningTokenCap = 577500000 * (10 ** 6); //2018年5.775亿(21亿*0.55*0.5)，以后逐年减半
 
     uint public gameMiningTokenStartTime = 1514736000; //new Date("Jan 01 2018 00:00:00 GMT+8").getTime() / 1000;
 
     function isContract(address _addr) internal view returns(bool) {
         uint size;
-        if (_addr == 0) 
+        if (_addr == 0)
             return false;
 
         assembly {
@@ -742,10 +742,10 @@ contract TopChainCoinDistribution is Ownable, Authorizable {
         uint currentYearRemainTokens = getCurrentYearGameMiningRemainToken(currentYear);
         require(_tokens <= currentYearRemainTokens);
 
-        gameMiningToken[currentYear] += _tokens; 
+        gameMiningToken[currentYear] += _tokens;
 
         token.mint(recipient, _tokens);
-        GameMining(recipient, _tokens); 
+        GameMining(recipient, _tokens);
     }
 
     function authorizedCreateTokensToPrivate(address recipient, uint _tokens) public onlyAuthorized {
@@ -765,4 +765,15 @@ contract TopChainCoinDistribution is Ownable, Authorizable {
     function () external {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

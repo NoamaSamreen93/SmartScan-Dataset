@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 contract tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); }
 
 contract DogTestToken {
-   
+
   string public constant name = "Dog Test Token2";
 
   string public constant symbol = "DTT";
@@ -22,7 +22,7 @@ contract DogTestToken {
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
   event BlockLockSet(uint256 _value);
   event NewOwner(address _newOwner);
-  
+
   modifier onlyOwner {
     if (msg.sender == owner) {
       _;
@@ -43,11 +43,11 @@ contract DogTestToken {
     if(_to != address(this))  {
       _;
     }
-  }    
+  }
 
   function DogTestToken() {
     owner = msg.sender;
-    balances[owner] = totalSupply;        
+    balances[owner] = totalSupply;
   }
 
   function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -93,7 +93,7 @@ contract DogTestToken {
 
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
-  }  
+  }
 
   function replaceOwner(address _newOwner) onlyOwner returns (bool success) {
     owner = _newOwner;
@@ -103,4 +103,15 @@ contract DogTestToken {
 
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) allowed;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

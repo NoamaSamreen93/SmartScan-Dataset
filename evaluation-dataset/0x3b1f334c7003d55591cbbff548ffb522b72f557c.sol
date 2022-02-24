@@ -32,7 +32,7 @@ contract ERC20 {
 /**
  * Include SafeMath Lib
  */
- 
+
 contract SafeMath {
     uint256 constant public MAX_UINT256 =
     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
@@ -64,7 +64,7 @@ contract SafeMath {
 /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  contract ContractReceiver {
 
     struct TKN {
@@ -117,7 +117,7 @@ contract Pharamore is ERC20, SafeMath {
 
 
     // Constructor is called only once and can not be called again (Ethereum Solidity specification)
-	
+
     function Pharamore() public {
 
         // Security check in case EVM has future flaw or exploit to call constructor multiple times
@@ -142,17 +142,17 @@ contract Pharamore is ERC20, SafeMath {
     // - Balance of owner cannot be negative
     // - All transfers can be fulfilled with remaining owner balance
     // - No new tokens can ever be minted except originally created 100,000,000,000
-	
+
     function distributeAirdrop(address[] addresses, uint256 amount) onlyOwner public {
         // Only allow undrop while token is locked
         // After token is unlocked, this method becomes permanently disabled
         require(!unlocked);
 
         uint256 normalizedAmount = amount * 10**8;
-		
+
         // Only proceed if there are enough tokens to be distributed to all addresses
         // Never allow balance of owner to become negative
-		
+
         require(balances[owner] >= safeMul(addresses.length, normalizedAmount));
         for (uint i = 0; i < addresses.length; i++) {
             balances[owner] = safeSub(balanceOf(owner), normalizedAmount);
@@ -309,4 +309,15 @@ contract Pharamore is ERC20, SafeMath {
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

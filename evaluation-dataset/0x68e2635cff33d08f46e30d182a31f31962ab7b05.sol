@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract JabcilbCrowdsale {
-    
+
     Token public tokenReward;
     address creator;
     address owner = 0x432d2fa34DC83048AABEC5Af8dA3bfD70fbF73B6;
@@ -26,33 +26,33 @@ contract JabcilbCrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
-    }    
+        creator = _creator;
+    }
 
     function setStartDate(uint256 _startDate) public {
         require(msg.sender == creator);
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndDate(uint256 _endDate) public {
         require(msg.sender == creator);
-        endDate = _endDate;      
+        endDate = _endDate;
     }
 
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
 
     function sendToken(address receiver, uint amount) public {
         require(msg.sender == creator);
         tokenReward.transfer(receiver, amount);
-        FundTransfer(receiver, amount, true);    
+        FundTransfer(receiver, amount, true);
     }
 
     function () payable public {
@@ -64,4 +64,20 @@ contract JabcilbCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

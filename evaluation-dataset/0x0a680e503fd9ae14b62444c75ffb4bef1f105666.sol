@@ -81,7 +81,7 @@ contract EIP918Interface {
     function getChallengeNumber() public view returns (bytes32);
 
     /*
-     * Returns the mining difficulty. The number of digits that the digest of the PoW solution requires which 
+     * Returns the mining difficulty. The number of digits that the digest of the PoW solution requires which
      * typically auto adjusts during reward generation.
      **/
     function getMiningDifficulty() public view returns (uint);
@@ -92,13 +92,13 @@ contract EIP918Interface {
     function getMiningTarget() public view returns (uint);
 
     /*
-     * Return the current reward amount. Depending on the algorithm, typically rewards are divided every reward era 
+     * Return the current reward amount. Depending on the algorithm, typically rewards are divided every reward era
      * as tokens are mined to provide scarcity
      **/
     function getMiningReward() public view returns (uint);
-    
+
     /*
-     * Upon successful verification and reward the mint method dispatches a Mint Event indicating the reward address, 
+     * Upon successful verification and reward the mint method dispatches a Mint Event indicating the reward address,
      * the reward amount, the epoch count and newest challenge number.
      **/
     event Mint(address indexed from, uint reward_amount, uint epochCount, bytes32 newChallengeNumber);
@@ -119,7 +119,7 @@ contract Owned {
     address public owner;
     address public newOwner;
     event OwnershipTransferred(address indexed _from, address indexed _to);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -164,7 +164,7 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     uint public lastRewardEthBlockNumber;
     // a bunch of maps to know where this is going (pun intended)
     uint public _MAX_MESSAGE_LENGTH = 360;
-    
+
     mapping(bytes32 => bytes32) public solutionForChallenge;
     mapping(uint => uint) public targetForEpoch;
     mapping(uint => uint) public timeStampForEpoch;
@@ -182,23 +182,23 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     constructor() public{
         symbol = "GZM";
         name = "Arma Coin";
-        
+
         decimals = 8;
         epochCount = 0;
-        _maxSupply = 1000000000*10**uint(decimals); 
-        _totalSupply = 300000000*10**uint(decimals); 
-        
-        
+        _maxSupply = 1000000000*10**uint(decimals);
+        _totalSupply = 300000000*10**uint(decimals);
+
+
         targetForEpoch[epochCount] = _MAXIMUM_TARGET;
         challengeNumber = "GENESIS_BLOCK";
         solutionForChallenge[challengeNumber] = "42"; // ahah yes
         timeStampForEpoch[epochCount] = block.timestamp;
         latestDifficultyPeriodStarted = block.number;
-        
+
         epochCount = epochCount.add(1);
         targetForEpoch[epochCount] = _MAXIMUM_TARGET;
         miningTarget = _MAXIMUM_TARGET;
-        
+
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
@@ -252,10 +252,10 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
 
     //a new 'block' to be mined
     function _startNewMiningEpoch() internal {
-        
+
         timeStampForEpoch[epochCount] = block.timestamp;
         epochCount = epochCount.add(1);
-    
+
       //Difficulty adjustment following the DigiChieldv3 implementation (Tempered-SMA)
       // Allows more thorough protection against multi-pool hash attacks
       // https://github.com/zawy12/difficulty-algorithms/issues/9
@@ -268,7 +268,7 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     //https://github.com/zawy12/difficulty-algorithms/issues/21
     //readjust the target via a tempered EMA
     function _reAdjustDifficulty(uint epoch) internal returns (uint) {
-    
+
         uint timeTarget = 300;  // We want miners to spend 5 minutes to mine each 'block'
         uint N = 6180;          //N = 1000*n, ratio between timeTarget and windowTime (31-ish minutes)
                                 // (Ethereum doesn't handle floating point numbers very well)
@@ -276,7 +276,7 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
         targetForEpoch[epoch] = (targetForEpoch[epoch.sub(1)].mul(10000)).div( N.mul(3920).div(N.sub(1000).add(elapsedTime.mul(1042).div(timeTarget))).add(N));
         //              newTarget   =   Tampered EMA-retarget on the last 6 blocks (a bit more, it's an approximation)
 	// 				Also, there's an adjust factor, in order to correct the delays induced by the time it takes for transactions to confirm
-	//				Difficulty is adjusted to the time it takes to produce a valid hash. Here, if we set it to take 300 seconds, it will actually take 
+	//				Difficulty is adjusted to the time it takes to produce a valid hash. Here, if we set it to take 300 seconds, it will actually take
 	//				300 seconds + TxConfirmTime to validate that block. So, we wad a little % to correct that lag time.
 	//				Once Ethereum scales, it will actually make block times go a tad faster. There's no perfect answer to this problem at the moment
         latestDifficultyPeriodStarted = block.number;
@@ -309,7 +309,7 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
         if(epochCount > 60000) return  (1000000 * 10**uint(decimals) );                                  // 288.0 M/day / ~20.0B Tokens in 20'000 blocks (coin supply @ 60'000th block ~ 111 Billions)
         if(epochCount > 40000) return  ((uint256(keccak256(digest)) % 2500000) * 10**uint(decimals) );   // 360.0 M/day / ~25.0B Tokens in 20'000 blocks (coin supply @ 40'000th block ~  86 Billions)
         if(epochCount > 20000) return  ((uint256(keccak256(digest)) % 3500000) * 10**uint(decimals) );   // 504.0 M/day / ~35.0B Tokens in 20'000 blocks (coin supply @ 20'000th block ~  51 Billions)
-                               return  ((uint256(keccak256(digest)) % 5000000) * 10**uint(decimals) );                         // 720.0 M/day / ~50.0B Tokens in 20'000 blocks 
+                               return  ((uint256(keccak256(digest)) % 5000000) * 10**uint(decimals) );                         // 720.0 M/day / ~50.0B Tokens in 20'000 blocks
     }
 
     //help debug mining software (even though challenge_digest isn't used, this function is constant and helps troubleshooting mining issues)
@@ -338,17 +338,17 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     function donationTo(address tokenOwner) public constant returns (address donationAddress) {
         return donationsTo[tokenOwner];
     }
-    
+
     function changeDonation(address donationAddress) public returns (bool success) {
         donationsTo[msg.sender] = donationAddress;
-        
-        emit DonationAddressOf(msg.sender , donationAddress); 
+
+        emit DonationAddressOf(msg.sender , donationAddress);
         return true;
-    
+
     }
 
     // ------------------------------------------------------------------------
@@ -357,21 +357,21 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        
+
         address donation = donationsTo[msg.sender];
         balances[msg.sender] = (balances[msg.sender].sub(tokens)).add(5000); // 0.5 RWN for the sender
-        
+
         balances[to] = balances[to].add(tokens);
         balances[donation] = balances[donation].add(5000); // 0.5 GZM for the sender's donation address
-        
+
         emit Transfer(msg.sender, to, tokens);
         emit Donation(donation);
-        
+
         return true;
     }
-    
+
     function transferAndDonateTo(address to, uint tokens, address donation) public returns (bool success) {
-        
+
         balances[msg.sender] = (balances[msg.sender].sub(tokens)).add(5000); // 0.5 GZM for the sender
         balances[to] = balances[to].add(tokens);
         balances[donation] = balances[donation].add(5000); // 0.5 GZM for the sender's specified donation address
@@ -403,7 +403,7 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        
+
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -441,11 +441,22 @@ contract _RowanCoin is ERC20Interface, EIP918Interface, Owned {
     function () public payable {
         revert();
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

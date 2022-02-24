@@ -42,7 +42,7 @@ contract ERC20 is ERC20Basic {
 
 contract ImmAirDropA{
     using SafeMath for uint256;
-	
+
     struct User{
 		address user_address;
 		uint signup_time;
@@ -52,22 +52,22 @@ contract ImmAirDropA{
 		uint256 paid_token;
 		bool status;
 	}
-	
+
     uint256 fixamt = 100000000000000000000;
     address public owner;
-	
+
     /* @dev Assigned wallet where the remaining unclaim tokens to be return */
     address public wallet;
-	
+
     /* @dev The token being distribute */
     ERC20 public token;
 
     /* @dev To record the different reward amount for each bounty  */
     mapping(address => User) public bounties;
-	
+
     /* @dev Admin with permission to manage the signed up bounty */
     mapping (address => bool) public admins;
-	
+
     function ImmAirDropA(ERC20 _token, address _wallet) public {
         require(_token != address(0));
         token = _token;
@@ -80,7 +80,7 @@ contract ImmAirDropA{
        require(msg.sender == owner);
        _;
     }
-	
+
     modifier onlyAdmin {
         require(admins[msg.sender]);
         _;
@@ -91,12 +91,12 @@ contract ImmAirDropA{
 			admins[_userlist] = true;
 		}
 	}
-	
+
 	function reClaimBalance() public onlyAdmin{
 		uint256 taBal = token.balanceOf(this);
 		token.transfer(wallet, taBal);
 	}
-	
+
 	function adminUpdateWallet(address _wallet) public onlyAdmin{
 		require(_wallet != address(0));
 		wallet = _wallet;
@@ -114,9 +114,20 @@ contract ImmAirDropA{
     		}
     	}
     }
-	
+
 	function () external payable {
 		revert();
 	}
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

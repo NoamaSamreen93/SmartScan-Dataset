@@ -40,7 +40,7 @@ contract SafeMath {
       require((x == 0) || (z / x == y));
       return z;
     }
-    
+
     function safeDiv(uint x, uint y)
         internal
         pure
@@ -97,7 +97,7 @@ contract Authorization {
     {
         owner = newOwner_;
     }
-    
+
     function assignOperator(address user_)
         public
         onlyOwner
@@ -107,7 +107,7 @@ contract Authorization {
             operators.push(user_);
         }
     }
-    
+
     function dismissOperator(address user_)
         public
         onlyOwner
@@ -120,7 +120,7 @@ contract Authorization {
             }
         }
     }
-    
+
     function checkOperator(address user_)
         public
         view
@@ -195,4 +195,15 @@ contract FundAccount is Authorization, SafeMath {
             return Token(token_).transfer(msg.sender, amount_);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

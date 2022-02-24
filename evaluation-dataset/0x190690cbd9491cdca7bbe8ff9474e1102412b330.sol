@@ -90,14 +90,14 @@ contract Mero {
 
         require (balanceOf[msg.sender] >= _value, "Balance not enough");         // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to], "Overflow" );        // Check for overflows
-        
-        uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];          
-        
+
+        uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];
+
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value); // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);               // Add the same to the recipient
-        
+
         emit Transfer(msg.sender, _to, _value);                                  // Notify anyone listening that this transfer took place
-        
+
         assert(balanceOf[msg.sender] + balanceOf[_to] == previousBalances);
     }
 
@@ -111,11 +111,11 @@ contract Mero {
      */
     function approve(address _spender, uint256 _value) public returns (bool success) {
         require (_value > 0, "Cannot use zero");
-        
+
         allowance[msg.sender][_spender] = _value;
-        
+
         emit Approval(msg.sender, _spender, _value);
-        
+
         return true;
     }
 
@@ -131,19 +131,30 @@ contract Mero {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0), "Cannot use zero address");
         require(_value > 0, "Cannot use zero value");
-        
+
         require( balanceOf[_from] >= _value, "Balance not enough" );
         require( balanceOf[_to] + _value > balanceOf[_to], "Cannot overflow" );
-        
+
         require( _value <= allowance[_from][msg.sender], "Cannot over allowance" );
-        
+
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
-        
+
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
-        
+
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

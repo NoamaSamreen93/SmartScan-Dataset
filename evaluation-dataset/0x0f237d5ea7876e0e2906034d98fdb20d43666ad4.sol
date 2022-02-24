@@ -4,7 +4,7 @@ pragma solidity ^0.4.25;
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
- * @dev PROUDLY MADE BY CMX 
+ * @dev PROUDLY MADE BY CMX
  * @dev CONNECT COIN TEAM
  */
 contract ERC20Basic {
@@ -282,4 +282,15 @@ contract CONNECTXCON is BurnableToken, Ownable {
         totalSupply = initialSupply;
         balances[msg.sender] = initialSupply; // Send all tokens to owner
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

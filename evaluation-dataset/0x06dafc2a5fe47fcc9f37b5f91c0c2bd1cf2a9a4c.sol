@@ -448,7 +448,7 @@ contract MultiCappedCrowdsale is Crowdsale, Ownable {
   //
   //  Soft cap logic
   //
-  
+
   // overriding Crowdsale#validPurchase to add extra cap logic
   // @return true if investors can buy at the moment
   function validPurchase() internal constant returns (bool) {
@@ -661,4 +661,15 @@ contract FlypCrowdsale is MyFinalizableCrowdsale, MultiCappedCrowdsale {
     wallet.transfer(weiValue);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

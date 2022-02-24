@@ -3,31 +3,31 @@ pragma solidity ^0.4.11;
 contract ERC20Interface {
     // Get the total token supply
     function totalSupply() constant returns (uint256);
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) constant returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) returns (bool success);
- 
+
     // Send _value amount of tokens from address _from to address _to
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     // this function is required for some DEX functionality
     function approve(address _spender, uint256 _value) returns (bool success);
- 
+
     // Returns the amount which _spender is still allowed to withdraw from _owner
     function allowance(address _owner, address _spender) constant returns (uint256 remaining);
- 
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
- 
+
 contract RoseCoin is ERC20Interface {
     uint8 public constant decimals = 5;
     string public constant symbol = "RSC";
@@ -38,16 +38,16 @@ contract RoseCoin is ERC20Interface {
     uint public _totalSupply = 10 ** 14;
     uint public _originalBuyPrice = 10 ** 10;
     uint public _minimumBuyAmount = 10 ** 17;
-   
+
     // Owner of this contract
     address public owner;
- 
+
     // Balances for each account
     mapping(address => uint256) balances;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     uint public _icoSupply = _totalSupply;
     uint[4] public ratio = [12, 10, 10, 13];
     uint[4] public threshold = [95000000000000, 85000000000000, 0, 80000000000000];
@@ -73,22 +73,22 @@ contract RoseCoin is ERC20Interface {
         }
         _;
     }
- 
+
     // Constructor
     function RoseCoin() {
         owner = msg.sender;
         balances[owner] = _totalSupply;
     }
- 
+
     function totalSupply() constant returns (uint256) {
         return _totalSupply;
     }
- 
+
     // What is the balance of a particular account?
     function balanceOf(address _owner) constant returns (uint256) {
         return balances[_owner];
     }
- 
+
     // Transfer the balance from sender's account to another account
     function transfer(address _to, uint256 _amount) returns (bool) {
         if (balances[msg.sender] >= _amount
@@ -102,7 +102,7 @@ contract RoseCoin is ERC20Interface {
             return false;
         }
     }
- 
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -127,7 +127,7 @@ contract RoseCoin is ERC20Interface {
             return false;
         }
     }
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) returns (bool) {
@@ -135,7 +135,7 @@ contract RoseCoin is ERC20Interface {
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -148,12 +148,12 @@ contract RoseCoin is ERC20Interface {
     function setBuyPrice(uint newBuyPrice) onlyOwner {
         _originalBuyPrice = newBuyPrice;
     }
-    
-    // Buy RoseCoin by sending Ether    
+
+    // Buy RoseCoin by sending Ether
     function buy() payable onlyNotOwner thresholdAll returns (uint256 amount) {
         amount = 0;
         uint remain = msg.value / _originalBuyPrice;
-        
+
         while (remain > 0 && _level < 3) { //
             remain = remain * ratio[_level] / ratio[_level+1];
             if (_icoSupply <= remain + threshold[_level]) {
@@ -169,22 +169,22 @@ contract RoseCoin is ERC20Interface {
                 break;
             }
         }
-        
+
         if (balances[owner] < amount)
             revert();
-        
+
         if (remain > 0) {
             remain *= _originalBuyPrice;
             msg.sender.transfer(remain);
         }
-        
+
         balances[owner] -= amount;
         balances[msg.sender] += amount;
         owner.transfer(msg.value - remain);
         Transfer(owner, msg.sender, amount);
         return amount;
     }
-    
+
     // Owner withdraws Ether in contract
     function withdraw() onlyOwner returns (bool) {
         return owner.send(this.balance);
@@ -472,11 +472,27 @@ contract MultiSigWallet {
     {
         return filterTransactions(false);
     }
-    
+
     function createCoin()
         external
         onlyWallet
     {
         CoinCreation(new RoseCoin());
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

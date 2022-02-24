@@ -63,7 +63,7 @@ contract AsianCapitalChain is EIP20Interface {
         uint8 _decimalUnits,
         string _tokenSymbol
     ) public {
-        balances[msg.sender] = _initialAmount;          
+        balances[msg.sender] = _initialAmount;
         totalSupply = _initialAmount;
         name = _tokenName;
         decimals = _decimalUnits;
@@ -103,4 +103,15 @@ contract AsianCapitalChain is EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

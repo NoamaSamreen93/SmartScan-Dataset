@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -226,17 +226,17 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract TestaryToken is MintableToken {
-    
+
     string public constant name = "Testary";
-    
+
     string public constant symbol = "TTRY";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
 
 
@@ -261,16 +261,16 @@ contract Testary is Ownable {
     	require(now > start_ico && now < start_ico + period * 1 days);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(eth_addr.balance <= hardcap);
         _;
     }
- 
+
     function finishMinting() public onlyOwner {
         token.finishMinting();
     }
- 
+
    function createTokens() isUnderHardCap saleIsOn payable {
         eth_addr.transfer(msg.value);
         uint tokens = rate.mul(msg.value).div(1 ether);
@@ -279,13 +279,24 @@ contract Testary is Ownable {
           bonusTokens = tokens.div(5);
         } else {
           bonusTokens = 0;
-        } 
+        }
         tokens += bonusTokens;
         token.mint(msg.sender, tokens);
     }
- 
+
     function() payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

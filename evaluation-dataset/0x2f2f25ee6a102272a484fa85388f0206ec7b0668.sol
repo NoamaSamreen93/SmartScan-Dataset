@@ -72,7 +72,7 @@ contract TopiaCoinSAFTSale is Ownable, Finalizable {
 	event PaymentRejected(address payor, bytes8 paymentIdentifier, uint256 paymentAmount); // Event
 	event UnableToAcceptPayment(address payor, bytes8 paymentIdentifier, uint256 paymentAmount); // Event
 	event UnableToRejectPayment(address payor, bytes8 paymentIdentifier, uint256 paymentAmount); // Event
-	
+
 	event SalesWalletUpdated(address oldWalletAddress, address newWalletAddress); // Event
 	event PaymentManagerUpdated(address oldPaymentManager, address newPaymentManager); // Event
 
@@ -91,7 +91,7 @@ contract TopiaCoinSAFTSale is Ownable, Finalizable {
 		bytes32 paymentHash;
 		uint256 paymentAmount;
 		uint date;
-		uint8 status; 
+		uint8 status;
 	}
 
 	uint8 PENDING_STATUS = 10;
@@ -104,8 +104,8 @@ contract TopiaCoinSAFTSale is Ownable, Finalizable {
 		_;
 	}
 
-	function TopiaCoinSAFTSale(address _salesWallet, address _paymentManager) 
-		Ownable () 
+	function TopiaCoinSAFTSale(address _salesWallet, address _paymentManager)
+		Ownable ()
 	{
 		require (_salesWallet != 0x0);
 
@@ -216,7 +216,7 @@ contract TopiaCoinSAFTSale is Ownable, Finalizable {
 		require (p.paymentHash == calculateHash(_paymentIdentifier, msg.value, nonce)) ;
 
 		bool forwardPayment = (p.status == PENDING_STATUS);
-		
+
 		p.from = msg.sender;
 		p.paymentIdentifier = _paymentIdentifier;
 		p.date = now;
@@ -312,5 +312,16 @@ contract TopiaCoinSAFTSale is Ownable, Finalizable {
 	function finalization() internal {
 		saleStarted = false;
 		SaleClosed();
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

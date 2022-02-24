@@ -1,16 +1,16 @@
 pragma solidity ^0.5.0;
 
 contract freedomStatement {
-    
+
     string public statement = "https://ipfs.globalupload.io/QmeeFwpnMk9CaXHZYv4Hn1FFD2MT7kxZ7TNnT9JfZqTzUM";
     mapping (address => bool) public checkconsent;
     event wearehere(string statement);
     uint public signAmounts;
-    
+
     constructor () public {
         emit wearehere(statement);
     }
-        
+
     function isHuman(address addr) internal view returns (bool) {
         uint size;
         assembly { size := extcodesize(addr) }
@@ -25,4 +25,15 @@ contract freedomStatement {
         signAmounts++;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

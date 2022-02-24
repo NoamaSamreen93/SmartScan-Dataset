@@ -339,19 +339,19 @@ contract PlayerFactory is ClubAccessControl {
     HKHcoinInterface hkhconinContract;
     uint initCoins = 1000000;
 
-    modifier onlyIfPlayerNotFreezed(address _playerAddress) { 
+    modifier onlyIfPlayerNotFreezed(address _playerAddress) {
         require (!players[_playerAddress].isFreezed);
-        _; 
+        _;
     }
-    
-    modifier onlyIfPlayerExist(address _playerAddress) { 
+
+    modifier onlyIfPlayerExist(address _playerAddress) {
         require (players[_playerAddress].isExist);
-        _; 
+        _;
     }
 
     event NewPlayer(address indexed _playerAddress);
 
-    function setHKHcoinAddress(address _address) 
+    function setHKHcoinAddress(address _address)
         external
         onlyIfWhitelisted(msg.sender)
     {
@@ -444,7 +444,7 @@ contract PlayerFactory is ClubAccessControl {
 }
 
 /**
- * 
+ *
  */
 contract LotteryFactory is PlayerFactory {
 
@@ -488,11 +488,11 @@ contract LotteryFactory is PlayerFactory {
         addAddressToWhitelist(msg.sender);
     }
 
-    function getLotteriesByOwner(address _owner) 
-        view 
-        external 
-        onlyIfPlayerExist(_owner) 
-        returns(uint[]) 
+    function getLotteriesByOwner(address _owner)
+        view
+        external
+        onlyIfPlayerExist(_owner)
+        returns(uint[])
     {
         uint[] memory result = new uint[](ownerLotteryCount[_owner]);
         uint counter = 0;
@@ -507,7 +507,7 @@ contract LotteryFactory is PlayerFactory {
 
     function createLottery(
         address _playerAddress,
-        string _betline, 
+        string _betline,
         string _place,
         uint32 _betAmount,
         uint32 _date,
@@ -565,4 +565,20 @@ contract LotteryFactory is PlayerFactory {
             lotteries[_id].isPaid = true;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -749,7 +749,7 @@ contract ArtworkUnique {
 
     //mapping with unique key
     mapping  (bytes32 => bool) internal uniqueArtworks;
-    
+
     //Creates a unique key based on the artwork name, author, and series
     function getUniqueKey(string name, string author, uint32 _version)  internal pure returns(bytes32) {
         string memory version = _uintToString(_version);
@@ -757,7 +757,7 @@ contract ArtworkUnique {
         string memory lowercased = _toLower(main);
         return keccak256(lowercased);
     }
-    
+
     //https://gist.github.com/thomasmaclean/276cb6e824e48b7ca4372b194ec05b97
     //transform to lowercase
     function _toLower(string str) internal pure returns (string)  {
@@ -774,7 +774,7 @@ contract ArtworkUnique {
 		}
 		return string(bLower);
 	}
-	
+
     //creates a unique key from all variables
     function _strConcat(string _a, string _b, string _c, string _separator) internal pure returns (string) {
         bytes memory _ba = bytes(_a);
@@ -1235,7 +1235,7 @@ contract ArtworkMinting is ArtworkAuction {
 contract ArtworkQuestions is ArtworkMinting {
     string private constant QUESTION  = "What is the value? Nothing is ";
     string public constant MAIN_QUESTION = "What is a masterpiece? ";
-    
+
     function getQuestion() public view returns (string) {
         uint256 value = saleAuction.getValue();
         string memory auctionValue = _uintToString(value);
@@ -1358,4 +1358,13 @@ contract ArtworkCore is ArtworkQuestions {
         super.unpause();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -884,7 +884,7 @@ contract Ownable {
 // File: contracts/common/IDatabase.sol
 
 interface IDatabase {
-    
+
     function createEntry() external payable returns (uint256);
     function auth(uint256, address) external;
     function deleteEntry(uint256) external;
@@ -927,7 +927,7 @@ interface IDatabase {
 // File: contracts/common/IDatabaseBuilder.sol
 
 interface IDatabaseBuilder {
-    
+
     function deployDatabase(
         address[],
         uint256[],
@@ -942,7 +942,7 @@ interface IDatabaseBuilder {
 // File: contracts/common/IChaingear.sol
 
 interface IChaingear {
-    
+
     function addDatabaseBuilderVersion(
         string,
         IDatabaseBuilder,
@@ -1004,7 +1004,7 @@ interface ISchema {
 * @notice not audited, not recommend to use in mainnet
 */
 contract Safe {
-    
+
     address private owner;
 
     constructor() public
@@ -1025,7 +1025,7 @@ contract Safe {
         require(msg.sender == owner);
         require(_amount <= address(this).balance);
         require(_entryOwner != address(0));
-        
+
         _entryOwner.transfer(_amount);
     }
 
@@ -1046,7 +1046,7 @@ contract Safe {
  * of people and split proportionately to some number of shares they own.
  */
 contract PaymentSplitter {
-    
+
     using SafeMath for uint256;
 
     uint256 internal totalShares;
@@ -1055,7 +1055,7 @@ contract PaymentSplitter {
     mapping(address => uint256) internal shares;
     mapping(address => uint256) internal released;
     address[] internal payees;
-    
+
     event PayeeAdded(address account, uint256 shares);
     event PaymentReleased(address to, uint256 amount);
     event PaymentReceived(address from, uint256 amount);
@@ -1113,16 +1113,16 @@ contract PaymentSplitter {
     {
         return payees[_index];
     }
-    
-    function getPayeesCount() 
+
+    function getPayeesCount()
         external
         view
         returns (uint256)
-    {   
+    {
         return payees.length;
     }
 
-    function release(address _account) 
+    function release(address _account)
         public
     {
         require(shares[_account] > 0);
@@ -1136,10 +1136,10 @@ contract PaymentSplitter {
         totalReleased = totalReleased.add(payment);
 
         _account.transfer(payment);
-        
+
         emit PaymentReleased(_account, payment);
     }
-    
+
     function _initializePayess(address[] _payees, uint256[] _shares)
         internal
     {
@@ -1155,7 +1155,7 @@ contract PaymentSplitter {
     function _addPayee(
         address _account,
         uint256 _shares
-    ) 
+    )
         internal
     {
         require(_account != address(0));
@@ -1165,7 +1165,7 @@ contract PaymentSplitter {
         payees.push(_account);
         shares[_account] = _shares;
         totalShares = totalShares.add(_shares);
-        
+
         emit PayeeAdded(_account, _shares);
     }
 }
@@ -1277,7 +1277,7 @@ contract DatabasePermissionControl is Ownable {
         whenPaused
     {
         require(CreateEntryPermissionGroup.AllUsers >= _newPermissionGroup);
-        
+
         permissionGroup = _newPermissionGroup;
         emit PermissionGroupChanged(_newPermissionGroup);
     }
@@ -1323,7 +1323,7 @@ contract DatabasePermissionControl is Ownable {
     {
         return whitelist[_address];
     }
-    
+
     function getPaused()
         external
         view
@@ -1336,10 +1336,10 @@ contract DatabasePermissionControl is Ownable {
 // File: contracts/databases/FeeSplitterDatabase.sol
 
 contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
-    
+
     event PayeeAddressChanged(
-        uint8 payeeIndex, 
-        address oldAddress, 
+        uint8 payeeIndex,
+        address oldAddress,
         address newAddress
     );
     event PayeesDeleted();
@@ -1349,7 +1349,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
         payable
         PaymentSplitter(_payees, _shares)
     { }
-    
+
     function ()
         external
         payable
@@ -1357,7 +1357,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
     {
         emit PaymentReceived(msg.sender, msg.value);
     }
-    
+
     function changePayeeAddress(uint8 _payeeIndex, address _newAddress)
         external
         whenNotPaused
@@ -1365,7 +1365,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
         require(_payeeIndex < 8);
         require(msg.sender == payees[_payeeIndex]);
         require(payees[_payeeIndex] != _newAddress);
-        
+
         address oldAddress = payees[_payeeIndex];
 
         shares[_newAddress] = shares[oldAddress];
@@ -1377,7 +1377,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
 
         emit PayeeAddressChanged(_payeeIndex, oldAddress, _newAddress);
     }
-    
+
     function setPayess(address[] _payees, uint256[] _shares)
         external
         whenPaused
@@ -1385,7 +1385,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
     {
         _initializePayess(_payees, _shares);
     }
-    
+
     function deletePayees()
         external
         whenPaused
@@ -1399,7 +1399,7 @@ contract FeeSplitterDatabase is PaymentSplitter, DatabasePermissionControl {
         payees.length = 0;
         totalShares = 0;
         totalReleased = 0;
-        
+
         emit PayeesDeleted();
     }
 }
@@ -1418,7 +1418,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
     /*
     *  Storage
     */
-    
+
     bytes4 private constant INTERFACE_SCHEMA_EULER_ID = 0x153366ed;
     bytes4 private constant INTERFACE_DATABASE_V1_EULER_ID = 0xf2c320c4;
 
@@ -1439,7 +1439,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
 
     bytes32[] private databaseTags;
     string private databaseDescription;
-    
+
     string private schemaDefinition;
     ISchema private entriesStorage;
     bool private databaseInitStatus = false;
@@ -1624,7 +1624,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
         onlyAdmin
     {
         require(databaseTags.length < 16);
-        databaseTags.push(_tag);    
+        databaseTags.push(_tag);
         emit TagAdded(_tag);
     }
 
@@ -1633,7 +1633,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
         onlyAdmin
     {
         require(_index < databaseTags.length);
-        databaseTags[_index] = _tag;    
+        databaseTags[_index] = _tag;
         emit TagUpdated(_index, _tag);
     }
 
@@ -1650,7 +1650,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
         databaseTags[_index] = lastTag;
         databaseTags[lastTagIndex] = "";
         databaseTags.length--;
-        
+
         emit TagDeleted(_index);
     }
 
@@ -1724,7 +1724,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
     {
         return address(entriesStorage);
     }
-    
+
     function getSchemaDefinition()
         external
         view
@@ -1784,7 +1784,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
     /**
     *  Public functions
     */
-    
+
     function initializeDatabase(string _schemaDefinition, bytes _schemaBytecode)
         public
         onlyAdmin
@@ -1803,7 +1803,7 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
         require(deployedAddress != address(0));
         require(SupportsInterfaceWithLookup(deployedAddress).supportsInterface(INTERFACE_SCHEMA_EULER_ID));
         entriesStorage = ISchema(deployedAddress);
-    
+
         schemaDefinition = _schemaDefinition;
         databaseInitStatus = true;
 
@@ -1859,4 +1859,16 @@ contract DatabaseV1 is IDatabase, Ownable, DatabasePermissionControl, SupportsIn
                 _data
         ));
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

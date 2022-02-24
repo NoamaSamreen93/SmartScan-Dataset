@@ -314,7 +314,7 @@ contract Crowdsale {
 
   function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) public {
     // Removed because recovering crowdsale
-    // require(_startTime >= now); 
+    // require(_startTime >= now);
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != address(0));
@@ -594,7 +594,7 @@ contract LSDToken is CappedToken, PausableToken, BurnableToken {
         CappedToken(_cap)
         public
     {
-        
+
     }
 
 }
@@ -614,13 +614,13 @@ contract LSDCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
     }
 
     function createTokenContract() internal returns (MintableToken) {
-        /** 
+        /**
             This returns an empty address because token needs arguments
         */
         return MintableToken(address(0));
-    
+
     }
-    
+
     function buyTokens(address beneficiary) public payable {
         require(beneficiary != address(0));
         require(validPurchase());
@@ -643,7 +643,7 @@ contract LSDCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
     }
 
     function calculateRate() internal view returns (uint256) {
-                
+
         if ( now <= 1521309600 )
             return rate.mul(115).div(100);
         else if ( now <= 1521374400 )
@@ -673,4 +673,15 @@ contract LSDCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

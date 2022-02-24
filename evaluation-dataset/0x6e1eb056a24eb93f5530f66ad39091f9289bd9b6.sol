@@ -50,8 +50,8 @@ contract BaseDINOToken {
 
     // Modifiers
     modifier onlyOwner() {
-        require(msg.sender == owner,"Only the owner is allowed to call this."); 
-        _; 
+        require(msg.sender == owner,"Only the owner is allowed to call this.");
+        _;
     }
 
     constructor() public{
@@ -233,7 +233,7 @@ contract BaseDINOToken {
 }
 
 contract DINOToken is BaseDINOToken {
-    
+
     // Constants
     string  public constant name = "Dinero";
     string  public constant symbol = "DINO";
@@ -242,7 +242,7 @@ contract DINOToken is BaseDINOToken {
     uint256 public constant INITIAL_SUPPLY      =  1300000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =   800000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =   500000000 * (10 ** uint256(decimals));
-    
+
     // Properties
     //uint256 public totalSupply;
     uint256 public crowdSaleAllowance;      // the number of tokens available for crowdsales
@@ -346,4 +346,12 @@ contract DINOToken is BaseDINOToken {
         emit Approval(_from, _to, _value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

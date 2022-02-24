@@ -164,7 +164,7 @@ contract Vault is VaultI, Ownable {
     enum State { Active, Success, Refunding, Closed }
 
     // The timestamp of the first deposit
-    uint256 public firstDepositTimestamp; 
+    uint256 public firstDepositTimestamp;
 
     mapping (address => uint256) public deposited;
 
@@ -180,7 +180,7 @@ contract Vault is VaultI, Ownable {
 
     // Timestamp that has to pass before sending funds to the wallet
     uint256 public nextDisbursement;
-    
+
     // Total amount that was deposited
     uint256 public totalDeposited;
 
@@ -203,8 +203,8 @@ contract Vault is VaultI, Ownable {
         uint256 _initialWei,
         uint256 _disbursementWei,
         uint256 _disbursementDuration
-    ) 
-        public 
+    )
+        public
     {
         require(_wallet != address(0));
         require(_disbursementWei != 0);
@@ -227,8 +227,8 @@ contract Vault is VaultI, Ownable {
 
     /// @dev Sends initial funds to the wallet.
     function saleSuccessful()
-        onlyOwner 
-        external 
+        onlyOwner
+        external
         atState(State.Active)
     {
         state = State.Success;
@@ -280,4 +280,15 @@ contract Vault is VaultI, Ownable {
         uint256 amountToSend = Math.min256(_amount, address(this).balance);
         trustedWallet.transfer(amountToSend);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

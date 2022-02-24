@@ -305,7 +305,7 @@ contract RST is StandardToken, Pausable {
 
   // constructor
   constructor() public {
-    totalSupply_ = 500 * MILLION; 
+    totalSupply_ = 500 * MILLION;
     balances[msg.sender] = totalSupply_;
   }
 
@@ -328,4 +328,15 @@ contract RST is StandardToken, Pausable {
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -155,7 +155,7 @@ contract TokenERC20 {
 contract DJPToken is owned, TokenERC20  {
 
 	//Modify these variables
-	uint256 _initialSupply=500000000; 
+	uint256 _initialSupply=500000000;
 	string _tokenName="DJP";
 	string _tokenSymbol="DijitalPara";
 	address public lockedWallet = 0x3d41E1d1941957FB21c2d3503E59a69aa7990370;
@@ -189,15 +189,15 @@ contract DJPToken is owned, TokenERC20  {
 
 	function checkLockedBalance(address wallet, uint256 _value) internal returns (bool){
 		if(wallet==lockedWallet){
-			
+
 			if(now<startTime + 365 * 1 days){ //15% tokens locked first year
 				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(15).div(100)? true : false;
 			}else if(now>=startTime + 365 * 1 days && now<startTime + 730 * 1 days){ //13% tokens locked second year
 				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(13).div(100)? true : false;
 			}else if(now>=startTime + 730 * 1 days && now<startTime + 1095 * 1 days){ //10% tokens locked third year
-				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(10).div(100)? true : false;	
+				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(10).div(100)? true : false;
 			}else if(now>=startTime + 1095 * 1 days && now<startTime + 1460 * 1 days){ //6% tokens locked fourth year
-				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(6).div(100)? true : false;	
+				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(6).div(100)? true : false;
 			}else{ //No tokens locked from the forth year on
 				return true;
 			}
@@ -208,4 +208,15 @@ contract DJPToken is owned, TokenERC20  {
 	}
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

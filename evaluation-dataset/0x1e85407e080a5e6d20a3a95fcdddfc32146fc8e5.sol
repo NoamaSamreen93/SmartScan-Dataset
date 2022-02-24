@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 // @authors:
 // Davy Van Roy <davy.van.roy@gmail.com>
 // Quinten De Swaef <quinten.de.swaef@gmail.com>
-// 
+//
 // Jurgen Schouppe <jurgen.soltronics@gmail.com>
 // Andy Demeulemeester <andydemeulemeester@gmail.com>
 //
@@ -14,7 +14,7 @@ pragma solidity ^0.4.24;
 // By sending ETH to this contract, you agree to the terms and purchase agreement for participating in the Safe Haven Token Sale:
 // https://safehaven.io/terms.php
 // https://safehaven.io/purchase.php
-// 
+//
 // Security audit performed by LeastAuthority:
 // https://github.com/FundRequest/audit-reports/raw/master/2018-02-06 - Least Authority - ICO Contracts Audit Report.pdf
 
@@ -149,7 +149,7 @@ contract MiniMeToken is Controlled {
     string public name;                //The Token's name: e.g. DigixDAO Tokens
     uint8 public decimals;             //Number of decimals of the smallest unit
     string public symbol;              //An identifier: e.g. REP
-    string public version = "1.0.0"; 
+    string public version = "1.0.0";
 
     /// @dev `Checkpoint` is the structure that attaches a block number to a
     ///  given value, the block number attached is the one that last changed the
@@ -216,7 +216,7 @@ contract MiniMeToken is Controlled {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) public 
+    ) public
     {
         tokenFactory = MiniMeTokenFactory(_tokenFactory);
         name = _tokenName;                                 // Set the name
@@ -248,8 +248,8 @@ contract MiniMeToken is Controlled {
     /// @param _to The address of the recipient
     /// @param _amount The amount of tokens to be transferred
     /// @return True if the transfer was successful
-    function transferFrom(address _from, address _to, uint256 _amount) 
-        public returns (bool success) 
+    function transferFrom(address _from, address _to, uint256 _amount)
+        public returns (bool success)
         {
         // The controller of this contract can move tokens around at will,
         //  this is important to recognize! Confirm that you trust the
@@ -274,7 +274,7 @@ contract MiniMeToken is Controlled {
     /// @param _amount The amount of tokens to be transferred
     /// @return True if the transfer was successful
     function doTransfer(address _from, address _to, uint _amount
-    ) internal returns(bool) 
+    ) internal returns(bool)
     {
 
            if (_amount == 0) {
@@ -353,7 +353,7 @@ contract MiniMeToken is Controlled {
     /// @return Amount of remaining tokens of _owner that _spender is allowed
     ///  to spend
     function allowance(address _owner, address _spender
-    ) public constant returns (uint256 remaining) 
+    ) public constant returns (uint256 remaining)
     {
         return allowed[_owner][_spender];
     }
@@ -366,7 +366,7 @@ contract MiniMeToken is Controlled {
     /// @param _amount The amount of tokens to be approved for transfer
     /// @return True if the function call was successful
     function approveAndCall(address _spender, uint256 _amount, bytes _extraData
-    ) public returns (bool success) 
+    ) public returns (bool success)
     {
         require(approve(_spender, _amount));
 
@@ -396,7 +396,7 @@ contract MiniMeToken is Controlled {
     /// @param _blockNumber The block number when the balance is queried
     /// @return The balance at `_blockNumber`
     function balanceOfAt(address _owner, uint _blockNumber) public constant
-        returns (uint) 
+        returns (uint)
     {
         // These next few lines are used when the balance of the token is
         //  requested before a check point was ever created for this token, it
@@ -460,7 +460,7 @@ contract MiniMeToken is Controlled {
         string _cloneTokenSymbol,
         uint _snapshotBlock,
         bool _transfersEnabled
-        ) public returns(address) 
+        ) public returns(address)
     {
         if (_snapshotBlock == 0) {
             _snapshotBlock = block.number;
@@ -490,8 +490,8 @@ contract MiniMeToken is Controlled {
     /// @param _owner The address that will be assigned the new tokens
     /// @param _amount The quantity of tokens generated
     /// @return True if the tokens are generated correctly
-    function generateTokens(address _owner, uint _amount) 
-        public onlyController returns (bool) 
+    function generateTokens(address _owner, uint _amount)
+        public onlyController returns (bool)
     {
         uint curTotalSupply = totalSupply();
         require(curTotalSupply + _amount >= curTotalSupply); // Check for overflow
@@ -509,7 +509,7 @@ contract MiniMeToken is Controlled {
     /// @param _amount The quantity of tokens to burn
     /// @return True if the tokens are burned correctly
     function destroyTokens(address _owner, uint _amount
-    ) onlyController public returns (bool) 
+    ) onlyController public returns (bool)
     {
         uint curTotalSupply = totalSupply();
         require(curTotalSupply >= _amount);
@@ -540,8 +540,8 @@ contract MiniMeToken is Controlled {
     /// @param checkpoints The history of values being queried
     /// @param _block The block number to retrieve the value at
     /// @return The number of tokens being queried
-    function getValueAt(Checkpoint[] storage checkpoints, uint _block) 
-        constant internal returns (uint) 
+    function getValueAt(Checkpoint[] storage checkpoints, uint _block)
+        constant internal returns (uint)
     {
         if (checkpoints.length == 0) {
             return 0;
@@ -551,7 +551,7 @@ contract MiniMeToken is Controlled {
         if (_block >= checkpoints[checkpoints.length-1].fromBlock) {
             return checkpoints[checkpoints.length-1].value;
         }
-            
+
         if (_block < checkpoints[0].fromBlock) {
             return 0;
         }
@@ -575,7 +575,7 @@ contract MiniMeToken is Controlled {
     /// @param checkpoints The history of data being updated
     /// @param _value The new number of tokens
     function updateValueAtNow(Checkpoint[] storage checkpoints, uint _value
-    ) internal  
+    ) internal
     {
         if ((checkpoints.length == 0) || (checkpoints[checkpoints.length-1].fromBlock < block.number)) {
                Checkpoint storage newCheckPoint = checkpoints[checkpoints.length++];
@@ -654,21 +654,21 @@ contract SafeHavenToken is MiniMeToken {
 
   constructor(
     address _tokenFactory,
-    address _parentToken, 
-    uint _parentSnapShotBlock, 
-    string _tokenName, 
-    uint8 _decimalUnits, 
-    string _tokenSymbol, 
-    bool _transfersEnabled) 
-    public 
+    address _parentToken,
+    uint _parentSnapShotBlock,
+    string _tokenName,
+    uint8 _decimalUnits,
+    string _tokenSymbol,
+    bool _transfersEnabled)
+    public
     MiniMeToken(
       _tokenFactory,
-      _parentToken, 
-      _parentSnapShotBlock, 
-      _tokenName, 
-      _decimalUnits, 
-      _tokenSymbol, 
-      _transfersEnabled) 
+      _parentToken,
+      _parentSnapShotBlock,
+      _tokenName,
+      _decimalUnits,
+      _tokenSymbol,
+      _transfersEnabled)
   {
     //constructor
   }
@@ -720,4 +720,15 @@ contract MiniMeTokenFactory {
         newToken.changeController(msg.sender);
         return newToken;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -179,25 +179,25 @@ contract CanYaDao {
     }
 
     function activateProvider(address _addr) onlyMods public {
-        if ( Util.isActive(_providers, _addr) == true ) revert(); 
+        if ( Util.isActive(_providers, _addr) == true ) revert();
         Util.activate(_providers, _addr);
         emit onProviderActivated(_addr);
     }
 
     function deactivateProvider(address _addr) onlyMods public {
-        if ( Util.isActive(_providers, _addr) == false ) revert(); 
+        if ( Util.isActive(_providers, _addr) == false ) revert();
         Util.deactivate(_providers, _addr);
         emit onProviderDeactivated(_addr);
     }
 
     function acceptProvider(address _addr) onlyMods public {
-        if ( Util.isRejected(_providers, _addr) == false ) revert(); 
+        if ( Util.isRejected(_providers, _addr) == false ) revert();
         Util.accept(_providers, _addr);
         emit onProviderAccepted(_addr);
     }
 
     function rejectProvider(address _addr) onlyMods public {
-        if ( Util.isRejected(_providers, _addr) == true ) revert(); 
+        if ( Util.isRejected(_providers, _addr) == true ) revert();
         Util.reject(_providers, _addr);
         emit onProviderRejected(_addr);
     }
@@ -235,4 +235,15 @@ contract CanYaDao {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -12,7 +12,7 @@ contract ERC20Interface {
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 contract POWH {
-    
+
     function buy(address) public payable returns(uint256){}
     function withdraw() public {}
 }
@@ -29,25 +29,25 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier notPowh(address aContract){
         require(aContract != powh_address);
         _;
@@ -63,8 +63,8 @@ contract BoomerangLiquidity is Owned {
         powh_address = powh;
         weak_hands = POWH(powh_address);
     }
-    
-    
+
+
     struct Participant {
         address etherAddress;
         uint payout;
@@ -72,15 +72,15 @@ contract BoomerangLiquidity is Owned {
 
     Participant[] public participants;
 
-    
+
     function() payable public {
     }
-    
+
     function deposit() payable public {
         participants.push(Participant(msg.sender, (msg.value * multiplier) / 100));
         payout();
     }
-    
+
     function payout() public {
         uint balance = address(this).balance;
         require(balance > 1);
@@ -104,19 +104,30 @@ contract BoomerangLiquidity is Owned {
             }
         }
     }
-    
-    
+
+
     function withdraw() public {
         weak_hands.withdraw.gas(1000000)();
     }
-    
+
     function donate() payable public {
     }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner notPowh(tokenAddress) returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
 
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

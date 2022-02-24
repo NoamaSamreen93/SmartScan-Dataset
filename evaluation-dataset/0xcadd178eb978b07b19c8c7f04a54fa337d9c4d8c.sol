@@ -19,7 +19,7 @@ interface Proxy {
     uint256 _c
   )
     external;
-    
+
 }
 
 /**
@@ -160,8 +160,8 @@ interface ERC20
 }
 
 /**
- * @dev Math operations with safety checks that throw on error. This contract is based on the 
- * source code at: 
+ * @dev Math operations with safety checks that throw on error. This contract is based on the
+ * source code at:
  * https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol.
  */
 library SafeMath
@@ -269,7 +269,7 @@ library SafeMath
   )
     internal
     pure
-    returns (uint256 remainder) 
+    returns (uint256 remainder)
   {
     require(_divisor != 0, DIVISION_BY_ZERO);
     remainder = _dividend % _divisor;
@@ -281,13 +281,13 @@ library SafeMath
  * @title Contract for setting abilities.
  * @dev For optimization purposes the abilities are represented as a bitfield. Maximum number of
  * abilities is therefore 256. This is an example(for simplicity is made for max 8 abilities) of how
- * this works. 
+ * this works.
  * 00000001 Ability A - number representation 1
  * 00000010 Ability B - number representation 2
  * 00000100 Ability C - number representation 4
  * 00001000 Ability D - number representation 8
  * 00010000 Ability E - number representation 16
- * etc ... 
+ * etc ...
  * To grant abilities B and C, we would need a bitfield of 00000110 which is represented by number
  * 6, in other words, the sum of abilities B and C. The same concept works for revoking abilities
  * and checking if someone has multiple abilities.
@@ -304,7 +304,7 @@ contract Abilitable
   string constant INVALID_INPUT = "017003";
 
   /**
-   * @dev Ability 1 is a reserved ability. It is an ability to grant or revoke abilities. 
+   * @dev Ability 1 is a reserved ability. It is an ability to grant or revoke abilities.
    * There can be minimum of 1 address with ability 1.
    * Other abilities are determined by implementing contract.
    */
@@ -345,7 +345,7 @@ contract Abilitable
    */
   modifier hasAbilities(
     uint256 _abilities
-  ) 
+  )
   {
     require(_abilities > 0, INVALID_INPUT);
     require(
@@ -425,7 +425,7 @@ contract Abilitable
     require(_abilities > 0, INVALID_INPUT);
     return (addressToAbility[_target] & _abilities) == _abilities;
   }
-  
+
 }
 
 /**
@@ -433,14 +433,14 @@ contract Abilitable
  * decentralized governance.
  * @dev Based on:https://github.com/0xProject/contracts/blob/master/contracts/TokenTransferProxy.sol
  */
-contract TokenTransferProxy is 
+contract TokenTransferProxy is
   Proxy,
-  Abilitable 
+  Abilitable
 {
 
   /**
    * @dev List of abilities:
-   * 2 - Ability to execute transfer. 
+   * 2 - Ability to execute transfer.
    */
   uint8 constant ABILITY_TO_EXECUTE = 2;
 
@@ -470,5 +470,14 @@ contract TokenTransferProxy is
       TRANSFER_FAILED
     );
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

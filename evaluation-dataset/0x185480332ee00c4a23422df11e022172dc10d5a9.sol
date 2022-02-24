@@ -44,7 +44,7 @@ contract NausiCoin is Erc20Token, owned {
 
     event Burn(address indexed from, uint amount);
     event Mint(address indexed from, uint amount);
-    
+
     constructor(string tokenName, string tokenSymbol, uint tokenDecimals, uint tokenTotalSupply) public {
         name = tokenName;
         symbol = tokenSymbol;
@@ -73,7 +73,7 @@ contract NausiCoin is Erc20Token, owned {
 
     function transferFrom(address from, address to, uint value) public returns (bool success){
         require(_allowance[from][msg.sender] >= value);
-        
+
         _allowance[from][msg.sender] -= value;
         _transfer(from, to, value);
 
@@ -140,4 +140,15 @@ contract NausiCoin is Erc20Token, owned {
 
         assert(_balanceOf[from] + _balanceOf[to] == previousBalance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

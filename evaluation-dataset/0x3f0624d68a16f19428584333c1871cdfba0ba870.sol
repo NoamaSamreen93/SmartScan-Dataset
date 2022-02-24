@@ -60,7 +60,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -185,7 +185,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -194,7 +194,7 @@ contract Ownable {
 
 /**
  * @title DatumGenesisToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator. 
+ * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
@@ -203,14 +203,14 @@ contract DatumGenesisToken is StandardToken, Ownable {
   string public name = "DAT Genesis Token";           //The Token's name: e.g. Dat Genesis Tokens
   uint8 public decimals = 18;                         //Number of decimals of the smallest unit
   string public symbol = "DATG";                             //An identifier: e.g. REP
-                                           
+
   uint256 public constant INITIAL_SUPPLY = 75000000 ether;
 
   // Flag that determines if the token is transferable or not.
   bool public transfersEnabled = false;
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function DatumGenesisToken() {
     totalSupply = INITIAL_SUPPLY;
@@ -247,11 +247,11 @@ contract DatumGenesisToken is StandardToken, Ownable {
 
 
 /**
- * @title  
+ * @title
  * @dev DatCrowdSale is a contract for managing a token crowdsale.
  * DatCrowdSale have a start and end date, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a refundable valut 
+ * on a token per ETH rate. Funds collected are forwarded to a refundable valut
  * as they arrive.
  */
 contract DatCrowdPreSale is Ownable {
@@ -284,7 +284,7 @@ contract DatCrowdPreSale is Ownable {
 
   //cap for the sale
   uint256 public cap = 5000000000000000000000 wei; //5000 ether
- 
+
 
 
 
@@ -296,7 +296,7 @@ contract DatCrowdPreSale is Ownable {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
@@ -309,14 +309,14 @@ contract DatCrowdPreSale is Ownable {
   event LogParticipation(address indexed sender, uint256 value, uint256 timestamp);
 
 
-  
+
   function DatCrowdPreSale(address _wallet) {
     token = createTokenContract();
     wallet = _wallet;
   }
 
 
-// creates the token to be sold. 
+// creates the token to be sold.
   // override this method to have crowdsale of a specific datum token.
   function createTokenContract() internal returns (DatumGenesisToken) {
     return new DatumGenesisToken();
@@ -409,4 +409,15 @@ contract DatCrowdPreSale is Ownable {
     return isFinalized;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

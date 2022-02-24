@@ -21,27 +21,27 @@ contract ToGoConcert {
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                       
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require(_to != 0x0);
-        
+
         require(balanceOf[_from] >= _value);
-        
+
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        
+
         balanceOf[_from] -= _value;
-        
+
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -89,4 +89,17 @@ contract ToGoConcert {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

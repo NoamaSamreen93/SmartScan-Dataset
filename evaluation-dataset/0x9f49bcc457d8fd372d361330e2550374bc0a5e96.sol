@@ -109,17 +109,26 @@ contract COINBIG is StandardToken {
   string public symbol = "CB";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 10000000000000000000000000000;
-  
+
   function COINBIG() {
     _totalSupply = INITIAL_SUPPLY;
 	_creator = 0x34625c78472AbBb80190d8be945D949D07d95D12;
 	balances[_creator] = INITIAL_SUPPLY;
 	bIsFreezeAll = false;
   }
-  
+
   function destroy() {
 	require(msg.sender == _creator);
 	suicide(_creator);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

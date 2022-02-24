@@ -82,7 +82,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
 
   /**
   * @dev transfer token for a specified address
@@ -198,7 +198,7 @@ contract TOKKA is StandardToken {
     string public symbol = "STPY";
     uint256 public decimals = 18;
 
-   
+
     function TOKKA() public {
        totalSupply = 35000000 * 10**18;
        balances[msg.sender] = totalSupply;
@@ -224,23 +224,23 @@ contract Crowdsale is Ownable {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   // Our Goal is 68254.06111663644 Ethers Hardcap
   uint256 public CAP = 68254061116636440000000;
-  
+
   bool crowdsaleClosed = false;
-  
+
   //Bonus Parameters
-  
+
   uint256 public PreIcobonusEnds = 1535731200;
-  
+
   uint256 public StgOnebonusEnds = 1538323200;
   uint256 public StgTwobonusEnds = 1541001600;
   uint256 public StgThreebonusEnds = 1543593600;
   uint256 public StgFourbonusEnds = 1546272000;
-  
-  
-  
+
+
+
 
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
@@ -255,11 +255,11 @@ contract Crowdsale is Ownable {
     endTime = _endTime;
     rate = _rate;
     wallet = _wallet;
-    
+
     //Bonus Parametersss
-    
+
     //StgOnebonusEnds = _bonusEnds;
-    
+
     token = createTokenContract();
   }
 
@@ -280,34 +280,34 @@ function buyTokens(address beneficiary) public payable {
     require(beneficiary != address(0));
     require(validPurchase());
     require(!crowdsaleClosed);
-    
+
     //Bounus Conditions
-    
-    
-    
+
+
+
     if (now <= PreIcobonusEnds) {
             rate = 667;
-         } 
-    
+         }
+
      else if (now <= StgOnebonusEnds && now > PreIcobonusEnds) {
             rate = 641;
-         }  
-    
+         }
+
     else if (now <= StgTwobonusEnds && now > StgOnebonusEnds ) {
             rate = 616;
-         }  
-     
+         }
+
      else if (now <= StgThreebonusEnds && now > StgTwobonusEnds ) {
             rate = 590;
-         } 
+         }
          else if (now <= StgFourbonusEnds && now > StgThreebonusEnds ) {
             rate = 564;
          }
     else{
         rate = 513;
     }
-     
-    
+
+
 
     uint256 weiAmount = msg.value;
 
@@ -317,7 +317,7 @@ function buyTokens(address beneficiary) public payable {
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
-    // transfer tokens purchased 
+    // transfer tokens purchased
     //ERC20(token).transfer(this, tokens);
     //StandardToken(token).transfer(this, tokens);
     token.transfer(beneficiary, tokens);
@@ -343,29 +343,40 @@ function buyTokens(address beneficiary) public payable {
   function hasEnded() public view returns (bool) {
     return now > endTime;
   }
-  
+
   function GoalReached() public view returns (bool) {
     return (weiRaised >= CAP);
   }
-  
+
   function Pause() public onlyOwner
   {
        //if (weiRaised >= CAP){
-           
+
         //}
         require(weiRaised >= CAP);
-        
+
         crowdsaleClosed = true;
   }
-  
+
   function Play() public onlyOwner
   {
        //if (weiRaised >= CAP){
-           
+
         //}
         require(crowdsaleClosed == true);
-        
+
         crowdsaleClosed = false;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

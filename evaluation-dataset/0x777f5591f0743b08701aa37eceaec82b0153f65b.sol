@@ -585,7 +585,7 @@ contract MigrationAgent {
 }
 
 /// @title Locked
-/// @dev Smart contract to enable locking and unlocking of token holders. 
+/// @dev Smart contract to enable locking and unlocking of token holders.
 contract Locked is Ownable {
 
     mapping (address => bool) public lockedList;
@@ -612,7 +612,7 @@ contract Locked is Ownable {
     function isLocked(address _user) public view returns (bool) {
         return lockedList[_user];
     }
-    
+
     /// @dev add user to lock
     /// @param _user to lock
     function addLock (address _user) public onlyOwner {
@@ -678,7 +678,7 @@ contract Token is Pausable, ERC20Detailed, Ownable, ERC20Burnable, MinterRole, L
         _mint(initialAllocation, INITIAL_SUPPLY + ONE_YEAR_SUPPLY);
         mintedYears[returnYear()] = true;
     }
-     
+
     /// @dev Function to determine year based on the current time
     /// There is no need to deal with leap years as only once per year mining can be run and
     /// one day is meaningless
@@ -774,4 +774,10 @@ contract Token is Pausable, ERC20Detailed, Ownable, ERC20Burnable, MinterRole, L
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

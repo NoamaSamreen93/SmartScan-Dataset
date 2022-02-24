@@ -226,51 +226,51 @@ contract IContractRegistry {
  * @notice It does not support ERC20 to ERC20 transfer.
  */
 
-contract IndTokenPayment is Ownable, ReentrancyGuard {  
+contract IndTokenPayment is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    IERC20Token[] public path;    
-    address public destinationWallet;       
+    IERC20Token[] public path;
+    address public destinationWallet;
     //Minimum tokens per 1 ETH to convert
     uint256 public minConversionRate;
     IContractRegistry public bancorRegistry;
     bytes32 public constant BANCOR_NETWORK = "BancorNetwork";
-    
-    event conversionSucceded(address from,uint256 fromTokenVal,address dest,uint256 minReturn,uint256 destTokenVal);    
+
+    event conversionSucceded(address from,uint256 fromTokenVal,address dest,uint256 minReturn,uint256 destTokenVal);
     event conversionMin(uint256 min);
-    
+
     constructor(IERC20Token[] _path,
                 address destWalletAddr,
                 address bancorRegistryAddr,
                 uint256 minConvRate){
         path = _path;
         bancorRegistry = IContractRegistry(bancorRegistryAddr);
-        destinationWallet = destWalletAddr;         
+        destinationWallet = destWalletAddr;
         minConversionRate = minConvRate;
     }
 
     function setConversionPath(IERC20Token[] _path) public onlyOwner {
         path = _path;
     }
-    
+
     function setBancorRegistry(address bancorRegistryAddr) public onlyOwner {
         bancorRegistry = IContractRegistry(bancorRegistryAddr);
     }
 
     function setMinConversionRate(uint256 minConvRate) public onlyOwner {
         minConversionRate = minConvRate;
-    }    
+    }
 
     function setDestinationWallet(address destWalletAddr) public onlyOwner {
         destinationWallet = destWalletAddr;
-    }    
-    
+    }
+
     function convertToInd() internal nonReentrant {
         assert(bancorRegistry.getAddress(BANCOR_NETWORK) != address(0));
-        IBancorNetwork bancorNetwork = IBancorNetwork(bancorRegistry.getAddress(BANCOR_NETWORK));   
+        IBancorNetwork bancorNetwork = IBancorNetwork(bancorRegistry.getAddress(BANCOR_NETWORK));
         uint256 minReturn = minConversionRate.mul(msg.value);
-        uint256 convTokens =  bancorNetwork.convertFor.value(msg.value)(path,msg.value,minReturn,destinationWallet);        
+        uint256 convTokens =  bancorNetwork.convertFor.value(msg.value)(path,msg.value,minReturn,destinationWallet);
         assert(convTokens > 0);
-        emit conversionSucceded(msg.sender,msg.value,destinationWallet,minReturn,convTokens);                                                                    
+        emit conversionSucceded(msg.sender,msg.value,destinationWallet,minReturn,convTokens);
     }
 
     //If accidentally tokens are transferred to this
@@ -287,10 +287,10 @@ contract IndTokenPayment is Ownable, ReentrancyGuard {
     function withdrawEther() public onlyOwner nonReentrant returns(bool){
         if(address(this).balance > 0){
             destinationWallet.transfer(address(this).balance);
-        }        
+        }
         return true;
     }
- 
+
     function () public payable {
         //Bancor contract can send the transfer back in case of error, which goes back into this
         //function ,convertToInd is non-reentrant.
@@ -307,4 +307,15 @@ contract IndTokenPayment is Ownable, ReentrancyGuard {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

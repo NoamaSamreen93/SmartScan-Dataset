@@ -459,7 +459,7 @@ contract MintableToken is PausableToken, MinterRole {
     modifier canMint() {
         require(!mintingFinished);
         _;
-    } 
+    }
     /**
      * @dev Function to mint tokens
      * @param to The address that will receive the minted tokens.
@@ -899,13 +899,13 @@ contract TokenController is multiowned {
 
     HlorToken public token;
 
-    constructor(address[] memory _owners, uint _required, address _tokenAddress) 
+    constructor(address[] memory _owners, uint _required, address _tokenAddress)
     multiowned(_owners, _required) public {
         token = HlorToken(_tokenAddress);
     }
- 
+
     function mint(address _to, uint256 _amount) onlyowner public returns (bool)
-    {   
+    {
         return token.mint(_to, _amount);
     }
 
@@ -928,4 +928,15 @@ contract TokenController is multiowned {
     function finishMinting() onlymanyowners(keccak256(msg.data)) public returns (bool) {
         token.finishMinting();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

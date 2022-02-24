@@ -20,7 +20,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -56,7 +56,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -92,7 +92,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -128,7 +128,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -164,7 +164,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -200,7 +200,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -236,7 +236,7 @@ library Sets {
         if (self.memberExists[other])  {
             self.memberExists[other] = false;
             uint index = self.memberIndex[other];
-            // change index of last value to index of other 
+            // change index of last value to index of other
             self.memberIndex[self.members[self.members.length - 1]] = index;
             // copy last value over other and decrement length
             self.members[index] = self.members[self.members.length - 1];
@@ -262,8 +262,8 @@ contract Prover {
     address owner;
     Sets.addressSet internal users;
     mapping (address => UserAccount) internal ledger;
-    
-    
+
+
     // structs
     struct UserAccount {
         Sets.bytes32Set hashes;
@@ -280,8 +280,8 @@ contract Prover {
     function Prover() {
         owner = msg.sender;
     }
-    
-    
+
+
     // fallback: unmatched transactions will be returned
     function () {
         revert();
@@ -308,7 +308,7 @@ contract Prover {
     {
         return status(target, sha3(dataString));
     }
-    
+
     // allow access to our structs via functions with convenient return values
     function usersGetter() public constant
         returns (uint256 number_unique_addresses, address[] unique_addresses)
@@ -319,8 +319,8 @@ contract Prover {
     function userEntries(address target) external constant returns (bytes32[]) {
         return ledger[target].hashes.members;
     }
-    
-    
+
+
     // public functions
     // adding entries
     function addEntry(bytes32 dataHash) payable {
@@ -339,7 +339,7 @@ contract Prover {
     function deleteEntry(string dataString) hasAccount {
         _deleteEntry(sha3(dataString));
     }
-    
+
     // allow owner to delete contract if no accounts exist
     function selfDestruct() {
         if ((msg.sender == owner) && (users.length() == 0)) {
@@ -384,4 +384,10 @@ contract Prover {
                 ledger[target].entries[dataHash].time,
                 ledger[target].entries[dataHash].value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

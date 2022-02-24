@@ -140,7 +140,7 @@ contract DSExec {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -320,12 +320,12 @@ contract DSTokenBase is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     function DSTokenBase(uint256 supply) {
         _balances[msg.sender] = supply;
         _supply = supply;
     }
-    
+
     function totalSupply() constant returns (uint256) {
         return _supply;
     }
@@ -335,60 +335,60 @@ contract DSTokenBase is ERC20, DSMath {
     function allowance(address src, address guy) constant returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 
 }
 
 contract WhiteList {
-    
+
     mapping (address => bool)   public  whiteList;
-    
+
     address  public  owner;
-    
+
     function WhiteList() public {
         owner = msg.sender;
         whiteList[owner] = true;
     }
-    
+
     function addToWhiteList(address [] _addresses) public {
         require(msg.sender == owner);
-        
+
         for (uint i = 0; i < _addresses.length; i++) {
             whiteList[_addresses[i]] = true;
         }
     }
-    
+
     function removeFromWhiteList(address [] _addresses) public {
         require (msg.sender == owner);
         for (uint i = 0; i < _addresses.length; i++) {
@@ -401,7 +401,7 @@ contract DSToken is DSTokenBase(0), DSStop {
 
     bytes32  public  symbol = "GENEOS";
     uint256  public  decimals = 18; // standard token precision. override to customize
-    
+
     WhiteList public wlcontract;
 
     function DSToken(WhiteList wlc_) {
@@ -448,9 +448,15 @@ contract DSToken is DSTokenBase(0), DSStop {
     // Optional token name
 
     bytes32   public  name = "";
-    
+
     function setName(bytes32 name_) auth {
         name = name_;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

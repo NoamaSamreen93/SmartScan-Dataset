@@ -69,7 +69,7 @@ contract DIDToken is Approvable {
 
         _numDID = _numDID * 1 ether;
         totalSupply = SafeMath.add(totalSupply, _numDID);
-        
+
         uint256 balance = DIDHolders[_recipient].balance;
         DIDHolders[_recipient].balance = SafeMath.add(balance, _numDID);
 
@@ -558,4 +558,15 @@ library SafeMath {
     return _quotient;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

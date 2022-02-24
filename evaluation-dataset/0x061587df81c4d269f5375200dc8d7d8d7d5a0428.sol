@@ -11,7 +11,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
+
 function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
@@ -55,7 +55,7 @@ contract Token is owned {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -102,7 +102,7 @@ contract StandardToken is Token {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -137,16 +137,27 @@ contract zXBToken is UnlimitedAllowanceToken {
     string constant public name = "zXBToken 0xbt";
     string constant public symbol = "zXBT";
     string wellcomeString = "Welcome to the 0xbt.net";
-    
+
     function getData() public constant returns (string) {
         return wellcomeString;
     }
-    
+
     function setData(string newData) public {
         wellcomeString = newData;
     }
-    
+
     function zXBToken() {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

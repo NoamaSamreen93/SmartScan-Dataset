@@ -35,12 +35,12 @@ library SafeMath {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
-interface token { 
-  function transfer(address receiver, uint amount) external returns (bool) ; 
+interface token {
+  function transfer(address receiver, uint amount) external returns (bool) ;
   function balanceOf(address holder) external view returns (uint) ;
 }
 contract Crowdsale {
@@ -73,9 +73,9 @@ contract Crowdsale {
 
 
   constructor () public {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0x41d5e81BFBCb4eB82F9d7Fda41b9FE2759C69564;
-    
+
     //Here will come the checksum address we got
     addressOfTokenUsedAsReward = 0x0B44547be0A0Df5dCd5327de8EA73680517c5a54;
 
@@ -118,8 +118,8 @@ contract Crowdsale {
 
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
@@ -165,10 +165,19 @@ contract Crowdsale {
   }
 
   function withdrawTokens(uint256 _amount) public {
-    
-    require (msg.sender == wallet && 
+
+    require (msg.sender == wallet &&
       tokenReward.balanceOf(address(this)).sub(tokensSold) >= _amount);
 
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

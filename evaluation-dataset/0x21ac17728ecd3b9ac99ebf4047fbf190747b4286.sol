@@ -146,24 +146,24 @@ contract TruAu is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-  
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+
     address public owner;
 
    constructor() public {
-        decimals = 18;                            
-        totalSupply_ =   500000000 * 10 ** uint256(decimals);                        
-        balances[0x1C5212C91a0d73161b7B7be19761bD92B7e2D4F5] = totalSupply_;             
-        name = "TruAu";                                   
-        symbol = "TruAu";                              
+        decimals = 18;
+        totalSupply_ =   500000000 * 10 ** uint256(decimals);
+        balances[0x1C5212C91a0d73161b7B7be19761bD92B7e2D4F5] = totalSupply_;
+        name = "TruAu";
+        symbol = "TruAu";
         owner = 0x1C5212C91a0d73161b7B7be19761bD92B7e2D4F5;
         Transfer(address(0x0), 0x1C5212C91a0d73161b7B7be19761bD92B7e2D4F5 , totalSupply_);
 
    }
-  
+
    modifier onlyOwner(){
        require(msg.sender == owner);
        _;
@@ -214,7 +214,7 @@ contract TruAu is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
     function() payable public{
         revert();
@@ -222,4 +222,15 @@ contract TruAu is ERC20, BasicToken {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

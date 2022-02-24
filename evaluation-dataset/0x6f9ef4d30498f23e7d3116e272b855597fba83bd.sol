@@ -10,9 +10,9 @@ pragma solidity ^0.4.24;
 // Concept:
 // buy a raffle ticket
 // => lifetime possible to win a round payout and a chance to win the jackpot
-// 
+//
 // Have fun, these games are purely intended for fun.
-// 
+//
 // Warning! do not simpply send eth to the contract, this will result in the
 // rafflepot being upped and does not give tickets
 // this is needed to receive the P3D divs
@@ -85,7 +85,7 @@ interface HourglassInterface  {
 }
 contract P3DRaffle is  Owned {
     using SafeMath for uint;
-    HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe); 
+    HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
    function harvestabledivs()
         view
         public
@@ -150,12 +150,12 @@ contract P3DRaffle is  Owned {
     uint256 public jackpot; //9%
     uint256 public devfee;//1%
     SPASMInterface constant SPASM_ = SPASMInterface(0xfaAe60F2CE6491886C9f7C9356bd92F688cA66a1);
-    
+
     constructor() public{
     Raffles[0].validation = true;
-    nextrafflenr++;    
+    nextrafflenr++;
 }
-    
+
     function buytickets(uint256 amount ,address masternode) public payable{
     require(msg.value >= 10 finney * amount);
     require(amount > 0);
@@ -171,13 +171,13 @@ contract P3DRaffle is  Owned {
 }
 function fetchdivstopot () public{
     //uint256 divs = harvestabledivs();
-    
-   
+
+
     P3Dcontract_.withdraw();
-    
+
 }
 function devfeetodev () public {
-    
+
     SPASM_.disburse.value(devfee)();
     devfee = 0;
 }
@@ -190,7 +190,7 @@ function startraffle () public{
     require(Raffles[nextrafflenr - 1].validation == true);
     require(rafflepot >= 103 finney);
     Raffles[nextrafflenr].drawblock = block.number;
-    
+
     Raffles[nextrafflenr].ticketssold = nextlotnr;
     nextrafflenr++;
 }
@@ -200,7 +200,7 @@ function validateraffle () public{
     uint256 drawblock = Raffles[rafnr].drawblock;
     require(val != true);
     require(drawblock < block.number);
-    
+
     //check if blockhash can be determined
         if(block.number - 256 > drawblock) {
             // can not be determined
@@ -225,13 +225,19 @@ function validateraffle () public{
             msg.sender.transfer(3 finney);
             rafflepot = rafflepot.sub(103 finney);
         }
-    
+
 }
 function () external payable{
     uint256 base = msg.value.div(100);
-    
+
     rafflepot = rafflepot.add(base.mul(90));// allocation to raffle
     jackpot = jackpot.add(base.mul(9)); // allocation to jackpot
     devfee = devfee.add(base);
 }// needed for P3D divs receiving
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

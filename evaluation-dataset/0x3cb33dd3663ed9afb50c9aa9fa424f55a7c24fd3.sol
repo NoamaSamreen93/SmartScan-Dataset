@@ -40,15 +40,15 @@ contract Queue {
     uint256 queueInteres = 100 szabo;
     address to;
     uint256 collect = 30 finney;
-    
+
     event QueueStart(address indexed user, address indexed parentUser, uint256 indexed timeshtamp);
     event BalanceUp(address indexed user, uint256 amount, uint256 indexed timeshtamp);
     event GetMyMoney(address indexed user, uint256 amount, uint256 indexed timeshtamp);
-    
+
     function () payable public {
         msg.sender.transfer(msg.value);
     }
-    
+
     function startQueue(address parentUser) payable public {
         require(msg.value == price);
         require(msg.sender != address(0));
@@ -56,7 +56,7 @@ contract Queue {
         require(!usersExist[msg.sender]);
         _queue(msg.sender, parentUser);
     }
-    
+
     function serchIndexByAddress(address a) public view returns (uint256 index) {
         for(index=0; index<users.length; index++) {
             if(a == users[index]){
@@ -64,7 +64,7 @@ contract Queue {
             }
         }
     }
-    
+
     function _removeIndex(uint256 indexToRemove) internal {
         if (indexToRemove >= users.length) return;
 
@@ -74,7 +74,7 @@ contract Queue {
         delete users[users.length-1];
         users.length--;
     }
-    
+
     function _queue(address user, address parentUser) internal {
         if (user != address(0x9a965e5e9c3A0F062C80a7f3d1B0972201b2F19f) ) {
             require(parentUser!=user);
@@ -84,7 +84,7 @@ contract Queue {
         usersExist[user]=true;
         users2users[user]=parentUser;
         emit QueueStart(user, parentUser, now);
-        
+
         if (collectBalances[parentUser].add(referalBonus) >= collect){
             reminder = collectBalances[parentUser].add(referalBonus) - collect;
             balancesTotal[parentUser] = balancesTotal[parentUser].add(interes);
@@ -97,7 +97,7 @@ contract Queue {
         }else{
             collectBalances[parentUser] = collectBalances[parentUser].add(referalBonus);
         }
-        
+
         if (collectBalances[users2users[parentUser]].add(referalBonus) >= collect){
             reminder = collectBalances[users2users[parentUser]].add(referalBonus) - collect;
             balancesTotal[users2users[parentUser]] = balancesTotal[users2users[parentUser]].add(interes);
@@ -110,12 +110,12 @@ contract Queue {
         }else{
             collectBalances[users2users[parentUser]] = collectBalances[users2users[parentUser]].add(referalBonus);
         }
-        
+
         uint256 length = users.length;
         uint256 existLastIndex = length.sub(1);
         uint256 firstHalfEnd = 0;
         uint256 secondHalfStart = 0;
-        
+
         if (length == 1 ){
             collectBalances[users[0]] = collectBalances[users[0]].add(queueInteres.mul(cyles.mul(2)));
         }else{
@@ -126,7 +126,7 @@ contract Queue {
                 firstHalfEnd  = length.div(2).sub(1);
                 secondHalfStart  = length.div(2);
             }
-            
+
             for (uint i = 1; i <= cyles; i++) {
                 if(collectBalances[users[nextForwardUserId]].add(queueInteres) >= collect){
                     reminder = collectBalances[users[nextForwardUserId]].add(queueInteres) - collect;
@@ -165,44 +165,57 @@ contract Queue {
             }
         }
     }
-    
+
     function getMyMoney() public {
         require(balances[msg.sender]>0);
         msg.sender.transfer(balances[msg.sender]);
         emit GetMyMoney(msg.sender, balances[msg.sender], now);
         balances[msg.sender]=0;
     }
-    
+
     function balanceOf(address who) public view returns (uint256 balance) {
         return balances[who];
     }
-    
+
     function balanceTotalOf(address who) public view returns (uint256 balanceTotal) {
         return balancesTotal[who];
     }
-    
+
     function getNextForwardUserId() public view returns (uint256) {
         return nextForwardUserId;
     }
-    
+
     function getNextBackUserId() public view returns (uint256) {
         return nextBackUserId;
     }
-    
+
     function getLastIndex() public view returns (uint256) {
         uint256 length = users.length;
         return length.sub(1);
     }
-    
+
     function getUserAddressById(uint256 id) public view returns (address userAddress) {
         return users[id];
     }
-    
+
     function checkExistAddress(address user) public view returns (bool) {
         return usersExist[user];
     }
-    
+
     function getParentUser(address user) public view returns (address) {
         return users2users[user];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

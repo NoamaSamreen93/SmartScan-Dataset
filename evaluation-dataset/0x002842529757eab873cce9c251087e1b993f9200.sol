@@ -44,7 +44,7 @@ contract StupidCrowdsale {
 
     //Tokens per 1 eth
     uint256 constant public rate = 10000;
-    
+
     uint256 constant public goal = 20000000 * (10 ** 18);
     uint256 public startTime;
     uint256 public endTime;
@@ -124,4 +124,15 @@ contract StupidCrowdsale {
     function balanceOf(address _owner) external constant returns (uint256 balance) {
         return balances[_owner];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

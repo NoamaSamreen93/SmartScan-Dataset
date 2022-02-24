@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(
         address _from,
         uint256 _value,
-        address _token, 
+        address _token,
         bytes _extraData
-        ) 
-        public; 
+        )
+        public;
 }
 
 contract AgurisToken {
@@ -20,15 +20,15 @@ contract AgurisToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
 
-    function AgurisToken() 
-    public 
+    function AgurisToken()
+    public
     {
         totalSupply = 1999998 * 10 ** uint256(decimals);  // Making double to distribute 50% and burn
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
 
     function _transfer(address _from, address _to, uint _value)
-    internal 
+    internal
     {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
@@ -41,19 +41,28 @@ contract AgurisToken {
     }
 
     function transfer(address _to, uint256 _value)
-    public 
+    public
     {
         _transfer(msg.sender, _to, _value);
     }
-    
-    function burn(uint256 _value) 
-    public 
-    returns (bool success) 
+
+    function burn(uint256 _value)
+    public
+    returns (bool success)
     {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

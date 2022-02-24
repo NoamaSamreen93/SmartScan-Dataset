@@ -17,7 +17,7 @@ contract Audit {
   mapping (address => mapping (bytes32 => DS.Proof)) public auditedContracts;
   // Maps auditor address to a list of audit code hashes
   mapping (address => bytes32[]) public auditorContracts;
-  
+
   // Returns code audit level, 0 if not present
   function isVerifiedAddress(address _auditorAddr, address _contractAddr) public view returns(uint) {
     bytes32 codeHash = keccak256(codeAt(_contractAddr));
@@ -27,12 +27,12 @@ contract Audit {
   function isVerifiedCode(address _auditorAddr, bytes32 _codeHash) public view returns(uint) {
     return auditedContracts[_auditorAddr][_codeHash].level;
   }
-  
+
   // Add audit information
   function addAudit(bytes32 _codeHash, uint _level, bytes32 _ipfsHash) public {
     address auditor = msg.sender;
     require(auditedContracts[auditor][_codeHash].insertedBlock == 0);
-    auditedContracts[auditor][_codeHash] = DS.Proof({ 
+    auditedContracts[auditor][_codeHash] = DS.Proof({
         level: _level,
         auditedBy: auditor,
         insertedBlock: block.number,
@@ -41,7 +41,7 @@ contract Audit {
     auditorContracts[auditor].push(_codeHash);
     emit NewAudit(auditor, _codeHash);
   }
-  
+
   // Add evidence to audited code, only author, if _newLevel is different from original
   // updates the contract's level
   function addEvidence(bytes32 _codeHash, uint _newLevel, bytes32 _ipfsHash) public {
@@ -84,7 +84,7 @@ contract MonteLabsMS {
   }
 
   function addAuditOrEvidence(bool audit, bytes32 _codeHash, uint _level,
-                              bytes32 _ipfsHash, uint8 _v, bytes32 _r, 
+                              bytes32 _ipfsHash, uint8 _v, bytes32 _r,
                               bytes32 _s) internal {
     address sender = msg.sender;
     require(owners[sender]);
@@ -110,4 +110,13 @@ contract MonteLabsMS {
                     uint8 _v, bytes32 _r, bytes32 _s) public {
     addAuditOrEvidence(false, _codeHash, _version, _ipfsHash, _v, _r, _s);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

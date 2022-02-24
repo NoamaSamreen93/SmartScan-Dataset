@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -37,11 +37,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -88,7 +88,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Ownable {
-    
+
   address public owner;
 
   function Ownable() {
@@ -101,18 +101,18 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 
 contract ANNA is StandardToken {
-    
+
   string public constant name = "ANNA";
-   
+
   string public constant symbol = "ANNA";
-    
+
   uint32 public constant decimals = 0;
 
   uint256 public INITIAL_SUPPLY = 27121989;
@@ -121,5 +121,21 @@ contract ANNA is StandardToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

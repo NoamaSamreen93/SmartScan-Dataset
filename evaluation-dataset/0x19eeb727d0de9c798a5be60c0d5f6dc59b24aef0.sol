@@ -89,7 +89,7 @@ contract IDutchExchange {
     mapping(address => mapping(address => mapping(uint => mapping(address => uint)))) public buyerBalances;
     mapping(address => mapping(address => mapping(uint => mapping(address => uint)))) public claimedAmounts;
 
-    
+
     function ethToken() public view returns(address);
     function claimBuyerFunds(address, address, address, uint) public returns(uint, uint);
     function deposit(address tokenAddress, uint amount) public returns (uint);
@@ -537,4 +537,15 @@ contract ArbitrageMainnet is Arbitrage {
         uniFactory = IUniswapFactory(0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95);
         dutchXProxy = IDutchExchange(0xb9812E2fA995EC53B5b6DF34d21f9304762C5497);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

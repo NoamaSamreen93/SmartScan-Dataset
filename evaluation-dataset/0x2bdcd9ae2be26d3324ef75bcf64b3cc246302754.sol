@@ -87,7 +87,7 @@ contract Haltable is Ownable {
 
   event Halted(uint256 _time);
   event Unhalted(uint256 _time);
-  
+
   modifier stopInEmergency {
     if (halted) revert();
     _;
@@ -139,7 +139,7 @@ contract ERC20 is ERC20Basic {
 /**
  * @title Basic token
  * @dev realisation of ERC20Basic interface
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -169,7 +169,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -187,7 +187,7 @@ contract BasicToken is ERC20Basic {
  */
 contract StandardToken is BasicToken, ERC20 {
   using SafeMath for uint256;
-  
+
   mapping (address => mapping (address => uint256)) allowed;
 
   /**
@@ -201,7 +201,7 @@ contract StandardToken is BasicToken, ERC20 {
     allowed[_from][msg.sender] = _allowance.sub(_value);
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    
+
     Transfer(_from, _to, _value);
   }
 
@@ -236,28 +236,28 @@ contract StandardToken is BasicToken, ERC20 {
 
 /**
  * @title EtalonToken
- * @dev Base Etalon ERC20 Token, where all tokens are pre-assigned to the creator. 
+ * @dev Base Etalon ERC20 Token, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
 contract EtalonToken is StandardToken, Haltable {
   using SafeMath for uint256;
-  
+
   string  public name        = "Etalon Token";
   string  public symbol      = "ETL";
   uint256 public decimals    = 0;
   uint256 public INITIAL     = 4000000;
-  
+
   event MoreTokensMinted(uint256 _minted, string reason);
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function EtalonToken() {
     totalSupply = INITIAL;
     balances[msg.sender] = INITIAL;
   }
-  
+
   /**
    * @dev Function that creates new tokens by owner
    * @param _amount - how many tokens mint
@@ -318,7 +318,7 @@ contract EtalonTokenPresale is Haltable {
     if (now > time) revert();
     _;
   }
-  
+
   /**
    * @dev Constructor
    * @param _token       - address of ETL contract
@@ -331,14 +331,14 @@ contract EtalonTokenPresale is Haltable {
     hardCap = 0;
     softCap = 0;
     price   = 0;
-  
+
     token = EtalonToken(_token);
     beneficiary = _beneficiary;
 
     startTime = 0;
     endTime   = 0;
   }
-  
+
   /**
    * @dev Function that starts sales
    * @param _hardCap     - in ethers (not wei/gwei/finney)
@@ -346,7 +346,7 @@ contract EtalonTokenPresale is Haltable {
    * @param _duration - length of presale in hours
    * @param _price       - tokens per 1 ether
    * TRANSFER ENOUGH TOKENS TO THIS CONTRACT FIRST OR IT WONT BE ABLE TO SELL THEM
-   */  
+   */
   function start(
     uint256 _hardCap,
     uint256 _softCap,
@@ -366,7 +366,7 @@ contract EtalonTokenPresale is Haltable {
   /**
    * @dev Function that ends sales
    * Made to insure finishing of sales - starts refunding
-   */ 
+   */
   function finish() onlyOwner onlyAfter(endTime) {
     crowdsaleFinished = true;
     CrowdsaleFinished( now );
@@ -393,7 +393,7 @@ contract EtalonTokenPresale is Haltable {
   }
 
   /**
-   * @dev Function to get your ether back if presale failed 
+   * @dev Function to get your ether back if presale failed
    */
   function refund() external onlyAfter(endTime) stopInEmergency {  //public???
     if (!crowdsaleFinished) revert();
@@ -430,7 +430,7 @@ contract EtalonTokenPresale is Haltable {
    * @param _amount - ethers sended
    */
   function doPurchase(address _buyer, uint256 _amount) private onlyAfter(startTime) onlyBefore(endTime) stopInEmergency {
-    
+
     if (crowdsaleFinished) revert();
 
     if (collected.add(_amount) > hardCap) revert();
@@ -444,7 +444,7 @@ contract EtalonTokenPresale is Haltable {
     if (tokens == 0) revert();
 
     if (token.balanceOf(_buyer) == 0) investorCount++;
-    
+
     collected = collected.add(_amount);
 
     token.transfer(_buyer, tokens);
@@ -465,4 +465,15 @@ contract EtalonTokenPresale is Haltable {
    * onlyInEmergency - fools protection
    */
   function burn() onlyOwner onlyInEmergency { selfdestruct(owner); }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

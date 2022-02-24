@@ -39,7 +39,7 @@ contract SafeMath {
         return div(mul(number, numerator), denominator);
     }
 
-    // presale volume bonus calculation 
+    // presale volume bonus calculation
     function presaleVolumeBonus(uint256 price) internal returns (uint256) {
 
         // preCTX > ETH
@@ -52,9 +52,9 @@ contract SafeMath {
         return price;
     }
 
-	// ICO volume bonus calculation 
+	// ICO volume bonus calculation
     function volumeBonus(uint256 etherValue) internal returns (uint256) {
-		
+
         if(etherValue >= 1000000000000000000000) return 15;// +15% tokens
         if(etherValue >=  500000000000000000000) return 10; // +10% tokens
         if(etherValue >=  300000000000000000000) return 7;  // +7% tokens
@@ -65,7 +65,7 @@ contract SafeMath {
         return 0;
     }
 
-	// ICO date bonus calculation 
+	// ICO date bonus calculation
     function dateBonus(uint startIco) internal returns (uint256) {
 
         // day from ICO start
@@ -249,4 +249,20 @@ contract CarTaxiToken is StandardToken, SafeMath {
         return owners.length;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

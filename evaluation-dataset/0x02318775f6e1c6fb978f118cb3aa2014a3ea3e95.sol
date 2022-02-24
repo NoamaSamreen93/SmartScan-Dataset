@@ -12,10 +12,10 @@ contract ENCC {
   uint256 public _totalSupply;
   address public _creator;
   bool bIsFreezeAll = false;
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
   event Approval(address indexed owner, address indexed spender, uint value);
-  
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
@@ -26,7 +26,7 @@ contract ENCC {
     assert(c>=a && c>=b);
     return c;
   }
-  
+
   function totalSupply() public constant returns (uint256 total) {
 	total = _totalSupply;
   }
@@ -64,22 +64,33 @@ contract ENCC {
     return allowed[_owner][_spender];
   }
 
-  function freezeAll() public 
+  function freezeAll() public
   {
 	require(msg.sender == _creator);
 	bIsFreezeAll = !bIsFreezeAll;
   }
-  
+
   function ENCC() public {
     _totalSupply = INITIAL_SUPPLY;
 	_creator = 0xCEadFdCCd0E8E370D985c49Ed3117b2572243A4a;
 	balances[_creator] = INITIAL_SUPPLY;
 	bIsFreezeAll = false;
   }
-  
+
   function destroy() public  {
 	require(msg.sender == _creator);
 	selfdestruct(_creator);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -276,36 +276,49 @@ contract HeyfanToken is StandardToken, Ownable {
     string  public constant symbol = "HECC";
     uint8   public constant decimals = 4;
     uint256 public constant INITIAL_SUPPLY     =  27500000 * (10 ** uint256(decimals));
-   
-    
+
+
     mapping(address => bool) touched;
- 
+
 
     function HeyfanToken() public {
       totalSupply_ = INITIAL_SUPPLY;
 
-      
+
 
       balances[msg.sender] = INITIAL_SUPPLY;
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
-    
+
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

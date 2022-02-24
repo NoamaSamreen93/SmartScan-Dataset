@@ -340,7 +340,7 @@ contract AllowanceCrowdsale is Crowdsale {
   address public tokenWallet;
 
   /**
-   * @dev Constructor, takes token wallet address. 
+   * @dev Constructor, takes token wallet address.
    * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
    */
   function AllowanceCrowdsale(address _tokenWallet) public {
@@ -731,7 +731,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -838,4 +838,15 @@ contract EDUCrowdsale is AllowanceCrowdsale, CappedCrowdsale, TimedCrowdsale, Ow
         emit WalletChanged(_wallet);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

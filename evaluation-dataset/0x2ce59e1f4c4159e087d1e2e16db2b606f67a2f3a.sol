@@ -80,11 +80,11 @@ contract Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -94,11 +94,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -147,8 +147,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -228,7 +228,7 @@ contract BurnableToken is StandardToken, Ownable {
     emit Burn(_who, _value);
     emit Transfer(_who, address(0), _value);
   }
-} 
+}
 
 /**
  * @title Mintable token
@@ -240,21 +240,21 @@ contract MintableToken is StandardToken, Ownable {
     using SafeMath for uint256;
 
   mapping(address => uint256)public shares;
-  
+
   address[] public beneficiaries;
- 
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event BeneficiariesAdded();
-  
+
   uint256 public lastMintingTime;
   uint256 public mintingStartTime = 1543622400;
   uint256 public mintingThreshold = 31536000;
   uint256 public lastMintedTokens = 91000000000000000;
 
   bool public mintingFinished = false;
-  
-  
+
+
 
   modifier canMint() {
     require(!mintingFinished);
@@ -274,69 +274,69 @@ contract MintableToken is StandardToken, Ownable {
    */
 
   function mint() hasMintPermission  canMint public  returns (bool){
-    
+
     uint256 _amount = tokensToMint();
-    
+
     totalSupply = totalSupply.add(_amount);
-    
-    
+
+
     for(uint8 i = 0; i<beneficiaries.length; i++){
-        
+
         balances[beneficiaries[i]] = balances[beneficiaries[i]].add(_amount.mul(shares[beneficiaries[i]]).div(100));
         emit Mint(beneficiaries[i], _amount.mul(shares[beneficiaries[i]]).div(100));
         emit Transfer(address(0), beneficiaries[i], _amount.mul(shares[beneficiaries[i]]).div(100));
     }
-    
+
     lastMintingTime = now;
-    
-   
+
+
      return true;
   }
-  
+
   //Return how much tokens will be minted as per algorithm. Each year 10% tokens will be reduced
   function tokensToMint()private returns(uint256 _tokensToMint){
-      
+
       uint8 tiersToBeMinted = currentTier() - getTierForLastMiniting();
-      
+
       require(tiersToBeMinted>0);
-      
+
       for(uint8 i = 0;i<tiersToBeMinted;i++){
           _tokensToMint = _tokensToMint.add(lastMintedTokens.sub(lastMintedTokens.mul(10).div(100)));
           lastMintedTokens = lastMintedTokens.sub(lastMintedTokens.mul(10).div(100));
       }
-      
+
       return _tokensToMint;
-      
+
   }
- 
+
   function currentTier()private view returns(uint8 _tier) {
-      
+
       uint256 currentTime = now;
-      
+
       uint256 nextTierStartTime = mintingStartTime;
-      
+
       while(nextTierStartTime < currentTime) {
           nextTierStartTime = nextTierStartTime.add(mintingThreshold);
           _tier++;
       }
-      
+
       return _tier;
-      
+
   }
-  
+
   function getTierForLastMiniting()private view returns(uint8 _tier) {
-      
+
        uint256 nextTierStartTime = mintingStartTime;
-      
+
       while(nextTierStartTime < lastMintingTime) {
           nextTierStartTime = nextTierStartTime.add(mintingThreshold);
           _tier++;
       }
-      
+
       return _tier;
-      
+
   }
-  
+
 
   /**
    * @dev Function to stop minting new tokens.
@@ -351,23 +351,23 @@ contract MintableToken is StandardToken, Ownable {
 
 
 function beneficiariesPercentage(address[] _beneficiaries, uint256[] percentages) onlyOwner external returns(bool){
-   
+
     require(_beneficiaries.length == 7);
     require(percentages.length == 7);
-    
+
     uint256 sumOfPercentages;
-    
+
     if(beneficiaries.length>0) {
-        
+
         for(uint8 j = 0;j<beneficiaries.length;j++) {
-            
+
             shares[beneficiaries[j]] = 0;
             delete beneficiaries[j];
-            
-            
+
+
         }
         beneficiaries.length = 0;
-        
+
     }
 
     for(uint8 i = 0; i < _beneficiaries.length; i++){
@@ -375,34 +375,34 @@ function beneficiariesPercentage(address[] _beneficiaries, uint256[] percentages
       require(_beneficiaries[i] != 0x0);
       require(percentages[i] > 0);
       beneficiaries.push(_beneficiaries[i]);
-      
+
       shares[_beneficiaries[i]] = percentages[i];
-      sumOfPercentages = sumOfPercentages.add(percentages[i]); 
-     
+      sumOfPercentages = sumOfPercentages.add(percentages[i]);
+
     }
 
     require(sumOfPercentages == 100);
     emit BeneficiariesAdded();
     return true;
-  } 
+  }
 }
 
 /**
- * @title ERA Swap Token 
+ * @title ERA Swap Token
  * @dev Token representing EST.
  */
  contract EraSwapToken is BurnableToken, MintableToken{
      string public name ;
      string public symbol ;
      uint8 public decimals = 8 ;
-     
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
      function ()public payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      * @param initialSupply The initial supply of tokens which will be fixed through out
@@ -418,11 +418,11 @@ function beneficiariesPercentage(address[] _beneficiaries, uint256[] percentages
          name = tokenName;
          symbol = tokenSymbol;
          balances[msg.sender] = totalSupply;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          emit Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
@@ -430,3 +430,14 @@ function beneficiariesPercentage(address[] _beneficiaries, uint256[] percentages
 	    return (name, symbol, totalSupply);
     }
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

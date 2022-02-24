@@ -767,7 +767,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         require((_nbytes > 0) && (_nbytes <= 32));
         // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -780,18 +780,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -804,11 +804,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, keccak256(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -901,7 +901,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
         require(prefix.length == n_random_bytes);
 
         for (uint256 i=0; i< n_random_bytes; i++) {
@@ -1087,7 +1087,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	uint256 public DEVELOPERSFUND;
 
 	// this will be initialized as the trusted game addresses which will forward their ether
-	// to the bankroll contract, and when players win, they will request the bankroll contract 
+	// to the bankroll contract, and when players win, they will request the bankroll contract
 	// to send these players their winnings.
 	// Feel free to audit these contracts on etherscan...
 	mapping(address => bool) public TRUSTEDADDRESSES;
@@ -1095,7 +1095,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	address public DICE;
 	address public SLOTS;
 
-	// mapping to log the last time a user contributed to the bankroll 
+	// mapping to log the last time a user contributed to the bankroll
 	mapping(address => uint256) contributionTime;
 
 	// constants for ERC20 standard
@@ -1121,9 +1121,9 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 		_;
 	}
 
-	// initialization function 
+	// initialization function
 	function EOSBetBankroll(address dice, address slots) public payable {
-		// function is payable, owner of contract MUST "seed" contract with some ether, 
+		// function is payable, owner of contract MUST "seed" contract with some ether,
 		// so that the ratios are correct when tokens are being minted
 		require (msg.value > 0);
 
@@ -1153,7 +1153,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 
 	///////////////////////////////////////////////
 	// VIEW FUNCTIONS
-	/////////////////////////////////////////////// 
+	///////////////////////////////////////////////
 
 	function checkWhenContributorCanTransferOrWithdraw(address bankrollerAddress) view public returns(uint256){
 		return contributionTime[bankrollerAddress];
@@ -1166,16 +1166,16 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 
 	///////////////////////////////////////////////
 	// BANKROLL CONTRACT <-> GAME CONTRACTS functions
-	/////////////////////////////////////////////// 
+	///////////////////////////////////////////////
 
 	function payEtherToWinner(uint256 amtEther, address winner) public addressInTrustedAddresses(msg.sender){
 		// this function will get called by a game contract when someone wins a game
 		// try to send, if it fails, then send the amount to the owner
 		// note, this will only happen if someone is calling the betting functions with
-		// a contract. They are clearly up to no good, so they can contact us to retreive 
+		// a contract. They are clearly up to no good, so they can contact us to retreive
 		// their ether
-		// if the ether cannot be sent to us, the OWNER, that means we are up to no good, 
-		// and the ether will just be given to the bankrollers as if the player/owner lost 
+		// if the ether cannot be sent to us, the OWNER, that means we are up to no good,
+		// and the ether will just be given to the bankrollers as if the player/owner lost
 
 		if (! winner.send(amtEther)){
 
@@ -1204,7 +1204,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 
 	// this function ADDS to the bankroll of EOSBet, and credits the bankroller a proportional
 	// amount of tokens so they may withdraw their tokens later
-	// also if there is only a limited amount of space left in the bankroll, a user can just send as much 
+	// also if there is only a limited amount of space left in the bankroll, a user can just send as much
 	// ether as they want, because they will be able to contribute up to the maximum, and then get refunded the rest.
 	function () public payable {
 
@@ -1234,7 +1234,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 		else {
 			contributedEther = msg.value;
 		}
-        
+
 		if (currentSupplyOfTokens != 0){
 			// determine the ratio of contribution versus total BANKROLL.
 			creditedTokens = SafeMath.mul(contributedEther, currentSupplyOfTokens) / currentTotalBankroll;
@@ -1246,17 +1246,17 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 			// but either way, give all the bankroll to person who deposits ether
 			creditedTokens = SafeMath.mul(contributedEther, 100);
 		}
-		
+
 		// now update the total supply of tokens and bankroll amount
 		totalSupply = SafeMath.add(currentSupplyOfTokens, creditedTokens);
 
-		// now credit the user with his amount of contributed tokens 
+		// now credit the user with his amount of contributed tokens
 		balances[msg.sender] = SafeMath.add(balances[msg.sender], creditedTokens);
 
 		// update his contribution time for stake time locking
 		contributionTime[msg.sender] = block.timestamp;
 
-		// now look if the attempted contribution would have taken the BANKROLL over the limit, 
+		// now look if the attempted contribution would have taken the BANKROLL over the limit,
 		// and if true, refund the excess ether.
 		if (contributionTakesBankrollOverLimit){
 			msg.sender.transfer(ifContributionTakesBankrollOverLimit_Refund);
@@ -1280,7 +1280,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 		// save in memory for cheap access.
 		uint256 tokenBalance = balances[msg.sender];
 		// verify that the contributor has enough tokens to cash out this many, and has waited the required time.
-		require(_amountTokens <= tokenBalance 
+		require(_amountTokens <= tokenBalance
 			&& contributionTime[msg.sender] + WAITTIMEUNTILWITHDRAWORTRANSFER <= block.timestamp
 			&& _amountTokens > 0);
 
@@ -1289,20 +1289,20 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 		uint256 currentTotalBankroll = getBankroll();
 		uint256 currentSupplyOfTokens = totalSupply;
 
-		// calculate the token withdraw ratio based on current supply 
+		// calculate the token withdraw ratio based on current supply
 		uint256 withdrawEther = SafeMath.mul(_amountTokens, currentTotalBankroll) / currentSupplyOfTokens;
 
-		// developers take 1% of withdrawls 
+		// developers take 1% of withdrawls
 		uint256 developersCut = withdrawEther / 100;
 		uint256 contributorAmount = SafeMath.sub(withdrawEther, developersCut);
 
 		// now update the total supply of tokens by subtracting the tokens that are being "cashed in"
 		totalSupply = SafeMath.sub(currentSupplyOfTokens, _amountTokens);
 
-		// and update the users supply of tokens 
+		// and update the users supply of tokens
 		balances[msg.sender] = SafeMath.sub(tokenBalance, _amountTokens);
 
-		// update the developers fund based on this calculated amount 
+		// update the developers fund based on this calculated amount
 		DEVELOPERSFUND = SafeMath.add(DEVELOPERSFUND, developersCut);
 
 		// lastly, transfer the ether back to the bankroller. Thanks for your contribution!
@@ -1329,14 +1329,14 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 		// 1. The owner can increase or decrease the target amount for a game. They can then call the updater function to give/receive the ether from the game.
 		// 1. The wait time until a user can withdraw or transfer their tokens after purchase through the default function above ^^^
 		// 2. The owner can change the maximum amount of investments allowed. This allows for early contributors to guarantee
-		// 		a certain percentage of the bankroll so that their stake cannot be diluted immediately. However, be aware that the 
+		// 		a certain percentage of the bankroll so that their stake cannot be diluted immediately. However, be aware that the
 		//		maximum amount of investments allowed will be raised over time. This will allow for higher bets by gamblers, resulting
 		// 		in higher dividends for the bankrollers
 		// 3. The owner can freeze payouts to bettors. This will be used in case of an emergency, and the contract will reject all
-		//		new bets as well. This does not mean that bettors will lose their money without recompense. They will be allowed to call the 
+		//		new bets as well. This does not mean that bettors will lose their money without recompense. They will be allowed to call the
 		// 		"refund" function in the respective game smart contract once payouts are un-frozen.
 		// 4. Finally, the owner can modify and withdraw the developers reward, which will fund future development, including new games, a sexier frontend,
-		// 		and TRUE DAO governance so that onlyOwner functions don't have to exist anymore ;) and in order to effectively react to changes 
+		// 		and TRUE DAO governance so that onlyOwner functions don't have to exist anymore ;) and in order to effectively react to changes
 		// 		in the market (lower the percentage because of increased competition in the blockchain casino space, etc.)
 
 	function transferOwnership(address newOwner) public {
@@ -1362,7 +1362,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	function withdrawDevelopersFund(address receiver) public {
 		require(msg.sender == OWNER);
 
-		// first get developers fund from each game 
+		// first get developers fund from each game
         EOSBetGameInterface(DICE).payDevelopersFund(receiver);
 		EOSBetGameInterface(SLOTS).payDevelopersFund(receiver);
 
@@ -1398,8 +1398,8 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	// don't allow transfers before the required wait-time
 	// and don't allow transfers to this contract addr, it'll just kill tokens
 	function transfer(address _to, uint256 _value) public returns (bool success){
-		if (balances[msg.sender] >= _value 
-			&& _value > 0 
+		if (balances[msg.sender] >= _value
+			&& _value > 0
 			&& contributionTime[msg.sender] + WAITTIMEUNTILWITHDRAWORTRANSFER <= block.timestamp
 			&& _to != address(this)){
 
@@ -1407,7 +1407,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 			balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
 			balances[_to] = SafeMath.add(balances[_to], _value);
 
-			// log event 
+			// log event
 			emit Transfer(msg.sender, _to, _value);
 			return true;
 		}
@@ -1419,9 +1419,9 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	// don't allow transfers before the required wait-time
 	// and don't allow transfers to the contract addr, it'll just kill tokens
 	function transferFrom(address _from, address _to, uint _value) public returns(bool){
-		if (allowed[_from][msg.sender] >= _value 
-			&& balances[_from] >= _value 
-			&& _value > 0 
+		if (allowed[_from][msg.sender] >= _value
+			&& balances[_from] >= _value
+			&& _value > 0
 			&& contributionTime[_from] + WAITTIMEUNTILWITHDRAWORTRANSFER <= block.timestamp
 			&& _to != address(this)){
 
@@ -1433,12 +1433,12 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 	  		// log event
     		emit Transfer(_from, _to, _value);
     		return true;
-   		} 
-    	else { 
+   		}
+    	else {
     		return false;
     	}
 	}
-	
+
 	function approve(address _spender, uint _value) public returns(bool){
 		if(_value > 0){
 
@@ -1451,7 +1451,7 @@ contract EOSBetBankroll is ERC20, EOSBetBankrollInterface {
 			return false;
 		}
 	}
-	
+
 	function allowance(address _owner, address _spender) constant public returns(uint){
 		return allowed[_owner][_spender];
 	}
@@ -1534,14 +1534,14 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 	// counters for frontend statistics
 	uint256 public AMOUNTWAGERED;
 	uint256 public GAMESPLAYED;
-	
+
 	// togglable values
 	uint256 public ORACLIZEQUERYMAXTIME;
 	uint256 public MINBET_forORACLIZE;
 	uint256 public MINBET;
 	uint256 public ORACLIZEGASPRICE;
 	uint256 public INITIALGASFORORACLIZE;
-	uint8 public HOUSEEDGE_inTHOUSANDTHPERCENTS; // 1 thousanthpercent == 1/1000, 
+	uint8 public HOUSEEDGE_inTHOUSANDTHPERCENTS; // 1 thousanthpercent == 1/1000,
 	uint8 public MAXWIN_inTHOUSANDTHPERCENTS; // determines the maximum win a user may receive.
 
 	// togglable functionality of contract
@@ -1669,7 +1669,7 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 		HOUSEEDGE_inTHOUSANDTHPERCENTS = houseEdgeInThousandthPercents;
 	}
 
-	// setting this to 0 would just force all bets through oraclize, and setting to MAX_UINT_256 would never use oraclize 
+	// setting this to 0 would just force all bets through oraclize, and setting to MAX_UINT_256 would never use oraclize
 	function setMinBetForOraclize(uint256 minBet) public {
 		require(msg.sender == OWNER);
 
@@ -1798,7 +1798,7 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 				etherAvailable = SafeMath.sub(SafeMath.add(etherAvailable, winnings), betPerRoll);
 			}
 
-			// update the gamesPlayed with how many games were played 
+			// update the gamesPlayed with how many games were played
 			GAMESPLAYED += gamesPlayed;
 			// update amount wagered with betPerRoll * i (the amount of times the roll loop was executed)
 			AMOUNTWAGERED = SafeMath.add(AMOUNTWAGERED, SafeMath.mul(betPerRoll, gamesPlayed));
@@ -1822,8 +1822,8 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 
 		// // otherwise, we need to save the game data into storage, and call oraclize
 		// // to get the miner-interference-proof randomness for us.
-		// // when oraclize calls back, we will reinstantiate the game data and resolve 
-		// // the spins with the random number given by oraclize 
+		// // when oraclize calls back, we will reinstantiate the game data and resolve
+		// // the spins with the random number given by oraclize
 		else {
 			// oraclize_newRandomDSQuery(delay in seconds, bytes of random data, gas for callback function)
 			bytes32 oraclizeQueryId;
@@ -1855,15 +1855,15 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 	}
 
 	// oraclize callback.
-	// Basically do the instant bet resolution in the play(...) function above, but with the random data 
-	// that oraclize returns, instead of getting psuedo-randomness from block.blockhash 
+	// Basically do the instant bet resolution in the play(...) function above, but with the random data
+	// that oraclize returns, instead of getting psuedo-randomness from block.blockhash
 	function __callback(bytes32 _queryId, string _result, bytes _proof) public {
 
 		DiceGameData memory data = diceData[_queryId];
-		// only need to check these, as all of the game based checks were already done in the play(...) function 
-		require(msg.sender == oraclize_cbAddress() 
-			&& !data.paidOut 
-			&& data.player != address(0) 
+		// only need to check these, as all of the game based checks were already done in the play(...) function
+		require(msg.sender == oraclize_cbAddress()
+			&& !data.paidOut
+			&& data.player != address(0)
 			&& LIABILITIES >= data.etherReceived);
 
 		// if the proof has failed, immediately refund the player his original bet...
@@ -1884,7 +1884,7 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 			}
 			// log the ledger proof fail
 			emit LedgerProofFailed(_queryId);
-			
+
 		}
 		// else, resolve the bet as normal with this miner-proof proven-randomness from oraclize.
 		else {
@@ -1905,7 +1905,7 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 			uint256 hypotheticalWinAmount = SafeMath.mul(SafeMath.mul(data.betPerRoll, 100), (1000 - houseEdgeInThousandthPercents)) / (data.rollUnder - 1) / 1000;
 
 			while (gamesPlayed < data.rolls && etherAvailable >= data.betPerRoll){
-				
+
 				// now, this roll is keccak256(_result, nonce) + 1 ... this is the main difference from using oraclize.
 
 				if (uint8(uint256(keccak256(_result, gamesPlayed)) % 100) + 1 < data.rollUnder){
@@ -1932,7 +1932,7 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 					winnings = 1;
 				}
 				gamesPlayed++;
-				
+
 				etherAvailable = SafeMath.sub(SafeMath.add(etherAvailable, winnings), data.betPerRoll);
 			}
 
@@ -1970,4 +1970,15 @@ contract EOSBetDice is usingOraclize, EOSBetGameInterface {
 
 // THANK YOU FOR READING THIS CONTRACT, HAVE A NICE DAY :)
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

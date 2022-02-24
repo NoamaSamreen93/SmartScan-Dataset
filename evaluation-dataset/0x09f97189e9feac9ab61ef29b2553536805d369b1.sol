@@ -679,8 +679,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -713,7 +713,7 @@ library SafeERC20 {
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction is SignatureBouncer {
     using SafeERC20 for ERC20Burnable;
 
@@ -956,4 +956,15 @@ contract DutchAuction is SignatureBouncer {
 
         endTime = now;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

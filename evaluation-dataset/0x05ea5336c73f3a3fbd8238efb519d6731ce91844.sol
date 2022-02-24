@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 /**
  * This contract specially developed for http://diceforslice.co
- * 
+ *
  * What is it?
  * This is a game that allows you to win an amount of ETH to your personal ethereum address.
  * The possible winning depends on your stake and on amount of ETH in the bank.
@@ -28,19 +28,19 @@ library Math {
         assert(a == 0 || c / a == b);
         return c;
     }
- 
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
- 
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
- 
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -69,7 +69,7 @@ library Math {
  */
 contract Ownable {
     address public owner;
-    
+
     modifier onlyOwner()  { require(msg.sender == owner); _; }
 
     function Ownable() public {
@@ -151,7 +151,7 @@ contract DiceForSlice is Ownable {
 
 
     /**
-     * @dev Special method for fill contract bank 
+     * @dev Special method for fill contract bank
      */
     function fillTheBank() external payable {
         require(msg.value >= sponsorDiff);
@@ -214,7 +214,7 @@ contract DiceForSlice is Ownable {
         uint256 _partStock    = Math.percent(msg.value, partStock);
         uint256 _partSponsor  = Math.percent(msg.value, partSponsor);
         uint256 _partReferral = Math.percent(msg.value, partReferral);
-        
+
         bank  = Math.add(bank,  _partBank);
         stock = Math.add(stock, _partStock);
         owner.transfer(_partOwner);
@@ -266,7 +266,7 @@ contract DiceForSlice is Ownable {
      */
     function rollOne(address referral, uint8 number)
     external payable isValidBet(rewardOne) bankNotEmpty {
-        require(isValidNumber(number));       
+        require(isValidNumber(number));
         bets[msg.sender]++;
 
         splitTheBet(referral);
@@ -363,4 +363,15 @@ contract DiceForSlice is Ownable {
             emit Loser(msg.sender);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

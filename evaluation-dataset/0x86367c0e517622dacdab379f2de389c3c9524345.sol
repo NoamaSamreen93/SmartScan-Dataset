@@ -584,3 +584,14 @@ contract UniversalUSDollar is ProxyToken {
   */
   constructor(address owner) public ProxyToken(owner, "Universal US Dollar", "UPUSD", 2, 0) {} // solium-disable-line no-empty-blocks
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 //
-// BUZZ is a voucher used as payment within Buzz.im website. 
+// BUZZ is a voucher used as payment within Buzz.im website.
 // You can use this token to pay for advertising on the network.
 // Ofcourse you can also use Fiat currencies and pay with credit
 // card, but the amount of Buzz credited to your account will be
@@ -124,7 +124,7 @@ contract BUZZ is ERC20 {
     {
         return totalSupply;
     }
-    
+
     // Bootstrap the contract and make the tokens
     // transferrable. No more minting will be possible.
     function start()
@@ -149,7 +149,7 @@ contract BUZZ is ERC20 {
 
     //
     // before start:
-    // 
+    //
     function mint(address _to, uint _amount) public
     only(owner)
     isNotStartedOnly
@@ -160,4 +160,15 @@ contract BUZZ is ERC20 {
         Transfer(msg.sender, _to, _amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

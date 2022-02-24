@@ -104,7 +104,7 @@ contract BountyBG {
 
         bounty.ended = true;
         bounty.endTime = block.timestamp;
-        
+
         _user.transfer(_reward);
         RewardStatus('Reward sent', bounty.id, _user, _reward);
     }
@@ -164,4 +164,15 @@ contract BountyBG {
         );
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

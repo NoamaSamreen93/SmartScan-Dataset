@@ -6,14 +6,14 @@ contract ERC20 {
 }
 
 contract Wallet {
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event TransferOwnership(address indexed from, address indexed to);
-    
+
     address Owner;
     function transferOwnership(address to) onlyOwner { TransferOwnership(Owner, to); Owner = to; }
-    
+
     mapping (address => uint) public Deposits;
     uint minDeposit;
     bool Locked = false;
@@ -40,7 +40,7 @@ contract Wallet {
     }
 
     function withdraw(uint amount) public payable { withdrawTo(msg.sender, amount); }
-    
+
     function withdrawTo(address to, uint amount) public onlyOwner {
         if (WithdrawalEnabled()) {
             uint max = Deposits[msg.sender];
@@ -68,4 +68,20 @@ contract Wallet {
     function lock() public { Locked = true; }
     modifier onlyOwner { if (msg.sender == Owner) _; }
     modifier open { if (!Locked) _; }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

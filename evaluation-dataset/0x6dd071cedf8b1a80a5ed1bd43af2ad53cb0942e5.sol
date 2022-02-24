@@ -1,7 +1,7 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The CryptoRacing Project.  All rights reserved.
-/* 
-/*   The first idle car race game of blockchain                 
+/*
+/*   The first idle car race game of blockchain
 /* ==================================================================== */
 pragma solidity ^0.4.20;
 
@@ -23,13 +23,13 @@ interface ERC20 {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -79,14 +79,14 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     uint8 public constant decimals = 0;
     uint256 private roughSupply;
     uint256 public totalRaceCoinProduction;
-   
+
     //Daily dividend ratio
     uint256 public bonusDivPercent = 20;
 
     //Recommendation ratio
     uint256 constant refererPercent = 5;
 
-    
+
 
     address[] public playerList;
     //Verifying whether duplication is repeated
@@ -157,14 +157,14 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     function getActionContract(address _actionAddr) external view onlyAdmin returns(bool) {
         return actionContracts[_actionAddr];
     }
-    
-   
+
+
 
 
     function RaceCoin() public {
         addrAdmin = msg.sender;
     }
-    
+
 
     function() external payable {
 
@@ -181,14 +181,14 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     function adjustDailyDividends(uint256 newBonusPercent) external onlyAdmin whenNotPaused {
 
         require(newBonusPercent > 0 && newBonusPercent <= 80);
-       
+
         bonusDivPercent = newBonusPercent;
 
     }
 
     // Stored race coin (rough supply as it ignores earned/unclaimed RaceCoin)
     function totalSupply() public view returns(uint256) {
-        return roughSupply; 
+        return roughSupply;
     }
 
 
@@ -219,10 +219,10 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     function transfer(address recipient, uint256 amount) public returns (bool) {
         updatePlayersRaceCoin(msg.sender);
         require(amount <= raceCoinBalance[msg.sender]);
-        
+
         raceCoinBalance[msg.sender] -= amount;
         raceCoinBalance[recipient] += amount;
-        
+
         emit Transfer(msg.sender, recipient, amount);
         return true;
     }
@@ -230,11 +230,11 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     function transferFrom(address player, address recipient, uint256 amount) public returns (bool) {
         updatePlayersRaceCoin(player);
         require(amount <= allowed[player][msg.sender] && amount <= raceCoinBalance[player]);
-        
+
         raceCoinBalance[player] -= amount;
         raceCoinBalance[recipient] += amount;
         allowed[player][msg.sender] -= amount;
-        
+
         emit Transfer(player, recipient, amount);
         return true;
     }
@@ -252,7 +252,7 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
 
 
     function addPlayerToList(address player) external{
-        
+
         require(actionContracts[msg.sender]);
         require(player != address(0));
 
@@ -264,11 +264,11 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
                b = true;
                break;
             }
-        } 
+        }
 
         if(!b){
             playerList.push(player);
-        }   
+        }
     }
 
 
@@ -363,14 +363,14 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
         newProduction = productionBaseValue[player].mul(100 + productionMultiplier[player]).div(100);
 
         decrease = previousProduction.sub(newProduction);
-        
+
         if (newProduction == 0) { // Special case which tangles with "inactive day" snapshots (claiming divs)
             raceCoinProductionZeroedSnapshots[player][allocatedRaceCoinSnapshots.length] = true;
             delete raceCoinProductionSnapshots[player][allocatedRaceCoinSnapshots.length]; // 0
         } else {
             raceCoinProductionSnapshots[player][allocatedRaceCoinSnapshots.length] = newProduction;
         }
-        
+
         lastRaceCoinProductionUpdate[player] = allocatedRaceCoinSnapshots.length;
         totalRaceCoinProduction -= decrease;
 
@@ -404,20 +404,20 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
 
         updatePlayersRaceCoin(target);
         require(balanceOf(target) > 0);
-        
+
         uint256 attackerAttackPower = attackPower[player];
         uint256 attackerplunderPower = plunderPower[player];
         uint256 defenderDefendPower = defendPower[target];
-        
+
 
         if (battleCooldown[target] > block.timestamp) { // When on battle cooldown, the defense is reduced by 50%
             defenderDefendPower = defenderDefendPower.div(2);
         }
-        
+
         if (attackerAttackPower > defenderDefendPower) {
             battleCooldown[player] = block.timestamp + 30 minutes;
             if (balanceOf(target) > attackerplunderPower) {
-               
+
                 uint256 unclaimedRaceCoin = balanceOfUnclaimedRaceCoin(target);
                 if (attackerplunderPower > unclaimedRaceCoin) {
                     uint256 raceCoinDecrease = attackerplunderPower - unclaimedRaceCoin;
@@ -435,10 +435,10 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
                 raceCoinBalance[player] += balanceOf(target);
                 raceCoinBalance[target] = 0;
             }
-            
+
             lastRaceCoinSaveTime[target] = block.timestamp;
             lastRaceCoinSaveTime[player] = block.timestamp;
-           
+
         } else {
             battleCooldown[player] = block.timestamp + 10 minutes;
             emit PlayerAttacked(player, target, false, 0);
@@ -452,16 +452,16 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
         return (attackPower[player], defendPower[player], plunderPower[player], battleCooldown[player]);
     }
 
-    
+
     function getPlayersAttributesInt(address player) external view returns (uint256, uint256, uint256, uint256){
-        return (getRaceCoinProduction(player), attackPower[player], defendPower[player], plunderPower[player]); 
+        return (getRaceCoinProduction(player), attackPower[player], defendPower[player], plunderPower[player]);
     }
 
 
     function getPlayersAttributesMult(address player) external view returns (uint256, uint256, uint256, uint256){
         return (productionMultiplier[player], attackMultiplier[player], defendMultiplier[player], plunderMultiplier[player]);
     }
-    
+
 
     function withdrawEther(uint256 amount) external {
         require(amount <= ethBalance[msg.sender]);
@@ -481,14 +481,14 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
     }
 
 
-    // To display 
+    // To display
     function getGameInfo(address player) external view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256){
-       
+
         return (block.timestamp, totalEtherPool, totalRaceCoinProduction,nextSnapshotTime, balanceOf(player), ethBalance[player], getRaceCoinProduction(player));
     }
 
 
-   
+
 
 
 
@@ -496,7 +496,7 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
         require(startSnapshot <= endSnapShot);
         require(startSnapshot >= lastRaceCoinFundClaim[msg.sender]);
         require(endSnapShot < allocatedRaceCoinSnapshots.length);
-        
+
         uint256 dividendsShare;
 
 
@@ -507,9 +507,9 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
             dividendsShare += (allocatedRaceCoinSnapshots[i] * raceCoinDuringSnapshot) / totalRaceCoinSnapshots[i];
         }
 
-        
+
         lastRaceCoinFundClaim[msg.sender] = endSnapShot + 1;
-        
+
         uint256 referalDivs;
         if (referer != address(0) && referer != msg.sender) {
             referalDivs = dividendsShare.mul(refererPercent).div(100); // 5%
@@ -517,17 +517,17 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
             refererDivsBalance[referer] += referalDivs;
             emit ReferalGain(referer, msg.sender, referalDivs);
         }
-        
+
         ethBalance[msg.sender] += dividendsShare - referalDivs;
     }
 
-    // To display 
+    // To display
     function viewUnclaimedRaceCoinDividends(address player) external view returns (uint256, uint256, uint256) {
         uint256 startSnapshot = lastRaceCoinFundClaim[player];
         uint256 latestSnapshot = allocatedRaceCoinSnapshots.length - 1; // No snapshots to begin with
-        
+
         uint256 dividendsShare;
-        
+
         for (uint256 i = startSnapshot; i <= latestSnapshot; i++) {
 
             uint256 raceCoinDuringSnapshot = raceCoinSnapshots[player][i];
@@ -547,19 +547,19 @@ contract RaceCoin is ERC20, AccessAdmin, IRaceCoin {
 
     // Allocate  divs for the day (00:00 cron job)
     function snapshotDailyRaceCoinFunding() external onlyAdmin whenNotPaused {
-       
+
         uint256 todaysRaceCoinFund = (totalEtherPool * bonusDivPercent) / 100; // 20% of pool daily
         totalEtherPool -= todaysRaceCoinFund;
-        
+
         totalRaceCoinProductionSnapshots.push(totalRaceCoinProduction);
         allocatedRaceCoinSnapshots.push(todaysRaceCoinFund);
         nextSnapshotTime = block.timestamp + 24 hours;
 
-        
+
         for (uint256 i = 0; i < playerList.length; i++) {
             updatePlayersRaceCoin(playerList[i]);
             raceCoinSnapshots[playerList[i]][lastRaceCoinProductionUpdate[playerList[i]]] = raceCoinBalance[playerList[i]];
-        } 
+        }
         totalRaceCoinSnapshots.push(roughSupply);
     }
 
@@ -605,4 +605,12 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -19,7 +19,7 @@ pragma solidity ^0.4.11;
 
 /// @title GUNS Crowdsale Contract - GeoFounders.com
 /// @author Shaun Shull
-/// @dev Simple single crowdsale contract for fixed supply, single-rate, 
+/// @dev Simple single crowdsale contract for fixed supply, single-rate,
 ///  block-range crowdsale. Additional token cleanup functionality.
 
 
@@ -181,7 +181,7 @@ contract GUNS is StandardToken {
         if (block.number <= fundingEndBlock && totalSupply < tokenCreationCap) throw;    // check past end block unless at creation cap
 
         if (!ethFundDeposit.send(this.balance)) throw;                                   // send account balance to ETH deposit address
-        
+
         uint256 remainingSupply = safeSubtract(tokenCreationCap, totalSupply);           // calculate remaining tokens to reach fixed supply
         if (remainingSupply > 0) {                                                       // if remaining supply left
             uint256 updatedSupply = safeAdd(totalSupply, remainingSupply);               // calculate total supply with remaining supply
@@ -216,7 +216,7 @@ contract GUNS is StandardToken {
     // (GUNS only, does not support 3rd party tokens)
     function mistakenTokens() external {
         if (msg.sender != ethFundDeposit) throw;                // check caller is ETH deposit address
-        
+
         if (balances[this] > 0) {                               // if contract has tokens
             Transfer(this, gunsFundDeposit, balances[this]);    // log transfer event
             balances[gunsFundDeposit] += balances[this];        // send tokens to dev tokens address
@@ -230,4 +230,15 @@ contract GUNS is StandardToken {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

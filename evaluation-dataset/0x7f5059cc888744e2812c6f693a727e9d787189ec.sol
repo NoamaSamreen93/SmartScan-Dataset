@@ -105,20 +105,20 @@ contract Avatarium is Ownable, ERC721 {
 
     // @dev The Birth event is fired, whenever a new Avatar has been created.
     event Birth(
-        uint256 tokenId, 
-        string name, 
+        uint256 tokenId,
+        string name,
         address owner);
 
     // @dev The TokenSold event is fired, whenever a token is sold.
     event TokenSold(
-        uint256 tokenId, 
-        uint256 oldPrice, 
-        uint256 newPrice, 
-        address prevOwner, 
-        address winner, 
+        uint256 tokenId,
+        uint256 oldPrice,
+        uint256 newPrice,
+        address prevOwner,
+        address winner,
         string name);
-    
-    
+
+
     // --- Constants --- //
 
 
@@ -212,7 +212,7 @@ contract Avatarium is Ownable, ERC721 {
         addressCOO = _newCOO;
     }
 
-    // @dev Grants another address the right to transfer a token via 
+    // @dev Grants another address the right to transfer a token via
     // takeOwnership() and transferFrom()
     function approve(address _to, uint256 _tokenId) public {
         // Check the ownership
@@ -295,7 +295,7 @@ contract Avatarium is Ownable, ERC721 {
         }
 
         // Fire event
-        
+
         TokenSold(
             _tokenId,
             sellingPrice,
@@ -312,7 +312,7 @@ contract Avatarium is Ownable, ERC721 {
     function priceOf(uint256 _tokenId) public view returns (uint256 price) {
         return avatarIndexToPrice[_tokenId];
     }
-    
+
     //@dev Allows pre-approved user to take ownership of a token.
     function takeOwnership(uint256 _tokenId) public {
         address newOwner = msg.sender;
@@ -358,7 +358,7 @@ contract Avatarium is Ownable, ERC721 {
     }
 
 
-    // --- Private Functions --- // 
+    // --- Private Functions --- //
 
 
     // Safety check on _to address to prevent against an unexpected 0x0 default.
@@ -368,8 +368,8 @@ contract Avatarium is Ownable, ERC721 {
 
     // For checking approval of transfer for address _to
     function _approved(address _to, uint256 _tokenId)
-    private 
-    view 
+    private
+    view
     returns (bool) {
         return avatarIndexToApproved[_tokenId] == _to;
     }
@@ -377,10 +377,10 @@ contract Avatarium is Ownable, ERC721 {
     // For creating Avatars.
     function _createAvatar(
         string _name,
-        address _owner, 
-        uint256 _rank) 
+        address _owner,
+        uint256 _rank)
         private {
-    
+
     // Getting the startingPrice
     uint256 _price;
     if (_rank == 1) {
@@ -401,7 +401,7 @@ contract Avatarium is Ownable, ERC721 {
         _price = SafeMath.mul(128, startingPrice);
     } else if (_rank == 9) {
         _price = SafeMath.mul(256, startingPrice);
-    } 
+    }
 
     Avatar memory _avatar = Avatar({name: _name});
 
@@ -417,9 +417,9 @@ contract Avatarium is Ownable, ERC721 {
     }
 
     // @dev Checks for token ownership.
-    function _owns(address claimant, uint256 _tokenId) 
-    private 
-    view 
+    function _owns(address claimant, uint256 _tokenId)
+    private
+    view
     returns (bool) {
         return claimant == avatarIndexToOwner[_tokenId];
     }
@@ -446,4 +446,15 @@ contract Avatarium is Ownable, ERC721 {
         // Fire event
         Transfer(_from, _to, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

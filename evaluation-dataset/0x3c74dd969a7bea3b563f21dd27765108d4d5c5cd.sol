@@ -50,8 +50,8 @@ contract BaseCHIPToken {
 
     // Modifiers
     modifier onlyOwner() {
-        require(msg.sender == owner,"Only the owner is allowed to call this."); 
-        _; 
+        require(msg.sender == owner,"Only the owner is allowed to call this.");
+        _;
     }
 
     constructor() public{
@@ -233,7 +233,7 @@ contract BaseCHIPToken {
 }
 
 contract CHIPToken is BaseCHIPToken {
-    
+
     // Constants
     string  public constant name = "Chips";
     string  public constant symbol = "CHP";
@@ -242,7 +242,7 @@ contract CHIPToken is BaseCHIPToken {
     uint256 public constant INITIAL_SUPPLY      =  2000000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  1000000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  1000000000 * (10 ** uint256(decimals));
-    
+
     // Properties
     //uint256 public totalSupply;
     uint256 public crowdSaleAllowance;      // the number of tokens available for crowdsales
@@ -346,4 +346,17 @@ contract CHIPToken is BaseCHIPToken {
         emit Approval(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -306,7 +306,7 @@ contract LoggedDividend is Ownable, LoggedERC20 {
         uint256 _amount,
         uint256 _totalSupply
     );
-    
+
     function LoggedDividend(
         uint256 initialSupply,
         string tokenName,
@@ -314,10 +314,10 @@ contract LoggedDividend is Ownable, LoggedERC20 {
         string tokenSymbol,
         bool transferAllSupplyToOwner,
         bool _locked
-    ) 
+    )
 		public
 		LoggedERC20(initialSupply, tokenName, decimalUnits, tokenSymbol, transferAllSupplyToOwner, _locked) {
-        
+
     }
 
     function addDividend(uint256 recycleTime) public payable onlyOwner {
@@ -451,7 +451,7 @@ contract PhaseICO is LoggedDividend {
         uint256 price;
         uint256 maxAmount;
     }
-    
+
     function PhaseICO(
         uint256 _icoSince,
         uint256 _icoTill,
@@ -461,7 +461,7 @@ contract PhaseICO is LoggedDividend {
         uint8 precision,
         bool transferAllSupplyToOwner,
         bool _locked
-    ) 
+    )
 		public
 		LoggedDividend(initialSupply, tokenName, precision, tokenSymbol, transferAllSupplyToOwner, _locked) {
         standard = "PhaseICO 0.1";
@@ -481,7 +481,7 @@ contract PhaseICO is LoggedDividend {
 
         uint256 newCollectedEthers = _collectedEthers;
         uint256 remainingValue = value;
-        
+
         for (uint i = 0; i < phases.length; i++) {
             Phase storage phase = phases[i];
 
@@ -506,7 +506,7 @@ contract PhaseICO is LoggedDividend {
                 break;
             }
         }
-        
+
         if (remainingValue > 0) {
             return 0;
         }
@@ -574,7 +574,7 @@ contract Cajutel is PhaseICO {
         phases.push(Phase(0.1 ether, 10000 ether + 750 ether + 500 ether));
         phases.push(Phase(0.15 ether, 30000 ether + 10000 ether + 750 ether + 500 ether));
         phases.push(Phase(0.2 ether, 80000 ether + 30000 ether + 10000 ether + 750 ether + 500 ether));
-    
+
     }
 
     /* public methods */
@@ -1038,4 +1038,17 @@ contract MigrateBalances is Ownable {
         Balance storage balance = balances[_id];
         return balance.migrated;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

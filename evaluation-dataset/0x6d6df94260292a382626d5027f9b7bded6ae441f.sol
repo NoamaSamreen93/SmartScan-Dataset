@@ -14,62 +14,62 @@ functionality has been integrated:
 contract NuruToken  {
     //Nuru Token
     string public name;
-    
+
     //Nuru Token Official Symbol
 	string public symbol;
-	
+
 	//Nuru Token Decimals
-	uint8 public decimals; 
-  
+	uint8 public decimals;
+
   //database to match user Accounts and their respective balances
   mapping(address => uint) _balances;
   mapping(address => mapping( address => uint )) _approvals;
-  
-  //Nuru Token Hard cap 
+
+  //Nuru Token Hard cap
   uint public cap_nuru;
-  
+
   //Number of Nuru Tokens in existence
   uint public _supply;
-  
+
 
   event TokenMint(address newTokenHolder, uint amountOfTokens);
   event TokenSwapOver();
-  
+
   event Transfer(address indexed from, address indexed to, uint value );
   event Approval(address indexed owner, address indexed spender, uint value );
   event mintting(address indexed to, uint value );
   event minterTransfered(address indexed prevCommand, address indexed nextCommand);
- 
+
  //Ethereum address of Authorized Nuru Token Minter
 address public dev;
 
 //check if hard cap reached before mintting new Tokens
 modifier cap_reached(uint amount) {
-    
+
     if((_supply + amount) > cap_nuru) revert();
     _;
 }
 
 //check if Account is the Authorized Minter
 modifier onlyMinter {
-    
+
       if (msg.sender != dev) revert();
       _;
   }
-  
+
   //initialize Nuru Token
   //pass Nuru Configurations to the Constructor
  function NuruToken(uint cap_token, uint initial_balance, string tokenName, string tokenSymbol, uint8 decimalUnits) public {
-    
+
     cap_nuru = cap_token;
     _supply += initial_balance;
     _balances[msg.sender] = initial_balance;
-    
+
     decimals = decimalUnits;
 	symbol = tokenSymbol;
 	name = tokenName;
     dev = msg.sender;
-    
+
   }
 
 //retrieve number of all Nuru Tokens in existence
@@ -96,9 +96,9 @@ function safeToAdd(uint a, uint b) internal returns (bool) {
 function transfer(address to, uint value) public returns (bool ok) {
 
     if(_balances[msg.sender] < value) revert();
-    
+
     if(!safeToAdd(_balances[to], value)) revert();
-    
+
 
     _balances[msg.sender] -= value;
     _balances[to] += value;
@@ -113,9 +113,9 @@ function transferFrom(address from, address to, uint value) public returns (bool
 
     // if you don't have approval, throw
     if(_approvals[from][msg.sender] < value) revert();
-    
+
     if(!safeToAdd(_balances[to], value)) revert();
-    
+
     // transfer and return true
     _approvals[from][msg.sender] -= value;
     _balances[from] -= value;
@@ -123,8 +123,8 @@ function transferFrom(address from, address to, uint value) public returns (bool
     Transfer(from, to, value);
     return true;
   }
-  
-  
+
+
 //allow another Ethereum account to spend Nuru Tokens from your Account
 function approve(address spender, uint value)
     public
@@ -139,20 +139,28 @@ function approve(address spender, uint value)
 //check if Nuru Hard Cap is reached before proceedig - revert if true
 function mint(address recipient, uint amount) onlyMinter cap_reached(amount) public
   {
-        
-   _balances[recipient] += amount;  
+
+   _balances[recipient] += amount;
    _supply += amount;
-    
-   
+
+
     mintting(recipient, amount);
   }
-  
+
  //transfer the priviledge of creating new Nuru Tokens to anothe Ethereum account
 function transferMintership(address newMinter) public onlyMinter returns(bool)
   {
     dev = newMinter;
-    
+
     minterTransfered(dev, newMinter);
   }
-  
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

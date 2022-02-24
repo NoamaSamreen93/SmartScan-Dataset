@@ -59,18 +59,18 @@ contract HerbalistToken is StandardERC20Token {
     function () {
         throw;
     }
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
     function HerbalistToken(
         ) {
-        balances[msg.sender] = 950000000000000000;               
-        totalSupply = 950000000000000000;                       
-        name = "Herbalist Token";                                  
-        decimals = 8;                            
-        symbol = "HERB";                               
+        balances[msg.sender] = 950000000000000000;
+        totalSupply = 950000000000000000;
+        name = "Herbalist Token";
+        decimals = 8;
+        symbol = "HERB";
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -80,4 +80,15 @@ contract HerbalistToken is StandardERC20Token {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

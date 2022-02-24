@@ -234,7 +234,7 @@ interface CabalInterface {
     function canonCount() external view returns (uint256);
 }
 contract AccountRegistry is AccountRegistryInterface, TokenRescue {
-    
+
     uint256 constant public registrationDeposit = 1 finney;
     uint256 constant public proposalCensorshipFee = 50 finney;
 
@@ -601,4 +601,15 @@ contract AccountRegistry is AccountRegistryInterface, TokenRescue {
         }
         return grant;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

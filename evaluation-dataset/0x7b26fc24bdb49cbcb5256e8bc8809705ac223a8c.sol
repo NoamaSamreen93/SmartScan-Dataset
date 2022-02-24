@@ -119,11 +119,11 @@ contract ReentrancyGuard {
 contract Ethery is Pausable, ReentrancyGuard{
   event NewBet(uint id, address player, uint wager, uint targetBlock);
   event BetResolved(uint id, BetStatus status);
-  
+
   bytes32 constant byteMask = bytes32(0xF);
 
   enum BetStatus { Pending, PlayerWon, HouseWon, Refunded }
-  
+
   struct Bet {
     address player;
     uint wager;
@@ -132,24 +132,24 @@ contract Ethery is Pausable, ReentrancyGuard{
     BetStatus status;
     uint targetBlock;
   }
-  
+
   Bet[] public bets;
-  
+
   mapping (uint => address) public betToOwner;
   mapping (address => uint) ownerBetCount;
-  
+
   uint resolverFee = 0.1 finney;
   uint maxPayout = 1 ether;
   uint pendingPay;
-  
+
   function setResolverFee(uint _resolverFee) external onlyOwner {
     resolverFee = _resolverFee;
   }
-  
+
   function getResolverFee() external view returns (uint){
     return resolverFee;
   }
-  
+
   function setMaxPayout(uint _maxPayout) external onlyOwner {
     maxPayout = _maxPayout;
   }
@@ -157,14 +157,14 @@ contract Ethery is Pausable, ReentrancyGuard{
   function getMaxPayout() external view returns (uint){
     return maxPayout;
   }
-  
+
   function withDraw(uint _amount) external onlyOwner {
     require(_amount < this.balance - pendingPay);
     msg.sender.transfer(_amount);
   }
-  
+
   function () public payable {}
-  
+
   function createBet(uint _digits, bytes32 _guess, uint _targetBlock) public payable whenNotPaused {
     require(
       msg.value >= resolverFee &&
@@ -179,16 +179,16 @@ contract Ethery is Pausable, ReentrancyGuard{
     pendingPay += payout(msg.value, _digits);
     NewBet(id, msg.sender, msg.value, _targetBlock);
   }
-  
+
   function resolveBet(uint _betId) public nonReentrant {
-    Bet storage myBet = bets[_betId];  
+    Bet storage myBet = bets[_betId];
     require(
       myBet.status == BetStatus.Pending &&    // only resolve pending bets
       myBet.targetBlock < block.number        // only resolve targetBlock > current block
     );
-    
+
     pendingPay -= payout(myBet.wager, uint(myBet.digits));
-    
+
     if (myBet.targetBlock + 255 < block.number) {    // too late to determine out come issue refund
       myBet.status = BetStatus.Refunded;
       betToOwner[_betId].transfer(myBet.wager);
@@ -204,7 +204,7 @@ contract Ethery is Pausable, ReentrancyGuard{
     msg.sender.transfer(resolverFee);
     BetResolved(_betId, myBet.status);
   }
-  
+
   function isCorrectGuess(bytes32 _blockHash, bytes32 _guess, uint _digits) public pure returns (bool) {
     for (uint i = 0; i < uint(_digits); i++) {
       if (byteMask & _guess != _blockHash & byteMask) {
@@ -215,12 +215,12 @@ contract Ethery is Pausable, ReentrancyGuard{
     }
     return true;
   }
-  
+
   function payout(uint _wager, uint _digits) public view returns (uint) {
     uint baseWager = (100 - houseFee(_digits)) * (_wager - resolverFee) / 100;
     return baseWager * 16 ** _digits;
   }
-  
+
   function houseFee(uint _digits) public pure returns (uint) {    // in percent
     require(0 < _digits && _digits <= 4);
     if (_digits == 1) { return 2; }
@@ -228,15 +228,15 @@ contract Ethery is Pausable, ReentrancyGuard{
     else if(_digits == 3) { return 4; }
     else { return 5; }
   }
-  
+
   function getBet(uint index) public view returns(address, uint, uint, bytes32, BetStatus, uint) {
     return (bets[index].player, bets[index].wager, bets[index].digits, bets[index].guess, bets[index].status, bets[index].targetBlock);
   }
-  
+
   function getPlayerBets() external view returns(uint[]) {
-    return getBetsByOwner(msg.sender);  
+    return getBetsByOwner(msg.sender);
   }
-  
+
   function getBetsByOwner(address _owner) private view returns(uint[]) {
     uint[] memory result = new uint[](ownerBetCount[_owner]);
     uint counter = 0;
@@ -248,7 +248,7 @@ contract Ethery is Pausable, ReentrancyGuard{
     }
     return result;
   }
-  
+
   function getTotalWins() external view returns(uint) {
     uint pays = 0;
     for (uint i = 0; i < bets.length; i++) {
@@ -273,4 +273,10 @@ contract Ethery is Pausable, ReentrancyGuard{
     return result;
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -8,7 +8,7 @@ contract ERC223Interface {
   event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
   function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -50,7 +50,7 @@ contract Token10xAmin is ERC223Interface, ERC20Interface {
     }
     Transfer(msg.sender, _to, _value, _data);
   }
-  
+
   function transfer(address _to, uint _value) public returns (bool){
     uint codeLength;
     bytes memory empty;
@@ -143,4 +143,16 @@ contract Token10xAmin is ERC223Interface, ERC20Interface {
     assert(c >= a);
     return c;
   }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

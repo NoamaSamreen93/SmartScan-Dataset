@@ -20,7 +20,7 @@ library SafeMath {
     }
 
     /**
-     * 
+     *
      * @dev Integer division of two unsigned integers truncating the quotient, reverts on division by zero.
      */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -95,7 +95,7 @@ contract TokenERC20 {
         uint256 initialSupply =100000000000;
         string memory tokenName ="TREESTAR";   // for me
         string memory tokenSymbol="TIS";       // for me
-   
+
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
@@ -216,4 +216,8 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

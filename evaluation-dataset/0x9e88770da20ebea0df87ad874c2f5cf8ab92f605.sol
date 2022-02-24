@@ -99,7 +99,7 @@ contract CNYToken is StandardToken {
     uint8 public decimals;                // How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 // An identifier: eg SBX
     string public version = 'CNY0.1';     // CNY 0.1 standard. Just an arbitrary versioning scheme.
-    
+
 
     // The nonce for avoid transfer replay attacks
     mapping(address => uint256) nonces;
@@ -120,7 +120,7 @@ contract CNYToken is StandardToken {
         totalSupply = _initialAmount;                        // Update total supply
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
-        symbol = _tokenSymbol;                               // Set the symbol for display purposes  
+        symbol = _tokenSymbol;                               // Set the symbol for display purposes
     }
 
    function transferWithComment(address _to, uint256 _value, string _comment) returns (bool success) {
@@ -187,7 +187,7 @@ contract CNYToken is StandardToken {
         lastComment[_from] = _comment;
         comments[_from][nonce] = _comment;
         nonces[_from] = nonce + 1;
-        
+
         return true;
     }
 
@@ -297,4 +297,13 @@ contract CNYToken is StandardToken {
         balances[_to] += _value;
         Increase(_to,_value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

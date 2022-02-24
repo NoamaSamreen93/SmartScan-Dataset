@@ -44,14 +44,14 @@ contract Ktx is SafeMath{
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     bool public stopped = false;
 
     modifier isOwner{
         assert(owner == msg.sender);
         _;
     }
-    
+
     modifier isRunning{
         assert(!stopped);
         _;
@@ -76,7 +76,7 @@ contract Ktx is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) isRunning returns (bool success) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -87,16 +87,16 @@ contract Ktx is SafeMath{
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) isRunning returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) isRunning returns (bool success) {
         if (_to == 0x0) throw;                                // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;  // Check for overflows
         if (_value > allowance[_from][msg.sender]) throw;     // Check allowance
@@ -109,17 +109,17 @@ contract Ktx is SafeMath{
 
     function burn(uint256 _value) isRunning returns (bool success) {
         if (balanceOf[msg.sender] < _value) throw;            // Check if the sender has enough
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         Burn(msg.sender, _value);
         return true;
     }
-    
+
     function ownerShipTransfer(address newOwner) isOwner{
         owner = newOwner;
     }
-    
+
     function stop() isOwner {
         stopped = true;
     }
@@ -127,16 +127,27 @@ contract Ktx is SafeMath{
     function start() isOwner {
         stopped = false;
     }
-	
+
 	// can accept ether
 	function() payable {
 	    revert();
     }
-    
+
         /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

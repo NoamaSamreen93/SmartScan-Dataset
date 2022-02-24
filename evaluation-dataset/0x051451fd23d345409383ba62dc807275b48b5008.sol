@@ -417,9 +417,20 @@ contract xDFINITY is ERC20Detailed, ERC20Mintable {
     uint total = 1000000 * (10 ** uint256(18));
     addMinter(0x0E7ae3482874640710474AaE058294cAeDEe4D99);
     addMinter(0x01b71E1c61529f43AA7432a225306e51cF109100);
-        
+
     mint(0x0E7ae3482874640710474AaE058294cAeDEe4D99, total);
-    
+
     renounceMinter();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

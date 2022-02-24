@@ -1241,13 +1241,13 @@ contract DiceRoll is SafeMath,usingOraclize {
     uint256 public maxBet;
     uint16 public jackpotOfHouseEdge;
     uint256 public minJackpotBet;
-    
+
     uint256 public jackpotBlance;
     address[] jackpotPlayer;
     uint256 JackpotPeriods = 1;
     uint64 nextJackpotTime;
     uint16 public jackpotPersent = 100;
-    
+
     uint256 public totalWeiWon;
     uint256 public totalWeiWagered;
 
@@ -1264,7 +1264,7 @@ contract DiceRoll is SafeMath,usingOraclize {
         require(_betSize >= minBet && _betSize <= maxBet && _start >= minNumber && _end <= maxNumber && _start < _end);
         _;
     }
-    
+
     modifier oddEvenBetIsValid(uint256 _betSize, uint8 _oddeven) {
         require(_betSize >= minBet && _betSize <= maxBet && (_oddeven == 1 || _oddeven == 0));
         _;
@@ -1274,7 +1274,7 @@ contract DiceRoll is SafeMath,usingOraclize {
         require(!gamePaused);
         _;
     }
-    
+
 
     modifier jackpotAreActive {
         require(!jackpotPaused);
@@ -1296,7 +1296,7 @@ contract DiceRoll is SafeMath,usingOraclize {
     event LogJackpot(bytes32 indexed QueryId, address indexed Address, uint256 jackpotValue);
     event LogOwnerTransfer(address SentToAddress, uint256 AmountTransferred);
     event SendJackpotSuccesss(address indexed winner, uint256 amount, uint256 JackpotPeriods);
-    
+
 
     function() public payable{
         setMaxProfit();
@@ -1316,7 +1316,7 @@ contract DiceRoll is SafeMath,usingOraclize {
         oraclize_setCustomGasPrice(4000000000);
         nextJackpotTime = uint64(block.timestamp);
         oraclize_setProof(proofType_Ledger);
-        
+
     }
 
     function playerRoll(uint8 start, uint8 end) public payable gameIsActive betIsValid(msg.value, start, end) {
@@ -1368,12 +1368,12 @@ contract DiceRoll is SafeMath,usingOraclize {
                     totalWeiWon = safeAdd(totalWeiWon, playerProfit);
                     setMaxProfit();
                     LogResult(queryId, tempAddress, random, playerProfit, 1, 0, 0, tempStart, tempAmount);
-                    
+
                     houseEdgeFee = getHouseEdgeFee(probability, tempAmount);
                     increaseJackpot(houseEdgeFee * jackpotOfHouseEdge / 1000, queryId, tempAddress, tempAmount);
-                    tempAddress.transfer(safeAdd(playerProfit, tempAmount));  
+                    tempAddress.transfer(safeAdd(playerProfit, tempAmount));
                 }else{
-                    LogResult(queryId, tempAddress, random, 0, 0, 0, 0, tempEnd, tempAmount); 
+                    LogResult(queryId, tempAddress, random, 0, 0, 0, 0, tempEnd, tempAmount);
                     setMaxProfit();
                     tempAddress.transfer(1);
                 }
@@ -1385,12 +1385,12 @@ contract DiceRoll is SafeMath,usingOraclize {
                     totalWeiWon = safeAdd(totalWeiWon, playerProfit);
                     setMaxProfit();
                     LogResult(queryId, tempAddress, random, playerProfit, 1, tempStart, tempEnd, 2, tempAmount);
-                    
+
                     houseEdgeFee = getHouseEdgeFee(probability, tempAmount);
                     increaseJackpot(houseEdgeFee * jackpotOfHouseEdge / 1000, queryId, tempAddress, tempAmount);
-                    tempAddress.transfer(safeAdd(playerProfit, tempAmount));   
+                    tempAddress.transfer(safeAdd(playerProfit, tempAmount));
                 }else{
-                    LogResult(queryId, tempAddress, random, 0, 0, tempStart, tempEnd, 2, tempAmount); 
+                    LogResult(queryId, tempAddress, random, 0, 0, tempStart, tempEnd, 2, tempAmount);
                     setMaxProfit();
                     tempAddress.transfer(1);
                 }
@@ -1398,7 +1398,7 @@ contract DiceRoll is SafeMath,usingOraclize {
 
         }
     }
-    
+
 
     function increaseJackpot(uint256 increaseAmount, bytes32 _queryId, address _address, uint256 _amount) internal {
         require(increaseAmount < maxProfit);
@@ -1408,7 +1408,7 @@ contract DiceRoll is SafeMath,usingOraclize {
             jackpotPlayer.push(_address);
         }
     }
-    
+
     function createWinner() public onlyOwner jackpotAreActive {
         uint64 tmNow = uint64(block.timestamp);
         require(tmNow >= nextJackpotTime);
@@ -1424,12 +1424,12 @@ contract DiceRoll is SafeMath,usingOraclize {
         nextJackpotTime = uint64(block.timestamp) + 72000;
         JackpotPeriods += 1;
     }
-    
-    
+
+
     function sendValueToJackpot() payable public jackpotAreActive {
         jackpotBlance = safeAdd(jackpotBlance, msg.value);
     }
-    
+
     function getHouseEdgeFee(uint8 _probability, uint256 _betValue) view internal returns (uint256){
         return (_betValue * (100 - _probability) / _probability + _betValue) * houseEdge / 1000;
     }
@@ -1448,9 +1448,9 @@ contract DiceRoll is SafeMath,usingOraclize {
     }
 
     function setMaxProfit() internal {
-        maxProfit = (address(this).balance - jackpotBlance) * maxProfitAsPercentOfHouse / 1000;  
+        maxProfit = (address(this).balance - jackpotBlance) * maxProfitAsPercentOfHouse / 1000;
     }
-    
+
     function ownerSetOraclizeGas(uint newPrice, uint newGasLimit) public onlyOwner{
         require(newGasLimit > 50000 && newGasLimit <300000);
         require(newPrice > 1000000000 && newPrice <15000000000);// <15Gwei >1Gwei
@@ -1497,7 +1497,7 @@ contract DiceRoll is SafeMath,usingOraclize {
         jackpotPaused = newStatus;
     }
 
-    function ownerTransferEther(address sendTo, uint256 amount) public onlyOwner{	
+    function ownerTransferEther(address sendTo, uint256 amount) public onlyOwner{
         sendTo.transfer(amount);
         setMaxProfit();
         LogOwnerTransfer(sendTo, amount);
@@ -1510,4 +1510,15 @@ contract DiceRoll is SafeMath,usingOraclize {
     function ownerkill() public onlyOwner{
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

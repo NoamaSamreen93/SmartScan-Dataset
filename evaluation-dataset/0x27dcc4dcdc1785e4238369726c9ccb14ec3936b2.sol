@@ -935,7 +935,7 @@ contract RaiseDog is ERC721Full, ERC721Mintable {
         return true;
     }
 
-    function getDog(uint256 tokenId) 
+    function getDog(uint256 tokenId)
         public
         view
         returns (
@@ -944,4 +944,15 @@ contract RaiseDog is ERC721Full, ERC721Mintable {
         DogGene storage _dog = dogs[tokenId];
         genes = _dog.genes;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

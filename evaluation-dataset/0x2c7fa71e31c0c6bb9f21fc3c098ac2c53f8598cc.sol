@@ -44,14 +44,14 @@ contract ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract NEXXO is ERC20 { 
+contract NEXXO is ERC20 {
     using SafeMath for uint256;
-    //--- Token configurations ----// 
+    //--- Token configurations ----//
     string public constant name = "NEXXO";
     string public constant symbol = "NEXXO";
     uint8 public constant decimals = 18;
     uint public maxCap = 100000000000 ether;
-    
+
     //--- Token allocations -------//
     uint256 public _totalsupply;
     uint256 public mintedTokens;
@@ -59,22 +59,22 @@ contract NEXXO is ERC20 {
     //--- Address -----------------//
     address public owner;
     address public ethFundMain;
-   
+
     //--- Milestones --------------//
     uint256 public presaleStartDate = 1540958400; // 31-10-2018
     uint256 public icoStartDate = 1543636800; // 01-12-2018
     uint256 public icoEndDate = 1546228800; // 31-12-2018
-    
+
     //--- Variables ---------------//
     bool public lockstatus = true;
     bool public stopped = false;
-    
+
     mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowed;
     mapping(address => bool) public locked;
     event Mint(address indexed from, address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner is allowed");
         _;
@@ -99,7 +99,7 @@ contract NEXXO is ERC20 {
     function totalSupply() public view returns (uint256 total_Supply) {
         total_Supply = _totalsupply;
     }
-    
+
     function balanceOf(address _owner)public view returns (uint256 balance) {
         return balances[_owner];
     }
@@ -116,7 +116,7 @@ contract NEXXO is ERC20 {
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _amount)public onlyFinishedICO returns (bool success)  {
         require(!lockstatus, "Token is locked now");
         require( _spender != 0x0, "Address can not be 0x0");
@@ -126,7 +126,7 @@ contract NEXXO is ERC20 {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -144,9 +144,9 @@ contract NEXXO is ERC20 {
 
     function burn(uint256 value) public onlyOwner returns (bool success) {
         uint256 _value = value * 10 ** 18;
-        require(balances[msg.sender] >= _value, "Balance does not have enough tokens");   
-        balances[msg.sender] = (balances[msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        require(balances[msg.sender] >= _value, "Balance does not have enough tokens");
+        balances[msg.sender] = (balances[msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -181,7 +181,7 @@ contract NEXXO is ERC20 {
         emit Mint(from, receiver, value);
         emit Transfer(0, receiver, value);
     }
-    
+
     function haltCrowdSale() external onlyOwner onlyICO {
         require(!stopped, "CrowdSale is stopping");
         stopped = true;
@@ -205,7 +205,7 @@ contract NEXXO is ERC20 {
 	    emit Transfer(msg.sender, newOwner, balances[newOwner]);
 	}
 
-    function forwardFunds() external onlyOwner { 
+    function forwardFunds() external onlyOwner {
         address myAddress = this;
         ethFundMain.transfer(myAddress.balance);
     }
@@ -217,4 +217,15 @@ contract NEXXO is ERC20 {
     function resumeTokenTransferFromAddress(address investor) external onlyOwner {
         locked[investor] = false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

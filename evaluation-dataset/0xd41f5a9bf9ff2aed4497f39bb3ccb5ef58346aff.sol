@@ -7,17 +7,17 @@ interface IModerator {
     function verifyIssue(address _tokenHolder, uint256 _value, bytes calldata _data) external view
         returns (bool allowed, byte statusCode, bytes32 applicationCode);
 
-    function verifyTransfer(address _from, address _to, uint256 _amount, bytes calldata _data) external view 
+    function verifyTransfer(address _from, address _to, uint256 _amount, bytes calldata _data) external view
         returns (bool allowed, byte statusCode, bytes32 applicationCode);
 
-    function verifyTransferFrom(address _from, address _to, address _forwarder, uint256 _amount, bytes calldata _data) external view 
+    function verifyTransferFrom(address _from, address _to, address _forwarder, uint256 _amount, bytes calldata _data) external view
         returns (bool allowed, byte statusCode, bytes32 applicationCode);
 
-    function verifyRedeem(address _sender, uint256 _amount, bytes calldata _data) external view 
+    function verifyRedeem(address _sender, uint256 _amount, bytes calldata _data) external view
         returns (bool allowed, byte statusCode, bytes32 applicationCode);
 
     function verifyRedeemFrom(address _sender, address _tokenHolder, uint256 _amount, bytes calldata _data) external view
-        returns (bool allowed, byte statusCode, bytes32 applicationCode);        
+        returns (bool allowed, byte statusCode, bytes32 applicationCode);
 
     function verifyControllerTransfer(address _controller, address _from, address _to, uint256 _value, bytes calldata _data, bytes calldata _operatorData) external view
         returns (bool allowed, byte statusCode, bytes32 applicationCode);
@@ -103,12 +103,12 @@ contract ModeratorRole {
 
     function renounceModerator() public {
         _removeModerator(msg.sender);
-    }    
+    }
 
     function _addModerator(address account) internal {
         _moderators.add(account);
         emit ModeratorAdded(account);
-    }    
+    }
 
     function _removeModerator(address account) internal {
         _moderators.remove(account);
@@ -170,7 +170,7 @@ contract BlacklistModerator is IModerator, Blacklistable {
     bytes32 internal constant FORBIDDEN_APPLICATION_CODE = keccak256("org.tenx.forbidden");
 
     function verifyIssue(address _account, uint256, bytes calldata) external view
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         if (isAllowed(_account)) {
             allowed = true;
@@ -183,8 +183,8 @@ contract BlacklistModerator is IModerator, Blacklistable {
         }
     }
 
-    function verifyTransfer(address _from, address _to, uint256, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyTransfer(address _from, address _to, uint256, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         if (isAllowed(_from) && isAllowed(_to)) {
             allowed = true;
@@ -197,8 +197,8 @@ contract BlacklistModerator is IModerator, Blacklistable {
         }
     }
 
-    function verifyTransferFrom(address _from, address _to, address _sender, uint256, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyTransferFrom(address _from, address _to, address _sender, uint256, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         if (isAllowed(_from) && isAllowed(_to) && isAllowed(_sender)) {
             allowed = true;
@@ -211,8 +211,8 @@ contract BlacklistModerator is IModerator, Blacklistable {
         }
     }
 
-    function verifyRedeem(address _sender, uint256, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyRedeem(address _sender, uint256, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         if (isAllowed(_sender)) {
             allowed = true;
@@ -225,8 +225,8 @@ contract BlacklistModerator is IModerator, Blacklistable {
         }
     }
 
-    function verifyRedeemFrom(address _sender, address _tokenHolder, uint256, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyRedeemFrom(address _sender, address _tokenHolder, uint256, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         if (isAllowed(_sender) && isAllowed(_tokenHolder)) {
             allowed = true;
@@ -237,18 +237,18 @@ contract BlacklistModerator is IModerator, Blacklistable {
             statusCode = STATUS_TRANSFER_FAILURE;
             applicationCode = FORBIDDEN_APPLICATION_CODE;
         }
-    }        
+    }
 
-    function verifyControllerTransfer(address, address, address, uint256, bytes calldata, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyControllerTransfer(address, address, address, uint256, bytes calldata, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         allowed = true;
         statusCode = STATUS_TRANSFER_SUCCESS;
         applicationCode = ALLOWED_APPLICATION_CODE;
     }
 
-    function verifyControllerRedeem(address, address, uint256, bytes calldata, bytes calldata) external view 
-        returns (bool allowed, byte statusCode, bytes32 applicationCode) 
+    function verifyControllerRedeem(address, address, uint256, bytes calldata, bytes calldata) external view
+        returns (bool allowed, byte statusCode, bytes32 applicationCode)
     {
         allowed = true;
         statusCode = STATUS_TRANSFER_SUCCESS;
@@ -258,4 +258,13 @@ contract BlacklistModerator is IModerator, Blacklistable {
     function isAllowed(address _account) internal view returns (bool) {
         return !isBlacklisted[_account];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

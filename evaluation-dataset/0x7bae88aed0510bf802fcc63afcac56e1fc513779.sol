@@ -83,7 +83,7 @@ contract StandardToken is Token {
 }
 
 contract WXYToken is StandardToken, SafeMath {
-    
+
     // metadata
     string  public constant name = "支付币";
     string  public constant symbol = "WXY";
@@ -132,7 +132,7 @@ contract WXYToken is StandardToken, SafeMath {
         balances[msg.sender] = totalSupply;
         require(currentSupply <= totalSupply);
     }
-    
+
     modifier isOwner()  { require(msg.sender == ethFundDeposit); _; }
 
     ///  设置token汇率
@@ -242,4 +242,10 @@ contract WXYToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.5.2;
  * Data Revolution Technologies PTY LTD
  * Touch Smart Token (TST)
  */
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -317,7 +317,7 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 contract TSToken is PausableToken {
-    string public constant name = "Touch Smart Token"; 
+    string public constant name = "Touch Smart Token";
     string public constant symbol = "TST";
     uint256 public constant decimals = 18;
 
@@ -325,10 +325,10 @@ contract TSToken is PausableToken {
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -336,38 +336,38 @@ contract TSToken is PausableToken {
         totalSupply_ = 1000000000 * (10 ** uint256(decimals));
         balances[msg.sender] = totalSupply_;
     }
-    
+
     function freezeOf(address _owner) public view returns (uint256) {
         return freezes[_owner];
     }
 
     function burn(uint256 _value) whenNotPaused public returns (bool) {
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) whenNotPaused public returns (bool) {
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         freezes[msg.sender] = freezes[msg.sender].add(_value);
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) whenNotPaused public returns (bool) {
         require(_value <= freezes[msg.sender]);
-        
+
         freezes[msg.sender] = freezes[msg.sender].sub(_value);
 		balances[msg.sender] = balances[msg.sender].add(_value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-    
+
     /**
     * @dev Allows the current owner to transfer control of the contract to a newOwner.
     * @param newOwner The address to transfer ownership to.
@@ -382,4 +382,13 @@ contract TSToken is PausableToken {
     function() payable external {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

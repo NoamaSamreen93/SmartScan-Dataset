@@ -217,8 +217,8 @@ contract PreSale  is Ownable {
           sellInWei = amount;
           amount = 0;
         }
-        
-        executeSell(investor, toSell, sellInWei); 
+
+        executeSell(investor, toSell, sellInWei);
         weiRised = weiRised.add(sellInWei);
         owner.transfer(amount);
         if (amount > 0) {
@@ -245,7 +245,7 @@ contract PreSale  is Ownable {
     investorsStorage.newInvestment(_investor, _weiAmount); // register the invested amount in the storage
 
     require(tkn.transfer(_investor, totalTokens)); // transfer the tokens to the investor
-    emit NewInvestment(_investor, totalTokens);   
+    emit NewInvestment(_investor, totalTokens);
   }
 
   /**
@@ -306,4 +306,15 @@ contract PreSale  is Ownable {
   }
 
   event NewInvestment(address _investor, uint256 tokens);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

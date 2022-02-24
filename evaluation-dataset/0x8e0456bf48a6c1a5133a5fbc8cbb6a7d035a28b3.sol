@@ -18,7 +18,7 @@ contract Owned {
     address public owner;
     address public executor;
     address public superOwner;
-  
+
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
     constructor() public {
@@ -66,14 +66,14 @@ contract ResultStorage is Owned, IResultStorage {
     event ResultAssigned(bytes32 indexed _predictionId, uint8 _outcomeId);
     event Withdraw(uint _amount);
 
-    struct Result {     
+    struct Result {
         uint8 outcomeId;
-        bool resolved; 
+        bool resolved;
     }
 
     uint8 public constant version = 1;
     bool public paused;
-    mapping(bytes32 => Result) public results;  
+    mapping(bytes32 => Result) public results;
 
     modifier notPaused() {
         require(paused == false, "Contract is paused");
@@ -84,21 +84,21 @@ contract ResultStorage is Owned, IResultStorage {
         require(results[_predictionId].resolved == true, "Prediction is not resolved");
         _;
     }
- 
+
     function setOutcome (bytes32 _predictionId, uint8 _outcomeId)
-            public 
+            public
             onlyAllowed
-            notPaused {        
-        
+            notPaused {
+
         results[_predictionId].outcomeId = _outcomeId;
         results[_predictionId].resolved = true;
-        
+
         emit ResultAssigned(_predictionId, _outcomeId);
     }
 
-    function getResult(bytes32 _predictionId) 
-            public 
-            view 
+    function getResult(bytes32 _predictionId)
+            public
+            view
             resolved(_predictionId)
             returns (uint8) {
         return results[_predictionId].outcomeId;
@@ -125,4 +125,15 @@ contract ResultStorage is Owned, IResultStorage {
     function pause(bool _paused) external onlyOwnerOrSuperOwner {
         paused = _paused;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

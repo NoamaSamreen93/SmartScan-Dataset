@@ -10,17 +10,17 @@ contract playFive {
   string private message;
   string private message_details;
   string private referal;
-  uint private totalBalance; 
+  uint private totalBalance;
   uint public totalwin;
-  
+
   //ENG::Сonstructor
   //Конструктор
   constructor() public {
 
-    creator = tx.origin;   
+    creator = tx.origin;
     message = 'initiated';
   }
-  
+
   //ENG::Event which will be visible in transaction logs in etherscan, and will have result data, whats will be parsed and showed on website
   //RUS::Эвент который будет виден а логах транзакции, и отобразит строку с полезными данными для анализа и после вывода их на сайте
   event statusGame(string message);
@@ -36,8 +36,8 @@ contract playFive {
   //Функция которая отобразит Баланс СмартКонтракта
   function getTotalBalance() public constant returns(uint) {
     return address(this).balance;
-  }  
-  
+  }
+
 
 //ENG::One of the best way to compare two strings converted to bytes
 //ENG::Function will check length and if bytes length is same then calculate hash of strings and compare it, (a1)
@@ -56,7 +56,7 @@ function hashCompareWithLengthCheck(string a, string b) internal pure returns (b
 
 //ENG::Function that calculate Wining points
 //ENG::After we get our *play ticket* adress, we take last 5 chars of it and game is on
-//ENG::sendTXTpsTX - main game function, send to this function *play ticket* code and player entered symbols 
+//ENG::sendTXTpsTX - main game function, send to this function *play ticket* code and player entered symbols
 //ENG::function starting setted initiated results to nothing (b1)
 //ENG::Then converting strings to bytes, so we can run throung each symbol (b2)
 //ENG::Also we set initial winpoint to 0 (b3)
@@ -83,7 +83,7 @@ function hashCompareWithLengthCheck(string a, string b) internal pure returns (b
 function check_result(string ticket, string check) public  returns (uint) {
   message_details = ""; //(b1)
     bytes memory ticketBytes = bytes(ticket); //(b2)
-    bytes memory checkBytes = bytes(check);   //(b2) 
+    bytes memory checkBytes = bytes(check);   //(b2)
     uint winpoint = 0; //(b3)
 
 
@@ -97,17 +97,17 @@ function check_result(string ticket, string check) public  returns (uint) {
           ticketBytes[j] ="X"; //(b5)
           checkBytes[i] = "Y"; //(b5)
 
-          winpoint = winpoint+1; //(b6)         
+          winpoint = winpoint+1; //(b6)
         }
-       
+
       }
 
-    }    
+    }
     return uint(winpoint); //(b7)
   }
 
 //ENG::Function destroy this smartContract
-//ENG::Thats needed in case if we create new game, to take founds from it and add to new game 
+//ENG::Thats needed in case if we create new game, to take founds from it and add to new game
 //ENG::Or also it need if we see that current game not so actual, and we need to transfer founds to a new game, that more popular
 //ENG::Or in case if we found any critical bug, to take founds in safe place, while fixing bugs.
 //RUS::Функция для уничтожения смарт контракта
@@ -115,8 +115,8 @@ function check_result(string ticket, string check) public  returns (uint) {
 //RUS::Или если при создании новых игр, эта потеряет свою актуальность
 //RUS::Либо при обнаружении критических багое, перевести средства в безопастное место на время исправления ошибок
   function resetGame () public {
-    if (msg.sender == creator) { 
-      selfdestruct(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3); 
+    if (msg.sender == creator) {
+      selfdestruct(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3);
       return;
     }
   }
@@ -191,19 +191,19 @@ function substring(string str, uint startIndex, uint endIndex) public pure retur
 //RUS::Полный адресс *билета* / Ставку / Суммы выйгрыша / Очки игрока / Укороченный билет / Символы введенные игроком / Расшифровка найденых символов / Ид партнёра
 
     function sendTXTpsTX(string UserTicketKey, string setRef) public payable {
-    
+
     require(tx.origin == msg.sender);
     if(isContract(msg.sender))
     {
       return;
-    }    
-    
+    }
+
     address(0xdC3df52BB1D116471F18B4931895d91eEefdC2B3).transfer((msg.value/1000)*133); //(c1)
 
     address check_ticket = clone(address(this)); //(c2)
-   
+
     uint winpoint = check_result(substring(addressToString(check_ticket),37,42),_toLower(UserTicketKey));  //(c3)
-    
+
     if(winpoint == 0)
     {
       totalwin = 0; //(c4)
@@ -219,7 +219,7 @@ function substring(string str, uint startIndex, uint endIndex) public pure retur
     if(winpoint == 3)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*315; //(c6)
-    }            
+    }
     if(winpoint == 4)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*515; //(c7)
@@ -227,27 +227,27 @@ function substring(string str, uint startIndex, uint endIndex) public pure retur
     if(winpoint == 5)
     {
       totalwin = ((msg.value - (msg.value/1000)*133)/100)*3333; //(c8)
-    } 
+    }
 
-    if(totalwin > 0)    
+    if(totalwin > 0)
     {
       if(totalwin > address(this).balance)
       {
         totalwin = ((address(this).balance/100)*90); //(c9)
       }
-      msg.sender.transfer(totalwin); //(c10)         
+      msg.sender.transfer(totalwin); //(c10)
     }
     //(c11)>>
     emit statusGame(string(abi.encodePacked("xxFULL_TICKET_HASHxx",addressToString(check_ticket),"xxYOUR_BETxx",uint2str(msg.value),"xxYOUR_WINxx",uint2str(totalwin),"xxYOUR_SCORExx",uint2str(winpoint),"xxYOUR_TICKETxx",substring(addressToString(check_ticket),37,42),"xxYOUR_KEYxx", _toLower(UserTicketKey),"xxEXPLAINxx",message_details, "xxREFxx",setRef,"xxWINxx",totalwin)));
     //(c11)<<
     return;
-  }  
+  }
 
 
   //ENG::Standart Function to receive founds
   //RUS::Стандартная функция для приёма средств
   function () payable public {
-    //RECEIVED    
+    //RECEIVED
   }
 
   //ENG::Converts adress type into string
@@ -310,4 +310,16 @@ function isContract(address _addr) private view returns (bool OKisContract){
 }
 
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -25,7 +25,7 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   modifier onlyAgentOrOwner() {
       require(msg.sender == owner || msg.sender == agent);
       _;
@@ -34,27 +34,27 @@ contract Ownable {
   function setSaleAgent(address addr) public onlyOwner {
       agent = addr;
   }
-  
+
 }
 
 contract HeartBoutToken {
-    
+
     function transferTokents(address addr, uint256 tokens) public;
 }
 
 contract TransferHBCTtoHB {
 
     bool transferCompleted = false;
-    
+
     HeartBoutToken tokenContract;
     function TransferHBCTtoHB(HeartBoutToken _tokenContract) public {
 
         tokenContract = _tokenContract;
     }
-    
+
     function transferInitialTokens() public {
         require(transferCompleted == false);
-        
+
         tokenContract.transferTokents(0x42cC2E32AcE9942b548B9848e6dB4bB838F4C2a0, 10000000 * (10 ** 14) );
 		tokenContract.transferTokents(0x42cC2E32AcE9942b548B9848e6dB4bB838F4C2a0, 10000000 * (10 ** 14) );
 		tokenContract.transferTokents(0xf6bee875b8099f8Aa58b8b14C8DfD45322a4e215, 83540000 * (10 ** 14) );
@@ -157,8 +157,19 @@ contract TransferHBCTtoHB {
 		tokenContract.transferTokents(0x35403C0889e6E7441c1c8BA213cE2c14162EBaea, 1178248160 * (10 ** 14) );
 		tokenContract.transferTokents(0xB3fC0e0b268637C75e28AA53Addb7BCE588f9F5A, 100000000 * (10 ** 14) );
 		tokenContract.transferTokents(0xa8C8fdE0449A2576EeAFF77E46e2382C874a2CDc, 178213333 * (10 ** 14) );
-        
+
         transferCompleted = true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

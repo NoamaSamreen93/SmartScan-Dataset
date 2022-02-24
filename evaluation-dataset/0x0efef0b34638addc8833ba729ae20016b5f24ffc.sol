@@ -8,7 +8,7 @@ pragma solidity ^0.4.15;
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20 {
-  
+
     /// @dev Returns the total token supply.
     function totalSupply() public constant returns (uint256 supply);
 
@@ -37,7 +37,7 @@ pragma solidity ^0.4.15;
 
 /// @title Owned
 /// @author Adrià Massanet <adria@codecontext.io>
-/// @notice The Owned contract has an owner address, and provides basic 
+/// @notice The Owned contract has an owner address, and provides basic
 ///  authorization control functions, this simplifies & the implementation of
 ///  "user permissions"
 contract Owned {
@@ -93,16 +93,16 @@ contract Owned {
         OwnershipTransferred(oldOwner, owner);
     }
 
-    /// @notice Decentralizes the contract, this operation cannot be undone 
+    /// @notice Decentralizes the contract, this operation cannot be undone
     /// @param _dac `0xdac` has to be entered for this function to work
     function removeOwnership(address _dac) onlyOwner {
         require(_dac == 0xdac);
         owner = 0x0;
         newOwnerCandidate = 0x0;
-        OwnershipRemoved();     
+        OwnershipRemoved();
     }
 
-} 
+}
 
 //File: node_modules/giveth-common-contracts/contracts/Escapable.sol
 /*
@@ -171,7 +171,7 @@ contract Escapable is Owned {
     /// @notice The `escapeHatch()` should only be called as a last resort if a
     /// security issue is uncovered or something unexpected happened
     /// @param _token to transfer, use 0x0 for ethers
-    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {   
+    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {
         require(escapeBlacklist[_token]==false);
 
         uint256 balance;
@@ -502,4 +502,15 @@ contract WithdrawContract is Escapable {
     event NewDeposit(uint indexed idDeposit, ERC20 indexed tokenContract, uint amount);
     event CancelPaymentGlobally(uint indexed idDeposit);
     event SkipPayment(uint indexed idDeposit, bool skip);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

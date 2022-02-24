@@ -56,20 +56,20 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
-    
+
   mapping (address => uint256) balances;
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
     /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0x0));
     require(_value <= balances[msg.sender]);
@@ -82,7 +82,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -122,7 +122,7 @@ contract StandardToken is ERC20, BurnableToken {
   mapping (address => mapping (address => uint256)) allowed;
 
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    
+
     require(_to != address(0x0));
     require(_value <= balances[msg.sender]);
     require(_value <= allowed[_from][msg.sender]);
@@ -168,5 +168,16 @@ contract ETLToken is StandardToken {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = totalSupply_;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

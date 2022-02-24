@@ -7,7 +7,7 @@ pragma solidity ^0.4.18;
 // ----------------------------------------------------------------------------
 // 'AEN' token contract
 //
-// Deployed by : 
+// Deployed by :
 // Symbol      : AEN
 // Name        : AEN Coin
 // Total supply: 4,000,000,000
@@ -192,4 +192,15 @@ contract AENToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

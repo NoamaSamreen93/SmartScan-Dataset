@@ -206,7 +206,7 @@ contract TokenERC20 {
         _burn(msg.sender, _value);
         return true;
     }
-    
+
     function _burn(address _who, uint256 _value) internal {
         balanceOf[_who] = balanceOf[_who].sub(_value);  // Subtract from the sender
         totalSupply = totalSupply.sub(_value);                      // Updates totalSupply
@@ -242,4 +242,15 @@ contract CPROPToken is admined, TokenERC20  {
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, decimalsToken, tokenSymbol) public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

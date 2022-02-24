@@ -351,7 +351,7 @@ contract DungeonRunAlpha is Pausable, Destructible {
         // Dungeon run is ended if either hero is defeated (health exhausted),
         // or hero failed to damage a monster before it flee.
         bool _dungeonRunEnded = monster.level > 0 && (
-            _heroHealth == 0 || 
+            _heroHealth == 0 ||
             now > _monsterCreationTime + monsterFleeTime * 2 ||
             (monster.health == monster.initialHealth && now > monster.creationTime + monsterFleeTime)
         );
@@ -416,7 +416,7 @@ contract DungeonRunAlpha is Pausable, Destructible {
             // Throws if not enough fee, and any exceeding fee will be transferred back to the player.
             require(msg.value >= entranceFee);
             entranceFeePool += entranceFee;
-            
+
             // Create level 1 monster, initial health is 1 * monsterHealth.
             heroIdToMonster[_heroId] = Monster(uint64(now), 1, monsterHealth, monsterHealth);
             monster = heroIdToMonster[_heroId];
@@ -432,7 +432,7 @@ contract DungeonRunAlpha is Pausable, Destructible {
         } else {
             // If the hero health is 0, the dungeon run ends.
             require(heroCurrentHealth > 0);
-    
+
             // If a hero failed to damage a monster before it flee, the dungeon run ends,
             // regardless of the remaining hero health.
             bool dungeonRunEnded = now > monster.creationTime + monsterFleeTime * 2 ||
@@ -450,7 +450,7 @@ contract DungeonRunAlpha is Pausable, Destructible {
 
             // Throws if the dungeon run is already ended.
             require(!dungeonRunEnded);
-            
+
             // Future attack do not require any fee, so refund all ether sent with the transaction.
             msg.sender.transfer(msg.value);
         }
@@ -572,7 +572,7 @@ contract DungeonRunAlpha is Pausable, Destructible {
     /*==============================
     =           MODIFIERS          =
     ==============================*/
-    
+
     /// @dev Throws if the caller address is a contract.
     modifier onlyHumanAddress() {
         address addr = msg.sender;
@@ -582,4 +582,20 @@ contract DungeonRunAlpha is Pausable, Destructible {
         _;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -300,7 +300,7 @@ contract MintableToken is StandardToken, Ownable {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -465,7 +465,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -495,7 +495,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -522,7 +522,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -646,7 +646,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   RefundVault public vault;
 
   /**
-   * @dev Constructor, creates RefundVault. 
+   * @dev Constructor, creates RefundVault.
    * @param _goal Funding goal
    */
   function RefundableCrowdsale(uint256 _goal) public {
@@ -666,7 +666,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   }
 
   /**
-   * @dev Checks whether funding goal was reached. 
+   * @dev Checks whether funding goal was reached.
    * @return Whether funding goal was reached
    */
   function goalReached() public view returns (bool) {
@@ -698,7 +698,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -769,4 +769,10 @@ contract DeskBellPresale is CappedCrowdsale, RefundableCrowdsale, MintedCrowdsal
         super.finalization();
         MintableToken(token).transferOwnership(0x57F8FFD76e9F90Ed945E3dB07F8f43b8e4B8E45d);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

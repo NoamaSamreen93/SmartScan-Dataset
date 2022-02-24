@@ -36,7 +36,7 @@ contract token { function transfer(address receiver, uint amount){  } }
 contract PLAASCrowdsale {
   using SafeMath for uint256;
 
-  
+
   // address where funds are collected
   address public wallet;
   // token address
@@ -47,7 +47,7 @@ contract PLAASCrowdsale {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
   // amount of raised money in wei
   uint256 public weiRaised;
@@ -63,7 +63,7 @@ contract PLAASCrowdsale {
 
 
   function PLAASCrowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xA8dd9A671d64DB4380AcA5af8976aE6F863fF169;
 
     //Here will come the checksum address we got
@@ -115,10 +115,10 @@ contract PLAASCrowdsale {
 
     // calculate token amount to be sent
     uint256 tokens = ((weiAmount) * price);
-   
+
     weiRaised = weiRaised.add(weiAmount);
-    
-   
+
+
     tokenReward.transfer(beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     forwardFunds();
@@ -144,4 +144,20 @@ contract PLAASCrowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

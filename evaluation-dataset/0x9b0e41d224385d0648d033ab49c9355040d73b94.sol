@@ -34,7 +34,7 @@ library SafeMath {
 
 
 contract X2invest {
-    //use of library of safe mathematical operations    
+    //use of library of safe mathematical operations
     using SafeMath
     for uint;
     // array containing information about beneficiaries
@@ -161,4 +161,13 @@ contract X2invest {
             makeDeposit();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

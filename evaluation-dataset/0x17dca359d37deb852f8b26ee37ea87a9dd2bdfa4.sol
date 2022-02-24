@@ -260,7 +260,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
     bool public isFinalized = false;
 
     event Finalized();
- 
+
     constructor(address _owner) public Ownable(_owner) {}
 
     /**
@@ -305,11 +305,11 @@ contract Whitelist is Ownable {
     */
     event Disapproved(address indexed investor);
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
-        
+
     }
 
     /** @param _investor the address of investor to be checked
@@ -458,11 +458,11 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
     }
 
     /** @dev Updates whitelist contract address
-      * @param whitelistAddress address of the new whitelist contract 
+      * @param whitelistAddress address of the new whitelist contract
       */
     function setWhitelistContract(address whitelistAddress)
-        public 
-        onlyValidator 
+        public
+        onlyValidator
         checkIsAddressValid(whitelistAddress)
     {
         whiteListingContract = Whitelist(whitelistAddress);
@@ -473,7 +473,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param beneficiary the address to which the tokens have to be minted
       */
     function buyTokens(address beneficiary)
-        public 
+        public
         payable
         checkIsInvestorApproved(beneficiary)
     {
@@ -490,10 +490,10 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
         currentMintNonce++;
     }
 
-    /** @dev Updates token rate 
-    * @param _rate New token rate 
-    */ 
-    function updateRate(uint256 _rate) public onlyOwner { 
+    /** @dev Updates token rate
+    * @param _rate New token rate
+    */
+    function updateRate(uint256 _rate) public onlyOwner {
         require(_rate > 0);
         rate = _rate;
         emit RateUpdated(rate);
@@ -503,7 +503,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param nonce request recorded at this particular nonce
       */
     function approveMint(uint256 nonce)
-        external 
+        external
         onlyValidator
     {
         require(_approveMint(nonce));
@@ -514,7 +514,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param reason reason for rejection
       */
     function rejectMint(uint256 nonce, uint256 reason)
-        external 
+        external
         onlyValidator
     {
         _rejectMint(nonce, reason);
@@ -524,20 +524,20 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param nonces request recorded at these nonces
       */
     function bulkApproveMints(uint256[] nonces)
-        external 
+        external
         onlyValidator
     {
         for (uint i = 0; i < nonces.length; i++) {
             require(_approveMint(nonces[i]));
-        }        
+        }
     }
-    
+
     /** @dev reject buy tokens requests
       * @param nonces request recorded at these nonces
       * @param reasons reasons for rejection
       */
     function bulkRejectMints(uint256[] nonces, uint256[] reasons)
-        external 
+        external
         onlyValidator
     {
         require(nonces.length == reasons.length);
@@ -559,7 +559,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
 
         //No need to use mint-approval on token side, since the minting is already approved in the crowdsale side
         TokenInterface(token).mint(pendingMints[nonce].to, pendingMints[nonce].tokens);
-        
+
         emit TokenPurchase(
             msg.sender,
             pendingMints[nonce].to,
@@ -582,7 +582,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
         checkIsAddressValid(pendingMints[nonce].to)
     {
         rejectedMintBalance[pendingMints[nonce].to] = rejectedMintBalance[pendingMints[nonce].to].add(pendingMints[nonce].weiAmount);
-        
+
         emit MintRejected(
             pendingMints[nonce].to,
             pendingMints[nonce].tokens,
@@ -590,7 +590,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
             nonce,
             reason
         );
-        
+
         delete pendingMints[nonce];
     }
 
@@ -615,7 +615,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param newToken New token contract address
       */
     function setTokenContract(address newToken)
-        external 
+        external
         onlyOwner
         checkIsAddressValid(newToken)
     {
@@ -626,7 +626,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param newOwner New owner of the token contract
       */
     function transferTokenOwnership(address newOwner)
-        public 
+        public
         onlyOwner
         checkIsAddressValid(newOwner)
     {
@@ -636,4 +636,15 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
     function forwardFunds(uint256 amount) internal {
         wallet.transfer(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -63,8 +63,8 @@ contract token {
     }
 
     /* Approve and then communicate the approved contract in a single tx */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public 
-        returns (bool success) {    
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -117,7 +117,7 @@ contract COOPET is owned, token {
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[_from]) revert();                        // Check if frozen            
+        if (frozenAccount[_from]) revert();                        // Check if frozen
         if (balanceOf[_from] < _value) revert();                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert();   // Check allowance
@@ -142,4 +142,15 @@ contract COOPET is owned, token {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

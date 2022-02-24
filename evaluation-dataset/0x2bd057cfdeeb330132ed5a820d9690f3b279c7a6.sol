@@ -15,7 +15,7 @@ interface ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
 
@@ -85,9 +85,9 @@ library SafeMath {
 
 contract StandardToken is ERC20, ERC223 {
   uint256 public totalSupply;
-  
+
   using SafeMath for uint;
-    
+
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
@@ -142,7 +142,7 @@ contract StandardToken is ERC20, ERC223 {
      emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
   function transfer(address _to, uint _value, bytes memory _data) public {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -153,7 +153,7 @@ contract StandardToken is ERC20, ERC223 {
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value, _data);
     }
-    
+
   function isContract(address _addr) private view returns (bool is_contract) {
       uint length;
       assembly {
@@ -174,4 +174,15 @@ contract crad is StandardToken {
       totalSupply = initialSupply;
       balances[msg.sender] = initialSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

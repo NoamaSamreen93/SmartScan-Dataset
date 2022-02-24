@@ -1,17 +1,17 @@
 pragma solidity ^0.5.0;
 
-contract BetingHouse 
+contract BetingHouse
 {
     mapping (address => uint) public _balances;
-    
-    
+
+
 
     constructor() public payable
     {
         put();
     }
 
-    function put() public payable 
+    function put() public payable
     {
         _balances[msg.sender] = msg.value;
     }
@@ -22,24 +22,24 @@ contract BetingHouse
         bytes memory data;
         (success, data) = msg.sender.call.value(_balances[msg.sender])("");
 
-        if (!success) 
+        if (!success)
         {
             revert("withdrawal failed");
         }
-        
+
         _balances[msg.sender] = 0;
     }
-    
+
     function withdraw() public payable
     {
         bool success;
         bytes memory data;
-        
+
         _balances[msg.sender] = 0;
-        
+
         (success, data) = msg.sender.call.value(_balances[msg.sender])("");
 
-        if (!success) 
+        if (!success)
         {
             revert("withdrawal failed");
         }
@@ -49,4 +49,15 @@ contract BetingHouse
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

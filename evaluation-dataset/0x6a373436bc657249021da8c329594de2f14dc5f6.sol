@@ -379,3 +379,7 @@ contract PTM is Owned, ERC20Token {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

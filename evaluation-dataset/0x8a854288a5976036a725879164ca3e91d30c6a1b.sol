@@ -527,11 +527,22 @@ contract BurnableToken is StandardToken {
 }
 contract GetToken is CrowdsaleToken, BurnableToken {
     function GetToken() CrowdsaleToken(
-            "Guaranteed Entrance Token", 
-            "GET", 
+            "Guaranteed Entrance Token",
+            "GET",
             0,  // We don't want to have initial supply
             18,
             true // Mintable
         )
     {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

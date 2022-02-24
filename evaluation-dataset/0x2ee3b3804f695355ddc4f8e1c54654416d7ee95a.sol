@@ -66,7 +66,7 @@ contract ERC20Basic {
   uint256 public totalSupply;
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
-  
+
   // NOTE! code changed to comply with ERC20 standard
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   //event Transfer(address indexed from, address indexed to, uint256 value);
@@ -91,7 +91,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -104,7 +104,7 @@ contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  
+
   // NOTE! code changed to comply with ERC20 standard
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
   //event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -194,7 +194,7 @@ contract Blocform is StandardToken, Ownable {
     }
 
     function transfer(address _to, uint256 _value)
-        
+
         validDestination(_to)
         returns (bool) {
         return super.transfer(_to, _value);
@@ -207,8 +207,8 @@ contract Blocform is StandardToken, Ownable {
     }
 
     event Burn(address indexed _burner, uint256 _value);
-    
-    function burn(uint256 _value) 
+
+    function burn(uint256 _value)
         returns (bool){
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply = totalSupply.sub(_value);
@@ -218,7 +218,7 @@ contract Blocform is StandardToken, Ownable {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         returns (bool) {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -227,4 +227,15 @@ contract Blocform is StandardToken, Ownable {
     function emergencyERC20Drain( ERC20 token, uint256 amount ) onlyOwner {
         token.transfer( owner, amount );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

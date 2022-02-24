@@ -1,11 +1,11 @@
 pragma solidity ^0.5.4;
 // ----------------------------------------------------------------------------
-// rev rbs eryk 190301.POC 
+// rev rbs eryk 190301.POC
 //
 // 'IGR' 'InGRedient Token with Fixed Supply Token'  contract
 //
 // Symbol      : IGR
-// Name        : InGRedient Token Certification of Value Ingredients for Recipe based Foods  -ERC20 - 
+// Name        : InGRedient Token Certification of Value Ingredients for Recipe based Foods  -ERC20 -
 // Total supply: 1,000,000.000000000000000000
 // Decimals    : 3
 //
@@ -70,18 +70,18 @@ function receiveApproval(address from, uint256 tokens, address token, bytes memo
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     event OwnershipTransferred(address indexed _from, address indexed _to);
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
     _;
     }
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
@@ -101,16 +101,16 @@ contract Owned {
 
 contract InGRedientToken  is ERC20Interface, Owned {
     using SafeMath for uint;
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-    
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -122,24 +122,24 @@ contract InGRedientToken  is ERC20Interface, Owned {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
     function totalSupply() public view returns (uint) {
         return _totalSupply.sub(balances[address(0)]);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to `to` account
     // - Owner's account must have sufficient balance to transfer
@@ -151,8 +151,8 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -166,8 +166,8 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
     //
@@ -184,8 +184,8 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
@@ -193,8 +193,8 @@ contract InGRedientToken  is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account. The `spender` contract function
@@ -206,16 +206,16 @@ contract InGRedientToken  is ERC20Interface, Owned {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
     function () external payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
@@ -223,12 +223,12 @@ contract InGRedientToken  is ERC20Interface, Owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
-    
-    
+
+
     // ==================================================================
     // >>>>>>  IGR token specific functions <<<<<<
     //===================================================================
-    
+
     event  FarmerRequestedCertificate(address owner, address certAuth, uint tokens);
     // --------------------------------------------------------------------------------------------------
     // routine 10- allows for sale of ingredients along with the respective IGR token transfer
@@ -240,7 +240,7 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit FarmerRequestedCertificate(owner, _certAuth, _tokens);
         return true;
     }
-    
+
     // --------------------------------------------------------------------------------------------------
     // routine 20-  certAuthIssuesCerticate  certification auth confirms that ingredients are trustworthy
     // as well as qtty , published url, product, details of IGR value property, location , date of harvest )
@@ -253,7 +253,7 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Transfer(owner, _farmer, _tokens);
         return true;
     }
-    
+
     // --------------------------------------------------------------------------------------------------
     // routine 30- allows for simple sale of ingredients along with the respective IGR token transfer ( with url)
     // --------------------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Transfer(msg.sender, _to, _tokens);
         return true;
     }
-    
+
     // --------------------------------------------------------------------------------------------------
     // routine 40- allows for sale of intermediate product made from certified ingredients along with
     // the respective IGR token transfer ( with url)
@@ -277,9 +277,9 @@ contract InGRedientToken  is ERC20Interface, Owned {
         transfer(_to, _tokens*_out2inIngredientPercentage/100);
         return true;
     }
-    
+
     //--------------------------------------------------------------------------------------------------
-    // aux function to generate a ethereum address from the food item visible numbers 
+    // aux function to generate a ethereum address from the food item visible numbers
     //( GTIN-13 + date of validity
     // is used by Routine 50- comminglerSellsProductSKUWithProRataIngred
     // and can be used to query teh blockchain by a consumer App
@@ -287,17 +287,17 @@ contract InGRedientToken  is ERC20Interface, Owned {
     function genAddressFromGTIN13date(string memory _GTIN13,string memory _YYMMDD) public pure returns(address b){
     //address b = bytes32(keccak256(abi.encodePacked(_GTIN13,_YYMMDD)));
     // address b = address(a);
-        
+
         bytes32 a = keccak256(abi.encodePacked(_GTIN13,_YYMMDD));
-        
+
         assembly{
         mstore(0,a)
         b:= mload(0)
         }
-        
+
         return b;
     }
-    
+
     // --------------------------------------------------------------------------------------------------
     //  transferAndWriteUrl- aux routine -Transfer the balance from token owner's account to `to` account
     // - Owner's account must have sufficient balance to transfer
@@ -310,7 +310,7 @@ contract InGRedientToken  is ERC20Interface, Owned {
         emit Transfer(msg.sender, _to, _tokens);
         return true;
     }
-    
+
     // --------------------------------------------------------------------------------------------------
     // routine 50- comminglerSellsProductSKUWithProRataIngred(address _to, int numPSKUsSold, ,string _url, uint _qttyIGRinLLSKU, string GTIN13, string YYMMDD )
     // allows for sale of final-consumer  product with resp SKU and Lot identification with corresponding IGR transfer  with url
@@ -328,4 +328,15 @@ contract InGRedientToken  is ERC20Interface, Owned {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

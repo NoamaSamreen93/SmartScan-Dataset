@@ -26,9 +26,9 @@ library SafeMath {
 
 
 contract Ownable {
-    
+
     address public owner;
-    
+
      constructor() public {
         owner = msg.sender;
     }
@@ -37,7 +37,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
@@ -48,9 +48,9 @@ contract Ownable {
 contract RDCCOIN is Ownable{
 
     using SafeMath for uint;
-    string public name;     
+    string public name;
     string public symbol;
-    uint8 public decimals;  
+    uint8 public decimals;
     uint private _totalSupply;
     uint public basisPointsRate = 0;
     uint public minimumFee = 0;
@@ -58,25 +58,25 @@ contract RDCCOIN is Ownable{
 
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 value
     );
-    
+
     event Approval(
         address indexed _owner,
         address indexed _spender,
         uint256 _value
     );
-    
+
     event Params(
         uint feeBasisPoints,
         uint maximumFee,
         uint minimumFee
     );
-    
+
     event Issue(
         uint amount
     );
@@ -84,26 +84,26 @@ contract RDCCOIN is Ownable{
     event Redeem(
         uint amount
     );
-    
+
 
     constructor () public {
-        name = 'RIDDLE COIN'; 
-        symbol = 'RDC'; 
-        decimals = 18; 
-        _totalSupply = 600000000 * 10**uint(decimals); 
+        name = 'RIDDLE COIN';
+        symbol = 'RDC';
+        decimals = 18;
+        _totalSupply = 600000000 * 10**uint(decimals);
         balances[msg.sender] = _totalSupply;
     }
-    
+
 
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-   
-  
+
+
     function balanceOf(address owner) public view returns (uint256) {
         return balances[owner];
     }
-   
+
     function transfer(address _to, uint256  _value) public onlyPayloadSize(2 * 32){
         uint fee = (_value.mul(basisPointsRate)).div(1000);
         if (fee > maximumFee) {
@@ -116,7 +116,7 @@ contract RDCCOIN is Ownable{
 
         require(_to != address(0));
 
-        require (_value > 0); 
+        require (_value > 0);
 
         require (balances[msg.sender] > _value);
 
@@ -126,7 +126,7 @@ contract RDCCOIN is Ownable{
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
 
-        balances[_to] = balances[_to].add(sendAmount); 
+        balances[_to] = balances[_to].add(sendAmount);
 
         if (fee > 0) {
             balances[owner] = balances[owner].add(fee);
@@ -135,8 +135,8 @@ contract RDCCOIN is Ownable{
 
         emit Transfer(msg.sender, _to, _value);
     }
-    
-  
+
+
     function approve(address _spender, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool success) {
 
         require (_value > 0);
@@ -150,8 +150,8 @@ contract RDCCOIN is Ownable{
         emit Approval(msg.sender,_spender, _value);
         return true;
     }
-    
- 
+
+
     function transferFrom(address _from, address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool success) {
 
         uint fee = (_value.mul(basisPointsRate)).div(1000);
@@ -166,7 +166,7 @@ contract RDCCOIN is Ownable{
 
         require(_to != address(0));
 
-        require (_value > 0); 
+        require (_value > 0);
 
         require(_value < balances[_from]);
 
@@ -184,13 +184,13 @@ contract RDCCOIN is Ownable{
         emit Transfer(_from, _to, sendAmount);
         return true;
     }
-    
+
 
     function allowance(address _from, address _spender) public view returns (uint remaining) {
         return allowed[_from][_spender];
     }
-    
-  
+
+
     function setParams(uint newBasisPoints,uint newMaxFee,uint newMinFee) public onlyOwner {
         require(newBasisPoints <= 9);
         require(newMaxFee <= 100);
@@ -210,7 +210,7 @@ contract RDCCOIN is Ownable{
         _totalSupply = _totalSupply.add(amount);
         emit Issue(amount);
     }
-    
+
 
     function decreaseSupply(uint amount) public onlyOwner {
         require(amount <= 10000000);
@@ -221,4 +221,15 @@ contract RDCCOIN is Ownable{
         balances[owner] = balances[owner].sub(amount);
         emit Redeem(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

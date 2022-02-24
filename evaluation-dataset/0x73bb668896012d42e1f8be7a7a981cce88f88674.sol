@@ -2,12 +2,12 @@ pragma solidity ^0.4.17;
 
 
 contract ERC20Basic {
-    
+
   uint256 public totalSupply;
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 
@@ -209,6 +209,60 @@ contract Crowdsale is Ownable {
 
 // creates the token to be sold.
 // override this method to have crowdsale of a specific mintable token.
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function createTokenContract() internal returns (MOKEN) {
     return new MOKEN();
   }
@@ -232,7 +286,7 @@ function buyTokens(address beneficiary) public payable {
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
-    // transfer tokens purchased 
+    // transfer tokens purchased
     ERC20(token).transfer(beneficiary, tokens);
 
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
@@ -243,7 +297,7 @@ function buyTokens(address beneficiary) public payable {
 function transferTokens(address beneficiary,uint tokens) onlyOwner public {
     require(beneficiary != address(0));
 
-    // transfer tokens purchased 
+    // transfer tokens purchased
     ERC20(token).transfer(beneficiary, tokens);
 
 }
@@ -264,24 +318,24 @@ function transferTokens(address beneficiary,uint tokens) onlyOwner public {
   function hasEnded() public view returns (bool) {
     return now > endTime;
   }
-  
+
   function setRate(uint256 _rate) public onlyOwner{
       rate = _rate;
   }
-  
+
   function setWallet(address _wallet) public onlyOwner{
       wallet = _wallet;
   }
-  
+
   function setStartTime(uint256 _startTime) public onlyOwner{
       startTime = _startTime;
   }
-  
+
   function setEndTime(uint256 _endTime) public onlyOwner{
       endTime = _endTime;
   }
-  
-  
+
+
 }
 
 contract CappedCrowdsale is Crowdsale {
@@ -290,13 +344,13 @@ contract CappedCrowdsale is Crowdsale {
 
   uint256 public cap;
 
-  function CappedCrowdsale(uint256 _cap,uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) 
+  function CappedCrowdsale(uint256 _cap,uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet)
     Crowdsale (_startTime, _endTime, _rate, _wallet) public {
     require(_cap > 0);
     cap = _cap;
   }
 
- 
+
   function validPurchase() internal view returns (bool) {
     uint256 count = weiRaised.add(msg.value);
     bool withinCap =  count <= cap;
@@ -309,4 +363,20 @@ contract CappedCrowdsale is Crowdsale {
     return super.hasEnded() || capReached;
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

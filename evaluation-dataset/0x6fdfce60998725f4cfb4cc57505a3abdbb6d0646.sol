@@ -8,14 +8,14 @@ pragma solidity ^0.4.19;
 contract SelfKeyToken {
     string public name = "SelfKey Token";
     string public symbol = "KEY";
-    uint8 public constant decimals = 18;  
+    uint8 public constant decimals = 18;
     address public owner;
 
     uint256 public constant tokensPerEth = 1;
     uint256 public constant howManyEtherInWeiToBecomeOwner = 1000 ether;
     uint256 public constant howManyEtherInWeiToKillContract = 500 ether;
     uint256 public constant howManyEtherInWeiToChangeSymbolName = 400 ether;
-    
+
     bool public funding = true;
 
     // The current total token supply.
@@ -42,8 +42,8 @@ contract SelfKeyToken {
             symbol = _symbol;
         }
     }
-    
-    
+
+
     function changeOwner (address _newowner) payable external
     {
         if (msg.value>=howManyEtherInWeiToBecomeOwner)
@@ -70,7 +70,7 @@ contract SelfKeyToken {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
         var senderBalance = balances[msg.sender];
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
@@ -81,15 +81,15 @@ contract SelfKeyToken {
         }
         return false;
     }
-    
+
     function mintTo(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
     }
-    
+
 
     function totalSupply() external constant returns (uint256) {
         return totalTokens;
@@ -121,7 +121,7 @@ contract SelfKeyToken {
     function approve(address _spender, uint256 _amount) public returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
-         
+
          return true;
      }
 // Crowdfunding:
@@ -134,10 +134,10 @@ contract SelfKeyToken {
         // The checks are split (instead of using or operator) because it is
         // cheaper this way.
         if (!funding) revert();
-        
+
         // Do not allow creating 0 or more than the cap tokens.
         if (msg.value == 0) revert();
-        
+
         var numTokens = msg.value * (1000.0/totalTokens);
         totalTokens += numTokens;
 
@@ -147,4 +147,10 @@ contract SelfKeyToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

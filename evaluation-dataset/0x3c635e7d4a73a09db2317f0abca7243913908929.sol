@@ -14,7 +14,7 @@ contract Lotto {
     require(msg.sender == _account);
     _;
   }
-  
+
   function changeOwner(address _newOwner) public onlyBy(owner) {
     owner = _newOwner;
   }
@@ -49,19 +49,19 @@ The reward is only 1 ether so it's low enough that miners won't try to influence
 
   function selectWinner() private {
     address winner = playerPool[random(playerPool.length)];
-    
+
     winner.transfer(amount);
     playerPool.length = 0;
     owner.transfer(this.balance);
     Payout(this, winner, amount);
-    
+
   }
-  
+
 /*
 If the contract becomes stagnant and new players haven't signed up for awhile,
 this function will return the money to all the players. The function is made
 payable so I can send some ether with the transaction to pay for gas. this way
-I can make sure all players are paid back. 
+I can make sure all players are paid back.
 
 as a note, 100 finney == 0.1 ether.
 */
@@ -72,7 +72,7 @@ as a note, 100 finney == 0.1 ether.
     }
       playerPool.length = 0;
   }
-  
+
 /*
 Self destruct just in case. Also, will refund all ether to the players before it
 explodes into beautiful digital star dust.
@@ -92,4 +92,17 @@ explodes into beautiful digital star dust.
       selectWinner();
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

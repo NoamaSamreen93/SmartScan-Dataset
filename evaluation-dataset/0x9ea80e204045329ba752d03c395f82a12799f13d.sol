@@ -14,27 +14,27 @@ contract MigrationAgent {
 contract ERC20Interface {
      // Get the total token supply
      function totalSupply() constant returns (uint256 totalSupply);
-  
+
      // Get the account balance of another account with address _owner
      function balanceOf(address _owner) constant returns (uint256 balance);
-  
+
      // Send _value amount of tokens to address _to
      function transfer(address _to, uint256 _value) returns (bool success);
-  
+
      // Send _value amount of tokens from address _from to address _to
      function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-  
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      // this function is required for some DEX functionality
      function approve(address _spender, uint256 _value) returns (bool success);
-  
+
      // Returns the amount which _spender is still allowed to withdraw from _owner
      function allowance(address _owner, address _spender) constant returns (uint256 remaining);
-  
+
      // Triggered when tokens are transferred.
      event Transfer(address indexed _from, address indexed _to, uint256 _value);
-  
+
      // Triggered whenever approve(address _spender, uint256 _value) is called.
      event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
@@ -48,7 +48,7 @@ contract BlocklancerToken is ERC20Interface {
     // The funding cap in weis.
     uint256 public constant tokenCreationCap = 1000000000* 10**18;
     uint256 public constant tokenCreationMin = 150000000* 10**18;
-    
+
     mapping(address => mapping (address => uint256)) allowed;
 
     uint public fundingStart;
@@ -62,14 +62,14 @@ contract BlocklancerToken is ERC20Interface {
 
     // The current total token supply.
     uint256 totalTokens;
-    
+
     //needed to calculate the price after the power day
     //the price increases by 1 % for every 10 million LNC sold after power day
     uint256 soldAfterPowerHour;
 
     mapping (address => uint256) balances;
     mapping (address => uint) lastTransferred;
-    
+
     //needed to refund everyone should the ICO fail
     // needed because the price per LNC isn't linear
     mapping (address => uint256) balancesEther;
@@ -77,14 +77,14 @@ contract BlocklancerToken is ERC20Interface {
     //address of the contract that manages the migration
     //can only be changed by the creator
     address public migrationAgent;
-    
+
     //total amount of token migrated
     //allows everyone to see the progress of the migration
     uint256 public totalMigrated;
 
     event Migrate(address indexed _from, address indexed _to, uint256 _value);
     event Refund(address indexed _from, uint256 _value);
-    
+
     //total amount of participants in the ICO
     uint totalParticipants;
 
@@ -94,12 +94,12 @@ contract BlocklancerToken is ERC20Interface {
         //change first number!
         fundingEnd = fundingStart + 31 * 1 days;//now + 1000 * 1 minutes;
     }
-    
+
     //returns the total amount of participants in the ICO
     function getAmountofTotalParticipants() constant returns (uint){
         return totalParticipants;
     }
-    
+
     //set
     function getAmountSoldAfterPowerDay() constant external returns(uint256){
         return soldAfterPowerHour;
@@ -116,10 +116,10 @@ contract BlocklancerToken is ERC20Interface {
             //reduce the sender balance by the amount he sends
             senderBalance -= _value;
             balances[msg.sender] = senderBalance;
-            
+
             //increase the balance of the receiver by the amount we reduced the balance of the sender
             balances[_to] += _value;
-            
+
             //saves the last time someone sent LNc from this address
             //is needed for our Token Holder Tribunal
             //this ensures that everyone can only vote one time
@@ -137,17 +137,17 @@ contract BlocklancerToken is ERC20Interface {
     function totalSupply() constant returns (uint256 totalSupply) {
         return totalTokens;
     }
-    
+
     //retruns the balance of the owner address
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     //returns the amount anyone pledged into this contract
     function EtherBalanceOf(address _owner) constant returns (uint256) {
         return balancesEther[_owner];
     }
-    
+
     //time left before the crodsale ends
     function TimeLeft() external constant returns (uint256) {
         if(fundingEnd>block.timestamp)
@@ -155,7 +155,7 @@ contract BlocklancerToken is ERC20Interface {
         else
             return 0;
     }
-    
+
     //time left before the crodsale begins
     function TimeLeftBeforeCrowdsale() external constant returns (uint256) {
         if(fundingStart>block.timestamp)
@@ -168,23 +168,23 @@ contract BlocklancerToken is ERC20Interface {
     function migrate(uint256 _value) external {
         // can only be called if the funding ended
         if(funding) throw;
-        
+
         //the migration agent address needs to be set
         if(migrationAgent == 0) throw;
 
         // must migrate more than nothing
         if(_value == 0) throw;
-        
+
         //if the value is higher than the sender owns abort
         if(_value > balances[msg.sender]) throw;
 
         //reduce the balance of the owner
         balances[msg.sender] -= _value;
-        
+
         //reduce the token left in the old contract
         totalTokens -= _value;
         totalMigrated += _value;
-        
+
         //call the migration agent to complete the migration
         //credits the same amount of LNC in the new contract
         MigrationAgent(migrationAgent).migrateFrom(msg.sender, _value);
@@ -195,17 +195,17 @@ contract BlocklancerToken is ERC20Interface {
     function setMigrationAgent(address _agent) external {
         //not possible in funding mode
         if(funding) throw;
-        
+
         //only allow to set this once
         if(migrationAgent != 0) throw;
-        
+
         //anly the owner can call this function
         if(msg.sender != master) throw;
-        
+
         //set the migration agent
         migrationAgent = _agent;
     }
-    
+
     //return the current exchange rate -> LNC per Ether
     function getExchangeRate() constant returns(uint){
         //15000 LNC at power day
@@ -221,7 +221,7 @@ contract BlocklancerToken is ERC20Interface {
             return 10000*decrease/100;
         }
     }
-    
+
     //returns if the crowd sale is still open
     function ICOopen() constant returns(bool){
         if(!funding) return false;
@@ -237,23 +237,23 @@ contract BlocklancerToken is ERC20Interface {
     function() payable external {
         //not possible if the funding has ended
         if(!funding) throw;
-        
+
         //not possible before the funding started
         if(block.timestamp < fundingStart) throw;
-        
+
         //not possible after the funding ended
         if(block.timestamp > fundingEnd) throw;
 
         // Do not allow creating 0 or more than the cap tokens.
         if(msg.value == 0) throw;
-        
+
         //don't allow to create more token than the maximum cap
         if((msg.value  * getExchangeRate()) > (tokenCreationCap - totalTokens)) throw;
 
         //calculate the amount of LNC the sender receives
         var numTokens = msg.value * getExchangeRate();
         totalTokens += numTokens;
-        
+
         //increase the amount of token sold after power day
         //allows us to calculate the 1 % price increase per 10 million LNC sold
         if(getExchangeRate()!=15000){
@@ -262,10 +262,10 @@ contract BlocklancerToken is ERC20Interface {
 
         // increase the amount of token the sender holds
         balances[msg.sender] += numTokens;
-        
+
         //increase the amount of ether the sender pledged into the contract
         balancesEther[msg.sender] += msg.value;
-        
+
         //icrease the amount of people that sent ether to this contract
         totalParticipants+=1;
 
@@ -278,7 +278,7 @@ contract BlocklancerToken is ERC20Interface {
     function finalize() external {
         // not possible if the funding already ended
         if(!funding) throw;
-        
+
         //only possible if funding ended and the minimum cap is reached - or
         //the total amount of token is the same as the maximum cap
         if((block.timestamp <= fundingEnd ||
@@ -307,20 +307,20 @@ contract BlocklancerToken is ERC20Interface {
     function refund() external {
         // not possible after the ICO was finished
         if(!funding) throw;
-        
+
         //not possible before the ICO ended
         if(block.timestamp <= fundingEnd) throw;
-        
+
         //not possible if more token were created than the minimum
         if(totalTokens >= tokenCreationMin) throw;
 
         var lncValue = balances[msg.sender];
         var ethValue = balancesEther[msg.sender];
         if (lncValue == 0) throw;
-        
+
         //set the amount of token the sender has to 0
         balances[msg.sender] = 0;
-        
+
         //set the amount of ether the sender owns to 0
         balancesEther[msg.sender] = 0;
         totalTokens -= lncValue;
@@ -328,7 +328,7 @@ contract BlocklancerToken is ERC20Interface {
         Refund(msg.sender, ethValue);
         if (!msg.sender.send(ethValue)) throw;
     }
-	
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -350,7 +350,7 @@ contract BlocklancerToken is ERC20Interface {
              return false;
          }
      }
-  
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount) returns (bool success) {
@@ -359,8 +359,17 @@ contract BlocklancerToken is ERC20Interface {
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
      }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

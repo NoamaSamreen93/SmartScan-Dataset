@@ -78,7 +78,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -645,7 +645,7 @@ contract ERC721Enumerable is ERC721Basic {
 }
 
 /**
- * @title ERC-721 Non-Fungible Token Standard, optional metadata 
+ * @title ERC-721 Non-Fungible Token Standard, optional metadata
  * @author Prashant Prabhakar Singh
  * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  */
@@ -938,7 +938,7 @@ contract Operators is Ownership {
   }
 
   function addOperator(address _newOperator, uint8 _level)
-    public 
+    public
     onlyOwner
     whenNotPaused
     onlyValidLevel(_level)
@@ -978,7 +978,7 @@ contract Operators is Ownership {
 
   }
 
-  
+
     /**
    * @dev Use removeOperatorByIndex instead to save gas
    * warning: not advised to use this function.
@@ -1035,7 +1035,7 @@ contract RealityClashWeapon is ERC721Token, Operators {
   mapping (uint => string) weaponDataOf;
   mapping (uint => string) ownerDataOf;
 
- 
+
   event WeaponAdded(uint indexed weaponId, string gameData, string weaponData, string ownerData, string tokenURI);
   event WeaponUpdated(uint indexed weaponId, string gameData, string weaponData, string ownerData, string tokenURI);
   event WeaponOwnerUpdated (uint indexed  _weaponId, address indexed  _oldOwner, address indexed  _newOwner);
@@ -1103,7 +1103,7 @@ contract RealityClashWeapon is ERC721Token, Operators {
    * @param _ownerData represents owner data of the weapon
    */
   function updateMetaData(uint _id, string memory _gameData, string memory _weaponData, string memory _ownerData)
-    public 
+    public
     onlyLevel(2)
     whenNotPaused
   {
@@ -1146,10 +1146,10 @@ contract RealityClashWeapon is ERC721Token, Operators {
    * @param _weaponData is new public data for weapon
    */
   function updateWeaponData (uint _id,  string memory _weaponData)
-    public 
+    public
     onlyLevel(2)
     whenNotPaused
-    returns(bool) 
+    returns(bool)
   {
     weaponDataOf[_id] = _weaponData;
     emit WeaponUpdated(_id, "", _weaponData, "", "");
@@ -1234,7 +1234,7 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
   mapping(address => uint) private userNonce;
 
   bool public isNormalUserAllowed; // can normal user access advanced features
-  
+
   constructor() public {
     isNormalUserAllowed = false;
   }
@@ -1245,7 +1245,7 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
    * @param _perm permission to users
    */
   function allowNormalUser(bool _perm)
-    public 
+    public
     onlyOwner
     whenNotPaused
   {
@@ -1295,7 +1295,7 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
    * message should be hash(functionWord, contractAddress, nonce, fnParams)
    */
   function provable_transfer(bytes32 message, bytes32 r, bytes32 s, uint8 v, address to, uint tokenId)
-    public 
+    public
     whenNotPaused
   {
     if (!isNormalUserAllowed) {
@@ -1307,7 +1307,7 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
 
     bytes32 proof = getMessageTransfer(signer, to, tokenId);
     require (proof == message);
-    
+
     // Execute original function
     require(to != address(0));
     clearApproval(signer, tokenId);
@@ -1344,7 +1344,7 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
   function getMessageTransfer(address signer, address to, uint id)
     public
     view
-    returns (bytes32) 
+    returns (bytes32)
   {
     return keccak256(abi.encodePacked(
       bytes4(0xb483afd3),
@@ -1363,8 +1363,8 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
    * @return hash of (functionWord, contractAddress, nonce, ...fnParams)
    */
   function getMessageSendApprovalForAll(address signer, address spender, bool approved)
-    public 
-    view 
+    public
+    view
     returns (bytes32)
   {
     bytes32 proof = keccak256(abi.encodePacked(
@@ -1417,4 +1417,15 @@ contract AdvancedRealityClashWeapon is RealityClashWeapon {
     selfdestruct(msg.sender);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

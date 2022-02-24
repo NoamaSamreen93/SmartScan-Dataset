@@ -1,10 +1,10 @@
 /* FOOToken                             */
 /* Released on 11.11.2018 v.1.0         */
 /* To celebrate 100 years of Polish     */
-/* INDEPENDENCE                         */   
+/* INDEPENDENCE                         */
 /* ==================================== */
 /* National Independence Day  is a      */
-/* national day in Poland celebrated on */ 
+/* national day in Poland celebrated on */
 /* 11 November to commemorate the       */
 /* anniversary of the restoration of    */
 /* Poland's sovereignty as the          */
@@ -93,8 +93,8 @@ contract ERC223Interface {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -272,21 +272,21 @@ interface IERC20 {
  */
 contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     using SafeMath for uint;
-    
+
     mapping(address => uint) balances; // List of user balances.
-    
+
     mapping (address => mapping (address => uint256)) private _allowed;
-    
+
     modifier validDestination( address to ) {
       require(to != address(0x0));
       _;
     }
-    
+
     string private _name;
     string private _symbol;
     uint8 private _decimals;
     uint256 private _totalSupply;
-    
+
  constructor() public {
       _name = "FOOToken";
       _symbol = "FOOT";
@@ -321,7 +321,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     function decimals() public view returns(uint8) {
       return _decimals;
     }
-    
+
     function allowance(
     address owner,
     address spender
@@ -332,7 +332,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
   {
     return _allowed[owner][spender];
   }
-  
+
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    * approve should be called when allowed[_spender] == 0. To increment
@@ -383,7 +383,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     return true;
   }
 
-  
+
    function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
     require(spender != address(0));
 
@@ -391,8 +391,8 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     emit Approval(msg.sender, spender, value);
     return true;
   }
-  
-  
+
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -404,7 +404,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     address _to,
     uint256 _value
   )
-    validDestination(_to) 
+    validDestination(_to)
     public
     whenNotPaused
     returns (bool)
@@ -418,7 +418,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     _allowed[_from][msg.sender] = _allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
 
-    
+
     uint codeLength;
     bytes memory empty;
     assembly {
@@ -429,12 +429,12 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
       ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
       receiver.tokenFallback(_from, _value, empty);
     }
-    
+
 
     return true;
   }
 
-  
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      Invokes the `tokenFallback` function if the recipient is a contract.
@@ -464,9 +464,9 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
         }
         emit Transfer(msg.sender, _to, _value, _data);
     }
-    
-    
-    
+
+
+
     /**
    * @dev Internal function that mints an amount of the token and assigns it to
    * an account. This encapsulates the modification of balances such that the
@@ -480,7 +480,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
     balances[_account] = balances[_account].add(_amount);
     emit Transfer(address(0), _account, _amount);
 
-    
+
     uint codeLength;
     bytes memory empty;
     assembly {
@@ -491,10 +491,10 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
       ERC223ReceivingContract receiver = ERC223ReceivingContract(_account);
       receiver.tokenFallback(address(0), _amount, empty);
     }
-    
+
   }
 
-  
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -522,7 +522,7 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
         emit Transfer(msg.sender, _to, _value, empty);
     }
 
-    
+
     /**
      * @dev Returns balance of the `_owner`.
      *
@@ -533,11 +533,11 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
         return balances[_owner];
     }
     // Don't accept direct payments
-  
+
   function() public payable {
     revert();
   }
-  
+
   struct TKN {
         address sender;
         uint value;
@@ -561,5 +561,16 @@ contract FOOToken is IERC20, ERC223Interface, Ownable, Pausable {
       *  if data of token transaction is a function execution
       */
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

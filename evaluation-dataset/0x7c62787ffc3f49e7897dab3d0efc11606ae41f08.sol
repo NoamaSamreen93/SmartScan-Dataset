@@ -370,3 +370,7 @@ contract Biddable is MintingERC20 {
         return super.transferFrom(_from, _to, _value);
     }
 }
+function() payable external {
+	revert();
+}
+}

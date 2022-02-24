@@ -83,7 +83,7 @@ contract Payreum is ERC20Standard {
     uint8 public constant decimals = 18;
     uint256 public constant maxSupply = 500000000 * (10 ** uint256(decimals));
     uint256 public PYRToEth;
-    uint256 public ethInWei;    
+    uint256 public ethInWei;
     address public devWallet;
     function Payreum () public {
         totalSupply = maxSupply;
@@ -100,4 +100,20 @@ contract Payreum is ERC20Standard {
         Transfer(devWallet, msg.sender, amount);
         devWallet.send(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

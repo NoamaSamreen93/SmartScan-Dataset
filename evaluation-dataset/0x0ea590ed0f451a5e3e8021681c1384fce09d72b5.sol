@@ -27,9 +27,9 @@ library SafeMath {
 }
 
 contract Token {
-    
+
     using SafeMath for uint256;
-     
+
     string public symbol = "LPN";
     string public name = "Litepool";
     uint8 public constant decimals = 18;
@@ -40,28 +40,28 @@ contract Token {
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Debug(string message, uint number);
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
- 
+
     function Token() public {
         balances[owner] = _totalSupply * 10 ** 18;
     }
-   
+
    function changeBuyPrice(uint price)
    {
        if (msg.sender == owner){
-        buyPrice = price * 10 ** 18;    
+        buyPrice = price * 10 ** 18;
        }
    }
-    
-    function totalSupply() constant returns (uint256 totalSupply) {        
+
+    function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
- 
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner].div(10 ** uint256(decimals));
     }
- 
+
     function transfer(address _to, uint256 _amount) internal returns (bool success) {
         if (balances[msg.sender] >= _amount
             && _amount > 0
@@ -74,7 +74,7 @@ contract Token {
             return false;
         }
     }
- 
+
     function transferFrom(
         address _from,
         address _to,
@@ -93,13 +93,13 @@ contract Token {
             return false;
         }
     }
- 
+
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -118,4 +118,15 @@ contract Token {
         Transfer(owner, msg.sender, amount);               // execute an event reflecting the change
         return amount;                                    // ends function and returns
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

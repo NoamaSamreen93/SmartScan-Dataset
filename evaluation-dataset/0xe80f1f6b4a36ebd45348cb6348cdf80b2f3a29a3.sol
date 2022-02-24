@@ -1359,10 +1359,10 @@ contract Adminstrator {
   address public admin;
   address payable public owner;
 
-  modifier onlyAdmin() { 
-        require(msg.sender == admin || msg.sender == owner,"Not authorized"); 
+  modifier onlyAdmin() {
+        require(msg.sender == admin || msg.sender == owner,"Not authorized");
         _;
-  } 
+  }
 
   constructor() public {
     admin = msg.sender;
@@ -1370,7 +1370,7 @@ contract Adminstrator {
   }
 
   function transferAdmin(address newAdmin) public onlyAdmin {
-    admin = newAdmin; 
+    admin = newAdmin;
   }
 }
 contract FiftyContract is Adminstrator,usingOraclize {
@@ -1381,7 +1381,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	mapping (address => uint) public membership;
 	mapping(address => mapping(uint => uint)) public memberOrders;
 	event membershipExtended(address indexed _self, uint newexpiretime);
-	
+
 	string public website="http://portal.globalcfo.org/getOrderVer4.php?eth=";
 	string[] public websiteString = ["http://portal.globalcfo.org/getOrderVer4.php?room=1&eth=",
 	"http://portal.globalcfo.org/getOrderVer4.php?room=2&eth=",
@@ -1391,11 +1391,11 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	"http://portal.globalcfo.org/getOrderVer4.php?room=50&eth="
 	];
 	mapping (bytes32 => treeNode) public oraclizeCallbacks;
-	
+
 	//About the tree
 	event completeTree(address indexed _self, uint indexed _nodeID, uint indexed _amount);
-	event startTree(address indexed _self, uint indexed _nodeID, uint indexed _amount);	
-	mapping (address => mapping (uint => uint)) public nodeIDIndex;	
+	event startTree(address indexed _self, uint indexed _nodeID, uint indexed _amount);
+	mapping (address => mapping (uint => uint)) public nodeIDIndex;
 	mapping (address => mapping (uint => bool)) public isReatingTree;
 	mapping (address => mapping (uint => mapping (uint => mapping (uint => treeNode)))) public treeChildren;
 	mapping (address => mapping (uint => mapping (uint => treeNode))) public treeParent;
@@ -1407,17 +1407,17 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	uint public spread=2;
 	uint public minimumTreeNodeReferred=2;
 	uint[] public possibleNodeType = [1,2,3,5,10,50];
-	
+
 	struct treeNode {
-		 address payable ethAddress; 
-		 uint nodeType; 
+		 address payable ethAddress;
+		 uint nodeType;
 		 uint nodeID;
 	}
 	struct rewardDistribution {
 		address payable first;
 		address payable second;
 	}
-	
+
 	//Statistic issue
 	uint256 public ethIN=0;
 	uint256 public ethOut=0;
@@ -1428,18 +1428,18 @@ contract FiftyContract is Adminstrator,usingOraclize {
 	event Paused(address account);
 	event Unpaused(address account);
 	event makeQuery(address indexed account, string msg);
-	event refundEvent(address indexed _self, uint sentETH, uint requireETH, uint shopID, 
+	event refundEvent(address indexed _self, uint sentETH, uint requireETH, uint shopID,
 	address parent, address grandparent, bool isOpeningExistingRoom);
-	
+
 	//Setting the variables
 	function setMembershipFee(uint rateFinney, uint memberDays) public onlyAdmin{
 		require(rateFinney > 0, "new rate must be positive");
 		require(memberDays > 0, "new membership time must be positive");
 		mRate = rateFinney * 10 ** uint256(15); //In finney
 		membershiptime = memberDays * 86400; //In days
-		
+
 	}
-	function setTreeSpec(uint newSpread, uint newDivideRate, uint newDivideBase, 
+	function setTreeSpec(uint newSpread, uint newDivideRate, uint newDivideBase,
 	uint newTreeNodeReferred, uint[] memory newNodeType) public onlyAdmin{
 		require(newSpread > 0, "new spread must > 0");
 		require(newDivideRate > 0, "new divide level must > 0");
@@ -1480,8 +1480,8 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		require(member != address(0));
 		membership[member] = 0;
 	}
-		
-	function() external payable { 
+
+	function() external payable {
 		require(!paused,"The contract is paused");
 		require(address(this).balance + msg.value > address(this).balance);
 		ethIN += msg.value;
@@ -1494,7 +1494,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		//bytes32 queryId=bytes32("AAA");
         oraclizeCallbacks[queryId] = treeNode(msg.sender,msg.value,0);
 	}
-		
+
 	function __callback(bytes32 myid, string memory result) public {
         if (msg.sender != oraclize_cbAddress()) revert();
 		bytes memory _baseBytes = bytes(result);
@@ -1517,16 +1517,16 @@ contract FiftyContract is Adminstrator,usingOraclize {
 			address payable grandgrandAddress = extractOneAddrFromByte(_baseBytes,85);
 			address payable ghostAddress1 = extractOneAddrFromByte(_baseBytes,127);
 			address payable ghostAddress2 = extractOneAddrFromByte(_baseBytes,169);
-			
+
 			currentNodes[treeRoot][totalETH] = true;
 			uint totalRequireETH = nodeIDIndex[treeRoot][totalETH];
 			nodeIDIndex[treeRoot][totalETH] += 1;
 			isReatingTree[treeRoot][totalETH] = (isReatingRoom==1)? true:false;
 			emit startTree(treeRoot,totalRequireETH,totalETH);
-			
+
 			if(parentAddress != address(0))
 				tempDirRefer[treeRoot][totalETH][totalRequireETH] = parentAddress;
-			rewardDistribution memory rewardResult = 
+			rewardDistribution memory rewardResult =
 				_placeChildTree(parentAddress,totalETH,treeRoot,totalRequireETH);
 			if(rewardResult.first == address(0) && grandAddress != address(0)){
 				//Try grandparent
@@ -1557,18 +1557,18 @@ contract FiftyContract is Adminstrator,usingOraclize {
 			address payable ghostAddress2 = extractOneAddrFromByte(_baseBytes,189);
 			bool[] memory isStartTreeHere = new bool[](2*possibleNodeType.length);
 			bool isOpeningExistingRoom=false;
-			uint totalRequireETH = 0;			
+			uint totalRequireETH = 0;
 			for(uint i=0;i<possibleNodeType.length;i++){
 				isStartTreeHere[i]
-					= (getOneDigit(_baseBytes,(i+21)-possibleNodeType.length) ==1)? 
+					= (getOneDigit(_baseBytes,(i+21)-possibleNodeType.length) ==1)?
 					true:false;
 				isStartTreeHere[i+possibleNodeType.length]
-					= (getOneDigit(_baseBytes,(i+21)-(2*possibleNodeType.length)) ==1)? 
+					= (getOneDigit(_baseBytes,(i+21)-(2*possibleNodeType.length)) ==1)?
 					true:false;
 				if(isStartTreeHere[i]){
 					totalRequireETH += possibleNodeType[i] * 10 ** uint256(18);
 					uint testTreeType = possibleNodeType[i] * 10 ** uint256(18);
-					if(currentNodes[treeRoot][testTreeType] 
+					if(currentNodes[treeRoot][testTreeType]
 						|| nodeIDIndex[treeRoot][testTreeType] >= (2 ** 32) -1){
 						isOpeningExistingRoom=true;
 					}
@@ -1613,10 +1613,10 @@ contract FiftyContract is Adminstrator,usingOraclize {
 					nodeIDIndex[treeRoot][totalETH] += 1;
 					isReatingTree[treeRoot][totalETH] = isStartTreeHere[i+possibleNodeType.length];
 					emit startTree(treeRoot,totalRequireETH,totalETH);
-					
+
 					if(parentAddress != address(0))
 						tempDirRefer[treeRoot][totalETH][totalRequireETH] = parentAddress;
-					rewardDistribution memory rewardResult = 
+					rewardDistribution memory rewardResult =
 						_placeChildTree(parentAddress,totalETH,treeRoot,totalRequireETH);
 					if(rewardResult.first == address(0) && grandAddress != address(0)){
 						//Try grandparent
@@ -1643,7 +1643,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		//We do BFS here, so need to search layer by layer
 		if(firstUpline == address(0)) return rewardDistribution(address(0),address(0));
 		address payable getETHOne = address(0); address payable getETHTwo = address(0);
-		uint8 firstLevelSearch=_placeChild(firstUpline,treeType,treeRoot,treeNodeID); 
+		uint8 firstLevelSearch=_placeChild(firstUpline,treeType,treeRoot,treeNodeID);
 		if(firstLevelSearch == 1){
 			getETHOne=firstUpline;
 			uint cNodeID=nodeIDIndex[firstUpline][treeType] - 1;
@@ -1674,7 +1674,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		return rewardDistribution(getETHOne,getETHTwo);
 	}
 	//Return 0, there is no place for the node, 1, there is a place and placed, 2, duplicate node is found
-	function _placeChild(address payable firstUpline, uint treeType, address payable treeRoot, uint treeNodeID) 
+	function _placeChild(address payable firstUpline, uint treeType, address payable treeRoot, uint treeNodeID)
 		internal returns(uint8) {
 		if(currentNodes[firstUpline][treeType] && nodeIDIndex[firstUpline][treeType] <(2 ** 32) -1){
 			uint cNodeID=nodeIDIndex[firstUpline][treeType] - 1;
@@ -1684,7 +1684,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 					treeChildren[firstUpline][treeType][cNodeID][i]
 						= treeNode(treeRoot,treeType,treeNodeID);
 					//Set parent
-					treeParent[treeRoot][treeType][treeNodeID] 
+					treeParent[treeRoot][treeType][treeNodeID]
 						= treeNode(firstUpline,treeType,cNodeID);
 					return 1;
 				}else{
@@ -1727,10 +1727,10 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		currentNodes[_root][_treeType] = false;
 		treeCompleteTime[_root][_treeType][nodeIDIndex[_root][_treeType]-1]=now;
 		//Ban this user
-		if(nodeIDIndex[_root][_treeType] == 1 && _isDirectRefCount < minimumTreeNodeReferred) 
+		if(nodeIDIndex[_root][_treeType] == 1 && _isDirectRefCount < minimumTreeNodeReferred)
 			nodeIDIndex[_root][_treeType] = (2 ** 32) -1;
 		emit completeTree(_root, nodeIDIndex[_root][_treeType], _treeType);
-		
+
 		if(isReatingTree[_root][_treeType]){
 			string memory queryStr = addressToString(_root);
 			for(uint i=0;i<possibleNodeType.length;i++){
@@ -1763,7 +1763,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 		}
 		return 0;
 	}
-	function distributeETH(address treeRoot, address payable rewardFirst, address payable rewardSecond, uint totalETH, 
+	function distributeETH(address treeRoot, address payable rewardFirst, address payable rewardSecond, uint totalETH,
 		bool isFund) internal{
 		//Distribute the award
 		uint moneyToDistribute = (totalETH * divideRadio) / divideRadioBase;
@@ -1780,7 +1780,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
 				nodeReceivedETH[rewardFirst] += moneyToDistribute;
 			}
 			//emit distributeETH(rewardResult.first, treeRoot, moneyToDistribute);
-		} 
+		}
 		if(rewardSecond != address(0)){
 			//If it is repeating, the fourth children will send 0.03 less, or 30
 			//The fifth and sixth children will not send out
@@ -1821,7 +1821,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
     }
     function addressToString(address _addr) public pure returns(string memory) {
         bytes32 value = bytes32(uint256(_addr));
-        bytes memory alphabet = "0123456789abcdef";    
+        bytes memory alphabet = "0123456789abcdef";
         bytes memory str = new bytes(42);
         str[0] = '0';
         str[1] = 'x';
@@ -1833,7 +1833,7 @@ contract FiftyContract is Adminstrator,usingOraclize {
     }
 
     function extractOneAddrFromByte(bytes memory tmp, uint start) internal pure returns (address payable){
-		 if(tmp.length < start+42) return address(0); 
+		 if(tmp.length < start+42) return address(0);
          uint160 iaddr = 0;
          uint160 b1;
          uint160 b2;
@@ -1865,5 +1865,14 @@ contract FiftyContract is Adminstrator,usingOraclize {
 			if(digit >=48 && digit<=57) result = (result * 10) + (digit - 48);
 		}
 		return result;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

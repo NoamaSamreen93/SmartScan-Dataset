@@ -236,8 +236,8 @@ contract Bounty is Ownable {
    function Bounty(address _tokenContractAddress) public {
       require(_tokenContractAddress != address(0));
       lamdenTau = LamdenTau(_tokenContractAddress);
-      
-      
+
+
    }
 
    function returnTokens() onlyOwner {
@@ -246,7 +246,7 @@ contract Bounty is Ownable {
    }
 
    function issueTokens() onlyOwner  {
-      
+
     lamdenTau.transfer(0xf2e99bc068ac16c3ba545c6f38126ab0193185ed, 27779180000000000000000);
     lamdenTau.transfer(0x147e57b7cef2408c2d6e0c945ede1976f24f4659, 213686000000000000000);
     lamdenTau.transfer(0x147e57b7cef2408c2d6e0c945ede1976f24f4659, 4096686277464000000000);
@@ -282,9 +282,20 @@ contract Bounty is Ownable {
     lamdenTau.transfer(0x194bd8b3db2332e5caa7d67aa541e1d49c919cba, 106843000000000000000000);
     lamdenTau.transfer(0x194bd8b3db2332e5caa7d67aa541e1d49c919cba, 104706140000000000000000);
     lamdenTau.transfer(0x194bd8b3db2332e5caa7d67aa541e1d49c919cba, 309844700000000000000000);
-        
+
       uint256 balance = lamdenTau.balanceOf(this);
       lamdenTau.transfer(msg.sender, balance);
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

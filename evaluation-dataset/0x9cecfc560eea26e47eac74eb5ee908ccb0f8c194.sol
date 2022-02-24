@@ -400,7 +400,7 @@ contract DetailedERC20 is ERC20 {
  * @dev Very simple ERC20 Token that can be minted.
  * It is meant to be used in a crowdsale contract.
  */
- 
+
 contract KHDonToken is MintableToken, DetailedERC20 {
       constructor(string _name, string _symbol, uint8 _decimals)
         DetailedERC20(_name, _symbol, _decimals)
@@ -408,4 +408,13 @@ contract KHDonToken is MintableToken, DetailedERC20 {
     {
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

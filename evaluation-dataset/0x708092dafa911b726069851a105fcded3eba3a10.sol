@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-    
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -51,7 +51,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-     
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -80,26 +80,26 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract DigitalCryptoAds is StandardToken { 
+contract DigitalCryptoAds is StandardToken {
 
-  
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'DCAD 2.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
 
-   
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'DCAD 2.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
+
+
     function DigitalCryptoAds () {
-        balances[msg.sender] = 1000000000000000000000000000000  ;               
+        balances[msg.sender] = 1000000000000000000000000000000  ;
         totalSupply = 1000000000000000000000000000000  ;
         name = "Digital Crypto Ads";
-        decimals = 18;                                               
-        symbol = "DCAD";                                             
-        unitsOneEthCanBuy = 10000000;                                     
-        fundsWallet = msg.sender;                                    
+        decimals = 18;
+        symbol = "DCAD";
+        unitsOneEthCanBuy = 10000000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -110,18 +110,34 @@ contract DigitalCryptoAds is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-       
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

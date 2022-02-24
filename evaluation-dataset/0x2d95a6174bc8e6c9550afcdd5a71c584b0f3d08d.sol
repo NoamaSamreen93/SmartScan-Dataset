@@ -182,7 +182,7 @@ contract StandardToken is ERC20Interface, Pausable {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint256 tokens) public returns (bool success) {
         require(spender != address(0));
@@ -194,7 +194,7 @@ contract StandardToken is ERC20Interface, Pausable {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -202,7 +202,7 @@ contract StandardToken is ERC20Interface, Pausable {
     // - 0 value transfers are not allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint256 tokens) public returns (bool success) {
-        //allow trading in token only if sale fhined 
+        //allow trading in token only if sale fhined
        if (msg.sender != owner)
             require(!paused);
         require(tokens > 0);
@@ -275,18 +275,29 @@ contract MintableToken is StandardToken {
 // note introduced onlyPayloadSize in StandardToken.sol to protect against short address attacks
 contract AllstocksToken is MintableToken {
     string public version = "1.0";
-    uint256 public constant INITIAL_SUPPLY = 225 * (10**5) * 10**decimals;     // 22.5m reserved for Allstocks use  
+    uint256 public constant INITIAL_SUPPLY = 225 * (10**5) * 10**decimals;     // 22.5m reserved for Allstocks use
 
     // constructor
     constructor() public {
       owner = msg.sender;
-      _totalSupply = INITIAL_SUPPLY;                         // 22.5m reserved for Allstocks use                            
+      _totalSupply = INITIAL_SUPPLY;                         // 22.5m reserved for Allstocks use
       balances[owner] = INITIAL_SUPPLY;                      // Deposit Allstocks share
       emit Transfer(address(0x0), owner, INITIAL_SUPPLY);    // log transfer
     }
 
-    function () public payable {       
+    function () public payable {
       require(msg.value == 0);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

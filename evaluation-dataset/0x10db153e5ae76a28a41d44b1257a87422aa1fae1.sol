@@ -84,7 +84,7 @@ contract ModuleManager is SelfAuthorized, Executor {
     address public constant SENTINEL_MODULES = address(0x1);
 
     mapping (address => address) internal modules;
-    
+
     function setupModules(address to, bytes data)
         internal
     {
@@ -422,4 +422,15 @@ contract WhitelistModule is Module {
         require(isWhitelisted[to], "Target account is not whitelisted");
         require(manager.execTransactionFromModule(to, value, data, Enum.Operation.Call), "Could not execute transaction");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

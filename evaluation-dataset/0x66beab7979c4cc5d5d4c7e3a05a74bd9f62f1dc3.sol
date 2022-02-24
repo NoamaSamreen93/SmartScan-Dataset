@@ -70,7 +70,7 @@ contract Ownable {
     require(msg.sender == owner || msg.sender == address(this));
     _;
   }
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -180,7 +180,7 @@ contract BasicToken is ERC20Basic, Pausable {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   struct Purchase {
     uint unlockTokens;
     uint unlockDate;
@@ -225,11 +225,11 @@ contract BasicToken is ERC20Basic, Pausable {
       require(!lock);
       uint256 weiAmount = _value.mul(withdrawCommission).div(priceEthPerToken);
       require(weiAmount <= uint256(address(this).balance));
-      
+
       totalSupply_ = totalSupply_.sub(_value);
       msg.sender.transfer(weiAmount);
       withdrawWallet.transfer(weiAmount.mul(uint256(100).sub(withdrawCommission)).div(100));
-      
+
       emit Withdraw(msg.sender, weiAmount, _value, priceEthPerToken, withdrawCommission);
     } else {
       balances[_to] = balances[_to].add(_value);
@@ -239,11 +239,11 @@ contract BasicToken is ERC20Basic, Pausable {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function getPurchases(address sender, uint index) public view returns(uint, uint) {
     return (balancesLock[sender][index].unlockTokens, balancesLock[sender][index].unlockDate);
   }
-  
+
   function checkVesting(address sender) public view returns (uint256) {
     uint256 availableTokens = 0;
     for (uint i = 0; i < balancesLock[sender].length; i++) {
@@ -252,7 +252,7 @@ contract BasicToken is ERC20Basic, Pausable {
         availableTokens = availableTokens.add(lockTokens);
       }
     }
-    
+
     return availableTokens;
   }
 
@@ -264,7 +264,7 @@ contract BasicToken is ERC20Basic, Pausable {
   function balanceOf(address _owner) public view returns (uint256) {
     return checkVesting(_owner);
   }
-  
+
   function balanceOfUnlockTokens(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
@@ -304,11 +304,11 @@ contract StandardToken is ERC20, BasicToken {
       require(!lock);
       uint256 weiAmount = _value.mul(withdrawCommission).div(priceEthPerToken);
       require(weiAmount <= uint256(address(this).balance));
-      
+
       totalSupply_ = totalSupply_.sub(_value);
       msg.sender.transfer(weiAmount);
       withdrawWallet.transfer(weiAmount.mul(uint256(100).sub(withdrawCommission)).div(100));
-      
+
       emit Withdraw(msg.sender, weiAmount, _value, priceEthPerToken, withdrawCommission);
     } else {
       balances[_to] = balances[_to].add(_value);
@@ -413,11 +413,11 @@ contract RubusFundBlackToken is StandardToken {
   event NewTokenPrice(uint256 tokenPrice);
   event GetWei(uint256 weiAmount);
   event AddWei(uint256 weiAmount);
-  
+
   event DepositCommission(uint256 deposit);
   event InvestCommission(uint256 invest);
   event WithdrawCommission(uint256 withdraw);
-  
+
   event DepositWallet(address deposit);
   event InvestWallet(address invest);
   event WithdrawWallet(address withdraw);
@@ -436,7 +436,7 @@ contract RubusFundBlackToken is StandardToken {
     newInvestWallet(0xf0EF10870308013903bd6Dc8f86E7a7EAF1a86Ab);
     newWithdraWallet(0x7c4C8b371d4348f7A1fd2e76f05aa60846b442DD);
   }
-  
+
   function _lockPaymentTokens(address sender, uint _amount, uint _date) internal {
     balancesLock[sender].push(Purchase(_amount, _date));
   }
@@ -444,18 +444,18 @@ contract RubusFundBlackToken is StandardToken {
   function () payable external whenNotPaused {
     require(msg.value >= minimalEthers);
     uint256 tokens = msg.value.mul(depositCommission).mul(priceEthPerToken).div(10000);
-    
+
     totalSupply_ = totalSupply_.add(tokens);
     uint256 lockTokens = tokens.mul(100).div(lockTokensPercent);
-    
+
     // balancesLock[msg.sender] = balancesLock[msg.sender].add(tokens);
     _lockPaymentTokens(msg.sender, lockTokens, now.add(lockTimestamp));
-    
+
     balances[msg.sender] = balances[msg.sender].add(tokens);
 
     investWallet.transfer(msg.value.mul(investCommission).div(100));
-    depositWallet.transfer(msg.value.mul(uint256(100).sub(depositCommission)).div(100)); 
-    
+    depositWallet.transfer(msg.value.mul(uint256(100).sub(depositCommission)).div(100));
+
     emit Transfer(rubusBlackAddress, msg.sender, tokens);
     emit Deposit(msg.sender, msg.value, tokens, priceEthPerToken, depositCommission);
   }
@@ -471,7 +471,7 @@ contract RubusFundBlackToken is StandardToken {
 
   function airdrop(address[] receiver, uint256[] amount) external onlyOwner {
     require(receiver.length > 0 && receiver.length == amount.length);
-    
+
     for(uint256 i = 0; i < receiver.length; i++) {
       uint256 tokens = amount[i];
       totalSupply_ = totalSupply_.add(tokens);
@@ -480,10 +480,10 @@ contract RubusFundBlackToken is StandardToken {
       emit AddTokens(receiver[i], tokens);
     }
   }
-  
+
   function deleteInvestorTokens(address[] user, uint256[] amount) external onlyOwner {
     require(user.length > 0 && user.length == amount.length);
-    
+
     for(uint256 i = 0; i < user.length; i++) {
       uint256 tokens = amount[i];
       require(tokens <= balances[user[i]]);
@@ -493,7 +493,7 @@ contract RubusFundBlackToken is StandardToken {
       emit DeleteTokens(user[i], tokens);
     }
   }
-  
+
   function setNewPrice(uint256 _ethPerToken) public onlyOwner {
     priceEthPerToken = _ethPerToken;
     emit NewTokenPrice(priceEthPerToken);
@@ -503,27 +503,27 @@ contract RubusFundBlackToken is StandardToken {
     depositCommission = _newDepositCommission;
     emit DepositCommission(depositCommission);
   }
-  
+
   function newInvestCommission(uint256 _newInvestCommission) public onlyOwner {
     investCommission = _newInvestCommission;
     emit InvestCommission(investCommission);
   }
-  
+
   function newWithdrawCommission(uint256 _newWithdrawCommission) public onlyOwner {
     withdrawCommission = _newWithdrawCommission;
     emit WithdrawCommission(withdrawCommission);
   }
-  
+
   function newDepositWallet(address _depositWallet) public onlyOwner {
     depositWallet = _depositWallet;
     emit DepositWallet(depositWallet);
   }
-  
+
   function newInvestWallet(address _investWallet) public onlyOwner {
     investWallet = _investWallet;
     emit InvestWallet(investWallet);
   }
-  
+
   function newWithdraWallet(address _withdrawWallet) public onlyOwner {
     withdrawWallet = _withdrawWallet;
     emit WithdrawWallet(withdrawWallet);
@@ -533,16 +533,32 @@ contract RubusFundBlackToken is StandardToken {
     lock = _lock;
     emit Lock(lock);
   }
-  
+
   function newMinimalEthers(uint256 _weiAMount) public onlyOwner {
     minimalEthers = _weiAMount;
   }
-  
+
   function newTokenUnlockPercent(uint256 _lockTokensPercent) public onlyOwner {
     lockTokensPercent = _lockTokensPercent;
   }
-  
+
   function newLockTimestamp(uint256 _lockTimestamp) public onlyOwner {
     lockTimestamp = _lockTimestamp;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

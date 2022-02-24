@@ -977,7 +977,7 @@ contract CryptoTeam {
 
     Bank public BankContract;
     GameWave public GameWaveContract;
-    
+
     /**
     * @dev Payable function. 10% will send to Developers fund and 90% will send to JackPot contract.
     * Also setting info about player.
@@ -988,7 +988,7 @@ contract CryptoTeam {
         BankContract.setInfo(msg.sender, msg.value.mul(90).div(100));
 
         address(GameWaveContract).transfer(msg.value.mul(10).div(100));
-        
+
         address(BankContract).transfer(msg.value.mul(90).div(100));
     }
 }
@@ -1059,4 +1059,10 @@ contract Sale {
         GWContract.transfer(msg.sender, balance);
         address(GWContract).transfer(amount);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

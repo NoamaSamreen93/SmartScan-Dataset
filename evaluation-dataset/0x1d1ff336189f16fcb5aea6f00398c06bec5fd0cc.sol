@@ -10,9 +10,9 @@ pragma solidity ^0.4.17;
 
 contract token {
 	function transferFrom(address sender, address receiver, uint amount) public returns(bool success) {}
-	
+
 	function transfer(address receiver, uint amount) public returns(bool success) {}
-	
+
 	function balanceOf(address holder) public constant returns(uint) {}
 }
 
@@ -44,7 +44,7 @@ contract safeMath {
 		assert(c >= a && c >= b);
 		return c;
 	}
-	
+
 	function safeMul(uint a, uint b) constant internal returns (uint) {
     uint c = a * b;
     assert(a == 0 || c / a == b);
@@ -69,11 +69,11 @@ contract casinoBank is owned, safeMath{
 	event Deposit(address _player, uint _numTokens, bool _chargeGas);
 	/** informs listeners how many tokens were withdrawn from the player to the receiver address */
 	event Withdrawal(address _player, address _receiver, uint _numTokens);
-	
+
 	function casinoBank(address tokenContract) public{
 		edg = token(tokenContract);
 	}
-	
+
 	/**
 	* accepts deposits for an arbitrary address.
 	* retrieves tokens from the message sender and adds them to the balance of the specified address.
@@ -84,23 +84,23 @@ contract casinoBank is owned, safeMath{
 	**/
 	function deposit(address receiver, uint numTokens, bool chargeGas) public isAlive{
 		require(numTokens > 0);
-		uint value = safeMul(numTokens,10000); 
+		uint value = safeMul(numTokens,10000);
 		if(chargeGas) value = safeSub(value, msg.gas/1000 * gasPrice);
 		assert(edg.transferFrom(msg.sender, address(this), numTokens));
 		balanceOf[receiver] = safeAdd(balanceOf[receiver], value);
 		playerBalance = safeAdd(playerBalance, value);
 		Deposit(receiver, numTokens, chargeGas);
   }
-	
+
 	/**
 	* If the user wants/needs to withdraw his funds himself, he needs to request the withdrawal first.
-	* This method sets the earliest possible withdrawal date to 7 minutes from now. 
+	* This method sets the earliest possible withdrawal date to 7 minutes from now.
 	* Reason: The user should not be able to withdraw his funds, while the the last game methods have not yet been mined.
 	**/
 	function requestWithdrawal() public{
 		withdrawAfter[msg.sender] = now + 7 minutes;
 	}
-	
+
 	/**
 	* In case the user requested a withdrawal and changes his mind.
 	* Necessary to be able to continue playing.
@@ -108,7 +108,7 @@ contract casinoBank is owned, safeMath{
 	function cancelWithdrawalRequest() public{
 		withdrawAfter[msg.sender] = 0;
 	}
-	
+
 	/**
 	* withdraws an amount from the user balance if 7 minutes passed since the request.
 	* @param amount the amount of tokens to withdraw
@@ -122,7 +122,7 @@ contract casinoBank is owned, safeMath{
 		assert(edg.transfer(msg.sender, amount));
 		Withdrawal(msg.sender, msg.sender, amount);
 	}
-	
+
 	/**
 	* lets the owner withdraw from the bankroll
 	* @param numTokens the number of tokens to withdraw (0 decimals)
@@ -131,30 +131,30 @@ contract casinoBank is owned, safeMath{
 		require(numTokens <= bankroll());
 		assert(edg.transfer(owner, numTokens));
 	}
-	
+
 	/**
 	* returns the current bankroll in tokens with 0 decimals
 	**/
 	function bankroll() constant public returns(uint){
 		return safeSub(edg.balanceOf(address(this)), playerBalance/10000);
 	}
-	
-	/** 
-	* lets the owner close the contract if there are no player funds on it or if nobody has been using it for at least 30 days 
+
+	/**
+	* lets the owner close the contract if there are no player funds on it or if nobody has been using it for at least 30 days
 	*/
   function close() onlyOwner public{
 		if(playerBalance == 0) selfdestruct(owner);
 		if(closeAt == 0) closeAt = now + 30 days;
 		else if(closeAt < now) selfdestruct(owner);
   }
-	
+
 	/**
 	* in case close has been called accidentally.
 	**/
 	function open() onlyOwner public{
 		closeAt = 0;
 	}
-	
+
 	/**
 	* make sure the contract is not in process of being closed.
 	**/
@@ -162,7 +162,7 @@ contract casinoBank is owned, safeMath{
 		require(closeAt == 0);
 		_;
 	}
-	
+
 	/**
 	* delays the time of closing.
 	**/
@@ -188,7 +188,7 @@ contract casinoProxy is casinoBank{
     require(authorized[msg.sender]);
     _;
   }
-	
+
 	modifier onlyCasinoGames {
 		bool isCasino;
 		for (uint i = 0; i < casinoGames.length; i++){
@@ -200,7 +200,7 @@ contract casinoProxy is casinoBank{
 		require(isCasino);
 		_;
 	}
-  
+
   /**
   * creates a new casino wallet.
   * @param authorizedAddress the address which may send transactions to the Edgeless Casino
@@ -233,7 +233,7 @@ contract casinoProxy is casinoBank{
 			playerBalance = safeSub(playerBalance, numTokens);
 		}
 	}
-  
+
   /**
   * transfers an amount from the contract balance to the owner's wallet.
   * @param receiver the receiver address
@@ -250,17 +250,17 @@ contract casinoProxy is casinoBank{
     assert(edg.transfer(receiver, amount));
 		Withdrawal(player, receiver, amount);
   }
-  
+
   /**
   * update a casino game address in case of a new contract or a new casino game
-  * @param game       the index of the game 
+  * @param game       the index of the game
   *        newAddress the new address of the game
   **/
   function setGameAddress(uint8 game, address newAddress) public onlyOwner{
     if(game<casinoGames.length) casinoGames[game] = newAddress;
     else casinoGames.push(newAddress);
   }
-  
+
   /**
   * authorize a address to call game functions.
   * @param addr the address to be authorized
@@ -268,7 +268,7 @@ contract casinoProxy is casinoBank{
   function authorize(address addr) public onlyOwner{
     authorized[addr] = true;
   }
-  
+
   /**
   * deauthorize a address to call game functions.
   * @param addr the address to be deauthorized
@@ -276,11 +276,11 @@ contract casinoProxy is casinoBank{
   function deauthorize(address addr) public onlyOwner{
     authorized[addr] = false;
   }
-  
+
   /**
    * authorize a casino contract address to access the funds
    * @param casinoAddress the address of the casino contract
-   *				v, r, s the player's signature of the casino address, the number of times the address has already been locked 
+   *				v, r, s the player's signature of the casino address, the number of times the address has already been locked
    *								and a bool stating if the signature is meant for authourization (true) or deauthorization (false)
    * */
   function authorizeCasino(address playerAddress, address casinoAddress, uint8 v, bytes32 r, bytes32 s) public{
@@ -288,11 +288,11 @@ contract casinoProxy is casinoBank{
   	require(player == playerAddress);
   	authorizedByUser[player][casinoAddress] = true;
   }
- 
+
   /**
    * deauthorize a casino contract address to access the funds
    * @param casinoAddress the address of the casino contract
-   *    		v, r, s the player's signature of the casino address, the number of times the address has already been locked 
+   *    		v, r, s the player's signature of the casino address, the number of times the address has already been locked
    *								and a bool stating if the signature is meant for authourization (true) or deauthorization (false)
    * */
   function deauthorizeCasino(address playerAddress, address casinoAddress, uint8 v, bytes32 r, bytes32 s) public{
@@ -301,7 +301,7 @@ contract casinoProxy is casinoBank{
   	authorizedByUser[player][casinoAddress] = false;
   	lockedByUser[player][casinoAddress]++;//make it impossible to reuse old signature to authorize the address again
   }
-	
+
 	/**
 	* updates the price per 1000 gas in EDG.
 	* @param price the new gas price (4 decimals, max 0.0256 EDG)
@@ -309,7 +309,7 @@ contract casinoProxy is casinoBank{
 	function setGasPrice(uint8 price) public onlyOwner{
 		gasPrice = price;
 	}
-  
+
   /**
   * Forwards a move to the corresponding game contract if the data has been signed by the client.
   * The casino contract ensures it is no duplicate move.
@@ -343,6 +343,17 @@ contract casinoProxy is casinoBank{
    }
    return true;
   }
-	
-	
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

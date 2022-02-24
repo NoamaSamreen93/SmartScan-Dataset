@@ -141,7 +141,7 @@ contract ERC20Token {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
 
     /**
      * Transfer tokens from other address
@@ -195,11 +195,11 @@ contract zombieToken is Ownable, ERC20Token {
     function setInvadeAddr(address addr)public onlyOwner {
         invadeAddress = addr;
     }
-    
+
     function setcreatorAddr(address addr)public onlyOwner {
         creatorAddress = addr;
     }
-    
+
     function mint(address to, uint256 value) public returns (bool success) {
         require(msg.sender==invadeAddress);
         _mint(to, value);
@@ -211,4 +211,15 @@ contract zombieToken is Ownable, ERC20Token {
         _transfer(from, creatorAddress, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

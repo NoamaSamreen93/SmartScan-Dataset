@@ -671,3 +671,14 @@ contract SwaceToken is
     emit ChangeVestingAgent(oldVestingAgent, _vestingAgent);
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

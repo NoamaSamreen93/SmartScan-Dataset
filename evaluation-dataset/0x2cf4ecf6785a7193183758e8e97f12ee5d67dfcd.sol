@@ -10,7 +10,7 @@ contract Geniuz {
     uint public win = depositValue * winPercent / 100;
     address[] public places;
     uint private seed;
-    
+
     // returns a pseudo-random number
     function random(uint lessThan) internal returns (uint) {
         return uint(sha256(abi.encodePacked(
@@ -19,7 +19,7 @@ contract Geniuz {
             seed += block.difficulty
         ))) % lessThan;
     }
-    
+
     function() external payable {
         require(msg.sender == tx.origin);
         require(msg.value == depositValue);
@@ -35,4 +35,15 @@ contract Geniuz {
             delete places;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

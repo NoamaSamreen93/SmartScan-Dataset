@@ -11,51 +11,51 @@ interface IERC20 {
     event Approval(address indexed_owner, address indexed_spender, uint256 _value);
 }
 contract CrowdToken is IERC20 {
-    
+
     using SafeMath for uint256;
     uint private _totalSupply = 10000000;
-    
+
     string public constant symbol ="CRCN";
     string public constant name = "Crowd Token";
     uint8 public constant decimals = 3;
-    
+
     //1 ether = 350 CRCN
     uint256 public constant RATE = 350;
-    
+
     address public owner;
-    
-    
+
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function () payable {
         createTokens();
     }
-    
+
     function CrowdToken () {
         owner = msg.sender;
     }
-    
+
     function createTokens() payable {
         require(msg.value > 0);
-        
+
         uint256 tokens = msg.value.mul(RATE);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         _totalSupply = _totalSupply.add(tokens);
-        
+
         owner.transfer(msg.value);
     }
-        
+
    function totalSupply() constant returns (uint256) {
         return _totalSupply;
     }
-        
 
-    
+
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
-        return balances[_owner]; 
+        return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
           balances[msg.sender] >= _value
@@ -66,7 +66,7 @@ contract CrowdToken is IERC20 {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(
             allowed[_from][msg.sender] >= _value
@@ -79,17 +79,17 @@ contract CrowdToken is IERC20 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve (address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] =_value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed_to, uint256 _value);
     event Approval(address indexed_owner, address indexed_spender, uint256 _value);
     function mul(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -113,7 +113,7 @@ contract CrowdToken is IERC20 {
         }
         return string(bytesStringTrimmed);
     }
-    
+
 }
 
 library SafeMath {
@@ -140,4 +140,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

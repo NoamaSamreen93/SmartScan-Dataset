@@ -3,7 +3,7 @@ contract BeatProfitMembership{
     address owner= 0x6A3CACAbaA5958A0cA73bd3908445d81852F3A7E;
     uint256 [] priceOfPeriod = [10000000000000000, 30000000000000000,300000000000000000,2000000000000000000, 5000000000000000000];
     uint256 [] TimeInSec = [3600, 86400,2592000,31536000];
-    
+
     mapping (address => uint256) public DueTime;
     mapping (address => bool) public Premium;
 
@@ -12,7 +12,7 @@ contract BeatProfitMembership{
         DueTime[0x491cFe3e5eF0C093971DaDdaBce7747EA69A991E] = 4689878400;
         DueTime[0x2ECc452E01f748183d697be4cb1db0531cc8F38F] = 4689878400;
         DueTime[0x353507473A89184e28E8F13e156Dc8055fD62A2C] = 4689878400;
-        
+
         Premium[0x491cFe3e5eF0C093971DaDdaBce7747EA69A991E] = true;
         Premium[0x2ECc452E01f748183d697be4cb1db0531cc8F38F] = true;
         Premium[0x353507473A89184e28E8F13e156Dc8055fD62A2C] = true;
@@ -20,7 +20,7 @@ contract BeatProfitMembership{
 
     function extendMembership(uint256 _type) public payable{
     // Type:[0]:hour, [1]:day, [2]:month, [3]:year, [4]:premium
-    
+
         require(msg.value >= priceOfPeriod[_type], "Payment Amount Wrong.");
         if(_type==4){
             // Premium Membership
@@ -33,7 +33,7 @@ contract BeatProfitMembership{
         else{
             DueTime[msg.sender] = now + mul(div(msg.value, priceOfPeriod[_type]), TimeInSec[_type]);
         }
-        
+
         owner.transfer(msg.value);
     }
 
@@ -67,4 +67,15 @@ contract BeatProfitMembership{
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

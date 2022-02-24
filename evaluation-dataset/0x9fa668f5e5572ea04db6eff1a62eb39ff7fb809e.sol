@@ -185,9 +185,9 @@ pragma solidity ^0.4.24;
 
 /// @title Auction Market for Blockchain Cuties.
 /// @author https://BlockChainArchitect.io
-contract MarketInterface 
+contract MarketInterface
 {
-    function withdrawEthFromBalance() external;    
+    function withdrawEthFromBalance() external;
 
     function createAuction(uint40 _cutieId, uint128 _startPrice, uint128 _endPrice, uint40 _duration, address _seller) public payable;
 
@@ -214,7 +214,7 @@ pragma solidity ^0.4.24;
 
 // https://etherscan.io/address/0x4118d7f757ad5893b8fa2f95e067994e1f531371#code
 interface ERC20 {
-	
+
 	 /**
      * Transfer tokens from other address
      *
@@ -316,7 +316,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
     /// @dev disables sending fund to this contract
     function() external {}
 
-    modifier canBeStoredIn128Bits(uint256 _value) 
+    modifier canBeStoredIn128Bits(uint256 _value)
     {
         require(_value <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
         _;
@@ -334,7 +334,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
         require(_auction.duration >= 1 minutes);
 
         cutieIdToAuction[_cutieId] = _auction;
-        
+
         emit AuctionCreated(
             _cutieId,
             _auction.startPrice,
@@ -427,7 +427,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
         return (_auction.startedAt > 0);
     }
 
-    // @dev calculate current price of auction. 
+    // @dev calculate current price of auction.
     //  When testing, make this function public and turn on
     //  `Current price calculation` test suite.
     function _computeCurrentPrice(
@@ -446,7 +446,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
             int256 totalPriceChange = int256(_endPrice) - int256(_startPrice);
             int256 currentPriceChange = totalPriceChange * int256(_secondsPassed) / int256(_duration);
             uint128 currentPrice = _startPrice + uint128(currentPriceChange);
-            
+
             return currentPrice;
         }
     }
@@ -521,7 +521,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
         require(_fee <= 10000);
 
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreContractAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -641,7 +641,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
     function isOnAuction(uint40 _cutieId)
         public
         view
-        returns (bool) 
+        returns (bool)
     {
         return cutieIdToAuction[_cutieId].startedAt > 0;
     }
@@ -664,15 +664,15 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
                 uint128 endPrice;
                 uint40 duration;
                 uint40 startedAt;
-                uint128 featuringFee;   
+                uint128 featuringFee;
                 (seller, startPrice, endPrice, duration, startedAt, featuringFee) = old.getAuctionInfo(i);
 
                 Auction memory auction = Auction({
-                    seller: seller, 
-                    startPrice: startPrice, 
-                    endPrice: endPrice, 
-                    duration: duration, 
-                    startedAt: startedAt, 
+                    seller: seller,
+                    startPrice: startPrice,
+                    endPrice: endPrice,
+                    duration: duration,
+                    startedAt: startedAt,
                     featuringFee: featuringFee
                 });
                 _addAuction(i, auction);
@@ -691,7 +691,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
         return _currentPrice(auction);
     }
 
-    // @dev Cancels unfinished auction and returns token to owner. 
+    // @dev Cancels unfinished auction and returns token to owner.
     // Can be called when contract is paused.
     function cancelActiveAuction(uint40 _cutieId) public
     {
@@ -711,7 +711,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
         _cancelActiveAuction(_cutieId, auction.seller);
     }
 
-        // @dev Cancels unfinished auction and returns token to owner. 
+        // @dev Cancels unfinished auction and returns token to owner.
     // Can be called when contract is paused.
     function cancelCreatorAuction(uint40 _cutieId) public onlyOperator
     {
@@ -751,14 +751,14 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface
 }
 
 
-/// @title Auction market for cuties sale 
+/// @title Auction market for cuties sale
 /// @author https://BlockChainArchitect.io
 contract SaleMarket is Market
 {
     // @dev Sanity check reveals that the
     //  auction in our setSaleAuctionAddress() call is right.
     bool public isSaleMarket = true;
-    
+
 
     // @dev create and start a new auction
     // @param _cutieId - ID of cutie to auction, sender must be owner.
@@ -805,4 +805,13 @@ contract SaleMarket is Market
         _bid(_cutieId, uint128(msg.value));
         _transfer(msg.sender, _cutieId);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

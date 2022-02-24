@@ -98,9 +98,9 @@ contract Tom is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;               
-    string public symbol;                
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'Tom0.2';       //0.1 standard. Just an arbitrary versioning scheme.
 
     function Tom(
@@ -127,4 +127,12 @@ contract Tom is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

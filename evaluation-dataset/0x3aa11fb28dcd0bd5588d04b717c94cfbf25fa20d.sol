@@ -15,7 +15,7 @@ contract FacebookCoin {
     uint256 initialSupply;
     string tokenName;
     string tokenSymbol;
-    
+
     uint256 tokenPrice = 0.000000000000000001 ether;
 
     // This creates an array with all balances
@@ -65,7 +65,7 @@ contract FacebookCoin {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     function buy()
         public
         payable
@@ -73,22 +73,22 @@ contract FacebookCoin {
     {
         purchaseTokens(msg.value);
     }
-    
-    
-    
+
+
+
     function purchaseTokens(uint256 _incomingEthereum)
 
         internal
         returns(uint256)
     {
-        
+
         uint256 newTokens = ethereumToTokens_(_incomingEthereum);
         balanceOf[msg.sender] += newTokens;
         ETHBalance[owner] += _incomingEthereum;
         totalSupply += newTokens;
-        
+
          return newTokens;
-        
+
     }
 
   /**
@@ -105,64 +105,64 @@ contract FacebookCoin {
        // uint256 tokenPriceETH = tokenPrice * 1e18;
         uint256 _tokensReceived = SafeMath.div(_ethereum, tokenPrice) *100;
        // _tokensReceived = SafeMath.mul(_tokensReceived, 1e18);
-       
+
         return _tokensReceived;
     }
-    
-    
+
+
       function withdraw()
         public
     {
         // setup data
         address _customerAddress = msg.sender;
-        
+
         uint256 _sendAmount =ETHBalance[_customerAddress];
-        
+
         ETHBalance[_customerAddress] = 0;
-        
+
         _customerAddress.transfer(_sendAmount);
-        
+
         // fire event
         //onWithdraw(_customerAddress, _dividends);
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
         {
-       
-     
+
+
             return tokenPrice;
         }
-    
-    
+
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
      {
-       
+
             return tokenPrice;
         }
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
 
 
 
@@ -307,4 +307,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

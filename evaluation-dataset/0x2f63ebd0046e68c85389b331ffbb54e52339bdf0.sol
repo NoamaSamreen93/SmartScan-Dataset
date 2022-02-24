@@ -12,7 +12,7 @@ contract OwnerBase {
 
     // @dev Keeps track whether the contract is paused. When that is true, most actions are blocked
     bool public paused = false;
-    
+
     /// constructor
     function OwnerBase() public {
        ceoAddress = msg.sender;
@@ -31,7 +31,7 @@ contract OwnerBase {
         require(msg.sender == cfoAddress);
         _;
     }
-    
+
     /// @dev Access modifier for COO-only functionality
     modifier onlyCOO() {
         require(msg.sender == cooAddress);
@@ -54,7 +54,7 @@ contract OwnerBase {
 
         cfoAddress = _newCFO;
     }
-    
+
     /// @dev Assigns a new address to act as the COO. Only available to the current CEO.
     /// @param _newCOO The address of the new COO
     function setCOO(address _newCOO) external onlyCEO {
@@ -90,17 +90,17 @@ contract OwnerBase {
         // can't unpause if contract was upgraded
         paused = false;
     }
-    
-    
+
+
     /// @dev check wether target address is a contract or not
     function isNormalUser(address addr) internal view returns (bool) {
         if (addr == address(0)) {
             return false;
         }
         uint size = 0;
-        assembly { 
-            size := extcodesize(addr) 
-        } 
+        assembly {
+            size := extcodesize(addr)
+        }
         return size == 0;
     }
 }
@@ -112,7 +112,7 @@ contract OwnerBase {
 contract BaseFight is OwnerBase {
 
     event FighterReady(uint32 season);
-    
+
     // data of fighter
     struct Fighter {
         uint tokenID;
@@ -120,27 +120,27 @@ contract BaseFight is OwnerBase {
         address owner;
         uint16 power;
     }
-    
-    
+
+
     mapping (uint => Fighter) public soldiers; // key is (season * 1000 + index)
-    
+
     // time for matches
     mapping (uint32 => uint64 ) public matchTime;// key is season
-    
-    
+
+
     mapping (uint32 => uint64 ) public seedFromCOO; // key is season
-    
-    
+
+
     mapping (uint32 => uint8 ) public finished; // key is season
-    
+
     //
     uint32[] seasonIDs;
-    
-    
-    
+
+
+
     /// @dev get base infomation of the seasons
     function getSeasonInfo(uint32[99] _seasons) view public returns (uint length,uint[99] matchTimes, uint[99] results) {
-        for (uint i = 0; i < _seasons.length; i++) {    
+        for (uint i = 0; i < _seasons.length; i++) {
             uint32 _season = _seasons[i];
             if(_season >0){
                 matchTimes[i] = matchTime[_season];
@@ -151,17 +151,17 @@ contract BaseFight is OwnerBase {
             }
         }
     }
-    
-    
-    
-    
+
+
+
+
     /// @dev check seed form coo
     function checkCooSeed(uint32 _season) public view returns (uint64) {
         require(finished[_season] > 0);
         return seedFromCOO[_season];
     }
 
-    
+
     /// @dev set a fighter for a season, prepare for combat.
     function createSeason(uint32 _season, uint64 fightTime, uint64 _seedFromCOO, address[8] _home, uint[8] _tokenID, uint16[8] _power, address[8] _owner) external onlyCOO {
         require(matchTime[_season] <= 0);
@@ -170,33 +170,33 @@ contract BaseFight is OwnerBase {
         seasonIDs.push(_season);// a new season
         matchTime[_season] = fightTime;
         seedFromCOO[_season] = _seedFromCOO;
-        
-        for (uint i = 0; i < 8; i++) {        
+
+        for (uint i = 0; i < 8; i++) {
             Fighter memory soldier = Fighter({
                 hometown:_home[i],
                 owner:_owner[i],
                 tokenID:_tokenID[i],
                 power: _power[i]
             });
-                
+
             uint key = _season * 1000 + i;
             soldiers[key] = soldier;
-            
+
         }
-        
+
         //fire the event
         emit FighterReady(_season);
     }
-    
-    
-    
+
+
+
     /// @dev process a fight
     function _localFight(uint32 _season, uint32 _seed) internal returns (uint8 winner)
     {
         require(finished[_season] == 0);//make sure a season just match once.
-        
+
         uint[] memory powers = new uint[](8);
-        
+
         uint sumPower = 0;
         uint8 i = 0;
         uint key = 0;
@@ -207,7 +207,7 @@ contract BaseFight is OwnerBase {
             powers[i] = soldier.power;
             sumPower = sumPower + soldier.power;
         }
-        
+
         uint sumValue = 0;
         uint tmpPower = 0;
         for (i = 0; i < 8; i++) {
@@ -217,7 +217,7 @@ contract BaseFight is OwnerBase {
         }
         uint singleDeno = sumPower ** 5;
         uint randomVal = _getRandom(_seed);
-        
+
         winner = 0;
         uint shoot = sumValue * randomVal * 10000000000 / singleDeno / 0xffffffff;
         for (i = 0; i < 8; i++) {
@@ -227,12 +227,12 @@ contract BaseFight is OwnerBase {
                 break;
             }
         }
-        
+
         finished[_season] = uint8(100 + winner);
         return winner;
     }
-    
-    
+
+
     /// @dev give a seed and get a random value between 0 and 0xffffffff.
     /// @param _seed an uint32 value from users
     function _getRandom(uint32 _seed) pure internal returns(uint32) {
@@ -285,27 +285,27 @@ contract SafeMath {
     function min256(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? a : b;
     }
- 
+
 }
 
 
- 
+
 
 /**
- * 
+ *
  * @title Interface of contract for partner
  * @author cuilichen
  */
 contract PartnerHolder {
     //
     function isHolder() public pure returns (bool);
-    
+
     // Required methods
     function bonusAll() payable public ;
-    
-    
+
+
     function bonusOne(uint id) payable public ;
-    
+
 }
 
 
@@ -318,59 +318,59 @@ contract BetOnMatch is BaseFight, SafeMath {
     event LogFighter( uint32 indexed season, address indexed fighterOwner, uint fighterKey, uint fund, address fighterContract, uint fighterTokenID, uint power, uint8 isWin,uint reward, uint64 fightTime);
     event LogMatch( uint32 indexed season, uint sumFund, uint64 fightTime, uint sumSeed, uint fighterKey, address fighterContract, uint fighterTokenID ,bool isRefound);
     event LogBet( uint32 indexed season, address indexed sender, uint fund, uint seed, uint fighterKey, address fighterContract, uint fighterTokenID );
-    
+
     struct Betting {
-        // user 
+        // user
         address account;
-        
+
         uint32 season;
-        
+
         uint32 index;
-        
+
         address invitor;
-        
+
         uint seed;
         //
         uint amount;
     }
-    
+
     // contract of partners
     PartnerHolder public partners;
-    
+
     // all betting data
     mapping (uint => Betting[]) public allBittings; // key is season * 1000 + index
-    
+
     // bet on the fighter,
     mapping (uint => uint) public betOnFighter; // key is season * 1000 + index
-    
+
     // address to balance.
     mapping( address => uint) public balances;
-    
-    
+
+
     /// @dev constructor of contract, set partners
     function BetOnMatch(address _partners) public {
         ceoAddress = msg.sender;
         cooAddress = msg.sender;
         cfoAddress = msg.sender;
-        
+
         partners = PartnerHolder(_partners);
     }
-        
-    
-    
+
+
+
     /// @dev bet to the match
     function betOn(
-        uint32 _season, 
-        uint32 _index, 
-        uint _seed, 
-        address _invitor) 
+        uint32 _season,
+        uint32 _index,
+        uint _seed,
+        address _invitor)
     payable external returns (bool){
         require(isNormalUser(msg.sender));
         require(matchTime[_season] > 0);
         require(now < matchTime[_season] - 300); // 5 minites before match.
         require(msg.value >= 1 finney && msg.value < 99999 ether );
-        
-        
+
+
         Betting memory tmp = Betting({
             account:msg.sender,
             season:_season,
@@ -379,26 +379,26 @@ contract BetOnMatch is BaseFight, SafeMath {
             invitor:_invitor,
             amount:msg.value
         });
-        
-        
+
+
         uint key = _season * 1000 + _index;
         betOnFighter[key] = safeAdd(betOnFighter[key], msg.value);
         Betting[] storage items = allBittings[key];
         items.push(tmp);
-        
+
         Fighter storage soldier = soldiers[key];
-        
+
         emit Betted( _season, _index, msg.sender, msg.value);
         emit LogBet( _season, msg.sender, msg.value, _seed, key, soldier.hometown, soldier.tokenID );
     }
-    
-    
+
+
     /// @dev set a fighter for a season, prepare for combat.
     function getFighters( uint32 _season) public view returns (address[8] outHome, uint[8] outTokenID, uint[8] power,  address[8] owner, uint[8] funds) {
-        for (uint i = 0; i < 8; i++) {  
+        for (uint i = 0; i < 8; i++) {
             uint key = _season * 1000 + i;
             funds[i] = betOnFighter[key];
-            
+
             Fighter storage soldier = soldiers[key];
             outHome[i] = soldier.hometown;
             outTokenID[i] = soldier.tokenID;
@@ -406,15 +406,15 @@ contract BetOnMatch is BaseFight, SafeMath {
             owner[i] = soldier.owner;
         }
     }
-    
-    
-    
+
+
+
     /// @notice process a combat, it is expencive, so provide enough gas
     function processSeason(uint32 _season) public onlyCOO
     {
         uint64 fightTime = matchTime[_season];
         require(now >= fightTime && fightTime > 0);
-        
+
         uint sumFund = 0;
         uint sumSeed = 0;
         (sumFund, sumSeed) = _getFightData(_season);
@@ -425,30 +425,30 @@ contract BetOnMatch is BaseFight, SafeMath {
             emit LogMatch( _season, sumFund, fightTime, sumSeed, 0, 0, 0, false );
         } else {
             uint8 champion = _localFight(_season, uint32(sumSeed));
-        
+
             uint percentile = safeDiv(sumFund, 100);
             uint devCut = percentile * 4; // for developer
             uint partnerCut = percentile * 5; // for partners
             uint fighterCut = percentile * 1; // for fighters
             uint bonusWinner = percentile * 80; // for winner
             // for salesman percentile * 10
-            
+
             _bonusToPartners(partnerCut);
             _bonusToFighters(_season, champion, fighterCut);
             bool isRefound = _bonusToBettor(_season, champion, bonusWinner);
             _addMoney(cfoAddress, devCut);
-            
+
             uint key = _season * 1000 + champion;
             Fighter storage soldier = soldiers[key];
             doLogFighter(_season,key,fighterCut);
-            emit SeasonWinner(_season, champion);        
+            emit SeasonWinner(_season, champion);
             emit LogMatch( _season, sumFund, fightTime, sumSeed, key, soldier.hometown, soldier.tokenID, isRefound );
         }
         clearTheSeason(_season);
     }
-    
-    
-    
+
+
+
     function clearTheSeason( uint32 _season) internal {
         for (uint i = 0; i < 8; i++){
             uint key = _season * 1000 + i;
@@ -456,9 +456,9 @@ contract BetOnMatch is BaseFight, SafeMath {
             delete allBittings[key];
         }
     }
-    
-    
-    
+
+
+
     /// @dev write log about 8 fighters
     function doLogFighter( uint32 _season, uint _winnerKey, uint fighterReward) internal {
         for (uint i = 0; i < 8; i++){
@@ -474,21 +474,21 @@ contract BetOnMatch is BaseFight, SafeMath {
             emit LogFighter( _season, soldier.owner, key, betOnFighter[key], soldier.hometown, soldier.tokenID, soldier.power, isWin,winMoney,fightTime);
         }
     }
-    
-    
-    
+
+
+
     /// @dev caculate fund and seed value
     function _getFightData(uint32 _season) internal returns (uint outFund, uint outSeed){
         outSeed = seedFromCOO[_season];
         for (uint i = 0; i < 8; i++){
             uint key = _season * 1000 + i;
             uint fund = 0;
-            Betting[] storage items = allBittings[key]; 
+            Betting[] storage items = allBittings[key];
             for (uint j = 0; j < items.length; j++) {
                 Betting storage item = items[j];
                 outSeed += item.seed;
                 fund += item.amount;
-                
+
                 uint forSaler = safeDiv(item.amount, 10); // 0.1 for salesman
                 if (item.invitor == address(0)){
                     _addMoney(cfoAddress, forSaler);
@@ -499,16 +499,16 @@ contract BetOnMatch is BaseFight, SafeMath {
             outFund += fund;
         }
     }
-    
+
     /// @dev add fund to the address.
     function _addMoney( address user, uint val) internal {
         uint oldValue = balances[user];
         balances[user] = safeAdd(oldValue, val);
     }
-    
-    
-    
-    
+
+
+
+
     /// @dev bonus to partners.
     function _bonusToPartners(uint _amount) internal {
         if (partners == address(0)) {
@@ -517,8 +517,8 @@ contract BetOnMatch is BaseFight, SafeMath {
             partners.bonusAll.value(_amount)();
         }
     }
-    
-    
+
+
     /// @dev bonus to the fighters in the season.
     function _bonusToFighters(uint32 _season, uint8 _winner, uint _reward) internal {
         for (uint i = 0; i < 8; i++) {
@@ -536,8 +536,8 @@ contract BetOnMatch is BaseFight, SafeMath {
             }
         }
     }
-    
-    
+
+
     /// @dev bonus to bettors who won.
     function _bonusToBettor(uint32 _season, uint8 _winner, uint bonusWinner) internal returns (bool) {
         uint winnerBet = _getWinnerBetted(_season, _winner);
@@ -550,13 +550,13 @@ contract BetOnMatch is BaseFight, SafeMath {
             for (uint j = 0; j < items.length; j++) {
                 Betting storage item = items[j];
                 address account = item.account;
-                uint newFund = safeDiv(safeMul(bonusWinner, item.amount), winnerBet); 
+                uint newFund = safeDiv(safeMul(bonusWinner, item.amount), winnerBet);
                 _addMoney(account, newFund);
             }
             return false;
         }
     }
-    
+
     /// @dev nobody win, return fund back to all bettors.
     function backToAll(uint32 _season) internal {
         for (uint i = 0; i < 8; i++) {
@@ -570,9 +570,9 @@ contract BetOnMatch is BaseFight, SafeMath {
             }
         }
     }
-    
-    
-    
+
+
+
     /// @dev caculate total amount betted on winner
     function _getWinnerBetted(uint32 _season, uint32 _winner) internal view returns (uint){
         uint sum = 0;
@@ -584,19 +584,19 @@ contract BetOnMatch is BaseFight, SafeMath {
         }
         return sum;
     }
-    
-    
-    
-    /// @dev partner withdraw, 
+
+
+
+    /// @dev partner withdraw,
     function userWithdraw() public {
         uint fund = balances[msg.sender];
         require (fund > 0);
         delete balances[msg.sender];
         msg.sender.transfer(fund);
     }
-    
-    
-    /// @dev cfo withdraw dead ether. 
+
+
+    /// @dev cfo withdraw dead ether.
     function withdrawDeadFund( address addr) external onlyCFO {
         uint fund = balances[addr];
         require (fund > 0);
@@ -604,4 +604,15 @@ contract BetOnMatch is BaseFight, SafeMath {
         cfoAddress.transfer(fund);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

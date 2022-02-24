@@ -25,9 +25,9 @@ contract Token {
 	}
 
 	// SC owners:
-	
+
 	address owner;
-	
+
 	function isOwner() returns (bool) {
 		if (msg.sender == owner) return true;
 		return false;
@@ -45,7 +45,7 @@ contract Token {
 	uint256 public initialSupply; // Initial and total token supply
 	uint256 public totalSupply;
 	// bool allocated = false; // True after defining token parameters and initial mint
-	
+
 	// Public variables of the token, all used for display
 	// HumanStandardToken is a specialisation of ERC20 defining these parameters
 	string public name;
@@ -54,15 +54,15 @@ contract Token {
 	string public standard = 'H0.1';
 
 	// **** METHODS
-	
+
 	// Get total amount of tokens, totalSupply is a public var actually
 	// function totalSupply() constant returns (uint256 totalSupply) {}
-	
+
 	// Get the account balance of another account with address _owner
 	function balanceOf(address _owner) constant returns (uint256 balance) {
 		return balances[_owner];
 	}
- 
+
  	// Send _amount amount of tokens to address _to
 	function transfer(address _to, uint256 _amount) returns (bool success) {
 		if (balances[msg.sender] < _amount) {
@@ -75,11 +75,11 @@ contract Token {
 
 		return true;
 	}
- 
+
  	// Send _amount amount of tokens from address _from to address _to
- 	// The transferFrom method is used for a withdraw workflow, allowing contracts to send 
- 	// tokens on your behalf, for example to "deposit" to a contract address and/or to charge 
- 	// fees in sub-currencies; the command should fail unless the _from account has 
+ 	// The transferFrom method is used for a withdraw workflow, allowing contracts to send
+ 	// tokens on your behalf, for example to "deposit" to a contract address and/or to charge
+ 	// fees in sub-currencies; the command should fail unless the _from account has
  	// deliberately authorized the sender of the message via some mechanism
 	function transferFrom(address _from, address _to, uint256 _amount) returns (bool success) {
 		if (balances[_from] < _amount) {
@@ -97,26 +97,26 @@ contract Token {
 
 		return true;
 	}
- 
- 	// Allow _spender to withdraw from your account, multiple times, up to the _amount amount. 
+
+ 	// Allow _spender to withdraw from your account, multiple times, up to the _amount amount.
  	// If this function is called again it overwrites the current allowance with _amount.
 	function approve(address _spender, uint256 _amount) returns (bool success) {
 		allowed[msg.sender][_spender] = _amount;
 		Approval(msg.sender, _spender, _amount);
-		
+
 		return true;
 	}
- 
+
  	// Returns the amount which _spender is still allowed to withdraw from _owner
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 		return allowed[_owner][_spender];
 	}
-	
+
 	// Constructor: set up token properties and owner token balance
 	function Token() {
 		// This is the constructor, so owner should be equal to msg.sender, and this method should be called just once
 		owner = msg.sender;
-		
+
 		// make sure owner address is configured
 		// if(owner == 0x0) throw;
 
@@ -128,7 +128,7 @@ contract Token {
 
 		initialSupply = 50000000 * 1000000; // 50M tokens, 6 decimals
 		totalSupply = initialSupply;
-		
+
 		name = "WorldTrade";
 		symbol = "WTE";
 		decimals = 6;
@@ -140,10 +140,10 @@ contract Token {
 	}
 
 	// **** EVENTS
-	
+
 	// Triggered when tokens are transferred
 	event Transfer(address indexed _from, address indexed _to, uint256 _amount);
-	
+
 	// Triggered whenever approve(address _spender, uint256 _amount) is called
 	event Approval(address indexed _owner, address indexed _spender, uint256 _amount);
 }
@@ -151,9 +151,9 @@ contract Token {
 
 // Interface of issuer contract, just to cast the contract address and make it callable from the asset contract
 contract IFIssuers {
-	
+
 	// **** DATA
-	
+
 	// **** FUNCTIONS
 	function isIssuer(address _issuer) constant returns (bool);
 }
@@ -161,7 +161,7 @@ contract IFIssuers {
 
 contract Asset is Token {
 	// **** DATA
-	
+
 	/** Asset states
 	*
 	* - Released: Once issued the asset stays as released until sent for free to someone specified by issuer
@@ -170,7 +170,7 @@ contract Asset is Token {
 	*/
 	enum assetStatus { Released, ForSale, Unfungible }
 	// https://ethereum.stackexchange.com/questions/1807/enums-in-solidity
-	
+
 	struct asst {
 		uint256 assetId;
 		address assetOwner;
@@ -185,15 +185,15 @@ contract Asset is Token {
 	address public SCIssuers; // Contract that defines who is an issuer and who is not
 	uint256 assetFeeIssuer; // Fee percentage for Issuer on every asset sale transaction
 	uint256 assetFeeWorldTrade; // Fee percentage for WorldTrade on every asset sale transaction
-	
+
 
 	// **** METHODS
-	
+
 	// Constructor
 	function Asset(address _SCIssuers) {
 		SCIssuers = _SCIssuers;
 	}
-	
+
 	// Queries the asset, knowing the id
 	function getAssetById(uint256 assetId) constant returns (uint256 _assetId, address _assetOwner, address _issuer, string _content, uint256 _sellPrice, uint256 _status) {
 		return (assetsById[assetId].assetId, assetsById[assetId].assetOwner, assetsById[assetId].issuer, assetsById[assetId].content, assetsById[assetId].sellPrice, uint256(assetsById[assetId].status));
@@ -212,7 +212,7 @@ contract Asset is Token {
 			Error('sendAssetTo: the asset does not belong to you, the seller');
 			return false;
 		}
-		
+
 		if (assetsById[assetId].sellPrice > 0) { // for non-null token paid transactions
 			// Check whether there is balance enough from the buyer to get its tokens
 			if (balances[assetBuyer] < assetsById[assetId].sellPrice) {
@@ -232,19 +232,19 @@ contract Asset is Token {
 				return false;
 			}
 		}
-		
+
 		// Set the asset status to Unfungible
 		assetsById[assetId].status = assetStatus.Unfungible;
-		
+
 		// Transfer the asset to the buyer
 		assetsById[assetId].assetOwner = assetBuyer;
-		
+
 		// Event log
 		SendAssetTo(assetId, assetBuyer);
-		
+
 		return true;
 	}
-	
+
 	// Buyer gets an asset providing it is in ForSale status, and pays the corresponding tokens to the seller/owner. amount must match assetPrice to have a deal.
 	function buyAsset(uint256 assetId, uint256 amount) returns (bool) {
 		// assetId must not be zero
@@ -258,20 +258,20 @@ contract Asset is Token {
 			Error('buyAsset: the asset is not for sale');
 			return false;
 		}
-		
+
 		// Check whether the asset price is the same as amount
 		if (assetsById[assetId].sellPrice != amount) {
 			Error('buyAsset: the asset price does not match the specified amount');
 			return false;
 		}
-		
+
 		if (assetsById[assetId].sellPrice > 0) { // for non-null token paid transactions
 			// Check whether there is balance enough from the buyer to pay the asset
 			if (balances[msg.sender] < assetsById[assetId].sellPrice) {
 				Error('buyAsset: there is not enough token balance to buy this asset');
 				return false;
 			}
-			
+
 			// Calculate the seller income
 			uint256 sellerIncome = assetsById[assetId].sellPrice * (1000 - assetFeeIssuer - assetFeeWorldTrade) / 1000;
 
@@ -280,14 +280,14 @@ contract Asset is Token {
 				Error('buyAsset: seller token transfer failed'); // This shouldn't happen ever, but just in case...
 				return false;
 			}
-			
+
 			// Send the issuer's fee
 			uint256 issuerIncome = assetsById[assetId].sellPrice * assetFeeIssuer / 1000;
 			if (!transfer(assetsById[assetId].issuer, issuerIncome)) {
 				Error('buyAsset: issuer token transfer failed'); // This shouldn't happen ever, but just in case...
 				return false;
 			}
-			
+
 			// Send the WorldTrade's fee
 			uint256 WorldTradeIncome = assetsById[assetId].sellPrice * assetFeeWorldTrade / 1000;
 			if (!transfer(owner, WorldTradeIncome)) {
@@ -295,20 +295,20 @@ contract Asset is Token {
 				return false;
 			}
 		}
-				
+
 		// Set the asset status to Unfungible
 		assetsById[assetId].status = assetStatus.Unfungible;
-		
+
 		// Transfer the asset to the buyer
 		assetsById[assetId].assetOwner = msg.sender;
-		
+
 		// Event log
 		BuyAsset(assetId, amount);
-		
+
 		return true;
 	}
-	
-	
+
+
 	// To limit issue functions just to authorized issuers
 	modifier onlyIssuer() {
 	    if (!IFIssuers(SCIssuers).isIssuer(msg.sender)) {
@@ -318,28 +318,28 @@ contract Asset is Token {
 	    }
 	}
 
-	
+
 	// To be called by issueAssetTo() and properly authorized issuers
 	function issueAsset(string content, uint256 sellPrice) onlyIssuer internal returns (uint256 nextAssetId) {
 		// Find out next asset Id
 		nextAssetId = lastAssetId + 1;
-		
+
 		assetsById[nextAssetId].assetId = nextAssetId;
 		assetsById[nextAssetId].assetOwner = msg.sender;
 		assetsById[nextAssetId].issuer = msg.sender;
 		assetsById[nextAssetId].content = content;
 		assetsById[nextAssetId].sellPrice = sellPrice;
 		assetsById[nextAssetId].status = assetStatus.Released;
-		
+
 		// Update lastAssetId
 		lastAssetId++;
 
 		// Event log
 		IssueAsset(nextAssetId, msg.sender, sellPrice);
-		
+
 		return nextAssetId;
 	}
-	
+
 	// Issuer sends a new free asset to a given user as a gift
 	function issueAssetTo(string content, address to) returns (bool) {
 		uint256 assetId = issueAsset(content, 0); // 0 tokens, as a gift
@@ -347,11 +347,11 @@ contract Asset is Token {
 			Error('issueAssetTo: asset has not been properly issued');
 			return (false);
 		}
-		
+
 		// The brand new asset is inmediatly sent to the recipient
 		return(sendAssetTo(assetId, to));
 	}
-	
+
 	// Seller can block tradability of its assets
 	function setAssetUnfungible(uint256 assetId) returns (bool) {
 		// assetId must not be zero
@@ -365,12 +365,12 @@ contract Asset is Token {
 			Error('setAssetUnfungible: only owners of the asset are allowed to update its status');
 			return false;
 		}
-		
+
 		assetsById[assetId].status = assetStatus.Unfungible;
 
 		// Event log
 		SetAssetUnfungible(assetId, msg.sender);
-		
+
 		return true;
 	}
 
@@ -387,13 +387,13 @@ contract Asset is Token {
 			Error('setAssetPrice: only owners of the asset are allowed to set its price and update its status');
 			return false;
 		}
-		
+
 		assetsById[assetId].sellPrice = sellPrice;
 		assetsById[assetId].status = assetStatus.ForSale;
 
 		// Event log
 		SetAssetPrice(assetId, msg.sender, sellPrice);
-		
+
 		return true;
 	}
 
@@ -404,19 +404,19 @@ contract Asset is Token {
 			Error('setAssetSaleFees: only Owner is authorized to update asset sale fees.');
 			return false;
 		}
-		
+
 		// Check new fees are consistent
 		if (feeIssuer + feeWorldTrade > 1000) {
 			Error('setAssetSaleFees: added fees exceed 100.0%. Not updated.');
 			return false;
 		}
-		
+
 		assetFeeIssuer = feeIssuer;
 		assetFeeWorldTrade = feeWorldTrade;
 
 		// Event log
 		SetAssetSaleFees(feeIssuer, feeWorldTrade);
-		
+
 		return true;
 	}
 
@@ -426,19 +426,30 @@ contract Asset is Token {
 
 	// Triggered when a seller sends its asset to a buyer and receives the corresponding tokens
 	event SendAssetTo(uint256 assetId, address assetBuyer);
-	
+
 	// Triggered when a buyer sends its tokens to a seller and receives the specified asset
 	event BuyAsset(uint256 assetId, uint256 amount);
 
 	// Triggered when the admin issues a new asset
 	event IssueAsset(uint256 nextAssetId, address assetOwner, uint256 sellPrice);
-	
+
 	// Triggered when the user updates its asset status to Unfungible
 	event SetAssetUnfungible(uint256 assetId, address assetOwner);
 
 	// Triggered when the user updates its asset price and status to ForSale
 	event SetAssetPrice(uint256 assetId, address assetOwner, uint256 sellPrice);
-	
+
 	// Triggered when the owner updates the asset sale fees
 	event SetAssetSaleFees(uint256 feeIssuer, uint256 feeWorldTrade);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

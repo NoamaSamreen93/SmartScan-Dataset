@@ -81,8 +81,8 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract PancaCoin is StandardToken { 
-    
+contract PancaCoin is StandardToken {
+
     address owner = msg.sender;
     string public constant name = "PancaCoin";
     string public constant symbol = "PANCA";
@@ -92,7 +92,7 @@ contract PancaCoin is StandardToken {
     uint256 public constant requestMinimum = 1 ether / 1000; // 0.01 Ether
     uint256 public tokensPerEth = 1000000e2;
     uint public target0drop = 2000;
-    
+
     event Airdrop(address indexed _owner, uint _amount, uint _balance);
     event Burn(address indexed burner, uint256 value);
     event TokensPerEthUpdated(uint _tokensPerEth);
@@ -103,7 +103,7 @@ contract PancaCoin is StandardToken {
 
     function Distribute(address _participant, uint _amount) Dev internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
         require( totalDistributed < totalSupply );
         balances[_participant] = balances[_participant] + (_amount);
         totalDistributed = totalDistributed + (_amount);
@@ -112,16 +112,16 @@ contract PancaCoin is StandardToken {
         emit Airdrop(_participant, _amount, balances[_participant]);
         emit Transfer(address(0), _participant, _amount);
     }
-    
-    function DistributeAirdrop(address _participant, uint _amount) Dev external {        
+
+    function DistributeAirdrop(address _participant, uint _amount) Dev external {
         Distribute(_participant, _amount);
     }
 
-    function DistributeAirdropMultiple(address[] _addresses, uint _amount) Dev external {        
+    function DistributeAirdropMultiple(address[] _addresses, uint _amount) Dev external {
         for (uint i = 0; i < _addresses.length; i++) Distribute(_addresses[i], _amount);
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) Dev public  {        
+    function updateTokensPerEth(uint _tokensPerEth) Dev public  {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
@@ -135,7 +135,7 @@ contract PancaCoin is StandardToken {
         totalDistributed = totalDistributed-(_value);
         emit Burn(burner, _value);
     }
-    
+
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
@@ -143,11 +143,11 @@ contract PancaCoin is StandardToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
 
     function withdraw(uint256 _wdamount) Dev public {
         uint256 wantAmount = _wdamount;
@@ -155,4 +155,15 @@ contract PancaCoin is StandardToken {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

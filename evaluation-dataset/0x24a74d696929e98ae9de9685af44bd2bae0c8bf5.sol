@@ -336,13 +336,13 @@ contract SeeleToken is PausableToken {
 
     /// Fields that are only changed in constructor
     /// seele sale  contract
-    address public minter; 
+    address public minter;
 
     /// Fields that can be changed by functions
     mapping (address => uint) public lockedBalances;
 
     /// claim flag
-    bool public claimedFlag;  
+    bool public claimedFlag;
 
     /*
      * MODIFIERS
@@ -369,14 +369,14 @@ contract SeeleToken is PausableToken {
     }
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the Seele Token
-     * @param _minter The SeeleCrowdSale Contract 
-     * @param _maxTotalSupply total supply token    
+     * @param _minter The SeeleCrowdSale Contract
+     * @param _maxTotalSupply total supply token
      */
-    function SeeleToken(address _minter, address _admin, uint _maxTotalSupply) 
-        public 
+    function SeeleToken(address _minter, address _admin, uint _maxTotalSupply)
+        public
         validAddress(_admin)
         validAddress(_minter)
         {
@@ -387,10 +387,10 @@ contract SeeleToken is PausableToken {
     }
 
     /**
-     * EXTERNAL FUNCTION 
-     * 
+     * EXTERNAL FUNCTION
+     *
      * @dev SeeleCrowdSale contract instance mint token
-     * @param receipent The destination account owned mint tokens    
+     * @param receipent The destination account owned mint tokens
      * @param amount The amount of mint token
      * @param isLock Lock token flag
      * be sent to this address.
@@ -412,9 +412,9 @@ contract SeeleToken is PausableToken {
     }
 
 
-    function setClaimedFlag(bool flag) 
+    function setClaimedFlag(bool flag)
         public
-        onlyOwner 
+        onlyOwner
     {
         claimedFlag = flag;
     }
@@ -427,11 +427,22 @@ contract SeeleToken is PausableToken {
     function claimTokens(address[] receipents)
         public
         canClaimed
-    {        
+    {
         for (uint i = 0; i < receipents.length; i++) {
             address receipent = receipents[i];
             balances[receipent] = balances[receipent].add(lockedBalances[receipent]);
             lockedBalances[receipent] = 0;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

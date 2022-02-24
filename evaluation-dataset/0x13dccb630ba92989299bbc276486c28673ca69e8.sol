@@ -229,14 +229,14 @@ contract BitArtToken is Heritable, ERC721 {
             uint[] memory result = new uint[](tokenCount);
             uint totaltokens = totalSupply();
             uint index = 0;
-            
+
             for (uint tokenId = 0; tokenId < totaltokens; tokenId++) {
                 if (tokenOwner[tokenId] == _owner) {
                     result[index] = tokenId;
                     index++;
                 }
             }
-            
+
             return result;
         }
     }
@@ -364,13 +364,13 @@ contract BitAuction is BitArtToken {
 
     function BitAuction() public { }
 
-    function setSaleDiscount(uint _tokenId, uint _discount) external {      
+    function setSaleDiscount(uint _tokenId, uint _discount) external {
         require(ownerOf(_tokenId) == msg.sender);
         require(_discount <= 90);
         require(_discount >= 10);
 
         Auction storage auction = tokenAuction[_tokenId];
-        require(auction.basePrice > 0);        
+        require(auction.basePrice > 0);
         require(auction.time2 <= now);
         auction.discount = uint8(_discount);
 
@@ -392,12 +392,12 @@ contract BitAuction is BitArtToken {
         }
 
         uint[] memory result = new uint[](count);
-        
+
         for (uint i = 0; i < count; i++) {
             uint tokenId = isEmpty ? i : _ids[i];
             result[i] = priceOf(tokenId);
-        }        
-        
+        }
+
         return result;
     }
 
@@ -406,14 +406,14 @@ contract BitAuction is BitArtToken {
         return _currentPrice(auction);
     }
 
-    function setAuctionDurationRules(uint _timeAfter, uint _duration, uint _fee) public onlyOwner {  
+    function setAuctionDurationRules(uint _timeAfter, uint _duration, uint _fee) public onlyOwner {
         require(_timeAfter >= 0 seconds);
         require(_timeAfter <= 7 days);
         require(_duration >= 24 hours);
         require(_duration <= 30 days);
         require(_fee >= 1);
         require(_fee <= 5);
-        
+
         _auctionStartsAfter = _timeAfter;
         _auctionDuration = _duration;
         _auctionFee = _fee;
@@ -426,14 +426,14 @@ contract BitAuction is BitArtToken {
         require(_time2 >= _time1);
         require(_pct1 > 0);
         require(_pct2 > 0);
-        
+
         Auction memory auction = Auction({
-            basePrice: _basePrice, 
-            time1: uint64(_time1), 
-            time2: uint64(_time2), 
-            pct1: uint8(_pct1), 
-            pct2: uint8(_pct2), 
-            discount: 0           
+            basePrice: _basePrice,
+            time1: uint64(_time1),
+            time2: uint64(_time2),
+            pct1: uint8(_pct1),
+            pct2: uint8(_pct2),
+            discount: 0
         });
 
         tokenAuction[_tokenId] = auction;
@@ -498,7 +498,7 @@ contract BitGallery is BitAuction {
     function BitGallery() public {
         setAuctionDurationRules(24 hours, 6 days, 3);
 
-        setMessage("Our web site is www.bitgallery.co");                          
+        setMessage("Our web site is www.bitgallery.co");
     }
 
     function() public payable {}
@@ -509,7 +509,7 @@ contract BitGallery is BitAuction {
 
     function addArtTo(address _owner, string _keyData, uint _basePrice) public onlyOwner {
         require(_basePrice >= 1 finney);
-        
+
         Art memory _art = Art({
             data: keccak256(_keyData)
         });
@@ -555,8 +555,8 @@ contract BitGallery is BitAuction {
 
     function payout(address _to) public onlyOwner {
         require(_to != address(this));
-        
-        if (_to == address(0)) { 
+
+        if (_to == address(0)) {
             _to = msg.sender;
         }
 
@@ -585,7 +585,18 @@ contract BitGallery is BitAuction {
         msg.sender.transfer(purchaseExcess);
     }
 
-    function setMessage(string _message) public onlyOwner {        
+    function setMessage(string _message) public onlyOwner {
         infoMessage = _message;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

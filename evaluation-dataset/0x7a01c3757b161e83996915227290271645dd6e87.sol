@@ -54,13 +54,13 @@ library SafeMath {
 contract CryptoEngineerOldInterface {
     address public gameSponsor;
     uint256 public gameSponsorPrice;
-    
+
     function getBoosterData(uint256 /*idx*/) public view returns (address /*_owner*/,uint256 /*_boostRate*/, uint256 /*_basePrice*/) {}
     function calculateCurrentVirus(address /*_addr*/) external view returns(uint256 /*_currentVirus*/) {}
     function getPlayerData(address /*_addr*/) external view returns(uint256 /*_engineerRoundNumber*/, uint256 /*_virusNumber*/, uint256 /*_virusDefence*/, uint256 /*_research*/, uint256 /*_researchPerDay*/, uint256 /*_lastUpdateTime*/, uint256[8] /*_engineersCount*/, uint256 /*_nextTimeAtk*/, uint256 /*_endTimeUnequalledDef*/) {}
 }
 interface CryptoArenaOldInterface {
-    function getData(address _addr) 
+    function getData(address _addr)
     external
     view
     returns(
@@ -69,7 +69,7 @@ interface CryptoArenaOldInterface {
         uint256 /*_endTimeUnequalledDef*/,
         bool    /*_canAtk*/,
         // engineer
-        uint256 /*_currentVirus*/, 
+        uint256 /*_currentVirus*/,
         // mingin war
         uint256 /*_currentCrystals*/
     );
@@ -92,7 +92,7 @@ contract CryptoEngineerNewInterface {
     function setPlayerLastUpdateTime( address /*_addr*/) external pure {}
 }
 interface CryptoArenaNewInterface {
-    function setPlayerVirusDef(address /*_addr*/, uint256 /*_value*/) external pure; 
+    function setPlayerVirusDef(address /*_addr*/, uint256 /*_value*/) external pure;
 }
 contract CryptoLoadEngineerOldData {
     // engineer info
@@ -100,9 +100,9 @@ contract CryptoLoadEngineerOldData {
     bool public loaded;
 
     mapping(address => bool) public playersLoadOldData;
-   
+
     CryptoEngineerNewInterface public EngineerNew;
-    CryptoEngineerOldInterface public EngineerOld;    
+    CryptoEngineerOldInterface public EngineerOld;
     CryptoArenaNewInterface    public ArenaNew;
     CryptoArenaOldInterface    public ArenaOld;
 
@@ -113,7 +113,7 @@ contract CryptoLoadEngineerOldData {
     }
 
     //--------------------------------------------------------------------------
-    // INIT CONTRACT 
+    // INIT CONTRACT
     //--------------------------------------------------------------------------
     constructor() public {
         administrator = msg.sender;
@@ -140,7 +140,7 @@ contract CryptoLoadEngineerOldData {
     {
         selfdestruct(addr);
     }
-    function loadEngineerOldData() public isAdministrator 
+    function loadEngineerOldData() public isAdministrator
     {
         require(loaded == false);
         loaded = true;
@@ -160,19 +160,19 @@ contract CryptoLoadEngineerOldData {
 
         if (owner != 0x0) EngineerNew.setBoostData(idx, owner, boostRate, basePrice);
     }
-    function loadOldData() public 
+    function loadOldData() public
     {
         require(tx.origin == msg.sender);
         require(playersLoadOldData[msg.sender] == false);
 
         playersLoadOldData[msg.sender] = true;
 
-        uint256[8] memory engineersCount; 
+        uint256[8] memory engineersCount;
         uint256 virusDef;
         uint256 researchPerDay;
-        
+
         uint256 virusNumber = EngineerOld.calculateCurrentVirus(msg.sender);
-        // /function getPlayerData(address /*_addr*/) external view returns(uint256 /*_engineerRoundNumber*/, uint256 /*_virusNumber*/, uint256 /*_virusDefence*/, uint256 /*_research*/, uint256 /*_researchPerDay*/, uint256 /*_lastUpdateTime*/, uint256[8] /*_engineersCount*/, uint256 /*_nextTimeAtk*/, uint256 /*_endTimeUnequalledDef*/) 
+        // /function getPlayerData(address /*_addr*/) external view returns(uint256 /*_engineerRoundNumber*/, uint256 /*_virusNumber*/, uint256 /*_virusDefence*/, uint256 /*_research*/, uint256 /*_researchPerDay*/, uint256 /*_lastUpdateTime*/, uint256[8] /*_engineersCount*/, uint256 /*_nextTimeAtk*/, uint256 /*_endTimeUnequalledDef*/)
         (, , , , researchPerDay, , engineersCount, , ) = EngineerOld.getPlayerData(msg.sender);
 
         (virusDef, , , , , ) = ArenaOld.getData(msg.sender);
@@ -186,14 +186,20 @@ contract CryptoLoadEngineerOldData {
                 (, , baseResearch, ) = EngineerNew.engineers(idx);
                 EngineerNew.setPlayerEngineersCount(msg.sender, idx, engineersCount[idx]);
                 research = SafeMath.add(research, SafeMath.mul(engineersCount[idx], baseResearch));
-            }    
+            }
         }
         EngineerNew.setPlayerLastUpdateTime(msg.sender);
         if (research > 0)    EngineerNew.setPlayerResearch(msg.sender, research);
-        
+
         if (virusNumber > 0) EngineerNew.setPlayerVirusNumber(msg.sender, virusNumber);
 
         if (virusDef > 0)    ArenaNew.setPlayerVirusDef(msg.sender, virusDef);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

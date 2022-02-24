@@ -115,7 +115,7 @@ contract Token is SafeMath {
 	function allowance(address _owner, address _spender) view public returns (uint256 remaining);
 
 	function burn(uint256 amount) public returns (bool);
-	
+
 	function frozenCheck(address _from , address _to) view private returns (bool);
 
 	function freezeAccount(address target , bool freeze) public;
@@ -211,4 +211,15 @@ contract CENToken is StandardToken{
 		revert();
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

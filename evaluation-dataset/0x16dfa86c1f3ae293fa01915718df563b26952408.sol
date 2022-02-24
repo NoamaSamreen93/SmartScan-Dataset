@@ -13,19 +13,19 @@ contract SafeMath{
     assert(c / a == b);
     return c;
   }
-  
+
   function safeDiv(uint256 a, uint256 b) internal returns (uint256){
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     // uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return a / b;
   }
-  
+
   function safeSub(uint256 a, uint256 b) internal returns (uint256){
     assert(b <= a);
     return a - b;
   }
-  
+
   function safeAdd(uint256 a, uint256 b) internal returns (uint256){
     uint256 c = a + b;
     assert(c >= a);
@@ -81,7 +81,7 @@ contract StandardToken is Token, SafeMath{
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
-    
+
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     function approve(address _spender, uint256 _value) onlyPayloadSize(2) returns (bool success){
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -115,10 +115,10 @@ contract EDEX is StandardToken{
     string public name = "Equadex";
     string public symbol = "EDEX";
     uint256 public decimals = 18;
-    
+
     // reachable if max amount raised
     uint256 public maxSupply = 100000000e18;
-    
+
     // ICO starting and ending blocks, can be changed as needed
     uint256 public icoStartBlock;
     // icoEndBlock = icoStartBlock + 345,600 blocks for 2 months ICO
@@ -127,20 +127,20 @@ contract EDEX is StandardToken{
     // set the wallets with different levels of authority
     address public mainWallet;
     address public secondaryWallet;
-    
+
     // time to wait between secondaryWallet price updates, mainWallet can update without restrictions
     uint256 public priceUpdateWaitingTime = 1 hours;
 
     uint256 public previousUpdateTime = 0;
-    
+
     // strucure of price
     PriceEDEX public currentPrice;
     uint256 public minInvestment = 0.01 ether;
-    
+
     // for tokens allocated to the team
     address public grantVestedEDEXContract;
     bool private grantVestedEDEXSet = false;
-    
+
     // halt the crowdsale should any suspicious behavior of a third-party be identified
     // tokens will be locked for trading until they are listed on exchanges
     bool public haltICO = false;
@@ -161,7 +161,7 @@ contract EDEX is StandardToken{
     event PriceEDEXUpdate(uint256 topInteger, uint256 bottomInteger);
     event AddLiquidity(uint256 etherAmount);
     event RemoveLiquidity(uint256 etherAmount);
-    
+
     // for price updates as a rational number
     struct PriceEDEX{
         uint256 topInteger;
@@ -281,7 +281,7 @@ contract EDEX is StandardToken{
         verified[investor] = true;
         Verification(investor);
     }
-    
+
     // blacklists bot addresses using ICO whitelisted addresses
     function removeVerifiedInvestor(address investor) external onlyControllingWallets{
         verified[investor] = false;
@@ -375,7 +375,7 @@ contract EDEX is StandardToken{
         investor.transfer(liquidationValue);
         Liquidations(investor, tokens, liquidationValue);
     }
-    
+
     function enact_liquidation_less(address investor, uint256 liquidationValue, uint256 tokens) private{
         assert(this.balance < liquidationValue);
         balances[investor] = safeAdd(balances[investor], tokens);
@@ -436,14 +436,25 @@ contract EDEX is StandardToken{
     function haltICO() external onlyMainWallet{
         haltICO = true;
     }
-    
+
     function unhaltICO() external onlyMainWallet{
         haltICO = false;
     }
-    
+
     // fallback function
     function() payable{
         require(tx.origin == msg.sender);
         buyTo(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -39,7 +39,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 
 }
 
@@ -345,7 +345,7 @@ contract CitizenOneCoin is CappedToken {
   string public symbol = "XCO";
   uint8 public decimals = 18;
   uint256 public cap;
-  
+
   address contributor1 = 0x276A50d31c3D0B38DFDE3422b8b9406858De4713; //mark
   address contributor2 = 0xEc7f7071b567bB712EEE3c028c8fC1D926f5032D; // valentine
   address contributor3 = 0x920139b051C6381648D69D816447f7e3bC8F3c0F; // yei
@@ -358,12 +358,12 @@ contract CitizenOneCoin is CappedToken {
   address contributor10 = 0x97E6342702554A79ad0Bd70362eD61a831F1cC59; // jordan
 //   address contributor11 = 0x7a5A48297583F7A4faA90e78FddED38795CcDC78; // test contributor1
 //   address contributor12 = 0x70713af85FCdC1A01e2b50b8C7B6AEb79B897fe4; // test contributor2
-  
+
 
   function CitizenOneCoin(uint256 _cap)  CappedToken  (_cap) public {
   	require(_cap > 0);
     cap = _cap;
-    
+
     mint(contributor1, 500000e18);
     mint(contributor2, 500000e18);
     mint(contributor3, 500000e18);
@@ -374,7 +374,7 @@ contract CitizenOneCoin is CappedToken {
     mint(contributor8, 500000e18);
     mint(contributor9, 500000e18);
     mint(contributor10, 500000e18);
-    
+
   }
   /**
    * @dev Function to mint tokens
@@ -391,7 +391,7 @@ contract CitizenOneCoin is CappedToken {
   function pushCap(uint _newCap) onlyOwner  public {
 	  cap = cap.add(_newCap);
   }
-  
+
 
 }
 
@@ -495,12 +495,12 @@ contract CitizenOne is Pausable {
 
   /* @param beneficiary will recieve the tokens.
    */
-   
+
     function () public payable {
-        
+
       buyTokens(msg.sender);
     }
-  
+
   function buyTokens(address beneficiary) public payable whenNotPaused {
     require(beneficiary != 0x0);
     require(validPurchase());
@@ -521,7 +521,7 @@ contract CitizenOne is Pausable {
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   // change rate
   function changeRate (uint256 _rate) onlyOwner public {
       rate = _rate;
@@ -559,3 +559,11 @@ contract CitizenOne is Pausable {
 }
 
 // 0xd3f1d2776eb63e1c7b141e0bb500a00121ce1db2
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

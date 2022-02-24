@@ -623,34 +623,34 @@ contract StagedCrowdsale is Ownable {
 contract Mainsale is StagedCrowdsale, FABACommonSale {
 
   address public FABAcompanyTokensWallet;
-  
+
   address public SoftwareTokensWallet;
-  
+
   address public ReservesForExchangeTokensWallet;
- 
+
   address public MentorsTokensWallet;
 
   address public bountyTokensWallet;
 
   uint public FABAcompanyTokensPercent;
-  
+
   uint public SoftwareTokensPercent;
-  
+
   uint public ReservesForExchangeTokensPercent;
-  
+
   uint public bountyTokensPercent;
-  
+
   uint public MentorsTokensPercent;
-  
-  
+
+
    function setSoftwareTokensPercent(uint newSoftwareTokensPercent) public onlyOwner {
    SoftwareTokensPercent = newSoftwareTokensPercent;
   }
    function setReservesForExchangeTokensPercent(uint newReservesForExchangeTokensPercent) public onlyOwner {
    ReservesForExchangeTokensPercent = newReservesForExchangeTokensPercent;
   }
-   
-  
+
+
   function setFABAcompanyTokensPercent(uint newFABAcompanyTokensPercent) public onlyOwner {
     FABAcompanyTokensPercent = newFABAcompanyTokensPercent;
   }
@@ -664,7 +664,7 @@ contract Mainsale is StagedCrowdsale, FABACommonSale {
   function setBountyTokensPercent(uint newBountyTokensPercent) public onlyOwner {
     bountyTokensPercent = newBountyTokensPercent;
   }
- 
+
   function setFABAcompanyTokensWallet(address newFABAcompanyTokensWallet) public onlyOwner {
     FABAcompanyTokensWallet = newFABAcompanyTokensWallet;
   }
@@ -672,7 +672,7 @@ contract Mainsale is StagedCrowdsale, FABACommonSale {
  function setReservesForExchangeTokensWallet(address newReservesForExchangeTokensWallet) public onlyOwner {
    ReservesForExchangeTokensWallet = newReservesForExchangeTokensWallet;
   }
-  
+
 
   function setBountyTokensWallet(address newBountyTokensWallet) public onlyOwner {
     bountyTokensWallet = newBountyTokensWallet;
@@ -776,9 +776,9 @@ contract Configurator is Ownable {
     mainsale.addMilestone(14,20);
     mainsale.addMilestone(14,10);
     mainsale.addMilestone(14,0);
-	
-  
-      
+
+
+
     mainsale.setPrice(520000000000000000000);
     mainsale.setWallet(0x83Af3226ca6d215F31dC0Baa0D969C06A1E5db3b);
     mainsale.setReservesForExchangeTokensWallet(0x83Af3226ca6d215F31dC0Baa0D969C06A1E5db3b);
@@ -788,14 +788,14 @@ contract Configurator is Ownable {
     mainsale.setSoftwareTokensWallet(0x83Af3226ca6d215F31dC0Baa0D969C06A1E5db3b);
     mainsale.setStart(1525219200);
     mainsale.setHardcap(173000000000000000000000);
-   
+
     mainsale.setReservesForExchangeTokensPercent(2);
     mainsale.setFABAcompanyTokensPercent(20);
     mainsale.setMentorsTokensPercent(10);
     mainsale.setBountyTokensPercent(5);
     mainsale.setSoftwareTokensPercent(1);
     commonConfigure(mainsale, token);
-	
+
     presale.setMainsale(mainsale);
 
     token.transferOwnership(owner);
@@ -815,3 +815,14 @@ contract Configurator is Ownable {
 }
 //Token owners will be paid a share of profits from the sale of stakes in the invested companies. Profits will be paid in ETH.
 //Tokens will be distributed within 8 weeks after ICO
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

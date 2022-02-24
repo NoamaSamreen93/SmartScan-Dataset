@@ -113,3 +113,14 @@ contract JEYCoinContract is JEY{
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

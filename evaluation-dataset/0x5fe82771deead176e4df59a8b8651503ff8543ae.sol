@@ -400,18 +400,18 @@ contract ERC20Detailed is IERC20 {
 contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
 	uint public initialSupply = 1200000000;
 	mapping (address => uint256) public freezeList;
-	
+
 	mapping (address => uint256) public whiteList;
 	mapping (address => LockItem[]) public lockList;
-	
+
     struct LockItem {
     uint256  time;
     uint256  amount;
-    
+
 }
-	
-	constructor() public ERC20Detailed("ClickGemToken", "CGMT", 18) 
-	{  
+
+	constructor() public ERC20Detailed("ClickGemToken", "CGMT", 18)
+	{
 		_mint(msg.sender, initialSupply*1000000000000000000);
 	}
 
@@ -424,10 +424,10 @@ contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
 	function unFreeze(address freezeAddress) public onlyOwner returns (bool done)
 	{
 		delete freezeList[freezeAddress];
-		return !isFreeze(freezeAddress); 
+		return !isFreeze(freezeAddress);
 	}
 
-	function isFreeze(address freezeAddress) public view returns (bool isFreezed) 
+	function isFreeze(address freezeAddress) public view returns (bool isFreezed)
 	{
 		return freezeList[freezeAddress]==1;
 	}
@@ -444,7 +444,7 @@ contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
         return !isWhiteList(whiteListAddress);
     }
 
-	function isWhiteList(address whiteListAddress) public view returns (bool iswhiteList) 
+	function isWhiteList(address whiteListAddress) public view returns (bool iswhiteList)
 	{
         return whiteList[whiteListAddress]==1;
     }
@@ -483,22 +483,22 @@ contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
 		lockList[_receiver].push(item);
         return true;
 	}
-	
+
 	function getLockedListSize(address lockedAddress) public view returns(uint256 _lenght)
 	{
 	    return lockList[lockedAddress].length;
 	}
-	
+
 	function getLockedAmountAt(address lockedAddress, uint8 index) public view returns(uint256 _amount)
 	{
 	    return lockList[lockedAddress][index].amount;
 	}
-	
+
 	function getLockedTimeAt(address lockedAddress, uint8 index) public view returns(uint256 _time)
 	{
 	    return lockList[lockedAddress][index].time.sub(now);
 	}
-	
+
 	function getLockedAmount(address lockedAddress) public view returns(uint256 _amount)
 	{
 	    uint256 lockedAmount =0;
@@ -516,4 +516,8 @@ contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
 	}
 
 
+}
+function() payable external {
+	revert();
+}
 }

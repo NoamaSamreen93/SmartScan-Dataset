@@ -1,24 +1,24 @@
 pragma solidity ^0.4.23;
 
 /*
-*  ██████╗ ██╗   ██╗███╗   ██╗███╗   ██╗██╗   ██╗    
-*  ██╔══██╗██║   ██║████╗  ██║████╗  ██║╚██╗ ██╔╝    
-*  ██████╔╝██║   ██║██╔██╗ ██║██╔██╗ ██║ ╚████╔╝     
-*  ██╔══██╗██║   ██║██║╚██╗██║██║╚██╗██║  ╚██╔╝      
-*  ██████╔╝╚██████╔╝██║ ╚████║██║ ╚████║   ██║       
-*  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝   ╚═╝       
-*                                                    
-*   ██████╗  █████╗ ███╗   ███╗███████╗              
-*  ██╔════╝ ██╔══██╗████╗ ████║██╔════╝              
-*  ██║  ███╗███████║██╔████╔██║█████╗                
-*  ██║   ██║██╔══██║██║╚██╔╝██║██╔══╝                
-*  ╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗              
-*   ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝      
+*  ██████╗ ██╗   ██╗███╗   ██╗███╗   ██╗██╗   ██╗
+*  ██╔══██╗██║   ██║████╗  ██║████╗  ██║╚██╗ ██╔╝
+*  ██████╔╝██║   ██║██╔██╗ ██║██╔██╗ ██║ ╚████╔╝
+*  ██╔══██╗██║   ██║██║╚██╗██║██║╚██╗██║  ╚██╔╝
+*  ██████╔╝╚██████╔╝██║ ╚████║██║ ╚████║   ██║
+*  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝   ╚═╝
+*
+*   ██████╗  █████╗ ███╗   ███╗███████╗
+*  ██╔════╝ ██╔══██╗████╗ ████║██╔════╝
+*  ██║  ███╗███████║██╔████╔██║█████╗
+*  ██║   ██║██╔══██║██║╚██╔╝██║██╔══╝
+*  ╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗
+*   ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
 
 
 * Author:  Konstantin G...
 * Telegram: @bunnygame
-* 
+*
 * email: info@bunnycoin.co
 * site : http://bunnycoin.co
 * @title Ownable
@@ -27,22 +27,22 @@ pragma solidity ^0.4.23;
 */
 
 contract Ownable {
-    
+
     address public ownerCEO;
-    address ownerMoney;  
+    address ownerMoney;
     address ownerServer;
     address privAddress;
-    
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
     */
-    constructor() public { 
-        ownerCEO = msg.sender; 
+    constructor() public {
+        ownerCEO = msg.sender;
         ownerServer = msg.sender;
         ownerMoney = msg.sender;
     }
- 
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -50,7 +50,7 @@ contract Ownable {
         require(msg.sender == ownerCEO);
         _;
     }
-   
+
     modifier onlyServer() {
         require(msg.sender == ownerServer || msg.sender == ownerCEO);
         _;
@@ -61,23 +61,23 @@ contract Ownable {
             ownerCEO = add;
         }
     }
- 
+
 
     function transferOwnershipServer(address add) public onlyOwner {
         if (add != address(0)) {
             ownerServer = add;
         }
-    } 
-     
+    }
+
     function transferOwnerMoney(address _ownerMoney) public  onlyOwner {
         if (_ownerMoney != address(0)) {
             ownerMoney = _ownerMoney;
         }
     }
- 
+
     function getOwnerMoney() public view onlyOwner returns(address) {
         return ownerMoney;
-    } 
+    }
     function getOwnerServer() public view onlyOwner returns(address) {
         return ownerServer;
     }
@@ -97,7 +97,7 @@ contract Ownable {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -124,18 +124,18 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-  
+
 }
- 
+
 
 contract BaseRabbit  is Ownable {
-       
+
 
 
     event SendBunny(address newOwnerBunny, uint32 bunnyId);
     event StopMarket(uint32 bunnyId);
     event StartMarket(uint32 bunnyId, uint money);
-    event BunnyBuy(uint32 bunnyId, uint money);  
+    event BunnyBuy(uint32 bunnyId, uint money);
     event EmotherCount(uint32 mother, uint summ);
     event NewBunny(uint32 bunnyId, uint dnk, uint256 blocknumber, uint breed );
     event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
@@ -150,22 +150,22 @@ contract BaseRabbit  is Ownable {
     event Approval(address owner, address approved, uint32 tokenId);
     event OwnerBunnies(address owner, uint32  tokenId);
 
- 
+
 
     address public  myAddr_test = 0x982a49414fD95e3268D3559540A67B03e40AcD64;
 
     using SafeMath for uint256;
     bool pauseSave = false;
     uint256 bigPrice = 0.0005 ether;
-    
+
     uint public commission_system = 5;
-     
+
     // ID the last seal
     uint32 public lastIdGen0;
     uint public totalGen0 = 0;
     // ID the last seal
     uint public lastTimeGen0;
-    
+
     // ID the last seal
   //  uint public timeRangeCreateGen0 = 1800;
     uint public timeRangeCreateGen0 = 1;
@@ -191,20 +191,20 @@ contract BaseRabbit  is Ownable {
     modifier timeRange() {
         require((lastTimeGen0+timeRangeCreateGen0) < now);
         _;
-    } 
+    }
 
     mapping(uint32 => uint) public totalSalaryBunny;
     mapping(uint32 => uint32[5]) public rabbitMother;
-    
+
     mapping(uint32 => uint) public motherCount;
-    
+
     // how many times did the rabbit cross
     mapping(uint32 => uint) public rabbitBreedCount;
 
     mapping(uint32 => uint)  public rabbitSirePrice;
     mapping(uint => uint32[]) public sireGenom;
     mapping (uint32 => uint) mapDNK;
-   
+
     uint32[12] public cooldowns = [
         uint32(1 minutes),
         uint32(2 minutes),
@@ -221,10 +221,10 @@ contract BaseRabbit  is Ownable {
     ];
 
 
-    struct Rabbit { 
+    struct Rabbit {
          // parents
         uint32 mother;
-        uint32 sire; 
+        uint32 sire;
         // block in which a rabbit was born
         uint birthblock;
          // number of births or how many times were offspring
@@ -233,25 +233,25 @@ contract BaseRabbit  is Ownable {
         uint birthLastTime;
         //the current role of the rabbit
         uint role;
-        //indexGenome   
+        //indexGenome
         uint genome;
     }
     /**
     * Where we will store information about rabbits
     */
     Rabbit[]  public rabbits;
-     
+
     /**
     * who owns the rabbit
     */
-    mapping (uint32 => address) public rabbitToOwner; 
+    mapping (uint32 => address) public rabbitToOwner;
     mapping(address => uint32[]) public ownerBunnies;
     //mapping (address => uint) ownerRabbitCount;
     mapping (uint32 => string) rabbitDescription;
-    mapping (uint32 => string) rabbitName; 
+    mapping (uint32 => string) rabbitName;
 
-    //giff 
-    mapping (uint32 => bool) giffblock; 
+    //giff
+    mapping (uint32 => bool) giffblock;
     mapping (address => bool) ownerGennezise;
 
 }
@@ -261,8 +261,8 @@ contract BaseRabbit  is Ownable {
 /// @title Interface for contracts conforming to ERC-721: Non-Fungible Tokens
 /// @author Dieter Shirley <dete@axiomzen.co> (https://github.com/dete)
 contract ERC721 {
-    // Required methods 
- 
+    // Required methods
+
 
     function ownerOf(uint32 _tokenId) public view returns (address owner);
     function approve(address _to, uint32 _tokenId) public returns (bool success);
@@ -278,7 +278,7 @@ contract PrivateRabbitInterface {
     function getNewRabbit(address from)  public view returns (uint);
     function mixDNK(uint dnkmother, uint dnksire, uint genome)  public view returns (uint);
     function isUIntPrivate() public pure returns (bool);
-    
+
   //  function mixGenesRabbits(uint256 genes1, uint256 genes2, uint256 targetBlock) public returns (uint256);
 }
 
@@ -286,7 +286,7 @@ contract PrivateRabbitInterface {
 
 
 contract BodyRabbit is BaseRabbit, ERC721 {
-     
+
     uint public totalBunny = 0;
     string public constant name = "CryptoRabbits";
     string public constant symbol = "CRB";
@@ -300,12 +300,12 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     function setPriv(address _privAddress) public returns(bool) {
         privAddress = _privAddress;
         privateContract = PrivateRabbitInterface(_privAddress);
-    } 
+    }
 
     bool public fcontr = false;
- 
-    
-    constructor() public { 
+
+
+    constructor() public {
         setPriv(myAddr_test);
         fcontr = true;
     }
@@ -323,26 +323,26 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         return rabbitToOwner[_tokenId];
     }
 
-    function approve(address _to, uint32 _tokenId) public returns (bool) { 
+    function approve(address _to, uint32 _tokenId) public returns (bool) {
         _to;
         _tokenId;
         return false;
     }
 
 
-    function removeTokenList(address _owner, uint32 _tokenId) internal { 
+    function removeTokenList(address _owner, uint32 _tokenId) internal {
         uint count = ownerBunnies[_owner].length;
         for (uint256 i = 0; i < count; i++) {
             if(ownerBunnies[_owner][i] == _tokenId)
-            { 
+            {
                 delete ownerBunnies[_owner][i];
                 if(count > 0 && count != (i-1)){
                     ownerBunnies[_owner][i] = ownerBunnies[_owner][(count-1)];
                     delete ownerBunnies[_owner][(count-1)];
-                } 
+                }
                 ownerBunnies[_owner].length--;
                 return;
-            } 
+            }
         }
     }
     /**
@@ -356,19 +356,19 @@ contract BodyRabbit is BaseRabbit, ERC721 {
             uint system  = procent.mul(commission_system);
 
             res = res.add(rabbitSirePrice[_tokenId]);
-            return res.add(system); 
+            return res.add(system);
         } else {
             return 0;
         }
     }
 
- 
+
     function addTokenList(address owner,  uint32 _tokenId) internal {
         ownerBunnies[owner].push( _tokenId);
         emit OwnerBunnies(owner, _tokenId);
-        rabbitToOwner[_tokenId] = owner; 
+        rabbitToOwner[_tokenId] = owner;
     }
- 
+
 
     function transfer(address _to, uint32 _tokenId) public {
         address currentOwner = msg.sender;
@@ -387,11 +387,11 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         require(oldOwner != _to);
         require(_to != address(0));
         removeTokenList(oldOwner, _tokenId);
-        addTokenList(_to, _tokenId); 
+        addTokenList(_to, _tokenId);
         emit Transfer (oldOwner, _to, _tokenId);
         return true;
-    }  
-    
+    }
+
     function setTimeRangeGen0(uint _sec) public onlyOwner {
         timeRangeCreateGen0 = _sec;
     }
@@ -405,7 +405,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
             return true;
         }else{
             return !promoPause;
-        } 
+        }
     }
 
     function setPauseSave() public onlyOwner  returns(bool) {
@@ -424,11 +424,11 @@ contract BodyRabbit is BaseRabbit, ERC721 {
     function getTokenOwner(address owner) public view returns(uint total, uint32[] list) {
         total = ownerBunnies[owner].length;
         list = ownerBunnies[owner];
-    } 
+    }
 
 
 
-    function setRabbitMother(uint32 children, uint32 mother) internal { 
+    function setRabbitMother(uint32 children, uint32 mother) internal {
         require(children != mother);
         if (mother == 0 )
         {
@@ -441,7 +441,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
               pullMother[start] = uint32(rabbitMother[mother][i]);
               rabbitMother[mother][i] = 0;
               start++;
-            } 
+            }
         }
         pullMother[start] = mother;
         start++;
@@ -451,11 +451,11 @@ contract BodyRabbit is BaseRabbit, ERC721 {
              }else{
                     rabbitMother[children][m] = pullMother[m];
              }
-        } 
+        }
         setMotherCount(mother);
     }
 
-      
+
 
     function setMotherCount(uint32 _mother) internal returns(uint)  { //internal
         motherCount[_mother] = motherCount[_mother].add(1);
@@ -472,15 +472,15 @@ contract BodyRabbit is BaseRabbit, ERC721 {
      function getTotalSalaryBunny(uint32 _bunny) public view returns(uint) { //internal
         return  totalSalaryBunny[_bunny];
     }
- 
- 
+
+
     function getRabbitMother( uint32 mother) public view returns(uint32[5]){
         return rabbitMother[mother];
     }
 
      function getRabbitMotherSumm(uint32 mother) public view returns(uint count) { //internal
         for (uint m = 0; m < 5 ; m++) {
-            if(rabbitMother[mother][m] != 0 ) { 
+            if(rabbitMother[mother][m] != 0 ) {
                 count++;
             }
         }
@@ -488,10 +488,10 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 
 
 
-    function getRabbitDNK(uint32 bunnyid) public view returns(uint) { 
+    function getRabbitDNK(uint32 bunnyid) public view returns(uint) {
         return mapDNK[bunnyid];
     }
-     
+
     function bytes32ToString(bytes32 x)internal pure returns (string) {
         bytes memory bytesString = new bytes(32);
         uint charCount = 0;
@@ -508,7 +508,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         }
         return string(bytesStringTrimmed);
     }
-    
+
     function uintToBytes(uint v) internal pure returns (bytes32 ret) {
         if (v == 0) {
             ret = '0';
@@ -531,19 +531,19 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         return ownerBunnies[_owner].length;
     }
 
-    function sendMoney(address _to, uint256 _money) internal { 
+    function sendMoney(address _to, uint256 _money) internal {
         _to.transfer((_money/100)*95);
-        ownerMoney.transfer((_money/100)*5); 
+        ownerMoney.transfer((_money/100)*5);
     }
 
-    function getGiffBlock(uint32 _bunnyid) public view returns(bool) { 
+    function getGiffBlock(uint32 _bunnyid) public view returns(bool) {
         return !giffblock[_bunnyid];
     }
 
-    function getOwnerGennezise(address _to) public view returns(bool) { 
+    function getOwnerGennezise(address _to) public view returns(bool) {
         return ownerGennezise[_to];
     }
-    
+
 
     function getBunny(uint32 _bunny) public view returns(
         uint32 mother,
@@ -551,7 +551,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
         uint birthblock,
         uint birthCount,
         uint birthLastTime,
-        uint role, 
+        uint role,
         uint genome,
         bool interbreed,
         uint leftTime,
@@ -570,7 +570,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
             birthLastTime = rabbits[_bunny].birthLastTime;
             role = rabbits[_bunny].role;
             genome = rabbits[_bunny].genome;
-                     
+
             if(birthCount > 14) {
                 birthCount = 14;
             }
@@ -603,7 +603,7 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 
         if(lastTime <= now && rabbits[_bunny].role == 0 ) {
             interbreed = true;
-        } 
+        }
     }
     /**
      *  we get cooldown
@@ -627,47 +627,47 @@ contract BodyRabbit is BaseRabbit, ERC721 {
 * sale and bye Rabbits
 */
 contract RabbitMarket is BodyRabbit {
- 
+
  // Long time
     uint stepMoney = 2*60*60;
-           
+
     function setStepMoney(uint money) public onlyOwner {
         stepMoney = money;
     }
     /**
     * @dev number of rabbits participating in the auction
     */
-    uint marketCount = 0; 
+    uint marketCount = 0;
 
     uint daysperiod = 1;
     uint sec = 1;
     // how many last sales to take into account in the contract before the formation of the price
     uint8 middlelast = 20;
-    
-   
-     
+
+
+
     // those who currently participate in the sale
     mapping(uint32 => uint256[]) internal marketRabbits;
-     
-     
-    uint256 middlePriceMoney = 1; 
-    uint256 middleSaleTime = 0;  
+
+
+    uint256 middlePriceMoney = 1;
+    uint256 middleSaleTime = 0;
     uint moneyRange;
- 
+
     function setMoneyRange(uint _money) public onlyOwner {
         moneyRange = _money;
     }
-     
+
     // the last cost of a sold seal
-    uint lastmoney = 0;  
+    uint lastmoney = 0;
     // the time which was spent on the sale of the cat
     uint lastTimeGen0;
 
     //how many closed auctions
     uint public totalClosedBID = 0;
-    mapping (uint32 => uint) bunnyCost; 
+    mapping (uint32 => uint) bunnyCost;
     mapping(uint32 => uint) bidsIndex;
- 
+
 
     /**
     * @dev get rabbit price
@@ -683,8 +683,8 @@ contract RabbitMarket is BodyRabbit {
     }
     /**
     * @dev We are selling rabbit for sale
-    * @param _bunnyid - whose rabbit we exhibit 
-    * @param _money - sale amount 
+    * @param _bunnyid - whose rabbit we exhibit
+    * @param _money - sale amount
     */
   function startMarket(uint32 _bunnyid, uint _money) public returns (uint) {
         require(isPauseSave());
@@ -698,11 +698,11 @@ contract RabbitMarket is BodyRabbit {
 
     /**
     * @dev remove from sale rabbit
-    * @param _bunnyid - a rabbit that is removed from sale 
+    * @param _bunnyid - a rabbit that is removed from sale
     */
     function stopMarket(uint32 _bunnyid) public returns(uint) {
         require(isPauseSave());
-        require(rabbitToOwner[_bunnyid] == msg.sender);  
+        require(rabbitToOwner[_bunnyid] == msg.sender);
         bunnyCost[_bunnyid] = 0;
         emit StopMarket(_bunnyid);
         return marketCount--;
@@ -723,12 +723,12 @@ contract RabbitMarket is BodyRabbit {
         // Sending money to the old user
         sendMoney(rabbitToOwner[_bunnyid], msg.value);
         // is sent to the new owner of the bought rabbit
-        transferFrom(rabbitToOwner[_bunnyid], msg.sender, _bunnyid); 
-        stopMarket(_bunnyid); 
+        transferFrom(rabbitToOwner[_bunnyid], msg.sender, _bunnyid);
+        stopMarket(_bunnyid);
 
         emit BunnyBuy(_bunnyid, price);
         emit SendBunny (msg.sender, _bunnyid);
-    } 
+    }
 
     /**
     * @dev give a rabbit to a specific user
@@ -750,8 +750,8 @@ contract RabbitMarket is BodyRabbit {
 /**
 * Basic actions for the transfer of rights of rabbits
 */
-contract BunnyGame is RabbitMarket {    
-  
+contract BunnyGame is RabbitMarket {
+
     function transferNewBunny(address _to, uint32 _bunnyid, uint localdnk, uint breed, uint32 matron, uint32 sire) internal {
         emit NewBunny(_bunnyid, localdnk, block.number, breed);
         emit CreateChildren(matron, sire, _bunnyid);
@@ -765,13 +765,13 @@ contract BunnyGame is RabbitMarket {
     * @dev create a new gene and put it up for sale, this operation takes place on the server
     */
     function createGennezise(uint32 _matron) public {
-         
+
         bool promo = false;
         require(isPriv());
         require(isPauseSave());
         require(isPromoPause());
- 
-        if (totalGen0 > promoGen0) { 
+
+        if (totalGen0 > promoGen0) {
             require(msg.sender == ownerServer || msg.sender == ownerCEO);
         } else if (!(msg.sender == ownerServer || msg.sender == ownerCEO)) {
             // promo action
@@ -779,17 +779,17 @@ contract BunnyGame is RabbitMarket {
                 ownerGennezise[msg.sender] = true;
                 promo = true;
         }
-        
+
         uint  localdnk = privateContract.getNewRabbit(msg.sender);
         Rabbit memory _Rabbit =  Rabbit( 0, 0, block.number, 0, 0, 0, 0);
         uint32 _bunnyid =  uint32(rabbits.push(_Rabbit));
         mapDNK[_bunnyid] = localdnk;
-       
-        transferNewBunny(msg.sender, _bunnyid, localdnk, 0, 0, 0);  
-        
+
+        transferNewBunny(msg.sender, _bunnyid, localdnk, 0, 0, 0);
+
         lastTimeGen0 = now;
-        lastIdGen0 = _bunnyid; 
-        totalGen0++; 
+        lastIdGen0 = _bunnyid;
+        totalGen0++;
 
         setRabbitMother(_bunnyid, _matron);
 
@@ -807,7 +807,7 @@ contract BunnyGame is RabbitMarket {
         }
         return genome.add(1);
     }
-    
+
     /**
     * create a new rabbit, according to the cooldown
     * @param _matron - mother who takes into account the cooldown
@@ -823,10 +823,10 @@ contract BunnyGame is RabbitMarket {
         require(_matron != _sire);
 
         require(getBreed(_matron));
-        // Checking the money 
-        
+        // Checking the money
+
         require(msg.value >= getSirePrice(_sire));
-        
+
         uint genome = getGenomeChildren(_matron, _sire);
 
         uint localdnk =  privateContract.mixDNK(mapDNK[_matron], mapDNK[_sire], genome);
@@ -845,20 +845,20 @@ contract BunnyGame is RabbitMarket {
         uint system = rabbitSirePrice[_sire].div(100);
         system = system.mul(commission_system);
         ownerMoney.transfer(system); // refund previous bidder
-  
+
         coolduwnUP(_matron);
         // we transfer the rabbit to the new owner
-        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk, genome, _matron, _sire);   
+        transferNewBunny(rabbitToOwner[_matron], bunnyid, localdnk, genome, _matron, _sire);
         // we establish parents for the child
         setRabbitMother(bunnyid, _matron);
         return bunnyid;
-    } 
-  
+    }
+
     /**
      *  Set the cooldown for childbirth
      * @param _mother - mother for which cooldown
      */
-    function coolduwnUP(uint32 _mother) internal { 
+    function coolduwnUP(uint32 _mother) internal {
         require(isPauseSave());
         rabbits[(_mother-1)].birthCount = rabbits[(_mother-1)].birthCount.add(1);
         rabbits[(_mother-1)].birthLastTime = now;
@@ -876,7 +876,7 @@ contract BunnyGame is RabbitMarket {
         if (getRabbitMotherSumm(_mother) > 0) {
             uint pastMoney = _valueMoney/getRabbitMotherSumm(_mother);
             for (uint i=0; i < getRabbitMotherSumm(_mother); i++) {
-                if (rabbitMother[_mother][i] != 0) { 
+                if (rabbitMother[_mother][i] != 0) {
                     uint32 _parrentMother = rabbitMother[_mother][i];
                     address add = rabbitToOwner[_parrentMother];
                     // pay salaries
@@ -887,10 +887,10 @@ contract BunnyGame is RabbitMarket {
 
                     add.transfer(pastMoney); // refund previous bidder
                 }
-            } 
+            }
         }
     }
-    
+
     /**
     * @dev We set the cost of renting our genes
     * @param price rent price
@@ -915,7 +915,7 @@ contract BunnyGame is RabbitMarket {
         emit ChengeSex(_rabbitid, true, getSirePrice(_rabbitid));
         return true;
     }
- 
+
     /**
     * @dev We set the cost of renting our genes
      */
@@ -929,28 +929,39 @@ contract BunnyGame is RabbitMarket {
         deleteSire(_rabbitid);
         return true;
     }
-    
-      function deleteSire(uint32 _tokenId) internal { 
+
+      function deleteSire(uint32 _tokenId) internal {
         uint gen = rabbits[(_tokenId-1)].genome;
 
         uint count = sireGenom[gen].length;
         for (uint i = 0; i < count; i++) {
             if(sireGenom[gen][i] == _tokenId)
-            { 
+            {
                 delete sireGenom[gen][i];
                 if(count > 0 && count != (i-1)){
                     sireGenom[gen][i] = sireGenom[gen][(count-1)];
                     delete sireGenom[gen][(count-1)];
-                } 
+                }
                 sireGenom[gen].length--;
                 emit ChengeSex(_tokenId, false, 0);
                 return;
-            } 
+            }
         }
-    } 
+    }
 
     function getMoney(uint _value) public onlyOwner {
         require(address(this).balance >= _value);
         ownerMoney.transfer(_value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

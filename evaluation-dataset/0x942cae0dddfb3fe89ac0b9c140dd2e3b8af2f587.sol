@@ -42,9 +42,9 @@ contract ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract WOWX is ERC20 { 
+contract WOWX is ERC20 {
     using SafeMath for uint256;
-    //--- Token configurations ----// 
+    //--- Token configurations ----//
     string private constant _name = "WOWX Token";
     string private constant _symbol = "WOWX";
     uint8 private constant _decimals = 18;
@@ -53,7 +53,7 @@ contract WOWX is ERC20 {
     //--- Milestones --------------//
     uint256 private _icoStartDate = 1551412800;   // 01-03-2019 12:00 GMT+8
     uint256 private _icoEndDate = 1561867200;     // 30-06-2019 12:00 GMT+8
-    
+
     //--- Token allocations -------//
     uint256 private _totalsupply;
 
@@ -61,15 +61,15 @@ contract WOWX is ERC20 {
     address private _owner;
     address private _walletWowX;
     address payable private _ethFundMain;
-    
+
     //--- Variables ---------------//
     bool private _lockToken = true;
     bool private _allowICO = true;
-    
+
     mapping(address => uint256) private balances;
     mapping(address => mapping(address => uint256)) private allowed;
     mapping(address => bool) private locked;
-    
+
     event Mint(address indexed from, address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
     event ChangeReceiveWallet(address indexed newAddress);
@@ -78,7 +78,7 @@ contract WOWX is ERC20 {
     event ChangeLockStatusFrom(address indexed investor, bool locked);
     event ChangeTokenLockStatus(bool locked);
     event ChangeAllowICOStatus(bool allow);
-    
+
     modifier onlyOwner() {
         require(msg.sender == _owner, "Only owner is allowed");
         _;
@@ -93,12 +93,12 @@ contract WOWX is ERC20 {
         require(now >= _icoEndDate, "CrowdSale is running");
         _;
     }
-    
+
     modifier onlyAllowICO() {
         require(_allowICO, "ICO stopped");
         _;
     }
-    
+
     modifier onlyUnlockToken() {
         require(!_lockToken, "Token locked");
         _;
@@ -108,23 +108,23 @@ contract WOWX is ERC20 {
     {
         _owner = msg.sender;
     }
-    
+
     function name() public pure returns (string memory) {
         return _name;
     }
-    
+
     function symbol() public pure returns (string memory) {
         return _symbol;
     }
-    
+
     function decimals() public pure returns (uint8) {
         return _decimals;
     }
-    
+
     function maxCap() public pure returns (uint256) {
         return _maxCap;
     }
-    
+
     function owner() public view returns (address) {
         return _owner;
     }
@@ -132,27 +132,27 @@ contract WOWX is ERC20 {
     function walletWowX() public view returns (address) {
         return _walletWowX;
     }
-    
+
     function ethFundMain() public view returns (address) {
         return _ethFundMain;
     }
-    
+
     function icoStartDate() public view returns (uint256) {
         return _icoStartDate;
     }
-    
+
     function icoEndDate() public view returns (uint256) {
         return _icoEndDate;
     }
-    
+
     function lockToken() public view returns (bool) {
         return _lockToken;
     }
-    
+
     function allowICO() public view returns (bool) {
         return _allowICO;
     }
-    
+
     function lockStatusFrom(address investor) public view returns (bool) {
         return locked[investor];
     }
@@ -160,11 +160,11 @@ contract WOWX is ERC20 {
     function totalSupply() public view returns (uint256) {
         return _totalsupply;
     }
-    
+
     function balanceOf(address investor) public view returns (uint256) {
         return balances[investor];
     }
-    
+
     function approve(address _spender, uint256 _amount) public onlyFinishedICO onlyUnlockToken returns (bool)  {
         require( _spender != address(0), "Address can not be 0x0");
         require(balances[msg.sender] >= _amount, "Balance does not have enough tokens");
@@ -174,7 +174,7 @@ contract WOWX is ERC20 {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _from, address _spender) public view returns (uint256) {
         return allowed[_from][_spender];
     }
@@ -188,7 +188,7 @@ contract WOWX is ERC20 {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom( address _from, address _to, uint256 _amount ) public onlyFinishedICO onlyUnlockToken returns (bool)  {
         require( _to != address(0), "Receiver can not be 0x0");
         require(!locked[_from], "From address is locked");
@@ -201,8 +201,8 @@ contract WOWX is ERC20 {
     }
 
     function burn(uint256 _value) public onlyOwner returns (bool) {
-        balances[msg.sender] = (balances[msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        balances[msg.sender] = (balances[msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -218,7 +218,7 @@ contract WOWX is ERC20 {
     }
 
     function () external payable onlyICO onlyAllowICO {
-        
+
     }
 
     function manualMint(address receiver, uint256 _value) public onlyOwner{
@@ -239,7 +239,7 @@ contract WOWX is ERC20 {
         emit Mint(from, _walletWowX, wowxShare);
         emit Transfer(address(0), _walletWowX, wowxShare);
     }
-    
+
     function haltCrowdSale() external onlyOwner {
         _allowICO = false;
         emit ChangeAllowICOStatus(false);
@@ -286,4 +286,15 @@ contract WOWX is ERC20 {
         locked[investor] = false;
         emit ChangeLockStatusFrom(investor, false);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

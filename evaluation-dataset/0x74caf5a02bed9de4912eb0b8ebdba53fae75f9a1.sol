@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract ROIcrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xc0c026e307B1B74f8d307181Db00CBe2A1B412e0;
@@ -23,38 +23,38 @@ contract ROIcrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
-    
+
     function kill() public {
         require(msg.sender == creator);
         selfdestruct(owner);
     }
-    
+
     function () payable public {
         require(msg.value > 0);
         require(tokenSold < 138216001);
         uint256 _price = price / 10;
         if(tokenSold < 45136000) {
             _price *= 4;
-            _price += price; 
+            _price += price;
         }
         if(tokenSold > 45135999 && tokenSold < 92456000) {
             _price *= 3;
             _price += price;
         }
         if(tokenSold > 92455999 && tokenSold < 138216000) {
-            _price += price; 
+            _price += price;
         }
         uint amount = msg.value * _price;
         tokenSold += amount / 1 ether;
@@ -62,4 +62,20 @@ contract ROIcrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

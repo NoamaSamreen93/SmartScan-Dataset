@@ -5,7 +5,7 @@ pragma solidity ^0.4.16;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract TokenERC20 {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 4;
@@ -14,7 +14,7 @@ contract TokenERC20 {
     // This creates an array with all balances of the APMA holders .
     mapping (address => uint256) public balanceOf;
 
-    //This creates an array of arrays to store the allowance provided by a contract owner to a given address 
+    //This creates an array of arrays to store the allowance provided by a contract owner to a given address
     mapping (address => mapping (address => uint256)) public allowance;
 
     // This generates a public event on the blockchain that will notify clients the transfer of APMA between different accounts
@@ -23,10 +23,10 @@ contract TokenERC20 {
     // This notifies clients about the amount of APMA burnt
     event Burn(address indexed from, uint256 value);
 
-    
-    // This is the initial function which will be called upon the creation of the APMA contract to generate the supply tokens 
-    
-    
+
+    // This is the initial function which will be called upon the creation of the APMA contract to generate the supply tokens
+
+
     function TokenERC20(
     ) public {
         totalSupply = 1000000000 * 10 ** uint256(decimals);  // Total supply of APMA
@@ -36,7 +36,7 @@ contract TokenERC20 {
     }
 
     // Internal function for transfer of tokens between 2 different addresses
-     
+
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -55,8 +55,8 @@ contract TokenERC20 {
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
-    
-    // Function to transfer APMAs to a given address from the contract owner 
+
+    // Function to transfer APMAs to a given address from the contract owner
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
@@ -69,7 +69,7 @@ contract TokenERC20 {
         return true;
     }
 
-    // Setting up the allowance for the spender on the behalf of the contract owner 
+    // Setting up the allowance for the spender on the behalf of the contract owner
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -87,7 +87,7 @@ contract TokenERC20 {
         }
     }
 
-    // Depleting the APMA supply 
+    // Depleting the APMA supply
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
@@ -106,4 +106,20 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

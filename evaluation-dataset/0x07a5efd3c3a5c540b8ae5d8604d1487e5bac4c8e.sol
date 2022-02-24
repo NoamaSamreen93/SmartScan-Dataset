@@ -3,7 +3,7 @@
 // Participate in the ICO by sending ETH to this contract. 1 ETH = 10 HOW
 //
 //
-// DON'T MISS THIS EXCLUSIVE OPPORTUNITY TO PARTICIPATE IN 
+// DON'T MISS THIS EXCLUSIVE OPPORTUNITY TO PARTICIPATE IN
 // HOWEYCOINS TRAVEL NETWORK NOW!
 //
 //
@@ -14,7 +14,7 @@
 // segments of the travel industry (air, hotel, car rental, and luxury segments),
 // earning coins you can trade for profit instead of points. Massive potential
 // upside benefits like:
-// 
+//
 // HoweyCoins are officially registered with the U.S. government;
 // HoweyCoins will trade on an SEC-compliant exchange where you can buy and sell
 // them for profit;
@@ -68,7 +68,7 @@ contract ERC223Receiver {
                          uint _value, bytes _data) external returns (bool ok);
 }
 
-// HoweyCoins are the cryptocurrency for the travel industry at exactly the right time. 
+// HoweyCoins are the cryptocurrency for the travel industry at exactly the right time.
 //
 // To participate in the ICO, simply send ETH to this contract, or call
 // buyAtPrice with the current price.
@@ -155,14 +155,14 @@ contract HoweyCoin is ERC20 {
     return allowed[_owner][_spender];
   }
 
-  function increaseApproval(address _spender, uint _addedValue) 
+  function increaseApproval(address _spender, uint _addedValue)
       external returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval(address _spender, uint _subtractedValue) 
+  function decreaseApproval(address _spender, uint _subtractedValue)
     external returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -194,7 +194,7 @@ contract HoweyCoin is ERC20 {
       ERC20 tok = ERC20(tokenAddress);
       tok.transfer(owner, tok.balanceOf(this));
     }
-  }  
+  }
 
   function _isContract(address _addr) internal view returns (bool is_contract) {
     uint length;
@@ -225,4 +225,15 @@ contract HoweyCoin is ERC20 {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

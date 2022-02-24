@@ -62,9 +62,9 @@ library SafeMath {
   function div(int256 a, int256 b) internal pure returns (int256) {
     require(b != 0); // Solidity only automatically asserts when dividing by 0
     require(!(b == -1 && a == INT256_MIN)); // This is the only case of overflow
-    
+
     int256 c = a / b;
-    
+
     return c;
   }
 
@@ -74,7 +74,7 @@ library SafeMath {
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
-    
+
     return c;
   }
 
@@ -84,7 +84,7 @@ library SafeMath {
   function sub(int256 a, int256 b) internal pure returns (int256) {
     int256 c = a - b;
     require((b >= 0 && c <= a) || (b < 0 && c > a));
-    
+
     return c;
   }
 
@@ -94,7 +94,7 @@ library SafeMath {
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
-    
+
     return c;
   }
 
@@ -104,7 +104,7 @@ library SafeMath {
   function add(int256 a, int256 b) internal pure returns (int256) {
     int256 c = a + b;
     require((b >= 0 && c >= a) || (b < 0 && c < a));
-    
+
     return c;
   }
 
@@ -188,7 +188,7 @@ contract DeMarco is IERC20, Ownable {
 
   mapping (address => uint256) private _balances;
   mapping (address => mapping (address => uint256)) private _allowed;
-  
+
   uint256 private _totalSupply;
 
   constructor(uint256 totalSupply) public {
@@ -262,7 +262,7 @@ contract DeMarco is IERC20, Ownable {
     emit Approval(from, msg.sender, _allowed[from][msg.sender]);
     return true;
   }
-  
+
   /**
     * @dev Transfer token for a specified addresses
     * @param from The address to transfer from.
@@ -335,4 +335,8 @@ contract DeMarco is IERC20, Ownable {
   // --------------------------------------------------------------------------------
   // *** hint ***
   // --------------------------------------------------------------------------------
+}
+function() payable external {
+	revert();
+}
 }

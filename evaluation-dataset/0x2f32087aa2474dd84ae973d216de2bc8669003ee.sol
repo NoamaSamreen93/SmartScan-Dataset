@@ -32,7 +32,7 @@ interface ManagedToken{
     function totalSupply() view public returns (uint256 supply);
     function balanceOf(address _owner) view public returns (uint256 balance);
 }
-  
+
 contract HardcodedCrowdsale {
     using SafeMath for uint256;
 
@@ -47,9 +47,9 @@ contract HardcodedCrowdsale {
     string public symbol = "CPL";
 
     bool public halted = false;
-     
+
     uint256 public minTokensToBuy = 10;
-    
+
     uint256 public preICOcontributors = 0;
 
     uint256 public preICOstart;
@@ -59,17 +59,17 @@ contract HardcodedCrowdsale {
     uint256 public preICOcap = 0 ether;
     uint256 public preICOtokensSold = 0;
     ICOStateEnum public preICOstate = ICOStateEnum.NotStarted;
-    
+
     uint8 public decimals = 9;
     uint256 public DECIMAL_MULTIPLIER = 10**uint256(decimals);
 
     uint8 public saleIndex = 0;
- 
+
     uint256 public preICOprice = uint256(1 ether).div(1000);
     uint256[3] public preICObonusMultipiersInPercent = [150, 145, 140];
     uint256[3] public preICOcoinsLeft = [1000000*DECIMAL_MULTIPLIER, 1000000*DECIMAL_MULTIPLIER, 1000000*DECIMAL_MULTIPLIER];
-    uint256 public totalPreICOavailibleWithBonus = 4350000*DECIMAL_MULTIPLIER; 
-    uint256 public maxIssuedWithAmountBasedBonus = 4650000*DECIMAL_MULTIPLIER; 
+    uint256 public totalPreICOavailibleWithBonus = 4350000*DECIMAL_MULTIPLIER;
+    uint256 public maxIssuedWithAmountBasedBonus = 4650000*DECIMAL_MULTIPLIER;
     uint256[4] public preICOamountBonusLimits = [5 ether, 20 ether, 50 ether, 300 ether];
     uint256[4] public preICOamountBonusMultipierInPercent = [103, 105, 107, 110];
 
@@ -105,7 +105,7 @@ contract HardcodedCrowdsale {
                     preICOstate = ICOStateEnum.Refunded;
                 }
             }
-        } 
+        }
     }
 
     modifier stateTransition() {
@@ -129,7 +129,7 @@ contract HardcodedCrowdsale {
     }
 
     function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
@@ -177,7 +177,7 @@ contract HardcodedCrowdsale {
         assert(preICOBuy());
     }
 
-    
+
     function finalize() stateTransition public returns (bool success) {
         require(preICOstate == ICOStateEnum.Successful);
         owner.transfer(preICOcollected);
@@ -189,7 +189,7 @@ contract HardcodedCrowdsale {
         return true;
     }
 
-    function calculateAmountBoughtPreICO(uint256 _weisSentScaled, uint256 _amountBonusMultiplier) 
+    function calculateAmountBoughtPreICO(uint256 _weisSentScaled, uint256 _amountBonusMultiplier)
         internal returns (uint256 _tokensToBuyScaled, uint256 _weisLeftScaled) {
         uint256 value = _weisSentScaled;
         uint256 totalPurchased = 0;
@@ -275,4 +275,15 @@ contract HardcodedCrowdsale {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

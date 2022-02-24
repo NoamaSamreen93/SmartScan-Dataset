@@ -1,7 +1,7 @@
 pragma solidity 0.5.7;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -61,7 +61,7 @@ library SafeMath {
  */
 contract Token {
     using SafeMath for uint256;
-    
+
     string public constant name = "Date System";
     string public constant symbol = "DTS";
     uint8 public constant decimals = 8;
@@ -196,4 +196,13 @@ contract Token {
         _allowed[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

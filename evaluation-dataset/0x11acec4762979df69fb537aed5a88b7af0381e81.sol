@@ -124,7 +124,7 @@ contract usingOraclize {
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_useCoupon(string code) oraclizeAPI internal {
         oraclize.useCoupon(code);
     }
@@ -136,7 +136,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -218,10 +218,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -274,7 +274,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -384,10 +384,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, bytes[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[2] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](2);
         dynargs[0] = args[0];
@@ -440,7 +440,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[4] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](4);
         dynargs[0] = args[0];
@@ -522,7 +522,7 @@ contract usingOraclize {
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -667,7 +667,7 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
+
     function stra2cbor(string[] arr) internal returns (bytes) {
             uint arrlen = arr.length;
 
@@ -751,17 +751,17 @@ contract usingOraclize {
             }
             return res;
         }
-        
-        
+
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-    
+
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
         bytes memory nbytes = new bytes(1);
@@ -775,26 +775,26 @@ contract usingOraclize {
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        bytes[3] memory args = [unonce, nbytes, sessionKeyHash]; 
+        bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
-    
+
     mapping(bytes32=>bytes32) oraclize_randomDS_args;
     mapping(bytes32=>bool) oraclize_randomDS_sessionKeysHashVerified;
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool){
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -806,8 +806,8 @@ contract usingOraclize {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(sha3(pubkey)) == signer) return true;
         else {
@@ -818,119 +818,119 @@ contract usingOraclize {
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) return false;
-        
-        
+
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) throw;
-        
+
         _;
     }
-    
+
     function oraclize_randomDS_proofVerify__returnCode(bytes32 _queryId, string _result, bytes _proof) internal returns (uint8){
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) return 1;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) return 2;
-        
+
         return 0;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
         bool match_ = true;
-        
+
         for (var i=0; i<prefix.length; i++){
             if (content[i] != prefix[i]) match_ = false;
         }
-        
+
         return match_;
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
-        
+
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
         if (checkok == false) return false;
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
-        
+
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) return false;
-        
-        
+
+
         // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
-        
-        
+
+
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
         checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
         if (checkok == false) return false;
-        
+
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
             oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
         uint minLength = length + toOffset;
@@ -955,7 +955,7 @@ contract usingOraclize {
 
         return to;
     }
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     // Duplicate Solidity's ecrecover, but catching the CALL return value
     function safer_ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal returns (bool, address) {
@@ -981,7 +981,7 @@ contract usingOraclize {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
 
@@ -1025,7 +1025,7 @@ contract usingOraclize {
 
         return safer_ecrecover(hash, v, r, s);
     }
-        
+
 }
 // </ORACLIZE_API>
 
@@ -1045,29 +1045,29 @@ contract DSSafeAddSub {
     function safeSub(uint a, uint b) internal returns (uint) {
         if (!safeToSubtract(a, b)) throw;
         return a - b;
-    } 
+    }
 }
 
 contract E93 is DSSafeAddSub, usingOraclize {
-    
+
     modifier onlyOwner {
-        
+
         // ETH93 admin accounts
-        
+
         require(msg.sender == 0x3a31AC87092909AF0e01B4d8fC6E03157E91F4bb || msg.sender == 0x44fc32c2a5d18700284cc9e0e2da3ad83e9a6c5d);
         _;
     }
-    
+
     modifier onlyOraclize {
         require(msg.sender == oraclize_cbAddress());
         _;
     }
-    
+
     modifier onlyOwnerOrOraclize {
         require(msg.sender == oraclize_cbAddress() || msg.sender == owner);
         _;
     }
-    
+
     address public owner = 0x44fc32c2a5d18700284cc9e0e2da3ad83e9a6c5d;
     address public charity = 0xD3F81260a44A1df7A7269CF66Abd9c7e4f8CdcD1; // Heifer International - see https://www.heifer.org/support/faq/online-donations to verify this is their Ethereum donation address. 5% of ticket sale revenue goes to this address.
     address public tokenContract = 0xfc5429ef09ed041622a23fee92e65efab389c1ce; // 1% of ticket sales go to E93 token holders, who can trade their E93 tokens in at any time.
@@ -1081,122 +1081,122 @@ contract E93 is DSSafeAddSub, usingOraclize {
         mapping (uint256 => address) tickets;
 		mapping (address => uint256) ticketsPerUser;
     }
-    
+
     mapping (uint => Lottery) public lotteries;
-    
+
     uint public totalTicketsSold;
-    
+
     function() payable {
-        
+
         if (msg.value < 0.01 ether) revert();
-        
+
         uint256 remainder = msg.value % (0.01 ether);
 
         uint256 numberOfTicketsForUser = safeSub(msg.value, remainder)/10**16; // msg.value will be the amount of Ether the user sends times 10^18, so divide this by 10^16 to get the number of tickets for that user (each ticket costs 0.01 Ether)
-        
+
         totalTicketsSold = safeAdd(totalTicketsSold, numberOfTicketsForUser);
-        
+
         lotteries[roundNumber].ticketsPerUser[msg.sender] = safeAdd(lotteries[roundNumber].ticketsPerUser[msg.sender], numberOfTicketsForUser);
-        
+
         // Each ticket for a lottery round is mapped to an address, eg. lotteries[0][5] would be the 6th ticket for the 1st lottery and might equal an address like 0x344ad635fd4e3684a326664e0698c8fefbe6dd91. With the below code, if the current round number was 0 and 6 tickets had been sold, and say the user has sent 0.03 Ether (buying 3 tickets), then their address would be mapped to lotteries[0][6], lotteries[0][7] and lotteries[0][8]
-        
+
         uint256 ticketToGiveUser = lotteries[roundNumber].ticketsSold;
-        
+
         for (uint i = 0; i < numberOfTicketsForUser; i++) {
             lotteries[roundNumber].tickets[ticketToGiveUser] = msg.sender;
             ticketToGiveUser++;
         }
-        
+
         lotteries[roundNumber].ticketsSold = safeAdd(lotteries[roundNumber].ticketsSold, numberOfTicketsForUser);
-        
+
     }
 
     function ticketsOwnedByUser (address user) public constant returns (uint256) {
         return lotteries[roundNumber].ticketsPerUser[user];
     }
-    
+
     function lookupPriorLottery (uint256 _roundNumber) public constant returns (uint256, uint256, address) {
         var ticketsSold = lotteries[_roundNumber].ticketsSold;
         var winningTicket = lotteries[_roundNumber].winningTicket;
         var winner = lotteries[_roundNumber].winner;
         return (ticketsSold, winningTicket, winner);
     }
-    
+
     function __callback(bytes32 myid, string result) onlyOraclize {
-        
-        // This gets called once a day and signals the end of the round, unless the lottery has been paused (ie. stopped == true). This will be called first by the runInOneDay() function (which sets waiting == true and waits a day), followed immediately by the update() function which runs the Oraclize query to get a random number from random.org. 
-        
+
+        // This gets called once a day and signals the end of the round, unless the lottery has been paused (ie. stopped == true). This will be called first by the runInOneDay() function (which sets waiting == true and waits a day), followed immediately by the update() function which runs the Oraclize query to get a random number from random.org.
+
         if (stopped == true) {
             revert();
         }
-        
+
         if (waiting == true) {
-            
+
             update();
-            
+
         } else {
-            
+
         // waiting == false, so the update() function to generate a random number has been called. Time to determine a winner and transfer Ether.
-            
+
         lotteries[roundNumber].finished = true;
 
         if (lotteries[roundNumber].ticketsSold > 0) {
-            
+
         lotteries[roundNumber].winningTicket = parseInt(result); // 'result' is the random number generated by random.org
-        
+
         lotteries[roundNumber].winner = lotteries[roundNumber].tickets[lotteries[roundNumber].winningTicket];
-        
+
         lotteries[roundNumber].winner.transfer(lotteries[roundNumber].ticketsSold * 0.0093 ether); // 0.0093 Winner gets 93% of ticket sale revenue (ticket price of 0.01 ether * 0.93 * number of tickets sold)
         charity.transfer(lotteries[roundNumber].ticketsSold * 0.0005 ether); // Heifer International gets 5%
         tokenContract.transfer(lotteries[roundNumber].ticketsSold * 0.0001 ether); // E93 token holders get 1% - see eth93.com/crowdsale
         owner.transfer(lotteries[roundNumber].ticketsSold * 0.0001 ether); // eth93.com gets 1%
-            
+
         }
-        
+
         roundNumber++;
-        
+
         runInOneDay();
-            
+
         }
-        
+
     }
-    
+
     // gas for Oraclize. 400000 seems to be just enough, make it 500000 to be safe (can be changed later if necessary).
     uint256 gas = 500000;
-    
+
     bool public waiting;
-    
+
     bool public stopped;
-    
+
     function runInOneDay() payable onlyOwner {
-        
+
         // This waits for one day (86400 seconds) and then executes the __callback function, which will then execute the update() function (since the waiting variable will be set to true). Then a random number is generated, a winner is determined and the next round starts.
-        
+
         waiting = true;
         oraclize_query(86400, "", "", gas);
     }
-  
+
     function updateGas(uint256 _gas) onlyOwner {
         gas = _gas;
     }
-    
+
     function stopGo() onlyOwner {
-        
+
         // Just in case the lottery needs to be paused for some reason. The contract can still sell tickets in this case, but a winner won't be declared until stopGo() and update() are called again.
-        
+
         if (stopped == false) {
             stopped = true;
         } else {
             stopped = false;
         }
     }
-    
+
     function update() payable onlyOwner {
-        
-        // This queries random.org to generate a random number between 0 and the number of tickets sold for the round - 1, which is used to determine the winner. Our API key for random.org is encrypted and can only be read by the Oraclize engine. 
-        
+
+        // This queries random.org to generate a random number between 0 and the number of tickets sold for the round - 1, which is used to determine the winner. Our API key for random.org is encrypted and can only be read by the Oraclize engine.
+
         waiting = false;
-        
+
         string memory part1 = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random.data.0', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateIntegers\",\"params\":{\"apiKey\":${[decrypt] BM6215lJMQLdkA/ELpxVpyyBbQ6HTNUzZS3Do/ILznENhTDIzKBRaQzhIDEAk0XX3gQC9dbD8N0F7loF92N6rzNY4onCX7IQAhcDB7cnQ48UM0AORq4bP9Wava5MJI6QIYxlfxmPUZ5tIV0+KfC/bmcMV3A9VYA=},\"n\":1,\"min\":0,\"max\":";
 
         string memory maxRandomNumber = uint2str(lotteries[roundNumber].ticketsSold - 1);
@@ -1206,19 +1206,30 @@ contract E93 is DSSafeAddSub, usingOraclize {
         string memory query = strConcat(part1, maxRandomNumber, part2);
 
         bytes32 rngId = oraclize_query("nested", query, gas);
-    
+
     }
-    
+
     function giveAllToCharity() onlyOwner {
-        
-        // Only call this if oraclize and random.org have some permanent problem and the round can't be completed, since no random number can be generated from oraclize or random.org. Then all the funds for the last lottery can go to Heifer International. 
-        
+
+        // Only call this if oraclize and random.org have some permanent problem and the round can't be completed, since no random number can be generated from oraclize or random.org. Then all the funds for the last lottery can go to Heifer International.
+
         charity.transfer(lotteries[roundNumber].ticketsSold * 0.01 ether);
         roundNumber++;
     }
-    
+
     function depositFunds() payable {
         // Used to top up the contract balance without doing anything else - this is necessary to pay for Oraclize calls and transfer costs.
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

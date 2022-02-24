@@ -223,7 +223,7 @@ contract ListingsERC721 is Ownable {
         uint256 dateStarts;
         uint256 dateEnds;
     }
-    
+
     event ListingCreated(bytes32 indexed listingId, address tokenContractAddress, uint256 price, uint256 allowance, uint256 dateStarts, uint256 dateEnds, address indexed seller);
     event ListingCancelled(bytes32 indexed listingId, uint256 dateCancelled);
     event ListingBought(bytes32 indexed listingId, address tokenContractAddress, uint256 price, uint256 amount, uint256 dateBought, address buyer);
@@ -300,4 +300,15 @@ contract ListingsERC721 is Ownable {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

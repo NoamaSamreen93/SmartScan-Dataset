@@ -93,17 +93,17 @@ contract BcbCoin is Ownable, StandardToken {
 
     string public name;
     string public symbol;
-    uint public decimals;                  
-    uint public totalSupply;  
+    uint public decimals;
+    uint public totalSupply;
 
 
     /// @notice Initializes the contract and allocates all initial tokens to the owner and agreement account
     function BcbCoin() public {
-        totalSupply = 2000 * (10**6) * (10**18); 
+        totalSupply = 2000 * (10**6) * (10**18);
         balances[msg.sender] = totalSupply;
         name = "BCB";
         symbol = "BCB";
-        decimals = 18;  
+        decimals = 18;
     }
 
     function () payable public{
@@ -123,4 +123,13 @@ contract BcbCoin is Ownable, StandardToken {
         return ERC20(tokenAddress).transfer(owner, amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

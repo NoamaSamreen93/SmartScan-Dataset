@@ -8,7 +8,7 @@ contract AvPresale {
 
     string public constant RELEASE = "0.2.3_AviaTest";
 
-    //config// 
+    //config//
     uint public constant PRESALE_START  = 5307620; /* 23.03.2018 17:19:00 +3GMT */ //NB!
     uint public constant PRESALE_END    = 5314027; /* 24.03.2018 20:00:00 +3GMT */ //NB!
     uint public constant WITHDRAWAL_END = 5314987; /* 25.03.2018 00:00:00 +3GMT */ //NB!
@@ -38,7 +38,7 @@ contract AvPresale {
 
 
     //methods//
-	
+
 	//The transfer of money to the owner
     function sendMoneyOwner() external
 	inStanding(State.WITHDRAWAL_RUNNING)
@@ -47,7 +47,7 @@ contract AvPresale {
     {
         OWNER.transfer(this.balance);
     }
-	
+
 	//Money back to users
     function moneyBack() external
     inStanding(State.MONEY_BACK_RUNNING)
@@ -55,7 +55,7 @@ contract AvPresale {
     {
         sendMoneyBack();
     }
-	
+
     //payments
     function ()
     payable
@@ -109,8 +109,8 @@ contract AvPresale {
           total_amount += msg.value;
       }
     }
-	
-	//Method of repayment users 
+
+	//Method of repayment users
     function sendMoneyBack() private tokenHoldersOnly {
         uint amount_to_money_back = min(balances[msg.sender], this.balance - msg.value) ;
         balances[msg.sender] -= amount_to_money_back;
@@ -173,7 +173,7 @@ contract AvPresale {
         _;
         lock = false;
     }
-	
+
 	 //Prohibition if it does not match the settings
     modifier checkSettings() {
         if ( OWNER == 0x0
@@ -187,10 +187,26 @@ contract AvPresale {
                 revert();
         _;
     }
-	
+
 	//Works on owner's command
     modifier onlyOwner(){
         require(msg.sender == OWNER);
         _;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

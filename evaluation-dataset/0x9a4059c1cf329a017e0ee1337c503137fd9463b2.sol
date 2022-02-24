@@ -10,7 +10,7 @@ pragma solidity ^0.4.15;
  */
 library SafeMath {
 
-    /** 
+    /**
      * @dev Safely add two numbers.
      *
      * @param x First operant.
@@ -25,7 +25,7 @@ library SafeMath {
         return z;
     }
 
-    /** 
+    /**
      * @dev Safely substract two numbers.
      *
      * @param x First operant.
@@ -40,7 +40,7 @@ library SafeMath {
         return z;
     }
 
-    /** 
+    /**
      * @dev Safely multiply two numbers.
      *
      * @param x First operant.
@@ -58,18 +58,18 @@ library SafeMath {
     /**
     * @dev Parse a floating point number from String to uint, e.g. "250.56" to "25056"
      */
-    function parse(string s) 
-    internal constant 
-    returns (uint256) 
+    function parse(string s)
+    internal constant
+    returns (uint256)
     {
     bytes memory b = bytes(s);
     uint result = 0;
     for (uint i = 0; i < b.length; i++) {
         if (b[i] >= 48 && b[i] <= 57) {
-            result = result * 10 + (uint(b[i]) - 48); 
+            result = result * 10 + (uint(b[i]) - 48);
         }
     }
-    return result; 
+    return result;
 }
 }
 
@@ -110,7 +110,7 @@ contract StandardToken is Token {
     }
 
     /**
-     * @dev Transfers _value amount of tokens to address _to, and MUST fire the Transfer event. 
+     * @dev Transfers _value amount of tokens to address _to, and MUST fire the Transfer event.
      * @dev The function SHOULD throw if the _from account balance does not have enough tokens to spend.
      *
      * @dev A token contract which creates new tokens SHOULD trigger a Transfer event with the _from address set to 0x0 when tokens are created.
@@ -137,9 +137,9 @@ contract StandardToken is Token {
     /**
      * @dev Transfers _value amount of tokens from address _from to address _to, and MUST fire the Transfer event.
      *
-     * @dev The transferFrom method is used for a withdraw workflow, allowing contracts to transfer tokens on your behalf. 
-     * @dev This can be used for example to allow a contract to transfer tokens on your behalf and/or to charge fees in 
-     * @dev sub-currencies. The function SHOULD throw unless the _from account has deliberately authorized the sender of 
+     * @dev The transferFrom method is used for a withdraw workflow, allowing contracts to transfer tokens on your behalf.
+     * @dev This can be used for example to allow a contract to transfer tokens on your behalf and/or to charge fees in
+     * @dev sub-currencies. The function SHOULD throw unless the _from account has deliberately authorized the sender of
      * @dev the message via some mechanism.
      *
      * Note Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
@@ -176,12 +176,12 @@ contract StandardToken is Token {
     }
 
     /**
-     * @dev Allows _spender to withdraw from your account multiple times, up to the _value amount. 
+     * @dev Allows _spender to withdraw from your account multiple times, up to the _value amount.
      * @dev If this function is called again it overwrites the current allowance with _value.
      *
-     * @dev NOTE: To prevent attack vectors like the one described in [1] and discussed in [2], clients 
-     * @dev SHOULD make sure to create user interfaces in such a way that they set the allowance first 
-     * @dev to 0 before setting it to another value for the same spender. THOUGH The contract itself 
+     * @dev NOTE: To prevent attack vectors like the one described in [1] and discussed in [2], clients
+     * @dev SHOULD make sure to create user interfaces in such a way that they set the allowance first
+     * @dev to 0 before setting it to another value for the same spender. THOUGH The contract itself
      * @dev shouldn't enforce it, to allow backwards compatilibilty with contracts deployed before.
      * @dev [1] https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/
      * @dev [2] https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
@@ -264,7 +264,7 @@ contract LCDToken is StandardToken {
     modifier onlyOwner() {
         // check if transaction sender is admin.
         require (msg.sender == admin1 || msg.sender == admin2);
-        // if yes, store his msg.data. 
+        // if yes, store his msg.data.
         multiSigHashes[msg.sender] = keccak256(msg.data);
         // check if his stored msg.data hash equals to the one of the other admin
         if ((multiSigHashes[admin1]) == (multiSigHashes[admin2])) {
@@ -329,7 +329,7 @@ contract LCDToken is StandardToken {
         balances[_appStore] = TOKEN_MINTING;
         trackHolder(_appStore);
 
-        // Init business development balance to admin1 
+        // Init business development balance to admin1
         balances[_admin1] = TOKEN_BUSINESS;
         trackHolder(_business_development);
 
@@ -422,4 +422,13 @@ contract LCDToken is StandardToken {
     {
         Auth(_authString, msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

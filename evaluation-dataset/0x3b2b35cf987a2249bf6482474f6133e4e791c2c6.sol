@@ -103,16 +103,16 @@ contract BasicToken is ERC20Basic {
 contract ERD is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    string public constant name = "ERD";
    string public constant symbol = "ERD";
-   uint256 public constant decimals = 18;  
+   uint256 public constant decimals = 18;
    address public ethStore = 0xDcbFE8d41D4559b3EAD3179fa7Bb3ad77EaDa564;
    uint256 public REMAINING_SUPPLY = 100000000000  * (10 ** uint256(decimals));
    event Debug(string message, address addr, uint256 number);
    event Message(string message);
     string buyMessage;
-  
+
   address wallet;
    /**
    * @dev Contructor that gives msg.sender all of existing tokens.
@@ -123,15 +123,15 @@ contract ERD is BasicToken,Ownable {
         wallet = _wallet;
         tokenBalances[wallet] = totalSupply;   //Since we divided the token into 10^18 parts
     }
-    
+
      function mint(address from, address to, uint256 tokenAmount) public onlyOwner {
       require(tokenBalances[from] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[to] = tokenBalances[to].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[from] = tokenBalances[from].sub(tokenAmount);                        // subtracts amount from seller's balance
       REMAINING_SUPPLY = tokenBalances[wallet];
-      Transfer(from, to, tokenAmount); 
+      Transfer(from, to, tokenAmount);
     }
-    
+
     function getTokenBalance(address user) public view returns (uint256 balance) {
         balance = tokenBalances[user]; // show token balance in full tokens not part
         return balance;
@@ -150,7 +150,7 @@ contract ERDTokenTransaction {
         string currency;
         string accountingPeriod;
     }
-    
+
     struct AccountChart {
         //uint entityId;
         address entityId;
@@ -159,22 +159,22 @@ contract ERDTokenTransaction {
         uint sales;
         uint isEntityInitialized;
     }
-    
+
     address[] entities;
     uint[] allTransactionIdsList;
-    
+
     uint[] allTransactionIdsAgainstAnEntityList;
     mapping(address=>uint[])  entityTransactionsIds;
     mapping(address=>Transaction[])  entityTransactions;
     mapping(address=>AccountChart)  entityAccountChart;
     mapping(address=>bool) freezedTokens;
     address wallet;
-    ERD public token;   
+    ERD public token;
     uint256 transactionIdSequence = 0;
     // how many token units a buyer gets per wei
     uint256 public ratePerWei = 100;
     uint256 public perTransactionRate = 1 * 10 ** 14;   //0.0001 tokens
-    
+
     /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -191,36 +191,36 @@ contract ERDTokenTransaction {
 
     Transaction transObj;
     AccountChart AccountChartObj;
-    
+
     function ERDTokenTransaction(address _wallet) public {
         wallet = _wallet;
         token = createTokenContract(wallet);
-        
-        //add owner entity 
+
+        //add owner entity
          entities.push(0);
-        //initialize account chart 
+        //initialize account chart
         AccountChartObj = AccountChart({
             entityId : wallet,
             accountsPayable: 0,
             accountsReceivable: 0,
             sales:0,
-            isEntityInitialized:1 
+            isEntityInitialized:1
         });
         entityAccountChart[wallet] = AccountChartObj;
     }
-    
+
     function createTokenContract(address wall) internal returns (ERD) {
     return new ERD(wall);
    }
-    
+
     // fallback function can be used to buy tokens
     function () public payable {
      buyTokens(msg.sender);
     }
-    
+
     // low level token purchase function
    // Minimum purchase can be of 1 ETH
-  
+
    function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
 
@@ -228,8 +228,8 @@ contract ERDTokenTransaction {
 
     // calculate token amount to be given
     uint256 tokens = weiAmount.mul(ratePerWei);
-   
-    token.mint(wallet, beneficiary, tokens); 
+
+    token.mint(wallet, beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     forwardFunds();
   }
@@ -239,7 +239,7 @@ contract ERDTokenTransaction {
     wallet.transfer(msg.value);
   }
     //Add transaction against entity
-    function AddTransactionAgainstExistingEntity(address entId,uint transType,uint amt,string curr, string accPr) public 
+    function AddTransactionAgainstExistingEntity(address entId,uint transType,uint amt,string curr, string accPr) public
     {
         require (entityAccountChart[entId].isEntityInitialized == 1);
         transactionIdSequence = transactionIdSequence + 1;
@@ -253,14 +253,14 @@ contract ERDTokenTransaction {
             currency : curr,
             accountingPeriod : accPr
           });
-          
+
           entityTransactions[entId].push(transObj);
           allTransactionIdsList.push(transactionIdSequence);
           entityTransactionsIds[entId].push(transactionIdSequence);
           MakeTokenCreditAndDebitEntry(msg.sender);
     }
     function MakeTokenCreditAndDebitEntry(address entId) internal {
-    
+
           transactionIdSequence = transactionIdSequence + 1;
          //debit entry
          transObj = Transaction({
@@ -276,8 +276,8 @@ contract ERDTokenTransaction {
           entityTransactions[entId].push(transObj);
           allTransactionIdsList.push(transactionIdSequence);
           entityTransactionsIds[entId].push(transactionIdSequence);
-          
-          
+
+
           transactionIdSequence = transactionIdSequence + 1;
          //credit entry
          transObj = Transaction({
@@ -290,7 +290,7 @@ contract ERDTokenTransaction {
             currency : "ERD",
             accountingPeriod : ""
           });
-          
+
           entityTransactions[entId].push(transObj);
           allTransactionIdsList.push(transactionIdSequence);
           entityTransactionsIds[entId].push(transactionIdSequence);
@@ -303,8 +303,8 @@ contract ERDTokenTransaction {
         require (entityAccountChart[entId].isEntityInitialized == 1);
         token.mint(msg.sender, wallet, perTransactionRate);
         require(freezedTokens[entId] == false);
-    
-       
+
+
         AccountChartObj = AccountChart({
             entityId : entId,
             accountsPayable: accPayable,
@@ -312,9 +312,9 @@ contract ERDTokenTransaction {
             sales:sale,
             isEntityInitialized:1
         });
-        
+
         entityAccountChart[entId] = AccountChartObj;
-        
+
          MakeTokenCreditAndDebitEntry(msg.sender);
     }
     function addEntity(address entId) public
@@ -323,21 +323,21 @@ contract ERDTokenTransaction {
         require(freezedTokens[entId] == false);
         require (entityAccountChart[entId].isEntityInitialized == 0);
         token.mint(msg.sender, wallet, perTransactionRate);
-       
+
         entities.push(entId);
-        //initialize account chart 
+        //initialize account chart
         AccountChartObj = AccountChart({
             entityId : entId,
             accountsPayable: 0,
             accountsReceivable: 0,
             sales:0,
-            isEntityInitialized:1 
+            isEntityInitialized:1
         });
         entityAccountChart[entId] = AccountChartObj;
         MakeTokenCreditAndDebitEntry(msg.sender);
     }
-    
-    function getAllEntityIds() public returns (address[] entityList) 
+
+    function getAllEntityIds() public returns (address[] entityList)
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
         token.mint(msg.sender, wallet, perTransactionRate);
@@ -346,7 +346,7 @@ contract ERDTokenTransaction {
         EmitEntityIds(entities);
         return entities;
     }
-    
+
     function getAllTransactionIdsByEntityId(address entId) public returns (uint[] transactionIds)
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
@@ -356,7 +356,7 @@ contract ERDTokenTransaction {
         EmitTransactionIds(entityTransactionsIds[entId]);
         return entityTransactionsIds[entId];
     }
-    
+
     function getAllTransactionIds() public returns (uint[] transactionIds)
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
@@ -366,8 +366,8 @@ contract ERDTokenTransaction {
         EmitTransactionIds(allTransactionIdsList);
         return allTransactionIdsList;
     }
-    
-    function getTransactionByTransactionId(uint transId) public 
+
+    function getTransactionByTransactionId(uint transId) public
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
         require(freezedTokens[msg.sender] == false);
@@ -388,13 +388,13 @@ contract ERDTokenTransaction {
                             transactionsListByEntityId[j].transactionDate,transactionsListByEntityId[j].currency,
                             transactionsListByEntityId[j].accountingPeriod);
                 }
-               
+
             }
         }
         EmitTransactionDetails (0,0,0,0,"NA","NA","NA");
     }
-    
-    function getTransactionByTransactionAndEntityId(address entId, uint transId) public 
+
+    function getTransactionByTransactionAndEntityId(address entId, uint transId) public
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
         require(freezedTokens[msg.sender] == false);
@@ -416,7 +416,7 @@ contract ERDTokenTransaction {
         }
         EmitTransactionDetails (0,0,0,0,"NA","NA","NA");
     }
-    
+
     function getAccountChartDetailsByEntityId(address entId) public
     {
         require(token.getTokenBalance(msg.sender)>=perTransactionRate);
@@ -430,14 +430,25 @@ contract ERDTokenTransaction {
         tokenBalance = token.getTokenBalance(msg.sender);
         return tokenBalance;
     }
-    
+
      function freezeTokensOfOneUser(address entityId) public {
         require(msg.sender == wallet);
         freezedTokens[entityId] = true;
     }
-    
+
     function UnfreezeTokensOfOneUser(address entityId) public {
         require(msg.sender == wallet);
         freezedTokens[entityId] = false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

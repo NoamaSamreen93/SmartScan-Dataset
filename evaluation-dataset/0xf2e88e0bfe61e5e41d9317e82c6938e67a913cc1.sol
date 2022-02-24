@@ -3,7 +3,7 @@ pragma solidity ^0.5.7;
 https://WhoWillRuleWesteros.flybet.online/
 */
 contract WhoWillRuleWesterosAtTheEnd {
-    
+
     uint8 public constant Withdraw = 0;
     uint8 public constant firstHero = 1;
     uint8 public constant lastHero = 49;
@@ -74,9 +74,9 @@ The Children Of The Forest = 49;
     bool public onPause = false;
     address payable Martin;
     address payable George;
-    
+
     event Bet(address indexed _who, uint8 _hero, uint256 amount);
-    
+
     modifier onlySiths {
         require(sith[msg.sender] == true);
         _;
@@ -98,7 +98,7 @@ The Children Of The Forest = 49;
             likeDAPP--;
         }
     }
-    
+
     function getLikes() external view returns (uint256) {
         return likeDAPP;
     }
@@ -129,7 +129,7 @@ The Children Of The Forest = 49;
                 }
             }
             if (retValue > 0) {
-                _winer.transfer(retValue); 
+                _winer.transfer(retValue);
             }
             return;
         } else {
@@ -157,7 +157,7 @@ The Children Of The Forest = 49;
         }
         return output;
     }
-    
+
     function endBetPeriod() external onlySiths {
         endBetting = true;
     }
@@ -221,4 +221,13 @@ The Children Of The Forest = 49;
         sith[_sith] = false;
         sithCount--;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

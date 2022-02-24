@@ -101,3 +101,9 @@ function add(uint256 a, uint256 b) internal pure returns (uint256) {
     return c;
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

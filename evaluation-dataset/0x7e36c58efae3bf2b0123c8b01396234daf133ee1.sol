@@ -9,7 +9,7 @@ contract BalanceHolder {
         uint256 amount
     );
 
-    function withdraw() 
+    function withdraw()
     public {
         uint256 bal = balanceOf[msg.sender];
         balanceOf[msg.sender] = 0;
@@ -23,7 +23,7 @@ contract IBalanceHolder {
 
     mapping(address => uint256) public balanceOf;
 
-    function withdraw() 
+    function withdraw()
     public {
     }
 
@@ -44,7 +44,7 @@ contract IRealitio is IBalanceHolder {
         uint256 bond;
     }
 
-    // Stored in a mapping indexed by commitment_id, a hash of commitment hash, question, bond. 
+    // Stored in a mapping indexed by commitment_id, a hash of commitment hash, question, bond.
     struct Commitment {
         uint32 reveal_ts;
         bool is_revealed;
@@ -65,12 +65,12 @@ contract IRealitio is IBalanceHolder {
     mapping(bytes32 => Question) public questions;
     mapping(bytes32 => Claim) public question_claims;
     mapping(bytes32 => Commitment) public commitments;
-    mapping(address => uint256) public arbitrator_question_fees; 
+    mapping(address => uint256) public arbitrator_question_fees;
 
-    /// @notice Function for arbitrator to set an optional per-question fee. 
+    /// @notice Function for arbitrator to set an optional per-question fee.
     /// @dev The per-question fee, charged when a question is asked, is intended as an anti-spam measure.
     /// @param fee The fee to be charged by the arbitrator when a question is asked
-    function setQuestionFee(uint256 fee) 
+    function setQuestionFee(uint256 fee)
     external {
     }
 
@@ -79,7 +79,7 @@ contract IRealitio is IBalanceHolder {
     /// @dev Template data is only stored in the event logs, but its block number is kept in contract storage.
     /// @param content The template content
     /// @return The ID of the newly-created template, which is created sequentially.
-    function createTemplate(string content) 
+    function createTemplate(string content)
     public returns (uint256) {
     }
 
@@ -93,9 +93,9 @@ contract IRealitio is IBalanceHolder {
     /// @param nonce A user-specified nonce used in the question ID. Change it to repeat a question.
     /// @return The ID of the newly-created template, which is created sequentially.
     function createTemplateAndAskQuestion(
-        string content, 
-        string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce 
-    ) 
+        string content,
+        string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce
+    )
         // stateNotCreated is enforced by the internal _askQuestion
     public payable returns (bytes32) {
     }
@@ -109,7 +109,7 @@ contract IRealitio is IBalanceHolder {
     /// @param opening_ts If set, the earliest time it should be possible to answer the question.
     /// @param nonce A user-specified nonce used in the question ID. Change it to repeat a question.
     /// @return The ID of the newly-created question, created deterministically.
-    function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) 
+    function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce)
         // stateNotCreated is enforced by the internal _askQuestion
     public payable returns (bytes32) {
     }
@@ -117,7 +117,7 @@ contract IRealitio is IBalanceHolder {
     /// @notice Add funds to the bounty for a question
     /// @dev Add bounty funds after the initial question creation. Can be done any time until the question is finalized.
     /// @param question_id The ID of the question you wish to fund
-    function fundAnswerBounty(bytes32 question_id) 
+    function fundAnswerBounty(bytes32 question_id)
     external payable {
     }
 
@@ -127,7 +127,7 @@ contract IRealitio is IBalanceHolder {
     /// @param question_id The ID of the question
     /// @param answer The answer, encoded into bytes32
     /// @param max_previous If specified, reverts if a bond higher than this was submitted after you sent your transaction.
-    function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous) 
+    function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)
     external payable {
     }
 
@@ -140,21 +140,21 @@ contract IRealitio is IBalanceHolder {
     /// @param max_previous If specified, reverts if a bond higher than this was submitted after you sent your transaction.
     /// @param _answerer If specified, the address to be given as the question answerer. Defaults to the sender.
     /// @dev Specifying the answerer is useful if you want to delegate the commit-and-reveal to a third-party.
-    function submitAnswerCommitment(bytes32 question_id, bytes32 answer_hash, uint256 max_previous, address _answerer) 
+    function submitAnswerCommitment(bytes32 question_id, bytes32 answer_hash, uint256 max_previous, address _answerer)
     external payable {
     }
 
     /// @notice Submit the answer whose hash you sent in a previous submitAnswerCommitment() transaction
     /// @dev Checks the parameters supplied recreate an existing commitment, and stores the revealed answer
     /// Updates the current answer unless someone has since supplied a new answer with a higher bond
-    /// msg.sender is intentionally not restricted to the user who originally sent the commitment; 
+    /// msg.sender is intentionally not restricted to the user who originally sent the commitment;
     /// For example, the user may want to provide the answer+nonce to a third-party service and let them send the tx
     /// NB If we are pending arbitration, it will be up to the arbitrator to wait and see any outstanding reveal is sent
     /// @param question_id The ID of the question
     /// @param answer The answer, encoded as bytes32
     /// @param nonce The nonce that, combined with the answer, recreates the answer_hash you gave in submitAnswerCommitment()
     /// @param bond The bond that you paid in your submitAnswerCommitment() transaction
-    function submitAnswerReveal(bytes32 question_id, bytes32 answer, uint256 nonce, uint256 bond) 
+    function submitAnswerReveal(bytes32 question_id, bytes32 answer, uint256 nonce, uint256 bond)
     external {
     }
 
@@ -163,7 +163,7 @@ contract IRealitio is IBalanceHolder {
     /// @param question_id The ID of the question
     /// @param requester The account that requested arbitration
     /// @param max_previous If specified, reverts if a bond higher than this was submitted after you sent your transaction.
-    function notifyOfArbitrationRequest(bytes32 question_id, address requester, uint256 max_previous) 
+    function notifyOfArbitrationRequest(bytes32 question_id, address requester, uint256 max_previous)
     external {
     }
 
@@ -175,28 +175,28 @@ contract IRealitio is IBalanceHolder {
     /// @param question_id The ID of the question
     /// @param answer The answer, encoded into bytes32
     /// @param answerer The account credited with this answer for the purpose of bond claims
-    function submitAnswerByArbitrator(bytes32 question_id, bytes32 answer, address answerer) 
+    function submitAnswerByArbitrator(bytes32 question_id, bytes32 answer, address answerer)
     external {
     }
 
     /// @notice Report whether the answer to the specified question is finalized
     /// @param question_id The ID of the question
     /// @return Return true if finalized
-    function isFinalized(bytes32 question_id) 
+    function isFinalized(bytes32 question_id)
     view public returns (bool) {
     }
 
     /// @notice (Deprecated) Return the final answer to the specified question, or revert if there isn't one
     /// @param question_id The ID of the question
     /// @return The answer formatted as a bytes32
-    function getFinalAnswer(bytes32 question_id) 
+    function getFinalAnswer(bytes32 question_id)
     external view returns (bytes32) {
     }
 
     /// @notice Return the final answer to the specified question, or revert if there isn't one
     /// @param question_id The ID of the question
     /// @return The answer formatted as a bytes32
-    function resultFor(bytes32 question_id) 
+    function resultFor(bytes32 question_id)
     external view returns (bytes32) {
     }
 
@@ -210,9 +210,9 @@ contract IRealitio is IBalanceHolder {
     /// @param min_bond The bond sent with the final answer must be this high or higher
     /// @return The answer formatted as a bytes32
     function getFinalAnswerIfMatches(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32 content_hash, address arbitrator, uint32 min_timeout, uint256 min_bond
-    ) 
+    )
     external view returns (bytes32) {
     }
 
@@ -231,9 +231,9 @@ contract IRealitio is IBalanceHolder {
     /// @param bonds Last-to-first, the bond supplied with each answer or commitment
     /// @param answers Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
     function claimWinnings(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32[] history_hashes, address[] addrs, uint256[] bonds, bytes32[] answers
-    ) 
+    )
     public {
     }
 
@@ -245,73 +245,73 @@ contract IRealitio is IBalanceHolder {
     /// @param hist_hashes In a single list for all supplied questions, the hash of each history entry.
     /// @param addrs In a single list for all supplied questions, the address of each answerer or commitment sender
     /// @param bonds In a single list for all supplied questions, the bond supplied with each answer or commitment
-    /// @param answers In a single list for all supplied questions, each answer supplied, or commitment ID 
+    /// @param answers In a single list for all supplied questions, each answer supplied, or commitment ID
     function claimMultipleAndWithdrawBalance(
-        bytes32[] question_ids, uint256[] lengths, 
+        bytes32[] question_ids, uint256[] lengths,
         bytes32[] hist_hashes, address[] addrs, uint256[] bonds, bytes32[] answers
-    ) 
+    )
     public {
     }
 
     /// @notice Returns the questions's content hash, identifying the question content
-    /// @param question_id The ID of the question 
-    function getContentHash(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getContentHash(bytes32 question_id)
     public view returns(bytes32) {
     }
 
     /// @notice Returns the arbitrator address for the question
-    /// @param question_id The ID of the question 
-    function getArbitrator(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getArbitrator(bytes32 question_id)
     public view returns(address) {
     }
 
     /// @notice Returns the timestamp when the question can first be answered
-    /// @param question_id The ID of the question 
-    function getOpeningTS(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getOpeningTS(bytes32 question_id)
     public view returns(uint32) {
     }
 
     /// @notice Returns the timeout in seconds used after each answer
-    /// @param question_id The ID of the question 
-    function getTimeout(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getTimeout(bytes32 question_id)
     public view returns(uint32) {
     }
 
     /// @notice Returns the timestamp at which the question will be/was finalized
-    /// @param question_id The ID of the question 
-    function getFinalizeTS(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getFinalizeTS(bytes32 question_id)
     public view returns(uint32) {
     }
 
     /// @notice Returns whether the question is pending arbitration
-    /// @param question_id The ID of the question 
-    function isPendingArbitration(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function isPendingArbitration(bytes32 question_id)
     public view returns(bool) {
     }
 
     /// @notice Returns the current total unclaimed bounty
     /// @dev Set back to zero once the bounty has been claimed
-    /// @param question_id The ID of the question 
-    function getBounty(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBounty(bytes32 question_id)
     public view returns(uint256) {
     }
 
     /// @notice Returns the current best answer
-    /// @param question_id The ID of the question 
-    function getBestAnswer(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBestAnswer(bytes32 question_id)
     public view returns(bytes32) {
     }
 
-    /// @notice Returns the history hash of the question 
-    /// @param question_id The ID of the question 
+    /// @notice Returns the history hash of the question
+    /// @param question_id The ID of the question
     /// @dev Updated on each answer, then rewound as each is claimed
-    function getHistoryHash(bytes32 question_id) 
+    function getHistoryHash(bytes32 question_id)
     public view returns(bytes32) {
     }
 
     /// @notice Returns the highest bond posted so far for a question
-    /// @param question_id The ID of the question 
-    function getBond(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBond(bytes32 question_id)
     public view returns(uint256) {
     }
 
@@ -1042,8 +1042,8 @@ contract IMarket {
 
 contract IUniverse {
     function getWinningChildUniverse() public view returns (IUniverse);
-    function createYesNoMarket(uint256 _endTime, uint256 _feePerEthInWei, ICash _denominationToken, address _designatedReporterAddress, bytes32 _topic, string _description, string _extraInfo) public 
-    payable returns (IMarket _newMarket); 
+    function createYesNoMarket(uint256 _endTime, uint256 _feePerEthInWei, ICash _denominationToken, address _designatedReporterAddress, bytes32 _topic, string _description, string _extraInfo) public
+    payable returns (IMarket _newMarket);
 }
 
 contract RealitioAugurArbitrator is BalanceHolder {
@@ -1080,23 +1080,23 @@ contract RealitioAugurArbitrator is BalanceHolder {
 
     mapping(bytes32 => RealitioQuestion) public realitio_questions;
 
-    modifier onlyInitialized() { 
+    modifier onlyInitialized() {
         require(dispute_fee > 0, "The contract cannot be used until a dispute fee has been set");
         _;
     }
 
-    modifier onlyUninitialized() { 
+    modifier onlyUninitialized() {
         require(dispute_fee == 0, "The contract can only be initialized once");
         _;
     }
 
     /// @notice Initialize a new contract
     /// @param _realitio The address of the realitio contract you arbitrate for
-    /// @param _template_id The ID of the realitio template we support. 
+    /// @param _template_id The ID of the realitio template we support.
     /// @param _dispute_fee The fee this contract will charge for resolution
     /// @param _genesis_universe The earliest supported Augur universe
     /// @param _market_token The token used by the market we create, typically Augur's wrapped ETH
-    function initialize(IRealitio _realitio, uint256 _template_id, uint256 _dispute_fee, IUniverse _genesis_universe, ICash _market_token) 
+    function initialize(IRealitio _realitio, uint256 _template_id, uint256 _dispute_fee, IUniverse _genesis_universe, ICash _market_token)
         onlyUninitialized
     external {
 
@@ -1116,7 +1116,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @notice Register a new child universe after a fork
     /// @dev Anyone can create Augur universes but the "correct" ones should be in a single line from the official genesis universe
     /// @dev If a universe goes into a forking state, someone will need to call this before you can create new markets.
-    function addForkedUniverse() 
+    function addForkedUniverse()
         onlyInitialized
     external {
         IUniverse child_universe = IUniverse(latest_universe).getWinningChildUniverse();
@@ -1129,12 +1129,12 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @dev The first item in the (supported) template must be the title.
     /// @dev Subsequent items (category, lang) aren't needed in Augur.
     /// @dev This does not support more complex templates, eg selects which also need a list of answrs.
-    function _trimQuestion(string q) 
+    function _trimQuestion(string q)
     internal pure returns (string) {
         return q.toSlice().split(REALITIO_DELIMITER.toSlice()).toString();
     }
 
-    function _callAugurMarketCreate(bytes32 question_id, string question, address designated_reporter) 
+    function _callAugurMarketCreate(bytes32 question_id, string question, address designated_reporter)
     internal {
         realitio_questions[question_id].augur_market = latest_universe.createYesNoMarket.value(msg.value)( now, 0, market_token, designated_reporter, 0x0, _trimQuestion(question), "");
         realitio_questions[question_id].owner = msg.sender;
@@ -1152,7 +1152,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
     function createMarket(
         string question, uint32 timeout, uint32 opening_ts, address asker, uint256 nonce,
         address designated_reporter
-    ) 
+    )
         onlyInitialized
     external payable {
         // Reconstruct the question ID from the content
@@ -1169,18 +1169,18 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @dev Filters the question struct from Realitio to stuff we need
     /// @dev Broken out into its own function to avoid stack depth limitations
     /// @param question_id The realitio question
-    /// @param last_history_hash The history hash when you gave your answer 
-    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment 
+    /// @param last_history_hash The history hash when you gave your answer
+    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment
     /// @param last_bond The bond paid in the last answer given
     /// @param last_answerer The account that submitted the last answer (or its commitment)
     /// @param is_commitment Whether the last answer was submitted with commit->reveal
     function _verifyInput(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32 last_history_hash, bytes32 last_answer_or_commitment_id, uint256 last_bond, address last_answerer, bool is_commitment
     ) internal view returns (bool, bytes32) {
         require(realitio.isPendingArbitration(question_id), "The question must be pending arbitration in realitio");
         bytes32 history_hash = realitio.getHistoryHash(question_id);
-        
+
         require(history_hash == keccak256(last_history_hash, last_answer_or_commitment_id, last_bond, last_answerer, is_commitment), "The history parameters supplied must match the history hash in the realitio contract");
 
     }
@@ -1190,16 +1190,16 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @dev To get the final answer, we need to reconstruct the final answer using the history hash
     /// @dev TODO: This should probably be in a library offered by Realitio
     /// @param question_id The ID of the realitio question
-    /// @param last_history_hash The history hash when you gave your answer 
-    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment 
+    /// @param last_history_hash The history hash when you gave your answer
+    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment
     /// @param last_bond The bond paid in the last answer given
     /// @param last_answerer The account that submitted the last answer (or its commitment)
     /// @param is_commitment Whether the last answer was submitted with commit->reveal
     function _answerData(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32 last_history_hash, bytes32 last_answer_or_commitment_id, uint256 last_bond, address last_answerer, bool is_commitment
     ) internal view returns (bool, bytes32) {
-    
+
         bool is_pending_arbitration;
         bytes32 history_hash;
 
@@ -1238,7 +1238,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @param market The Augur market
     function realitioAnswerFromAugurMarket(
        IMarket market
-    ) 
+    )
         onlyInitialized
     public view returns (bytes32) {
         bytes32 answer;
@@ -1263,18 +1263,18 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @notice Report the answer from a finalized Augur market to a Realitio contract with a question awaiting arbitration
     /// @dev Pays the arbitration bounty to whoever created the Augur market. Probably the same person will call this function, but they don't have to.
     /// @dev We need to know who gave the final answer and what it was, as they need to be supplied as the arbitration winner if the last answer is right
-    /// @dev These just need to be fetched from Realitio, but they can't be fetched directly because to save gas, Realitio doesn't store them 
+    /// @dev These just need to be fetched from Realitio, but they can't be fetched directly because to save gas, Realitio doesn't store them
     /// @dev To get the final answer, we need to reconstruct the final answer using the history hash
     /// @param question_id The ID of the question you're reporting on
-    /// @param last_history_hash The history hash when you gave your answer 
-    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment 
+    /// @param last_history_hash The history hash when you gave your answer
+    /// @param last_answer_or_commitment_id The last answer given, or its commitment ID if it was a commitment
     /// @param last_bond The bond paid in the last answer given
     /// @param last_answerer The account that submitted the last answer (or its commitment)
     /// @param is_commitment Whether the last answer was submitted with commit->reveal
     function reportAnswer(
         bytes32 question_id,
         bytes32 last_history_hash, bytes32 last_answer_or_commitment_id, uint256 last_bond, address last_answerer, bool is_commitment
-    ) 
+    )
         onlyInitialized
     public {
 
@@ -1288,7 +1288,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
 
         _verifyInput(question_id, last_history_hash, last_answer_or_commitment_id, last_bond, last_answerer, is_commitment);
 
-        (is_answered, last_answer) = _answerData(question_id, last_history_hash, last_answer_or_commitment_id, last_bond, last_answerer, is_commitment);  
+        (is_answered, last_answer) = _answerData(question_id, last_history_hash, last_answer_or_commitment_id, last_bond, last_answerer, is_commitment);
 
         require(market.isFinalized(), "The augur market must have been finalized");
 
@@ -1313,7 +1313,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
 
     /// @notice Return the dispute fee for the specified question. 0 indicates that we won't arbitrate it.
     /// @dev Uses a general default, but can be over-ridden on a question-by-question basis.
-    function getDisputeFee(bytes32) 
+    function getDisputeFee(bytes32)
     external view returns (uint256) {
         return dispute_fee;
     }
@@ -1324,7 +1324,7 @@ contract RealitioAugurArbitrator is BalanceHolder {
     /// @dev Will trigger an error if the notification fails, eg because the question has already been finalized
     /// @param question_id The question in question
     /// @param max_previous The highest bond level we should accept (used to check the state hasn't changed)
-    function requestArbitration(bytes32 question_id, uint256 max_previous) 
+    function requestArbitration(bytes32 question_id, uint256 max_previous)
         onlyInitialized
     external payable returns (bool) {
 
@@ -1339,4 +1339,15 @@ contract RealitioAugurArbitrator is BalanceHolder {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

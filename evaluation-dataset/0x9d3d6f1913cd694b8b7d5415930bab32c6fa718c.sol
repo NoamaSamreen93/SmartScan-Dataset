@@ -231,7 +231,7 @@ contract BurnableToken is StandardToken {
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
     }
-	
+
 
 }
 
@@ -239,10 +239,10 @@ contract NotesToken is BurnableToken, Ownable
 {
     // Map of all notes for all addresses
     mapping( address => string[] ) notes;
-    
+
     // Price per character
     uint256 public CharPrice;
-    
+
     /**
     * @dev Set new price per character (only for Owner). Return true.
     * @param newPrice The new price per character.
@@ -252,31 +252,31 @@ contract NotesToken is BurnableToken, Ownable
         CharPrice = newPrice;
         return true;
     }
-    
+
     /**
     * @dev Return notes count for sender.
     */
-    function getNotesCount() public view returns (uint256 count) 
+    function getNotesCount() public view returns (uint256 count)
     {
         return notes[msg.sender].length;
     }
-  
+
     /**
-    * @dev Add note to sender. Return true when done. 
+    * @dev Add note to sender. Return true when done.
     * @param s The note-string.
     */
-    function addNote(string s) public 
+    function addNote(string s) public
     {
         uint256 needValue = bytes(s).length * CharPrice;
         require ( needValue <= balances[msg.sender] );
-        
+
         balances[msg.sender] = balances[msg.sender].sub(needValue);
         totalSupply = totalSupply.sub(needValue);
         notes[msg.sender].push(s);
     }
-    
+
     /**
-    * @dev Return note-string by index for sender. 
+    * @dev Return note-string by index for sender.
     * @param index The index of note in note-list.
     */
     function getNoteByIndex(uint index) public constant returns (string) {
@@ -327,7 +327,7 @@ contract SecuredNotes is NotesToken, HasNoEther {
             transfer(recipients[i], amounts[i]);
         }
     }
-	
+
 	/**
 	* @dev Create `mintedAmount` tokens
     * @param mintedAmount The amount of tokens it will minted
@@ -337,4 +337,13 @@ contract SecuredNotes is NotesToken, HasNoEther {
 			balances[owner] += mintedAmount;
 			Transfer(address(0), owner, mintedAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   event Burn(address indexed burner, uint256 value);
 
   /**
@@ -304,7 +304,7 @@ contract MintableToken is StandardToken {
   event MintFinished();
 
   bool public mintingFinished = false;
-  
+
   uint256 public cap = 30000000000000000000000000; //30M token cap
 
 
@@ -344,10 +344,10 @@ contract MintableToken is StandardToken {
 
 contract EtceteraToken is MintableToken {
 
-  string public constant name = "Etcetera"; 
-  string public constant symbol = "ERA"; 
+  string public constant name = "Etcetera";
+  string public constant symbol = "ERA";
   uint8 public constant decimals = 18;
-  
+
   uint256 private constant founderTokens = 3000000000000000000000000; //3M tokens
 
     function EtceteraToken() public {
@@ -356,4 +356,15 @@ contract EtceteraToken is MintableToken {
     Transfer(0x0, msg.sender, founderTokens);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,16 +2,16 @@ pragma solidity ^0.4.24;
 
 contract Storage {
     address owner; // This address has permission to upload data
-    
+
     bytes32[] public data; // Storage container in pieces of 32 byte
     uint remainder; // Where the previous uploadData() left off
-    
+
     bool readOnly; // Set the contract to read only once upload is finished
 
     constructor() {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -64,7 +64,7 @@ contract Storage {
     // If a mistake is done during upload, reverse using erase()
     function erase(uint _entriesToDelete) onlyOwner readWrite public {
         require(_entriesToDelete != 0);
-        if(data.length < _entriesToDelete) { 
+        if(data.length < _entriesToDelete) {
             delete data;
         }
         else data.length -= _entriesToDelete;
@@ -87,4 +87,15 @@ contract Storage {
         }
         return result;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

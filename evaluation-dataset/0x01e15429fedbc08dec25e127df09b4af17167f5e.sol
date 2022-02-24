@@ -15,8 +15,8 @@ pragma solidity 0.4.24;
 * -- DEX Platform Notes --
 * 1. By default, only KYC'ed hodlers of tokens may participate on this DEX.
 *    - Issuer is free to relax this restriction subject to counsels Legal Opinion.
-* 2. The issuer has sole discretion to set a minimum bid and a maximum ask. 
-* 3. Seller shall pay a trade execution fee in ETH which is automatically deducted herein. 
+* 2. The issuer has sole discretion to set a minimum bid and a maximum ask.
+* 3. Seller shall pay a trade execution fee in ETH which is automatically deducted herein.
 *    - Issuer is free to amend the trade execution fee percentage from time to time.
 *
 */
@@ -25,7 +25,7 @@ pragma solidity 0.4.24;
 // ERC Token Standard #20 Interface
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20Basic.sol
-// 
+//
 // ----------------------------------------------------------------------------
 contract ERC20Interface {
     function totalSupply() public view returns (uint256);
@@ -63,7 +63,7 @@ contract HorizonContractBase {
 
 
 
- 
+
 
 /**
  * @title SafeMath
@@ -131,7 +131,7 @@ library SafeMath {
 
 
 library DSMath {
-    
+
     function dsAdd(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x);
     }
@@ -166,8 +166,8 @@ library DSMath {
 * -- DEX Platform Notes --
 * 1. By default, only KYC'ed hodlers of tokens may participate on this DEX.
 *    - Issuer is free to relax this restriction subject to counsels Legal Opinion.
-* 2. The issuer has sole discretion to set a minimum bid and a maximum ask. 
-* 3. Seller shall pay a trade execution fee in ETH which is automatically deducted herein. 
+* 2. The issuer has sole discretion to set a minimum bid and a maximum ask.
+* 3. Seller shall pay a trade execution fee in ETH which is automatically deducted herein.
 *    - Issuer is free to amend the trade execution fee percentage from time to time.
 *
 */
@@ -201,7 +201,7 @@ contract VOXTrader is HorizonContractBase {
 
     // The percentage taken off the cost of buying tokens in Ether.
     uint256 public etherFeePercent;
-    
+
     // The minimum Ether fee when buying tokens (if the calculated percent is less than this value);
     uint256 public etherFeeMin;
 
@@ -332,7 +332,7 @@ contract VOXTrader is HorizonContractBase {
 
     /** @notice Allow/disallow users from participating in trading.
      *
-     * @param who       The user 
+     * @param who       The user
      * @param canTrade  True to allow trading, false to disallow.
     */
     function setTradingAllowed(address who, bool canTrade) public onlyOwner {
@@ -368,7 +368,7 @@ contract VOXTrader is HorizonContractBase {
 
         TradeOrder memory order = orderBook[msg.sender];
         require(order.price != 0 || order.expiry != 0, "There is no existing order to modify.");
-        
+
         order.price = price;
         orderBook[msg.sender] = order;
 
@@ -408,7 +408,7 @@ contract VOXTrader is HorizonContractBase {
         order.expiry = expiry;
         orderBook[msg.sender] = order;
 
-        emit TokenOfferChanged(msg.sender, order.quantity, order.price, order.expiry);        
+        emit TokenOfferChanged(msg.sender, order.quantity, order.price, order.expiry);
     }
 
     /**
@@ -441,7 +441,7 @@ contract VOXTrader is HorizonContractBase {
 
         fee = ethers.wmul(etherFeePercent / 100);
         if(fee < etherFeeMin)
-            fee = etherFeeMin;            
+            fee = etherFeeMin;
 
         return fee;
     }
@@ -543,4 +543,15 @@ contract VOXTrader is HorizonContractBase {
 
         selfdestruct(recipient);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

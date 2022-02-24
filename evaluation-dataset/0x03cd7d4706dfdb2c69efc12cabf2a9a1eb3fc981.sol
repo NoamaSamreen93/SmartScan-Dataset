@@ -14,7 +14,7 @@ contract SafeMath{
     assert(a == b * c + a % b);
     return c;
   }
-	
+
 	function safeSub(uint a, uint b) internal returns (uint) {
     	assert(b <= a);
     	return a - b;
@@ -49,7 +49,7 @@ contract ERC20{
 }
 
 contract Snbtoken is ERC20, SafeMath{
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -70,7 +70,7 @@ contract Snbtoken is ERC20, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -100,7 +100,7 @@ contract Snbtoken is ERC20, SafeMath{
 
 contract SnbtokenICO is ERC20, SafeMath{
 
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -121,7 +121,7 @@ contract SnbtokenICO is ERC20, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -147,8 +147,8 @@ contract SnbtokenICO is ERC20, SafeMath{
 
 	modifier during_offering_time(){
 
-	    
-	    
+
+
 	    if(now>1513911600)
 		{
 				price 	= 2231;
@@ -173,9 +173,9 @@ contract SnbtokenICO is ERC20, SafeMath{
 		{
 		        price 	= 500;
 		}
-	    
-	    
-	    
+
+
+
 		if (now >= endTime){
 			throw;
 		}else{
@@ -220,10 +220,21 @@ contract SnbtokenICO is ERC20, SafeMath{
 		owner 	= msg.sender;
 
 		price 	= 500;
-				
+
 
 
 		endTime = 1514617200;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

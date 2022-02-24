@@ -83,7 +83,7 @@ contract StandardToken is Token {
 }
 
 contract KBToken is StandardToken, SafeMath {
-    
+
     // metadata
     string  public constant name = "2K BLOCKCHAIN";
     string  public constant symbol = "2KB";
@@ -132,7 +132,7 @@ contract KBToken is StandardToken, SafeMath {
         balances[msg.sender] = totalSupply;
         require(currentSupply <= totalSupply);
     }
-    
+
     modifier isOwner()  { require(msg.sender == ethFundDeposit); _; }
 
     ///  设置token汇率
@@ -242,4 +242,17 @@ contract KBToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

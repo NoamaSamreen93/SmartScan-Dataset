@@ -77,7 +77,7 @@ contract ERC20 is ERC20Basic {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -242,7 +242,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -405,4 +405,10 @@ contract WavestreamPresale is CappedCrowdsale, Ownable {
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal whenNotClosed {
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

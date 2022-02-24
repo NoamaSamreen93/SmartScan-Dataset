@@ -14,27 +14,27 @@ pragma solidity ^0.4.24;
 //         #############`            .############`
 //         ###########+                ############
 //        ###########;                  ###########
-//        ##########'                    ###########                                                                                      
-//       '##########    '#.        `,     ##########                                                                                    
-//       ##########    ####'      ####.   :#########;                                                                                   
-//      `#########'   :#####;    ######    ##########                                                                                 
-//      :#########    #######:  #######    :#########         
-//      +#########    :#######.########     #########`       
-//      #########;     ###############'     #########:       
-//      #########       #############+      '########'        
-//      #########        ############       :#########        
-//      #########         ##########        ,#########        
-//      #########         :########         ,#########        
-//      #########        ,##########        ,#########        
-//      #########       ,############       :########+        
-//      #########      .#############+      '########'        
-//      #########:    `###############'     #########,        
-//      +########+    ;#######`;#######     #########         
-//      ,#########    '######`  '######    :#########         
-//       #########;   .#####`    '#####    ##########         
-//       ##########    '###`      +###    :#########:         
-//       ;#########+     `                ##########          
-//        ##########,                    ###########          
+//        ##########'                    ###########
+//       '##########    '#.        `,     ##########
+//       ##########    ####'      ####.   :#########;
+//      `#########'   :#####;    ######    ##########
+//      :#########    #######:  #######    :#########
+//      +#########    :#######.########     #########`
+//      #########;     ###############'     #########:
+//      #########       #############+      '########'
+//      #########        ############       :#########
+//      #########         ##########        ,#########
+//      #########         :########         ,#########
+//      #########        ,##########        ,#########
+//      #########       ,############       :########+
+//      #########      .#############+      '########'
+//      #########:    `###############'     #########,
+//      +########+    ;#######`;#######     #########
+//      ,#########    '######`  '######    :#########
+//       #########;   .#####`    '#####    ##########
+//       ##########    '###`      +###    :#########:
+//       ;#########+     `                ##########
+//        ##########,                    ###########
 //         ###########;                ############
 //         +############             .############`
 //          ###########+           ,#############;
@@ -135,13 +135,13 @@ library SafeMath {
 
 /**
 * @title Ownable
-* @dev The Ownable contract has an owner address, and provides basic authorization control 
-* functions, this simplifies the implementation of "user permissions". 
-*/ 
+* @dev The Ownable contract has an owner address, and provides basic authorization control
+* functions, this simplifies the implementation of "user permissions".
+*/
 contract Ownable {
     address public owner;
 
-/** 
+/**
 * @dev The Ownable constructor sets the original `owner` of the contract to the sender
 * account.
 */
@@ -185,7 +185,7 @@ contract StandardToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     mapping(address => uint256) balances;
-    
+
     /**
     * @dev transfer token for a specified address
     * @param _to The address to transfer to.
@@ -196,7 +196,7 @@ contract StandardToken {
         require(_value <= balances[msg.sender]);
         require(balances[msg.sender] >= _value && balances[_to].add(_value) >= balances[_to]);
 
-    
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -206,13 +206,13 @@ contract StandardToken {
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /**
     * @dev Transfer tokens from one address to another
     * @param _from address The address which you want to send tokens from
@@ -226,13 +226,13 @@ contract StandardToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
-    }       
+    }
 
     /**
     * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -275,20 +275,20 @@ contract Token0xC is StandardToken, Ownable {
     uint256 public startDate1;
     uint256 public endDate1;
     uint256 public rate1;
-    
+
     // Sale period2.
     uint256 public startDate2;
     uint256 public endDate2;
     uint256 public rate2;
-    
-    // Sale period3. 
+
+    // Sale period3.
     uint256 public startDate3;
     uint256 public endDate3;
     uint256 public rate3;
 
     //2018 08 16
     uint256 BaseTimestamp = 1534377600;
-    
+
     //SaleCap
     uint256 public dailyCap;
     uint256 public saleCap;
@@ -354,7 +354,7 @@ contract Token0xC is StandardToken, Ownable {
         }else if (period == 3) {
             require(_start > endDate2);
             startDate3 = _start;
-            endDate3 = _end;      
+            endDate3 = _end;
         }
     }
 
@@ -387,7 +387,7 @@ contract Token0xC is StandardToken, Ownable {
     function setDailyCap(uint256 _dailyCap) public onlyOwner{
         dailyCap = _dailyCap;
     }
-    
+
     function setBuyLimit(uint256 _BuyEtherLimit) public onlyOwner{
         BuyEtherLimit = _BuyEtherLimit;
     }
@@ -431,14 +431,14 @@ contract Token0xC is StandardToken, Ownable {
         balances[tokenWallet] = balances[tokenWallet].add(balances[0xb1]);
         balances[0xb1] = 0;
     }
-    
+
     //Purge the time in the timestamp.
     function DateConverter(uint256 ts) public view returns(uint256 currentDayWithoutTime){
         uint256 dayInterval = ts.sub(BaseTimestamp);
         uint256 dayCount = dayInterval.div(86400);
         return BaseTimestamp.add(dayCount.mul(86400));
     }
-    
+
     //Check SaleActive
     function saleActive() public constant returns (bool) {
         return (
@@ -450,16 +450,16 @@ contract Token0xC is StandardToken, Ownable {
                 now < endDate3 && saleCap > 0)
                 );
     }
-    
+
     //Buy Token
     function buyTokens(address sender, uint256 value) internal {
         //Check Sale Status
         require(saleActive());
-        
+
         //Minum buying limit
         require(value >= BuyEtherLimit,"value no enough" );
         require(sender != tokenWallet);
-        
+
         if(DateConverter(now) > LastbetDay )
         {
             LastbetDay = DateConverter(now);
@@ -468,13 +468,13 @@ contract Token0xC is StandardToken, Ownable {
 
         // Calculate token amount to be purchased
         uint256 bonus = getBonusByTime();
-        
+
         uint256 amount = value.mul(bonus);
-        
+
         // We have enough token to sale
         require(LeftDailyCap >= amount, "cap not enough");
         require(balances[tokenWallet] >= amount);
-        
+
         LeftDailyCap = LeftDailyCap.sub(amount);
 
         // Transfer
@@ -482,10 +482,21 @@ contract Token0xC is StandardToken, Ownable {
         balances[sender] = balances[sender].add(amount);
         emit TokenPurchase(sender, value, amount);
         emit Transfer(tokenWallet, sender, amount);
-        
+
         saleCap = saleCap.sub(amount);
 
         // Forward the fund to fund collection wallet.
         fundWallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

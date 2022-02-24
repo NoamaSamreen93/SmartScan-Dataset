@@ -158,21 +158,21 @@ contract TokenLock {
     using SafeMath for uint256;
     address public owner;
     address public md_address;
-    
+
     struct LockRecord {
         address userAddress;
         uint256 amount;
         uint256 releaseTime;
     }
-    
+
     LockRecord[] lockRecords;
     mapping(uint256 => bool) lockStatus;
-    
+
     MD md;
 
     event Deposit(address indexed _userAddress, uint256 _amount, uint256 _releaseTime, uint256 _index);
     event Release(address indexed _userAddress, address indexed _merchantAddress, uint256 _merchantAmount, uint256 _releaseTime, uint256 _index);
-    
+
     modifier ownerOnly {
       require(
             msg.sender == owner,
@@ -180,7 +180,7 @@ contract TokenLock {
         );
         _;
     }
-    
+
     //constructor
     constructor(address _owner, address _md_address) public{
         owner = _owner;
@@ -191,7 +191,7 @@ contract TokenLock {
     function getContractBalance() public view returns (uint256 _balance) {
         return md.balanceOf(this);
     }
-    
+
     function deposit(address _userAddress, uint256 _amount, uint256 _days) public ownerOnly {
         require(_amount > 0);
         require(md.transferFrom(_userAddress, this, _amount));
@@ -200,30 +200,30 @@ contract TokenLock {
         uint256 l = lockRecords.push(r);
         emit Deposit(_userAddress, _amount, releaseTime, l.sub(1));
     }
-    
+
     function release(uint256 _index, address _merchantAddress, uint256 _merchantAmount) public ownerOnly {
         require(
             lockStatus[_index] == false,
             "Already released."
         );
-        
+
         LockRecord storage r = lockRecords[_index];
-        
+
         require(
             r.releaseTime <= block.timestamp,
             "Release time not reached"
         );
-        
+
         require(
             _merchantAmount <= r.amount,
             "Merchant amount larger than locked amount."
         );
 
-        
+
         if (_merchantAmount > 0) {
             require(md.transfer(_merchantAddress, _merchantAmount));
         }
-        
+
         uint256 remainingAmount = r.amount.sub(_merchantAmount);
         if (remainingAmount > 0){
             require(md.transfer(r.userAddress, remainingAmount));
@@ -232,7 +232,7 @@ contract TokenLock {
         lockStatus[_index] = true;
         emit Release(r.userAddress, _merchantAddress, _merchantAmount, r.releaseTime, _index);
     }
-    
+
     /**
      * Change owner address (where ICO ETH is being forwarded).
      */
@@ -240,7 +240,7 @@ contract TokenLock {
         owner = _newowner;
         return true;
     }
-    
+
     // forward all eth to owner
     function() payable public {
         if (!owner.call.value(msg.value)()) revert();
@@ -252,4 +252,15 @@ contract TokenLock {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

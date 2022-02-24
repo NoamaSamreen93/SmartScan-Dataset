@@ -683,7 +683,7 @@ contract PayUSD is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, ERC20Paus
     function transfer(address to, uint256 value) public returns (bool) {
         bool result = super.transfer(to, value);
         payStakingFee(to, value, transferFee);
-        return result;   
+        return result;
     }
 
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
@@ -697,20 +697,20 @@ contract PayUSD is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, ERC20Paus
         uint256 stakingFee = _value.mul(_fees).div(feeDenominator);
         if(stakingFee > 0) {
             _transfer(_payer, staker, stakingFee);
-        } 
+        }
         return stakingFee;
     }
 
-    function changeStakingFees(uint256 _transferFee, uint256 _mintFee, uint256 _burnFee, uint256 _feeDenominator) public onlyMinter {        
+    function changeStakingFees(uint256 _transferFee, uint256 _mintFee, uint256 _burnFee, uint256 _feeDenominator) public onlyMinter {
         require(_transferFee < _feeDenominator, "_feeDenominator must be greater than _transferFee");
         require(_mintFee < _feeDenominator, "_feeDenominator must be greater than _mintFee");
         require(_burnFee < _feeDenominator, "_feeDenominator must be greater than _burnFee");
 
-        transferFee = _transferFee; 
-        mintFee = _mintFee; 
+        transferFee = _transferFee;
+        mintFee = _mintFee;
         burnFee = _burnFee;
         feeDenominator = _feeDenominator;
-        
+
         emit ChangeStakingFees(
             transferFee,
             mintFee,
@@ -736,4 +736,15 @@ contract PayUSD is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable, ERC20Paus
         burnAddress = _add;
         emit ChangeBurnAddress(_add);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

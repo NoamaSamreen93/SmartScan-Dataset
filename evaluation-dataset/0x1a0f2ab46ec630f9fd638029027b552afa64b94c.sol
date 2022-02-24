@@ -630,7 +630,7 @@ contract ATX is MiniMeToken {
         require(generateFinished == false);
         return super.generateTokens(_owner, _amount);
     }
-    
+
     function swapTokens(address[] _owners, uint[] _amounts) public onlyController returns (uint) {
         require(generateFinished == false);
         require(_owners.length == _amounts.length);
@@ -658,7 +658,7 @@ contract ATX is MiniMeToken {
         }
         return resetcnt;
     }
-    
+
     function doTransfer(address _from, address _to, uint _amount) internal returns(bool) {
         require(blacklisted[_from] == false);
         return super.doTransfer(_from, _to, _amount);
@@ -680,4 +680,15 @@ contract ATX is MiniMeToken {
         selfdestruct(to);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -65,7 +65,7 @@ contract Ownable {
 	}
 
 	function transferOwnership (address newOwner) public returns (bool);
-	
+
 	function setFountainFoundationOwner (address foundation) public returns (bool);
 }
 
@@ -163,7 +163,7 @@ contract CappedToken is Ownable {
 	function canMint (uint256 amount) public view returns (bool) {
 		return (token_cap == 0) || (token_created.add(amount) <= token_cap);
 	}
-	
+
 	function canMintFoundation(uint256 amount) internal view returns(bool) {
 		return(token_foundation_created.add(amount) <= token_foundation_cap);
 	}
@@ -236,7 +236,7 @@ contract LockableProtocol is BasicToken {
 
 contract MintAndBurnToken is TokenForge, CappedToken, LockableProtocol {
 	using SafeMath for uint256;
-	
+
 	event Mint(address indexed user, uint256 amount);
 	event Burn(address indexed user, uint256 amount);
 
@@ -264,7 +264,7 @@ contract MintAndBurnToken is TokenForge, CappedToken, LockableProtocol {
 			require(canMintFoundation(amount));
 			token_foundation_created = token_foundation_created.add(amount);
 		}
-		
+
 		token_created = token_created.add(amount);
 		wallets[target] = wallets[target].add(amount);
 
@@ -675,10 +675,10 @@ contract FountainToken is LockableToken {
 		address oldOwner = owner;
 		owner = newOwner;
 		emit OwnershipTransferred(oldOwner, newOwner);
-		
+
 		return true;
 	}
-	
+
 	function setFountainFoundationOwner (address newFoundationOwner) public onlyOwner returns (bool) {
 		require(newFoundationOwner != address(0));
 		require(newFoundationOwner != foundationOwner);
@@ -697,7 +697,7 @@ contract FountainToken is LockableToken {
 
 		return true;
 	}
-	
+
 }
 
 
@@ -709,15 +709,15 @@ contract FountainTokenUpgrade is FountainToken {
 	event Refund(address, uint);
 	event SetFoundation(uint);
 	event FinishUpgrade();
-	
+
 	bool public upgrade_running;
 
 	bool public upgrade_finish;
-	
+
 	FountainToken ftn;
-	
+
 	address public oldContract;
-	
+
 	mapping(address=>bool) public upgraded;
 	mapping(address=>bool) public skiplist;
 
@@ -780,7 +780,7 @@ contract FountainTokenUpgrade is FountainToken {
 
 	function runRefund(address addr) public whenUpgrading canUpgrade onlyOwner {
 		uint amount = refundlist[addr];
-		wallets[addr] = wallets[addr].add(amount); 
+		wallets[addr] = wallets[addr].add(amount);
 		token_created = token_created.add(amount);
 		refundlist[addr] = 0;
 		emit Refund(addr, amount);
@@ -796,7 +796,7 @@ contract FountainTokenUpgrade is FountainToken {
 		for (uint i = 0; i < l; i++){
 			addr = addrs[i];
 			amount = refundlist[addr];
-			wallets[addr] = wallets[addr].add(amount); 
+			wallets[addr] = wallets[addr].add(amount);
 			token_created = token_created.add(amount);
 			refundlist[addr] = 0;
 			emit Refund(addr, amount);
@@ -834,7 +834,7 @@ contract FountainTokenUpgrade is FountainToken {
 		(uint a, uint b, uint c, uint d) = ftn.lockbins(addr,0);
 		uint len = d;
 		if (len > 0){
-			lockbins[addr][0].amount = len; 
+			lockbins[addr][0].amount = len;
 			for (uint i=1; i <= len; i++){
 				(a, b, c, d) = ftn.lockbins(addr,i);
 				lockbins[addr][i] = LockBin({
@@ -850,14 +850,14 @@ contract FountainTokenUpgrade is FountainToken {
 		emit Mint(addr, amount);
 		emit Transfer(address(0), addr, amount);
 	}
-	
-	
+
+
 	function batchUpgrade(address[] addrs) whenUpgrading whenPaused canUpgrade onlyOwner{
 		uint l = addrs.length;
 		require(l > 0);
 		uint a;
-		uint b; 
-		uint c; 
+		uint b;
+		uint c;
 		uint d;
 		for (uint i = 0; i < l; i++){
 
@@ -869,11 +869,11 @@ contract FountainTokenUpgrade is FountainToken {
 
 			upgraded[addr] = true;
 			wallets[addr] = amount;
-	
+
 			(a, b, c, d) = ftn.lockbins(addr,0);
 			uint len = d;
 			if (len > 0){
-				lockbins[addr][0].amount = len; 
+				lockbins[addr][0].amount = len;
 				for (uint j=1; j <= len; j++){
 					(a, b, c, d) = ftn.lockbins(addr, j);
 					lockbins[addr][j] = LockBin({
@@ -889,8 +889,24 @@ contract FountainTokenUpgrade is FountainToken {
 			emit Mint(addr, amount);
 			emit Transfer(address(0), addr, amount);
 
-		} 
-		
+		}
+
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

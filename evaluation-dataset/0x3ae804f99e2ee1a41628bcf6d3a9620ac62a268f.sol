@@ -71,7 +71,7 @@ library SafeMath {
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0);
         uint256 c = a / b;
-    
+
         return c;
     }
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -582,4 +582,15 @@ contract ERC721Constructor {
         ERC721Construct.renounceMinter();
         emit newERC721(address(ERC721Construct), name, symbol, owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,10 +1,10 @@
 pragma solidity ^0.5.7;
 
-library SafeMath 
+library SafeMath
 {
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
 	{
-        if (a == 0) 
+        if (a == 0)
 		{
             return 0;
         }
@@ -15,7 +15,7 @@ library SafeMath
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b > 0);
         uint256 c = a / b;
@@ -23,7 +23,7 @@ library SafeMath
         return c;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b <= a);
         uint256 c = a - b;
@@ -31,7 +31,7 @@ library SafeMath
         return c;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         require(c >= a);
@@ -39,14 +39,14 @@ library SafeMath
         return c;
     }
 
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mod(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b != 0);
         return a % b;
     }
 }
 
-interface IERC20 
+interface IERC20
 {
     function transfer(address to, uint256 value) external returns (bool);
     function approve(address spender, uint256 value) external returns (bool);
@@ -58,45 +58,45 @@ interface IERC20
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract ERC20 is IERC20 
+contract ERC20 is IERC20
 {
     using SafeMath for uint256;
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
     uint256 private _totalSupply;
 
-    function totalSupply() public view returns (uint256) 
+    function totalSupply() public view returns (uint256)
     {
         return _totalSupply;
     }
 
-    function balanceOf(address owner) public view returns (uint256) 
+    function balanceOf(address owner) public view returns (uint256)
     {
         return _balances[owner];
     }
 
-    function allowance(address owner, address spender) public view returns (uint256) 
+    function allowance(address owner, address spender) public view returns (uint256)
     {
         return _allowed[owner][spender];
     }
 
-    function transfer(address to, uint256 value) public returns (bool) 
+    function transfer(address to, uint256 value) public returns (bool)
     {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     function transferBulk(address[] memory _toAccounts, uint256[] memory _tokenAmount) public returns (bool)
     {
         require(_toAccounts.length == _tokenAmount.length);
-        for(uint i=0; i<_toAccounts.length; i++) 
+        for(uint i=0; i<_toAccounts.length; i++)
         {
             _transfer(msg.sender, _toAccounts[i], _tokenAmount[i]);
         }
         return true;
     }
 
-    function approve(address spender, uint256 value) public returns (bool) 
+    function approve(address spender, uint256 value) public returns (bool)
     {
         require(spender != address(0));
 
@@ -105,7 +105,7 @@ contract ERC20 is IERC20
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 value) public returns (bool) 
+    function transferFrom(address from, address to, uint256 value) public returns (bool)
     {
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
@@ -113,7 +113,7 @@ contract ERC20 is IERC20
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) 
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool)
     {
         require(spender != address(0));
 
@@ -122,7 +122,7 @@ contract ERC20 is IERC20
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) 
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool)
     {
         require(spender != address(0));
 
@@ -131,7 +131,7 @@ contract ERC20 is IERC20
         return true;
     }
 
-    function _transfer(address from, address to, uint256 value) internal 
+    function _transfer(address from, address to, uint256 value) internal
     {
         require(to != address(0));
 
@@ -140,31 +140,31 @@ contract ERC20 is IERC20
         emit Transfer(from, to, value);
     }
 
-    function _mint(address account, uint256 value) internal 
+    function _mint(address account, uint256 value) internal
     {
         require(account != address(0));
 
         _totalSupply = _totalSupply.add(value);
-        
+
         require(_balances[account].add(value) <= 11111111111000000000000000000, "Cant mint > then 11†111†111†111");
-        
+
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
 
-    function _burn(address account, uint256 value) internal 
+    function _burn(address account, uint256 value) internal
     {
         require(account != address(0));
 
         _totalSupply = _totalSupply.sub(value);
-        
+
         require(_totalSupply.sub(value) > _totalSupply.div(2), "Cant burn > 50% of total supply");
-        
+
         _balances[account] = _balances[account].sub(value);
         emit Transfer(account, address(0), value);
     }
 
-    function _burnFrom(address account, uint256 value) internal 
+    function _burnFrom(address account, uint256 value) internal
     {
         _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
         _burn(account, value);
@@ -172,14 +172,14 @@ contract ERC20 is IERC20
     }
 }
 
-library Roles 
+library Roles
 {
-    struct Role 
+    struct Role
     {
         mapping (address => bool) bearer;
     }
 
-    function add(Role storage role, address account) internal 
+    function add(Role storage role, address account) internal
     {
         require(account != address(0));
         require(!has(role, account));
@@ -187,7 +187,7 @@ library Roles
         role.bearer[account] = true;
     }
 
-    function remove(Role storage role, address account) internal 
+    function remove(Role storage role, address account) internal
     {
         require(account != address(0));
         require(has(role, account));
@@ -195,7 +195,7 @@ library Roles
         role.bearer[account] = false;
     }
 
-    function has(Role storage role, address account) internal view returns (bool) 
+    function has(Role storage role, address account) internal view returns (bool)
     {
         require(account != address(0));
         return role.bearer[account];
@@ -215,12 +215,12 @@ contract MinterRole {
         _owner = msg.sender;
         _addMinter(msg.sender);
     }
-    
+
     modifier onlyOwner() {
         require(isOwner());
         _;
     }
-    
+
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
@@ -253,36 +253,36 @@ contract MinterRole {
     }
 }
 
-contract ERC20Detailed is IERC20 
+contract ERC20Detailed is IERC20
 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
 
-    constructor (string memory name, string memory symbol, uint8 decimals) public 
+    constructor (string memory name, string memory symbol, uint8 decimals) public
     {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
     }
 
-    function name() public view returns (string memory) 
+    function name() public view returns (string memory)
     {
         return _name;
     }
 
-    function symbol() public view returns (string memory) 
+    function symbol() public view returns (string memory)
     {
         return _symbol;
     }
 
-    function decimals() public view returns (uint8) 
+    function decimals() public view returns (uint8)
     {
         return _decimals;
     }
 }
 
-contract ERC20Burnable is ERC20, MinterRole 
+contract ERC20Burnable is ERC20, MinterRole
 {
     function burn(uint256 value) public onlyMinter
     {
@@ -295,26 +295,26 @@ contract ERC20Burnable is ERC20, MinterRole
     }
 }
 
-contract ERC20Mintable is ERC20, MinterRole 
+contract ERC20Mintable is ERC20, MinterRole
 {
-    function mint(address to, uint256 value) public onlyMinter returns (bool) 
+    function mint(address to, uint256 value) public onlyMinter returns (bool)
     {
         _mint(to, value);
         return true;
     }
 }
 
-contract Token is ERC20, MinterRole, ERC20Detailed, ERC20Mintable, ERC20Burnable 
+contract Token is ERC20, MinterRole, ERC20Detailed, ERC20Mintable, ERC20Burnable
 {
     address payable private _wallet;
     uint256 private _weiRaised;
-    
-    constructor (address payable wallet) public ERC20Detailed("CryptoWars Token", "CWT", 18) 
+
+    constructor (address payable wallet) public ERC20Detailed("CryptoWars Token", "CWT", 18)
     {
         _wallet = wallet;
 	}
-	
-	function () external payable 
+
+	function () external payable
     {
         uint256 weiAmount = msg.value;
         require(msg.sender != address(0));
@@ -322,14 +322,23 @@ contract Token is ERC20, MinterRole, ERC20Detailed, ERC20Mintable, ERC20Burnable
         _weiRaised = _weiRaised.add(weiAmount);
         _wallet.transfer(msg.value);
     }
-    
-    function wallet() public view returns (address payable) 
+
+    function wallet() public view returns (address payable)
     {
         return _wallet;
     }
-    
-    function weiRaised() public view returns (uint256) 
+
+    function weiRaised() public view returns (uint256)
     {
         return _weiRaised;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

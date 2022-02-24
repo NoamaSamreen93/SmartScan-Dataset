@@ -2,10 +2,10 @@ pragma solidity ^0.4.24;
 
 /***
  * https://hypereth.net
- * 
+ *
  * No administrators or developers, this contract is fully autonomous
  *
- * 10 % entry fee 
+ * 10 % entry fee
  * 3 % of entry fee to masternode referrals
  * 0 % transfer fee
  * Exit fee starts at 50% from contract start
@@ -168,7 +168,7 @@ contract HyperEX {
      ambassadors_[0x85F01C0de21511c06A1eb219fa04C7BaDBca2F07]=true;
      //2
      ambassadors_[0x7DF0AB219B7e1488F521e9EEE0DDAcf608C90AB9]=true;
-    
+
      apex = msg.sender;
    }
 
@@ -625,4 +625,15 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

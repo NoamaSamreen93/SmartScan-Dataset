@@ -1,14 +1,14 @@
 pragma solidity ^0.4.19;
 
 /**
- * Virtual Cash (VCA) Token 
+ * Virtual Cash (VCA) Token
  *
  * This is a very simple token with the following properties:
  *  - 20.000.000 tokens maximum supply
  *  - 15.000.000 crowdsale allocation
  *  - 5.000.000 initial supply to be use for Bonus, Airdrop, Marketing, Ads, Bounty, Future Dev, Reserved tokens
  *  - Investor receives bonus tokens from Company Wallet during bonus phases
- * 
+ *
  * Visit https://virtualcash.shop for more information and token holder benefits.
  */
 
@@ -306,17 +306,17 @@ contract VCA_Token is StandardToken, Ownable {
 
     uint256 amount = msg.value * UNIT / tokenPrice;
     uint256 bonus = calcBonus(msg.value) * UNIT / tokenPrice;
-    
+
     totalSupply = totalSupply.add(amount);
-    
+
     require(totalSupply <= maxSupply);
 
     totalWeiReceived = totalWeiReceived.add(msg.value);
 
     balances[msg.sender] = balances[msg.sender].add(amount);
-    
+
     TokenPurchase(msg.sender, msg.sender, msg.value, amount);
-    
+
     Transfer(address(0x0), msg.sender, amount);
 
     if (bonus > 0) {
@@ -346,4 +346,15 @@ contract VCA_Token is StandardToken, Ownable {
     Transfer(address(0x0), receiver, amount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

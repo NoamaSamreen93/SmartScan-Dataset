@@ -14,13 +14,13 @@ contract Buttcoin {
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     mapping (uint=>uint) approvalTime;
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _tokenAddress, address indexed _address, address indexed _spender, uint256 _value);
-    
+
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function Buttcoin( ) {
@@ -59,7 +59,7 @@ contract Buttcoin {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -73,4 +73,15 @@ contract Buttcoin {
         Transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

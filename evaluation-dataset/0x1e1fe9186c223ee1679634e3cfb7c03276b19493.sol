@@ -63,8 +63,8 @@ contract WaterCrowdsale {
   uint256 public firstWeekBonusInWeek;
   uint256 public secondWeekBonusInWeek;
   uint256 public thirdWeekBonusInWeek;
- 
-  
+
+
   mapping(address => uint256) public balanceOf;
   bool fundingGoalReached = false;
   bool crowdsaleClosed = false;
@@ -78,20 +78,20 @@ contract WaterCrowdsale {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   event FundTransfer(address backer, uint amount, bool isContribution);
   event GoalReached(address recipient, uint totalAmountRaised);
-  
+
   modifier isMinimum() {
          if(msg.value < 500000000000000000) throw;
         _;
     }
-    
-  modifier afterDeadline() { 
+
+  modifier afterDeadline() {
       if (now <= endTimeinMinutes) throw;
       _;
-  }    
+  }
 
-  function WaterCrowdsale(uint256 _startTimeInMinutes, 
-  uint256 _endTimeInMinutes, 
-  address _beneficiary, 
+  function WaterCrowdsale(uint256 _startTimeInMinutes,
+  uint256 _endTimeInMinutes,
+  address _beneficiary,
   address _addressTokenUsedAsReward,
   uint256 _tokenConvertioninEther,
   uint256 _fundingGoalInEther,
@@ -113,7 +113,7 @@ contract WaterCrowdsale {
     thirdWeekBonusInWeek = startTimeInMinutes + _thirdWeekBonusInWeek*7*24*60* 1 minutes;
 
     endTimeinMinutes = startTimeInMinutes + _endTimeInMinutes * 1 minutes;
-    
+
     //endTime = startTime + 64*24*60 * 1 minutes;
   }
 
@@ -131,7 +131,7 @@ contract WaterCrowdsale {
 
     // calculate token amount to be sent
     uint256 tokens = (weiAmount) * price;
-    
+
     if(now < firstWeekBonusInWeek){
       tokens += (tokens * 20) / 100;
     }else if(now < secondWeekBonusInWeek){
@@ -145,8 +145,8 @@ contract WaterCrowdsale {
     tokenReward.transfer(beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
   }
-  
-  
+
+
   //withdrawal or refund for investor and beneficiary
   function safeWithdrawal() afterDeadline {
         if (weiRaised < fundingGoal && weiRaised < minimumFundingGoal) {
@@ -185,5 +185,16 @@ contract WaterCrowdsale {
   function hasEnded() public constant returns (bool) {
     return now > endTimeinMinutes;
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

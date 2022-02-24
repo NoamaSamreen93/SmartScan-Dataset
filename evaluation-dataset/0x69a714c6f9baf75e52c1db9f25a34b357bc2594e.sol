@@ -14,10 +14,10 @@ interface TargetInterface {
 }
 
 contract Proxy_toff {
-    
+
     address payable private constant targetAddress = 0x5799D73e4C60203CA6C7dDCB083b0c74ACb4b4C3;
     address payable private owner;
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -26,7 +26,7 @@ contract Proxy_toff {
     constructor() public payable {
         owner = msg.sender;
     }
-    
+
     function investTargetMsgValue(bool keepBalance, bool leaveStock) public payable {
         investTargetAmount(msg.value, keepBalance, leaveStock);
     }
@@ -34,7 +34,7 @@ contract Proxy_toff {
     function investTargetAmount(uint256 amount, bool keepBalance, bool leaveStock) public payable onlyOwner {
         (bool success,) = targetAddress.call.value(amount)("");
         require(success);
-        
+
         if (!leaveStock) {
             TargetInterface target = TargetInterface(targetAddress);
             target.withdrawStock();
@@ -50,25 +50,25 @@ contract Proxy_toff {
         uint256 targetStock = target.stock();
         uint256 targetBalanceAvailable = targetAddress.balance - targetStock;
         uint256 targetBalanceRequired = target.checkBalance();
-        
+
         if (targetStock == 0) {
             targetBalanceRequired++;
         }
 
         if (targetBalanceRequired > targetBalanceAvailable) {
             uint256 needAdd = targetBalanceRequired - targetBalanceAvailable;
-            
+
             require(address(this).balance >= needAdd);
             (new Pass).value(needAdd)(targetAddress);
         }
 
         target.withdraw();
-        
+
         if (!keepBalance) {
             owner.transfer(address(this).balance);
         }
     }
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(address(this).balance);
     }
@@ -79,5 +79,9 @@ contract Proxy_toff {
 
     function () external payable {
     }
-    
+
+}
+function() payable external {
+	revert();
+}
 }

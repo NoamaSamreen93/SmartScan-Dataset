@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -55,7 +55,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
@@ -244,11 +244,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract SimpleCoinToken is BurnableToken {
-    
+
   string public constant name = "Coin Casino Token";
-   
+
   string public constant symbol = "CAS";
-    
+
   uint32 public constant decimals = 18;
 
   uint256 public INITIAL_SUPPLY = 1200000000 * 1 ether;
@@ -257,13 +257,13 @@ contract SimpleCoinToken is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address public multisig;
 
   uint public restrictedPercent;
@@ -273,9 +273,9 @@ contract Crowdsale is Ownable {
   SimpleCoinToken public token = new SimpleCoinToken();
 
   uint public start;
-    
+
   uint public period;
-  
+
   uint public presale;
 
   uint public rate;
@@ -289,8 +289,8 @@ contract Crowdsale is Ownable {
 	presale = 19; //till 2018.01.15
 	period = presale + 31; //till 2018.02.15
     }
-  
-  
+
+
 
   modifier saleIsOn() {
     require(now > start && now < start + period * 1 days);
@@ -319,5 +319,16 @@ contract Crowdsale is Ownable {
   function() external payable {
     createTokens();
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

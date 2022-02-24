@@ -439,7 +439,7 @@ contract DetailedERC20 is ERC20 {
 
 // File: contracts/HonestToken.sol
 
-contract HonestToken is StandardToken, PausableToken 
+contract HonestToken is StandardToken, PausableToken
 {
     string public constant name = "Honest";
     string public constant symbol = "HNST";
@@ -455,4 +455,13 @@ contract HonestToken is StandardToken, PausableToken
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

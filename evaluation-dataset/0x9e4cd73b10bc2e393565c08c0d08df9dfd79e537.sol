@@ -4,16 +4,16 @@ contract Token{
 
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) public returns   
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success);
 
     function approve(address _spender, uint256 _value) public returns (bool success);
 
-    function allowance(address _owner, address _spender) public constant returns 
+    function allowance(address _owner, address _spender) public constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -27,8 +27,8 @@ contract HPAToken is Token {
         totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);         // 设置初始总量
         balances[msg.sender] = totalSupply; // 初始token数量给予消息发送者，因为是构造函数，所以这里也是合约的创建者
 
-        name = _tokenName;                   
-        decimals = _decimalUnits;          
+        name = _tokenName;
+        decimals = _decimalUnits;
         symbol = _tokenSymbol;
     }
 
@@ -44,7 +44,7 @@ contract HPAToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -58,8 +58,8 @@ contract HPAToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
-    { 
+    function approve(address _spender, uint256 _value) public returns (bool success)
+    {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -70,4 +70,13 @@ contract HPAToken is Token {
     }
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

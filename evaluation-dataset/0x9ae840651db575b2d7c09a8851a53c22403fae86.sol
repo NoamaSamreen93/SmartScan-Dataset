@@ -139,7 +139,7 @@ contract lockEtherPay {
         require(msg.sender == owner);
         _;
     }
-    
+
     // Buy keys
     function bid() public payable blabla {
         uint _minLeaderAmount = pot.mul(MIN_LEADER_FRAC_TOP).div(MIN_LEADER_FRAC_BOT);
@@ -161,7 +161,7 @@ contract lockEtherPay {
             NewLeader(now, leader, pot, hasntStarted);
         }
     }
-    
+
     // Withdraw winned pot
     function withdrawEarnings() public blabla { require(earnings[msg.sender] > 0);
         assert(earnings[msg.sender] <= this.balance);
@@ -170,8 +170,8 @@ contract lockEtherPay {
         msg.sender.transfer(_amount);
         EarningsWithdrawal(now, msg.sender, _amount);
     }
-    
-    // Sell keys 
+
+    // Sell keys
     function withdrawDividends() public { require(dividendShares[msg.sender] > 0);
         uint _dividendShares = dividendShares[msg.sender];
         assert(_dividendShares <= totalDividendShares);
@@ -233,4 +233,13 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

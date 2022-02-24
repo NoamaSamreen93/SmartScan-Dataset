@@ -32,7 +32,7 @@ library SafeMath {
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -43,9 +43,9 @@ contract Owned {
     }
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
-    
 
-    
+
+
     function transferOwnership(address _newOwner) public onlyOwner {
        require(_newOwner != owner);
         newOwner = _newOwner;
@@ -140,4 +140,15 @@ contract CodexStandardToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -85,12 +85,12 @@ contract PayFair is SafeMath, ERC20, Ownable {
  uint public constant FROZEN_TOKENS = 11e6;
  uint public constant MULTIPLIER = 10 ** decimals;
  ERC20 public oldToken;
- 
+
  /// approve() allowances
  mapping (address => mapping (address => uint)) allowed;
  /// holder balances
  mapping(address => uint) balances;
- 
+
  /// @dev Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
  /// @param size payload size
  modifier onlyPayloadSize(uint size) {
@@ -102,7 +102,7 @@ contract PayFair is SafeMath, ERC20, Ownable {
  constructor (address oldTokenAdddress) public {
    owner = msg.sender;
    oldToken = ERC20(oldTokenAdddress);
-   
+
    totalSupply = convertToDecimal(FROZEN_TOKENS);
    balances[owner] = convertToDecimal(FROZEN_TOKENS);
  }
@@ -112,10 +112,10 @@ contract PayFair is SafeMath, ERC20, Ownable {
    revert();
  }
 
- function upgradeTokens(uint amountToUpgrade) public {  
+ function upgradeTokens(uint amountToUpgrade) public {
     require(amountToUpgrade <= convertToDecimal(oldToken.balanceOf(msg.sender)));
-    require(amountToUpgrade <= convertToDecimal(oldToken.allowance(msg.sender, address(this))));   
-    
+    require(amountToUpgrade <= convertToDecimal(oldToken.allowance(msg.sender, address(this))));
+
     emit Transfer(address(0), msg.sender, amountToUpgrade);
     totalSupply = safeAdd(totalSupply, amountToUpgrade);
     balances[msg.sender] = safeAdd(balances[msg.sender], amountToUpgrade);
@@ -184,4 +184,13 @@ contract PayFair is SafeMath, ERC20, Ownable {
  function allowance(address _owner, address _spender) public view returns (uint remaining) {
    return allowed[_owner][_spender];
  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

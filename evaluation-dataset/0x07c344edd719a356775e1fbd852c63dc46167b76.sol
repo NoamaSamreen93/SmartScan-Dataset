@@ -20,7 +20,7 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     event GeneratedToken(address indexed requester);
 }
 
@@ -37,40 +37,40 @@ contract ColumbusToken is IERC20 {
     mapping (address => uint256) private _balances;
 
     mapping (address => mapping (address => uint256)) private _allowed;
-    
+
     mapping (address => bool) private _requested;
 
     uint256 private _totalSupply;
-    
+
     string public constant name = "Columbus Token";
     string public constant symbol = "CBUS";
     // 18 Decimals is standard for ERC20
     uint8 public constant decimals = 18;
     // Columbus population 2018: 879,170
-    uint256 public constant max_supply = 879170 * 10**uint(decimals); 
-    
+    uint256 public constant max_supply = 879170 * 10**uint(decimals);
+
     constructor() public {
         _totalSupply = _tokens(1);
         _balances[msg.sender] = _tokens(1);
     }
-    
+
     function getToken() public {
         // Don't allow more tokens to be created than the maximum supply
         require(_totalSupply < max_supply);
         // Don't allow the requesting address to request more than one token.
         require(_requested[msg.sender] == false);
-        
+
         _requested[msg.sender] = true;
         _balances[msg.sender] += _tokens(1);
         _totalSupply += _tokens(1);
-        
+
         emit GeneratedToken(msg.sender);
     }
-    
+
     function _tokens(uint256 token) internal pure returns (uint256) {
         return token * 10**uint(decimals);
     }
-    
+
     /**
     * @dev Total number of tokens in existence
     */
@@ -298,4 +298,15 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

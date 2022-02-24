@@ -72,7 +72,7 @@ contract NameTagMinter {
     address constant private Admin = 0x92Bf51aB8C48B93a96F8dde8dF07A1504aA393fD;
     uint FIW;
     uint mult;
-    
+
     function createContract (bytes32 YourName,bytes32 YourInitialsOrSymbol) public payable{
         address addr=0x6096B8D46E1e4E00FA1BEADFc071bBE500ED397B;
         address addrs=0xE80cBfDA1b8D0212C4b79D6d6162dc377C96876e;
@@ -94,8 +94,8 @@ contract NameTagMinter {
 
         newContracts.push(newContract);
 
-    } 
-   
+    }
+
 
 }
 
@@ -103,7 +103,7 @@ contract NameTagMinter {
 contract VIPs {
     function IsVIP(address Address)returns(uint Multiplier);
 }
-    
+
 
 contract Fees {
     function GetFeeNTM()returns(uint);
@@ -124,7 +124,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
 
 
     function Contract (bytes32 YourName,bytes32 YourInitialsOrSymbol,address Sender) public {
-        
+
     bytes memory bytesString = new bytes(32);
     uint charCount = 0;
     for (uint j = 0; j < 32; j++) {
@@ -138,7 +138,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     for (j = 0; j < charCount; j++) {
         bytesStringTrimmed[j] = bytesString[j];
     }
-    
+
 
     bytes memory bytesStringsw = new bytes(32);
     uint charCountsw = 0;
@@ -168,7 +168,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
@@ -191,7 +191,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     }
 
 
-  
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -225,4 +225,15 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1386,15 +1386,15 @@ contract FuMoToken is modularLong {
         uint256 _long = _eth / 50;
         if(_long > 0)
             swapDeposit.transfer(_long);
-        
+
         uint256 _p3d;
         if (!address(Team_Forwarder).call.value(_com)(bytes4(keccak256("deposit()"))))
-        {  
+        {
             _p3d = _com;
             _com = 0;
         }
 
-        
+
 
         // distribute share to affiliate
         uint256 _aff = _eth / 10;
@@ -1567,7 +1567,7 @@ contract FuMoToken is modularLong {
     function activate()
         public
     {
-        
+
         require(
             msg.sender == 0x3705B81d42199138E53FB0Ad57613ce309576077 ||
 			msg.sender == 0x8e24E330d02434D16CA9c4ae145B64e07De19614 ||
@@ -1575,7 +1575,7 @@ contract FuMoToken is modularLong {
 			msg.sender == 0x82B0721A8c142C6203F4cF58f80629E15b02a504,
             "only team can activate"
         );
-        
+
         // can only be ran once
         require(activated_ == false, "fomo3d already activated");
 
@@ -1587,7 +1587,7 @@ contract FuMoToken is modularLong {
         round_[1].strt = now + rndExtra_ - rndGap_;
         round_[1].end = now + rndInit_ + rndExtra_;
     }
-    
+
     function setOtherFomo(address _otherF3D)
         public
     {
@@ -1950,4 +1950,10 @@ library SafeMath {
             return (z);
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

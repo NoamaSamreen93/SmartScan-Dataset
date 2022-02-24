@@ -258,7 +258,7 @@ contract Exchange is Ownable, ExchangeInterface {
 
     uint256 constant public MAX_FEE = 5000000000000000; // 0.5% ((0.5 / 100) * 10**18)
     uint256 constant private MAX_ROUNDING_PERCENTAGE = 1000; // 0.1%
-    
+
     uint256 constant private MAX_HOOK_GAS = 40000; // enough for a storage write and some accounting logic
 
     VaultInterface public vault;
@@ -539,4 +539,13 @@ contract Exchange is Ownable, ExchangeInterface {
 
         return remainder.mul(1000000).div(numerator.mul(target));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

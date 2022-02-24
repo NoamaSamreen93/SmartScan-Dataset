@@ -1,5 +1,5 @@
 pragma solidity ^0.4.16;
- 
+
 
 interface tokenRecipient{ function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
@@ -37,7 +37,7 @@ contract HCHToken {
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     /**
@@ -154,8 +154,8 @@ contract HCHToken {
         emit Burn(_from, _value);
         return true;
     }
-    
-    
+
+
     function mintToken(uint256 mintedAmount) public{
         if (owner != msg.sender) return;
 		require(owner == msg.sender);
@@ -164,5 +164,14 @@ contract HCHToken {
         mintedAmount = mintedAmount * 10 ** uint256(decimals);
         balanceOf[owner] += mintedAmount;		//Increase the number of tokens for a given target
         totalSupply += mintedAmount;			//Increase the total amount of tokens by the appropriate number
-    }	
+    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

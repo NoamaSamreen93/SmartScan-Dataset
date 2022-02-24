@@ -39,7 +39,7 @@ library SafeMath {
 //CONTRACT INTERFACE
 
 contract OneHundredthMonkey {
- 	function adminWithdraw() public {}	
+ 	function adminWithdraw() public {}
 }
 
 //MAIN CONTRACT
@@ -55,15 +55,15 @@ contract AdminBank {
 	address public mainContract;
 	bool public mainContractSet = false;
 
-	address public teamMemberA = 0x2597afE84661669E590016E51f8FB0059D1Ad63e; 
-	address public teamMemberB = 0x2E6C1b2B4F7307dc588c289C9150deEB1A66b73d; 
-	address public teamMemberC = 0xB3CaC7157d772A7685824309Dc1eB79497839795; 
-	address public teamMemberD = 0x87395d203B35834F79B46cd16313E6027AE4c9D4; 
-	address public teamMemberE = 0x2c3e0d5cbb08e0892f16bf06c724ccce6a757b1c; 
-	address public teamMemberF = 0xd68af19b51c41a69e121fb5fb4d77768711c4979; 
-	address public teamMemberG = 0x8c992840Bc4BA758018106e4ea9E7a1d6F0F11e5; 
-	address public teamMemberH = 0xd83FAf0D707616752c4AbA00f799566f45D4400A; 
-	address public teamMemberI = 0xca4a41Fc611e62E3cAc10aB1FE9879faF5012687; 
+	address public teamMemberA = 0x2597afE84661669E590016E51f8FB0059D1Ad63e;
+	address public teamMemberB = 0x2E6C1b2B4F7307dc588c289C9150deEB1A66b73d;
+	address public teamMemberC = 0xB3CaC7157d772A7685824309Dc1eB79497839795;
+	address public teamMemberD = 0x87395d203B35834F79B46cd16313E6027AE4c9D4;
+	address public teamMemberE = 0x2c3e0d5cbb08e0892f16bf06c724ccce6a757b1c;
+	address public teamMemberF = 0xd68af19b51c41a69e121fb5fb4d77768711c4979;
+	address public teamMemberG = 0x8c992840Bc4BA758018106e4ea9E7a1d6F0F11e5;
+	address public teamMemberH = 0xd83FAf0D707616752c4AbA00f799566f45D4400A;
+	address public teamMemberI = 0xca4a41Fc611e62E3cAc10aB1FE9879faF5012687;
 
 	uint256 public teamMemberArate = 20; //20%
 	uint256 public teamMemberBrate = 20; //20%
@@ -99,20 +99,20 @@ contract AdminBank {
 	}
 
 	//MODIFIERS
-	
-	modifier isTeamMember() { 
-		require (validTeamMember[msg.sender] == true, "you are not a team member"); 
-		_; 
+
+	modifier isTeamMember() {
+		require (validTeamMember[msg.sender] == true, "you are not a team member");
+		_;
 	}
 
-	modifier isMainContractSet() { 
-		require (mainContractSet == true, "the main contract is not yet set"); 
-		_; 
+	modifier isMainContractSet() {
+		require (mainContractSet == true, "the main contract is not yet set");
+		_;
 	}
 
-	modifier onlyHumans() { 
-        require (msg.sender == tx.origin, "no contracts allowed"); 
-        _; 
+	modifier onlyHumans() {
+        require (msg.sender == tx.origin, "no contracts allowed");
+        _;
     }
 
 	//EVENTS
@@ -144,7 +144,7 @@ contract AdminBank {
 
 	//FUNCTIONS
 
-	//add main contract address 
+	//add main contract address
 	function setContractAddress(address _address) external onlyHumans() {
 		require (msg.sender == masterAdmin);
 		require (mainContractSet == false);
@@ -160,7 +160,7 @@ contract AdminBank {
 
 	//team member withdraw
 	function teamWithdraw() external isTeamMember() isMainContractSet() onlyHumans() {
-	
+
 		//set up for msg.sender
 		address user;
 		uint256 rate;
@@ -192,13 +192,13 @@ contract AdminBank {
 			user = teamMemberI;
 			rate = teamMemberIrate;
 		}
-		
-		//update accounting 
+
+		//update accounting
 		uint256 teamMemberShare = fundsReceived.mul(rate).div(100);
 		teamMemberTotal[user] = teamMemberShare;
 		teamMemberUnclaimed[user] = teamMemberTotal[user].sub(teamMemberClaimed[user]);
-		
-		//safe transfer 
+
+		//safe transfer
 		uint256 toTransfer = teamMemberUnclaimed[user];
 		teamMemberUnclaimed[user] = 0;
 		teamMemberClaimed[user] = teamMemberTotal[user];
@@ -268,14 +268,14 @@ contract AdminBank {
 		} else if (proposingAddressIndex[_new] == 8 && msg.sender == teamMemberI) {
 			isProposedAddress[_new] = false;
 			isProposing[msg.sender] = false;
-		} 
+		}
 
 		emit addressChangeRemoved(msg.sender, _new);
 	}
 
 	function acceptProposal() external onlyHumans() {
 		require (isProposedAddress[msg.sender] == true, "your address must be proposed");
-		
+
 		if (proposingAddressIndex[msg.sender] == 0) {
 			address old = teamMemberA;
 			validTeamMember[old] = false;
@@ -330,7 +330,7 @@ contract AdminBank {
 			isProposing[old] = false;
 			teamMemberI = msg.sender;
 			validTeamMember[teamMemberI] = true;
-		} 
+		}
 
 		isProposedAddress[msg.sender] = false;
 
@@ -374,7 +374,7 @@ contract AdminBank {
 		}
 
 		uint256 teamMemberShare = fundsReceived.mul(rate).div(100);
-		uint256 unclaimed = teamMemberShare.sub(teamMemberClaimed[_user]); 
+		uint256 unclaimed = teamMemberShare.sub(teamMemberClaimed[_user]);
 
 		return unclaimed;
 	}
@@ -387,6 +387,14 @@ contract AdminBank {
 
 	function () public payable {
 		fundsReceived += msg.value;
-		emit fundsIn(msg.value, msg.sender, fundsReceived); 
+		emit fundsIn(msg.value, msg.sender, fundsReceived);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
 	}
 }

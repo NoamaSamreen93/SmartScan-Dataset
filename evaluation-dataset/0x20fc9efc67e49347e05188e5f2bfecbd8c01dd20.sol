@@ -82,7 +82,7 @@ contract Ownable {
  */
 contract StandardMintableBurnableToken is Ownable {
   using SafeMath for uint256;
-  
+
   mapping (address => mapping (address => uint256)) internal allowed;
   event Approval(address indexed owner, address indexed spender, uint256 value);
   uint256 public totalSupply;
@@ -191,7 +191,7 @@ contract StandardMintableBurnableToken is Ownable {
 
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
-  
+
   bool public mintingFinished = false;
 
 
@@ -260,4 +260,15 @@ contract MasToken is StandardMintableBurnableToken {
   string public symbol = "MAS";
   uint public decimals = 18;
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

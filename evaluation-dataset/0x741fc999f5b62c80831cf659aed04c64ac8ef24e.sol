@@ -13,7 +13,7 @@ contract token {
 	function transferFrom(address sender, address receiver, uint amount) returns(bool success) {}
 
 	function burn() {}
-	
+
 	function setStart(uint newStart) {}
 }
 
@@ -80,10 +80,10 @@ contract Crowdsale is SafeMath {
 
 	/*  initialization, set the token address */
 	function Crowdsale(
-		address _tokenAddr, 
-		address _walletAddr, 
-		address _tokenOwner, 
-		uint _start, 
+		address _tokenAddr,
+		address _walletAddr,
+		address _tokenOwner,
+		uint _start,
 		uint _end,
 		uint _timeAfterSoftCap) {
 		tokenReward = token(_tokenAddr);
@@ -123,29 +123,29 @@ contract Crowdsale is SafeMath {
 			if (newEnd < end) {
 				end = newEnd;
 				tokenReward.setStart(newEnd);
-			} 
+			}
 		}
 	}
-	
+
 	function getNumTokens(uint _value) constant returns(uint numTokens, bool reachedSoftCap) {
 		if (tokensSold < softCap) {
 			numTokens = safeMul(_value,rateSoft)/rateCoefficient;
-			if (safeAdd(tokensSold,numTokens) < softCap) 
+			if (safeAdd(tokensSold,numTokens) < softCap)
 				return (numTokens, false);
-			else if (safeAdd(tokensSold,numTokens) == softCap) 
+			else if (safeAdd(tokensSold,numTokens) == softCap)
 				return (numTokens, true);
 			else {
 				numTokens = safeSub(softCap, tokensSold);
 				uint missing = safeSub(_value, safeMul(numTokens,rateCoefficient)/rateSoft);
 				return (safeAdd(numTokens, safeMul(missing,rateHard)/rateCoefficient), true);
 			}
-		} 
-		else 
+		}
+		else
 			return (safeMul(_value,rateHard)/rateCoefficient, false);
 	}
 
 	modifier afterDeadline() {
-		if (now > end) 
+		if (now > end)
 			_;
 	}
 
@@ -173,4 +173,20 @@ contract Crowdsale is SafeMath {
 		}
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

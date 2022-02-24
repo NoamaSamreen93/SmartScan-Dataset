@@ -646,7 +646,7 @@ contract DividableAsset is AssetHashToken, ERC20Interface {
     }
 
     /**
-     * 
+     *
      * Warning: may fail when number of owners exceeds 100 due to gas limit of a block in Ethereum.
      */
     function distributeDivident(uint amount) public {
@@ -817,4 +817,15 @@ contract DividableAsset is AssetHashToken, ERC20Interface {
         emit Transfer(msg.sender, address(0), _totalSupply);
         emit TokenSplitEvent(id, 0, 0, 0, msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

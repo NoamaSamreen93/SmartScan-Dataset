@@ -310,7 +310,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -722,7 +722,7 @@ contract MintableToken is StandardToken, Ownable {
 // import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract ALMToken is MintableToken {
-    
+
     string public constant name = "Almee Token";
     string public constant symbol = "ALM";
     uint8 public constant decimals = 18;
@@ -737,13 +737,19 @@ contract ALMToken is MintableToken {
 contract ALMCrowdsale is CappedCrowdsale, MintedCrowdsale, Ownable {
     constructor (uint256 _rate, address _wallet, MintableToken _token, uint256 _cap)
         public
-        Crowdsale(_rate, _wallet, _token) 
+        Crowdsale(_rate, _wallet, _token)
         CappedCrowdsale(_cap)
     {
-        
+
     }
 
     function createTokenContract() internal returns (MintableToken) {
         return new ALMToken();
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

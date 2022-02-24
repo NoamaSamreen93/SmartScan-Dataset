@@ -1,16 +1,16 @@
 pragma solidity ^0.4.23;/*
- _ _____  ___   _ _  __ 
- ` __ ___  ___  _  _  ,'   
+ _ _____  ___   _ _  __
+ ` __ ___  ___  _  _  ,'
   `. __  ____   /__ ,'
-    `.  __  __ /  ,'       
+    `.  __  __ /  ,'
       `.__ _  /_,'
         `. _ /,'
-          `./'             
-          ,/`.             
-        ,'/ __`.        
-      ,'_/_  _ _`.      
-    ,'__/_ ___ _  `.       
-  ,'_  /___ __ _ __ `.  
+          `./'
+          ,/`.
+        ,'/ __`.
+      ,'_/_  _ _`.
+    ,'__/_ ___ _  `.
+  ,'_  /___ __ _ __ `.
  '-.._/____   _  __  _`.
 Decentralized Securities Licensing
 */contract PeerLicensing {
@@ -50,7 +50,7 @@ Decentralized Securities Licensing
 		mapping(address => uint256) public souleculeCoreR1;
 		mapping(address => uint256) public souleculeCoreG1;
 		mapping(address => uint256) public souleculeCoreB1;*/
-	
+
 	// Array between each address and how much Ether has been paid out to it.
 	// Note that this is scaled by the scaleFactor variable.
 	mapping(address => address) public reff;
@@ -89,7 +89,7 @@ Decentralized Securities Licensing
         address indexed referredBy,
         bool token
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 totalTokensAtTheTime,//maybe it'd be cool to see what % people are selling from their total bank
@@ -98,14 +98,14 @@ Decentralized Securities Licensing
         bool token,
         uint256 resolved
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted,
         bool token
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
@@ -138,10 +138,10 @@ Decentralized Securities Licensing
 		uint256 out =add(balance, pocketBalance);
 		// Update the payouts array, incrementing the request address by `balance`.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
-		
+
 		// Send the dividends to the address that requested the withdraw.
 		withdrawSum = add(withdrawSum,out);
 		msg.sender.transfer(out);
@@ -158,10 +158,10 @@ Decentralized Securities Licensing
 		uint256 out =add(balance, pocketBalance);
 		// Update the payouts array, incrementing the request address by `balance`.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
-		
+
 		// Send the dividends to the address that requested the withdraw.
 		withdrawSum = add(withdrawSum,out);
 		to.transfer(out);
@@ -208,7 +208,7 @@ Decentralized Securities Licensing
 		address sender = msg.sender;
 		if (_reff == 0x0000000000000000000000000000000000000000)
 			_reff = lastGateway;
-			
+
 		if(  add(holdings_BEAR[_reff],holdings_BULL[_reff]) >= stakingRequirement ) {
 			//good to go. good gateway
 		}else{
@@ -269,7 +269,7 @@ Decentralized Securities Licensing
 			if(slim_reinvest){
 				return div( mul(_eth , withdrawSum), mul(investSum,3) );//discount for supporting the Pyramid
 			}else{
-				return div( mul(_eth , withdrawSum), investSum);// amount * withdrawSum / investSum	
+				return div( mul(_eth , withdrawSum), investSum);// amount * withdrawSum / investSum
 			}
 		}
 		//gotta multiply and stuff in that order in order to get a high precision taxed amount.
@@ -323,13 +323,13 @@ Decentralized Securities Licensing
 									// Any transaction of less than 1 szabo is likely to be worth less than the gas used to send it.
 									if (msg.value < 0.000001 ether || msg.value > 1000000 ether)
 										revert();
-													
+
 									// msg.sender is the address of the caller.
 									var sender = msg.sender;
-									
+
 									// 10% of the total Ether sent is used to pay existing holders.
-									uint256 fee = 0; 
-									uint256 trickle = 0; 
+									uint256 fee = 0;
+									uint256 trickle = 0;
 									if(holdings_BULL[sender] != totalBondSupply_BULL){
 										fee = fluxFeed(msg.value,false);
 										trickle = div(fee, trickTax);
@@ -342,7 +342,7 @@ Decentralized Securities Licensing
 
 									// The buyer fee, scaled by the scaleFactor variable.
 									var buyerFee = fee * scaleFactor;
-									
+
 									if (totalBondSupply_BULL > 0){// because ...
 										// Compute the bonus co-efficient for all existing holders and the buyer.
 										// The buyer receives part of the distribution for each token bought in the
@@ -353,16 +353,16 @@ Decentralized Securities Licensing
 										}else{
 											bonusCoEff = scaleFactor;
 										}
-										
+
 										// The total reward to be distributed amongst the masses is the fee (in Ether)
 										// multiplied by the bonus co-efficient.
 										var holderReward = fee * bonusCoEff;
-										
+
 										buyerFee -= holderReward;
-										
+
 										// The Ether value per token is increased proportionally.
 										earningsPerBond_BULL = add(earningsPerBond_BULL,div(holderReward , totalBondSupply_BULL));
-										
+
 									}
 
 									//resolve reward tracking stuff
@@ -383,10 +383,10 @@ Decentralized Securities Licensing
 										holdings_BEAR[sender] = add(holdings_BEAR[sender], numTokens);
 										payoutDiff = (int256) ((earningsPerBond_BEAR * numTokens) - buyerFee);
 									}
-									
+
 									// Then we update the payouts array for the buyer with this amount...
 									payouts[sender] = payouts[sender]+payoutDiff;
-									
+
 									// And then we finally add it to the variable tracking the total amount spent to maintain invariance.
 									totalPayouts = totalPayouts+payoutDiff;
 
@@ -421,7 +421,7 @@ Decentralized Securities Licensing
 								// will be *significant*.
 								function sell(uint256 amount,bool bondType) internal {
 								    var numEthersBeforeFee = getEtherForTokens(amount);
-									
+
 									// x% of the resulting Ether is used to pay remaining holders.
 									uint256 fee = 0;
 									uint256 trickle = 0;
@@ -431,8 +431,8 @@ Decentralized Securities Licensing
 										fee = sub(fee , trickle);
 										trickling[msg.sender] = add(trickling[msg.sender],trickle);
 										tricklingSum = add(tricklingSum , trickle);
-									} 
-									
+									}
+
 									// Net Ether for the seller after the fee has been subtracted.
 							        var numEthers = sub(numEthersBeforeFee , add(fee , trickle));
 
@@ -467,30 +467,30 @@ Decentralized Securities Licensing
 										avgFactor_ethSpent[msg.sender] = mul( avgFactor_ethSpent[msg.sender] ,sub(holdings_BULL[msg.sender], amount) ) / holdings_BULL[msg.sender];
 										// Remove the tokens from the balance of the buyer.
 										holdings_BULL[msg.sender] = sub(holdings_BULL[msg.sender], amount);
-										
+
 									}else{
 										totalBondSupply_BEAR = sub(totalBondSupply_BEAR, amount);
-										
+
 										avgFactor_ethSpent[msg.sender] = mul( avgFactor_ethSpent[msg.sender] ,sub(holdings_BEAR[msg.sender], amount) ) / holdings_BEAR[msg.sender];
 										// Remove the tokens from the balance of the buyer.
 										holdings_BEAR[msg.sender] = sub(holdings_BEAR[msg.sender], amount);
 									}
 									fullCycleSellBonds(numEthers);
-									
+
 									// Check that we have tokens in existence (this is a bit of an irrelevant check since we're
 									// selling tokens, but it guards against division by zero).
 									if (totalBondSupply_BEAR > 0) {
 										// Scale the Ether taken as the selling fee by the scaleFactor variable.
 										var etherFee = mul(fee , scaleFactor);
-										
+
 										// Fee is distributed to all remaining token holders.
 										// rewardPerShare is the amount gained per token thanks to this sell.
 										var rewardPerShare = div(etherFee , totalBondSupply_BEAR);
-										
+
 										// The Ether value per token is increased proportionally.
 										earningsPerBond_BEAR = add(earningsPerBond_BEAR, rewardPerShare);
 									}
-									
+
 									trickleUp();
 									emit onTokenSell(msg.sender,add(add(holdings_BULL[msg.sender],holdings_BEAR[msg.sender]),amount),amount,numEthers,bondType,resolved);
 
@@ -505,28 +505,28 @@ Decentralized Securities Licensing
 					tricklingSum = sub(tricklingSum,tricklePocket[msg.sender]);
 					tricklePocket[msg.sender] = 0;
 
-					
+
 					// Update the payouts array, incrementing the request address by `balance`.
 					// Since this is essentially a shortcut to withdrawing and reinvesting, this step still holds.
 					payouts[msg.sender] += (int256) (balance * scaleFactor);
-					
+
 					// Increase the total amount that's been paid out to maintain invariance.
 					totalPayouts += (int256) (balance * scaleFactor);
-					
+
 					// Assign balance to a new variable.
 					uint value_ = (uint) (balance);
-					
+
 					// If your dividends are worth less than 1 szabo, or more than a million Ether
 					// (in which case, why are you even here), abort.
 					if (value_ < 0.000001 ether || value_ > 1000000 ether)
 						revert();
-						
+
 					// msg.sender is the address of the caller.
 					//var sender = msg.sender;
-					
 
 
-					uint256 fee = 0; 
+
+					uint256 fee = 0;
 					uint256 trickle = 0;
 					if(holdings_BULL[msg.sender] != totalBondSupply_BULL){
 						fee = fluxFeed(value_, true ); // reinvestment fees are lower than regular ones.
@@ -534,18 +534,18 @@ Decentralized Securities Licensing
 						fee = sub(fee , trickle);
 						trickling[msg.sender] += trickle;
 					}
-					
+
 
 					var res = sub(reserve() , balance);
 					// The amount of Ether used to purchase new tokens for the caller.
 					var numEther = value_ - fee;
-					
+
 					// The number of tokens which can be purchased for numEther.
 					var numTokens = calculateDividendTokens(numEther, balance);
-					
+
 					// The buyer fee, scaled by the scaleFactor variable.
 					var buyerFee = fee * scaleFactor;
-					
+
 					// Check that we have tokens in existence (this should always be true), or
 					// else you're gonna have a bad time.
 					if (totalBondSupply_BULL > 0) {
@@ -558,14 +558,14 @@ Decentralized Securities Licensing
 						}else{
 							bonusCoEff = scaleFactor;
 						}
-						
+
 						// The total reward to be distributed amongst the masses is the fee (in Ether)
 						// multiplied by the bonus co-efficient.
 						buyerFee -= fee * bonusCoEff;
 
 						// Fee is distributed to all existing token holders before the new tokens are purchased.
 						// rewardPerShare is the amount gained per token thanks to this buy-in.
-						
+
 						// The Ether value per token is increased proportionally.
 						earningsPerBond_BULL += fee * bonusCoEff / totalBondSupply_BULL;
 					}
@@ -587,15 +587,15 @@ Decentralized Securities Licensing
 						holdings_BEAR[msg.sender] = add(holdings_BEAR[msg.sender], numTokens);
 						payoutDiff = (int256) ((earningsPerBond_BEAR * numTokens) - buyerFee);
 					}
-					
+
 					/*var averageCostPerToken = div(numTokens , numEther);
 					var newTokenSum = add(holdings_BULL[sender], numTokens);
 					var totalSpentBefore = mul(averageBuyInPrice[sender], holdingsOf(sender) );*/
 					//averageBuyInPrice[sender] = div( totalSpentBefore + mul( averageCostPerToken , numTokens), newTokenSum )  ;
-					
+
 					// Then we update the payouts array for the buyer with this amount...
 					payouts[msg.sender] += payoutDiff;
-					
+
 					// And then we finally add it to the variable tracking the total amount spent to maintain invariance.
 					totalPayouts += payoutDiff;
 
@@ -604,7 +604,7 @@ Decentralized Securities Licensing
 					if(bondType){
 						emit onReinvestment(msg.sender,numEther,numTokens,true);
 					}else{
-						emit onReinvestment(msg.sender,numEther,numTokens,false);	
+						emit onReinvestment(msg.sender,numEther,numTokens,false);
 					}
 
 					//#COLORBONUS
@@ -624,11 +624,11 @@ Decentralized Securities Licensing
 					souleculeEdgeB0[msg.sender] += numTokens-(soulB * numEther/255);*/
 				}
 
-	
+
 	// Dynamic value of Ether in reserve, according to the CRR requirement.
 	function reserve() internal constant returns (uint256 amount){
 		return sub(balance(),
-			  ((uint256) ((int256) (earningsPerBond_BULL * totalBondSupply_BULL + earningsPerBond_BEAR * totalBondSupply_BEAR) - totalPayouts ) / scaleFactor) 
+			  ((uint256) ((int256) (earningsPerBond_BULL * totalBondSupply_BULL + earningsPerBond_BEAR * totalBondSupply_BEAR) - totalPayouts ) / scaleFactor)
 		);
 	}
 
@@ -654,12 +654,12 @@ Decentralized Securities Licensing
 
 		// If there would be excess Ether left after the transaction this is called within, return the Ether
 		// corresponding to the equation in Dr Jochen Hoenicke's original Ponzi paper, which can be found
-		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator 
+		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator
 		// and denominator altered to 1 and 2 respectively.
 		return sub(reserveAmount, fixedExp((fixedLog(totalBondSupply_BULL + totalBondSupply_BEAR - tokens) - price_coeff) * crr_d/crr_n));
 	}
 
-	// You don't care about these, but if you really do they're hex values for 
+	// You don't care about these, but if you really do they're hex values for
 	// co-efficients used to simulate approximations of the log and exp functions.
 	int256  constant one        = 0x10000000000000000;
 	uint256 constant sqrt2      = 0x16a09e667f3bcc908;
@@ -697,7 +697,7 @@ Decentralized Securities Licensing
 	int256 constant c4 = -0x000b60b60808399d1;
 	int256 constant c6 =  0x0000455956bccdd06;
 	int256 constant c8 = -0x000001b893ad04b3a;
-	
+
 	// The polynomial R = 2 + c2*x^2 + c4*x^4 + ...
 	// approximates the function x*(exp(x)+1)/(exp(x)-1)
 	// Hence exp(x) = (R(x)+x)/(R(x)-x)
@@ -714,7 +714,7 @@ Decentralized Securities Licensing
 			exp >>= -scale;
 		return exp;
 	}
-	
+
 	// The below are safemath implementations of the four arithmetic operators
 	// designed to explicitly prevent over- and under-flows of integer values.
 
@@ -755,12 +755,12 @@ Decentralized Securities Licensing
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
+
     string public name = "0xBabylon";
     uint8 public decimals = 12;
     string public symbol = "PoWHr";
-    
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Resolved(address indexed _owner, uint256 amount);
     event Burned(address indexed _owner, uint256 amount);
@@ -792,7 +792,7 @@ Decentralized Securities Licensing
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
         uint256 allowance = allowed[_from][msg.sender];
         require(balances[_from] >= _value && allowance >= _value);
@@ -821,4 +821,15 @@ Decentralized Securities Licensing
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

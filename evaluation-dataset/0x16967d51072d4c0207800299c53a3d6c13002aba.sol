@@ -308,7 +308,7 @@ contract ERC20 is IERC20 {
             _burn(from, value);
             return;
         }
-        
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
@@ -356,8 +356,8 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
     }
-    
-    
+
+
     /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -435,4 +435,15 @@ contract CXRToken is ERC20Detailed, Ownable {
         uint256 initialSupply = supply * 10 ** decimals;
         _mint(address(0x742236fbd952Cc462DD202F4143a9Fb5e8Fcd1A9), initialSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

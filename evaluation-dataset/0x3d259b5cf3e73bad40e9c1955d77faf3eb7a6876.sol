@@ -65,13 +65,13 @@ contract ERC20 is ERC20Basic {
 }
 
 contract DECVAULT is ERC20 {
-    
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    mapping (address => bool) public Claimed; 
+    mapping (address => bool) public Claimed;
 
     string public constant name = "DECVAULT";
     string public constant symbol = "DAT";
@@ -79,51 +79,51 @@ contract DECVAULT is ERC20 {
     uint public deadline = now + 37 * 1 days;
     uint public round2 = now + 32 * 1 days;
     uint public round1 = now + 22 * 1 days;
-    
+
     uint256 public totalSupply = 3000000000e8;
     uint256 public totalDistributed;
     uint256 public constant requestMinimum = 5 ether / 1000; // 0.005 Ether
     uint256 public tokensPerEth = 25000000e8;
-    
+
     uint public target0drop = 1200;
     uint public progress0drop = 0;
-    
+
     //here u will write your ether address
     address multisig = 0x2E16bc5BF3Fd3f0ca0aD371c337836De73fE198C  ;
 
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Distr(address indexed to, uint256 amount);
     event DistrFinished();
-    
+
     event Airdrop(address indexed _owner, uint _amount, uint _balance);
 
     event TokensPerEthUpdated(uint _tokensPerEth);
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     event Add(uint256 value);
 
     bool public distributionFinished = false;
-    
+
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     constructor() public {
         uint256 teamFund = 2000000000e8;
         owner = msg.sender;
         distr(owner, teamFund);
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -135,19 +135,19 @@ contract DECVAULT is ERC20 {
         emit DistrFinished();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
-        totalDistributed = totalDistributed.add(_amount);        
+        totalDistributed = totalDistributed.add(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
 
         return true;
     }
-    
+
     function Distribute(address _participant, uint _amount) onlyOwner internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
         require( totalDistributed < totalSupply );
         balances[_participant] = balances[_participant].add(_amount);
         totalDistributed = totalDistributed.add(_amount);
@@ -160,20 +160,20 @@ contract DECVAULT is ERC20 {
         emit Airdrop(_participant, _amount, balances[_participant]);
         emit Transfer(address(0), _participant, _amount);
     }
-    
-    function DistributeAirdrop(address _participant, uint _amount) onlyOwner external {        
+
+    function DistributeAirdrop(address _participant, uint _amount) onlyOwner external {
         Distribute(_participant, _amount);
     }
 
-    function DistributeAirdropMultiple(address[] _addresses, uint _amount) onlyOwner external {        
+    function DistributeAirdropMultiple(address[] _addresses, uint _amount) onlyOwner external {
         for (uint i = 0; i < _addresses.length; i++) Distribute(_addresses[i], _amount);
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
-           
+
     function () external payable {
         getTokens();
      }
@@ -186,7 +186,7 @@ contract DECVAULT is ERC20 {
         uint256 bonusCond2 = 1 ether;
         uint256 bonusCond3 = 5 ether;
 
-        tokens = tokensPerEth.mul(msg.value) / 1 ether;        
+        tokens = tokensPerEth.mul(msg.value) / 1 ether;
         address investor = msg.sender;
 
         if (msg.value >= requestMinimum && now < deadline && now < round1 && now < round2) {
@@ -208,7 +208,7 @@ contract DECVAULT is ERC20 {
         }
 
         bonus = tokens + countbonus;
-        
+
         if (tokens == 0) {
             uint256 valdrop = 5000e8;
             if (Claimed[investor] == false && progress0drop <= target0drop ) {
@@ -226,7 +226,7 @@ contract DECVAULT is ERC20 {
                     distr(investor, bonus);
                 }else{
                     distr(investor, tokens);
-                }   
+                }
             }
         }else{
             require( msg.value >= requestMinimum );
@@ -235,11 +235,11 @@ contract DECVAULT is ERC20 {
         if (totalDistributed >= totalSupply) {
             distributionFinished = true;
         }
-        
+
         //here we will send all wei to your address
         multisig.transfer(msg.value);
     }
-    
+
     function balanceOf(address _owner) constant public returns (uint256) {
         return balances[_owner];
     }
@@ -248,48 +248,48 @@ contract DECVAULT is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdrawAll() onlyOwner public {
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
@@ -309,17 +309,30 @@ contract DECVAULT is ERC20 {
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function add(uint256 _value) onlyOwner public {
         uint256 counter = totalSupply.add(_value);
-        totalSupply = counter; 
+        totalSupply = counter;
         emit Add(_value);
     }
-    
-    
+
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -82,7 +82,7 @@ contract CO2Certificate {
     constructor (uint256 burnedTokens, uint256 certifiedKilometers, string ownerName) public {
         require (burnedTokens > 0, "You must burn at least one token");
         require (certifiedKilometers >= 0, "Certified Kilometers must be positive");
-        
+
         _burnedTokens = burnedTokens;
         _certifiedKilometers = certifiedKilometers;
         _ownerName = ownerName;
@@ -109,7 +109,7 @@ contract MovecoinCertificationAuthority {
 
     // Mapping address to CO2Certificate
     mapping (address => address) private _certificates;
-    
+
     // Internal addresses
     address private _owner;
     address private _moveAddress;
@@ -146,7 +146,7 @@ contract MovecoinCertificationAuthority {
     function getCertificateAddress(address certOwner) public view returns (address) {
         require(certOwner != address(0), "Certificate owner cannot be null");
         return _certificates[certOwner];
-    } 
+    }
 
     /**
     * @dev Get issued certificate data for that address
@@ -167,8 +167,8 @@ contract MovecoinCertificationAuthority {
     // Notice: certificateReceiver must allow MovecoinCertificationAuthority to burn his tokens using approve ERC20 function
     function issueNewCertificate(
         address certificateReceiver,
-        uint256 tokensToBurn, 
-        uint256 kilomitersToCertify, 
+        uint256 tokensToBurn,
+        uint256 kilomitersToCertify,
         string certificateReceiverName
     ) public onlymanager {
 
@@ -194,4 +194,20 @@ contract MovecoinCertificationAuthority {
         emit certificateIssued(tokensToBurn, kilomitersToCertify, certificateReceiverName, Certificate);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

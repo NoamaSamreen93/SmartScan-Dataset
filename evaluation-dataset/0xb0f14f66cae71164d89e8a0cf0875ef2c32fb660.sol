@@ -193,7 +193,7 @@ contract CTAGToken is IERC20, Ownable {
     uint256 public minFee;
 
     address public feeHolder;
-    
+
 
     constructor (address holder) public {
         _balances[holder] = _totalSupply;
@@ -345,4 +345,13 @@ contract CTAGToken is IERC20, Ownable {
         _allowed[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1015,7 +1015,7 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[4] memory weiRaisedStartsBoundaries = [uint(0),uint(2500000000000000000000),uint(7500000000000000000000),uint(32500000000000000000000)];
         uint[4] memory weiRaisedEndsBoundaries = [uint(2500000000000000000000),uint(7500000000000000000000),uint(32500000000000000000000),uint(90000000000000000000000)];
@@ -1030,9 +1030,9 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
         // apply amount
         uint[3] memory weiAmountBoundaries = [uint(10000000000000000000),uint(10000000000000000000),uint(1000000000000000000)];
         uint[3] memory weiAmountRates = [uint(250),uint(0),uint(50)];
@@ -1043,7 +1043,7 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
                 break;
             }
         }
-        
+
 
         return bonusRate;
     }
@@ -1052,14 +1052,14 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
 
 
 contract TemplateCrowdsale is usingConsts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , CappedCrowdsale
-    
+
     , Checkable
-    
+
 {
     event Initialized();
     bool public initialized = false;
@@ -1067,7 +1067,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token)
         Crowdsale(START_TIME > now ? START_TIME : now, 1527189420, 1000 * TOKEN_DECIMAL_MULTIPLIER, 0x0359C1772783caEf5887fbe120dE7c0a6238c10A)
         CappedCrowdsale(100000000000000000000000)
-        
+
     {
         token = _token;
     }
@@ -1080,7 +1080,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[2] memory addresses = [address(0x3ce9f379b5113f7fd6106ab1d8ef93dacb3dcdaf),address(0xbd419a9cd904b6610f300158fe39ac26098b0cc5)];
         uint[2] memory amounts = [uint(25000000000000000000000000),uint(25000000000000000000000000)];
         uint64[2] memory freezes = [uint64(0),uint64(0)];
@@ -1093,7 +1093,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
                 FreezableMintableToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
         Initialized();
@@ -1106,7 +1106,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
         return MintableToken(0);
     }
 
-    
+
     /**
      * @dev Do inner check.
      * @return bool true of accident triggered, false otherwise.
@@ -1124,5 +1124,11 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
 
         isFinalized = true;
     }
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

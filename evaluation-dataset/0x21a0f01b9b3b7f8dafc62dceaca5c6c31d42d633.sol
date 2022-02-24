@@ -86,8 +86,8 @@ contract Ownable {
 
 
 //Announcement of an interface for recipient approving
-interface tokenRecipient { 
-	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData)public; 
+interface tokenRecipient {
+	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData)public;
 }
 
 contract ERC20Basic {
@@ -110,7 +110,7 @@ contract ERC20 is ERC20Basic {
 
 
 contract ShareXERC20 is Ownable{
-	
+
 	//===================public variables definition start==================
     string public name;															//Name of your Token
     string public symbol;														//Symbol of your Token
@@ -122,12 +122,12 @@ contract ShareXERC20 is Ownable{
     mapping (address => mapping (address => uint256)) public allowance;			//Announce the dictionary of account's available balance
 	//===================public variables definition end==================
 
-	
-	//===================events definition start==================    
+
+	//===================events definition start==================
     event Transfer(address indexed from, address indexed to, uint256 value);	//Event on blockchain which notify client
 	//===================events definition end==================
-	
-	
+
+
 	//===================Contract Initialization Sequence Definition start===================
     function ShareXERC20 () public {
 		decimals=8;															//Assignment of Token's decimals
@@ -135,12 +135,12 @@ contract ShareXERC20 is Ownable{
         balanceOf[owner] = totalSupply;                						//Assignment of Token's creator initial tokens
         name = "ShareX";                                   					//Set the name of Token
         symbol = "SEXC";                               						//Set the symbol of  Token
-        
+
     }
 	//===================Contract Initialization Sequence definition end===================
-	
+
 	//===================Contract behavior & funtions definition start===================
-	
+
 	/*
 	*	Funtion: Transfer funtions
 	*	Type:Internal
@@ -160,13 +160,13 @@ contract ShareXERC20 is Ownable{
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-		
+
 		//Verify transaction
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
-        
+
     }
-	
-	
+
+
 	/*
 	*	Funtion: Transfer tokens
 	*	Type:Public
@@ -175,11 +175,11 @@ contract ShareXERC20 is Ownable{
 			@_value:transaction amount
 	*/
     function transfer(address _to, uint256 _value) public returns (bool success) {
-		
+
         _transfer(msg.sender, _to, _value);
         return true;
-    }	
-	
+    }
+
 	/*
 	*	Funtion: Transfer tokens from other address
 	*	Type:Public
@@ -189,14 +189,14 @@ contract ShareXERC20 is Ownable{
 			@_value:transaction amount
 	*/
 
-    function transferFrom(address _from, address _to, uint256 _value) public 
+    function transferFrom(address _from, address _to, uint256 _value) public
 	returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     					//Allowance verification
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
 	/*
 	*	Funtion: Approve usable amount for an account
 	*	Type:Public
@@ -204,7 +204,7 @@ contract ShareXERC20 is Ownable{
 			@_spender:	address of spender's account
 			@_value:	approve amount
 	*/
-    function approve(address _spender, uint256 _value) public 
+    function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -218,7 +218,7 @@ contract ShareXERC20 is Ownable{
 			@_value:	approve amount
 			@_extraData:additional information to send to the approved contract
 	*/
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
         returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -249,7 +249,7 @@ contract ShareXTokenVault is Ownable {
     //Wallet Addresses for allocation
     address public teamReserveWallet = 0x78e27c0347fa3afcc31e160b0fbc6f90186fd2b6;
     address public firstReserveWallet = 0xef2ab7226c1a3d274caad2dec6d79a4db5d5799e;
-    
+
     address public CEO = 0x2Fc7607CE5f6c36979CC63aFcDA6D62Df656e4aE;
     address public COO = 0x08465f80A28E095DEE4BE0692AC1bA1A2E3EEeE9;
     address public CTO = 0xB22E5Ac6C3a9427C48295806a34f7a3C0FD21443;
@@ -257,7 +257,7 @@ contract ShareXTokenVault is Ownable {
     address public CPO = 0xa33da3654d5fdaBC4Dd49fB4e6c81C58D28aA74a;
     address public CEO_TEAM =0xc0e3294E567e965C3Ff3687015fCf88eD3CCC9EA;
     address public AWD = 0xc0e3294E567e965C3Ff3687015fCf88eD3CCC9EA;
-    
+
     uint256 public CEO_SHARE = 45;
     uint256 public COO_SHARE = 12;
     uint256 public CTO_SHARE = 9;
@@ -265,21 +265,21 @@ contract ShareXTokenVault is Ownable {
     uint256 public CPO_SHARE = 9;
     uint256 public CEO_TEAM_SHARE =6;
     uint256 public AWD_SHARE =10;
-    
+
     uint256 public DIV = 100;
 
     //Token Allocations
     uint256 public teamReserveAllocation = 16 * (10 ** 7) * (10 ** 8);
     uint256 public firstReserveAllocation = 4 * (10 ** 7) * (10 ** 8);
-    
+
 
     //Total Token Allocations
     uint256 public totalAllocation = 2 * (10 ** 8) * (10 ** 8);
 
     uint256 public teamVestingStages = 8;
-    //first unlocked Token 
+    //first unlocked Token
     uint256 public firstTime =1531584000;  //2018-07-15 00:00:00
-    
+
     //teamTimeLock
     uint256 public teamTimeLock = 2 * 365 days;
     //team unlocked over
@@ -289,7 +289,7 @@ contract ShareXTokenVault is Ownable {
     /** Reserve allocations */
     mapping(address => uint256) public allocations;
 
-    /** When timeLocks are over (UNIX Timestamp)  */  
+    /** When timeLocks are over (UNIX Timestamp)  */
     mapping(address => uint256) public timeLocks;
 
     /** How many tokens each reserve wallet has claimed */
@@ -351,14 +351,14 @@ contract ShareXTokenVault is Ownable {
 
         owner = msg.sender;
         token = ShareXERC20(_token);
-        
+
     }
 
     function allocate() public notLocked notAllocated onlyOwner {
 
         //Makes sure Token Contract has the exact number of tokens
         require(token.balanceOf(address(this)) == totalAllocation);
-        
+
         allocations[teamReserveWallet] = teamReserveAllocation;
         allocations[firstReserveWallet] = firstReserveAllocation;
 
@@ -375,7 +375,7 @@ contract ShareXTokenVault is Ownable {
 
         // timeLocks[teamReserveWallet] = lockedAt.add(teamTimeLock);
         timeLocks[teamReserveWallet] = secondTime;
-        
+
         // timeLocks[firstReserveWallet] = lockedAt.add(firstReserveTimeLock);
         timeLocks[firstReserveWallet] = firstTime;
 
@@ -454,17 +454,17 @@ contract ShareXTokenVault is Ownable {
         claimed[teamReserveWallet] = totalUnlocked;
 
         // require(token.transfer(teamReserveWallet, payment));
-        
+
         require(token.transfer(AWD,payment));
-        
+
         Distributed(AWD, payment);
     }
-  
-    //Current Vesting stage for ShareX team 
+
+    //Current Vesting stage for ShareX team
     function teamVestingStage() public view onlyTeamReserve returns(uint256){
-        
+
         // Every 3 months
-        uint256 vestingMonths = teamTimeLock.div(teamVestingStages); 
+        uint256 vestingMonths = teamTimeLock.div(teamVestingStages);
 
         // uint256 stage = (block.timestamp.sub(lockedAt)).div(vestingMonths);
         uint256 stage  = (block.timestamp).sub(firstTime).div(vestingMonths);
@@ -485,4 +485,15 @@ contract ShareXTokenVault is Ownable {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

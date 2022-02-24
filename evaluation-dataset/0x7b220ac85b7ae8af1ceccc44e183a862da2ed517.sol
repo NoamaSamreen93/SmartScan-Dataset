@@ -19,7 +19,7 @@ interface Proxy {
     uint256 _c
   )
     external;
-    
+
 }
 
 /**
@@ -95,7 +95,7 @@ interface XcertBurnable // is Xcert
  */
 interface XcertMutable // is Xcert
 {
-  
+
   /**
    * @dev Updates Xcert imprint.
    * @param _tokenId Id of the Xcert.
@@ -123,7 +123,7 @@ interface XcertPausable // is Xcert
     bool _isPaused
   )
     external;
-    
+
 }
 
 /**
@@ -131,9 +131,9 @@ interface XcertPausable // is Xcert
  */
 interface XcertRevokable // is Xcert
 {
-  
+
   /**
-   * @dev Revokes a specified Xcert. Reverts if not called from contract owner or authorized 
+   * @dev Revokes a specified Xcert. Reverts if not called from contract owner or authorized
    * address.
    * @param _tokenId Id of the Xcert we want to destroy.
    */
@@ -145,8 +145,8 @@ interface XcertRevokable // is Xcert
 }
 
 /**
- * @dev Math operations with safety checks that throw on error. This contract is based on the 
- * source code at: 
+ * @dev Math operations with safety checks that throw on error. This contract is based on the
+ * source code at:
  * https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol.
  */
 library SafeMath
@@ -254,7 +254,7 @@ library SafeMath
   )
     internal
     pure
-    returns (uint256 remainder) 
+    returns (uint256 remainder)
   {
     require(_divisor != 0, DIVISION_BY_ZERO);
     remainder = _dividend % _divisor;
@@ -266,13 +266,13 @@ library SafeMath
  * @title Contract for setting abilities.
  * @dev For optimization purposes the abilities are represented as a bitfield. Maximum number of
  * abilities is therefore 256. This is an example(for simplicity is made for max 8 abilities) of how
- * this works. 
+ * this works.
  * 00000001 Ability A - number representation 1
  * 00000010 Ability B - number representation 2
  * 00000100 Ability C - number representation 4
  * 00001000 Ability D - number representation 8
  * 00010000 Ability E - number representation 16
- * etc ... 
+ * etc ...
  * To grant abilities B and C, we would need a bitfield of 00000110 which is represented by number
  * 6, in other words, the sum of abilities B and C. The same concept works for revoking abilities
  * and checking if someone has multiple abilities.
@@ -325,7 +325,7 @@ contract Abilitable
    */
   modifier hasAbilities(
     uint256 _abilities
-  ) 
+  )
   {
     require(_abilities > 0, INVALID_INPUT);
     require(
@@ -401,11 +401,11 @@ contract Abilitable
     require(_abilities > 0, INVALID_INPUT);
     return (addressToAbility[_target] & _abilities) == _abilities;
   }
-  
+
 }
 
 /**
- * @dev ERC-721 non-fungible token standard. 
+ * @dev ERC-721 non-fungible token standard.
  * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
  */
 interface ERC721
@@ -450,7 +450,7 @@ interface ERC721
    * approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
    * the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
    * function checks if `_to` is a smart contract (code size > 0). If so, it calls
-   * `onERC721Received` on `_to` and throws if the return value is not 
+   * `onERC721Received` on `_to` and throws if the return value is not
    * `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
    * @param _from The current owner of the NFT.
    * @param _to The new owner.
@@ -548,12 +548,12 @@ interface ERC721
     external
     view
     returns (address);
-    
+
   /**
    * @dev Get the approved address for a single NFT.
    * @notice Throws if `_tokenId` is not a valid NFT.
    * @param _tokenId The NFT to find the approved address for.
-   * @return Address that _tokenId is approved for. 
+   * @return Address that _tokenId is approved for.
    */
   function getApproved(
     uint256 _tokenId
@@ -587,7 +587,7 @@ interface ERC721Metadata
 
   /**
    * @dev Returns a descriptive name for a collection of NFTs in this contract.
-   * @return Representing name. 
+   * @return Representing name.
    */
   function name()
     external
@@ -596,7 +596,7 @@ interface ERC721Metadata
 
   /**
    * @dev Returns a abbreviated name for a collection of NFTs in this contract.
-   * @return Representing symbol. 
+   * @return Representing symbol.
    */
   function symbol()
     external
@@ -664,7 +664,7 @@ interface ERC721Enumerable
 }
 
 /**
- * @dev ERC-721 interface for accepting safe transfers. 
+ * @dev ERC-721 interface for accepting safe transfers.
  * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
  */
 interface ERC721TokenReceiver
@@ -691,7 +691,7 @@ interface ERC721TokenReceiver
   )
     external
     returns(bytes4);
-    
+
 }
 
 /**
@@ -925,8 +925,8 @@ contract NFTokenMetadataEnumerable is
    * @notice Throws unless `msg.sender` is the current owner, an authorized operator, or the
    * approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
    * the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
-   * function checks if `_to` is a smart contract (code size > 0). If so, it calls 
-   * `onERC721Received` on `_to` and throws if the return value is not 
+   * function checks if `_to` is a smart contract (code size > 0). If so, it calls
+   * `onERC721Received` on `_to` and throws if the return value is not
    * `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
    * @param _from The current owner of the NFT.
    * @param _to The new owner.
@@ -1061,7 +1061,7 @@ contract NFTokenMetadataEnumerable is
    * @dev Get the approved address for a single NFT.
    * @notice Throws if `_tokenId` is not a valid NFT.
    * @param _tokenId ID of the NFT to query the approval of.
-   * @return Address that _tokenId is approved for. 
+   * @return Address that _tokenId is approved for.
    */
   function getApproved(
     uint256 _tokenId
@@ -1139,7 +1139,7 @@ contract NFTokenMetadataEnumerable is
 
   /**
    * @dev Returns a descriptive name for a collection of NFTs.
-   * @return Representing name. 
+   * @return Representing name.
    */
   function name()
     external
@@ -1151,7 +1151,7 @@ contract NFTokenMetadataEnumerable is
 
   /**
    * @dev Returns an abbreviated name for NFTs.
-   * @return Representing symbol. 
+   * @return Representing symbol.
    */
   function symbol()
     external
@@ -1160,7 +1160,7 @@ contract NFTokenMetadataEnumerable is
   {
     _symbol = nftSymbol;
   }
-  
+
   /**
    * @notice A distinct Uniform Resource Identifier (URI) for a given asset.
    * @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC 3986. The URI may point
@@ -1372,7 +1372,7 @@ contract NFTokenMetadataEnumerable is
    */
   function _uint2str(
     uint256 _i
-  ) 
+  )
     internal
     pure
     returns (string memory str)
@@ -1398,13 +1398,13 @@ contract NFTokenMetadataEnumerable is
     }
     str = string(bstr);
   }
-  
+
 }
 
 /**
  * @dev Xcert implementation.
  */
-contract XcertToken is 
+contract XcertToken is
   Xcert,
   XcertBurnable,
   XcertMutable,
@@ -1520,7 +1520,7 @@ contract XcertToken is
   }
 
   /**
-   * @dev Revokes(destroys) a specified Xcert. Reverts if not called from contract owner or 
+   * @dev Revokes(destroys) a specified Xcert. Reverts if not called from contract owner or
    * authorized address.
    * @param _tokenId Id of the Xcert we want to destroy.
    */
@@ -1632,14 +1632,14 @@ contract XcertToken is
      * {
      *   require(!isPaused, TRANSFERS_DISABLED);
      * }
-     * There is no need to check for pausable capability here since by using logical deduction we 
+     * There is no need to check for pausable capability here since by using logical deduction we
      * can say based on code above that:
      * !supportedInterfaces[0xbedb86fb] => !isPaused
      * isPaused => supportedInterfaces[0xbedb86fb]
-     * (supportedInterfaces[0xbedb86fb] ∧ isPaused) <=> isPaused. 
+     * (supportedInterfaces[0xbedb86fb] ∧ isPaused) <=> isPaused.
      * This saves 200 gas.
      */
-    require(!isPaused, TRANSFERS_DISABLED); 
+    require(!isPaused, TRANSFERS_DISABLED);
     super._transferFrom(_from, _to, _tokenId);
   }
 }
@@ -1648,13 +1648,13 @@ contract XcertToken is
  * @title XcertCreateProxy - creates a token on behalf of contracts that have been approved via
  * decentralized governance.
  */
-contract XcertCreateProxy is 
-  Abilitable 
+contract XcertCreateProxy is
+  Abilitable
 {
 
   /**
    * @dev List of abilities:
-   * 2 - Ability to execute create. 
+   * 2 - Ability to execute create.
    */
   uint8 constant ABILITY_TO_EXECUTE = 2;
 
@@ -1676,7 +1676,7 @@ contract XcertCreateProxy is
   {
     Xcert(_xcert).create(_to, _id, _imprint);
   }
-  
+
 }
 
 pragma experimental ABIEncoderV2;
@@ -1685,8 +1685,8 @@ pragma experimental ABIEncoderV2;
 
 
 /**
- * @dev Decentralize exchange, creating, updating and other actions for fundgible and non-fundgible 
- * tokens powered by atomic swaps. 
+ * @dev Decentralize exchange, creating, updating and other actions for fundgible and non-fundgible
+ * tokens powered by atomic swaps.
  */
 contract OrderGateway is
   Abilitable
@@ -1727,7 +1727,7 @@ contract OrderGateway is
    * See also:
    * https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer
    * https://github.com/trezor/trezor-mcu/blob/master/firmware/ethereum.c#L602
-   * https://github.com/trezor/trezor-mcu/blob/master/firmware/crypto.c#L36 
+   * https://github.com/trezor/trezor-mcu/blob/master/firmware/crypto.c#L36
    * @param eip721 Signature using eip721.
    */
   enum SignatureKind
@@ -1748,14 +1748,14 @@ contract OrderGateway is
 
   /**
    * @dev Structure representing what to send and where.
-   * @param kind Enum representing action kind. 
+   * @param kind Enum representing action kind.
    * @param proxy Id representing approved proxy address.
    * @param token Address of the token we are sending.
    * @param param1 Address of the sender or imprint.
    * @param to Address of the receiver.
    * @param value Amount of ERC20 or ID of ERC721.
    */
-  struct ActionData 
+  struct ActionData
   {
     ActionKind kind;
     uint32 proxy;
@@ -1770,7 +1770,7 @@ contract OrderGateway is
    * @param r ECDSA signature parameter r.
    * @param s ECDSA signature parameter s.
    * @param v ECDSA signature parameter v.
-   * @param kind Type of signature. 
+   * @param kind Type of signature.
    */
   struct SignatureData
   {
@@ -1787,9 +1787,9 @@ contract OrderGateway is
    * @param actions Data of all the actions that should accure it this order.
    * @param signature Data from the signed claim.
    * @param seed Arbitrary number to facilitate uniqueness of the order's hash. Usually timestamp.
-   * @param expiration Timestamp of when the claim expires. 0 if indefinet. 
+   * @param expiration Timestamp of when the claim expires. 0 if indefinet.
    */
-  struct OrderData 
+  struct OrderData
   {
     address maker;
     address taker;
@@ -1798,7 +1798,7 @@ contract OrderGateway is
     uint256 expiration;
   }
 
-  /** 
+  /**
    * @dev Valid proxy contract addresses.
    */
   address[] public proxies;
@@ -1840,7 +1840,7 @@ contract OrderGateway is
   );
 
   /**
-   * @dev Adds a verified proxy address. 
+   * @dev Adds a verified proxy address.
    * @notice Can be done through a multisig wallet in the future.
    * @param _proxy Proxy address.
    */
@@ -1855,7 +1855,7 @@ contract OrderGateway is
   }
 
   /**
-   * @dev Removes a proxy address. 
+   * @dev Removes a proxy address.
    * @notice Can be done through a multisig wallet in the future.
    * @param _index Index of proxy we are removing.
    */
@@ -1873,13 +1873,13 @@ contract OrderGateway is
    * @dev Performs the atomic swap that can exchange, create, update and do other actions for
    * fungible and non-fungible tokens.
    * @param _data Data required to make the order.
-   * @param _signature Data from the signature. 
+   * @param _signature Data from the signature.
    */
   function perform(
     OrderData memory _data,
     SignatureData memory _signature
   )
-    public 
+    public
   {
     require(_data.taker == msg.sender, TAKER_NOT_EQUAL_TO_SENDER);
     require(_data.expiration >= now, CLAIM_EXPIRED);
@@ -1890,7 +1890,7 @@ contract OrderGateway is
         _data.maker,
         claim,
         _signature
-      ), 
+      ),
       INVALID_SIGNATURE
     );
 
@@ -1908,7 +1908,7 @@ contract OrderGateway is
     );
   }
 
-  /** 
+  /**
    * @dev Cancels order.
    * @notice You can cancel the same order multiple times. There is no check for whether the order
    * was already canceled due to gas optimization. You should either check orderCancelled variable
@@ -1973,7 +1973,7 @@ contract OrderGateway is
       )
     );
   }
-  
+
   /**
    * @dev Verifies if claim signature is valid.
    * @param _signer address of signer.
@@ -2050,14 +2050,14 @@ contract OrderGateway is
           Abilitable(_order.actions[i].token).isAble(_order.maker, ABILITY_ALLOW_CREATE_ASSET),
           SIGNER_NOT_AUTHORIZED
         );
-        
+
         XcertCreateProxy(proxies[_order.actions[i].proxy]).create(
           _order.actions[i].token,
           _order.actions[i].to,
           _order.actions[i].value,
           _order.actions[i].param1
         );
-      } 
+      }
       else if (_order.actions[i].kind == ActionKind.transfer)
       {
         address from = address(uint160(bytes20(_order.actions[i].param1)));
@@ -2066,7 +2066,7 @@ contract OrderGateway is
           || from == _order.taker,
           SENDER_NOT_TAKER_OR_MAKER
         );
-        
+
         Proxy(proxies[_order.actions[i].proxy]).execute(
           _order.actions[i].token,
           from,
@@ -2076,5 +2076,11 @@ contract OrderGateway is
       }
     }
   }
-  
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

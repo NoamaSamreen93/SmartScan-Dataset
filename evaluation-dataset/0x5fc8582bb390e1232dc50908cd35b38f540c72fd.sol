@@ -55,3 +55,7 @@ contract BitcoinQuick {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

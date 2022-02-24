@@ -398,12 +398,12 @@ contract Ownable {
 contract MainCoin is BurnableToken, Ownable {
   /// @notice Constant field with token full name
   // solium-disable-next-line uppercase
-  string constant public name = "MainCoin"; 
+  string constant public name = "MainCoin";
   /// @notice Constant field with token symbol
   string constant public symbol = "MNC"; // solium-disable-line uppercase
   /// @notice Constant field with token precision depth
   uint256 constant public decimals = 18; // solium-disable-line uppercase
-  /// @notice Constant field with token cap (total supply limit) - 500M 
+  /// @notice Constant field with token cap (total supply limit) - 500M
   uint256 constant public initial = 500 ether * 10 ** 6; // solium-disable-line uppercase
 
   mapping (address=>bool) public allowedAddresses;
@@ -425,7 +425,7 @@ contract MainCoin is BurnableToken, Ownable {
     allowedAddresses[_for] = false;
     return true;
   }
-  
+
   modifier isTrasferAllowed(address a, address b) {
     require(unfrozen || allowedAddresses[a] || allowedAddresses[b]);
     _;
@@ -475,4 +475,13 @@ contract MainCoin is BurnableToken, Ownable {
   function decreaseApproval(address _spender, uint256 _subtractedValue) public isTrasferAllowed(msg.sender, _spender) returns (bool) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -30,20 +30,20 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
@@ -51,7 +51,7 @@ contract BoomerangLiquidity is Owned {
 
     P3D internal constant p3dContract = P3D(address(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe));
     address internal constant sk2xContract = P3D(address(0xAfd87E1E1eCe09D18f4834F64F63502718d1b3d4));
-    
+
     function() payable public {
         if(p3dContract.myDividends(true) > 0){
             p3dContract.withdraw();
@@ -63,13 +63,29 @@ contract BoomerangLiquidity is Owned {
             p3dContract.buy.value(half)(msg.sender);
         }
     }
-    
+
     function donateP3D() payable public {
         p3dContract.buy.value(msg.value)(msg.sender);
     }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         require(tokenAddress != address(p3dContract));
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

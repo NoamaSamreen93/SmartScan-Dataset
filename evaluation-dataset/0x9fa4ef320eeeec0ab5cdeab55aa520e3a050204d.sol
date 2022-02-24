@@ -77,7 +77,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -153,9 +153,9 @@ contract Otest1Token is ERC20Interface, Owned, SafeMath {
         // Check if the sender has enough
         require(balances[msg.sender] >= tokens);
         // Check if sender is frozen
-        require(!frozenAccount[msg.sender]);     
-        // Check if recipient is frozen                
-        require(!frozenAccount[to]);                   
+        require(!frozenAccount[msg.sender]);
+        // Check if recipient is frozen
+        require(!frozenAccount[to]);
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -169,7 +169,7 @@ contract Otest1Token is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -180,7 +180,7 @@ contract Otest1Token is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -189,9 +189,9 @@ contract Otest1Token is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         // Check if sender is frozen
-        require(!frozenAccount[from]);     
-        // Check if recipient is frozen                
-        require(!frozenAccount[to]);                       
+        require(!frozenAccount[from]);
+        // Check if recipient is frozen
+        require(!frozenAccount[to]);
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
@@ -260,4 +260,13 @@ contract Otest1Token is ERC20Interface, Owned, SafeMath {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

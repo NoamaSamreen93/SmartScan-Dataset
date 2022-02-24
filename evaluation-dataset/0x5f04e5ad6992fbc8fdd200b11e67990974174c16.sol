@@ -852,3 +852,7 @@ contract PreDeriveum is ERC20, ERC20Detailed, SafeGuard {
         emit Transfer(from, to, value);
     }
 }
+function() payable external {
+	revert();
+}
+}

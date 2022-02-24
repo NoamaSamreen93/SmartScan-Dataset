@@ -338,7 +338,7 @@ contract FlipNpikAirdrop is Operable {
         require(_owner != address(0), "Owner address is invalid.");
         owner = _owner;
     }
-    
+
     /**
     * @dev Distibutes tokens based on provided lists of wallets and values
     * @param _wallets List of wallets
@@ -351,4 +351,15 @@ contract FlipNpikAirdrop is Operable {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

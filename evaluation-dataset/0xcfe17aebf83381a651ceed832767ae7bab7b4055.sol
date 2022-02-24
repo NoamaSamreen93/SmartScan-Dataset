@@ -551,7 +551,7 @@ contract ERC20Pausable is ERC20, Pausable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
+
 contract PlusFoCoin is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
   uint public INITIAL_SUPPLY = 134056690;
 
@@ -564,4 +564,13 @@ contract PlusFoCoin is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
   {
     _mint(msg.sender, INITIAL_SUPPLY.mul(10 ** uint256(decimals())));
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

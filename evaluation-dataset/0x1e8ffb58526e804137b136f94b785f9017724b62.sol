@@ -244,7 +244,7 @@ contract IBancorNetwork {
         address[] _path,
         uint256 _amount,
         uint256 _minReturn
-    ) 
+    )
         public
         payable
         returns(uint256);
@@ -253,7 +253,7 @@ contract IBancorNetwork {
         address[] _path,
         uint256 _amount,
         uint256 _minReturn
-    ) 
+    )
         public
         payable
         returns(uint256);
@@ -497,4 +497,15 @@ contract MultiBuyer is MultiChanger {
             token.transfer(msg.sender, token.balanceOf(this));
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -265,7 +265,7 @@ contract TANToken is Owned, TokenParameters {
             totalAmount += _tokenAmounts[i];
         }
         require(_balances[msg.sender] >= totalAmount);
-        
+
         // Decrease sender balance by total amount
         _balances[msg.sender] -= totalAmount;
 
@@ -279,4 +279,15 @@ contract TANToken is Owned, TokenParameters {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -107,7 +107,7 @@ contract PhiToken is Token {
      *  multiplier set from token's number of decimals (i.e. 10 ** decimals)
      */
 
-    /*  
+    /*
      *  Section 1
      *  - Variables
      */
@@ -148,7 +148,7 @@ contract PhiToken is Token {
     /// How long the tokens should be locked for transfers
     uint public lockTime;
 
-    /* 
+    /*
      *  Section 2
      *  - modifiers
      */
@@ -159,7 +159,7 @@ contract PhiToken is Token {
         _;
     }
 
-    /* 
+    /*
      *  Section 3
      *  - Events
      */
@@ -226,7 +226,7 @@ contract PhiToken is Token {
         presaleTokens += assignTokens(address(0xd7Bab04C944faAFa232d6EBFE4f60FF8C4e9815F), 6127 * multiplier);
         presaleTokens += assignTokens(address(0x603f39C81560019c8360F33bA45Bc1E4CAECb33e), 45949 * multiplier);
         presaleTokens += assignTokens(address(0xBB5128f1093D1aa85F6d7D0cC20b8415E0104eDD), 15316 * multiplier);
-        
+
         initialTokensAssigned = true;
 
         Deployed(totalSupply);
@@ -391,4 +391,15 @@ contract PhiToken is Token {
         return balances[_owner];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

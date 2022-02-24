@@ -421,3 +421,14 @@ contract OWpay is Ownable, Pausable, IERC20 {
         emit Transfer(address(0), account, value);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

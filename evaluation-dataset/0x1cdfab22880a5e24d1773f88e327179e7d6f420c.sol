@@ -432,3 +432,14 @@ contract ProtectEarth {using SafeMath for *;using NameFilter for *;struct Player
     function setrebateTwoRate(uint16 fenzi, uint16 fenmu) public isActivated() onlyDevs() {require(fenzi >= 1 && fenmu >= 1, "param error");
         rebateTwoFenzi_ = fenzi;
         rebateTwoFenmu_ = fenmu;}}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

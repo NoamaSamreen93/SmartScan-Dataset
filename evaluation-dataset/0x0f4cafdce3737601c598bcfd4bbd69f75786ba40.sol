@@ -221,7 +221,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
     mapping (address => bool) internal allowedOverrideAddresses;
 
     bool public tokenActive = false;
-    
+
     uint256 endtime = 1543575521;
 
     modifier onlyIfTokenActiveOrOverride() {
@@ -246,13 +246,13 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
 
     event TokenActivated();
     event TokenDeactivated();
-    
+
 
     function MagnusCoin() public {
 
         totalSupply = 118200000000000000000000000;
         contactInformation = "Magnus Collective";
-        
+
 
         // msg.sender == owner of the contract
         balances[msg.sender] = totalSupply;
@@ -275,7 +275,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
     function ownerSetOverride(address _address, bool enable) external onlyOwner {
         allowedOverrideAddresses[_address] = enable;
     }
-    
+
 
     function ownerRecoverTokens(address _address, uint256 _value) external onlyOwner {
             require(_address != address(0));
@@ -287,7 +287,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
             Transfer(_address, owner, _value);
     }
 
-    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {        
+    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {
 
         // By holding back on setting these, it prevents the token
         // from being a duplicate in ERC token searches if the need to
@@ -310,7 +310,7 @@ contract MagnusCoin is StandardToken, Ownable, Contactable {
         tokenActive = false;
         TokenDeactivated();
     }
-    
+
 
 }
 
@@ -357,7 +357,7 @@ contract Pausable is Ownable {
 contract MagnusSale is Ownable, Pausable {
     using SafeMath for uint256;
 
-    // this sale contract is creating the Magnus 
+    // this sale contract is creating the Magnus
     MagnusCoin internal token;
 
     // UNIX timestamp (UTC) based start and end, inclusive
@@ -380,7 +380,7 @@ contract MagnusSale is Ownable, Pausable {
     uint256 internal fiatCurrencyRaisedInEquivalentWeiValue = 0; // value of wei raised outside this contract
     uint256 public weiRaisedIncludingFiatCurrencyRaised;       /* total of all weiContributions inclduing external*/
     bool internal isPresale;              /*  this will be false  */
-    bool public isRefunding = false;    
+    bool public isRefunding = false;
 
 
     address internal multiFirstWallet=0x9B7eDe5f815551279417C383779f1E455765cD6E;
@@ -391,11 +391,11 @@ contract MagnusSale is Ownable, Pausable {
 
     event ContributionReceived(address indexed buyer, bool presale, uint256 rate, uint256 value, uint256 tokens);
     event PegETHUSD(uint256 pegETHUSD);
-    
+
 
     function MagnusSale(
     ) public {
-        
+
         peggedETHUSD = 1210;
         address _token=0x1a7CC52cA652Ac5df72A7fA4b131cB9312dD3423;
         hardCap = 40000000000000000000000;
@@ -409,13 +409,13 @@ contract MagnusSale is Ownable, Pausable {
         uint256 _durationHours=4400;
 
         token = MagnusCoin(_token);
-        
+
         end = start.add(_durationHours.mul(1 hours));
 
 
     }
 
-    
+
 
     function() public payable whenNotPaused {
         require(!isRefunding);
@@ -451,7 +451,7 @@ contract MagnusSale is Ownable, Pausable {
             // there aren't enough tokens to fill the contribution amount, so recalculate the contribution amount
             _tokens = _tokensRemaining;
             _weiContribution = _tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
-            
+
         }
 
         // add the contributed wei to any existing value for the sender
@@ -545,11 +545,11 @@ contract MagnusSale is Ownable, Pausable {
         }
     }
 
-    
+
     function addFiatCurrencyRaised( uint256 _fiatCurrencyIncrementInEquivalentWeiValue ) onlyOwner public {
         fiatCurrencyRaisedInEquivalentWeiValue = fiatCurrencyRaisedInEquivalentWeiValue.add( _fiatCurrencyIncrementInEquivalentWeiValue);
         weiRaisedIncludingFiatCurrencyRaised = weiRaisedIncludingFiatCurrencyRaised.add(_fiatCurrencyIncrementInEquivalentWeiValue);
-        
+
     }
 
     function reduceFiatCurrencyRaised( uint256 _fiatCurrencyDecrementInEquivalentWeiValue ) onlyOwner public {
@@ -557,4 +557,15 @@ contract MagnusSale is Ownable, Pausable {
         weiRaisedIncludingFiatCurrencyRaised = weiRaisedIncludingFiatCurrencyRaised.sub(_fiatCurrencyDecrementInEquivalentWeiValue);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

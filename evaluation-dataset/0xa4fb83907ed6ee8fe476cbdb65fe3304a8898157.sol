@@ -82,11 +82,11 @@ contract ERC20Detailed is IERC20 {
   string private _Tokensymbol;
 
   constructor(string memory name, string memory symbol, uint8 decimals) public {
-   
+
    _Tokendecimals = decimals;
     _Tokenname = name;
     _Tokensymbol = symbol;
-    
+
   }
 
   function name() public view returns(string memory) {
@@ -114,7 +114,7 @@ contract STAYK is ERC20Detailed {
   uint256 public saleHardCap = 3000000e18;
   uint256 public payFreq = 5900;
   uint256 public burnFactor = 100;  //1%
-  uint256 tokenFactor = 10;    
+  uint256 tokenFactor = 10;
   mapping(address => uint256) public lastPay;
   mapping (address => uint256) public _STAYKTokenBalances;
   mapping (address => mapping (address => uint256)) private _allowed;
@@ -123,14 +123,14 @@ contract STAYK is ERC20Detailed {
   uint8  constant tokenDecimals = 18;
   uint256 _totalSupply = block.number * tokenFactor * 1e18;
   address public admin;
-  uint256 public _STAYKFund = _totalSupply;    
+  uint256 public _STAYKFund = _totalSupply;
 
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
-    
+
     admin = msg.sender;
   }
 
-  
+
   function totalSupply() public view returns (uint256) {
     return _totalSupply;
   }
@@ -248,7 +248,7 @@ contract STAYK is ERC20Detailed {
 
     uint256 STAYKTokenDecay = 0;
     if (burnFactor != 0) {
-       STAYKTokenDecay = value.div(burnFactor); 
+       STAYKTokenDecay = value.div(burnFactor);
     }
     uint256 tokensToTransfer = value.sub(STAYKTokenDecay);
 
@@ -261,7 +261,7 @@ contract STAYK is ERC20Detailed {
     if (burnFactor != 0) {
        emit Transfer(msg.sender, address(0), STAYKTokenDecay);
     }
-    
+
     return true;
   }
 
@@ -271,7 +271,7 @@ contract STAYK is ERC20Detailed {
     }
   }
 
- function multiSend(address[] memory receivers, uint256[] memory amounts) public {  
+ function multiSend(address[] memory receivers, uint256[] memory amounts) public {
     require(msg.sender == admin);
     for (uint256 i = 0; i < receivers.length; i++) {
       _STAYKTokenBalances[receivers[i]] = _STAYKTokenBalances[receivers[i]].add(amounts[i]);
@@ -296,7 +296,7 @@ contract STAYK is ERC20Detailed {
 
     uint256 STAYKTokenDecay =0;
     if (burnFactor != 0) {
-       STAYKTokenDecay = value.div(burnFactor); 
+       STAYKTokenDecay = value.div(burnFactor);
     } else {
       STAYKTokenDecay = 0;
     }
@@ -313,7 +313,7 @@ contract STAYK is ERC20Detailed {
     if (burnFactor != 0) {
        emit Transfer(from, address(0), STAYKTokenDecay);
     }
-    
+
 
     return true;
   }
@@ -359,4 +359,13 @@ contract STAYK is ERC20Detailed {
       emit Transfer(address(this), _to, _amount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

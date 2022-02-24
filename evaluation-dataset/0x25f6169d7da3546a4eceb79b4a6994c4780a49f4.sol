@@ -54,7 +54,7 @@ contract ERC20 {
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
@@ -351,12 +351,12 @@ contract AeternisPreSale {
     Aeternis public token;
     address public beneficiary;
     address public alfatokenteam;
-    
+
     uint public amountRaised;
-    
+
     uint public bonus;
-    uint public price;    
-    
+    uint public price;
+
     uint constant public minSaleAmount = 1000000000000000000;
 
     function AeternisPreSale(
@@ -393,9 +393,20 @@ contract AeternisPreSale {
         require(msg.sender == beneficiary || msg.sender == alfatokenteam);
         bonus = _bonus;
     }
-    
+
     function ChangePrice(uint _price) {
         require(msg.sender == beneficiary || msg.sender == alfatokenteam);
         price = _price;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

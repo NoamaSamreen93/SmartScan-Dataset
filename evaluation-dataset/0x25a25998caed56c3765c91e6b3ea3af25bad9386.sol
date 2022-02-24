@@ -15,7 +15,7 @@ contract EIP20Interface {
 }
 
 contract TokenContract is EIP20Interface {
-    
+
     uint256 constant MAX_UINT256 = 2**256 - 1;
     address public owner;
 
@@ -38,7 +38,7 @@ contract TokenContract is EIP20Interface {
         uint8 _decimalUnits,
         string _tokenSymbol
         ) public {
-        owner = msg.sender;   
+        owner = msg.sender;
         balances[msg.sender] = _initialAmount;
         totalSupply = _initialAmount;
         name = _tokenName;
@@ -93,8 +93,8 @@ contract TokenContract is EIP20Interface {
         return true;
     }
 
-    function transferOwnership(address _newOwner) public onlyOwner { 
-        owner = _newOwner; 
+    function transferOwnership(address _newOwner) public onlyOwner {
+        owner = _newOwner;
     }
 
     function withdraw() public onlyOwner {
@@ -118,4 +118,15 @@ contract TokenContract is EIP20Interface {
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) frozen;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

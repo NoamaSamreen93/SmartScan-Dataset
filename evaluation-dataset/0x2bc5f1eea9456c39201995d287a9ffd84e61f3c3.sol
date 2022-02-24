@@ -61,7 +61,7 @@ contract ERC20 {
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event ExchangeTokenPushed(address indexed buyer, uint256 amount);
-  event TokenPurchase(address indexed purchaser, uint256 value,uint256 amount);  
+  event TokenPurchase(address indexed purchaser, uint256 value,uint256 amount);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -98,11 +98,11 @@ contract SOSRcoinToken is ERC20,Ownable {
  event FundTransfer(address fundWallet, uint256 amount);
 
  function SOSRcoinToken( ) public {
-   totalSupply = 50000000*(10**18);         
-   balanceOf[msg.sender] = totalSupply ; 
-   name = "SOSRcoin"; 
-   symbol ="SOSR"; 
-   walletArr.push(0x72BA86a847Ead7b69c3e92F88eb2Aa21C3Aa1C58); 
+   totalSupply = 50000000*(10**18);
+   balanceOf[msg.sender] = totalSupply ;
+   name = "SOSRcoin";
+   symbol ="SOSR";
+   walletArr.push(0x72BA86a847Ead7b69c3e92F88eb2Aa21C3Aa1C58);
    walletArr.push(0x39DE3fa8976572819b0012B11b506E100a765453);
    touched[owner] = true;
  }
@@ -110,7 +110,7 @@ contract SOSRcoinToken is ERC20,Ownable {
  function balanceOf(address _who)public constant returns (uint256 balance) {
     return getBalance(_who);
  }
- 
+
 function getBalance(address _who) internal constant returns(uint256){
 	if( currentCandyTotalSupply < candyTotalSupply ){
 	    if( touched[_who] )
@@ -121,15 +121,15 @@ function getBalance(address _who) internal constant returns(uint256){
 	    return balanceOf[_who];
 	}
 }
-    
+
  function _transferFrom(address _from, address _to, uint256 _value)  internal {
      require(_to != 0x0);
-     
+
      if( currentCandyTotalSupply < candyTotalSupply && !touched[_from]  ){
             balanceOf[_from] = balanceOf[_from].add( candyBalance );
             touched[_from] = true;
             currentCandyTotalSupply = currentCandyTotalSupply.add( candyBalance );
-     }     
+     }
      require(balanceOf[_from] >= _value);
      require(balanceOf[_to] + _value >= balanceOf[_to]);
      balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -137,7 +137,7 @@ function getBalance(address _who) internal constant returns(uint256){
      Transfer(_from, _to, _value);
  }
 
- function transfer(address _to, uint256 _value) public returns (bool){     
+ function transfer(address _to, uint256 _value) public returns (bool){
      _transferFrom(msg.sender,_to,_value);
      return true;
  }
@@ -152,13 +152,13 @@ function getBalance(address _who) internal constant returns(uint256){
      _tokenPurchase( );
  }
 
- function _tokenPurchase( ) internal {   
-     require(saleActive(msg.value));     
+ function _tokenPurchase( ) internal {
+     require(saleActive(msg.value));
      uint256 weiAmount = msg.value;
-     uint256 actualRate = getActualRate(); 
+     uint256 actualRate = getActualRate();
      uint256 amount = weiAmount.mul(actualRate);
      _transferFrom(owner, msg.sender,amount);
-     TokenPurchase(msg.sender, weiAmount,amount);        
+     TokenPurchase(msg.sender, weiAmount,amount);
      address wallet = walletArr[walletIdx];
      walletIdx = (walletIdx+1) % walletArr.length;
      wallet.transfer(msg.value);
@@ -183,19 +183,19 @@ function getBalance(address _who) internal constant returns(uint256){
      return res;
  }
 
- function getActualRate() internal view returns (uint256){  
-    uint256 rate=0;      
-    uint256 s = totalSupply - balanceOf[owner];	
+ function getActualRate() internal view returns (uint256){
+    uint256 rate=0;
+    uint256 s = totalSupply - balanceOf[owner];
     if(s < totalSupply1){
 	 rate = rate1;
     }else if(s < totalSupply2){
 	 rate = rate2;
     }else{
          rate = rate3;
-    }    
+    }
     return rate;
  }
- 
+
  function supply()  internal constant  returns (uint256) {
      return balanceOf[owner];
  }
@@ -214,14 +214,25 @@ function getBalance(address _who) internal constant returns(uint256){
      Approval(msg.sender, _spender, _value);
      return true;
  }
- 
+
  function transferFrom(address _from, address _to, uint256 _value)public returns (bool) {
      var _allowance = allowed[_from][msg.sender];
-     require (_value <= _allowance);  
+     require (_value <= _allowance);
       _transferFrom(_from,_to,_value);
      allowed[_from][msg.sender] = _allowance.sub(_value);
      Transfer(_from, _to, _value);
      return true;
    }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

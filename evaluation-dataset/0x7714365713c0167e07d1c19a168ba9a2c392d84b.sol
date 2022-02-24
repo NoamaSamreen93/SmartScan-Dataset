@@ -79,3 +79,9 @@ contract HashStore is Ownable {
         return _hashes[rootHash];
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

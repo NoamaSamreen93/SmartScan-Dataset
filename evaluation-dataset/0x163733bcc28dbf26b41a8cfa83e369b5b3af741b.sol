@@ -23,7 +23,7 @@ interface TokenNotifier {
  * @dev Math operations with safety checks that throw on error
  */
 contract SafeMath {
-    
+
     function safeMul(uint256 a, uint256 b) internal constant returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -46,7 +46,7 @@ contract SafeMath {
 contract Owned {
 
     address owner;
-    
+
     function Owned() { owner = msg.sender; }
 
     modifier onlyOwner { require(msg.sender == owner); _; }
@@ -168,11 +168,22 @@ contract PersianTokenICO is TokenICO {
         icoStartBlock = _icoStartBlock;
         icoEndBlock = _icoEndBlock;
     }
-  
+
     function () onlyDuringICO payable {
         totalContributions = safeAdd(totalContributions, msg.value);
         contributions[msg.sender] = safeAdd(contributions[msg.sender], msg.value);
         Contributed(msg.sender, msg.value, estimateBalanceOf(msg.sender));
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -74,7 +74,7 @@ contract U42 {
 	//for each balance address, map allowed addresses to amount allowed
 	mapping (address => mapping (address => uint256)) internal allowed;
 
-	//each service is represented by a Service struct 
+	//each service is represented by a Service struct
 	struct Service {
 		address applicationAddress;
 		uint32 serviceId;
@@ -110,12 +110,12 @@ contract U42 {
 
 	//methods emit the following events
 	event Transfer (
-		address indexed from, 
-		address indexed to, 
+		address indexed from,
+		address indexed to,
 		uint256 value );
 
 	event TokensBurned (
-		address indexed burner, 
+		address indexed burner,
 		uint256 value );
 
 	event Approval (
@@ -144,17 +144,17 @@ contract U42 {
 
 	event ReferenceConfirmed (
 		address indexed applicationAddress,
-		uint256 indexed applicationReference, 
-		address indexed confirmedBy, 
+		uint256 indexed applicationReference,
+		address indexed confirmedBy,
 		uint256 confirmerTokensMinimum );
 
 	event StartProvision (
-	    address indexed applicationAddress, 
-	    uint32 indexed serviceId, 
+	    address indexed applicationAddress,
+	    uint32 indexed serviceId,
 	    address indexed userAddress,
 	    uint256 provisionId,
 	    uint256 serviceCredits,
-	    uint256 tokensPerCredit, 
+	    uint256 tokensPerCredit,
 	    uint256 applicationReference );
 
 	event UpdateProvision (
@@ -204,12 +204,12 @@ contract U42 {
 		emit Transfer(address(0), msg.sender, totalSupply_);
 	}
 
-	function listSimpleService ( 
-			uint32 _serviceId, 
+	function listSimpleService (
+			uint32 _serviceId,
 			string _serviceDescription,
 			uint256 _tokensRequired,
 			address _updateAddress,
-			address _receiptAddress	) 
+			address _receiptAddress	)
 		public returns (
 			bool success ) {
 
@@ -219,7 +219,7 @@ contract U42 {
 		//check service doesn't already exist for this application id
 		require(services[msg.sender][_serviceId].applicationAddress == 0);
 
-		//check cost of the service is >0 
+		//check cost of the service is >0
 		require(_tokensRequired != 0);
 
 		//check receiptAddress is not address(0)
@@ -251,13 +251,13 @@ contract U42 {
 		return true;
 	}
 
-	function listService ( 
-			uint32 _serviceId, 
+	function listService (
+			uint32 _serviceId,
 			string _serviceDescription,
 			uint256 _tokensPerCredit,
 			uint256 _maxCreditsPerProvision,
 			address _updateAddress,
-			address _receiptAddress	) 
+			address _receiptAddress	)
 		public returns (
 			bool success ) {
 
@@ -267,7 +267,7 @@ contract U42 {
 		//check service doesn't already exist for this application id
 		require(services[msg.sender][_serviceId].applicationAddress == 0);
 
-		//check cost of the service is >0 
+		//check cost of the service is >0
 		require(_tokensPerCredit != 0);
 
 		//check receiptAddress is not address(0)
@@ -299,8 +299,8 @@ contract U42 {
 		return true;
 	}
 
-	function getServicesForApplication ( 
-			address _applicationAddress ) 
+	function getServicesForApplication (
+			address _applicationAddress )
 		public view returns (
 			uint32[] serviceIds ) {
 
@@ -308,7 +308,7 @@ contract U42 {
 	}
 
 	function getRemovedServicesForApplication (
-			address _applicationAddress ) 
+			address _applicationAddress )
 		public view returns (
 			uint32[] serviceIds ) {
 
@@ -325,8 +325,8 @@ contract U42 {
 		return services[_applicationAddress][_serviceId].isRemoved;
 	}
 
-	function getServiceInformation ( 
-			address _applicationAddress, 
+	function getServiceInformation (
+			address _applicationAddress,
 			uint32 _serviceId )
 		public view returns (
 			bool exists,
@@ -362,8 +362,8 @@ contract U42 {
 	}
 
 	function getServiceUpdateAddress (
-			address _applicationAddress, 
-			uint32 _serviceId ) 
+			address _applicationAddress,
+			uint32 _serviceId )
 		public view returns (
 			address updateAddress ) {
 
@@ -373,9 +373,9 @@ contract U42 {
 	}
 
 	function updateServiceDescription (
-			address _targetApplicationAddress, 
-			uint32 _serviceId, 
-			string _serviceDescription ) 
+			address _targetApplicationAddress,
+			uint32 _serviceId,
+			string _serviceDescription )
 		public returns (
 			bool success ) {
 
@@ -386,23 +386,23 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _targetApplicationAddress || 
+		require(msg.sender == _targetApplicationAddress ||
 			( s.updateAddress != address(0) && msg.sender == s.updateAddress ));
 
 		//check that service is not removed
 		require(s.isRemoved == false);
 
 		services[_targetApplicationAddress][_serviceId].serviceDescription=_serviceDescription;
-		
+
 		emit ServiceChanged(_targetApplicationAddress, _serviceId);
 
 		return true;
 	}
 
 	function updateServiceTokensPerCredit (
-			address _targetApplicationAddress, 
-			uint32 _serviceId, 
-			uint256 _tokensPerCredit ) 
+			address _targetApplicationAddress,
+			uint32 _serviceId,
+			uint256 _tokensPerCredit )
 		public returns (
 			bool success ) {
 
@@ -413,20 +413,20 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _targetApplicationAddress || 
+		require(msg.sender == _targetApplicationAddress ||
 			( s.updateAddress != address(0) && msg.sender == s.updateAddress ));
 
 		//check that service is not removed
 		require(s.isRemoved == false);
 
-		//check changed cost of the service is >0 
+		//check changed cost of the service is >0
 		require(_tokensPerCredit != 0);
 
 		services[_targetApplicationAddress][_serviceId].tokensPerCredit=_tokensPerCredit;
-		
+
 		emit ServiceChanged(_targetApplicationAddress, _serviceId);
 
-		return true;		
+		return true;
 	}
 
 	function updateServiceMaxCreditsPerProvision (
@@ -443,7 +443,7 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _targetApplicationAddress || 
+		require(msg.sender == _targetApplicationAddress ||
 			( s.updateAddress != address(0) && msg.sender == s.updateAddress ));
 
 		//check that service is not removed
@@ -455,13 +455,13 @@ contract U42 {
 		services[_targetApplicationAddress][_serviceId].maxCreditsPerProvision=_maxCreditsPerProvision;
 
 		emit ServiceChanged(_targetApplicationAddress, _serviceId);
-	
-		return true;		
+
+		return true;
 	}
 
 	function changeServiceReceiptAddress(
-			uint32 _serviceId, 
-			address _receiptAddress ) 
+			uint32 _serviceId,
+			address _receiptAddress )
 		public returns (
 			bool success ) {
 
@@ -477,10 +477,10 @@ contract U42 {
 		require(_receiptAddress != address(0));
 
 		services[msg.sender][_serviceId].receiptAddress=_receiptAddress;
-		
+
 		emit ServiceChanged(msg.sender, _serviceId);
 
-		return true;		
+		return true;
 	}
 
 	function changeServiceUpdateAddress (
@@ -507,8 +507,8 @@ contract U42 {
 	}
 
 	function removeService (
-			address _targetApplicationAddress, 
-			uint32 _serviceId ) 
+			address _targetApplicationAddress,
+			uint32 _serviceId )
 		public returns (
 			bool success ) {
 
@@ -516,9 +516,9 @@ contract U42 {
 		require(services[_targetApplicationAddress][_serviceId].applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _targetApplicationAddress || 
-			( services[_targetApplicationAddress][_serviceId].updateAddress != address(0) 
-			   && msg.sender == services[_targetApplicationAddress][_serviceId].updateAddress 
+		require(msg.sender == _targetApplicationAddress ||
+			( services[_targetApplicationAddress][_serviceId].updateAddress != address(0)
+			   && msg.sender == services[_targetApplicationAddress][_serviceId].updateAddress
 			  ));
 
 		//check that service is not already removed
@@ -536,11 +536,11 @@ contract U42 {
 	}
 
 	function transferToSimpleService (
-			address _applicationAddress, 
-			uint32 _serviceId, 
-			uint256 _tokenValue, 
-			uint256 _applicationReference, 
-			uint256 _multiple ) 
+			address _applicationAddress,
+			uint32 _serviceId,
+			uint256 _tokenValue,
+			uint256 _applicationReference,
+			uint256 _multiple )
 		public returns (
 			bool success ) {
 
@@ -568,7 +568,7 @@ contract U42 {
 		//transfer the tokens -- this verifies the sender owns the tokens
 		transfer(s.receiptAddress, _tokenValue);
 
-		//this starts and ends a simple provision at a single point in time 
+		//this starts and ends a simple provision at a single point in time
 		emit CompleteSimpleProvision(_applicationAddress, _serviceId, msg.sender, _multiple, _applicationReference);
 
 		return true;
@@ -576,11 +576,11 @@ contract U42 {
 
 
 	function transferToService (
-			address _applicationAddress, 
-			uint32 _serviceId, 
-			uint256 _tokenValue, 
+			address _applicationAddress,
+			uint32 _serviceId,
+			uint256 _tokenValue,
 			uint256 _credits,
-			uint256 _applicationReference ) 
+			uint256 _applicationReference )
 		public returns (
 			uint256 provisionId ) {
 
@@ -613,13 +613,13 @@ contract U42 {
 				_credits,
 				_applicationReference,
 				msg.sender,
-				_credits		
+				_credits
 			);
 
 		//transfer the tokens
 		transfer(s.receiptAddress, _tokenValue);
 
-		//emits a start provision 
+		//emits a start provision
 		emit StartProvision(_applicationAddress, _serviceId, msg.sender, pid, _credits, s.tokensPerCredit, _applicationReference);
 
 		//return provision id
@@ -640,7 +640,7 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//check that service is not removed
-		require(services[_applicationAddress][_serviceId].isRemoved == false);		
+		require(services[_applicationAddress][_serviceId].isRemoved == false);
 
 		//get & check that the provision exists (address at userAddress)
 		Provision storage p=provisions[_applicationAddress][_serviceId][_provisionId];
@@ -668,7 +668,7 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _applicationAddress || 
+		require(msg.sender == _applicationAddress ||
 			( s.updateAddress != address(0) && msg.sender == s.updateAddress ));
 
 		//check that service is not removed
@@ -680,11 +680,11 @@ contract U42 {
 
 		//update the credits remaining
 		p.creditsRemaining=_creditsRemaining;
-	
+
 		//fires UpdateProvision
 		emit UpdateProvision(_applicationAddress, _serviceId, _provisionId, _creditsRemaining);
 
-		return true;		
+		return true;
 	}
 
 	function completeProvision (
@@ -702,7 +702,7 @@ contract U42 {
 		require(s.applicationAddress != 0);
 
 		//update must be by the application address or, if specified, update address
-		require(msg.sender == _applicationAddress || 
+		require(msg.sender == _applicationAddress ||
 			( s.updateAddress != address(0) && msg.sender == s.updateAddress ));
 
 		//check that service is not removed
@@ -742,7 +742,7 @@ contract U42 {
 		require(balances[msg.sender] > 0);
 
 		//sender must have min tokens if specified
-		require(_senderTokensMinimum == 0 
+		require(_senderTokensMinimum == 0
 			|| balances[msg.sender] >= _senderTokensMinimum);
 
 		emit ReferenceConfirmed(_applicationAddress, _applicationReference, msg.sender, _senderTokensMinimum);
@@ -812,7 +812,7 @@ contract U42 {
 		return true;
 	}
 
-	function ownerBurn ( 
+	function ownerBurn (
 			uint256 _value )
 		public returns (
 			bool success) {
@@ -836,8 +836,8 @@ contract U42 {
 		return true;
 
 	}
-	
-	
+
+
 	function totalSupply ( ) public view returns (
 		uint256 ) {
 
@@ -845,7 +845,7 @@ contract U42 {
 	}
 
 	function balanceOf (
-			address _owner ) 
+			address _owner )
 		public view returns (
 			uint256 ) {
 
@@ -853,8 +853,8 @@ contract U42 {
 	}
 
 	function transfer (
-			address _to, 
-			uint256 _value ) 
+			address _to,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -872,8 +872,8 @@ contract U42 {
    	//in that transaction order can be modified in a block to spend, change approval, spend again
    	//the method is kept for ERC-20 compatibility, but a set to zero, set again or use of the below increase/decrease should be used instead
 	function approve (
-			address _spender, 
-			uint256 _value ) 
+			address _spender,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -884,8 +884,8 @@ contract U42 {
 	}
 
 	function increaseApproval (
-			address _spender, 
-			uint256 _addedValue ) 
+			address _spender,
+			uint256 _addedValue )
 		public returns (
 			bool ) {
 
@@ -897,7 +897,7 @@ contract U42 {
 
 	function decreaseApproval (
 			address _spender,
-			uint256 _subtractedValue ) 
+			uint256 _subtractedValue )
 		public returns (
 			bool ) {
 
@@ -914,8 +914,8 @@ contract U42 {
 	}
 
 	function allowance (
-			address _owner, 
-			address _spender ) 
+			address _owner,
+			address _spender )
 		public view returns (
 			uint256 remaining ) {
 
@@ -923,9 +923,9 @@ contract U42 {
 	}
 
 	function transferFrom (
-			address _from, 
-			address _to, 
-			uint256 _value ) 
+			address _from,
+			address _to,
+			uint256 _value )
 		public returns (
 			bool ) {
 
@@ -940,4 +940,15 @@ contract U42 {
 		return true;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

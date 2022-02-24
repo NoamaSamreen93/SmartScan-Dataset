@@ -58,10 +58,10 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -155,7 +155,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -179,7 +179,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -229,7 +229,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract MSPT is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "MySmartProperty Tokens";
   string public constant symbol = "MSPT";
   uint32 public constant decimals = 18;
@@ -251,8 +251,8 @@ contract MSPT is Ownable, MintableToken {
     addressEccles = 0xF59C5199FCd7e29b2979831e39EfBcf16b90B485;
     addressJenkins = 0x974e94C33a37e05c4cE292b43e7F50a57fAA5Bc7;
     addressLeskiw = 0x3a7e8Eb6DDAa74e58a6F3A39E3d073A9eFA22160;
-    addressBilborough = 0xAabb89Ade1Fc2424b7FE837c40E214375Dcf9840;  
-      
+    addressBilborough = 0xAabb89Ade1Fc2424b7FE837c40E214375Dcf9840;
+
     //Founders and supporters initial Allocations
     balances[addressSupporters] = balances[addressSupporters].add(summSupporters);
     balances[addressEccles] = balances[addressEccles].add(summEccles);
@@ -284,33 +284,33 @@ contract Crowdsale is Ownable {
   uint256 public startPreICO;
   uint256 public startICO;
   uint256 public endPreICO;
-  uint256 public endICO;           
-  
+  uint256 public endICO;
+
   uint256 public maxAmountPreICO;
   uint256 public maxAmountICO;
-  
+
   uint256 public totalPreICOAmount;
   uint256 public totalICOAmount;
-  
+
   // Remaining Token Allocation
   uint public mintStart1; //15th July 2018
   uint public mintStart2; //15th August 2018
   uint public mintStart3; //15th December 2018
   uint public mintStart4; //15th January 2018
-  uint public mintStart5; //15th July 2019     
-  
+  uint public mintStart5; //15th July 2019
+
   // address where funds are collected
   address public wallet;
 
   // how many token units a buyer gets per wei
   uint256 public ratePreICO;
-  uint256 public rateICO;      
+  uint256 public rateICO;
 
   // minimum quantity values
-  uint256 public minQuanValues; 
-  
+  uint256 public minQuanValues;
+
   // Remaining Token Allocation
-  uint256 public totalMintAmount; 
+  uint256 public totalMintAmount;
   uint256 public allowTotalMintAmount;
   uint256 public mintAmount1;
   uint256 public mintAmount2;
@@ -319,7 +319,7 @@ contract Crowdsale is Ownable {
   uint256 public mintAmount5;
   // totalTokens
   uint256 public totalTokens;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -338,20 +338,20 @@ contract Crowdsale is Ownable {
     startPreICO = 1527948000; //3 June 2018 00:00:00 +10 GMT
     endPreICO = 1530280800; //30 June 2018 00:00:00 +10 GMT
     startICO = 1530280800; //30 June 2018 00:00:00 +10 GMT
-    endICO = startICO +  30 * 1 days;           
+    endICO = startICO +  30 * 1 days;
     // restrictions on amounts during the ico stages
     maxAmountPreICO = 12000000  * 1 ether;
     maxAmountICO = 24000000  * 1 ether;
     // rate decimals = 2;
     ratePreICO = 79294;
     rateICO = 59470;
-    // Remaining Token Allocation    
+    // Remaining Token Allocation
     mintAmount1 = 10000000 * 1 ether;
     mintAmount2 = 10000000 * 1 ether;
     mintAmount3 = 10000000 * 1 ether;
     mintAmount4 = 10000000 * 1 ether;
     mintAmount5 = 10000000 * 1 ether;
-    
+
     mintStart1 = 1538316000; //1st October  2018 +10 GMT
     mintStart2 = 1540994400; //1st November 2018 +10 GMT
     mintStart3 = 1551362400; //1st March    2019 +10 GMT
@@ -362,11 +362,11 @@ contract Crowdsale is Ownable {
   }
   function setRatePreICO(uint _ratePreICO) public {
     ratePreICO = _ratePreICO;
-  }  
+  }
   function setRateICO(uint _rateICO) public {
     rateICO = _rateICO;
-  }    
-  
+  }
+
   function createTokenContract() internal returns (MSPT) {
     return new MSPT();
   }
@@ -387,7 +387,7 @@ contract Crowdsale is Ownable {
     if (now >= startPreICO && now < endPreICO && totalPreICOAmount < maxAmountPreICO && tokens == 0){
       tokens = weiAmount.div(100).mul(ratePreICO);
       if (maxAmountPreICO.sub(totalPreICOAmount) < tokens){
-        tokens = maxAmountPreICO.sub(totalPreICOAmount); 
+        tokens = maxAmountPreICO.sub(totalPreICOAmount);
         weiAmount = tokens.mul(100).div(ratePreICO);
         backAmount = msg.value.sub(weiAmount);
       }
@@ -395,23 +395,23 @@ contract Crowdsale is Ownable {
       if (totalPreICOAmount >= maxAmountPreICO){
         startICO = now;
         endICO = startICO + 30 * 1 days;
-      }   
-    }    
+      }
+    }
     if (now >= startICO && totalICOAmount < maxAmountICO  && tokens == 0){
       tokens = weiAmount.div(100).mul(rateICO);
       if (maxAmountICO.sub(totalICOAmount) < tokens){
-        tokens = maxAmountICO.sub(totalICOAmount); 
+        tokens = maxAmountICO.sub(totalICOAmount);
         weiAmount = tokens.mul(100).div(rateICO);
         backAmount = msg.value.sub(weiAmount);
       }
       totalICOAmount = totalICOAmount.add(tokens);
-    }     
+    }
     require(tokens > 0);
     token.mint(beneficiary, tokens);
     wallet.transfer(weiAmount);
-    
+
     if (backAmount > 0){
-      msg.sender.transfer(backAmount);    
+      msg.sender.transfer(backAmount);
     }
     emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
   }
@@ -420,26 +420,42 @@ contract Crowdsale is Ownable {
     require(_amount > 0);
     require(_to != address(0));
     if (now >= mintStart1 && now < mintStart2){
-      allowTotalMintAmount = mintAmount1;  
+      allowTotalMintAmount = mintAmount1;
     }
     if (now >= mintStart2 && now < mintStart3){
-      allowTotalMintAmount = mintAmount1.add(mintAmount2);  
-    }  
+      allowTotalMintAmount = mintAmount1.add(mintAmount2);
+    }
     if (now >= mintStart3 && now < mintStart4){
-      allowTotalMintAmount = mintAmount1.add(mintAmount2).add(mintAmount3);  
-    }       
+      allowTotalMintAmount = mintAmount1.add(mintAmount2).add(mintAmount3);
+    }
     if (now >= mintStart4 && now < mintStart5){
-      allowTotalMintAmount = mintAmount1.add(mintAmount2).add(mintAmount3).add(mintAmount4);  
-    }       
+      allowTotalMintAmount = mintAmount1.add(mintAmount2).add(mintAmount3).add(mintAmount4);
+    }
     if (now >= mintStart5){
       allowTotalMintAmount = totalMintAmount.add(totalTokens.sub(token.getTotalSupply()));
-    }       
+    }
     require(_amount.add(totalMintAmount) <= allowTotalMintAmount);
     token.mint(_to, _amount);
     totalMintAmount = totalMintAmount.add(_amount);
     return true;
   }
   function finishMintingTokens() onlyOwner public returns (bool) {
-    token.finishMinting(); 
+    token.finishMinting();
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

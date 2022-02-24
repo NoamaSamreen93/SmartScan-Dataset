@@ -7,7 +7,7 @@ pragma solidity ^0.4.25;
 // Name        : BTCCREDIT Token
 // Total supply: 300000000
 // Decimals    : 18
-// 
+//
 // ----------------------------------------------------------------------------
 
 
@@ -121,13 +121,13 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
     }
 
     function distributeTokens(address _address,  uint _amount) public onlyOwner returns (bool) {
-        
+
         uint total = safeAdd(_distributedTokenCount, _amount);
         require (total <= _totalSupply, "Distributed Tokens exceeded Total Suuply");
         balances[_address] = safeAdd(balances[_address], _amount);
 
         _distributedTokenCount = safeAdd(_distributedTokenCount, _amount);
-        
+
         emit Transfer (address(0), _address, _amount);
         return true;
     }
@@ -175,7 +175,7 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -186,7 +186,7 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -201,14 +201,14 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
-    // Mint tokens 
-    // 
+    // Mint tokens
+    //
     // Increase the total supply
     // - assign the newly minted tokens to target address
     // - token count to be added in total suuply - mintedAmount
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     function mintToken(address _target, uint256 _mintedAmount) public onlyOwner {
         require(!frozenAccount[_target], "Account is frozen");
         balances[_target] = safeAdd(balances[_target], _mintedAmount);
@@ -238,9 +238,9 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
         require(_burnedAmount <= allowed[_from][msg.sender], "Amount not allowed");
 
         balances[_from] = safeSub(balances[_from], _burnedAmount);
-        allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _burnedAmount);        
+        allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _burnedAmount);
         _totalSupply = safeSub(_totalSupply, _burnedAmount);
-        
+
         emit Burn(_from, _burnedAmount);
         return true;
     }
@@ -281,9 +281,20 @@ contract BTCCToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function destroyContract() public onlyOwner {
         emit Debug(true);
         selfdestruct(this);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

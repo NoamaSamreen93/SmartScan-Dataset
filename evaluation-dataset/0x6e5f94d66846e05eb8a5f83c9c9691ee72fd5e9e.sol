@@ -124,17 +124,17 @@ contract BasicToken is ERC20Basic {
 contract BountyManager is Ownable  {
 	using SafeMath for uint256;
 
-	
 
-	
-	/*Variables about the token contract */	
+
+
+	/*Variables about the token contract */
 	Peculium public pecul; // The Peculium token
 	bool public initPecul; // boolean to know if the Peculium token address has been init
-	
+
 	event InitializedToken(address contractToken);
-	
+
 	/*Variables about the bounty manager */
-	address public bountymanager ; // address of the bounty manager 
+	address public bountymanager ; // address of the bounty manager
 	uint256 public bountymanagerShare; // nb token for the bountymanager
 	bool public First_pay_bountymanager; // boolean to test if the first pay has been send to the bountymanager
 	uint256 public first_pay; // pourcent of the first pay rate
@@ -146,51 +146,51 @@ contract BountyManager is Ownable  {
 	event InitializedManager(address ManagerAdd);
 	event FirstPaySend(uint256 first,address receiver);
 	event MonthlyPaySend(uint256 monthPay,address receiverMonthly);
-	
-	
+
+
 	//Constructor
 	function BountyManager() {
-		
+
 		bountymanagerShare = SafeMath.mul(72000000,(10**8)); // we allocate 72 million token to the bounty manager (maybe to change)
-		
+
 		first_pay = SafeMath.div(SafeMath.mul(40,bountymanagerShare),100); // first pay is 40%
 		montly_pay = SafeMath.div(SafeMath.mul(10,bountymanagerShare),100); // other pay are 10%
 		nbMonthsPay = 0;
-		
+
 		First_pay_bountymanager=true;
 		initPecul = false;
 		bountyInit==false;
-		
+
 
 	}
-	
-	
+
+
 	/***  Functions of the contract ***/
-	
-	function InitPeculiumAdress(address peculAdress) onlyOwner 
+
+	function InitPeculiumAdress(address peculAdress) onlyOwner
 	{ // We init the address of the token
-	
+
 		pecul = Peculium(peculAdress);
 		payday = pecul.dateDefrost();
 		initPecul = true;
 		InitializedToken(peculAdress);
-	
+
 	}
-	
-	function change_bounty_manager (address public_key) onlyOwner 
+
+	function change_bounty_manager (address public_key) onlyOwner
 	{ // to change the bounty manager address
-	
+
 		bountymanager = public_key;
 		bountyInit=true;
 		InitializedManager(public_key);
-	
+
 	}
-	
-	function transferManager() onlyOwner Initialize BountyManagerInit 
+
+	function transferManager() onlyOwner Initialize BountyManagerInit
 	{ // Transfer pecul for the Bounty manager
-		
+
 		require(now > payday);
-	
+
 		if(First_pay_bountymanager==false && nbMonthsPay < 6)
 		{
 
@@ -198,9 +198,9 @@ contract BountyManager is Ownable  {
 			payday = payday.add( 31 days);
 			nbMonthsPay=nbMonthsPay.add(1);
 			MonthlyPaySend(montly_pay,bountymanager);
-		
+
 		}
-		
+
 		if(First_pay_bountymanager==true)
 		{
 
@@ -208,14 +208,14 @@ contract BountyManager is Ownable  {
 			payday = payday.add( 35 days);
 			First_pay_bountymanager=false;
 			FirstPaySend(first_pay,bountymanager);
-		
+
 		}
 
 
-		
+
 	}
 		/***  Modifiers of the contract ***/
-	
+
 	modifier Initialize { // We need to initialize first the token contract
 		require (initPecul==true);
 		_;
@@ -223,7 +223,7 @@ contract BountyManager is Ownable  {
     	modifier BountyManagerInit { // We need to initialize first the address of the bountyManager
 		require (bountyInit==true);
 		_;
-    	} 
+    	}
 
 }
 
@@ -328,13 +328,13 @@ contract BurnableToken is StandardToken {
 contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 Token with burnable and ownable aptitude
 
 	using SafeMath for uint256; // We use safemath to do basic math operation (+,-,*,/)
-	using SafeERC20 for ERC20Basic; 
+	using SafeERC20 for ERC20Basic;
 
     	/* Public variables of the token for ERC20 compliance */
-	string public name = "Peculium"; //token name 
+	string public name = "Peculium"; //token name
     	string public symbol = "PCL"; // token symbol
     	uint256 public decimals = 8; // token number of decimal
-    	
+
     	/* Public variables specific for Peculium */
         uint256 public constant MAX_SUPPLY_NBTOKEN   = 20000000000*10**8; // The max cap is 20 Billion Peculium
 
@@ -344,62 +344,62 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
 
     	/* Event for the freeze of account */
- 	event FrozenFunds(address target, bool frozen);     	 
+ 	event FrozenFunds(address target, bool frozen);
      	event Defroze(address msgAdd, bool freeze);
-	
 
 
-   
+
+
 	//Constructor
 	function Peculium() {
 		totalSupply = MAX_SUPPLY_NBTOKEN;
-		balances[owner] = totalSupply; // At the beginning, the owner has all the tokens. 
+		balances[owner] = totalSupply; // At the beginning, the owner has all the tokens.
 		balancesCanSell[owner] = true; // The owner need to sell token for the private sale and for the preICO, ICO.
-		
+
 		dateStartContract=now;
 		dateDefrost = dateStartContract + 85 days; // everybody can defrost his own token after the 25 january 2018 (85 days after 1 November)
 
 	}
 
-	/*** Public Functions of the contract ***/	
-	
-	function defrostToken() public 
+	/*** Public Functions of the contract ***/
+
+	function defrostToken() public
 	{ // Function to defrost your own token, after the date of the defrost
-	
+
 		require(now>dateDefrost);
 		balancesCanSell[msg.sender]=true;
 		Defroze(msg.sender,true);
 	}
-				
-	function transfer(address _to, uint256 _value) public returns (bool) 
+
+	function transfer(address _to, uint256 _value) public returns (bool)
 	{ // We overright the transfer function to allow freeze possibility
-	
+
 		require(balancesCanSell[msg.sender]);
 		return BasicToken.transfer(_to,_value);
-	
+
 	}
-	
-	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
 	{ // We overright the transferFrom function to allow freeze possibility (need to allow before)
-	
-		require(balancesCanSell[msg.sender]);	
+
+		require(balancesCanSell[msg.sender]);
 		return StandardToken.transferFrom(_from,_to,_value);
-	
+
 	}
 
-	/***  Owner Functions of the contract ***/	
+	/***  Owner Functions of the contract ***/
 
-   	function freezeAccount(address target, bool canSell) onlyOwner 
+   	function freezeAccount(address target, bool canSell) onlyOwner
    	{
-        
+
         	balancesCanSell[target] = canSell;
         	FrozenFunds(target, canSell);
-    	
+
     	}
 
 
-	/*** Others Functions of the contract ***/	
-	
+	/*** Others Functions of the contract ***/
+
 	/* Approves and then calls the receiving contract */
 	function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
 		allowed[msg.sender][_spender] = _value;
@@ -411,17 +411,23 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
   	function getBlockTimestamp() constant returns (uint256)
   	{
-        
+
         	return now;
-  	
+
   	}
 
-  	function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)  
+  	function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)
   	{ // Return info about the public address and balance of the account of the owner of the contract
-    	
+
     		ownerAddr = owner;
 		ownerBalance = balanceOf(ownerAddr);
-  	
+
   	}
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

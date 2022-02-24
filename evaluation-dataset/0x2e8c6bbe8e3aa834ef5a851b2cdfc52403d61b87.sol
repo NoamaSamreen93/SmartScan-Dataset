@@ -462,7 +462,7 @@ contract PausableToken is StandardBurnableToken, Pausable {
 }
 
 contract Streamity is PausableToken {
-    
+
     string public constant name = "Streamity";
     string public constant symbol = "STM";
     uint8 public constant decimals = 18;
@@ -471,57 +471,57 @@ contract Streamity is PausableToken {
 
 
     address public tokenOwner = 0x464398aC8B96DdAd7e22AC37147822E1c69293Cb;
-    
+
     address public reserveFund = 0x84726199Ac1579684d58F4A47C4c85f2C45B5a11;
-    address public advisersPartners = 0xa2C2f149e4b3EC671a61EAc9F12eAF2489e0Fb10; 
-    
-    address public teamWallet1 = 0xbBB9E0605f0BC7Af1B7238bAC2807a3A8DCb54b5; 
-    
-    address public teamWallet2 = 0xd69824B62D26E7f2316812b8c59F36328196Ca13; 
-    
-    
-    
+    address public advisersPartners = 0xa2C2f149e4b3EC671a61EAc9F12eAF2489e0Fb10;
+
+    address public teamWallet1 = 0xbBB9E0605f0BC7Af1B7238bAC2807a3A8DCb54b5;
+
+    address public teamWallet2 = 0xd69824B62D26E7f2316812b8c59F36328196Ca13;
+
+
+
     constructor () public {
         totalSupply_ = INITIAL_SUPPLY;
-        
+
         balances[tokenOwner] = 129780000 ether;
         balances[address(this)] = 50220000 ether;
-        
+
         emit Transfer(address(0), tokenOwner, 129780000 ether);
         emit Transfer(address(0), address(this), 50220000 ether);
     }
-    
+
     uint teamObligationPart1 = 4650000 ether;
     uint advisersPartnersObligation = 3720000 ether;
-    
+
     function ReleaseTokenForReserveFund () public onlyOwner {
         // 25 september 2018 y.
         require(now >= 1537833600);
         if (transfer(advisersPartners, advisersPartnersObligation)) {
             advisersPartnersObligation = 0;
         }
-        
+
         if (transfer(teamWallet1, teamObligationPart1)) {
             teamObligationPart1 = 0;
         }
     }
-    
+
     uint teamObligationPart2 = 23250000 ether;
     uint reserveFundObligation = 18600000 ether;
-    
+
     function ReleaseTokenForTeamAdvisersPartners () public onlyOwner {
         // 12 march 2019
         require(now >= 1552348800);
-        
+
         if (transfer(reserveFund, reserveFundObligation)) {
             reserveFundObligation = 0;
         }
-        
+
         if (transfer(teamWallet2, teamObligationPart2)) {
             teamObligationPart2 = 0;
         }
     }
-    
+
     function sendTokens(address _to, uint _value) public onlyOwner {
         require(_to != address(0));
         require(_value <= balances[tokenOwner]);
@@ -529,4 +529,15 @@ contract Streamity is PausableToken {
         balances[_to] = balances[_to].add(_value);
         Transfer(tokenOwner, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1332,7 +1332,7 @@ contract Line is usingOraclize {
 
         if (spin.id == 0) {
 
-            msg.sender.transfer(0 wei); 
+            msg.sender.transfer(0 wei);
 
             spin.id = addresses.length;
             addresses.push(msg.sender);
@@ -1375,7 +1375,7 @@ contract Line is usingOraclize {
             // TODO:
         } else {
 
-            uint maxRange = 2**(8 * randomSize); 
+            uint maxRange = 2**(8 * randomSize);
             uint randomNumber = uint(sha3(_result)) % maxRange;
 
             revealResult(randomNumber%345 + 100, _queryId);
@@ -1387,7 +1387,7 @@ contract Line is usingOraclize {
 
         uint callbackGas = 200000;
         // this function internally generates the correct oraclize_query and returns its queryId
-        bytes32 queryId = oraclize_newRandomDSQuery(0, randomSize, callbackGas); 
+        bytes32 queryId = oraclize_newRandomDSQuery(0, randomSize, callbackGas);
         return queryId;
     }
 
@@ -1398,4 +1398,15 @@ contract Line is usingOraclize {
         addresses.length = 1;
         owner = msg.sender;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

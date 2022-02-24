@@ -8,9 +8,9 @@ pragma solidity ^0.4.23;
    ) _   )
     ( \_
   _(_\ \)__
- (____\___)) 
- 
- 
+ (____\___))
+
+
 */
 
 
@@ -59,10 +59,10 @@ contract ShitCloneFarmer {
         ballShitClone[msg.sender] = SafeMath.add(ballShitClone[msg.sender], newShitClone);
         claimedTime[msg.sender] = 0;
         lastEvent[msg.sender] = now;
-        
+
         // send referral time
         claimedTime[referrals[msg.sender]] = SafeMath.add(claimedTime[referrals[msg.sender]], SafeMath.div(timeUsed, 5)); // +20%
-        
+
         // boost market to prevent sprem hoarding
         marketTime = SafeMath.add(marketTime, SafeMath.div(timeUsed, 10)); // +10%
     }
@@ -73,7 +73,7 @@ contract ShitCloneFarmer {
         uint256 cellCount = getMyTime();
         uint256 cellValue = calculateCellSell(cellCount);
         uint256 fee = devFee(cellValue);
-        
+
         // one third of your ShitClones die :'(
         ballShitClone[msg.sender] = SafeMath.mul(SafeMath.div(ballShitClone[msg.sender], 3), 2); // =66%
         claimedTime[msg.sender] = 0;
@@ -212,4 +212,10 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

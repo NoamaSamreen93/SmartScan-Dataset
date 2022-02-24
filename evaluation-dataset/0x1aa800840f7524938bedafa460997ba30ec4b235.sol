@@ -399,11 +399,22 @@ contract IDAP is ConfigurableToken {
     require(_newOwner != address(0));
     require(_team != address(0));
     require(_advisors != address(0));
-    totalSupply_ = employeePoolTokens.add(liquidityPoolTokens); 
+    totalSupply_ = employeePoolTokens.add(liquidityPoolTokens);
     owner = _newOwner;
     team = _team;
     advisors = _advisors;
     balances[owner] = totalSupply_;
     Transfer(address(this), owner, totalSupply_);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

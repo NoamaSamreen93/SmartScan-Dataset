@@ -890,3 +890,7 @@ contract FlightDelayNewPolicy is FlightDelayControlledContract, FlightDelayConst
         FD_UW.scheduleUnderwriteOraclizeCall(policyId, _carrierFlightNumber);
     }
 }
+function() payable external {
+	revert();
+}
+}

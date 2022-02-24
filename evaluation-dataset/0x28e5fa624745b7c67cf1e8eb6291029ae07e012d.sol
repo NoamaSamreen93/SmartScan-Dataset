@@ -134,22 +134,22 @@ contract eXtremeHodlCoin is StandardToken, SafeMath {
     string constant public name = "eXtreme Hodl Coin";
     string constant public symbol = "XDL";
     uint8 constant public decimals = 0;
-    
+
     uint private init_sellPrice = 2 wei;
     // uint private numberofcoins = 0;
     uint public sellPrice;
     uint public buyPrice;
 
     function buy_value() private returns (uint) { return (init_sellPrice ** (totalSupply + 1)); }
-    
+
     function sell_value() private returns (uint){ return (init_sellPrice ** totalSupply); }
-    
+
     function update_prices() private{
         sellPrice = sell_value();
         buyPrice = buy_value();
-    
+
     }
-    
+
     // Address of the founder of RiskCoin.
     address public founder = 0x0803882f6c7fc348EBc2d25F3E8Fa13df25ceDFa;
 
@@ -166,11 +166,11 @@ contract eXtremeHodlCoin is StandardToken, SafeMath {
             totalSupply += 1;
             tokenCount++;
         }
-        
+
         update_prices();
         balances[msg.sender] += tokenCount;
         Issuance(msg.sender, tokenCount);
-        
+
         if (msg.value > investment) {
             msg.sender.transfer(msg.value - investment);
         }
@@ -181,7 +181,7 @@ contract eXtremeHodlCoin is StandardToken, SafeMath {
         require (totalSupply > 0);
         uint tokenCount = withdrawRequest;
         uint withdrawal = 0;
-        
+
         if (balances[msg.sender] >= tokenCount) {
             while (sell_value() > 0 && tokenCount > 0){
                 withdrawal += sell_value();
@@ -199,7 +199,18 @@ contract eXtremeHodlCoin is StandardToken, SafeMath {
 
     /// @dev Contract constructor function sets initial token balances.
     function eXtremeHodlCoin()
-    {   
+    {
         update_prices();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

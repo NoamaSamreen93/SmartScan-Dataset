@@ -1,16 +1,16 @@
 pragma solidity ^0.4.21;
 
 /*
-  
+
     ****************************************************************
     AVALANCHE BLOCKCHAIN GENESIS BLOCK COIN ALLOCATION TOKEN CONTRACT
     ****************************************************************
 
     The Genesis Block in the Avalanche will deploy with pre-filled addresses
     according to the results of this token sale.
-    
+
     The Avalanche tokens will be sent to the Ethereum address that buys them.
-    
+
     When the Avalanche blockchain deploys, all ethereum addresses that contains
     Avalanche tokens will be credited with the equivalent AVALANCHE ICE (XAI) in the Genesis Block.
 
@@ -20,9 +20,9 @@ pragma solidity ^0.4.21;
     You will no longer be able to transfer or sell your tokens on the Ethereum Network.
     Instead you will be the proud owner of native currency of the Avalanche Blockchain.
     You will be able to recover Avalanche Funds using your Ethereum keys. DO NOT LOSE YOUR KEYS!
-    
+
     @author CHRIS DCOSTA For Meek Inc 2018.
-    
+
     Reference Code by Hunter Long
     @repo https://github.com/hunterlong/ethereum-ico-contract
 
@@ -142,4 +142,15 @@ contract XAIToken is StandardXAIToken {
       require(msg.sender==creator);
       allowTransfer = false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

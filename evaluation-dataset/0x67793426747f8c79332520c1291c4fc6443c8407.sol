@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract CELLCrowdsale {
-    
+
     Token public tokenReward;
     address creator;
     address owner = 0x81Ae4b8A213F3933B0bE3bF25d13A3646F293A64;
@@ -26,33 +26,33 @@ contract CELLCrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
-    }    
+        creator = _creator;
+    }
 
     function setStartDate(uint256 _startDate) public {
         require(msg.sender == creator);
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndDate(uint256 _endDate) public {
         require(msg.sender == creator);
-        endDate = _endDate;      
+        endDate = _endDate;
     }
 
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
 
     function sendToken(address receiver, uint amount) public {
         require(msg.sender == creator);
         tokenReward.transfer(receiver, amount);
-        FundTransfer(receiver, amount, true);    
+        FundTransfer(receiver, amount, true);
     }
 
     function () payable public {
@@ -61,7 +61,7 @@ contract CELLCrowdsale {
         require(tokenSelled < 100000001);
         uint amount = msg.value / 10 finney;
         require(amount > 5);
-        uint amount20; 
+        uint amount20;
         // Step 1 (15.01. - 12.02.) - 40% BONUS (1 ETH = 700 Tokens)
         if(now > startDate && now < 1518480000) {
             price = 700;
@@ -93,10 +93,26 @@ contract CELLCrowdsale {
             price = 500;
             amount *= price * 100;
         }
-        
+
         tokenSelled += amount;
         tokenReward.transfer(msg.sender, amount);
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

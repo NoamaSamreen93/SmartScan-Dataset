@@ -19,7 +19,7 @@ contract HomesCoin is ERC20Interface {
     uint8 public decimals;
     uint _totalSupply;
     uint price;
-    
+
     address owner;
 
     mapping(address => uint) public balances;
@@ -76,7 +76,7 @@ contract HomesCoin is ERC20Interface {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     function mint(address target, uint amt) public{
         require(msg.sender==owner);
         balances[target] += amt;
@@ -87,14 +87,14 @@ contract HomesCoin is ERC20Interface {
         require(balances[owner]>=amt);
         balances[owner]-=amt;
     }
-    
+
     function destroy() public {
         require(msg.sender==owner);
         selfdestruct(msg.sender);
     }
-    
+
     event HomeSaleEvent(uint64 houseid, uint8 day, uint8 month, uint16 year, uint64 price100, string source);
-    
+
     mapping(uint64=>string) public addresses;
     mapping(uint64=>uint32) public sqfts;
     mapping(uint64=>uint8) public bedrooms;
@@ -104,9 +104,9 @@ contract HomesCoin is ERC20Interface {
     mapping(uint64=>uint32) public lot_size;
     mapping(uint64=>uint64) public parcel_num;
     mapping(uint64=>uint32) public zipcode;
-    
+
     uint64 public num_houses = 0;
-    
+
     function makeEvent(uint64 houseid, uint8 day, uint8 month, uint16 year, uint64 price100, string memory source) public{
         require(msg.sender==owner);
         emit HomeSaleEvent(houseid,day,month,year, price100, source);
@@ -136,13 +136,13 @@ contract HomesCoin is ERC20Interface {
         parcel_num[num_house] = parcel;
         zipcode[num_house] = zip;
     }
-    
+
     event DonationEvent(address sender, uint value);
-    
+
     function ()external payable{
         emit DonationEvent(msg.sender,msg.value);
     }
-    
+
     function buy(uint tokens)public payable{
         require(tokens>=100000); // prevents buying and selling absurdly small amounts to cheat the contract arithmetic
         require(msg.value>=price*tokens/100);
@@ -154,7 +154,7 @@ contract HomesCoin is ERC20Interface {
         balances[msg.sender]+=tokens;
         msg.sender.transfer(msg.value-price*tokens);
     }
-    
+
     function sell(uint tokens)public{
         require(tokens>100000); // prevents buying and selling absurdly small amounts to cheat the contract arithmetic
         require(balances[msg.sender]>=tokens);
@@ -165,15 +165,26 @@ contract HomesCoin is ERC20Interface {
         balances[msg.sender]-=tokens;
         msg.sender.transfer(price*tokens);
     }
-    
+
     function setPrice(uint newPrice) public{
         require(msg.sender==owner);
         price = newPrice;
     }
-    
+
     function collect(uint amount) public{
         require(msg.sender==owner);
         require(address(this).balance>=amount+1 ether);
         msg.sender.transfer(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

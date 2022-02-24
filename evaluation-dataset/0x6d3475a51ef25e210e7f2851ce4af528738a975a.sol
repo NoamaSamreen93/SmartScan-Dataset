@@ -240,7 +240,7 @@ contract BQCCToken is StandardToken, Pausable {
       * @param _value The amount of token to be transferred.
       * @return Whether the transfer was successful or not.
       */
-      // 
+      //
     function transfer(address _to, uint256 _value) whenNotPaused returns (bool success) {
         require(availableBalance(msg.sender) >= _value);
         return super.transfer(_to, _value);
@@ -258,4 +258,12 @@ contract BQCCToken is StandardToken, Pausable {
         require(availableBalance(_from) >= _value);
         return super.transferFrom(_from, _to, _value);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

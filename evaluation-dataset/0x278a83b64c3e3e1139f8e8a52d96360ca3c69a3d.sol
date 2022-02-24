@@ -484,7 +484,7 @@ contract ERC20 is IERC20 {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(_balances[sender] >= amount, "ERC20: transfer more than balance");
         require(amount > 0, "ERC20: transfer value negative");
-        
+
         _balances[sender] = _balances[sender].sub(amount);
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
@@ -941,7 +941,7 @@ contract NexxoToken is Ownable, ERC20, Pausable, ERC20Burnable {
     uint8 public decimals;
     uint public _totalSupply;
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address payable fundsWallet;           // Where should the raised ETH go?
 
     mapping(address => uint) balances;
@@ -976,7 +976,7 @@ contract NexxoToken is Ownable, ERC20, Pausable, ERC20Burnable {
         emit Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value); 
+        fundsWallet.transfer(msg.value);
     }
 
     // ------------------------------------------------------------------------
@@ -1014,7 +1014,7 @@ contract NexxoToken is Ownable, ERC20, Pausable, ERC20Burnable {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -1025,7 +1025,7 @@ contract NexxoToken is Ownable, ERC20, Pausable, ERC20Burnable {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -1069,4 +1069,15 @@ contract NexxoToken is Ownable, ERC20, Pausable, ERC20Burnable {
         burn(amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

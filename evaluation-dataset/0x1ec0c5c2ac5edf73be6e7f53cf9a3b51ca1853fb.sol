@@ -128,7 +128,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -235,7 +235,7 @@ contract BurnableToken is StandardToken {
 */
 contract Token is MintableToken, BurnableToken, Withdrawable {
     function Token() StandardToken("ADGEX Limited", "AGE", 8) public {
-        
+
     }
 }
 
@@ -278,12 +278,12 @@ contract Crowdsale is Withdrawable, Pausable {
 
     function setTokenRate(uint _value) onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         steps[currentStep].priceTokenWei = 1 ether / _value;
 
         NewRate(steps[currentStep].priceTokenWei);
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!crowdsaleClosed);
         require(msg.value >= 0.0001 ether);
@@ -295,7 +295,7 @@ contract Crowdsale is Withdrawable, Pausable {
         uint sum = msg.value;
         uint amount = sum.mul(1 ether).div(step.priceTokenWei).div(1e10);
         uint retSum = 0;
-        
+
         if(step.tokensSold.add(amount) > step.tokensForSale) {
             uint retAmount = step.tokensSold.add(amount).sub(step.tokensForSale);
             retSum = retAmount.mul(step.priceTokenWei).mul(1e10).div(1 ether);
@@ -321,7 +321,7 @@ contract Crowdsale is Withdrawable, Pausable {
     function nextStep() onlyOwner public {
         require(!crowdsaleClosed);
         require(steps.length - 1 > currentStep);
-        
+
         currentStep += 1;
 
         NextStep(currentStep);
@@ -329,11 +329,22 @@ contract Crowdsale is Withdrawable, Pausable {
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         token.transferOwnership(beneficiary);
 
         crowdsaleClosed = true;
 
         CrowdsaleClose();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

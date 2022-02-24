@@ -206,20 +206,36 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract StormBrewCoin is StandardToken {
-    
+
     string public name = "Storm Brew Coin";
     string public symbol = "SBC";
     string public version = "1.0";
     uint8 public decimals = 4;
-    
+
     uint256 INITIAL_SUPPLY = 400000000e4;
-    
+
     function StormBrewCoin() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[this] = totalSupply_;
         allowed[this][msg.sender] = totalSupply_;
-        
+
         emit Approval(this, msg.sender, balances[this]);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

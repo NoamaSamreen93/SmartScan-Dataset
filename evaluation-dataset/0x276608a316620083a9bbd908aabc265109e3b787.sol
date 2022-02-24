@@ -77,7 +77,7 @@ contract FreezableToken is Ownable {
     /**
     * @dev Check the specified token holder whether his/her token balance is frozen.
     * @param _wallet The address of token holder to check.
-    */ 
+    */
     function isFrozen(address _wallet) public view returns (bool) {
         return frozenList[_wallet];
     }
@@ -450,4 +450,15 @@ contract KarmazaToken is StandardToken, BurnableToken, FreezableToken, Pausable 
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -17,7 +17,7 @@ contract SafeMath {
         assert(c >= a && c >= b);
         return c;
     }
-    
+
     function safeDiv(uint a, uint b) pure internal returns (uint) {
     assert(b > 0); // Solidity automatically throws when dividing by 0
     uint c = a / b;
@@ -56,7 +56,7 @@ contract Mari is ERC20, SafeMath
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
-    
+
      enum Stages {
         NOTSTARTED,
         ICO,
@@ -64,14 +64,14 @@ contract Mari is ERC20, SafeMath
         ENDED
     }
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
             revert();
         _;
     }
-    
+
      modifier onlyOwner() {
         if (msg.sender != owner) {
             revert();
@@ -87,22 +87,22 @@ contract Mari is ERC20, SafeMath
         Transfer(0, owner, balances[owner]);
         Transfer(0, owner, balances[address(this)]);
     }
-  
+
     function () public payable atStage(Stages.ICO)
     {
         require(!stopped && msg.sender != owner && now <= enddate);
         no_of_tokens = safeMul(msg.value , _price_tokn);
         transferTokens(msg.sender,no_of_tokens);
     }
-    
-     function start_ICO() public onlyOwner 
+
+     function start_ICO() public onlyOwner
       {
           stage = Stages.ICO;
           stopped = false;
           startdate = now;
           enddate = startdate + 30 days;
      }
-    
+
     // called by the owner, pause ICO
     function StopICO() external onlyOwner {
         stopped = true;
@@ -114,14 +114,14 @@ contract Mari is ERC20, SafeMath
         stopped = false;
         stage = Stages.ICO;
     }
-    
+
      function end_ICO() external onlyOwner
      {
          stage = Stages.ENDED;
          totalsupply = safeSub(totalsupply , balances[address(this)]);
          balances[address(this)] = 0;
          Transfer(address(this), 0 , balances[address(this)]);
-         
+
      }
 
 
@@ -129,12 +129,12 @@ contract Mari is ERC20, SafeMath
     {
         return totalsupply;
     }
-    
+
     function balanceOf(address sender) public constant returns (uint256)
     {
         return balances[sender];
     }
-    
+
     function transferFrom(
         address _from,
         address _to,
@@ -153,7 +153,7 @@ contract Mari is ERC20, SafeMath
             return false;
         }
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) public returns(bool success) {
@@ -170,25 +170,25 @@ contract Mari is ERC20, SafeMath
         if (balances[msg.sender] >= _amount &&
             _amount > 0 &&
             balances[_to] + _amount > balances[_to]) {
-         
+
             balances[msg.sender] -= _amount;
             balances[_to] += _amount;
             Transfer(msg.sender, _to, _amount);
 
-          
+
 
             return true;
         } else {
             return false;
         }
     }
-    
+
           // Transfer the balance from owner's account to another account
     function transferTokens(address _to, uint256 _amount) private returns(bool success) {
         if (balances[address(this)] >= _amount &&
             _amount > 0 &&
             balances[_to] + _amount > balances[_to]) {
-         
+
             balances[address(this)] -= _amount;
             balances[_to] += _amount;
             Transfer(address(this), _to, _amount);
@@ -198,11 +198,22 @@ contract Mari is ERC20, SafeMath
             return false;
         }
     }
-    
+
      function drain() external onlyOwner {
         owner.transfer(this.balance);
     }
-    
-    
-    
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

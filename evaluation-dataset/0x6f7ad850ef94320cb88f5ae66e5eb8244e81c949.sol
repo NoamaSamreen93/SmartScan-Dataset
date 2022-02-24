@@ -11,8 +11,8 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
-}    
+
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -133,8 +133,8 @@ contract x32323 is owned{
     uint256 public sellPrice;
     uint256 public buyPrice;
 
-    
-    
+
+
 
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner {
         sellPrice = newSellPrice;
@@ -162,9 +162,15 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -154,8 +154,8 @@ contract TokenERC20 {
 contract Token is owned, TokenERC20  {
 
 	//Modify these variables
-	uint256 _initialSupply=420000000; 
-	string _tokenName="testdist";  
+	uint256 _initialSupply=420000000;
+	string _tokenName="testdist";
 	string _tokenSymbol="tsdt";
 	address wallet1 = 0x8012Eb27b9F5Ac2b74A975a100F60d2403365871;
 	uint256 public startTime;
@@ -182,4 +182,13 @@ contract Token is owned, TokenERC20  {
 	}
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

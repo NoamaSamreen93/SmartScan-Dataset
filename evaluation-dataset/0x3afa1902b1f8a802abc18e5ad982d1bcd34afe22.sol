@@ -84,19 +84,19 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
- 
+
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
 
- 
+
   function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -197,7 +197,7 @@ contract GSToken is PausableToken {
 
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public frozenAccountTokens;
-    
+
     event FrozenFunds(address target, bool frozen);
     event Burn(address indexed burner, uint256 value);
     event Freeze(address indexed from, uint256 value);
@@ -212,7 +212,7 @@ contract GSToken is PausableToken {
     function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(balances[msg.sender] >= _value);
         require(_value > 0);
-        balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);   
+        balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
         totalSupply_ = SafeMath.sub(totalSupply_,_value);
         emit Burn(msg.sender, _value);
         return true;
@@ -244,16 +244,16 @@ contract GSToken is PausableToken {
 
     function freezeAccountWithToken(address wallet, uint256 _value) public onlyOwner returns (bool success) {
         require(balances[wallet] >= _value);
-        require(_value > 0); 
+        require(_value > 0);
         frozenAccountTokens[wallet] = SafeMath.add(frozenAccountTokens[wallet], _value);
         emit Freeze(wallet, _value);
         return true;
     }
-    
+
     function unfreezeAccountWithToken(address wallet, uint256 _value) public onlyOwner returns (bool success) {
         require(balances[wallet] >= _value);
-        require(_value > 0); 
-        frozenAccountTokens[wallet] = SafeMath.sub(frozenAccountTokens[wallet], _value);         
+        require(_value > 0);
+        frozenAccountTokens[wallet] = SafeMath.sub(frozenAccountTokens[wallet], _value);
         emit Unfreeze(wallet, _value);
         return true;
     }
@@ -266,4 +266,15 @@ contract GSToken is PausableToken {
         }
         return(i);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

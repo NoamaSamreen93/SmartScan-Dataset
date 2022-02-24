@@ -9,7 +9,7 @@ contract ECF {
     uint8 public decimals;  // decimals 可以有的小数点个数，最小的代币单位。18 是建议的默认值
     uint256 public totalSupply;
 	address public owner;
-	
+
 
     // 用mapping保存每个地址对应的余额
     mapping (address => uint256) public balanceOf;
@@ -22,13 +22,13 @@ contract ECF {
 
     // 事件，用来通知客户端代币被消费
     event Burn(address indexed from, uint256 value);
-    
+
     //表示相应的授权的请求被同意，可以正式授权
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-	
+
 	/* 冻结 */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* 解冻 */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -43,7 +43,7 @@ contract ECF {
         symbol = tokenSymbol;                               // 代币符号
 		owner = msg.sender;
 	}
-	
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -171,7 +171,7 @@ contract ECF {
 	//冻结
 	function freeze(address target,uint256 _value) onlyOwner public returns (bool success) {
         if (balanceOf[target] < _value) revert();            // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         balanceOf[target] = balanceOf[target].sub(_value);                      // Subtract from the sender
         freezeOf[target] = freezeOf[target].add(_value);                                // Updates totalSupply
         emit Freeze(target, _value);
@@ -180,13 +180,13 @@ contract ECF {
 	//解冻
 	function unfreeze(address target,uint256 _value) onlyOwner public returns (bool success) {
         if (freezeOf[target] < _value) revert();            // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         freezeOf[target] = freezeOf[target].sub(_value);                      // Subtract from the sender
 		balanceOf[target] = balanceOf[target].add(_value);
         emit Unfreeze(target, _value);
         return true;
     }
-	
+
 	// can accept ether
 	function() payable public{
     }
@@ -236,4 +236,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

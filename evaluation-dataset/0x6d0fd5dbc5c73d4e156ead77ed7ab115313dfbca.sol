@@ -227,7 +227,7 @@ contract ItemToken {
     uint256 previousPrice = previousPriceOf(_itemId); // previous price of the token (oldOwner bought it for this price)
     uint256 charityCut = charityCutOf(_itemId); // actual charity cut of the token (oldOwner set this value)
     uint256 excess = msg.value.sub(price); // excess
-    
+
     charityCutOfItem[_itemId] = _charityCutNew; // update the charity cut array
     previousPriceOfItem[_itemId] = priceOf(_itemId); // update the previous price array
     priceOfItem[_itemId] = nextPriceOf(_itemId); // update price of item
@@ -242,11 +242,11 @@ contract ItemToken {
     uint256 devCut = calculateDevCut(price); // calculate dev cut
     // Charity contribution
     uint256 charityAmount = ((price.sub(devCut)).sub(previousPrice)).mul(charityCut).div(100); // calculate the charity cut
-    
+
     charityAddress.transfer(charityAmount); // transfer payment to the address of the charity
     oldOwner.transfer((price.sub(devCut)).sub(charityAmount)); // transfer payment to old owner minus the dev cut and the charity cut
 
-    
+
     if (excess > 0) {
       newOwner.transfer(excess); // transfer the excess
     }
@@ -412,4 +412,12 @@ interface IItemRegistry {
   function ownerOf (uint256 _itemId) external view returns (address _owner);
   function priceOf (uint256 _itemId) external view returns (uint256 _price);
   function charityCutOf (uint256 _itemId) external view returns (uint256 _charityCut);
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

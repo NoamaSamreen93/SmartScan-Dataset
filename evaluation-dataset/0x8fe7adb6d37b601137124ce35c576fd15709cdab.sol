@@ -13,19 +13,19 @@ contract SafeMath
 		c = a + b;
 		require(c >= a);
 	}
-	
+
 	function safeSub(uint a, uint b) public pure returns (uint c)
 	{
 		require(b <= a);
 		c = a - b;
 	}
-	
+
 	function safeMul(uint a, uint b) public pure returns (uint c)
 	{
 		c = a * b;
 		require(a == 0 || c / a == b);
 	}
-	
+
 	function safeDiv(uint a, uint b) public pure returns (uint c)
 	{
 		require(b > 0);
@@ -38,29 +38,29 @@ contract Owned
 {
 	address public owner;
 	address public newOwner;
-	
+
 	event OwnershipTransferred
 	(
 		address indexed owner,
 		address indexed newOwner
 	);
-	
+
 	constructor() public
 	{
 		owner = msg.sender;
 	}
-	
+
 	modifier onlyOwner
 	{
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	function transferOwnership(address _newOwner) onlyOwner public
 	{
 		newOwner = _newOwner;
 	}
-	
+
 	function acceptOwnership() public
 	{
 		require(msg.sender == newOwner);
@@ -86,7 +86,7 @@ contract ERC20Interface
 		address indexed to,
 		uint tokens
 	);
-	
+
 	event Approval
 	(
 		address indexed tokenOwner,
@@ -102,32 +102,32 @@ contract StandardERC20Token is ERC20Interface, SafeMath
 	string public symbol;
 	uint8 public decimals = 8;
 	uint256 public totalSupply;
-	
+
 	mapping(address => bool) frozen;
 	mapping(address => uint) balanceOfAddress;
 	mapping(address => mapping(address => uint)) allowed;
-	
+
 	constructor(string _tokenName, string _tokenSymbol) public
 	{
 		name = _tokenName;
 		symbol = _tokenSymbol;
 	}
-	
+
 	function totalSupply() public view returns (uint)
 	{
 		return totalSupply - balanceOfAddress[address(0)];
 	}
-	
+
 	function balanceOf(address tokenOwner) public view returns (uint balance)
 	{
 		return balanceOfAddress[tokenOwner];
 	}
-	
+
 	function allowance(address tokenOwner, address spender) public view returns (uint remaining)
 	{
 		return allowed[tokenOwner][spender];
 	}
-	
+
 	function transfer(address to, uint tokens) public returns (bool success)
 	{
 		require(to != address(0));
@@ -138,14 +138,14 @@ contract StandardERC20Token is ERC20Interface, SafeMath
 		emit Transfer(msg.sender, to, tokens);
 		return true;
 	}
-	
+
 	function approve(address spender, uint tokens) public returns (bool success)
 	{
 		allowed[msg.sender][spender] = tokens;
 		emit Approval(msg.sender, spender, tokens);
 		return true;
 	}
-	
+
 	function transferFrom(address from, address to, uint tokens) public returns (bool success)
 	{
 		require(to != address(0));
@@ -170,7 +170,7 @@ contract BOSToken is StandardERC20Token, Owned
 	address public vault;
 	address public wallet;
 	bool public isBurnable = true;
-	
+
 	event FreezeAccount
 	(
 		address indexed target,
@@ -194,7 +194,7 @@ contract BOSToken is StandardERC20Token, Owned
 	{
 		require(vault == address(0));
 		require(_vault != address(0));
-		
+
 		totalSupply = initialSupply * 10 ** uint256(decimals);
 		vault = _vault;
 		wallet = _wallet;
@@ -213,7 +213,7 @@ contract BOSToken is StandardERC20Token, Owned
 		frozen[target] = false;
 		emit FreezeAccount(target, false);
 	}
-	
+
 	function setWallet(address newWallet) onlyOwner public
 	{
 		require(newWallet != address(0));
@@ -225,8 +225,19 @@ contract BOSToken is StandardERC20Token, Owned
 	{
 		 wallet.transfer(msg.value);
 	}
-	
+
 	function transferAnyERC20Token(address tokenAddress, uint tokens) onlyOwner public returns (bool success) {
 		return ERC20Interface(tokenAddress).transfer(vault, tokens);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

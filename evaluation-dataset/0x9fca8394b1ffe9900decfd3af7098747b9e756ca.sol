@@ -1,25 +1,25 @@
 // Ethertote - Reward/Recogniton contract
-// 09.08.18 
+// 09.08.18
 //
 // ----------------------------------------------------------------------------
 // Overview
 // ----------------------------------------------------------------------------
 //
-// There are various individuals we would like to reward over the coming 
-// weeks with TOTE tokens. Admins will add an ethereum wallet address and a 
-// number of tokens for each individual to this smart contract. 
+// There are various individuals we would like to reward over the coming
+// weeks with TOTE tokens. Admins will add an ethereum wallet address and a
+// number of tokens for each individual to this smart contract.
 // The individual simply needs to click on the claim button and claim their tokens.
 //
-// This function will open immediately after the completion of the token sale, and will 
-// remain open for 60 days, after which time admin will be able to recover any 
-// unclaimed tokens 
+// This function will open immediately after the completion of the token sale, and will
+// remain open for 60 days, after which time admin will be able to recover any
+// unclaimed tokens
 // ----------------------------------------------------------------------------
 
 
 pragma solidity 0.4.24;
 
 ///////////////////////////////////////////////////////////////////////////////
-// SafeMath Library 
+// SafeMath Library
 ///////////////////////////////////////////////////////////////////////////////
 library SafeMath {
 
@@ -91,47 +91,47 @@ contract TokenSale {
 
 contract Reward {
         using SafeMath for uint256;
-        
+
     // VARIABLES
     address public admin;
     address public thisContractAddress;
     address public tokenContractAddress = 0x42be9831FFF77972c1D0E1eC0aA9bdb3CaA04D47;
-    
+
     address public tokenSaleAddress = 0x1C49d3c4895E7b136e8F8b804F1279068d4c3c96;
-    
+
     uint public contractCreationBlockNumber;
     uint public contractCreationBlockTime;
-    
+
     uint public tokenSaleClosingTime;
-    
+
     bool public claimTokenWindowOpen;
     uint public windowOpenTime;
-  
-    // ENUM
-    EthertoteToken token;       
-    TokenSale tokensale;
-    
 
-    // EVENTS 
+    // ENUM
+    EthertoteToken token;
+    TokenSale tokensale;
+
+
+    // EVENTS
 	event Log(string text);
-        
+
     // MODIFIERS
-    modifier onlyAdmin { 
+    modifier onlyAdmin {
         require(
             msg.sender == admin
-        ); 
-        _; 
+        );
+        _;
     }
-        
-    modifier onlyContract { 
+
+    modifier onlyContract {
         require(
             msg.sender == admin ||
             msg.sender == thisContractAddress
-        ); 
-        _; 
-    }   
-        
- 
+        );
+        _;
+    }
+
+
     // CONSTRUCTOR
     constructor() public payable {
         admin = msg.sender;
@@ -142,18 +142,18 @@ contract Reward {
 
 	    emit Log("Reward contract created.");
     }
-    
+
     // FALLBACK FUNCTION
     function () private payable {}
-    
-        
+
+
 // ----------------------------------------------------------------------------
 // Admin Only Functions
 // ----------------------------------------------------------------------------
 
-    // STRUCT 
+    // STRUCT
     Claimant[] public claimants;  // special struct variable
-    
+
         struct Claimant {
         address claimantAddress;
         uint claimantAmount;
@@ -170,18 +170,18 @@ contract Reward {
                 });
                 claimants.push(newClaimant);
     }
-    
-    
+
+
     function adjustEntitlement(address _address, uint _amount) onlyAdmin public {
         for (uint i = 0; i < claimants.length; i++) {
             if(_address == claimants[i].claimantAddress) {
                 claimants[i].claimantAmount = _amount;
             }
             else revert();
-            }  
+            }
     }
-    
-    // recover tokens tha were not claimed 
+
+    // recover tokens tha were not claimed
     function recoverTokens() onlyAdmin public {
         require(now < (showTokenSaleClosingTime().add(61 days)));
         token.transfer(admin, token.balanceOf(thisContractAddress));
@@ -189,18 +189,18 @@ contract Reward {
 
 
 // ----------------------------------------------------------------------------
-// This method can be used by admin to extract Eth accidentally 
+// This method can be used by admin to extract Eth accidentally
 // sent to this smart contract.
 // ----------------------------------------------------------------------------
     function ClaimEth() onlyAdmin public {
         address(admin).transfer(address(this).balance);
 
-    }  
-    
-    
-    
+    }
+
+
+
 // ----------------------------------------------------------------------------
-// PUBLIC FUNCTION - To be called by people claiming reward 
+// PUBLIC FUNCTION - To be called by people claiming reward
 // ----------------------------------------------------------------------------
 
     // callable by claimant after token sale is completed
@@ -215,12 +215,12 @@ contract Reward {
             }
           }
     }
-    
-    
+
+
 // ----------------------------------------------------------------------------
 // public view Functions
 // ----------------------------------------------------------------------------
-    
+
     // check claim entitlement
     function checkClaimEntitlement() public view returns(uint) {
         for (uint i = 0; i < claimants.length; i++) {
@@ -228,12 +228,12 @@ contract Reward {
                 require(claimants[i].claimantHasClaimed == false);
                 return claimants[i].claimantAmount;
             }
-            
-        }  
+
+        }
         return 0;
     }
-    
-    
+
+
     // check claim entitlement of any wallet
     function checkClaimEntitlementofWallet(address _address) public view returns(uint) {
         for (uint i = 0; i < claimants.length; i++) {
@@ -241,19 +241,19 @@ contract Reward {
                 require(claimants[i].claimantHasClaimed == false);
                 return claimants[i].claimantAmount;
             }
-            
-        }  
+
+        }
         return 0;
     }
-    
-    
+
+
     // total number of claimants
     function numberOfClaimants() public view returns(uint) {
         return claimants.length;
     }
-    
-    
-    
+
+
+
     // check Eth balance of this contract
     function thisContractBalance() public view returns(uint) {
       return address(this).balance;
@@ -270,4 +270,13 @@ contract Reward {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

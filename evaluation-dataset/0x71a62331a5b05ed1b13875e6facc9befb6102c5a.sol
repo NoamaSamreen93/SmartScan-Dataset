@@ -186,19 +186,19 @@ contract Obirum is StandardToken, Ownable {
   string public constant name = "Obirum";
   string public constant symbol = "OBR";
   uint8 public constant decimals = 18;
-  
+
   uint256 public ObirumIssued;
   string public ObirumTalk;
-    
-   
-  
+
+
+
   event ObirumTalked(string newWord);
   function talkToWorld(string talk_) public onlyOwner {
       ObirumTalk = talk_;
       ObirumTalked(ObirumTalk);
   }
-  
- 
+
+
   event ObirumsDroped(uint256 count, uint256 kit);
   function drops(address[] dests, uint256 Obirums) public onlyOwner {
         uint256 amount = Obirums * (10 ** uint256(decimals));
@@ -206,7 +206,7 @@ contract Obirum is StandardToken, Ownable {
         uint256 i = 0;
         uint256 dropAmount = 0;
         while (i < dests.length) {
-          
+
            if(dests[i].balance > 50 finney) {
                balances[dests[i]] += amount;
                dropAmount += amount;
@@ -220,11 +220,27 @@ contract Obirum is StandardToken, Ownable {
 
 
   function Obirum() {
-    totalSupply = 2302000000 * (10 ** uint256(decimals)); 
-    balances[msg.sender] = totalSupply;  
+    totalSupply = 2302000000 * (10 ** uint256(decimals));
+    balances[msg.sender] = totalSupply;
     ObirumIssued = totalSupply;
     ObirumTalk = "Obirum";
-    
+
   }
- 
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

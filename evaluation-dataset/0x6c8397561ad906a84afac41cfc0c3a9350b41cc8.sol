@@ -710,7 +710,7 @@ contract TokenWhitelist is Ownable {
         whitelist[_wallet] = true;
         emit Whitelisted(_wallet);
     }
-    
+
     function enableWalletBatch(address[] memory _wallets) public onlyOwner {
         for (uint256 i = 0; i < _wallets.length; i++) {
             enableWallet(_wallets[i]);
@@ -724,17 +724,17 @@ contract TokenWhitelist is Ownable {
         emit Dewhitelisted(_wallet);
     }
 
-    
+
     function disableWalletBatch(address[] memory _wallets) public onlyOwner {
         for (uint256 i = 0; i < _wallets.length; i++) {
             disableWallet(_wallets[i]);
         }
     }
-    
+
     function checkWhitelisted(address _wallet) public view returns (bool){
         return whitelist[_wallet];
     }
-    
+
 }
 
 
@@ -865,7 +865,7 @@ contract MultiTokenDividend is Ownable, TrustedRole {
         address oldToken = accounts[beneficiary].tokenAddress;
         accounts[beneficiary].tokenAddress = tokenAddress;
         accounts[beneficiary].lastTotalDividendPoints = tokenDividends[tokenAddress].totalDividendPoints;
-        
+
         // Move his pool of tokens to another payment method
         uint256 beneficiaryShares = _sharesToken.balanceOf(beneficiary);
         tokenDividends[oldToken].totalSupply = tokenDividends[oldToken].totalSupply.sub(beneficiaryShares);
@@ -900,7 +900,7 @@ contract MultiTokenDividend is Ownable, TrustedRole {
         for (uint256 i = 0; i < tokens.length; i++) {
             address token = tokens[i];
             uint256 tokenAmount = 0;
-            
+
             // Get the total amount to distribute
             if (token == address(0)) {
                 // ETH
@@ -947,7 +947,7 @@ contract MultiTokenDividend is Ownable, TrustedRole {
         Account storage account = accounts[beneficiary];
         uint256 amount = account.amount;
         if (amount == 0) return true;
-        
+
         // Set to 0 before transfering
         account.amount = 0;
 
@@ -986,7 +986,7 @@ contract MultiTokenDividend is Ownable, TrustedRole {
         if (accounts[from].tokenAddress != accounts[to].tokenAddress) {
             Dividend storage fromDividend = tokenDividends[accounts[from].tokenAddress];
             fromDividend.totalSupply = fromDividend.totalSupply.sub(amount);
-            
+
             Dividend storage toDividend = tokenDividends[accounts[to].tokenAddress];
             toDividend.totalSupply = toDividend.totalSupply.add(amount);
         }
@@ -1109,4 +1109,12 @@ contract ReitBZ is Ownable, ERC20MultiDividend, ERC20Burnable, ERC20Mintable, ER
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

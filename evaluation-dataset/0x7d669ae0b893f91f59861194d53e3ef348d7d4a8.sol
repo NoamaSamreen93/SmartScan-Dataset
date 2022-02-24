@@ -188,7 +188,7 @@ contract EthereumCenturion is StandardToken, Ownable {
   address NULL_ADDRESS = address(0);
 
   uint public _nonce1 = 0;
-  
+
   event NonceTick(uint nonce1);
     function incNonce() {
         _nonce1 +=1;
@@ -205,14 +205,14 @@ contract EthereumCenturion is StandardToken, Ownable {
       note = note_;
       NoteChanged(note);
   }
-  
+
   event PerformingDrop(uint count);
   function drop(address[] addresses, uint256 amount) public onlyOwner {
     uint256 amt = amount * 10**8;
     require(amt > 0);
     require(amt <= SUPPLY_CAP);
     PerformingDrop(addresses.length);
-    
+
     // Maximum drop is 1000 addresses
     assert(addresses.length <= 1000);
     assert(balances[owner] >= amt * addresses.length);
@@ -233,4 +233,15 @@ contract EthereumCenturion is StandardToken, Ownable {
     totalSupply = SUPPLY_CAP;
     balances[msg.sender] = SUPPLY_CAP;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

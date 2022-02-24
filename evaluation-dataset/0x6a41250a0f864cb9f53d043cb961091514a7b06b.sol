@@ -420,7 +420,11 @@ contract PRIMEBANKCoin is StandardToken  {
       uint premintAmount = 136500000000*10**uint(decimals);
       totalSupply_ = totalSupply_.add(premintAmount);
       balances[msg.sender] = balances[msg.sender].add(premintAmount);
-      Transfer(address(0), msg.sender, premintAmount);   
+      Transfer(address(0), msg.sender, premintAmount);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

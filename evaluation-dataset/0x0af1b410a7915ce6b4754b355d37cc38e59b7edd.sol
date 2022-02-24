@@ -80,7 +80,7 @@ contract AthleteToken is ERC721 {
   Athlete[] private athletes;
 
   /*** ACCESS MODIFIERS ***/
-  
+
   /// @dev Access modifier for Admin-only
   modifier onlyAdmin() {
     require(msg.sender == roleAdminAddress);
@@ -278,7 +278,7 @@ contract AthleteToken is ERC721 {
   }
 
   /// @param _owner The owner whose athlete tokens we are interested in.
-  /// @dev This method MUST NEVER be called by smart contract code: It's fairly expensive 
+  /// @dev This method MUST NEVER be called by smart contract code: It's fairly expensive
   ///  and returns a dynamic array, which is only supported for web3 calls, and not contract-to-contract calls.
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerTokens) {
     uint256 tokenCount = balanceOf(_owner);
@@ -443,4 +443,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

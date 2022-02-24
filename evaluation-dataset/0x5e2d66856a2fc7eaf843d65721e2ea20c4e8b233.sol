@@ -57,10 +57,10 @@ contract CryptoStorage is StorageBase {
 
     // number of monsters in pregnant
     uint256 public pregnantMonsters;
-    
+
     // monsterId => total number
     mapping (uint256 => uint32) public monsterCurrentNumber;
-    
+
     // tokenId => owner address
     mapping (uint256 => address) public monsterIndexToOwner;
 
@@ -82,8 +82,8 @@ contract CryptoStorage is StorageBase {
         uint256 _birthTime,
         uint256 _monsterId,
         bytes _properties
-    ) 
-        public 
+    )
+        public
         onlyOwner
         returns (uint256)
     {
@@ -132,7 +132,7 @@ contract CryptoStorage is StorageBase {
             uint32 monsterNum,
             uint16 monsterId,
             bytes properties
-        ) 
+        )
     {
         Monster storage monster = monsters[_tokenId];
 
@@ -166,7 +166,7 @@ contract CryptoStorage is StorageBase {
     function getSiringWithId(uint256 _tokenId) external view returns (uint32) {
         return monsters[_tokenId].siringWithId;
     }
-    
+
     function setSiringWithId(uint256 _tokenId, uint32 _siringWithId) external onlyOwner {
         monsters[_tokenId].siringWithId = _siringWithId;
     }
@@ -214,7 +214,7 @@ contract CryptoStorage is StorageBase {
     function updateProperties(uint256 _tokenId, bytes _properties) external onlyOwner {
         monsters[_tokenId].properties = _properties;
     }
-    
+
     function setMonsterIndexToOwner(uint256 _tokenId, address _owner) external onlyOwner {
         monsterIndexToOwner[_tokenId] = _owner;
     }
@@ -230,7 +230,7 @@ contract CryptoStorage is StorageBase {
     function setMonsterIndexToApproved(uint256 _tokenId, address _approved) external onlyOwner {
         monsterIndexToApproved[_tokenId] = _approved;
     }
-    
+
     function deleteMonsterIndexToApproved(uint256 _tokenId) external onlyOwner {
         delete monsterIndexToApproved[_tokenId];
     }
@@ -251,3 +251,10 @@ contract CryptoStorage is StorageBase {
         pregnantMonsters--;
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

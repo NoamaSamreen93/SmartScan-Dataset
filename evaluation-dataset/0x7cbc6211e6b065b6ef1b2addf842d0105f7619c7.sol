@@ -1,23 +1,23 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The ether.online Project.  All rights reserved.
-/* 
-/* https://ether.online  The first RPG game of blockchain 
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* https://ether.online  The first RPG game of blockchain
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
     modifier onlyAdmin() {
         require(msg.sender == addrAdmin);
@@ -75,8 +75,8 @@ contract AccessService is AccessAdmin {
         addrFinance = _newFinance;
     }
 
-    function withdraw(address _target, uint256 _amount) 
-        external 
+    function withdraw(address _target, uint256 _amount)
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         require(_amount > 0);
@@ -86,7 +86,7 @@ contract AccessService is AccessAdmin {
             receiver.transfer(_amount);
         } else {
             receiver.transfer(this.balance);
-        }      
+        }
     }
 }
 
@@ -118,7 +118,7 @@ contract DataMining is AccessService, IDataMining {
         addrFinance = msg.sender;
     }
 
-    function setRecommender(address _target, address _recommender) 
+    function setRecommender(address _target, address _recommender)
         external
         onlyService
     {
@@ -127,7 +127,7 @@ contract DataMining is AccessService, IDataMining {
         RecommenderChange(_target, _recommender);
     }
 
-    function setRecommenderMulti(address[] _targets, address[] _recommenders) 
+    function setRecommenderMulti(address[] _targets, address[] _recommenders)
         external
         onlyService
     {
@@ -147,7 +147,7 @@ contract DataMining is AccessService, IDataMining {
         return recommendRelation[_target];
     }
 
-    function addFreeMineral(address _target, uint32 _cnt)  
+    function addFreeMineral(address _target, uint32 _cnt)
         external
         onlyService
     {
@@ -202,4 +202,15 @@ contract DataMining is AccessService, IDataMining {
     function getFreeMineral(address _target) external view returns(uint32) {
         return freeMineral[_target];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

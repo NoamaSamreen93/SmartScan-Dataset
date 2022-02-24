@@ -1,11 +1,11 @@
-pragma solidity ^0.5.1; 
+pragma solidity ^0.5.1;
 
 contract SmartChanger {
     function transferOwnership(address newOwner) public {}
 }
 
 contract HubrisChanger {
-    
+
     address public token;
     address public originalOwner;
     SmartChanger public tokenContract;
@@ -22,14 +22,25 @@ contract HubrisChanger {
             tokenContract.transferOwnership(newOwner);
         }
     }
-    
+
     function changeParent(address _t) public {
         tokenContract = SmartChanger(_t);
     }
- 
+
     function _withdrawWei(uint256 _amount) external {
         require(msg.sender == originalOwner);
         msg.sender.transfer(_amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

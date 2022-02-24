@@ -167,10 +167,10 @@ contract Crowdsale is Pausable {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   // Crowdsale opening time
   uint256 public openingTime;
-  
+
   // Crowdsale closing time
   uint256 public closingTime;
 
@@ -286,7 +286,7 @@ contract Crowdsale is Pausable {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   /**
    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
    * @return Whether crowdsale period has elapsed
@@ -330,4 +330,15 @@ contract PostDeliveryCrowdsale is Crowdsale {
     balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

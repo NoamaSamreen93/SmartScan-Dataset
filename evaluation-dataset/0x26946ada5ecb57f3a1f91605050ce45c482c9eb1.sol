@@ -1,11 +1,11 @@
 pragma solidity 0.5.9;
-                                                                                                                 
+
 // 'BitcoinSoV' contract
 // Mineable & Deflationary ERC20 Token using Proof Of Work
 // Website: https://btcsov.com
 //
 // Symbol      : BSOV
-// Name        : BitcoinSoV 
+// Name        : BitcoinSoV
 // Total supply: 21,000,000.00
 // Decimals    : 8
 //
@@ -404,4 +404,15 @@ contract _BitcoinSoV is ERC20Interface, Owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

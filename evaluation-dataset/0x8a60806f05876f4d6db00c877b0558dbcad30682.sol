@@ -77,7 +77,7 @@ contract BasicAccessControl {
             moderators.push(_newModerator);
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         uint foundIndex = 0;
         for (; foundIndex < moderators.length; foundIndex++) {
@@ -105,7 +105,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -116,10 +116,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
     function removeElementOfArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -136,7 +136,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -151,10 +151,10 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
 }
 
 contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint8 public STAT_COUNT = 6;
     uint8 public STAT_MAX = 32;
-    
+
     struct MonsterClassAcc {
         uint32 classId;
         uint256 price;
@@ -173,10 +173,10 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     // data contract
     address public dataContract;
-    
+
     function EtheremonProcessor(address _dataContract) public {
         dataContract = _dataContract;
     }
@@ -186,36 +186,36 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         require(dataContract != 0x0);
         _;
     }
-    
+
 
     // event
     event EventCatchMonster(address indexed trainer, ResultCode result, uint64 objId);
     event EventCashOut(address indexed trainer, ResultCode result, uint256 amount);
     event EventWithdrawEther(address indexed sendTo, ResultCode result, uint256 amount);
- 
+
      // admin
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public returns(ResultCode) {
         if (_amount > this.balance) {
             EventWithdrawEther(_sendTo, ResultCode.ERROR_INVALID_AMOUNT, 0);
             return ResultCode.ERROR_INVALID_AMOUNT;
         }
-        
+
         _sendTo.transfer(_amount);
         EventWithdrawEther(_sendTo, ResultCode.SUCCESS, _amount);
         return ResultCode.SUCCESS;
     }
-    
+
     function setDataContract(address _dataContract) onlyModerators public {
         dataContract = _dataContract;
     }
-    
+
     function addMonsterClassBasic(uint32 _classId, uint8 _type, uint256 _price, uint256 _returnPrice,
         uint8 _ss1, uint8 _ss2, uint8 _ss3, uint8 _ss4, uint8 _ss5, uint8 _ss6) onlyModerators public {
-            
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.setMonsterClass(_classId, _price, _returnPrice, true);
         data.addElementToArrayType(ArrayType.CLASS_TYPE, uint64(_classId), _type);
-        
+
         // add stat step
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss1);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss2);
@@ -223,12 +223,12 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss4);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss5);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss6);
-        
+
     }
-    
-    function addMonsterClassExtend(uint32 _classId, uint8 _type2, uint8 _type3, 
+
+    function addMonsterClassExtend(uint32 _classId, uint8 _type2, uint8 _type3,
         uint8 _st1, uint8 _st2, uint8 _st3, uint8 _st4, uint8 _st5, uint8 _st6 ) onlyModerators public {
-        
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         if (_type2 > 0) {
             data.addElementToArrayType(ArrayType.CLASS_TYPE, uint64(_classId), _type2);
@@ -236,7 +236,7 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         if (_type3 > 0) {
             data.addElementToArrayType(ArrayType.CLASS_TYPE, uint64(_classId), _type3);
         }
-        
+
         // add stat base
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st1);
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st2);
@@ -244,9 +244,9 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st4);
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st5);
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st6);
-        
+
     }
-    
+
     // helper
     function getRandom(uint8 maxRan, uint8 index) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1));
@@ -255,24 +255,24 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         return uint8(genNum % maxRan);
     }
-    
+
     function () payable public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.addExtraBalance(msg.sender, msg.value);
     }
-    
+
     // public
-    
+
     function catchMonster(uint32 _classId, string _name) requireDataContract public payable returns(ResultCode) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
-        
+
         if (class.classId == 0 || class.catchable == false) {
             EventCatchMonster(msg.sender, ResultCode.ERROR_CLASS_NOT_FOUND, 0);
             return ResultCode.ERROR_CLASS_NOT_FOUND;
         }
-        
+
         uint256 totalBalance = safeAdd(msg.value, data.getExtraBalance(msg.sender));
         uint256 payPrice = class.price;
         if (payPrice > totalBalance) {
@@ -280,10 +280,10 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
             EventCatchMonster(msg.sender, ResultCode.ERROR_LOW_BALANCE, 0);
             return ResultCode.ERROR_LOW_BALANCE;
         }
-        
+
         // deduct the balance
         data.setExtraBalance(msg.sender, safeSubtract(totalBalance, payPrice));
-        
+
         // add monster
         uint64 objId = data.addMonsterObj(_classId, msg.sender, _name);
         // generate base stat
@@ -299,14 +299,14 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
             // update price
             data.setMonsterClass(_classId, distributedPrice, class.returnPrice, true);
         }
-        
+
         EventCatchMonster(msg.sender, ResultCode.SUCCESS, objId);
         return ResultCode.SUCCESS;
     }
-    
+
     function cashOut(uint256 _amount) requireDataContract public returns(ResultCode) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
-        
+
         uint256 totalAmount = data.collectAllReturnBalance(msg.sender);
         // default to cash out all
         if (_amount == 0) {
@@ -316,13 +316,13 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
             EventCashOut(msg.sender, ResultCode.ERROR_LOW_BALANCE, 0);
             return ResultCode.ERROR_LOW_BALANCE;
         }
-        
+
         // check contract has enough money
         if (this.balance < _amount) {
             EventCashOut(msg.sender, ResultCode.ERROR_NOT_ENOUGH_MONEY, 0);
             return ResultCode.ERROR_NOT_ENOUGH_MONEY;
         }
-        
+
         if (_amount > 0) {
             data.deductExtraBalance(msg.sender, _amount);
             if (!msg.sender.send(_amount)) {
@@ -331,16 +331,16 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
                 return ResultCode.ERROR_SEND_FAIL;
             }
         }
-        
+
         EventCashOut(msg.sender, ResultCode.SUCCESS, _amount);
         return ResultCode.SUCCESS;
     }
-    
+
     function getTrainerBalance(address _trainer) constant public returns(uint256) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.getExpectedBalance(_trainer);
     }
-    
+
     function getMonsterClassBasic(uint32 _classId) constant public returns(uint256, uint256, uint256, bool) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
@@ -364,26 +364,37 @@ contract EtheremonProcessor is EtheremonEnum, BasicAccessControl, SafeMath {
         MonsterObjAcc memory obj;
         uint32 _ = 0;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, _, _, obj.createTime) = data.getMonsterObj(_objId);
-     
+
         return getLevel(obj.exp);
     }
-    
+
     function getMonsterCP(uint64 _objId) constant public returns(uint64) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         uint32 _ = 0;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, _, _, obj.createTime) = data.getMonsterObj(_objId);
-     
+
         uint baseSize = data.getSizeArrayType(ArrayType.STAT_BASE, obj.monsterId);
         if (baseSize == 0)
             return 0;
-        
+
         uint256 total = 0;
         for(uint i=0; i < baseSize; i+=1) {
             total += data.getElementInArrayType(ArrayType.STAT_BASE, obj.monsterId, i);
             total += safeMult(data.getElementInArrayType(ArrayType.STAT_STEP, uint64(obj.classId), i), getLevel(obj.exp));
         }
-        
+
         return uint64(total/baseSize);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

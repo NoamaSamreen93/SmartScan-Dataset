@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 contract ScamStampToken {
     //The Scam Stamp Token is intended to mark an address as SCAM.
     //this token is used by the contract ScamStamp defined bellow
-    //a false ERC20 token, where transfers can be done only by 
+    //a false ERC20 token, where transfers can be done only by
     //the creator of the token.
 
     string public constant name = "SCAM Stamp Token";
@@ -27,7 +27,7 @@ contract ScamStampToken {
     }
     //Only the owner of the token can transfer.
     //tokens are being generated on the fly,
-    //tokenSupply increases with double the amount that is required to be transfered 
+    //tokenSupply increases with double the amount that is required to be transfered
     //if the amount isn't available to transfer
     //newly generated tokens are never burned.
     function transfer(address _to, uint256 _amount) onlyOwner returns (bool success){
@@ -38,7 +38,7 @@ contract ScamStampToken {
                 Transfer(msg.sender, _to, _amount);
                 return true;
                 }else{
-                    totalSupply += _amount + _amount;   
+                    totalSupply += _amount + _amount;
                     balances[msg.sender] += _amount + _amount;
                     balances[msg.sender] -= _amount;
                     balances[_to] += _amount;
@@ -116,7 +116,7 @@ address public owner;
 //the address of the ScamStampToken created by this contract
 address public scamStampTokenAddress;
 //the actual ScamStampToken
-ScamStampToken theScamStampToken; 
+ScamStampToken theScamStampToken;
 //the contract has a brokerage fee applied to all payable function calls
 //the fee is 2% of the amount sent.
 //the fee is directly sent to the owner of this contract
@@ -155,7 +155,7 @@ theScamStampToken = ScamStampToken(scamStampTokenAddress);
 
 }
 event MarkedAsScam(address scammer, address by, uint256 amount);
-//markAsSpam: payable function. 
+//markAsSpam: payable function.
 //it flags the address as a scam address by sending ScamStampTokens to it.
 //the minimum value sent with this function call must be  pricePerUnit - set to 1 finney
 //the value sent to this function will be held as insurance by this contract.
@@ -174,7 +174,7 @@ function markAsScam(address scammer) payable hasMinimumAmountToFlag{
     uint256 q = mul(reliefRatio, mul(msg.value, pricePerUnit));
     MarkedAsScam(scammer, msg.sender, q);
 }
-//once an address is flagged as SCAM it can be forgiven by the flagger 
+//once an address is flagged as SCAM it can be forgiven by the flagger
 //unless the scammer already started to pay its debt
 
 function forgiveIt(address scammer) {
@@ -232,7 +232,7 @@ modifier addressToBeAScammer(address scammer){
 event Forgived(address scammer, address by, uint256 amount);
 event PartiallyForgived(address scammer, address by, uint256 amount);
 //forgiveMe - function called by scammer to pay any of its debt
-//If the amount sent to this function is greater than the amount 
+//If the amount sent to this function is greater than the amount
 //that is needed to cover or debt is sent back to the scammer.
 function forgiveMe() payable toBeAScammer returns (bool success){
     address scammer = msg.sender;
@@ -249,7 +249,7 @@ function forgiveMeOnBehalfOf(address scammer) payable addressToBeAScammer(scamme
     }
     function forgiveThis(address scammer) private returns (bool success){
         uint256 forgivenessAmount = msg.value;
-        uint256 contractFeeAmount =  div(mul(forgivenessAmount, contractFeePercentage), 100); 
+        uint256 contractFeeAmount =  div(mul(forgivenessAmount, contractFeePercentage), 100);
         uint256 numberOfTotalTokensToForgive = div(div(forgivenessAmount, reliefRatio), pricePerUnit);
         forgivenessAmount = forgivenessAmount - contractFeeAmount;
         for(uint128 i = 0; i < flaggedIndex[scammer].length; i++){
@@ -296,8 +296,19 @@ function forgiveMeOnBehalfOf(address scammer) payable addressToBeAScammer(scamme
     }
     function () payable {
         owner.transfer(msg.value);
-        DonationReceived(msg.sender, msg.value);        
+        DonationReceived(msg.sender, msg.value);
     }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

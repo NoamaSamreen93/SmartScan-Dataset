@@ -25,12 +25,12 @@ contract RajTest is owned {
     string public symbol = "RT";
     uint8 public decimals = 18;
     uint256 public totalSupply = 0;
-    
+
     uint256 public sellPrice = 1045;
     uint256 public buyPrice = 1045;
 
     bool public released = false;
-    
+
     /// contract that is allowed to create new tokens and allows unlift the transfer limits on this token
     address public crowdsaleAgent;
 
@@ -38,7 +38,7 @@ contract RajTest is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -300,4 +300,15 @@ contract RajTestICO is owned, Killable {
         // Transfer Fund to owner's address
         receiver.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

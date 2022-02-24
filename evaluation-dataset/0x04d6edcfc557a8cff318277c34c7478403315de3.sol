@@ -281,7 +281,7 @@ contract RektFyi is Ownable {
     uint public constant PRECISION = 100000000000000; // 4 orders of magnitude / decimal places
     uint public constant MULTIPLIER_FLOOR = 1000000000000000000; // 1x
     uint public constant MULTIPLIER_CEILING = 10000000000000000000; // 10x
-    uint public constant BONUS_FLOOR = 1250000000000000000; //1.25x 
+    uint public constant BONUS_FLOOR = 1250000000000000000; //1.25x
     uint public constant BONUS_CEILING = 1800000000000000000; //1.8x
     uint public constant BOUNTY_BONUS_MINIMUM = 5000000000000000000; // $5
     uint public constant HOLD_SCORE_CEILING = 1000000000000000000000000000; // 1 RAY
@@ -430,7 +430,7 @@ contract RektFyi is Ownable {
 
         balance[_receiver] = 0;
         totalSupply --;
-        
+
         emit Transfer(_receiver, address(0), 1);
 
         uint feeReward = distributeBurnRewards(_receiver, sender);
@@ -511,7 +511,7 @@ contract RektFyi is Ownable {
         require(_seconds > 0 && _seconds <= HOLD_TIME_MAX, "Hold time must not be higher than HOLD_TIME_MAX");
         holdTimeCeiling = _seconds;
     }
-    
+
 
     /// @dev Permanent shutdown of the contract.
     /// No one can give or bump, everyone can burn and withdraw.
@@ -715,4 +715,15 @@ contract RektFyi is Ownable {
             _destination.transfer(amountETH);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

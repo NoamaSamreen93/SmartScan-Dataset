@@ -232,10 +232,21 @@ contract HBT is StandardToken,Ownable{
 	uint256 public constant decimals = 18;
 
 	uint256 public constant MAX_SUPPLY=100000000*10**decimals;
-	
+
 	function HBT(){
 		totalSupply = MAX_SUPPLY ;
 		balances[msg.sender] = MAX_SUPPLY;
 		Transfer(0x0, msg.sender, MAX_SUPPLY);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

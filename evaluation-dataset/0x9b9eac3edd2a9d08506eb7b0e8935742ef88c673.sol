@@ -226,3 +226,12 @@ contract tppToken is ERC20Interface, Owned, SafeMath {
         owner.transfer(address(this).balance);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

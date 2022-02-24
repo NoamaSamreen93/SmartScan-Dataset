@@ -223,7 +223,7 @@ contract ABXToken {
 
         Approval(msg.sender, tokensSpender, newTokensNumber);
     }
-    
+
     //An Attack Vector on Approve/TransferFrom Methods:
     //https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     function safeApprove(address tokensHolder, address tokensSpender,
@@ -233,4 +233,13 @@ contract ABXToken {
 
         unsafeApprove(tokensHolder, tokensSpender, newTokensNumber);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

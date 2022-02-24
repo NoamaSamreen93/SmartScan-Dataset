@@ -454,7 +454,7 @@ contract SIOO is DSToken("SIOO"), ERC223 {
             if (!TokenController(controller).onApprove(msg.sender, _spender, _amount))
                 revert();
         }
-        
+
         return super.approve(_spender, _amount);
     }
 
@@ -553,4 +553,15 @@ contract SIOO is DSToken("SIOO"), ERC223 {
 ////////////////
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

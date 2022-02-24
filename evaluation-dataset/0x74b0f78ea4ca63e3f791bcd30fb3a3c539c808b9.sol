@@ -72,9 +72,9 @@ contract owned {
 }
 
 contract TokenERC20 is owned {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "圣链";
     string public constant symbol     = "HRG";
     uint32 public constant decimals   = 18;
@@ -91,18 +91,18 @@ contract TokenERC20 is owned {
      /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
-	
+
 	function TokenERC20(
         uint256 initialSupply
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
@@ -114,9 +114,9 @@ contract TokenERC20 is owned {
 		} else{
 		    return false;
 		}
-		
+
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
@@ -130,7 +130,7 @@ contract TokenERC20 is owned {
 		}else{
 		    return false;
 		}
-		
+
 	}
 
 
@@ -160,12 +160,12 @@ contract TokenERC20 is owned {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
- 
+
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     ////
     /**
      * Destroy tokens from other account
@@ -175,15 +175,15 @@ contract TokenERC20 is owned {
      * @param _from the address of the sender
      * @param _value the amount of money to burn
      */
-     
+
        function burnFrom(address _from, uint256 _value) public onlyOwner returns (bool success) {
-        require(balances[_from] >= _value);              
-        balances[_from] = balances[_from].sub(_value);                          
+        require(balances[_from] >= _value);
+        balances[_from] = balances[_from].sub(_value);
         balances[msg.sender] = balances[msg.sender].add(_value);
         return true;
     }
-    
-  
+
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -191,4 +191,20 @@ contract TokenERC20 is owned {
         frozenAccount[target] = freeze;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

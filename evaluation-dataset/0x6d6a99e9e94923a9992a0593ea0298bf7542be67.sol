@@ -1,18 +1,18 @@
 pragma solidity ^0.4.24;
 
 contract dapBetting {
-    
+
     /* Types */
-    
+
     enum eventStatus{ open, finished, closed }
-    
+
     struct bid{
         uint id;
         bytes32 name;
         address[] whoBet;
         uint amountReceived;
     }
-    
+
     struct betEvent{
         uint id;
         bytes32 name;
@@ -27,25 +27,25 @@ contract dapBetting {
         bet[] bets;
         eventStatus status;
     }
-    
+
     struct bet{
         address person;
         bytes32 bidName;
         uint amount;
     }
-    
+
     /* Storage */
-    
+
     mapping (address => betEvent[]) public betEvents;
     mapping (address => uint) public pendingWithdrawals;
-    
+
     /* Events */
-    
+
     event eventCreated(uint id, address creator);
     event betMade(uint value, uint id);
     event eventStatusChanged(uint status);
     event withdrawalDone(uint amount);
-    
+
     /* Modifiers */
     modifier onlyFinished(address creator, uint eventId){
         if (betEvents[creator][eventId].status == eventStatus.finished || betEvents[creator][eventId].endBlock < block.number){
@@ -58,9 +58,9 @@ contract dapBetting {
         }
     }
     /* Methods */
-    
+
     function createEvent(bytes32 name, bytes32[] names, address arbitrator, uint fee, uint256 endBlock, uint256 minBid, uint256 maxBid) external{
-        
+
         require(fee < 100);
         /* check whether event with such name already exist */
         bool found;
@@ -70,12 +70,12 @@ contract dapBetting {
             }
         }
         require(!found);
-        
+
         /* check names for duplicates */
         for (uint8 y=0;i<names.length;i++){
             require(names[y] != names[y+1]);
         }
-        
+
         uint newId = betEvents[msg.sender].length++;
         betEvents[msg.sender][newId].id = newId;
         betEvents[msg.sender][newId].name = name;
@@ -86,16 +86,16 @@ contract dapBetting {
         betEvents[msg.sender][newId].minBid = minBid;
         betEvents[msg.sender][newId].maxBid = maxBid;
         betEvents[msg.sender][newId].arbitratorFee = fee;
-        
+
         for (uint8 i = 0;i < names.length; i++){
             uint newBidId = betEvents[msg.sender][newId].bids.length++;
             betEvents[msg.sender][newId].bids[newBidId].name = names[i];
             betEvents[msg.sender][newId].bids[newBidId].id = newBidId;
         }
-        
+
         emit eventCreated(newId, msg.sender);
     }
-    
+
     function makeBet(address creator, uint eventId, bytes32 bidName) payable external{
         require(betEvents[creator][eventId].status == eventStatus.open);
         if (betEvents[creator][eventId].endBlock > 0){
@@ -128,17 +128,17 @@ contract dapBetting {
         betEvents[creator][eventId].bets[newBetId].person = msg.sender;
         betEvents[creator][eventId].bets[newBetId].amount = msg.value;
         betEvents[creator][eventId].bets[newBetId].bidName = bidName;
-        
+
         emit betMade(msg.value, newBetId);
     }
-    
+
     function finishEvent(address creator, uint eventId) external{
         require(betEvents[creator][eventId].status == eventStatus.open && betEvents[creator][eventId].endBlock == 0);
         require(msg.sender == betEvents[creator][eventId].arbitrator);
         betEvents[creator][eventId].status = eventStatus.finished;
         emit eventStatusChanged(1);
     }
-    
+
     function determineWinner(address creator, uint eventId, bytes32 bidName) external onlyFinished(creator, eventId) onlyArbitrator(creator, eventId){
         require (findBid(creator, eventId, bidName));
         betEvent storage cEvent = betEvents[creator][eventId];
@@ -152,7 +152,7 @@ contract dapBetting {
                 amountLost += cEvent.bids[x].amountReceived;
             }
         }
-        
+
         /* Calculating amount of all won bets */
         for (x=0;x<cEvent.bets.length;x++){
             if(cEvent.bets[x].bidName == cEvent.winner){
@@ -184,19 +184,19 @@ contract dapBetting {
         cEvent.status = eventStatus.closed;
         emit eventStatusChanged(2);
     }
-    
+
     function withdraw(address person) private{
         uint amount = pendingWithdrawals[person];
         pendingWithdrawals[person] = 0;
         person.transfer(amount);
         emit withdrawalDone(amount);
     }
-    
+
     function requestWithdraw() external {
         //require(pendingWithdrawals[msg.sender] != 0);
         withdraw(msg.sender);
     }
-    
+
     function findBid(address creator, uint eventId, bytes32 bidName) private view returns(bool){
         for (uint8 i=0;i<betEvents[creator][eventId].bids.length;i++){
             if(betEvents[creator][eventId].bids[i].name == bidName){
@@ -204,11 +204,11 @@ contract dapBetting {
             }
         }
     }
-    
+
     function calc(uint one, uint two) private pure returns(uint){
         return one/two;
     }
-    function percent(uint numerator, uint denominator, uint precision) public 
+    function percent(uint numerator, uint denominator, uint precision) public
 
     pure returns(uint quotient) {
            // caution, check safe-to-multiply here
@@ -218,11 +218,11 @@ contract dapBetting {
           return ( _quotient);
     }
     /* Getters */
-    
+
     function getBidsNum(address creator, uint eventId) external view returns (uint){
         return betEvents[creator][eventId].bids.length;
     }
-    
+
     function getBid(address creator, uint eventId, uint bidId) external view returns (uint, bytes32, uint){
         bid storage foundBid = betEvents[creator][eventId].bids[bidId];
         return(foundBid.id, foundBid.name, foundBid.amountReceived);
@@ -235,12 +235,12 @@ contract dapBetting {
     function getWhoBet(address creator, uint eventId, uint bidId) external view returns (address[]){
         return betEvents[creator][eventId].bids[bidId].whoBet;
     }
-    
+
     function getBet(address creator, uint eventId, uint betId) external view returns(address, bytes32, uint){
         bet storage foundBet = betEvents[creator][eventId].bets[betId];
         return (foundBet.person, foundBet.bidName, foundBet.amount);
     }
-    
+
     function getEventId(address creator, bytes32 eventName) external view returns (uint, bool){
         for (uint i=0;i<betEvents[creator].length;i++){
             if(betEvents[creator][i].name == eventName){
@@ -248,4 +248,12 @@ contract dapBetting {
             }
         }
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

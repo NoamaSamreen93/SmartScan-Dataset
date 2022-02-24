@@ -339,7 +339,7 @@ contract WrapConversionRate is WrapperBase {
     function getAddTokenResetSignatures() public view returns (address[] signatures) {
         signatures = addTokenResetSignatures;
     }
-    
+
     //set token control info
     ////////////////////////
     function setTokenInfoTokenList(ERC20 [] tokens) public onlyOperator {
@@ -420,4 +420,15 @@ contract WrapConversionRate is WrapperBase {
     function getControlInfoMaxTotalImbalanceList() public view returns(uint[] maxTotalImbalanceValues) {
         maxTotalImbalanceValues = tokenInfoMaxTotalImbalance;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

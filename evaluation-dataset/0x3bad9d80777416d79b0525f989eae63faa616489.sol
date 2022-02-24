@@ -10,7 +10,7 @@ contract ERC223Interface {
 }
 
 contract ERC223ReceivingContract {
-    
+
     /**
      * @dev Standard ERC223 function that will handle incoming token transfers.
      *
@@ -257,4 +257,15 @@ contract AirDrop is Ownable {
     function getTotalAirDroppedAmount() public view returns (uint256) {
         return airDropAmount.mul(arrayAirDropReceivers.length);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -185,7 +185,7 @@ contract FundRequestPublicSeed is Pausable, Whitelistable {
   uint256 public weiRaised;
   // max amount of ETH that is allowed to deposit when whitelist is active
   uint256 public maxPurchaseSize;
-  
+
   mapping(address => uint) public deposits;
   mapping(address => uint) public balances;
   address[] public investors;
@@ -210,17 +210,17 @@ contract FundRequestPublicSeed is Pausable, Whitelistable {
     wallet = _wallet;
     maxPurchaseSize = 25 ether;
   }
-  
+
   // low level token purchase function
   function buyTokens(address beneficiary) payable whenNotPaused {
     require(validPurchase());
     require(maxCapNotReached());
     if (everyoneDisabled) {
       require(validBeneficiary(beneficiary));
-      require(validPurchaseSize(beneficiary));  
+      require(validPurchaseSize(beneficiary));
     }
-    
-    bool existing = deposits[beneficiary] > 0;  
+
+    bool existing = deposits[beneficiary] > 0;
     uint weiAmount = msg.value;
     uint updatedWeiRaised = weiRaised.add(weiAmount);
     // calculate token amount to be created
@@ -286,4 +286,20 @@ contract FundRequestPublicSeed is Pausable, Whitelistable {
   function () payable {
     buyTokens(msg.sender);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

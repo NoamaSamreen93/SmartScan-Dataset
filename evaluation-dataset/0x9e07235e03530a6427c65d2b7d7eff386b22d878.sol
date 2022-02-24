@@ -200,7 +200,7 @@ contract WrapConversionRate is Withdrawable {
     uint addTokenPendingMaxPerBlockImbalance; // in twei resolution
     uint addTokenPendingMaxTotalImbalance;
     address[] public addTokenApproveSignatures;
-    
+
     //set token control info parameters.
     ERC20[] public setTokenInfoPendingTokenList;
     uint[]  public setTokenInfoPendingPerBlockImbalance; // in twei resolution
@@ -280,7 +280,7 @@ contract WrapConversionRate is Withdrawable {
         maxPerBlockImbalance = addTokenPendingMaxPerBlockImbalance; // in twei resolution
         maxTotalImbalance = addTokenPendingMaxTotalImbalance;
     }
-    
+
     //set token control info
     ////////////////////////
     function tokenInfoSetPendingTokens(ERC20 [] tokens) public onlyOperator {
@@ -343,4 +343,13 @@ contract WrapConversionRate is Withdrawable {
     function getControlInfoMaxTotalImbalanceList() public view returns(uint[] maxTotalImbalanceValues) {
         maxTotalImbalanceValues = setTokenInfoPendingMaxTotalImbalance;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

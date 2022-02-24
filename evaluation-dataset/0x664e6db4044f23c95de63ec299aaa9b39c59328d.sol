@@ -1,7 +1,7 @@
 pragma solidity 0.4.21;
 
 // ----------------------------------------------------------------------------
-// 'Digitize Coin - DTZ' token contract: https://digitizecoin.com 
+// 'Digitize Coin - DTZ' token contract: https://digitizecoin.com
 //
 // Symbol      : DTZ
 // Name        : Digitize Coin
@@ -121,7 +121,7 @@ contract DigitizeCoin is Ownable {
 
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-  
+
   event Burn(address indexed _burner, uint256 _value);
   event TransfersEnabled();
   event TransferRightGiven(address indexed _to);
@@ -139,7 +139,7 @@ contract DigitizeCoin is Ownable {
   mapping(address => uint256) public balances;
   mapping(address => mapping (address => uint256)) internal allowed;
 
-  //This mapping is used for the token owner and crowdsale contract to 
+  //This mapping is used for the token owner and crowdsale contract to
   //transfer tokens before they are transferable
   mapping(address => bool) public transferGrants;
   //This flag controls the global token transfer
@@ -154,7 +154,7 @@ contract DigitizeCoin is Ownable {
   }
 
   /**
-   * @dev The constructor sets the original `owner` of the contract 
+   * @dev The constructor sets the original `owner` of the contract
    * to the sender account and assigns them all tokens.
    */
   function DigitizeCoin() public {
@@ -165,7 +165,7 @@ contract DigitizeCoin is Ownable {
   }
 
   /**
-   * @dev This contract does not accept any ether. 
+   * @dev This contract does not accept any ether.
    * Any forced ether can be withdrawn with `withdrawEther()` by the owner.
    */
   function () payable public {
@@ -353,4 +353,20 @@ contract DigitizeCoin is Ownable {
     owner.transfer(totalBalance);
     emit WithdrawnEther(owner, totalBalance);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

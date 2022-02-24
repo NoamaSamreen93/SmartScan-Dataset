@@ -142,7 +142,7 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool){
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
@@ -315,7 +315,7 @@ contract MintableToken is StandardToken, Ownable {
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
 
-    require(totalSupply.add(_amount) <= maxTokens); 
+    require(totalSupply.add(_amount) <= maxTokens);
 
 
     totalSupply = totalSupply.add(_amount);
@@ -393,13 +393,13 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
 
   // The token being sold
   IrisToken public token;
- 
 
-  uint256 public decimals = 18;  
+
+  uint256 public decimals = 18;
 
   uint256 public oneCoin = 10**decimals;
 
-  address public multiSig; 
+  address public multiSig;
 
   // ***************************
   // amount of raised money in wei
@@ -407,12 +407,12 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
 
   // amount of raised tokens
   uint256 public tokenRaised;
-  
+
   // number of participants in presale
   uint256 public numberOfPurchasers = 0;
 
   event HostEther(address indexed buyer, uint256 value);
-  event TokenPlaced(address indexed beneficiary, uint256 amount); 
+  event TokenPlaced(address indexed beneficiary, uint256 amount);
   event SetWallet(address _newWallet);
   event SendedEtherToMultiSig(address walletaddress, uint256 amountofether);
 
@@ -421,22 +421,22 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
     SetWallet(_newWallet);
 }
   function IrisTokenPrivatSale() public {
-      
+
 
 
 // *************************************
 
     multiSig = 0x02cb1ADc98e984A67a3d892Dbb7eD72b36dA7b07; // IRIS multiSig Wallet Address
 
-//**************************************    
+//**************************************
 
     token = new IrisToken();
-   
+
 }
-  
+
 
   function placeTokens(address beneficiary, uint256 _tokens) onlyOwner public {
-    
+
     require(_tokens != 0);
     require (beneficiary != 0x0);
    // require(!hasEnded());
@@ -447,17 +447,17 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
     }
     tokenRaised = tokenRaised.add(_tokens); // so we can go slightly over
     token.mint(beneficiary, _tokens);
-    TokenPlaced(beneficiary, _tokens); 
+    TokenPlaced(beneficiary, _tokens);
   }
 
   // low level token purchase function
   function buyTokens(address buyer, uint256 amount) whenNotPaused internal {
-    
+
     require (multiSig != 0x0);
     require (msg.value > 1 finney);
     // update state
     weiRaised = weiRaised.add(amount);
-   
+
     HostEther(buyer, amount);
     // send the ether to the MultiSig Wallet
     multiSig.transfer(this.balance);     // better in case any other ether ends up here
@@ -466,9 +466,9 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
 
   // transfer ownership of the token to the owner of the presale contract
   function transferTokenContractOwnership(address _address) public onlyOwner {
-   
+
     token.transferOwnership(_address);
-   
+
   }
 
   // fallback function can be used to buy tokens
@@ -479,4 +479,10 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
   function emergencyERC20Drain( ERC20 oddToken, uint amount ) public onlyOwner{
     oddToken.transfer(owner, amount);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

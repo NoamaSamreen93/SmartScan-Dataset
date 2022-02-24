@@ -67,10 +67,10 @@ contract Ownable {
 }
 
 interface ITransferPolicy {
-    function isTransferPossible(address from, address to, uint256 amount) 
+    function isTransferPossible(address from, address to, uint256 amount)
         external view returns (bool);
-    
-    function isBehalfTransferPossible(address sender, address from, address to, uint256 amount) 
+
+    function isBehalfTransferPossible(address sender, address from, address to, uint256 amount)
         external view returns (bool);
 }
 
@@ -130,4 +130,15 @@ contract WhitelistTransferPolicy is ITransferPolicy, Ownable {
         whitelist[address_] = false;
         emit AddressUnwhitelisted(address_);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

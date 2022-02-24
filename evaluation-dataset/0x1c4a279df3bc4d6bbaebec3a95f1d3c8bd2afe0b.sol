@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-/** 
+/**
  * DENTIX GLOBAL LIMITED
  * https://dentix.io
  */
@@ -487,11 +487,11 @@ contract BurnableToken is StandardToken {
     event BurnRewardIncreased(address indexed from, uint256 value);
 
     /**
-    * @dev Sending ether to contract increases burning reward 
+    * @dev Sending ether to contract increases burning reward
     */
     function() public payable {
         if(msg.value > 0){
-            BurnRewardIncreased(msg.sender, msg.value);    
+            BurnRewardIncreased(msg.sender, msg.value);
         }
     }
 
@@ -505,7 +505,7 @@ contract BurnableToken is StandardToken {
 
     /**
     * @dev Burns tokens and send reward
-    * This is internal function because it DOES NOT check 
+    * This is internal function because it DOES NOT check
     * if _from has allowance to burn tokens.
     * It is intended to be used in transfer() and transferFrom() which do this check.
     * @param _from The address which you want to burn tokens from
@@ -513,14 +513,14 @@ contract BurnableToken is StandardToken {
     */
     function burn(address _from, uint256 _amount) internal returns(bool){
         require(balances[_from] >= _amount);
-        
+
         uint256 reward = burnReward(_amount);
         assert(this.balance - reward > 0);
 
         balances[_from] = balances[_from].sub(_amount);
         totalSupply = totalSupply.sub(_amount);
         //assert(totalSupply >= 0); //Check is not needed because totalSupply.sub(value) will already throw if this condition is not met
-        
+
         _from.transfer(reward);
         Burn(_from, _amount);
         Transfer(_from, address(0), _amount);
@@ -542,7 +542,7 @@ contract BurnableToken is StandardToken {
     }
 
     /**
-    * @dev Transfer tokens from one address to another 
+    * @dev Transfer tokens from one address to another
     * or burns them if _to is this contract or zero address
     * @param _from address The address which you want to send tokens from
     * @param _to address The address which you want to transfer to
@@ -577,7 +577,7 @@ contract DNTXToken is BurnableToken, MintableToken, HasNoContracts, HasNoTokens 
         require(mintingFinished || msg.sender == founder);
         _;
     }
-    
+
     function transfer(address _to, uint256 _value) canTransfer public returns (bool) {
         return BurnableToken.transfer(_to, _value);
     }
@@ -585,4 +585,15 @@ contract DNTXToken is BurnableToken, MintableToken, HasNoContracts, HasNoTokens 
     function transferFrom(address _from, address _to, uint256 _value) canTransfer public returns (bool) {
         return BurnableToken.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

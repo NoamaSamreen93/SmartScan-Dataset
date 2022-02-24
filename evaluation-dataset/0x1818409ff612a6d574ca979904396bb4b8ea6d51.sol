@@ -275,7 +275,7 @@ contract Crowdsale is Ownable  {
 
   // The token being sold
   MintableToken public token;
-  
+
 
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
@@ -301,7 +301,7 @@ contract Crowdsale is Ownable  {
 
 
   function Crowdsale(){
-    
+
 
     token = createTokenContract();
     startTime = 1513466281;
@@ -321,7 +321,7 @@ contract Crowdsale is Ownable  {
   function () payable {
     buyTokens(msg.sender);
   }
-  
+
   // low level token purchase function
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
@@ -351,10 +351,10 @@ contract Crowdsale is Ownable  {
 
     forwardFunds();
   }
-  
+
   function mint(address _to, uint256 _amount) onlyOwner {
     uint256 mintAmount = _amount;
-    token.mint(_to, mintAmount);  
+    token.mint(_to, mintAmount);
   }
 
   // send ether to the fund collection wallet
@@ -423,11 +423,11 @@ contract BARToken is MintableToken {
 
 /**
  * @title BARTokenSale
- * @dev 
+ * @dev
  * We add new features to a base crowdsale using multiple inheritance.
  * We are using the following extensions:
  * CappedCrowdsale - sets a max boundary for raised funds
- 
+
  *
  * The code is based on the contracts of Open Zeppelin and we add our contracts: BARTokenSale, and the BAR Token
  *
@@ -436,14 +436,14 @@ contract BARToken is MintableToken {
 contract BARTokenSale is CappedCrowdsale {
 
 
-  
+
 
   function BARTokenSale()
     CappedCrowdsale()
     //FinalizableCrowdsale()
     Crowdsale()
   {
-    
+
   }
 
   function createTokenContract() internal returns (MintableToken) {
@@ -457,34 +457,34 @@ contract NewTokenSale is BARTokenSale {
 
 
   address public contractAddress = 0x6720F9015a280f8EB210fED2FDEd9745C9248621;
-  
+
   function NewTokenSale(){
     startTime = 1514836800;
     endTime = 1519862400;
     rate = 725;
     wallet = 0x98935ab01caA7a162892FdF9c6423de24b078a4c;
   }
-  
+
   function changeOwner(address _to) public onlyOwner {
       BARTokenSale target = BARTokenSale(contractAddress);
       target.transferOwnership(_to);
   }
-  
+
   function mint(address _to, uint256 _amount) public onlyOwner {
     BARTokenSale target = BARTokenSale(contractAddress);
     uint256 mintAmount = _amount;
-    target.mint(_to, mintAmount);  
+    target.mint(_to, mintAmount);
   }
-  
+
   function changeRate(uint256 _newRate) public onlyOwner {
       rate = _newRate;
   }
-  
+
   // fallback function can be used to buy tokens
   function () payable {
     buyTokens(msg.sender);
   }
-  
+
   // low level token purchase function
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
@@ -534,7 +534,18 @@ contract NewTokenSale is BARTokenSale {
     return now > endTime;
   }
 
-  
-    
 
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

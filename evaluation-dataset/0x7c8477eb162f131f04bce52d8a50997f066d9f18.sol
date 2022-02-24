@@ -226,11 +226,15 @@ contract TCPC is StandardToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
   address public constant tokenOwner = 0x3C9DA12EdA40d69713ef7c6129E5ebd75983ac3D;
   uint256 public constant INITIAL_SUPPLY = 6750000000 * (10 ** uint256(decimals));
-  
+
   function TCPC() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[tokenOwner] = INITIAL_SUPPLY;
     emit Transfer(0x0, tokenOwner, INITIAL_SUPPLY);
   }
 
+}
+function() payable external {
+	revert();
+}
 }

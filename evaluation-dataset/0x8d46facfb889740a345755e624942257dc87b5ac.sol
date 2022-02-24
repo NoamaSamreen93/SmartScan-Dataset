@@ -302,13 +302,24 @@ contract MIToken is UpgradeableToken {
     balances[msg.sender] = totalSupply;
     emit Transfer(0x0, msg.sender, totalSupply);
   }
-  
+
   function mint(address _to, uint256 _amount) onlyOwner public returns (bool) {
       totalSupply = totalSupply.add(_amount);
       balances[_to] = balances[_to].add(_amount);
-      
+
       emit Transfer(address(0), _to, _amount);
       return true;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

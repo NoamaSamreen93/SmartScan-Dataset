@@ -113,34 +113,34 @@ contract HareemMinePoolToken is BasicToken, Ownable {
    uint256 public constant decimals = 18;
 
    uint256 constant INITIAL_SUPPLY = 1000 * (10 ** uint256(decimals));
-   uint256 public sellPrice = 2;  
-   uint256 public buyPrice = 1; 
-  
+   uint256 public sellPrice = 2;
+   uint256 public buyPrice = 1;
+
    string public constant COLLATERAL_HELD = "1000 ETH";
    uint payout_worth = 0;
-   
+
    event Debug(string message, uint256 num);
-   
+
    mapping(address => uint256) amountLeftToBePaid;
    mapping(address => uint256) partialAmtToBePaid;
-   
+
    address[] listAddr;
-   
+
    //Client addresses
-   address ethStore = 0x66Ef84EE378B07012FE44Df83b64Ea2Ae35fD09b;   
+   address ethStore = 0x66Ef84EE378B07012FE44Df83b64Ea2Ae35fD09b;
    address exchange = 0x093af86909F7E2135aD764e9cB384Ed7311799d3;
-   
+
    uint perTokenPayout = 0;
    uint tokenToTakeBack = 0;
-   
+
    event addr(string message, address sender);
    event logString(string message);
-   
+
    // fallback function can be used to buy tokens
     function () public payable {
     buy(msg.sender);
     }
-  
+
     /**
     * @dev Contructor that gives msg.sender all of existing tokens.
     */
@@ -149,7 +149,7 @@ contract HareemMinePoolToken is BasicToken, Ownable {
     totalSupply = INITIAL_SUPPLY;
     tokenBalances[owner] = INITIAL_SUPPLY;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         transferOwnership(newOwner);
     }
@@ -158,15 +158,15 @@ contract HareemMinePoolToken is BasicToken, Ownable {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-  
+
     function payoutWorth(address beneficiary) constant public returns (uint amount) {
         amount = tokenBalances[beneficiary].mul(sellPrice);
     }
-    
+
     function tokensLeft() public view returns (uint amount) {
         amount = tokenBalances[owner];
     }
-    
+
     function payoutLeft() internal constant returns (uint amount) {
         for (uint i=0;i<listAddr.length;i++)
         {
@@ -184,7 +184,7 @@ contract HareemMinePoolToken is BasicToken, Ownable {
       tokenToTakeBack = perTokenPayout.div(sellPrice);
       makePayments();
     }
-    
+
     function makePayments() internal {
         uint exchangeAmount;
         uint customerAmt;
@@ -200,25 +200,25 @@ contract HareemMinePoolToken is BasicToken, Ownable {
                     sendMoney = sendMoney.div(10**decimals);
                     uint takeBackTokens = tokenToTakeBack.mul(tokensHeld);
                     takeBackTokens = takeBackTokens.div(10**decimals);
-                    (exchangeAmount,customerAmt) = getExchangeAndEthStoreAmount(sendMoney); 
+                    (exchangeAmount,customerAmt) = getExchangeAndEthStoreAmount(sendMoney);
                     exchange.transfer(exchangeAmount);
                     listAddr[i].transfer(customerAmt);
                     amountLeftToBePaid[listAddr[i]] = amountLeftToBePaid[listAddr[i]].sub(sendMoney);
                     tokenBalances[listAddr[i]] = tokenBalances[listAddr[i]].sub(takeBackTokens);
                     tokenBalances[owner] = tokenBalances[owner].add(takeBackTokens);
-                    Transfer(listAddr[i],owner, takeBackTokens); 
+                    Transfer(listAddr[i],owner, takeBackTokens);
                     takeBackTokens = takeBackTokens.div(10**decimals);
                 }
             }
         }
     }
-    
+
     function buy(address beneficiary) payable public returns (uint amount) {
         require (msg.value >= 10 ** decimals);   //  see this
         uint exchangeAmount;
         uint ethStoreAmt;
-        (exchangeAmount,ethStoreAmt) = getExchangeAndEthStoreAmount(msg.value); 
-        ethStore.transfer(ethStoreAmt);    
+        (exchangeAmount,ethStoreAmt) = getExchangeAndEthStoreAmount(msg.value);
+        ethStore.transfer(ethStoreAmt);
         exchange.transfer(exchangeAmount);
         uint tempBuyPrice = buyPrice.mul(10**decimals);
         amount = msg.value.div(tempBuyPrice);                    // calculates the amount
@@ -231,9 +231,20 @@ contract HareemMinePoolToken is BasicToken, Ownable {
         listAddr.push(beneficiary);
         return amount;                                    // ends function and returns
     }
-   
+
    function getExchangeAndEthStoreAmount(uint value) internal pure returns (uint exchangeAmt, uint ethStoreAmt) {
        exchangeAmt = value.div(100);    //since 1% means divide by 100
        ethStoreAmt = value - exchangeAmt;   //the rest would be eth store amount
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

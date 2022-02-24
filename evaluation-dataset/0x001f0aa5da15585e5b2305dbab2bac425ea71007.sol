@@ -291,7 +291,7 @@ contract IpsxToken is StandardToken, Ownable {
 
 
   // Public variables of the Token.
-  string public name = "IPSX"; 
+  string public name = "IPSX";
   uint8 public decimals = 18;
   string public symbol = "IPSX";
 
@@ -304,7 +304,7 @@ contract IpsxToken is StandardToken, Ownable {
 
   /**
    * @dev Initialize the IpsxToken and transfers the totalSupply to the
-   *      contract creator. 
+   *      contract creator.
    */
   function IpsxToken() public {
     balances[msg.sender] = totalSupply;
@@ -315,7 +315,7 @@ contract IpsxToken is StandardToken, Ownable {
    */
   modifier canTransfer() {
     require(transferable || (crowdsale != address(0) && crowdsale == msg.sender));
-    _; 
+    _;
   }
 
   /**
@@ -366,4 +366,15 @@ contract IpsxToken is StandardToken, Ownable {
     totalSupply = totalSupply.sub(_value);
     Burn(owner, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

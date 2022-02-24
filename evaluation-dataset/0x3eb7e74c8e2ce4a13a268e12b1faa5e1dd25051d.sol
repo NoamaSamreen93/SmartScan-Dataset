@@ -58,9 +58,9 @@ contract Ownable {
 contract OneStageMainSale is Ownable {
 
     ERC20 public token;
-    
+
     ERC20 public authorize;
-    
+
     using SafeMath for uint;
 
     address public backEndOperator = msg.sender;
@@ -81,7 +81,7 @@ contract OneStageMainSale is Ownable {
     uint256 public softCap1Stage = 1000000*1e18; // $2,600,000 = 1,000,000 INM
     uint256 public hardCap1Stage = 1700000*1e18; // 1,700,000 INM = $4,420,000 USD
 
-    uint256 public buyPrice; // 2.6 USD 
+    uint256 public buyPrice; // 2.6 USD
     uint256 public dollarPrice; // Ether by USD
 
     uint256 public soldTokens; // solded tokens - > 1,700,000 INM
@@ -195,4 +195,17 @@ contract OneStageMainSale is Ownable {
         msg.sender.transfer(rate);
         weisRaised = weisRaised.sub(rate);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

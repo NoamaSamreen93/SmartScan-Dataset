@@ -18,23 +18,23 @@ contract Owned {
 
     /**
      * @dev Only the owner of contract
-     */ 
+     */
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
      * @dev transfer the ownership to other
      *      - Only the owner can operate
-     */ 
+     */
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
 
-    /** 
+    /**
      * @dev Accept the ownership from last owner
-     */ 
+     */
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -46,7 +46,7 @@ contract TRNData is Owned {
     TripioRoomNightData dataSource;
     /**
      * Only the valid vendor and the vendor is valid
-     */ 
+     */
     modifier onlyVendor {
         uint256 vendorId = dataSource.vendorIds(msg.sender);
         require(vendorId > 0);
@@ -84,7 +84,7 @@ contract TRNData is Owned {
         require(dataSource.ratePlanIsExist(_vendorId, _rpid));
         _;
     }
-    
+
     /**
      * Token is valid
      */
@@ -167,7 +167,7 @@ contract TRNData is Owned {
         uint256 year = _date / 10000;
         uint256 mon = _date / 100 - year * 100;
         uint256 day = _date - mon * 100 - year * 10000;
-        
+
         if(year < 1970 || mon <= 0 || mon > 12 || day <= 0 || day > 31)
             return false;
 
@@ -195,7 +195,7 @@ contract TRNData is Owned {
     }
 }
 contract TRNVendors is TRNData {
-    
+
     /**
      * Constructor
      */
@@ -233,9 +233,9 @@ contract TRNVendors is TRNData {
      * @param _name The name of vendor
      * @return Success
      */
-    function addVendor(address _vendor, string _name) 
-        external 
-        onlyOwner 
+    function addVendor(address _vendor, string _name)
+        external
+        onlyOwner
         returns(bool) {
         // _vendor is valid address
         require(_vendor != address(0));
@@ -246,7 +246,7 @@ contract TRNVendors is TRNData {
         require(nameBytes.length > 0 && nameBytes.length < 200);
 
         dataSource.pushVendor(_name, _vendor, false);
-    
+
         // Event
         emit VendorAdded(_vendor, _name);
         return true;
@@ -258,14 +258,14 @@ contract TRNVendors is TRNData {
      * @param _vendor The address of vendor
      * @return Success
      */
-    function removeVendorByAddress(address _vendor) 
-        public 
-        onlyOwner 
+    function removeVendorByAddress(address _vendor)
+        public
+        onlyOwner
         returns(bool) {
         // _vendor exists
         uint256 id = dataSource.vendorIds(_vendor);
         require(id > 0);
-        
+
         dataSource.removeVendor(id);
         // Event
         emit VendorRemoved(_vendor);
@@ -277,9 +277,9 @@ contract TRNVendors is TRNData {
      *      Only owner can operate
      * @param _vendorId The id of vendor
      */
-    function removeVendorById(uint256 _vendorId) 
-        external 
-        onlyOwner 
+    function removeVendorById(uint256 _vendorId)
+        external
+        onlyOwner
         returns(bool) {
         (,address vendor,,) = dataSource.getVendor(_vendorId);
         return removeVendorByAddress(vendor);
@@ -292,14 +292,14 @@ contract TRNVendors is TRNData {
      * @param _valid The validation of vendor
      * @return Success
      */
-    function makeVendorValid(uint256 _vendorId, bool _valid) 
-        external 
-        onlyOwner 
+    function makeVendorValid(uint256 _vendorId, bool _valid)
+        external
+        onlyOwner
         returns(bool) {
         (,address vendor,,) = dataSource.getVendor(_vendorId);
         require(dataSource.vendorIds(vendor) > 0);
         dataSource.updateVendorValid(_vendorId, _valid);
-        
+
         // Event
         emit VendorValid(vendor, _valid);
         return true;
@@ -312,7 +312,7 @@ contract TRNVendors is TRNData {
      * @param _name The name of vendor
      * @return Success
      */
-    function updateVendorName(uint256 _vendorId, string _name) 
+    function updateVendorName(uint256 _vendorId, string _name)
         external
         onlyOwner
         returns(bool) {
@@ -334,9 +334,9 @@ contract TRNVendors is TRNData {
      * @param _limit How many vendorIds one page
      * @return The vendorIds and the next vendorId as tuple, the next page not exists when next eq 0
      */
-    function getVendorIds(uint256 _from, uint256 _limit) 
-        external 
-        view 
+    function getVendorIds(uint256 _from, uint256 _limit)
+        external
+        view
         returns(uint256[], uint256){
         return dataSource.getVendors(_from, _limit, true);
     }
@@ -346,9 +346,9 @@ contract TRNVendors is TRNData {
      * @param _vendorId Then vendor id
      * @return The vendor info(_name, _vendor, _timestamp, _valid)
      */
-    function getVendor(uint256 _vendorId) 
-        external 
-        view 
+    function getVendor(uint256 _vendorId)
+        external
+        view
         returns(string _name, address _vendor, uint256 _timestamp, bool _valid) {
         (_name, _vendor, _timestamp, _valid) = dataSource.getVendor(_vendorId);
     }
@@ -358,8 +358,8 @@ contract TRNVendors is TRNData {
      * @param _vendor Then vendor address
      * @return Then vendor info(_vendorId, _name, _timestamp, _valid)
      */
-    function getVendorByAddress(address _vendor) 
-        external 
+    function getVendorByAddress(address _vendor)
+        external
         view
         returns(uint256 _vendorId, string _name, uint256 _timestamp, bool _valid) {
         _vendorId = dataSource.vendorIds(_vendor);
@@ -389,13 +389,13 @@ contract TRNTokens is TRNData {
      *      Only owner can operate
      * @param _contract The address of digital currency contract
      */
-    function addToken(address _contract) 
-        external 
-        onlyOwner 
+    function addToken(address _contract)
+        external
+        onlyOwner
         returns(uint256) {
         require(_contract != address(0));
         uint256 id = dataSource.pushToken(_contract, false);
-        // Event 
+        // Event
         emit TokenAdded(_contract);
         return id;
     }
@@ -405,9 +405,9 @@ contract TRNTokens is TRNData {
      *      Only owner can operate
      * @param _tokenId The index of digital currency contract
      */
-    function removeToken(uint256 _tokenId) 
-        external 
-        onlyOwner 
+    function removeToken(uint256 _tokenId)
+        external
+        onlyOwner
         returns(bool){
         require(dataSource.tokenIndexToAddress(_tokenId) != address(0));
         dataSource.removeToken(_tokenId);
@@ -419,13 +419,13 @@ contract TRNTokens is TRNData {
     /**
      * @dev Returns all the supported digital currency tokens
      * @param _from The begin tokenId
-     * @param _limit How many tokenIds one page 
+     * @param _limit How many tokenIds one page
      * @return All the supported digital currency tokens
      */
 
-    function supportedTokens(uint256 _from, uint256 _limit) 
-        external 
-        view 
+    function supportedTokens(uint256 _from, uint256 _limit)
+        external
+        view
         returns(uint256[], uint256) {
         return dataSource.getTokens(_from, _limit, true);
     }
@@ -435,9 +435,9 @@ contract TRNTokens is TRNData {
      * @param _tokenId The token Id
      * @return The token info(symbol, name, decimals)
      */
-    function getToken(uint256 _tokenId) 
+    function getToken(uint256 _tokenId)
         external
-        view 
+        view
         returns(string _symbol, string _name, uint8 _decimals, address _token) {
         return dataSource.getToken(_tokenId);
     }
@@ -492,10 +492,10 @@ library LinkedListLib {
     /**
      * @dev Returns the number of elements in the list
      * @param self stored linked list from contract
-     */ 
-    function sizeOf(LinkedList storage self) 
-        internal 
-        view 
+     */
+    function sizeOf(LinkedList storage self)
+        internal
+        view
         returns (uint256 numElements) {
         return self.length;
     }
@@ -506,8 +506,8 @@ library LinkedListLib {
      * @param _node id of the node to get
      */
     function getNode(LinkedList storage self, uint256 _node)
-        public 
-        view 
+        public
+        view
         returns (bool, uint256, uint256) {
         if (!nodeExists(self,_node)) {
             return (false, 0, 0);
@@ -523,8 +523,8 @@ library LinkedListLib {
      * @param _direction direction to step in
      */
     function getAdjacent(LinkedList storage self, uint256 _node, bool _direction)
-        public 
-        view 
+        public
+        view
         returns (bool, uint256) {
         if (!nodeExists(self,_node)) {
             return (false,0);
@@ -542,11 +542,11 @@ library LinkedListLib {
      * @return next first node beyond '_node' in direction `_direction`
      */
     function getSortedSpot(LinkedList storage self, uint256 _node, uint256 _value, bool _direction)
-        public 
-        view 
+        public
+        view
         returns (uint256) {
-        if (sizeOf(self) == 0) { 
-            return 0; 
+        if (sizeOf(self) == 0) {
+            return 0;
         }
         require((_node == 0) || nodeExists(self,_node));
         bool exists;
@@ -562,7 +562,7 @@ library LinkedListLib {
      * @param _node first node for linking
      * @param _link  node to link to in the _direction
      */
-    function createLink(LinkedList storage self, uint256 _node, uint256 _link, bool _direction) 
+    function createLink(LinkedList storage self, uint256 _node, uint256 _link, bool _direction)
         private {
         self.list[_link][!_direction] = _node;
         self.list[_node][_direction] = _link;
@@ -575,8 +575,8 @@ library LinkedListLib {
      * @param _new  new node to insert
      * @param _direction direction to insert node in
      */
-    function insert(LinkedList storage self, uint256 _node, uint256 _new, bool _direction) 
-        internal 
+    function insert(LinkedList storage self, uint256 _node, uint256 _new, bool _direction)
+        internal
         returns (bool) {
         if(!nodeExists(self,_new) && nodeExists(self,_node)) {
             uint256 c = self.list[_node][_direction];
@@ -594,11 +594,11 @@ library LinkedListLib {
      * @param self stored linked list from contract
      * @param _node node to remove from the list
      */
-    function remove(LinkedList storage self, uint256 _node) 
-        internal 
+    function remove(LinkedList storage self, uint256 _node)
+        internal
         returns (uint256) {
-        if ((_node == NULL) || (!nodeExists(self,_node))) { 
-            return 0; 
+        if ((_node == NULL) || (!nodeExists(self,_node))) {
+            return 0;
         }
         createLink(self, self.list[_node][PREV], self.list[_node][NEXT], NEXT);
         delete self.list[_node][PREV];
@@ -613,8 +613,8 @@ library LinkedListLib {
      * @param _index The node Id
      * @param _direction push to the head (NEXT) or tail (PREV)
      */
-    function add(LinkedList storage self, uint256 _index, bool _direction) 
-        internal 
+    function add(LinkedList storage self, uint256 _index, bool _direction)
+        internal
         returns (uint256) {
         insert(self, HEAD, _index, _direction);
         return self.index;
@@ -625,8 +625,8 @@ library LinkedListLib {
      * @param self stored linked list from contract
      * @param _direction push to the head (NEXT) or tail (PREV)
      */
-    function push(LinkedList storage self, bool _direction) 
-        internal 
+    function push(LinkedList storage self, bool _direction)
+        internal
         returns (uint256) {
         self.index++;
         insert(self, HEAD, self.index, _direction);
@@ -638,8 +638,8 @@ library LinkedListLib {
      * @param self stored linked list from contract
      * @param _direction pop from the head (NEXT) or the tail (PREV)
      */
-    function pop(LinkedList storage self, bool _direction) 
-        internal 
+    function pop(LinkedList storage self, bool _direction)
+        internal
         returns (uint256) {
         bool exists;
         uint256 adj;
@@ -665,7 +665,7 @@ contract TripioRoomNightData is Owned {
     // Interface signature of erc721 metadata.
     // bytes4(keccak256("name()")) ^ bytes4(keccak256("symbol()")) ^ bytes4(keccak256("tokenURI(uint256)"));
     bytes4 constant public interfaceSignature_ERC721Metadata = 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd;
-        
+
     // Interface signature of erc721.
     // bytes4(keccak256("balanceOf(address)")) ^
     // bytes4(keccak256("ownerOf(uint256)")) ^
@@ -727,7 +727,7 @@ contract TripioRoomNightData is Owned {
     struct RoomNight {
         uint256 vendorId;
         uint256 rpid;
-        uint256 token;          // The digital currency token 
+        uint256 token;          // The digital currency token
         uint256 price;          // The digital currency price
         uint256 timestamp;      // Create timestamp.
         uint256 date;           // The checkin date
@@ -805,9 +805,9 @@ contract TripioRoomNightData is Owned {
      * @param _limit the total nodes of one page
      * @param _direction direction to step in
      */
-    function getNodes(LinkedListLib.LinkedList storage self, uint256 _node, uint256 _limit, bool _direction) 
+    function getNodes(LinkedListLib.LinkedList storage self, uint256 _node, uint256 _limit, bool _direction)
         private
-        view 
+        view
         returns (uint256[], uint256) {
         bool exists;
         uint256 i = 0;
@@ -849,9 +849,9 @@ contract TripioRoomNightData is Owned {
      * @param _contract The contract address
      * @param _name The contract name
      */
-    function authorizeContract(address _contract, string _name) 
-        public 
-        onlyOwner 
+    function authorizeContract(address _contract, string _name)
+        public
+        onlyOwner
         returns(bool) {
         uint256 codeSize;
         assembly { codeSize := extcodesize(_contract) }
@@ -873,8 +873,8 @@ contract TripioRoomNightData is Owned {
      * @dev Deauthorized `_contract` by address
      * @param _contract The contract address
      */
-    function deauthorizeContract(address _contract) 
-        public 
+    function deauthorizeContract(address _contract)
+        public
         onlyOwner
         authorizedContractValid(_contract)
         returns(bool) {
@@ -882,8 +882,8 @@ contract TripioRoomNightData is Owned {
         authorizedContractList.remove(id);
         authorizedContractIds[_contract] = 0;
         delete authorizedContracts[id];
-        
-        // Event 
+
+        // Event
         emit ContractDeauthorized(_contract);
         return true;
     }
@@ -892,7 +892,7 @@ contract TripioRoomNightData is Owned {
      * @dev Deauthorized `_contract` by contract id
      * @param _cid The contract id
      */
-    function deauthorizeContractById(uint256 _cid) 
+    function deauthorizeContractById(uint256 _cid)
         public
         onlyOwner
         authorizedContractIdValid(_cid)
@@ -902,7 +902,7 @@ contract TripioRoomNightData is Owned {
         authorizedContractIds[acontract] = 0;
         delete authorizedContracts[_cid];
 
-        // Event 
+        // Event
         emit ContractDeauthorized(acontract);
         return true;
     }
@@ -913,9 +913,9 @@ contract TripioRoomNightData is Owned {
      * @param _limit How many authorize contract ids one page
      * @return The authorize contract ids and the next authorize contract id as tuple, the next page not exists when next eq 0
      */
-    function getAuthorizeContractIds(uint256 _from, uint256 _limit) 
-        external 
-        view 
+    function getAuthorizeContractIds(uint256 _from, uint256 _limit)
+        external
+        view
         returns(uint256[], uint256){
         return getNodes(authorizedContractList, _from, _limit, true);
     }
@@ -925,11 +925,11 @@ contract TripioRoomNightData is Owned {
      * @param _cid Then authorize contract id
      * @return The authorize contract info(_name, _acontract)
      */
-    function getAuthorizeContract(uint256 _cid) 
-        external 
-        view 
+    function getAuthorizeContract(uint256 _cid)
+        external
+        view
         returns(string _name, address _acontract) {
-        AuthorizedContract memory acontract = authorizedContracts[_cid]; 
+        AuthorizedContract memory acontract = authorizedContracts[_cid];
         _name = acontract.name;
         _acontract = acontract.acontract;
     }
@@ -941,9 +941,9 @@ contract TripioRoomNightData is Owned {
      * @param _vendorId The vendor id
      * @param _rpid The rate plan id
      */
-    function getRatePlan(uint256 _vendorId, uint256 _rpid) 
-        public 
-        view 
+    function getRatePlan(uint256 _vendorId, uint256 _rpid)
+        public
+        view
         returns (string _name, uint256 _timestamp, bytes32 _ipfs) {
         _name = vendors[_vendorId].ratePlans[_rpid].name;
         _timestamp = vendors[_vendorId].ratePlans[_rpid].timestamp;
@@ -958,9 +958,9 @@ contract TripioRoomNightData is Owned {
      * @param _tokenId The digital token id
      * @return The price info(inventory, init, price)
      */
-    function getPrice(uint256 _vendorId, uint256 _rpid, uint256 _date, uint256 _tokenId) 
+    function getPrice(uint256 _vendorId, uint256 _rpid, uint256 _date, uint256 _tokenId)
         public
-        view 
+        view
         returns(uint16 _inventory, bool _init, uint256 _price) {
         _inventory = vendors[_vendorId].ratePlans[_rpid].prices[_date].inventory;
         _init = vendors[_vendorId].ratePlans[_rpid].prices[_date].init;
@@ -981,9 +981,9 @@ contract TripioRoomNightData is Owned {
      * @param _tokenId The digital token id
      * @return The price info(inventory, init, price)
      */
-    function getPrices(uint256 _vendorId, uint256 _rpid, uint256[] _dates, uint256 _tokenId) 
+    function getPrices(uint256 _vendorId, uint256 _rpid, uint256[] _dates, uint256 _tokenId)
         public
-        view 
+        view
         returns(uint16[] _inventories, uint256[] _prices) {
         uint16[] memory inventories = new uint16[](_dates.length);
         uint256[] memory prices = new uint256[](_dates.length);
@@ -1012,9 +1012,9 @@ contract TripioRoomNightData is Owned {
      * @param _date The date desc (20180723)
      * @return The inventory info(inventory, init)
      */
-    function getInventory(uint256 _vendorId, uint256 _rpid, uint256 _date) 
+    function getInventory(uint256 _vendorId, uint256 _rpid, uint256 _date)
         public
-        view 
+        view
         returns(uint16 _inventory, bool _init) {
         _inventory = vendors[_vendorId].ratePlans[_rpid].prices[_date].inventory;
         _init = vendors[_vendorId].ratePlans[_rpid].prices[_date].init;
@@ -1030,9 +1030,9 @@ contract TripioRoomNightData is Owned {
      * @param _rpid The rate plan id
      * @return If the rate plan of the vendor is exist returns true otherwise return false
      */
-    function ratePlanIsExist(uint256 _vendorId, uint256 _rpid) 
-        public 
-        view 
+    function ratePlanIsExist(uint256 _vendorId, uint256 _rpid)
+        public
+        view
         returns (bool) {
         return vendors[_vendorId].ratePlanList.nodeExists(_rpid);
     }
@@ -1045,9 +1045,9 @@ contract TripioRoomNightData is Owned {
      * @param _direction Direction to step in
      * @return The order ids and the next id
      */
-    function getOrdersOfOwner(address _owner, uint256 _from, uint256 _limit, bool _direction) 
-        public 
-        view 
+    function getOrdersOfOwner(address _owner, uint256 _from, uint256 _limit, bool _direction)
+        public
+        view
         returns (uint256[], uint256) {
         return getNodes(roomNightOwners[_owner], _from, _limit, _direction);
     }
@@ -1057,24 +1057,24 @@ contract TripioRoomNightData is Owned {
      * @param _owner The vendor address
      * @param _from The begin id of the node to get
      * @param _limit The total nodes of on page
-     * @param _direction Direction to step in 
+     * @param _direction Direction to step in
      * @return The order ids and the next id
      */
-    function getOrdersOfVendor(address _owner, uint256 _from, uint256 _limit, bool _direction) 
-        public 
-        view 
+    function getOrdersOfVendor(address _owner, uint256 _from, uint256 _limit, bool _direction)
+        public
+        view
         returns (uint256[], uint256) {
         return getNodes(roomNightVendors[_owner], _from, _limit, _direction);
     }
 
     /**
-     * @dev Get the token count of somebody 
+     * @dev Get the token count of somebody
      * @param _owner The owner of token
      * @return The token count of `_owner`
      */
-    function balanceOf(address _owner) 
-        public 
-        view 
+    function balanceOf(address _owner)
+        public
+        view
         returns(uint256) {
         return roomNightOwners[_owner].length;
     }
@@ -1083,12 +1083,12 @@ contract TripioRoomNightData is Owned {
      * @dev Get rate plan ids of `_vendorId`
      * @param _from The begin id of the node to get
      * @param _limit The total nodes of on page
-     * @param _direction Direction to step in 
+     * @param _direction Direction to step in
      * @return The rate plan ids and the next id
      */
-    function getRatePlansOfVendor(uint256 _vendorId, uint256 _from, uint256 _limit, bool _direction) 
-        public 
-        view 
+    function getRatePlansOfVendor(uint256 _vendorId, uint256 _from, uint256 _limit, bool _direction)
+        public
+        view
         returns(uint256[], uint256) {
         return getNodes(vendors[_vendorId].ratePlanList, _from, _limit, _direction);
     }
@@ -1097,12 +1097,12 @@ contract TripioRoomNightData is Owned {
      * @dev Get token ids
      * @param _from The begin id of the node to get
      * @param _limit The total nodes of on page
-     * @param _direction Direction to step in 
+     * @param _direction Direction to step in
      * @return The token ids and the next id
      */
-    function getTokens(uint256 _from, uint256 _limit, bool _direction) 
-        public 
-        view 
+    function getTokens(uint256 _from, uint256 _limit, bool _direction)
+        public
+        view
         returns(uint256[], uint256) {
         return getNodes(tokenList, _from, _limit, _direction);
     }
@@ -1113,8 +1113,8 @@ contract TripioRoomNightData is Owned {
      * @return The token info(symbol, name, decimals)
      */
     function getToken(uint256 _tokenId)
-        public 
-        view 
+        public
+        view
         returns(string _symbol, string _name, uint8 _decimals, address _token) {
         _token = tokenIndexToAddress[_tokenId];
         TripioToken tripio = TripioToken(_token);
@@ -1127,12 +1127,12 @@ contract TripioRoomNightData is Owned {
      * @dev Get vendor ids
      * @param _from The begin id of the node to get
      * @param _limit The total nodes of on page
-     * @param _direction Direction to step in 
+     * @param _direction Direction to step in
      * @return The vendor ids and the next id
      */
-    function getVendors(uint256 _from, uint256 _limit, bool _direction) 
-        public 
-        view 
+    function getVendors(uint256 _from, uint256 _limit, bool _direction)
+        public
+        view
         returns(uint256[], uint256) {
         return getNodes(vendorList, _from, _limit, _direction);
     }
@@ -1142,9 +1142,9 @@ contract TripioRoomNightData is Owned {
      * @param _vendorId The vendor id
      * @return The vendor infomation(name, vendor, timestamp, valid)
      */
-    function getVendor(uint256 _vendorId) 
-        public 
-        view 
+    function getVendor(uint256 _vendorId)
+        public
+        view
         returns(string _name, address _vendor,uint256 _timestamp, bool _valid) {
         _name = vendors[_vendorId].name;
         _vendor = vendors[_vendorId].vendor;
@@ -1157,8 +1157,8 @@ contract TripioRoomNightData is Owned {
      * @dev Update base uri of token metadata
      * @param _tokenBaseURI The base uri
      */
-    function updateTokenBaseURI(string _tokenBaseURI) 
-        public 
+    function updateTokenBaseURI(string _tokenBaseURI)
+        public
         onlyOwnerOrAuthorizedContract {
         tokenBaseURI = _tokenBaseURI;
     }
@@ -1169,8 +1169,8 @@ contract TripioRoomNightData is Owned {
      * @param _rnid The room night order id
      * @param _direction direction to step in
      */
-    function pushOrderOfOwner(address _owner, uint256 _rnid, bool _direction) 
-        public 
+    function pushOrderOfOwner(address _owner, uint256 _rnid, bool _direction)
+        public
         onlyOwnerOrAuthorizedContract {
         if(!roomNightOwners[_owner].listExists()) {
             roomNightOwners[_owner] = LinkedListLib.LinkedList(0, 0);
@@ -1183,8 +1183,8 @@ contract TripioRoomNightData is Owned {
      * @param _owner The owner address
      * @param _rnid The room night order id
      */
-    function removeOrderOfOwner(address _owner, uint _rnid) 
-        public 
+    function removeOrderOfOwner(address _owner, uint _rnid)
+        public
         onlyOwnerOrAuthorizedContract {
         require(roomNightOwners[_owner].nodeExists(_rnid));
         roomNightOwners[_owner].remove(_rnid);
@@ -1196,8 +1196,8 @@ contract TripioRoomNightData is Owned {
      * @param _rnid The room night order id
      * @param _direction direction to step in
      */
-    function pushOrderOfVendor(address _vendor, uint256 _rnid, bool _direction) 
-        public 
+    function pushOrderOfVendor(address _vendor, uint256 _rnid, bool _direction)
+        public
         onlyOwnerOrAuthorizedContract {
         if(!roomNightVendors[_vendor].listExists()) {
             roomNightVendors[_vendor] = LinkedListLib.LinkedList(0, 0);
@@ -1210,8 +1210,8 @@ contract TripioRoomNightData is Owned {
      * @param _vendor The vendor address
      * @param _rnid The room night order id
      */
-    function removeOrderOfVendor(address _vendor, uint256 _rnid) 
-        public 
+    function removeOrderOfVendor(address _vendor, uint256 _rnid)
+        public
         onlyOwnerOrAuthorizedContract {
         require(roomNightVendors[_vendor].nodeExists(_rnid));
         roomNightVendors[_vendor].remove(_rnid);
@@ -1219,11 +1219,11 @@ contract TripioRoomNightData is Owned {
 
     /**
      * @dev Transfer token to somebody
-     * @param _tokenId The token id 
+     * @param _tokenId The token id
      * @param _to The target owner of the token
      */
-    function transferTokenTo(uint256 _tokenId, address _to) 
-        public 
+    function transferTokenTo(uint256 _tokenId, address _to)
+        public
         onlyOwnerOrAuthorizedContract {
         roomNightIndexToOwner[_tokenId] = _to;
         roomNightApprovals[_tokenId] = address(0);
@@ -1234,8 +1234,8 @@ contract TripioRoomNightData is Owned {
      * @param _tokenId The token id
      * @param _to Somebody to be approved
      */
-    function approveTokenTo(uint256 _tokenId, address _to) 
-        public 
+    function approveTokenTo(uint256 _tokenId, address _to)
+        public
         onlyOwnerOrAuthorizedContract {
         roomNightApprovals[_tokenId] = _to;
     }
@@ -1246,11 +1246,11 @@ contract TripioRoomNightData is Owned {
      * @param _to The owner of tokens to be operate
      * @param _approved Approved or not
      */
-    function approveOperatorTo(address _operator, address _to, bool _approved) 
-        public 
+    function approveOperatorTo(address _operator, address _to, bool _approved)
+        public
         onlyOwnerOrAuthorizedContract {
         operatorApprovals[_to][_operator] = _approved;
-    } 
+    }
 
     /**
      * @dev Update base price of rate plan
@@ -1260,20 +1260,20 @@ contract TripioRoomNightData is Owned {
      * @param _price The price to be updated
      */
     function updateBasePrice(uint256 _vendorId, uint256 _rpid, uint256 _tokenId, uint256 _price)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         vendors[_vendorId].ratePlans[_rpid].basePrice.init = true;
         vendors[_vendorId].ratePlans[_rpid].basePrice.tokens[_tokenId] = _price;
     }
 
     /**
-     * @dev Update base inventory of rate plan 
+     * @dev Update base inventory of rate plan
      * @param _vendorId The vendor id
      * @param _rpid The rate plan id
      * @param _inventory The inventory to be updated
      */
     function updateBaseInventory(uint256 _vendorId, uint256 _rpid, uint16 _inventory)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         vendors[_vendorId].ratePlans[_rpid].basePrice.inventory = _inventory;
     }
@@ -1305,7 +1305,7 @@ contract TripioRoomNightData is Owned {
      * @param _inventory The inventory to be updated
      */
     function updateInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint16 _inventory)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         if (vendors[_vendorId].ratePlans[_rpid].prices[_date].init) {
             vendors[_vendorId].ratePlans[_rpid].prices[_date].inventory = _inventory;
@@ -1321,8 +1321,8 @@ contract TripioRoomNightData is Owned {
      * @param _date The date desc (20180723)
      * @param _inventory The amount to be reduced
      */
-    function reduceInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint16 _inventory) 
-        public  
+    function reduceInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint16 _inventory)
+        public
         onlyOwnerOrAuthorizedContract {
         uint16 a = 0;
         if(vendors[_vendorId].ratePlans[_rpid].prices[_date].init) {
@@ -1343,8 +1343,8 @@ contract TripioRoomNightData is Owned {
      * @param _date The date desc (20180723)
      * @param _inventory The amount to be add
      */
-    function addInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint16 _inventory) 
-        public  
+    function addInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint16 _inventory)
+        public
         onlyOwnerOrAuthorizedContract {
         uint16 c = 0;
         if(vendors[_vendorId].ratePlans[_rpid].prices[_date].init) {
@@ -1368,7 +1368,7 @@ contract TripioRoomNightData is Owned {
      * @param _inventory The inventory to be updated
      */
     function updatePriceAndInventories(uint256 _vendorId, uint256 _rpid, uint256 _date, uint256 _tokenId, uint256 _price, uint16 _inventory)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         if (vendors[_vendorId].ratePlans[_rpid].prices[_date].init) {
             vendors[_vendorId].ratePlans[_rpid].prices[_date].inventory = _inventory;
@@ -1386,12 +1386,12 @@ contract TripioRoomNightData is Owned {
      * @param _ipfs The rate plan IPFS address
      * @param _direction direction to step in
      */
-    function pushRatePlan(uint256 _vendorId, string _name, bytes32 _ipfs, bool _direction) 
-        public 
+    function pushRatePlan(uint256 _vendorId, string _name, bytes32 _ipfs, bool _direction)
+        public
         onlyOwnerOrAuthorizedContract
         returns(uint256) {
         RatePlan memory rp = RatePlan(_name, uint256(now), _ipfs, Price(0, false));
-        
+
         uint256 id = vendors[_vendorId].ratePlanList.push(_direction);
         vendors[_vendorId].ratePlans[id] = rp;
         return id;
@@ -1402,8 +1402,8 @@ contract TripioRoomNightData is Owned {
      * @param _vendorId The vendor id
      * @param _rpid The rate plan id
      */
-    function removeRatePlan(uint256 _vendorId, uint256 _rpid) 
-        public 
+    function removeRatePlan(uint256 _vendorId, uint256 _rpid)
+        public
         onlyOwnerOrAuthorizedContract {
         delete vendors[_vendorId].ratePlans[_rpid];
         vendors[_vendorId].ratePlanList.remove(_rpid);
@@ -1417,19 +1417,19 @@ contract TripioRoomNightData is Owned {
      * @param _ipfs The rate plan IPFS address
      */
     function updateRatePlan(uint256 _vendorId, uint256 _rpid, string _name, bytes32 _ipfs)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         vendors[_vendorId].ratePlans[_rpid].ipfs = _ipfs;
         vendors[_vendorId].ratePlans[_rpid].name = _name;
     }
-    
+
     /**
      * @dev Push token contract to the token list
      * @param _direction direction to step in
      */
     function pushToken(address _contract, bool _direction)
-        public 
-        onlyOwnerOrAuthorizedContract 
+        public
+        onlyOwnerOrAuthorizedContract
         returns(uint256) {
         uint256 id = tokenList.push(_direction);
         tokenIndexToAddress[id] = _contract;
@@ -1440,8 +1440,8 @@ contract TripioRoomNightData is Owned {
      * @dev Remove token by `_tokenId`
      * @param _tokenId The digital token id
      */
-    function removeToken(uint256 _tokenId) 
-        public 
+    function removeToken(uint256 _tokenId)
+        public
         onlyOwnerOrAuthorizedContract {
         delete tokenIndexToAddress[_tokenId];
         tokenList.remove(_tokenId);
@@ -1457,8 +1457,8 @@ contract TripioRoomNightData is Owned {
      * @param _ipfs The rate plan IPFS address
      */
     function generateRoomNightToken(uint256 _vendorId, uint256 _rpid, uint256 _date, uint256 _token, uint256 _price, bytes32 _ipfs)
-        public 
-        onlyOwnerOrAuthorizedContract 
+        public
+        onlyOwnerOrAuthorizedContract
         returns(uint256) {
         roomnights.push(RoomNight(_vendorId, _rpid, _token, _price, now, _date, _ipfs));
 
@@ -1473,8 +1473,8 @@ contract TripioRoomNightData is Owned {
      * @param _rnid The room night token id
      * @param _isRefund Is redund or not
      */
-    function updateRefundApplications(address _buyer, uint256 _rnid, bool _isRefund) 
-        public 
+    function updateRefundApplications(address _buyer, uint256 _rnid, bool _isRefund)
+        public
         onlyOwnerOrAuthorizedContract {
         refundApplications[_buyer][_rnid] = _isRefund;
     }
@@ -1486,8 +1486,8 @@ contract TripioRoomNightData is Owned {
      * @param _direction direction to step in
      */
     function pushVendor(string _name, address _vendor, bool _direction)
-        public 
-        onlyOwnerOrAuthorizedContract 
+        public
+        onlyOwnerOrAuthorizedContract
         returns(uint256) {
         uint256 id = vendorList.push(_direction);
         vendorIds[_vendor] = id;
@@ -1499,8 +1499,8 @@ contract TripioRoomNightData is Owned {
      * @dev Remove vendor from vendor list
      * @param _vendorId The vendor id
      */
-    function removeVendor(uint256 _vendorId) 
-        public 
+    function removeVendor(uint256 _vendorId)
+        public
         onlyOwnerOrAuthorizedContract {
         vendorList.remove(_vendorId);
         address vendor = vendors[_vendorId].vendor;
@@ -1514,7 +1514,7 @@ contract TripioRoomNightData is Owned {
      * @param _valid The vendor is valid or not
      */
     function updateVendorValid(uint256 _vendorId, bool _valid)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         vendors[_vendorId].valid = _valid;
     }
@@ -1525,7 +1525,7 @@ contract TripioRoomNightData is Owned {
      * @param _name Then vendor name
      */
     function updateVendorName(uint256 _vendorId, string _name)
-        public 
+        public
         onlyOwnerOrAuthorizedContract {
         vendors[_vendorId].name = _name;
     }
@@ -1550,8 +1550,8 @@ contract TripioRoomNightAdmin is TRNVendors, TRNTokens {
      * @dev Update the base URI of token asset
      * @param _uri The base uri of token asset
      */
-    function updateBaseTokenURI(string _uri) 
-        external 
+    function updateBaseTokenURI(string _uri)
+        external
         onlyOwner {
         dataSource.updateTokenBaseURI(_uri);
         emit TokenBaseURIChanged(_uri);
@@ -1563,4 +1563,15 @@ contract TripioRoomNightAdmin is TRNVendors, TRNTokens {
     function destroy() external onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

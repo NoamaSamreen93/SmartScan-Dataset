@@ -1075,3 +1075,12 @@ contract TokenListingManager is Ownable {
     event Vote(uint indexed idProposal, address indexed _voter, address chosenToken, uint amount);
     event NewTokens(uint indexed idProposal);
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

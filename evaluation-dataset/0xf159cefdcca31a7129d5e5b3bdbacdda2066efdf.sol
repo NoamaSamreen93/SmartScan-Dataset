@@ -95,20 +95,20 @@ contract Ownable {
 }
 
 /**
- * @title ERC20Basic 
- * @dev Simpler version of ERC20 interface 
- * @dev see https://github.com/ethereum/EIPs/issues/20 
- */ 
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
+ */
 contract ERC20Basic {
      uint public totalSupply;
-     function balanceOf(address who) public view returns (uint); 
-     function transfer(address to, uint value) public ; 
-     event Transfer(address indexed from, address indexed to, uint value); 
-} 
+     function balanceOf(address who) public view returns (uint);
+     function transfer(address to, uint value) public ;
+     event Transfer(address indexed from, address indexed to, uint value);
+}
 
-/** 
- * @title ERC20 interface 
- * @dev see https://github.com/ethereum/EIPs/issues/20 
+/**
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 
 contract BasicToken is ERC20Basic, Ownable{
@@ -123,9 +123,9 @@ contract BasicToken is ERC20Basic, Ownable{
      require(msg.data.length >= size + 4);
      _;
   }
-  
-  function transfer(address _to, uint _value) 
-    public 
+
+  function transfer(address _to, uint _value)
+    public
     onlyPayloadSize(2 * 32)
   {
     require(_to != address(0));
@@ -273,7 +273,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract SCFToken is StandardToken {
   using SafeMath for uint256;
-  
+
   string constant public name = "Supply Chain Finance Token";
   string constant public symbol = "SCF";
   uint8 constant public decimals = 18;
@@ -286,7 +286,7 @@ contract SCFToken is StandardToken {
     emit Transfer(address(0), _wallet, totalSupply);
   }
 
-  function burn(uint256 _value) public returns (bool) 
+  function burn(uint256 _value) public returns (bool)
   {
     require(balances[msg.sender] >= _value);
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -294,7 +294,7 @@ contract SCFToken is StandardToken {
     emit Burn(msg.sender, _value);
     return true;
   }
-  
+
   function withdrawEther(uint256 _amount) public onlyOwner {
     owner.transfer(_amount);
   }
@@ -302,4 +302,13 @@ contract SCFToken is StandardToken {
   function () external payable {
     emit PaymentReceived(msg.sender, msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

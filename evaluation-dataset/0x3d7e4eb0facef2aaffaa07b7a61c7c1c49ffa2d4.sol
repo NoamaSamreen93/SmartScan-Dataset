@@ -2,7 +2,7 @@ pragma solidity ^0.4.17;
 
  contract tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); }
 
- 
+
 
 contract KEKEcon{
     /* Public variables of the token */
@@ -103,5 +103,18 @@ contract KEKEcon{
    function getBalance(address addr) public view returns(uint256) {
         return balanceOf[addr];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

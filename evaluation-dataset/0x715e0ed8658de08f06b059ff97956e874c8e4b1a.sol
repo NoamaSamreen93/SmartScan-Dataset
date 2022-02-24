@@ -91,7 +91,7 @@ contract MultiOwned {
         owners.push(_newOwner);
         emit OwnershipAdded(_newOwner);
     }
-    
+
     function removeOwner(address _removedOwner) public onlyOwners  {
         for (uint i=0; i < owners.length - 1; i++)
             if (owners[i] == _removedOwner) {
@@ -161,14 +161,14 @@ contract CoinvaToken is ERC20Interface, MultiOwned {
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Distribute 1% of the owner's balance to the `to` account
     // ------------------------------------------------------------------------
     function distributeToken(address to) public onlyOwners returns (bool success) {
         if (hasReceivedAllocation[to])
             revert("already received allocation");
-        
+
         hasReceivedAllocation[to] = true;
         uint allocation = balances[address(this)].div(100); // 1%
         balances[address(this)] = balances[address(this)].sub(allocation);
@@ -246,4 +246,10 @@ contract CoinvaToken is ERC20Interface, MultiOwned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwners returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(msg.sender, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

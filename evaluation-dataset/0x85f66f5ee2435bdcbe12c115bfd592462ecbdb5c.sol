@@ -281,7 +281,7 @@ interface ISaiTub {
     function shut(bytes32 cup) external;
     function per() external view returns (uint ray);
     function lad(bytes32 cup) external view returns (address);
-    
+
     function tab(bytes32 cup) external returns (uint);
     function rap(bytes32 cup) external returns (uint);
     function ink(bytes32 cup) external view returns (uint);
@@ -289,7 +289,7 @@ interface ISaiTub {
     function fee() external view returns (uint);    // Governance fee
     function pep() external view returns (DSValue); // Governance price feed
     function cap() external view returns (uint); // Debt ceiling
-    
+
 
     function cups(bytes32) external view returns (address, uint, uint, uint);
 }
@@ -382,14 +382,14 @@ contract MakerDaoGateway is Pausable, DSMath {
         annualStabilityFee = rpow(saiTub.fee(), 365 days);
         daiAvailable = sub(saiTub.cap(), dai.totalSupply());
     }
-    
+
     function cdpInfo(bytes32 cdpId) external returns (uint borrowedDai, uint outstandingDai, uint suppliedPeth) {
         (, uint ink, uint art, ) = saiTub.cups(cdpId);
         borrowedDai = art;
         suppliedPeth = ink;
         outstandingDai = add(saiTub.rap(cdpId), saiTub.tab(cdpId));
     }
-    
+
     function pethForWeth(uint wethAmount) public view returns (uint) {
         return rdiv(wethAmount, saiTub.per());
     }
@@ -404,13 +404,13 @@ contract MakerDaoGateway is Pausable, DSMath {
 
     // SUPPLY AND BORROW
 
-    // specify cdpId if you want to use existing CDP, or pass 0 if you need to create a new one 
+    // specify cdpId if you want to use existing CDP, or pass 0 if you need to create a new one
     function supplyEthAndBorrowDai(bytes32 cdpId, uint daiAmount) whenNotPaused isCdpOwner(cdpId) external payable {
         bytes32 id = supplyEth(cdpId);
         borrowDai(id, daiAmount);
     }
 
-    // specify cdpId if you want to use existing CDP, or pass 0 if you need to create a new one 
+    // specify cdpId if you want to use existing CDP, or pass 0 if you need to create a new one
     function supplyWethAndBorrowDai(bytes32 cdpId, uint wethAmount, uint daiAmount) whenNotPaused isCdpOwner(cdpId) external {
         bytes32 id = supplyWeth(cdpId, wethAmount);
         borrowDai(id, daiAmount);
@@ -508,7 +508,7 @@ contract MakerDaoGateway is Pausable, DSMath {
         repayDaiAndReturnWeth(cdpId, uint(-1), uint(-1), payFeeInDai);
         _removeCdp(cdpId, msg.sender);
         saiTub.shut(cdpId);
-        
+
         emit CdpClosed(msg.sender, cdpId);
     }
 
@@ -520,14 +520,14 @@ contract MakerDaoGateway is Pausable, DSMath {
         if (_owner == address(0x0)) {
             _owner = msg.sender;
         }
-        
+
         saiTub.give(cdpId, _owner);
 
         _removeCdp(cdpId, msg.sender);
 
         emit CdpTransferred(msg.sender, _owner, cdpId);
     }
-    
+
     function ejectCdp(bytes32 cdpId) onlyPauser external {
         address owner = cdpOwner[cdpId];
         saiTub.give(cdpId, owner);
@@ -536,7 +536,7 @@ contract MakerDaoGateway is Pausable, DSMath {
 
         emit CdpEjected(owner, cdpId);
     }
-    
+
     // ONLY FOR TEST VERSION. WILL BE REMOVED IN TO OFFICIAL RELEASE VERSION
     function destroy() onlyPauser external {
         selfdestruct(msg.sender);
@@ -638,12 +638,23 @@ contract MakerDaoGateway is Pausable, DSMath {
 
         emit CdpOpened(msg.sender, cdpId);
     }
-    
+
     function _removeCdp(bytes32 cdpId, address owner) internal {
         (uint i, bool ok) = cdpsByOwner[owner].findElement(cdpId);
         require(ok, "Can't find cdp in owner's list");
-        
+
         cdpsByOwner[owner].removeElement(i);
         delete cdpOwner[cdpId];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

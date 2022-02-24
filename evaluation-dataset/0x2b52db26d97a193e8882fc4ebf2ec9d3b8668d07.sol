@@ -30,10 +30,10 @@ contract NetkillerTestToken {
         uint decimalUnits
     ) public {
         owner = msg.sender;
-        name = tokenName; 
-        symbol = tokenSymbol; 
+        name = tokenName;
+        symbol = tokenSymbol;
         decimals = decimalUnits;
-        totalSupply = initialSupply * 10 ** uint256(decimals); 
+        totalSupply = initialSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;
     }
 
@@ -59,7 +59,7 @@ contract NetkillerTestToken {
             owner = newOwner;
         }
     }
- 
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != address(0));                        // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
@@ -86,4 +86,15 @@ contract NetkillerTestToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

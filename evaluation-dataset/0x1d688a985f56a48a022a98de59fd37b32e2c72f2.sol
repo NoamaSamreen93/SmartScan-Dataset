@@ -164,7 +164,7 @@ contract Beercoin is ERC20Token, Owned {
 
         uint256 value = 0;
         bytes memory caps = bytes(new string(numberOfCaps));
-        
+
         for (uint256 i = 0; i < numberOfCaps; ++i) {
             uint256 currentCoin = producedCaps + i;
 
@@ -213,7 +213,7 @@ contract Beercoin is ERC20Token, Owned {
         } else {
             _transfer(this, user, 1 * 10 ** uint256(decimals));
         }
-        
+
         return true;
 	}
 
@@ -310,4 +310,15 @@ contract Beercoin is ERC20Token, Owned {
 		Burn(value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

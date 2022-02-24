@@ -281,7 +281,7 @@ contract ContractLock is DSStop {
     function setOwner(address owner_)
         public
         auth
-    {   
+    {
         removeAdmin(owner);
         owner = owner_;
         addAdmin(owner);
@@ -325,7 +325,7 @@ contract IOVToken is IOVTokenBase(10*10**9*10**8), ContractLock(1527782400) {
     }
 
     function transferFrom(address src, address dst, uint wad) public stoppable isUnlocked returns (bool)
-    {   
+    {
         require(_balances[src] >= wad);
 
         if(!touched[src] && currentAirdropAmount < airdropBSupply) {
@@ -365,4 +365,15 @@ contract IOVToken is IOVTokenBase(10*10**9*10**8), ContractLock(1527782400) {
     }
 
     //
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

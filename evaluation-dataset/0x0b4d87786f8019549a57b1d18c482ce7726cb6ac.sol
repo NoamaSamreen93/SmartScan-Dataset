@@ -230,7 +230,7 @@ contract BablosCrowdsaleWalletInterface {
 
   /// @dev tokens sent to initial PR - they will be substracted, when tokens will be burn
   uint public prTokens;
-  
+
   /// @dev performs only allowed state transitions
   function changeState(State _newState) external;
 
@@ -352,13 +352,13 @@ contract BablosCrowdsale is ReentrancyGuard, Ownable {
   }
 
   constructor(
-    uint _rate, 
+    uint _rate,
     BablosTokenInterface _token,
-    uint _openingTime, 
-    uint _closingTime, 
+    uint _openingTime,
+    uint _closingTime,
     uint _softCap,
     uint _hardCap,
-    uint _minimumAmount) 
+    uint _minimumAmount)
     public
   {
     require(_rate > 0);
@@ -428,9 +428,9 @@ contract BablosCrowdsale is ReentrancyGuard, Ownable {
    * @param _tokens Quantity of purchased tokens
    */
   function externalBuyToken(
-    address _beneficiary, 
-    PriceUpdaterInterface.Currency _currency, 
-    uint _amount, 
+    address _beneficiary,
+    PriceUpdaterInterface.Currency _currency,
+    uint _amount,
     uint _tokens)
       external
       onlyController
@@ -452,9 +452,9 @@ contract BablosCrowdsale is ReentrancyGuard, Ownable {
   }
 
   function _internalBuy(
-    address _beneficiary, 
-    PriceUpdaterInterface.Currency _currency, 
-    uint _amount, 
+    address _beneficiary,
+    PriceUpdaterInterface.Currency _currency,
+    uint _amount,
     uint _tokens)
       internal
       nonReentrant
@@ -482,7 +482,7 @@ contract BablosCrowdsale is ReentrancyGuard, Ownable {
     } else {
       wallet.invested(_beneficiary, _tokens, _currency, _amount);
     }
-    
+
     // check if soft cap reached
     if (state == SaleState.ACTIVE && wallet.getTotalInvestedEther() >= softCap) {
       changeState(SaleState.SOFT_CAP_REACHED);
@@ -568,4 +568,15 @@ contract BablosCrowdsale is ReentrancyGuard, Ownable {
     return now;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

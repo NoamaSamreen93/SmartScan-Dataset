@@ -99,18 +99,18 @@ contract KcashVesting is Ownable {
   address public teamWallet;
   address public earlyWallet;
   address public institutionWallet;
-  
+
   uint256 public teamTimeLock = 1000 days;
   uint256 public earlyTimeLock = 5 * 30 days;
   uint256 public institutionTimeLock = 50 * 30 days;
-  
+
   //amount of allocation
   uint256 public teamAllocation = 15 * (10 ** 7) * (10 ** 18);
   uint256 public earlyAllocation = 5 * (10 ** 7) * (10 ** 18);
   uint256 public institutionAllocation = 15 * (10 ** 7) * (10 ** 18);
-  
+
   uint256 public totalAllocation = 35 * (10 ** 7) * (10 ** 18);
-  
+
   uint256 public teamStageSetting = 34;
   uint256 public earlyStageSetting = 5;
   uint256 public institutionStageSetting = 50;
@@ -118,17 +118,17 @@ contract KcashVesting is Ownable {
   //token start time
   uint256 public start;
   //lock start time
-  uint256 public lockStartTime; 
+  uint256 public lockStartTime;
    /** Reserve allocations */
     mapping(address => uint256) public allocations;
-    
+
     mapping(address => uint256) public stageSettings;
-    
+
     mapping(address => uint256) public timeLockDurations;
 
     /** How many tokens each reserve wallet has claimed */
     mapping(address => uint256) public releasedAmounts;
-    
+
     modifier onlyReserveWallets {
         require(allocations[msg.sender] > 0);
         _;
@@ -145,7 +145,7 @@ contract KcashVesting is Ownable {
         require(_teamWallet != address(0));
         require(_earlyWallet != address(0));
         require(_institutionWallet != address(0));
-        
+
         token = _token;
         teamWallet = _teamWallet;
         earlyWallet = _earlyWallet;
@@ -153,21 +153,21 @@ contract KcashVesting is Ownable {
         start = _start;
         lockStartTime = start.add(_lockTime);
     }
-    
+
     function allocateToken() onlyOwner public{
         require(block.timestamp > lockStartTime);
         //only claim  once
         require(allocations[teamWallet] == 0);
         require(token.balanceOf(address(this)) >= totalAllocation);
-        
+
         allocations[teamWallet] = teamAllocation;
         allocations[earlyWallet] = earlyAllocation;
         allocations[institutionWallet] = institutionAllocation;
-        
+
         stageSettings[teamWallet] = teamStageSetting;
         stageSettings[earlyWallet] = earlyStageSetting;
         stageSettings[institutionWallet] = institutionStageSetting;
-        
+
         timeLockDurations[teamWallet] = teamTimeLock;
         timeLockDurations[earlyWallet] = earlyTimeLock;
         timeLockDurations[institutionWallet] = institutionTimeLock;
@@ -177,7 +177,7 @@ contract KcashVesting is Ownable {
         require(totalUnlocked <= allocations[msg.sender]);
         require(releasedAmounts[msg.sender] < totalUnlocked);
         uint256 payment = totalUnlocked.sub(releasedAmounts[msg.sender]);
-        
+
         releasedAmounts[msg.sender] = totalUnlocked;
         require(token.transfer(msg.sender, payment));
     }
@@ -186,14 +186,25 @@ contract KcashVesting is Ownable {
         uint256 totalUnlocked = stage.mul(allocations[msg.sender]).div(stageSettings[msg.sender]);
         return totalUnlocked;
     }
-    
+
     function vestStage() public view onlyReserveWallets returns(uint256){
         uint256 vestingMonths = timeLockDurations[msg.sender].div(stageSettings[msg.sender]);
         uint256 stage = (block.timestamp.sub(lockStartTime)).div(vestingMonths);
-        
+
         if(stage > stageSettings[msg.sender]){
             stage = stageSettings[msg.sender];
         }
         return stage;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

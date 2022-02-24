@@ -671,9 +671,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "NIT";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xb3938B5A09386a941C52E70C9B575C7b236805b7;
-    
+
     uint public constant START_TIME = 1557153840;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -681,9 +681,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -707,5 +707,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

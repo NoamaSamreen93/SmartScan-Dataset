@@ -7,8 +7,8 @@
 
  * @notice Copyright © 2016 - 2018 Mt Pelerin Group SA - All Rights Reserved
 
- * @notice All matters regarding the intellectual property of this code 
- * @notice or software are subject to Swiss Law without reference to its 
+ * @notice All matters regarding the intellectual property of this code
+ * @notice or software are subject to Swiss Law without reference to its
  * @notice conflicts of law rules.
 
  * @notice License for each contract is available in the respective file
@@ -291,7 +291,7 @@ contract RatesProvider is IRatesProvider, Authority {
   function rateWEIPerCHFCent() public view returns (uint256) {
     return rateWEIPerCHFCent;
   }
-  
+
   /**
    * @dev rate ETHCHF
    */
@@ -330,4 +330,20 @@ contract RatesProvider is IRatesProvider, Authority {
   }
 
   event Rate(uint256 at, uint256 rateWEIPerCHFCent);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

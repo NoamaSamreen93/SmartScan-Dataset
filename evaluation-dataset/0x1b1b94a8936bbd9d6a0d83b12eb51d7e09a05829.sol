@@ -17,7 +17,7 @@ function transferFrom(address _from, address _to, uint256 _value) external retur
 function approve(address _spender, uint256 _value) external returns (bool);
 
 function allowance(address _owner, address _spender) external constant returns (uint256);
-    
+
 }
 
 library SafeMath {
@@ -38,7 +38,7 @@ library SafeMath {
         assert(a >= b);
         return a - b;
     }
-    
+
 }
 
 contract Ownable {
@@ -77,9 +77,9 @@ contract Ownable {
 contract StandardToken is ERC20, Ownable{
 
     using SafeMath for uint256;
-    
+
     //Total amount of TheWolfCoin
-    uint256 _totalSupply = 5000000000; 
+    uint256 _totalSupply = 5000000000;
 
     //Balances for each account
     mapping (address => uint256)  balances;
@@ -253,4 +253,15 @@ contract TheWolfCoin is StandardToken {
         Transfer (this, WOLF4, balances[WOLF4]);
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

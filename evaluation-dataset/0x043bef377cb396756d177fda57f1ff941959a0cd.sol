@@ -53,7 +53,7 @@ contract Crowdsale {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -73,7 +73,7 @@ contract Crowdsale {
 
 
   function Crowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0x6Dad2050A88fcf9f19c9EAC4F2AeC08c10192BE5;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -122,12 +122,12 @@ contract Crowdsale {
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
     // contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -156,4 +156,15 @@ contract Crowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

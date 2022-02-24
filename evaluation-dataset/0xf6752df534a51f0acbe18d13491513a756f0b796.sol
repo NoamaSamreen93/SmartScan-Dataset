@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -227,7 +227,7 @@ contract CryptoTycoonsConstants{
             croupierMap[newCroupier] = true;
         }
     }
-    
+
     function deleteCroupier(address newCroupier) external onlyOwner {
         bool isCroupier = croupierMap[newCroupier];
         if (isCroupier == true) {
@@ -244,7 +244,7 @@ contract CryptoTycoonsConstants{
         require (_maxProfit < MAX_AMOUNT, "maxProfit should be a sane number.");
         maxProfit = _maxProfit;
     }
-    
+
     // Funds withdrawal to cover costs of AceDice operation.
     function withdrawFunds(address payable beneficiary, uint withdrawAmount) external onlyOwner {
         require (withdrawAmount <= address(this).balance, "Increase amount larger than balance.");
@@ -271,7 +271,7 @@ contract CryptoTycoonsConstants{
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getRankingRewardSize();
     }
-        
+
     function handleVIPPaybackAndExp(CryptoTycoonsVIPLib vipLib, address payable gambler, uint amount) internal returns(uint vipPayback) {
         // CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         vipLib.addUserExp(gambler, amount);
@@ -303,7 +303,7 @@ contract CryptoTycoonsConstants{
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getJackpotSize();
     }
-   
+
     function verifyCommit(uint commit, uint8 v, bytes32 r, bytes32 s) internal view {
         // Check that commit is valid - it has not expired and its signature is valid.
         // require (block.number <= commitLastBlock, "Commit has expired.");
@@ -340,8 +340,8 @@ contract CryptoTycoonsConstants{
     }
 
     function processBet(
-        uint betMask, uint reveal, 
-        uint8 v, bytes32 r, bytes32 s, address payable inviter) 
+        uint betMask, uint reveal,
+        uint8 v, bytes32 r, bytes32 s, address payable inviter)
     external payable;
 }
 contract CardRPS is CryptoTycoonsConstants(10 ether)  {
@@ -349,7 +349,7 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
     event FailedPayment(address indexed beneficiary, uint amount);
     event Payment(address indexed beneficiary, uint amount, uint playerNum1, uint playerNum2, uint npcNum1, uint npcNum2, uint betAmount, uint rouletteIndex);
     event JackpotPayment(address indexed beneficiary, uint amount, uint playerNum1, uint playerNum2, uint npcNum1, uint npcNum2, uint betAmount);
-    
+
     struct RandomNumber{
         uint8 playerNum1;
         uint8 playerNum2;
@@ -359,8 +359,8 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
     }
 
     function processBet(
-        uint betMask, uint reveal, 
-        uint8 v, bytes32 r, bytes32 s, address payable inviter) 
+        uint betMask, uint reveal,
+        uint8 v, bytes32 r, bytes32 s, address payable inviter)
         external payable {
 
         address payable gambler = msg.sender;
@@ -383,7 +383,7 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
     }
 
     function processReward(
-        address payable gambler, uint amount, 
+        address payable gambler, uint amount,
         bytes32 entropy, address payable inviter) internal{
 
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
@@ -401,8 +401,8 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
         // uint mask = 2 ** 8;
         randomNumber.playerNum1 = uint8(seed % 3);
         seed = seed / 2 ** 8;
-        
-        randomNumber.playerNum2 = uint8(seed % 3);        
+
+        randomNumber.playerNum2 = uint8(seed % 3);
         seed = seed / 2 ** 8;
 
         randomNumber.npcNum1 = uint8(seed % 3);
@@ -429,7 +429,7 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
             inviter.transfer(amount * HOUSE_EDGE_PERCENT / 100 * 7 /100);
         }
 
-        
+
         payBettingReward(gambler, randomNumber, amount, houseEdge, jackpotFee, _vipPayback);
 
 
@@ -437,15 +437,15 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
     }
 
     function handleJackpotReward(
-        CryptoTycoonsVIPLib vipLib, 
-        RandomNumber memory randomNumber, 
+        CryptoTycoonsVIPLib vipLib,
+        RandomNumber memory randomNumber,
         bytes32 entropy,
         address payable gambler, uint jackpotFee, uint amount) private {
 
         uint jackpotWin = 0;
         // Roll for a jackpot (if eligible).
         if (amount >= MIN_JACKPOT_BET) {
-                        
+
             VIPLibraryAddress.transfer(jackpotFee);
             vipLib.increaseJackpot(jackpotFee);
 
@@ -459,22 +459,22 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
                 vipLib.payJackpotReward(gambler);
             }
         }
-        
+
         // Log jackpot win.
         if (jackpotWin > 0) {
-            emit JackpotPayment(gambler, 
-                    jackpotWin, 
-                    randomNumber.playerNum1, 
-                    randomNumber.playerNum2, 
-                    randomNumber.npcNum1, 
-                    randomNumber.npcNum2, 
+            emit JackpotPayment(gambler,
+                    jackpotWin,
+                    randomNumber.playerNum1,
+                    randomNumber.playerNum2,
+                    randomNumber.npcNum1,
+                    randomNumber.npcNum2,
                     amount);
         }
     }
 
     function payBettingReward(
-        address payable gambler, 
-        RandomNumber memory randomNumber, 
+        address payable gambler,
+        RandomNumber memory randomNumber,
         uint amount, uint houseEdge, uint jackpotFee,
         uint vipPayback) private {
         uint8 winValue = calculateWinValue(randomNumber); // 0 -> draw, 1 -> user win, 2 -> npc win
@@ -486,7 +486,7 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
             winAmount = amount - houseEdge - jackpotFee;
         } else if (winValue == 1) {
             // user win
-            winAmount = (amount - houseEdge - jackpotFee) 
+            winAmount = (amount - houseEdge - jackpotFee)
                             * getRouletteRate(randomNumber.rouletteIndex) / 10;
         } else {
 
@@ -495,30 +495,30 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
         winAmount += vipPayback;
         if(winAmount > 0){
             if (gambler.send(winAmount)) {
-                emit Payment(gambler, winAmount, 
-                    randomNumber.playerNum1, 
-                    randomNumber.playerNum2, 
-                    randomNumber.npcNum1, 
+                emit Payment(gambler, winAmount,
+                    randomNumber.playerNum1,
+                    randomNumber.playerNum2,
+                    randomNumber.npcNum1,
                     randomNumber.npcNum2,
                     amount, randomNumber.rouletteIndex);
             } else {
                 emit FailedPayment(gambler, amount);
             }
         }else{
-            emit Payment(gambler, winAmount, 
-                randomNumber.playerNum1, 
-                randomNumber.playerNum2, 
-                randomNumber.npcNum1, 
+            emit Payment(gambler, winAmount,
+                randomNumber.playerNum1,
+                randomNumber.playerNum2,
+                randomNumber.npcNum1,
                 randomNumber.npcNum2,
                 amount, randomNumber.rouletteIndex);
         }
-        
+
         // Send the funds to gambler.
-        // sendFunds(gambler, winAmount == 0 ? 1 wei : winAmount, winAmount, 
-        //             randomNumber.playerNum1, 
-        //             randomNumber.playerNum2, 
-        //             randomNumber.npcNum1, 
-        //             randomNumber.npcNum2, 
+        // sendFunds(gambler, winAmount == 0 ? 1 wei : winAmount, winAmount,
+        //             randomNumber.playerNum1,
+        //             randomNumber.playerNum2,
+        //             randomNumber.npcNum1,
+        //             randomNumber.npcNum2,
         //             amount,
         //             randomNumber.rouletteIndex);
     }
@@ -550,7 +550,7 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
             winValue = 1; // user win
         } else{
             winValue = 2; // npc win
-        } 
+        }
         return winValue;
     }
 
@@ -583,4 +583,13 @@ contract CardRPS is CryptoTycoonsConstants(10 ether)  {
         }
         return rate;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

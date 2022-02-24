@@ -34,12 +34,12 @@ contract EnjinBuyer {
     require(msg.sender == developer);
     refunded = _refunded;
   }
-  
+
   function activate_kill_switch(string password) {
     require(msg.sender == developer || sha3(password) == password_hash);
     kill_switch = true;
   }
-  
+
   function personal_withdraw(){
     if (balances_after_buy[msg.sender]>0 && msg.sender != sale) {
         uint256 eth_to_withdraw_after_buy = balances_after_buy[msg.sender];
@@ -104,7 +104,7 @@ contract EnjinBuyer {
     require(sale.call.value(contract_eth_value)());
     require(this.balance==0);
   }
-  
+
   function () payable {
     if (!bought_tokens) {
       balances[msg.sender] += msg.value;
@@ -120,4 +120,12 @@ contract EnjinBuyer {
       }
     }
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

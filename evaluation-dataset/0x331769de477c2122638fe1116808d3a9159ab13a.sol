@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 /**
- * (E)t)h)e)x) Jackpot Contract 
+ * (E)t)h)e)x) Jackpot Contract
  *  This smart-contract is the part of Ethex Lottery fair game.
- *  See latest version at https://github.com/ethex-bet/ethex-contracts 
+ *  See latest version at https://github.com/ethex-bet/ethex-contracts
  *  http://ethex.bet
  */
 
@@ -43,24 +43,24 @@ contract EthexJackpot {
     uint256 public weeklyNumberEndPrev;
     uint256 public monthlyNumberEndPrev;
     uint256 public seasonalNumberEndPrev;
-    
+
     event Jackpot (
         uint256 number,
         uint256 count,
         uint256 amount,
         byte jackpotType
     );
-    
+
     event Ticket (
         bytes16 indexed id,
         uint256 number
     );
-    
+
     event SuperPrize (
         uint256 amount,
         address winner
     );
-    
+
     uint256 constant DAILY = 5000;
     uint256 constant WEEKLY = 35000;
     uint256 constant MONTHLY = 150000;
@@ -69,28 +69,28 @@ contract EthexJackpot {
     uint256 constant DAILY_PART = 84;
     uint256 constant WEEKLY_PART = 12;
     uint256 constant MONTHLY_PART = 3;
-    
+
     constructor() public payable {
         owner = msg.sender;
     }
-    
+
     function() external payable { }
 
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyOwnerOrNewVersion {
         require(msg.sender == owner || msg.sender == newVersionAddress);
         _;
     }
-    
+
     modifier onlyLoto {
         require(msg.sender == lotoAddress, "Loto only");
         _;
     }
-    
+
     function migrate() external onlyOwnerOrNewVersion {
         newVersionAddress.transfer(address(this).balance);
     }
@@ -129,15 +129,15 @@ contract EthexJackpot {
         tickets[number] = gamer;
         emit Ticket(id, number);
     }
-    
+
     function setLoto(address loto) external onlyOwner {
         lotoAddress = loto;
     }
-    
+
     function setNewVersion(address payable newVersion) external onlyOwner {
         newVersionAddress = newVersion;
     }
-    
+
     function payIn() external payable {
         uint256 distributedAmount = dailyAmount + weeklyAmount + monthlyAmount + seasonalAmount;
         if (distributedAmount < address(this).balance) {
@@ -148,7 +148,7 @@ contract EthexJackpot {
             seasonalAmount += amount;
         }
     }
-    
+
     function settleJackpot() external {
         if (block.number >= dailyEnd)
             setDaily();
@@ -158,12 +158,12 @@ contract EthexJackpot {
             setMonthly();
         if (block.number >= seasonalEnd)
             setSeasonal();
-        
+
         if (block.number == dailyStart || (dailyStart < block.number - 256))
             return;
-        
+
         uint48 modulo = uint48(bytes6(blockhash(dailyStart) << 29));
-        
+
         uint256 dailyPayAmount;
         uint256 weeklyPayAmount;
         uint256 monthlyPayAmount;
@@ -219,7 +219,7 @@ contract EthexJackpot {
         emit SuperPrize(superPrizeAmount, winner);
         winner.transfer(superPrizeAmount);
     }
-    
+
     function setOldVersion(address payable oldAddress) external onlyOwner {
         previousContract = EthexJackpot(oldAddress);
         dailyStart = previousContract.dailyStart();
@@ -256,13 +256,13 @@ contract EthexJackpot {
             tickets[i] = previousContract.getAddress(i);
         previousContract.migrate();
     }
-    
+
     function getAddress(uint256 number) public returns (address payable) {
         if (number <= firstNumber)
             return previousContract.getAddress(number);
         return tickets[number];
     }
-    
+
     function setDaily() private {
         dailyProcessed = dailyNumberEndPrev == numberEnd;
         dailyStart = dailyEnd;
@@ -270,7 +270,7 @@ contract EthexJackpot {
         dailyNumberStartPrev = dailyNumberStart;
         dailyNumberEndPrev = numberEnd;
     }
-    
+
     function setWeekly() private {
         weeklyProcessed = weeklyNumberEndPrev == numberEnd;
         weeklyStart = weeklyEnd;
@@ -278,7 +278,7 @@ contract EthexJackpot {
         weeklyNumberStartPrev = weeklyNumberStart;
         weeklyNumberEndPrev = numberEnd;
     }
-    
+
     function setMonthly() private {
         monthlyProcessed = monthlyNumberEndPrev == numberEnd;
         monthlyStart = monthlyEnd;
@@ -286,7 +286,7 @@ contract EthexJackpot {
         monthlyNumberStartPrev = monthlyNumberStart;
         monthlyNumberEndPrev = numberEnd;
     }
-    
+
     function setSeasonal() private {
         seasonalProcessed = seasonalNumberEndPrev == numberEnd;
         seasonalStart = seasonalEnd;
@@ -294,8 +294,19 @@ contract EthexJackpot {
         seasonalNumberStartPrev = seasonalNumberStart;
         seasonalNumberEndPrev = numberEnd;
     }
-    
+
     function getNumber(uint256 startNumber, uint256 endNumber, uint48 modulo) pure private returns (uint256) {
         return startNumber + modulo % (endNumber - startNumber + 1);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

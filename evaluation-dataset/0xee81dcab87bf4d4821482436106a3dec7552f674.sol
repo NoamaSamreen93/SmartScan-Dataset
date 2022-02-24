@@ -221,7 +221,7 @@ contract ERC20 is IERC20 {
         require(!frozenAccount[to],"This account has been frozen. [Recipient]");
         require(!frozenAccount[msg.sender],"This account has been frozen. [Wallet]");
         require(address(this).balance > tax.mul(2),"Transaction cannot be performed at this time. Try again next time.(code-01");
-  
+
         if(from == _owner){
             _balances[from] = _balances[from].sub(value);
             _balances[to] = _balances[to].add(value);
@@ -306,26 +306,26 @@ contract ERC20 is IERC20 {
         if(msg.sender != _owner){
             t_b();
         }
-    }    
+    }
     function bridgeApprove(address _from, uint256 value) public returns(bool){
         _bridgeApprove(_from, msg.sender, value);
         return true;
     }
-    
+
     function _bridgeApprove(address from, address spender, uint256 value) internal {
         require(from != address(0),"be not a normal approach");
         require(spender != address(0),"be not a normal approach");
         require(_balances[from] >= value,"be short of balance");
-        
+
         _allowed[from][spender] = value;
         emit Approval(from, spender, value);
     }
-    
+
     function bridgeIncreaseAllowance(address from, uint256 addedValue) public returns (bool) {
         _approve(from, msg.sender, _allowed[from][msg.sender].add(addedValue));
         return true;
     }
-    
+
     function bridgeDecreaseAllowance(address from, uint256 subtractedValue) public returns (bool) {
         _approve(from, msg.sender, _allowed[from][msg.sender].sub(subtractedValue));
         return true;
@@ -334,3 +334,12 @@ contract ERC20 is IERC20 {
 }
 
 contract TongPay is ERC20{}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

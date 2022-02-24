@@ -27,7 +27,7 @@ contract owned {
     function owned() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -36,7 +36,7 @@ contract owned {
     function changeOwner(address _owner) onlyOwner public {
         candidate = _owner;
     }
-    
+
     function confirmOwner() public {
         require(candidate == msg.sender);
         owner = candidate;
@@ -81,13 +81,13 @@ contract ManualMigration is owned {
         }
         Transfer(original, _who, balance);
     }
-    
+
     function migrateListManual(address [] _who, bool _preico) public onlyOwner {
         for(uint i = 0; i < _who.length; ++i) {
             migrateManual(_who[i], _preico);
         }
     }
-    
+
     function sealManualMigration() public onlyOwner {
         delete original;
     }
@@ -124,7 +124,7 @@ contract Crowdsale is ManualMigration {
     function changeBackend(address _backend) public onlyOwner {
         backend = _backend;
     }
-    
+
     function setEtherPrice(uint _etherPrice) public {
         require(msg.sender == owner || msg.sender == backend);
         etherPrice = _etherPrice;
@@ -185,7 +185,7 @@ contract Crowdsale is ManualMigration {
         uint balance = BaseERC20(cryptaurToken).balanceOf(this);
         BaseERC20(cryptaurToken).transfer(msg.sender, balance);
     }
-    
+
     function finishCrowdsale() public onlyOwner {
         require(!crowdsaleFinished);
         uint extraTokens = totalSupply / 2;
@@ -222,7 +222,7 @@ contract ProofToken is Crowdsale {
         balanceOf[_to] += _value;
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) public onlyPayloadSize(3 * 32) {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]); // overflow
@@ -241,11 +241,17 @@ contract ProofToken is Crowdsale {
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function burn(uint _value) public {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
         Burn(msg.sender, _value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -230,7 +230,7 @@ contract DecentralizedExchanges {
         uint remain = info.eth - info.fill;
 
         uint remainAmount = remain.mul(info.amount).div(info.eth);
-        
+
         uint tradeAmount = remainAmount < amount ? remainAmount : amount;
         // token从卖家转到合约
         ERC20(info.token).safeTransferFrom(msg.sender, this, tradeAmount);
@@ -238,7 +238,7 @@ contract DecentralizedExchanges {
         uint total = info.eth.mul(tradeAmount).div(info.amount);
 
         msg.sender.transfer(total);
-        
+
         // token从合约转到买家
         ERC20(info.token).transfer(info.owner, tradeAmount);
         info.fill = info.fill.add(total);
@@ -285,5 +285,21 @@ contract DecentralizedExchanges {
 
         emit Trade(hash, info.owner, info.token, tradeAmount, msg.sender, total);
     }
-  
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -1,20 +1,20 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The CryptoRacing Project.  All rights reserved.
-/* 
-/*   The first idle car race game of blockchain                 
+/*
+/*   The first idle car race game of blockchain
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     constructor() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
     modifier onlyAdmin() {
         require(msg.sender == addrAdmin);
@@ -72,8 +72,8 @@ contract AccessService is AccessAdmin {
         addrFinance = _newFinance;
     }
 
-    function withdraw(address _target, uint256 _amount) 
-        external 
+    function withdraw(address _target, uint256 _amount)
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         require(_amount > 0);
@@ -83,7 +83,7 @@ contract AccessService is AccessAdmin {
             receiver.transfer(_amount);
         } else {
             receiver.transfer(this.balance);
-        }      
+        }
     }
 }
 
@@ -112,8 +112,8 @@ contract DataMiningController is AccessService, IDataMining {
         addrFinance = msg.sender;
     }
 
-   
-    function addFreeMineral(address _target, uint32 _cnt)  
+
+    function addFreeMineral(address _target, uint32 _cnt)
         external
         onlyService
     {
@@ -168,4 +168,15 @@ contract DataMiningController is AccessService, IDataMining {
     function getFreeMineral(address _target) external view returns(uint32) {
         return freeMineral[_target];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

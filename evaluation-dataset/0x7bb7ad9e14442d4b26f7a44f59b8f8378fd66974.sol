@@ -17,7 +17,7 @@ contract STQDistribution {
     * @return encoded transfer
     */
   function encodeTransfer (uint96 _lotsNumber, address _to)
-  public pure returns (uint256 _encodedTransfer) 
+  public pure returns (uint256 _encodedTransfer)
   {
     return (_lotsNumber << 160) | uint160 (_to);
   }
@@ -137,4 +137,10 @@ contract Token {
      */
     event Approval (
         address indexed _owner, address indexed _spender, uint256 _value);
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -4,33 +4,33 @@ pragma solidity ^0.4.20;
 
 contract PoWMLottery {
     using SafeMath for uint256;
-    
+
     // Contract setup
     bool public isLotteryOpen = false;
     address POWM_address = address(0xA146240bF2C04005A743032DC0D241ec0bB2BA2B);
     POWM maths = POWM(POWM_address);
     address owner;
-    
+
     // Datasets
     mapping (uint256 => address) public gamblers;
     mapping (address => uint256) public token_buyins;
     mapping (address => uint256) public last_round_bought;
-    
+
     uint256 public num_tickets_current_round = 0;
     uint256 public current_round = 0;
     uint256 public numTokensInLottery = 0;
-    
+
     address masternode_referrer;
-    
+
     // Can't buy more than 25 tokens.
     uint256 public MAX_TOKEN_BUYIN = 25;
-    
+
     function PoWMLottery() public {
         current_round = 1;
         owner = msg.sender;
         masternode_referrer = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -50,7 +50,7 @@ contract PoWMLottery {
     function buyTickets() public payable {
         require(isLotteryOpen == true);
         require(last_round_bought[msg.sender] != current_round);
-        
+
         // Buy the tokens.
         // Should be between 0 and 25.
         uint256 tokens_before = maths.myTokens();
@@ -59,13 +59,13 @@ contract PoWMLottery {
         uint256 tokens_bought = SafeMath.sub(tokens_after, tokens_before).div(1e18);
         require(tokens_bought >= 1 && tokens_bought <= MAX_TOKEN_BUYIN);
         numTokensInLottery = maths.myTokens();
-        
+
         // Set last_round_bought = current round and token_buyins value
         // Uses a for loop to put up to 25 tickets in.
         uint8 i = 0;
         while (i < tokens_bought) {
             i++;
-            
+
             gamblers[num_tickets_current_round] = msg.sender;
             num_tickets_current_round++;
         }
@@ -73,21 +73,21 @@ contract PoWMLottery {
         token_buyins[msg.sender] = tokens_bought;
         last_round_bought[msg.sender] = current_round;
     }
-    
+
     function setMaxTokenBuyin(uint256 tokens) public onlyOwner {
         require(isLotteryOpen == false);
         require(tokens > 0);
-        
+
         MAX_TOKEN_BUYIN = tokens;
     }
-    
+
     function openLottery() onlyOwner public {
         require(isLotteryOpen == false);
         current_round++;
         isLotteryOpen = true;
         num_tickets_current_round = 0;
     }
-    
+
     // We need to be payable in order to receive dividends.
     // And if not sent from the contract, let people buy in this way.
     function () public payable {
@@ -95,23 +95,23 @@ contract PoWMLottery {
             buyTickets();
         }
     }
-    
+
     function closeLotteryAndPickWinner() onlyOwner public {
         require(isLotteryOpen == true);
         isLotteryOpen = false;
-        
+
         // Pick winner as a pseudo-random hash of the timestamp among all the current winners
         // YES we know this isn't /truly/ random but unless the prize is worth more than the block mining reward
         //  it doesn't fucking matter.
         uint256 winning_number = uint256(keccak256(block.blockhash(block.number - 1))) % num_tickets_current_round;
         address winner = gamblers[winning_number];
         masternode_referrer = winner;
-        
+
         // ERC20 transfer & clear out our tokens.
         uint256 exact_tokens = maths.myTokens();
         maths.transfer(winner, exact_tokens);
         numTokensInLottery = 0;
-        
+
         // transfer any divs we got
         winner.transfer(address(this).balance);
     }
@@ -169,4 +169,12 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

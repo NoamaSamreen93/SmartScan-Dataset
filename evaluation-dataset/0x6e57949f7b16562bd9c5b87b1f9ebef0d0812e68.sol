@@ -67,7 +67,7 @@ contract FiatContract {
     /**
      * 1 criptocrew= $30,000 MXN
      * 1 criptocrew =~ $1,500 USD
-     * 1 criptocrew =~ $1,390 EUR 
+     * 1 criptocrew =~ $1,390 EUR
      * 1 criptocrew =~ 15 ETH
      */
 
@@ -112,4 +112,12 @@ contract FiatContract {
         emit Donation(msg.sender);
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

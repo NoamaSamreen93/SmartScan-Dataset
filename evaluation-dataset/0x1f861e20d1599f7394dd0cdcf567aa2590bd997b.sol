@@ -117,13 +117,13 @@ contract BasicToken is ERC20Basic, Ownable {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   bool public stopped = false;
-  
+
   event Stop(address indexed from);
-  
+
   event Start(address indexed from);
-  
+
   modifier isRunning {
     assert (!stopped);
     _;
@@ -159,7 +159,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function balanceOf(address _owner) public view returns (uint256 ownerBalance) {
     return balances[_owner];
   }
-  
+
   function stop() onlyOwner public {
     stopped = true;
     emit Stop(msg.sender);
@@ -297,7 +297,7 @@ contract CappedMintableToken is StandardToken {
     require(!mintingFinished);
     _;
   }
-  
+
   modifier onlyMintAgent() {
     // crowdsale contracts or owner are allowed to mint new tokens
     if(!mintAgents[msg.sender] && (msg.sender != owner)) {
@@ -320,7 +320,7 @@ contract CappedMintableToken is StandardToken {
     mintAgents[addr] = state;
     emit MintingAgentChanged(addr, state);
   }
-  
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -368,37 +368,48 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 
 /**
  * @title ODXToken
- * @dev Simple ERC20 Token,   
+ * @dev Simple ERC20 Token,
  * Tokens are mintable and burnable.
  * No initial token upon creation
  * Added max token supply
  */
 contract ODXToken is CappedMintableToken, StandardBurnableToken {
 
-  string public name; 
-  string public symbol; 
-  uint8 public decimals; 
+  string public name;
+  string public symbol;
+  uint8 public decimals;
 
   /**
    * @dev set totalSupply_ = 0;
    */
   constructor(
-      string _name, 
-      string _symbol, 
-      uint8 _decimals, 
+      string _name,
+      string _symbol,
+      uint8 _decimals,
       uint256 _maxTokens
-  ) 
-    public 
-    CappedMintableToken(_maxTokens) 
+  )
+    public
+    CappedMintableToken(_maxTokens)
   {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
     totalSupply_ = 0;
   }
-  
+
   function () payable public {
       revert();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

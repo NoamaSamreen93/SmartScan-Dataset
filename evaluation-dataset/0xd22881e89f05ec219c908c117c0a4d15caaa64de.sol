@@ -68,7 +68,7 @@ contract Proxy is Ownable {
         emit SetImplementation(iimplementation, _implementation);
         iimplementation = _implementation;
     }
-    
+
     function() external {
         address _impl = iimplementation;
         assembly {
@@ -85,4 +85,13 @@ contract Proxy is Ownable {
             return(ptr, size)
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

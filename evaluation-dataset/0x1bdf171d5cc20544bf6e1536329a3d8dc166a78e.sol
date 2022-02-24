@@ -870,7 +870,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
 
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
@@ -1043,7 +1043,7 @@ THE SOFTWARE.
 
 // MOST LOGGING IS CURRENTLY DISABLED TO SAVE GAS FOR INITIAL OPERATION, WILL CHANGE ONCE ETH BUFFER IS BUILT
 contract EthFlip is usingOraclize {
-    
+
   // Bet archival
 //   struct Bet {
 //     bool win;
@@ -1051,7 +1051,7 @@ contract EthFlip is usingOraclize {
 //     uint blockNumber;
 //     address playerAddress;
 //   }
-  
+
   // Player archival
 //   struct Player {
 //     uint[] orderedPastBetValues;
@@ -1060,13 +1060,13 @@ contract EthFlip is usingOraclize {
 //     uint totalBet;
 //     uint totalWon;
 //   }
-    
+
   // Oraclize query callback data preservation
   struct QueryMap {
     uint betValue;
     address playerAddress;
   }
-  
+
   // Game parameters
   bool private gamePaused;
   uint private minBet;
@@ -1075,7 +1075,7 @@ contract EthFlip is usingOraclize {
   uint private oraclizeGas;
   uint private gasPricePctOfBetValue;
   address private owner;
-  
+
   // Static game information
   uint private currentQueryId;
   uint private currentBetNumber;
@@ -1090,7 +1090,7 @@ contract EthFlip is usingOraclize {
 //   mapping (address => Player) private playerBetData;
 //   mapping (uint => Bet) private pastBets;
   mapping (uint => QueryMap) private queryIdMap;
-  
+
   // Events
   event BetComplete(bool _win, uint _betNumber, uint _betValue, uint _blockNumber, address _playerAddress, uint _totalPayouts);
   event GameStatusUpdate(bool _paused);
@@ -1112,33 +1112,33 @@ contract EthFlip is usingOraclize {
 //   event SecondaryPayoutVariableSet(uint _payout);
 //   event PlayerAddressPriorToPayoutIs(address _address);
 //   event CurrentBetIncremented(uint _currentBetNumber);
-  
+
   // Modifiers
   modifier gameIsActive {
     require(!gamePaused);
     _;
   }
-  
+
   modifier gameIsNotActive {
     require(gamePaused);
     _;
   }
-  
+
   modifier senderIsOwner {
     require(msg.sender == owner);
     _;
   }
-  
+
   modifier senderIsOraclize {
     require(msg.sender == oraclize_cbAddress());
     _;
   }
-  
+
   modifier sentEnoughForBet {
     require(msg.value >= minBet);
     _;
   }
-  
+
   modifier didNotSendOverMaxBet {
     require(msg.value <= maxBet);
     _;
@@ -1155,7 +1155,7 @@ contract EthFlip is usingOraclize {
     oraclize_setCustomGasPrice(4010000000);
     owner = msg.sender;
   }
-  
+
   // Fallback
   function() public payable {}
 
@@ -1163,7 +1163,7 @@ contract EthFlip is usingOraclize {
   function placeBet() public payable gameIsActive sentEnoughForBet didNotSendOverMaxBet {
     secureGenerateNumber(msg.sender, msg.value);
   }
-  
+
   // Securely generate number randomly
   function secureGenerateNumber(address _playerAddress, uint _betValue) private {
     oraclize_setCustomGasPrice(calculatePriorityGasPrice(_betValue));
@@ -1176,7 +1176,7 @@ contract EthFlip is usingOraclize {
     queryIdMap[convertedId].playerAddress = _playerAddress;
     // QueryIdBetPlayerAddressAdded(convertedId, queryIdMap[convertedId].playerAddress);
   }
-  
+
   // Check if the player won
   function checkIfWon() private {
     uint houseNumber = houseEdgeBasedNumber();
@@ -1192,7 +1192,7 @@ contract EthFlip is usingOraclize {
     }
     logBet();
   }
-  
+
   // Winner payout
   function sendPayout() private {
     uint payout = amountToPayout;
@@ -1201,12 +1201,12 @@ contract EthFlip is usingOraclize {
     // PlayerAddressPriorToPayoutIs(queryIdMap[currentQueryId].playerAddress);
     queryIdMap[currentQueryId].playerAddress.transfer(payout);
   }
-  
+
   // Helpers
   function houseEdgeBasedNumber() view private returns (uint) {
     return 50 - houseEdge;
   }
-  
+
   function calculatePriorityGasPrice(uint bet) private returns (uint) {
     uint gasPrice = ((((bet*gasPricePctOfBetValue)/100)/oraclizeGas) + 10000000);
     if (gasPrice <= 2000000000) {
@@ -1217,10 +1217,10 @@ contract EthFlip is usingOraclize {
     }
     return gasPrice;
   }
-  
+
   function logBet() private {
     // Disable logging to save gas on initial release
-    
+
     // // Static updates
     currentBetNumber++;
     // CurrentBetIncremented(currentBetNumber);
@@ -1230,82 +1230,82 @@ contract EthFlip is usingOraclize {
     } else {
       totalLosses++;
     }
-    // 
+    //
     // // Player updates
     // playerBetData[queryIdMap[currentQueryId].playerAddress].orderedPastBetValues.push(queryIdMap[currentQueryId].betValue);
     // playerBetData[queryIdMap[currentQueryId].playerAddress].orderedPastBetNumbers.push(currentBetNumber);
     // playerBetData[queryIdMap[currentQueryId].playerAddress].orderedPastBetWins.push(win);
     // playerBetData[queryIdMap[currentQueryId].playerAddress].totalBet += queryIdMap[currentQueryId].betValue;
     // if (win) playerBetData[queryIdMap[currentQueryId].playerAddress].totalWon += queryIdMap[currentQueryId].betValue;
-    
+
     // // Bets updates
     // pastBets[currentBetNumber] = Bet({win:win, betValue:queryIdMap[currentQueryId].betValue, blockNumber:block.number, playerAddress:queryIdMap[currentQueryId].playerAddress});
-  
+
     // Emit complete event
     BetComplete(win, currentBetNumber, queryIdMap[currentQueryId].betValue, block.number, queryIdMap[currentQueryId].playerAddress, totalPayouts);
   }
-  
+
   // Static information getters
   function getLastBetNumber() constant public returns (uint) {
     return currentBetNumber;
   }
-  
+
   function getTotalPayouts() constant public returns (uint) {
     return totalPayouts;
   }
-  
+
   function getTotalWins() constant public returns (uint) {
     return totalWins;
   }
-  
+
   function getTotalLosses() constant public returns (uint) {
     return totalLosses;
   }
-  
+
   // Game information getters
   function getBalance() constant public returns (uint) {
     return this.balance;
   }
-  
+
   function getGamePaused() constant public returns (bool) {
       return gamePaused;
   }
-  
+
   function getMinBet() constant public returns (uint) {
       return minBet;
   }
-  
+
   function getMaxBet() constant public returns (uint) {
       return maxBet;
   }
-  
+
   function getHouseEdge() constant public returns (uint) {
       return houseEdge;
   }
-  
+
   function getOraclizeGas() constant public returns (uint) {
       return oraclizeGas;
   }
-  
+
   function getGasPricePctOfBetValue() constant public returns (uint) {
       return gasPricePctOfBetValue;
   }
-  
+
   function getOwnerAddress() constant public returns (address) {
       return owner;
   }
-  
+
 //   function getPlayerBetData(address _playerAddress) constant public returns (uint[] _orderedPastBetValues, uint[] _orderedPastBetNumbers, bool[] _orderedPastBetWins, uint _totalBet, uint _totalWon) {
 //     Player memory player = playerBetData[_playerAddress];
 //     return (player.orderedPastBetValues, player.orderedPastBetNumbers, player.orderedPastBetWins, player.totalBet, player.totalWon);
 //   }
-//   
+//
 //   function getPastBet(uint _betNumber) constant public returns (bool _win, uint _betValue, uint _blockNumber, address _playerAddress) {
 //     require(currentBetNumber >= _betNumber && _betNumber > 0);
 //     Bet memory bet = pastBets[_betNumber];
 //     return (bet.win, bet.betValue, bet.blockNumber, bet.playerAddress);
 //   }
-  
+
   // Owner only setters
   // Changes made here only apply while the game is PAUSED (with notification on the website), so all participants
   // may audit the contract on unpause prior to placing bets in the proceeding rounds; in addition, all changes will
@@ -1314,47 +1314,47 @@ contract EthFlip is usingOraclize {
     gamePaused = true;
     GameStatusUpdate(true);
   }
-  
+
   function resumeGame() public senderIsOwner gameIsNotActive {
     gamePaused = false;
     GameStatusUpdate(false);
   }
-  
+
   function setMaxBet(uint _newMax) public senderIsOwner gameIsNotActive {
     require(_newMax >= 100000000000000000);
     maxBet = _newMax;
     MaxBetUpdate(_newMax);
   }
-  
+
   function setMinBet(uint _newMin) public senderIsOwner gameIsNotActive {
     require(_newMin >= 1000000000000000);
     minBet = _newMin;
     MinBetUpdate(_newMin);
   }
-  
+
   function setHouseEdge(uint _newEdge) public senderIsOwner gameIsNotActive {
     require(_newEdge <= 25);
     houseEdge = _newEdge;
     HouseEdgeUpdate(_newEdge);
   }
-  
+
   function setOraclizeGas(uint _newGas) public senderIsOwner gameIsNotActive {
     oraclizeGas = _newGas;
   }
-  
+
   function setGasPricePctOfBetValue(uint _newPct) public senderIsOwner gameIsNotActive {
     gasPricePctOfBetValue = _newPct;
   }
-  
+
   function setOwner(address _newOwner) public senderIsOwner gameIsNotActive {
     owner = _newOwner;
     OwnerUpdate(_newOwner);
   }
-  
+
   function selfDestruct() public senderIsOwner gameIsNotActive {
     selfdestruct(owner);
   }
-  
+
   // Oraclize random number function
   // the callback function is called by Oraclize when the result is ready
   // the oraclize_randomDS_proofVerify modifier prevents an invalid proof to execute this function code:
@@ -1375,4 +1375,15 @@ contract EthFlip is usingOraclize {
       queryIdMap[currentQueryId].playerAddress.transfer(refundValue);
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

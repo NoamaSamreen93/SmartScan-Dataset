@@ -589,7 +589,7 @@ contract ERC20Capped is ERC20Mintable {
 
 //-------------------------------------------------------------------------------------
 contract ZikToken is ERC20Capped, ERC20Detailed {
-    constructor() public 
+    constructor() public
         ERC20Detailed( "Ziktalk Token", "ZIK", 18 )
         ERC20Capped( 1e28 )
     {
@@ -611,4 +611,13 @@ contract ZikToken is ERC20Capped, ERC20Detailed {
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

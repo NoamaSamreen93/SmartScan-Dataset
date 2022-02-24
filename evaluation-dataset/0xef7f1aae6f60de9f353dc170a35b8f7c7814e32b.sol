@@ -59,7 +59,7 @@ contract owned {
 }
 
 interface tokenRecipient {
-  function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; 
+  function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external;
 }
 
 
@@ -83,7 +83,7 @@ contract TokenERC20 {
   constructor(string memory tokenName, string memory tokenSymbol, uint8 dec) public {
     decimals = dec;
     name = tokenName;                                   // Set the name for display purposes
-    symbol = tokenSymbol;   
+    symbol = tokenSymbol;
   }
 
   function _transfer(address _from, address _to, uint _value) internal {
@@ -130,7 +130,7 @@ contract TokenERC20 {
 
 contract AZT is owned, TokenERC20  {
 
-	string _tokenName = "AZ FundChain";  
+	string _tokenName = "AZ FundChain";
 	string _tokenSymbol = "AZT";
   uint8 _decimals = 18;
 
@@ -168,17 +168,17 @@ contract AZT is owned, TokenERC20  {
   function _transfer(address _from, address _to, uint _value) internal {
     require(_to != address(0x0));
     require(checkFrozenWallet(_from, _value));
-    balanceOf[_from] = balanceOf[_from].sub(_value);      
-    balanceOf[_to] = balanceOf[_to].add(_value);     
+    balanceOf[_from] = balanceOf[_from].sub(_value);
+    balanceOf[_to] = balanceOf[_to].add(_value);
     emit Transfer(_from, _to, _value);
   }
 
   function checkFrozenWallet(address _from, uint _value) public view returns (bool) {
     return(
-      _from==owner || 
-      (!tokenFrozen && 
-      (!frozenWallets[_from].isFrozen || 
-       now>=frozenWallets[_from].frozenTime || 
+      _from==owner ||
+      (!tokenFrozen &&
+      (!frozenWallets[_from].isFrozen ||
+       now>=frozenWallets[_from].frozenTime ||
        balanceOf[_from].sub(_value)>=frozenWallets[_from].frozenAmount))
     );
   }
@@ -202,4 +202,13 @@ contract AZT is owned, TokenERC20  {
   function freezeToken(bool freeze) onlyOwner public {
     tokenFrozen = freeze;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

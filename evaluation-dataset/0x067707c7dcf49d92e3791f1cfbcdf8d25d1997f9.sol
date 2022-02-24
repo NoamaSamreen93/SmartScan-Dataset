@@ -373,7 +373,7 @@ contract ERC20 is IERC20 {
     }
 }
 
-contract Admin { 
+contract Admin {
 
         address private superAdmin;
         mapping(address => bool) public admin;
@@ -471,4 +471,15 @@ contract Constant is ERC20, Admin {
                 _burn(redeemer, value);
                 emit __redeem(offchain);
         }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

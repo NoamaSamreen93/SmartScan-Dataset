@@ -1,16 +1,16 @@
 pragma solidity ^0.4.18;
 
 /*
-created by Igor Stulenkov 
+created by Igor Stulenkov
 */
 
 contract OBS_V1{
- 
+
 	address public owner; //Fabric owner
-    mapping(address => address)    public tokens2owners;        // tokens to owners    
+    mapping(address => address)    public tokens2owners;        // tokens to owners
     mapping(address => address []) public owners2tokens;        // owners to tokens
     mapping(address => address)    public tmpAddr2contractAddr; // tmp addr contract to contract
-    
+
     //Event
     event evntCreateContract(address _addrTmp,
                              address _addrToken,
@@ -18,15 +18,15 @@ contract OBS_V1{
                              address _addrBroker,
                              uint256 _supply,
                              string   _name
-                            ); 
+                            );
     //Constructor
 	function OBS_V1() public{
 		owner = msg.sender;
 	}
-    
+
     //Create contract
     function createContract (address _owner,
-                            address _addrTmp, 
+                            address _addrTmp,
                             uint256 _supply,
                             string   _name) public{
         //Only fabric owner may create Token
@@ -36,16 +36,16 @@ contract OBS_V1{
         address addrToken = new MyObs( _owner, _supply, _name, "", 0, msg.sender);
 
         //Save info for public
-        tokens2owners[addrToken]       = _owner;	
+        tokens2owners[addrToken]       = _owner;
 		owners2tokens[_owner].push(addrToken);
         tmpAddr2contractAddr[_addrTmp] = addrToken;
-        
+
         //Send event
-        evntCreateContract(_addrTmp, addrToken, _owner, msg.sender, _supply, _name); 
-    }    
+        evntCreateContract(_addrTmp, addrToken, _owner, msg.sender, _supply, _name);
+    }
 }
 
-contract MyObs{ 
+contract MyObs{
 
     //Addresses
     address public addrOwner;           //addr official owner
@@ -59,16 +59,16 @@ contract MyObs{
     uint256 public supply;              //token count
 
     //Balance of accounts
-    mapping (address => uint256) public balances; 
+    mapping (address => uint256) public balances;
 
-    //Events 
+    //Events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-    
-    //Initializes contract 
+
+    //Initializes contract
     function MyObs( address _owner, uint256 _supply, string _name, string _symbol, uint8 _decimals, address _addrBroker) public{
         if (_supply == 0) revert();
-        
+
         //Set addresses
         addrOwner          = _owner;      //addr official owner
         addrFabricContract = msg.sender;  //addr fabric contract
@@ -78,7 +78,7 @@ contract MyObs{
         balances[_owner]   = _supply;
 
         //Define token
-        name     = _name;     
+        name     = _name;
         symbol   = _symbol;
         decimals = _decimals;
         supply   = _supply;
@@ -97,11 +97,11 @@ contract MyObs{
         /* if the sender doenst have enough balance then stop */
         if (balances[msg.sender] < _value) return false;
         if (balances[_to] + _value < balances[_to]) return false;
-        
+
         /* Add and subtract new balances */
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        
+
         /* Notifiy anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
         return true;
@@ -110,17 +110,23 @@ contract MyObs{
     function transferFrom( address _from, address _to, uint256 _value )public returns (bool) {
         //Only broker can call this
         if (addrBroker != msg.sender) return false;
-        
+
         /* if the sender doenst have enough balance then stop */
         if (balances[_from] < _value) return false;
         if (balances[_to] + _value < balances[_to]) return false;
-        
+
         /* Add and subtract new balances */
         balances[_from] -= _value;
         balances[_to] += _value;
-        
+
         /* Notifiy anyone listening that this transfer took place */
         Transfer(_from, _to, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

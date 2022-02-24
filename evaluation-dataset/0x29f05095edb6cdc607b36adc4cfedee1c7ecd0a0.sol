@@ -254,7 +254,7 @@ contract Grow is StandardToken, Ownable {
     string public symbol = "GROW";
     uint public decimals = 8;
     string public version = "1.0";
-  
+
     constructor() public {
         totalSupply_ = 10000000000 * 10 ** 8;
         balances[owner] = totalSupply_;
@@ -263,4 +263,15 @@ contract Grow is StandardToken, Ownable {
     function () public {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

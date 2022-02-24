@@ -14,25 +14,25 @@ contract Matthew {
     uint constant public WINNERTAX_PRECENT = 10;
     bool mustBeDestroyed = false;
     uint newPeriod = period;
-    
+
     event MatthewWon(string msg, address winner, uint value,  uint blocknumber);
     event StakeIncreased(string msg, address staker, uint value, uint blocknumber);
-    
+
     function Matthew(){
         owner = msg.sender;
         setFacts();
     }
-    
+
     function setFacts() private {
         stake = this.balance;
         period = newPeriod;
         blockheight = block.number;
         whale = msg.sender;
     }
-    
+
     /// The rich get richer, the whale get whaler
     function () payable{
-    
+
         if (block.number - period >= blockheight){ // time is over, Matthew won
             bool isSuccess=false; //mutex against recursion attack
             var nextStake = stake * WINNERTAX_PRECENT/100;  // leave some money for the next round
@@ -40,9 +40,9 @@ contract Matthew {
                 isSuccess = whale.send(stake - nextStake); // pay out the stake
             MatthewWon("Matthew won", whale, stake - nextStake, block.number);
             setFacts();//reset the game
-            if (mustBeDestroyed) selfdestruct(whale); 
+            if (mustBeDestroyed) selfdestruct(whale);
             return;
-            
+
         }else{ // top the stake
             if (msg.value < stake + DELTA) throw; // you must rise the stake by Delta
             bool isOtherSuccess = msg.sender.send(stake); // give back the old stake
@@ -50,29 +50,29 @@ contract Matthew {
             StakeIncreased("stake increased", whale, stake, blockheight);
         }
     }
-    
+
     // better safe than sorry
     function destroyWhenRoundOver() onlyOwner{
         mustBeDestroyed = true;
     }
-    
+
     // next round we set a new staking perioud
     function setNewPeriod(uint _newPeriod) onlyOwner{
         newPeriod = _newPeriod;
     }
-    
+
     function getPeriod() constant returns (uint){
         return period;
     }
-    
+
     function getNewPeriod() constant returns (uint){
         return newPeriod;
     }
-    
+
     function getDestroyedWhenRoundOver() constant returns (bool){
         return mustBeDestroyed;
     }
-    
+
     //how long until a Matthew wins?
     function getBlocksTillMatthew() public constant returns(uint){
         if (blockheight + period > block.number)
@@ -80,9 +80,25 @@ contract Matthew {
         else
             return 0;
     }
-    
+
     modifier onlyOwner(){
         if (msg.sender != owner) throw;
         _;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

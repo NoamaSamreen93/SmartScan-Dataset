@@ -129,10 +129,10 @@ contract HuaLiToken is IERC20 , Owned{
 
   uint256 private _totalSupply;
 
-  
+
   mapping(address => uint256) balances;
   uint256[] public releaseTimeLines=[1539748800,1545019200,1550376000,1555473600,1560744000,1566014400,1571284800,1576555200,1581912000,1587096000,1592366400,1597636800,1602907200,1608177600,1613534400,1618632000,1623902400,1629172800,1634443200,1639713600,1645070400,1650168000,1655438400,1660708800];
-    
+
   struct Role {
     address roleAddress;
     uint256 amount;
@@ -140,12 +140,12 @@ contract HuaLiToken is IERC20 , Owned{
     uint256 round;
     uint256 rate;
   }
-   
+
   mapping (address => mapping (uint256 => Role)) public mapRoles;
   mapping (address => address) private lockList;
-  
+
   event Lock(address from, uint256 value, uint256 lockAmount , uint256 balance);
-  
+
   constructor() public {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
@@ -189,7 +189,7 @@ contract HuaLiToken is IERC20 , Owned{
   * @param value The amount to be transferred.
   */
   function transfer(address to, uint256 value) public returns (bool) {
-    if(_canTransfer(msg.sender,value)){ 
+    if(_canTransfer(msg.sender,value)){
       _transfer(msg.sender, to, value);
       return true;
     } else {
@@ -230,7 +230,7 @@ contract HuaLiToken is IERC20 , Owned{
     returns (bool)
   {
     require(value <= _allowed[from][msg.sender]);
-    
+
     if (_canTransfer(from, value)) {
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
@@ -298,11 +298,11 @@ contract HuaLiToken is IERC20 , Owned{
   function _transfer(address from, address to, uint256 value) internal {
     require(value <= _balances[from]);
     require(to != address(0));
-    
+
     _balances[from] = _balances[from].sub(value);
     _balances[to] = _balances[to].add(value);
     emit Transfer(from, to, value);
-    
+
   }
 
   /**
@@ -318,11 +318,11 @@ contract HuaLiToken is IERC20 , Owned{
     _balances[account] = _balances[account].add(value);
     emit Transfer(address(0), account, value);
   }
-  
+
   function setTimeLine(uint256[] timeLine) onlyOwner public {
     releaseTimeLines = timeLine;
   }
-  
+
   /**
    * @dev getRoleReleaseSeting
    * @param roleType 1:Seed 2:Angel 3:PE 4:AirDrop
@@ -340,24 +340,24 @@ contract HuaLiToken is IERC20 , Owned{
       return (0,0,0);
     }
   }
-  
+
   function addLockUser(address roleAddress,uint256 amount,uint256 roleType) onlyOwner public {
     (uint256 firstRate, uint256 round, uint256 rate) = getRoleReleaseSeting(roleType);
     mapRoles[roleAddress][roleType] = Role(roleAddress,amount,firstRate,round,rate);
     lockList[roleAddress] = roleAddress;
   }
-  
+
   function addLockUsers(address[] roleAddress,uint256[] amounts,uint256 roleType) onlyOwner public {
     for(uint i= 0;i<roleAddress.length;i++){
       addLockUser(roleAddress[i],amounts[i],roleType);
     }
   }
-  
+
   function removeLockUser(address roleAddress,uint256 role) onlyOwner public {
     mapRoles[roleAddress][role] = Role(0x0,0,0,0,0);
     lockList[roleAddress] = 0x0;
   }
-  
+
   function getRound() constant public returns (uint) {
     for(uint i= 0;i<releaseTimeLines.length;i++){
       if(now<releaseTimeLines[i]){
@@ -369,7 +369,7 @@ contract HuaLiToken is IERC20 , Owned{
       }
     }
   }
-   
+
   function isUserInLockList(address from) constant public returns (bool) {
     if(lockList[from]==0x0){
       return false;
@@ -377,7 +377,7 @@ contract HuaLiToken is IERC20 , Owned{
       return true;
     }
   }
-  
+
   function _canTransfer(address from,uint256 _amount) private returns (bool) {
     if(!isUserInLockList(from)){
       return true;
@@ -394,7 +394,7 @@ contract HuaLiToken is IERC20 , Owned{
     }
     return true;
   }
-  
+
   function getLockAmount(address from) constant public returns (uint256) {
     uint256 _lock = 0;
     for(uint i= 1;i<=4;i++){
@@ -404,7 +404,7 @@ contract HuaLiToken is IERC20 , Owned{
     }
     return _lock;
   }
-  
+
   function getLockAmountByRoleType(address from,uint roleType) constant public returns (uint256) {
     uint256 _rount = getRound();
     uint256 round = 0;
@@ -421,5 +421,16 @@ contract HuaLiToken is IERC20 , Owned{
     }
     return mapRoles[from][roleType].amount.sub(firstAmount.add(rountAmount));
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

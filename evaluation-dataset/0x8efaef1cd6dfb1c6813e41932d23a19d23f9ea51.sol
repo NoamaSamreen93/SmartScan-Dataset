@@ -243,7 +243,7 @@ contract ERC20 {
 contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
 
     using SafeMath for uint256;
-    
+
     string constant VERSION = "0.5";
 
     /**
@@ -252,7 +252,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
      *  15‰ = 1.5%
      */
     uint public constant FEE_PERMILLE = 15;
-    
+
     /**
      *  Address of Monetha Vault for fee collection
      */
@@ -272,10 +272,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     constructor(address _monethaVault, address _admin) public {
         require(_monethaVault != 0x0);
         monethaVault = _monethaVault;
-        
+
         setAdmin(_admin);
     }
-    
+
     /**
      *  acceptPayment accept payment from PaymentAcceptor, forwards it to merchant's wallet
      *      and collects Monetha fee.
@@ -285,7 +285,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     function acceptPayment(address _merchantWallet, uint _monethaFee) external payable onlyMonetha whenNotPaused {
         require(_merchantWallet != 0x0);
         require(_monethaFee >= 0 && _monethaFee <= FEE_PERMILLE.mul(msg.value).div(1000)); // Monetha fee cannot be greater than 1.5% of payment
-        
+
         uint merchantIncome = msg.value.sub(_monethaFee);
 
         _merchantWallet.transfer(merchantIncome);
@@ -316,10 +316,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
         require(_monethaFee >= 0 && _monethaFee <= FEE_PERMILLE.mul(_value).div(1000));
 
         uint merchantIncome = _value.sub(_monethaFee);
-        
+
         ERC20(_tokenAddress).transfer(_merchantWallet, merchantIncome);
         ERC20(_tokenAddress).transfer(monethaVault, _monethaFee);
-        
+
         emit PaymentProcessedToken(_tokenAddress, _merchantWallet, merchantIncome, _monethaFee);
     }
 
@@ -695,7 +695,7 @@ contract PrivatePaymentProcessor is Pausable, Destructible, Contactable, Restric
         fundAddress = merchantWallet.merchantFundAddress();
 
         ERC20(_tokenAddress).transferFrom(msg.sender, address(this), _orderValue);
-        
+
         ERC20(_tokenAddress).transfer(address(monethaGateway), _orderValue);
 
         if (fundAddress != address(0)) {
@@ -703,7 +703,7 @@ contract PrivatePaymentProcessor is Pausable, Destructible, Contactable, Restric
         } else {
             monethaGateway.acceptTokenPayment(merchantWallet, _monethaFee, _tokenAddress, _orderValue);
         }
-        
+
         // log payment event
         emit OrderPaidInToken(_orderId, _originAddress, _tokenAddress, _orderValue, _monethaFee);
     }
@@ -764,7 +764,7 @@ contract PrivatePaymentProcessor is Pausable, Destructible, Contactable, Restric
         require(WithdrawState.Null == withdrawals[_orderId].state);
 
         ERC20(_tokenAddress).transferFrom(msg.sender, address(this), _orderValue);
-        
+
         // create withdraw
         withdrawals[_orderId] = Withdraw({
             state: WithdrawState.Pending,
@@ -845,4 +845,15 @@ contract PrivatePaymentProcessor is Pausable, Destructible, Contactable, Restric
 
         merchantWallet = _newWallet;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

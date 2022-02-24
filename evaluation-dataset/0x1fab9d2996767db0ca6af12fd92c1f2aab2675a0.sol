@@ -105,7 +105,7 @@ contract ERC223Receiving {
  *
  * Standard multisig wallet
  * Holds the bankroll ETH, as well as the bankroll 33% ZTH tokens.
-*/ 
+*/
 contract ZethrMultiSigWallet is ERC223Receiving {
   using SafeMath for uint;
 
@@ -174,7 +174,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
   }
 
   modifier ownerDoesNotExist(address owner) {
-    if (isOwner[owner]) 
+    if (isOwner[owner])
       revert();
       _;
   }
@@ -268,7 +268,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
   {
 
   }
-    
+
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
   function addOwner(address owner)
@@ -539,7 +539,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
 // Zethr token bankroll function prototypes
 contract ZethrTokenBankrollInterface is ERC223Receiving {
   uint public jackpotBalance;
-  
+
   function getMaxProfit(address) public view returns (uint);
   function gameTokenResolution(uint _toWinnerAmount, address _winnerAddress, uint _toJackpotAmount, address _jackpotAddress, uint _originalBetSize) external;
   function payJackpotToWinner(address _winnerAddress, uint payoutDivisor) public;
@@ -550,8 +550,8 @@ contract ZethrTokenBankrollInterface is ERC223Receiving {
 contract ZethrBankrollControllerInterface is ERC223Receiving {
   address public jackpotAddress;
 
-  ZethrTokenBankrollInterface[7] public tokenBankrolls; 
-  
+  ZethrTokenBankrollInterface[7] public tokenBankrolls;
+
   ZethrMultiSigWallet public multiSigWallet;
 
   mapping(address => bool) public validGameAddresses;
@@ -2333,7 +2333,7 @@ contract ZethrBankroll {
 /*
 *
 * Jackpot holding contract.
-*  
+*
 * This accepts token payouts from a game for every player loss,
 * and on a win, pays out *half* of the jackpot to the winner.
 *
@@ -2862,7 +2862,7 @@ contract ZethrSlots is ZethrGame {
 
     return (winAmount, lossAmount, jackpotAmount, jackpotWins, output);
   }
-    
+
     event SlotsResult(
         uint    _blockNumber,
         address _target,
@@ -2872,7 +2872,7 @@ contract ZethrSlots is ZethrGame {
         uint    _lossAmount,
         uint[]  _output
     );
-    
+
   /** @dev Retrieve the results of the spin, for web3 calls.
     * @param _blockNumber The block number of the spin
     * @param _numSpins The number of spins of this bet
@@ -3176,4 +3176,15 @@ contract ZethrSlots is ZethrGame {
     uint8 spins = uint8(_data[0]);
     return (_tokenCount.div(spins).mul(50) <= getMaxProfit()) && (_tokenCount.div(spins) >= minBet);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

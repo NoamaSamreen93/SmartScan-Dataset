@@ -654,7 +654,7 @@ contract CaelumAcceptERC20 is Ownable  {
     event Deposit(address token, address user, uint amount, uint balance);
     event Withdraw(address token, address user, uint amount, uint balance);
 
-    
+
 
 
     /**
@@ -1129,7 +1129,7 @@ contract CaelumMasternode is CaelumVotings, CaelumAbstractMasternode {
      */
     address public miningContract;
     address public tokenContract;
-    
+
     bool minerSet = false;
     bool tokenSet = false;
 
@@ -1207,11 +1207,11 @@ contract CaelumMasternode is CaelumVotings, CaelumAbstractMasternode {
     function getMiningReward() public view returns(uint) {
         return CaelumMiner(miningContract).getMiningReward();
     }
-    
+
     address cloneDataFrom = 0x7600bF5112945F9F006c216d5d6db0df2806eDc6;
-    
+
     function getDataFromContract () onlyOwner public returns(uint) {
-        
+
         CaelumMasternode prev = CaelumMasternode(cloneDataFrom);
         (uint epoch,
         uint candidate,
@@ -1221,7 +1221,7 @@ contract CaelumMasternode is CaelumVotings, CaelumAbstractMasternode {
         uint powreward,
         uint masternodereward,
         uint usercounter) = prev.contractProgress();
-        
+
         masternodeEpoch = epoch;
         masternodeRound = round;
         miningEpoch = miningepoch;
@@ -1236,7 +1236,7 @@ contract CaelumToken is Ownable, StandardToken, CaelumVotings, CaelumAcceptERC20
     using SafeMath for uint;
 
     ERC20 previousContract;
-    
+
     bool contractSet = false;
     bool public swapClosed = false;
     uint public swapCounter;
@@ -1245,7 +1245,7 @@ contract CaelumToken is Ownable, StandardToken, CaelumVotings, CaelumAcceptERC20
     string public name = "Caelum Token";
     uint8 public decimals = 8;
     uint256 public totalSupply = 2100000000000000;
-    
+
     address public miningContract = 0x0;
 
     /**
@@ -1280,7 +1280,7 @@ contract CaelumToken is Ownable, StandardToken, CaelumVotings, CaelumAcceptERC20
     function setMiningContractFromVote (address _t) internal {
         miningContract = _t;
     }
-    
+
     function changeSwapState (bool _state) onlyOwner public {
         require(swapCounter <= 9);
         swapClosed = _state;
@@ -1297,12 +1297,12 @@ contract CaelumToken is Ownable, StandardToken, CaelumVotings, CaelumAcceptERC20
         require(!swapClosed);
         uint amountToUpgrade = previousContract.balanceOf(msg.sender);
         require(amountToUpgrade <= previousContract.allowance(msg.sender, this));
-        
+
         if(previousContract.transferFrom(msg.sender, this, amountToUpgrade)){
             balances[msg.sender] = balances[msg.sender].add(amountToUpgrade); // 2% Premine as determined by the community meeting.
             emit Transfer(this, msg.sender, amountToUpgrade);
         }
-        
+
         require(previousContract.balanceOf(msg.sender) == 0);
     }
 }
@@ -1556,7 +1556,7 @@ contract CaelumMiner is CaelumVotings, CaelumAbstractMiner {
     }
 
     function setMiningContract (address _t) onlyOwner public {
-        return; 
+        return;
     }
 
     function setMasternodeContractFromVote(address _t) internal {
@@ -1572,7 +1572,7 @@ contract CaelumMiner is CaelumVotings, CaelumAbstractMiner {
     function setMiningContractFromVote (address _t) internal {
         return;
     }
-    
+
     function lockMiningContract () onlyOwner public {
         ACTIVE_CONTRACT_STATE = false;
     }
@@ -1593,7 +1593,7 @@ contract CaelumMiner is CaelumVotings, CaelumAbstractMiner {
 
         ACTIVE_CONTRACT_STATE = true;
     }
-    
+
 
     /**
      * @dev override of the original function since we want to call the masternode contract remotely.
@@ -1652,7 +1652,7 @@ contract CaelumMiner is CaelumVotings, CaelumAbstractMiner {
 
         return _mnReward;
     }
-    
+
     function getMiningReward() public view returns(uint) {
         return MasternodeContract.rewardsProofOfWork();
     }
@@ -1663,7 +1663,7 @@ contract CaelumMiner is CaelumVotings, CaelumAbstractMiner {
  * Burn some gas and create all contracts in a single call :-)
  */
 
-contract caelumFactory { 
+contract caelumFactory {
 
     CaelumMiner public MINER;
     CaelumMasternode public MASTER;
@@ -1688,4 +1688,15 @@ contract caelumFactory {
         MINER.transferOwnership(msg.sender);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

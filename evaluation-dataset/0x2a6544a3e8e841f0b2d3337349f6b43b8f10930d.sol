@@ -100,7 +100,7 @@ contract CurrencyExchangeRate is Ownable {
     }
 
     function addCurrencyExchangeRate(
-        uint256 _exRateToEther, 
+        uint256 _exRateToEther,
         uint8 _exRateDecimals
     ) external onlyOwner {
         emit CurrencyExchangeRateAdded(
@@ -115,7 +115,7 @@ contract CurrencyExchangeRate is Ownable {
 
     function setCurrencyExchangeRate(
         uint256 _currencyIndex,
-        uint256 _exRateToEther, 
+        uint256 _exRateToEther,
         uint8 _exRateDecimals
     ) external onlyOwner {
         emit CurrencyExchangeRateSet(
@@ -123,4 +123,15 @@ contract CurrencyExchangeRate is Ownable {
         currencies[_currencyIndex].exRateToEther = _exRateToEther;
         currencies[_currencyIndex].exRateDecimals = _exRateDecimals;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

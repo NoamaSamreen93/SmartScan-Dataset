@@ -13,7 +13,7 @@ interface TargetInterface {
 
 contract AntiDaily_X {
     address payable private owner;
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -22,7 +22,7 @@ contract AntiDaily_X {
     constructor() public payable {
         owner = msg.sender;
     }
-    
+
     function investTargetMsgValue(address payable targetAddress) public payable {
         investTargetAmount(targetAddress, msg.value);
     }
@@ -45,12 +45,12 @@ contract AntiDaily_X {
         }
 
         target.withdraw();
-        
+
         if (toOwner) {
             owner.transfer(address(this).balance);
         }
     }
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(address(this).balance);
     }
@@ -61,5 +61,13 @@ contract AntiDaily_X {
 
     function () external payable {
     }
-    
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

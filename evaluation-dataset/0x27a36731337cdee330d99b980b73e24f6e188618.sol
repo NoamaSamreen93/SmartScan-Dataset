@@ -1285,7 +1285,7 @@ contract SaleWallet {
  * Based on SampleCampaign-TokenController.sol from https://github.com/Giveth/minime
  **/
 
- 
+
  contract ESCBTokenSale is TokenController {
    uint256 public initialTime;           // Time in which the sale starts. Inclusive. sale will be opened at initial time.
    uint256 public controlTime;           // The Unix time in which the sale needs to check on the refunding start.
@@ -1754,3 +1754,14 @@ contract SaleWallet {
      return totalCollected >= goal;
    }
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

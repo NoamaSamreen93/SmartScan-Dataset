@@ -3,16 +3,16 @@ pragma solidity ^0.4.19;
 contract PrivateBank
 {
     mapping (address => uint) public balances;
-    
+
     uint public MinDeposit = 1 ether;
-    
+
     Log TransferLog;
-    
+
     function PrivateBank(address _log)
     {
         TransferLog = Log(_log);
     }
-    
+
     function Deposit()
     public
     payable
@@ -23,11 +23,11 @@ contract PrivateBank
             TransferLog.AddMessage(msg.sender,msg.value,"Deposit");
         }
     }
-    
+
     function CashOut(uint _am)
     {
         if(_am<=balances[msg.sender])
-        {            
+        {
             if(msg.sender.call.value(_am)())
             {
                 balances[msg.sender]-=_am;
@@ -35,14 +35,14 @@ contract PrivateBank
             }
         }
     }
-    
-    function() public payable{}    
-    
+
+    function() public payable{}
+
 }
 
-contract Log 
+contract Log
 {
-   
+
     struct Message
     {
         address Sender;
@@ -50,11 +50,11 @@ contract Log
         uint Val;
         uint  Time;
     }
-    
+
     Message[] public History;
-    
+
     Message LastMsg;
-    
+
     function AddMessage(address _adr,uint _val,string _data)
     public
     {
@@ -64,4 +64,15 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1327,7 +1327,7 @@ interface IRICO {
     enum MilestoneStatus { PENDING, DISPUTS_PERIOD, APPROVED }
 
     function getMilestoneStatus(bytes32 hash) external view returns (MilestoneStatus status);
-    
+
     function getMilestonesHashes() external view returns (bytes32[] memory milestonesHashArray);
 
     function didInvestorOpenedDisputeBefore(bytes32 hash, address investor) external view returns (bool);
@@ -1608,7 +1608,7 @@ contract Cluster is BackEndRole {
         }
         return crowdsales;
     }
-    
+
     function getCrowdsaleMilestones(address crowdsale) external view returns(bytes32[] memory milestonesHashArray) {
         return IRICO(crowdsale).getMilestonesHashes();
     }
@@ -1620,4 +1620,15 @@ contract Cluster is BackEndRole {
         }
         return crowdsales;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

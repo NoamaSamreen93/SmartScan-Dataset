@@ -298,7 +298,7 @@ contract PandaBase is PandaAccessControl {
         uint32(5 minutes),
         uint32(30 minutes),
         uint32(2 hours),
-        uint32(4 hours),    
+        uint32(4 hours),
         uint32(8 hours),
         uint32(24 hours),
         uint32(48 hours),
@@ -359,7 +359,7 @@ contract PandaBase is PandaAccessControl {
     mapping (uint256 => uint256) public wizzPandaQuota;
     mapping (uint256 => uint256) public wizzPandaCount;
 
-    
+
     /// wizz panda control
     function getWizzPandaQuotaOf(uint256 _tp) view external returns(uint256) {
         return wizzPandaQuota[_tp];
@@ -428,7 +428,7 @@ contract PandaBase is PandaAccessControl {
 
         // New panda starts with the same cooldown as parent gen/2
         uint16 cooldownIndex = 0;
-        // when contract creation, geneScience ref is null 
+        // when contract creation, geneScience ref is null
         if (pandas.length>0){
             uint16 pureDegree = uint16(geneScience.getPureFromGene(_genes));
             if (pureDegree==0) {
@@ -493,7 +493,7 @@ contract PandaBase is PandaAccessControl {
         // This will assign ownership, and also emit the Transfer event as
         // per ERC721 draft
         _transfer(0, _owner, newKittenId);
-        
+
         return newKittenId;
     }
 
@@ -1233,7 +1233,7 @@ contract ClockAuctionBase {
             uint256(_auction.endingPrice),
             uint256(_auction.duration)
         );
-    } 
+    }
 
     /// @dev Cancels an auction unconditionally.
     function _cancelAuction(uint256 _tokenId, address _seller) internal {
@@ -1761,7 +1761,7 @@ contract SaleClockAuction is ClockAuction {
             1
         );
         _addAuction(_tokenId, auction);
-    }    
+    }
 
     /// @dev Updates lastSalePrice if seller is the nft contract
     /// Otherwise, works the same as default bid method.
@@ -1845,7 +1845,7 @@ contract SaleClockAuctionERC20 is ClockAuction {
     mapping (address => uint256) public erc20ContractsSwitcher;
 
     mapping (address => uint256) public balances;
-    
+
     // Delegate constructor
     function SaleClockAuctionERC20(address _nftAddr, uint256 _cut) public
         ClockAuction(_nftAddr, _cut) {}
@@ -1882,7 +1882,7 @@ contract SaleClockAuctionERC20 is ClockAuction {
         require(msg.sender == address(nonFungibleContract));
 
         require (erc20ContractsSwitcher[_erc20Address] > 0);
-        
+
         _escrow(_seller, _tokenId);
         Auction memory auction = Auction(
             _seller,
@@ -1914,7 +1914,7 @@ contract SaleClockAuctionERC20 is ClockAuction {
             uint256(_auction.duration),
             _erc20address
         );
-    }   
+    }
 
     function bid(uint256 _tokenId)
         external
@@ -1952,7 +1952,7 @@ contract SaleClockAuctionERC20 is ClockAuction {
         require(msg.sender == address(nonFungibleContract));
         ERC20(_erc20Address).transfer(_to, balances[_erc20Address]);
     }
-    
+
     /// @dev Computes the price and transfers winnings.
     /// Does NOT transfer ownership of token.
     function _bidERC20(address _erc20Address,address _buyerAddress, uint256 _tokenId, uint256 _bidAmount)
@@ -1970,7 +1970,7 @@ contract SaleClockAuctionERC20 is ClockAuction {
 
 
         require (_erc20Address != address(0) && _erc20Address == tokenIdToErc20Address[_tokenId]);
-        
+
 
         // Check that the bid is greater than or equal to the current price
         uint256 price = _currentPrice(auction);
@@ -2189,7 +2189,7 @@ contract PandaAuction is PandaBreeding {
     function withdrawERC20Balance(address _erc20Address, address _to) external onlyCLevel {
         require(saleAuctionERC20 != address(0));
         saleAuctionERC20.withdrawERC20Balance(_erc20Address,_to);
-    }    
+    }
 }
 
 
@@ -2389,7 +2389,7 @@ contract PandaCore is PandaMinting {
         newContractAddress = _v2Address;
         ContractUpgrade(_v2Address);
     }
-    
+
 
     /// @notice No tipping!
     /// @dev Reject all Ether from being sent here, unless it's from one of the
@@ -2458,4 +2458,20 @@ contract PandaCore is PandaMinting {
             cfoAddress.send(balance - subtractFees);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

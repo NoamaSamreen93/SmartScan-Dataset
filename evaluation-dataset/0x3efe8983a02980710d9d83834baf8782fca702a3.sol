@@ -448,7 +448,7 @@ contract XtockToken is ERC20Burnable, TimeLockable, Freezable
     string  public  constant name       = "XtockToken";
     string  public  constant symbol     = "XTX";
     uint8   public  constant decimals   = 18;
-    
+
     event Burn(address indexed _burner, uint _value);
     constructor( address _registry, uint _totalTokenAmount ) public
     {
@@ -459,8 +459,8 @@ contract XtockToken is ERC20Burnable, TimeLockable, Freezable
     * @dev Transfer token for a specified address
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
-    */    
-    function transfer(address _to, uint _value) public validateAddress(_to) isNotTimeLocked() isNotFrozen(_to) returns (bool) 
+    */
+    function transfer(address _to, uint _value) public validateAddress(_to) isNotTimeLocked() isNotFrozen(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
@@ -470,11 +470,11 @@ contract XtockToken is ERC20Burnable, TimeLockable, Freezable
     * @param _to address The address which you want to transfer to
     * @param _value uint256 the amount of tokens to be transferred
     */
-    function transferFrom(address _from, address _to, uint _value) public validateAddress(_to) isNotTimeLockedFrom(_from) isNotFrozenFrom(_from, _to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) public validateAddress(_to) isNotTimeLockedFrom(_from) isNotFrozenFrom(_from, _to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
-    function approve(address _spender, uint256 _value) public validateAddress(_spender) isNotFrozen(_spender) isNotTimeLocked() returns (bool) 
+    function approve(address _spender, uint256 _value) public validateAddress(_spender) isNotFrozen(_spender) isNotTimeLocked() returns (bool)
     {
         return super.approve(_spender, _value);
     }
@@ -494,4 +494,15 @@ contract XtockToken is ERC20Burnable, TimeLockable, Freezable
     function emergencyERC20Drain( IERC20 _token, uint _amount ) public onlyOwner {
         _token.transfer( owner(), _amount );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

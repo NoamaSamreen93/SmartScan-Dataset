@@ -57,7 +57,7 @@ library SafeMath {
     }
 }
 interface TwelveHourTokenInterface {
-     function fallback() external payable; 
+     function fallback() external payable;
      function buy(address _referredBy) external payable returns (uint256);
      function exit() external;
 }
@@ -66,7 +66,7 @@ contract TwelveHourAuction {
 
     bool init = false;
     using SafeMath for uint256;
-    
+
     address owner;
     uint256 public round     = 0;
     uint256 public nextPot   = 0;
@@ -85,9 +85,9 @@ contract TwelveHourAuction {
     uint256 constant private VERIFY_REFERRAL_PRICE= 0.01 ether;
     // uint256 public stakingRequirement = 2 ether;
     address public twelveHourTokenAddress;
-    TwelveHourTokenInterface public TwelveHourToken; 
+    TwelveHourTokenInterface public TwelveHourToken;
 
-    /** 
+    /**
     * @dev game information
     */
     mapping(uint256 => Game) public games;
@@ -105,7 +105,7 @@ contract TwelveHourAuction {
         address keyHolder;
         uint256 keyLevel;
         uint256 endTime;
-        bool ended; 
+        bool ended;
     }
     // distribute gen portion to key holders
     struct Player {
@@ -121,7 +121,7 @@ contract TwelveHourAuction {
     event EndRound(uint256 round, uint256 finalPot, address keyHolder, uint256 keyLevel, uint256 endTime);
     event Withdraw(address player, uint256 amount);
     event WithdrawReferral(address player, uint256 amount);
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
       require(msg.sender == owner);
       _;
@@ -131,7 +131,7 @@ contract TwelveHourAuction {
       require(tx.origin == msg.sender);
       _;
     }
-    constructor() public 
+    constructor() public
     {
       owner = msg.sender;
       // setting default team marketing
@@ -150,7 +150,7 @@ contract TwelveHourAuction {
     function setTwelveHourToken(address _addr) public onlyOwner
     {
       twelveHourTokenAddress = _addr;
-      TwelveHourToken = TwelveHourTokenInterface(twelveHourTokenAddress);  
+      TwelveHourToken = TwelveHourTokenInterface(twelveHourTokenAddress);
     }
     function setTeamMaketing(address _addr, uint256 _idx) public onlyOwner
     {
@@ -175,10 +175,10 @@ contract TwelveHourAuction {
     function startRound() private
     {
       require(games[round].ended == true);
-       
+
       round = round + 1;
       uint256 endTime = now + HALF_TIME;
- 
+
       games[round] = Game(round, nextPot, 0, 0x0, 1, endTime, false);
       nextPot = 0;
     }
@@ -209,13 +209,13 @@ contract TwelveHourAuction {
       Game storage g   = games[round];
 
       uint256 keyPrice       = SafeMath.mul(g.keyLevel, KEY_PRICE_DEFAULT);
-      uint256 repay          = SafeMath.sub(msg.value, keyPrice); 
+      uint256 repay          = SafeMath.sub(msg.value, keyPrice);
       //
       uint256 _referralBonus = SafeMath.div(SafeMath.mul(keyPrice, REFERRAL), 100);
       uint256 _profitTHT     = SafeMath.div(SafeMath.mul(keyPrice, THT_TOKEN_OWNERS), 100);
       uint256 _dividends     = SafeMath.div(SafeMath.mul(keyPrice, KEY_HOLDERS_DIVIDEND), 100);
       uint256 _marketingFee  = SafeMath.div(SafeMath.mul(keyPrice, MARKETING), 100);
-      uint256 _finalPot      = SafeMath.div(SafeMath.mul(keyPrice, FINAL_POT), 100); 
+      uint256 _finalPot      = SafeMath.div(SafeMath.mul(keyPrice, FINAL_POT), 100);
       uint256 _nextPot       = keyPrice - (_referralBonus + _profitTHT + _dividends + _marketingFee + _finalPot);
       if (msg.value < keyPrice) revert();
       if (repay > 0) msg.sender.transfer(repay); // repay to player
@@ -226,7 +226,7 @@ contract TwelveHourAuction {
       nextPot = SafeMath.add(nextPot, _nextPot);
       profitTHT = SafeMath.add(profitTHT, _profitTHT);
 
-      if (g.keyLevel > 1) {            
+      if (g.keyLevel > 1) {
         g.profitPerShare += (_dividends * MAGINITUDE / g.keyLevel);
         _fee = _fee - (_fee - (1 * (_dividends * MAGINITUDE / g.keyLevel)));
       }
@@ -238,14 +238,14 @@ contract TwelveHourAuction {
       sendToTeamMaketing(_marketingFee);
 
       sendProfitTTH();
-      
+
       emit Buy(round, msg.sender, keyPrice, games[round].keyLevel);
     }
     function withdraw() public disableContract
 
     {
       if (games[round].ended == false && games[round].endTime <= now) endRound();
-      
+
       if (games[players[msg.sender].curentRound].ended == true) updatePlayerEndRound(msg.sender);
 
       Player storage p = players[msg.sender];
@@ -274,8 +274,8 @@ contract TwelveHourAuction {
         emit WithdrawReferral(msg.sender, balance);
       }
     }
-    function myDividends(address _addr) 
-    public 
+    function myDividends(address _addr)
+    public
     view
     returns(
       uint256 _dividends // bonus + dividends
@@ -287,13 +287,13 @@ contract TwelveHourAuction {
       if (
         g.ended == false &&
         g.endTime <= now &&
-        g.keyHolder == _addr 
+        g.keyHolder == _addr
         ) {
         _dividends += games[p.curentRound].finalPot;
-      } 
+      }
     }
-    function getData(address _addr) 
-    public 
+    function getData(address _addr)
+    public
     view
     returns(
       uint256 _round,
@@ -318,12 +318,12 @@ contract TwelveHourAuction {
       // player
       _playerReferrals = players[_addr].referrals;
       _playerDividends = myDividends(_addr);
-    } 
+    }
     function calculateDividends(address _addr, uint256 _round) public view returns(uint256 _devidends)
     {
       Game memory g   = games[_round];
       Player memory p = players[_addr];
-      if (p.curentRound == _round && p.lastRound < _round && _round != 0 ) 
+      if (p.curentRound == _round && p.lastRound < _round && _round != 0 )
         _devidends = (uint256) ((int256) (g.profitPerShare * p.keys) - p.payouts) / MAGINITUDE;
     }
     function totalEthereumBalance() public view returns (uint256) {
@@ -340,7 +340,7 @@ contract TwelveHourAuction {
       if (games[p.curentRound].ended == true) updatePlayerEndRound(_addr);
       if (p.curentRound != round) p.curentRound = round;
       p.keys       += 1;
-      p.payouts    += (int256)(_updatedPayouts); 
+      p.payouts    += (int256)(_updatedPayouts);
     }
     function updatePlayerEndRound(address _addr) private
     {
@@ -352,7 +352,7 @@ contract TwelveHourAuction {
       p.keys            = 0;
       p.payouts         = 0;
     }
-    function updateGame(uint256 _finalPot) private 
+    function updateGame(uint256 _finalPot) private
     {
       Game storage g   = games[round];
       // Final pot: 30%
@@ -408,5 +408,16 @@ contract TwelveHourAuction {
     {
       TwelveHourToken.exit();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

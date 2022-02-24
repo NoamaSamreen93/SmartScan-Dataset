@@ -7,7 +7,7 @@ pragma solidity ^0.4.19;
  * @author Dmitriy Khizhinskiy
  * @author "MIT"
  *
- */ 
+ */
 
 /**
  * @title ERC20 Basic smart contract
@@ -74,7 +74,7 @@ contract Ownable {
     function confirmOwnership() public {
         require(candidate == msg.sender);
         owner = candidate;
-        OwnershipTransferred(owner, candidate);        
+        OwnershipTransferred(owner, candidate);
     }
 }
 
@@ -89,7 +89,7 @@ contract MultiOwners {
 
     event AccessGrant(address indexed owner);
     event AccessRevoke(address indexed owner);
-    
+
     mapping(address => bool) owners;
     address public publisher;
 
@@ -100,9 +100,9 @@ contract MultiOwners {
     }
 
 
-    modifier onlyOwner() { 
+    modifier onlyOwner() {
         require(owners[msg.sender] == true);
-        _; 
+        _;
     }
 
 
@@ -290,8 +290,8 @@ contract ERC20 is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
     mapping (address => mapping (address => uint256)) internal allowed;
-  
-    /** 
+
+    /**
     * @dev Transfer tokens from one address to another
     * @param _from address The address which you want to send tokens from
     * @param _to address The address which you want to transfer to
@@ -447,7 +447,7 @@ contract McFlyToken is MintableToken {
     /// @dev check for allowence of transfer
     modifier canTransfer() {
         require(mintingFinished || whitelist[msg.sender]);
-        _;        
+        _;
     }
 
     /// @dev add address to whitelist
@@ -516,7 +516,7 @@ contract Haltable is MultiOwners {
 
 
 /**
- * @title McFly crowdsale smart contract 
+ * @title McFly crowdsale smart contract
  * @author Copyright (c) 2018 McFly.aero
  * @author Dmitriy Khizhinskiy
  * @author "MIT"
@@ -527,7 +527,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
 
     /// @dev Total ETH received during WAVES, TLP1.2 & window[1-5]
     uint256 public counter_in; // tlp2
-    
+
     /// @dev minimum ETH to partisipate in window 1-5
     uint256 public minETHin = 1e18; // 1 ETH
 
@@ -546,7 +546,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     /// @dev Cap maximum possible tokens for minting
     uint256 public constant hardCapInTokens = 1800e24; // 1,800,000,000 MFL
 
-    /// @dev maximum possible tokens for sell 
+    /// @dev maximum possible tokens for sell
     uint256 public constant mintCapInTokens = 1260e24; // 1,260,000,000 MFL
 
     /// @dev tokens crowd within TLP2
@@ -615,7 +615,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
         uint32 totalTransCnt;
         uint32 refundIndex;
         uint256 tokenPerWindow;
-    } 
+    }
     mapping (uint8 => Window) public ww;
 
 
@@ -639,7 +639,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     /// @dev check for Non zero value
     modifier validPurchase() {
         require(msg.value != 0);
-        _;        
+        _;
     }
 
 
@@ -677,8 +677,8 @@ contract McFlyCrowd is MultiOwners, Haltable {
         address _airdropWallet,
         address _airdropGW,
         address _preMcFlyWallet
-    ) public 
-    {   
+    ) public
+    {
         require(_startTimeTLP2 >= block.timestamp);
         require(_preMcFlyTotalSupply > 0);
         require(_wallet != 0x0);
@@ -789,7 +789,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     }
 
 
-    /** 
+    /**
      * @dev change agent for minting
      * @param agent - new agent address
      */
@@ -799,7 +799,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     }
 
 
-    /** 
+    /**
      * @dev change wallet for team vesting (this make possible to set smart-contract address later)
      * @param _newTeamWallet - new wallet address
      */
@@ -809,7 +809,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     }
 
 
-    /** 
+    /**
      * @dev change wallet for advisory vesting (this make possible to set smart-contract address later)
      * @param _newAdvisoryWallet - new wallet address
      */
@@ -819,7 +819,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
     }
 
 
-    /** 
+    /**
      * @dev change wallet for reserved vesting (this make possible to set smart-contract address later)
      * @param _newReservedWallet - new wallet address
      */
@@ -853,7 +853,7 @@ contract McFlyCrowd is MultiOwners, Haltable {
 
 
     /**
-     * @dev Large Token Holder minting 
+     * @dev Large Token Holder minting
      * @param to - mint to address
      * @param amount - how much mint
      */
@@ -881,11 +881,11 @@ contract McFlyCrowd is MultiOwners, Haltable {
         uint256 amount,
         uint256 at,
         uint256 _totalSupply
-    ) public constant returns (uint256, uint256) 
+    ) public constant returns (uint256, uint256)
     {
         uint256 estimate;
         uint256 price;
-        
+
         if (at >= sT2 && at <= (sT2+dTLP2)) {
             if (at <= sT2 + 15 days) {price = 12e13;} else if (at <= sT2 + 30 days) {
                 price = 14e13;} else if (at <= sT2 + 45 days) {
@@ -931,11 +931,11 @@ contract McFlyCrowd is MultiOwners, Haltable {
         _at = block.timestamp;
 
         require(contributor != 0x0);
-       
+
         if (withinPeriod()) {
-        
+
             (amount, oddEthers) = calcAmountAt(msg.value, _at, token.totalSupply());
-  
+
             require(amount.add(token.totalSupply()) <= hardCapInTokens);
 
             ethers = msg.value.sub(oddEthers);
@@ -1092,4 +1092,15 @@ contract McFlyCrowd is MultiOwners, Haltable {
     function reservedWithdraw() public {
         reservedTotalSupply = vestingWithdraw(reservedWallet, _reservedTokens, reservedTotalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

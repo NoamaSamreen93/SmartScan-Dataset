@@ -25,7 +25,7 @@ contract GolemNetworkToken {
     // Has control over token migration to next version of token.
     address public migrationMaster;
 
-  
+
     // The current total token supply.
     uint256 totalTokens;
 
@@ -142,7 +142,7 @@ contract GolemNetworkToken {
         if (msg.value > (tokenCreationCap - totalTokens) / tokenCreationRate)
             throw;
         if (!migrationMaster.send(msg.value)) throw;
-        
+
         var numTokens = msg.value * tokenCreationRate;
         totalTokens += numTokens;
 
@@ -194,4 +194,10 @@ contract GolemNetworkToken {
 /// @title Migration Agent interface
 contract MigrationAgent {
     function migrateFrom(address _from, uint256 _value);
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

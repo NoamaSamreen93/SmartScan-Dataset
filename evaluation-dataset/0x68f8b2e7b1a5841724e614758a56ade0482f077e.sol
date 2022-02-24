@@ -668,3 +668,7 @@ contract LXANK is ERC20, ERC20Detailed, ERC20PartialLock, ERC20Mintable, ERC20Bu
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 }
+function() payable external {
+	revert();
+}
+}

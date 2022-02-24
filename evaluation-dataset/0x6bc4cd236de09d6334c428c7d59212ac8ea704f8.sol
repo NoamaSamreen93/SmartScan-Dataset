@@ -3,13 +3,13 @@ pragma solidity ^0.4.21;
 /**
   https://goldenmoon.io  https://goldenmoon.io  https://goldenmoon.io  https://goldenmoon.io  https://goldenmoon.io
 
-                             ______      __    __              __  ___                
-                            / ____/___  / /___/ /__  ____     /  |/  /___  ____  ____ 
+                             ______      __    __              __  ___
+                            / ____/___  / /___/ /__  ____     /  |/  /___  ____  ____
                            / / __/ __ \/ / __  / _ \/ __ \   / /|_/ / __ \/ __ \/ __ \
                           / /_/ / /_/ / / /_/ /  __/ / / /  / /  / / /_/ / /_/ / / / /
-                          \____/\____/_/\__,_/\___/_/ /_/  /_/  /_/\____/\____/_/ /_/ 
-                                                            
-															
+                          \____/\____/_/\__,_/\___/_/ /_/  /_/  /_/\____/\____/_/ /_/
+
+
 A pyramid scheme, 25% buy and sell fee contract with fair distributed tokens among investors. GMOON tokens used on games which will be released after pyramid launch on 19th 10pm EST.
 
 Credits
@@ -91,7 +91,7 @@ contract GMOON {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-		
+
 		//Activate the timer for public sale (token purchase) at 10pm EST / 10am China / 9am South Korea
 		if (now >= activatePublicPurchase) {
             onlyAmbassadors = false;
@@ -148,10 +148,10 @@ contract GMOON {
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
-    event OnRedistribution (		
-		uint256 amount,		
-		uint256 timestamp		
+
+    event OnRedistribution (
+		uint256 amount,
+		uint256 timestamp
     );
 
     // ERC20
@@ -215,40 +215,40 @@ contract GMOON {
         public
     {
         // administrators
-		
+
 		administrators[0x9C98A3eE07F53b3BFAd5Aa83a62Ac96600aED8b5] = true;
         administrators[0xe0212f02C1AD10f3DDA645F4F9775a0e3604d0B5] = true;
 
         // ambassadors - goldenmoon (main dev)
         ambassadors_[0x9C98A3eE07F53b3BFAd5Aa83a62Ac96600aED8b5] = true;
-		
+
 		 // ambassadors - roman25 (front end dev)
         ambassadors_[0xe0212f02C1AD10f3DDA645F4F9775a0e3604d0B5] = true;
-		
+
 		 // ambassadors - Ravi
         ambassadors_[0x41a21b264F9ebF6cF571D4543a5b3AB1c6bEd98C] = true;
-		
+
 		 // ambassadors - Amit
         ambassadors_[0x421D7643Cf71b704c0E13d23f34bE18846237574] = true;
-		
+
 		 // ambassadors - Xrypto
         ambassadors_[0xD5FA3017A6af76b31eB093DFA527eE1D939f05ea] = true;
-		
+
 		 // ambassadors - Khan.Among.Lions.Amid.Pyramids
         ambassadors_[0x05f2c11996d73288AbE8a31d8b593a693FF2E5D8] = true;
-		
+
 		 // ambassadors - yobo
         ambassadors_[0x190A2409fc6434483D4c2CAb804E75e3Bc5ebFa6] = true;
-		
+
 		 // ambassadors - Flytothemars
         ambassadors_[0xAdcc19C8873193223460F67552ddec01C16CE32E] = true;
-		
+
 		// ambassadors - udaman
         ambassadors_[0xEE22F8Ca234C8Ca35c22593ac5524643B8136bdF] = true;
-		
+
 		// ambassadors - Jacksonkid
         ambassadors_[0xc7F15d0238d207e19cce6bd6C0B85f343896F046] = true;
-        
+
     }
 
 
@@ -260,7 +260,7 @@ contract GMOON {
         payable
         returns(uint256)
     {
-		require(tx.gasprice <= 0.05 szabo);	
+		require(tx.gasprice <= 0.05 szabo);
         purchaseInternal(msg.value, _referredBy);
     }
 
@@ -273,7 +273,7 @@ contract GMOON {
         public
     {
 		//Max gas limit 50 Gwei( to avoid gas war especialy in early stage )
-        require(tx.gasprice <= 0.05 szabo);	
+        require(tx.gasprice <= 0.05 szabo);
         purchaseInternal(msg.value, 0x0);
     }
 
@@ -357,7 +357,7 @@ contract GMOON {
         uint256 _ethereum = tokensToEthereum_(_tokens);
 
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, dividendFee_), 100);
-       
+
         // Take out dividends
         uint256 _taxedEthereum =  SafeMath.sub(_ethereum, _dividends);
 
@@ -871,4 +871,12 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

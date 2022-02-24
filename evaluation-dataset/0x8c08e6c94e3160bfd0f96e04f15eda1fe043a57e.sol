@@ -9,7 +9,7 @@ library SafeMath {
         if (a == 0) {
             return 0;
         }
-        
+
         uint256 c = a * b;
         assert(c / a == b);
         return c;
@@ -48,7 +48,7 @@ contract ERC20Basic {
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
-    function approve(address spender, uint256 value) public returns (bool); 
+    function approve(address spender, uint256 value) public returns (bool);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 // ----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ contract BasicToken is ERC20Basic {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-    
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -98,13 +98,13 @@ contract Ownable {
 
     modifier onlyOwner() { require(msg.sender == owner); _; }
     modifier onlyOwnerOrOperator() { require(msg.sender == owner || msg.sender == operator); _; }
-    
+
     function transferOwnership(address _newOwner) external onlyOwner {
         require(_newOwner != address(0));
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
     }
-  
+
     function transferOperator(address _newOperator) external onlyOwner {
         require(_newOperator != address(0));
         emit OperatorTransferred(operator, _newOperator);
@@ -127,9 +127,9 @@ contract BlackList is Ownable {
         require(_lockAddress != address(0));
         require(_lockAddress != owner);
         require(blackList[_lockAddress] != true);
-        
+
         blackList[_lockAddress] = true;
-        
+
         emit Lock(_lockAddress);
 
         return true;
@@ -137,9 +137,9 @@ contract BlackList is Ownable {
 
     function UnLockAddress(address _unlockAddress) external onlyOwner returns (bool) {
         require(blackList[_unlockAddress] != false);
-        
+
         blackList[_unlockAddress] = false;
-        
+
         emit Unlock(_unlockAddress);
 
         return true;
@@ -173,7 +173,7 @@ contract Pausable is Ownable {
 // https://github.com/ethereum/EIPs/issues/20
 // ----------------------------------------------------------------------------
 contract StandardToken is ERC20, BasicToken {
-  
+
     mapping (address => mapping (address => uint256)) internal allowed;
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
@@ -184,17 +184,17 @@ contract StandardToken is ERC20, BasicToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    
+
         emit Transfer(_from, _to, _value);
-    
+
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-    
+
         emit Approval(msg.sender, _spender, _value);
-    
+
         return true;
     }
 
@@ -204,21 +204,21 @@ contract StandardToken is ERC20, BasicToken {
 
     function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = (allowed[msg.sender][_spender].add(_addedValue));
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    
+
         return true;
     }
 
     function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool) {
         uint256 oldValue = allowed[msg.sender][_spender];
-    
+
         if (_subtractedValue > oldValue) {
         allowed[msg.sender][_spender] = 0;
         } else {
         allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
@@ -234,7 +234,7 @@ contract MultiTransferToken is StandardToken, Ownable {
 
         uint16 ui;
         uint256 amountSum = 0;
-    
+
         for (ui = 0; ui < _to.length; ui++) {
             require(_to[ui] != address(0));
 
@@ -246,10 +246,10 @@ contract MultiTransferToken is StandardToken, Ownable {
         for (ui = 0; ui < _to.length; ui++) {
             balances[msg.sender] = balances[msg.sender].sub(_amount[ui]);
             balances[_to[ui]] = balances[_to[ui]].add(_amount[ui]);
-        
+
             emit Transfer(msg.sender, _to[ui], _amount[ui]);
         }
-    
+
         return true;
     }
 }
@@ -266,7 +266,7 @@ contract BurnableToken is StandardToken, Ownable {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
-    
+
         emit BurnAdminAmount(msg.sender, _value);
         emit Transfer(msg.sender, address(0), _value);
     }
@@ -287,10 +287,10 @@ contract MintableToken is StandardToken, Ownable {
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         totalSupply_ = totalSupply_.add(_amount);
         balances[_to] = balances[_to].add(_amount);
-    
+
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
-    
+
         return true;
     }
 
@@ -335,4 +335,15 @@ contract IPToken is PausableToken, MintableToken, BurnableToken, MultiTransferTo
     string public name = "IN PAY TOKEN";
     string public symbol = "IPT";
     uint256 public decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

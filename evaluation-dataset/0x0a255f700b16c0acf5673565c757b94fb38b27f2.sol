@@ -44,7 +44,7 @@ library SafeMath {
 /*
 * Contract that is working with ERC223 tokens
 */
- 
+
 contract ContractReceiver {
 	function tokenFallback(address _from, uint _value, bytes _data) public pure {
 	}
@@ -147,32 +147,32 @@ contract ERC20Interface {
  *
  * https://github.com/Dexaran/ERC223-token-standard
  */
- 
+
 
  /* New ERC223 contract interface */
- 
+
 contract ERC223 is ERC20Interface {
 	function transfer(address to, uint value, bytes data) public returns (bool);
-	
+
 	event Transfer(address indexed from, address indexed to, uint tokens);
 	event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
- 
+
 contract NeoWorldCash is ERC223, Pausable {
 
 	using SafeMath for uint256;
 
 	mapping(address => uint) balances;
 	mapping(address => mapping(address => uint)) allowed;
-	
+
 	string public name;
 	string public symbol;
 	uint8 public decimals;
 	uint256 public totalSupply;
 
 	event Burn(address indexed from, uint256 value);
-	
+
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
@@ -184,8 +184,8 @@ contract NeoWorldCash is ERC223, Pausable {
 		balances[msg.sender] = totalSupply;
 		emit Transfer(address(0), msg.sender, totalSupply);
 	}
-	
-	
+
+
 	// Function to access name of token .
 	function name() public constant returns (string) {
 		return name;
@@ -202,7 +202,7 @@ contract NeoWorldCash is ERC223, Pausable {
 	function totalSupply() public constant returns (uint256) {
 		return totalSupply;
 	}
-	
+
 	// Function that is called when a user or another contract wants to transfer funds .
 	function transfer(address _to, uint _value, bytes _data) public whenNotPaused returns (bool) {
 		if(isContract(_to)) {
@@ -212,7 +212,7 @@ contract NeoWorldCash is ERC223, Pausable {
 			return transferToAddress(_to, _value, _data);
 		}
 	}
-	
+
 	// Standard function transfer similar to ERC20 transfer with no _data .
 	// Added due to backwards compatibility reasons .
 	function transfer(address _to, uint _value) public whenNotPaused returns (bool) {
@@ -246,10 +246,10 @@ contract NeoWorldCash is ERC223, Pausable {
 		emit Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
-	
+
 	//function that is called when transaction target is a contract
 	function transferToContract(address _to, uint _value, bytes _data) private returns (bool) {
-	
+
 		ContractReceiver receiver = ContractReceiver(_to);
 		uint256 price;
 		address owner;
@@ -266,10 +266,10 @@ contract NeoWorldCash is ERC223, Pausable {
 
 	function balanceOf(address _owner) public constant returns (uint) {
 		return balances[_owner];
-	}  
+	}
 
 	function burn(uint256 _value) public returns (bool) {
-		require (_value > 0); 
+		require (_value > 0);
 		require (balanceOf(msg.sender) >= _value);            // Check if the sender has enough
 		balances[msg.sender] = balanceOf(msg.sender).sub(_value);                      // Subtract from the sender
 		totalSupply = totalSupply.sub(_value);                                // Updates totalSupply
@@ -294,7 +294,7 @@ contract NeoWorldCash is ERC223, Pausable {
 	//
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
 	// recommends that there are no checks for the approval double-spend attack
-	// as this should be implemented in user interfaces 
+	// as this should be implemented in user interfaces
 	// ------------------------------------------------------------------------
 	function approve(address spender, uint tokens) public whenNotPaused returns (bool) {
 		allowed[msg.sender][spender] = tokens;
@@ -305,7 +305,7 @@ contract NeoWorldCash is ERC223, Pausable {
 
 	// ------------------------------------------------------------------------
 	// Transfer `tokens` from the `from` account to the `to` account
-	// 
+	//
 	// The calling account must already have sufficient tokens approve(...)-d
 	// for spending from the `from` account and
 	// - From account must have sufficient balance to transfer
@@ -340,5 +340,16 @@ contract NeoWorldCash is ERC223, Pausable {
 	// ------------------------------------------------------------------------
 	function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool) {
 		return ERC20Interface(tokenAddress).transfer(owner, tokens);
-	}	
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

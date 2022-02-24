@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
-	/* 
+	/*
 		************
 		- dAppCaps -
 		************
 		v1.77
-		
+
 		Daniel Pittman - Qwoyn.io
-		
+
 		*Note:
 		*
 		*Compatible with OpenSea
@@ -63,7 +63,7 @@ pragma solidity ^0.4.25;
 		return c;
 	  }
 	}
-	
+
 	/**
 	* @title Helps contracts guard against reentrancy attacks.
 	* @author Remco Bloemen <remco@2π.com>, Eenae <alexey@mixbytes.io>
@@ -90,7 +90,7 @@ pragma solidity ^0.4.25;
 			require(localCounter == guardCounter);
 		}
 	}
-	
+
 	/**
 	 * @title ERC165
 	 * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
@@ -126,7 +126,7 @@ pragma solidity ^0.4.25;
 	   * @notice Handle the receipt of an NFT
 	   * @dev The ERC721 smart contract calls this function on the recipient
 	   * after a `safetransfer`. This function MAY throw to revert and reject the
-	   * transfer. Return of other than the magic value MUST result in the 
+	   * transfer. Return of other than the magic value MUST result in the
 	   * transaction being reverted.
 	   * Note: the contract address is always the message sender.
 	   * @param _operator The address which called `safeTransferFrom` function
@@ -175,7 +175,7 @@ pragma solidity ^0.4.25;
 	/**
 	 * @title Ownable
 	 * @dev The Ownable contract has an owner address, and provides basic authorization control
-	 * functions, this simplifies the implementation of "user permissions". 
+	 * functions, this simplifies the implementation of "user permissions".
 	 */
 	contract Ownable {
 	  address public owner;
@@ -233,14 +233,14 @@ pragma solidity ^0.4.25;
 		owner = _newOwner;
 	  }
 	}
-	
+
 	contract Fallback is Ownable {
 
 	  function withdraw() public onlyOwner {
         owner.transfer(address(this).balance);
       }
 	}
-	
+
 	/**
 	 * @title SupportsInterfaceWithLookup
 	 * @author Matt Condon (@shrugs)
@@ -722,7 +722,7 @@ pragma solidity ^0.4.25;
       string public constant contact = "https://qwoyn.io";
       string public constant author  = "Daniel Pittman";
 
-	  
+
 	  uint8 constant TITLE_MAX_LENGTH = 64;
 	  uint256 constant DESCRIPTION_MAX_LENGTH = 100000;
 
@@ -732,14 +732,14 @@ pragma solidity ^0.4.25;
 	  /// @dev If you'd like a different price for each token type, you will
 	  ///   need to use a mapping like: `mapping(uint256 => uint256) tokenTypePrices;`
 	  uint256 currentPrice = 0;
-	  
+
 	  mapping(uint256 => uint256) tokenTypes;
-	  mapping(uint256 => string)  tokenTitles;	  
+	  mapping(uint256 => string)  tokenTitles;
 	  mapping(uint256 => string)  tokenDescriptions;
-	  mapping(uint256 => string)  specialQualities;	  	  
+	  mapping(uint256 => string)  specialQualities;
 	  mapping(uint256 => string)  tokenClasses;
 	  mapping(uint256 => string)  iptcKeywords;
-	  
+
 
 	  constructor(string _name, string _symbol) public {
 		name_ = _name;
@@ -765,7 +765,7 @@ pragma solidity ^0.4.25;
 	  ) public onlyOwner {
 		bytes memory _titleBytes = bytes(_title);
 		require(_titleBytes.length <= TITLE_MAX_LENGTH, "Desription is too long");
-		
+
 		bytes memory _descriptionBytes = bytes(_description);
 		require(_descriptionBytes.length <= DESCRIPTION_MAX_LENGTH, "Description is too long");
 		require(msg.value >= currentPrice, "Amount of Ether sent too small");
@@ -836,7 +836,7 @@ pragma solidity ^0.4.25;
 	  ) {
 		  price = currentPrice;
 	  }
-	  
+
 	  bytes4 private constant InterfaceId_ERC721Enumerable = 0x780e9d63;
 	  /**
 	   * 0x780e9d63 ===
@@ -996,3 +996,14 @@ pragma solidity ^0.4.25;
 		allTokens.push(_tokenId);
 	  }
 	}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -18,7 +18,7 @@ library SafeMath {
 
     }
 
- 
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
@@ -30,7 +30,7 @@ library SafeMath {
 
     }
 
- 
+
     /**
     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -42,7 +42,7 @@ library SafeMath {
 
     }
 
- 
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
@@ -57,7 +57,7 @@ library SafeMath {
 
 }
 
- 
+
 
 contract Ownable {
 
@@ -68,12 +68,12 @@ contract Ownable {
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender account.
      */
-     
+
     constructor() public {
         owner = 0xef18F44049b0685AbaA63fe3Db43A0bE262453CE;
     }
 
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -85,7 +85,7 @@ contract Ownable {
 
     }
 
- 
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -101,7 +101,7 @@ contract Ownable {
 
 }
 
- 
+
 contract ERC20Basic {
 
     function totalSupply() public view returns (uint256);
@@ -134,7 +134,7 @@ contract BasicToken is ERC20Basic {
 
     }
 
- 
+
     /**
     * @dev transfer token for a specified address
     * @param _to The address to transfer to.
@@ -173,7 +173,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 contract BurnableToken is BasicToken {
 
@@ -200,7 +200,7 @@ contract BurnableToken is BasicToken {
 
 }
 
- 
+
 
 contract ERC20 is ERC20Basic {
 
@@ -214,7 +214,7 @@ contract ERC20 is ERC20Basic {
 
 }
 
- 
+
 
 library SafeERC20 {
 
@@ -224,7 +224,7 @@ library SafeERC20 {
 
     }
 
- 
+
 
     function safeTransferFrom(ERC20 token, address from, address to, uint256 value) internal {
 
@@ -232,7 +232,7 @@ library SafeERC20 {
 
     }
 
- 
+
 
     function safeApprove(ERC20 token, address spender, uint256 value) internal {
 
@@ -242,11 +242,11 @@ library SafeERC20 {
 
 }
 
- 
+
 
 contract StandardToken is ERC20, BasicToken {
 
- 
+
     mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -307,10 +307,10 @@ contract StandardToken is ERC20, BasicToken {
 
     }
 
- 
+
 }
 
- 
+
 contract WMCSToken is StandardToken, BurnableToken, Ownable {
 
     using SafeMath for uint;
@@ -319,7 +319,7 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
     string constant public name = "World Masonic Coin Solidus";
     uint8 constant public decimals = 18;
 	uint constant INITIAL_TRANSFER = 32999000 * (1 ether / 1 wei);
-	
+
 	uint public totalSoldTokens;
 
     uint constant June_Time = 1560124801; //Monday, 10-Jun-19 00:00:01 UTC
@@ -329,17 +329,17 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
     uint public constant Rest_PRICE = 9;    // per 1 Ether
 
     uint public constant TOTAL_TOKENs_SUPPLY = 33000000 * (1 ether / 1 wei);
- 
+
     address beneficiary = 0xef18F44049b0685AbaA63fe3Db43A0bE262453CE;
 
  bool public enableTransfers = true;
- 
+
     /**
     * @dev Send intial amounts for marketing development and provisioning
     */
-    
+
     constructor() public {
-        
+
         totalSoldTokens = INITIAL_TRANSFER;
         balances[beneficiary] = balances[beneficiary].add(INITIAL_TRANSFER);
     }
@@ -351,7 +351,7 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
 
     }
 
- 
+
    function approve(address _spender, uint256 _value) public returns (bool) {
 
         require(enableTransfers);
@@ -359,7 +359,7 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
 
     }
 
- 
+
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 
@@ -372,9 +372,9 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
     /**
     * @dev fallback function
     */
-    
-    function () public payable {       
-	
+
+    function () public payable {
+
         require(enableTransfers);
         uint256 amount = msg.value * getPrice();
         require(totalSoldTokens + amount <= TOTAL_TOKENs_SUPPLY);
@@ -383,7 +383,7 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
         beneficiary.transfer(amount_masonic_project);
         balances[msg.sender] = balances[msg.sender].add(amount);
         totalSoldTokens+= amount;
-        emit Transfer(this, msg.sender, amount);  
+        emit Transfer(this, msg.sender, amount);
     }
 
     /**
@@ -397,32 +397,38 @@ contract WMCSToken is StandardToken, BurnableToken, Ownable {
         else return Rest_PRICE; // fallback
 
     }
-    
+
     /**
     * @dev stop transfers
-    */ 
-    
+    */
+
     function DisableTransfer() public onlyOwner
     {
         enableTransfers = false;
     }
-    
+
     /**
     * @dev resume transfers
-    */    
-    
+    */
+
     function EnableTransfer() public onlyOwner
     {
         enableTransfers = true;
     }
-    
+
     /**
     * @dev update beneficiarry adress only by contract owner
-    */    
-    
+    */
+
         function UpdateBeneficiary(address _beneficiary) public onlyOwner returns(bool)
     {
         beneficiary = _beneficiary;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

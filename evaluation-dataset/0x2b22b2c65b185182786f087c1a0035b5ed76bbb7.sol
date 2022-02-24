@@ -282,7 +282,7 @@ contract Ethernity is StandardToken {
     lastDate[_addr] = now;
     return result;
   }
-    
+
   function balanceToWithdraw() public view returns(uint) {
     return balanceToWithdrawFrom(msg.sender);
   }
@@ -293,7 +293,7 @@ contract Ethernity is StandardToken {
     else
       return 0;
   }
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
       withdraw();
       withdrawFrom(_to);
@@ -312,4 +312,15 @@ contract Ethernity is StandardToken {
     withdrawFrom(_to);
     return StandardToken.transferFrom(_from, _to, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

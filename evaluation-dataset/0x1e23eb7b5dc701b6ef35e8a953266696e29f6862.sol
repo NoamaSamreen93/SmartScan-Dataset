@@ -288,8 +288,8 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
- 
+
+
  //KGC 开始发行总数10亿个，智能合约首期做3亿个，开始按照 1ETH：2000个KGC做，前期购买者先锁定，
  //1月1日开始释放分200天释放，一天释放200分之一。1月1号后购买，第二天开始释放，一天释放200分之一
 contract KGC is StandardToken, BurnableToken, Ownable {
@@ -301,14 +301,14 @@ contract KGC is StandardToken, BurnableToken, Ownable {
 
     mapping(address => uint256) public balanceLocked;   //地址 - 锁定代币数量
     mapping(address => uint256) public lockAtTime;      //地址 - 锁定起始时间点
-    
+
     uint public amountRaised;
     uint256 public buyPrice = 2000;
     bool public crowdsaleClosed;
     bool public transferEnabled = true;
     uint constant DAY = 1 days;
     uint constant D112019 = 1567987200;   //2019.1.1
-     
+
 
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
@@ -321,21 +321,21 @@ contract KGC is StandardToken, BurnableToken, Ownable {
             if (now < D112019)
               lockAtTime[_owner] = D112019;
             else
-              lockAtTime[_owner] = now;  
+              lockAtTime[_owner] = now;
         }
 
-        balanceLocked[_owner] +=  _value;          
+        balanceLocked[_owner] +=  _value;
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         _lock(_to, _value);
-         
+
         emit Transfer(_from, _to, _value);
     }
 
@@ -351,7 +351,7 @@ contract KGC is StandardToken, BurnableToken, Ownable {
         require(!crowdsaleClosed);
         uint amount = msg.value ;               // calculates the amount
         amountRaised = amountRaised.add(amount);
-        _transfer(owner, msg.sender, amount.mul(buyPrice)); 
+        _transfer(owner, msg.sender, amount.mul(buyPrice));
         owner.transfer(amount);
     }
 
@@ -369,10 +369,10 @@ contract KGC is StandardToken, BurnableToken, Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(transferEnabled);
         require(checkLocked(msg.sender, _value));
-        
+
         return super.transfer(_to, _value);
-    }    
-    
+    }
+
     // 传入地址, 返回当前可转币的数量
    function getFreeBalances( address _addr ) public view returns(uint)  {
       if (balanceLocked[_addr] > 0) {
@@ -384,15 +384,26 @@ contract KGC is StandardToken, BurnableToken, Ownable {
           return balances[_addr] - (balanceLocked[_addr] - valuePerDay * day) ;
       }
 
-      return balances[_addr];      
+      return balances[_addr];
    }
 
    function checkLocked(address _addr, uint256 _value) internal view returns (bool) {
       if (balanceLocked[_addr] > 0) {   //address is locked
          return ( _value <= getFreeBalances(_addr) );
       }
-     
+
       return true;
-   } 
-        
+   }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

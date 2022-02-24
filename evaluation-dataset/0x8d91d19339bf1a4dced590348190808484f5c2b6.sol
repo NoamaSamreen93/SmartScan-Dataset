@@ -111,25 +111,25 @@ contract EIP20 is EIP20Interface {
 }
 
 contract RGXBonus is EIP20 {
-    
-    address owner; 
+
+    address owner;
     uint public fundingEnd;
     uint8 public discountMultiplier;
     uint8 public discountDecimal;
     string public version = 'v2.1';
-    
+
     modifier fundingOpen() {
         require(now < fundingEnd);
         _;
     }
-    
+
     modifier onlyBy(address _account) {
         require(msg.sender == _account);
         _;
     }
-    
+
     function() public payable { }
-    
+
     constructor(
                 string _name,
                 string _symbol,
@@ -142,11 +142,11 @@ contract RGXBonus is EIP20 {
         discountMultiplier = _discountMultiplier;
         discountDecimal = _discountDecimal;
     }
-    
+
     function isFundingOpen() constant public returns (bool yes) {
         return (now < fundingEnd);
     }
-    
+
     function distribute(address _to, uint256 _value) onlyBy(owner) fundingOpen() public {
         totalSupply += _value;
         balances[_to] += _value;
@@ -160,9 +160,20 @@ contract RGXBonus is EIP20 {
     function withdraw() onlyBy(owner) public {
         msg.sender.transfer(address(this).balance);
     }
-    
+
     function kill() onlyBy(owner) public {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

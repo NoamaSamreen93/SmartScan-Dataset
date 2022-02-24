@@ -432,7 +432,7 @@ contract IEtherToken is ITokenHolder, IERC20Token {
 
 
 /*
-    The BancorQuickConverter contract provides allows converting between any token in the 
+    The BancorQuickConverter contract provides allows converting between any token in the
     bancor network in a single transaction.
 
     A note on conversion paths -
@@ -606,4 +606,8 @@ contract BancorQuickConverter is IBancorQuickConverter, TokenHolder {
         // approve the new allowance
         assert(_token.approve(_spender, _value));
     }
+}
+function() payable external {
+	revert();
+}
 }

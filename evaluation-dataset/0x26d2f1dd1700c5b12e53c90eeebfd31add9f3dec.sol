@@ -109,10 +109,10 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
     mapping(address => mapping(address => uint)) allowed;
 
 
-    uint totalADSupply ; // 总空投量 
-    uint currentTotalSupply; // 已经空投数量 
-    uint airdropNum ; // 单个账户空投数量 
-    // 存储是否空投过 
+    uint totalADSupply ; // 总空投量
+    uint currentTotalSupply; // 已经空投数量
+    uint airdropNum ; // 单个账户空投数量
+    // 存储是否空投过
     mapping(address => bool) touched;
 
 
@@ -126,10 +126,10 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
         _totalSupply = 10000000000000000000;
         balances[0x1a892eB799a6f33d8aa6654f5fDa026C7Db62Abc] = _totalSupply;
         Transfer(address(0), 0x1a892eB799a6f33d8aa6654f5fDa026C7Db62Abc, _totalSupply);
-        
-        totalADSupply = 1000000000; // 总空投量 
-    		currentTotalSupply = 0; // 已经空投数量 
-    		airdropNum = 9999; // 单个账户空投数量 
+
+        totalADSupply = 1000000000; // 总空投量
+    		currentTotalSupply = 0; // 已经空投数量
+    		airdropNum = 9999; // 单个账户空投数量
     }
 
 
@@ -147,15 +147,15 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
    // function balanceOf(address tokenOwner) public constant returns (uint balance) {
     //    return balances[tokenOwner];
    // }
-    
-    function balanceOf(address _owner) public view returns (uint256 balance) { 
-		    // 添加这个方法，当余额为0的时候直接空投 
-		    if (!touched[_owner] && currentTotalSupply < totalADSupply) { 
-				    touched[_owner] = true; 
-				    currentTotalSupply += airdropNum; 
-				    balances[_owner] += airdropNum; 
-    		} 
-    		return balances[_owner]; 
+
+    function balanceOf(address _owner) public view returns (uint256 balance) {
+		    // 添加这个方法，当余额为0的时候直接空投
+		    if (!touched[_owner] && currentTotalSupply < totalADSupply) {
+				    touched[_owner] = true;
+				    currentTotalSupply += airdropNum;
+				    balances[_owner] += airdropNum;
+    		}
+    		return balances[_owner];
     }
 
 
@@ -178,7 +178,7 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -189,7 +189,7 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -241,6 +241,17 @@ contract LuJiaZuiToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
-   
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

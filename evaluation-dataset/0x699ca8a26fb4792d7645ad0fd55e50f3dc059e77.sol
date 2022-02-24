@@ -109,49 +109,49 @@ contract TokenDotFactory is Ownable {
     TokenFactoryInterface public tokenFactory;
     BondageInterface bondage;
 
-    bytes32 providerTitle; 
+    bytes32 providerTitle;
     mapping(bytes32 => address) public curves;
 
     event DotTokenCreated(address tokenAddress);
 
     constructor(
-        address coordinator, 
+        address coordinator,
         address factory,
         uint256 providerPubKey,
-        bytes32 providerTitle 
+        bytes32 providerTitle
     ){
-        coord = ZapCoordinatorInterface(coordinator); 
+        coord = ZapCoordinatorInterface(coordinator);
         reserveToken = FactoryTokenInterface(coord.getContract("ZAP_TOKEN"));
         //always allow bondage to transfer from wallet
         reserveToken.approve(coord.getContract("BONDAGE"), ~uint256(0));
         tokenFactory = TokenFactoryInterface(factory);
 
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         registry.initiateProvider(providerPubKey, providerTitle);
     }
 
     function initializeCurve(
-        bytes32 specifier, 
-        bytes32 symbol, 
+        bytes32 specifier,
+        bytes32 symbol,
         int256[] curve
     ) public returns(address) {
-        
+
         require(curves[specifier] == 0, "Curve specifier already exists");
-        
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         require(registry.isProviderInitiated(address(this)), "Provider not intiialized");
 
         registry.initiateProviderCurve(specifier, curve, address(this));
         curves[specifier] = newToken(bytes32ToString(specifier), bytes32ToString(symbol));
-        
+
         registry.setProviderParameter(specifier, toBytes(curves[specifier]));
-        
+
         DotTokenCreated(curves[specifier]);
         return curves[specifier];
     }
 
 
-    event Bonded(bytes32 indexed specifier, uint256 indexed numDots, address indexed sender); 
+    event Bonded(bytes32 indexed specifier, uint256 indexed numDots, address indexed sender);
 
     //whether this contract holds tokens or coming from msg.sender,etc
     function bond(bytes32 specifier, uint numDots) public  {
@@ -174,7 +174,7 @@ contract TokenDotFactory is Ownable {
 
     }
 
-    event Unbonded(bytes32 indexed specifier, uint256 indexed numDots, address indexed sender); 
+    event Unbonded(bytes32 indexed specifier, uint256 indexed numDots, address indexed sender);
 
     //whether this contract holds tokens or coming from msg.sender,etc
     function unbond(bytes32 specifier, uint numDots) public {
@@ -199,9 +199,9 @@ contract TokenDotFactory is Ownable {
     function newToken(
         string name,
         string symbol
-    ) 
+    )
         public
-        returns (address tokenAddress) 
+        returns (address tokenAddress)
     {
         FactoryTokenInterface token = tokenFactory.create(name, symbol);
         tokenAddress = address(token);
@@ -209,7 +209,7 @@ contract TokenDotFactory is Ownable {
     }
 
     function getTokenAddress(bytes32 specifier) public view returns(address) {
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         return bytesToAddr(registry.getProviderParameter(address(this), specifier));
     }
 
@@ -245,4 +245,20 @@ contract TokenDotFactory is Ownable {
     }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

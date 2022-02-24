@@ -1,22 +1,22 @@
 pragma solidity ^0.4.23;
 ///////////////////////////////////////////////////
-//  
+//
 //  `iCashweb` ICW Token Contract
 //
 //  Total Tokens: 300,000,000.000000000000000000
 //  Name: iCashweb
 //  Symbol: ICWeb
 //  Decimal Scheme: 18
-//  
+//
 //  by Nishad Vadgama
 ///////////////////////////////////////////////////
 
 library iMath {
     function mul(
         uint256 a, uint256 b
-    ) 
-    internal 
-    pure 
+    )
+    internal
+    pure
     returns(uint256) {
         if (a == 0) {
             return 0;
@@ -28,9 +28,9 @@ library iMath {
 
     function div(
         uint256 a, uint256 b
-    ) 
-    internal 
-    pure 
+    )
+    internal
+    pure
     returns(uint256) {
         uint256 c = a / b;
         return c;
@@ -38,9 +38,9 @@ library iMath {
 
     function sub(
         uint256 a, uint256 b
-    ) 
-    internal 
-    pure 
+    )
+    internal
+    pure
     returns(uint256) {
         assert(b <= a);
         return a - b;
@@ -48,9 +48,9 @@ library iMath {
 
     function add(
         uint256 a, uint256 b
-    ) 
-    internal 
-    pure 
+    )
+    internal
+    pure
     returns(uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -60,49 +60,49 @@ library iMath {
 contract iSimpleContract {
     function changeRate(
         uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function startMinting(
         bool status
-    ) 
-    public 
-    returns(bool);  
+    )
+    public
+    returns(bool);
 
     function changeOwnerShip(
         address toWhom
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
-    function releaseMintTokens() 
-    public 
+    function releaseMintTokens()
+    public
     returns(bool);
 
     function transferMintTokens(
         address to, uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function moveMintTokens(
         address from, address to, uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function manageOperable(
         address _from, bool _value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function isOperable(
         address _from
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(bool);
 
     event Release(
@@ -114,26 +114,26 @@ contract iSimpleContract {
     );
 }
 contract iERC01Basic is iSimpleContract {
-    function totalSupply() 
-    public 
-    view 
+    function totalSupply()
+    public
+    view
     returns(uint256);
 
     function balanceOf(
         address who
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(uint256);
 
     function transfer(
         address to, uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function transferTokens()
-    public 
+    public
     payable;
 
     event Transfer(
@@ -143,21 +143,21 @@ contract iERC01Basic is iSimpleContract {
 contract iERC20 is iERC01Basic {
     function allowance(
         address owner, address spender
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(uint256);
 
     function transferFrom(
         address from, address to, uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
 
     function approve(
         address spender, uint256 value
-    ) 
-    public 
+    )
+    public
     returns(bool);
     event Approval(
         address indexed owner, address indexed spender, uint256 value
@@ -178,64 +178,64 @@ contract ICWToken is iERC01Basic {
     uint8 public constant           decimals = 18;
     uint256 public constant         INITIAL_SUPPLY = 150000000 * (10 ** uint256(decimals));
 
-    modifier onlyByOwned() 
+    modifier onlyByOwned()
     {
         require(msg.sender == contractModifierAddress || operable[msg.sender] == true);
         _;
     }
 
-    function getMinted() 
-    public 
-    view 
+    function getMinted()
+    public
+    view
     returns(bool) {
         return _minted;
     }
 
-    function getOwner() 
-    public 
-    view 
+    function getOwner()
+    public
+    view
     returns(address) {
         return contractModifierAddress;
     }
-    
-    function getMintingStatus() 
-    public 
-    view 
+
+    function getMintingStatus()
+    public
+    view
     returns(bool) {
         return _mintingStarted;
     }
 
-    function getRate() 
-    public 
-    view 
+    function getRate()
+    public
+    view
     returns(uint256) {
         return _rate;
     }
 
-    function totalSupply() 
-    public 
-    view 
+    function totalSupply()
+    public
+    view
     returns(uint256) {
         return _totalSupply;
     }
 
-    function totalMintSupply() 
-    public 
-    view 
+    function totalMintSupply()
+    public
+    view
     returns(uint256) {
         return _totalMintSupply;
     }
 
     function balanceOf(
         address _owner
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(uint256 balance) {
         return balances[_owner];
     }
 
-    function destroyContract() 
+    function destroyContract()
     public {
         require(msg.sender == contractModifierAddress);
         selfdestruct(contractModifierAddress);
@@ -243,9 +243,9 @@ contract ICWToken is iERC01Basic {
 
     function changeRate(
         uint256 _value
-    ) 
-    public 
-    onlyByOwned 
+    )
+    public
+    onlyByOwned
     returns(bool) {
         require(_value > 0);
         _rate = _value;
@@ -254,9 +254,9 @@ contract ICWToken is iERC01Basic {
 
     function startMinting(
         bool status_
-    ) 
-    public 
-    onlyByOwned 
+    )
+    public
+    onlyByOwned
     returns(bool) {
         _mintingStarted = status_;
         return true;
@@ -264,9 +264,9 @@ contract ICWToken is iERC01Basic {
 
     function changeOwnerShip(
         address _to
-    ) 
-    public 
-    onlyByOwned 
+    )
+    public
+    onlyByOwned
     returns(bool) {
         address oldOwner = contractModifierAddress;
         uint256 balAmount = balances[oldOwner];
@@ -277,9 +277,9 @@ contract ICWToken is iERC01Basic {
         return true;
     }
 
-    function releaseMintTokens() 
-    public 
-    onlyByOwned 
+    function releaseMintTokens()
+    public
+    onlyByOwned
     returns(bool) {
         require(_minted == false);
         uint256 releaseAmount = _maxMintable.sub(_totalMintSupply);
@@ -294,8 +294,8 @@ contract ICWToken is iERC01Basic {
 
     function transferMintTokens(
         address _to, uint256 _value
-    ) 
-    public 
+    )
+    public
     onlyByOwned
     returns(bool) {
         uint totalToken = _totalMintSupply.add(_value);
@@ -308,9 +308,9 @@ contract ICWToken is iERC01Basic {
 
     function moveMintTokens(
         address _from, address _to, uint256 _value
-    ) 
-    public 
-    onlyByOwned 
+    )
+    public
+    onlyByOwned
     returns(bool) {
         require(_to != _from);
         require(_value <= balances[_from]);
@@ -322,7 +322,7 @@ contract ICWToken is iERC01Basic {
 
     function manageOperable(
         address _from, bool _value
-    ) 
+    )
     public returns(bool) {
         require(msg.sender == contractModifierAddress);
         operable[_from] = _value;
@@ -332,15 +332,15 @@ contract ICWToken is iERC01Basic {
 
     function isOperable(
         address _from
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(bool) {
         return operable[_from];
     }
 
     function transferTokens()
-    public 
+    public
     payable {
         require(_mintingStarted == true && msg.value > 0);
         uint tokens = msg.value.mul(_rate);
@@ -354,8 +354,8 @@ contract ICWToken is iERC01Basic {
 
     function transfer(
         address _to, uint256 _value
-    ) 
-    public 
+    )
+    public
     returns(bool) {
         require(_to != msg.sender);
         require(_value <= balances[msg.sender]);
@@ -372,8 +372,8 @@ contract iCashwebToken is iERC20, ICWToken {
 
     function transferFrom(
         address _from, address _to, uint256 _value
-    ) 
-    public 
+    )
+    public
     returns(bool) {
         require(_to != msg.sender);
         require(_value <= balances[_from]);
@@ -387,8 +387,8 @@ contract iCashwebToken is iERC20, ICWToken {
 
     function approve(
         address _spender, uint256 _value
-    ) 
-    public 
+    )
+    public
     returns(bool) {
         _allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -397,17 +397,17 @@ contract iCashwebToken is iERC20, ICWToken {
 
     function allowance(
         address _owner, address _spender
-    ) 
-    public 
-    view 
+    )
+    public
+    view
     returns(uint256) {
         return _allowed[_owner][_spender];
     }
 
     function increaseApproval(
         address _spender, uint _addedValue
-    ) 
-    public 
+    )
+    public
     returns(bool) {
         _allowed[msg.sender][_spender] = _allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, _allowed[msg.sender][_spender]);
@@ -416,8 +416,8 @@ contract iCashwebToken is iERC20, ICWToken {
 
     function decreaseApproval(
         address _spender, uint _subtractedValue
-    ) 
-    public 
+    )
+    public
     returns(bool) {
         uint oldValue = _allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -433,7 +433,7 @@ contract iCashwebToken is iERC20, ICWToken {
 contract iCashweb is iCashwebToken {
     string public constant name = "iCashweb";
     string public constant symbol = "ICWeb";
-    constructor() 
+    constructor()
     public {
         _mintingStarted = false;
         _minted = false;
@@ -442,9 +442,15 @@ contract iCashweb is iCashwebToken {
         _maxMintable = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
-    function () 
-    public 
+    function ()
+    public
     payable {
         transferTokens();
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

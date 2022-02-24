@@ -10,7 +10,7 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
   function div(uint a, uint b) internal pure returns (uint) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint c = a / b;
@@ -65,9 +65,9 @@ interface ERC223 {
 interface ERC223ReceivingContract { function tokenFallback(address _from, uint _value, bytes calldata _data) external; }
 
 contract Token is ERC20, ERC223, owned {
-    
+
     using SafeMath for uint;
-    
+
     string internal _symbol;
     string internal _name;
     uint256 internal _decimals = 18;
@@ -81,13 +81,13 @@ contract Token is ERC20, ERC223, owned {
     uint256 public remainingTokens;
     //uint256 public teamReserve;
     uint256 public buyPrice;    //eth per Token
-    
+
     constructor(string memory name, string memory symbol, uint totalSupply) public {
         _symbol = symbol;
         _name = name;
         _totalSupply = totalSupply * 10 ** uint256(_decimals);  // Update total supply with the decimal amount
     }
-    
+
     function name() public view returns (string memory) { return _name; }
     function symbol() public view returns (string memory) { return _symbol; }
     function decimals() public view returns (uint256) { return _decimals; }
@@ -100,20 +100,20 @@ contract Token is ERC20, ERC223, owned {
 }
 
 contract SiBiCryptToken is Token {
-   
+
     /**
      * @dev enum of current crowd sale state
      **/
-     enum Stages {none, icoStart, icoPaused, icoResumed, icoEnd} 
+     enum Stages {none, icoStart, icoPaused, icoResumed, icoEnd}
      Stages currentStage;
     bool payingDividends;
     uint256 freezeTimeStart;
     uint256 constant freezePeriod = 1 * 1 days;
-    
+
     function balanceOf(address _addr) public view returns (uint) {
         return _balanceOf[_addr];
     }
-    
+
     modifier checkICOStatus(){
         require(currentStage == Stages.icoPaused || currentStage == Stages.icoEnd, "Pls, try again after ICO");
         _;
@@ -170,7 +170,7 @@ contract SiBiCryptToken is Token {
         emit thirdPartyTransfer(_from, _to, _value, msg.sender);
         return true;
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -180,21 +180,21 @@ contract SiBiCryptToken is Token {
         require(_balanceOf[_to] + _value > _balanceOf[_to], "overflow err"); // Check for overflows
         uint previousBalances = _balanceOf[_from] + _balanceOf[_to]; // Save this for an assertion in the future
         // Subtract from the sender
-        _balanceOf[_from] = _balanceOf[_from].sub(_value); 
+        _balanceOf[_from] = _balanceOf[_from].sub(_value);
         _balanceOf[_to] = _balanceOf[_to].add(_value); // Add the same to the recipient
         emit Transfer(_from, _to, _value);
 
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(_balanceOf[_from] + _balanceOf[_to] == previousBalances);
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool) {
         require(_balanceOf[msg.sender]>=_value);
         _allowances[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public view returns (uint) {
         return _allowances[_owner][_spender];
     }
@@ -203,14 +203,14 @@ contract SiBiCryptToken is Token {
 
 
 contract SiBiCryptICO is SiBiCryptToken {
-    
-  
+
+
     /**
      * @dev constructor of CrowdsaleToken
      **/
       /* Initializes contract with initial supply tokens and sharesPercent to the creator _owner of the contract */
     constructor(
-            string memory tokenName, string memory tokenSymbol, uint256 initialSupply, address payable _reclaimablePocket, address payable _teamWallet 
+            string memory tokenName, string memory tokenSymbol, uint256 initialSupply, address payable _reclaimablePocket, address payable _teamWallet
         ) Token(tokenName, tokenSymbol, initialSupply) owned(_reclaimablePocket, _teamWallet) public {
         uint toOwnerWallet = (_totalSupply*40)/100;
         uint toTeam = (_totalSupply*15)/100;
@@ -223,8 +223,8 @@ contract SiBiCryptICO is SiBiCryptToken {
          currentStage = Stages.none;
          payingDividends = false;
     }
-    
-  
+
+
     /// @param newBuyPrice Price users can buy token from the contract
     function setPrices(uint256 newBuyPrice) onlyOwner public {
         buyPrice = newBuyPrice;   //ETH per Token
@@ -236,11 +236,11 @@ contract SiBiCryptICO is SiBiCryptToken {
         require(currentStage == Stages.icoStart || currentStage == Stages.icoResumed, "Oops! ICO is not running");
         require(msg.value > 0);
         require(remainingTokens > 0, "Tokens sold out! you may proceed to buy from Token holders");
-        
+
         uint256 weiAmount = msg.value; // Calculate tokens to sell
         uint256 tokens = (weiAmount.div(buyPrice)).mul(1*10**18);
         uint256 returnWei;
-        
+
         if(tokens > remainingTokens){
             uint256 newTokens = remainingTokens;
             uint256 newWei = (newTokens.mul(buyPrice)).div(1*10**18);
@@ -248,22 +248,22 @@ contract SiBiCryptICO is SiBiCryptToken {
             weiAmount = newWei;
             tokens = newTokens;
         }
-        
+
         tokensSold = tokensSold.add(tokens); // Increment raised amount
         remainingTokens = remainingTokens.sub(tokens); //decrease remaining token
         if(returnWei > 0){
             msg.sender.transfer(returnWei);
             emit returnedWei(address(this), msg.sender, returnWei);
         }
-        
+
         _balanceOf[msg.sender] = _balanceOf[msg.sender].add(tokens);
         emit Transfer(address(this), msg.sender, tokens);
         emit purchaseInvoice(msg.sender, tokens, msg.value, weiAmount, returnWei);
-       
+
         owner.transfer(weiAmount); // Send money for project execution
         if(remainingTokens == 0 ){pauseIco();}
     }
-    
+
     /**
      * @dev startIco starts the public ICO
      **/
@@ -273,29 +273,29 @@ contract SiBiCryptICO is SiBiCryptToken {
         currentStage = Stages.icoStart;
         return true;
     }
-    
+
     function pauseIco() internal {
         require(currentStage != Stages.icoEnd, "Oops! ICO has been finalized.");
         currentStage = Stages.icoPaused;
         owner.transfer(address(this).balance);
     }
-    
+
     function resumeIco() public onlyOwner returns(bool) {
         require(currentStage == Stages.icoPaused, "call denied");
         currentStage = Stages.icoResumed;
         return true;
     }
-    
+
     function ICO_State() public view returns(string memory) {
         if(currentStage == Stages.none) return "Initializing...";
         if(currentStage == Stages.icoPaused) return "Paused!";
         if(currentStage == Stages.icoEnd) return "ICO Stopped!";
         else return "ICO is running...";
     }
-    
+
 
     /**
-     * @dev endIco closes down the ICO 
+     * @dev endIco closes down the ICO
      **/
     function endIco() internal {
         currentStage = Stages.icoEnd;
@@ -304,7 +304,7 @@ contract SiBiCryptICO is SiBiCryptToken {
             _balanceOf[owner] = _balanceOf[owner].add(remainingTokens);
         }
         // transfer any remaining ETH balance in the contract to the owner
-        owner.transfer(address(this).balance); 
+        owner.transfer(address(this).balance);
     }
 
     /**
@@ -330,3 +330,12 @@ contract SiBiCryptICO is SiBiCryptToken {
  * If you find this code useful or helpful, please give a tip @ 0x15f26bA042233BC6e31e961195fFACAC7F63E97E Thanks!***
  * ******************************************************************************************************************
 **/
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

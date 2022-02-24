@@ -24,7 +24,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function max64(uint64 a, uint64 b) internal constant returns (uint64) {
     return a >= b ? a : b;
   }
@@ -49,44 +49,44 @@ library SafeMath {
      function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
      function approve(address _spender, uint256 _value) returns (bool success);
      function allowance(address _owner, address _spender) constant returns (uint256 remaining);
-        
+
      event Transfer(address indexed _from, address indexed _to, uint256 _value);
      event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     }
 
  contract GenesisToken is ERC20Interface {
-     
+
      using SafeMath for uint256;
-     
+
      string public constant symbol = "GEN";
      string public constant name = "Genesis";
      uint8 public constant decimals = 18;
      uint256 _totalSupply = 16000000000000000000000000;
-     
+
      address public owner;
- 
+
     mapping(address => uint256) balances;
-    
+
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     modifier onlyOwner() {
          if (msg.sender != owner) {
              revert();
          }
          _;
      }
-     
+
     function GenesisToken() {
         owner = msg.sender;
         balances[owner] = _totalSupply;
-    } 
-    
+    }
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
              && _amount > 0
              && balances[_to] + _amount > balances[_to]) {
              balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -97,7 +97,7 @@ library SafeMath {
              return false;
          }
     }
-    
+
     function transferFrom(
             address _from,
             address _to,
@@ -116,17 +116,17 @@ library SafeMath {
              return false;
          }
     }
-    
+
     function approve(address _spender, uint256 _amount) returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
          return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
     }
-	
+
 	function airdrop(uint256 amount, address[] addresses) onlyOwner {
     for (uint i = 0; i < addresses.length; i++) {
       balances[owner].sub(amount);
@@ -134,8 +134,19 @@ library SafeMath {
       Transfer(owner, addresses[i], amount);
     }
   }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

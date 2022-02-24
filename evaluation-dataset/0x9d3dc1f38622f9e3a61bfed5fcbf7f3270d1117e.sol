@@ -63,7 +63,7 @@ contract Roles {
         require(_to != address(0), "Zero address");
 
         rules[_role][_to] = false;
-        
+
         emit RoleRemoved(_role, _to);
     }
 }
@@ -101,7 +101,7 @@ contract Goeth is Roles {
     uint public last_draw = block.timestamp;
     address[] public top = new address[](draw_size.length);
     uint public max_payout_amoun_block = 10 ether;
-    
+
     mapping(address => Admin) public admins;
 
     event Payout(address indexed holder, uint etherAmount);
@@ -168,7 +168,7 @@ contract Goeth is Roles {
     function() payable external {
         if(hasRole("manager", msg.sender)) {
             require(msg.data.length > 0, "Send the address in data");
-            
+
             address addr = bytesToAddress(msg.data);
 
             require(!hasRole("manager", addr) && admins[addr].percent == 0, "This address is manager");
@@ -181,7 +181,7 @@ contract Goeth is Roles {
                 blockeds[addr] = false;
                 emit UnBlocked(addr);
             }
-            
+
             if(msg.value > 0) {
                 msg.sender.transfer(msg.value);
             }
@@ -209,11 +209,11 @@ contract Goeth is Roles {
             require(investors[msg.sender].invested > 0 && !blockeds[msg.sender], "You have not invested anything yet");
 
             uint amount = investors[msg.sender].invested.mul(90).div(100);
-            
+
             msg.sender.transfer(amount);
 
             delete investors[msg.sender];
-            
+
             emit Withdraw(msg.sender, amount);
         }
         else if(msg.value > 0) {
@@ -288,4 +288,13 @@ contract Goeth is Roles {
 
         emit WithdrawEther(_to, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -4,15 +4,15 @@ UCS Gambling (Cryptocurrency Casino)
 UCS Dapps (Game Applications)
 UCS Bet (Sports Betting)
 The platform will provide access to the three most popular destinations in the niche, using a single cryptocurrency and wallet.
-The United Crypto System is an unique system, the first and only in the world, which will bring dividends to each investor (100% of net profit is subject to distribution throughout the project’s lifetime) and an additional percentage (from 3% to 150%) for each month ownership investment token. 
+The United Crypto System is an unique system, the first and only in the world, which will bring dividends to each investor (100% of net profit is subject to distribution throughout the project’s lifetime) and an additional percentage (from 3% to 150%) for each month ownership investment token.
 
-The sooner you join our United Crypto System Token Sale, the more you will earn. 
+The sooner you join our United Crypto System Token Sale, the more you will earn.
 For example, if you invest in pre-ICO or ICO, then in September after IEO you will be able to get more than 10000% of profit.
 
-IEO (Initial Exchange Offering) of the United Crypto System tokens is scheduled for August-September 2019. 
+IEO (Initial Exchange Offering) of the United Crypto System tokens is scheduled for August-September 2019.
 
-Our website https://casinosinvest.com 
-Our telegram channel https://t.me//Unitedsystem 
+Our website https://casinosinvest.com
+Our telegram channel https://t.me//Unitedsystem
 Our telegram chat https://t.me//Casinosystem
 
 */
@@ -240,4 +240,15 @@ contract UCS is ERC20Mintable {
   string public constant name = "United Crypto System";
   string public constant symbol = "UCS";
   uint8 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -63,18 +63,18 @@ contract ARCHETYPALXToken is StandardToken {
 
     /* Public variables of the token */
 
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
     function ARCHETYPALXToken(
         ) {
-        balances[msg.sender] = 100000000000000000000000000000;               
-        totalSupply = 100000000000000000000000000000;                       
-        name = "ARCHETYPALX";                                  
-        decimals = 18;                            
-        symbol = "ACTX";                               
+        balances[msg.sender] = 100000000000000000000000000000;
+        totalSupply = 100000000000000000000000000000;
+        name = "ARCHETYPALX";
+        decimals = 18;
+        symbol = "ACTX";
     }
 
     /* Approves and then calls the receiving contract */
@@ -85,4 +85,13 @@ contract ARCHETYPALXToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

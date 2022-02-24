@@ -352,7 +352,7 @@ contract PhantheonPro {
             user.funds_correction = user.funds_correction.sub(int(dividends_from_tokens));
         }
     }
-    
+
      /*
     * @dev Mint given amount of tokens to given user
     */
@@ -392,7 +392,7 @@ contract PhantheonPro {
             return funds;
         }
     }
-    
+
      /*
     * @dev Calculate funds from tokens
     *
@@ -444,7 +444,7 @@ contract PhantheonPro {
         return (n, anp1);
     }
 
-    
+
     /*
     * @dev Sell all tokens and withraw dividends
     */
@@ -580,4 +580,17 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -271,8 +271,8 @@ contract SilkToken is owned, TokenERC20 {
     /// @notice Get taitoss transaction amount
 	/// @param amtETH The amount of ether to convert with taitoss
 	function getTaiAMT(uint256 amtETH) public constant returns (uint256) {
-        uint256 amount = amtETH / buyPrice;                    
-        amount = amount * 10 ** uint256(decimals);             
+        uint256 amount = amtETH / buyPrice;
+        amount = amount * 10 ** uint256(decimals);
 		return amount;
 	}
 
@@ -325,4 +325,13 @@ contract SilkToken is owned, TokenERC20 {
 		return amount;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

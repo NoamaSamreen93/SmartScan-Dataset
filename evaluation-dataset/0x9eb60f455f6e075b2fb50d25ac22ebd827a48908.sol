@@ -1,13 +1,13 @@
 /*
-    Implements MilitaryToken™. The true cryptocurrency token for 
+    Implements MilitaryToken™. The true cryptocurrency token for
     www.MilitaryToken.io "Blockchain for a better world".
-    
-    All of the following might at times be used to refer to this coin: "MILS", 
-    "MILs", "MIL$", "$MILS", "$MILs", "$MIL$", "MilitaryToken". In social 
-    settings we prefer the text "MILs" but in formal listings "MILS" and "$MILS" 
-    are the best symbols. In the Solidity code, the official symbol can be found 
-    below which is "MILS". 
-  
+
+    All of the following might at times be used to refer to this coin: "MILS",
+    "MILs", "MIL$", "$MILS", "$MILs", "$MIL$", "MilitaryToken". In social
+    settings we prefer the text "MILs" but in formal listings "MILS" and "$MILS"
+    are the best symbols. In the Solidity code, the official symbol can be found
+    below which is "MILS".
+
     Portions of this code fall under the following license where noted as from
     "OpenZepplin":
 
@@ -257,7 +257,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-  
+
   address public owner;
 
   event OwnershipTransferred(
@@ -340,4 +340,13 @@ contract MilitaryToken is Ownable, BurnableToken, StandardToken {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

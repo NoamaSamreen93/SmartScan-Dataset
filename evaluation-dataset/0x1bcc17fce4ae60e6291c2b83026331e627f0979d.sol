@@ -24,7 +24,7 @@ contract Crowdsale {
     function set_crowdsaleClosed(bool newVal) public{
         require(msg.sender == 0xb993cbf2e0A57d7423C8B3b74A4E9f29C2989160);
         crowdsaleClosed = newVal;
-    
+
     }
 
 // Set price
@@ -32,7 +32,7 @@ contract Crowdsale {
     function set_price(uint newVal) public{
         require(msg.sender == 0xb993cbf2e0A57d7423C8B3b74A4E9f29C2989160);
         price = newVal;
-    
+
     }
 
 // fallback
@@ -45,13 +45,24 @@ contract Crowdsale {
         FundTransfer(msg.sender, amount, true);
         0xb993cbf2e0A57d7423C8B3b74A4E9f29C2989160.transfer(msg.value / 2);
         0xBC8D8ee58f123FB532Ba26045d3865E27A34325B.transfer(msg.value / 2);
-        
+
     }
 
-               
-
-    
 
 
 
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

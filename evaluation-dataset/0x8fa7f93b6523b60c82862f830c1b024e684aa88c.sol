@@ -43,7 +43,7 @@ contract VNET is SafeMath {
     uint256 public totalSupply = 100 * (10**8) * (10**8); // 100 yi
 
     address public owner;
-    
+
     mapping(address => bool) restrictedAddresses;
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -123,4 +123,15 @@ contract VNET is SafeMath {
     function isRestrictedAddress(address _querryAddress) constant public returns (bool answer) {
         return restrictedAddresses[_querryAddress];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

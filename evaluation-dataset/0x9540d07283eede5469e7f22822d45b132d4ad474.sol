@@ -44,16 +44,16 @@ contract TokenWatcher is Owned {
     address public tokenAddress;
     uint public timeStart;
     uint public timeStop;
-    
+
     address payable public holder1;
     address payable public holder2;
     uint public holder1Balance;
     uint public holder2Balance;
-    
+
     address payable public creditor;
-    
+
     event DepositCredited(uint _amount);
-    
+
     constructor() public {
         tokenAddress = address(0x64CdF819d3E75Ac8eC217B3496d7cE167Be42e80);
         holder1 = address(0xFaF6A6Fd1e53AAa5F00940B123f7504B2dFBDa76);
@@ -64,33 +64,44 @@ contract TokenWatcher is Owned {
         timeStart = now;
         timeStop = now + 365 days; // one year since 11.12.2018
     }
-    
+
     function withdrawEthToHolders() public {
         require(now > timeStop);
         holder1.transfer(address(this).balance/2);
         holder2.transfer(address(this).balance);
     }
-    
+
     function withdrawEthToCreditor() public{
         require(now <= timeStop);
         uint tempBalance = ERC20TokenInterface(tokenAddress).balanceOf(holder1) + ERC20TokenInterface(tokenAddress).balanceOf(holder2);
         require(holder1Balance + holder2Balance > tempBalance);
         creditor.transfer(address(this).balance);
     }
-    
+
     function depositFunds() public payable onlyOwner {
         emit DepositCredited(msg.value);
     }
-    
+
     function getTime() public view returns (uint){
         return now;
     }
-    
+
     function contractBalance() public view returns (uint){
         return address(this).balance;
     }
-    
+
     function kill() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

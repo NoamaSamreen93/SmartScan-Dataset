@@ -222,3 +222,7 @@ contract SuperAfrica
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

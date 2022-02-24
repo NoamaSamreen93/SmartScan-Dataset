@@ -31,7 +31,7 @@ contract FoundGameCoin {
 		uint8 decimalUnits,
         string tokenSymbol
     ) public {
-		
+
 		   balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
         name = tokenName;                                   // Set the name for display purposes
@@ -120,4 +120,15 @@ contract FoundGameCoin {
             return true;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

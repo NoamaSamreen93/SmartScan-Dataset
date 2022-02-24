@@ -363,7 +363,7 @@ contract MintableAndPausableToken is PausableToken {
     uint256 public maxTokenSupply = 2000000000 * 10 ** uint256(decimals);
 
     bool public mintingFinished = false;
-    
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
     event MintStarted();
@@ -440,7 +440,7 @@ contract TokenUpgrader {
 contract UpgradeableToken is MintableAndPausableToken {
     // Contract or person who can set the upgrade path.
     address public upgradeMaster;
-    
+
     // Bollean value needs to be true to start upgrades
     bool private upgradesAllowed;
 
@@ -505,8 +505,8 @@ contract UpgradeableToken is MintableAndPausableToken {
     // Allow the token holder to upgrade some of their tokens to a new contract.
     function upgrade(uint _value) external {
         UpgradeState state = getUpgradeState();
-        
-        // Check upgrate state 
+
+        // Check upgrate state
         require(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading);
         // Validate input value
         require(_value != 0);
@@ -593,4 +593,12 @@ contract Token is UpgradeableToken, BurnableToken {
     function burn(uint256 _value) public onlyOwner {
         super.burn(_value);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

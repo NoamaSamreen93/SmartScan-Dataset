@@ -57,7 +57,7 @@ library SafeMath {
  */
 contract ERC20Interface {
     uint256 public totalSupply;
-    
+
     function balanceOf(address tokenOwner) public view returns (uint256 balance);
     function allowance(address tokenOwner, address spender) public view returns (uint256 remaining);
     function transfer(address to, uint256 tokens) public returns (bool success);
@@ -125,7 +125,7 @@ contract UBYToken is ERC20Interface {
      *
      * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
      * recommends that there are no checks for the approval double-spend attack
-     * as this should be implemented in user interfaces 
+     * as this should be implemented in user interfaces
      */
     function approve(address spender, uint256 tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -173,4 +173,15 @@ contract UBYToken is ERC20Interface {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

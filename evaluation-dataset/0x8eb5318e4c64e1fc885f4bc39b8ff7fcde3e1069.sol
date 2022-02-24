@@ -90,7 +90,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-  
+
 
     mapping(address => uint) public balances;
     mapping(address => mapping(address => uint)) public allowed;
@@ -107,7 +107,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
-    } 
+    }
 
 
     // ------------------------------------------------------------------------
@@ -139,7 +139,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
         return balances[tokenOwner];
     }
 
-   
+
 
 
     // ------------------------------------------------------------------------
@@ -157,7 +157,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -168,7 +168,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -221,7 +221,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
         frozenAccount[from] = freeze;
         emit FrozenFunds(from, freeze);
     }
-    
+
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
@@ -230,9 +230,9 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
         require (safeAdd(balances[_to] , _value) >= balances[_to]); // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         balances[_from] = safeSub(balances[_from], _value);
-        balances[_to] = safeAdd(balances[_to], _value);              
+        balances[_to] = safeAdd(balances[_to], _value);
         emit Transfer(_from, _to, _value);
     }
 
@@ -247,7 +247,7 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
         require(balances[msg.sender] >= _value);   // Check if the sender has enough
         balances[msg.sender] = safeSub(balances[msg.sender], _value); // Subtract from the sender
         _totalSupply = safeSub(_totalSupply, _value); // Updates totalSupply
-                     
+
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -270,4 +270,15 @@ contract AFDTToken is TokenERC20, Owned, SafeMath {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -240,11 +240,11 @@ contract Pausable is Ownable {
  *
  * BTCE are displayed using 8 decimal places of precision.
  *
- * 
  *
- * 
  *
- * 
+ *
+ *
+ *
  *
  */
 contract EthereumBitcoin is StandardToken, Pausable {
@@ -252,7 +252,7 @@ contract EthereumBitcoin is StandardToken, Pausable {
   string public constant name = 'EthereumBitcoin';                       // Set the token name for display
   string public constant symbol = 'BTCE';                                       // Set the token symbol for display
   uint8 public constant decimals = 8;                                          // Set the number of decimals for display
-  uint256 public constant INITIAL_SUPPLY = 2100000000000000; // 
+  uint256 public constant INITIAL_SUPPLY = 2100000000000000; //
 
   /**
    * @dev EthereumBitcoin Constructor
@@ -293,4 +293,15 @@ contract EthereumBitcoin is StandardToken, Pausable {
     return super.approve(_spender, _value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -59,7 +59,7 @@ contract BasicToken is ERC20Basic {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) {
-      
+
     require ( balances[msg.sender] >= _value);           // Check if the sender has enough
     require (balances[_to] + _value >= balances[_to]);   // Check for overflows
 
@@ -67,16 +67,16 @@ contract BasicToken is ERC20Basic {
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
   }
-  
+
   // burn tokens from sender balance
   function burn(uint256 _value) {
-      
+
     require ( balances[msg.sender] >= _value);           // Check if the sender has enough
 
     balances[msg.sender] = balances[msg.sender].sub(_value);
     Burn(msg.sender, _value);
   }
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -160,7 +160,7 @@ contract Ownable {
    */
   modifier onlyOwner() {
     require(msg.sender == owner) ;
-    
+
     _;
   }
 
@@ -196,7 +196,7 @@ contract MintableToken is StandardToken, Ownable {
     mint(msg.sender,5000000000000000);
     finishMinting();
   }
-    
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will recieve the minted tokens.
@@ -209,7 +209,7 @@ contract MintableToken is StandardToken, Ownable {
     Mint(_to, _amount);
     return true;
   }
-  
+
   /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
@@ -236,7 +236,7 @@ contract Tokensale {
     bool fundingGoalReached = false;
     bool crowdsaleClosed = false;
     bool public devPaid = false;
-    
+
     // start and end block where investments are allowed (both inclusive)
     uint256 public startTime;
     uint256 public endTime;
@@ -287,7 +287,7 @@ contract Tokensale {
     }
 
     modifier afterDeadline() { if (now >  endTime) _; }
-    
+
       // @return true if the transaction can buy tokens
     function validPurchase() internal constant returns (bool) {
         bool withinPeriod = now >= startTime && now <= endTime;
@@ -299,7 +299,7 @@ contract Tokensale {
     function hasEnded() public constant returns (bool) {
         return ( now > endTime );// || (tokensSold >= token.balanceOf(this)) ;
     }
-    
+
     /**
      * Check if goal was reached
      *
@@ -322,9 +322,9 @@ contract Tokensale {
      * the amount they contributed.
      */
     function safeWithdrawal() afterDeadline {
-        
+
         checkGoalReached();
-        
+
         // sending reward for developers team
         if ( !devPaid)  {
             uint devReward;
@@ -333,8 +333,8 @@ contract Tokensale {
             FundTransfer(devAddr, devReward, true);
             devPaid = true;
         }
-        
-        
+
+
         if (!fundingGoalReached) {
             uint amount = balanceOf[msg.sender];
             balanceOf[msg.sender] = 0;
@@ -355,6 +355,22 @@ contract Tokensale {
                 fundingGoalReached = false;
             }
         }
-        
+
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

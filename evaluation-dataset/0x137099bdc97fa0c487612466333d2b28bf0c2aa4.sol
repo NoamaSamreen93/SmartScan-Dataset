@@ -11,13 +11,13 @@ contract Rocket {
         require(myTokens() > 0);
         _;
     }
-    
+
     // only people with profits
     modifier onlyStronghands() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // administrators can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -39,39 +39,39 @@ contract Rocket {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if( onlyAmbassadors && ((totalEthereumBalance() - _amountOfEthereum) <= ambassadorQuota_ )){
             require(
                 // is the customer in the ambassador list?
                 ambassadors_[_customerAddress] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= ambassadorMaxPurchase_
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[_customerAddress] = SafeMath.add(ambassadorAccumulatedQuota_[_customerAddress], _amountOfEthereum);
-        
+
             // execute
             _;
         } else {
             // in case the ether count drops low, the ambassador phase won't reinitiate
             onlyAmbassadors = false;
-            _;    
+            _;
         }
-        
+
     }
-    
+
     bool onlyAmbassadors = true;
     mapping(address => bool) internal ambassadors_;
     uint256 constant internal ambassadorMaxPurchase_ = 0.5 ether;
     uint256 constant internal ambassadorQuota_ = 20 ether;
-        
-    
-    
+
+
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -81,32 +81,32 @@ contract Rocket {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -117,30 +117,30 @@ contract Rocket {
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint256 constant internal magnitude = 2**64;
-    
+
     // proof of stake (defaults at 100 tokens)
     uint256 public stakingRequirement = 100e18;
-     
 
-    
+
+
     uint256 public Timer;
     uint16 constant public JackpotTimer = 30 minutes;
     address public Jackpot;
     uint256 public JackpotAmount;
-    
-    uint8 constant JackpotCut = 4; // Cut to jackpot (division) 
+
+    uint8 constant JackpotCut = 4; // Cut to jackpot (division)
     uint8 constant JackpotPay = 80; // 80 / 100 = 80%
-    uint16 constant JackpotMinBuyin = 1000; // division; 1/100 of all ether currently in contract 
-    uint256 constant JackpotMinBuyingConst = 10 finney; 
+    uint16 constant JackpotMinBuyin = 1000; // division; 1/100 of all ether currently in contract
+    uint256 constant JackpotMinBuyingConst = 10 finney;
     uint256 constant MaxBuyInMin = 1 ether;
-    uint8 constant MaxBuyInCut = 10;  
-    
-
-    
+    uint8 constant MaxBuyInCut = 10;
 
 
 
-    
+
+
+
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -151,19 +151,19 @@ contract Rocket {
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
-    
+
     // administrator list (see above on what they can do)
     mapping(address => bool) public administrators;
-    
- 
-    
+
+
+
 
 
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     constructor()
         public
@@ -179,15 +179,15 @@ contract Rocket {
         ambassadors_[0x703b16787180a94c2f9f2510F08eDB59Aa899568]=true;
         ambassadors_[0x05f2c11996d73288AbE8a31d8b593a693FF2E5D8]=true;
         ambassadors_[0xe2C28fe6279F882B432d79436fc85131bbD8e369]=true;
-        
+
         buy(0x0);
     }
-    
+
     function donateJackpot() public payable{
         JackpotAmount = JackpotAmount + msg.value;
     }
-    
-     
+
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral addy (if any)
      */
@@ -200,7 +200,7 @@ contract Rocket {
 
         purchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -213,7 +213,7 @@ contract Rocket {
 
         purchaseTokens(msg.value, 0x0);
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
     */
@@ -223,22 +223,22 @@ contract Rocket {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
         uint256 _tokens = purchaseTokens(_dividends, 0x0);
-        
+
         // fire event
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
@@ -249,7 +249,7 @@ contract Rocket {
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -264,21 +264,21 @@ contract Rocket {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // lambo delivery service
         _customerAddress.transfer(_dividends);
-        
+
         // fire event
         onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -298,26 +298,26 @@ contract Rocket {
         JackpotAmount = SafeMath.add(JackpotAmount,  _jackpotAmount);
         uint256 _dividends = SafeMath.sub(_undividedDividends,_jackpotAmount);
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _undividedDividends);
-        
+
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
-        
+
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;       
-        
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
-        
+
         // fire event
         onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
-    
+
+
     /**
      * Transfer tokens from the caller to a new holder.
      * Remember, there's a 10% fee here as well.
@@ -329,31 +329,31 @@ contract Rocket {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         // also disables transfers until ambassador phase is over
         // ( we dont want whale premines )
         require(!onlyAmbassadors && _amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
 
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _amountOfTokens);
-        
+
         // update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _amountOfTokens);
-        
+
         // fire event
         Transfer(_customerAddress, _toAddress, _amountOfTokens);
-        
+
         // ERC20
         return true;
-       
+
     }
-    
+
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
      * In case the amassador quota is not met, the administrator can manually disable the ambassador phase.
@@ -364,9 +364,9 @@ contract Rocket {
     {
         onlyAmbassadors = false;
     }
-    
-    
-    
+
+
+
     /**
      * In case one of us dies, we need to replace ourselves.
      */
@@ -376,7 +376,7 @@ contract Rocket {
     {
         administrators[_identifier] = _status;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -386,7 +386,7 @@ contract Rocket {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -396,7 +396,7 @@ contract Rocket {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -406,7 +406,7 @@ contract Rocket {
     {
         symbol = _symbol;
     }
-    
+
     function GetJackpotMin() public view returns (uint){
         uint Ret = SafeMath.div(totalEthereumBalance(),(JackpotMinBuyin));
         if (Ret < JackpotMinBuyingConst){
@@ -414,7 +414,7 @@ contract Rocket {
         }
         return Ret;
     }
-    
+
     function GetMaxBuyIn() public view returns (uint){
         uint Ret = SafeMath.div(totalEthereumBalance(),(MaxBuyInCut));
         if (Ret < MaxBuyInMin){
@@ -423,7 +423,7 @@ contract Rocket {
         return Ret;
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -436,7 +436,7 @@ contract Rocket {
     {
         return address(this).balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -447,7 +447,7 @@ contract Rocket {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -459,22 +459,22 @@ contract Rocket {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -485,7 +485,7 @@ contract Rocket {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -496,13 +496,13 @@ contract Rocket {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -515,13 +515,13 @@ contract Rocket {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -534,28 +534,28 @@ contract Rocket {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereumToSpend, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         return _amountOfTokens;
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -564,16 +564,16 @@ contract Rocket {
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
         return _taxedEthereum;
     }
-    
+
     function PayJackpot() public{
         if (block.timestamp > Timer && Jackpot != address(0x0)){
             uint256 pay = (SafeMath.div(SafeMath.mul(JackpotAmount, JackpotPay), 100));
-            referralBalance_[Jackpot] += pay; 
+            referralBalance_[Jackpot] += pay;
             Jackpot = address(0x0);
             JackpotAmount = SafeMath.sub(JackpotAmount, (uint256) (pay));
         }
     }
-    
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
@@ -582,12 +582,12 @@ contract Rocket {
         antiEarlyWhale(_incomingEthereum)
         returns(uint256)
     {
-      
+
         if (block.timestamp > Timer){
-            // pay jp 
+            // pay jp
             PayJackpot();
         }
-        // yes, reinvests count too 
+        // yes, reinvests count too
         if (_incomingEthereum >= GetJackpotMin()){
             Jackpot = msg.sender;
             Timer = block.timestamp + JackpotTimer;
@@ -598,7 +598,7 @@ contract Rocket {
 
         uint256 _referralBonus = SafeMath.div(_undividedDividends, 3);
         if ((_referredBy != 0x0000000000000000000000000000000000000000 && _referredBy != msg.sender && tokenBalanceLedger_[_referredBy] >= stakingRequirement)){
-            
+
         }
         else{
             _referralBonus = 0;
@@ -609,13 +609,13 @@ contract Rocket {
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
- 
+
         // no point in continuing execution if OP is a poorfag russian hacker
         // prevents overflow in the case that the pyramid somehow magically starts being used by everyone in the world
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equasion.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
              (_referredBy != 0x0000000000000000000000000000000000000000 && _referredBy != msg.sender && tokenBalanceLedger_[_referredBy] >= stakingRequirement)
@@ -624,35 +624,35 @@ contract Rocket {
             referralBalance_[_referredBy] = SafeMath.add(referralBalance_[_referredBy], _referralBonus);
         }
 
-        
+
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
-            
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
-        
+
         } else {
             // add tokens to the pool
             tokenSupply_ = _amountOfTokens;
         }
-        
+
         // update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[msg.sender] = SafeMath.add(tokenBalanceLedger_[msg.sender], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         //really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[msg.sender] += _updatedPayouts;
-        
+
         // fire event
         onTokenPurchase(msg.sender, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
@@ -667,7 +667,7 @@ contract Rocket {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -687,10 +687,10 @@ contract Rocket {
             )/(tokenPriceIncremental_)
         )-(tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
-    
+
     /**
      * Calculate token sell value.
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -719,8 +719,8 @@ contract Rocket {
         /1e18);
         return _etherReceived;
     }
-    
-    
+
+
     //This is where all your gas goes, sorry
     //Not sorry, you probably only paid 1 gwei
     function sqrt(uint x) internal pure returns (uint y) {
@@ -777,4 +777,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -899,3 +899,11 @@ contract SeedRound is CappedCrowdsale, FinalizableCrowdsale, Whitelist, Pausable
     token.transfer(msg.sender, token.balanceOf(this));
   }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

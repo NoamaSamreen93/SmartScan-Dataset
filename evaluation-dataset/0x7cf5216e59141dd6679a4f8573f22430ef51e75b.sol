@@ -153,7 +153,7 @@ contract SandwichShop
         {
             if( shopSandwich[ cart[msg.sender][x].sandwichIdNumber ].quantity > 0 )
             {
-                NewSandwichTicket( _firstname, msg.sender, 
+                NewSandwichTicket( _firstname, msg.sender,
                                    shopSandwich[ cart[msg.sender][x].sandwichIdNumber ].sandwichName,
                                    cart[msg.sender][x].notes );
                 decrementQuantity( cart[msg.sender][x].sandwichIdNumber );
@@ -180,4 +180,15 @@ contract SandwichShop
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

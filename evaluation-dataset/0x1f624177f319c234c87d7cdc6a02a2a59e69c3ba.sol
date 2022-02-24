@@ -175,7 +175,7 @@ contract Gabicoin is Owned, EIP20
         activatedPhases[2] = i2;
 
         Activate();
-        
+
         isActive = true;// Activate token.
     }
 
@@ -213,4 +213,15 @@ contract Gabicoin is Owned, EIP20
 
     // Ico balances.
     mapping (address => IcoBalance) public icoBalances;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

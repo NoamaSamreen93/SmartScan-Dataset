@@ -28,7 +28,7 @@ library SafeMath {
 
     // ERC20 Token Smart Contract
     contract HOTCOIN {
-        
+
         string public constant name = "HOTCOIN";
         string public constant symbol = "HOT";
         uint8 public constant decimals = 18;
@@ -36,10 +36,10 @@ library SafeMath {
         uint256 public RATE = 1;
         bool public isMinting = true;
         string public constant generatedBy  = "Togen.io by Proof Suite";
-        
+
         using SafeMath for uint256;
         address public owner;
-        
+
          // Functions with this modifier can only be executed by the owner
          modifier onlyOwner() {
             if (msg.sender != owner) {
@@ -47,7 +47,7 @@ library SafeMath {
             }
              _;
          }
-     
+
         // Balances for each account
         mapping(address => uint256) balances;
         // Owner of account approves the transfer of an amount to another account
@@ -60,7 +60,7 @@ library SafeMath {
 
         // Constructor
         constructor() public {
-            owner = 0xaffde113872b3fe922db4f20634f0258ae75fa78; 
+            owner = 0xaffde113872b3fe922db4f20634f0258ae75fa78;
             balances[owner] = _totalSupply;
         }
 
@@ -70,12 +70,12 @@ library SafeMath {
              require(balances[msg.sender] >= _value && _value > 0 );
              _totalSupply = _totalSupply.sub(_value);
              balances[msg.sender] = balances[msg.sender].sub(_value);
-             
+
         }
 
 
 
-        // This function creates Tokens  
+        // This function creates Tokens
          function createTokens() payable {
             if(isMinting == true){
                 require(msg.value > 0);
@@ -99,7 +99,7 @@ library SafeMath {
         }
 
 
-        
+
         function totalSupply() constant returns(uint256){
             return _totalSupply;
         }
@@ -108,7 +108,7 @@ library SafeMath {
             return balances[_owner];
         }
 
-         // Transfer the balance from owner's account to another account   
+         // Transfer the balance from owner's account to another account
         function transfer(address _to, uint256 _value)  returns(bool) {
             require(balances[msg.sender] >= _value && _value > 0 );
             balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -116,7 +116,7 @@ library SafeMath {
             Transfer(msg.sender, _to, _value);
             return true;
         }
-        
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -131,20 +131,36 @@ library SafeMath {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _value) returns(bool){
-        allowed[msg.sender][_spender] = _value; 
+        allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     // Returns the amount which _spender is still allowed to withdraw from _owner
     function allowance(address _owner, address _spender) constant returns(uint256){
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -127,7 +127,7 @@ contract EXVToken is ERC20Interface, Owned {
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -149,7 +149,7 @@ contract EXVToken is ERC20Interface, Owned {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf(_from) + balanceOf(_to) == previousBalances);
     }
-    
+
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to `to` account
     // - Owner's account must have sufficient balance to transfer
@@ -232,4 +232,15 @@ contract EXVToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

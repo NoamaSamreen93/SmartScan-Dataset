@@ -102,7 +102,7 @@ contract zombieMain {
 
 contract zombieInvasion is Ownable{
     using SafeMath for uint256;
-    
+
     zombieToken zombietoken = zombieToken(0x83B8C8A08938B878017fDF0Ec0A689313F75739D);
     zombieMain zombiemain = zombieMain(0x58fd762F76D57C6fC2a480F6d26c1D03175AD64F);
 
@@ -113,7 +113,7 @@ contract zombieInvasion is Ownable{
     }
 
     struct Area {
-      uint starLimit; 
+      uint starLimit;
       uint8 TeamMemberlimitCount; // 5
       uint8[] roletype;     //  4,4,99,99,99
       uint TotallimitTeamCount;
@@ -133,7 +133,7 @@ contract zombieInvasion is Ownable{
       bytes32 teamHash;
       uint blocknumber;
     }
-    
+
     Area[] public areas;
 
     mapping (uint=>Zombie) public zombies;
@@ -170,13 +170,13 @@ contract zombieInvasion is Ownable{
     for(uint16 a = 0; a<areas[_areaId].roletype.length; a++){
       if(areas[_areaId].roletype[a] == 99) continue;
       if(zombiemain.seeZombieRole(_zombieId[a]) != areas[_areaId].roletype[a]) revert();
-    }    
+    }
 
     areas[_areaId].TotalTeamCount ++;
 
     require(teams[teamHash].areaID == 0);
     teams[teamHash] = Team(false,_areaId,_zombieId,uint32(now+areas[_areaId].duration),msg.sender,teamHash,block.number + 1);
-    
+
     StartInvasion(teamHash, _areaId, _zombieId);
   }
 
@@ -226,9 +226,20 @@ contract zombieInvasion is Ownable{
   function addArea(uint starLimit,uint8 TeamMemberlimitCount,uint8[] roletype,uint _totallimitTeamCount,string name,uint ZOBRevenue,bool isOpen,uint32 duration) public onlyOwner{
       areas.push(Area(starLimit, TeamMemberlimitCount, roletype, _totallimitTeamCount, 0, name, ZOBRevenue, isOpen, duration));
   }
-  
+
   function closeArea(uint areaId) public onlyOwner{
       areas[areaId].isOpen = false;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

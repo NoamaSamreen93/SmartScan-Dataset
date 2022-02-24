@@ -69,7 +69,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function max256(uint256 a, uint256 b) internal pure returns (uint256) {
     return a >= b ? a : b;
   }
@@ -104,7 +104,7 @@ contract StandardToken is ERC20Token {
         balances[msg.sender] = balances[msg.sender].safeSub(_value);
         balances[_to] = balances[_to].safeAdd(_value);
 
-        emit Transfer(msg.sender, _to, _value);            
+        emit Transfer(msg.sender, _to, _value);
 
         return true;
     }
@@ -124,12 +124,12 @@ contract StandardToken is ERC20Token {
         allowed[_from][msg.sender] = _allowance.safeSub(_value);
 
         emit Transfer(_from, _to, _value);
-            
+
         return true;
     }
 
     /// @dev Gets the balance of the specified address.
-    /// @param _owner The address to query the the balance of. 
+    /// @param _owner The address to query the the balance of.
     /// @return An uint256 representing the amount owned by the passed address.
     function balanceOf(address _owner) view public returns (uint256) {
         return balances[_owner];
@@ -144,7 +144,7 @@ contract StandardToken is ERC20Token {
         //  already 0 to mitigate the race condition described here:
         //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-        
+
         allowed[msg.sender][_spender] = _value;
 
         emit Approval(msg.sender, _spender, _value);
@@ -161,7 +161,7 @@ contract StandardToken is ERC20Token {
     }
 
     /// @notice approve should be called when allowed[_spender] == 0. To increment
-    /// allowed value it is better to use this function to avoid 2 calls (and wait until 
+    /// allowed value it is better to use this function to avoid 2 calls (and wait until
     /// the first transaction is mined)
     function increaseApproval (address _spender, uint256 _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].safeAdd(_addedValue);
@@ -172,11 +172,11 @@ contract StandardToken is ERC20Token {
     }
 
     /// @notice approve should be called when allowed[_spender] == 0. To decrement
-    /// allowed value it is better to use this function to avoid 2 calls (and wait until 
+    /// allowed value it is better to use this function to avoid 2 calls (and wait until
     /// the first transaction is mined)
     function decreaseApproval (address _spender, uint256 _subtractedValue) public returns (bool) {
         uint256 oldValue = allowed[msg.sender][_spender];
-        
+
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
         } else {
@@ -206,7 +206,7 @@ contract MigrationAgent {
 /// @author Hoard Team
 contract Mintable {
 
-    /// @dev Mint new tokens  
+    /// @dev Mint new tokens
     /// @notice params -> (address _recipient, uint256 _amount)
     function mintTokens         (address, uint256) public;
 }
@@ -216,7 +216,7 @@ contract Mintable {
 /// @author Hoard Team
 contract Migratable {
 
-    /// @dev Migrates tokens for msg.sender  
+    /// @dev Migrates tokens for msg.sender
     /// @notice params -> (uint256 _value)
     function migrate            (uint256) public;
 
@@ -259,10 +259,10 @@ contract ExtendedStandardToken is StandardToken, Migratable, Mintable {
 
         // Validate input value
         require(_value > 0);
-    
+
         //require(_value <= balances[msg.sender]);
         //not necessary as safeSub throws in case the above condition does not hold
-    
+
         balances[msg.sender] = balances[msg.sender].safeSub(_value);
         totalSupply = totalSupply.safeSub(_value);
         totalMigrated = totalMigrated.safeAdd(_value);
@@ -276,7 +276,7 @@ contract ExtendedStandardToken is StandardToken, Migratable, Mintable {
     // MINTING LOGIC
 
     /// @dev Mints additional tokens
-    /// @param _recipient owner of new tokens 
+    /// @param _recipient owner of new tokens
     /// @param _amount amount of tokens to mint
     function mintTokens         (address _recipient, uint256 _amount) public {
         require(_amount > 0);
@@ -292,9 +292,9 @@ contract ExtendedStandardToken is StandardToken, Migratable, Mintable {
     // CONTROL LOGIC
 
     /// @dev Sets address of a new migration agent
-    /// @param _address address of new migration agent 
+    /// @param _address address of new migration agent
     function setMigrationAgent  (address _address) public {
-        migrationAgent = _address; 
+        migrationAgent = _address;
     }
 
 }
@@ -353,14 +353,14 @@ contract HoardToken is ExtendedStandardToken {
 
     /// @notice ExtendedStandardToken is StandardToken
     function transfer               (address _to, uint256 _value) public
-        returns (bool) 
+        returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
 
     /// @notice ExtendedStandardToken is StandardToken
-    function transferFrom           (address _from, address _to, uint256 _value) public 
+    function transferFrom           (address _from, address _to, uint256 _value) public
         returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
@@ -369,7 +369,7 @@ contract HoardToken is ExtendedStandardToken {
 
     /// @notice ExtendedStandardToken is Migratable
     function migrate                (uint256 _value) public migrationAgentSet {
-        super.migrate(_value);    
+        super.migrate(_value);
     }
 
     /// @notice ExtendedStandardToken
@@ -392,4 +392,13 @@ contract HoardToken is ExtendedStandardToken {
     /// @dev changes migration master address to another one
     function changeMigrationMaster  (address _address) onlyHoard external { migrationMaster = _address; }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -2604,7 +2604,7 @@ contract QuantstampAuditView is Ownable {
   function getReportHash(uint256 requestId) public view returns (bytes32) {
     return keccak256(reportData.getReport(requestId));
   }
-  
+
   /**
    * @dev Returns the sum of min audit prices.
    */
@@ -2718,4 +2718,15 @@ contract QuantstampAuditView is Ownable {
     }
     return arr;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

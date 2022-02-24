@@ -115,7 +115,7 @@ contract EthToSmthSwaps {
     swaps[_ownerAddress][msg.sender].balance = 0;
     swaps[_ownerAddress][msg.sender].secret = _secret;
 
-    Withdraw(msg.sender, _ownerAddress, now); 
+    Withdraw(msg.sender, _ownerAddress, now);
   }
   // BTC Owner withdraw money and adds secret key to swap
   // BTC Owner receive +1 reputation
@@ -131,7 +131,7 @@ contract EthToSmthSwaps {
     swaps[msg.sender][participantAddress].balance = 0;
     swaps[msg.sender][participantAddress].secret = _secret;
 
-    Withdraw(participantAddress, msg.sender, now); 
+    Withdraw(participantAddress, msg.sender, now);
   }
   // BTC Owner withdraw money and adds secret key to swap
   // BTC Owner receive +1 reputation
@@ -147,7 +147,7 @@ contract EthToSmthSwaps {
     swaps[_ownerAddress][participantAddress].balance = 0;
     swaps[_ownerAddress][participantAddress].secret = _secret;
 
-    Withdraw(participantAddress, _ownerAddress, now); 
+    Withdraw(participantAddress, _ownerAddress, now);
   }
 
   // ETH Owner receive secret
@@ -180,4 +180,15 @@ contract EthToSmthSwaps {
     delete swaps[_ownerAddress][_participantAddress];
     delete participantSigns[_ownerAddress][_participantAddress];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

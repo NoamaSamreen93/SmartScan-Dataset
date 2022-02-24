@@ -25,7 +25,7 @@ contract XaibeCoin {
 
 	constructor(uint256 _initialSupply) public {
 		balanceOf[msg.sender] = _initialSupply;
-		totalSupply = _initialSupply;		
+		totalSupply = _initialSupply;
 	}
 
 	function transfer(address _to, uint256 _value) public returns(bool success) {
@@ -40,19 +40,30 @@ contract XaibeCoin {
 	function approve(address _spender, uint256 _value) public returns(bool success){
 		allowance[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
-		return true;	
+		return true;
 	}
 
 	function transferFrom(address _from, address _to, uint256 _value) public returns(bool success){
 		require(_value <= balanceOf[_from]);
 		require(_value <= allowance[_from][msg.sender]);
-		
+
 		balanceOf[_from] -= _value;
 		balanceOf[_to] += _value;
-		
+
 		allowance[_from][msg.sender] -= _value;
 
 		Transfer(_from, _to, _value);
 		return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

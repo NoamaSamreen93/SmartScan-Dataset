@@ -184,7 +184,7 @@ contract OWNI_Contract is IERC20, Ownable, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -195,7 +195,7 @@ contract OWNI_Contract is IERC20, Ownable, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -226,7 +226,7 @@ contract OWNI_Contract is IERC20, Ownable, SafeMath {
     function () public payable {
         revert();
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
@@ -234,4 +234,10 @@ contract OWNI_Contract is IERC20, Ownable, SafeMath {
         return IERC20(tokenAddress).transfer(owner(), tokens);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

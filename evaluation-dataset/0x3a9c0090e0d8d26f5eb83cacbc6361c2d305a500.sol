@@ -119,13 +119,13 @@ contract BasicToken is ERC20Basic, Ownable {
   mapping(address => uint256) balances;
   // 1 denied / 0 allow
   mapping(address => uint8) permissionsList;
-  
+
   function SetPermissionsList(address _address, uint8 _sign) public onlyOwner{
-    permissionsList[_address] = _sign; 
+    permissionsList[_address] = _sign;
   }
   function GetPermissionsList(address _address) public constant onlyOwner returns(uint8){
-    return permissionsList[_address]; 
-  }  
+    return permissionsList[_address];
+  }
   uint256 totalSupply_;
 
   /**
@@ -423,11 +423,11 @@ contract BurnableByOwner is BasicToken {
 }
 
 contract TRND is Ownable, MintableToken, BurnableByOwner {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Trends";
   string public constant symbol = "TRND";
   uint32 public constant decimals = 18;
-  
+
   address public addressPrivateSale;
   address public addressAirdrop;
   address public addressFoundersShare;
@@ -442,13 +442,13 @@ contract TRND is Ownable, MintableToken, BurnableByOwner {
   function TRND() public {
     addressPrivateSale   = 0x6701DdeDBeb3155B8c908D0D12985A699B9d2272;
     addressFoundersShare = 0x441B2B781a6b411f1988084a597e2ED4e0A7C352;
-    addressPartnershipsAndExchanges  = 0x5317709Ffae188eF4ed3BC3434a4EC629778721f; 
+    addressPartnershipsAndExchanges  = 0x5317709Ffae188eF4ed3BC3434a4EC629778721f;
     addressAirdrop       = 0xd176131235B5B8dC314202a8B348CC71798B0874;
-	
-    summPrivateSale   = 5000000 * (10 ** uint256(decimals)); 
-    summFoundersShare = 5000000 * (10 ** uint256(decimals));  
-    summPartnershipsAndExchanges  = 7500000 * (10 ** uint256(decimals));  		    
-    summAirdrop       = 2500000 * (10 ** uint256(decimals));  
+
+    summPrivateSale   = 5000000 * (10 ** uint256(decimals));
+    summFoundersShare = 5000000 * (10 ** uint256(decimals));
+    summPartnershipsAndExchanges  = 7500000 * (10 ** uint256(decimals));
+    summAirdrop       = 2500000 * (10 ** uint256(decimals));
     // Founders and supporters initial Allocations
     mint(addressPrivateSale, summPrivateSale);
     mint(addressAirdrop, summAirdrop);
@@ -472,8 +472,8 @@ contract Crowdsale is Ownable {
   // soft cap
   uint softcap;
   // hard cap
-  uint256 hardcapPreICO; 
-  uint256 hardcapMainSale;  
+  uint256 hardcapPreICO;
+  uint256 hardcapMainSale;
   TRND public token;
   // balances for softcap
   mapping(address => uint) public balances;
@@ -481,17 +481,17 @@ contract Crowdsale is Ownable {
   // start and end timestamps where investments are allowed (both inclusive)
   //ico
     //start
-  uint256 public startIcoPreICO;  
-  uint256 public startIcoMainSale;  
-    //end 
-  uint256 public endIcoPreICO; 
-  uint256 public endIcoMainSale;   
+  uint256 public startIcoPreICO;
+  uint256 public startIcoMainSale;
+    //end
+  uint256 public endIcoPreICO;
+  uint256 public endIcoMainSale;
   //token distribution
  // uint256 public maxIco;
 
   uint256 public totalSoldTokens;
-  uint256 minPurchasePreICO;     
-  
+  uint256 minPurchasePreICO;
+
   // how many token units a Contributor gets per wei
   uint256 public rateIcoPreICO;
   uint256 public rateIcoMainSale;
@@ -501,8 +501,8 @@ contract Crowdsale is Ownable {
   mapping(address => uint) public unconfirmedSumAddr;
   // address where funds are collected
   address public wallet;
-  
-  
+
+
 /**
 * event for token Procurement logging
 * @param contributor who Pledged for the tokens
@@ -511,19 +511,19 @@ contract Crowdsale is Ownable {
 * @param amount amount of tokens Procured
 */
   event TokenProcurement(address indexed contributor, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   function Crowdsale() public {
     token = createTokenContract();
     //soft cap in tokens
-    softcap            = 20000000 * 1 ether; 
-    hardcapPreICO      =  5000000 * 1 ether; 
-    hardcapMainSale    = 75000000 * 1 ether; 
-	
+    softcap            = 20000000 * 1 ether;
+    hardcapPreICO      =  5000000 * 1 ether;
+    hardcapMainSale    = 75000000 * 1 ether;
+
     //min Purchase in wei = 0.1 ETH
     minPurchasePreICO      = 100000000000000000;
     // start and end timestamps where investments are allowed
     //ico
-    //start/end 
+    //start/end
     startIcoPreICO   = 1527843600; //   06/01/2018 @ 9:00am (UTC)
     endIcoPreICO     = 1530435600; //   07/01/2018 @ 9:00am (UTC)
     startIcoMainSale = 1530435600; //   07/01/2018 @ 9:00am (UTC)
@@ -537,8 +537,8 @@ contract Crowdsale is Ownable {
     // address where funds are collected
     wallet = 0xca5EdAE100d4D262DC3Ec2dE96FD9943Ea659d04;
   }
-  
-  function setStartIcoPreICO(uint256 _startIcoPreICO) public onlyOwner  { 
+
+  function setStartIcoPreICO(uint256 _startIcoPreICO) public onlyOwner  {
     uint256 delta;
     require(now < startIcoPreICO);
 	if (startIcoPreICO > _startIcoPreICO) {
@@ -554,56 +554,56 @@ contract Crowdsale is Ownable {
 	  endIcoPreICO     = endIcoPreICO.add(delta);
       startIcoMainSale = startIcoMainSale.add(delta);
       endIcoMainSale   = endIcoMainSale.add(delta);
-	}	
+	}
   }
-  
+
   function setRateIcoPreICO(uint256 _rateIcoPreICO) public onlyOwner  {
     rateIcoPreICO = _rateIcoPreICO;
-  }   
+  }
   function setRateIcoMainSale(uint _rateIcoMainSale) public onlyOwner  {
     rateIcoMainSale = _rateIcoMainSale;
-  }     
+  }
   // fallback function can be used to Procure tokens
   function () external payable {
     procureTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (TRND) {
     return new TRND();
   }
-  
+
   function getRateIcoWithBonus() public view returns (uint256) {
     uint256 bonus;
 	uint256 rateICO;
-    //icoPreICO   
+    //icoPreICO
     if (now >= startIcoPreICO && now < endIcoPreICO){
       rateICO = rateIcoPreICO;
-    }  
+    }
 
-    //icoMainSale   
+    //icoMainSale
     if (now >= startIcoMainSale  && now < endIcoMainSale){
       rateICO = rateIcoMainSale;
-    }  
+    }
 
     //bonus
     if (now >= startIcoPreICO && now < startIcoPreICO.add( 2 * 7 * 1 days )){
       bonus = 10;
-    }  
+    }
     if (now >= startIcoPreICO.add(2 * 7 * 1 days) && now < startIcoPreICO.add(4 * 7 * 1 days)){
       bonus = 8;
-    } 
+    }
     if (now >= startIcoPreICO.add(4 * 7 * 1 days) && now < startIcoPreICO.add(6 * 7 * 1 days)){
       bonus = 6;
-    } 
+    }
     if (now >= startIcoPreICO.add(6 * 7 * 1 days) && now < startIcoPreICO.add(8 * 7 * 1 days)){
       bonus = 4;
-    } 
+    }
     if (now >= startIcoPreICO.add(8 * 7 * 1 days) && now < startIcoPreICO.add(10 * 7 * 1 days)){
       bonus = 2;
-    } 
+    }
 
     return rateICO + rateICO.mul(bonus).div(100);
-  }    
+  }
   // low level token Pledge function
   function procureTokens(address beneficiary) public payable {
     uint256 tokens;
@@ -613,27 +613,27 @@ contract Crowdsale is Ownable {
     uint hardCap;
     require(beneficiary != address(0));
     rate = getRateIcoWithBonus();
-    //icoPreICO   
+    //icoPreICO
     hardCap = hardcapPreICO;
     if (now >= startIcoPreICO && now < endIcoPreICO && totalSoldTokens < hardCap){
 	  require(weiAmount >= minPurchasePreICO);
       tokens = weiAmount.mul(rate);
       if (hardCap.sub(totalSoldTokens) < tokens){
-        tokens = hardCap.sub(totalSoldTokens); 
+        tokens = hardCap.sub(totalSoldTokens);
         weiAmount = tokens.div(rate);
         backAmount = msg.value.sub(weiAmount);
       }
-    }  
-    //icoMainSale  
+    }
+    //icoMainSale
     hardCap = hardcapMainSale.add(hardcapPreICO);
     if (now >= startIcoMainSale  && now < endIcoMainSale  && totalSoldTokens < hardCap){
       tokens = weiAmount.mul(rate);
       if (hardCap.sub(totalSoldTokens) < tokens){
-        tokens = hardCap.sub(totalSoldTokens); 
+        tokens = hardCap.sub(totalSoldTokens);
         weiAmount = tokens.div(rate);
         backAmount = msg.value.sub(weiAmount);
       }
-    }     
+    }
     require(tokens > 0);
     totalSoldTokens = totalSoldTokens.add(tokens);
     balances[msg.sender] = balances[msg.sender].add(weiAmount);
@@ -642,7 +642,7 @@ contract Crowdsale is Ownable {
 	unconfirmedSumAddr[msg.sender] = unconfirmedSumAddr[msg.sender].add(tokens);
 	token.SetPermissionsList(beneficiary, 1);
     if (backAmount > 0){
-      msg.sender.transfer(backAmount);    
+      msg.sender.transfer(backAmount);
     }
     emit TokenProcurement(msg.sender, beneficiary, weiAmount, tokens);
   }
@@ -654,13 +654,13 @@ contract Crowdsale is Ownable {
     balances[msg.sender] = 0;
     msg.sender.transfer(value);
   }
-  
+
   function transferEthToMultisig() public onlyOwner {
     address _this = this;
-    require(totalSoldTokens.sub(unconfirmedSum) >= softcap && now > endIcoMainSale);  
+    require(totalSoldTokens.sub(unconfirmedSum) >= softcap && now > endIcoMainSale);
     wallet.transfer(_this.balance);
-  } 
-  
+  }
+
   function refundUnconfirmed() public{
     require(now > endIcoMainSale);
     require(balances[msg.sender] > 0);
@@ -672,25 +672,25 @@ contract Crowdsale is Ownable {
     uint uvalue = unconfirmedSumAddr[msg.sender];
     unconfirmedSumAddr[msg.sender] = 0;
     token.burn(msg.sender, uvalue );
-   // totalICO = totalICO.sub(token.balanceOf(msg.sender));    
-  } 
-  
+   // totalICO = totalICO.sub(token.balanceOf(msg.sender));
+  }
+
   function SetPermissionsList(address _address, uint8 _sign) public onlyOwner{
       uint8 sign;
       sign = token.GetPermissionsList(_address);
       token.SetPermissionsList(_address, _sign);
       if (_sign == 0){
-          if (sign != _sign){  
+          if (sign != _sign){
 			unconfirmedSum = unconfirmedSum.sub(unconfirmedSumAddr[_address]);
 			unconfirmedSumAddr[_address] = 0;
           }
       }
    }
-   
+
    function GetPermissionsList(address _address) public constant onlyOwner returns(uint8){
-     return token.GetPermissionsList(_address); 
-   }   
-   
+     return token.GetPermissionsList(_address);
+   }
+
    function pause() onlyOwner public {
      token.pause();
    }
@@ -698,5 +698,16 @@ contract Crowdsale is Ownable {
    function unpause() onlyOwner public {
      token.unpause();
    }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

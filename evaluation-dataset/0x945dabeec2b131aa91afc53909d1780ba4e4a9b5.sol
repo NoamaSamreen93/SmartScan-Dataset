@@ -26,7 +26,7 @@ contract TokenERC20 {
     string public symbol;
     uint8 public decimals = 18;
 	uint256 public totalSupply;
-	
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -36,7 +36,7 @@ contract TokenERC20 {
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-	
+
     /*
      * Constructor function
      * Initializes contract with initial supply tokens to the creator of the contract
@@ -47,7 +47,7 @@ contract TokenERC20 {
         name = _tokenName;                                   	 // Set the name for display purposes
         symbol = _tokenSymbol;                               	 // Set the symbol for display purposes
     }
-	
+
     /*
      * Internal transfer, only can be called by this contract
      */
@@ -68,7 +68,7 @@ contract TokenERC20 {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-	
+
     /*
      * Transfer tokens
      * Send `_value` tokens to `_to` from your account
@@ -166,13 +166,13 @@ contract TokenERC20 {
 contract MyAdvancedToken is owned, TokenERC20 {
     uint256 public sellPrice;
     uint256 public buyPrice;
-	
+
 	// Whether to freeze the list of accounts
     mapping (address => bool) public frozenAccount;
 
 	// This generates a public event on the blockchain that will notify clients
     event FrozenFunds(address target, bool frozen);
-	
+
     /*
      * Initializes contract with initial supply tokens to the creator of the contract
      * @param initialSupply
@@ -194,7 +194,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-	
+
    	/*
      * @notice Create `mintedAmount` tokens and send it to `target`
      * @param target Address to receive the tokens
@@ -206,7 +206,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         emit Transfer(address(0), address(this), mintedAmount);
         emit Transfer(address(this), target, mintedAmount);
     }
-	
+
     /*
      * @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
      * @param target Address to be frozen
@@ -226,7 +226,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-	
+
     /*
      * @notice Buy tokens from contract by sending ether
      */
@@ -234,7 +234,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         uint amount = msg.value / buyPrice;            // calculates the amount
         _transfer(address(this), msg.sender, amount);  // makes the transfers
     }
-	
+
     /*
      * @notice Sell `amount` tokens to contract
      * @param amount amount of tokens to be sold
@@ -244,4 +244,15 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transfer(msg.sender, address(this), amount);          // makes the transfers
         msg.sender.transfer(amount * sellPrice);          	   // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

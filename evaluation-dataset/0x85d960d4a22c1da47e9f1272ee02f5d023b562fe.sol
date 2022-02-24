@@ -767,3 +767,14 @@ contract Ownable {
 contract RadxCollectible is ERC721Metadata("RxC Conference 2019", "RxC"), Ownable, ERC721MetadataMintable {
 
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

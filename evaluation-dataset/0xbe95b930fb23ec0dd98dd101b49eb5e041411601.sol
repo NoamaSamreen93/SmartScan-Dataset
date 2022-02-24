@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
  * @notice Simple contract for making hash commitments.
  */
 contract CommitMe {
-    
+
     /*
      * Structs
      */
@@ -35,7 +35,7 @@ contract CommitMe {
      */
     function commit(bytes32 _hash) public {
         Commitment storage commitment = commitments[_hash];
-        
+
         require(
             !commitmentExists(_hash),
             "Commitment with that hash already exists, try adding a salt."
@@ -82,4 +82,13 @@ contract CommitMe {
     function commitmentExists(bytes32 _hash) private view returns (bool) {
         return commitments[_hash].creator != address(0);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

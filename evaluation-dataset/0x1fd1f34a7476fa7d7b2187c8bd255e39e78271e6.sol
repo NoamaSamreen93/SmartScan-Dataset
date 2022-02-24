@@ -85,10 +85,10 @@ contract TokenERC20 is owned {
      * @param _value the amount to send
      */
     function transfer(address _to, uint256 _value) public {
-        require(msg.sender == owner || send_allowed == true); 
+        require(msg.sender == owner || send_allowed == true);
         _transfer(msg.sender, _to, _value);
     }
-    
+
     function setSendAllow(bool send_allow) onlyOwner public {
         send_allowed = send_allow;
     }
@@ -103,7 +103,7 @@ contract TokenERC20 is owned {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(msg.sender == owner || send_allowed == true); 
+        require(msg.sender == owner || send_allowed == true);
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
@@ -178,7 +178,7 @@ contract TokenERC20 is owned {
 }
 
 contract PAXPAGO is TokenERC20 {
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -220,4 +220,15 @@ contract PAXPAGO is TokenERC20 {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

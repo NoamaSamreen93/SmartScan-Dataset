@@ -17,7 +17,7 @@ contract owned {
     }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
@@ -38,7 +38,7 @@ contract TokenBase {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 _value);
-    
+
     /**
      * Constrctor function
      *
@@ -173,7 +173,7 @@ contract TokenBase {
 
 
 contract SmartIndustrialToken is owned, TokenBase {
-    
+
     // Public variables of the token
     string public tokenName = "Smart Industrial Token";
     string public tokenSymbol = "SIT";
@@ -195,7 +195,7 @@ contract SmartIndustrialToken is owned, TokenBase {
         require (balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         // Subtract from the sender
@@ -214,4 +214,15 @@ contract SmartIndustrialToken is owned, TokenBase {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

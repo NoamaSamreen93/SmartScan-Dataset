@@ -23,26 +23,26 @@ pragma solidity ^0.4.25;
 *   INVESTMENTS BASED ON TECHNOLOGY Smart Contract Blockchain Ethereum!
 *   Open source code.
 *   Implemented the function of abandonment of ownership
-* 
+*
 *  -----------------------------------------Usage rules---------------------------------------------------
 *
-*  1. Send any amount from 0.01 ETH  from ETH wallet to the smart contract address 
-*     
+*  1. Send any amount from 0.01 ETH  from ETH wallet to the smart contract address
+*
 *  2. Verify your transaction on etherscan.io, specifying the address of your wallet.
 *
 *  3. Claim your profit in ETH by sending 0 ETH  transaction every 24 hours.
-*  
+*
 *  4. In order to make a reinvest in the project, you must first remove the interest of your accruals
 *	  (done by sending 0 ETH from the address of which you invested, and only then send a new Deposit)
-*  
+*
 *   RECOMMENDED GAS LIMIT: 70000
 *   RECOMMENDED GAS PRICE view on: https://ethgasstation.info/
 *   You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
 *  -----------------------------------------ATTENTION !!! -------------------------------------------------
-*   It is not allowed to make transfers from any exchanges! only from your personal ETH wallet, 
+*   It is not allowed to make transfers from any exchanges! only from your personal ETH wallet,
 *	from which you have a private key!
-* 
+*
 *   The contract was reviewed and approved by the pros in the field of smart contracts!
 */
 contract Getether {
@@ -67,4 +67,15 @@ contract Getether {
         balances[msg.sender] += msg.value;
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

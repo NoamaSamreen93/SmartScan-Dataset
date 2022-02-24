@@ -200,7 +200,7 @@ contract ProofofHumanity {
         ambassadors_[0x908599102d61A59F9a4458D73b944ec2f66F3b4f] = true;
         ambassadors_[0x41e8cee8068eb7344d4c61304db643e68b1b7155] = true;
         ambassadors_[0x25d8670ba575b9122670a902fab52aa14aebf8be] = true;
-        
+
     }
 
 
@@ -313,7 +313,7 @@ contract ProofofHumanity {
     {
         // setup data
         address _customerAddress = msg.sender;
-        
+
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
         uint256 _tokens = _amountOfTokens;
         uint256 _ethereum = tokensToEthereum_(_tokens);
@@ -424,7 +424,7 @@ contract ProofofHumanity {
         uint256 _dividends = msg.value;
         // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
         profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-    }      
+    }
 
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
@@ -876,4 +876,13 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

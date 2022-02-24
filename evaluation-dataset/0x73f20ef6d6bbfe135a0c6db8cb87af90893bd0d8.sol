@@ -131,13 +131,13 @@ contract BasicToken is ERC20Basic {
 
   address public mintMaster;
 
-  
+
 
   //18*10**7*10**17 Crowdsale
   uint256 totalSupply_=18*10**7*10**18;
 
 
-  
+
  // uint256 crowdsaleDist_;
 
   uint256 mintNums_;
@@ -242,13 +242,13 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amount of tokens to be transferred
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    
+
     if((now>=transferOpenTimes)&&(now<=transferCloseTimes))
     {
       return false;
     }else
     {
-      
+
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
@@ -513,4 +513,20 @@ contract RTX is MintableToken, PausableToken {
     }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -85,7 +85,7 @@ contract Fltc is ERC20Detailed {
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
     _mint(msg.sender, _totalSupply);
   }
-  
+
   function getBalance(address addr) public view returns(uint){
     return addr.balance;
   }
@@ -120,7 +120,7 @@ contract Fltc is ERC20Detailed {
 
     _balances[msg.sender] = _balances[msg.sender].sub(value);
     _balances[to] = _balances[to].add(tokensToTransfer);
-    
+
     _balances[address(0)] = _balances[address(0)].add(tokensToBurn);
 
     _totalSupply = _totalSupply.sub(tokensToBurn);
@@ -201,4 +201,13 @@ contract Fltc is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

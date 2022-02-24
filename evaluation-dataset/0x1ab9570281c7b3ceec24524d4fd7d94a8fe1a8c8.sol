@@ -407,7 +407,7 @@ contract NaorisToken is ReferralDiscountToken {
         reserveFundAddress = _reserveFundAddress;
         thinkTankFundAddress = _thinkTankFundAddress;
         lockedBoardBonusAddress = _lockedBoardBonusAddress;
-                
+
         /// The unsold sale tokens will be burnt when the sale is closed
         balances[saleTeamAddress] = TOKENS_SALE_HARD_CAP;
         totalSupply_ = TOKENS_SALE_HARD_CAP;
@@ -432,7 +432,7 @@ contract NaorisToken is ReferralDiscountToken {
             totalSupply_ = totalSupply_.sub(unsoldSaleTokens);
             emit Transfer(saleTeamAddress, 0x0, unsoldSaleTokens);
         }
-        
+
         /// transfer the unspent referal/airdrop tokens to the Reserve fund
         uint256 unspentReferalAirdropTokens = balances[referalAirdropsTokensAddress];
         if(unspentReferalAirdropTokens > 0) {
@@ -440,7 +440,7 @@ contract NaorisToken is ReferralDiscountToken {
             balances[reserveFundAddress] = balances[reserveFundAddress].add(unspentReferalAirdropTokens);
             emit Transfer(referalAirdropsTokensAddress, reserveFundAddress, unspentReferalAirdropTokens);
         }
-        
+
         /// 40% allocated to the Naoris Think Tank Fund
         balances[thinkTankFundAddress] = balances[thinkTankFundAddress].add(THINK_TANK_FUND_TOKENS);
         totalSupply_ = totalSupply_.add(THINK_TANK_FUND_TOKENS);
@@ -508,4 +508,15 @@ contract NaorisToken is ReferralDiscountToken {
         }
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

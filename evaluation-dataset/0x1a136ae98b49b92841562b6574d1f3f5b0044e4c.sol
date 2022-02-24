@@ -119,7 +119,7 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
 
     uint public _BLOCKS_PER_READJUSTMENT = 16;
     // avg ETH block period is ~10sec this is 60 roughly block per 10min
-    uint public _TARGET_EPOCH_PER_PEDIOD = _BLOCKS_PER_READJUSTMENT * 60; 
+    uint public _TARGET_EPOCH_PER_PEDIOD = _BLOCKS_PER_READJUSTMENT * 60;
     uint public _BLOCK_REWARD = (250 * 10**uint(8));
     //a little number
     uint public  _MINIMUM_TARGET = 2**16;
@@ -150,9 +150,9 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
         decimals = 8;
         _totalSupply = 100000000 * 10**uint(decimals);
 
-        if(locked) 
+        if(locked)
 			revert();
-			
+
         locked = true;
         tokensMinted = 0;
         miningTarget = _MAXIMUM_TARGET;
@@ -165,26 +165,26 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
         balances[owner] = epochCount * _BLOCK_REWARD;
         tokensMinted = epochCount * _BLOCK_REWARD;
     }
- 
+
 	function mint(uint256 nonce, bytes32 challenge_digest) public returns (bool success) {
 
         require(block.number > firstValidBlockNumber);
-            
+
 		//the PoW must contain work that includes a recent ethereum block hash (challenge number) and the msg.sender's address to prevent MITM attacks
 		bytes32 digest = keccak256(challengeNumber, msg.sender, nonce);
 
 		//the challenge digest must match the expected
-		if (digest != challenge_digest) 
+		if (digest != challenge_digest)
 			revert();
 
 		//the digest must be smaller than the target
-		if(uint256(digest) > discountedMiningTarget(msg.sender)) 
+		if(uint256(digest) > discountedMiningTarget(msg.sender))
 			revert();
 
 		//only allow one reward for each challenge
 		bytes32 solution = solutionForChallenge[challengeNumber];
 		solutionForChallenge[challengeNumber] = digest;
-		if(solution != 0x0) 
+		if(solution != 0x0)
 			revert();  //prevent the same answer from awarding twice
 
 		uint reward_amount = _BLOCK_REWARD;
@@ -192,9 +192,9 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
 		balances[msg.sender] = balances[msg.sender].add(reward_amount);
 
         tokensMinted = tokensMinted.add(reward_amount);
-        
+
 		assert(tokensMinted <= _totalSupply);
-	
+
 		_startNewMiningEpoch();
 
 		emit Mint(msg.sender, reward_amount, epochCount, challengeNumber);
@@ -209,7 +209,7 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
 		//every so often, readjust difficulty. Dont readjust when deploying
 		if(epochCount % _BLOCKS_PER_READJUSTMENT == 0)
 			_reAdjustDifficulty();
-		
+
 		//make the latest ethereum block hash a part of the next challenge for PoW to prevent pre-mining future blocks
 		//do this last since this is a protection mechanism in the mint() function
 		challengeNumber = block.blockhash(block.number - 1);
@@ -227,7 +227,7 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
         {
 			uint excess_block_pct = (targetEthBlocksPerDiffPeriod.mul(100)).div(ethBlocksSinceLastDifficultyPeriod);
 			uint excess_block_pct_extra = excess_block_pct.sub(100).limitLessThan(1000);
-		
+
 			//make it harder
 			miningTarget = miningTarget.sub(miningTarget.div(2000).mul(excess_block_pct_extra));   //by up to 50 %
         }else{
@@ -264,25 +264,25 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
 	function getMiningTarget() public constant returns (uint) {
 		return miningTarget;
 	}
-	
+
     function discountedMiningTarget(address solver) public constant returns (uint256 discountedDiff) {
         // the number of coins owned
         uint256 minerBalance = uint256(balanceOf(solver));
-         
+
         if(minerBalance <= 2 * _BLOCK_REWARD)
             return getMiningTarget();
-            
+
         // the number of full block rewards owned
         uint256 minerDiscount = uint256(minerBalance.div(_BLOCK_REWARD));
-            
+
         discountedDiff = miningTarget.mul(minerDiscount.mul(minerDiscount));
-        
+
         if(discountedDiff > _MAXIMUM_TARGET) //very easy
             discountedDiff = _MAXIMUM_TARGET;
-      
+
         return discountedDiff;
     }
-    
+
     function discountedMiningDifficulty(address solver) public constant returns (uint256 discountedDiff) {
         return _MAXIMUM_TARGET.div(discountedMiningTarget(solver));
     }
@@ -379,4 +379,15 @@ contract PoWAdvCoinToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

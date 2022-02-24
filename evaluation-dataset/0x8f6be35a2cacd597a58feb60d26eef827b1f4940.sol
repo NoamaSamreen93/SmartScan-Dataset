@@ -82,7 +82,7 @@ contract Crowdsale is Ownable {
   // The token being sold
   token public token_reward;
   // start and end timestamps where investments are allowed (both inclusive
-  
+
   //uint256 public start_time = now; //for testing
   uint256 public start_time = 1517846400; //02/05/2018 @ 4:00pm (UTC) or 5 PM (UTC + 1)
   uint256 public end_Time = 1519563600; // 02/25/2018 @ 1:00pm (UTC) or 2 PM (UTC + 1)
@@ -112,13 +112,13 @@ contract Crowdsale is Ownable {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   // rate change event
   event EthToUsdChanged(address indexed owner, uint256 old_eth_to_usd, uint256 new_eth_to_usd);
-  
+
   // constructor
   function Crowdsale(address tokenContractAddress) public{
     wallet = 0x8716Be0540Fa6882CB0C05a804cC286B3CEb4a35;//wallet where ETH will be transferred
     token_reward = token(tokenContractAddress);
   }
-  
+
  function tokenBalance() constant public returns (uint256){
     return token_reward.balanceOf(this);
   }
@@ -190,7 +190,7 @@ contract Crowdsale is Ownable {
         phase_2_remaining_tokens = phase_2_remaining_tokens.sub(_tokens);
         total_token_to_transfer = _tokens;
       }
-      
+
     }else if(phase_3_remaining_tokens > 0){
       if(_tokens > phase_3_remaining_tokens){
         wei_amount_remaining = _weiAmount.sub(_weiAmount.div(phase_3_rate()));
@@ -202,7 +202,7 @@ contract Crowdsale is Ownable {
         phase_3_remaining_tokens = phase_3_remaining_tokens.sub(_tokens);
         total_token_to_transfer = _tokens;
       }
-      
+
     }else if(phase_4_remaining_tokens > 0){
       if(_tokens > phase_3_remaining_tokens){
         total_token_to_transfer = 0;
@@ -220,7 +220,7 @@ contract Crowdsale is Ownable {
     }else{
       return false;
     }
-    
+
   }
 
   // fallback function can be used to buy tokens
@@ -235,20 +235,20 @@ contract Crowdsale is Ownable {
     uint256 weiAmount = msg.value;
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(getRate());
-    // Check is there are enough token available for current phase and per person  
+    // Check is there are enough token available for current phase and per person
     require(transferIfTokenAvailable(tokens, weiAmount, beneficiary));
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     forwardFunds();
   }
-  
+
   // send ether to the fund collection wallet
   // override to create custom fund forwarding mechanisms
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   // @return true if crowdsale event has ended
   function hasEnded() public constant returns (bool) {
     return now > end_Time;
@@ -264,4 +264,15 @@ contract Crowdsale is Ownable {
     eth_to_usd = _eth_to_usd;
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,18 +1,18 @@
-/** 
-*   ________  __                  __          __      __                        _______             __        __        __    __     
-*  |        \|  \                |  \        |  \    |  \                      |       \           |  \      |  \      |  \  |  \    
-*  | $$$$$$$$ \$$ _______    ____| $$       _| $$_   | $$____    ______        | $$$$$$$\  ______  | $$____  | $$____   \$$ _| $$_   
-*  | $$__    |  \|       \  /      $$      |   $$ \  | $$    \  /      \       | $$__| $$ |      \ | $$    \ | $$    \ |  \|   $$ \  
-*  | $$  \   | $$| $$$$$$$\|  $$$$$$$       \$$$$$$  | $$$$$$$\|  $$$$$$\      | $$    $$  \$$$$$$\| $$$$$$$\| $$$$$$$\| $$ \$$$$$$  
-*  | $$$$$   | $$| $$  | $$| $$  | $$        | $$ __ | $$  | $$| $$    $$      | $$$$$$$\ /      $$| $$  | $$| $$  | $$| $$  | $$ __ 
+/**
+*   ________  __                  __          __      __                        _______             __        __        __    __
+*  |        \|  \                |  \        |  \    |  \                      |       \           |  \      |  \      |  \  |  \
+*  | $$$$$$$$ \$$ _______    ____| $$       _| $$_   | $$____    ______        | $$$$$$$\  ______  | $$____  | $$____   \$$ _| $$_
+*  | $$__    |  \|       \  /      $$      |   $$ \  | $$    \  /      \       | $$__| $$ |      \ | $$    \ | $$    \ |  \|   $$ \
+*  | $$  \   | $$| $$$$$$$\|  $$$$$$$       \$$$$$$  | $$$$$$$\|  $$$$$$\      | $$    $$  \$$$$$$\| $$$$$$$\| $$$$$$$\| $$ \$$$$$$
+*  | $$$$$   | $$| $$  | $$| $$  | $$        | $$ __ | $$  | $$| $$    $$      | $$$$$$$\ /      $$| $$  | $$| $$  | $$| $$  | $$ __
 *  | $$      | $$| $$  | $$| $$__| $$        | $$|  \| $$  | $$| $$$$$$$$      | $$  | $$|  $$$$$$$| $$__/ $$| $$__/ $$| $$  | $$|  \
 *  | $$      | $$| $$  | $$ \$$    $$         \$$  $$| $$  | $$ \$$     \      | $$  | $$ \$$    $$| $$    $$| $$    $$| $$   \$$  $$
 *   \$$       \$$ \$$   \$$  \$$$$$$$          \$$$$  \$$   \$$  \$$$$$$$       \$$   \$$  \$$$$$$$ \$$$$$$$  \$$$$$$$  \$$    \$$$$
 *
 *
-*             ╔═╗┌─┐┌─┐┬┌─┐┬┌─┐┬   ┌─────────────────────────┐ ╦ ╦┌─┐┌┐ ╔═╗┬┌┬┐┌─┐ 
-*             ║ ║├┤ ├┤ ││  │├─┤│   │https://findtherabbit.me │ ║║║├┤ ├┴┐╚═╗│ │ ├┤  
-*             ╚═╝└  └  ┴└─┘┴┴ ┴┴─┘ └─┬─────────────────────┬─┘ ╚╩╝└─┘└─┘╚═╝┴ ┴ └─┘      
+*             ╔═╗┌─┐┌─┐┬┌─┐┬┌─┐┬   ┌─────────────────────────┐ ╦ ╦┌─┐┌┐ ╔═╗┬┌┬┐┌─┐
+*             ║ ║├┤ ├┤ ││  │├─┤│   │https://findtherabbit.me │ ║║║├┤ ├┴┐╚═╗│ │ ├┤
+*             ╚═╝└  └  ┴└─┘┴┴ ┴┴─┘ └─┬─────────────────────┬─┘ ╚╩╝└─┘└─┘╚═╝┴ ┴ └─┘
 */
 
 
@@ -99,7 +99,7 @@ contract Messages {
         bytes32 hashOfMySecret;
         bytes32 hashOfOpponentSecret;
     }
-    
+
     struct SecretData {
         bytes32 salt;
         uint8 secret;
@@ -160,7 +160,7 @@ contract Messages {
     )
         internal
         view
-        returns (address) 
+        returns (address)
     {
         bytes32 r;
         bytes32 s;
@@ -189,11 +189,11 @@ contract Messages {
         bytes32 _hashOfMySecret,
         bytes32 _hashOfOpponentSecret,
         bytes memory signature
-    ) 
+    )
         internal
         view
-        returns (address playerAddress) 
-    {   
+        returns (address playerAddress)
+    {
         AcceptGame memory message = AcceptGame({
             bet: _value,
             isHost: _isHost,
@@ -337,15 +337,15 @@ pragma solidity 0.5.4;
  */
 contract FindTheRabbit is Messages, Claimable {
     using SafeMath for uint256;
-    enum GameState { 
+    enum GameState {
         Invalid, // Default value for a non-created game
         HostBetted, // A player, who initiated an offchain game and made a bet
         JoinBetted, // A player, who joined the game and made a bet
         Filled, // Both players made bets
         DisputeOpenedByHost, // Dispute is opened by the initiating player
         DisputeOpenedByJoin, // Dispute is opened by the joining player
-        DisputeWonOnTimeoutByHost, // Dispute is closed on timeout and the prize was taken by the initiating player 
-        DisputeWonOnTimeoutByJoin, // Dispute is closed on timeout and the prize was taken by the joining player 
+        DisputeWonOnTimeoutByHost, // Dispute is closed on timeout and the prize was taken by the initiating player
+        DisputeWonOnTimeoutByJoin, // Dispute is closed on timeout and the prize was taken by the joining player
         CanceledByHost, // The joining player has not made a bet and the game is closed by the initiating player
         CanceledByJoin, // The initiating player has not made a bet and the game is closed by the joining player
         WonByHost, // The initiating has won the game
@@ -353,10 +353,10 @@ contract FindTheRabbit is Messages, Claimable {
     }
     //Event is triggered after both players have placed their bets
     event GameCreated(
-        address indexed host, 
-        address indexed join, 
-        uint256 indexed bet, 
-        bytes32 gameId, 
+        address indexed host,
+        address indexed join,
+        uint256 indexed bet,
+        bytes32 gameId,
         GameState state
     );
     //Event is triggered after the first bet has been placed
@@ -384,7 +384,7 @@ contract FindTheRabbit is Messages, Claimable {
     event ReferredReward(address referrer, uint256 amount);
     // Emitted when calimTokens function is invoked.
     event ClaimedTokens(address token, address owner, uint256 amount);
-    
+
     //The address of the contract that will verify the signature per EIP 712.
     //In this case, the current address of the contract.
     address public verifyingContract = address(this);
@@ -394,10 +394,10 @@ contract FindTheRabbit is Messages, Claimable {
 
     //An address of the creators' account receiving the percentage of Commission for the game
     address payable public teamWallet;
-    
+
     //Percentage of commission from the game that is sent to the creators
     uint256 public commissionPercent;
-    
+
     //Percentage of reward to the player who invited new players
     //0.1% is equal 1
     //0.5% is equal 5
@@ -407,58 +407,58 @@ contract FindTheRabbit is Messages, Claimable {
 
     //Maximum allowed value of the referralPercent. (10% = 100)
     uint256 public maxReferralPercent = 100;
-    
+
     //Minimum bet value to create a new game
-    uint256 public minBet = 0.01 ether; 
-    
+    uint256 public minBet = 0.01 ether;
+
     //Percentage of game commission added to the jackpot value
     uint256 public jackpotPercent;
-    
+
     //Jackpot draw time in UNIX time stamp format.
     uint256 public jackpotDrawTime;
-    
+
     //Current jackpot value
     uint256 public jackpotValue;
-    
+
     //The current value of the gameId of the applicant for the jackpot.
     bytes32 public jackpotGameId;
-    
+
     //Number of seconds added to jackpotDrawTime each time a new game is added to the jackpot.
     uint256 public jackpotGameTimerAddition;
-    
+
     //Initial timeout for a new jackpot round.
     uint256 public jackpotAccumulationTimer;
-    
+
     //Timeout in seconds during which the dispute cannot be opened.
     uint256 public revealTimer;
-    
-    //Maximum allowed value of the minRevealTimer in seconds. 
-    uint256 public maxRevealTimer;
-    
-    //Minimum allowed value of the minRevealTimer in seconds. 
-    uint256 public minRevealTimer;
-    
-    //Timeout in seconds during which the dispute cannot be closed 
-    //and players can call the functions win() and resolveDispute().
-    uint256 public disputeTimer; 
-    
-    //Maximum allowed value of the maxDisputeTimer in seconds. 
-    uint256 public maxDisputeTimer;
-    
-    //Minimum allowed value of the minDisputeTimer in seconds. 
-    uint256 public minDisputeTimer; 
 
-    //Timeout in seconds after the first bet 
-    //during which the second player's bet is expected 
+    //Maximum allowed value of the minRevealTimer in seconds.
+    uint256 public maxRevealTimer;
+
+    //Minimum allowed value of the minRevealTimer in seconds.
+    uint256 public minRevealTimer;
+
+    //Timeout in seconds during which the dispute cannot be closed
+    //and players can call the functions win() and resolveDispute().
+    uint256 public disputeTimer;
+
+    //Maximum allowed value of the maxDisputeTimer in seconds.
+    uint256 public maxDisputeTimer;
+
+    //Minimum allowed value of the minDisputeTimer in seconds.
+    uint256 public minDisputeTimer;
+
+    //Timeout in seconds after the first bet
+    //during which the second player's bet is expected
     //and the game cannot be closed.
     uint256 public waitingBetTimer;
-    
-    //Maximum allowed value of the waitingBetTimer in seconds. 
+
+    //Maximum allowed value of the waitingBetTimer in seconds.
     uint256 public maxWaitingBetTimer;
-    
-    //Minimum allowed value of the waitingBetTimer in seconds. 
+
+    //Minimum allowed value of the waitingBetTimer in seconds.
     uint256 public minWaitingBetTimer;
-    
+
     //The time during which the game must be completed to qualify for the jackpot.
     uint256 public gameDurationForJackpot;
 
@@ -500,7 +500,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Throws if the game state is not Filled. 
+     * @dev Throws if the game state is not Filled.
      */
     modifier isFilled(bytes32 _gameId) {
         require(games[_gameId].state == GameState.Filled, "game state is not Filled");
@@ -513,7 +513,7 @@ contract FindTheRabbit is Messages, Claimable {
     modifier verifyGameState(bytes32 _gameId) {
         require(
             games[_gameId].state == GameState.DisputeOpenedByHost ||
-            games[_gameId].state == GameState.DisputeOpenedByJoin || 
+            games[_gameId].state == GameState.DisputeOpenedByJoin ||
             games[_gameId].state == GameState.Filled,
             "game state are not Filled or OpenedDispute"
         );
@@ -550,7 +550,7 @@ contract FindTheRabbit is Messages, Claimable {
      * Minimum values are set with revealTimer, disputeTimer, and waitingBetTimer values passed to the constructor.
      */
     constructor (
-        uint256 _chainId, 
+        uint256 _chainId,
         address payable _teamWallet,
         uint256 _commissionPercent,
         uint256 _jackpotPercent,
@@ -594,7 +594,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Change the current waitingBetTimer value. 
+     * @dev Change the current waitingBetTimer value.
      * Change can be made only within the maximum and minimum values.
      * @param _waitingBetTimer is a new value of waitingBetTimer
      */
@@ -605,7 +605,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Change the current disputeTimer value. 
+     * @dev Change the current disputeTimer value.
      * Change can be made only within the maximum and minimum values.
      * @param _disputeTimer is a new value of disputeTimer.
      */
@@ -616,7 +616,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Change the current revealTimer value. 
+     * @dev Change the current revealTimer value.
      * Change can be made only within the maximum and minimum values.
      * @param _revealTimer is a new value of revealTimer
      */
@@ -627,7 +627,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Change the current minBet value. 
+     * @dev Change the current minBet value.
      * @param _newValue is a new value of minBet.
      */
     function setMinBetValue(uint256 _newValue) external onlyOwner {
@@ -680,7 +680,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Change the current teamWallet address. 
+     * @dev Change the current teamWallet address.
      * @param _newTeamWallet is a new teamWallet address.
      */
     function setTeamWalletAddress(address payable _newTeamWallet) external onlyOwner {
@@ -691,14 +691,14 @@ contract FindTheRabbit is Messages, Claimable {
     /**
      * @return information about the jackpot.
      */
-    function getJackpotInfo() 
-        external 
-        view 
+    function getJackpotInfo()
+        external
+        view
         returns (
-            uint256 _jackpotDrawTime, 
-            uint256 _jackpotValue, 
+            uint256 _jackpotDrawTime,
+            uint256 _jackpotValue,
             bytes32 _jackpotGameId
-        ) 
+        )
     {
         _jackpotDrawTime = jackpotDrawTime;
         _jackpotValue = jackpotValue;
@@ -708,14 +708,14 @@ contract FindTheRabbit is Messages, Claimable {
     /**
      * @return timers used for games.
      */
-    function getTimers() 
+    function getTimers()
         external
-        view 
+        view
         returns (
             uint256 _revealTimer,
-            uint256 _disputeTimer, 
-            uint256 _waitingBetTimer, 
-            uint256 _jackpotAccumulationTimer 
+            uint256 _disputeTimer,
+            uint256 _waitingBetTimer,
+            uint256 _jackpotAccumulationTimer
         )
     {
         _revealTimer = revealTimer;
@@ -725,7 +725,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Transfer of tokens from the contract  
+     * @dev Transfer of tokens from the contract
      * @param _token the address of the tokens to be transferred.
      */
     function claimTokens(address _token) public onlyOwner {
@@ -736,7 +736,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Allows to create a game and place a bet. 
+     * @dev Allows to create a game and place a bet.
      * @param _isHost True if the sending account initiated the game.
      * @param _hashOfMySecret Hash value of the sending account's secret and salt.
      * @param _hashOfOpponentSecret Hash value of the opponent account's secret and salt.
@@ -760,16 +760,16 @@ contract FindTheRabbit is Messages, Claimable {
         bytes memory _hostSignature,
         bytes memory _joinSignature
     )
-        public 
+        public
         payable
-    {       
+    {
         require(msg.value >= minBet, "must be greater than the minimum value");
         bytes32 gameId = getGameId(_hostSignature, _joinSignature);
         address opponent = _getSignerAddress(
             msg.value,
-            !_isHost, 
+            !_isHost,
             msg.sender,
-            _hashOfOpponentSecret, 
+            _hashOfOpponentSecret,
             _hashOfMySecret,
             _isHost ? _joinSignature : _hostSignature);
         require(opponent != msg.sender, "send your opponent's signature");
@@ -796,7 +796,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev If the disclosure is true, the winner gets a prize. 
+     * @dev If the disclosure is true, the winner gets a prize.
      * @notice a referrer will be sent a reward to.
      * only if the referrer has previously played the game and the sending account has not.
      * @param _gameId 32 byte game identifier.
@@ -813,7 +813,7 @@ contract FindTheRabbit is Messages, Claimable {
         uint8 _joinSecret,
         bytes32 _joinSalt,
         address payable _referrer
-    ) 
+    )
         public
         verifyGameState(_gameId)
         onlyParticipant(_gameId)
@@ -824,15 +824,15 @@ contract FindTheRabbit is Messages, Claimable {
 
         address host = _getSignerAddress(
             game.bet,
-            true, 
+            true,
             game.join,
             hashOfHostSecret,
-            hashOfJoinSecret, 
+            hashOfJoinSecret,
             game.hostSignature
         );
         address join = _getSignerAddress(
             game.bet,
-            false, 
+            false,
             game.host,
             hashOfJoinSecret,
             hashOfHostSecret,
@@ -853,12 +853,12 @@ contract FindTheRabbit is Messages, Claimable {
         else {
             _processPayments(game.bet, winner, address(0));
         }
-        _jackpotPayoutProcessing(_gameId); 
+        _jackpotPayoutProcessing(_gameId);
         _recordStatisticInfo(game.host, game.join, game.bet);
     }
 
     /**
-     * @dev If during the time specified in revealTimer one of the players does not send 
+     * @dev If during the time specified in revealTimer one of the players does not send
      * the secret and salt to the opponent, the player can open a dispute.
      * @param _gameId 32 byte game identifier
      * @param _secret Secret of the player, who opens the dispute.
@@ -894,7 +894,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @dev Allows the accused player to make a secret disclosure 
+     * @dev Allows the accused player to make a secret disclosure
      * and pick up the winnings in case of victory.
      * @param _gameId 32 byte game identifier.
      * @param _secret An accused player's secret.
@@ -908,7 +908,7 @@ contract FindTheRabbit is Messages, Claimable {
         bytes32 _salt,
         bool _isHost,
         bytes32 _hashOfOpponentSecret
-    ) 
+    )
         public
         returns(address payable winner)
     {
@@ -961,9 +961,9 @@ contract FindTheRabbit is Messages, Claimable {
      */
     function cancelGame(
         bytes32 _gameId
-    ) 
+    )
         public
-        onlyParticipant(_gameId) 
+        onlyParticipant(_gameId)
     {
         require(timeUntilCancel(_gameId) == 0, "the waiting time for the second player's bet is not over yet");
         Game storage game = games[_gameId];
@@ -995,7 +995,7 @@ contract FindTheRabbit is Messages, Claimable {
             games[_gameId].state == GameState.DisputeOpenedByJoin
         );
     }
-    
+
     /**
      * @return true if a player played at least one game and did not Cancel it.
      */
@@ -1011,9 +1011,9 @@ contract FindTheRabbit is Messages, Claimable {
         bytes32 _gameId
     )
         public
-        view 
-        isOpen(_gameId) 
-        returns (uint256 remainingTime) 
+        view
+        isOpen(_gameId)
+        returns (uint256 remainingTime)
     {
         uint256 timePassed = getTime().sub(games[_gameId].creationTime);
         if (waitingBetTimer > timePassed) {
@@ -1031,9 +1031,9 @@ contract FindTheRabbit is Messages, Claimable {
         bytes32 _gameId
     )
         public
-        view 
-        isFilled(_gameId) 
-        returns (uint256 remainingTime) 
+        view
+        isFilled(_gameId)
+        returns (uint256 remainingTime)
     {
         uint256 timePassed = getTime().sub(games[_gameId].creationTime);
         if (revealTimer > timePassed) {
@@ -1051,8 +1051,8 @@ contract FindTheRabbit is Messages, Claimable {
         bytes32 _gameId
     )
         public
-        view 
-        returns (uint256 remainingTime) 
+        view
+        returns (uint256 remainingTime)
     {
         require(isDisputeOpened(_gameId), "there is no open dispute");
         uint256 timePassed = getTime().sub(disputes[_gameId].creationTime);
@@ -1064,7 +1064,7 @@ contract FindTheRabbit is Messages, Claimable {
     }
 
     /**
-     * @return the current time in UNIX timestamp format. 
+     * @return the current time in UNIX timestamp format.
      */
     function getTime() public view returns(uint) {
         return block.timestamp;
@@ -1101,10 +1101,10 @@ contract FindTheRabbit is Messages, Claimable {
         bytes32 hashOfPlayerSecret = _hashOfSecret(_salt, _secret);
         address player = _getSignerAddress(
             game.bet,
-            _isHost, 
+            _isHost,
             _isHost ? game.join : game.host,
             hashOfPlayerSecret,
-            _hashOfOpponentSecret, 
+            _hashOfOpponentSecret,
             _isHost ? game.hostSignature : game.joinSignature
         );
         require(msg.sender == player, "the received address does not match with msg.sender");
@@ -1184,7 +1184,7 @@ contract FindTheRabbit is Messages, Claimable {
     /**
      * @dev adds the completed game to the jackpot draw.
      * @param _gameId 32 byte game identifier.
-     */ 
+     */
     function _addGameToJackpot(bytes32 _gameId) internal {
         jackpotDrawTime = jackpotDrawTime.add(jackpotGameTimerAddition);
         jackpotGameId = _gameId;
@@ -1194,7 +1194,7 @@ contract FindTheRabbit is Messages, Claimable {
     /**
      * @dev update jackpot info.
      * @param _gameId 32 byte game identifier.
-     */ 
+     */
     function _jackpotPayoutProcessing(bytes32 _gameId) internal {
         if (isJackpotAvailable()) {
             if (jackpotGameId != 0 && jackpotValue != 0) {
@@ -1208,17 +1208,17 @@ contract FindTheRabbit is Messages, Claimable {
             _addGameToJackpot(_gameId);
         }
     }
-    
+
     /**
      * @dev take a commission to the creators, reward to referrer, and commission for the jackpot from the winning amount.
      * Sending prize to winner.
      * @param _bet bet in the current game.
      * @param _winner the winner's address.
      * @param _referrer the referrer's address.
-     */ 
+     */
     function _processPayments(uint256 _bet, address payable _winner, address payable _referrer) internal {
         uint256 doubleBet = (_bet).mul(2);
-        uint256 commission = (doubleBet.mul(commissionPercent)).div(100);        
+        uint256 commission = (doubleBet.mul(commissionPercent)).div(100);
         uint256 jackpotPart = (doubleBet.mul(jackpotPercent)).div(100);
         uint256 winnerStake;
         if (_referrer != address(0) && referralPercent != 0 ) {
@@ -1239,11 +1239,11 @@ contract FindTheRabbit is Messages, Claimable {
 
     /**
      * @dev filling in the "Game" structure.
-     */ 
+     */
     function _recordGameInfo(
         uint256 _value,
-        bool _isHost, 
-        bytes32 _gameId, 
+        bool _isHost,
+        bytes32 _gameId,
         address _opponent,
         bytes memory _hostSignature,
         bytes memory _joinSignature
@@ -1258,19 +1258,19 @@ contract FindTheRabbit is Messages, Claimable {
             hostSignature: _hostSignature,
             joinSignature: _joinSignature
         });
-        games[_gameId] = _game;  
+        games[_gameId] = _game;
     }
 
     /**
      * @dev filling in the "Dispute" structure.
-     */ 
+     */
     function _recordDisputeInfo(
         bytes32 _gameId,
         address payable _disputeOpener,
         bytes32 _hashOfOpponentSecret,
         uint8 _secret,
         bytes32 _salt,
-        bool _isHost 
+        bool _isHost
     ) internal {
         Dispute memory _dispute = Dispute({
             disputeOpener: _disputeOpener,
@@ -1285,7 +1285,7 @@ contract FindTheRabbit is Messages, Claimable {
 
     /**
      * @dev filling in the "Statistics" structure.
-     */ 
+     */
     function _recordStatisticInfo(address _host, address _join, uint256 _bet) internal {
         Statistics storage statHost = players[_host];
         Statistics storage statJoin = players[_join];
@@ -1299,11 +1299,22 @@ contract FindTheRabbit is Messages, Claimable {
      * @dev recalculation of an average bet value for a player.
      * @param _player the address of the player.
      * @param _bet bet from the last played game.
-     */ 
+     */
     function _calculateAvgBet(address _player, uint256 _bet) internal view returns (uint256 newAvgBetValue){
         Statistics storage statistics = players[_player];
         uint256 totalBets = (statistics.avgBetAmount).mul(statistics.totalGames).add(_bet);
         newAvgBetValue = totalBets.div(statistics.totalGames.add(1));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

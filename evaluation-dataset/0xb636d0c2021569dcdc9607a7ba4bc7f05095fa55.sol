@@ -1,7 +1,7 @@
 pragma solidity ^0.5.8;
 
 contract ERC20_Contract{
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 18;
@@ -12,10 +12,10 @@ contract ERC20_Contract{
     bool public openRaise = true;
     uint256 public raiseOption = 0;
     address payable internal management;
-    
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
 	event SendEth(address indexed to, uint256 value);
-    
+
     constructor(
         uint256 initialSupply,
         string memory tokenName,
@@ -29,17 +29,17 @@ contract ERC20_Contract{
         admin = msg.sender;
     }
 
-    modifier onlyAdmin() { 
+    modifier onlyAdmin() {
         require(msg.sender == admin);
         _;
     }
 
-    modifier isAct() { 
+    modifier isAct() {
         require(isActivity);
         _;
     }
 
-    modifier isOpenRaise() { 
+    modifier isOpenRaise() {
         require(openRaise);
         _;
     }
@@ -54,11 +54,11 @@ contract ERC20_Contract{
         emit SendEth(management, msg.value);
         emit Transfer(management, msg.sender, buyNum);
 	}
-    
+
     function transfer(address _to, uint256 _value) public isAct{
 	    _transfer(msg.sender, _to, _value);
     }
-    
+
     function batchTransfer(address[] memory _tos, uint[] memory _values) public isAct {
         require(_tos.length == _values.length);
         uint256 _total = 0;
@@ -70,7 +70,7 @@ contract ERC20_Contract{
             _transfer(msg.sender,_tos[i],_values[i]);
 	    }
     }
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != address(0));
         require(balanceOf[_from] >= _value);
@@ -81,29 +81,38 @@ contract ERC20_Contract{
         emit Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-	
+
 	function setRaiseOption(uint256 _price)public onlyAdmin{
 		raiseOption = _price;
 	}
-	
+
 	function setRaiseOpen(bool _open) public onlyAdmin{
 	    openRaise = _open;
 	}
-	
+
 	function setAct(bool _isAct) public onlyAdmin{
 		isActivity = _isAct;
 	}
-	
+
 	function changeAdmin(address _address) public onlyAdmin{
        admin = _address;
     }
-    
+
     function changeFinance(address payable _address) public onlyAdmin{
        management = _address;
     }
-	
+
 	function destructContract()public onlyAdmin{
 		selfdestruct(management);
 	}
-	
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

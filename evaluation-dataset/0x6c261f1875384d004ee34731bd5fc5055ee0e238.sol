@@ -411,7 +411,7 @@ contract Distributable is StandardToken, Ownable, Whitelist, DateKernel {
         emit MemberUpdated(_who, _left);
         return true;
     }
-    
+
     function airdrop(address[] dests, uint256[] values) public onlyOwner {
         // This simple validation will catch most mistakes without consuming
         // too much gas.
@@ -500,4 +500,12 @@ contract TutorNinjaToken is Distributable, BurnableToken, CanReclaimToken, Claim
     function() external {
         revert("Does not accept ether");
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

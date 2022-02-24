@@ -27,7 +27,7 @@ contract Token {
 contract RegularToken is Token {
 
     function transfer(address _to, uint _value) returns (bool) {
-       
+
         if (balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -68,7 +68,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
 
     function transferFrom(address _from, address _to, uint _value)
         public
@@ -103,4 +103,20 @@ contract GangnamToken is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

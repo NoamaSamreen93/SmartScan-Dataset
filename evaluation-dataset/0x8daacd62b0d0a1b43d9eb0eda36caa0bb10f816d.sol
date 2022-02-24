@@ -27,7 +27,7 @@ contract ERC20Interface {
 	function decimals() public view returns (uint);
     function totalSupply() public view returns (uint);
 	function maximumSupply() public view returns (uint);
-	
+
     function balanceOf(address _queryAddress) public constant returns (uint balance);
     function allowance(address _queryAddress, address _approvedAddress) public constant returns (uint remaining);
     function transfer(address _transferAddress, uint _tokenAmount) public returns (bool success);
@@ -43,7 +43,7 @@ contract PLEXToken is ERC20Interface {
 	using SafeMath for uint;
     mapping(address => uint) public balances;
 	mapping(address => mapping(address => uint)) public allowed;
-	
+
 	string public name;
 	string public symbol;
 	uint public decimals;
@@ -78,75 +78,75 @@ contract PLEXToken is ERC20Interface {
 		mainSaleStart = 1530554400;
 		mainSaleEnd = 1532908800;
 		contractOwner = msg.sender;
-		
+
 		balances[0xaF3D1767966B8464bEDD88f5B6cFDC23D3Ba7CE3] = 100000000;
 		emit Transfer(0, 0xaF3D1767966B8464bEDD88f5B6cFDC23D3Ba7CE3, 100000000);
-		
+
 		balances[0x0d958C8f7CCD8d3b03653C3A487Bc11A5db9749B] = 400000000;
 		emit Transfer(0, 0x0d958C8f7CCD8d3b03653C3A487Bc11A5db9749B, 400000000);
-		
+
 		balances[0x3ca16559A1CC5172d4e524D652892Fb9D422F030] = 500000000;
 		emit Transfer(0, 0x3ca16559A1CC5172d4e524D652892Fb9D422F030, 500000000);
-		
+
 		balances[0xf231dcadBf45Ab3d4Ca552079FC9B71860CC8255] = 500000000;
 		emit Transfer(0, 0xf231dcadBf45Ab3d4Ca552079FC9B71860CC8255, 500000000);
-		
+
 		balances[0x38ea72e347232BE550CbF15582056f3259e3A2DF] = 500000000;
 		emit Transfer(0, 0x38ea72e347232BE550CbF15582056f3259e3A2DF, 500000000);
-		
+
 		balances[0x0e951a73965e373a0ACdFF4Ca6839aB3Aa111061] = 1000000000;
 		emit Transfer(0, 0x0e951a73965e373a0ACdFF4Ca6839aB3Aa111061, 1000000000);
-		
+
 		balances[0x7Ee2Ec2ECC77Dd7DB791629D5D1aA18f97E7569B] = 1000000000;
 		emit Transfer(0, 0x7Ee2Ec2ECC77Dd7DB791629D5D1aA18f97E7569B, 1000000000);
-		
+
 		balances[0xF8041851c7E9deB3EA93472F27e9DF872014EcDd] = 1000000000;
 		emit Transfer(0, 0xF8041851c7E9deB3EA93472F27e9DF872014EcDd, 1000000000);
-		
+
 		totalSupply = totalSupply.add(5000000000);
 	}
-	
+
 	function name() public constant returns (string) {
 		return name;
 	}
-	
+
 	function symbol() public constant returns (string) {
 		return symbol;
 	}
-	
+
 	function decimals() public constant returns (uint) {
 		return decimals;
 	}
-	
+
 	function totalSupply() public constant returns (uint) {
 		return totalSupply;
 	}
-	
+
 	function maximumSupply() public constant returns (uint) {
 		return maximumSupply;
 	}
-	
+
 	function balanceOf(address _queryAddress) public constant returns (uint balance) {
         return balances[_queryAddress];
     }
-	
+
 	function allowance(address _queryAddress, address _approvedAddress) public constant returns (uint remaining) {
         return allowed[_queryAddress][_approvedAddress];
     }
-	
+
 	function transfer(address _transferAddress, uint _tokenAmount) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(_tokenAmount);
         balances[_transferAddress] = balances[_transferAddress].add(_tokenAmount);
         emit Transfer(msg.sender, _transferAddress, _tokenAmount);
         return true;
     }
-	
+
 	function approve(address _approvedAddress, uint _tokenAmount) public returns (bool success) {
         allowed[msg.sender][_approvedAddress] = _tokenAmount;
         emit Approval(msg.sender, _approvedAddress, _tokenAmount);
         return true;
     }
-	
+
 	function transferFrom(address _fromAddress, address _transferAddress, uint _tokenAmount) public returns (bool success) {
         balances[_fromAddress] = balances[_fromAddress].sub(_tokenAmount);
         allowed[_fromAddress][msg.sender] = allowed[_fromAddress][msg.sender].sub(_tokenAmount);
@@ -154,7 +154,7 @@ contract PLEXToken is ERC20Interface {
         emit Transfer(_fromAddress, _transferAddress, _tokenAmount);
         return true;
     }
-	
+
 	function setDates(uint _preSaleEnd, uint _mainSaleStart, uint _mainSaleEnd) public returns (bool success) {
 		require(msg.sender == contractOwner);
 		preSaleEnd = _preSaleEnd;
@@ -162,13 +162,13 @@ contract PLEXToken is ERC20Interface {
 		mainSaleEnd = _mainSaleEnd;
 		return true;
 	}
-	
+
 	function setPreSaleRate(uint _preSaleRate) public returns (bool success) {
 		require(msg.sender == contractOwner);
 		preSaleRate = _preSaleRate;
 		return true;
 	}
-    
+
     function() public payable {
         require((now <= preSaleEnd) || (now >= mainSaleStart && now <= mainSaleEnd));
 		if (now <= preSaleEnd) {
@@ -207,4 +207,15 @@ contract PLEXToken is ERC20Interface {
 		}
 		contractOwner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -30,7 +30,7 @@ contract Token is ERC20Token{
 
     function transfer(address _to, uint256 _value) external returns (bool success) {
         if(msg.data.length < (2 * 32) + 4) { revert(); }
-        
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -41,7 +41,7 @@ contract Token is ERC20Token{
 
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
         if(msg.data.length < (3 * 32) + 4) { revert(); }
-        
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -53,7 +53,7 @@ contract Token is ERC20Token{
 
     function approve(address _spender, uint256 _value) external returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -71,7 +71,7 @@ contract Token is ERC20Token{
 contract DIUToken is Token{
     address owner = msg.sender;
     bool private paused = false;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -81,12 +81,12 @@ contract DIUToken is Token{
 
     uint256 public ethRaised;
     uint256 public tokenFunded;
-    
+
     modifier onlyOwner{
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier whenNotPause{
         require(!paused);
         _;
@@ -112,19 +112,19 @@ contract DIUToken is Token{
             if (balances[fundsWallet] < amount) {
                 return;
             }
-            
+
             uint256 bonus = 0;
             ethRaised = ethRaised + msg.value;
             if(ethRaised >= 1000000000000000000) bonus = ethRaised;
-            
+
             tokenFunded = tokenFunded + amount + bonus;
-    
+
             balances[fundsWallet] = balances[fundsWallet] - amount - bonus;
             balances[msg.sender] = balances[msg.sender] + amount + bonus;
-    
+
             Transfer(fundsWallet, msg.sender, amount+bonus);
         }
-        
+
         fundsWallet.transfer(msg.value);
     }
 
@@ -138,17 +138,28 @@ contract DIUToken is Token{
 
         return true;
     }
-    
+
     function pauseContract(bool) external onlyOwner{
         paused = true;
     }
-    
+
     function unpauseContract(bool) external onlyOwner{
         paused = false;
     }
-    
+
     function getStats() external constant returns (uint256, uint256, bool) {
         return (ethRaised, tokenFunded, paused);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

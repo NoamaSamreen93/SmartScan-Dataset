@@ -77,7 +77,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -115,7 +115,7 @@ contract CountryToken is ERC721, Ownable {
   mapping(uint256 => uint256) private ownedTokensIndex;
 
   // Balances from % payouts.
-  mapping (address => uint256) private payoutBalances; 
+  mapping (address => uint256) private payoutBalances;
 
   // Events
   event CountryPurchased(uint256 indexed _tokenId, address indexed _owner, uint256 _purchasePrice);
@@ -149,7 +149,7 @@ contract CountryToken is ERC721, Ownable {
     require(_startingPrice > 0);
     // make sure token hasn't been used yet
     require(countryData[_tokenId].price == 0);
-    
+
     // create new token
     Country storage newCountry = countryData[_tokenId];
 
@@ -161,7 +161,7 @@ contract CountryToken is ERC721, Ownable {
 
     // store country in storage
     listedCountries.push(_tokenId);
-    
+
     // mint new token
     _mint(_owner, _tokenId);
   }
@@ -208,7 +208,7 @@ contract CountryToken is ERC721, Ownable {
   * @dev Purchase country from previous owner
   * @param _tokenId uint256 of token
   */
-  function purchaseCountry(uint256 _tokenId) public 
+  function purchaseCountry(uint256 _tokenId) public
     payable
     isNotContract(msg.sender)
   {
@@ -229,7 +229,7 @@ contract CountryToken is ERC721, Ownable {
     uint256 profit = price.sub(country.lastPrice);
     uint256 poolCut = calculatePoolCut(profit);
     poolTotal += poolCut;
-    
+
     // 3% goes to developers
     uint256 devCut = price.mul(3).div(100);
     devOwed = devOwed.add(devCut);
@@ -250,7 +250,7 @@ contract CountryToken is ERC721, Ownable {
     if (excess > 0) {
       newOwner.transfer(excess);
     }
-    
+
     // set last purchase price to storage
     lastPurchase = now;
 
@@ -309,7 +309,7 @@ contract CountryToken is ERC721, Ownable {
         uint256 totalCountryOwed = poolTotal * countryData[countrys[i]].payout / 10000;
         uint256 countryOwed = totalCountryOwed.sub(countryData[countrys[i]].withdrawn);
         owed += countryOwed;
-        
+
         countryData[countrys[i]].withdrawn += countryOwed;
     }
     payoutBalances[_owner] += owed;
@@ -323,7 +323,7 @@ contract CountryToken is ERC721, Ownable {
   function updateSinglePayout(address _owner, uint256 _itemId) internal {
     uint256 totalCountryOwed = poolTotal * countryData[_itemId].payout / 10000;
     uint256 countryOwed = totalCountryOwed.sub(countryData[_itemId].withdrawn);
-        
+
     countryData[_itemId].withdrawn += countryOwed;
     payoutBalances[_owner] += countryOwed;
   }
@@ -348,8 +348,8 @@ contract CountryToken is ERC721, Ownable {
   * @dev Return all country data
   * @param _tokenId uint256 of token
   */
-  function getCountryData (uint256 _tokenId) external view 
-  returns (address _owner, uint256 _startingPrice, uint256 _price, uint256 _nextPrice, uint256 _payout) 
+  function getCountryData (uint256 _tokenId) external view
+  returns (address _owner, uint256 _startingPrice, uint256 _price, uint256 _nextPrice, uint256 _payout)
   {
     Country memory country = countryData[_tokenId];
     return (country.owner, country.startingPrice, country.price, getNextPrice(country.price), country.payout);
@@ -472,7 +472,7 @@ contract CountryToken is ERC721, Ownable {
   function isApprovedFor(address _owner, uint256 _tokenId) internal view returns (bool) {
     return approvedFor(_tokenId) == _owner;
   }
-  
+
   /**
   * @dev Internal function to clear current approval and transfer the ownership of a given token ID
   * @param _from address which you want to send tokens from
@@ -561,4 +561,15 @@ contract CountryToken is ERC721, Ownable {
     return "EC";
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

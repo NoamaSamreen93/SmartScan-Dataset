@@ -12,7 +12,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -22,17 +22,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -40,7 +40,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -52,8 +52,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 contract SafeMath {
     function safeAdd(uint x, uint y) pure internal returns(uint) {
@@ -91,13 +91,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
@@ -105,7 +105,7 @@ contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -130,7 +130,7 @@ contract IAngelCardData is AccessControl, Enums {
     function getTotalAngels() constant public returns (uint64);
     function getAngelLockStatus(uint64 _angelId) constant public returns (bool);
 }
- 
+
 contract AngelWrapper721 is AccessControl, Enums {
   //Events
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
@@ -139,10 +139,10 @@ contract AngelWrapper721 is AccessControl, Enums {
 
 
 //Storage
- 
-   
+
+
     address public angelCardDataContract = 0x6d2e76213615925c5fc436565b5ee788ee0e86dc;
-    
+
     struct Angel {
         uint64 angelId;
         uint8 angelCardSeriesId;
@@ -161,7 +161,7 @@ contract AngelWrapper721 is AccessControl, Enums {
 
 
 
-    
+
     function SetAngelCardDataContact(address _angelCardDataContract) onlyCREATOR external {
        angelCardDataContract = _angelCardDataContract;
     }
@@ -170,52 +170,52 @@ contract AngelWrapper721 is AccessControl, Enums {
            IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
            return angelCardData.getOwnerAngelCount(_owner);
   }
-  
+
   function ownerOf(uint256 _tokenId) public view returns (address _owner) {
             IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
             address owner;
         (,,,,,,,,,,owner) = angelCardData.getAngel(uint64(_tokenId));
             return owner;
   }
-  
+
   function getTokenByIndex (address _owner, uint index) constant public returns (uint64) {
-      //returns the angel number of the index-th item in that addresses angel list. 
+      //returns the angel number of the index-th item in that addresses angel list.
              IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
         return uint64(angelCardData.getAngelByIndex(_owner, index));
-        
-  }
-	
 
-        
+  }
+
+
+
          function getAngel(uint64 _angelId) constant public returns(uint64 angelId, uint8 angelCardSeriesId, uint16 battlePower, uint8 aura, uint16 experience, uint price, address owner) {
         IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
         (angelId,angelCardSeriesId, battlePower, aura,experience,price,,,,, owner) = angelCardData.getAngel(_angelId);
-      
+
     }
-        
-        
-       
-    
+
+
+
+
     function getTokenLockStatus(uint64 _tokenId) constant public returns (bool) {
        IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
        return angelCardData.getAngelLockStatus(_tokenId);
-       
+
     }
-    
-   
- 
+
+
+
   function transfer(address _to, uint256 _tokenId) public {
-      
+
         IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
        address owner;
        (,,,,,,,,, owner) = angelCardData.getAngel(uint64(_tokenId));
-      
+
        if ((seraphims[msg.sender] == true)  || (owner == msg.sender))
        {
          angelCardData.transferAngel(owner,_to, uint64 (_tokenId)) ;
          Transfer(owner, _to, _tokenId);
          MarketplaceTransfer(owner,  _to, _tokenId, msg.sender);
-           
+
        }
       else {revert();}
   }
@@ -223,10 +223,10 @@ contract AngelWrapper721 is AccessControl, Enums {
   {
       //this function should never be called - instead, use updateAccessoryLock from the accessoryData contract;
       revert();
-      
+
   }
   function takeOwnership(uint256 _tokenId) public
-  { 
+  {
      //this function should never be called - instead use transfer
      revert();
   }
@@ -234,3 +234,14 @@ contract AngelWrapper721 is AccessControl, Enums {
         selfdestruct(creatorAddress);
     }
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

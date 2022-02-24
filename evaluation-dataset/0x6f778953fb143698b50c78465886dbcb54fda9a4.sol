@@ -56,7 +56,7 @@ contract GOC is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -67,16 +67,16 @@ contract GOC is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) throw;                                // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;  // Check for overflows
         if (_value > allowance[_from][msg.sender]) throw;     // Check allowance
@@ -86,9 +86,15 @@ contract GOC is SafeMath{
         Transfer(_from, _to, _value);
         return true;
     }
-	
+
 	// can accept ether
 	function() payable {
 		revert();
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

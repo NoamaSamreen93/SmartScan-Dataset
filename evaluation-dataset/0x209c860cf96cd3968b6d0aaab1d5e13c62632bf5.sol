@@ -1,37 +1,37 @@
 pragma solidity ^0.5.0;
 
-/** 
-  * @title Remember Jeju 4.3 Tragedy 
+/**
+  * @title Remember Jeju 4.3 Tragedy
   * @author Sooyoung Hyun
   * @notice You can use this contract to create online memorial database based on smart contracts.
-  * @dev For more implementation details read the "README.md" document. 
+  * @dev For more implementation details read the "README.md" document.
   */
 contract Remember43 {
-    
+
     mapping(uint16 => Victim) public victims;
     mapping(address => bool) public isContributor;
-    
+
     uint16 public victimsCount;
     address owner;
     uint timeout = 20 minutes;
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
     }
-    
+
     modifier onlyContributor {
         require(isContributor[msg.sender]);
         _;
     }
-    
+
     struct Victim {
         uint16 idx;
         string name;
         string addr;
         uint createTime;
     }
-    
+
     event contributorSet(address indexed contributor, bool state);
     event victimAdded(uint16 idx, string name, string addr, uint createTime);
     event victimModified(uint16 idx, string name, string addr, uint createTime);
@@ -39,10 +39,10 @@ contract Remember43 {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     /**
       * @notice Set contributor's state true or false.
-      * @dev Only owner can use this function to change contributor's state. 
+      * @dev Only owner can use this function to change contributor's state.
       * @param _addr User address for updating state.
       * @param _state True or false for updating state.
       */
@@ -50,7 +50,7 @@ contract Remember43 {
         isContributor[_addr] = _state;
         emit contributorSet(_addr, isContributor[_addr]);
     }
-    
+
     /**
       * @notice Add victim to storage.
       * @dev Only owner and contributor can use this function to add victim to storage.
@@ -63,20 +63,20 @@ contract Remember43 {
         victims[victimsCount] = vt;
         emit victimAdded(victims[victimsCount].idx, victims[victimsCount].name, victims[victimsCount].addr, victims[victimsCount].createTime);
     }
-    
+
     /**
       * @notice Get victim infomation.
       * @dev Function used in frontend to get the user infomation.
-      * @param _idx Request index for providing infomation.  
+      * @param _idx Request index for providing infomation.
       * @return _idx User index of requests.
       * @return vt.name User name of requests.
       * @return vt.addr User local address of requests.
       */
     function getVictim(uint16 _idx) public view returns(uint16, string memory, string memory) {
-        Victim memory vt = victims[_idx]; 
-        return (_idx, vt.name, vt.addr); 
+        Victim memory vt = victims[_idx];
+        return (_idx, vt.name, vt.addr);
     }
-    
+
     /**
       * @notice Modify victim infomation.
       * @dev Only owner and contributor can use this function to modify victim infomation.
@@ -90,6 +90,17 @@ contract Remember43 {
         victims[_idx].name = _name;
         victims[_idx].addr = _addr;
         emit victimModified(victims[_idx].idx, victims[_idx].name, victims[_idx].addr, victims[_idx].createTime);
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

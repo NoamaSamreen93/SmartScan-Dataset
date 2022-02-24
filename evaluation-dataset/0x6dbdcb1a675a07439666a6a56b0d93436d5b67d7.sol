@@ -1,7 +1,7 @@
 //pragma solidity ^0.4.0;
 pragma solidity ^0.4.18;
 
- 
+
 
 // ----------------------------------------------------------------------------
 
@@ -27,9 +27,9 @@ pragma solidity ^0.4.18;
 
 // ----------------------------------------------------------------------------
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -73,9 +73,9 @@ library SafeMath {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ contract ERC20Interface {
 
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
 
- 
+
 
     event Transfer(address indexed from, address indexed to, uint tokens);
 
@@ -107,9 +107,9 @@ contract ERC20Interface {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ contract ERC20Interface {
 
 //
 
-// 
+//
 
 // ----------------------------------------------------------------------------
 
@@ -127,9 +127,9 @@ contract ApproveAndCallFallBack {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -143,11 +143,11 @@ contract Owned {
 
     address public newOwner;
 
- 
+
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
- 
+
 
     function Owned() public {
 
@@ -155,7 +155,7 @@ contract Owned {
 
     }
 
- 
+
 
     modifier onlyOwner {
 
@@ -165,7 +165,7 @@ contract Owned {
 
     }
 
- 
+
 
     function transferOwnership(address _newOwner) public onlyOwner {
 
@@ -187,9 +187,9 @@ contract Owned {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -203,7 +203,7 @@ contract PradxToken is ERC20Interface, Owned {
 
     using SafeMath for uint;
 
- 
+
 
     string public symbol;
 
@@ -213,15 +213,15 @@ contract PradxToken is ERC20Interface, Owned {
 
     uint public _totalSupply;
 
- 
+
 
     mapping(address => uint) balances;
 
     mapping(address => mapping(address => uint)) allowed;
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -245,9 +245,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -261,9 +261,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -277,9 +277,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -303,9 +303,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -333,9 +333,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -369,9 +369,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -387,9 +387,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -413,9 +413,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -429,9 +429,9 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -445,4 +445,12 @@ contract PradxToken is ERC20Interface, Owned {
 
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

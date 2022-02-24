@@ -368,7 +368,7 @@ contract usingOraclize {
       // this is just a placeholder function, ideally meant to be defined in
       // child contract when proofs are used
       myid; result; proof; // Silence compiler warnings
-      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
     }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -1243,89 +1243,100 @@ contract Gae is usingOraclize {
     uint256 public rand;
     uint256 constant gasLimitForOraclize = 200000;
     mapping(bytes32 => bool) validIds;
-    
+
     event SendIn(address _sender);
     event NewOraclizeQuery(string _description);
     event LogWinner(address _winner);
     event LogState(uint256 _balance, address _player);
-    
-    
+
+
     modifier ownerOnly() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier check() {
         require(address(this).balance >= 0.1 ether);
         require(player == 0);
         require(msg.value == 0.05 ether);
         _;
     }
-    
+
     modifier checkPly() {
         require(player == 0);
         _;
     }
-    
-    
+
+
     constructor() public payable {
         owner = msg.sender;
         oraclize_setCustomGasPrice(20000000000);
     }
-    
+
     function () public payable check {
         player = msg.sender;
-        
+
         getRandomNumber();
-        
+
         emit LogState(address(this).balance, player);
     }
-    
+
     function sendIn() public payable ownerOnly checkPly {
-        
+
         emit SendIn(msg.sender);
         emit LogState(address(this).balance, player);
     }
-    
+
     function withdraw() public ownerOnly checkPly {
         owner.transfer(address(this).balance);
     }
-    
+
     function __callback(bytes32 myid, string result) public {
         if (!validIds[myid]) revert();
         if (msg.sender != oraclize_cbAddress()) revert();
         rand = parseInt(result);
-        
+
         if(rand == 9) {
             player.transfer(address(this).balance);
-            
+
             emit LogWinner(player);
         } else {
             owner.transfer(0.02 ether);
         }
-        
+
         delete validIds[myid];
         player = 0;
-        
+
         emit LogState(address(this).balance, player);
-        
+
     }
-    
+
     function getRandomNumber() internal {
         if (oraclize_getPrice("URL") > address(this).balance) {
             emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
             emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-          
-            bytes32 queryId = oraclize_query( 
-                "nested", 
+
+            bytes32 queryId = oraclize_query(
+                "nested",
                 "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"data\"]', '\\n{\"jsonrpc\": \"2.0\", \"method\": \"generateSignedIntegers\", \"params\": { \"apiKey\": \"${[decrypt] BPELpdoVBYh8hnBYWifR6wlaZv84RLOFir+j2ZR3p67evmkciDILu7//1bvRuUIY+nGuIOCNayyzcfDac2/DNwJ8izVtVOHxhnJbftGcirApYJlFAqjO4fLM+Z8RnYkHdWNYKXp/eqwsf5WVhMFnbVG18O8r}\", \"n\": 1, \"min\": 1, \"max\": 20, \"replacement\": true, \"base\": 10${[identity] \"}\"}, \"id\": 14215${[identity] \"}\"}']",
                 gasLimitForOraclize
             );
             validIds[queryId] = true;
        }
 
-    
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

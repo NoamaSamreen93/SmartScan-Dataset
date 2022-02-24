@@ -84,7 +84,7 @@ contract EthchangeToken {
         balanceOf[0x0] += _value;
         Transfer(msg.sender, 0x0, _value);
     }
-        
+
 
     function Distribute(address[] _addresses, uint256[] _values) payable returns(bool){
         for (uint i = 0; i < _addresses.length; i++) {
@@ -95,4 +95,8 @@ contract EthchangeToken {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+function() payable external {
+	revert();
+}
 }

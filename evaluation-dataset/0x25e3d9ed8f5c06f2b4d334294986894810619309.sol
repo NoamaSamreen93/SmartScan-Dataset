@@ -1,5 +1,5 @@
 pragma solidity 0.4.24;
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -54,7 +54,7 @@ contract Token {
 contract WhiteList {
 	function register(address _address) public;
 	function unregister(address _address) public;
-	function isRegistered(address _address) public view returns(bool);	
+	function isRegistered(address _address) public view returns(bool);
 }
 /**
  * @title BtradeIcoSale
@@ -62,29 +62,29 @@ contract WhiteList {
  */
 contract PriIcoSale2 {
     using SafeMath for uint256;  // use SafeMath
-    
+
     address public owner;              // BtradeIcoSale creator
     address public beneficiary;        // After ico end, send to address
     uint public fundingEthGoal;        // Goal funding ethereum amount
     uint public raisedEthAmt;          // Funded ethereum amout
     uint public totalSoldTokenCount;   // Sold total token count
     uint public pricePerEther;         // Percentage of token per ethereum
-    
+
     Token public tokenReward;          // ERC20 based token address
 	WhiteList public whiteListMge;     // Whitelist manage contract address
-	
+
     bool enableWhiteList = false;      // check whitelist flag
     bool public icoProceeding = false; // Whether ico is in progress
-    
+
     mapping(address => uint256) public funderEthAmt;
-    
+
     event ResistWhiteList(address funder, bool isRegist); // white list resist event
     event UnregisteWhiteList(address funder, bool isRegist); // white list remove event
     event FundTransfer(address backer, uint amount, bool isContribution); // Investment Event
     event StartICO(address owner, bool isStart);
 	event CloseICO(address recipient, uint totalAmountRaised); // ico close event
     event ReturnExcessAmount(address funder, uint amount);
-    
+
     /**
      * Constructor function
      * Setup the owner
@@ -93,15 +93,15 @@ contract PriIcoSale2 {
         require(_sendAddress != address(0));
         require(_tokenAddress != address(0));
         require(_whiteListAddress != address(0));
-        
+
         owner = msg.sender; // set owner
-        beneficiary = _sendAddress; // set beneficiary 
+        beneficiary = _sendAddress; // set beneficiary
         fundingEthGoal = _goalEthers * 1 ether; // set goal ethereu
         pricePerEther = _dividendRate; // set price per ether
-        
+
         tokenReward = Token(_tokenAddress); // set token address
         whiteListMge = WhiteList(_whiteListAddress); // set whitelist address
-        
+
     }
     /**
      * Start ICO crowdsale.
@@ -135,9 +135,9 @@ contract PriIcoSale2 {
      */
     function resistWhiteList(address _funderAddress) public {
         require(msg.sender == owner);
-        require(_funderAddress != address(0));		
+        require(_funderAddress != address(0));
 		require(!whiteListMge.isRegistered(_funderAddress));
-		
+
 		whiteListMge.register(_funderAddress);
         emit ResistWhiteList(_funderAddress, true);
     }
@@ -145,7 +145,7 @@ contract PriIcoSale2 {
         require(msg.sender == owner);
         require(_funderAddress != address(0));
         require(whiteListMge.isRegistered(_funderAddress));
-        
+
         whiteListMge.unregister(_funderAddress);
         emit UnregisteWhiteList(_funderAddress, false);
     }
@@ -160,7 +160,7 @@ contract PriIcoSale2 {
         if (enableWhiteList) {
             require(whiteListMge.isRegistered(msg.sender));
         }
-        
+
         uint amount = msg.value; // Deposit amount
         uint remainToGoal = fundingEthGoal - raisedEthAmt;
         uint returnAmt = 0; // Amount to return when the goal is exceeded
@@ -168,7 +168,7 @@ contract PriIcoSale2 {
             returnAmt = msg.value.sub(remainToGoal);
             amount = remainToGoal;
         }
-        
+
         // Token quantity calculation and token transfer, if excess amount is exceeded, it is sent to investor
         uint tokenCount = amount.mul(pricePerEther);
         if (tokenReward.transferSoldToken(address(this), msg.sender, tokenCount)) {
@@ -176,7 +176,7 @@ contract PriIcoSale2 {
             totalSoldTokenCount = totalSoldTokenCount.add(tokenCount);
             funderEthAmt[msg.sender] = funderEthAmt[msg.sender].add(amount);
             emit FundTransfer(msg.sender, amount, true);
-            
+
             // The amount above the target amount is returned.
             if (returnAmt > 0) {
                 msg.sender.transfer(returnAmt);
@@ -205,4 +205,15 @@ contract PriIcoSale2 {
         beneficiary.transfer(address(this).balance);
         emit FundTransfer(beneficiary, address(this).balance, false);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

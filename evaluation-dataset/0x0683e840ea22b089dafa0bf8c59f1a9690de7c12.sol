@@ -1026,3 +1026,14 @@ contract CryptoCardsERC721 is Ownable, ERC721Full, ERC721MetadataMintable {
 contract CryptoCardsPackToken is CryptoCardsERC721 {
     constructor() public CryptoCardsERC721("Crypto-Cards Packs", "PACKS") { }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

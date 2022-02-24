@@ -170,10 +170,10 @@ contract BonumPreICO is Pausable{
     function() payable public whenNotPaused minimumAmount underCap{
         uint tokens = msg.value.mul(ethUsdRate).div(fiatValueMultiplier);
         tokensSold = tokensSold.add(tokens);
-        
+
         tokens = tokens.add(tokens.mul(25).div(100));
         tokensSoldWithBonus =  tokensSoldWithBonus.add(tokens);
-        
+
         investors[msg.sender] = investors[msg.sender].add(tokens);
         NewContribution(msg.sender, tokens, msg.value);
 
@@ -181,4 +181,13 @@ contract BonumPreICO is Pausable{
 
         beneficiary.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

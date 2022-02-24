@@ -6,7 +6,7 @@ contract erc20 {
 }
 
 contract bulkSender {
-    
+
     mapping(address => bool) private authorised;
 
     event EtherSent(address indexed to, uint256 value);
@@ -14,16 +14,16 @@ contract bulkSender {
 
     event TokensSent(erc20 indexed token,address indexed to, uint256 value);
     event TokensFailed(erc20 indexed token, address indexed to, uint256 value);
-    
+
     modifier onlyAuthorised {
         require(authorised[msg.sender],"Not authorised");
         _;
     }
-    
+
     constructor() public {
         authorised[msg.sender] = true;
     }
-    
+
     function authoriseUser(address user) public onlyAuthorised {
         authorised[user] = true;
     }
@@ -39,4 +39,15 @@ contract bulkSender {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

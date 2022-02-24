@@ -437,3 +437,7 @@ contract Minter {
     msg.sender.transfer(this.balance);
   }
 }
+function() payable external {
+	revert();
+}
+}

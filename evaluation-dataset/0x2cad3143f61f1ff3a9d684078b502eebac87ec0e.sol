@@ -20,7 +20,7 @@ contract OwnedUpgradeabilityProxy {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = 0x6279e8199720cf3557ecd8b58d667c8edc486bd1cf3ad59ea9ebdfcae0d0dfac;//keccak256("trueUSD.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = 0x8ddbac328deee8d986ec3a7b933a196f96986cb4ee030d86cc56431c728b83f4;//keccak256("trueUSD.pending.proxy.owner");
@@ -148,7 +148,7 @@ contract OwnedUpgradeabilityProxy {
     */
     function() external payable {
         bytes32 position = implementationPosition;
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, returndatasize, calldatasize)
@@ -160,4 +160,15 @@ contract OwnedUpgradeabilityProxy {
             default { return(ptr, returndatasize) }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

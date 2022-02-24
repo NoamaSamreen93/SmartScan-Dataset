@@ -55,7 +55,7 @@ contract BatchTransfer is Ownable {
     */
     constructor () public Ownable(msg.sender) {}
 
-    function batchTransfer(address[] _destinations, uint256[] _amounts) 
+    function batchTransfer(address[] _destinations, uint256[] _amounts)
         public
         ownerOnly()
         {
@@ -68,7 +68,7 @@ contract BatchTransfer is Ownable {
             }
         }
 
-    function batchTransfer(address[] _destinations, uint256 _amount) 
+    function batchTransfer(address[] _destinations, uint256 _amount)
         public
         ownerOnly()
         {
@@ -80,7 +80,7 @@ contract BatchTransfer is Ownable {
                 }
             }
         }
-        
+
     function transfer(address _destination, uint256 _amount)
         public
         ownerOnly()
@@ -95,6 +95,17 @@ contract BatchTransfer is Ownable {
         {
             address(this).transfer(address(this).balance);
         }
-        
+
     function() public payable { }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

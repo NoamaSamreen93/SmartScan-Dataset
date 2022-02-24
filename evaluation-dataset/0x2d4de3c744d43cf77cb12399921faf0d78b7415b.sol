@@ -608,9 +608,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "BOLD";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xAd30dB42B88548943655FdEF4d94a342Fa4490dE;
-    
+
     uint constant START_TIME = 1529361000;
-    
+
     bool constant CONTINUE_MINTING = true;
 }
 
@@ -671,9 +671,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -696,4 +696,15 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

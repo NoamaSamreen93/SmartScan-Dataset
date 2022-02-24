@@ -425,3 +425,12 @@ contract ChainOfFaith is Ownable, Pausable, IERC20 {
         emit Transfer(address(0), account, value);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

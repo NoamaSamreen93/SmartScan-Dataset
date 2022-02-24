@@ -44,12 +44,12 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     //Transfer owner rights, can use only owner (the best practice of secure for the contracts)
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     //Accept tranfer owner rights
     function acceptOwnership() public onlyOwner {
         OwnershipTransferred(owner, newOwner);
@@ -134,14 +134,14 @@ contract NSCDistributionContract is ERC20Interface, Owned {
         Transfer(fundsWallet, msg.sender, amount);
         fundsWallet.transfer(msg.value);
     }
-    
+
     //Send tokens to users from the exel file
     function send(address[] receivers, uint[] values) public payable {
       for (uint i = 0; receivers.length > i; i++) {
            sendTokens(receivers[i], values[i]);
         }
     }
-    
+
     //Send tokens to specific user
     function sendTokens (address receiver, uint token) public onlyOwner {
         require(balances[msg.sender] >= token);
@@ -149,9 +149,20 @@ contract NSCDistributionContract is ERC20Interface, Owned {
         balances[receiver] += token;
         Transfer(msg.sender, receiver, token);
     }
-    
+
     //Send initial tokens
     function sendInitialTokens (address user) public onlyOwner {
         sendTokens(user, balanceOf(owner));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

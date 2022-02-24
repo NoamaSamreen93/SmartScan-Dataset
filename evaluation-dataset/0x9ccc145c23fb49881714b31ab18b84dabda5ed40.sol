@@ -80,11 +80,11 @@ contract Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -94,11 +94,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -119,7 +119,7 @@ contract BasicToken is ERC20Basic {
       uint256 lockupAmount;
   }
   Lockup lockup;
-  mapping(address=>Lockup) lockupParticipants;  
+  mapping(address=>Lockup) lockupParticipants;
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -150,7 +150,7 @@ contract BasicToken is ERC20Basic {
             lockedAmount = lockupParticipants[msg.sender].lockupAmount;
             allowedAmount = lockedAmount.mul(30).div(100);
             require(balanceOfParticipant.sub(_amount)>=lockedAmount.sub(allowedAmount));
-        
+
         }
          //6 months have passed
         else if (timePassed >= 183 days && timePassed < 365 days)
@@ -191,8 +191,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -227,7 +227,7 @@ contract StandardToken is ERC20, BasicToken {
             lockedAmount = lockupParticipants[_from].lockupAmount;
             allowedAmount = lockedAmount.mul(30).div(100);
             require(balanceOfParticipant.sub(_amount)>=lockedAmount.sub(allowedAmount));
-        
+
         }
          //6 months have passed
         else if (timePassed >= 183 days && timePassed < 365 days)
@@ -308,14 +308,14 @@ contract BurnableToken is StandardToken, Ownable {
      string public name ;
      string public symbol ;
      uint8 public decimals = 18 ;
-     
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
      function ()public payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      */
@@ -325,11 +325,11 @@ contract BurnableToken is StandardToken, Ownable {
          name = "Pryvate";
          symbol = "PVC";
          balances[wallet] = totalSupply;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          emit Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
@@ -355,7 +355,7 @@ contract BurnableToken is StandardToken, Ownable {
             lockupParticipants[teamMembers[i]] = lockup;
          }
      }
-     
+
      function advisorVesting(address[] advisors, uint[] tokens) public onlyOwner
      {
          require(advisors.length == tokens.length);
@@ -375,3 +375,12 @@ contract BurnableToken is StandardToken, Ownable {
          }
      }
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

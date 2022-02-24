@@ -109,7 +109,7 @@ contract Multiplier2 {
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -180,10 +180,16 @@ contract Multiplier2 {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

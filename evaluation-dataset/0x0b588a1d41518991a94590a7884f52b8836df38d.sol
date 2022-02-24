@@ -9,7 +9,7 @@ contract FlyToTheMoonEvents {
         uint256 indexed rndNo,
         uint256 keys,
         uint256 eth,
-        uint256 timeStamp  
+        uint256 timeStamp
     );
 
     // become leader during second stage
@@ -18,7 +18,7 @@ contract FlyToTheMoonEvents {
         address indexed player,
         uint256 indexed rndNo,
         uint256 eth,
-        uint256 timeStamp  
+        uint256 timeStamp
     );
 
     // player withdraw
@@ -84,33 +84,33 @@ contract FlyToTheMoon is FlyToTheMoonEvents {
     /**
      * @dev prevents contracts from interacting
      */
-    modifier onlyHuman() 
+    modifier onlyHuman()
     {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
-    modifier isWithinLimits(uint256 _eth) 
+    modifier isWithinLimits(uint256 _eth)
     {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
-        _;    
+        _;
     }
 
     /**
      * @dev only owner
      */
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(owner == msg.sender, "only owner can do it");
-        _;    
+        _;
     }
 
     /**
@@ -313,9 +313,9 @@ contract FlyToTheMoon is FlyToTheMoonEvents {
     /**
      * @dev returns all current round info needed for front end
      * 0x747dff42
-     * @return round id 
+     * @return round id
      * @return total eth for round
-     * @return total keys for round 
+     * @return total keys for round
      * @return time round started
      * @return time round ends
      * @return current leader
@@ -323,13 +323,13 @@ contract FlyToTheMoon is FlyToTheMoonEvents {
      * @return current key price
      */
     function getCurrentRoundInfo()
-        public 
-        view 
+        public
+        view
         returns(uint256, uint256, uint256, uint256, uint256, address, uint256, uint256)
     {
 
         uint256 _rndNo = rndNo;
-        
+
         return (
             _rndNo,
             round_m[_rndNo].eth,
@@ -341,20 +341,20 @@ contract FlyToTheMoon is FlyToTheMoonEvents {
             getBuyPrice()
         );
     }
-    
+
     /**
      * @dev return the price buyer will pay for next 1 individual key during first stage.
      * 0x018a25e8
      * @return price for next key bought (in wei format)
      */
     function getBuyPrice()
-        public 
-        view 
+        public
+        view
         returns(uint256)
     {
         uint256 _rndNo = rndNo;
         uint256 _now = now;
-        
+
         // start next round?
         if (_now > round_m[_rndNo].endTime)
         {
@@ -372,8 +372,8 @@ contract FlyToTheMoon is FlyToTheMoonEvents {
 library KeysCalc {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -384,10 +384,10 @@ library KeysCalc {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -404,23 +404,23 @@ library KeysCalc {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -431,19 +431,19 @@ library KeysCalc {
  * @dev Math operations with safety checks that throw on error
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -459,7 +459,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -471,30 +471,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -505,20 +505,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -526,4 +526,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

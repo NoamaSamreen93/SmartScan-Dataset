@@ -47,11 +47,11 @@ contract NoahDividend is Ownable {
         if (investors.length != tokenAmounts.length || investors.length == 0 || tokenAmounts.length == 0) {
             revert();
         }
-        
+
         // if (!this.checkTotalBalance(tokenAmounts)) {
         //     revert();
         // }
-        
+
         for (uint i = 0; i < investors.length; i++) {
             bool result = noahToken.transfer(investors[i], tokenAmounts[i]);
             if (result == true){
@@ -60,4 +60,15 @@ contract NoahDividend is Ownable {
         }
         return results;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

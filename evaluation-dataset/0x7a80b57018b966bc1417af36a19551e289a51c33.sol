@@ -579,7 +579,7 @@ contract Crowdsale {
 
 /**
  * @title CappedWhitelistedCrowdsale
- * @dev Crowdsale with a limit for total contributions and per-beneficiary caps. 
+ * @dev Crowdsale with a limit for total contributions and per-beneficiary caps.
  * Combination of CappedCrowdsale and IndividuallyCappedCrowdsale
  */
 contract TieredPriceCrowdsale is Crowdsale {
@@ -588,13 +588,13 @@ contract TieredPriceCrowdsale is Crowdsale {
     uint256 private _tier3Start;
     uint256 private _tier4Start;
 
-    constructor( 
+    constructor(
       uint256 baseRate,
       uint256 openingTimeTier2,
-      uint256 openingTimeTier3, 
+      uint256 openingTimeTier3,
       uint256 openingTimeTier4
-    ) 
-    public 
+    )
+    public
     {
         require(baseRate > 0);
         require(openingTimeTier2 > block.timestamp);
@@ -637,8 +637,8 @@ contract TieredPriceCrowdsale is Crowdsale {
       * @return Timestamp when the tier starts
       */
     function tierStartTime(
-        uint256 tier       
-    ) external view returns(uint256) 
+        uint256 tier
+    ) external view returns(uint256)
     {
         if(tier == 2){
             return _tier2Start;
@@ -754,7 +754,7 @@ contract CapperRole {
 contract WhitelistedCrowdsale is Crowdsale, CapperRole {
     using SafeMath for uint256;
 
-    uint256 private _invCap;   
+    uint256 private _invCap;
 
     mapping(address => uint256) private _contributions;
     mapping(address => uint256) private _caps;
@@ -1175,8 +1175,8 @@ contract PlazaCrowdsale is CappedCrowdsale, FinalizableCrowdsale, MintedCrowdsal
         address wallet,
         uint256 cap,
         ERC20Mintable token,
-        uint256 openingTimeTier4, 
-        uint256 openingTimeTier3, 
+        uint256 openingTimeTier4,
+        uint256 openingTimeTier3,
         uint256 openingTimeTier2,
         uint256 invCap
     )
@@ -1188,4 +1188,10 @@ contract PlazaCrowdsale is CappedCrowdsale, FinalizableCrowdsale, MintedCrowdsal
     TieredPriceCrowdsale(rate, openingTimeTier2, openingTimeTier3, openingTimeTier4)
     {}
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -64,7 +64,7 @@ contract ERC20 is Owned {
     function transfer(address _to, uint _value) isStartedOnly public returns (bool success) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-    
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -76,7 +76,7 @@ contract ERC20 is Owned {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -173,4 +173,15 @@ contract SWAP is ERC20 {
         }
         return(i);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

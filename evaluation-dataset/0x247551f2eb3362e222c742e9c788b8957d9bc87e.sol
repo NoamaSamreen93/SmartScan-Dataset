@@ -61,7 +61,7 @@ contract GNYToken is ERC20Interface, SafeMath {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     // Triggered when tokens are transferred.
@@ -74,7 +74,7 @@ contract GNYToken is ERC20Interface, SafeMath {
         _totalSupply = 400000000000000000000000000;
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() public view returns (uint256) {
       return _totalSupply;
     }
@@ -108,4 +108,15 @@ contract GNYToken is ERC20Interface, SafeMath {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

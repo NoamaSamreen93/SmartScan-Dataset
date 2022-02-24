@@ -254,7 +254,7 @@ contract StandardToken is ERC20, BasicToken {
 /**
  * @title Eternal Token
  * @dev DistributableToken contract is based on a simple initial supply token, with an API for the owner to perform bulk distributions.
- *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions. 
+ *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions.
  */
 
 contract BITRNXCCC is StandardToken, Ownable {
@@ -273,7 +273,7 @@ contract BITRNXCCC is StandardToken, Ownable {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
-   
+
     /**
      * @dev Distribute tokens to multiple addresses in a single transaction
      *
@@ -289,4 +289,15 @@ contract BITRNXCCC is StandardToken, Ownable {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -56,7 +56,7 @@ contract JCCoin  {
 
     }
 
-	
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (msg.sender != founder) revert();
 
@@ -71,14 +71,26 @@ contract JCCoin  {
     }
 
 
-	
+
     function() {
         revert();
     }
 
     // only owner can kill
-    function kill() { 
-        if (msg.sender == founder) suicide(founder); 
+    function kill() {
+        if (msg.sender == founder) suicide(founder);
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

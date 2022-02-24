@@ -31,7 +31,7 @@ library SafeMath {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
 		c = a + b;
 		assert(c >= a);
@@ -103,13 +103,13 @@ contract StandardToken is ERC20, BasicToken {
 
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
-    
+
     if (_subtractedValue > oldValue) {
       allowed[msg.sender][_spender] = 0;
     } else {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
-    
+
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
@@ -174,7 +174,7 @@ contract Pausable is Ownable {
     paused = false;
     emit Unpause();
   }
-  
+
     function notPausable() onlyOwner public{
         paused = false;
         canPause = false;
@@ -191,25 +191,36 @@ contract sdcoin is StandardToken, Pausable {
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
         return super.approve(_spender, _value);
     }
-    
+
     function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
-    
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
-  } 
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

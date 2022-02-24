@@ -7,10 +7,10 @@ contract Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
     function approve(address _spender, uint256 _value) returns (bool success) {}
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -61,12 +61,12 @@ contract CoinWorldBank is StandardToken {
      uint256 public unitsOneEthCanBuy;
      uint256 public totalEthInWei;
      address public fundsWallet;
-    
+
     function CoinWorldBank() {
         balances[msg.sender] = 100000000000000000000000000000;
         totalSupply = 100000000000000000000000000000;
         name = "CoinWorldBank";
-        decimals = 18; 
+        decimals = 18;
         symbol = "CWBank";
         unitsOneEthCanBuy = 80000;
         fundsWallet = msg.sender;
@@ -81,7 +81,7 @@ contract CoinWorldBank is StandardToken {
         balances[msg.sender] = balances[msg.sender] + amount;
 
         Transfer(fundsWallet, msg.sender, amount);
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -89,4 +89,15 @@ contract CoinWorldBank is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

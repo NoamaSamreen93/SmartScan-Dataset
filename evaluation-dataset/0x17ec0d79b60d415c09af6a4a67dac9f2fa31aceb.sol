@@ -253,9 +253,9 @@ contract TokenRegistry is Ownable {
     /// @dev Provides a registered token's address when given the token symbol.
     /// @param _symbol Symbol of registered token.
     /// @return Token's address.
-    function getTokenAddressBySymbol(string _symbol) 
+    function getTokenAddressBySymbol(string _symbol)
         public
-        view 
+        view
         returns (address)
     {
         return tokenBySymbol[_symbol];
@@ -264,7 +264,7 @@ contract TokenRegistry is Ownable {
     /// @dev Provides a registered token's address when given the token name.
     /// @param _name Name of registered token.
     /// @return Token's address.
-    function getTokenAddressByName(string _name) 
+    function getTokenAddressByName(string _name)
         public
         view
         returns (address)
@@ -341,4 +341,15 @@ contract TokenRegistry is Ownable {
     {
         return tokenAddresses;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

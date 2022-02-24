@@ -83,11 +83,11 @@ contract Crowdsale {
   // Amount of wei raised
   uint256 public weiRaised;
 
-  modifier onlyOwner() { 
-    require (msg.sender == owner); 
+  modifier onlyOwner() {
+    require (msg.sender == owner);
     _;
   }
-  
+
   /**
    * Event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -171,7 +171,7 @@ contract Crowdsale {
   /*
    * @dev owner set owner
    * @param new owner address
-   */ 
+   */
   function ownerSetOwner(address _newOwner) public onlyOwner {
     owner = _newOwner;
   }
@@ -179,7 +179,7 @@ contract Crowdsale {
   /*
    * @dev owner set new wallet
    * @param new wallet to collect funds
-   */ 
+   */
   function ownerSetWallet(address _newWallet) public onlyOwner {
     wallet = _newWallet;
   }
@@ -187,15 +187,15 @@ contract Crowdsale {
   /*
    * @dev owner set new wallet
    * @param new wallet to collect funds
-   */ 
+   */
   function ownerSetRate(uint256 _newRate) public onlyOwner {
     rate = _newRate;
   }
 
   /*
-   * @dev owner selfdestruct contract ***BE CAREFUL! EMERGENCY ONLY*** 
+   * @dev owner selfdestruct contract ***BE CAREFUL! EMERGENCY ONLY***
    * before self destruct, execute ownerTokenTransfer() to GET TOKEN OUT.
-   */ 
+   */
   function ownerSelfDestruct() public onlyOwner {
     selfdestruct(owner);
   }
@@ -267,4 +267,10 @@ contract Crowdsale {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

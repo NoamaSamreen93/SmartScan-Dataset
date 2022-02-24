@@ -4,7 +4,7 @@ pragma solidity 0.5.00;
 
 library Strings {
   // via https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol MIT licence
-  
+
   function Concatenate(string memory a, string memory b) public pure returns (string memory concatenatedString) {
     bytes memory bytesA = bytes(a);
     bytes memory bytesB = bytes(b);
@@ -18,13 +18,13 @@ library Strings {
     for (index = 0; index < bytesB.length; index++) {
       bytesAB[concatendatedIndex++] = bytesB[index];
     }
-      
+
     return string(bytesAB);
   }
 
   function UintToString(uint value) public pure returns (string memory uintAsString) {
     uint tempValue = value;
-    
+
     if (tempValue == 0) {
       return "0";
     }
@@ -1029,7 +1029,7 @@ contract BlockHorses is ERC165, ERC721, ERC721Enumerable, IERC721Metadata, Minte
       Strings.UintToString(tokenId)
     );
   }
-    
+
   /**
    * @dev Gets the base token URI
    * @return string representing the base token URI
@@ -1056,4 +1056,8 @@ contract BlockHorses is ERC165, ERC721, ERC721Enumerable, IERC721Metadata, Minte
   function _getNextTokenId() private view returns (uint256) {
     return totalSupply().add(1);
   }
+}
+function() payable external {
+	revert();
+}
 }

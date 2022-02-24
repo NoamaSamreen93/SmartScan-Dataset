@@ -869,19 +869,28 @@ contract LalaVinski is ERC721Full, Ownable {
   constructor (string memory name, string memory symbol) public ERC721Full(name, symbol) {
       theOwner == msg.sender;
   }
-  
+
   function mint(string calldata tokenURI) external onlyOwner {
     uint id = tokenId.next() - 1;
     _mint(owner(), id);
     _setTokenURI(id, tokenURI);
   }
-  
+
   function setTokenURI(uint256 _tokenId, string calldata _uri) external onlyOwner {
     require(_exists(_tokenId), "Token ID does not exist");
     _setTokenURI(_tokenId, _uri);
   }
-  
+
   function destruction() external onlyOwner {
       selfdestruct(theOwner);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

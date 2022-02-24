@@ -13,13 +13,13 @@ interface TeamInterface {
 /**
  * @title Artist Contract
  * @dev http://www.puzzlebid.com/
- * @author PuzzleBID Game Team 
+ * @author PuzzleBID Game Team
  * @dev Simon<vsiryxm@163.com>
  */
 contract Artist {
 
-    TeamInterface private team; 
-    mapping(bytes32 => address payable) private artists; 
+    TeamInterface private team;
+    mapping(bytes32 => address payable) private artists;
 
     constructor(address _teamAddress) public {
         require(_teamAddress != address(0));
@@ -48,7 +48,7 @@ contract Artist {
     function getAddress(bytes32 _artistID) external view returns (address payable) {
         return artists[_artistID];
     }
-   
+
     function add(bytes32 _artistID, address payable _address) external onlyAdmin() {
         require(this.hasArtist(_artistID) == false);
         artists[_artistID] = _address;
@@ -65,4 +65,13 @@ contract Artist {
         emit OnUpdateAddress(_artistID, _address);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

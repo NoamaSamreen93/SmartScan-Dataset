@@ -1,5 +1,5 @@
 pragma solidity ^0.5.2;
- 
+
 /**
  * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
@@ -15,13 +15,13 @@ library SafeMath {
         if (a == 0) {
             return 0;
         }
- 
+
         uint256 c = a * b;
         require(c / a == b);
- 
+
         return c;
     }
- 
+
     /**
      * @dev Integer division of two unsigned integers truncating the quotient, reverts on division by zero.
      */
@@ -30,30 +30,30 @@ library SafeMath {
         require(b > 0);
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
- 
+
         return c;
     }
- 
+
     /**
      * @dev Subtracts two unsigned integers, reverts on overflow (i.e. if subtrahend is greater than minuend).
      */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         uint256 c = a - b;
- 
+
         return c;
     }
- 
+
     /**
      * @dev Adds two unsigned integers, reverts on overflow.
      */
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a);
- 
+
         return c;
     }
- 
+
     /**
      * @dev Divides two unsigned integers and returns the remainder (unsigned integer modulo),
      * reverts when dividing by zero.
@@ -63,7 +63,7 @@ library SafeMath {
         return a % b;
     }
 }
- 
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
@@ -71,9 +71,9 @@ library SafeMath {
  */
 contract Ownable {
     address private _owner;
- 
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
@@ -82,14 +82,14 @@ contract Ownable {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
     }
- 
+
     /**
      * @return the address of the owner.
      */
     function owner() public view returns (address) {
         return _owner;
     }
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -97,14 +97,14 @@ contract Ownable {
         require(isOwner());
         _;
     }
- 
+
     /**
      * @return true if `msg.sender` is the owner of the contract.
      */
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
- 
+
     /**
      * @dev Allows the current owner to relinquish control of the contract.
      * @notice Renouncing to ownership will leave the contract without an owner.
@@ -115,7 +115,7 @@ contract Ownable {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
- 
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -123,7 +123,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public onlyOwner {
         _transferOwnership(newOwner);
     }
- 
+
     /**
      * @dev Transfers control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -134,29 +134,29 @@ contract Ownable {
         _owner = newOwner;
     }
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 interface IERC20 {
     function totalSupply() external view returns (uint256);
- 
+
     function balanceOf(address who) external view returns (uint256);
- 
+
     function allowance(address owner, address spender) external view returns (uint256);
- 
+
     function transfer(address to, uint256 value) external returns (bool);
- 
+
     function approve(address spender, uint256 value) external returns (bool);
- 
+
     function transferFrom(address from, address to, uint256 value) external returns (bool);
- 
+
     event Transfer(address indexed from, address indexed to, uint256 value);
- 
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /**
  * @title Helps contracts guard against reentrancy attacks.
  * @author Remco Bloemen <remco@2π.com>, Eenae <alexey@mixbytes.io>
@@ -166,13 +166,13 @@ interface IERC20 {
 contract ReentrancyGuard {
     /// @dev counter to allow mutex lock with only one SSTORE operation
     uint256 private _guardCounter;
- 
+
     constructor () internal {
         // The counter starts at one to prevent changing it from zero to a non-zero
         // value, which is a more expensive operation.
         _guardCounter = 1;
     }
- 
+
     /**
      * @dev Prevents a contract from calling itself, directly or indirectly.
      * Calling a `nonReentrant` function from another `nonReentrant`
@@ -187,7 +187,7 @@ contract ReentrancyGuard {
         require(localCounter == _guardCounter);
     }
 }
- 
+
 /**
  * @title Pausable
  * @dev Base contract which allows children to implement an emergency stop mechanism.
@@ -195,20 +195,20 @@ contract ReentrancyGuard {
 contract Pausable is Ownable {
     event Paused(address account);
     event Unpaused(address account);
- 
+
     bool private _paused;
- 
+
     constructor () internal {
         _paused = false;
     }
- 
+
     /**
      * @return True if the contract is paused, false otherwise.
      */
     function paused() public view returns (bool) {
         return _paused;
     }
- 
+
     /**
      * @dev Modifier to make a function callable only when the contract is not paused.
      */
@@ -216,7 +216,7 @@ contract Pausable is Ownable {
         require(!_paused);
         _;
     }
- 
+
     /**
      * @dev Modifier to make a function callable only when the contract is paused.
      */
@@ -224,7 +224,7 @@ contract Pausable is Ownable {
         require(_paused);
         _;
     }
- 
+
     /**
      * @dev Called by a pauser to pause, triggers stopped state.
      */
@@ -232,7 +232,7 @@ contract Pausable is Ownable {
         _paused = true;
         emit Paused(msg.sender);
     }
- 
+
     /**
      * @dev Called by a pauser to unpause, returns to normal state.
      */
@@ -241,27 +241,27 @@ contract Pausable is Ownable {
         emit Unpaused(msg.sender);
     }
 }
- 
+
 /**
  * @title ERACoin
- * @dev ERC20 Token 
+ * @dev ERC20 Token
  */
 contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
    using SafeMath for uint256;
-   
+
     mapping (address => uint256) private _balances;
- 
+
     mapping (address => mapping (address => uint256)) private _allowed;
- 
+
     uint256 private _totalSupply;
-    
+
     /**
     * @dev Total number of tokens in existence
     */
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
- 
+
     /**
     * @dev Gets the balance of the specified address.
     * @param owner The address to query the balance of.
@@ -270,7 +270,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param owner address The address which owns the funds.
@@ -280,7 +280,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowed[owner][spender];
     }
- 
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      * Beware that changing an allowance with this method brings the risk that someone may use both the old
@@ -296,7 +296,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         emit Approval(msg.sender, spender, value);
         return true;
     }
- 
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      * approve should be called when allowed_[_spender] == 0. To increment
@@ -313,7 +313,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         emit Approval(msg.sender, spender, _allowed[msg.sender][spender]);
         return true;
     }
- 
+
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      * approve should be called when allowed_[_spender] == 0. To decrement
@@ -326,12 +326,12 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
         require(spender != address(0));
-        
+
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
         emit Approval(msg.sender, spender, _allowed[msg.sender][spender]);
         return true;
     }
- 
+
     /**
     * @dev Transfer token for a specified addresses
     * @param from The address to transfer from.
@@ -340,12 +340,12 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
     */
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
- 
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
- 
+
     /**
      * @dev Internal function that mints an amount of the token and assigns it to
      * an account. This encapsulates the modification of balances such that the
@@ -355,12 +355,12 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
      */
     function _mint(address account, uint256 value) internal {
         require(account != address(0));
- 
+
         _totalSupply = _totalSupply.add(value);
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
- 
+
     /**
      * @dev Internal function that burns an amount of the token of a given
      * account.
@@ -373,7 +373,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _balances[account] = _balances[account].sub(value);
         emit Transfer(account, address(0), value);
     }
- 
+
     /**
      * @dev Internal function that burns an amount of the token of a given
      * account, deducting from the sender's allowance for said account. Uses the
@@ -387,12 +387,12 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _burn(account, value);
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
     }
- 
+
     string private _name;
     string private _symbol;
     uint8 private _decimals;
     uint256 private _initSupply;
-    
+
     constructor (string memory name, string memory symbol, uint8 decimals, uint256 initSupply) public {
         _name = name;
         _symbol = symbol;
@@ -400,40 +400,40 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _initSupply = initSupply.mul(10 **uint256(decimals));
         _mint(msg.sender, _initSupply);
     }
- 
+
     /**
      * @return the name of the token.
      */
     function name() public view returns (string memory) {
         return _name;
     }
- 
+
     /**
      * @return the symbol of the token.
      */
     function symbol() public view returns (string memory) {
         return _symbol;
     }
- 
+
     /**
      * @return the number of decimals of the token.
      */
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     /**
      * @return the initial Supply of the token.
      */
     function initSupply() public view returns (uint256) {
         return _initSupply;
     }
-   
-   mapping (address => bool) status; 
-   
-   
+
+   mapping (address => bool) status;
+
+
    // Address bounty Admin
-    address private _walletAdmin; 
+    address private _walletAdmin;
    // Address where funds can be collected
     address payable _walletBase90;
     // Address where funds can be collected too
@@ -449,11 +449,11 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
     uint256 private _y;
     // Amount of wei raised
     uint256 private _weiRaised;
-    // Min token*s qty required to buy  
+    // Min token*s qty required to buy
     uint256 private _MinTokenQty;
-    // Max token*s qty is available for transfer by bounty Admin 
+    // Max token*s qty is available for transfer by bounty Admin
     uint256 private _MaxTokenAdminQty;
-    
+
    /**
      * @dev Function to mint tokens
      * @param to The address that will receive the minted tokens.
@@ -464,7 +464,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _mint(to, value);
         return true;
     }
-    
+
    /**
      * @dev Function to burn tokens
      * @param to The address to burn tokens.
@@ -475,29 +475,29 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _burn(to, value);
         return true;
     }
-    
+
     /**
     * @dev Transfer token for a specified address.onlyOwner
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
     function transferOwner(address to, uint256 value) public onlyOwner returns (bool) {
-      
+
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     /**
     * @dev Transfer token for a specified address
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
     function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
-      
+
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     /**
      * @dev Transfer tokens from one address to another.
      * Note that while this function emits an Approval event, this is not required as per the specification,
@@ -507,13 +507,13 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
      * @param value uint256 the amount of tokens to be transferred
      */
     function transferFrom(address from, address to, uint256 value) public whenNotPaused returns (bool) {
-      
+
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
         return true;
     }
-     
+
    /**
      * @dev check an account's status
      * @return bool
@@ -523,7 +523,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         bool currentStatus = status[account];
         return currentStatus;
     }
-    
+
     /**
      * @dev change an account's status. OnlyOwner
      * @return bool
@@ -533,7 +533,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         bool currentStatus1 = status[account];
        status[account] = (currentStatus1 == true) ? false : true;
     }
- 
+
    /**
      * @dev fallback function ***DO NOT OVERRIDE***
      * Note that other contracts will transfer fund with a base gas stipend
@@ -543,7 +543,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
     function () external payable {
         buyTokens(msg.sender, msg.value);
         }
-        
+
     function buyTokens(address beneficiary, uint256 weiAmount) public nonReentrant payable {
         require(beneficiary != address(0) && beneficiary !=_walletBase90 && beneficiary !=_walletF5 && beneficiary !=_walletS5);
         require(weiAmount > 0);
@@ -572,7 +572,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
        // transfer 5% weiAmount to _walletS5
        _walletS5.transfer(weiAmount.div(100).mul(5));
     }
-  
+
     /**
      * Set Rate. onlyOwner
      */
@@ -580,7 +580,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         require(rate >= 1);
         _rate = rate;
     }
-   
+
     /**
      * Set Y. onlyOwner
      */
@@ -588,7 +588,7 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         require(y >= 1);
         _y = y;
     }
-    
+
     /**
      * Set together the _walletBase90,_walletF5,_walletS5. onlyOwner
      */
@@ -596,64 +596,64 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _walletBase90 = B90Wallet;
          _walletF5 = F5Wallet;
          _walletS5 = S5Wallet;
-    } 
-    
+    }
+
     /**
      * Set the _walletBase90. onlyOwner
      */
     function setWalletB90(address payable B90Wallet) public onlyOwner  {
         _walletBase90 = B90Wallet;
-    } 
-    
+    }
+
     /**
      * @return the _walletBase90.
      */
     function WalletBase90() public view returns (address) {
         return _walletBase90;
     }
-    
+
     /**
      * Set the _walletF5. onlyOwner
      */
     function setWalletF5(address payable F5Wallet) public onlyOwner  {
         _walletF5 = F5Wallet;
-    } 
-    
+    }
+
     /**
      * @return the _walletF5.
      */
     function WalletF5() public view returns (address) {
         return _walletF5;
     }
-    
+
      /**
      * Set the _walletS5. onlyOwner
      */
     function setWalletS5(address payable S5Wallet) public onlyOwner  {
         _walletS5 = S5Wallet;
-    } 
-    
+    }
+
     /**
      * @return the _walletS5.
      */
     function WalletS5() public view returns (address) {
         return _walletS5;
     }
-    
+
     /**
      * Set the _walletTokenSale. onlyOwner
      */
     function setWalletAdmin(address WalletAdmin) public onlyOwner  {
         _walletAdmin = WalletAdmin;
-    } 
-    
+    }
+
      /**
      * @return the _walletTokenSale.
      */
     function WalletAdmin() public view returns (address) {
         return _walletAdmin;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the admin.
      */
@@ -661,14 +661,14 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         require(isAdmin());
         _;
     }
- 
+
     /**
      * @return true if `msg.sender` is the admin of the contract.
      */
     function isAdmin() public view returns (bool) {
         return msg.sender == _walletAdmin;
     }
- 
+
     /**
     * @dev Transfer token for a specified address.onlyOwner
     * @param to The address to transfer to.
@@ -679,54 +679,63 @@ contract ERACoin is IERC20, Ownable, ReentrancyGuard, Pausable  {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
     /**
      * Set the _MinTokenQty. onlyOwner
      */
     function setMinTokenQty(uint256 MinTokenQty) public onlyOwner  {
         _MinTokenQty = MinTokenQty;
-    } 
-    
+    }
+
     /**
      * Set the _MinTokenQty. onlyOwner
      */
     function setMaxTokenAdminQty(uint256 MaxTokenAdminQty) public onlyOwner  {
         _MaxTokenAdminQty = MaxTokenAdminQty;
-    } 
-    
+    }
+
     /**
      * @return Rate.
      */
     function Rate() public view returns (uint256) {
         return _rate;
     }
-   
+
     /**
      * @return _Y.
      */
     function Y() public view returns (uint256) {
         return _y;
     }
-    
+
     /**
      * @return the number of wei income Total.
      */
     function WeiRaised() public view returns (uint256) {
         return _weiRaised;
     }
-    
+
     /**
      * @return _MinTokenQty.
      */
     function MinTokenQty() public view returns (uint256) {
         return _MinTokenQty;
     }
-    
+
      /**
      * @return _MinTokenQty.
      */
     function MaxTokenAdminQty() public view returns (uint256) {
         return _MaxTokenAdminQty;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

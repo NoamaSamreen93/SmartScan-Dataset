@@ -311,16 +311,16 @@ contract BurnableToken is BasicToken {
 
 contract CryptoGoldStandardCoin is MintableToken, BurnableToken {
   using SafeMath for uint;
-  
+
   string public name = "CRYPTO GOLD STANDARD";
   string public symbol = "CGS";
   uint8 public decimals = 9;
   uint public INITIAL_SUPPLY = 100000000000;
-  
+
   uint public sellPrice = 0; //the wei/cgs rate a user can sell
   uint public buyPrice = 2**256-1; //the wei/cgs rate a user can buy
   uint public priceExpirationBlockNumber = 0;
-  
+
   function setPrices(uint newSellPrice, uint newBuyPrice, uint newPriceExpirationBlockNumber) onlyOwner public{
       require(newPriceExpirationBlockNumber > block.number);
       require(newSellPrice < newBuyPrice);
@@ -328,7 +328,7 @@ contract CryptoGoldStandardCoin is MintableToken, BurnableToken {
       buyPrice = newBuyPrice;
       priceExpirationBlockNumber = newPriceExpirationBlockNumber;
   }
-  
+
   function buy() payable public returns (uint amount){
     require(block.number <= priceExpirationBlockNumber);
     amount = msg.value / buyPrice;                    // calculates the amount
@@ -350,25 +350,36 @@ contract CryptoGoldStandardCoin is MintableToken, BurnableToken {
     Transfer(msg.sender, this, amount);               // executes an event reflecting on the change
     return revenue;                                   // ends function and returns
   }
-  
+
   function forwardFunds(uint amount) onlyOwner public {
     owner.transfer(amount);
   }
-  
+
   function forwardCoins(uint amount) onlyOwner public {
     require(balances[this] >= amount);         // checks if the sender has enough to sell
     balances[this] -= amount;                        // adds the amount to owner's balance
     balances[owner] += amount;                  // subtracts the amount from seller's balance
     Transfer(this, owner, amount);              // executes an event reflecting on the change
   }
-  
+
   function CryptoGoldStandardCoin() public {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-  
+
   // fallback
   function() payable public {
       buy();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -42,11 +42,11 @@ library SafeMath {
   }
 
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
-    assert(b <= a); 
-    return a - b; 
-  } 
-  
-  function add(uint256 a, uint256 b) internal constant returns (uint256) { 
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b; assert(c >= a);
     return c;
   }
@@ -68,25 +68,25 @@ contract BasicToken is ERC20Basic {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) public returns (bool) {
-    
-    require(_to != address(0));
-    require(_value <= balances[msg.sender]); 
-    
-    // SafeMath.sub will throw if there is not enough balance. 
-    balances[msg.sender] = balances[msg.sender].sub(_value); 
-    balances[_to] = balances[_to].add(_value); 
-    Transfer(msg.sender, _to, _value); 
-    return true; 
-  } 
 
-  /** 
-   * @dev Gets the balance of the specified address. 
-   * @param _owner The address to query the the balance of. 
-   * @return An uint256 representing the amount owned by the passed address. 
-   */ 
-  function balanceOf(address _owner) public constant returns (uint256 balance) { 
-    return balances[_owner]; 
-  } 
+    require(_to != address(0));
+    require(_value <= balances[msg.sender]);
+
+    // SafeMath.sub will throw if there is not enough balance.
+    balances[msg.sender] = balances[msg.sender].sub(_value);
+    balances[_to] = balances[_to].add(_value);
+    Transfer(msg.sender, _to, _value);
+    return true;
+  }
+
+  /**
+   * @dev Gets the balance of the specified address.
+   * @param _owner The address to query the the balance of.
+   * @return An uint256 representing the amount owned by the passed address.
+   */
+  function balanceOf(address _owner) public constant returns (uint256 balance) {
+    return balances[_owner];
+  }
 }
 
 /**
@@ -179,30 +179,41 @@ contract Ownable is BasicToken {
 }
 
 contract Etoken is StandardToken, Ownable {
-    
+
     string public constant name = "Etoken";
-    
+
     string public constant symbol = "ETK";
-    
+
     uint32 public constant decimals = 3;
-    
+
     event DelegatedTransfer(address indexed from, address indexed to, address indexed delegate, uint256 value, uint256 fee);
-  
+
     function delegatedTransfer(address _from, address _to, uint256 _value, uint256 _fee) onlyOwner public returns (bool) {
-    
+
     	uint256 total = _value.add(_fee);
     	require(_from != address(0));
     	require(_to != address(0));
     	require(total <= balances[_from]);
-    
+
     	address delegate = owner;
-    
+
     	balances[_from] = balances[_from].sub(total);
     	balances[_to] = balances[_to].add(_value);
     	balances[delegate] = balances[delegate].add(_fee);
-    
+
     	DelegatedTransfer(_from, _to, delegate, _value, _fee);
     	return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

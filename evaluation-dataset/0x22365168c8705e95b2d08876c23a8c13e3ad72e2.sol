@@ -4,9 +4,9 @@ contract ERC20 {
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function allowance(address owner, address spender) public view returns (uint256);
-    
+
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
     function approve(address spender, uint256 value) public returns (bool);
@@ -14,10 +14,10 @@ contract ERC20 {
     function totalSupply() public view returns (uint256);
 
     function balanceOf(address who) public view returns (uint256);
-    
+
     function transfer(address to, uint256 value) public returns (bool);
-    
-  
+
+
 }
 
 
@@ -90,7 +90,7 @@ contract Ownable {
 
 }
 
-contract Vault is Ownable { 
+contract Vault is Ownable {
 
     function () public payable {
 
@@ -125,7 +125,7 @@ contract TournamentPass is ERC20, Ownable {
     address[] public minters;
     uint256 supply;
     uint mintLimit = 20000;
-    
+
     function name() public view returns (string){
         return "GU Tournament Passes";
     }
@@ -169,7 +169,7 @@ contract TournamentPass is ERC20, Ownable {
         require(isMinter(msg.sender));
         if (amount.add(supply) > mintLimit) {
             return false;
-        } 
+        }
         supply = supply.add(amount);
         balances[to] = balances[to].add(amount);
         emit Transfer(address(0), to, amount);
@@ -218,7 +218,7 @@ contract TournamentPass is ERC20, Ownable {
     uint public price = 250 finney;
 
     function purchase(uint amount) public payable {
-        
+
         require(msg.value >= price.mul(amount));
         require(supply.add(amount) <= mintLimit);
 
@@ -229,4 +229,15 @@ contract TournamentPass is ERC20, Ownable {
         address(vault).transfer(msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

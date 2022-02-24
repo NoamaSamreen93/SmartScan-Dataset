@@ -62,13 +62,13 @@ interface ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
 contract LIZAToken is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -164,7 +164,7 @@ contract LIZAToken is ERC20, ERC223 {
      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
     function transfer(address _to, uint _value, bytes _data) public {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -185,4 +185,15 @@ contract LIZAToken is ERC20, ERC223 {
       return (length>0);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

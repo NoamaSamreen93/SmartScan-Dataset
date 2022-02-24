@@ -13,7 +13,7 @@ contract Ownable {
     address private _pendingOwner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
      * @dev The constructor sets the original owner of the contract to the sender account.
      */
@@ -44,7 +44,7 @@ contract Ownable {
     function pendingOwner() public view returns (address) {
         return _pendingOwner;
     }
-    
+
     /**
      * @dev Tells the address of the owner
      * @return the address of the owner
@@ -52,7 +52,7 @@ contract Ownable {
     function owner() public view returns (address ) {
         return _owner;
     }
-    
+
     /**
     * @dev Sets a new owner address
     * @param _newOwner The newOwner to set
@@ -75,9 +75,9 @@ contract Ownable {
     function claimOwnership() public onlyPendingOwner {
         emit OwnershipTransferred(_owner, _pendingOwner);
         _owner = _pendingOwner;
-        _pendingOwner = address(0); 
+        _pendingOwner = address(0);
     }
-    
+
 }
 
 // File: contracts/Operable.sol
@@ -87,7 +87,7 @@ pragma solidity 0.5.0;
 
 contract Operable is Ownable {
 
-    address private _operator; 
+    address private _operator;
 
     event OperatorChanged(address indexed previousOperator, address indexed newOperator);
 
@@ -98,7 +98,7 @@ contract Operable is Ownable {
     function operator() external view returns (address) {
         return _operator;
     }
-    
+
     /**
      * @dev Only the operator can operate store
      */
@@ -109,7 +109,7 @@ contract Operable is Ownable {
 
     /**
      * @dev update the storgeOperator
-     * @param _newOperator The newOperator to update  
+     * @param _newOperator The newOperator to update
      */
     function updateOperator(address _newOperator) public onlyOwner {
         require(_newOperator != address(0), "Cannot change the newOperator to the zero address");
@@ -198,7 +198,7 @@ contract TokenStore is Operable {
     using SafeMath for uint256;
 
     uint256 public totalSupply;
-    
+
     string  public name = "PingAnToken";
     string  public symbol = "PAT";
     uint8 public decimals = 18;
@@ -254,7 +254,7 @@ contract TokenStore is Operable {
 pragma solidity 0.5.0;
 
 
-interface ERC20Interface {  
+interface ERC20Interface {
 
     function totalSupply() external view returns (uint256);
 
@@ -285,7 +285,7 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
 
 
     TokenStore public tokenStore;
-    
+
     event TokenStoreSet(address indexed previousTokenStore, address indexed newTokenStore);
     event ChangeTokenName(string newName, string newSymbol);
 
@@ -298,7 +298,7 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
         tokenStore = TokenStore(_newTokenStore);
         return true;
     }
-    
+
     function changeTokenName(string memory _name, string memory _symbol) public onlyOwner {
         tokenStore.changeTokenName(_name, _symbol);
         emit ChangeTokenName(_name, _symbol);
@@ -315,19 +315,19 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
     function allowance(address _holder, address _spender) public view returns (uint256) {
         return tokenStore.allowed(_holder, _spender);
     }
-    
+
     function name() public view returns (string memory) {
         return tokenStore.name();
     }
-    
+
     function symbol() public view returns (string memory) {
         return tokenStore.symbol();
     }
-    
+
     function decimals() public view returns (uint8) {
         return tokenStore.decimals();
     }
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      * Beware that changing an allowance with this method brings the risk that someone may use both the old
@@ -341,12 +341,12 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
         address _spender,
         uint256 _value
     ) public returns (bool success) {
-        require (_spender != address(0), "Cannot approve to the zero address");       
+        require (_spender != address(0), "Cannot approve to the zero address");
         tokenStore.setAllowance(msg.sender, _spender, _value);
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an holder allowed to a spender.
      *
@@ -361,12 +361,12 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
         address _spender,
         uint256 _addedValue
     ) public returns (bool success) {
-        require (_spender != address(0), "Cannot increaseApproval to the zero address");      
+        require (_spender != address(0), "Cannot increaseApproval to the zero address");
         tokenStore.addAllowance(msg.sender, _spender, _addedValue);
         emit Approval(msg.sender, _spender, tokenStore.allowed(msg.sender, _spender));
         return true;
     }
-    
+
     /**
      * @dev Decrease the amount of tokens that an holder allowed to a spender.
      *
@@ -379,9 +379,9 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
      */
     function decreaseApproval(
         address _spender,
-        uint256 _subtractedValue 
+        uint256 _subtractedValue
     ) public returns (bool success) {
-        require (_spender != address(0), "Cannot decreaseApproval to the zero address");       
+        require (_spender != address(0), "Cannot decreaseApproval to the zero address");
         tokenStore.subAllowance(msg.sender, _spender, _subtractedValue);
         emit Approval(msg.sender, _spender, tokenStore.allowed(msg.sender, _spender));
         return true;
@@ -394,17 +394,17 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
      * @param _value uint256 the amount of tokens to be transferred
      */
     function transferFrom(
-        address _from, 
-        address _to, 
+        address _from,
+        address _to,
         uint256 _value
     ) public returns (bool success) {
-        require(_to != address(0), "Cannot transfer to zero address"); 
-        tokenStore.subAllowance(_from, msg.sender, _value);          
+        require(_to != address(0), "Cannot transfer to zero address");
+        tokenStore.subAllowance(_from, msg.sender, _value);
         tokenStore.subBalance(_from, _value);
         tokenStore.addBalance(_to, _value);
         emit Transfer(_from, _to, _value);
         return true;
-    } 
+    }
 
     /**
      * @dev Transfer token for a specified address
@@ -412,10 +412,10 @@ contract ERC20StandardToken is ERC20Interface, Ownable {
      * @param _value The amount to be transferred.
      */
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
     ) public returns (bool success) {
-        require (_to != address(0), "Cannot transfer to zero address");    
+        require (_to != address(0), "Cannot transfer to zero address");
         tokenStore.subBalance(msg.sender, _value);
         tokenStore.addBalance(_to, _value);
         emit Transfer(msg.sender, _to, _value);
@@ -438,7 +438,7 @@ contract PausableToken is ERC20StandardToken {
     event Pause();
     event Unpause();
     event PauserChanged(address indexed previousPauser, address indexed newPauser);
-    
+
     /**
      * @dev Tells the address of the pauser
      * @return The address of the pauser
@@ -446,7 +446,7 @@ contract PausableToken is ERC20StandardToken {
     function pauser() public view returns (address) {
         return _pauser;
     }
-    
+
     /**
      * @dev Modifier to make a function callable only when the contract is not paused.
      */
@@ -501,25 +501,25 @@ contract PausableToken is ERC20StandardToken {
         uint256 _addedValue
     ) public whenNotPaused returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
-    } 
+    }
 
     function decreaseApproval(
         address _spender,
-        uint256 _subtractedValue 
+        uint256 _subtractedValue
     ) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 
     function transferFrom(
-        address _from, 
-        address _to, 
+        address _from,
+        address _to,
         uint256 _value
     ) public whenNotPaused returns (bool success) {
         return super.transferFrom(_from, _to, _value);
-    } 
+    }
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
     ) public whenNotPaused returns (bool success) {
         return super.transfer(_to, _value);
@@ -539,7 +539,7 @@ contract BlacklistStore is Operable {
     /**
      * @dev Checks if account is blacklisted
      * @param _account The address to check
-     * @param _status The address status    
+     * @param _status The address status
      */
     function setBlacklist(address _account, uint256 _status) public onlyOperator {
         blacklisted[_account] = _status;
@@ -592,7 +592,7 @@ contract BlacklistableToken is PausableToken {
     function blacklister() public view returns (address) {
         return _blacklister;
     }
-    
+
     /**
      * @dev Set the blacklistStore
      * @param _newblacklistStore The blacklistStore address to set
@@ -602,9 +602,9 @@ contract BlacklistableToken is PausableToken {
         blacklistStore = BlacklistStore(_newblacklistStore);
         return true;
     }
-    
+
     /**
-     * @dev Update the blacklister 
+     * @dev Update the blacklister
      * @param _newBlacklister The newBlacklister to update
      */
     function updateBlacklister(address _newBlacklister) public onlyOwner {
@@ -616,7 +616,7 @@ contract BlacklistableToken is PausableToken {
     /**
      * @dev Checks if account is blacklisted
      * @param _account The address status to query
-     * @return the address status 
+     * @return the address status
      */
     function queryBlacklist(address _account) public view returns (uint256) {
         return blacklistStore.blacklisted(_account);
@@ -638,31 +638,31 @@ contract BlacklistableToken is PausableToken {
     ) public notBlacklisted(msg.sender) notBlacklisted(_spender) returns (bool success) {
         return super.approve(_spender, _value);
     }
-    
+
     function increaseApproval(
         address _spender,
         uint256 _addedValue
     ) public notBlacklisted(msg.sender) notBlacklisted(_spender) returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
-    } 
+    }
 
     function decreaseApproval(
         address _spender,
-        uint256 _subtractedValue 
+        uint256 _subtractedValue
     ) public notBlacklisted(msg.sender) notBlacklisted(_spender) returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 
     function transferFrom(
-        address _from, 
-        address _to, 
+        address _from,
+        address _to,
         uint256 _value
     ) public notBlacklisted(_from) notBlacklisted(_to) notBlacklisted(msg.sender) returns (bool success) {
         return super.transferFrom(_from, _to, _value);
-    } 
+    }
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
     ) public notBlacklisted(msg.sender) notBlacklisted(_to) returns (bool success) {
         return super.transfer(_to, _value);
@@ -678,7 +678,7 @@ pragma solidity 0.5.0;
 contract BurnableToken is BlacklistableToken {
 
     event Burn(address indexed burner, uint256 value);
-    
+
     /**
      * @dev holder can burn some of its own tokens
      * amount is less than or equal to the minter's account balance
@@ -686,7 +686,7 @@ contract BurnableToken is BlacklistableToken {
     */
     function burn(
         uint256 _value
-    ) public whenNotPaused notBlacklisted(msg.sender) returns (bool success) {   
+    ) public whenNotPaused notBlacklisted(msg.sender) returns (bool success) {
         tokenStore.subBalance(msg.sender, _value);
         tokenStore.subTotalSupply(_value);
         emit Burn(msg.sender, _value);
@@ -721,7 +721,7 @@ contract MintableToken is BlacklistableToken {
     function minter() public view returns (address) {
         return _minter;
     }
- 
+
     /**
      * @dev update the minter
      * @param _newMinter The newMinter to update
@@ -739,12 +739,12 @@ contract MintableToken is BlacklistableToken {
      * @return A boolean that indicates if the operation was successful.
      */
     function mint(
-        address _to, 
+        address _to,
         uint256 _value
     ) public onlyMinter whenNotPaused notBlacklisted(msg.sender) notBlacklisted(_to) returns (bool) {
         require(_to != address(0), "Cannot mint to zero address");
         tokenStore.addTotalSupply(_value);
-        tokenStore.addBalance(_to, _value);  
+        tokenStore.addBalance(_to, _value);
         emit Mint(msg.sender, _to, _value);
         emit Transfer(address(0), _to, _value);
         return true;
@@ -763,7 +763,7 @@ contract PingAnToken is BurnableToken, MintableToken {
 
 
     /**
-     * contract only can initialized once 
+     * contract only can initialized once
      */
     bool private initialized = true;
 
@@ -780,4 +780,15 @@ contract PingAnToken is BurnableToken, MintableToken {
         initialized = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

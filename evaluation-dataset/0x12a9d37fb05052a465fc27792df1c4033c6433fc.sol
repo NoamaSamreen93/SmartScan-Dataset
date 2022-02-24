@@ -96,12 +96,12 @@ contract Token is ERC20Interface, Owned, SafeMath {
         name = "PlayBetCoin";
         decimals = 18;
         _totalSupply = 154000000;
-        _totalSupply = _totalSupply * 10 ** decimals;        
+        _totalSupply = _totalSupply * 10 ** decimals;
         balances[owner] = _totalSupply;
-        emit Transfer(address(0), owner, _totalSupply);   
+        emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -191,7 +191,7 @@ contract Token is ERC20Interface, Owned, SafeMath {
     function () external payable {
         revert();
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -199,4 +199,15 @@ contract Token is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

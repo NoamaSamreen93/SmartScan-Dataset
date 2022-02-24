@@ -426,12 +426,12 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "BDS coin";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xbCFcB0299071Dc5f22176c17C1A2A67BA315D8a8;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
-contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable    
-{  
+contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
+{
     event Initialized();
     bool public initialized = false;
 
@@ -439,7 +439,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
     }
@@ -462,7 +462,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -471,7 +471,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0xbCFcB0299071Dc5f22176c17C1A2A67BA315D8a8)];
         uint[1] memory amounts = [uint(10000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -483,7 +483,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -491,5 +491,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

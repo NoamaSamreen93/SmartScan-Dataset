@@ -436,7 +436,7 @@ contract IOGToken is StandardToken, Ownable, Pausable {
     function transferFrom(address _from, address _to, uint256 _value) canTransfer(_from) whenNotPaused public returns (bool success) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     function approve(address _spender, uint256 _value) whenNotPaused public returns (bool) {
         return super.approve(_spender, _value);
     }
@@ -463,10 +463,21 @@ contract IOGToken is StandardToken, Ownable, Pausable {
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
     }
-	
+
 	// token drain
     function emergencyERC20Drain(ERC20 token, uint256 amount) external onlyOwner {
         // owner can drain tokens that are sent here by mistake
         token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

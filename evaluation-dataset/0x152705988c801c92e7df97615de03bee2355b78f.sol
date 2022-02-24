@@ -1,6 +1,6 @@
 pragma solidity ^0.4.8;
 
- 
+
 
 // ----------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ pragma solidity ^0.4.8;
 
 // ----------------------------------------------------------------------------------------------
 
- 
+
 
 // ERC Token Standard #20 Interface
 
@@ -22,25 +22,25 @@ contract ERC20Interface {
 
     function totalSupply() constant returns (uint256 totalSupply);
 
- 
+
 
     // Get the account balance of another account with address _owner
 
     function balanceOf(address _owner) constant returns (uint256 balance);
 
- 
+
 
     // Send _value amount of tokens to address _to
 
     function transfer(address _to, uint256 _value) returns (bool success);
 
- 
+
 
     // Send _value amount of tokens from address _from to address _to
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
 
- 
+
 
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
 
@@ -50,19 +50,19 @@ contract ERC20Interface {
 
     function approve(address _spender, uint256 _value) returns (bool success);
 
- 
+
 
     // Returns the amount which _spender is still allowed to withdraw from _owner
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
- 
+
 
     // Triggered when tokens are transferred.
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
- 
+
 
     // Triggered whenever approve(address _spender, uint256 _value) is called.
 
@@ -70,7 +70,7 @@ contract ERC20Interface {
 
 }
 
- 
+
 
 contract FixedSupplyToken is ERC20Interface {
 
@@ -82,25 +82,25 @@ contract FixedSupplyToken is ERC20Interface {
 
     uint256 _totalSupply = 1000000000;
 
-    
+
 
     // Owner of this contract
 
     address public owner;
 
- 
+
 
     // Balances for each account
 
     mapping(address => uint256) balances;
 
- 
+
 
     // Owner of account approves the transfer of an amount to another account
 
     mapping(address => mapping (address => uint256)) allowed;
 
- 
+
 
     // Functions with this modifier can only be executed by the owner
 
@@ -116,7 +116,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     // Constructor
 
@@ -128,7 +128,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     function totalSupply() constant returns (uint256 totalSupply) {
 
@@ -136,7 +136,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     // What is the balance of a particular account?
 
@@ -146,13 +146,13 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     // Transfer the balance from owner's account to another account
 
     function transfer(address _to, uint256 _amount) returns (bool success) {
 
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
 
             && _amount > 0
 
@@ -174,7 +174,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     // Send _value amount of tokens from address _from to address _to
 
@@ -224,7 +224,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
 
@@ -240,7 +240,7 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
- 
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 
@@ -248,4 +248,15 @@ contract FixedSupplyToken is ERC20Interface {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

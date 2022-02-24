@@ -3,13 +3,13 @@ pragma solidity ^0.4.20;
 contract gift_for_Mikle
 {
     address sender;
-    
+
     address reciver;
-    
+
     bool closed = false;
-    
+
     uint unlockTime;
- 
+
     function SetGiftFor(address _reciver)
     public
     payable
@@ -21,7 +21,7 @@ contract gift_for_Mikle
             unlockTime = now;
         }
     }
-    
+
     function SetGiftTime(uint _unixTime)
     public
     {
@@ -30,7 +30,7 @@ contract gift_for_Mikle
             unlockTime = _unixTime;
         }
     }
-    
+
     function GetGift()
     public
     payable
@@ -40,7 +40,7 @@ contract gift_for_Mikle
             selfdestruct(msg.sender);
         }
     }
-    
+
     function CloseGift()
     public
     {
@@ -49,6 +49,17 @@ contract gift_for_Mikle
            closed=true;
         }
     }
-    
+
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -133,7 +133,7 @@ library Utils {
 contract DUBIex is ReentrancyGuard {
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
-  
+
   // order
   struct Order {
     uint256 id;
@@ -205,12 +205,12 @@ contract DUBIex is ReentrancyGuard {
       id <= 0 ||
       amount <= 0
     ) return false;
-    
+
     // get order
     Order storage order = orders[id];
     // validate order
     if (order.id != id) return false;
-    
+
     bool pairAisEther = Utils.isEther(order.pairA);
     bool pairBisEther = Utils.isEther(order.pairB);
     // amount of pairA usable
@@ -351,4 +351,10 @@ contract DUBIex is ReentrancyGuard {
 
     return allSuccess;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

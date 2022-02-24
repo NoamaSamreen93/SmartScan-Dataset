@@ -268,7 +268,7 @@ contract MKCToken is MKCStop, StandardToken{
     string public version = "v0.1";
      /// initial amount of MKC Token
     uint256 public initialAmount = (10 ** 9) * (10 ** 18);
-   
+
 
     event Destroy(address from, uint value);
 
@@ -284,7 +284,7 @@ contract MKCToken is MKCStop, StandardToken{
     function transferFrom(address src, address dst, uint wad) public stoppable  returns (bool) {
         return super.transferFrom(src, dst, wad);
     }
-    
+
     function approve(address guy, uint wad) public stoppable  returns (bool) {
         return super.approve(guy, wad);
     }
@@ -301,4 +301,13 @@ contract MKCToken is MKCStop, StandardToken{
         name = name_;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -36,14 +36,14 @@ contract NRB_Contract {
 // ----------------------------------------------------------------------------
 // contract WhiteListAccess
 // ----------------------------------------------------------------------------
-contract WhiteListAccess { 
-    
+contract WhiteListAccess {
+
     function WhiteListAccess() public {
         owner = msg.sender;
         whitelist[owner] = true;
         whitelist[address(this)] = true;
     }
-    
+
     address public owner;
     mapping (address => bool) whitelist;
 
@@ -71,12 +71,12 @@ contract CNT_Common is WhiteListAccess {
     address public ETH_address;    // representation of Ether as Token (0x1)
     address public EOS_address;    // EOS Tokens
     address public NRB_address;    // New Rich on The Block Contract
-    
+
     address public CNT_address;    // Chip
     address public BGB_address;    // BG Coin
     address public VPE_address;    // Vapaee Token
     address public GVPE_address;   // Golden Vapaee Token
-    
+
 
 }
 
@@ -185,7 +185,7 @@ contract CNT_Crowdsale is CNT_Common {
         paid[owner] = paid[owner] + remaining;
 
         raised = raised + remaining;
-        remaining = 0;        
+        remaining = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -203,4 +203,15 @@ contract CNT_Crowdsale is CNT_Common {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

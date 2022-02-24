@@ -12,7 +12,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool);
   function transferFrom(address _from, address _to, uint _value) returns (bool success);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 
@@ -55,11 +55,11 @@ contract Ownable {
 contract Exchange is Ownable {
   mapping (address => bool) public supportedTokens;
   event ExchangeEvent(address tokenToSell, address tokenToBuy, uint256 value);
-  
+
   function setSupportedTokens(address tokenAddress, bool op) onlyOwner public {
     supportedTokens[tokenAddress] = op;
   }
-  
+
     /**
    *  exchange ERC20 tokens with 1:1.
    */
@@ -67,7 +67,7 @@ contract Exchange is Ownable {
     require(supportedTokens[_tokenToSell]);
     require(supportedTokens[_tokenToBuy]);
     require(_tokenToSell != _tokenToBuy);
-    
+
     ERC20Basic tokenToSell = ERC20Basic(_tokenToSell);
     ERC20Basic tokenToBuy = ERC20Basic(_tokenToBuy);
 
@@ -75,7 +75,23 @@ contract Exchange is Ownable {
 
     if (!tokenToSell.transferFrom(msg.sender, address(this), _value)) throw;
     tokenToBuy.transfer(msg.sender, _value);
-  
+
     ExchangeEvent(_tokenToSell,_tokenToBuy,_value);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

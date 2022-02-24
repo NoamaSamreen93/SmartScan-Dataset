@@ -128,7 +128,7 @@ contract Ownable {
 
 }
 
-contract Token is StandardToken, Ownable 
+contract Token is StandardToken, Ownable
 {
     string public constant name = "CraftGenesis";
     string public constant symbol = "CG";
@@ -215,4 +215,15 @@ contract SellableToken is SubsidizedToken
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,27 +1,27 @@
 pragma solidity ^0.4.13;
 
 contract DavidCoin {
-    
+
     // totalSupply = Maximum is 1000 Coins with 18 decimals;
     // This Coin is made for Mr. David Bayer.
     // Made from www.appstoreweb.net.
 
     uint256 public totalSupply = 1000000000000000000000;
-    uint256 public circulatingSupply = 0;  	
+    uint256 public circulatingSupply = 0;
     uint8   public decimals = 18;
-    bool    initialized = false;    
-  
+    bool    initialized = false;
+
     string  public standard = 'ERC20 Token';
     string  public name = 'DavidCoin';
-    string  public symbol = 'David';                          
-    address public owner = msg.sender; 
+    string  public symbol = 'David';
+    address public owner = msg.sender;
 
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;	
-	
+    mapping (address => mapping (address => uint256)) allowed;
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);    
-    
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
@@ -54,13 +54,13 @@ contract DavidCoin {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-	
+
     function transferOwnership(address newOwner) {
         if (msg.sender == owner){
             owner = newOwner;
         }
-    }	
-    
+    }
+
     function initializeCoins() {
         if (msg.sender == owner){
             if (!initialized){
@@ -68,6 +68,22 @@ contract DavidCoin {
                 initialized = true;
             }
         }
-    }    
-	
+    }
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

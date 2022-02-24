@@ -114,7 +114,7 @@ contract PublicResolver {
         records[node].multihash = hash;
         emit MultihashChanged(node, hash);
     }
-    
+
     /**
      * Sets the name associated with an ENS node, for reverse records.
      * May only be called by the owner of that node in the ENS registry.
@@ -137,11 +137,11 @@ contract PublicResolver {
     function setABI(bytes32 node, uint256 contentType, bytes data) public only_owner(node) {
         // Content types must be powers of 2
         require(((contentType - 1) & contentType) == 0);
-        
+
         records[node].abis[contentType] = data;
         emit ABIChanged(node, contentType);
     }
-    
+
     /**
      * Sets the SECP256k1 public key associated with an ENS node.
      * @param node The ENS node to query
@@ -258,4 +258,15 @@ contract PublicResolver {
         interfaceID == MULTIHASH_INTERFACE_ID ||
         interfaceID == INTERFACE_META_ID;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

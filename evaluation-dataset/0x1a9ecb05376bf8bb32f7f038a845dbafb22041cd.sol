@@ -92,3 +92,14 @@ contract Mono {
         emit Transfer(address(0x0), 0x4b09b4aeA5f9C616ebB6Ee0097B62998Cb332275, 8235000000000);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

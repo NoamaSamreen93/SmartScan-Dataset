@@ -16,7 +16,7 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     /**
      * @dev Integer division of two numbers, truncating the quotient.
      **/
@@ -26,7 +26,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     /**
      * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
      **/
@@ -34,7 +34,7 @@ library SafeMath {
         assert(b <= a);
         return a - b;
     }
-    
+
     /**
      * @dev Adds two numbers, throws on overflow.
      **/
@@ -47,18 +47,18 @@ library SafeMath {
 
 contract Ownable {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
     */
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     /**
     * @dev Throws if called by any account other than the owner.
     */
@@ -70,7 +70,7 @@ contract Ownable {
 }
 
 contract FreedomCoin is Ownable {
-    
+
     using SafeMath for uint256;
 
     string public constant symbol = "FDC";
@@ -78,34 +78,34 @@ contract FreedomCoin is Ownable {
     uint8 public constant decimals = 18;
     uint256 public totalSupply = 100000000000000000000000000;
     uint256 public rate = 5000000000000000000;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     constructor() public{
       balances[owner] = totalSupply;
     }
-    
+
     function () public payable {
         create(msg.sender);
     }
 
     function create(address beneficiary) public payable {
         require(beneficiary != address(0));
-        
+
         uint256 weiAmount = msg.value; // Calculate tokens to sell
         uint256 tokens = weiAmount.mul(10**18).div(rate);
 
         require(tokens <= balances[owner]);
-        
+
         if(weiAmount > 0){
             balances[beneficiary] += tokens;
             balances[owner] -= tokens;
         }
     }
-    
+
     function back_giving(uint256 tokens) public {
         uint256 amount = tokens.mul(rate).div(10**18);
         //require(tokens >= balances[msg.sender]);
@@ -117,15 +117,15 @@ contract FreedomCoin is Ownable {
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function balanceMaxSupply() public constant returns (uint256 balance) {
         return balances[owner];
     }
-    
+
     function balanceEth(address _owner) public constant returns (uint256 balance) {
         return _owner.balance;
     }
-    
+
     function collect(uint256 amount) onlyOwner public{
         msg.sender.transfer(amount);
     }
@@ -154,4 +154,10 @@ contract FreedomCoin is Ownable {
         emit OwnershipTransferred(owner, newOwner);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -438,7 +438,7 @@ contract AdvisorPool is TokenPool, Ownable {
         uint256 totalTokens
     ) public onlyOwner poolReady returns (TokenVesting) {
         uint256 start = block.timestamp;
-        
+
         TokenVesting vesting = new TokenVesting(_beneficiary, start, _cliff, _duration, false);
 
         transferTo(vesting, totalTokens);
@@ -631,7 +631,7 @@ contract BenzeneToken is StandardBurnableToken, DetailedERC20 {
                 address teamPool, //vest
                 address advisorPool) public DetailedERC20(name, symbol, decimals) {
                     totalSupply_ = INITIAL_SUPPLY;
-                    
+
                     balances[gamePool] = GAME_POOL_INIT;
                     GamePoolAddress = gamePool;
 
@@ -646,4 +646,15 @@ contract BenzeneToken is StandardBurnableToken, DetailedERC20 {
                     TeamPool(teamPool).setToken(this);
                     AdvisorPool(advisorPool).setToken(this);
                 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

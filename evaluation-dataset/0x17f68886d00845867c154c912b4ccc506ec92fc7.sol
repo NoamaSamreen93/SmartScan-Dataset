@@ -44,7 +44,7 @@ contract ERC20 is ERC20Basic {
 }
 
 contract TokenLocker {
-    
+
     address public owner;
 
     ERC20 public token;
@@ -58,7 +58,7 @@ contract TokenLocker {
         token = tokenAddr;
     }
 
-    /** 
+    /**
      *  @dev Call the ERC20 `transfer` function on the underlying token contract
      *  @param dest Token destination
      *  @param amount Amount of tokens to be transferred
@@ -111,7 +111,7 @@ contract DelegatedShareholderAssociation is TokenRecipient {
 
     /* Delegated votes by delegate. */
     mapping (address => uint) public delegatedAmountsByDelegate;
-    
+
     /* Tokens currently locked by vote delegation. */
     uint public totalLockedTokens;
 
@@ -187,7 +187,7 @@ contract DelegatedShareholderAssociation is TokenRecipient {
 
     /**
       * Delegate an amount of tokens
-      * 
+      *
       * @notice Set the delegate address for a specified number of tokens belonging to the sending address, locking the tokens.
       * @dev An address holding tokens (shares) may only delegate some portion of their vote to one delegate at any one time
       * @param tokensToLock number of tokens to be locked (sending address must have at least this many tokens)
@@ -208,9 +208,9 @@ contract DelegatedShareholderAssociation is TokenRecipient {
         TokensDelegated(msg.sender, tokensToLock, delegate);
     }
 
-    /** 
+    /**
      * Undelegate all delegated tokens
-     * 
+     *
      * @notice Clear the delegate address for all tokens delegated by the sending address, unlocking the locked tokens.
      * @dev Can only be called by a sending address currently delegating tokens, will transfer all locked tokens back to the sender
      * @return The number of tokens previously locked, now released
@@ -402,8 +402,8 @@ contract DelegatedShareholderAssociation is TokenRecipient {
 
         /* Assert that a minimum quorum has been reached. */
         require(quorum >= minimumQuorum);
-        
-        /* Mark proposal as finalized. */   
+
+        /* Mark proposal as finalized. */
         p.finalized = true;
 
         if (yea > nay) {
@@ -440,4 +440,15 @@ contract WyvernDAO is DelegatedShareholderAssociation {
         tokenLocker = new TokenLocker(sharesAddress);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

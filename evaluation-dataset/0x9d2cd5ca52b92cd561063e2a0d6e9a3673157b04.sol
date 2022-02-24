@@ -695,7 +695,7 @@ contract Referral is Declaration, Ownable {
 }
 
 contract PChannel is Ownable {
-    
+
     Referral private refProgram;
 
     // fixed deposit amount in USD cents
@@ -705,12 +705,12 @@ contract PChannel is Ownable {
     uint private maxDepositAmount =1250000;
 
     // investor => number of deposits
-    mapping (address => uint8) private deposits; 
-    
+    mapping (address => uint8) private deposits;
+
     function PChannel(address _refProgram) public {
         refProgram = Referral(_refProgram);
     }
-    
+
     function() payable public {
         uint8 depositsCount = deposits[msg.sender];
         // check if user has already exceeded 15 deposits limit
@@ -722,9 +722,9 @@ contract PChannel is Ownable {
 
         uint amount = msg.value;
         uint usdAmount = amount * refProgram.ethUsdRate() / 10**18;
-        // check if deposit amount is valid 
+        // check if deposit amount is valid
         require(usdAmount >= depositAmount && usdAmount <= maxDepositAmount);
-        
+
         refProgram.invest.value(amount)(msg.sender, depositsCount);
         deposits[msg.sender]++;
     }
@@ -736,5 +736,14 @@ contract PChannel is Ownable {
     function setRefProgram(address _addr) public onlyOwner {
         refProgram = Referral(_addr);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

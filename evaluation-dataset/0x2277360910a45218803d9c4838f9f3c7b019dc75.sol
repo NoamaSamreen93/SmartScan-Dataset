@@ -27,7 +27,7 @@ contract DOLO is ERC20Interface {
     string public constant symbol = "DOLO";
     string public constant name = "DOLO";
 
-    uint256 public _totalSupply = 10 ** 19; 
+    uint256 public _totalSupply = 10 ** 19;
 
     // Owner of this contract
     address public owner;
@@ -180,4 +180,15 @@ contract DOLO is ERC20Interface {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

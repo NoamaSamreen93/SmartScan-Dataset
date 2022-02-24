@@ -197,7 +197,7 @@ contract MercuryPresale is Pausable {
     wallet = 0x1dE159F3bb50992b78E06697B6273e326ADCcf75;
     rate = 6000;
     minInvestment = 1 * (10**16);
-    cap = 16600 * (10**18); 
+    cap = 16600 * (10**18);
 
   }
 
@@ -264,4 +264,15 @@ contract MercuryPresale is Pausable {
     return capReached;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

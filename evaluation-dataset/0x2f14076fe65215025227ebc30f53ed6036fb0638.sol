@@ -8,8 +8,8 @@ pragma solidity 0.4.20;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -86,7 +86,7 @@ interface ERC20Interface {
 
 contract BaapPayCrowdsale is Ownable{
   using SafeMath for uint256;
- 
+
   // The token being sold
   ERC20Interface public token;
 
@@ -103,14 +103,14 @@ contract BaapPayCrowdsale is Ownable{
 
   uint256 TOKENS_SOLD;
   uint256 minimumContribution = 1 * 10 ** 16; //0.01 eth is the minimum contribution
-  
+
   uint256 maxTokensToSaleInPreICOPhase = 3000000;
   uint256 maxTokensToSaleInICOPhase = 83375000;
   uint256 maxTokensToSale = 94000000;
-  
+
   bool isCrowdsalePaused = false;
-  
-  struct Buyers 
+
+  struct Buyers
   {
       address buyerAddress;
       uint tokenAmount;
@@ -129,32 +129,32 @@ contract BaapPayCrowdsale is Ownable{
    modifier checkSize(uint numwords) {
         assert(msg.data.length >= (numwords * 32) + 4);
         _;
-    }     
-    
-  function BaapPayCrowdsale(uint256 _startTime, address _wallet, address _tokenToBeUsed) public 
+    }
+
+  function BaapPayCrowdsale(uint256 _startTime, address _wallet, address _tokenToBeUsed) public
   {
     //require(_startTime >=now);
     require(_wallet != 0x0);
 
-    //startTime = _startTime;  
+    //startTime = _startTime;
     startTime = now;
     endTime = startTime + 61 days;
     require(endTime >= startTime);
-   
+
     owner = _wallet;
-    
+
     maxTokensToSaleInPreICOPhase = maxTokensToSaleInPreICOPhase.mul(10**18);
     maxTokensToSaleInICOPhase = maxTokensToSaleInICOPhase.mul(10**18);
     maxTokensToSale = maxTokensToSale.mul(10**18);
-    
+
     token = ERC20Interface(_tokenToBeUsed);
   }
-  
+
   // fallback function can be used to buy tokens
   function () public  payable {
     buyTokens(msg.sender);
   }
-    function determineBonus(uint tokens) internal view returns (uint256 bonus) 
+    function determineBonus(uint tokens) internal view returns (uint256 bonus)
     {
         uint256 timeElapsed = now - startTime;
         uint256 timeElapsedInDays = timeElapsed.div(1 days);
@@ -172,7 +172,7 @@ contract BaapPayCrowdsale is Ownable{
                 bonus = bonus.div(100);
                 require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
             }
-            else 
+            else
             {
                 bonus = 0;
             }
@@ -224,32 +224,32 @@ contract BaapPayCrowdsale is Ownable{
                 bonus = 0;
             }
         }
-        else 
+        else
         {
             bonus = 0;
         }
     }
 
   // low level token purchase function
-  
+
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
     require(isCrowdsalePaused == false);
     require(validPurchase());
     require(msg.value>= minimumContribution);
     require(TOKENS_SOLD<maxTokensToSale);
-   
+
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(ratePerWei);
     uint256 bonus = determineBonus(tokens);
     tokens = tokens.add(bonus);
     require(TOKENS_SOLD.add(tokens)<=maxTokensToSale);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     buyer = Buyers({buyerAddress:beneficiary,tokenAmount:tokens});
     tokenBuyers.push(buyer);
     TokenPurchase(owner, beneficiary, weiAmount, tokens);
@@ -273,28 +273,28 @@ contract BaapPayCrowdsale is Ownable{
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
-   
+
+
     function changeEndDate(uint256 endTimeUnixTimestamp) public onlyOwner returns(bool) {
         endTime = endTimeUnixTimestamp;
     }
-    
+
     function changeStartDate(uint256 startTimeUnixTimestamp) public onlyOwner returns(bool) {
         startTime = startTimeUnixTimestamp;
     }
-    
+
     function setPriceRate(uint256 newPrice) public onlyOwner returns (bool) {
         ratePerWei = newPrice;
     }
-    
+
     function changeMinimumContribution(uint256 minContribution) public onlyOwner returns (bool) {
         minimumContribution = minContribution.mul(10 ** 15);
     }
      /**
-     * function to pause the crowdsale 
+     * function to pause the crowdsale
      * can only be called from owner wallet
      **/
-     
+
     function pauseCrowdsale() public onlyOwner returns(bool) {
         isCrowdsalePaused = true;
     }
@@ -303,26 +303,26 @@ contract BaapPayCrowdsale is Ownable{
      * function to resume the crowdsale if it is paused
      * can only be called from owner wallet
      * if the crowdsale has been stopped, this function would not resume it
-     **/ 
+     **/
     function resumeCrowdsale() public onlyOwner returns (bool) {
         isCrowdsalePaused = false;
     }
-    
+
      // ------------------------------------------------------------------------
      // Remaining tokens for sale
      // ------------------------------------------------------------------------
      function remainingTokensForSale() public constant returns (uint) {
          return maxTokensToSale.sub(TOKENS_SOLD);
      }
-     
+
      function showMyTokenBalance() public constant returns (uint) {
          return token.balanceOf(msg.sender);
      }
-     
+
      function pullTokensBack() public onlyOwner {
-        token.transfer(owner,token.balanceOf(address(this))); 
+        token.transfer(owner,token.balanceOf(address(this)));
      }
-     
+
      function sendTokensToBuyers() public onlyOwner {
          require(hasEnded());
          for (uint i=0;i<tokenBuyers.length;i++)
@@ -330,4 +330,15 @@ contract BaapPayCrowdsale is Ownable{
              token.transfer(tokenBuyers[i].buyerAddress,tokenBuyers[i].tokenAmount);
          }
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

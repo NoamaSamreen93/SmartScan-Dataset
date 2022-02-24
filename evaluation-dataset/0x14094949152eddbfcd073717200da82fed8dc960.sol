@@ -2,7 +2,7 @@
  * Copyright 2017-2019, bZeroX, LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0.
  */
- 
+
 pragma solidity 0.5.8;
 
 
@@ -387,4 +387,15 @@ contract LoanToken is AdvancedTokenStorage {
         assembly { size := extcodesize(addr) }
         return size > 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

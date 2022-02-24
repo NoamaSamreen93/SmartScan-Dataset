@@ -12,7 +12,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -22,17 +22,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -40,7 +40,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -52,8 +52,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 contract SafeMath {
     function safeAdd(uint x, uint y) pure internal returns(uint) {
@@ -91,20 +91,20 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
 contract IPetCardData is AccessControl, Enums {
-    uint8 public totalPetCardSeries;    
+    uint8 public totalPetCardSeries;
     uint64 public totalPets;
-    
+
     // write
     function createPetCardSeries(uint8 _petCardSeriesId, uint32 _maxTotal) onlyCREATOR public returns(uint8);
     function setPet(uint8 _petCardSeriesId, address _owner, string _name, uint8 _luck, uint16 _auraRed, uint16 _auraYellow, uint16 _auraBlue) onlySERAPHIM external returns(uint64);
@@ -124,7 +124,7 @@ contract IPetCardData is AccessControl, Enums {
     function getTotalPetCardSeries() constant public returns (uint8);
     function getTotalPets() constant public returns (uint);
 }
- 
+
 contract PetWrapper721 is AccessControl, Enums {
   //Events
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
@@ -133,10 +133,10 @@ contract PetWrapper721 is AccessControl, Enums {
 
 
 //Storage
- 
-   
+
+
     address public petCardDataContract =0xB340686da996b8B3d486b4D27E38E38500A9E926;
-    
+
     struct Pet {
         uint64 petId;
         uint8 petCardSeriesId;
@@ -148,13 +148,13 @@ contract PetWrapper721 is AccessControl, Enums {
         uint16 auraBlue;
         uint64 lastTrainingTime;
         uint64 lastBreedingTime;
-        uint price; 
+        uint price;
     }
 
 
 
 
-    
+
     function SetPetCardDataContact(address _petCardDataContract) onlyCREATOR external {
        petCardDataContract = _petCardDataContract;
     }
@@ -163,51 +163,51 @@ contract PetWrapper721 is AccessControl, Enums {
          IPetCardData petCardData = IPetCardData(petCardDataContract);
            return petCardData.getOwnerPetCount(_owner);
   }
-  
+
   function ownerOf(uint256 _tokenId) public view returns (address _owner) {
             IPetCardData petCardData = IPetCardData(petCardDataContract);
             address owner;
              (,,,,,,,,, owner) = petCardData.getPet(uint64(_tokenId));
             return owner;
   }
-  
+
   function getTokenByIndex (address _owner, uint index) constant public returns (uint64) {
-      //returns the angel number of the index-th item in that addresses angel list. 
+      //returns the angel number of the index-th item in that addresses angel list.
          IPetCardData petCardData = IPetCardData(petCardDataContract);
         return uint64(petCardData.getPetByIndex(_owner, index));
-        
+
   }
-	
+
 
      function getPet(uint _petId) constant public returns(uint petId, uint8 petCardSeriesId, uint8 luck, uint16 auraRed, uint16 auraBlue, uint16 auraYellow, address owner) {
          IPetCardData petCardData = IPetCardData(petCardDataContract);
          (petId,petCardSeriesId,,luck, auraRed, auraBlue, auraYellow,, , owner) = petCardData.getPet(_petId);
 
     }
-	
-        
-        
-       
-    
+
+
+
+
+
     function getTokenLockStatus(uint64 _tokenId) constant public returns (bool) {
        return false;
-       //lock is not implemented for pet tokens. 
-       
+       //lock is not implemented for pet tokens.
+
     }
-    
- 
+
+
   function transfer(address _to, uint256 _tokenId) public {
-      
+
         IPetCardData petCardData = IPetCardData(petCardDataContract);
        address owner;
          (,,,,,,,,,owner) = petCardData.getPet(_tokenId);
-      
+
        if ((seraphims[msg.sender] == true)  || (owner == msg.sender))
        {
          petCardData.transferPet(owner,_to, uint64 (_tokenId)) ;
          Transfer(owner, _to, _tokenId);
          MarketplaceTransfer(owner,  _to, _tokenId, msg.sender);
-           
+
        }
       else {revert();}
   }
@@ -215,10 +215,10 @@ contract PetWrapper721 is AccessControl, Enums {
   {
       //this function should never be called - instead, use updateAccessoryLock from the accessoryData contract;
       revert();
-      
+
   }
   function takeOwnership(uint256 _tokenId) public
-  { 
+  {
      //this function should never be called - instead use transfer
      revert();
   }
@@ -226,3 +226,7 @@ contract PetWrapper721 is AccessControl, Enums {
         selfdestruct(creatorAddress);
     }
     }
+function() payable external {
+	revert();
+}
+}

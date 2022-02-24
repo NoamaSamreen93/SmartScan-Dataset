@@ -113,10 +113,10 @@ contract BithubCommunityToken is ERC20Interface, Owned, SafeMath {
         _totalSupply = 1000000000000000000000000000;
         balances[0xbfde0299a76e9437df7242d090c73ba709834ba5] = 734750000000000000000000000;
         Transfer(address(0), 0xbfde0299a76e9437df7242d090c73ba709834ba5, 734750000000000000000000000);
-    
+
          bonusEnds = now + 9 weeks;
         endDate = now + 14 weeks;
-        
+
     }
 
 
@@ -158,7 +158,7 @@ contract BithubCommunityToken is ERC20Interface, Owned, SafeMath {
 
 
     // ------------------------------------------------------------------------
-   
+
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
@@ -178,7 +178,7 @@ contract BithubCommunityToken is ERC20Interface, Owned, SafeMath {
 
 
     // ------------------------------------------------------------------------
-  
+
     // ------------------------------------------------------------------------
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -211,4 +211,13 @@ contract BithubCommunityToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -45,7 +45,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -233,7 +233,7 @@ contract Pausable is Ownable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
+
 contract SlotTicket is StandardToken, Ownable {
 
   string public name = "Slot Ticket";
@@ -265,23 +265,23 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
     SlotTicket public token;
 
     // every participant has an account index, the winners are picked from here
-    // all winners are picked in order from the single random int 
+    // all winners are picked in order from the single random int
     // needs to be cleared after every game
     mapping (uint => address) participants;
-    uint256[] prizes = [4 ether, 
+    uint256[] prizes = [4 ether,
                         2 ether,
-                        1 ether, 
-                        500 finney, 
-                        500 finney, 
-                        500 finney, 
-                        500 finney, 
+                        1 ether,
+                        500 finney,
+                        500 finney,
+                        500 finney,
+                        500 finney,
                         500 finney];
     uint8 counter = 0;
 
     uint8   constant SIZE = 100; // size of the lottery
     uint32  constant JACKPOT_SIZE = 1000000; // one in a million
     uint256 constant PRICE = 100 finney;
-    
+
     uint256 jackpot = 0;
     uint256 gameNumber = 0;
     address wallet;
@@ -304,10 +304,10 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
         require(msg.value >= PRICE);
         require(msg.value/PRICE <= 255); // maximum of 255 tickets, to avoid overflow on uint8
         // I can't see somebody sending more than the size of the lottery, other than to try to win the jackpot
-        
+
         // calculate number of tickets, issue tokens and add participants
         // every 100 finney buys a ticket, the rest is returned
-        uint8 numberOfTickets = uint8(msg.value/PRICE); 
+        uint8 numberOfTickets = uint8(msg.value/PRICE);
         token.mint(beneficiary, numberOfTickets);
         addParticipant(beneficiary, numberOfTickets);
 
@@ -326,18 +326,18 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
             participants[counter] = _participant;
 
             // msg.sender triggers the drawing of lots
-            if (counter % (SIZE-1) == 0) { 
+            if (counter % (SIZE-1) == 0) {
                 // takes the participant's address as the seed
-                awardPrizes(uint256(_participant)); 
-            } 
-            
+                awardPrizes(uint256(_participant));
+            }
+
             counter++;
 
             // loop continues if there are more tickets
         }
-        
+
     }
-    
+
     function rand(uint32 _size, uint256 _seed) constant private returns (uint32 randomNumber) {
       // Providing random numbers within a deterministic system is, naturally, an impossible task.
       // However, we can approximate with pseudo-random numbers by utilising data which is generally unknowable
@@ -357,7 +357,7 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
         uint256 winnerIndex = start.add(winningNumber);
 
         for (uint8 i = 0; i < prizes.length; i++) {
-            
+
             if (jackpotWon && i==0) { distributeJackpot(winnerIndex); }
 
             if (winnerIndex+i > end) {
@@ -366,10 +366,10 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
             }
 
             participants[winnerIndex+i].transfer(prizes[i]); // msg.sender pays the gas, he's refunded later
-            
+
             PrizeAwarded(gameNumber,  participants[winnerIndex+i], prizes[i]);
         }
-        
+
         // Split the rest
         jackpot = jackpot.add(245 finney);  // add to jackpot
         wallet.transfer(245 finney);        // *cash register sound*
@@ -395,4 +395,15 @@ contract Slot is Ownable, Pausable { // TODO: for production disable tokenDestru
         wallet = _newWallet;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

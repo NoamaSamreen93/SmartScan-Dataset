@@ -2,14 +2,14 @@ pragma solidity 0.4.18;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -19,7 +19,7 @@ contract Ownable {
 
 
   /**
-   * @dev revert()s if called by any account other than the owner. 
+   * @dev revert()s if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -31,7 +31,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     if (newOwner != address(0)) {
@@ -47,8 +47,8 @@ contract Ownable {
  * Math operations with safety checks
  */
 library SafeMath {
-  
-  
+
+
   function mul256(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -71,8 +71,8 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
-  }  
-  
+  }
+
   function mod256(uint256 a, uint256 b) internal pure returns (uint256) {
 	uint256 c = a % b;
 	return c;
@@ -111,7 +111,7 @@ contract ERC20Basic {
 
 /**
  * @title ERC20 interface
- * @dev ERC20 interface with allowances. 
+ * @dev ERC20 interface with allowances.
  */
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant public returns (uint256);
@@ -125,7 +125,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -155,7 +155,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -229,16 +229,16 @@ contract StandardToken is BasicToken, ERC20 {
 /**
  * @title TeuToken
  * @dev The main TEU token contract
- * 
+ *
  */
- 
+
 contract TeuToken is StandardToken, Ownable{
   string public name = "20-footEqvUnit";
   string public symbol = "TEU";
   uint public decimals = 18;
 
   event TokenBurned(uint256 value);
-  
+
   function TeuToken() public {
     totalSupply = (10 ** 8) * (10 ** decimals);
     balances[msg.sender] = totalSupply;
@@ -270,7 +270,7 @@ contract Pausable is Ownable {
     }
     _;
   }
-  
+
   modifier onlyInEmergency {
     if (!stopped) {
       revert();
@@ -288,8 +288,8 @@ contract Pausable is Ownable {
 }
 
 /**
- * @title teuBookingDeposit 
- * @dev TEU Booking Deposit: A smart contract governing the entitlement of TEU token of two parties for a container shipping booking 
+ * @title teuBookingDeposit
+ * @dev TEU Booking Deposit: A smart contract governing the entitlement of TEU token of two parties for a container shipping booking
   */
 contract TeuBookingDeposit is Ownable, Pausable {
 	event eAdjustClientAccountBalance(bytes32 indexed _PartnerID, bytes32 _ClientId, bytes32 _adjustedBy, string _CrDr, uint256 _tokenAmount, string CrDrR, uint256 _tokenRAmount);
@@ -305,24 +305,24 @@ contract TeuBookingDeposit is Ownable, Pausable {
 	event eTransactionFeeForBooking(bytes32 indexed _PartnerID, string _TxNum, bytes32 _fromClientId1, bytes32 _toClientId2, uint256 _amount1, uint256 _rAmount1, uint256 _amount2, uint256 _rAmount2);
 	event eWithdrawTokenToClientAccount(bytes32 indexed _clientId, bytes32 _withdrawnBy, uint256 _tokenAmount, address _transferTo);
 	event eWithdrawUnallocatedRestrictedToken(uint256 _tokenAmount, bytes32 _withdrawnBy);
-	
-	
-	
+
+
+
     using SafeMath for uint256;
-	
-	
+
+
     TeuToken    private token;
-	/*  
+	/*
     * Failsafe drain
     */
     function drain() onlyOwner public {
         if (!owner.send(this.balance)) revert();
     }
-	
+
 	function () payable public {
 		if (msg.value!=0) revert();
 	}
-	
+
 	function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
 		bytes memory tempEmptyStringTest = bytes(source);
 		if (tempEmptyStringTest.length == 0) {
@@ -333,71 +333,71 @@ contract TeuBookingDeposit is Ownable, Pausable {
 			result := mload(add(source, 32))
 		}
 	}
-	
+
 	function killTransaction(bytes32 _PartnerID, bytes32 _killedBy, string _txHash, string _txNum) onlyOwner stopInEmergency public {
 		eKillTransactionEvent(_PartnerID, _killedBy, _txHash, _txNum);
 	}
-	
-		
+
+
 	function cancelTransaction(bytes32 _PartnerID, string _TxNum, bytes32 _fromClientId1, bytes32 _toClientId2, uint256 _tokenAmount1, uint256 _rAmount1, uint256 _tokenAmount2, uint256 _rAmount2, uint256 _grandTotal) onlyOwner stopInEmergency public {
         eCancelTransactionEvent(_PartnerID, _TxNum, _fromClientId1, _tokenAmount1, _rAmount1, _grandTotal);
 		eCancelTransactionEvent(_PartnerID, _TxNum, _toClientId2, _tokenAmount2, _rAmount2, _grandTotal);
 	}
-	
-	
+
+
 	function AdjustClientAccountBalance(bytes32 _PartnerID, bytes32 _ClientId, bytes32 _allocatedBy, string _CrDr, uint256 _tokenAmount, string CrDrR, uint256 _RtokenAmount) onlyOwner stopInEmergency public {
 		eAdjustClientAccountBalance(_PartnerID, _ClientId, _allocatedBy, _CrDr, _tokenAmount, CrDrR, _RtokenAmount);
 	}
-	
+
 	function setWalletToClientAccount(bytes32 _clientId, address _wallet, bytes32 _setBy) onlyOwner public {
         eSetWalletToClientAccount(_clientId, _wallet, _setBy);
     }
-	
+
     function receiveTokenByClientAccount(string _clientId, uint256 _tokenAmount, address _transferFrom) stopInEmergency public {
         require(_tokenAmount > 0);
         bytes32 _clientId32 = stringToBytes32(_clientId);
-		token.transferFrom(_transferFrom, this, _tokenAmount);   
+		token.transferFrom(_transferFrom, this, _tokenAmount);
 		eReceiveTokenByClientAccount(_clientId32, _tokenAmount, _transferFrom);
     }
-	
+
 	function withdrawTokenToClientAccount(bytes32 _clientId, bytes32 _withdrawnBy, address _transferTo, uint256 _tokenAmount) onlyOwner stopInEmergency public {
         require(_tokenAmount > 0);
 
-		token.transfer(_transferTo, _tokenAmount);      
+		token.transfer(_transferTo, _tokenAmount);
 
 		eWithdrawTokenToClientAccount(_clientId, _withdrawnBy, _tokenAmount, _transferTo);
     }
-	
 
-	
+
+
     // functions for restricted token management
     function allocateRestrictedTokenTo(bytes32 _PartnerID, bytes32 _clientId, bytes32 _allocatedBy, uint256 _tokenAmount) onlyOwner stopInEmergency public {
 		eAllocateRestrictedTokenTo(_PartnerID, _clientId, _allocatedBy, _tokenAmount);
     }
-    
+
     function withdrawUnallocatedRestrictedToken(uint256 _tokenAmount, bytes32 _withdrawnBy) onlyOwner stopInEmergency public {
         //require(_tokenAmount <= token.balanceOf(this).sub256(totalBookingClientToken).sub256(totalClientToken).sub256(totalRestrictedToken));
         token.transfer(msg.sender, _tokenAmount);
 		eWithdrawUnallocatedRestrictedToken(_tokenAmount, _withdrawnBy);
-    } 
+    }
 
 // functions for restricted token management Partner side
     function allocateRestrictedTokenToPartner(bytes32 _PartnerID, bytes32 _allocatedBy, uint256 _tokenAmount) onlyOwner stopInEmergency public {
 		eAllocateRestrictedTokenToPartner(_PartnerID, _allocatedBy, _tokenAmount);
     }
-	
+
     function partnerAllocateRestrictedTokenTo(bytes32 _PartnerID, bytes32 _clientId, uint256 _tokenAmount) onlyOwner stopInEmergency public {
 		ePartnerAllocateRestrictedTokenTo(_PartnerID, _clientId, _tokenAmount);
     }
-	
-// functions for transferring token to booking 	
-	function confirmTokenTransferToBooking(bytes32 _PartnerID, string _TxNum, bytes32 _fromClientId1, bytes32 _toClientId2, uint256 _tokenAmount1, uint256 _rAmount1, uint256 _tokenAmount2, uint256 _rAmount2, uint256 _txTokenAmount1, uint256 _txRAmount1, uint256 _txTokenAmount2, uint256 _txRAmount2) onlyOwner stopInEmergency public {		
+
+// functions for transferring token to booking
+	function confirmTokenTransferToBooking(bytes32 _PartnerID, string _TxNum, bytes32 _fromClientId1, bytes32 _toClientId2, uint256 _tokenAmount1, uint256 _rAmount1, uint256 _tokenAmount2, uint256 _rAmount2, uint256 _txTokenAmount1, uint256 _txRAmount1, uint256 _txTokenAmount2, uint256 _txRAmount2) onlyOwner stopInEmergency public {
 		eConfirmTokenTransferToBooking(_PartnerID, _TxNum, _fromClientId1, _toClientId2, _tokenAmount1, _rAmount1, _tokenAmount2, _rAmount2);
 		eTransactionFeeForBooking(_PartnerID, _TxNum, _fromClientId1, _toClientId2, _txTokenAmount1, _txRAmount1, _txTokenAmount2, _txRAmount2);
 	}
 
- 
-// functions for returning tokens	
+
+// functions for returning tokens
 	function confirmReturnToken(bytes32 _PartnerID, string _TxNum, bytes32 _fromClientId1, bytes32 _toClientId2, uint256 _tokenAmount1, uint256 _rAmount1, uint256 _tokenAmount2, uint256 _rAmount2, uint256 _grandTotal) onlyOwner stopInEmergency public {
         eConfirmReturnToken(_PartnerID, _TxNum, _fromClientId1, _tokenAmount1, _rAmount1, _grandTotal);
 		eConfirmReturnToken(_PartnerID, _TxNum, _toClientId2, _tokenAmount2, _rAmount2, _grandTotal);
@@ -408,10 +408,14 @@ contract TeuBookingDeposit is Ownable, Pausable {
     function getToken() constant public onlyOwner returns (address) {
         return token;
     }
-	
+
     function setToken(address _token) public onlyOwner stopInEmergency {
         require(token == address(0));
         token = TeuToken(_token);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

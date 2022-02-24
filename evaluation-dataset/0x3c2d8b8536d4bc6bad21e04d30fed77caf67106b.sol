@@ -608,7 +608,7 @@ contract Consts {
     string constant TOKEN_SYMBOL = "CRIP";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0x26a8cA94E953500e03218A3289a533A6484a77b7;
-    
+
     bool constant CONTINUE_MINTING = true;
 }
 
@@ -669,9 +669,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -688,7 +688,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -696,7 +696,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -719,4 +719,17 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -129,36 +129,36 @@ interface PlayerBookReceiverInterface {
 
 contract PlayerBook is Ownable {
     using NameFilter for string;
-    
+
     string constant public name = "PlayerBook";
-    string constant public symbol = "PlayerBook";    
+    string constant public symbol = "PlayerBook";
 
     uint256 public registrationFee_ = 10 finney;            // price to register a name
     mapping (bytes32 => address) public nameToAddr;
     mapping (address => string[]) public addrToNames;
-    
-    PlayerBookReceiverInterface public currentGame; 
-    
+
+    PlayerBookReceiverInterface public currentGame;
+
     address public CFO;
-    address public COO; 
-    
+    address public COO;
+
     modifier onlyCOO() {
         require(msg.sender == COO);
-        _; 
+        _;
     }
-    
+
     constructor(address _CFO, address _COO) public {
         CFO = _CFO;
-        COO = _COO; 
+        COO = _COO;
     }
-    
+
     function setCFO(address _CFO) onlyOwner public {
-        CFO = _CFO; 
-    }  
-  
+        CFO = _CFO;
+    }
+
     function setCOO(address _COO) onlyOwner public {
-        COO = _COO; 
-    }  
+        COO = _COO;
+    }
 
     modifier isHuman() {
         address _addr = msg.sender;
@@ -168,7 +168,7 @@ contract PlayerBook is Ownable {
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
 
     function checkIfNameValid(string _nameStr) public view returns(bool) {
       bytes32 _name = _nameStr.nameFilter();
@@ -189,7 +189,7 @@ contract PlayerBook is Ownable {
       if(names.length > 0) {
         return names[names.length-1];
       } else {
-        return ""; 
+        return "";
       }
     }
 
@@ -203,8 +203,8 @@ contract PlayerBook is Ownable {
       address _addr = msg.sender;
       nameToAddr[_name] = _addr;
       addrToNames[_addr].push(_nameString);
-      // update current game user info 
-      currentGame.receivePlayerInfo(_addr, _nameString); 
+      // update current game user info
+      currentGame.receivePlayerInfo(_addr, _nameString);
     }
 
     function registerNameByCOO(string _nameString, address _addr) public onlyCOO {
@@ -212,17 +212,23 @@ contract PlayerBook is Ownable {
       require(nameToAddr[_name] == address(0), "name must not be taken by others");
       nameToAddr[_name] = _addr;
       addrToNames[_addr].push(_nameString);
-      // update current game user info 
-      currentGame.receivePlayerInfo(_addr, _nameString);       
+      // update current game user info
+      currentGame.receivePlayerInfo(_addr, _nameString);
     }
-    
-    
+
+
     function setCurrentGame(address _addr) public onlyCOO {
-        currentGame = PlayerBookReceiverInterface(_addr); 
+        currentGame = PlayerBookReceiverInterface(_addr);
     }
 
     function withdrawBalance() public onlyCOO {
       uint _amount = address(this).balance;
       CFO.transfer(_amount);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

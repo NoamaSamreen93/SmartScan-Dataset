@@ -55,7 +55,7 @@ contract ERC20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract Tipcoin is ERC20Interface {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -65,8 +65,8 @@ contract Tipcoin is ERC20Interface {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -79,16 +79,16 @@ contract Tipcoin is ERC20Interface {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Reject when someone sends ethers to this contract
     // ------------------------------------------------------------------------
     function() public payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -126,7 +126,7 @@ contract Tipcoin is ERC20Interface {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         if(tokens > 0 && spender != address(0)) {
@@ -139,7 +139,7 @@ contract Tipcoin is ERC20Interface {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -164,8 +164,8 @@ contract Tipcoin is ERC20Interface {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -181,8 +181,8 @@ contract Tipcoin is ERC20Interface {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -204,4 +204,17 @@ contract Tipcoin is ERC20Interface {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

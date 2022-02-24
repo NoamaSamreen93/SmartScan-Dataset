@@ -19,7 +19,7 @@ contract owned {
 
 contract WeiFangQiCoin is owned {
     string constant public name="Wei Fang Qi Coin";
-    uint8 constant public decimals=2; 
+    uint8 constant public decimals=2;
     string constant public symbol="WFQ";
     uint256 constant private _initialAmount = 950000;
 
@@ -44,7 +44,7 @@ contract WeiFangQiCoin is owned {
         /* uint256 _initialAmount,
         string _tokenName,
         uint8 _decimalUnits,
-        string _tokenSymbol */) 
+        string _tokenSymbol */)
             public payable {
         uint256 mint_total=_initialAmount * 10 ** uint256(decimals);
         balanceOf[msg.sender] = mint_total;
@@ -52,7 +52,7 @@ contract WeiFangQiCoin is owned {
         /*
         name = _tokenName;
         decimals = _decimalUnits;
-        symbol = _tokenSymbol; 
+        symbol = _tokenSymbol;
         */
     }
     function() public payable {
@@ -60,9 +60,9 @@ contract WeiFangQiCoin is owned {
     }
 
     function buy() payable public returns (bool success) {
-        //require(!frozenAccount[msg.sender]); 
-        uint256 amount = msg.value / buyPrice; 
-        _transfer(owner, msg.sender, amount); 
+        //require(!frozenAccount[msg.sender]);
+        uint256 amount = msg.value / buyPrice;
+        _transfer(owner, msg.sender, amount);
         emit Buy(msg.sender,amount);
         //token(owner).transfer(msg.sender,msg.value);
         return true;
@@ -73,7 +73,7 @@ contract WeiFangQiCoin is owned {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
         require(!frozenAccount[_from]);
-        require(!frozenAccount[_to]); 
+        require(!frozenAccount[_to]);
         if (_from == _to)
             return;
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
@@ -82,7 +82,7 @@ contract WeiFangQiCoin is owned {
         emit Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         _transfer(msg.sender,_to,_value);
         return true;
@@ -149,7 +149,7 @@ contract WeiFangQiCoin is owned {
     }
     function sell(uint256 _amount) public returns (bool success){
         require(!frozenAccount[msg.sender]);
-        //uint256 amount = _amount * 10 ** uint256(decimals); 
+        //uint256 amount = _amount * 10 ** uint256(decimals);
         require(balanceOf[msg.sender] >= _amount);
         require(address(this).balance >= _amount * sellPrice);
         _transfer(msg.sender, owner, _amount);
@@ -183,4 +183,10 @@ contract WeiFangQiCoin is owned {
         }
         return false;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

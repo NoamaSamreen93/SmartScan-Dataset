@@ -30,7 +30,7 @@ contract FEMCoin {
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = 10000000000;  
+        totalSupply = 10000000000;
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = "FEMCoin";                                   // Set the name for display purposes
         symbol = "FEMC";                               // Set the symbol for display purposes
@@ -150,4 +150,15 @@ contract FEMCoin {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

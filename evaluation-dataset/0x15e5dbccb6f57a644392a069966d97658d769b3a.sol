@@ -8,7 +8,7 @@ contract ERC223Interface {
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -78,7 +78,7 @@ contract ERC223Token is ERC223Interface {
     using SafeMath for uint;
 
     mapping(address => uint) balances; // List of user balances.
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      Invokes the `tokenFallback` function if the recipient is a contract.
@@ -108,7 +108,7 @@ contract ERC223Token is ERC223Interface {
         }
         Transfer(msg.sender, _to, _value, _data);
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -136,7 +136,7 @@ contract ERC223Token is ERC223Interface {
         Transfer(msg.sender, _to, _value, empty);
     }
 
-    
+
     /**
      * @dev Returns balance of the `_owner`.
      *
@@ -174,14 +174,14 @@ contract CoVEXTokenERC223 is ERC223Token{
     uint256 maxPerUser = 100 ether;
 
     /**
-     * Address which will receive raised funds 
+     * Address which will receive raised funds
      * and owns the total supply of tokens
      */
     address public fundsWallet;
 
     function CoVEXTokenERC223() {
         fundsWallet = msg.sender;
-        
+
         startTimestamp = now;
         durationSeconds = 0; //admin can set it later
 
@@ -213,7 +213,7 @@ contract CoVEXTokenERC223 is ERC223Token{
     }
 
     function transfer(address _to, uint _value, bytes _data){
-        return super.transfer(_to, _value, _data);   
+        return super.transfer(_to, _value, _data);
     }
 
     function calculateTokenAmount(uint256 weiAmount) constant returns(uint256) {
@@ -221,7 +221,7 @@ contract CoVEXTokenERC223 is ERC223Token{
         // setting rewards is possible only for 4 weeks
         for (uint i = 1; i <= 4; i++) {
             if (now <= startTimestamp + 7 days) {
-                return tokenAmount.mul(100+weeklyRewards[i]).div(100);    
+                return tokenAmount.mul(100+weeklyRewards[i]).div(100);
             }
         }
         return tokenAmount;
@@ -242,7 +242,7 @@ contract CoVEXTokenERC223 is ERC223Token{
       Transfer(burner, address(0), _value, empty);
     }
 
-    function adminAddICO(uint256 _startTimestamp, uint256 _durationSeconds, 
+    function adminAddICO(uint256 _startTimestamp, uint256 _durationSeconds,
         uint256 _coinsPerETH, uint256 _maxCap, uint _week1Rewards,
         uint _week2Rewards, uint _week3Rewards, uint _week4Rewards) isOwner{
 
@@ -277,4 +277,15 @@ contract CoVEXTokenERC223 is ERC223Token{
         require(msg.sender == fundsWallet);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

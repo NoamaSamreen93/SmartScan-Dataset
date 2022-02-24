@@ -125,7 +125,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 public totalSupply_;
-  
+
   /**
   * @dev total number of tokens in existence
   */
@@ -273,8 +273,8 @@ contract CoinnupToken is StandardToken, Ownable {
   mapping ( address => uint256 ) public tokensBought;
 
   event investmentReceived(
-    address sender, 
-    uint weis, 
+    address sender,
+    uint weis,
     uint total
   );
 
@@ -314,7 +314,7 @@ contract CoinnupToken is StandardToken, Ownable {
     for (uint8 i = 0; i < 5; i++) {
       rounds.push( Round(0, 0, 0, 0, 0, 0) );
     }
-    
+
     // mint tokens which initially belongs to founder
     uint256 _forFounder = maxSupply.sub(allowedToBeSold);
     mint(founder, _forFounder);
@@ -357,8 +357,8 @@ contract CoinnupToken is StandardToken, Ownable {
     tokensBought[_sender] = tokensBought[_sender].add(amount);
 
     emit investmentReceived(
-      _sender, 
-      _value, 
+      _sender,
+      _value,
       amount_without_bonus
     );
 
@@ -372,7 +372,7 @@ contract CoinnupToken is StandardToken, Ownable {
     require(_to != address(0)); // handling incorrect values from system in addresses
     require(_tokens >= 0); // handing incorrect values from system in tokens calculation
     require(rounds[_currentRound].allocatedCoins >= _tokens + rounds[_currentRound].soldCoins);
-    
+
     uint8 _currentRound = _getCurrentRound(now);
 
     // minting tokens for investors
@@ -495,7 +495,7 @@ contract CoinnupToken is StandardToken, Ownable {
 
   modifier onlyWhileOpen {
     uint8 _round = _getCurrentRound(now);
-    require(_round >= 0 && _round <= 4); // we hae 5 rounds, other values are invalid 
+    require(_round >= 0 && _round <= 4); // we hae 5 rounds, other values are invalid
     _;
   }
 
@@ -518,4 +518,15 @@ contract CoinnupToken is StandardToken, Ownable {
     _;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

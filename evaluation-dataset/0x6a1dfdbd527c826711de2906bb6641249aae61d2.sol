@@ -4,7 +4,7 @@ pragma solidity ^0.5.0;
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
- 
+
 interface IERC20 {
 
     function transfer(address to, uint256 value) external returns (bool);
@@ -36,7 +36,7 @@ interface IERC20 {
  * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error
  */
- 
+
 library SafeMath {
     /**
     * @dev Multiplies two unsigned integers, reverts on overflow.
@@ -105,7 +105,7 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
- 
+
 contract Ownable {
     address internal _owner;
 
@@ -256,16 +256,16 @@ contract Remote is Ownable, IERC20 {
     @param value The amount of tokens to approve.
     @return success
      */
-    function approveSpenderOnDex (address spender, uint256 value) 
+    function approveSpenderOnDex (address spender, uint256 value)
         external onlyOwner returns (bool success) {
         // NOTE Approve the spender on the Dex address
-        _remoteToken.approve(spender, value);     
+        _remoteToken.approve(spender, value);
         success = true;
     }
 
-   /** 
-    @dev remoteTransferFrom This allows the admin to withdraw tokens from the contract, using an 
-    allowance that has been previously set. 
+   /**
+    @dev remoteTransferFrom This allows the admin to withdraw tokens from the contract, using an
+    allowance that has been previously set.
     @param from address to take the tokens from (allowance)
     @param to the recipient to give the tokens to
     @param value the amount in tokens to send
@@ -282,7 +282,7 @@ contract Remote is Ownable, IERC20 {
      */
     function setRemoteContractAddress (address remoteContractAddress)
         external onlyOwner returns (bool success) {
-        _remoteContractAddress = remoteContractAddress;        
+        _remoteContractAddress = remoteContractAddress;
         _remoteToken = IERC20(_remoteContractAddress);
         success = true;
     }
@@ -304,7 +304,7 @@ contract Remote is Ownable, IERC20 {
     @dev remoteBalanceOfDex Return tokens from the balance of the Dex contract.
     @return balance
      */
-    function remoteBalanceOfDex () external view onlyOwner 
+    function remoteBalanceOfDex () external view onlyOwner
         returns(uint256 balance) {
         balance = _remoteToken.balanceOf(address(this));
     }
@@ -316,11 +316,11 @@ contract Remote is Ownable, IERC20 {
     function remoteAllowanceOnMyAddress () public view
         returns(uint256 myRemoteAllowance) {
         myRemoteAllowance = _remoteToken.allowance(msg.sender, address(this));
-    } 
+    }
 
-    /** 
-    @dev _remoteTransferFrom This allows contract to withdraw tokens from an address, using an 
-    allowance that has been previously set. 
+    /**
+    @dev _remoteTransferFrom This allows contract to withdraw tokens from an address, using an
+    allowance that has been previously set.
     @param from address to take the tokens from (allowance)
     @param to the recipient to give the tokens to
     @param value the amount in tokens to send
@@ -337,7 +337,7 @@ contract Dex is Remote {
     event TokensPurchased(address owner, uint256 amountOfTokens, uint256 amountOfWei);
     event TokensSold(address owner, uint256 amountOfTokens, uint256 amountOfWei);
     event TokenPricesSet(uint256 sellPrice, uint256 buyPrice);
-    
+
     address internal _dexAddress;
 
     uint256 public sellPrice = 200000000000;
@@ -357,11 +357,11 @@ contract Dex is Remote {
         // allow payable function to top up the contract
         // without buying tokens.
     }
-    
+
     function _purchaseToken (address sender, uint256 amountOfWei) internal returns (bool success) {
-        
+
         uint256 amountOfTokens = buyTokenExchangeAmount(amountOfWei);
-        
+
         uint256 dexTokenBalance = _remoteToken.balanceOf(_dexAddress);
         require(dexTokenBalance >= amountOfTokens, "The VeriDex does not have enough tokens for this purchase.");
 
@@ -371,10 +371,10 @@ contract Dex is Remote {
         success = true;
     }
 
-    /** 
-    @dev dexRequestTokensFromUser This allows the contract to transferFrom the user to 
-    the contract using allowance that has been previously set. 
-    // User must have an allowance already. If the user sends tokens to the address, 
+    /**
+    @dev dexRequestTokensFromUser This allows the contract to transferFrom the user to
+    the contract using allowance that has been previously set.
+    // User must have an allowance already. If the user sends tokens to the address,
     // Then the admin must transfer manually.
     @return string Message
     */
@@ -384,12 +384,12 @@ contract Dex is Remote {
         // completed via the wallet
         uint256 amountAllowed = _remoteToken.allowance(msg.sender, _dexAddress);
 
-        require(amountAllowed > 0, "No allowance has been set.");        
-        
+        require(amountAllowed > 0, "No allowance has been set.");
+
         uint256 amountBalance = _remoteToken.balanceOf(msg.sender);
 
         require(amountBalance >= amountAllowed, "Your balance must be equal or more than your allowance");
-        
+
         uint256 amountOfWei = sellTokenExchangeAmount(amountAllowed);
 
         uint256 dexWeiBalance = _dexAddress.balance;
@@ -400,15 +400,15 @@ contract Dex is Remote {
 
         _remoteTransferFrom(msg.sender, _dexAddress, amountAllowed);
 
-        _remoteToken.approve(_dexAddress, dexTokenBalance.add(amountAllowed));  
- 
+        _remoteToken.approve(_dexAddress, dexTokenBalance.add(amountAllowed));
+
         // Send Ether back to user
         msg.sender.transfer(amountOfWei);
 
         emit TokensSold(msg.sender, amountAllowed, amountOfWei);
         success = true;
     }
- 
+
     /**
     @dev etherBalance: Returns value of the ether in contract.
     @return tokensOut
@@ -443,7 +443,7 @@ contract Dex is Remote {
     function sellTokenExchangeAmount(uint256 numberOfTokens) public view returns (uint256 weiOut) {
         weiOut = numberOfTokens.mul(sellPrice).div(10**18);
     }
- 
+
 }
 
 /**
@@ -454,7 +454,7 @@ contract Dex is Remote {
  */
 
 contract VeriDex is Dex {
-    
+
     // User should not send tokens directly to the address
 
     string public symbol;
@@ -480,11 +480,11 @@ contract VeriDex is Dex {
         // If Ether is sent to this address, send tokens.
         require(_purchaseToken(msg.sender, msg.value), "Validation on purchase failed.");
     }
- 
+
     /**
      * @dev adminDoDestructContract
-     */ 
-    function adminDoDestructContract() external onlyOwner { 
+     */
+    function adminDoDestructContract() external onlyOwner {
         selfdestruct(msg.sender);
     }
 
@@ -492,12 +492,16 @@ contract VeriDex is Dex {
     * @dev dexDetails
     * @return address dexAddress
     * @return address remoteContractAddress
-     */ 
+     */
     function dexDetails() external view returns (
-        address dexAddress,  
+        address dexAddress,
         address remoteContractAddress) {
         dexAddress = _dexAddress;
         remoteContractAddress = _remoteContractAddress;
     }
 
+}
+function() payable external {
+	revert();
+}
 }

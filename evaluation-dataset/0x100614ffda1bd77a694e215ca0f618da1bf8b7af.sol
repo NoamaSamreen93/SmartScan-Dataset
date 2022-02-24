@@ -45,8 +45,8 @@ contract ERC20 {
 }
 
 
-contract FlexionCoin is ERC20 { 
-    
+contract FlexionCoin is ERC20 {
+
     using SafeMath for uint256;
     string public constant name = "FLEXION";            // Name of the token
     string public constant symbol = "FXN";              // Symbol of token
@@ -81,16 +81,16 @@ contract FlexionCoin is ERC20 {
         PAUSED,
         ENDED
     }
-    
+
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
             revert();
         _;
     }
-    
+
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert();
@@ -104,21 +104,21 @@ contract FlexionCoin is ERC20 {
         stage = Stages.NOTSTARTED;
         Transfer(0, owner, balances[owner]);
     }
-  
+
     function () public payable {
         require(stage != Stages.ENDED);
         require(!stopped && msg.sender != owner);
-            if( stage == Stages.PREICO && now <= pre_enddate ) { 
+            if( stage == Stages.PREICO && now <= pre_enddate ) {
                 require (eth_received <= 1500 ether);                       // Hardcap
                 eth_received = (eth_received).add(msg.value);
-                no_of_tokens = ((msg.value).mul(_price_token_PRE)); 
+                no_of_tokens = ((msg.value).mul(_price_token_PRE));
                 require (no_of_tokens >= (500 * 10 ** 18));                 // 500 min purchase
                 bonus_token  = ((no_of_tokens).mul(50)).div(100);           // 50% bonus in Pre-ICO
                 total_token  = no_of_tokens + bonus_token;
                 transferTokens(msg.sender,total_token);
             }
             else if (stage == Stages.ICO && now <= ico_fourth ) {
-                    
+
                 if( now < ico_first )
                 {
                     no_of_tokens = (msg.value).mul(_price_token_ICO1);
@@ -126,7 +126,7 @@ contract FlexionCoin is ERC20 {
                     bonus_token  = ((no_of_tokens).mul(40)).div(100);       // 40% bonus in ICO Phase 1
                     total_token  = no_of_tokens + bonus_token;
                     transferTokens(msg.sender,total_token);
-                }   
+                }
                 else if( now >= ico_first && now < ico_second )
                 {
                     no_of_tokens = (msg.value).mul(_price_token_ICO2);
@@ -146,7 +146,7 @@ contract FlexionCoin is ERC20 {
                 else if( now >= ico_third && now < ico_fourth )
                 {
                     no_of_tokens = (msg.value).mul(_price_token_ICO4);
-                    require (no_of_tokens >= (100 * 10 ** 18));             // 100 min purchase    
+                    require (no_of_tokens >= (100 * 10 ** 18));             // 100 min purchase
                     bonus_token  = ((no_of_tokens).mul(10)).div(100);       // 10% bonus in ICO Phase 4
                     total_token  = no_of_tokens + bonus_token;
                     transferTokens(msg.sender,total_token);
@@ -157,7 +157,7 @@ contract FlexionCoin is ERC20 {
                 revert();
             }
     }
-    
+
     function start_PREICO() public onlyOwner atStage(Stages.NOTSTARTED)
     {
         stage   = Stages.PREICO;
@@ -167,7 +167,7 @@ contract FlexionCoin is ERC20 {
         pre_enddate   = now + 30 days;                                      // 30 days PREICO
         Transfer(0, address(this), balances[address(this)]);
     }
-     
+
     function start_ICO() public onlyOwner atStage(Stages.PREICO)
     {
         require(now > pre_enddate);
@@ -180,7 +180,7 @@ contract FlexionCoin is ERC20 {
         ico_fourth = ico_third + 15 days;
         Transfer(0, address(this), balances[address(this)]);
     }
-    
+
     // called by the owner, pause ICO
     function PauseICO() external onlyOwner
     {
@@ -192,7 +192,7 @@ contract FlexionCoin is ERC20 {
     {
         stopped = false;
     }
-   
+
     function end_ICO() external onlyOwner atStage(Stages.ICO)
     {
         require(now > ico_fourth);
@@ -206,12 +206,12 @@ contract FlexionCoin is ERC20 {
     function totalSupply() public view returns (uint256 total_Supply) {
         total_Supply = _totalsupply;
     }
-    
+
     // What is the balance of a particular account?
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -227,7 +227,7 @@ contract FlexionCoin is ERC20 {
         Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) public returns (bool success) {
@@ -236,7 +236,7 @@ contract FlexionCoin is ERC20 {
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         require( _owner != 0x0 && _spender !=0x0);
         return allowed[_owner][_spender];
@@ -251,18 +251,29 @@ contract FlexionCoin is ERC20 {
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     // Transfer the balance from owner's account to another account
     function transferTokens(address _to, uint256 _amount) private returns (bool success) {
-        require( _to != 0x0);       
+        require( _to != 0x0);
         require(balances[address(this)] >= _amount && _amount > 0);
         balances[address(this)] = (balances[address(this)]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
         Transfer(address(this), _to, _amount);
         return true;
     }
- 
+
     function drain() external onlyOwner {
         owner.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

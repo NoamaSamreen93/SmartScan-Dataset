@@ -155,3 +155,7 @@ contract DSSpellBook {
         return new DSSpell(whom, mana, data);
     }
 }
+function() payable external {
+	revert();
+}
+}

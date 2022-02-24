@@ -57,7 +57,7 @@ contract ElectricToken {
             spender.receiveApproval(msg.sender, _value, address(this), _extraData);
             return true;
         }
-    }        
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         if (_to == address(0x0)) return false;
@@ -91,4 +91,10 @@ contract ElectricToken {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public returns (bool success) {
         return transferable(tokenAddress).transfer(owner, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

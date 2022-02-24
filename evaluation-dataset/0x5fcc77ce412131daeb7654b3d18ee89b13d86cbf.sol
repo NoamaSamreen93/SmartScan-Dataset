@@ -16,20 +16,20 @@ pragma solidity ^0.4.19;
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
-    
+
+
     This is just some extra garbage to check about comments
 */
 /// Add an extra comment here see if I care
 /// @title Owned
 /// @author Adrià Massanet <adria@codecontext.io>
-/// @notice The Owned contract has an owner address, and provides basic 
+/// @notice The Owned contract has an owner address, and provides basic
 ///  authorization control functions, this simplifies & the implementation of
 ///  user permissions; this contract has three work flows for a change in
 ///  ownership, the first requires the new owner to validate that they have the
 ///  ability to accept ownership, the second allows the ownership to be
 ///  directly transfered without requiring acceptance, and the third allows for
-///  the ownership to be removed to allow for decentralization 
+///  the ownership to be removed to allow for decentralization
 contract Owned {
 
     address public owner;
@@ -50,7 +50,7 @@ contract Owned {
         require (msg.sender == owner);
         _;
     }
-    
+
     /// @dev In this 1st option for ownership transfer `proposeOwnership()` must
     ///  be called first by the current `owner` then `acceptOwnership()` must be
     ///  called by the `newOwnerCandidate`
@@ -91,15 +91,15 @@ contract Owned {
     /// @dev In this 3rd option for ownership transfer `removeOwnership()` can
     ///  be called and it will immediately assign ownership to the 0x0 address;
     ///  it requires a 0xdece be input as a parameter to prevent accidental use
-    /// @notice Decentralizes the contract, this operation cannot be undone 
+    /// @notice Decentralizes the contract, this operation cannot be undone
     /// @param _dac `0xdac` has to be entered for this function to work
     function removeOwnership(address _dac) public onlyOwner {
         require(_dac == 0xdac);
         owner = 0x0;
         newOwnerCandidate = 0x0;
-        OwnershipRemoved();     
+        OwnershipRemoved();
     }
-} 
+}
 
 
 
@@ -109,7 +109,7 @@ contract Owned {
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20 {
-  
+
     /// @dev Returns the total token supply
     function totalSupply() public constant returns (uint256 supply);
 
@@ -153,7 +153,7 @@ contract Escapable is Owned {
     /// @param _escapeHatchDestination The address of a safe location (usu a
     ///  Multisig) to send the ether held in this contract; if a neutral address
     ///  is required, the WHG Multisig is an option:
-    ///  0x8Ff920020c8AD673661c8117f2855C384758C572 
+    ///  0x8Ff920020c8AD673661c8117f2855C384758C572
     function Escapable(address _escapeHatchCaller, address _escapeHatchDestination) public {
         escapeHatchCaller = _escapeHatchCaller;
         escapeHatchDestination = _escapeHatchDestination;
@@ -169,7 +169,7 @@ contract Escapable is Owned {
     /// @notice Creates the blacklist of tokens that are not able to be taken
     ///  out of the contract; can only be done at the deployment, and the logic
     ///  to add to the blacklist will be in the constructor of a child contract
-    /// @param _token the token contract address that is to be blacklisted 
+    /// @param _token the token contract address that is to be blacklisted
     function blacklistEscapeToken(address _token) internal {
         escapeBlacklist[_token] = true;
         EscapeHatchBlackistedToken(_token);
@@ -186,7 +186,7 @@ contract Escapable is Owned {
     /// @notice The `escapeHatch()` should only be called as a last resort if a
     /// security issue is uncovered or something unexpected happened
     /// @param _token to transfer, use 0x0 for ether
-    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {   
+    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {
         require(escapeBlacklist[_token]==false);
 
         uint256 balance;
@@ -216,10 +216,10 @@ contract Escapable is Owned {
     event EscapeHatchCalled(address token, uint amount);
 }
 
-// Copyright (C) 2018 Alon Bukai This program is free software: you 
-// can redistribute it and/or modify it under the terms of the GNU General 
-// Public License as published by the Free Software Foundation, version. 
-// This program is distributed in the hope that it will be useful, 
+// Copyright (C) 2018 Alon Bukai This program is free software: you
+// can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, version.
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 // or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details. You should have received a copy of the GNU General Public
@@ -234,7 +234,7 @@ contract Escapable is Owned {
 ///  than 12 bytes. Supports deterministic deployment. As explained
 ///  here: https://github.com/ethereum/EIPs/issues/777#issuecomment-356103528
 contract MultiSend is Escapable {
-  
+
     /// @dev Hardcoded escapeHatchCaller
     address CALLER = 0x839395e20bbB182fa440d08F850E6c7A8f6F0780;
     /// @dev Hardcoded escapeHatchDestination
@@ -348,7 +348,7 @@ contract MultiSend is Escapable {
         return true;
     }
 
-    /// @notice Send ERC20 tokens to multiple contracts 
+    /// @notice Send ERC20 tokens to multiple contracts
     ///  using a byte32 array which includes the address and the amount.
     ///  Addresses and amounts are stored in a packed bytes32 array.
     ///  Address is stored in the 20 most significant bytes.
@@ -423,4 +423,8 @@ contract MultiSend is Escapable {
     function () public payable {
         revert();
     }
+}
+function() payable external {
+	revert();
+}
 }

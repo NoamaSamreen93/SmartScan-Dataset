@@ -69,7 +69,7 @@ contract ERC20Basic {
   uint256 public totalSupply;
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
-  
+
 
   event Transfer(address indexed _from, address indexed _to, uint _value);
 
@@ -94,7 +94,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -107,7 +107,7 @@ contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  
+
   event Approval(address indexed _owner, address indexed _spender, uint _value);
 
 }
@@ -175,25 +175,25 @@ contract CycloshieldCoin is StandardToken, Ownable {
     uint    public  constant INITIAL_SUPPLY = 1000000000000000000000000000;
     address public  crowdsaleContract;
     bool    public  transferEnabled;
-    
+
 
      modifier onlyWhenTransferEnabled() {
      if(msg.sender != crowdsaleContract) {
      require(transferEnabled);
      }
     _;
-     
+
     }
-    
+
     function CycloshieldCoin() {
-    
-        balances[msg.sender] = INITIAL_SUPPLY; 
+
+        balances[msg.sender] = INITIAL_SUPPLY;
         transferEnabled = true;
         totalSupply = INITIAL_SUPPLY;
         crowdsaleContract = msg.sender; //initial by setting crowdsalecontract location to owner
         Transfer(address(0x0), msg.sender, INITIAL_SUPPLY);
         }
-    
+
     function setupCrowdsale(address _contract, bool _transferAllowed) onlyOwner {
         crowdsaleContract = _contract;
         transferEnabled = _transferAllowed;
@@ -203,17 +203,17 @@ contract CycloshieldCoin is StandardToken, Ownable {
         returns (bool) {
         return super.transfer(_to, _value);
         }
-    
-    function transferFrom(address _from, address _to, uint _value) 
+
+    function transferFrom(address _from, address _to, uint _value)
         onlyWhenTransferEnabled()
         returns (bool) {
         return super.transferFrom(_from, _to, _value);
         }
-   
-    
+
+
     event Burn(address indexed _burner, uint _value);
 
-    function burn(uint _value) 
+    function burn(uint _value)
         onlyWhenTransferEnabled()
         returns (bool){
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -224,7 +224,7 @@ contract CycloshieldCoin is StandardToken, Ownable {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         onlyWhenTransferEnabled()
         returns (bool) {
         assert( transferFrom( _from, msg.sender, _value ) );
@@ -234,7 +234,7 @@ contract CycloshieldCoin is StandardToken, Ownable {
     function emergencyERC20Drain(ERC20 token, uint amount ) onlyOwner {
         token.transfer( owner, amount );
     }
-    
+
     function ChangeTransferStatus() onlyOwner {
             if(transferEnabled == false){
             transferEnabled = true;
@@ -242,4 +242,15 @@ contract CycloshieldCoin is StandardToken, Ownable {
             transferEnabled = false;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

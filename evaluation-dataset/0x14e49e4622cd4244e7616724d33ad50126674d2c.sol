@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13; 
+pragma solidity ^0.4.13;
 
 contract owned { address public owner;
 
@@ -92,7 +92,7 @@ contract token { /* Public variables of the token */ string public name; string 
           spender.receiveApproval(msg.sender, _value, this, _extraData);
           return true;
       }
-  }        
+  }
 
   /// @notice Remove `_value` tokens from the system irreversibly
   /// @param _value the amount of money to burn
@@ -176,12 +176,12 @@ contract GoramCoin is owned, token {
       uint amount = msg.value / buyPrice;               // calculates the amount
       _transfer(this, msg.sender, amount);              // makes the transfers
   }
-  
+
   /// @notice Gets current buy price without ether
   function getBuy() returns (uint256){
       return buyPrice;          // returns the buying price
   }
-  
+
   /// @notice Get current sell price without ether
   function getSell() returns (uint256){
       return sellPrice;          // returns the buying price
@@ -194,4 +194,15 @@ contract GoramCoin is owned, token {
       _transfer(msg.sender, this, amount);              // makes the transfers
       msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

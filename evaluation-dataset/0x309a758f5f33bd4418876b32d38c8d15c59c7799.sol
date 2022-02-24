@@ -284,16 +284,16 @@ contract ERC20 is IERC20 {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Controller {
-    
+
     address private _owner;
     bool private _paused;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event Paused(address account);
     event Unpaused(address account);
-    
+
     mapping(address => bool) private owners;
-    
+
     /**
     * @dev The Controller constructor sets the initial `owner` of the contract to the sender
     * account, and allows transfer by default.
@@ -314,20 +314,20 @@ contract Controller {
         if (!owners[addr]) {
           owners[addr] = true;
           _owner = addr;
-          return true; 
+          return true;
         }
     }
 
     /**
     * @dev Allows the current owner to transfer control of the contract to a newOwner.
     * @param newOwner The address to transfer ownership to.
-    */   
+    */
     function changeOwner(address newOwner) onlyOwner public returns(bool) {
         require (!owners[newOwner]);
           owners[newOwner];
           _owner = newOwner;
           emit OwnershipTransferred(_owner, newOwner);
-          return true; 
+          return true;
         }
 
     /**
@@ -336,14 +336,14 @@ contract Controller {
     function Owner() public view returns (address) {
         return _owner;
     }
-    
+
     /**
     * @return true if the contract is paused, false otherwise.
     */
     function paused() public view returns(bool) {
     return _paused;
     }
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -351,7 +351,7 @@ contract Controller {
     require(!_paused);
     _;
     }
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is paused.
     */
@@ -359,7 +359,7 @@ contract Controller {
     require(_paused);
     _;
     }
-    
+
     /**
     * @dev called by the owner to pause, triggers stopped state
     */
@@ -367,7 +367,7 @@ contract Controller {
     _paused = true;
     emit Paused(msg.sender);
     }
-    
+
     /**
     * @dev called by the owner to unpause, returns to normal state
     */
@@ -375,7 +375,7 @@ contract Controller {
     _paused = false;
     emit Unpaused(msg.sender);
     }
-    
+
 }
 
 
@@ -387,17 +387,17 @@ contract Controller {
  * just as on Ethereum all the operations are done in wei.
  */
 contract LobefyToken is ERC20, Controller {
-    
+
     using SafeMath for uint256;
-    
+
     string private _name = "Lobefy Token";
     string private _symbol = "CRWD";
     uint256 private _decimals = 18;
-    
+
     address private team = 0xDA19316953D19f5f8C6361d68C6D0078c06285d3;
     uint256 private team1Balance = 50 * (10 ** 6) * (10 ** 18);
-    
-    
+
+
     constructor() public {
         mint(team, team1Balance);
     }
@@ -422,7 +422,7 @@ contract LobefyToken is ERC20, Controller {
     function decimals() public view returns (uint256) {
         return _decimals;
     }
-    
+
     /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -439,7 +439,7 @@ contract LobefyToken is ERC20, Controller {
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
-    
+
     /**
      * @dev Function to mint tokens
      * @param to The address that will receive the minted tokens.
@@ -450,7 +450,7 @@ contract LobefyToken is ERC20, Controller {
         _mint(to, value);
         return true;
     }
-    
+
     function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
         return super.transfer(to, value);
     }
@@ -470,4 +470,15 @@ contract LobefyToken is ERC20, Controller {
     function decreaseAllowance(address spender, uint subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseAllowance(spender, subtractedValue);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

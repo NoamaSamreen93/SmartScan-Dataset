@@ -340,3 +340,7 @@ contract Multipliers {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

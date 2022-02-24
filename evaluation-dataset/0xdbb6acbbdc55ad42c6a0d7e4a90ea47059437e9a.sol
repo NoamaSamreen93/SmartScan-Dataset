@@ -216,7 +216,7 @@ contract Defimanager is Structs {
         if (lender == CurrentLender.COMPOUND) {
             return balanceComp() + balanceDai();
         }
-        if (lender == CurrentLender.DYDX) { 
+        if (lender == CurrentLender.DYDX) {
             return balanceDyDx() + balanceDai();
         }
         return balanceDai();
@@ -284,7 +284,7 @@ contract Defimanager is Structs {
 
         //figure out current benchmark account balance
         uint256 benchmarkCurrentBalance = (benchmarkBalancePrev * balanceDaiCurrent()) / balancePrev;
-        
+
         //figure out how much the user actually has right now
 
         uint256 userCurrentBalance = benchmarkCurrentBalance * accounts[msg.sender].userBalanceLast / accounts[msg.sender].benchmarkBalanceLast;
@@ -312,7 +312,7 @@ contract Defimanager is Structs {
     function withdrawDai(uint amount) public returns(uint) {
         uint256 benchmarkCurrentBalance = (benchmarkBalancePrev * balanceDaiCurrent()) / balancePrev;
         uint256 userCurrentBalance = benchmarkCurrentBalance * accounts[msg.sender].userBalanceLast / accounts[msg.sender].benchmarkBalanceLast;
-        require(amount <= userCurrentBalance, 'cannot withdraw'); 
+        require(amount <= userCurrentBalance, 'cannot withdraw');
 
         accounts[msg.sender].userBalanceLast = userCurrentBalance - amount;
         benchmarkBalancePrev = benchmarkCurrentBalance;
@@ -333,4 +333,13 @@ contract Defimanager is Structs {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

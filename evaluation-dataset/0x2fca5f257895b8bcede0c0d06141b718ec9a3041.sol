@@ -4,7 +4,7 @@ library SafeMath {
     function add(uint256 _a, uint256 _b) pure internal returns (uint256) {
         uint256 c = _a + _b;
         assert(c >= _a && c >= _b);
-        
+
         return c;
     }
 
@@ -85,7 +85,7 @@ contract TrexDexMain {
     modifier hasPayloadSize(uint256 size) {
         assert(msg.data.length >= size + 4);
         _;
-    }    
+    }
 
     constructor(address _feeAddress) public {
         owner = msg.sender;
@@ -276,7 +276,7 @@ contract TrexDexMain {
         else if (availableVolume(_buyTokenAddress, _buyAmount, _sellTokenAddress, _sellAmount, _takeAddress, _baseTokenAddress, _expireBlock, _nonce, _makeAddress, _v, _r, _s) > _amount) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -328,4 +328,15 @@ contract TrexDexMain {
         return (orders[_makeAddress][_hash] || ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _hash)), _v, _r, _s) == _makeAddress);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

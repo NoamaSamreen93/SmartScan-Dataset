@@ -61,7 +61,7 @@ contract Token is Owned {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-	
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -314,4 +314,15 @@ contract Aequitas is CapitalMiningToken {
             10 minutes,             // blockInterval
             5000000000              // rewardValue
     ){}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

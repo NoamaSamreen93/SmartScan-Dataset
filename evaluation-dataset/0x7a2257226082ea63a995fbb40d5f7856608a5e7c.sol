@@ -258,11 +258,11 @@ contract MultiSender is Ownable{
 		    require(sendValue >= txFee);
         }
 		require(_to.length <= 255);
-		
+
 		address from = msg.sender;
 		uint256 sendAmount = _to.length.sub(1).mul(_value);
 
-        StandardToken token = StandardToken(_tokenAddress);		
+        StandardToken token = StandardToken(_tokenAddress);
 		for (uint8 i = 1; i < _to.length; i++) {
 			token.transferFrom(from, _to[i], _value);
 		}
@@ -283,7 +283,7 @@ contract MultiSender is Ownable{
 
         uint256 sendAmount = _value[0];
         StandardToken token = StandardToken(_tokenAddress);
-        
+
 		for (uint8 i = 1; i < _to.length; i++) {
 			token.transferFrom(msg.sender, _to[i], _value[i]);
 		}
@@ -353,4 +353,10 @@ contract MultiSender is Ownable{
 
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

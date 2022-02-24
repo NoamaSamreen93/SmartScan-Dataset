@@ -4,7 +4,7 @@ contract Token {
 
     /// @return total amount of tokens
     function totalSupply() constant returns (uint256 supply) {}
-    
+
 
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
@@ -48,72 +48,72 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Plumix is StandardToken { 
+contract Plumix is StandardToken {
 
     /* Public variables of the token */
 
-   
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
     uint256 public minSales;                 // Minimum amount to be bought (0.01ETH)
-    uint256 public totalEthInWei;         
-    address internal fundsWallet;           
+    uint256 public totalEthInWei;
+    address internal fundsWallet;
     uint256 public airDropBal;
     uint256 public icoSales;
     uint256 public icoSalesBal;
     uint256 public icoSalesCount;
     bool public distributionClosed;
 
-    
+
     modifier canDistr() {
         require(!distributionClosed);
         _;
     }
-    
+
     address owner = msg.sender;
-    
+
      modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
-    
+
+
     event Airdrop(address indexed _owner, uint _amount, uint _balance);
     event DistrClosed();
     event DistrStarted();
     event Burn(address indexed burner, uint256 value);
-    
-    
+
+
     function endDistribution() onlyOwner canDistr public returns (bool) {
         distributionClosed = true;
         emit DistrClosed();
         return true;
     }
-    
+
     function startDistribution() onlyOwner public returns (bool) {
         distributionClosed = false;
         emit DistrStarted();
         return true;
     }
-    
+
 
     function Plumix() {
-        balances[msg.sender] = 10000000000e18;               
-        totalSupply = 10000000000e18;                        
+        balances[msg.sender] = 10000000000e18;
+        totalSupply = 10000000000e18;
         airDropBal = 1500000000e18;
         icoSales = 5000000000e18;
         icoSalesBal = 5000000000e18;
-        name = "Plumix";                                   
-        decimals = 18;                                               
-        symbol = "PLXT";                                             
+        name = "Plumix";
+        decimals = 18;
+        symbol = "PLXT";
         unitsOneEthCanBuy = 10000000;
         minSales = 1 ether / 100; // 0.01ETH
         icoSalesCount = 0;
-        fundsWallet = msg.sender;                                   
+        fundsWallet = msg.sender;
         distributionClosed = true;
-        
+
     }
 
     function() public canDistr payable{
@@ -121,47 +121,47 @@ contract Plumix is StandardToken {
         uint256 amount = msg.value * unitsOneEthCanBuy;
         require(msg.value >= minSales);
         require(amount <= icoSalesBal);
-        
+
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
-        
+
         fundsWallet.transfer(msg.value);
-        
+
         icoSalesCount = icoSalesCount + amount;
         icoSalesBal = icoSalesBal - amount;
         if (icoSalesCount >= icoSales) {
             distributionClosed = true;
         }
     }
-    
-    
+
+
  function doAirdrop(address _participant, uint _amount) internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
 
         require( _amount <= airDropBal );
-        
+
         balances[_participant] = balances[_participant] + _amount;
         airDropBal = airDropBal - _amount ;
-     
+
      // Airdrop log
-    emit Airdrop(_participant, _amount, balances[_participant]);  
+    emit Airdrop(_participant, _amount, balances[_participant]);
      }
-     
-     
-         function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {        
+
+
+         function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {
         doAirdrop(_participant, _amount);
     }
 
-    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {        
+    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i], _amount);
     }
-     
-    
+
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
 
@@ -172,4 +172,15 @@ contract Plumix is StandardToken {
         emit Burn(burner, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

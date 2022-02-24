@@ -33,13 +33,13 @@ library SafeMath {
 
 /**
 * @title Ownable
-* @dev The Ownable contract has an owner address, and provides basic authorization control 
-* functions, this simplifies the implementation of "user permissions". 
-*/ 
+* @dev The Ownable contract has an owner address, and provides basic authorization control
+* functions, this simplifies the implementation of "user permissions".
+*/
 contract Ownable {
     address public owner;
 
-/** 
+/**
 * @dev The Ownable constructor sets the original `owner` of the contract to the sender
 * account.
 */
@@ -80,7 +80,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
-    * @dev Basic version of StandardToken, with no allowances. 
+    * @dev Basic version of StandardToken, with no allowances.
        */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -101,7 +101,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-      * @param _owner The address to query the the balance of. 
+      * @param _owner The address to query the the balance of.
           * @return An uint256 representing the amount owned by the passed address.
               */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -258,7 +258,7 @@ contract ZXCToken is StandardToken, Ownable {
         }else if (period == 2) {
             require(_start > endDate1);
             startDate2 = _start;
-            endDate2 = _end;      
+            endDate2 = _end;
         }
     }
 
@@ -321,7 +321,7 @@ contract ZXCToken is StandardToken, Ownable {
         balances[tokenWallet] = balances[tokenWallet].add(balances[0xb1]);
         balances[0xb1] = 0;
     }
-    
+
     //確認是否正常銷售
     function saleActive() public constant returns (bool) {
         return (
@@ -331,7 +331,7 @@ contract ZXCToken is StandardToken, Ownable {
                 getCurrentTimestamp() < endDate2 && saleCap > 0)
                 );
     }
-   
+
     //Get CurrentTS
     function getCurrentTimestamp() internal view returns (uint256) {
         return now;
@@ -341,7 +341,7 @@ contract ZXCToken is StandardToken, Ownable {
     function buyTokens(address sender, uint256 value) internal {
         //Check Sale Status
         require(saleActive());
-        
+
         //Minum buying limit
         require(value >= 0.5 ether);
 
@@ -360,7 +360,7 @@ contract ZXCToken is StandardToken, Ownable {
         balances[tokenWallet] = balances[tokenWallet].sub(amount);
         balances[sender] = balances[sender].add(amount);
         TokenPurchase(sender,value, amount);
-        
+
         saleCap = saleCap - amount;
 
         // Update state.
@@ -369,5 +369,16 @@ contract ZXCToken is StandardToken, Ownable {
         // Forward the fund to fund collection wallet.
         //tokenWallet.transfer(msg.value);
         fundWallet.transfer(msg.value);
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

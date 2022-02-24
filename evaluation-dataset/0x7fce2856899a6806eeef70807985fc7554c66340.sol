@@ -144,7 +144,7 @@ contract CLPToken is StandardToken, SafeMath {
     // Initial founder address (set in constructor)
     // This address handle administration of the token.
     address public founder = 0x0;
-	
+
     // Block timing/contract unlocking information
 	uint public month6companyUnlock = 1525132801; // May 01, 2018 UTC
 	uint public month12companyUnlock = 1541030401; // Nov 01, 2018 UTC
@@ -160,7 +160,7 @@ contract CLPToken is StandardToken, SafeMath {
     bool public allocated2Year = false;
     bool public allocated3Year = false;
     bool public allocated4Year = false;
-	
+
 	bool public allocated6Months = false;
     bool public allocated12Months = false;
     bool public allocated18Months = false;
@@ -169,7 +169,7 @@ contract CLPToken is StandardToken, SafeMath {
     // Token count information
 	uint currentTokenSaled = 0;
     uint public totalTokensSale = 87000000 * 10**decimals;
-    uint public totalTokensReserve = 39000000 * 10**decimals; 
+    uint public totalTokensReserve = 39000000 * 10**decimals;
     uint public totalTokensCompany = 24000000 * 10**decimals;
 
     event Buy(address indexed sender, uint eth, uint fbt);
@@ -277,7 +277,7 @@ contract CLPToken is StandardToken, SafeMath {
     */
     function getTotalCurrentSaled() constant returns (uint256 currentTokenSaled)  {
 		require(msg.sender==founder);
-		
+
 		return currentTokenSaled;
     }
 
@@ -286,7 +286,7 @@ contract CLPToken is StandardToken, SafeMath {
     */
     function addInvestorList(address investor, uint256 amountToken)  returns (bool success) {
 		require(msg.sender==founder);
-		
+
 		if(currentTokenSaled + amountToken <= totalTokensSale)
 		{
 			balances[investor] = safeAdd(balances[investor], amountToken);
@@ -299,4 +299,15 @@ contract CLPToken is StandardToken, SafeMath {
 		    return false;
 		}
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -324,24 +324,24 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Freeze is Ownable, ReentrancyGuard {
-  
+
   using SafeMath for uint256;
 
   struct Group {
     address[] holders;
     uint until;
   }
-  
+
 	/**
 	 * @dev number of groups
 	 */
   uint public groups;
-  
+
 	/**
 	 * @dev link group ID ---> Group structure
 	 */
   mapping (uint => Group) public lockup;
-  
+
 	/**
 	 * @dev Check if holder under lock up
 	 */
@@ -349,17 +349,17 @@ contract Freeze is Ownable, ReentrancyGuard {
     bool freezed;
     uint groupId;
     (freezed, groupId) = isFreezed(_holder);
-    
+
     if (freezed) {
       if (lockup[groupId-1].until < block.timestamp)
         _;
-      else 
+      else
         revert("Your holdings are freezed, wait until transfers become allowed");
     }
-    else 
+    else
       _;
   }
-  
+
 	/**
 	 * @param _holder address of token holder to check
 	 * @return bool - status of freezing and group
@@ -375,13 +375,13 @@ contract Freeze is Ownable, ReentrancyGuard {
           freezed = true;
           i++;
           continue;
-        }  
+        }
         else {
           i++;
           continue;
         }
       }
-      
+
       if (index != 0) {
         freezed = true;
         i++;
@@ -390,10 +390,10 @@ contract Freeze is Ownable, ReentrancyGuard {
       i++;
     }
     if (!freezed) i = 0;
-    
+
     return (freezed, i);
   }
-  
+
 	/**
 	 * @dev internal usage to get index of holder in group
 	 * @param element address of token holder to check
@@ -406,7 +406,7 @@ contract Freeze is Ownable, ReentrancyGuard {
     }
     return 0;
   }
-  
+
 	/**
 	 * @dev internal usage to check that 0 is 0 index or it means that address not exists
 	 * @param _holder address of token holder to check
@@ -416,11 +416,11 @@ contract Freeze is Ownable, ReentrancyGuard {
   function checkZeroIndex (address _holder, uint lockGroup) internal view returns (bool) {
     if (lockup[lockGroup].holders[0] == _holder)
       return true;
-        
-    else 
+
+    else
       return false;
   }
-  
+
 	/**
 	 * @dev Will set group of addresses that will be under lock. When locked address can't
 	  		  do some actions with token
@@ -431,7 +431,7 @@ contract Freeze is Ownable, ReentrancyGuard {
   function setGroup (address[] memory _holders, uint _until) public onlyOwner returns (bool) {
     lockup[groups].holders = _holders;
     lockup[groups].until   = _until;
-    
+
     groups++;
     return true;
   }
@@ -439,7 +439,7 @@ contract Freeze is Ownable, ReentrancyGuard {
 
 /**
  * @dev This contract needed for inheritance of StandardToken interface,
-        but with freezing modifiers. So, it have exactly same methods, but with 
+        but with freezing modifiers. So, it have exactly same methods, but with
         lockupEnded(msg.sender) modifier.
  * @notice Inherit from it at SingleToken, to make freezing functionality works
 */
@@ -505,16 +505,25 @@ contract PausableToken is StandardToken, Freeze {
 
 contract SingleToken is PausableToken {
 
-  string  public constant name      = "Gofind XR"; 
+  string  public constant name      = "Gofind XR";
 
   string  public constant symbol    = "XR";
 
   uint32  public constant decimals  = 8;
 
   uint256 public constant maxSupply = 13E16;
-  
+
   constructor() public {
     totalSupply_ = totalSupply_.add(maxSupply);
     balances[msg.sender] = balances[msg.sender].add(maxSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

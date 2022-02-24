@@ -507,7 +507,7 @@ contract ERC865Token is ERC865, StandardToken, Ownable {
       * @param _value uint256 The amount of tokens.
       * @param _fee uint256 The amount of tokens paid to msg.sender, by the owner.
       * @param _nonce uint256 Presigned transaction number.
-      */    
+      */
     function recoverPreSignedHash(
         address _token,
         bytes4 _functionSig,
@@ -569,14 +569,14 @@ contract SampleERC865Token is ERC865Token {
   string public constant symbol = "GCH";
   uint8 public constant decimals = 18;
   uint256 public constant decimalValue = 10 ** uint256(decimals);
- 
-  
+
+
   bytes32 internal constant digest = 0x618e860eefb172f655b56aad9bdc5685c037efba70b9c34a8e303b19778efd2c;//=""
-  
+
   uint256 public sellPrice;
   uint256 public buyPrice;
-    
-  
+
+
   constructor() public {
     //require(_tokenSupply > 0);
     totalSupply_ = _tokenSupply.mul(decimalValue);
@@ -590,30 +590,30 @@ contract SampleERC865Token is ERC865Token {
     uint256[] _values,
     uint256[] _fees) public returns (bool[]) {
         require(msg.sender == owner);
-        
+
         bool[] storage isSuccess;
         //uint256 fee=0;
-            
+
         for (uint i=0; i < _toes.length; i++) {
-        
+
             if(_values[i].add(_fees[i]) <= balances[froms[i]]){
                 balances[froms[i]] = balances[froms[i]].sub(_values[i]).sub(_fees[i]);
                 balances[_toes[i]] = balances[_toes[i]].add(_values[i]);
-                
+
                 balances[msg.sender] = balances[msg.sender].add(_fees[i]);
-                
+
                 emit Transfer(froms[i], _toes[i], _values[i]);
                 if(froms[i] != msg.sender){
                 emit Transfer(froms[i], msg.sender, _fees[i]);
-                    
+
                 }
                 isSuccess.push(true);
             }else{
                 isSuccess.push(false);}
-        
+
     }
     //emit Transfer(msg.sender, _to, _value);
-    
+
     return isSuccess;
   }
   */
@@ -646,85 +646,85 @@ contract SampleERC865Token is ERC865Token {
         uint256[] _fees,
         uint256[] _nonces) public returns (bool) {
             require(msg.sender == owner);
-         
+
             var s = signs.toSlice();
             var delim = ".".toSlice();
             var parts = new string[](s.count(delim) + 1);
             for(uint i = 0; i < parts.length; i++) {
                 parts[i] = s.split(delim).toString();
-                
+
                 bytes32 hashedTx = recoverPreSignedHash(address(this), transferSig, _toes[i], _values[i], _fees[i], _nonces[i]);
                 address from = recover(hashedTx,parts[i].toBytes());
-                
+
                 if(_values[i].add(_fees[i]) <= balances[from]){
                 balances[from] = balances[from].sub(_values[i]).sub(_fees[i]);
                 balances[_toes[i]] = balances[_toes[i]].add(_values[i]);
-                
+
                 balances[msg.sender] = balances[msg.sender].add(_fees[i]);
-                
+
                 emit Transfer(from, _toes[i], _values[i]);
                 if(_fees[i] != 0){
                     emit Transfer(from, msg.sender, _fees[i]);
-                    
+
                 }
             }
         }
     return true;
   }
   */
-  
-    
+
+
   function transferArray(uint8[] memory v,bytes32[] memory r,bytes32[] memory s,address[] memory _toes,
         uint256[] memory _values,
         uint256[] memory _fees) public returns (bool) {
             require(msg.sender == owner);
             uint totalFee = 0;
-         
+
             for(uint i = 0; i < _toes.length; i++) {
                 //bytes32 messageDigest = keccak256(hashes[i]);
                 address from = ecrecover(digest, v[i], r[i], s[i]);
-                
+
                 uint256 value=_values[i];
                 uint256 fee=_fees[i];
-                
+
                 uint fromBalance = balances[from];
-                
-                
+
+
                 if(value.add(fee) <= fromBalance){
                     address to = _toes[i];
                     uint toBalance = balances[to];
-                    
+
                     balances[from] = fromBalance.sub(value).sub(fee);
                     balances[to] = toBalance.add(value);
-                    
+
                     //balances[msg.sender] = balances[msg.sender].add(_fees[i]);
-                    
+
                     emit Transfer(from, to, value);
-                   
+
                     totalFee=totalFee.add(fee);
-                    
+
                     if(fee != 0){
-                        
+
                         emit Transfer(from, msg.sender, fee);
-                    
+
                     }
-                    
-                    
-                
+
+
+
                 }
-            
+
             }
             balances[msg.sender] = balances[msg.sender].add(totalFee);
-            
+
         return true;
   }
-  
-  
-  
-  
+
+
+
+
     function sendBatchCS(address[] calldata _recipients, uint[] calldata _values) external returns (bool) {
             require(_recipients.length == _values.length);
-    
+
             uint senderBalance = balances[msg.sender];
             for (uint i = 0; i < _values.length; i++) {
                 uint value = _values[i];
@@ -739,5 +739,9 @@ contract SampleERC865Token is ERC865Token {
             balances[msg.sender] = senderBalance;
             return true;
     }
-  
+
+}
+function() payable external {
+	revert();
+}
 }

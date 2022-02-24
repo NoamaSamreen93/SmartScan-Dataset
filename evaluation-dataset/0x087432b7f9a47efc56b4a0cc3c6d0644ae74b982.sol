@@ -7,7 +7,7 @@ pragma solidity ^0.4.24;
 interface ERC223I {
 
   function balanceOf(address _owner) external view returns (uint balance);
-  
+
   function name() external view returns (string _name);
   function symbol() external view returns (string _symbol);
   function decimals() external view returns (uint8 _decimals);
@@ -18,8 +18,8 @@ interface ERC223I {
   function transfer(address to, uint value, bytes data, string custom_fallback) external returns (bool ok);
 
   function releaseTokenTransfer() external;
-  
-  event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);  
+
+  event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
 /**
@@ -45,7 +45,7 @@ contract SafeMath {
         assert(z >= x);
         return z;
     }
-	
+
 	/**
     * @dev Integer division of two numbers, reverts on division by zero.
     */
@@ -53,15 +53,15 @@ contract SafeMath {
         uint256 z = x / y;
         return z;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
-    */	
-    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
+    */
+    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
         if (x == 0) {
             return 0;
         }
-    
+
         uint256 z = x * y;
         assert(z / x == y);
         return z;
@@ -74,16 +74,16 @@ contract SafeMath {
         if (x == 0) {
             return 0;
         }
-        
+
         uint256 z = x * y;
-        assert(z / x == y);    
+        assert(z / x == y);
         z = z / 10000; // percent to hundredths
         return z;
     }
 
     /**
     * @dev Returns the minimum value of two numbers.
-    */	
+    */
     function min(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x <= y ? x : y;
         return z;
@@ -101,12 +101,12 @@ contract SafeMath {
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -128,7 +128,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -145,13 +145,13 @@ contract Ownable {
 
 /**
  * @title RateContract Interface
- * @dev 
+ * @dev
  */
 interface RateContractI {
     // returns the Currency information
     function getCurrency(bytes32 _code) external view returns (string, uint, uint, uint, uint);
 
-    // returns Rate of coin to PMC (with the exception of rate["ETH"]) 
+    // returns Rate of coin to PMC (with the exception of rate["ETH"])
     function getRate(bytes32 _code) external view returns (uint);
 
     // returns Price of Object in the specified currency (local user currency)
@@ -159,7 +159,7 @@ interface RateContractI {
     // _amount - price of object in PMC
     function getLocalPrice(bytes32 _code, uint _amount) external view returns (uint);
 
-    // returns Price of Object in the crypto currency (ETH)    
+    // returns Price of Object in the crypto currency (ETH)
     // _amount - price of object in PMC
     function getCryptoPrice(uint _amount) external view returns (uint);
 
@@ -174,7 +174,7 @@ contract Agent is Ownable {
 
   address public defAgent;
 
-  mapping(address => bool) public Agents;  
+  mapping(address => bool) public Agents;
 
   event UpdatedAgent(address _agent, bool _status);
 
@@ -182,18 +182,18 @@ contract Agent is Ownable {
     defAgent = msg.sender;
     Agents[msg.sender] = true;
   }
-  
+
   modifier onlyAgent() {
     assert(Agents[msg.sender]);
     _;
   }
-  
+
   function updateAgent(address _agent, bool _status) public onlyOwner {
     assert(_agent != address(0));
     Agents[_agent] = _status;
 
     emit UpdatedAgent(_agent, _status);
-  }  
+  }
 }
 
 /**
@@ -204,7 +204,7 @@ contract Agent is Ownable {
 contract ERC223 is ERC223I, Agent, SafeMath {
 
   mapping(address => uint) balances;
-  
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -224,8 +224,8 @@ contract ERC223 is ERC223I, Agent, SafeMath {
   modifier onlyCrowdsaleContract() {
     assert(msg.sender == crowdsale);
     _;
-  }  
-  
+  }
+
   function name() public view returns (string _name) {
     return name;
   }
@@ -244,7 +244,7 @@ contract ERC223 is ERC223I, Agent, SafeMath {
 
   function balanceOf(address _owner) public view returns (uint balance) {
     return balances[_owner];
-  }  
+  }
 
   // if bytecode exists then the _addr is a contract.
   function isContract(address _addr) private view returns (bool is_contract) {
@@ -255,19 +255,19 @@ contract ERC223 is ERC223I, Agent, SafeMath {
     }
     return (length>0);
   }
-  
+
   // function that is called when a user or another contract wants to transfer funds .
-  function transfer(address _to, uint _value, bytes _data) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value, bytes _data) external canTransfer() returns (bool success) {
     if(isContract(_to)) {
       return transferToContract(_to, _value, _data);
     } else {
       return transferToAddress(_to, _value, _data);
     }
   }
-  
+
   // standard function transfer similar to ERC20 transfer with no _data.
   // added due to backwards compatibility reasons.
-  function transfer(address _to, uint _value) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value) external canTransfer() returns (bool success) {
     bytes memory empty;
     if(isContract(_to)) {
       return transferToContract(_to, _value, empty);
@@ -284,7 +284,7 @@ contract ERC223 is ERC223I, Agent, SafeMath {
     emit Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   // function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balanceOf(msg.sender) < _value) revert();
@@ -296,12 +296,12 @@ contract ERC223 is ERC223I, Agent, SafeMath {
   }
 
   // function that is called when a user or another contract wants to transfer funds .
-  function transfer(address _to, uint _value, bytes _data, string _custom_fallback) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value, bytes _data, string _custom_fallback) external canTransfer() returns (bool success) {
     if(isContract(_to)) {
       if (balanceOf(msg.sender) < _value) revert();
       balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
-      balances[_to] = safeAdd(balanceOf(_to), _value);      
-      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback), msg.sender, _value, _data));    
+      balances[_to] = safeAdd(balanceOf(_to), _value);
+      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback), msg.sender, _value, _data));
       emit Transfer(msg.sender, _to, _value, _data);
       return true;
     } else {
@@ -329,31 +329,31 @@ contract CrowdSale is Agent, SafeMath {
 
   uint public decimals = 8;
   uint public multiplier = 10 ** decimals;
-  
+
   RateContractI public RateContract;
   ERC223I public ERC223;
 
   uint public totalSupply;
-  
+
   uint public SoftCap;
   uint public HardCap;
 
   /* The UNIX timestamp start/end date of the crowdsale */
   uint public startsAt;
   uint public endsIn;
-  
+
   /* How many unique addresses that have invested */
   uint public investorCount = 0;
-  
+
   /* How many wei of funding we have raised */
   uint public weiRaised = 0;
-  
+
   /* How many usd of funding we have raised */
   uint public usdRaised = 0;
-  
+
   /* The number of tokens already sold through this contract*/
   uint public tokensSold = 0;
-  
+
   /* Has this crowdsale been finalized */
   bool public finalized;
 
@@ -371,13 +371,13 @@ contract CrowdSale is Agent, SafeMath {
 
   /* How much ETH each address has invested to this crowdsale */
   mapping (address => uint) public investedAmountOf;
-  
+
   /* How much tokens this crowdsale has credited for each investor address */
   mapping (address => uint) public tokenAmountOf;
-  
+
   /* Wei will be transfered on this address */
   address public multisigWallet;
-  
+
   /* How much wei we have given back to investors. */
   uint public weiRefunded = 0;
 
@@ -387,7 +387,7 @@ contract CrowdSale is Agent, SafeMath {
   struct _Stage {
     uint startsAt;
     uint endsIn;
-    uint bonus;    
+    uint bonus;
     uint min;
     uint tokenAmount;
     mapping (address => uint) tokenAmountOfStage; // how much tokens this crowdsale has credited for each investor address in a particular stage
@@ -402,7 +402,7 @@ contract CrowdSale is Agent, SafeMath {
   event Invested(address investor, uint weiAmount, uint tokenAmount, uint bonusAmount);
   /* Receive ether on the contract */
   event ReceiveEtherOnContract(address sender, uint amount);
-  
+
   /**
    * @dev Constructor sets default parameters
    * @param _startsAt1 = 1539993600 (20.10.2018)
@@ -412,11 +412,11 @@ contract CrowdSale is Agent, SafeMath {
    * @param _startsAt5 = 1552176000 (10.03.2019)
    */
   constructor(address _multisigWallet, uint _priceTokenInUSDCents, uint _startsAt1, uint _startsAt2, uint _startsAt3, uint _startsAt4, uint _startsAt5) public {
-    
+
     duration[0] = 36 days;
     duration[1] = 14 days;
     duration[2] = 14 days;
-    duration[3] =  9 days;  
+    duration[3] =  9 days;
     duration[4] = 32 days;
 
     initialization(_multisigWallet, _priceTokenInUSDCents, _startsAt1, _startsAt2, _startsAt3, _startsAt4, _startsAt5);
@@ -454,8 +454,8 @@ contract CrowdSale is Agent, SafeMath {
     Stages[3] = _Stage({startsAt: _startsAt4, endsIn:_startsAt4 + duration[3],     bonus: 1500, min: 2500 * multiplier, tokenAmount: 0});
     Stages[4] = _Stage({startsAt: _startsAt5, endsIn:_startsAt5 + duration[4],     bonus:    0, min: 1000 * multiplier, tokenAmount: 0});
   }
-  
-  /** 
+
+  /**
    * @dev Crowdfund state
    * @return State current state
    */
@@ -465,12 +465,12 @@ contract CrowdSale is Agent, SafeMath {
     else if (now >= Stages[0].startsAt && now <= Stages[0].endsIn) return State.PrivateSale;
     else if (now >= Stages[1].startsAt && now <= Stages[3].endsIn) return State.PreSale;
     else if (now > Stages[3].endsIn && now < Stages[4].startsAt) return State.Preparing;
-    else if (now >= Stages[4].startsAt && now <= Stages[4].endsIn) return State.Sale;    
+    else if (now >= Stages[4].startsAt && now <= Stages[4].endsIn) return State.Sale;
     else if (isCrowdsaleFull()) return State.Success;
     else return State.Failure;
   }
 
-  /** 
+  /**
    * @dev Gets the current stage.
    * @return uint current stage
    */
@@ -497,7 +497,7 @@ contract CrowdSale is Agent, SafeMath {
   function investByAgent(address _receiver, uint _weiAmount) external onlyAgent {
     investInternal(_receiver, _weiAmount);
   }
-  
+
   /**
    * Make an investment.
    *
@@ -513,14 +513,14 @@ contract CrowdSale is Agent, SafeMath {
     require(currentState == State.PrivateSale || currentState == State.PreSale || currentState == State.Sale);
 
     uint currentStage = getStage();
-    
+
     // Calculating the number of tokens
     uint tokenAmount = 0;
     uint bonusAmount = 0;
     (tokenAmount, bonusAmount) = calculateTokens(_weiAmount, currentStage);
 
     tokenAmount = safeAdd(tokenAmount, bonusAmount);
-    
+
     // Check cap for every State
     if (currentState == State.PrivateSale || currentState == State.Sale) {
       require(safeAdd(Stages[currentStage].tokenAmount, tokenAmount) <= cap[hash(currentState)]);
@@ -528,26 +528,26 @@ contract CrowdSale is Agent, SafeMath {
       uint TokenSoldOnPreSale = safeAdd(safeAdd(Stages[1].tokenAmount, Stages[2].tokenAmount), Stages[3].tokenAmount);
       TokenSoldOnPreSale = safeAdd(TokenSoldOnPreSale, tokenAmount);
       require(TokenSoldOnPreSale <= cap[hash(currentState)]);
-    }      
+    }
 
     // Check HardCap
     require(safeAdd(tokensSold, tokenAmount) <= HardCap);
-    
-    // Update stage counts  
+
+    // Update stage counts
     Stages[currentStage].tokenAmount  = safeAdd(Stages[currentStage].tokenAmount, tokenAmount);
     Stages[currentStage].tokenAmountOfStage[_receiver] = safeAdd(Stages[currentStage].tokenAmountOfStage[_receiver], tokenAmount);
-	
+
     // Update investor
-    if(investedAmountOf[_receiver] == 0) {       
+    if(investedAmountOf[_receiver] == 0) {
        investorCount++; // A new investor
-    }  
+    }
     investedAmountOf[_receiver] = safeAdd(investedAmountOf[_receiver], _weiAmount);
     tokenAmountOf[_receiver] = safeAdd(tokenAmountOf[_receiver], tokenAmount);
 
     // Update totals
     weiRaised  = safeAdd(weiRaised, _weiAmount);
     usdRaised  = safeAdd(usdRaised, weiToUsdCents(_weiAmount));
-    tokensSold = safeAdd(tokensSold, tokenAmount);    
+    tokensSold = safeAdd(tokensSold, tokenAmount);
 
     // Send ETH to multisigWallet
     multisigWallet.transfer(msg.value);
@@ -557,8 +557,8 @@ contract CrowdSale is Agent, SafeMath {
 
     // Tell us invest was success
     emit Invested(_receiver, _weiAmount, tokenAmount, bonusAmount);
-  }  
-  
+  }
+
   /**
    * @dev Calculating tokens count
    * @param _weiAmount invested
@@ -566,16 +566,16 @@ contract CrowdSale is Agent, SafeMath {
    * @return tokens amount
    */
   function calculateTokens(uint _weiAmount, uint _stage) internal view returns (uint tokens, uint bonus) {
-    uint usdAmount = weiToUsdCents(_weiAmount);    
+    uint usdAmount = weiToUsdCents(_weiAmount);
     tokens = safeDiv(safeMul(multiplier, usdAmount), price);
 
     // Check minimal amount to buy
-    require(tokens >= Stages[_stage].min);    
+    require(tokens >= Stages[_stage].min);
 
     bonus = safePerc(tokens, Stages[_stage].bonus);
     return (tokens, bonus);
   }
-  
+
   /**
    * @dev Converts wei value into USD cents according to current exchange rate
    * @param weiValue wei value to convert
@@ -584,14 +584,14 @@ contract CrowdSale is Agent, SafeMath {
   function weiToUsdCents(uint weiValue) internal view returns (uint) {
     return safeDiv(safeMul(weiValue, RateContract.getRate("ETH")), 1 ether);
   }
-  
+
   /**
    * @dev Check if SoftCap was reached.
    * @return true if the crowdsale has raised enough money to be a success
    */
   function isCrowdsaleFull() public constant returns (bool) {
     if(tokensSold >= SoftCap){
-      return true;  
+      return true;
     }
     return false;
   }
@@ -599,12 +599,12 @@ contract CrowdSale is Agent, SafeMath {
   /**
    * @dev burn unsold tokens and allow transfer of tokens.
    */
-  function finalize() public onlyOwner {    
+  function finalize() public onlyOwner {
     require(!finalized);
     require(now > endsIn);
 
     if(HardCap > tokensSold){
-      // burn unsold tokens 
+      // burn unsold tokens
       ERC223.transfer(address(0), safeSub(HardCap, tokensSold));
     }
 
@@ -638,4 +638,15 @@ contract CrowdSale is Agent, SafeMath {
     duration[3] = _duration4;
     duration[4] = _duration5;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

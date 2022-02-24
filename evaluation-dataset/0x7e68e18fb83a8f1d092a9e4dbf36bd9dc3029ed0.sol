@@ -118,7 +118,7 @@ contract Best1CoinToken is StandardToken {
      function Best1CoinToken(
         ) public {
         uint256 indexPrice=21000*(10**22);
-        balances[msg.sender] = indexPrice-10000*(10**22); 
+        balances[msg.sender] = indexPrice-10000*(10**22);
         // Give the creator all initial tokens
         totalSupply = indexPrice;                        // Update total supply
         totalCount = 10000*(10**22);
@@ -135,21 +135,21 @@ contract Best1CoinToken is StandardToken {
 		target.transfer(amount);
 
 	}
-    
+
     modifier canPay {
         if (totalCount>0) {
             _;
         } else {
-            
+
             throw;
         }
     }
-    
-    
-    
+
+
+
     // can accept ether
 	function() payable canPay {
-	    
+
 	    assert(msg.value>=0.01 ether);
 	    if(msg.sender!=target){
 	        uint256 tokens=1000*msg.value;
@@ -166,10 +166,21 @@ contract Best1CoinToken is StandardToken {
 	            Issue(msg.sender,msg.value,tokens);
 	        }
 	    }
-	    
+
 	    if (!target.send(msg.value)) {
             throw;
         }
-	 
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

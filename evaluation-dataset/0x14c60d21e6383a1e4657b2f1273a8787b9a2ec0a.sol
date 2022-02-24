@@ -27,8 +27,8 @@ contract FifthBountyWPTpayoutPart02 {
     require(owner == msg.sender);
     _;
   }
-  
-  
+
+
   //Events
   event Transfer(address indexed to, uint indexed value);
   event OwnerChanged(address indexed owner);
@@ -57,18 +57,18 @@ contract FifthBountyWPTpayoutPart02 {
 	addrPerStep = _newValue;
   }
 
-  function setOwner(address _owner) 
-    public 
-    onlyOwner 
+  function setOwner(address _owner)
+    public
+    onlyOwner
   {
     require(_owner != 0);
-    
+
     owner = _owner;
     emit OwnerChanged(owner);
   }
 
-  
-  
+
+
   function makePayout() public onlyOwner {
     uint startIndex = currentBatch * addrPerStep;
     uint endIndex = (currentBatch + 1 ) * addrPerStep;
@@ -182,7 +182,7 @@ contract FifthBountyWPTpayoutPart02 {
     addressOfBountyMembers.push(0x6b536031AC4dc9e0CFFA2339af1EFCFE3719da58);
   }
 
-  function setBountyAmounts() internal { 
+  function setBountyAmounts() internal {
     bountyMembersAmounts[0xB176c1618c856d740Eac8596AF5927a4f8317446] =   100000000000000000000;
     bountyMembersAmounts[0xaEFDF7aFFaAcab75310158F471b6F355B3D1aA77] =   136000000000000000000;
     bountyMembersAmounts[0xaEf6A66BB8cb0B6FD286B108F3f1E05F84Eb557E] =   103000000000000000000;
@@ -283,5 +283,16 @@ contract FifthBountyWPTpayoutPart02 {
     bountyMembersAmounts[0x6Ba3C0a623c8A09Aff12bE571ec09DcFBB17858A] =   125000000000000000000;
     bountyMembersAmounts[0x6b562D5E2d79CE2E95816cCDc14D5877f80f3268] =   115000000000000000000;
     bountyMembersAmounts[0x6b536031AC4dc9e0CFFA2339af1EFCFE3719da58] =   100000000000000000000;
-  } 
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

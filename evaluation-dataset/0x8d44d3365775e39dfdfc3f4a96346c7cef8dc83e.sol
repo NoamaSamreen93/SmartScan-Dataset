@@ -671,9 +671,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "MIGRATIC";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xb65695c2852CfA2FFB1a70B094CB4F0391C3Da01;
-    
+
     uint public constant START_TIME = 1562558400;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -681,9 +681,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -707,5 +707,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

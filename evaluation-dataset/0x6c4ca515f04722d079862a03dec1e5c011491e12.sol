@@ -26,10 +26,10 @@ contract ToadFarmer {
         hatcheryToad[msg.sender] = SafeMath.add(hatcheryToad[msg.sender], newToad);
         claimedEggs[msg.sender] = 0;
         lastHatch[msg.sender] = now;
-        
+
         // Send referral eggs
         claimedEggs[referrals[msg.sender]] = SafeMath.add(claimedEggs[referrals[msg.sender]], SafeMath.div(eggsUsed, 5));
-        
+
         // Boost market to stop toad hoarding
         marketEggs = SafeMath.add(marketEggs, SafeMath.div(eggsUsed, 10));
     }
@@ -45,7 +45,7 @@ contract ToadFarmer {
         ceoAddress.transfer(fee);
         msg.sender.transfer(SafeMath.sub(eggValue, fee));
     }
-    
+
     function buyEggs() public payable {
         require(initialized);
         uint256 eggsBought = calculateEggBuy(msg.value, SafeMath.sub(address(this).balance, msg.value));
@@ -153,4 +153,12 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

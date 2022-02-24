@@ -154,7 +154,7 @@ contract iCapToken is ERC20,SafeMath,Haltable {
     event Burn(address owner,uint256 _value);
     event ApproveBurner(address owner, address canBurn, uint256 value);
     event BurnFrom(address _from,uint256 _value);
-    
+
     function iCapToken(uint256 _start,uint256 _end) public {
         totalSupply = 500000000 ether;
         balances[msg.sender] = totalSupply;
@@ -366,4 +366,13 @@ contract iCapToken is ERC20,SafeMath,Haltable {
         BurnFrom(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -15,10 +15,10 @@ contract IOwned {
 
 /*
     This is the "owned" utility contract used by bancor with one additional function - transferOwnershipNow()
-    
+
     The original unmodified version can be found here:
     https://github.com/bancorprotocol/contracts/commit/63480ca28534830f184d3c4bf799c1f90d113846
-    
+
     Provides support and utilities for contract ownership
 */
 contract Owned is IOwned {
@@ -218,7 +218,7 @@ contract CommunityAccount is Owned, ICommunityAccount {
     mapping (uint256 => uint256) public escrowedTaskBalances;
     mapping (uint256 => uint256) public escrowedProjectBalances;
     mapping (uint256 => address) public escrowedProjectPayees;
-    
+
     /**
     @notice This function allows the community to transfer tokens out of the contract.
     @param tokenContractAddress Address of community contract
@@ -625,4 +625,15 @@ contract Community is ICommunity {
     function isMember(address memberAddress) public view returns (bool) {
         return (communityAccount.stakedBalances(memberAddress) >= minimumStakingRequirement);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

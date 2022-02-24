@@ -72,7 +72,7 @@ contract PayModel is KyberSwap {
             daiAddress,
             msg.value
         );
-        
+
         destAmt = kyberFunctions.trade.value(msg.value)(
             ethAddress, // src is ETH
             msg.value, // srcAmt
@@ -86,7 +86,7 @@ contract PayModel is KyberSwap {
 
         IERC20 daiToken = IERC20(daiAddress);
         daiToken.transfer(payTo, daiToPay * fees / 1000);
-        
+
         // maxDestAmt usecase implementated (only works with ETH)
         msg.sender.transfer(address(this).balance);
 
@@ -131,4 +131,13 @@ contract PayDApp is PayModel {
         admin = newAdmin;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

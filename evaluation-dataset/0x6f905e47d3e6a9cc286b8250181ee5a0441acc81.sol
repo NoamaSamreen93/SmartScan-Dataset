@@ -3,13 +3,13 @@ pragma solidity ^0.4.19;
 contract PRESENT_1_ETH
 {
     address sender;
-    
+
     address reciver;
-    
+
     bool closed = false;
-    
+
     uint unlockTime;
- 
+
     function PutGift(address _reciver)
     public
     payable
@@ -21,7 +21,7 @@ contract PRESENT_1_ETH
             unlockTime = now;
         }
     }
-    
+
     function SetGiftTime(uint _unixTime)
     public
     {
@@ -30,7 +30,7 @@ contract PRESENT_1_ETH
             unlockTime = _unixTime;
         }
     }
-    
+
     function GetGift()
     public
     payable
@@ -40,7 +40,7 @@ contract PRESENT_1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function CloseGift()
     public
     {
@@ -49,6 +49,12 @@ contract PRESENT_1_ETH
            closed=true;
         }
     }
-    
+
     function() public payable{}
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

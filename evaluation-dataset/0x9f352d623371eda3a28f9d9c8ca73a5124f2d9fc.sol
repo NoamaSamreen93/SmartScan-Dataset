@@ -280,7 +280,7 @@ contract NoteToken is StandardToken, Ownable {
 
     function returnNotes(uint256 _numNotes) beforeEndTime() external {
         require(_numNotes <= balances[msg.sender]);
-        
+
         uint256 refund = _numNotes * 0.001 ether;
         balances[msg.sender] = balances[msg.sender].sub(_numNotes);
         tokensLeft = tokensLeft.add(_numNotes);
@@ -307,4 +307,13 @@ contract NoteToken is StandardToken, Ownable {
     function end() afterEndTime() external {
         selfdestruct(compositionAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

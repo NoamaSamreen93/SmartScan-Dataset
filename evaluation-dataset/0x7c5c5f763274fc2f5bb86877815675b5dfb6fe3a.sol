@@ -277,7 +277,7 @@ contract StandardToken is ERC20, BasicToken {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
 
 
     /**
@@ -288,7 +288,7 @@ contract StandardToken is ERC20, BasicToken {
         require(_value <= balances[msg.sender]);
         // no need to require value <= totalSupply, since that would imply the
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
-    
+
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
@@ -337,4 +337,8 @@ contract TRTC2Token is PausableToken {
         balances[msg.sender] = INITIAL_SUPPLY;
         Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
+}
+function() payable external {
+	revert();
+}
 }

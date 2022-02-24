@@ -127,11 +127,11 @@ contract Rollback is Owned, ApprovalReceiver {
 
 
     using SafeMath for uint256;
-    
+
     Token public token = Token(0xD850942eF8811f2A866692A623011bDE52a462C1);
 
     uint256 public totalSetCredit;                  //set ven that should be returned
-    uint256 public totalReturnedCredit;             //returned ven  
+    uint256 public totalReturnedCredit;             //returned ven
 
     struct Credit {
         uint128 total;
@@ -156,10 +156,10 @@ contract Rollback is Owned, ApprovalReceiver {
         token.transfer(_address, _amount);
     }
 
-    function setCredit(address _account, uint256 _amount) onlyOwner { 
+    function setCredit(address _account, uint256 _amount) onlyOwner {
 
         totalSetCredit += _amount;
-        totalSetCredit -= credits[_account].total;        
+        totalSetCredit -= credits[_account].total;
 
         credits[_account].total = _amount.toUINT128();
         require(credits[_account].total >= credits[_account].used);
@@ -168,7 +168,7 @@ contract Rollback is Owned, ApprovalReceiver {
 
     function getCredit(address _account) constant returns (uint256 total, uint256 used) {
         return (credits[_account].total, credits[_account].used);
-    }    
+    }
 
     function receiveApproval(address _from, uint256 _value, address /*_tokenContract*/, bytes /*_extraData*/) {
         require(msg.sender == address(token));
@@ -177,7 +177,7 @@ contract Rollback is Owned, ApprovalReceiver {
         uint256 remainedCredit = credits[_from].total - credits[_from].used;
 
         if(_value > remainedCredit)
-            _value = remainedCredit;  
+            _value = remainedCredit;
 
         uint256 balance = token.balanceOf(_from);
         if(_value > balance)
@@ -194,7 +194,15 @@ contract Rollback is Owned, ApprovalReceiver {
         totalReturnedCredit +=_value;
 
         _from.transfer(ethAmount);
-        
+
         onReturned(_from, _value, ethAmount);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

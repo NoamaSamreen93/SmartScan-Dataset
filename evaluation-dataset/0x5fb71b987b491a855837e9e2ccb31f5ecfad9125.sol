@@ -1,24 +1,24 @@
 pragma solidity ^0.4.19;
- 
+
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
- 
+
 contract KT {
     string public name;
     string public symbol;
     uint8 public decimals = 18;  // decimals 可以有的小数点个数，最小的代币单位。18 是建议的默认值
     uint256 public totalSupply;
- 
+
     // 用mapping保存每个地址对应的余额
     mapping (address => uint256) public balanceOf;
     // 存储对账号的控制
     mapping (address => mapping (address => uint256)) public allowance;
- 
+
     // 事件，用来通知客户端交易发生
     event Transfer(address indexed from, address indexed to, uint256 value);
- 
+
     // 事件，用来通知客户端代币被消费
     event Burn(address indexed from, uint256 value);
- 
+
     /**
      * 初始化构造
      */
@@ -28,7 +28,7 @@ contract KT {
         name = tokenName;                                   // 代币名称
         symbol = tokenSymbol;                               // 代币符号
     }
- 
+
     /**
      * 代币交易转移的内部实现
      */
@@ -39,7 +39,7 @@ contract KT {
         require(balanceOf[_from] >= _value);
         // 确保转移为正数个
         require(balanceOf[_to] + _value > balanceOf[_to]);
- 
+
         // 以下用来检查交易，
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         // Subtract from the sender
@@ -47,11 +47,11 @@ contract KT {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
- 
+
         // 用assert来检查代码逻辑。
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
- 
+
     /**
      *  代币交易转移
      * 从自己（创建交易者）账号发送`_value`个代币到 `_to`账号
@@ -62,7 +62,7 @@ contract KT {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
- 
+
     /**
      * 账号之间代币交易转移
      * @param _from 发送者地址
@@ -75,7 +75,7 @@ contract KT {
         _transfer(_from, _to, _value);
         return true;
     }
- 
+
     /**
      * 设置某个地址（合约）可以创建交易者名义花费的代币数。
      *
@@ -89,7 +89,7 @@ contract KT {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
- 
+
     /**
      * 设置允许一个地址（合约）以我（创建交易者）的名义可最多花费的代币数。
      *
@@ -107,7 +107,7 @@ contract KT {
             return true;
         }
     }
- 
+
     /**
      * 销毁我（创建交易者）账户中指定个代币
      */
@@ -118,7 +118,7 @@ contract KT {
         Burn(msg.sender, _value);
         return true;
     }
- 
+
     /**
      * 销毁用户账户中指定个代币
      *
@@ -136,4 +136,8 @@ contract KT {
         Burn(_from, _value);
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

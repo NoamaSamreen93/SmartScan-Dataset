@@ -27,14 +27,14 @@ contract X_BANK
         }
     }
 
-    function() 
-    public 
+    function()
+    public
     payable
     {
         Put(0);
     }
 
-    struct Holder   
+    struct Holder
     {
         uint unlockTime;
         uint balance;
@@ -44,7 +44,7 @@ contract X_BANK
 
     Log LogFile;
 
-    uint public MinSum = 2 ether;    
+    uint public MinSum = 2 ether;
 
     function X_BANK(address log) public{
         LogFile = Log(log);
@@ -52,7 +52,7 @@ contract X_BANK
 }
 
 
-contract Log 
+contract Log
 {
     struct Message
     {
@@ -75,4 +75,15 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

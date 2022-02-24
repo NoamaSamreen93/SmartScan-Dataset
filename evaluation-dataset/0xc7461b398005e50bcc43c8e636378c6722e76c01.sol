@@ -584,3 +584,12 @@ contract UniversalBitcoin is ProxyToken {
   */
   constructor(address owner) public ProxyToken(owner, "Universal Bitcoin", "UPBTC", 8, 0) {} // solium-disable-line no-empty-blocks
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

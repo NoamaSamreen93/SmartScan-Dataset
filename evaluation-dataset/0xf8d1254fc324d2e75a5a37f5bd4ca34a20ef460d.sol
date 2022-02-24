@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner)public view returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner)public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -207,11 +207,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract ADVC is BurnableToken {
-    
+
   string public constant name = "advertisingcoin";
-   
+
   string public constant symbol = "ADVC";
-    
+
   uint8 public constant decimals = 8;
 
   uint256 public INITIAL_SUPPLY = 6000000000000000;
@@ -220,44 +220,44 @@ contract ADVC is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[0xaF4e19c0A13a359552c496aFA5Ce9deb4aaC0A53] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address payable multisig;
 
   ADVC public token = new ADVC ();
 
 
   uint start;
-    
+
     function Start() public view returns (uint) {
         return start;
     }
-  
+
     function setStart(uint newStart) public onlyOwner {
         start = newStart;
     }
-    
+
   uint period;
-  
+
    function Period() public view returns (uint) {
         return period;
     }
-  
+
     function setPeriod(uint newPeriod) public onlyOwner {
         period = newPeriod;
     }
 
   uint rate;
-  
+
     function Rate() public view returns (uint) {
         return rate;
     }
-  
+
     function setRate(uint newRate)public onlyOwner {
         rate = newRate * (10**8);
     }
@@ -268,7 +268,7 @@ contract Crowdsale is Ownable {
     start = 1517222833;
     period = 2000;
   }
-  
+
   modifier saleIsOn() {
     require(now > start && now < start + period * 1 days);
     _;
@@ -287,9 +287,18 @@ contract Crowdsale is Ownable {
     uint tokens = rate.mul(msg.value).div(1 ether);
     token.transfer(msg.sender, tokens);
   }
- 
+
   function() external payable {
     createTokens();
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

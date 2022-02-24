@@ -65,7 +65,7 @@ contract Coin {
 contract MultiOwnable {
     address public root;
     mapping (address => address) public owners; // owner => parent of owner
-    
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
@@ -74,7 +74,7 @@ contract MultiOwnable {
         root= msg.sender;
         owners[root]= root;
     }
-    
+
     /**
     * @dev Throws if called by any account other than the owner.
     */
@@ -82,7 +82,7 @@ contract MultiOwnable {
         require(owners[msg.sender] != 0);
         _;
     }
-    
+
     /**
     * @dev Adding new owners
     */
@@ -91,7 +91,7 @@ contract MultiOwnable {
         owners[_owner]= msg.sender;
         return true;
     }
-    
+
     /**
      * @dev Deleting owners
      */
@@ -110,7 +110,7 @@ contract MultiOwnable {
  */
 contract KStarCoinSale is MultiOwnable {
     using SafeMath for uint256;
-    
+
     eICOLevel public level;
     uint256 public rate;
     uint256 public minWei;
@@ -123,9 +123,9 @@ contract KStarCoinSale is MultiOwnable {
         require(level != eICOLevel.C_ICO_END);
         _;
     }
-    
+
     enum eICOLevel { C_ICO_PRESALE, C_ICO_ONSALE, C_ICO_END }
-    
+
     Coin public coin;
     address public wallet;
 
@@ -133,7 +133,7 @@ contract KStarCoinSale is MultiOwnable {
     function KStarCoinSale(Coin _coin, address _wallet) public {
         require(_coin != address(0));
         require(_wallet != address(0));
-        
+
         coin= _coin;
         wallet= _wallet;
 
@@ -141,46 +141,57 @@ contract KStarCoinSale is MultiOwnable {
                         3750,       // 3000 is default, +750 is pre-sale bonus
                         1e5 szabo); // = 0.1 ether
     }
-    
+
     // Update variables related to crowdfunding
     function updateICOVars(eICOLevel _level, uint _rate, uint _minWei) onlyOwner public returns (bool) {
         require(checkValidLevel(_level));
         require(_rate != 0);
         require(_minWei >= 1 szabo);
-        
+
         level= _level;
         rate= _rate;
         minWei= _minWei;
-        
+
         ICOVarsChange(level, rate, minWei);
         return true;
     }
-    
+
     function () external payable {
         buyCoin(msg.sender);
     }
-    
+
     function buyCoin(address beneficiary) onSale public payable {
         require(beneficiary != address(0));
         require(msg.value >= minWei);
 
         // calculate token amount to be created
         uint256 coins= getCoinAmount(msg.value);
-        
-        // update state 
+
+        // update state
         coin.sell(beneficiary, coins, "");
-        
+
         forwardFunds();
     }
 
     function getCoinAmount(uint256 weiAmount) internal view returns(uint256) {
         return weiAmount.mul(rate);
     }
-  
+
     // send ether to the fund collection wallet
     function forwardFunds() internal {
         wallet.transfer(msg.value);
     }
-    
+
     event ICOVarsChange(eICOLevel level, uint256 rate, uint256 minWei);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

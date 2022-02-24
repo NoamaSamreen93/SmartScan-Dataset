@@ -1019,3 +1019,12 @@ contract PumaPayPullPayment is PayableOwnable {
         return address(_address).balance <= MINIMUM_AMOUNT_OF_ETH_FOR_OPERATORS;
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

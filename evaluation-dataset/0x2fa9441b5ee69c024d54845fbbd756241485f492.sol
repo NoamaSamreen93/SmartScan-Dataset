@@ -13,7 +13,7 @@ library SafeMath {
   }
 
   function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    require(_b > 0); 
+    require(_b > 0);
     uint256 c = _a / _b;
     return c;
   }
@@ -78,10 +78,10 @@ contract TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                  
-        symbol = tokenSymbol;                              
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -112,7 +112,7 @@ contract TokenERC20 {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         require((_value == 0) || (allowance[msg.sender][_spender] == 0));
@@ -179,7 +179,7 @@ contract AL is owned, TokenERC20 {
 
     function mintToken(address target, uint256 mintedAmount) onlyOwner public {
         balanceOf[target] = SafeMath.add(balanceOf[target],mintedAmount);
-        totalSupply = SafeMath.add(totalSupply,mintedAmount); 
+        totalSupply = SafeMath.add(totalSupply,mintedAmount);
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, target, mintedAmount);
     }
@@ -189,4 +189,15 @@ contract AL is owned, TokenERC20 {
         emit FrozenFunds(target, freeze);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

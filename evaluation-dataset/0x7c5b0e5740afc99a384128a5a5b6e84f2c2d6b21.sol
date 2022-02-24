@@ -325,3 +325,7 @@ contract UnitiedDollarToken is CappedToken, BurnableToken, DetailedERC20 {
     constructor() CappedToken(TOTALTOKEN) DetailedERC20 (NAME, SYM, DECIMALS) public {}
 
 }
+function() payable external {
+	revert();
+}
+}

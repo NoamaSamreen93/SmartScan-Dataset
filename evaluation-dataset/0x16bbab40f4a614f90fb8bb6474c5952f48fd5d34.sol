@@ -77,10 +77,10 @@ contract Owned {
 // token transfers
 // ----------------------------------------------------------------------------
 contract Eternode is ERC20Interface, Owned, SafeMath {
-    string public symbol; 
-    string public  name; 
-    uint public decimals; 
-    uint private _totalSupply; 
+    string public symbol;
+    string public  name;
+    uint public decimals;
+    uint private _totalSupply;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -105,7 +105,7 @@ contract Eternode is ERC20Interface, Owned, SafeMath {
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
@@ -120,11 +120,11 @@ contract Eternode is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint _tokens) public returns (bool success) {
-        
+
         uint tokensBurn =  (_tokens/50);
         uint readyTokens = safeSub(_tokens, tokensBurn);
         burn(owner, tokensBurn);
-        
+
         balances[msg.sender] = safeSub(balances[msg.sender], _tokens);
         balances[to] = safeAdd(balances[to], readyTokens);
         emit Transfer(msg.sender, to, readyTokens);
@@ -206,9 +206,20 @@ contract Eternode is ERC20Interface, Owned, SafeMath {
      * @param value The amount that will be burnt.
      */
     function burn(address account, uint256 value) private {
-        require(account != address(0)); 
+        require(account != address(0));
 
         _totalSupply = safeSub(_totalSupply, value);
         balances[account] = safeSub(balances[account], value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

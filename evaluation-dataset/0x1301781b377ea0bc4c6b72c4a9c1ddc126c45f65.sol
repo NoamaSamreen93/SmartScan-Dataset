@@ -1,17 +1,17 @@
 pragma solidity ^0.4.16;
 
-interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }  
+interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract TokenERC20  {
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 18; 
+    uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
 
     // This creates an array with all balances
-    mapping (address => uint256) public balanceOf;   
+    mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
     // This generates a public event on the blockchain that will notify clients
@@ -31,7 +31,7 @@ contract TokenERC20  {
         name = tokenName;						 				// Set the name for display purposes
         symbol = tokenSymbol;									// Set the symbol for display purposes
     }
-   
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -146,4 +146,15 @@ contract TokenERC20  {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

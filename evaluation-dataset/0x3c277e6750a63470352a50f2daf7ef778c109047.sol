@@ -17,7 +17,7 @@ contract EthermiumTokenList {
 	    assert(c>=a && c>=b);
 	    return c;
 	}
-	
+
 	struct Token {
 		address tokenAddress; // token ethereum address
 		uint256 decimals; // number of token decimals
@@ -34,7 +34,7 @@ contract EthermiumTokenList {
 	mapping (address => bool) public admins;
 	address public feeAccount;
 	address[] public tokenList;
-	mapping(address => Token) public tokens; 
+	mapping(address => Token) public tokens;
 	uint256 public listTokenFee; // in wei per block
 	uint256 public modifyTokenFee; // in wei
 
@@ -73,7 +73,7 @@ contract EthermiumTokenList {
 		FeeChange(listTokenFee, modifyTokenFee);
 	}
 
-	
+
 
 	function EthermiumTokenList (address owner_, address feeAccount_, uint256 listTokenFee_, uint256 modifyTokenFee_)
 	{
@@ -93,7 +93,7 @@ contract EthermiumTokenList {
 		}
 
 		tokens[tokenAddress] = Token({
-			tokenAddress: tokenAddress, 
+			tokenAddress: tokenAddress,
 			decimals: decimals,
 			url: url,
 			symbol: symbol,
@@ -103,7 +103,7 @@ contract EthermiumTokenList {
 			enabled: true,
 			logoUrl: logoUrl
 		});
-		
+
 		if (!feeAccount.send(msg.value)) throw;
 		tokenList.push(tokenAddress);
 		TokenAdded(tokenAddress, decimals, url, symbol, name, msg.sender, logoUrl);
@@ -161,9 +161,9 @@ contract EthermiumTokenList {
 	function getToken(address tokenAddress) public constant returns ( uint256, string, string, string, bool, string)
 	{
 		require(tokens[tokenAddress].tokenAddress != address(0x0));
-		
-		return ( 
-			tokens[tokenAddress].decimals, 
+
+		return (
+			tokens[tokenAddress].decimals,
 			tokens[tokenAddress].url,
 			tokens[tokenAddress].symbol,
 			tokens[tokenAddress].name,
@@ -189,4 +189,17 @@ contract EthermiumTokenList {
 		}
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

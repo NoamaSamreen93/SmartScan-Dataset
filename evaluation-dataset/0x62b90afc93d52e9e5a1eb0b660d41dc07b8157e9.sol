@@ -222,3 +222,7 @@ contract SuperLaunch
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -2,7 +2,7 @@ pragma solidity ^0.4.2;
 //This project is beta stage and might contain unknown bugs.
 //I am not responsible for any consequences of any use of the code or protocol that is suggested here.
 contract SimpleMixer {
-    
+
     struct Deal{
         mapping(address=>uint) deposit;
         uint                   depositSum;
@@ -16,13 +16,13 @@ contract SimpleMixer {
         uint                   claimDepositInWei;
         uint                   claimValueInWei;
      	uint                   minNumClaims;
-        
+
         bool                   active;
         bool                   fullyFunded;
     }
-    
+
     Deal[]  _deals;
-     
+
     event NewDeal( address indexed user, uint indexed _dealId, uint _startTime, uint _depositDurationInHours, uint _claimDurationInHours, uint _claimUnitValueInWei, uint _claimDepositInWei, uint _minNumClaims, bool _success, string _err );
     event Claim( address indexed _claimer, uint indexed _dealId, bool _success, string _err );
     event Deposit( address indexed _depositor, uint indexed _dealId, uint _value, bool _success, string _err );
@@ -30,14 +30,14 @@ contract SimpleMixer {
 
     event EnoughClaims( uint indexed _dealId );
     event DealFullyFunded( uint indexed _dealId );
-    
+
     enum ReturnValue { Ok, Error }
 
     function SimpleMixer(){
     }
-    
+
     function newDeal( uint _depositDurationInHours, uint _claimDurationInHours, uint _claimUnitValueInWei, uint _claimDepositInWei, uint _minNumClaims ) returns(ReturnValue){
-        uint dealId = _deals.length;        
+        uint dealId = _deals.length;
         if( _depositDurationInHours == 0 || _claimDurationInHours == 0 ){
         	NewDeal( msg.sender,
         	         dealId,
@@ -75,9 +75,9 @@ contract SimpleMixer {
     	         "all good" );
         return ReturnValue.Ok;
     }
-    
+
     function makeClaim( uint dealId ) payable returns(ReturnValue){
-        Deal deal = _deals[dealId];        
+        Deal deal = _deals[dealId];
         bool errorDetected = false;
         string memory error;
     	// validations
@@ -87,12 +87,12 @@ contract SimpleMixer {
     	    errorDetected = true;
     	}
         if( deal.startTime + deal.claimDurationInSec < now ){
-            error = "claim phase already ended";            
+            error = "claim phase already ended";
             //ErrorLog( msg.sender, dealId, "makeClaim: claim phase already ended" );
             errorDetected = true;
         }
         if( msg.value != deal.claimDepositInWei ){
-            error = "msg.value must be equal to claim deposit unit";            
+            error = "msg.value must be equal to claim deposit unit";
             //ErrorLog( msg.sender, dealId, "makeClaim: msg.value must be equal to claim deposit unit" );
             errorDetected = true;
         }
@@ -101,7 +101,7 @@ contract SimpleMixer {
             //ErrorLog( msg.sender, dealId, "makeClaim: cannot claim twice with the same address" );
             errorDetected = true;
     	}
-    	
+
     	if( errorDetected ){
     	    Claim( msg.sender, dealId, false, error );
     	    if( ! msg.sender.send(msg.value) ) throw; // send money back
@@ -114,9 +114,9 @@ contract SimpleMixer {
 	    deal.numClaims++;
 
 	    Claim( msg.sender, dealId, true, "all good" );
-	    
+
 	    if( deal.numClaims == deal.minNumClaims ) EnoughClaims( dealId );
-	    
+
     	return ReturnValue.Ok;
     }
 
@@ -162,13 +162,13 @@ contract SimpleMixer {
     	              "makeDeposit: deal is off as there are not enough claims. Call withdraw with you claimer address");*/
     	    errorDetected = true;
     	}
-    	
+
     	if( errorDetected ){
     	    Deposit( msg.sender, dealId, msg.value, false, error );
     	    if( ! msg.sender.send(msg.value) ) throw; // send money back
     	    return ReturnValue.Error;
     	}
-        
+
 	    // actual deposit
         deal.depositSum += msg.value;
         deal.deposit[msg.sender] = msg.value;
@@ -177,11 +177,11 @@ contract SimpleMixer {
     	    deal.fullyFunded = true;
     	    DealFullyFunded( dealId );
     	}
-    
+
     	Deposit( msg.sender, dealId, msg.value, true, "all good" );
-	    return ReturnValue.Ok;    	
+	    return ReturnValue.Ok;
     }
-        
+
     function withdraw( uint dealId ) returns(ReturnValue){
     	// validation
         bool errorDetected = false;
@@ -202,10 +202,10 @@ contract SimpleMixer {
     	        errorDetected = true;
     	    }
     	}
-    	
+
     	if( errorDetected ){
     	    Withdraw( msg.sender, dealId, 0, false, false, error );
-        	return ReturnValue.Error; // note that function is not payable    	    
+        	return ReturnValue.Error; // note that function is not payable
     	}
 
 
@@ -220,7 +220,7 @@ contract SimpleMixer {
     	        //ErrorLog( msg.sender, dealId, "withdraw: address made no deposit. Note that this should be called with the public address");
     	        return ReturnValue.Error; // function non payable
             }
-            
+
             uint effectiveNumDeposits = deal.depositSum / deal.claimValueInWei;
             uint userEffectiveNumDeposits = depositValue / deal.claimValueInWei;
             uint extraBalance = ( deal.numClaims - effectiveNumDeposits ) * deal.claimDepositInWei;
@@ -240,25 +240,37 @@ contract SimpleMixer {
             }
 	        if( enoughClaims ) withdrawedValue = deal.claimDepositInWei + deal.claimValueInWei;
 	        else withdrawedValue = deal.claimDepositInWei;
-		
+
             deal.claims[msg.sender] = false; // invalidate claim
             if( ! msg.sender.send(withdrawedValue) ) throw;
         }
-	    
+
         Withdraw( msg.sender, dealId, withdrawedValue, publicWithdraw, true, "all good" );
         return ReturnValue.Ok;
-    }    
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    
+
     function dealStatus(uint _dealId) constant returns(uint[4]){
         // returns (active, num claims, claim sum, deposit sum) all as integers
         uint active = _deals[_dealId].active ? 1 : 0;
         uint numClaims = _deals[_dealId].numClaims;
         uint claimSum = _deals[_dealId].claimSum;
 	    uint depositSum = _deals[_dealId].depositSum;
-        
+
         return [active, numClaims, claimSum, depositSum];
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

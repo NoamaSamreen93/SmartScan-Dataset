@@ -29,19 +29,19 @@ contract POWH {
 
 contract CharityMiner {
     using SafeMath for uint256;
-    
+
     // Modifiers
     modifier notP3d(address aContract) {
         require(aContract != address(p3d));
         _;
     }
-    
+
     // Events
     event Deposit(uint256 amount, address depositer, uint256 donation);
     event Withdraw(uint256 tokens, address depositer, uint256 tokenValue, uint256 donation);
     event Dividends(uint256 amount, address sender);
     event Paused(bool paused);
-    
+
     // Public Variables
     bool public paused = false;
     address public charityAddress = 0x8f951903C9360345B4e1b536c7F5ae8f88A64e79; // Giveth
@@ -55,32 +55,32 @@ contract CharityMiner {
     uint public largestDonation;
     uint public currentHolders;
     uint public totalDividends;
-    
+
     // Public Mappings
     mapping( address => bool ) public donor;
     mapping( address => uint256 ) public userTokens;
     mapping( address => uint256 ) public userDonations;
-    
+
     // PoWH Contract
     POWH p3d;
-	
+
 	// Constructor
 	constructor(address powh) public {
 	    p3d = POWH(powh);
 	    P3DAddress = powh;
 	    owner = msg.sender;
 	}
-	
+
 	// Pause
 	// - In case charity address is no longer active or deposits have to be paused for unexpected reason
 	// - Cannot be paused while anyone owns tokens
 	function pause() public {
 	    require(msg.sender == owner && myTokens() == 0);
 	    paused = !paused;
-	    
+
 	    emit Paused(paused);
 	}
-	
+
 	// Fallback
 	// - Easy deposit, sets default feeDivisor
 	function() payable public {
@@ -96,87 +96,87 @@ contract CharityMiner {
 	function deposit(uint8 feeDivisor) payable public {
 	    require(msg.value > 100000 && !paused);
 	    require(feeDivisor >= 2 && feeDivisor <= 10); // 50% to 10% donation range
-	    
+
 	    // If we have divs, withdraw them
 	    uint divs = myDividends();
 	    if(divs > 0){
 	        p3d.withdraw();
 	    }
-	    
+
 	    // Split deposit
 	    uint fee = msg.value.div(feeDivisor);
 	    uint purchase = msg.value.sub(fee);
 	    uint donation = divs.add(fee);
-	    
+
 	    // Send donation
 	    charityAddress.transfer(donation);
-	    
+
 	    // Buy tokens
 	    uint tokens = myTokens();
 	    p3d.buy.value(purchase)(msg.sender);
 	    uint newTokens = myTokens().sub(tokens);
-	    
+
 	    // If new donor, add them to stats
 	    if(!donor[msg.sender]){
 	        donor[msg.sender] = true;
 	        totalDonors += 1;
 	        currentHolders += 1;
 	    }
-	    
+
 	    // If largest donor, update stats
 	    // Don't include dividends or token value in user donations
-	    if(fee > largestDonation){ 
+	    if(fee > largestDonation){
 	        largestDonation = fee;
 	        largestDonor = msg.sender;
 	    }
-	    
+
 	    // Update stats and storage
 	    totalDonations += 1;
 	    totalDonated += donation;
 	    totalDividends += divs;
 	    lastDonor = msg.sender;
-	    userDonations[msg.sender] = userDonations[msg.sender].add(fee); 
+	    userDonations[msg.sender] = userDonations[msg.sender].add(fee);
 	    userTokens[msg.sender] = userTokens[msg.sender].add(newTokens);
-	    
+
 	    // Deposit event
 	    emit Deposit(purchase, msg.sender, donation);
 	}
-	
+
 	// Withdraw
 	// - Sell user's tokens and withdraw the eth value, sends divs as donation
 	// - User doesn't get any of the excess divs
 	function withdraw() public {
 	    uint tokens = userTokens[msg.sender];
 	    require(tokens > 0);
-	    
+
 	    // Save divs and balance
 	    uint divs = myDividends();
 	    uint balance = address(this).balance;
-	    
+
 	    // Update before we sell
 	    userTokens[msg.sender] = 0;
-	    
+
 	    // Sell tokens and withdraw
 	    p3d.sell(tokens);
 	    p3d.withdraw();
-	    
+
 	    // Get value of sold tokens
 	    uint tokenValue = address(this).balance.sub(divs).sub(balance);
-	    
+
 	    // Send donation and payout
 	    charityAddress.transfer(divs);
 	    msg.sender.transfer(tokenValue);
-	    
+
 	    // Update stats
 	    totalDonated += divs;
 	    totalDividends += divs;
 	    totalDonations += 1;
 	    currentHolders -= 1;
-	    
+
 	    // Withdraw event
 	    emit Withdraw(tokens, msg.sender, tokenValue, divs);
 	}
-	
+
 	// SendDividends
 	// - Withdraw dividends and send as donation (can be called by anyone)
 	function sendDividends() public {
@@ -184,37 +184,37 @@ contract CharityMiner {
 	    // Don't want to spam them with tiny donations
 	    require(divs > 100000);
 	    p3d.withdraw();
-	    
+
 	    // Send donation
 	    charityAddress.transfer(divs);
-	    
+
 	    // Update stats
 	    totalDonated += divs;
 	    totalDividends += divs;
 	    totalDonations += 1;
-	    
+
 	    // Dividends event
 	    emit Dividends(divs, msg.sender);
 	}
-	
+
     // MyTokens
     // - Retun tokens owned by this contract
     function myTokens() public view returns(uint256) {
         return p3d.myTokens();
     }
-    
+
 	// MyDividends
 	// - Return contract's current dividends including referral bonus
 	function myDividends() public view returns(uint256) {
         return p3d.myDividends(true);
     }
-	
+
 	// Rescue function to transfer tokens. Cannot be used on P3D.
 	function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens) public notP3d(tokenAddress) returns (bool success) {
 		require(msg.sender == owner);
 		return ERC20Interface(tokenAddress).transfer(tokenOwner, tokens);
 	}
-    
+
 }
 
 
@@ -262,4 +262,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -12,7 +12,7 @@ contract ERC20Basic {
 
 contract Dist{
 
-    // public    
+    // public
     address public owner;
     address public tokenAddress; // 0x6781a0F84c7E9e846DCb84A9a5bd49333067b104 ZAP token mainnet address
     uint public unlockTime;
@@ -53,4 +53,20 @@ contract Dist{
         }
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

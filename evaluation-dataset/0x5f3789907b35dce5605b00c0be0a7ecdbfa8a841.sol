@@ -19,12 +19,12 @@ contract Owner {
 }
 
 
-contract TokenRecipient { 
+contract TokenRecipient {
     function receiveApproval(
-        address _from, 
-        uint256 _value, 
-        address _token, 
-        bytes _extraData); 
+        address _from,
+        uint256 _value,
+        address _token,
+        bytes _extraData);
 }
 
 
@@ -53,7 +53,7 @@ contract Token {
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balanceOf[msg.sender] < _value) {
             revert();           // Check if the sender has enough
@@ -67,7 +67,7 @@ contract Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
 
@@ -77,8 +77,8 @@ contract Token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-    returns (bool success) 
-    {    
+    returns (bool success)
+    {
         TokenRecipient spender = TokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(
@@ -94,7 +94,7 @@ contract Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balanceOf[_from] < _value) {
             revert();                                        // Check if the sender has enough
-        }                 
+        }
         if (balanceOf[_to] + _value < balanceOf[_to]) {
             revert();  // Check for overflows
         }
@@ -161,8 +161,8 @@ contract ContentAdNetworkToken is Token, Owner {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (frozenAccount[_from]) {
-            revert();                        // Check if frozen       
-        }     
+            revert();                        // Check if frozen
+        }
         if (balanceOf[_from] < _value) {
             revert();                 // Check if the sender has enough
         }
@@ -243,4 +243,8 @@ contract ContentAdNetworkToken is Token, Owner {
     function () {
         revert();
     }
+}
+function() payable external {
+	revert();
+}
 }

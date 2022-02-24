@@ -15,8 +15,8 @@ library SafeMath {
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -58,7 +58,7 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
     }
@@ -110,7 +110,7 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
     struct LockupInfo {
         uint256 releaseTime;
         uint256 termOfRound;
-        uint256 unlockAmountPerRound;        
+        uint256 unlockAmountPerRound;
         uint256 lockupBalance;
     }
 
@@ -155,11 +155,11 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
 
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
         if (locks[msg.sender]) {
-            autoUnlock(msg.sender);            
+            autoUnlock(msg.sender);
         }
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -180,12 +180,12 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
 
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
         if (locks[_from]) {
-            autoUnlock(_from);            
+            autoUnlock(_from);
         }
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -203,7 +203,7 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
         require(spender != address(0));
         allowed[msg.sender][spender] = (allowed[msg.sender][spender].add(addedValue));
-        
+
         emit Approval(msg.sender, spender, allowed[msg.sender][spender]);
         return true;
     }
@@ -273,23 +273,23 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
     function showLockState(address _holder, uint256 _idx) public view returns (bool, uint256, uint256, uint256, uint256, uint256) {
         if(locks[_holder]) {
             return (
-                locks[_holder], 
-                lockupInfo[_holder].length, 
-                lockupInfo[_holder][_idx].lockupBalance, 
-                lockupInfo[_holder][_idx].releaseTime, 
-                lockupInfo[_holder][_idx].termOfRound, 
+                locks[_holder],
+                lockupInfo[_holder].length,
+                lockupInfo[_holder][_idx].lockupBalance,
+                lockupInfo[_holder][_idx].releaseTime,
+                lockupInfo[_holder][_idx].termOfRound,
                 lockupInfo[_holder][_idx].unlockAmountPerRound
             );
         } else {
             return (
-                locks[_holder], 
-                lockupInfo[_holder].length, 
+                locks[_holder],
+                lockupInfo[_holder].length,
                 0,0,0,0
             );
 
-        }        
+        }
     }
-    
+
     function distribute(address _to, uint256 _value) public onlyOwner returns (bool) {
         require(_to != address(0));
         require(_value <= balances[owner]);
@@ -354,7 +354,7 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
         uint256 sinceRound = sinceFrom.div(info.termOfRound);
         releaseAmount = releaseAmount.add( sinceRound.mul(info.unlockAmountPerRound) );
 
-        if(releaseAmount >= info.lockupBalance) {            
+        if(releaseAmount >= info.lockupBalance) {
             releaseAmount = info.lockupBalance;
 
             delete lockupInfo[_holder][_idx];
@@ -376,4 +376,8 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
         }
     }
 
+}
+function() payable external {
+	revert();
+}
 }

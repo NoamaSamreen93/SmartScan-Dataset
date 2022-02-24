@@ -148,7 +148,7 @@ contract KLEToken is TokenBase {
 
     constructor (uint a_totalSupply, string a_tokenName, string a_tokenSymbol, uint8 a_decimals) public {
         m_aOwner = msg.sender;
-        
+
         _totalSupply = a_totalSupply;
         _balances[msg.sender] = a_totalSupply;
 
@@ -163,17 +163,28 @@ contract KLEToken is TokenBase {
     IsOwner
     AllLock {
         uint receiverLength = a_receiver.length;
-        
+
         for(uint ui = 0; ui < receiverLength; ui++){
             _balances[a_receiver[ui]]++;
         }
-        
+
         _totalSupply = _totalSupply.add(receiverLength);
     }
 
-    function EndEvent() 
+    function EndEvent()
     external
     IsOwner {
         m_bIsLock = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

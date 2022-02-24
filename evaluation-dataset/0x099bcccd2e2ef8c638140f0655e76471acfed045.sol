@@ -2,7 +2,7 @@ pragma solidity ^0.5.7;
 
 contract Ownable {
     address public owner;
-    
+
     event SetOwner(address _owner);
 
     modifier onlyOwner() {
@@ -12,7 +12,7 @@ contract Ownable {
 
     constructor() public {
         emit SetOwner(msg.sender);
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     /**
@@ -25,7 +25,7 @@ contract Ownable {
         emit SetOwner(_to);
         owner = _to;
         return true;
-    } 
+    }
 }
 
 interface Oracle {
@@ -72,7 +72,7 @@ contract SimpleOracle is Ownable {
         uint256 rate,
         uint256 decimals
     );
-    
+
     event SetExpirationTime(uint256 _time);
     event SetUrl(string _url);
     event SetFallback(address _fallback);
@@ -88,7 +88,7 @@ contract SimpleOracle is Ownable {
 
     struct Rate {
         uint8 decimals;
-        uint40 timestamp; 
+        uint40 timestamp;
         uint208 value;
     }
 
@@ -120,7 +120,7 @@ contract SimpleOracle is Ownable {
         delegate = _delegate;
         emit SetDelegate(_delegate);
     }
-    
+
     function updateRate(
         bytes32 _currency,
         uint256 _value,
@@ -160,4 +160,15 @@ contract SimpleOracle is Ownable {
         emit DeliveredRate(msg.sender, _currency, rate.timestamp, rate.value, rate.decimals);
         return (rate.value, rate.decimals);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

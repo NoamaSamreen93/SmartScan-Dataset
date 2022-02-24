@@ -317,7 +317,7 @@ contract AdminableProxy is AdminUpgradeabilityProxy {
   /**
    * Contract constructor.
    */
-  constructor(address _implementation, bytes memory _data) 
+  constructor(address _implementation, bytes memory _data)
   AdminUpgradeabilityProxy(_implementation, _data) public payable {
   }
 
@@ -330,4 +330,13 @@ contract AdminableProxy is AdminUpgradeabilityProxy {
     return rv;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

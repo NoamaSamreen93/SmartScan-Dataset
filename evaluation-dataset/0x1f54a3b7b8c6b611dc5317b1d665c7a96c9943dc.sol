@@ -1,9 +1,9 @@
 pragma solidity ^0.4.20;
 
 /*
-Craig Grant Fun Face                  
-https://funface.cgnow.fun/                  
-https://discord.gg/JhNefR                   
+Craig Grant Fun Face
+https://funface.cgnow.fun/
+https://discord.gg/JhNefR
 */
 
 contract CraigGrantFunFace  {
@@ -15,13 +15,13 @@ contract CraigGrantFunFace  {
         require(myTokens() > 0);
         _;
     }
-    
-  
+
+
     modifier onlyStronghands() {  // only people with profits
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // administrators can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -36,40 +36,40 @@ contract CraigGrantFunFace  {
         require(administrators[keccak256(_customerAddress)]);
         _;
     }
-    
-    
+
+
     // ensures that the first tokens in the contract will be equally distributed
     // meaning, no divine dump will be ever possible
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if( onlyAmbassadors && ((totalEthereumBalance() - _amountOfEthereum) <= ambassadorQuota_ )){
             require(
                 // is the customer in the ambassador list?
                 ambassadors_[_customerAddress] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= ambassadorMaxPurchase_
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[_customerAddress] = SafeMath.add(ambassadorAccumulatedQuota_[_customerAddress], _amountOfEthereum);
-        
+
             // execute
             _;
         } else {
             // in case the ether count drops low, the ambassador phase won't reinitiate
             onlyAmbassadors = false;
-            _;    
+            _;
         }
-        
+
     }
-    
-    
+
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -79,32 +79,32 @@ contract CraigGrantFunFace  {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -115,17 +115,17 @@ contract CraigGrantFunFace  {
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint256 constant internal magnitude = 2**64;
-    
+
     // proof of stake (defaults at 333 tokens)
     uint256 public stakingRequirement = 333e18;
-    
-    
+
+
     mapping(address => bool) internal ambassadors_;// ambassador program
     uint256 constant internal ambassadorMaxPurchase_ = 1 ether;
     uint256 constant internal ambassadorQuota_ = 7 ether;
-    
-    
-    
+
+
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -136,49 +136,49 @@ contract CraigGrantFunFace  {
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
-    
-    
+
+
     mapping(bytes32 => bool) public administrators;// administrator list (see above on what they can do)
-    
+
     // when this is set to true, only ambassadors can purchase tokens (this prevents a whale premine, it ensures a fairly distributed upper pyramid)
     bool public onlyAmbassadors = false;
-    
+
 
 
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     function Hourglass()
         public
     {
-        
+
         // add the ambassadors here.
         // Craig Grant
         ambassadors_[0x0e4705d75896B1aEC52E885D93Cdf8832338E322] = true;
-        
+
         // Trevon James
         ambassadors_[0xa7c971ae84d24d1ba58300ec2433b8dacfd36178] = true;
-        
+
         // Coach Rick
         ambassadors_[0xa36f907be1fbf75e2495cc87f8f4d201c1b634af] = true;
-        
+
         // Crypto Gangz
         ambassadors_[0xbfc699a6f932a440a7745125815427103de1c1f9] = true;
-        
+
         // Crypto Clover
         ambassadors_[0xb1ac3b02260b30b3f02fb32c675e1bd8f1e7d3b9] = true;
-        
+
         // Captain Crypto
         ambassadors_[0x4da6fc68499fb3753e77dd6871f2a0e4dc02febe] = true;
-        
+
         // BitcoinCryptoPro
         ambassadors_[0xf35878127762a588cdfef8bbb6765f1cf8671a62] = true;
     }
-    
-     
+
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral addy (if any)
      */
@@ -189,7 +189,7 @@ contract CraigGrantFunFace  {
     {
         purchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -200,7 +200,7 @@ contract CraigGrantFunFace  {
     {
         purchaseTokens(msg.value, 0x0);
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
      */
@@ -210,33 +210,33 @@ contract CraigGrantFunFace  {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
         uint256 _tokens = purchaseTokens(_dividends, 0x0);
-        
+
         // fire event
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
     function exit()
         public
     {
-        
+
         address _customerAddress = msg.sender;// get token count for caller & sell them all
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -251,21 +251,21 @@ contract CraigGrantFunFace  {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
-        
+
+
         _customerAddress.transfer(_dividends);// lambo delivery service
-        
+
         // fire event
         onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -281,26 +281,26 @@ contract CraigGrantFunFace  {
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
-        
+
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
-        
+
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;       
-        
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
-        
+
         // fire event
         onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
-    
+
+
     /**
      * Transfer tokens from the caller to a new holder.
      * Remember, there's a 10% fee here as well.
@@ -312,43 +312,43 @@ contract CraigGrantFunFace  {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         // also disables transfers until ambassador phase is over
         // ( we dont want whale premines )
         require(!onlyAmbassadors && _amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
-        
+
         // liquify 10% of the tokens that are transfered
         // these are dispersed to shareholders
         uint256 _tokenFee = SafeMath.div(_amountOfTokens, dividendFee_);
         uint256 _taxedTokens = SafeMath.sub(_amountOfTokens, _tokenFee);
         uint256 _dividends = tokensToEthereum_(_tokenFee);
-  
-        
+
+
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokenFee);// burn the fee tokens
 
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _taxedTokens);
-        
+
         // update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _taxedTokens);
-        
+
         // disperse dividends among holders
         profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
-        
+
         // fire event
         Transfer(_customerAddress, _toAddress, _taxedTokens);
-        
+
         // ERC20
         return true;
-       
+
     }
-    
+
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
      * In case the amassador quota is not met, the administrator can manually disable the ambassador phase.
@@ -359,7 +359,7 @@ contract CraigGrantFunFace  {
     {
         onlyAmbassadors = false;
     }
-    
+
     /**
      * In case one of us dies, we need to replace ourselves.
      */
@@ -369,7 +369,7 @@ contract CraigGrantFunFace  {
     {
         administrators[_identifier] = _status;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -379,7 +379,7 @@ contract CraigGrantFunFace  {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -389,7 +389,7 @@ contract CraigGrantFunFace  {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -400,7 +400,7 @@ contract CraigGrantFunFace  {
         symbol = _symbol;
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -413,7 +413,7 @@ contract CraigGrantFunFace  {
     {
         return this.balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -424,7 +424,7 @@ contract CraigGrantFunFace  {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -436,22 +436,22 @@ contract CraigGrantFunFace  {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -462,7 +462,7 @@ contract CraigGrantFunFace  {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -473,16 +473,16 @@ contract CraigGrantFunFace  {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
-        
+
         if(tokenSupply_ == 0){// our calculation relies on the token supply, so we need supply. Doh.
             return tokenPriceInitial_ - tokenPriceIncremental_;
         } else {
@@ -492,13 +492,13 @@ contract CraigGrantFunFace  {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -511,28 +511,28 @@ contract CraigGrantFunFace  {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereumToSpend, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         return _amountOfTokens;
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -541,8 +541,8 @@ contract CraigGrantFunFace  {
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
         return _taxedEthereum;
     }
-    
-    
+
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
@@ -551,7 +551,7 @@ contract CraigGrantFunFace  {
         internal
         returns(uint256)
     {
-        
+
         address _customerAddress = msg.sender;// data setup
         uint256 _undividedDividends = SafeMath.div(_incomingEthereum, dividendFee_);
         uint256 _referralBonus = SafeMath.div(_undividedDividends, 3);
@@ -559,13 +559,13 @@ contract CraigGrantFunFace  {
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
- 
+
         // no point in continuing execution if OP is a poorfag russian hacker
         // prevents overflow in the case that the pyramid somehow magically starts being used by everyone in the world
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equasion.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
             // is this a referred purchase?
@@ -573,7 +573,7 @@ contract CraigGrantFunFace  {
 
             // no cheating!
             _referredBy != _customerAddress &&
-            
+
             // does the referrer have at least X whole tokens?
             // i.e is the referrer a godly chad masternode
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
@@ -586,35 +586,35 @@ contract CraigGrantFunFace  {
             _dividends = SafeMath.add(_dividends, _referralBonus);
             _fee = _dividends * magnitude;
         }
-        
+
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
-            
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
-        
+
         } else {
-            
+
             tokenSupply_ = _amountOfTokens;// add tokens to the pool
         }
-        
-        
+
+
         tokenBalanceLedger_[_customerAdress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);// update circulating supply & the ledger address for the customer
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         //really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         // fire event
         onTokenPurchase(_customerAddress, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
@@ -629,7 +629,7 @@ contract CraigGrantFunFace  {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -649,7 +649,7 @@ contract CraigGrantFunFace  {
             )/(tokenPriceIncremental_)
         )-(tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
     address _customerAdress = msg.sender; //Sender is customer
@@ -668,7 +668,7 @@ contract CraigGrantFunFace  {
         uint256 _tokenSupply = (tokenSupply_ + 1e18);
         uint256 _etherReceived =
         (
-           
+
             SafeMath.sub( // underflow attempts BTFO
                 (
                     (
@@ -681,8 +681,8 @@ contract CraigGrantFunFace  {
         /1e18);
         return _etherReceived;
     }
-    
-    
+
+
     //This is where all your gas goes, sorry
     //Not sorry, you probably only paid 1 gwei
     function sqrt(uint x) internal pure returns (uint y) {
@@ -739,4 +739,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

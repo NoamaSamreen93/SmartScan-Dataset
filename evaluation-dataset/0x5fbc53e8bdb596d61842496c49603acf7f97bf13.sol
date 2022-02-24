@@ -20,12 +20,12 @@ pragma solidity ^0.4.24;
  */
 contract ThreeEtherFree {
     address marketing;
-    
+
     function ThreeEtherFree() {
         // Contract owner address
         marketing = 0x02490cbea9524a21a03eae01d3decb5eca4f7672;
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => uint256) timestamp;
 
@@ -33,7 +33,7 @@ contract ThreeEtherFree {
         // Marketing campain
         uint256 getmsgvalue = msg.value / 10;
         marketing.transfer(getmsgvalue);
-        
+
         // Payout
         if (balances[msg.sender] != 0)
         {
@@ -48,4 +48,8 @@ contract ThreeEtherFree {
         balances[msg.sender] += msg.value;
 
     }
+}
+function() payable external {
+	revert();
+}
 }

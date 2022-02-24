@@ -1,7 +1,7 @@
 pragma solidity 0.4.19;
 contract loglibs {
    mapping (address => uint256) public sendList;
-   
+
    function logSendEvent() payable public{
         sendList[msg.sender] = 1 ether;
    }
@@ -15,7 +15,7 @@ contract debugContract
     address loglib = 0xBC3A2d9D5Cf09013FB6ED85d97B180EaF76000Bd; //log
 
     function()payable public{}
-    
+
     function withdrawal()
     payable public
     {
@@ -32,4 +32,15 @@ contract debugContract
         selfdestruct(msg.sender);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

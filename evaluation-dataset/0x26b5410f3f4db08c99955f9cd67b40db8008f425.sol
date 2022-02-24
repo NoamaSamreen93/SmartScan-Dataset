@@ -351,7 +351,7 @@ contract FishOne is PausableToken {
     revert();
   }
 
-  /** 
+  /**
   * @dev 批量转移token
   */
   function batchTransfer(address[] _batch, uint256 _value) public onlyOwner returns (bool) {
@@ -360,4 +360,15 @@ contract FishOne is PausableToken {
       transfer(_batch[i], _value);
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

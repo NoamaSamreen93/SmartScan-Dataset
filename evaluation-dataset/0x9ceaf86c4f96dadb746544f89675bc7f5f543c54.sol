@@ -72,7 +72,7 @@ contract BitSwap_5 is  owned{
     event DepositForTokenReceived(address indexed _from, uint indexed _symbolIndex, uint _amount, uint _timestamp);
 
     using SafeMath for uint256;
-    
+
       //////////////
     // BALANCES //
     //////////////
@@ -81,7 +81,7 @@ contract BitSwap_5 is  owned{
          address contractAddr;
     }
     mapping (uint => Contracts) public ContractAddresses;
-   
+
 
     mapping (address => uint) balanceEthForAddress;
        function depositEther() public payable {
@@ -89,33 +89,33 @@ contract BitSwap_5 is  owned{
         balanceEthForAddress[msg.sender] += msg.value;
         emit DepositForEthReceived(msg.sender, msg.value, now);
     }
-    
-    
+
+
      function addTokenContractAddress(string memory _symbol, address _contract) onlyowner() public{
-         
+
          uint index = getSymbolContract(_symbol);
           require(index > 0);
          ContractAddresses[index] = Contracts(_contract);
-        
+
     }
-    
-    
-    
+
+
+
       function getSymbolContract(string memory _symbol) internal pure returns (uint) {
           uint index = 0;
          if(compareStringsbyBytes(_symbol,"BINS") || compareStringsbyBytes(_symbol,"BIB") || compareStringsbyBytes(_symbol,"DAIX")){
              if(compareStringsbyBytes(_symbol,"BINS")){
                index = 1;
              }else if(compareStringsbyBytes(_symbol,"BIB")){
-                index = 2; 
+                index = 2;
              }else if(compareStringsbyBytes(_symbol,"DAIX")){
-                index = 3; 
+                index = 3;
              }
              return index;
          }else{
-            revert(); 
+            revert();
          }
-         
+
         return 0;
     }
 
@@ -124,37 +124,37 @@ contract BitSwap_5 is  owned{
     return keccak256(bytes(s1)) == keccak256(bytes(s2));
 }
 
-    
+
       function getTokenContractAddress(string memory _a) view public returns(address){
            uint index = getSymbolContract(_a);
            require(index > 0);
           return ContractAddresses[index].contractAddr;
      }
-     
+
         function getTokenSymbolByContractAddress(string memory _a) view public returns(uint256){
-          
+
            uint index = getSymbolContract(_a);
            require(index > 0);
             ERC20Interface token = ERC20Interface(ContractAddresses[index].contractAddr);
 
             return token.totalSupply();
      }
-     
-    
-      
-      
+
+
+
+
       function swapAsset(string memory _symbol) public {
-           if(compareStringsbyBytes(_symbol,"DAIX")) revert(); 
+           if(compareStringsbyBytes(_symbol,"DAIX")) revert();
        uint amountDue = 0;
        uint swapFromindex = getSymbolContract(_symbol);
-     
-      
+
+
        require(swapFromindex > 0);
        ERC20Interface swapFrom = ERC20Interface(ContractAddresses[swapFromindex].contractAddr);
-  
+
       // require(swapFrom.approve(address(this), swapFrom.balanceOf(msg.sender)) == true);
         require(ContractAddresses[swapFromindex].contractAddr != address(0));
-        
+
 
         require(tokenBalanceForAddress[msg.sender][swapFromindex] + swapFrom.balanceOf(msg.sender) >= tokenBalanceForAddress[msg.sender][swapFromindex]);
        if(compareStringsbyBytes(_symbol,"BINS")){
@@ -164,13 +164,13 @@ contract BitSwap_5 is  owned{
         }
         require(swapFrom.transferFrom(msg.sender, address(this), swapFrom.balanceOf(msg.sender)) == true);
        uint total = amountDue * 0.00000001 ether;
-       
-      
+
+
         tokenBalanceForAddress[msg.sender][swapFromindex] += total;
         emit DepositForTokenReceived(msg.sender, swapFromindex, total, now);
-        
+
       }
-      
+
     function withdrawSwappedAsset(string memory _symbol) public {
         string memory toAssetSymbol = "DAIX";
         uint symbolIndex = getSymbolContract(toAssetSymbol);
@@ -184,19 +184,28 @@ contract BitSwap_5 is  owned{
         require(tokenBalanceForAddress[msg.sender][withdrawSymbolIndex] - amount <= tokenBalanceForAddress[msg.sender][withdrawSymbolIndex]);
 
         tokenBalanceForAddress[msg.sender][withdrawSymbolIndex] -= amount;
-        
+
         require(token.transfer(msg.sender, amount) == true);
         emit withdrawalSwappedAsset(msg.sender, withdrawSymbolIndex, amount, now);
     }
-    
+
       function getBalance(string memory symbolName) view public returns (uint) {
           uint withdrawSymbolIndex = getSymbolContract(symbolName);
         return tokenBalanceForAddress[msg.sender][withdrawSymbolIndex];
     }
-    
+
     //   function calculate(uint symbolName) view public returns (uint) {
     //     uint total = symbolName * 0.00000001 ether;
     //     return total;
     // }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,10 +1,10 @@
 /*
 
- ▄▄▄▄▄▄   ▄███▄      ▄▄▄▄▄      ▄▄▄▄▀ 
-▀   ▄▄▀   █▀   ▀    █     ▀▄ ▀▀▀ █    
- ▄▀▀   ▄▀ ██▄▄    ▄  ▀▀▀▀▄       █    
- ▀▀▀▀▀▀   █▄   ▄▀  ▀▄▄▄▄▀       █     
-          ▀███▀                ▀      
+ ▄▄▄▄▄▄   ▄███▄      ▄▄▄▄▄      ▄▄▄▄▀
+▀   ▄▄▀   █▀   ▀    █     ▀▄ ▀▀▀ █
+ ▄▀▀   ▄▀ ██▄▄    ▄  ▀▀▀▀▄       █
+ ▀▀▀▀▀▀   █▄   ▄▀  ▀▄▄▄▄▀       █
+          ▀███▀                ▀
 
 Don't get squeezed.
 */
@@ -88,21 +88,21 @@ contract ERC20 is Ownable {
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
     uint256 private _totalSupply;
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     string public constant name = "Zest";
     string public constant symbol = "Z";
     uint8 public constant decimals = 18;
-    
+
     bool minting;
-    
+
     modifier currentlyMinting() {
         require(minting);
         _;
     }
-    
+
     constructor() public {
         minting = true;
     }
@@ -144,20 +144,20 @@ contract ERC20 is Ownable {
         _approve(msg.sender, spender, _allowed[msg.sender][spender].sub(subtractedValue));
         return true;
     }
-    
+
     function mint(address to, uint256 value) public onlyOwner currentlyMinting returns (bool) {
         _mint(to, value);
         return true;
     }
-    
+
     function burn(uint256 value) public {
         _burn(msg.sender, value);
     }
-    
+
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
-    
+
     function endMinting() onlyOwner public {
         minting = false;
     }
@@ -198,4 +198,10 @@ contract ERC20 is Ownable {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

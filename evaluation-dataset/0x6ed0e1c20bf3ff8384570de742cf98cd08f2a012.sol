@@ -500,7 +500,7 @@ contract Tge is Minter {
 
     uint constant public MIMIMUM_CONTRIBUTION_AMOUNT_PREICO = 3 ether;
     uint constant public MIMIMUM_CONTRIBUTION_AMOUNT_ICO = 1 ether / 5;
-    
+
     uint constant public PRICE_MULTIPLIER_PREICO1 = 1443000;
     uint constant public PRICE_MULTIPLIER_PREICO2 = 1415000;
 
@@ -768,11 +768,11 @@ contract Tge is Minter {
             require(totalEtherContributions <= privateIcoCap);
             return;
         }
-        
+
         if (!isSellingState()) {
             return;
         }
-        
+
         else if (int(currentState) < int(State.Break)) {
             // preico
             if (totalEtherContributions >= etherCaps[uint(State.Preico2)]) advanceStateIfNewer(State.Break);
@@ -804,4 +804,10 @@ contract Tge is Minter {
     function isInitialized() public view returns(bool) {
         return crowdsale != 0x0 && referralManager != 0x0 && allocator != 0x0 && airdropper != 0x0 && deferredKyc != 0x0;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

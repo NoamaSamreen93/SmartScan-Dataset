@@ -399,7 +399,7 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-  
+
 }
 
 // File: contracts/ERC20Mintable.sol
@@ -413,7 +413,7 @@ pragma solidity ^0.5.0;
  * @dev ERC20 minting logic
  */
 contract ERC20Mintable is ERC20 {
-    
+
     /**
     * @dev Internal function that mints an amount of the token and assigns it to
     * an account. This encapsulates the modification of balances such that the
@@ -472,7 +472,7 @@ contract TokenDetails {
 
     string internal _name;
     string internal _symbol;
-    
+
     /**
     * @return the name of the token.
     */
@@ -616,4 +616,13 @@ contract XmedLoyaltyToken is XmedBaseLoyaltyToken {
         _transfer(from, to, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

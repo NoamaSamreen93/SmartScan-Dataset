@@ -85,7 +85,7 @@ contract MidasToken is ERC20Interface, Owned {
         _totalSupply = 500000000;
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
-        
+
     }
 
 
@@ -187,4 +187,8 @@ contract MidasToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+function() payable external {
+	revert();
+}
 }

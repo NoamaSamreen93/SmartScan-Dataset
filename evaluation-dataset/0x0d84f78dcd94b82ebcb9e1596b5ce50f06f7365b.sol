@@ -121,7 +121,7 @@ contract Whitelist is Ownable {
     /// @param bonusPercent The bonus percentage shared among users
     /// @param maxPurchaseAmount The maximum each participant is allowed to contribute in wei
     function addParticipants(address[] users, uint256 bonusPercent, uint256 maxPurchaseAmount) external onlyOwner {
-        
+
         for(uint i=0; i<users.length; i+=1) {
             require(users[i] != address(0));
             participants[users[i]].bonusPercent = bonusPercent;
@@ -139,7 +139,7 @@ contract Whitelist is Ownable {
     /// @notice De-whitelist multiple crowdsale participants at once
     /// @param users The participants to revoke
     function revokeParticipants(address[] users) external onlyOwner {
-        
+
         for(uint i=0; i<users.length; i+=1) {
             require(users[i] != address(0));
             participants[users[i]].maxPurchaseAmount = 0;
@@ -153,5 +153,16 @@ contract Whitelist is Ownable {
         Participant storage participant = participants[beneficiary];
         participant.weiContributed = participant.weiContributed.add(weiAmount);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

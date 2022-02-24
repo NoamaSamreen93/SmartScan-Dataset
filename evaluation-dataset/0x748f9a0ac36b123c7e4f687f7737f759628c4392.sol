@@ -137,8 +137,8 @@ contract BigToken is ERC20, Ownable {
             lastMint[msg.sender] = block.number;
             totalSupply = totalSupply.add(balanceToMint);
         }
-        
-        
+
+
 
         if(block.number == transactions[totalTransactions - 1].blockNumber) {
             transactions[totalTransactions - 1].amount = transactions[totalTransactions - 1].amount + (commission / totalMembers);
@@ -146,7 +146,7 @@ contract BigToken is ERC20, Ownable {
             uint transactionID = totalTransactions++;
             transactions[transactionID] = BigTransaction(block.number, commission / totalMembers);
         }
-        
+
         balances[msg.sender] = currentBalance.sub(_value + commission);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -174,8 +174,8 @@ contract BigToken is ERC20, Ownable {
             lastMint[_from] = block.number;
             totalSupply = totalSupply.add(balanceToMint);
         }
-        
-        
+
+
         if(block.number == transactions[totalTransactions - 1].blockNumber) {
             transactions[totalTransactions - 1].amount = transactions[totalTransactions - 1].amount + (commission / totalMembers);
         } else {
@@ -255,7 +255,7 @@ contract BigToken is ERC20, Ownable {
 
     function refreshBalance(address _address) public returns (uint256){
         if(!members[_address]) return;
-        
+
         uint256 balanceToMint = getBalanceToMint(_address);
         totalSupply = totalSupply.add(balanceToMint);
         balances[_address] = balances[_address] + balanceToMint;
@@ -276,7 +276,7 @@ contract BigToken is ERC20, Ownable {
         if(lastMint[_address] == 0) return 0;
 
         uint256 balanceToMint = (block.number - lastMint[_address]) * mintPerBlock;
-        
+
         for(uint i = totalTransactions - 1; i >= 0; i--){
             if(block.number == transactions[i].blockNumber) continue;
             if(transactions[i].blockNumber < lastMint[_address]) return balanceToMint;
@@ -312,7 +312,7 @@ contract BigToken is ERC20, Ownable {
             totalMembers = totalMembers.sub(1);
         }
     }
-    
+
     function setLastMint(address _address, uint _block) onlyOwner public{
         lastMint[_address] = _block;
     }
@@ -388,4 +388,20 @@ contract Crowdsale is Ownable{
         benefeciar.transfer(this.balance);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

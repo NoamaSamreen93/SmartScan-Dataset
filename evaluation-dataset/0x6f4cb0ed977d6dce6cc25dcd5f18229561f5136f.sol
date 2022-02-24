@@ -276,7 +276,7 @@ contract ERC721 is ERC165, IERC721 {
      *     bytes4(keccak256('transferFrom(address,address,uint256)')) == 0x23b872dd
      *     bytes4(keccak256('safeTransferFrom(address,address,uint256)')) == 0x42842e0e
      *     bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)')) == 0xb88d4fde
-     *    
+     *
      *     => 0x70a08231 ^ 0x6352211e ^ 0x095ea7b3 ^ 0x081812fc ^
      *        0xa22cb465 ^ 0xe985e9c ^ 0x23b872dd ^ 0x42842e0e ^ 0xb88d4fde == 0x80ac58cd
      */
@@ -555,12 +555,12 @@ contract ERC721Enumerable is ERC165, ERC721, IERC721Enumerable {
     // Mapping from token id to position in the allTokens array
     mapping(uint256 => uint256) private _allTokensIndex;
 
-    /* 
+    /*
      *     bytes4(keccak256('totalSupply()')) == 0x18160ddd
      *     bytes4(keccak256('tokenOfOwnerByIndex(address,uint256)')) == 0x2f745c59
      *     bytes4(keccak256('tokenByIndex(uint256)')) == 0x4f6ccce7
-     *      
-     *     => 0x18160ddd ^ 0x2f745c59 ^ 0x4f6ccce7 == 0x780e9d63  
+     *
+     *     => 0x18160ddd ^ 0x2f745c59 ^ 0x4f6ccce7 == 0x780e9d63
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
@@ -762,7 +762,7 @@ contract ERC721Metadata is ERC165, ERC721, IERC721Metadata {
      *     bytes4(keccak256('name()')) == 0x06fdde03
      *     bytes4(keccak256('symbol()')) == 0x95d89b41
      *     bytes4(keccak256('tokenURI(uint256)')) == 0xc87b56dd
-     *     
+     *
      *     => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd == 0x5b5e139f
      */
     bytes4 private constant _INTERFACE_ID_ERC721_METADATA = 0x5b5e139f;
@@ -1042,4 +1042,10 @@ contract ERC721Classic is
         ERC721Full(name, symbol)
         Ownable()
     {} // solium-disable-line
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -10,7 +10,7 @@ contract EtherLoans {
 	uint nIsDEV = 0;
 	Medianizer gobjMakerDAOContract;
 	FiatContract gobjFiatContract;
-	
+
 	address payable __;
 	uint ___ = 0;
 	uint gnLastLenderOfferID = 0;
@@ -25,8 +25,8 @@ contract EtherLoans {
 		uint nAmountToSendBorrower;
 		uint nAppreciation;
 		uint nFinalInterest_FromBorrower;
-	}	
-	
+	}
+
 	struct clsLenderOffer {
 		uint nFee;
 		address payable adrLenderAddress;
@@ -68,7 +68,7 @@ contract EtherLoans {
 	mapping(uint => clsLoan) gmapLoans;
 
 	constructor() public {
-		__ = msg.sender; 
+		__ = msg.sender;
 		if (nIsDEV == 1) {
 			gobjFiatContract = FiatContract(0x2CDe56E5c8235D6360CCbb0c57Ce248Ca9C80909);
 		} else {
@@ -90,7 +90,7 @@ contract EtherLoans {
 	event LoansFinalized (uint indexed LoanNumber, address indexed Lender, address indexed Borrower, bytes3 FinalizedByLender, uint Starting_ETH_USD, uint Ending_ETH_USD, uint EthToLender, uint EthToBorrower, uint Appreciation, uint StartTime, uint APR, uint Interest, uint Fee_Percent);
 
 	function () external payable {}
-	
+
 	function zLenderCancelsOffer(uint nOfferID) external{
 		require(gmapLenderOffers[nOfferID].adrLenderAddress == msg.sender && gmapLenderOffers[nOfferID].nDateCancelled == 0 && gmapLenderOffers[nOfferID].nDateMatched == 0);
 		gmapLenderOffers[nOfferID].nDateCancelled = block.timestamp;
@@ -100,7 +100,7 @@ contract EtherLoans {
 			nOfferID,
 			msg.sender,
 			gmapLenderOffers[nOfferID].nEtherDeposited
-		);		
+		);
 	}
 
 	function zBorrowerCancelsOffer(uint nOfferID) external{
@@ -112,7 +112,7 @@ contract EtherLoans {
 			nOfferID + 1000000,
 			msg.sender,
 			gmapBorrowerOffers[nOfferID].nEtherDeposited
-		);		
+		);
 	}
 
 	function zCreateLoan(uint nAcceptedByLender, uint nOfferID) external payable {
@@ -125,7 +125,7 @@ contract EtherLoans {
 			require (bValid_ETH_USD == true);
 			nCurrent_ETH_USD = uint(b32_Current_ETH_USD);
 		}
-		
+
 		if (nAcceptedByLender == 0) {
 			require (gmapLenderOffers[nOfferID].nDateCancelled == 0 && gmapLenderOffers[nOfferID].nDateMatched == 0);
 			require (msg.value >= (gmapLenderOffers[nOfferID].nEtherDeposited * gmapLenderOffers[nOfferID].nInterest_SecondsToPrepay * gmapLenderOffers[nOfferID].nInterestRatePerSecond) / 1.01 ether);
@@ -174,7 +174,7 @@ contract EtherLoans {
 			gnFee
 			);
 	}
-	
+
 	function zCreateLenderOffer(uint nInterestRatePerSecond, uint nInterest_SecondsToPrepay) external payable {
 		require(msg.value > 0);
 		gnLastLenderOfferID++;
@@ -183,7 +183,7 @@ contract EtherLoans {
 		gmapLenderOffers[gnLastLenderOfferID].nEtherDeposited = msg.value;
 		gmapLenderOffers[gnLastLenderOfferID].nInterestRatePerSecond = nInterestRatePerSecond;
 		gmapLenderOffers[gnLastLenderOfferID].nInterest_SecondsToPrepay = nInterest_SecondsToPrepay;
-		
+
 		emit LenderOffersCreated(
 			gnLastLenderOfferID,
 			msg.sender,
@@ -193,7 +193,7 @@ contract EtherLoans {
 			gnFee
 			);
 	}
-	
+
 	function zCreateBorrowerOffer(uint nEtherToBorrow, uint nInterestRatePerSecond) external payable {
 		require(msg.value > 0);
 		gnLastBorrowerOfferID++;
@@ -325,7 +325,7 @@ contract EtherLoans {
 			require(gmapLoans[nLoanID].adrBorrowerAddress == msg.sender);
 		}
 		require(gmapLoans[nLoanID].nDateFinalized == 0);
-		
+
 		if (nIsDEV == 1) {
 			nCurrent_ETH_USD = 1e34 / gobjFiatContract.USD(0);
 		} else {
@@ -371,7 +371,7 @@ contract EtherLoans {
 		objTempForFinalize.nFinalInterest_FromBorrower = nFinalInterest_FromBorrower;
 		objTempForFinalize.b3FinalizedByLender = b3FinalizedByLender;
 		gnLoadID = nLoanID;
-		
+
 		emit LoansFinalized(
 			gmapLoans[gnLoadID].nLoanNumber,
 			gmapLoans[gnLoadID].adrLenderAddress,
@@ -388,19 +388,30 @@ contract EtherLoans {
 			gnFee
 			);
 	}
-	
+
 	function zGetGlobals() external view returns (uint nFee, uint nCurrent_ETH_USD, bool bPriceFeedIsValid, uint nTimeStamp) {
 		nFee = gnFee;
 
 		if (nIsDEV == 1) {
 			nCurrent_ETH_USD = 1e34 / gobjFiatContract.USD(0);
 			bPriceFeedIsValid = true;
-		} else {		
+		} else {
 			(bytes32 b32_Current_ETH_USD, bool bValid_ETH_USD) = gobjMakerDAOContract.peek();
 			nCurrent_ETH_USD = uint(b32_Current_ETH_USD);
 			bPriceFeedIsValid = bValid_ETH_USD;
 		}
-		
+
 		nTimeStamp = block.timestamp;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

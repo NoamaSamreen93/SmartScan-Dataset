@@ -1398,7 +1398,7 @@ contract RNG is usingOraclize, Ownable, Whitelist {
         address lottery;
         uint round;
     }
-    
+
     mapping(bytes32 => Request) public requests; // requests from lottery to oraclize
 
     uint public callbackGas = 2000000;
@@ -1440,7 +1440,7 @@ contract RNG is usingOraclize, Ownable, Whitelist {
         assert(temp.processRound(requests[_queryId].round, uint(keccak256(abi.encodePacked(_result)))));
 
     }
-    
+
     function update(uint _roundNumber, uint _additionalNonce, uint _period) public payable {
         uint n = 32; // number of random bytes we want the datasource to return
         uint delay = 0; // number of seconds to wait before the execution takes place
@@ -1457,7 +1457,7 @@ contract RNG is usingOraclize, Ownable, Whitelist {
 
         emit RequestIsSended(msg.sender, _roundNumber, queryId);
     }
-    
+
     function withdraw(address payable _to, uint256 _value) public onlyOwner {
         emit Withdraw(_to, _value);
         _to.transfer(_value);
@@ -1496,7 +1496,7 @@ contract RNG is usingOraclize, Ownable, Whitelist {
         returns (bytes32)
     {
         require((_nbytes > 0) && (_nbytes <= 32), "");
-        
+
         // Convert from seconds to ledger timer ticks
         _delay *= 10;
         bytes memory nbytes = new bytes(1);
@@ -1504,22 +1504,22 @@ contract RNG is usingOraclize, Ownable, Whitelist {
         bytes memory unonce = new bytes(32);
         bytes memory sessionKeyHash = new bytes(32);
         bytes32 sessionKeyHash_bytes32 = oraclize_randomDS_getSessionPubKeyHash();
-        
+
         assembly {
             mstore(unonce, 0x20)
             mstore(add(unonce, 0x20), xor(blockhash(sub(number, 1)), xor(coinbase, xor(timestamp, _additionalNonce))))
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        
+
         bytes memory delay = new bytes(32);
-        
+
         assembly {
             mstore(add(delay, 0x20), _delay)
         }
 
         bytes memory delay_bytes8 = new bytes(8);
-        
+
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
@@ -1543,4 +1543,15 @@ contract RNG is usingOraclize, Ownable, Whitelist {
         oraclize_randomDS_setCommitment(queryId, keccak256(abi.encodePacked(delay_bytes8_left, args[1], sha256(args[0]), args[2])));
         return queryId;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

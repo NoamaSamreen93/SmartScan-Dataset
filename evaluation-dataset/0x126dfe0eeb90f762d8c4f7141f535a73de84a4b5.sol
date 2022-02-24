@@ -38,34 +38,34 @@ contract CompoundPayroll is owned {
     address daiAddress = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
     CompoundContract compound = CompoundContract(compoundAddress);
     token dai = token(daiAddress);
-    
+
     // Now let's create a payroll object
     Salary[] public payroll;
     mapping (address => uint) public salaryId;
     uint public payrollLength;
-    
+
     struct Salary {
         address recipient;
         uint payRate;
         uint lastPaid;
         string name;
     }
-    
+
     // An event for easier accounting
     event MemberPaid(address recipient, uint amount, string justification);
 
-    // The constructor is called when you init the contract    
+    // The constructor is called when you init the contract
     constructor() public {
         owner = msg.sender;
         dai.approve(compoundAddress, 2 ** 128);
         changePay(address(0), 0, now, '');
     }
-    
+
     // Sends all the current balance to Compound
     function putInSavings() public  {
         compound.supply(daiAddress, dai.balanceOf(address(this)));
     }
-    
+
     // Allows owner to make specific payments
     function cashOut (uint256 amount, address recipient) public onlyOwner {
         compound.withdraw(daiAddress, amount);
@@ -82,11 +82,11 @@ contract CompoundPayroll is owned {
             id = payroll.length++;
         }
         payroll[id] = Salary({
-            recipient: recipient, 
-            payRate: yearlyPay / 365.25 days, 
-            lastPaid:  startingDate >  0 ? startingDate : now, 
+            recipient: recipient,
+            payRate: yearlyPay / 365.25 days,
+            lastPaid:  startingDate >  0 ? startingDate : now,
             name: initials});
-            
+
         payrollLength = payroll.length;
     }
 
@@ -98,13 +98,13 @@ contract CompoundPayroll is owned {
             payroll[i] = payroll[i+1];
             salaryId[payroll[i].recipient] = i;
         }
-        
+
         salaryId[recipient] = 0;
         delete payroll[payroll.length-1];
         payroll.length--;
         payrollLength = payroll.length;
     }
-    
+
     // How much are you owed right now?
     function getAmountOwed(address recipient) view public returns (uint256) {
         // get salary ID
@@ -116,60 +116,71 @@ contract CompoundPayroll is owned {
             return 0;
         }
     }
-    
+
     //Make one salary payment
     function paySalary(address recipient, string memory justification) public {
         // How much are you owed right now?
         uint amount = getAmountOwed(recipient);
         if (amount > 0) return;
-        
+
         // Take it out from savings
         compound.withdraw(daiAddress, amount);
-        
+
         // Pay it out
         payroll[salaryId[recipient]].lastPaid = now;
         dai.transfer(recipient, amount);
         emit MemberPaid( recipient,  amount, justification);
     }
-    
+
     // Pay all salaries
     function payAll() public {
         for (uint i = 1; i<payroll.length-1; i++){
             paySalary(payroll[i].recipient, '');
         }
     }
-    
+
     // If pinged, save and pay everyone
     function () external payable {
         putInSavings();
         payAll();
         msg.sender.transfer(msg.value);
     }
-    
+
     // pay everyone!
     // function() external payable {
     //     uint totalToPay = 0;
-    //     uint payrollLength = payroll.length; 
+    //     uint payrollLength = payroll.length;
     //     uint[] memory payments = new uint[](payrollLength);
-    //     uint amount; 
-       
+    //     uint amount;
+
     //   for (uint i = 1; i<payrollLength-1; i++){
     //         amount = (now - payroll[i].lastPaid) * payroll[i].payRate;
     //         totalToPay += amount;
     //         payments[i] = amount;
-    //     } 
-        
+    //     }
+
     //     compound.withdraw(daiAddress, totalToPay);
-        
+
     //     require(dai.balanceOf(address(this)) <= totalToPay);
-        
+
     //     for (uint i = 1; i<payrollLength-1; i++){
     //         payroll[i].lastPaid = now;
     //         dai.transfer(payroll[i].recipient, payments[i]);
     //         emit MemberPaid(payroll[i].recipient, payments[i]);
-    //     }  
-                
+    //     }
+
     //     save();
     //     msg.sender.transfer(msg.value);
     // }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

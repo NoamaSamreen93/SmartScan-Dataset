@@ -286,7 +286,7 @@ contract PausableToken is StandardToken, Pausable {
 
 
 contract DMAToken is PausableToken {
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
   string public name = "DataMiningAlliance";
   string public symbol = "DMA";
   uint public decimals = 8;
@@ -296,4 +296,15 @@ contract DMAToken is PausableToken {
 	Transfer(address(0x0), msg.sender, totalSupply);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

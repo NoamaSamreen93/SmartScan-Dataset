@@ -88,7 +88,7 @@ contract Bussiness is Ownable {
 
   mapping(uint256 => Price) public prices;
   mapping(uint256 => Price) public usdtPrices;
-  
+
   /**
    * @dev Throws if called by any account other than the ceo address.
    */
@@ -105,7 +105,7 @@ contract Bussiness is Ownable {
   function getApproved(uint256 _tokenId) public view returns (address){
       return erc721Address.getApproved(_tokenId);
   }
-  
+
   function setPrice(uint256 _tokenId, uint256 _ethPrice, uint256 _usdtPrice) public {
       require(erc721Address.ownerOf(_tokenId) == msg.sender);
       prices[_tokenId] = Price(msg.sender, _ethPrice, 0);
@@ -177,4 +177,15 @@ contract Bussiness is Ownable {
     prices[tokenId] = Price(address(0), 0, 0);
     usdtPrices[tokenId] = Price(address(0), 0, 0);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

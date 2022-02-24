@@ -1,14 +1,14 @@
 pragma solidity ^0.4.15;
 
 contract tickets {
-    
+
     mapping(uint256 => uint256) public ticketPrices;
     mapping(address => uint256[]) public ticketsOwners;
     mapping(uint256 => address) public ticketsOwned;
     mapping(address => uint256) public noOfTicketsOwned;
     mapping(address => bool) public banned;
     uint256 public noOfSeats;
-    
+
     mapping(address => uint256[]) public reservations;
     mapping(address => uint256) public noOfreservations;
     mapping(address => uint256) public timeOfreservations;
@@ -16,7 +16,7 @@ contract tickets {
     mapping(uint256 => address) public addressesReserving;
     uint256 public lowestAddressReserving=0;
     uint256 public highestAddressReserving=0;
-    
+
     mapping(uint256 => uint256[]) public ticketTransfers;
     mapping(uint256 => uint256) public ticketTransfersPerAmount;
     uint256 public ticketTransfersAmount = 0;
@@ -24,17 +24,17 @@ contract tickets {
     mapping(address => uint256) public ticketTransferersAmount;
     mapping(address => uint256[]) public ticketTransferees;
     mapping(address => uint256) public ticketTransfereesAmount;
-    
+
     mapping(address => bytes32) public hashes;
-    
+
     string public name;
-    
+
     uint256 public secondsToHold = 60 * 5 ;
-    
+
     address public owner;
-    
+
     uint256 eventDate;
-    
+
     function tickets(uint256[] ticks, uint256 nOfSeats, string n, uint256 eD) {
         for(uint256 i=0;i<nOfSeats;i++) {
             ticketPrices[i] = ticks[i];
@@ -44,7 +44,7 @@ contract tickets {
         owner = msg.sender;
         eventDate = eD;
     }
-    
+
     function reserveSeats(uint256[] seats, uint256 nOfSeats) {
         if(noOfreservations[msg.sender] != 0 && !banned[msg.sender]) {
             revert();
@@ -66,7 +66,7 @@ contract tickets {
         highestAddressReserving++;
         Reserved(msg.sender, seats);
     }
-    
+
     function resetReservations(address requester, bool resetOwn) {
         if(noOfreservations[requester] == 0) {
             throw;
@@ -80,7 +80,7 @@ contract tickets {
         timeOfreservations[requester] = 0;
         priceOfreservations[requester] = 0;
     }
-    
+
     function resetReservationsInternal() private {
         bool pastTheLowest = false;
         bool stop = false;
@@ -96,10 +96,10 @@ contract tickets {
             if(timeOfreservations[addressesReserving[i]] == 0 && !pastTheLowest) {
                 lowestAddressReserving = i;
             }
-            
+
         }
     }
-    
+
     function revokeTickets(address revokee, bool payback) payable {
         if(msg.sender == owner) {
             banned[revokee] = true;
@@ -116,7 +116,7 @@ contract tickets {
             Banned(revokee, payback);
         }
     }
-    
+
     function InvokeTransfer(address transferee, uint256[] ticks, uint256 amount) {
         if(amount>0 && getTransfer(msg.sender,transferee) != 100000000000000000) {
             for(uint256 i=0;i<amount;i++) {
@@ -130,7 +130,7 @@ contract tickets {
             revert();
         }
     }
-    
+
     function removeTransfer(uint256 transferID) {
         bool transferer = false;
         for(uint256 i=0;i<ticketTransferersAmount[msg.sender] && !transferer;i++) {
@@ -144,7 +144,7 @@ contract tickets {
             revert();
         }
     }
-    
+
     function finishTransfer(uint256 transferID) payable {
         bool transferee = false;
         for(uint256 j=0;j<ticketTransfereesAmount[msg.sender] && !transferee;j++) {
@@ -168,7 +168,7 @@ contract tickets {
             revert();
         }
     }
-    
+
     function getTransfer(address transferer, address transferee) returns (uint256) {
         for(uint256 i=0;i<ticketTransferersAmount[transferer];i++) {
             for(uint256 j=0;j<ticketTransfereesAmount[transferee];j++) {
@@ -179,7 +179,7 @@ contract tickets {
         }
         return 100000000000000000;
     }
-    
+
     function returnTickets(uint256 ticketID) {
         if(now < eventDate) {
             if(ticketsOwned[ticketID] == msg.sender) {
@@ -198,7 +198,7 @@ contract tickets {
             revert();
         }
     }
-    
+
     function changePrice (uint256[] seats, uint256 nOfSeats) {
         if(nOfSeats == noOfSeats) {
             for(uint256 i = 0;i<noOfSeats;i++) {
@@ -208,15 +208,15 @@ contract tickets {
             revert();
         }
     }
-    
+
     function setHash(bytes32 hash) {
         hashes[msg.sender] = hash;
     }
-    
+
     function checkHash(address a, string password) constant returns (bool) {
         return hashes[a]!="" && hashes[a] == sha3(password);
     }
-    
+
     function end() {
         if(msg.sender == owner) {
             if(now > eventDate) {
@@ -226,7 +226,7 @@ contract tickets {
             revert();
         }
     }
-    
+
     function() payable {
         if(msg.value == priceOfreservations[msg.sender] && !banned[msg.sender]) {
             for(uint256 i=0;i<noOfreservations[msg.sender];i++) {
@@ -238,11 +238,17 @@ contract tickets {
             revert();
         }
     }
-    
+
     event Reserved(address indexed _to, uint256[] _tickets);
     event Confirmed(address indexed _to);
     event TransferStarted(address indexed _from, address indexed _to, uint256[] _tickets, uint256 _transferID);
     event Transferred(uint256 _transferID);
     event Banned(address indexed _banned, bool payback);
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

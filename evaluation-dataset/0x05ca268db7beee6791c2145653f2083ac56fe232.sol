@@ -74,7 +74,7 @@ contract BasicToken is ERC20Basic {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
     function balanceOf(address _owner) public view returns (uint256) {
         return balances[_owner];
     }
@@ -193,9 +193,9 @@ contract NRXtoken is StandardToken, BurnableToken {
     constructor(address _CrowdsaleAddress) public {
         CrowdsaleAddress = _CrowdsaleAddress;
         totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;      
+        balances[msg.sender] = INITIAL_SUPPLY;
     }
-  
+
     modifier onlyOwner() {
         // only Crowdsale contract
         require(msg.sender == CrowdsaleAddress);
@@ -251,7 +251,7 @@ contract NRXtoken is StandardToken, BurnableToken {
 
     function() external payable {
         revert("The token contract don`t receive ether");
-    }  
+    }
 }
 
 
@@ -287,7 +287,7 @@ contract ProjectFundAddress {
     function() external payable {
         // The contract don`t receive ether
         revert();
-    } 
+    }
 }
 
 
@@ -297,7 +297,7 @@ contract TeamAddress {
     function() external payable {
         // The contract don`t receive ether
         revert();
-    } 
+    }
 }
 
 contract PartnersAddress {
@@ -306,7 +306,7 @@ contract PartnersAddress {
     function() external payable {
         // The contract don`t receive ether
         revert();
-    } 
+    }
 }
 
 contract AdvisorsAddress {
@@ -315,7 +315,7 @@ contract AdvisorsAddress {
     function() external payable {
         // The contract don`t receive ether
         revert();
-    } 
+    }
 }
 
 contract BountyAddress {
@@ -323,14 +323,14 @@ contract BountyAddress {
     function() external payable {
         // The contract don`t receive ether
         revert();
-    } 
+    }
 }
 
 /**
  * @title Crowdsale contract and burnable token ERC20
  */
 contract Crowdsale is Ownable {
-    using SafeMath for uint; 
+    using SafeMath for uint;
     event LogStateSwitch(State newState);
     event Withdraw(address indexed from, address indexed to, uint256 amount);
 
@@ -349,7 +349,7 @@ contract Crowdsale is Ownable {
     address public contractorsProfitAddress = 0x0;
     address public saasApiProfitAddress = 0x0;
 
-    
+
     NRXtoken public token = new NRXtoken(myAddress);
 
     /**
@@ -362,19 +362,19 @@ contract Crowdsale is Ownable {
     BountyAddress public holdAddress5 = new BountyAddress();
 
     /**
-     * @dev Create state of contract 
+     * @dev Create state of contract
      */
-    enum State { 
-        Init,    
+    enum State {
+        Init,
         CrowdSale,
         WorkTime
     }
-        
+
     State public currentState = State.Init;
 
-    modifier onlyInState(State state){ 
-        require(state==currentState); 
-        _; 
+    modifier onlyInState(State state){
+        require(state==currentState);
+        _;
     }
 
     constructor() public {
@@ -390,7 +390,7 @@ contract Crowdsale is Ownable {
         _transferTokens(address(holdAddress4), TotalTokens.mul(35).div(1000));
         // Transer tokens to bounty address. (3%)
         _transferTokens(address(holdAddress5), TotalTokens.mul(3).div(100));
-        
+
         /**
          * @dev Create periods
          * TokenSale between 01/09/2018 and 30/11/2018
@@ -400,10 +400,10 @@ contract Crowdsale is Ownable {
 
         crowdSaleStartTime = 1535760000;
         crowdSaleEndTime = crowdSaleStartTime + 91 days;
-        
-        
+
+
     }
-    
+
     function setRate(uint _newRate) public onlyOwner {
         /**
          * @dev Enter the amount of tokens per 1 ether
@@ -415,7 +415,7 @@ contract Crowdsale is Ownable {
         require (_addr != address(0));
         marketingProfitAddress = _addr;
     }
-    
+
     function setNeironixProfitAddress(address _addr) public onlyOwner onlyInState(State.Init){
         require (_addr != address(0));
         neironixProfitAddress = _addr;
@@ -425,17 +425,17 @@ contract Crowdsale is Ownable {
         require (_addr != address(0));
         lawSupportProfitAddress = _addr;
     }
- 
+
     function setHostingProfitAddress(address _addr) public onlyOwner onlyInState(State.Init){
         require (_addr != address(0));
         hostingProfitAddress = _addr;
     }
- 
+
     function setTeamProfitAddress(address _addr) public onlyOwner onlyInState(State.Init){
         require (_addr != address(0));
         teamProfitAddress = _addr;
     }
-    
+
     function setContractorsProfitAddress(address _addr) public onlyOwner onlyInState(State.Init){
         require (_addr != address(0));
         contractorsProfitAddress = _addr;
@@ -445,9 +445,9 @@ contract Crowdsale is Ownable {
         require (_addr != address(0));
         saasApiProfitAddress = _addr;
     }
-    
+
     function acceptTokensFromUsers(address _investor, uint256 _value) public onlyOwner{
-        token.acceptTokens(_investor, _value); 
+        token.acceptTokens(_investor, _value);
     }
 
     function transferTokensFromProjectFundAddress(address _investor, uint256 _value) public onlyOwner returns(bool){
@@ -460,9 +460,9 @@ contract Crowdsale is Ownable {
         uint256 value = _value;
         require (value >= 1);
         value = value.mul(1 ether);
-        token.transferTokensFromSpecialAddress(address(holdAddress1), _investor, value); 
+        token.transferTokensFromSpecialAddress(address(holdAddress1), _investor, value);
         return true;
-    } 
+    }
 
     function transferTokensFromTeamAddress(address _investor, uint256 _value) public onlyOwner returns(bool){
         /**
@@ -474,10 +474,10 @@ contract Crowdsale is Ownable {
         require (value >= 1);
         value = value.mul(1 ether);
         require (now >= crowdSaleEndTime + 182 days, "only after 182 days");
-        token.transferTokensFromSpecialAddress(address(holdAddress2), _investor, value); 
+        token.transferTokensFromSpecialAddress(address(holdAddress2), _investor, value);
         return true;
-    } 
-    
+    }
+
     function transferTokensFromPartnersAddress(address _investor, uint256 _value) public onlyOwner returns(bool){
         /**
          * @dev the function transfer tokens from PartnersAddress to investor
@@ -488,10 +488,10 @@ contract Crowdsale is Ownable {
         require (value >= 1);
         value = value.mul(1 ether);
         require (now >= crowdSaleEndTime + 91 days, "only after 91 days");
-        token.transferTokensFromSpecialAddress(address(holdAddress3), _investor, value); 
+        token.transferTokensFromSpecialAddress(address(holdAddress3), _investor, value);
         return true;
-    } 
-    
+    }
+
     function transferTokensFromAdvisorsAddress(address _investor, uint256 _value) public onlyOwner returns(bool){
         /**
          * @dev the function transfer tokens from AdvisorsAddress to investor
@@ -502,10 +502,10 @@ contract Crowdsale is Ownable {
         require (value >= 1);
         value = value.mul(1 ether);
         require (now >= crowdSaleEndTime + 91 days, "only after 91 days");
-        token.transferTokensFromSpecialAddress(address(holdAddress4), _investor, value); 
+        token.transferTokensFromSpecialAddress(address(holdAddress4), _investor, value);
         return true;
-    }     
-    
+    }
+
     function transferTokensFromBountyAddress(address _investor, uint256 _value) public onlyOwner returns(bool){
         /**
          * @dev the function transfer tokens from BountyAddress to investor
@@ -515,9 +515,9 @@ contract Crowdsale is Ownable {
         uint256 value = _value;
         require (value >= 1);
         value = value.mul(1 ether);
-        token.transferTokensFromSpecialAddress(address(holdAddress5), _investor, value); 
+        token.transferTokensFromSpecialAddress(address(holdAddress5), _investor, value);
         return true;
-    }     
+    }
 
 
     function _transferTokens(address _newInvestor, uint256 _value) internal {
@@ -526,7 +526,7 @@ contract Crowdsale is Ownable {
         uint256 value = _value;
         value = value.mul(1 ether);
         token.transfer(_newInvestor, value);
-    }  
+    }
 
     function transferTokens(address _newInvestor, uint256 _value) public onlyOwner {
         /**
@@ -535,7 +535,7 @@ contract Crowdsale is Ownable {
          */
         _transferTokens(_newInvestor, _value);
     }
-    
+
     function setState(State _state) internal {
         currentState = _state;
         emit LogStateSwitch(_state);
@@ -600,7 +600,7 @@ contract Crowdsale is Ownable {
          * @dev Distributing profit
          * the function start automatically every time when contract receive a payable transaction
          */
-        
+
         uint256 marketingProfit = myAddress.balance.mul(30).div(100);   // 30%
         uint256 lawSupportProfit = myAddress.balance.div(20);           // 5%
         uint256 hostingProfit = myAddress.balance.div(20);              // 5%
@@ -614,7 +614,7 @@ contract Crowdsale is Ownable {
             marketingProfitAddress.transfer(marketingProfit);
             emit Withdraw(msg.sender, marketingProfitAddress, marketingProfit);
         }
-        
+
         if (lawSupportProfitAddress != address(0)) {
             lawSupportProfitAddress.transfer(lawSupportProfit);
             emit Withdraw(msg.sender, lawSupportProfitAddress, lawSupportProfit);
@@ -646,29 +646,29 @@ contract Crowdsale is Ownable {
         emit Withdraw(msg.sender, neironixProfitAddress, myBalance);
 
     }
- 
+
     function _saleTokens() internal returns(bool) {
-        require(uint64(now) > crowdSaleStartTime, "Sale stage is not yet, Contract is init, do not accept ether."); 
-         
+        require(uint64(now) > crowdSaleStartTime, "Sale stage is not yet, Contract is init, do not accept ether.");
+
         if (currentState == State.Init) {
             require(neironixProfitAddress != address(0),"At least one of profit addresses must be entered");
             setState(State.CrowdSale);
         }
-        
+
         /**
          * @dev calculation length of periods, pauses, auto set next stage
          */
         if (uint64(now) > crowdSaleEndTime){
             require (false, "CrowdSale stage is passed - contract do not accept ether");
         }
-        
+
         uint tokens = tokenRate.mul(msg.value);
-        
+
         if (currentState == State.CrowdSale) {
             require (msg.value <= 250 ether, "Maximum 250 ether for transaction all CrowdSale period");
             require (msg.value >= 0.1 ether, "Minimum 0,1 ether for transaction all CrowdSale period");
         }
-        
+
         tokens = tokens.add(tokens.mul(setBonus()).div(100));
         token.transfer(msg.sender, tokens);
         return true;
@@ -679,6 +679,17 @@ contract Crowdsale is Ownable {
         if (_saleTokens()) {
             _withdrawProfit();
         }
-    }    
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

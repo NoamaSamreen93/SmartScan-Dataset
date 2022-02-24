@@ -275,17 +275,17 @@ contract Authorizable is Ownable {
 
 
 contract LiteNetCoin is StandardToken, Authorizable{
-	
+
 	uint256 public INITIAL_SUPPLY = 300000000 * 1 ether; // Всего токенов
 	string public constant name = "LiteNetCoin";
     string public constant symbol = "LNC";
 	uint8 public constant decimals = 18;
-	
+
 	constructor() public  {
         totalSupply_ = INITIAL_SUPPLY;
 		balances[owner] = totalSupply_;
     }
-	
+
 	function totalSupply() public view returns (uint256) {
 		return totalSupply_;
     }
@@ -298,37 +298,37 @@ contract Crowdsale is LiteNetCoin {
 	using SafeMath for uint256;
 
     LiteNetCoin public token = new LiteNetCoin();
-	
+
 	uint256 public constant BASE_RATE = 2500;
- 
+
 	// Старт pre sale 1
 	uint64 public constant PRE_SALE_START_1 = 1526256000; // 14/05/2018/00/00/00
 	//uint64 public constant PRE_SALE_FINISH_1 = 1526860800; // 21/05/2018/00/00/00
-	
+
 	// Старт pre sale 2
 	uint64 public constant PRE_SALE_START_2 = 1527465600; // 28/05/2018/00/00/00
 	//uint64 public constant PRE_SALE_FINISH_2 = 1528588800; // 10/06/2018/00/00/00
-	
+
 	// Старт pre sale 3
 	uint64 public constant PRE_SALE_START_3 = 1529884800; // 25/06/2018/00/00/00
 	//uint64 public constant PRE_SALE_FINISH_3 = 1530403200; // 01/07/2018/00/00/00
-	
+
 	// Старт pre sale 4
-	
+
 	//uint64 public constant PRE_SALE_START_4 = 1525996800; // 27/08/2018/00/00/00
 	uint64 public constant PRE_SALE_START_4 = 1535328000; // 27/08/2018/00/00/00
 	//uint64 public constant PRE_SALE_FINISH_4 = 1518134400; // 02/09/2018/00/00/00
-	
-	// Старт pre ICO 
+
+	// Старт pre ICO
 	uint64 public constant PRE_ICO_START = 1538870400; // 07/10/2018/00/00/00
 	//uint64 public constant PRE_ICO_FINISH = 1539475200; // 14/10/2018/00/00/00
-	
-	// Старт ICO 
+
+	// Старт ICO
 	uint64 public constant ICO_START = 1541030400; // 01/11/2018/00/00/00
-	
+
 	//Конец ICO
 	uint64 public constant ICO_FINISH = 1541376000; // 05/11/2018/00/00/00
- 
+
 	// ICO открыто или закрыто
 	bool public icoClosed = false;
 
@@ -338,15 +338,15 @@ contract Crowdsale is LiteNetCoin {
 	event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
 
 	enum TokenDistributions { crowdsale, reserve, bounty, team, founders }
 	mapping(uint => uint256) public distributions;
-	
+
 	address public teamTokens = 0xC7FDAE4f201D76281975D890d5491D90Ec433B0E;
 	address public notSoldTokens = 0x6CccCD6fa8184D29950dF21DDDE1069F5B37F3d1;
-	
-	
+
+
 	constructor() public  {
 		distributions[uint8(TokenDistributions.crowdsale)] = 240000000 * 1 ether;
 		distributions[uint8(TokenDistributions.founders)] = 12000000 * 1 ether;
@@ -373,16 +373,16 @@ contract Crowdsale is LiteNetCoin {
     function() public payable {
 		buyTokens(msg.sender);
     }
-    
+
     // получает адрес получаетля токенов
     function buyTokens(address _addr) public payable {
 		require(msg.value >= 0.001 ether);
 		require(distributions[0] > 0);
 		require(totalBuyTokens_ <= INITIAL_SUPPLY );
 		require(getCurrentRound() > 0);
-		
+
 		uint discountPercent = getCurrentDiscountPercent();
-		
+
 		uint256 weiAmount = msg.value;
         uint256 tokens = getRate(weiAmount);
 		uint256 bonusTokens = tokens.mul(discountPercent).div(100);
@@ -392,17 +392,17 @@ contract Crowdsale is LiteNetCoin {
 	    token.transfer(_addr, tokens);
 		totalSupply_ = totalSupply_.sub(tokens);
 		distributions[0] = distributions[0].sub(tokens);
-		
+
 	    owner.transfer(msg.value);
-		
+
 		emit TokenPurchase(msg.sender, _addr, weiAmount, tokens);
     }
 
 
-	
+
 	function getCurrentRound() public view returns (uint8 round) {
         round = 0;
-		
+
 		if(now > ICO_START + 3 days  && now <= ICO_START + 5 days)      round = 7;
 		if(now > ICO_START        && now <= ICO_START        + 3 days)  round = 6;
 		if(now > PRE_ICO_START    && now <= PRE_ICO_START    + 7 days)  round = 5;
@@ -410,7 +410,7 @@ contract Crowdsale is LiteNetCoin {
 		if(now > PRE_SALE_START_3 && now <= PRE_SALE_START_3 + 6 days)  round = 3;
 		if(now > PRE_SALE_START_2 && now <= PRE_SALE_START_2 + 13 days) round = 2;
 		if(now > PRE_SALE_START_1 && now <= PRE_SALE_START_1 + 8 days)  round = 1;
-		
+
 
 		/* if(now > ICO_START        ) round = 6;
 		if(now > PRE_ICO_START    ) round = 5;
@@ -418,17 +418,17 @@ contract Crowdsale is LiteNetCoin {
 		if(now > PRE_SALE_START_3 ) round = 3;
 		if(now > PRE_SALE_START_2 ) round = 2;
 		if(now > PRE_SALE_START_1 ) round = 1; */
-		
-		
+
+
         return round;
     }
-	
-	
+
+
 	function getCurrentDiscountPercent() constant returns (uint){
 		uint8 round = getCurrentRound();
 		uint discountPercent = 0;
-		
-		
+
+
 		if(round == 1 ) discountPercent = 65;
 		if(round == 2 ) discountPercent = 65;
 		if(round == 3 ) discountPercent = 60;
@@ -436,44 +436,44 @@ contract Crowdsale is LiteNetCoin {
 		if(round == 5 ) discountPercent = 40;
 		if(round == 6 ) discountPercent = 30;
 		if(round == 7 ) discountPercent = 0;
-		
+
 		return discountPercent;
-		
+
 	}
-	
+
 
 	function totalBuyTokens() public view returns (uint256) {
 		return totalBuyTokens_;
 	}
-	
+
 	function getRate(uint256 _weiAmount) internal view returns (uint256) {
 		return _weiAmount.mul(BASE_RATE);
 	}
-	
-	
+
+
 	function sendOtherTokens(address _addr,uint256 _amount) onlyOwner onlyAuthorized isNotIcoClosed public {
         require(totalBuyTokens_ <= INITIAL_SUPPLY);
-		
+
 		token.transfer(_addr, _amount);
 		totalSupply_ = totalSupply_.sub(_amount);
 		totalBuyTokens_ = totalBuyTokens_.add(_amount);
-		
+
     }
-	
-	
+
+
 	function sendBountyTokens(address _addr,uint256 _amount) onlyOwner onlyAuthorized isNotIcoClosed public {
         require(distributions[3] > 0);
 		sendOtherTokens(_addr, _amount);
 		distributions[3] = distributions[3].sub(_amount);
     }
-	
 
-	
-	// Закрываем ICO 
+
+
+	// Закрываем ICO
     function close() public onlyOwner isNotIcoClosed {
         // Закрываем ICO
 		require(now > ICO_FINISH);
-		
+
 		if(distributions[0] > 0){
 			token.transfer(notSoldTokens, distributions[0]);
 			totalSupply_ = totalSupply_.sub(distributions[0]);
@@ -481,21 +481,32 @@ contract Crowdsale is LiteNetCoin {
 			distributions[0] = 0;
 		}
 		token.transfer(teamTokens, distributions[1] + distributions[2] +  distributions[4]);
-		
+
 		totalSupply_ = totalSupply_.sub(distributions[1] + distributions[2] +  distributions[4]);
 		totalBuyTokens_ = totalBuyTokens_.add(distributions[1] + distributions[2] +  distributions[4]);
-		
+
 		distributions[1] = 0;
 		distributions[2] = 0;
 		distributions[4] = 0;
-		
-		
+
+
         icoClosed = true;
     }
-	
+
 	modifier isNotIcoClosed {
         require(!icoClosed);
         _;
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

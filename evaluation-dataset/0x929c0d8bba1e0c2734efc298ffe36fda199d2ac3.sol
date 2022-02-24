@@ -71,7 +71,7 @@ contract WipeProxy is DSMath {
         address _mkrEx,
         uint cupid,
         uint wad
-    ) public 
+    ) public
     {
         require(wad > 0, "no-wipe-no-dai");
 
@@ -118,4 +118,15 @@ contract WipeProxy is DSMath {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

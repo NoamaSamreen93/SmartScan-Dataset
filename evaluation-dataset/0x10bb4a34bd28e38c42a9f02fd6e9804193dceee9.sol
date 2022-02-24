@@ -359,7 +359,7 @@ contract ZeroBTCWorldCup {
     }
 
     /* PUBLIC-FACING COMPETITION INTERACTIONS */
-    
+
     // Register to participate in the competition. Apart from gas costs from
     //   making predictions and updating your score if necessary, this is the
     //   only 0xBTC you will need to spend throughout the tournament.
@@ -370,7 +370,7 @@ contract ZeroBTCWorldCup {
         require(!playerRegistered[_customerAddress]);
         // Receive the entry fee tokens.
         BTCTKN.transferFrom(_customerAddress, address(this), entryFee);
-        
+
         registeredPlayers = SafeMath.addint256(registeredPlayers, 1);
         playerRegistered[_customerAddress] = true;
         playerGamesScored[_customerAddress] = 0;
@@ -418,7 +418,7 @@ contract ZeroBTCWorldCup {
     {
         BTCTKN.approve(address(this), entryFee);
     }
-    
+
     // What was the last game ID that has had an official score registered for it?
     function gameResultsLogged()
         view
@@ -619,7 +619,7 @@ contract ZeroBTCWorldCup {
     function _btcToken(address _tokenContract) private pure returns (bool) {
         return _tokenContract == BTCTKNADDR; // Returns "true" if this is the 0xBTC Token Contract
     }
-    
+
     // As new fixtures become known through progression or elimination, they're added here.
     function addNewGame(string _opponents, int8 _gameID)
         isAdministrator
@@ -791,4 +791,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

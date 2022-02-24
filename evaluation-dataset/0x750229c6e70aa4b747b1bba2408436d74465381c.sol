@@ -20,10 +20,10 @@ contract Ownable {
     ContractOwnershipTransferred(contractOwner, _newOwner);
     contractOwner = _newOwner;
   }
-  
+
   function payoutFromContract() public onlyContractOwner {
       contractOwner.transfer(this.balance);
-  }  
+  }
 
 }
 
@@ -94,14 +94,14 @@ contract CryptoCinema is ERC721, Ownable {
 
   function create18FilmsTokens() public onlyContractOwner {
      uint256 totalFilms = totalSupply();
-	 
+
 	 require (totalFilms<1); // only 3 tokens for start
-	 
+
 	 for (uint8 i=1; i<=18; i++)
 		_createFilm("Film", address(this), startingPrice);
-	
+
   }
-  
+
   function getFilm(uint256 _tokenId) public view returns (string filmName, uint256 sellingPrice, address owner) {
     Film storage film = films[_tokenId];
     filmName = film.name;
@@ -135,9 +135,9 @@ contract CryptoCinema is ERC721, Ownable {
 
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 97), 100)); //97% to previous owner
 
-	
-    // The price increases by 20% 
-    filmIdToPrice[_tokenId] = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 12), 10)); 
+
+    // The price increases by 20%
+    filmIdToPrice[_tokenId] = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 12), 10));
 
     _transfer(oldOwner, newOwner, _tokenId);
 
@@ -147,13 +147,13 @@ contract CryptoCinema is ERC721, Ownable {
     }
 
     TokenSold(_tokenId, sellingPrice, filmIdToPrice[_tokenId], oldOwner, newOwner, films[_tokenId].name);
-	
+
     if (msg.value > sellingPrice) { //if excess pay
 	    uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
 		msg.sender.transfer(purchaseExcess);
 	}
   }
-  
+
   function symbol() public pure returns (string) { //ERC721
     return SYMBOL;
   }
@@ -173,33 +173,33 @@ contract CryptoCinema is ERC721, Ownable {
   }
 
   function allFilmsInfo(uint256 _startFilmId) public view returns (address[] owners, uint256[] prices) { //for web site view
-	
+
 	uint256 totalFilms = totalSupply();
-	
+
     if (totalFilms == 0 || _startFilmId >= totalFilms) {
         // Return an empty array
       return (new address[](0), new uint256[](0));
     }
-	
+
 	uint256 indexTo;
 	if (totalFilms > _startFilmId+1000)
 		indexTo = _startFilmId + 1000;
-	else 	
+	else
 		indexTo = totalFilms;
-		
-    uint256 totalResultFilms = indexTo - _startFilmId;		
-		
+
+    uint256 totalResultFilms = indexTo - _startFilmId;
+
 	address[] memory owners_res = new address[](totalResultFilms);
 	uint256[] memory prices_res = new uint256[](totalResultFilms);
-	
+
 	for (uint256 filmId = _startFilmId; filmId < indexTo; filmId++) {
 	  owners_res[filmId - _startFilmId] = filmIdToOwner[filmId];
 	  prices_res[filmId - _startFilmId] = filmIdToPrice[filmId];
 	}
-	
+
 	return (owners_res, prices_res);
   }
-  
+
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerToken) { //ERC721 for web site view
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
@@ -269,6 +269,60 @@ contract CryptoCinema is ERC721, Ownable {
     return _checkedAddr == filmIdToOwner[_tokenId];
   }
 
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function _transfer(address _from, address _to, uint256 _tokenId) private {
     ownershipTokenCount[_to]++;
     filmIdToOwner[_tokenId] = _to;
@@ -313,4 +367,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

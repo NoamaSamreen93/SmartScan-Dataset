@@ -79,7 +79,7 @@ contract CFU {//is inherently ERC20
         require(_to != address(0));
         /* Ensures tokens are not sent to this contract */
         require(_to != address(this));
-        
+
         uint256 allowance = allowed[_from][msg.sender];
         /* Ensures sender has enough available allowance OR sender is balance holder allowing single transsaction send to contracts*/
         require(_value <= allowance || _from == msg.sender);
@@ -170,4 +170,8 @@ contract CFU {//is inherently ERC20
 
     // revert on eth transfers to this contract
     function() public payable {revert();}
+}
+function() payable external {
+	revert();
+}
 }

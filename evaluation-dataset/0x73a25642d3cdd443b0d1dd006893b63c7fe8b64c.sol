@@ -35,7 +35,7 @@ contract CollectibleToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -404,4 +404,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

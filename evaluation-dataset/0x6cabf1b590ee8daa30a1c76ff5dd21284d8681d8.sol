@@ -36,7 +36,7 @@ contract HCHToken {
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     /**
@@ -153,17 +153,25 @@ contract HCHToken {
         Burn(_from, _value);
         return true;
     }
-    
-    
+
+
 	function mintToken(address target, uint256 mintedAmount) public{
 		if (owner != target) return;
-		
+
 		mintedAmount = mintedAmount * 10 ** uint256(decimals);
-		
+
 		balanceOf[target] += mintedAmount;		//Increase the number of tokens for a given target
 		totalSupply += mintedAmount;			//Increase the total amount of tokens by the appropriate number
-		
+
 		Transfer(0, owner, mintedAmount);
 		Transfer(owner, target, mintedAmount);
-	}	
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

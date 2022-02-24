@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract Richer3D {
     using SafeMath for *;
-    
+
     //************
     //Game Setting
     //************
@@ -28,7 +28,7 @@ contract Richer3D {
     mapping(address=>DataModal.PlayerInfo) private pInfoXpAdd;
     mapping(address=>uint256) private pIDXpAdd;
     mapping(uint256=>address) private pAddXpID;
-    
+
     //*************
     // P3D Data
     //*************
@@ -41,15 +41,15 @@ contract Richer3D {
     //*************
     event newPlayerJoinGameEvent(address indexed _address,uint256 indexed _amount,bool indexed _JoinWithEth,uint256 _timestamp);
     event calculateTargetEvent(uint256 indexed _roundID);
-    
+
     constructor() public {
         dayNumber = 1;
     }
-    
+
     function() external payable {
         joinGameWithInviterID(0);
     }
-    
+
     //************
     //Game payable
     //************
@@ -64,7 +64,7 @@ contract Richer3D {
         buyCore(_senderAddress,pInfoXpAdd[_senderAddress].inviterAddress,_eth);
         emit newPlayerJoinGameEvent(msg.sender,msg.value,true,_timestamp);
     }
-    
+
     //********************
     // Method need Gas
     //********************
@@ -78,21 +78,21 @@ contract Richer3D {
         pInfoXpAdd[_senderAddress].withDrawNumber = pInfoXpAdd[_senderAddress].withDrawNumber.sub(_amount);
         emit newPlayerJoinGameEvent(_senderAddress,_amount,false,_timestamp);
     }
-    
+
     function calculateTarget() public {
         require(calculating_target == false,"Waiting....");
         calculating_target = true;
         uint256 _timestamp = now;
         require(_timestamp.sub(rInfoXrID[roundNumber].lastCalculateTime) >= cycleTime,"Less than cycle Time from last operation");
-        //allocate p3d dividends to contract 
+        //allocate p3d dividends to contract
         uint256 dividends = p3dContract.myDividends(true);
         if(dividends > 0) {
             if(rInfoXrID[roundNumber].dayInfoXDay[dayNumber].playerNumber > 0) {
                 p3dDividesXroundID[roundNumber] = p3dDividesXroundID[roundNumber].add(dividends);
-                p3dContract.withdraw();    
+                p3dContract.withdraw();
             } else {
                 platformBalance = platformBalance.add(dividends);
-                p3dContract.withdraw();    
+                p3dContract.withdraw();
             }
         }
         uint256 increaseBalance = getIncreaseBalance(dayNumber,roundNumber);
@@ -110,7 +110,7 @@ contract Richer3D {
                 rInfoXrID[roundNumber].startTime = _timestamp;
                 rInfoXrID[roundNumber].lastCalculateTime = _timestamp;
             } else {
-                rInfoXrID[roundNumber].lastCalculateTime = _timestamp;   
+                rInfoXrID[roundNumber].lastCalculateTime = _timestamp;
             }
              //dividends for mine holder
             rInfoXrID[roundNumber].increaseETH = rInfoXrID[roundNumber].increaseETH.sub(getETHNeedPay(roundNumber,dayNumber.sub(1))).sub(ethForP3D);
@@ -124,7 +124,7 @@ contract Richer3D {
                     uint256 platformBalanceAmount = platformBalance;
                     platformBalance = 0;
                     sysAdminAddress.transfer(platformBalanceAmount);
-                } 
+                }
                 haveWinner = true;
             }
             rInfoXrID[roundNumber].winnerDay = dayNumber.sub(1);
@@ -150,7 +150,7 @@ contract Richer3D {
         pAddXpID[totalPlayerNumber] = _senderAddress;
         pInfoXpAdd[_senderAddress].inviterAddress = pAddXpID[_inviterID];
     }
-    
+
     function buyCore(address _playerAddress,address _inviterAddress,uint256 _amount) private {
         require(_amount >= 0.01 ether,"You need to pay 0.01 ether at lesat");
         //10 percent of the investment amount belongs to the inviter
@@ -178,7 +178,7 @@ contract Richer3D {
         rInfoXrID[roundNumber].dayInfoXDay[dayNumber].mineAmountXAddress[_senderAddress] = rInfoXrID[roundNumber].dayInfoXDay[dayNumber].mineAmountXAddress[_senderAddress].add(_amount*5);
         rInfoXrID[roundNumber].dayInfoXDay[dayNumber].ethPayAmountXAddress[_senderAddress] = rInfoXrID[roundNumber].dayInfoXDay[dayNumber].ethPayAmountXAddress[_senderAddress].add(_amount);
     }
-    
+
     function playerWithdraw(uint256 _amount) public {
         address _senderAddress = msg.sender;
         uint256 balance = getUserBalance(_senderAddress);
@@ -188,7 +188,7 @@ contract Richer3D {
         pInfoXpAdd[_senderAddress].withDrawNumber = pInfoXpAdd[_senderAddress].withDrawNumber.add(_amount);
         _senderAddress.transfer(_amount.sub(_amount.div(100)));
     }
-    
+
     function sendBalanceForDevelop(uint256 _roundID) private {
         uint256 bouns = getBounsWithRoundID(_roundID).div(5);
         sysDevelopAddress.transfer(bouns.div(2));
@@ -202,7 +202,7 @@ contract Richer3D {
         _bouns = _bouns.add(rInfoXrID[_roundID].bounsInitNumber).add(rInfoXrID[_roundID].increaseETH);
         return(_bouns);
     }
-    
+
     function getETHNeedPay(uint256 _roundID,uint256 _dayID) private view returns(uint256 _amount) {
         if(_dayID >=2) {
             uint256 mineTotal = rInfoXrID[_roundID].totalMine.sub(rInfoXrID[_roundID].dayInfoXDay[_dayID].actualMine).sub(rInfoXrID[_roundID].dayInfoXDay[_dayID].increaseMine);
@@ -212,12 +212,12 @@ contract Richer3D {
         }
         return(_amount);
     }
-    
+
     function getIncreaseBalance(uint256 _dayID,uint256 _roundID) private view returns(uint256 _balance) {
         _balance = rInfoXrID[_roundID].dayInfoXDay[_dayID].increaseETH;
         return(_balance);
     }
-    
+
     function getMineInfoInDay(address _userAddress,uint256 _roundID, uint256 _dayID) private view returns(uint256 _totalMine,uint256 _myMine,uint256 _additional) {
         //Through traversal, the total amount of ore by the end of the day, the amount of ore held by users, and the amount of additional additional secondary ore
         for(uint256 i=1;i<=_dayID;i++) {
@@ -233,12 +233,12 @@ contract Richer3D {
         }
         return(_totalMine,_myMine,_additional);
     }
-    
+
     //Ore ->eth conversion rate
     function getTransformRate() private pure returns(uint256 _rate) {
         return(60);
     }
-    
+
     //Calculate the amount of eth to be paid in x day for user
     function getTransformMineInDay(address _userAddress,uint256 _roundID,uint256 _dayID) private view returns(uint256 _transformedMine) {
         (,uint256 userMine,) = getMineInfoInDay(_userAddress,_roundID,_dayID.sub(1));
@@ -246,7 +246,7 @@ contract Richer3D {
         _transformedMine = userMine.mul(rate).div(10000);
         return(_transformedMine);
     }
-    
+
     //Calculate the amount of eth to be paid in x day for all people
     function calculateTotalMinePay(uint256 _roundID,uint256 _dayID) private view returns(uint256 _needToPay) {
         uint256 mine = rInfoXrID[_roundID].totalMine.sub(rInfoXrID[_roundID].dayInfoXDay[_dayID].actualMine).sub(rInfoXrID[_roundID].dayInfoXDay[_dayID].increaseMine);
@@ -264,10 +264,10 @@ contract Richer3D {
         } else {
             target = ((1000000).sub(SafeMath.pwr((100).sub((3).mul(_dayID)),3))).mul(needToPay).div(1000000);
             if(target == 0) target = 0.0063 ether;
-            return(target);            
+            return(target);
         }
     }
-    
+
     //Query user income balance
     function getUserBalance(address _userAddress) private view returns(uint256 _balance) {
         if(pIDXpAdd[_userAddress] == 0) {
@@ -287,7 +287,7 @@ contract Richer3D {
         _balance = totalTransformed.add(inviteEarnings).add(getBounsEarnings(_userAddress)).add(getHoldEarnings(_userAddress)).add(getUserP3DDivEarnings(_userAddress)).sub(withDrawNumber);
         return(_balance);
     }
-    
+
     //Calculated the number of ETH users won in the prize pool
     function getBounsEarnings(address _userAddress) private view returns(uint256 _bounsEarnings) {
         for(uint256 i=1;i<roundNumber;i++) {
@@ -310,15 +310,15 @@ contract Richer3D {
             uint256 winnerDay = rInfoXrID[i].winnerDay;
             if(winnerDay == 0) {
                 _holdEarnings = _holdEarnings;
-            } else {  
+            } else {
                 (uint256 totalMine,uint256 myMine,) = getMineInfoInDay(_userAddress,i,rInfoXrID[i].totalDay);
                 uint256 bouns = getBounsWithRoundID(i).mul(7).div(50);
-                _holdEarnings = _holdEarnings.add(bouns.mul(myMine).div(totalMine));    
+                _holdEarnings = _holdEarnings.add(bouns.mul(myMine).div(totalMine));
             }
         }
         return(_holdEarnings);
     }
-    
+
     //Calculate user's P3D bonus
     function getUserP3DDivEarnings(address _userAddress) private view returns(uint256 _myP3DDivide) {
         if(rInfoXrID[roundNumber].totalDay <= 1) {
@@ -337,9 +337,9 @@ contract Richer3D {
         }
         return(_myP3DDivide);
     }
-    
+
     //*******************
-    // UI 
+    // UI
     //*******************
     function getDefendPlayerList() public view returns(address[]) {
         if (rInfoXrID[roundNumber].dayInfoXDay[dayNumber-1].playerNumber == 0) {
@@ -356,7 +356,7 @@ contract Richer3D {
         }
         return(playerList);
     }
-    
+
     function getAttackPlayerList() public view returns(address[]) {
         uint256 number = rInfoXrID[roundNumber].dayInfoXDay[dayNumber].playerNumber;
         if(number > 100) {
@@ -368,32 +368,32 @@ contract Richer3D {
         }
         return(playerList);
     }
-    
+
     function getCurrentFieldBalanceAndTarget() public view returns(uint256 day,uint256 bouns,uint256 todayBouns,uint256 dailyTarget) {
         uint256 fieldBalance = getBounsWithRoundID(roundNumber).mul(7).div(10);
         uint256 todayBalance = getIncreaseBalance(dayNumber,roundNumber) ;
         dailyTarget = getDailyTarget(roundNumber,dayNumber);
         return(dayNumber,fieldBalance,todayBalance,dailyTarget);
     }
-    
+
     function getUserIDAndInviterEarnings() public view returns(uint256 userID,uint256 inviteEarning) {
         return(pIDXpAdd[msg.sender],pInfoXpAdd[msg.sender].inviteEarnings);
     }
-    
+
     function getCurrentRoundInfo() public view returns(uint256 _roundID,uint256 _dayNumber,uint256 _ethMineNumber,uint256 _startTime,uint256 _lastCalculateTime) {
         DataModal.RoundInfo memory roundInfo = rInfoXrID[roundNumber];
         (uint256 totalMine,,) = getMineInfoInDay(msg.sender,roundNumber,dayNumber);
         return(roundNumber,dayNumber,totalMine,roundInfo.startTime,roundInfo.lastCalculateTime);
     }
-    
+
     function getUserProperty() public view returns(uint256 ethMineNumber,uint256 holdEarning,uint256 transformRate,uint256 ethBalance,uint256 ethTranslated,uint256 ethMineCouldTranslateToday,uint256 ethCouldGetToday) {
         if(pIDXpAdd[msg.sender] <1) {
-            return(0,0,0,0,0,0,0);        
+            return(0,0,0,0,0,0,0);
         }
         (,uint256 myMine,uint256 additional) = getMineInfoInDay(msg.sender,roundNumber,dayNumber);
         ethMineNumber = myMine;
         holdEarning = additional;
-        transformRate = getTransformRate();      
+        transformRate = getTransformRate();
         ethBalance = getUserBalance(msg.sender);
         uint256 totalTransformed = 0;
         for(uint256 i=1;i<rInfoXrID[roundNumber].totalDay;i++) {
@@ -412,7 +412,7 @@ contract Richer3D {
             ethCouldGetToday
             );
     }
-    
+
     function getPlatformBalance() public view returns(uint256 _platformBalance) {
         require(msg.sender == sysAdminAddress,"Ummmmm......Only admin could do this");
         return(platformBalance);
@@ -437,7 +437,7 @@ contract Richer3D {
             getBounsWithRoundID(roundNumber).mul(7).div(10)
             );
     }
-    
+
     function getUserAddressList() public view returns(address[]) {
         address[] memory addressList = new address[](totalPlayerNumber);
         for(uint256 i=0;i<totalPlayerNumber;i++) {
@@ -445,7 +445,7 @@ contract Richer3D {
         }
         return(addressList);
     }
-    
+
     function getUsersInfo() public view returns(uint256[7][]){
         uint256[7][] memory infoList = new uint256[7][](totalPlayerNumber);
         for(uint256 i=0;i<totalPlayerNumber;i++) {
@@ -464,16 +464,16 @@ contract Richer3D {
             infoList[i][4] = getUserBalance(userAddress).add(pInfoXpAdd[userAddress].withDrawNumber);
             infoList[i][5] = pInfoXpAdd[userAddress].inviteEarnings;
             infoList[i][6] = totalTransformed;
-        }        
+        }
         return(infoList);
     }
-    
+
     function getP3DInfo() public view returns(uint256 _p3dTokenInContract,uint256 _p3dDivInRound) {
         _p3dTokenInContract = p3dContract.balanceOf(address(this));
         _p3dDivInRound = p3dDividesXroundID[roundNumber];
         return(_p3dTokenInContract,_p3dDivInRound);
     }
-    
+
 }
 
 //P3D Interface
@@ -491,7 +491,7 @@ library DataModal {
         address inviterAddress;
         uint256 withDrawNumber;
     }
-    
+
     struct DayInfo {
         uint256 playerNumber;
         uint256 actualMine;
@@ -501,7 +501,7 @@ library DataModal {
         mapping(address=>uint256) ethPayAmountXAddress;
         mapping(address=>uint256) mineAmountXAddress;
     }
-    
+
     struct RoundInfo {
         uint256 startTime;
         uint256 lastCalculateTime;
@@ -518,10 +518,10 @@ library SafeMath {
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -530,12 +530,12 @@ library SafeMath {
         require(c / a == b, "SafeMath mul failed");
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0, "SafeMath div failed");
         uint256 c = a / b;
         return c;
-    } 
+    }
 
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
@@ -543,7 +543,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -555,30 +555,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -589,20 +589,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -610,4 +610,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

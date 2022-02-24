@@ -117,7 +117,7 @@ contract BAOToken is StandardToken {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        //call the receiveApproval function on the contract you want to be notified. 
+        //call the receiveApproval function on the contract you want to be notified.
         //This crafts the function signature manually so one doesn't have to include a contract in here just for this.
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed when one does this that the call *should* succeed, otherwise one would use vanilla approve instead.
@@ -131,4 +131,10 @@ contract BAOToken is StandardToken {
     string public version = "v1.1";
     uint256 public initialAmount = 800 * (10 ** 8) * (10 ** 18);
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

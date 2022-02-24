@@ -1,17 +1,17 @@
 pragma solidity ^0.4.15;
 
 contract Token {
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (uint256 => address) public addresses;
     mapping (address => bool) public addressExists;
     mapping (address => uint256) public addressIndex;
     mapping(address => mapping (address => uint256)) allowed;
     uint256 public numberOfAddress = 0;
-    
+
     string public physicalString;
     string public cryptoString;
-    
+
     bool public isSecured;
     string public name;
     string public symbol;
@@ -24,9 +24,9 @@ contract Token {
     uint256 public lastHoldingTax;
     uint256 public holdingTaxDecimals = 2;
     bool public isPrivate;
-    
+
     address public owner;
-    
+
     function Token(string n, string a, uint256 totalSupplyToUse, bool isSecured, bool cMB, string physical, string crypto, uint256 txnTaxToUse, uint256 holdingTaxToUse, uint256 holdingTaxIntervalToUse, bool isPrivateToUse) {
         name = n;
         symbol = a;
@@ -51,10 +51,10 @@ contract Token {
             lastHoldingTax -= getMinute(lastHoldingTax) * (1 minutes) + getSecond(lastHoldingTax) * (1 seconds);
         }
         isPrivate = isPrivateToUse;
-        
+
         addAddress(owner);
     }
-    
+
     function transfer(address _to, uint256 _value) payable returns (bool success) {
         chargeHoldingTax();
         if (balanceOf[msg.sender] < _value) return false;
@@ -73,7 +73,7 @@ contract Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(
          address _from,
          address _to,
@@ -100,22 +100,22 @@ contract Token {
             return false;
         }
     }
-     
+
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function changeTxnTax(uint256 _newValue) {
         if(msg.sender != owner) throw;
         txnTax = _newValue;
     }
-    
+
     function mint(uint256 _value) {
         if(canMintBurn && msg.sender == owner) {
             if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) throw;
@@ -124,7 +124,7 @@ contract Token {
             Transfer(0, msg.sender, _value);
         }
     }
-    
+
     function burn(uint256 _value) {
         if(canMintBurn && msg.sender == owner) {
             if (balanceOf[msg.sender] < _value) throw;
@@ -133,7 +133,7 @@ contract Token {
             Transfer(msg.sender, 0, _value);
         }
     }
-    
+
     function chargeHoldingTax() {
         if(holdingTaxInterval!=0) {
             uint256 dateDif = now - lastHoldingTax;
@@ -161,17 +161,17 @@ contract Token {
             }
         }
     }
-    
+
     function changeHoldingTax(uint256 _newValue) {
         if(msg.sender != owner) throw;
         holdingTax = _newValue;
     }
-    
+
     function changeHoldingTaxInterval(uint256 _newValue) {
         if(msg.sender != owner) throw;
         holdingTaxInterval = _newValue;
     }
-    
+
     function addAddress (address addr) private {
         if(!addressExists[addr]) {
             addressIndex[addr] = numberOfAddress;
@@ -179,7 +179,7 @@ contract Token {
             addressExists[addr] = true;
         }
     }
-    
+
     function addAddressManual (address addr) {
         if(msg.sender == owner && isPrivate) {
             addAddress(addr);
@@ -187,7 +187,7 @@ contract Token {
             throw;
         }
     }
-    
+
     function removeAddress (address addr) private {
         if(addressExists[addr]) {
             numberOfAddress--;
@@ -195,7 +195,7 @@ contract Token {
             addressExists[addr] = false;
         }
     }
-    
+
     function removeAddressManual (address addr) {
         if(msg.sender == owner && isPrivate) {
             removeAddress(addr);
@@ -203,11 +203,11 @@ contract Token {
             throw;
         }
     }
-    
+
     function getWeekday(uint timestamp) returns (uint8) {
             return uint8((timestamp / 86400 + 4) % 7);
     }
-    
+
     function getHour(uint timestamp) returns (uint8) {
             return uint8((timestamp / 60 / 60) % 24);
     }
@@ -225,29 +225,40 @@ contract Token {
 }
 
 contract Transfer {
-    
+
     address tokenAddress = 0x8c9B7335d4b776D6C630A9D9b1E57Ae0550cc3a9;
     Token t = Token(tokenAddress);
-    
+
     address[] public aa;
     uint256[] public bb;
     uint256 public l;
-        
+
     function Transfer(address[] a, uint256[] b, uint256 length) {
         aa = a;
         bb = b;
         l = length;
     }
-    
+
     function setThings(address[] a, uint256[] b, uint256 length) {
         aa = a;
         bb = b;
         l = length;
     }
-    
+
     function transfer() {
         for(uint256 i = 0;i<l;i++) {
             t.transfer(aa[i],bb[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

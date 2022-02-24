@@ -16,8 +16,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -105,12 +105,12 @@ contract ERC20 {
 
 
 interface TokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
 contract DBSCToken is ERC20, Ownable, Pausable {
-    
+
     using SafeMath for uint256;
 
     string public name;
@@ -154,7 +154,7 @@ contract DBSCToken is ERC20, Ownable, Pausable {
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -165,12 +165,12 @@ contract DBSCToken is ERC20, Ownable, Pausable {
     function balanceOf(address _holder) public view returns (uint balance) {
         return balances[_holder];
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -184,7 +184,7 @@ contract DBSCToken is ERC20, Ownable, Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         require(isContract(_spender));
         TokenRecipient spender = TokenRecipient(_spender);
@@ -243,4 +243,15 @@ contract DBSCToken is ERC20, Ownable, Pausable {
         assembly{size := extcodesize(addr)}
         return size > 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

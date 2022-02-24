@@ -234,7 +234,7 @@ contract TomoCoin is StandardToken, Pausable {
 
   uint256 public constant tomoDeposit = 100000000 * 10**decimals;
 
-  function TomoCoin(address _tomoDepositAddress) public { 
+  function TomoCoin(address _tomoDepositAddress) public {
     tomoDepositAddress = _tomoDepositAddress;
 
     balances[tomoDepositAddress] = tomoDeposit;
@@ -347,7 +347,7 @@ contract TomoTokenSale is Pausable {
     return tomo.mint(to, val);
   }
 
-  function () public payable {    
+  function () public payable {
     createTokens(msg.sender, msg.value);
   }
 
@@ -416,4 +416,15 @@ contract TomoTokenSale is Pausable {
     isFinalized = true;
     ethFundDepositAddress.transfer(this.balance);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

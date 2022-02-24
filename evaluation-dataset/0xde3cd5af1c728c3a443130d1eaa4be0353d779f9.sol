@@ -22,7 +22,7 @@ contract HorizonContractBase {
 // ERC Token Standard #20 Interface
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20Basic.sol
-// 
+//
 // ----------------------------------------------------------------------------
 interface ERC20Interface {
     function totalSupply() external view returns (uint256);
@@ -61,7 +61,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
         require(msg.sender == regulatorApprovedKycProvider, "Only the KYC Provider can call this function.");
         _;
     }
-	
+
 	// Contract authorization - only allow the official issuer to perform certain actions.
     modifier onlyIssuer {
         require(msg.sender == issuer, "Only the Issuer can call this function.");
@@ -70,17 +70,17 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
     // The approved KYC provider that verifies all ICO/TGE Contributors.
     address public regulatorApprovedKycProvider;
-    
+
     // The issuer
     address public issuer;
 
     // Public identity variables of the token used by ERC20 platforms.
     string public name;
     string public symbol;
-    
+
     // There is no good reason to deviate from 18 decimals, see https://github.com/ethereum/EIPs/issues/724.
     uint8 public decimals = 18;
-    
+
     // The total supply of tokens, set at creation, decreased with burn.
     uint256 public totalSupply_;
 
@@ -110,7 +110,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
     // Notification when tokens are burned by the owner.
     event Burn(address indexed from, uint256 value);
-    
+
     // Emitted when mint event ocurred
     // added by andrewju
     event Mint(address indexed from, uint256 value);
@@ -128,10 +128,10 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
         totalSupply_ = totalSupply * 10 ** uint256(decimals);   // Set the total supply of ICO Tokens.
         balances[msg.sender] = totalSupply_;
         rewardPool_ = _rewardPool * 10 ** uint256(decimals);   // Set the total supply of ICO Reward Tokens.
-        
+
         setKycProvider(msg.sender);
         setIssuer(msg.sender);
-        
+
     }
 
     /**
@@ -201,7 +201,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
     function transfer(address to, uint256 value) public returns (bool) {
         return _transfer(msg.sender, to, value);
     }
-	
+
     /**
      * Transfer pre-approved tokens on behalf of an account.
      *
@@ -213,7 +213,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      */
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
         require(value <= allowanceCollection[from][msg.sender], "Amount to transfer is greater than allowance.");
-		
+
         allowanceCollection[from][msg.sender] = allowanceCollection[from][msg.sender].sub(value);
         _transfer(from, to, value);
         return true;
@@ -269,7 +269,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's KYC app will register a hash of the Contributors
-     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be 
+     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be
      * notified of the submission and retrieve the Contributor data for formal review.
      *
      * All Contributors must successfully complete our ICO KYC review prior to being allowed on-board.
@@ -289,7 +289,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's registered KYC provider submits their approval
-     * for this Contributor to particpate using the ICO-Platform portal. 
+     * for this Contributor to particpate using the ICO-Platform portal.
      *
      * Each Contributor will then be sent the Ethereum, Bitcoin and IBAN account numbers to
      * deposit their Approved Contribution in exchange for ICO Tokens.
@@ -309,7 +309,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform shall register a fully licensed Swiss KYC
-     * provider to assess each potential Contributor for KYC and AML under Swiss law. 
+     * provider to assess each potential Contributor for KYC and AML under Swiss law.
      *
      * -- End ICO-Platform Note --
      *
@@ -318,7 +318,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
     function setKycProvider(address who) public onlyOwner {
         regulatorApprovedKycProvider = who;
     }
-    
+
         /**
      * Set the issuer address
      *
@@ -327,8 +327,8 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
     function setIssuer(address who) public onlyOwner {
         issuer = who;
     }
-    
-    
+
+
     /**
      * Retrieve the KYC hash from the specified index.
      *
@@ -352,7 +352,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's portal shall award referrers as part of the ICO
-     * ICO Token issuance procedure as overseen by the Swiss KYC provider. 
+     * ICO Token issuance procedure as overseen by the Swiss KYC provider.
      *
      * -- End ICO-Platform Note --
      *
@@ -372,7 +372,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      * During the ICO phase the owner will allocate tokens once KYC completes and funds are deposited.
      *
      * ---- ICO-Platform Note ----
-     * The horizon-globex.com ICO platform's portal shall issue ICO Token to Contributors on receipt of 
+     * The horizon-globex.com ICO platform's portal shall issue ICO Token to Contributors on receipt of
      * the Approved Contribution funds at the KYC providers Escrow account/wallets.
      * Only after ICO Tokens are issued to the Contributor can the Swiss KYC provider allow the transfer
      * of funds from their Escrow to Company.
@@ -387,7 +387,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
         // If an attempt is made to transfer more tokens than owned, transfer the remainder.
         uint256 toTransfer = (value > (balances[msg.sender] - rewardPool_ )) ? (balances[msg.sender] - rewardPool_) : value;
-        
+
         _transfer(msg.sender, to, toTransfer);
 
         // Handle a referred account receiving tokens.
@@ -402,7 +402,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
      * End the ICO phase in accordance with KYC procedures and clean up.
      *
      * ---- ICO-Platform Note ----
-     * The horizon-globex.com ICO platform's portal shall halt the ICO at the end of the 
+     * The horizon-globex.com ICO platform's portal shall halt the ICO at the end of the
      * Contribution Period, as defined in the ICO Terms and Conditions at timelessluxurygroup.com.
      *
      * -- End ICO-Platform Note --
@@ -417,7 +417,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
         emit IcoComplete();
     }
-	
+
     /**
      * Internal transfer, can only be called by this contract
      *
@@ -433,11 +433,11 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
         // Quick exit for zero, but allow it in case this transfer is part of a chain.
         if(value == 0)
             return true;
-		
+
         // Perform the transfer.
         balances[from] = balances[from].sub(value);
         balances[to] = balances[to].add(value);
-		
+
         // Any tokens sent to to owner are implicitly burned.
         if (to == owner) {
             _burn(to, value);
@@ -445,7 +445,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
         return true;
     }
-    
+
     /**
      * Permanently mint tokens to increase the totalSupply_.
      *
@@ -455,11 +455,11 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
         require(value > 0, "Tokens to mint must be greater than zero");
         balances[owner] = balances[owner].add(value);
         totalSupply_ = totalSupply_.add(value);
-        
+
         emit Mint(msg.sender, value);
-        
+
     }
-    
+
     /**
      * Permanently destroy tokens from totalSupply_.
      *
@@ -539,7 +539,7 @@ library SafeMath {
 // TradeToken Standard #20 Interface
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20Basic.sol
-// 
+//
 // ----------------------------------------------------------------------------
 interface TokenInterface {
     function hold(address who, uint256 quantity) external returns(bool);
@@ -666,7 +666,7 @@ contract RegD is HorizonContractBase {
         heldTokens[who] = holding;
         emit TokensHeld(who, holding.quantity, holding.releaseDate);
     }
-	
+
     /**
      * @notice Hold tokens post-ICO with a variable release date on those tokens.
      *
@@ -727,7 +727,7 @@ contract RegD is HorizonContractBase {
 
         return false;
     }
-	
+
     /**
      * @notice Release some of an affiliate's tokens to a broker/trading wallet.
      *
@@ -792,12 +792,12 @@ contract RegD is HorizonContractBase {
      */
     function addTime(address who, int tSeconds) public onlyTransferAgent returns (bool) {
         require(tSeconds != 0, "Time added cannot be zero.");
-        
+
         Holding memory holding = heldTokens[who];
         uint256 oldDate = holding.releaseDate;
         uint256 newDate = tSeconds < 0 ? holding.releaseDate.sub(uint(-tSeconds)) : holding.releaseDate.add(uint(tSeconds));
         heldTokens[who] = Holding(holding.quantity, newDate, holding.isAffiliate);
-        
+
         emit ReleaseDateChanged(who, oldDate, heldTokens[who].releaseDate);
         return true;
     }
@@ -832,4 +832,13 @@ contract RegD is HorizonContractBase {
         Holding memory h = heldTokens[who];
         return (h.quantity != 0 || h.releaseDate != 0);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

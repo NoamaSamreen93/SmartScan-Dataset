@@ -91,7 +91,7 @@ contract Reservation is mortal, SafeMath {
 	function withdraw() {
 		uint amount = balanceOf[msg.sender];
 		require(amount > 0);
-		
+
 		balanceOf[msg.sender] = 0;
 		msg.sender.transfer(amount);
 	}
@@ -100,9 +100,20 @@ contract Reservation is mortal, SafeMath {
 	function getNumInvestors() constant returns(uint) {
 		return investors.length;
 	}
-	
+
 	function setICO(address _icoAddr) onlyOwner {
 		ico = ICO(_icoAddr);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

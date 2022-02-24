@@ -323,7 +323,7 @@ contract WBTCSwapContract is ERC20SwapContract {
         // Logs close event
         emit LogClose(_swapID, _secretKey);
     }
-    
+
     /// @notice Checks whether a swap is refundable or not.
     ///
     /// @param _swapID The unique atomic swap id.
@@ -353,4 +353,15 @@ contract WBTCSwapContract is ERC20SwapContract {
     function swapID(bytes32 _secretLock, uint256 _timelock) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(_secretLock, _timelock));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

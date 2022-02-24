@@ -14,7 +14,7 @@ contract OwnerBase {
 
     // @dev Keeps track whether the contract is paused. When that is true, most actions are blocked
     bool public paused = false;
-    
+
     /// constructor
     function OwnerBase() public {
        ceoAddress = msg.sender;
@@ -33,7 +33,7 @@ contract OwnerBase {
         require(msg.sender == cfoAddress);
         _;
     }
-    
+
     /// @dev Access modifier for COO-only functionality
     modifier onlyCOO() {
         require(msg.sender == cooAddress);
@@ -56,7 +56,7 @@ contract OwnerBase {
 
         cfoAddress = _newCFO;
     }
-    
+
     /// @dev Assigns a new address to act as the COO. Only available to the current CEO.
     /// @param _newCOO The address of the new COO
     function setCOO(address _newCOO) external onlyCEO {
@@ -92,17 +92,17 @@ contract OwnerBase {
         // can't unpause if contract was upgraded
         paused = false;
     }
-    
-    
+
+
     /// @dev check wether target address is a contract or not
     function isNormalUser(address addr) internal view returns (bool) {
         if (addr == address(0)) {
             return false;
         }
         uint size = 0;
-        assembly { 
-            size := extcodesize(addr) 
-        } 
+        assembly {
+            size := extcodesize(addr)
+        }
         return size == 0;
     }
 }
@@ -111,16 +111,16 @@ contract OwnerBase {
 contract Lottery is OwnerBase {
 
     event Winner( address indexed account,uint indexed id, uint indexed sn );
-    
+
     uint public price = 1 finney;
-    
+
     uint public reward = 10 finney;
-    
+
     uint public sn = 1;
-    
+
     uint private seed = 0;
-    
-    
+
+
     /// @dev constructor of contract, create a seed
     function Lottery() public {
         ceoAddress = msg.sender;
@@ -128,41 +128,41 @@ contract Lottery is OwnerBase {
         cfoAddress = msg.sender;
         seed = now;
     }
-    
+
     /// @dev set seed by coo
     function setSeed( uint val) public onlyCOO {
         seed = val;
     }
-    
-    
+
+
     function() public payable {
         // get ether, maybe from coo.
     }
-        
-    
-    
+
+
+
     /// @dev buy lottery
     function buy(uint id) payable public {
         require(isNormalUser(msg.sender));
         require(msg.value >= price);
-        uint back = msg.value - price;  
-        
+        uint back = msg.value - price;
+
         sn++;
         uint sum = seed + sn + now + uint(msg.sender);
         uint ran = uint16(keccak256(sum));
-        if (ran * 10000 < 880 * 0xffff) { // win the reward 
+        if (ran * 10000 < 880 * 0xffff) { // win the reward
             back = reward + back;
             emit Winner(msg.sender, id, sn);
         }else{
             emit Winner(msg.sender, id, 0);
         }
-        
+
         if (back > 1 finney) {
             msg.sender.transfer(back);
         }
     }
-    
-    
+
+
 
     // @dev Allows the cfo to capture the balance.
     function cfoWithdraw( uint remain) external onlyCFO {
@@ -170,8 +170,19 @@ contract Lottery is OwnerBase {
         require(myself.balance > remain);
         cfoAddress.transfer(myself.balance - remain);
     }
-    
-    
-    
-    
+
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

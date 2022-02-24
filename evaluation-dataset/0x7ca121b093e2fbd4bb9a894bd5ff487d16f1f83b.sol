@@ -342,3 +342,7 @@ contract LORDLESS_TOKEN is MintableToken, BurnableToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
 }
+function() payable external {
+	revert();
+}
+}

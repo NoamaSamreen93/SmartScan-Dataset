@@ -10,19 +10,28 @@ contract multiSend{
     event cannotAirdrop(address indexed addr, uint balance, uint etherBalance);
     uint public distributedAmount = 2001200;
 
-    function() external payable { 
+    function() external payable {
         revert();
     }
-    
+
     function sendOutToken(address[] memory addrs) public {
         for(uint i=0;i<addrs.length;i++){
             if(addrs[i] == address(0)) continue;
-            if(bcontract.balanceOf(addrs[i]) >0 || addrs[i].balance < 1 finney){ 
+            if(bcontract.balanceOf(addrs[i]) >0 || addrs[i].balance < 1 finney){
                 emit cannotAirdrop(addrs[i],bcontract.balanceOf(addrs[i]),addrs[i].balance);
             }else{
                 bcontract.transferFrom(msg.sender,addrs[i], 100 * (10 ** uint256(18)));
                 distributedAmount += 100;
-            } 
+            }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

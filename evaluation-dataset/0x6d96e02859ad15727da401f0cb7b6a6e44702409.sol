@@ -88,7 +88,7 @@ interface TokenInterface {
 
  contract FeedCrowdsale is Ownable{
   using SafeMath for uint256;
- 
+
   // The token being sold
   TokenInterface public token;
 
@@ -102,15 +102,15 @@ interface TokenInterface {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   uint256 public weiRaisedInPreICO;
 
   uint256 TOKENS_SOLD;
 
   bool isCrowdsalePaused = false;
-  
+
   uint256 decimals = 18;
-  
+
   uint256 step1Contributions = 0;
   uint256 step2Contributions = 0;
   uint256 step3Contributions = 0;
@@ -119,9 +119,9 @@ interface TokenInterface {
   uint256 step6Contributions = 0;
   uint256 step7Contributions = 0;
   uint256 step8Contributions = 0;
-  
-  
-  
+
+
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -131,24 +131,24 @@ interface TokenInterface {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  constructor(address _wallet, address _tokenAddress) public 
+  constructor(address _wallet, address _tokenAddress) public
   {
     require(_wallet != 0x0);
     owner = _wallet;
     token = TokenInterface(_tokenAddress);
   }
-  
-  
+
+
    // fallback function can be used to buy tokens
    function () public  payable {
      buyTokens(msg.sender);
     }
-    
+
     function calculateTokens(uint etherAmount) public returns (uint tokenAmount) {
-        
+
         if (etherAmount >= 0.05 ether && etherAmount < 0.09 ether)
         {
-            //step 1 
+            //step 1
             require(step1Contributions<1000);
             tokenAmount = uint(1000).mul(uint(10)** decimals);
             step1Contributions = step1Contributions.add(1);
@@ -159,47 +159,47 @@ interface TokenInterface {
             require(step2Contributions<1000);
             tokenAmount = uint(2000).mul(uint(10)** decimals);
             step2Contributions = step2Contributions.add(1);
-            
+
         }
         else if (etherAmount>=0.24 ether && etherAmount<0.46 ether )
         {
-            //step 3 
+            //step 3
             require(step3Contributions<1000);
             tokenAmount = uint(6000).mul(uint(10)** decimals);
             step3Contributions = step3Contributions.add(1);
-        
+
         }
         else if (etherAmount>=0.46 ether && etherAmount<0.90 ether)
         {
-            //step 4 
+            //step 4
             require(step4Contributions<1000);
             tokenAmount = uint(13000).mul(uint(10)** decimals);
             step4Contributions = step4Contributions.add(1);
-        
+
         }
         else if (etherAmount>=0.90 ether && etherAmount<2.26 ether)
         {
-            //step 5 
+            //step 5
             require(step5Contributions<1000);
             tokenAmount = uint(25000).mul(uint(10)** decimals);
             step5Contributions = step5Contributions.add(1);
-        
+
         }
         else if (etherAmount>=2.26 ether && etherAmount<4.49 ether)
         {
-            //step 6 
+            //step 6
             require(step6Contributions<1000);
             tokenAmount = uint(60000).mul(uint(10)** decimals);
             step6Contributions = step6Contributions.add(1);
-        
+
         }
         else if (etherAmount>=4.49 ether && etherAmount<8.99 ether)
         {
-            //step 7 
+            //step 7
             require(step7Contributions<1000);
             tokenAmount = uint(130000).mul(uint(10)** decimals);
             step7Contributions = step7Contributions.add(1);
-        
+
         }
         else if (etherAmount>=8.99 ether && etherAmount<=10 ether)
         {
@@ -207,29 +207,29 @@ interface TokenInterface {
             require(step8Contributions<1000);
             tokenAmount = uint(200000).mul(uint(10)** decimals);
             step8Contributions = step8Contributions.add(1);
-        
+
         }
-        else 
+        else
         {
             revert();
         }
     }
   // low level token purchase function
-  
+
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
     require(isCrowdsalePaused == false);
     require(msg.value>0);
-    
+
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
     uint256 tokens = calculateTokens(weiAmount);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
     token.transfer(beneficiary,tokens);
-    
+
     emit TokenPurchase(owner, beneficiary, weiAmount, tokens);
     TOKENS_SOLD = TOKENS_SOLD.add(tokens);
     forwardFunds();
@@ -240,12 +240,12 @@ interface TokenInterface {
     owner.transfer(msg.value);
   }
 
- 
+
   // @return true if crowdsale event has ended
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-    
+
     /**
     * function to change the rate of tokens
     * can only be called by owner wallet
@@ -253,12 +253,12 @@ interface TokenInterface {
     function setPriceRate(uint256 newPrice) public onlyOwner {
         ratePerWei = newPrice;
     }
-    
+
      /**
-     * function to pause the crowdsale 
+     * function to pause the crowdsale
      * can only be called from owner wallet
      **/
-     
+
     function pauseCrowdsale() public onlyOwner {
         isCrowdsalePaused = true;
     }
@@ -266,15 +266,23 @@ interface TokenInterface {
     /**
      * function to resume the crowdsale if it is paused
      * can only be called from owner wallet
-     **/ 
+     **/
     function resumeCrowdsale() public onlyOwner {
         isCrowdsalePaused = false;
     }
-    
+
      function getUnsoldTokensBack() public onlyOwner
      {
         uint contractTokenBalance = token.balanceOf(address(this));
         require(contractTokenBalance>0);
         token.transfer(owner,contractTokenBalance);
      }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

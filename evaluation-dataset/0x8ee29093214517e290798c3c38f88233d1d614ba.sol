@@ -263,27 +263,38 @@ contract StandardToken is ERC20, DudeToken {
 
 
 contract SoftDude is StandardToken, Ownable {
-    
+
     string public name = "Soft Dude";
     string public symbol = "DUDE";
     string public version = "1.0";
     uint8 public decimals = 18;
-    
+
     uint256 INITIAL_SUPPLY = 1000000000e18;
-    
+
     function SoftDude() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[this] = totalSupply_;
         allowed[this][msg.sender] = totalSupply_;
-        
+
         emit Approval(this, msg.sender, balances[this]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
     function() public {
         revert();
-    }    
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

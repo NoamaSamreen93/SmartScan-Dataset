@@ -128,35 +128,35 @@ library SafeMath {
     }
 }
 contract VitalikSteward {
-    
+
     /*
-    This smart contract collects patronage from current owner through a Harberger tax model and 
+    This smart contract collects patronage from current owner through a Harberger tax model and
     takes stewardship of the asset token if the patron can't pay anymore.
 
-    Harberger Tax (COST): 
+    Harberger Tax (COST):
     - Asset is always on sale.
     - You have to have a price set.
     - Tax (Patronage) is paid to maintain ownership.
     - Steward maints control over ERC721.
     */
     using SafeMath for uint256;
-    
+
     uint256 public price; //in wei
     IERC721Full public assetToken; // ERC721 NFT.
-    
+
     uint256 public totalCollected; // all patronage ever collected
-    uint256 public currentCollected; // amount currently collected for patron  
-    uint256 public timeLastCollected; // 
+    uint256 public currentCollected; // amount currently collected for patron
+    uint256 public timeLastCollected; //
     uint256 public deposit;
 
     address payable public organization; // non-profit organization
     uint256 public organizationFund;
-    
+
     mapping (address => bool) public patrons;
     mapping (address => uint256) public timeHeld;
 
     uint256 public timeAcquired;
-    
+
     // 30% patronage
     uint256 patronageNumerator = 300000000000;
     uint256 patronageDenominator = 1000000000000;
@@ -169,13 +169,13 @@ contract VitalikSteward {
         assetToken.setup();
         organization = _organization;
         state = StewardState.Foreclosed;
-    } 
+    }
 
     event LogBuy(address indexed owner, uint256 indexed price);
     event LogPriceChange(uint256 indexed newPrice);
     event LogForeclosure(address indexed prevOwner);
     event LogCollection(uint256 indexed collected);
-    
+
     modifier onlyPatron() {
         require(msg.sender == assetToken.ownerOf(42), "Not patron");
         _;
@@ -187,7 +187,7 @@ contract VitalikSteward {
     }
 
     modifier collectPatronage() {
-       _collectPatronage(); 
+       _collectPatronage();
        _;
     }
 
@@ -228,7 +228,7 @@ contract VitalikSteward {
     }
 
     /*
-    now + deposit/patronage per second 
+    now + deposit/patronage per second
     now + depositAbleToWithdraw/(price*nume/denom/365).
     */
     function foreclosureTime() public view returns (uint256) {
@@ -242,7 +242,7 @@ contract VitalikSteward {
         // determine patronage to pay
         if (state == StewardState.Owned) {
             uint256 collection = patronageOwed();
-            
+
             // should foreclose and stake stewardship
             if (collection >= deposit) {
                 // up to when was it actually paid for?
@@ -255,20 +255,20 @@ contract VitalikSteward {
                 timeLastCollected = now;
                 currentCollected = currentCollected.add(collection);
             }
-            
+
             deposit = deposit.sub(collection);
             totalCollected = totalCollected.add(collection);
             organizationFund = organizationFund.add(collection);
             emit LogCollection(collection);
         }
     }
-    
+
     // note: anyone can deposit
     function depositWei() public payable collectPatronage {
         require(state != StewardState.Foreclosed, "Foreclosed");
         deposit = deposit.add(msg.value);
     }
-    
+
     function buy(uint256 _newPrice) public payable collectPatronage {
         require(_newPrice > 0, "Price is zero");
         require(msg.value > price, "Not enough"); // >, coz need to have at least something for deposit
@@ -278,8 +278,8 @@ contract VitalikSteward {
             uint256 totalToPayBack = price;
             if(deposit > 0) {
                 totalToPayBack = totalToPayBack.add(deposit);
-            }  
-    
+            }
+
             // pay previous owner their price + deposit back.
             address payable payableCurrentOwner = address(uint160(currentOwner));
             payableCurrentOwner.transfer(totalToPayBack);
@@ -287,7 +287,7 @@ contract VitalikSteward {
             state = StewardState.Owned;
             timeLastCollected = now;
         }
-        
+
         deposit = msg.value.sub(price);
         transferAssetTokenTo(currentOwner, msg.sender, _newPrice);
         emit LogBuy(msg.sender, _newPrice);
@@ -296,11 +296,11 @@ contract VitalikSteward {
     function changePrice(uint256 _newPrice) public onlyPatron collectPatronage {
         require(state != StewardState.Foreclosed, "Foreclosed");
         require(_newPrice != 0, "Incorrect Price");
-        
+
         price = _newPrice;
         emit LogPriceChange(price);
     }
-    
+
     function withdrawDeposit(uint256 _wei) public onlyPatron collectPatronage returns (uint256) {
         _withdrawDeposit(_wei);
     }
@@ -342,11 +342,22 @@ contract VitalikSteward {
     function transferAssetTokenTo(address _currentOwner, address _newOwner, uint256 _newPrice) internal {
         // note: it would also tabulate time held in stewardship by smart contract
         timeHeld[_currentOwner] = timeHeld[_currentOwner].add((timeLastCollected.sub(timeAcquired)));
-        
+
         assetToken.transferFrom(_currentOwner, _newOwner, 42);
 
         price = _newPrice;
         timeAcquired = now;
         patrons[_newOwner] = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

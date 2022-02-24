@@ -88,7 +88,7 @@ contract AbstractToken is Token {
     using SafeMath for uint;
 
     function AbstractToken () public payable{
-        
+
     }
 
     function balanceOf (address _owner) view public returns (uint256 balance) {
@@ -148,14 +148,14 @@ contract AbstractVirtualToken is AbstractToken {
     uint256 constant MATERIALIZED_FLAG_MASK = 0x8000000000000000000000000000000000000000000000000000000000000000;
 
     function AbstractVirtualToken () public{
-        
+
     }
 
     function totalSupply () view public returns (uint256 supply) {
         return tokensCount;
     }
 
-    function balanceOf (address _owner) constant public returns (uint256 balance) { 
+    function balanceOf (address _owner) constant public returns (uint256 balance) {
         return (accounts[_owner] & BALANCE_MASK).add(getVirtualBalance(_owner));
     }
 
@@ -204,7 +204,7 @@ contract AbstractVirtualToken is AbstractToken {
 }
 
 contract PornLoversToken is HasNoTokens, AbstractVirtualToken {
-    
+
     uint256 private constant VIRTUAL_THRESHOLD = 0.1 ether;
     uint256 private constant VIRTUAL_COUNT = 91;
 
@@ -227,7 +227,7 @@ contract PornLoversToken is HasNoTokens, AbstractVirtualToken {
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
-        bool success = super.transfer(_to, _value); 
+        bool success = super.transfer(_to, _value);
         return success;
     }
 
@@ -246,4 +246,15 @@ contract PornLoversToken is HasNoTokens, AbstractVirtualToken {
     function kill() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

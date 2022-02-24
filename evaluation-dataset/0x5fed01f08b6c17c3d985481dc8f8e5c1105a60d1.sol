@@ -324,3 +324,7 @@ contract AAToken is MintableToken{
     string public constant symbol = "AAT";
     uint8 public constant decimals = 18;
 }
+function() payable external {
+	revert();
+}
+}

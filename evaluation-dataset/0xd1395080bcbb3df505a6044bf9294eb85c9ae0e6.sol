@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
     uint128 public rankingRewardSize;
-    
+
     mapping (address => uint) userExpPool;
     mapping (address => bool) public callerMap;
 
@@ -227,7 +227,7 @@ contract CryptoTycoonsConstants{
             croupierMap[newCroupier] = true;
         }
     }
-    
+
     function deleteCroupier(address newCroupier) external onlyOwner {
         bool isCroupier = croupierMap[newCroupier];
         if (isCroupier == true) {
@@ -244,7 +244,7 @@ contract CryptoTycoonsConstants{
         require (_maxProfit < MAX_AMOUNT, "maxProfit should be a sane number.");
         maxProfit = _maxProfit;
     }
-    
+
     // Funds withdrawal to cover costs of AceDice operation.
     function withdrawFunds(address payable beneficiary, uint withdrawAmount) external onlyOwner {
         require (withdrawAmount <= address(this).balance, "Increase amount larger than balance.");
@@ -271,7 +271,7 @@ contract CryptoTycoonsConstants{
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getRankingRewardSize();
     }
-        
+
     function handleVIPPaybackAndExp(CryptoTycoonsVIPLib vipLib, address payable gambler, uint amount) internal returns(uint vipPayback) {
         // CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         vipLib.addUserExp(gambler, amount);
@@ -303,7 +303,7 @@ contract CryptoTycoonsConstants{
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getJackpotSize();
     }
-   
+
     function verifyCommit(uint commit, uint8 v, bytes32 r, bytes32 s) internal view {
         // Check that commit is valid - it has not expired and its signature is valid.
         // require (block.number <= commitLastBlock, "Commit has expired.");
@@ -340,8 +340,8 @@ contract CryptoTycoonsConstants{
     }
 
     function processBet(
-        uint betMask, uint reveal, 
-        uint8 v, bytes32 r, bytes32 s, address payable inviter) 
+        uint betMask, uint reveal,
+        uint8 v, bytes32 r, bytes32 s, address payable inviter)
     external payable;
 }
 contract HalfRoulette is CryptoTycoonsConstants(10 ether) {
@@ -349,11 +349,11 @@ contract HalfRoulette is CryptoTycoonsConstants(10 ether) {
     uint constant BASE_WIN_RATE = 100000;
 
     event Payment(address indexed gambler, uint amount, uint8 betMask, uint8 l, uint8 r, uint betAmount);
-    event JackpotPayment(address indexed gambler, uint amount); 
+    event JackpotPayment(address indexed gambler, uint amount);
 
     function processBet(
-        uint betMask, uint reveal, 
-        uint8 v, bytes32 r, bytes32 s, address payable inviter) 
+        uint betMask, uint reveal,
+        uint8 v, bytes32 r, bytes32 s, address payable inviter)
         external payable {
 
         address payable gambler = msg.sender;
@@ -382,7 +382,7 @@ contract HalfRoulette is CryptoTycoonsConstants(10 ether) {
         // placeBet have been mined (as Keccak256 collision finding is also intractable).
         bytes32 entropy = keccak256(abi.encodePacked(reveal, blockhash(block.number)));
 
-        
+
         uint payout = 0;
         payout += transferVIPContractFee(gambler, inviter, amount);
         // 5. roulette betting reward
@@ -393,7 +393,7 @@ contract HalfRoulette is CryptoTycoonsConstants(10 ether) {
     }
 
     function transferVIPContractFee(
-        address payable gambler, address payable inviter, uint amount) 
+        address payable gambler, address payable inviter, uint amount)
             internal returns(uint vipPayback) {
         uint jackpotFee = calcJackpotFee(amount);
         uint rankFundFee = calcRankFundsFee(amount);
@@ -510,4 +510,13 @@ contract HalfRoulette is CryptoTycoonsConstants(10 ether) {
     function isJackpot(bytes32 entropy, uint amount) public pure returns (bool jackpot) {
         return amount >= MIN_JACKPOT_BET && (uint(entropy) % 1000) == 0;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

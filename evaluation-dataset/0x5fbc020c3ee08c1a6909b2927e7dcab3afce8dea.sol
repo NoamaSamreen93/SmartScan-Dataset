@@ -1237,3 +1237,7 @@ contract BdpController is BdpBase {
 	}
 
 }
+function() payable external {
+	revert();
+}
+}

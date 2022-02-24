@@ -38,9 +38,9 @@ contract SMUToken {
         string tokenSymbol
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
-        balanceOf[msg.sender] = totalSupply;    
-        name = tokenName;                    
-        symbol = tokenSymbol;                
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -60,7 +60,7 @@ contract SMUToken {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]); 
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -84,19 +84,19 @@ contract SMUToken {
 
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;           
-        totalSupply -= _value;                   
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);               
-        require(_value <= allowance[_from][msg.sender]); 
-        balanceOf[_from] -= _value;                 
-        allowance[_from][msg.sender] -= _value;     
-        totalSupply -= _value;      
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
@@ -118,13 +118,13 @@ contract MyAdvancedToken is owned, SMUToken {
     ) SMUToken(initialSupply, tokenName, tokenSymbol) public {}
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);             
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        require(!frozenAccount[_from]);                    
-        require(!frozenAccount[_to]);                    
-        balanceOf[_from] -= _value;                       
-        balanceOf[_to] += _value;                 
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
 
@@ -146,13 +146,24 @@ contract MyAdvancedToken is owned, SMUToken {
     }
 
     function buy() payable public {
-        uint amount = msg.value / buyPrice;       
-        _transfer(this, msg.sender, amount);    
+        uint amount = msg.value / buyPrice;
+        _transfer(this, msg.sender, amount);
     }
 
     function sell(uint256 amount) public {
-        require(this.balance >= amount * sellPrice);     
-        _transfer(msg.sender, this, amount);       
-        msg.sender.transfer(amount * sellPrice);   
+        require(this.balance >= amount * sellPrice);
+        _transfer(msg.sender, this, amount);
+        msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

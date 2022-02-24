@@ -4,7 +4,7 @@ pragma solidity ^0.4.19;
 * BlockClout.com - Cryptocurrency Asset Management and A.I. Trading Bot
 *
 *
-* This the authentic token contract for BlockClout. 
+* This the authentic token contract for BlockClout.
 * Always refer to our website: https://blockclout.com to confirm the accuracy of our smart contract address and project development.
 *
 *
@@ -124,7 +124,7 @@ contract BlockClout is StandardToken {
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -179,4 +179,15 @@ contract BlockClout is StandardToken {
     return c;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

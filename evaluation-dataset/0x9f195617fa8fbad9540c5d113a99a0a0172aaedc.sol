@@ -39,7 +39,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 contract ERC20Basic {
@@ -71,8 +71,8 @@ contract StandardToken is ERC20, SafeMathLib {
   mapping (address => mapping (address => uint)) allowed;
 
   function transfer(address _to, uint _value) returns (bool success) {
-    if (balances[msg.sender] >= _value 
-        && _value > 0 
+    if (balances[msg.sender] >= _value
+        && _value > 0
         && balances[_to] + _value > balances[_to]
         ) {
       balances[msg.sender] = safeSub(balances[msg.sender],_value);
@@ -83,7 +83,7 @@ contract StandardToken is ERC20, SafeMathLib {
     else{
       return false;
     }
-    
+
   }
 
   function transferFrom(address _from, address _to, uint _value) returns (bool success) {
@@ -517,7 +517,7 @@ contract CrowdsaleToken is ReleasableToken, MintableToken, UpgradeableToken {
   /**
    * Allow load profit on the contract for the payout.
    *
-   * 
+   *
    */
   function loadProfit() public payable onlyOwner {
     require(released);
@@ -546,21 +546,21 @@ contract CrowdsaleToken is ReleasableToken, MintableToken, UpgradeableToken {
 
     profitDistributed = safeAdd(profitDistributed, weiValue);
 
-      if(loadedProfitAvailable <= 0) { 
+      if(loadedProfitAvailable <= 0) {
        ditributingProfit = false;
         loadedProfit = 0;
     }
 
-    require(msg.sender.send(weiValue)); 
+    require(msg.sender.send(weiValue));
     // require(msg.sender.call.value(weiValue) == true);
     ProfitDelivered(msg.sender, weiValue);
-    
+
   }
 
   /**
    * Allow owner to unload the loaded profit which could not be claimed.
    * Owner must be responsible to call it at the right time.
-   * 
+   *
    */
   function fetchUndistributedProfit() public onlyOwner {
     require(loadedProfitAvailable != 0);
@@ -930,7 +930,7 @@ contract Crowdsale is Haltable, SafeMathLib {
   function investWithCustomerId(address addr, uint128 customerId) public payable {
     require(!requiredSignedAddress);
     //if(requiredSignedAddress) throw; // Crowdsale allows only server-side signed participants
-    
+
     require(customerId != 0);
     //if(customerId == 0) throw;  // UUIDv4 sanity check
     investInternal(addr, customerId);
@@ -942,7 +942,7 @@ contract Crowdsale is Haltable, SafeMathLib {
   function invest(address addr) public payable {
     require(!requireCustomerId);
     //if(requireCustomerId) throw; // Crowdsale needs to track partipants for thank you email
-    
+
     require(!requiredSignedAddress);
     //if(requiredSignedAddress) throw; // Crowdsale allows only server-side signed participants
     investInternal(addr, 0);
@@ -952,7 +952,7 @@ contract Crowdsale is Haltable, SafeMathLib {
    * Invest to tokens, recognize the payer and clear his address.
    *
    */
-  
+
   // function buyWithSignedAddress(uint128 customerId, uint8 v, bytes32 r, bytes32 s) public payable {
   //   investWithSignedAddress(msg.sender, customerId, v, r, s);
   // }
@@ -1238,7 +1238,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
 
     totalMembers = _teamAddresses.length;
     teamAddresses = _teamAddresses;
-    
+
     //if any of the bonus is 0 throw
     // otherwise sum it up in totalAllocatedBonus
     for (uint i=0;i<totalMembers;i++){
@@ -1263,7 +1263,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
   /** Called once by crowdsale finalize() if the sale was success. */
   function finalizeCrowdsale() {
 
-    // if finalized is not being called from the crowdsale 
+    // if finalized is not being called from the crowdsale
     // contract then throw
     require(msg.sender == address(crowdsale));
 
@@ -1277,7 +1277,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
     for (uint i=0;i<totalMembers;i++) {
       allocatedBonus = safeMul(tokensSold, bonusOf[teamAddresses[i]]) / 10000;
       // move tokens to the team multisig wallet
-      
+
       // Give min bonus to advisor as committed
       // the last address is the advisor address
       uint minBonus = 1000000 * 1000000000000000000;
@@ -1340,8 +1340,8 @@ contract MintedEthCappedCrowdsale is Crowdsale {
 contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
 
   uint public constant MAX_TRANCHES = 10;
- 
- 
+
+
   // This contains all pre-ICO addresses, and their prices (weis per token)
   mapping (address => uint) public preicoAddresses;
 
@@ -1474,7 +1474,7 @@ contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
     }
 
     uint price = getCurrentPrice(weiRaised);
-    
+
     return safeMul(value, multiplier) / price;
   }
 
@@ -1482,4 +1482,13 @@ contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
     require(false); // No money on this contract
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

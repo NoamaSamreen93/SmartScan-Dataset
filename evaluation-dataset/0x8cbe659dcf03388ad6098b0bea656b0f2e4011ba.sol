@@ -1,5 +1,5 @@
-/// @title Cryptocurrency  of the Ravensburg-Weingarten University of Applied Sciences ///(German: Hochschule Ravensburg-Weingarten) 
-///@author Walther,Dominik 
+/// @title Cryptocurrency  of the Ravensburg-Weingarten University of Applied Sciences ///(German: Hochschule Ravensburg-Weingarten)
+///@author Walther,Dominik
 
 pragma solidity ^0.4.13; contract owned { address public owner;
   function owned() {
@@ -23,7 +23,7 @@ contract HRWtoken is owned { string public name; string public symbol; uint8 pub
   mapping (address => uint256) public balanceOf;
   mapping (address => mapping (address => uint256)) public allowance;
 
- ///@notice generate a event on the blockchain to show transfer information 
+ ///@notice generate a event on the blockchain to show transfer information
   event Transfer(address indexed from, address indexed to, uint256 value);
 
 ///@notice initialization of the contract and distribution of tokes to the creater
@@ -35,20 +35,20 @@ contract HRWtoken is owned { string public name; string public symbol; uint8 pub
 address centralMinter
       ) {
 if(centralMinter != 0 ) owner = centralMinter;
-      balanceOf[msg.sender] = initialSupply;       
-      totalSupply = initialSupply;                        
-      name = tokenName;                                   
-      symbol = tokenSymbol;                               
-      decimals = decimalUnits;                            
+      balanceOf[msg.sender] = initialSupply;
+      totalSupply = initialSupply;
+      name = tokenName;
+      symbol = tokenSymbol;
+      decimals = decimalUnits;
   }
 
   ///@notice only the contract can operate this internal funktion
   function _transfer(address _from, address _to, uint _value) internal {
-      require (_to != 0x0);           
-      require (balanceOf[_from] >= _value);            
-      require (balanceOf[_to] + _value > balanceOf[_to]); 
-      balanceOf[_from] -= _value;                         
-      balanceOf[_to] += _value;                            
+      require (_to != 0x0);
+      require (balanceOf[_from] >= _value);
+      require (balanceOf[_to] + _value > balanceOf[_to]);
+      balanceOf[_from] -= _value;
+      balanceOf[_to] += _value;
       Transfer(_from, _to, _value);
   }
 
@@ -59,12 +59,12 @@ if(centralMinter != 0 ) owner = centralMinter;
       _transfer(msg.sender, _to, _value);
   }
 
-  /// @notice to dend the tokens the sender need the allowance 
+  /// @notice to dend the tokens the sender need the allowance
   /// @param _from The address of the sender
   /// @param _to The address of the recipient
   /// @param _value value units to send
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-      require (_value < allowance[_from][msg.sender]);     
+      require (_value < allowance[_from][msg.sender]);
       allowance[_from][msg.sender] -= _value;
       _transfer(_from, _to, _value);
       return true;
@@ -90,7 +90,7 @@ if(centralMinter != 0 ) owner = centralMinter;
           spender.receiveApproval(msg.sender, _value, this, _extraData);
           return true;
       }
-  }        
+  }
 /// @notice Create new token in addition to the initalsupply and send to target adress
   /// @param target address to receive the tokens
   /// @param mintedAmount ist the generated amount send to specified adress
@@ -110,15 +110,26 @@ if(centralMinter != 0 ) owner = centralMinter;
 
 /// @notice The Ether send to the contract exchange by BuyPrice and send back  ///HRW Tokens
   function buy() payable {
-      uint amount = msg.value / buyPrice;               
-      _transfer(this, msg.sender, amount);              
+      uint amount = msg.value / buyPrice;
+      _transfer(this, msg.sender, amount);
   }
 
 /// @notice the HRWToken send to the contract and exchange by SellPrice and ///send ether back
   /// @param amount HRW Token to sale
   function sell(uint256 amount) {
-      require(this.balance >= amount * sellPrice);      
-      _transfer(msg.sender, this, amount);              
-      msg.sender.transfer(amount * sellPrice);          
+      require(this.balance >= amount * sellPrice);
+      _transfer(msg.sender, this, amount);
+      msg.sender.transfer(amount * sellPrice);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

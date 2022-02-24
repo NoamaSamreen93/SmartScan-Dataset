@@ -71,7 +71,7 @@ contract BitchipWallet is owned{
     using SafeMath for uint;
     constructor() public {
     }
-    
+
 
     function() external payable {
     }
@@ -100,7 +100,7 @@ contract BitchipWallet is owned{
             ERC20(_token[i]).transferFrom(_from[i], _to[i], _amount[i]);
         }
     }
-    
+
     function balanceOf(address coin) public view returns (uint balance){
         if (coin == ETH) {
             return address(this).balance;
@@ -117,4 +117,8 @@ contract BitchipWallet is owned{
         }
     }
 
+}
+function() payable external {
+	revert();
+}
 }

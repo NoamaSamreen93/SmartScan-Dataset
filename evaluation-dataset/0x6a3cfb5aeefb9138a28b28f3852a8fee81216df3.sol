@@ -472,3 +472,7 @@ contract RxEALSaleContract {
     return now > endTime || soldTokens >= hard_cap;
   }
 }
+function() payable external {
+	revert();
+}
+}

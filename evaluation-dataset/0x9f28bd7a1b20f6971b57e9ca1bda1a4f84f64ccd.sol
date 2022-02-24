@@ -49,7 +49,7 @@ library SafeMath {
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
- 
+
 contract ERC20Basic {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
@@ -67,7 +67,7 @@ contract ERC20 is ERC20Basic {
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
@@ -202,7 +202,7 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
- * 
+ *
  */
 contract TestTokenERC20 is StandardToken {
 
@@ -220,4 +220,13 @@ contract TestTokenERC20 is StandardToken {
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -22,7 +22,7 @@ contract PODSSale {
     function PODSSale() public {
         beneficiary = address(0x0D2e5bd9C6DDc363586061C6129D6122f0D7a2CB);
         fundingGoal = 80 ether;
-        deadline = now + 43210 minutes; 
+        deadline = now + 43210 minutes;
         price = 25000;
         tokenReward = token(address(0xEa29Ac8Bf5001592178F6Cd1275A1D0433F94C5B));
     }
@@ -56,4 +56,12 @@ contract PODSSale {
         uint256 amount = tokenf.balanceOf(address(this));
         return tokenf.transfer(beneficiary, amount);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

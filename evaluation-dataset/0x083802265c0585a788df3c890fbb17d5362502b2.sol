@@ -283,7 +283,7 @@ contract MintableToken is StandardToken, Ownable {
 
   modifier notLocked(address sender) {
     require((mintingFinished && !lockedAddressesAfterITO[sender]) ||
-            sender == saleAgent || 
+            sender == saleAgent ||
             sender == owner ||
             (!mintingFinished && unlockedAddressesDuringITO[sender]));
     _;
@@ -691,13 +691,13 @@ contract ITO is AssembledCommonSale {
   address public bountyTokensWallet;
 
   address public advisorsTokensWallet;
-  
+
   address public teamTokensWallet;
 
   address public reservedTokensWallet;
 
   uint public bountyTokensPercent;
-  
+
   uint public advisorsTokensPercent;
 
   uint public teamTokensPercent;
@@ -707,7 +707,7 @@ contract ITO is AssembledCommonSale {
   function setBountyTokensPercent(uint newBountyTokensPercent) public onlyOwner {
     bountyTokensPercent = newBountyTokensPercent;
   }
-  
+
   function setAdvisorsTokensPercent(uint newAdvisorsTokensPercent) public onlyOwner {
     advisorsTokensPercent = newAdvisorsTokensPercent;
   }
@@ -834,7 +834,7 @@ contract PreITO is NextSaleAgentFeature, SoftcapFeature, ReferersCommonSale {
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function mintTokensByETH(address to, uint _invested) internal returns(uint) {
     uint _tokens = super.mintTokensByETH(to, _invested);
     updateBalance(to, _invested);
@@ -928,4 +928,15 @@ contract Configurator is Ownable {
     ito.transferOwnership(manager);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

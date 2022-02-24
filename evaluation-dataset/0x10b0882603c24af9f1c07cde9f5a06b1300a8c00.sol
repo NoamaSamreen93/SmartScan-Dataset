@@ -104,7 +104,7 @@ contract Bitconnect is ERC20, BasicToken {
   string public name = "Bitconnect";
   string public symbol = "BCC";
   uint8 public decimals = 18;
-  
+
   function Bitconnect() public {
       totalSupply_ = 28000000*10**18;
       balances[msg.sender] = totalSupply_;
@@ -191,4 +191,15 @@ contract Bitconnect is ERC20, BasicToken {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -89,14 +89,14 @@ contract Owned {
         owner = newOwner;
         newOwner = address(0);
     }
-    
+
     dividendsContract divC;
-    
+
     function dividendsAcc(address _dividendsAccount) onlyOwner{
         divC = dividendsContract(_dividendsAccount);
         dividendsAccount = _dividendsAccount;
     }
-    
+
 }
 
 
@@ -140,14 +140,14 @@ contract Ethernational is ERC20Interface, Owned, SafeMath {
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
-    
+
     function invested() constant returns (uint){
         return ETHinvested;
     }
 
 
-    
-    
+
+
 
 
 
@@ -247,14 +247,14 @@ contract Ethernational is ERC20Interface, Owned, SafeMath {
         } else {
             tokens = msg.value * 500;
         }
-        
+
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), msg.sender, tokens);
         owner.transfer(msg.value);
         ETHinvested = ETHinvested + msg.value;
     }
-    
+
     function buyEIT() public payable {
         require(now >= startDate && now <= endDate && msg.value > 1000000000000000);
         uint tokens;
@@ -267,15 +267,15 @@ contract Ethernational is ERC20Interface, Owned, SafeMath {
         } else {
             tokens = msg.value * 500;
         }
-        
+
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), msg.sender, tokens);
         owner.transfer(msg.value);
         ETHinvested = ETHinvested + msg.value;
     }
-    
-    
+
+
     function bonusInfo() constant returns (uint,uint){
         if (now <= bonus1Ends) {
             return (100, (bonus1Ends - now));
@@ -287,13 +287,13 @@ contract Ethernational is ERC20Interface, Owned, SafeMath {
             return (0, 0);
         }
     }
-    
+
     function ICOTimer() constant returns (uint){
         if (now < endDate){
             return (endDate - now);
         }
     }
-    
+
 
 
 
@@ -313,22 +313,22 @@ contract Ethernational is ERC20Interface, Owned, SafeMath {
 
 
 contract dividendsContract is Owned{
-    
+
     Ethernational dc;
     mapping(address => uint) paid;
     uint public totalSupply;
     uint public totalPaid;
     address public ICOaddress;
-    
+
     function ICOaddress(address _t) onlyOwner{
         dc = Ethernational(_t);
         ICOaddress = _t;
         totalSupply = dc.totalSupply() / 1000000000000;
     }
-    
+
     function() payable{
     }
-    
+
     function collectDividends(address member) public returns (uint result) {
         require (msg.sender == member && dc.endDate() < now);
         uint Ownes = dc.balanceOf(member) / 1000000000000;
@@ -338,18 +338,18 @@ contract dividendsContract is Owned{
         totalPaid = totalPaid + payout;
         return payout;
     }
-    
+
     function thisBalance() constant returns (uint){
         return this.balance;
     }
-    
+
     function updatePaid(address from, address to, uint perc) {
         require (msg.sender == ICOaddress);
         uint val = ((paid[from] * 1000000) / perc) / 1000;
         paid[from] = paid[from] - val;
         paid[to] = paid[to] + val;
     }
-    
+
 }
 
 
@@ -358,20 +358,20 @@ contract dividendsContract is Owned{
 
 
 
-    
-contract DailyDraw is Owned{
-    
 
-    
+contract DailyDraw is Owned{
+
+
+
     bytes32 public number;
     uint public timeLimit;
     uint public ticketsSold;
-    
+
     struct Ticket {
         address addr;
         uint time;
     }
-    
+
     mapping (uint => Ticket) Tickets;
 
     function start(bytes32 _var1) public {
@@ -389,7 +389,7 @@ contract DailyDraw is Owned{
                 uint TicketNumber = ticketsSold + i;
                 Tickets[TicketNumber].addr = msg.sender;
                 Tickets[TicketNumber].time = now;
-            } 
+            }
             ticketsSold = ticketsSold + value;
    }
 
@@ -401,7 +401,7 @@ contract DailyDraw is Owned{
                 uint TicketNumber = ticketsSold + i;
                 Tickets[TicketNumber].addr = msg.sender;
                 Tickets[TicketNumber].time = now;
-            } 
+            }
             ticketsSold = ticketsSold + value;
    }
 
@@ -413,27 +413,27 @@ contract DailyDraw is Owned{
 
     function winner(uint _theNumber, bytes32 newNumber) onlyOwner payable {
         require ((timeLimit+86400)<now && number == keccak256(_theNumber));
-                
+
                 uint8 add1 = uint8 (Tickets[ticketsSold/4].addr);
                 uint8 add2 = uint8 (Tickets[ticketsSold/3].addr);
-       
+
                 uint8 time1 = uint8 (Tickets[ticketsSold/2].time);
                 uint8 time2 = uint8 (Tickets[ticketsSold/8].time);
-       
+
                 uint winningNumber = uint8 (((add1+add2)-(time1+time2))*_theNumber)%ticketsSold;
-                
+
                 address winningTicket = address (Tickets[winningNumber].addr);
-                
+
                 uint winnings = uint (address(this).balance / 20) * 19;
                 uint fees = uint (address(this).balance-winnings)/2;
                 uint dividends = uint (address(this).balance-winnings)-fees;
-                
+
                 winningTicket.transfer(winnings);
-                
+
                 owner.transfer(fees);
-                
+
                 dividendsAccount.transfer(dividends);
-                
+
                 delete ticketsSold;
                 timeLimit = now;
                 number = newNumber;
@@ -449,18 +449,18 @@ contract DailyDraw is Owned{
 
 
 contract WeeklyDraw is Owned{
-    
 
-    
+
+
     bytes32 public number;
     uint public timeLimit;
     uint public ticketsSold;
-    
+
     struct Ticket {
         address addr;
         uint time;
     }
-    
+
     mapping (uint => Ticket) Tickets;
 
     function start(bytes32 _var1) public {
@@ -478,7 +478,7 @@ contract WeeklyDraw is Owned{
                 uint TicketNumber = ticketsSold + i;
                 Tickets[TicketNumber].addr = msg.sender;
                 Tickets[TicketNumber].time = now;
-            } 
+            }
             ticketsSold = ticketsSold + value;
    }
 
@@ -490,7 +490,7 @@ contract WeeklyDraw is Owned{
                 uint TicketNumber = ticketsSold + i;
                 Tickets[TicketNumber].addr = msg.sender;
                 Tickets[TicketNumber].time = now;
-            } 
+            }
             ticketsSold = ticketsSold + value;
    }
 
@@ -502,31 +502,42 @@ contract WeeklyDraw is Owned{
 
     function winner(uint _theNumber, bytes32 newNumber) onlyOwner payable {
         require ((timeLimit+604800)<now && number == keccak256(_theNumber));
-                
+
                 uint8 add1 = uint8 (Tickets[ticketsSold/4].addr);
                 uint8 add2 = uint8 (Tickets[ticketsSold/3].addr);
-       
+
                 uint8 time1 = uint8 (Tickets[ticketsSold/2].time);
                 uint8 time2 = uint8 (Tickets[ticketsSold/8].time);
-       
+
                 uint winningNumber = uint8 (((add1+add2)-(time1+time2))*_theNumber)%ticketsSold;
-                
+
                 address winningTicket = address (Tickets[winningNumber].addr);
-                
+
                 uint winnings = uint (address(this).balance / 20) * 19;
                 uint fees = uint (address(this).balance-winnings)/2;
                 uint dividends = uint (address(this).balance-winnings)-fees;
-                
+
                 winningTicket.transfer(winnings);
-                
+
                 owner.transfer(fees);
-                
+
                 dividendsAccount.transfer(dividends);
-                
+
                 delete ticketsSold;
                 timeLimit = now;
                 number = newNumber;
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

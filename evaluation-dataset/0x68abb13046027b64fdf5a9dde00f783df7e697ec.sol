@@ -87,11 +87,11 @@ contract NervesStakeTestingPremium{
         uint totalAmount;
         uint totalBonusReceived;
         uint withdrawCount;
-        Contribution[] contributions;       
+        Contribution[] contributions;
     }
 
     mapping(address => User) public users;
-    
+
     address[] usersList;
     address owner;
 
@@ -171,23 +171,23 @@ contract NervesStakeTestingPremium{
 
     function MultiSendToken() public onlyOwner {
         uint i = indexOfPayee;
-        
+
         while(i<usersList.length && msg.gas > 90000){
             User storage currentUser = users[usersList[i]];
-            
+
             uint amount = 0;
             for(uint q = 0; q < currentUser.contributions.length; q++){
                 if(now > currentUser.contributions[q].time + 24 hours){
                     amount = amount.add(currentUser.contributions[q].amount);
                 }
             }
-            
+
             if(amount >= 100000 * (10 ** 18)){  //TODO
                 uint bonus = amount.mul(bonusRate).div(10000);
 
                 require(token.balanceOf(address(this)) >= bonus);
                 currentUser.totalBonusReceived = currentUser.totalBonusReceived.add(bonus);
-               
+
                 require(token.transfer(currentUser.user, bonus));
             }
             i++;
@@ -209,7 +209,7 @@ contract NervesStakeTestingPremium{
         indexOfEthSent = 0;
 
         emit EthBonusSet(_EthBonus);
-    } 
+    }
 
     function MultiSendEth() public onlyOwner {
         require(EthBonus > 0);
@@ -218,16 +218,16 @@ contract NervesStakeTestingPremium{
 
         while(p<usersList.length && msg.gas > 90000){
             User memory currentUser = users[usersList[p]];
-            
+
             uint amount = 0;
             for(uint q = 0; q < currentUser.contributions.length; q++){
                 if(now > currentUser.contributions[q].time + 3 days){
                     amount = amount.add(currentUser.contributions[q].amount);
                 }
-            }            
+            }
             if(amount >= 100000 * (10 ** 18)){  //TODO
                 uint EthToSend = EthBonus.mul(amount).div(totalTokensDeposited);
-                
+
                 require(address(this).balance >= EthToSend);
                 currentUser.user.transfer(EthToSend);
             }
@@ -294,7 +294,7 @@ contract NervesStakeTestingPremium{
         User memory user = users[msg.sender];
         return user.totalBonusReceived;
     }
-    
+
     function GetContributionsCount() public view returns(uint){
         User memory user = users[msg.sender];
         return user.contributions.length;
@@ -323,5 +323,21 @@ contract NervesStakeTestingPremium{
     function ReturnTokens(address destination, address account, uint amount) public onlyOwner{
         ERC20(destination).transfer(account,amount);
     }
-   
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

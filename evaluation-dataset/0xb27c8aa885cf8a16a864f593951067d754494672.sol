@@ -1,17 +1,17 @@
 pragma solidity ^0.5.4;
 
 contract NiftyWallet {
-    
-    /**
-     * The Nifty Wallet - the niftiest wallet around!
-     * Author - Duncan Cock Foster. duncan@niftygateway.com 
-     */ 
 
     /**
-     * Constants 
+     * The Nifty Wallet - the niftiest wallet around!
+     * Author - Duncan Cock Foster. duncan@niftygateway.com
+     */
+
+    /**
+     * Constants
      * The address of the master contract, and the account ID for this wallet
      * Account ID is used to retrieve the signing private key for this wallet
-     */ 
+     */
 
     address masterContractAdd = 0x4CADB4bAd0e2a49CC5D6CE26D8628C8f451dA346;
     uint userAccountID = 0;
@@ -33,24 +33,24 @@ contract NiftyWallet {
         MasterContract m_c_instance = MasterContract(masterContractAdd);
         return (m_c_instance.returnUserControlAddress(userAccountID));
     }
-    
+
     function returnWalletTxCount() public view returns(uint) {
         return(walletTxCount);
     }
-    
+
     /**
      * Modifier to check msg.sender
      */
-     
+
     modifier onlyValidSender() {
         MasterContract m_c_instance = MasterContract(masterContractAdd);
         require(m_c_instance.returnIsValidSendingKey(msg.sender) == true);
         _;
       }
 
-    /** 
+    /**
      * Fall back function - get paid and static calls
-     */ 
+     */
 
     function()
         payable
@@ -59,20 +59,20 @@ contract NiftyWallet {
         if (msg.value > 0)
             emit Deposit(msg.sender, msg.value);
         else if (msg.data.length > 0) {
-            //static call 
+            //static call
             MasterContract m_c_instance = MasterContract(masterContractAdd);
             address loc =  (m_c_instance.returnStaticContractAddress());
                 assembly {
                     calldatacopy(0, 0, calldatasize())
                     let result := staticcall(gas, loc, 0, calldatasize(), 0, 0)
                     returndatacopy(0, 0, returndatasize())
-                    switch result 
-                    case 0 {revert(0, returndatasize())} 
+                    switch result
+                    case 0 {revert(0, returndatasize())}
                     default {return (0, returndatasize())}
                 }
         }
     }
-    
+
     /**
      * @dev function to call any on chain transaction
      * @dev verifies that the transaction data has been signed by the wallets controlling private key
@@ -80,8 +80,8 @@ contract NiftyWallet {
      * @param  _signedData bytes - signature of txData + wallet address
      * @param destination address - destination for this transaction
      * @param value uint - value of this transaction
-     * @param data bytes - transaction data 
-     */ 
+     * @param data bytes - transaction data
+     */
 
     function callTx(bytes memory _signedData,
                      address destination,
@@ -105,11 +105,11 @@ contract NiftyWallet {
             revert();
         }
     }
-    
-    /** External call function 
+
+    /** External call function
      * Taken from Gnosis Mutli Sig wallet
      * https://github.com/gnosis/MultiSigWallet/blob/master/contracts/MultiSigWallet.sol
-     */ 
+     */
 
     // call has been separated into its own function in order to take advantage
     // of the Solidity's code generator to produce a loop that copies tx.data into memory.
@@ -142,4 +142,13 @@ contract MasterContract {
     function recover(bytes32 hash, bytes memory sig) public pure returns (address);
     function returnTxMessageToSign(bytes memory txData, address des_add, uint value, uint tx_count)
     public view returns(bytes32);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

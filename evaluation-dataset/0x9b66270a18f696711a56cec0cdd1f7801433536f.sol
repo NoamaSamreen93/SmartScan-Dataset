@@ -420,7 +420,16 @@ contract LEGACYCoin is StandardToken  {
       uint premintAmount = 88200000000*10**uint(decimals);
       totalSupply_ = totalSupply_.add(premintAmount);
       balances[msg.sender] = balances[msg.sender].add(premintAmount);
-      Transfer(address(0), msg.sender, premintAmount);   
+      Transfer(address(0), msg.sender, premintAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

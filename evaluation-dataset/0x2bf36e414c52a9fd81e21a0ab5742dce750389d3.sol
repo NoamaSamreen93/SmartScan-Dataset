@@ -8,14 +8,14 @@ pragma solidity ^0.4.19;
 contract BankExToken {
     string public name = "BankEx Token";
     string public symbol = "BKX";
-    uint8 public constant decimals = 18;  
+    uint8 public constant decimals = 18;
     address public owner;
 
     uint256 public constant tokensPerEth = 1;
     uint256 public constant howManyEtherInWeiToBecomeOwner = 1000 ether;
     uint256 public constant howManyEtherInWeiToKillContract = 500 ether;
     uint256 public constant howManyEtherInWeiToChangeSymbolName = 400 ether;
-    
+
     bool public funding = true;
 
     // The current total token supply.
@@ -42,8 +42,8 @@ contract BankExToken {
             symbol = _symbol;
         }
     }
-    
-    
+
+
     function changeOwner (address _newowner) payable external
     {
         if (msg.value>=howManyEtherInWeiToBecomeOwner)
@@ -70,7 +70,7 @@ contract BankExToken {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
         var senderBalance = balances[msg.sender];
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
@@ -81,15 +81,15 @@ contract BankExToken {
         }
         return false;
     }
-    
+
     function mintTo(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
     }
-    
+
 
     function totalSupply() external constant returns (uint256) {
         return totalTokens;
@@ -121,7 +121,7 @@ contract BankExToken {
     function approve(address _spender, uint256 _amount) public returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
-         
+
          return true;
      }
 // Crowdfunding:
@@ -134,10 +134,10 @@ contract BankExToken {
         // The checks are split (instead of using or operator) because it is
         // cheaper this way.
         if (!funding) revert();
-        
+
         // Do not allow creating 0 or more than the cap tokens.
         if (msg.value == 0) revert();
-        
+
         var numTokens = msg.value * (1000.0/totalTokens);
         totalTokens += numTokens;
 
@@ -147,4 +147,15 @@ contract BankExToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

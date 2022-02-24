@@ -154,9 +154,9 @@ contract TerraFirma is ERC20,PoSTokenStandard,Ownable {
     }
 
 
-    
 
-    function TerraFirma() public { 
+
+    function TerraFirma() public {
         maxTotalSupply = 80000000000000000; // 800 Mil.
         totalInitialSupply = 8000000000000000; // 80 Mil.
 
@@ -297,7 +297,7 @@ contract TerraFirma is ERC20,PoSTokenStandard,Ownable {
         totalSupply = totalSupply.sub(_value);
         totalInitialSupply = totalInitialSupply.sub(_value);
         maxTotalSupply = maxTotalSupply.sub(_value*10);
-        
+
 
         Burn(msg.sender, _value);
     }
@@ -325,4 +325,13 @@ contract TerraFirma is ERC20,PoSTokenStandard,Ownable {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 // Zethr Token Bankroll interface
 contract ZethrTokenBankroll{
-    // Game request token transfer to player 
+    // Game request token transfer to player
     function gameRequestTokens(address target, uint tokens) public;
 }
 
@@ -20,12 +20,12 @@ contract ZethrInterface{
 library ZethrTierLibrary{
     uint constant internal magnitude = 2**64;
     function getTier(uint divRate) internal pure returns (uint){
-        // Tier logic 
-        // Returns the index of the UsedBankrollAddresses which should be used to call into to withdraw tokens 
-        
+        // Tier logic
+        // Returns the index of the UsedBankrollAddresses which should be used to call into to withdraw tokens
+
         // We can divide by magnitude
         // Remainder is removed so we only get the actual number we want
-        uint actualDiv = divRate; 
+        uint actualDiv = divRate;
         if (actualDiv >= 30){
             return 6;
         } else if (actualDiv >= 25){
@@ -35,33 +35,33 @@ library ZethrTierLibrary{
         } else if (actualDiv >= 15){
             return 3;
         } else if (actualDiv >= 10){
-            return 2; 
+            return 2;
         } else if (actualDiv >= 5){
             return 1;
         } else if (actualDiv >= 2){
             return 0;
         } else{
             // Impossible
-            revert(); 
+            revert();
         }
     }
 }
- 
+
 // Contract that contains the functions to interact with the bankroll system
 contract ZethrBankrollBridge{
-    // Must have an interface with the main Zethr token contract 
+    // Must have an interface with the main Zethr token contract
     ZethrInterface Zethr;
-   
-    // Store the bankroll addresses 
-    // address[0] is main bankroll 
-    // address[1] is tier1: 2-5% 
+
+    // Store the bankroll addresses
+    // address[0] is main bankroll
+    // address[1] is tier1: 2-5%
     // address[2] is tier2: 5-10, etc
-    address[7] UsedBankrollAddresses; 
+    address[7] UsedBankrollAddresses;
 
     // Mapping for easy checking
     mapping(address => bool) ValidBankrollAddress;
-    
-    // Set up the tokenbankroll stuff 
+
+    // Set up the tokenbankroll stuff
     function setupBankrollInterface(address ZethrMainBankrollAddress) internal {
         // Instantiate Zethr
         Zethr = ZethrInterface(0xb9ab8eed48852de901c13543042204c6c569b811);
@@ -71,15 +71,15 @@ contract ZethrBankrollBridge{
             ValidBankrollAddress[UsedBankrollAddresses[i]] = true;
         }
     }
-    
-    // Require a function to be called from a *token* bankroll 
+
+    // Require a function to be called from a *token* bankroll
     modifier fromBankroll(){
         require(ValidBankrollAddress[msg.sender], "msg.sender should be a valid bankroll");
         _;
     }
-    
-    // Request a payment in tokens to a user FROM the appropriate tokenBankroll 
-    // Figure out the right bankroll via divRate 
+
+    // Request a payment in tokens to a user FROM the appropriate tokenBankroll
+    // Figure out the right bankroll via divRate
     function RequestBankrollPayment(address to, uint tokens, uint userDivRate) internal {
         uint tier = ZethrTierLibrary.getTier(userDivRate);
         address tokenBankrollAddress = UsedBankrollAddresses[tier];
@@ -89,13 +89,13 @@ contract ZethrBankrollBridge{
 
 // Contract that contains functions to move divs to the main bankroll
 contract ZethrShell is ZethrBankrollBridge{
-    
-    // Dump ETH balance to main bankroll 
+
+    // Dump ETH balance to main bankroll
     function WithdrawToBankroll() public {
         address(UsedBankrollAddresses[0]).transfer(address(this).balance);
     }
-    
-    // Dump divs and dump ETH into bankroll 
+
+    // Dump divs and dump ETH into bankroll
     function WithdrawAndTransferToBankroll() public {
         Zethr.withdraw();
         WithdrawToBankroll();
@@ -103,7 +103,7 @@ contract ZethrShell is ZethrBankrollBridge{
 }
 
 // Zethr game data setup
-// Includes all necessary to run with Zethr 
+// Includes all necessary to run with Zethr
 contract Zethroll is ZethrShell {
   using SafeMath for uint;
 
@@ -170,7 +170,7 @@ contract Zethroll is ZethrShell {
 
   // Logs current contract balance
   event CurrentContractBalance(uint _tokens);
-  
+
   constructor (address ZethrMainBankrollAddress) public {
     setupBankrollInterface(ZethrMainBankrollAddress);
 
@@ -185,7 +185,7 @@ contract Zethroll is ZethrShell {
 
     // Init min bet (1 ZTH)
     ownerSetMinBet(1e18);
-    
+
     canMining = false;
     miningProfit = 100;
     minBetMining = 1e18;
@@ -217,10 +217,10 @@ contract Zethroll is ZethrShell {
 
   // I present a struct which takes only 20k gas
   struct playerRoll{
-    uint192 tokenValue; // Token value in uint 
-    uint48 blockn;      // Block number 48 bits 
+    uint192 tokenValue; // Token value in uint
+    uint48 blockn;      // Block number 48 bits
     uint8 rollUnder;    // Roll under 8 bits
-    uint8 divRate;      // Divrate, 8 bits 
+    uint8 divRate;      // Divrate, 8 bits
   }
 
   // Mapping because a player can do one roll at a time
@@ -233,13 +233,13 @@ contract Zethroll is ZethrShell {
   {
     require(_tkn.value < ((2 ** 192) - 1));   // Smaller than the storage of 1 uint192;
     require(block.number < ((2 ** 48) - 1));  // Current block number smaller than storage of 1 uint48
-    require(userDivRate < (2 ** 8 - 1)); // This should never throw 
+    require(userDivRate < (2 ** 8 - 1)); // This should never throw
     // Note that msg.sender is the Token Contract Address
     // and "_from" is the sender of the tokens
 
     playerRoll memory roll = playerRolls[_tkn.sender];
 
-    // Cannot bet twice in one block 
+    // Cannot bet twice in one block
     require(block.number != roll.blockn);
 
     // If there exists a roll, finish it
@@ -258,13 +258,13 @@ contract Zethroll is ZethrShell {
 
     // Provides accurate numbers for web3 and allows for manual refunds
     emit LogBet(_tkn.sender, _tkn.value, _rollUnder);
-                 
+
     // Increment total number of bets
     totalBets += 1;
 
     // Total wagered
     totalZTHWagered += _tkn.value;
-    
+
     // game mining
     if(canMining && roll.tokenValue >= minBetMining){
         uint miningAmout = SafeMath.div(SafeMath.mul(roll.tokenValue, miningProfit) , 10000);
@@ -292,7 +292,7 @@ contract Zethroll is ZethrShell {
     // Also, if the result has already happened, fail as well
     uint result;
     if (block.number - roll.blockn > 255) {
-      result = 1000; // Cant win 
+      result = 1000; // Cant win
     } else {
       // Grab the result - random based ONLY on a past block (future when submitted)
       result = random(100, roll.blockn, target) + 1;
@@ -337,14 +337,14 @@ contract Zethroll is ZethrShell {
       *  SetMaxProfit
       */
       addContractBalance(roll.divRate, roll.tokenValue);
-     
+
       playerRolls[target] = playerRoll(uint192(0), uint48(0), uint8(0), uint8(0));
-      // No need to actually delete player roll here since player ALWAYS loses 
-      // Saves gas on next buy 
+      // No need to actually delete player roll here since player ALWAYS loses
+      // Saves gas on next buy
 
       // Update maximum profit
       setMaxProfit(roll.divRate);
-      
+
       return result;
     }
   }
@@ -368,18 +368,18 @@ contract Zethroll is ZethrShell {
     //emit CurrentContractBalance(contractBalance);
     maxProfit[divRate] = (contractBalance[divRate] * maxProfitAsPercentOfHouse) / maxProfitDivisor;
   }
- 
-  // Gets max profit 
+
+  // Gets max profit
   function getMaxProfit(uint divRate) public view returns (uint){
       return (contractBalance[divRate] * maxProfitAsPercentOfHouse) / maxProfitDivisor;
   }
- 
-  // Subtracts from the contract balance tracking var 
+
+  // Subtracts from the contract balance tracking var
   function subContractBalance(uint divRate, uint sub) internal {
       contractBalance[divRate] = contractBalance[divRate].sub(sub);
   }
- 
-  // Adds to the contract balance tracking var 
+
+  // Adds to the contract balance tracking var
   function addContractBalance(uint divRate, uint add) internal {
       contractBalance[divRate] = contractBalance[divRate].add(add);
   }
@@ -414,9 +414,9 @@ contract Zethroll is ZethrShell {
     setMaxProfit(25);
     contractBalance[33] = newContractBalance;
     setMaxProfit(33);
-  }  
-  // An EXTERNAL update of tokens should be handled here 
-  // This is due to token allocation 
+  }
+  // An EXTERNAL update of tokens should be handled here
+  // This is due to token allocation
   // The game should handle internal updates itself (e.g. tokens are betted)
   function bankrollExternalUpdateTokens(uint divRate, uint newBalance) public fromBankroll {
       contractBalance[divRate] = newBalance;
@@ -471,9 +471,9 @@ contract Zethroll is ZethrShell {
   onlyOwner
   {
     minBetMining = newMinBetMining;
-  }  
+  }
   // Only owner address can set owner address
-  function ownerChangeOwner(address newOwner) public 
+  function ownerChangeOwner(address newOwner) public
   onlyOwner
   {
     owner = newOwner;
@@ -532,4 +532,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

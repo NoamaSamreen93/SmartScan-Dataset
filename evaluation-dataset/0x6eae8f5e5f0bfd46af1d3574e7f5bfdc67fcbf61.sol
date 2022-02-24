@@ -22,12 +22,12 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract TokenERC20 {
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
-  
+
     mapping (address => uint256) public balanceOf;
-    
+
 
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -35,20 +35,20 @@ contract TokenERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Burn(address indexed from, uint256 value);
-	
+
 
     function TokenERC20(uint256 initialSupply, string tokenName, string tokenSymbol) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
 
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require(_to != 0x0);
-        
+
         require(balanceOf[_from] >= _value);
 
         require(balanceOf[_to] + _value > balanceOf[_to]);
@@ -60,7 +60,7 @@ contract TokenERC20 {
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
 
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -114,17 +114,17 @@ contract TokenERC20 {
 
 contract EncryptedToken is owned, TokenERC20 {
   uint256 INITIAL_SUPPLY = 10000000000;
-  
+
   mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-	
+
 	function EncryptedToken() TokenERC20(INITIAL_SUPPLY, 'PPS', 'PPS') payable public {
-    		
-    		
+
+
     }
-    
+
 	/* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -135,7 +135,7 @@ contract EncryptedToken is owned, TokenERC20 {
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
-        
+
     }
 
     /// @notice Create `mintedAmount` tokens and send it to `target`
@@ -157,4 +157,10 @@ contract EncryptedToken is owned, TokenERC20 {
     }
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

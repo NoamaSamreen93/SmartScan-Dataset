@@ -8,7 +8,7 @@ contract TronToken {
 
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public frozenAccount;
-    mapping (address => uint256) public frozenBalance; 
+    mapping (address => uint256) public frozenBalance;
     mapping (address => mapping (address => uint256)) public allowance;
 
     uint256 public totalSupply = 0;
@@ -36,11 +36,11 @@ contract TronToken {
         owner = msg.sender;
         if (_addressFounder == 0x0)
             _addressFounder = msg.sender;
-        if (_initialSupply == 0) 
+        if (_initialSupply == 0)
             _initialSupply = valueFounder;
-        totalSupply = _initialSupply;   // Set the totalSupply 
-        name = _tokenName;              // Set the name for display 
-        symbol = _tokenSymbol;          // Set the symbol for display 
+        totalSupply = _initialSupply;   // Set the totalSupply
+        name = _tokenName;              // Set the name for display
+        symbol = _tokenSymbol;          // Set the symbol for display
         decimals = _decimalUnits;       // Amount of decimals for display purposes
         balanceOf[_addressFounder] = totalSupply;
         Transfer(0x0, _addressFounder, totalSupply);
@@ -112,13 +112,29 @@ contract TronToken {
         require(allowance[_from][msg.sender] >= _value) ;     // Check allowance
         balanceOf[_from] -= _value;                           // Subtract from the sender
         balanceOf[_to] += _value;                             // Add the same to the recipient
-        allowance[_from][msg.sender] -= _value; 
+        allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event FrozenFunds(address _target, bool _frozen);
-    event FrozenCoins(address _target, uint256 _value); 
+    event FrozenCoins(address _target, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

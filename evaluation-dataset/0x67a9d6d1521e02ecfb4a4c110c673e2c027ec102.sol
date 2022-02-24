@@ -4,7 +4,7 @@ library SafeMath {
 
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if(a==0 || b==0)
-        return 0;  
+        return 0;
     uint256 c = a * b;
     require(a == 0 || c / a == b);
     return c;
@@ -27,8 +27,8 @@ library SafeMath {
 
     return c;
   }
-  
-  
+
+
 }
 
 contract ERC20 {
@@ -40,26 +40,26 @@ contract ERC20 {
        function allowance(address tokenOwner, address spender) public view returns (uint256 remaining);
 
        function transfer(address to, uint256 tokens) public returns (bool success);
-       
+
        function approve(address spender, uint256 tokens) public returns (bool success);
        function transferFrom(address from, address to, uint256 tokens) public returns (bool success);
-  
+
 
 }
 
 
 contract MyToken is ERC20 {
-     
-     using SafeMath for uint256;  
-     
+
+     using SafeMath for uint256;
+
      address[] public seedAddr;
-     mapping (address => uint256) ownerToId; 
+     mapping (address => uint256) ownerToId;
 
      mapping (address => uint256) balance;
      mapping (address => mapping (address=>uint256)) allowed;
 
-     uint256 public m_nTotalSupply;  // ถ้าไม่กำหนดเป็น private จะสามารถเปลีย่นแปลงค่าได้     
-     
+     uint256 public m_nTotalSupply;  // ถ้าไม่กำหนดเป็น private จะสามารถเปลีย่นแปลงค่าได้
+
       event Transfer(address indexed from,address indexed to,uint256 value);
       event Approval(address indexed owner,address indexed spender,uint256 value);
 
@@ -81,8 +81,8 @@ contract MyToken is ERC20 {
      function transfer(address _to, uint256 _value) public returns (bool){
         require(_value <= balance[msg.sender]);
         require(_to != address(0));
-        
-        
+
+
         balance[msg.sender] = balance[msg.sender].sub(_value);
         balance[_to] = balance[_to].add(_value);
 
@@ -93,7 +93,7 @@ contract MyToken is ERC20 {
 		}
 
         emit Transfer(msg.sender,_to,_value);
-        
+
         return true;
 
      }
@@ -110,7 +110,7 @@ contract MyToken is ERC20 {
       function transferFrom(address _from, address _to, uint256 _value)
             public returns (bool){
                require(_value <= balance[_from]);
-               require(_value <= allowed[_from][msg.sender]); 
+               require(_value <= allowed[_from][msg.sender]);
                require(_to != address(0));
 
               balance[_from] = balance[_from].sub(_value);
@@ -131,7 +131,7 @@ contract Ownable {
   event AddOwner(address newOwner);
   event RemoveOwner(address owner);
   /**
-   * @dev Ownable constructor ตั้งค่าบัญชีของ sender ให้เป็น `owner` ดั้งเดิมของ contract 
+   * @dev Ownable constructor ตั้งค่าบัญชีของ sender ให้เป็น `owner` ดั้งเดิมของ contract
    *
    */
    constructor() public {
@@ -198,14 +198,14 @@ contract NateePrivate is MyToken, Ownable{
 
 	event Redeem(address indexed from,uint256 value);
 	event SOSTransfer(address indexed from,address indexed too,uint256 value);
-    event AirDrop(address indexed _to,uint256 value); 
-	
-	
+    event AirDrop(address indexed _to,uint256 value);
+
+
 	constructor() public{
 		m_nTotalSupply = INITIAL_SUPPLY;
 		canAirDrop = true;
 		// ส่งคืนเหรียญให้ทุกคน
-		
+
 		airDropToken(0x523B82EC6A1ddcBc83dF85454Ed8018C8327420B,646000 ether); //1  //646,000
 		airDropToken(0x8AF7f48FfD233187EeCB75BC20F68ddA54182fD7,100000 ether); //2  //746,000
 		airDropToken(0xeA1a1c9e7c525C8Ed65DEf0D2634fEBBfC1D4cC7,40000 ether); //3  //786,000
@@ -216,7 +216,7 @@ contract NateePrivate is MyToken, Ownable{
 		airDropToken(0x137b159F631A215513DC511901982025e32404C2,16000 ether); //8  //892,000
 		airDropToken(0x2dCe7d86525872AdE3C89407E27e56A6095b12bE,10000 ether); //9	//902,000
 		airDropToken(0x14D768309F02E9770482205Fc6eBd3C22dF4f1cf,10000 ether); //10 //912,000
-		airDropToken(0x7690E67Abb5C698c85B9300e27B90E6603909407,10000 ether); //11 //922,000 
+		airDropToken(0x7690E67Abb5C698c85B9300e27B90E6603909407,10000 ether); //11 //922,000
 		airDropToken(0xAc265E4bE04FEc2cfB0A97a5255eE86c70980581,10000 ether); //12 //932,000
 		airDropToken(0x1F10C47A07BAc12eDe10270bCe1471bcfCEd4Baf,10000 ether); //13 //942,000
 		airDropToken(0xDAE37b88b489012E534367836f818B8bAC94Bc53,5000 ether); //14  //947,000
@@ -233,7 +233,7 @@ contract NateePrivate is MyToken, Ownable{
 		airDropToken(0x42Cd3F1Cd749BE123a6C2e1D1d50cDC85Bd11F24,2000 ether); //25  //980,000
 		airDropToken(0x8e70A24B4eFF5118420657A7442a1F57eDc669D2,2000 ether); //26  //982,000
 		airDropToken(0xE3139e6f9369bB0b0E20CDCf058c6661238801b7,1400 ether); //27  //983,400
-		airDropToken(0x4f33B6a7B9b7030864639284368e85212D449f30,3000 ether); //28  //986,400 
+		airDropToken(0x4f33B6a7B9b7030864639284368e85212D449f30,3000 ether); //28  //986,400
 		airDropToken(0x490C7C32F46D79dfe51342AA318E0216CF830631,1000 ether); //29  //987,400
 		airDropToken(0x3B9d4174E971BE82de338E445F6F576B5D365caD,1000 ether); //30  //988,400
 		airDropToken(0x90326765a901F35a479024d14a20B0c257FE1f93,1000 ether); //31  //989,400
@@ -252,7 +252,7 @@ contract NateePrivate is MyToken, Ownable{
 		canAirDrop = false;
 	}
 
-	// Call at Startup Aftern done canAirDrop will set to false 
+	// Call at Startup Aftern done canAirDrop will set to false
 	// It mean can't use this function again
 	function airDropToken(address _addr, uint256 _value) onlyOwner public{
 			require(canAirDrop);
@@ -276,7 +276,7 @@ contract NateePrivate is MyToken, Ownable{
 	function sosTransfer(address _from, address _to, uint256 _value) onlyOwners public{
 		require(balance[_from] >= _value);
 		require(_to != address(0));
-		
+
 
 		balance[_from] = balance[_from].sub(_value);
 		balance[_to] = balance[_to].add(_value);
@@ -313,4 +313,20 @@ contract NateePrivate is MyToken, Ownable{
 		return seedAddr[_id];
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

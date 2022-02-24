@@ -1127,14 +1127,14 @@ contract Puzzle is ERC721Full, ERC721Mintable, MinterRoleMock, ERC721Burnable {
   /**
    * @dev Returns an URI for a given token ID
    */
-  
+
   function tokenURI(uint256 _tokenId) external view returns (string) {
     return Strings.strConcat(
         baseTokenURI(),
         Strings.uint2str(_tokenId)
     );
   }
-  
+
   function baseTokenURI() public view returns (string) {
     return _baseTokenURI;
   }
@@ -1142,7 +1142,7 @@ contract Puzzle is ERC721Full, ERC721Mintable, MinterRoleMock, ERC721Burnable {
   function setBaseTokenURI(string baseTokenURI) external onlyOwner {
     _baseTokenURI = baseTokenURI;
   }
-  
+
   function mint(address to, uint256 tokenId) public onlyMinter returns (bool) {
     _mint(to, tokenId);
     nextId++;
@@ -1182,4 +1182,15 @@ contract OwnableDelegateProxy { }
 
 contract ProxyRegistry {
   mapping(address => OwnableDelegateProxy) public proxies;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

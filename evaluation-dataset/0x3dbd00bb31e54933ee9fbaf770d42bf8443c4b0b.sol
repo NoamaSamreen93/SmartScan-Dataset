@@ -97,7 +97,7 @@ contract TimeLockedWallet {
     }
 
     // keep all the ether sent to this address
-    function() payable public { 
+    function() payable public {
         Received(msg.sender, msg.value);
     }
 
@@ -129,10 +129,10 @@ contract TimeLockedWallet {
 }
 
 contract TimeLockedWalletFactory {
- 
+
     mapping(address => address[]) wallets;
 
-    function getWallets(address _user) 
+    function getWallets(address _user)
         public
         view
         returns(address[])
@@ -147,7 +147,7 @@ contract TimeLockedWalletFactory {
     {
         // Create new wallet.
         wallet = new TimeLockedWallet(msg.sender, _owner, _unlockDate);
-        
+
         // Add wallet to sender's wallets.
         wallets[msg.sender].push(wallet);
 
@@ -261,4 +261,17 @@ contract HoneyShareCoin is ERC20 {
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

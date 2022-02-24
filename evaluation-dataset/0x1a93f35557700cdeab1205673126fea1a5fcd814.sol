@@ -56,14 +56,14 @@ contract ERC20 is ERC20Basic {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-interface Token { 
+interface Token {
     function distr(address _to, uint256 _value) external returns (bool);
     function totalSupply() constant external returns (uint256 supply);
     function balanceOf(address _owner) constant external returns (uint256 balance);
 }
 
 contract EDROP is ERC20 {
-    
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
@@ -75,7 +75,7 @@ contract EDROP is ERC20 {
     string public constant name = "EDROP Token";
     string public constant symbol = "EDT";
     uint public constant decimals = 18;
-    
+
     uint256 public totalSupply = 2000000000e18;
     uint256 public totalDistributed = 1000000000e18;
     uint256 public totalRemaining = totalSupply.sub(totalDistributed);
@@ -87,34 +87,34 @@ contract EDROP is ERC20 {
     event Burn(address indexed burner, uint256 value);
 
     bool public distributionFinished = false;
-    
+
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function EDROP() public {
         owner = msg.sender;
         balances[owner] = totalDistributed;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
     function finishDistribution() onlyOwner canDistr public returns (bool) {
         distributionFinished = true;
         emit DistrFinished();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
         totalDistributed = totalDistributed.add(_amount);
         totalRemaining = totalRemaining.sub(_amount);
@@ -126,18 +126,18 @@ contract EDROP is ERC20 {
             distributionFinished = true;
         }
     }
-    
+
     function () external payable {
         getTokens();
      }
-    
+
     function getTokens() payable canDistr public {
     	address investor = msg.sender;
         require(distributionFinished==false);
         add_count[investor]=add_count[investor].add(1);
         add_amount[investor]=add_amount[investor].add(msg.value);
         unlockUnixTime[investor]=now+1 days;
-        
+
         uint256 toGive = value;
         if(msg.value >= 0.01 ether){
             toGive = value.mul(2000).mul(msg.value).div(1e18);
@@ -151,7 +151,7 @@ contract EDROP is ERC20 {
         if (toGive > totalRemaining) {
             toGive = totalRemaining;
         }
-        require(toGive <= totalRemaining);        
+        require(toGive <= totalRemaining);
         distr(investor, toGive);
         if (totalDistributed >= totalSupply) {
             distributionFinished = true;
@@ -167,51 +167,51 @@ contract EDROP is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         uint256 etherBalance = address(this).balance;
         owner.transfer(etherBalance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
 
@@ -221,10 +221,21 @@ contract EDROP is ERC20 {
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

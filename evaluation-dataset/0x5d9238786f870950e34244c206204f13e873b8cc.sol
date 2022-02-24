@@ -53,38 +53,38 @@ contract owned {
 }
 
 contract PokerPay is owned,IERC20{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public constant _totalSupply = 99000000000000000000000000000000;
- 
+
     string public constant symbol = 'XRR';
 
     string public constant name = 'Poker Pay';
-    
+
     uint8 public constant decimals = 18;
-    
+
     mapping(address => uint256) public balances;
     mapping (address => mapping (address => uint256)) allowed;
 
     constructor() public {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
-   
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
             && _value > 0
         );
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -95,7 +95,7 @@ contract PokerPay is owned,IERC20{
         require(
             allowed[_from][msg.sender] >= _value
             && balances[_from] >= _value
-            && _value > 0  
+            && _value > 0
         );
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -113,8 +113,12 @@ contract PokerPay is owned,IERC20{
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

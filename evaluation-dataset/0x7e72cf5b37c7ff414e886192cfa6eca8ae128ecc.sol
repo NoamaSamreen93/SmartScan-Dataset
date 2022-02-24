@@ -36,7 +36,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -67,11 +67,11 @@ library SafeMath {
   }
 }
 /**
- * @title Crowdsale 
+ * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract Crowdsale {
@@ -93,7 +93,7 @@ contract Crowdsale {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) {
     require(_startTime >= now);
@@ -106,7 +106,7 @@ contract Crowdsale {
     rate = _rate;
     wallet = _wallet;
   }
-  // creates the token to be sold. 
+  // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
@@ -146,7 +146,7 @@ contract Crowdsale {
 }
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -164,7 +164,7 @@ contract BasicToken is ERC20Basic {
   }
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -274,11 +274,22 @@ contract EverhuskToken is MintableToken {
     uint8 public constant decimals = 18;
 }
 contract EverhuskCrowdsale is Crowdsale {
-    function EverhuskCrowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) 
+    function EverhuskCrowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet)
         Crowdsale(_startTime, _endTime, _rate, _wallet)
     {
     }
     function createTokenContract() internal returns (MintableToken) {
         return new EverhuskToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

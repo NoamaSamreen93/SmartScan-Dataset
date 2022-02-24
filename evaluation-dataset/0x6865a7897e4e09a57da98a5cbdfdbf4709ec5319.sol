@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 contract Ownerable{
-    
+
     address public owner;
 
     address public delegate;
@@ -20,22 +20,22 @@ contract Ownerable{
         require(msg.sender == delegate,"Permission denied");
         _;
     }
-    
+
     modifier onlyOwnerOrDelegate() {
         require(msg.sender == owner||msg.sender == delegate,"Permission denied");
         _;
     }
-    
+
     function changeOwner(address newOwner) public onlyOwner{
         require(newOwner!= 0x0,"address is invalid");
         owner = newOwner;
     }
-    
+
     function changeDelegate(address newDelegate) public onlyOwner{
         require(newDelegate!= 0x0,"address is invalid");
         delegate = newDelegate;
     }
-    
+
 }
 
 contract Pausable is Ownerable{
@@ -85,47 +85,47 @@ contract Pausable is Ownerable{
 }
 
 contract EthTransfer is Pausable{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 constant ADMIN_DEPOIST_TIME_INTERVAL = 24 hours;
     uint256 constant ADMIN_DEPOIST_MAX_AMOUNT = 50 ether;
     uint256 last_time_admin_depoist = 0;
-    
+
     uint constant HOUSE_EDGE_PERCENT = 15; //1.5%
     uint constant HOUSE_EDGE_MINIMUM_AMOUNT = 0.00045 ether;
-    
+
     uint256 public _total_house_edge = 0;
-    
+
     uint256 public _ID = 1; //AUTO INCREMENT
     uint256 public _newChannelID = 10000;
-        
+
     event addChannelSucc    (uint256 indexed id,uint256 channelID,string name);
     event rechargeSucc      (uint256 indexed id,uint256 channelID,address user,uint256 amount,string ext);
     event depositSucc       (uint256 indexed id,uint256 channelID,address beneficiary,uint256 amount,uint256 houseEdge,string ext);
     event withdrawSucc      (uint256 indexed id,uint256 amount);
     event depositBySuperAdminSucc           (uint256 indexed id,uint256 amount,address beneficiary);
     event changeChannelDelegateSucc         (uint256 indexed id,address newDelegate);
-    
+
     mapping(uint256 => Channel) public _channelMap; // channelID => channel info
-    
+
     mapping(address => uint256) public _idMap; // delegate => channelID
-    
+
     function addNewChannel(string name_,address channelDelegate_,uint256 partnershipCooperationBounsRate_) public onlyDelegate{
         require(_idMap[channelDelegate_] == 0,"An address can only manage one channel.");
-        
+
         _channelMap[_newChannelID] = Channel(name_,_newChannelID,channelDelegate_,0,partnershipCooperationBounsRate_);
         _idMap[channelDelegate_] = _newChannelID;
-        
+
         emit addChannelSucc(_ID,_newChannelID,name_);
         _newChannelID++;
         _ID++;
     }
-    
+
     function() public payable{
         revert();
     }
-    
+
     function recharge(uint256 channelID_,string ext_) public payable whenNotPaused{
         Channel storage targetChannel = _channelMap[channelID_];
         require(targetChannel.channelID!=0,"target Channel is no exist");
@@ -136,7 +136,7 @@ contract EthTransfer is Pausable{
 
         uint256 targetEth = inEth.sub(partnershipCooperationBouns);
         targetChannel.totalEth = targetChannel.totalEth.add(targetEth);
-        
+
         emit rechargeSucc(_ID, channelID_, msg.sender, inEth, ext_);
         _ID++;
     }
@@ -146,19 +146,19 @@ contract EthTransfer is Pausable{
         Channel storage channelInfo = _channelMap[_idMap[msg.sender]];
         require(channelInfo.channelDelegate == msg.sender,"You are not the administrator of this channel.");
         require(_idMap[newDelegate_] == 0,"An address can only manage one channel.");
-        
+
         channelInfo.channelDelegate = newDelegate_;
         _idMap[msg.sender] = 0;
         _idMap[newDelegate_] = channelInfo.channelID;
-        
+
         emit changeChannelDelegateSucc(_ID, newDelegate_);
         _ID++;
-    }    
-    
+    }
+
     function deposit(address beneficiary_,uint256 amount_,string ext_) public whenNotPaused{
         //Verify user identity
         require(_idMap[msg.sender] != 0,"this address isn't a manager");
-        
+
         Channel storage channelInfo = _channelMap[_idMap[msg.sender]];
         //Query administrator privileges
         require(channelInfo.channelDelegate == msg.sender,"You are not the administrator of this channel.");
@@ -166,29 +166,29 @@ contract EthTransfer is Pausable{
         bytes32 orderId = keccak256(abi.encodePacked(ext_));
         require(!channelInfo.channelOrderHistory[orderId],"this order is deposit already");
         channelInfo.channelOrderHistory[orderId] = true;
-        
+
         uint256 totalLeftEth = channelInfo.totalEth.sub(amount_);
-        
+
         uint houseEdge = amount_ * HOUSE_EDGE_PERCENT / 1000;
         if (houseEdge < HOUSE_EDGE_MINIMUM_AMOUNT) {
             houseEdge = HOUSE_EDGE_MINIMUM_AMOUNT;
         }
-        
+
         channelInfo.totalEth = totalLeftEth.sub(houseEdge);
         _total_house_edge = _total_house_edge.add(houseEdge);
-        
+
         beneficiary_.transfer(amount_);
-        
+
         emit depositSucc(_ID, channelInfo.channelID, beneficiary_, amount_, houseEdge, ext_);
         _ID++;
     }
-    
+
     function depositByDelegate(address beneficiary_,uint256 amount_,string ext_, bytes32 r, bytes32 s, uint8 v) public onlyDelegate whenNotPaused{
-        //Verify user identity 
+        //Verify user identity
         bytes32 signatureHash = keccak256(abi.encodePacked(beneficiary_, amount_,ext_));
         address secretSigner = ecrecover(signatureHash, v, r, s);
         require(_idMap[secretSigner] != 0,"this address isn't a manager");
-        
+
         Channel storage channelInfo = _channelMap[_idMap[secretSigner]];
         //Query administrator privileges
         require(channelInfo.channelDelegate == secretSigner,"You are not the administrator of this channel.");
@@ -196,32 +196,32 @@ contract EthTransfer is Pausable{
         bytes32 orderId = keccak256(abi.encodePacked(ext_));
         require(!channelInfo.channelOrderHistory[orderId],"this order is deposit already");
         channelInfo.channelOrderHistory[orderId] = true;
-        
+
         uint256 totalLeftEth = channelInfo.totalEth.sub(amount_);
-        
+
         uint houseEdge = amount_ * HOUSE_EDGE_PERCENT / 1000;
         if (houseEdge < HOUSE_EDGE_MINIMUM_AMOUNT) {
             houseEdge = HOUSE_EDGE_MINIMUM_AMOUNT;
         }
-        
+
         channelInfo.totalEth = totalLeftEth.sub(houseEdge);
         _total_house_edge = _total_house_edge.add(houseEdge);
-        
+
         beneficiary_.transfer(amount_);
-        
+
         emit depositSucc(_ID, channelInfo.channelID, beneficiary_, amount_, houseEdge, ext_);
         _ID++;
     }
-    
+
     function withdraw() public onlyOwnerOrDelegate {
         require(_total_house_edge > 0,"no edge to withdraw");
         owner.transfer(_total_house_edge);
-        
+
         emit withdrawSucc(_ID,_total_house_edge);
         _total_house_edge = 0;
         _ID++;
     }
-    
+
     function depositBySuperAdmin(uint256 channelID_, uint256 amount_, address beneficiary_) public onlyOwner{
         require(now - last_time_admin_depoist >= ADMIN_DEPOIST_TIME_INTERVAL," super admin time limit");
         require(amount_ <= ADMIN_DEPOIST_MAX_AMOUNT," over super admin deposit amount limit");
@@ -230,11 +230,11 @@ contract EthTransfer is Pausable{
         uint256 totalLeftEth = channelInfo.totalEth.sub(amount_);
         channelInfo.totalEth = totalLeftEth;
         beneficiary_.transfer(amount_);
-        
+
         emit depositBySuperAdminSucc(_ID, amount_, beneficiary_);
         _ID++;
     }
-    
+
     struct Channel{
         string name;
         uint256 channelID;
@@ -243,9 +243,9 @@ contract EthTransfer is Pausable{
         uint256 partnershipCooperationBounsRate;
         mapping(bytes32 => bool) channelOrderHistory;
     }
-    
+
     function destory() public onlyOwner whenPaused{
-        selfdestruct(owner);    
+        selfdestruct(owner);
     }
 }
 
@@ -351,4 +351,20 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

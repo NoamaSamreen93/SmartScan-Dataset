@@ -288,23 +288,23 @@ contract Swachhcoin is PausableToken {
         _;
     }
 
-    function Swachhcoin( address _admin ) 
+    function Swachhcoin( address _admin )
     {
         // assign the admin account
         admin = _admin;
 
-       
+
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
         Transfer(address(0x0), msg.sender, INITIAL_SUPPLY);
     }
 
-    function transfer(address _to, uint _value) validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -321,7 +321,7 @@ contract Swachhcoin is PausableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) returns (bool) 
+    function burnFrom(address _from, uint256 _value) returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -339,4 +339,20 @@ contract Swachhcoin is PausableToken {
         AdminTransferred(admin, newAdmin);
         admin = newAdmin;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -8,13 +8,13 @@ contract FastProfit {
     uint constant public MIN_DEPOSIT = 0.01 ether;
 
     uint constant public LAST_DEPOSIT_PERCENT = 2;
-    
+
     LastDeposit public last;
 
     struct Deposit {
-        address depositor; 
-        uint128 deposit;   
-        uint128 expect;    
+        address depositor;
+        uint128 deposit;
+        uint128 expect;
     }
 
     struct LastDeposit {
@@ -24,25 +24,25 @@ contract FastProfit {
     }
 
     Deposit[] private queue;
-    uint public currentReceiverIndex = 0; 
+    uint public currentReceiverIndex = 0;
 
     function () public payable {
         if(msg.value == 0 && msg.sender == last.depositor) {
             require(gasleft() >= 220000, "We require more gas!");
             require(last.blockNumber + 258 < block.number, "Last depositor should wait 258 blocks (~1 hour) to claim reward");
-            
+
             uint128 money = uint128((address(this).balance));
             if(money >= last.expect){
                 last.depositor.transfer(last.expect);
             } else {
                 last.depositor.transfer(money);
             }
-            
+
             delete last;
         }
         else if(msg.value > 0){
             require(gasleft() >= 220000, "We require more gas!");
-            require(msg.value <= MAX_DEPOSIT && msg.value >= MIN_DEPOSIT, "Deposit must be >= 0.01 ETH and <= 1 ETH"); 
+            require(msg.value <= MAX_DEPOSIT && msg.value >= MIN_DEPOSIT, "Deposit must be >= 0.01 ETH and <= 1 ETH");
 
             queue.push(Deposit(msg.sender, uint128(msg.value), uint128(msg.value*MULTIPLIER/100)));
 
@@ -62,27 +62,27 @@ contract FastProfit {
 
         for(uint i=0; i<queue.length; i++){
 
-            uint idx = currentReceiverIndex + i;  
+            uint idx = currentReceiverIndex + i;
 
-            Deposit storage dep = queue[idx]; 
+            Deposit storage dep = queue[idx];
 
-            if(money >= dep.expect){  
-                dep.depositor.transfer(dep.expect); 
-                money -= dep.expect;            
+            if(money >= dep.expect){
+                dep.depositor.transfer(dep.expect);
+                money -= dep.expect;
 
-                
+
                 delete queue[idx];
             }else{
-                dep.depositor.transfer(money); 
-                dep.expect -= money;       
+                dep.depositor.transfer(money);
+                dep.expect -= money;
                 break;
             }
 
-            if(gasleft() <= 50000)        
+            if(gasleft() <= 50000)
                 break;
         }
 
-        currentReceiverIndex += i; 
+        currentReceiverIndex += i;
     }
 
     function getDeposit(uint idx) public view returns (address depositor, uint deposit, uint expect){
@@ -119,9 +119,18 @@ contract FastProfit {
             }
         }
     }
-    
+
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

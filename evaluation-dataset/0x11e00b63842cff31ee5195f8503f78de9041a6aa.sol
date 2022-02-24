@@ -2,7 +2,7 @@
     Implements AquaToken, which is a test.
 
     (Test Version 2.0)
-  
+
     Portions of this code fall under the following license from "OpenZepplin"
 
     The MIT License (MIT)
@@ -190,4 +190,15 @@ contract AquaToken is BurnableToken, StandardToken {
             owner = newOwner;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

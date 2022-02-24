@@ -86,7 +86,7 @@ contract BasicFrozenToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
     /**
    * @dev mapping sender -> unfrozeTimestamp
    * when sender is unfrozen
@@ -121,7 +121,7 @@ contract BasicFrozenToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // Custom code - checking for frozen state
     require(isUnfrozen(msg.sender));
 
@@ -197,7 +197,7 @@ contract StandardToken is ERC20, BasicFrozenToken {
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
-    
+
     // Custom code - проверка на факт разморозки
     require(isUnfrozen(_from));
 
@@ -299,17 +299,17 @@ library SafeMath {
 /**
  * @title Quasacoin token
  * Based on code by OpenZeppelin MintableToken.sol
- 
+
   + added frozing when minting
- 
+
  */
 
 contract QuasacoinToken is StandardToken, Ownable {
-    
+
   string public name = "Quasacoin";
   string public symbol = "QUA";
   uint public decimals = 18;
-  
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
 
@@ -333,14 +333,14 @@ contract QuasacoinToken is StandardToken, Ownable {
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
 
-    uint frozenTime = 0; 
+    uint frozenTime = 0;
     // frozeness is checked until  07.07.18 00:00:00 (1530921600), after all tokens are minted as unfrozen
     if(now < 1530921600) {
       // выпуск                      до 15.01.18 00:00:00 (1515974400) - заморозка до 30.03.18 00:00:00 (1522368000)
       if(now < 1515974400)
         frozenTime = 1522368000;
 
-      // выпуск c 15.01.18 00:00:00  до 15.02.18 00:00:00 (1518652800) - заморозка до 30.05.18 00:00:00 (1527638400)     
+      // выпуск c 15.01.18 00:00:00  до 15.02.18 00:00:00 (1518652800) - заморозка до 30.05.18 00:00:00 (1527638400)
       else if(now < 1518652800)
         frozenTime = 1527638400;
 
@@ -359,7 +359,7 @@ contract QuasacoinToken is StandardToken, Ownable {
       // выпуск c 15.05.18 00:00:00  до 15.06.18 00:00:00 (1529020800) - заморозка до 30.06.18 00:00:00 (1530316800)
       else if(now < 1529020800)
         frozenTime = 1530316800;
-      else 
+      else
       // выпуск с 15.06.18 00:00:00  после до 07.07.18 00:00:00 (1530921600) - заморозка до 07.07.18 00:00:00 (1530921600)
         frozenTime = 1530921600;
       unfrozeTimestamp[_to] = frozenTime;
@@ -431,13 +431,13 @@ contract QuasacoinTokenCrowdsale {
     tokenOwner = 0x373ae730d8c4250b3d022a65ef998b8b7ab1aa53;
     wallet = 0x373ae730d8c4250b3d022a65ef998b8b7ab1aa53;
 
-    // 15.01.18 00:00:00 (1515974400) 
+    // 15.01.18 00:00:00 (1515974400)
     startPreICOTime = 1515974400;
     // 15.02.18 00:00:00 (1518652800)
     startICOTime = 1518652800;
     // 26.03.18 00:00:00 (1522022400)
     endTime = 1522022400;
-    
+
     // Pre-ICO, 1 ETH = 6000 QUA
     ratePreICO = 6000;
 
@@ -462,10 +462,10 @@ contract QuasacoinTokenCrowdsale {
 
     // calculate token amount to be created
     uint256 tokens;
-    if(now < startICOTime) {  
+    if(now < startICOTime) {
       weiRaisedPreICO = weiRaisedPreICO.add(weiAmount);
       tokens = weiAmount * ratePreICO;
-    } 
+    }
     else {
       weiRaisedICO = weiRaisedICO.add(weiAmount);
       tokens = weiAmount * rateICO;
@@ -485,7 +485,7 @@ contract QuasacoinTokenCrowdsale {
 
   // @return true if the transaction can buy tokens
   function validPurchase() internal constant returns (bool) {
-   
+
     if(now >= startPreICOTime && now < startICOTime) {
       return weiRaisedPreICO.add(msg.value) <= capPreICO;
     } else if(now >= startICOTime && now < endTime) {
@@ -523,14 +523,14 @@ contract QuasacoinTokenCrowdsale {
   function mintProxy(address _to, uint256 _amount) public {
     require(allowedMinters[msg.sender]);
     require(now >= startPreICOTime && now < endTime);
-    
+
     uint256 weiAmount;
 
     if(now < startICOTime) {
       weiAmount = _amount.div(ratePreICO);
       require(weiRaisedPreICO.add(weiAmount) <= capPreICO);
       weiRaisedPreICO = weiRaisedPreICO.add(weiAmount);
-    } 
+    }
     else {
       weiAmount = _amount.div(rateICO);
       require(weiRaisedICO.add(weiAmount) <= capICO);
@@ -540,4 +540,15 @@ contract QuasacoinTokenCrowdsale {
     token.mint(_to, _amount);
     TokenPurchase(msg.sender, _to, weiAmount, _amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

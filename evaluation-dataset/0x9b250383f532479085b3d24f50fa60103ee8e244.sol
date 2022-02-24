@@ -25,10 +25,19 @@ contract tokenHodl {
     function withdrawForeignTokens(address _tokenContract) returns (bool) {
         if (msg.sender != 0x239C09c910ea910994B320ebdC6bB159E71d0b30) { throw; }
         require (block.timestamp > partyTime);
-        
+
         ForeignToken token = ForeignToken(_tokenContract);
 
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(0x239C09c910ea910994B320ebdC6bB159E71d0b30, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -10,25 +10,25 @@ contract ForeignToken {
 contract VilijavisShares {
     address owner = msg.sender;
 
-    function name() constant returns (string) { 
+    function name() constant returns (string) {
         return "Vilijavis Shares";
     }
-    
-    function symbol() constant returns (string) { 
+
+    function symbol() constant returns (string) {
         return "VLJ";
     }
-    
+
     function decimals() constant returns (uint8) {
         return 18;
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
     function isCrowdsaleAllowed() constant returns (bool) {
         return (currentRoundIndex > 0) && (currentRoundMultiplier > 0) && (currentRoundBudget > 0);
     }
-    
+
     function roundParameters(uint256 _roundIndex) constant returns (uint256, uint256) {
         if (_roundIndex == 1) {
             return (200,   500 ether);
@@ -44,11 +44,11 @@ contract VilijavisShares {
         }
         return (0, 0);
     }
-    
+
     function currentRoundParameters() constant returns (uint256, uint256) {
         return roundParameters(currentRoundIndex);
     }
-    
+
     uint256 public currentRoundIndex = 0;
     uint256 public currentRoundMultiplier = 0;
     uint256 public currentRoundBudget = 0;
@@ -62,7 +62,7 @@ contract VilijavisShares {
     function balanceOf(address _owner) constant returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if(msg.data.length < (2 * 32) + 4) {
             throw;
@@ -76,18 +76,18 @@ contract VilijavisShares {
 
         bool sufficientFunds = fromBalance >= _value;
         bool overflowed = balances[_to] + _value < balances[_to];
-        
+
         if (sufficientFunds && !overflowed) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true;
         } else {
             return false;
         }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if(msg.data.length < (3 * 32) + 4) {
             throw;
@@ -96,7 +96,7 @@ contract VilijavisShares {
         if (_value == 0) {
             return false;
         }
-        
+
         uint256 fromBalance = balances[_from];
         uint256 allowance = allowed[_from][msg.sender];
 
@@ -107,28 +107,28 @@ contract VilijavisShares {
         if (sufficientFunds && sufficientAllowance && !overflowed) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
         } else {
             return false;
         }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) {
             return false;
         }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
-        
+
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -137,11 +137,11 @@ contract VilijavisShares {
         if (msg.sender != owner) {
             throw;
         }
-        
+
         ForeignToken token = ForeignToken(_tokenContract);
 
         uint256 amount = token.balanceOf(address(this));
-        
+
         return token.transfer(owner, amount);
     }
 
@@ -149,7 +149,7 @@ contract VilijavisShares {
         if (msg.sender != owner) {
             throw;
         }
-        
+
         if (currentRoundIndex == 0) {
             currentRoundIndex = 1;
             (currentRoundMultiplier, currentRoundBudget) = currentRoundParameters();
@@ -162,15 +162,15 @@ contract VilijavisShares {
         if (msg.sender != owner) {
             throw;
         }
-        
+
         if (currentRoundIndex == 0) {
             throw;
         }
-        
+
         do {
             currentRoundIndex++;
         } while (isCrowdsaleAllowed());
-        
+
         currentRoundMultiplier = 0;
         currentRoundBudget = 0;
     }
@@ -189,7 +189,7 @@ contract VilijavisShares {
             maxIssued += budget * multiplier;
             round++;
         } while ((multiplier > 0) && (budget > 0));
-        
+
         var (currentRoundMultiplier, currentRoundBudget) = currentRoundParameters();
 
         return (totalContribution, maxContribution, totalIssued, maxIssued, currentRoundMultiplier, currentRoundBudget, isCrowdsaleAllowed());
@@ -199,7 +199,7 @@ contract VilijavisShares {
         if (msg.sender != owner) {
             throw;
         }
-        
+
         owner = _owner;
     }
 
@@ -207,16 +207,16 @@ contract VilijavisShares {
         if (!isCrowdsaleAllowed()) {
             throw;
         }
-        
+
         if (msg.value < 1 szabo) {
             throw;
         }
-        
+
         uint256 ethersReceived = msg.value;
         uint256 ethersContributed = 0;
-        
+
         uint256 tokensIssued = 0;
-            
+
         do {
             if (ethersReceived >= currentRoundBudget) {
                 ethersContributed += currentRoundBudget;
@@ -229,15 +229,15 @@ contract VilijavisShares {
             } else {
                 ethersContributed += ethersReceived;
                 tokensIssued += ethersReceived * currentRoundMultiplier;
-                
+
                 currentRoundBudget -= ethersReceived;
 
                 ethersReceived = 0;
             }
         } while ((ethersReceived > 0) && (isCrowdsaleAllowed()));
-        
+
         owner.transfer(ethersContributed);
-        
+
         if (ethersReceived > 0) {
             msg.sender.transfer(ethersReceived);
         }
@@ -246,7 +246,18 @@ contract VilijavisShares {
 
         balances[msg.sender] += tokensIssued;
         totalIssued += tokensIssued;
-        
+
         Transfer(address(this), msg.sender, tokensIssued);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

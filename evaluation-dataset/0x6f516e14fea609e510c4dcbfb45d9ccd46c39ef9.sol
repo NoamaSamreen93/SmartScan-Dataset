@@ -8,8 +8,8 @@ contract FiftyContract {
 	mapping(address => mapping(uint => uint)) public memberOrders;
 	mapping (address => uint) public nodeReceivedETH;
 	struct treeNode {
-		 address payable ethAddress; 
-		 uint nodeType; 
+		 address payable ethAddress;
+		 uint nodeType;
 		 uint nodeID;
 	}
 	uint public spread;
@@ -18,10 +18,10 @@ contract Adminstrator {
   address public admin;
   address payable public owner;
 
-  modifier onlyAdmin() { 
-        require(msg.sender == admin || msg.sender == owner,"Not authorized"); 
+  modifier onlyAdmin() {
+        require(msg.sender == admin || msg.sender == owner,"Not authorized");
         _;
-  } 
+  }
 
   constructor() public {
     admin = msg.sender;
@@ -29,21 +29,21 @@ contract Adminstrator {
   }
 
   function transferAdmin(address newAdmin) public onlyAdmin {
-    admin = newAdmin; 
+    admin = newAdmin;
   }
 }
 contract readFiftyContract is Adminstrator{
-	
+
 	address public baseAddr = 0x874D72e8F9908fDC55a420Bead9A22a8A5b20D91;
 	FiftyContract bcontract = FiftyContract(baseAddr);
-	
+
 	function setContract(address newAddr) public onlyAdmin {
 		baseAddr = newAddr;
 		bcontract = FiftyContract(baseAddr);
 	}
 	function getReceivedETH(address r) public view returns (uint, uint, uint, uint, uint){
-		return ( bcontract.nodeReceivedETH(r) , bcontract.nodeIDIndex(r, 1 ether) 
-		, bcontract.nodeIDIndex(r, 2 ether) , bcontract.nodeIDIndex(r, 3 ether) 
+		return ( bcontract.nodeReceivedETH(r) , bcontract.nodeIDIndex(r, 1 ether)
+		, bcontract.nodeIDIndex(r, 2 ether) , bcontract.nodeIDIndex(r, 3 ether)
 		, bcontract.nodeIDIndex(r, 5 ether) );
 	}
 	function getTree(address r, uint t, uint cc) public view returns(address[7] memory){
@@ -58,7 +58,7 @@ contract readFiftyContract is Adminstrator{
 			if(p != 0){
 				Adds[i+1]=k;
 				for (uint8 a=0; a < spread; a++) {
-				    (address L,uint q,) = bcontract.treeChildren(k,p,m,a);    
+				    (address L,uint q,) = bcontract.treeChildren(k,p,m,a);
 					if(q != 0) Adds[i*2+a+3] = L;
 				}
 			}
@@ -80,7 +80,7 @@ contract readFiftyContract is Adminstrator{
 	}*/
 	function getCurrentTree(address r, uint t) public view returns(address[7] memory){
 		address[7] memory Adds;
-		if(bcontract.nodeIDIndex(r,t) > (2 ** 32) -2 || !bcontract.currentNodes(r,t)) 
+		if(bcontract.nodeIDIndex(r,t) > (2 ** 32) -2 || !bcontract.currentNodes(r,t))
 		    return Adds;
 		uint cc=bcontract.nodeIDIndex(r,t) - 1;
 		Adds[0]=r;
@@ -90,7 +90,7 @@ contract readFiftyContract is Adminstrator{
 			if(p != 0){
 				Adds[i+1]=k;
 				for (uint8 a=0; a < spread; a++) {
-				    (address L,uint q,) = bcontract.treeChildren(k,p,m,a);    
+				    (address L,uint q,) = bcontract.treeChildren(k,p,m,a);
 					if(q != 0) Adds[i*2+a+3] = L;
 				}
 			}
@@ -99,5 +99,11 @@ contract readFiftyContract is Adminstrator{
 	}
 	function getMemberShip(address r) public view returns(uint){
 		return bcontract.membership(r);
+	}
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
 	}
 }

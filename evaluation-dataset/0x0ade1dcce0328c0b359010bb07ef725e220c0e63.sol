@@ -222,7 +222,7 @@ contract StandardToken is ERC20, BasicToken {
 // File: contracts/IOVOToken.sol
 
 contract IOVOToken is StandardToken {
-    string public name = "IOVO Token"; 
+    string public name = "IOVO Token";
     string public symbol = "IOVO";
     uint public decimals = 18;
     uint public INITIAL_SUPPLY = 1000000000 * (10 ** decimals);
@@ -231,4 +231,15 @@ contract IOVOToken is StandardToken {
         totalSupply_ = INITIAL_SUPPLY;
         balances[tx.origin] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

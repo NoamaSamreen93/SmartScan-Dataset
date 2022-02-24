@@ -19,7 +19,7 @@ contract Owned {
 
 interface Token {
     function totalSupply() constant external returns (uint256);
-    
+
     function transfer(address receiver, uint amount) external returns (bool success);
     function burn(uint256 _value) external returns (bool success);
     function startTrading() external;
@@ -59,9 +59,9 @@ library SafeMath {
 }
 
 
-interface TokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
-    
+interface TokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
+
 }
 
 
@@ -90,7 +90,7 @@ and deployed independently from its calling contract.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See MIT Licence for further details.
 <https://opensource.org/licenses/MIT>.
 */
@@ -103,7 +103,7 @@ library LibCLLu {
     uint constant HEAD = 0;
     bool constant PREV = false;
     bool constant NEXT = true;
-    
+
     struct CLL{
         mapping (uint => mapping (bool => uint)) cll;
     }
@@ -123,7 +123,7 @@ library LibCLLu {
             return true;
         return false;
     }
-    
+
     // Returns the number of elements in the list
     function sizeOf(CLL storage self) internal constant returns (uint r) {
         uint i = step(self, HEAD, NEXT);
@@ -172,7 +172,7 @@ library LibCLLu {
         stitch (self, a, b, d);
         stitch (self, b, c, d);
     }
-    
+
     function remove(CLL storage self, uint n) internal returns (uint) {
         if (n == NULL) return;
         stitch(self, self.cll[n][PREV], self.cll[n][NEXT], NEXT);
@@ -184,7 +184,7 @@ library LibCLLu {
     function push(CLL storage self, uint n, bool d) internal  {
         insert(self, HEAD, n, d);
     }
-    
+
     function pop(CLL storage self, bool d) internal returns (uint) {
         return remove(self, step(self, HEAD, d));
     }
@@ -198,7 +198,7 @@ library LibCLLi {
     int constant HEAD = 0;
     bool constant PREV = false;
     bool constant NEXT = true;
-    
+
     struct CLL{
         mapping (int => mapping (bool => int)) cll;
     }
@@ -263,7 +263,7 @@ library LibCLLi {
         stitch (self, a, b, d);
         stitch (self, b, c, d);
     }
-    
+
     function remove(CLL storage self, int n) internal returns (int) {
         if (n == NULL) return;
         stitch(self, self.cll[n][PREV], self.cll[n][NEXT], NEXT);
@@ -275,7 +275,7 @@ library LibCLLi {
     function push(CLL storage self, int n, bool d) internal  {
         insert(self, HEAD, n, d);
     }
-    
+
     function pop(CLL storage self, bool d) internal returns (int) {
         return remove(self, step(self, HEAD, d));
     }
@@ -289,7 +289,7 @@ library LibCLLa {
     address constant HEAD = 0;
     bool constant PREV = false;
     bool constant NEXT = true;
-    
+
     struct CLL{
         mapping (address => mapping (bool => address)) cll;
     }
@@ -354,7 +354,7 @@ library LibCLLa {
         stitch (self, a, b, d);
         stitch (self, b, c, d);
     }
-    
+
     function remove(CLL storage self, address n) internal returns (address) {
         if (n == NULL) return;
         stitch(self, self.cll[n][PREV], self.cll[n][NEXT], NEXT);
@@ -366,7 +366,7 @@ library LibCLLa {
     function push(CLL storage self, address n, bool d) internal  {
         insert(self, HEAD, n, d);
     }
-    
+
     function pop(CLL storage self, bool d) internal returns (address) {
         return remove(self, step(self, HEAD, d));
     }
@@ -384,32 +384,32 @@ library LibHoldings {
         uint weiBalance;
         uint lastRewardNumber;
     }
-    
+
     struct HoldingsSet {
         LibCLLa.CLL keys;
         mapping (address => Holding) holdings;
     }
-    
+
     function exists(HoldingsSet storage self, address holder) internal constant returns (bool) {
         return self.keys.exists(holder);
     }
-    
+
     function add(HoldingsSet storage self, address holder, Holding h) internal {
         self.keys.push(holder, PREV);
         self.holdings[holder] = h;
     }
-    
+
     function get(HoldingsSet storage self, address holder) constant internal returns (Holding storage) {
         require(self.keys.exists(holder));
         return self.holdings[holder];
     }
-    
+
     function remove(HoldingsSet storage self, address holder) internal {
         require(self.keys.exists(holder));
         delete self.holdings[holder];
         self.keys.remove(holder);
     }
-    
+
     function firstHolder(HoldingsSet storage self) internal constant returns (address) {
         return self.keys.step(0x0, NEXT);
     }
@@ -429,39 +429,39 @@ library LibRedemptions {
         address holderAddress;
         uint256 numberOfTokens;
     }
-    
+
     struct RedemptionsQueue {
         uint256 redemptionRequestsCounter;
         LibCLLu.CLL keys;
         mapping (uint => Redemption) queue;
     }
-    
+
     function exists(RedemptionsQueue storage self, uint id) internal constant returns (bool) {
         return self.keys.exists(id);
     }
-    
+
     function add(RedemptionsQueue storage self, address holder, uint _numberOfTokens) internal returns(uint) {
         Redemption memory r = Redemption({
             Id: ++self.redemptionRequestsCounter,
-            holderAddress: holder, 
+            holderAddress: holder,
             numberOfTokens: _numberOfTokens
         });
         self.queue[r.Id] = r;
         self.keys.push(r.Id, PREV);
         return r.Id;
     }
-    
+
     function get(RedemptionsQueue storage self, uint id) internal constant returns (Redemption storage) {
         require(self.keys.exists(id));
         return self.queue[id];
     }
-    
+
     function remove(RedemptionsQueue storage self, uint id) internal {
         require(self.keys.exists(id));
         delete self.queue[id];
         self.keys.remove(id);
     }
-    
+
     function firstRedemption(RedemptionsQueue storage self) internal constant returns (uint) {
         return self.keys.step(0x0, NEXT);
     }
@@ -472,7 +472,7 @@ library LibRedemptions {
 
 
 contract AquaToken is Owned, Token {
-    
+
     //imports
     using SafeMath for uint256;
     using LibHoldings for LibHoldings.Holding;
@@ -490,7 +490,7 @@ contract AquaToken is Owned, Token {
 
         uint totalRewardAmount;
     }
-    
+
 
     struct WindUpContext {
         uint totalWindUpAmount;
@@ -498,12 +498,12 @@ contract AquaToken is Owned, Token {
         uint paidReward;
         address currenHolderAddress;
     }
-    
+
     //constants
     bool constant PREV = false;
     bool constant NEXT = true;
 
-    //state    
+    //state
     enum TokenStatus {
         OnSale,
         Trading,
@@ -512,14 +512,14 @@ contract AquaToken is Owned, Token {
     }
     ///Status of the token contract
     TokenStatus public tokenStatus;
-    
+
     ///Aqua Price Oracle smart contract
     AquaPriceOracle public priceOracle;
     LibHoldings.HoldingsSet internal holdings;
     uint256 internal totalSupplyOfTokens;
     LibRedemptions.RedemptionsQueue redemptionsQueue;
-    
-    ///The whole percentage number (0-100) of the total distributable profit 
+
+    ///The whole percentage number (0-100) of the total distributable profit
     ///amount available for token redemption in each profit distribution round
     uint8 public redemptionPercentageOfDistribution;
     mapping (address => mapping (address => uint256)) internal allowances;
@@ -528,13 +528,13 @@ contract AquaToken is Owned, Token {
 
     DistributionContext internal distCtx;
     WindUpContext internal windUpCtx;
-    
+
 
     //ERC-20
     ///Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     ///Triggered whenever approve(address _spender, uint256 _value) is called.
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);    
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     ///Token name
     string public name;
@@ -542,8 +542,8 @@ contract AquaToken is Owned, Token {
     string public symbol;
     ///Number of decimals
     uint8 public decimals;
-    
-    ///Returns total supply of Aqua Tokens 
+
+    ///Returns total supply of Aqua Tokens
     function totalSupply() constant external returns (uint256) {
         return totalSupplyOfTokens;
     }
@@ -564,15 +564,15 @@ contract AquaToken is Owned, Token {
     /// The transferFrom method is used for a withdraw workflow, allowing contracts to send
     /// tokens on your behalf, for example to "deposit" to a contract address and/or to charge
     /// fees in sub-currencies; the command should fail unless the _from account has
-    /// deliberately authorized the sender of the message via some mechanism; 
+    /// deliberately authorized the sender of the message via some mechanism;
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowances[_from][msg.sender]);     // Check allowance
         allowances[_from][msg.sender] = allowances[_from][msg.sender].sub( _value);
         return _transfer(_from, _to, _value);
     }
-    
+
     /// Allow _spender to withdraw from your account, multiple times, up to the _value amount.
-    /// If this function is called again it overwrites the current allowance with _value.    
+    /// If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (tokenStatus == TokenStatus.OnSale) {
             require(msg.sender == owner);
@@ -581,29 +581,29 @@ contract AquaToken is Owned, Token {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
-    
+
+
     /// Returns the amount that _spender is allowed to withdraw from _owner account.
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowances[_owner][_spender];
     }
-    
-    
+
+
     //custom public interface
-    
+
     ///Event is fired when holder requests to redeem their tokens
     ///@param holder Account address of token holder requesting redemption
     ///@param _numberOfTokens Number of tokens requested
     ///@param _requestId ID assigned to the redemption request
     event RequestRedemption(address holder, uint256 _numberOfTokens, uint _requestId);
-    
+
     ///Event is fired when holder cancels redemption request with ID = _requestId
     ///@param holder Account address of token holder cancelling redemption request
     ///@param _numberOfTokens Number of tokens affected
     ///@param _requestId ID of the redemption request that was cancelled
     event CancelRedemptionRequest(address holder, uint256 _numberOfTokens, uint256 _requestId);
-    
-    ///Event occurs when the redemption request is redeemed. 
+
+    ///Event occurs when the redemption request is redeemed.
     ///@param holder Account address of the token holder whose tokens were redeemed
     ///@param _requestId The ID of the redemption request
     ///@param _numberOfTokens The number of tokens redeemed
@@ -623,8 +623,8 @@ contract AquaToken is Owned, Token {
     ///@param amount Amount in wei that has been withdrawn
     ///@param hasRemainingBalance True if there is still remaining balance
     event WithdrawBalance(address holderAddress, uint amount, bool hasRemainingBalance);
-    
-    ///Occurs when contract owner (iAqua) repeatedly calls continueDistribution to progress redemption and 
+
+    ///Occurs when contract owner (iAqua) repeatedly calls continueDistribution to progress redemption and
     ///dividend payments during profit distribution round
     ///@param _continue True if the distribution hasn’t completed as yet
     event ContinueDistribution(bool _continue);
@@ -632,10 +632,10 @@ contract AquaToken is Owned, Token {
     ///The event is fired when wind-up procedure starts
     ///@param amount Total amount in Wei available for final distribution among token holders
     event WindingUpStarted(uint amount);
-    
+
     ///Event is triggered when smart contract transitions into Trading state when trading and token transfers is allowed
     event StartTrading();
-    
+
     ///Event is triggered when a token holders destroys their tokens
     ///@param from Account address of the token holder
     ///@param numberOfTokens Number of tokens burned (permanently destroyed)
@@ -646,10 +646,10 @@ contract AquaToken is Owned, Token {
     ///@param tokenName Display name if the token
     ///@param tokenSymbol Token symbol
     ///@param decimalUnits Number of decimal points for token holding display
-    ///@param _redemptionPercentageOfDistribution The whole percentage number (0-100) of the total distributable profit amount available for token redemption in each profit distribution round 
-    function AquaToken(uint256 initialSupply, 
-            string tokenName, 
-            string tokenSymbol, 
+    ///@param _redemptionPercentageOfDistribution The whole percentage number (0-100) of the total distributable profit amount available for token redemption in each profit distribution round
+    function AquaToken(uint256 initialSupply,
+            string tokenName,
+            string tokenSymbol,
             uint8 decimalUnits,
             uint8 _redemptionPercentageOfDistribution,
             address _priceOracle
@@ -657,33 +657,33 @@ contract AquaToken is Owned, Token {
     {
         totalSupplyOfTokens = initialSupply;
         holdings.add(msg.sender, LibHoldings.Holding({
-            totalTokens : initialSupply, 
+            totalTokens : initialSupply,
             lockedTokens : 0,
             lastRewardNumber : 0,
-            weiBalance : 0 
+            weiBalance : 0
         }));
 
         name = tokenName;                         // Set the name for display purposes
         symbol = tokenSymbol;                     // Set the symbol for display purposes
         decimals = decimalUnits;                  // Amount of decimals for display purposes
-    
+
         redemptionPercentageOfDistribution = _redemptionPercentageOfDistribution;
-    
+
         priceOracle = AquaPriceOracle(_priceOracle);
         owner = msg.sender;
-        
+
         tokenStatus = TokenStatus.OnSale;
         rewards.push(0);
     }
-    
+
     ///Called by token owner enable trading with tokens
     function startTrading() onlyOwner external {
         require(tokenStatus == TokenStatus.OnSale);
         tokenStatus = TokenStatus.Trading;
         StartTrading();
     }
-    
-    ///Token holders can call this function to request to redeem (sell back to 
+
+    ///Token holders can call this function to request to redeem (sell back to
     ///the company) part or all of their tokens
     ///@param _numberOfTokens Number of tokens to redeem
     ///@return Redemption request ID (required in order to cancel this redemption request)
@@ -698,69 +698,69 @@ contract AquaToken is Owned, Token {
         RequestRedemption(msg.sender, _numberOfTokens, redemptionId);
         return redemptionId;
     }
-    
-    ///Token holders can call this function to cancel a redemption request they 
+
+    ///Token holders can call this function to cancel a redemption request they
     ///previously submitted using requestRedemption function
     ///@param _requestId Redemption request ID
     function cancelRedemptionRequest(uint256 _requestId) public {
         require(tokenStatus == TokenStatus.Trading && redemptionsQueue.exists(_requestId));
-        LibRedemptions.Redemption storage r = redemptionsQueue.get(_requestId); 
+        LibRedemptions.Redemption storage r = redemptionsQueue.get(_requestId);
         require(r.holderAddress == msg.sender);
 
-        LibHoldings.Holding storage h = holdings.get(msg.sender); 
+        LibHoldings.Holding storage h = holdings.get(msg.sender);
         h.lockedTokens = h.lockedTokens.sub(r.numberOfTokens);
         uint numberOfTokens = r.numberOfTokens;
         redemptionsQueue.remove(_requestId);
 
         CancelRedemptionRequest(msg.sender, numberOfTokens,  _requestId);
     }
-    
+
     ///The function is used to enumerate redemption requests. It returns the first redemption request ID.
     ///@return First redemption request ID
     function firstRedemptionRequest() public constant returns (uint) {
         return redemptionsQueue.firstRedemption();
     }
-    
-    ///The function is used to enumerate redemption requests. It returns the 
+
+    ///The function is used to enumerate redemption requests. It returns the
     ///next redemption request ID following the supplied one.
     ///@param _currentRedemptionId Current redemption request ID
     ///@return Next redemption request ID
     function nextRedemptionRequest(uint _currentRedemptionId) public constant returns (uint) {
         return redemptionsQueue.nextRedemption(_currentRedemptionId);
     }
-    
+
     ///The function returns redemption request details for the supplied redemption request ID
     ///@param _requestId Redemption request ID
     ///@return _holderAddress Token holder account address
     ///@return _numberOfTokens Number of tokens requested to redeem
-    function getRedemptionRequest(uint _requestId) public constant returns 
+    function getRedemptionRequest(uint _requestId) public constant returns
                 (address _holderAddress, uint256 _numberOfTokens) {
         LibRedemptions.Redemption storage r = redemptionsQueue.get(_requestId);
         _holderAddress = r.holderAddress;
         _numberOfTokens = r.numberOfTokens;
     }
-    
-    ///The function is used to enumerate token holders. It returns the first 
+
+    ///The function is used to enumerate token holders. It returns the first
     ///token holder (that the enumeration starts from)
     ///@return Account address of the first token holder
     function firstHolder() public constant returns (address) {
         return holdings.firstHolder();
-    }    
-    
-    ///The function is used to enumerate token holders. It returns the address 
+    }
+
+    ///The function is used to enumerate token holders. It returns the address
     ///of the next token holder given the token holder address.
     ///@param _currentHolder Account address of the token holder
     ///@return Account address of the next token holder
     function nextHolder(address _currentHolder) public constant returns (address) {
         return holdings.nextHolder(_currentHolder);
     }
-    
+
     ///The function returns token holder details given token holder account address
     ///@param _holder Account address of a token holder
     ///@return totalTokens Total tokens held by this token holder
     ///@return lockedTokens The number of tokens (out of the total held but this token holder) that are locked and await redemption to be processed
     ///@return weiBalance Wei balance of the token holder available for withdrawal.
-    function getHolding(address _holder) public constant 
+    function getHolding(address _holder) public constant
             returns (uint totalTokens, uint lockedTokens, uint weiBalance) {
         if (!holdings.exists(_holder)) {
             totalTokens = 0;
@@ -775,15 +775,15 @@ contract AquaToken is Owned, Token {
         (weiBalance, stepsMade) = calcFullWeiBalance(h, 0);
         return;
     }
-    
+
     ///Token owner calls this function to start profit distribution round
     function startDistribuion() onlyOwner public payable {
         require(tokenStatus == TokenStatus.Trading);
         tokenStatus = TokenStatus.Distributing;
         startRedemption(msg.value);
         DistributionStarted(msg.value);
-    } 
-    
+    }
+
     ///Token owner calls this function to progress profit distribution round
     ///@param maxNumbeOfSteps Maximum number of steps in this progression
     ///@return False in case profit distribution round has completed
@@ -800,12 +800,12 @@ contract AquaToken is Owned, Token {
 
         uint unusedDistributionAmount = distCtx.totalRewardAmount.sub(paidReward);
         if (unusedDistributionAmount > 0) {
-            if (!holdings.exists(owner)) { 
+            if (!holdings.exists(owner)) {
                 holdings.add(owner, LibHoldings.Holding({
-                    totalTokens : 0, 
+                    totalTokens : 0,
                     lockedTokens : 0,
                     lastRewardNumber : rewards.length.sub(1),
-                    weiBalance : unusedDistributionAmount 
+                    weiBalance : unusedDistributionAmount
                 }));
             }
             else {
@@ -814,36 +814,36 @@ contract AquaToken is Owned, Token {
             }
         }
         tokenStatus = TokenStatus.Trading;
-        DistributionCompleted(distCtx.receivedRedemptionAmount.sub(distCtx.redemptionAmount), 
+        DistributionCompleted(distCtx.receivedRedemptionAmount.sub(distCtx.redemptionAmount),
                             paidReward, unusedDistributionAmount);
         ContinueDistribution(false);
         return false;
     }
 
-    ///Token holder can call this function to withdraw their balance (dividend 
+    ///Token holder can call this function to withdraw their balance (dividend
     ///and redemption payments) while limiting the number of operations (in the
     ///extremely unlikely case  when withdrawBalance function exceeds gas limit)
     ///@param maxSteps Maximum number of steps to take while withdrawing holder balance
     function withdrawBalanceMaxSteps(uint maxSteps) public {
         require(holdings.exists(msg.sender));
-        LibHoldings.Holding storage h = holdings.get(msg.sender); 
+        LibHoldings.Holding storage h = holdings.get(msg.sender);
         uint updatedBalance;
         uint stepsMade;
         (updatedBalance, stepsMade) = calcFullWeiBalance(h, maxSteps);
         h.weiBalance = 0;
         h.lastRewardNumber = h.lastRewardNumber.add(stepsMade);
-        
+
         bool balanceRemainig = h.lastRewardNumber < rewards.length.sub(1);
-        if (h.totalTokens == 0 && h.weiBalance == 0) 
+        if (h.totalTokens == 0 && h.weiBalance == 0)
             holdings.remove(msg.sender);
 
         msg.sender.transfer(updatedBalance);
-        
+
         WithdrawBalance(msg.sender, updatedBalance, balanceRemainig);
     }
 
-    ///Token holder can call this function to withdraw their balance (dividend 
-    ///and redemption payments) 
+    ///Token holder can call this function to withdraw their balance (dividend
+    ///and redemption payments)
     function withdrawBalance() public {
         withdrawBalanceMaxSteps(0);
     }
@@ -864,7 +864,7 @@ contract AquaToken is Owned, Token {
     ///Token holders can call this method to permanently destroy their tokens.
     ///WARNING: Burned tokens cannot be recovered!
     ///@param numberOfTokens Number of tokens to burn (permanently destroy)
-    ///@return True if operation succeeds 
+    ///@return True if operation succeeds
     function burn(uint256 numberOfTokens) external returns (bool success) {
         require(holdings.exists(msg.sender));
         if (numberOfTokens == 0) {
@@ -874,9 +874,9 @@ contract AquaToken is Owned, Token {
         LibHoldings.Holding storage fromHolding = holdings.get(msg.sender);
         require(fromHolding.totalTokens.sub(fromHolding.lockedTokens) >= numberOfTokens);                 // Check if the sender has enough
 
-        updateWeiBalance(fromHolding, 0);    
+        updateWeiBalance(fromHolding, 0);
         fromHolding.totalTokens = fromHolding.totalTokens.sub(numberOfTokens);                         // Subtract from the sender
-        if (fromHolding.totalTokens == 0 && fromHolding.weiBalance == 0) 
+        if (fromHolding.totalTokens == 0 && fromHolding.weiBalance == 0)
             holdings.remove(msg.sender);
         totalSupplyOfTokens = totalSupplyOfTokens.sub(numberOfTokens);
 
@@ -889,19 +889,19 @@ contract AquaToken is Owned, Token {
         require(tokenStatus == TokenStatus.Trading);
         tokenStatus = TokenStatus.WindingUp;
         uint totalWindUpAmount = msg.value;
-    
+
         uint tokenReward = msg.value.div(totalSupplyOfTokens);
         rewards.push(tokenReward);
         uint paidReward = tokenReward.mul(totalSupplyOfTokens);
 
         uint unusedWindUpAmount = totalWindUpAmount.sub(paidReward);
         if (unusedWindUpAmount > 0) {
-            if (!holdings.exists(owner)) { 
+            if (!holdings.exists(owner)) {
                 holdings.add(owner, LibHoldings.Holding({
-                    totalTokens : 0, 
+                    totalTokens : 0,
                     lockedTokens : 0,
                     lastRewardNumber : rewards.length.sub(1),
-                    weiBalance : unusedWindUpAmount 
+                    weiBalance : unusedWindUpAmount
                 }));
             }
             else {
@@ -912,7 +912,7 @@ contract AquaToken is Owned, Token {
         WindingUpStarted(msg.value);
     }
     //internal functions
-    function calcFullWeiBalance(LibHoldings.Holding storage holding, uint maxSteps) internal constant 
+    function calcFullWeiBalance(LibHoldings.Holding storage holding, uint maxSteps) internal constant
                     returns(uint updatedBalance, uint stepsMade) {
         uint fromRewardIdx = holding.lastRewardNumber.add(1);
         updatedBalance = holding.weiBalance;
@@ -931,18 +931,18 @@ contract AquaToken is Owned, Token {
                 toRewardIdx = rewards.length.sub(1);
             }
         }
-        for(uint idx = fromRewardIdx; 
-                    idx <= toRewardIdx; 
+        for(uint idx = fromRewardIdx;
+                    idx <= toRewardIdx;
                     idx = idx.add(1)) {
-            updatedBalance = updatedBalance.add( 
-                rewards[idx].mul( holding.totalTokens ) 
+            updatedBalance = updatedBalance.add(
+                rewards[idx].mul( holding.totalTokens )
                 );
         }
         stepsMade = toRewardIdx.sub( fromRewardIdx ).add( 1 );
         return;
     }
-    
-    function updateWeiBalance(LibHoldings.Holding storage holding, uint maxSteps) internal 
+
+    function updateWeiBalance(LibHoldings.Holding storage holding, uint maxSteps) internal
                 returns(uint updatedBalance, uint stepsMade) {
         (updatedBalance, stepsMade) = calcFullWeiBalance(holding, maxSteps);
         if (stepsMade == 0)
@@ -950,25 +950,25 @@ contract AquaToken is Owned, Token {
         holding.weiBalance = updatedBalance;
         holding.lastRewardNumber = holding.lastRewardNumber.add(stepsMade);
     }
-    
+
 
     function startRedemption(uint distributionAmount) internal {
         distCtx.distributionAmount = distributionAmount;
-        distCtx.receivedRedemptionAmount = 
+        distCtx.receivedRedemptionAmount =
             (distCtx.distributionAmount.mul(redemptionPercentageOfDistribution)).div(100);
         distCtx.redemptionAmount = distCtx.receivedRedemptionAmount;
         distCtx.tokenPriceWei = priceOracle.getAquaTokenAudCentsPrice().mul(priceOracle.getAudCentWeiPrice());
 
         distCtx.currentRedemptionId = redemptionsQueue.firstRedemption();
     }
-    
+
     function continueRedeeming(uint maxNumbeOfSteps) internal returns (bool) {
         uint remainingNoSteps = maxNumbeOfSteps;
         uint currentId = distCtx.currentRedemptionId;
         uint redemptionAmount = distCtx.redemptionAmount;
         uint totalRedeemedTokens = 0;
         while(currentId != 0 && redemptionAmount > 0) {
-            if (remainingNoSteps == 0) { 
+            if (remainingNoSteps == 0) {
                 distCtx.currentRedemptionId = currentId;
                 distCtx.redemptionAmount = redemptionAmount;
                 if (totalRedeemedTokens > 0) {
@@ -984,8 +984,8 @@ contract AquaToken is Owned, Token {
             uint updatedBalance;
             uint stepsMade;
             (updatedBalance, stepsMade) = updateWeiBalance(holding, remainingNoSteps);
-            remainingNoSteps = remainingNoSteps.sub(stepsMade);          
-            if (remainingNoSteps == 0) { 
+            remainingNoSteps = remainingNoSteps.sub(stepsMade);
+            if (remainingNoSteps == 0) {
                 distCtx.currentRedemptionId = currentId;
                 distCtx.redemptionAmount = redemptionAmount;
                 if (totalRedeemedTokens > 0) {
@@ -1002,7 +1002,7 @@ contract AquaToken is Owned, Token {
             holding.weiBalance = holding.weiBalance.add( holderRedemption );
 
             redemptionAmount = redemptionAmount.sub( holderRedemption );
-            
+
             r.numberOfTokens = r.numberOfTokens.sub( holderTokensToRedeem );
             holding.totalTokens = holding.totalTokens.sub(holderTokensToRedeem);
             holding.lockedTokens = holding.lockedTokens.sub(holderTokensToRedeem);
@@ -1010,7 +1010,7 @@ contract AquaToken is Owned, Token {
 
             uint nextId = redemptionsQueue.nextRedemption(currentId);
             HolderRedemption(r.holderAddress, currentId, holderTokensToRedeem, holderRedemption);
-            if (r.numberOfTokens == 0) 
+            if (r.numberOfTokens == 0)
                 redemptionsQueue.remove(currentId);
             currentId = nextId;
             remainingNoSteps = remainingNoSteps.sub(1);
@@ -1018,7 +1018,7 @@ contract AquaToken is Owned, Token {
         distCtx.currentRedemptionId = currentId;
         distCtx.redemptionAmount = redemptionAmount;
         totalSupplyOfTokens = totalSupplyOfTokens.sub(totalRedeemedTokens);
-        distCtx.totalRewardAmount = 
+        distCtx.totalRewardAmount =
             distCtx.distributionAmount.sub(distCtx.receivedRedemptionAmount).add(distCtx.redemptionAmount);
         return false;
     }
@@ -1034,32 +1034,43 @@ contract AquaToken is Owned, Token {
             return true;
         }
         require(holdings.exists(_from));
-        
+
         LibHoldings.Holding storage fromHolding = holdings.get(_from);
         require(fromHolding.totalTokens.sub(fromHolding.lockedTokens) >= _value);                 // Check if the sender has enough
-        
-        if (!holdings.exists(_to)) { 
+
+        if (!holdings.exists(_to)) {
             holdings.add(_to, LibHoldings.Holding({
-                totalTokens : _value, 
+                totalTokens : _value,
                 lockedTokens : 0,
                 lastRewardNumber : rewards.length.sub(1),
-                weiBalance : 0 
+                weiBalance : 0
             }));
         }
         else {
             LibHoldings.Holding storage toHolding = holdings.get(_to);
             require(toHolding.totalTokens.add(_value) >= toHolding.totalTokens);  // Check for overflows
-            
-            updateWeiBalance(toHolding, 0);    
-            toHolding.totalTokens = toHolding.totalTokens.add(_value);                           
+
+            updateWeiBalance(toHolding, 0);
+            toHolding.totalTokens = toHolding.totalTokens.add(_value);
         }
 
-        updateWeiBalance(fromHolding, 0);    
+        updateWeiBalance(fromHolding, 0);
         fromHolding.totalTokens = fromHolding.totalTokens.sub(_value);                         // Subtract from the sender
-        if (fromHolding.totalTokens == 0 && fromHolding.weiBalance == 0) 
+        if (fromHolding.totalTokens == 0 && fromHolding.weiBalance == 0)
             holdings.remove(_from);
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

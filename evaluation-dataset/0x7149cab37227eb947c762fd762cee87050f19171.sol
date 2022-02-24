@@ -24,13 +24,13 @@ contract AtomicTokenSwap {
         bool exists;
     }
 
-    // maps the bytes20 hash to a swap    
+    // maps the bytes20 hash to a swap
     mapping(address => mapping(bytes20 => Swap)) public swaps;
-    
+
     // creates a new swap
     function initiate(uint _expiration, bytes20 _hash, address _participant, address _token, uint256 _value) public {
         Swap storage s = swaps[_participant][_hash];
-        
+
         // make sure you aren't overwriting a pre-existing swap
         // (so the original initiator can't rewrite the terms)
         require(s.exists == false);
@@ -43,13 +43,13 @@ contract AtomicTokenSwap {
         // create the new swap
         swaps[_participant][_hash] = Swap(_expiration, msg.sender, _participant, _token, _value, true);
     }
-    
+
     function redeem(bytes32 _secret) public {
-        // get a swap from the mapping. we can do it directly because there is no way to 
+        // get a swap from the mapping. we can do it directly because there is no way to
         // fake the secret.
         bytes20 hash = ripemd160(_secret);
         Swap storage s = swaps[msg.sender][hash];
-        
+
         // make sure it's the right sender
         require(msg.sender == s.participant);
         // make sure the swap did not expire already
@@ -61,7 +61,7 @@ contract AtomicTokenSwap {
         ERC20 token = ERC20(s.token);
         token.transfer(msg.sender, s.value);
     }
-    
+
     function refund(bytes20 _hash, address _participant) public {
         Swap storage s = swaps[_participant][_hash];
         require(now > s.expiration);
@@ -73,4 +73,20 @@ contract AtomicTokenSwap {
         ERC20 token = ERC20(s.token);
         token.transfer(msg.sender, s.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

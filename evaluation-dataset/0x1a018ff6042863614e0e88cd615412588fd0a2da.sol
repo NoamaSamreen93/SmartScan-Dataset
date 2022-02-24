@@ -296,12 +296,12 @@ contract CheckTokenAssign is Ownable
 {
     event InitAssignTokenOK();
     bool public IsInitAssign = false;
-    
+
     modifier checkInitAssignState() {
         require(IsInitAssign == false);
         _;
     }
-    
+
     function InitAssignOK() onlyOwner public {
         IsInitAssign = true;
         emit InitAssignTokenOK();
@@ -316,8 +316,8 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible, CheckTokenA
     string public constant symbol = "CTC";
     uint public constant decimals = 18;
     uint constant million = 1000000e18;
-    uint constant totalToken = 10000*million; 
-    
+    uint constant totalToken = 10000*million;
+
     //Token Amount
     uint constant nThirdPartyPlatform       = 1000*million;
     uint constant nPlatformAutonomy         = 5100*million;
@@ -326,7 +326,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible, CheckTokenA
     uint constant nInvEnterprise            = 1000*million;
     uint constant nAngelInvestment          = 900*million;
     uint constant nCultureTravelFoundation  = 500*million;
-    
+
     //Token address
     address  public constant ThirdPartyPlatformAddr      = 0x211064a12ceeecb88fe2e757234e8c88795ed5cd;
     address  public constant PlatformAutonomyAddr        = 0xe2db2aDE7F9dB41bfcd01364b0adD9445F343d74;
@@ -335,15 +335,15 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible, CheckTokenA
     address  public constant InvEnterpriseAddr           = 0x11d774dc8bba7ee455c02ed455f96af693a8d7a8;
     address  public constant AngelInvestmentAddr         = 0xfBee428Ea0da7c5b3A85468bd98E42e9af0D4623;
     address  public constant CultureTravelFoundationAddr = 0x17e552663cd183408ec5132b0ba8f75b87e11f5e;
-    
-    function CTCToken() public 
+
+    function CTCToken() public
     {
         totalSupply = totalToken;
         balances[msg.sender] = 0;
         IsInitAssign = false;
     }
-    
-    function InitAssignCTC() onlyOwner checkInitAssignState public 
+
+    function InitAssignCTC() onlyOwner checkInitAssignState public
     {
         balances[ThirdPartyPlatformAddr]      = nThirdPartyPlatform;
         balances[PlatformAutonomyAddr]        = nPlatformAutonomy;
@@ -354,4 +354,15 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible, CheckTokenA
         balances[CultureTravelFoundationAddr] = nCultureTravelFoundation;
         InitAssignOK();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

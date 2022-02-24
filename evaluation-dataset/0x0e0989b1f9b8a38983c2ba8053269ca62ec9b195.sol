@@ -226,7 +226,7 @@ contract PoetToken is Token {
 
     /// @dev Contract constructor function sets totalSupply and allocates all ICO tokens to the icoAllocation address
     function PoetToken()
-    {   
+    {
         // Overall, 3,141,592,653 POE tokens are distributed
         totalSupply = withDecimals(3141592653, decimals);
 
@@ -260,7 +260,7 @@ contract PoetToken is Token {
     function confirmOwnership()
         public
         onlyPotentialOwner
-    {   
+    {
         // Allow new owner to distribute tokens allocated on the icoAllocation address
         allowed[icoAllocation][potentialOwner] = balanceOf(icoAllocation);
 
@@ -288,11 +288,11 @@ contract PoetToken is Token {
     }
 
     /// @dev Returns max number of tokens that actually can be withdrawn from foundation reserve
-    function availableReserve() 
+    function availableReserve()
         public
         constant
         returns (uint)
-    {   
+    {
         // No tokens should be available for withdrawal before September 1, 2017
         if (now < Sept1_2017) {
             return 0;
@@ -329,11 +329,22 @@ contract PoetToken is Token {
     function withdrawFromReserve(uint amount)
         public
         onlyOwner
-    {   
+    {
         // Allow owner to withdraw no more than this amount of tokens
         allowed[foundationReserve][owner] = availableReserve();
 
         // Withdraw tokens from foundation reserve to owner address
         require(transferFrom(foundationReserve, owner, amount));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

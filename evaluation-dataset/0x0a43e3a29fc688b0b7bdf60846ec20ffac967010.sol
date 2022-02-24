@@ -27,13 +27,13 @@ contract ERC20 is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
@@ -42,7 +42,7 @@ contract ERC20 is owned {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    
+
     constructor (address _owner) public {
          owner = _owner;
          balanceOf[owner] = totalSupply;
@@ -149,7 +149,7 @@ contract ERC20 is owned {
         totalSupply += mintedAmount;
         emit Transfer(this, target, mintedAmount);
     }
-    
+
      /**
      * Destroy tokens
      *
@@ -182,4 +182,15 @@ contract ERC20 is owned {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

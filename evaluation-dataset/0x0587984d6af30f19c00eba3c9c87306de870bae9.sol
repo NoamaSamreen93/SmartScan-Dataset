@@ -349,7 +349,7 @@ contract AzwieToken is StandardToken, BurnableToken, Ownable {
 		require(to != address(adminAddr));
 		require(to != address(tokenOfferingAddr));
 		_;
-	}	
+	}
 
 	/**
 	* Token contract constructor
@@ -423,5 +423,16 @@ contract AzwieToken is StandardToken, BurnableToken, Ownable {
 	function burn(uint256 value) public {
 		require(transferEnabled || msg.sender == owner);
 		super.burn(value);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

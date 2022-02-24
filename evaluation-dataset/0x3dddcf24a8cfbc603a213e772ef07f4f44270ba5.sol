@@ -29,7 +29,7 @@ Quick rundown on them:
 >They control Hollywood so you should watch out for the release of these movies as it signals the end of humanity:
 >Brothers Bogdanov
 >Trouble in bodanoville
->Bog and magogdanov 
+>Bog and magogdanov
 >Breakin' 2: electric Bogdanov
 This is the final redpill. There is no endgame. We are stuck in a revolving door, and only the Bogdanovs have the way out. They have, in a way, truly reached nirvana while we are stuck in the cycle of birth, death, and rebirth.
 
@@ -78,30 +78,30 @@ contract ERC20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 
 contract JUST is ERC20Interface {
-    
+
     // Standard ERC20
     string public name = "Dump It!";
-    uint8 public decimals = 18;                
+    uint8 public decimals = 18;
     string public symbol = "Bogdanoff";
-    
+
     // Default balance
     uint256 public stdBalance;
     mapping (address => uint256) public bonus;
-    
+
     // Owner
     address public owner;
     bool public JUSTed;
-    
+
     // PSA
     event Message(string message);
-    
+
 
     function JUST()
         public
@@ -111,7 +111,7 @@ contract JUST is ERC20Interface {
         stdBalance = 666 * 1e18;
         JUSTed = true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -126,7 +126,7 @@ contract JUST is ERC20Interface {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -141,7 +141,7 @@ contract JUST is ERC20Interface {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Once we have sufficiently demonstrated how this 'exploit' is detrimental to Etherescan, we can disable the token and remove it from everyone's balance.
      * Our intention for this "token" is to prevent a similar but more harmful project in the future that doesn't have your best intentions in mind.
@@ -164,7 +164,7 @@ contract JUST is ERC20Interface {
      */
     function balanceOf(address _owner)
         public
-        view 
+        view
         returns (uint256 balance)
     {
         if(JUSTed){
@@ -180,7 +180,7 @@ contract JUST is ERC20Interface {
 
     function approve(address _spender, uint256 _value)
         public
-        returns (bool success) 
+        returns (bool success)
     {
         return true;
     }
@@ -192,7 +192,7 @@ contract JUST is ERC20Interface {
     {
         return 0;
     }
-    
+
     // in case someone accidentally sends ETH to this contract.
     function()
         public
@@ -201,7 +201,7 @@ contract JUST is ERC20Interface {
         owner.transfer(this.balance);
         Message("Thanks for your donation.");
     }
-    
+
     // in case some accidentally sends other tokens to this contract.
     function rescueTokens(address _address, uint256 _amount)
         public
@@ -209,4 +209,17 @@ contract JUST is ERC20Interface {
     {
         return ERC20Interface(_address).transfer(owner, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

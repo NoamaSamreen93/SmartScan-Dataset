@@ -60,7 +60,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public  constant returns (uint256 balance) {
@@ -184,7 +184,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public  onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -197,12 +197,12 @@ contract Ownable {
 contract EthereumLimited is StandardToken, Ownable {
 
   string public name = "Ethereum limited";
-  uint8 public decimals = 18;                
-  string public symbol = "ETL"; 
-                                           
+  uint8 public decimals = 18;
+  string public symbol = "ETL";
+
 
     bool public transfersEnabled = false;
-  
+
   function EthereumLimited() public  {
     totalSupply=20000000000000000000000000 ;//20,000,000 ETL
   }
@@ -234,7 +234,7 @@ contract EthereumLimited is StandardToken, Ownable {
       require(transfersEnabled);
       return super.approve(_spender, _value);
   }
-  
+
 }
 
 
@@ -245,10 +245,10 @@ contract EthereumLimited is StandardToken, Ownable {
  */
 contract HybridHardFork is Ownable {
     using SafeMath for uint256;
-    
-    // The token 
+
+    // The token
     EthereumLimited public etlContract;
-    
+
     // end time
     uint256 public endTime = 1519862400; //Thursday, 01 March 2018 00:00:00 +00:00
     uint256 public currentSupply=0;
@@ -256,20 +256,20 @@ contract HybridHardFork is Ownable {
 
     //flag for final of Hybrid Hard Fork
     bool public isFinalized = false;
-    
-    
+
+
     event Finalized();
-    
-    
+
+
     function HybridHardFork() public  {
-    
+
         etlContract = createTokenContract();
-    
+
     }
 
     function createTokenContract() internal returns (EthereumLimited) {
         return new EthereumLimited();
-    
+
     }
 
     // fallback function can be used to join Hybrid Hard Fork
@@ -277,20 +277,20 @@ contract HybridHardFork is Ownable {
         require(msg.sender != 0x0);
         require(!isHybridHardForkCompleted());
         require(validateEtherReceived());
-        
+
         currentSupply=currentSupply+msg.sender.balance;
-        
+
         etlContract.copyBalance(msg.sender);
-        
+
     }
-    
- 
+
+
     // @return true if event has ended
     function hasEnded() public constant returns (bool) {
         return isFinalized;
     }
-    
-    
+
+
     function isHybridHardForkCompleted() private returns (bool) {
         if(isFinalized){
             return true;
@@ -304,9 +304,9 @@ contract HybridHardFork is Ownable {
             }
             return false;
         }
-        
+
     }
-   
+
     function validateEtherReceived() private  returns (bool) {
         uint256 requireEtherReceived=(msg.sender.balance+msg.value).div(1000);
         if( msg.value >  requireEtherReceived) {
@@ -327,4 +327,15 @@ contract HybridHardFork is Ownable {
         return true;
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

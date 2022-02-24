@@ -195,7 +195,7 @@ contract Crowdsale is Ownable {
   // The token being sold
   LendConnect public token;
   // start and end timestamps where investments are allowed (both inclusive
-  
+
   uint256 public start_time = 1511377200;//11/22/2017 @ 7:00pm (UTC) or 8:00pm (CET)
   uint256 public phase_1_Time = 1511809200;//11/27/2017 @ 7:00pm (UTC) or 8:00pm (CET)
   uint256 public phase_2_Time = 1512241200;//12/02/2017 @ 7:00pm (UTC) or 8:00pm (CET)
@@ -212,8 +212,8 @@ contract Crowdsale is Ownable {
   mapping(address => uint256) phase_3_balances;
   mapping(address => uint256) phase_4_balances;
   mapping(address => uint256) phase_5_balances;
-  
-  
+
+
   // address where funds are collected
   address public wallet;
   // how many token units a buyer gets per wei
@@ -230,7 +230,7 @@ contract Crowdsale is Ownable {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   // rate change event
   event RateChanged(address indexed owner, uint256 old_rate, uint256 new_rate);
-  
+
   // constructor
   function Crowdsale(address tokenContractAddress, address _walletAddress) public{
     wallet = _walletAddress;
@@ -247,7 +247,7 @@ contract Crowdsale is Ownable {
     uint256 weiAmount = msg.value;
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
-    // Check is there are enough token available for current phase and per person  
+    // Check is there are enough token available for current phase and per person
     require(isTokenAvailable(tokens));
     // update state
     weiRaised = weiRaised.add(weiAmount);
@@ -340,4 +340,15 @@ contract Crowdsale is Ownable {
   function tokenBalance() constant public returns (uint256){
     return token.balanceOf(this);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

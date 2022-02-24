@@ -16,7 +16,7 @@ pragma solidity ^0.4.24;
 // Safe maths
 // ----------------------------------------------------------------------------
 library SafeMath {
-    
+
     /**
     * @dev Adds two numbers, reverts on overflow.
     */
@@ -149,7 +149,7 @@ contract IMCToken is ERC20Interface, Owned {
         decimals = 8;
         _totalSupply = 1000000000 * (10 ** uint(decimals));
         balances[owner] = _totalSupply;
-        
+
         emit Transfer(address(0), owner, _totalSupply);
     }
 
@@ -219,7 +219,7 @@ contract IMCToken is ERC20Interface, Owned {
      * @return success 交易成功
      */
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        
+
         if (_from == msg.sender) {
             // 自己转账时不需要approve，可以直接进行转账
             _transfer(_from, _to, _value);
@@ -298,7 +298,7 @@ contract IMCToken is ERC20Interface, Owned {
      */
     function approveContractCall(address _contractAddress) public onlyOwner returns (bool){
         externalContractAddress = _contractAddress;
-        
+
         return true;
     }
 
@@ -338,16 +338,16 @@ contract IMCIssuingRecord is Owned{
         string fileFormat; // 上链存证的文件格式
         uint stripLen; // 上链存证的文件分区
     }
-    
+
     // 分配记录
     mapping(uint => RecordInfo) public issuingRecord;
-    
+
     // 用户数
     uint public userCount;
-    
+
     // 发行总币数
     uint public totalIssuingBalance;
-    
+
     /**
      * 构造函数
      * @param _tokenAddr address ERC20合约地址
@@ -359,11 +359,11 @@ contract IMCIssuingRecord is Owned{
 
         // 初始化平台账户地址
         platformAddr = _platformAddr;
-        
+
         // 初始化合约执行者
         executorAddress = msg.sender;
     }
-    
+
     /**
      * 修改platformAddr，只有owner能够修改
      * @param _addr address 地址
@@ -371,7 +371,7 @@ contract IMCIssuingRecord is Owned{
     function modifyPlatformAddr(address _addr) public onlyOwner {
         platformAddr = _addr;
     }
-    
+
     /**
      * 修改executorAddress，只有owner能够修改
      * @param _addr address 地址
@@ -388,7 +388,7 @@ contract IMCIssuingRecord is Owned{
     function sendTokenToPlatform(uint _tokens) internal returns (bool) {
 
         imcToken.issue(platformAddr, _tokens);
-        
+
         return true;
     }
 
@@ -414,7 +414,7 @@ contract IMCIssuingRecord is Owned{
 
         // 累计发行币数
         totalIssuingBalance = totalIssuingBalance.add(_token);
-        
+
         // 记录发行信息
         issuingRecord[_date] = RecordInfo(_date, _hash, _depth, _userCount, _token, _fileFormat, _stripLen);
 
@@ -422,9 +422,18 @@ contract IMCIssuingRecord is Owned{
         sendTokenToPlatform(_token);
 
         emit IssuingRecordAdd(_date, _hash, _depth, _userCount, _token, _fileFormat, _stripLen);
-        
+
         return true;
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

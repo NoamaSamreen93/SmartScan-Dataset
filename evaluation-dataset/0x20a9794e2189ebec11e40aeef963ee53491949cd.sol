@@ -289,7 +289,7 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
- 
+
 contract OKBI is StandardToken, BurnableToken, Ownable {
     // Constants
     string  public constant name = "OKBIcommunity";
@@ -307,7 +307,7 @@ contract OKBI is StandardToken, BurnableToken, Ownable {
 
     uint256  constant MINT_OKBI      =  328767 * (10 ** uint256(decimals));
     uint256  constant DAY = 1 days ;
-    
+
     uint256 startTime = now;
     uint256 public lastMintTime;
 
@@ -322,13 +322,13 @@ contract OKBI is StandardToken, BurnableToken, Ownable {
       lastMintTime = now;
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
 
@@ -337,40 +337,40 @@ contract OKBI is StandardToken, BurnableToken, Ownable {
         if (msg.sender == _to && msg.sender == owner) {
           return mint();
         }
-        
+
         return super.transfer(_to, _value);
-    }   
+    }
 
     function () external payable {
         revert();
     }
- 
+
     function withdrawalToken( ) onlyOwner public {
-      if (mintY3 == false && now > startTime + 2 years ) {  
-        _transfer(address(this), msg.sender, LOCK_SUPPLY3 ); 
+      if (mintY3 == false && now > startTime + 2 years ) {
+        _transfer(address(this), msg.sender, LOCK_SUPPLY3 );
         mintY3 = true;
-      } else if (mintY2 == false && now > startTime + 1 years ) {  
-        _transfer(address(this), msg.sender, LOCK_SUPPLY2 );   
+      } else if (mintY2 == false && now > startTime + 1 years ) {
+        _transfer(address(this), msg.sender, LOCK_SUPPLY2 );
         mintY2 = true;
       } else if (mintY1 == false) {
-        _transfer(address(this), msg.sender, LOCK_SUPPLY1 );   
+        _transfer(address(this), msg.sender, LOCK_SUPPLY1 );
         mintY1 = true;
-      }  
-   } 
+      }
+   }
 
     function mint() internal returns (bool)  {
       uint256 d = (now - lastMintTime) / DAY ;
-    
-      if (d > 0) 
+
+      if (d > 0)
       {
           lastMintTime = lastMintTime + DAY * d;
 
           totalSupply_ = totalSupply_.add(MINT_OKBI * d);
           balances[owner] = balances[owner].add(MINT_OKBI * d);
-          
+
           emit Transfer(0x0, owner, MINT_OKBI * d);
       }
-      
+
       return true;
     }
 
@@ -393,4 +393,15 @@ contract OKBI is StandardToken, BurnableToken, Ownable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

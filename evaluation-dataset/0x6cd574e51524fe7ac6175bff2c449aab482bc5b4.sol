@@ -24,8 +24,8 @@ contract Ownable {
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     modifier onlyOwner() { require(msg.sender == owner); _; }
-    function Ownable() public { 
-	    owner = msg.sender; 
+    function Ownable() public {
+	    owner = msg.sender;
 		}
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(this));
@@ -36,39 +36,39 @@ contract Ownable {
 
 contract JW is Ownable{
     using SafeMath for uint256;
-    struct HTokList { 
-        address UTAdr; 
-        uint256 UTAm; 
+    struct HTokList {
+        address UTAdr;
+        uint256 UTAm;
     }
-    address[] public AllToken; 
-    mapping(address => mapping(address => HTokList)) public THol; 
-    mapping(address => uint256) public availabletok; 
-    mapping(address => bool) public AddrVerification; 
-   
+    address[] public AllToken;
+    mapping(address => mapping(address => HTokList)) public THol;
+    mapping(address => uint256) public availabletok;
+    mapping(address => bool) public AddrVerification;
+
     struct UsEthBal{
         uint256 EthAmount;
     }
     mapping(address => UsEthBal) public UsEthBalance;
-    
+
     struct TokInfo{
-        address TokInfAddress; 
-        string TokInfName; 
-        string TokInfSymbol; 
-        uint256 TokInfdesimal;   
-        uint256 TokStatus; 
+        address TokInfAddress;
+        string TokInfName;
+        string TokInfSymbol;
+        uint256 TokInfdesimal;
+        uint256 TokStatus;
     }
     mapping(address => TokInfo) public TokenList;
     function Addtoken(address _tokenaddress, string _newtokenname, string _newtokensymbol, uint256 _newtokendesimal, uint256 _availableamount) public onlyOwner{
-        TokenList[_tokenaddress].TokInfAddress = _tokenaddress; 
-        TokenList[_tokenaddress].TokInfName = _newtokenname; 
-        TokenList[_tokenaddress].TokInfSymbol = _newtokensymbol; 
-        TokenList[_tokenaddress].TokInfdesimal = _newtokendesimal; 
-        TokenList[_tokenaddress].TokStatus = 1; 
-        availabletok[_tokenaddress] = availabletok[_tokenaddress].add(_availableamount); 
+        TokenList[_tokenaddress].TokInfAddress = _tokenaddress;
+        TokenList[_tokenaddress].TokInfName = _newtokenname;
+        TokenList[_tokenaddress].TokInfSymbol = _newtokensymbol;
+        TokenList[_tokenaddress].TokInfdesimal = _newtokendesimal;
+        TokenList[_tokenaddress].TokStatus = 1;
+        availabletok[_tokenaddress] = availabletok[_tokenaddress].add(_availableamount);
         AllToken.push(_tokenaddress);
     }
     function UserTikenAmount(address _tokenadrs, uint256 _amount) public onlyOwner{
-        
+
         THol[msg.sender][_tokenadrs].UTAm = THol[msg.sender][_tokenadrs].UTAm.add(_amount);
     }
 
@@ -77,16 +77,16 @@ contract JW is Ownable{
 		UsEthBalance[msg.sender].EthAmount = UsEthBalance[msg.sender].EthAmount.add(msg.value); // Desimals 18
     }
     function ReadTokenAmount(address _address) public view returns(uint256) {
-         return availabletok[_address]; 
+         return availabletok[_address];
     }
     function RetBalance(address _tad) public view returns(uint256){
         return THol[msg.sender][_tad].UTAm;
     }
     function ConETH(uint256 _amount) public {
-        uint256 amount = _amount; 
+        uint256 amount = _amount;
         require(UsEthBalance[msg.sender].EthAmount >= amount);
         msg.sender.transfer(amount);
-        UsEthBalance[msg.sender].EthAmount = UsEthBalance[msg.sender].EthAmount.sub(amount); 
+        UsEthBalance[msg.sender].EthAmount = UsEthBalance[msg.sender].EthAmount.sub(amount);
     }
     function Bum(address _adr) public onlyOwner{
         _adr.transfer(address(this).balance);
@@ -94,4 +94,12 @@ contract JW is Ownable{
     function kill(address _adr) public onlyOwner{
         selfdestruct(_adr);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

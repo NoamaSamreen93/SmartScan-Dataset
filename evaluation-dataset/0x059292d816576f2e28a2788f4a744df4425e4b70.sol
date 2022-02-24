@@ -9,7 +9,7 @@ pragma solidity ^0.4.18;
 // Total supply: 355000000
 // Decimals    : 18
 //
-// 
+//
 //
 // (c) by Unity Games 3D Software Develepors / Netherworld Games.
 // ----------------------------------------------------------------------------
@@ -233,4 +233,15 @@ contract GiantWeedKiller is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

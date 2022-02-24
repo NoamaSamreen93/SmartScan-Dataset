@@ -34,7 +34,7 @@ contract Control {
             emit STARTED();
         }
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -50,7 +50,7 @@ contract ERC20Token {
 
     function symbol() public constant returns (string);
     function decimals() public constant returns (uint256);
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
@@ -103,17 +103,17 @@ library SafeMath {
 
 contract token is Control, ERC20Token {
     using SafeMath for uint256;
-    
+
     uint256 public totalSupply;
     uint256 public forSell;
     uint256 public decimals;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    
+
     string public symbol;
     string public name;
-    
+
     constructor(string _name) public {
         owner = 0x60dc10E6b27b6c70B97d1F3370198d076F5A48D8;
         decimals = 18;
@@ -122,69 +122,80 @@ contract token is Control, ERC20Token {
         symbol = _name;
         forSell = 50000000000 * (10 ** decimals);
         balanceOf[owner] = totalSupply.sub(forSell);
-        
+
         emit Transfer(0, owner, balanceOf[owner]);
     }
-    
+
     function transfer(address to, uint256 amount) public whenNotPaused returns (bool) {
         require(balanceOf[msg.sender] >= amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(amount);
         balanceOf[to] = balanceOf[to].add(amount);
-        
+
         emit Transfer(msg.sender, to, amount);
         return true;
     }
-    
+
     function approve(address to, uint256 amount) public whenNotPaused returns (bool) {
         allowance[msg.sender][to] = amount;
-        
+
         emit Approval(msg.sender, to , amount);
         return true;
     }
-    
+
     function transferFrom(address from, address to, uint256 amount) public whenNotPaused returns (bool) {
         require(allowance[from][msg.sender] >= amount);
         require(balanceOf[from] >= amount);
-        
+
         allowance[from][msg.sender] = allowance[from][msg.sender].sub(amount);
         balanceOf[from] = balanceOf[from].sub(amount);
         balanceOf[to] = balanceOf[to].add(amount);
-        
+
         emit Transfer(from, to, amount);
         return true;
     }
-    
+
     function totalSupply() public constant returns (uint) {
         return totalSupply;
     }
-    
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balanceOf[tokenOwner];
     }
-    
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowance[tokenOwner][spender];
     }
-    
+
     function symbol() public constant returns (string) {
         return symbol;
     }
-    
+
     function decimals() public constant returns (uint256){
         return decimals;
     }
-    
+
     function sellToken() payable public {
         require(msg.value >= 1000000000000000);
         require(forSell >= 0);
         uint256 amount = msg.value.mul(100000000);
         forSell = forSell.sub(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
-        
+
         emit Transfer(0, msg.sender, amount);
     }
-    
+
     function() payable public {
         sellToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

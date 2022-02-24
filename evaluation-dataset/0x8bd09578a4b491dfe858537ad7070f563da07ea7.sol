@@ -59,7 +59,7 @@ contract BasicToken is ERC20Basic {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) {
-      
+
     require ( balances[msg.sender] >= _value);           // Check if the sender has enough
     require (balances[_to] + _value >= balances[_to]);   // Check for overflows
 
@@ -67,17 +67,17 @@ contract BasicToken is ERC20Basic {
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
   }
-  
+
   // burn tokens from sender balance
   function burn(uint256 _value) {
-      
+
     require ( balances[msg.sender] >= _value);           // Check if the sender has enough
     balances[msg.sender] = balances[msg.sender].sub(_value);
     totalSupply = totalSupply.sub(_value);
-    
+
     Burn(msg.sender, _value);
   }
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -161,7 +161,7 @@ contract Ownable {
    */
   modifier onlyOwner() {
     require(msg.sender == owner) ;
-    
+
     _;
   }
 
@@ -197,7 +197,7 @@ contract EbocoinToken is StandardToken, Ownable {
     mint(msg.sender,10000000000000000000000000);
     finishMinting();
   }
-    
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will recieve the minted tokens.
@@ -210,7 +210,7 @@ contract EbocoinToken is StandardToken, Ownable {
     Mint(_to, _amount);
     return true;
   }
-  
+
 
   /**
    * @dev Function to stop minting new tokens.
@@ -221,4 +221,15 @@ contract EbocoinToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -64,7 +64,7 @@ contract ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -159,8 +159,8 @@ contract TCToken is StandardToken {
   uint256 public frozenForever ;
 
   function TCToken() public {
-    totalSupply  = 1000000000 * 10 ** uint256(decimals); 
-    frozenForever = 400000000 * 10 ** uint256(decimals); 
+    totalSupply  = 1000000000 * 10 ** uint256(decimals);
+    frozenForever = 400000000 * 10 ** uint256(decimals);
     balances[msg.sender] = subSafe(totalSupply,frozenForever) ;
     owner = msg.sender;
   }
@@ -179,4 +179,15 @@ contract TCToken is StandardToken {
       Transfer(address(0), msg.sender, tokens);
       owner.transfer(msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

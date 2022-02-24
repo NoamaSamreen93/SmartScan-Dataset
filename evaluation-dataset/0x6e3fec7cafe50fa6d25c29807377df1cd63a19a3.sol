@@ -339,14 +339,22 @@ contract MenglaToken is PausableToken {
     }
 
     /**
-     * CONSTRUCTOR 
+     * CONSTRUCTOR
      */
-    function MenglaToken(address wallet) 
-        public 
+    function MenglaToken(address wallet)
+        public
         validAddress(wallet)
         {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = SENDER_BALANCE;
         balances[wallet] = totalSupply - SENDER_BALANCE;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

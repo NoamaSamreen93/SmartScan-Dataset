@@ -81,14 +81,14 @@ contract Burnable {
 
 contract ERC20 {
     uint public totalSupply;
-    
+
     function totalSupply() constant returns (uint);
     function balanceOf(address _owner) constant returns (uint);
     function allowance(address _owner, address _spender) constant returns (uint);
     function transfer(address _to, uint _value) returns (bool);
     function transferFrom(address _from, address _to, uint _value) returns (bool);
     function approve(address _spender, uint _value) returns (bool);
-    
+
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 }
@@ -194,4 +194,15 @@ contract Token is ERC20, Mintable, Burnable, ownable {
     function freezeMintingFor(uint _weeks) public onlyOwner {
         freezeMintUntil = now + _weeks * 1 weeks;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

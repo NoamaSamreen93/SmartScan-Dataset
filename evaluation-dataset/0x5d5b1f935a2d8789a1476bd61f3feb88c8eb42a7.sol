@@ -98,9 +98,13 @@ contract TokenTimelock is Ownable, Clockmaking {
 
     token.safeTransfer(owner, amount);
   }
-  
+
   function updateTime(uint64 _releaseTime) public onlyClockmaker {
       releaseTime = _releaseTime;
   }
-  
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

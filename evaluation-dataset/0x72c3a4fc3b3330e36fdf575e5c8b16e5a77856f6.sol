@@ -125,7 +125,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -975,7 +975,7 @@ contract ERC721TokenWithData is ERC721Token("CryptoAssaultUnit", "CAU"), Ownable
 			data[_index][_tokenId3]
 		);
 	}
-	
+
 	function getDataAndOwner3(uint256 _tokenId1, uint256 _tokenId2, uint256 _tokenId3, uint256 _index) public view returns (uint256, uint256, uint256, address, address, address) {
 		return (
 			data[_index][_tokenId1],
@@ -986,14 +986,14 @@ contract ERC721TokenWithData is ERC721Token("CryptoAssaultUnit", "CAU"), Ownable
 			ownerOf(_tokenId3)
 		);
 	}
-	
+
 	function _setData(uint256 _tokenId, uint256 _index, uint256 _data) internal {
-		
+
 		data[_index][_tokenId] = _data;
 	}
 
 	function setData(uint256 _tokenId, uint256 _index, uint256 _data) public {
-		
+
 		require(approvedContractAddresses[msg.sender], "not an approved sender");
 		data[_index][_tokenId] = _data;
 	}
@@ -1043,7 +1043,7 @@ contract ERC721TokenWithData is ERC721Token("CryptoAssaultUnit", "CAU"), Ownable
 
 		_burn(ownerOf(_tokenId), _tokenId);
 	}
-	
+
 	function burn3(uint256 _tokenId1, uint256 _tokenId2, uint256 _tokenId3) public {
 		require(
 			approvedContractAddresses[msg.sender] ||
@@ -1190,7 +1190,7 @@ contract PackSale is Pausable {
 	function setTokenContractAddress(address newAddress) onlyOwner public {
 		token = Token(newAddress);
 	}
-	
+
 	struct WaitingToHatch {
 		address owner;
 		uint16 amount;
@@ -1215,7 +1215,7 @@ contract PackSale is Pausable {
 		prices[5] = 1.2 ether;
 		prices[6] = 2.99 ether;
 	}
-	
+
 	function withdrawBalance() onlyOwner public {
 		owner.transfer(address(this).balance);
 	}
@@ -1273,8 +1273,8 @@ contract PackSale is Pausable {
 			pushHatch(msg.sender, 5, 0, sku); // 5 common or better
 		} else if (sku == 3) {
 			// 20 common or better
-			pushHatch(msg.sender, 10, 0, sku); 
-			pushHatch(msg.sender, 10, 0, sku); 
+			pushHatch(msg.sender, 10, 0, sku);
+			pushHatch(msg.sender, 10, 0, sku);
 		} else if (sku == 4) {
 			pushHatch(msg.sender, 10, 1, sku);  // 10 rare or better
 		} else if (sku == 5) {
@@ -1324,7 +1324,7 @@ contract PackSale is Pausable {
 
 		return waitingToHatchNum;
 	}
-	
+
 	function getProjectedBlockHash(uint256 blockNumber) internal view returns (uint256) {
 
 		uint256 blockToHash = blockNumber;
@@ -1337,7 +1337,7 @@ contract PackSale is Pausable {
 	{
 		return uint8(rand % NUM_UNIT_TYPES);
 	}
- 
+
 	function getRandomRarity(uint32 rand, uint256 minimumRarity) internal pure returns (uint256)
 	{
 
@@ -1365,7 +1365,7 @@ contract PackSale is Pausable {
 		require(waitingToHatchNum > 0, "nothing to hatch");
 
 		WaitingToHatch memory w = peekHatch();
-		
+
 		// can't hatch on the same block. its block hash would be unknown.
 		require (w.purchasedOnBlockNumber < block.number, "Can't hatch on the same block.");
 
@@ -1408,4 +1408,20 @@ contract PackSale is Pausable {
 		emit Hatched(w.owner, w.amount);
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

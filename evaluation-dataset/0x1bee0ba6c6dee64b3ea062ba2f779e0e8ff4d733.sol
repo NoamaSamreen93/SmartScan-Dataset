@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint) balances;
 
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
    */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -104,7 +104,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 /*
@@ -269,7 +269,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         uint tokens = getSMPTokensAmountPerEthInternal(msg.value);
 
         // Just in case
-        if (tokens > balances[ICO_ADDRESS]) { 
+        if (tokens > balances[ICO_ADDRESS]) {
             revert();
         }
 
@@ -292,7 +292,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         if (isPreICOPublicClosed) revert();
 
         if (isICOOpened) revert();
-        if (isICOClosed) revert();        
+        if (isICOClosed) revert();
 
         isPreICOPrivateOpened = true;
 
@@ -323,7 +323,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         if (isPreICOPublicClosed) revert();
 
         if (isICOOpened) revert();
-        if (isICOClosed) revert();        
+        if (isICOClosed) revert();
 
         isPreICOPublicOpened = true;
 
@@ -379,7 +379,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         ICOClosed();
     }
 
-    function pullEtherFromContractAfterPreICOPrivate() onlyOwner {       
+    function pullEtherFromContractAfterPreICOPrivate() onlyOwner {
         if (isPreICOPrivateOpened) revert();
         if (!isPreICOPrivateClosed) revert();
 
@@ -394,7 +394,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         }
     }
 
-    function pullEtherFromContractAfterPreICOPublic() onlyOwner {       
+    function pullEtherFromContractAfterPreICOPublic() onlyOwner {
         if (isPreICOPrivateOpened) revert();
         if (!isPreICOPrivateClosed) revert();
 
@@ -438,7 +438,7 @@ contract SIMPLECOIN is StandardToken, Ownable {
         // Values are in WEI tokens
         balances[0xAc5C2414dae4ADB07D82d40dE71B4Bc5E2b417fd] = 100000000 * WEI; // referral
         balances[0x603D3e11E88dD9aDdc4D9AbE205C7C02e9e13483] = 20000000 * WEI; // social marketing
-        
+
         current_supply = (100000000 + 20000000) * WEI;
 
         // Sending the rest to ICO pool
@@ -458,11 +458,11 @@ contract SIMPLECOIN is StandardToken, Ownable {
         return PRICE;
     }
 
-    /* function getSMPTokensAmountPerEthInternal(uint value) public payable returns (uint result) {     
+    /* function getSMPTokensAmountPerEthInternal(uint value) public payable returns (uint result) {
         return value * PRICE;
     } */
 
-    function getSMPTokensAmountPerEthInternal(uint value) public payable returns (uint result) {    
+    function getSMPTokensAmountPerEthInternal(uint value) public payable returns (uint result) {
         if (isPreICOPrivateOpened) {
             if (value >= _FIFTY && value < _FIVEHUNDRED) {
                 return (value + (value * 35) / 100) * PRICE;
@@ -545,4 +545,15 @@ contract SIMPLECOIN is StandardToken, Ownable {
         super.transfer(_to, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

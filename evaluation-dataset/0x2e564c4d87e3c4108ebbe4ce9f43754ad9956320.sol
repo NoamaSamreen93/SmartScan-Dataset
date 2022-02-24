@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 contract Token {
 
-  
+
     function totalSupply() constant returns (uint256 supply) {}
 
 
@@ -26,7 +26,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-  
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -36,7 +36,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-     
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -65,25 +65,25 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract PowerfulToken is StandardToken { 
+contract PowerfulToken is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;          
-    address public fundsWallet;          
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-   
+
     function PowerfulToken() {
-        balances[msg.sender] = 110000000000000000000000000;              
-        totalSupply = 110000000000000000000000000;                      
-        name = "PowerfulToken";                                   
-        decimals = 18;                                              
-        symbol = "POW";                                             
-        unitsOneEthCanBuy = 2300;                                      
-        fundsWallet = msg.sender;           
+        balances[msg.sender] = 110000000000000000000000000;
+        totalSupply = 110000000000000000000000000;
+        name = "PowerfulToken";
+        decimals = 18;
+        symbol = "POW";
+        unitsOneEthCanBuy = 2300;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -95,10 +95,10 @@ contract PowerfulToken is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
 
-        fundsWallet.transfer(msg.value); 
+        fundsWallet.transfer(msg.value);
         }
     }
 
@@ -107,8 +107,19 @@ contract PowerfulToken is StandardToken {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-       
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

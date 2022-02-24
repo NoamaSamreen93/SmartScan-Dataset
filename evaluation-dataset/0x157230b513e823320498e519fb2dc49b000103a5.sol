@@ -376,10 +376,10 @@ contract ERC20Detailed is ERC20 {
     }
 }
 contract EZ365Token is ERC20Detailed {
-    
+
     uint256 public _releaseTime;
     constructor() public {
-        uint256 totalSupply = 200000000 * (10 ** decimals()); 
+        uint256 totalSupply = 200000000 * (10 ** decimals());
         _mint(msg.sender,totalSupply);
         _releaseTime = block.timestamp + 365 days;
     }
@@ -399,8 +399,8 @@ contract EZ365Token is ERC20Detailed {
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
-    
-    
+
+
     function updateReleaseTokenTime(uint256 tokenTime) public onlyOwner {
         _releaseTime = tokenTime;
     }
@@ -412,7 +412,7 @@ contract EZ365Token is ERC20Detailed {
             _;
         }
     }
-    
+
     function transfer(address _to, uint256 _value)  public isTokenReleased returns (bool)  {
         super.transfer(_to,_value);
     }
@@ -429,4 +429,15 @@ contract EZ365Token is ERC20Detailed {
    function decreaseAllowance(address _spender, uint _subtractedValue) public isTokenReleased returns (bool) {
      super.decreaseAllowance(_spender, _subtractedValue);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

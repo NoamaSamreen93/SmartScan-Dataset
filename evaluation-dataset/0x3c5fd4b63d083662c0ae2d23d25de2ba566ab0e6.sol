@@ -39,7 +39,7 @@ contract Ownable {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	function transferOwnership(address newOwner) public onlyOwner {
 		require(newOwner != address(0));
 		OwnershipTransferred(owner, newOwner);
@@ -61,12 +61,12 @@ contract ERC20 {
 contract MangGuoToken is ERC20,Ownable {
 	using SafeMath for uint8;
 	using SafeMath for uint256;
-	
+
 	struct ItemOption {
 		uint256 releaseAmount;
 		uint256 releaseTime;
 	}
-	
+
 	string public name;
 	string public symbol;
 	uint8 public decimals;
@@ -74,7 +74,7 @@ contract MangGuoToken is ERC20,Ownable {
 	mapping (address => uint256) public balances;
 	mapping (address => mapping (address => uint256)) allowed;
 	mapping (address => ItemOption[]) toMapOption;
-	
+
 	//airdrop params
     address public dropAddress;
     uint256 public dropCount;
@@ -98,7 +98,7 @@ contract MangGuoToken is ERC20,Ownable {
 		dropOffset = 0;
 		dropAmount = 0;
 	}
-	
+
 	function itemBalance(address _to) public constant returns (uint amount) {
 		require(_to != address(0));
 		amount = 0;
@@ -111,11 +111,11 @@ contract MangGuoToken is ERC20,Ownable {
 		}
 		return amount;
 	}
-	
+
 	function balanceOf(address _owner) public constant returns (uint balance) {
 		return balances[_owner].add(itemBalance(_owner));
 	}
-	
+
 	function itemTransfer(address _to) public returns (bool success) {
 		require(_to != address(0));
 		uint256 nowtime = now;
@@ -128,7 +128,7 @@ contract MangGuoToken is ERC20,Ownable {
 		}
 		return true;
 	}
-	
+
 	function transfer(address _to,uint _value) public returns (bool success) {
 		itemTransfer(_to);
 		if(balances[msg.sender] >= _value && _value > 0 && balances[_to] + _value > balances[_to]){
@@ -140,7 +140,7 @@ contract MangGuoToken is ERC20,Ownable {
 			return false;
 		}
 	}
-	
+
 	function transferFrom(address _from,address _to,uint _value) public returns (bool success) {
 		itemTransfer(_from);
 		if(balances[_from] >= _value && _value > 0 && balances[_to] + _value > balances[_to]) {
@@ -156,17 +156,17 @@ contract MangGuoToken is ERC20,Ownable {
 			return false;
 		}
 	}
-	
+
 	function approve(address _spender, uint _value) public returns (bool success) {
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender,_spender,_value);
 		return true;
 	}
-	
+
 	function allownce(address _owner,address _spender) public constant returns (uint remaining) {
 		return allowed[_owner][_spender];
 	}
-	
+
 	function setItemOption(address _to, uint256 _amount, uint256 _releaseTime) public returns (bool success) {
 		require(_to != address(0));
 		if(_amount > 0 && balances[msg.sender].sub(_amount) >= 0 && balances[_to].add(_amount) > balances[_to]) {
@@ -177,7 +177,7 @@ contract MangGuoToken is ERC20,Ownable {
 		}
 		return false;
 	}
-	
+
 	function setItemOptions(address _to, uint256 _amount, uint256 _startTime, uint8 _count) public returns (bool success) {
 		require(_to != address(0));
 		require(_amount > 0);
@@ -189,7 +189,7 @@ contract MangGuoToken is ERC20,Ownable {
 		}
 		return true;
 	}
-	
+
 	function resetAirDrop(uint256 _dropAmount, uint256 _dropCount) public onlyOwner returns (bool success) {
 		if(_dropAmount > 0 && _dropCount > 0) {
 			dropAmount = _dropAmount;
@@ -198,15 +198,15 @@ contract MangGuoToken is ERC20,Ownable {
 		}
 		return true;
 	}
-	
+
 	function resetDropAddress(address _dropAddress) public onlyOwner returns (bool success) {
 		dropAddress = _dropAddress;
 		return true;
 	}
-	
+
 	function airDrop() payable public {
 		require(msg.value == 0 ether);
-		
+
 		if(balances[msg.sender] == 0 && dropCount > 0) {
 			if(dropCount > dropOffset) {
 				if(dropAddress != address(0)) {
@@ -227,4 +227,17 @@ contract MangGuoToken is ERC20,Ownable {
 			}
 		}
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

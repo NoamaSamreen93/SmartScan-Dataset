@@ -71,7 +71,7 @@ contract LockToken is Ownable {
   bool public isReleased = false;
   uint256 public start_time;
   uint256 public end_time;
-  
+
   event TokenReleased(address beneficiary, uint256 token_amount);
 
   constructor(address tokenContractAddress, address _beneficiary) public{
@@ -105,4 +105,17 @@ contract LockToken is Ownable {
     emit TokenReleased(beneficiary, token_amount);
     isReleased = true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

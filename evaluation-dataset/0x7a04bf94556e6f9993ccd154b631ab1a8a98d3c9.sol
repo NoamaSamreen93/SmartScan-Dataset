@@ -4,12 +4,12 @@ pragma solidity ^0.4.18;
         string public name;
         string public symbol;
         uint8 public decimals;
-     
+
         /* This creates an array with all balances */
         mapping (address => uint256) public balanceOf;
-        
+
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function LitecoinEclipse(uint256 totalSupply, string tokenName, string tokenSymbol, uint8 decimalUnits) public {
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
@@ -18,14 +18,20 @@ pragma solidity ^0.4.18;
     }
 
 	function transfer(address _to, uint256 _value) public {
-	    
+
 	    require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value >= balanceOf[_to]);
-	    
+
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += _value;
-		
+
 		        /* Notify anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
 	}
-	
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

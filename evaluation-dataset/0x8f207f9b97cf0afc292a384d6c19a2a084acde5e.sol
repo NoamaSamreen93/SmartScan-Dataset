@@ -84,7 +84,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract CloudMoolah is StandardToken { 
+contract CloudMoolah is StandardToken {
 
     /* Public variables of the token */
 
@@ -97,20 +97,20 @@ contract CloudMoolah is StandardToken {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function CloudMoolah() {
         balances[msg.sender] = 300000000000000000000000000;               // Give the creator all initial tokens.
-        totalSupply = 300000000000000000000000000;                       // Update total supply 
-        name = "CloudMoolah";                                          // Set the name for display purposes 
+        totalSupply = 300000000000000000000000000;                       // Update total supply
+        name = "CloudMoolah";                                          // Set the name for display purposes
         decimals = 18;                                                // Amount of decimals for display purposes
-        symbol = "MOO";                                              // Set the symbol for display purposes 
-        unitsOneEthCanBuy = 5000;                                   // Set the price of your token for the ICO 
+        symbol = "MOO";                                              // Set the symbol for display purposes
+        unitsOneEthCanBuy = 5000;                                   // Set the price of your token for the ICO
         fundsWallet = msg.sender;                                  // The owner of the contract gets ETH
     }
 
@@ -125,7 +125,7 @@ contract CloudMoolah is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -139,4 +139,15 @@ contract CloudMoolah is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

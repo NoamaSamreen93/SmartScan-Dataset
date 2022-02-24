@@ -12,21 +12,21 @@ contract TokenERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
 
-    
+
     function TokenERC20(uint256 initialSupply, string tokenName, string tokenSymbol) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
-        balanceOf[msg.sender] = totalSupply;  
+        balanceOf[msg.sender] = totalSupply;
         name = tokenName;
         symbol = tokenSymbol;
     }
 
-   
+
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
 
-        
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
@@ -34,12 +34,12 @@ contract TokenERC20 {
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
-    
+
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
 
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
         allowance[_from][msg.sender] -= _value;
@@ -47,14 +47,14 @@ contract TokenERC20 {
         return true;
     }
 
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -65,7 +65,7 @@ contract TokenERC20 {
         }
     }
 
-    
+
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
@@ -74,7 +74,7 @@ contract TokenERC20 {
         return true;
     }
 
-    
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
@@ -84,4 +84,15 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

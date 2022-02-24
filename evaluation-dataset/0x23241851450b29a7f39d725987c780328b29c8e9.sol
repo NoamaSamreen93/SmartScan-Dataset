@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
-/* 
+/*
  * Traveler Token Contract
  * =======================
- * 
- * ROUGHLY BASED on the OpenZeppelin Library (https://github.com/OpenZeppelin/zeppelin-solidity). 
+ *
+ * ROUGHLY BASED on the OpenZeppelin Library (https://github.com/OpenZeppelin/zeppelin-solidity).
  * ASSEMBLED, MODIFIED & COMPLETED by Codemelt.
  * FOR Traveler (https://traveler.com).
  */
@@ -264,4 +264,15 @@ contract TravelerToken is BurnableToken {
       revert("This contract does not accept Ethereum!");
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

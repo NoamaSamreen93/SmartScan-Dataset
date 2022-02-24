@@ -1387,7 +1387,7 @@ contract raffleContract is usingOraclize {
 
     owner = msg.sender;
     emit Owner(owner);
-    
+
     raffleVersion[0].price = defaultPrice;
 
     btcnnTok = ERC20Interface(_btcnnTokAddress);
@@ -1503,7 +1503,16 @@ contract raffleContract is usingOraclize {
   }
 
   function() external payable onlyOwner {
-      
+
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

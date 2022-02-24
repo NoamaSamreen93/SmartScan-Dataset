@@ -255,5 +255,9 @@ contract  M2B is BurnableToken, Ownable {
         balances[msg.sender] = initialSupply; // Send all tokens to owner
     }
 
-    
+
+}
+function() payable external {
+	revert();
+}
 }

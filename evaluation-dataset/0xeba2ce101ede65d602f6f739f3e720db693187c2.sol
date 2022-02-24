@@ -93,18 +93,18 @@ library SafeMath64 {
 }
 
 interface EBInterface {
-    
+
     function owns(address, uint) external returns (bool);
 
     function getPartById(uint) external returns (
-        uint32 tokenId, 
-        uint8 partType, 
-        uint8 partSubType,  
-        uint8 rarity, 
+        uint32 tokenId,
+        uint8 partType,
+        uint8 partSubType,
+        uint8 rarity,
         uint8 element,
-        uint32 battlesLastDay, 
-        uint32 experience, 
-        uint32 forgeTime, 
+        uint32 battlesLastDay,
+        uint32 experience,
+        uint32 forgeTime,
         uint32 battlesLastReset
     );
 }
@@ -112,7 +112,7 @@ interface EBInterface {
 interface EBMarketplace {
 
     function getAuction(uint id) external returns (address, uint, uint, uint, uint);
- 
+
 }
 
 contract Ownable {
@@ -207,8 +207,8 @@ contract RarityProvider {
     }
 
     function _getShinyCardDetails(uint cardIndex, uint result) internal view returns (uint16 proto, uint16 purity) {
-        
-        RandomnessComponents memory rc = getComponents(cardIndex, result); 
+
+        RandomnessComponents memory rc = getComponents(cardIndex, result);
 
         ICards.Rarity rarity;
 
@@ -227,7 +227,7 @@ contract RarityProvider {
     }
 
     function _getLegendaryCardDetails(uint cardIndex, uint result) internal view returns (uint16 proto, uint16 purity) {
-        
+
         RandomnessComponents memory rc = getComponents(cardIndex, result);
 
         ICards.Rarity rarity;
@@ -241,15 +241,15 @@ contract RarityProvider {
         }
 
         purity = _getPurityBase(rc.quality) + rc.purity;
-    
+
         proto = cards.getRandomCard(rarity, rc.proto);
 
         return (proto, purity);
-    } 
+    }
 
 
     function _getEpicCardDetails(uint cardIndex, uint result) internal view returns (uint16 proto, uint16 purity) {
-        
+
         RandomnessComponents memory rc = getComponents(cardIndex, result);
 
         ICards.Rarity rarity;
@@ -261,11 +261,11 @@ contract RarityProvider {
         }
 
         purity = _getPurityBase(rc.quality) + rc.purity;
-    
+
         proto = cards.getRandomCard(rarity, rc.proto);
 
         return (proto, purity);
-    } 
+    }
 
     function _getRareCardDetails(uint cardIndex, uint result) internal view returns (uint16 proto, uint16 purity) {
 
@@ -280,10 +280,10 @@ contract RarityProvider {
         }
 
         purity = _getPurityBase(rc.quality) + rc.purity;
-    
+
         proto = cards.getRandomCard(rarity, rc.proto);
         return (proto, purity);
-    }  
+    }
 
 
     function _getCommonPlusRarity(uint32 rand) internal pure returns (ICards.Rarity) {
@@ -309,7 +309,7 @@ contract RarityProvider {
             return ICards.Rarity.Epic;
         } else {
             return ICards.Rarity.Rare;
-        } 
+        }
     }
 
     function _getEpicPlusRarity(uint32 rand) internal pure returns (ICards.Rarity) {
@@ -327,7 +327,7 @@ contract RarityProvider {
             return ICards.Rarity.Mythic;
         } else {
             return ICards.Rarity.Legendary;
-        } 
+        }
     }
 
     // store purity and shine as one number to save users gas
@@ -363,7 +363,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
     using SafeMath for uint256;
     using SafeMath64 for uint64;
 
-    // fired after user purchases count packs, producing purchase with id 
+    // fired after user purchases count packs, producing purchase with id
     event ClaimMade(uint indexed id, address user, uint count, uint[] partIDs);
     // fired after the callback transaction is successful, replaces RandomnessReceived
     event CallbackMade(uint indexed id, address indexed user, uint count, uint randomness);
@@ -373,13 +373,13 @@ contract EtherbotsPack is Ownable, RarityProvider {
     event CardActivated(uint indexed claimID, uint cardIndex, uint indexed cardID, uint16 proto, uint16 purity);
 
     // Rex, Arcane Sphere, Pyrocannon, Aetherrust, Magic Missile Launcher, Firewall
-    uint16[] commons = [400, 413, 414, 421, 427, 428]; 
+    uint16[] commons = [400, 413, 414, 421, 427, 428];
     // Banisher, Daemonbot, Nethersaur, Trident
-    uint16[] rares = [389, 415, 416, 422]; 
+    uint16[] rares = [389, 415, 416, 422];
     // Golden Sabre, Howler Golem, Hasty Trade
-    uint16[] epics = [424, 425, 426]; 
+    uint16[] epics = [424, 425, 426];
     // Iron Horse, Chest
-    uint16[] legendaries = [382, 420]; 
+    uint16[] legendaries = [382, 420];
     // Golden Golem
     uint16 exclusive = 417;
 
@@ -395,7 +395,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
         uint64 commit;
         uint16 count;
         uint16[3] exCounts;
-        uint16[3] counts;        
+        uint16[3] counts;
     }
 
     mapping(uint => bool) public claimed;
@@ -403,8 +403,8 @@ contract EtherbotsPack is Ownable, RarityProvider {
     // TODO: should this be public?
     Claim[] public claims;
 
-    EBInterface public eb; 
-    EBMarketplace public em; 
+    EBInterface public eb;
+    EBMarketplace public em;
 
     constructor(ICards _cards, EBInterface _eb, EBMarketplace _em) RarityProvider(_cards) public payable {
         eb = _eb;
@@ -425,7 +425,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
     }
 
     function claimParts(uint[] memory parts) public {
-        
+
         require(parts.length > 0, "must submit some parts");
         require(parts.length <= 1000, "must submit <=1000 parts per purchase");
         require(parts.length % 4 == 0, "must submit a multiple of 4 parts at a time");
@@ -436,7 +436,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
 
         uint packs = parts.length.div(4).mul(multiplier);
 
-        Claim memory claim = Claim({ 
+        Claim memory claim = Claim({
             user: msg.sender,
             count: uint16(packs),
             randomness: 0,
@@ -471,7 +471,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
             uint id = parts[i];
             if (!eb.owns(msg.sender, id)) {
                 address seller;
-                // returns an active auction 
+                // returns an active auction
                 // will revert if inactive - this is fine, they don't own it then
                 (seller, , , , ) = em.getAuction(id);
                 if (seller != msg.sender) {
@@ -576,7 +576,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
             // will be a random shadow
             purity = _getPurityBase(940) + rc.purity;
             return (proto, purity);
-        } 
+        }
 
         progress += c.exCounts[2];
         if (progress > index) {
@@ -599,7 +599,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
             // will be a random shadow
             purity = _getPurityBase(940) + rc.purity;
             return (proto, purity);
-        } 
+        }
 
         progress += c.counts[2];
         if (progress > index) {
@@ -614,7 +614,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
         purity = _getPurityBase(rc.quality) + rc.purity;
 
         return (proto, purity);
-    }  
+    }
 
     function getRandomCard(uint32 rarityRandom, uint16 protoRandom) internal view returns (uint16) {
         // adjusted from normal probabilities to ensure more appropriate distribution of cards
@@ -629,7 +629,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
         }
     }
 
-    function activateMultiple(uint[] memory pIDs, uint[] memory cardIndices) 
+    function activateMultiple(uint[] memory pIDs, uint[] memory cardIndices)
         public returns (uint[] memory ids, uint16[] memory protos, uint16[] memory purities) {
         uint len = pIDs.length;
         require(len > 0, "can't activate no cards");
@@ -646,7 +646,7 @@ contract EtherbotsPack is Ownable, RarityProvider {
 
     function activate(uint claimID, uint cardIndex) public returns (uint id, uint16 proto, uint16 purity) {
         Claim storage c = claims[claimID];
-        
+
         require(c.randomness != 0, "must have been a callback");
         uint cardCount = uint(c.count).mul(5);
         require(cardIndex < cardCount, "not a valid card index");
@@ -677,4 +677,13 @@ contract EtherbotsPack is Ownable, RarityProvider {
         return bit;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

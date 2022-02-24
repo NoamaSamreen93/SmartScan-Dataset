@@ -694,20 +694,20 @@ contract ERC20 is ERC20Basic {
 contract ERC721Basic {
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
   event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);  
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
   function balanceOf(address _owner) public view returns (uint256 _balance);
   function ownerOf(uint256 _tokenId) public view returns (address _owner);
   function exists(uint256 _tokenId) public view returns (bool _exists);
-  
+
   function approve(address _to, uint256 _tokenId) public;
   function getApproved(uint256 _tokenId) public view returns (address _operator);
-  
+
   function setApprovalForAll(address _operator, bool _approved) public;
   function isApprovedForAll(address _owner, address _operator) public view returns (bool);
 
   function transferFrom(address _from, address _to, uint256 _tokenId) public;
-  function safeTransferFrom(address _from, address _to, uint256 _tokenId) public;  
+  function safeTransferFrom(address _from, address _to, uint256 _tokenId) public;
   function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) public;
 }
 
@@ -788,7 +788,7 @@ contract ERC721Receiver {
    *  Equals to `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`,
    *  which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
    */
-  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba; 
+  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba;
 
   /**
    * @notice Handle the receipt of an NFT
@@ -797,7 +797,7 @@ contract ERC721Receiver {
    *  transfer. This function MUST use 50,000 gas or less. Return of other
    *  than the magic value MUST result in the transaction being reverted.
    *  Note: the contract address is always the message sender.
-   * @param _from The sending address 
+   * @param _from The sending address
    * @param _tokenId The NFT identifier which is being transfered
    * @param _data Additional data with no specified format
    * @return `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
@@ -814,10 +814,10 @@ contract ERC721Receiver {
 contract ERC721BasicToken is ERC721Basic {
   using SafeMath for uint256;
   using AddressUtils for address;
-  
+
   // Equals to `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
   // which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
-  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba; 
+  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba;
 
   // Mapping from token ID to owner
   mapping (uint256 => address) internal tokenOwner;
@@ -946,7 +946,7 @@ contract ERC721BasicToken is ERC721Basic {
     clearApproval(_from, _tokenId);
     removeTokenFrom(_from, _tokenId);
     addTokenTo(_to, _tokenId);
-    
+
     Transfer(_from, _to, _tokenId);
   }
 
@@ -1098,7 +1098,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
   // Mapping from token id to position in the allTokens array
   mapping(uint256 => uint256) internal allTokensIndex;
 
-  // Optional mapping for token URIs 
+  // Optional mapping for token URIs
   mapping(uint256 => string) internal tokenURIs;
 
   /**
@@ -1219,7 +1219,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
   */
   function _mint(address _to, uint256 _tokenId) internal {
     super._mint(_to, _tokenId);
-    
+
     allTokensIndex[_tokenId] = allTokens.length;
     allTokens.push(_tokenId);
   }
@@ -2378,4 +2378,15 @@ contract DebtKernel is Pausable {
         // Limit gas to prevent reentrancy.
         return ERC20(token).allowance.gas(EXTERNAL_QUERY_GAS_LIMIT)(owner, TOKEN_TRANSFER_PROXY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

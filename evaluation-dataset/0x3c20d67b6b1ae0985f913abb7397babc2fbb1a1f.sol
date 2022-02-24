@@ -30,8 +30,8 @@ contract ICEDIUM is ERC20Interface{
     string public name = "ICEDIUM";
     string public symbol = "ICD";
     uint8 public decimals = 18;
-    // (300 mln with 18 decimals) 
-    uint public supply; 
+    // (300 mln with 18 decimals)
+    uint public supply;
     address public founder;
     mapping(address => uint) public balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -98,11 +98,24 @@ contract ICEDIUM is ERC20Interface{
         balances[msg.sender] -= tokens;
         emit Transfer(msg.sender, to, tokens);
         return true;
-    } 
+    }
     // ------------------------------------------------------------------------
     // Revert function to NOT accept ETH
     // ------------------------------------------------------------------------
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

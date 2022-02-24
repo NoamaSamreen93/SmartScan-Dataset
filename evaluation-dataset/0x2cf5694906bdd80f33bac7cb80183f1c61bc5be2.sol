@@ -320,7 +320,7 @@ contract GenericERC20 {
 
     function allowance(address _owner, address _spender)
         public view returns (uint256);
-        
+
     // Return type not defined intentionally since not all ERC20 tokens return proper result type
     function transfer(address _to, uint256 _value) public;
 
@@ -552,7 +552,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
 
     ///  Merchant identifier hash
     bytes32 public merchantIdHash;
-    
+
     //Deal event
     event DealCompleted(
         uint orderId,
@@ -620,7 +620,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
     /**
-     *  recordDealCancelReason creates an event of not paid deal that was cancelled 
+     *  recordDealCancelReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -648,7 +648,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
 /**
-     *  recordDealRefundReason creates an event of not paid deal that was cancelled 
+     *  recordDealRefundReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -866,11 +866,11 @@ contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
      */
     function withdrawAllTokensToExchange(address _tokenAddress, address _depositAccount, uint _minAmount) external onlyMerchantOrMonetha whenNotPaused {
         require(_tokenAddress != address(0));
-        
+
         uint balance = GenericERC20(_tokenAddress).balanceOf(address(this));
-        
+
         require(balance >= _minAmount);
-        
+
         GenericERC20(_tokenAddress).transfer(_depositAccount, balance);
     }
 
@@ -1000,7 +1000,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
     /**
      *  Assigns the acceptor to the order (when client initiates order).
      *  @param _orderId Identifier of the order
-     *  @param _price Price of the order 
+     *  @param _price Price of the order
      *  @param _paymentAcceptor order payment acceptor
      *  @param _originAddress buyer address
      *  @param _fee Monetha fee
@@ -1297,4 +1297,15 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         //update parties Reputation
         merchantWallet.setCompositeReputation("total", _merchantReputation);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -413,7 +413,7 @@ contract ComissionList is Claimable {
   function getTransferPerc() public view returns (uint256) {
     return transferInfo.perc;
   }
-  
+
   // взять фикс по комиссии для перевода
   function getTransferStat() public view returns (uint256) {
     return transferInfo.stat;
@@ -518,7 +518,7 @@ contract EvaCurrency is PausableToken, BurnableToken {
     balances[_to] = balances[_to].add(resultAmount);
     balances[staker] = balances[staker].add(fee);
     lastUsedNonce[sender] = _nonce;
-    
+
     emit Transfer(sender, _to, _amount);
     emit Transfer(sender, address(0), fee);
     return true;
@@ -567,8 +567,16 @@ contract EvaCurrency is PausableToken, BurnableToken {
   function changeStaker(address _staker) onlyOwner public returns (bool success) {
     staker = _staker;
   }
-  
+
   function getNullAddress() public view returns (address) {
     return address(0);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

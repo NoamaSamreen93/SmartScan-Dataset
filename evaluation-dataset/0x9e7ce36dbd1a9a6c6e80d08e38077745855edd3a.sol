@@ -22,7 +22,7 @@ contract owned {
 }
 
 interface tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract TokenERC20 {
@@ -75,7 +75,7 @@ contract TokenERC20 {
         balanceOf[_from] -= _value;
         // Add the same to the recipient
         balanceOf[_to] += _value;
-        
+
         emit Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
@@ -205,13 +205,13 @@ contract BimCoinToken is owned, TokenERC20 {
     function setPrice(uint256 newBuyPrice) onlyOwner public {
         buyPrice = newBuyPrice;
     }
-    
+
     /// @notice Allow users to buy tokens for `newBuyPrice` eth
     /// @param newBuyPrice Price users can buy from the contract
     function setPriceInCents(uint256 newBuyPrice) onlyOwner public {
         buyPriceInCent = newBuyPrice;
     }
-    
+
     /// @notice Buy tokens from contract by sending ether
     function () payable public {
         buy();
@@ -220,18 +220,18 @@ contract BimCoinToken is owned, TokenERC20 {
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         require(onSale);
-        
+
         uint256 price = getPrice();
-        
+
         uint amount = msg.value * TOKENS_PER_DOLLAR * 10 ** uint256(decimals) / price;               // calculates the amount
-        
+
         require(balanceOf[owner] - amount >= storageAmount);
-        
+
         store.transfer(msg.value);
-        
+
         _transfer(owner, msg.sender, amount);              // makes the transfers
     }
-    
+
     function getPrice() private view returns (uint256){
         if(useFiatService){
             return fiatService.USD(0) * buyPriceInCent;
@@ -239,27 +239,36 @@ contract BimCoinToken is owned, TokenERC20 {
             return etherPerCent * buyPriceInCent;
         }
     }
-    
+
     function setUseService(bool status) external onlyOwner{
         useFiatService = status;
     }
-    
+
     function setEtherCentPrice(uint256 _newValue) external onlyOwner {
         etherPerCent = (10 ** uint256(decimals))/(_newValue);
     }
-    
+
     function setStore(address _newValue) external onlyOwner {
         store = _newValue;
     }
-    
+
     function toggleSale(bool _value) external onlyOwner {
         onSale = _value;
     }
-    
+
     function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         if(balance > 0){
             store.transfer(balance);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

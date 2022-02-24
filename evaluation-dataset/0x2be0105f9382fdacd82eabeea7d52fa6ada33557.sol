@@ -736,3 +736,14 @@ contract SITExchanger is Controlled, TokenController {
   event TokensCollected(address indexed _holder, uint256 _amount);
 
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

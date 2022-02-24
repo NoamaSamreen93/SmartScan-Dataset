@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract ClearCoinAdExchange {
-    
+
     /*
      * Events
      */
@@ -10,9 +10,9 @@ contract ClearCoinAdExchange {
     event adSlotActivated(address indexed wallet);
     event adSlotDeactivated(address indexed wallet);
     event clickTracked(address indexed lineItem, address indexed adSlot);
-    
+
     address owner;
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -41,21 +41,21 @@ contract ClearCoinAdExchange {
         uint256[] categories;    // (1,2,3,4,etc) => (Automotive, Education, Business, ICO, etc)
         bool active;
     }
-    
+
     // all line items
     // costs are charged from this address as XCLR
     // think of it as the control for Max Lifetime Spend, but you can always top-up with more XCLR
     // also an identifier for the creative URI
     mapping (address => LineItem) line_items;
-    
+
     modifier lineItemExists {
         require(
             line_items[msg.sender].active,
             "This address has not created a line item."
         );
         _;
-    }    
-        
+    }
+
     function createLineItem(
         string destination_url,
         uint256 max_cpc,
@@ -75,16 +75,16 @@ contract ClearCoinAdExchange {
 
         emit lineItemActivated(msg.sender);
     }
-    
+
     function deactivateLineItem() public lineItemExists {
         line_items[msg.sender].active = false;
-        
+
         emit lineItemDeactivated(msg.sender);
     }
-    
+
     function activateLineItem() public lineItemExists {
         line_items[msg.sender].active = true;
-        
+
         emit lineItemActivated(msg.sender);
     }
 
@@ -100,11 +100,11 @@ contract ClearCoinAdExchange {
         uint256 avg_ad_quality; // reputation of this AdSlot (updated by algorithm that considers NHT% and number of historical clicks)
         bool active;
     }
-    
+
     // all ad slots
     // costs are paid out to these addresses as XCLR
     mapping (address => AdSlot) ad_slots;
-    
+
     modifier adSlotExists {
         require(
             ad_slots[msg.sender].active,
@@ -112,7 +112,7 @@ contract ClearCoinAdExchange {
         );
         _;
     }
-    
+
     function createAdSlot(
         string domain,
         uint256 creative_type,
@@ -130,16 +130,16 @@ contract ClearCoinAdExchange {
 
         emit adSlotActivated(msg.sender);
     }
-    
+
     function deactivateAdSlot() public adSlotExists {
         ad_slots[msg.sender].active = false;
-        
+
         emit adSlotDeactivated(msg.sender);
     }
-    
+
     function activateAdSlot() public adSlotExists {
         ad_slots[msg.sender].active = true;
-        
+
         emit adSlotActivated(msg.sender);
     }
 
@@ -147,5 +147,16 @@ contract ClearCoinAdExchange {
     function trackClick(address line_item_address, address ad_slot_address) public onlyOwner {
         emit clickTracked(line_item_address, ad_slot_address);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

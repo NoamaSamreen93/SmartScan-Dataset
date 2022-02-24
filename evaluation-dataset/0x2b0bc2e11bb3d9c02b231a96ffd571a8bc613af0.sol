@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -90,7 +90,7 @@ contract BlockMakerERC20Token is StandardToken {
     /* Public variables of the token */
 
     string public name;                   //fancy name: eg BlockMaker.IO ERC20 Tokens
-    uint8 public decimals;                //How many decimals to show. ie. There are 1000000000000000000000000 base units with 18 decimals. 
+    uint8 public decimals;                //How many decimals to show. ie. There are 1000000000000000000000000 base units with 18 decimals.
     string public symbol;                 //An identifier: eg BMIO
     string public version = 'H1.0';       //human 0.1 standard. Just an arbitrary versioning scheme.
 
@@ -114,4 +114,15 @@ contract BlockMakerERC20Token is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

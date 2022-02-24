@@ -5,7 +5,7 @@ pragma solidity ^0.4.23;
  *
  * Name of the project: Senddox registration service
  * Version: 0.8
- * Author: Juan Livingston 
+ * Author: Juan Livingston
  *
  *********************************************************************************
  ********************************************************************************/
@@ -21,7 +21,7 @@ contract ERC20Basic {
 
 
 // Interface for Storage
-contract GlobalStorageMultiId { 
+contract GlobalStorageMultiId {
 	uint256 public regPrice;
 	function registerUser(bytes32 _id) payable returns(bool);
 	function changeAddress(bytes32 _id , address _newAddress) returns(bool);
@@ -68,9 +68,9 @@ contract RegDocuments {
 
 
 	// Constructor
-	constructor() {     
-		price = 0.01 ether;  
-		admin = msg.sender;        
+	constructor() {
+		price = 0.01 ether;
+		admin = msg.sender;
 		owner = 0xc238ff50c09787e7b920f711850dd945a40d3232;
 		version = "v0.6";
 		storageAddress = 0x8f49722c61a9398a1c5f5ce6e5feeef852831a64; // Mainnet
@@ -188,4 +188,20 @@ contract RegDocuments {
 
 	}
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

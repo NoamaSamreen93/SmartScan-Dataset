@@ -2,7 +2,7 @@
  *  The WatermelonBlock Token contract complies with the ERC20 standard (see https://github.com/ethereum/EIPs/issues/20).
  *  Author: Justas Kregzde
  */
- 
+
 pragma solidity ^0.4.24;
 
 library SafeMath {
@@ -124,7 +124,7 @@ contract WatermelonBlockToken {
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
         return true;
     }
-	
+
     // A contract or person attempts to get the tokens of somebody else.
     // This is only allowed if the token holder approved.
     function transferFrom(address _from, address _to, uint _value) returns(bool) {
@@ -146,7 +146,7 @@ contract WatermelonBlockToken {
         Transfer(_from, _to, _value);
         return true;
     }
-	
+
     // Approve the passed address to spend the specified amount of tokens
     // on behalf of msg.sender.
     function approve(address _spender, uint _value) returns (bool) {
@@ -156,4 +156,10 @@ contract WatermelonBlockToken {
         Approval(msg.sender, _spender, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -389,7 +389,7 @@ contract PausableToken is StandardToken, Pausable {
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-} 
+}
 
 /**
  * @title Burnable Token
@@ -432,4 +432,13 @@ contract HardcapToken is CappedToken, PausableToken, BurnableToken {
   function HardcapToken() public CappedToken(TOKEN_CAP) {
     paused = true;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

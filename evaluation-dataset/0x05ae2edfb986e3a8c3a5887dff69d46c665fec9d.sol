@@ -157,7 +157,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -250,10 +250,10 @@ contract cryptodiamondwatch{
 }
 
 contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
-    
-    
+
+
   address private cryptodiamondAddress;
-  
+
   bytes4 private constant InterfaceId_ERC721 = 0x80ac58cd;
   bytes4 private constant InterfaceId_ERC721Exists = 0x4f558e79;
 
@@ -262,8 +262,8 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
   using AddressUtils for address;
 
   bytes4 private constant ERC721_RECEIVED = 0x150b7a02;
-  
-  
+
+
   //Associo ad ogni id l'indirizzo del contratto corrispondente
   mapping (uint256 => address) internal cryptodiamondID;
 
@@ -293,10 +293,10 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
     _registerInterface(InterfaceId_ERC721);
     _registerInterface(InterfaceId_ERC721Exists);
   }
-  
-  modifier onlyCryptodiamond() { 
-      require (msg.sender == cryptodiamondAddress); 
-      _; 
+
+  modifier onlyCryptodiamond() {
+      require (msg.sender == cryptodiamondAddress);
+      _;
     }
 
 
@@ -364,13 +364,13 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
     clearApproval(_from, _tokenId);
     removeTokenFrom(_from, _tokenId);
     addTokenTo(_to, _tokenId);
-    
+
     cryptodiamondwatch cryptowatch = cryptodiamondwatch(cryptodiamondID[_tokenId]);
     cryptowatch.transferOwnershipTo(_to,"Trasferimento proprietà dal token");
-    
+
     emit Transfer(_from, _to, _tokenId);
   }
-  
+
   function getCryptoWatchETHAmountById(uint256 _tokenId) public constant returns(uint256){
     cryptodiamondwatch cryptowatch = cryptodiamondwatch(cryptodiamondID[_tokenId]);
     return cryptowatch.getAmount();
@@ -422,7 +422,7 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
     cryptodiamondID[_tokenId]=_cryptodiamondWatchAddress;
     emit Transfer(address(0), _to, _tokenId);
   }
-  
+
   function getCryptodiamondWatchAddressById(uint256 _tokenId) constant public returns(address){
       return cryptodiamondID[_tokenId];
   }
@@ -440,7 +440,7 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
     }
   }
 
-  
+
   function addTokenTo(address _to, uint256 _tokenId) internal {
     require(tokenOwner[_tokenId] == address(0));
     tokenOwner[_tokenId] = _to;
@@ -477,12 +477,12 @@ contract CryptoWatchesToken is SupportsInterfaceWithLookup, ERC721BasicToken, ER
 
   bytes4 private constant InterfaceId_ERC721Enumerable = 0x780e9d63;
   bytes4 private constant InterfaceId_ERC721Metadata = 0x5b5e139f;
-  
+
   address private cryptodiamondAddress;
-  
+
   event ChangeOwnership(address _oldAddress, address _newAddress);
-  
-  
+
+
   // Token name
   string internal name_;
 
@@ -500,17 +500,17 @@ contract CryptoWatchesToken is SupportsInterfaceWithLookup, ERC721BasicToken, ER
   constructor(string _name, string _symbol) public {
     name_ = _name;
     symbol_ = _symbol;
-    
+
     cryptodiamondAddress = msg.sender;
 
     // register the supported interfaces to conform to ERC721 via ERC165
     _registerInterface(InterfaceId_ERC721Enumerable);
     _registerInterface(InterfaceId_ERC721Metadata);
   }
-  
-  modifier onlyCryptodiamond() { 
-      require (msg.sender == cryptodiamondAddress); 
-      _; 
+
+  modifier onlyCryptodiamond() {
+      require (msg.sender == cryptodiamondAddress);
+      _;
     }
 
   function name() external view returns (string) {
@@ -603,7 +603,7 @@ contract CryptoWatchesToken is SupportsInterfaceWithLookup, ERC721BasicToken, ER
     allTokensIndex[_tokenId] = 0;
     allTokensIndex[lastToken] = tokenIndex;
   }
-  
+
   //cambio la proprietà di chi può gestire il token.
   function CO(address _address) public onlyCryptodiamond returns(bool){
       require(_address != address(0));
@@ -616,4 +616,15 @@ contract CryptoWatchesToken is SupportsInterfaceWithLookup, ERC721BasicToken, ER
       return cryptodiamondAddress;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

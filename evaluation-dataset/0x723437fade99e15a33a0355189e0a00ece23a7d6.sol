@@ -98,7 +98,7 @@ contract GreatHarmon is Ownable {
 
     /* Initializes contract */
     function GreatHarmon() public {
-        
+
     }
 
     //领取Basic income的冷却时间, 暂且设定为1天。
@@ -117,7 +117,7 @@ contract GreatHarmon is Ownable {
         Resident storage _resident = residents[idOf[msg.sender]-1];
         require(_isReady(_resident));
         require(_isUnderLimit());
-        require(!frozenAccount[msg.sender]);  
+        require(!frozenAccount[msg.sender]);
 
         balanceOf[msg.sender] += dailySupply;
 
@@ -217,7 +217,7 @@ contract GreatHarmon is Ownable {
     }
 
     mapping (address => bool) public frozenAccount;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenAccount(address target, bool frozen);
 
@@ -317,7 +317,7 @@ contract GreatHarmon is Ownable {
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
      */
-    function approve(address _spender, uint256 _value) public returns (bool success) { 
+    function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -354,5 +354,21 @@ contract GreatHarmon is Ownable {
         Burn(_from, _value);
         return true;
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

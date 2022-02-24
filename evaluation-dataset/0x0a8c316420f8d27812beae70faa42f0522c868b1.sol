@@ -41,7 +41,7 @@ interface ERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address _who) external view returns (uint256);
     function transfer(address _to, uint256 _value) external returns(bool);
-    
+
     function allowance(address _owner, address _spender) external view returns (uint256);
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool);
     function approve(address _spender, uint256 _value) external returns (bool);
@@ -53,12 +53,12 @@ interface ERC20 {
 
 /**
  * @title Contract Ownable
- **/ 
+ **/
 contract Ownable {
     address public owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOWner);
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -73,7 +73,7 @@ contract Ownable {
 
 /**
  *  @title Contract Pauseable
- **/ 
+ **/
 contract Pauseable is Ownable {
     bool public paused = false;
 
@@ -109,14 +109,14 @@ contract WAVEliteToken is ERC20, Pauseable {
 
     mapping(address => uint256) internal balances;
     mapping(address => mapping(address => uint256)) internal allowed;
-    uint256 _totalSupply;    
-    
+    uint256 _totalSupply;
+
 
     string public constant name = "WAVElite";
     string public constant symbol = "WAVELT";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY =  45000000 * (10 ** uint256(decimals));
-    
+
     function WAVEliteToken() public {
         owner = msg.sender;
         _totalSupply = INITIAL_SUPPLY;
@@ -145,7 +145,7 @@ contract WAVEliteToken is ERC20, Pauseable {
 
     function allowance(address _owner, address _spender) external view returns (uint256) {
         return allowed[_owner][_spender];
-    }    
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) external whenNotPaused returns (bool) {
         require(_to != address(0));
@@ -192,6 +192,17 @@ contract WAVEliteToken is ERC20, Pauseable {
         balances[burner] = balances[burner].sub(_value);
         _totalSupply = _totalSupply.sub(_value);
         Burn(burner, _value);
-        Transfer(burner, address(0), _value);      
+        Transfer(burner, address(0), _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

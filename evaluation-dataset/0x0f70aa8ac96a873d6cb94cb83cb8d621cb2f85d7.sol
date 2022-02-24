@@ -400,7 +400,7 @@ contract TradeableToken is StandardToken, Ownable {
     function() payable public {
         require(msg.value > 0);
         buy(msg.sender, msg.value);
-    }    
+    }
 
     /**
     * @notice Transfer or sell tokens
@@ -514,7 +514,7 @@ contract TradeableToken is StandardToken, Ownable {
 
     /**
     * @notice Distribute tokens to buyers
-    * @param buyers an array of addresses to pay tokens for their ether. Should be composed from outside by reading Sale events 
+    * @param buyers an array of addresses to pay tokens for their ether. Should be composed from outside by reading Sale events
     */
     function distributeTokens(address[] buyers) onlyOwner public {
         require(currentState == State.Distribution);
@@ -527,7 +527,7 @@ contract TradeableToken is StandardToken, Ownable {
             uint256 tokenAmount = etherAmount.mul(currentPeriodRate);
             uint256 fee = tokenAmount.mul(buyFeeMilliPercent).div(MILLI_PERCENT_DIVIDER);
             tokenAmount = tokenAmount.sub(fee);
-            
+
             receivedEther[buyer] = 0;
             currentPeriodEtherCollected = currentPeriodEtherCollected.sub(etherAmount);
             //mint tokens
@@ -540,7 +540,7 @@ contract TradeableToken is StandardToken, Ownable {
     /**
     * @notice Distribute ether to sellers
     * If not enough ether is available on contract ballance
-    * @param sellers an array of addresses to pay ether for their tokens. Should be composed from outside by reading Redemption events 
+    * @param sellers an array of addresses to pay ether for their tokens. Should be composed from outside by reading Redemption events
     */
     function distributeEther(address[] sellers) onlyOwner payable public {
         require(currentState == State.Distribution);
@@ -553,7 +553,7 @@ contract TradeableToken is StandardToken, Ownable {
             uint256 etherAmount = tokenAmount.div(currentPeriodRate);
             uint256 fee = etherAmount.mul(sellFeeMilliPercent).div(MILLI_PERCENT_DIVIDER);
             etherAmount = etherAmount.sub(fee);
-            
+
             soldTokens[seller] = 0;
             currentPeriodTokenCollected = currentPeriodTokenCollected.sub(tokenAmount);
             if(!seller.send(etherAmount)){
@@ -598,7 +598,7 @@ contract UP1KToken is TradeableToken, MintableToken, HasNoContracts, HasNoTokens
         require(mintingFinished || msg.sender == founder);
         _;
     }
-    
+
     function transfer(address _to, uint256 _value) canTransfer public returns(bool) {
         return super.transfer(_to, _value);
     }
@@ -606,4 +606,15 @@ contract UP1KToken is TradeableToken, MintableToken, HasNoContracts, HasNoTokens
     function transferFrom(address _from, address _to, uint256 _value) canTransfer public returns(bool) {
         return super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

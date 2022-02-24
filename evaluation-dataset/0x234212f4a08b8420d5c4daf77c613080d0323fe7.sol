@@ -53,11 +53,11 @@ contract RichiumToken is owned {
     mapping (address => uint256) public balanceOf;
 
     mapping (address => bool) public approvedAccount;
-    
+
     event ApprovedAccount(address target, bool approve);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
-    
+
     uint256 public bid;
     uint256 public ask;
 
@@ -148,7 +148,7 @@ contract RichiumToken is owned {
     function () payable public {
         buy();
     }
-    
+
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         require(ask > 0);
@@ -167,4 +167,15 @@ contract RichiumToken is owned {
         _transfer(msg.sender, this, amount);
         msg.sender.transfer(e);					// sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

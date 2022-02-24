@@ -130,7 +130,7 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
@@ -356,13 +356,13 @@ contract MintableToken is StandardToken, Ownable {
   bool public mintingFinished = false;
 
   uint256 public maxMintQuantity;
-  
+
   bool public isLimitMint = false;
 
   modifier canMint() {
-  	
+
     require(!mintingFinished);
-    
+
     _;
   }
 
@@ -387,9 +387,9 @@ contract MintableToken is StandardToken, Ownable {
     public
     returns (bool)
   {
-	    
+
 	require(maxMintQuantity>=totalSupply_.add(_amount));
-  	
+
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     emit Mint(_to, _amount);
@@ -403,17 +403,17 @@ contract MintableToken is StandardToken, Ownable {
   * @param _value The amount to be transferred.
   */
   function mintArray(address[] _to, uint256[] _value) public  returns (bool) {
-    
+
     uint cnt = _to.length;
     uint cntVal = _value.length;
-    
+
     require(cnt >0);
     require(cnt == cntVal);
-    
+
     for (uint i = 0; i < cnt; i++) {
     	mint(_to[i],_value[i]);
     }
-    
+
     return true;
   }
 
@@ -542,4 +542,15 @@ contract MOATOKEN is MintableToken,PausableToken,BurnableToken {
     maxMintQuantity=2100000000000000000000000000;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

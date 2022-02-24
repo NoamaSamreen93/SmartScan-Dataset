@@ -473,7 +473,7 @@ contract SMRDistributionVault is ArgumentsChecker, multiowned, ERC20 {
 
         totalSupply = m_SMR.totalSupply();
 
-        
+
     }
 
     function getInitialOwners() private pure returns (address[]) {
@@ -544,4 +544,17 @@ result[1] = address(0xe4074bb7bd4828baed9d2bece1e386408428dfb7);
 
     string public constant name = "SMR Community Fund Vault 1";
     string public constant symbol = "SMRDV";
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

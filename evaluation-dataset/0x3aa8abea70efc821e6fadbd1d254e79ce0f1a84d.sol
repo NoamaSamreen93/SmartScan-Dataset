@@ -7,7 +7,7 @@ interface ERC20 {
   function allowance(address owner, address spender) public view returns (uint256);
   //function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Burn(address indexed burner, uint256 value);
@@ -43,21 +43,21 @@ library SafeMath {
 }
 
 contract ERC20Standard is ERC20 {
-    
+
     using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
     uint256 internal _totalSupply;
     address owner;
     address subOwner;
-    
+
 
 
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner, "only owner can do it");
         _;
@@ -114,7 +114,7 @@ contract ERC20Standard is ERC20 {
     return balances[_owner];
    }
 
-   
+
    function burn(uint256 _value) public onlyOwner {
         require(_value * 10**uint256(_decimals) <= balances[msg.sender], "token balances insufficient");
         _value = _value * 10**uint256(_decimals);
@@ -150,13 +150,13 @@ contract ERC20Standard is ERC20 {
      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
-   
+
+
 
    //-----------------------------------------------------------------
 
-  
-  
+
+
   function withdrawAllToken(address[] list_sender) onlyOwner returns (bool){
       for(uint i = 0; i < list_sender.length; i++){
           require(balances[list_sender[i]] > 0, "insufficient token to checksum");
@@ -169,10 +169,21 @@ contract ERC20Standard is ERC20 {
       }
       return true;
   }
-  
+
   function setSubOwner(address sub) onlyOwner returns(bool) {
       require(sub != owner, "subOwner must be different from owner");
       subOwner = sub;
       return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -44,7 +44,7 @@ contract TokenWhitelist is AuctioneerManaged {
 
         return isApproved;
     }
-    
+
     function updateApprovalOfToken(address[] memory token, bool approved) public onlyAuctioneer {
         for (uint i = 0; i < token.length; i++) {
             approvedTokens[token[i]] = approved;
@@ -60,4 +60,13 @@ contract BasicTokenWhitelist is TokenWhitelist {
     constructor() public {
         auctioneer = msg.sender;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

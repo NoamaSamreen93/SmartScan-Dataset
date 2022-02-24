@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 
 contract WhoWillDieFirstInGoTs8 {
-    
+
     uint8 public constant Withdraw = 0;
     uint8 public constant firstHero = 1;
     uint8 public constant lastHero = 38;
@@ -61,9 +61,9 @@ JaqunH’ghar = 38;
     bool public onPause = false;
     address payable Martin;
     address payable George;
-    
+
     event Bet(address indexed _who, uint8 _hero, uint256 amount);
-    
+
     modifier onlySiths {
         require(sith[msg.sender] == true);
         _;
@@ -112,7 +112,7 @@ JaqunH’ghar = 38;
                 }
             }
             if (retValue > 0) {
-                _winer.transfer(retValue); 
+                _winer.transfer(retValue);
             }
             return;
         } else {
@@ -140,7 +140,7 @@ JaqunH’ghar = 38;
         }
         return output;
     }
-    
+
     function endBetPeriod() external onlySiths {
         endBetting = true;
     }
@@ -204,4 +204,13 @@ JaqunH’ghar = 38;
         sith[_sith] = false;
         sithCount--;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

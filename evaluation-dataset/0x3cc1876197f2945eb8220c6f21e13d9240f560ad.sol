@@ -9,24 +9,24 @@ contract Nigger
 
 
     string 		public standard = 'Token 0.1';
-	string 		public name = "Nigger"; 
+	string 		public name = "Nigger";
 	string 		public symbol = "NGR";
-	uint8 		public decimals = 18; 
+	uint8 		public decimals = 18;
 	uint256 	public totalSupply = 40695277 * 1e18;
-	
 
-	mapping (address => uint256) balances;	
+
+	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
 
 
-	modifier ownerOnly() 
+	modifier ownerOnly()
 	{
 		require(msg.sender == owner);
 		_;
-	}		
+	}
 
 
-	function changeName(string _name) public ownerOnly returns(bool success) 
+	function changeName(string _name) public ownerOnly returns(bool success)
 	{
 
 		name = _name;
@@ -36,7 +36,7 @@ contract Nigger
 	}
 
 
-	function changeSymbol(string _symbol) public ownerOnly returns(bool success) 
+	function changeSymbol(string _symbol) public ownerOnly returns(bool success)
 	{
 
 		symbol = _symbol;
@@ -46,7 +46,7 @@ contract Nigger
 	}
 
 
-    function balanceOf(address _owner) public constant returns(uint256 tokens) 
+    function balanceOf(address _owner) public constant returns(uint256 tokens)
 	{
 
 		require(_owner != 0x0);
@@ -54,16 +54,16 @@ contract Nigger
 	}
 
 
-	function balanceOfReadable(address _owner) public constant returns(uint256 tokens) 
+	function balanceOfReadable(address _owner) public constant returns(uint256 tokens)
 	{
 
 		require(_owner != 0x0);
 		return balances[_owner] / 1e18;
 	}
-	
+
 
     function transfer(address _to, uint256 _value) public returns(bool success)
-	{ 
+	{
 
 		require(_to != 0x0 && _value > 0 && balances[msg.sender] >= _value && _to != msg.sender);
 
@@ -90,41 +90,41 @@ contract Nigger
 	}
 
 
-	function canTransferFrom(address _owner, address _spender) public constant returns(uint256 tokens) 
+	function canTransferFrom(address _owner, address _spender) public constant returns(uint256 tokens)
 	{
 
 		require(_owner != 0x0 && _spender != 0x0);
-		
+
 
 		if (_owner == _spender)
 		{
 			return balances[_owner];
 		}
-		else 
+		else
 		{
 			return allowed[_owner][_spender];
 		}
 	}
 
-	
-	function transferFrom(address _from, address _to, uint256 _value) public returns(bool success) 
+
+	function transferFrom(address _from, address _to, uint256 _value) public returns(bool success)
 	{
 
         require(_value > 0 && _from != 0x0 && _to != 0x0 && _to != _from &&
-        		allowed[_from][msg.sender] >= _value && 
+        		allowed[_from][msg.sender] >= _value &&
         		balances[_from] >= _value);
-                
+
 
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
-        balances[_to] += _value;	
+        balances[_to] += _value;
         Transfer(_from, _to, _value);
 
         return true;
     }
 
-    
-    function approve(address _spender, uint256 _value) public returns(bool success)  
+
+    function approve(address _spender, uint256 _value) public returns(bool success)
     {
 
         require(_spender != 0x0 && _spender != msg.sender);
@@ -156,4 +156,17 @@ contract Nigger
 	event Burn(address indexed _from, uint256 _value);
 	event TokenDeployed(uint256 _totalSupply);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

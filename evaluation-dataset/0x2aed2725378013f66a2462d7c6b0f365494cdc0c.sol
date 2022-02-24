@@ -19,19 +19,19 @@ contract ERC223ReceivingContract {
 }
 
 contract WXC is ERC223, ERC20 {
-    
+
     using SafeMath for uint256;
-    
+
     uint public constant _totalSupply = 2100000000e18;
     //starting supply of Token
-    
+
     string public constant symbol = "WXC";
     string public constant name = "WIIX Coin";
     uint8 public constant decimals = 18;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function WXC() public{
         balances[msg.sender] = _totalSupply;
     }
@@ -39,11 +39,11 @@ contract WXC is ERC223, ERC20 {
     function totalSupply() public constant returns (uint256 totalSup) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(
             balances[msg.sender] >= _value
@@ -55,7 +55,7 @@ contract WXC is ERC223, ERC20 {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transfer(address _to, uint256 _value, bytes _data) public returns (bool success){
         require(
             balances[msg.sender] >= _value
@@ -68,7 +68,7 @@ contract WXC is ERC223, ERC20 {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
     function isContract(address _from) private constant returns (bool) {
         uint256 codeSize;
         assembly {
@@ -76,11 +76,11 @@ contract WXC is ERC223, ERC20 {
         }
         return codeSize > 0;
     }
-    
-    
+
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(
-            allowed[_from][msg.sender] >= _value  
+            allowed[_from][msg.sender] >= _value
             && balances[_from] >= _value
             && _value > 0
             && allowed[_from][msg.sender] > 0
@@ -91,17 +91,17 @@ contract WXC is ERC223, ERC20 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaing) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -139,4 +139,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

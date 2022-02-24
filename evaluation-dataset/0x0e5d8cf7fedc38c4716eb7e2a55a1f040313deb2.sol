@@ -322,9 +322,9 @@ contract Cryptocoin is ERC20, Claimable {
   address public accICO;
 
   constructor (
-      address _accICO, 
+      address _accICO,
       uint256 _initialSupply)
-  public 
+  public
   {
       require(_accICO         != address(0));//audit recommendation
       require(_initialSupply  > 0);
@@ -338,7 +338,7 @@ contract Cryptocoin is ERC20, Claimable {
       emit Transfer(address(0), _accICO, totalSupply());
   }
 
-  
+
   function burn(uint256 amount) external {
     require(amount <= _balances[msg.sender]);
 
@@ -356,15 +356,26 @@ contract Cryptocoin is ERC20, Claimable {
       require(address(token) != address(0));
       uint256 balance = token.balanceOf(address(this));
       token.transfer(owner, balance);
-      
+
   }
 
   //***************************************************************
   // ERC20 part of this contract based on best practices of
   // https://github.com/OpenZeppelin/zeppelin-solidity
-  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group; 
+  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group;
   //     Telegram: https://t.me/msmobile
   //               https://t.me/alexamuek
   // Code released under the MIT License(see git root).
   ////**************************************************************
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -631,7 +631,7 @@ contract MiniMeTokenFactory {
  * @dev Basic MiniMe token
  */
 contract EthealTokenV2 is MiniMeToken {
-    function EthealTokenV2(address _tokenFactory, address _parentToken, uint _parentSnapShotBlock, bool _transfersEnabled) 
+    function EthealTokenV2(address _tokenFactory, address _parentToken, uint _parentSnapShotBlock, bool _transfersEnabled)
         MiniMeToken(
             _tokenFactory,
             _parentToken,                // no parent token
@@ -644,4 +644,12 @@ contract EthealTokenV2 is MiniMeToken {
     {
 
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

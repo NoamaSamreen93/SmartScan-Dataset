@@ -32,7 +32,7 @@ contract Ownable {
     address public owner;
 
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -80,7 +80,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
     using SafeMath
@@ -97,10 +97,10 @@ contract BasicToken is ERC20Basic {
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
     }
-	
+
 	/**
 	  * @dev Gets the balance of the specified address.
-	  * @param _owner The address to query the the balance of. 
+	  * @param _owner The address to query the the balance of.
 	  * @return An uint256 representing the amount owned by the passed address.
 	  */
     function balanceOf(address _owner) constant returns(uint256 balance) {
@@ -112,7 +112,7 @@ contract BasicToken is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
     mapping(address => mapping(address => uint256)) allowed;
-	
+
 	/**
 	   * @dev Transfer tokens from one address to another
 	   * @param _from address The address which you want to send tokens from
@@ -166,7 +166,7 @@ contract MintableToken is StandardToken, Ownable {
     event MintStarted();
     event RefundRequest(uint256 sum,address adr,uint256 balance);
     event CoinBuy(uint256 sum,address adr);
-    
+
 
     bool public mintingFinished = true;
     bool public goalReached = false;
@@ -189,7 +189,7 @@ contract MintableToken is StandardToken, Ownable {
         if (mintingFinished == false || alreadyMintedOnce == false) revert();
         _;
     }
-    
+
     modifier IsMintingGoal() {
         if (mintingFinished == false || alreadyMintedOnce == false || goalReached == false ) revert();
         _;
@@ -203,9 +203,9 @@ contract MintableToken is StandardToken, Ownable {
     function getNow() public returns(uint256){
         return now;
     }
-    
+
 	/**
-	   * @dev Premium for buying TITS at the begining of ICO 
+	   * @dev Premium for buying TITS at the begining of ICO
 	   * @return bool True if no errors
 	   */
     function fastBuyBonus() private returns(uint) {
@@ -294,7 +294,7 @@ contract MintableToken is StandardToken, Ownable {
     }
 
 	/**
-	   * @dev Function refunds contributors if ICO was unsuccesful 
+	   * @dev Function refunds contributors if ICO was unsuccesful
 	   * @return bool True if conditions for refund are met false otherwise.
 	   */
     function refund() returns(bool) {
@@ -308,7 +308,7 @@ contract MintableToken is StandardToken, Ownable {
         }
         revert();
     }
- 
+
 }
 
 contract TitsToken is MintableToken {
@@ -336,7 +336,7 @@ contract TitsToken is MintableToken {
     address[] public voters;
 
 	/**
-	   * @dev voting long enought to go to next phase 
+	   * @dev voting long enought to go to next phase
 	   */
     modifier votingLong() {
         if (getNow() - voitingStartTime <  VOTING_TIMESPAN) revert();
@@ -344,7 +344,7 @@ contract TitsToken is MintableToken {
     }
 
 	/**
-	   * @dev preparation for voting (application for voting) long enought to go to next phase 
+	   * @dev preparation for voting (application for voting) long enought to go to next phase
 	   */
     modifier votingPrepareLong() {
         if (getNow() - voitingStartTime < VOTING_PREPARE_TIMESPAN) revert();
@@ -381,9 +381,9 @@ contract TitsToken is MintableToken {
             revert();
         }
     }
-		
+
 	/**
-	   * @dev can be called by anyone, if timespan withou accepted proposal long enought 
+	   * @dev can be called by anyone, if timespan withou accepted proposal long enought
 	   * enables refund
 	   */
 	function registerVotingPrepareFailure() mintingClosed{
@@ -440,7 +440,7 @@ contract TitsToken is MintableToken {
 
 	/**
 	   * @dev closes voting on proposed Lottery Contract address
-	   * checks if failed - if No votes is more common than yes increase failed voting count and if it reaches 10 
+	   * checks if failed - if No votes is more common than yes increase failed voting count and if it reaches 10
 	   * reach of goal is failing and investors can withdraw their money
 	   */
     function closeVoring() votingInProgress votingLong {
@@ -472,10 +472,21 @@ contract TitsToken is MintableToken {
             if (isVoteYes==false) {
                 votesAvailable[msg.sender] = 0;
                 votedNo = votedNo.add(votes);
-            } 
-            else{
-                revert();   
             }
-            
+            else{
+                revert();
+            }
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

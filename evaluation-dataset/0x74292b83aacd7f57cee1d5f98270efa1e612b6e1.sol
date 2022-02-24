@@ -85,7 +85,7 @@ contract Salary {
 
   event TerminatePackage(address indexed staff);
   event ChangeTokenContractAddress(address indexed newAddress);
-  
+
   modifier onlyAdmin() {
     require(msg.sender == admin);
     _;
@@ -178,7 +178,7 @@ contract Salary {
   /**
    * @dev Change token address from BCNP to BCNT
    * @param _newAddress the new token contract address
-  */ 
+  */
   function changeTokenContractAddress(address _newAddress) external onlyAdmin {
     require(_newAddress != address(0));
     token = ERC20(_newAddress);
@@ -189,4 +189,20 @@ contract Salary {
     admin = msg.sender;
     token = ERC20(_tokenAddress);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

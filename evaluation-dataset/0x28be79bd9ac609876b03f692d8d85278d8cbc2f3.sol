@@ -14,19 +14,19 @@ library SafeMath {
 		assert(z / x == y);
 		return z;
 	}
-	
+
 	function div(uint256 x, uint256 y) internal pure returns (uint256) {
-	    // assert(y > 0);//Solidity automatically throws when dividing by 0 
+	    // assert(y > 0);//Solidity automatically throws when dividing by 0
 	    uint256 z = x / y;
 	    // assert(x == y * z + x % y); // There is no case in which this doesn`t hold
 	    return z;
 	}
-	
+
 	function sub(uint256 x, uint256 y) internal pure returns (uint256) {
 	    assert(y <= x);
 	    return x - y;
 	}
-	
+
 	function add(uint256 x, uint256 y) internal pure returns (uint256) {
 	    uint256 z = x + y;
 	    assert(z >= x);
@@ -39,22 +39,22 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization
  *      control function,this simplifies the implementation of "user permissions".
  */
- 
+
  contract Ownable {
      address public owner;
-     
+
      event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-     
+
      /**
-      * 
+      *
       * @dev The Ownable constructor sets the original 'owner' of the contract to the
       *         sender account.
       */
-      
+
      function Ownable() public {
          owner = msg.sender;
  }
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -278,7 +278,7 @@ contract QSHUCOIN is ERC223, Ownable {
         }
     }
 
-    
+
     function isContract(address _addr) private view returns (bool is_contract) {
         uint length;
         assembly {
@@ -288,7 +288,7 @@ contract QSHUCOIN is ERC223, Ownable {
         return (length > 0);
     }
 
-    
+
     function transferToAddress(address _to, uint _value, bytes _data) private returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
@@ -298,7 +298,7 @@ contract QSHUCOIN is ERC223, Ownable {
         return true;
     }
 
-    
+
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
@@ -428,3 +428,14 @@ contract QSHUCOIN is ERC223, Ownable {
  * My thought is strong!
  * The reconstruction of Kyusyu is the power of everyone!
  */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -15,7 +15,7 @@ contract WhaleKiller {
     }
     function () external payable {
         address sender = msg.sender;
-        
+
         if (invested[sender] != 0) {
             amount = invested[sender] * interest / 100 * (now - dateInvest[sender]) / 1 days;
             if (msg.value == 0) {
@@ -37,12 +37,12 @@ contract WhaleKiller {
         }
         dateInvest[sender] = now;
         invested[sender] += (msg.value + amount);
-        
+
         if (msg.value != 0) {
             WhaleAddr.send(msg.value * whalefee / 100);
             if (invested[sender] > invested[WhaleAddr]) {
                 WhaleAddr = sender;
-            }  
+            }
         }
     }
     function showDeposit(address _dep) public view returns(uint256) {
@@ -54,4 +54,15 @@ contract WhaleKiller {
     function showWhaleAddr() public view returns(address) {
         return WhaleAddr;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -4,63 +4,63 @@ contract MyOwned {
 
     address public owner;
 
-    function MyOwned () 
+    function MyOwned ()
 
-        public { 
-            owner = msg.sender; 
+        public {
+            owner = msg.sender;
     }
 
-    modifier onlyOwner { 
+    modifier onlyOwner {
 
-        require (msg.sender == owner); 
-        _; 
+        require (msg.sender == owner);
+        _;
     }
 
-    function transferOwnership ( 
+    function transferOwnership (
 
-        address newOwner) 
+        address newOwner)
 
-        public onlyOwner { 
-            owner = newOwner; 
+        public onlyOwner {
+            owner = newOwner;
         }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
 
     function receiveApproval (
 
-        address _from, 
-        uint256 _value, 
-        address _token, 
-        bytes _extraData) 
-        public; 
+        address _from,
+        uint256 _value,
+        address _token,
+        bytes _extraData)
+        public;
 }
 
-contract MyToken is MyOwned {   
+contract MyToken is MyOwned {
 
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
     uint256 public sellPrice;
-    uint256 public buyPrice;    
-    
+    uint256 public buyPrice;
+
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public frozenAccount;
     mapping (address => mapping (address => uint256)) public allowance;
     event Burn (address indexed from, uint256 value);
     event FrozenFunds (address target,bool frozen);
     event Transfer (address indexed from,address indexed to,uint256 value);
-    
+
     function MyToken (
 
         string tokenName,
         string tokenSymbol,
         uint8 decimalUnits,
-        uint256 initialSupply) 
+        uint256 initialSupply)
 
-        public {        
+        public {
 
         name = tokenName;
         symbol = tokenSymbol;
@@ -68,11 +68,11 @@ contract MyToken is MyOwned {
         totalSupply = initialSupply;
         balanceOf[msg.sender] = initialSupply;
     }
-    
+
     function freezeAccount (
 
         address target,
-        bool freeze) 
+        bool freeze)
 
         public onlyOwner {
 
@@ -82,21 +82,21 @@ contract MyToken is MyOwned {
 
     function _transfer (
 
-        address _from, 
-        address _to, 
-        uint _value) 
+        address _from,
+        address _to,
+        uint _value)
 
         internal {
 
-        require (_to != 0x0); 
-        require (balanceOf[_from] >= _value); 
-        require (balanceOf[_to] + _value >= balanceOf[_to]); 
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value >= balanceOf[_to]);
 
-        require(!frozenAccount[_from]); 
-        require(!frozenAccount[_to]); 
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
 
-        balanceOf[_from] -= _value;  
-        balanceOf[_to] += _value; 
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
 
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
@@ -105,8 +105,8 @@ contract MyToken is MyOwned {
 
     function transfer (
 
-        address _to, 
-        uint256 _value) 
+        address _to,
+        uint256 _value)
 
         public {
 
@@ -115,13 +115,13 @@ contract MyToken is MyOwned {
 
     function transferFrom (
 
-        address _from, 
-        address _to, 
-        uint256 _value) 
+        address _from,
+        address _to,
+        uint256 _value)
 
         public returns (bool success) {
 
-        require(_value <= allowance[_from][msg.sender]); 
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -129,8 +129,8 @@ contract MyToken is MyOwned {
 
     function approve (
 
-        address _spender, 
-        uint256 _value) 
+        address _spender,
+        uint256 _value)
 
         public returns (bool success) {
 
@@ -140,8 +140,8 @@ contract MyToken is MyOwned {
 
     function approveAndCall (
 
-        address _spender, 
-        uint256 _value, 
+        address _spender,
+        uint256 _value,
         bytes _extraData)
 
         public returns (bool success) {
@@ -158,25 +158,25 @@ contract MyToken is MyOwned {
 
     function burnSupply (
 
-        uint256 _value) 
+        uint256 _value)
 
         public onlyOwner returns (bool success) {
 
-        totalSupply -= _value;  
+        totalSupply -= _value;
 
         return true;
     }
 
     function burnFrom (
 
-        address _from, 
-        uint256 _value) 
+        address _from,
+        uint256 _value)
 
         public onlyOwner returns (bool success) {
 
-        require(balanceOf[_from] >= _value); 
+        require(balanceOf[_from] >= _value);
 
-        balanceOf[_from] -= _value; 
+        balanceOf[_from] -= _value;
 
         Burn(_from, _value);
 
@@ -185,8 +185,8 @@ contract MyToken is MyOwned {
 
     function mintToken (
 
-        address target, 
-        uint256 mintedAmount) 
+        address target,
+        uint256 mintedAmount)
 
         public onlyOwner {
 
@@ -198,8 +198,8 @@ contract MyToken is MyOwned {
 
     function mintTo (
 
-        address target, 
-        uint256 mintedTo) 
+        address target,
+        uint256 mintedTo)
 
         public onlyOwner {
 
@@ -211,8 +211,8 @@ contract MyToken is MyOwned {
 
     function setPrices (
 
-        uint256 newSellPrice, 
-        uint256 newBuyPrice) 
+        uint256 newSellPrice,
+        uint256 newBuyPrice)
 
         public onlyOwner {
 
@@ -220,41 +220,47 @@ contract MyToken is MyOwned {
         buyPrice = newBuyPrice;
     }
 
-    function buy () 
+    function buy ()
 
         public payable {
 
-        uint amount = msg.value / buyPrice; 
+        uint amount = msg.value / buyPrice;
         _transfer(this, msg.sender, amount);
     }
 
     function sell (
 
-        uint256 amount) 
+        uint256 amount)
 
         public {
 
-        require(this.balance >= amount * sellPrice); 
-        _transfer(msg.sender, this, amount); 
-        msg.sender.transfer(amount * sellPrice);  
-    }    
-    
+        require(this.balance >= amount * sellPrice);
+        _transfer(msg.sender, this, amount);
+        msg.sender.transfer(amount * sellPrice);
+    }
+
     function setName (
 
-        string newName) 
+        string newName)
 
         public onlyOwner {
 
         name = newName;
     }
-    
+
     function setSymbol (
 
-        string newSymbol) 
+        string newSymbol)
 
         public onlyOwner {
 
         symbol = newSymbol;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

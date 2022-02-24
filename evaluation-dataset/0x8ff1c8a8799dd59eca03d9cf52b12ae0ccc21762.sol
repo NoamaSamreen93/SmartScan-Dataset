@@ -16,7 +16,7 @@ contract Manager {
     * account.
     */
     function Manager() public {
-        coo = msg.sender; 
+        coo = msg.sender;
         cfo = 0x447870C2f334Fcda68e644aE53Db3471A9f7302D;
         ceo = 0x6EC9C6fcE15DB982521eA2087474291fA5Ad6d31;
         cao = 0x391Ef2cB0c81A2C47D659c3e3e6675F550e4b183;
@@ -39,9 +39,9 @@ contract Manager {
         require(msg.sender == cao);
         _;
     }
-    
+
     bool allowTransfer = false;
-    
+
     function changeAllowTransferState() public onlyCOO {
         if (allowTransfer) {
             allowTransfer = false;
@@ -49,7 +49,7 @@ contract Manager {
             allowTransfer = true;
         }
     }
-    
+
     modifier whenTransferAllowed() {
         require(allowTransfer);
         _;
@@ -136,13 +136,13 @@ contract SkinBase is Manager {
 
     // Number of all total valid skins
     // skinId 0 should not correspond to any skin, because skin.mixingWithId==0 indicates not mixing
-    uint256 public nextSkinId = 1;  
+    uint256 public nextSkinId = 1;
 
     // Number of skins an account owns
     mapping (address => uint256) public numSkinOfAccounts;
 
     event SkinTransfer(address from, address to, uint256 skinId);
-    
+
     // // Give some skins to init account for unit tests
     // function SkinBase() public {
     //     address account0 = 0x627306090abaB3A6e1400e9345bC60c78a8BEf57;
@@ -153,14 +153,14 @@ contract SkinBase is Manager {
     //     for (uint256 i = 1; i <= 15; i++) {
     //         if (i < 10) {
     //             skin.appearance = uint128(i);
-    //             if (i < 7) { 
+    //             if (i < 7) {
     //                 skinIdToOwner[i] = account0;
     //                 numSkinOfAccounts[account0] += 1;
-    //             } else {  
+    //             } else {
     //                 skinIdToOwner[i] = account1;
     //                 numSkinOfAccounts[account1] += 1;
     //             }
-    //         } else {  
+    //         } else {
     //             skin.appearance = uint128(block.blockhash(block.number - i + 9));
     //             skinIdToOwner[i] = account1;
     //             numSkinOfAccounts[account1] += 1;
@@ -169,7 +169,7 @@ contract SkinBase is Manager {
     //         isOnSale[i] = false;
     //         nextSkinId += 1;
     //     }
-    // } 
+    // }
 
     // Get the i-th skin an account owns, for off-chain usage only
     function skinOfAccountById(address account, uint256 id) external view returns (uint256) {
@@ -183,7 +183,7 @@ contract SkinBase is Manager {
                if (count == id) {
                    // This is the id-th skin of current account, a.k.a, what we need
                     return i;
-               } 
+               }
                count++;
            }
         }
@@ -201,15 +201,15 @@ contract SkinBase is Manager {
     function withdrawETH() external onlyCAO {
         cfo.transfer(this.balance);
     }
-    
+
     function transferP2P(uint256 id, address targetAccount) whenTransferAllowed public {
         require(skinIdToOwner[id] == msg.sender);
         require(msg.sender != targetAccount);
         skinIdToOwner[id] = targetAccount;
-        
+
         numSkinOfAccounts[msg.sender] -= 1;
         numSkinOfAccounts[targetAccount] += 1;
-        
+
         // emit event
         SkinTransfer(msg.sender, targetAccount, id);
     }
@@ -246,7 +246,7 @@ contract SkinMix is SkinBase {
     event AutoMix(address account, uint256 skinAId, uint256 skinBId, uint64 cooldownEndTime);
     event MixSuccess(address account, uint256 skinId, uint256 skinAId, uint256 skinBId);
 
-    // Set mix formula contract address 
+    // Set mix formula contract address
     function setMixFormulaAddress(address mixFormulaAddress) external onlyCOO {
         mixFormula = MixFormulaInterface(mixFormulaAddress);
     }
@@ -297,7 +297,7 @@ contract SkinMix is SkinBase {
         return (isOnSale[skinId] == false);
     }
 
-    // mix  
+    // mix
     function mix(uint256 skinAId, uint256 skinBId) public whenNotPaused {
 
         // Check whether skins are valid
@@ -379,7 +379,7 @@ contract SkinMarket is SkinMix {
     // Values 0-10,000 map to 0%-100%
     uint128 public trCut = 400;
 
-    // Sale orders list 
+    // Sale orders list
     mapping (uint256 => uint256) public desiredPrice;
 
     // events
@@ -398,13 +398,13 @@ contract SkinMarket is SkinMix {
         // Only owner of skin pass
         require(skinIdToOwner[skinId] == msg.sender);
 
-        // Check whether skin is mixing 
+        // Check whether skin is mixing
         require(skins[skinId].mixingWithId == 0);
 
         // Check whether skin is already on sale
         require(isOnSale[skinId] == false);
 
-        require(price > 0); 
+        require(price > 0);
 
         // Put on sale
         desiredPrice[skinId] = price;
@@ -413,12 +413,12 @@ contract SkinMarket is SkinMix {
         // Emit the Approval event
         PutOnSale(msg.sender, skinId);
     }
-  
+
     // Withdraw an sale order
     function withdrawSale(uint256 skinId) external whenNotPaused {
         // Check whether this skin is on sale
         require(isOnSale[skinId] == true);
-        
+
         // Can only withdraw self's sale
         require(skinIdToOwner[skinId] == msg.sender);
 
@@ -429,7 +429,7 @@ contract SkinMarket is SkinMix {
         // Emit the cancel event
         WithdrawSale(msg.sender, skinId);
     }
- 
+
     // Buy skin in market
     function buyInMarket(uint256 skinId) external payable whenNotPaused {
         // Check whether this skin is on sale
@@ -497,7 +497,7 @@ contract SkinMinting is SkinMarket {
                                      50,
                                      100,
                                      200];
-    
+
     uint256[6] public payMultiple = [10,
                                      12,
                                      15,
@@ -512,7 +512,7 @@ contract SkinMinting is SkinMarket {
 
     // functions
 
-    // Set price 
+    // Set price
     function setBaseSummonPrice(uint256 newPrice) external onlyCOO {
         baseSummonPrice = newPrice;
     }
@@ -547,7 +547,7 @@ contract SkinMinting is SkinMarket {
         putOnSale(nextSkinId, salePrice);
 
         nextSkinId++;
-        numSkinOfAccounts[coo] += 1;   
+        numSkinOfAccounts[coo] += 1;
         skinCreatedNum += 1;
     }
 
@@ -562,31 +562,31 @@ contract SkinMinting is SkinMarket {
         CreateNewSkin(nextSkinId, donee);
 
         nextSkinId++;
-        numSkinOfAccounts[donee] += 1;   
+        numSkinOfAccounts[donee] += 1;
         skinCreatedNum += 1;
     }
 
-    // 
+    //
     function moveData(uint128[] legacyAppearance, address[] legacyOwner, bool[] legacyIsOnSale, uint256[] legacyDesiredPrice) external onlyCOO {
         Skin memory newSkin = Skin({appearance: 0, cooldownEndTime: 0, mixingWithId: 0});
         for (uint256 i = 0; i < legacyOwner.length; i++) {
             newSkin.appearance = legacyAppearance[i];
             newSkin.cooldownEndTime = uint64(now);
             newSkin.mixingWithId = 0;
-            
+
             skins[nextSkinId] = newSkin;
             skinIdToOwner[nextSkinId] = legacyOwner[i];
             isOnSale[nextSkinId] = legacyIsOnSale[i];
             desiredPrice[nextSkinId] = legacyDesiredPrice[i];
-    
+
             // Emit the create event
             CreateNewSkin(nextSkinId, legacyOwner[i]);
-    
+
             nextSkinId++;
             numSkinOfAccounts[legacyOwner[i]] += 1;
             if (numSkinOfAccounts[legacyOwner[i]] > freeBleachNum[legacyOwner[i]]*10 || freeBleachNum[legacyOwner[i]] == 0) {
                 freeBleachNum[legacyOwner[i]] += 1;
-            }   
+            }
             skinCreatedNum += 1;
         }
     }
@@ -622,10 +622,10 @@ contract SkinMinting is SkinMarket {
 
         nextSkinId++;
         numSkinOfAccounts[msg.sender] += 1;
-        
+
         accountToSummonNum[msg.sender] += 1;
-        
-        // Handle the paylevel        
+
+        // Handle the paylevel
         if (payLevel < 5) {
             if (accountToSummonNum[msg.sender] >= levelSplits[payLevel]) {
                 accountToPayLevel[msg.sender] = payLevel + 1;
@@ -663,7 +663,7 @@ contract SkinMinting is SkinMarket {
             // Emit the create event
             CreateNewSkin(nextSkinId, msg.sender);
             nextSkinId++;
-        }  
+        }
 
         // Give additional skin
         randomAppearance = mixFormula.summon10SkinAppearance(nextSkinId);
@@ -677,8 +677,8 @@ contract SkinMinting is SkinMarket {
 
         numSkinOfAccounts[msg.sender] += 11;
         accountToSummonNum[msg.sender] += 10;
-        
-        // Handle the paylevel        
+
+        // Handle the paylevel
         if (payLevel < 5) {
             if (accountToSummonNum[msg.sender] >= levelSplits[payLevel]) {
                 accountToPayLevel[msg.sender] = payLevel + 1;
@@ -729,10 +729,10 @@ contract SkinMinting is SkinMarket {
         require(accountToBleachNum[msg.sender] < bleachDailyLimit);
         accountToBleachNum[msg.sender] += 1;
 
-        // Check whether msg.sender is owner of the skin 
+        // Check whether msg.sender is owner of the skin
         require(msg.sender == skinIdToOwner[skinId]);
 
-        // Check whether this skin is on sale 
+        // Check whether this skin is on sale
         require(isOnSale[skinId] == false);
 
         uint256 bleachNum = 0;
@@ -749,9 +749,9 @@ contract SkinMinting is SkinMarket {
         require(msg.value >= bleachNum * bleachPrice);
 
         Skin storage originSkin = skins[skinId];
-        // Check whether this skin is in mixing 
+        // Check whether this skin is in mixing
         require(originSkin.mixingWithId == 0);
-        
+
         uint128 newAppearance = mixFormula.bleachAppearance(originSkin.appearance, attributes);
         originSkin.appearance = newAppearance;
 
@@ -766,4 +766,15 @@ contract SkinMinting is SkinMarket {
             levelClearTime = nextDay;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,27 +2,27 @@ pragma solidity ^0.4.24;
 
 /**
 *     https://doubledivs.cash/
-*      _______   ______    __    __  .______    __       _______ 
+*      _______   ______    __    __  .______    __       _______
 *     |       \ /  __  \  |  |  |  | |   _  \  |  |     |   ____|
-*     |  .--.  |  |  |  | |  |  |  | |  |_)  | |  |     |  |__   
-*     |  |  |  |  |  |  | |  |  |  | |   _  <  |  |     |   __|  
-*     |  '--'  |  `--'  | |  `--'  | |  |_)  | |  `----.|  |____ 
+*     |  .--.  |  |  |  | |  |  |  | |  |_)  | |  |     |  |__
+*     |  |  |  |  |  |  | |  |  |  | |   _  <  |  |     |   __|
+*     |  '--'  |  `--'  | |  `--'  | |  |_)  | |  `----.|  |____
 *     |_______/ \______/   \______/  |______/  |_______||_______|
-*                                                                
-*      _______   __  ____    ____   _______.                     
-*     |       \ |  | \   \  /   /  /       |                     
-*     |  .--.  ||  |  \   \/   /  |   (----`                     
-*     |  |  |  ||  |   \      /    \   \                         
-*     |  '--'  ||  |    \    / .----)   |                        
-*     |_______/ |__|     \__/  |_______/                         
-*                                                     
+*
+*      _______   __  ____    ____   _______.
+*     |       \ |  | \   \  /   /  /       |
+*     |  .--.  ||  |  \   \/   /  |   (----`
+*     |  |  |  ||  |   \      /    \   \
+*     |  '--'  ||  |    \    / .----)   |
+*     |_______/ |__|     \__/  |_______/
+*
 *     DOUBLEDIVS 50% DIVIDENDS. FOREVER.
-*     
+*
 *     https://doubledivs.cash/
 *     https://doubledivs.cash/
 */
 contract DOUBLEDIVS{
-    
+
     using SafeMath for uint256;
 
     mapping(address => uint256) investments;
@@ -41,11 +41,11 @@ contract DOUBLEDIVS{
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
-     * @dev Сonstructor Sets the original roles of the contract 
+     * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor(address _bountyManager) public {
         owner = msg.sender;
         ownerWallet = msg.sender;
@@ -55,7 +55,7 @@ contract DOUBLEDIVS{
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -125,7 +125,7 @@ contract DOUBLEDIVS{
             return false;
         }
     }
-    
+
     /**
     * @dev Bounty reward
     */
@@ -175,7 +175,7 @@ contract DOUBLEDIVS{
         return referrer[_hunter];
     }
 
-    
+
 }
 
 /**
@@ -209,4 +209,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

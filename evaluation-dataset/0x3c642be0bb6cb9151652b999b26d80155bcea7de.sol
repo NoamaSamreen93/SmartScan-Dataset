@@ -287,7 +287,7 @@ contract ERC165 is IERC165 {
 pragma solidity 0.5.0;
 
 
- 
+
 
 
 
@@ -837,7 +837,7 @@ contract NametagToken  is ERC721Enumerable, IERC721Metadata {
   function claimToken( address to,  string memory name  ) public  returns (bool)
   {
     require(containsOnlyLower(name));
- 
+
     uint256 tokenId = (uint256) (keccak256(abi.encodePacked(name)));
 
     require( reservedTokenId[tokenId] == address(0x0) || reservedTokenId[tokenId] == to  );
@@ -990,4 +990,17 @@ contract NametagToken  is ERC721Enumerable, IERC721Metadata {
   }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

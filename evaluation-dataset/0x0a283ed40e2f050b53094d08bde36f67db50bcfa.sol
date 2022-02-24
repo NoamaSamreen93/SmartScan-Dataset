@@ -46,7 +46,7 @@ contract FreeCoin is ERC20Interface {
     function balanceOf(address _address) constant returns (uint256) {
         return getBalance(_address);
     }
-    
+
     function transfer(address _to, uint256 _amount) public returns (bool success) {
         initialize(msg.sender);
 
@@ -92,7 +92,7 @@ contract FreeCoin is ERC20Interface {
             return false;
         }
     }
-    
+
     function approve(address _spender, uint256 _amount) public returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
@@ -120,4 +120,15 @@ contract FreeCoin is ERC20Interface {
             return balances[_address];
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

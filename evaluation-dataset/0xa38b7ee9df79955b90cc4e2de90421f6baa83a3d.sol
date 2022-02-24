@@ -28,7 +28,7 @@ contract TokenERC20 {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-	
+
     constructor (
         uint256 initialSupply,
         string memory tokenName,
@@ -61,7 +61,7 @@ contract TokenERC20 {
         _transfer(_from, _to, _value);
         return true;
     }
-	
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -104,4 +104,13 @@ contract MCToken is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

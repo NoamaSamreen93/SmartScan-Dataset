@@ -89,7 +89,7 @@ contract Managed {
 
 	constructor(
 		address roleManagerAddr,
-		address opt, 
+		address opt,
 		uint optCoolDown
 	) public {
 		roleManagerAddress = roleManagerAddr;
@@ -98,9 +98,9 @@ contract Managed {
 		operationCoolDown = optCoolDown;
 	}
 
-	function updateRoleManager(address newManagerAddr) 
-		inUpdateWindow() 
-		public 
+	function updateRoleManager(address newManagerAddr)
+		inUpdateWindow()
+		public
 	returns (bool) {
 		require(roleManager.passedContract(newManagerAddr));
 		roleManagerAddress = newManagerAddr;
@@ -110,10 +110,10 @@ contract Managed {
 		return true;
 	}
 
-	function updateOperator() public inUpdateWindow() returns (bool) {	
-		address updater = msg.sender;	
+	function updateOperator() public inUpdateWindow() returns (bool) {
+		address updater = msg.sender;
 		operator = roleManager.provideAddress(updater, 0);
-		emit UpdateOperator(updater, operator);	
+		emit UpdateOperator(updater, operator);
 		return true;
 	}
 
@@ -172,7 +172,7 @@ contract Custodian is Managed {
 	uint maturityInSecond; // set to 0 for perpetuals
 	uint preResetWaitingBlocks;
 	uint priceFetchCoolDown;
-	
+
 	// cycle state variables
 	uint lastPreResetBlockNo = 0;
 	uint nextResetAddrIndex;
@@ -226,14 +226,14 @@ contract Custodian is Managed {
 		address payable fc,
 		uint comm,
 		uint pd,
-		uint preResetWaitBlk, 
+		uint preResetWaitBlk,
 		uint pxFetchCoolDown,
 		address opt,
 		uint optCoolDown,
 		uint minimumBalance
-		) 
+		)
 		public
-		Managed(roleManagerAddr, opt, optCoolDown) 
+		Managed(roleManagerAddr, opt, optCoolDown)
 	{
 		contractCode = code;
 		maturityInSecond = maturity;
@@ -270,10 +270,10 @@ contract Custodian is Managed {
 	/// @param from  from address
 	/// @param to   to address
 	/// @param tokens num of tokens transferred
-	function transferInternal(uint index, address from, address to, uint tokens) 
-		internal 
+	function transferInternal(uint index, address from, address to, uint tokens)
+		internal
 		inState(State.Trading)
-		returns (bool success) 
+		returns (bool success)
 	{
 		// Prevent transfer to 0x0 address. Use burn() instead
 		require(to != address(0));
@@ -286,7 +286,7 @@ contract Custodian is Managed {
 		balanceOf[index][from] = balanceOf[index][from].sub(tokens);
 		// Add the same to the recipient
 		balanceOf[index][to] = balanceOf[index][to].add(tokens);
-	
+
 		// Asserts are used to use static analysis to find bugs in your code. They should never fail
 		assert(balanceOf[index][from].add(balanceOf[index][to]) == previousBalances);
 		emit Transfer(from, to, tokens, index);
@@ -296,24 +296,24 @@ contract Custodian is Managed {
 	}
 
 	function determineAddress(uint index, address from) internal view returns (address) {
-		return index == 0 && msg.sender == aTokenAddress || 
-			index == 1 && msg.sender == bTokenAddress 
+		return index == 0 && msg.sender == aTokenAddress ||
+			index == 1 && msg.sender == bTokenAddress
 			? from : msg.sender;
 	}
 
 	function transfer(uint index, address from, address to, uint tokens)
 		public
 		inState(State.Trading)
-		returns (bool success) 
+		returns (bool success)
 	{
 		require(index == 0 || index == 1);
 		return transferInternal(index, determineAddress(index, from), to, tokens);
 	}
 
-	function transferFrom(uint index, address spender, address from, address to, uint tokens) 
-		public 
+	function transferFrom(uint index, address spender, address from, address to, uint tokens)
+		public
 		inState(State.Trading)
-		returns (bool success) 
+		returns (bool success)
 	{
 		require(index == 0 || index == 1);
 		address spenderToUse = determineAddress(index, spender);
@@ -322,9 +322,9 @@ contract Custodian is Managed {
 		return transferInternal(index, from, to, tokens);
 	}
 
-	function approve(uint index, address sender, address spender, uint tokens) 
-		public 
-		returns (bool success) 
+	function approve(uint index, address sender, address spender, uint tokens)
+		public
+		returns (bool success)
 	{
 		require(index == 0 || index == 1);
 		address senderToUse = determineAddress(index, sender);
@@ -350,7 +350,7 @@ contract Custodian is Managed {
 				}
 				delete users[lastIdx - 1];
 				existingUsers[user] = 0;
-				users.length--;					
+				users.length--;
 			}
 		} else if (balanceA >= minBalance || balanceB >= minBalance) {
 			users.push(user);
@@ -362,11 +362,11 @@ contract Custodian is Managed {
 	/*
      * Operation Functions
      */
-	function collectFee(uint amountInWei) 
-		public 
-		only(feeCollector) 
-		inState(State.Trading) 
-		returns (bool success) 
+	function collectFee(uint amountInWei)
+		public
+		only(feeCollector)
+		inState(State.Trading)
+		returns (bool success)
 	{
 		uint feeBalance = feeBalanceInWei().sub(amountInWei);
 		feeCollector.transfer(amountInWei);
@@ -374,10 +374,10 @@ contract Custodian is Managed {
 		return true;
 	}
 
-	function updateOracle(address newOracleAddr) 
+	function updateOracle(address newOracleAddr)
 		only(roleManager.moderator())
-		inUpdateWindow() 
-		public 
+		inUpdateWindow()
+		public
 	returns (bool) {
 		require(roleManager.passedContract(newOracleAddr));
 		oracleAddress = newOracleAddr;
@@ -388,9 +388,9 @@ contract Custodian is Managed {
 		return true;
 	}
 
-	function updateFeeCollector() 
-		public 
-		inUpdateWindow() 
+	function updateFeeCollector()
+		public
+		inUpdateWindow()
 	returns (bool) {
 		address updater = msg.sender;
 		feeCollector = roleManager.provideAddress(updater, 0);
@@ -408,11 +408,11 @@ contract DualClassCustodian is Custodian {
 
 	uint alphaInBP;
 	uint betaInWei;
-	uint limitUpperInWei; 
+	uint limitUpperInWei;
 	uint limitLowerInWei;
 	uint iterationGasThreshold;
-	uint periodCouponInWei; 
-	uint limitPeriodicInWei; 
+	uint periodCouponInWei;
+	uint limitPeriodicInWei;
 
 	// reset intermediate values
 	uint newAFromAPerA;
@@ -434,7 +434,7 @@ contract DualClassCustodian is Custodian {
 	event SetValue(uint index, uint oldValue, uint newValue);
 
 	function() external payable {}
-	
+
 	/*
      * Constructor
      */
@@ -455,16 +455,16 @@ contract DualClassCustodian is Custodian {
 		uint iteGasTh,
 		uint preResetWaitBlk,
 		uint minimumBalance
-		) 
-		public 
-		Custodian ( 
+		)
+		public
+		Custodian (
 		code,
 		maturity,
 		roleManagerAddr,
 		fc,
 		comm,
 		pd,
-		preResetWaitBlk, 
+		preResetWaitBlk,
 		pxFetchCoolDown,
 		msg.sender,
 		optCoolDown,
@@ -475,7 +475,7 @@ contract DualClassCustodian is Custodian {
 		betaInWei = WEI_DENOMINATOR;
 		periodCouponInWei = r;
 		limitPeriodicInWei = hp;
-		limitUpperInWei = hu; 
+		limitUpperInWei = hu;
 		limitLowerInWei = hd;
 		iterationGasThreshold = iteGasTh; // 65000;
 	}
@@ -492,12 +492,12 @@ contract DualClassCustodian is Custodian {
 		address aAddr,
 		address bAddr,
 		address oracleAddr
-		) 
-		public 
-		inState(State.Inception) 
+		)
+		public
+		inState(State.Inception)
 		only(operator)
-		returns (bool success) 
-	{	
+		returns (bool success)
+	{
 		aTokenAddress = aAddr;
 		aToken = ICustodianToken(aTokenAddress);
 		bTokenAddress = bAddr;
@@ -518,12 +518,12 @@ contract DualClassCustodian is Custodian {
 	}
 
 	/// @dev create with ETH
-	function create() 
-		public 
-		payable 
-		inState(State.Trading) 
-		returns (bool) 
-	{	
+	function create()
+		public
+		payable
+		inState(State.Trading)
+		returns (bool)
+	{
 		return createInternal(msg.sender, msg.value);
 	}
 
@@ -531,9 +531,9 @@ contract DualClassCustodian is Custodian {
 	///	@param amount amount of WETH to create
 	///	@param wethAddr wrapEth contract address
 	function createWithWETH(uint amount, address wethAddr)
-		public 
-		inState(State.Trading) 
-		returns (bool success) 
+		public
+		inState(State.Trading)
+		returns (bool success)
 	{
 		require(amount > 0 && wethAddr != address(0));
 		IWETH wethToken = IWETH(wethAddr);
@@ -547,8 +547,8 @@ contract DualClassCustodian is Custodian {
 		return createInternal(msg.sender, amount);
 	}
 
-	function createInternal(address sender, uint ethAmtInWei) 
-		internal 
+	function createInternal(address sender, uint ethAmtInWei)
+		internal
 		returns(bool)
 	{
 		require(ethAmtInWei > 0);
@@ -574,10 +574,10 @@ contract DualClassCustodian is Custodian {
 		totalSupplyB = totalSupplyB.add(tokenValueB);
 
 		emit Create(
-			sender, 
-			ethAmtInWei, 
-			tokenValueA, 
-			tokenValueB, 
+			sender,
+			ethAmtInWei,
+			tokenValueA,
+			tokenValueB,
 			feeInWei
 			);
 		emit TotalSupply(totalSupplyA, totalSupplyB);
@@ -587,10 +587,10 @@ contract DualClassCustodian is Custodian {
 
 	}
 
-	function redeem(uint amtInWeiA, uint amtInWeiB) 
-		public 
-		inState(State.Trading) 
-		returns (bool success) 
+	function redeem(uint amtInWeiA, uint amtInWeiB)
+		public
+		inState(State.Trading)
+		returns (bool success)
 	{
 		uint adjAmtInWeiA = amtInWeiA.mul(BP_DENOMINATOR).div(alphaInBP);
 		uint deductAmtInWeiB = adjAmtInWeiA < amtInWeiB ? adjAmtInWeiA : amtInWeiB;
@@ -620,12 +620,12 @@ contract DualClassCustodian is Custodian {
 	}
 
 	function redeemInternal(
-		address payable sender, 
-		uint ethAmtInWei, 
-		uint deductAmtInWeiA, 
-		uint deductAmtInWeiB) 
-		internal 
-		returns(bool) 
+		address payable sender,
+		uint ethAmtInWei,
+		uint deductAmtInWeiA,
+		uint deductAmtInWeiB)
+		internal
+		returns(bool)
 	{
 		require(ethAmtInWei > 0);
 		ethCollateralInWei = ethCollateralInWei.sub(ethAmtInWei);
@@ -639,10 +639,10 @@ contract DualClassCustodian is Custodian {
 		totalSupplyB = totalSupplyB.sub(deductAmtInWeiB);
 		sender.transfer(ethAmtInWei);
 		emit Redeem(
-			sender, 
-			ethAmtInWei, 
-			deductAmtInWeiA, 
-			deductAmtInWeiB, 
+			sender,
+			ethAmtInWei,
+			deductAmtInWeiA,
+			deductAmtInWeiB,
 			feeInWei
 		);
 		emit TotalSupply(totalSupplyA, totalSupplyB);
@@ -652,13 +652,13 @@ contract DualClassCustodian is Custodian {
 	}
 
 	function deductFee(
-		uint ethAmtInWei, 
+		uint ethAmtInWei,
 		uint commInBP
-	) 
+	)
 		internal pure
 		returns (
-			uint ethAmtAfterFeeInWei, 
-			uint feeInWei) 
+			uint ethAmtAfterFeeInWei,
+			uint feeInWei)
 	{
 		require(ethAmtInWei > 0);
 		feeInWei = ethAmtInWei.mul(commInBP).div(BP_DENOMINATOR);
@@ -723,9 +723,9 @@ contract DualClassCustodian is Custodian {
 			uint(resetState),
 			alphaInBP,
 			betaInWei,
-			periodCouponInWei, 
-			limitPeriodicInWei, 
-			limitUpperInWei, 
+			periodCouponInWei,
+			limitPeriodicInWei,
+			limitUpperInWei,
 			limitLowerInWei,
 			iterationGasThreshold
 		];
@@ -765,9 +765,9 @@ contract Mozart is DualClassCustodian {
 		uint iteGasTh,
 		uint preResetWaitBlk,
 		uint minimumBalance
-		) 
-		public 
-		DualClassCustodian ( 
+		)
+		public
+		DualClassCustodian (
 			code,
 			maturity,
 			roleManagerAddr,
@@ -797,8 +797,8 @@ contract Mozart is DualClassCustodian {
 		lastPriceInWei = priceInWei;
 		lastPriceTimeInSecond = timeInSecond;
 		(navAInWei, navBInWei) = calculateNav(
-			priceInWei, 
-			resetPriceInWei 
+			priceInWei,
+			resetPriceInWei
 			);
 		if (maturityInSecond > 0 && timeInSecond > maturityInSecond) {
 			state = State.Matured;
@@ -807,26 +807,26 @@ contract Mozart is DualClassCustodian {
 			state = State.PreReset;
 			lastPreResetBlockNo = block.number;
 			emit StartPreReset();
-		} 
+		}
 		emit AcceptPrice(priceInWei, timeInSecond, navAInWei, navBInWei);
 		return true;
 	}
-	
+
 	function calculateNav(
-		uint priceInWei, 
+		uint priceInWei,
 		uint rstPriceInWei
-		) 
-		internal 
-		view 
-		returns (uint, uint) 
+		)
+		internal
+		view
+		returns (uint, uint)
 	{
 		uint navEthInWei = priceInWei.mul(WEI_DENOMINATOR).div(rstPriceInWei);
-		
+
 		uint navParentInWei = navEthInWei
 			.mul(alphaInBP
 				.add(BP_DENOMINATOR))
 			.div(BP_DENOMINATOR);
-		
+
 		if(navEthInWei >= WEI_DENOMINATOR.mul(2)) {
 			return (0, navParentInWei);
 		}
@@ -877,11 +877,11 @@ contract Mozart is DualClassCustodian {
 				newAFromAPerA = newBFromAPerA.mul(alphaInBP).div(BP_DENOMINATOR);
 				totalSupplyB = totalSupplyB.mul(navBInWei).div(WEI_DENOMINATOR).add(totalSupplyA.mul(newBFromAPerA).div(WEI_DENOMINATOR));
 				totalSupplyA = totalSupplyA.mul(navBInWei).div(WEI_DENOMINATOR).add(totalSupplyA.mul(newAFromAPerA).div(WEI_DENOMINATOR));
-			} 
+			}
 
 			emit TotalSupply(totalSupplyA, totalSupplyB);
 			emit StartReset(nextResetAddrIndex, users.length);
-		} else 
+		} else
 			emit StartPreReset();
 
 		return true;
@@ -920,7 +920,7 @@ contract Mozart is DualClassCustodian {
 		}
 
 		if (localResetAddrIndex >= users.length) {
-			
+
 			resetPriceInWei = lastPriceInWei;
 			resetPriceTimeInSecond = lastPriceTimeInSecond;
 			navAInWei = WEI_DENOMINATOR;
@@ -937,4 +937,10 @@ contract Mozart is DualClassCustodian {
 		}
 	}
 	// end of reset function
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

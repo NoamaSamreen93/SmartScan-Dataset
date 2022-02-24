@@ -12,7 +12,7 @@ contract PoriniDoGoodToken {
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -22,7 +22,7 @@ contract PoriniDoGoodToken {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function PoriniDoGoodToken() public {
-        
+
         totalSupply = initSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
@@ -73,4 +73,15 @@ contract PoriniDoGoodToken {
         _transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

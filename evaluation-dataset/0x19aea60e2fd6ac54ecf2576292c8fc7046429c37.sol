@@ -127,7 +127,7 @@ contract UHubToken is StdToken
     uint public constant TOTAL_SUPPLY = 1156789000 * (1 ether / 1 wei); //1B156M789K
     // this includes DEVELOPERS_BONUS
     uint public constant DEVELOPERS_BONUS = 476787800 * (1 ether / 1 wei); //476M787K
-	
+
 	// 100M1k2 tokens sold during presale
     uint public constant PRESALE_PRICE = 5200;  // per 1 Ether
     uint public constant PRESALE_MAX_ETH = 19231;
@@ -171,20 +171,20 @@ contract UHubToken is StdToken
 /// Modifiers:
     modifier onlyTokenManager()
     {
-        require(msg.sender==tokenManager); 
-        _; 
+        require(msg.sender==tokenManager);
+        _;
     }
-    
+
     modifier onlyTokenCrowner()
     {
-        require(msg.sender==escrow); 
-        _; 
+        require(msg.sender==escrow);
+        _;
     }
 
     modifier onlyInState(State state)
     {
-        require(state==currentState); 
-        _; 
+        require(state==currentState);
+        _;
     }
 
 /// Events:
@@ -194,7 +194,7 @@ contract UHubToken is StdToken
 /// Functions:
     /// @dev Constructor
     /// @param _tokenManager Token manager address.
-    function UHubToken(address _tokenManager, address _escrow, address _teamTokenBonus) 
+    function UHubToken(address _tokenManager, address _escrow, address _teamTokenBonus)
     {
         tokenManager = _tokenManager;
         teamTokenBonus = _teamTokenBonus;
@@ -204,7 +204,7 @@ contract UHubToken is StdToken
         uint teamBonus = DEVELOPERS_BONUS;
         balances[_teamTokenBonus] += teamBonus;
         supply+= teamBonus;
-        
+
         assert(PRESALE_TOKEN_SUPPLY_LIMIT==100001200 * (1 ether / 1 wei));
         assert(TOTAL_SOLD_TOKEN_SUPPLY_LIMIT==680001200 * (1 ether / 1 wei));
     }
@@ -260,7 +260,7 @@ contract UHubToken is StdToken
              if(icoSoldTokens<(200000000 * (1 ether / 1 wei))){
                   return ICO_PRICE1;
              }
-             
+
              if(icoSoldTokens<(300000000 * (1 ether / 1 wei))){
                   return ICO_PRICE2;
              }
@@ -275,19 +275,19 @@ contract UHubToken is StdToken
     {
         //setState() method call shouldn't be entertained after ICOFinished
         require(currentState != State.ICOFinished);
-        
+
         currentState = _nextState;
         // enable/disable transfers
         //enable transfers only after ICOFinished, disable otherwise
         //enableTransfers = (currentState==State.ICOFinished);
     }
-    
+
     function DisableTransfer() public onlyTokenManager
     {
         enableTransfers = false;
     }
-    
-    
+
+
     function EnableTransfer() public onlyTokenManager
     {
         enableTransfers = true;
@@ -295,7 +295,7 @@ contract UHubToken is StdToken
 
     function withdrawEther() public onlyTokenManager
     {
-        if(this.balance > 0) 
+        if(this.balance > 0)
         {
             require(escrow.send(this.balance));
         }
@@ -322,15 +322,26 @@ contract UHubToken is StdToken
     {
         tokenManager = _mgr;
     }
-    
+
     function ChangeCrowner(address _mgr) public onlyTokenCrowner
     {
         escrow = _mgr;
     }
 
     // Default fallback function
-    function() payable 
+    function() payable
     {
         buyTokens();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

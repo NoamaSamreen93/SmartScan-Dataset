@@ -1,11 +1,11 @@
 pragma solidity ^0.4.19;
- 
- 
- 
- 
- 
+
+
+
+
+
 contract Lottery7 {
-    
+
     address owner;
     address profit = 0xB7BB510B0746bdeE208dB6fB781bF5Be39d15A15;
     uint public tickets;
@@ -18,11 +18,11 @@ contract Lottery7 {
     address ticket3;
     address ticket4;
     address ticket5;
-    uint constant price = 0.1 ether; 
+    uint constant price = 0.1 ether;
     uint seed;
     bool entry = false;
-     
-    function Lottery7() public { 
+
+    function Lottery7() public {
         owner = msg.sender;
         tickets = 5;
         round = 1;
@@ -30,8 +30,8 @@ contract Lottery7 {
         entry = false;
         seed = 777;
     }
-     
-     
+
+
     function changeStatus(string w) public {
         if (msg.sender == owner) {
             status = w;
@@ -40,33 +40,33 @@ contract Lottery7 {
             revert();
         }
     }
-    
+
     function changeSeed(uint32 n) public {
         if (msg.sender == owner) {
             seed = uint(n);
-            seed = uint(block.blockhash(block.number-seed))%2000 + 1; 
+            seed = uint(block.blockhash(block.number-seed))%2000 + 1;
         }
         else {
             revert();
         }
     }
-     
-    function () public payable { 
+
+    function () public payable {
         buyTickets();
     }
-     
+
     function buyTickets() public payable {
-        if (entry == true) { 
+        if (entry == true) {
             revert();
         }
         entry = true;
-        
+
         if (msg.value != (price)) {
             entry = false;
-            if (keccak256(status) == keccak256("Shutdown")) { 
+            if (keccak256(status) == keccak256("Shutdown")) {
                 selfdestruct(owner);
             }
-            revert(); 
+            revert();
         }
         else {
             if (tickets == 5) {
@@ -76,7 +76,7 @@ contract Lottery7 {
             else if(tickets == 4) {
                 tickets -= 1;
                 ticket2 = msg.sender;
-                profit.transfer(price * 1/2); 
+                profit.transfer(price * 1/2);
             }
             else if(tickets == 3) {
                 tickets -= 1;
@@ -88,40 +88,51 @@ contract Lottery7 {
             }
             else if(tickets == 1) {
                 ticket5 = msg.sender;
-                
-                tickets = 5; 
-                round += 1; 
-                seed = uint(block.blockhash(block.number-seed))%2000 + 1; 
-                uint random_number = uint(block.blockhash(block.number-seed))%5 + 1; 
-                lastWiningTicketNumber = random_number; 
-    
-                uint pay = (price * 9/2); 
-                
+
+                tickets = 5;
+                round += 1;
+                seed = uint(block.blockhash(block.number-seed))%2000 + 1;
+                uint random_number = uint(block.blockhash(block.number-seed))%5 + 1;
+                lastWiningTicketNumber = random_number;
+
+                uint pay = (price * 9/2);
+
                 if (random_number == 1) {
                     ticket1.transfer(pay);
-                    lastWinner = ticket1; 
+                    lastWinner = ticket1;
                 }
                 else if(random_number == 2) {
                     ticket2.transfer(pay);
-                    lastWinner = ticket2; 
+                    lastWinner = ticket2;
                 }
                 else if(random_number == 3) {
                     ticket3.transfer(pay);
-                    lastWinner = ticket3; 
+                    lastWinner = ticket3;
                 }
                 else if(random_number == 4) {
                     ticket4.transfer(pay);
-                    lastWinner = ticket4; 
+                    lastWinner = ticket4;
                 }
                 else if(random_number == 5) {
                     ticket5.transfer(pay);
-                    lastWinner = ticket5; 
+                    lastWinner = ticket5;
                 }
             }
         }
 
         entry = false;
     }
-     
-     
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

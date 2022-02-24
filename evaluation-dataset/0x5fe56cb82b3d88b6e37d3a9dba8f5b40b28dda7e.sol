@@ -35,30 +35,30 @@ contract OwnedInterface {
 }
 
 contract Owned is OwnedInterface {
-    
+
     address private contractOwner;
-  
+
     event LogOwnerChanged(
-        address oldOwner, 
+        address oldOwner,
         address newOwner);
 
     modifier onlyOwner {
         require(msg.sender == contractOwner);
         _;
-    } 
-   
+    }
+
     function Owned() public {
         contractOwner = msg.sender;
     }
-    
+
     function getOwner() public view returns(address owner) {
         return contractOwner;
     }
-  
-    function changeOwner(address newOwner) 
-        public 
-        onlyOwner 
-        returns(bool success) 
+
+    function changeOwner(address newOwner)
+        public
+        onlyOwner
+        returns(bool success)
     {
         require(newOwner != 0);
         LogOwnerChanged(contractOwner, newOwner);
@@ -67,13 +67,13 @@ contract Owned is OwnedInterface {
     }
 }
 
-contract TimeLimitedStoppableInterface is OwnedInterface 
+contract TimeLimitedStoppableInterface is OwnedInterface
 {
   function isRunning() public view returns(bool contractRunning);
   function setRunSwitch(bool) public returns(bool onOff);
 }
 
-contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned 
+contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned
 {
   bool private running;
   uint private finalBlock;
@@ -83,7 +83,7 @@ contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned
     require(running);
     _;
   }
-  
+
   event LogSetRunSwitch(address sender, bool isRunning);
   event LogSetFinalBlock(address sender, uint lastBlock);
 
@@ -94,10 +94,10 @@ contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned
     LogSetFinalBlock(msg.sender, finalBlock);
   }
 
-  function isRunning() 
+  function isRunning()
     public
-    view 
-    returns(bool contractRunning) 
+    view
+    returns(bool contractRunning)
   {
     return running && now <= finalBlock;
   }
@@ -106,7 +106,7 @@ contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned
     return finalBlock;
   }
 
-  function setRunSwitch(bool onOff) 
+  function setRunSwitch(bool onOff)
     public
     onlyOwner
     returns(bool success)
@@ -116,10 +116,10 @@ contract TimeLimitedStoppable is TimeLimitedStoppableInterface, Owned
     return true;
   }
 
-  function SetFinalBlock(uint lastBlock) 
-    public 
-    onlyOwner 
-    returns(bool success) 
+  function SetFinalBlock(uint lastBlock)
+    public
+    onlyOwner
+    returns(bool success)
   {
     finalBlock = lastBlock;
     LogSetFinalBlock(msg.sender, finalBlock);
@@ -276,21 +276,21 @@ contract CMCT is CMCTInterface, StandardToken, CanReclaimToken {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-   
+
   function isCMCT() public pure returns(bool isIndeed) {
       return true;
   }
 }
 
 contract CmctSaleInterface is TimeLimitedStoppableInterface, CanReclaimToken {
-  
+
   struct FunderStruct {
     bool registered;
     bool approved;
   }
-  
+
   mapping(address => FunderStruct) public funderStructs;
-  
+
   function isUser(address user) public view returns(bool isIndeed);
   function isApproved(address user) public view returns(bool isIndeed);
   function registerSelf(bytes32 uid) public returns(bool success);
@@ -304,9 +304,9 @@ contract CmctSaleInterface is TimeLimitedStoppableInterface, CanReclaimToken {
 }
 
 contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
-  
+
   CMCTInterface cmctToken;
-  
+
   event LogSetTokenAddress(address sender, address cmctContract);
   event LogUserRegistered(address indexed sender, address indexed user, bytes32 indexed uid);
   event LogUserApproved(address indexed sender, address user, bytes32 indexed uid);
@@ -315,15 +315,15 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
   event LogCMCTRelayFailed(address indexed sender, address indexed receiver, uint amount, bytes32 indexed uid);
   event LogCMCTRelayed(address indexed sender, address indexed receiver, uint amount, bytes32 indexed uid);
   event LogEthReceived(address indexed sender, uint amount);
-  
+
   modifier onlyifInitialized {
       require(cmctToken.isCMCT());
       _;
   }
 
-  function 
-    CmctSale(address cmctContract) 
-    public 
+  function
+    CmctSale(address cmctContract)
+    public
   {
     require(cmctContract != 0);
     cmctToken = CMCTInterface(cmctContract);
@@ -361,7 +361,7 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
       require(!isUser(user));
       funderStructs[user].registered = true;
       LogUserRegistered(msg.sender, user, uid);
-      return true;      
+      return true;
   }
 
   function approveUser(address user, bytes32 uid) public onlyOwner onlyIfRunning returns(bool success) {
@@ -377,7 +377,7 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
       require(isApproved(user));
       funderStructs[user].approved = false;
       LogUserDisapproved(msg.sender, user, uid);
-      return true;      
+      return true;
   }
 
   function withdrawEth(uint amount, address to, bytes32 uid) public onlyOwner returns(bool success) {
@@ -396,7 +396,7 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
       return true;
     }
   }
- 
+
   function bulkRelayCMCT(address[] receivers, uint[] amounts, bytes32 uid) public onlyOwner onlyIfRunning onlyifInitialized returns(bool success) {
     for(uint i=0; i<receivers.length; i++) {
       if(!isApproved(receivers[i])) {
@@ -404,7 +404,7 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
       } else {
         LogCMCTRelayed(msg.sender, receivers[i], amounts[i], uid);
         require(cmctToken.transfer(receivers[i], amounts[i]));
-      } 
+      }
     }
     return true;
   }
@@ -413,4 +413,8 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
     require(isApproved(msg.sender));
     LogEthReceived(msg.sender, msg.value);
   }
+}
+function() payable external {
+	revert();
+}
 }

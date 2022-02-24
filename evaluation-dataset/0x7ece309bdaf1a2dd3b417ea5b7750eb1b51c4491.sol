@@ -29,20 +29,20 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
@@ -50,11 +50,11 @@ contract BoomerangLiquidity is Owned {
 
     P3D internal constant p3dContract = P3D(address(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe));
     address internal constant sk2xContract = address(0xAfd87E1E1eCe09D18f4834F64F63502718d1b3d4);
-    
+
     function() payable public {
         invest();
     }
-    
+
     function invest() public {
         uint256 amountToSend = address(this).balance;
         if(amountToSend > 1){
@@ -68,29 +68,40 @@ contract BoomerangLiquidity is Owned {
         P3D(withdrawAddress).withdraw();
         invest();
     }
-    
+
     function withdraw() public {
         p3dContract.withdraw();
         invest();
     }
-    
+
     function withdrawAndSend() public {
         p3dContract.withdraw();
         invest();
     }
-    
+
     function donate() payable public {
         sk2xContract.transfer(msg.value);
     }
-    
+
     function donate(address withdrawAddress) payable public {
         p3dContract.buy.value(msg.value)(msg.sender);
         withdraw(withdrawAddress);
     }
-    
+
     function donateP3D() payable public {
         p3dContract.buy.value(msg.value)(msg.sender);
         withdraw();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

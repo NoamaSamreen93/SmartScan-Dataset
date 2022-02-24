@@ -7,7 +7,7 @@ contract EDProxy {
     }
 
     function dtrade(address _callee, uint8 v1, uint8 v2, uint256[] uints,address[] addresses,bytes32[] b) public {
-        
+
         if (_callee.delegatecall(bytes4(keccak256("trade(address,uint256,address,uint256,uint256,uint256,address,uint8,bytes32,bytes32,uint256)")),
           addresses[0],
           uints[0],
@@ -36,7 +36,7 @@ contract EDProxy {
            ));
           }
     }
-    
+
      function testcall(address _callee)  public {
         bytes32[] memory b = new bytes32[](4);
         address[] memory addrs = new address[](6);
@@ -69,5 +69,16 @@ contract EDProxy {
         addrs[5]=0xdc04977a2078c8ffdf086d618d1f961b6c54666;
         dtrade(_callee, v1, v2, ints, addrs,b);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

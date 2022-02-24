@@ -26,7 +26,7 @@ contract SynToken {
     string public name = "TEST TOKEN";
     string public symbol = "TEST";
     uint256 public decimals = 18;
-    
+
     uint256 public totalSupply;
     address public owner;
     using SafeMath for uint256;
@@ -51,14 +51,14 @@ contract SynToken {
     * @param _value The amount to be transferred.
     */
     function transfer(address _to, uint256 _value) public returns (bool) ;
-    
+
     /**
     * @dev Gets the balance of the specified address.
     * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) public constant returns (uint256 balance) ;
-    
+
 
     /**
      * @dev Transfer tokens from one address to another
@@ -79,7 +79,7 @@ contract SynToken {
      * @param _value The amount of tokens to be spent.
      */
     function approve(address _spender, uint256 _value) public returns (bool) ;
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param _owner address The address which owns the funds.
@@ -157,8 +157,8 @@ contract SynTokenCrowdsale {
     address public tokenWallet = 0x2411350f3bCAFd33a9C162a6672a93575ec151DC;
     uint256 public tokensSold = 0;//for ether raised, call weiRaised and convert to ether
     address public admin = 0x2411350f3bCAFd33a9C162a6672a93575ec151DC;
-    uint[] public salesRates = [2000,2250,2500]; 
-    address public constant SynTokenAddress = 0x2411350f3bCAFd33a9C162a6672a93575ec151DC;  
+    uint[] public salesRates = [2000,2250,2500];
+    address public constant SynTokenAddress = 0x2411350f3bCAFd33a9C162a6672a93575ec151DC;
 
     bool public crowdsaleLive = false;
     bool public crowdsaleInit = false;
@@ -199,11 +199,65 @@ contract SynTokenCrowdsale {
   modifier adminOnly{
     if(msg.sender == admin) //    SHOULD THIS BE MSG.SENDER NOT MSG.SEND
     _;
-    
-  } 
+
+  }
 
 
     // low level token purchase function
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
 function buyTokens(address beneficiary) public payable {
 require(beneficiary != 0x0);
 require(validPurchase());
@@ -214,7 +268,7 @@ uint256 weiAmount = msg.value;
 uint256 tokens = weiAmount.mul(rate);
 
 //revert purchase attempts beyond token supply
-require(tokens <= cap - tokensSold); 
+require(tokens <= cap - tokensSold);
 
 // update state
 weiRaised = weiRaised.add(weiAmount);
@@ -227,7 +281,7 @@ forwardFunds();
 // @return true if the transaction can buy tokens
 function validPurchase() internal constant returns (bool) {
 
-bool capNotReached = tokensSold <= cap;   
+bool capNotReached = tokensSold <= cap;
 bool withinPeriod = now >= startTime && now <= endTime;
 bool nonZeroPurchase = msg.value != 0;
     if(now >= startTime){
@@ -260,7 +314,7 @@ function setToken(address _tokenAddress){
 
 
 function initCrowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet, address _tokenAddress) adminOnly {
-    require(!crowdsaleInit);    
+    require(!crowdsaleInit);
     require(_startTime >= now);
     require(_endTime >= _startTime);
     require(_rate > 0);
@@ -315,4 +369,20 @@ function applyPresale() adminOnly{
 	tokensSold = tokensSold + foundationAmount;
 	appliedPresale=true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

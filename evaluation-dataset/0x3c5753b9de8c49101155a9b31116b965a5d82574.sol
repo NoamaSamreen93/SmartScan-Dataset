@@ -1,23 +1,23 @@
 pragma solidity ^0.4.21;
 
 /*
-  
+
     ****************************************************************
     AVALANCHE BLOCKCHAIN GENESIS BLOCK COIN ALLOCATION SALE CONTRACT
     ****************************************************************
 
     The Genesis Block in the Avalanche will deploy with pre-filled addresses
     according to the results of this token sale.
-    
+
     The Avalanche tokens will be sent to the Ethereum address that buys them.
-    
+
     When the Avalanche blockchain deploys, all ethereum addresses that contains
     Avalanche tokens will be credited with the equivalent AVALANCHE ICE (XAI) in the Genesis Block.
 
     There will be no developer premine. There will be no private presale. This is it.
 
     @author CHRIS DCOSTA For Meek Inc 2018.
-    
+
     Reference Code by Hunter Long
     @repo https://github.com/hunterlong/ethereum-ico-contract
 
@@ -54,7 +54,7 @@ contract Sale {
     event Contribution(address from, uint256 amount);
 
     constructor(address _wallet) public {
-        startBlock = block.number; // imediate start 
+        startBlock = block.number; // imediate start
         maxMintable = 4045084999529091000000000000; // max sellable (18 decimals)
         ETHWallet = _wallet; // 0x696863b0099394384cd595468b8b6270ea77fC68
         isFunding = true;
@@ -118,10 +118,23 @@ contract Sale {
         creator = _creator;
     }
 
-    // change transfer ability for ERC20 token (toggle on/off) 
+    // change transfer ability for ERC20 token (toggle on/off)
     function changeTransferStats(bool _allowed) external {
         require(msg.sender==creator);
         Token.changeTransfer(_allowed);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

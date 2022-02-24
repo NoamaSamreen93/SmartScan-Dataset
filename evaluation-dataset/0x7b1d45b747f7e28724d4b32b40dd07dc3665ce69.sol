@@ -5,8 +5,8 @@
  * Interwave Global
  * www.iw-global.com
  **/
- 
- 
+
+
 pragma solidity ^0.4.18;
 
 /**
@@ -76,7 +76,7 @@ contract Crowdsale {
     // debug
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     //token.transfer(msg.sender, tokens);
-    token.transferFrom(tokenStockAddress, msg.sender, tokens); 
+    token.transferFrom(tokenStockAddress, msg.sender, tokens);
 
     forwardFunds();
   }
@@ -86,7 +86,7 @@ contract Crowdsale {
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
- 
+
   function setRate(uint newRate) external payable {
 	require(msg.sender == wallet);
 	rate = newRate;
@@ -100,7 +100,7 @@ contract Crowdsale {
   // Interwave Global
   // www.iw-global.com
   // ----------------------------------------------------------------------------------------------
- 
+
 pragma solidity ^0.4.18;
 
 contract owned {
@@ -289,10 +289,10 @@ contract TrueGoldCoinToken is owned, TokenERC20 {
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function TrueGoldCoinToken(
 
-    ) 
+    )
 
     TokenERC20(10000000, "TrueGoldCoin", "TGC") public {}
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -344,4 +344,10 @@ contract TrueGoldCoinToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -115,7 +115,7 @@ contract ERC20 is ERC20Basic {
 }
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
@@ -467,12 +467,12 @@ contract MyWishRateProvider is usingMyWishConsts, MyWishRateProviderI, Ownable {
     }
 }
 /**
- * @title Crowdsale 
+ * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  *
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract Crowdsale {
@@ -740,4 +740,15 @@ contract MyWishCrowdsale is usingMyWishConsts, FinalizableCrowdsale {
         MyWishToken(token).crowdsaleFinished();
         token.transferOwnership(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

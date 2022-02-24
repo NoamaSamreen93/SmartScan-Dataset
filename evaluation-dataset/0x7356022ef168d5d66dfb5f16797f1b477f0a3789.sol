@@ -14,7 +14,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyCFO() {
         require(msg.sender == cfoAddress);
         _;
@@ -25,7 +25,7 @@ contract Ownable {
             owner = newOwner;
         }
     }
-    
+
     function setCFO(address newCFO) external onlyOwner {
         require(newCFO != address(0));
 
@@ -80,12 +80,12 @@ contract JackpotInterface {
 contract AccessControl is Pausable {
     ParentInterface public parent;
     JackpotInterface public jackpot;
-    
+
     function setParentAddress(address _address) public whenPaused onlyOwner
     {
         parent = ParentInterface(_address);
     }
-    
+
     function setJackpotAddress(address _address) public whenPaused onlyOwner
     {
         jackpot = JackpotInterface(_address);
@@ -95,7 +95,7 @@ contract AccessControl is Pausable {
 // setting a special price
 contract Discount is AccessControl {
     uint128[101] public discount;
-    
+
     function setPrice(uint8 _tokenId, uint128 _price) external onlyOwner {
         discount[_tokenId] = _price;
     }
@@ -103,7 +103,7 @@ contract Discount is AccessControl {
 
 contract StoreLimit is AccessControl {
 	uint8 public saleLimit = 10;
-	
+
 	function setSaleLimit(uint8 _limit) external onlyOwner {
 		saleLimit = _limit;
 	}
@@ -115,36 +115,36 @@ contract Store is Discount, StoreLimit {
         parent = ParentInterface(_presaleAddr);
         paused = true;
     }
-    
+
 	// purchasing a parrot
     function purchaseParrot(uint256 _tokenId) external payable whenNotPaused
     {
 		require(_tokenId <= saleLimit);
-		
+
         uint64 birthTime; uint256 genes; uint64 breedTimeout; uint16 quality; address parrot_owner;
         (birthTime,  genes, breedTimeout, quality, parrot_owner) = parent.getPet(_tokenId);
-        
+
         require(parrot_owner == address(this));
-        
+
         if(discount[_tokenId] == 0)
             require(parent.recommendedPrice(quality) <= msg.value);
         else
             require(discount[_tokenId] <= msg.value);
-        
+
         parent.transfer(msg.sender, _tokenId);
-        
+
         if(!jackpot.finished()) {
             jackpot.addPlayer(msg.sender);
             address(jackpot).transfer(msg.value / 2);
         }
     }
-    
+
     function unpause() public onlyOwner whenPaused {
 		require(address(jackpot) != address(0));
 
         super.unpause();
     }
-    
+
     function gift(uint256 _tokenId, address to) external onlyOwner{
         parent.transfer(to, _tokenId);
     }
@@ -152,4 +152,20 @@ contract Store is Discount, StoreLimit {
     function withdrawBalance(uint256 summ) external onlyCFO {
         cfoAddress.transfer(summ);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

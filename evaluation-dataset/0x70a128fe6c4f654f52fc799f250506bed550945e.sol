@@ -24,7 +24,7 @@ contract ERC20Interface {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
-/** 
+/**
  * Contract function to receive approval and execute function in one call
  */
 contract ApproveAndCallFallBack {
@@ -118,7 +118,7 @@ contract CpublicGold is ERC20Interface, Owned, SafeMath {
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    /** 
+    /**
      * Token owner can approve for spender to transferFrom(...) tokens
      * from the token owner's account
      */
@@ -127,9 +127,9 @@ contract CpublicGold is ERC20Interface, Owned, SafeMath {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    /** 
+    /**
     * Transfer tokens from the from account to the to account
-    * 
+    *
     * - From account must have sufficient balance to transfer
     * - Spender must have sufficient allowance to transfer
     * - 0 value transfers are allowed
@@ -141,14 +141,14 @@ contract CpublicGold is ERC20Interface, Owned, SafeMath {
         emit Transfer(from, to, tokens);
         return true;
     }
-    /** 
+    /**
     * Returns the amount of tokens approved by the owner that can be
     * transferred to the spender's account
     */
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    /** 
+    /**
      * Token owner can approve for spender to transferFrom(...) tokens
      * from the token owner's account. The spender contract function
      * receiveApproval(...) is then executed
@@ -171,4 +171,20 @@ contract CpublicGold is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -114,7 +114,7 @@ contract PullPayment {
 	mapping(address => uint) public payments;
 	event LogRefundETH(address to, uint value);
 	/**
-	*  Store sent amount as credit to be pulled, called by payer 
+	*  Store sent amount as credit to be pulled, called by payer
 	**/
 	function asyncSend(address dest, uint amount) internal {
 		payments[dest] = payments[dest].add(amount);
@@ -167,16 +167,16 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-  
+
 	using SafeMath for uint;
 
 	mapping(address => uint) balances;
 
 	/*
-	* Fix for the ERC20 short address attack  
+	* Fix for the ERC20 short address attack
 	*/
 	modifier onlyPayloadSize(uint size) {
 	   if(msg.data.length < size + 4) {
@@ -226,9 +226,9 @@ contract StandardToken is BasicToken, ERC20 {
  *  ClusterToken presale contract.
  */
 contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
-	
+
   using SafeMath for uint;
-  
+
   struct Backer {
         address buyer;
         uint contribution;
@@ -236,7 +236,7 @@ contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
         uint withdrawnAtCluster;
         bool state;
     }
-    
+
     /**
      * Variables
     */
@@ -244,47 +244,47 @@ contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
     string public constant symbol = "CLRT";
     uint256 public constant decimals = 18;
     uint256 private buyPriceEth = 10000000000000000;
-    
+
     uint256 public initialBlockCount;
     uint256 private testBlockEnd;
     uint256 public contributors;
-    
+
     uint256 private minedBlocks;
     uint256 private ClusterCurrent;
     uint256 private SegmentCurrent;
     uint256 private UnitCurrent;
-  
-  
+
+
     mapping(address => Backer) public backers;
-    
-   
+
+
     /**
      * @dev Contract constructor
-     */ 
+     */
     function ClusterToken() {
     totalSupply = 750000000000000000000;
     balances[msg.sender] = totalSupply;
-    
+
     initialBlockCount = 4086356;
 
     contributors = 0;
     }
-    
-    
+
+
     /**
      * @return Returns the current amount of CLUSTERS
-     */ 
+     */
     function currentCluster() constant returns (uint256 currentCluster)
     {
     	uint blockCount = block.number - initialBlockCount;
     	uint result = blockCount.div(1000000);
     	return result;
     }
-    
-    
+
+
     /**
      * @return Returns the current amount of SEGMENTS
-     */ 
+     */
     function currentSegment() constant returns (uint256 currentSegment)
     {
     	uint blockCount = block.number - initialBlockCount;
@@ -293,24 +293,24 @@ contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
 
     	return result;
     }
-    
-    
+
+
     /**
      * @return Returns the current amount of UNITS
-     */ 
+     */
     function currentUnit() constant returns (uint256 currentUnit)
     {
     	uint blockCount = block.number - initialBlockCount;
     	uint getClusters = currentCluster().mul(1000000);
         uint newUnit = currentSegment().mul(1000);
-    	return blockCount.sub(getClusters).sub(newUnit);      
-    	
+    	return blockCount.sub(getClusters).sub(newUnit);
+
     }
-    
-    
+
+
     /**
      * @return Returns the current network block
-     */ 
+     */
     function currentBlock() constant returns (uint256 blockNumber)
     {
     	return block.number - initialBlockCount;
@@ -321,109 +321,109 @@ contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
     /**
      * @dev Allows users to buy CLUSTER and receive their tokens at once.
      * @return The amount of CLUSTER bought by sender.
-     */ 
+     */
     function buyClusterToken() payable returns (uint amount) {
-        
-        if (balances[this] < amount) throw;                          
+
+        if (balances[this] < amount) throw;
         amount = msg.value.mul(buyPriceEth).div(1 ether);
         balances[msg.sender] += amount;
         balances[this] -= amount;
         Transfer(this, msg.sender, amount);
-        
+
         Backer backer = backers[msg.sender];
         backer.contribution = backer.contribution.add(amount);
         backer.withdrawnAtSegment = backer.withdrawnAtSegment.add(0);
         backer.withdrawnAtCluster = backer.withdrawnAtCluster.add(0);
         backer.state = backer.state = true;
-        
+
         contributors++;
-        
+
         return amount;
     }
-    
-    
+
+
     /**
      * @dev Allows users to claim CLUSTER every 1000 SEGMENTS (1.000.000 blocks).
      * @return The amount of CLUSTER claimed by sender.
      */
     function claimClusters() public returns (uint amount) {
-        
+
         if (currentSegment() == 0) throw;
-        if (!backers[msg.sender].state) throw; 
-        
+        if (!backers[msg.sender].state) throw;
+
         uint previousWithdraws = backers[msg.sender].withdrawnAtCluster;
         uint entitledToClusters = currentCluster().sub(previousWithdraws);
-        
+
         if (entitledToClusters == 0) throw;
         if (!isEntitledForCluster(msg.sender)) throw;
-        
+
         uint userShares = backers[msg.sender].contribution.div(1 finney);
         uint amountForPayout = buyPriceEth.div(contributors);
-        
-        amount =  amountForPayout.mul(userShares).mul(1000);                           
-        
+
+        amount =  amountForPayout.mul(userShares).mul(1000);
+
         balances[msg.sender] += amount;
         balances[this] -= amount;
         Transfer(this, msg.sender, amount);
-        
-        backers[msg.sender].withdrawnAtCluster = currentCluster(); 
-        
+
+        backers[msg.sender].withdrawnAtCluster = currentCluster();
+
         return amount;
     }
-    
-    
+
+
     /**
      * @dev Allows users to claim segments every 1000 UNITS (blocks).
      * @dev NOTE: Users claiming SEGMENTS instead of CLUSTERS get only half of the reward.
      * @return The amount of SEGMENTS claimed by sender.
      */
     function claimSegments() public returns (uint amount) {
-        
+
         if (currentSegment() == 0) throw;
-        if (!backers[msg.sender].state) throw;  
-        
-        
+        if (!backers[msg.sender].state) throw;
+
+
         uint previousWithdraws = currentCluster().add(backers[msg.sender].withdrawnAtSegment);
         uint entitledToSegments = currentCluster().add(currentSegment().sub(previousWithdraws));
-        
+
         if (entitledToSegments == 0 ) throw;
-        
+
         uint userShares = backers[msg.sender].contribution.div(1 finney);
         uint amountForPayout = buyPriceEth.div(contributors);
-        
-        amount =  amountForPayout.mul(userShares).div(10).div(2);                           
-        
+
+        amount =  amountForPayout.mul(userShares).div(10).div(2);
+
         balances[msg.sender] += amount;
         balances[this] -= amount;
         Transfer(this, msg.sender, amount);
-        
-        backers[msg.sender].withdrawnAtSegment = currentSegment(); 
-        
+
+        backers[msg.sender].withdrawnAtSegment = currentSegment();
+
         return amount;
     }
 
-    
+
     /**
      * @dev Function if users send funds to this contract, call the buy function.
-     */ 
+     */
     function() payable {
         if (msg.sender != owner) {
             buyClusterToken();
         }
     }
-    
-    
+
+
     /**
      * @dev Allows owner to withdraw funds from the account.
-     */ 
+     */
     function Drain() onlyOwner public {
         if(this.balance > 0) {
             if (!owner.send(this.balance)) throw;
         }
     }
-    
-    
-    
+
+
+
     /**
     *  Burn away the specified amount of ClusterToken tokens.
     * @return Returns success boolean.
@@ -434,19 +434,30 @@ contract ClusterToken is StandardToken, PullPayment, Ownable, Pausable {
         Transfer(msg.sender, 0x0, _value);
         return true;
     }
-    
-    
+
+
     /**
      * @dev Internal check to see if at least 1000 segments passed without withdrawal prior to rewarding a cluster
-     */ 
+     */
     function isEntitledForCluster(address _sender) private constant returns (bool) {
-        
-        uint t1 = currentCluster().mul(1000).add(currentSegment()); 
-        uint t2 = backers[_sender].withdrawnAtSegment;      
+
+        uint t1 = currentCluster().mul(1000).add(currentSegment());
+        uint t2 = backers[_sender].withdrawnAtSegment;
 
         if (t1.sub(t2) >= 1000) { return true; }
         return false;
-        
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -20,7 +20,7 @@ contract Token {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-    
+
 }
 
 contract Owned{
@@ -62,12 +62,12 @@ contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
-        
+
         _transfer(msg.sender,_to,_value);
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        
+
         require(_value <= allowed[_from][msg.sender]);
         allowed[_from][msg.sender] -= _value;
         _transfer(_from,_to,_value);
@@ -128,12 +128,12 @@ contract XRTToken is XRTStandards {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version; 
+    string public version;
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function XRTToken(uint256 _initialSupply, string t_name, string t_symbol,string t_version, uint8 decimalsUnits,uint256 OneEthValue) public {
         initialSupply = _initialSupply;
@@ -142,9 +142,9 @@ contract XRTToken is XRTStandards {
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
         name = t_name;                                   // Set the name for display purposes (CHANGE THIS)
         symbol = t_symbol;                                             // Set the symbol for display purposes (CHANGE THIS)
-        unitsOneEthCanBuy = OneEthValue*10**uint256(decimals);                                    
+        unitsOneEthCanBuy = OneEthValue*10**uint256(decimals);
         fundsWallet = msg.sender;
-        version = t_version;                                  
+        version = t_version;
     }
 
     function() payable{
@@ -162,7 +162,7 @@ contract XRTToken is XRTStandards {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -174,6 +174,17 @@ contract XRTToken is XRTStandards {
         if(approve(_spender,_value)){
             require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
             return true;
-        }    
+        }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

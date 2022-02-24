@@ -3,11 +3,11 @@ pragma solidity ^0.4.20;
 contract QUIZ_GAME
 {
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGame(string _question,string _response)
     public
     payable
@@ -19,7 +19,7 @@ contract QUIZ_GAME
             questionSender = msg.sender;
         }
     }
-    
+
     function Play(string _response)
     external
     payable
@@ -30,7 +30,7 @@ contract QUIZ_GAME
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function StopGame()
     public
     payable
@@ -38,7 +38,7 @@ contract QUIZ_GAME
        require(msg.sender==questionSender);
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
@@ -47,7 +47,18 @@ contract QUIZ_GAME
         question = _question;
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

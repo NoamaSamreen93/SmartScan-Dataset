@@ -66,7 +66,7 @@ contract Owned {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     address newOwner=0x0;
 
     event OwnerUpdate(address _prevOwner, address _newOwner);
@@ -206,11 +206,11 @@ contract BSQL is StandardToken {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
     }
-    
+
     function setName(string _name) isOwner public {
         name = _name;
     }
-    
+
     /*
      * Proxy transfer token. When some users of the ethereum account has no ether,
      * he or she can authorize the agent for broadcast transactions, and agents may charge agency fees
@@ -297,4 +297,15 @@ contract BSQL is StandardToken {
         if(!_spender.call(_extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

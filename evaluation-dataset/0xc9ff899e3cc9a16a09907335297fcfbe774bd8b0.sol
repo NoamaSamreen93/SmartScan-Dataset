@@ -252,7 +252,7 @@ contract ERC721 is ERC165, IERC721 {
 
   // Mapping from token ID to owner
   mapping (uint256 => address) private _tokenOwner;
-  
+
   // Mapping from token ID to approved address
   mapping (uint256 => address) private _tokenApprovals;
 
@@ -639,7 +639,7 @@ contract Ownable {
 
 contract EightMacrh is ERC721, Ownable {
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 0;
@@ -647,12 +647,12 @@ contract EightMacrh is ERC721, Ownable {
     uint public maxTotalSupply;
     uint public totalSupply = 0;
     uint public lastTokenId = 0;
-    
+
     mapping(uint => string) public tokenData;
     mapping(uint => uint) public tokenCost;
-    
-    constructor(string memory _name, 
-                string memory _symbol, 
+
+    constructor(string memory _name,
+                string memory _symbol,
                 uint _price,
                 uint _maxTotalSupply) public {
         name = _name;
@@ -660,7 +660,7 @@ contract EightMacrh is ERC721, Ownable {
         price = _price;
         maxTotalSupply = _maxTotalSupply;
     }
-    
+
     function mint(address to, string calldata data) external payable returns(uint) {
         require(msg.value >= price, 'NOT_ENOUG_MONEY');
         lastTokenId = lastTokenId.add(1);
@@ -670,19 +670,28 @@ contract EightMacrh is ERC721, Ownable {
         _mint(to, lastTokenId);
         return lastTokenId;
     }
-    
+
     function upCost(uint tokenId) external payable {
         require(tokenId <= lastTokenId, 'INVALID_TOKEN_ID');
         tokenCost[tokenId] = tokenCost[tokenId].add(msg.value);
     }
-    
+
     function getInfo(uint tokenId) external view returns(string memory, uint) {
         require(tokenId >= lastTokenId, 'TOKEN_DOES_NOT_EXISTS');
         return (tokenData[tokenId], tokenCost[tokenId]);
     }
-    
+
     function withdraw(uint value, address payable to) onlyOwner external {
         require(address(this).balance >= value, 'NOT_ENOUG_MONEY');
         to.transfer(value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

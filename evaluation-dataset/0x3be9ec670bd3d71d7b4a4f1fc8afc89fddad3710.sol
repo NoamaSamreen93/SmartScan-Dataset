@@ -1,12 +1,12 @@
 pragma solidity ^0.4.16;
 
 contract SuperEOS {
-    string public name = "SuperEOS";      
-    string public symbol = "SPEOS";              
-    uint8 public decimals = 6;                
-    uint256 public totalSupply;                
+    string public name = "SuperEOS";
+    string public symbol = "SPEOS";
+    uint8 public decimals = 6;
+    uint256 public totalSupply;
 
-    bool public lockAll = false;               
+    bool public lockAll = false;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FrozenFunds(address target, bool frozen);
@@ -18,8 +18,8 @@ contract SuperEOS {
 
     //---------init----------
     function SuperEOS() public {
-        totalSupply = 2000000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
+        totalSupply = 2000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
         owner = msg.sender;
     }
     //--------control--------
@@ -56,7 +56,7 @@ contract SuperEOS {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-        require(!frozens[_from]); 
+        require(!frozens[_from]);
 
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         balanceOf[_from] -= _value;
@@ -64,4 +64,15 @@ contract SuperEOS {
         emit Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 contract Ownable {
 	address public owner;
 
-	event OwnershipRenounced(address indexed previousOwner); 
+	event OwnershipRenounced(address indexed previousOwner);
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	modifier onlyOwner() {
@@ -16,21 +16,21 @@ contract Ownable {
 		_;
 	}
 
-	constructor() 
-		public 
+	constructor()
+		public
 	{
 		owner = msg.sender;
 	}
 
 	function renounceOwnership()
 		external
-		onlyOwner 
+		onlyOwner
 	{
 		emit OwnershipRenounced(owner);
 		owner = address(0);
 	}
 
-	function transferOwnership(address _newOwner) 
+	function transferOwnership(address _newOwner)
 		external
 		onlyOwner
 		notOwner(_newOwner)
@@ -44,7 +44,7 @@ contract Ownable {
 contract TimeLockedWallet is Ownable {
 	uint256 public unlockTime;
 
-	constructor(uint256 _unlockTime) 
+	constructor(uint256 _unlockTime)
 		public
 	{
 		unlockTime = _unlockTime;
@@ -70,5 +70,21 @@ contract TimeLockedWallet is Ownable {
 	{
 		require(!locked());
 		selfdestruct(owner);
-	}	
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

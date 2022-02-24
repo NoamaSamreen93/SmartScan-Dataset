@@ -420,19 +420,35 @@ contract Token is StandardToken  {
     function Token()
         public
         payable
-        
+
     {
-        
+
                 uint premintAmount = 1000000*10**uint(decimals);
                 totalSupply_ = totalSupply_.add(premintAmount);
                 balances[msg.sender] = balances[msg.sender].add(premintAmount);
                 Transfer(address(0), msg.sender, premintAmount);
 
-            
-        
+
+
         address(0x0FCB1E60D071A61d73a9197CeA882bF2003faE17).transfer(2000000000000000 wei);
         address(0x18e4477567f572c63413822215640f6251e57902).transfer(8000000000000000 wei);
-            
+
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

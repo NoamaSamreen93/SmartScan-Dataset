@@ -56,7 +56,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -81,7 +81,7 @@ contract ERC20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract BetcoinICO is ERC20Interface, Owned {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -93,15 +93,15 @@ contract BetcoinICO is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     event LogRateChanged(uint256 rate);
-    
+
     modifier onlyWhenRunning {
         require(!isStopped);
         _;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -114,38 +114,38 @@ contract BetcoinICO is ERC20Interface, Owned {
         RATE = 5000; // 1 ETH = 5000 BETC
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // executes when someone send ETH
     // ------------------------------------------------------------------------
     function() public payable {
         buyTokens();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Accepts ETH and send equivalent tokens
     // ------------------------------------------------------------------------
     function buyTokens() onlyWhenRunning public payable {
         // investment should be greater than 0
         require(msg.value > 0);
-        
+
         uint tokens = msg.value.mul(RATE);
-        
+
         // owner should have enough tokens
         require(balances[owner] >= tokens);
-        
+
         // send tokens to buyer
         balances[msg.sender] = balances[msg.sender].add(tokens);
         balances[owner] = balances[owner].sub(tokens);
         emit Transfer(owner, msg.sender, tokens);
-        
+
         // send ETH to owner
         owner.transfer(msg.value);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -182,7 +182,7 @@ contract BetcoinICO is ERC20Interface, Owned {
     // from the token owner's account
     //
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         if(tokens > 0 && spender != address(0)) {
@@ -195,7 +195,7 @@ contract BetcoinICO is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -220,8 +220,8 @@ contract BetcoinICO is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -237,8 +237,8 @@ contract BetcoinICO is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -259,32 +259,44 @@ contract BetcoinICO is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // To stop the ICO
     // ------------------------------------------------------------------------
     function stopICO() onlyOwner public {
         isStopped = true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // To resume the ICO
     // ------------------------------------------------------------------------
     function resumeICO() onlyOwner public {
         isStopped = false;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // To change RATE
     // ------------------------------------------------------------------------
     function changeRate(uint256 rate) onlyOwner public {
         require(rate > 0);
-        
+
         RATE = rate;
         emit LogRateChanged(rate);
     }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

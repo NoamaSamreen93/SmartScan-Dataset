@@ -48,7 +48,7 @@ library SafeMath {
 }
 
 contract ExorbuxKing {
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
   address public owner;
   address public king;
   string public kingsMessage;
@@ -83,7 +83,7 @@ contract ExorbuxKing {
     require(owner == msg.sender);
     _;
   }
-  
+
   function setDevFee (uint256 _n) onlyOwner() public {
 	  require(_n >= 0 && _n <= 90);
     devFeePercent = _n;
@@ -107,7 +107,7 @@ contract ExorbuxKing {
     require(!isContract(msg.sender));
     require(bytes(_message).length <= maxMessageChars);
     require(msg.value > 0);
-    
+
     if (_roundNumber == currentRoundNumber && !roundExpired()) {
       // bid in active round
       require(msg.value > lastBidAmount);
@@ -182,7 +182,7 @@ contract ExorbuxKing {
   }
 
   function getPastRound(uint256 _roundNum) public view returns (address _kingAddress, uint256 _finalBid, uint256 _kingWinnings, string _finalMessage) {
-    _kingAddress = roundToKing[_roundNum]; 
+    _kingAddress = roundToKing[_roundNum];
     _kingWinnings = roundToWinnings[_roundNum];
     _finalBid = roundToFinalBid[_roundNum];
     _finalMessage = roundToFinalMessage[_roundNum];
@@ -193,4 +193,15 @@ contract ExorbuxKing {
     assembly { size := extcodesize(addr) }
     return size > 0;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

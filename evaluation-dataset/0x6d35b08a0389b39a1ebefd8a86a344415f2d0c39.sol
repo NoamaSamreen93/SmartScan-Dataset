@@ -2,19 +2,19 @@ pragma solidity 0.4.25;
 
 /**
 * ETH CRYPTOCURRENCY DISTRIBUTION PROJECT
-* 
+*
 * Web              - https://333eth.io
-* 
+*
 * Twitter          - https://twitter.com/333eth_io
-* 
+*
 * Telegram_channel - https://t.me/Ethereum333
-* 
+*
 * EN  Telegram_chat: https://t.me/Ethereum333_chat_en
-* 
+*
 * RU  Telegram_chat: https://t.me/Ethereum333_chat_ru
-* 
+*
 * KOR Telegram_chat: https://t.me/Ethereum333_chat_kor
-* 
+*
 * Email:             mailto:support(at sign)333eth.io
 */
 
@@ -27,14 +27,14 @@ library RecipientsStorage {
     uint size;
   }
 
-  struct Recipient { 
+  struct Recipient {
     uint keyIndex;
     Percent.percent percent;
     bool isLocked;
   }
 
-  struct KeyFlag { 
-    address key; 
+  struct KeyFlag {
+    address key;
     bool deleted;
   }
 
@@ -69,7 +69,7 @@ library RecipientsStorage {
     if (keyIndex == 0) {
       return false;
     }
-      
+
     delete s.data[key];
     s.keys[keyIndex].deleted = true;
     s.size--;
@@ -82,7 +82,7 @@ library RecipientsStorage {
     s.data[key].isLocked = false;
     return true;
   }
-  
+
 
   function recipient(Storage storage s, address key) internal view returns (Recipient memory r) {
     return Recipient(s.data[key].keyIndex, s.data[key].percent, s.data[key].isLocked);
@@ -126,7 +126,7 @@ contract Accessibility {
     m_admins[msg.sender] = AccessRank.Full;
     emit LogProvideAccess(msg.sender, now, AccessRank.Full);
   }
-  
+
   function provideAccess(address addr, AccessRank rank) public onlyAdmin(AccessRank.Full) {
     require(m_admins[addr] != AccessRank.Full, "cannot change full access rank");
     if (m_admins[addr] != rank) {
@@ -275,14 +275,14 @@ contract Distributor is Accessibility {
     }
   }
 
-  function payout() public onlyAdmin(AccessRank.Payout) { 
+  function payout() public onlyAdmin(AccessRank.Payout) {
     if (payKeyIndex == m_recipients.iterStart()) {
       require(address(this).balance > 0, "zero balance");
       require(now>payPaymentTime+12 hours, "the latest payment was earlier than 12 hours");
       payPaymentTime = now;
       payValue = address(this).balance;
     }
-    
+
     uint i = payKeyIndex;
     uint dividends;
     RecipientsStorage.Recipient memory r;
@@ -292,7 +292,7 @@ contract Distributor is Accessibility {
       (rAddr, r) = m_recipients.iterGet(i);
       dividends = r.percent.mmul(payValue);
       if (rAddr.send(dividends)) {
-        emit LogPayDividends(rAddr, now, dividends); 
+        emit LogPayDividends(rAddr, now, dividends);
       }
     }
 
@@ -302,4 +302,12 @@ contract Distributor is Accessibility {
       payKeyIndex = m_recipients.iterStart();
     }
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

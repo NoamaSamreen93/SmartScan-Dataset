@@ -20,7 +20,7 @@ contract StandardToken is Token {
     function formatDecimals(uint256 _value) internal pure returns (uint256 ) {
         return _value * 10 ** decimals;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         _value = formatDecimals(_value);
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -74,4 +74,15 @@ contract KTCoin is StandardToken {
 		totalSupply = formatDecimals(3000000000);
         balances[msg.sender] =totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

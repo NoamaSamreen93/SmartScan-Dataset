@@ -120,7 +120,7 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0)); 
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -140,4 +140,15 @@ contract BNIToken is StandardToken, Ownable
         totalSupply = initialSupply;
         balances[owner] = initialSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

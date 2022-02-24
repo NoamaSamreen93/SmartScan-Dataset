@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 /*
 *
 * Jackpot holding contract for Zlots.
-*  
+*
 * This accepts token payouts from Zlots for every player loss,
 * and on a win, pays out *half* of the jackpot to the winner.
 *
@@ -31,7 +31,7 @@ contract ZlotsJackpotHoldingContract is ERC223Receiving {
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
-  } 
+  }
 
   // Require msg.sender to be zlots
   modifier onlyZlots() {
@@ -57,7 +57,7 @@ contract ZlotsJackpotHoldingContract is ERC223Receiving {
 
   // Trackers
   uint payoutNumber = 0; // How many times we've paid out the jackpot
-  uint totalPaidOut = 0; // The total amount we've paid out 
+  uint totalPaidOut = 0; // The total amount we've paid out
 
   // ------------------------- Functions
 
@@ -76,7 +76,7 @@ contract ZlotsJackpotHoldingContract is ERC223Receiving {
   function payOutWinner(address winner) onlyZlots {
 		// Calculate payout & pay out
  		uint payoutAmount = Zethr.balanceOf(address(this)) / 2;
-		Zethr.transfer(winner, payoutAmount);	
+		Zethr.transfer(winner, payoutAmount);
 
 		// Incremement the vars
 		payoutNumber += 1;
@@ -106,4 +106,20 @@ contract ZlotsJackpotHoldingContract is ERC223Receiving {
   function getJackpot() public view returns (uint) {
     return Zethr.balanceOf(address(this)) / 2;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

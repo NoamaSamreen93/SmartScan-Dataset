@@ -340,7 +340,7 @@ contract PantheonEcoSystem {
         if (total_supply > 0) {
             user.funds_correction = user.funds_correction.sub(int(tokens.mul(shared_profit) / total_supply));
         }
-        
+
         else if (dividends_from_tokens != 0) {
             user.funds_correction = user.funds_correction.sub(int(dividends_from_tokens));
         }
@@ -362,7 +362,7 @@ contract PantheonEcoSystem {
         }
     }
 
-   
+
     function fundsToTokens(uint funds) internal view returns (uint tokens, uint _price) {
         uint b = price.mul(2).sub(price_offset);
         uint D = b.mul(b).add(price_offset.mul(8).mul(funds).mul(precision_factor));
@@ -371,7 +371,7 @@ contract PantheonEcoSystem {
         return (n, anp1);
     }
 
-  
+
     function tokensToFunds(uint tokens) internal view returns (uint funds, uint _price) {
         uint sell_price = price.sub(price_offset);
         uint an = sell_price.add(price_offset).sub(price_offset.mul(tokens) / precision_factor);
@@ -500,4 +500,15 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

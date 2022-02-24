@@ -24,12 +24,12 @@ contract RequestSale {
   address public owner;
   // The crowdsale address. Can be verified at: https://request.network/#/presale.
   address public sale = 0xa579E31b930796e3Df50A56829cF82Db98b6F4B3;
-  
+
   //Constructor. Sets the sender as the owner of the contract.
   function RequestSale() {
     owner = msg.sender;
   }
-  
+
   // Allows any user to withdraw his tokens.
   // Token's ERC20 address as argument as it is unknow at the time of deployement.
   function perform_withdrawal(address tokenAddress) {
@@ -49,7 +49,7 @@ contract RequestSale {
     // Send the funds.  Throws on failure to prevent loss of funds.
     require(token.transfer(msg.sender, tokens_to_withdraw));
   }
-  
+
   // Allows any caller to get his eth refunded.
   function refund_me() {
     // Store the user's balance prior to withdrawal in a temporary variable.
@@ -59,7 +59,7 @@ contract RequestSale {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(eth_to_withdraw);
   }
-  
+
   // Buy the tokens. Sends ETH to the presale wallet and records the ETH amount held in the contract.
   function buy_the_tokens() {
     // Only allow the owner to perform the buy in.
@@ -83,9 +83,9 @@ contract RequestSale {
     require(msg.sender == owner);
     // Raise the cap.
     eth_cap = 1000 ether;
-    
+
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Only allow deposits if the contract hasn't already purchased the tokens.
@@ -95,4 +95,15 @@ contract RequestSale {
     // Update records of deposited ETH to include the received amount.
     balances[msg.sender] += msg.value;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

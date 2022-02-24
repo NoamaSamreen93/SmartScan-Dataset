@@ -121,7 +121,7 @@ contract ERC20 {
 
 
 contract ATxProxy is ERC20 {
-    
+
     bytes32 public smbl;
     address public platform;
 
@@ -173,7 +173,7 @@ contract ATxAssetInterface {
 }
 
 contract AssetProxy is ERC20 {
-    
+
     bytes32 public smbl;
     address public platform;
 
@@ -654,19 +654,19 @@ contract PendingManagerInterface {
     function signOut(address _contract) external returns (uint);
 
     function addPolicyRule(
-        bytes4 _sig, 
-        address _contract, 
-        bytes32 _groupName, 
-        uint _acceptLimit, 
-        uint _declineLimit 
-        ) 
+        bytes4 _sig,
+        address _contract,
+        bytes32 _groupName,
+        uint _acceptLimit,
+        uint _declineLimit
+        )
         external returns (uint);
-        
+
     function removePolicyRule(
-        bytes4 _sig, 
-        address _contract, 
+        bytes4 _sig,
+        address _contract,
         bytes32 _groupName
-        ) 
+        )
         external returns (uint);
 
     function addTx(bytes32 _key, bytes4 _sig, address _contract) external returns (uint);
@@ -722,7 +722,7 @@ contract PendingManager is Object, PendingManagerEmitter, PendingManagerInterfac
         uint groupsCount;
         mapping(uint => Requirements) participatedGroups; // index => globalGroupIndex
         mapping(bytes32 => uint) groupName2index; // groupName => localIndex
-        
+
         uint totalAcceptedLimit;
         uint totalDeclinedLimit;
 
@@ -742,7 +742,7 @@ contract PendingManager is Object, PendingManagerEmitter, PendingManagerInterfac
 
         uint alreadyAccepted;
         uint alreadyDeclined;
-        
+
         mapping(address => Vote) votes; // member address => vote
         mapping(bytes32 => uint) acceptedCount; // groupName => how many from group has already accepted
         mapping(bytes32 => uint) declinedCount; // groupName => how many from group has already declined
@@ -836,7 +836,7 @@ contract PendingManager is Object, PendingManagerEmitter, PendingManagerInterfac
         require(_declineLimit != 0);
 
         bytes32 _policyHash = keccak256(_sig, _contract);
-        
+
         if (policyId2Index[_policyHash] == 0) {
             uint _policiesCount = policiesCount.add(1);
             index2PolicyId[_policiesCount] = _policyHash;
@@ -875,10 +875,10 @@ contract PendingManager is Object, PendingManagerEmitter, PendingManagerInterfac
         bytes4 _sig,
         address _contract,
         bytes32 _groupName
-    ) 
-    onlyContractOwner 
-    external 
-    returns (uint) 
+    )
+    onlyContractOwner
+    external
+    returns (uint)
     {
         require(_sig != bytes4(0));
         require(_contract != 0x0);
@@ -1138,7 +1138,7 @@ contract PendingManager is Object, PendingManagerEmitter, PendingManagerInterfac
     ) {
         require(_sig != bytes4(0));
         require(_contract != 0x0);
-        
+
         bytes32 _policyHash = keccak256(_sig, _contract);
         uint _policyIdx = policyId2Index[_policyHash];
         if (_policyIdx == 0) {
@@ -1472,10 +1472,10 @@ contract ServiceController is MultiSigAdapter {
     /// @return `true` when an address is a service, `false` otherwise
     function isService(address _address) public view returns (bool check) {
         return _address == profiterole ||
-            _address == treasury || 
-            _address == proxy || 
-            _address == pendingManager || 
-            emissionProviders[_address] || 
+            _address == treasury ||
+            _address == proxy ||
+            _address == pendingManager ||
+            emissionProviders[_address] ||
             burningMans[_address] ||
             sideServices[_address];
     }
@@ -2329,7 +2329,7 @@ contract DataController is OracleMethodAdapter, DataControllerEmitter {
         }
 
         countryLimitsList[_countryIndex].maxTokenHolderNumber = _limit;
-        
+
         _emitCountryCodeChanged(_countryIndex, _countryCode, _limit);
         return OK;
     }
@@ -2436,14 +2436,14 @@ contract ATxAsset is BasicAsset, Owned {
     /// @param _dataController - data controller.
     /// @param _lockupDate - th lockup date.
     function initAtx(
-        address _proxy, 
-        address _serviceController, 
-        address _dataController, 
+        address _proxy,
+        address _serviceController,
+        address _dataController,
         uint _lockupDate
-    ) 
-    onlyContractOwner 
-    public 
-    returns (bool) 
+    )
+    onlyContractOwner
+    public
+    returns (bool)
     {
         require(_serviceController != 0x0);
         require(_dataController != 0x0);
@@ -2471,14 +2471,14 @@ contract ATxAsset is BasicAsset, Owned {
     ///
     /// @return success.
     function __transferWithReference(
-        address _to, 
-        uint _value, 
-        string _reference, 
+        address _to,
+        uint _value,
+        string _reference,
         address _sender
-    ) 
-    onlyProxy 
-    public 
-    returns (bool) 
+    )
+    onlyProxy
+    public
+    returns (bool)
     {
         var (_fromRole, _toRole) = _getParticipantRoles(_sender, _to);
 
@@ -2512,22 +2512,22 @@ contract ATxAsset is BasicAsset, Owned {
     ///
     /// @return success.
     function __transferFromWithReference(
-        address _from, 
-        address _to, 
-        uint _value, 
-        string _reference, 
+        address _from,
+        address _to,
+        uint _value,
+        string _reference,
         address _sender
-    ) 
-    public 
-    onlyProxy 
-    returns (bool) 
+    )
+    public
+    onlyProxy
+    returns (bool)
     {
         var (_fromRole, _toRole) = _getParticipantRoles(_from, _to);
 
         // @note Special check for operational withdraw.
-        bool _isTransferFromHolderToContractOwner = (_fromRole == Roles.Holder) && 
-            (contractOwner == _to) && 
-            (dataController.allowance(_from) >= _value) && 
+        bool _isTransferFromHolderToContractOwner = (_fromRole == Roles.Holder) &&
+            (contractOwner == _to) &&
+            (dataController.allowance(_from) >= _value) &&
             super.__transferFromWithReference(_from, _to, _value, _reference, _sender);
         if (_isTransferFromHolderToContractOwner) {
             return true;
@@ -2591,16 +2591,16 @@ contract ATxAsset is BasicAsset, Owned {
     }
 
     function _checkTransferAllowanceFrom(
-        address _to, 
-        Roles _toRole, 
-        uint _value, 
-        address _from, 
-        Roles _fromRole, 
+        address _to,
+        Roles _toRole,
+        uint _value,
+        address _from,
+        Roles _fromRole,
         address
-    ) 
-    internal 
-    view 
-    returns (bool) 
+    )
+    internal
+    view
+    returns (bool)
     {
         return _checkTransferAllowance(_to, _toRole, _value, _from, _fromRole);
     }
@@ -2808,4 +2808,8 @@ contract ATxAsset is BasicAsset, Owned {
 /// Note: all the non constant functions return false instead of throwing in case if state change
 /// didn't happen yet.
 contract XMIAsset is ATxAsset {
+}
+function() payable external {
+	revert();
+}
 }

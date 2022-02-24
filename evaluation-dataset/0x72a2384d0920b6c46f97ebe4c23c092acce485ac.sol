@@ -51,11 +51,11 @@ contract EIP20 is EIP20Interface {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
-    
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function EIP20(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public {
         balances[msg.sender] = _initialAmount;               // Give the creator all initial tokens
@@ -100,14 +100,14 @@ contract EIP20 is EIP20Interface {
     }
 }
 contract RGEToken is EIP20 {
-    
+
     /* ERC20 */
     string public name = 'Rouge';
     string public symbol = 'RGE';
     uint8 public decimals = 8;
-    
+
     /* RGEToken */
-    address owner; 
+    address owner;
     address public crowdsale;
     uint public endTGE;
     string public version = 'v0.2';
@@ -119,12 +119,12 @@ contract RGEToken is EIP20 {
         require(msg.sender == _account);
         _;
     }
-    
+
     constructor() EIP20 (totalSupply, name, decimals, symbol) public {
         owner = msg.sender;
         crowdsale = address(0);
     }
-    
+
     function startCrowdsaleY0(address _crowdsale) onlyBy(owner) public {
         require(_crowdsale != address(0));
         require(crowdsale == address(0));
@@ -175,4 +175,20 @@ contract RGEToken is EIP20 {
         return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

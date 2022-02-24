@@ -13,7 +13,7 @@ contract ERC20 {
 contract Leader {
     address owner;
     mapping (address => bool) public admins;
-    
+
     modifier onlyOwner() {
         require(owner == msg.sender);
         _;
@@ -23,7 +23,7 @@ contract Leader {
         require(admins[msg.sender]);
         _;
     }
-    
+
     function setOwner (address _addr) onlyOwner() public {
         owner = _addr;
     }
@@ -42,7 +42,7 @@ contract PredictionContractTradeplace is ERC20, Leader {
     string public symbol = "PCT";
     uint8 public decimals = 8;
     uint256 public totalSupply = 100000000000000000;
-	
+
     using SafeMath for uint256;
 
     mapping (address => uint256) public balanceOf;
@@ -75,7 +75,7 @@ contract PredictionContractTradeplace is ERC20, Leader {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != 0x0 && _value > 0);
         require (balanceOf[_from] >= _value && _value <= allowance[_from][msg.sender]);
@@ -131,4 +131,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

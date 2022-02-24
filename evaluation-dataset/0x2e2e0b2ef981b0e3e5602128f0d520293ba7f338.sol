@@ -11,25 +11,25 @@ library SafeMath {
         assert(a == 0 || c / a == b);
         return c;
     }
- 
+
     function div(uint256 a, uint256 b) internal pure returns(uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
- 
+
     function sub(uint256 a, uint256 b) internal pure returns(uint256) {
         assert(b <= a);
         return a - b;
     }
- 
+
     function add(uint256 a, uint256 b) internal pure returns(uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
     }
- 
+
 }
 
 
@@ -44,7 +44,7 @@ library Address {
 /**
 */
 contract SInv {
-    //use of library of safe mathematical operations    
+    //use of library of safe mathematical operations
     using SafeMath for uint;
     using Address for *;
 
@@ -71,18 +71,18 @@ contract SInv {
 
     constructor() public {
         daysOnline = block.timestamp;
-    }    
-    
+    }
+
     modifier isIssetUser() {
         require(userDeposit[msg.sender] > 0, "Deposit not found");
         _;
     }
- 
+
     modifier timePayment() {
         require(now >= userTime[msg.sender].add(chargingTime), "Too fast payout request");
         _;
     }
-    
+
     function() external payable {
         if (msg.value > 0) {
             //makeDeposit(MyPersonalRefName[msg.data.toAddress()]);
@@ -118,7 +118,7 @@ contract SInv {
         uint UserInitDeposit=userDeposit[msg.sender];
         projectFund.transfer(UserInitDeposit.mul(projectPercent).div(1000));
     }
- 
+
     //make a contribution to the system
     function makeDeposit(bytes32 referrer) public payable {
         if (msg.value > 0) {
@@ -143,7 +143,7 @@ contract SInv {
             collectPercent();
         }
     }
-    
+
     //function call for fallback
     function makeDepositA(address referrer) public payable {
         if (msg.value > 0) {
@@ -166,21 +166,21 @@ contract SInv {
             collectPercent();
         }
     }
-     
+
     function getUserEarnings(address addr) public view returns(uint)
     {
         return UserEarnings[addr];
     }
- 
+
     //calculation of the current interest rate on the deposit
     function persentRate() public view returns(uint) {
         return(startPercent);
- 
+
     }
- 
+
     // Withdraw of your referral earnings
     function PayOutRefBonus() external
-    {       
+    {
         //Check if User has Bonus
         require(RefBonus[msg.sender]>0,"You didn't earn any bonus");
         uint payout = RefBonus[msg.sender];
@@ -189,8 +189,8 @@ contract SInv {
         //Set to 0 since its payed out
         RefBonus[msg.sender]=0;
     }
- 
- 
+
+
     //refund of the amount available for withdrawal on deposit
     function payoutAmount(address addr) public view returns(uint,uint) {
         uint rate = userDeposit[addr].mul(startPercent).div(100000);
@@ -199,13 +199,13 @@ contract SInv {
         return (withdrawalAmount, interestRate);
     }
 
- 
+
     mapping (address=>address) public TheGuyWhoReffedMe;
- 
+
     mapping (address=>bytes32) public MyPersonalRefName;
     //for bidirectional search
     mapping (bytes32=>address) public RefNameToAddress;
-    
+
     // referral counter
     mapping (address=>uint256) public referralCounter;
     // referral earnings counter
@@ -213,23 +213,23 @@ contract SInv {
 
     //public function to register your ref
     function createMyPersonalRefName(bytes32 _RefName) external payable
-    {  
+    {
         //ref name shouldn't be 0
         require(_RefName > 0);
 
         //Check if RefName is already registered
         require(RefNameToAddress[_RefName]==0, "Somebody else owns this Refname");
- 
+
         //check if User already has a ref Name
-        require(MyPersonalRefName[msg.sender] == 0, "You already registered a Ref");  
- 
+        require(MyPersonalRefName[msg.sender] == 0, "You already registered a Ref");
+
         //If not registered
         MyPersonalRefName[msg.sender]= _RefName;
 
         RefNameToAddress[_RefName]=msg.sender;
 
     }
- 
+
     function newRegistrationwithRef() private
     {
         //Give Bonus to refs
@@ -237,14 +237,14 @@ contract SInv {
         CheckSecondGradeRefAdress();
         CheckThirdGradeRefAdress();
     }
- 
+
     //first grade ref gets 1% extra
     function CheckFirstGradeRefAdress() private
-    {  
+    {
         //   3 <-- This one
         //  /
         // 4
- 
+
         //Check if Exist
         if(TheGuyWhoReffedMe[msg.sender]>0) {
         //Send the Ref his 1%
@@ -253,7 +253,7 @@ contract SInv {
             referralCounter[TheGuyWhoReffedMe[msg.sender]]++;
         }
     }
- 
+
     //second grade ref gets 0,5% extra
     function CheckSecondGradeRefAdress() private
     {
@@ -270,7 +270,7 @@ contract SInv {
             referralCounter[TheGuyWhoReffedMe[TheGuyWhoReffedMe[msg.sender]]]++;
         }
     }
- 
+
     //third grade ref gets 0,25% extra
     function CheckThirdGradeRefAdress() private
     {
@@ -289,7 +289,7 @@ contract SInv {
             referralCounter[TheGuyWhoReffedMe[TheGuyWhoReffedMe[TheGuyWhoReffedMe[msg.sender]]]]++;
         }
     }
-    
+
     //Returns your personal RefName, when it is registered
     function getMyRefName(address addr) public view returns(bytes32)
     {
@@ -316,4 +316,15 @@ contract SInv {
         }
         return string(bytesStringTrimmed);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

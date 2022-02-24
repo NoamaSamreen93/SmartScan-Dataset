@@ -1,16 +1,16 @@
 pragma solidity ^0.4.24;
 
 contract demo1 {
-    
-    
+
+
     mapping(address => uint256) private playerVault;
-   
+
     modifier hasEarnings()
     {
         require(playerVault[msg.sender] > 0);
         _;
     }
-    
+
     function myEarnings()
         external
         view
@@ -19,7 +19,7 @@ contract demo1 {
     {
         return playerVault[msg.sender];
     }
-    
+
     function withdraw()
         external
         hasEarnings
@@ -30,8 +30,8 @@ contract demo1 {
 
         msg.sender.transfer(amount);
     }
-    
-   
+
+
 
      function deposit() public payable returns (uint) {
         // Use 'require' to test user inputs, 'assert' for internal invariants
@@ -44,5 +44,16 @@ contract demo1 {
 
         return playerVault[msg.sender];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

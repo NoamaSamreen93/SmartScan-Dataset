@@ -8,9 +8,9 @@ contract G2X {
     uint256 public buyPrice;
     uint256 public numDecimalsBuyPrice;
     uint256 public numDecimalsSellPrice;
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     address public owner;
     uint256 public totalSupply;
 
@@ -28,18 +28,18 @@ contract G2X {
     }
 
     function recieveFunds() public payable {
-        emit ReciveFunds(msg.sender,msg.value);   
-    } 
-    
+        emit ReciveFunds(msg.sender,msg.value);
+    }
+
     function returnFunds(uint256 _value) public onlyOwner {
         require (address (this).balance >= _value);
         owner.transfer (_value);
         emit ReturnFunds(msg.sender, _value);
     }
-    
-    function getBalance() public view returns(uint256) { 
-        return address(this).balance; 
-    }    
+
+    function getBalance() public view returns(uint256) {
+        return address(this).balance;
+    }
 
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -48,8 +48,8 @@ contract G2X {
 
     function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
-        emit TransferOwnership(newOwner); 
-    }  
+        emit TransferOwnership(newOwner);
+    }
 
     function setPrices(uint256 newSellPrice, uint256 newnumDecimalsSellPrice, uint256 newBuyPrice, uint256 newnumDecimalsBuyPrice) public onlyOwner {
         sellPrice = newSellPrice;
@@ -66,24 +66,24 @@ contract G2X {
         balances[this] -= _value;
         emit Buy(this, msg.sender, _value);
         return _value;
-    }  
+    }
 
     function sell(uint256 _value) public returns (uint256 revenue){
         require(balances[msg.sender] >= _value);
-        balances[this] += _value;         
-        balances[msg.sender] -= _value;                  
+        balances[this] += _value;
+        balances[msg.sender] -= _value;
         revenue =   (_value * sellPrice) /numDecimalsSellPrice;
         msg.sender.transfer(revenue);
-        emit Sell(msg.sender, this, _value);             
-        return revenue;                                   
-    }   
+        emit Sell(msg.sender, this, _value);
+        return revenue;
+    }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require (_to != (0x0));
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -94,7 +94,7 @@ contract G2X {
         balances[_to] += _value;
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
-        emit Transfer(_from, _to, _value); 
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -104,14 +104,14 @@ contract G2X {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value); 
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
- 
+
     function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(balances[msg.sender] >= _value);   // Check if the sender has enough
         balances[msg.sender] -= _value;            // Subtract from the sender
@@ -129,4 +129,15 @@ contract G2X {
     event TransferOwnership(address indexed newOwner);
     event ReturnFunds(address indexed _from, uint256 _value);
     event ReciveFunds(address indexed _from, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

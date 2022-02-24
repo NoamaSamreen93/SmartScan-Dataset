@@ -421,7 +421,7 @@ contract CertificationRegistry {
       * Ensure that only a privileged certificate administrator is able to perform.
       */
     modifier onlyPrivilegedCertAdmin(string memory organizationID) {
-        require(CertAdmins[toCertAdminKey(msg.sender, organizationID)] || RosenCertAdmins[msg.sender], 
+        require(CertAdmins[toCertAdminKey(msg.sender, organizationID)] || RosenCertAdmins[msg.sender],
 		"Access denied, Please use function with certificate admin privileges");
         _;
     }
@@ -450,4 +450,13 @@ contract CertificationRegistry {
         "Duplicated hash-value exception!");
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

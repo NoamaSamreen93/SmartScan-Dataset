@@ -4,7 +4,7 @@ pragma solidity ^0.4.15;
  * @contract Deal Token (DEAL)
  * This has all the functions and events of a standard ERC20 Token as decribed here
  * https://theethereum.wiki/w/index.php/ERC20_Token_Standard
- * Along with them it also has one additional functionality 
+ * Along with them it also has one additional functionality
  * Burn - To burn existing coins
  */
 
@@ -50,7 +50,7 @@ library SafeMath {
 
   function min256(uint256 a, uint256 b) internal constant returns (uint256) {
     return a < b ? a : b;
-  }  
+  }
 }
 
 /**
@@ -155,7 +155,7 @@ contract BasicToken is ERC20Basic, Pausable {
    * @dev Fix for the ERC20 short address attack.
    */
   modifier onlyPayloadSize(uint size) {
-     assert(msg.data.length >= size + 4);      
+     assert(msg.data.length >= size + 4);
      _;
   }
 
@@ -299,7 +299,7 @@ contract MintableToken is StandardToken {
 
 /**
  * @title Burnable token
- * @dev Simple ERC20 Token example, with token that can be burnt 
+ * @dev Simple ERC20 Token example, with token that can be burnt
  */
 
 contract BurnableToken is StandardToken {
@@ -313,12 +313,12 @@ contract BurnableToken is StandardToken {
    * @param _amount The amount of tokens to burn.
    * @return A boolean that indicates if the operation was successful.
    */
-  function burn(address _from, uint _amount) whenNotPaused onlyOwner returns (bool) {    
+  function burn(address _from, uint _amount) whenNotPaused onlyOwner returns (bool) {
     totalSupply = totalSupply.sub(_amount);
     balances[_from] = balances[_from].sub(_amount);
     Burn(_from, _amount);
     return true;
-  }  
+  }
 }
 
 /**
@@ -342,11 +342,17 @@ contract DealToken is MintableToken, BurnableToken {
 
     function DealToken() public {
     /**
-      * @dev Mint initial supply and assign those inital supply 
+      * @dev Mint initial supply and assign those inital supply
       * @dev Send those tokens to the contract creator address
     */
     totalSupply = 40000000000000000; //400M
     balances[msg.sender] = totalSupply;
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

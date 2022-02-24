@@ -8,7 +8,7 @@ contract SNRCTOKEN {
     uint8 public decimals = 18;  // 18 是建议的默认值
     uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf;  // 
+    mapping (address => uint256) public balanceOf;  //
     mapping (address => mapping (address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -76,4 +76,15 @@ contract SNRCTOKEN {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

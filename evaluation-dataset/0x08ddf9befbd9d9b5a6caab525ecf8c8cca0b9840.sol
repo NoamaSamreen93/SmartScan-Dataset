@@ -1,5 +1,5 @@
 /*
- * VISTA FINTECH  
+ * VISTA FINTECH
  * SMART CONTRACT FOR CROWNSALE http://www.vistafin.com
  * Edit by Ray Indinor
  * Approved by Jacky Hsieh
@@ -12,41 +12,41 @@ library SafeMath {
 		assert(a == 0 || c / a == b);
 		return c;
 	}
-	
+
 	function div(uint a, uint b) internal returns (uint) {
 		assert(b > 0);
 		uint c = a / b;
 		assert(a == b * c + a % b);
 		return c;
 	}
-	
+
 	function sub(uint a, uint b) internal returns (uint) {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function add(uint a, uint b) internal returns (uint) {
 		uint c = a + b;
 		assert(c >= a);
 		return c;
 	}
-	
+
 	function max64(uint64 a, uint64 b) internal constant returns (uint64) {
 		return a >= b ? a : b;
 	}
-	
+
 	function min64(uint64 a, uint64 b) internal constant returns (uint64) {
 		return a < b ? a : b;
 	}
-	
+
 	function max256(uint256 a, uint256 b) internal constant returns (uint256) {
 		return a >= b ? a : b;
 	}
-	
+
 	function min256(uint256 a, uint256 b) internal constant returns (uint256) {
 		return a < b ? a : b;
 	}
-	
+
 	function assert(bool assertion) internal {
 		if (!assertion) {
 			throw;
@@ -60,12 +60,12 @@ contract Ownable {
     function Ownable() {
         owner = msg.sender;
     }
-	
+
     modifier onlyOwner {
         if (msg.sender != owner) throw;
         _;
     }
-	
+
     function transferOwnership(address newOwner) onlyOwner {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -77,7 +77,7 @@ contract Ownable {
 
 /*
  * Pausable Function
- * Abstract contract that allows children to implement an emergency stop function. 
+ * Abstract contract that allows children to implement an emergency stop function.
  */
 contract Pausable is Ownable {
 	bool public stopped = false;
@@ -87,27 +87,27 @@ contract Pausable is Ownable {
 		}
 		_;
 	}
-  
+
 	modifier onlyInEmergency {
 		if (!stopped) {
 			throw;
 		}
 		_;
 	}
-	
+
 /*
  * EmergencyStop Function
- * called by the owner on emergency, triggers stopped state 
+ * called by the owner on emergency, triggers stopped state
  */
 function emergencyStop() external onlyOwner {
     stopped = true;
 	}
 
-	
+
 /*
  * Release EmergencyState Function
  * called by the owner on end of emergency, returns to normal state
- */  
+ */
 
 function release() external onlyOwner onlyInEmergency {
     stopped = false;
@@ -117,7 +117,7 @@ function release() external onlyOwner onlyInEmergency {
 /*
  * ERC20Basic class
  * Abstract contract that allows children to implement ERC20basic persistent data in state variables.
- */ 	
+ */
 contract ERC20Basic {
   uint public totalSupply;
   function balanceOf(address who) constant returns (uint);
@@ -129,7 +129,7 @@ contract ERC20Basic {
 /*
  * ERC20 class
  * Abstract contract that allows children to implement ERC20 persistent data in state variables.
- */ 
+ */
 contract ERC20 is ERC20Basic {
 	function allowance(address owner, address spender) constant returns (uint);
 	function transferFrom(address from, address to, uint value);
@@ -145,13 +145,13 @@ contract ERC20 is ERC20Basic {
  */
 
 contract BasicToken is ERC20Basic {
-  
+
 	using SafeMath for uint;
-  
+
 	mapping(address => uint) balances;
-  
+
 	/*
-	* Fix for the ERC20 short address attack  
+	* Fix for the ERC20 short address attack
 	*/
 	modifier onlyPayloadSize(uint size) {
 		if(msg.data.length < size + 4) {
@@ -159,13 +159,13 @@ contract BasicToken is ERC20Basic {
 		}
 		_;
 	}
-	
+
 	function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) {
 		balances[msg.sender] = balances[msg.sender].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		Transfer(msg.sender, _to, _value);
 	}
-	
+
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
 	}
@@ -217,5 +217,16 @@ contract VISTAcoin is StandardToken, Ownable {
 	function VISTAcoin() {
 		totalSupply = 50000000;
 		balances[msg.sender] = totalSupply; // Send all tokens to owner
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -93,15 +93,15 @@ contract PawsCoin is StandardToken { // CHANGE THIS. Update the contract name.
 
     PawsCoinPawsCoinPawsCoinPawsCoin********PawsCoin******PawsCoin
 ********PawsCoin**************PawsCoin******    */
-    string public name;                   // Token 
+    string public name;                   // Token
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: ..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public PawsCoin ;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address  fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function PawsCoin() {
         balances[msg.sender] = 500000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
@@ -112,7 +112,7 @@ contract PawsCoin is StandardToken { // CHANGE THIS. Update the contract name.
                                               // Set the price of your token for the ICO (CHANGE THIS)
         fundsWallet = msg.sender;                                    // The owner of the contract gets ETH
     }
-                                
+
 
 /* Approves and then calls the receiving contract */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -125,4 +125,13 @@ contract PawsCoin is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -110,3 +110,12 @@ contract CustomToken is BaseToken, BurnToken, ICOToken {
         icoHolder = 0x723751481f1133d012e96209c88fc81ecdaca083;
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

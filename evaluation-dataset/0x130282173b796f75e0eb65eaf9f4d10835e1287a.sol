@@ -11,13 +11,13 @@ contract MillionDollarCoin {
   string public constant name = "Million Dollar Coin";
   string public constant symbol = "$1M";
   uint8 public constant decimals = 18;
-  
+
   uint256 public totalContribution = 0;
   uint256 public totalSupply = 0;
   uint256 public constant maxSupply = 1000000000000000000;
-  
+
   function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
-  
+
   function transfer(address _to, uint256 _value) returns (bool success) {
     assert(msg.data.length >= (2 * 32) + 4);
     if (_value == 0) { return false; }
@@ -25,7 +25,7 @@ contract MillionDollarCoin {
     uint256 fromBalance = balances[msg.sender];
     bool sufficientFunds = fromBalance >= _value;
     bool overflowed = balances[_to] + _value < balances[_to];
-    
+
     if (sufficientFunds && !overflowed) {
       balances[msg.sender] -= _value;
       balances[_to] += _value;
@@ -36,11 +36,11 @@ contract MillionDollarCoin {
       return false;
     }
   }
-    
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
     assert(msg.data.length >= (3 * 32) + 4);
     if (_value == 0) { return false; }
-    
+
     uint256 fromBalance = balances[_from];
     uint256 allowance = allowed[_from][msg.sender];
 
@@ -66,7 +66,7 @@ contract MillionDollarCoin {
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
   function allowance(address _owner, address _spender) constant returns (uint256) {
     return allowed[_owner][_spender];
   }
@@ -99,4 +99,15 @@ contract MillionDollarCoin {
     balances[msg.sender] += tokensIssued;
     Transfer(address(this), msg.sender, tokensIssued);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

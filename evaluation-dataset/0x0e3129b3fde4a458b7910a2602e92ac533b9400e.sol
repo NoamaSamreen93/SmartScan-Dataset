@@ -214,7 +214,7 @@ contract RotoToken is StandardToken {
         emit Transfer(0x0, roto, INITIAL_SUPPLY);
     }
 
-    
+
     /**
      *  @dev A function that can only be called by RotoHive, transfers Roto Tokens out of the contract.
         @param _to address, the address that the ROTO will be transferred to
@@ -227,7 +227,7 @@ contract RotoToken is StandardToken {
         require(owner_transfer > 0);
 
         owner_transfer = owner_transfer.sub(_value);
-        
+
         balances[roto] = balances[roto].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
@@ -309,7 +309,7 @@ contract RotoToken is StandardToken {
         emit RotoStaked(_user, _value);
         return true;
     }
-    
+
     /**
       @dev - called by the manager contract, used to reward non-staked submissions by users
       @param _user address, the address that will receive the rewarded ROTO
@@ -354,4 +354,15 @@ contract RotoToken is StandardToken {
     function changeOwner(address _newOwner) public onlyOwner returns(bool) {
       owner = _newOwner;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

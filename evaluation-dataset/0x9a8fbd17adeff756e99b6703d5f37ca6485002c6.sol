@@ -6,17 +6,17 @@ contract Token{
 
     function transfer(address _to, uint256 _value) returns (bool success);
 
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     function approve(address _spender, uint256 _value) returns (bool success);
 
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -31,13 +31,13 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
-        balances[_from] -= _value; 
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
@@ -47,7 +47,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -62,24 +62,24 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract GDToken is StandardToken { 
+contract GDToken is StandardToken {
 
     /* Public variables of the token */
-    string public name;                   
-    uint8 public decimals;               
-    string public symbol;               
-    string public version = 'H0.1';    
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H0.1';
 
     function GDToken(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) {
-        balances[msg.sender] = _initialAmount; 
-        totalSupply = _initialAmount;         
-        name = _tokenName;                   
-        decimals = _decimalUnits;           
-        symbol = _tokenSymbol;             
+        balances[msg.sender] = _initialAmount;
+        totalSupply = _initialAmount;
+        name = _tokenName;
+        decimals = _decimalUnits;
+        symbol = _tokenSymbol;
     }
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -90,4 +90,13 @@ contract GDToken is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

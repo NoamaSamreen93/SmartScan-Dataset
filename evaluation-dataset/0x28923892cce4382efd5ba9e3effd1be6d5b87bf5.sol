@@ -376,7 +376,7 @@ contract CrowdsaleExt is Haltable {
     if (isWhiteListed) {
       uint num = 0;
       for (var i = 0; i < joinedCrowdsalesLen; i++) {
-        if (this == joinedCrowdsales[i]) 
+        if (this == joinedCrowdsales[i])
           num = i;
       }
       if (num + 1 < joinedCrowdsalesLen) {
@@ -591,7 +591,7 @@ contract CrowdsaleExt is Haltable {
     if (lastCrowdsaleCntrct.finalized()) throw;
     uint num = 0;
     for (var i = 0; i < joinedCrowdsalesLen; i++) {
-      if (this == joinedCrowdsales[i]) 
+      if (this == joinedCrowdsales[i])
         num = i;
     }
     if (num + 1 < joinedCrowdsalesLen) {
@@ -806,4 +806,15 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     uint multiplier = 10 ** decimals;
     return value.times(multiplier) / oneTokenInWei;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

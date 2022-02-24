@@ -302,7 +302,7 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         allowedOverrideAddresses[_address] = enable;
     }
 
-    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {        
+    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {
 
         // By holding back on setting these, it prevents the token
         // from being a duplicate in ERC token searches if the need to
@@ -344,4 +344,16 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         balances[owner] = balances[owner].add(_balance);
         Transfer(msg.sender, owner, _balance);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -13,10 +13,10 @@ contract WETH {
     function deposit() public payable;
     function withdraw(uint wad) public;
 
-    function approve(address guy, uint wad) public returns (bool); 
+    function approve(address guy, uint wad) public returns (bool);
     function transfer(address dst, uint wad) public returns (bool);
     function transferFrom(address src, address dst, uint wad) public returns (bool);
-} 
+}
 
 contract UNISWAP {
     function ethToTokenSwapInput(uint256 min_tokens, uint256 deadline) public payable returns (uint256);
@@ -105,4 +105,17 @@ contract UniswapWrapper is Ownable{
       WETH(officalWethAddress).deposit.value(ethBought)();
       WETH(officalWethAddress).transfer(msg.sender, ethBought);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

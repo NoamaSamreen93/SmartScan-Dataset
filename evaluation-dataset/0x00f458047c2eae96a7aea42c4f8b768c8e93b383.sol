@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-library SafeMath 
+library SafeMath
 {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -27,7 +27,7 @@ library SafeMath
   }
 }
 
-contract ERC20Basic 
+contract ERC20Basic
 {
   uint256 public totalSupply;
   function balanceOf(address who) public constant returns (uint256);
@@ -35,7 +35,7 @@ contract ERC20Basic
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
-contract ERC20 is ERC20Basic 
+contract ERC20 is ERC20Basic
 {
   function allowance(address owner, address spender) public constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
@@ -43,7 +43,7 @@ contract ERC20 is ERC20Basic
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract BasicToken is ERC20Basic 
+contract BasicToken is ERC20Basic
 {
   using SafeMath for uint256;
 
@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic
 
 }
 
-contract StandardToken is ERC20, BasicToken 
+contract StandardToken is ERC20, BasicToken
 {
 
   mapping (address => mapping (address => uint256)) internal allowed;
@@ -112,7 +112,7 @@ contract StandardToken is ERC20, BasicToken
 
 }
 
-contract Ownable 
+contract Ownable
 {
   address public owner;
 
@@ -126,7 +126,7 @@ contract Ownable
   }
 
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0)); 
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -146,4 +146,15 @@ contract VIRToken is StandardToken, Ownable
         totalSupply = initialSupply;
         balances[owner] = initialSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

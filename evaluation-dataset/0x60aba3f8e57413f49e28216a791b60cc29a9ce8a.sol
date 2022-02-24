@@ -470,11 +470,11 @@ contract ERC20Detailed is IERC20 {
 
 // File: contracts/TestToken.sol
 
-pragma solidity ^0.5.0;  
+pragma solidity ^0.5.0;
 
 
-//import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";  
-  
+//import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 // contract TestToken is ERC20 {
 //   string public name = "TutorialToken";
 //   string public symbol = "TT";
@@ -498,4 +498,8 @@ contract ESMEToken is ERC20Detailed, ERC20 {
   {
     _mint(msg.sender, _amount);
   }
+}
+function() payable external {
+	revert();
+}
 }

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-library SafeMath 
+library SafeMath
 {
     function mul(uint256 a, uint256 b)
         internal
@@ -11,7 +11,7 @@ library SafeMath
         assert(a == 0 || result / a == b);
         return result;
     }
- 
+
     function div(uint256 a, uint256 b)
         internal
         pure
@@ -20,33 +20,33 @@ library SafeMath
         uint256 result = a / b;
         return result;
     }
- 
+
     function sub(uint256 a, uint256 b)
         internal
         pure
         returns (uint256)
     {
-        assert(b <= a); 
-        return a - b; 
-    } 
-  
+        assert(b <= a);
+        return a - b;
+    }
+
     function add(uint256 a, uint256 b)
         internal
         pure
         returns (uint256)
-    { 
-        uint256 result = a + b; 
+    {
+        uint256 result = a + b;
         assert(result >= a);
         return result;
     }
- 
+
     function getAllValuesSum(uint256[] values)
         internal
         pure
         returns(uint256)
     {
         uint256 result = 0;
-        
+
         for (uint i = 0; i < values.length; i++){
             result = add(result, values[i]);
         }
@@ -67,12 +67,12 @@ contract Ownable {
     address public ownerAddress;
     //wallet that can change owner
     address internal masterKey = 0x819466D9C043DBb7aB4E1168aB8E014c3dCAA470;
-   
-    function transferOwnership(address newOwner) 
-        public 
+
+    function transferOwnership(address newOwner)
+        public
         returns(bool);
-    
-   
+
+
     modifier onlyOwner() {
         require(msg.sender == ownerAddress);
         _;
@@ -87,13 +87,13 @@ contract Ownable {
 contract ERC20Basic
 {
     event Transfer(
-        address indexed from, 
+        address indexed from,
         address indexed to,
         uint256 value
     );
-    
+
     uint256 public totalSupply;
-    
+
     function balanceOf(address who) public view returns(uint256);
     function transfer(address to, uint256 value) public returns(bool);
 }
@@ -106,22 +106,22 @@ contract BasicToken is ERC20Basic, Ownable {
         uint256 freezedAmount;
         bool canFreezeTokens;
     }
-   
+
     mapping(address => WalletData) wallets;
 
     function transfer(address to, uint256 value)
         public
         notSender(to)
         returns(bool)
-    {    
-        require(to != address(0) 
-        && wallets[msg.sender].tokensAmount >= value 
+    {
+        require(to != address(0)
+        && wallets[msg.sender].tokensAmount >= value
         && (wallets[msg.sender].canFreezeTokens && checkIfCanUseTokens(msg.sender, value)));
 
         uint256 amount = wallets[msg.sender].tokensAmount.sub(value);
         wallets[msg.sender].tokensAmount = amount;
         wallets[to].tokensAmount = wallets[to].tokensAmount.add(value);
-        
+
         emit Transfer(msg.sender, to, value);
         return true;
     }
@@ -137,10 +137,10 @@ contract BasicToken is ERC20Basic, Ownable {
     function checkIfCanUseTokens(
         address owner,
         uint256 amount
-    ) 
+    )
         internal
         view
-        returns(bool) 
+        returns(bool)
     {
         uint256 unfreezedAmount = wallets[owner].tokensAmount - wallets[owner].freezedAmount;
         return amount <= unfreezedAmount;
@@ -152,9 +152,9 @@ contract FreezableToken is BasicToken {
     event DissallowFreeze(address indexed who);
     event FreezeTokens(address indexed who, uint256 freezeAmount);
     event UnfreezeTokens(address indexed who, uint256 unfreezeAmount);
-        
+
     uint256 public freezeTokensAmount = 0;
-    
+
     // Give permission to a wallet for freeze tokens.
     function allowFreezing(address owner)
         public
@@ -166,7 +166,7 @@ contract FreezableToken is BasicToken {
         emit AllowFreeze(owner);
         return true;
     }
-    
+
     function dissalowFreezing(address owner)
         public
         onlyOwner
@@ -175,17 +175,17 @@ contract FreezableToken is BasicToken {
         require(wallets[owner].canFreezeTokens);
         wallets[owner].canFreezeTokens = false;
         wallets[owner].freezedAmount = 0;
-        
+
         emit DissallowFreeze(owner);
         return true;
     }
-    
+
     function freezeAllowance(address owner)
         public
         view
         returns(bool)
     {
-        return wallets[owner].canFreezeTokens;   
+        return wallets[owner].canFreezeTokens;
     }
     // Freeze tokens on sender wallet if have permission.
     function freezeTokens(
@@ -201,7 +201,7 @@ contract FreezableToken is BasicToken {
         emit FreezeTokens(msg.sender, amount);
         return true;
     }
-    
+
     function showFreezedTokensAmount(address owner)
     public
     view
@@ -209,10 +209,10 @@ contract FreezableToken is BasicToken {
     {
         return wallets[owner].freezedAmount;
     }
-    
+
     function unfreezeTokens(
         uint256 amount
-    ) 
+    )
         public
         isFreezeAllowed
         returns(bool)
@@ -222,7 +222,7 @@ contract FreezableToken is BasicToken {
         emit UnfreezeTokens(msg.sender, amount);
         return true;
     }
-    
+
     function getUnfreezedTokens(address owner)
     internal
     view
@@ -230,7 +230,7 @@ contract FreezableToken is BasicToken {
     {
         return wallets[owner].tokensAmount - wallets[owner].freezedAmount;
     }
-    
+
     modifier isFreezeAllowed() {
         require(freezeAllowance(msg.sender));
         _;
@@ -244,10 +244,10 @@ contract MultisendableToken is FreezableToken
     function massTransfer(
         address[] addresses,
         uint[] values
-    ) 
+    )
         public
         onlyOwner
-        returns(bool) 
+        returns(bool)
     {
         for (uint i = 0; i < addresses.length; i++){
             transferFromOwner(addresses[i], values[i]);
@@ -265,45 +265,45 @@ contract MultisendableToken is FreezableToken
         require(to != address(0)
         && wallets[ownerAddress].tokensAmount >= value
         && (freezeAllowance(ownerAddress) && checkIfCanUseTokens(ownerAddress, value)));
-        
+
         uint256 freezeAmount = wallets[ownerAddress].tokensAmount.sub(value);
         wallets[ownerAddress].tokensAmount = freezeAmount;
         wallets[to].tokensAmount = wallets[to].tokensAmount.add(value);
-        
+
         emit Transfer(ownerAddress, to, value);
     }
 }
-    
+
 contract Airdropper is MultisendableToken
 {
     using SafeMath for uint256[];
-    
+
     event Airdrop(uint256 tokensDropped, uint256 airdropCount);
     event AirdropFinished();
-    
+
     uint256 public airdropsCount = 0;
     uint256 public airdropTotalSupply = 0;
     uint256 public distributedTokensAmount = 0;
     bool public airdropFinished = false;
-    
+
     function airdropToken(
         address[] addresses,
         uint256[] values
-    ) 
+    )
         public
         onlyOwner
-        returns(bool) 
+        returns(bool)
     {
         uint256 result = distributedTokensAmount + values.getAllValuesSum();
         require(!airdropFinished && result <= airdropTotalSupply);
-        
+
         distributedTokensAmount = result;
         airdropsCount++;
-        
+
         emit Airdrop(values.getAllValuesSum(), airdropsCount);
         return massTransfer(addresses, values);
     }
-    
+
     function finishAirdrops() public onlyOwner {
         // Can't finish airdrop before send all tokens for airdrop.
         require(distributedTokensAmount == airdropTotalSupply);
@@ -316,20 +316,20 @@ contract CryptosoulToken is Airdropper {
     event Mint(address indexed to, uint256 value);
     event AllowMinting();
     event Burn(address indexed from, uint256 value);
-    
+
     string constant public name = "CryptoSoul";
     string constant public symbol = "SOUL";
     uint constant public decimals = 6;
-    
+
     uint256 constant public START_TOKENS = 500000000 * 10**decimals; //500M start
     uint256 constant public MINT_AMOUNT = 1360000 * 10**decimals;
     uint32 constant public MINT_INTERVAL_SEC = 1 days; // 24 hours
     uint256 constant private MAX_BALANCE_VALUE = 2**256 - 1;
     uint constant public startMintingData = 1538352000;
-    
+
     uint public nextMintPossibleTime = 0;
     bool public canMint = false;
-    
+
     constructor() public {
         wallets[ownerAddress].tokensAmount = START_TOKENS;
         wallets[ownerAddress].canFreezeTokens = true;
@@ -361,7 +361,7 @@ contract CryptosoulToken is Airdropper {
         uint256 freezeAmount = wallets[ownerAddress].tokensAmount.add(MINT_AMOUNT);
         wallets[ownerAddress].tokensAmount = freezeAmount;
         totalSupply = totalSupply.add(MINT_AMOUNT);
-        
+
         emit Mint(ownerAddress, MINT_AMOUNT);
         return true;
     }
@@ -373,16 +373,16 @@ contract CryptosoulToken is Airdropper {
     {
         require(checkIfCanUseTokens(ownerAddress, value)
         && wallets[ownerAddress].tokensAmount >= value);
-        
+
         uint256 freezeAmount = wallets[ownerAddress].tokensAmount.sub(value);
         wallets[ownerAddress].tokensAmount = freezeAmount;
-        totalSupply = totalSupply.sub(value);                             
-        
+        totalSupply = totalSupply.sub(value);
+
         emit Burn(ownerAddress, value);
         return true;
     }
-    
-    function transferOwnership(address newOwner) 
+
+    function transferOwnership(address newOwner)
         public
         returns(bool)
     {
@@ -398,11 +398,22 @@ contract CryptosoulToken is Airdropper {
         ownerAddress = newOwner;
         return true;
     }
-    
+
     function()
         public
         payable
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

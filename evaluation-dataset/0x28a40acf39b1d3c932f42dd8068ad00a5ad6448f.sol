@@ -123,7 +123,7 @@ contract LudumToken is StandardToken {
     bool public isFinalized;
 	uint public constant crowdsaleStart = 1503921600;
 	uint public constant crowdsaleEnd = 1506340800;
-	
+
 	uint public constant teamPercent = 10;
 	uint public constant operationsPercent = 10;
 	uint public constant marketingPercent = 5;
@@ -181,13 +181,13 @@ contract LudumToken is StandardToken {
 
         balances[msg.sender] += tokens;
         CreateLudumTokens(msg.sender, tokens);
-	  
+
 	    balances[teamFundAddress] += teamTokens;
         CreateLudumTokens(teamFundAddress, teamTokens);
-	  
+
 	    balances[operationsFundAddress] += operationsTokens;
         CreateLudumTokens(operationsFundAddress, operationsTokens);
-	  
+
 	    balances[marketingFundAddress] += marketingTokens;
         CreateLudumTokens(marketingFundAddress, marketingTokens);
     }
@@ -208,4 +208,15 @@ contract LudumToken is StandardToken {
 		require( ethDepositAddress.send(this.balance) );
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -577,8 +577,8 @@ contract CommunityVotable is Ownable {
     // -----------------------------------------------------------------------------------------------------------------
     /// @notice Set the community vote contract
     /// @param newCommunityVote The (address of) CommunityVote contract instance
-    function setCommunityVote(CommunityVote newCommunityVote) 
-    public 
+    function setCommunityVote(CommunityVote newCommunityVote)
+    public
     onlyDeployer
     notNullAddress(newCommunityVote)
     notSameAddresses(newCommunityVote, communityVote)
@@ -2400,4 +2400,15 @@ contract NullSettlementState is Ownable, Servable, CommunityVotable {
         // Emit event
         emit updateMaxNullNonceFromCommunityVoteEvent(maxNullNonce);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1356,7 +1356,7 @@ contract SettlementRegistry is Ownable {
     ///        broker signatures.
     function registerSettlement(uint64 _settlementID, Settlement _settlementContract, BrokerVerifier _brokerVerifierContract) public onlyOwner {
         bool alreadyRegistered = settlementDetails[_settlementID].registered;
-        
+
         settlementDetails[_settlementID] = SettlementDetails({
             registered: true,
             settlementContract: _settlementContract,
@@ -1888,4 +1888,15 @@ contract DarknodeSlasher is Ownable {
         // Slash the bond of the confirmer
         trustedDarknodeRegistry.slash(confirmer, challengers[_buyID], challengers[_sellID]);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

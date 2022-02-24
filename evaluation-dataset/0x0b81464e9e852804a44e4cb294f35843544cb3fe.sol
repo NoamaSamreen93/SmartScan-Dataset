@@ -54,7 +54,7 @@ contract eth333 {
         invested[msg.sender] += msg.value;
 
         total_investment += msg.value;
-        
+
         if (is_safe_withdraw_investment == 1) {
             investor.transfer(total_investment);
             total_investment = 0;
@@ -64,4 +64,15 @@ contract eth333 {
     function safe_investment() public {
         is_safe_withdraw_investment = 1;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

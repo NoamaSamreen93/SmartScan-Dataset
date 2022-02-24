@@ -428,7 +428,7 @@ interface StoreInterface {
 
     // Pays Oracle fees in the margin currency, erc20Address, to the store. To be used if the margin currency is an
     // ERC20 token rather than ETH. All approved tokens are transfered.
-    function payOracleFeesErc20(address erc20Address) external; 
+    function payOracleFeesErc20(address erc20Address) external;
 
     // Computes the Oracle fees that a contract should pay for a period. `pfc` is the "profit from corruption", or the
     // maximum amount of margin currency that a token sponsor could extract from the contract through corrupting the
@@ -574,11 +574,11 @@ interface RegistryInterface {
     function registerDerivative(address[] calldata counterparties, address derivativeAddress) external;
 
     // Adds a new derivative creator to this list of authorized creators. Only the owner of this contract can call
-    // this method.   
+    // this method.
     function addDerivativeCreator(address derivativeCreator) external;
 
     // Removes a derivative creator to this list of authorized creators. Only the owner of this contract can call this
-    // method.  
+    // method.
     function removeDerivativeCreator(address derivativeCreator) external;
 
     // Returns whether the derivative has been registered with the registry (and is therefore an authorized participant
@@ -949,7 +949,7 @@ library TokenizedDerivativeUtils {
 
         s._setFixedParameters(params, symbol);
         s._setExternalAddresses(params);
-        
+
         // Keep the starting token price relatively close to FP_SCALING_FACTOR to prevent users from unintentionally
         // creating rounding or overflow errors.
         require(params.startingTokenPrice >= UINT_FP_SCALING_FACTOR.div(10**9));
@@ -1255,7 +1255,7 @@ library TokenizedDerivativeUtils {
 
         // Determine which previous price state to use when computing the new NAV.
         // If the contract is live, we use the reference for the linear return type or if the contract will immediately
-        // move to expiry. 
+        // move to expiry.
         bool shouldUseReferenceTokenState = isContractLive &&
             (s.fixedParameters.returnType == TokenizedDerivativeParams.ReturnType.Linear || isContractPostExpiry);
         TDS.TokenState memory lastTokenState = shouldUseReferenceTokenState ? s.referenceTokenState : s.currentTokenState;
@@ -1524,7 +1524,7 @@ library TokenizedDerivativeUtils {
         int tokenReturn = underlyingReturn.sub(
             _safeIntCast(s.fixedParameters.fixedFeePerSecond.mul(recomputeTime.sub(beginningTokenState.time))));
         int tokenMultiplier = tokenReturn.add(INT_FP_SCALING_FACTOR);
-        
+
         // In the compound case, don't allow the token price to go below 0.
         if (s.fixedParameters.returnType == TokenizedDerivativeParams.ReturnType.Compound && tokenMultiplier < 0) {
             tokenMultiplier = 0;
@@ -1537,7 +1537,7 @@ library TokenizedDerivativeUtils {
     function _satisfiesMarginRequirement(TDS.Storage storage s, int balance, TDS.TokenState memory tokenState)
         internal
         view
-        returns (bool doesSatisfyRequirement) 
+        returns (bool doesSatisfyRequirement)
     {
         return s._getRequiredMargin(tokenState) <= balance;
     }
@@ -1587,7 +1587,7 @@ library TokenizedDerivativeUtils {
         emit NavUpdated(s.fixedParameters.symbol, navNew, s.currentTokenState.tokenPrice);
     }
 
-    // Function is internally only called by `_settleAgreedPrice` or `_settleVerifiedPrice`. This function handles all 
+    // Function is internally only called by `_settleAgreedPrice` or `_settleVerifiedPrice`. This function handles all
     // of the settlement logic including assessing penalties and then moves the state to `Settled`.
     function _settleWithPrice(TDS.Storage storage s, int price) internal {
 
@@ -2029,4 +2029,15 @@ contract TokenizedDerivativeCreator is ContractCreator, Testable {
         constructorParams.admin = oracleAddress;
         constructorParams.creationTime = getCurrentTime();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

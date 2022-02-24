@@ -1,5 +1,5 @@
 pragma solidity ^0.4.13;
- 
+
 
 /**
  * @title ERC20Basic
@@ -29,7 +29,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -53,15 +53,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -155,7 +155,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -179,7 +179,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -193,9 +193,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -227,26 +227,26 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract RomanovEmpireTokenCoin is MintableToken {
-    
+
     string public constant name = " Romanov Empire Imperium Token";
-    
+
     string public constant symbol = "REI";
-    
+
     uint32 public constant decimals = 0;
-    
+
 }
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
-    
+
     address manager;
 
     uint restrictedPercent;
@@ -258,15 +258,15 @@ contract Crowdsale is Ownable {
     uint start;
 
     uint preIcoEnd;
-    
+
     uint preICOhardcap;
 
     uint public ETHUSD;
-    
+
     uint public hardcapUSD;
-    
+
     uint public collectedFunds;
-    
+
     bool pause;
 
     function Crowdsale() {
@@ -276,25 +276,25 @@ contract Crowdsale is Ownable {
         restricted = 0x1e129862b37Fe605Ef2099022F497caab7Db194c;//msg.sender;
         //адрес кошелька управляющего контрактом
         manager = msg.sender;
-        //процент, от проданных токенов, который мы оставляем себе 
+        //процент, от проданных токенов, который мы оставляем себе
         restrictedPercent = 1200;
-        //курс эфира к токенам 
+        //курс эфира к токенам
         ETHUSD = 70000;
-        //время старта  
+        //время старта
         start = now;
 	//время завершения prICO
         preIcoEnd = 1546300800; //Tue, 01 Jan 2019 00:00:00 GMT
         //период ICO в минутах
         //period = 25;
         //максимальное число сбора в токенах на PreICO
-        preICOhardcap = 42000;		
+        preICOhardcap = 42000;
         //максимальное число сбора в токенах
         //hardcap = 42000;
         //максимальное число сбора в центах
         hardcapUSD = 500000000;
         //собрано средство в центах
         collectedFunds = 0;
-        //пауза 
+        //пауза
         pause = false;
     }
 
@@ -303,7 +303,7 @@ contract Crowdsale is Ownable {
     	require(pause!=true);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(token.totalSupply() < preICOhardcap);
         //если набран hardcapUSD
@@ -313,7 +313,7 @@ contract Crowdsale is Ownable {
 
     function finishMinting() public {
         require(msg.sender == manager);
-        
+
         uint issuedTokenSupply = token.totalSupply();
         uint restrictedTokens = issuedTokenSupply.mul(restrictedPercent).div(10000);
         token.mint(restricted, restrictedTokens);
@@ -323,35 +323,35 @@ contract Crowdsale is Ownable {
     function createTokens() isUnderHardCap saleIsOn payable {
 
         require(msg.value > 0);
-        
+
         uint256 totalSupply = token.totalSupply();
-        
+
         uint256 numTokens = 0;
         uint256 summ1 = 1800000;
         uint256 summ2 = 3300000;
-          
+
         uint256 price1 = 18000;
         uint256 price2 = 15000;
         uint256 price3 = 12000;
-          
+
         uint256 usdValue = msg.value.mul(ETHUSD).div(1000000000000000000);
-          
-        uint256 spendMoney = 0; 
-        
+
+        uint256 spendMoney = 0;
+
         uint256 tokenRest = 0;
         uint256 rest = 0;
-        
+
           require(totalSupply < preICOhardcap);
-          
+
           tokenRest = preICOhardcap.sub(totalSupply);
 
           require(tokenRest > 0);
-            
-          
+
+
           if(usdValue>summ2 && tokenRest > 200 ){
               numTokens = (usdValue.sub(summ2)).div(price3).add(200);
               if(numTokens > tokenRest)
-                numTokens = tokenRest;              
+                numTokens = tokenRest;
               spendMoney = summ2.add((numTokens.sub(200)).mul(price3));
           }else if(usdValue>summ1 && tokenRest > 100 ) {
               numTokens = (usdValue.sub(summ1)).div(price2).add(100);
@@ -364,19 +364,19 @@ contract Crowdsale is Ownable {
                 numTokens = tokenRest;
               spendMoney = numTokens.mul(price1);
           }
-    
+
           rest = (usdValue.sub(spendMoney)).mul(1000000000000000000).div(ETHUSD);
-    
+
          msg.sender.transfer(rest);
          if(rest<msg.value){
             multisig.transfer(msg.value.sub(rest));
-            collectedFunds = collectedFunds + msg.value.sub(rest).mul(ETHUSD).div(1000000000000000000); 
+            collectedFunds = collectedFunds + msg.value.sub(rest).mul(ETHUSD).div(1000000000000000000);
          }
-         
+
           token.mint(msg.sender, numTokens);
-          
-        
-        
+
+
+
     }
 
     function() external payable {
@@ -385,18 +385,27 @@ contract Crowdsale is Ownable {
 
     function mint(address _to, uint _value) {
         require(msg.sender == manager);
-        token.mint(_to, _value);   
-    }    
-    
+        token.mint(_to, _value);
+    }
+
     function setETHUSD( uint256 _newPrice ) {
         require(msg.sender == manager);
         ETHUSD = _newPrice;
-    }    
-    
+    }
+
     function setPause( bool _newPause ) {
         require(msg.sender == manager);
         pause = _newPause;
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -313,10 +313,10 @@ contract ReentrancyGuard {
 ///  can then be redeemed for cryptokitties when desired.
 /// @notice When wrapping a cryptokitty, you get a generic WG0 token. Since the WG0 token is generic, it has no
 ///  no information about what cryptokitty you submitted, so you will most likely not receive the same kitty
-///  back when redeeming the token unless you specify that kitty's ID. The token only entitles you to receive 
+///  back when redeeming the token unless you specify that kitty's ID. The token only entitles you to receive
 ///  *a* cryptokitty in return, not necessarily the *same* cryptokitty in return. A different user can submit
 ///  their own WG0 tokens to the contract and withdraw the kitty that you originally deposited. WG0 tokens have
-///  no information about which kitty was originally deposited to mint WG0 - this is due to the very nature of 
+///  no information about which kitty was originally deposited to mint WG0 - this is due to the very nature of
 ///  the ERC20 standard being fungible, and the ERC721 standard being nonfungible.
 contract WrappedCKG0 is ERC20, ReentrancyGuard {
 
@@ -348,19 +348,19 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
     /// @dev An Array containing all of the cryptokitties that are locked in the contract, backing
     ///  WG0 ERC20 tokens 1:1
     /// @notice Some of the kitties in this array were indeed deposited to the contract, but they
-    ///  are no longer held by the contract. This is because withdrawSpecificKitty() allows a 
-    ///  user to withdraw a kitty "out of order". Since it would be prohibitively expensive to 
-    ///  shift the entire array once we've withdrawn a single element, we instead maintain this 
-    ///  mapping to determine whether an element is still contained in the contract or not. 
+    ///  are no longer held by the contract. This is because withdrawSpecificKitty() allows a
+    ///  user to withdraw a kitty "out of order". Since it would be prohibitively expensive to
+    ///  shift the entire array once we've withdrawn a single element, we instead maintain this
+    ///  mapping to determine whether an element is still contained in the contract or not.
     uint256[] private depositedKittiesArray;
 
     /// @dev A mapping keeping track of which kittyIDs are currently contained within the contract.
     /// @notice We cannot rely on depositedKittiesArray as the source of truth as to which cats are
-    ///  deposited in the contract. This is because burnTokensAndWithdrawKitties() allows a user to 
-    ///  withdraw a kitty "out of order" of the order that they are stored in the array. Since it 
-    ///  would be prohibitively expensive to shift the entire array once we've withdrawn a single 
-    ///  element, we instead maintain this mapping to determine whether an element is still contained 
-    ///  in the contract or not. 
+    ///  deposited in the contract. This is because burnTokensAndWithdrawKitties() allows a user to
+    ///  withdraw a kitty "out of order" of the order that they are stored in the array. Since it
+    ///  would be prohibitively expensive to shift the entire array once we've withdrawn a single
+    ///  element, we instead maintain this mapping to determine whether an element is still contained
+    ///  in the contract or not.
     mapping (uint256 => bool) private kittyIsDepositedInContract;
 
     /* ********* */
@@ -386,11 +386,11 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
     ///  of WG0 ERC20 tokens.
     /// @param _kittyIds  The ids of the cryptokitties that will be locked into the contract.
     /// @notice The user must first call approve() in the Cryptokitties Core contract on each kitty
-    ///  that thye wish to deposit before calling depositKittiesAndMintTokens(). There is no danger 
-    ///  of this contract overreaching its approval, since the CryptoKitties Core contract's approve() 
-    ///  function only approves this contract for a single Cryptokitty. Calling approve() allows this 
+    ///  that thye wish to deposit before calling depositKittiesAndMintTokens(). There is no danger
+    ///  of this contract overreaching its approval, since the CryptoKitties Core contract's approve()
+    ///  function only approves this contract for a single Cryptokitty. Calling approve() allows this
     ///  contract to transfer the specified kitty in the depositKittiesAndMintTokens() function.
-    
+
     function depositKittiesAndMintTokens(uint256[] calldata _kittyIds) external nonReentrant {
         require(_kittyIds.length > 0, 'you must submit an array with at least one element');
         for(uint i = 0; i < _kittyIds.length; i++){
@@ -405,11 +405,11 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
         _mint(msg.sender, (_kittyIds.length).mul(10**18));
     }
 
-    /// @notice Allows a user to burn WG0 ERC20 tokens in exchange for an equal number of locked 
+    /// @notice Allows a user to burn WG0 ERC20 tokens in exchange for an equal number of locked
     ///  cryptokitties.
-    /// @param _kittyIds  The IDs of the kitties that the user wishes to withdraw. If the user submits 0 
+    /// @param _kittyIds  The IDs of the kitties that the user wishes to withdraw. If the user submits 0
     ///  as the ID for any kitty, the contract uses the last kitty in the array for that kitty.
-    /// @param _destinationAddresses  The addresses that the withdrawn kitties will be sent to (this allows 
+    /// @param _destinationAddresses  The addresses that the withdrawn kitties will be sent to (this allows
     ///  anyone to "airdrop" kitties to addresses that they do not own in a single transaction).
     function burnTokensAndWithdrawKitties(uint256[] calldata _kittyIds, address[] calldata _destinationAddresses) external nonReentrant {
         require(_kittyIds.length == _destinationAddresses.length, 'you did not provide a destination address for each of the cats you wish to withdraw');
@@ -417,7 +417,7 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
         uint256 numTokensToBurn = _kittyIds.length;
         require(balanceOf(msg.sender) >= numTokensToBurn.mul(10**18), 'you do not own enough tokens to withdraw this many ERC721 cats');
         _burn(msg.sender, numTokensToBurn.mul(10**18));
-        
+
         for(uint i = 0; i < numTokensToBurn; i++){
             uint256 kittyToWithdraw = _kittyIds[i];
             if(kittyToWithdraw == 0){
@@ -457,7 +457,7 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
     }
 
     /// @notice Removes any kitties that exist in the array but are no longer held in the
-    ///  contract, which happens if the first few kitties have previously been withdrawn 
+    ///  contract, which happens if the first few kitties have previously been withdrawn
     ///  out of order using the withdrawSpecificKitty() function.
     /// @notice This function exists to prevent a griefing attack where a malicious attacker
     ///  could call withdrawSpecificKitty() on a large number of kitties at the front of the
@@ -486,7 +486,7 @@ contract WrappedCKG0 is ERC20, ReentrancyGuard {
     /// @dev We leave the fallback function payable in case the current State Rent proposals require
     ///  us to send funds to this contract to keep it alive on mainnet.
     /// @notice There is no function that allows the contract creator to withdraw any funds sent
-    ///  to this contract, so any funds sent directly to the fallback function that are not used for 
+    ///  to this contract, so any funds sent directly to the fallback function that are not used for
     ///  State Rent are lost forever.
     function() external payable {}
 }
@@ -498,4 +498,13 @@ contract KittyCore {
     function transfer(address _to, uint256 _tokenId) external;
     function getKitty(uint256 _id) public view returns (uint256 _generation);
     mapping (uint256 => address) public kittyIndexToApproved;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

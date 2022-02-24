@@ -55,12 +55,12 @@ contract CryptoEngineerInterface {
     uint256 public prizePool = 0;
 
     function subVirus(address /*_addr*/, uint256 /*_value*/) public {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public {}
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/) {}
     function isEngineerContract() external pure returns(bool) {}
 }
 contract CryptoMiningWarInterface {
-    uint256 public deadline; 
+    uint256 public deadline;
     function subCrystal( address /*_addr*/, uint256 /*_value*/ ) public {}
     function isMiningWarContract() external pure returns(bool) {}
 }
@@ -81,30 +81,30 @@ contract CrystalDeposit {
     address miningWarAddress;
     uint256 miningWarDeadline;
     uint256 constant private CRTSTAL_MINING_PERIOD = 86400;
-    /** 
+    /**
     * @dev mini game information
     */
     mapping(uint256 => Game) public games;
-    /** 
+    /**
     * @dev player information
     */
     mapping(address => Player) public players;
 
     mapping(address => bool)   public miniGames;
-   
+
     struct Game {
         uint256 round;
         uint256 crystals;
         uint256 prizePool;
         uint256 startTime;
         uint256 endTime;
-        bool ended; 
+        bool ended;
     }
     struct Player {
         uint256 currentRound;
         uint256 lastRound;
         uint256 reward;
-        uint256 share; // your crystals share in current round 
+        uint256 share; // your crystals share in current round
     }
     event EndRound(uint256 round, uint256 crystals, uint256 prizePool, uint256 startTime, uint256 endTime);
     event Deposit(address player, uint256 currentRound, uint256 deposit, uint256 currentShare);
@@ -127,9 +127,9 @@ contract CrystalDeposit {
     }
     function () public payable
     {
-        
+
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -144,7 +144,7 @@ contract CrystalDeposit {
     {
         selfdestruct(addr);
     }
-    function setContractsMiniGame( address _addr ) public isAdministrator 
+    function setContractsMiniGame( address _addr ) public isAdministrator
     {
         MiniGameInterface MiniGame = MiniGameInterface( _addr );
         if( MiniGame.isContractMiniGame() == false ) { revert(); }
@@ -159,7 +159,7 @@ contract CrystalDeposit {
     {
         miniGames[_addr] = false;
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 _miningWarDeadline ) public
@@ -172,15 +172,15 @@ contract CrystalDeposit {
         CryptoMiningWarInterface miningWarInterface = CryptoMiningWarInterface(_addr);
 
         require(miningWarInterface.isMiningWarContract() == true);
-        
+
         miningWarAddress = _addr;
-        
+
         MiningWar = miningWarInterface;
     }
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isEngineerContract() == true);
 
         Engineer = engineerInterface;
@@ -195,7 +195,7 @@ contract CrystalDeposit {
         miningWarDeadline = MiningWar.deadline();
 
         games[round].ended = true;
-    
+
         startRound();
     }
     function startRound() private
@@ -203,7 +203,7 @@ contract CrystalDeposit {
         require(games[round].ended == true);
 
         uint256 crystalsLastRound = games[round].crystals;
-        uint256 prizePoolLastRound= games[round].prizePool; 
+        uint256 prizePoolLastRound= games[round].prizePool;
 
         round = round + 1;
 
@@ -214,11 +214,11 @@ contract CrystalDeposit {
         uint256 endTime = startTime + HALF_TIME;
         // claim 5% of current prizePool as rewards.
         uint256 engineerPrizePool = getEngineerPrizePool();
-        
+
         uint256 prizePool = SafeMath.div(SafeMath.mul(engineerPrizePool, 5),100);
 
         Engineer.claimPrizePool(address(this), prizePool);
-        
+
         if (crystalsLastRound == 0) prizePool = SafeMath.add(prizePool, prizePoolLastRound);
 
         games[round] = Game(round, 0, prizePool, startTime, endTime, false);
@@ -230,7 +230,7 @@ contract CrystalDeposit {
 
         Game storage g = games[round];
         g.ended = true;
-        
+
         startRound();
 
         emit EndRound(g.round, g.crystals, g.prizePool, g.startTime, g.endTime);
@@ -244,12 +244,12 @@ contract CrystalDeposit {
         require(games[round].startTime <= now);
         require(_value >= 1);
 
-        MiningWar.subCrystal(msg.sender, _value); 
+        MiningWar.subCrystal(msg.sender, _value);
 
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(msg.sender);
-        
+
         Game storage g = games[round];
         uint256 _share = SafeMath.mul(_value, CRTSTAL_MINING_PERIOD);
         g.crystals = SafeMath.add(g.crystals, _share);
@@ -261,7 +261,7 @@ contract CrystalDeposit {
             p.currentRound = round;
         }
 
-        emit Deposit(msg.sender, p.currentRound, _value, p.share); 
+        emit Deposit(msg.sender, p.currentRound, _value, p.share);
     }
     function getCurrentReward(address _addr) public view returns(uint256 _currentReward)
     {
@@ -269,26 +269,26 @@ contract CrystalDeposit {
         _currentReward = p.reward;
         _currentReward += calculateReward(_addr, p.currentRound);
     }
-    function withdrawReward(address _addr) public 
+    function withdrawReward(address _addr) public
     {
         // require(miniGames[msg.sender] == true);
 
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(_addr);
         Player storage p = players[_addr];
-        uint256 balance  = p.reward; 
+        uint256 balance  = p.reward;
         if (address(this).balance >= balance && balance > 0) {
              _addr.transfer(balance);
             // update player
-            p.reward = 0;     
+            p.reward = 0;
         }
     }
     function updateReward(address _addr) private
     {
         Player storage p = players[_addr];
-        
-        if ( 
+
+        if (
             games[p.currentRound].ended == true &&
             p.lastRound < p.currentRound
             ) {
@@ -296,7 +296,7 @@ contract CrystalDeposit {
             p.lastRound = p.currentRound;
         }
     }
-    function getData(address _addr) 
+    function getData(address _addr)
     public
     view
     returns(
@@ -310,7 +310,7 @@ contract CrystalDeposit {
         uint256 _share
     ) {
          (_prizePool, _crystals, _startTime, _endTime) = getCurrentGame();
-         (_reward, _share)                 = getPlayerData(_addr);         
+         (_reward, _share)                 = getPlayerData(_addr);
     }
       /**
     * @dev calculate reward
@@ -321,7 +321,7 @@ contract CrystalDeposit {
         Game memory g = games[_round];
         if (g.endTime > now) return 0;
         if (g.crystals == 0) return 0;
-        if (p.lastRound >= _round) return 0; 
+        if (p.lastRound >= _round) return 0;
         return SafeMath.div(SafeMath.mul(g.prizePool, p.share), g.crystals);
     }
     function getCurrentGame() private view returns(uint256 _prizePool, uint256 _crystals, uint256 _startTime, uint256 _endTime)
@@ -336,11 +336,22 @@ contract CrystalDeposit {
     {
         Player memory p = players[_addr];
         _reward           = p.reward;
-        if (p.currentRound == round) _share = players[_addr].share; 
+        if (p.currentRound == round) _share = players[_addr].share;
         if (p.currentRound != p.lastRound) _reward += calculateReward(_addr, p.currentRound);
     }
     function getEngineerPrizePool() private view returns(uint256)
     {
         return Engineer.prizePool();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

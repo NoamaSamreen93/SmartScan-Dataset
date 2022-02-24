@@ -192,7 +192,7 @@ contract StandardToken is ERC20, Ownable {
   {
     return allowed[_owner][_spender];
   }
-  
+
 
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
@@ -357,14 +357,14 @@ contract AgaveCoin is Ownable, ERC20Burnable {
     uint public decimals = 18;
 
     uint public INITIAL_SUPPLY = 35000 * (10**6) * (10 ** uint256(decimals)) ; // 35 Billion
-    
+
 
     /// The owner of this address:
     address public ICOAddress = 0xFd167447Fb1A5E10b962F9c89c857f83bfFEB5D4;
-    
+
     /// The owner of this address:
-    address public AgaveCoinOperations = 0x88Ea9058d99DEf4182f4b356Ad178AdCF8e5D784;    
-    
+    address public AgaveCoinOperations = 0x88Ea9058d99DEf4182f4b356Ad178AdCF8e5D784;
+
 
     uint256 ICOAddressTokens = 25550 * (10**6) * (10**uint256(decimals));
     uint256 AgaveCoinOperationsTokens = 9450 * (10**6) * (10**uint256(decimals));
@@ -387,4 +387,15 @@ contract AgaveCoin is Ownable, ERC20Burnable {
         Ownable.transferOwnership(_newOwner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

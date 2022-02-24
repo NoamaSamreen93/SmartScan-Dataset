@@ -7,7 +7,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -17,17 +17,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -35,7 +35,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -47,8 +47,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 
 contract SafeMath {
@@ -87,13 +87,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
@@ -102,7 +102,7 @@ contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -128,12 +128,12 @@ contract IAngelCardData is AccessControl, Enums {
     function getAngelLockStatus(uint64 _angelId) constant public returns (bool);
 }
 contract LeaderboardSlogans is AccessControl {
-    
-    
+
+
     mapping(uint64 => string) public slogans;
     uint64[] Slogans;
     address public angelCardDataContract = 0x6D2E76213615925c5fc436565B5ee788Ee0E86DC;
-    
+
      function SetAngelCardDataContact(address _angelCardDataContract) onlyCREATOR external {
         angelCardDataContract = _angelCardDataContract;
     }
@@ -142,14 +142,25 @@ contract LeaderboardSlogans is AccessControl {
           address angelowner;
           (,,,,,,,,,,angelowner) = angelCardData.getAngel(_angelID);
             if (angelowner != msg.sender) {revert();}
-             //can only set slogans for angels you own. 
+             //can only set slogans for angels you own.
             slogans[_angelID] = _slogan;
     }
     function getSlogan(uint64 _angelID) public constant returns (string) {
         return slogans[_angelID];
     }
-    
+
        function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

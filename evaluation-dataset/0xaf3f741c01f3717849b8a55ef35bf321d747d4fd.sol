@@ -15,13 +15,13 @@ pragma solidity ^0.5.2;
  * compliant implementations may not do it.
  */
 
- 
- 
+
+
  contract Ownable {
      address private _owner;
- 
+
      event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
      /**
       * @dev The Ownable constructor sets the original `owner` of the contract to the sender
       * account.
@@ -30,14 +30,14 @@ pragma solidity ^0.5.2;
          _owner = msg.sender;
          emit OwnershipTransferred(address(0), _owner);
      }
- 
+
      /**
       * @return the address of the owner.
       */
      function owner() public view returns (address) {
          return _owner;
      }
- 
+
      /**
       * @dev Throws if called by any account other than the owner.
       */
@@ -45,14 +45,14 @@ pragma solidity ^0.5.2;
          require(isOwner());
          _;
      }
- 
+
      /**
       * @return true if `msg.sender` is the owner of the contract.
       */
      function isOwner() public view returns (bool) {
          return msg.sender == _owner;
      }
- 
+
      /**
       * @dev Allows the current owner to relinquish control of the contract.
       * It will not be possible to call the functions with the `onlyOwner`
@@ -64,7 +64,7 @@ pragma solidity ^0.5.2;
          emit OwnershipTransferred(_owner, address(0));
          _owner = address(0);
      }
- 
+
      /**
       * @dev Allows the current owner to transfer control of the contract to a newOwner.
       * @param newOwner The address to transfer ownership to.
@@ -72,7 +72,7 @@ pragma solidity ^0.5.2;
      function transferOwnership(address newOwner) public onlyOwner {
          _transferOwnership(newOwner);
      }
- 
+
      /**
       * @dev Transfers control of the contract to a newOwner.
       * @param newOwner The address to transfer ownership to.
@@ -83,16 +83,16 @@ pragma solidity ^0.5.2;
          _owner = newOwner;
      }
  }
- 
- 
- 
+
+
+
  contract Pausable is Ownable {
    event Pause();
    event Unpause();
- 
+
    bool public paused = false;
- 
- 
+
+
    /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -100,7 +100,7 @@ pragma solidity ^0.5.2;
      require(!paused);
      _;
    }
- 
+
    /**
     * @dev Modifier to make a function callable only when the contract is paused.
     */
@@ -108,7 +108,7 @@ pragma solidity ^0.5.2;
      require(paused);
      _;
    }
- 
+
    /**
     * @dev called by the owner to pause, triggers stopped state
     */
@@ -116,7 +116,7 @@ pragma solidity ^0.5.2;
      paused = true;
      emit Pause();
    }
- 
+
    /**
     * @dev called by the owner to unpause, returns to normal state
     */
@@ -125,7 +125,7 @@ pragma solidity ^0.5.2;
      emit Unpause();
    }
  }
- 
+
 
 contract IERC20 {
     function transfer(address to, uint256 value) external returns (bool);
@@ -350,7 +350,7 @@ contract testingitnow is Pausable {
   mapping(address => uint256) _balances;
 
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
   // The token being sold
   testingToken public token;
   uint256 constant public tokenDecimals = 18;
@@ -360,15 +360,15 @@ contract testingitnow is Pausable {
 
   // totalSupply
   uint256 public totalSupply = 5000000000 * (10 ** uint256(tokenDecimals));
- 
+
 
 
   constructor () public {
-    
+
     token = createTokenContract();
     token.unpause();
     token.transfer(msg.sender, totalSupply);
-    
+
 
 
   }
@@ -570,4 +570,13 @@ library Address {
         assembly { size := extcodesize(account) }
         return size > 0;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

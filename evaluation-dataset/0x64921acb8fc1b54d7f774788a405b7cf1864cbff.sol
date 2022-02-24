@@ -388,7 +388,7 @@ contract ERC20Mintable is ERC20 {
     }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, bytes calldata _extraData) external;
 }
 
@@ -406,7 +406,7 @@ contract ADC is ERC20Mintable, ERC20Burnable {
 
     function approveAndCall(address _spender, uint256 _value, bytes calldata _extraData)
         external
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -414,4 +414,8 @@ contract ADC is ERC20Mintable, ERC20Burnable {
             return true;
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

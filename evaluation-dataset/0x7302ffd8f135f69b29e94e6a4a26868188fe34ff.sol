@@ -12,8 +12,8 @@ pragma solidity ^0.4.24;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -103,7 +103,7 @@ contract YANKEES is ERC20Interface,Ownable {
    using SafeMath for uint256;
     uint256 public totalSupply;
     mapping(address => uint256) tokenBalances;
-   
+
    string public constant name = "YANKEES";
    string public constant symbol = "YANK";
    uint256 public constant decimals = 18;
@@ -132,8 +132,8 @@ contract YANKEES is ERC20Interface,Ownable {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  
+
+
      /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -151,7 +151,7 @@ contract YANKEES is ERC20Interface,Ownable {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -174,9 +174,9 @@ contract YANKEES is ERC20Interface,Ownable {
      function totalSupply() public constant returns (uint) {
          return totalSupply  - tokenBalances[address(0)];
      }
-     
-    
-     
+
+
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -184,7 +184,7 @@ contract YANKEES is ERC20Interface,Ownable {
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
-     
+
      /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -222,14 +222,14 @@ contract YANKEES is ERC20Interface,Ownable {
     return true;
   }
 
-     
+
      // ------------------------------------------------------------------------
      // Don't accept ETH
      // ------------------------------------------------------------------------
      function () public payable {
          revert();
      }
- 
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -248,4 +248,20 @@ contract YANKEES is ERC20Interface,Ownable {
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -55,9 +55,9 @@ contract owned {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract TokenERC20 {
-    
+
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -140,7 +140,7 @@ contract TokenERC20 {
      */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-        require(_spender != 0x0);    
+        require(_spender != 0x0);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -207,12 +207,12 @@ contract TPIToken is owned, TokenERC20 {
     string public name = "ThaneCoin";
     string public symbol = "TPI";
     uint8 public decimals = 18;
-    
-    
+
+
     uint256 public buyPrice;
-    uint256 public totalSupply = 91000000e18;  
-    
-    
+    uint256 public totalSupply = 91000000e18;
+
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -235,7 +235,7 @@ contract TPIToken is owned, TokenERC20 {
         balanceOf[_to] = balanceOf[_to].add(_value);                           // Add the same to the recipient
         Transfer(_from, _to, _value);
     }
-    
+
     /**
    * Transfer given number of tokens from given owner to given recipient.
    *
@@ -250,7 +250,7 @@ contract TPIToken is owned, TokenERC20 {
 	require(!frozenAccount[_from]);
     return TokenERC20.transferFrom(_from, _to, _value);
   }
-  
+
   /**
    * Transfer given number of tokens from message sender to given recipient.
    * @param _to address to transfer tokens to the owner of
@@ -266,7 +266,7 @@ contract TPIToken is owned, TokenERC20 {
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
@@ -278,20 +278,31 @@ contract TPIToken is owned, TokenERC20 {
         require(newBuyPrice > 0);
         buyPrice = newBuyPrice;
     }
-    
+
     function withdrawEther() onlyOwner {
        require(this.balance >= 100 ether);
        owner.transfer(this.balance);
     }
-   
-	
+
+
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         require(msg.value > 0);
         require(buyPrice > 0);
-         uint amount = msg.value.mul(buyPrice); 
+         uint amount = msg.value.mul(buyPrice);
         _transfer(owner, msg.sender, amount);              // makes the transfers
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -219,7 +219,7 @@ contract Ownable {
 
 contract InvestorsFeature is Ownable, StandardToken {
     using SafeMath for uint;
-    
+
     address[] public investors;
     mapping(address => bool) isInvestor;
     function deposit(address investor, uint tokens) internal {
@@ -228,18 +228,18 @@ contract InvestorsFeature is Ownable, StandardToken {
             isInvestor[investor] = true;
         }
     }
-    
+
     function sendp(address addr, uint amount) internal {
         require(addr != address(0));
         require(amount > 0);
         deposit(addr, amount);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[this] = balances[this].sub(amount);
         balances[addr] = balances[addr].add(amount);
         Transfer(this, addr, amount);
     }
-    
+
     function payDividends(uint) onlyOwner public {
         uint threshold = (30000  * (10 ** 8));
         require(balanceOf(this) >= threshold);
@@ -249,62 +249,71 @@ contract InvestorsFeature is Ownable, StandardToken {
             if(balances[investor] < (2500 * (10 ** 8))) continue;
             total += balances[investor];
         }
-        
+
         uint perToken = balances[this].mul(10 ** 10) / total;
-        
-        
+
+
         for(it = 0; it < investors.length;++it) {
             investor =  investors[it];
             if(balances[investor] < (2500 * (10 ** 8))) continue;
             uint out = balances[investor].mul(perToken).div(10 ** 10);
             sendp(investor, out);
-            
+
         }
     }
 
 }
 
 contract FinTab is Ownable, StandardToken, InvestorsFeature  {
-    
+
 
   string public constant name = "FinTabToken";
   string public constant symbol = "FNT";
   uint8 public constant decimals = 8;
-  
+
   uint256 public constant INITIAL_SUPPLY = (30 * (10**6)) * (10 ** uint256(decimals));
   uint public constant weiPerToken = 1 ether / (750 * (10 ** uint(decimals)));
-  
-  
-  
+
+
+
   function FinTab() public {
     totalSupply = INITIAL_SUPPLY;
     balances[this] = INITIAL_SUPPLY;
     Transfer(address(0), this, INITIAL_SUPPLY);
   }
-  
+
   function fromEther(uint value) private constant returns(uint) {
       return value / weiPerToken;
   }
-  
+
   function send(address addr, uint amount) public onlyOwner {
       sendp(addr, amount);
   }
-  
-  
+
+
   function() public payable {
       uint tokens = fromEther(msg.value);
       sendp(msg.sender, tokens);
   }
-  
+
   function burnRemainder(uint) public onlyOwner {
       uint value = balances[this];
       totalSupply = totalSupply.sub(value);
       balances[this] = 0;
   }
-  
+
   function moneyBack(address addr) public onlyOwner {
       require(addr != 0x0);
       addr.transfer(this.balance);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

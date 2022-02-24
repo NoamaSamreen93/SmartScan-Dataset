@@ -19,9 +19,9 @@ contract TheCoinBBToken {
     function TheCoinBBToken(uint256 initialSupply,string tokenName, string tokenSymbol, uint8 decimalUnits) public {
         //初始发币金额(总额要去除小数位数设置的长度)
         balanceOf[msg.sender] = initialSupply;
-        name = tokenName;                                 
-        symbol = tokenSymbol;                               
-        decimals = decimalUnits; 
+        name = tokenName;
+        symbol = tokenSymbol;
+        decimals = decimalUnits;
     }
 
     //转账操作
@@ -34,4 +34,13 @@ contract TheCoinBBToken {
         Transfer(msg.sender, _to, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

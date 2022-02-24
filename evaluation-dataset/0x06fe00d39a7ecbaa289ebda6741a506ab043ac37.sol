@@ -111,7 +111,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -233,7 +233,7 @@ contract BurnableToken is StandardToken {
 */
 contract Token is CappedToken, BurnableToken {
     function Token() CappedToken(10000000000 * 1 ether) StandardToken("Multi-Level-MarketingCoin", "MLMCoin", 18) public {
-        
+
     }
 }
 
@@ -279,12 +279,12 @@ contract Crowdsale is Pausable {
 
     function setTokenRate(uint _value) onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         steps[currentStep].priceTokenWei = 1 ether / _value;
 
         NewRate(steps[currentStep].priceTokenWei);
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!crowdsaleClosed);
         require(msg.value >= 0.001 ether);
@@ -297,7 +297,7 @@ contract Crowdsale is Pausable {
         uint sum = msg.value;
         uint amount = sum.mul(1 ether).div(step.priceTokenWei);
         uint retSum = 0;
-        
+
         if(step.tokensSold.add(amount) > step.tokensForSale) {
             uint retAmount = step.tokensSold.add(amount).sub(step.tokensForSale);
             retSum = retAmount.mul(step.priceTokenWei).div(1 ether);
@@ -323,7 +323,7 @@ contract Crowdsale is Pausable {
         require(!crowdsaleClosed);
 
         Step memory step = steps[currentStep];
-        
+
         require(step.issue);
         require(step.tokensSold.add(_value) <= step.tokensForSale);
 
@@ -337,7 +337,7 @@ contract Crowdsale is Pausable {
     function nextStep() onlyOwner public {
         require(!crowdsaleClosed);
         require(steps.length - 1 > currentStep);
-        
+
         currentStep += 1;
 
         NextStep(currentStep);
@@ -345,7 +345,7 @@ contract Crowdsale is Pausable {
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         token.mint(this, 1350000000 ether);
         token.mint(beneficiary, token.cap() - token.totalSupply());
         token.finishMinting();
@@ -362,4 +362,15 @@ contract Crowdsale is Pausable {
 
         token.transfer(beneficiary, token.balanceOf(this));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

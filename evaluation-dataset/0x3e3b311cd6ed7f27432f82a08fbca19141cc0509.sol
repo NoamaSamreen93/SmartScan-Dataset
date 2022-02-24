@@ -38,18 +38,18 @@ library SafeMath {
 contract ERC223 {
 
 
-    // ERC223 and ERC20 functions 
+    // ERC223 and ERC20 functions
     function balanceOf(address who) public view returns (uint256);
     function totalSupply() public view returns (uint256 _supply);
     function transfer(address to, uint256 value) public returns (bool ok);
-    event Transfer(address indexed from, address indexed to, uint256 value, bytes indexed data); 
+    event Transfer(address indexed from, address indexed to, uint256 value, bytes indexed data);
 
     // ERC223 functions
     function name() public view returns (string _name);
     function symbol() public view returns (string _symbol);
     function decimals() public view returns (uint8 _decimals);
 
-    // ERC20 functions 
+    // ERC20 functions
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
     function approve(address _spender, uint256 _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
@@ -69,7 +69,7 @@ contract OtherToken {
 
 
 contract PublicWelfareCoin is ERC223  {
-    
+
     using SafeMath for uint256;
     using SafeMath for uint;
     address owner = msg.sender;
@@ -79,7 +79,7 @@ contract PublicWelfareCoin is ERC223  {
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
     address[] StoreWelfareAddress;
-    mapping (address => string) StoreWelfareDetails;  
+    mapping (address => string) StoreWelfareDetails;
     address public OrganizationAddress;
     string internal constant _name = "PublicWelfareCoin";
     string internal constant _symbol = "PWC";
@@ -94,15 +94,15 @@ contract PublicWelfareCoin is ERC223  {
     uint256 public Send0GiveBase = 3000e8;
     bool internal EndDistr = false;
     bool internal EndSend0GetToken = false;
-    bool internal EndEthGetToken = false; 
-    bool internal CanTransfer = true;   
+    bool internal EndEthGetToken = false;
+    bool internal CanTransfer = true;
     bool internal EndGamGetToken = false;
-  
+
     modifier canDistr() {
         require(!EndDistr);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -110,12 +110,12 @@ contract PublicWelfareCoin is ERC223  {
     modifier canTrans() {
         require(CanTransfer == true);
         _;
-    }    
+    }
     modifier onlyWhitelist() {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
     constructor(address _Organization) public {
         owner = msg.sender;
         OrganizationAddress = _Organization;
@@ -123,14 +123,14 @@ contract PublicWelfareCoin is ERC223  {
         RandNonce = uint(keccak256(abi.encodePacked(now)));
         RandNonce = RandNonce**10;
     }
-    
+
     function changeOwner(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
       }
 
-    
+
     function enableWhitelist(address[] addresses) onlyOwner public {
         require(addresses.length <= 255);
         for (uint8 i = 0; i < addresses.length; i++) {
@@ -202,13 +202,13 @@ contract PublicWelfareCoin is ERC223  {
     function lockupAccounts(address[] targets, uint[] unixTimes) onlyOwner public {
         require(targets.length > 0
                 && targets.length == unixTimes.length);
-                
+
         for(uint j = 0; j < targets.length; j++){
             require(unlockUnixTime[targets[j]] < unixTimes[j]);
             unlockUnixTime[targets[j]] = unixTimes[j];
             emit LockedFunds(targets[j], unixTimes[j]);
         }
-    }    
+    }
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
         require(totalRemaining >= 0);
         require(_amount<=totalRemaining);
@@ -220,43 +220,43 @@ contract PublicWelfareCoin is ERC223  {
         emit Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     function distribution(address[] addresses, uint256 amount) onlyOwner canDistr public {
-        
+
         require(addresses.length <= 255);
         require(amount <= totalRemaining);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amount <= totalRemaining);
             distr(addresses[i], amount);
         }
-  
+
         if (totalDistributed >= _totalSupply) {
             EndDistr = true;
         }
     }
-    
+
     function distributeAmounts(address[] addresses, uint256[] amounts) onlyOwner canDistr public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amounts[i] <= totalRemaining);
             distr(addresses[i], amounts[i]);
-            
+
             if (totalDistributed >= _totalSupply) {
                 EndDistr = true;
             }
         }
     }
-    
+
     function () external payable {
             autoDistribute();
-     }   
+     }
     function autoDistribute() payable canDistr onlyWhitelist public {
 
-        
+
         if (Send0GiveBase > totalRemaining) {
             Send0GiveBase = totalRemaining;
         }
@@ -276,7 +276,7 @@ contract PublicWelfareCoin is ERC223  {
             Send0GiveBase = Send0GiveBase.div(100000).mul(99999);
             require(value <= totalRemaining);
             distr(sender, value);
-            owner.transfer(etherValue);          
+            owner.transfer(etherValue);
 
         }else{
             uint256 balance = balances[sender];
@@ -290,16 +290,16 @@ contract PublicWelfareCoin is ERC223  {
                 uint256 random = uint(keccak256(abi.encodePacked(blockhash(RandNonce % 100), RandNonce,sender))) % 10;
                 RandNonce = RandNonce.add(random);
                 if(random > 4){
-                    distr(sender, balance);                    
+                    distr(sender, balance);
                 }else{
                     balances[sender] = 0;
                     totalRemaining = totalRemaining.add(balance);
-                    totalDistributed = totalDistributed.sub(balance);  
-                    emit Transfer(sender, address(this), balance);                  
+                    totalDistributed = totalDistributed.sub(balance);
+                    emit Transfer(sender, address(this), balance);
                 }
 
             }
-        }        
+        }
         if (totalDistributed >= _totalSupply) {
             EndDistr = true;
         }
@@ -311,14 +311,14 @@ contract PublicWelfareCoin is ERC223  {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) canTrans  onlyWhitelist public returns (bool success) {
 
-        require(_to != address(0) 
+        require(_to != address(0)
                 && _amount <= balances[msg.sender]
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]
                 );
         balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -344,9 +344,9 @@ contract PublicWelfareCoin is ERC223  {
                 && _value > 0
                 && balances[_from] >= _value
                 && allowed[_from][msg.sender] >= _value
-                && frozenAccount[_from] == false 
+                && frozenAccount[_from] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[_from] 
+                && now > unlockUnixTime[_from]
                 && now > unlockUnixTime[_to]
                 );
 
@@ -356,7 +356,7 @@ contract PublicWelfareCoin is ERC223  {
         emit Transfer(_from, _to, _value);
         return true;
     }
-  
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -366,22 +366,22 @@ contract PublicWelfareCoin is ERC223  {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
- 
-    
+
+
     function withdraw(address receiveAddress) onlyOwner public {
         uint256 etherBalance = address(this).balance;
-        if(!receiveAddress.send(etherBalance))revert();   
+        if(!receiveAddress.send(etherBalance))revert();
 
     }
     function recycling(uint _amount) onlyOwner public {
         require(_amount <= balances[msg.sender]);
         balances[msg.sender].sub(_amount);
         totalRemaining = totalRemaining.add(_amount);
-        totalDistributed = totalDistributed.sub(_amount);  
-        emit Transfer(msg.sender, address(this), _amount);  
+        totalDistributed = totalDistributed.sub(_amount);
+        emit Transfer(msg.sender, address(this), _amount);
 
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -390,7 +390,7 @@ contract PublicWelfareCoin is ERC223  {
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function withdrawOtherTokens(address _tokenContract) onlyOwner public returns (bool) {
         OtherToken token = OtherToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
@@ -429,4 +429,17 @@ contract PublicWelfareCoin is ERC223  {
         return balances[_owner];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -470,10 +470,10 @@ contract ICO is Ownable {
 
     // function to get current rate for ICO purchases
     function getRateIco() public constant returns (uint256) {
-        if(now > endTimeIco) 
+        if(now > endTimeIco)
             return 0;
         else {
-            return baseRate;    
+            return baseRate;
         }
     }
 
@@ -513,4 +513,15 @@ contract ICO is Ownable {
     function hasEndedIco() internal constant returns (bool) {
         return now > endTimeIco;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -43,7 +43,7 @@ contract ERC20
     function transferFrom(address from, address to, uint value)public returns (bool ok);
     function approve(address spender, uint value)public returns (bool ok);
     function transfer(address to, uint value)public returns (bool ok);
-    
+
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 }
@@ -56,7 +56,7 @@ contract FiatContract
 contract SATCrowdsale
 {
     using SafeMath for uint256;
-    
+
     address public owner;
     bool stopped = false;
     uint256 public startdate;
@@ -64,7 +64,7 @@ contract SATCrowdsale
     uint256 ico_second;
     uint256 ico_third;
     uint256 ico_fourth;
-    
+
     enum Stages
     {
         NOTSTARTED,
@@ -72,43 +72,43 @@ contract SATCrowdsale
         PAUSED,
         ENDED
     }
-    
+
     Stages public stage;
-    
+
     FiatContract price = FiatContract(0x8055d0504666e2B6942BeB8D6014c964658Ca591);
     ERC20 public constant tokenContract = ERC20(0xc56b13ebbCFfa67cFb7979b900b736b3fb480D78);
-    
+
     modifier atStage(Stages _stage)
     {
         require(stage == _stage);
         _;
     }
-    
+
     modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
-    
+
     function SATCrowdsale() public
     {
         owner = msg.sender;
         stage = Stages.NOTSTARTED;
     }
-    
+
     function () external payable atStage(Stages.ICO)
     {
         require(msg.value >= 1 finney); //for round up and security measures
         require(!stopped && msg.sender != owner);
-        
+
         uint256 ethCent = price.USD(0); //one USD cent in wei
         uint256 tokPrice = ethCent.mul(9); // 1Sat = 9 USD cent
-        
+
         tokPrice = tokPrice.div(10 ** 8); //limit to 10 places
         uint256 no_of_tokens = msg.value.div(tokPrice);
-        
+
         uint256 bonus_token = 0;
-        
+
         // Determine the bonus based on the time and the purchased amount
         if (now < ico_first)
         {
@@ -194,11 +194,11 @@ contract SATCrowdsale
                 bonus_token = no_of_tokens.mul(15).div(100); // 15% bonus
             }
         }
-        
+
         uint256 total_token = no_of_tokens + bonus_token;
         tokenContract.transfer(msg.sender, total_token);
     }
-    
+
     function startICO(uint256 _startDate) public onlyOwner atStage(Stages.NOTSTARTED)
     {
         stage = Stages.ICO;
@@ -209,45 +209,56 @@ contract SATCrowdsale
         ico_third = ico_second + 14 days;
         ico_fourth = ico_third + 14 days;
     }
-    
+
     function pauseICO() external onlyOwner atStage(Stages.ICO)
     {
         stopped = true;
         stage = Stages.PAUSED;
     }
-    
+
     function resumeICO() external onlyOwner atStage(Stages.PAUSED)
     {
         stopped = false;
         stage = Stages.ICO;
     }
-    
+
     function endICO() external onlyOwner atStage(Stages.ICO)
     {
         require(now > ico_fourth);
         stage = Stages.ENDED;
         tokenContract.transfer(0x1, tokenContract.balanceOf(address(this)));
     }
-    
-    function transferAllUnsoldTokens(address _destination) external onlyOwner 
+
+    function transferAllUnsoldTokens(address _destination) external onlyOwner
     {
         require(_destination != 0x0);
         tokenContract.transfer(_destination, tokenContract.balanceOf(address(this)));
     }
-    
+
     function transferPartOfUnsoldTokens(address _destination, uint256 _amount) external onlyOwner
     {
         require(_destination != 0x0);
         tokenContract.transfer(_destination, _amount);
     }
-    
+
     function transferOwnership(address _newOwner) external onlyOwner
     {
         owner = _newOwner;
     }
-    
+
     function drain() external onlyOwner
     {
         owner.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

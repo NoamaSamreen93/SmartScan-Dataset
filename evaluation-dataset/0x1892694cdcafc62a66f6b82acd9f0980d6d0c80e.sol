@@ -256,7 +256,7 @@ contract StandardToken is ERC20, BasicToken {
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event Burn(address indexed burner, uint indexed value);
@@ -268,7 +268,7 @@ contract MintableToken is StandardToken, Ownable {
     require(!mintingFinished);
     _;
   }
-  
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -280,7 +280,7 @@ contract MintableToken is StandardToken, Ownable {
     totalSupply_ = totalSupply_.sub(_value);
     Burn(burner, _value);
   }
- 
+
 
   /**
    * @dev Function to mint tokens
@@ -308,19 +308,19 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract GeniusEther is MintableToken {
-    
+
     string public constant name = "Bar Coin2";
-    
+
     string public constant symbol = "BarCoin2";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
 
 contract bar is GeniusEther {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
 
     GeniusEther public token = new GeniusEther();
@@ -337,7 +337,7 @@ contract bar is GeniusEther {
 	start = 1523185200;
 	stop =  1523186700;
     hardcap = 0.1 ether;
-    softcap = 0.005 ether; 
+    softcap = 0.005 ether;
     breco =false;
     }
 
@@ -345,7 +345,7 @@ contract bar is GeniusEther {
     	require(now >= start && now < stop);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(this.balance <= hardcap);
         _;
@@ -361,20 +361,20 @@ contract bar is GeniusEther {
     if (now >= stop && this.balance<=softcap) {
 	    breco=true; }
 	}
-	
+
    function Reco() {
        uint256 bal;
        if (breco=true) {
         bal= token.balanceOf(msg.sender);
         token.burn(bal);
-        msg.sender.transfer(bal);    
+        msg.sender.transfer(bal);
        }
-    }	
+    }
 
    function createTokens() isUnderHardCap saleIsOn payable {
-       
+
        if (msg.value< 0.0001 ether) {
-        msg.sender.transfer(msg.value);    
+        msg.sender.transfer(msg.value);
        }
        else {
         token.mint(msg.sender, msg.value);
@@ -386,5 +386,16 @@ contract bar is GeniusEther {
         if (now < start) {msg.sender.transfer(msg.value);}
         if (now > stop && breco==true) {Reco();}
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

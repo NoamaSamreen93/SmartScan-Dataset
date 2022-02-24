@@ -150,7 +150,7 @@ contract DinoToken is StandardToken, Pausable {
         public
         validDestination(_to)
         whenNotPaused
-        returns (bool) 
+        returns (bool)
     {
         return super.transfer(_to, _value);
     }
@@ -159,7 +159,7 @@ contract DinoToken is StandardToken, Pausable {
         public
         validDestination(_to)
         whenNotPaused
-        returns (bool) 
+        returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -177,9 +177,9 @@ contract DinoTokenSale is Ownable {
     uint public constant ALLOC_SALE             = 90000000e18; // 45%
 
     // sale stage
-    uint public constant STAGE1_TIME_END  = 9 days; 
-    uint public constant STAGE2_TIME_END  = 20 days; 
-    uint public constant STAGE3_TIME_END  = 35 days; 
+    uint public constant STAGE1_TIME_END  = 9 days;
+    uint public constant STAGE2_TIME_END  = 20 days;
+    uint public constant STAGE3_TIME_END  = 35 days;
 
     // Token sale rate from ETH to DINO
     uint public constant RATE_PRESALE      = 4000; // +25%
@@ -188,16 +188,16 @@ contract DinoTokenSale is Ownable {
     uint public constant RATE_CROWDSALE_S3 = 3200; // +0%
 
 	// For token transfer
-    address public constant WALLET_FOUNDATION = 0x9bd5ae7400ce11b418a4ef9e9310fbd0c2f5e503; 
-    address public constant WALLET_TEAM       = 0x9bb148948a75a5b205b4d13efb9fe893c8c8fb7b; 
-    address public constant WALLET_MARKETING  = 0x83e5e7f8f90c90a0b8948dc2c1116f8c0dcf10d8; 
-    address public constant WALLET_ADVISOR    = 0x5c166aa48503fbec223fa06d2757af01850d60f7; 
+    address public constant WALLET_FOUNDATION = 0x9bd5ae7400ce11b418a4ef9e9310fbd0c2f5e503;
+    address public constant WALLET_TEAM       = 0x9bb148948a75a5b205b4d13efb9fe893c8c8fb7b;
+    address public constant WALLET_MARKETING  = 0x83e5e7f8f90c90a0b8948dc2c1116f8c0dcf10d8;
+    address public constant WALLET_ADVISOR    = 0x5c166aa48503fbec223fa06d2757af01850d60f7;
 
     // For ether transfer
-    address private constant WALLET_ETH_DINO  = 0x191B29ADbCA5Ecb285005Cff15441F8411DF5f72; 
-    address private constant WALLET_ETH_ADMIN = 0xAba33f3a098f7f0AC9B60614e395A40406e97915; 
+    address private constant WALLET_ETH_DINO  = 0x191B29ADbCA5Ecb285005Cff15441F8411DF5f72;
+    address private constant WALLET_ETH_ADMIN = 0xAba33f3a098f7f0AC9B60614e395A40406e97915;
 
-    DinoToken public dinoToken; 
+    DinoToken public dinoToken;
 
     uint256 public presaleStartTime = 1528416000; // 2018-6-8 8:00 (UTC+8) 1528416000
     uint256 public startTime        = 1528848000; // 2018-6-13 8:00 (UTC+8) 1528848000
@@ -235,9 +235,9 @@ contract DinoTokenSale is Ownable {
         }
     }
 
-    function validPurchase() 
-        internal 
-        returns(bool) 
+    function validPurchase()
+        internal
+        returns(bool)
     {
         bool withinPeriod = now >= presaleStartTime && now <= endTime;
         bool nonZeroPurchase = msg.value != 0;
@@ -257,41 +257,41 @@ contract DinoTokenSale is Ownable {
     }
 
     function ()
-        public 
-        payable 
+        public
+        payable
     {
         require(validPurchase());
 
         uint256 weiAmount = msg.value;
         uint256 purchaseTokens;
 
-        if (whitelisted_Presale[msg.sender]) 
-            purchaseTokens = weiAmount.mul(RATE_PRESALE); 
+        if (whitelisted_Presale[msg.sender])
+            purchaseTokens = weiAmount.mul(RATE_PRESALE);
         else
-            purchaseTokens = weiAmount.mul(getPriceRate()); 
+            purchaseTokens = weiAmount.mul(getPriceRate());
 
         require(purchaseTokens > 0 && ALLOC_SALE - totalDinoSold >= purchaseTokens); // supply check
         require(dinoToken.transfer(msg.sender, purchaseTokens));
         emit TokenPurchase(msg.sender, weiAmount, purchaseTokens);
 
-        totalDinoSold = totalDinoSold.add(purchaseTokens); 
+        totalDinoSold = totalDinoSold.add(purchaseTokens);
         weiRaised = weiRaised.add(weiAmount);
         weiContributions[msg.sender] = weiContributions[msg.sender].add(weiAmount);
-        
+
         forwardFunds();
     }
 
-    function forwardFunds() 
-        internal 
+    function forwardFunds()
+        internal
     {
         WALLET_ETH_DINO.transfer((msg.value).mul(91).div(100));
         WALLET_ETH_ADMIN.transfer((msg.value).mul(9).div(100));
     }
 
-    function hasEnded() 
-        public 
+    function hasEnded()
+        public
         view
-        returns(bool) 
+        returns(bool)
     {
         return now > endTime;
     }
@@ -303,7 +303,7 @@ contract DinoTokenSale is Ownable {
         halted = _halted;
     }
 
-    function drainToken(address _to, uint256 _amount) 
+    function drainToken(address _to, uint256 _amount)
         public
         onlyOwner
     {
@@ -311,7 +311,7 @@ contract DinoTokenSale is Ownable {
         dinoToken.transfer(_to, _amount);
     }
 
-    function drainRemainingToken(address _to) 
+    function drainRemainingToken(address _to)
         public
         onlyOwner
     {
@@ -319,10 +319,21 @@ contract DinoTokenSale is Ownable {
         dinoToken.transfer(_to, dinoToken.balanceOf(this));
     }
 
-    function safeDrain() 
+    function safeDrain()
         public
         onlyOwner
     {
         WALLET_ETH_ADMIN.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -6,16 +6,16 @@ contract MB {
   string public symbol = "MB";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 100000000000000000000000000000;
-    
+
   mapping(address => uint) balances;
   mapping (address => mapping (address => uint)) allowed;
   uint256 public _totalSupply;
   address public _creator;
   bool bIsFreezeAll = false;
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
   event Approval(address indexed owner, address indexed spender, uint value);
-  
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
@@ -26,7 +26,7 @@ contract MB {
     assert(c>=a && c>=b);
     return c;
   }
-  
+
   function totalSupply() public constant returns (uint256 total) {
 	total = _totalSupply;
   }
@@ -64,22 +64,38 @@ contract MB {
     return allowed[_owner][_spender];
   }
 
-  function freezeAll() public 
+  function freezeAll() public
   {
 	require(msg.sender == _creator);
 	bIsFreezeAll = !bIsFreezeAll;
   }
-  
+
   function MB() public {
     _totalSupply = INITIAL_SUPPLY;
 	_creator = 0xf2F91C1C681816eE275ce9b4366D5a906da6eBf5;
 	balances[_creator] = INITIAL_SUPPLY;
 	bIsFreezeAll = false;
   }
-  
+
   function destroy() public  {
 	require(msg.sender == _creator);
 	selfdestruct(_creator);
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

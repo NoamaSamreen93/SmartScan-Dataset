@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-       
+
         //if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
@@ -81,28 +81,28 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Rozium is StandardToken { 
+contract Rozium is StandardToken {
 
     /* Public variables of the token */
 
-    
-    string public name;                  	
-    uint8 public decimals;                            	
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;    	
-    uint256 public totalEthInWei;          
-    address public fundsWallet; 		
 
-   
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
+
+
     function Rozium() {
-        balances[msg.sender] = 150000000000000000000000000;              
-        totalSupply = 150000000000000000000000000;                      
-        name = "Rozium";                                   
-        decimals = 18;                                               
-        symbol = "RZM";                                            
-        unitsOneEthCanBuy = 27000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 150000000000000000000000000;
+        totalSupply = 150000000000000000000000000;
+        name = "Rozium";
+        decimals = 18;
+        symbol = "RZM";
+        unitsOneEthCanBuy = 27000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -115,10 +115,10 @@ contract Rozium is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        
-        fundsWallet.transfer(msg.value);                               
+
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -130,4 +130,17 @@ contract Rozium is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

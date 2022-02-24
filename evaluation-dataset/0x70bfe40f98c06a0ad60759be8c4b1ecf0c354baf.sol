@@ -1045,7 +1045,7 @@ contract DarknodeRegistry is Ownable {
     }
 
     /// @notice Allows the contract owner to initiate an ownership transfer of
-    /// the DarknodeRegistryStore. 
+    /// the DarknodeRegistryStore.
     /// @param _newOwner The address to transfer the ownership to.
     function transferStoreOwnership(address _newOwner) external onlyOwner {
         store.transferOwnership(_newOwner);
@@ -1402,7 +1402,7 @@ contract SettlementRegistry is Ownable {
     ///        broker signatures.
     function registerSettlement(uint64 _settlementID, Settlement _settlementContract, BrokerVerifier _brokerVerifierContract) public onlyOwner {
         bool alreadyRegistered = settlementDetails[_settlementID].registered;
-        
+
         settlementDetails[_settlementID] = SettlementDetails({
             registered: true,
             settlementContract: _settlementContract,
@@ -2232,11 +2232,11 @@ contract RenExSettlement is Ownable {
     function updateRenExTokens(RenExTokens _newRenExTokensContract) external onlyOwner {
         // Basic validation knowing that RenExTokens exposes VERSION
         require(bytes(_newRenExTokensContract.VERSION()).length > 0, "invalid tokens contract");
-        
+
         emit LogRenExTokensUpdated(renExTokensContract, _newRenExTokensContract);
         renExTokensContract = _newRenExTokensContract;
     }
-    
+
     /// @notice The owner of the contract can update the RenExBalances address.
     /// @param _newRenExBalancesContract The address of the new RenExBalances
     ///       contract.
@@ -2803,7 +2803,7 @@ contract RenExBalances is Ownable {
 
     /// @dev Should match the address in the DarknodeRewardVault
     address constant public ETHEREUM = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    
+
     // Delay between a trader calling `withdrawSignal` and being able to call
     // `withdraw` without a broker signature.
     uint256 constant public SIGNAL_DELAY = 48 hours;
@@ -2891,7 +2891,7 @@ contract RenExBalances is Ownable {
     /// @param _newBrokerVerifierContract the address of the new broker verifier contract
     function updateBrokerVerifierContract(RenExBrokerVerifier _newBrokerVerifierContract) external onlyOwner {
         // Basic validation knowing that RenExBrokerVerifier exposes VERSION
-        require(bytes(_newBrokerVerifierContract.VERSION()).length > 0, "invalid broker verifier contract");        
+        require(bytes(_newBrokerVerifierContract.VERSION()).length > 0, "invalid broker verifier contract");
 
         emit LogBrokerVerifierContractUpdated(brokerVerifierContract, _newBrokerVerifierContract);
         brokerVerifierContract = _newBrokerVerifierContract;
@@ -2921,7 +2921,7 @@ contract RenExBalances is Ownable {
             CompatibleERC20(_token).safeApprove(rewardVaultContract, _fee);
             rewardVaultContract.deposit(_feePayee, ERC20(_token), _fee);
         }
-        
+
         // Increase balance
         if (_value > 0) {
             privateIncrementBalance(_traderTo, ERC20(_token), _value);
@@ -3121,11 +3121,11 @@ contract RenExSwapperdSettlement is Ownable {
     function updateRenExTokens(RenExTokens _newRenExTokensContract) external onlyOwner {
         // Basic validation knowing that RenExTokens exposes VERSION
         require(bytes(_newRenExTokensContract.VERSION()).length > 0, "invalid tokens contract");
-        
+
         emit LogRenExTokensUpdated(renExTokensContract, _newRenExTokensContract);
         renExTokensContract = _newRenExTokensContract;
     }
-    
+
     /// @notice The owner of the contract can update the RenExBalances address.
     /// @param _newRenExBalancesContract The address of the new RenExBalances
     ///       contract.
@@ -3485,4 +3485,20 @@ contract RenExSwapperdSettlement is Ownable {
             return (_numerator / _denominator) / 10 ** uint256(-_scale);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

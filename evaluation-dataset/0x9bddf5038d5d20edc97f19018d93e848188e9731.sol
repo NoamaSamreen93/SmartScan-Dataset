@@ -273,7 +273,7 @@ contract MintableToken is StandardToken, Ownable {
 
   function mint(address _to, uint256 _amount) public returns (bool) {
     require((msg.sender == saleAgent || msg.sender == owner) && !mintingFinished);
-    
+
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
@@ -566,11 +566,23 @@ contract PreICO is ValueBonusFeature, NextSaleAgentFeature, CommonSale {
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function fallback() internal minInvestLimited(msg.value) returns(uint) {
     require(now >= start && now < endSaleDate());
     wallet.transfer(msg.value);
     return mintTokensByETH(msg.sender, msg.value);
   }
-  
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

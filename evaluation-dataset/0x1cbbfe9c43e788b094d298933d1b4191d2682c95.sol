@@ -55,27 +55,27 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract GEZI is StandardToken { 
+contract GEZI is StandardToken {
 
 
-    string public name;                
-    uint8 public decimals;           
-    string public symbol;                
-    string public version = "1.0"; 
-    uint256 public unitsOneEthCanBuy;    
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = "1.0";
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
- 
+
     function GEZI() {
-        balances[msg.sender] = 500000000000000000;               
-        totalSupply = 500000000000000000;                        
-        name = "GEZItoken";                                              
-        decimals = 8;                                               
-        symbol = "GEZI";                                            
-                                            
-        fundsWallet = msg.sender;                                   
-                          
+        balances[msg.sender] = 500000000000000000;
+        totalSupply = 500000000000000000;
+        name = "GEZItoken";
+        decimals = 8;
+        symbol = "GEZI";
+
+        fundsWallet = msg.sender;
+
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -84,4 +84,15 @@ contract GEZI is StandardToken {
         if (!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {throw;}
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

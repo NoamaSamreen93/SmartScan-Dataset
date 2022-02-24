@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract TomMonaLisa is StandardToken {
 
-    function TomMonaLisa() public { 
+    function TomMonaLisa() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract TomMonaLisa is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,8 @@ contract TomMonaLisa is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

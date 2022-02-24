@@ -180,12 +180,18 @@ contract CalorieCoin is owned, StandardToken {
 
         assert(balances[msg.sender] == pre_balance - num);
     }
-    
+
         function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
-    
 
+
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

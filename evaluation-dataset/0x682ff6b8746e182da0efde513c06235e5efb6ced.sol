@@ -639,7 +639,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
 /**
  * @dev See https://fytoken.github.io/
  * Get sworn at by important people on the blockchain. Auction off that token. Get rich. Simple right?
- * Also, FYT token will solve world hunger, relativity theory's shortcomings, interplanetory travel and 
+ * Also, FYT token will solve world hunger, relativity theory's shortcomings, interplanetory travel and
  * that small problem of consciousness.
  */
 contract FYouToken is Ownable, ERC721Token {
@@ -668,10 +668,10 @@ contract FYouToken is Ownable, ERC721Token {
 
     // finney i.e. 0.001 eth
     uint256 private fee = 1;
-    
+
     /**
-     * @dev Function to create a token and associate it with Graffiti. 
-     * If both message and url are empty then those can be set again. 
+     * @dev Function to create a token and associate it with Graffiti.
+     * If both message and url are empty then those can be set again.
      * If any of the message or url are set, then both are prevented from furhter modification
      * @param _schmuck the address to which the token will be created. Usually same as address of function invoker.
      * @param _clearTextMessageJustToBeSuperClear The string Graffiti.
@@ -758,4 +758,20 @@ contract FYouToken is Ownable, ERC721Token {
         feesAvailableForWithdraw = feesAvailableForWithdraw.sub(_amount);
         _to.transfer(_amount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

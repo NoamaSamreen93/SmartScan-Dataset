@@ -3,29 +3,29 @@ pragma solidity 0.5.9;
 contract DistributedEnergyCoinBase {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     constructor() public {}
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address src) public view returns (uint256) {
         return _balances[src];
     }
-    
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         emit Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function add(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x + y;
         require(z >= x && z>=y);
@@ -43,9 +43,9 @@ contract DistributedEnergyCoin is DistributedEnergyCoinBase {
 
     string  public  symbol = "EDC";
     string  public name = "EDC Coin";
-    uint256  public  decimals = 8; 
+    uint256  public  decimals = 8;
     uint256 public freezedValue = 38280000*(10**8);
-    uint256 public releaseTime = 1560902400; 
+    uint256 public releaseTime = 1560902400;
     uint256 public latestReleaseTime = 1560902400; // 2019-06-19
     address public owner;
     address public freezeOwner = address(0x01);
@@ -57,7 +57,7 @@ contract DistributedEnergyCoin is DistributedEnergyCoinBase {
     }
 
     FreezeStruct[] public unfreezeTimeMap;
-    
+
     constructor() public{
         _supply = 319000000*(10**8);
         _balances[freezeOwner] = freezedValue;
@@ -102,4 +102,13 @@ contract DistributedEnergyCoin is DistributedEnergyCoinBase {
 
         emit Transfer(freezeOwner, owner, unfreezeTimeMap[i].unfreezeValue);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

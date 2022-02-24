@@ -90,7 +90,7 @@ contract McFlight is Ownable {
     constructor () public {
         GridMaster_Contract_ID = address(this);
     }
-    
+
     function Start_Flight(
         uint256 _Flight_ID,
         uint256 _Flight_start_time,
@@ -105,7 +105,7 @@ contract McFlight is Ownable {
         address _Insurance_ID,
         address _Catering_ID,
         address _App_ID
-        ) public onlyOwner 
+        ) public onlyOwner
         {
             require(_Flight_ID != 0);
 
@@ -133,7 +133,7 @@ contract McFlight is Ownable {
             flights[_Flight_ID].Insurance_ID = _Insurance_ID;
             flights[_Flight_ID].Catering_ID = _Catering_ID;
             flights[_Flight_ID].App_ID = _App_ID;
-            
+
             emit FlightStart(_Flight_ID, _Flight_start_time, _McFLY_tokens_reserved);
     }
 
@@ -150,7 +150,7 @@ contract McFlight is Ownable {
         uint256 _Insurance_Fee,
         uint256 _Catering_Fee,
         uint256 _App_Fee
-        ) public onlyOwner 
+        ) public onlyOwner
         {
             flightFees[flights[_Flight_ID].Car_ID].value = _Car_Fee;
             flightFees[flights[_Flight_ID].Pad_Owner_Departure_ID].value = _Pad_Owner_Departure_Fee;
@@ -189,4 +189,13 @@ contract McFlight is Ownable {
     function DeleteMe() public onlyOwner {
         selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

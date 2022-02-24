@@ -100,7 +100,7 @@ contract MonLockupFund is Ownable {
         uint256 diff = (now - lockupDate) / 2592000; // month diff
         uint256 partition = 30;
 
-        if (diff >= partition) 
+        if (diff >= partition)
             return 0;
         else
             return initLockupAmt.mul(partition-diff).div(partition);
@@ -109,4 +109,15 @@ contract MonLockupFund is Ownable {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

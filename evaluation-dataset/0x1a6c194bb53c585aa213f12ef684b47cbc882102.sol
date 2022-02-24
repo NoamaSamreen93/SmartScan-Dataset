@@ -135,7 +135,7 @@ contract Blacklisted is Ownable {
 	*/
 	function setBlacklist(address _address, bool _bool) public onlyOwner {
 		require(_address != address(0));
-		
+
 		blacklist[_address] = _bool;
 		emit SetBlacklist(_address, _bool);
 	}
@@ -375,7 +375,7 @@ contract MaterialResourceToken is BurnableToken {
     string public constant symbol = "MRT1";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 10000000000;
-    
+
 	mapping(address => string) public keys;
 
     constructor() public {
@@ -391,5 +391,16 @@ contract MaterialResourceToken is BurnableToken {
 
 		keys[msg.sender] = _key;
 		emit Register(msg.sender, _key);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

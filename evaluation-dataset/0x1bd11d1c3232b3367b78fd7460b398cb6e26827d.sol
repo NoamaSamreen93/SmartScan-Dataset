@@ -10,14 +10,14 @@ contract Sale {
     uint256 private sendtoken;
     uint256 private cost1token;
     token public tokenReward;
-    
+
     function Sale() public {
         tokenReward = token(maintoken);
     }
-    
+
     function() external payable {
         cost1token = 0.0000056 ether;
-        
+
         if ( now > 1547586000 ) {
             cost1token = 0.0000195 ether;
         }
@@ -25,9 +25,20 @@ contract Sale {
         if ( now > 1556226000 ) {
             cost1token = 0.000028 ether;
         }
-        
+
         sendtoken = (msg.value)/cost1token;
         tokenReward.transferFrom(owner, msg.sender, sendtoken);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -608,7 +608,7 @@ contract Consts {
     string constant TOKEN_SYMBOL = "EJAC";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xB030dC3457e03e6a5c2e9c428Cbd8F104B5282d5;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -669,11 +669,11 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
     , ERC223Token
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -690,7 +690,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0xb030dc3457e03e6a5c2e9c428cbd8f104b5282d5)];
         uint[1] memory amounts = [uint(250000000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -702,7 +702,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -710,7 +710,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -733,4 +733,15 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

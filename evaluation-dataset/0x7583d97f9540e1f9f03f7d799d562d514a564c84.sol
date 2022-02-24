@@ -1,5 +1,5 @@
 pragma solidity ^0.4.8;
-contract PeonyToken{ 
+contract PeonyToken{
     /* Public variables of the token */
     string public name;                   //名称: eg Simon Bucks
     uint8 public decimals;               //最多的小数位数，How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
@@ -26,9 +26,9 @@ contract PeonyToken{
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -42,7 +42,7 @@ contract PeonyToken{
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -56,15 +56,15 @@ contract PeonyToken{
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -76,4 +76,20 @@ contract PeonyToken{
     }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

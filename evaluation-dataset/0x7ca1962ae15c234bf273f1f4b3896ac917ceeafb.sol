@@ -293,8 +293,19 @@ contract FOREToken is PausableToken {
   string public name = "FORESEE";
   string public symbol = "FORE";
   uint8 public decimals = 18;
-  
+
   function FOREToken() public {
       balances[msg.sender] = totalSupply;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

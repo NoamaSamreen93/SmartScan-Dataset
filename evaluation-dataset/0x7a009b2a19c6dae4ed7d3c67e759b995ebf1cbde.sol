@@ -307,10 +307,10 @@ constructor () public {
     openingTime = 1537135200;
     closingTime = 1538344800;
     cap = 0;
-    bonusCap = 1000000000000000000000000; //1M WPT 
+    bonusCap = 1000000000000000000000000; //1M WPT
     minInvestmentValue = 0.02 ether;
     ethRaised = 0;
-        
+
     checksOn = true;
     gasAmount = 25000;
   }
@@ -356,7 +356,7 @@ constructor () public {
   function setGasAmount(uint256 _gasAmount) public onlyOwner {
     gasAmount = _gasAmount;
   }
-  
+
    /**
    * @dev Set cap for current round.
    */
@@ -582,7 +582,7 @@ constructor () public {
     closingTime = 1535320800;
 
     minInvestmentValue = 0.02 ether;
-        
+
     checksOn = true;
     gasAmount = 25000;
   }
@@ -712,7 +712,7 @@ constructor () public {
     tokensRaised = tokensRaised.add(tokens);
 
     minterContract.mint(_beneficiary, tokens);
-    
+
     emit TokenPurchase(
       msg.sender,
       _beneficiary,
@@ -777,4 +777,10 @@ constructor () public {
         isTransferDone
         );
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

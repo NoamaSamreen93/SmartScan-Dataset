@@ -91,7 +91,7 @@ contract WorkProff is TokenBase {
     function WorkProff() public {
         minerTimeOfLastProof = now;
     }
-    
+
     function proofOfWork(uint nonce) public {
         require(minerTotalReward < minerTotalSupply);
         bytes8 n = bytes8(sha3(nonce, minerCurrentChallenge));
@@ -99,7 +99,7 @@ contract WorkProff is TokenBase {
 
         uint timeSinceLastProof = (now - minerTimeOfLastProof);
         require(timeSinceLastProof >= 5 seconds);
-        
+
         uint reward = 0;
         uint difficuty = 0;
         if (now - foundingTime < minerPreTime) {
@@ -212,4 +212,15 @@ contract Token is Option {
         Transfer(0, this, value);
         Transfer(this, owner, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

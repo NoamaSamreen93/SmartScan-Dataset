@@ -559,9 +559,9 @@ contract ERC20Capped is ERC20Mintable {
 }
 
 contract QuadransToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped {
-    
+
     using SafeERC20 for ERC20;
-    
+
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 600000000 * (10 ** uint256(DECIMALS));
 
@@ -571,4 +571,13 @@ contract QuadransToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped {
     constructor () public ERC20Capped(INITIAL_SUPPLY) ERC20Detailed("QuadransToken", "QDT", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

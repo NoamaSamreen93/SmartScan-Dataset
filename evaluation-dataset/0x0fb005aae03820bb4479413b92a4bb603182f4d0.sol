@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24; 
+pragma solidity ^0.4.24;
 
 interface ERC721 /* is ERC165 */ {
     /// @dev This emits when ownership of any NFT changes by any mechanism.
@@ -160,7 +160,7 @@ contract Ownable {
 interface AvatarService {
   function updateAvatarInfo(address _owner, uint256 _tokenId, string _name, uint256 _dna) external;
   function createAvatar(address _owner, string _name, uint256 _dna) external  returns(uint256);
-  function getMountedChildren(address _owner,uint256 _tokenId, address _childAddress) external view returns(uint256[]); 
+  function getMountedChildren(address _owner,uint256 _tokenId, address _childAddress) external view returns(uint256[]);
   function getAvatarInfo(uint256 _tokenId) external view returns (string _name, uint256 _dna);
   function getOwnedAvatars(address _owner) external view returns(uint256[] _avatars);
   function unmount(address _owner, address _childContract, uint256[] _children, uint256 _avatarId) external;
@@ -184,7 +184,7 @@ contract AvatarOperator is Ownable {
     for(uint8 i = 0; i < nameBytes.length; ++i) {
       uint8 asc = uint8(nameBytes[i]);
       require (
-        asc == 95 || (asc >= 48 && asc <= 57) || (asc >= 65 && asc <= 90) || (asc >= 97 && asc <= 122), "Invalid name"); 
+        asc == 95 || (asc >= 48 && asc <= 57) || (asc >= 65 && asc <= 90) || (asc >= 97 && asc <= 122), "Invalid name");
     }
     _;
   }
@@ -197,7 +197,7 @@ contract AvatarOperator is Ownable {
     avatarService = AvatarService(_addr);
     avatarAddress = _addr;
   }
-  
+
   function updateAvatarInfo(uint256 _tokenId, string _name, uint256 _dna) external nameValid(_name){
     avatarService.updateAvatarInfo(msg.sender, _tokenId, _name, _dna);
   }
@@ -219,15 +219,26 @@ contract AvatarOperator is Ownable {
   function getOwnedAvatars() external view returns(uint256[] _tokenIds) {
     return avatarService.getOwnedAvatars(msg.sender);
   }
- 
+
   function handleChildren(
-	address _childContract, 
+	address _childContract,
 	uint256[] _unmountChildren, // array of unmount child ids
 	uint256[] _mountChildren,   // array of mount child ids
-	uint256 _avatarId)           // above ids from which avatar 
+	uint256 _avatarId)           // above ids from which avatar
 	external {
 	require(_childContract != address(0), "child address error");
 	avatarService.unmount(msg.sender, _childContract, _unmountChildren, _avatarId);
 	avatarService.mount(msg.sender, _childContract, _mountChildren, _avatarId);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

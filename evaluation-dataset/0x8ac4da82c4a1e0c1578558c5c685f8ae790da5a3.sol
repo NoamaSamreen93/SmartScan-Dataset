@@ -1,9 +1,9 @@
-pragma solidity ^0.4.23; 
- 
-/*    
+pragma solidity ^0.4.23;
+
+/*
 * Author:  Konstantin G...
 * Telegram: @bunnygame
-* 
+*
 * email: info@bunnycoin.co
 * site : http://bunnycoin.co
 * @title Ownable
@@ -12,17 +12,17 @@ pragma solidity ^0.4.23;
 */
 
 contract Ownable {
-    
+
     address owner;
-    address ownerMoney;   
-    
+    address ownerMoney;
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
 
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
-    */    
+    */
     constructor() public {
         owner = msg.sender;
         ownerMoney = msg.sender;
@@ -36,28 +36,28 @@ contract Ownable {
         _;
     }
 
- 
+
 
     function transferMoney(address _add) public  onlyOwner {
         if (_add != address(0)) {
             ownerMoney = _add;
         }
     }
-    
- 
+
+
     function transferOwner(address _add) public onlyOwner {
         if (_add != address(0)) {
             owner = _add;
         }
-    } 
-      
+    }
+
     function getOwnerMoney() public view onlyOwner returns(address) {
         return ownerMoney;
-    } 
- 
+    }
+
 }
 
- 
+
 
 /**
  * @title Whitelist
@@ -72,7 +72,7 @@ contract Whitelist is Ownable {
 
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
- 
+
   /**
    * @dev Throws if called by any account that's not whitelisted.
    */
@@ -82,7 +82,7 @@ contract Whitelist is Ownable {
     }
 
     constructor() public {
-            whitelist[msg.sender] = true;  
+            whitelist[msg.sender] = true;
     }
 
   /**
@@ -110,7 +110,7 @@ contract Whitelist is Ownable {
     function getInWhitelist(address addr) public view returns(bool) {
         return whitelist[addr];
     }
- 
+
     /**
     * @dev add addresses to the whitelist
     * @param addrs addresses
@@ -169,18 +169,18 @@ library SafeMath {
         return c;
     }
 }
- 
+
 contract StorageMarket  is Whitelist {
 
   using SafeMath for uint256;
- 
+
     // the last cost of a sold seal
-    uint public lastmoney = 0;   
-    uint public lastBunny = 0;   
-    uint public countBunny = 0;   
+    uint public lastmoney = 0;
+    uint public lastBunny = 0;
+    uint public countBunny = 0;
 
 
-    bool public pause = false; 
+    bool public pause = false;
 
     // how many a bunny
     mapping (uint32 => uint) public bunnyCost;
@@ -199,26 +199,37 @@ contract StorageMarket  is Whitelist {
 
     function setBunnyCost(uint32 _bunnyID, uint _money) external onlyWhitelisted {
         require(isPauseSave());
-        lastmoney = _money;   
-        lastBunny = _bunnyID;  
+        lastmoney = _money;
+        lastBunny = _bunnyID;
         bunnyCost[_bunnyID] = _money;
-        if (bunnyCost[_bunnyID] == 0) { 
+        if (bunnyCost[_bunnyID] == 0) {
             countBunny = countBunny.add(1);
         }
         emit AddCost(_bunnyID, _money);
     }
-    
+
     function getBunnyCost(uint32 _bunnyID) public view returns (uint money) {
         return bunnyCost[_bunnyID];
     }
 
-    function deleteBunnyCost(uint32 _bunnyID) external onlyWhitelisted { 
-        require(isPauseSave()); 
+    function deleteBunnyCost(uint32 _bunnyID) external onlyWhitelisted {
+        require(isPauseSave());
         bunnyCost[_bunnyID] = 0;
-        if (bunnyCost[_bunnyID] != 0) { 
+        if (bunnyCost[_bunnyID] != 0) {
             countBunny = countBunny.sub(1);
-            emit DeleteCost(_bunnyID); 
+            emit DeleteCost(_bunnyID);
         }
     }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -69,11 +69,11 @@ contract owned {
 
 
 
- 
+
 contract RECFToken is owned {
-    
+
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string public constant name = "RealEstateCryptoFund";
     string public constant symbol = "RECF";
@@ -85,8 +85,8 @@ contract RECFToken is owned {
     // This creates an array with all balanceOf
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
-    
+
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
     bool public mintingFinished = false;
@@ -112,7 +112,7 @@ contract RECFToken is owned {
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
-        
+
     }
 
        /**
@@ -181,9 +181,9 @@ function finishMinting() onlyOwner canMint public returns (bool) {
     mintingFinished = true;
     emit MintFinished();
     return true;
-    }  
+    }
 
-    
+
    /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -208,7 +208,7 @@ function burn(uint256 _value) onlyOwner public {
      *
      * @param _from the address of the sender
      * @param _value the amount of money to burn
-      
+
      */
 function burnFrom(address _from, uint256 _value) onlyOwner public returns (bool success) {
         require(balanceOf[_from] >= _value);                                                // Check if the targeted balance is enough
@@ -222,4 +222,10 @@ function burnFrom(address _from, uint256 _value) onlyOwner public returns (bool 
 
 
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

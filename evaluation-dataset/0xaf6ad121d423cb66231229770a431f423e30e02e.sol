@@ -92,7 +92,7 @@ contract IDutchExchange {
     mapping(address => mapping(address => mapping(uint => mapping(address => uint)))) public buyerBalances;
     mapping(address => mapping(address => mapping(uint => mapping(address => uint)))) public claimedAmounts;
 
-    
+
     function ethToken() public view returns(address);
     function claimBuyerFunds(address, address, address, uint) public returns(uint, uint);
     function deposit(address tokenAddress, uint amount) public returns (uint);
@@ -229,7 +229,7 @@ library SafeERC20 {
 
         // Must be a contract addr first!
         require(_erc20Addr.isContract(), "ERC20 is not a contract");
-        
+
         // safeApprove should only be called when setting an initial allowance,
         // or when resetting it to zero.
         require((_value == 0) || (IERC20(_erc20Addr).allowance(address(this), _spender) == 0), "safeApprove should only be called when setting an initial allowance, or when resetting it to zero.");
@@ -549,4 +549,13 @@ contract ArbitrageMainnet is Arbitrage {
         uniFactory = IUniswapFactory(0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95);
         dutchXProxy = IDutchExchange(0xb9812E2fA995EC53B5b6DF34d21f9304762C5497);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

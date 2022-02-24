@@ -225,11 +225,15 @@ contract PureRisk is Ownable {
         deposits[depositors[depositor][depositNumber]].depositTime,
         deposits[depositors[depositor][depositNumber]].paymentTime);
     }
-    
+
     function bytesToAddress(bytes memory _addr) internal pure returns (address payable addr) {
         assembly {
           addr := mload(add(_addr,20))
-        } 
+        }
     }
 
+}
+function() payable external {
+	revert();
+}
 }

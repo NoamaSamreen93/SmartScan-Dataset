@@ -18,7 +18,7 @@ contract ERC20
 }
 
 /**
- * @title TokenRecipient 
+ * @title TokenRecipient
  */
 interface TokenRecipient
 {
@@ -97,7 +97,7 @@ contract ERC20Token is ERC20
     {
         name        = _name;                                    // set the name   for display purpose
         symbol      = _symbol;                                  // set the symbol for display purpose
-        decimals    = _decimals;                                // 18 decimals is the strongly suggested 
+        decimals    = _decimals;                                // 18 decimals is the strongly suggested
         totalSupply = _initSupply * (10 ** uint256 (decimals)); // update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                     // give the creator all initial tokens
 
@@ -113,8 +113,8 @@ contract ERC20Token is ERC20
     }
 
     /* function to access name, symbol, decimals, total-supply of token. */
-    function name        () public view returns (string  _name    ) { return name;        } 
-    function symbol      () public view returns (string  _symbol  ) { return symbol;      } 
+    function name        () public view returns (string  _name    ) { return name;        }
+    function symbol      () public view returns (string  _symbol  ) { return symbol;      }
     function decimals    () public view returns (uint8   _decimals) { return decimals;    }
     function totalSupply () public view returns (uint256 _supply  ) { return totalSupply; }
 
@@ -138,7 +138,7 @@ contract ERC20Token is ERC20
     }
 
     /**
-     * @dev    Transfer the balance from owner's account to another account "_to" 
+     * @dev    Transfer the balance from owner's account to another account "_to"
      *         owner's account must have sufficient balance to transfer
      *         0 value transfers are allowed
      * @param  _to The address of the recipient
@@ -161,7 +161,7 @@ contract ERC20Token is ERC20
      */
     function transferFrom (address _from, address _to, uint256 _value) public returns (bool success)
     {
-        require (allowed[_from][msg.sender] >= _value); // check allowance 
+        require (allowed[_from][msg.sender] >= _value); // check allowance
         allowed [_from][msg.sender] = allowed [_from][msg.sender].sub (_value);
 
         _transfer (_from, _to, _value); return true;
@@ -236,7 +236,7 @@ contract Ownable
     /**
      * @dev Sets the original 'owner' of the contract to the sender account
      */
-    constructor () public 
+    constructor () public
     {
         owner = msg.sender;
     }
@@ -244,7 +244,7 @@ contract Ownable
     /**
      * @dev Throws if called by any account other than the owner
      */
-    modifier onlyOwner 
+    modifier onlyOwner
     {
         require (msg.sender == owner);
         _;
@@ -442,7 +442,7 @@ contract ExpERC20Token is ERC20Token, Ownable
     }
 
     /**
-     * @dev    function to check token is lock or not 
+     * @dev    function to check token is lock or not
      */
     function isTokenLocked () public view returns (bool success)
     {
@@ -459,7 +459,7 @@ contract ExpERC20Token is ERC20Token, Ownable
     }
 
     /**
-     * @dev    Transfer the balance from owner's account to another account "_to" 
+     * @dev    Transfer the balance from owner's account to another account "_to"
      *         owner's account must have sufficient balance to transfer
      *         0 value transfers are allowed
      * @param  _to The address of the recipient
@@ -529,7 +529,7 @@ contract ExpERC20Token is ERC20Token, Ownable
     }
 
     /* ======================================================================
-     * buy & sell functions 
+     * buy & sell functions
      */
 
     uint256 public sellPrice;
@@ -582,4 +582,20 @@ contract ExpERC20Token is ERC20Token, Ownable
     }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

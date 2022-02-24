@@ -6,8 +6,8 @@ pragma solidity ^0.4.24;
  *  - GAIN 3% EVERY 24 HOURS (every 5900 blocks)
  *  - 0.5% for Promotion on your investment (every ether stays on contract's balance)
  *  - 0.5% dev commision
- *  - 10% affliate commision 
- *  - 89% Payout commision 
+ *  - 10% affliate commision
+ *  - 89% Payout commision
  *
  * How to use:
  *  1. Send any amount of ether to make an investment(minimum 0.01)
@@ -24,7 +24,7 @@ pragma solidity ^0.4.24;
  */
 
 contract Infinite3{
-    
+
     using SafeMath for uint256;
 
     mapping(address => uint256) investments;
@@ -43,11 +43,11 @@ contract Infinite3{
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
-     * @dev Сonstructor Sets the original roles of the contract 
+     * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor(address _bountyManager) public {
         owner = msg.sender;
         ownerWallet = msg.sender;
@@ -57,7 +57,7 @@ contract Infinite3{
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -127,7 +127,7 @@ contract Infinite3{
             return false;
         }
     }
-    
+
     /**
     * @dev Bounty reward
     */
@@ -176,16 +176,16 @@ contract Infinite3{
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-    
+
     /**
-    * @dev Updates referrer balance 
+    * @dev Updates referrer balance
     * @param _hunter The address of the referrer
     * @param _amount An uint256 representing the referral earnings.
     */
     function updateReferral(address _hunter, uint256 _amount) onlyBountyManager public {
         referrer[_hunter] = referrer[_hunter].add(_amount);
     }
-    
+
 }
 
 /**
@@ -219,4 +219,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

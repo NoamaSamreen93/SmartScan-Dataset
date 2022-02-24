@@ -167,20 +167,20 @@ contract KinguinKrowns is ERC223, StandardToken {
   string public constant symbol = "KRS";
   uint8 public constant decimals = 18;
   // uint256 public totalSupply; // defined in ERC20 contract
-		
+
   function KinguinKrowns() {
 	owner = msg.sender;
     totalSupply = 100000000 * (10**18); // 100 mln
     balances[msg.sender] = totalSupply;
-  } 
-  
+  }
+
   /*
   //only do if call is from owner modifier
   modifier onlyOwner() {
     if (msg.sender != owner) throw;
     _;
   }*/
-  
+
   //function that is called when a user or another contract wants to transfer funds
   function transfer(address _to, uint _value, bytes _data) returns (bool success) {
     //filtering if the target is a contract with bytecode inside it
@@ -216,12 +216,12 @@ contract KinguinKrowns is ERC223, StandardToken {
     assembly { length := extcodesize(_addr) }
     return length > 0;
   }
-  
-  // returns krown balance of given address 	
+
+  // returns krown balance of given address
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-	
+
 }
 
 contract KinguinIco is SafeMath, ERC223Receiver {
@@ -229,41 +229,41 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   address public owner;             // contract owner address
   address public api;               // address of api manager
   KinguinKrowns public krs;     // handler to KRS token contract
-  
+
   // rounds data storage:
   struct IcoRoundData {
     uint rMinEthPayment;            // set minimum ETH payment
-    uint rKrsUsdFixed;              // set KRS/USD fixed ratio for calculation of krown amount to be sent, 
+    uint rKrsUsdFixed;              // set KRS/USD fixed ratio for calculation of krown amount to be sent,
     uint rKycTreshold;              // KYC treshold in EUR (needed for check whether incoming payment requires KYC/AML verified address)
     uint rMinKrsCap;                // minimum amount of KRS to be sent during a round
     uint rMaxKrsCap;                // maximum amount of KRS to be sent during a round
     uint rStartBlock;               // number of blockchain start block for a round
     uint rEndBlock;                 // number of blockchain end block for a round
     uint rEthPaymentsAmount;        // sum of ETH tokens received from participants during a round
-    uint rEthPaymentsCount;         // counter of ETH payments during a round 
+    uint rEthPaymentsCount;         // counter of ETH payments during a round
     uint rSentKrownsAmount;         // sum of ETH tokens received from participants during a round
     uint rSentKrownsCount;          // counter of KRS transactions during a round
     bool roundCompleted;            // flag whether a round has finished
   }
   mapping(uint => IcoRoundData) public icoRounds;  // table of rounds data: ico number, ico record
-  
+
   mapping(address => bool) public allowedAdresses; // list of KYC/AML approved wallets: participant address, allowed/not allowed
-  
+
   struct RoundPayments {            // structure for storing sum of payments
     uint round;
     uint amount;
   }
-  // amount of payments from the same address during each round 
+  // amount of payments from the same address during each round
   //  (to catch multiple payments to check KYC/AML approvance): participant address, payments record
-  mapping(address => RoundPayments) public paymentsFromAddress; 
+  mapping(address => RoundPayments) public paymentsFromAddress;
 
   uint public ethEur;               // current EUR/ETH exchange rate (for AML check)
-  uint public ethUsd;               // current ETH/USD exchange rate (sending KRS for ETH calc) 
+  uint public ethUsd;               // current ETH/USD exchange rate (sending KRS for ETH calc)
   uint public krsUsd;               // current KRS/USD exchange rate (sending KRS for ETH calc)
   uint public rNo;                  // counter for rounds
   bool public icoInProgress;        // ico status flag
   bool public apiAccessDisabled;    // api access security flag
-  
+
   event LogReceivedEth(address from, uint value, uint block); // publish an event about incoming ETH
   event LogSentKrs(address to, uint value, uint block); // publish an event about sent KRS
 
@@ -278,7 +278,7 @@ contract KinguinIco is SafeMath, ERC223Receiver {
 	require(msg.sender == owner);
     _;
   }
-  
+
   // execution allowed only for contract owner or api address
   modifier onlyOwnerOrApi() {
 	require(msg.sender == owner || msg.sender == api);
@@ -287,19 +287,19 @@ contract KinguinIco is SafeMath, ERC223Receiver {
 	}
     _;
   }
- 
+
   function KinguinIco() {
     owner = msg.sender; // this contract owner
-    api = msg.sender; // initially api address is the contract owner's address 
-    krs = KinguinKrowns(0xdfb410994b66778bd6cc2c82e8ffe4f7b2870006); // KRS token 
-  } 
- 
+    api = msg.sender; // initially api address is the contract owner's address
+    krs = KinguinKrowns(0xdfb410994b66778bd6cc2c82e8ffe4f7b2870006); // KRS token
+  }
+
   // receiving ETH and sending KRS
   function () payable {
     if(msg.sender != owner) { // if ETH comes from other than the contract owner address
       if(block.number >= icoRounds[rNo].rStartBlock && block.number <= icoRounds[rNo].rEndBlock && !icoInProgress) {
         icoInProgress = true;
-      }  
+      }
       require(block.number >= icoRounds[rNo].rStartBlock && block.number <= icoRounds[rNo].rEndBlock && !icoRounds[rNo].roundCompleted); // allow payments only during the ico round
       require(msg.value >= icoRounds[rNo].rMinEthPayment); // minimum eth payment
 	  require(ethEur > 0); // ETH/EUR rate for AML must be set earlier
@@ -316,15 +316,15 @@ contract KinguinIco is SafeMath, ERC223Receiver {
       if(paymentsFromAddress[msg.sender].round != rNo) { // on mappings all keys are possible, so there is no checking for its existence
         paymentsFromAddress[msg.sender].round = rNo; // on new round set to current round
         paymentsFromAddress[msg.sender].amount = 0; // zeroing amount on new round
-      }   
+      }
       if(safeMul(ethEur, safeDiv(msg.value, 10**18)) >= icoRounds[rNo].rKycTreshold || // if payment from this sender requires to be from KYC/AML approved address
         // if sum of payments from this sender address requires to be from KYC/AML approved address
-        safeMul(ethEur, safeDiv(safeAdd(paymentsFromAddress[msg.sender].amount, msg.value), 10**18)) >= icoRounds[rNo].rKycTreshold) { 
+        safeMul(ethEur, safeDiv(safeAdd(paymentsFromAddress[msg.sender].amount, msg.value), 10**18)) >= icoRounds[rNo].rKycTreshold) {
 		require(allowedAdresses[msg.sender]); // only KYC/AML allowed address
       }
 
       icoRounds[rNo].rEthPaymentsAmount = safeAdd(icoRounds[rNo].rEthPaymentsAmount, msg.value);
-      icoRounds[rNo].rEthPaymentsCount += 1; 
+      icoRounds[rNo].rEthPaymentsCount += 1;
       paymentsFromAddress[msg.sender].amount = safeAdd(paymentsFromAddress[msg.sender].amount, msg.value);
       LogReceivedEth(msg.sender, msg.value, block.number);
       icoRounds[rNo].rSentKrownsAmount = safeAdd(icoRounds[rNo].rSentKrownsAmount, krowns4eth);
@@ -342,7 +342,7 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   }
 
   // receiving tokens other than ETH
-  
+
   // ERC223 receiver implementation - https://github.com/aragon/ERC23/blob/master/contracts/implementation/Standard223Receiver.sol
   Tkn tkn;
 
@@ -373,10 +373,10 @@ contract KinguinIco is SafeMath, ERC223Receiver {
     if (!__isTokenFallback) throw;
     _;
   }
-  
+
   function supportsToken(address token) returns (bool) {
     if (token == address(krs)) {
-	  return true; 
+	  return true;
     } else {
       revert();
 	}
@@ -384,16 +384,16 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   // end of ERC223 receiver implementation ------------------------------------
 
 
-  // set up a new ico round  
+  // set up a new ico round
   function newIcoRound(uint _rMinEthPayment, uint _rKrsUsdFixed, uint _rKycTreshold,
     uint _rMinKrsCap, uint _rMaxKrsCap, uint _rStartBlock, uint _rEndBlock) public onlyOwner {
     require(!icoInProgress);            // new round can be set up only after finished/cancelled the active one
     require(rNo < 25);                  // limit of 25 rounds (with pre-ico)
 	rNo += 1;                           // increment round number, pre-ico has number 1
-	icoRounds[rNo] = IcoRoundData(_rMinEthPayment, _rKrsUsdFixed, _rKycTreshold, _rMinKrsCap, _rMaxKrsCap, 
-	  _rStartBlock, _rEndBlock, 0, 0, 0, 0, false); // rEthPaymentsAmount, rEthPaymentsCount, rSentKrownsAmount, rSentKrownsCount); 
+	icoRounds[rNo] = IcoRoundData(_rMinEthPayment, _rKrsUsdFixed, _rKycTreshold, _rMinKrsCap, _rMaxKrsCap,
+	  _rStartBlock, _rEndBlock, 0, 0, 0, 0, false); // rEthPaymentsAmount, rEthPaymentsCount, rSentKrownsAmount, rSentKrownsCount);
   }
-  
+
   // remove current round, params only - it does not refund any ETH!
   function removeCurrentIcoRound() public onlyOwner {
     require(icoRounds[rNo].rEthPaymentsAmount == 0); // only if there was no payment already
@@ -415,9 +415,9 @@ contract KinguinIco is SafeMath, ERC223Receiver {
 
   function changeIcoRoundEnding(uint _rEndBlock) public onlyOwner {
     require(icoRounds[rNo].rStartBlock > 0); // round must be set up earlier
-    icoRounds[rNo].rEndBlock = _rEndBlock;  
+    icoRounds[rNo].rEndBlock = _rEndBlock;
   }
- 
+
   // closes round automatically
   function endIcoRound() private {
     icoInProgress = false;
@@ -425,11 +425,11 @@ contract KinguinIco is SafeMath, ERC223Receiver {
 	icoRounds[rNo].roundCompleted = true;
   }
 
-  // close round manually - if needed  
+  // close round manually - if needed
   function endIcoRoundManually() public onlyOwner {
     endIcoRound();
   }
-  
+
   // add a verified KYC/AML address
   function addAllowedAddress(address _address) public onlyOwnerOrApi {
     allowedAdresses[_address] = true;
@@ -453,14 +453,14 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   function setKrsUsdRate(uint _krsUsd) public onlyOwnerOrApi {
     krsUsd = _krsUsd;
   }
-  
+
   // set all three exchange rates: ETH/EUR, ETH/USD, KRS/USD
   function setAllRates(uint _ethEur, uint _ethUsd, uint _krsUsd) public onlyOwnerOrApi {
     ethEur = _ethEur;
     ethUsd = _ethUsd;
 	  krsUsd = _krsUsd;
   }
-  
+
   // send KRS from the contract to a given address (for BTC and FIAT payments)
   function sendKrs(address _receiver, uint _amount) public onlyOwnerOrApi {
     krs.transfer(_receiver, _amount);
@@ -470,17 +470,17 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   function getKrsFromApproved(address _from, uint _amount) public onlyOwnerOrApi {
     krs.transferFrom(_from, address(this), _amount);
   }
-  
+
   // send ETH from the contract to a given address
   function sendEth(address _receiver, uint _amount) public onlyOwner {
     _receiver.transfer(_amount);
   }
- 
+
   // disable/enable access from API - for security reasons
   function disableApiAccess(bool _disabled) public onlyOwner {
     apiAccessDisabled = _disabled;
   }
-  
+
   // change API wallet address - for security reasons
   function changeApi(address _address) public onlyOwner {
     api = _address;
@@ -490,5 +490,16 @@ contract KinguinIco is SafeMath, ERC223Receiver {
   function changeOwner(address _address) public onlySuperOwner {
     owner = _address;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

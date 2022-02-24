@@ -944,7 +944,7 @@ contract MarketContractFactoryMPX is Ownable {
         require(registryAddress != address(0), "registryAddress can not be null");
         require(collateralPoolAddress != address(0), "collateralPoolAddress can not be null");
         require(oracleHubAddress != address(0), "oracleHubAddress can not be null");
-        
+
         marketContractRegistry = registryAddress;
         MARKET_COLLATERAL_POOL = collateralPoolAddress;
         oracleHub = oracleHubAddress;
@@ -1006,4 +1006,15 @@ contract MarketContractFactoryMPX is Ownable {
         require(oracleHubAddress != address(0), "oracleHubAddress can not be null");
         oracleHub = oracleHubAddress;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

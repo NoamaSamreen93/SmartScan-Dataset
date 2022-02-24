@@ -18,7 +18,7 @@ contract BrandContest {
     }
     mapping (string => Contest) contests;
 
-    
+
     struct Slot {
         uint256 price;
         address owner;
@@ -30,34 +30,34 @@ contract BrandContest {
         require(_newCEO != address(0));
         ceoAddress = _newCEO;
     }
-    
+
     function buyTicket(string _key) public payable {
         require(msg.sender != address(0));
         Contest storage contest = contests[_key];
         require(contest.open == true);
         require(msg.value >= contest.ticket_price);
-        
+
         contest.tickets[contest.tickets_sold] = msg.sender;
         contest.tickets_sold++;
-        
+
         if(msg.value > contest.ticket_price){
             msg.sender.transfer(SafeMath.sub(msg.value, contest.ticket_price));
         }
     }
-    
+
     function buySlot(uint256 _slot) public payable {
         require(msg.sender != address(0));
         Slot storage slot = slots[_slot];
         require(slot.owner == address(0));
         require(msg.value >= slot.price);
-    
+
         slot.owner = msg.sender;
 
         if(msg.value > slot.price){
             msg.sender.transfer(SafeMath.sub(msg.value, slot.price));
         }
     }
-    
+
     function getContest(string _key) public view returns (
         string name,
         bool open,
@@ -71,12 +71,12 @@ contract BrandContest {
         ticket_price = contests[_key].ticket_price;
         tickets_sold = contests[_key].tickets_sold;
         winner = contests[_key].winner;
-    
+
         for(uint8 i = 0; i < 5; i++){
             last_tickets[i] = contests[_key].tickets[ contests[_key].tickets_sold-1-i ];
         }
     }
-    
+
     function getSlot(uint256 _slot) public view returns (
         uint256 slot,
         bool open,
@@ -88,7 +88,7 @@ contract BrandContest {
         price = slots[_slot].price;
         owner = slots[_slot].owner;
     }
-    
+
     function getTickets(string _key) public view returns (
         string name,
         address[] tickets
@@ -98,7 +98,7 @@ contract BrandContest {
             tickets[i] = contests[_key].tickets[ i ];
         }
     }
-    
+
     function getMyTickets(string _key, address _address) public view returns (
         string name,
         uint ticket_count
@@ -115,12 +115,12 @@ contract BrandContest {
         require(msg.sender != address(0));
         contests[_key] = Contest(true, _ticket_price, 0, address(0));
     }
-    
+
     function createSlot(uint256 _slot, uint256 _price) public onlyCEO {
         require(msg.sender != address(0));
         slots[_slot] = Slot(_price, address(0));
     }
-    
+
     function closeContest(string _key) public onlyCEO {
         require(msg.sender != address(0));
         uint seed = (block.number + contests[_key].tickets_sold + contests[_key].ticket_price);
@@ -128,7 +128,7 @@ contract BrandContest {
         contests[_key].winner = contests[_key].tickets[winner_num];
         contests[_key].open = false;
     }
-    
+
     function payout() public onlyCEO {
         ceoAddress.transfer(this.balance);
     }
@@ -156,4 +156,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

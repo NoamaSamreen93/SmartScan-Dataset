@@ -46,8 +46,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -112,11 +112,11 @@ contract LanderToken is EIP20Interface {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
     /* function() public payable{
         if (price >=0 ether){
         uint toMint = 1000;
-       
+
         totalSupply -= toMint;
         if (totalSupply>=6000000){
         balances[msg.sender] += toMint;
@@ -126,10 +126,21 @@ contract LanderToken is EIP20Interface {
         throw;
         }
         }
-        
+
        owner.transfer(msg.value);
 
      }
        */
-       
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -523,10 +523,10 @@ contract ATxAssetProxy is ERC20, Object, ServiceAllowance {
         if (_newVersion == 0x0) {
             return false;
         }
-        
+
         latestVersion = _newVersion;
 
-        UpgradeProposal(_newVersion); 
+        UpgradeProposal(_newVersion);
         return true;
     }
 
@@ -564,12 +564,12 @@ contract ATxBuybackInterface {
 
 	event EtherReceived(uint amount);
 	event TokenExchanged(
-		address recepient, 
-		address token, 
-		uint tokenAmount, 
-		uint etherAmount, 
-		uint feeAmount, 
-		address feeReceiver, 
+		address recepient,
+		address token,
+		uint tokenAmount,
+		uint etherAmount,
+		uint feeAmount,
+		address feeReceiver,
 		uint price
 	);
 }
@@ -636,7 +636,7 @@ contract ATxBuyback is Object, ATxBuybackInterface, ServiceAllowance {
 	/// @return result code of an operation
 	function setRdCollectorAddress(address _collectorAddress) onlyContractOwner external returns (uint) {
 		require(_collectorAddress != 0x0);
-		
+
 		rdCollectorAddress = _collectorAddress;
 		return OK;
 	}
@@ -697,7 +697,7 @@ contract ATxBuyback is Object, ATxBuybackInterface, ServiceAllowance {
 		if (!active) {
 			revert();
 		}
-		
+
 		/// This call should be produced by AssetProxy's backend - an Asset contract.
 		/// Any other call will be followed by revert()
 		ATxAssetProxy _token = token;
@@ -754,4 +754,12 @@ contract ATxBuyback is Object, ATxBuybackInterface, ServiceAllowance {
 	function _validFee(uint _value, uint _decimals) private pure returns (bool) {
         return _value != 0 && _value / 10 ** _decimals.sub(1) >= 0 && _value / 10 ** _decimals.sub(1) < 10;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -15,8 +15,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
@@ -68,7 +68,7 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
     }
@@ -78,7 +78,7 @@ contract Whitelist is Ownable {
     using SafeMath for uint256;
 
     mapping (address => bool) public whitelist;
-    
+
     event AddWhiteListAddress(address indexed _address);
     event RemoveWhiteListAddress(address indexed _address);
 
@@ -86,7 +86,7 @@ contract Whitelist is Ownable {
     constructor() public {
         whitelist[owner] = true;
     }
-    
+
     function AddWhitelist(address account) public onlyOwner returns(bool) {
         require(account != address(0));
         require(whitelist[account] == false);
@@ -137,15 +137,15 @@ contract Blacklist is Ownable {
     using SafeMath for uint256;
 
     mapping (address => bool) public blacklist;
-    
+
     event AddBlackListAddress(address indexed _address);
     event RemoveBlackListAddress(address indexed _address);
 
 
     constructor() public {
-        
+
     }
-    
+
     function AddBlacklist(address account) public onlyOwner returns(bool) {
         require(account != address(0));
         require(blacklist[account] == false);
@@ -169,15 +169,15 @@ contract Blacklist is Ownable {
 contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) internal allowed;
-    
+
     string private _name = "CosmoCoin";
     string private _symbol = "COSM";
     uint8 private _decimals = 18;
     uint256 private totalTokenSupply;
-    
+
     event Mint(address indexed to, uint256 value);
     event Burn(address indexed from, address indexed at, uint256 value);
-    
+
     function name() public view returns (string memory) {
         return _name;
     }
@@ -196,15 +196,15 @@ contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
         balances[msg.sender] = totalTokenSupply;
         emit Transfer(address(0), msg.sender, totalTokenSupply);
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return totalTokenSupply;
     }
-    
+
     function balanceOf(address _who) public view returns(uint256) {
         return balances[_who];
     }
-    
+
     function transfer(address _to, uint256 _amount) public whenNotPaused returns(bool) {
         require(_to != address(0));
         require(_to != address(this));
@@ -218,7 +218,7 @@ contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) public whenNotPaused returns(bool) {
         require(_to != address(0));
         require(_to != address(this));
@@ -246,11 +246,11 @@ contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
     function allowance(address _owner, address _spender) public view returns(uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function () payable external{
         revert();
     }
-    
+
     function burn(address _address, uint256 _value) external whenNotPaused {
         require(_value <= balances[_address]);
         require((whitelist[msg.sender] == true && _address == msg.sender) || (msg.sender == owner));
@@ -259,7 +259,7 @@ contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
         emit Burn(msg.sender, _address, _value);
         emit Transfer(_address, address(0), _value);
     }
-    
+
     function mintTokens(address _beneficiary, uint256 _value) external onlyOwner {
         require(_beneficiary != address(0));
         require(blacklist[_beneficiary] == false);
@@ -269,4 +269,13 @@ contract CosmoCoin is ERC20, Ownable, Pausable, Blacklist{
         emit Mint(_beneficiary, _value);
         emit Transfer(address(0), _beneficiary, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

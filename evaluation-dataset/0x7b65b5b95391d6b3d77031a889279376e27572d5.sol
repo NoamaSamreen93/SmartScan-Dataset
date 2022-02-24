@@ -59,16 +59,16 @@ contract OriginalMyIdRepository is accessControlled{
         } else {
             userIndex = userIds.length++;
         }
-        
+
         idRepository i = userIds[userIndex];
-        
+
         if ( userIdIndex[id] == 0 ){
             i.userId = id;
             userIdIndex[id] = userIndex;
             totalUsers++;
         }
 
-        string[] walletList = i.userWallets; 
+        string[] walletList = i.userWallets;
         uint w = walletList.length++;
         if ( userByWallet[wallet] > 0 ) throw;
         i.userWallets[w] = wallet;
@@ -80,7 +80,7 @@ contract OriginalMyIdRepository is accessControlled{
 
         return true;
     }
-    
+
     function checkUserByWallet( string wallet ) returns ( uint256 ) {
         uint256 userId = userByWallet[wallet];
         CheckUserByWallet( userId );
@@ -828,4 +828,10 @@ library strings {
 
         return ret;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

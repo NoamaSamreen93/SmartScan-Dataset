@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 /*
-Name: Coink 
+Name: Coink
 Symbol: CONK
 
 Website: www.Coink.io
@@ -409,4 +409,15 @@ contract COINK is DSTokenBase , DSStop {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

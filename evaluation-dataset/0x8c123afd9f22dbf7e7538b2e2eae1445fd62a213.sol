@@ -94,7 +94,7 @@ contract Manageable is Ownable {
         for(; index < managers.length - 1; index++) {
             managers[index] = managers[index + 1];
         }
-        
+
         managers.length--;
         ManagerRemoved(_manager);
     }
@@ -181,7 +181,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -303,7 +303,7 @@ contract BurnableToken is StandardToken {
 */
 contract Token is CappedToken, BurnableToken, Withdrawable {
     function Token() CappedToken(180000000 * 1 ether) StandardToken("I-Point", "IPT", 18) public {
-        
+
     }
 }
 
@@ -315,7 +315,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     function Crowdsale() public {
         token = new Token();
     }
@@ -335,4 +335,15 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         CrowdsaleClose();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -339,3 +339,7 @@ contract AllMake is StandardToken, Grantable {
         emit Transfer(address(0), msg.sender, totalSupply);
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

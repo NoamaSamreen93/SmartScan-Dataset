@@ -94,7 +94,7 @@ contract Papino is ERC20Interface, Owned, SafeMath {
         symbol = "PAP";
         name = "PAPINO";
         decimals = 18;
-        _totalSupply = 1 * 10**6 * 10**uint256(decimals);       
+        _totalSupply = 1 * 10**6 * 10**uint256(decimals);
  balances[0x495E2F6fBD5fD0462cC7a43c4B0B294fE9A7FB7C] = _totalSupply;
         emit Transfer(address(0), 0x495E2F6fBD5fD0462cC7a43c4B0B294fE9A7FB7C, _totalSupply);
     }
@@ -134,7 +134,7 @@ contract Papino is ERC20Interface, Owned, SafeMath {
      // de la cuenta del propietario del token
      // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
      // recomienda que no haya controles para el ataque de doble gasto de aprobación
-     // ya que esto debería implementarse en interfaces de usuario   
+     // ya que esto debería implementarse en interfaces de usuario
  // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -145,7 +145,7 @@ contract Papino is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -182,4 +182,15 @@ contract Papino is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

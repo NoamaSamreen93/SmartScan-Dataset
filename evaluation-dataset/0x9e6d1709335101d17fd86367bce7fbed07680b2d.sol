@@ -94,8 +94,8 @@ contract Jackpot is Ownable {
   mapping (address => uint256) public contributions;
 
 
-  function executeLottery() { 
-      
+  function executeLottery() {
+
         if (lastIndex > 9) {
           uint randomNumber = this.balance.mul(16807) % 2147483647;
           randomNumber = randomNumber % lastTicketNumber;
@@ -129,9 +129,9 @@ contract Jackpot is Ownable {
           //Both SafeMath.div and / throws on error
           if (!winner.send(balance - balance/10)) throw;
           newWinner(winner, randomNumber);
-          
+
         }
-      
+
   }
 
   function getPlayers() constant returns (address[], uint256[]) {
@@ -187,4 +187,13 @@ contract Jackpot is Ownable {
       executeLottery();
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

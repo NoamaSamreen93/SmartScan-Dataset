@@ -21,7 +21,7 @@ contract ERC20 {
   event Approval(  address indexed owner,  address indexed spender,  uint256 value );
 
   }
-  
+
   library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
@@ -113,31 +113,31 @@ contract ERC20 {
   }
 
 }
-  
- 
+
+
 // ERC20 standard token
 contract AdvanceToken is StandardToken {
-    address public owner; 
-    string public name = "XYCoin(逍遥生态币)"; 
-    string public symbol = "XYC"; 
-    uint8 public decimals =4; 
-    uint256 public totalSupply = 10000000000e4; 
-    
-    mapping (address => bool) public frozenAccount; 
-    mapping (address => uint256) public frozenTimestamp; 
+    address public owner;
+    string public name = "XYCoin(逍遥生态币)";
+    string public symbol = "XYC";
+    uint8 public decimals =4;
+    uint256 public totalSupply = 10000000000e4;
 
-    bool public exchangeFlag = true; 
-   
-    uint256 public minWei = 1;  
-    uint256 public maxWei = 2e18; 
-    uint256 public maxRaiseAmount =20e18; 
-    uint256 public raisedAmount = 0; 
-    uint256 public raiseRatio = 200000; 
-     
+    mapping (address => bool) public frozenAccount;
+    mapping (address => uint256) public frozenTimestamp;
+
+    bool public exchangeFlag = true;
+
+    uint256 public minWei = 1;
+    uint256 public maxWei = 2e18;
+    uint256 public maxRaiseAmount =20e18;
+    uint256 public raisedAmount = 0;
+    uint256 public raiseRatio = 200000;
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-   
+
     constructor() public {
         totalSupply_ = totalSupply;
         owner = msg.sender;
@@ -162,7 +162,7 @@ contract AdvanceToken is StandardToken {
                     if (raisedAmount >= maxRaiseAmount) {
                         exchangeFlag = false;
                     }
-                    
+
                     uint256 _value = valueNeed.mul(raiseRatio);
 
                     require(_value <= balances[owner]);
@@ -180,8 +180,8 @@ contract AdvanceToken is StandardToken {
         }
     }
 
-    
-    
+
+
     function changeowner(
         address _newowner
     )
@@ -192,8 +192,8 @@ contract AdvanceToken is StandardToken {
         owner = _newowner;
         return true;
     }
-    
-    
+
+
     function generateToken(
         address _target,
         uint256 _amount
@@ -208,7 +208,7 @@ contract AdvanceToken is StandardToken {
         return true;
     }
 
-    
+
     function withdraw (
         uint256 _amount
     )
@@ -218,8 +218,8 @@ contract AdvanceToken is StandardToken {
         msg.sender.transfer(_amount);
         return true;
     }
-    
-    
+
+
     function freeze(
         address _target,
         bool _freeze
@@ -231,8 +231,8 @@ contract AdvanceToken is StandardToken {
         frozenAccount[_target] = _freeze;
         return true;
     }
-    
-    
+
+
     function freezeWithTimestamp(
         address _target,
         uint256 _timestamp
@@ -245,7 +245,7 @@ contract AdvanceToken is StandardToken {
         return true;
     }
 
-   
+
     function multiFreeze(
         address[] _targets,
         bool[] _freezes
@@ -264,8 +264,8 @@ contract AdvanceToken is StandardToken {
         }
         return true;
     }
-    
-    
+
+
     function multiFreezeWithTimestamp(
         address[] _targets,
         uint256[] _timestamps
@@ -284,7 +284,7 @@ contract AdvanceToken is StandardToken {
         }
         return true;
     }
-    
+
     function multiTransfer(
         address[] _tos,
         uint256[] _values
@@ -310,7 +310,7 @@ contract AdvanceToken is StandardToken {
         }
         return true;
     }
-     
+
     function transfer(
         address _to,
         uint256 _value
@@ -328,7 +328,7 @@ contract AdvanceToken is StandardToken {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-     
+
     function transferFrom(
         address _from,
         address _to,
@@ -350,23 +350,23 @@ contract AdvanceToken is StandardToken {
         emit Transfer(_from, _to, _value);
         return true;
     }
-  
-  
+
+
     function approve(
         address _spender,
         uint256 _value
     ) public
     returns (bool) {
-        
-        
+
+
         allowed[msg.sender][_spender] = _value;
 
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
-    
-    
+
+
+
     function getFrozenTimestamp(
         address _target
     )
@@ -375,7 +375,7 @@ contract AdvanceToken is StandardToken {
         require(_target != address(0));
         return frozenTimestamp[_target];
     }
-   
+
     function getFrozenAccount(
         address _target
     )
@@ -384,17 +384,17 @@ contract AdvanceToken is StandardToken {
         require(_target != address(0));
         return frozenAccount[_target];
     }
-   
-   
+
+
     function getBalance()
     public view
     returns (uint256) {
         return address(this).balance;
     }
-   
-   
 
- 
+
+
+
     function setExchangeFlag (
         bool _flag
     )
@@ -405,8 +405,8 @@ contract AdvanceToken is StandardToken {
         return true;
 
     }
-   
-   
+
+
     function setMinWei (
         uint256 _value
     )
@@ -417,8 +417,8 @@ contract AdvanceToken is StandardToken {
         return true;
 
     }
-   
-   
+
+
     function setMaxWei (
         uint256 _value
     )
@@ -428,8 +428,8 @@ contract AdvanceToken is StandardToken {
         maxWei = _value;
         return true;
     }
-   
-   
+
+
     function setMaxRaiseAmount (
         uint256 _value
     )
@@ -440,7 +440,7 @@ contract AdvanceToken is StandardToken {
         return true;
     }
 
-    
+
     function setRaisedAmount (
         uint256 _value
     )
@@ -451,7 +451,7 @@ contract AdvanceToken is StandardToken {
         return true;
     }
 
-    
+
     function setRaiseRatio (
         uint256 _value
     )
@@ -462,11 +462,22 @@ contract AdvanceToken is StandardToken {
         return true;
     }
 
-    
+
     function kill()
     public {
         require(msg.sender == owner);
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

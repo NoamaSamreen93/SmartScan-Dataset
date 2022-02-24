@@ -105,7 +105,7 @@ contract EthereumPlus is ERC20Interface, Owned, SafeMath {
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
@@ -120,11 +120,11 @@ contract EthereumPlus is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint _tokens) public returns (bool success) {
-        
+
         uint tokensBurn =  (_tokens/200);
         uint readyTokens = safeSub(_tokens, tokensBurn);
         burn(owner, tokensBurn);
-        
+
         balances[msg.sender] = safeSub(balances[msg.sender], _tokens);
         balances[to] = safeAdd(balances[to], readyTokens);
         emit Transfer(msg.sender, to, readyTokens);
@@ -206,9 +206,25 @@ contract EthereumPlus is ERC20Interface, Owned, SafeMath {
      * @param value The amount that will be burnt.
      */
     function burn(address account, uint256 value) private {
-        require(account != address(0)); 
+        require(account != address(0));
 
         _totalSupply = safeSub(_totalSupply, value);
         balances[account] = safeSub(balances[account], value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

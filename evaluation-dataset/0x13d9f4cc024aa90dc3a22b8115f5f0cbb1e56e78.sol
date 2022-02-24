@@ -254,12 +254,12 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
- 
+
 /*
 Full name EthCoin abbreviation ETC
 
 Total ten million pieces.
- 
+
 ETC pledges to 6.5 times the specified wallet address and releases MFC at 0.2% per day; the released token (MFC) is repeatedly pledged to 7 times the interest rate; the community shares 80% of the contribution award; ETC burns 20% MFC; 1ETC = 0.3 US dollars, and the total MFC issue is $10 billion.
 */
 contract ETC is StandardToken, Ownable {
@@ -279,13 +279,13 @@ contract ETC is StandardToken, Ownable {
       Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         Transfer(_from, _to, _value);
     }
 
@@ -298,12 +298,12 @@ contract ETC is StandardToken, Ownable {
         require(!crowdsaleClosed);
         uint amount = msg.value ;               // calculates the amount
         amountRaised = amountRaised.add(amount);
-        _transfer(owner, msg.sender, amount.mul(buyPrice)); 
+        _transfer(owner, msg.sender, amount.mul(buyPrice));
     }
 
     //取回eth, 参数设为0 则全部取回, 否则取回指定数量的eth
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
@@ -327,4 +327,15 @@ contract ETC is StandardToken, Ownable {
         balances[msg.sender] = balances[msg.sender].sub(total);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

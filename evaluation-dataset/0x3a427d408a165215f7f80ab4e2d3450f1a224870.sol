@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -26,12 +26,12 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 // Standard token interface (ERC 20)
 // https://github.com/ethereum/EIPs/issues/20
-contract ERC20 
+contract ERC20
 {
 // Functions:
     /// @return total amount of tokens
@@ -81,7 +81,7 @@ contract Owned {
 
     /**
      * @dev Delegate contract to another person
-     * @param _owner New owner address 
+     * @param _owner New owner address
      */
     function setOwner(address _owner) onlyOwner
     { owner = _owner; }
@@ -95,41 +95,41 @@ contract Owned {
 
 contract ArbitrageCtCrowdsale is Owned {
     event Print(string _name, uint _value);
-    
+
     using SafeMath for uint;
-    
-    address public multisig = 0xe98bdde8edbfc6ff6bb8804077b6be9d4401a71d; 
+
+    address public multisig = 0xe98bdde8edbfc6ff6bb8804077b6be9d4401a71d;
 
     address public addressOfERC20Tocken = 0x1245ef80F4d9e02ED9425375e8F649B9221b31D8;
     ERC20 public token;
-    
-    
-    uint public startICO = now; 
+
+
+    uint public startICO = now;
     uint public endICO = 1515974400; //Mon, 15 Jan 2018 00:00:00 GMT
-    
+
     uint public tokenETHAmount = 75000 * 100000000;
-   
+
     function tokenBalance() constant returns (uint256) {
         return token.balanceOf(address(this));
-    } 
-    
+    }
+
     function ArbitrageCtCrowdsale(){//(address _addressOfERC20Tocken){
         owner = msg.sender;
         token = ERC20(addressOfERC20Tocken);
         //token = ERC20(_addressOfERC20Tocken);
     }
-    
+
     //Адрес токена установлен при деплоее
    /* function setAddressOfERC20Tocken(address _addressOfERC20Tocken) onlyOwner {
         addressOfERC20Tocken =  _addressOfERC20Tocken;
         token = ERC20(addressOfERC20Tocken);
-        
+
     }*/
-    
+
     function transferToken(address _to, uint _value) onlyOwner returns (bool) {
         return token.transfer(_to,  _value);
     }
-    
+
     function() payable {
         doPurchase();
     }
@@ -138,14 +138,14 @@ contract ArbitrageCtCrowdsale is Owned {
         require(now >= startICO && now < endICO);
 
         require(msg.value >= 10000000000000000); // > 0.01 ETH
-        
+
         uint sum = msg.value;
-        
+
         uint tokensAmount;
-        
+
         tokensAmount = sum.mul(tokenETHAmount).div(1000000000000000000);//.mul(token.decimals);
 
-        
+
         //Bonus
         if(sum >= 100 * 1000000000000000000){
            tokensAmount = tokensAmount.mul(110).div(100);
@@ -172,12 +172,23 @@ contract ArbitrageCtCrowdsale is Owned {
         }
 
         require(tokenBalance() > tokensAmount);
-        
+
         require(token.transfer(msg.sender, tokensAmount));
         multisig.transfer(msg.value);
-        
-        
+
+
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

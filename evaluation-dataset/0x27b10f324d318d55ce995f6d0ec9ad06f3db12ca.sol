@@ -59,11 +59,22 @@ contract ExoTokensMarketSimple {
         msg.sender.transfer(address(this).balance);
 
     }
- 
+
     // change the owner
     function setOwner(address _owner) public onlyOwner {
-        owner = _owner;    
+        owner = _owner;
     }
     // fallback
-    function() external payable { }   
+    function() external payable { }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

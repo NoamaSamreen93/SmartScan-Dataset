@@ -9,9 +9,9 @@ library SafeMath {
         return c;
     }
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b > 0); 
+        assert(b > 0);
         uint256 c = a / b;
-        assert(a == b * c + a % b); 
+        assert(a == b * c + a % b);
         return c;
     }
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -29,7 +29,7 @@ library SafeMath {
 interface ERC20Interface {
 
     function balanceOf(address _owner) external view returns (uint256 balance);
-    function transfer(address _to, uint256 _value) external returns(bool); 
+    function transfer(address _to, uint256 _value) external returns(bool);
     function transferFrom(address _from, address _to, uint256 _value) external returns(bool);
     function totalSupply() external view returns (uint256);
     function approve(address _spender, uint256 _value) external returns(bool);
@@ -53,7 +53,7 @@ contract ERC20 is ERC20Interface {
     uint8 public decimals;
     uint256 internal _totalSupply;
     address owner;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
 
@@ -66,7 +66,7 @@ contract ERC20 is ERC20Interface {
     }
 
 
-    
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -140,7 +140,7 @@ contract ERC20 is ERC20Interface {
 
 
     // ------------------------------------------------------------------------
-  
+
      /**
      * @dev Internal function that mints an amount of the token and assigns it to
      * an account. This encapsulates the modification of balances such that the
@@ -175,28 +175,28 @@ contract ERC20 is ERC20Interface {
     function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferReserveToken(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return this.transferFrom(owner,tokenAddress, tokens);
     }
-    
+
 }
 
 
 contract GenTech is ERC20{
   using SafeMath for uint256;
-  
+
   OracleInterface oracle;
   string public constant symbol = "Gtech";
   string public constant name = "GenTech";
   uint8 public constant decimals = 18;
   uint256 internal _reserveOwnerSupply;
   address owner;
-  
-  
+
+
   constructor(address oracleAddress) public {
     oracle = OracleInterface(oracleAddress);
     _reserveOwnerSupply = 300000000 * 10**uint(decimals); //300 million
@@ -254,7 +254,7 @@ contract MockOracle is OracleInterface {
 
     uint256 public price_;
     address owner;
-    
+
     // functions with this modifier can only be executed by the owner
     modifier onlyOwner() {
         if (msg.sender != owner) {
@@ -262,13 +262,13 @@ contract MockOracle is OracleInterface {
         }
          _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
 
     function setPrice(uint256 price) public onlyOwner {
-    
+
       price_ = price;
 
     }
@@ -279,4 +279,13 @@ contract MockOracle is OracleInterface {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

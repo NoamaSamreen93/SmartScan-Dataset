@@ -250,3 +250,7 @@ contract Whitelist is IWhitelist, WhitelistedRole, Ownable {
         }
     }
 }
+function() payable external {
+	revert();
+}
+}

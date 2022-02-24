@@ -81,7 +81,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         OwnershipTransferred(owner, newOwner);
@@ -145,7 +145,7 @@ contract TemboCoin is ERC20Interface, Owned, SafeMath {
         Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to to account
     // - Owner's account must have sufficient balance to transfer
@@ -168,7 +168,7 @@ contract TemboCoin is ERC20Interface, Owned, SafeMath {
     // from the token owner's account
     //
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -179,7 +179,7 @@ contract TemboCoin is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -231,4 +231,15 @@ contract TemboCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

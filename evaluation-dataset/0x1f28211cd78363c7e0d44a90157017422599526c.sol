@@ -163,7 +163,7 @@ interface ERC721 /* is ERC165 */ {
     /// @param _tokenId The NFT to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
     function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) external payable;
-	
+
     /// @notice Transfers the ownership of an NFT from one address to another address
     /// @dev This works identically to the other function with an extra data parameter,
     ///  except this function just sets data to ""
@@ -215,7 +215,7 @@ interface ERC721 /* is ERC165 */ {
 
 contract CorsariumAccessControl is SplitPayment {
 //contract CorsariumAccessControl {
-   
+
     event ContractUpgrade(address newContract);
 
     // The addresses of the accounts (or contracts) that can execute actions within each roles.
@@ -285,9 +285,9 @@ contract CardBase is CorsariumAccessControl, ERC721, ERC721Metadata {
 
     /// @dev The Print event is fired whenever a new card comes into existence.
     event Print(address owner, uint256 cardId);
-    
+
     uint256 lastPrintedCard = 0;
-     
+
     mapping (uint256 => address) public tokenIdToOwner;  // 721 tokenIdToOwner
     mapping (address => uint256) public ownerTokenCount; // 721 ownerTokenCount
     mapping (uint256 => address) public tokenIdToApproved; // 721 tokenIdToApprovedAddress
@@ -298,16 +298,16 @@ contract CardBase is CorsariumAccessControl, ERC721, ERC721Metadata {
 
     /// @dev Assigns ownership of a specific card to an address.
     /*function _transfer(address _from, address _to, uint256 _tokenId) internal {
-      
+
         ownershipTokenCount[_to]++;
         // transfer ownership
         cardIndexToOwner[_tokenId] = _to;
-       
+
         // Emit the transfer event.
         Transfer(_from, _to, _tokenId);
-        
+
     }*/
-    
+
     function _createCard(uint256 _prototypeId, address _owner) internal returns (uint) {
 
         // This will assign ownership, and also emit the Transfer event as
@@ -319,9 +319,9 @@ contract CardBase is CorsariumAccessControl, ERC721, ERC721Metadata {
         //_addTokenToOwnersList(_owner, lastPrintedCard);
         Transfer(0, _owner, lastPrintedCard);
         //tokenCountIndex[_prototypeId]++;
-        
+
         //_transfer(0, _owner, lastPrintedCard); //<-- asd
-        
+
 
         return lastPrintedCard;
     }
@@ -408,7 +408,7 @@ contract CardOwnership is CardBase {
             }
         }
     }
-	
+
     /// @notice Transfers the ownership of an NFT from one address to another address
     /// @dev This works identically to the other function with an extra data parameter,
     ///  except this function just sets data to ""
@@ -464,7 +464,7 @@ contract CardOwnership is CardBase {
     function approve(address _approved, uint256 _tokenId) external payable {
         require(msg.sender == _ownerOf(_tokenId));
         require(msg.sender != _approved);
-        
+
         if (_getApproved(_tokenId) != address(0) || _approved != address(0)) {
             _approve(_approved, _tokenId);
             Approval(msg.sender, _approved, _tokenId);
@@ -527,7 +527,7 @@ contract CardOwnership is CardBase {
 
     function isContract(address _addr) internal view returns (bool) {
         uint256 size;
-        assembly { 
+        assembly {
             size := extcodesize(_addr)
         }
         return size > 0;
@@ -564,7 +564,7 @@ contract CorsariumCore is CardOwnership {
         nonce += amount;
 
     }
-    
+
     function cardsOfOwner(address _owner) external view returns (uint256[] ownerCards) {
         uint256 tokenCount = ownerTokenCount[_owner];
 
@@ -637,7 +637,7 @@ contract CorsariumCore is CardOwnership {
             return result;
         }
     }
-    
+
 }
 
 interface ERC721TokenReceiver {
@@ -647,7 +647,7 @@ interface ERC721TokenReceiver {
     ///  transfer. This function MUST use 50,000 gas or less. Return of other
     ///  than the magic value MUST result in the transaction being reverted.
     ///  Note: the contract address is always the message sender.
-    /// @param _from The sending address 
+    /// @param _from The sending address
     /// @param _tokenId The NFT identifier which is being transfered
     /// @param data Additional data with no specified format
     /// @return `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
@@ -663,4 +663,15 @@ interface ERC165 {
     /// @return `true` if the contract implements `interfaceID` and
     ///  `interfaceID` is not 0xffffffff, `false` otherwise
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

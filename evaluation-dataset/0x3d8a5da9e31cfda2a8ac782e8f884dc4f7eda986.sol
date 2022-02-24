@@ -15,7 +15,7 @@ interface IERC20 {
     function balanceOf(address who) external view returns (uint256);
 
     function allowance(address owner, address spender) external view returns (uint256);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -234,4 +234,17 @@ contract SimpleToken is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("Infinity", "NITY", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -29,7 +29,7 @@ contract SafeMath {
     }
   }
 
-contract MyToken is SafeMath{   
+contract MyToken is SafeMath{
     address public owner;
     uint8 public decimals = 18;
     uint256 public totalSupply;
@@ -45,23 +45,23 @@ contract MyToken is SafeMath{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
     constructor(
-        uint256 initSupply, 
-        string tokenName, 
-        string tokenSymbol, 
+        uint256 initSupply,
+        string tokenName,
+        string tokenSymbol,
         uint8 decimalUnits) public {
         owner = msg.sender;
         totalSupply = initSupply;
         name = tokenName;
         symbol = tokenSymbol;
-        decimals = decimalUnits;  
+        decimals = decimalUnits;
         balanceOf[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
@@ -77,7 +77,7 @@ contract MyToken is SafeMath{
     function balanceOf(address _owner) public view returns (uint256) {
         return balanceOf[_owner];
     }
-    
+
     /// @param _owner The address from which the freeze amount will be retrieved
     /// @return The freeze amount
     function freezeOf(address _owner) public view returns (uint256) {
@@ -110,7 +110,7 @@ contract MyToken is SafeMath{
         totalSupply = SafeMath.sub(totalSupply,_value);                         // Updates totalSupply
         emit Burn(msg.sender, _value);
     }
-	
+
     /// @notice freeze `_value` token of '_addr' address
     /// @param _addr The address to be freezed
     /// @param _value The amount of token to be freezed
@@ -122,7 +122,7 @@ contract MyToken is SafeMath{
         freezeOf[_addr] = SafeMath.add(freezeOf[_addr], _value);                // Add the same amount to freeze of _addr address
         emit Freeze(_addr, _value);
     }
-	
+
     /// @notice unfreeze `_value` token of '_addr' address
     /// @param _addr The address to be unfreezed
     /// @param _value The amount of token to be unfreezed
@@ -140,8 +140,19 @@ contract MyToken is SafeMath{
 		require(owner == msg.sender);
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() payable public {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

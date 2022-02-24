@@ -158,21 +158,27 @@ contract IlumXToken is StandardToken {
   string public constant symbol = "IlumX";
   address public creator = msg.sender;
   uint256 public constant decimals = 18;
-  
+
 
   uint256 public constant INITIAL_SUPPLY = 940000000 * 10**18;
 
   /**
    * @dev Contructor that gives msg.sender all of existing tokens.
    */
-  
+
   function IlumXToken() {
     require(msg.sender == creator);
  	totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
-    
+
   }
 
 
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

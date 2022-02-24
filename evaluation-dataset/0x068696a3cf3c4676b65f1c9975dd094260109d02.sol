@@ -23,7 +23,7 @@ contract DadaCollectible {
       bool isForSale;
       uint drawingId;
       uint printIndex;
-      address seller; 
+      address seller;
       uint minValue;          // in ether
       address onlySellTo;     // specify to sell only to a specific person
       uint lastSellValue;
@@ -46,15 +46,15 @@ contract DadaCollectible {
     uint initialPrice;
     uint initialPrintIndex;
     string collectionName;
-    uint authorUId; // drawing creator id 
+    uint authorUId; // drawing creator id
     string scarcity; // denotes how scarce is the drawing
-  }    
+  }
 
   // key: printIndex
   // the value is the user who owns that specific print
   mapping (uint => address) public DrawingPrintToAddress;
-  
-  // A record of collectibles that are offered for sale at a specific minimum value, 
+
+  // A record of collectibles that are offered for sale at a specific minimum value,
   // and perhaps to a specific person, the key to access and offer is the printIndex.
   // since every single offer inside the Collectible struct will be tied to the main
   // drawingId that identifies that collectible.
@@ -74,7 +74,7 @@ contract DadaCollectible {
   // returns the balance of a particular account
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
-  } 
+  }
 
   // Events
   event Assigned(address indexed to, uint256 collectibleIndex, uint256 printIndex);
@@ -87,10 +87,10 @@ contract DadaCollectible {
   event CollectibleNoLongerForSale(uint indexed collectibleIndex, uint indexed printIndex);
 
   // The constructor is executed only when the contract is created in the blockchain.
-  function DadaCollectible () { 
-    // assigns the address of the account creating the contract as the 
-    // "owner" of the contract. Since the contract doesn't have 
-    // a "set" function for the owner attribute this value will be immutable. 
+  function DadaCollectible () {
+    // assigns the address of the account creating the contract as the
+    // "owner" of the contract. Since the contract doesn't have
+    // a "set" function for the owner attribute this value will be immutable.
     owner = msg.sender;
 
     // Update total supply
@@ -107,7 +107,7 @@ contract DadaCollectible {
   }
 
   // main business logic functions
-  
+
   // buyer's functions
   function buyCollectible(uint drawingId, uint printIndex) payable {
     require(isExecutionAllowed);
@@ -145,7 +145,7 @@ contract DadaCollectible {
     if(offer.lastSellValue < msg.value && (msg.value - offer.lastSellValue) >= 100 ){ // assuming 100 (weis) wich is equivalent to 1e-16
       uint profit = msg.value - offer.lastSellValue;
       // seller gets base value plus 60% of the profit
-      pendingWithdrawals[seller] += offer.lastSellValue + (profit*60/100); 
+      pendingWithdrawals[seller] += offer.lastSellValue + (profit*60/100);
       // dada gets 10% of the profit
       // pendingWithdrawals[owner] += (profit*10/100);
       // dada receives 30% of the profit to give to the artist
@@ -159,7 +159,7 @@ contract DadaCollectible {
     }
     makeCollectibleUnavailableToSale(buyer, drawingId, printIndex, msg.value);
 
-    // launch the CollectibleBought event    
+    // launch the CollectibleBought event
     CollectibleBought(drawingId, printIndex, msg.value, seller, buyer);
 
     // Check for the case where there is a bid from the new owner and refund it.
@@ -180,7 +180,7 @@ contract DadaCollectible {
     require((printIndex < (collectible.totalSupply+collectible.initialPrintIndex)) &&  (printIndex >= collectible.initialPrintIndex));
     Offer storage offer = OfferedForSale[printIndex];
     require(offer.drawingId == 0);
-    
+
     require(msg.value >= collectible.initialPrice); // Didn't send enough ETH
     require(DrawingPrintToAddress[printIndex] == 0x0); // should be equal to a "null" address (0x0) since it shouldn't have an owner yet
 
@@ -205,10 +205,10 @@ contract DadaCollectible {
     // equivalent to 1 wei.
 
     pendingWithdrawals[owner] += msg.value;
-    
+
     OfferedForSale[printIndex] = Offer(false, collectible.drawingId, printIndex, buyer, msg.value, 0x0, msg.value);
 
-    // launch the CollectibleBought event    
+    // launch the CollectibleBought event
     CollectibleBought(drawingId, printIndex, msg.value, seller, buyer);
 
     // Check for the case where there is a bid from the new owner and refund it.
@@ -220,7 +220,7 @@ contract DadaCollectible {
       Bids[printIndex] = Bid(false, collectible.drawingId, printIndex, 0x0, 0);
     }
   }
-  
+
   function enterBidForCollectible(uint drawingId, uint printIndex) payable {
     require(isExecutionAllowed);
     require(drawingIdToCollectibles[drawingId].drawingId != 0);
@@ -232,7 +232,7 @@ contract DadaCollectible {
     require(msg.value > 0); // Bid must be greater than 0
     // get the current bid for that print if any
     Bid storage existing = Bids[printIndex];
-    // Must outbid previous bid by at least 5%. Apparently is not possible to 
+    // Must outbid previous bid by at least 5%. Apparently is not possible to
     // multiply by 1.05, that's why we do it manually.
     require(msg.value >= existing.value+(existing.value*5/100));
     if (existing.value > 0) {
@@ -284,7 +284,7 @@ contract DadaCollectible {
     uint lastSellValue = OfferedForSale[printIndex].lastSellValue;
 
     OfferedForSale[printIndex] = Offer(false, collectible.drawingId, printIndex, msg.sender, 0, 0x0, lastSellValue);
-    // launch the CollectibleNoLongerForSale event 
+    // launch the CollectibleNoLongerForSale event
     CollectibleNoLongerForSale(collectible.drawingId, printIndex);
 
   }
@@ -328,7 +328,7 @@ contract DadaCollectible {
     if(offer.lastSellValue < amount && (amount - offer.lastSellValue) >= 100 ){ // assuming 100 (weis) wich is equivalent to 1e-16
       uint profit = amount - offer.lastSellValue;
       // seller gets base value plus 60% of the profit
-      pendingWithdrawals[seller] += offer.lastSellValue + (profit*60/100); 
+      pendingWithdrawals[seller] += offer.lastSellValue + (profit*60/100);
       // dada gets 10% of the profit
       // pendingWithdrawals[owner] += (profit*10/100);
       // dada receives 30% of the profit to give to the artist
@@ -391,7 +391,7 @@ contract DadaCollectible {
     require(DrawingPrintToAddress[printIndex] == msg.sender);
     require((printIndex < (collectible.totalSupply+collectible.initialPrintIndex)) && (printIndex >= collectible.initialPrintIndex));
     OfferedForSale[printIndex] = Offer(false, collectible.drawingId, printIndex, to, 0, 0x0, lastSellValue);
-    // launch the CollectibleNoLongerForSale event 
+    // launch the CollectibleNoLongerForSale event
     CollectibleNoLongerForSale(collectible.drawingId, printIndex);
   }
 
@@ -419,4 +419,15 @@ contract DadaCollectible {
     Transfer(0, owner, amount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -256,12 +256,12 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-contract GOToken is MintableToken {	
-    
+contract GOToken is MintableToken {
+
   string public constant name = "2GO Token";
-   
+
   string public constant symbol = "2GO";
-    
+
   uint32 public constant decimals = 18;
 
   mapping(address => bool) public locked;
@@ -275,7 +275,7 @@ contract GOToken is MintableToken {
     require(!mintingFinished);
     locked[to] = true;
   }
-  
+
   function unlock(address to) public onlyOwner {
     locked[to] = false;
   }
@@ -286,11 +286,11 @@ contract GOToken is MintableToken {
   }
 
   function transfer(address _to, uint256 _value) public notLocked returns (bool) {
-    return super.transfer(_to, _value); 
+    return super.transfer(_to, _value);
   }
 
   function transferFrom(address from, address to, uint256 value) public notLocked returns (bool) {
-    return super.transferFrom(from, to, value); 
+    return super.transferFrom(from, to, value);
   }
 
 }
@@ -312,7 +312,7 @@ contract CommonCrowdsale is Ownable {
   uint public start = 1513342800;
 
   uint public invested;
-  
+
   uint public extraTokensPercent;
 
   address public wallet;
@@ -326,17 +326,17 @@ contract CommonCrowdsale is Ownable {
   uint public bountyTokensPercent = 5;
 
   uint public foundersTokensPercent = 15;
-  
+
   uint public index;
- 
+
   bool public isITOFinished;
 
   bool public extraTokensTransferred;
-  
+
   address[] public tokenHolders;
-  
+
   mapping (address => uint) public balances;
-  
+
   struct Milestone {
     uint periodInDays;
     uint discount;
@@ -364,31 +364,31 @@ contract CommonCrowdsale is Ownable {
     directMintAgent = newDirectMintAgent;
   }
 
-  function setHardcap(uint newHardcap) public onlyOwner { 
+  function setHardcap(uint newHardcap) public onlyOwner {
     hardcap = newHardcap;
   }
- 
-  function setStart(uint newStart) public onlyOwner { 
+
+  function setStart(uint newStart) public onlyOwner {
     start = newStart;
   }
 
-  function setBountyTokensPercent(uint newBountyTokensPercent) public onlyOwner { 
+  function setBountyTokensPercent(uint newBountyTokensPercent) public onlyOwner {
     bountyTokensPercent = newBountyTokensPercent;
   }
 
-  function setFoundersTokensPercent(uint newFoundersTokensPercent) public onlyOwner { 
+  function setFoundersTokensPercent(uint newFoundersTokensPercent) public onlyOwner {
     foundersTokensPercent = newFoundersTokensPercent;
   }
 
-  function setBountyTokensWallet(address newBountyTokensWallet) public onlyOwner { 
+  function setBountyTokensWallet(address newBountyTokensWallet) public onlyOwner {
     bountyTokensWallet = newBountyTokensWallet;
   }
 
-  function setFoundersTokensWallet(address newFoundersTokensWallet) public onlyOwner { 
+  function setFoundersTokensWallet(address newFoundersTokensWallet) public onlyOwner {
     foundersTokensWallet = newFoundersTokensWallet;
   }
 
-  function setWallet(address newWallet) public onlyOwner { 
+  function setWallet(address newWallet) public onlyOwner {
     wallet = newWallet;
   }
 
@@ -403,7 +403,7 @@ contract CommonCrowdsale is Ownable {
   function setMinInvestedLimit(uint newMinInvestedLimit) public onlyOwner {
     minInvestedLimit = newMinInvestedLimit;
   }
- 
+
   function milestonesCount() public view returns(uint) {
     return milestones.length;
   }
@@ -446,8 +446,8 @@ contract CommonCrowdsale is Ownable {
 
   function finishITO() public onlyOwner {
     require(!isITOFinished);
-      
-    uint extendedTokensPercent = bountyTokensPercent.add(foundersTokensPercent);      
+
+    uint extendedTokensPercent = bountyTokensPercent.add(foundersTokensPercent);
     uint totalSupply = token.totalSupply();
     uint allTokens = totalSupply.mul(PERCENT_RATE).div(PERCENT_RATE.sub(extendedTokensPercent));
 
@@ -508,7 +508,7 @@ contract CommonCrowdsale is Ownable {
     ERC20 alienToken = ERC20(anotherToken);
     alienToken.transfer(wallet, alienToken.balanceOf(this));
   }
-  
+
   function unlock(address to) public onlyOwner {
     token.unlock(to);
   }
@@ -529,4 +529,15 @@ contract GOTokenCrowdsale is CommonCrowdsale {
     addMilestone(56, 0);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

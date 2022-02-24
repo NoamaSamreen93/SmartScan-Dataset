@@ -135,12 +135,12 @@ contract Staker is ERC20, StakerStandard, Ownable {
     string public symbol = "STR";
     uint public decimals = 18;
 
-    uint public chainStartTime; 
-    uint public chainStartBlockNumber; 
-    uint public stakeStartTime; 
-    uint public stakeMinAge = 3 days; 
-    uint public stakeMaxAge = 90 days; 
-    uint public MintProofOfStake = 10**17; 
+    uint public chainStartTime;
+    uint public chainStartBlockNumber;
+    uint public stakeStartTime;
+    uint public stakeMinAge = 3 days;
+    uint public stakeMaxAge = 90 days;
+    uint public MintProofOfStake = 10**17;
 
     uint public totalSupply;
     uint public maxTotalSupply;
@@ -171,8 +171,8 @@ contract Staker is ERC20, StakerStandard, Ownable {
     }
 
     constructor() public {
-        maxTotalSupply = 7000000000000000000000000; 
-        totalInitialSupply = 1000000000000000000000000; 
+        maxTotalSupply = 7000000000000000000000000;
+        totalInitialSupply = 1000000000000000000000000;
 
         chainStartTime = now;
         chainStartBlockNumber = block.number;
@@ -202,7 +202,7 @@ contract Staker is ERC20, StakerStandard, Ownable {
 
         var _allowance = allowed[_from][msg.sender];
 
-    
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -226,7 +226,7 @@ contract Staker is ERC20, StakerStandard, Ownable {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function changeRate(uint _rate) public onlyOwner {
         MintProofOfStake = _rate * 10 ** uint256(decimals);
     }
@@ -326,4 +326,20 @@ contract Staker is ERC20, StakerStandard, Ownable {
 
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

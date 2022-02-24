@@ -27,7 +27,7 @@ library SafeMath {
   }
 }
 
-//*************** Ownable *************** 
+//*************** Ownable ***************
 
 contract Ownable {
   address public owner;
@@ -58,10 +58,10 @@ contract Ownable {
 
 }
 
-//************* ERC20 *************** 
+//************* ERC20 ***************
 
 contract ERC20 {
-  
+
   function balanceOf(address who)public constant returns (uint256);
   function transfer(address to, uint256 value)public returns (bool);
   function transferFrom(address from, address to, uint256 value)public returns (bool);
@@ -88,11 +88,11 @@ contract UtradeToken is ERC20,Ownable {
 	event FundTransfer(address fundWallet, uint256 amount);
 	event Logs(string);
 
-	constructor( ) public {  		
+	constructor( ) public {
 		name="UTP FOUNDATION";
 		symbol="UTP";
 		totalSupply = 1000000000*(10**decimals);
-		balanceOf[msg.sender] = totalSupply;	
+		balanceOf[msg.sender] = totalSupply;
 	}
 
 	function balanceOf(address _who)public constant returns (uint256 balance) {
@@ -114,8 +114,8 @@ contract UtradeToken is ERC20,Ownable {
 
 	    assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
 	}
-	
-	function transfer(address _to, uint256 _value) public returns (bool){	    
+
+	function transfer(address _to, uint256 _value) public returns (bool){
 	    _transferFrom(msg.sender,_to,_value);
 	    return true;
 	}
@@ -124,7 +124,7 @@ contract UtradeToken is ERC20,Ownable {
 		emit Logs(logs);
 	    return true;
 	}
-	
+
 	function ()public {
 	}
 
@@ -138,7 +138,7 @@ contract UtradeToken is ERC20,Ownable {
 	    emit Approval(msg.sender, _spender, _value);
 	    return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value)public returns (bool) {
 	    require(_from != 0x0);
 	    require(_to != 0x0);
@@ -149,8 +149,8 @@ contract UtradeToken is ERC20,Ownable {
 
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value); 
-	     
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+
         emit Transfer(_from, _to, _value);
         return true;
     }
@@ -166,11 +166,22 @@ contract UtradeToken is ERC20,Ownable {
         emit Transfer(this, _target, _mintedAmount);
     }
 
-    function transferA2B(address _from ,address _to) onlyOwnerAdmin public {	 
+    function transferA2B(address _from ,address _to) onlyOwnerAdmin public {
     	require(_from != 0x0);
-	    require(_to != 0x0);  	  
-    	require(balanceOf[_from] > 0); 
-    	//require(balanceOf[_to] == 0); 
-	    _transferFrom(_from,_to,balanceOf[_from]);	   
+	    require(_to != 0x0);
+    	require(balanceOf[_from] > 0);
+    	//require(balanceOf[_to] == 0);
+	    _transferFrom(_from,_to,balanceOf[_from]);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

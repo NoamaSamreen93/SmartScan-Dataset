@@ -172,8 +172,8 @@ contract StandardToken {
 }
 
 contract KG is StandardToken {
-    string public constant name = "KG"; // name of Token 
-    string public constant symbol = "KG"; // symbol of Token 
+    string public constant name = "KG"; // name of Token
+    string public constant symbol = "KG"; // symbol of Token
     uint8 public constant decimals = 18;
 
     uint256 internal constant INIT_TOTALSUPPLY = 30000000000; // Total amount of tokens
@@ -184,4 +184,13 @@ contract KG is StandardToken {
         balances[wallet] = totalSupply;
         emit Transfer(address(0), wallet, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

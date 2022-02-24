@@ -151,14 +151,14 @@ contract Arascacoin is ERC223, Ownable {
     mapping(address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
-    
+
     event FrozenFunds(address indexed target, bool frozen);
     event LockedFunds(address indexed target, uint256 locked);
     event Burn(address indexed from, uint256 amount);
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
 
-    /** 
+    /**
      * @dev Constructor is called only once and can not be called again
      */
     function Arascacoin() public {
@@ -376,7 +376,7 @@ contract Arascacoin is ERC223, Ownable {
      */
     function mint(address _to, uint256 _unitAmount) onlyOwner canMint public returns (bool) {
         require(_unitAmount > 0);
-        
+
         totalSupply = totalSupply.add(_unitAmount);
         balanceOf[_to] = balanceOf[_to].add(_unitAmount);
         Mint(_to, _unitAmount);
@@ -397,7 +397,7 @@ contract Arascacoin is ERC223, Ownable {
      * @dev Function to distribute tokens to the list of addresses by the provided amount
      */
     function distributeAirdrop(address[] addresses, uint256 amount) public returns (bool) {
-        require(amount > 0 
+        require(amount > 0
                 && addresses.length > 0
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
@@ -405,7 +405,7 @@ contract Arascacoin is ERC223, Ownable {
         amount = amount.mul(1e8);
         uint256 totalAmount = amount.mul(addresses.length);
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
@@ -423,20 +423,20 @@ contract Arascacoin is ERC223, Ownable {
                 && addresses.length == amounts.length
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
-                
+
         uint256 totalAmount = 0;
-        
+
         for(uint j = 0; j < addresses.length; j++){
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e8);
             totalAmount = totalAmount.add(amounts[j]);
         }
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (j = 0; j < addresses.length; j++) {
             balanceOf[addresses[j]] = balanceOf[addresses[j]].add(amounts[j]);
             Transfer(msg.sender, addresses[j], amounts[j]);
@@ -453,13 +453,13 @@ contract Arascacoin is ERC223, Ownable {
                 && addresses.length == amounts.length);
 
         uint256 totalAmount = 0;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e8);
             require(balanceOf[addresses[j]] >= amounts[j]);
             balanceOf[addresses[j]] = balanceOf[addresses[j]].sub(amounts[j]);
@@ -473,7 +473,7 @@ contract Arascacoin is ERC223, Ownable {
     function setDistributeAmount(uint256 _unitAmount) onlyOwner public {
         distributeAmount = _unitAmount;
     }
-    
+
     /**
      * @dev Function to distribute tokens to the msg.sender automatically
      *      If distributeAmount is 0, this function doesn't work
@@ -484,7 +484,7 @@ contract Arascacoin is ERC223, Ownable {
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
         if(msg.value > 0) owner.transfer(msg.value);
-        
+
         balanceOf[owner] = balanceOf[owner].sub(distributeAmount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(distributeAmount);
         Transfer(owner, msg.sender, distributeAmount);
@@ -496,4 +496,15 @@ contract Arascacoin is ERC223, Ownable {
     function() payable public {
         autoDistribute();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

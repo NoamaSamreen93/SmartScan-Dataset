@@ -126,11 +126,11 @@ contract Pausable is Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -140,11 +140,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -193,8 +193,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -275,14 +275,14 @@ contract MintableToken is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    
+
     uint256 initialTotalSupply = totalSupply.sub(mintedTokens);
-    
+
     //To check miniting of tokens should not exceed 15% of initialTotalSupply
-    require(initialTotalSupply.mul(50).div(100) > mintedTokens.add(_amount));    
-   
+    require(initialTotalSupply.mul(50).div(100) > mintedTokens.add(_amount));
+
     totalSupply = totalSupply.add(_amount);
-    
+
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
     Transfer(address(0), _to, _amount);
@@ -308,14 +308,14 @@ contract MintableToken is StandardToken, Ownable {
      string public name ;
      string public symbol ;
      uint8 public decimals = 18 ;
-     
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
      function ()public payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      * @param initialSupply The initial supply of tokens which will be fixed through out
@@ -331,18 +331,18 @@ contract MintableToken is StandardToken, Ownable {
          name = tokenName;
          symbol = tokenSymbol;
          balances[msg.sender] = totalSupply;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
     function getTokenDetail() public view returns (string, string, uint256) {
 	    return (name, symbol, totalSupply);
     }
-    
+
      function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -354,10 +354,21 @@ contract MintableToken is StandardToken, Ownable {
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
     function mint(address _to, uint256 _amount)  public whenNotPaused returns (bool) {
     return super.mint(_to, _amount);
   }
 
-  
+
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

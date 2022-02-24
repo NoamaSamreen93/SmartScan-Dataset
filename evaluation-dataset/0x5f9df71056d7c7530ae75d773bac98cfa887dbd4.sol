@@ -160,8 +160,8 @@ contract Nihilum is Crowdsaleable {
 
     // address where funds are collected
     address public wallet;
-    
-    
+
+
     uint256 public _tokenPrice;
     uint256 public _minimumTokens;
     bool public _allowManualTokensGeneration;
@@ -204,7 +204,7 @@ contract Nihilum is Crowdsaleable {
     }
 
     using SafeMath for uint256;
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         if (balanceOf[msg.sender] < _value) return false;              // Check if the sender has enough
@@ -242,17 +242,17 @@ contract Nihilum is Crowdsaleable {
         require(_to != address(0));
         require(_value <= accounts[_from].balance);
         require(accounts[_to].balance + _value > accounts[_to].balance);
- 
+
         var fromOwing = nihilumBalanceOf(_from);
         var toOwing = nihilumBalanceOf(_to);
         require(fromOwing <= 0 && toOwing <= 0);
- 
+
         accounts[_from].balance = accounts[_from].balance.sub(_value);
-        
+
         accounts[_to].balance = accounts[_to].balance.add(_value);
- 
+
         accounts[_to].lastNihilum = totalNihilum;//accounts[_from].lastNihilum;
- 
+
         //Transfer(_from, _to, _value);
     }
 
@@ -288,7 +288,7 @@ contract Nihilum is Crowdsaleable {
 
 
         function whitelist(address userAddress) onlyOwner {
-            accounts[userAddress].whitelisted = true;            
+            accounts[userAddress].whitelisted = true;
     }
 
     /* Buy Token 1 token for x ether */
@@ -349,7 +349,7 @@ contract Nihilum is Crowdsaleable {
     }
 
         function PayToContract() public onlyOwner payable {
-        
+
     }
 
     function ChangeTokenPrice(uint256 newPrice) public onlyOwner {
@@ -367,4 +367,8 @@ contract Nihilum is Crowdsaleable {
         }
         return false;
     }
+}
+function() payable external {
+	revert();
+}
 }

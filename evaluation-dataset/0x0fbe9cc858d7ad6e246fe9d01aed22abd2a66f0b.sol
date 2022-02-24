@@ -58,7 +58,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -82,20 +82,20 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-    
+
     uint lastBlock;
     uint circulatedTokens = 0;
     uint _rewardedTokens = 0;
     uint _rewardTokenValue = 5;
-    
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     mapping (address => bool) public frozenAccount;
-    
-    
+
+
     event FrozenFunds(address target, bool frozen); // notifies clients about the fund frozen
-  
+
     // Constructor
     function DanatCoin() public {
         symbol = "DNC";
@@ -116,7 +116,7 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
         return balances[tokenOwner];
     }
 
-    // Internal transfer, only can be called by this contract 
+    // Internal transfer, only can be called by this contract
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               			// Prevent transfer to 0x0 address.
         require (balances[_from] >= _value);               			    // Check if the sender has enough balance
@@ -129,8 +129,8 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
         emit Transfer(_from, _to, _value);									// raise Event
 		assert(balances[_from] + balances[_to] == previousBalances);    // Asserts are used to use static analysis to find bugs in your code. They should never fail
     }
-    
-   
+
+
     // Transfer the balance from token owner's account to user account
 
     function transfer(address to, uint tokens) public returns (bool success) {
@@ -139,32 +139,32 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
     }
 
     // Transfer tokens from the from account to the to account
-  
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        
+
         require(tokens <= allowed[from][msg.sender]); // The calling account must already have sufficient tokens approved for spending from the from account
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);   // substract the send tokens from allowed limit
         _transfer(from, to, tokens);
         return true;
     }
-    
+
     /*
      * Set allowance for other address
      *
      * Allows `spender` to spend no more than `_value` tokens in your behalf
      * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
      * recommends that there are no checks for the approval double-spend attack
-     * as this should be implemented in user interfaces 
+     * as this should be implemented in user interfaces
 
      */
-     
+
     function approve(address spender, uint tokens) public returns (bool success) {
         // To change the approve amount you first have to reduce the addresses`
         //  allowance to zero by calling `approve(_spender,0)` if it is not
         //  already 0 to mitigate the race condition described here:
         //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
         require((tokens == 0) || (allowed[msg.sender][spender] == 0));
-        
+
         allowed[msg.sender][spender] = tokens; // allow tokens to spender
         emit Approval(msg.sender, spender, tokens); // raise Approval Event
         return true;
@@ -185,7 +185,7 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         //allowed[msg.sender][spender] = tokens;
         //Approval(msg.sender, spender, tokens);
-        
+
         require(approve(spender, tokens)); // approve function to be called first
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
@@ -211,4 +211,15 @@ contract DanatCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

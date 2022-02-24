@@ -23,8 +23,8 @@ contract TokenERC20 {
     // Public variables of the token
     uint8 public decimals = 18;
     uint256 public totalSupply;
-    string public name = 'SuperDollar';                   
-    string public symbol= 'ISD';                 
+    string public name = 'SuperDollar';
+    string public symbol= 'ISD';
     string public version = 'https://www.superdollar.org';
     address public fundsWallet = 0x632730f269b31678F6105F9a1b16cC0c09bDd9d1;
     address public teamWallet = 0xDb3A1bF1583FB199c0aAAb11b1C98e2735402c93;
@@ -43,13 +43,13 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function TokenERC20( 
+    function TokenERC20(
 	) public {
         totalSupply = 1000000000 * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[fundsWallet] = totalSupply/100*51;        
-	balanceOf[teamWallet] = totalSupply/100*10;		
+        balanceOf[fundsWallet] = totalSupply/100*51;
+	balanceOf[teamWallet] = totalSupply/100*10;
 	balanceOf[foundationWallet] = totalSupply/100*31;
-	balanceOf[investorWallet] = totalSupply/100*8;	
+	balanceOf[investorWallet] = totalSupply/100*8;
     }
 
     /**
@@ -134,7 +134,7 @@ contract TokenERC20 {
         }
     }
 
-  
+
 }
 
 /******************************************/
@@ -184,9 +184,8 @@ contract SuperDollar is owned, TokenERC20 {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
-    
 
 
 
@@ -195,4 +194,16 @@ contract SuperDollar is owned, TokenERC20 {
 
 
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

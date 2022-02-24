@@ -483,7 +483,7 @@ contract BasicMultiToken is Pausable, StandardToken, DetailedERC20, ERC1003Token
 
     event Bundle(address indexed who, address indexed beneficiary, uint256 value);
     event Unbundle(address indexed who, address indexed beneficiary, uint256 value);
-    
+
     constructor() public DetailedERC20("", "", 0) {
     }
 
@@ -636,7 +636,7 @@ contract MultiToken is IMultiToken, BasicMultiToken {
         returnAmount = getReturn(_fromToken, _toToken, _amount);
         require(returnAmount > 0, "The return amount is zero");
         require(returnAmount >= _minReturn, "The return amount is less than _minReturn value");
-        
+
         ERC20(_fromToken).checkedTransferFrom(msg.sender, this, _amount);
         ERC20(_toToken).checkedTransfer(msg.sender, returnAmount);
 
@@ -718,4 +718,15 @@ contract FeeMultiToken is Ownable, MultiToken {
         super.lend(_to, _token, _amount, _target, _data);
         require(_token.balanceOf(this) >= prevBalance.mul(ONE_HUNDRED_PERCRENTS.add(lendFee)).div(ONE_HUNDRED_PERCRENTS), "lend: tokens must be returned with lend fee");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

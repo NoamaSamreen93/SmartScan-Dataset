@@ -17,10 +17,10 @@ contract eXMR {
 
     function eXMR() public {
         balanceOf[msg.sender] = 18400000000000000000;
-        totalSupply = 18400000000000000000;                      
-        name = "eMONERO";                                  
-        decimals = 12;                            
-        symbol = "eXMR";           
+        totalSupply = 18400000000000000000;
+        name = "eMONERO";
+        decimals = 12;
+        symbol = "eXMR";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -63,20 +63,31 @@ contract eXMR {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value); 
-        balanceOf[msg.sender] -= _value;           
-        totalSupply -= _value;                     
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

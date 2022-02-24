@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
 interface IERC20 {
-    
+
   function name() external view returns (string);
-  
+
   function symbol() external view returns (string);
-  
+
   function decimals() external view returns (uint8);
 
   function totalSupply() external view returns (uint256);
@@ -84,25 +84,25 @@ contract XSN is IERC20 {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   string private _name = 'Stakenet';
-  
+
   string private _symbol = 'XSN';
-  
+
   uint8 private _decimals = 18;
 
   uint256 private _totalSupply;
-  
+
   constructor () public {
       _mint(msg.sender, 100000000 ether);
   }
-  
+
   function name() public view returns (string) {
       return _name;
   }
-  
+
   function symbol() public view returns (string) {
       return _symbol;
   }
-  
+
   function decimals() public view returns (uint8) {
       return _decimals;
   }
@@ -210,4 +210,15 @@ contract XSN is IERC20 {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
     _burn(account, value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -105,11 +105,11 @@ contract ERC20 is IERC20 {
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
-    
+
     string public constant name = "AlexCoin";
-    
+
     string public constant symbol = "ABC";
-    
+
     uint8 public constant decimals = 0;
 
     /**
@@ -266,4 +266,10 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

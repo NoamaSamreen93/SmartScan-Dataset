@@ -70,7 +70,7 @@ contract Bussiness is Ownable {
     ERC20BasicInterface public nagemonToken = ERC20BasicInterface(0xF63C5639786E7ce7C35B3D2b97E74bf7af63eEEA);
     uint256 public NagemonExchange = 297;
     constructor() public {}
-    
+
     /**
      * @dev Throws if called by any account other than the ceo address.
      */
@@ -111,7 +111,7 @@ contract Bussiness is Ownable {
         uint256 tokenDecimal = 18 - nagemonToken.decimals();
         return _weiAmount * NagemonExchange / (10 ** tokenDecimal);
     }
-    
+
     function config(uint256 _NagemonExchange, address _technical) public onlyOwner returns (uint256, address){
         NagemonExchange = _NagemonExchange;
         technical = _technical;
@@ -122,4 +122,13 @@ contract Bussiness is Ownable {
         ceoAddress = _address;
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

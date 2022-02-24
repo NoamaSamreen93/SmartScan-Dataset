@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
  *
  * ETH 5% Contract
  *  - GAIN 5% PER 24 HOURS (every 5900 blocks)
- *  - No fees on your investment 
+ *  - No fees on your investment
  *
  * How to use:
  *  1. Send any amount of ether to make an investment
@@ -41,4 +41,15 @@ contract FreeInvestment5 {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

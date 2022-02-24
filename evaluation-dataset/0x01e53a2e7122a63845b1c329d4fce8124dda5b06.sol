@@ -1,15 +1,15 @@
 pragma solidity ^0.4.16;
 
-contract Base 
+contract Base
 {
     address Creator = msg.sender;
     address Owner_01 = msg.sender;
     address Owner_02;
     address Owner_03;
-    
-    function add(uint256 x, uint256 y) 
-    internal 
-    returns (uint256) 
+
+    function add(uint256 x, uint256 y)
+    internal
+    returns (uint256)
     {
         uint256 z = x + y;
         if((z >= x) && (z >= y))
@@ -22,9 +22,9 @@ contract Base
         }
     }
 
-    function sub(uint256 x, uint256 y) 
-    internal 
-    returns (uint256) 
+    function sub(uint256 x, uint256 y)
+    internal
+    returns (uint256)
     {
         if(x >= y)
         {
@@ -37,9 +37,9 @@ contract Base
         }
     }
 
-    function mul(uint256 x, uint256 y) 
-    internal 
-    returns (uint256) 
+    function mul(uint256 x, uint256 y)
+    internal
+    returns (uint256)
     {
         uint256 z = x * y;
         if((x == 0) || (z / x == y))
@@ -51,15 +51,15 @@ contract Base
             revert();
         }
     }
-    
+
     event Deposit(address indexed sender, uint value);
-    
+
     event Invest(address indexed sender, uint value);
-    
+
     event Refound(address indexed sender, uint value);
-    
+
     event Withdraw(address indexed sender, uint value);
-    
+
     event Log(string message);
 }
 
@@ -70,63 +70,63 @@ contract Loan is Base
         uint Time;
         uint Invested;
     }
-    
+
     uint public TotalInvested;
     uint public Available;
     uint public InvestorsQty;
     uint public prcntRate = 1;
     bool CanRefound;
-    
+
     address Owner_0l;
     address Owner_02;
     address Owner_03;
-    
+
     mapping (address => uint) public Investors;
     mapping (address => Creditor) public Creditors;
-    
+
     function initLoan()
     {
         Owner_0l = msg.sender;
     }
-    
-    function SetScndOwner(address addr) 
-    public 
+
+    function SetScndOwner(address addr)
+    public
     {
         require((msg.sender == Owner_02)||(msg.sender==Creator));
         Owner_02 = addr;
     }
-    
-    function SetThrdOwner(address addr) 
-    public 
+
+    function SetThrdOwner(address addr)
+    public
     {
         require((msg.sender == Owner_02)||(msg.sender==Creator));
         Owner_03 = addr;
     }
-    
+
     function SetPrcntRate(uint val)
     public
     {
         if(val>=1&&msg.sender==Creator)
         {
-            prcntRate = val;  
+            prcntRate = val;
         }
     }
-    
+
     function StartRefound(bool val)
     public
     {
         if(msg.sender==Creator)
-        { 
+        {
             CanRefound = val;
         }
     }
-    
+
     function() payable
     {
         InvestFund();
     }
-    
-    function InvestFund() 
+
+    function InvestFund()
     public
     payable
     {
@@ -137,28 +137,28 @@ contract Loan is Base
             TotalInvested+=msg.value;
             Available+=msg.value;
             Invest(msg.sender,msg.value);
-        }   
+        }
     }
-    
-    function ToLend() 
-    public 
+
+    function ToLend()
+    public
     payable
     {
         Creditors[msg.sender].Time = now;
         Creditors[msg.sender].Invested += msg.value;
         Deposit(msg.sender,msg.value);
     }
-    
-    function CheckProfit(address addr) 
-    public 
-    constant 
+
+    function CheckProfit(address addr)
+    public
+    constant
     returns(uint)
     {
         return ((Creditors[addr].Invested/100)*prcntRate)*((now-Creditors[addr].Time)/1 days);
     }
-    
-    function TakeBack() 
-    public 
+
+    function TakeBack()
+    public
     payable
     {
         uint profit = CheckProfit(msg.sender);
@@ -170,9 +170,9 @@ contract Loan is Base
             Refound(msg.sender,summ);
         }
     }
-    
-    function WithdrawToInvestor(address _addr, uint _wei) 
-    public 
+
+    function WithdrawToInvestor(address _addr, uint _wei)
+    public
     payable
     {
         if(Investors[_addr]>0)
@@ -187,7 +187,7 @@ contract Loan is Base
             }
         }
     }
-    
+
     function Wthdraw()
     public
     payable
@@ -197,13 +197,24 @@ contract Loan is Base
             Creator.transfer(this.balance);
         }
     }
-    
-    
+
+
     function isOwner()
     private
-    constant 
+    constant
     returns (bool)
     {
         return( msg.sender == Owner_01 || msg.sender == Owner_02 || msg.sender == Owner_03);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

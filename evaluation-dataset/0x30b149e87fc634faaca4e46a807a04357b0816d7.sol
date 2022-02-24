@@ -652,7 +652,7 @@ contract DiceGameCrowdsale is TokenDeskProxyAware {
             token.mint(TOURNAMENT_WALLET, uint256(TOURNAMENT_TOKENS_PERCENT).mul(totalSupply).div(ICO_TOKENS_PERCENT));
 
             token.mint(BOUNTY_WALLET, uint256(BOUNTY_TOKENS_PERCENT).mul(totalSupply).div(ICO_TOKENS_PERCENT));
-            
+
             token.mint(ADVISORS_WALLET, uint256(ADVISORS_TOKENS_PERCENT).mul(totalSupply).div(ICO_TOKENS_PERCENT));
 
             token.finishMinting();
@@ -709,4 +709,15 @@ contract DiceGameCrowdsale is TokenDeskProxyAware {
     function getNow() internal view returns (uint256) {
         return now;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

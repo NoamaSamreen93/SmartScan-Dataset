@@ -149,14 +149,14 @@ contract PonziCoin is StandardToken, SafeMath {
     /// and cap was not reached. Returns token count.
     function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       uint tokenCount = msg.value / buyPrice;
       if (tokenCount > tierBudget) {
         tokenCount = tierBudget;
       }
-      
+
       uint investment = tokenCount * buyPrice;
 
       balances[msg.sender] += tokenCount;
@@ -192,9 +192,20 @@ contract PonziCoin is StandardToken, SafeMath {
 
     /// @dev Contract constructor function sets initial token balances.
     function PonziCoin()
-    {   
+    {
         // It's not a good scam unless it's pre-mined. No I'm not going to dump on you, don't worry. This isn't a scam (at least not entirely). If I feel like maintaining the website is too much I'll give the keys to someone else.
         balances[founder] = 200000;
         totalSupply += 200000;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

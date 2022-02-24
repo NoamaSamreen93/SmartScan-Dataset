@@ -49,7 +49,7 @@ contract ERC20 {
 
  // This generates a public event on the blockchain that will notify clients
   function transfer(address _to, uint256 _value) public returns (bool);
-  
+
 // This generates a public event on the blockchain that will notify clients
   function approve(address _spender, uint256 _value) public returns (bool);
 
@@ -58,7 +58,7 @@ contract ERC20 {
   event Transfer( address indexed from, address indexed to,  uint256 value);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
-  
+
   // This notifies clients about the amount burnt
   event Burn(address indexed from, uint256 value);
 }
@@ -178,7 +178,7 @@ contract StandardToken is ERC20 {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
    /**
      * Destroy tokens
      *
@@ -225,4 +225,15 @@ contract POBTokenERC20 is StandardToken {
         balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
         emit Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

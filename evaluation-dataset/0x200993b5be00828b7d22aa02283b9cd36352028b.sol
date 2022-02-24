@@ -4,7 +4,7 @@ contract Owned {
 	modifier only_owner {
 		if (msg.sender != owner)
 			return;
-		_; 
+		_;
 	}
 
 	event NewOwner(address indexed old, address indexed current);
@@ -144,7 +144,7 @@ contract LegalLazyScheduler is Ownable {
     function() internal callback;
 
     event LogRegisteredInterval(uint64 date, uint64 duration);
-    event LogProcessedInterval(uint64 date, uint64 intervals);    
+    event LogProcessedInterval(uint64 date, uint64 intervals);
     /**
     * Triggers the registered callback function for the number of periods passed since last update
     */
@@ -160,7 +160,7 @@ contract LegalLazyScheduler is Ownable {
         }
         _;
     }
-    
+
     function LegalLazyScheduler() {
         lastUpdate = uint64(now);
     }
@@ -173,7 +173,7 @@ contract LegalLazyScheduler is Ownable {
         lastUpdate = uint64(now);
         intervalDuration = _intervalDuration;
         callback = _callback;
-        LogRegisteredInterval(lastUpdate, intervalDuration);        
+        LogRegisteredInterval(lastUpdate, intervalDuration);
     }
 }
 
@@ -231,7 +231,7 @@ contract LegalTGE is Ownable, Pausable {
   /** State machine
    * - PreparePreContribution: During this phase SmartOne adjust conversionRate and start/end date
    * - PreContribution: During this phase only registered users can contribute to the TGE and therefore receive a bonus until cap or end date is reached
-   * - PrepareContribution: During this phase SmartOne adjusts conversionRate by the ETHUSD depreciation during PreContribution and change start and end date in case of an unforseen event 
+   * - PrepareContribution: During this phase SmartOne adjusts conversionRate by the ETHUSD depreciation during PreContribution and change start and end date in case of an unforseen event
    * - Contribution: During this all users can contribute until cap or end date is reached
    * - Auditing: SmartOne awaits recommendation by auditor and board of foundation will then finalize contribution or enable refunding
    * - Finalized: Token are released
@@ -258,10 +258,10 @@ contract LegalTGE is Ownable, Pausable {
   event LogTokenAssigned(address sender, address newToken);
 
   /**
-  * Every timed transition must be loged for auditing 
+  * Every timed transition must be loged for auditing
   */
   event LogTimedTransition(uint _now, States _newState);
-  
+
   /**
   * This event is fired when PreContribution data is changed during the PreparePreContribution phase
   */
@@ -273,17 +273,17 @@ contract LegalTGE is Ownable, Pausable {
   event LogContribution(address contributor, uint256 weiAmount, uint256 tokenAmount, VerificationLevel verificationLevel, States _state);
 
   /**
-  * This event will be fired when SmartOne finalizes the TGE 
+  * This event will be fired when SmartOne finalizes the TGE
   */
   event LogFinalized(address sender);
 
   /**
-  * This event will be fired when the auditor confirms the confirms regularity confirmity 
+  * This event will be fired when the auditor confirms the confirms regularity confirmity
   */
   event LogRegularityConfirmation(address sender, bool _regularity, bytes32 _comment);
-  
+
   /**
-  * This event will be fired when refunding is enabled by the auditor 
+  * This event will be fired when refunding is enabled by the auditor
   */
   event LogRefundsEnabled(address sender);
 
@@ -295,7 +295,7 @@ contract LegalTGE is Ownable, Pausable {
   /**
   * This refund vault used to hold funds while TGE is running.
   * Uses the default implementation provided by the OpenZeppelin community.
-  */ 
+  */
   RefundVault public vault;
 
   /**
@@ -305,81 +305,81 @@ contract LegalTGE is Ownable, Pausable {
 
   /**
   * The token we are giving the contributors in return for their contributions
-  */ 
+  */
   LegalToken public token;
-  
+
   /**
   * The contract provided by Parity Tech (Gav Woods) to verify the mobile number during user registration
-  */ 
+  */
   ProofOfSMS public proofOfSMS;
 
-  /** 
+  /**
   * The contribution (wei) will be forwarded to this address after the token has been finalized by the foundation board
   */
   address public multisigWallet;
 
-  /** 
+  /**
   * Maximum amount of wei this TGE can raise.
   */
   uint256 public tokenCap;
 
-  /** 
-  * The amount of wei a contributor has contributed. 
+  /**
+  * The amount of wei a contributor has contributed.
   * Used to check whether the total of contributions per user exceeds the max limit (depending on his verification level)
   */
   mapping (address => uint) public weiPerContributor;
 
-  /** 
+  /**
   * Minimum amount of tokens a contributor is able to buy
   */
   uint256 public minWeiPerContributor;
 
-  /** 
+  /**
   * Maximum amount of tokens an SMS verified user can contribute.
   */
   uint256 public maxWeiSMSVerified;
 
-  /** 
+  /**
   * Maximum amount of tokens an none-verified user can contribute.
   */
   uint256 public maxWeiUnverified;
 
-  /* 
+  /*
   * The number of token units a contributor receives per ETHER during pre-contribtion phase
-  */ 
+  */
   uint public preSaleConversionRate;
 
-  /* 
+  /*
   * The UNIX timestamp (in seconds) defining when the pre-contribution phase will start
   */
   uint public preSaleStartDate;
 
-  /* 
+  /*
   * The UNIX timestamp (in seconds) defining when the TGE will end
   */
   uint public preSaleEndDate;
 
-  /* 
+  /*
   * The number of token units a contributor receives per ETHER during contribution phase
-  */ 
+  */
   uint public saleConversionRate;
 
-  /* 
+  /*
   * The UNIX timestamp (in seconds) defining when the TGE will start
   */
   uint public saleStartDate;
 
-  /* 
+  /*
   * The UNIX timestamp (in seconds) defining when the TGE would end if cap will not be reached
   */
   uint public saleEndDate;
 
-  /* 
+  /*
   * The bonus a sms verified user will receive for a contribution during pre-contribution phase in base points
   */
   uint public smsVerifiedBonusBps;
 
-  /* 
+  /*
   * The bonus a kyc verified user will receive for a contribution during pre-contribution phase in base points
   */
   uint public kycVerifiedBonusBps;
@@ -436,8 +436,8 @@ contract LegalTGE is Ownable, Pausable {
   */
   uint256 public weiRaised = 0;
 
-  /* 
-  * The amount of wei raised during the preContribution phase 
+  /*
+  * The amount of wei raised during the preContribution phase
   */
   uint256 public preSaleWeiRaised = 0;
 
@@ -458,7 +458,7 @@ contract LegalTGE is Ownable, Pausable {
   uint public numberOfContributors = 0;
 
   /**
-  * dictionary that maps addresses to contributors which have sucessfully been verified by the external KYC process 
+  * dictionary that maps addresses to contributors which have sucessfully been verified by the external KYC process
   */
   mapping (address => bool) public kycRegisteredContributors;
 
@@ -485,7 +485,7 @@ contract LegalTGE is Ownable, Pausable {
     // --------------------------------------------------------------------------------
     // the address of the account used for auditing
     require(_foundationBoard != 0x0);
-    
+
     // the address of the multisig must not be 'undefined'
     require(_multisigWallet != 0x0);
 
@@ -494,9 +494,9 @@ contract LegalTGE is Ownable, Pausable {
 
     // the address of the account used for auditing
     require(_auditor != 0x0);
-    
+
     // the address of the cap for this TGE must not be 'undefined'
-    require(_tokenCap > 0); 
+    require(_tokenCap > 0);
 
     // pre-contribution and contribution phases must not overlap
     // require(_preSaleStartDate <= _preSaleEndDate);
@@ -535,7 +535,7 @@ contract LegalTGE is Ownable, Pausable {
     // the maximum number of wei an unverified user can contribute
     maxWeiUnverified = _maxWeiUnverified;
 
-    // the maximum number of wei an SMS verified user can contribute    
+    // the maximum number of wei an SMS verified user can contribute
     maxWeiSMSVerified = _maxWeiSMSVerified;
   }
 
@@ -545,7 +545,7 @@ contract LegalTGE is Ownable, Pausable {
       // mint the pre allocated tokens for the institutional investors
       token.mint(instContWallet, instContAllocatedTokens);
       tokensSold += instContAllocatedTokens;
-    }    
+    }
     LogTokenAssigned(msg.sender, _legalToken);
   }
 
@@ -567,7 +567,7 @@ contract LegalTGE is Ownable, Pausable {
     // the contribution start date must not be in the past
     require(_saleStartDate >= now);
 
-    // the contribution end date must not be before start date 
+    // the contribution end date must not be before start date
     require(_saleEndDate >= _saleStartDate);
   }
 
@@ -581,15 +581,15 @@ contract LegalTGE is Ownable, Pausable {
       return States.Finalized;
     if ( hasState(States.Refunding))
       return States.Refunding;
-    if ( isCapReached()) 
+    if ( isCapReached())
       return States.Auditing;
     if ( isNowBefore(preSaleStartDate))
-      return States.PreparePreContribution; 
+      return States.PreparePreContribution;
     if ( isNowBefore(preSaleEndDate))
       return States.PreContribution;
-    if ( isNowBefore(saleStartDate))  
+    if ( isNowBefore(saleStartDate))
       return States.PrepareContribution;
-    if ( isNowBefore(saleEndDate))    
+    if ( isNowBefore(saleEndDate))
       return States.Contribution;
     return States.Auditing;
   }
@@ -617,8 +617,8 @@ contract LegalTGE is Ownable, Pausable {
   }
 
   function updateState() public stateTransitions {
-  }  
-  
+  }
+
   /**
    * @dev Checks whether contract is in a state in which contributions will be accepted
    */
@@ -636,11 +636,11 @@ contract LegalTGE is Ownable, Pausable {
     require(hasState(States.PreparePreContribution) || (hasState(States.PrepareContribution)));
     _;
   }
-  /** 
+  /**
   * This modifier makes sure that not more tokens as specified can be allocated
   */
   modifier teamBonusLimit(uint64 _tokenBps) {
-    uint teamBonusBps = 0; 
+    uint teamBonusBps = 0;
     for ( uint i = 0; i < teamBonuses.length; i++ ) {
       teamBonusBps = teamBonusBps.add(teamBonuses[i].tokenBps);
     }
@@ -663,7 +663,7 @@ contract LegalTGE is Ownable, Pausable {
   * Post-conditions:
   */
   function preparePreContribution(uint _preSaleConversionRate, uint _preSaleStartDate, uint _preSaleEndDate) public onlyOwner inState(States.PreparePreContribution) {
-    validatePreContribution(_preSaleConversionRate, _preSaleStartDate, _preSaleEndDate);    
+    validatePreContribution(_preSaleConversionRate, _preSaleStartDate, _preSaleEndDate);
     preSaleConversionRate = _preSaleConversionRate;
     preSaleStartDate = _preSaleStartDate;
     preSaleEndDate = _preSaleEndDate;
@@ -688,7 +688,7 @@ contract LegalTGE is Ownable, Pausable {
 
   // fallback function can be used to buy tokens
   function () payable public {
-    contribute();  
+    contribute();
   }
   function getWeiPerContributor(address _contributor) public constant returns (uint) {
   	return weiPerContributor[_contributor];
@@ -699,7 +699,7 @@ contract LegalTGE is Ownable, Pausable {
     require(msg.value >= minWeiPerContributor);
 
     VerificationLevel verificationLevel = getVerificationLevel();
-    
+
     // we only allow verified users to participate during pre-contribution phase
     require(hasState(States.Contribution) || verificationLevel > VerificationLevel.None);
 
@@ -741,17 +741,17 @@ contract LegalTGE is Ownable, Pausable {
 
     forwardFunds();
 
-    LogContribution(msg.sender, msg.value, tokenAmount, verificationLevel, state);    
+    LogContribution(msg.sender, msg.value, tokenAmount, verificationLevel, state);
   }
 
- 
+
   function calculateTokenAmount(uint256 _weiAmount, VerificationLevel _verificationLevel) public constant returns (uint256) {
     uint256 conversionRate = saleConversionRate;
     if ( state == States.PreContribution) {
       conversionRate = preSaleConversionRate;
     }
     uint256 tokenAmount = _weiAmount.mul(conversionRate);
-    
+
     // an anonymous user (Level-0) gets no bonus
     uint256 bonusTokenAmount = 0;
 
@@ -812,7 +812,7 @@ contract LegalTGE is Ownable, Pausable {
     require(msg.sender == auditor);
     _;
   }
-  
+
   /**
    * @dev Throws if auditor has not yet confirmed TGE
    */
@@ -822,7 +822,7 @@ contract LegalTGE is Ownable, Pausable {
   }
 
  /*
- * After the TGE reaches state 'auditing', the auditor will verify the legal and regulatory obligations 
+ * After the TGE reaches state 'auditing', the auditor will verify the legal and regulatory obligations
  */
  function confirmLawfulness(bool _regulationsFulfilled, bytes32 _auditorComment) public onlyAuditor stateTransitions inState ( States.Auditing ) {
     regulationsFulfilled = _regulationsFulfilled;
@@ -843,14 +843,14 @@ contract LegalTGE is Ownable, Pausable {
     setState(States.Finalized);
     // Make token transferable otherwise the transfer call used when granting vesting to teams will be rejected.
     token.releaseTokenTransfer();
-    
-    // mint bonusus for 
+
+    // mint bonusus for
     allocateTeamBonusTokens();
 
     // the funds can now be transfered to the multisig wallet of the foundation
     vault.close();
 
-    // disable minting for the TGE (though tokens will still be minted to compensate an inflation period) 
+    // disable minting for the TGE (though tokens will still be minted to compensate an inflation period)
     token.finishMinting();
 
     // now we can safely enable the shceduler for inflation compensation
@@ -867,16 +867,16 @@ contract LegalTGE is Ownable, Pausable {
 
     LogRefundsEnabled(msg.sender);
 
-    // no need to trigger event here since this allready done in RefundVault (see event RefundsEnabled) 
-    vault.enableRefunds(); 
+    // no need to trigger event here since this allready done in RefundVault (see event RefundsEnabled)
+    vault.enableRefunds();
   }
-  
+
 
 // =============================================================================================================================
 // Postallocation Reward Tokens
 // =============================================================================================================================
-  
-  /** 
+
+  /**
   * Called once by TGE finalize() if the sale was success.
   */
   function allocateTeamBonusTokens() private {
@@ -893,7 +893,7 @@ contract LegalTGE is Ownable, Pausable {
   }
 
   // =============================================================================================================================
-  // All functions related to Refunding can be found here. 
+  // All functions related to Refunding can be found here.
   // Uses some slightly modifed logic from https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/crowdsale/RefundableTGE.sol
   // =============================================================================================================================
 
@@ -1209,7 +1209,7 @@ contract VestedToken is StandardToken, LimitedTransferToken, Ownable {
   function transferableTokens(address holder, uint64 time) public constant returns (uint256) {
     uint256 grantIndex = tokenGrantsCount(holder);
 
-    if (grantIndex == 0) 
+    if (grantIndex == 0)
       return super.transferableTokens(holder, time); // shortcut for holder without grants
 
     // Iterate through all the grants the holder has, and add all non-vested tokens
@@ -1361,12 +1361,12 @@ contract SimpleCertifier is Owned, Certifier {
 
 	modifier only_delegate {
 		assert(msg.sender == delegate);
-		_; 
+		_;
 	}
 	modifier only_certified(address _who) {
 		if (!certs[_who].active)
 			return;
-		_; 
+		_;
 	}
 
 	struct Certification {
@@ -1400,7 +1400,7 @@ contract ProofOfSMS is SimpleCertifier {
 		RequiredFeeNotMet(fee, msg.value);
 			return;
 		}
-		_; 
+		_;
 	}
 	event RequiredFeeNotMet(uint required, uint provided);
 	event Requested(address indexed who);
@@ -1477,25 +1477,25 @@ contract LegalToken is LegalLazyScheduler, MintableToken, VestedToken {
 
     /**
     * Annually new minted tokens will be transferred to this wallet.
-    * Publications will be rewarded with funds (incentives).  
+    * Publications will be rewarded with funds (incentives).
     */
     address public rewardWallet;
 
     /**
-    * Name and symbol were updated. 
+    * Name and symbol were updated.
     */
     event UpdatedTokenInformation(bytes32 newName, bytes32 newSymbol);
 
     /**
-    * @dev Constructor that gives msg.sender all of existing tokens. 
+    * @dev Constructor that gives msg.sender all of existing tokens.
     */
     function LegalToken(address _rewardWallet, uint32 _inflationCompBPS, uint32 _inflationCompInterval) onlyOwner public {
         setTokenInformation("Legal Token", "LGL");
-        totalSupply = 0;        
+        totalSupply = 0;
         rewardWallet = _rewardWallet;
         inflationCompBPS = _inflationCompBPS;
         registerIntervalCall(_inflationCompInterval, mintInflationPeriod);
-    }    
+    }
 
     /**
     * This function allows the token owner to rename the token after the operations
@@ -1508,7 +1508,7 @@ contract LegalToken is LegalLazyScheduler, MintableToken, VestedToken {
     }
 
     /**
-    * Mint new tokens for the predefined inflation period and assign them to the reward wallet. 
+    * Mint new tokens for the predefined inflation period and assign them to the reward wallet.
     */
     function mintInflationPeriod() private {
         uint256 tokensToMint = totalSupply.mul(inflationCompBPS).div(10000);
@@ -1516,8 +1516,8 @@ contract LegalToken is LegalLazyScheduler, MintableToken, VestedToken {
         balances[rewardWallet] = balances[rewardWallet].add(tokensToMint);
         Mint(rewardWallet, tokensToMint);
         Transfer(0x0, rewardWallet, tokensToMint);
-    }     
-    
+    }
+
     function setRewardWallet(address _rewardWallet) public onlyOwner {
         rewardWallet = _rewardWallet;
     }
@@ -1568,4 +1568,15 @@ contract LegalToken is LegalLazyScheduler, MintableToken, VestedToken {
         // calls StandardToken.decreaseApproval(..)
         return super.decreaseApproval(_spender, _subtractedValue);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

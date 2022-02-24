@@ -234,7 +234,7 @@ contract Distribution is CanReclaimToken, Claimable, Whitelist {
             emit Distributed(beneficiary, batchAmount);
         }
     }
-    
+
     function batchDistributeWithAmount(
         address[] batchReceivers,
         uint256[] batchAmounts
@@ -249,9 +249,20 @@ contract Distribution is CanReclaimToken, Claimable, Whitelist {
             emit Distributed(beneficiary, v);
         }
     }
-    
+
 
     function finished() public view returns (bool) {
         return amount == 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

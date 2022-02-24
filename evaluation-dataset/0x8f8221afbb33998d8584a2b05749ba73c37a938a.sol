@@ -214,7 +214,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 /**
- * @title StandardCrowdsale 
+ * @title StandardCrowdsale
  * @dev StandardCrowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
@@ -250,10 +250,10 @@ contract StandardCrowdsale {
     event TokenPurchase(address indexed purchaser, uint256 value, uint256 amount);
 
     function StandardCrowdsale(
-        uint256 _startTime, 
-        uint256 _endTime, 
-        uint256 _rate, 
-        address _wallet) 
+        uint256 _startTime,
+        uint256 _endTime,
+        uint256 _rate,
+        address _wallet)
     {
         require(_startTime >= now);
         require(_endTime >= _startTime);
@@ -271,25 +271,25 @@ contract StandardCrowdsale {
     // creates the token to be sold.
     // Request Modification : change to StandardToken
     // override this method to have crowdsale of a specific mintable token.
-    function createTokenContract() 
-        internal 
-        returns(StandardToken) 
+    function createTokenContract()
+        internal
+        returns(StandardToken)
     {
         return new StandardToken();
     }
 
     // fallback function can be used to buy tokens
-    function () 
-       payable 
+    function ()
+       payable
     {
         buyTokens();
     }
 
     // low level token purchase function
     // Request Modification : change to not mint but transfer from this contract
-    function buyTokens() 
-       public 
-       payable 
+    function buyTokens()
+       public
+       payable
     {
         require(validPurchase());
 
@@ -309,16 +309,16 @@ contract StandardCrowdsale {
 
     // send ether to the fund collection wallet
     // override to create custom fund forwarding mechanisms
-    function forwardFunds() 
-       internal 
+    function forwardFunds()
+       internal
     {
         wallet.transfer(msg.value);
     }
 
     // @return true if the transaction can buy tokens
-    function validPurchase() 
-        internal 
-        returns(bool) 
+    function validPurchase()
+        internal
+        returns(bool)
     {
         bool withinPeriod = now >= startTime && now <= endTime;
         bool nonZeroPurchase = msg.value != 0;
@@ -326,10 +326,10 @@ contract StandardCrowdsale {
     }
 
     // @return true if crowdsale event has ended
-    function hasEnded() 
-        public 
-        constant 
-        returns(bool) 
+    function hasEnded()
+        public
+        constant
+        returns(bool)
     {
         return now > endTime;
     }
@@ -394,8 +394,8 @@ contract ProgressiveIndividualCappedCrowdsale is StandardCrowdsale, Ownable {
      * @dev overriding CappedCrowdsale#validPurchase to add an individual cap
      * @return true if investors can buy at the moment
      */
-    function validPurchase() 
-        internal 
+    function validPurchase()
+        internal
         returns(bool)
     {
         require(tx.gasprice <= GAS_LIMIT_IN_WEI);
@@ -408,20 +408,20 @@ contract ProgressiveIndividualCappedCrowdsale is StandardCrowdsale, Ownable {
      * @dev Set the individual cap for the first day. This function can not be called withing the 24h before the sale for security reasons
      * @param _baseEthCapPerAddress base cap in wei
      */
-    function setBaseEthCapPerAddress(uint256 _baseEthCapPerAddress) 
+    function setBaseEthCapPerAddress(uint256 _baseEthCapPerAddress)
         public
-        onlyOwner 
+        onlyOwner
         only24HBeforeSale
     {
         baseEthCapPerAddress = _baseEthCapPerAddress;
     }
 
     /**
-     * @dev Get the current individual cap. 
+     * @dev Get the current individual cap.
      * @dev This amount increase everyday in an exponential way. Day 1: base cap, Day 2: 2 * base cap, Day 3: 4 * base cap ...
      * @return individual cap in wei
      */
-    function getCurrentEthCapPerAddress() 
+    function getCurrentEthCapPerAddress()
         public
         constant
         returns(uint)
@@ -442,7 +442,7 @@ contract ProgressiveIndividualCappedCrowdsale is StandardCrowdsale, Ownable {
  *
  */
 contract WhitelistedCrowdsale is StandardCrowdsale, Ownable {
-    
+
     mapping(address=>bool) public registered;
 
     event RegistrationStatusChanged(address target, bool isRegistered);
@@ -502,7 +502,7 @@ contract RequestToken is StandardToken, Ownable {
     address public  earlyInvestorWallet;
 
 
-    modifier onlyWhenTransferEnabled() 
+    modifier onlyWhenTransferEnabled()
     {
         if ( now <= transferableStartTime ) {
             require(msg.sender == tokenSaleContract || msg.sender == earlyInvestorWallet || msg.sender == owner);
@@ -510,17 +510,17 @@ contract RequestToken is StandardToken, Ownable {
         _;
     }
 
-    modifier validDestination(address to) 
+    modifier validDestination(address to)
     {
         require(to != address(this));
         _;
     }
 
     function RequestToken(
-        uint tokenTotalAmount, 
-        uint _transferableStartTime, 
-        address _admin, 
-        address _earlyInvestorWallet) 
+        uint tokenTotalAmount,
+        uint _transferableStartTime,
+        address _admin,
+        address _earlyInvestorWallet)
     {
         // Mint all tokens. Then disable minting forever.
         totalSupply = tokenTotalAmount * (10 ** uint256(decimals));
@@ -544,7 +544,7 @@ contract RequestToken is StandardToken, Ownable {
         public
         validDestination(_to)
         onlyWhenTransferEnabled
-        returns (bool) 
+        returns (bool)
     {
         return super.transfer(_to, _value);
     }
@@ -559,7 +559,7 @@ contract RequestToken is StandardToken, Ownable {
         public
         validDestination(_to)
         onlyWhenTransferEnabled
-        returns (bool) 
+        returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -571,7 +571,7 @@ contract RequestToken is StandardToken, Ownable {
      * @param _value The amount to be burned.
      * @return always true (necessary in case of override)
      */
-    function burn(uint _value) 
+    function burn(uint _value)
         public
         onlyWhenTransferEnabled
         returns (bool)
@@ -589,10 +589,10 @@ contract RequestToken is StandardToken, Ownable {
      * @param _value The amount to be burned.
      * @return always true (necessary in case of override)
      */
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         public
         onlyWhenTransferEnabled
-        returns(bool) 
+        returns(bool)
     {
         assert(transferFrom(_from, msg.sender, _value));
         return burn(_value);
@@ -605,7 +605,7 @@ contract RequestToken is StandardToken, Ownable {
      */
     function emergencyERC20Drain(ERC20 token, uint amount )
         public
-        onlyOwner 
+        onlyOwner
     {
         token.transfer(owner, amount);
     }
@@ -613,7 +613,7 @@ contract RequestToken is StandardToken, Ownable {
 
 /**
  * @title RequestTokenSale
- * @dev 
+ * @dev
  * We add new features to a base crowdsale using multiple inheritance.
  * We are using the following extensions:
  * CappedCrowdsale - sets a max boundary for raised funds
@@ -667,24 +667,35 @@ contract RequestTokenSale is Ownable, CappedCrowdsale, WhitelistedCrowdsale, Pro
      * @dev Create the Request token (override createTokenContract of StandardCrowdsale)
      * @return the StandardToken created
      */
-    function createTokenContract () 
-      internal 
-      returns(StandardToken) 
+    function createTokenContract ()
+      internal
+      returns(StandardToken)
     {
         return new RequestToken(TOTAL_REQUEST_TOKEN_SUPPLY, endTime.add(PERIOD_AFTERSALE_NOT_TRANSFERABLE_IN_SEC), REQUEST_FOUNDATION_WALLET, EARLY_INVESTOR_WALLET);
     }
 
     /**
-     * @dev Transfer the unsold tokens to the request Foundation multisign wallet 
+     * @dev Transfer the unsold tokens to the request Foundation multisign wallet
      * @dev Only for owner
      * @return the StandardToken created
      */
-    function drainRemainingToken () 
+    function drainRemainingToken ()
       public
       onlyOwner
     {
         require(hasEnded());
         token.transfer(REQUEST_FOUNDATION_WALLET, token.balanceOf(this));
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

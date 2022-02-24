@@ -35,7 +35,7 @@ contract OwnableToken {
 	address public minter;
 	address public burner;
 	address public controller;
-	
+
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	function OwnableToken() public {
@@ -46,12 +46,12 @@ contract OwnableToken {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	modifier onlyMinter() {
 		require(msg.sender == minter);
 		_;
 	}
-	
+
 	modifier onlyBurner() {
 		require(msg.sender == burner);
 		_;
@@ -60,8 +60,8 @@ contract OwnableToken {
 		require(msg.sender == controller);
 		_;
 	}
-  
-	modifier onlyPayloadSize(uint256 numwords) {                                       
+
+	modifier onlyPayloadSize(uint256 numwords) {
 		assert(msg.data.length == numwords * 32 + 4);
 		_;
 	}
@@ -71,15 +71,15 @@ contract OwnableToken {
 		emit OwnershipTransferred(owner, newOwner);
 		owner = newOwner;
 	}
-	
+
 	function setMinter(address _minterAddress) public onlyOwner {
 		minter = _minterAddress;
 	}
-	
+
 	function setBurner(address _burnerAddress) public onlyOwner {
 		burner = _burnerAddress;
 	}
-	
+
 	function setControler(address _controller) public onlyOwner {
 		controller = _controller;
 	}
@@ -88,7 +88,7 @@ contract OwnableToken {
 contract KYCControl is OwnableToken {
 	event KYCApproved(address _user, bool isApproved);
 	mapping(address => bool) public KYCParticipants;
-	
+
 	function isKYCApproved(address _who) view public returns (bool _isAprroved){
 		return KYCParticipants[_who];
 	}
@@ -101,22 +101,22 @@ contract KYCControl is OwnableToken {
 
 contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 	using SafeMath for uint256;
-	
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
 	/* Public variables of the token */
 	string public name;
 	string public symbol;
 	uint8 public decimals;
 	uint256 public _totalSupply;
-	
+
 	/*Private Variables*/
 	uint256 constant POW = 10 ** 18;
 	uint256 _circulatingSupply;
-	
+
 	/* This creates an array with all balances */
 	mapping (address => uint256) public balances;
-		
+
 	// This notifies clients about the amount burnt
 	event Burn(address indexed from, uint256 value);
 	event Mint(address indexed _participant, uint256 value);
@@ -129,7 +129,7 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 		_totalSupply = SafeMath.mul(1000000000, POW);     			//1 Billion Tokens with 18 Decimals
 		_circulatingSupply = 0;
 	}
-	
+
 	function mintToken(address _participant, uint256 _mintedAmount) public onlyMinter returns (bool _success) {
 		require(_mintedAmount > 0);
 		require(_circulatingSupply.add(_mintedAmount) <= _totalSupply);
@@ -137,14 +137,14 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 
         balances[_participant] =  balances[_participant].add(_mintedAmount);
         _circulatingSupply = _circulatingSupply.add(_mintedAmount);
-		
+
 		emit Transfer(0, this, _mintedAmount);
         emit Transfer(this, _participant, _mintedAmount);
 		emit Mint(_participant, _mintedAmount);
-		
+
 		return true;
     }
-	
+
 	function burn(address _participant, uint256 _value) public onlyBurner returns (bool _success) {
         require(_value > 0);
 		require(balances[_participant] >= _value);   							// Check if the sender has enough
@@ -154,19 +154,27 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
         _totalSupply = _totalSupply.sub(_value);                      			// Updates totalSupply
 		emit Transfer(_participant, 0, _value);
         emit Burn(_participant, _value);
-        
+
 		return true;
     }
-  
+
 	function totalSupply() public view returns (uint256) {
 		return _totalSupply;
 	}
-	
+
 	function circulatingSupply() public view returns (uint256) {
 		return _circulatingSupply;
 	}
-	
+
 	function balanceOf(address _owner) public view returns (uint256 balance) {
 		return balances[_owner];
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
 	}
 }

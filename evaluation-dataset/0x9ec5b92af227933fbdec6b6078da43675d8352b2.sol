@@ -671,9 +671,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "DIVID";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0x7406fA32f0c6337fb5db0099DF1BBa9C0fCD8df0;
-    
+
     uint public constant START_TIME = 1559660040;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -681,9 +681,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -707,5 +707,14 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

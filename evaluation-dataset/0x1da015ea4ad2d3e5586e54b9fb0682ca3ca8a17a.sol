@@ -36,7 +36,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -284,7 +284,7 @@ library SafeMath {
 }
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -305,7 +305,7 @@ contract BasicToken is ERC20Basic {
   }
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -440,7 +440,7 @@ contract FrozenableToken is Operational, BurnableToken, ReentrancyGuard {
     function freezeForOwner(uint256 _value, uint256 _unFrozenTime) onlyOperator returns(bool) {
         require(balances[owner] >= _value);
         require(_unFrozenTime > createTime);
-        require(_unFrozenTime > now);  
+        require(_unFrozenTime > now);
         if (_unFrozenTime.parseTimestamp().year - createTime.parseTimestamp().year > 10 ){
                 balances[owner] = balances[owner].sub(_value);
                 frozenForever = frozenForever.add(_value);
@@ -543,4 +543,15 @@ contract DragonToken is DragonReleaseableToken {
     function DragonToken(
                      address operator
                      ) DragonReleaseableToken(operator) {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

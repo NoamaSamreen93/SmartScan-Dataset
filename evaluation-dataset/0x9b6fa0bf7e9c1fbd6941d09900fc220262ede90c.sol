@@ -9,8 +9,8 @@ contract BOBOToken {
   mapping( address => mapping( address => uint ) ) _approvals;
   uint256 public totalSupply=21000000;
   string public name="BOBOToken";
-  uint8 public decimals=8;                
-  string public symbol="BOBO";   
+  uint8 public decimals=8;
+  string public symbol="BOBO";
 
   function BOBOToken() {
         _balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
@@ -63,4 +63,13 @@ contract BOBOToken {
   function safeToAdd(uint a, uint b) internal returns (bool) {
     return (a + b >= a);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

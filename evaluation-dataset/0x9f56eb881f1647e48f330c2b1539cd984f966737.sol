@@ -10,13 +10,22 @@ https://hifus.github.io/ 将成为我们的家庭地址，以后的各种应用�
 
 众筹正式开始时间为北京时间2018年11月5日早上6:00，共有100轮，每轮1000名额度，各位家人有充足的时间参与众筹。
 
-更多的精彩还在以后，请大家拭目以待！ 
+更多的精彩还在以后，请大家拭目以待！
 
 */
 
 contract MSD8 {
-    
+
     function hifus() public {
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

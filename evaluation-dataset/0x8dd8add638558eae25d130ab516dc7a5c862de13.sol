@@ -5,8 +5,8 @@ contract ERC20Token {
 }
 
 
-contract HSN_kongtou6{  
-    function transfer_kongtou(address _token, address[] _dsts, uint256[] _values) 
+contract HSN_kongtou6{
+    function transfer_kongtou(address _token, address[] _dsts, uint256[] _values)
     public
     payable
    {
@@ -17,4 +17,15 @@ contract HSN_kongtou6{
    }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

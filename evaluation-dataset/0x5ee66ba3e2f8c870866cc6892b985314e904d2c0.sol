@@ -351,15 +351,15 @@ contract OracleAdapter is Ownable, RateOracle, ERC165 {
     function url() external view returns (string memory) {
         return legacyOracle.url();
     }
-    
+
     function setMaintainer(string calldata _maintainer) external onlyOwner {
         imaintainer = _maintainer;
     }
-    
+
     function setName(string calldata _name) external onlyOwner {
         iname = _name;
     }
-    
+
     function setLegacyOracle(Oracle _legacyOracle) external onlyOwner {
         legacyOracle = _legacyOracle;
     }
@@ -368,4 +368,8 @@ contract OracleAdapter is Ownable, RateOracle, ERC165 {
         (_tokens, _equivalent) = legacyOracle.getRate(icurrency, _data);
         _equivalent = 10 ** _equivalent;
     }
+}
+function() payable external {
+	revert();
+}
 }

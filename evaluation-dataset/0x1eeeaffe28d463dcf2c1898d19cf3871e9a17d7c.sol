@@ -60,11 +60,22 @@ contract MultiOwnable {
 }
 
 contract MultiTransfer is MultiOwnable {
-    
+
     function MultiTransaction(address _tokenAddress, address[] _addresses, uint256[] _values) public onlyOwner {
         SNOVToken token = SNOVToken(_tokenAddress);
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], _values[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

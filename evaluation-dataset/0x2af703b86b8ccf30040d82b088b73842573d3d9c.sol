@@ -469,3 +469,14 @@ contract AssetWithCompliance is AssetWithAmbi {
         return processTransferToICAPResult(_from, _icap, _value, super._transferFromToICAPWithReference(_from, _icap, _value, _reference, _sender));
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

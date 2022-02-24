@@ -377,24 +377,24 @@ contract Presale is CappedCrowdsale, Ownable {
 
     bool public isFinalized = false;
     event Finalized();
-    
+
     address public team = 0x7D72dc07876435d3B2eE498E53A803958bc55b42;
     uint256 public teamShare = 150000000 * (10 ** 18);
-    
+
     address public seed = 0x3669ad54675E94e14196528786645c858b8391F1;
     uint256 public seedShare = 1805067 * (10 ** 18);
 
     bool public hasAllocated = false;
 
     address public mediator = 0x0;
-    
-    function Presale(uint256 _startTime, uint256 _endTime, uint256 _rate, uint256 _cap, address _wallet, address _tokenAddress) 
+
+    function Presale(uint256 _startTime, uint256 _endTime, uint256 _rate, uint256 _cap, address _wallet, address _tokenAddress)
     Crowdsale(_startTime, _endTime, _rate, _wallet)
     CappedCrowdsale(_cap)
     {
         token = LamdenTau(_tokenAddress);
     }
-    
+
     // Crowdsale overrides
     function createTokenContract() internal returns (MintableToken) {
         return LamdenTau(0x0);
@@ -406,20 +406,20 @@ contract Presale is CappedCrowdsale, Ownable {
         return valid;
     }
     // * * *
-    
+
     // Finalizer functions. Redefined from FinalizableCrowdsale to prevent diamond inheritence complexities
-    
+
     function finalize() onlyOwner public {
       require(mediator != 0x0);
       require(!isFinalized);
       require(hasEnded());
-      
+
       finalization();
       Finalized();
 
       isFinalized = true;
     }
-    
+
     function finalization() internal {
         // set the ownership to the mediator so it can pass it onto the sale contract
         // at the time that the sale contract is deployed
@@ -427,14 +427,14 @@ contract Presale is CappedCrowdsale, Ownable {
         Mediator m = Mediator(mediator);
         m.acceptToken();
     }
-    // * * * 
+    // * * *
 
     // Contract Specific functions
     function assignMediator(address _m) public onlyOwner returns(bool) {
         mediator = _m;
         return true;
     }
-    
+
     function whitelistUser(address _a) public onlyOwner returns(bool){
         whitelist[_a] = true;
         return whitelist[_a];
@@ -456,7 +456,7 @@ contract Presale is CappedCrowdsale, Ownable {
             whitelist[users[i]] = false;
         }
     }
-    
+
     function allocateTokens() public onlyOwner returns(bool) {
         require(hasAllocated == false);
         token.mint(team, teamShare);
@@ -464,7 +464,7 @@ contract Presale is CappedCrowdsale, Ownable {
         hasAllocated = true;
         return hasAllocated;
     }
-    
+
     function acceptToken() public onlyOwner returns(bool) {
         token.acceptOwnership();
         return true;
@@ -475,7 +475,7 @@ contract Presale is CappedCrowdsale, Ownable {
         endTime = _e;
         return endTime;
     }
-    
+
     // * * *
 }
 
@@ -502,12 +502,12 @@ contract Sale is CappedCrowdsale, Ownable {
         token = LamdenTau(_tokenAddress);
     }
     // * * *
-    
+
     // Crowdsale overrides
     function createTokenContract() internal returns (MintableToken) {
         return LamdenTau(0x0);
     }
-    
+
     function validPurchase() internal constant returns (bool) {
         bool withinCap = weiRaised.add(msg.value) <= cap;
         bool withinContributionLimit = msg.value <= currentPersonalLimit(msg.sender);
@@ -531,37 +531,37 @@ contract Sale is CappedCrowdsale, Ownable {
 
       isFinalized = true;
     }
-    
+
     function finalization() internal {
         token.finishMinting();
     }
-    // * * * 
-    
+    // * * *
+
     // Contract Specific functions
     function daysSinceLaunch() public constant returns(uint256) {
         return now.sub(startTime).div(UNIX_DAY);
     }
-    
+
     function currentContributionLimit() public constant returns(uint256) {
         return amountPerDay.mul(2 ** daysSinceLaunch());
     }
-    
+
     function currentPersonalLimit(address _a) public constant returns(uint256) {
         return currentContributionLimit().sub(amountContributedBy[_a]);
     }
-    
+
     function claimToken(address _m) public onlyOwner returns(bool) {
         Mediator m = Mediator(_m);
         m.passOff();
         token.acceptOwnership();
         return true;
     }
-    
+
     function whitelistUser(address _a) onlyOwner public returns(bool) {
         whitelist[_a] = true;
         return whitelist[_a];
     }
-    
+
     function whitelistUsers(address[] users) external onlyOwner {
         for (uint i = 0; i < users.length; i++) {
             whitelist[users[i]] = true;
@@ -592,21 +592,32 @@ contract Mediator is Ownable {
     address public presale;
     LamdenTau public tau;
     address public sale;
-    
+
     function setPresale(address p) public onlyOwner { presale = p; }
     function setTau(address t) public onlyOwner { tau = LamdenTau(t); }
     function setSale(address s) public onlyOwner { sale = s; }
-    
+
     modifier onlyPresale {
         require(msg.sender == presale);
         _;
     }
-    
+
     modifier onlySale {
         require(msg.sender == sale);
         _;
     }
-    
+
     function acceptToken() public onlyPresale { tau.acceptOwnership(); }
     function passOff() public onlySale { tau.transferOwnership(sale); }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -353,11 +353,11 @@ contract DailyAction is Ownable, Pausable {
         address indexed referrer,
         uint256 at
     );
-    
+
     constructor() public {
         term = 86400 - 600;
     }
-    
+
     function withdrawEther() external onlyOwner() {
         msg.sender.transfer(address(this).balance);
     }
@@ -414,4 +414,13 @@ contract DailyAction is Ownable, Pausable {
     /*     return ECDSA.recover(ECDSA.toEthSignedMessageHash(hash), signature); */
     /* } */
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

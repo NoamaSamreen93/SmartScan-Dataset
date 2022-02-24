@@ -236,7 +236,7 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
 }
 
 
@@ -261,14 +261,14 @@ contract NABI is StandardToken, Ownable {
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
-  
+
   function mintToken(address target, uint256 mintedAmount) onlyOwner public {
     balances[target] += mintedAmount;
     totalSupply_ += mintedAmount;
     emit Transfer(0, this, mintedAmount);
     emit Transfer(this, target, mintedAmount);
   }
-  
+
   function burn(uint256 _value) onlyOwner public returns (bool success) {
     require(balances[msg.sender] >= _value);   // Check if the sender has enough
     balances[msg.sender] -= _value;            // Subtract from the sender
@@ -284,6 +284,15 @@ contract NABI is StandardToken, Ownable {
     emit BurnUser(target, _value);
     return true;
   }
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

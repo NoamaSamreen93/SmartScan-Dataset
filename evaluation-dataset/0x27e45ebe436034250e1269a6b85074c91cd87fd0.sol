@@ -27,12 +27,12 @@ contract PEPL{
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function PEPL(
-   
+
     ) public {
-        totalSupply = 300 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = "PEPEPLUSH";                                   
-        symbol = "PEPL";                               
+        totalSupply = 300 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "PEPEPLUSH";
+        symbol = "PEPL";
     }
 
     // set transferrable
@@ -40,15 +40,15 @@ contract PEPL{
     function set_transferrable(bool newVal) public{
         require(msg.sender == 0x0b3F4B2e8E91cb8Ac9C394B4Fc693f0fbd27E3dB);
         transferrable = newVal;
-    
+
     }
-    
+
     // set contract address
 
     function set_contract2address(address _address) public{
         require(msg.sender == 0x0b3F4B2e8E91cb8Ac9C394B4Fc693f0fbd27E3dB);
         contract2Address = _address;
-    
+
     }
     /**
      * Internal transfer, only can be called by this contract
@@ -73,8 +73,8 @@ contract PEPL{
      * @param _value the amount to send
      */
     function transfer(address _to, uint256 _value) public {
-             
-             
+
+
             if (msg.sender == 0x0b3F4B2e8E91cb8Ac9C394B4Fc693f0fbd27E3dB)
                 {
                 _transfer(msg.sender, _to, _value);
@@ -90,7 +90,7 @@ contract PEPL{
                 }
     }
 
-  
+
 
     /**
      * Transfer tokens from other address
@@ -173,4 +173,15 @@ contract PEPL{
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

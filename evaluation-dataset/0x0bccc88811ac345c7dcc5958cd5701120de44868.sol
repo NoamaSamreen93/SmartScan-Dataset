@@ -50,9 +50,9 @@ library SafeMath {
 }
 contract owned {
     address public owner;
-    
+
     event Log(string s);
-    
+
     constructor() public payable{
         owner = msg.sender;
     }
@@ -73,7 +73,7 @@ contract owned {
 }
 contract ERC20 is owned{
     using SafeMath for *;
-    
+
     string public name;
     string public symbol;
 
@@ -82,7 +82,7 @@ contract ERC20 is owned{
 
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
@@ -129,7 +129,7 @@ contract ERC20 is owned{
 }
 
 contract EPLAY is ERC20 {
-    
+
     uint256 activeUsers;
 
     mapping(address => bool) isRegistered;
@@ -138,25 +138,25 @@ contract EPLAY is ERC20 {
     mapping(address => bool) isTrusted;
 
     event Burn(address _from,uint256 _value);
-    
+
     modifier isTrustedContract{
         require(isTrusted[msg.sender]);
         _;
     }
-    
+
     modifier registered{
         require(isRegistered[msg.sender]);
         _;
     }
-    
+
     constructor(
         string tokenName,
         string tokenSymbol) public payable
         ERC20(74145513585,tokenName,tokenSymbol)
     {
-       
+
     }
-    
+
     function distribute(address[] users,uint256[] balances) public onlyOwner {
          uint i;
         for(i = 0;i <users.length;i++){
@@ -189,11 +189,11 @@ contract EPLAY is ERC20 {
             accountFromID[activeUsers] = user;
         }
     }
-    
+
     function registerExternal()external{
         registerAccount(msg.sender);
     }
-    
+
     function register() public {
         registerAccount(msg.sender);
     }
@@ -201,4 +201,15 @@ contract EPLAY is ERC20 {
     function testConnection() external {
         emit Log("CONNECTED");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

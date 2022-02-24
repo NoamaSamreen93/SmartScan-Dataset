@@ -225,8 +225,8 @@ contract StandardToken is ERC20, BasicToken {
 contract BFMToken is StandardToken {
 
     string public constant name = "Blockchain and Fintech Media Union";
-    string public constant symbol = "BFM"; 
-    uint8 public constant decimals = 18; 
+    string public constant symbol = "BFM";
+    uint8 public constant decimals = 18;
 
     uint256 public constant INITIAL_SUPPLY = 500 * (10 ** uint256(decimals));
 
@@ -239,4 +239,15 @@ contract BFMToken is StandardToken {
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

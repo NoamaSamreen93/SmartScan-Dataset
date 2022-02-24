@@ -44,7 +44,7 @@ contract HACHIKO is Ownable {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    
+
     constructor() public {
         totalSupply = 10000000 * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
@@ -166,4 +166,10 @@ contract HACHIKO is Ownable {
         emit Burn(_from, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

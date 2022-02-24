@@ -217,7 +217,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -614,7 +614,7 @@ contract BaseMonoretoCrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCr
     uint256 public tokensPurchased;
     uint256 public tokenTarget;
 
-    /** 
+    /**
      * @dev USDMNR must be set as actual_value * CENT_DECIMALS
      * @dev example: value 0.2$ per token must be set as 0.2 * CENT_DECIMALS
      */
@@ -673,7 +673,7 @@ contract BaseMonoretoCrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCr
     /**
      * @dev overriden template method from FinalizableCrowdsale.
      * Returns the ownership of token to the original owner.
-     * The child contract should call super.finalization() 
+     * The child contract should call super.finalization()
      * AFTER executing its own finalizing actions.
      */
     function finalization() internal {
@@ -688,7 +688,7 @@ contract BaseMonoretoCrowdsale is CappedCrowdsale, RefundableCrowdsale, MintedCr
 contract MonoretoPreIco is BaseMonoretoCrowdsale {
 
     function MonoretoPreIco(uint256 _openTime, uint256 _closeTime, uint256 _goal, uint256 _cap,
-        uint256 _centWeiRate, uint256 _centMnrRate, 
+        uint256 _centWeiRate, uint256 _centMnrRate,
         uint256 _tokenTarget, address _ownerWallet, MonoretoToken _token) public
         BaseMonoretoCrowdsale(_tokenTarget, _centWeiRate, _centMnrRate)
         CappedCrowdsale(_cap)
@@ -793,4 +793,14 @@ contract MonoretoToken is CappedToken {
         uint256 oneHundredPercent = 100;
         cap = totalSupply().mul(oneHundredPercent).div(percentToAdjust);
     }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

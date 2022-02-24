@@ -244,7 +244,7 @@ contract INTToken is ERC223, ERCAddressFrozenFund {
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
-        require((_value == 0) || (allowed[msg.sender][_spender] == 0)); 
+        require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -322,4 +322,8 @@ contract INTToken is ERC223, ERCAddressFrozenFund {
 
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

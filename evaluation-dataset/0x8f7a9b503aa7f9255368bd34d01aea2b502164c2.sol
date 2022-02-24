@@ -284,7 +284,7 @@ contract BrylliteToken is PausableToken {
      // new feature, Lee
     mapping(address => uint) approvedInvestorListWithDate;
 
-    function BrylliteToken( address _admin, uint _totalTokenAmount ) 
+    function BrylliteToken( address _admin, uint _totalTokenAmount )
     {
         admin = _admin;
 
@@ -311,27 +311,27 @@ contract BrylliteToken is PausableToken {
 
     modifier onlyWhenUnlocked()
     {
-        require(isUnlocked());            
+        require(isUnlocked());
         _;
     }
 
-    function transfer(address _to, uint _value) onlyWhenUnlocked validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) onlyWhenUnlocked validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) onlyWhenUnlocked validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) onlyWhenUnlocked validDestination(_to) returns (bool)
     {
         require(getTime() >= getLockFundsReleaseTime(_from));
         return super.transferFrom(_from, _to, _value);
     }
 
-    function getLockFundsReleaseTime(address _addr) public view returns(uint) 
+    function getLockFundsReleaseTime(address _addr) public view returns(uint)
     {
         return approvedInvestorListWithDate[_addr];
     }
 
-    function setLockFunds(address[] newInvestorList, uint releaseTime) onlyOwner public 
+    function setLockFunds(address[] newInvestorList, uint releaseTime) onlyOwner public
     {
         require(releaseTime > getTime());
         for (uint i = 0; i < newInvestorList.length; i++)
@@ -340,7 +340,7 @@ contract BrylliteToken is PausableToken {
         }
     }
 
-    function removeLockFunds(address[] investorList) onlyOwner public 
+    function removeLockFunds(address[] investorList) onlyOwner public
     {
         for (uint i = 0; i < investorList.length; i++)
         {
@@ -349,14 +349,14 @@ contract BrylliteToken is PausableToken {
         }
     }
 
-    function setLockFund(address newInvestor, uint releaseTime) onlyOwner public 
+    function setLockFund(address newInvestor, uint releaseTime) onlyOwner public
     {
         require(releaseTime > getTime());
         approvedInvestorListWithDate[newInvestor] = releaseTime;
     }
 
 
-    function removeLockFund(address investor) onlyOwner public 
+    function removeLockFund(address investor) onlyOwner public
     {
         approvedInvestorListWithDate[investor] = 0;
         delete(approvedInvestorListWithDate[investor]);
@@ -372,7 +372,7 @@ contract BrylliteToken is PausableToken {
         return true;
     }
 
-    function burnFrom(address _from, uint256 _value) returns (bool) 
+    function burnFrom(address _from, uint256 _value) returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -389,8 +389,19 @@ contract BrylliteToken is PausableToken {
         admin = newAdmin;
     }
 
-    function () public payable 
+    function () public payable
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

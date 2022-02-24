@@ -70,11 +70,11 @@ contract SmartVows is Ownable, Util {
     // Names of marriage partners
     string public partner1_name;
     string public partner2_name;
-    
+
     // Partners' eth address
     address public partner1_address;
     address public partner2_address;
-    
+
     // Partners Vows
     string public partner1_vows;
     string public partner2_vows;
@@ -93,7 +93,7 @@ contract SmartVows is Ownable, Util {
 
     // prenup Text
     string public prenupAgreement;
-    
+
     //Last Will and Testaments
     string public partner1_will;
     string public partner2_will;
@@ -101,18 +101,18 @@ contract SmartVows is Ownable, Util {
     // Partners Signed Marriage Contract
     bool public partner1_signed;
     bool public partner2_signed;
-    
+
     // Partners Voted to update the prenup
     bool public partner1_voted_update_prenup;
     bool public partner2_voted_update_prenup;
-    
+
     //Partners Voted to update the marriage status
     bool public partner1_voted_update_marriage_status;
     bool public partner2_voted_update_marriage_status;
-    
+
     // Did both partners signed the contract
      bool public is_signed;
-    
+
     // Officiant
     string public officiant;
 
@@ -121,7 +121,7 @@ contract SmartVows is Ownable, Util {
 
     // Location of marriage
     string public location;
-    
+
     Event[] public lifeEvents;
 
     struct Event {
@@ -130,8 +130,8 @@ contract SmartVows is Ownable, Util {
         string description;
         string mesg;
     }
-    
-    uint public eventcount; 
+
+    uint public eventcount;
 
     // Declare Life event structure
     event LifeEvent(string name, string description, string mesg);
@@ -143,15 +143,15 @@ contract SmartVows is Ownable, Util {
         string ce_description;
         string ce_mesg;
     }
-    
-    uint public contracteventcount; 
+
+    uint public contracteventcount;
 
     // Declare Contract event structure
     event ContractEvent(string ce_description, string ce_mesg);
 
-    function SmartVows(string _partner1, address _partner1_address, string _partner2, address _partner2_address, string _marriageDate, string _maritalStatus, string _officiant, string _witnesses, string _location, bytes _coupleImageIPFShash, bytes _marriageLicenceImageIPFShash) public{        
+    function SmartVows(string _partner1, address _partner1_address, string _partner2, address _partner2_address, string _marriageDate, string _maritalStatus, string _officiant, string _witnesses, string _location, bytes _coupleImageIPFShash, bytes _marriageLicenceImageIPFShash) public{
         partner1_name = _partner1;
-        partner2_name = _partner2;  
+        partner2_name = _partner2;
         partner1_address=_partner1_address;
         partner2_address=_partner2_address;
         marriageDate =_marriageDate;
@@ -164,7 +164,7 @@ contract SmartVows is Ownable, Util {
 
         //Record contract creation in events
         saveContractEvent("Blockchain marriage smart contract created","Marriage smart contract added to the blockchain");
-        
+
     }
 
     // Add Life event, either partner can update
@@ -178,15 +178,15 @@ contract SmartVows is Ownable, Util {
         LifeEvent(name, description, mesg);
         eventcount++;
     }
-    
-    
+
+
     function saveContractEvent(string description, string mesg) private {
         contractEvents.push(contractEvent(block.timestamp, description, mesg));
         ContractEvent(description, mesg);
         contracteventcount++;
     }
 
-    
+
     // Update partner 1 vows only once
     function updatePartner1_vows(string _partner1_vows) public {
         require((msg.sender == owner || msg.sender == partner1_address) && (bytes(partner1_vows).length == 0));
@@ -218,12 +218,12 @@ contract SmartVows is Ownable, Util {
             partner2_signed = true;
             saveContractEvent("Marriage signed", "Smart Contract signed by Partner 2");
         }
-        
+
         if(partner1_signed && partner2_signed){// if both signed then make the contract as signed
             is_signed = true;
         }
     }
-    
+
     //Function to vote to allow for updating marital status, both partners must vote to allow update
         function voteToUpdateMaritalStatus() public {
         if(msg.sender == partner1_address){
@@ -235,7 +235,7 @@ contract SmartVows is Ownable, Util {
             saveContractEvent("Vote - Change Marital Status", "Partner 2 voted to updated Marital Status");
         }
     }
-    
+
     //Function to vote to allow for updating prenup, both partners must vote true to allow update
     function voteToUpdatePrenup() public {
         if(msg.sender == partner1_address){
@@ -268,19 +268,30 @@ contract SmartVows is Ownable, Util {
         partner1_voted_update_prenup = false;
         partner2_voted_update_prenup = false;
     }
-     
+
     // Update partner 1 will, only partner 1 can update
     function updatePartner1_will(string _partner1_will) public {
         require(msg.sender == partner1_address);
         partner1_will = _partner1_will;
         saveContractEvent("Update - Will", "Partner 1 Will Updated");
     }
-  
+
     // Update partner 2 will, only partner 2 can update
     function updatePartner2_will(string _partner2_will) public {
         require(msg.sender == partner2_address);
         partner2_will = _partner2_will;
         saveContractEvent("Update - Will", "Partner 2 Will Updated");
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

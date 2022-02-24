@@ -64,7 +64,7 @@ contract Ownable {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
@@ -115,7 +115,7 @@ contract Pausable is Ownable {
   }
 }
 
- 
+
 /**
  * @title ERC20 interface
  */
@@ -234,7 +234,7 @@ contract StandardToken is ERC20, Pausable {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   function burn(uint256 _value) public returns(bool success){
     require(balances[msg.sender]>=_value);
     totalSupply-=_value;
@@ -242,7 +242,7 @@ contract StandardToken is ERC20, Pausable {
     emit Burn(msg.sender,_value);
     return true;
     }
-    
+
   function burnFrom(address _from,uint256 _value)public returns(bool success){
     require(balances[_from]>=_value);
     require(allowed[_from][msg.sender]>=_value);
@@ -309,9 +309,20 @@ contract ShinhwaToken is ModToken {
     uint public totalSupply = _initialAmount * 10 ** uint256(decimals);
     string constant public name = "Shinhwa Token";
     string constant public symbol = "SWT";
-    
+
   function ShinhwaToken() public {
         balances[msg.sender] = totalSupply;
         Transfer(address(0), msg.sender, totalSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

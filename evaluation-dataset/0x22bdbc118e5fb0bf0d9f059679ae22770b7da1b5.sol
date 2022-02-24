@@ -164,13 +164,13 @@ contract Ownable {
     address public owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
     constructor() {
         owner = msg.sender;
     }
 
 
-  
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -229,4 +229,15 @@ contract KopexExchange is TokenHolder{
         tokenContract.transfer(_buyer, amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

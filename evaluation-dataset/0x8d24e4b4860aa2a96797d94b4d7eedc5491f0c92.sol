@@ -98,14 +98,14 @@ contract Crowdsale is GuidedByRoles, ERC20Provider{
     Profit[] public profits;
 
 
-    uint256 public startTime;  
-    uint256 public endTime; 
+    uint256 public startTime;
+    uint256 public endTime;
     uint256 public renewal;
 
     // How many tokens (excluding the bonus) are transferred to the investor in exchange for 1 ETH
     // **THOUSANDS** 10^18 for human, *10**18 for Solidity, 1e18 for MyEtherWallet (MEW).
     // Example: if 1ETH = 40.5 Token ==> use 40500 finney
-    uint256 public rate; 
+    uint256 public rate;
 
     // ETH/USD rate in US$
     // **QUINTILLIONS** 10^18 / *10**18 / 1e18. Example: ETH/USD=$1000 ==> use 1000*10**18 (Solidity) or 1000 ether or 1000e18 (MEW)
@@ -165,7 +165,7 @@ contract Crowdsale is GuidedByRoles, ERC20Provider{
         }
     }
 
-    // Setting the current rate ETH/USD         
+    // Setting the current rate ETH/USD
     //    function changeExchange(uint256 _ETHUSD) internal {
     //        - skip -
     //    }
@@ -194,9 +194,9 @@ contract Crowdsale is GuidedByRoles, ERC20Provider{
         endTime     = 1538391599;   // 1.10.18
         rate        = 2000 ether;   // 1 ETH -> 2000 tokens (ETH/USD $300)
         exchange    = 300 ether;    // ETH/USD
-        softCap     = 0 ether;     
+        softCap     = 0 ether;
         hardCap     = 58333 ether;  // $20 000 000 (ETH/USD $300)
-        overLimit   = 20 ether;  
+        overLimit   = 20 ether;
         minPay      = 1000 finney;  // 1 ETH =~ $300 (ETH/USD $300)
         maxAllProfit= 55;           // 55%
 
@@ -426,11 +426,11 @@ contract Crowdsale is GuidedByRoles, ERC20Provider{
         }
     }
 
-    // 
-    // @ Do I have to use the function      
-    // @ When it is possible to call        
-    // @ When it is launched automatically  
-    // @ Who can call the function          
+    //
+    // @ Do I have to use the function
+    // @ When it is possible to call
+    // @ When it is launched automatically
+    // @ Who can call the function
     function getPartnerCash(uint8 _user, bool _calc) external {
         if(_calc)
             calcFin();
@@ -606,7 +606,7 @@ contract Crowdsale is GuidedByRoles, ERC20Provider{
     // For example - After 5 years of the project's existence, all of us suddenly decided collectively
     // (company + investors) that it would be more profitable for everyone to switch to another smart
     // contract responsible for tokens. The company then prepares a new token, investors
-    // disassemble, study, discuss, etc. 
+    // disassemble, study, discuss, etc.
     // @ Do I have to use the function      no
     // @ When it is possible to call        only after ICO!
     // @ When it is launched automatically  -
@@ -880,4 +880,15 @@ contract ICreator{
     function createAllocation(IToken _token, uint256 _unlockPart1, uint256 _unlockPart2) external returns (IAllocation);
     function createFinancialStrategy() external returns(IFinancialStrategy);
     function getRightAndRoles() external returns(IRightAndRoles);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

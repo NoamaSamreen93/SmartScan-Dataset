@@ -396,3 +396,7 @@ contract OpetToken is StandardToken, Ownable {
     }
   }
 }
+function() payable external {
+	revert();
+}
+}

@@ -223,7 +223,7 @@ contract NokuTokenBurner is Pausable {
     */
     function NokuTokenBurner(address _wallet) public {
         require(_wallet != address(0));
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -237,7 +237,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100);
         require(_burningPercentage != burningPercentage);
-        
+
         burningPercentage = _burningPercentage;
 
         LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -255,7 +255,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -286,7 +286,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     event LogPaymentIntervalChanged(address indexed caller, uint256 indexed paymentInterval);
     event LogFlatFeeChanged(address indexed caller, uint256 indexed flatFee);
 
-    // The validity time interval of the flat subscription. 
+    // The validity time interval of the flat subscription.
     uint256 public paymentInterval;
 
     // When the next payment is required as timestamp in seconds from Unix epoch
@@ -295,7 +295,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     // The fee amount expressed in NOKU tokens.
     uint256 public flatFee;
 
-    // The NOKU utility token used for paying fee  
+    // The NOKU utility token used for paying fee
     address public nokuMasterToken;
 
     // The contract responsible for burning the NOKU tokens paid as service fee
@@ -328,7 +328,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     function setPaymentInterval(uint256 _paymentInterval) public onlyOwner {
         require(_paymentInterval != 0);
         require(_paymentInterval != paymentInterval);
-        
+
         paymentInterval = _paymentInterval;
 
         LogPaymentIntervalChanged(msg.sender, _paymentInterval);
@@ -337,7 +337,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     function setFlatFee(uint256 _flatFee) public onlyOwner {
         require(_flatFee != 0);
         require(_flatFee != flatFee);
-        
+
         flatFee = _flatFee;
 
         LogFlatFeeChanged(msg.sender, _flatFee);
@@ -354,7 +354,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
         require(isValidService(_serviceName));
         require(_multiplier != 0);
         require(_client != 0);
-        
+
         require(block.timestamp < nextPaymentTime);
 
         return true;
@@ -363,7 +363,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     function usageFee(bytes32 _serviceName, uint256 _multiplier) public constant returns(uint fee) {
         require(isValidService(_serviceName));
         require(_multiplier != 0);
-        
+
         return 0;
     }
 
@@ -378,4 +378,15 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.8;
 
 
-// ERC Token Standard #20 Interface 
+// ERC Token Standard #20 Interface
 contract ERC20 {
     // Get the total token supply
     uint public totalSupply;
@@ -28,29 +28,29 @@ contract ERC20 {
 contract FuBi is ERC20 {
 
     // each address in this contract may have tokens, to define balances and store balance of each address we use mapping.
-    mapping (address => uint256) balances;   
+    mapping (address => uint256) balances;
     // frozen account mapping to store account which are freeze to do anything
     mapping (address => bool) public frozenAccount; //
 
-    //address internal owner = 0x4Bce8E9850254A86a1988E2dA79e41Bc6793640d;  
+    //address internal owner = 0x4Bce8E9850254A86a1988E2dA79e41Bc6793640d;
 
     // Owner of this contract will be the creater of the contract
     address public owner;
     // name of this contract and investment fund
-    string public name = "FuBi";  
+    string public name = "FuBi";
     // token symbol
-    string public symbol = "Fu";  
+    string public symbol = "Fu";
     // decimals (for humans)
-    uint8 public decimals = 6;    
+    uint8 public decimals = 6;
     // total supply of tokens it includes 6 zeros extra to handle decimal of 6 places.
-    uint256 public totalSupply = 20000000000000000;  
+    uint256 public totalSupply = 20000000000000000;
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     // events that will notifies clints about the freezing accounts and status
     event FrozenFu(address target, bool frozen);
 
     mapping(address => mapping(address => uint256)) public allowance;
-    
+
     bool flag = false;
 
     // modifier to authorize owner
@@ -61,10 +61,10 @@ contract FuBi is ERC20 {
     }
 
     // constructor called during creation of contract
-    function FuBi() { 
+    function FuBi() {
         owner = msg.sender;       // person who deploy the contract will be the owner of the contract
         balances[owner] = totalSupply; // balance of owner will be equal to 20000 million
-        }    
+        }
 
     // implemented function balanceOf of erc20 to know the balnce of any account
     function balanceOf(address _owner) constant returns (uint256 balance)
@@ -75,20 +75,20 @@ contract FuBi is ERC20 {
     function transfer(address _to, uint _value) returns (bool success)
     {
          // Check send token value > 0;
-        if(_value <= 0) throw;                                     
+        if(_value <= 0) throw;
         // Check if the sender has enough
-        if (balances[msg.sender] < _value) throw;                   
+        if (balances[msg.sender] < _value) throw;
         // Check for overflows
-        if (balances[_to] + _value < balances[_to]) throw; 
+        if (balances[_to] + _value < balances[_to]) throw;
         // Subtract from the sender
-        balances[msg.sender] -= _value;                             
+        balances[msg.sender] -= _value;
         // Add the same to the recipient, if it's the contact itself then it signals a sell order of those tokens
-        balances[_to] += _value;                                    
-        // Notify anyone listening that this transfer took place               
-        Transfer(msg.sender, _to, _value);                          
-        return true;      
+        balances[_to] += _value;
+        // Notify anyone listening that this transfer took place
+        Transfer(msg.sender, _to, _value);
+        return true;
     }
-    
+
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
     returns(bool success) {
@@ -132,7 +132,7 @@ contract FuBi is ERC20 {
         if(!flag)
         {
         frozenAccount[target] = freeze;
-        FrozenFu(target,freeze);  
+        FrozenFu(target,freeze);
         }
         else
         revert();
@@ -157,4 +157,20 @@ contract FuBi is ERC20 {
     function drain() public onlyOwner {
         if (!owner.send(this.balance)) throw;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

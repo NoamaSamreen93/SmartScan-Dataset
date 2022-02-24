@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
 contract Ownable {
-    
+
     address public owner = 0x0;
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
      modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -19,32 +19,32 @@ contract CryptoSoulPresale is Ownable{
         uint256 deposit;
         uint256 soulValue;
     }
-    
+
     event Deposit(address indexed _from, uint256 _value);
-    
+
     mapping(address => DataBase) walletsData;
     address[] internal wallets;
-    
+
     uint24 public depositsCount = 0;
-    
+
     uint256 public soulCap = 83300000;
-    
+
     uint256 public collectedFunds = 0;
     uint256 public distributedTokens = 0;
-    
+
     uint256 public soulReward0 = 125000;
     uint256 public soulReward1 = 142800;
     uint256 public soulReward2 = 166600;
-    
+
     uint256 public minDeposit = 0.01 ether;
     uint256 public ethPriceLvl0 = 0.99 ether;
     uint256 public ethPriceLvl1 = 6.99 ether;
-    
+
     function() external payable{
         require(msg.value >= minDeposit &&
         distributedTokens < soulCap);
         uint256 ethValue = msg.value;
-        uint256 soulValue = getSoulByEth(ethValue);     
+        uint256 soulValue = getSoulByEth(ethValue);
         uint256 totalSoulValue = distributedTokens + soulValue;
         if (totalSoulValue > soulCap){
             soulValue = soulCap - distributedTokens;
@@ -61,30 +61,30 @@ contract CryptoSoulPresale is Ownable{
         distributedTokens += soulValue;
         emit Deposit(msg.sender, msg.value);
     }
-  
+
   function getDepositValue(address _owner) public view returns(uint256){
       return walletsData[_owner].deposit;
   }
-  
+
   function balanceOf(address _owner) public view returns(uint256){
       return walletsData[_owner].soulValue;
   }
-   
+
    function changeSoulReward(uint256 _value0, uint256 _value1, uint256 _value2) public onlyOwner{
       soulReward0 = _value0;
       soulReward1 = _value1;
       soulReward2 = _value2;
       recountUsersBalance();
    }
-   
+
    function changeMinDeposit(uint256 _value) public onlyOwner{
        minDeposit = _value;
    }
-   
+
    function changeSoulCap(uint256 _value) public onlyOwner{
        soulCap = _value;
    }
-   
+
    function addUser(address _wallet, uint256 _depositValue) public onlyOwner{
        require(walletsData[_wallet].deposit == 0);
        saveUserWallet(_wallet);
@@ -94,9 +94,9 @@ contract CryptoSoulPresale is Ownable{
        distributedTokens += soulValue;
        collectedFunds += _depositValue;
    }
-   
+
    function recountUsersBalance() internal{
-       int256 distributeDiff = 0; 
+       int256 distributeDiff = 0;
        for(uint24 i = 0; i < wallets.length; i++){
            address wallet = wallets[i];
            uint256 originalValue = walletsData[wallet].soulValue;
@@ -113,7 +113,7 @@ contract CryptoSoulPresale is Ownable{
             distributedTokens = totalSoul;
        }
    }
-   
+
    function assignOldUserFunds(address[] _oldUsersWallets, uint256[] _values) public onlyOwner{
        wallets = _oldUsersWallets;
        for(uint24 i = 0; i < wallets.length; i++){
@@ -125,19 +125,19 @@ contract CryptoSoulPresale is Ownable{
            distributedTokens += soulValue;
        }
    }
-   
+
    function saveUserWallet(address _address) internal{
        wallets.push(_address);
    }
-   
+
    function getResidualEtherAmount(uint256 _ethValue, uint256 _soulResidual) internal view returns(uint256){
       return _soulResidual * 10 ** 18 / getRewardLevel(_ethValue);
   }
-  
+
    function getSoulByEth(uint256 _ethValue) internal view returns(uint256){
        return (_ethValue * getRewardLevel(_ethValue)) / 10 ** 18;
    }
-   
+
    function getRewardLevel(uint256 _ethValue) internal view returns(uint256){
         if (_ethValue <= ethPriceLvl0){
            return soulReward0;
@@ -147,14 +147,23 @@ contract CryptoSoulPresale is Ownable{
            return soulReward2;
        }
    }
-   
+
    function countUser(address _owner) internal{
        if (walletsData[_owner].deposit == 0){
            saveUserWallet(_owner);
        }
    }
-   
+
    function getUsersCount() public view returns(uint256){
        return wallets.length;
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

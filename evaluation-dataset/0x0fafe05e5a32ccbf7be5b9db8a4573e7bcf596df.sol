@@ -372,7 +372,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -399,7 +399,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -413,7 +413,7 @@ contract TimedCrowdsale is Crowdsale {
 
 /**
  * @title IncreasingPriceCrowdsale
- * @dev Extension of Crowdsale contract that increases the price of tokens linearly in time. 
+ * @dev Extension of Crowdsale contract that increases the price of tokens linearly in time.
  * Note that what should be provided to the constructor is the initial and final _rates_, that is,
  * the amount of tokens per wei contributed. Thus, the initial rate must be greater than the final rate.
  */
@@ -436,8 +436,8 @@ contract IncreasingPriceCrowdsale is TimedCrowdsale {
   }
 
   /**
-   * @dev Returns the rate of tokens per wei at the present time. 
-   * Note that, as price _increases_ with time, the rate _decreases_. 
+   * @dev Returns the rate of tokens per wei at the present time.
+   * Note that, as price _increases_ with time, the rate _decreases_.
    * @return The number of tokens a buyer gets per wei at a given time
    */
   function getCurrentRate() public view returns (uint256) {
@@ -462,7 +462,7 @@ contract IncreasingPriceCrowdsale is TimedCrowdsale {
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -477,7 +477,7 @@ contract MintedCrowdsale is Crowdsale {
 }
 
 contract BigLuvCrowdsale is  TimedCrowdsale, MintedCrowdsale,Ownable {
- 
+
   //decimal value
   uint256 public constant DECIMAL_FACTOR = 10 ** uint256(18);
   uint256 public publicAllocationTokens = 50000000*DECIMAL_FACTOR;
@@ -493,17 +493,17 @@ contract BigLuvCrowdsale is  TimedCrowdsale, MintedCrowdsale,Ownable {
   TimedCrowdsale(_starttime,_endTime)Crowdsale(_rate, _wallet,_token)
   {
   }
-    
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
   function buyTokens(address _beneficiary) public payable {
     require(_beneficiary != address(0));
-  
+
     uint256 weiAmount = msg.value;
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
@@ -514,7 +514,7 @@ contract BigLuvCrowdsale is  TimedCrowdsale, MintedCrowdsale,Ownable {
     TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
     _forwardFunds();
   }
-  
+
  /**
  * @dev Change TokenPrice
  * @param  _rate is TokenPrice
@@ -526,20 +526,20 @@ contract BigLuvCrowdsale is  TimedCrowdsale, MintedCrowdsale,Ownable {
 }
 
  /**
- * @dev Change crowdsale OpeningTime 
+ * @dev Change crowdsale OpeningTime
  * @param  _startTime is Start time in Seconds
  */
   function changeStarttime(uint256 _startTime) public onlyOwner {
-    require(_startTime != 0); 
+    require(_startTime != 0);
     openingTime = _startTime;
     }
-    
+
  /**
  * @dev Change crowdsale ClosingTime
  * @param  _endTime is End time in Seconds
  */
   function changeEndtime(uint256 _endTime) public onlyOwner {
-    require(_endTime != 0); 
+    require(_endTime != 0);
     closingTime = _endTime;
     }
  /**
@@ -551,7 +551,18 @@ contract BigLuvCrowdsale is  TimedCrowdsale, MintedCrowdsale,Ownable {
     require (_to != 0x0 && _value < publicAllocationTokens);
     _processPurchase(_to, _value);
     publicAllocationTokens=publicAllocationTokens.sub(_value);
-       
+
     }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -512,7 +512,7 @@ contract ERC20Pausable is ERC20, Pausable {
 
 contract Blockbid is ERC20, ERC20Detailed, ERC20Burnable, ERC20Pausable {
 	uint private INITIAL_SUPPLY = 108178000e2;
-	
+
 	constructor ()
 		ERC20Burnable()
 		ERC20Detailed("Blockbid", "BID", 2)
@@ -520,5 +520,14 @@ contract Blockbid is ERC20, ERC20Detailed, ERC20Burnable, ERC20Pausable {
 		public
 	{
 		_mint(msg.sender, INITIAL_SUPPLY);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

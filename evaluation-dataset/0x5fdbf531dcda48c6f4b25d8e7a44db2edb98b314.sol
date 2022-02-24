@@ -151,3 +151,7 @@ contract CBCK {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

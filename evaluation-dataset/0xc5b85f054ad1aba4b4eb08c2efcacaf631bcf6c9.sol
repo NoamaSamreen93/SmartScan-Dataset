@@ -184,7 +184,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
-  
+
 }
 
 /**
@@ -395,7 +395,7 @@ contract BurnableToken is MintableToken {
 
 /**
  * @title Aurus Token
- * @dev Main token ganeration contract 
+ * @dev Main token ganeration contract
  */
 contract AurusToken is BurnableToken{
 
@@ -408,4 +408,13 @@ contract AurusToken is BurnableToken{
         transferOwnership(0xEE011a67d720944B274AD862750967Ce3494Bc40);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -28,9 +28,9 @@ contract Presale {
     uint public amountAvailable;
 
     address public erotixFund = 0x1a0cc2B7F7Cb6fFFd3194A2AEBd78A4a072915Be;
-    
+
     // Smart contract which releases received ERX on the 1st of March 2019
-    address public foundersFund = 0xaefe05643b613823dBAF6245AFb819Fd56fBdd22; 
+    address public foundersFund = 0xaefe05643b613823dBAF6245AFb819Fd56fBdd22;
 
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
@@ -155,7 +155,7 @@ contract Presale {
                 }
             }
         }
-        
+
         if (presaleClosed) {
             if (fundingGoalReached && beneficiary == msg.sender) {
                 if (beneficiary.send(amountRaised)) {
@@ -167,4 +167,13 @@ contract Presale {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

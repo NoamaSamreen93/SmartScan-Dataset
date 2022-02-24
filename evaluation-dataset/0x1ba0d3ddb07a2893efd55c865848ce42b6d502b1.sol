@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-/* 
+/*
  * IGNITE RATINGS "PHASED DISCOUNT" CROWDSALE CONTRACT. COPYRIGHT 2018 TRUSTIC HOLDING INC. Author - Damon Barnard (damon@igniteratings.com)
  * CONTRACT DEPLOYS A CROWDSALE WITH TIME-BASED REDUCING DISCOUNTS.
  */
@@ -170,7 +170,7 @@ contract Crowdsale {
 
         tc.transfer(owner, tc.balanceOf(this));
     }
-    
+
     /*
      * ALLOW IGNITE TO WITHDRAW CROWDSALE PROCEEDS TO OPERATIONS AND INDEX WALLETS
      */
@@ -181,4 +181,15 @@ contract Crowdsale {
         operations.transfer(total * operationsSplit / 100);
         index.transfer(total * indexSplit / 100);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

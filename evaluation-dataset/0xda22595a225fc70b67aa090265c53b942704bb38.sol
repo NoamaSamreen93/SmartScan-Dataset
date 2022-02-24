@@ -1005,3 +1005,12 @@ emit ClaimedTokens(_token, msg.sender, balance);
 event ClaimedTokens(address indexed _token, address indexed _controller, uint256 _amount);
 event TokensCollected(address indexed _holder, uint256 _amount);
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

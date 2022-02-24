@@ -76,7 +76,7 @@ contract Incinerate is ERC20Detailed {
   mapping (address => uint256) private _balances;
   mapping (address => mapping (address => uint256)) private _allowed;
 
- 
+
 
   string constant tokenSymbol = "INC8";
   string constant tokenName = "Incinerate Token";
@@ -109,7 +109,7 @@ contract Incinerate is ERC20Detailed {
 
   function transfer(address to, uint256 value) public returns (bool) {
       uint256 scaledValue = value.mul(100);
-      
+
     require(scaledValue <= _balances[msg.sender]);
     require(to != address(0));
 
@@ -134,16 +134,16 @@ contract Incinerate is ERC20Detailed {
 
   function approve(address spender, uint256 value) public returns (bool) {
     require(spender != address(0));
-    
+
     if(value == MAX_UINT) {
          _allowed[msg.sender][spender] = value;
          emit Approval(msg.sender, spender, value);
     } else {
-    
+
          uint256 scaledValue = value.mul(100);
          _allowed[msg.sender][spender] = scaledValue;
          emit Approval(msg.sender, spender, value);
-  
+
     }
       return true;
   }
@@ -211,4 +211,15 @@ contract Incinerate is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(scaledAmount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -358,13 +358,13 @@ contract ChimpDistribution is Ownable {
   uint256 public constant INITIAL_SUPPLY   = 100000000000 * decimalFactor;
   uint256 public AVAILABLE_TOTAL_SUPPLY    = 100000000000 * decimalFactor;
 
-  uint256 public AVAILABLE_AIRDROP_SUPPLY  =      20000000 * decimalFactor; 
-  uint256 public AVAILABLE_MERCHANT_SUPPLY =   30000000000 * decimalFactor; 
-  uint256 public AVAILABLE_PAYROLL_SUPPLY =    12200000000 * decimalFactor; 
-  uint256 public AVAILABLE_MARKETING_SUPPLY =    210000000 * decimalFactor; 
-  uint256 public AVAILABLE_PARTNERS_SUPPLY =    5000000000 * decimalFactor; 
-  uint256 public AVAILABLE_ADVISORS_SUPPLY =     750000000 * decimalFactor; 
-  uint256 public AVAILABLE_RESERVE_SUPPLY  =   51820000000 * decimalFactor; 
+  uint256 public AVAILABLE_AIRDROP_SUPPLY  =      20000000 * decimalFactor;
+  uint256 public AVAILABLE_MERCHANT_SUPPLY =   30000000000 * decimalFactor;
+  uint256 public AVAILABLE_PAYROLL_SUPPLY =    12200000000 * decimalFactor;
+  uint256 public AVAILABLE_MARKETING_SUPPLY =    210000000 * decimalFactor;
+  uint256 public AVAILABLE_PARTNERS_SUPPLY =    5000000000 * decimalFactor;
+  uint256 public AVAILABLE_ADVISORS_SUPPLY =     750000000 * decimalFactor;
+  uint256 public AVAILABLE_RESERVE_SUPPLY  =   51820000000 * decimalFactor;
 
 
   uint256 public grandTotalClaimed = 0;
@@ -448,7 +448,7 @@ function setAllocation (address _recipient, uint256 _totalAllocated, AllocationT
       AVAILABLE_TOTAL_SUPPLY = AVAILABLE_TOTAL_SUPPLY.sub(_totalAllocated);
       emit LogNewAllocation(_recipient, _supply, _totalAllocated, grandTotalAllocated());
     }
-    
+
   /**
     * @dev Add an airdrop admin
     */
@@ -511,4 +511,15 @@ function setAllocation (address _recipient, uint256 _totalAllocated, AllocationT
     uint256 balance = token.balanceOf(address(this));
     require(token.transfer(_recipient, balance));
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

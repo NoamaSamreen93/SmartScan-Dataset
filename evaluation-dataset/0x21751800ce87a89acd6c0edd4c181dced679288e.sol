@@ -2,10 +2,10 @@ pragma solidity ^0.4.25;
 
 contract EasySmartolutionProcessor {
     address constant public smartolution = 0x2628E13a3CBDC52Ed96b4B8D6b1041D3EF3A409e;
-    
+
     constructor () public {
     }
-    
+
     function () external payable {
         require(msg.value == 0, "This contract doest not accept ether");
     }
@@ -17,4 +17,15 @@ contract EasySmartolutionProcessor {
 
 contract EasySmartolutionInterface {
     function processPayment(address _address) public;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

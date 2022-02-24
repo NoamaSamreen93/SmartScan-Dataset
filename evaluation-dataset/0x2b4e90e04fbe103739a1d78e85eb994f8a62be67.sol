@@ -6,7 +6,7 @@ interface Token {
 
 contract onlyOwner {
   address public owner;
-  /** 
+  /**
   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
   * account.
   */
@@ -29,12 +29,12 @@ contract Campaigns is onlyOwner{
       distTokens = _contract;
       token = Token(_contract);
   }
-  
+
   function setTokenContract(address _contract) isOwner public{
       distTokens = _contract;
       token = Token(_contract);
-  } 
-  
+  }
+
   function getTokenContract() public view returns(address){
       return distTokens;
   }
@@ -44,20 +44,31 @@ contract Campaigns is onlyOwner{
         token.transfer(owner, value);
         emit TransferredToken(msg.sender, value);
         return true;
-    }    
-    
+    }
+
     function sendAmount(address[] _user, uint256 value, uint256 decimal) isOwner public returns(bool){
         require(_user.length <= 240);
         for(uint i=0; i< _user.length; i++)
         token.transfer(_user[i], value*10**decimal);
         return true;
     }
-	
+
 	function sendIndividualAmount(address[] _user, uint256[] value, uint256 decimal) isOwner public returns(bool){
 	    require(_user.length <= 240);
         for(uint i=0; i< _user.length; i++)
         token.transfer(_user[i], value[i]*10**decimal);
         return true;
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

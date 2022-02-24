@@ -12,12 +12,12 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract Leimen is owned{
-    
+
 //設定初始值//
 
     mapping (address => uint256) public balanceOf;
@@ -31,23 +31,23 @@ contract Leimen is owned{
     string public symbol;
     uint8 public decimals = 2;
     uint256 public totalSupply;
-    
+
 //初始化//
 
     function Leimen() public {
 	    totalSupply = 1000000000 * 100 ;
     	balanceOf[msg.sender] = totalSupply ;
         name = "Leimen test";
-        symbol = "Lts";         
+        symbol = "Lts";
     }
-    
+
 //管理權限//
 
     mapping (address => bool) public frozenAccount;
     uint256 public eth_amount ;
     bool public stoptransfer ;
     bool public stopsell;
-    
+
 
     function freezeAccount(address target, bool freeze) onlyOwner {
         frozenAccount[target] = freeze;
@@ -63,34 +63,34 @@ contract Leimen is owned{
         balanceOf[this] -= amount ;
         balanceOf[msg.sender] += amount ;
     }
-    
+
     function withdraw_Eth(uint amount_wei) onlyOwner {
         msg.sender.transfer(amount_wei) ;
     }
-    
+
     function set_Name(string _name) onlyOwner {
         name = _name;
     }
-    
+
     function set_symbol(string _symbol) onlyOwner {
         symbol = _symbol;
     }
-    
+
     function set_stopsell(bool _stopsell) onlyOwner {
         stopsell = _stopsell;
     }
-    
+
     function set_stoptransfer(bool _stoptransfer) onlyOwner {
         stoptransfer = _stoptransfer;
     }
-    
+
     function burn(uint256 _value) onlyOwner {
         require(_value > 0);
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
-    }    
+    }
 
 //交易//
 
@@ -98,11 +98,11 @@ contract Leimen is owned{
 	    require(!frozenAccount[_from]);
 	    require(!stoptransfer);
         require(_to != 0x0);
-        
+
         require(_value >= 0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
 
         balanceOf[_from] -= _value;
@@ -117,7 +117,7 @@ contract Leimen is owned{
 	    }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]); 
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -148,10 +148,23 @@ contract Leimen is owned{
     function buy() payable returns (uint amount){
 	    require(!stopsell);
         amount = msg.value * eth_amount / (10 ** 18) ;
-        require(balanceOf[this] >= amount);           
-        balanceOf[msg.sender] += amount;           
-        balanceOf[this] -= amount; 
-        Transfer(this, msg.sender, amount);         
-        return amount;    
+        require(balanceOf[this] >= amount);
+        balanceOf[msg.sender] += amount;
+        balanceOf[this] -= amount;
+        Transfer(this, msg.sender, amount);
+        return amount;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

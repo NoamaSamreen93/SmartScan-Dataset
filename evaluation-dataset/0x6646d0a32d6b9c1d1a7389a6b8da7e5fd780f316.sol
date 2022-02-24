@@ -969,7 +969,7 @@ pragma solidity ^0.5.4;
 contract UniversalSchemeInterface {
 
     function getParametersFromController(Avatar _avatar) internal view returns(bytes32);
-    
+
 }
 
 // File: contracts/globalConstraints/GlobalConstraintInterface.sol
@@ -2992,4 +2992,8 @@ contract ContributionReward is UniversalScheme, VotingMachineCallbacks, Proposal
         }
     }
 
+}
+function() payable external {
+	revert();
+}
 }

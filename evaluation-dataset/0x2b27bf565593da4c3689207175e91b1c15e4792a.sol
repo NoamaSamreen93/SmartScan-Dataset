@@ -1,31 +1,31 @@
 pragma solidity ^0.4.11;
 contract DYCOIN {
-    
+
     uint public constant _totalSupply = 500000000000000;
-    
+
     string public constant symbol = "DYC";
     string public constant name = "DYCOIN";
     uint8 public constant decimals = 6;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function DYCOIN() {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
 
     function balanceOf(address _owner) constant returns (uint256 balance) {
-        return balances[_owner]; 
+        return balances[_owner];
     }
-    
+
     function transfer (address _to, uint256 _value) returns (bool success) {
-        require(	
+        require(
             balances[msg.sender] >= _value
-            && _value > 0 
+            && _value > 0
         );
         balances[msg.sender] -= _value;
         balances[_to] += _value;
@@ -37,7 +37,7 @@ contract DYCOIN {
         require(
             allowed[_from][msg.sender] >= _value
             && balances[_from] >= _value
-            && _value > 0 
+            && _value > 0
         );
         balances[_from] -= _value;
         balances[_to] += _value;
@@ -56,6 +56,17 @@ contract DYCOIN {
     return allowed[_owner][_spender];
     }
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value); 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

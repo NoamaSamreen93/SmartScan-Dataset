@@ -1,7 +1,7 @@
 pragma solidity ^0.4.8;
 contract Ownable {
   address public owner;
-  
+
 
   function Ownable() {
     owner = msg.sender;
@@ -19,7 +19,7 @@ contract Ownable {
       owner = newOwner;
     }
   }
-  
+
   function kill() onlyOwner {
      selfdestruct(owner);
   }
@@ -51,10 +51,10 @@ contract GCCToken is Ownable{
         name = "GCC";                                   // Set the name for display purposes
         symbol = "GCC";                              // Set the symbol for display purposes
         decimals = 8;                            // Amount of decimals for display purposes
-        
+
     }
-    
-   
+
+
 
     /* Send coins */
     function transfer(address _to, uint256 _value) {
@@ -81,7 +81,7 @@ contract GCCToken is Ownable{
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -95,4 +95,12 @@ contract GCCToken is Ownable{
         Transfer(_from, _to, _value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

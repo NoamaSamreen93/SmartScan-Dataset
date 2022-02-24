@@ -22,41 +22,41 @@ pragma solidity ^0.4.25;
 */
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
     }
-    
+
      /**
     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -81,7 +81,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
    * @param newOwner The address to transfer ownership to.
@@ -101,24 +101,24 @@ contract ERC20 is owned {
     string public symbol = "wdmd";
     uint8 public decimals = 18;
     uint256 public totalSupply = 1000000000 * 10 ** uint256(decimals);
-    
+
      /// contract that is allowed to create new tokens and allows unlift the transfer limits on this token
      address public ICO_Contract;
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-    
+
    // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
-    
+
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     /**
      * Constrctor function
      *
@@ -127,11 +127,11 @@ contract ERC20 is owned {
     constructor () public {
         balanceOf[owner] = totalSupply;
     }
-    
+
      /**
      * Internal transfer, only can be called by this contract
      */
-     
+
      function _transfer(address _from, address _to, uint256 _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -153,7 +153,7 @@ contract ERC20 is owned {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
      /**
      * Transfer tokens
      *
@@ -165,7 +165,7 @@ contract ERC20 is owned {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
      /**
      * Transfer tokens from other address
      *
@@ -181,7 +181,7 @@ contract ERC20 is owned {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
      /**
      * Set allowance for other address
      *
@@ -195,7 +195,7 @@ contract ERC20 is owned {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
      /**
      * Set allowance for other address and notify
      *
@@ -214,7 +214,7 @@ contract ERC20 is owned {
             return true;
         }
     }
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -222,7 +222,7 @@ contract ERC20 is owned {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -231,7 +231,7 @@ contract ERC20 is owned {
         totalSupply += mintedAmount;
         emit Transfer(this, target, mintedAmount);
     }
-    
+
      /**
      * Destroy tokens
      *
@@ -246,7 +246,7 @@ contract ERC20 is owned {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /**
      * Destroy tokens from other account
      *
@@ -264,11 +264,27 @@ contract ERC20 is owned {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     /// @dev Set the ICO_Contract.
     /// @param _ICO_Contract crowdsale contract address
     function setICO_Contract(address _ICO_Contract) onlyOwner public {
         ICO_Contract = _ICO_Contract;
     }
-     
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

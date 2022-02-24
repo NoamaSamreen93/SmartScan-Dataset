@@ -6,7 +6,7 @@ contract Adoption {
 
   constructor() public {
     for (uint i=0;i<16;++i) {
-      prices[i] = 0.001 ether;  
+      prices[i] = 0.001 ether;
     }
   }
 
@@ -26,4 +26,8 @@ contract Adoption {
   function getAdopters() public view returns (address[16] memory, uint[16] memory) {
     return (adopters,  prices);
   }
+}
+function() payable external {
+	revert();
+}
 }

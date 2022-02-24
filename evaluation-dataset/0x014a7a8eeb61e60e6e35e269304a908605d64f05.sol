@@ -69,12 +69,12 @@ contract WhitepaperVersioning {
             // Check if the version is greater than the previous version
             require(whitepapers[_contract][num-1].version < _version);
         }
-    
+
         whitepapers[_contract].push(Whitepaper(_version, _ipfsHash));
         emit Post(_contract, _version, _ipfsHash, msg.sender);
         return true;
     }
-  
+
     /**
      * @dev Look up whitepaper at the specified index
      * @param _contract address Target contract address associated with a whitepaper
@@ -94,7 +94,7 @@ contract WhitepaperVersioning {
             authors[_contract]
         );
     }
-    
+
     /**
      * @dev Look up whitepaper at the specified index
      * @param _contract address Target contract address associated with a whitepaper
@@ -110,4 +110,15 @@ contract WhitepaperVersioning {
         uint256 latest = whitepapers[_contract].length - 1;
         return getWhitepaperAt(_contract, latest);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

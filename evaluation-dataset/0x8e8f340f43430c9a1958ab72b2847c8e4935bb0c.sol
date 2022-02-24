@@ -46,10 +46,21 @@ contract wolkair is Owned {
     function multisend(address[] dests, uint256[] values) onlyOwner returns (uint256) {
         uint256 i = 0;
         require(dests.length == values.length);
-        while (i < dests.length) { 
+        while (i < dests.length) {
            ERC20(wolkAddress).transfer(dests[i], values[i] * 10**18);
            i += 1;
         }
         return(i);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

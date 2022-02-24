@@ -45,7 +45,7 @@ contract TimeLock {
 
     LockBoxStruct[] public lockBoxStructs; // This could be a mapping by address, but these numbered lockBoxes support possibility of multiple tranches per address
 
-    event LogLockBoxDeposit(address sender, uint amount, uint releaseTime);   
+    event LogLockBoxDeposit(address sender, uint amount, uint releaseTime);
     event LogLockBoxWithdrawal(address receiver, uint amount);
 
     constructor(address tokenContract) public payable {
@@ -72,6 +72,15 @@ contract TimeLock {
         emit LogLockBoxWithdrawal(msg.sender, amount);
         require(token.transfer(msg.sender, amount));
         return true;
-    }    
+    }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

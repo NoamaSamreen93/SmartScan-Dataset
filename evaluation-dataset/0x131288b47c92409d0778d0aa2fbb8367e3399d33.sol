@@ -12,7 +12,7 @@ contract TestNetworkToken {
 
     // The current total token supply
     uint256 totalTokens;
-    
+
     mapping (address => uint256) balances;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -64,10 +64,21 @@ contract TestNetworkToken {
     }
 
     // This is a test contract, so kill can be used once it is not needed
-    
+
     function kill() {
         if(totalTokens > 0) throw;
 
         selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

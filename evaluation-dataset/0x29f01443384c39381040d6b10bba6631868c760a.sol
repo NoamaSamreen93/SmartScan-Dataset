@@ -50,7 +50,7 @@ contract AuctusTokenSale is ContractReceiver {
 	address public auctusWhiteListAddress = 0xA6e728E524c1D7A65fE5193cA1636265DE9Bc982;
 
 	uint256 public startTime = 1522159200; //2018-03-27 2 PM UTC
-	uint256 public endTime; 
+	uint256 public endTime;
 
 	uint256 public basicPricePerEth = 2000;
 
@@ -153,10 +153,10 @@ contract AuctusTokenSale is ContractReceiver {
 		emit Revoke(msg.sender, investedValue);
 	}
 
-	function finish() 
+	function finish()
 		onlyOwner
-		saleCompletedSuccessfully 
-		public 
+		saleCompletedSuccessfully
+		public
 	{
 		//40% of the ethers are unvested
 		uint256 freeEthers = address(this).balance * 40 / 100;
@@ -212,11 +212,11 @@ contract AuctusTokenSale is ContractReceiver {
 		uint256 preSale = 2397307557007329968290000;
 
 		transferTokens(auctusCoreTeam, bounty, reserveForFuture, preSale, partnershipsAdvisoryVested, partnershipsAdvisoryFree, privateSales);
-		
+
 		remainingTokens = totalAmount - auctusCoreTeam - bounty - reserveForFuture - preSale - partnershipsAdvisoryVested - partnershipsAdvisoryFree - privateSales;
 		saleWasSet = true;
 	}
-	
+
 	function transferTokens(
 		uint256 auctusCoreTeam,
 		uint256 bounty,
@@ -235,5 +235,16 @@ contract AuctusTokenSale is ContractReceiver {
 		assert(token.transfer(0x03f6278E5c359a5E8947a62E87D85AC394580d13, partnershipsAdvisoryVested, empty)); //AuctusTokenVesting SC
 		assert(token.transfer(0x6c89Cc03036193d52e9b8386413b545184BDAb99, partnershipsAdvisoryFree));
 		assert(token.transfer(0xd1B10607921C78D9a00529294C4b99f1bd250E1c, privateSales));
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

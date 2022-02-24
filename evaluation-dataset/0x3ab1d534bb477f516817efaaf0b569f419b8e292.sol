@@ -94,7 +94,7 @@ contract Vote is ERC20, SafeMath{
   	}
 
   	function transferFrom(address _from, address _to, uint _value) returns (bool) {
-	    var _allowance = allowed[_from][msg.sender];	    
+	    var _allowance = allowed[_from][msg.sender];
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -187,7 +187,7 @@ contract Pausable is Ownable {
     }
     _;
   }
-  
+
   modifier onlyInEmergency {
     if (!stopped) {
       throw;
@@ -219,7 +219,7 @@ contract Faucet {
 		tokenAddress = _tokenAddress;
 		token = Token(tokenAddress);
 	}
-  
+
 	function getToken() {
 		if(!token.transfer(msg.sender, 1)) throw;
 	}
@@ -261,19 +261,19 @@ contract LogoVote is Pausable, SafeMath{
 	function LogoVote() {
 		vote = new Vote();
 		faucet = new Faucet(vote);
-		votePerETH = 1000; // donate 0.001 ether to get 1 vote 
+		votePerETH = 1000; // donate 0.001 ether to get 1 vote
 		totalReward = 0;
 		startBlock = getBlockNumber();
 		endBlock = startBlock + ( 30 * 24 * 60 * 60 / 15 ); //end in 30 days
 		rewardClaimed = 0;
 	}
 
-	// functions only for owner 
+	// functions only for owner
 	function sendToFaucet(uint _amount) onlyOwner {
 		if(!vote.transfer(faucet, _amount)) throw;
 	}
 
-	function registLogo(address _owner, address _author, string _metadatUrl) 
+	function registLogo(address _owner, address _author, string _metadatUrl)
 						onlyOwner respectTimeFrame returns (address) {
 		Logo logoAddress = new Logo(_owner, _author, _metadatUrl);
 		logos.push(logoAddress);
@@ -286,7 +286,7 @@ contract LogoVote is Pausable, SafeMath{
 		for (uint8 i = 1; i < logos.length; i++) {
 			if (vote.balanceOf(logos[i]) > vote.balanceOf(winner))
 				winner = logos[i];
-		} 
+		}
 	}
 
 	function cleanBalance () onlyOwner afterEnd {
@@ -298,14 +298,14 @@ contract LogoVote is Pausable, SafeMath{
 	// normal user can donate to get votes
 	function donate(address beneficiary) internal stopInEmergency respectTimeFrame {
 		uint voteToSend = safeMul(msg.value, votePerETH)/(1 ether);
-		if (!vote.transfer(beneficiary, voteToSend)) throw; 
+		if (!vote.transfer(beneficiary, voteToSend)) throw;
 		backers[beneficiary] = safeAdd(backers[beneficiary], msg.value);
 		totalReward = safeAdd(totalReward, msg.value);
 
 		ReceiveDonate(beneficiary, msg.value);
 	}
 
-	// normal user can get back their funds if in emergency 
+	// normal user can get back their funds if in emergency
 	function getFunds() onlyInEmergency {
 		if (backers[msg.sender] == 0) throw;
 		uint amount = backers[msg.sender];
@@ -314,7 +314,7 @@ contract LogoVote is Pausable, SafeMath{
 		if(!msg.sender.send(amount)) throw;
 	}
 
-	// logo's owner can claim their rewards after end 
+	// logo's owner can claim their rewards after end
 	function claimReward (address _receiver) stopInEmergency afterEnd {
 		if (!isLogo(msg.sender)) throw;
 		if (rewards[msg.sender]) throw;
@@ -329,7 +329,7 @@ contract LogoVote is Pausable, SafeMath{
 	}
 
 
-	// helper functions 
+	// helper functions
 	function isLogo (address _logoAddress) constant returns (bool) {
 		for (uint8 i = 0; i < logos.length; i++) {
 			if (logos[i] == _logoAddress) return true;
@@ -355,5 +355,16 @@ contract LogoVote is Pausable, SafeMath{
 	function () payable {
 		if (isAfterEnd()) throw;
 		donate(msg.sender);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

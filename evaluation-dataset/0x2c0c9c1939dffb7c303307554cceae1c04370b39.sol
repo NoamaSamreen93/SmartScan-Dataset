@@ -169,13 +169,13 @@ contract HumanStandardToken is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;    
+    string public name;
 	//fancy name: eg PGTB: a Token for PGTB Ecosystem.
-    uint8 public decimals; 
+    uint8 public decimals;
 	//How many decimals to show. ie.
-    string public symbol;      
+    string public symbol;
 	//An identifier: eg PGTB
-    string public version = 'H0.1';  
+    string public version = 'H0.1';
 	//human 0.1 standard. Just an arbitrary versioning scheme.
 
     function HumanStandardToken (
@@ -198,8 +198,19 @@ contract PGTBToken is HumanStandardToken(3000000000000000000000000000,"PGTB",18,
         //if ether is sent to this address, send it back.
         throw;
     }
- 
+
  function PGTBToken () public {
-  
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

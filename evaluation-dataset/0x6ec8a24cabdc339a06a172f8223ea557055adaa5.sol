@@ -282,10 +282,10 @@ contract MiniMeToken is ERC20, Controlled {
 
            // Then update the balance array with the new value for the address
            //  receiving the tokens
-           
+
            var previousBalanceTo = balanceOfAt(_to, block.number);
-           assert(previousBalanceTo+_amount>=previousBalanceTo); 
-           
+           assert(previousBalanceTo+_amount>=previousBalanceTo);
+
            //// if (previousBalanceTo + _amount < previousBalanceTo) throw; // Check for overflow
            updateValueAtNow(balances[_to], previousBalanceTo + _amount);
 
@@ -502,9 +502,9 @@ contract MiniMeToken is ERC20, Controlled {
         uint curTotalSupply = totalSupply();
 
         //uint curTotalSupply = getValueAt(totalSupplyHistory, block.number);
-        
+
         assert(curTotalSupply >= _amount);
-        
+
         //// if (curTotalSupply < _amount) throw;
 
         updateValueAtNow(totalSupplyHistory, curTotalSupply - _amount);
@@ -727,7 +727,7 @@ contract MiniMeIrrevocableVestedToken is MiniMeToken, SafeMath {
     // Check start, cliff and vesting are properly order to ensure correct functionality of the formula.
 
     require(_cliff >= _start && _vesting >= _cliff);
-    
+
     require(tokenGrantsCount(_to)<=MAX_GRANTS_PER_ADDRESS); //// To prevent a user being spammed and have his balance locked (out of gas attack when calculating vesting).
 
     assert(canCreateGrants[msg.sender]);
@@ -869,11 +869,11 @@ contract GNX is MiniMeIrrevocableVestedToken {
   ) MiniMeIrrevocableVestedToken(
     _tokenFactory,
     0xBB13E608888E5D30C09b13F89d27631056161B9F,		//genaro network token mainnet
-    4313000,  										//snapshot for mainnet	
+    4313000,  										//snapshot for mainnet
     "Genaro X", 		  								// Token name
     9,												// Decimals
     "GNX",											// Symbol
-    true												// Enable Transfers	
+    true												// Enable Transfers
     ) {}
 
     // data is an array of uints. Each uint represents a transfer.
@@ -897,5 +897,11 @@ contract GNX is MiniMeIrrevocableVestedToken {
             uint amount = data[i] / D160;
             assert(destroyTokens(addr,amount));
         }
-    }    
+    }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

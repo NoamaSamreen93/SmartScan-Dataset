@@ -268,7 +268,7 @@ contract InseeCoin is ISStop, StandardToken{
     string public version = "v0.1";
      /// initial amount of InseeCoin
     uint256 public initialAmount = (10 ** 10) * (10 ** 18);
-   
+
 
     event Destroy(address from, uint value);
 
@@ -284,7 +284,7 @@ contract InseeCoin is ISStop, StandardToken{
     function transferFrom(address src, address dst, uint wad) public stoppable  returns (bool) {
         return super.transferFrom(src, dst, wad);
     }
-    
+
     function approve(address guy, uint wad) public stoppable  returns (bool) {
         return super.approve(guy, wad);
     }
@@ -425,4 +425,15 @@ contract TokenLock {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

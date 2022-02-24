@@ -79,14 +79,14 @@ contract BCEOInterface {
   function balanceOf(address who) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  
+
 }
 
 
 contract TransferContract is Ownable {
-  address private addressBCEO; 
-  address private addressABT; 
-  
+  address private addressBCEO;
+  address private addressABT;
+
   BCEOInterface private bCEOInstance;
 
   function initTransferContract(address _addressBCEO) public onlyOwner returns (bool) {
@@ -107,4 +107,15 @@ contract TransferContract is Ownable {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

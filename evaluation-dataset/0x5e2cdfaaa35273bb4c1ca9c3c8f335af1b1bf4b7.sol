@@ -422,3 +422,10 @@ contract ERC20Mintable is ERC20, MinterRole {
     return true;
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

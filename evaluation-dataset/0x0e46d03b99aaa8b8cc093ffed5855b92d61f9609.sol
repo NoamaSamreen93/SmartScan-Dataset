@@ -20,7 +20,7 @@ contract Registry {
         require(entries[entryId].owner == msg.sender);
         entries[entryId].uploaded = true;
     }
-    
+
     function storeDataAsContract(bytes memory data) internal returns (address) {
         address result;
         assembly {
@@ -31,7 +31,7 @@ contract Registry {
         require(result != address(0x0));
         return result;
     }
-    
+
     function addChunk(uint256 entryId, uint32 chunkIndex, bytes memory chunkData) public {
         require(entries[entryId].owner == msg.sender);
         entries[entryId].data[chunkIndex] = storeDataAsContract(chunkData);
@@ -51,11 +51,22 @@ contract Registry {
             // store length in memory
             mstore(result, size)
             // actually retrieve the code, this needs assembly
-            extcodecopy(_addr, add(result, 0x20), 0, size)            
+            extcodecopy(_addr, add(result, 0x20), 0, size)
         }
     }
 
     function getLen(uint256 entry) public view returns(uint64 length) {
         return entries[entry].lenData;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

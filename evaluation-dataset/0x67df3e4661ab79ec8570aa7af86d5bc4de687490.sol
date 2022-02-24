@@ -769,7 +769,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
 	// Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -782,18 +782,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -806,11 +806,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, sha3(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -903,9 +903,9 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-	
+
 	if (prefix.length != n_random_bytes) throw;
-	        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1071,7 +1071,7 @@ contract Dice is usingOraclize {
     uint constant BET_STATE_CANCEL_BY_ORACLIZE_ERROR_FEE = 6;//Canceled due to service fee is more than the bet amount
     uint constant BET_STATE_CANCEL_BY_RANDOM_NUMBER_A_EUQAL_B = 7;//Canceled due to ending in a draw
 
-    
+
     //Variables of Contract Management===================================================================================================
     address public owner;//Contract Owner
     bool public isStopped;//Pause the Contract
@@ -1143,7 +1143,7 @@ contract Dice is usingOraclize {
         owner = newOwner;
     }
 
-    //Bet Management=====================================================================================================    
+    //Bet Management=====================================================================================================
     function setBetFee(uint newfee) public
         onlyOwner
     {
@@ -1161,8 +1161,8 @@ contract Dice is usingOraclize {
 		onlyOwner
 	{
         oraclize_setCustomGasPrice(newgasprice);
-    }     
-    
+    }
+
 
     //Contract Owner withdraws the profit from the contract and sent to the specific account
     function getProfitToAddress(uint profit , address receiver) public
@@ -1224,9 +1224,9 @@ contract Dice is usingOraclize {
 
 
     //Place the Bet=====================================================================================================
-    
+
     function() public
-        payable 
+        payable
     {
 
         bet();
@@ -1234,7 +1234,7 @@ contract Dice is usingOraclize {
 
     function bet() public
         payable
-        onlyIfNotStopped 
+        onlyIfNotStopped
     {
         //Verify the Bet
         uint betpriceid = getBetPriceID(msg.value);
@@ -1283,10 +1283,10 @@ contract Dice is usingOraclize {
                 0//Service Fee of Random Number Query
             ));
 
-            //Update waitPairBetIDs    
+            //Update waitPairBetIDs
             if (waitpairbetid == INVALID_BET_ID )
                 waitPairBetIDs[betpriceid] = bets.length - 1;
-                        
+
         }
 
     }
@@ -1322,7 +1322,7 @@ contract Dice is usingOraclize {
 
     //Callback of Oraclize Random Number=========================================================================================
     function __callback(bytes32 _queryId, string _result, bytes _proof) public
-    { 
+    {
         //Only Oraclize can use callback
         if (msg.sender != oraclize_cbAddress()) throw;
 
@@ -1343,12 +1343,12 @@ contract Dice is usingOraclize {
             // the proof verification has passed
             uint maxRange = 2**(8 * 2); // this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
             uint randomNumber = uint(sha3(_result)) % maxRange; // this is an efficient way to get the uint out in the [0, maxRange] range
-            
+
             //The left 8 digits is A’s result and the right 8 digits is B’s result
             //The bigger number wins; equal means a draw
             uint randomA = randomNumber >> 8;
             uint randomB = randomNumber & 0x00FF;
-            
+
             //Save Bet Result
             bets[betid].numberRolled = randomNumber;
 
@@ -1358,7 +1358,7 @@ contract Dice is usingOraclize {
             bool senderror = false;
             if(randomA == randomB){
                 //A game ended in a draw will deduct the commission
-                cancelBet(betid,true,BET_STATE_CANCEL_BY_RANDOM_NUMBER_A_EUQAL_B);                
+                cancelBet(betid,true,BET_STATE_CANCEL_BY_RANDOM_NUMBER_A_EUQAL_B);
             }else{
                 address win;
                 address lose;
@@ -1381,23 +1381,23 @@ contract Dice is usingOraclize {
                 if(!lose.send(1)){
                     //Failed to send coin
                     address2SendErrorValue[lose] += 1;
-                    LOG_SEND_ERROR(betid,lose,1);                    
+                    LOG_SEND_ERROR(betid,lose,1);
                 }
-                
+
                 //Successfully ended
                 bets[betid].betState = BET_STATE_END;
             }
         }
     }
 
-    
+
 
     //Cancel the Bet=====================================================================================================
     //Player cancels the bet
     function cancelBetByPlayer(uint betid) public
-            onlyBetCanCancel(betid)  
-    {                
-        if (bets[betid].playerAddressA == msg.sender) 
+            onlyBetCanCancel(betid)
+    {
+        if (bets[betid].playerAddressA == msg.sender)
             cancelBetByA(betid);
         else if (bets[betid].playerAddressB == msg.sender)
             cancelBetByB(betid);
@@ -1413,7 +1413,7 @@ contract Dice is usingOraclize {
             bets[betid].playerAddressA = bets[betid].playerAddressB;
             bets[betid].playerAddressB = address(0x0);
             bets[betid].betState = BET_STATE_WAITPAIR;
-            //Update waitPairBetIDs    
+            //Update waitPairBetIDs
             uint betpriceid = getBetPriceID(bets[betid].betPrice);
             waitPairBetIDs[betpriceid] = betid;
         }else{
@@ -1451,7 +1451,7 @@ contract Dice is usingOraclize {
 
     function cancelBet(uint betid,bool fee,uint betstate)
         private
-        onlyBetCanCancel(betid)        
+        onlyBetCanCancel(betid)
     {
 
         //Cancel Player A
@@ -1472,7 +1472,7 @@ contract Dice is usingOraclize {
         private
     {
         for( uint i = 0 ;i<waitPairBetIDs.length;i++){
-            if(waitPairBetIDs[i] == betid){                
+            if(waitPairBetIDs[i] == betid){
                 findNextwaitPairBetIDs(i , betid);
                 break;
             }
@@ -1486,7 +1486,7 @@ contract Dice is usingOraclize {
         uint cancelAmount = bets[betid].betPrice  -  bets[betid].betPrice * (fee ? betFee : 0) / 10000 - bets[betid].oraclizeFee / 2;
         if(!receiver.send(cancelAmount)){
             address2SendErrorValue[receiver] += cancelAmount;
-            LOG_SEND_ERROR(betid,receiver,cancelAmount);            
+            LOG_SEND_ERROR(betid,receiver,cancelAmount);
         }
 
     }
@@ -1496,10 +1496,10 @@ contract Dice is usingOraclize {
     function getBets(uint start , uint length) public
         constant
         returns(uint[])
-    {   
+    {
         //Verify the Parameter
-        if(start >= bets.length) throw;      
-        if(length == 0) throw;  
+        if(start >= bets.length) throw;
+        if(length == 0) throw;
 
         if(start+length > bets.length)
             length = bets.length - start;
@@ -1532,13 +1532,13 @@ contract Dice is usingOraclize {
             if(  bets[i].betState == BET_STATE_WAITPAIR  ){
                 result += bets[i].betPrice;
             }else if ( bets[i].betState == BET_STATE_WAITORACLIZE ){
-                result += bets[i].betPrice * 2;                
+                result += bets[i].betPrice * 2;
             }
         }
 
         return result;
 
-    }    
+    }
 
     //Get Service Fee of Random Number
     function getOraclizePrice() public
@@ -1548,4 +1548,20 @@ contract Dice is usingOraclize {
         return oraclize_getPrice("random", oraclizeCallbackGasLimit);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

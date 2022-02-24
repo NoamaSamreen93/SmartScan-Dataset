@@ -64,7 +64,7 @@ library SafeMath {
  */
 contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
-    
+
     mapping(address => uint256) balances;
     uint256 totalSupply_;
     uint256 burnedTotalNum_;
@@ -300,4 +300,15 @@ contract HBBToken is StandardToken {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

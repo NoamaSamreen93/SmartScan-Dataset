@@ -21,14 +21,14 @@ contract CardboardUnicornAssembler {
   address public owner = msg.sender;
   uint public pricePerUnicorn = 1 finney;
   uint public lastPriceSetDate = 0;
-  
+
   event PriceUpdate(uint newPrice, address updater);
 
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
    * Change ownership of the assembler
    */
@@ -39,7 +39,7 @@ contract CardboardUnicornAssembler {
     CardboardUnicorns cu = CardboardUnicorns(cardboardUnicornTokenAddress);
     cu.changeOwner(_newOwner);
   }
-  
+
   /**
    * Change the CardboardUnicorns token contract managed by this contract
    */
@@ -48,7 +48,7 @@ contract CardboardUnicornAssembler {
     require(cu.owner() == address(this)); // We must be the owner of the token
     cardboardUnicornTokenAddress = _newTokenAddress;
   }
-  
+
   /**
    * Change the real unicorn contract location.
    * This contract is used as a price reference; should the Ethereum Foundation
@@ -57,7 +57,7 @@ contract CardboardUnicornAssembler {
   function changeRealUnicornAddress(address _newUnicornAddress) onlyOwner {
     realUnicornAddress = _newUnicornAddress;
   }
-  
+
   function withdraw(bool _includeToken) onlyOwner {
     if (_includeToken) {
       // First have the token contract send all its funds to its owner (which is us)
@@ -91,7 +91,7 @@ contract CardboardUnicornAssembler {
     pricePerUnicorn = (congress.priceOfAUnicornInFinney() * 1 finney) / 1000;
     PriceUpdate(pricePerUnicorn, msg.sender);
   }
-  
+
   /**
    * Set a specific price for a CardboardUnicorn
    */
@@ -100,7 +100,7 @@ contract CardboardUnicornAssembler {
     lastPriceSetDate = block.timestamp;
     PriceUpdate(pricePerUnicorn, msg.sender);
   }
-  
+
   /**
    * Strap a horn to a horse!
    */
@@ -111,9 +111,20 @@ contract CardboardUnicornAssembler {
         owner.transfer(msg.value);
     }
   }
-  
+
   function() payable {
       assembleUnicorn();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

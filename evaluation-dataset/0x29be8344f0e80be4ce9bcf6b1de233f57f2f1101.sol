@@ -29,12 +29,12 @@ contract ERC20 is ERC20Basic {
 
 
 contract Veriseum is ERC20 {
-    
+
     address owner = msg.sender;
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     uint256 public totalSupply = 12000000 * 10**8;
 
     function name() public constant returns (string) { return "Veriseum"; }
@@ -58,7 +58,7 @@ contract Veriseum is ERC20 {
         balances[msg.sender] = totalSupply;
     }
 
-    modifier onlyOwner { 
+    modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
@@ -81,7 +81,7 @@ contract Veriseum is ERC20 {
              Transfer(owner, addresses[i], _value);
          }
     }
-    
+
     function balanceOf(address _owner) constant public returns (uint256) {
 	 return balances[_owner];
     }
@@ -91,7 +91,7 @@ contract Veriseum is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
          if (balances[msg.sender] >= _amount
@@ -105,7 +105,7 @@ contract Veriseum is ERC20 {
              return false;
          }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
          if (balances[_from] >= _amount
@@ -121,17 +121,17 @@ contract Veriseum is ERC20 {
             return false;
          }
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -150,4 +150,15 @@ contract Veriseum is ERC20 {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -93,7 +93,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   modifier onlyPayloadSize(uint numwords) {
       assert(msg.data.length >= numwords * 32 + 4);
       _;
@@ -257,4 +257,10 @@ contract Token is BurnableToken, Ownable {
         emit Transfer(address(0x0), owner, initialSupply);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

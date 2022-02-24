@@ -832,20 +832,31 @@ contract CrowdliToken is ERC20Detailed, ERC20Mintable, ERC20Pausable, Ownable {
 
     constructor (string memory _name, string memory _symbol, uint8 _decimals) ERC20Detailed(_name,_symbol,_decimals) public {
     }
-    
+
     function mint(address account, uint256 amount) public onlyMinter returns (bool) {
          if (balanceOf(account) == 0) {
             investors.push(account);
          }
          return super.mint(account, amount);
     }
-    
-    
+
+
     function initToken(address _directorsBoard,address _crowdliSTO) external onlyOwner{
     	addMinter(_directorsBoard);
     	addMinter(_crowdliSTO);
     	addPauser(_directorsBoard);
     	addPauser(_crowdliSTO);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -77,7 +77,7 @@ contract Ownable {
 
 contract ICertification {
   event Certificate(bytes32 indexed certHash, bytes32 innerHash, address indexed certifier);
-  event Revocation(bytes32 indexed certHash, bool invalid);  
+  event Revocation(bytes32 indexed certHash, bool invalid);
   address public newAddress;
   uint public genesis;
 }
@@ -89,8 +89,8 @@ contract Certification is ICertification, Ownable {
     string id;
   }
 
-  mapping (address => Certifier) public certifiers;  
-  mapping (bytes32 => bool) public revoked;  
+  mapping (address => Certifier) public certifiers;
+  mapping (bytes32 => bool) public revoked;
 
   constructor() public {
     genesis = block.number;
@@ -136,4 +136,15 @@ contract Certification is ICertification, Ownable {
     newAddress = _newAddress;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

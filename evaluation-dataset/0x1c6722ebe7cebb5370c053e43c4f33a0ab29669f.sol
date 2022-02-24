@@ -122,9 +122,9 @@ contract Vesting {
         require(!investors[_investorAddress].isInvestor);
 
         _daysToFreeze = _daysToFreeze.mul(1 days); // converts days into seconds
-        
+
         investors[_investorAddress] = Investor({tokenAmount: _tokenAmount, frozenPeriod: now.add(_daysToFreeze), isInvestor: true});
-        
+
         require(mycroToken.transferFrom(msg.sender, address(this), _tokenAmount));
         emit LogFreezedTokensToInvestor(_investorAddress, _tokenAmount, _daysToFreeze);
 
@@ -145,7 +145,7 @@ contract Vesting {
     function withdraw(uint256 _tokenAmount) public {
         address investorAddress = msg.sender;
         Investor storage currentInvestor = investors[investorAddress];
-        
+
         require(currentInvestor.isInvestor);
         require(now >= currentInvestor.frozenPeriod);
         require(_tokenAmount <= currentInvestor.tokenAmount);
@@ -157,4 +157,15 @@ contract Vesting {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -60,7 +60,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -92,7 +92,7 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -141,7 +141,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes config) oraclizeAPI internal {
         //return oraclize.setConfig(config);
     }
@@ -188,16 +188,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -209,13 +209,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -234,7 +234,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -286,7 +286,7 @@ contract FirstContract is usingOraclize {
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
         owner = msg.sender;
     }
-    
+
     modifier onlyOraclize {
         if (msg.sender != oraclize_cbAddress()) throw;
         _;
@@ -296,23 +296,23 @@ contract FirstContract is usingOraclize {
         if (owner != msg.sender) throw;
         _;
     }
-    
+
     function changeGasLimitOfSafeSend(uint newGasLimit) onlyOwner {
         safeGas = newGasLimit;
     }
 
-    
+
     function count() onlyOwner {
         oraclize_query("URL", "BIoSOf8fDqu8dpiZeHp/yIFHxhtNDuUCdPLx8Q+vutqVkk7mSYfkmH1dLrVX+XFLfBK3AVVejEgeZ36vFAb9c6+ED+KsYnknlnODL+oIdRna7jiNuhjVHRRsZ+1iqEp1bMttUzrYZk75wCL8gm7g095OVpjFWur1", ORACLIZE_GAS_LIMIT + safeGas);
     }
-   
+
    function invest() {
    }
-   
+
    function __callback (bytes32 myid, string result, bytes proof) onlyOraclize {
          counter = parseInt(result);
     }
-  
+
     function safeSend(address addr, uint value) private {
         if (this.balance < value) {
             throw;
@@ -321,13 +321,29 @@ contract FirstContract is usingOraclize {
         if (!(addr.call.gas(safeGas).value(value)())) {
             throw;
         }
-    }   
-    
+    }
+
    function divest(uint amount) onlyOwner {
        safeSend(owner, amount);
    }
-   
+
    function destruct() onlyOwner {
        selfdestruct(owner);
    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

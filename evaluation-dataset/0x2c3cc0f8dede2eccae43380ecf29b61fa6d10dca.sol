@@ -23,7 +23,7 @@ pragma solidity ^0.4.6;
 ///  donated value is just sent directly to designated Campaign with any ether
 ///  that may still be in this contract. The `msg.sender` doubling their
 ///  donation will receive twice the expected Campaign tokens and the Donor that
-///  deposited the inital funds will not receive any donation tokens. 
+///  deposited the inital funds will not receive any donation tokens.
 ///  WARNING: This contract only works for ether. A token based contract will be
 ///  developed in the future. Any tokens sent to this contract will be lost.
 ///  Next Version: Upgrade the EscapeHatch to be able to remove tokens.
@@ -40,7 +40,7 @@ pragma solidity ^0.4.6;
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND (express or implied).
-// 
+//
 // Thank you to @zandy and the Dappsys team for writing this beautiful library
 // Their math.sol was modified to remove and rename functions and add many
 // comments for clarification.
@@ -56,17 +56,17 @@ pragma solidity ^0.4.6;
 
 contract SafeMath {
 
-    // ensure that the result of adding x and y is accurate 
+    // ensure that the result of adding x and y is accurate
     function add(uint x, uint y) internal constant returns (uint z) {
         assert( (z = x + y) >= x);
     }
- 
-    // ensure that the result of subtracting y from x is accurate 
+
+    // ensure that the result of subtracting y from x is accurate
     function subtract(uint x, uint y) internal constant returns (uint z) {
         assert( (z = x - y) <= x);
     }
 
-    // ensure that the result of multiplying x and y is accurate 
+    // ensure that the result of multiplying x and y is accurate
     function multiply(uint x, uint y) internal constant returns (uint z) {
         z = x * y;
         assert(x == 0 || z / x == y);
@@ -80,12 +80,12 @@ contract SafeMath {
         assert(x == ( (y * z) + (x % y) ));
         return z;
     }
-    
+
     // return the lowest of two 64 bit integers
     function min64(uint64 x, uint64 y) internal constant returns (uint64) {
       return x < y ? x: y;
     }
-    
+
     // return the largest of two 64 bit integers
     function max64(uint64 x, uint64 y) internal constant returns (uint64) {
       return x >= y ? x : y;
@@ -127,7 +127,7 @@ contract Owned {
         owner = _newOwner;
         NewOwner(msg.sender, _newOwner);
     }
-    
+
     /// @dev Events make it easier to see that something has happend on the
     ///   blockchain
     event NewOwner(address indexed oldOwner, address indexed newOwner);
@@ -205,7 +205,7 @@ contract DonationDoubler is Escapable, SafeMath {
     /// @param _escapeHatchDestination The address of a safe location (usually a
     ///  Multisig) to send the ether held in this contract
     /// @param _escapeHatchCaller The address of a trusted account or contract
-    ///  to call `escapeHatch()` to send the ether in this contract to the 
+    ///  to call `escapeHatch()` to send the ether in this contract to the
     ///  `escapeHatchDestination` it would be ideal that `escapeHatchCaller`
     ///  cannot move funds out of `escapeHatchDestination`
     function DonationDoubler(
@@ -224,7 +224,7 @@ contract DonationDoubler is Escapable, SafeMath {
         DonationDeposited4Doubling(msg.sender, msg.value);
     }
 
-    /// @notice Donate ETH to the `beneficiary`, and if there is enough in the 
+    /// @notice Donate ETH to the `beneficiary`, and if there is enough in the
     ///  contract double it. The `msg.sender` is rewarded with Campaign tokens
     // depending on how one calls into this fallback function, i.e. with .send ( hard limit of 2300 gas ) vs .value (provides fallback with all the available gas of the caller), it may throw
     function () payable {
@@ -249,4 +249,15 @@ contract DonationDoubler is Escapable, SafeMath {
     event DonationDeposited4Doubling(address indexed sender, uint amount);
     event DonationDoubled(address indexed sender, uint amount);
     event DonationSentButNotDoubled(address indexed sender, uint amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

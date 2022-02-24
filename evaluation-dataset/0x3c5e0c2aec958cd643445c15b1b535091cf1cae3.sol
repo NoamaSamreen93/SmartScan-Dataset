@@ -2,19 +2,19 @@ pragma solidity ^0.4.25;
 
 /* Real Estate Token . Жетоны недвижимости
  █ REAL ESTATE BLOCKCHAIN INNOVATIONS █ БЛОКЧЕЙН НЕДВИЖИМОСТИ ИННОВАЦИИ █
- 
+
  Long-term and short-term investments █ Долгосрочные и краткосрочные инвестиции
  Benefits from 10% to 200%            █ Преимущества от 10% до 200%
  Invest in the ETH blockchain         █ Инвестируйте в блокчейн ETH
  Can be withdrawn at any time         █ Может быть отозван в любое время
- 
+
  How to invest? █ Как инвестировать?
- 
+
  Send minimum 0.01 ETH to Smart Contract █ Отправьте не менее 0,01 ETH на Smart Contract
- 
+
  You have invested 0.01 ETH and got a Real Estate Token (RET) of 20,000
  Вы вложили 0,01 ETH и получили жетон недвижимости (RET) в размере 20 000
- 
+
 How to withdraw?
 Send 0 ETH to Contract after you get 20,000 RET
 
@@ -23,9 +23,9 @@ Send 0 ETH to Contract after you get 20,000 RET
 
 Where is the office located? █ Где находится офис?
 
-REAL is an initiative of Real Estate Token Pte. Ltd. UEN 201720446Z	
+REAL is an initiative of Real Estate Token Pte. Ltd. UEN 201720446Z
 REAL является инициативой Real Estate Token Pte. Ltd. UEN 201720446Z
- 
+
 
 
 
@@ -67,7 +67,7 @@ contract Multiplier {
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -138,7 +138,7 @@ contract Multiplier {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
@@ -150,21 +150,21 @@ contract Multiplier {
 
 contract Token {
 
-    
+
     function totalSupply() constant returns (uint256 supply) {}
 
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -218,23 +218,23 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract RealEstateToken is StandardToken { 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;           
-    address public fundsWallet;          
+contract RealEstateToken is StandardToken {
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    
+
     function RealEstateToken() {
-        balances[msg.sender] = 201009982000000000000000000;               
-        name = "Real Estate Token";                                   
-        decimals = 18;                                              
-        symbol = "RET";                                             
-        unitsOneEthCanBuy = 2000000;                                      
-        fundsWallet = msg.sender;                                 
+        balances[msg.sender] = 201009982000000000000000000;
+        name = "Real Estate Token";
+        decimals = 18;
+        symbol = "RET";
+        unitsOneEthCanBuy = 2000000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -247,19 +247,32 @@ contract RealEstateToken is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        
-        fundsWallet.transfer(msg.value);                               
+
+        fundsWallet.transfer(msg.value);
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -17,8 +17,8 @@ contract owned {
     }
 }
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
 contract TokenERC20 {
@@ -142,7 +142,7 @@ contract Eclipse is owned, TokenERC20 {
     uint256 public  unitsOneEthCanBuy;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function Eclipse() 
+    function Eclipse()
     TokenERC20(1000000000, 'Eclipse', 'ECP') public {
          unitsOneEthCanBuy = 1893;
     }
@@ -166,4 +166,15 @@ contract Eclipse is owned, TokenERC20 {
         //Transfer ether to fundsWallet
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

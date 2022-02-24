@@ -29,7 +29,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -39,7 +39,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -68,24 +68,24 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Mjolnir is StandardToken { 
-    
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;          
-    address public fundsWallet;          
+contract Mjolnir is StandardToken {
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     function Mjolnir() {
-        balances[msg.sender] = 128192000000000000000000;              
-        totalSupply = 128192000000000000000000;                 
-        name = "Mjolnir";                                  
-        decimals = 18;                          
-        symbol = "MJG";                                 
-        unitsOneEthCanBuy = 2000;                            
-        fundsWallet = msg.sender;                    
+        balances[msg.sender] = 128192000000000000000000;
+        totalSupply = 128192000000000000000000;
+        name = "Mjolnir";
+        decimals = 18;
+        symbol = "MJG";
+        unitsOneEthCanBuy = 2000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -98,9 +98,9 @@ contract Mjolnir is StandardToken {
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -111,3 +111,14 @@ contract Mjolnir is StandardToken {
 }
 
 //* All the Git Code was provided by Ethereum.org and modified by Mjolnir Developer
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

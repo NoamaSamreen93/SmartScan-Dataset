@@ -4,7 +4,7 @@ contract HeroAccessControl {
     event ContractUpgrade(address newContract);
     address public leaderAddress;
     address public opmAddress;
-    
+
     bool public paused = false;
 
     modifier onlyLeader() {
@@ -56,8 +56,8 @@ contract HeroAccessControl {
     function unpause() public onlyLeader whenPaused {
         paused = false;
     }
-    
-    
+
+
 }
 
 
@@ -80,40 +80,40 @@ function allowance(address _owner, address _spender) constant returns (uint256);
 
 contract HeroLedger is HeroAccessControl{
     ERC20 public erc20;
-    
-    mapping (address => uint256) public ownerIndexToERC20Balance;  
-    mapping (address => uint256) public ownerIndexToERC20Used;  
+
+    mapping (address => uint256) public ownerIndexToERC20Balance;
+    mapping (address => uint256) public ownerIndexToERC20Used;
     uint256 public totalBalance;
     uint256 public totalUsed;
-    
+
     uint256 public totalPromo;
     uint256 public candy;
-        
+
     function setERC20Address(address _address,uint256 _totalPromo,uint256 _candy) public onlyLeader {
         ERC20 candidateContract = ERC20(_address);
         require(candidateContract.isERC20());
-        erc20 = candidateContract; 
-        uint256 realTotal = erc20.balanceOf(this); 
+        erc20 = candidateContract;
+        uint256 realTotal = erc20.balanceOf(this);
         require(realTotal >= _totalPromo);
         totalPromo=_totalPromo;
         candy=_candy;
     }
-    
+
     function setERC20TotalPromo(uint256 _totalPromo,uint256 _candy) public onlyLeader {
         uint256 realTotal = erc20.balanceOf(this);
         totalPromo +=_totalPromo;
-        require(realTotal - totalBalance >= totalPromo); 
-        
+        require(realTotal - totalBalance >= totalPromo);
+
         candy=_candy;
     }
- 
+
     function charge(uint256 amount) public {
     		if(erc20.transferFrom(msg.sender, this, amount)){
     				ownerIndexToERC20Balance[msg.sender] += amount;
     				totalBalance +=amount;
     		}
-    }	
-		
+    }
+
 		function collect(uint256 amount) public {
 				require(ownerIndexToERC20Balance[msg.sender] >= amount);
     		if(erc20.transfer(msg.sender, amount)){
@@ -121,7 +121,7 @@ contract HeroLedger is HeroAccessControl{
     				totalBalance -=amount;
     		}
     }
-    
+
     function withdrawERC20Balance(uint256 amount) external onlyLeader {
         uint256 realTotal = erc20.balanceOf(this);
      		require((realTotal -  (totalPromo  + totalBalance- totalUsed ) )  >=amount);
@@ -129,8 +129,8 @@ contract HeroLedger is HeroAccessControl{
         totalBalance -=amount;
         totalUsed -=amount;
     }
-    
-    
+
+
     function withdrawOtherERC20Balance(uint256 amount, address _address) external onlyLeader {
     		require(_address != address(erc20));
     		require(_address != address(this));
@@ -139,7 +139,7 @@ contract HeroLedger is HeroAccessControl{
         require( realTotal >= amount );
         candidateContract.transfer(leaderAddress, amount);
     }
-    
+
 
 }
 
@@ -147,7 +147,7 @@ contract HeroBase is  HeroLedger{
     event Recruitment(address indexed owner, uint256 heroId, uint256 yinId, uint256 yangId, uint256 talent);
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event ItmesChange(uint256 indexed tokenId, uint256 items);
-    
+
     address public magicStore;
 
     struct Hero {
@@ -157,13 +157,13 @@ contract HeroBase is  HeroLedger{
         uint32 yinId;
         uint32 yangId;
         uint16 cooldownIndex;
-        uint16 generation;        
-        uint256 belongings;       
+        uint16 generation;
+        uint256 belongings;
         uint32 items;
-    }    
-    
+    }
+
     uint32[14] public cooldowns = [
-    
+
         uint32(1 minutes),
         uint32(2 minutes),
         uint32(5 minutes),
@@ -179,17 +179,17 @@ contract HeroBase is  HeroLedger{
         uint32(4 days),
         uint32(7 days)
     ];
-        
-    uint128 public cdFee = 118102796674000; 
+
+    uint128 public cdFee = 118102796674000;
 
     Hero[] heroes;
     mapping (uint256 => address) public heroIndexToOwner;
     mapping (address => uint256) ownershipTokenCount;
 
-    mapping (uint256 => address) public heroIndexToApproved;   
-    mapping (uint256 => uint32) public heroIndexToWin;   
+    mapping (uint256 => address) public heroIndexToApproved;
+    mapping (uint256 => uint32) public heroIndexToWin;
     mapping (uint256 => uint32) public heroIndexToLoss;
-  
+
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         ownershipTokenCount[_to]++;
         heroIndexToOwner[_tokenId] = _to;
@@ -211,12 +211,12 @@ contract HeroBase is  HeroLedger{
         returns (uint)
     {
         require(_generation <= 65535);
-       
-        
+
+
         uint16 _cooldownIndex = uint16(_generation/2);
         if(_cooldownIndex > 13){
         	_cooldownIndex =13;
-        }   
+        }
         Hero memory _hero = Hero({
             talent: _talent,
             recruitmentTime: uint64(now),
@@ -240,12 +240,12 @@ contract HeroBase is  HeroLedger{
         _transfer(0, _owner, newHeroId);
 
         return newHeroId;
-    } 
-    
+    }
+
     function setMagicStore(address _address) public onlyOPM{
        magicStore = _address;
     }
- 
+
 }
 
 contract ERC721 {
@@ -269,7 +269,7 @@ contract HeroOwnership is HeroBase, ERC721 {
     {
         return true;
     }
-    
+
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return heroIndexToOwner[_tokenId] == _claimant;
     }
@@ -361,13 +361,13 @@ contract HeroOwnership is HeroBase, ERC721 {
 }
 
 contract MasterRecruitmentInterface {
-    function isMasterRecruitment() public pure returns (bool);   
-    function fightMix(uint256 belongings1, uint256 belongings2) public returns (bool,uint256,uint256,uint256);    
+    function isMasterRecruitment() public pure returns (bool);
+    function fightMix(uint256 belongings1, uint256 belongings2) public returns (bool,uint256,uint256,uint256);
 }
 
 
 contract HeroFighting is HeroOwnership {
-  
+
     MasterRecruitmentInterface public masterRecruitment;
     function setMasterRecruitmentAddress(address _address) public onlyLeader {
         MasterRecruitmentInterface candidateContract = MasterRecruitmentInterface(_address);
@@ -393,7 +393,7 @@ contract HeroFighting is HeroOwnership {
     }
 
     function _fight(uint32 _yinId, uint32 _yangId)
-        internal 
+        internal
         whenNotPaused
         returns(uint256)
     {
@@ -403,50 +403,50 @@ contract HeroFighting is HeroOwnership {
         uint16 parentGen = yin.generation;
         if (yang.generation > yin.generation) {
             parentGen = yang.generation;
-        }        
+        }
         var (flag, childTalent, belongings1,  belongings2) = masterRecruitment.fightMix(yin.belongings,yang.belongings);
         yin.belongings = belongings1;
-        yang.belongings = belongings2;                
-	      if(!flag){      
+        yang.belongings = belongings2;
+	      if(!flag){
            (_yinId,_yangId) = (_yangId,_yinId);
-        }    
+        }
         address owner = heroIndexToOwner[_yinId];
         heroIndexToWin[_yinId] +=1;
         heroIndexToLoss[_yangId] +=1;
-        uint256 newHeroId = _createHero(_yinId, _yangId, parentGen + 1, childTalent, owner); 
+        uint256 newHeroId = _createHero(_yinId, _yangId, parentGen + 1, childTalent, owner);
         _triggerCooldown(yang);
         _triggerCooldown(yin);
         return (newHeroId );
     }
-    
-    
-   
-    
-     function reduceCDFee(uint256 heroId) 
-         public 
-         view 
+
+
+
+
+     function reduceCDFee(uint256 heroId)
+         public
+         view
          returns (uint256 fee)
     {
     		Hero memory hero = heroes[heroId];
     		require(hero.cooldownEndTime > now);
     		uint64 cdTime = uint64(hero.cooldownEndTime-now);
     		fee= uint256(cdTime * cdFee * (hero.cooldownIndex+1));
-    		
+
     }
-    
-    
-    
+
+
+
 }
 
 
 contract ClockAuction {
     //bool public isClockAuction = true;
-    
+
     function withdrawBalance() external ;
-      
+
     function order(uint256 _tokenId, uint256 orderAmount ,address buyer)
         public  returns (bool);
-    
+
      function createAuction(
         uint256 _tokenId,
         uint256 _startingPrice,
@@ -457,19 +457,19 @@ contract ClockAuction {
         address _seller
     )
         public;
-    
+
     function getSeller(uint256 _tokenId)
         public
         returns
     (
         address seller
-    ); 
-    
+    );
+
      function getCurrentPrice(uint256 _tokenId, uint8 ccy)
         public
         view
         returns (uint256);
-        
+
 }
 
 contract FightClockAuction is ClockAuction {
@@ -485,8 +485,8 @@ contract HeroAuction is HeroFighting {
 
 		SaleClockAuction public saleAuction;
     FightClockAuction public fightAuction;
-    uint256 public ownerCut =500;    
-    
+    uint256 public ownerCut =500;
+
     function setSaleAuctionAddress(address _address) public onlyLeader {
         SaleClockAuction candidateContract = SaleClockAuction(_address);
         require(candidateContract.isSaleClockAuction());
@@ -498,7 +498,7 @@ contract HeroAuction is HeroFighting {
         require(candidateContract.isFightClockAuction());
         fightAuction = candidateContract;
     }
-    
+
 
     function createSaleAuction(
         uint256 _heroId,
@@ -522,35 +522,35 @@ contract HeroAuction is HeroFighting {
             msg.sender
         );
     }
-    
+
     function orderOnSaleAuction(
         uint256 _heroId,
         uint256 orderAmount
     )
         public
     {
-        require(ownerIndexToERC20Balance[msg.sender] >= orderAmount); 
+        require(ownerIndexToERC20Balance[msg.sender] >= orderAmount);
         address saller = saleAuction.getSeller(_heroId);
         uint256 price = saleAuction.getCurrentPrice(_heroId,1);
         require( price <= orderAmount && saller != address(0));
-       
+
         if(saleAuction.order(_heroId, orderAmount, msg.sender)  &&orderAmount >0 ){
-         
+
 	          ownerIndexToERC20Balance[msg.sender] -= orderAmount;
-	    		  ownerIndexToERC20Used[msg.sender] += orderAmount;  
-	    		  
+	    		  ownerIndexToERC20Used[msg.sender] += orderAmount;
+
 	    		  if( saller == address(this)){
 	    		     totalUsed +=orderAmount;
 	    		  }else{
 	    		     uint256 cut = _computeCut(price);
 	    		     totalUsed += (orderAmount - price +cut);
 	    		     ownerIndexToERC20Balance[saller] += price -cut;
-	    		  }	
-         } 
-          
-        
+	    		  }
+         }
+
+
     }
-    
+
 
     function createFightAuction(
         uint256 _heroId,
@@ -573,7 +573,7 @@ contract HeroAuction is HeroFighting {
             _duration,
             msg.sender
         );
-    }    
+    }
 
     function orderOnFightAuction(
         uint256 _yangId,
@@ -587,25 +587,25 @@ contract HeroAuction is HeroFighting {
         require(isReadyToFight(_yinId));
         require(_yinId !=_yangId);
         require(ownerIndexToERC20Balance[msg.sender] >= orderAmount);
-        
+
         address saller= fightAuction.getSeller(_yangId);
         uint256 price = fightAuction.getCurrentPrice(_yangId,1);
-      
+
         require( price <= orderAmount && saller != address(0));
-        
+
         if(fightAuction.order(_yangId, orderAmount, msg.sender)){
 	         _fight(uint32(_yinId), uint32(_yangId));
 	        ownerIndexToERC20Balance[msg.sender] -= orderAmount;
-	    		ownerIndexToERC20Used[msg.sender] += orderAmount;  
-	    		
+	    		ownerIndexToERC20Used[msg.sender] += orderAmount;
+
     		  if( saller == address(this)){
     		     totalUsed +=orderAmount;
     		  }else{
     		     uint256 cut = _computeCut(price);
     		     totalUsed += (orderAmount - price+cut);
     		     ownerIndexToERC20Balance[saller] += price-cut;
-    		  }	  
-	        
+    		  }
+
         }
     }
 
@@ -613,24 +613,24 @@ contract HeroAuction is HeroFighting {
         saleAuction.withdrawBalance();
         fightAuction.withdrawBalance();
     }
-    
+
     function setCut(uint256 newCut) public onlyOPM{
         ownerCut = newCut;
     }
-    
-    
+
+
     function _computeCut(uint256 _price) internal view returns (uint256) {
         return _price * ownerCut / 10000;
-    }  
-    
-    
+    }
+
+
     function promoBun(address _address) public {
         require(msg.sender == address(saleAuction));
         if(totalPromo >= candy && candy > 0){
           ownerIndexToERC20Balance[_address] += candy;
           totalPromo -=candy;
          }
-    } 
+    }
 
 }
 
@@ -638,7 +638,7 @@ contract HeroMinting is HeroAuction {
 
     uint256 public promoCreationLimit = 5000;
     uint256 public gen0CreationLimit = 50000;
-    
+
     uint256 public gen0StartingPrice = 100000000000000000;
     uint256 public gen0AuctionDuration = 1 days;
 
@@ -666,7 +666,7 @@ contract HeroMinting is HeroAuction {
 				if(price == 0 ){
 				     price = _computeNextGen0Price();
 				}
-				
+
         saleAuction.createAuction(
             heroId,
             price *1000,
@@ -693,8 +693,8 @@ contract HeroMinting is HeroAuction {
 
         return nextPrice;
     }
-    
-    
+
+
 }
 
 contract HeroCore is HeroMinting {
@@ -722,7 +722,7 @@ contract HeroCore is HeroMinting {
             msg.sender != address(0)
         );
     }
-    
+
     function getHero(uint256 _id)
         public
         view
@@ -737,7 +737,7 @@ contract HeroCore is HeroMinting {
 	      uint256 talent,
 	      uint256 belongings,
 	      uint32 items
-	    
+
     ) {
         Hero storage her = heroes[_id];
         isReady = (her.cooldownEndTime <= now);
@@ -761,39 +761,50 @@ contract HeroCore is HeroMinting {
 
         super.unpause();
     }
-    
-    
+
+
      function setNewCdFee(uint128 _cdFee) public onlyOPM {
         cdFee = _cdFee;
     }
-     
-    function reduceCD(uint256 heroId,uint256 reduceAmount) 
-         public  
-         whenNotPaused 
+
+    function reduceCD(uint256 heroId,uint256 reduceAmount)
+         public
+         whenNotPaused
     {
     		Hero storage hero = heroes[heroId];
     		require(hero.cooldownEndTime > now);
     		require(ownerIndexToERC20Balance[msg.sender] >= reduceAmount);
-    		
+
     		uint64 cdTime = uint64(hero.cooldownEndTime-now);
     		require(reduceAmount >= uint256(cdTime * cdFee * (hero.cooldownIndex+1)));
-    		
+
     		ownerIndexToERC20Balance[msg.sender] -= reduceAmount;
-    		ownerIndexToERC20Used[msg.sender] += reduceAmount;  
+    		ownerIndexToERC20Used[msg.sender] += reduceAmount;
         totalUsed +=reduceAmount;
     		hero.cooldownEndTime = uint64(now);
     }
-    
+
     function useItems(uint32 _items, uint256 tokenId, address owner, uint256 fee) public returns (bool flag){
       require(msg.sender == magicStore);
-      require(owner == heroIndexToOwner[tokenId]);        
+      require(owner == heroIndexToOwner[tokenId]);
          heroes[tokenId].items=_items;
-         ItmesChange(tokenId,_items);      
+         ItmesChange(tokenId,_items);
       ownerIndexToERC20Balance[owner] -= fee;
-    	ownerIndexToERC20Used[owner] += fee;  
+    	ownerIndexToERC20Used[owner] += fee;
       totalUsed +=fee;
-      
+
       flag = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

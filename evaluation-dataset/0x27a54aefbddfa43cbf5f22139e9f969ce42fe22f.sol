@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
 library gladiate {
     enum Weapon {None, Knife, Sword, Spear}
     enum GladiatorState {Null, Incoming, Active, Outgoing}
-    
+
     struct Gladiator {
         GladiatorState state;
         uint stateTransitionBlock;
@@ -24,35 +24,35 @@ contract Arena {
         return uint8(keccak256(block.blockhash(block.number-1), pseudoRandomNonce)) % limit;
         pseudoRandomNonce++;
     }
-    
+
     uint constant public coinValue = 50000000000000000; // 0.05 ETH
-    
+
     uint constant spawnTime = 3;
     uint constant despawnTime = 2;
-    
+
     address public emperor;
     mapping (address => gladiate.Gladiator) public gladiators;
-    
+
     struct Tile {
         uint coins;
         gladiate.Weapon weapon;
         address gladiator;
     }
-    
+
     Tile[10][10] tiles;
-    
+
     function Arena()
     public {
         emperor = msg.sender;
     }
-    
-    modifier onlyEmporer() 
+
+    modifier onlyEmporer()
         {require(msg.sender == emperor); _;}
-    modifier gladiatorExists(address owner) 
+    modifier gladiatorExists(address owner)
         {require(gladiators[owner].state != gladiate.GladiatorState.Null); _;}
-    modifier gladiatorInState(address owner, gladiate.GladiatorState s) 
+    modifier gladiatorInState(address owner, gladiate.GladiatorState s)
         {require(gladiators[owner].state == s); _;}
-    
+
     function startGladiatorWithCoin(uint8 x, uint8 y, address owner)
     internal {
         gladiators[owner].state = gladiate.GladiatorState.Incoming;
@@ -60,29 +60,29 @@ contract Arena {
         gladiators[owner].x = x;
         gladiators[owner].y = y;
         gladiators[owner].coins = 1;
-        
+
         tiles[x][y].gladiator = owner;
     }
-    
+
     function despawnGladiatorAndAwardCoins(address owner)
     internal {
         owner.transfer(gladiators[owner].coins * coinValue);
-        
+
         gladiators[owner].state = gladiate.GladiatorState.Null;
     }
-    
+
     function addCoins(uint8 x, uint8 y, uint amount)
     internal {
         tiles[x][y].coins += amount;
     }
-    
+
     function throwIn()
     external
-    payable 
+    payable
     returns (bool) {
         require(gladiators[msg.sender].state == gladiate.GladiatorState.Null);
         require(msg.value == coinValue);
-        
+
         uint8 lastX;
         uint8 lastY;
         for (uint8 i=0; i<3; i++) {
@@ -90,7 +90,7 @@ contract Arena {
             uint8 y = pseudoRandomUint8(10);
             lastX = x;
             lastY = y;
-            
+
             if (tiles[x][y].gladiator == 0x0) {
                 startGladiatorWithCoin(x, y, msg.sender);
                 return true;
@@ -101,34 +101,45 @@ contract Arena {
         addCoins(lastX, lastY, 1);
         return false;
     }
-    
+
     function activateGladiator(address who)
     external
     gladiatorExists(who)
     gladiatorInState(who, gladiate.GladiatorState.Incoming) {
         require(gladiators[who].stateTransitionBlock <= block.number);
-        
+
         gladiators[who].state = gladiate.GladiatorState.Active;
         gladiators[who].stateTransitionBlock = (uint(0) - 1);//max int
     }
-    
+
     function imOut()
     external
     gladiatorInState(msg.sender, gladiate.GladiatorState.Active) {
         gladiators[msg.sender].state = gladiate.GladiatorState.Outgoing;
         gladiators[msg.sender].stateTransitionBlock = block.number + despawnTime;
     }
-    
+
     function getOut()
     external
     gladiatorInState(msg.sender, gladiate.GladiatorState.Outgoing) {
         require(gladiators[msg.sender].stateTransitionBlock <= block.number);
-        
+
         despawnGladiatorAndAwardCoins(msg.sender);
     }
-    
-    function nextBlock() 
+
+    function nextBlock()
     public {
         gladiators[0x0].coins ++;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

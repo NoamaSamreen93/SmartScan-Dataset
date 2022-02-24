@@ -110,7 +110,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
 
     ///  Merchant identifier hash
     bytes32 public merchantIdHash;
-    
+
     //Deal event
     event DealCompleted(
         uint orderId,
@@ -178,7 +178,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
     /**
-     *  recordDealCancelReason creates an event of not paid deal that was cancelled 
+     *  recordDealCancelReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -206,7 +206,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
 /**
-     *  recordDealRefundReason creates an event of not paid deal that was cancelled 
+     *  recordDealRefundReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -501,7 +501,7 @@ library SafeMath {
 contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
 
     using SafeMath for uint256;
-    
+
     string constant VERSION = "0.4";
 
     /**
@@ -510,7 +510,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
      *  15‰ = 1.5%
      */
     uint public constant FEE_PERMILLE = 15;
-    
+
     /**
      *  Address of Monetha Vault for fee collection
      */
@@ -529,10 +529,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     function MonethaGateway(address _monethaVault, address _admin) public {
         require(_monethaVault != 0x0);
         monethaVault = _monethaVault;
-        
+
         setAdmin(_admin);
     }
-    
+
     /**
      *  acceptPayment accept payment from PaymentAcceptor, forwards it to merchant's wallet
      *      and collects Monetha fee.
@@ -679,7 +679,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
     /**
      *  Assigns the acceptor to the order (when client initiates order).
      *  @param _orderId Identifier of the order
-     *  @param _price Price of the order 
+     *  @param _price Price of the order
      *  @param _paymentAcceptor order payment acceptor
      *  @param _originAddress buyer address
      *  @param _fee Monetha fee
@@ -775,7 +775,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         uint32 _merchantReputation,
         uint _dealHash,
         string _refundReason
-    )   
+    )
         external onlyMonetha whenNotPaused
         atState(_orderId, State.Paid) transition(_orderId, State.Refunding)
     {
@@ -805,9 +805,9 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
      *  withdrawRefund performs fund transfer to the client's account.
      *  @param _orderId Identifier of the order
      */
-    function withdrawRefund(uint _orderId) 
+    function withdrawRefund(uint _orderId)
         external whenNotPaused
-        atState(_orderId, State.Refunding) transition(_orderId, State.Refunded) 
+        atState(_orderId, State.Refunding) transition(_orderId, State.Refunded)
     {
         Order storage order = orders[_orderId];
         order.originAddress.transfer(order.price);
@@ -901,4 +901,15 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         //update parties Reputation
         merchantWallet.setCompositeReputation("total", _merchantReputation);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

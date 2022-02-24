@@ -161,10 +161,10 @@ contract JoySale is Ownable {
 
 	IJoyToken public token;
 
-	uint256 public round; // 1, 2 or 3. Rounds 1 and 3 are whitelisted. 
+	uint256 public round; // 1, 2 or 3. Rounds 1 and 3 are whitelisted.
 	uint256 public round3StartAt;
 	uint256 public tokensSold;
-	
+
 	bool isFinished;
 	uint256 finishedAt;
 
@@ -270,5 +270,16 @@ contract JoySale is Ownable {
 	 		i += 1;
 	 	}
 	 	return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

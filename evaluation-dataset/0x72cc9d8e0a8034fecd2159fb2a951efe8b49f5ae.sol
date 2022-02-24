@@ -47,7 +47,7 @@ contract token {
 * @dev This contract will return the unix value of any date
 */
 contract DateTimeAPI {
-        
+
     function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour) constant returns (uint timestamp);
 
 }
@@ -101,7 +101,7 @@ contract ICO {
     * @param _addressOfTokenUsedAsReward is the token totalDistributed
     */
     function ICO (token _addressOfTokenUsedAsReward) public {
-        
+
         startTime = dateTimeContract.toTimestamp(2018,3,2,12); //From March 2 12:00 UTC
         ICOdeadline = dateTimeContract.toTimestamp(2018,3,30,12); //Till March 30 12:00 UTC;
         rate = 80000; //Tokens per ether unit
@@ -132,27 +132,27 @@ contract ICO {
 
             tokenBought = tokenBought.mul(15);
             tokenBought = tokenBought.div(10);//+50%
-        
+
         } else if (state == State.stage2){
-        
+
             tokenBought = tokenBought.mul(125);
             tokenBought = tokenBought.div(100);//+25%
-        
+
         } else if (state == State.stage3){
-        
+
             tokenBought = tokenBought.mul(115);
             tokenBought = tokenBought.div(100);//+15%
-        
+
         }
 
         icoTokensReceived[msg.sender] = icoTokensReceived[msg.sender].add(tokenBought);
         totalDistributed = totalDistributed.add(tokenBought);
-        
+
         tokenReward.transfer(msg.sender, tokenBought);
 
         LogFundingReceived(msg.sender, msg.value, totalRaised);
         LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
@@ -180,7 +180,7 @@ contract ICO {
 
     /* If an account has tokens from the ico, the amount after the airdrop */
     /* will be newBalance = tokens * TOKEN_SUPPLY_ICO / totalDistributed */
-      
+
     function computeAirdrop(address _participant) public constant returns (uint airdrop) {
         require(state == State.Successful);
 
@@ -208,11 +208,11 @@ contract ICO {
         } else if(state == State.stage2 && now > dateTimeContract.toTimestamp(2018,3,16,12)) { //Till March 16 12:00 UTC
 
             state = State.stage3;
-            
+
         } else if(state == State.stage3 && now > dateTimeContract.toTimestamp(2018,3,23,12)) { //From March 23 12:00 UTC
 
             state = State.stage4;
-            
+
         } else if(now > ICOdeadline && state!=State.Successful) { //if we reach ico deadline and its not Successful yet
 
         state = State.Successful; //ico becomes Successful
@@ -239,8 +239,24 @@ contract ICO {
     * @dev direct payments
     */
     function () public payable {
-        
+
         contribute();
 
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -134,7 +134,7 @@ contract MpctToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 1000000000e18;
-    address public constant WALLET_MPCT   = 0x8Ea314386D3de2bB5Ce9F100C976a3ffaEbF5d24; 
+    address public constant WALLET_MPCT   = 0x8Ea314386D3de2bB5Ce9F100C976a3ffaEbF5d24;
 
     function MpctToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -149,4 +149,15 @@ contract MpctToken is StandardToken {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

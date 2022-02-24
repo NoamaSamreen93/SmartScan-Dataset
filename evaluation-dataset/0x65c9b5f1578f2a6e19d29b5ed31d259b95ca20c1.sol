@@ -72,7 +72,7 @@ library SafeMath {
 
  * token purchases and the crowdsale will assign them tokens based
 
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
 
  to a wallet
 
@@ -110,7 +110,7 @@ contract Crowdsale {
 
   // mapping (address => uint) public contributions;
 
-  
+
 
 
 
@@ -150,7 +150,7 @@ contract Crowdsale {
 
   function Crowdsale() {
 
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
 
     wallet = 0xe30EC6264873675ddB5c98a694D94D9613755082;
 
@@ -254,9 +254,9 @@ contract Crowdsale {
 
     // calculate token amount to be sent
 
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
 
 
@@ -264,7 +264,7 @@ contract Crowdsale {
 
     weiRaised = weiRaised.add(weiAmount);
 
-    
+
 
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
 
@@ -322,4 +322,20 @@ contract Crowdsale {
 
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

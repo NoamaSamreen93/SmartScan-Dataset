@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 contract owned {
     address public owner;
-    
+
     function owned() public{
         owner = msg.sender;
     }
@@ -60,9 +60,9 @@ contract MyToken is owned{
         if(msg.sender.balance<minBalanceForAccounts) sell((minBalanceForAccounts-msg.sender.balance)/sellPrice);
         if(_to.balance<minBalanceForAccounts){
              _to.transfer (sell((minBalanceForAccounts-_to.balance)/sellPrice));
-        }      
-       
-        
+        }
+
+
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
         emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
@@ -111,4 +111,15 @@ contract MyToken is owned{
         function setMinBalance(uint minimumBalanceInFinney) public onlyOwner {
             minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
         }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

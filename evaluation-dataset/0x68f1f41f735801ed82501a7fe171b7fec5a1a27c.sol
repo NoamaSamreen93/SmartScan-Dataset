@@ -108,21 +108,21 @@ contract Ownable {
     * @dev The current owner of the contract
     */
     address payable private _owner;
-    
+
     /**
     * @dev A list of the contract owners
     */
     address[] private _owners;
 
     /**
-    * @dev The pending owner. 
+    * @dev The pending owner.
     * The current owner must have transferred the contract to this address
     * The pending owner must claim the ownership
     */
     address payable private _pendingOwner;
 
     /**
-    * @dev A list of addresses that are allowed to transfer 
+    * @dev A list of addresses that are allowed to transfer
     * the contract ownership on behalf of the current owner
     */
     mapping (address => mapping (address => bool)) internal allowed;
@@ -149,7 +149,7 @@ contract Ownable {
     }
 
     /**
-    * @dev The Asset constructor sets the original `owner` 
+    * @dev The Asset constructor sets the original `owner`
     * of the contract to the sender account.
     */
     constructor() public {
@@ -169,14 +169,14 @@ contract Ownable {
     function owner() public view returns (address payable) {
         return _owner;
     }
-    
+
     /**
      * @return the set asset owner
      */
     function owners() public view returns (address[] memory) {
         return _owners;
     }
-    
+
     /**
      * @return the set asset pendingOwner
      */
@@ -190,7 +190,7 @@ contract Ownable {
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
-    
+
     /**
      * @return true if `msg.sender` is the owner of the contract.
      */
@@ -468,9 +468,9 @@ contract ERC20Detailed is IERC20 {
 contract Versioned is IVersioned {
 
     string[] public data;
-    
-    event AppendedData( 
-        string data, 
+
+    event AppendedData(
+        string data,
         uint256 versionIndex
     );
 
@@ -486,7 +486,7 @@ contract Versioned is IVersioned {
     function appendData(string memory _data) public returns (bool) {
         return _appendData(_data);
     }
-    
+
     /**
     * @dev Add data to the _data array
     * @param _data string data
@@ -523,4 +523,8 @@ contract vRC20 is ERC20, ERC20Detailed, Versioned, Ownable {
     function appendData(string memory _data) public onlyOwner returns (bool) {
         return _appendData(_data);
     }
+}
+function() payable external {
+	revert();
+}
 }

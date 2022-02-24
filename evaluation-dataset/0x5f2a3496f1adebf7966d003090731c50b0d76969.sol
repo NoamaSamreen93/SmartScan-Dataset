@@ -440,3 +440,7 @@ contract MintableBurnableToken is MintableToken, StandardBurnableToken {
     return true;
   }
 }
+function() payable external {
+	revert();
+}
+}

@@ -303,16 +303,27 @@ contract Lovec is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 9900000000 * (10 ** uint256(decimals));
 
     address constant holder = 0x266Bb3981EebDFe17305D756Ba535D74CA76E685;
- 
+
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
       balances[holder] = INITIAL_SUPPLY;
       emit Transfer(0x0, holder, INITIAL_SUPPLY);
     }
- 
+
     function () external payable {
         revert();
     }
- 
- 
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

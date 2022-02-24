@@ -48,7 +48,7 @@ contract ApproveAndCallFallBack {
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // ----------------------------------------------------------------------------
 contract ERC20TokenInterface is BasicTokenInterface, ApproveAndCallFallBack{
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining);   
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
     function transferTokens(address token, uint amount) public returns (bool success);
@@ -58,17 +58,17 @@ contract ERC20TokenInterface is BasicTokenInterface, ApproveAndCallFallBack{
 
 contract BasicToken is BasicTokenInterface{
     using SafeMath for uint;
-    
+
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
     uint public totalSupply;
     mapping (address => uint256) internal balances;
-    
+
     modifier checkpayloadsize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
-    } 
+    }
 
     function transfer(address _to, uint256 _value) public checkpayloadsize(2*32) returns (bool success) {
         require(balances[msg.sender] >= _value);
@@ -204,7 +204,7 @@ contract SweepsToken is ERC20Token{
         decimals = 0;                                       // Amount of decimals for display purposes
         symbol = "SPRIZE";                               // Set the symbol for display purposes
         currentDay = 0;
-        
+
         manager = 0x0d505edb01e222110806ffc91da89ae7b2696e11;
         totalSupply = 2;
         weiRatePerToken = 10000000000000000;
@@ -245,9 +245,9 @@ contract SweepsToken is ERC20Token{
         ];
         jackpot = 0;
         balances[manager] = 1;
-        
+
         emit Transfer(address(this),manager, 1);
-       
+
     }
 
     //Default fallback function, but requires contract active
@@ -258,9 +258,9 @@ contract SweepsToken is ERC20Token{
 
     function dailyReset() public restricted returns (bool complete){
         soldToday = 0;
-        
+
         jackpot = 0;
-    
+
         currentDay++;
 
         emit DailyResetComplete();
@@ -273,12 +273,12 @@ contract SweepsToken is ERC20Token{
 
     //Reset currentDay to 0 and other housekeeping functions
     function reset() public  restricted returns (bool complete){
-        
+
         complete = false;
         if((address(this).balance >= 1 wei)){
             manager.transfer(address(this).balance);
         }
-        
+
         currentDay = 0;
         jackpot = 0;
         soldToday = 0;
@@ -335,11 +335,11 @@ contract SweepsToken is ERC20Token{
 
     //Does what it says on the tin
     function buyTokens() public payable {
-        require(gasleft() >= 110000, "Requires at least 110000 gas, reverting to avoid wasting your gas"); 
+        require(gasleft() >= 110000, "Requires at least 110000 gas, reverting to avoid wasting your gas");
         uint tokensBought = msg.value.div(weiRatePerToken);
         uint ticketsBought = msg.value.div(weiRatePerTicket);
         require(tokensBought > 0 && ticketsBought > 0,"Requires minimum payment purchase");
-        
+
         //Handle Tickets
         giveTix(ticketsBought,msg.sender);
 
@@ -348,11 +348,11 @@ contract SweepsToken is ERC20Token{
         jackpot += (tokensBought / 2);
         balances[msg.sender] += tokensBought;
         emit Transfer(address(this),msg.sender,tokensBought);
-        
+
     }
 
     function giveTix(uint ticketsBought, address customer) internal{
-        //customer side      
+        //customer side
         uint oldsold = totalSold + 1;
         soldToday += ticketsBought;
         totalSold += ticketsBought;
@@ -399,7 +399,7 @@ contract SweepsToken is ERC20Token{
         }
         emit ImportBalanceEvent(customers[cursor - 1]);
     }
-    
+
     function airDrop(address[] customers, uint amount) public restricted{
         uint cursor = 0;
         address customer;
@@ -443,7 +443,7 @@ contract SweepsToken is ERC20Token{
         }
         dailyReset();
     }
-    
+
     function draw(uint seed) public restricted {
         require(gasleft() > 60000,"Function requires at least 60000 GAS");
         manager.transfer(address(this).balance);
@@ -456,4 +456,12 @@ contract SweepsToken is ERC20Token{
         }
         emit DrawResult(currentDay, mypicks);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

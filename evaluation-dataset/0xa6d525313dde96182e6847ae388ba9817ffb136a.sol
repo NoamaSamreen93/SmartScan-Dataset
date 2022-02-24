@@ -1,4 +1,4 @@
-/*  
+/*
     Subscrypto
     Copyright (C) 2019 Subscrypto Team
 
@@ -39,12 +39,12 @@ contract SubscryptoMeta {
 
 
     function registerSubscription(
-        bytes32 slug, 
-        string calldata name, 
-        string calldata description, 
+        bytes32 slug,
+        string calldata name,
+        string calldata description,
         string calldata url,
-        uint daiCents, 
-        uint32 interval) external 
+        uint daiCents,
+        uint32 interval) external
     {
         require(daiCents >= MIN_SUBSCRIPTION_DAI_CENTS, "Subsciption amount too low");
         require(interval >= 86400, "Interval must be at least 1 day");
@@ -63,4 +63,13 @@ contract SubscryptoMeta {
         delete subscriptions[msg.sender];
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

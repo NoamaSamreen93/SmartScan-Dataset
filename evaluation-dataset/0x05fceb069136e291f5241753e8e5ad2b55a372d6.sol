@@ -22,7 +22,7 @@ contract CrypteloERC20 {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     event Supply(uint256 supply);
     /**
      * Constrctor function
@@ -38,12 +38,12 @@ contract CrypteloERC20 {
         totalSupplyPrivateSale = 100000000;
         totalSupplyTeamTokens = 125000000;
         totalSupplyExpansionTokens = 125000000;
-        
+
         address privateW = 0xc837Bf0664C67390aC8dA52168D0Bbdbfc53B03f;
         address ICOW = 0x25814bb26Ff76E196A2D4F69EE0A6cEd0415965c;
         address companyW = 0xA84Bff015B31e3Bc10A803F5BC5aE98e99922B68;
         address expansionW = 0x600BeAbb79885acbE606944f54ae8bC29Ec332ef;
-        
+
         balanceOf[ICOW] = totalSupplyICO * ( 10 ** decimals);
         balanceOf[privateW] = totalSupplyPrivateSale * ( 10 ** decimals);
         balanceOf[companyW] = totalSupplyTeamTokens * ( 10 ** decimals);
@@ -166,4 +166,15 @@ contract CrypteloERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

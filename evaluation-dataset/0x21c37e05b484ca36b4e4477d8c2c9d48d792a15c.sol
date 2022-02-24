@@ -9,12 +9,12 @@ pragma solidity ^0.4.18;
 // Total supply: 100000000
 // Decimals    : 18
 //
-// 
+//
 //
 // (c) by Moritz Neto & Daniel Bar with BokkyPooBah / Bok Consulting Pty Ltd Au 2017. The MIT Licence.
 // ----------------------------------------------------------------------------
 // It's kitten season. Bella and Blu were lucky enough to find furever homes.
-// They want to help the hoomans that are working to help all the kittens and 
+// They want to help the hoomans that are working to help all the kittens and
 // other animals looking for furever homes. Bella and Blu have made friends all
 // over the world with people that have dedicated their lives to animal rescue.
 // Bella and Blu decided it was time to do their part and raise money to help.
@@ -24,7 +24,7 @@ pragma solidity ^0.4.18;
 // along the way... Bella joined in and they had a conversation. Bella, a little
 // older and wiser at 11, suggested they create their first coin. A little research,
 // some Solidity, and some nice guys at MIT all added up together to.... BellaBlu Token
-// Help Bella and Blu help their friends... 
+// Help Bella and Blu help their friends...
 //
 // ----------------------------------------------------------------------------
 // Safe maths
@@ -254,4 +254,15 @@ contract BellaBluToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

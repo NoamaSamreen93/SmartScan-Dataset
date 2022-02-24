@@ -272,24 +272,24 @@ contract TokenFunctions is Ownable, Pausable {
   mapping (address => FoundationStruct) foundation;
   mapping (address => PrivatePurchaserStruct) privatePurchaser;
   /**
-   *  @uint256 totalSupply - Total supply of tokens 
-   *  @uint256 publicSupply - Total public Supply 
-   *  @uint256 bountySupply - Total Bounty Supply 
-   *  @uint256 privateSupply - Total Private Supply 
-   *  @uint256 advisorSupply - Total Advisor Supply 
+   *  @uint256 totalSupply - Total supply of tokens
+   *  @uint256 publicSupply - Total public Supply
+   *  @uint256 bountySupply - Total Bounty Supply
+   *  @uint256 privateSupply - Total Private Supply
+   *  @uint256 advisorSupply - Total Advisor Supply
    *  @uint256 backerSupply - Total Backer Supply
-   *  @uint256 founderSupply - Total Founder Supply 
-   *  @uint256 foundationSupply - Total Foundation Supply 
+   *  @uint256 founderSupply - Total Founder Supply
+   *  @uint256 foundationSupply - Total Foundation Supply
   */
-      
-  uint256 public totalTokens = 105926908800000000000000000; 
-  uint256 internal publicSupply = 775353800000000000000000; 
+
+  uint256 public totalTokens = 105926908800000000000000000;
+  uint256 internal publicSupply = 775353800000000000000000;
   uint256 internal bountySupply = 657896000000000000000000;
-  uint256 internal privateSupply = 52589473690000000000000000;  
+  uint256 internal privateSupply = 52589473690000000000000000;
   uint256 internal advisorSupply = 2834024170000000000000000;
   uint256 internal backerSupply = 317780730000000000000000;
   uint256 internal founderSupply = 10592690880000000000000000;
-  uint256 internal foundationSupply = 38159689530000000000000000; 
+  uint256 internal foundationSupply = 38159689530000000000000000;
   event AdvisorTokenTransfer (address indexed beneficiary, uint256 amount);
   event BackerTokenTransfer (address indexed beneficiary, uint256 amount);
   event FoundationTokenTransfer (address indexed beneficiary, uint256 amount);
@@ -303,94 +303,94 @@ contract TokenFunctions is Ownable, Pausable {
   event PublicTokenTransfer (address indexed beneficiary, uint256 amount);
   event AddPrivatePurchaser (address indexed privatePurchaserAddress, uint timeLock, uint256 privatePurchaserTokens, uint256 privatePurchaserBonus);
   function addAdvisors (address advisorAddress, uint timeLock, uint256 advisorToken) onlyOwner public returns(bool acknowledgement) {
-      
+
       require(now < timeLock || timeLock == 0);
       require(advisorToken > 0);
       require(advisorAddress != 0x0);
       require(advisorSupply >= advisorToken);
       advisorSupply = SafeMath.sub(advisorSupply,advisorToken);
-      
+
       advisor[advisorAddress].advisorTimeLock = timeLock;
       advisor[advisorAddress].advisorTokens = advisorToken;
-      
+
       AddAdvisor(advisorAddress, timeLock, advisorToken);
       return true;
-        
+
   }
   function getAdvisorStatus (address addr) public view returns(address, uint, uint256) {
         return (addr, advisor[addr].advisorTimeLock, advisor[addr].advisorTokens);
-  } 
+  }
   function addBackers (address backerAddress, uint timeLock, uint256 backerToken) onlyOwner public returns(bool acknowledgement) {
-      
+
       require(now < timeLock || timeLock == 0);
       require(backerToken > 0);
       require(backerAddress != 0x0);
       require(backerSupply >= backerToken);
       backerSupply = SafeMath.sub(backerSupply,backerToken);
-           
+
       backer[backerAddress].backerTimeLock = timeLock;
       backer[backerAddress].backerTokens = backerToken;
-      
+
       AddBacker(backerAddress, timeLock, backerToken);
       return true;
-        
+
   }
   function getBackerStatus(address addr) public view returns(address, uint, uint256) {
         return (addr, backer[addr].backerTimeLock, backer[addr].backerTokens);
-  } 
+  }
   function addFounder(address founderAddress, uint timeLock, uint256 founderToken) onlyOwner public returns(bool acknowledgement) {
-      
+
       require(now < timeLock || timeLock == 0);
       require(founderToken > 0);
       require(founderAddress != 0x0);
       require(founderSupply >= founderToken);
-      founderSupply = SafeMath.sub(founderSupply,founderToken);  
+      founderSupply = SafeMath.sub(founderSupply,founderToken);
       founder[founderAddress].founderTimeLock = timeLock;
       founder[founderAddress].founderTokens = founderToken;
-      
+
       AddFounder(founderAddress, timeLock, founderToken);
       return true;
-        
+
   }
   function getFounderStatus(address addr) public view returns(address, uint, uint256) {
         return (addr, founder[addr].founderTimeLock, founder[addr].founderTokens);
   }
   function addFoundation(address foundationAddress, uint timeLock, uint256 foundationToken, uint256 foundationBonus) onlyOwner public returns(bool acknowledgement) {
-      
+
       require(now < timeLock || timeLock == 0);
       require(foundationToken > 0);
       require(foundationBonus > 0);
       require(foundationAddress != 0x0);
       uint256 totalTokens = SafeMath.add(foundationToken, foundationBonus);
       require(foundationSupply >= totalTokens);
-      foundationSupply = SafeMath.sub(foundationSupply, totalTokens);  
+      foundationSupply = SafeMath.sub(foundationSupply, totalTokens);
       foundation[foundationAddress].foundationBonus = foundationBonus;
       foundation[foundationAddress].foundationTimeLock = timeLock;
       foundation[foundationAddress].foundationTokens = foundationToken;
-      
+
       AddFoundation(foundationAddress, timeLock, foundationToken, foundationBonus);
       return true;
-        
+
   }
   function getFoundationStatus(address addr) public view returns(address, uint, uint256, uint256) {
         return (addr, foundation[addr].foundationTimeLock, foundation[addr].foundationBonus, foundation[addr].foundationTokens);
   }
   function addPrivatePurchaser(address privatePurchaserAddress, uint timeLock, uint256 privatePurchaserToken, uint256 privatePurchaserBonus) onlyOwner public returns(bool acknowledgement) {
-      
+
       require(now < timeLock || timeLock == 0);
       require(privatePurchaserToken > 0);
       require(privatePurchaserBonus > 0);
       require(privatePurchaserAddress != 0x0);
       uint256 totalTokens = SafeMath.add(privatePurchaserToken, privatePurchaserBonus);
       require(privateSupply >= totalTokens);
-      privateSupply = SafeMath.sub(privateSupply, totalTokens);        
+      privateSupply = SafeMath.sub(privateSupply, totalTokens);
       privatePurchaser[privatePurchaserAddress].privatePurchaserTimeLock = timeLock;
       privatePurchaser[privatePurchaserAddress].privatePurchaserTokens = privatePurchaserToken;
       privatePurchaser[privatePurchaserAddress].privatePurchaserBonus = privatePurchaserBonus;
-      
+
       AddPrivatePurchaser(privatePurchaserAddress, timeLock, privatePurchaserToken, privatePurchaserBonus);
       return true;
-        
+
   }
   function getPrivatePurchaserStatus(address addr) public view returns(address, uint256, uint, uint) {
         return (addr, privatePurchaser[addr].privatePurchaserTimeLock, privatePurchaser[addr].privatePurchaserTokens, privatePurchaser[addr].privatePurchaserBonus);
@@ -404,18 +404,18 @@ contract TokenFunctions is Ownable, Pausable {
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
   }
-  
-  /** 
-   * function getTokenAddress - Get Token Address 
+
+  /**
+   * function getTokenAddress - Get Token Address
    */
   function getTokenAddress() onlyOwner public returns (address) {
     return token;
   }
 }
 /**
- * @title HazzaToken 
+ * @title HazzaToken
  */
- 
+
 contract HazzaToken is MintableToken {
     /**
     *  @string name - Token Name
@@ -427,7 +427,7 @@ contract HazzaToken is MintableToken {
     string public constant symbol = "HAZ";
     uint8 public constant decimals = 18;
     uint256 public constant _totalSupply = 105926908800000000000000000;
-  
+
     /** Constructor HazzaToken */
     function HazzaToken() {
         totalSupply = _totalSupply;
@@ -460,8 +460,8 @@ library SafeMath {
   }
 }
 contract TokenDistribution is TokenFunctions {
-  /** 
-  * function grantAdvisorToken - Transfer advisor tokens 
+  /**
+  * function grantAdvisorToken - Transfer advisor tokens
   */
     function grantAdvisorToken() public returns(bool response) {
         require(advisor[msg.sender].advisorTokens > 0);
@@ -470,11 +470,11 @@ contract TokenDistribution is TokenFunctions {
         advisor[msg.sender].advisorTokens = 0;
         token.mint(msg.sender, transferToken);
         AdvisorTokenTransfer(msg.sender, transferToken);
-        
+
         return true;
-      
+
     }
-  /** 
+  /**
   * function grantBackerToken - Transfer backer tokens
   */
     function grantBackerToken() public returns(bool response) {
@@ -484,15 +484,15 @@ contract TokenDistribution is TokenFunctions {
         backer[msg.sender].backerTokens = 0;
         token.mint(msg.sender, transferToken);
         BackerTokenTransfer(msg.sender, transferToken);
-        
+
         return true;
-      
+
     }
-  /** 
-  * function grantFoundationToken - Transfer foundation tokens  
+  /**
+  * function grantFoundationToken - Transfer foundation tokens
   */
     function grantFoundationToken() public returns(bool response) {
-  
+
         if (now > foundation[msg.sender].foundationTimeLock) {
                 require(foundation[msg.sender].foundationTokens > 0);
                 uint256 transferToken = foundation[msg.sender].foundationTokens;
@@ -500,7 +500,7 @@ contract TokenDistribution is TokenFunctions {
                 token.mint(msg.sender, transferToken);
                 FoundationTokenTransfer(msg.sender, transferToken);
         }
-        
+
         if (foundation[msg.sender].foundationBonus > 0) {
                 uint256 transferTokenBonus = foundation[msg.sender].foundationBonus;
                 foundation[msg.sender].foundationBonus = 0;
@@ -508,10 +508,10 @@ contract TokenDistribution is TokenFunctions {
                 FoundationTokenTransfer(msg.sender, transferTokenBonus);
         }
         return true;
-      
+
     }
-  /** 
-  * function grantFounderToken - Transfer founder tokens  
+  /**
+  * function grantFounderToken - Transfer founder tokens
   */
     function grantFounderToken() public returns(bool response) {
         require(founder[msg.sender].founderTokens > 0);
@@ -520,11 +520,11 @@ contract TokenDistribution is TokenFunctions {
         founder[msg.sender].founderTokens = 0;
         token.mint(msg.sender, transferToken);
         FounderTokenTransfer(msg.sender, transferToken);
-        
+
         return true;
-      
+
     }
-  /** 
+  /**
   * function grantPrivatePurchaserToken - Transfer Private Purchasers tokens
   */
     function grantPrivatePurchaserToken() public returns(bool response) {
@@ -535,7 +535,7 @@ contract TokenDistribution is TokenFunctions {
                 token.mint(msg.sender, transferToken);
                 PrivatePurchaserTokenTransfer(msg.sender, transferToken);
         }
-        
+
         if (privatePurchaser[msg.sender].privatePurchaserBonus > 0) {
                 uint256 transferBonusToken = privatePurchaser[msg.sender].privatePurchaserBonus;
                 privatePurchaser[msg.sender].privatePurchaserBonus = 0;
@@ -543,9 +543,9 @@ contract TokenDistribution is TokenFunctions {
                 PrivatePurchaserTokenTransfer(msg.sender, transferBonusToken);
         }
         return true;
-      
+
     }
-    /** 
+    /**
     * function bountyFunds - Transfer bounty tokens via AirDrop
     * @param beneficiary address where owner wants to transfer tokens
     * @param tokens value of token
@@ -556,17 +556,17 @@ contract TokenDistribution is TokenFunctions {
         bountySupply = SafeMath.sub(bountySupply, tokens[i]);
         token.mint(beneficiary[i], tokens[i]);
         BountyTokenTransfer(beneficiary[i], tokens[i]);
-        
+
         }
     }
-        /** 
+        /**
     * function publicTransferToken - Transfer public tokens via AirDrop
     * @param beneficiary address where owner wants to transfer tokens
     * @param tokens value of token
     */
     function publicTransferToken(address[] beneficiary, uint256[] tokens) onlyOwner public {
         for (uint i = 0; i < beneficiary.length; i++) {
-        
+
         require(publicSupply >= tokens[i]);
         publicSupply = SafeMath.sub(publicSupply,tokens[i]);
         token.mint(beneficiary[i], tokens[i]);
@@ -575,13 +575,24 @@ contract TokenDistribution is TokenFunctions {
     }
 }
 contract HazzaTokenInterface is TokenFunctions, TokenDistribution {
-  
+
     /** Constructor HazzaTokenInterface */
     function HazzaTokenInterface() public TokenFunctions() {
     }
-    
+
     /** HazzaToken Contract */
     function createTokenContract() internal returns (MintableToken) {
         return new HazzaToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

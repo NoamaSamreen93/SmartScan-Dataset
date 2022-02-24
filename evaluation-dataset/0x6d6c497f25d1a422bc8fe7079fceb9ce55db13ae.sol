@@ -11,7 +11,7 @@ contract ERC223Interface {
     function allowance(address _owner, address _spender) public view returns (uint256);
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
     function approve(address _spender, uint256 _value) public returns (bool);
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -20,8 +20,8 @@ contract ERC223Interface {
  /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -191,18 +191,18 @@ library SafeMath {
 
 contract SRATOKEN is ERC223Interface, Pausable {
     using SafeMath for uint256;
-    
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
     uint256 internal _totalSupply;
-    
+
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
     mapping (address => bool) public frozenAccount;
-    
+
     event FrozenFunds(address target, bool frozen);
-    
+
     constructor(string name, string symbol, uint8 decimals, uint256 totalSupply) public {
         _name = name;
         _symbol = symbol;
@@ -210,39 +210,39 @@ contract SRATOKEN is ERC223Interface, Pausable {
         _totalSupply = totalSupply;
         balances[msg.sender] = totalSupply;
     }
-    
+
     function name() public view returns (string) {
         return _name;
     }
-    
+
     function symbol() public view returns (string) {
         return _symbol;
     }
-    
+
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
-    function freezeAccount(address target, bool freeze) 
-    public 
+
+    function freezeAccount(address target, bool freeze)
+    public
     onlyOwner
     {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
-    function transfer(address _to, uint256 _value) 
+
+    function transfer(address _to, uint256 _value)
     public
     whenNotPaused
-    returns (bool) 
+    returns (bool)
     {
         require(_value > 0 );
         require(_value <= balances[msg.sender]);
@@ -253,8 +253,8 @@ contract SRATOKEN is ERC223Interface, Pausable {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
-    function transfer(address _to, uint _value, bytes _data) 
+
+    function transfer(address _to, uint _value, bytes _data)
     public
     whenNotPaused
     returns (bool)
@@ -271,11 +271,11 @@ contract SRATOKEN is ERC223Interface, Pausable {
         emit Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
-    function isContract(address _addr) 
+
+    function isContract(address _addr)
     private
     view
-    returns (bool is_contract) 
+    returns (bool is_contract)
     {
         uint length;
         assembly {
@@ -284,57 +284,57 @@ contract SRATOKEN is ERC223Interface, Pausable {
         }
         return (length>0);
     }
-    
-    function transferFrom(address _from, address _to, uint256 _value) 
+
+    function transferFrom(address _from, address _to, uint256 _value)
     public
     whenNotPaused
-    returns (bool) 
+    returns (bool)
     {
         require(_value > 0 );
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
         require(!frozenAccount[_to]);
         require(!frozenAccount[_from]);
-        
+
         balances[_from] = SafeMath.sub(balances[_from], _value);
         balances[_to] = SafeMath.add(balances[_to], _value);
         allowed[_from][msg.sender] = SafeMath.sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
-    function approve(address _spender, uint256 _value) 
+
+    function approve(address _spender, uint256 _value)
     public
     whenNotPaused
-    returns (bool) 
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
-    function allowance(address _owner, address _spender) 
+
+    function allowance(address _owner, address _spender)
     public
     view
-    returns (uint256) 
+    returns (uint256)
     {
         return allowed[_owner][_spender];
     }
-    
-    function increaseApproval(address _spender, uint _addedValue) 
+
+    function increaseApproval(address _spender, uint _addedValue)
     public
     whenNotPaused
-    returns (bool) 
+    returns (bool)
     {
         allowed[msg.sender][_spender] = SafeMath.add(allowed[msg.sender][_spender], _addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    function decreaseApproval(address _spender, uint _subtractedValue) 
+
+    function decreaseApproval(address _spender, uint _subtractedValue)
     public
     whenNotPaused
-    returns (bool) 
+    returns (bool)
     {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -345,19 +345,19 @@ contract SRATOKEN is ERC223Interface, Pausable {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    function distributeAirdrop(address[] addresses, uint256 amount) 
+
+    function distributeAirdrop(address[] addresses, uint256 amount)
     public
-    returns (bool seccess) 
+    returns (bool seccess)
     {
         require(amount > 0);
         require(addresses.length > 0);
         require(!frozenAccount[msg.sender]);
-        
+
         uint256 totalAmount = amount.mul(addresses.length);
         require(balances[msg.sender] >= totalAmount);
         bytes memory empty;
-        
+
         for (uint i = 0; i < addresses.length; i++) {
             require(addresses[i] != address(0));
             require(!frozenAccount[addresses[i]]);
@@ -365,27 +365,27 @@ contract SRATOKEN is ERC223Interface, Pausable {
             emit Transfer(msg.sender, addresses[i], amount, empty);
         }
         balances[msg.sender] = balances[msg.sender].sub(totalAmount);
-        
+
         return true;
     }
-    
-    function distributeAirdrop(address[] addresses, uint256[] amounts) 
+
+    function distributeAirdrop(address[] addresses, uint256[] amounts)
     public returns (bool) {
         require(addresses.length > 0);
         require(addresses.length == amounts.length);
         require(!frozenAccount[msg.sender]);
-        
+
         uint256 totalAmount = 0;
-        
+
         for(uint i = 0; i < addresses.length; i++){
             require(amounts[i] > 0);
             require(addresses[i] != address(0));
             require(!frozenAccount[addresses[i]]);
-            
+
             totalAmount = totalAmount.add(amounts[i]);
         }
         require(balances[msg.sender] >= totalAmount);
-        
+
         bytes memory empty;
         for (i = 0; i < addresses.length; i++) {
             balances[addresses[i]] = balances[addresses[i]].add(amounts[i]);
@@ -394,25 +394,25 @@ contract SRATOKEN is ERC223Interface, Pausable {
         balances[msg.sender] = balances[msg.sender].sub(totalAmount);
         return true;
     }
-    
+
     /**
      * @dev Function to collect tokens from the list of addresses
      */
-    function collectTokens(address[] addresses, uint256[] amounts) 
+    function collectTokens(address[] addresses, uint256[] amounts)
     public
-    onlyOwner 
+    onlyOwner
     returns (bool) {
         require(addresses.length > 0);
         require(addresses.length == amounts.length);
 
         uint256 totalAmount = 0;
         bytes memory empty;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0);
             require(addresses[j] != address(0));
             require(!frozenAccount[addresses[j]]);
-                    
+
             require(balances[addresses[j]] >= amounts[j]);
             balances[addresses[j]] = balances[addresses[j]].sub(amounts[j]);
             totalAmount = totalAmount.add(amounts[j]);
@@ -421,4 +421,12 @@ contract SRATOKEN is ERC223Interface, Pausable {
         balances[msg.sender] = balances[msg.sender].add(totalAmount);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

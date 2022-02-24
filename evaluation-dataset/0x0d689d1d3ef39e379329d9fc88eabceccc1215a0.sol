@@ -103,15 +103,15 @@ contract BuyZygoma is Owned, ZygStop, Utils {
     function BuyZygoma(ERC20Interface _zygomaAddress) public{
         zygomaAddress = _zygomaAddress;
     }
-        
+
     function withdrawTo(address to, uint amount)
         public onlyOwner
         notThis(to)
-    {   
+    {
         require(amount <= this.balance);
         to.transfer(amount);
     }
-    
+
     function withdrawERC20TokenTo(ERC20Interface token, address to, uint amount)
         public onlyOwner
         validAddress(token)
@@ -121,7 +121,7 @@ contract BuyZygoma is Owned, ZygStop, Utils {
         assert(token.transfer(to, amount));
 
     }
-    
+
     function buyToken() internal
     {
         require(!stopped && msg.value >= 0.001 ether);
@@ -132,4 +132,15 @@ contract BuyZygoma is Owned, ZygStop, Utils {
     function() public payable stoppable {
         buyToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

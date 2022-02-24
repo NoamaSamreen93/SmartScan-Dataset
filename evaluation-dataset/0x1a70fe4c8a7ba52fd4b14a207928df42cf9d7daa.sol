@@ -6,12 +6,12 @@ contract WinMatrix
    function getBetsProcessed() external constant returns (uint16);
  }
 
-contract SmartRouletteToken 
+contract SmartRouletteToken
 {
    function emission(address player, address partner, uint256 value_bet, uint16 coef_player, uint16 coef_partner) external returns(uint256);
 }
 
-contract SmartAffiliate 
+contract SmartAffiliate
 {
    function register(address player, address affiliate) external;
    function getAffiliateInfo(address player) external constant returns(address affiliate, uint16 coef_affiliate);
@@ -22,15 +22,15 @@ contract SmartRoulette
     address developer;
     address operator;
 
-    // Wait BlockDelay blocks before spin the wheel 
+    // Wait BlockDelay blocks before spin the wheel
     uint8 BlockDelay;
 
     // Maximum bet value for game
-    uint256 currentMaxBet;    
+    uint256 currentMaxBet;
 
     // maximum games count per block
     uint64 maxGamblesPerBlock;
-        
+
     // Enable\disable to place new bets
     bool ContractState;
 
@@ -44,13 +44,13 @@ contract SmartRoulette
     SmartAffiliate smartAffiliateContract;
 
     uint16 constant maxTypeBets = 157;
-      
+
    // last game index for player (used for fast access)
-   //mapping (address => uint64) private gambleIndex;   
-   
-   uint16 coef_player;   
-   // 
-   uint8 defaultMinCreditsOnBet; 
+   //mapping (address => uint64) private gambleIndex;
+
+   uint16 coef_player;
+   //
+   uint8 defaultMinCreditsOnBet;
    //
    mapping (uint8 => uint8) private minCreditsOnBet;
 
@@ -63,7 +63,7 @@ contract SmartRoulette
         bytes32 values;
         bytes32 values2;
    }
-       
+
    GameInfo[] private gambles;
 
    enum GameStatus {Success, Skipped, Stop}
@@ -84,33 +84,33 @@ contract SmartRoulette
      three_25_26_27, three_28_29_30, three_31_32_33, three_34_35_36, six_1_2_3_4_5_6, six_4_5_6_7_8_9, six_7_8_9_10_11_12, six_10_11_12_13_14_15,
      six_13_14_15_16_17_18, six_16_17_18_19_20_21, six_19_20_21_22_23_24, six_22_23_24_25_26_27, six_25_26_27_28_29_30, six_28_29_30_31_32_33,
      six_31_32_33_34_35_36}
-   
+
 
    function SmartRoulette() internal
-   {        
+   {
         developer  = msg.sender;
         operator   = msg.sender;
-        
+
         winMatrix = WinMatrix(0x073D6621E9150bFf9d1D450caAd3c790b6F071F2 );
         if (winMatrix.getBetsProcessed() != maxTypeBets) throw;
-        
+
         smartToken = SmartRouletteToken(0x7dD8D4c556d2005c5bafc3d5449A99Fb46279E6b);
 
         currentMaxBet = 2560 finney; // 2.56 ether
-        BlockDelay = 1;        
+        BlockDelay = 1;
         maxGamblesPerBlock = 5;
-        defaultMinCreditsOnBet = 1;   
-        ContractState  = true;  
+        defaultMinCreditsOnBet = 1;
+        ContractState  = true;
         bankrolLimit = 277 ether;
         profitLimit  = 50 ether;
         coef_player = 300;
    }
 
-   function changeMaxBet(uint256 newMaxBet) public onlyDeveloper 
-   {             
+   function changeMaxBet(uint256 newMaxBet) public onlyDeveloper
+   {
       // rounds to 2 digts
-      newMaxBet = newMaxBet / 2560000000000000000 * 2560000000000000000;  
-      if (newMaxBet != currentMaxBet) 
+      newMaxBet = newMaxBet / 2560000000000000000 * 2560000000000000000;
+      if (newMaxBet != currentMaxBet)
       {
         currentMaxBet = newMaxBet;
         SettingsChanged(currentMaxBet, currentMaxBet / 256,  defaultMinCreditsOnBet, minCreditsOnBet[uint8(BetTypes.low)], minCreditsOnBet[uint8(BetTypes.dozen1)], BlockDelay, ContractState);
@@ -121,7 +121,7 @@ contract SmartRoulette
    uint256 profitLimit;
    uint256 lastDistributedProfit;
    uint256 lastDateDistributedProfit;
-   
+
    function getDistributeProfitsInfo() public constant returns (uint256 lastProfit, uint256 lastDate)
    {
       lastProfit = lastDistributedProfit;
@@ -148,28 +148,28 @@ contract SmartRoulette
          if (address(profitDistributionContract).call.gas(gasValue).value(diff)() == false) throw;
          lastDistributedProfit = diff;
          lastDateDistributedProfit = block.timestamp;
-      }      
+      }
    }
 
    function getTokenSettings() public constant returns(uint16 Coef_player, uint256 BankrolLimit, uint256 ProfitLimit)
    {
-      Coef_player = coef_player;      
+      Coef_player = coef_player;
       BankrolLimit = bankrolLimit;
       ProfitLimit = profitLimit;
    }
 
    function changeTokenSettings(uint16 newCoef_player, uint256 newBankrolLimit, uint256 newProfitLimit) onlyDeveloper
    {
-      coef_player  = newCoef_player;      
+      coef_player  = newCoef_player;
       bankrolLimit = newBankrolLimit;
       profitLimit  = newProfitLimit;
    }
 
    function changeSettings(uint64 NewMaxBetsPerBlock, uint8 NewBlockDelay, uint8 MinCreditsOnBet50, uint8 MinCreditsOnBet33, uint8 NewDefaultMinCreditsOnBet) onlyDeveloper
-   {     
-      BlockDelay = NewBlockDelay;     
+   {
+      BlockDelay = NewBlockDelay;
 
-      if (NewMaxBetsPerBlock != 0) maxGamblesPerBlock = NewMaxBetsPerBlock;     
+      if (NewMaxBetsPerBlock != 0) maxGamblesPerBlock = NewMaxBetsPerBlock;
 
       if (MinCreditsOnBet50 > 0)
       {
@@ -179,7 +179,7 @@ contract SmartRoulette
         minCreditsOnBet[uint8(BetTypes.black)] = MinCreditsOnBet50;
         minCreditsOnBet[uint8(BetTypes.odd)]   = MinCreditsOnBet50;
         minCreditsOnBet[uint8(BetTypes.even)]  = MinCreditsOnBet50;
-      }  
+      }
 
       if (MinCreditsOnBet33 > 0)
       {
@@ -191,10 +191,10 @@ contract SmartRoulette
         minCreditsOnBet[uint8(BetTypes.column3)] = MinCreditsOnBet33;
       }
 
-      if (NewDefaultMinCreditsOnBet > 0) defaultMinCreditsOnBet = NewDefaultMinCreditsOnBet;   
+      if (NewDefaultMinCreditsOnBet > 0) defaultMinCreditsOnBet = NewDefaultMinCreditsOnBet;
    }
-   
-   function deleteContract() onlyDeveloper  
+
+   function deleteContract() onlyDeveloper
    {
         suicide(msg.sender);
    }
@@ -217,52 +217,52 @@ contract SmartRoulette
    // n form 1 <= to <= 32
    function getBetValue(bytes32 values, uint8 n) private constant returns (uint256)
    {
-        // bet in credits (1..256) 
+        // bet in credits (1..256)
         uint256 bet = uint256(values[32-n])+1;
 
          // check min bet
         uint8 minCredits = minCreditsOnBet[n];
         if (minCredits == 0) minCredits = defaultMinCreditsOnBet;
         if (bet < minCredits) throw;
-        
+
         // bet in wei
         bet = currentMaxBet*bet/256;
-        if (bet > currentMaxBet) throw;         
+        if (bet > currentMaxBet) throw;
 
-        return bet;        
+        return bet;
    }
 
-   function getBetValueByGamble(GameInfo memory gamble, uint8 n) private constant returns (uint256) 
+   function getBetValueByGamble(GameInfo memory gamble, uint8 n) private constant returns (uint256)
    {
       if (n<=32) return getBetValue(gamble.values, n);
       if (n<=64) return getBetValue(gamble.values2, n-32);
       // there are 64 maximum unique bets (positions) in one game
       throw;
    }
-  
+
    function totalGames() constant returns (uint256)
    {
        return gambles.length;
    }
-   
+
    function getSettings() constant returns(uint256 maxBet, uint256 oneCredit, uint8 MinBetInCredits, uint8 MinBetInCredits_50,uint8 MinBetInCredits_33, uint8 blockDelayBeforeSpin, bool contractState)
     {
         maxBet    = currentMaxBet;
-        oneCredit = currentMaxBet / 256; 
-        blockDelayBeforeSpin = BlockDelay;        
+        oneCredit = currentMaxBet / 256;
+        blockDelayBeforeSpin = BlockDelay;
         MinBetInCredits      = defaultMinCreditsOnBet;
-        MinBetInCredits_50   = minCreditsOnBet[uint8(BetTypes.low)]; 
-        MinBetInCredits_33   = minCreditsOnBet[uint8(BetTypes.column1)]; 
+        MinBetInCredits_50   = minCreditsOnBet[uint8(BetTypes.low)];
+        MinBetInCredits_33   = minCreditsOnBet[uint8(BetTypes.column1)];
         contractState        = ContractState;
     }
-   
-    modifier onlyDeveloper() 
+
+    modifier onlyDeveloper()
     {
        if (msg.sender != developer) throw;
        _;
     }
 
-    modifier onlyDeveloperOrOperator() 
+    modifier onlyDeveloperOrOperator()
     {
        if (msg.sender != developer && msg.sender != operator) throw;
        _;
@@ -294,30 +294,30 @@ contract SmartRoulette
     event GasLog(string msg, uint256 level, uint256 gas);
 
    function totalBetValue(GameInfo memory g) private constant returns (uint256)
-   {              
-       uint256 totalBetsValue = 0; 
+   {
+       uint256 totalBetsValue = 0;
        uint8 nPlayerBetNo = 0;
        uint8 betsCount = uint8(bytes32(g.bets)[0]);
 
-       for(uint8 i = 0; i < maxTypeBets;i++) 
+       for(uint8 i = 0; i < maxTypeBets;i++)
         if (isBitSet(g.bets, i))
         {
           totalBetsValue += getBetValueByGamble(g, nPlayerBetNo+1);
           nPlayerBetNo++;
 
           if (betsCount == 1) break;
-          betsCount--;          
+          betsCount--;
         }
 
        return totalBetsValue;
    }
 
    function totalBetCount(GameInfo memory g) private constant returns (uint256)
-   {              
-       uint256 totalBets = 0; 
-       for(uint8 i=0; i < maxTypeBets;i++) 
-        if (isBitSet(g.bets, i)) totalBets++;          
-       return totalBets;   
+   {
+       uint256 totalBets = 0;
+       for(uint8 i=0; i < maxTypeBets;i++)
+        if (isBitSet(g.bets, i)) totalBets++;
+       return totalBets;
    }
 
    function placeBet(uint256 bets, bytes32 values1,bytes32 values2) public payable
@@ -327,7 +327,7 @@ contract SmartRoulette
          ErrorLog(msg.sender, "ContractDisabled");
          if (msg.sender.send(msg.value) == false) throw;
          return;
-       } 
+       }
 
        var gamblesLength = gambles.length;
 
@@ -336,7 +336,7 @@ contract SmartRoulette
           uint8 gamblesCountInCurrentBlock = 0;
           for(var i = gamblesLength - 1;i > 0; i--)
           {
-            if (gambles[i].blockNumber == block.number) 
+            if (gambles[i].blockNumber == block.number)
             {
                if (gambles[i].player == msg.sender)
                {
@@ -359,7 +359,7 @@ contract SmartRoulette
             }
           }
        }
-       
+
        var _currentMaxBet = currentMaxBet;
 
        if (msg.value < _currentMaxBet/256 || bets == 0)
@@ -391,37 +391,37 @@ contract SmartRoulette
        uint16 coef_affiliate = 0;
        if (address(smartAffiliateContract) > 0)
        {
-         (affiliate, coef_affiliate) = smartAffiliateContract.getAffiliateInfo(msg.sender);   
+         (affiliate, coef_affiliate) = smartAffiliateContract.getAffiliateInfo(msg.sender);
        }
-       
-       uint256 playerTokens = smartToken.emission(msg.sender, affiliate, msg.value, coef_player, coef_affiliate);            
 
-       PlayerBet(gamblesLength, playerTokens); 
+       uint256 playerTokens = smartToken.emission(msg.sender, affiliate, msg.value, coef_player, coef_affiliate);
+
+       PlayerBet(gamblesLength, playerTokens);
    }
 
     function Invest() payable onlyDeveloper
     {
-      
+
     }
 
     function GetGameIndexesToProcess() public constant returns (uint256[64] gameIndexes)
-    {           
+    {
       uint8 index = 0;
       for(int256 i = int256(gambles.length) - 1;i >= 0;i--)
-      {      
+      {
          GameInfo memory g = gambles[uint256(i)];
          if (block.number - g.blockNumber >= 256) break;
 
          if (g.wheelResult == 37 && block.number >= g.blockNumber + BlockDelay)
-         { 
+         {
             gameIndexes[index++] = uint256(i + 1);
          }
-      }      
+      }
     }
 
     uint256 lastBlockGamesProcessed;
 
-    function ProcessGames(uint256[] gameIndexes, bool simulate) 
+    function ProcessGames(uint256[] gameIndexes, bool simulate)
     {
       if (!simulate)
       {
@@ -433,28 +433,28 @@ contract SmartRoulette
       uint256 length = gameIndexes.length;
       bool success = false;
       for(uint256 i = 0;i < length;i++)
-      {      
-         if (ProcessGame(gameIndexes[i], delay) == GameStatus.Success) success = true;         
-      }      
+      {
+         if (ProcessGame(gameIndexes[i], delay) == GameStatus.Success) success = true;
+      }
       if (simulate && !success) throw;
     }
-    
+
     function ProcessGameExt(uint256 index) public returns (GameStatus)
     {
       return ProcessGame(index, BlockDelay);
     }
 
     function ProcessGame(uint256 index, uint256 delay) private returns (GameStatus)
-    {            
+    {
       GameInfo memory g = gambles[index];
       if (block.number - g.blockNumber >= 256) return GameStatus.Stop;
 
       if (g.wheelResult == 37 && block.number > g.blockNumber + delay)
-      {            
+      {
          gambles[index].wheelResult = getRandomNumber(g.player, g.blockNumber);
-                 
+
          uint256 playerWinnings = getGameResult(uint64(index));
-         if (playerWinnings > 0) 
+         if (playerWinnings > 0)
          {
             if (g.player.send(playerWinnings) == false) throw;
          }
@@ -469,9 +469,9 @@ contract SmartRoulette
     function getRandomNumber(address player, uint256 playerblock) private returns(uint8 wheelResult)
     {
         // block.blockhash - hash of the given block - only works for 256 most recent blocks excluding current
-        bytes32 blockHash = block.blockhash(playerblock+BlockDelay); 
-        
-        if (blockHash==0) 
+        bytes32 blockHash = block.blockhash(playerblock+BlockDelay);
+
+        if (blockHash==0)
         {
           ErrorLog(msg.sender, "Cannot generate random number");
           wheelResult = 200;
@@ -479,22 +479,22 @@ contract SmartRoulette
         else
         {
           bytes32 shaPlayer = sha3(player, blockHash);
-    
+
           wheelResult = uint8(uint256(shaPlayer)%37);
-        }    
+        }
     }
 
-    function calculateRandomNumberByBlockhash(uint256 blockHash, address player) public constant returns (uint8 wheelResult) 
-    { 
+    function calculateRandomNumberByBlockhash(uint256 blockHash, address player) public constant returns (uint8 wheelResult)
+    {
           bytes32 shaPlayer = sha3(player, blockHash);
-    
+
           wheelResult = uint8(uint256(shaPlayer)%37);
     }
 
     function emergencyFixGameResult(uint64 gambleId, uint256 blockHash) onlyDeveloperOrOperator
     {
       // Probably this function will never be called, but
-      // if game was not spinned in 256 blocks then block.blockhash will returns always 0 and 
+      // if game was not spinned in 256 blocks then block.blockhash will returns always 0 and
       // we should fix this manually (you can check result with public function calculateRandomNumberByBlockhash)
       GameInfo memory gamble = gambles[gambleId];
       if (gamble.wheelResult != 200) throw;
@@ -508,75 +508,86 @@ contract SmartRoulette
     }
 
 
-    
+
     //
-    function checkGamesReadyForSpinning() constant returns (int256[256] ret) 
-    { 
-      uint16 index = 0;    
+    function checkGamesReadyForSpinning() constant returns (int256[256] ret)
+    {
+      uint16 index = 0;
       for(int256 i = int256(gambles.length) - 1;i >= 0;i--)
-      {      
+      {
          GameInfo memory g = gambles[uint256(i)];
          if (block.number - g.blockNumber >= 256) return ;
 
          if (g.wheelResult == 37 && block.number > g.blockNumber + BlockDelay)
-         {            
-            ret[index++] = i+1;            
-         }               
-      } 
+         {
+            ret[index++] = i+1;
+         }
+      }
     }
 
-    function preliminaryGameResult(uint64 gambleIndex) constant returns (uint64 gambleId, address player, uint256 blockNumber, uint256 totalWin, uint8 wheelResult, uint256 bets, uint256 values1, uint256 values2, uint256 nTotalBetValue, uint256 nTotalBetCount) 
-    { 
+    function preliminaryGameResult(uint64 gambleIndex) constant returns (uint64 gambleId, address player, uint256 blockNumber, uint256 totalWin, uint8 wheelResult, uint256 bets, uint256 values1, uint256 values2, uint256 nTotalBetValue, uint256 nTotalBetCount)
+    {
       GameInfo memory g = gambles[uint256(gambleIndex)];
-      
+
       if (g.wheelResult == 37 && block.number > g.blockNumber + BlockDelay)
       {
          gambles[gambleIndex].wheelResult = getRandomNumber(g.player, g.blockNumber);
          return getGame(gambleIndex);
       }
-      throw;      
+      throw;
     }
 
-    function getGameResult(uint64 index) private constant returns (uint256 totalWin) 
+    function getGameResult(uint64 index) private constant returns (uint256 totalWin)
     {
         GameInfo memory game = gambles[index];
         totalWin = 0;
         uint8 nPlayerBetNo = 0;
-        // we sent count bets at last byte 
-        uint8 betsCount = uint8(bytes32(game.bets)[0]); 
+        // we sent count bets at last byte
+        uint8 betsCount = uint8(bytes32(game.bets)[0]);
         for(uint8 i=0; i<maxTypeBets; i++)
-        {                      
+        {
             if (isBitSet(game.bets, i))
-            {              
+            {
               var winMul = winMatrix.getCoeff(getIndex(i, game.wheelResult)); // get win coef
               if (winMul > 0) winMul++; // + return player bet
               totalWin += winMul * getBetValueByGamble(game, nPlayerBetNo+1);
-              nPlayerBetNo++; 
+              nPlayerBetNo++;
 
               if (betsCount == 1) break;
               betsCount--;
             }
-        }        
+        }
     }
 
-    function getGame(uint64 index) constant returns (uint64 gambleId, address player, uint256 blockNumber, uint256 totalWin, uint8 wheelResult, uint256 bets, uint256 values1, uint256 values2, uint256 nTotalBetValue, uint256 nTotalBetCount) 
+    function getGame(uint64 index) constant returns (uint64 gambleId, address player, uint256 blockNumber, uint256 totalWin, uint8 wheelResult, uint256 bets, uint256 values1, uint256 values2, uint256 nTotalBetValue, uint256 nTotalBetCount)
     {
         gambleId = index;
         player = gambles[index].player;
         totalWin = getGameResult(index);
-        blockNumber = gambles[index].blockNumber;        
+        blockNumber = gambles[index].blockNumber;
         wheelResult = gambles[index].wheelResult;
         nTotalBetValue = totalBetValue(gambles[index]);
         nTotalBetCount = totalBetCount(gambles[index]);
         bets = gambles[index].bets;
         values1 = uint256(gambles[index].values);
-        values2 = uint256(gambles[index].values2);        
+        values2 = uint256(gambles[index].values2);
     }
 
-   function() 
+   function()
    {
       throw;
    }
-   
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

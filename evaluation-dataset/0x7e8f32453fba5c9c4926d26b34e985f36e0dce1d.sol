@@ -19,7 +19,7 @@ contract Wolker {
       throw;
     }
   }
-  
+
   /// @param _from The address of the sender
   /// @param _to The address of the recipient
   /// @param _value The amount of token to be transferred
@@ -36,12 +36,12 @@ contract Wolker {
       throw;
     }
   }
- 
+
   /// @return total amount of tokens
   function totalSupply() external constant returns (uint256) {
         return generalTokens + reservedTokens;
   }
- 
+
   /// @param _owner The address from which the balance will be retrieved
   /// @return The balance
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -67,7 +67,7 @@ contract Wolker {
     return true;
   }
 
-  /// @param _trustee_to_remove Revoke trustee's permission on settle media spend 
+  /// @param _trustee_to_remove Revoke trustee's permission on settle media spend
   /// @return Whether the deauthorization was successful or not
   function deauthorize(address _trustee_to_remove) returns (bool success) {
     authorized[msg.sender][_trustee_to_remove] = false;
@@ -77,7 +77,7 @@ contract Wolker {
 
   // @param _owner
   // @param _trustee
-  // @return authorization_status for platform settlement 
+  // @return authorization_status for platform settlement
   function check_authorization(address _owner, address _trustee) constant returns (bool authorization_status) {
     return authorized[_owner][_trustee];
   }
@@ -123,22 +123,22 @@ contract Wolker {
   uint256 public constant tokenCreationMax = 100 * 10**5 * 10**decimals; // 1000 Wolk Max
   uint256 public constant tokenExchangeRate = 10000;   // 10000 Wolk per 1 ETH
   uint256 public generalTokens = wolkFund; // tokens in circulation
-  uint256 public reservedTokens; 
+  uint256 public reservedTokens;
 
   //address public owner = msg.sender;
   address public owner = 0xC28dA4d42866758d0Fc49a5A3948A1f43de491e9; // Urmi
   address public multisig_owner = 0x6968a9b90245cB9bD2506B9460e3D13ED4B2FD1e; // new multi-sig
 
   bool public isFinalized = false;          // after token sale success, this is true
-  uint public constant dust = 1000000 wei; 
+  uint public constant dust = 1000000 wei;
   bool public fairsale_protection = true;
 
-  
+
      // Actual crowdsale
   uint256 public start_block;                // Starting block
   uint256 public end_block;                  // Ending block
-  uint256 public unlockedAt;                 // Unlocking block 
- 
+  uint256 public unlockedAt;                 // Unlocking block
+
   uint256 public end_ts;                     // Unix End time
 
 
@@ -151,7 +151,7 @@ contract Wolker {
 
 
   //**** Constructor:
-  function Wolk() 
+  function Wolk()
   {
     if ( msg.sender != owner ) throw;
     // Actual crowdsale
@@ -168,8 +168,8 @@ contract Wolker {
     allocations[0x9D203A36cd61b21B7C8c7Da1d8eeB13f04bb24D9] = 2;  // Michael - Test
     allocations[0x5fcf700654B8062B709a41527FAfCda367daE7b1] = 1;  // Michael - Main
     allocations[0xC28dA4d42866758d0Fc49a5A3948A1f43de491e9] = 1;  // Urmi
-    
-    CreateWolk(owner, wolkFund); 
+
+    CreateWolk(owner, wolkFund);
   }
 
   // ****** VESTING SUPPORT
@@ -180,7 +180,7 @@ contract Wolker {
     if (vested < 0 ) throw; // Will fail if allocation (and therefore toTransfer) is 0.
     allocations[msg.sender] = 0;
     reservedTokens = safeSub(reservedTokens, vested);
-    balances[msg.sender] = safeAdd(balances[msg.sender], vested); 
+    balances[msg.sender] = safeAdd(balances[msg.sender], vested);
     Vested(msg.sender, vested);
   }
 
@@ -191,23 +191,23 @@ contract Wolker {
     if (block.number < start_block) throw;
     if (block.number > end_block) throw;
     if (msg.value <= dust) throw;
-    if (tx.gasprice > 0.46 szabo && fairsale_protection) throw; 
-    if (msg.value > 4 ether && fairsale_protection) throw; 
+    if (tx.gasprice > 0.46 szabo && fairsale_protection) throw;
+    if (msg.value > 4 ether && fairsale_protection) throw;
 
     uint256 tokens = safeMul(msg.value, tokenExchangeRate); // check that we're not over totals
     uint256 checkedSupply = safeAdd(generalTokens, tokens);
     if ( checkedSupply > tokenCreationMax) throw; // they need to get their money back if something goes wrong
-    
+
       generalTokens = checkedSupply;
       balances[msg.sender] = safeAdd(balances[msg.sender], tokens);   // safeAdd not needed; bad semantics to use here
       CreateWolk(msg.sender, tokens); // logs token creation
-    
+
   }
-  
+
   // The value of the message must be sufficiently large to not be considered dust.
   //modifier is_not_dust { if (msg.value < dust) throw; _; }
 
-  // Disabling fairsale protection  
+  // Disabling fairsale protection
   function fairsale_protectionOFF() external {
     if ( block.number - start_block < 200) throw; // fairsale window is strictly enforced
     if ( msg.sender != owner ) throw;
@@ -220,23 +220,23 @@ contract Wolker {
     if ( isFinalized ) throw;
     if ( msg.sender != owner ) throw;  // locks finalize to ETH owner
     if ( generalTokens < tokenCreationMin ) throw; // have to sell tokenCreationMin to finalize
-    if ( block.number < end_block ) throw;  
+    if ( block.number < end_block ) throw;
     isFinalized = true;
     end_ts = now;
     unlockedAt = end_ts + 2 minutes;
     if ( ! multisig_owner.send(this.balance) ) throw;
   }
 
-	function withdraw() onlyOwner{ 		
-		if (this.balance == 0) throw;				
-		if (generalTokens < tokenCreationMin) throw;	
+	function withdraw() onlyOwner{
+		if (this.balance == 0) throw;
+		if (generalTokens < tokenCreationMin) throw;
         if ( ! multisig_owner.send(this.balance) ) throw;
  }
-	
+
   function refund() external {
-    if ( isFinalized ) throw; 
-    if ( block.number < end_block ) throw;   
-    if ( generalTokens >= tokenCreationMin ) throw;  
+    if ( isFinalized ) throw;
+    if ( block.number < end_block ) throw;
+    if ( generalTokens >= tokenCreationMin ) throw;
     if ( msg.sender == owner ) throw;
     uint256 Val = balances[msg.sender];
     balances[msg.sender] = 0;
@@ -245,7 +245,7 @@ contract Wolker {
     LogRefund(msg.sender, ethVal);
     if ( ! msg.sender.send(ethVal) ) throw;
   }
-    
+
   // ****** Platform Settlement
   function settleFrom(address _from, address _to, uint256 _value) isOperational() external returns (bool success) {
     var _allowance = allowed[_from][msg.sender];
@@ -272,7 +272,7 @@ contract Wolker {
     assert(msg.sender == minter_address);
     _;
   }
-  
+
   address public minter_address = owner;
 
   function mintTokens(uint reward_tok, address recipient) external payable only_minter
@@ -282,31 +282,31 @@ contract Wolker {
     MintEvent(reward_tok, recipient);
   }
 
-  function changeMintingAddress(address newAddress) onlyOwner returns (bool success) { 
-    minter_address = newAddress; 
+  function changeMintingAddress(address newAddress) onlyOwner returns (bool success) {
+    minter_address = newAddress;
     return true;
   }
 
-  
+
   //**** SafeMath:
   function safeMul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
   function safeDiv(uint a, uint b) internal returns (uint) {
     assert(b > 0);
     uint c = a / b;
     assert(a == b * c + a % b);
     return c;
   }
-  
+
   function safeSub(uint a, uint b) internal returns (uint) {
     assert(b <= a);
     return a - b;
   }
-  
+
   function safeAdd(uint a, uint b) internal returns (uint) {
     uint c = a + b;
     assert(c>=a && c>=b);
@@ -316,4 +316,15 @@ contract Wolker {
   function assert(bool assertion) internal {
     if (!assertion) throw;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -439,7 +439,7 @@ contract DetailedERC20 is ERC20 {
 
 
 
-contract Kawanggawa is StandardToken, PausableToken 
+contract Kawanggawa is StandardToken, PausableToken
 {
     string public constant name = "Kawanggawa";
     string public constant symbol = "KGWA";
@@ -455,4 +455,15 @@ contract Kawanggawa is StandardToken, PausableToken
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

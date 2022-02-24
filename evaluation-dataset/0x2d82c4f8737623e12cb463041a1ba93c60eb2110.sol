@@ -166,8 +166,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -974,7 +974,7 @@ contract CustomWhitelist is CustomPausable {
         emit WhitelistRemoved(_accounts[i]);
       }
     }
-    
+
     return true;
   }
 
@@ -1005,9 +1005,9 @@ contract TokenSale is CappedCrowdsale, FinalizableCrowdsale, CustomWhitelist {
     IERC20 _token,
     uint256 _bonus,
     uint256 _cap)
-  public 
-  TimedCrowdsale(_openingTime, _closingTime) 
-  CappedCrowdsale(_cap) 
+  public
+  TimedCrowdsale(_openingTime, _closingTime)
+  CappedCrowdsale(_cap)
   Crowdsale(_rate, _wallet, _token) {
     require(_bonus > 0, "Bonus must be greater than 0");
     bonus = _bonus;
@@ -1060,7 +1060,7 @@ contract TokenSale is CappedCrowdsale, FinalizableCrowdsale, CustomWhitelist {
   ///@notice This is called before determining the token amount.
   ///@param _beneficiary Contributing address of ETH
   ///@param _weiAmount ETH contribution
-  function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) 
+  function _preValidatePurchase(address _beneficiary, uint256 _weiAmount)
   internal view whenNotPaused ifWhitelisted(_beneficiary) {
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
@@ -1078,4 +1078,15 @@ contract TokenSale is CappedCrowdsale, FinalizableCrowdsale, CustomWhitelist {
   function _forwardFunds() internal {
     //nothing to do here
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

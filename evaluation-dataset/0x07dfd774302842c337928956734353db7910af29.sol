@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -226,24 +226,24 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract Articoin is MintableToken {
-    
+
     string public constant name = "articoin";
-    
+
     string public constant symbol = "ARTN";
-    
+
     uint32 public constant decimals = 4;
-    
+
 }
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address public multisig;
 
     uint public restrictedPercent;
@@ -253,15 +253,15 @@ contract Crowdsale is Ownable {
     Articoin public token = new Articoin();
 
     uint public start;
-    
+
     uint public period;
 
     uint public hardcap;
 
     uint public rate;
-    
+
     uint public softcap;
-    
+
     mapping(address => uint) public balances;
 
     function Crowdsale() public {
@@ -279,7 +279,7 @@ contract Crowdsale is Ownable {
       require(now > start && now < start + period * 1 days);
       _;
     }
-  
+
     modifier isUnderHardCap() {
       require(multisig.balance <= hardcap);
       _;
@@ -287,9 +287,9 @@ contract Crowdsale is Ownable {
 
     function refund() public {
       require(this.balance < softcap && now > start + period * 1 days);
-      uint value = balances[msg.sender]; 
-      balances[msg.sender] = 0; 
-      msg.sender.transfer(value); 
+      uint value = balances[msg.sender];
+      balances[msg.sender] = 0;
+      msg.sender.transfer(value);
     }
 
     function finishMinting() public onlyOwner {
@@ -316,9 +316,20 @@ contract Crowdsale is Ownable {
       token.mint(msg.sender, tokens);
       balances[msg.sender] = balances[msg.sender].add(msg.value);
     }
-    
+
     function() external payable {
-      createTokens(); 
+      createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -199,7 +199,7 @@ contract Whitelist is Ownable{
         emit AddPartner(partner, partners_counter);
         partners_counter++;
     }
-    
+
     constructor () public {
         _add_partner(msg.sender);
     }
@@ -319,7 +319,7 @@ contract Periods is Ownable{
         return _periods[period];
     }
 
-    
+
     function setCurrentPeriod(uint16 period) public onlyOwner returns (bool){
         require(period < _total_periods, "Do not have timestamp for that period");
         _current_period = period;
@@ -602,7 +602,7 @@ contract Subscriptions is Ownable, Periods {
     function _partners_redeem(uint256 partners_subscriber_id, uint256 subscriber_id, uint256 subscription_id, uint256 amount ) private returns(bool){
 
         Subscription memory subscription = _subscriptions[_subscribers_subscriptions[subscriber_id][subscription_id]];
-        Subscription storage partners_subscription = _subscriptions[_subscribers_subscriptions_by_period[partners_subscriber_id][subscription.period]]; 
+        Subscription storage partners_subscription = _subscriptions[_subscribers_subscriptions_by_period[partners_subscriber_id][subscription.period]];
 
         uint256 redemption_total = amount.mul(subscription.certificate_partners_rate);
         partners_subscription.redemption = partners_subscription.redemption.add( redemption_total);
@@ -644,7 +644,7 @@ contract Subscriptions is Ownable, Periods {
 
     }
 
- 
+
 
 
     function subscribe(address subscriber, uint256 amount, uint256 units, uint256 unit_rate, uint256 partner_rate) internal returns(bool){
@@ -665,7 +665,7 @@ contract Subscriptions is Ownable, Periods {
         }
         uint256 cert_rate = subscription.certificate_rate.add(pay_to_partner_rate).add(commission());
         return ( subscription_debit.sub(subscription_credit).div( floor(cert_rate, ROUNDING)) );
-    }    
+    }
 
     function _getTopupAmount(uint256 subscriber_id, uint256 subscription_id, uint256 amount) private view returns (uint256){
         Subscription memory subscription = _subscriptions[_subscribers_subscriptions[subscriber_id][subscription_id]];
@@ -1216,4 +1216,15 @@ contract Cert is Ownable, Whitelist, Subscriptions{
         token.transfer(_to, balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

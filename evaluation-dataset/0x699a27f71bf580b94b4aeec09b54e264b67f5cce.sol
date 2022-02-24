@@ -55,7 +55,7 @@ contract ERC20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract CrestToken is ERC20Interface {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -66,16 +66,16 @@ contract CrestToken is ERC20Interface {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     event Burn(address indexed burner, uint256 value);
-    
-    
+
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -88,16 +88,16 @@ contract CrestToken is ERC20Interface {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Reject when someone sends ethers to this contract
     // ------------------------------------------------------------------------
     function() public payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -135,7 +135,7 @@ contract CrestToken is ERC20Interface {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         if(tokens > 0 && spender != address(0)) {
@@ -148,7 +148,7 @@ contract CrestToken is ERC20Interface {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -173,8 +173,8 @@ contract CrestToken is ERC20Interface {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -190,8 +190,8 @@ contract CrestToken is ERC20Interface {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -212,8 +212,8 @@ contract CrestToken is ERC20Interface {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     function burn(uint256 _value) onlyOwner public {
       require(_value > 0);
       require(_value <= balances[msg.sender]);
@@ -224,4 +224,20 @@ contract CrestToken is ERC20Interface {
       emit Transfer(burner, address(0), _value);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

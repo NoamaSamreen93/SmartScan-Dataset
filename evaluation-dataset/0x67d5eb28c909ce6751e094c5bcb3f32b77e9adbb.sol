@@ -95,7 +95,7 @@ contract PullPayment {
   function withdrawPayments() {
     address payee = msg.sender;
     uint payment = payments[payee];
-    
+
     if (payment == 0) {
       throw;
     }
@@ -122,7 +122,7 @@ contract Pausable is Ownable {
     }
     _;
   }
-  
+
   modifier onlyInEmergency {
     if (!stopped) {
       throw;
@@ -149,7 +149,7 @@ contract RLC is ERC20, SafeMath, Ownable {
   string public name;       //fancy name
   string public symbol;
   uint8 public decimals;    //How many decimals to show.
-  string public version = 'v0.1'; 
+  string public version = 'v0.1';
   uint public initialSupply;
   uint public totalSupply;
   bool public locked;
@@ -175,9 +175,9 @@ contract RLC is ERC20, SafeMath, Ownable {
 
     initialSupply = 87000000000000000;
     totalSupply = initialSupply;
-    balances[msg.sender] = initialSupply;// Give the creator all initial tokens                    
-    name = 'iEx.ec Network Token';        // Set the name for display purposes     
-    symbol = 'RLC';                       // Set the symbol for display purposes  
+    balances[msg.sender] = initialSupply;// Give the creator all initial tokens
+    name = 'iEx.ec Network Token';        // Set the name for display purposes
+    symbol = 'RLC';                       // Set the symbol for display purposes
     decimals = 9;                        // Amount of decimals for display purposes
   }
 
@@ -201,7 +201,7 @@ contract RLC is ERC20, SafeMath, Ownable {
 
   function transferFrom(address _from, address _to, uint _value) onlyUnlocked returns (bool) {
     var _allowance = allowed[_from][msg.sender];
-    
+
     balances[_to] = safeAdd(balances[_to], _value);
     balances[_from] = safeSub(balances[_from], _value);
     allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -220,7 +220,7 @@ contract RLC is ERC20, SafeMath, Ownable {
   }
 
     /* Approve and then comunicate the approved contract in a single tx */
-  function approveAndCall(address _spender, uint256 _value, bytes _extraData){    
+  function approveAndCall(address _spender, uint256 _value, bytes _extraData){
       TokenSpender spender = TokenSpender(_spender);
       if (approve(_spender, _value)) {
           spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -230,7 +230,7 @@ contract RLC is ERC20, SafeMath, Ownable {
   function allowance(address _owner, address _spender) constant returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 
@@ -271,11 +271,11 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 	uint public rlc_bounty;		// amount of bounties RLC
 	uint public rlc_reserve;	// amount of the contingency reserve
-	uint public rlc_team;		// amount of the team RLC 
+	uint public rlc_team;		// amount of the team RLC
 	mapping(address => Backer) public backers; //backersETH indexed by their ETH address
 
 	modifier onlyBy(address a){
-		if (msg.sender != a) throw;  
+		if (msg.sender != a) throw;
 		_;
 	}
 
@@ -324,7 +324,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		rlc_team=12000000000000000;
 	}
 
-	/* 
+	/*
 	 * The fallback function corresponds to a donation in ETH
 	 */
 	function() payable {
@@ -332,12 +332,12 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		receiveETH(msg.sender);
 	}
 
-	/* 
+	/*
 	 * To call to start the crowdsale
 	 */
 	function start() onlyBy(owner) {
-		startBlock = now ;            
-		endBlock =  now + 30 days;    
+		startBlock = now ;
+		endBlock =  now + 30 days;
 	}
 
 	/*
@@ -346,19 +346,19 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	function receiveETH(address beneficiary) internal stopInEmergency  respectTimeFrame  {
 		if (msg.value < minInvestETH) throw;								//don't accept funding under a predefined threshold
 		uint rlcToSend = bonus(safeMul(msg.value,RLCPerETH)/(1 ether));		//compute the number of RLC to send
-		if (safeAdd(rlcToSend, safeAdd(RLCSentToETH, RLCSentToBTC)) > maxCap) throw;	
+		if (safeAdd(rlcToSend, safeAdd(RLCSentToETH, RLCSentToBTC)) > maxCap) throw;
 
 		Backer backer = backers[beneficiary];
-		if (!rlc.transfer(beneficiary, rlcToSend)) throw;     				// Do the RLC transfer right now 
+		if (!rlc.transfer(beneficiary, rlcToSend)) throw;     				// Do the RLC transfer right now
 		backer.rlcSent = safeAdd(backer.rlcSent, rlcToSend);
-		backer.weiReceived = safeAdd(backer.weiReceived, msg.value);		// Update the total wei collected during the crowdfunding for this backer    
+		backer.weiReceived = safeAdd(backer.weiReceived, msg.value);		// Update the total wei collected during the crowdfunding for this backer
 		ETHReceived = safeAdd(ETHReceived, msg.value);						// Update the total wei collected during the crowdfunding
 		RLCSentToETH = safeAdd(RLCSentToETH, rlcToSend);
 
-		emitRLC(rlcToSend);													// compute the variable part 
+		emitRLC(rlcToSend);													// compute the variable part
 		ReceivedETH(beneficiary,ETHReceived);								// send the corresponding contribution event
 	}
-	
+
 	/*
 	* receives a donation in BTC
 	*/
@@ -372,7 +372,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		}
 
 		Backer backer = backers[beneficiary];
-		if (!rlc.transfer(beneficiary, rlcToSend)) throw;							// Do the transfer right now 
+		if (!rlc.transfer(beneficiary, rlcToSend)) throw;							// Do the transfer right now
 		backer.rlcSent = safeAdd(backer.rlcSent , rlcToSend);
 		backer.btc_address = btc_address;
 		backer.satoshiReceived = safeAdd(backer.satoshiReceived, value);
@@ -402,12 +402,12 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		return amount;
 	}
 
-	/* 
+	/*
 	 * When mincap is not reach backer can call the approveAndCall function of the RLC token contract
 	 * with this crowdsale contract on parameter with all the RLC they get in order to be refund
 	 */
 	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) minCapNotReached public {
-		if (msg.sender != address(rlc)) throw; 
+		if (msg.sender != address(rlc)) throw;
 		if (_extraData.length != 0) throw;								// no extradata needed
 		if (_value != backers[_from].rlcSent) throw;					// compare value from backer balance
 		if (!rlc.transferFrom(_from, address(this), _value)) throw ;	// get the token back to the crowdsale contract
@@ -429,8 +429,8 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	function setRLCPerETH(uint rate) onlyBy(BTCproxy) {
 		RLCPerETH=rate;
 	}
-	
-	/*	
+
+	/*
 	* Finalize the crowdsale, should be called after the refund period
 	*/
 	function finalize() onlyBy(owner) {
@@ -442,7 +442,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 			if(!rlc.transfer(reserve,6000000000000000)) throw;								// max cap 6000000RLC
 			rlc_reserve = 6000000000000000;
 		} else {
-			if(!rlc.transfer(reserve,rlc_reserve)) throw;  
+			if(!rlc.transfer(reserve,rlc_reserve)) throw;
 		}
 		if (rlc_bounty > 6000000000000000){
 			if(!rlc.transfer(bounty,6000000000000000)) throw;								// max cap 6000000RLC
@@ -458,10 +458,26 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		crowdsaleClosed = true;
 	}
 
-	/*	
+	/*
 	* Failsafe drain
 	*/
 	function drain() onlyBy(owner) {
 		if (!owner.send(this.balance)) throw;
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

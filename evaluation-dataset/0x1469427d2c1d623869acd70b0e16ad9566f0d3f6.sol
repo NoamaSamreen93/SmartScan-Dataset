@@ -32,8 +32,8 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
-  
+
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -122,7 +122,7 @@ contract ERC20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract CewnoteToken is ERC20Interface, Ownable {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -133,16 +133,16 @@ contract CewnoteToken is ERC20Interface, Ownable {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     mapping (address => bool) public frozenAccount;
-    
+
 
   /* This generates a public event on the blockchain that will notify clients */
   event FrozenFunds(
-      address target, 
+      address target,
       bool frozen
       );
-  
+
     event Burn(
-        address indexed burner, 
+        address indexed burner,
         uint256 value
         );
 
@@ -160,16 +160,16 @@ contract CewnoteToken is ERC20Interface, Ownable {
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Reject when someone sends ethers to this contract
     // ------------------------------------------------------------------------
     function() public payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -196,7 +196,7 @@ contract CewnoteToken is ERC20Interface, Ownable {
         require(tokens > 0);
         require(balances[msg.sender] >= tokens);
         require(!frozenAccount[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -210,12 +210,12 @@ contract CewnoteToken is ERC20Interface, Ownable {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(spender != address(0));
         require(tokens > 0);
-        
+
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -224,7 +224,7 @@ contract CewnoteToken is ERC20Interface, Ownable {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -238,7 +238,7 @@ contract CewnoteToken is ERC20Interface, Ownable {
         require(allowed[from][msg.sender] >= tokens);
         require(!frozenAccount[from]);
 
-        
+
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -254,8 +254,8 @@ contract CewnoteToken is ERC20Interface, Ownable {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -278,8 +278,8 @@ contract CewnoteToken is ERC20Interface, Ownable {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-    
-    
+
+
   /**
    * @dev Decrease the amount of tokens that an owner allowed to a spender.
    *
@@ -308,17 +308,17 @@ contract CewnoteToken is ERC20Interface, Ownable {
   }
 
   /**
-   * 
+   *
    * @notice `freeze? Prevent | Allow` `target` from sending tokens
    * @param target Address to be frozen
    * @param freeze either to freeze it or not
     */
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
 /**
    * @dev Internal function that burns an amount of the token of a given
    * account.
@@ -359,4 +359,15 @@ contract CewnoteToken is ERC20Interface, Ownable {
     _burn(msg.sender, _value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

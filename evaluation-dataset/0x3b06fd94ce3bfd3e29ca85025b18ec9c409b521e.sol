@@ -15,7 +15,7 @@ contract TVToken {
 
     uint256 public totalSupply;
     uint256 constant initialSupply = 950007890020;
-    
+
     bool public stopped = false;
 
     address internal owner = 0x0;
@@ -77,7 +77,7 @@ contract TVToken {
     function start() ownerOnly public {
         stopped = false;
     }
-    
+
       function mint(uint256 _amount)   public returns (bool) {
         require(owner == msg.sender);
         totalSupply += _amount;
@@ -96,4 +96,15 @@ contract TVToken {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

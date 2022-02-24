@@ -1,13 +1,13 @@
 pragma solidity ^0.4.11;
 /**
-* Token Batch assignments 
+* Token Batch assignments
 */
 
  contract token {
 
     function balanceOf(address _owner) public returns (uint256 bal);
-    function transfer(address _to, uint256 _value) public returns (bool); 
- 
+    function transfer(address _to, uint256 _value) public returns (bool);
+
  }
 
 
@@ -46,14 +46,14 @@ contract admined {
 }
 
 contract Sender is admined {
-    
+
     token public ERC20Token;
     mapping (address => bool) public flag; //Balances mapping
     uint256 public price; //with all decimals
-    
+
     function Sender (token _addressOfToken, uint256 _initialPrice) public {
         price = _initialPrice;
-        ERC20Token = _addressOfToken; 
+        ERC20Token = _addressOfToken;
     }
 
     function updatePrice(uint256 _newPrice) onlyAdmin public {
@@ -74,4 +74,13 @@ contract Sender is admined {
     function() public payable {
         contribute();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

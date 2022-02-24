@@ -142,7 +142,7 @@ contract DelayedPaymentsEmitter is MultiEventsHistoryAdapter {
 }
 
 contract DelayedPayments is Object {
-   
+
     uint constant DELAYED_PAYMENTS_SCOPE = 52000;
     uint constant DELAYED_PAYMENTS_INVALID_INVOCATION = DELAYED_PAYMENTS_SCOPE + 17;
 
@@ -199,7 +199,7 @@ contract DelayedPayments is Object {
     function DelayedPayments(
         uint _absoluteMinTimeLock,
         uint _timeLock,
-        uint _maxSecurityGuardDelay) 
+        uint _maxSecurityGuardDelay)
     {
         absoluteMinTimeLock = _absoluteMinTimeLock;
         timeLock = _timeLock;
@@ -613,7 +613,7 @@ contract BuyBack is Object {
         if (!delayedPayments.allowedSpenders(this)) {
             throw;
         }
-        delayedPayments.authorizePayment(msg.sender,total,1 hours); 
+        delayedPayments.authorizePayment(msg.sender,total,1 hours);
         Sell(msg.sender, _amount, total);
 
         return OK;
@@ -759,4 +759,15 @@ contract BuyBack is Object {
             throw;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

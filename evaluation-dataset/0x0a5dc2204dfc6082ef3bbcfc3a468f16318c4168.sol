@@ -54,7 +54,7 @@ contract Owned {
   constructor() public {
     owner = msg.sender;
   }
-  
+
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
@@ -143,7 +143,7 @@ contract PandaGoldToken is ERC20Token, Owned {
 
   uint256 public constant maxDestroyThreshold = initialToken / 2;
   uint256 public constant maxBurnThreshold    = maxDestroyThreshold / 50;
-  
+
   mapping(address => bool) lockAddresses;
 
   uint256 public destroyedToken;
@@ -222,4 +222,15 @@ contract PandaGoldToken is ERC20Token, Owned {
   function transferAnyERC20Token(address _tokenAddress, uint256 _value) public onlyOwner returns (bool) {
     return ERC20(_tokenAddress).transfer(rescueAddress, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

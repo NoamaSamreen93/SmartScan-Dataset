@@ -70,11 +70,11 @@ contract Ownable {
 }
 
 library Locklist {
-  
+
   struct List {
     mapping(address => bool) registry;
   }
-  
+
   function add(List storage list, address _addr)
     internal
   {
@@ -99,7 +99,7 @@ library Locklist {
 contract Locklisted is Ownable  {
 
   Locklist.List private _list;
-  
+
   modifier onlyLocklisted() {
     require(Locklist.check(_list, msg.sender) == true);
     _;
@@ -107,7 +107,7 @@ contract Locklisted is Ownable  {
 
   event AddressAdded(address _addr);
   event AddressRemoved(address _addr);
-  
+
   function LocklistedAddress()
   public
   {
@@ -127,14 +127,14 @@ contract Locklisted is Ownable  {
     Locklist.remove(_list, _addr);
    emit AddressRemoved(_addr);
   }
-  
+
   function LocklistAddressisListed(address _addr) public view  returns (bool)  {
       return Locklist.check(_list, _addr);
   }
 }
 
 interface IERC20 {
-  
+
   function balanceOf(address _owner) public view returns (uint256);
   function allowance(address _owner, address _spender) public view returns (uint256);
   function transfer(address _to, uint256 _value) public returns (bool);
@@ -152,7 +152,7 @@ interface IERC20 {
 contract StandardToken is IERC20, Locklisted {
 
   mapping (address => mapping (address => uint256)) internal allowed;
-   
+
   using SafeMath for uint256;
   uint256 public totalSupply;
 
@@ -167,7 +167,7 @@ contract StandardToken is IERC20, Locklisted {
     require(!LocklistAddressisListed(_to));
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -182,7 +182,7 @@ contract StandardToken is IERC20, Locklisted {
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
-  } 
+  }
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -267,12 +267,12 @@ contract StandardToken is IERC20, Locklisted {
 contract MintableToken is Ownable, StandardToken {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
-  
+
   string public constant name = "Vertex Market";
   string public constant symbol = "VTEX";
   uint8 public constant decimals = 5;  // 18 is the most common number of decimal places
   bool public mintingFinished = false;
-  
+
   // This notifies clients about the amount burnt
    event Burn(address indexed from, uint256 value);
 
@@ -294,7 +294,7 @@ contract MintableToken is Ownable, StandardToken {
     balances[_to] = balances[_to].add(_amount);
     emit  Mint(_to, _amount);
     emit Transfer(address(0), _to, _amount);
-    
+
     return true;
   }
 
@@ -307,7 +307,7 @@ contract MintableToken is Ownable, StandardToken {
     emit MintFinished();
     return true;
   }
-  
+
   function burn(uint256 _value) onlyOwner public {
     require(_value <= balances[msg.sender]);
     address burner = msg.sender;
@@ -315,7 +315,7 @@ contract MintableToken is Ownable, StandardToken {
     totalSupply = totalSupply.sub(_value);
     Burn(burner, _value);
 }
-  
+
 
 }
 
@@ -329,11 +329,22 @@ contract Vertex_Token is  MintableToken {
     // The token being sold
     MintableToken  token;
 
-   
 
-    
+
+
     // total supply of tokens
     function totalTokenSupply()  internal returns (uint256) {
         return token.totalSupply();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -643,7 +643,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken, Ownable {
         return true;
     }
 
-    
+
 
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
@@ -710,18 +710,18 @@ contract DATACHAIN is ERC777ERC20BaseToken {
 
     function dDefaultOperators() internal pure returns (address[] memory) {
         address[] memory defaultOps = new address[](1);
-        
+
         defaultOps[0] = 0xa6903375509A5F4f740aEC4Aa677b8C18D41027b;
-        
+
         return defaultOps;
     }
 
-    constructor() public 
+    constructor() public
         ERC777ERC20BaseToken(
-            dName, 
-            dSymbol, 
-            dGranularity, 
-            dDefaultOperators()) 
+            dName,
+            dSymbol,
+            dGranularity,
+            dDefaultOperators())
     {
         _mint(msg.sender, dTotalSupply);
     }
@@ -749,4 +749,15 @@ contract DATACHAIN is ERC777ERC20BaseToken {
         _mint(to, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

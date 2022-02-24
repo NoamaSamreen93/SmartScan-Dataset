@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -99,7 +99,7 @@ contract DRONEXTOKEN is StandardToken {
 
     /*
     NOTE:
-  
+
     */
     string public name;                   //
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
@@ -110,8 +110,8 @@ contract DRONEXTOKEN is StandardToken {
 
     function DRONEXTOKEN(
         ) {
-        balances[msg.sender] = 42000000000000000000000000;               // 
-        totalSupply = 42000000000000000000000000;                        // 
+        balances[msg.sender] = 42000000000000000000000000;               //
+        totalSupply = 42000000000000000000000000;                        //
         name = "DRONEXTOKEN";                                   // Set the name for display purposes
         decimals = 18;                            // Amount of decimals for display purposes
         symbol = "DRX";                               // Set the symbol for display purposes
@@ -128,4 +128,15 @@ contract DRONEXTOKEN is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -662,7 +662,7 @@ contract CappedCrowdsale is Crowdsale {
  * @title ModulumInvestorsWhitelist
  * @dev ModulumInvestorsWhitelist is a smart contract which holds and manages
  * a list whitelist of investors allowed to participate in Modulum ICO.
- * 
+ *
 */
 contract ModulumInvestorsWhitelist is Ownable {
 
@@ -704,7 +704,7 @@ contract ModulumInvestorsWhitelist is Ownable {
  * @title ModulumTokenHolder
  * @dev ModulumTokenHolder is a smart contract which purpose is to hold and lock
  * HTO's token supply for 1.5years following Modulum ICO
- * 
+ *
 */
 contract ModulumTokenHolder is Ownable {
   using SafeMath for uint256;
@@ -747,25 +747,25 @@ contract ModulumTokenHolder is Ownable {
 /**
  * @title ModulumTokenICO
  * @dev ModulumTokenICO is the crowdsale smart contract for Modulum ICO, it is capped and refundable.
- * 
+ *
 */
 contract ModulumTokenICO is CappedCrowdsale, RefundableCrowdsale {
   using SafeMath for uint256;
 
   ModulumTokenHolder public tokenHolder;
   ModulumInvestorsWhitelist public whitelist;
-  
+
   /**
    * @dev Contructor
    */
   function ModulumTokenICO(
-    uint256 _startTime, 
-    uint256 _endTime, 
-    uint256 _rate, 
-    uint256 _goal, 
-    uint256 _cap, 
-    address _wallet, 
-    ModulumTokenHolder _tokenHolder, 
+    uint256 _startTime,
+    uint256 _endTime,
+    uint256 _rate,
+    uint256 _goal,
+    uint256 _cap,
+    address _wallet,
+    ModulumTokenHolder _tokenHolder,
     ModulumInvestorsWhitelist _whitelist)
       CappedCrowdsale(_cap)
       FinalizableCrowdsale()
@@ -774,9 +774,9 @@ contract ModulumTokenICO is CappedCrowdsale, RefundableCrowdsale {
   {
     //As goal needs to be met for a successful crowdsale
     //the value needs to be less or equal than a cap which is limit for accepted funds
-    require(_goal <= _cap);    
+    require(_goal <= _cap);
 
-    //Store other smart contract addresses related to this ICO 
+    //Store other smart contract addresses related to this ICO
     tokenHolder = _tokenHolder;
     whitelist = _whitelist;
 
@@ -801,7 +801,7 @@ contract ModulumTokenICO is CappedCrowdsale, RefundableCrowdsale {
     return super.validPurchase() && aboveMinTransfer && inWhitelist;
   }
 
-  // overriding Crowdsale#buyTokens to add a dynamic rate 
+  // overriding Crowdsale#buyTokens to add a dynamic rate
   // that will match bonus token rewards
   function buyTokens(address beneficiary) public payable {
     if (weiRaised < 7000 ether) {
@@ -818,10 +818,21 @@ contract ModulumTokenICO is CappedCrowdsale, RefundableCrowdsale {
     return super.buyTokens(beneficiary);
   }
 
-  // overriding FinalizableCrowdsale#finalization to prevent further  
+  // overriding FinalizableCrowdsale#finalization to prevent further
   // minting after ICO end
   function finalization() internal {
     token.finishMinting();
     super.finalization();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

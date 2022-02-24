@@ -265,7 +265,7 @@ contract APIRegistry is Ownable {
     function listApi(uint pricePerCall, bytes32 sellerUsername, bytes32 apiName, string hostname, string docsUrl) public {
         // make sure input params are valid
         require(pricePerCall != 0 && sellerUsername != "" && apiName != "" && bytes(hostname).length != 0);
-        
+
         // make sure the name isn't already taken
         require(apiIds[hostname] == 0);
 
@@ -294,15 +294,15 @@ contract APIRegistry is Ownable {
     // ------------------------------------------------------------------------
     function getApiByIdWithoutDynamics(
         uint apiId
-    ) 
+    )
         public
-        view 
+        view
         returns (
-            uint pricePerCall, 
+            uint pricePerCall,
             bytes32 sellerUsername,
-            bytes32 apiName, 
+            bytes32 apiName,
             address sellerAddress
-        ) 
+        )
     {
         APIForSale storage api = apis[apiId];
 
@@ -317,17 +317,17 @@ contract APIRegistry is Ownable {
     // ------------------------------------------------------------------------
     function getApiById(
         uint apiId
-    ) 
-        public 
-        view 
+    )
+        public
+        view
         returns (
-            uint pricePerCall, 
-            bytes32 sellerUsername, 
-            bytes32 apiName, 
-            address sellerAddress, 
-            string hostname, 
+            uint pricePerCall,
+            bytes32 sellerUsername,
+            bytes32 apiName,
+            address sellerAddress,
+            string hostname,
             string docsUrl
-        ) 
+        )
     {
         APIForSale storage api = apis[apiId];
 
@@ -344,17 +344,17 @@ contract APIRegistry is Ownable {
     // ------------------------------------------------------------------------
     function getApiByName(
         string _hostname
-    ) 
-        public 
-        view 
+    )
+        public
+        view
         returns (
-            uint pricePerCall, 
-            bytes32 sellerUsername, 
-            bytes32 apiName, 
-            address sellerAddress, 
-            string hostname, 
+            uint pricePerCall,
+            bytes32 sellerUsername,
+            bytes32 apiName,
+            address sellerAddress,
+            string hostname,
             string docsUrl
-        ) 
+        )
     {
         uint apiId = apiIds[_hostname];
         if (apiId == 0) {
@@ -565,7 +565,7 @@ contract APICalls is Ownable {
     // the fee this contract takes from every sale.  expressed as percent.  so a value of 3 indicates a 3% txn fee
     uint public saleFee;
 
-    // if the buyer has never paid, we need to pick a date for when they probably started using the API.  
+    // if the buyer has never paid, we need to pick a date for when they probably started using the API.
     // This is in seconds and will be subtracted from "now"
     uint public defaultBuyerLastPaidAt;
 
@@ -667,7 +667,7 @@ contract APICalls is Ownable {
     constructor() public {
         version = 1;
 
-        // default token reward of 100 tokens.  
+        // default token reward of 100 tokens.
         // token has 18 decimal places so that's why 100 * 10^18
         tokenReward = 100 * 10**18;
 
@@ -803,7 +803,7 @@ contract APICalls is Ownable {
     }
 
     // ------------------------------------------------------------------------
-    // Function to pay the seller for a single API buyer.  
+    // Function to pay the seller for a single API buyer.
     // Settles reported usage according to credits and approved amounts.
     // ------------------------------------------------------------------------
     function paySellerForBuyer(uint apiId, address buyerAddress) public {
@@ -853,7 +853,7 @@ contract APICalls is Ownable {
     }
 
     // ------------------------------------------------------------------------
-    // Function to pay the seller for all buyers with nonzero balance.  
+    // Function to pay the seller for all buyers with nonzero balance.
     // Settles reported usage according to credits and approved amounts.
     // ------------------------------------------------------------------------
     function paySeller(uint apiId) public {
@@ -906,7 +906,7 @@ contract APICalls is Ownable {
 
         // transfer seller the eth
         sellerAddress.transfer(payout);
-    } 
+    }
 
     // ------------------------------------------------------------------------
     // Let anyone see when the buyer last paid for a given API
@@ -914,21 +914,21 @@ contract APICalls is Ownable {
     function buyerLastPaidAt(uint apiId, address buyerAddress) public view returns (uint) {
         APIBalance storage apiBalance = owed[apiId];
         return apiBalance.buyerLastPaidAt[buyerAddress];
-    }   
+    }
 
     // ------------------------------------------------------------------------
     // Get buyer info struct for a specific buyer address
     // ------------------------------------------------------------------------
-    function buyerInfoOf(address addr) 
-        public 
-        view 
+    function buyerInfoOf(address addr)
+        public
+        view
         returns (
-            bool overdrafted, 
-            uint lifetimeOverdraftCount, 
-            uint credits, 
-            uint lifetimeCreditsUsed, 
+            bool overdrafted,
+            uint lifetimeOverdraftCount,
+            uint credits,
+            uint lifetimeCreditsUsed,
             uint lifetimeExceededApprovalAmountCount
-        ) 
+        )
     {
         BuyerInfo storage buyer = buyers[addr];
         overdrafted = buyer.overdrafted;
@@ -1028,18 +1028,18 @@ contract APICalls is Ownable {
 
     // ------------------------------------------------------------------------
     // function to let the buyer set their approved amount of wei per second for an api
-    // this function also lets the buyer set the time they last paid for an API if they've never paid that API before.  
+    // this function also lets the buyer set the time they last paid for an API if they've never paid that API before.
     // this is important because the total amount approved for a given transaction is based on a wei per second spending limit
     // but the smart contract doesn't know when the buyer started using the API
     // so with this function, a buyer can et the time they first used the API and the approved amount calculations will be accurate when the seller requests payment.
     // ------------------------------------------------------------------------
     function approveAmountAndSetFirstUseTime(
-        uint apiId, 
-        address buyerAddress, 
-        uint newAmount, 
+        uint apiId,
+        address buyerAddress,
+        uint newAmount,
         uint firstUseTime
-    ) 
-        public 
+    )
+        public
     {
         require(buyerAddress != address(0) && apiId != 0);
 
@@ -1050,7 +1050,7 @@ contract APICalls is Ownable {
         require(apiBalance.buyerLastPaidAt[buyerAddress] == 0);
 
         apiBalance.buyerLastPaidAt[buyerAddress] = firstUseTime;
-        
+
         BuyerInfo storage buyer = buyers[buyerAddress];
         buyer.approvedAmounts[apiId] = newAmount;
 
@@ -1114,7 +1114,7 @@ contract APICalls is Ownable {
 
         // log that they paid
         apiBalance.buyerLastPaidAt[buyerAddress] = now;
-        
+
         return buyerPaid;
     }
 
@@ -1174,21 +1174,21 @@ contract APICalls is Ownable {
     // if owed > approved > credits then pay credits and mark as overdrafted
     // ------------------------------------------------------------------------
     function chargeBuyer(
-        uint apiId, 
-        address buyerAddress, 
-        uint elapsedSecondsSinceLastPayout, 
+        uint apiId,
+        address buyerAddress,
+        uint elapsedSecondsSinceLastPayout,
         uint buyerOwes
-    ) 
-        private 
+    )
+        private
         returns (
-            uint paid, 
+            uint paid,
             bool overdrafted
-        ) 
+        )
     {
         BuyerInfo storage buyer = buyers[buyerAddress];
         uint approvedAmountPerSecond = buyer.approvedAmounts[apiId];
         uint approvedAmountSinceLastPayout = approvedAmountPerSecond.mul(elapsedSecondsSinceLastPayout);
-        
+
         // do we have the credits to pay owed?
         if (buyer.credits >= buyerOwes) {
             // yay, buyer can pay their debits
@@ -1197,7 +1197,7 @@ contract APICalls is Ownable {
 
             // has buyer approved enough to pay what they owe?
             if (approvedAmountSinceLastPayout >= buyerOwes) {
-                // approved is greater than owed.  
+                // approved is greater than owed.
                 // mark as not exceeded approved amount
                 buyer.exceededApprovedAmount[apiId] = false;
 
@@ -1252,4 +1252,20 @@ contract APICalls is Ownable {
             apiBalance.nonzeroAddresses.length--;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

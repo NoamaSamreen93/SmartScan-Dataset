@@ -258,7 +258,7 @@ contract BountyProgram {
   uint256 tokenAvailable = 25 * 10**4 * 10**18;
 
   // Name of this contract
-  string private contractName;  
+  string private contractName;
   // Contract Manager
   ContractManagerInterface private contractManager;
   // The fida mintable token
@@ -1087,7 +1087,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         require((_nbytes > 0) && (_nbytes <= 32));
         // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -1100,18 +1100,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -1124,11 +1124,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, keccak256(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -1221,7 +1221,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
         require(prefix.length == n_random_bytes);
 
         for (uint256 i=0; i< n_random_bytes; i++) {
@@ -1596,14 +1596,14 @@ contract FidaSale is BonusProgram, BountyProgram, PriceChecker {
   /**
    * @notice Triggered when btc token bought address is changed
    * @param _oldAddress Address what the authorized address used to be
-   * @param _newAddress Address what the authorized address 
+   * @param _newAddress Address what the authorized address
    */
   event BtcTokenBoughtAddressChanged(address indexed _oldAddress, address indexed _newAddress);
 
   /**
    * @notice Triggered when the whitelisting address is changed
    * @param _oldAddress Address what the authorized address used to be
-   * @param _newAddress Address what the authorized address 
+   * @param _newAddress Address what the authorized address
    */
   event WhitelistingAddressChanged(address indexed _oldAddress, address indexed _newAddress);
 
@@ -1651,9 +1651,9 @@ contract FidaSale is BonusProgram, BountyProgram, PriceChecker {
    * @param _tokenContractName Name of the token contract in the contract manager
    * @param _memberContractName Name of the member manager contract in the contract manager
    */
-  constructor(string _contractName, address _wallet, address _bountyAddress, address _btcTokenBoughtAddress, address _whitelistingAddress, address _priceCheckerAddress, address _contractManager, string _tokenContractName, string _memberContractName) public payable 
-    BonusProgram(INITIAL_BONUSLIST_TOKENS) 
-    BountyProgram(_contractName, _bountyAddress, _bountyAddress, _contractManager) 
+  constructor(string _contractName, address _wallet, address _bountyAddress, address _btcTokenBoughtAddress, address _whitelistingAddress, address _priceCheckerAddress, address _contractManager, string _tokenContractName, string _memberContractName) public payable
+    BonusProgram(INITIAL_BONUSLIST_TOKENS)
+    BountyProgram(_contractName, _bountyAddress, _bountyAddress, _contractManager)
     PriceChecker(_priceCheckerAddress) {
 
     contractName = _contractName;
@@ -1695,7 +1695,7 @@ contract FidaSale is BonusProgram, BountyProgram, PriceChecker {
 
     emit WalletAddressChanged(oldAddress, _walletAddress);
   }
-  
+
   /**
    * @notice Change the address which is authorized to send bought tokens with BTC
    * @param _address Address of the authorized btc tokens bought client
@@ -1896,4 +1896,15 @@ contract FidaSale is BonusProgram, BountyProgram, PriceChecker {
 
     emit FinishedSale();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

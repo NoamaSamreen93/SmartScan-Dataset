@@ -47,7 +47,7 @@ contract Ownable {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -69,7 +69,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
@@ -97,10 +97,10 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -119,7 +119,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -196,9 +196,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -230,17 +230,17 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract EstateCoin is MintableToken {
-    
+
     string public constant name = "EstateCoin";
-    
+
     string public constant symbol = "ESC";
-    
+
     uint32 public constant decimals = 2;
-    
+
     uint256 public maxTokens = 12100000000000000000000000;
 
   function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
@@ -325,10 +325,10 @@ contract ESCCrowdsale is Ownable {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   //amount of sold money in wei
   uint256 public tokenSold = 0;
-  
+
   uint256 public cap;
 
   /**
@@ -394,15 +394,15 @@ contract ESCCrowdsale is Ownable {
 
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
-    
+
     if (token.mint(beneficiary, tokens)) {
         // update state
         weiRaised = weiRaised.add(weiAmount);
 
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
-    
+
         forwardFunds();
-    
+
         tokenSold = tokenSold.add(tokens);
         uint256 bonus = 0;
         if (now < 1507291200) {
@@ -416,24 +416,24 @@ contract ESCCrowdsale is Ownable {
         } else if (now < 1507636800) {
             bonus = tokens.div(100); //1%
         }
-        
+
         if (bonus > 0) {
             token.mint(beneficiary, bonus);
             TokenBonus(msg.sender, beneficiary, bonus);
         }
     }
   }
-    
+
   //manually transfer tokens
   function transferTokens(address _to, uint256 _amount) onlyOwner public returns (bool) {
     require(!isFinalized);
     require(!hasEnded());
     require(_to != 0x0);
     require(_amount > 0);
-    
+
     token.mint(_to, _amount);
     tokenSold += _amount;
-    
+
     return true;
   }
 
@@ -457,7 +457,7 @@ contract ESCCrowdsale is Ownable {
     bool capReached = weiRaised >= cap;
     return (now > endTime) || capReached;
   }
-    
+
   /**
    * @dev Must be called after crowdsale ends, to do some extra finalization
    * work. Calls the contract's finalization function.
@@ -471,7 +471,7 @@ contract ESCCrowdsale is Ownable {
 
     isFinalized = true;
   }
-  
+
   // if crowdsale is unsuccessful, investors can claim refunds here
   function claimRefund() public {
     require(isFinalized);
@@ -494,4 +494,15 @@ contract ESCCrowdsale is Ownable {
     return weiRaised >= goal;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

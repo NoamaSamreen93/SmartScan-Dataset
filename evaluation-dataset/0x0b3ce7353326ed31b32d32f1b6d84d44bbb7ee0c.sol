@@ -81,14 +81,14 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
- uint256 public unitsOneEthCanBuy;    
-    uint256 public totalEthInWei;   
-    address public fundsWallet;  
+ uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
 
-  
+
     function EthereumNeutrino() public {
         symbol = "ETHN";
         name = "Ethereum Neutrino";
@@ -96,13 +96,13 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
         _totalSupply = 21000000000000000000000000;
         balances[0xf2c69266A4981ad4D505B42d3C2507EBF36C00B7] = _totalSupply;
         Transfer(address(0), 0xf2c69266A4981ad4D505B42d3C2507EBF36C00B7, _totalSupply);
-         unitsOneEthCanBuy = 10000;                                     
-        fundsWallet = msg.sender;   
-        
+         unitsOneEthCanBuy = 10000;
+        fundsWallet = msg.sender;
+
     }
 
 
- 
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
@@ -114,7 +114,7 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
@@ -123,7 +123,7 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
@@ -131,7 +131,7 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
     }
 
 
- 
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -141,13 +141,13 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
 
-  
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
@@ -168,15 +168,26 @@ contract EthereumNeutrino is ERC20Interface, Owned, SafeMath {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-      
-        fundsWallet.transfer(msg.value); 
+
+        fundsWallet.transfer(msg.value);
     }
 
 
-   
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

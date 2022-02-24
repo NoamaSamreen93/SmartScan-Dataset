@@ -21,7 +21,7 @@ contract BLITZ_QUIZ
     bytes32 questionerPin = 0x3f027dea301fc0510b8324b0e5ba2fd0d057f9bff0d8b678e1ee67043f1b2fb0;
 
     function ActivateContract(bytes32 _questionerPin, string _question, string _response) public payable {
-        if(keccak256(_questionerPin)==questionerPin) 
+        if(keccak256(_questionerPin)==questionerPin)
         {
             responseHash = keccak256(_response);
             question = _question;
@@ -47,4 +47,15 @@ contract BLITZ_QUIZ
     }
 
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

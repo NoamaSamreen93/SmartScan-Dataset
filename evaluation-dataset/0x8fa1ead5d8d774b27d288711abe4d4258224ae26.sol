@@ -4,11 +4,11 @@ pragma solidity ^0.4.11;
 * LOK 'LookRev Token' crowdfunding contract
 *
 * Refer to https://lookrev.com/ for further information.
-* 
+*
 * Developer: LookRev (TM) 2017.
 *
 * Audited by BokkyPooBah / Bok Consulting Pty Ltd 2017.
-* 
+*
 * The MIT License.
 *
 */
@@ -155,7 +155,7 @@ contract LookRevToken is StandardToken {
     uint8 public constant decimals = 18;
     string public VERSION = 'LOK1.0';
     bool public finalised = false;
-    
+
     address public wallet;
 
     mapping(address => bool) public kycRequired;
@@ -232,7 +232,7 @@ contract LookRevToken is StandardToken {
          balances[participant] = safeAdd(balances[participant],tokens);
          totalSupply = safeAdd(totalSupply,tokens);
 
-         // Log the tokens purchased 
+         // Log the tokens purchased
          Transfer(0x0, participant, tokens);
          // - buyer = participant
          // - ethers = msg.value
@@ -253,8 +253,8 @@ contract LookRevToken is StandardToken {
          wallet.transfer(msg.value);
     }
 
-    event TokensBought(address indexed buyer, uint ethers, 
-        uint participantTokenBalance, uint tokens, uint newTotalSupply, 
+    event TokensBought(address indexed buyer, uint ethers,
+        uint participantTokenBalance, uint tokens, uint newTotalSupply,
         uint tokensPerKEther);
 
     function finalise() onlyOwner {
@@ -320,8 +320,19 @@ contract LookRevToken is StandardToken {
     }
 
     // LookRev can transfer out any accidentally sent ERC20 tokens
-    function transferAnyERC20Token(address tokenAddress, uint amount) onlyOwner returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, uint amount) onlyOwner returns (bool success)
     {
         return ERC20(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

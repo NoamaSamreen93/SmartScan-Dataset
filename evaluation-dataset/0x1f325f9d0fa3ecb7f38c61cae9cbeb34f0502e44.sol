@@ -150,7 +150,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 }
 contract CoupeToken is StandardToken {
-	string public name = "Coupecoin Fusion"; 
+	string public name = "Coupecoin Fusion";
   string public symbol = "CECF";
   uint256 public decimals = 18;
   uint256 public constant INITIAL_SUPPLY = 5000000 * (10 ** uint256(decimals));
@@ -161,4 +161,15 @@ contract CoupeToken is StandardToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

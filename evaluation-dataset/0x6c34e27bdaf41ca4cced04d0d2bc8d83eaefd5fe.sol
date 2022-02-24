@@ -138,7 +138,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -328,4 +328,12 @@ contract ROKToken is TokenERC20 {
     function ROKToken() TokenERC20(15000000000, "ROKToken", "ROK", 18) public {
 
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

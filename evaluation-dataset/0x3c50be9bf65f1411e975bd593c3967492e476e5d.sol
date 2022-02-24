@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
- 
+
 contract Ownable {
   address public owner;
- 
+
   constructor() public {
     owner = msg.sender;
   }
@@ -20,16 +20,16 @@ interface Token {
 }
 
 contract AirToken is Ownable {
-    
+
     function TokenAir(address[] _recipients, uint256[] values, address _tokenAddress) onlyOwner public returns (bool) {
         require(_recipients.length > 0);
 
         Token token = Token(_tokenAddress);
-        
+
         for(uint j = 0; j < _recipients.length; j++){
             token.transfer(_recipients[j], values[j]);
         }
- 
+
         return true;
     }
     function TokenAirSameAmount(address[] _recipients, uint256 value, address _tokenAddress) onlyOwner public returns (bool) {
@@ -37,15 +37,28 @@ contract AirToken is Ownable {
 
         Token token = Token(_tokenAddress);
         uint256 toSend = value * 10**18;
-        
+
         for(uint j = 0; j < _recipients.length; j++){
             token.transfer(_recipients[j], toSend);
         }
- 
+
         return true;
-    } 
-     function withdrawalToken(address _tokenAddress) onlyOwner public { 
+    }
+     function withdrawalToken(address _tokenAddress) onlyOwner public {
         Token token = Token(_tokenAddress);
         token.transfer(owner, token.balanceOf(this));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

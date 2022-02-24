@@ -209,7 +209,7 @@ contract ROE is ERC20Interface, Pausable {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public whenNotPaused returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -238,7 +238,7 @@ contract ROE is ERC20Interface, Pausable {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -292,11 +292,20 @@ contract ROE is ERC20Interface, Pausable {
     }
 
     function burn(uint256 _value) public onlyOwner returns (bool) {
-        require (_value > 0); 
+        require (_value > 0);
         require (balanceOf(msg.sender) >= _value);            // Check if the sender has enough
         balances[msg.sender] = balanceOf(msg.sender).sub(_value);                      // Subtract from the sender
         _totalSupply = _totalSupply.sub(_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
-    }    
+    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -208,15 +208,24 @@ contract AdoiToken is ERC20Interface, Owned {
 
 
 
-    function() external payable {}  
-    
+    function() external payable {}
+
     function withdraw() external onlyOwner {
         msg.sender.transfer(address(this).balance);
-    }   
+    }
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

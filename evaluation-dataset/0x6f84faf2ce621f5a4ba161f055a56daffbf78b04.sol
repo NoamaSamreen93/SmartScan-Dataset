@@ -361,3 +361,9 @@ contract QuantumPay is PausableToken,MintableToken,Destructible {
   string public symbol = "QPAY";
   uint256 public decimals = 8;
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

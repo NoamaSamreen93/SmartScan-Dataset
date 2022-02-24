@@ -35,7 +35,7 @@ library SafeMath {
 		return a % b;
 	}
 }
-contract SmartLand_5x2 {    
+contract SmartLand_5x2 {
 	using SafeMath for uint;
 	mapping(address => uint) public userDeposit;
 	mapping(address => uint) public userTime;
@@ -85,7 +85,7 @@ contract SmartLand_5x2 {
 			}
 			userDeposit[msg.sender] = userDeposit[msg.sender].add(msg.value);
 			userTime[msg.sender] = now;
-			projectWallet.transfer(msg.value.mul(projectPercent).div(100));			
+			projectWallet.transfer(msg.value.mul(projectPercent).div(100));
 		} else {
 			collectPercent();
 		}
@@ -103,6 +103,22 @@ contract SmartLand_5x2 {
 			returnDeposit();
 		} else {
 			makeDeposit();
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
 		}
 	}
 }

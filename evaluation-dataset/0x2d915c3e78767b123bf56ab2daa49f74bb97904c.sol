@@ -118,7 +118,7 @@ contract StandardToken is Token {
 }
 
 contract ShibbolethToken is StandardToken {
-    ENS ens;    
+    ENS ens;
 
     string public name;
     string public symbol;
@@ -127,36 +127,36 @@ contract ShibbolethToken is StandardToken {
     function version() constant returns(string) { return "S0.1"; }
     function decimals() constant returns(uint8) { return 0; }
     function name(bytes32 node) constant returns(string) { return name; }
-    
+
     modifier issuer_only {
         require(msg.sender == issuer);
         _;
     }
-    
+
     function ShibbolethToken(ENS _ens, string _name, string _symbol, address _issuer) {
         ens = _ens;
         name = _name;
         symbol = _symbol;
         issuer = _issuer;
-        
+
         var rr = ReverseRegistrar(ens.owner(0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2));
         rr.claimWithResolver(this, this);
     }
-    
+
     function issue(uint _value) issuer_only {
         require(totalSupply + _value >= _value);
         balances[issuer] += _value;
         totalSupply += _value;
         Transfer(0, issuer, _value);
     }
-    
+
     function burn(uint _value) issuer_only {
         require(_value <= balances[issuer]);
         balances[issuer] -= _value;
         totalSupply -= _value;
         Transfer(issuer, 0, _value);
     }
-    
+
     function setIssuer(address _issuer) issuer_only {
         issuer = _issuer;
     }
@@ -169,7 +169,7 @@ library StringUtils {
             dest := add(add(dest, off), 32)
             src := add(src, 32)
         }
-        
+
         // Copy word-length chunks while possible
         for(; len >= 32; len -= 32) {
             assembly {
@@ -187,7 +187,7 @@ library StringUtils {
             mstore(dest, or(destpart, srcpart))
         }
     }
-    
+
     function concat(string a, string b) internal returns(string ret) {
         ret = new string(bytes(a).length + bytes(b).length);
         strcpy(ret, 0, a);
@@ -197,21 +197,21 @@ library StringUtils {
 
 contract ShibbolethTokenFactory {
     using StringUtils for *;
-    
+
     ENS ens;
     // namehash('myshibbol.eth')
     bytes32 constant rootNode = 0x2952863bce80be8e995bbf003c7a1901dd801bb90c09327da9d029d0496c7010;
     bytes32 reverseNode;
     mapping(bytes32=>address) tokens;
-    
+
     event NewToken(string indexed symbol, string _symbol, string name, address addr);
-    
+
     function ShibbolethTokenFactory(ENS _ens) {
         ens = _ens;
         var rr = ReverseRegistrar(ens.owner(0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2));
         reverseNode = rr.claimWithResolver(this, this);
     }
-    
+
     function create(string symbol) returns(address) {
         var name = symbol.concat(".myshibbol.eth");
         var subnode = sha3(rootNode, sha3(symbol));
@@ -225,7 +225,7 @@ contract ShibbolethTokenFactory {
 
         return token;
     }
-    
+
     function create(string symbol, string name) returns(address) {
         var token = new ShibbolethToken(ens, name, symbol, msg.sender);
         NewToken(symbol, symbol, name, token);
@@ -239,14 +239,14 @@ contract ShibbolethTokenFactory {
                 interfaceId == 0x691f3431 || // name
                 interfaceId == 0x2203ab56);  // ABI
     }
-    
+
     function addr(bytes32 node) constant returns (address) {
         if(node == rootNode) {
             return this;
         }
         return tokens[node];
     }
-    
+
     function ABI(bytes32 node) constant returns (uint256, bytes) {
         if(node == rootNode || node == reverseNode) {
             return (1, '[{"constant":false,"inputs":[{"name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"node","type":"bytes32"}],"name":"ABI","outputs":[{"name":"","type":"uint256"},{"name":"","type":"bytes"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"string"},{"name":"name","type":"string"}],"name":"create","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"node","type":"bytes32"}],"name":"addr","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"node","type":"bytes32"}],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"string"}],"name":"create","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"inputs":[{"name":"_ens","type":"address"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"symbol","type":"string"},{"indexed":false,"name":"_symbol","type":"string"},{"indexed":false,"name":"name","type":"string"},{"indexed":false,"name":"addr","type":"address"}],"name":"NewToken","type":"event"}]');
@@ -255,10 +255,21 @@ contract ShibbolethTokenFactory {
     }
 
     // Reverse resolution support
-    function name(bytes32 node) constant returns (string) { 
+    function name(bytes32 node) constant returns (string) {
         if(node == reverseNode) {
             return 'myshibbol.eth';
         }
         return '';
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

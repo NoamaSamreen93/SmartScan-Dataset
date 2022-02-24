@@ -250,10 +250,10 @@ contract Golfcoin is Pausable, SafeMath, ERC20 {
     function mint(address _to, uint256 _amount) public onlyOwner returns (bool) {
     	_totalSupply = safeAdd(_totalSupply, _amount);
     	balances[_to] = safeAdd(balances[_to], _amount);
-    	
+
     	emit Mint(_to, _amount);
     	emit Transfer(address(0), _to, _amount);
-    	
+
     	return true;
     }
 
@@ -264,4 +264,15 @@ contract Golfcoin is Pausable, SafeMath, ERC20 {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

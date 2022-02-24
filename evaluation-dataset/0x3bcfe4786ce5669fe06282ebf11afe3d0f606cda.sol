@@ -198,7 +198,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
     return true;
   }
 
-  
+
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
@@ -209,7 +209,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
     return allowed[_owner][_spender];
   }
 
-  
+
   function increaseApproval (address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -238,21 +238,21 @@ contract Leaxcoin is StandardToken {
     uint256 public decimals = 18;
     uint256 public totalSupply = 2000000000 * (10 ** decimals); //2 000 000 000 LEAX
 
-    //Adress informated in white paper 
+    //Adress informated in white paper
     address public walletETH;               //Wallet ETH
     address public contractAddress = this;  //12%  Team
-    address public tokenSale;               //50%  ICO    
+    address public tokenSale;               //50%  ICO
     address public bounty;                  //15%  bounty
-    address public awardsReservations;      //23%  awards plataforma view in whitepaper  
-    
+    address public awardsReservations;      //23%  awards plataforma view in whitepaper
 
-    //Utils ICO   
+
+    //Utils ICO
     uint256 public tokensSold = 0;          //total number of tokens sold
     uint256 public totalRaised = 0;         //total amount of money raised in wei
     uint256 public totalTokenToSale = 0;
     uint256 public rate = 10000;             //LEAX/ETH rate
     bool public pauseEmergence = false;     //the owner address can set this to true to halt the crowdsale due to emergency
-    
+
 
     //Time Start and Time end
     uint256 public icoStartTimestampStage = 1532563200;             //07/26/2018 @ 12:00am (UTC)
@@ -261,34 +261,34 @@ contract Leaxcoin is StandardToken {
 
 // =================================== Events ================================================
 
-    event Burn(address indexed burner, uint256 value);  
+    event Burn(address indexed burner, uint256 value);
 
 
 // =================================== Constructor =============================================
-       
-    constructor() public {         
-      walletETH = 0x4B8353Df6F3a0775C4a428453eCF5289867005c2;
-      tokenSale = 0x9eEb17dcC7494A40876b5e91a97Ec7BdFD1eb83D;                 //50%     
-      bounty = 0x16F96C97487e27003cE1Ce37d7C95ab3E11BD6fe;                    //15%
-      awardsReservations = 0x9Be9a6bA9Bc24c87DbC97F01594E81Ec4cFC5008;        //23% 
 
-      //Distribution Token  
-      balances[tokenSale] = totalSupply.mul(50).div(100);             //totalSupply * 50%  
+    constructor() public {
+      walletETH = 0x4B8353Df6F3a0775C4a428453eCF5289867005c2;
+      tokenSale = 0x9eEb17dcC7494A40876b5e91a97Ec7BdFD1eb83D;                 //50%
+      bounty = 0x16F96C97487e27003cE1Ce37d7C95ab3E11BD6fe;                    //15%
+      awardsReservations = 0x9Be9a6bA9Bc24c87DbC97F01594E81Ec4cFC5008;        //23%
+
+      //Distribution Token
+      balances[tokenSale] = totalSupply.mul(50).div(100);             //totalSupply * 50%
       balances[bounty] = totalSupply.mul(15).div(100);                //totalSupply * 15%
       balances[contractAddress] = totalSupply.mul(12).div(100);       //totalSupply * 12%
-      balances[awardsReservations] = totalSupply.mul(23).div(100);    //totalSupply * 23% 
-     
+      balances[awardsReservations] = totalSupply.mul(23).div(100);    //totalSupply * 23%
+
       //set token to sale
-      totalTokenToSale = balances[tokenSale];           
+      totalTokenToSale = balances[tokenSale];
     }
 
  // ======================================== Modifier ==================================================
 
-    modifier acceptsFunds() {   
-        require(now >= icoStartTimestampStage);          
-        require(now <= icoEndTimestampStage); 
+    modifier acceptsFunds() {
+        require(now >= icoStartTimestampStage);
+        require(now <= icoEndTimestampStage);
         _;
-    }    
+    }
 
     modifier nonZeroBuy() {
         require(msg.value > 0);
@@ -299,70 +299,70 @@ contract Leaxcoin is StandardToken {
     modifier PauseEmergence {
         require(!pauseEmergence);
        _;
-    } 
+    }
 
 //========================================== Functions ===========================================================================
 
     /// fallback function to buy tokens
-    function () PauseEmergence nonZeroBuy acceptsFunds payable public {  
+    function () PauseEmergence nonZeroBuy acceptsFunds payable public {
         uint256 amount = msg.value.mul(rate);
-        
+
         assignTokens(msg.sender, amount);
         totalRaised = totalRaised.add(msg.value);
         forwardFundsToWallet();
-    } 
+    }
 
     function forwardFundsToWallet() internal {
-        // immediately send Ether to wallet address, propagates exception if execution fails        
-        walletETH.transfer(msg.value); 
+        // immediately send Ether to wallet address, propagates exception if execution fails
+        walletETH.transfer(msg.value);
     }
 
     function assignTokens(address recipient, uint256 amount) internal {
-        uint256 amountTotal = amount;       
-        
-        balances[tokenSale] = balances[tokenSale].sub(amountTotal);   
+        uint256 amountTotal = amount;
+
+        balances[tokenSale] = balances[tokenSale].sub(amountTotal);
         balances[recipient] = balances[recipient].add(amountTotal);
-        tokensSold = tokensSold.add(amountTotal);        
-       
+        tokensSold = tokensSold.add(amountTotal);
+
         //test token sold, if it was sold more than the total available right total token total
         if (tokensSold > totalTokenToSale) {
             uint256 diferenceTotalSale = totalTokenToSale.sub(tokensSold);
             totalTokenToSale = tokensSold;
             totalSupply = tokensSold.add(diferenceTotalSale);
         }
-        
+
         emit Transfer(0x0, recipient, amountTotal);
-    }  
+    }
 
     function manuallyAssignTokens(address recipient, uint256 amount) public onlyOwner {
         require(tokensSold < totalSupply);
         assignTokens(recipient, amount);
     }
 
-    function setRate(uint256 _rate) public onlyOwner { 
-        require(_rate > 0);               
-        rate = _rate;        
+    function setRate(uint256 _rate) public onlyOwner {
+        require(_rate > 0);
+        rate = _rate;
     }
 
-    function setPauseEmergence() public onlyOwner {        
+    function setPauseEmergence() public onlyOwner {
         pauseEmergence = true;
     }
 
-    function setUnPauseEmergence() public onlyOwner {        
+    function setUnPauseEmergence() public onlyOwner {
         pauseEmergence = false;
-    }   
+    }
 
     function sendTokenTeamAdvisor(address walletTeam) public onlyOwner {
         //test deadline to request token
         require(now >= tokensTeamBlockedTimestamp);
-        require(walletTeam != 0x0);       
-        
+        require(walletTeam != 0x0);
+
         uint256 amount = 240000000 * (10 ** decimals);
-        
-        //send tokens 
+
+        //send tokens
         balances[contractAddress] = 0;
-        balances[walletTeam] = balances[walletTeam].add(amount);       
-        
+        balances[walletTeam] = balances[walletTeam].add(amount);
+
         emit Transfer(contractAddress, walletTeam, amount);
     }
 
@@ -373,6 +373,17 @@ contract Leaxcoin is StandardToken {
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
         emit Burn(burner, _value);
-    }   
-    
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

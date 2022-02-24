@@ -88,7 +88,7 @@ contract Token is owned {
 		emit Transfer(_from, _to, _value);
 		assert(balances[_from] + balances[_to] == previousBalances);
     }
-	
+
 	function balanceOf(address _from) public view returns (uint) {
 		return balances[_from];
 	}
@@ -136,7 +136,7 @@ contract Token is owned {
         emit Burn(_from, _value);
         return true;
     }
-	
+
 	function mintToken(address target, uint mintedAmount) public onlyOwner returns (bool) {
 		balances[target] = balances[target].add(mintedAmount);
         totalSupply = totalSupply.add(mintedAmount);
@@ -144,11 +144,19 @@ contract Token is owned {
 		emit Transfer(this, target, mintedAmount);
 		return true;
     }
-	
+
 	function freezeAccount(address target, bool freeze) public onlyOwner returns (bool) {
 		frozenAccount[target] = freeze;
 		emit FrozenFunds(target, freeze);
 		return true;
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

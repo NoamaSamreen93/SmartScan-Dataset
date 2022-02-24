@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
- 
+
 contract NRMc {
     string public symbol = "NRMc";
     string public name = "NRMc Closed ICO";
@@ -38,22 +38,22 @@ contract NRMc {
     uint public onefive = 0;
     uint _durationInMinutes = 0;
     mapping(address => uint256) public balanceOf;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
- 
+
     function NRMc(address adr) {
         if (startDone == false) {
-        owner = adr;        
+        owner = adr;
         }
     }
-    
+
     function StartICO(uint256 durationInMinutes) {
-        if (msg.sender == owner 
+        if (msg.sender == owner
         && startDone == false)
         {
             balances[owner] = _totalSupply;
@@ -62,102 +62,102 @@ contract NRMc {
             startDone = true;
         }
     }
-    
+
     function SendPreReserved1() {
-            if (msg.sender == owner 
+            if (msg.sender == owner
             && prereserved1Done == false
             && balances[owner] >= perReserve
             && balances[reserve1] + perReserve > balances[reserve1]
             && now <= deadline
-            && !finishDone 
-            && startDone) 
+            && !finishDone
+            && startDone)
             {
                 balances[owner] -= perReserve;
                 balances[reserve1] += perReserve;
                 Transfer(owner, reserve1, perReserve);
                 prereserved1Done = true;
-                backers += 1; 
+                backers += 1;
             }
-    }       
-    
+    }
+
     function SendPreReserved2() {
-            if (msg.sender == owner 
+            if (msg.sender == owner
             && prereserved2Done == false
             && balances[owner] >= perReserve
             && balances[reserve2] + perReserve > balances[reserve2]
             && now <= deadline
-            && !finishDone 
-            && startDone) 
+            && !finishDone
+            && startDone)
             {
                 balances[owner] -= perReserve;
                 balances[reserve2] += perReserve;
                 Transfer(owner, reserve2, perReserve);
                 prereserved2Done = true;
-                backers += 1; 
+                backers += 1;
             }
-    }       
+    }
 
     function SendPreReserved3() {
-            if (msg.sender == owner 
+            if (msg.sender == owner
             && prereserved3Done == false
             && balances[owner] >= perReserve
             && balances[reserve3] + perReserve > balances[reserve3]
             && now <= deadline
-            && !finishDone 
-            && startDone) 
+            && !finishDone
+            && startDone)
             {
                 balances[owner] -= perReserve;
                 balances[reserve3] += perReserve;
                 Transfer(owner, reserve3, perReserve);
                 prereserved3Done = true;
-                backers += 1; 
+                backers += 1;
             }
-    }       
-    
+    }
+
     function SendPreReserved4() {
-            if (msg.sender == owner 
+            if (msg.sender == owner
             && prereserved4Done == false
             && balances[owner] >= perReserve
             && balances[reserve4] + perReserve > balances[reserve4]
             && now <= deadline
-            && !finishDone 
-            && startDone) 
+            && !finishDone
+            && startDone)
             {
                 balances[owner] -= perReserve;
                 balances[reserve4] += perReserve;
                 Transfer(owner, reserve4, perReserve);
                 prereserved4Done = true;
-                backers += 1; 
+                backers += 1;
             }
-    }       
-    
+    }
+
     function SendPreReserved5() {
-            if (msg.sender == owner 
+            if (msg.sender == owner
             && prereserved5Done == false
             && balances[owner] >= perReserve
             && balances[reserve5] + perReserve > balances[reserve5]
             && now <= deadline
-            && !finishDone 
-            && startDone) 
+            && !finishDone
+            && startDone)
             {
                 balances[owner] -= perReserve;
                 balances[reserve5] += perReserve;
                 Transfer(owner, reserve5, perReserve);
                 prereserved5Done = true;
-                backers += 1; 
+                backers += 1;
             }
-    }       
- 
-    function totalSupply() constant returns (uint256 totalSupply) {        
+    }
+
+    function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
- 
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function transfer(address _to, uint256 _amount) returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -168,7 +168,7 @@ contract NRMc {
             return false;
         }
     }
- 
+
     function transferFrom(
         address _from,
         address _to,
@@ -187,7 +187,7 @@ contract NRMc {
             return false;
         }
     }
-    
+
     function () payable {
         uint _amount = msg.value * rate;
         uint amount = msg.value;
@@ -195,7 +195,7 @@ contract NRMc {
             && _amount > 0
             && balances[msg.sender] + _amount > balances[msg.sender]
             && now <= deadline
-            && !finishDone 
+            && !finishDone
             && startDone) {
         backers += 1;
         balances[msg.sender] += _amount;
@@ -204,25 +204,25 @@ contract NRMc {
         Transfer(owner, msg.sender, _amount);
         } else {
             if (!msg.sender.send(amount)) {
-                overRaisedUnsend += amount; 
+                overRaisedUnsend += amount;
             }
         }
     }
- 
+
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     modifier afterDeadline() { if (now > deadline || balances[owner] == 0) _; }
 
     function safeWithdrawal() afterDeadline {
-        
+
     if (onefiveDone == false) {
         onefive = this.balance / 5;
         onefiveDone = true;
@@ -231,31 +231,37 @@ contract NRMc {
     if (out1 == msg.sender && !out1Done) {
         if (out1.send(onefive)) {
            out1Done = true;
-        } 
+        }
     }
-        
+
     if (out2 == msg.sender && !out2Done) {
         if (out2.send(onefive)) {
            out2Done = true;
-        } 
-    }  
-        
+        }
+    }
+
     if (out3 == msg.sender && !out3Done) {
         if (out3.send(onefive)) {
            out3Done = true;
-        } 
+        }
     }
-    
+
     if (out4 == msg.sender && !out4Done) {
         if (out4.send(onefive)) {
            out4Done = true;
-        } 
+        }
     }
-    
+
     if (out5 == msg.sender && !out5Done) {
         if (out5.send(onefive)) {
            out5Done = true;
-        } 
+        }
     }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

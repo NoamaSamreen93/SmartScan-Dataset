@@ -4,7 +4,7 @@ pragma solidity ^0.4.23;
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
-library SafeMath 
+library SafeMath
 {
 
   /**
@@ -51,7 +51,7 @@ library SafeMath
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
@@ -59,7 +59,7 @@ library SafeMath
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract Ownable 
+contract Ownable
 {
   address public owner;
 
@@ -101,7 +101,7 @@ contract Ownable
     emit OwnershipTransferred(owner, _newOwner);
     owner = _newOwner;
   }
-  
+
 }
 
 
@@ -109,7 +109,7 @@ contract Ownable
  * @title Pausable
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
-contract Pausable is Ownable 
+contract Pausable is Ownable
 {
   event Pause();
   event Unpause();
@@ -155,7 +155,7 @@ contract Pausable is Ownable
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
-contract ERC20Basic 
+contract ERC20Basic
 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
@@ -167,14 +167,14 @@ contract ERC20Basic
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 is ERC20Basic 
+contract ERC20 is ERC20Basic
 {
   function allowance(address owner, address spender) public view returns (uint256);
 
   function transferFrom(address from, address to, uint256 value) public returns (bool);
 
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Approval(
     address indexed owner,
     address indexed spender,
@@ -187,7 +187,7 @@ contract ERC20 is ERC20Basic
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
-contract BasicToken is ERC20Basic 
+contract BasicToken is ERC20Basic
 {
   using SafeMath for uint256;
 
@@ -235,7 +235,7 @@ contract BasicToken is ERC20Basic
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract StandardToken is ERC20, BasicToken 
+contract StandardToken is ERC20, BasicToken
 {
 
   mapping (address => mapping (address => uint256)) internal allowed;
@@ -329,7 +329,7 @@ contract StandardToken is ERC20, BasicToken
  * @title Pausable token
  * @dev StandardToken modified with pausable transfers.
  **/
-contract PausableToken is StandardToken, Pausable 
+contract PausableToken is StandardToken, Pausable
 {
 
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
@@ -359,9 +359,9 @@ contract PausableToken is StandardToken, Pausable
  * @title Frozenable Token
  * @dev Illegal address that can be frozened.
  */
-contract FrozenableToken is Ownable 
+contract FrozenableToken is Ownable
 {
-    
+
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address indexed to, bool frozen);
@@ -383,9 +383,9 @@ contract FrozenableToken is Ownable
 /**
  * @title Colorbay Token
  * @dev Global digital painting asset platform token.
- * @author colorbay.org 
+ * @author colorbay.org
  */
-contract Colorbay is PausableToken, FrozenableToken 
+contract Colorbay is PausableToken, FrozenableToken
 {
 
     string public name = "Colorbay Token";
@@ -426,8 +426,8 @@ contract Colorbay is PausableToken, FrozenableToken
      */
     function transferFrom(address _from, address _to, uint256 _value) public whenNotFrozen(_from) returns (bool) {
         return super.transferFrom(_from, _to, _value);
-    }        
-    
+    }
+
 }
 
 /**
@@ -461,52 +461,52 @@ library SafeERC20 {
 contract TokenVesting is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20Basic;
-  
+
     ERC20Basic public token;
 
     uint256 public planCount = 0;
     uint256 public payPool = 0;
-    
+
     //A token holder's plan
     struct Plan {
       //beneficiary of tokens after they are released
-      address beneficiary; 
-      
+      address beneficiary;
+
       //Lock start time
       uint256 startTime;
-      
+
       //Lock deadline
       uint256 locktoTime;
-      
+
       //Number of installments of release time
-      uint256 releaseStages; 
-      
+      uint256 releaseStages;
+
       //Release completion time
       uint256 endTime;
-      
+
       //Allocated token balance
       uint256 totalToken;
-      
+
       //Current release quantity
       uint256 releasedAmount;
-      
+
       //Whether the token can be revoked
       bool revocable;
-      
+
       //Whether the token has been revoked
       bool isRevoked;
-      
+
       //Remarks for a plan
       string remark;
     }
-    
+
     //Token holder's plan set
     mapping (address => Plan) public plans;
-    
+
     event Released(address indexed beneficiary, uint256 amount);
     event Revoked(address indexed beneficiary, uint256 refund);
     event AddPlan(address indexed beneficiary, uint256 startTime, uint256 locktoTime, uint256 releaseStages, uint256 endTime, uint256 totalToken, uint256 releasedAmount, bool revocable, bool isRevoked, string remark);
-    
+
     /**
      * @param _token ERC20 token which is being vested
      */
@@ -531,7 +531,7 @@ contract TokenVesting is Ownable {
         require(plans[_beneficiary].beneficiary != address(0));
         _;
     }
-    
+
     /**
      * @dev Add a token holder's plan
      */
@@ -546,14 +546,14 @@ contract TokenVesting is Ownable {
         planCount = planCount.add(1);
         emit AddPlan(_beneficiary, _startTime, _locktoTime, _releaseStages, _endTime, _totalToken, 0, _revocable, false, _remark);
     }
-    
+
     /**
     * @notice Transfers vested tokens to beneficiary.
     */
     function release(address _beneficiary) public whenPlanExist(_beneficiary) {
 
         require(!plans[_beneficiary].isRevoked);
-        
+
         uint256 unreleased = releasableAmount(_beneficiary);
 
         if(unreleased > 0 && unreleased <= plans[_beneficiary].totalToken) {
@@ -561,10 +561,10 @@ contract TokenVesting is Ownable {
             payPool = payPool.sub(unreleased);
             token.safeTransfer(_beneficiary, unreleased);
             emit Released(_beneficiary, unreleased);
-        }        
-        
+        }
+
     }
-    
+
     /**
      * @dev Calculates the amount that has already vested but hasn't been released yet.
      */
@@ -584,18 +584,18 @@ contract TokenVesting is Ownable {
         } else if (block.timestamp > plans[_beneficiary].endTime && plans[_beneficiary].totalToken == plans[_beneficiary].releasedAmount) {
             return plans[_beneficiary].totalToken;
         }
-        
+
         uint256 totalTime = plans[_beneficiary].endTime.sub(plans[_beneficiary].locktoTime);
         uint256 totalToken = plans[_beneficiary].totalToken;
         uint256 releaseStages = plans[_beneficiary].releaseStages;
         uint256 endTime = block.timestamp > plans[_beneficiary].endTime ? plans[_beneficiary].endTime : block.timestamp;
         uint256 passedTime = endTime.sub(plans[_beneficiary].locktoTime);
-        
+
         uint256 unitStageTime = totalTime.div(releaseStages);
         uint256 unitToken = totalToken.div(releaseStages);
         uint256 currStage = passedTime.div(unitStageTime);
 
-        uint256 totalBalance = 0;        
+        uint256 totalBalance = 0;
         if(currStage > 0 && releaseStages == currStage && (totalTime % releaseStages) > 0 && block.timestamp < plans[_beneficiary].endTime) {
             totalBalance = unitToken.mul(releaseStages.sub(1));
         } else if(currStage > 0 && releaseStages == currStage) {
@@ -604,9 +604,9 @@ contract TokenVesting is Ownable {
             totalBalance = unitToken.mul(currStage);
         }
         return totalBalance;
-        
+
     }
-    
+
     /**
      * @notice Allows the owner to revoke the vesting. Tokens already vested
      * remain in the contract, the rest are returned to the owner.
@@ -615,26 +615,26 @@ contract TokenVesting is Ownable {
     function revoke(address _beneficiary) public onlyOwner whenPlanExist(_beneficiary) {
 
         require(plans[_beneficiary].revocable && !plans[_beneficiary].isRevoked);
-        
+
         //Transfer the attribution token to the beneficiary before revoking.
         release(_beneficiary);
 
         uint256 refund = revokeableAmount(_beneficiary);
-    
+
         plans[_beneficiary].isRevoked = true;
         payPool = payPool.sub(refund);
-        
+
         token.safeTransfer(owner, refund);
         emit Revoked(_beneficiary, refund);
     }
-    
+
     /**
      * @dev Calculates the amount that recoverable token.
      */
     function revokeableAmount(address _beneficiary) public view whenPlanExist(_beneficiary) returns (uint256) {
 
         uint256 totalBalance = 0;
-        
+
         if(plans[_beneficiary].isRevoked) {
             totalBalance = 0;
         } else if (block.timestamp <= plans[_beneficiary].locktoTime) {
@@ -644,7 +644,7 @@ contract TokenVesting is Ownable {
         }
         return totalBalance;
     }
-    
+
     /**
      * Current token balance of the contract
      */
@@ -652,4 +652,20 @@ contract TokenVesting is Ownable {
         return token.balanceOf(this);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

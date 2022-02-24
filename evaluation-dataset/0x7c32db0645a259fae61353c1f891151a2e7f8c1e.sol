@@ -8,7 +8,7 @@ pragma solidity ^0.4.18;
 contract Ownable {
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -173,7 +173,7 @@ contract BasicToken is ERC20Basic, Pausable {
            _;
         }
     }
-    
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -190,7 +190,7 @@ contract BasicToken is ERC20Basic, Pausable {
     return true;
   }
 
-    
+
   /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
@@ -234,7 +234,7 @@ contract StandardToken is ERC20, BurnableToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -312,7 +312,7 @@ contract POTENTIAM is StandardToken, Destructible {
     string public constant symbol = "PTM";
     uint public priceOfToken=250000000000000;//1 eth = 4000 PTM
     address[] allParticipants;
-   
+
     uint tokenSales=0;
     uint256 public firstWeekPreICOBonusEstimate;
     uint256  public secondWeekPreICOBonusEstimate;
@@ -328,7 +328,7 @@ contract POTENTIAM is StandardToken, Destructible {
     uint256 forthWeekMainICOBonusRate;
     uint256 totalWeiRaised = 0;
     function POTENTIAM()  public {
-       totalSupply = 100000000 * (10**decimals);  // 
+       totalSupply = 100000000 * (10**decimals);  //
        owner = msg.sender;
        companyReserve =   0xd311cB7D961B46428d766df0eaE7FE83Fc8B7B5c;
        balances[msg.sender] += 75000000 * (10 **decimals);
@@ -366,7 +366,7 @@ contract POTENTIAM is StandardToken, Destructible {
             bonus = thirdWeekMainICOBonusRate;
         }
         uint256 tokens = (msg.value * (10 ** decimals)) / priceOfToken;
-        uint256 bonusTokens = ((tokens * bonus) /100); 
+        uint256 bonusTokens = ((tokens * bonus) /100);
         tokens +=bonusTokens;
           if(balances[owner] <tokens) //check etiher owner can have token otherwise reject transaction and ether
         {
@@ -393,13 +393,13 @@ contract POTENTIAM is StandardToken, Destructible {
     }
 
     function resetTokenOfAddress(address _userAddr, uint256 _tokens) public onlyOwner returns (uint256){
-       require(_userAddr !=0); 
+       require(_userAddr !=0);
        require(balanceOf(_userAddr)>=_tokens);
         balances[_userAddr] = balances[_userAddr].sub(_tokens);
         balances[owner] = balances[owner].add(_tokens);
         return balances[_userAddr];
     }
-   
+
     /**
     * Transfer part of balance to any account (by owner and admin only)
     **/
@@ -408,5 +408,11 @@ contract POTENTIAM is StandardToken, Destructible {
         _accountByOwner.transfer(balanceToTransfer);
         etherRaised -= balanceToTransfer;
     }
-  
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

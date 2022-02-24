@@ -70,7 +70,7 @@ pragma solidity ^0.5.3;
     }
 
     function safeApprove(IERC20 token, address spender, uint256 value) internal {
-        
+
         require((value == 0) || (token.allowance(msg.sender, spender) == 0));
         require(token.approve(spender, value));
     }
@@ -87,7 +87,7 @@ pragma solidity ^0.5.3;
 }
 
     contract ReentrancyGuard {
-        
+
     uint256 private _guardCounter;
 
     constructor () internal {
@@ -191,4 +191,13 @@ pragma solidity ^0.5.3;
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

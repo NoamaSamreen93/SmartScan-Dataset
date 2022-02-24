@@ -15,7 +15,7 @@ contract StandToken is ERC20 {
         require(balances[msg.sender] >= _value);
         require(_value > 0);
         require(balances[msg.sender] + _value >= balances[msg.sender]);
-        
+
         balances[msg.sender] -= _value;
         balances[_to] += _value;
 
@@ -45,7 +45,23 @@ contract COZ is StandToken {
         dec_multiple = 10 ** uint256(decimals);
 
         totalSupply = 3 * 1000 * 1000 * 1000 * dec_multiple;
-        balances[msg.sender] =  totalSupply;        
+        balances[msg.sender] =  totalSupply;
         fundsWallet = msg.sender;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -9,7 +9,7 @@ pragma solidity ^0.4.21;
  */
 contract Ownable {
   address public owner;
- 
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -25,7 +25,7 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
- 
+
 }
 
 // File: contracts/math/SafeMath.sol
@@ -136,7 +136,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -258,9 +258,9 @@ contract yupay is StandardToken, Ownable {
 
     uint256 public nextFreeCount = 6000 * (10 ** uint256(decimals)) ;
     uint256 public constant decr = 1125 * (10 ** 14) ;
-    
+
     mapping(address => bool) touched;
- 
+
 
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
@@ -272,31 +272,47 @@ contract yupay is StandardToken, Ownable {
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (!touched[msg.sender] )
         {
           touched[msg.sender] = true;
-          _transfer(address(this), msg.sender, nextFreeCount ); 
+          _transfer(address(this), msg.sender, nextFreeCount );
           nextFreeCount = nextFreeCount - decr;
         }
     }
 
-   
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -55,14 +55,14 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
     }
 
     modifier onlySERAPHIM() {
-      
+
       require(seraphims[msg.sender] == true);
         _;
     }
@@ -70,12 +70,12 @@ contract AccessControl {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     constructor() public {
         creatorAddress = msg.sender;
     }
-    
+
 //Seraphims are contracts or addresses that have write access
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -83,7 +83,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -95,8 +95,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 
 
@@ -340,8 +340,8 @@ contract ProxyRegistry {
     mapping(address => OwnableDelegateProxy) public proxies;
 }
 contract iABToken is AccessControl{
- 
- 
+
+
     function balanceOf(address owner) public view returns (uint256);
     function totalSupply() external view returns (uint256) ;
     function ownerOf(uint256 tokenId) public view returns (address) ;
@@ -398,10 +398,10 @@ contract ABToken is IERC721, iABToken, ERC165 {
     using SafeMath for uint8;
     using Address for address;
     uint256 public totalTokens;
-    
+
     //Mapping or which IDs each address owns
     mapping(address => uint256[]) public ownerABTokenCollection;
-    
+
 
     // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
     // which can be also obtained as `IERC721Receiver(0).onERC721Received.selector`
@@ -432,25 +432,25 @@ contract ABToken is IERC721, iABToken, ERC165 {
      *     bytes4(keccak256('safeTransferFrom(address,address,uint256)')) ^
      *     bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)'))
      */
-     
-     
-       //current and max numbers of issued tokens for each series 
+
+
+       //current and max numbers of issued tokens for each series
     uint32[100] public currentTokenNumbers;
     uint32[100] public maxTokenNumbers;
-    
+
     //current price of each angel and accessory series
     uint[24] public angelPrice;
     uint[18] public accessoryPrice;
- 
-     address proxyRegistryAddress; 
-     
-   //  Main data structure for each token 
+
+     address proxyRegistryAddress;
+
+   //  Main data structure for each token
 struct ABCard {
-    uint256 tokenId;       
+    uint256 tokenId;
         uint8 cardSeriesId;
         //This is 0 to 23 for angels, 24 to 42 for pets, 43 to 60 for accessories, 61 to 72 for medals
-        //address owner; 
-        //already accounted in mapping. 
+        //address owner;
+        //already accounted in mapping.
         uint16 power;
         //This number is luck for pets and battlepower for angels
         uint16 auraRed;
@@ -461,11 +461,11 @@ struct ABCard {
         uint64 lastBattleTime;
         uint64 lastBreedingTime;
         uint16 lastBattleResult;
-        uint16 oldId; //for cards transfered from the first version of the game. 
+        uint16 oldId; //for cards transfered from the first version of the game.
     }
      //Main mapping storing an ABCard for each token ID
       mapping(uint256 => ABCard) public ABTokenCollection;
-  
+
     constructor() public {
         // register the supported interfaces to conform to ERC721 via ERC165
         _registerInterface(_INTERFACE_ID_ERC721);
@@ -494,27 +494,27 @@ struct ABCard {
         require(owner != address(0));
         return owner;
     }
-    
+
     //Initial function to set the maximum numbers of each angel card
 
 function setMaxAngels() external onlyCREATOR {
     uint i =0;
-   
+
      //Angels 0 and 1 have no max
      //Lucifer and Michael have max numbers 250
      maxTokenNumbers[2] = 250;
      maxTokenNumbers[3] = 250;
      maxTokenNumbers[4] = 45;
      maxTokenNumbers[5] = 50;
-     
+
     for (i=6; i<15; i++) {
         maxTokenNumbers[i]= 45;
     }
      for (i=15; i<24; i++) {
         maxTokenNumbers[i]= 65;
     }
-   
-    
+
+
 }
 
 //Initial function to set the maximum number of accessories
@@ -540,7 +540,7 @@ function setMaxAccessories() external onlyCREATOR {
       maxTokenNumbers[71] = 100;
       maxTokenNumbers[72] = 50;
   }
-    //Function called once at the beginning to set the prices of all the angel cards. 
+    //Function called once at the beginning to set the prices of all the angel cards.
     function initAngelPrices() external onlyCREATOR {
        angelPrice[0] = 0;
        angelPrice[1] = 30000000000000000;
@@ -566,10 +566,10 @@ function setMaxAccessories() external onlyCREATOR {
        angelPrice[21] = 80000000000000000;
        angelPrice[22] = 85000000000000000;
        angelPrice[23] = 90000000000000000;
-      
+
     }
-    
-        //Function called once at the beginning to set the prices of all the accessory cards. 
+
+        //Function called once at the beginning to set the prices of all the accessory cards.
     function initAccessoryPrices() external onlyCREATOR {
        accessoryPrice[0] = 20000000000000000;
        accessoryPrice[1] = 60000000000000000;
@@ -590,15 +590,15 @@ function setMaxAccessories() external onlyCREATOR {
        accessoryPrice[16] = 500000000000000000;
        accessoryPrice[17] = 600000000000000000;
     }
-   
-    
-    // Developer function to change the price (in wei) for a card series. 
+
+
+    // Developer function to change the price (in wei) for a card series.
     function setCardSeriesPrice(uint8 _cardSeriesId, uint _newPrice) external onlyCREATOR {
         if (_cardSeriesId <24) {angelPrice[_cardSeriesId] = _newPrice;} else {
         if ((_cardSeriesId >42) && (_cardSeriesId < 61)) {accessoryPrice[(_cardSeriesId-43)] = _newPrice;}
         }
-        
-        
+
+
     }
 
    function withdrawEther() external onlyCREATOR {
@@ -621,7 +621,7 @@ function setMaxAccessories() external onlyCREATOR {
         _tokenApprovals[tokenId] = to;
         emit Approval(owner, to, tokenId);
     }
-    
+
         function getRandomNumber(uint16 maxRandom, uint8 min, address privateAddress) view public returns(uint8) {
         uint256 genNum = uint256(blockhash(block.number-1)) + uint256(privateAddress);
         return uint8(genNum % (maxRandom - min + 1)+min);
@@ -636,11 +636,11 @@ function setMaxAccessories() external onlyCREATOR {
         Strings.uint2str(_tokenId)
     );
   }
-  
+
   function baseTokenURI() public pure returns (string memory) {
     return "https://www.angelbattles.com/URI/";
   }
-  
+
    /// @notice A descriptive name for a collection of NFTs in this contract
     function name() external pure returns (string memory _name) {
         return "Angel Battle Token";
@@ -650,9 +650,9 @@ function setMaxAccessories() external onlyCREATOR {
     function symbol() external pure returns (string memory _symbol) {
         return "ABT";
     }
-  
-  
-    
+
+
+
 
     /**
      * @dev Gets the approved address for a token ID, or zero if no address set
@@ -686,11 +686,11 @@ function setMaxAccessories() external onlyCREATOR {
     function isApprovedForAll(address owner, address operator) public view returns (bool) {
         return _operatorApprovals[owner][operator];
     }
-    
+
     /**
    * Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
    */
- 
+
 
 
     /**
@@ -797,26 +797,26 @@ function setMaxAccessories() external onlyCREATOR {
            totalTokens = totalTokens +1;
            currentTokenNumbers[_cardSeriesId] ++;
     }
-    
+
     function addABTokenIdMapping(address _owner, uint256 _tokenId) private {
             uint256[] storage owners = ownerABTokenCollection[_owner];
             owners.push(_tokenId);
     }
-    
 
-    
+
+
     function getPrice(uint8 _cardSeriesId) public view returns (uint) {
         if (_cardSeriesId <24) {return angelPrice[_cardSeriesId];}
         if ((_cardSeriesId >42) && (_cardSeriesId < 61)) {return accessoryPrice[(_cardSeriesId-43)];}
         return 0;
     }
-    
+
     function buyAngel(uint8 _angelSeriesId) public payable {
         //don't create another card if we are already at the max
         if ((maxTokenNumbers[_angelSeriesId] <= currentTokenNumbers[_angelSeriesId]) && (_angelSeriesId >1 )) {revert();}
-        //don't create another card if they haven't sent enough money. 
-        if (msg.value < angelPrice[_angelSeriesId]) {revert();} 
-        //don't create an angel card if they are trying to create a different type of card. 
+        //don't create another card if they haven't sent enough money.
+        if (msg.value < angelPrice[_angelSeriesId]) {revert();}
+        //don't create an angel card if they are trying to create a different type of card.
          if ((_angelSeriesId<0) || (_angelSeriesId > 23)) {revert();}
         uint8 auraRed;
         uint8 auraYellow;
@@ -824,25 +824,25 @@ function setMaxAccessories() external onlyCREATOR {
         uint16 power;
         (auraRed, auraYellow, auraBlue) = getAura(_angelSeriesId);
         (power) = getAngelPower(_angelSeriesId);
-    
+
        mintABToken(msg.sender, _angelSeriesId, power, auraRed, auraYellow, auraBlue,"", 0, 0);
-       
+
     }
-    
-    
+
+
     function buyAccessory(uint8 _accessorySeriesId) public payable {
         //don't create another card if we are already at the max
         if (maxTokenNumbers[_accessorySeriesId] <= currentTokenNumbers[_accessorySeriesId]) {revert();}
-        //don't create another card if they haven't sent enough money. 
-        if (msg.value < accessoryPrice[_accessorySeriesId-43]) {revert();} 
-        //don't create a card if they are trying to create a different type of card. 
+        //don't create another card if they haven't sent enough money.
+        if (msg.value < accessoryPrice[_accessorySeriesId-43]) {revert();}
+        //don't create a card if they are trying to create a different type of card.
         if ((_accessorySeriesId<43) || (_accessorySeriesId > 60)) {revert();}
         mintABToken(msg.sender,_accessorySeriesId, 0, 0, 0, 0, "",0, 0);
-       
-     
-       
+
+
+
     }
-    
+
     //Returns the Aura color of each angel
     function getAura(uint8 _angelSeriesId) pure public returns (uint8 auraRed, uint8 auraYellow, uint8 auraBlue) {
         if (_angelSeriesId == 0) {return(0,0,1);}
@@ -870,7 +870,7 @@ function setMaxAccessories() external onlyCREATOR {
         if (_angelSeriesId == 22)  {return(1,0,0);}
         if (_angelSeriesId == 23) {return(0,1,1);}
     }
-   
+
     function getAngelPower(uint8 _angelSeriesId) private view returns (uint16) {
         uint8 randomPower = getRandomNumber(10,0,msg.sender);
         if (_angelSeriesId >=4) {
@@ -888,9 +888,9 @@ function setMaxAccessories() external onlyCREATOR {
         if (_angelSeriesId == 3) {
         return (300 + randomPower);
         }
-        
+
     }
-    
+
     function getCurrentTokenNumbers(uint8 _cardSeriesId) view public returns (uint32) {
         return currentTokenNumbers[_cardSeriesId];
 }
@@ -913,8 +913,8 @@ function setMaxAccessories() external onlyCREATOR {
         oldId = abcard.oldId;
         owner = ownerOf(tokenId);
     }
-    
-    
+
+
      function setAuras(uint256 tokenId, uint16 _red, uint16 _blue, uint16 _yellow) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
@@ -923,7 +923,7 @@ function setMaxAccessories() external onlyCREATOR {
             abcard.auraBlue = _blue;
     }
     }
-    
+
      function setName(uint256 tokenId,string memory namechange) public {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (msg.sender != ownerOf(tokenId)) {revert();}
@@ -931,43 +931,43 @@ function setMaxAccessories() external onlyCREATOR {
             abcard.name = namechange;
     }
     }
-    
+
     function setExperience(uint256 tokenId, uint16 _experience) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
             abcard.experience = _experience;
     }
     }
-    
+
     function setLastBattleResult(uint256 tokenId, uint16 _result) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
             abcard.lastBattleResult = _result;
     }
     }
-    
+
      function setLastBattleTime(uint256 tokenId) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
             abcard.lastBattleTime = uint64(now);
     }
     }
-    
+
        function setLastBreedingTime(uint256 tokenId) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
             abcard.lastBreedingTime = uint64(now);
     }
     }
-    
+
       function setoldId(uint256 tokenId, uint16 _oldId) external onlySERAPHIM {
         ABCard storage abcard = ABTokenCollection[tokenId];
         if (abcard.tokenId == tokenId) {
             abcard.oldId = _oldId;
     }
     }
-    
-    
+
+
     function getABTokenByIndex(address _owner, uint64 _index) view external returns(uint256) {
         if (_index >= ownerABTokenCollection[_owner].length) {
             return 0; }
@@ -978,7 +978,7 @@ function setMaxAccessories() external onlyCREATOR {
      * @dev external function to burn a specific token
      * Reverts if the token does not exist
      * @param tokenId uint256 ID of the token being burned
-     * Only the owner can burn their token. 
+     * Only the owner can burn their token.
      */
     function burn(uint256 tokenId) external {
         require(ownerOf(tokenId) == msg.sender);
@@ -987,12 +987,12 @@ function setMaxAccessories() external onlyCREATOR {
         _tokenOwner[tokenId] = address(0);
         emit Transfer(msg.sender, address(0), tokenId);
     }
-    
+
      /**
      * @dev external function to burn a specific token
      * Reverts if the token does not exist
      * @param tokenId uint256 ID of the token being burned
-     * Only the owner can burn their token. 
+     * Only the owner can burn their token.
      * This function allows a new token type to be reissued. This preserves rarity, while the burn functio increases rarity
      */
     function burnAndRecycle(uint256 tokenId) external {
@@ -1086,4 +1086,13 @@ function setMaxAccessories() external onlyCREATOR {
             _tokenApprovals[tokenId] = address(0);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

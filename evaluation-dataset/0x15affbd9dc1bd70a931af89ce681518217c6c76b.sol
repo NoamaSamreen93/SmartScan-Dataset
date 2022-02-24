@@ -380,11 +380,11 @@ contract StarCoin is Ownable, StandardToken {
         emit Transfer(address(this), _user, _amount);
     }
 
-    function rewardTokens(address _user, uint256 _tokens) external   { 
+    function rewardTokens(address _user, uint256 _tokens) external   {
         require(msg.sender == owner || isMinter[msg.sender]);
         _mintTokens(_user, _tokens);
     }
-    function buyStudioStake(address _user, uint256 _tokens) external   { 
+    function buyStudioStake(address _user, uint256 _tokens) external   {
         require(msg.sender == owner || isMinter[msg.sender]);
         _burn(_user, _tokens);
     }
@@ -1356,4 +1356,15 @@ contract EtherPornStars is Ownable, SupportsInterfaceWithLookup, ERC721BasicToke
   {
     return ownedTokens[msg.sender];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

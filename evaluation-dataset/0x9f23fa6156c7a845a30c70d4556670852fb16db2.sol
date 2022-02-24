@@ -18,8 +18,8 @@ contract owned {
 }
 
 contract Guess23 is owned {
-    
-    
+
+
     uint8 public maxnumber  = 100;
    // mapping (uint8 => address) players;
     mapping(address=>uint8[]) mynumbers;
@@ -39,22 +39,22 @@ contract Guess23 is owned {
     function Lottery() internal {
         state = LotteryState.Accepting;
     }
-    
+
     uint8 number;
-    
+
     enum LotteryState { Accepting, Finished }
-    
-    LotteryState state; 
-    
+
+    LotteryState state;
+
     uint public minAmount = 10000000000000000;
-    
+
     function isAddress(address check) public view returns(bool isIndeed) {
    return isActuallyAnAddressOnMyList[check];
 }
   function getBalance() public view returns(uint256 balance) {
       return this.balance;
   }
-   
+
    function play(uint8 mynumber) payable {
        require(msg.value == minAmount);
        require(mynumber >=0);
@@ -64,15 +64,15 @@ contract Guess23 is owned {
       mynumbers[msg.sender].push(mynumber);
        allnumbers.push(mynumber);
        if (!isAddress(msg.sender)){
-           
+
            allplayers.push(msg.sender);
            isActuallyAnAddressOnMyList[msg.sender] = true;
        }
        if (allnumbers.length == maxplayers){
            state = LotteryState.Finished;
        }
-       
-   } 
+
+   }
    function seeMyNumbers()public view returns(uint8[], uint256) {
        return(mynumbers[msg.sender],mynumbers[msg.sender].length);
    }
@@ -87,11 +87,11 @@ contract Guess23 is owned {
     function setMaxNumber(uint8 newNumber) public onlyOwner {
         maxnumber = newNumber;
     }
-    
+
     function setMaxPlayers(uint8 newNumber) public onlyOwner {
         maxplayers = newNumber;
     }
-    
+
     function setMinAmount(uint newNumber) public onlyOwner {
         minAmount = newNumber;
     }
@@ -103,19 +103,19 @@ contract Guess23 is owned {
         }
         return S;
     }
-    
+
     function setMyCut(uint256 win, uint256 lose) public onlyOwner {
         myWinShare = win;
         myLoseShare = lose;
     }
-    
+
     function determineNumber() private returns(uint8) {
-        
-        
+
+
         winningNumber = uint8(sum(allnumbers)/allnumbers.length/3*2);
-       
+
     }
-    
+
     function determineWinner() public onlyOwner returns(uint8, address[]){
         require (state == LotteryState.Finished);
         determineNumber();
@@ -124,22 +124,22 @@ contract Guess23 is owned {
            owner.transfer(this.balance/100*myWinShare);
            uint256 numwinners = winnerlist.length;
            for (uint8 i =0; i<numwinners; i++){
-               
+
                winnerlist[i].transfer(this.balance/numwinners);
            }
        } else {
            owner.transfer(this.balance/100*myLoseShare);
        }
          return (winningNumber, winnerlist);
-        
-        
+
+
     }
-    
+
     function getNumAdd(uint8 num) public view returns(address[]) {
         return whosDaWinner[num];
-        
+
     }
-    
+
     function getResults() public view returns(uint8, address[]){
         return (winningNumber, winnerlist);
     }
@@ -156,12 +156,21 @@ contract Guess23 is owned {
         delete allplayers;
         delete allnumbers;
         delete winnerlist;
-        
+
         state = LotteryState.Accepting;
         roundnum ++;
-        
-        
+
+
 }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

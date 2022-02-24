@@ -293,42 +293,42 @@ contract MintableToken is StandardToken, Ownable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
 
- 
+
+
 contract VestopiaToken is MintableToken {
-    
+
     string public constant name = "Vestopia";
-    
+
     string public constant symbol = "VTP";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
- 
- 
+
+
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
- 
+
     uint restrictedPercent;
- 
+
     address restricted;
- 
+
     VestopiaToken public token = new VestopiaToken();
- 
+
     uint start;
-    
+
     uint period;
- 
+
     uint hardcap;
- 
+
     uint rate;
-    
+
     uint minPrice;
- 
+
     function Crowdsale() public {
     minPrice = 100000000000000000;
 	multisig =0x78e904695cc97248bB18eCfd83d4dd20D73fd619 ;
@@ -339,32 +339,32 @@ contract Crowdsale is Ownable {
 	period = 60;
     hardcap = 7257000000000000000000;
     }
- 
+
     modifier saleIsOn() {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(multisig.balance <= hardcap);
         _;
     }
-    
+
   function setMinPrice(uint newMinPrice) public onlyOwner {
      minPrice = newMinPrice;
-         
+
      }
-  
-    
+
+
     function finishMinting() public onlyOwner {
-       
+
 	uint issuedTokenSupply = token.totalSupply();
 	uint restrictedTokens = issuedTokenSupply.mul(restrictedPercent).div(100 - restrictedPercent);
 	token.mint(restricted, restrictedTokens);
         token.finishMinting();
     }
-    
- 
+
+
   function createTokens() isUnderHardCap saleIsOn public payable {
       require(msg.value >= minPrice);
         multisig.transfer(msg.value);
@@ -381,9 +381,20 @@ contract Crowdsale is Ownable {
         token.mint(msg.sender, tokens);
     }
 
- 
+
     function() external payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -925,9 +925,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "HNN";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0xc5A792CFD6faFE71348f919815B2A2eaaEf32a93;
-    
+
     uint public constant START_TIME = 1535698800;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -1039,9 +1039,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1065,7 +1065,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1196,12 +1196,12 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
-    
-    
-    
+
+
+
+
     , WhitelistedCrowdsale
-    
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1211,7 +1211,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(2000 * TOKEN_DECIMAL_MULTIPLIER, 0x0DD7F0d06771eBa8B04Cc929718E15E326CBACC8, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1538290860)
         CappedCrowdsale(37500000000000000000000)
-        
+
     {
     }
 
@@ -1223,7 +1223,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[4] memory addresses = [address(0x9144dd91d7039806bab5fa60fc2020198873293d),address(0x470049b2a6877b115717477e8abdc376c7954e60),address(0x911869e7d29571e0d00046ae4ff635d4de580afd),address(0xb3e869896f00f442f4bf9028c12e7936a8e9fb85)];
         uint[4] memory amounts = [uint(200000000000000000000000000),uint(30000000000000000000000000),uint(10000000000000000000000000),uint(10000000000000000000000000)];
         uint64[4] memory freezes = [uint64(0),uint64(0),uint64(0),uint64(0)];
@@ -1235,14 +1235,14 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
+
     /**
      * @dev override hasClosed to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1251,9 +1251,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 10000000000000000000;
         return super.hasClosed() || remainValue;
     }
-    
 
-    
+
+
     function setStartTime(uint _startTime) public onlyOwner {
         // only if CS was not started
         require(now < openingTime);
@@ -1263,9 +1263,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(_startTime, closingTime, openingTime, closingTime);
         openingTime = _startTime;
     }
-    
 
-    
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < closingTime);
@@ -1275,9 +1275,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         closingTime = _endTime;
     }
-    
 
-    
+
+
     function setTimes(uint _startTime, uint _endTime) public onlyOwner {
         require(_endTime > _startTime);
         uint oldStartTime = openingTime;
@@ -1307,11 +1307,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         }
     }
-    
 
-    
 
-    
+
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
@@ -1322,13 +1322,19 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     )
         internal
     {
-        
+
         require(msg.value >= 10000000000000000000);
-        
-        
+
+
         require(msg.value <= 4000000000000000000000);
-        
+
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

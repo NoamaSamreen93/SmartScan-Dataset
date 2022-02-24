@@ -1246,3 +1246,12 @@ contract LockingEth4Reputation is Locking4Reputation, Ownable {
 contract DxLockEth4Rep is LockingEth4Reputation {
     constructor() public {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

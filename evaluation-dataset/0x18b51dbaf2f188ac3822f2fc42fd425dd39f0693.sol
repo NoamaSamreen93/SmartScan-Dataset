@@ -427,7 +427,7 @@ contract Terminateable is Ownable {
   event Terminate();
 
   bool public terminated = false;
-  
+
   /**
    * @dev Modifier to make a function callable only when the contract is not terminated.
    */
@@ -456,7 +456,7 @@ contract TerminateableToken is MintableToken, Terminateable {
   function mint(
     address _to,
     uint256 _value
-  ) 
+  )
     public
     whenNotTerminated
     returns (bool)
@@ -528,4 +528,15 @@ contract OSEToken is PausableToken, TerminateableToken, CappedToken {
     string public icon = "QmdXK2rRCQkQtRm2YZpVsDG3ERn3yqtpFetPEjiNQquQFx";
 
     constructor () public CappedToken(50000000000000000){}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

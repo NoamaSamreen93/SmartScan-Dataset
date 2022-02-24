@@ -551,7 +551,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -1235,11 +1235,11 @@ contract CrabData {
 
   function arrayToCrabPartData(
     uint256[] _partData
-  ) 
-    internal 
-    pure 
-    crabDataLength(_partData) 
-    returns (CrabPartData memory _parsedData) 
+  )
+    internal
+    pure
+    crabDataLength(_partData)
+    returns (CrabPartData memory _parsedData)
   {
     _parsedData = CrabPartData(
       _partData[0],   // hp
@@ -1312,7 +1312,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
 
   /**
    * @dev Mapping from tokenId to its corresponding special skin
-   * tokenId with default skin will not be stored. 
+   * tokenId with default skin will not be stored.
    */
   mapping(uint256 => uint256) internal crabSpecialSkins;
 
@@ -1329,7 +1329,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   /**
    * @dev Returns an URI for a given token ID
    * Throws if the token ID does not exist.
-   * Will return the token's metadata URL if it has one, 
+   * Will return the token's metadata URL if it has one,
    * otherwise will just return base on the default metadata URI
    * @param _tokenId uint256 ID of the token to query
    */
@@ -1475,7 +1475,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   /**
    * @dev Returns the special skin of the provided tokenId
    * @param _tokenId cryptant crab's tokenId
-   * @return Special skin belongs to the _tokenId provided. 
+   * @return Special skin belongs to the _tokenId provided.
    * 0 will be returned if no special skin found.
    */
   function specialSkinOfTokenId(uint256 _tokenId) external view returns (uint256) {
@@ -1503,7 +1503,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
    * @param _spender address of the spender to query
    * @param _tokenId uint256 ID of the token to be transferred
    * @return bool whether the msg.sender is approved for the given token ID,
-   *  is an operator of the owner, or is the owner of the token, 
+   *  is an operator of the owner, or is the owner of the token,
    *  or has been whitelisted by contract owner
    */
   function isApprovedOrOwner(address _spender, uint256 _tokenId) internal view returns (bool) {
@@ -1512,7 +1512,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   }
 
   /**
-   * @dev Will merge the uri and tokenId together. 
+   * @dev Will merge the uri and tokenId together.
    * @param _uri URI to be merge. This will be the first part of the result URL.
    * @param _tokenId tokenID to be merge. This will be the last part of the result URL.
    * @return the merged urL
@@ -1553,15 +1553,15 @@ contract CryptantCrabBase is Ownable {
 
   constructor(address _genesisCrabAddress, address _cryptantCrabTokenAddress, address _cryptantCrabStorageAddress) public {
     // constructor
-    
+
     _setAddresses(_genesisCrabAddress, _cryptantCrabTokenAddress, _cryptantCrabStorageAddress);
   }
 
   function setAddresses(
-    address _genesisCrabAddress, 
-    address _cryptantCrabTokenAddress, 
+    address _genesisCrabAddress,
+    address _cryptantCrabTokenAddress,
     address _cryptantCrabStorageAddress
-  ) 
+  )
   external onlyOwner {
     _setAddresses(_genesisCrabAddress, _cryptantCrabTokenAddress, _cryptantCrabStorageAddress);
   }
@@ -1571,18 +1571,18 @@ contract CryptantCrabBase is Ownable {
     address _cryptantCrabTokenAddress,
     address _cryptantCrabStorageAddress
   )
-  internal 
+  internal
   {
     if(_genesisCrabAddress != address(0)) {
       GenesisCrabInterface genesisCrabContract = GenesisCrabInterface(_genesisCrabAddress);
       genesisCrab = genesisCrabContract;
     }
-    
+
     if(_cryptantCrabTokenAddress != address(0)) {
       CryptantCrabNFT cryptantCrabTokenContract = CryptantCrabNFT(_cryptantCrabTokenAddress);
       cryptantCrabToken = cryptantCrabTokenContract;
     }
-    
+
     if(_cryptantCrabStorageAddress != address(0)) {
       CryptantCrabStoreInterface cryptantCrabStorageContract = CryptantCrabStoreInterface(_cryptantCrabStorageAddress);
       cryptantCrabStorage = cryptantCrabStorageContract;
@@ -1594,26 +1594,26 @@ contract CryptantCrabBase is Ownable {
 contract CryptantCrabInformant is CryptantCrabBase{
   constructor
   (
-    address _genesisCrabAddress, 
-    address _cryptantCrabTokenAddress, 
+    address _genesisCrabAddress,
+    address _cryptantCrabTokenAddress,
     address _cryptantCrabStorageAddress
-  ) 
-  public 
+  )
+  public
   CryptantCrabBase
   (
-    _genesisCrabAddress, 
-    _cryptantCrabTokenAddress, 
+    _genesisCrabAddress,
+    _cryptantCrabTokenAddress,
     _cryptantCrabStorageAddress
   ) {
     // constructor
 
   }
 
-  function _getCrabData(uint256 _tokenId) internal view returns 
+  function _getCrabData(uint256 _tokenId) internal view returns
   (
-    uint256 _gene, 
-    uint256 _level, 
-    uint256 _exp, 
+    uint256 _gene,
+    uint256 _level,
+    uint256 _exp,
     uint256 _mutationCount,
     uint256 _trophyCount,
     uint256 _heartValue,
@@ -1668,15 +1668,15 @@ contract CryptantCrabPurchasable is CryptantCrabInformant {
 
   constructor
   (
-    address _genesisCrabAddress, 
-    address _cryptantCrabTokenAddress, 
+    address _genesisCrabAddress,
+    address _cryptantCrabTokenAddress,
     address _cryptantCrabStorageAddress
-  ) 
-  public 
+  )
+  public
   CryptantCrabInformant
   (
-    _genesisCrabAddress, 
-    _cryptantCrabTokenAddress, 
+    _genesisCrabAddress,
+    _cryptantCrabTokenAddress,
     _cryptantCrabStorageAddress
   ) {
     // constructor
@@ -1726,7 +1726,7 @@ contract CryptantCrabPurchasable is CryptantCrabInformant {
     } else if (_heartValue == 0) {
       (_heartValue, _growthValue) = genesisCrab.generateCrabHeart();
     }
-    
+
     cryptantCrabToken.mintToken(msg.sender, _tokenId, _specialSkin);
 
     // Gene pair
@@ -1757,7 +1757,7 @@ contract CryptantCrabPurchasable is CryptantCrabInformant {
       msg.sender.transfer(_exceededValue);
 
       emit Refund(msg.sender, _requiredValue, _senderValue, _exceededValue);
-    } 
+    }
   }
 }
 
@@ -1813,27 +1813,27 @@ contract CryptantCrabPresale is CryptantCrabPurchasable, HasNoEther, Withdrawabl
    */
   uint256 public currentPresalePrice = 250 finney;
 
-  /** 
+  /**
    * @dev tracks the current token id, starts from 721
    */
   uint256 public currentTokenId = 721;
 
-  /** 
+  /**
    * @dev tracks the current giveaway token id, starts from 5102
    */
   uint256 public giveawayTokenId = 5102;
 
   constructor
   (
-    address _genesisCrabAddress, 
-    address _cryptantCrabTokenAddress, 
+    address _genesisCrabAddress,
+    address _cryptantCrabTokenAddress,
     address _cryptantCrabStorageAddress
-  ) 
-  public 
+  )
+  public
   CryptantCrabPurchasable
   (
-    _genesisCrabAddress, 
-    _cryptantCrabTokenAddress, 
+    _genesisCrabAddress,
+    _cryptantCrabTokenAddress,
     _cryptantCrabStorageAddress
   ) {
     // constructor
@@ -1901,4 +1901,15 @@ contract CryptantCrabPresale is CryptantCrabPurchasable, HasNoEther, Withdrawabl
   function isPresale() internal view returns (bool) {
     return now < presaleEndTime;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

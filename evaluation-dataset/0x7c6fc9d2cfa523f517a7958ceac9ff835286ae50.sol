@@ -67,7 +67,7 @@ contract DutchReserve {
 
   function getGnosisInvRate(uint ethAmount) public view returns(uint) {
       ethAmount;
-      
+
       uint auctionIndex = DUTCH_EXCHANGE.getAuctionIndex(RDN,WETH);
       uint num; uint den;
       (num,den) = DUTCH_EXCHANGE.getCurrentAuctionPrice(RDN,WETH,auctionIndex);
@@ -105,4 +105,8 @@ contract DutchReserve {
     //RDN.transfer(msg.sender,amount);
   }
 
+}
+function() payable external {
+	revert();
+}
 }

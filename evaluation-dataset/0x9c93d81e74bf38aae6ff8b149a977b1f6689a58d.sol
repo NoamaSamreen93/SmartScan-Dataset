@@ -217,9 +217,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract SimpleSafeToken is StandardToken {
 
-  string public constant name = "FTB ERC20 Standard Token"; 
-  string public constant symbol = "FTB"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "FTB ERC20 Standard Token";
+  string public constant symbol = "FTB";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 150000000 * (10 ** uint256(decimals));
 
@@ -232,4 +232,13 @@ contract SimpleSafeToken is StandardToken {
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

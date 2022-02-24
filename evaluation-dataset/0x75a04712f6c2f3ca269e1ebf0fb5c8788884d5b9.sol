@@ -21,7 +21,7 @@ contract VIUREFoundersTokenSale {
     if (_start_block <= block.number) throw;
     if (_end_block <= _start_block) throw;
     if (_project_wallet == 0) throw;
-    
+
     token_sale_start_block = _start_block;
     token_sale_end_block = _end_block;
     project_wallet = _project_wallet;
@@ -54,7 +54,7 @@ contract VIUREFoundersTokenSale {
     if (is_max_goal_reached()) throw;
 
     if (transferred_total + msg.value > max_goal_amount) {
-     
+
       var change_to_return = transferred_total + msg.value - max_goal_amount;
       if (!msg.sender.send(change_to_return)) throw;
 
@@ -70,7 +70,7 @@ contract VIUREFoundersTokenSale {
 
   function transfer_funds_to_project() {
     if (!is_min_goal_reached()) throw;
-    
+
     if (this.balance == 0) throw;
 
     if (!project_wallet.send(this.balance)) throw;
@@ -80,7 +80,7 @@ contract VIUREFoundersTokenSale {
     if (!has_token_sale_time_ended()) throw;
 
     if (is_min_goal_reached()) throw;
-  
+
     if (block.number > refund_window_end_block) throw;
 
     var refund_amount = balances[msg.sender];
@@ -102,4 +102,20 @@ contract VIUREFoundersTokenSale {
     if (this.balance == 0) throw;
     if (!project_wallet.send(this.balance)) throw;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

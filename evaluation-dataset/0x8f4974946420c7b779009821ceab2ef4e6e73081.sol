@@ -54,9 +54,9 @@ library SafeMath {
 
 
 
-/** 
+/**
  * @title IndexConsumer
- * @dev This contract adds an autoincrementing index to contracts. 
+ * @dev This contract adds an autoincrementing index to contracts.
  */
 contract IndexConsumer {
 
@@ -99,14 +99,14 @@ contract CapTables is IndexConsumer {
 
     /* EVENTS */
 
-    
+
 
     event NewSecurity(uint256 security);
     event SecurityMigration(uint256 security, address newAddress);
 
-    modifier onlySecurity(uint256 security) {  
+    modifier onlySecurity(uint256 security) {
         require(
-            msg.sender == addresses[security], 
+            msg.sender == addresses[security],
             "this method MUST be called by the security's control account"
         );
         _;
@@ -136,11 +136,22 @@ contract CapTables is IndexConsumer {
     }
 
     /** @dev Transfer an amount of security. */
-    function transfer(uint256 security, address src, address dest, uint256 amount) 
-        public 
-        onlySecurity(security) 
+    function transfer(uint256 security, address src, address dest, uint256 amount)
+        public
+        onlySecurity(security)
     {
         capTable[security][src] = capTable[security][src].sub(amount);
         capTable[security][dest] = capTable[security][dest].add(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

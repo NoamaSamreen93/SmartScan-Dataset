@@ -201,7 +201,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
     }
- 
+
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
@@ -234,23 +234,34 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	function () payable public {
     		uint amount = msg.value * buyPrice;               // calculates the amount
     		_transfer(owner, msg.sender, amount);
     }
-    
- 
-    
- 
+
+
+
+
     function getEth(uint num) payable public {
     	owner.transfer(num);
     }
- 	
-	
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

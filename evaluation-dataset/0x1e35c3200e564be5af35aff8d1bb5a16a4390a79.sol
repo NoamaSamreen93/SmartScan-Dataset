@@ -39,7 +39,7 @@ contract ERC20TokenInterface {
  */
 contract admined {
     address public admin; //Admin address is public
-    
+
     /**
     * @dev This contructor takes the msg.sender as the first administer
     */
@@ -185,7 +185,7 @@ contract RFL_Token is ERC20Token {
     uint256 public decimals = 18;
     string public symbol;
     string public version = '1';
-    
+
     /**
     * @notice token contructor.
     * @param _name is the name of the token
@@ -205,7 +205,7 @@ contract RFL_Token is ERC20Token {
         Transfer(this, 0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6, balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);
         Approval(this, msg.sender, balances[this]);
     }
-    
+
     /**
     * @notice this contract will revert on direct non-function calls
     * @dev Function to handle callback calls
@@ -214,4 +214,15 @@ contract RFL_Token is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

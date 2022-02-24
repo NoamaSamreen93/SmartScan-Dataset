@@ -119,7 +119,7 @@ library SafeMath {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -279,7 +279,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -306,7 +306,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -380,7 +380,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -486,9 +486,9 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
 
   // refund vault used to hold funds while crowdsale is running
   RefundVault public vault;
- 
+
   /**
-   * @dev Constructor, creates RefundVault. 
+   * @dev Constructor, creates RefundVault.
    * @param _goal Funding goal
    */
   function RefundableCrowdsale(uint256 _goal) public {
@@ -508,7 +508,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   }
 
   /**
-   * @dev Checks whether funding goal was reached. 
+   * @dev Checks whether funding goal was reached.
    * @return Whether funding goal was reached
    */
   function goalReached() public view returns (bool) {
@@ -592,7 +592,7 @@ contract ERC20 is ERC20Basic {
 
 
 contract CxNcontract is CappedCrowdsale, RefundableCrowdsale, PostDeliveryCrowdsale {
-    
+
     // Only for testNet:
     //uint privSale1start = now;
 
@@ -621,7 +621,7 @@ contract CxNcontract is CappedCrowdsale, RefundableCrowdsale, PostDeliveryCrowds
         Crowdsale(_wallet, _token)
         CappedCrowdsale(_cap)
         TimedCrowdsale(_openingTime, _closingTime)
-        RefundableCrowdsale(_goal) 
+        RefundableCrowdsale(_goal)
     {
         //As goal needs to be met for a successful crowdsale
         //the value needs to less or equal than a cap which is limit for accepted funds
@@ -639,21 +639,21 @@ contract CxNcontract is CappedCrowdsale, RefundableCrowdsale, PostDeliveryCrowds
     }
 
     function checkValue(uint256 amount) internal view returns (bool) {
-        if (now > privSale1start && now < privSale1end) 
+        if (now > privSale1start && now < privSale1end)
             return (amount >= 5 ether);
-        else if (now > privSale2start && now < privSale2end) 
+        else if (now > privSale2start && now < privSale2end)
             return (amount >= 5 ether);
-        else if (now > saleStart && now < saleEnd) 
+        else if (now > saleStart && now < saleEnd)
             return (amount >= 0.1 ether);
         return false;
     }
 
     function getRate() public view returns (uint256) {
-        if (now > privSale1start && now < privSale1end) 
+        if (now > privSale1start && now < privSale1end)
             return 14375; // Stage I
-        else if (now > privSale2start && now < privSale2end) 
+        else if (now > privSale2start && now < privSale2end)
             return 13750; // Stage II
-        else if (now > saleStart && now < saleEnd) 
+        else if (now > saleStart && now < saleEnd)
             return 12500; // Public Sale
         return 0;
     }
@@ -661,11 +661,22 @@ contract CxNcontract is CappedCrowdsale, RefundableCrowdsale, PostDeliveryCrowds
     function finalization() internal {
         uint256 tokensForPartners = 2800000 ether;
         uint256 tokensNeededToClose = tokensForPartners.add(tokensDistributed);
-        
+
         require(token.balanceOf(wallet) >= tokensNeededToClose);
 
         token.transferFrom(wallet, partnerAddress, tokensForPartners);
 
         super.finalization();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

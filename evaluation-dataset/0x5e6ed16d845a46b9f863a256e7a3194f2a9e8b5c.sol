@@ -17,7 +17,7 @@ contract Owned {
 
 
 contract Mortal is Owned {
-    
+
     function kill() {
         if (msg.sender == owner)
             selfdestruct(owner);
@@ -229,3 +229,10 @@ contract Lotthereum is Mortal {
     function () payable {
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

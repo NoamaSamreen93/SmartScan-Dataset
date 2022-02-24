@@ -6,7 +6,7 @@
 //	Date of current version:	2017/09/01												//
 //	Brief Description:			The smart contract that will create tokens. The tokens	//
 //								will be apportioned according to the results of the 	//
-//								ICO conducted on ico.info earlier. Results of the ICO	// 
+//								ICO conducted on ico.info earlier. Results of the ICO	//
 //								can be viewed at https://ico.info/projects/19 and are 	//
 //								summarized below:										//
 //								BTC raised: 386.808										//
@@ -207,12 +207,12 @@ contract StandardToken is ERC20Protocol {
     mapping (address => mapping (address => uint)) allowed;
 }
 
-contract tokenRecipient { 
+contract tokenRecipient {
 	function receiveApproval(
-		address _from, 
-		uint256 _value, 
-		address _token, 
-		bytes _extraData); 
+		address _from,
+		uint256 _value,
+		address _token,
+		bytes _extraData);
 }
 
 contract ClipperCoin is Owned{
@@ -225,19 +225,19 @@ contract ClipperCoin is Owned{
 
     /// Total supply of Clipper Coin
     uint public totalSupply = 200000000 ether;
-    
+
     /// Create an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     /// Generate public event on the blockchain that will notify clients of transfers
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
-    /// Generate public event on the blockchain that notifies clients how much CCC has 
+
+    /// Generate public event on the blockchain that notifies clients how much CCC has
     /// been destroyed
     event Burn(address indexed from, uint256 value);
-    
-    /// Initialize contract with initial supply of tokens sent to the creator of the 
+
+    /// Initialize contract with initial supply of tokens sent to the creator of the
     /// contract, who is defined as the minter of the coin
     function ClipperCoin(
     	uint256 initialSupply,
@@ -245,51 +245,51 @@ contract ClipperCoin is Owned{
     	uint8 tokenDecimals,
     	string tokenSymbol
     	) {
-    	    
+
     	//Give creator all initial tokens
     	balanceOf[msg.sender]  = initialSupply;
-    	
+
     	// Set the total supply of all Clipper Coins
     	totalSupply  = initialSupply;
-    	
+
     	// Set the name of Clipper Coins
     	name = tokenName;
-    	
+
     	// Set the symbol of Clipper Coins: CCC
     	symbol = tokenSymbol;
-    	
+
     	// Set the amount of decimal places present in Clipper Coin: 18
     	// Note: 18 is the ethereum standard
     	decimals = tokenDecimals;
     }
-    
-    
+
+
     /// Internal transfers, which can only be called by this contract.
     function _transfer(
     	address _from,
     	address _to,
     	uint _value)
     	internal {
-    	    
-    	// Prevent transfers to the 0x0 address. Use burn() instead to 
+
+    	// Prevent transfers to the 0x0 address. Use burn() instead to
     	// permanently remove Clipper Coins from the Blockchain
     	require (_to != 0x0);
-    	
+
     	// Check that the account has enough Clipper Coins to be transferred
-        require (balanceOf[_from] > _value);                
-        
+        require (balanceOf[_from] > _value);
+
         // Check that the subraction of coins is not occuring
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        balanceOf[_from] -= _value;                         
-        balanceOf[_to] += _value;                           
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
-    
+
     /// @notice Send `_value` tokens to `_to` from your account
     /// @param _to The address of the recipient
     /// @param _value the amount to send
     function transfer(
-    	address _to, 
+    	address _to,
     	uint256 _value) {
         _transfer(msg.sender, _to, _value);
     }
@@ -299,10 +299,10 @@ contract ClipperCoin is Owned{
     /// @param _to The address of the recipient
     /// @param _value the amount to send
     function transferFrom(
-    	address _from, 
-    	address _to, 
+    	address _from,
+    	address _to,
     	uint256 _value) returns (bool success) {
-        require (_value < allowance[_from][msg.sender]);     
+        require (_value < allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -312,47 +312,58 @@ contract ClipperCoin is Owned{
     /// @param _spender The address authorized to spend
     /// @param _value the max amount they can spend
     function approve(
-    	address _spender, 
+    	address _spender,
     	uint256 _value) returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
-    /// @notice Allows `_spender` to spend no more than `_value` tokens on your behalf, 
+    /// @notice Allows `_spender` to spend no more than `_value` tokens on your behalf,
     ///			and then ping the contract about it
     /// @param _spender The address authorized to spend
     /// @param _value the max amount they can spend
     /// @param _extraData some extra information to send to the approved contract
     function approveAndCall(
-    	address _spender, 
-    	uint256 _value, 
+    	address _spender,
+    	uint256 _value,
     	bytes _extraData) returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
     function burn(uint256 _value) returns (bool success) {
-        require (balanceOf[msg.sender] > _value);            
-        balanceOf[msg.sender] -= _value;                      
-        totalSupply -= _value;                                
+        require (balanceOf[msg.sender] > _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(
-    	address _from, 
+    	address _from,
     	uint256 _value) returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

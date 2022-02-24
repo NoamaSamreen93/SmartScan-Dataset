@@ -70,7 +70,7 @@ contract StandardToken is ERC20Token{
 
   /**
    * Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
-   * 
+   *
    * param _spender The address which will spend the funds.
    * param _value The amount of tokens to be spent.
    */
@@ -119,8 +119,8 @@ contract Token is StandardToken{
     mapping (uint => uint256[]) public freezeOf; //所有数额，地址与数额合并为uint256，位运算拆分。
     mapping (uint => bool) public stepUnlockInfo; //所有锁仓，key 使用序号向上增加，value,是否已解锁。
     mapping (address => uint256) public freezeOfUser; //用户所有锁仓，方便用户查询自己锁仓余额
-    
-   
+
+
     uint256 internal constant INITIAL_SUPPLY = 1 * (10**8) * (10 **18);
 
 
@@ -187,7 +187,7 @@ contract Token is StandardToken{
         }
         emit TransferMulti(len, amount);
     }
-    
+
 
     function transferMultiSameVaule(address[] _to, uint256 _value) transable public returns (bool success){
         uint256 len = _to.length;
@@ -254,7 +254,7 @@ contract Token is StandardToken{
     function burn(uint256 _value) transable public returns (bool success) {
         require(_value > 0);
         require(_value <= balanceOf[msg.sender]);
-   
+
         balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
         emit Burn(msg.sender, _value);
@@ -297,4 +297,15 @@ contract Token is StandardToken{
       owner = newOwner;
       emit ChangeOwner(owner, newOwner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

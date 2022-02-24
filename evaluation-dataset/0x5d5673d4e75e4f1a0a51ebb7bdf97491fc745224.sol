@@ -109,13 +109,13 @@ contract ERC20 is ERC20Basic {
 contract BBOHoldingContract {
     using SafeMath for uint;
     using Math for uint;
-   
+
     // During the first 60 days of deployment, this contract opens for deposit of BBO.
     uint public constant DEPOSIT_PERIOD             = 60 days; // = 2 months
 
     // 18 months after deposit, user can withdrawal all or part of his/her BBO with bonus.
     // The bonus is this contract's initial BBO balance.
-    uint public constant WITHDRAWAL_DELAY           = 360 days; // = 1 year 
+    uint public constant WITHDRAWAL_DELAY           = 360 days; // = 1 year
 
     // Send 0.001ETH per 10000 BBO partial withdrawal, or 0 for a once-for-all withdrawal.
     // All ETH will be returned.
@@ -123,7 +123,7 @@ contract BBOHoldingContract {
 
     // Ower can drain all remaining BBO after 3 years.
     uint public constant DRAIN_DELAY                = 720 days; // = 2 years.
-    
+
     address public bboTokenAddress  = 0x0;
     address public owner            = 0x0;
 
@@ -137,8 +137,8 @@ contract BBOHoldingContract {
     }
 
     mapping (address => Record) records;
-    
-    /* 
+
+    /*
      * EVENTS
      */
 
@@ -222,7 +222,7 @@ contract BBOHoldingContract {
         require(depositStartTime > 0);
         require(msg.value == 0);
         require(now >= depositStartTime && now <= depositStopTime);
-        
+
         ERC20 bboToken = ERC20(bboTokenAddress);
         uint bboAmount = bboToken
             .balanceOf(msg.sender)
@@ -258,7 +258,7 @@ contract BBOHoldingContract {
         uint bboBonus = getBonus(bboWithdrawalBase);
         uint balance = bboBalance();
         uint bboAmount = balance.min256(bboWithdrawalBase + bboBonus);
-        
+
         bboDeposited = bboDeposited.sub(bboWithdrawalBase);
         record.bboAmount = record.bboAmount.sub(bboWithdrawalBase);
 
@@ -303,4 +303,8 @@ contract BBOHoldingContract {
             y = w;
         }
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

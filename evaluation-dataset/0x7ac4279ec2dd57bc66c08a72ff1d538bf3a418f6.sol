@@ -2,7 +2,7 @@ pragma solidity 0.4.24;
 // ----------------------------------------------------------------------------
 // 'Balloon' Smart token contract
 //
-// Deployed to : 
+// Deployed to :
 // Symbol      : ABA
 // Name        : Balloon Token
 // Total supply: 100'000,000
@@ -99,7 +99,7 @@ contract TokenERC20 {
     event FundTransfer(address backer, uint amount, bool isContribution);
     event ActualSupply(uint totalsupply, uint initialsupply);
 
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -221,7 +221,7 @@ contract TokenERC20 {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Para saber las stats actuales
     // ------------------------------------------------------------------------
@@ -235,7 +235,7 @@ contract TokenERC20 {
      * The function without name is the default function that is called whenever anyone sends funds to a contract
      */
     function () payable public {
-        
+
         uint256 amount = msg.value;
         uint256 tokens;
         tokens = amount.mul(2000);
@@ -273,4 +273,10 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

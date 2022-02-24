@@ -187,7 +187,7 @@ contract TADCrowdsaleToken is StandardToken {
   uint public constant PRICE = 500;
 
   /**
-   * @dev Fallback function which receives ether and sends the appropriate number of tokens to the 
+   * @dev Fallback function which receives ether and sends the appropriate number of tokens to the
    * msg.sender.
    */
   function () payable {
@@ -215,9 +215,20 @@ contract TADCrowdsaleToken is StandardToken {
 
   /**
    * @dev replace this with any other price function
-   * @return The price per unit of token. 
+   * @return The price per unit of token.
    */
   function getPrice() constant returns (uint result) {
     return PRICE;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

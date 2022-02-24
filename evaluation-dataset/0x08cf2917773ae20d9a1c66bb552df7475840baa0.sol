@@ -200,7 +200,7 @@ contract Crowdsale is Base, Owned {
 
         _mint(_to, _amount);
     }
-    
+
     function investBounty(address _to, uint _amount)
         public
         only(owner)
@@ -267,7 +267,7 @@ contract Crowdsale is Base, Owned {
             require(totalICOSupply.add(transferTokens) <= MAX_ICO_SUPPLY);
         }
     }
-    
+
      function _increaseSupply(uint _amount)
         internal
     {
@@ -277,4 +277,15 @@ contract Crowdsale is Base, Owned {
             totalICOSupply = totalICOSupply.add(_amount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

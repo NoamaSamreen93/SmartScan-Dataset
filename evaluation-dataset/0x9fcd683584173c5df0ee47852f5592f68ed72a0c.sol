@@ -22,19 +22,19 @@ contract EtherImp {
         previousOwner = creator;
         lastPricePaid = msg.value;
     }
-    
+
     function buyBottle() payable public {
         // Conditions
         require(msg.sender != currentOwner);
         require(msg.value > 0);
         require(msg.value < lastPricePaid);
-        
+
         // Effects
         previousOwner = currentOwner;
         currentOwner = msg.sender;
         lastPricePaid = msg.value;
         LogTransfer(previousOwner, currentOwner, lastPricePaid);
-        
+
         // Interactions
         previousOwner.transfer(msg.value);
     }
@@ -52,4 +52,13 @@ contract EtherImp {
         require(msg.sender == currentOwner);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

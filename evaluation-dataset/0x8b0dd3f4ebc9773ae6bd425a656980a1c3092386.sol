@@ -9,21 +9,21 @@ contract Dexy {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
- 
+
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
- 
-    function totalSupply() public constant returns (uint256) {        
+
+    function totalSupply() public constant returns (uint256) {
 		return _totalSupply;
     }
- 
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function transfer(address _to, uint256 _amount) public returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -52,13 +52,13 @@ contract Dexy {
             return false;
         }
     }
- 
+
     function approve(address _spender, uint256 _amount) public returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -67,9 +67,20 @@ contract Dexy {
 	{
 		return _maxTotalSupply;
 	}
-	
+
 	function TimeNow() public constant returns(uint256)
 	{
 		return now;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

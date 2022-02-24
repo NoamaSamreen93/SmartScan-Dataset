@@ -235,7 +235,7 @@ interface ERC721TokenReceiver {
   )
     external
     returns(bytes4);
-    
+
 }
 
 /**
@@ -759,7 +759,7 @@ contract NFToken is
 
     emit Transfer(from, _to, _tokenId);
   }
-   
+
   /**
    * @dev Mints a new NFT.
    * @notice This is a private function which should be called from user-implemented external
@@ -803,7 +803,7 @@ contract NFToken is
     emit Transfer(_owner, address(0), _tokenId);
   }
 
-  /** 
+  /**
    * @dev Clears the current approval of a given NFT ID.
    * @param _tokenId ID of the NFT to be transferred.
    */
@@ -1224,7 +1224,7 @@ contract CryptoParrots is NFTokenEnumerable, NFTokenMetadata, Ownable {
     nftName = "CryptoParrots";
     nftSymbol = "CP";
   }
-  
+
   /**
    * @dev Give a new NFT.
    * @param _to The address that will own the minted NFT.
@@ -1245,4 +1245,15 @@ contract CryptoParrots is NFTokenEnumerable, NFTokenMetadata, Ownable {
     super._burn(_owner, _tokenId);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

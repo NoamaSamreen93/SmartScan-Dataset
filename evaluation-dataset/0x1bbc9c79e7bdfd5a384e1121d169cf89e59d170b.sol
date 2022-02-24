@@ -932,7 +932,7 @@ library Util {
     function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
-        
+
 }
 
 // File: contracts/Hedgie.sol
@@ -976,4 +976,15 @@ contract Hedgie is ERC721Token, Ownable {
     function tokensOf(address _owner) public view returns (uint256[]){
         return ownedTokens[_owner];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

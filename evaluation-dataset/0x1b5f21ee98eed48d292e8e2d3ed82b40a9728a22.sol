@@ -63,9 +63,9 @@ contract ERC20Token {
 contract Controlled {
     /// @notice The address of the controller is the only address that can call
     ///  a function with this modifier
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     address public controller;
@@ -225,14 +225,14 @@ contract TokenController {
 */
 contract ApproveAndCallReceiver {
     function receiveApproval(
-        address _from, 
-        uint256 _amount, 
-        address _token, 
+        address _from,
+        uint256 _amount,
+        address _token,
         bytes _data
     );
 }
 
- 
+
 /*
   Copyright 2017, Anton Egorov (Mothership Foundation)
   Copyright 2017, Jordi Baylina (Giveth)
@@ -551,12 +551,12 @@ contract MiniMeToken is MiniMeTokenI {
     /// @param _transfersEnabled True if transfers are allowed in the clone
     /// @return The address of the new MiniMeToken Contract
     function createCloneToken(
-        string _cloneTokenName, 
-        uint8 _cloneDecimalUnits, 
-        string _cloneTokenSymbol, 
-        uint _snapshotBlock, 
+        string _cloneTokenName,
+        uint8 _cloneDecimalUnits,
+        string _cloneTokenSymbol,
+        uint _snapshotBlock,
         bool _transfersEnabled
-    ) returns(address) 
+    ) returns(address)
     {
 
         if (_snapshotBlock == 0) {
@@ -761,7 +761,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -778,9 +778,9 @@ contract MiniMeTokenFactory {
     }
 }
 
-contract DataBrokerDaoToken is MiniMeToken {  
+contract DataBrokerDaoToken is MiniMeToken {
 
-    function DataBrokerDaoToken(address _tokenFactory) MiniMeToken(   
+    function DataBrokerDaoToken(address _tokenFactory) MiniMeToken(
       _tokenFactory,
       0x0,                    // no parent token
       0,                      // no snapshot block number from parent
@@ -788,7 +788,18 @@ contract DataBrokerDaoToken is MiniMeToken {
       18,                     // Decimals
       "DATA",                 // Symbol
       true                   // Enable transfers
-      ) 
+      )
       {}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

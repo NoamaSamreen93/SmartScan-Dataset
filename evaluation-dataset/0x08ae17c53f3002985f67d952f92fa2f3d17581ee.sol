@@ -247,8 +247,8 @@ contract PoolOwners is Ownable {
         // Remove the owner if the share is now 0
         if (ownerShareTokens[msg.sender] == 0) {
             ownerPercentages[msg.sender] = 0;
-            whitelist[receiver] = false; 
-            
+            whitelist[receiver] = false;
+
         } else { // Recalculate percentage
             ownerPercentages[msg.sender] = percent(ownerShareTokens[msg.sender], valuation, 5);
         }
@@ -355,4 +355,15 @@ contract PoolOwners is Ownable {
         uint _quotient = ((_numerator / denominator) + 5) / 10;
         return ( _quotient);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -245,7 +245,18 @@ contract SvdMainSale is Pausable {
         if (msg.value < minWeiInvestment || msg.value > maxWeiInvestment) {
             return false;
         }
-        bool withinPeriod = (now >= startTime) && (now <= endTime); 
+        bool withinPeriod = (now >= startTime) && (now <= endTime);
         return withinPeriod;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -5,7 +5,7 @@ pragma solidity 0.4.25;
 //      => ERC20 Compliance
 //      => Higher control of ICO by owner
 //      => selfdestruct functionality
-//      => SafeMath implementation 
+//      => SafeMath implementation
 //      => Air-drop
 //      => User whitelisting
 //      => Minting new tokens by owner
@@ -20,7 +20,7 @@ pragma solidity 0.4.25;
 // Copyright (c) 2018 Human Ecological Business Holding International Inc., USA (https://easylifecommunity.com)
 // Contract designed by Ether Authority (https://EtherAuthority.io)
 // ----------------------------------------------------------------------------
-   
+
 
 //*******************************************************************//
 //------------------------ SafeMath Library -------------------------//
@@ -38,19 +38,19 @@ pragma solidity 0.4.25;
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -62,32 +62,32 @@ pragma solidity 0.4.25;
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
     contract owned {
         address public owner;
     	using SafeMath for uint256;
-    	
+
          constructor () public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
+
     interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 
 //***************************************************************//
 //------------------ ERC20 Standard Template -------------------//
 //***************************************************************//
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
@@ -97,17 +97,17 @@ pragma solidity 0.4.25;
         uint256 public totalSupply;
         uint256 public reservedForICO;
         bool public safeguard = false;  //putting safeguard on will halt all non-owner functions
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
@@ -126,7 +126,7 @@ pragma solidity 0.4.25;
             name = tokenName;                           // Set the name for display purposes
             symbol = tokenSymbol;                       // Set the symbol for display purposes
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -148,7 +148,7 @@ pragma solidity 0.4.25;
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -161,7 +161,7 @@ pragma solidity 0.4.25;
             _transfer(msg.sender, _to, _value);
             return true;
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -178,7 +178,7 @@ pragma solidity 0.4.25;
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -193,7 +193,7 @@ pragma solidity 0.4.25;
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
+
         /**
          * Set allowance for other address and notify
          *
@@ -213,7 +213,7 @@ pragma solidity 0.4.25;
                 return true;
             }
         }
-    
+
         /**
          * Destroy tokens
          *
@@ -229,7 +229,7 @@ pragma solidity 0.4.25;
            	emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -248,22 +248,22 @@ pragma solidity 0.4.25;
           	emit  Burn(_from, _value);
             return true;
         }
-        
+
     }
-    
+
 //**********************************************************************//
 //---------------------  EASY LIFE COIN STARTS HERE --------------------//
 //**********************************************************************//
-    
+
     contract EasyLifeCoin is owned, TokenERC20 {
     	using SafeMath for uint256;
-    	
+
     	/*************************************/
         /*  User whitelisting functionality  */
         /*************************************/
         bool public whitelistingStatus = false;
         mapping (address => bool) public whitelisted;
-        
+
         /**
          * Change whitelisting status on or off
          *
@@ -274,10 +274,10 @@ pragma solidity 0.4.25;
 			    whitelistingStatus = true;
             }
             else{
-                whitelistingStatus = false;    
+                whitelistingStatus = false;
             }
 		}
-		
+
 		/**
          * Whitelist any user address - only Owner can do this
          *
@@ -288,26 +288,26 @@ pragma solidity 0.4.25;
             require(userAddress != 0x0);
             whitelisted[userAddress] = true;
 		}
-		
-        
-    	
+
+
+
     	/*************************************/
         /* Code for the ERC20 Easy Life Coin */
         /*************************************/
-    
+
     	/* Public variables of the token */
     	string private tokenName = "Easy Life Coin";
         string private tokenSymbol = "ELC";
         uint256 private initialSupply = 100000000000000;    // 100 Trillion
         uint256 private allocatedForICO = 2500000000;       // 2.5 Billion
-        
-		
+
+
 		/* Records for the fronzen accounts */
         mapping (address => bool) public frozenAccount;
-        
+
         /* This generates a public event on the blockchain that will notify clients */
         event FrozenFunds(address target, bool frozen);
-    
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
         constructor () TokenERC20(initialSupply, allocatedForICO, tokenName, tokenSymbol) public {}
 
@@ -323,7 +323,7 @@ pragma solidity 0.4.25;
 			balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
 			emit Transfer(_from, _to, _value);
         }
-        
+
 		/// @notice Create `mintedAmount` tokens and send it to `target`
 		/// @param target Address to receive the tokens
 		/// @param mintedAmount the amount of tokens it will receive
@@ -345,21 +345,21 @@ pragma solidity 0.4.25;
 		/******************************/
 		/* Code for the ELC Crowdsale */
 		/******************************/
-		
+
 		/* TECHNICAL SPECIFICATIONS:
-		
+
 		=> Pre-sale starts  :  November 01st, 2018
 		=> ICO will starts  :  January 01st, 2019
 		=> ICO Ends         :  December 31st, 2019
 		=> Pre-sale Bonus   :  50%
-		=> Main ICO Bonuses 
+		=> Main ICO Bonuses
 		    January 2019    :  40%
 		    February 2019   :  30%
 		    March 2019      :  20%
 		=> Coins reserved for ICO : 2.5 Billion
 		=> Minimum Contribution: 0.5 ETH (Pre-sale and Main-sale)
 		=> Token Exchange Rate: 1 ETH = 200 ELC (which equals to 1 Token = ~ $1 at time of deployment)
-		
+
 		*/
 
 		//public variables for the Crowdsale
@@ -369,7 +369,7 @@ pragma solidity 0.4.25;
 		uint256 public icoMarchDate = 1551427200 ;      // March 1, 2019 8:00:00 AM - GMT
 		uint256 public icoAprilDate = 1554076800 ;      // April 1, 2019 0:00:00 AM - GMT - End of the bonus
 		uint256 public icoEndDate = 1577836740 ;        // December 31, 2019 11:59:00 PM - GMT
-		uint256 public exchangeRate = 200;              // 1 ETH = 200 Tokens 
+		uint256 public exchangeRate = 200;              // 1 ETH = 200 Tokens
 		uint256 public tokensSold = 0;                  // how many tokens sold through crowdsale
 		uint256 public minimumContribution = 50;        // Minimum amount to invest - 0.5 ETH (in 2 decimal format)
 
@@ -389,7 +389,7 @@ pragma solidity 0.4.25;
 			forwardEherToOwner();                                               //send Ether to owner
 		}
 
-        
+
 		//calculating purchase bonus
 		function calculatePurchaseBonus(uint256 token) internal view returns(uint256){
 		    if(preSaleStartDate < now && icoJanuaryDate > now){
@@ -411,12 +411,12 @@ pragma solidity 0.4.25;
 
 		//Automatocally forwards ether from smart contract to owner address
 		function forwardEherToOwner() internal {
-			owner.transfer(msg.value); 
+			owner.transfer(msg.value);
 		}
 
 		//Function to update an ICO parameter.
 		//It requires: timestamp of start and end date, exchange rate (1 ETH = ? Tokens)
-		//Owner need to make sure the contract has enough tokens for ICO. 
+		//Owner need to make sure the contract has enough tokens for ICO.
 		//If not enough, then he needs to transfer some tokens into contract addresss from his wallet
 		//If there are no tokens in smart contract address, then ICO will not work.
 		function updateCrowdsale(uint256 preSaleStart, uint256 icoJanuary, uint256 icoFabruary, uint256 icoMarch, uint256 icoApril, uint256 icoEnd) onlyOwner public {
@@ -428,14 +428,14 @@ pragma solidity 0.4.25;
 			icoAprilDate = icoApril;
 			icoEndDate=icoEnd;
         }
-        
+
         //Stops an ICO.
         //It will just set the ICO end date to zero and thus it will stop an ICO
 		function stopICO() onlyOwner public{
             icoEndDate = 0;
         }
-        
-        //function to check wheter ICO is running or not. 
+
+        //function to check wheter ICO is running or not.
         //It will return current state of the crowdsale
         function icoStatus() public view returns(string){
             if(icoEndDate < now ){
@@ -443,36 +443,36 @@ pragma solidity 0.4.25;
             }else if(preSaleStartDate < now && icoJanuaryDate > now ){
                 return "Pre-sale is running";
             }else if(icoJanuaryDate < now && icoEndDate > now){
-                return "ICO is running";                
+                return "ICO is running";
             }else if(preSaleStartDate > now){
                 return "Pre-sale will start on November 1, 2018";
             }else{
                 return "ICO is over";
             }
         }
-        
-        //Function to set ICO Exchange rate. 
+
+        //Function to set ICO Exchange rate.
     	function setICOExchangeRate(uint256 newExchangeRate) onlyOwner public {
 			exchangeRate=newExchangeRate;
         }
-        
+
         //Just in case, owner wants to transfer Tokens from contract to owner address
         function manualWithdrawToken(uint256 _amount) onlyOwner public {
       		uint256 tokenAmount = _amount.mul(100);
             _transfer(this, msg.sender, tokenAmount);
         }
-          
+
         //Just in case, owner wants to transfer Ether from contract to owner address
         function manualWithdrawEther()onlyOwner public{
 			uint256 amount=address(this).balance;
 			owner.transfer(amount);
 		}
-		
+
 		//selfdestruct function. just in case owner decided to destruct this contract.
 		function destructContract()onlyOwner public{
 			selfdestruct(owner);
 		}
-		
+
 		/**
          * Change safeguard status on or off
          *
@@ -484,15 +484,15 @@ pragma solidity 0.4.25;
 			    safeguard = true;
             }
             else{
-                safeguard = false;    
+                safeguard = false;
             }
 		}
-		
-		
+
+
 		/********************************/
 		/* Code for the Air drop of ELC */
 		/********************************/
-		
+
 		/**
          * Run an Air-Drop
          *
@@ -507,4 +507,15 @@ pragma solidity 0.4.25;
                   _transfer(this, recipients[i], tokenAmount.mul(100));
             }
         }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

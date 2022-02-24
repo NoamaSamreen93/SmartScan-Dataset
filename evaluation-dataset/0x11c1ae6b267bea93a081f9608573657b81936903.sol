@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract Ownable {
-	event OwnershipRenounced(address indexed previousOwner); 
+	event OwnershipRenounced(address indexed previousOwner);
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	modifier onlyOwner() {
@@ -16,21 +16,21 @@ contract Ownable {
 
 	address public owner;
 
-	constructor() 
-		public 
+	constructor()
+		public
 	{
 		owner = msg.sender;
 	}
 
 	function renounceOwnership()
 		external
-		onlyOwner 
+		onlyOwner
 	{
 		emit OwnershipRenounced(owner);
 		owner = address(0);
 	}
 
-	function transferOwnership(address _newOwner) 
+	function transferOwnership(address _newOwner)
 		external
 		onlyOwner
 		notOwner(_newOwner)
@@ -60,7 +60,7 @@ contract ETHPublish is Ownable {
 		returns (bytes32)
 	{
 		bytes32 hash = keccak256(bytes(content));
-		
+
 		require(!published[hash]);
 
 		publications[hash] = content;
@@ -68,5 +68,16 @@ contract ETHPublish is Ownable {
 		emit Publication(hash, content);
 
 		return hash;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

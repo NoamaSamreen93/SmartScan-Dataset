@@ -47,7 +47,7 @@ contract BasicToken is ERC20Basic {
 
     mapping(address => uint256) balances;
 
-    
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
 
@@ -58,7 +58,7 @@ contract BasicToken is ERC20Basic {
         return true;
     }
 
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -82,7 +82,7 @@ contract StandardToken is ERC20, BasicToken {
     mapping (address => mapping (address => uint256)) allowed;
 
 
-   
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
 
@@ -95,19 +95,19 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-    
+
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
-    
+
     function increaseApproval (address _spender, uint _addedValue) public returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -138,7 +138,7 @@ contract SkyvToken is StandardToken {
         balances[msg.sender] = INIT_SUPPLY;
         emit Transfer(0x0, msg.sender, INIT_SUPPLY);
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -149,4 +149,15 @@ contract SkyvToken is StandardToken {
         require(_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

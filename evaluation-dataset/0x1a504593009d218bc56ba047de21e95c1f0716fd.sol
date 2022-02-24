@@ -44,8 +44,8 @@ contract RegularToken is Token {
             balances[_to] += _value;
             emit Transfer(msg.sender, _to, _value);
             return true;
-        } else { 
-            return false; 
+        } else {
+            return false;
         }
     }
 
@@ -56,8 +56,8 @@ contract RegularToken is Token {
             allowed[_from][msg.sender] -= _value;
             emit Transfer(_from, _to, _value);
             return true;
-        } else { 
-            return false; 
+        } else {
+            return false;
         }
     }
 
@@ -82,7 +82,7 @@ contract RegularToken is Token {
 
 contract UnboundedRegularToken is RegularToken {
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -121,4 +121,15 @@ contract MDDCToken is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

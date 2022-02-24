@@ -187,20 +187,20 @@ contract Vicion is ERC20Interface, Owned {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
         return true;
     }
-    
+
     // transfer balance to owner
 	function withdrawEther(uint256 amount) public returns (bool success){
 		if(msg.sender != owner)revert();
 	    msg.sender.transfer(amount);
 	    return true;
 	}
-	
+
 
     // ------------------------------------------------------------------------
     // Accept ETH
     // ------------------------------------------------------------------------
     function () external payable {
-       
+
     }
 
 
@@ -210,4 +210,10 @@ contract Vicion is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

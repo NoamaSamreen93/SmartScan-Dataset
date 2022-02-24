@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-  
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -51,7 +51,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-      
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -90,24 +90,24 @@ contract EtherSmart is StandardToken { // CHANGE THIS. Update the contract name.
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function EtherSmart() {
-        balances[msg.sender] = 21000000000000000000000000000;      
-        totalSupply = 21000000000000000000000000000;               
-        name = "EtherSmart";                                   
-        decimals = 18;                                        
-        symbol = "ESM";                                       
-        unitsOneEthCanBuy = 111111000;                        
-        fundsWallet = msg.sender;                             
+        balances[msg.sender] = 21000000000000000000000000000;
+        totalSupply = 21000000000000000000000000000;
+        name = "EtherSmart";
+        decimals = 18;
+        symbol = "ESM";
+        unitsOneEthCanBuy = 111111000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -121,7 +121,7 @@ contract EtherSmart is StandardToken { // CHANGE THIS. Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -135,4 +135,20 @@ contract EtherSmart is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

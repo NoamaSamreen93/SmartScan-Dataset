@@ -3,12 +3,12 @@ pragma solidity ^0.4.11;
 
 contract ERC20Standard {
 	uint public totalSupply;
-	
+
 	string public name;
 	uint8 public decimals;
 	string public symbol;
 	string public version;
-	
+
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint)) allowed;
 
@@ -16,7 +16,7 @@ contract ERC20Standard {
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -26,7 +26,7 @@ contract ERC20Standard {
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -52,7 +52,7 @@ contract ERC20Standard {
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -70,5 +70,16 @@ contract Whales is ERC20Standard {
 		symbol = "WHL";
 		version = "1.0";
 		balances[msg.sender] = totalSupply;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

@@ -286,13 +286,13 @@ contract UnitedfansToken is MintableToken {
     event Unlocked();
 
     modifier onlyUnlocked() {
-        if (locked) 
+        if (locked)
             revert();
         _;
     }
 
     modifier onlyAuthorized() {
-        if (msg.sender != owner && msg.sender != crowdSaleAddress && msg.sender != admin) 
+        if (msg.sender != owner && msg.sender != crowdSaleAddress && msg.sender != admin)
             revert();
         _;
     }
@@ -334,14 +334,14 @@ contract UnitedfansToken is MintableToken {
     /// @param _value The amount of token to be migrated
     function migrate(uint256 _value) external {
         // Abort if not in Operational Migration state.
-        
-        if (migrationAgent == 0) 
+
+        if (migrationAgent == 0)
             revert();
-        
+
         // Validate input value.
-        if (_value == 0) 
+        if (_value == 0)
             revert();
-        if (_value > balances[msg.sender]) 
+        if (_value > balances[msg.sender])
             revert();
 
         balances[msg.sender] -= _value;
@@ -359,7 +359,7 @@ contract UnitedfansToken is MintableToken {
     /// @param _agent The address of the MigrationAgent contract
     function setMigrationAgent(address _agent) external onlyUnlocked() {
         // Abort if not in Operational Normal state.
-        
+
         require(migrationAgent == 0);
         require(msg.sender == migrationMaster);
         migrationAgent = _agent;
@@ -368,8 +368,8 @@ contract UnitedfansToken is MintableToken {
     function resetCrowdSaleAddress(address _newCrowdSaleAddress) external onlyAuthorized() {
         crowdSaleAddress = _newCrowdSaleAddress;
     }
-    
-    function setMigrationMaster(address _master) external {       
+
+    function setMigrationMaster(address _master) external {
         require(msg.sender == migrationMaster);
         require(_master != 0);
         migrationMaster = _master;
@@ -483,7 +483,7 @@ contract Crowdsale {
 contract UnitedfansTokenCrowdsale is Ownable, Crowdsale {
 
     using SafeMath for uint256;
- 
+
     //operational
     bool public LockupTokensWithdrawn = false;
     uint256 public constant toDec = 10**18;
@@ -506,11 +506,11 @@ contract UnitedfansTokenCrowdsale is Ownable, Crowdsale {
     function UnitedfansTokenCrowdsale(address _admin)
     Crowdsale(
         now + 10, // 2018-02-01T00:00:00+00:00 - 1517443200
-        endTimeNumber, // 2018-08-01T00:00:00+00:00 - 
+        endTimeNumber, // 2018-08-01T00:00:00+00:00 -
         12000,/* start rate - 1000 */
         _admin
-    )  
-    public 
+    )
+    public
     {}
 
     // creates the token to be sold.
@@ -581,7 +581,7 @@ contract UnitedfansTokenCrowdsale is Ownable, Crowdsale {
         uint256 tokensRemaining = tokensForFullBuy.sub(tokensToRefundFor);
         uint256 weiAmountToRefund = tokensToRefundFor.div(rate);
         uint256 weiRemaining = weiAmount.sub(weiAmountToRefund);
-        
+
         // update state
         weiRaised = weiRaised.add(weiRemaining);
 
@@ -609,4 +609,15 @@ contract UnitedfansTokenCrowdsale is Ownable, Crowdsale {
         endTime = block.timestamp;
         state = State.SaleOver;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

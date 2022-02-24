@@ -50,7 +50,7 @@ contract Pausable is Ownable {
     require(!stopped);
     _;
   }
-  
+
   modifier onlyInEmergency {
     require(stopped);
     _;
@@ -119,30 +119,30 @@ contract ICO is SafeMath, Pausable{
     event ReceivedETH(address addr, uint value);
 	event ReceivedBTC(address addr, uint value);
 	event ReceivedGBP(address addr, uint value);
-    
-    modifier beforeDeadline{ 
-        require(now < deadline); 
+
+    modifier beforeDeadline{
+        require(now < deadline);
         _;
     }
-	modifier afterDeadline{ 
-	    require(now >= deadline); 
-	    _; 
+	modifier afterDeadline{
+	    require(now >= deadline);
+	    _;
 	}
-	modifier ICOactive{ 
-	    require(!crowdsaleClosed); 
-	    _; 
+	modifier ICOactive{
+	    require(!crowdsaleClosed);
+	    _;
 	}
-	
-	modifier ICOinactive{ 
-	    require(crowdsaleClosed); 
-	    _; 
+
+	modifier ICOinactive{
+	    require(crowdsaleClosed);
+	    _;
 	}
-	
+
 	modifier onlyBy(address a){
 	    require(msg.sender == a);
 		_;
 	}
-	
+
     /**
      * Constrctor function
      *
@@ -179,7 +179,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedETH(msg.sender,msg.value);
         }
     }
-    
+
     function ReceiveBTC(address addr, uint value) public stopInEmergency beforeDeadline ICOactive onlyBy(BTCproxy){
         require(value >= MinimumInvestment());
         uint amount = amountToSend(value);
@@ -192,7 +192,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedBTC(addr,value);
         }
     }
-    
+
     function ReceiveGBP(address addr, uint value) public stopInEmergency beforeDeadline ICOactive onlyBy(GBPproxy){
         require(value >= MinimumInvestment());
         uint amount = amountToSend(value);
@@ -206,7 +206,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedGBP(addr,value);
         }
     }
-    
+
     function MinimumInvestment() internal returns(uint){
         if (now <= preIcoEnds){
             return 0.1 ether;
@@ -214,7 +214,7 @@ contract ICO is SafeMath, Pausable{
             return 0.01 ether;
         }
     }
-    
+
     function amountToSend(uint amount) internal returns(uint){
         uint toSend = 0;
         if (tokensSold <= 5 * (10 ** 6) * (10 ** 6)){
@@ -255,7 +255,7 @@ contract ICO is SafeMath, Pausable{
 		crowdsaleClosed = true;
 	}
 
-    
+
     function safeWithdrawal() public afterDeadline ICOinactive{
         if (!fundingGoalReached) {
             uint amount = balanceOf[msg.sender];
@@ -269,4 +269,8 @@ contract ICO is SafeMath, Pausable{
             }
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

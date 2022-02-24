@@ -118,14 +118,14 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
-    uint public start; 
+    uint public start;
     uint public end;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function EphronTestCoin(
         uint startTime,
@@ -135,7 +135,7 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
         string tokenSymbol,
         uint256 etherCostOfEachToken
         ) {
-        totalSupply = initialSupply;   
+        totalSupply = initialSupply;
         balances[msg.sender] = initialSupply;                        // Update total supply (1000 for example) (CHANGE THIS)
         name = tokenName;                                   // Set the name for display purposes (CHANGE THIS)
         decimals = 0;                                               // Amount of decimals for display purposes (CHANGE THIS)
@@ -145,7 +145,7 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
         start = startTime;
         end = endTime;
     }
-    
+
     // ---- FOR TEST ONLY ----
     uint _current = 0;
     function current() public returns (uint) {
@@ -171,7 +171,7 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -186,7 +186,7 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
         return true;
     }
     modifier afterDeadline() { if (current() >= end) _; }
-    
+
     function safeWithdrawal() afterDeadline {
         uint amount = balances[msg.sender];
         if (address(this).balance >= amount) {
@@ -197,4 +197,20 @@ contract EphronTestCoin is StandardToken { // CHANGE THIS. Update the contract n
             }
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

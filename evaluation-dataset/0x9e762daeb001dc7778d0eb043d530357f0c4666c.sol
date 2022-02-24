@@ -875,7 +875,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1217,22 +1217,22 @@ contract Dice is usingOraclize {
         if (oraclizeFee >= msg.value) throw;
         uint betValue = msg.value - oraclizeFee;
 
-     if ((((betValue * (10000 - edge)) / pwin) <= (getBankroll()) / 30) && (betValue >= minBet)) {        
+     if ((((betValue * (10000 - edge)) / pwin) <= (getBankroll()) / 30) && (betValue >= minBet)) {
            bytes32 myid =
-                 oraclize_query("nested", 
-        "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random.data.0', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateIntegers\",\"params\":{\"apiKey\":\"${[decrypt] BHvgt4Bhec2IJyErKzdCVu3FSzo6mKW10ZDb38Ruyj6bOCyzY5738oLb8a5fGGfMhjcVjabuo9YOJ+f83/lXZELZQSmMAwbhg+thjUJZMoBLsFmAnD17UjEPPr1ffUNfAn7AI74sB3AwVh3296JCtcEVWn66}\",\"n\":1,\"min\":1,\"max\":10000,\"replacement\":true${[identity] \"}\"},\"id\":1${[identity] \"}\"}']");    
-                
+                 oraclize_query("nested",
+        "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random.data.0', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateIntegers\",\"params\":{\"apiKey\":\"${[decrypt] BHvgt4Bhec2IJyErKzdCVu3FSzo6mKW10ZDb38Ruyj6bOCyzY5738oLb8a5fGGfMhjcVjabuo9YOJ+f83/lXZELZQSmMAwbhg+thjUJZMoBLsFmAnD17UjEPPr1ffUNfAn7AI74sB3AwVh3296JCtcEVWn66}\",\"n\":1,\"min\":1,\"max\":10000,\"replacement\":true${[identity] \"}\"},\"id\":1${[identity] \"}\"}']");
+
             LOG_NewBet(msg.sender, betValue, pwin, myid);
             bets[myid] = Bet(msg.sender, betValue, 0, pwin);
             betsKeys.push(myid);
             amountBets += 1;
-            
+
         }
         else {
             throw;
-        }    
-        
-        
+        }
+
+
     }
 
     function __callback(bytes32 myid, string result, bytes proof)
@@ -1279,7 +1279,7 @@ contract Dice is usingOraclize {
 
     //SECTION III: INVEST & DIVEST
 
-    function invest() payable public 
+    function invest() payable public
     onlyOwner
     onlyIfNotStopped {
         LOG_IncreaseInvestment(msg.value);
@@ -1316,4 +1316,13 @@ contract Dice is usingOraclize {
         isStopped = true;
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

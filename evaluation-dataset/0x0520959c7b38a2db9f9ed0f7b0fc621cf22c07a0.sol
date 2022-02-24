@@ -421,9 +421,9 @@ contract CommunityCoin is CappedToken, PausableToken {
   uint8 public constant decimals = 18;
 
   uint public constant unit = 10 ** uint256(decimals);
-  
+
   uint public lockPeriod = 90 days;
-  
+
   uint public startTime;
 
   function CommunityCoin(uint _startTime,uint _tokenCap) CappedToken(_tokenCap.mul(unit)) public {
@@ -431,7 +431,7 @@ contract CommunityCoin is CappedToken, PausableToken {
       startTime=_startTime;
       pause();
     }
-    
+
      function unpause() onlyOwner whenPaused public {
     require(now > startTime + lockPeriod);
     super.unpause();
@@ -470,8 +470,8 @@ contract TokenLocker is Ownable, ERC20Basic {
     uint constant public lockPeriod = 180 days;
 
     event TokenReleased(address _to, uint _value);
-    
-    
+
+
     function TokenLocker(CommunityCoin _token) public {
         token = _token;
         releaseTime = token.startTime().add(lockPeriod);
@@ -490,7 +490,7 @@ contract TokenLocker is Ownable, ERC20Basic {
         require(newPool > pool);
         uint amount = newPool.sub(pool);
         pool = newPool;
-        balances[owner] = balances[owner].add(amount); 
+        balances[owner] = balances[owner].add(amount);
         Transfer(address(0), owner, amount);
     }
 
@@ -528,4 +528,15 @@ contract TokenLocker is Ownable, ERC20Basic {
     function () payable public{
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

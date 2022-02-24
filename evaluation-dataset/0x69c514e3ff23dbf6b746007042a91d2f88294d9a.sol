@@ -71,23 +71,23 @@ contract StandardToken is ZiubeToken {
 }
 
 contract Ziube is StandardToken {
-    
-    string public name;                   
-    uint8 public decimals;              
-    string public symbol;                 
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'V1.012';
-    uint256 public unitsBuy;     
-    uint256 public totalEthInWei;        
-    address public fundsWallet;         
+    uint256 public unitsBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     function Ziube() {
-        balances[msg.sender] = 92000000000000000000000000000;     
-        totalSupply = 92000000000000000000000000000;    
-        name = "Ziube";                                 
-        decimals = 18;                                           
-        symbol = "XZE";                                             
-        unitsBuy = 200000;                                      
-        fundsWallet = msg.sender;                                  
+        balances[msg.sender] = 92000000000000000000000000000;
+        totalSupply = 92000000000000000000000000000;
+        name = "Ziube";
+        decimals = 18;
+        symbol = "XZE";
+        unitsBuy = 200000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -97,7 +97,7 @@ contract Ziube is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
         Transfer(fundsWallet, msg.sender, amount);
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -110,7 +110,23 @@ contract Ziube is StandardToken {
     for (uint256 i = 0; i < addrs.length; i++) {
       transfer(addrs[i], amount);
     }
-    
+
   }
-  
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

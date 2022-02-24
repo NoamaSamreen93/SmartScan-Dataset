@@ -1216,29 +1216,29 @@ contract usingOraclize {
 
 //pragma solidity ^0.4.8;
 
-contract tokenRecipient { 
-    
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); 
-    
+contract tokenRecipient {
+
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData);
+
 }
 
 contract EtherFlipRaffleToken is usingOraclize {
-    
+
     modifier oraclizeAction {
         if (msg.sender != oraclize_cbAddress()) revert();
         _;
     }
-    
+
     modifier ownerAction {
          if (msg.sender != owner) revert();
          _;
     }
-    
+
     address public etherflipContract;
     address public owner;
 
     token public raffleTokenReward;
-    
+
     //~ Hashes for lookups
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -1254,7 +1254,7 @@ contract EtherFlipRaffleToken is usingOraclize {
     string public symbol = "ETIX";
     uint8 public decimals = 0;
     uint256 public totalSupply = 15000000;
-    
+
     //~ Raffle Setup
     uint public numberInRaffle = 0;
     uint public winningNumber;
@@ -1266,7 +1266,7 @@ contract EtherFlipRaffleToken is usingOraclize {
         balanceOf[msg.sender] = totalSupply;
         owner = msg.sender;
     }
-    
+
     function () payable {
         if (msg.sender != owner) { revert(); }
     }
@@ -1274,28 +1274,28 @@ contract EtherFlipRaffleToken is usingOraclize {
     //~~ Methods based on Token.sol from Ethereum Foundation
     //~ Transfer
     function transfer(address _to, uint256 _value) {
-        if (_to == 0x0) revert();                               
-        if (balanceOf[msg.sender] < _value) revert();           
-        if (balanceOf[_to] + _value < balanceOf[_to]) revert(); 
-        
+        if (_to == 0x0) revert();
+        if (balanceOf[msg.sender] < _value) revert();
+        if (balanceOf[_to] + _value < balanceOf[_to]) revert();
+
         if (msg.sender == etherflipContract) {
             raffleAddress[numberInRaffle] = _to;
             // We are using numberInRaffle as our mod, when we send ETIX - numberInRaffle increases as long as it is the EFContract sending
             numberInRaffle += 1;
-            
+
             // override 'value' to only pass one ETIX on each transfer; this is needed to give our current EtherFlip
             // contract the ability to send only one token even when we are passing a dynamic value for each token transfer
-            balanceOf[msg.sender] -= 1;                   
-            balanceOf[_to] += 1;                           
+            balanceOf[msg.sender] -= 1;
+            balanceOf[_to] += 1;
             Transfer(msg.sender, _to, 1);
         } else {
-            balanceOf[msg.sender] -= _value;                   
-            balanceOf[_to] += _value;                           
+            balanceOf[msg.sender] -= _value;
+            balanceOf[_to] += _value;
             Transfer(msg.sender, _to, _value);
         }
     }
-    
-    function __callback(bytes32 _queryId, string _result, bytes _proof) oraclizeAction { 
+
+    function __callback(bytes32 _queryId, string _result, bytes _proof) oraclizeAction {
         if (oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) != 0 || _proof.length == 0) {
             ProofFailed(true);
         } else {
@@ -1305,7 +1305,7 @@ contract EtherFlipRaffleToken is usingOraclize {
             numberInRaffle = 0;
         }
     }
-    
+
     function manualRaffle() ownerAction {
         oraclize_setProof(proofType_Ledger);
         uint numberOfBytes = 7;
@@ -1313,22 +1313,22 @@ contract EtherFlipRaffleToken is usingOraclize {
         uint callbackGas = 250000;
         currentQueryID = oraclize_newRandomDSQuery(delay, numberOfBytes, callbackGas);
     }
-    
+
     function setEFContract(address newContract, address newToken, uint awardAmount) ownerAction {
         etherflipContract = newContract;
         raffleTokenReward = token(newToken);
         raffleRewardAmount = awardAmount;
     }
-    
-    function refundTransfer(address outboundAddress, uint amount) ownerAction {        
+
+    function refundTransfer(address outboundAddress, uint amount) ownerAction {
         outboundAddress.transfer(amount);
     }
-    
+
     function walletSend(address tokenAddress, uint amount, address outboundAddress) ownerAction {
         token chosenToken = token(tokenAddress);
         chosenToken.transfer(outboundAddress, amount);
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -1340,15 +1340,15 @@ contract EtherFlipRaffleToken is usingOraclize {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (_to == 0x0) revert();                                
-        if (balanceOf[_from] < _value) revert();                 
-        if (balanceOf[_to] + _value < balanceOf[_to]) revert();  
-        if (_value > allowance[_from][msg.sender]) revert();     
-        balanceOf[_from] -= _value;                           
-        balanceOf[_to] += _value;                            
+        if (_to == 0x0) revert();
+        if (balanceOf[_from] < _value) revert();
+        if (balanceOf[_to] + _value < balanceOf[_to]) revert();
+        if (_value > allowance[_from][msg.sender]) revert();
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
@@ -1356,3 +1356,14 @@ contract EtherFlipRaffleToken is usingOraclize {
 }
 
 contract token { function transfer(address receiver, uint amount){ receiver; amount; } }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

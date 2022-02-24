@@ -171,7 +171,7 @@ library SafeMath {
 }
 
 
- 
+
 
 
 /**
@@ -244,8 +244,8 @@ contract Ownable {
         _owner = newOwner;
     }
 }
- 
- 
+
+
 
 
 
@@ -436,7 +436,7 @@ contract ERC20 is IERC20 {
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
     }
 }
- 
+
 
 
 
@@ -479,7 +479,7 @@ contract ERC20Detailed is IERC20 {
         return _decimals;
     }
 }
- 
+
 
 
 
@@ -501,7 +501,7 @@ contract ERC20Mintable is ERC20, MinterRole {
         return true;
     }
 }
- 
+
 
 
 
@@ -530,7 +530,7 @@ contract ERC20Capped is ERC20Mintable {
         super._mint(account, value);
     }
 }
- 
+
 
 contract PictosisGenesisToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Capped {
     address public exchangeContract;
@@ -595,4 +595,15 @@ contract PictosisGenesisToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Cappe
 
     event ClaimedTokens(address indexed _token, address indexed _sender, uint256 _amount);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

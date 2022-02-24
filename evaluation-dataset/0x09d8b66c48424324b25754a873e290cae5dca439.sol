@@ -58,7 +58,7 @@ contract Owned {
     function Owned() public {
         owner = msg.sender;
     }
- 
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -101,13 +101,13 @@ contract NovaToken is ERC20Interface, Owned {
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
- 
- 
+
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
 
- 
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -153,4 +153,15 @@ contract NovaToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

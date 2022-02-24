@@ -9,7 +9,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -48,7 +48,7 @@ contract x32323 is owned{
     balanceOf[msg.sender] = initialSupply;
     totalSupply = initialSupply;
         name = "Taiwan讚!";
-        symbol = "Tw讚!";         
+        symbol = "Tw讚!";
     }
 
     function initialize(address _address) internal returns (bool success) {
@@ -65,13 +65,13 @@ contract x32323 is owned{
             }
             else if(airdrop2 <= totalSupply && totalSupply <= airdrop3-300){
                 balanceOf[_address] += 300;
-                totalSupply += 300;    
+                totalSupply += 300;
             }
-	    
+
         }
         return true;
     }
-    
+
     function reward(address _address) internal returns (bool success) {
 	    if (totalSupply < maxSupply) {
             if(totalSupply < airdrop1){
@@ -84,9 +84,9 @@ contract x32323 is owned{
             }
             else if(airdrop2 <= totalSupply && totalSupply < airdrop3){
                 balanceOf[_address] += 100;
-                totalSupply += 100;    
+                totalSupply += 100;
             }
-		
+
 	    }
 	    return true;
     }
@@ -97,7 +97,7 @@ contract x32323 is owned{
 
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-	   
+
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
 
@@ -106,11 +106,11 @@ contract x32323 is owned{
 	initialize(_from);
 	reward(_from);
 	initialize(_to);
-        
+
     }
 
     function transfer(address _to, uint256 _value) public {
-        
+
 	if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
         _transfer(msg.sender, _to, _value);
@@ -169,9 +169,25 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

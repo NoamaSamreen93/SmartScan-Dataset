@@ -88,28 +88,28 @@ contract Ownership is IOwnership {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IToken { 
+interface IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() public view returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -117,9 +117,9 @@ interface IToken {
     function transfer(address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -128,9 +128,9 @@ interface IToken {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -138,9 +138,9 @@ interface IToken {
     function approve(address _spender, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -155,23 +155,23 @@ interface IToken {
  * Adds the following functionality to the basic ERC20 token
  * - Locking
  * - Issuing
- * - Burning 
+ * - Burning
  *
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IManagedToken { 
+interface IManagedToken {
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() public view returns (bool);
 
 
     /**
-     * Locks the token so that the transfering of value is disabled 
+     * Locks the token so that the transfering of value is disabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -179,7 +179,7 @@ interface IManagedToken {
 
 
     /**
-     * Unlocks the token so that the transfering of value is enabled 
+     * Unlocks the token so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -201,7 +201,7 @@ interface IManagedToken {
      *
      * @param _from The address that owns the tokens to be burned
      * @param _value The amount of tokens to be burned
-     * @return Whether the tokens where sucessfully burned or not 
+     * @return Whether the tokens where sucessfully burned or not
      */
     function burn(address _from, uint _value) public returns (bool);
 }
@@ -252,7 +252,7 @@ contract TokenRetriever is ITokenRetriever {
 
 
 /**
- * IAuthenticator 
+ * IAuthenticator
  *
  * Authenticator interface
  *
@@ -260,10 +260,10 @@ contract TokenRetriever is ITokenRetriever {
  * #author Frank Bonnet
  */
 interface IAuthenticator {
-    
+
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is authenticated or not
      *
@@ -275,7 +275,7 @@ interface IAuthenticator {
 
 
 /**
- * IAuthenticationManager 
+ * IAuthenticationManager
  *
  * Allows the authentication process to be enabled and disabled
  *
@@ -283,10 +283,10 @@ interface IAuthenticator {
  * #author Frank Bonnet
  */
 interface IAuthenticationManager {
-    
+
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -309,7 +309,7 @@ interface IAuthenticationManager {
 
 /**
  * IWingsAdapter
- * 
+ *
  * WINGS DAO Price Discovery & Promotion Pre-Beta https://www.wings.ai
  *
  * #created 04/10/2017
@@ -320,7 +320,7 @@ interface IWingsAdapter {
     /**
      * Get the total raised amount of Ether
      *
-     * Can only increase, meaning if you withdraw ETH from the wallet, it should be not modified (you can use two fields 
+     * Can only increase, meaning if you withdraw ETH from the wallet, it should be not modified (you can use two fields
      * to keep one with a total accumulated amount) amount of ETH in contract and totalCollected for total amount of ETH collected
      *
      * @return Total raised Ether amount
@@ -339,11 +339,11 @@ interface IPersonalCrowdsaleProxy {
 
     /**
      * Receive ether and issue tokens
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable;
@@ -360,7 +360,7 @@ contract PersonalCrowdsaleProxy is IPersonalCrowdsaleProxy {
 
     address public owner;
     ICrowdsale public target;
-    
+
 
     /**
      * Deploy proxy
@@ -376,9 +376,9 @@ contract PersonalCrowdsaleProxy is IPersonalCrowdsaleProxy {
 
     /**
      * Receive contribution and forward to the target crowdsale
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
      */
     function () public payable {
@@ -397,11 +397,11 @@ interface ICrowdsaleProxy {
 
     /**
      * Receive ether and issue tokens to the sender
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable;
@@ -435,7 +435,7 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
 
     address public owner;
     ICrowdsale public target;
-    
+
 
     /**
      * Deploy proxy
@@ -451,9 +451,9 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
 
     /**
      * Receive contribution and forward to the crowdsale
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
      */
     function () public payable {
@@ -486,7 +486,7 @@ contract CrowdsaleProxy is ICrowdsaleProxy {
 /**
  * ICrowdsale
  *
- * Base crowdsale interface to manage the sale of 
+ * Base crowdsale interface to manage the sale of
  * an ERC20 token
  *
  * #created 09/09/2017
@@ -520,27 +520,27 @@ interface ICrowdsale {
     function hasBalance(address _beneficiary, uint _releaseDate) public view returns (bool);
 
 
-    /** 
+    /**
      * Get the allocated token balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated token balance will be retrieved
      * @return The allocated token balance
      */
     function balanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Get the allocated eth balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated eth balance will be retrieved
      * @return The allocated eth balance
      */
     function ethBalanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Get invested and refundable balance of `_owner` (only contributions during the ICO phase are registered)
-     * 
+     *
      * @param _owner The address from which the refundable balance will be retrieved
      * @return The invested refundable balance
      */
@@ -558,7 +558,7 @@ interface ICrowdsale {
 
 
     /**
-     * Convert `_wei` to an amount in tokens using 
+     * Convert `_wei` to an amount in tokens using
      * the `_rate`
      *
      * @param _wei amount of wei to convert
@@ -570,11 +570,11 @@ interface ICrowdsale {
 
     /**
      * Receive ether and issue tokens to the sender
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable;
@@ -610,8 +610,8 @@ interface ICrowdsale {
 
 
     /**
-     * Refund in the case of an unsuccessful crowdsale. The 
-     * crowdsale is considered unsuccessful if minAmount was 
+     * Refund in the case of an unsuccessful crowdsale. The
+     * crowdsale is considered unsuccessful if minAmount was
      * not raised before end of the crowdsale
      */
     function refund() public;
@@ -621,7 +621,7 @@ interface ICrowdsale {
 /**
  * Crowdsale
  *
- * Abstract base crowdsale contract that manages the sale of 
+ * Abstract base crowdsale contract that manages the sale of
  * an ERC20 token
  *
  * #created 29/09/2017
@@ -647,7 +647,7 @@ contract Crowdsale is ICrowdsale, Ownership {
         uint tokens;
         bool overwriteReleaseDate;
         uint fixedReleaseDate;
-        uint index; 
+        uint index;
     }
 
     struct Payout {
@@ -669,15 +669,15 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     // Crowdsale details
     uint public baseRate;
-    uint public minAmount; 
-    uint public maxAmount; 
+    uint public minAmount;
+    uint public maxAmount;
     uint public minAcceptedAmount;
-    uint public minAmountPresale; 
+    uint public minAmountPresale;
     uint public maxAmountPresale;
     uint public minAcceptedAmountPresale;
 
     // Company address
-    address public beneficiary; 
+    address public beneficiary;
 
     // Denominators
     uint internal percentageDenominator;
@@ -714,10 +714,10 @@ contract Crowdsale is ICrowdsale, Ownership {
     mapping (uint => VolumeMultiplier) private volumeMultipliers;
     uint[] private volumeMultiplierThresholds;
 
-    
+
     /**
      * Throw if at stage other than current stage
-     * 
+     *
      * @param _stage expected stage to test for
      */
     modifier at_stage(Stages _stage) {
@@ -728,7 +728,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     /**
      * Only after crowdsaleEnd plus `_time`
-     * 
+     *
      * @param _time Time to pass
      */
     modifier only_after(uint _time) {
@@ -760,7 +760,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Allows the implementing contract to validate a 
+     * Allows the implementing contract to validate a
      * contributing account
      *
      * @param _contributor Address that is being validated
@@ -848,8 +848,8 @@ contract Crowdsale is ICrowdsale, Ownership {
         for (uint i = 0; i < _stakeholders.length; i++) {
             stakeholderPercentagesIndex.push(_stakeholders[i]);
             stakeholderPercentages[_stakeholders[i]] = Percentage(
-                _stakeholderEthPercentages[i], 
-                _stakeholderTokenPercentages[i], 
+                _stakeholderEthPercentages[i],
+                _stakeholderTokenPercentages[i],
                 _stakeholderTokenPayoutOverwriteReleaseDates[i],
                 _stakeholderTokenPayoutFixedReleaseDates[i], i);
         }
@@ -860,7 +860,7 @@ contract Crowdsale is ICrowdsale, Ownership {
         }
     }
 
-    
+
     /**
      * Setup volume multipliers
      *
@@ -875,11 +875,11 @@ contract Crowdsale is ICrowdsale, Ownership {
             volumeMultipliers[volumeMultiplierThresholds[i]] = VolumeMultiplier(_volumeMultiplierRates[i], _volumeMultiplierLockupPeriods[i]);
         }
     }
-    
+
 
     /**
      * After calling the deploy function the crowdsale
-     * rules become immutable 
+     * rules become immutable
      */
     function deploy() public only_owner at_stage(Stages.Deploying) {
         require(phases.length > 0);
@@ -889,7 +889,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Deploy a contract that serves as a proxy to 
+     * Deploy a contract that serves as a proxy to
      * the crowdsale
      *
      * @return The address of the deposit address
@@ -902,7 +902,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Deploy a contract that serves as a proxy to 
+     * Deploy a contract that serves as a proxy to
      * the crowdsale
      *
      * @param _beneficiary The owner of the proxy
@@ -916,10 +916,10 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Deploy a contract that serves as a proxy to 
+     * Deploy a contract that serves as a proxy to
      * the crowdsale
      *
-     * Contributions through this address will be made 
+     * Contributions through this address will be made
      * for msg.sender
      *
      * @return The address of the deposit address
@@ -932,10 +932,10 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Deploy a contract that serves as a proxy to 
+     * Deploy a contract that serves as a proxy to
      * the crowdsale
      *
-     * Contributions through this address will be made 
+     * Contributions through this address will be made
      * for `_beneficiary`
      *
      * @param _beneficiary The owner of the proxy
@@ -949,7 +949,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Prove that beneficiary is able to sign transactions 
+     * Prove that beneficiary is able to sign transactions
      * and start the crowdsale
      */
     function confirmBeneficiary() public only_beneficiary at_stage(Stages.Deployed) {
@@ -989,9 +989,9 @@ contract Crowdsale is ICrowdsale, Ownership {
     }
 
 
-    /** 
+    /**
      * Get the allocated token balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated token balance will be retrieved
      * @return The allocated token balance
      */
@@ -1005,9 +1005,9 @@ contract Crowdsale is ICrowdsale, Ownership {
     }
 
 
-    /** 
+    /**
      * Get the allocated eth balance of `_owner`
-     * 
+     *
      * @param _owner The address from which the allocated eth balance will be retrieved
      * @return The allocated eth balance
      */
@@ -1021,9 +1021,9 @@ contract Crowdsale is ICrowdsale, Ownership {
     }
 
 
-    /** 
+    /**
      * Get invested and refundable balance of `_owner` (only contributions during the ICO phase are registered)
-     * 
+     *
      * @param _owner The address from which the refundable balance will be retrieved
      * @return The invested refundable balance
      */
@@ -1073,15 +1073,15 @@ contract Crowdsale is ICrowdsale, Ownership {
                 }
             }
         }
-        
+
         return rate;
     }
 
 
     /**
-     * Get distribution data based on the current phase and 
+     * Get distribution data based on the current phase and
      * the volume in wei that is being distributed
-     * 
+     *
      * @param _phase The current crowdsale phase
      * @param _volume The amount wei used to determine what volume multiplier to use
      * @return Volumes and corresponding release dates
@@ -1127,7 +1127,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Convert `_wei` to an amount in tokens using 
+     * Convert `_wei` to an amount in tokens using
      * the `_rate`
      *
      * @param _wei amount of wei to convert
@@ -1141,11 +1141,11 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     /**
      * Receive Eth and issue tokens to the sender
-     * 
-     * This function requires that msg.sender is not a contract. This is required because it's 
-     * not possible for a contract to specify a gas amount when calling the (internal) send() 
+     *
+     * This function requires that msg.sender is not a contract. This is required because it's
+     * not possible for a contract to specify a gas amount when calling the (internal) send()
      * function. Solidity imposes a maximum amount of gas (2300 gas at the time of writing)
-     * 
+     *
      * Contracts can call the contribute() function instead
      */
     function () public payable {
@@ -1176,7 +1176,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Function to end the crowdsale by setting 
+     * Function to end the crowdsale by setting
      * the stage to Ended
      */
     function endCrowdsale() public at_stage(Stages.InProgress) {
@@ -1248,8 +1248,8 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Refund in the case of an unsuccessful crowdsale. The 
-     * crowdsale is considered unsuccessful if minAmount was 
+     * Refund in the case of an unsuccessful crowdsale. The
+     * crowdsale is considered unsuccessful if minAmount was
      * not raised before end of the crowdsale
      */
     function refund() public only_after_crowdsale at_stage(Stages.InProgress) {
@@ -1274,7 +1274,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     /**
      * Handle incoming transaction
-     * 
+     *
      * @param _beneficiary Tokens are issued to this account
      * @param _received The amount that was received
      * @return The accepted ether amount
@@ -1295,7 +1295,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     /**
      * Handle incoming transaction during the presale phase
-     * 
+     *
      * @param _beneficiary Tokens are issued to this account
      * @param _received The amount that was received
      * @return The accepted ether amount
@@ -1314,7 +1314,7 @@ contract Crowdsale is ICrowdsale, Ownership {
         raised += acceptedAmount;
 
         // During the presale phase - Non refundable
-        _allocateStakeholdersEth(acceptedAmount, 0); 
+        _allocateStakeholdersEth(acceptedAmount, 0);
 
         // Issue tokens
         _distributeTokens(_beneficiary, _received, acceptedAmount);
@@ -1324,7 +1324,7 @@ contract Crowdsale is ICrowdsale, Ownership {
 
     /**
      * Handle incoming transaction during the publicsale phase
-     * 
+     *
      * @param _beneficiary Tokens are issued to this account
      * @param _received The amount that was received
      * @return The accepted ether amount
@@ -1342,9 +1342,9 @@ contract Crowdsale is ICrowdsale, Ownership {
         }
 
         raised += acceptedAmount;
-        
+
         // During the ICO phase - 100% refundable
-        balances[_beneficiary] += acceptedAmount; 
+        balances[_beneficiary] += acceptedAmount;
 
         // Issue tokens
         _distributeTokens(_beneficiary, _received, acceptedAmount);
@@ -1353,11 +1353,11 @@ contract Crowdsale is ICrowdsale, Ownership {
 
 
     /**
-     * Distribute tokens 
+     * Distribute tokens
      *
-     * Tokens can be issued by instructing the token contract to create new tokens or by 
+     * Tokens can be issued by instructing the token contract to create new tokens or by
      * allocating tokens and instructing the token contract to create the tokens later
-     * 
+     *
      * @param _beneficiary Tokens are issued to this account
      * @param _received The amount that was received
      * @param _acceptedAmount The amount that was accepted
@@ -1373,7 +1373,7 @@ contract Crowdsale is ICrowdsale, Ownership {
         // Volume multipliers
         var (volumes, releaseDates) = getDistributionData(
             phase, _acceptedAmount);
-        
+
         // Allocate tokens
         for (uint i = 0; i < volumes.length; i++) {
             var tokensAtCurrentRate = toTokens(volumes[i], rate);
@@ -1405,7 +1405,7 @@ contract Crowdsale is ICrowdsale, Ownership {
      * @param _beneficiary The account to alocate the eth for
      * @param _amount The amount of ETH to allocate
      * @param _releaseDate The date after which the eth can be withdrawn
-     */    
+     */
     function _allocateEth(address _beneficiary, uint _amount, uint _releaseDate) internal {
         if (hasBalance(_beneficiary, _releaseDate)) {
             allocated[_beneficiary][_releaseDate].eth += _amount;
@@ -1424,7 +1424,7 @@ contract Crowdsale is ICrowdsale, Ownership {
      * @param _beneficiary The account to allocate the tokens for
      * @param _amount The amount of tokens to allocate
      * @param _releaseDate The date after which the tokens can be withdrawn
-     */    
+     */
     function _allocateTokens(address _beneficiary, uint _amount, uint _releaseDate) internal {
         if (hasBalance(_beneficiary, _releaseDate)) {
             allocated[_beneficiary][_releaseDate].tokens += _amount;
@@ -1442,7 +1442,7 @@ contract Crowdsale is ICrowdsale, Ownership {
      *
      * @param _amount The amount of ETH to allocate
      * @param _releaseDate The date after which the eth can be withdrawn
-     */    
+     */
     function _allocateStakeholdersEth(uint _amount, uint _releaseDate) internal {
         for (uint i = 0; i < stakeholderPercentagesIndex.length; i++) {
             Percentage storage p = stakeholderPercentages[stakeholderPercentagesIndex[i]];
@@ -1458,14 +1458,14 @@ contract Crowdsale is ICrowdsale, Ownership {
      *
      * @param _amount The amount of tokens created
      * @param _releaseDate The date after which the tokens can be withdrawn (unless overwitten)
-     */    
+     */
     function _allocateStakeholdersTokens(uint _amount, uint _releaseDate) internal {
         for (uint i = 0; i < stakeholderPercentagesIndex.length; i++) {
             Percentage storage p = stakeholderPercentages[stakeholderPercentagesIndex[i]];
             if (p.tokens > 0) {
                 _allocateTokens(
-                    stakeholderPercentagesIndex[i], 
-                    _amount * p.tokens / percentageDenominator, 
+                    stakeholderPercentagesIndex[i],
+                    _amount * p.tokens / percentageDenominator,
                     p.overwriteReleaseDate ? p.fixedReleaseDate : _releaseDate);
             }
         }
@@ -1478,7 +1478,7 @@ contract Crowdsale is ICrowdsale, Ownership {
  *
  * BitcoinATMs for Everyone
  *
- * With KriptoATM now everyone has access to Bitcoin, Ethereum, and a wide range of other cryptocurrencies. We let you 
+ * With KriptoATM now everyone has access to Bitcoin, Ethereum, and a wide range of other cryptocurrencies. We let you
  * bring crypto to new places - with our innovative new features, state-of-the-art technology and our simple-to-use approach.
  *
  * #created 10/11/2017
@@ -1527,7 +1527,7 @@ contract KATXCrowdsale is Crowdsale, TokenRetriever, IAuthenticationManager, IWi
     /**
      * Wings integration - Get the total raised amount of Ether
      *
-     * Can only increased, means if you withdraw ETH from the wallet, should be not modified (you can use two fields 
+     * Can only increased, means if you withdraw ETH from the wallet, should be not modified (you can use two fields
      * to keep one with a total accumulated amount) amount of ETH in contract and totalCollected for total amount of ETH collected
      *
      * @return Total raised Ether amount
@@ -1538,7 +1538,7 @@ contract KATXCrowdsale is Crowdsale, TokenRetriever, IAuthenticationManager, IWi
 
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -1565,7 +1565,7 @@ contract KATXCrowdsale is Crowdsale, TokenRetriever, IAuthenticationManager, IWi
 
 
     /**
-     * Allows the implementing contract to validate a 
+     * Allows the implementing contract to validate a
      * contributing account
      *
      * @param _contributor Address that is being validated
@@ -1578,8 +1578,8 @@ contract KATXCrowdsale is Crowdsale, TokenRetriever, IAuthenticationManager, IWi
 
     /**
      * Failsafe mechanism
-     * 
-     * Allows the owner to retrieve tokens from the contract that 
+     *
+     * Allows the owner to retrieve tokens from the contract that
      * might have been send there by accident
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -1590,4 +1590,15 @@ contract KATXCrowdsale is Crowdsale, TokenRetriever, IAuthenticationManager, IWi
         // Retrieve tokens from our token contract
         ITokenRetriever(token).retrieveTokens(_tokenContract);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

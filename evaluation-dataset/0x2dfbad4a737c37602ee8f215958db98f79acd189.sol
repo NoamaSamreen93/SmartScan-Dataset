@@ -184,7 +184,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
-  
+
 }
 
 /**
@@ -395,7 +395,7 @@ contract BurnableToken is MintableToken {
 
 /**
  * @title Nova Token
- * @dev Main token ganeration contract 
+ * @dev Main token ganeration contract
  */
 contract NovaToken is BurnableToken{
 
@@ -409,4 +409,15 @@ contract NovaToken is BurnableToken{
         finishMinting();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -46,11 +46,11 @@ contract BasicToken is ERC20Basic {
 
   mapping(address => uint256) balances;
 
-  
+
    //@dev transfer token for a specified address
   // @param _to The address to transfer to.
    //@param _value The amount to be transferred.
-   
+
   function transfer(address _to, uint256 _value) returns (bool) {
     require(_to != address(0));
 
@@ -61,11 +61,11 @@ contract BasicToken is ERC20Basic {
     return true;
   }
 
-  
+
    //@dev Gets the balance of the specified address.
-   //@param _owner The address to query the the balance of. 
+   //@param _owner The address to query the the balance of.
   // @return An uint256 representing the amount owned by the passed address.
-  
+
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
@@ -125,23 +125,23 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   /**
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint256 _addedValue) 
-    returns (bool success) 
+  function increaseApproval (address _spender, uint256 _addedValue)
+    returns (bool success)
     {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint256 _subtractedValue) 
-    returns (bool success) 
+  function decreaseApproval (address _spender, uint256 _subtractedValue)
+    returns (bool success)
     {
     uint256 oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -173,7 +173,7 @@ contract Ownable {
     //@dev Allows the current owner to transfer control of the contract to a newOwner.
     //@param newOwner The address to transfer ownership to.
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -268,7 +268,7 @@ contract BLTToken is StandardToken, Ownable, PriceUpdate, Pausable, SalePausable
 	string 	public constant symbol = "BLT";
 	uint256	public constant decimals = 18;
 	//uint256 public price = 400;  moved to price setting contract
-    
+
     address public bltRetainedAcc = 0x48259a35030c8dA6aaA1710fD31068D30bfc716C;  //holds blt company retained
     address public bltOwnedAcc =    0x1CA33C197952B8D9dd0eDC9EFa20018D6B3dcF5F;  //holds blt company owned
     address public bltMasterAcc =   0xACc2be4D782d472cf4f928b116054904e5513346; //master account to hold BLT
@@ -292,9 +292,9 @@ contract BLTToken is StandardToken, Ownable, PriceUpdate, Pausable, SalePausable
 
 
 	function transferFrom(address _from, address _to, uint256 _value) whenNotPaused returns (bool success) {
-	    
+
 	    var allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = balances[_to].add(_value);
 	    balances[_from] = balances[_from].sub(_value);
 	    allowed[_from][msg.sender] = allowance.sub(_value);
@@ -319,7 +319,7 @@ contract BLTToken is StandardToken, Ownable, PriceUpdate, Pausable, SalePausable
 		balances[bltRetainedAcc] = bltRetained;             // fund BLT Retained account
         balances[bltOwnedAcc] = bltOwned;                   // fund BLT Owned account
         balances[bltMasterAcc] = bltMaster;                 // fund BLT master account
-        
+
         allowed[bltMasterAcc][msg.sender] = bltMaster;
 
         totalSupply = bltRetained + bltOwned + bltMaster;
@@ -334,7 +334,7 @@ contract BLTToken is StandardToken, Ownable, PriceUpdate, Pausable, SalePausable
 
 
 contract BLTTokenSale is BLTToken {
-    using SafeMath for uint256;    
+    using SafeMath for uint256;
 
     BLTToken public token;
     uint256 public etherRaised;
@@ -344,7 +344,7 @@ contract BLTTokenSale is BLTToken {
     address public bltMasterToSale = 0xACc2be4D782d472cf4f928b116054904e5513346;    //BLT available for sale
 
     event MintedToken(address from, address to, uint256 value1);                    //event that Tokens were sent
-    event RecievedEther(address from, uint256 value1);                               //event that ether received function ran     
+    event RecievedEther(address from, uint256 value1);                               //event that ether received function ran
 
     function () payable {
 		createTokens(msg.sender,msg.value);
@@ -352,7 +352,7 @@ contract BLTTokenSale is BLTToken {
 
         //initiates the sale of the token
 	function createTokens(address _recipient, uint256 _value) saleWhenNotPaused {
-        
+
         require (_value != 0);                                                      //value must be greater than zero
         require (now >= saleStartTime);                                             //only works during token sale
         require (_recipient != 0x0);                                                //not a contract validation
@@ -364,26 +364,37 @@ contract BLTTokenSale is BLTToken {
             etherRaised = etherRaised.add(_value);
             forwardFunds();
             RecievedEther(msg.sender,_value);
-        }                                        
+        }
 
 	}
-    
-     //transfers BLT from storage account into the purchasers account   
+
+     //transfers BLT from storage account into the purchasers account
     function mint(address _to, uint256 _tokens) internal saleWhenNotPaused returns (bool success) {
-        
+
         address _from = bltMasterToSale;
 	    var allowance = allowed[_from][owner];
-	    
+
 	    balances[_to] = balances[_to].add(_tokens);
 	    balances[_from] = balances[_from].sub(_tokens);
 	    allowed[_from][owner] = allowance.sub(_tokens);
         Transfer(_from, _to, _tokens);                                               //capture event in logs
-	    MintedToken(_from,_to, _tokens); 
+	    MintedToken(_from,_to, _tokens);
       return true;
-	}    
-      //forwards ether to storage wallet  
+	}
+      //forwards ether to storage wallet
       function forwardFunds() internal {
         ethDeposits.transfer(msg.value);
-        
+
         }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

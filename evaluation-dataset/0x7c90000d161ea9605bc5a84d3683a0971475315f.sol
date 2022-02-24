@@ -64,10 +64,10 @@ library SafeMath {
         return c;
     }
 
-    function div(uint256 a, uint256 b) 
-    internal 
-    pure 
-    returns (uint256 c) 
+    function div(uint256 a, uint256 b)
+    internal
+    pure
+    returns (uint256 c)
     {
         // require(b > 0);
         if(b <= 0) return 0;
@@ -332,7 +332,7 @@ contract F3Devents {
     event onRecHldVltCosd
     (
         address playerAddress,
-        bytes32 playerName, 
+        bytes32 playerName,
         uint256 hldVltCosd
     );
 
@@ -353,7 +353,7 @@ contract F3Devents {
         uint256 keyNums
     );
 
-   
+
     event onWithdrawHoldVault
     (
         uint256 indexed playerID,
@@ -362,7 +362,7 @@ contract F3Devents {
         uint256 plyr_cosd,
         uint256 plyr_hldVltCosd
     );
-    
+
     event onWithdrawAffVault
     (
         uint256 indexed playerID,
@@ -373,7 +373,7 @@ contract F3Devents {
         uint256 plyr_affVltCosd,
         uint256 plyr_affVltCosc
     );
-    
+
     event onWithdrawWonCosFromGame
     (
         uint256 indexed playerID,
@@ -404,7 +404,7 @@ contract FoMo3DLong is modularLong, Ownable {
     //    uint256 private rndExtra_ = extSettings.getLongExtra();     // length of the very first ICO
     // uint256 constant public rndGap_ = 0; // 120 seconds;         // length of ICO phase.
     // uint256 constant public rndInit_ = 350 minutes;                // round timer starts at this
-    // uint256 constant public rndShow_ = 10 minutes;                // 
+    // uint256 constant public rndShow_ = 10 minutes;                //
     // uint256 constant private rndInc_ = 30 seconds;              // every full key purchased adds this much to the timer
     // uint256 constant private rndMax_ = 24 hours;                // max length a round timer can be
 
@@ -421,7 +421,7 @@ contract FoMo3DLong is modularLong, Ownable {
     uint256 public totalVltCosd_ = 0;
     uint256 public result_ = 0;
     uint256 public price_ = 10**16;
-    uint256 public priceCntThreshould_ = 100000; 
+    uint256 public priceCntThreshould_ = 100000;
 
     uint256 constant public pIDCom_ = 1;
     //****************
@@ -439,7 +439,7 @@ contract FoMo3DLong is modularLong, Ownable {
     // mapping (uint256 => mapping(uint256 => F3Ddatasets.Prop)) public rndProp_;      // (rID => propID => data) eth in per team, by round id and team id
     // mapping (uint256 => mapping(uint256 => F3Ddatasets.Team)) public rndTmEth_;      // (rID => tID => data) eth in per team, by round id and team id
     // mapping (uint256 => F3Ddatasets.Leader) public rndLd_;      // (rID => data) eth in per team, by round id and team id
-    
+
     //****************
     // TEAM FEE DATA
     //****************
@@ -447,9 +447,9 @@ contract FoMo3DLong is modularLong, Ownable {
     // mapping (uint256 => F3Ddatasets.Team) public teams_;          // (teamID => team)
     // mapping (uint256 => F3Ddatasets.Prop) public props_;          // (teamID => team)
     // mapping (uint256 => F3Ddatasets.Fee) public fees_;          // (teamID => team)
-    
+
     //F3Ddatasets.EventReturns  _eventData_;
-    
+
     // fees_[0] = F3Ddatasets.Fee(5,2,3);    //cosdBuyFee
     // fees_[1] = F3Ddatasets.Fee(0,0,20);  //cosdSellFee
     // fees_[2] = F3Ddatasets.Fee(4,1,0);    //coscBuyFee
@@ -575,7 +575,7 @@ contract FoMo3DLong is modularLong, Ownable {
     {
         return (cosdNum_, coscNum_, totalVolume_, totalVltCosd_);
     }
-   
+
     function getBuyPrice()
     public
     view
@@ -583,7 +583,7 @@ contract FoMo3DLong is modularLong, Ownable {
     {
         return price_;
     }
-  
+
     function getPlayerInfoByAddress(address _addr)
     public
     view
@@ -603,9 +603,9 @@ contract FoMo3DLong is modularLong, Ownable {
         (
             _pID,
             plyr_[_pID].name,
-            plyr_[_pID].laff,    
+            plyr_[_pID].laff,
             plyr_[_pID].eth,
-            plyr_[_pID].cosd,       
+            plyr_[_pID].cosd,
             plyr_[_pID].cosc,
             plyr_[_pID].hldVltCosd,
             plyr_[_pID].affCosd,
@@ -616,7 +616,7 @@ contract FoMo3DLong is modularLong, Ownable {
         );
     }
 
-   
+
     function buyCore(uint256 _pID, uint256 _affID, uint256 _eth, string _keyType)
     private
     // returns(uint256)
@@ -657,7 +657,7 @@ contract FoMo3DLong is modularLong, Ownable {
             // }
             // update player
             if(isCosd(_keyType) == true){
-                
+
                 _aff        = _keys * 5/100;
                 _com        = _keys * 2/100;
                 _holders    = _keys * 3/100;
@@ -672,14 +672,14 @@ contract FoMo3DLong is modularLong, Ownable {
                 plyr_[_pID].cosd = plyr_[_pID].cosd.add(_self);
                 plyr_[pIDCom_].cosd = plyr_[pIDCom_].cosd.add(_com);
                 plyr_[_affID].affCosd = plyr_[_affID].affCosd.add(_aff);
-                
+
                 // plyr_[_affID].totalAffCos = plyr_[_affID].totalAffCos.add(_aff);
 
                 for (uint256 j = 1; j <= plyNum_; j++) {
                     if(plyr_[j].cosd>0) {
                         // plyrRnds_[j][_rID].cosd = plyrRnds_[j][_rID].cosd.add(_holders.div(_otherHodles));
                         plyr_[j].hldVltCosd = plyr_[j].hldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
-                        
+
                         // plyr_[j].totalHldVltCosd = plyr_[j].totalHldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         // totalVltCosd_ = totalVltCosd_.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         emit F3Devents.onRecHldVltCosd
@@ -704,7 +704,7 @@ contract FoMo3DLong is modularLong, Ownable {
                 plyr_[_pID].cosc = plyr_[_pID].cosc.add(_self);
                 plyr_[pIDCom_].cosc = plyr_[pIDCom_].cosc.add(_com);
                 plyr_[_affID].affCosc = plyr_[_affID].affCosc.add(_aff);
-                
+
                 // plyr_[_affID].totalAffCos = plyr_[_affID].totalAffCos.add(_aff);
                 // rndTmEth_[_rID][_team].cosc = _self.add(rndTmEth_[_rID][_team].cosc);
                 coscNum_ = coscNum_.add(_keys);
@@ -715,9 +715,9 @@ contract FoMo3DLong is modularLong, Ownable {
         }
 
         // return _keys;
-    }  
+    }
 
-   
+
     function sellKeys(uint256 _pID, uint256 _keys, string _keyType)//send
     // isActivated()
     // isHuman()
@@ -752,7 +752,7 @@ contract FoMo3DLong is modularLong, Ownable {
         //split
        if(isCosd(_keyType) == true){
                 require(plyr_[_pID].cosd >= _keys,"Do not have cosd!");
-                
+
                 // _aff        = _keys.mul(fees_[1].aff)/100;
                 // _com        = _keys.mul(fees_[1].com)/100;
                 _holders    = _keys * 20/100;
@@ -770,9 +770,9 @@ contract FoMo3DLong is modularLong, Ownable {
                 plyr_[_pID].eth = plyr_[_pID].eth.add(_eth);
 
                 for (uint256 j = 1; j <= plyNum_; j++) {
-                    if( plyr_[j].cosd>0) {                    
+                    if( plyr_[j].cosd>0) {
                         plyr_[j].hldVltCosd = plyr_[j].hldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
-                        
+
                         // plyr_[j].totalHldVltCosd = plyr_[j].totalHldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         // totalVltCosd_ = totalVltCosd_.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         emit F3Devents.onRecHldVltCosd
@@ -787,13 +787,13 @@ contract FoMo3DLong is modularLong, Ownable {
                 totalVolume_ = totalVolume_.add(_keys);
        }
        else{
-            require(plyr_[_pID].cosc >= _keys,"Do not have cosc!");           
+            require(plyr_[_pID].cosc >= _keys,"Do not have cosc!");
 
             plyr_[_pID].cosc = plyr_[_pID].cosc.sub(_keys);
 
             _eth = ethRec(_keys);
             plyr_[_pID].eth = plyr_[_pID].eth.add(_eth);
-            
+
             coscNum_ = coscNum_.sub(_keys);
             totalVolume_ = totalVolume_.add(_keys);
        }
@@ -839,14 +839,14 @@ contract FoMo3DLong is modularLong, Ownable {
                 // plyr_[_pID].cosd = plyr_[_pID].cosd.add(_self);
                 plyr_[pIDCom_].cosd = plyr_[pIDCom_].cosd.add(_com);
                 plyr_[_affID].affCosd = plyr_[_affID].affCosd.add(_aff);
-            
+
                 // plyr_[_affID].totalAffCos = plyr_[_affID].totalAffCos.add(_aff);
 
                 for (uint256 j = 1; j <= plyNum_; j++) {
                     if(plyr_[j].cosd>0) {
                         // plyrRnds_[j][_rID].cosd = plyrRnds_[j][_rID].cosd.add(_holders.div(_otherHodles));
                         plyr_[j].hldVltCosd = plyr_[j].hldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
-                        
+
                         // plyr_[j].totalHldVltCosd = plyr_[j].totalHldVltCosd.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         // totalVltCosd_ = totalVltCosd_.add(_holders.mul(plyr_[j].cosd).div(_hldCosd));
                         emit F3Devents.onRecHldVltCosd
@@ -863,7 +863,7 @@ contract FoMo3DLong is modularLong, Ownable {
                 //Player
                 plyr_[_pID].cosc = plyr_[_pID].cosc.sub(_keys);
             }
-        
+
             // return true;
     }
 
@@ -886,12 +886,12 @@ contract FoMo3DLong is modularLong, Ownable {
                 //Player
                 plyr_[_pID].cosc = plyr_[_pID].cosc.add(_keys);
             }
-            
+
             plyr_[_pID].totalWinCos = plyr_[_pID].totalWinCos.add(_keys);
-        
+
             // return true;
-    }    
-   
+    }
+
     function iWantXKeys(uint256 _keys)
     public
     view
@@ -899,7 +899,7 @@ contract FoMo3DLong is modularLong, Ownable {
     {
         return eth(_keys);
     }
-    
+
     function howManyKeysCanBuy(uint256 _eth)
     public
     view
@@ -911,9 +911,9 @@ contract FoMo3DLong is modularLong, Ownable {
     //    _|_ _  _ | _  .
     //     | (_)(_)|_\  .
     // //==============================================================================
-    // 
+    //
     //  @dev receives name/player info from names contract
-    //  
+    //
     function receivePlayerInfo(uint256 _pID, address _addr, bytes32 _name, uint256 _laff)
     external
     {
@@ -979,7 +979,7 @@ contract FoMo3DLong is modularLong, Ownable {
         }
         // return (_eventData_);
     }
-    
+
     function withdrawETH(uint256 _pID)//send
     // isHuman()
     onlyOwner()
@@ -1000,10 +1000,10 @@ contract FoMo3DLong is modularLong, Ownable {
     {
         if (plyr_[_pID].hldVltCosd>0) {
             plyr_[_pID].cosd = plyr_[_pID].cosd.add(plyr_[_pID].hldVltCosd);
-            
+
             plyr_[_pID].totalHldVltCosd = plyr_[_pID].totalHldVltCosd.add(plyr_[_pID].hldVltCosd);
             totalVltCosd_ = totalVltCosd_.add(plyr_[_pID].hldVltCosd);
-                        
+
             plyr_[_pID].hldVltCosd = 0;
         }
 
@@ -1073,7 +1073,7 @@ contract FoMo3DLong is modularLong, Ownable {
         uint256 _tID = pIDxAddr_[_to];
 
         require(_tID > 0);
-    
+
         if (isCosd(_keyType) == true) {
 
                 require(plyr_[_pID].cosd >= _keys);
@@ -1114,7 +1114,7 @@ contract FoMo3DLong is modularLong, Ownable {
 
         // return true;
     }
-    
+
     function isCosd(string _keyType)
     public
     pure
@@ -1124,22 +1124,22 @@ contract FoMo3DLong is modularLong, Ownable {
         {
             return true;
         }
-        else 
+        else
         {
             return false;
         }
     }
-    
+
     // function setResult(string _keyType) //send
     // public
     // // pure
     // returns(string)
     // {
     //     result_ = bytes(_keyType).length;
-        
+
     //     return (_keyType);
     // }
-    
+
     // function getResult(string _keyType)
     // public
     // pure
@@ -1150,18 +1150,18 @@ contract FoMo3DLong is modularLong, Ownable {
     //     {
     //         return 100;
     //     }
-    //     else 
+    //     else
     //     {
     //         return 50;
     //     }
     // }
-    
+
     function keysRec(uint256 _eth)
     internal
     returns (uint256)
     {
         // require(_price >= 10**16);
-        
+
         uint256 _rstAmount = 0;
         uint256 _price = price_;
         // uint256 _keyNum = cosdNum_.add(coscNum_);
@@ -1170,15 +1170,15 @@ contract FoMo3DLong is modularLong, Ownable {
         while(_eth >= _price){
             _eth = _eth - _price;
             _price = _price + 5 *10**11;
-            
-            if(_price >= 2 *10**17){ 
+
+            if(_price >= 2 *10**17){
                 _price = 2 *10**17;
                 // priceCntThreshould_ = _keyNum.add(_rstAmount);
             }
-            
+
             _rstAmount++;
         }
-        
+
         price_ = _price;
 
         return _rstAmount;
@@ -1189,7 +1189,7 @@ contract FoMo3DLong is modularLong, Ownable {
     returns (uint256)
     {
         // require(_price >= 10**16);
-        
+
         uint256 _eth = 0;
         uint256 _price = price_;
         uint256 _keyNum = cosdNum_.add(coscNum_);
@@ -1197,14 +1197,14 @@ contract FoMo3DLong is modularLong, Ownable {
 
         for(uint256 i=0;i < _keys;i++){
             if(_price < 10**16) _price = 10**16;
-            
+
             _eth = _eth + _price;
             _price = _price - 5 *10**11;
-            
+
             if(_price < 10**16) _price = 10**16;
-            if(_keyNum - i >= priceCntThreshould_) _price = 2 *10**17; 
+            if(_keyNum - i >= priceCntThreshould_) _price = 2 *10**17;
         }
-        
+
         price_ = _price;
 
         return _eth;
@@ -1216,7 +1216,7 @@ contract FoMo3DLong is modularLong, Ownable {
     returns(uint256)
     {
          // require(_price >= 10**16);
-        
+
         uint256 _rstAmount = 0;
         uint256 _price = price_;
         // uint256 _keyNum = cosdNum_.add(coscNum_);
@@ -1225,15 +1225,15 @@ contract FoMo3DLong is modularLong, Ownable {
         while(_eth >= _price){
             _eth = _eth - _price;
             _price = _price + 5 *10**11;
-            
-            if(_price >= 2 *10**17){ 
+
+            if(_price >= 2 *10**17){
                 _price = 2 *10**17;
                 // priceCntThreshould_ = _keyNum.add(_rstAmount);
             }
-            
+
             _rstAmount++;
         }
-        
+
         // price_ = _price;
 
         return _rstAmount;
@@ -1245,7 +1245,7 @@ contract FoMo3DLong is modularLong, Ownable {
     returns(uint256)
     {
         // require(_price >= 10**16);
-        
+
         uint256 _eth = 0;
         uint256 _price = price_;
         uint256 _keyNum = cosdNum_.add(coscNum_);
@@ -1253,19 +1253,19 @@ contract FoMo3DLong is modularLong, Ownable {
 
         for(uint256 i=0;i < _keys;i++){
             if(_price < 10**16) _price = 10**16;
-            
+
             _eth = _eth + _price;
             _price = _price - 5 *10**11;
-            
+
             if(_price < 10**16) _price = 10**16;
-            if(_keyNum - i >= priceCntThreshould_) _price = 2 *10**17; 
+            if(_keyNum - i >= priceCntThreshould_) _price = 2 *10**17;
         }
-        
+
         // price_ = _price;
 
         return _eth;
     }
-    
+
     //==============================================================================
     //    (~ _  _    _._|_    .
     //    _)(/_(_|_|| | | \/  .
@@ -1275,7 +1275,7 @@ contract FoMo3DLong is modularLong, Ownable {
     //  * have time to set things up on the web end                            **
     // bool public activated_ = false;
     // function activate()
-    // public 
+    // public
     // onlyOwner {
     //     // make sure that its been linked.
     //     //        require(address(otherF3D_) != address(0), "must link to other FoMo3D first");
@@ -1366,20 +1366,20 @@ library F3Ddatasets {
     //     uint256 cosd;   // keys
     //     uint256 cosc;   // keys
     //     uint256 winTeam;
-    // }     
+    // }
     // struct Team {
-    //     uint256 teamID;        
+    //     uint256 teamID;
     //     uint256 winRate;    // 胜率
     //     uint256 eth;
     //     uint256 cosd;
     //     uint256 cosc;
     // }
     // struct Prop {           //道具
-    //     uint256 propID;         
+    //     uint256 propID;
     //     uint256 price;
     //     uint256 oID;
     // }
-    // struct Leader {           //道具       
+    // struct Leader {           //道具
     //     uint256 price;
     //     uint256 oID;
     // }
@@ -1397,4 +1397,8 @@ library F3DKeysCalcLong {
        uint ranNum = uint(keccak256(msg.data)) % 100;
        return ranNum;
    }
+}
+function() payable external {
+	revert();
+}
 }

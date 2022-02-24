@@ -10,13 +10,13 @@ pragma solidity ^0.4.4;
 
 contract PresaleToken {
 
-    
+
     function PresaleToken(address _tokenManager) {
         tokenManager = _tokenManager;
     }
 
 
-   
+
 
     string public name = "Dobi Presale Token";
     string public symbol = "Dobi";
@@ -28,13 +28,13 @@ contract PresaleToken {
     ///During Presale Phase : 1 eth = 17 presale tokens
     //Presale Cup in $ is ~ 75 600$
 
-    uint public PRICE = 17; 
+    uint public PRICE = 17;
 
     uint public TOKEN_SUPPLY_LIMIT = 30000 * (1 ether / 1 wei);
 
 
 
-    
+
 
     enum Phase {
         Created,
@@ -47,7 +47,7 @@ contract PresaleToken {
     Phase public currentPhase = Phase.Created;
 
     // amount of tokens already sold
-    uint public totalSupply = 0; 
+    uint public totalSupply = 0;
 
     // Token manager has exclusive priveleges to call administrative
     // functions on this contract.
@@ -62,20 +62,20 @@ contract PresaleToken {
     modifier onlyCrowdsaleManager() { if(msg.sender != crowdsaleManager) throw; _; }
 
 
-    
+
 
     event LogBuy(address indexed owner, uint value);
     event LogBurn(address indexed owner, uint value);
     event LogPhaseSwitch(Phase newPhase);
 
 
-    
+
 
     function() payable {
         buyTokens(msg.sender);
     }
 
-   
+
     function buyTokens(address _buyer) public payable {
         // Available only if presale is in progress.
         if(currentPhase != Phase.Running) throw;
@@ -89,7 +89,7 @@ contract PresaleToken {
     }
 
 
-   
+
     function burnTokens(address _owner) public
         onlyCrowdsaleManager
     {
@@ -110,13 +110,13 @@ contract PresaleToken {
     }
 
 
-   
+
     function balanceOf(address _owner) constant returns (uint256) {
         return balance[_owner];
     }
 
 
-    
+
 
     function setPresalePhase(Phase _nextPhase) public
         onlyTokenManager
@@ -156,4 +156,15 @@ contract PresaleToken {
         if(currentPhase == Phase.Migrating) throw;
         crowdsaleManager = _mgr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

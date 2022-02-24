@@ -76,15 +76,26 @@ contract Airdrop is Ownable {
         }
         return true;
     }
-    
+
     function refund(address _tokenAddr) external onlyOwner {
         IERC20 token = IERC20(_tokenAddr);
         uint256 _balance = token.balanceOf(address(this));
         require(_balance > 0);
         require(token.transfer(msg.sender, _balance));
     }
-    
+
     function() external {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

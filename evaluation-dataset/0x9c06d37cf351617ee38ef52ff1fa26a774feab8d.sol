@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
- 
+
 
 contract SAUBAERtoken  {
     string public constant symbol = "SAUBAER";
@@ -14,14 +14,14 @@ contract SAUBAERtoken  {
 	mapping (address => uint256) balances;
 	// Owner of account approuves the transfert of an account to another account
     mapping (address => mapping (address => uint256)) allowed;
-    
-     
+
+
     // Triggered when tokens are transferred
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     // Constructor
     function SAUBAERtoken() {
          owner = msg.sender;
@@ -29,7 +29,7 @@ contract SAUBAERtoken  {
      }
 
 
-    
+
     // SEND TOKEN: Transfer amount _value from the addr calling function to address _to
     function transfer(address _to, uint256 _value) returns (bool success) {
         // Check if the value is autorized
@@ -43,8 +43,20 @@ contract SAUBAERtoken  {
             return true;
         } else { return false; }
     }
- 
-   
 
 
+
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

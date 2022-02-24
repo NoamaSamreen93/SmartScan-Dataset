@@ -4,21 +4,21 @@ pragma solidity ^0.4.6;
 // ==== DISCLAIMER ====
 //
 // ETHEREUM IS STILL AN EXPEREMENTAL TECHNOLOGY.
-// ALTHOUGH THIS SMART CONTRACT CREATED WITH GREAT CARE AND IN HOPE TO BE USEFUL, NO GUARANTEES OF FLAWLES OPERATION CAN BE GIVEN. 
-// ESPECIALLY SUBTILE BUGS, HACKER ATTACS OR MALFUNCTION OF UNDERLYING TECHNOLOGY CAN CAUSE AN UNINTENTIONAL BEHAVIOUR. 
-// YOU ARE DEEPLY ENCORAGED TO STUDY THIS SMART CONTRACT CAREFULLY IN ORDER TO UNDERSTAND POSSIBLE EDGE CASES AND RISKS. 
+// ALTHOUGH THIS SMART CONTRACT CREATED WITH GREAT CARE AND IN HOPE TO BE USEFUL, NO GUARANTEES OF FLAWLES OPERATION CAN BE GIVEN.
+// ESPECIALLY SUBTILE BUGS, HACKER ATTACS OR MALFUNCTION OF UNDERLYING TECHNOLOGY CAN CAUSE AN UNINTENTIONAL BEHAVIOUR.
+// YOU ARE DEEPLY ENCORAGED TO STUDY THIS SMART CONTRACT CAREFULLY IN ORDER TO UNDERSTAND POSSIBLE EDGE CASES AND RISKS.
 // DON'T USE THIS SMART CONTRACT IN CASE OF ANY SUBSTANTIONAL DOUBTS OR IF YOU DON'T KNOW WHAT ARE YOU DOING.
 //
-// THIS SOFTWARE IS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-// OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+// THIS SOFTWARE IS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+// OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ====
 //
 //
-// ==== PARANOIA NOTICE ==== 
-// A careful reader will find here some unnecessary checks and excessive code consuming some extra valuable gas. It is intentionally. 
+// ==== PARANOIA NOTICE ====
+// A careful reader will find here some unnecessary checks and excessive code consuming some extra valuable gas. It is intentionally.
 // Even contract should works without these parts, they make the code more secure in production as well for future refactoring.
 // Additionally it shows more clearly what we have took care of.
 // You are welcome to discuss that places.
@@ -148,8 +148,8 @@ contract Presale {
 
     function currentState() private constant returns (State) {
         if (isAborted) {
-            return this.balance > 0 
-                   ? State.REFUND_RUNNING 
+            return this.balance > 0
+                   ? State.REFUND_RUNNING
                    : State.CLOSED;
         } else if (block.number < PRESALE_START) {
             return State.BEFORE_START;
@@ -161,7 +161,7 @@ contract Presale {
             return State.WITHDRAWAL_RUNNING;
         } else {
             return State.REFUND_RUNNING;
-        } 
+        }
     }
 
     //
@@ -182,9 +182,9 @@ contract Presale {
 
     //fails if something in setup is looking weird
     modifier validSetupOnly() {
-        if ( OWNER == 0x0 
-            || PRESALE_START == 0 
-            || PRESALE_END == 0 
+        if ( OWNER == 0x0
+            || PRESALE_START == 0
+            || PRESALE_END == 0
             || WITHDRAWAL_END ==0
             || PRESALE_START <= block.number
             || PRESALE_START >= PRESALE_END
@@ -210,7 +210,7 @@ contract Presale {
 
 
     // don`t accept transactions with value less than allowed minimum
-    modifier notTooSmallAmountOnly(){	
+    modifier notTooSmallAmountOnly(){
         if (msg.value < MIN_ACCEPTED_AMOUNT) throw;
         _;
     }
@@ -225,3 +225,14 @@ contract Presale {
         locked = false;
     }
 }//contract
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

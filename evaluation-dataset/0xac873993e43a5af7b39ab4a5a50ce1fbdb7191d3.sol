@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 
 // Voken Public Sale
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -316,7 +316,7 @@ contract VokenPublicSale is Ownable, Pausable{
     uint24 private GAS_EX = 1500000;        // 1.5 Mwei gas for ex
 
     // Price
-    uint256 private VOKEN_USD_PRICE_START = 1000;       // $      0.00100 USD    
+    uint256 private VOKEN_USD_PRICE_START = 1000;       // $      0.00100 USD
     uint256 private VOKEN_USD_PRICE_STEP = 10;          // $    + 0.00001 USD
     uint256 private STAGE_USD_CAP_START = 100000000;    // $    100 USD
     uint256 private STAGE_USD_CAP_STEP = 1000000;       // $     +1 USD
@@ -490,10 +490,10 @@ contract VokenPublicSale is Ownable, Pausable{
             if (stageIndex.mod(SEASON_STAGES) > 0) {
                 return __seasonNumber.add(1);
             }
-            
+
             return __seasonNumber;
         }
-        
+
         return 1;
     }
 
@@ -503,7 +503,7 @@ contract VokenPublicSale is Ownable, Pausable{
     function transferTopSales(uint16 seasonNumber, address payable to) external onlyOwner {
         uint256 __weiRemain = seasonTopSalesRemain(seasonNumber);
         require(to != address(0));
-        
+
         _seasonWeiTopSalesTransfered[seasonNumber] = _seasonWeiTopSalesTransfered[seasonNumber].add(__weiRemain);
         emit SeasonTopSalesWeiTransfered(seasonNumber, to, __weiRemain);
         to.transfer(__weiRemain);
@@ -633,7 +633,7 @@ contract VokenPublicSale is Ownable, Pausable{
      * @dev Calculate stage dollor cap, by stage index.
      */
     function stageUsdCap(uint16 stageIndex) private view returns (uint256) {
-        uint256 __usdCap = STAGE_USD_CAP_START.add(STAGE_USD_CAP_STEP.mul(stageIndex)); 
+        uint256 __usdCap = STAGE_USD_CAP_START.add(STAGE_USD_CAP_STEP.mul(stageIndex));
 
         if (__usdCap > STAGE_USD_CAP_MAX) {
             return STAGE_USD_CAP_MAX;
@@ -788,9 +788,9 @@ contract VokenPublicSale is Ownable, Pausable{
         // If wei remains, refund.
         if (__usdRemain > 0) {
             uint256 __weiRemain = usd2wei(__usdRemain);
-            
+
             __weiUsed = msg.value.sub(__weiRemain);
-            
+
             // Refund wei back
             msg.sender.transfer(__weiRemain);
         }
@@ -840,7 +840,7 @@ contract VokenPublicSale is Ownable, Pausable{
                 }
 
                 _pending_ = _pending_.sub(WHITELIST_REF_REWARDS_PCT[i]);
-                _rewards_.push(WHITELIST_REF_REWARDS_PCT[i]);                    
+                _rewards_.push(WHITELIST_REF_REWARDS_PCT[i]);
                 _referrers_.push(__refAccount);
             }
 
@@ -891,7 +891,7 @@ contract VokenPublicSale is Ownable, Pausable{
         uint256 __weiTopSales = usd2weiTopSales(usdAmount);
 
         _usdSeasonAccountPurchased[_season][msg.sender] = _usdSeasonAccountPurchased[_season][msg.sender].add(usdAmount);   // season => address => purchased, in USD
-        
+
         _stageUsdSold[_stage] = _stageUsdSold[_stage].add(usdAmount);                   // stage sold, in USD
         _seasonWeiSold[_season] = _seasonWeiSold[_season].add(__weiSold);               // season sold, in wei
         _seasonWeiTopSales[_season] = _seasonWeiTopSales[_season].add(__weiTopSales);   // season Top-Sales, in wei
@@ -910,7 +910,7 @@ contract VokenPublicSale is Ownable, Pausable{
      */
     function transfervokenIssued(uint256 amount, uint256 usdAmount) private returns (bool) {
         _vokenTxs = _vokenTxs.add(1);
-        
+
         _vokenIssued = _vokenIssued.add(amount);
         _stageVokenIssued[_stage] = _stageVokenIssued[_stage].add(amount);
         _accountVokenIssued[msg.sender] = _accountVokenIssued[msg.sender].add(amount);
@@ -982,8 +982,17 @@ contract VokenPublicSale is Ownable, Pausable{
 
             __receiver.transfer(__weiReward);
         }
-        
+
         if (_pending_ > 0)
             _weiPending = _weiPending.add(weiAmount.mul(_pending_).div(100));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

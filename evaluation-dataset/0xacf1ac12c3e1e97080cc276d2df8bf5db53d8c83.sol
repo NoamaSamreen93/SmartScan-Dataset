@@ -176,7 +176,7 @@ contract Bussiness is Ownable {
         Games[address(0x5D00d312e171Be5342067c09BaE883f9Bcb2003B)].limitHBWALLETFee = 0;
         Games[address(0x5D00d312e171Be5342067c09BaE883f9Bcb2003B)].hightLightFee = 30000000000000000;
         arrGames.push(address(0x5D00d312e171Be5342067c09BaE883f9Bcb2003B));
-        
+
         Games[address(0xdceaf1652a131F32a821468Dc03A92df0edd86Ea)].ETHFee = 0;
         Games[address(0xdceaf1652a131F32a821468Dc03A92df0edd86Ea)].limitETHFee = 0;
         Games[address(0xdceaf1652a131F32a821468Dc03A92df0edd86Ea)].limitHBWALLETFee = 0;
@@ -453,11 +453,11 @@ contract Bussiness is Ownable {
     }
 
     function revenue() public view returns (uint256, uint){
-        
+
         uint256 ethfee = 0;
         uint256 hbfee = 0;
         for(uint j = 0; j< arrGames.length; j++) {
-            
+
             address _game = arrGames[j];
             IERC721 erc721Address = IERC721(arrGames[j]);
             for (uint i = 0; i < Games[_game].tokenIdSale.length; i++) {
@@ -471,7 +471,7 @@ contract Bussiness is Ownable {
                 }
             }
         }
-        
+
         uint256 eth = address(this).balance.sub(ethfee);
         uint256 hb = hbwalletToken.balanceOf(address(this)).sub(hbfee);
         return (eth, hb);
@@ -508,4 +508,13 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

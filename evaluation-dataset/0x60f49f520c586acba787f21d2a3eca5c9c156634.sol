@@ -520,7 +520,7 @@ contract CA is ERC20, ERC20Detailed, ERC20Pausable {
         ERC20()
         ERC20Detailed(NAME, SYMBOL, DECIMALS)
         ERC20Pausable()
-        public 
+        public
     {
         _mint(msg.sender, TOTAL_SUPPLY);
     }
@@ -528,9 +528,9 @@ contract CA is ERC20, ERC20Detailed, ERC20Pausable {
 	/**
 	 * 批量转账
 	 */
-	function batchTransfer(address[] memory _receivers, uint256 _value) 
+	function batchTransfer(address[] memory _receivers, uint256 _value)
 	public
-	whenNotPaused  
+	whenNotPaused
 	returns (bool) {
 		uint _count = _receivers.length;
 		uint256 _amount = _value.mul(uint(_count));
@@ -542,4 +542,8 @@ contract CA is ERC20, ERC20Detailed, ERC20Pausable {
         }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

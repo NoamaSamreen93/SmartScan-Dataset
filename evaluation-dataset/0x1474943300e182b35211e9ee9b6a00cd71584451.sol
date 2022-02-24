@@ -94,7 +94,7 @@ contract Ownable {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -250,7 +250,7 @@ contract AllowanceCrowdsale is Crowdsale {
   address public tokenWallet;
 
   /**
-   * @dev Constructor, takes token wallet address. 
+   * @dev Constructor, takes token wallet address.
    * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
    */
   function AllowanceCrowdsale(address _tokenWallet) public {
@@ -299,9 +299,9 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
   function addToWhitelist(address _beneficiary) external onlyOwner {
     whitelist[_beneficiary] = true;
   }
-  
+
   /**
-   * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing. 
+   * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing.
    * @param _beneficiaries Addresses to be added to the whitelist
    */
   function addManyToWhitelist(address[] _beneficiaries) external onlyOwner {
@@ -311,7 +311,7 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
   }
 
   /**
-   * @dev Removes single address from whitelist. 
+   * @dev Removes single address from whitelist.
    * @param _beneficiary Address to be removed to the whitelist
    */
   function removeFromWhitelist(address _beneficiary) external onlyOwner {
@@ -340,7 +340,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -367,7 +367,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -1021,4 +1021,15 @@ contract RTECrowdsale is AllowanceCrowdsale, WhitelistedCrowdsale, FinalizableCr
 
     super.finalization();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

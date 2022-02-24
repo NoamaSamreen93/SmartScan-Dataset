@@ -90,15 +90,15 @@ contract StandardToken is ERC20, SafeMath {
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], _value); // Subtract from the sender
         totalSupply = safeSub(totalSupply,_value); // Updates totalSupply
         Burn(msg.sender, _value);
         return true;
     }
-    
-    
+
+
 
 }
 
@@ -106,8 +106,8 @@ contract TCSCCoin is Ownable, StandardToken {
 
     string public name;
     string public symbol;
-    uint public decimals;                  
-    uint public totalSupply;  
+    uint public decimals;
+    uint public totalSupply;
 
 
     /// @notice Initializes the contract and allocates all initial tokens to the owner and agreement account
@@ -135,12 +135,12 @@ contract TCSCCoin is Ownable, StandardToken {
     {
         return ERC20(tokenAddress).transfer(owner, amount);
     }
-    
+
     function freezeAccount(address target, bool freeze) public onlyOwner  {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
+
     function mintToken(address _toAcct, uint256 _value) public onlyOwner  {
         balances[_toAcct] = safeAdd(balances[_toAcct], _value);
         totalSupply = safeAdd(totalSupply, _value);
@@ -148,4 +148,15 @@ contract TCSCCoin is Ownable, StandardToken {
         Transfer(this, _toAcct, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

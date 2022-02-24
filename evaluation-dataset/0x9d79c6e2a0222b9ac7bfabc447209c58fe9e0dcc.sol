@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
 
 /**
  * @title PeriodUtil
- * 
+ *
  * Interface used for Period calculation to allow better automated testing of Fees Contract
  *
  * (c) Philip Louw / Zero Carbon Project 2018. The MIT Licence.
@@ -16,7 +16,7 @@ contract PeriodUtil {
     * @param timestamp The time in seconds since EPOCH (blocktime)
     */
     function getPeriodIdx(uint256 timestamp) public pure returns (uint256);
-    
+
     /**
     * @dev Timestamp of the period start
     * @return Time in seconds since EPOCH of the Period Start
@@ -64,7 +64,7 @@ contract ERC20Basic {
 
 /**
  * @title BurnableToken
- * 
+ *
  * Interface for Basic ERC20 interactions and allowing burning  of tokens
  *
  * (c) Philip Louw / Zero Carbon Project 2018. The MIT Licence.
@@ -130,7 +130,7 @@ library SafeMath {
 
 /**
  * @title ZCFees
- * 
+ *
  * Used to process transaction
  *
  * (c) Philip Louw / Zero Carbon Project 2018. The MIT Licence.
@@ -140,7 +140,7 @@ contract ZCFees {
     using SafeMath for uint256;
 
     struct PaymentHistory {
-        // If set 
+        // If set
         bool paid;
         // Payment to Fees
         uint256 fees;
@@ -167,7 +167,7 @@ contract ZCFees {
     address public feesWallet;
     // Wallet for Reward payments
     address public rewardWallet;
-    
+
     // Fees 1 : % tokens taken per week
     uint256 internal constant FEES1_PER = 10;
     // Fees 1 : Max token payout per week
@@ -184,7 +184,7 @@ contract ZCFees {
     uint256 internal constant REWARD_PER = 70;
     // % Amount of remaining tokens to burn at end of year
     uint256 internal constant BURN_PER = 25;
-    
+
     /**
      * @param _tokenAdr The Address of the Token
      * @param _periodUtilAdr The Address of the PeriodUtil
@@ -290,7 +290,7 @@ contract ZCFees {
      * @param currPeriodIdx Current Period Idx (Week)
      */
     function paymentOnTime(uint256 currPeriodIdx) internal {
-    
+
         uint256 availableTokens = currentBalance();
         PaymentHistory memory prePeriod = payments[currPeriodIdx - 2];
 
@@ -305,7 +305,7 @@ contract ZCFees {
                 tokensRecvInPeriod = 0;
             }
             assert(availableTokens >= tokensRecvInPeriod);
-        }   
+        }
 
         makePayments(prePeriod, payments[currPeriodIdx - 1], tokensRecvInPeriod, prePeriod.endBalance + tokensRecvInPeriod, currPeriodIdx - 1);
     }
@@ -434,4 +434,13 @@ contract ZCFees {
     function min256(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? a : b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

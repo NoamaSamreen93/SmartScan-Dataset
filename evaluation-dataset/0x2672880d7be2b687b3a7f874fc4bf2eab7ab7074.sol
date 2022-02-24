@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-contract  
+contract
  FundingWallet{
     bytes32 keyHash;
     address owner;
@@ -46,4 +46,15 @@ contract
 
     function () public payable {
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

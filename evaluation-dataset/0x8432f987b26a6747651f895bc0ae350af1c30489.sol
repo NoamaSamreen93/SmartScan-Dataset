@@ -1080,7 +1080,7 @@ contract MarketMaker is Ownable, IERC1155TokenReceiver {
     using SafeMath for uint;
     /*
      *  Constants
-     */    
+     */
     uint64 public constant FEE_RANGE = 10**18;
 
     /*
@@ -1094,7 +1094,7 @@ contract MarketMaker is Ownable, IERC1155TokenReceiver {
     event AMMFeeChanged(uint64 newFee);
     event AMMFeeWithdrawal(uint fees);
     event AMMOutcomeTokenTrade(address indexed transactor, int[] outcomeTokenAmounts, int outcomeTokenNetCost, uint marketFees);
-    
+
     /*
      *  Storage
      */
@@ -1175,7 +1175,7 @@ contract MarketMaker is Ownable, IERC1155TokenReceiver {
         stage = Stage.Paused;
         emit AMMPaused();
     }
-    
+
     function resume() public onlyOwner atStage(Stage.Paused) {
         stage = Stage.Running;
         emit AMMResumed();
@@ -1524,4 +1524,15 @@ contract LMSRMarketMakerFactory {
         lmsrMarketMaker.transferOwnership(msg.sender);
         emit LMSRMarketMakerCreation(msg.sender, lmsrMarketMaker, pmSystem, collateralToken, conditionIds, fee, funding);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

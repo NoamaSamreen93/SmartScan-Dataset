@@ -743,12 +743,12 @@ contract HealthToken is StandardToken {
 
   constructor(
     address _wallet
-  ) 
+  )
   public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[_wallet] = INITIAL_SUPPLY;
     emit Transfer(address(0), _wallet, INITIAL_SUPPLY);
-    
+
   }
 
 }
@@ -757,12 +757,12 @@ contract HealthTokenCrowdsale is AllowanceCrowdsale, HasNoTokens {
 
   constructor
     (
-      uint256 _rate, 
+      uint256 _rate,
       address _wallet,
       StandardToken _token,
       address _tokenWallet
-    ) 
-    
+    )
+
   public
     Crowdsale(_rate, _wallet, _token)
     AllowanceCrowdsale(_tokenWallet)
@@ -812,7 +812,7 @@ contract HealthTokenCrowdsale is AllowanceCrowdsale, HasNoTokens {
     for(uint i = 0; i < volumeDiscounts.length; i ++) {
       if(weiAmount >= volumeDiscounts[i].volume && volumeDiscount < volumeDiscounts[i].discount) {
         volumeDiscount = volumeDiscounts[i].discount;
-      } 
+      }
     }
 
     totalDiscount = totalDiscount + volumeDiscount;
@@ -823,4 +823,15 @@ contract HealthTokenCrowdsale is AllowanceCrowdsale, HasNoTokens {
 
     return tokensAmount;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

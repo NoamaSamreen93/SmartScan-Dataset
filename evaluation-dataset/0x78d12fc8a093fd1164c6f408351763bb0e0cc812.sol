@@ -377,7 +377,7 @@ contract Escrow_V3 {
             fundExecutors[_fundExecutors[i]] = true;
         }
     }
-   
+
     /**
     * @dev Funds the `addressToFund` with the proided `weiAmount`
     * Signature from the dapp is used in order to authorize the funding
@@ -485,4 +485,10 @@ contract Escrow_V3 {
     }
 
     function() external payable {}
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

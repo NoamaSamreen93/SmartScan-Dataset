@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract ASCCrowdsale {
-    
+
     Token public tokenReward;
     address creator;
     address owner = 0xb99776950E24a1D580d8c1622ab6C92002aEc169;
@@ -26,33 +26,33 @@ contract ASCCrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
-    }    
+        creator = _creator;
+    }
 
     function setStartDate(uint256 _startDate) public {
         require(msg.sender == creator);
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndDate(uint256 _endDate) public {
         require(msg.sender == creator);
-        endDate = _endDate;      
+        endDate = _endDate;
     }
 
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
 
     function sendToken(address receiver, uint amount) public {
         require(msg.sender == creator);
         tokenReward.transfer(receiver, amount);
-        FundTransfer(receiver, amount, true);    
+        FundTransfer(receiver, amount, true);
     }
 
     function () payable public {
@@ -87,4 +87,16 @@ contract ASCCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

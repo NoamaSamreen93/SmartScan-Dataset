@@ -151,3 +151,7 @@ contract PrettyGirl {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

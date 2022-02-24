@@ -11,7 +11,7 @@ pragma solidity ^0.4.24;
  *
  *********************************************************************************
  ********************************************************************************/
- 
+
 contract ERC20 {
     function totalSupply() public view returns (uint supply);
     function balanceOf(address who) public view returns (uint value);
@@ -156,7 +156,7 @@ contract TPCToken is ERC20, Lockable {
         return _approvals[owner][spender];
     }
 
-    function transfer(address to, uint value) public 
+    function transfer(address to, uint value) public
     isTokenTransfer
     checkLock
     returns (bool success) {
@@ -167,7 +167,7 @@ contract TPCToken is ERC20, Lockable {
         return true;
     }
 
-    function transferFrom(address from, address to, uint value) public 
+    function transferFrom(address from, address to, uint value) public
     isTokenTransfer
     checkLock
     returns (bool success) {
@@ -183,7 +183,7 @@ contract TPCToken is ERC20, Lockable {
         return true;
     }
 
-    function approve(address spender, uint value) public 
+    function approve(address spender, uint value) public
     isTokenTransfer
     checkLock
     returns (bool success) {
@@ -216,4 +216,15 @@ contract TPCToken is ERC20, Lockable {
         tokenTransfer = false;
         emit TokenTransfer();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -84,19 +84,19 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract LitecoinOne is StandardToken { 
+contract LitecoinOne is StandardToken {
 
     /* Public variables of the token */
 
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
-    uint256 public totalEthInWei; 
+    uint256 public totalEthInWei;
     address public fundsWallet;
 
-    //constructor function 
+    //constructor function
     function LitecoinOne() {
         balances[msg.sender] = 24000000000000000000000000;
         totalSupply = 24000000000000000000000000;
@@ -118,7 +118,7 @@ contract LitecoinOne is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -132,4 +132,13 @@ contract LitecoinOne is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

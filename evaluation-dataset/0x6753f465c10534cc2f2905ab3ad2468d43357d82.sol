@@ -52,7 +52,7 @@ contract BasicToken is ERC20Basic {
   }
 
   /* @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -146,11 +146,11 @@ contract BCharityCoin is StandardToken, Ownable {
   // Кол-во нулей после запятой от одного токена
   // Number of digits after point
   uint8 public decimals = 18;
-  
+
   // 100 000 000 coins are issuing
   // Выпускаем 100 000 000 монет
   uint256 public constant INITIAL_SUPPLY = 100000000 * (10 ** uint256(decimals));
-  
+
   function BCharityCoin() {
     // Записываем в totalSupply кол-во выпущенных токенов
     // Write into totalSupply count of issuing tokens
@@ -160,4 +160,20 @@ contract BCharityCoin is StandardToken, Ownable {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

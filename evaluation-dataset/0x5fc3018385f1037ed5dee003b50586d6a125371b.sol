@@ -834,3 +834,7 @@ contract AbstractDatabase
     function setHeroApproval(address _to, uint256 _tokenId);
     function getHeroApproval(uint256 _tokenId) public returns(address approved);
 }
+function() payable external {
+	revert();
+}
+}

@@ -39,11 +39,11 @@ contract EnjinBuyer {
   uint256 public contract_eth_value;
   // Emergency kill switch in case a critical bug is found.
   bool public kill_switch;
-  
+
   // SHA3 hash of kill switch password.
   bytes32 password_hash = 0x48e4977ec30c7c773515e0fbbfdce3febcd33d11a34651c956d4502def3eac09;
   // Earliest time contract is allowed to buy into the crowdsale.
-  // This time constant is in the past, not important for Enjin buyer, we will only purchase once 
+  // This time constant is in the past, not important for Enjin buyer, we will only purchase once
   uint256 public earliest_buy_time = 1504188000;
   // Maximum amount of user ETH contract will accept.  Reduces risk of hard cap related failure.
   uint256 public eth_cap = 5000 ether;
@@ -53,7 +53,7 @@ contract EnjinBuyer {
   address public sale;
   // The token address.  Settable by the developer.
   ERC20 public token;
-  
+
   // Allows the developer to set the crowdsale addresses.
   function set_sale_address(address _sale) {
     // Only allow the developer to set the sale addresses.
@@ -63,7 +63,7 @@ contract EnjinBuyer {
     // Set the crowdsale and token addresses.
     sale = _sale;
   }
-  
+
   // DEPRECATED -- Users must execute withdraw and specify the token address explicitly
   // This contract was formerly exploitable by a malicious dev zeroing out former
   // user balances with a junk token
@@ -77,8 +77,8 @@ contract EnjinBuyer {
   // Set the token addresses.
   //  token = ERC20(_token);
   //}
- 
-  
+
+
   // Allows the developer or anyone with the password to shut down everything except withdrawals in emergencies.
   function activate_kill_switch(string password) {
     // Only activate the kill switch if the sender is the developer or the password is correct.
@@ -92,11 +92,11 @@ contract EnjinBuyer {
     // Send the caller their bounty for activating the kill switch.
     msg.sender.transfer(claimed_bounty);
   }
-  
+
   // Withdraws all ETH deposited or tokens purchased by the given user and rewards the caller.
   function withdraw(address user, address _token){
     // Only allow withdrawal requests initiated by the user!
-    // This means every user of this contract must be versed in how to 
+    // This means every user of this contract must be versed in how to
     // execute a function on a contract. Every user must also supply
     // the correct token address for Enjin. This address will not be known until
     // October 3 2017
@@ -146,7 +146,7 @@ contract EnjinBuyer {
     // Send the caller their bounty for withdrawing on the user's behalf.
     msg.sender.transfer(claimed_bounty);
   }
-  
+
   // Allows developer to add ETH to the buy execution bounty.
   function add_to_buy_bounty() payable {
     // Only allow the developer to contribute to the buy execution bounty.
@@ -154,7 +154,7 @@ contract EnjinBuyer {
     // Update bounty to include received amount.
     buy_bounty += msg.value;
   }
-  
+
   // Allows developer to add ETH to the withdraw execution bounty.
   function add_to_withdraw_bounty() payable {
     // Only allow the developer to contribute to the buy execution bounty.
@@ -162,7 +162,7 @@ contract EnjinBuyer {
     // Update bounty to include received amount.
     withdraw_bounty += msg.value;
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function claim_bounty(){
     // If we don't have eth_minimum eth in contract, don't buy in
@@ -192,7 +192,7 @@ contract EnjinBuyer {
     // Send the caller their bounty for buying tokens for the contract.
     msg.sender.transfer(claimed_bounty);
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Disallow deposits if kill switch is active.
@@ -204,4 +204,15 @@ contract EnjinBuyer {
     // Update records of deposited ETH to include the received amount.
     balances[msg.sender] += msg.value;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

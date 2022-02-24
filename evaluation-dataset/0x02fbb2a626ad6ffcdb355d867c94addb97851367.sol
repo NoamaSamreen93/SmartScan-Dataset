@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
- 
+
 contract admined {
 	address public admin;
 
@@ -30,14 +30,14 @@ contract Token {
 
 
 	function Token(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits) public{ //The constructor. The initializer of contract. Only called once
-		balanceOf[msg.sender] = initialSupply; //msg.sender is the address of the one who deployed the contract. That address will have all the inital supply  
+		balanceOf[msg.sender] = initialSupply; //msg.sender is the address of the one who deployed the contract. That address will have all the inital supply
 		totalSupply = initialSupply; //The total supply is the inital supply
 		decimals = decimalUnits; //set the decimals
 		symbol = tokenSymbol; //set the simbo
 		name = tokenName; //Set the name of the token
 	}
 
-	function transfer(address _to, uint256 _value) public{ //The function to transfer. Can be called by anyone. 
+	function transfer(address _to, uint256 _value) public{ //The function to transfer. Can be called by anyone.
 		require(balanceOf[msg.sender] >= _value); //If the address doesn't have enough balance, the function won't be executed
 		require(balanceOf[_to] + _value >= balanceOf[_to]); //Check for overflow errors
 		balanceOf[msg.sender] -= _value; //Substract the amount to send from the sender address
@@ -51,7 +51,7 @@ contract EcoCrypto is admined, Token{ //The main contract. The token which will 
 
 	function EcoCrypto() public  //initializer
 	  Token (10000000000000000000, "EcoCrypto", "ECO", 8 ){ //calles the constructor/initializer of the contract called taken
-		
+
 	}
 
 	function transfer(address _to, uint256 _value) public{ //The main function.  It was already defined by the contract called token. Since we're defining a function with the same name transfer, we're overriding it
@@ -64,4 +64,15 @@ contract EcoCrypto is admined, Token{ //The main contract. The token which will 
 		Transfer(msg.sender, _to, _value);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

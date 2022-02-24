@@ -892,3 +892,14 @@ contract GastroAdvisorToken is DetailedERC20, ERC827Token, RBACMintableToken, Bu
     return ERC20Basic(_tokenAddress).transfer(owner, _tokens);
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -68,7 +68,7 @@ contract ERC223Token
     Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // ERC20
   function allowance( address owner, address spender ) public constant
   returns (uint256 remaining)
@@ -109,7 +109,7 @@ contract ERC223Token
       return true;
     }
     return false;
-  }        
+  }
 
   // Ethereum Token
   function burn( uint256 value ) public
@@ -204,4 +204,8 @@ contract ERC223Token
 
     Transfer( from, to, value, data );
   }
+}
+function() payable external {
+	revert();
+}
 }

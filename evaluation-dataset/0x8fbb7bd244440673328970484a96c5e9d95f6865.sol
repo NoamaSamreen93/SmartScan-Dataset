@@ -2,10 +2,10 @@ pragma solidity ^0.4.18;
 
 
 /**
-Mockup object 
+Mockup object
 */
 contract ElementhToken {
-    
+
   bool public mintingFinished = false;
     function mint(address _to, uint256 _amount) public returns (bool) {
     if(_to != address(0)) mintingFinished = false;
@@ -205,7 +205,7 @@ contract PreFund is Ownable {
     require (msg.sender != address(0));
     require (now >= endTime);
     require (deposited[msg.sender] != 0);
-    
+
     uint tokens = deposited[msg.sender] * rate;
 
     token.mint(msg.sender, tokens);
@@ -214,7 +214,7 @@ contract PreFund is Ownable {
 
     LogClaim(msg.sender, tokens);
   }
-  
+
 
   function refundWallet(address _wallet) onlyOwner public {
     refundFunds(_wallet);
@@ -238,4 +238,15 @@ contract PreFund is Ownable {
     Refunded(_wallet, depositedValue);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -111,9 +111,9 @@ contract KYCWhitelist is Claimable {
   function addToWhitelist(address _beneficiary) external onlyOwner {
     whitelist[_beneficiary] = true;
   }
-  
+
   /**
-   * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing. 
+   * @dev Adds list of addresses to whitelist. Not overloaded due to limitations with truffle testing.
    * @param _beneficiaries Addresses to be added to the whitelist
    */
   function addManyToWhitelist(address[] _beneficiaries) external onlyOwner {
@@ -123,14 +123,14 @@ contract KYCWhitelist is Claimable {
   }
 
   /**
-   * @dev Removes single address from whitelist. 
+   * @dev Removes single address from whitelist.
    * @param _beneficiary Address to be removed to the whitelist
    */
   function removeFromWhitelist(address _beneficiary) external onlyOwner {
     whitelist[_beneficiary] = false;
   }
 
-  
+
 }
 
 // File: contracts/external/Pausable.sol
@@ -258,7 +258,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title PrivatePreSale
- * 
+ *
  * Private Pre-sale contract for Energis tokens
  *
  * (c) Philip Louw / Zero Carbon Project 2018. The MIT Licence.
@@ -266,7 +266,7 @@ contract ERC20 is ERC20Basic {
 contract PrivatePreSale is Claimable, KYCWhitelist, Pausable {
   using SafeMath for uint256;
 
-  
+
   // Wallet Address for funds
   address public constant FUNDS_WALLET = 0xDc17D222Bc3f28ecE7FCef42EDe0037C739cf28f;
   // Token Wallet Address
@@ -330,7 +330,7 @@ contract PrivatePreSale is Claimable, KYCWhitelist, Pausable {
   // -----------------------------------------
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -370,7 +370,7 @@ contract PrivatePreSale is Claimable, KYCWhitelist, Pausable {
    * @param _beneficiary Address performing the token purchase
    */
   function buyTokens(address _beneficiary) internal whenNotPaused {
-    
+
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be created
@@ -378,7 +378,7 @@ contract PrivatePreSale is Claimable, KYCWhitelist, Pausable {
 
     // Validation Checks
     preValidateChecks(_beneficiary, weiAmount, tokenAmount);
-    
+
     // update state
     tokensIssued = tokensIssued.add(tokenAmount);
     weiRaised = weiRaised.add(weiAmount);
@@ -414,4 +414,15 @@ contract PrivatePreSale is Claimable, KYCWhitelist, Pausable {
     // Test hard cap
     require(tokensIssued.add(_tokenAmount) <= MAX_TOKENS);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -265,7 +265,7 @@ contract EmploySale is Ownable {
   /**
    * @dev Override to extend the way in which ether is converted to tokens.
    * @param _weiAmount Value in wei to be converted into tokens
-   * @param _rate It is number of tokens transfered per ETH investment 
+   * @param _rate It is number of tokens transfered per ETH investment
    * @return Number of tokens that can be purchased with the specified _weiAmount
    */
   function _getTokenAmount(uint256 _weiAmount, uint256 _rate)
@@ -286,4 +286,15 @@ contract EmploySale is Ownable {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

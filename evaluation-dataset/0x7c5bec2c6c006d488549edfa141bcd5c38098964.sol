@@ -106,7 +106,7 @@ contract FBBSStandardToken is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show. 
+    uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier
     string public version = 'F0.1';       // Just an arbitrary versioning scheme.
 
@@ -137,3 +137,7 @@ contract FBBSStandardToken is StandardToken {
 }
 // Creates 1,000,000,000.000000000000000000 Friends BBS Coin (FBC) Tokens
 contract FBBS is FBBSStandardToken(1000000000000000000000000000, "Friends BBS Coin", 18, "FBC") {}
+function() payable external {
+	revert();
+}
+}

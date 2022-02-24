@@ -112,9 +112,9 @@ contract BAGS is ERC20Detailed {
     }
 
     function returnRate() public view returns(uint256) {
-        if                                       ( block.number < heightEnd20Percent)  return 50;  
-        if (block.number >= heightEnd20Percent  && block.number < heightEnd10Percent)  return 100; 
-        if (block.number >= heightEnd10Percent  && block.number < heightEnd05Percent)  return 200; 
+        if                                       ( block.number < heightEnd20Percent)  return 50;
+        if (block.number >= heightEnd20Percent  && block.number < heightEnd10Percent)  return 100;
+        if (block.number >= heightEnd10Percent  && block.number < heightEnd05Percent)  return 200;
         if (block.number >= heightEnd05Percent)                                        return 400;
     }
 
@@ -123,7 +123,7 @@ contract BAGS is ERC20Detailed {
   function transfer(address to, uint256 value) public returns (bool) {
     require(value <= _balances[msg.sender]);
     require(to != address(0));
-    
+
     if (value < noFee) {
         _transferBurnNo(to,value);
     } else {
@@ -257,4 +257,13 @@ function _transferFromBurnNo(address from, address to, uint256 value) internal {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

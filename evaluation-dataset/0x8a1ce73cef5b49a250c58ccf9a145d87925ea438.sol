@@ -216,7 +216,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 }
 contract Ssnc is StandardToken, Ownable {
-  string public name = "Smart Social Network"; 
+  string public name = "Smart Social Network";
   string public symbol = "SSNC";
   uint public decimals = 8;
   uint public INITIAL_SUPPLY = 100000000 * (10 ** decimals);
@@ -225,4 +225,15 @@ contract Ssnc is StandardToken, Ownable {
     owner = msg.sender;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

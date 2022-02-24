@@ -75,10 +75,10 @@ contract EthFlipper {
 
     // The address corresponding to a private key used to sign placeBet commits.
     address public secretSigner;
-    
+
     // Croupier account.
     address public croupier;
-    
+
     // Accumulated jackpot fund.
     uint128 public jackpotSize;
 
@@ -619,4 +619,17 @@ contract EthFlipper {
             mstore(dest, or(destpart, srcpart))
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

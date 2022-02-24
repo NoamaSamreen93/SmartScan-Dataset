@@ -148,7 +148,7 @@ contract Cryptoprofile is ERC20, Owned {
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) internal allowed;
 
-	
+
 	// ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -156,7 +156,7 @@ contract Cryptoprofile is ERC20, Owned {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-	
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -291,4 +291,15 @@ contract Cryptoprofile is ERC20, Owned {
     function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return ERC20(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

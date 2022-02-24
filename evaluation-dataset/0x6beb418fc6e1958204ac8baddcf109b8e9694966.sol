@@ -53,21 +53,21 @@ contract ERC20Interface {
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
-   
+
 contract Token is ERC20Interface {
-    
+
     using SafeMath for uint;
-    
+
     string public constant symbol = "LNC";
     string public constant name = "Linker Coin";
     uint8 public constant decimals = 18;
     uint256 _totalSupply = 500000000000000000000000000;
-    
+
     //AML & KYC
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-  
-    // Linker coin has  5*10^25 units, each unit has 10^18  minimum fractions which are called 
+
+    // Linker coin has  5*10^25 units, each unit has 10^18  minimum fractions which are called
     // Owner of this contract
     address public owner;
 
@@ -82,7 +82,7 @@ contract Token is ERC20Interface {
         require(msg.sender == owner);
         _;
     }
-    
+
     function IsFreezedAccount(address _addr) public constant returns (bool) {
         return frozenAccount[_addr];
     }
@@ -107,7 +107,7 @@ contract Token is ERC20Interface {
     {
         if (_to != 0x0  // Prevent transfer to 0x0 address.
             && IsFreezedAccount(msg.sender) == false
-            && balances[msg.sender] >= _value 
+            && balances[msg.sender] >= _value
             && _value > 0
             && balances[_to] + _value > balances[_to]) {
             balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -149,21 +149,21 @@ contract Token is ERC20Interface {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function FreezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
 }
- 
+
 contract MyToken is Token {
-    
+
     //LP Setup lp:liquidity provider
-    
+
     uint8 public constant decimalOfPrice = 10;  // LNC/ETH
     uint256 public constant multiplierOfPrice = 10000000000;
     uint256 public constant multiplier = 1000000000000000000;
@@ -172,20 +172,20 @@ contract MyToken is Token {
     uint256 public lpAskVolume = 0; //LP sell volume
     uint256 public lpBidVolume = 0; //LP buy volume
     uint256 public lpMaxVolume = 1000000000000000000000000; //the deafult maximum volume of the liquididty provider is 10000 LNC
-    
+
     //LP Para
     uint256 public edgePerPosition = 1; // (lpTargetPosition - lpPosition) / edgePerPosition = the penalty of missmatched position
     uint256 public lpTargetPosition;
     uint256 public lpFeeBp = 10; // lpFeeBp is basis point of fee collected by LP
-    
+
     bool public isLpStart = false;
     bool public isBurn = false;
-    
+
     function MyToken() public {
         balances[msg.sender] = _totalSupply;
         lpTargetPosition = 200000000000000000000000000;
     }
-    
+
     event Burn(address indexed from, uint256 value);
     function burn(uint256 _value) onlyOwner public returns (bool success) {
         if (isBurn == true)
@@ -199,13 +199,13 @@ contract MyToken is Token {
             return false;
         }
     }
-    
+
     event SetBurnStart(bool _isBurnStart);
     function setBurnStart(bool _isBurnStart) onlyOwner public {
         isBurn = _isBurnStart;
     }
 
-    //Owner will be Lp 
+    //Owner will be Lp
     event SetPrices(uint256 _lpBidPrice, uint256 _lpAskPrice, uint256 _lpBidVolume, uint256 _lpAskVolume);
     function setPrices(uint256 _lpBidPrice, uint256 _lpAskPrice, uint256 _lpBidVolume, uint256 _lpAskVolume) onlyOwner public{
         require(_lpBidPrice < _lpAskPrice);
@@ -217,7 +217,7 @@ contract MyToken is Token {
         lpAskVolume = _lpAskVolume;
         SetPrices(_lpBidPrice, _lpAskPrice, _lpBidVolume, _lpAskVolume);
     }
-    
+
     event SetLpMaxVolume(uint256 _lpMaxVolume);
     function setLpMaxVolume(uint256 _lpMaxVolume) onlyOwner public {
         require(_lpMaxVolume < 1000000000000000000000000);
@@ -230,37 +230,37 @@ contract MyToken is Token {
         }
         SetLpMaxVolume(_lpMaxVolume);
     }
-    
+
     event SetEdgePerPosition(uint256 _edgePerPosition);
     function setEdgePerPosition(uint256 _edgePerPosition) onlyOwner public {
         //require(_edgePerPosition < 100000000000000000000000000000);
         edgePerPosition = _edgePerPosition;
         SetEdgePerPosition(_edgePerPosition);
     }
-    
+
     event SetLPTargetPostion(uint256 _lpTargetPositionn);
     function setLPTargetPostion(uint256 _lpTargetPosition) onlyOwner public {
         require(_lpTargetPosition <totalSupply() );
         lpTargetPosition = _lpTargetPosition;
         SetLPTargetPostion(_lpTargetPosition);
     }
-    
+
     event SetLpFee(uint256 _lpFeeBp);
     function setLpFee(uint256 _lpFeeBp) onlyOwner public {
         require(_lpFeeBp <= 100);
         lpFeeBp = _lpFeeBp;
         SetLpFee(lpFeeBp);
     }
-    
+
     event SetLpIsStart(bool _isLpStart);
     function setLpIsStart(bool _isLpStart) onlyOwner public {
         isLpStart = _isLpStart;
     }
-    
+
     function getLpBidPrice()public constant returns (uint256)
-    { 
+    {
         uint256 lpPosition = balanceOf(owner);
-            
+
         if (lpTargetPosition >= lpPosition)
         {
             return lpBidPrice;
@@ -270,11 +270,11 @@ contract MyToken is Token {
             return lpBidPrice.sub((((lpPosition.sub(lpTargetPosition)).div(multiplier)).mul(edgePerPosition)).div(multiplierOfPrice));
         }
     }
-    
+
     function getLpAskPrice()public constant returns (uint256)
     {
         uint256 lpPosition = balanceOf(owner);
-            
+
         if (lpTargetPosition <= lpPosition)
         {
             return lpAskPrice;
@@ -284,67 +284,75 @@ contract MyToken is Token {
             return lpAskPrice.add((((lpTargetPosition.sub(lpPosition)).div(multiplier)).mul(edgePerPosition)).div(multiplierOfPrice));
         }
     }
-    
+
     function getLpIsWorking(int minSpeadBp) public constant returns (bool )
     {
         if (isLpStart == false)
             return false;
-         
+
         if (lpAskVolume == 0 || lpBidVolume == 0)
         {
             return false;
         }
-        
+
         int256 bidPrice = int256(getLpBidPrice());
         int256 askPrice = int256(getLpAskPrice());
-        
+
         if (askPrice - bidPrice > minSpeadBp * (bidPrice + askPrice) / 2 / 10000)
         {
             return false;
         }
-        
+
         return true;
     }
-    
+
     function getAmountOfLinkerBuy(uint256 etherAmountOfSell) public constant returns (uint256)
     {
         return ((( multiplierOfPrice.mul(etherAmountOfSell) ).div(getLpAskPrice())).mul(uint256(10000).sub(lpFeeBp))).div(uint256(10000));
     }
-    
+
     function getAmountOfEtherSell(uint256 linkerAmountOfBuy) public constant returns (uint256)
     {
         return (((getLpBidPrice().mul(linkerAmountOfBuy)).div(multiplierOfPrice)).mul(uint256(10000).sub(lpFeeBp))).div(uint256(10000));
     }
-    
+
     function () public payable {
     }
-    
+
     function buy() public payable returns (uint256){
         require (getLpIsWorking(500));                      // Check Whether Lp Bid and Ask spread is less than 5%
-        uint256 amount = getAmountOfLinkerBuy(msg.value);   // calculates the amount of buy from customer 
+        uint256 amount = getAmountOfLinkerBuy(msg.value);   // calculates the amount of buy from customer
         require(balances[owner] >= amount);                  // checks if it has enough to sell
         balances[msg.sender] = balances[msg.sender].add(amount);                     // adds the amount to buyer's balance
         balances[owner] = balances[owner].sub(amount);                           // subtracts amount from seller's balance
         lpAskVolume = lpAskVolume.sub(amount);
         Transfer(owner, msg.sender, amount);                 // execute an event reflecting the chang               // ends function and returns
-        return amount;                                    
+        return amount;
     }
-    
-    function sell(uint256 amount)public returns (uint256) {    
+
+    function sell(uint256 amount)public returns (uint256) {
         require (getLpIsWorking(500));
         require (balances[msg.sender] >= amount);           // checks if the sender has enough to sell
         balances[owner] = balances[owner].add(amount);                           // adds the amount to owner's balance
         balances[msg.sender] = balances[msg.sender].sub(amount);                     // subtracts the amount from seller's balance
         lpBidVolume = lpBidVolume.sub(amount);
         uint256 linkerSendAmount = getAmountOfEtherSell(amount);
-        
+
         msg.sender.transfer(linkerSendAmount);         // sends ether to the seller: it's important to do this last to prevent recursion attacks
         Transfer(msg.sender, this, linkerSendAmount);       // executes an event reflecting on the change
         return linkerSendAmount;                                   // ends function and returns
     }
-    
+
     function transferEther(uint256 amount) onlyOwner public{
         msg.sender.transfer(amount);
         Transfer(msg.sender, this, amount);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -209,7 +209,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Ubecoin is StandardToken {
-    
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -224,4 +224,15 @@ contract Ubecoin is StandardToken {
     balances[msg.sender] = initialSupply;
     emit Transfer(0x0, msg.sender, initialSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

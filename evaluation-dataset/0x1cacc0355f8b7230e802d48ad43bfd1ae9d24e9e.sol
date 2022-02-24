@@ -10,7 +10,7 @@ contract CryptoBeautyVoting {
   address[] private arrOfVoters;
   uint256[] private arrOfBeautyIdMatchedVoters;
   address private owner;
-  
+
   constructor() public {
     owner = msg.sender;
     restartTime = 7 days;
@@ -126,4 +126,15 @@ contract CryptoBeautyVoting {
     assembly { size := extcodesize(addr) } // solium-disable-line
     return size > 0;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

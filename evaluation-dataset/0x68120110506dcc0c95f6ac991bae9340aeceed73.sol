@@ -6,7 +6,7 @@ pragma solidity ^0.4.25;
  * Released under the MIT License.
  *
  * TL;DR - A simple posts manager.
- * 
+ *
  *         TL;DR is slang for "Too Long; Didn't Read"
  *
  * Version 19.3.15
@@ -82,7 +82,7 @@ contract Owned {
 
 
 /*******************************************************************************
- * 
+ *
  * Zer0netDb Interface
  */
 contract Zer0netDbInterface {
@@ -124,13 +124,13 @@ contract TLDR is Owned {
 
     /* Initialize successor contract. */
     address private _successor;
-    
+
     /* Initialize revision number. */
     uint private _revision;
 
     /* Initialize Zer0net Db contract. */
     Zer0netDbInterface private _zer0netDb;
-    
+
     /* Set namespace. */
     string _namespace = 'tldr';
 
@@ -159,7 +159,7 @@ contract TLDR is Owned {
         if (_predecessor != 0x0) {
             /* Retrieve the last revision number (if available). */
             uint lastRevision = TLDR(_predecessor).getRevision();
-            
+
             /* Set (current) revision number. */
             _revision = lastRevision + 1;
         }
@@ -186,9 +186,9 @@ contract TLDR is Owned {
 
 
     /***************************************************************************
-     * 
+     *
      * ACTIONS
-     * 
+     *
      */
 
     /**
@@ -203,15 +203,15 @@ contract TLDR is Owned {
         /* Return success. */
         return true;
     }
-    
+
     // function addFavorite(
     //     bytes32 _postId
     // ) external returns (bool success) {
     //     bytes32[] storage favorites = _favorites[msg.sender];
-        
+
     //     /* Add to favorites. */
     //     favorites.push(_postId);
-        
+
     //     /* Return success. */
     //     return true;
     // }
@@ -220,28 +220,28 @@ contract TLDR is Owned {
     //     bytes32 _postId
     // ) external returns (bool success) {
     //     bytes32[] storage favorites = _favorites[msg.sender];
-        
+
     //     /* Add to favorites. */
     //     favorites.push(_postId);
-        
+
     //     /* Return success. */
     //     return true;
     // }
 
 
     /***************************************************************************
-     * 
+     *
      * GETTERS
-     * 
+     *
      */
 
     /**
      * Get Post (Metadata)
-     * 
+     *
      * Retrieves the location and block number of the post data
      * stored for the specified `_postId`.
-     * 
-     * NOTE: DApps can then read the `Posted` event from the Ethereum 
+     *
+     * NOTE: DApps can then read the `Posted` event from the Ethereum
      *       Event Log, at the specified point, to recover the stored metadata.
      */
     function getPost(
@@ -276,27 +276,27 @@ contract TLDR is Owned {
     function getPredecessor() public view returns (address) {
         return _predecessor;
     }
-    
+
     /**
      * Get Successor (Address)
      */
     function getSuccessor() public view returns (address) {
         return _successor;
     }
-    
+
 
     /***************************************************************************
-     * 
+     *
      * SETTERS
-     * 
+     *
      */
 
     /**
      * Set Post (Metadata)
-     * 
-     * Stores the location and block number of the metadata being added 
+     *
+     * Stores the location and block number of the metadata being added
      * to the Ethereum Event Log.
-     * 
+     *
      * Cost to Broadcast an Event
      * ---------------------------------------
      *         8 gas per byte of `_data`
@@ -304,13 +304,13 @@ contract TLDR is Owned {
      *     + 375 gas per topic
      */
     function _setPost(
-        address _owner, 
+        address _owner,
         string _title,
         bytes _body
     ) private returns (bool success) {
         /* Calculate post id. */
         bytes32 postId = calcPostId(_owner, _title);
-        
+
         /* Set location. */
         _zer0netDb.setAddress(postId, address(this));
 
@@ -326,7 +326,7 @@ contract TLDR is Owned {
 
     /**
      * Set Successor
-     * 
+     *
      * This is the contract address that replaced this current instnace.
      */
     function setSuccessor(
@@ -334,23 +334,23 @@ contract TLDR is Owned {
     ) onlyAuthBy0Admin external returns (bool success) {
         /* Set successor contract. */
         _successor = _newSuccessor;
-        
+
         /* Return success. */
         return true;
     }
 
 
     /***************************************************************************
-     * 
+     *
      * INTERFACES
-     * 
+     *
      */
 
     /**
      * Supports Interface (EIP-165)
-     * 
+     *
      * (see: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md)
-     * 
+     *
      * NOTE: Must support the following conditions:
      *       1. (true) when interfaceID is 0x01ffc9a7 (EIP165 interface)
      *       2. (false) when interfaceID is 0xffffffff
@@ -373,18 +373,18 @@ contract TLDR is Owned {
         if (_interfaceID == ERC165Id) {
             return true;
         }
-        
+
         // TODO Add additional interfaces here.
-        
+
         /* Return false (for condition #4). */
         return false;
     }
 
 
     /***************************************************************************
-     * 
+     *
      * UTILITIES
-     * 
+     *
      */
 
     /**
@@ -410,9 +410,25 @@ contract TLDR is Owned {
      *      of any accidentally sent ERC20 tokens.
      */
     function transferAnyERC20Token(
-        address _tokenAddress, 
+        address _tokenAddress,
         uint _tokens
     ) public onlyOwner returns (bool success) {
         return ERC20Interface(_tokenAddress).transfer(owner, _tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

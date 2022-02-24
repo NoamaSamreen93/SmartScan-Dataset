@@ -2,7 +2,7 @@
 pragma solidity ^0.5.0;
 
 contract CryptoTycoonsVIPLib{
-    
+
     address payable public owner;
 
     mapping (address => uint) userExpPool;
@@ -282,7 +282,7 @@ contract AceDice {
             croupierMap[newCroupier] = true;
         }
     }
-    
+
     function deleteCroupier(address newCroupier) external onlyOwner {
         bool isCroupier = croupierMap[newCroupier];
         if (isCroupier == true) {
@@ -676,4 +676,13 @@ contract AceDice {
             emit TodaysRankingPayment(to, prize);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

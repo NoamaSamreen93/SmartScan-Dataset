@@ -464,7 +464,7 @@ contract MyToken is Burnable, Ownable {
     return super.transfer(_to, _value);
   }
 
-  function transferFrom(address _from, address _to, uint _value) public canTransfer(_from) returns (bool success) {    
+  function transferFrom(address _from, address _to, uint _value) public canTransfer(_from) returns (bool success) {
     return super.transferFrom(_from, _to, _value);
   }
 
@@ -475,4 +475,20 @@ contract MyToken is Burnable, Ownable {
   function burnFrom(address _from, uint _value) public onlyOwner returns (bool success) {
     return super.burnFrom(_from, _value);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

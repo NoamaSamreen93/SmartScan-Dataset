@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 // sol ควรจะสั้นๆ ตรงไปตรงมา อย่าเยอะ
-// Dome C. <dome@tel.co.th> 
+// Dome C. <dome@tel.co.th>
 contract SbuyToken {
 
     string public name = "SbuyMining";      //  token name
@@ -37,7 +37,7 @@ contract SbuyToken {
         balanceOf[_addressFounder] = valueFounder;
         Transfer(0x0, _addressFounder, valueFounder);
     }
-    
+
 
     function transfer (address _to, uint256 _value) public isRunning validAddress returns (bool success)  {
         require(balanceOf[msg.sender] >= _value);
@@ -87,4 +87,10 @@ contract SbuyToken {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

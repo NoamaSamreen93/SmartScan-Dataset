@@ -4,15 +4,15 @@ contract Ownable {
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   constructor() public { owner = msg.sender;  }
- 
-  modifier onlyOwner() {     
+
+  modifier onlyOwner() {
       address sender =  msg.sender;
       address _owner = owner;
-      require(msg.sender == _owner);    
-      _;  
+      require(msg.sender == _owner);
+      _;
   }
-  
-  function transferOwnership(address newOwner) onlyOwner public { 
+
+  function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -48,14 +48,27 @@ contract SelfDestroy is Ownable {
     using SafeMath for uint256;
     uint256 public weiAmount = 0;
     constructor() public {}
-   
+
    // fallback function to receive ether
     function () public payable {
         weiAmount = weiAmount + msg.value;
     }
-   
+
    function destroy(address _address) public onlyOwner {
        selfdestruct(_address);
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

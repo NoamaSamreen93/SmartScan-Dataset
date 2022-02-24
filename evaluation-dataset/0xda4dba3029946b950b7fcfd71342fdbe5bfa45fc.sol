@@ -52,18 +52,27 @@ contract Stake is Owned {
 }
 
 contract EtherBox is Stake{
-    
+
     constructor() public{
         fee = 1;
         users = 0;
         domain = 'www.etherbox.io';
         owner = msg.sender;
     }
-    
+
     function () payable external {
         require(msg.value>0);
         if (stakes[msg.sender]==0) users++;
         stakes[msg.sender]+=msg.value;
         emit Staked(msg.sender,msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

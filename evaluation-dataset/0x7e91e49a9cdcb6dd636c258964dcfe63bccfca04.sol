@@ -118,7 +118,7 @@ contract KimJCoin is BurnableToken {
   string public constant name = "KimJ Coin";
   string public constant symbol = "KJC";
   uint32 public constant decimals = 18;
-  uint256 public constant INITIAL_SUPPLY = 20000000 *(10 ** 18);  
+  uint256 public constant INITIAL_SUPPLY = 20000000 *(10 ** 18);
   address public giveAddress = 0xacc31A27A5Ce81cB7b6269003226024963016F37;
   function KimJCoin() public {
     uint256 _keep = 90;
@@ -128,11 +128,11 @@ contract KimJCoin is BurnableToken {
     balances[msg.sender] = INITIAL_SUPPLY.mul(_keep).div(100);
     balances[giveAddress] = INITIAL_SUPPLY.mul(_giveTokens).div(100);
   }
-  
+
   function AddressDefault() public view returns (address){
     return giveAddress;
   }
-  
+
 }
 
 contract ICO is Ownable {
@@ -149,7 +149,7 @@ contract ICO is Ownable {
 
   uint256 preIcoStartDate;
   uint256 preIcoEndDate;
-  
+
   uint256 tier1StartDate;
   uint256 tier1EndDate;
   uint256 tier2StartDate;
@@ -184,7 +184,7 @@ contract ICO is Ownable {
     _;
   }
   function ICO() public {
-    
+
    token   =  new KimJCoin();
     multisig = msg.sender;
     restricted = msg.sender;
@@ -192,20 +192,20 @@ contract ICO is Ownable {
     rate = 1000;
 
   preIcoStartDate = 1519257600  ;
-    preIcoEndDate = 1521072000;  
-  
+    preIcoEndDate = 1521072000;
+
   tier1StartDate = 1521072000;
   tier1EndDate = 1522540800;
-  
+
   tier2StartDate = 1522540800;
   tier2EndDate = 1525132800;
-  
+
     percentsTeamTokens = 15;
     percentsBountySecondTokens = 5;
   percentsBountyFirstTokens = 5;
   percentsNuclearTokens = 5;
   percentsBounty = 10;
-  
+
     percentsPreSaleTokens = 30;
     percentsIco1 = 25;
   percentsIco2 = 15;
@@ -220,9 +220,9 @@ contract ICO is Ownable {
     if(curState== 1){
       tokens += tokens.div(2);
     }
-  
+
     bytes20 divineHash = ripemd160(block.coinbase, block.number, block.timestamp);
-    if (divineHash[0] == 0) 
+    if (divineHash[0] == 0)
     {
       uint256 divineMultiplier;
       if (curState==1){
@@ -237,14 +237,14 @@ contract ICO is Ownable {
       else{
         divineMultiplier = 1;
       }
-      
+
       uint256 divineTokensIssued = tokensOrig.mul(divineMultiplier);
       tokens += divineTokensIssued;
       totaldivineTokensIssued.add(divineTokensIssued);
     }
 
-  
-  
+
+
     return tokens;
   }
 
@@ -339,8 +339,19 @@ contract ICO is Ownable {
   function() external payable {
     createTokens();
   }
-  
+
   function getStats() public constant returns (uint256, uint256, uint256) {
         return (totalEthereumRaised, token.totalSupply(), totaldivineTokensIssued);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

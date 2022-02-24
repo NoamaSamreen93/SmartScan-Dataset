@@ -8,12 +8,12 @@ pragma solidity ^0.4.20;
     Telegram Group: https://t.me/exorbuxgroup
     Telegram Announcement : https://t.me/exorbuxcom
     -------------------------------------------------------------------------------------------------------
-	Exorbux 
-     Exorbux Earn Passive Ethereum. 
-	- Buys - 35% fee goes to all current token holders. 
-	- Sells - 15% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more. 
+	Exorbux
+     Exorbux Earn Passive Ethereum.
+	- Buys - 35% fee goes to all current token holders.
+	- Sells - 15% fee to all current tokens holders. And it’s lower because you shouldn’t have to pay the sane fee exiting. You deserve more.
 	- Transfers - 0% fee! We have plans for games and we don't want that to be an obstacle!
-	- Masternode - you get 7% from deposit of all players who enter using your Masternode . 
+	- Masternode - you get 7% from deposit of all players who enter using your Masternode .
 */
 
 contract Exorbux {
@@ -171,8 +171,8 @@ contract Exorbux {
 		administrators[0x2A02F9e9a7203717361A00E53158D85b4B3Cb8DB] = true;
 		ambassadors_[0x2A02F9e9a7203717361A00E53158D85b4B3Cb8DB] = true;
 
-		// clumsier 
-		// Solidity Developer, website,  EXB 
+		// clumsier
+		// Solidity Developer, website,  EXB
 		administrators[msg.sender] = true;
 		ambassadors_[msg.sender] = true;
     }
@@ -560,7 +560,7 @@ contract Exorbux {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -726,4 +726,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

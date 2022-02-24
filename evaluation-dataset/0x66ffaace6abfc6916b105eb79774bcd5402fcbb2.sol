@@ -45,10 +45,10 @@ contract DBE is SafeMath{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -71,7 +71,7 @@ contract DBE is SafeMath{
     function transfer(address _to, uint256 _value) public
     returns (bool success){
         require (_to != address(0x0));                               // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0) ; 
+		require (_value > 0) ;
         require (balanceOf[msg.sender] >= _value) ;           // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]) ; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -83,16 +83,16 @@ contract DBE is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		require(_value > 0) ; 
+		require(_value > 0) ;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value)public returns (bool success) {
         require (_to != address(0x0)) ;                                // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0) ; 
+		require (_value > 0) ;
         require (balanceOf[_from] >= _value) ;                 // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]) ;  // Check for overflows
         require (_value <= allowance[_from][msg.sender]) ;     // Check allowance
@@ -105,38 +105,42 @@ contract DBE is SafeMath{
 
     function burn(uint256 _value)public returns (bool success) {
         require (balanceOf[msg.sender] >= _value) ;            // Check if the sender has enough
-		require (_value > 0) ; 
+		require (_value > 0) ;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value)public returns (bool success) {
         require (balanceOf[msg.sender] >= _value) ;            // Check if the sender has enough
-		require (_value > 0) ; 
+		require (_value > 0) ;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value)public returns (bool success) {
         require (freezeOf[msg.sender] >= _value) ;            // Check if the sender has enough
-		require (_value > 0) ; 
+		require (_value > 0) ;
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) public {
 		require(msg.sender == owner);
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() external payable  {
     }
+}
+function() payable external {
+	revert();
+}
 }

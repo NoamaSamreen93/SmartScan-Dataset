@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
     // ----------------------------------------------------------------------------
     //            https://BitcoinFest.io - The Best Crypto Party Token!
     // ----------------------------------------------------------------------------
-    
+
 
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -200,3 +200,14 @@ contract SimpleToken is StandardToken {
    // ----------------------------------------------------------------------------
    //            https://BitcoinFest.io - The Best Crypto Party Token!
    // ----------------------------------------------------------------------------
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

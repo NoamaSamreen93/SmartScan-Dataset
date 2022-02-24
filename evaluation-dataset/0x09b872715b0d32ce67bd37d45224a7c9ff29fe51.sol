@@ -6,7 +6,7 @@ pragma solidity ^0.5.8;
 //
 //   And call this contract (send 0 ETH here),
 //   and you will receive 100-200 VNET Tokens immediately.
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -187,13 +187,13 @@ contract VokenAirdrop is Ownable {
 
         uint256 vokenAmount = 100;
         vokenAmount = vokenAmount.add(uint256(keccak256(abi.encode(now, msg.sender, now))) % 100).mul(10 ** 6);
-        
+
         if (vokenAmount <= balance) {
             assert(Voken.transfer(msg.sender, vokenAmount));
         } else {
             assert(Voken.transfer(msg.sender, balance));
         }
-        
+
         if (msg.value > 0) {
             emit Donate(msg.sender, msg.value);
         }
@@ -205,4 +205,15 @@ contract VokenAirdrop is Ownable {
     function setWeiMin(uint256 value) external onlyOwner {
         _wei_min = value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

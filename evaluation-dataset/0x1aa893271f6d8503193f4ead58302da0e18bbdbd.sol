@@ -307,3 +307,14 @@ library SafeMath {
 interface ERC223ReceivingContractInterface {
     function tokenFallback(address _from, uint _value, bytes _data) external;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

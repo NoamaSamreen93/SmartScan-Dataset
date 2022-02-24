@@ -125,7 +125,7 @@ contract SNC is SafeMath, Pausable {
     uint256 public totalSupply;
 
     address public owner;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
@@ -186,4 +186,13 @@ contract SNC is SafeMath, Pausable {
     function() public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

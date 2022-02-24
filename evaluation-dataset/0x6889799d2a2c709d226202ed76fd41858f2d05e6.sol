@@ -138,18 +138,18 @@ contract StandardToken is ERC20, Pausable {
     }
 
     function addSupply(uint256 _value) onlyOwner public returns (bool success) {
-        require(_value > 0);      
-        balances[msg.sender] = balances[msg.sender].add(_value);                    
-        totalSupply = totalSupply.add(_value);                          
+        require(_value > 0);
+        balances[msg.sender] = balances[msg.sender].add(_value);
+        totalSupply = totalSupply.add(_value);
         AddSupply(msg.sender, _value);
         return true;
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(_value > 0); 
-        require(balances[msg.sender] >= _value);         
-        balances[msg.sender] = balances[msg.sender].sub(_value);                    
-        totalSupply = totalSupply.sub(_value);                          
+        require(_value > 0);
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         Burn(msg.sender, _value);
         return true;
     }
@@ -162,7 +162,7 @@ contract KLABToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 1000000e18;
-    address public constant WALLET_KLAB   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622; 
+    address public constant WALLET_KLAB   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622;
 
     function KLABToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -186,4 +186,20 @@ contract KLABToken is StandardToken {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

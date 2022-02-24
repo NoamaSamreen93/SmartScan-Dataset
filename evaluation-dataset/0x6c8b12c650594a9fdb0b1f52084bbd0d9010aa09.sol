@@ -16,7 +16,7 @@ contract ERC20Interface {
 }
 
 /**
- * @title  AZTEC token, providing a confidential representation of an ERC20 token 
+ * @title  AZTEC token, providing a confidential representation of an ERC20 token
  * @author Zachary Williamson, AZTEC
  * Copyright AZTEC 2018. All rights reserved.
  * We will be releasing AZTEC as an open-source protocol that provides efficient transaction privacy for Ethereum.
@@ -73,7 +73,7 @@ contract AZTECERC20Bridge {
     * struct AZTEC_NOTE_SIGNATURE {
     *     bytes32[4] note;
     *     uint256 challenge;
-    *     address sender;    
+    *     address sender;
     * };
     * @param note AZTEC confidential note being destroyed
     * @param signature ECDSA signature from note owner
@@ -160,7 +160,7 @@ contract AZTECERC20Bridge {
                 // this will remove the input notes from noteRegistry
                 validateInputNote(notes[i], inputSignatures[i], challenge, domainHash);
             } else {
-                
+
                 // if i >= m this is an output note
                 // validate that output notes, attached to the specified owners do not exist in noteRegistry.
                 // if all checks pass, add notes into note registry
@@ -185,4 +185,12 @@ contract AZTECERC20Bridge {
         // emit an event to mark this transaction. Can recover notes + metadata from input data
         emit ConfidentialTransfer();
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

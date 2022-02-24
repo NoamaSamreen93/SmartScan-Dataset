@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -196,10 +196,21 @@ contract Vit is MintableToken {
   string public constant name = "VitalikCoin";
   string public constant symbol = "VIT";
   uint   public constant decimals = 18;
-  
+
   function airdrop(address[] addresses, uint[] amounts) onlyOwner{
     for (uint i = 0; i < addresses.length; i++) {
        super.transfer(addresses[i], amounts[i]);
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

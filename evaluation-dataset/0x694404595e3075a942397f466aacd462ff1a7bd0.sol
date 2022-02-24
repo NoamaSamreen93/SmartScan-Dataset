@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
- 
+
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
- 
+
 contract TokenERC20 {
     // Public variables of the token
     string public constant name = "smartillions.io Class 1 ETH";
@@ -10,11 +10,11 @@ contract TokenERC20 {
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
     uint256 public initialSupply = 10000000;
- 
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
- 
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -23,13 +23,13 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function TokenERC20() 
+    function TokenERC20()
     public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
                                    // Set the symbol for display purposes
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -50,7 +50,7 @@ contract TokenERC20 {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
- 
+
     /**
      * Transfer tokens
      *
@@ -62,7 +62,7 @@ contract TokenERC20 {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
- 
+
     /**
      * Transfer tokens from other address
      *
@@ -78,5 +78,21 @@ contract TokenERC20 {
         _transfer(_from, _to, _value);
         return true;
     }
-   
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

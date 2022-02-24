@@ -211,3 +211,14 @@ contract LynchpinPublicICO is Ownable(0xAc983022185b95eF2B2C7219143483BD0C65Ecda
         emit LogSaleClosed();
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

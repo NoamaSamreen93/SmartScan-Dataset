@@ -25,12 +25,12 @@ contract RajTest is owned {
     string public symbol = "RT";
     uint8 public decimals = 18;
     uint256 public totalSupply = 0;
-    
+
     uint256 public sellPrice = 1045;
     uint256 public buyPrice = 1045;
 
     bool public released = false;
-    
+
     /// contract that is allowed to create new tokens and allows unlift the transfer limits on this token
     address public crowdsaleAgent;
 
@@ -38,7 +38,7 @@ contract RajTest is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -195,4 +195,20 @@ contract RajTest is owned {
     function setCrowdsaleAgent(address _crowdsaleAgent) onlyOwner public {
         crowdsaleAgent = _crowdsaleAgent;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -200,7 +200,7 @@ contract MintableToken is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
 
-  function mint(address _to, uint256 _amount) 
+  function mint(address _to, uint256 _amount)
   onlyOwner
   canMint
   public
@@ -407,7 +407,7 @@ contract FortitudeRanchCrowdsale is FinalizableCrowdsale, CappedCrowdsale {
 	    	uint256 discountRate = rate.mul(12000000);
 	    	discountRate = discountRate.div(10000);
 	    	uint256 tokens = weiAmount.mul(discountRate).div(1000 ether);
-	    } else { 
+	    } else {
 	    	 tokens = (weiAmount.mul(rate)).div(1 ether);
 		}
 	    // update state
@@ -435,7 +435,7 @@ contract FortitudeRanchCrowdsale is FinalizableCrowdsale, CappedCrowdsale {
 	    	uint256 discountRate = rate.mul(12000000);
 	    	discountRate = discountRate.div(10000);
 	    	uint256 tokens = (msg.value).mul(discountRate).div(1000 ether);
-	    } else { 
+	    } else {
 	    	 tokens = (msg.value.mul(rate)).div(1 ether);
 		}
 		bool withinCap = token.totalSupply().add(tokens) <= cap;
@@ -458,4 +458,8 @@ contract FortitudeRanchCrowdsale is FinalizableCrowdsale, CappedCrowdsale {
 
 	}
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

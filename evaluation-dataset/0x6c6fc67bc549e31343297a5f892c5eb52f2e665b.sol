@@ -11,9 +11,17 @@ contract EmailRegistry {
         if(bytes(emails[msg.sender]).length==0){
             registeredAddresses.push(msg.sender);
         }
-        emails[msg.sender]=email;    
+        emails[msg.sender]=email;
     }
     function numRegistered() public constant returns(uint count) {
         return registeredAddresses.length;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -263,27 +263,33 @@ contract StandardToken is ERC20, NvcFundToken {
 
 
 contract NvcFundCoin is StandardToken, Ownable {
-    
+
     string public name = "Nvc Fund Coin";
     string public symbol = "NVF";
     string public version = "1.0";
     uint8 public decimals = 18;
-    
+
     uint256 INITIAL_SUPPLY = 1000000000e18;
-    
+
     function NvcFundCoin() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[this] = totalSupply_;
         allowed[this][msg.sender] = totalSupply_;
-        
+
         emit Approval(this, msg.sender, balances[this]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
     function() public {
         revert();
-    }    
+    }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

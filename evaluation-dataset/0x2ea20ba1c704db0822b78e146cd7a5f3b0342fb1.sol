@@ -138,7 +138,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -328,10 +328,21 @@ contract ZJLTToken is TokenERC20 {
     function ZJLTToken() TokenERC20(2500000000, "ZJLTToken", "ZJLT Distributed Factoring Network", 18) public {
 
     }
-	
+
 	function () payable public {
       //if ether is sent to this address, send it back.
       //throw;
       require(false);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

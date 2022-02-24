@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24; 
+pragma solidity ^0.4.24;
 
 // ----------------------------------------------------------------------------
 // 'SQR' 'SaleQR' standard token contract saleqr.com
@@ -71,18 +71,18 @@ contract ERC20 is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     var _allowance = allowed[_from][msg.sender];
 
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     allowed[msg.sender][_spender] = _value;
@@ -110,5 +110,16 @@ contract SaleQR is StandardToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

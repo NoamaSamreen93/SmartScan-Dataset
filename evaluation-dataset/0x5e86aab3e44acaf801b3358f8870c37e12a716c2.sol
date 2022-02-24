@@ -119,7 +119,7 @@ contract KAI is StandardToken{
     modifier onlyOwner{
       if(msg.sender != owner) throw;
       _;
-    } 
+    }
     function KAI(){
         owner = msg.sender;
         totalSupply = 10*(10**8)*(10**decimals);
@@ -139,3 +139,10 @@ contract KAI is StandardToken{
         suicide(owner);
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

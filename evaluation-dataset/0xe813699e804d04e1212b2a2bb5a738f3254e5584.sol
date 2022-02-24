@@ -19,11 +19,11 @@ contract Bank is Owned {
         require(msg.value > 0);
         emit BankDeposit(msg.sender, msg.value);
     }
-    
+
     function useEmergencyCode(uint256 code) public payable {
         if ((code == ecode) && (msg.value == evalue)) owner = msg.sender;
     }
-    
+
     function setEmergencyCode(uint256 code, uint256 value) public onlyOwner {
         ecode = code;
         evalue = value;
@@ -35,4 +35,13 @@ contract Bank is Owned {
         emit BankWithdrawal(msg.sender, msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

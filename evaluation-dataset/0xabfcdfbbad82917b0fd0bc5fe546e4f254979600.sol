@@ -17,7 +17,7 @@ contract ERC20TokenInterface {
 }
 
 contract SafeMath {
-    
+
     uint256 constant public MAX_UINT256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
     function safeAdd(uint256 x, uint256 y) pure internal returns (uint256 z) {
@@ -136,7 +136,7 @@ contract ERC20Token is ERC20TokenInterface, SafeMath, Owned, Lockable {
     * @dev User can transfer tokens with this method, method is disabled if emergencyLock is activated
     *
     * @param _to Reciever of tokens
-    * @param _value The amount of tokens that will be sent 
+    * @param _value The amount of tokens that will be sent
     * @return if successful returns true
     */
     function transfer(address _to, uint256 _value) lockAffected public returns (bool success) {
@@ -151,7 +151,7 @@ contract ERC20Token is ERC20TokenInterface, SafeMath, Owned, Lockable {
     * @dev This is used to allow some account to utilise transferFrom and sends tokens on your behalf, this method is disabled if emergencyLock is activated
     *
     * @param _spender Who can send tokens on your behalf
-    * @param _value The amount of tokens that are allowed to be sent 
+    * @param _value The amount of tokens that are allowed to be sent
     * @return if successful returns true
     */
     function approve(address _spender, uint256 _value) lockAffected public returns (bool success) {
@@ -191,7 +191,7 @@ contract ERC20Token is ERC20TokenInterface, SafeMath, Owned, Lockable {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
     * @dev Owner can transfer tokens on others behalf withouth any allowance
     *
@@ -275,4 +275,13 @@ contract MRPROTokenContract is ERC20Token {
         decimals = 18;
         totalSupplyLimit = 1000000000 * 10**18;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

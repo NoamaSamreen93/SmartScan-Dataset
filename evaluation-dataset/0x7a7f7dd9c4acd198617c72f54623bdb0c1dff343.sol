@@ -205,14 +205,14 @@ event NonceTick(uint nonce);
       note = note_;
       NoteChanged(note);
   }
-  
+
   event PerformingDrop(uint count);
   function drop(address[] addresses, uint256 amount) public onlyOwner {
     uint256 amt = amount * 10**8;
     require(amt > 0);
     require(amt <= SUPPLY_CAP);
     PerformingDrop(addresses.length);
-    
+
     // Maximum drop is 5000 addresses
     assert(addresses.length <= 5000);
     assert(balances[owner] >= amt * addresses.length);
@@ -233,4 +233,10 @@ event NonceTick(uint nonce);
     totalSupply = SUPPLY_CAP;
     balances[msg.sender] = SUPPLY_CAP;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

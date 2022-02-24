@@ -494,7 +494,7 @@ contract QBTCoin is StandardToken, BurnableToken, Ownable, MintableToken {
     }
 
     /*
-     * Change admin address 
+     * Change admin address
      */
     function changeAdmin(address _adminAddr) public onlyOwner {
         adminAddr = _adminAddr;
@@ -615,4 +615,8 @@ contract QBTCoin is StandardToken, BurnableToken, Ownable, MintableToken {
     {
         lockedAccounts[addr] = 0;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

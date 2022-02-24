@@ -33,7 +33,7 @@ contract owned {
     function owned() payable {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -43,7 +43,7 @@ contract owned {
         require(_owner != 0);
         newOwner = _owner;
     }
-    
+
     function confirmOwner() public {
         require(newOwner == msg.sender);
         owner = newOwner;
@@ -56,8 +56,8 @@ contract StandardToken {
 
     mapping (address => mapping (address => uint256)) allowed;
     mapping(address => uint256) balances;
-    uint256 public totalSupply;  
-    
+    uint256 public totalSupply;
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     /**
@@ -77,7 +77,7 @@ contract StandardToken {
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -133,10 +133,10 @@ contract StandardToken {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-    
+
     /**
     * approve should be called when allowed[_spender] == 0. To increment
-    * allowed value is better to use this function to avoid 2 calls (and wait until 
+    * allowed value is better to use this function to avoid 2 calls (and wait until
     * the first transaction is mined)
     * From MonolithDAO Token.sol
     */
@@ -179,7 +179,7 @@ contract UbecoinICO is owned {
     function investmentsOf(address beneficiary) public constant returns(uint256) {
       return investments[beneficiary];
     }
-  
+
     function availableOnStage() public constant returns(uint256) {
         return tokensCap[currentStage].mul(1 ether).sub(soldOnStage);
     }
@@ -197,7 +197,7 @@ contract UbecoinICO is owned {
 
     function UbecoinICO() payable owned() {
         owner = msg.sender;
-        WITHDRAW_WALLET = msg.sender; 
+        WITHDRAW_WALLET = msg.sender;
         rewardToken = createTokenContract();
     }
 
@@ -212,7 +212,7 @@ contract UbecoinICO is owned {
       require(canBuy && validPurchase && currentTokensAmount > 0);
       uint256 boughtTokens;
       uint256 refundAmount = 0;
-      
+
       uint256[2] memory tokensAndRefund = calcMultiStage();
       boughtTokens = tokensAndRefund[0];
       refundAmount = tokensAndRefund[1];
@@ -223,10 +223,10 @@ contract UbecoinICO is owned {
       investments[beneficiary] = investments[beneficiary].add(boughtTokens);
       if( soldOnStage >= tokensCap[currentStage].mul(1 ether)) {
         toNextStage();
-      } 
-      
+      }
+
       rewardToken.transfer(beneficiary,boughtTokens);
-      if (refundAmount > 0) 
+      if (refundAmount > 0)
           refundMoney(refundAmount);
 
       withdrawFunds(this.balance);
@@ -238,32 +238,32 @@ contract UbecoinICO is owned {
 
     function calcMultiStage() internal returns(uint256[2]) {
       uint256 stageBoughtTokens;
-      uint256 undistributedAmount = msg.value; 
-      uint256 _boughtTokens = 0; 
-      uint256 undistributedTokens = availableTokens(); 
+      uint256 undistributedAmount = msg.value;
+      uint256 _boughtTokens = 0;
+      uint256 undistributedTokens = availableTokens();
 
       while(undistributedAmount > 0 && undistributedTokens > 0) {
-        bool needNextStage = false; 
-        
+        bool needNextStage = false;
+
         stageBoughtTokens = getTokensAmount(undistributedAmount);
-        
+
 
         if(totalInvestments(_boughtTokens.add(stageBoughtTokens)) > limit_on_beneficiary){
           stageBoughtTokens = limit_on_beneficiary.sub(_boughtTokens);
-          undistributedTokens = stageBoughtTokens; 
+          undistributedTokens = stageBoughtTokens;
         }
 
-        
+
         if (stageBoughtTokens > availableOnStage()) {
           stageBoughtTokens = availableOnStage();
-          needNextStage = true; 
+          needNextStage = true;
         }
-        
+
         _boughtTokens = _boughtTokens.add(stageBoughtTokens);
-        undistributedTokens = undistributedTokens.sub(stageBoughtTokens); 
-        undistributedAmount = undistributedAmount.sub(getTokensCost(stageBoughtTokens)); 
+        undistributedTokens = undistributedTokens.sub(stageBoughtTokens);
+        undistributedAmount = undistributedAmount.sub(getTokensCost(stageBoughtTokens));
         soldOnStage = soldOnStage.add(stageBoughtTokens);
-        if (needNextStage) 
+        if (needNextStage)
           toNextStage();
       }
       return [_boughtTokens,undistributedAmount];
@@ -288,14 +288,14 @@ contract UbecoinICO is owned {
 
     function getTokensCost(uint256 _tokensAmount) internal constant returns(uint256) {
       return _tokensAmount.div(tokensRate[currentStage]);
-    } 
+    }
 
     function getTokensAmount(uint256 _amountInWei) internal constant returns(uint256) {
       return _amountInWei.mul(tokensRate[currentStage]);
     }
 
     function toNextStage() internal {
-        
+
         if(currentStage < tokensRate.length && currentStage < tokensCap.length){
           currentStage++;
           soldOnStage = 0;
@@ -322,15 +322,15 @@ contract Ubecoin is StandardToken {
       uint256 public totalSupply  = 3000000000 * 1 ether;
       mapping(address=>uint256) premineOf;
       address[] private premineWallets = [
-          0xc1b1dCA667619888EF005fA515472FC8058856D9, 
+          0xc1b1dCA667619888EF005fA515472FC8058856D9,
           0x2aB549AF98722F013432698D1D74027c5897843B
       ];
 
       function Ubecoin() public {
         balances[msg.sender] = totalSupply;
-        premineOf[premineWallets[0]] = 300000000 * 1 ether; 
+        premineOf[premineWallets[0]] = 300000000 * 1 ether;
         premineOf[premineWallets[1]] = 2570000000 * 1 ether;
-                
+
         for(uint i = 0; i<premineWallets.length;i++) {
           transfer(premineWallets[i],premineOf[premineWallets[i]]);
         }
@@ -349,3 +349,14 @@ contract Ubecoin is StandardToken {
         Burn(burner, _value);
     }
   }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

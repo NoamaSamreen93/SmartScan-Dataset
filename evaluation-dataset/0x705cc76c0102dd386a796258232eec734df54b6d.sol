@@ -1,6 +1,6 @@
 pragma solidity 0.4.15;
 
-/*    
+/*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,7 @@ pragma solidity 0.4.15;
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
+
 
 
 
@@ -792,7 +792,7 @@ contract MiniMeToken is Controlled {
 
 contract TokenSale is Owned, TokenController {
     using SafeMath for uint256;
-    
+
     SHP public shp;
     Trustee public trustee;
 
@@ -819,7 +819,7 @@ contract TokenSale is Owned, TokenController {
     event Contribution(uint256 etherAmount, address _caller);
     event NewSale(address indexed caller, uint256 etherAmount, uint256 tokensGenerated);
     event SaleClosed(uint256 when);
-    
+
     modifier notPaused() {
         require(!paused);
         _;
@@ -833,7 +833,7 @@ contract TokenSale is Owned, TokenController {
     modifier isValidated() {
         require(msg.sender != 0x0);
         require(msg.value > 0);
-        require(!isContract(msg.sender)); 
+        require(!isContract(msg.sender));
         require(tx.gasprice <= MAX_GAS_PRICE);
         _;
     }
@@ -890,10 +890,10 @@ contract TokenSale is Owned, TokenController {
     /// @param _tokens the number of tokens to mint
     /// @param _destination the address to send the tokens to
     function mintTokens(
-        uint256 _tokens, 
+        uint256 _tokens,
         address _destination
-    ) 
-        onlyOwner 
+    )
+        onlyOwner
     {
         shp.generateTokens(_destination, _tokens);
         NewSale(_destination, 0, _tokens);
@@ -907,7 +907,7 @@ contract TokenSale is Owned, TokenController {
     /// @notice Updates the counters for the amount of Ether paid
     /// @param _etherAmount the amount of Ether paid
     function updateCounters(uint256 _etherAmount) internal;
-    
+
     /// @notice Parent constructor. This needs to be extended from the child contracts
     /// @param _etherEscrowAddress the address that will hold the crowd funded Ether
     /// @param _bountyAddress the address that will hold the bounty scheme SHP
@@ -1010,7 +1010,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -1045,7 +1045,7 @@ contract SHP is MiniMeToken {
 
 contract SharpeCrowdsale is TokenSale {
     using SafeMath for uint256;
- 
+
     uint256 public etherPaid = 0;
     uint256 public totalContributions = 0;
 
@@ -1060,7 +1060,7 @@ contract SharpeCrowdsale is TokenSale {
     uint256 public firstTierDiscountUpperLimitEther;
     uint256 public secondTierDiscountUpperLimitEther;
     uint256 public thirdTierDiscountUpperLimitEther;
-    
+
     enum ContributionState {Paused, Resumed}
     event ContributionStateChanged(address caller, ContributionState contributionState);
     enum AllowedContributionState {Whitelisted, NotWhitelisted, AboveWhitelisted, BelowWhitelisted, WhitelistClosed}
@@ -1128,7 +1128,7 @@ contract SharpeCrowdsale is TokenSale {
         uint256 _thirdTierDiscountUpperLimitEther,
         uint256 _minPresaleContributionEther,
         uint256 _maxPresaleContributionEther
-    ) 
+    )
         onlyOwner
     {
         minDiscountEther = _minDiscountEther;
@@ -1170,7 +1170,7 @@ contract SharpeCrowdsale is TokenSale {
     /// @param _etherAmount The amount of ether used to evaluate the tier the contribution lies within
     /// @param _contributorTokens The tokens allocated based on the contribution
     function applyDiscount(
-        uint256 _etherAmount, 
+        uint256 _etherAmount,
         uint256 _contributorTokens
     )
         internal
@@ -1201,4 +1201,20 @@ contract SharpeCrowdsale is TokenSale {
         totalContributions = totalContributions.add(1);
         CountersUpdated(etherPaid, _etherAmount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

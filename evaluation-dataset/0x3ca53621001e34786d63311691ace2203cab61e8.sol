@@ -171,7 +171,7 @@ contract MiniMeTokenI is ERC20Token, Burnable {
   function destroyTokens(address _owner, uint _amount) public returns (bool);
 
 /////////////////
-// Finalize 
+// Finalize
 ////////////////
   function finalize() public;
 
@@ -200,7 +200,7 @@ contract TokenController {
     /// @param _owner The address that sent the ether to create tokens
     /// @return True if the ether is accepted, false if it throws
   function proxyMintTokens(
-    address _owner, 
+    address _owner,
     uint _amount,
     bytes32 _paidTxID) public returns(bool);
 
@@ -404,4 +404,17 @@ contract Distribution is Controlled, TokenController {
     bytes32 _paidTxID
   );
   event Finalized();
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

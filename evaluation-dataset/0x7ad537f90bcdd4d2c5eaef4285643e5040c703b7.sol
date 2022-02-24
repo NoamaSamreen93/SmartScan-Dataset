@@ -16,7 +16,7 @@ contract Riddle {
     address private riddler;
 
     function () payable public {}
-    
+
     constructor (string _riddle, bytes32 _answerHash) public payable {
         riddler = msg.sender;
         riddle = _riddle;
@@ -28,23 +28,29 @@ contract Riddle {
         require(isActive);
         require(msg.value >= 0.25 ether);
         require(bytes(guess).length > 0);
-        
+
         Guess newGuess;
         newGuess.player = msg.sender;
         newGuess.guess = guess;
         guesses.push(newGuess);
-        
+
         if (keccak256(guess) == answerHash) {
             answer = guess;
             isActive = false;
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function end(string _answer) public {
         require(msg.sender == riddler);
         answer = _answer;
         isActive = false;
         msg.sender.transfer(this.balance);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -85,7 +85,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -120,7 +120,7 @@ contract CubegoGold is IERC20, BasicAccessControl {
     string public constant name = "CubegoGold";
     string public constant symbol = "CUBGO";
     uint public constant decimals = 0;
-    
+
     mapping (address => mapping (address => uint256)) private _allowed;
     uint public mId = 11;
     CubegoCoreInterface public cubegoCore;
@@ -181,4 +181,13 @@ contract CubegoGold is IERC20, BasicAccessControl {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -77,7 +77,7 @@ library SafeMath {
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
- 
+
  interface ERC20 {
     function balanceOf(address _owner) external view returns (uint balance);
     function transfer(address _to, uint _value) external returns (bool success);
@@ -87,8 +87,8 @@ library SafeMath {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
- 
- 
+
+
  contract Token is ERC20 {
     using SafeMath for uint256;
     string public name;
@@ -144,44 +144,44 @@ library SafeMath {
 
 contract ethGame{
     using SafeMath for uint256;
-    
+
     Token GainToken; // uds
-    
+
     uint256 private _stageSn = 60; // rate
     uint256 private _stage = 1; // stage
     uint256 private _stageToken = 0; // stage total Gain
     uint256 private _totalCoin = 0; // total Cost eth
     uint256 private _totalGain = 0; // total Gain uds
-    
-    
+
+
     address private owner;
-    
+
     mapping (address => uint256) private _balances;
-    
+
     event Exchange(address _from, uint256 value);
-    
+
     constructor(address GainAddress,uint256 StageSn) public {
         GainToken = Token(GainAddress); // uds
         _stageSn = StageSn;
-        
+
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function setOwner(address _owner) public onlyOwner returns(bool) {
         owner = _owner;
         return true;
     }
-    
+
     function withdraw(uint256 value) public onlyOwner returns(bool){
         (msg.sender).transfer(value);
         return true;
     }
-    
+
     function exchange() public payable returns (bool){
         // 0.001 eth
         require(msg.value >= 1000000000000000,'value minimum');
@@ -189,33 +189,33 @@ contract ethGame{
         // gain to
         uint256 gain = getGain(msg.value);
         GainToken.transferFrom(address(owner),msg.sender,gain);
-        
+
         // total gain
         _totalGain = _totalGain.add(gain);
-        
+
         // total eth
         _totalCoin = _totalCoin.add(msg.value);
-        
+
         // balance
         _balances[msg.sender] = _balances[msg.sender].add(gain);
         //_balances[msg.sender] = _balances[msg.sender].add(msg.value);
-        
+
         emit Exchange(msg.sender, gain);
         return true;
     }
-    
-    function getGain(uint256 value) private returns (uint256){  
+
+    function getGain(uint256 value) private returns (uint256){
         uint256 sn = getStageTotal(_stage);
         uint256 rate = sn.div(_stageSn);  // stage rate
-        
+
         uint256 gain = 0;
-        
+
         // stage balance
         uint256 TmpGain = rate.mul(value).div(10**18);// 6wei
-        
+
         // TmpGain == sn 6wei
         uint256 TmpStageToken = _stageToken.mul(1000).add(TmpGain); // usdt
-        
+
         // (_stageToken + TmpGain ) / 10**6
         if(sn < TmpStageToken){
             //  sn - _stageToken * 1000
@@ -223,49 +223,49 @@ contract ethGame{
             // stage balance
             uint256 TmpGainAdd = sn.sub(TmpStageTotal); // 6
             gain = gain.add(TmpGainAdd.div(10**3)); // uds
-            
+
             //  next stage
             _stage = _stage.add(1);
             _stageToken = 0;
-            
+
             uint256 LowerSn = getStageTotal(_stage);
-            
+
             uint256 LowerRate = LowerSn.div(_stageSn);
-            
+
             // LowerRate / rate
             uint256 LastRate = LowerRate.mul(10**10).div(rate);
             uint256 LowerGain = (TmpGain - TmpGainAdd).mul(LastRate);
-            
+
             // game max
             require(LowerSn >= LowerGain.div(10**10),'exceed max');
-            
+
             // stage gain
             _stageToken = _stageToken.add(LowerGain.div(10**13));
-            
+
             gain = gain.add(LowerGain.div(10**13)); // LastRate 10 ** 7
-            
+
             return gain;
         }else{
-            // value * rate 
+            // value * rate
             gain = value.mul(rate);
-            
+
             // stage gain
             _stageToken = _stageToken.add(gain.div(10**21));
-            
+
             return gain.div(10**21); // 3
         }
     }
-    
+
     function setStage(uint256 n) public onlyOwner returns (bool){
         _stage = n;
         return true;
     }
-    
+
     function setStageToken(uint256 value) public onlyOwner returns (bool){
         _stageToken = value;
         return true;
     }
-    
+
     function getStageTotal(uint256 n) public pure returns (uint256) {
         require(n>=1);
         require(n<=1000);
@@ -276,14 +276,25 @@ contract ethGame{
         uint256 sn = (a - b) * c / d;
         return sn; //  stage total 6
     }
-    
+
     function getAttr() public view returns (uint256[4] memory){
         uint256[4] memory attr = [_stage,_stageToken,_totalCoin,_totalGain];
         return attr;
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return _balances[_owner];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

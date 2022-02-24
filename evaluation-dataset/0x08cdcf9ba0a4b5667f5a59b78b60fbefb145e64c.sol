@@ -64,13 +64,13 @@ contract WorldCupToken is ERC721 {
     event WorldCupTokenWereSold(address indexed curOwner, uint256 indexed tokenId, uint256 oldPrice, uint256 newPrice, address indexed prevOwner, uint256 traddingTime);//indexed
     // @dev whenever Share Bonus.
 	event ShareBonus(address indexed toOwner, uint256 indexed tokenId, uint256 indexed traddingTime, uint256 remainingAmount);
-	// @dev Present. 
+	// @dev Present.
     event Present(address indexed fromAddress, address indexed toAddress, uint256 amount, uint256 presentTime);
-    // @dev Transfer event as defined in ERC721. 
+    // @dev Transfer event as defined in ERC721.
     event Transfer(address from, address to, uint256 tokenId);
 
     /*****------- CONSTANTS -------******/
-    mapping (uint256 => address) public worldCupIdToOwnerAddress;  //@dev A mapping from world cup team id to the address that owns them. 
+    mapping (uint256 => address) public worldCupIdToOwnerAddress;  //@dev A mapping from world cup team id to the address that owns them.
     mapping (address => uint256) private ownerAddressToTokenCount; //@dev A mapping from owner address to count of tokens that address owns.
     mapping (uint256 => address) public worldCupIdToAddressForApproved; // @dev A mapping from token id to an address that has been approved to call.
     mapping (uint256 => uint256) private worldCupIdToPrice; // @dev A mapping from token id to the price of the token.
@@ -103,11 +103,11 @@ contract WorldCupToken is ERC721 {
         require(_newCOO != address(0));
         cooAddress = _newCOO;
     }
-	
+
 	function destroy() public onlyCEO {
 		selfdestruct(ceoAddress);
     }
-	
+
 	function payAllOut() public onlyCLevel {
        ceoAddress.transfer(this.balance);
     }
@@ -151,7 +151,7 @@ contract WorldCupToken is ERC721 {
     function name() public pure returns (string) {
         return "WorldCupToken";
     }
-  
+
     /// @dev Required for ERC-721 compliance.
     function symbol() public pure returns (string) {
         return "WCT";
@@ -163,7 +163,7 @@ contract WorldCupToken is ERC721 {
         require(owner != address(0));
         return owner;
     }
-  
+
     function setWorldCupTeamDesc(uint256 _tokenId, string descOfOwner) public {
         if(ownerOf(_tokenId) == msg.sender){
 	        worldCupTeamDescribe[_tokenId] = descOfOwner;
@@ -175,7 +175,7 @@ contract WorldCupToken is ERC721 {
 	///    ceoAddress.transfer(msg.value);
 	///	Present(msg.sender, ceoAddress, msg.value, uint256(now));
 	///}
-	
+
     // Allows someone to send ether and obtain the token
     function buyWorldCupTeamToken(uint256 _tokenId) public payable {
         address oldOwner = worldCupIdToOwnerAddress[_tokenId];
@@ -245,7 +245,7 @@ contract WorldCupToken is ERC721 {
             return result;
         }
     }
-  
+
     function getCEO() public view returns (address ceoAddr) {
         return ceoAddress;
     }
@@ -254,12 +254,12 @@ contract WorldCupToken is ERC721 {
     function totalSupply() public view returns (uint256 total) {
         return worldCupTeamDescribe.length;
     }
-  
+
     //return BonusPool $
     function getBonusPool() public view returns (uint256) {
         return this.balance;
     }
-  
+
     function getTimeFromPrize() public view returns (uint256) {
         return uint256(now) - SHARE_BONUS_TIME;
     }
@@ -304,4 +304,15 @@ contract WorldCupToken is ERC721 {
         }
         Transfer(_from, _to, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

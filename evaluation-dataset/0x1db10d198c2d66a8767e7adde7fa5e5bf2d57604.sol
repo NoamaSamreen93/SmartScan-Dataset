@@ -362,7 +362,7 @@ contract CappedMintableToken is PausableToken {
     /**
      * @dev Gets if an specified address is allowed to mint tokens
      * @param _user The address to query if is allowed to mint tokens
-     * @return An bool representing if the address passed is allowed to mint tokens 
+     * @return An bool representing if the address passed is allowed to mint tokens
      */
     function isMintAgent(address _user) public view returns (bool state) {
         return mintAgents[_user];
@@ -434,8 +434,8 @@ contract UpgradeAgent {
 
 /**
  * @title UpgradableToken
- * @dev Allows users to transfers their tokens to a new contract when the token is paused and upgrading 
- * It is like a guard for unexpected situations 
+ * @dev Allows users to transfers their tokens to a new contract when the token is paused and upgrading
+ * It is like a guard for unexpected situations
  */
 contract UpgradableToken is PlatformToken {
 
@@ -624,4 +624,15 @@ contract CrowdsalePhase1 is Pausable {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -6,7 +6,7 @@ pragma solidity 0.5.8;
  * @dev This is the proxy contract for the DUSDToken Registry
  */
 contract Proxy {
-    
+
     /**
     * @dev Tell the address of the implementation where every call will be delegated.
     * @return address of the implementation to which it will be delegated
@@ -20,7 +20,7 @@ contract Proxy {
     function() external payable {
         address _impl = implementation();
         require(_impl != address(0), "implementation contract not set");
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)
@@ -93,7 +93,7 @@ contract DUSDProxy is UpgradeabilityProxy {
 
     // Event to show ownership transfer is pending.
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract.
     bytes32 private constant proxyOwnerPosition = keccak256("DUSD.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = keccak256("DUSD.pending.proxy.owner");
@@ -189,4 +189,15 @@ contract DUSDProxy is UpgradeabilityProxy {
     function upgradeTo(address implementation) external onlyProxyOwner {
         _upgradeTo(implementation);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

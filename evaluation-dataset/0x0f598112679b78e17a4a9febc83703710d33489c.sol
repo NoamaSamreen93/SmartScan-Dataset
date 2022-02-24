@@ -48,8 +48,8 @@ contract MoneroGold {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
-    function setName(string _name) isOwner 
+
+    function setName(string _name) isOwner
     {
         name = _name;
     }
@@ -65,4 +65,15 @@ contract MoneroGold {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event SupplyBurn(uint256 _amount);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

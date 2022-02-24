@@ -18,7 +18,7 @@ contract Ownable {
    */
 //   function Ownable() public {
   constructor() public payable{
-      
+
     owner = msg.sender;
   }
 
@@ -119,7 +119,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 function ceil(uint256 a, uint256 m) internal pure returns (uint256) {
     uint256 c = add(a,m);
     uint256 d = sub(c,1);
@@ -165,7 +165,7 @@ contract BasicToken is ERC20Basic {
     uint256 onePercent = roundValue.mul(basePercent).div(4000);
     return onePercent;
   }
-  
+
   function transfer(address to, uint256 value) public returns (bool) {
     require(to != address(0));
     require(value <= balances[msg.sender]);
@@ -182,7 +182,7 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, address(0), tokensToBurn);
     return true;
   }
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -198,7 +198,7 @@ contract BasicToken is ERC20Basic {
 //     emit Transfer(msg.sender, _to, _value);
 //     return true;
 //   }
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -346,7 +346,7 @@ contract EqvcTokens is StandardToken, Ownable {
     uint256 public constant INITIAL_SUPPLY = 2000000;
     uint256 public constant TOKEN_OFFERING_ALLOWANCE = 2000000;
     uint256 public constant ADMIN_ALLOWANCE = INITIAL_SUPPLY - TOKEN_OFFERING_ALLOWANCE;
-    
+
     // Address of token admin
     address public adminAddr;
 
@@ -355,7 +355,7 @@ contract EqvcTokens is StandardToken, Ownable {
 
     // Enable transfers after conclusion of token offering
     bool public transferEnabled = false;
-    
+
     /**
      * Check if transfer is allowed
      *
@@ -394,7 +394,7 @@ contract EqvcTokens is StandardToken, Ownable {
         require(to != address(tokenOfferingAddr));
         _;
     }
-    
+
     /**
      * Token contract constructor
      *
@@ -402,7 +402,7 @@ contract EqvcTokens is StandardToken, Ownable {
      */
     function EqvcToken(address admin) public {
         totalSupply = INITIAL_SUPPLY;
-        
+
         // Mint tokens
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0x0), msg.sender, totalSupply);
@@ -411,9 +411,9 @@ contract EqvcTokens is StandardToken, Ownable {
         adminAddr = admin;
         approve(adminAddr, ADMIN_ALLOWANCE);
     }
-    
-    
- 
+
+
+
 
     /**
      * Set token offering to approve allowance for offering contract to distribute tokens
@@ -430,7 +430,7 @@ contract EqvcTokens is StandardToken, Ownable {
         approve(offeringAddr, amount);
         tokenOfferingAddr = offeringAddr;
     }
-    
+
     /**
      * Enable transfers
      */
@@ -450,7 +450,7 @@ contract EqvcTokens is StandardToken, Ownable {
     function transfer(address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transfer(to, value);
     }
-    
+
     /**
      * Transfer from `from` account to `to` account using allowance in `from` account to the sender
      *
@@ -461,7 +461,7 @@ contract EqvcTokens is StandardToken, Ownable {
     function transferFrom(address from, address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transferFrom(from, to, value);
     }
-    
+
 }
 
 contract EqvcsCrowdsale is Pausable {
@@ -480,7 +480,7 @@ contract EqvcsCrowdsale is Pausable {
     // Price of the tokens as in tokens per ether
     uint256 public rate;
 
-    // Amount of raised in Wei 
+    // Amount of raised in Wei
     uint256 public EthRaised;
 
     // Timelines for contribution limit policy
@@ -494,7 +494,7 @@ contract EqvcsCrowdsale is Pausable {
     // Contributions in Wei for each participant
     mapping(address => uint256) public contributions;
 
-    // Funding cap in ETH. 
+    // Funding cap in ETH.
      uint256 public constant FUNDING_ETH_HARD_CAP = 1300;
 
     // Min contribution is 0.1 ether
@@ -509,7 +509,7 @@ contract EqvcsCrowdsale is Pausable {
     // The current stage of the offering
     Stages public stage;
 
-    enum Stages { 
+    enum Stages {
         Setup,
         OfferingStarted,
         OfferingEnded
@@ -536,15 +536,15 @@ contract EqvcsCrowdsale is Pausable {
         _;
     }
 
-    
+
     /**
      * The constructor of the contract.
      * @param eqvcToEtherRate Number of Eqvcs per ether
      * @param beneficiaryAddr Address where funds are collected
      */
     function EqvcCrowdsale(
-        uint256 eqvcToEtherRate, 
-        address payable beneficiaryAddr, 
+        uint256 eqvcToEtherRate,
+        address payable beneficiaryAddr,
         address tokenAddress
     ) public {
         require(eqvcToEtherRate > 0);
@@ -576,9 +576,9 @@ contract EqvcsCrowdsale is Pausable {
     }
 
     /**
-     * Whitelist participant address 
-     * 
-     * 
+     * Whitelist participant address
+     *
+     *
      * @param users Array of addresses to be whitelisted
      */
     // function whitelist(address[] memory users) public onlyOwner {
@@ -610,8 +610,8 @@ contract EqvcsCrowdsale is Pausable {
     function endOffering() public onlyOwner atStage(Stages.OfferingStarted) {
         endOfferingImpl();
     }
-    
-  
+
+
     /**
      * Function to invest ether to buy tokens, can be called directly or called by the fallback function
      * Only whitelisted users can buy tokens.
@@ -628,7 +628,7 @@ contract EqvcsCrowdsale is Pausable {
 
     /**
      * Function that returns whether offering has ended
-     * 
+     *
      * @return bool Return true if token offering has ended
      */
     function hasEnded() public view returns (bool) {
@@ -643,7 +643,7 @@ contract EqvcsCrowdsale is Pausable {
      * - total Wei raised not greater than FUNDING_ETH_HARD_CAP
      * - contribution per perticipant within contribution limit
      *
-     * 
+     *
      */
     modifier validPurchase() {
         require(now >= startTime && now <= endTime && stage == Stages.OfferingStarted);
@@ -651,26 +651,26 @@ contract EqvcsCrowdsale is Pausable {
           maxContribution = 2000;
         }
         uint256 contributionInETH = uint256(msg.value).div(10**18);
-        address participant = msg.sender; 
+        address participant = msg.sender;
 
 
         require(contributionInETH <= maxContribution.sub(contributions[participant]));
         require(participant != address(0) && contributionInETH >= minContribution && contributionInETH <= maxContribution);
         require(EthRaised.add(contributionInETH) <= FUNDING_ETH_HARD_CAP);
-        
+
         _;
     }
 
 
     function buyTokens() internal validPurchase {
-      
+
         // contributionInETH amount in eth
         uint256 contributionInETH = uint256(msg.value).div(10**18);
         address participant = msg.sender;
 
         // Calculate token amount to be distributed
         uint256 tokens = contributionInETH.mul(rate);
-        
+
         if (!token.transferFrom(token.owner(), participant, tokens)) {
             revert();
         }
@@ -680,16 +680,16 @@ contract EqvcsCrowdsale is Pausable {
 
         remainCap = FUNDING_ETH_HARD_CAP.sub(EthRaised);
 
-        
+
        // Check if the funding cap has been reached, end the offering if so
         if (EthRaised >= FUNDING_ETH_HARD_CAP) {
             endOfferingImpl();
         }
-        
+
         // // Transfer funds to beneficiary
         // transfer(beneficiary,contributionInETH);
         beneficiary.transfer(contributionInETH.mul(10**18));
-        emit TokenPurchase(msg.sender, contributionInETH, tokens);          
+        emit TokenPurchase(msg.sender, contributionInETH, tokens);
     }
 
 
@@ -706,7 +706,7 @@ contract EqvcsCrowdsale is Pausable {
      * Allocate tokens for presale participants before public offering, can only be executed at Stages.Setup stage.
      *
      * @param to Participant address to send Eqvcs to
-     * @param tokens Amount of Eqvcs to be sent to parcitipant 
+     * @param tokens Amount of Eqvcs to be sent to parcitipant
      */
     function allocateTokens(address to, uint256 tokens) public onlyOwner returns (bool) {
         if (!token.transferFrom(token.owner(), to, tokens)) {
@@ -714,7 +714,7 @@ contract EqvcsCrowdsale is Pausable {
         }
         return true;
     }
-    
+
     /**
      * Bulk version of allocateTokens
      */
@@ -727,4 +727,13 @@ contract EqvcsCrowdsale is Pausable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -39,20 +39,20 @@ contract ERC20 is ERC20Basic {
 }
 
 contract TrineChain is ERC20 {
-    
-    using SafeMath for uint256; 
-    address owner = msg.sender; 
 
-    mapping (address => uint256) balances; 
+    using SafeMath for uint256;
+    address owner = msg.sender;
+
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    mapping (address => uint256) locknum; 
+    mapping (address => uint256) locknum;
 
     string public constant name = "TrineChain";
     string public constant symbol = "TRCON";
     uint public constant decimals = 18;
-    uint256 _Rate = 10 ** decimals;    
+    uint256 _Rate = 10 ** decimals;
     uint256 public totalSupply = 1000000000 * _Rate;
-    
+
 
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -75,7 +75,7 @@ contract TrineChain is ERC20 {
 
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0) && newOwner != owner) {
-             owner = newOwner;   
+             owner = newOwner;
         }
     }
 
@@ -93,7 +93,7 @@ contract TrineChain is ERC20 {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             lock(addresses[i], amounts[i]);
         }
@@ -107,7 +107,7 @@ contract TrineChain is ERC20 {
         balances[owner] = balances[owner].sub(_amount * _Rate);
         balances[_to] = balances[_to].add(_amount * _Rate);
         locknum[_to] += lockcheck(_amount) * _Rate;
-        
+
         Transfer(owner, _to, _amount * _Rate);
         return true;
     }
@@ -129,12 +129,12 @@ contract TrineChain is ERC20 {
         return _amount * 8/10;
         }
     }
-    
+
     function distribute(address[] addresses, uint256[] amounts) onlyOwner public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             distr(addresses[i], amounts[i]);
         }
@@ -165,7 +165,7 @@ contract TrineChain is ERC20 {
         require(_amount <= balances[_from]);
         require(_amount <= balances[_from].sub(locknum[_from]));
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -183,4 +183,10 @@ contract TrineChain is ERC20 {
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

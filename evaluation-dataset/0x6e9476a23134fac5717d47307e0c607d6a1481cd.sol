@@ -79,7 +79,7 @@ contract IBC is ERC20Interface, Owned, SafeMath {
     mapping(address => mapping(address => uint)) allowed;
 
 
-   
+
     constructor() public {
         symbol = "IBC";
         name = "Intelligent Business Chain";
@@ -90,7 +90,7 @@ contract IBC is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
@@ -111,7 +111,7 @@ contract IBC is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -128,13 +128,13 @@ contract IBC is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
 
-    
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -143,14 +143,20 @@ contract IBC is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function () public payable {
         revert();
     }
 
 
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

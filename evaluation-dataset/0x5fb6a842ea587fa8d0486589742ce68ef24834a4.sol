@@ -9,16 +9,16 @@ contract TokenERC20 {
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-	
-	
+
+
 	bytes32 public currentChallenge;                         // The coin starts with a challenge
     uint public timeOfLastProof;                             // Variable to keep track of when rewards were given
     uint public difficulty = 10**32;                         // Difficulty starts reasonably low
 	uint constant amounttomine = 5000000;
 	bool miningGoalReached = false;
-	uint public mined = 0; 
+	uint public mined = 0;
 	uint public curReward = 0;
-	
+
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -162,8 +162,8 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
-	
-	
+
+
     function proofOfWork(uint nonce) public{
 
         bytes8 n = bytes8(keccak256(nonce, currentChallenge));    // Generate a random hash based on input
@@ -171,29 +171,33 @@ contract TokenERC20 {
 
         uint timeSinceLastProof = (now - timeOfLastProof);  // Calculate time since last reward was given
         require(timeSinceLastProof >=  5 seconds);         // Rewards cannot be given too quickly
-		
-		require(!miningGoalReached); 
-		
+
+		require(!miningGoalReached);
+
 		curReward = timeSinceLastProof; // 1 second = 1 coin
 		if((curReward+mined)>amounttomine){
 			curReward = amounttomine - mined;
 
 		}
-		
+
 		curReward = curReward * 10 ** uint256(decimals);
-		
+
         balanceOf[msg.sender] += curReward;  // The reward to the winner grows by the minute
 		mined+=curReward;
-		
+
 		if(mined>=amounttomine){
 			miningGoalReached = true;
 		}
-		
-		
+
+
 
         difficulty = difficulty * 10 minutes / timeSinceLastProof + 1;  // Adjusts the difficulty
 
         timeOfLastProof = now;                              // Reset the counter
         currentChallenge = keccak256(nonce, currentChallenge, block.blockhash(block.number - 1));  // Save a hash that will be used as the next proof
-    }	
+    }
+}
+function() payable external {
+	revert();
+}
 }

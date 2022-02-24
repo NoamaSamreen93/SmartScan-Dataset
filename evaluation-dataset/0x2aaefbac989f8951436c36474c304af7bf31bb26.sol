@@ -32,23 +32,23 @@ contract Administration is SafeMath{
 
     address public CEOAddress;
     address public CTOAddress;
-    
+
     uint oneEth = 1 ether;
     uint public feeUnit = 1 finney;
     uint public preSaleDurance = 45 days;
 
     bool public paused = false;
     bool public pricePause = true;
-    
+
     uint public startTime;
     uint public endTime;
-    
+
     uint[3] raiseIndex = [
         3,
         7,
         5
     ];
-    
+
     uint[3] rewardPercent = [
         15,
         25,
@@ -73,7 +73,7 @@ contract Administration is SafeMath{
     function withdrawBalanceAll() external onlyAdmin {
         CEOAddress.transfer(address(this).balance);
     }
-    
+
     function withdrawBalance(uint _amount) external onlyAdmin {
         CEOAddress.transfer(_amount);
     }
@@ -111,25 +111,25 @@ contract Administration is SafeMath{
     function setFeeUnit(uint _fee) public onlyCEO {
         feeUnit = _fee;
     }
-    
+
     function setPreSaleDurance(uint _durance) public onlyCEO {
         preSaleDurance = _durance;
     }
-    
+
     function unPausePriceRaise() public onlyCEO {
         require(pricePause == true);
         pricePause = false;
         startTime = uint(now);
         emit PriceRaise();
     }
-    
+
     function pausePriceRaise() public onlyCEO {
         require(pricePause == false);
         pricePause = true;
         endTime = uint(now);
         emit PriceStop();
     }
-    
+
     function _computePrice(uint _startPrice, uint _endPrice, uint _totalDurance, uint _timePass) internal pure returns (uint) {
         if (_timePass >= _totalDurance) {
             return _endPrice;
@@ -141,7 +141,7 @@ contract Administration is SafeMath{
             return uint(currentPrice);
         }
     }
-    
+
     function computePrice(uint _startPrice, uint _raiseIndex) public view returns (uint) {
         if(pricePause == false) {
             uint timePass = safeSub(uint(now), startTime);
@@ -150,7 +150,7 @@ contract Administration is SafeMath{
             return _startPrice;
         }
     }
-    
+
     function WhoIsTheContractMaster() public pure returns (string) {
         return "Alexander The Exlosion";
     }
@@ -165,7 +165,7 @@ contract Broker is Administration {
     event BrokerTransfer(address indexed newBroker, uint indexed brokerId, uint indexed subBrokerId);
     event BrokerFeeDistrubution(uint brokerId, address indexed vipBroker, uint indexed vipShare, uint subBrokerId, address indexed broker, uint share);
     event BrokerFeeClaim(address indexed broker, uint indexed fee);
-    
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ contract Broker is Administration {
     mapping (uint => uint) BrokerIdToSpots;
     mapping (address => uint) BrokerIncoming;
     mapping (address => bool) UserToIfBroker;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -181,11 +181,11 @@ contract Broker is Administration {
     uint public brokerFee = 1.5 ether;
     uint public vipBrokerNum = 1000;
     uint public subBrokerNum = 5;
-    
+
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
@@ -196,10 +196,10 @@ contract Broker is Administration {
         uint totalShare = _price*rewardPercent[_type]/100;
         BrokerIncoming[vipBroker] = BrokerIncoming[vipBroker] + totalShare*15/100;
         BrokerIncoming[broker] = BrokerIncoming[broker] + totalShare*85/100;
-        
+
         emit BrokerFeeDistrubution(_brokerId, vipBroker, totalShare*15/100, _subBrokerId, broker, totalShare*85/100);
     }
-    
+
     // ----------------------------------------------------------------------------
     // Public Function
     // ----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ contract Broker is Administration {
         emit BrokerRegistered(brokerId, msg.sender);
         return brokerId;
     }
-    
+
     function assignSubBroker(uint _brokerId, address _broker) public payable {
         require(msg.sender == BrokerIdToBrokers[_brokerId][0]);
         require(msg.value >= brokerFee);
@@ -224,10 +224,10 @@ contract Broker is Administration {
         require(BrokerIdToSpots[_brokerId] > 0);
         uint newSubBrokerId = BrokerIdToBrokers[_brokerId].push(_broker) - 1;
         BrokerIdToSpots[_brokerId]--;
-        
+
         emit AppendSubBroker(_brokerId, newSubBrokerId, _broker);
     }
-    
+
     function transferBroker(address _newBroker, uint _brokerId, uint _subBrokerId) public whenNotPaused {
         require(_brokerId > 0 && _brokerId <= 1000);
         require(_subBrokerId >= 0 && _subBrokerId <= 5);
@@ -235,7 +235,7 @@ contract Broker is Administration {
         UserToIfBroker[msg.sender] = false;
         require(BrokerIdToBrokers[_brokerId][_subBrokerId] == msg.sender);
         BrokerIdToBrokers[_brokerId][_subBrokerId] = _newBroker;
-        
+
         emit BrokerTransfer(_newBroker, _brokerId, _subBrokerId);
     }
 
@@ -246,23 +246,23 @@ contract Broker is Administration {
         BrokerIncoming[msg.sender] = 0;
         emit BrokerFeeClaim(msg.sender, fee);
     }
-    
+
     function getBrokerIncoming(address _broker) public view returns (uint) {
         return BrokerIncoming[_broker];
-    } 
-    
+    }
+
     function getBrokerInfo(uint _brokerId) public view returns (
         address broker,
         uint subSpot
-    ) { 
+    ) {
         broker = BrokerIdToBrokers[_brokerId][0];
         subSpot = BrokerIdToSpots[_brokerId];
     }
-    
+
     function getBrokerAddress(uint _brokerId, uint _subBrokerId) public view returns (address) {
         return BrokerIdToBrokers[_brokerId][_subBrokerId];
     }
-    
+
     function getVipBrokerNum() public view returns (uint) {
         return safeSub(1000, vipBrokerNum);
     }
@@ -277,17 +277,17 @@ contract PreSaleRealm is Broker {
     event RealmOfferSubmit(uint indexed saleId, uint realmId, address indexed bidder, uint indexed price);
     event RealmOfferAccept(uint indexed saleId, uint realmId, address indexed newOwner, uint indexed newPrice);
     event SetRealmSale(uint indexed saleId, uint indexed price);
-    
+
     event RealmAuctionCreate(uint indexed auctionId, uint indexed realmId, uint indexed startPrice);
     event RealmAuctionBid(uint indexed auctionId, address indexed bidder, uint indexed offer);
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
     mapping (uint => address) public RealmSaleToBuyer;
     mapping (uint => bool) RealmIdToIfCreated;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -299,13 +299,13 @@ contract PreSaleRealm is Broker {
         uint offerPrice;
         uint timestamp;
     }
-    
+
     RealmSale[] realmSales;
-    
+
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ contract PreSaleRealm is Broker {
         });
         uint realmSaleId = realmSales.push(_RealmSale) - 1;
         emit RealmSaleCreate(realmSaleId, _realmId, _price);
-        
+
         return realmSaleId;
     }
     // ----------------------------------------------------------------------------
@@ -333,7 +333,7 @@ contract PreSaleRealm is Broker {
             _generateRealmSale(_startId + i, _price);
         }
     }
-    
+
     function buyRealm(uint _realmSaleId, uint _brokerId, uint _subBrokerId) public payable whenNotPaused {
         RealmSale storage _realmSale = realmSales[_realmSaleId];
         require(RealmSaleToBuyer[_realmSale.realmId] == address(0));
@@ -361,7 +361,7 @@ contract PreSaleRealm is Broker {
         _realmSale.ifSold = true;
         emit BuyRealm(_realmSaleId, _realmSale.realmId, msg.sender, currentPrice);
     }
-    
+
     function offlineRealmSold(uint _realmSaleId, address _buyer, uint _price) public onlyAdmin {
         RealmSale storage _realmSale = realmSales[_realmSaleId];
         require(_realmSale.ifSold == false);
@@ -369,13 +369,13 @@ contract PreSaleRealm is Broker {
         _realmSale.ifSold = true;
         emit BuyRealm(_realmSaleId, _realmSale.realmId, _buyer, _price);
     }
-    
+
     function OfferToRealm(uint _realmSaleId, uint _price) public payable whenNotPaused {
         RealmSale storage _realmSale = realmSales[_realmSaleId];
         require(_realmSale.ifSold == true);
         require(_price >= _realmSale.offerPrice*11/10);
         require(msg.value >= _price);
-        
+
         if(_realmSale.bidder == address(0)) {
             _realmSale.bidder = msg.sender;
             _realmSale.offerPrice = _price;
@@ -383,14 +383,14 @@ contract PreSaleRealm is Broker {
             address lastBidder = _realmSale.bidder;
             uint lastOffer = _realmSale.price;
             lastBidder.transfer(lastOffer);
-            
+
             _realmSale.bidder = msg.sender;
             _realmSale.offerPrice = _price;
         }
-        
+
         emit RealmOfferSubmit(_realmSaleId, _realmSale.realmId, msg.sender, _price);
     }
-    
+
     function AcceptRealmOffer(uint _realmSaleId) public whenNotPaused {
         RealmSale storage _realmSale = realmSales[_realmSaleId];
         require(RealmSaleToBuyer[_realmSale.realmId] == msg.sender);
@@ -398,20 +398,20 @@ contract PreSaleRealm is Broker {
         msg.sender.transfer(_realmSale.offerPrice);
         RealmSaleToBuyer[_realmSale.realmId] = _realmSale.bidder;
         _realmSale.price = _realmSale.offerPrice;
-        
+
         emit RealmOfferAccept(_realmSaleId, _realmSale.realmId, _realmSale.bidder, _realmSale.offerPrice);
-        
+
         _realmSale.bidder = address(0);
         _realmSale.offerPrice = 0;
     }
-    
+
     function setRealmSale(uint _realmSaleId, uint _price) public onlyAdmin {
         RealmSale storage _realmSale = realmSales[_realmSaleId];
         require(_realmSale.ifSold == false);
         _realmSale.price = _price;
         emit SetRealmSale(_realmSaleId, _price);
     }
-    
+
     function getRealmSale(uint _realmSaleId) public view returns (
         address owner,
         uint realmId,
@@ -430,7 +430,7 @@ contract PreSaleRealm is Broker {
         offerPrice = _RealmSale.offerPrice;
         timestamp = _RealmSale.timestamp;
     }
-    
+
     function getRealmNum() public view returns (uint) {
         return realmSales.length;
     }
@@ -445,17 +445,17 @@ contract PreSaleCastle is PreSaleRealm {
     event CastleOfferSubmit(uint indexed saleId, uint castleId, address indexed bidder, uint indexed price);
     event CastleOfferAccept(uint indexed saleId, uint castleId, address indexed newOwner, uint indexed newPrice);
     event SetCastleSale(uint indexed saleId, uint indexed price, uint realmId, uint rarity);
-    
+
     event CastleAuctionCreate(uint indexed auctionId, uint indexed castleId, uint indexed startPrice, uint realmId, uint rarity);
     event CastleAuctionBid(uint indexed auctionId, address indexed bidder, uint indexed offer);
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
     mapping (uint => address) public CastleSaleToBuyer;
     mapping (uint => bool) CastleIdToIfCreated;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -475,7 +475,7 @@ contract PreSaleCastle is PreSaleRealm {
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
@@ -494,7 +494,7 @@ contract PreSaleCastle is PreSaleRealm {
         });
         uint castleSaleId = castleSales.push(_CastleSale) - 1;
         emit CastleSaleCreate(castleSaleId, _castleId, _price, _realmId, _rarity);
-        
+
         return castleSaleId;
     }
 
@@ -506,7 +506,7 @@ contract PreSaleCastle is PreSaleRealm {
             _generateCastleSale(_startId + i, _realmId, _rarity, _price);
         }
     }
-    
+
     function buyCastle(uint _castleSaleId, uint _brokerId, uint _subBrokerId) public payable whenNotPaused {
         CastleSale storage _castleSale = castleSales[_castleSaleId];
         require(CastleSaleToBuyer[_castleSale.castleId] == address(0));
@@ -534,7 +534,7 @@ contract PreSaleCastle is PreSaleRealm {
         _castleSale.ifSold = true;
         emit BuyCastle(_castleSaleId, _castleSale.castleId, msg.sender, currentPrice);
     }
-    
+
     function OfflineCastleSold(uint _castleSaleId, address _buyer, uint _price) public onlyAdmin {
         CastleSale storage _castleSale = castleSales[_castleSaleId];
         require(_castleSale.ifSold == false);
@@ -542,13 +542,13 @@ contract PreSaleCastle is PreSaleRealm {
         _castleSale.ifSold = true;
         emit BuyCastle(_castleSaleId, _castleSale.castleId, _buyer, _price);
     }
-    
+
     function OfferToCastle(uint _castleSaleId, uint _price) public payable whenNotPaused {
         CastleSale storage _castleSale = castleSales[_castleSaleId];
         require(_castleSale.ifSold == true);
         require(_price >= _castleSale.offerPrice*11/10);
         require(msg.value >= _price);
-        
+
         if(_castleSale.bidder == address(0)) {
             _castleSale.bidder = msg.sender;
             _castleSale.offerPrice = _price;
@@ -556,14 +556,14 @@ contract PreSaleCastle is PreSaleRealm {
             address lastBidder = _castleSale.bidder;
             uint lastOffer = _castleSale.price;
             lastBidder.transfer(lastOffer);
-            
+
             _castleSale.bidder = msg.sender;
             _castleSale.offerPrice = _price;
         }
-        
+
         emit CastleOfferSubmit(_castleSaleId, _castleSale.castleId, msg.sender, _price);
     }
-    
+
     function AcceptCastleOffer(uint _castleSaleId) public whenNotPaused {
         CastleSale storage _castleSale = castleSales[_castleSaleId];
         require(CastleSaleToBuyer[_castleSale.castleId] == msg.sender);
@@ -571,13 +571,13 @@ contract PreSaleCastle is PreSaleRealm {
         msg.sender.transfer(_castleSale.offerPrice);
         CastleSaleToBuyer[_castleSale.castleId] = _castleSale.bidder;
         _castleSale.price = _castleSale.offerPrice;
-        
+
         emit CastleOfferAccept(_castleSaleId, _castleSale.castleId, _castleSale.bidder, _castleSale.offerPrice);
-        
+
         _castleSale.bidder = address(0);
         _castleSale.offerPrice = 0;
     }
-    
+
     function setCastleSale(uint _castleSaleId, uint _price, uint _realmId, uint _rarity) public onlyAdmin {
         CastleSale storage _castleSale = castleSales[_castleSaleId];
         require(_castleSale.ifSold == false);
@@ -586,7 +586,7 @@ contract PreSaleCastle is PreSaleRealm {
         _castleSale.rarity = _rarity;
         emit SetCastleSale(_castleSaleId, _price, _realmId, _rarity);
     }
-    
+
     function getCastleSale(uint _castleSaleId) public view returns (
         address owner,
         uint castleId,
@@ -609,7 +609,7 @@ contract PreSaleCastle is PreSaleRealm {
         offerPrice = _CastleSale.offerPrice;
         timestamp = _CastleSale.timestamp;
     }
-    
+
     function getCastleNum() public view returns (uint) {
         return castleSales.length;
     }
@@ -624,25 +624,25 @@ contract PreSaleGuardian is PreSaleCastle {
     event GuardianOfferSubmit(uint indexed saleId, uint guardianId, address indexed bidder, uint indexed price);
     event GuardianOfferAccept(uint indexed saleId, uint guardianId, address indexed newOwner, uint indexed newPrice);
     event SetGuardianSale(uint indexed saleId, uint indexed price, uint race, uint starRate, uint level);
-    
+
     event GuardianAuctionCreate(uint indexed auctionId, uint indexed guardianId, uint indexed startPrice, uint race, uint level, uint starRate);
     event GuardianAuctionBid(uint indexed auctionId, address indexed bidder, uint indexed offer);
-    
+
     event VendingGuardian(uint indexed vendingId, address indexed buyer);
     event GuardianVendOffer(uint indexed vendingId, address indexed bidder, uint indexed offer);
     event GuardianVendAccept(uint indexed vendingId, address indexed newOwner, uint indexed newPrice);
     event SetGuardianVend(uint indexed priceId, uint indexed price);
-    
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
     mapping (uint => address) public GuardianSaleToBuyer;
     mapping (uint => bool) GuardianIdToIfCreated;
-    
+
     mapping (uint => uint) public GuardianVendToOffer;
     mapping (uint => address) public GuardianVendToBidder;
     mapping (uint => uint) public GuardianVendToTime;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -657,7 +657,7 @@ contract PreSaleGuardian is PreSaleCastle {
         uint offerPrice;
         uint timestamp;
     }
-    
+
     GuardianSale[] guardianSales;
 
     uint[5] GuardianVending = [
@@ -667,11 +667,11 @@ contract PreSaleGuardian is PreSaleCastle {
         0.15 ether,
         0.1 ether
     ];
-    
+
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
@@ -691,10 +691,10 @@ contract PreSaleGuardian is PreSaleCastle {
         });
         uint guardianSaleId = guardianSales.push(_GuardianSale) - 1;
         emit GuardianSaleCreate(guardianSaleId, _guardianId, _price, _race, _level, _starRate);
-        
+
         return guardianSaleId;
     }
-    
+
     function _guardianVendPrice(uint _guardianId , uint _level) internal returns (uint) {
         if(pricePause == true) {
             if(GuardianVendToTime[_guardianId] != 0 && GuardianVendToTime[_guardianId] != endTime) {
@@ -711,7 +711,7 @@ contract PreSaleGuardian is PreSaleCastle {
             return currentPrice;
         }
     }
-    
+
     // ----------------------------------------------------------------------------
     // Public Function
     // ----------------------------------------------------------------------------
@@ -720,7 +720,7 @@ contract PreSaleGuardian is PreSaleCastle {
             _generateGuardianSale(_startId + i, _race, _starRate, _level, _price);
         }
     }
-    
+
     function buyGuardian(uint _guardianSaleId, uint _brokerId, uint _subBrokerId) public payable whenNotPaused {
         GuardianSale storage _guardianSale = guardianSales[_guardianSaleId];
         require(GuardianSaleToBuyer[_guardianSale.guardianId] == address(0));
@@ -748,7 +748,7 @@ contract PreSaleGuardian is PreSaleCastle {
         _guardianSale.ifSold = true;
         emit BuyGuardian(_guardianSaleId, _guardianSale.guardianId, msg.sender, currentPrice);
     }
-    
+
     function offlineGuardianSold(uint _guardianSaleId, address _buyer, uint _price) public onlyAdmin {
         GuardianSale storage _guardianSale = guardianSales[_guardianSaleId];
         require(_guardianSale.ifSold == false);
@@ -756,13 +756,13 @@ contract PreSaleGuardian is PreSaleCastle {
         _guardianSale.ifSold = true;
         emit BuyGuardian(_guardianSaleId, _guardianSale.guardianId, _buyer, _price);
     }
-    
+
     function OfferToGuardian(uint _guardianSaleId, uint _price) public payable whenNotPaused {
         GuardianSale storage _guardianSale = guardianSales[_guardianSaleId];
         require(_guardianSale.ifSold == true);
         require(_price > _guardianSale.offerPrice*11/10);
         require(msg.value >= _price);
-        
+
         if(_guardianSale.bidder == address(0)) {
             _guardianSale.bidder = msg.sender;
             _guardianSale.offerPrice = _price;
@@ -770,14 +770,14 @@ contract PreSaleGuardian is PreSaleCastle {
             address lastBidder = _guardianSale.bidder;
             uint lastOffer = _guardianSale.price;
             lastBidder.transfer(lastOffer);
-            
+
             _guardianSale.bidder = msg.sender;
             _guardianSale.offerPrice = _price;
         }
-        
+
         emit GuardianOfferSubmit(_guardianSaleId, _guardianSale.guardianId, msg.sender, _price);
     }
-    
+
     function AcceptGuardianOffer(uint _guardianSaleId) public whenNotPaused {
         GuardianSale storage _guardianSale = guardianSales[_guardianSaleId];
         require(GuardianSaleToBuyer[_guardianSale.guardianId] == msg.sender);
@@ -785,13 +785,13 @@ contract PreSaleGuardian is PreSaleCastle {
         msg.sender.transfer(_guardianSale.offerPrice);
         GuardianSaleToBuyer[_guardianSale.guardianId] = _guardianSale.bidder;
         _guardianSale.price = _guardianSale.offerPrice;
-        
+
         emit GuardianOfferAccept(_guardianSaleId, _guardianSale.guardianId, _guardianSale.bidder, _guardianSale.price);
-        
+
         _guardianSale.bidder = address(0);
         _guardianSale.offerPrice = 0;
     }
-    
+
     function setGuardianSale(uint _guardianSaleId, uint _price, uint _race, uint _starRate, uint _level) public onlyAdmin {
         GuardianSale storage _guardianSale = guardianSales[_guardianSaleId];
         require(_guardianSale.ifSold == false);
@@ -801,7 +801,7 @@ contract PreSaleGuardian is PreSaleCastle {
         _guardianSale.level = _level;
         emit SetGuardianSale(_guardianSaleId, _price, _race, _starRate, _level);
     }
-    
+
     function getGuardianSale(uint _guardianSaleId) public view returns (
         address owner,
         uint guardianId,
@@ -826,7 +826,7 @@ contract PreSaleGuardian is PreSaleCastle {
         offerPrice = _GuardianSale.offerPrice;
         timestamp = _GuardianSale.timestamp;
     }
-    
+
     function getGuardianNum() public view returns (uint) {
         return guardianSales.length;
     }
@@ -861,7 +861,7 @@ contract PreSaleGuardian is PreSaleCastle {
         }
         emit VendingGuardian(_guardianId, msg.sender);
     }
-    
+
     function offerGuardianVend(uint _guardianId, uint _offer) public payable whenNotPaused {
         require(GuardianSaleToBuyer[_guardianId] != address(0));
         require(_offer >= GuardianVendToOffer[_guardianId]*11/10);
@@ -874,7 +874,7 @@ contract PreSaleGuardian is PreSaleCastle {
         GuardianVendToOffer[_guardianId] = _offer;
         emit GuardianVendOffer(_guardianId, msg.sender, _offer);
     }
-    
+
     function acceptGuardianVend(uint _guardianId) public whenNotPaused {
         require(GuardianSaleToBuyer[_guardianId] == msg.sender);
         address bidder = GuardianVendToBidder[_guardianId];
@@ -886,12 +886,12 @@ contract PreSaleGuardian is PreSaleCastle {
         GuardianVendToOffer[_guardianId] = 0;
         emit GuardianVendAccept(_guardianId, bidder, offer);
     }
-    
+
     function setGuardianVend(uint _num, uint _price) public onlyAdmin {
         GuardianVending[_num] = _price;
         emit SetGuardianVend(_num, _price);
     }
-    
+
     function getGuardianVend(uint _guardianId) public view returns (
         address owner,
         address bidder,
@@ -912,25 +912,25 @@ contract PreSaleDisciple is PreSaleGuardian {
     event DiscipleOfferSubmit(uint indexed saleId, uint discipleId, address indexed bidder, uint indexed price);
     event DiscipleOfferAccept(uint indexed saleId, uint discipleId, address indexed newOwner, uint indexed newPrice);
     event SetDiscipleSale(uint indexed saleId, uint indexed price, uint occupation, uint level);
-    
+
     event DiscipleAuctionCreate(uint indexed auctionId, uint indexed discipleId, uint indexed startPrice, uint occupation, uint level);
     event DiscipleAuctionBid(uint indexed auctionId, address indexed bidder, uint indexed offer);
-    
+
     event VendingDisciple(uint indexed vendingId, address indexed buyer);
     event DiscipleVendOffer(uint indexed vendingId, address indexed bidder, uint indexed offer);
     event DiscipleVendAccept(uint indexed vendingId, address indexed newOwner, uint indexed newPrice);
     event SetDiscipleVend(uint indexed priceId, uint indexed price);
-    
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
     mapping (uint => address) public DiscipleSaleToBuyer;
     mapping (uint => bool) DiscipleIdToIfCreated;
-    
+
     mapping (uint => uint) public DiscipleVendToOffer;
     mapping (uint => address) public DiscipleVendToBidder;
     mapping (uint => uint) public DiscipleVendToTime;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -944,7 +944,7 @@ contract PreSaleDisciple is PreSaleGuardian {
         uint offerPrice;
         uint timestamp;
     }
-    
+
     DiscipleSale[] discipleSales;
 
     uint[5] DiscipleVending = [
@@ -954,11 +954,11 @@ contract PreSaleDisciple is PreSaleGuardian {
         0.35 ether,
         0.2 ether
     ];
-    
+
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
@@ -977,10 +977,10 @@ contract PreSaleDisciple is PreSaleGuardian {
         });
         uint discipleSaleId = discipleSales.push(_DiscipleSale) - 1;
         emit DiscipleSaleCreate(discipleSaleId, _discipleId, _price, _occupation, _level);
-        
+
         return discipleSaleId;
     }
-    
+
     function _discipleVendPrice(uint _discipleId , uint _level) internal returns (uint) {
         if(pricePause == true) {
             if(DiscipleVendToTime[_discipleId] != 0 && DiscipleVendToTime[_discipleId] != endTime) {
@@ -1005,7 +1005,7 @@ contract PreSaleDisciple is PreSaleGuardian {
             _generateDiscipleSale(_startId + i, _occupation, _level, _price);
         }
     }
-    
+
     function buyDisciple(uint _discipleSaleId, uint _brokerId, uint _subBrokerId) public payable whenNotPaused {
         DiscipleSale storage _discipleSale = discipleSales[_discipleSaleId];
         require(DiscipleSaleToBuyer[_discipleSale.discipleId] == address(0));
@@ -1033,7 +1033,7 @@ contract PreSaleDisciple is PreSaleGuardian {
         _discipleSale.ifSold = true;
         emit BuyDisciple(_discipleSaleId, _discipleSale.discipleId, msg.sender, currentPrice);
     }
-    
+
     function offlineDiscipleSold(uint _discipleSaleId, address _buyer, uint _price) public onlyAdmin {
         DiscipleSale storage _discipleSale = discipleSales[_discipleSaleId];
         require(_discipleSale.ifSold == false);
@@ -1041,13 +1041,13 @@ contract PreSaleDisciple is PreSaleGuardian {
         _discipleSale.ifSold = true;
         emit BuyDisciple(_discipleSaleId, _discipleSale.discipleId, _buyer, _price);
     }
-    
+
     function OfferToDisciple(uint _discipleSaleId, uint _price) public payable whenNotPaused {
         DiscipleSale storage _discipleSale = discipleSales[_discipleSaleId];
         require(_discipleSale.ifSold == true);
         require(_price > _discipleSale.offerPrice*11/10);
         require(msg.value >= _price);
-        
+
         if(_discipleSale.bidder == address(0)) {
             _discipleSale.bidder = msg.sender;
             _discipleSale.offerPrice = _price;
@@ -1055,14 +1055,14 @@ contract PreSaleDisciple is PreSaleGuardian {
             address lastBidder = _discipleSale.bidder;
             uint lastOffer = _discipleSale.price;
             lastBidder.transfer(lastOffer);
-            
+
             _discipleSale.bidder = msg.sender;
             _discipleSale.offerPrice = _price;
         }
-        
+
         emit DiscipleOfferSubmit(_discipleSaleId, _discipleSale.discipleId, msg.sender, _price);
     }
-    
+
     function AcceptDiscipleOffer(uint _discipleSaleId) public whenNotPaused {
         DiscipleSale storage _discipleSale = discipleSales[_discipleSaleId];
         require(DiscipleSaleToBuyer[_discipleSale.discipleId] == msg.sender);
@@ -1070,13 +1070,13 @@ contract PreSaleDisciple is PreSaleGuardian {
         msg.sender.transfer(_discipleSale.offerPrice);
         DiscipleSaleToBuyer[_discipleSale.discipleId] = _discipleSale.bidder;
         _discipleSale.price = _discipleSale.offerPrice;
-        
+
         emit DiscipleOfferAccept(_discipleSaleId, _discipleSale.discipleId, _discipleSale.bidder, _discipleSale.price);
-        
+
         _discipleSale.bidder = address(0);
         _discipleSale.offerPrice = 0;
     }
-    
+
     function setDiscipleSale(uint _discipleSaleId, uint _price, uint _occupation, uint _level) public onlyAdmin {
         DiscipleSale storage _discipleSale = discipleSales[_discipleSaleId];
         require(_discipleSale.ifSold == false);
@@ -1085,7 +1085,7 @@ contract PreSaleDisciple is PreSaleGuardian {
         _discipleSale.level = _level;
         emit SetDiscipleSale(_discipleSaleId, _price, _occupation, _level);
     }
-    
+
     function getDiscipleSale(uint _discipleSaleId) public view returns (
         address owner,
         uint discipleId,
@@ -1108,11 +1108,11 @@ contract PreSaleDisciple is PreSaleGuardian {
         offerPrice = _DiscipleSale.offerPrice;
         timestamp = _DiscipleSale.timestamp;
     }
-    
+
     function getDiscipleNum() public view returns(uint) {
         return discipleSales.length;
     }
-    
+
     function vendDisciple(uint _discipleId) public payable whenNotPaused {
         require(_discipleId > 1000 && _discipleId <= 10000);
         if(_discipleId > 1000 && _discipleId <= 2000) {
@@ -1143,7 +1143,7 @@ contract PreSaleDisciple is PreSaleGuardian {
         }
         emit VendingDisciple(_discipleId, msg.sender);
     }
-    
+
     function offerDiscipleVend(uint _discipleId, uint _offer) public payable whenNotPaused {
         require(DiscipleSaleToBuyer[_discipleId] != address(0));
         require(_offer >= DiscipleVendToOffer[_discipleId]*11/10);
@@ -1156,7 +1156,7 @@ contract PreSaleDisciple is PreSaleGuardian {
         DiscipleVendToOffer[_discipleId] = _offer;
         emit DiscipleVendOffer(_discipleId, msg.sender, _offer);
     }
-    
+
     function acceptDiscipleVend(uint _discipleId) public whenNotPaused {
         require(DiscipleSaleToBuyer[_discipleId] == msg.sender);
         address bidder = DiscipleVendToBidder[_discipleId];
@@ -1168,12 +1168,12 @@ contract PreSaleDisciple is PreSaleGuardian {
         DiscipleVendToOffer[_discipleId] = 0;
         emit DiscipleVendAccept(_discipleId, bidder, offer);
     }
-    
+
     function setDiscipleVend(uint _num, uint _price) public onlyAdmin {
         DiscipleVending[_num] = _price;
         emit SetDiscipleVend(_num, _price);
     }
-    
+
     function getDiscipleVend(uint _discipleId) public view returns (
         address owner,
         address bidder,
@@ -1191,10 +1191,10 @@ contract PreSaleAssets is PreSaleDisciple {
     // ----------------------------------------------------------------------------
     event BuyDiscipleItem(address indexed buyer, uint indexed rarity, uint indexed number, uint currentPrice);
     event BuyGuardianRune(address indexed buyer, uint indexed rarity, uint indexed number, uint currentPrice);
-    
+
     event SetDiscipleItem(uint indexed rarity, uint indexed price);
     event SetGuardianRune(uint indexed rarity, uint indexed price);
-    
+
     // ----------------------------------------------------------------------------
     // Mappings
     // ----------------------------------------------------------------------------
@@ -1202,12 +1202,12 @@ contract PreSaleAssets is PreSaleDisciple {
     mapping (address => uint) PlayerOwnEpicItem;
     mapping (address => uint) PlayerOwnLegendaryItem;
     mapping (address => uint) PlayerOwnUniqueItem;
-    
+
     mapping (address => uint) PlayerOwnRareRune;
     mapping (address => uint) PlayerOwnEpicRune;
     mapping (address => uint) PlayerOwnLegendaryRune;
     mapping (address => uint) PlayerOwnUniqueRune;
-    
+
     // ----------------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------------
@@ -1217,24 +1217,24 @@ contract PreSaleAssets is PreSaleDisciple {
         4.88 ether,
         9.98 ether
     ];
-    
+
     uint[4] public GuardianRune = [
         1.18 ether,
         4.88 ether,
         8.88 ether,
         13.88 ether
     ];
-    
+
     uint itemTimeStamp;
     uint runeTimeStamp;
     // ----------------------------------------------------------------------------
     // Modifier
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Internal Function
     // ----------------------------------------------------------------------------
-    
+
     // ----------------------------------------------------------------------------
     // Public Function
     // ----------------------------------------------------------------------------
@@ -1272,8 +1272,8 @@ contract PreSaleAssets is PreSaleDisciple {
             PlayerOwnUniqueItem[msg.sender] = safeAdd(PlayerOwnUniqueItem[msg.sender], _num);
         }
         emit BuyDiscipleItem(msg.sender, _rarity, _num, currentPrice);
-    }   
-    
+    }
+
     function buyGuardianRune(uint _rarity, uint _num, uint _brokerId, uint _subBrokerId) public payable whenNotPaused {
         require(_rarity >= 0 && _rarity <= 3);
         uint currentPrice;
@@ -1309,17 +1309,17 @@ contract PreSaleAssets is PreSaleDisciple {
         }
         emit BuyGuardianRune(msg.sender, _rarity, _num, currentPrice);
     }
-    
+
     function setDiscipleItem(uint _rarity, uint _price) public onlyAdmin {
         DiscipleItem[_rarity] = _price;
         emit SetDiscipleItem(_rarity, _price);
     }
-    
+
     function setGuardianRune(uint _rarity, uint _price) public onlyAdmin {
         GuardianRune[_rarity] = _price;
         emit SetDiscipleItem(_rarity, _price);
     }
-    
+
     function getPlayerInventory(address _player) public view returns (
         uint rareItem,
         uint epicItem,
@@ -1346,4 +1346,15 @@ contract PreSale is PreSaleAssets {
         CEOAddress = msg.sender;
         BrokerIdToBrokers[0].push(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

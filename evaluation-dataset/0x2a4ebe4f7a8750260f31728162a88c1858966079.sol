@@ -8,8 +8,8 @@ pragma solidity ^0.4.11;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
 contract DRIVRNetworkToken is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    string public constant name = "DRIVR Network";
    string public constant symbol = "DVR";
    uint256 public constant decimals = 18;
@@ -140,10 +140,21 @@ contract DRIVRNetworkToken is BasicToken,Ownable {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
       totalSupply = totalSupply.sub(tokenAmount);
     }
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

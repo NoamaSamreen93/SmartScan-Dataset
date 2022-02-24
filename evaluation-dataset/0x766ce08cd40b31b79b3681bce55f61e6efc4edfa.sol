@@ -300,7 +300,7 @@ contract Registry {
         address adminAddr;
         uint256 timestamp;
     }
-    
+
     // never remove any storage variables
     address public owner;
     address public pendingOwner;
@@ -623,12 +623,12 @@ contract ProxyStorage {
     address public pendingOwner;
 
     bool initialized;
-    
+
     BalanceSheet balances_Deprecated;
     AllowanceSheet allowances_Deprecated;
 
     uint256 totalSupply_;
-    
+
     bool private paused_Deprecated = false;
     address private globalPause_Deprecated;
 
@@ -675,8 +675,8 @@ pragma solidity >=0.4.25 <0.6.0;
 
 /**
  * @title HasOwner
- * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin. 
- and provides basic authorization control functions. Inherits storage layout of 
+ * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin.
+ and provides basic authorization control functions. Inherits storage layout of
  ProxyStorage.
  */
 contract HasOwner is ProxyStorage {
@@ -688,7 +688,7 @@ contract HasOwner is ProxyStorage {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -743,14 +743,14 @@ pragma solidity >=0.4.25 <0.6.0;
 
 
 contract ReclaimerToken is HasOwner {
-    /**  
+    /**
     *@dev send all eth balance in the contract to another address
     */
     function reclaimEther(address payable _to) external onlyOwner {
         _to.transfer(address(this).balance);
     }
 
-    /**  
+    /**
     *@dev send all token balance of an arbitary erc20 token
     in the contract to another address
     */
@@ -759,7 +759,7 @@ contract ReclaimerToken is HasOwner {
         token.transfer(_to, balance);
     }
 
-    /**  
+    /**
     *@dev allows owner of the contract to gain ownership of any contract that the contract currently owns
     */
     function reclaimContract(Ownable _ownable) external onlyOwner {
@@ -829,9 +829,9 @@ pragma solidity >=0.4.25 <0.6.0;
  */
 contract ModularStandardToken is ModularBasicToken {
     using SafeMath for uint256;
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -1074,7 +1074,7 @@ contract CompliantDepositTokenWithHook is ReclaimerToken, RegistryClone, Burnabl
         require(_value >= burnMin, "below min burn bound");
         require(_value <= burnMax, "exceeds max burn bound");
         _subBalance(_from, _value);
-        _subAllowance(_from, _spender, _value); 
+        _subAllowance(_from, _spender, _value);
         emit Transfer(_from, _to, _value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_to, _value);
@@ -1269,7 +1269,7 @@ contract OwnedUpgradeabilityProxy {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = 0x6004f6b6eb3de57beb988d207d67d1fd96d97f56565b653b6e80b856d7c1a35f;//keccak256("EURON.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = 0x76a33b3ea4443d67022b6c5254816af27c5cfd5c856e0422ce98ad937f4d709d;//keccak256("EURON.pending.proxy.owner");
@@ -1397,7 +1397,7 @@ contract OwnedUpgradeabilityProxy {
     */
     function() external payable {
         bytes32 position = implementationPosition;
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, returndatasize, calldatasize)
@@ -1426,8 +1426,8 @@ into two addresses. One, called the "owner" address, has unfettered control of t
 it can mint new tokens, transfer ownership of the contract, etc. However to make
 extra sure that EURON is never compromised, this owner key will not be used in
 day-to-day operations, allowing it to be stored at a heightened level of security.
-Instead, the owner appoints an various "admin" address. 
-There are 3 different types of admin addresses;  MintKey, MintRatifier, and MintPauser. 
+Instead, the owner appoints an various "admin" address.
+There are 3 different types of admin addresses;  MintKey, MintRatifier, and MintPauser.
 MintKey can request and revoke mints one at a time.
 MintPausers can pause individual mints or pause all mints.
 MintRatifiers can approve and finalize mints with enough approval.
@@ -1451,7 +1451,7 @@ contract TokenController {
         uint256 requestedBlock;
         uint256 numberOfApproval;
         bool paused;
-        mapping(address => bool) approved; 
+        mapping(address => bool) approved;
     }
 
     address public owner;
@@ -1464,12 +1464,12 @@ contract TokenController {
     uint256 public multiSigMintThreshold;
 
 
-    uint256 public instantMintLimit; 
-    uint256 public ratifiedMintLimit; 
+    uint256 public instantMintLimit;
+    uint256 public ratifiedMintLimit;
     uint256 public multiSigMintLimit;
 
-    uint256 public instantMintPool; 
-    uint256 public ratifiedMintPool; 
+    uint256 public instantMintPool;
+    uint256 public ratifiedMintPool;
     uint256 public multiSigMintPool;
     address[2] public ratifiedPoolRefillApprovals;
 
@@ -1480,7 +1480,7 @@ contract TokenController {
     uint256 public mintReqInvalidBeforeThisBlock; //all mint request before this block are invalid
     address public mintKey;
     MintOperation[] public mintOperations; //list of a mint requests
-    
+
     CompliantDepositTokenWithHook public token;
     OwnedUpgradeabilityProxy public token_proxy;
     Registry public registry;
@@ -1492,7 +1492,7 @@ contract TokenController {
 
     address constant public PAUSED_IMPLEMENTATION = 0xfA2350552ba1593E7D3Abd284C4d55ae26aAEa20; // ***To be changed the paused version of EURON in Production
 
-    
+
 
     modifier onlyFastPauseOrOwner() {
         require(msg.sender == fastPause || msg.sender == owner, "must be pauser or owner");
@@ -1532,11 +1532,11 @@ contract TokenController {
     event TransferChild(address indexed child, address indexed newOwner);
     event RequestReclaimContract(address indexed other);
     event SetToken(CompliantDepositTokenWithHook newContract);
-    
+
     event RequestMint(address indexed to, uint256 indexed value, uint256 opIndex, address mintKey);
     event FinalizeMint(address indexed to, uint256 indexed value, uint256 opIndex, address mintKey);
     event InstantMint(address indexed to, uint256 indexed value, address indexed mintKey);
-    
+
     event TransferMintKey(address indexed previousMintKey, address indexed newMintKey);
     event MintRatified(uint256 indexed opIndex, address indexed ratifier);
     event RevokeMint(uint256 opIndex);
@@ -1596,7 +1596,7 @@ contract TokenController {
         owner = pendingOwner;
         pendingOwner = address(0);
     }
-    
+
     /*
     ========================================
     proxy functions
@@ -1674,11 +1674,11 @@ contract TokenController {
             if (refillApprovals[0] == address(0)) {
                 ratifiedPoolRefillApprovals[0] = msg.sender;
                 return;
-            } 
+            }
             if (refillApprovals[1] == address(0)) {
                 ratifiedPoolRefillApprovals[1] = msg.sender;
                 return;
-            } 
+            }
         }
         delete ratifiedPoolRefillApprovals; // clears the whole array
         multiSigMintPool = multiSigMintPool.sub(ratifiedMintLimit.sub(ratifiedMintPool));
@@ -1721,7 +1721,7 @@ contract TokenController {
 
 
     /**
-     * @dev ratifier ratifies a request mint. If the number of ratifiers that signed off is greater than 
+     * @dev ratifier ratifies a request mint. If the number of ratifiers that signed off is greater than
      the number of approvals required, the request is finalized
      * @param _index the index of the requestMint to ratify
      * @param _to the address to mint to
@@ -1800,7 +1800,7 @@ contract TokenController {
         return true;
     }
 
-    /** 
+    /**
     *@dev revoke a mint request, Delete the mintOperation
     *@param index of the request (visible in the RequestMint event accompanying the original request)
     */
@@ -1819,8 +1819,8 @@ contract TokenController {
     ========================================
     */
 
-    /** 
-    *@dev Replace the current mintkey with new mintkey 
+    /**
+    *@dev Replace the current mintkey with new mintkey
     *@param _newMintKey address of the new mintKey
     */
     function transferMintKey(address _newMintKey) external onlyOwner {
@@ -1828,37 +1828,37 @@ contract TokenController {
         emit TransferMintKey(mintKey, _newMintKey);
         mintKey = _newMintKey;
     }
- 
+
     /*
     ========================================
     Mint Pausing
     ========================================
     */
 
-    /** 
-    *@dev invalidates all mint request initiated before the current block 
+    /**
+    *@dev invalidates all mint request initiated before the current block
     */
     function invalidateAllPendingMints() external onlyOwner {
         mintReqInvalidBeforeThisBlock = block.number;
     }
 
-    /** 
-    *@dev pause any further mint request and mint finalizations 
+    /**
+    *@dev pause any further mint request and mint finalizations
     */
     function pauseMints() external onlyMintPauserOrOwner {
         mintPaused = true;
         emit AllMintsPaused(true);
     }
 
-    /** 
-    *@dev unpause any further mint request and mint finalizations 
+    /**
+    *@dev unpause any further mint request and mint finalizations
     */
     function unpauseMints() external onlyOwner {
         mintPaused = false;
         emit AllMintsPaused(false);
     }
 
-    /** 
+    /**
     *@dev pause a specific mint request
     *@param  _opIndex the index of the mint request the caller wants to pause
     */
@@ -1867,7 +1867,7 @@ contract TokenController {
         emit MintPaused(_opIndex, true);
     }
 
-    /** 
+    /**
     *@dev unpause a specific mint request
     *@param  _opIndex the index of the mint request the caller wants to unpause
     */
@@ -1882,7 +1882,7 @@ contract TokenController {
     ========================================
     */
 
-    /** 
+    /**
     *@dev Set Transfer Fee
     */
 
@@ -1890,7 +1890,7 @@ contract TokenController {
         token.setTransferFee(transferFee);
     }
 
-    /** 
+    /**
     *@dev Update this contract's token pointer to newContract (e.g. if the
     contract is upgraded)
     */
@@ -1900,7 +1900,7 @@ contract TokenController {
         emit SetToken(token);
     }
 
-    /** 
+    /**
     *@dev Update this contract's registry pointer to _registry
     */
     function setRegistry(Registry _registry) external onlyOwner {
@@ -1908,7 +1908,7 @@ contract TokenController {
         emit SetRegistry( address(registry));
     }
 
-    /** 
+    /**
     *@dev Swap out token's permissions registry
     *@param _registry new registry for token
     */
@@ -1916,7 +1916,7 @@ contract TokenController {
         token.setRegistry(_registry);
     }
 
-    /** 
+    /**
     *@dev Claim ownership of an arbitrary HasOwner contract
     */
     function issueClaimOwnership(address _other) public onlyOwner {
@@ -1924,10 +1924,10 @@ contract TokenController {
         other.claimOwnership();
     }
 
-    /** 
+    /**
     *@dev Transfer ownership of _child to _newOwner.
     Can be used e.g. to upgrade this TokenController contract.
-    *@param _child contract that tokenController currently Owns 
+    *@param _child contract that tokenController currently Owns
     *@param _newOwner new owner/pending owner of _child
     */
     function transferChild(HasOwner _child, address _newOwner) external onlyOwner {
@@ -1935,7 +1935,7 @@ contract TokenController {
         emit TransferChild(address(_child), _newOwner);
     }
 
-    /** 
+    /**
     *@dev Transfer ownership of a contract from token to this TokenController.
     Can be used e.g. to reclaim balance sheet
     in order to transfer it to an upgraded EURON contract.
@@ -1946,24 +1946,24 @@ contract TokenController {
         emit RequestReclaimContract( address(_other));
     }
 
-    /** 
-    *@dev send all ether in token address to the owner of tokenController 
+    /**
+    *@dev send all ether in token address to the owner of tokenController
     */
     function requestReclaimEther() external onlyOwner {
         address payable owners_address = address( uint160(owner));
         token.reclaimEther(owners_address);
     }
 
-    /** 
+    /**
     *@dev transfer all tokens of a particular type in token address to the
-    owner of tokenController 
+    owner of tokenController
     *@param _token token address of the token to transfer
     */
     function requestReclaimToken(ERC20 _token) external onlyOwner {
         token.reclaimToken(_token, owner);
     }
 
-    /** 
+    /**
     *@dev set new contract to which specified address can send eth to to quickly pause token
     *@param _newFastPause address of the new contract
     */
@@ -1972,14 +1972,14 @@ contract TokenController {
         emit FastPauseSet(_newFastPause);
     }
 
-    /** 
+    /**
     *@dev pause all pausable actions on EURON, mints/burn/transfer/approve
     */
     function pauseToken() external onlyFastPauseOrOwner {
         OwnedUpgradeabilityProxy(token_proxy).upgradeTo(PAUSED_IMPLEMENTATION);
     }
-    
-    /** 
+
+    /**
     *@dev wipe balance of a blacklisted address
     *@param _blacklistedAddress address whose balance will be wiped
     */
@@ -1987,7 +1987,7 @@ contract TokenController {
         token.wipeBlacklistedAccount(_blacklistedAddress);
     }
 
-    /** 
+    /**
     *@dev Change the minimum and maximum amounts that EURON users can
     burn to newMin and newMax
     *@param _min minimum amount user can burn at a time
@@ -1997,7 +1997,7 @@ contract TokenController {
         token.setBurnBounds(_min, _max);
     }
 
-    /** 
+    /**
     *@dev Owner can send ether balance in contract address
     *@param _to address to which the funds will be send to
     */
@@ -2005,7 +2005,7 @@ contract TokenController {
         _to.transfer(address(this).balance);
     }
 
-    /** 
+    /**
     *@dev Owner can send erc20 token balance in contract address
     *@param _token address of the token to send
     *@param _to address to which the funds will be send to
@@ -2014,4 +2014,10 @@ contract TokenController {
         uint256 balance = _token.balanceOf(address(this));
         _token.transfer(_to, balance);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

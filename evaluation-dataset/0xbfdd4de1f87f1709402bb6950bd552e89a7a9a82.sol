@@ -1,27 +1,27 @@
 pragma solidity ^0.5.3;
 
-contract Ownable 
+contract Ownable
 {
     address private owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    constructor() public 
+    constructor() public
     {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner, "Only owner can call this function.");
         _;
     }
 
-    function isOwner() public view returns(bool) 
+    function isOwner() public view returns(bool)
     {
         return msg.sender == owner;
     }
 
-    function transferOwnership(address newOwner) public onlyOwner 
+    function transferOwnership(address newOwner) public onlyOwner
     {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
@@ -34,7 +34,7 @@ contract IERC20
     uint256 public tokenTotalSupply;
     string private tokenName;
     string private tokenSymbol;
-    
+
     function balanceOf(address who) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
     function transfer(address to, uint256 value) external returns (bool);
@@ -59,8 +59,8 @@ contract IERC223 is IERC20
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
-contract IERC223Receiver 
-{ 
+contract IERC223Receiver
+{
     function tokenFallback(address from, address sender, uint value, bytes memory data) public returns (bool);
 }
 
@@ -83,11 +83,11 @@ contract IMigrationSource
     function finalizeMigration() external;
 }
 
-library SafeMath 
+library SafeMath
 {
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -97,28 +97,28 @@ library SafeMath
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b > 0, "Division error.");
         uint256 c = a / b;
         return c;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b <= a, "Subtraction error.");
         uint256 c = a - b;
         return c;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         require(c >= a, "Adding error.");
         return c;
     }
 
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mod(uint256 a, uint256 b) internal pure returns (uint256)
     {
         require(b != 0, "Mod error.");
         return a % b;
@@ -141,27 +141,27 @@ contract EggToken is IERC223, Ownable, IMigrationSource
     IMigrationAgent private migrationAgentContract;
     bool private isMigrated;
     bool private isCrowdsaleSet;
-    
+
     address private owner;
-    
-    constructor(string memory name, 
-                string memory symbol, 
-                uint256 totalSupply, 
-                address developmentTeamAddress, 
-                uint256 developmentTeamBalance, 
-                address marketingTeamAddress, 
-                uint256 marketingTeamBalance, 
-                address productTeamAddress, 
-                uint256 productTeamBalance, 
+
+    constructor(string memory name,
+                string memory symbol,
+                uint256 totalSupply,
+                address developmentTeamAddress,
+                uint256 developmentTeamBalance,
+                address marketingTeamAddress,
+                uint256 marketingTeamBalance,
+                address productTeamAddress,
+                uint256 productTeamBalance,
                 address airdropAddress,
-                uint256 airdropBalance) public 
+                uint256 airdropBalance) public
     {
         tokenName = name;
         tokenSymbol = symbol;
         tokenDecimals = 18;
 
         tokenTotalSupply = totalSupply;
-        
+
         balances[developmentTeamAddress] = developmentTeamBalance;
         balances[marketingTeamAddress] = marketingTeamBalance;
         balances[productTeamAddress] = productTeamBalance;
@@ -175,25 +175,25 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         tokenTotalSupply = tokenTotalSupply.add(crowdsaleBalance);
         balances[crowdsaleAddress] = crowdsaleBalance;
     }
-    
-    function approve(address spender, uint256 value) validAddress(spender) external returns (bool) 
+
+    function approve(address spender, uint256 value) validAddress(spender) external returns (bool)
     {
         allowances[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
-    function transfer(address to, uint256 value) external returns (bool) 
+
+    function transfer(address to, uint256 value) external returns (bool)
     {
         return transfer(to, value, new bytes(0));
     }
-    
+
     function transferFrom(address from, address to, uint256 value) external returns (bool)
     {
         return transferFrom(from, to, value, new bytes(0));
     }
-    
-    function transferBatch(address[] calldata to, uint256 value) external returns (bool) 
+
+    function transferBatch(address[] calldata to, uint256 value) external returns (bool)
     {
         return transferBatch(to, value, new bytes(0));
     }
@@ -232,7 +232,7 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         balances[msg.sender] = balances[msg.sender].sub(totalValue);
 
         uint256 i = 0;
-        while (i < to.length) 
+        while (i < to.length)
         {
             checkAddressValidity(to[i]);
             balances[to[i]] = balances[to[i]].add(value);
@@ -247,26 +247,26 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         return true;
     }
 
-    function contractFallback(address sender, address to, uint256 value, bytes memory data) private returns (bool) 
+    function contractFallback(address sender, address to, uint256 value, bytes memory data) private returns (bool)
     {
         IERC223Receiver reciever = IERC223Receiver(to);
         return reciever.tokenFallback(msg.sender, sender, value, data);
     }
 
-    function isContract(address to) internal view returns (bool) 
+    function isContract(address to) internal view returns (bool)
     {
         uint length;
         assembly { length := extcodesize(to) }
         return length > 0;
     }
-    
+
     function increaseAllowance(address spender, uint256 addedValue) validAddress(spender) external returns (bool)
     {
         allowances[msg.sender][spender] = allowances[msg.sender][spender].add(addedValue);
         emit Approval(msg.sender, spender, allowances[msg.sender][spender]);
         return true;
     }
-    
+
     function decreaseAllowance(address spender, uint256 subtractedValue) validAddress(spender) external returns (bool)
     {
         allowances[msg.sender][spender] = allowances[msg.sender][spender].sub(subtractedValue);
@@ -274,7 +274,7 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         return true;
     }
 
-    function burnOwnTokens(uint256 amountToBurn) enoughBalance(msg.sender, amountToBurn) external 
+    function burnOwnTokens(uint256 amountToBurn) enoughBalance(msg.sender, amountToBurn) external
     {
         require(balances[msg.sender] >= amountToBurn, "Can't burn more tokens than you own.");
         tokenTotalSupply = tokenTotalSupply.sub(amountToBurn);
@@ -282,16 +282,16 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         emit Transfer(msg.sender, address(0), amountToBurn, new bytes(0));
     }
 
-    function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success)
     {
         return IERC20(tokenAddress).transfer(owner, tokens);
     }
 
-    function balanceOf(address balanceOwner) external view returns (uint256) 
+    function balanceOf(address balanceOwner) external view returns (uint256)
     {
         return balances[balanceOwner];
     }
-    
+
     function allowance(address balanceOwner, address spender) external view returns (uint256)
     {
         return allowances[balanceOwner][spender];
@@ -309,18 +309,18 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         return tokenDecimals;
     }
 
-    function totalSupply() external view returns (uint256) 
+    function totalSupply() external view returns (uint256)
     {
         return tokenTotalSupply;
     }
 
-    modifier validAddress(address _address) 
+    modifier validAddress(address _address)
     {
         checkAddressValidity(_address);
         _;
     }
 
-    modifier enoughBalance(address from, uint256 value) 
+    modifier enoughBalance(address from, uint256 value)
     {
         checkBalance(from, value);
         _;
@@ -336,7 +336,7 @@ contract EggToken is IERC223, Ownable, IMigrationSource
     {
         require(value <= balances[from], "Specified address has less tokens than required for this operation.");
     }
-    
+
     function setMigrationAgent(address agent) onlyOwner validAddress(agent) external
     {
         require(migrationAgentAddress == address(0), "Migration Agent was specified already.");
@@ -363,4 +363,13 @@ contract EggToken is IERC223, Ownable, IMigrationSource
         migrationAgentAddress = address(0);
         isMigrated = true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

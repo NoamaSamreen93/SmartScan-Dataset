@@ -37,7 +37,7 @@ function registerUsername(address _targetAddress, bytes32 _name, bytes32 _userId
     _requireBalance();
     require(isNameAvailable(_name), "The name was already taken");
     require(isUserIdAvailable(_userId), "The userId already has a name");
-    
+
     manaToken.transferFrom(_targetAddress, address(this), price);
     manaToken.burn(price);
 
@@ -68,6 +68,17 @@ function _requireBalance() internal view {
     require(
         manaToken.allowance(msg.sender, address(this)) >= price,
         "The contract is not authorized to use MANA on sender behalf"
-    );        
+    );
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

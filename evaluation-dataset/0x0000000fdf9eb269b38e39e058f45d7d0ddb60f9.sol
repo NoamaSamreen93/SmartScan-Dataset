@@ -5,7 +5,7 @@
  * Uses code from the OpenZeppelin project
  */
 
- 
+
 // File: contracts/openzeppelin-solidity/contracts/ownership/Ownable.sol
 
 pragma solidity ^0.5.6;
@@ -247,4 +247,15 @@ contract InvictusWhitelist is Ownable, WhitelistedRole {
         require(account != msg.sender, "Use renounceWhitelistAdmin");
         _removeWhitelistAdmin(account);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

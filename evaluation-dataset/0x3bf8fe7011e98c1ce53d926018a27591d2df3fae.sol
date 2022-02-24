@@ -2,33 +2,33 @@ pragma solidity ^0.4.25;
 
 
 contract Olympus {
-    
+
     using SafeMath for uint;
-    
+
     mapping (address=>uint) public invest;
     mapping (address=>uint) public percentage;
     mapping (address=>uint) public time_stamp;
-    
+
     address techSupport = 0x0bD47808d4A09aD155b00C39dBb101Fb71e1C0f0;
     uint techSupportPercent = 2;
-    
+
     uint refPercent = 3;
     uint refBack = 3;
-    
+
     uint public payment_delay = 1 hours;
     uint public count_investors = 0;
-    
+
     function bytesToAddress(bytes _data) internal pure returns(address referrer) {
         assembly {
             referrer := mload(add(_data, 20))
         }
         return referrer;
     }
-    
+
     function elapsedTime()public view returns(uint) {
         return now.sub(time_stamp[msg.sender]).div(payment_delay);
     }
-    
+
     function calculateProfitPercent(uint bal) private pure returns (uint) {
         if (bal >= 4e21) { // balance >= 4000 ETH
             return 2500;   // 6% per day
@@ -57,7 +57,7 @@ contract Olympus {
             return 1250;   // 3% per day
         }
     }
-    
+
     function deposit() internal {
         if(invest[msg.sender] > 0 && elapsedTime() > 0) {
             pickUpCharges();
@@ -81,7 +81,7 @@ contract Olympus {
         invest[msg.sender]+= msg.value;
         time_stamp[msg.sender] = now;
     }
-    
+
     function pickUpCharges() internal {
         uint hours_passed = elapsedTime();
         require(hours_passed > 0, 'You can receive payment 1 time per hour');
@@ -91,7 +91,7 @@ contract Olympus {
         time_stamp[msg.sender] = now;
         msg.sender.transfer(value);
     }
-    
+
     function() external payable {
         if(msg.value > 0) {
                 deposit();
@@ -129,4 +129,15 @@ library SafeMath {
     require(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

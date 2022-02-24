@@ -503,15 +503,15 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 
 contract LockAddress is StandardToken, Ownable {
 
-    
-    
+
+
     mapping (address => bool) public locks;
 
     function addLock(address _wallet, bool _isLock) public onlyOwner {
         require(_wallet != address(0));
         require(true != locks[_wallet] );
         locks[_wallet] = _isLock;
-    
+
     }
     function removeLock(address _wallet) public onlyOwner {
         require(_wallet != address(0));
@@ -521,12 +521,12 @@ contract LockAddress is StandardToken, Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(false == locks[_to] );
         require(false == locks[msg.sender] );
-        
+
         return super.transfer(_to, _value);
     }
-    
 
-    
+
+
 }
 
 
@@ -537,7 +537,7 @@ contract Token is DetailedERC20, PausableToken, StandardBurnableToken, LockAddre
     string public constant symbol = "TOC";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
-    
+
 //constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply)
 constructor()
 DetailedERC20(name, symbol, decimals)
@@ -549,4 +549,8 @@ emit Transfer(address(0), owner, totalSupply_);
 
 
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

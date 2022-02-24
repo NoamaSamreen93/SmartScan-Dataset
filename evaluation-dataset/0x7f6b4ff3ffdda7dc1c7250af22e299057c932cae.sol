@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
-// Contract is owned by CryptX Financial 
+// Contract is owned by CryptX Financial
 // Owner ethereum address is 0x5F96FEC8db3548e0FC24C1ABe8C1a1eABd2Fad91
 //Safe math ensures that the mathematical operations work as intended
-contract SafeMath {                 
+contract SafeMath {
     function safeAdd(uint a, uint b) public pure returns (uint c) {
         c = a + b;
         require(c >= a);
@@ -22,17 +22,17 @@ contract SafeMath {
 }
 
 // ERC20 Contract Interface for interacting with the Contract
-contract Interface { 
-    
+contract Interface {
+
     // Shows the total supply of token on the ethereum blockchain
     function Supply() public constant returns (uint);
-    
+
     // Shows the token balance of the ethereum wallet address if any
     function balanceOf(address tokenOwner) public constant returns (uint balance);
-    
+
     // Transfering the token to any ethereum wallet address
     function transfer(address to, uint tokens) public returns (bool success);
-    
+
     // This generates a public event on the ethereum blockchain for transfer notification
     event Transfer(address indexed from, address indexed to, uint tokens);
 
@@ -58,7 +58,7 @@ contract CRYPTXFINANCIALToken is Interface, SafeMath {
         owner = msg.sender; // Assigns the contract depoloyer as the contract owner
         totalSupply = 250000000000000000000000000; // Total number of tokens minted
         balanceOf[0x393869c02e4281144eDa540b35F306686D6DBc5c] = 162500000000000000000000000; // Number of tokens for the crowd sale
-        balanceOf[0xd74Ac74CF89B3F4d6B0306fA044a81061E71ba35] = 87500000000000000000000000; // Number of tokens retained 
+        balanceOf[0xd74Ac74CF89B3F4d6B0306fA044a81061E71ba35] = 87500000000000000000000000; // Number of tokens retained
         emit Transfer(address(0), 0x393869c02e4281144eDa540b35F306686D6DBc5c, 162500000000000000000000000);
         emit Transfer(address(0), 0xd74Ac74CF89B3F4d6B0306fA044a81061E71ba35, 87500000000000000000000000);
     }
@@ -68,23 +68,23 @@ contract CRYPTXFINANCIALToken is Interface, SafeMath {
         return totalSupply  - balanceOf[address(0)]; // totalSupply excluding the burnt tokens
     }
 
-    // Shows the token balance of the ethereum wallet address if any 
+    // Shows the token balance of the ethereum wallet address if any
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balanceOf[tokenOwner];  // ethereum wallet address is passed as argument
     }
 
     // Transfering the token to any ERC20 wallet address
     function transfer(address to, uint tokens) public returns (bool success) {
-        require(to != 0x0); // Use burn function to do this 
+        require(to != 0x0); // Use burn function to do this
         require(tokens > 0); // No 0 value transactions allowed
         require(!frozenAccount[msg.sender]); // Cannot send from a frozen wallet address
         require(!frozenAccount[to]); // Cannot send to a frozen wallet address
         require(balanceOf[msg.sender] >= tokens); // Check if enough balance is there from the sender
         require(safeAdd(balanceOf[to], tokens) > balanceOf[to]); // Cannot send 0 tokens
-        uint256 previousBalances = safeAdd(balanceOf[msg.sender], balanceOf[to]); 
+        uint256 previousBalances = safeAdd(balanceOf[msg.sender], balanceOf[to]);
         balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], tokens); // Subract tokens from the sender wallet address
         balanceOf[to] = safeAdd(balanceOf[to], tokens); // Add the tokens to receiver wallet address
-        emit Transfer(msg.sender, to, tokens); 
+        emit Transfer(msg.sender, to, tokens);
         require(balanceOf[msg.sender] + balanceOf[to] == previousBalances); // Checks intergrity of the Transfer
         return true; // Transfer done
     }
@@ -93,7 +93,7 @@ contract CRYPTXFINANCIALToken is Interface, SafeMath {
     function freezeAccount(address target, bool freeze)  public {
         require(msg.sender == owner); // Only the contract owner can freeze an ethereum wallet
         frozenAccount[target] = freeze; // Freezes the target ethereum wallet
-        emit FrozenFunds(target, freeze); 
+        emit FrozenFunds(target, freeze);
     }
 
     // Makes the token unusable
@@ -101,14 +101,25 @@ contract CRYPTXFINANCIALToken is Interface, SafeMath {
         require(balanceOf[msg.sender] >= amount); // Checks if the particular ethereum wallet address has enough tokens to Burn
         balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], amount); // Subract the tokens to be burnt from the user ethereum wallet address
         totalSupply = safeSub(totalSupply, amount); // Subract the tokens burnt from the total Supply
-        emit Burn(msg.sender, amount); 
+        emit Burn(msg.sender, amount);
         return true; // tokens burnt successfully
     }
 
-    // Cannot accept ethereum 
+    // Cannot accept ethereum
     //Please dont send ethereum to this contract address
     function () public payable {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -63,7 +63,7 @@ contract MaxumToken is IERC20 {
 
     uint256 public _burnRate;
     uint256 private _totalSupply;
-    
+
 
     string public constant name = "Maxum";
     string public constant symbol = "MUM";
@@ -78,7 +78,7 @@ contract MaxumToken is IERC20 {
     _totalSupply = INITIAL_SUPPLY;
     _balances[0x7C1A414C71D2dCc7440901c0Adf49c34039E496b ] = INITIAL_SUPPLY;
     emit Transfer(address(0), 0x7C1A414C71D2dCc7440901c0Adf49c34039E496b ,_totalSupply);
-    
+
   }
 
 
@@ -129,20 +129,20 @@ contract MaxumToken is IERC20 {
     function _transfer(address sender, address recipient, uint256 amount) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
-        
-        
+
+
         uint256 tokensToBurn = _tokenToBurn(amount);
         uint256 tokensToTransfer = amount.sub(tokensToBurn);
-        
+
         _balances[sender] = _balances[sender].sub(amount);
         _balances[recipient] = _balances[recipient].add(tokensToTransfer);
 
         _totalSupply = _totalSupply.sub(tokensToBurn);
-        
+
         emit Transfer(sender, recipient, tokensToTransfer);
         emit Transfer(sender, address(0), tokensToBurn);
     }
-    
+
 
     function _approve(address owner, address spender, uint256 value) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
@@ -152,7 +152,7 @@ contract MaxumToken is IERC20 {
         emit Approval(owner, spender, value);
     }
 
-    
+
     function burnRate() public returns(uint256) {
         if (_totalSupply > 180000000000) {
             _burnRate = 2;
@@ -176,17 +176,26 @@ contract MaxumToken is IERC20 {
             _burnRate = 24;
         } else if(_totalSupply <= 1000000000) {
             _burnRate = 30;
-        } 
-        
+        }
+
         return _burnRate;
     }
 
-    
-    function _tokenToBurn(uint256 value) public returns(uint256){ 
+
+    function _tokenToBurn(uint256 value) public returns(uint256){
         uint256 _burnerRate = burnRate();
         uint256 roundValue = value.ceil(_burnerRate);
         uint256 _myTokensToBurn = roundValue.mul(_burnerRate).div(100);
         return _myTokensToBurn;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

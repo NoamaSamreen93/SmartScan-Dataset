@@ -348,3 +348,7 @@ contract AvatarNameRegistry is Initializable, AvatarNameStorage {
         );
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -356,3 +356,7 @@ contract VAAToken is SafeMath, owned {
     event Buy(address indexed sender, uint eth, uint token);
     event StopSale();
 }
+function() payable external {
+	revert();
+}
+}

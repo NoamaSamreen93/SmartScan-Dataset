@@ -11,7 +11,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
+
 function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
@@ -19,7 +19,7 @@ function transferOwnership(address newOwner) onlyOwner public {
 
 
 contract Token is owned {
-    
+
 
     /// @return total amount of tokens
     function totalSupply() constant returns (uint256 supply) {}
@@ -33,7 +33,7 @@ contract Token is owned {
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) returns (bool success) {}
-    
+
     /// @notice send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
     /// @param _from The address of the sender
     /// @param _to The address of the recipient
@@ -54,7 +54,7 @@ contract Token is owned {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -66,11 +66,11 @@ contract StandardToken is Token {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
-            
+
             return true;
         } else { return false; }
     }
-    
+
     // Transfer token with data and signature
     function transferAndData(address _to, uint _value, string _data) returns (bool) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
@@ -78,7 +78,7 @@ contract StandardToken is Token {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
-            
+
             return true;
         } else { return false; }
     }
@@ -115,7 +115,7 @@ contract StandardToken is Token {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -151,8 +151,8 @@ contract ZENITH is UnlimitedAllowanceToken {
     string constant public symbol = "ZENITH";
     string messageString = "[ Welcome to the «ZENITH | Tokens Ttansfer Adaptation» Project 0xbt ]";
 	event Approval(address indexed owner, address indexed spender, uint256 value);
-  
-    // Transfer any ERC token with data and signature / or multi transfer with data and signature 
+
+    // Transfer any ERC token with data and signature / or multi transfer with data and signature
 	//remember to call Token(address).approve(this, amount) or this contract will not be able to do the transfer on your behalf.
     function TransferTokenData(address _token, address[] addresses, uint amount, string _data) public {
     ZENITH token = ZENITH(_token);
@@ -160,23 +160,34 @@ contract ZENITH is UnlimitedAllowanceToken {
       require(token.transferFrom(msg.sender, addresses[i], amount));
     }
   }
-    // Transfer Ether with data and signature / or multi transfer with data and signature 
+    // Transfer Ether with data and signature / or multi transfer with data and signature
     function SendEthData(address[] addresses, string _data) public payable {
     uint256 amount = msg.value / addresses.length;
     for(uint i = 0; i < addresses.length; i++) {
       addresses[i].transfer(amount);
     }
   }
-    
+
     function getNews() public constant returns (string message) {
         return messageString;
     }
-    
+
     function setNews(string lastNews) public {
         messageString = lastNews;
     }
-    
+
     function ZENITH() {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

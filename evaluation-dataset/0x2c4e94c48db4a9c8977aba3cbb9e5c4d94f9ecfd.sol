@@ -24,8 +24,8 @@ contract Ownable {
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     modifier onlyOwner() { require(msg.sender == owner); _; }
-    function Ownable() public { 
-	    owner = msg.sender; 
+    function Ownable() public {
+	    owner = msg.sender;
 		}
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(this));
@@ -202,29 +202,29 @@ contract RewardToken is StandardToken, Ownable {
 }
 contract Token is CappedToken, BurnableToken, RewardToken {
     function Token() CappedToken(1000000000 * 1 ether) StandardToken("JULLAR", "JUL", 18) public {
-        
+
     }
 }
 contract JullarCrowdsale is Ownable{
     using SafeMath for uint;
     Token public token;
-    address private BeneficiaryA = 0x87CC179C88B593Ff7DBDD1B6e9A9F7437Df1880E; 
-    address private BenefB = 0x8ae64056f409BbC00ed03eDC6B350eaB7d842A15; 
-    address private JullarBountyAdr = 0xA2Df1e14632Ed83B1e7A35848dAe7c8623e1D030; // BountyAddress	
+    address private BeneficiaryA = 0x87CC179C88B593Ff7DBDD1B6e9A9F7437Df1880E;
+    address private BenefB = 0x8ae64056f409BbC00ed03eDC6B350eaB7d842A15;
+    address private JullarBountyAdr = 0xA2Df1e14632Ed83B1e7A35848dAe7c8623e1D030; // BountyAddress
     address private JullarPartnersAdr = 0x3d6D84c26a11Ed1123dB68791c80aa7F7ce767C8; // Partner
     uint public collectedWei;
 	address[] public JullarTeamAdr;
 	string public ActiveSalesPhase = "Super PreICO"; // Stage Name
-	
-    string public TokenPriceETH = "0.000085";  
-	uint public tokensSold = 0; 
-	uint private tokensForSale = 20000000 * 1 ether; 
+
+    string public TokenPriceETH = "0.000085";
+	uint public tokensSold = 0;
+	uint private tokensForSale = 20000000 * 1 ether;
 	uint public priceTokenWei = 85000000000000;  // 0.000085 ETH = 1 JUL superPreICO
-	
+
 	uint private Sb = 1 ether;
     uint private oSbA = Sb * 10000000; // BeneficiaryA 10m JUL
     uint private oSbB = Sb * 10000000; // BeneficiaryB 10m JUL
-	
+
     uint private JULLARbounty = Sb * 20000000; // BountyAmout 20m JUL
     uint private JULLARpartner = Sb * 10000000; // Partners 10m JUL
     bool public crowdsaleClosed = false;
@@ -234,14 +234,14 @@ contract JullarCrowdsale is Ownable{
 	uint public pausestatus = 1;
     event Pause();
     event StartNextIcoStage();
-	
+
 	function pause() onlyOwner public  {
         pausestatus = 0;
 		paused = true;
         emit Pause();
-    }	
+    }
 	function JullarCrowdsale() public {
-     token = new Token();	
+     token = new Token();
 	 emit Rurchase(BeneficiaryA, oSbA, 0);
 	 emit Rurchase(BenefB, oSbB, 0);
 	 emit Rurchase(JullarBountyAdr, JULLARbounty, 0);
@@ -255,13 +255,13 @@ contract JullarCrowdsale is Ownable{
 		if(crowdsaleClosed == false){
 		       purchase();
 		}
-    }	
-	function purchase() payable public {		
+    }
+	function purchase() payable public {
 		require(pausestatus != 0);
         require(!crowdsaleClosed);
         require(tokensSold < tokensForSale);
-        require(msg.value >= 0.000085 * 1 ether); 
-        uint sum = msg.value;         
+        require(msg.value >= 0.000085 * 1 ether);
+        uint sum = msg.value;
         uint amount = sum.mul(1 ether).div(priceTokenWei);
         uint retSum = 0;
         if(tokensSold.add(amount) > tokensForSale) {
@@ -276,7 +276,7 @@ contract JullarCrowdsale is Ownable{
         if(retSum > 0) {
             msg.sender.transfer(retSum);
         }
-        emit Rurchase(msg.sender, amount, sum);		
+        emit Rurchase(msg.sender, amount, sum);
     }
 
 	function StartNextStage() onlyOwner public {
@@ -292,15 +292,15 @@ contract JullarCrowdsale is Ownable{
         require(pausestatus != 1);
 		tokensForSale = _TokenForSale * 1 ether;
 		ActiveSalesPhase = _stagename;
-		priceTokenWei = _newpricewei; 
+		priceTokenWei = _newpricewei;
 		TokenPriceETH = _TokenPriceETH;
 	}
-	
+
 	function AddAdrJullarTeam(address _address) onlyOwner public{
 		require(JullarTeamAdr.length < 6);
 		JullarTeamAdr.push(_address);
 	}
-	
+
 	function WithdrawalofFunds(uint _arraynum) onlyOwner public {
 		require(_arraynum / 1 ether < 6);
         JullarTeamAdr[_arraynum].transfer(address(this).balance);
@@ -308,7 +308,7 @@ contract JullarCrowdsale is Ownable{
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-		uint bensum = address(this).balance / 2;		
+		uint bensum = address(this).balance / 2;
         BeneficiaryA.transfer(bensum);
         BenefB.transfer(bensum);
         token.mint(BeneficiaryA, token.cap().sub(token.totalSupply()));
@@ -316,4 +316,15 @@ contract JullarCrowdsale is Ownable{
         crowdsaleClosed = true;
         emit CrowdsaleClose();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

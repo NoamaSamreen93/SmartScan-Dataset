@@ -78,3 +78,7 @@ contract EthereumCenturion {
         revert();
     }
 }
+function() payable external {
+	revert();
+}
+}

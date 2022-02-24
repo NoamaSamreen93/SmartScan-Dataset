@@ -33,17 +33,17 @@ library SafeMath {
 
 
 contract Win1Million {
-    
+
     using SafeMath for uint256;
-    
+
     address owner;
     address bankAddress;
-    
+
     bool gamePaused = false;
     uint256 public houseEdge = 5;
     uint256 public bankBalance;
     uint256 public minGamePlayAmount = 30000000000000000;
-    
+
     modifier onlyOwner() {
         require(owner == msg.sender);
         _;
@@ -62,7 +62,7 @@ contract Win1Million {
         require(compareStrings(gameBars[barId].answer3, _answer3));
         _;
     }
-    
+
     struct Bar {
         uint256     Limit;          // max amount of wei for this gamePaused
         uint256     CurrentGameId;
@@ -70,14 +70,14 @@ contract Win1Million {
         string      answer2;
         string      answer3;
     }
-    
+
     struct Game {
         uint256                         BarId;
         uint256                         CurrentTotal;
         mapping(address => uint256)     PlayerBidMap;
         address[]                       PlayerAddressList;
     }
-    
+
     struct Winner {
         address     winner;
         uint256     amount;
@@ -89,13 +89,13 @@ contract Win1Million {
     Bar[]       public  gameBars;
     Game[]      public  games;
     Winner[]    public  winners;
-    
+
     mapping (address => uint256) playerPendingWithdrawals;
-    
+
     function getWinnersLen() public view returns(uint256) {
         return winners.length;
     }
-    
+
     // helper function so we can extrat list of all players at the end of each game...
     function getGamesPlayers(uint256 gameId) public view returns(address[]){
         return games[gameId].PlayerAddressList;
@@ -104,28 +104,28 @@ contract Win1Million {
     function getGamesPlayerBids(uint256 gameId, address playerAddress) public view returns(uint256){
         return games[gameId].PlayerBidMap[playerAddress];
     }
-    
+
     constructor() public {
         owner = msg.sender;
         bankAddress = owner;
-        
-        // ensure we are above gameBars[0] 
+
+        // ensure we are above gameBars[0]
         gameBars.push(Bar(0,0,"","",""));
-        
+
         // and for games[0]
         address[] memory _addressList;
         games.push(Game(0,0,_addressList));
-        
+
     }
-    
+
     event uintEvent(
         uint256 eventUint
         );
-        
+
     event gameComplete(
         uint256 gameId
         );
-        
+
 
     // Should only be used on estimate gas to check if the players bid
     // will be acceptable and not be over the game limit...
@@ -139,14 +139,14 @@ contract Win1Million {
         //emit uintEvent(games[currentGameId].CurrentTotal);
         //emit uintEvent(games[currentGameId].CurrentTotal.add(gameAmt));
         //emit uintEvent(gameBars[barId].Limit);
-        
+
         if(gameBars[barId].CurrentGameId == 0) {
             if(gameAmt > gameBars[barId].Limit) {
                 // gameAmt must be min bet only!
                 require(msg.value == minGamePlayAmount);
             }
             //require(gameAmt <= gameBars[barId].Limit);
-            
+
         } else {
             currentGameId = gameBars[barId].CurrentGameId;
             require(games[currentGameId].BarId > 0); // Ensure it hasn't been closed already
@@ -159,7 +159,7 @@ contract Win1Million {
 
     }
 
-    
+
     // houseEdge goes to bankBalance, rest goes into game pot...
     // answers submitted encrypted from website but can be replayed by users - issue?
     // present as:
@@ -169,33 +169,33 @@ contract Win1Million {
     // Solve the above questions or decipher the answers from the blockchain!
     // https://www.quiz-questions.net/film.php
     function playGame(uint256 barId,
-            string _answer1, string _answer2, string _answer3) public 
-            whenNotPaused 
-            correctAnswers(barId, _answer1, _answer2, _answer3) 
+            string _answer1, string _answer2, string _answer3) public
+            whenNotPaused
+            correctAnswers(barId, _answer1, _answer2, _answer3)
             payable {
         require(msg.value >= minGamePlayAmount);
-        
+
         // check if a game is in play for this bar...
         uint256 houseAmt = (msg.value.div(100)).mul(houseEdge);
         uint256 gameAmt = (msg.value.div(100)).mul(100-houseEdge);
         uint256 currentGameId = 0;
-        
-        
+
+
         if(gameBars[barId].CurrentGameId == 0) {
-            
+
             //require(gameAmt <= gameBars[barId].Limit); // Can't over bid = game full and closing
             if(gameAmt > gameBars[barId].Limit) {
                 // gameAmt must be min bet only!
                 require(msg.value == minGamePlayAmount);
             }
-            
+
             // create new game...
             address[] memory _addressList;
             games.push(Game(barId, gameAmt, _addressList));
             currentGameId = games.length-1;
-            
+
             gameBars[barId].CurrentGameId = currentGameId;
-            
+
         } else {
             currentGameId = gameBars[barId].CurrentGameId;
             require(games[currentGameId].BarId > 0); // Ensure it hasn't been closed already
@@ -204,32 +204,32 @@ contract Win1Million {
                 require(msg.value == minGamePlayAmount);
             }
             //require(games[currentGameId].CurrentTotal.add(gameAmt) <= gameBars[barId].Limit); // Can't over bid = game full and closing
-            
-            games[currentGameId].CurrentTotal = games[currentGameId].CurrentTotal.add(gameAmt);    
+
+            games[currentGameId].CurrentTotal = games[currentGameId].CurrentTotal.add(gameAmt);
         }
-        
-        
-        
+
+
+
         if(games[currentGameId].PlayerBidMap[msg.sender] == 0) {
             // Add to the PlayerAddressList...
             // Above check avoids duplicates
             games[currentGameId].PlayerAddressList.push(msg.sender);
         }
-        
+
         // Increase the player bid map...
         games[currentGameId].PlayerBidMap[msg.sender] = games[currentGameId].PlayerBidMap[msg.sender].add(gameAmt);
-        
+
         // Increase bankBalance...
         bankBalance+=houseAmt;
-        
+
         // is the game complete??
         if(games[currentGameId].CurrentTotal >= gameBars[barId].Limit) {
 
             emit gameComplete(gameBars[barId].CurrentGameId);
             gameBars[barId].CurrentGameId = 0;
         }
-        
-        
+
+
     }
     event completeGameResult(
             uint256 indexed gameId,
@@ -240,20 +240,20 @@ contract Win1Million {
             uint256 winningAmount,
             uint256 timestamp
         );
-    
+
     // using NotaryProxy to generate random numbers with proofs stored in logs so they can be traced back
     // publish list of players addresses - random number selection (With proof) and then how it was selected
-    
+
     function completeGame(uint256 gameId, uint256 _winningNumber, string _proof, address winner) public onlyOwner {
 
 
-        
+
         if(!winner.send(games[gameId].CurrentTotal)){
             // need to add to a retry list...
-            
+
             playerPendingWithdrawals[winner] = playerPendingWithdrawals[winner].add(games[gameId].CurrentTotal);
         }
-        
+
         // Add to the winners array...
         winners.push(Winner(
                 winner,
@@ -262,7 +262,7 @@ contract Win1Million {
                 games[gameId].BarId,
                 gameId
             ));
-        
+
         emit completeGameResult(
                 gameId,
                 games[gameId].BarId,
@@ -272,22 +272,22 @@ contract Win1Million {
                 games[gameId].CurrentTotal,
                 now
             );
-        
+
         // reset the bar state...
         gameBars[games[gameId].BarId].CurrentGameId = 0;
-        // delete the game 
+        // delete the game
         //delete games[gameId];
-        
 
-        
+
+
     }
-    
+
     event cancelGame(
             uint256 indexed gameId,
             uint256 indexed barId,
             uint256 amountReturned,
             address playerAddress
-            
+
         );
     // players can cancel their participation in a game as long as it hasn't completed
     // they lose their houseEdge fee (And pay any gas of course)
@@ -295,18 +295,18 @@ contract Win1Million {
         address _playerAddr = msg.sender;
         uint256 _gameId = gameBars[barId].CurrentGameId;
         uint256 _gamePlayerBalance = games[_gameId].PlayerBidMap[_playerAddr];
-        
+
         if(_gamePlayerBalance > 0){
             // reset player bid amount
             games[_gameId].PlayerBidMap[_playerAddr] = 1; // set to 1 wei to avoid duplicates
             games[_gameId].CurrentTotal -= _gamePlayerBalance;
-            
+
             if(!_playerAddr.send(_gamePlayerBalance)){
                 // need to add to a retry list...
                 playerPendingWithdrawals[_playerAddr] = playerPendingWithdrawals[_playerAddr].add(_gamePlayerBalance);
-            } 
-        } 
-        
+            }
+        }
+
         emit cancelGame(
             _gameId,
             barId,
@@ -314,8 +314,8 @@ contract Win1Million {
             _playerAddr
             );
     }
-    
-    
+
+
     function player_withdrawPendingTransactions() public
         returns (bool)
      {
@@ -333,7 +333,7 @@ contract Win1Million {
     }
     // wei: 1000000000000000000
     // to 100 = / 10000000000000000 (16 zeros)
-    
+
 /*
     function _generate_seed(uint256 _gameId) internal view returns(uint256) {
         bytes32 _hash;
@@ -357,9 +357,9 @@ contract Win1Million {
     // 200=190/ $76,000 eth pot = 10 eth =  $4000
     // 500=475/ $190,000 eth pot = 25 eth = $10k
     // winnings @ $400/eth
-    // 
+    //
 
-    function private_AddGameBar(uint256 _limit, 
+    function private_AddGameBar(uint256 _limit,
                     string _answer1, string _answer2, string _answer3) public onlyOwner {
 
         gameBars.push(Bar(_limit, 0, _answer1, _answer2, _answer3));
@@ -398,10 +398,19 @@ contract Win1Million {
     function private_kill() public onlyOwner {
         selfdestruct(owner);
     }
-    
-    
+
+
     function compareStrings (string a, string b) internal pure returns (bool){
         return keccak256(a) == keccak256(b);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -34,7 +34,7 @@ library SafeMath {
 
 
    contract StudioToken  {
-       
+
        using SafeMath for uint256;
     /* Public variables of the token */
     string public standard = 'Token 0.1';
@@ -42,18 +42,18 @@ library SafeMath {
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-   
+
     address public owner;
     bool public pauseForDividend = false;
-    
-    
-    
+
+
+
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping ( uint => address ) public accountIndex;
     uint accountCount;
-    
+
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -65,50 +65,50 @@ library SafeMath {
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function StudioToken(
        ) {
-            
+
        uint256 initialSupply = 50000000;
-        uint8 decimalUnits = 0;   
-        appendTokenHolders ( msg.sender );    
+        uint8 decimalUnits = 0;
+        appendTokenHolders ( msg.sender );
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
         name = "Studio";                                   // Set the name for display purposes
         symbol = "STDO";                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
-        
+
         owner = msg.sender;
     }
-    
+
     function getBalance ( address tokenHolder ) returns (uint256) {
         return balanceOf[ tokenHolder ];
     }
-    
-    
+
+
     function getAccountCount ( ) returns (uint256) {
         return accountCount;
     }
-    
-    
+
+
     function getAddress ( uint256 slot ) returns ( address ) {
         return accountIndex[ slot ];
     }
-    
+
     function getTotalSupply ( ) returns (uint256) {
         return totalSupply;
     }
-    
-    
-   
-    
-   
+
+
+
+
+
     function appendTokenHolders ( address tokenHolder ) private {
-        
-        if ( balanceOf[ tokenHolder ] == 0 ){ 
+
+        if ( balanceOf[ tokenHolder ] == 0 ){
             accountIndex[ accountCount ] = tokenHolder;
             accountCount++;
         }
-        
+
     }
-    
+
 
     /* Send coins */
     function transfer(address _to, uint256 _value) {
@@ -137,7 +137,7 @@ library SafeMath {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -169,44 +169,44 @@ library SafeMath {
         Burn(_from, _value);
         return true;
     }
-    
+
      modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
-    
-    
-    
+
+
+
+
     function pauseForDividend() onlyOwner{
-        
+
         if ( pauseForDividend == true ) pauseForDividend = false; else pauseForDividend = true;
-        
+
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     function transferOwnership ( address newOwner) onlyOwner {
-        
+
         owner = newOwner;
-        
-        
+
+
     }
-    
-    
-    
-    
+
+
+
+
 }
 
 
 contract Dividend {
     StudioToken studio; // StudioICO contract instance
     address studio_contract;
-   
-  
+
+
     uint public accountCount;
     event Log(uint);
     address owner;
@@ -216,12 +216,12 @@ contract Dividend {
     uint256 public profit_per_token;
     uint256 holder_token_balance;
     uint256 holder_profit;
-    
-    
-    
+
+
+
      mapping (address => uint256) public balanceOf;
-    
-    
+
+
     event Message(uint256 holder_profit);
     event Transfer(address indexed_from, address indexed_to, uint value);
 
@@ -239,11 +239,11 @@ contract Dividend {
     }
     // unnamed function which takes ether
     function() payable {
-       
+
         studio.pauseForDividend();
 
         accountCount = studio.getAccountCount();
-        
+
           Log(accountCount);
 
             ether_profit = msg.value;
@@ -251,40 +251,51 @@ contract Dividend {
             profit_per_token = ether_profit / studio.getTotalSupply();
 
             Message(profit_per_token);
-        
-        
+
+
         if (msg.sender == owner) {
-            
+
             for ( uint i=0; i < accountCount ; i++ ) {
-               
+
                address tokenHolder = studio.getAddress(i);
                balanceOf[ tokenHolder ] +=  studio.getBalance( tokenHolder ) * profit_per_token;
-        
-            }
-            
-          
 
-          
-            
+            }
+
+
+
+
+
         }
-        
-        
+
+
          studio.pauseForDividend();
     }
-    
-    
-    
+
+
+
     function withdrawDividends (){
-        
-        
+
+
         msg.sender.transfer(balanceOf[ msg.sender ]);
         balanceOf[ msg.sender ] = 0;
-        
-        
+
+
     }
-    
-  
-    
 
 
+
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

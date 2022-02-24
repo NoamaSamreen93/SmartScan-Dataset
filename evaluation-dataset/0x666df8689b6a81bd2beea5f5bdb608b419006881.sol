@@ -67,7 +67,7 @@ contract owned {
 
 contract KFToken is owned{
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string constant public name = "KF Token";
     string constant public symbol = "KT";
@@ -95,7 +95,7 @@ contract KFToken is owned{
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -205,4 +205,20 @@ contract KFToken is owned{
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

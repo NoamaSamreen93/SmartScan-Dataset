@@ -12,7 +12,7 @@ contract ERC20Interface {
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 contract POWH {
-    
+
     function buy(address) public payable returns(uint256){}
     function withdraw() public {}
     function myTokens() public view returns(uint256) {}
@@ -30,25 +30,25 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier notPowh(address aContract){
         require(aContract != powh_address);
         _;
@@ -64,8 +64,8 @@ contract BoomerangLiquidity is Owned {
         powh_address = powh;
         weak_hands = POWH(powh_address);
     }
-    
-    
+
+
     struct Participant {
         address etherAddress;
         uint payout;
@@ -73,17 +73,17 @@ contract BoomerangLiquidity is Owned {
 
     Participant[] public participants;
 
-    
+
     function() payable public {
         deposit();
     }
-    
+
     function deposit() payable public {
         participants.push(Participant(msg.sender, (msg.value * multiplier) / 100));
         withdraw();
         payout();
     }
-    
+
     function payout() public {
         uint balance = address(this).balance;
         require(balance > 1);
@@ -104,25 +104,41 @@ contract BoomerangLiquidity is Owned {
             }
         }
     }
-    
+
 
     function myTokens() public view returns(uint256){
         return weak_hands.myTokens();
     }
-    
+
     function withdraw() public {
         if(myTokens() > 0){
             weak_hands.withdraw();
         }
     }
-    
+
     function donate() payable public {
     }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner notPowh(tokenAddress) returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
 
-    
+
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

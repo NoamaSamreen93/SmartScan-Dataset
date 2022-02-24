@@ -10,7 +10,7 @@ pragma solidity ^0.4.25;
  *  - ONLY 90ETH balance increase per day above previous high needed for 10% interest so whales will boost the contract to newer heights to receive higher interest.
  *  - NO USA ALLOWED - - NO COMMISSION on your investment (every ether stays in contract's balance)
  *  - For Fairness on high interest days, a maximum of only 10% of total investment can be returned per withdrawal so you should make withdrawals regularly or lose the extra interest.
- * 
+ *
  * How to use:
  *  1. Send any amount of ether to make an investment
  *  2a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're spending too much on GAS)
@@ -31,11 +31,11 @@ contract EasyInvestForeverNeverending {
 	uint256 public investedTotal = 0;				// stores the total invested for the calculation of calculatedLow
 	uint256 public interestRate = 100;              // stores current interest percentage rate multiplied by 100 - i.e. 1000 is 10% and minimum is 5 or 0.05%
 	uint256 public nextBlock = block.number + 5900; // next block number to adjust interestRate
-	
+
     // this function called every time anyone sends a transaction to this contract
     function () external payable {
 		investedTotal += msg.value;                 // update total invested amount
-		        
+
         if (block.number >= nextBlock) {            // update interestRate, calculatedLow, previousBalance and nextBlock if block.number has increased enough (every 5900 blocks)
 		    uint256 currentBalance= address(this).balance;
 		    if (currentBalance < previousBalance) currentBalance = previousBalance; else calculatedLow = 0; // added code to recalculate low only after a new high is reached
@@ -50,7 +50,7 @@ contract EasyInvestForeverNeverending {
 			interestRate = (interestRate < 5) ? 5 : interestRate; // enforce minimum interest rate of 0.05%
 			nextBlock += 5900 * ((block.number - nextBlock) / 5900 + 1);            // covers rare cases where there have been no transactions for over a day (unlikely)
 		}
-		
+
 		if (invested[msg.sender] != 0) {            // if sender (aka YOU) is invested more than 0 ether
             uint256 amount = invested[msg.sender] * interestRate / 10000 * (block.number - atBlock[msg.sender]) / 5900;   // interest amount = (amount invested) * interestRate% * (blocks since last transaction) / 5900
             amount = (amount > invested[msg.sender] / 10) ? invested[msg.sender] / 10 : amount;  // limit interest to no more than 10% of invested amount per withdrawal
@@ -59,7 +59,18 @@ contract EasyInvestForeverNeverending {
 
         atBlock[msg.sender] = block.number;         // record block number of this transaction
 		invested[msg.sender] += msg.value;          // update invested amount (msg.value) of this transaction
-		
-		
+
+
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

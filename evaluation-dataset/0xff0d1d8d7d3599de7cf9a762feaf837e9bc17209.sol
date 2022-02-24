@@ -6,7 +6,7 @@ pragma solidity ^0.5.3;
 
 /**
 * @title ERC223ReceivingContract
-* @dev ContractReceiver abstract class that define by erc223, the method tokenFallback must by receiver contract if it want 
+* @dev ContractReceiver abstract class that define by erc223, the method tokenFallback must by receiver contract if it want
 *      to accept erc223 tokens.
 *      ERC223 Receiving Contract interface
 */
@@ -46,7 +46,7 @@ contract Authenticity{
 * @dev Math operations with safety checks that throw on error
 */
 library safeMath {
-    
+
     /**
     * @dev Adds two numbers, reverts on overflow.
     */
@@ -54,7 +54,7 @@ library safeMath {
         c = a + b;
         require(c >= a);
     }
-    
+
     /**
     * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -62,7 +62,7 @@ library safeMath {
         require(b <= a);
         c = a - b;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
     */
@@ -70,7 +70,7 @@ library safeMath {
         c = a * b;
         require(a == 0 || c / a == b);
     }
-    
+
     /**
     * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
     */
@@ -87,7 +87,7 @@ library safeMath {
 */
 contract Ownable {
     address public owner;
-    
+
     constructor() internal{
         owner = msg.sender;
     }
@@ -107,18 +107,18 @@ contract Ownable {
 *      functions, this simplifies the implementation of "user address authorization".
 */
 contract BlackList is Ownable{
-    
+
     mapping (address => bool) internal isBlackListed;
-    
+
     event AddedBlackList(address _user);
     event RemovedBlackList(address _user);
-    
+
     function getBlackListStatus(address _maker) external view returns (bool) {
         return isBlackListed[_maker];
     }
-    
+
     /**
-    * @param _evilUser address of user the owner want to add in BlackList 
+    * @param _evilUser address of user the owner want to add in BlackList
     */
     function addBlackList (address _evilUser) public onlyOwner {
         require(!isBlackListed[_evilUser]);
@@ -127,7 +127,7 @@ contract BlackList is Ownable{
     }
 
     /**
-    * @param _clearedUser address of user the owner want to remove BlackList 
+    * @param _clearedUser address of user the owner want to remove BlackList
     */
     function removeBlackList (address _clearedUser) public onlyOwner {
         require(isBlackListed[_clearedUser]);
@@ -141,17 +141,17 @@ contract BlackList is Ownable{
 * @dev standard ERC223 contract
 */
 contract BasicERC223 is BlackList,ERC223Interface {
-    
+
     using safeMath for uint;
     uint8 public basisPointsRate;
     uint public minimumFee;
     uint public maximumFee;
     address[] holders;
-    
+
     mapping(address => uint) internal balances;
-    
+
     event Transfer(address from, address to, uint256 value, bytes data, uint256 fee);
-    
+
     /**
     * @dev Function that is called when a user or another contract wants to transfer funds.
     * @param _address address of contract.
@@ -165,7 +165,7 @@ contract BasicERC223 is BlackList,ERC223Interface {
         }
         return (length > 0);
     }
-    
+
     /**
     * @dev function that is called by transfer method to calculate Fee.
     * @param _amount Amount of tokens.
@@ -176,7 +176,7 @@ contract BasicERC223 is BlackList,ERC223Interface {
         if (fee > maximumFee) fee = maximumFee;
         if (fee < minimumFee) fee = minimumFee;
     }
-    
+
     /**
     * @dev function that is called when transaction target is a contract.
     * @return true if transferToContract execute successfully.
@@ -197,7 +197,7 @@ contract BasicERC223 is BlackList,ERC223Interface {
         holderIsExist(_to);
         return true;
     }
-    
+
     /**
     * @dev function that is called when transaction target is a external Address.
     * @return true if transferToAddress execute successfully.
@@ -216,7 +216,7 @@ contract BasicERC223 is BlackList,ERC223Interface {
         holderIsExist(_to);
         return true;
     }
-    
+
     /**
     * @dev Check for existing holder address if not then add it .
     * @param _holder The address to check it already exist or not.
@@ -228,7 +228,7 @@ contract BasicERC223 is BlackList,ERC223Interface {
                 success=true;
         if(!success) holders.push(_holder);
     }
-    
+
     /**
     * @dev Get all holders of Contract.
     * @return array of holder address.
@@ -250,16 +250,16 @@ contract CoolDex is BasicERC223{
     bool public Auth;
     bool public deprecated;
     bytes empty;
-   
+
     /** @dev fee Events */
     event Params(uint8 feeBasisPoints,uint maximumFee,uint minimumFee);
-    
+
     /** @dev IsAutheticate is modifier use to check contract is verifyed or not. */
     modifier IsAuthenticate(){
         require(Auth);
         _;
     }
-    
+
     constructor(string memory _name, string memory _symbol, uint256 totalSupply) public {
         name = _name;                                       // Name of token
         symbol = _symbol;                                   // Symbol of token
@@ -269,14 +269,14 @@ contract CoolDex is BasicERC223{
         holders.push(msg.sender);
         emit Transfer(address(this), msg.sender, _totalSupply);
     }
-    
+
     /**
     * @dev Get totalSupply of tokens.
     */
     function totalSupply() IsAuthenticate public view returns (uint256) {
         return _totalSupply;
     }
-    
+
     /**
     * @dev Gets the balance of the specified address.
     * @param _owner The address to query the the balance of.
@@ -285,7 +285,7 @@ contract CoolDex is BasicERC223{
     function balanceOf(address _owner) IsAuthenticate public view returns (uint balance) {
         return balances[_owner];
     }
-    
+
     /**
     * @dev Transfer the specified amount of tokens to the specified address.
     *      This function works the same with the previous one
@@ -301,7 +301,7 @@ contract CoolDex is BasicERC223{
         if(isContract(to)) return transferToContract(to, value, empty);
         else return transferToAddress(to, value, empty);
     }
-    
+
     /**
     * @dev Transfer the specified amount of tokens to the specified address.
     *      Invokes the `tokenFallback` function if the recipient is a contract.
@@ -319,18 +319,18 @@ contract CoolDex is BasicERC223{
         if(isContract(to)) return transferToContract(to, value, data);
         else return transferToAddress(to, value, data);
     }
-    
+
     /**
-    * @dev authenticate the address is valid or not 
+    * @dev authenticate the address is valid or not
     * @param _authenticate The address is authenticate or not.
     * @return true if address is valid.
     */
     function authenticate(address _authenticate) onlyOwner public returns(bool){
         return Auth = Authenticity(_authenticate).getAddress(address(this));
     }
-    
+
     /**
-    * @dev withdraw the token on our contract to owner 
+    * @dev withdraw the token on our contract to owner
     * @param _tokenContract address of contract to withdraw token.
     * @return true if transfer success.
     */
@@ -339,7 +339,7 @@ contract CoolDex is BasicERC223{
         uint tokenBalance = token.balanceOf(address(this));
         return token.transfer(owner,tokenBalance);
     }
-    
+
     /**
     * @dev Issue a new amount of tokens
     *      these tokens are deposited into the owner address
@@ -352,7 +352,7 @@ contract CoolDex is BasicERC223{
         _totalSupply = _totalSupply.add(amount);
         emit Transfer(address(0), owner, amount);
     }
-    
+
     /**
     * @dev Redeem tokens.These tokens are withdrawn from the owner address
     *      if the balance must be enough to cover the redeem
@@ -367,7 +367,7 @@ contract CoolDex is BasicERC223{
         balances[owner] = balances[owner].sub(amount);
         emit Transfer(owner, address(0), amount);
     }
-    
+
     /**
     * @dev Function to set the basis point rate.
     * @param newBasisPoints uint which is <= 9.
@@ -383,7 +383,7 @@ contract CoolDex is BasicERC223{
         minimumFee = newMinFee.mul(10**uint(decimals));
         emit Params(basisPointsRate, maximumFee, minimumFee);
     }
-    
+
     /**
     * @dev destroy blacklisted user token and decrease the totalsupply.
     * @param _blackListedUser destroy token of blacklisted user.
@@ -395,7 +395,7 @@ contract CoolDex is BasicERC223{
         _totalSupply = _totalSupply.sub(dirtyFunds);
         emit Transfer(_blackListedUser, address(0), dirtyFunds);
     }
-    
+
     /**
     * @dev deprecate current contract in favour of a new one.
     * @param _upgradedAddress contract address of upgradable contract.
@@ -413,7 +413,7 @@ contract CoolDex is BasicERC223{
         }
         return true;
     }
-    
+
     /**
     * @dev Destroy the contract.
     */
@@ -421,4 +421,13 @@ contract CoolDex is BasicERC223{
         require(_owner == owner);
         selfdestruct(_owner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

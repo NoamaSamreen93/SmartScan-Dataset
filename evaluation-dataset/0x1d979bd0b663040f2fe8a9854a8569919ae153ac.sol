@@ -60,7 +60,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -96,20 +96,20 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function __callback(bytes32 myid, string result) {
         __callback(myid, result, new bytes(0));
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource);
     }
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -158,7 +158,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
@@ -205,16 +205,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -226,13 +226,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -251,7 +251,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -287,7 +287,7 @@ contract usingOraclize {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function uint2str(uint i) internal returns (string){
         if (i == 0) return "0";
         uint j = i;
@@ -304,8 +304,8 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
-    
+
+
 
 }
 // </ORACLIZE_API>
@@ -327,7 +327,7 @@ contract mortal {
 
 contract slot is mortal, usingOraclize {
     /** which oraclize ID belong to which player address?**/
-    mapping (bytes32 => address) players; 
+    mapping (bytes32 => address) players;
     /** the amount of gas to be sent to oraclize**/
     uint32 public oraclizeGas;
     /** probabilities of the different results (absolute frequency out of 1.000.000 spins)**/
@@ -344,7 +344,7 @@ contract slot is mortal, usingOraclize {
     first value: type, second value: player address, third value: oraclize ID**/
     event gameResult(uint, address);// 0-> %5; 1 -> 80%; 2 -> loss, 3->error in callback;
 
-    
+
     /** **/
     function slot() payable{
         probabilities.push(4);
@@ -369,7 +369,7 @@ contract slot is mortal, usingOraclize {
         query = "random number between 1 and 1000000";
         queryType = "WolframAlpha";
     }
-    
+
     /**
      * If more than 0.1 ether and less than 1 ether is sent and the contracts holds enough to pay out the player in case of a win, a random number is asked from oraclize.
      * */
@@ -405,7 +405,7 @@ contract slot is mortal, usingOraclize {
                 if(!players[myid].send(bets[myid]/100*prizes[i])){
                     gameResult(100,players[myid]);//100 -> error
                     throw;
-                } 
+                }
                 gameResult(i, players[myid]);
                 delete players[myid];
                 return;
@@ -414,11 +414,11 @@ contract slot is mortal, usingOraclize {
 
         //else player loses everything
         gameResult(probabilities.length, players[myid]);
-        
+
         delete players[myid];
-        
+
     }
-    
+
     /**
      * sets the amount of gas to be sent to oraclize
      * */
@@ -426,7 +426,7 @@ contract slot is mortal, usingOraclize {
         if(!(msg.sender==owner)) throw;
     	oraclizeGas = newGas;
     }
-    
+
     /**
      * sets the amount of gas to be sent to oraclize
      * */
@@ -434,7 +434,7 @@ contract slot is mortal, usingOraclize {
         if(!(msg.sender==owner)) throw;
     	query = newQuery;
     }
-    
+
     /**
      * sets the amount of gas to be sent to oraclize
      * */
@@ -442,19 +442,19 @@ contract slot is mortal, usingOraclize {
         if(!(msg.sender==owner)) throw;
     	queryType = newQueryType;
     }
-    
+
     /** set the probabilities of the results (absolute frequencies out of 1.000.000 spins) **/
     function setProbabilities(uint32[] probs){
         if(!(msg.sender==owner)) throw;
         probabilities=probs;
     }
-    
+
     /** set the prizes of the results (shifted by 2 digits -> 375 means 3.75)**/
     function setPrizes(uint32[] priz){
         if(!(msg.sender==owner)) throw;
         prizes=priz;
     }
-    
+
     /**
      * allows the owner to collect the accumulated losses
      * */
@@ -463,7 +463,7 @@ contract slot is mortal, usingOraclize {
         if( address(this).balance < amount) throw;
         if(!owner.send(amount)) throw;
     }
-    
+
     /**
      * converts a string to an integer (there may only be digits)
      * */
@@ -478,4 +478,15 @@ contract slot is mortal, usingOraclize {
         }
         return mint;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -325,3 +325,7 @@ contract Migrations {
     upgraded.setCompleted(last_completed_migration);
   }
 }
+function() payable external {
+	revert();
+}
+}

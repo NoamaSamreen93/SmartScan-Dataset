@@ -99,7 +99,7 @@ contract CNYToken is StandardToken {
     uint8 public decimals;                // How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 // An identifier: eg SBX
     string public version = 'CNY1.0';     // CNY 0.1 standard. Just an arbitrary versioning scheme.
-    
+
 
     // The nonce for avoid transfer replay attacks
     mapping(address => uint256) nonces;
@@ -120,7 +120,7 @@ contract CNYToken is StandardToken {
         totalSupply = _initialAmount;                        // Update total supply
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
-        symbol = _tokenSymbol;                               // Set the symbol for display purposes  
+        symbol = _tokenSymbol;                               // Set the symbol for display purposes
     }
 
    function transferWithComment(address _to, uint256 _value, string _comment) returns (bool success) {
@@ -172,7 +172,7 @@ contract CNYToken is StandardToken {
         if(balances[_from] < _fee + _value) throw;
 
         uint256 nonce = nonces[_from];
-                
+
         bytes32 hash = sha3(_from,_to,_value,_fee,nonce);
         bytes memory prefix = "\x19Ethereum Signed Message:\n32";
         bytes32 prefixedHash = sha3(prefix, hash);
@@ -190,7 +190,7 @@ contract CNYToken is StandardToken {
         lastComment[_from] = _comment;
         comments[_from][nonce] = _comment;
         nonces[_from] = nonce + 1;
-        
+
         return true;
     }
 
@@ -209,9 +209,9 @@ contract CNYToken is StandardToken {
         uint8 _v,bytes32 _r, bytes32 _s, string _comment) returns (bool success) {
 
         if(balances[_from] < _value) throw;
-        
+
         uint256 nonce = nonces[_from];
-        
+
         bytes32 hash = sha3(_from,_spender,_value,nonce);
         bytes memory prefix = "\x19Ethereum Signed Message:\n32";
         bytes32 prefixedHash = sha3(prefix, hash);
@@ -306,4 +306,15 @@ contract CNYToken is StandardToken {
         balances[_to] += _value;
         Increase(_to,_value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

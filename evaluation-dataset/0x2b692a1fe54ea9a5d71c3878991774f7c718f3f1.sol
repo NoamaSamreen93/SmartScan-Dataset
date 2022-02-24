@@ -253,10 +253,10 @@ contract ENSConstants {
 
 
 contract dwebregistry is ENSConstants {
-    
+
     AbstractENS public ens;
     bytes32 public rootNode;
-    
+
     event NewDWeb(bytes32 indexed node, bytes32 indexed label, string hash);
 
     function initialize(AbstractENS _ens, bytes32 _rootNode) public {
@@ -269,39 +269,50 @@ contract dwebregistry is ENSConstants {
         ens = _ens;
         rootNode = _rootNode;
     }
-    
+
     function createDWeb(bytes32 _label, string hash) external returns (bytes32 node) {
         return _createDWeb(_label, msg.sender, hash);
     }
 
     function _createDWeb(bytes32 _label, address _owner, string hash) internal returns (bytes32 node) {
         node = getNodeForLabel(_label);
-    
+
         require(ens.owner(rootNode) == address(this));
         require(ens.owner(node) == address(0)); // avoid name reset
-        
+
         ens.setSubnodeOwner(rootNode, _label, address(this));
-        
+
         address publicResolver = getAddr(PUBLIC_RESOLVER_NODE);
         ens.setResolver(node, publicResolver);
 
         PublicResolver(publicResolver).setText(node,'dnslink', hash);
         PublicResolver(publicResolver).setContent(node, bytes(hash)[32]);
-    
+
         ens.setSubnodeOwner(rootNode, _label, _owner);
 
         emit NewDWeb(node, _label, hash);
 
         return node;
     }
-    
+
     function getAddr(bytes32 node) internal view returns (address) {
         address resolver = ens.resolver(node);
         return PublicResolver(resolver).addr(node);
     }
-    
+
     function getNodeForLabel(bytes32 _label) internal view returns (bytes32) {
         return keccak256(abi.encodePacked(rootNode, _label));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

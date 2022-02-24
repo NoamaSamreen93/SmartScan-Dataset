@@ -413,9 +413,9 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
 }
-    
+
 pragma solidity ^0.5.0;
 
 contract Chaingrapher is ERC721, ERC721EnumerableSimple, ERC721Metadata("Smart Contract analytics: Chaingraph.io", "Chaingraph.io - Smart contract analytics") {
@@ -441,7 +441,7 @@ contract Chaingrapher is ERC721, ERC721EnumerableSimple, ERC721Metadata("Smart C
         require(_tokenId == 0 || _exists(_tokenId.sub(1)), "Previous token ID has to exist.");
         _mint(_owner, _tokenId);
     }
-    
+
     function createMulti(uint256 _tokenIdStart, address[] memory _owners)
     public
     onlyCreateControl
@@ -474,4 +474,15 @@ contract Chaingrapher is ERC721, ERC721EnumerableSimple, ERC721Metadata("Smart C
     {
         revert("The contract cannot receive ETH payments.");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -349,7 +349,7 @@ contract Multiownable {
     event OperationPerformed(bytes32 operation, uint howMany, uint ownersCount, address performer);
     event OperationDownvoted(bytes32 operation, uint votes, uint ownersCount,  address downvoter);
     event OperationCancelled(bytes32 operation, address lastCanceller);
-    
+
     // ACCESSORS
 
     function isOwner(address wallet) public view returns(bool) {
@@ -426,7 +426,7 @@ contract Multiownable {
     modifier onlySomeOwners(uint howMany) {
         require(howMany > 0, "onlySomeOwners: howMany argument is zero");
         require(howMany <= owners.length, "onlySomeOwners: howMany argument exceeds the number of owners");
-        
+
         if (checkHowManyOwners(howMany)) {
             bool update = (insideCallSender == address(0));
             if (update) {
@@ -459,7 +459,7 @@ contract Multiownable {
 
     /**
      * @dev onlyManyOwners modifier helper
-     */    
+     */
     function checkHowManyOwners(uint howMany) internal returns(bool) {
         if (insideCallSender == msg.sender) {
             require(howMany <= insideCallCount, "checkHowManyOwners: nested owners modifier check require more owners");
@@ -555,7 +555,7 @@ contract Multiownable {
             require(ownersIndices[newOwners[i]] == 0, "transferOwnershipWithHowMany: owners array contains duplicates");
             ownersIndices[newOwners[i]] = i + 1;
         }
-        
+
         emit OwnershipTransferred(owners, howManyOwnersDecide, newOwners, newHowManyOwnersDecide);
         owners = newOwners;
         howManyOwnersDecide = newHowManyOwnersDecide;
@@ -565,24 +565,24 @@ contract Multiownable {
 
 }
 
-contract vUSD is ERC20, ERC20Detailed, Multiownable {    
+contract vUSD is ERC20, ERC20Detailed, Multiownable {
     address public operator;
     uint256 public availableForMinting = 0;
 
     event OperatorSet(address _address);
     event OperatorDisabled();
 
-    constructor (string memory name, string memory symbol, uint8 decimals, address[] memory _owners, uint8 threshold) public 
-        ERC20Detailed(name, symbol, decimals) 
-        Multiownable(_owners, threshold) {     
+    constructor (string memory name, string memory symbol, uint8 decimals, address[] memory _owners, uint8 threshold) public
+        ERC20Detailed(name, symbol, decimals)
+        Multiownable(_owners, threshold) {
     }
 
     modifier onlyOperator() {
         require(operator != address(0) && msg.sender == operator, "Forbidden");
         _;
     }
-    
-    function setOperator(address _address) public onlyManyOwners {            
+
+    function setOperator(address _address) public onlyManyOwners {
         operator = _address;
         emit OperatorSet(_address);
     }
@@ -592,7 +592,7 @@ contract vUSD is ERC20, ERC20Detailed, Multiownable {
         emit OperatorDisabled();
     }
 
-    function allowMint(uint256 amount) public onlyManyOwners { 
+    function allowMint(uint256 amount) public onlyManyOwners {
         require(amount > 0, "Amount below zero");
         availableForMinting = availableForMinting.add(amount);
     }
@@ -606,9 +606,18 @@ contract vUSD is ERC20, ERC20Detailed, Multiownable {
     }
 
     function mint(address _address, uint256 amount) public onlyOperator returns (bool) {
-        require(availableForMinting >= amount, "Insufficient available for minting");    
+        require(availableForMinting >= amount, "Insufficient available for minting");
         _mint(_address, amount);
         availableForMinting = availableForMinting.sub(amount);
         return true;
-    }        
+    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

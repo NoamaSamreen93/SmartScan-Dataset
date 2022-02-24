@@ -18,9 +18,9 @@ library SafeMath {
   }
 
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    
+
     uint256 c = a / b;
-    
+
     return c;
   }
 
@@ -142,7 +142,7 @@ contract BasicToken is ERC20Basic {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
@@ -320,8 +320,8 @@ contract BurnableToken is StandardToken {
     function burn(uint256 _value) public {
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-        
-        
+
+
 
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
@@ -375,11 +375,20 @@ contract CSDToken is BurnableToken, PausableToken {
     string public name = "Cloud Service   diamond  token";
     string public symbol = "csdt";
     uint256 public decimals = 18;
-    
+
     uint256 public constant INITIAL_SUPPLY = 100 * 1000 * 1000 * (10 ** uint256(decimals));
 
     function CSDToken() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

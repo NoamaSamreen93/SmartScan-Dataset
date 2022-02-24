@@ -936,7 +936,7 @@ contract AddressToken is ERC721Full("AddressToken", "ATKN"), IAddressDeployerOwn
     function addressToURI(address _addr) public pure returns(string) {
         bytes32 value = bytes32(uint256(_addr));
         bytes memory alphabet = "0123456789abcdef";
-        
+
         bytes memory str = new bytes(51);
         str[0] = "e";
         str[1] = "t";
@@ -960,4 +960,20 @@ contract AddressToken is ERC721Full("AddressToken", "ATKN"), IAddressDeployerOwn
         // solium-disable-next-line arg-overflow
         return address(keccak256(abi.encodePacked(byte(0xd6), byte(0x94), _deployer, byte(1))));
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

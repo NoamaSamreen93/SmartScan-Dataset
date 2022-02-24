@@ -223,7 +223,7 @@ contract NokuTokenBurner is Pausable {
     */
     function NokuTokenBurner(address _wallet) public {
         require(_wallet != address(0));
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -237,7 +237,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100);
         require(_burningPercentage != burningPercentage);
-        
+
         burningPercentage = _burningPercentage;
 
         LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -255,7 +255,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -667,4 +667,15 @@ contract NokuCustomERC20 is Ownable, DetailedERC20, MintableToken, BurnableToken
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

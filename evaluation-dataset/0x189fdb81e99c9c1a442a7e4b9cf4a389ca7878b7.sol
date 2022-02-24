@@ -572,13 +572,13 @@ contract ERC20Pausable is ERC20, Pausable {
 // File: contracts/SDR.sol
 
 contract SDR is ERC20, ERC20Burnable, ERC20Detailed, ERC20Mintable, ERC20Pausable {
-    
+
     string private _name = "SDR";
     string private _symbol = "SDR";
     uint8 private _decimals = 18;
-    
+
     constructor() ERC20Detailed(_name, _symbol, _decimals) public {
-    }    
+    }
 
     function burn(uint256 value) public whenNotPaused {
         _burn(msg.sender, value);
@@ -592,4 +592,15 @@ contract SDR is ERC20, ERC20Burnable, ERC20Detailed, ERC20Mintable, ERC20Pausabl
         _mint(to, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

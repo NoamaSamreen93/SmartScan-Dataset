@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 --------------------------------------------------------------------------------
 Unity Coin Smart Contract
 
-Credit	: Rejean Leclerc 
+Credit	: Rejean Leclerc
 Mail 	: rejean.leclerc123@gmail.com
 
 --------------------------------------------------------------------------------
@@ -45,9 +45,9 @@ library SafeMath {
 }
 
 contract UnityCoin {
-           
+
     using SafeMath for uint256;
-    
+
     string public constant name = "Unity Coin";
     string public constant symbol = "UNT";
     uint8 public constant decimals = 18;
@@ -62,23 +62,23 @@ contract UnityCoin {
 
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed from, address indexed to, uint256 value);
-	
+
     function UnityCoin() {
         owner = msg.sender;
         balances[owner] = initialSupply;
     }
-    
+
    function () payable {
         convertTokens();
     }
-    
+
 	/* from begin January to end January   around 1 cent per token*/
     /* from begin Febuary to end Febuary   around 5 cent per token*/
     /* before and after ..... nothing  */
     function convertTokens() payable {
         require(msg.value > 0);
-		
-		canBuy = false;        
+
+		canBuy = false;
         if (now > 1512968674 && now < 1517356800 ) {
             RATE = 75000;
             canBuy = true;
@@ -113,7 +113,7 @@ contract UnityCoin {
             && allowed[_from][msg.sender] >= _value
             && _value > 0
             && balances[_to] + _value > balances[_to]) {
-			
+
             balances[_from] = balances[_from].sub(_value);
             allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
             balances[_to] = balances[_to].add(_value);
@@ -147,4 +147,15 @@ contract UnityCoin {
     function balanceOf(address _address) constant returns (uint256 balance) {
         return balances[_address];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

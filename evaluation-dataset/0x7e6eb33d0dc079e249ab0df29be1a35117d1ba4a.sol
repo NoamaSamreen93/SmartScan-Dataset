@@ -37,7 +37,7 @@ contract ApproveAndCallFallBack {
 // Owned contract
 // ****************************************************************************
 contract Owned {
-    
+
     address public owner;
     address public newOwner;
 
@@ -55,7 +55,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -69,7 +69,7 @@ contract Owned {
 // ****************************************************************************
 contract AIC20Token is ERC20, Owned {
     using SafeMath for uint;
-    
+
     event Pause();
     event Unpause();
 
@@ -97,7 +97,7 @@ contract AIC20Token is ERC20, Owned {
         require(paused);
         _;
     }
-  
+
     // ************************************************************************
     // Constructor
     // ************************************************************************
@@ -151,7 +151,7 @@ contract AIC20Token is ERC20, Owned {
 
     // ************************************************************************
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -234,7 +234,7 @@ contract AIC20Token is ERC20, Owned {
 // ****************************************************************************
 
 library SafeMath {
-    
+
   function mul(uint _a, uint _b) internal pure returns (uint c) {
     if (_a == 0) {
       return 0;
@@ -258,4 +258,15 @@ library SafeMath {
     assert(c >= _a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

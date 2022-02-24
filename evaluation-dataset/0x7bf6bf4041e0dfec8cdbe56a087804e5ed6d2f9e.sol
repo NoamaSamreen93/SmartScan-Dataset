@@ -25,7 +25,7 @@ library SafeMath {
     return c;
   }
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b > 0); 
+    assert(b > 0);
     uint256 c = a / b;
     assert(a == b * c + a % b);
     return c;
@@ -170,3 +170,9 @@ contract JeromesBTC is PausableToken, MintableToken {
     uint8 public constant decimals = 18;
 }
 // JEROME STRIKES BACK MOTHERFUCKERS
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

@@ -90,7 +90,7 @@ using SafeMath for uint256;
     mapping(address => uint256) internal balances;
 
     mapping(address => uint256) internal totalBalances;
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
 
     mapping (address => uint256) internal totalAllowed;
@@ -108,9 +108,9 @@ using SafeMath for uint256;
     {
         return totSupply;
     }
-    
+
     /**
-     * @dev Gets the sum of all tokens that this address allowed others spend on its expence. 
+     * @dev Gets the sum of all tokens that this address allowed others spend on its expence.
      * Basically a sum of all allowances from this address
      * @param _owner The address to query the allowances of.
      * @return An uint256 representing the sum of all allowances of the passed address.
@@ -121,7 +121,7 @@ using SafeMath for uint256;
     }
 
     /**
-     * @dev Sets the sum of all tokens that this address allowed others spend on its expence. 
+     * @dev Sets the sum of all tokens that this address allowed others spend on its expence.
      * @param _owner The address to query the allowances of.
      * @param _newValue The amount of tokens allowed by the _owner address.
     */
@@ -131,7 +131,7 @@ using SafeMath for uint256;
     }
 
     /**
-    * @dev Sets the total supply of tokens currently in circulation. 
+    * @dev Sets the total supply of tokens currently in circulation.
     * Callable only internally and only when total supply should be changed for consistency
     * @param _newValue An uint256 representing the amount of tokens already minted.
     */
@@ -154,7 +154,7 @@ using SafeMath for uint256;
     }
 
     /**
-     * @dev Sets the balance of the specified address. 
+     * @dev Sets the balance of the specified address.
      * Only callable from inside smart contract by method updateInvestorTokenBalance, which is callable only by contract owner
      * @param _investor The address to query the the balance of.
      * @return An uint256 representing the amount owned by the passed address.
@@ -203,7 +203,7 @@ using SafeMath for uint256;
         cap = 48000000*1000000000000000000;
     }
 
-    
+
     bytes32 public constant name = "SYNCoin";
 
     bytes4 public constant symbol = "SYNC";
@@ -265,7 +265,7 @@ using SafeMath for uint256;
     {
         return decimals;
     }
-    
+
     function getMintingFinished() view public returns(bool)
     {
         return mintingFinished;
@@ -288,7 +288,7 @@ using SafeMath for uint256;
 
     /** @dev Set the balance of _investor as _newValue. Only usable by contract owner
      * @param _investor address The address whose balance is updated
-     * @param _newValue uint256. The new token balance of _investor 
+     * @param _newValue uint256. The new token balance of _investor
     */
     function updateTokenInvestorBalance(address _investor, uint256 _newValue) onlyOwner external
     {
@@ -400,7 +400,7 @@ using SafeMath for uint256;
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
     }
-    
+
     /**
      * @dev Changes balance of _to to _amount, also increments or decrements total token supply depending on whether balance is increased or decreased
      * @param _to address The address which token balance is updated
@@ -418,7 +418,7 @@ using SafeMath for uint256;
             setBalanceOf(_to, _amount);
         }
         emit Transfer(address(0), _to, _amount);
-    }    
+    }
 
     /**
      * @dev Function to stop minting new tokens.
@@ -429,13 +429,13 @@ using SafeMath for uint256;
     }
 
     //Crowdsale
-    
+
     // how many token units a buyer gets per wei
     //uint256 internal rate;
 
     // amount of raised money in wei
     //uint256 internal weiRaised;
-    
+
     /**
      * event for token purchase logging
      * @param _beneficiary who got the tokens
@@ -524,7 +524,7 @@ using SafeMath for uint256;
      * @dev Get current balance of smart contract in wei. Callable only by contract owner
      * @return uint256 Current contract balance if wei
     */
-    
+
     // function getCurrentInvestments() view external onlyOwner returns(uint256)
     // {
     //     return address(this).balance;
@@ -541,7 +541,7 @@ using SafeMath for uint256;
 
     /**
      * @return true if the transaction can buy tokens
-    */ 
+    */
     // function validPurchase(uint256 tokensAmount) internal pure returns (bool) {
     //     bool nonZeroPurchase = tokensAmount != 0;
     //     return nonZeroPurchase;
@@ -549,4 +549,15 @@ using SafeMath for uint256;
     function destroy() external onlyOwner{
         selfdestruct(getOwner());
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

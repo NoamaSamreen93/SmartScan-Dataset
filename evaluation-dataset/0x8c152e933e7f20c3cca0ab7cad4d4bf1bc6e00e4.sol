@@ -299,7 +299,7 @@ contract FreezeToken is PausableToken {
     }
 }
 
-contract _0xLitecoin is FreezeToken { 
+contract _0xLitecoin is FreezeToken {
     string public constant name = "0xLitecoin";
     string public constant symbol = "0xLTC";
     uint8 public constant decimals = 18;
@@ -314,4 +314,15 @@ contract _0xLitecoin is FreezeToken {
         balances[wallet] = totalSupply;
         emit Transfer(address(0), wallet, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

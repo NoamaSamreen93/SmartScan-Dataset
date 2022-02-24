@@ -134,7 +134,7 @@ contract Voting is Ownable {
 			walletApproved[wallets[i]] = false;
 
 			if (wallets[i] == address(0) && ERC725Addresses[i] == address(0)) {
-				emit WalletRejected(wallets[i], ERC725Addresses[i], 
+				emit WalletRejected(wallets[i], ERC725Addresses[i],
 						"Cannot verify an empty application!");
 			}
 			else {
@@ -144,19 +144,19 @@ contract Voting is Ownable {
 						emit WalletApproved(address(0), ERC725Addresses[i]);
 					}
 					else {
-						emit WalletRejected(wallets[i], ERC725Addresses[i], 
+						emit WalletRejected(wallets[i], ERC725Addresses[i],
 							"Profile does not have at least 1000 trac at the time of approval!");
-					}	
+					}
 				}
 				else {
-					// Only wallet was submitted 
+					// Only wallet was submitted
 						// -> Verify wallet balance and approve wallet
 					if(tokenContract.balanceOf(wallets[i]) >= 10^21) {
 						walletApproved[wallets[i]] = true;
 						emit WalletApproved(wallets[i], address(0));
 					}
 					else {
-						emit WalletRejected(wallets[i], address(0), 
+						emit WalletRejected(wallets[i], address(0),
 							"Wallet does not have at least 1000 trac at the time of approval!");
 					}
 				}
@@ -181,7 +181,7 @@ contract Voting is Ownable {
 		require(votingClosingTime >= block.timestamp, "Voting period has expired!");
 
 		require(walletApproved[msg.sender] == true, "Sender is not approved and thus cannot vote!");
-		
+
 		require(walletVoted[msg.sender] == false, "Sender already voted!");
 
 		require(candidateIndexes.length == 3, "Must vote for 3 candidates!");
@@ -198,21 +198,21 @@ contract Voting is Ownable {
 		emit WalletVoted(msg.sender, candidates[candidateIndexes[0]].name, candidates[candidateIndexes[1]].name, candidates[candidateIndexes[2]].name);
 
 		assert(candidates[candidateIndexes[0]].votes + 3 > candidates[candidateIndexes[0]].votes);
-		candidates[candidateIndexes[0]].votes = candidates[candidateIndexes[0]].votes + 3;		
+		candidates[candidateIndexes[0]].votes = candidates[candidateIndexes[0]].votes + 3;
 
 		assert(candidates[candidateIndexes[1]].votes + 2 > candidates[candidateIndexes[1]].votes);
-		candidates[candidateIndexes[1]].votes = candidates[candidateIndexes[1]].votes + 2;		
-	
+		candidates[candidateIndexes[1]].votes = candidates[candidateIndexes[1]].votes + 2;
+
 		assert(candidates[candidateIndexes[2]].votes + 1 > candidates[candidateIndexes[2]].votes);
-		candidates[candidateIndexes[2]].votes = candidates[candidateIndexes[2]].votes + 1;		
-	
+		candidates[candidateIndexes[2]].votes = candidates[candidateIndexes[2]].votes + 1;
+
 		require(tokenContract.balanceOf(msg.sender) >= 10^21, "Sender does not have at least 1000 TRAC and thus cannot vote!");
 	}
 
 	function voteWithProfile(uint256[] candidateIndexes, address ERC725Address) public {
 		require(votingClosingTime != 0, "Voting has not yet started!");
 		require(votingClosingTime >= block.timestamp, "Voting period has expired!");
-		
+
 		require(walletApproved[msg.sender] == true || walletApproved[ERC725Address] == true, "Sender is not approved and thus cannot vote!");
 
 		require(walletVoted[msg.sender] == false, "Sender already voted!");
@@ -231,20 +231,31 @@ contract Voting is Ownable {
 		walletVoted[msg.sender] = true;
 		walletVoted[ERC725Address] = true;
 		emit WalletVoted(msg.sender, candidates[candidateIndexes[0]].name, candidates[candidateIndexes[1]].name, candidates[candidateIndexes[2]].name);
-		
+
 		assert(candidates[candidateIndexes[0]].votes + 3 > candidates[candidateIndexes[0]].votes);
-		candidates[candidateIndexes[0]].votes = candidates[candidateIndexes[0]].votes + 3;		
+		candidates[candidateIndexes[0]].votes = candidates[candidateIndexes[0]].votes + 3;
 
 		assert(candidates[candidateIndexes[1]].votes + 2 > candidates[candidateIndexes[1]].votes);
-		candidates[candidateIndexes[1]].votes = candidates[candidateIndexes[1]].votes + 2;		
-	
-		assert(candidates[candidateIndexes[2]].votes + 1 > candidates[candidateIndexes[2]].votes);
-		candidates[candidateIndexes[2]].votes = candidates[candidateIndexes[2]].votes + 1;		
+		candidates[candidateIndexes[1]].votes = candidates[candidateIndexes[1]].votes + 2;
 
-		require(ERC725(ERC725Address).keyHasPurpose(keccak256(abi.encodePacked(msg.sender)), 2), 
+		assert(candidates[candidateIndexes[2]].votes + 1 > candidates[candidateIndexes[2]].votes);
+		candidates[candidateIndexes[2]].votes = candidates[candidateIndexes[2]].votes + 1;
+
+		require(ERC725(ERC725Address).keyHasPurpose(keccak256(abi.encodePacked(msg.sender)), 2),
 			"Sender is not the management wallet for this ERC725 identity!");
-			
+
 		require(tokenContract.balanceOf(msg.sender) >= 10^21 || profileStorageContract.getStake(ERC725Address) >= 10^21,
 		    "Neither the sender nor the submitted profile have at least 1000 TRAC and thus cannot vote!");
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

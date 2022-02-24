@@ -40,7 +40,7 @@ contract Ownable {
 
     /// @dev Allows the current owner to transfer control of the contract to a newOwner.
     /// @param _newOwner The address to transfer ownership to.
-    
+
     function transferOwnership(address _newOwner) public notNull(_newOwner) onlyOwner {
         newOwner = _newOwner;
     }
@@ -54,7 +54,7 @@ contract Ownable {
     }
 
     // EVENTS
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 }
 
@@ -145,10 +145,10 @@ contract ERC20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     // EVENTS
-    
+
     // solhint-disable-next-line no-simple-event-func-name
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -197,7 +197,7 @@ contract ERC20Token is Ownable, ERC20Interface {
     mapping (address => mapping (address => uint256)) internal allowed;
 
     uint256 internal _totalSupply;
-    
+
     // CONSTRUCTOR
 
     constructor(uint256 initialAmount) public {
@@ -236,8 +236,8 @@ contract ERC20Token is Ownable, ERC20Interface {
     * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     */
-   
-    /// @notice `msg.sender` approves `_spender` to spend `_value` tokens   
+
+    /// @notice `msg.sender` approves `_spender` to spend `_value` tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @param _value The amount of tokens to be approved for transfer
     /// @return Whether the approval was successful or not
@@ -288,7 +288,7 @@ contract ERC20Token is Ownable, ERC20Interface {
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
         return true;
-    }   
+    }
 
     // PRIVATE FUNCTIONS
 }
@@ -340,7 +340,7 @@ contract MintableToken is PausableToken
 
     modifier onlyMinter {
         require(minters[msg.sender], "Caller not minter");
-        _; 
+        _;
     }
 
     // CONSTRUCTOR
@@ -371,7 +371,7 @@ contract MintableToken is PausableToken
         emit AddMinter(_newMinter);
     }
 
-    /// @dev remove minter 
+    /// @dev remove minter
     /// @notice remove minter address  `_oldMinter`
     /// @param _oldMinter The address of the minter to remove
     function removeMinter(address _oldMinter) public notNull(_oldMinter) onlyOwner {
@@ -414,9 +414,9 @@ contract MintableToken is PausableToken
     // PRIVATE FUNCTIONS
 
     // EVENTS
-    
+
     event AddMinter(address indexed newMinter);
-    
+
     event RemoveMinter(address indexed oldMinter);
 }
 
@@ -427,7 +427,7 @@ contract MigrationAgent is Ownable, Pausable {
     address public migrationFromContract; // the conttactto migate from
 
     // MODIFIERS
-    
+
     modifier onlyMigrationFromContract() {
         require(msg.sender == migrationFromContract, "Only from migration contract");
         _;
@@ -436,7 +436,7 @@ contract MigrationAgent is Ownable, Pausable {
 
     // PUBLIC FUNCTIONS
 
-    /// @dev set contract to migrate to 
+    /// @dev set contract to migrate to
     /// @param _toContract Then contract address to migrate to
     function startMigrateToContract(address _toContract) public onlyOwner whenPaused {
         migrationToContract = _toContract;
@@ -453,7 +453,7 @@ contract MigrationAgent is Ownable, Pausable {
     }
 
     /// @dev Each user calls the migrate function on the original contract to migrate the users’ tokens to the migration agent migrateFrom on the `migrationToContract` contract
-    function migrate() public;   
+    function migrate() public;
 
     /// @dev migrageFrom is called from the migrating contract `migrationFromContract`
     /// @param _from The account to be migrated into new contract
@@ -502,7 +502,7 @@ contract ActiveBitcoinEtherCertificate is MintableToken, MigrationAgent {
 
     // EXTERNAL FUNCTIONS
 
-    /// @notice update contract description to  `_text` 
+    /// @notice update contract description to  `_text`
     /// @param _text The new description
     function updateDescription(string calldata _text) external onlyMinter {
         description = _text;
@@ -552,10 +552,10 @@ contract ActiveBitcoinEtherCertificate is MintableToken, MigrationAgent {
 
         if (returndata.length > 0) { // Return data is optional
             require(abi.decode(returndata, (bool)));
-        }        
+        }
     }
 
-    /// @notice minter transfer account tokens from one address `_from` to new token owner address `_to`. If `_to` is the redeem address then tokens will be burned 
+    /// @notice minter transfer account tokens from one address `_from` to new token owner address `_to`. If `_to` is the redeem address then tokens will be burned
     /// @param _from The address of the original token owner
     /// @param _to The address of the new token owner
     /// @return Whether the transfer was successful or not
@@ -571,17 +571,17 @@ contract ActiveBitcoinEtherCertificate is MintableToken, MigrationAgent {
 
     // INTERNAL FUNCTIONS
 
-    /// @notice internal send `_value` token to `_to` from `_from` 
+    /// @notice internal send `_value` token to `_to` from `_from`
     /// @param _from The address of the sender
     /// @param _to The address of the recipient
-    /// @param _value The amount of token to be transferred 
+    /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transferInternal(address _from, address _to, uint256 _value) internal notNull(_from) returns (bool) {
         require(_to == redeemAddress, "Wrong destination address");
         // burn _value
         balances[_from] = balances[_from].sub(_value);
         _totalSupply = _totalSupply.sub(_value);
-        // report as transfer + burn 
+        // report as transfer + burn
         emit Transfer(_from, _to, _value);
         emit Transfer(_to, address(0), _value);
         return true;
@@ -590,4 +590,15 @@ contract ActiveBitcoinEtherCertificate is MintableToken, MigrationAgent {
     // PRIVATE FUNCTIONS
 
     event TransferAccount(address indexed _from, address indexed _to);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

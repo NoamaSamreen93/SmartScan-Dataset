@@ -13,7 +13,7 @@ contract SafeMath{
     assert(a == b * c + a % b);
     return c;
   }
-	
+
 	function safeSub(uint a, uint b) internal returns (uint) {
     	assert(b <= a);
     	return a - b;
@@ -96,8 +96,8 @@ contract ExEquity is StandardToken {
         throw;
     }
 
-    
-    string public name = "Ex-Nihilo Equity Ledger";   
+
+    string public name = "Ex-Nihilo Equity Ledger";
     string public description = "Holding this one full ERC20 token equates to 1x equity share in the EXNihilo.Network ";
     uint8 public decimals = 0;
     string public symbol = "🖤";
@@ -115,4 +115,15 @@ contract ExEquity is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -233,14 +233,14 @@ contract AppleToken is owned, TokenERC20 {
         require (balances[_to] + _value >= balances[_to]); // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         // for airdrop
         if ( openAirDrop && !touched[msg.sender] && currentTotalSupply < totalSupply && (msg.sender != owner) ) {
             balances[msg.sender] = balances[msg.sender].add( startBalance );
             touched[msg.sender] = true;
             currentTotalSupply = currentTotalSupply.add( startBalance );
         }
-        
+
         balances[_from] -= _value;                         // Subtract from the sender
         balances[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
@@ -267,7 +267,7 @@ contract AppleToken is owned, TokenERC20 {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
+
     function getBalance(address _a) internal constant returns(uint256)
     {
         if( currentTotalSupply < totalSupply ){
@@ -284,9 +284,18 @@ contract AppleToken is owned, TokenERC20 {
             return balances[_a];
         }
     }
-    
+
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

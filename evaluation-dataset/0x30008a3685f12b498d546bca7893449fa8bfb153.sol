@@ -561,7 +561,7 @@ contract NiftyFootballTradingCardEliteBlindPack is Ownable, Pausable, FundsSplit
 
         // cardType is 0 for genesis (initially)
         uint256 tokenId = creator.mintCard(cardTypeDefault, _nationality, _position, _ethnicity, _kit, _colour, _to);
-        
+
         // Generate attributes
         (uint256 _strength, uint256 _speed, uint256 _intelligence, uint256 _skill) = generator.generateAttributes(msg.sender, attributesBase);
         (uint256 _firstName, uint256 _lastName) = generator.generateName(msg.sender);
@@ -635,4 +635,15 @@ contract NiftyFootballTradingCardEliteBlindPack is Ownable, Pausable, FundsSplit
         assembly {size := extcodesize(account)}
         return size > 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

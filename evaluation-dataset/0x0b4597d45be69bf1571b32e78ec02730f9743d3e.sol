@@ -6,7 +6,7 @@ pragma solidity ^0.4.16;
 interface dAppBridge_I {
     function getOwner() external returns(address);
     function getMinReward(string requestType) external returns(uint256);
-    function getMinGas() external returns(uint256);    
+    function getMinGas() external returns(uint256);
     // Only import the functions we use...
     function callURL(string callback_method, string external_url, string external_params, string json_extract_element) external payable returns(bytes32);
 }
@@ -16,18 +16,18 @@ contract DappBridgeLocator_I {
 
 contract clientOfdAppBridge {
     address internal _dAppBridgeLocator_Prod_addr = 0x5b63e582645227F1773bcFaE790Ea603dB948c6A;
-    
+
     DappBridgeLocator_I internal dAppBridgeLocator;
-    dAppBridge_I internal dAppBridge; 
+    dAppBridge_I internal dAppBridge;
     uint256 internal current_gas = 0;
     uint256 internal user_callback_gas = 0;
-    
+
     function initBridge() internal {
         //} != _dAppBridgeLocator_addr){
-        if(address(dAppBridgeLocator) != _dAppBridgeLocator_Prod_addr){ 
+        if(address(dAppBridgeLocator) != _dAppBridgeLocator_Prod_addr){
             dAppBridgeLocator = DappBridgeLocator_I(_dAppBridgeLocator_Prod_addr);
         }
-        
+
         if(address(dAppBridge) != dAppBridgeLocator.currentLocation()){
             dAppBridge = dAppBridge_I(dAppBridgeLocator.currentLocation());
         }
@@ -41,24 +41,24 @@ contract clientOfdAppBridge {
 
         _;
     }
-    
+
 
     event event_senderAddress(
         address senderAddress
     );
-    
+
     event evnt_dAdppBridge_location(
         address theLocation
     );
-    
+
     event only_dAppBridgeCheck(
         address senderAddress,
         address checkAddress
     );
-    
+
     modifier only_dAppBridge_ {
         initBridge();
-        
+
         //emit event_senderAddress(msg.sender);
         //emit evnt_dAdppBridge_location(address(dAppBridge));
         emit only_dAppBridgeCheck(msg.sender, address(dAppBridge));
@@ -74,9 +74,9 @@ contract clientOfdAppBridge {
 
         _;
     }
-    
 
-    
+
+
     function setGas(uint256 new_gas) internal {
         require(new_gas > 0);
         current_gas = new_gas;
@@ -87,7 +87,7 @@ contract clientOfdAppBridge {
         user_callback_gas = new_callback_gas;
     }
 
-    
+
 
     function callURL(string callback_method, string external_url, string external_params) internal dAppBridgeClient returns(bytes32) {
         uint256 _reward = dAppBridge.getMinReward('callURL')+user_callback_gas;
@@ -115,7 +115,7 @@ contract clientOfdAppBridge {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
-    
+
     function bytes32string(bytes32 b32) internal pure returns (string out) {
         bytes memory s = new bytes(64);
         for (uint8 i = 0; i < 32; i++) {
@@ -123,7 +123,7 @@ contract clientOfdAppBridge {
             byte hi = byte(uint8(b) / 16);
             byte lo = byte(uint8(b) - 16 * uint8(hi));
             s[i*2] = char(hi);
-            s[i*2+1] = char(lo);            
+            s[i*2+1] = char(lo);
         }
         out = string(s);
     }
@@ -131,7 +131,7 @@ contract clientOfdAppBridge {
     function compareStrings (string a, string b) internal pure returns (bool){
         return keccak256(a) == keccak256(b);
     }
-    
+
     function concatStrings(string _a, string _b) internal pure returns (string){
         bytes memory bytes_a = bytes(_a);
         bytes memory bytes_b = bytes(_b);
@@ -151,19 +151,19 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -178,14 +178,14 @@ library SafeMath {
 //
 
 contract DiceRoll is clientOfdAppBridge {
-    
+
     using SafeMath for uint256;
 
-    
+
     string public randomAPI_url;
     string internal randomAPI_key;
     string internal randomAPI_extract;
-    
+
     struct playerDiceRoll {
         bytes32     betID;
         address     playerAddr;
@@ -197,7 +197,7 @@ contract DiceRoll is clientOfdAppBridge {
         uint256     result;
         uint256     timestamp;
     }
-    
+
 
     mapping (bytes32 => playerDiceRoll) public playerRolls;
     mapping (address => uint256) playerPendingWithdrawals;
@@ -212,7 +212,7 @@ contract DiceRoll is clientOfdAppBridge {
     uint256 public minRollUnder;
     uint256 public houseEdge; // 98 = 2%
     uint256 public totalUserProfit;
-    uint256 public totalWins; 
+    uint256 public totalWins;
     uint256 public totalLosses;
     uint256 public totalWinAmount;
     uint256 public totalLossAmount;
@@ -220,12 +220,12 @@ contract DiceRoll is clientOfdAppBridge {
     uint256 internal totalProfit;
     uint256 public maxMultiRolls;
     uint256 public gameNumber;
-    
+
     uint256 public oracleFee;
-    
-    
+
+
     mapping(uint256 => bool) public permittedRolls;
-    
+
     uint public maxPendingPayouts; // Max potential payments
 
     function private_getGameState() public view returns(uint256 _contractBalance,
@@ -256,7 +256,7 @@ contract DiceRoll is clientOfdAppBridge {
         _totalLossAmount = totalLossAmount;
         _liveMaxBet = getLiveMaxBet();
         _totalFails = totalFails;
-    
+
     }
     modifier onlyOwner() {
         require (msg.sender == owner);
@@ -272,13 +272,13 @@ contract DiceRoll is clientOfdAppBridge {
         require(betSize <= maxBet);
         require(betSize >= minBet);
         require(permittedRolls[rollUnder] == true);
-        
+
         uint256 potential_profit = (msg.value * (houseEdge / rollUnder)) - msg.value;
         require(maxPendingPayouts.add(potential_profit) <= address(this).balance);
-        
+
         _;
     }
-    
+
     modifier validBetMulti(uint256 betSize, uint256 rollUnder, uint256 number_of_rolls) {
         require(rollUnder > minRoll);
         require(rollUnder < maxRoll);
@@ -286,10 +286,10 @@ contract DiceRoll is clientOfdAppBridge {
         require(betSize >= minBet);
         require(number_of_rolls <= maxMultiRolls);
         require(permittedRolls[rollUnder] == true);
-        
+
         uint256 potential_profit = (msg.value * (houseEdge / rollUnder)) - msg.value;
         require(maxPendingPayouts.add(potential_profit) <= address(this).balance);
-        
+
         _;
     }
 
@@ -323,7 +323,7 @@ contract DiceRoll is clientOfdAppBridge {
         paid = _playerDiceRoll.paid;
         result = _playerDiceRoll.result;
         timestamp = _playerDiceRoll.timestamp;
-        
+
     }
 
     function getOwner() external view returns(address){
@@ -334,7 +334,7 @@ contract DiceRoll is clientOfdAppBridge {
         address myAddress = this;
         return myAddress.balance;
     }
-    
+
     constructor() public payable {
         owner = msg.sender;
         houseEdge = 96; // 4% commission to us on wins
@@ -363,9 +363,9 @@ contract DiceRoll is clientOfdAppBridge {
         totalFails = 0;
         maxMultiRolls = 5;
         gameNumber = 0;
-        oracleFee = 80000000000000; 
+        oracleFee = 80000000000000;
     }
-    
+
     event DiceRollResult_failedSend(
             bytes32 indexed betID,
             address indexed playerAddress,
@@ -373,41 +373,41 @@ contract DiceRoll is clientOfdAppBridge {
             uint256 result,
             uint256 amountToSend
         );
-        
+
 
     // totalUserProfit : Includes the original stake
     // totalWinAmount : Is just the win amount (Does not include orig stake)
     event DiceRollResult(
-            bytes32 indexed betID, 
-            address indexed playerAddress, 
-            uint256 rollUnder, 
+            bytes32 indexed betID,
+            address indexed playerAddress,
+            uint256 rollUnder,
             uint256 result,
             uint256 stake,
             uint256 profit,
             uint256 win,
             bool paid,
             uint256 timestamp);
-    
+
     // This is called from dAppBridge.com with the random number with secure proof
     function callback(bytes32 key, string callbackData) external payable only_dAppBridge {
         require(playerRolls[key].playerAddr != address(0x0));
         require(playerRolls[key].win == 2); // we've already process it if so!
 
         playerRolls[key].result = parseInt(callbackData);
-        
+
         uint256 _totalWin = playerRolls[key].stake.add(playerRolls[key].profit); // total we send back to playerRolls
-        
-        
+
+
         if(maxPendingPayouts < playerRolls[key].profit){
             //force refund as game failed...
             playerRolls[key].result == 0;
-            
+
         } else {
             maxPendingPayouts = maxPendingPayouts.sub(playerRolls[key].profit); // take it out of the pending payouts now
         }
-        
-        
-        
+
+
+
         if(playerRolls[key].result == 0){
 
             totalFails = totalFails.add(1);
@@ -415,117 +415,117 @@ contract DiceRoll is clientOfdAppBridge {
 
             if(!playerRolls[key].playerAddr.send(playerRolls[key].stake)){
                 //playerRolls[key].paid = false;
-                
-                
-                
+
+
+
                 emit DiceRollResult(key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result,
                     playerRolls[key].stake, 0, 0, false, now);
-                
+
                 emit DiceRollResult_failedSend(
                     key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result, playerRolls[key].stake );
-                    
+
                playerPendingWithdrawals[playerRolls[key].playerAddr] = playerPendingWithdrawals[playerRolls[key].playerAddr].add(playerRolls[key].stake);
-               
+
                delete playerRolls[key];
             } else {
-                
+
                 emit DiceRollResult(key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result,
                     playerRolls[key].stake, 0, 0, true, now);
-                
+
                 delete playerRolls[key];
             }
 
             return;
-            
+
         } else {
-        
+
             if(playerRolls[key].result < playerRolls[key].rollUnder) {
 
                 contractBalance = contractBalance.sub(playerRolls[key].profit.add(oracleFee)); // how much we have won/lost
                 totalUserProfit = totalUserProfit.add(_totalWin); // game stats
                 totalWins = totalWins.add(1);
                 totalWinAmount = totalWinAmount.add(playerRolls[key].profit);
-                
 
-        
+
+
                 uint256 _player_profit_1percent = playerRolls[key].profit.div(houseEdge);
                 uint256 _our_cut = _player_profit_1percent.mul(100-houseEdge); // we get 4%
                 totalProfit = totalProfit.add(_our_cut); // Only add when its a win!
 
                 if(!playerRolls[key].playerAddr.send(_totalWin)){
                     // failed to send - need to retry so add to playerPendingWithdrawals
-                    
+
                     emit DiceRollResult(key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result,
                         playerRolls[key].stake, playerRolls[key].profit, 1, false, now);
-                    
+
                     emit DiceRollResult_failedSend(
                         key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result, _totalWin );
-    
+
                     playerPendingWithdrawals[playerRolls[key].playerAddr] = playerPendingWithdrawals[playerRolls[key].playerAddr].add(_totalWin);
-                    
+
                     delete playerRolls[key];
-                    
+
                 } else {
-                    
+
                     emit DiceRollResult(key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result,
                         playerRolls[key].stake, playerRolls[key].profit, 1, true, now);
-                        
+
                     delete playerRolls[key];
-                        
+
                 }
-                
+
                 return;
-                
+
             } else {
                 //playerRolls[key].win=0;
                 totalLosses = totalLosses.add(1);
                 totalLossAmount = totalLossAmount.add(playerRolls[key].stake);
                 contractBalance = contractBalance.add(playerRolls[key].stake.sub(oracleFee)); // how much we have won
-                
+
                 emit DiceRollResult(key, playerRolls[key].playerAddr, playerRolls[key].rollUnder, playerRolls[key].result,
                     playerRolls[key].stake, playerRolls[key].profit, 0, true, now);
                 delete playerRolls[key];
 
-    
+
                 return;
             }
         }
 
-        
+
 
     }
-    
-    
+
+
     function rollDice(uint rollUnder) public payable gameActive validBet(msg.value, rollUnder) returns (bytes32) {
 
         // This is the actual call to dAppBridge - using their callURL function to easily access an external API
-        // such as random.org        
-        bytes32 betID = callURL("callback", randomAPI_url, 
-        constructAPIParam(), 
+        // such as random.org
+        bytes32 betID = callURL("callback", randomAPI_url,
+        constructAPIParam(),
         randomAPI_extract);
 
         gameNumber = gameNumber.add(1);
 
-        
+
         uint256 _fullTotal = (msg.value * getBetDivisor(rollUnder)   ); // 0.0002 * 250 = 0.0005
         _fullTotal = _fullTotal.div(100);
         _fullTotal = _fullTotal.sub(msg.value);
-        
+
         uint256 _fullTotal_1percent = _fullTotal.div(100); // e.g = 1
-        
+
         uint256 _player_profit = _fullTotal_1percent.mul(houseEdge); // player gets 96%
-        
-        
+
+
         playerRolls[betID] = playerDiceRoll(betID, msg.sender, rollUnder, msg.value, _player_profit, 2, false, 0, now);
 
         maxPendingPayouts = maxPendingPayouts.add(_player_profit); // don't add it to contractBalance yet until its a loss
 
         emit DiceRollResult(betID, msg.sender, rollUnder, 0,
             msg.value, _player_profit, 2, false, now);
-            
+
         return betID;
     }
-    
+
     function rollDice(uint rollUnder, uint number_of_rolls) public payable gameActive validBetMulti(msg.value, rollUnder, number_of_rolls) returns (bytes32) {
 
         uint c = 0;
@@ -534,7 +534,7 @@ contract DiceRoll is clientOfdAppBridge {
         }
 
     }
-    
+
     function getBetDivisor(uint256 rollUnder) public pure returns (uint256) {
         if(rollUnder==5)
             return 20 * 100;
@@ -556,20 +556,20 @@ contract DiceRoll is clientOfdAppBridge {
             return 1.25 * 100;
         if(rollUnder==90)
             return 1.11 * 100;
-        
+
         return (100/rollUnder) * 10;
     }
-    
+
     function constructAPIParam() internal view returns(string){
         return strConcat(
             strConcat("{\"jsonrpc\":\"2.0\",\"method\":\"generateIntegers\",\"params\":{\"apiKey\":\"",
         randomAPI_key, "\",\"n\":1,\"min\":", uint2str(minRoll), ",\"max\":", uint2str(maxRoll), ",\"replacement\":true,\"base\":10},\"id\":"),
-        uint2str(gameNumber), "}" 
+        uint2str(gameNumber), "}"
         ); // Add in gameNumber to the params to avoid clashes
     }
-    
+
     // need to process any playerPendingWithdrawals
-    
+
     // Allow a user to withdraw any pending amount (That may of failed previously)
     function player_withdrawPendingTransactions() public
         returns (bool)
@@ -592,9 +592,9 @@ contract DiceRoll is clientOfdAppBridge {
         return playerPendingWithdrawals[addressToCheck];
     }
 
-    
+
     // need to auto calc max bet
-    
+
 
     // private functions
     function private_addPermittedRoll(uint256 _rollUnder) public onlyOwner {
@@ -691,7 +691,7 @@ contract DiceRoll is clientOfdAppBridge {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d, string _e, string _f, string _g) internal pure returns (string) {
         string memory abcdef = strConcat(_a,_b,_c,_d,_e,_f);
         return strConcat(abcdef, _g);
@@ -753,4 +753,15 @@ contract DiceRoll is clientOfdAppBridge {
         return string(bstr);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -692,3 +692,10 @@ contract OAKTokenCrowdsale is FinalizableCrowdsale, Pausable {
   }
 
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

@@ -1304,3 +1304,14 @@ contract PixieCrowdsale is Crowdsale, Pausable {
     emit OwnerTransfer(msg.sender, address(this), _beneficiary, _tokenAmount);
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

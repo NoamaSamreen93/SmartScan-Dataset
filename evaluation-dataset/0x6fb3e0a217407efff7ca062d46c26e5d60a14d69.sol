@@ -494,3 +494,9 @@ contract IoTeXNetwork is StandardToken, Pausable {
       return super.decreaseApproval(_spender, _subtractedValue);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

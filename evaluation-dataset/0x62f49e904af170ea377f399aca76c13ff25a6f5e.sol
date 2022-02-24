@@ -73,13 +73,13 @@ interface Token {
 }
 
 contract TrustlessOTC is Ownable {
-    
+
     mapping(address => uint256) public balanceTracker;
-    
+
     event OfferCreated(uint indexed tradeID);
     event OfferCancelled(uint indexed tradeID);
     event OfferTaken(uint indexed tradeID);
-    
+
     struct TradeOffer {
         address tokenFrom;
         address tokenTo;
@@ -89,12 +89,12 @@ contract TrustlessOTC is Ownable {
         bool active;
         uint tradeID;
     }
-    
+
     TradeOffer[] public offers;
-    
+
     function initiateTrade(
         address _tokenFrom,
-        address _tokenTo, 
+        address _tokenTo,
         uint256 _amountFrom,
         uint256 _amountTo
         ) public returns (uint newTradeID) {
@@ -112,7 +112,7 @@ contract TrustlessOTC is Ownable {
             o.tradeID = newTradeID;
             emit OfferCreated(newTradeID);
     }
-    
+
     function cancelTrade(uint tradeID) public returns (bool) {
         TradeOffer storage o = offers[tradeID];
         require(msg.sender == o.creator);
@@ -122,7 +122,7 @@ contract TrustlessOTC is Ownable {
         emit OfferCancelled(tradeID);
         return true;
     }
-    
+
     function take(uint tradeID) public returns (bool) {
         TradeOffer storage o = offers[tradeID];
         require(o.active == true);
@@ -133,10 +133,10 @@ contract TrustlessOTC is Ownable {
         emit OfferTaken(tradeID);
         return true;
     }
-    
+
     function getOfferDetails(uint tradeID) external view returns (
         address _tokenFrom,
-        address _tokenTo, 
+        address _tokenTo,
         uint256 _amountFrom,
         uint256 _amountTo,
         address _creator,
@@ -151,13 +151,17 @@ contract TrustlessOTC is Ownable {
         _active = o.active;
     }
 
-    
+
     function reclaimToken(Token _token) external onlyOwner {
         uint256 balance = _token.balanceOf(address(this));
         uint256 excess = balance - balanceTracker[address(_token)];
         require(excess > 0);
         _token.transfer(owner, excess);
     }
-    
-    
+
+
+}
+function() payable external {
+	revert();
+}
 }

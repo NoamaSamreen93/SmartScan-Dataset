@@ -222,7 +222,7 @@ contract FixedSupplyBurnableToken is ERC20Interface, Owned {
         allowed[account][msg.sender] = allowed[account][msg.sender].sub(value);
         _burn(account, value);
         emit Approval(account, msg.sender, allowed[account][msg.sender]);
-    
+
     }
 
     // ------------------------------------------------------------------------
@@ -231,4 +231,13 @@ contract FixedSupplyBurnableToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

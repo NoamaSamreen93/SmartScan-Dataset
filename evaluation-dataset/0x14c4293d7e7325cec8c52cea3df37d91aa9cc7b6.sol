@@ -853,7 +853,7 @@ contract GameData {
         uint256 wildAnimalId;
         uint256 xp;
         uint16 effectiveness;
-        uint16[3] accessories;      
+        uint16[3] accessories;
     }
 }
 
@@ -1101,15 +1101,15 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
     }
 
     function sequenceContractDna(uint256 wildAnimalId, uint256[] calldata dnaIds) external {
-        require(!isWithdrawnFromContract(msg.sender, wildAnimalId), "Animal was already minted from contract");  
+        require(!isWithdrawnFromContract(msg.sender, wildAnimalId), "Animal was already minted from contract");
         withdrawnHashedContractAnimals[keccak256(abi.encodePacked(msg.sender, wildAnimalId))] = true;
-        sequenceDna(wildAnimalId, dnaIds, cryptoServalContract);  
+        sequenceDna(wildAnimalId, dnaIds, cryptoServalContract);
     }
 
     function sequenceRepositoryDna(uint256 wildAnimalId, uint256[] calldata dnaIds) external {
-        require(!isWithdrawnFromRepository(msg.sender, wildAnimalId), "Animal was already minted from repository");  
+        require(!isWithdrawnFromRepository(msg.sender, wildAnimalId), "Animal was already minted from repository");
         withdrawnHashedRepositoryAnimals[keccak256(abi.encodePacked(msg.sender, wildAnimalId))] = true;
-        sequenceDna(wildAnimalId, dnaIds, dnaRepositoryContract);  
+        sequenceDna(wildAnimalId, dnaIds, dnaRepositoryContract);
     }
 
     function spawnOffspring(
@@ -1125,7 +1125,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         payable
         usesNonce(nonce)
         spawnPriced()
-    {        
+    {
         require(now < timestamp.add(spawnWindow), "Animal spawn expired");
         require(effectiveness <= 100, "Invalid effectiveness");
         require(isServalChainSigner(
@@ -1141,7 +1141,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         addressToGems[msg.sender] = addressToGems[msg.sender].sub(rarityToSpawnGemCost[rarity]);
         mintAnimal(wildAnimalId, effectiveness, msg.sender);
     }
-        
+
     function requestGems(
         uint256 amount,
         uint256 nonce,
@@ -1150,15 +1150,15 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         bytes32 s
         )
         external
-        payable        
+        payable
         usesNonce(nonce)
         syncPriced()
     {
         require(isServalChainSigner(
             keccak256(abi.encodePacked(amount, nonce, msg.sender, this)), v, r, s),
             "Invalid signature"
-            );        
-        addGems(msg.sender, amount);        
+            );
+        addGems(msg.sender, amount);
     }
 
     function addXp(
@@ -1182,7 +1182,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
 
         emit XpAddedEvent(animalId, xpToAdd);
     }
-      
+
     function addAccessories(
         uint256 animalId,
         uint8 accessorySlot,
@@ -1194,7 +1194,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         )
         external
         payable
-        syncPriced()      
+        syncPriced()
         usesNonce(nonce)
     {
         require(isServalChainSigner(
@@ -1204,25 +1204,25 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
                 s
             ),
             "Invalid signature"
-            );        
+            );
         require(msg.sender == ownerOf(animalId));
-        require(animals[animalId].accessories[accessorySlot] == 0);     
-        
+        require(animals[animalId].accessories[accessorySlot] == 0);
+
         animals[animalId].accessories[accessorySlot] = accessoryId;
         emit AccessoryAddedEvent(animalId, accessorySlot, accessoryId);
     }
 
-    function fuseAnimal(uint256 animalId) external payable syncPriced() {        
+    function fuseAnimal(uint256 animalId) external payable syncPriced() {
         Animal memory animal = animals[animalId];
 
         address wildAnimalOwner;
         uint8 rarity;
         (, , rarity, , , wildAnimalOwner,) = cryptoServalContract.getAnimal(animal.wildAnimalId);
-        
+
         uint256 gemsToAdd = uint256(animal.effectiveness).div(4);
         uint256 rarityMultiplier = uint256(rarity).add(1);
 
-        if (gemsToAdd > 2) {            
+        if (gemsToAdd > 2) {
             gemsToAdd = gemsToAdd.mul(rarityMultiplier);
         }
 
@@ -1244,7 +1244,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         // approve, not a transfer, let marketplace confirm the original owner and take ownership
         approve(address(marketplaceContract), _tokenId);
         marketplaceContract.createAuction(_tokenId, startPrice, endPrice, duration);
-    } 
+    }
 
     function getAnimal(uint256 animalId)
     external
@@ -1296,7 +1296,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
     }
 
     function isWithdrawnFromRepository(address owner, uint256 wildAnimalId) public view returns(bool) {
-        return withdrawnHashedRepositoryAnimals[keccak256(abi.encodePacked(owner, wildAnimalId))]; 
+        return withdrawnHashedRepositoryAnimals[keccak256(abi.encodePacked(owner, wildAnimalId))];
     }
 
     function isServalChainSigner(bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) public view returns (bool) {
@@ -1312,7 +1312,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         uint256 sumOfEffectiveness = 0;
 
         require(!hasDuplicateMember(dnaIds), "DNA array contains the same cards");
-        
+
         for (uint256 i = 0; i < dnaIds.length; i++) {
             uint animalId;
             address owner;
@@ -1324,21 +1324,21 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
             require(animalId == animalToSpawn, "Provided DNA has incorrect wild animal id");
             require(msg.sender == owner, "Sender is not owner of DNA");
 
-            if (effectiveness > highestEffectiveness) { 
+            if (effectiveness > highestEffectiveness) {
                 highestEffectiveness = effectiveness;
             }
 
             sumOfEffectiveness = sumOfEffectiveness.add(effectiveness);
         }
-        
-        uint256 effectivenessBonus = (sumOfEffectiveness.sub(highestEffectiveness)).div(10); 
+
+        uint256 effectivenessBonus = (sumOfEffectiveness.sub(highestEffectiveness)).div(10);
         uint256 finalEffectiveness = highestEffectiveness.add(effectivenessBonus);
         if (finalEffectiveness > 100) {
             addGems(msg.sender, finalEffectiveness.sub(100));
-            
-            finalEffectiveness = 100;            
+
+            finalEffectiveness = 100;
         }
-        
+
         mintAnimal(animalToSpawn, uint16(finalEffectiveness), msg.sender);
     }
 
@@ -1362,7 +1362,7 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
             0,
             effectiveness,
             [uint16(0), uint16(0), uint16(0)]
-        ); 
+        );
         uint256 id = animals.length; // id before push
         animals.push(animal);
         _mint(mintTo, id);
@@ -1389,4 +1389,15 @@ contract CryptoServalV2 is ERC721Full("CryptoServalGame", "CSG"), GameData, Rest
         require(msg.value == spawnCost, "Mint price not paid");
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

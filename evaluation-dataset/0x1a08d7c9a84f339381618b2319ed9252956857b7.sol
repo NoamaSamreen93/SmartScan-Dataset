@@ -16,7 +16,7 @@ contract RiddleMeThis {
     address private riddler;
 
     function () payable public {}
-    
+
     constructor (string _riddle, bytes32 _answerHash) public payable {
         riddler = msg.sender;
         riddle = _riddle;
@@ -28,23 +28,34 @@ contract RiddleMeThis {
         require(isActive);
         require(msg.value > 1 ether);
         require(bytes(guess).length > 0);
-        
+
         Guess newGuess;
         newGuess.player = msg.sender;
         newGuess.guess = guess;
         guesses.push(newGuess);
-        
+
         if (keccak256(guess) == answerHash) {
             answer = guess;
             isActive = false;
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function end(string _answer) public {
         require(msg.sender == riddler);
         answer = _answer;
         isActive = false;
         msg.sender.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,25 +1,25 @@
 /**
  * Do you have any questions or suggestions? Emails us @ support@cryptbond.net
- * 
+ *
  * ===================== CRYPTBOND NETWORK =======================*
-  oooooooo8 oooooooooo ooooo  oooo oooooooooo  ooooooooooo oooooooooo    ooooooo  oooo   oooo ooooooooo   
-o888     88  888    888  888  88    888    888 88  888  88  888    888 o888   888o 8888o  88   888    88o 
-888          888oooo88     888      888oooo88      888      888oooo88  888     888 88 888o88   888    888 
-888o     oo  888  88o      888      888            888      888    888 888o   o888 88   8888   888    888 
- 888oooo88  o888o  88o8   o888o    o888o          o888o    o888ooo888    88ooo88  o88o    88  o888ooo88   
-                                                                                                          
-        oooo   oooo ooooooooooo ooooooooooo oooo     oooo  ooooooo  oooooooooo  oooo   oooo                       
-         8888o  88   888    88  88  888  88  88   88  88 o888   888o 888    888  888  o88                         
-         88 888o88   888ooo8        888       88 888 88  888     888 888oooo88   888888                           
-         88   8888   888    oo      888        888 888   888o   o888 888  88o    888  88o                         
-        o88o    88  o888ooo8888    o888o        8   8      88ooo88  o888o  88o8 o888o o888o                      
-*                                                                
+  oooooooo8 oooooooooo ooooo  oooo oooooooooo  ooooooooooo oooooooooo    ooooooo  oooo   oooo ooooooooo
+o888     88  888    888  888  88    888    888 88  888  88  888    888 o888   888o 8888o  88   888    88o
+888          888oooo88     888      888oooo88      888      888oooo88  888     888 88 888o88   888    888
+888o     oo  888  88o      888      888            888      888    888 888o   o888 88   8888   888    888
+ 888oooo88  o888o  88o8   o888o    o888o          o888o    o888ooo888    88ooo88  o88o    88  o888ooo88
+
+        oooo   oooo ooooooooooo ooooooooooo oooo     oooo  ooooooo  oooooooooo  oooo   oooo
+         8888o  88   888    88  88  888  88  88   88  88 o888   888o 888    888  888  o88
+         88 888o88   888ooo8        888       88 888 88  888     888 888oooo88   888888
+         88   8888   888    oo      888        888 888   888o   o888 888  88o    888  88o
+        o88o    88  o888ooo8888    o888o        8   8      88ooo88  o888o  88o8 o888o o888o
+*
 * ===============================================================*
 **/
 /*
  For ICO: 50%
-- For Founders: 10% 
-- For Team: 10% 
+- For Founders: 10%
+- For Team: 10%
 - For Advisors: 10%
 - For Airdrop: 20%
 ✅ ICO Timeline:
@@ -35,7 +35,7 @@ o888     88  888    888  888  88    888    888 88  888  88  888    888 o888   88
 - All token sold out
 - End of ICO
 
-*/ 
+*/
 
 /**
  * @title Crowdsale
@@ -46,7 +46,7 @@ o888     88  888    888  888  88    888    888 88  888  88  888    888 o888   88
  * as they arrive.
  */
 pragma solidity ^0.4.24;
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -86,7 +86,7 @@ contract Ownable {
    */
   function Ownable() public {
     owner = msg.sender;
-    
+
   }
 
 
@@ -112,7 +112,7 @@ contract Ownable {
             OwnershipTransferred(owner, newOwner);
             owner = newOwner;
          }
-             
+
     }
 
 }
@@ -138,7 +138,7 @@ contract Cryptbond is ERC20Interface,Ownable {
    using SafeMath for uint256;
     uint256 public totalSupply;
     mapping(address => uint256) tokenBalances;
-   
+
    string public constant name = "Cryptbond";
    string public constant symbol = "CBN";
    uint256 public constant decimals = 0;
@@ -159,7 +159,7 @@ contract Cryptbond is ERC20Interface,Ownable {
         tokenBalances[wallet] = 3000000000;   //Since we divided the token into 10^18 parts
         }
     }
-    
+
  /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -172,8 +172,8 @@ contract Cryptbond is ERC20Interface,Ownable {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  
+
+
      /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -191,16 +191,16 @@ contract Cryptbond is ERC20Interface,Ownable {
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
     uint price = 0.000001 ether;
     function() public payable {
-        
+
         uint toMint = msg.value/price;
         //totalSupply += toMint;
         tokenBalances[msg.sender]+=toMint;
         Transfer(0,msg.sender,toMint);
-        
-     }     
+
+     }
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -223,7 +223,7 @@ contract Cryptbond is ERC20Interface,Ownable {
      function totalSupply() public constant returns (uint) {
          return totalSupply  - tokenBalances[address(0)];
      }
-     
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -261,4 +261,15 @@ contract Cryptbond is ERC20Interface,Ownable {
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

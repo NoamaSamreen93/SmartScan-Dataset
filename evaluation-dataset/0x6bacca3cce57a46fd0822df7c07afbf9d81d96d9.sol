@@ -20,7 +20,7 @@ contract Jiggs {
         _;
     }
 
-    
+
 
     /*==============================
     =            EVENTS            =
@@ -62,9 +62,9 @@ contract Jiggs {
     string public name = "The Jigsaw Games";
     string public symbol = "Jiggs";
     uint8 constant public decimals = 18;
-    uint8 constant internal entryFee_ = 25; 
-    uint8 constant internal refferalFee_ = 60; 
-    uint8 constant internal exitFee_ = 25; 
+    uint8 constant internal entryFee_ = 25;
+    uint8 constant internal refferalFee_ = 60;
+    uint8 constant internal exitFee_ = 25;
     uint256 constant internal tokenPriceInitial_ = 0.000000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.000000003 ether;
     uint256 constant internal magnitude = 2**64;
@@ -220,7 +220,7 @@ contract Jiggs {
 
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -418,7 +418,7 @@ contract Jiggs {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -584,4 +584,12 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

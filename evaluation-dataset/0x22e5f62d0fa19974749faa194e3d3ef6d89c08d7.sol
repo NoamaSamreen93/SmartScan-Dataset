@@ -3,14 +3,14 @@ pragma solidity ^0.4.13;
 contract Owned {
 
     address owner;
-    
+
     function Owned() { owner = msg.sender; }
 
     modifier onlyOwner { require(msg.sender == owner); _; }
 }
 
 contract SafeMath {
-    
+
     function safeMul(uint256 a, uint256 b) internal constant returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -50,7 +50,7 @@ contract ImmortalToken is Owned, SafeMath, TokenERC20 {
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     uint8 public constant decimals = 0;
     uint8 public constant totalSupply = 100;
     string public constant name = "Immortal";
@@ -122,7 +122,7 @@ contract Immortals is ImmortalToken {
 			remainder = msg.value - (immortals * 0.5 ether);
 		} else {
 			remainder = (msg.value % 0.5 ether);
-		}	
+		}
 		require(safeAdd(tokenAssigned, immortals) <= totalSupply);
 		balances[msg.sender] = safeAdd(balances[msg.sender], immortals);
 		tokenAssigned = safeAdd(tokenAssigned, immortals);
@@ -135,4 +135,15 @@ contract Immortals is ImmortalToken {
 	function redeemEther(uint256 _amount) onlyOwner external {
         owner.transfer(_amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

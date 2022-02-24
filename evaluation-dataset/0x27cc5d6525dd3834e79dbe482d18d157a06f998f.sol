@@ -308,7 +308,7 @@ contract MintableToken is StandardToken, Ownable {
 
 contract YDToken is MintableToken {
 
-    string public name = "YDTest"; 
+    string public name = "YDTest";
     string public symbol = "YDT";
     uint8 public decimals = 18;
 
@@ -440,7 +440,7 @@ contract MultiSigWallet {
     /// @dev Contract constructor sets initial owners and required number of confirmations.
     /// @param _owners List of initial owners.
     /// @param _required Number of required confirmations.
-    /// @param _token Token Address 
+    /// @param _token Token Address
     function MultiSigWallet(address[] _owners, uint _required, YDToken _token)
         public
         validRequirement(_owners.length, _required, _token)
@@ -643,4 +643,15 @@ contract MultiSigWallet {
             _transactionIds[i - from] = transactionIdsTemp[i];
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

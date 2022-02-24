@@ -257,3 +257,14 @@ contract NatCoin is MintableToken {
   string public constant symbol = "NTC";
   uint256 public constant decimals = 18;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

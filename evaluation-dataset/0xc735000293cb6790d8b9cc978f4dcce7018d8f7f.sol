@@ -327,12 +327,12 @@ contract Countdown3D {
         public
         view
         returns(
-            uint256 balance, 
-            uint256 blockCap, 
-            uint256 claimed, 
-            uint256 pot, 
-            uint256 random, 
-            uint256 startTime, 
+            uint256 balance,
+            uint256 blockCap,
+            uint256 claimed,
+            uint256 pot,
+            uint256 random,
+            uint256 startTime,
             uint256 tickets)
     {
         Round storage round = rounds[roundId];
@@ -872,4 +872,13 @@ library Caste {
 
         return (caste0 + cost, caste1, caste2);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -279,3 +279,12 @@ contract RentalProcessorToken is ERC20 {
         _mint(msg.sender, 2000000000 * (10 ** decimals));
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

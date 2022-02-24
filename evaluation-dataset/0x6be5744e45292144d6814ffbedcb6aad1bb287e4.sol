@@ -20,7 +20,7 @@ contract owned {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract CikkaCoin is owned {
-   
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -44,13 +44,13 @@ contract CikkaCoin is owned {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function CikkaCoin() public {
-  
+
         totalSupply = 500000000 * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = 'Cikka Coin';                                   // Set the name for display purposes
         symbol = 'CiC';                               // Set the symbol for display purposes
    }
-   
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -165,9 +165,9 @@ contract CikkaCoin is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
      mapping (address => bool) public frozenAccount;
-     
+
      /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -181,7 +181,7 @@ contract CikkaCoin is owned {
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -189,5 +189,13 @@ contract CikkaCoin is owned {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
- 
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

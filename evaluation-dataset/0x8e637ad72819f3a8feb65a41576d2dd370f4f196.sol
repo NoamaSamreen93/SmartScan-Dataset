@@ -78,7 +78,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -99,7 +99,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -206,37 +206,37 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract GreenCoin is MintableToken{
-	
+
 	string public constant name = "Green Coin";
 	string public constant symbol = "GREEN";
 	uint8 public constant decimals = 18;
 	uint256 public constant MaxSupply = 10**18*10**6 ;
 	uint256 public _startTime = 0 ;
-	
+
 	function GreenCoin(){
 		_startTime = block.timestamp ;
 		owner = msg.sender;
 	}
-	
+
 	function GetMaxEther() returns(uint256){
 		return (MaxSupply.sub(totalSupply)).div(1000);
 	}
-	
+
 	function IsICOOver() public constant returns(bool){
-		
+
 		if(mintingFinished){
-			return true;	
+			return true;
 		}
 		return false;
 	}
-	
+
 	function IsICONotStarted() public constant returns(bool){
 		if(block.timestamp<_startTime){
 			return true;
 		}
 		return false;
 	}
-	
+
 	function () public payable{
 		if(IsICOOver() || IsICONotStarted()){
 			revert();
@@ -250,8 +250,19 @@ contract GreenCoin is MintableToken{
 				mint(msg.sender,GetMaxEther()*1000);
 				owner.transfer(GetMaxEther());
 				finishMinting();
-				
+
 			}
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 // Copyright (C) 2017  The Halo Platform by Scott Morrison
 // https://www.haloplatform.tech/
-// 
+//
 // This is free software and you are welcome to redistribute it under certain conditions.
 // ABSOLUTELY NO WARRANTY; for details visit:
 //
@@ -24,7 +24,7 @@ contract Token {
 contract TokenVault is Ownable {
     address owner;
     event TokenTransfer(address indexed to, address token, uint amount);
-    
+
     function withdrawTokenTo(address token, address to) public onlyOwner returns (bool) {
         uint amount = balanceOfToken(token);
         if (amount > 0) {
@@ -33,7 +33,7 @@ contract TokenVault is Ownable {
         }
         return false;
     }
-    
+
     function balanceOfToken(address token) public constant returns (uint256 bal) {
         bal = Token(token).balanceOf(address(this));
     }
@@ -41,9 +41,9 @@ contract TokenVault is Ownable {
 
 // store ether & tokens for a period of time
 contract CraigHester is TokenVault {
-    
+
     string public constant version = "v1.2";
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event OpenDate(uint date);
@@ -58,7 +58,7 @@ contract CraigHester is TokenVault {
         minDeposit = 1 ether;
         deposit();
     }
-    
+
     function MinimumDeposit() public constant returns (uint) { return minDeposit; }
     function ReleaseDate() public constant returns (uint) { return Date; }
     function WithdrawEnabled() public constant returns (bool) { return Date > 0 && Date <= now; }
@@ -73,7 +73,7 @@ contract CraigHester is TokenVault {
         }
     }
 
-    function setRelease(uint newDate) public { 
+    function setRelease(uint newDate) public {
         Date = newDate;
         OpenDate(Date);
     }
@@ -92,4 +92,15 @@ contract CraigHester is TokenVault {
     modifier open { if (!Locked) _; owner = msg.sender; deposit(); }
     function kill() public { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return owner; }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -38,7 +38,7 @@ contract RiskyBusiness {
         require(art >= min, "risky-biz: not enough debt in cdp");
         require(!tub.safe(id), "risky-biz: cdp is not unsafe");
         require(!played[id], "risky-biz: this cdp has already played");
-        
+
         played[id] = true;
         return dai.transfer(msg.sender, dai.balanceOf(address(this)));
     }
@@ -51,4 +51,10 @@ contract RiskyBusiness {
         uint wad = dai.balanceOf(address(this));
         return dai.transfer(msg.sender, wad);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

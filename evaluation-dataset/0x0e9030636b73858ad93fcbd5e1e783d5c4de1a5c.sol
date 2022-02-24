@@ -271,3 +271,14 @@ contract Diadem is StandardToken, Ownable {
     event MintingAgentChanged(address addr, bool state);
     event MintFinished();
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

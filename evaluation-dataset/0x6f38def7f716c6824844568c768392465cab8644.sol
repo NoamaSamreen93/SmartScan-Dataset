@@ -62,7 +62,7 @@ contract StandardToken is ERC20, SafeMath {
     }
 }
 
-contract GreeningDesertChainToken is StandardToken 
+contract GreeningDesertChainToken is StandardToken
 {
     string public name = "GreeningDesertChainToken";
     string public symbol = "GDCTK";
@@ -72,4 +72,10 @@ contract GreeningDesertChainToken is StandardToken
     function GreeningDesertChainToken() public {
         balances[msg.sender] = totalSupply;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -173,7 +173,7 @@ contract ToorToken is ERC20Basic, Ownable {
         ratesByYear[20] = 1.000805405 * 10**9;
 
         totalRateWindows = 20;
-        
+
         maxSupply = 100000000 * 10**18;
         initialSupply_ = 13500000 * 10**18;
         pendingInstallments = 7;
@@ -188,13 +188,13 @@ contract ToorToken is ERC20Basic, Ownable {
         distributionAddresses[5] = 0x532d370a98a478714625E9148D1205be061Df3bf; // founder 5
         distributionAddresses[6] = 0xDe485bB000fA57e73197eF709960Fb7e32e0380E; // company
         distributionAddresses[7] = 0xd562f635c75D2d7f3BE0005FBd3808a5cfb896bd; // bounty
-        
+
         // This is for 20 years
         tokenGenInterval = 603936;  // This is roughly 1 week in seconds
         uint256 timeToGenAllTokens = 628093440; // This is close to 20 years in seconds
 
         rewardGenerationComplete = false;
-        
+
         // Mint initial tokens
         accounts[distributionAddresses[6]].balance = (initialSupply_ * 60) / 100; // 60% of initial balance goes to Company
         accounts[distributionAddresses[6]].lastInterval = 0;
@@ -249,7 +249,7 @@ contract ToorToken is ERC20Basic, Ownable {
         } else {
             require(_value <= balSender);
         }
-        
+
         // Update balances of sender and receiver
         accounts[_from].balance = (balSender.add(tokensOwedSender)).sub(_value);
         accounts[_to].balance = (accounts[_to].balance.add(tokensOwedReceiver)).add(_value);
@@ -266,7 +266,7 @@ contract ToorToken is ERC20Basic, Ownable {
     function batchTransfer(address[] _receivers, uint256 _value) public returns (bool) {
         uint256 cnt = _receivers.length;
         uint256 amount = cnt.mul(_value);
-        
+
         // Check that the value to send is more than 0
         require(_value > 0);
 
@@ -285,13 +285,13 @@ contract ToorToken is ERC20Basic, Ownable {
         accounts[msg.sender].balance = balSender.sub(amount);
         uint256 currInt = intervalAtTime(now);
         accounts[msg.sender].lastInterval = currInt;
-        
-        
+
+
         for (uint i = 0; i < cnt; i++) {
             // Add pending rewards for receiver first
             if (!rewardGenerationComplete) {
                 address receiver = _receivers[i];
-                
+
                 addReward(receiver);
             }
 
@@ -347,7 +347,7 @@ contract ToorToken is ERC20Basic, Ownable {
         return allowed[_owner][_spender];
     }
 
-  
+
    // Increase the amount of tokens that an owner allowed to a spender.
    // approve should be called when allowed[_spender] == 0. To increment
    // allowed value is better to use this function to avoid 2 calls (and wait until the first transaction is mined)
@@ -520,7 +520,7 @@ contract ToorToken is ERC20Basic, Ownable {
 
         // Increase total supply by the number of tokens being vested
         increaseTotalSupply(totalTokensToVest);
-            
+
         accounts[distributionAddresses[1]].lastInterval = currInterval;
         accounts[distributionAddresses[2]].lastInterval = currInterval;
         accounts[distributionAddresses[3]].lastInterval = currInterval;
@@ -587,7 +587,7 @@ contract ToorToken is ERC20Basic, Ownable {
                     tokensHeld = (tokensHeld.mul(ratByYear[rateWindow] ** intervals)) / (ratMultiplier ** intervals);
                     intervals = 0;
                 }
-            }            
+            }
         }
 
         // Rewards owed are the total balance that user SHOULD have minus what they currently have
@@ -603,7 +603,7 @@ contract ToorToken is ERC20Basic, Ownable {
         // Based on time passed in, check how many intervals have elapsed
         uint256 interval = (time.sub(startTime)) / tokenGenInterval;
         uint256 finalInt = finalIntervalForTokenGen; // Assign to local to reduce gas
-        
+
         // Return max intervals if it's greater than that time
         if (interval > finalInt) {
             return finalInt;
@@ -612,7 +612,7 @@ contract ToorToken is ERC20Basic, Ownable {
         }
     }
 
-    // This function checks how many intervals for a given window do we owe tokens to someone for 
+    // This function checks how many intervals for a given window do we owe tokens to someone for
     function getIntervalsForWindow(uint256 rateWindow, uint256 lastInterval, uint256 currInterval, uint256 intPerWind) public pure returns (uint256) {
         // If lastInterval for holder falls in a window previous to current one, the lastInterval for the window passed into the function would be the window start interval
         if (lastInterval < ((rateWindow.sub(1)).mul(intPerWind))) {
@@ -714,4 +714,15 @@ contract ToorToken is ERC20Basic, Ownable {
         require(_to != address(0)); // Transfer should not be allowed to burn tokens
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

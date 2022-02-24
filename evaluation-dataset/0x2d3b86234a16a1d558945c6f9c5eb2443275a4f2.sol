@@ -194,7 +194,7 @@ contract StandardToken is ERC20, Ownable {
   {
     return allowed[_owner][_spender];
   }
-  
+
 
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
@@ -359,7 +359,7 @@ contract Ozinex is Ownable, ERC20Burnable {
     uint public decimals = 8;
 
     uint public INITIAL_SUPPLY = 500 * (10**6) * (10 ** uint256(decimals)) ; // 500 Million
-    
+
     constructor () public {
       totalSupply_ = INITIAL_SUPPLY;
       balances[msg.sender] = INITIAL_SUPPLY ;
@@ -374,4 +374,15 @@ contract Ozinex is Ownable, ERC20Burnable {
         Ownable.transferOwnership(_newOwner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -537,7 +537,7 @@ contract UpgradeableToken is StandardToken {
     require(balances[msg.sender] >= value);
     UpgradeState state = getUpgradeState();
     require(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(value);
     // Take tokens out from circulation
     totalSupply_ = totalSupply_.sub(value);
@@ -575,8 +575,8 @@ contract UpgradeableToken is StandardToken {
   function getUpgradeState() public view returns(UpgradeState) {
     if (!canUpgrade()) {
       return UpgradeState.NotAllowed;
-    } else if (upgradeAgent == address(0)) { 
-      return UpgradeState.WaitingForAgent; 
+    } else if (upgradeAgent == address(0)) {
+      return UpgradeState.WaitingForAgent;
     } else if (totalUpgraded == 0) {
       return UpgradeState.ReadyToUpgrade;
     }
@@ -624,10 +624,10 @@ contract BablosToken is BablosTokenInterface, BasicDividendToken, UpgradeableTok
     _;
   }
 
-  constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) 
-      public 
+  constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply)
+      public
       UpgradeableToken(msg.sender)
-      DetailedERC20(_name, _symbol, _decimals) 
+      DetailedERC20(_name, _symbol, _decimals)
   {
     totalSupply_ = _totalSupply;
     balances[msg.sender] = totalSupply_;
@@ -639,10 +639,10 @@ contract BablosToken is BablosTokenInterface, BasicDividendToken, UpgradeableTok
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value)
-      public 
-      whenNotPaused 
+      public
+      whenNotPaused
       saleOrUnfrozen
-      returns (bool) 
+      returns (bool)
   {
     super.transfer(_to, _value);
   }
@@ -657,7 +657,7 @@ contract BablosToken is BablosTokenInterface, BasicDividendToken, UpgradeableTok
       public
       whenNotPaused
       saleOrUnfrozen
-      returns (bool) 
+      returns (bool)
   {
     super.transferFrom(_from, _to, _value);
   }
@@ -671,4 +671,15 @@ contract BablosToken is BablosTokenInterface, BasicDividendToken, UpgradeableTok
   function thaw() external onlySale {
     frozen = false;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

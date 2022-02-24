@@ -49,26 +49,26 @@ interface WorksInterface {
 
     function addWorks(
         bytes32 _worksID,
-        bytes32 _artistID, 
-        uint8 _debrisNum, 
-        uint256 _price, 
+        bytes32 _artistID,
+        uint8 _debrisNum,
+        uint256 _price,
         uint256 _beginTime
-    ) 
+    )
         external;
 
     function configRule(
         bytes32 _worksID,
-        uint8 _firstBuyLimit, 
-        uint256 _freezeGap, 
-        uint256 _protectGap, 
+        uint8 _firstBuyLimit,
+        uint256 _freezeGap,
+        uint256 _protectGap,
         uint256 _increaseRatio,
-        uint256 _discountGap, 
-        uint256 _discountRatio, 
+        uint256 _discountGap,
+        uint256 _discountRatio,
 
-        uint8[3] calldata _firstAllot, 
-        uint8[3] calldata _againAllot, 
-        uint8[3] calldata _lastAllot 
-    ) 
+        uint8[3] calldata _firstAllot,
+        uint8[3] calldata _againAllot,
+        uint8[3] calldata _lastAllot
+    )
         external;
 
     function publish(bytes32 _worksID, uint256 _beginTime) external;
@@ -77,10 +77,10 @@ interface WorksInterface {
 
     function getWorks(bytes32 _worksID) external view returns (uint8, uint256, uint256, uint256, bool);
 
-    function getDebris(bytes32 _worksID, uint8 _debrisID) external view 
+    function getDebris(bytes32 _worksID, uint8 _debrisID) external view
         returns (uint256, address, address, bytes32, bytes32, uint256);
 
-    function getRule(bytes32 _worksID) external view 
+    function getRule(bytes32 _worksID) external view
         returns (uint8, uint256, uint256, uint256, uint256, uint256, uint8[3] memory, uint8[3] memory, uint8[3] memory);
 
     function hasWorks(bytes32 _worksID) external view returns (bool);
@@ -96,7 +96,7 @@ interface WorksInterface {
     function isSecond(bytes32 _worksID, uint8 _debrisID) external view returns (bool);
 
     function isGameOver(bytes32 _worksID) external view returns (bool);
-    
+
     function isFinish(bytes32 _worksID, bytes32 _unionID) external view returns (bool);
 
     function hasFirstUnionIds(bytes32 _worksID, bytes32 _unionID) external view returns (bool);
@@ -208,10 +208,10 @@ interface PlayerInterface {
     function updateRewardAmount(bytes32 _unionID, bytes32 _worksID, uint256 _amount) external;
 
     function updateMyWorks(
-        bytes32 _unionID, 
-        address _address, 
-        bytes32 _worksID, 
-        uint256 _totalInput, 
+        bytes32 _unionID,
+        address _address,
+        bytes32 _worksID,
+        uint256 _totalInput,
         uint256 _totalOutput
     ) external;
 
@@ -223,19 +223,19 @@ interface PlayerInterface {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -251,7 +251,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -263,30 +263,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -297,20 +297,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -324,63 +324,63 @@ library SafeMath {
 library Datasets {
 
     struct Player {
-        address[] ethAddress; 
-        bytes32 referrer; 
-        address payable lastAddress; 
+        address[] ethAddress;
+        bytes32 referrer;
+        address payable lastAddress;
         uint256 time;
     }
 
-    struct MyWorks { 
-        address ethAddress; 
-        bytes32 worksID; 
-        uint256 totalInput; 
-        uint256 totalOutput; 
-        uint256 time; 
+    struct MyWorks {
+        address ethAddress;
+        bytes32 worksID;
+        uint256 totalInput;
+        uint256 totalOutput;
+        uint256 time;
     }
 
 
     struct Works {
-        bytes32 worksID; 
-        bytes32 artistID; 
-        uint8 debrisNum; 
-        uint256 price; 
-        uint256 beginTime; 
+        bytes32 worksID;
+        bytes32 artistID;
+        uint8 debrisNum;
+        uint256 price;
+        uint256 beginTime;
         uint256 endTime;
-        bool isPublish; 
+        bool isPublish;
         bytes32 lastUnionID;
     }
 
     struct Debris {
-        uint8 debrisID; 
-        bytes32 worksID; 
-        uint256 initPrice; 
-        uint256 lastPrice; 
-        uint256 buyNum; 
-        address payable firstBuyer; 
-        address payable lastBuyer; 
-        bytes32 firstUnionID; 
-        bytes32 lastUnionID; 
-        uint256 lastTime; 
+        uint8 debrisID;
+        bytes32 worksID;
+        uint256 initPrice;
+        uint256 lastPrice;
+        uint256 buyNum;
+        address payable firstBuyer;
+        address payable lastBuyer;
+        bytes32 firstUnionID;
+        bytes32 lastUnionID;
+        uint256 lastTime;
     }
-    
-    struct Rule {       
-        uint8 firstBuyLimit; 
-        uint256 freezeGap; 
-        uint256 protectGap; 
-        uint256 increaseRatio;
-        uint256 discountGap; 
-        uint256 discountRatio; 
 
-        uint8[3] firstAllot; 
+    struct Rule {
+        uint8 firstBuyLimit;
+        uint256 freezeGap;
+        uint256 protectGap;
+        uint256 increaseRatio;
+        uint256 discountGap;
+        uint256 discountRatio;
+
+        uint8[3] firstAllot;
         uint8[3] againAllot;
-        uint8[3] lastAllot; 
+        uint8[3] lastAllot;
     }
 
     struct PlayerCount {
-        uint256 lastTime; 
-        uint256 firstBuyNum; 
-        uint256 firstAmount; 
-        uint256 secondAmount; 
+        uint256 lastTime;
+        uint256 firstBuyNum;
+        uint256 firstAmount;
+        uint256 secondAmount;
         uint256 rewardAmount;
     }
 
@@ -389,7 +389,7 @@ library Datasets {
 /**
  * @title PuzzleBID Game Main Contract
  * @dev http://www.puzzlebid.com/
- * @author PuzzleBID Game Team 
+ * @author PuzzleBID Game Team
  * @dev Simon<vsiryxm@163.com>
  */
 contract PuzzleBID {
@@ -399,12 +399,12 @@ contract PuzzleBID {
     string constant public name = "PuzzleBID Game";
     string constant public symbol = "PZB";
 
-    TeamInterface private team; 
-    PlatformInterface private platform; 
-    ArtistInterface private artist; 
-    WorksInterface private works; 
-    PlayerInterface private player; 
-    
+    TeamInterface private team;
+    PlatformInterface private platform;
+    ArtistInterface private artist;
+    WorksInterface private works;
+    PlayerInterface private player;
+
     constructor(
         address _teamAddress,
         address _platformAddress,
@@ -424,7 +424,7 @@ contract PuzzleBID {
         artist = ArtistInterface(_artistAddress);
         works = WorksInterface(_worksAddress);
         player = PlayerInterface(_playerAddress);
-    }  
+    }
 
     function() external payable {
         revert();
@@ -450,25 +450,25 @@ contract PuzzleBID {
     modifier checkPlay(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID) {
         require(msg.value > 0);
 
-        require(works.hasWorks(_worksID)); 
-        require(works.hasDebris(_worksID, _debrisID)); 
+        require(works.hasWorks(_worksID));
+        require(works.hasDebris(_worksID, _debrisID));
         require(works.isGameOver(_worksID) == false);
         require(works.isPublish(_worksID) && works.isStart(_worksID));
         require(works.isProtect(_worksID, _debrisID) == false);
-         
-        require(player.isFreeze(_unionID, _worksID) == false); 
+
+        require(player.isFreeze(_unionID, _worksID) == false);
         if(player.getFirstBuyNum(_unionID, _worksID).add(1) > works.getFirstBuyLimit(_worksID)) {
             require(works.isSecond(_worksID, _debrisID));
-        }      
+        }
         require(msg.value >= works.getDebrisPrice(_worksID, _debrisID));
         _;
-    } 
-       
+    }
+
     modifier onlyAdmin() {
         require(team.isAdmin(msg.sender));
         _;
     }
-    
+
     function upgrade(
         address _teamAddress,
         address _platformAddress,
@@ -489,54 +489,54 @@ contract PuzzleBID {
         works = WorksInterface(_worksAddress);
         player = PlayerInterface(_playerAddress);
         emit OnUpgrade(_teamAddress, _platformAddress, _artistAddress, _worksAddress, _playerAddress);
-    }   
+    }
 
-    function startPlay(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID, bytes32 _referrer) 
+    function startPlay(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID, bytes32 _referrer)
         isHuman()
         checkPlay(_worksID, _debrisID, _unionID)
         external
         payable
     {
-        player.register(_unionID, msg.sender, _worksID, _referrer); 
+        player.register(_unionID, msg.sender, _worksID, _referrer);
 
         uint256 lastPrice = works.getLastPrice(_worksID, _debrisID);
 
         bytes32 lastUnionID = works.getLastUnionId(_worksID, _debrisID);
 
-        works.updateDebris(_worksID, _debrisID, _unionID, msg.sender); 
+        works.updateDebris(_worksID, _debrisID, _unionID, msg.sender);
 
-        player.updateLastTime(_unionID, _worksID); 
-        
-        platform.updateTurnover(_worksID, msg.value); 
+        player.updateLastTime(_unionID, _worksID);
 
-        platform.updateAllTurnover(msg.value); 
-        
+        platform.updateTurnover(_worksID, msg.value);
+
+        platform.updateAllTurnover(msg.value);
+
         if(works.isSecond(_worksID, _debrisID)) {
-            secondPlay(_worksID, _debrisID, _unionID, lastUnionID, lastPrice);            
+            secondPlay(_worksID, _debrisID, _unionID, lastUnionID, lastPrice);
         } else {
             works.updateBuyNum(_worksID, _debrisID);
-            firstPlay(_worksID, _debrisID, _unionID);       
+            firstPlay(_worksID, _debrisID, _unionID);
         }
 
         if(works.isFinish(_worksID, _unionID)) {
-            works.finish(_worksID, _unionID); 
+            works.finish(_worksID, _unionID);
             finishGame(_worksID);
-            collectWorks(_worksID, _unionID); 
+            collectWorks(_worksID, _unionID);
         }
 
     }
 
-    function firstPlay(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID) private {    
-        works.updateFirstBuyer(_worksID, _debrisID, _unionID, msg.sender);    
-        player.updateFirstBuyNum(_unionID, _worksID); 
-        player.updateFirstAmount(_unionID, _worksID, msg.value); 
+    function firstPlay(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID) private {
+        works.updateFirstBuyer(_worksID, _debrisID, _unionID, msg.sender);
+        player.updateFirstBuyNum(_unionID, _worksID);
+        player.updateFirstAmount(_unionID, _worksID, msg.value);
 
-        uint8[3] memory firstAllot = works.getAllot(_worksID, 0); 
-        artist.getAddress(works.getArtistId(_worksID)).transfer(msg.value.mul(firstAllot[0]) / 100); 
-        platform.getFoundAddress().transfer(msg.value.mul(firstAllot[1]) / 100); 
+        uint8[3] memory firstAllot = works.getAllot(_worksID, 0);
+        artist.getAddress(works.getArtistId(_worksID)).transfer(msg.value.mul(firstAllot[0]) / 100);
+        platform.getFoundAddress().transfer(msg.value.mul(firstAllot[1]) / 100);
 
-        works.updatePools(_worksID, msg.value.mul(firstAllot[2]) / 100); 
-        platform.deposit.value(msg.value.mul(firstAllot[2]) / 100)(_worksID); 
+        works.updatePools(_worksID, msg.value.mul(firstAllot[2]) / 100);
+        platform.deposit.value(msg.value.mul(firstAllot[2]) / 100)(_worksID);
 
     }
 
@@ -549,63 +549,63 @@ contract PuzzleBID {
         player.updateSecondAmount(_unionID, _worksID, msg.value);
 
         uint8[3] memory againAllot = works.getAllot(_worksID, 1);
-        uint256 lastPrice = works.getLastPrice(_worksID, _debrisID); 
+        uint256 lastPrice = works.getLastPrice(_worksID, _debrisID);
         uint256 commission = lastPrice.mul(againAllot[1]) / 100;
-        platform.getFoundAddress().transfer(commission); 
+        platform.getFoundAddress().transfer(commission);
 
-        lastPrice = lastPrice.sub(commission); 
+        lastPrice = lastPrice.sub(commission);
 
         if(lastPrice > _oldPrice) {
-            uint256 overflow = lastPrice.sub(_oldPrice); 
-            artist.getAddress(works.getArtistId(_worksID)).transfer(overflow.mul(againAllot[0]) / 100); 
-            works.updatePools(_worksID, overflow.mul(againAllot[2]) / 100); 
-            platform.deposit.value(overflow.mul(againAllot[2]) / 100)(_worksID); 
+            uint256 overflow = lastPrice.sub(_oldPrice);
+            artist.getAddress(works.getArtistId(_worksID)).transfer(overflow.mul(againAllot[0]) / 100);
+            works.updatePools(_worksID, overflow.mul(againAllot[2]) / 100);
+            platform.deposit.value(overflow.mul(againAllot[2]) / 100)(_worksID);
             player.getLastAddress(_oldUnionID).transfer(
-                lastPrice.sub(overflow.mul(againAllot[0]) / 100)                
+                lastPrice.sub(overflow.mul(againAllot[0]) / 100)
                 .sub(overflow.mul(againAllot[2]) / 100)
-            ); 
-        } else { 
+            );
+        } else {
             player.getLastAddress(_oldUnionID).transfer(lastPrice);
         }
 
     }
 
-    function finishGame(bytes32 _worksID) private {              
+    function finishGame(bytes32 _worksID) private {
         uint8 lastAllot = works.getAllot(_worksID, 2, 0);
         platform.transferTo(msg.sender, works.getPools(_worksID).mul(lastAllot) / 100);
-        firstSend(_worksID); 
-        secondSend(_worksID); 
+        firstSend(_worksID);
+        secondSend(_worksID);
     }
 
     function collectWorks(bytes32 _worksID, bytes32 _unionID) private {
         player.updateMyWorks(_unionID, msg.sender, _worksID, 0, 0);
     }
-    
+
     function firstSend(bytes32 _worksID) private {
         uint8 i;
-        bytes32[] memory tmpFirstUnionId = works.getFirstUnionIds(_worksID); 
-        address tmpAddress; 
+        bytes32[] memory tmpFirstUnionId = works.getFirstUnionIds(_worksID);
+        address tmpAddress;
         uint256 tmpAmount;
         uint8 lastAllot = works.getAllot(_worksID, 2, 1);
         for(i=0; i<tmpFirstUnionId.length; i++) {
             tmpAddress = player.getLastAddress(tmpFirstUnionId[i]);
             tmpAmount = player.getFirstAmount(tmpFirstUnionId[i], _worksID);
             tmpAmount = works.getPools(_worksID).mul(lastAllot).mul(tmpAmount) / 100 / works.getPrice(_worksID);
-            platform.transferTo(tmpAddress, tmpAmount); 
+            platform.transferTo(tmpAddress, tmpAmount);
         }
     }
 
     function secondSend(bytes32 _worksID) private {
         uint8 i;
-        bytes32[] memory tmpSecondUnionId = works.getSecondUnionIds(_worksID); 
-        address tmpAddress; 
+        bytes32[] memory tmpSecondUnionId = works.getSecondUnionIds(_worksID);
+        address tmpAddress;
         uint256 tmpAmount;
         uint8 lastAllot = works.getAllot(_worksID, 2, 2);
         for(i=0; i<tmpSecondUnionId.length; i++) {
             tmpAddress = player.getLastAddress(tmpSecondUnionId[i]);
             tmpAmount = player.getSecondAmount(tmpSecondUnionId[i], _worksID);
             tmpAmount = works.getPools(_worksID).mul(lastAllot).mul(tmpAmount) / 100 / (platform.getTurnover(_worksID).sub(works.getPrice(_worksID)));
-            platform.transferTo(tmpAddress, tmpAmount); 
+            platform.transferTo(tmpAddress, tmpAmount);
         }
     }
 
@@ -614,3 +614,9 @@ contract PuzzleBID {
     }
 
  }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

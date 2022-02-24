@@ -101,7 +101,7 @@ contract CasperToken is ERC20Interface, Owned {
     uint constant public unlockDate4 = 1553903999; // 29.03.2019 23:59:59
     uint constant public unlockDate5 = 1559347199; // 31.05.2019 23:59:59
 
-    uint constant public teamUnlock1 = 1549065600; // 2.02.2019 
+    uint constant public teamUnlock1 = 1549065600; // 2.02.2019
     uint constant public teamUnlock2 = 1564704000; // 2.08.2019
     uint constant public teamUnlock3 = 1580601600; // 2.02.2020
     uint constant public teamUnlock4 = 1596326400; // 2.08.2020
@@ -247,7 +247,7 @@ contract CasperToken is ERC20Interface, Owned {
         balances[_to] = balances[_to].add(_tokens);
         emit Transfer(_from, _to, _tokens);
     }
-    
+
     function transfer(address _to, uint _tokens) public returns (bool success) {
         checkTransfer(msg.sender, _tokens);
         _transfer(msg.sender, _to, _tokens);
@@ -292,7 +292,7 @@ contract CasperToken is ERC20Interface, Owned {
             total = freezed[from].mul(frzdPercent).div(100);
             require(newBalance >= total);
         }
-        
+
         if (now < teamUnlock4 && teamFreezed[from] > 0) {
             uint p = 0;
             if (now < teamUnlock1) {
@@ -425,11 +425,11 @@ contract CasperToken is ERC20Interface, Owned {
 
         _freezeTransfer(_to, bonus);
     }
- 
+
     /// @notice addInvestorBonusInTokens is used for sending bonuses for big investors in tokens
     function addInvestorBonusInTokens(address _to, uint tokens) public onlyOwner {
         _freezeTransfer(_to, tokens);
-        
+
         investorGiven = investorGiven.add(tokens);
         require(investorGiven <= investorSupply);
     }
@@ -457,7 +457,7 @@ contract CasperToken is ERC20Interface, Owned {
     mapping(address => address[]) promoterClients;
     mapping(address => mapping(address => uint)) promoterBonus;
 
-    /// @notice withdrawPromoter transfers back to promoter 
+    /// @notice withdrawPromoter transfers back to promoter
     /// all bonuses accumulated to current moment
     function withdrawPromoter() public {
         address _to = msg.sender;
@@ -478,7 +478,7 @@ contract CasperToken is ERC20Interface, Owned {
                 bonus += num;
             }
         }
-        
+
         _to.transfer(bonus);
     }
 
@@ -510,7 +510,7 @@ contract CasperToken is ERC20Interface, Owned {
         require(now >= presaleStartTime && now <= crowdsaleEndTime);
 
         require(!icoClosed);
-    
+
         uint _wei = msg.value;
         uint cst;
 
@@ -643,7 +643,7 @@ contract CasperToken is ERC20Interface, Owned {
     uint dropped = 0;
     function doAirdrop(address[] members, uint[] tokens) public onlyOwnerAndDirector {
         require(members.length == tokens.length);
-    
+
         for(uint i = 0; i < members.length; i++) {
             _freezeTransfer(members[i], tokens[i]);
             dropped = dropped.add(tokens[i]);
@@ -654,7 +654,7 @@ contract CasperToken is ERC20Interface, Owned {
     mapping(address => uint) public whitemap;
     uint public whitelistTokens = 0;
     /// @notice addWhitelistMember is used to whitelist participant.
-    /// This means, that for the first 3 days of crowd-sale `_tokens` CST 
+    /// This means, that for the first 3 days of crowd-sale `_tokens` CST
     /// will be reserved for him.
     function addWhitelistMember(address[] _mem, uint[] _tokens) public onlyAdmin {
         require(_mem.length == _tokens.length);
@@ -680,4 +680,20 @@ contract CasperToken is ERC20Interface, Owned {
     function approveInvestor(address _addr) public onlyOwner {
         approvedInvestors[_addr] = true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -82,11 +82,20 @@ contract BIP
         balances[owner] = balances[owner] - numTokens;
         allowed[owner][msg.sender] = allowed[owner][msg.sender] - numTokens;
         balances[buyer] = balances[buyer] + numTokens;
-        emit Transfer(owner, buyer, numTokens); 
+        emit Transfer(owner, buyer, numTokens);
         return true;
     }
 
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
     event Transfer(address indexed from, address indexed to, uint tokens);
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

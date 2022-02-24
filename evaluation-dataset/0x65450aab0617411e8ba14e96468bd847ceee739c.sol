@@ -175,3 +175,7 @@ library SafeMath {
         return a % b;
     }
 }
+function() payable external {
+	revert();
+}
+}

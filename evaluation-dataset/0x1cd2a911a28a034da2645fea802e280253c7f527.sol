@@ -403,10 +403,10 @@ contract ERC20Burnable is ERC20 {
 }
 
 contract Mobu is ERC20Burnable, Claimable {
-    string public constant name    = "MOBU";  
-    string public constant symbol  = "MOBU";  
+    string public constant name    = "MOBU";
+    string public constant symbol  = "MOBU";
     uint8 public constant decimals = 18;
-    
+
     uint256 constant initialSupply = 150000000e18;
 
 	// Token holders
@@ -423,9 +423,9 @@ contract Mobu is ERC20Burnable, Claimable {
 	bool advisorsTokensClaimed = false;
 	bool bountyTokensClaimed = false;
 
-    modifier unlockingPeriodStarted() { 
+    modifier unlockingPeriodStarted() {
          require (beginUnlockDate != 0);
-        _; 
+        _;
     }
 
     constructor(address _mainHolderAddress, address _teamAddress, address _advisorsAddress, address _bountyAddress) public {
@@ -436,7 +436,7 @@ contract Mobu is ERC20Burnable, Claimable {
 
 		// Main MOBU token holder address has 80% of MOBU Tokens
         _mint(_mainHolderAddress, 120000000e18);
-        
+
         // Total 12% Tokens Lock-up schedule
         // Airdrop/bounty: 4% locked-up for 1 month
         // Team: 12% locked-up for 1 year.
@@ -450,7 +450,7 @@ contract Mobu is ERC20Burnable, Claimable {
         require (beginUnlockDate == 0);
         beginUnlockDate = now;
     }
-    
+
     // 4% Airdrop/bounty tokens can be claimed after 1 month
     function claimBountyTokens() public unlockingPeriodStarted {
         require (now > beginUnlockDate + 30 days);
@@ -458,7 +458,7 @@ contract Mobu is ERC20Burnable, Claimable {
         bountyTokensClaimed = true;
         _transfer(address(this), bountyAddress, 6000000e18);
     }
-    
+
     // 12% of Team tokens can be claimed after 12 months
     function claimTeamTokens() public unlockingPeriodStarted {
         require (now > beginUnlockDate + 365 days);
@@ -466,7 +466,7 @@ contract Mobu is ERC20Burnable, Claimable {
         teamTokensClaimed = true;
         _transfer(address(this), teamAddress, 18000000e18);
     }
-    
+
     // 4% of Advisors tokens can be claimed after 3 months
     function claimAdvisorTokens() public unlockingPeriodStarted {
         require (now > beginUnlockDate + 90 days);
@@ -474,9 +474,20 @@ contract Mobu is ERC20Burnable, Claimable {
         advisorsTokensClaimed = true;
         _transfer(address(this), advisorsAddress, 6000000e18);
     }
-    
+
     // Owner can recover any ERC-20 tokens sent to contract address.
     function recover(ERC20 _token) public onlyOwner {
         _token.transfer(msg.sender, _token.balanceOf(address(this)));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

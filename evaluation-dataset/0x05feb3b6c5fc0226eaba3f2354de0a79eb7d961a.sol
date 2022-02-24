@@ -58,7 +58,7 @@ contract Crowdsale {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -78,7 +78,7 @@ contract Crowdsale {
 
 
   function Crowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xD975c18B7B9e6a0821cD86126705f9544B6e392d;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -154,9 +154,9 @@ contract Crowdsale {
     uint256 tokens;
 
     if (tokensSoldGoal>0&&tokensSold<tokensSoldGoal*10**18)
-      tokens = (weiAmount) * priceBeforeGoalReached; 
+      tokens = (weiAmount) * priceBeforeGoalReached;
     else tokens = (weiAmount) * price;
-    
+
     if(minBuy!=0){
       if(tokens < minBuy*10**18) throw;
     }
@@ -168,7 +168,7 @@ contract Crowdsale {
     // update state
     weiRaised = weiRaised.add(weiAmount);
     tokensSold = tokensSold.add(tokens);
-    
+
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
     // contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -197,4 +197,15 @@ contract Crowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

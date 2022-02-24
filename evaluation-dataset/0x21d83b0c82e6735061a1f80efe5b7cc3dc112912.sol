@@ -217,9 +217,9 @@ contract Ownable {
 /////////////////
 
 contract ROBUtilityToken is StandardToken, Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     // Descriptive properties
     string public constant name = "RobertMiller";
     string public constant symbol = "ROB";
@@ -238,7 +238,7 @@ contract ROBUtilityToken is StandardToken, Ownable {
     uint256 public fundingStartBlock = 5859014;
     uint256 public fundingEndBlock = 6100000;
     uint256 public constant tokenCreationCap =  10 * (10**6) * 10**decimals;
-    
+
     // Setting the exchange rate for the ROB utility token sale.
     uint256 public constant ROBEthExchangeRate = 400;
 
@@ -271,4 +271,15 @@ contract ROBUtilityToken is StandardToken, Ownable {
       etherProceedsAccount.transfer(this.balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

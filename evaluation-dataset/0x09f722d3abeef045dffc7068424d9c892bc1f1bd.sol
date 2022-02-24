@@ -1,12 +1,12 @@
 /*
-  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888      
-    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888      
-    888  888    888 888     888 Y88b.      888                     888                 888      
-    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.  
-    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b 
-    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888 
-    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888 
-  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888 
+  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888
+    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888
+    888  888    888 888     888 Y88b.      888                     888                 888
+    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.
+    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b
+    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888
+    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888
+  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888
 
   Rocket startup for your ICO
 
@@ -293,7 +293,7 @@ contract ICOStartSale is Pausable {
    * @param _addresses Addresses to add.
    * @param _rate Optional custom rate reserved for all added addresses (0 = use default rate).
    * @return true if at least one address was added to the whitelist,
-   * false if all addresses were already in the whitelist  
+   * false if all addresses were already in the whitelist
    */
   function addAddressesToWhitelist(address[] _addresses, uint256 _rate) onlyOwner public returns (bool success) {
     success = false;
@@ -307,7 +307,7 @@ contract ICOStartSale is Pausable {
   /**
    * @dev Remove an address from the whitelist.
    * @param _address Address to remove.
-   * @return true if the address was removed from the whitelist, 
+   * @return true if the address was removed from the whitelist,
    * false if the address wasn't in the whitelist in the first place.
    */
   function removeAddressFromWhitelist(address _address) onlyOwner public returns (bool success) {
@@ -325,7 +325,7 @@ contract ICOStartSale is Pausable {
   /**
    * @dev Remove addresses from the whitelist.
    * @param _addresses addresses
-   * @return true if at least one address was removed from the whitelist, 
+   * @return true if at least one address was removed from the whitelist,
    * false if all addresses weren't in the whitelist in the first place
    */
   function removeAddressesFromWhitelist(address[] _addresses) onlyOwner public returns (bool success) {
@@ -402,4 +402,15 @@ contract ICOStartSale is Pausable {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -83,7 +83,7 @@ contract StandardToken is Token {
 }
 
 contract RBToken is StandardToken, SafeMath {
-    
+
     // metadata
     string  public constant name = "百达娱乐";
     string  public constant symbol = "RB";
@@ -242,4 +242,15 @@ contract RBToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -225,8 +225,8 @@ contract StandardToken is ERC20, BasicToken {
 contract IHCToken is StandardToken {
 
     string public constant name = "Inteligent Health Chain";
-    string public constant symbol = "IHC"; 
-    uint8 public constant decimals = 18; 
+    string public constant symbol = "IHC";
+    uint8 public constant decimals = 18;
 
     uint256 public constant INITIAL_SUPPLY = 5 * (10 ** 9) * (10 ** uint256(decimals));
 
@@ -239,4 +239,10 @@ contract IHCToken is StandardToken {
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

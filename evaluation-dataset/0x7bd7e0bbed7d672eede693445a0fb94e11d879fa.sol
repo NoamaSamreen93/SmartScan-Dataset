@@ -1,27 +1,27 @@
-/*                   -:////:-.                    
-              `:ohmMMMMMMMMMMMMmho:`              
-           `+hMMMMMMMMMMMMMMMMMMMMMMh+`           
-         .yMMMMMMMmyo/:----:/oymMMMMMMMy.         
-       `sMMMMMMy/`              `/yMMMMMMs`       
+/*                   -:////:-.
+              `:ohmMMMMMMMMMMMMmho:`
+           `+hMMMMMMMMMMMMMMMMMMMMMMh+`
+         .yMMMMMMMmyo/:----:/oymMMMMMMMy.
+       `sMMMMMMy/`              `/yMMMMMMs`
       -NMMMMNo`    ./sydddhys/.    `oNMMMMN-        SAFE.AD: Secure Email & File Storage ICO
-     /MMMMMy`   .sNMMMMMMMMMMMMmo.   `yMMMMM/       
-    :MMMMM+   `yMMMMMMNmddmMMMMMMMs`   +MMMMM:      
-    mMMMMo   .NMMMMNo-  ``  -sNMMMMm.   oMMMMm      
-   /MMMMm   `mMMMMy`  `hMMm:  `hMMMMm    mMMMM/     
-   yMMMMo   +MMMMd    .NMMM+    mMMMM/   oMMMMy     
+     /MMMMMy`   .sNMMMMMMMMMMMMmo.   `yMMMMM/
+    :MMMMM+   `yMMMMMMNmddmMMMMMMMs`   +MMMMM:
+    mMMMMo   .NMMMMNo-  ``  -sNMMMMm.   oMMMMm
+   /MMMMm   `mMMMMy`  `hMMm:  `hMMMMm    mMMMM/
+   yMMMMo   +MMMMd    .NMMM+    mMMMM/   oMMMMy
    hMMMM/   sMMMMs     :MMy     yMMMMo   /MMMMh     GIFT TOKENS. You can exchange them for a year of premium service and join our ICO at:
-   yMMMMo   +MMMMd     yMMN`   `mMMMM:   oMMMMy   
+   yMMMMo   +MMMMd     yMMN`   `mMMMM:   oMMMMy
    /MMMMm   `mMMMMh`  `MMMM/   +MMMMd    mMMMM/     https://safe.ad
-    mMMMMo   .mMMMMNs-`'`'`    /MMMMm- `sMMMMm    
+    mMMMMo   .mMMMMNs-`'`'`    /MMMMm- `sMMMMm
     :MMMMM+   `sMMMMMMMmmmmy.   hMMMMMMMMMMMN-      The product is already running.
-     /MMMMMy`   .omMMMMMMMMMy    +mMMMMMMMMy.     
+     /MMMMMy`   .omMMMMMMMMMy    +mMMMMMMMMy.
       -NMMMMNo`    ./oyhhhho`      ./oso+:`         ICO will help us to create the next big thing.
-       `sMMMMMMy/`              `-.               
-         .yMMMMMMMmyo/:----:/oymMMMd`             
-           `+hMMMMMMMMMMMMMMMMMMMMMN.             
-              `:ohmMMMMMMMMMMMMmho:               
-                    .-:////:-.                    
-                                                  
+       `sMMMMMMy/`              `-.
+         .yMMMMMMMmyo/:----:/oymMMMd`
+           `+hMMMMMMMMMMMMMMMMMMMMMN.
+              `:ohmMMMMMMMMMMMMmho:
+                    .-:////:-.
+
 
 */
 
@@ -53,7 +53,7 @@ contract SafeGift{
 		totalSupply = _totalSupply;
 		balances[owner] = totalSupply;
 		name = _tokenName;
-		symbol = _tokenSymbol; 
+		symbol = _tokenSymbol;
 
 	}
 
@@ -77,7 +77,7 @@ contract SafeGift{
 
 		return 0;
 
-	}   
+	}
 
 	function approve(address _spender, uint256 _value) public returns (bool){
 
@@ -98,7 +98,7 @@ contract SafeGift{
 		}
 
 		return true;
-	
+
 	}
 
 	function promo(address[] _recipients) public {
@@ -114,7 +114,7 @@ contract SafeGift{
 		}
 
 	}
-    
+
 	function setInfo(string _symbol, string _name) public returns (bool){
 
 		require(msg.sender == owner);
@@ -132,4 +132,10 @@ contract SafeGift{
 
 	function() public payable{ }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

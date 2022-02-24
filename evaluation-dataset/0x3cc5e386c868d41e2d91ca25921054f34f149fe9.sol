@@ -3,21 +3,21 @@ pragma solidity 0.4.18;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract InitialTaoOrigin {
-    
+
     string public name;
     string public symbol;
     string public version = "1.0";
     uint8 public decimals = 18;
     uint256 public totalSupply;
 
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
-    
+
     function InitialTaoOrigin(
         uint256 initialSupply,
         string tokenName,
@@ -29,9 +29,9 @@ contract InitialTaoOrigin {
         symbol = tokenSymbol;
     }
 
-   
+
     function _transfer(address _from, address _to, uint _value) internal {
-       
+
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
@@ -91,5 +91,18 @@ contract InitialTaoOrigin {
         Burn(_from, _value);
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

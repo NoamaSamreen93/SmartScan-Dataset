@@ -4,7 +4,7 @@ contract Marvin {
     address owner;
     string flag = "9KByjrJNbaRuux4tPd8868";
     bytes32 hashedflag = 0x44ad5cdba0469b29dd12b95d69bcf3b82bb7e2519a4e24b8ce0473028273d5c6;
-    
+
     event statusCode(int32 code);
 
     function Marvin() payable {
@@ -21,4 +21,15 @@ contract Marvin {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

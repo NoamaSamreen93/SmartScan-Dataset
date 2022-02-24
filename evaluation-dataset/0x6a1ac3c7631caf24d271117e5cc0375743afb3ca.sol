@@ -217,3 +217,7 @@ contract LuckyCoin is  StandardToken{
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 }
+function() payable external {
+	revert();
+}
+}

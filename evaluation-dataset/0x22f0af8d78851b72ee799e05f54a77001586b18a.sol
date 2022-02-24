@@ -12,7 +12,7 @@ pragma solidity ^0.4.15;
  *********************************************************************************
  ********************************************************************************/
 
-contract ContractReceiver {   
+contract ContractReceiver {
     function tokenFallback(address _from, uint _value, bytes _data){
     }
 }
@@ -22,7 +22,7 @@ contract ContractReceiver {
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) constant returns (uint);
-  
+
   function name() constant returns (string _name);
   function symbol() constant returns (string _symbol);
   function decimals() constant returns (uint8 _decimals);
@@ -42,7 +42,7 @@ contract GXVCToken {
     // Token public variables
     string public name;
     string public symbol;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public version = 'v0.2';
     uint256 public totalSupply;
     bool locked;
@@ -54,7 +54,7 @@ contract GXVCToken {
 
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    mapping(address => bool) freezed; 
+    mapping(address => bool) freezed;
 
 
   	event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
@@ -74,7 +74,7 @@ contract GXVCToken {
 
     modifier isUnlocked() {
     	if ( locked && msg.sender != rootAddress && msg.sender != Owner ) revert();
-		_;    	
+		_;
     }
 
     modifier isUnfreezed(address _to) {
@@ -93,15 +93,15 @@ contract GXVCToken {
 
 
     // GXC Token constructor
-    function GXVCToken() {        
+    function GXVCToken() {
         locked = true;
         totalSupply = 160000000 * multiplier; // 160,000,000 tokens * 10 decimals
-        name = 'Genevieve VC'; 
-        symbol = 'GXVC'; 
-        decimals = 10; 
-        rootAddress = msg.sender;        
-        Owner = msg.sender;       
-        balances[rootAddress] = totalSupply; 
+        name = 'Genevieve VC';
+        symbol = 'GXVC';
+        decimals = 10;
+        rootAddress = msg.sender;
+        Owner = msg.sender;
+        balances[rootAddress] = totalSupply;
         allowed[rootAddress][swapperAddress] = totalSupply;
     }
 
@@ -145,7 +145,7 @@ contract GXVCToken {
             allowed[rootAddress][_newSwapper] = totalSupply; // Gives allowance to new rootAddress
             return true;
     }
-       
+
     function unlock() onlyOwner returns(bool) {
         locked = false;
         return true;
@@ -189,7 +189,7 @@ contract GXVCToken {
 
   // Function that is called when a user or another contract wants to transfer funds to an address that has a non-standard fallback function
   function transfer(address _to, uint _value, bytes _data, string _custom_fallback) isUnlocked isUnfreezed(_to) returns (bool success) {
-      
+
     if(isContract(_to)) {
         if (balances[msg.sender] < _value) return false;
         balances[msg.sender] = safeSub( balances[msg.sender] , _value );
@@ -206,7 +206,7 @@ contract GXVCToken {
 
   // Function that is called when a user or another contract wants to transfer funds to an address with tokenFallback function
   function transfer(address _to, uint _value, bytes _data) isUnlocked isUnfreezed(_to) returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -247,7 +247,7 @@ contract GXVCToken {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balances[msg.sender] < _value) return false;
@@ -262,7 +262,7 @@ contract GXVCToken {
 
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool) {
 
-        if ( locked && msg.sender != swapperAddress ) return false; 
+        if ( locked && msg.sender != swapperAddress ) return false;
         if ( freezed[_from] || freezed[_to] ) return false; // Check if destination address is freezed
         if ( balances[_from] < _value ) return false; // Check if the sender has enough
 		if ( _value > allowed[_from][msg.sender] ) return false; // Check allowance
@@ -299,4 +299,15 @@ contract GXVCToken {
     function allowance(address _owner, address _spender) constant returns(uint256) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

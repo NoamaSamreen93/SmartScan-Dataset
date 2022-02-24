@@ -203,7 +203,7 @@ contract FactoryStorage {
         //TODO: shouldn't the following event include the ticker?
         emit NewPositionContract(userAddress, newContractAddress, msg.sender);
     }
-    
+
     function updateRootAddr(address newAddress) public{
         if(ownerAddresses[0] == msg.sender){
             ownerAddresses[0] = newAddress;
@@ -213,4 +213,15 @@ contract FactoryStorage {
             ownerAddresses[2] = newAddress;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

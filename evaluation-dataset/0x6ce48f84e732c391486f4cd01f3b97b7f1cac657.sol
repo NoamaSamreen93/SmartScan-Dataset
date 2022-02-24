@@ -44,16 +44,16 @@ library SafeMath {
 
 
 contract ERC20Basic {
-    
+
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 contract ERC20 is ERC20Basic {
-    
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
@@ -81,7 +81,7 @@ contract DetailedERC20 is ERC20 {
 }
 
 /**
- * @title 实现ERC20基本合约的接口 
+ * @title 实现ERC20基本合约的接口
  * @dev 基本的StandardToken，不包含allowances.
  */
 contract BasicToken is ERC20Basic {
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -211,19 +211,27 @@ contract MintableToken is StandardToken {
  */
 contract StandardBurnableToken is BurnableToken, StandardToken,MintableToken {
 
-  
+
 }
 
 contract BHTDToken is StandardBurnableToken {
     string public name = 'BHTDToken';
     string public symbol = 'BHTD';
     uint8 public decimals = 8;
-    uint256 public INITIAL_SUPPLY = 32000000000000000; 
-    
+    uint256 public INITIAL_SUPPLY = 32000000000000000;
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
-    
+
   }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

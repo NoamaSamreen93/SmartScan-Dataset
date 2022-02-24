@@ -289,13 +289,13 @@ contract DataWalletToken is PausableToken, BurnableToken {
     string public constant symbol = "DXT";
     uint8 public constant decimals = 8;
     uint256 public constant INITIAL_SUPPLY = 1000000000 * 10**uint256(decimals);
-    
+
     /**
     * @dev DataWalletToken Constructor
     */
 
     function DataWalletToken() public {
-        totalSupply = INITIAL_SUPPLY;   
+        totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
 
@@ -312,4 +312,15 @@ contract DataWalletToken is PausableToken, BurnableToken {
         Transfer(msg.sender, beneficiary, amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

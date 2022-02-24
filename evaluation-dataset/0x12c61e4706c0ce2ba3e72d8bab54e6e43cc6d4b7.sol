@@ -188,7 +188,7 @@ contract CompetitionChainContract is owned, TokenERC20 {
 
         if(frozenBalance[_from] != 0)  // Check if sender is frozen
         {
-            require(balanceOf[_from] - frozenBalance[_from] >= _value); 
+            require(balanceOf[_from] - frozenBalance[_from] >= _value);
         }
         // 以下用来检查交易，
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
@@ -203,11 +203,22 @@ contract CompetitionChainContract is owned, TokenERC20 {
 
     /// @notice 锁仓功能
     /// @param target Address to be frozen
-    /// @param freezeCount the count to be freezon 
+    /// @param freezeCount the count to be freezon
     function freezeAccount(address target, uint freezeCount) onlyOwner public {
         frozenBalance[target] = freezeCount;
         FrozenFunds(target, freezeCount);
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

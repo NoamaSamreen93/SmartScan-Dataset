@@ -29,9 +29,9 @@ contract TokenERC20 {
 
 ) public {
         totalSupply = 9565658097 * 10 ** 8;  //     (W23;I9;N14;N14;E5;X24)*4 = 9.565.658.097 => ("0xb95a25FD53B7AE768AFEa6b491366080a73F4C47" Carteira Funder)
-        balanceOf[msg.sender] = totalSupply;                
-        name = "ZinBO";                                  
-        symbol = "ZBO";                               
+        balanceOf[msg.sender] = totalSupply;
+        name = "ZinBO";
+        symbol = "ZBO";
     }
 
 
@@ -161,4 +161,12 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

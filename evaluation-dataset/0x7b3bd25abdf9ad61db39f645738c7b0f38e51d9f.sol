@@ -1,7 +1,7 @@
 pragma solidity ^0.5.1;
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external;
 }
 
 /**
@@ -146,7 +146,7 @@ contract SOContract {
      */
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value); 
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -180,7 +180,7 @@ contract SOContract {
     }
 
     /**
-     * Get allowance 
+     * Get allowance
      *
      */
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
@@ -203,4 +203,10 @@ contract SOContract {
             return true;
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

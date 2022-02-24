@@ -15,7 +15,7 @@ interface ERC223Interface {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -95,7 +95,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
     event Burn(address indexed from, uint256 value);
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -113,7 +113,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
     }
 
 
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      Invokes the `tokenFallback` function if the recipient is a contract.
@@ -149,7 +149,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
         emit Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -171,7 +171,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
         return true;
     }
 
-    
+
     /**
      * @dev Returns balance of the `_owner`.
      *
@@ -188,7 +188,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
         returns (string) {
         return _name;
     }
-    
+
     function symbol()
         public
         view
@@ -217,7 +217,7 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
         require(_value <= allowed[_from][msg.sender]);
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         balances[_from] = SafeMath.sub(balances[_from], _value);
         balances[_to] = SafeMath.add(balances[_to], _value);
         allowed[_from][msg.sender] = SafeMath.sub(allowed[_from][msg.sender], _value);
@@ -230,17 +230,17 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = SafeMath.add(allowed[msg.sender][_spender], _addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -309,4 +309,13 @@ contract BBB is ERC20Interface, owned, ERC223Interface {
     // can accept ether
     function() payable {
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

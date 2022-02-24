@@ -371,10 +371,10 @@ contract Migratable is ERC20, Ownable{
   mapping (address => bool) private _old;
 
   event NewVersionChanges(address old, address new_);
-  
+
   event OldVersionAdded(address old);
   event OldVersionRemoved(address old);
-  
+
   event Migrated(address account, uint256 balance);
 
   modifier onlyOldVersion(){
@@ -538,7 +538,7 @@ contract Token is ERC20, ERC20Detailed {
 }
 
 contract ArtworkToken is Token, Policable, Seizable, Pausable, Documentable, Migratable{
-    
+
 
     constructor (
         string memory name,
@@ -547,7 +547,7 @@ contract ArtworkToken is Token, Policable, Seizable, Pausable, Documentable, Mig
         uint256 amount,
         address policyContract,
         address documentsContract
-    ) public 
+    ) public
         Token(name, symbol, decimals, amount)
         Policable(policyContract)
         Pausable()
@@ -570,9 +570,18 @@ contract ArtworkToken is Token, Policable, Seizable, Pausable, Documentable, Mig
 }
 
 interface ITransferPolicy {
-    function isTransferPossible(address from, address to, uint256 amount) 
+    function isTransferPossible(address from, address to, uint256 amount)
         external view returns (bool);
-    
-    function isBehalfTransferPossible(address sender, address from, address to, uint256 amount) 
+
+    function isBehalfTransferPossible(address sender, address from, address to, uint256 amount)
         external view returns (bool);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

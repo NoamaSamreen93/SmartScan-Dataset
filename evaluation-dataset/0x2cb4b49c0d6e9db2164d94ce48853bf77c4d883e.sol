@@ -176,7 +176,7 @@ contract LibSignature {
         bytes32 r;
         bytes32 s;
     }
-    
+
     /**
      * Validate a signature given a hash calculated from the order data, the signer, and the
      * signature data passed in with the order.
@@ -411,7 +411,7 @@ contract LibMath {
 }
 
 /**
- * @title LibRelayer provides two distinct features for relayers. 
+ * @title LibRelayer provides two distinct features for relayers.
  *
  * First, Relayers can opt into or out of the Hydro liquidity incentive system.
  *
@@ -492,7 +492,7 @@ contract LibRelayer {
  */
 contract LibDiscount is LibOwnable {
     using SafeMath for uint256;
-    
+
     // The base discounted rate is 100% of the current rate, or no discount.
     uint256 public constant DISCOUNT_RATE_BASE = 100;
 
@@ -516,7 +516,7 @@ contract LibDiscount is LibOwnable {
         /**
          * We construct calldata for the `balanceOf` ABI.
          * The layout of this calldata is in the table below.
-         * 
+         *
          * ╔════════╤════════╤════════╤═══════════════════╗
          * ║ Area   │ Offset │ Length │ Contents          ║
          * ╟────────┼────────┼────────┼───────────────────╢
@@ -1394,4 +1394,15 @@ contract HybridExchange is LibOrder, LibMath, LibRelayer, LibDiscount, LibExchan
             result.takerGasFee
         );
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

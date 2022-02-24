@@ -12,20 +12,20 @@ pragma solidity ^0.5.2;
  * @title SafeMath
  * @dev Math operations with safety checks that revert on error
  */
- 
+
 library SafeMath{
-    
-    
+
+
   /**
   * @dev Multiplies two numbers, reverts on overflow.
   */
-  
+
   function mul(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    
+
     // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
     // benefit is lost if 'b' is also tested.
 
-    
+
     if (_a == 0) {
       return 0;
     }
@@ -36,27 +36,27 @@ library SafeMath{
     return c;
   }
 
- 
+
    /**
   * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
   */
- 
+
   function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    
+
     require(_b > 0); // Solidity only automatically asserts when dividing by 0
     uint256 c = _a / _b;
-    
+
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
     return c;
   }
-  
-  
- 
+
+
+
    /**
   * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
   */
-  
+
   function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     require(_b <= _a);
     uint256 c = _a - _b;
@@ -68,7 +68,7 @@ library SafeMath{
   /**
   * @dev Adds two numbers, reverts on overflow.
   */
-  
+
   function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
     uint256 c = _a + _b;
     require(c >= _a);
@@ -76,7 +76,7 @@ library SafeMath{
     return c;
   }
 
-    
+
 }
 
 /**
@@ -86,43 +86,43 @@ library SafeMath{
  */
 
 contract Ownable {
-    
+
     // hot and cold wallet addresses
-    
+
     address public hotOwner=0xCd39203A332Ff477a35dA3AD2AD7761cDBEAb7F0;
 
     address public coldOwner=0x1Ba688e70bb4F3CB266b8D721b5597bFbCCFF957;
-    
-    
+
+
     //events
-    
+
     event OwnershipTransferred(address indexed _newHotOwner,address indexed _newColdOwner,address indexed _oldColdOwner);
 
 
     /**
    * @dev Reverts if called by any account other than the hotOwner.
    */
-   
+
     modifier onlyHotOwner() {
         require(msg.sender == hotOwner);
         _;
     }
-    
+
      /**
    * @dev Reverts if called by any account other than the coldOwner.
    */
-    
+
     modifier onlyColdOwner() {
         require(msg.sender == coldOwner);
         _;
     }
-    
+
      /**
    * @dev Function assigns new hotowner and coldOwner
    * @param _newHotOwner address The address which owns the funds.
    * @param _newColdOwner address The address which can change the hotOwner.
    */
-    
+
     function transferOwnership(address _newHotOwner,address _newColdOwner) public onlyColdOwner returns (bool) {
         require(_newHotOwner != address(0));
         require(_newColdOwner!= address(0));
@@ -130,8 +130,8 @@ contract Ownable {
         coldOwner = _newColdOwner;
         emit OwnershipTransferred(_newHotOwner,_newColdOwner,msg.sender);
         return true;
-        
-        
+
+
     }
 
 }
@@ -143,25 +143,25 @@ contract Ownable {
  */
 
 contract Authorizable is Ownable {
-    
+
     //map to check if the address is authorized to issue, redeem sila
     mapping(address => bool) authorized;
-    
+
     //events for when address is added or removed
     event AuthorityAdded(address indexed _toAdd);
     event AuthorityRemoved(address indexed _toRemove);
-    
+
     //array of authorized address to check for all the authorized addresses
     address[] public authorizedAddresses;
 
-    
+
     modifier onlyAuthorized() {
         require(authorized[msg.sender] || hotOwner == msg.sender);
         _;
     }
-    
-    
-     
+
+
+
      /**
    * @dev Function addAuthorized adds addresses that can issue,redeem and transfer silas
    * @param _toAdd address of the added authority
@@ -175,7 +175,7 @@ contract Authorizable is Ownable {
         emit AuthorityAdded(_toAdd);
         return true;
     }
-    
+
     /**
    * @dev Function RemoveAuthorized removes addresses that can issue and redeem silas
    * @param _toRemove address of the added authority
@@ -190,22 +190,22 @@ contract Authorizable is Ownable {
         emit AuthorityRemoved(_toRemove);
         return true;
     }
-    
-    
+
+
     // view all the authorized addresses
     function viewAuthorized() external view returns(address[] memory _authorizedAddresses){
         return authorizedAddresses;
     }
-    
-    
+
+
     // check if the address is authorized
-    
+
     function isAuthorized(address _authorized) external view returns(bool _isauthorized){
         return authorized[_authorized];
     }
-    
-    
-  
+
+
+
 
 }
 
@@ -218,34 +218,34 @@ contract Authorizable is Ownable {
  */
 
 contract EmergencyToggle is Ownable{
-     
+
     //variable to pause the entire contract if true
-    bool public emergencyFlag; 
+    bool public emergencyFlag;
 
     //constructor
     constructor () public{
-      emergencyFlag = false;                            
-      
+      emergencyFlag = false;
+
     }
-  
-  
+
+
    /**
     * @dev onlyHotOwner can can pause the usage of issue,redeem, transfer functions
     */
-    
+
     function emergencyToggle() external onlyHotOwner{
       emergencyFlag = !emergencyFlag;
     }
 
-    
- 
+
+
  }
- 
+
  /**
  * @title  Token is Betalist,Blacklist
  */
  contract Betalist is Authorizable,EmergencyToggle{
-     
+
     //maps for betalisted and blacklisted addresses
     mapping(address=>bool) betalisted;
     mapping(address=>bool) blacklisted;
@@ -255,7 +255,7 @@ contract EmergencyToggle is Ownable{
     event BlacklistedAddress (address indexed _blacklisted);
     event RemovedFromBlacklist(address indexed _toRemoveBlacklist);
     event RemovedFromBetalist(address indexed _toRemoveBetalist);
-    
+
     //variable to check if betalist is required when calling several functions on smart contract
     bool public requireBetalisted;
 
@@ -263,10 +263,10 @@ contract EmergencyToggle is Ownable{
     //constructor
     constructor () public{
         requireBetalisted=true;
-        
+
     }
-    
-    
+
+
    /**
   * @dev betaList the specified address
   * @param _toBetalist the address to betalist
@@ -279,9 +279,9 @@ contract EmergencyToggle is Ownable{
         betalisted[_toBetalist]=true;
         emit BetalistedAddress(_toBetalist);
         return true;
-        
+
     }
-    
+
      /**
   * @dev remove from betaList the specified address
   * @param _toRemoveBetalist The address to be removed
@@ -293,10 +293,10 @@ contract EmergencyToggle is Ownable{
         betalisted[_toRemoveBetalist]=false;
         emit RemovedFromBetalist(_toRemoveBetalist);
         return true;
-        
+
     }
-    
-      
+
+
     /**
   * @dev blackList the specified address
   * @param _toBlacklist The address to blacklist
@@ -308,9 +308,9 @@ contract EmergencyToggle is Ownable{
         blacklisted[_toBlacklist]=true;
         emit RemovedFromBlacklist(_toBlacklist);
         return true;
-        
+
     }
-    
+
      /**
   * @dev remove from blackList the specified address
   * @param _toRemoveBlacklist The address to blacklist
@@ -322,9 +322,9 @@ contract EmergencyToggle is Ownable{
         blacklisted[_toRemoveBlacklist]=false;
         emit RemovedFromBlacklist(_toRemoveBlacklist);
         return true;
-        
+
     }
- 
+
       /**
   * @dev check the specified address if isBetaListed
   * @param _betalisted The address to transfer to.
@@ -332,18 +332,18 @@ contract EmergencyToggle is Ownable{
     function isBetaListed(address _betalisted) external view returns(bool){
             return (betalisted[_betalisted]);
     }
-    
-     
+
+
       /**
   * @dev check the specified address isBlackListed
   * @param _blacklisted The address to transfer to.
   */
     function isBlackListed(address _blacklisted) external view returns(bool){
         return (blacklisted[_blacklisted]);
-        
+
     }
-    
-    
+
+
 }
 
 /**
@@ -351,7 +351,7 @@ contract EmergencyToggle is Ownable{
  */
 
 contract Token{
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
     function transferFrom(address _from, address _to, uint256 _value) public  returns (bool success);
@@ -373,13 +373,13 @@ contract StandardToken is Token,Betalist{
   mapping (address => uint256)  balances;
 
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   uint256 public totalSupply;
 
 
- 
-  
-  
+
+
+
   /**
   * @dev Gets the balance of the specified address.
   * @return An uint256 representing the amount owned by the passed address.
@@ -389,26 +389,26 @@ contract StandardToken is Token,Betalist{
         return balances[_owner];
   }
 
-  
-  
+
+
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
    * @param _spender address The address which will spend the funds.
    * @return A uint256 specifying the amount of tokens still available for the spender.
    */
-  
+
   function allowance(address _owner,address _spender)public view returns (uint256){
         return allowed[_owner][_spender];
   }
 
- 
+
   /**
   * @dev Transfer token for a specified address
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(!emergencyFlag);
     require(_value <= balances[msg.sender]);
@@ -425,8 +425,8 @@ contract StandardToken is Token,Betalist{
     return true;
 
   }
-  
-  
+
+
     /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    * Beware that changing an allowance with this method brings the risk that someone may use both the old
@@ -448,8 +448,8 @@ contract StandardToken is Token,Betalist{
     return true;
 
   }
-  
-  
+
+
     /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -475,30 +475,30 @@ contract StandardToken is Token,Betalist{
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
     return true;
-    
+
   }
 
 }
 
 contract AssignOperator is StandardToken{
-    
+
     //mappings
-    
+
     mapping(address=>mapping(address=>bool)) isOperator;
-    
-    
+
+
     //Events
     event AssignedOperator (address indexed _operator,address indexed _for);
     event OperatorTransfer (address indexed _developer,address indexed _from,address indexed _to,uint _amount);
     event RemovedOperator  (address indexed _operator,address indexed _for);
-    
-    
+
+
     /**
    * @dev AssignedOperator to transfer tokens on users behalf
    * @param _developer address The address which is allowed to transfer tokens on users behalf
    * @param _user address The address which developer want to transfer from
    */
-    
+
     function assignOperator(address _developer,address _user) public onlyAuthorized returns(bool){
         require(!emergencyFlag);
         require(_developer != address(0));
@@ -514,7 +514,7 @@ contract AssignOperator is StandardToken{
         emit AssignedOperator(_developer,_user);
         return true;
     }
-    
+
     /**
    * @dev RemoveOperator allowed to transfer tokens on users behalf
    * @param _developer address The address which is allowed to trasnfer tokens on users behalf
@@ -528,16 +528,16 @@ contract AssignOperator is StandardToken{
         isOperator[_developer][_user]=false;
         emit RemovedOperator(_developer,_user);
         return true;
-        
+
     }
-    
+
     /**
    * @dev Operatransfer for developer to transfer tokens on users behalf without requiring ethers in managed  ethereum accounts
    * @param _from address the address to transfer tokens from
    * @param _to address The address which developer want to transfer to
    * @param _amount the amount of tokens user wants to transfer
    */
-    
+
     function operatorTransfer(address _from,address _to,uint _amount) public returns (bool){
         require(!emergencyFlag);
         require(isOperator[msg.sender][_from]);
@@ -557,21 +557,21 @@ contract AssignOperator is StandardToken{
         emit OperatorTransfer(msg.sender,_from, _to, _amount);
         emit Transfer(_from,_to,_amount);
         return true;
-        
-        
+
+
     }
-    
+
      /**
    * @dev checkIsOperator is developer an operator allowed to transfer tokens on users behalf
-   * @param _developer the address allowed to trasnfer tokens 
+   * @param _developer the address allowed to trasnfer tokens
    * @param _for address The address which developer want to transfer from
    */
-    
+
     function checkIsOperator(address _developer,address _for) external view returns (bool){
             return (isOperator[_developer][_for]);
     }
 
-    
+
 }
 
 
@@ -583,22 +583,22 @@ contract AssignOperator is StandardToken{
 
 contract SilaToken is AssignOperator{
     using SafeMath for uint256;
-    
+
     // parameters for silatoken
     string  public constant name = "SilaToken";
     string  public constant symbol = "SILA";
     uint256 public constant decimals = 18;
     string  public version = "1.0";
-    
-     
+
+
     //Events fired during successfull execution of main silatoken functions
     event Issued(address indexed _to,uint256 _value);
     event Redeemed(address indexed _from,uint256 _amount);
     event ProtectedTransfer(address indexed _from,address indexed _to,uint256 _amount);
     event ProtectedApproval(address indexed _owner,address indexed _spender,uint256 _amount);
     event GlobalLaunchSila(address indexed _launcher);
-    
-    
+
+
 
     /**
    * @dev issue tokens from sila  to _to address
@@ -615,13 +615,13 @@ contract SilaToken is AssignOperator{
         }
         require(!blacklisted[_to]);
         totalSupply = totalSupply.add(_amount);
-        balances[_to] = balances[_to].add(_amount);                 
-        emit Issued(_to, _amount);                     
+        balances[_to] = balances[_to].add(_amount);
+        emit Issued(_to, _amount);
         return true;
     }
-    
-    
-      
+
+
+
    /**
    * @dev redeem tokens from _from address
    * @dev onlyAuthorized  addresses can call this function
@@ -637,15 +637,15 @@ contract SilaToken is AssignOperator{
             require(betalisted[_from]);
         }
         require(!blacklisted[_from]);
-        balances[_from] = balances[_from].sub(_amount);   
+        balances[_from] = balances[_from].sub(_amount);
         totalSupply = totalSupply.sub(_amount);
         emit Redeemed(_from,_amount);
         return true;
-            
+
 
     }
-    
-    
+
+
     /**
    * @dev Transfer tokens from one address to another
    * @dev onlyAuthorized  addresses can call this function
@@ -670,29 +670,29 @@ contract SilaToken is AssignOperator{
         emit ProtectedTransfer(_from, _to, _amount);
         emit Transfer(_from,_to,_amount);
         return true;
-        
+
     }
-    
-    
+
+
     /**
     * @dev Launch sila for global transfers to work as standard
     */
-    
+
     function globalLaunchSila() public onlyHotOwner{
             require(!emergencyFlag);
             require(requireBetalisted);
             requireBetalisted=false;
             emit GlobalLaunchSila(msg.sender);
     }
-    
-    
-    
+
+
+
      /**
    * @dev batchissue , isuue tokens in batches to multiple addresses at a time
    * @param _amounts The amount of tokens to be issued.
    * @param _toAddresses tokens to be issued to these addresses respectively
     */
-    
+
     function batchIssue(address[] memory _toAddresses,uint256[]  memory _amounts) public onlyAuthorized returns(bool) {
             require(!emergencyFlag);
             require(_toAddresses.length==_amounts.length);
@@ -701,28 +701,28 @@ contract SilaToken is AssignOperator{
                 require(check);
             }
             return true;
-            
+
     }
-    
-    
+
+
     /**
     * @dev batchredeem , redeem tokens in batches from multiple addresses at a time
     * @param _amounts The amount of tokens to be redeemed.
     * @param _fromAddresses tokens to be redeemed to from addresses respectively
      */
-    
+
     function batchRedeem(address[] memory  _fromAddresses,uint256[]  memory _amounts) public onlyAuthorized returns(bool){
             require(!emergencyFlag);
             require(_fromAddresses.length==_amounts.length);
             for(uint i = 0; i < _fromAddresses.length; i++) {
                 bool check=redeem(_fromAddresses[i],_amounts[i]);
                 require(check);
-            }  
+            }
             return true;
-        
+
     }
-    
-    
+
+
       /**
     * @dev batchTransfer, transfer tokens in batches between multiple addresses at a time
     * @param _fromAddresses tokens to be transfered to these addresses respectively
@@ -737,15 +737,24 @@ contract SilaToken is AssignOperator{
             for(uint i = 0; i < _fromAddresses.length; i++) {
                 bool check=protectedTransfer(_fromAddresses[i],_toAddresses[i],_amounts[i]);
                 require(check);
-               
+
             }
             return true;
-        
-    } 
-    
-    
-    
 
-    
-    
+    }
+
+
+
+
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

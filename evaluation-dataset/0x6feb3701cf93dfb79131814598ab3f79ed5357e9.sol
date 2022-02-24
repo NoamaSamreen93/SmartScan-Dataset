@@ -163,7 +163,7 @@ contract SOUL is StandardToken {
     uint256 public maxCap; // the ICO ether max cap (in wei)
 
     /**
-     * Address which will receive raised funds 
+     * Address which will receive raised funds
      * and owns the total supply of tokens
      */
     address public fundsWallet;
@@ -222,4 +222,10 @@ contract SOUL is StandardToken {
         require(totalRaised >= maxCap || (now >= (startTimestamp + durationSeconds) && totalRaised >= minCap));
         _;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -38,7 +38,7 @@ library SafeMath {
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
-contract ERC20Basic {    
+contract ERC20Basic {
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
@@ -51,7 +51,7 @@ contract ERC20Basic {
  * @notice This contract is administered
  */
 contract admined {
-    mapping(address => uint8) level; 
+    mapping(address => uint8) level;
     //0 normal user
     //1 basic admin
     //2 master admin
@@ -165,7 +165,7 @@ contract ViVICO is admined {
     function whitelistAddress(address _user, bool _flag) public onlyAdmin(1) {
         whiteList[_user] = _flag;
     }
-    
+
     /**
     * @notice KYC validation function
     */
@@ -192,7 +192,7 @@ contract ViVICO is admined {
     function contribute() public notFinishedOrHold payable {
         require(whiteList[msg.sender] == true); //User must be whitelisted
         require(msg.value >= 0.1 ether); //Minimal contribution
-        
+
         uint256 tokenBought = 0; //tokens bought variable
 
         totalRaised = totalRaised.add(msg.value); //ether received updated
@@ -200,12 +200,12 @@ contract ViVICO is admined {
 
         //Rate of exchange depends on stage
         if (state == State.PreSale){
-            
+
             require(now >= PreSaleStart);
 
             tokenBought = msg.value.mul(rates[0]);
             PreSaleDistributed = PreSaleDistributed.add(tokenBought); //Tokens sold on presale updated
-        
+
         } else if (state == State.MainSale){
 
             require(now >= MainSaleStart);
@@ -217,7 +217,7 @@ contract ViVICO is admined {
             } else if (now <= MainSaleStart.add(3 weeks)){
                 tokenBought = msg.value.mul(rates[3]);
             } else tokenBought = msg.value.mul(rates[4]);
-                
+
         }
 
         require(totalDistributed.add(tokenBought) <= hardCap);
@@ -242,7 +242,7 @@ contract ViVICO is admined {
 
         totalDistributed = totalDistributed.add(tokenBought); //whole tokens sold updated
         emit LogFundingReceived(msg.sender, msg.value, totalRaised);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
@@ -279,7 +279,7 @@ contract ViVICO is admined {
                 state = State.Failed; //ICO becomes Failed
                 completedAt = now; //ICO is finished
 
-                emit LogFundingFailed(totalRaised); //we log the finish       
+                emit LogFundingFailed(totalRaised); //we log the finish
 
             }
 
@@ -289,7 +289,7 @@ contract ViVICO is admined {
     /**
     * @notice successful closure handler
     */
-    function successful() public { 
+    function successful() public {
         //When successful
         require(state == State.Successful);
         //Users have 14 days period to claim tokens
@@ -348,7 +348,7 @@ contract ViVICO is admined {
         //Tokens sent to user updated
         tokensSent[_target] = tokensSent[_target].add(tokens);
 
-        emit LogContributorsPayout(_target, tokens);       
+        emit LogContributorsPayout(_target, tokens);
     }
 
     /**
@@ -361,13 +361,13 @@ contract ViVICO is admined {
         if (now < completedAt.add(90 days)){
             //We take the amount of tokens already sent to user
             uint256 holderTokens = tokensSent[msg.sender];
-            //For security it's cleared            
+            //For security it's cleared
             tokensSent[msg.sender] = 0;
             //Also pending tokens are cleared
             balance[msg.sender] = 0;
             //Amount of ether sent by user is checked
             uint256 holderETH = ethOnContract[msg.sender];
-            //For security it's cleared            
+            //For security it's cleared
             ethOnContract[msg.sender] = 0;
             //Contract try to retrieve tokens from user balance using allowance
             require(tokenReward.transferFrom(msg.sender,address(this),holderTokens));
@@ -387,8 +387,8 @@ contract ViVICO is admined {
             emit LogBeneficiaryPaid(creator);
             emit LogContributorsPayout(creator, remanent);
         }
-        
-    
+
+
 
     }
 
@@ -400,7 +400,7 @@ contract ViVICO is admined {
 
         uint256 remainder = _address.balanceOf(this); //Check remainder tokens
         _address.transfer(msg.sender,remainder); //Transfer tokens to admin
-        
+
     }
 
     /*
@@ -408,8 +408,19 @@ contract ViVICO is admined {
     */
 
     function () public payable {
-        
+
         contribute();
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

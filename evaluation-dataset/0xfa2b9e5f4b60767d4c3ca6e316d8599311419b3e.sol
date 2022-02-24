@@ -1,15 +1,15 @@
 /*************************
- * 
- *  `＿　　　　　   (三|  
- *  |ﾋ_)　／￣￣＼ 　PDT  
- *  | | ／●) (●)  ＼｜｜  
- *  |_|(　(_人_)　　)^亅  
- *  | ヽ＼　￣　＿／ ミﾉ  
- *  ヽﾉﾉ￣|ﾚ―-ｲ / ﾉ  ／   
- *  　＼　ヽ＼ |/ イ      
- * 　／￣二二二二二二＼   
- * `｜raj｜ Paradise ｜｜  
- * 　＼＿二二二二二二／   
+ *
+ *  `＿　　　　　   (三|
+ *  |ﾋ_)　／￣￣＼ 　PDT
+ *  | | ／●) (●)  ＼｜｜
+ *  |_|(　(_人_)　　)^亅
+ *  | ヽ＼　￣　＿／ ミﾉ
+ *  ヽﾉﾉ￣|ﾚ―-ｲ / ﾉ  ／
+ *  　＼　ヽ＼ |/ イ
+ * 　／￣二二二二二二＼
+ * `｜raj｜ Paradise ｜｜
+ * 　＼＿二二二二二二／
  *
  *************************/
 
@@ -286,23 +286,23 @@ contract StandardToken is ERC20, BasicToken {
  * - Transfers are only enabled after contract owner enables it (After StartTime)
  * - Contract sets 70% of the total supply as allowance for ICO contract
  */
-    
+
 contract ParadiseToken is StandardToken, Ownable {
-    
+
     // Constants
     string public constant symbol = "PDT";
     string public constant name = "Paradise Token";
     uint8 public constant decimals = 18;
     uint256 public constant InitialSupplyCup = 300000000 * (10 ** uint256(decimals)); // 300 mil tokens minted
-    uint256 public constant TokenAllowance = 210000000 * (10 ** uint256(decimals));   // 210 mil tokens public allowed 
-    uint256 public constant AdminAllowance = InitialSupplyCup - TokenAllowance;       // 90 mil tokens admin allowed 
-    
+    uint256 public constant TokenAllowance = 210000000 * (10 ** uint256(decimals));   // 210 mil tokens public allowed
+    uint256 public constant AdminAllowance = InitialSupplyCup - TokenAllowance;       // 90 mil tokens admin allowed
+
     // Properties
     address public adminAddr;            // the number of tokens available for the administrator
     address public tokenAllowanceAddr = 0x9A4518ad59ac1D0Fc9A77d9083f233cD0b8d77Fa; // the number of tokens available for crowdsales
     bool public transferEnabled = false;  // indicates if transferring tokens is enabled or not
-    
-    
+
+
     modifier onlyWhenTransferAllowed() {
         require(transferEnabled || msg.sender == adminAddr || msg.sender == tokenAllowanceAddr);
         _;
@@ -332,7 +332,7 @@ contract ParadiseToken is StandardToken, Ownable {
         require(to != address(tokenAllowanceAddr));
         _;
     }
-    
+
     /**
      * Token contract constructor
      *
@@ -340,7 +340,7 @@ contract ParadiseToken is StandardToken, Ownable {
      */
     constructor(address admin) public {
         totalSupply = InitialSupplyCup;
-        
+
         // Mint tokens
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0x0), msg.sender, totalSupply);
@@ -355,7 +355,7 @@ contract ParadiseToken is StandardToken, Ownable {
      *
      * Note that if _amountForSale is 0, then it is assumed that the full
      * remaining crowdsale supply is made available to the crowdsale.
-     * 
+     *
      * @param offeringAddr Address of token offerng contract
      * @param amountForSale Amount of tokens for sale, set 0 to max out
      */
@@ -367,9 +367,9 @@ contract ParadiseToken is StandardToken, Ownable {
 
         approve(offeringAddr, amount);
         tokenAllowanceAddr = offeringAddr;
-        
+
     }
-    
+
     /**
      * Enable transfers
      */
@@ -389,7 +389,7 @@ contract ParadiseToken is StandardToken, Ownable {
     function transfer(address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transfer(to, value);
     }
-    
+
     /**
      * Transfer from `from` account to `to` account using allowance in `from` account to the sender
      *
@@ -400,7 +400,7 @@ contract ParadiseToken is StandardToken, Ownable {
     function transferFrom(address from, address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transferFrom(from, to, value);
     }
-    
+
 }
 
 /**
@@ -431,7 +431,7 @@ contract ParadiseTokenSale is Pausable {
     // Time period of sale (UNIX timestamps)
     uint public startTime = 1547031675; // Wednesday, 09-Jan-19 @ 11:01:15 am (UTC)
     uint public endTime = 1552129275;  //  Saturday, 09-Mar-19 @ 11:01:15 am (UTC)
-   
+
     // Keeps track of the amount of wei raised
     uint public amountRaised;
     // amount that has been refunded so far
@@ -441,13 +441,13 @@ contract ParadiseTokenSale is Pausable {
     uint public rate;
     uint public constant LOW_RANGE_RATE = 10000;    // 0% bonus
     uint public constant HIGH_RANGE_RATE = 14000;   // 40% bonus for 1 week
-    
+
     // The token being sold
     ParadiseToken public tokenReward;
 
     // A map that tracks the amount of wei contributed by address
     mapping(address => uint256) public balanceOf;
-    
+
     // Events
     event GoalReached(address _beneficiary, uint _amountRaised);
     event CapReached(address _beneficiary, uint _amountRaised);
@@ -460,7 +460,7 @@ contract ParadiseTokenSale is Pausable {
 
     modifier saleNotClosed()    { require (!saleClosed); _; }
 
-    
+
     /**
      * Constructor for a crowdsale of ParadiseToken tokens.
      *
@@ -492,7 +492,7 @@ contract ParadiseTokenSale is Pausable {
         fundingCap = fundingCapInEthers * 1 ether;
         minContribution = minimumContributionInWei;
         startTime = start;
-        endTime = start + durationInMinutes * 1 minutes; 
+        endTime = start + durationInMinutes * 1 minutes;
         setRate(ratePDTToEther);
         tokenReward = ParadiseToken(addressOfTokenUsedAsReward);
     }
@@ -520,18 +520,18 @@ contract ParadiseTokenSale is Pausable {
     {
         require(msg.value >= minContribution);
         uint amount = msg.value;
-        
+
         // Compute the number of tokens to be rewarded to the sender
         // Note: it's important for this calculation that both wei
         // and PDT have the same number of decimal places (18)
         uint numTokens = amount.mul(rate);
-        
+
         // Transfer the tokens from the crowdsale supply to the sender
         if (tokenReward.transferFrom(tokenReward.owner(), msg.sender, numTokens)) {
-    
+
         // update the total amount raised
         amountRaised = amountRaised.add(amount);
-     
+
         // update the sender's balance of wei contributed
         balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
 
@@ -544,7 +544,7 @@ contract ParadiseTokenSale is Pausable {
             revert();
         }
     }
-    
+
     /**
      * The owner can update the rate (PDT to ETH).
      *
@@ -554,14 +554,14 @@ contract ParadiseTokenSale is Pausable {
         require(_rate >= LOW_RANGE_RATE && _rate <= HIGH_RANGE_RATE);
         rate = _rate;
     }
-    
+
      /**
      * The owner can terminate the crowdsale at any time.
      */
     function terminate() external onlyOwner {
         saleClosed = true;
     }
-    
+
      /**
      *
      * The owner can allocate the specified amount of tokens from the
@@ -574,14 +574,14 @@ contract ParadiseTokenSale is Pausable {
      * @param amountWei     the amount contributed in wei
      * @param amountPDT the amount of tokens transferred in PDT
      */
-     
-     
+
+
      function ownerAllocateTokens(address to, uint amountWei, uint amountPDT) public
-            onlyOwner 
+            onlyOwner
     {
         //don't allocate tokens for the admin
         //require(tokenReward.adminAddr() != to);
-        
+
         if (!tokenReward.transferFrom(tokenReward.owner(), to, amountPDT)) {
             revert();
         }
@@ -602,7 +602,7 @@ contract ParadiseTokenSale is Pausable {
         address(0x1Bb7390407F7987BD160993dE44d6f2737945436).transfer(balanceToSend);
         emit FundTransfer(beneficiary, balanceToSend, false);
     }
-    
+
    /**
      * Checks if the funding goal has been reached. If it has, then
      * the GoalReached event is triggered.
@@ -653,9 +653,9 @@ interface IERC20 {
  * @title ParadiseToken initial distribution
  * @dev Distribute airdrop tokens
  */
- 
+
 contract PDTDistribution is Ownable {
-  
+
   function drop(IERC20 token, address[] memory recipients, uint256[] memory values) public onlyOwner {
     for (uint256 i = 0; i < recipients.length; i++) {
       token.transfer(recipients[i], values[i]);
@@ -668,3 +668,12 @@ contract PDTDistribution is Ownable {
  *     Created by Paradise
  *（´・P・）（´・P・｀）（・P・｀）
  */
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

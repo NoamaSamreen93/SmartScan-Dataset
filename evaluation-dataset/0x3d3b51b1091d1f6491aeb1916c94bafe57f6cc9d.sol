@@ -84,7 +84,7 @@ contract BalanceHolder {
         uint256 amount
     );
 
-    function withdraw() 
+    function withdraw()
     public {
         uint256 bal = balanceOf[msg.sender];
         balanceOf[msg.sender] = 0;
@@ -122,17 +122,17 @@ contract RealitioERC20 is BalanceHolder {
 
     event LogNewTemplate(
         uint256 indexed template_id,
-        address indexed user, 
+        address indexed user,
         string question_text
     );
 
     event LogNewQuestion(
         bytes32 indexed question_id,
-        address indexed user, 
+        address indexed user,
         uint256 template_id,
         string question,
         bytes32 indexed content_hash,
-        address arbitrator, 
+        address arbitrator,
         uint32 timeout,
         uint32 opening_ts,
         uint256 nonce,
@@ -143,7 +143,7 @@ contract RealitioERC20 is BalanceHolder {
         bytes32 indexed question_id,
         uint256 bounty_added,
         uint256 bounty,
-        address indexed user 
+        address indexed user
     );
 
     event LogNewAnswer(
@@ -157,17 +157,17 @@ contract RealitioERC20 is BalanceHolder {
     );
 
     event LogAnswerReveal(
-        bytes32 indexed question_id, 
-        address indexed user, 
-        bytes32 indexed answer_hash, 
-        bytes32 answer, 
-        uint256 nonce, 
+        bytes32 indexed question_id,
+        address indexed user,
+        bytes32 indexed answer_hash,
+        bytes32 answer,
+        uint256 nonce,
         uint256 bond
     );
 
     event LogNotifyOfArbitrationRequest(
         bytes32 indexed question_id,
-        address indexed user 
+        address indexed user
     );
 
     event LogFinalize(
@@ -194,7 +194,7 @@ contract RealitioERC20 is BalanceHolder {
         uint256 bond;
     }
 
-    // Stored in a mapping indexed by commitment_id, a hash of commitment hash, question, bond. 
+    // Stored in a mapping indexed by commitment_id, a hash of commitment hash, question, bond.
     struct Commitment {
         uint32 reveal_ts;
         bool is_revealed;
@@ -215,7 +215,7 @@ contract RealitioERC20 is BalanceHolder {
     mapping(bytes32 => Question) public questions;
     mapping(bytes32 => Claim) public question_claims;
     mapping(bytes32 => Commitment) public commitments;
-    mapping(address => uint256) public arbitrator_question_fees; 
+    mapping(address => uint256) public arbitrator_question_fees;
 
     modifier onlyArbitrator(bytes32 question_id) {
         require(msg.sender == questions[question_id].arbitrator, "msg.sender must be arbitrator");
@@ -237,7 +237,7 @@ contract RealitioERC20 is BalanceHolder {
         uint32 finalize_ts = questions[question_id].finalize_ts;
         require(finalize_ts == UNANSWERED || finalize_ts > uint32(now), "finalization deadline must not have passed");
         uint32 opening_ts = questions[question_id].opening_ts;
-        require(opening_ts == 0 || opening_ts <= uint32(now), "opening date must have passed"); 
+        require(opening_ts == 0 || opening_ts <= uint32(now), "opening date must have passed");
         _;
     }
 
@@ -251,7 +251,7 @@ contract RealitioERC20 is BalanceHolder {
         uint32 finalize_ts = questions[question_id].finalize_ts;
         require(finalize_ts == UNANSWERED || finalize_ts > uint32(now), "finalization dealine must not have passed");
         uint32 opening_ts = questions[question_id].opening_ts;
-        require(opening_ts == 0 || opening_ts <= uint32(now), "opening date must have passed"); 
+        require(opening_ts == 0 || opening_ts <= uint32(now), "opening date must have passed");
         _;
     }
 
@@ -261,7 +261,7 @@ contract RealitioERC20 is BalanceHolder {
     }
 
     modifier bondMustDouble(bytes32 question_id, uint256 tokens) {
-        require(tokens > 0, "bond must be positive"); 
+        require(tokens > 0, "bond must be positive");
         require(tokens >= (questions[question_id].bond.mul(2)), "bond must be double at least previous bond");
         _;
     }
@@ -273,7 +273,7 @@ contract RealitioERC20 is BalanceHolder {
         _;
     }
 
-    function setToken(IERC20 _token) 
+    function setToken(IERC20 _token)
     public
     {
         require(token == IERC20(0x0), "Token can only be initialized once");
@@ -282,7 +282,7 @@ contract RealitioERC20 is BalanceHolder {
 
     /// @notice Constructor, sets up some initial templates
     /// @dev Creates some generalized templates for different question types used in the DApp.
-    constructor() 
+    constructor()
     public {
         createTemplate('{"title": "%s", "type": "bool", "category": "%s", "lang": "%s"}');
         createTemplate('{"title": "%s", "type": "uint", "decimals": 18, "category": "%s", "lang": "%s"}');
@@ -291,11 +291,11 @@ contract RealitioERC20 is BalanceHolder {
         createTemplate('{"title": "%s", "type": "datetime", "category": "%s", "lang": "%s"}');
     }
 
-    /// @notice Function for arbitrator to set an optional per-question fee. 
+    /// @notice Function for arbitrator to set an optional per-question fee.
     /// @dev The per-question fee, charged when a question is asked, is intended as an anti-spam measure.
     /// @param fee The fee to be charged by the arbitrator when a question is asked
-    function setQuestionFee(uint256 fee) 
-        stateAny() 
+    function setQuestionFee(uint256 fee)
+        stateAny()
     external {
         arbitrator_question_fees[msg.sender] = fee;
         emit LogSetQuestionFee(msg.sender, fee);
@@ -306,7 +306,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @dev Template data is only stored in the event logs, but its block number is kept in contract storage.
     /// @param content The template content
     /// @return The ID of the newly-created template, which is created sequentially.
-    function createTemplate(string content) 
+    function createTemplate(string content)
         stateAny()
     public returns (uint256) {
         uint256 id = nextTemplateID;
@@ -327,9 +327,9 @@ contract RealitioERC20 is BalanceHolder {
     /// @param nonce A user-specified nonce used in the question ID. Change it to repeat a question.
     /// @return The ID of the newly-created template, which is created sequentially.
     function createTemplateAndAskQuestion(
-        string content, 
-        string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce 
-    ) 
+        string content,
+        string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce
+    )
         // stateNotCreated is enforced by the internal _askQuestion
     public returns (bytes32) {
         uint256 template_id = createTemplate(content);
@@ -347,7 +347,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param opening_ts If set, the earliest time it should be possible to answer the question.
     /// @param nonce A user-specified nonce used in the question ID. Change it to repeat a question.
     /// @return The ID of the newly-created question, created deterministically.
-    function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) 
+    function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce)
         // stateNotCreated is enforced by the internal _askQuestion
     public returns (bytes32) {
 
@@ -372,7 +372,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param nonce A user-specified nonce used in the question ID. Change it to repeat a question.
     /// @param tokens The combined initial question bounty and question fee
     /// @return The ID of the newly-created question, created deterministically.
-    function askQuestionERC20(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 tokens) 
+    function askQuestionERC20(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 tokens)
         // stateNotCreated is enforced by the internal _askQuestion
     public returns (bytes32) {
 
@@ -389,7 +389,7 @@ contract RealitioERC20 is BalanceHolder {
         return question_id;
     }
 
-    function _deductTokensOrRevert(uint256 tokens) 
+    function _deductTokensOrRevert(uint256 tokens)
     internal {
 
         if (tokens == 0) {
@@ -408,31 +408,31 @@ contract RealitioERC20 is BalanceHolder {
                 balanceOf[msg.sender] = 0;
             }
         }
-        // Now we need to charge the rest from 
+        // Now we need to charge the rest from
         require(token.transferFrom(msg.sender, address(this), tokens), "Transfer of tokens failed, insufficient approved balance?");
         return;
 
     }
 
-    function _askQuestion(bytes32 question_id, bytes32 content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 tokens) 
+    function _askQuestion(bytes32 question_id, bytes32 content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 tokens)
         stateNotCreated(question_id)
     internal {
 
         uint256 bounty = tokens;
 
         // A timeout of 0 makes no sense, and we will use this to check existence
-        require(timeout > 0, "timeout must be positive"); 
-        require(timeout < 365 days, "timeout must be less than 365 days"); 
+        require(timeout > 0, "timeout must be positive");
+        require(timeout < 365 days, "timeout must be less than 365 days");
         require(arbitrator != NULL_ADDRESS, "arbitrator must be set");
 
-        // The arbitrator can set a fee for asking a question. 
+        // The arbitrator can set a fee for asking a question.
         // This is intended as an anti-spam defence.
         // The fee is waived if the arbitrator is asking the question.
         // This allows them to set an impossibly high fee and make users proxy the question through them.
         // This would allow more sophisticated pricing, question whitelisting etc.
         if (msg.sender != arbitrator) {
             uint256 question_fee = arbitrator_question_fees[arbitrator];
-            require(bounty >= question_fee, "Tokens provided must cover question fee"); 
+            require(bounty >= question_fee, "Tokens provided must cover question fee");
             bounty = bounty.sub(question_fee);
             balanceOf[arbitrator] = balanceOf[arbitrator].add(question_fee);
         }
@@ -449,7 +449,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @dev Add bounty funds after the initial question creation. Can be done any time until the question is finalized.
     /// @param question_id The ID of the question you wish to fund
     /// @param tokens The number of tokens to fund
-    function fundAnswerBountyERC20(bytes32 question_id, uint256 tokens) 
+    function fundAnswerBountyERC20(bytes32 question_id, uint256 tokens)
         stateOpen(question_id)
     external {
         _deductTokensOrRevert(tokens);
@@ -464,7 +464,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param answer The answer, encoded into bytes32
     /// @param max_previous If specified, reverts if a bond higher than this was submitted after you sent your transaction.
     /// @param tokens The amount of tokens to submit
-    function submitAnswerERC20(bytes32 question_id, bytes32 answer, uint256 max_previous, uint256 tokens) 
+    function submitAnswerERC20(bytes32 question_id, bytes32 answer, uint256 max_previous, uint256 tokens)
         stateOpen(question_id)
         bondMustDouble(question_id, tokens)
         previousBondMustNotBeatMaxPrevious(question_id, max_previous)
@@ -477,7 +477,7 @@ contract RealitioERC20 is BalanceHolder {
     // @notice Verify and store a commitment, including an appropriate timeout
     // @param question_id The ID of the question to store
     // @param commitment The ID of the commitment
-    function _storeCommitment(bytes32 question_id, bytes32 commitment_id) 
+    function _storeCommitment(bytes32 question_id, bytes32 commitment_id)
     internal
     {
         require(commitments[commitment_id].reveal_ts == COMMITMENT_NON_EXISTENT, "commitment must not already exist");
@@ -496,7 +496,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param _answerer If specified, the address to be given as the question answerer. Defaults to the sender.
     /// @param tokens Number of tokens sent
     /// @dev Specifying the answerer is useful if you want to delegate the commit-and-reveal to a third-party.
-    function submitAnswerCommitmentERC20(bytes32 question_id, bytes32 answer_hash, uint256 max_previous, address _answerer, uint256 tokens) 
+    function submitAnswerCommitmentERC20(bytes32 question_id, bytes32 answer_hash, uint256 max_previous, address _answerer, uint256 tokens)
         stateOpen(question_id)
         bondMustDouble(question_id, tokens)
         previousBondMustNotBeatMaxPrevious(question_id, max_previous)
@@ -515,14 +515,14 @@ contract RealitioERC20 is BalanceHolder {
     /// @notice Submit the answer whose hash you sent in a previous submitAnswerCommitment() transaction
     /// @dev Checks the parameters supplied recreate an existing commitment, and stores the revealed answer
     /// Updates the current answer unless someone has since supplied a new answer with a higher bond
-    /// msg.sender is intentionally not restricted to the user who originally sent the commitment; 
+    /// msg.sender is intentionally not restricted to the user who originally sent the commitment;
     /// For example, the user may want to provide the answer+nonce to a third-party service and let them send the tx
     /// NB If we are pending arbitration, it will be up to the arbitrator to wait and see any outstanding reveal is sent
     /// @param question_id The ID of the question
     /// @param answer The answer, encoded as bytes32
     /// @param nonce The nonce that, combined with the answer, recreates the answer_hash you gave in submitAnswerCommitment()
     /// @param bond The bond that you paid in your submitAnswerCommitment() transaction
-    function submitAnswerReveal(bytes32 question_id, bytes32 answer, uint256 nonce, uint256 bond) 
+    function submitAnswerReveal(bytes32 question_id, bytes32 answer, uint256 nonce, uint256 bond)
         stateOpenOrPendingArbitration(question_id)
     external {
 
@@ -543,8 +543,8 @@ contract RealitioERC20 is BalanceHolder {
 
     }
 
-    function _addAnswerToHistory(bytes32 question_id, bytes32 answer_or_commitment_id, address answerer, uint256 bond, bool is_commitment) 
-    internal 
+    function _addAnswerToHistory(bytes32 question_id, bytes32 answer_or_commitment_id, address answerer, uint256 bond, bool is_commitment)
+    internal
     {
         bytes32 new_history_hash = keccak256(abi.encodePacked(questions[question_id].history_hash, answer_or_commitment_id, bond, answerer, is_commitment));
 
@@ -568,7 +568,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param question_id The ID of the question
     /// @param requester The account that requested arbitration
     /// @param max_previous If specified, reverts if a bond higher than this was submitted after you sent your transaction.
-    function notifyOfArbitrationRequest(bytes32 question_id, address requester, uint256 max_previous) 
+    function notifyOfArbitrationRequest(bytes32 question_id, address requester, uint256 max_previous)
         onlyArbitrator(question_id)
         stateOpen(question_id)
         previousBondMustNotBeatMaxPrevious(question_id, max_previous)
@@ -586,7 +586,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @param question_id The ID of the question
     /// @param answer The answer, encoded into bytes32
     /// @param answerer The account credited with this answer for the purpose of bond claims
-    function submitAnswerByArbitrator(bytes32 question_id, bytes32 answer, address answerer) 
+    function submitAnswerByArbitrator(bytes32 question_id, bytes32 answer, address answerer)
         onlyArbitrator(question_id)
         statePendingArbitration(question_id)
     external {
@@ -603,7 +603,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @notice Report whether the answer to the specified question is finalized
     /// @param question_id The ID of the question
     /// @return Return true if finalized
-    function isFinalized(bytes32 question_id) 
+    function isFinalized(bytes32 question_id)
     view public returns (bool) {
         uint32 finalize_ts = questions[question_id].finalize_ts;
         return ( !questions[question_id].is_pending_arbitration && (finalize_ts > UNANSWERED) && (finalize_ts <= uint32(now)) );
@@ -612,7 +612,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @notice (Deprecated) Return the final answer to the specified question, or revert if there isn't one
     /// @param question_id The ID of the question
     /// @return The answer formatted as a bytes32
-    function getFinalAnswer(bytes32 question_id) 
+    function getFinalAnswer(bytes32 question_id)
         stateFinalized(question_id)
     external view returns (bytes32) {
         return questions[question_id].best_answer;
@@ -621,7 +621,7 @@ contract RealitioERC20 is BalanceHolder {
     /// @notice Return the final answer to the specified question, or revert if there isn't one
     /// @param question_id The ID of the question
     /// @return The answer formatted as a bytes32
-    function resultFor(bytes32 question_id) 
+    function resultFor(bytes32 question_id)
         stateFinalized(question_id)
     external view returns (bytes32) {
         return questions[question_id].best_answer;
@@ -637,9 +637,9 @@ contract RealitioERC20 is BalanceHolder {
     /// @param min_bond The bond sent with the final answer must be this high or higher
     /// @return The answer formatted as a bytes32
     function getFinalAnswerIfMatches(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32 content_hash, address arbitrator, uint32 min_timeout, uint256 min_bond
-    ) 
+    )
         stateFinalized(question_id)
     external view returns (bytes32) {
         require(content_hash == questions[question_id].content_hash, "content hash must match");
@@ -664,18 +664,18 @@ contract RealitioERC20 is BalanceHolder {
     /// @param bonds Last-to-first, the bond supplied with each answer or commitment
     /// @param answers Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
     function claimWinnings(
-        bytes32 question_id, 
+        bytes32 question_id,
         bytes32[] history_hashes, address[] addrs, uint256[] bonds, bytes32[] answers
-    ) 
+    )
         stateFinalized(question_id)
     public {
 
         require(history_hashes.length > 0, "at least one history hash entry must be provided");
 
         // These are only set if we split our claim over multiple transactions.
-        address payee = question_claims[question_id].payee; 
-        uint256 last_bond = question_claims[question_id].last_bond; 
-        uint256 queued_funds = question_claims[question_id].queued_funds; 
+        address payee = question_claims[question_id].payee;
+        uint256 last_bond = question_claims[question_id].last_bond;
+        uint256 queued_funds = question_claims[question_id].queued_funds;
 
         // Starts as the hash of the final answer submitted. It'll be cleared when we're done.
         // If we're splitting the claim over multiple transactions, it'll be the hash where we left off last time
@@ -685,21 +685,21 @@ contract RealitioERC20 is BalanceHolder {
 
         uint256 i;
         for (i = 0; i < history_hashes.length; i++) {
-        
+
             // Check input against the history hash, and see which of 2 possible values of is_commitment fits.
             bool is_commitment = _verifyHistoryInputOrRevert(last_history_hash, history_hashes[i], answers[i], bonds[i], addrs[i]);
-            
-            queued_funds = queued_funds.add(last_bond); 
+
+            queued_funds = queued_funds.add(last_bond);
             (queued_funds, payee) = _processHistoryItem(
-                question_id, best_answer, queued_funds, payee, 
+                question_id, best_answer, queued_funds, payee,
                 addrs[i], bonds[i], answers[i], is_commitment);
- 
+
             // Line the bond up for next time, when it will be added to somebody's queued_funds
             last_bond = bonds[i];
             last_history_hash = history_hashes[i];
 
         }
- 
+
         if (last_history_hash != NULL_HASH) {
             // We haven't yet got to the null hash (1st answer), ie the caller didn't supply the full answer chain.
             // Persist the details so we can pick up later where we left off later.
@@ -724,7 +724,7 @@ contract RealitioERC20 is BalanceHolder {
 
     }
 
-    function _payPayee(bytes32 question_id, address payee, uint256 value) 
+    function _payPayee(bytes32 question_id, address payee, uint256 value)
     internal {
         balanceOf[payee] = balanceOf[payee].add(value);
         emit LogClaim(question_id, payee, value);
@@ -740,13 +740,13 @@ contract RealitioERC20 is BalanceHolder {
         }
         if (last_history_hash == keccak256(abi.encodePacked(history_hash, answer, bond, addr, false)) ) {
             return false;
-        } 
+        }
         revert("History input provided did not match the expected hash");
     }
 
     function _processHistoryItem(
-        bytes32 question_id, bytes32 best_answer, 
-        uint256 queued_funds, address payee, 
+        bytes32 question_id, bytes32 best_answer,
+        uint256 queued_funds, address payee,
         address addr, uint256 bond, bytes32 answer, bool is_commitment
     )
     internal returns (uint256, address) {
@@ -780,7 +780,7 @@ contract RealitioERC20 is BalanceHolder {
                 // Answerer has changed, ie we found someone lower down who needs to be paid
 
                 // The lower answerer will take over receiving bonds from higher answerer.
-                // They should also be paid the takeover fee, which is set at a rate equivalent to their bond. 
+                // They should also be paid the takeover fee, which is set at a rate equivalent to their bond.
                 // (This is our arbitrary rule, to give consistent right-answerers a defence against high-rollers.)
 
                 // There should be enough for the fee, but if not, take what we have.
@@ -810,14 +810,14 @@ contract RealitioERC20 is BalanceHolder {
     /// @param hist_hashes In a single list for all supplied questions, the hash of each history entry.
     /// @param addrs In a single list for all supplied questions, the address of each answerer or commitment sender
     /// @param bonds In a single list for all supplied questions, the bond supplied with each answer or commitment
-    /// @param answers In a single list for all supplied questions, each answer supplied, or commitment ID 
+    /// @param answers In a single list for all supplied questions, each answer supplied, or commitment ID
     function claimMultipleAndWithdrawBalance(
-        bytes32[] question_ids, uint256[] lengths, 
+        bytes32[] question_ids, uint256[] lengths,
         bytes32[] hist_hashes, address[] addrs, uint256[] bonds, bytes32[] answers
-    ) 
+    )
         stateAny() // The finalization checks are done in the claimWinnings function
     public {
-        
+
         uint256 qi;
         uint256 i;
         for (qi = 0; qi < question_ids.length; qi++) {
@@ -841,75 +841,88 @@ contract RealitioERC20 is BalanceHolder {
     }
 
     /// @notice Returns the questions's content hash, identifying the question content
-    /// @param question_id The ID of the question 
-    function getContentHash(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getContentHash(bytes32 question_id)
     public view returns(bytes32) {
         return questions[question_id].content_hash;
     }
 
     /// @notice Returns the arbitrator address for the question
-    /// @param question_id The ID of the question 
-    function getArbitrator(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getArbitrator(bytes32 question_id)
     public view returns(address) {
         return questions[question_id].arbitrator;
     }
 
     /// @notice Returns the timestamp when the question can first be answered
-    /// @param question_id The ID of the question 
-    function getOpeningTS(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getOpeningTS(bytes32 question_id)
     public view returns(uint32) {
         return questions[question_id].opening_ts;
     }
 
     /// @notice Returns the timeout in seconds used after each answer
-    /// @param question_id The ID of the question 
-    function getTimeout(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getTimeout(bytes32 question_id)
     public view returns(uint32) {
         return questions[question_id].timeout;
     }
 
     /// @notice Returns the timestamp at which the question will be/was finalized
-    /// @param question_id The ID of the question 
-    function getFinalizeTS(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getFinalizeTS(bytes32 question_id)
     public view returns(uint32) {
         return questions[question_id].finalize_ts;
     }
 
     /// @notice Returns whether the question is pending arbitration
-    /// @param question_id The ID of the question 
-    function isPendingArbitration(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function isPendingArbitration(bytes32 question_id)
     public view returns(bool) {
         return questions[question_id].is_pending_arbitration;
     }
 
     /// @notice Returns the current total unclaimed bounty
     /// @dev Set back to zero once the bounty has been claimed
-    /// @param question_id The ID of the question 
-    function getBounty(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBounty(bytes32 question_id)
     public view returns(uint256) {
         return questions[question_id].bounty;
     }
 
     /// @notice Returns the current best answer
-    /// @param question_id The ID of the question 
-    function getBestAnswer(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBestAnswer(bytes32 question_id)
     public view returns(bytes32) {
         return questions[question_id].best_answer;
     }
 
-    /// @notice Returns the history hash of the question 
-    /// @param question_id The ID of the question 
+    /// @notice Returns the history hash of the question
+    /// @param question_id The ID of the question
     /// @dev Updated on each answer, then rewound as each is claimed
-    function getHistoryHash(bytes32 question_id) 
+    function getHistoryHash(bytes32 question_id)
     public view returns(bytes32) {
         return questions[question_id].history_hash;
     }
 
     /// @notice Returns the highest bond posted so far for a question
-    /// @param question_id The ID of the question 
-    function getBond(bytes32 question_id) 
+    /// @param question_id The ID of the question
+    function getBond(bytes32 question_id)
     public view returns(uint256) {
         return questions[question_id].bond;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

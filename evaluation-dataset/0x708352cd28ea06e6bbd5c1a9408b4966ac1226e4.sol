@@ -532,7 +532,7 @@ library PresaleBonuses {
         /// Second day bonus
         if ((day == 3 && hour >= 5) || (day == 4 && hour < 5)) {
             return applyPercentage(_purchased, 45);
-        } 
+        }
 
         /// Days 3 - 20 bonus
         if (day < 22) {
@@ -574,7 +574,7 @@ library PresaleBonuses {
     {
         num = _base.mul(_percentage).div(100);
     }
-    
+
 }
 
 pragma solidity ^0.4.11;
@@ -1125,7 +1125,7 @@ contract Vesting is Ownable {
                                     uint _totalAmount)
         public onlyOwner
     {
-        // Check that we are registering a depositor and the address we register to vest to 
+        // Check that we are registering a depositor and the address we register to vest to
         //  does not already have a depositor.
         require( _depositor != 0x0 );
         require( vestingSchedules[_newAddress].depositor == 0x0 );
@@ -1135,7 +1135,7 @@ contract Vesting is Ownable {
         require( _endTimestamp > _cliffTimestamp );
 
         // Some lock period sanity checks.
-        require( _lockPeriod != 0 ); 
+        require( _lockPeriod != 0 );
         require( _endTimestamp.sub(_startTimestamp) > _lockPeriod );
 
         // Register the new address.
@@ -1199,7 +1199,7 @@ contract Vesting is Ownable {
     }
 
     function withdrawVestedTokens()
-        public 
+        public
     {
         VestingSchedule storage vestingSchedule = vestingSchedules[msg.sender];
 
@@ -1325,9 +1325,9 @@ contract Vesting is Ownable {
 
 // Vesting Schedules
 // ...................
-// Team tokens will be vested over 18 months with a 1/3 vested after 6 months, 1/3 vested after 12 months and 1/3 vested 
-// after 18 months. 
-// Partnership and Development + Sharing Bounties + Reserves tokens will be vested over two years with 1/24 
+// Team tokens will be vested over 18 months with a 1/3 vested after 6 months, 1/3 vested after 12 months and 1/3 vested
+// after 18 months.
+// Partnership and Development + Sharing Bounties + Reserves tokens will be vested over two years with 1/24
 // available upfront and 1/24 available each month after
 
 pragma solidity ^0.4.18;
@@ -1766,4 +1766,20 @@ contract VyralSale is Ownable {
     event LogContribution(Phase phase, address buyer, uint contribution);
 
     event LogReferral(address referrer, address invitee, uint referralReward);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

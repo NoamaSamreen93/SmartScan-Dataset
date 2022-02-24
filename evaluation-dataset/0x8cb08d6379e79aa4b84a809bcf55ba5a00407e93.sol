@@ -88,7 +88,7 @@ contract ReentrancyGuard {
 
 contract Map is PullPayment, Destructible, ReentrancyGuard {
     using SafeMath for uint256;
-    
+
     // STRUCTS
 
     struct Transaction {
@@ -105,7 +105,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         string key;
         uint kingdomTier;
         uint kingdomType;
-        uint minimumPrice; 
+        uint minimumPrice;
         uint lastTransaction;
         uint transactionCount;
         uint returnPrice;
@@ -151,7 +151,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
     Transaction[] public kingdomTransactions;
     uint public currentRound;
     address public bookerAddress;
-    
+
     mapping(uint => Round) rounds;
     mapping(address => uint) lastTransaction;
 
@@ -208,12 +208,12 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         require (kingdoms[rounds[currentRound].kingdomsKeys[_key]].owner == _sender);
         _;
     }
-    
-    // ERC20 
+
+    // ERC20
     address public woodAddress;
     ERC20Basic woodInterface;
     // ERC20Basic rock;
-    // ERC20Basic 
+    // ERC20Basic
 
     // EVENTS
 
@@ -249,8 +249,8 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         for (uint i = 1; i < 10; i++) {
             if (now < rounds[currentRound].startTime + (i * 12 hours)) {
                 uint result = (10 * i);
-                if (result > 100) { 
-                    return 100; 
+                if (result > 100) {
+                    return 100;
                 } else {
                     return result;
                 }
@@ -261,8 +261,8 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
     //
     //  This is the main function. It is called to buy a kingdom
     //
-    function purchaseKingdom(string _key, string _title, bool _locked, address affiliate) public 
-    payable 
+    function purchaseKingdom(string _key, string _title, bool _locked, address affiliate) public
+    payable
     nonReentrant()
     checkKingdomExistence(_key)
     checkIsNotLocked(_key)
@@ -301,7 +301,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
             }
             compensateLatestMonarch(kingdom.lastTransaction, kingdom.returnPrice);
         }
-        
+
         // woodInterface.resetTimer(_key);
 
         kingdom.kingdomTier++;
@@ -320,7 +320,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
             kingdom.returnPrice = 1.0125 ether;
             kingdom.minimumPrice = 2.43 ether;
         }
-        
+
         kingdom.owner = msg.sender;
         kingdom.locked = _locked;
 
@@ -403,7 +403,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         uint nextMinimumPrice = 0.09 ether; // STARTING_CLAIM_PRICE_WEI.add(STARTING_CLAIM_PRICE_WEI.mul(2));
 
         uint kingdomId = kingdoms.push(Kingdom("", "", 1, 0, 0, 0, 1, refundPrice, address(0), false)) - 1;
-        
+
         kingdoms[kingdomId].kingdomType = _type;
         kingdoms[kingdomId].title = _title;
         kingdoms[kingdomId].owner = msg.sender;
@@ -413,7 +413,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
 
         rounds[currentRound].kingdomsKeys[_key] = kingdomId;
         rounds[currentRound].kingdomsCreated[_key] = true;
-        
+
         if(_locked == true) {
             asyncSend(bookerAddress, ACTION_TAX);
         }
@@ -577,7 +577,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         Kingdom storage kingdom = kingdoms[kingdomId];
         return (kingdom.title, kingdom.minimumPrice, kingdom.lastTransaction, kingdom.transactionCount, kingdom.owner, kingdom.kingdomType, kingdom.locked);
     }
- 
+
     // function upgradeTier(string _key) public {
     //     // require(now < rounds[currentRound].endTime);
     //     Round storage round = rounds[currentRound];
@@ -610,7 +610,7 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
                 } else if (kingdoms[index].kingdomTier == 5) {
                     round.scores[msg.sender] = round.scores[msg.sender] + 13;
                 }
-                
+
                 if(round.scores[msg.sender] != 0 && round.scores[msg.sender] == maxPoints) {
                     if(lastTransaction[userAddress] < lastTransaction[addr]) {
                         addr = userAddress;
@@ -623,4 +623,15 @@ contract Map is PullPayment, Destructible, ReentrancyGuard {
         }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

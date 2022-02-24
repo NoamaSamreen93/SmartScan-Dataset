@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 /* ==================================================================== */
 /* Copyright (c) 2018 The Priate Conquest Project.  All rights reserved.
-/* 
-/* https://www.pirateconquest.com One of the world's slg games of blockchain 
-/*  
+/*
+/* https://www.pirateconquest.com One of the world's slg games of blockchain
+/*
 /* authors rainy@livestar.com/Jonny.Fu@livestar.com
-/*                 
+/*
 /* ==================================================================== */
 /// This Random is inspired by https://github.com/axiomzen/eth-random
 contract Random {
@@ -20,7 +20,7 @@ contract Random {
         return uint256(keccak256(_outSeed, block.blockhash(block.number - 1), block.coinbase, block.difficulty));
     }
 
-    
+
     function _randByRange(uint256 _min, uint256 _max) internal returns (uint256) {
         if (_min >= _max) {
             return _min;
@@ -31,7 +31,7 @@ contract Random {
     function _rankByNumber(uint256 _max) internal returns (uint256) {
         return _rand() % _max;
     }
-    
+
 }
 
 interface CaptainTokenInterface {
@@ -52,19 +52,19 @@ interface CaptainGameConfigInterface {
 contract CaptainPreSell is Random {
   using SafeMath for SafeMath;
   address devAddress;
-  
+
   function CaptainPreSell() public {
     devAddress = msg.sender;
   }
 
   CaptainTokenInterface public captains;
-  CaptainGameConfigInterface public config; 
+  CaptainGameConfigInterface public config;
   /// @dev The BuyToken event is fired whenever a token is sold.
   event BuyToken(uint256 tokenId, uint256 oldPrice, address prevOwner, address winner);
-  
+
   //mapping
   mapping(uint32 => uint256) captainToCount;
-  mapping(address => uint32[]) captainUserMap; 
+  mapping(address => uint32[]) captainUserMap;
   /// @notice No tipping!
   /// @dev Reject all Ether from being sent here, unless it's from one of the
   ///  two auction contracts. (Hopefully, we can prevent user accidents.)
@@ -105,15 +105,15 @@ contract CaptainPreSell is Random {
     require(msg.value >= price);
      //get the config
     uint32 atk_min;
-    uint32 atk_max; 
+    uint32 atk_max;
     (,,atk_min,atk_max) = config.getLevelConfig(_captainId,1);
-   
+
     atk_min = uint32(SafeMath.div(SafeMath.mul(uint256(atk_min),rdm),100));
     atk_max = uint32(SafeMath.div(SafeMath.mul(uint256(atk_max),rdm),100));
-   
+
     price = SafeMath.div(SafeMath.mul(price,130),100);
     captains.CreateCaptainToken(msg.sender,price,_captainId,color,atk, defense,atk_min,atk_max);
-  
+
     uint256 balance = captains.balanceOf(msg.sender);
     uint256 tokenId = captains.tokenOfOwnerByIndex(msg.sender,balance-1);
     captains.setTokenPrice(tokenId,price);
@@ -122,7 +122,7 @@ contract CaptainPreSell is Random {
 
     //transfer
     //devAddress.transfer(msg.value);
-    //event 
+    //event
     BuyToken(_captainId, price,address(this),msg.sender);
   }
 
@@ -204,4 +204,13 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

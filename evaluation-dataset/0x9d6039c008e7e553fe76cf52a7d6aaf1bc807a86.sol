@@ -116,3 +116,12 @@ contract HumanStandardToken is StandardToken {
 
 // Creates 160,000,000.000000000000000000 TokenCCC17 Tokens
 contract TokenCCC17 is HumanStandardToken(160000000000000000000000000, "TokenCCC17", 18, "CCC17") {}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

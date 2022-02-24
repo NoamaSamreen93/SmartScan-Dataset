@@ -74,7 +74,7 @@ contract mkethToken is ERC20Interface {
 
   // 转移余额到其他账户
   function transfer(address _to, uint256 _amount) returns (bool success) {
-      if (balances[msg.sender] >= _amount 
+      if (balances[msg.sender] >= _amount
           && _amount > 0
           && balances[_to] + _amount > balances[_to]) {
           balances[msg.sender] -= _amount;
@@ -117,4 +117,15 @@ contract mkethToken is ERC20Interface {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

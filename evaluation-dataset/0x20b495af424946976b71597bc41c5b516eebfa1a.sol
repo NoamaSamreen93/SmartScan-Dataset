@@ -382,7 +382,7 @@ contract ERC1132 {
         bytes32 indexed _reason,
         uint256 _amount
     );
-    
+
     /**
      * @dev Locks a specified amount of tokens against an address,
      *      for a specified reason and time
@@ -392,7 +392,7 @@ contract ERC1132 {
      */
     function lock(bytes32 _reason, uint256 _amount, uint256 _time, address _of)
         public returns (bool);
-  
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason
@@ -402,7 +402,7 @@ contract ERC1132 {
      */
     function tokensLocked(address _of, bytes32 _reason)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns tokens locked for a specified address for a
      *      specified reason at a specific time
@@ -413,14 +413,14 @@ contract ERC1132 {
      */
     function tokensLockedAtTime(address _of, bytes32 _reason, uint256 _time)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Returns total tokens held by an address (locked + transferable)
      * @param _of The address to query the total balance of
      */
     function totalBalanceOf(address _of)
         public view returns (uint256 amount);
-    
+
     /**
      * @dev Extends lock for a specified reason and time
      * @param _reason The reason to lock tokens
@@ -428,7 +428,7 @@ contract ERC1132 {
      */
     function extendLock(bytes32 _reason, uint256 _time)
         public returns (bool);
-    
+
     /**
      * @dev Increase number of tokens locked for a specified reason
      * @param _reason The reason to lock tokens
@@ -444,7 +444,7 @@ contract ERC1132 {
      */
     function tokensUnlockable(address _of, bytes32 _reason)
         public view returns (uint256 amount);
- 
+
     /**
      * @dev Unlocks the unlockable tokens of a specified address
      * @param _of Address of user, claiming back unlockable tokens
@@ -478,7 +478,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
 	string public constant symbol 					= "YWC";
 	uint256 public constant decimals 				= 18;
 	uint256 public constant INITIAL_SUPPLY 				= 10000000 * (10 ** decimals);
-    
+
 	constructor() public {
         	totalSupply_ 						= INITIAL_SUPPLY;
 		balances[msg.sender] 					= INITIAL_SUPPLY;
@@ -498,21 +498,21 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
 	// Mint
 	function mint(address _to, uint256 _amount) public onlyOwner {
         	require(_amount > 0, INVALID_TOKEN_VALUES);
-        	
+
 		balances[_to] 						= balances[_to].add(_amount);
         	totalSupply_ 						= totalSupply_.add(_amount);
-        	
+
 		emit Mint(_to, _amount);
-	}	
+	}
 
 	// Burn
 	function burn(address _of, uint256 _amount) public onlyOwner {
         	require(_amount > 0, INVALID_TOKEN_VALUES);
         	require(_amount <= balances[_of], NOT_ENOUGH_TOKENS);
-        	
+
 		balances[_of] 						= balances[_of].sub(_amount);
         	totalSupply_ 						= totalSupply_.sub(_amount);
-        	
+
 		emit Burn(_of, _amount);
 	}
 
@@ -534,7 +534,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
 
 		emit Transfer(_of, address(this), _amount);
 		emit Locked(_of, _reason, _amount, validUntil);
-		
+
 		return true;
     	}
 
@@ -542,7 +542,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
         	public
         	returns (bool)
     	{
-        	uint256 validUntil 					= now.add(_time); 
+        	uint256 validUntil 					= now.add(_time);
 
         	require(tokensLocked(_to, _reason) == 0, ALREADY_LOCKED);
         	require(_amount != 0, AMOUNT_ZERO);
@@ -555,7 +555,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
         	locked[_to][_reason] 					= lockToken(_amount, validUntil, false);
 
         	emit Locked(_to, _reason, _amount, validUntil);
-        
+
 		return true;
     	}
 
@@ -563,7 +563,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
         	public
         	view
         	returns (uint256 amount)
-    	{	
+    	{
         	if (!locked[_of][_reason].claimed)
             		amount 						= locked[_of][_reason].amount;
     	}
@@ -598,22 +598,22 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
         	locked[msg.sender][_reason].validity 			= locked[msg.sender][_reason].validity.add(_time);
 
         	emit Locked(msg.sender, _reason, locked[msg.sender][_reason].amount, locked[msg.sender][_reason].validity);
-        
+
 		return true;
-    	}	
+    	}
 
     	function increaseLockAmount(bytes32 _reason, uint256 _amount)
         	public
         	returns (bool)
     	{
         	require(tokensLocked(msg.sender, _reason) > 0, NOT_LOCKED);
-        	
+
 		transfer(address(this), _amount);
 
         	locked[msg.sender][_reason].amount 			= locked[msg.sender][_reason].amount.add(_amount);
 
         	emit Locked(msg.sender, _reason, locked[msg.sender][_reason].amount, locked[msg.sender][_reason].validity);
-        
+
 		return true;
    	}
 
@@ -622,7 +622,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
         	view
         	returns (uint256 amount)
     	{
-        	if (locked[_of][_reason].validity <= now && !locked[_of][_reason].claimed) 
+        	if (locked[_of][_reason].validity <= now && !locked[_of][_reason].claimed)
             		amount 						= locked[_of][_reason].amount;
     	}
 
@@ -634,7 +634,7 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
 
         	for (uint256 i = 0; i < lockReason[_of].length; i++) {
             		lockedTokens 					= tokensUnlockable(_of, lockReason[_of][i]);
-            
+
 	    		if (lockedTokens > 0) {
                 		unlockableTokens 			= unlockableTokens.add(lockedTokens);
                 		locked[_of][lockReason[_of][i]].claimed = true;
@@ -656,4 +656,15 @@ contract YoonwooCoin is StandardToken, Ownable, ERC1132 {
             		unlockableTokens 				= unlockableTokens.add(tokensUnlockable(_of, lockReason[_of][i]));
         	}
     	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

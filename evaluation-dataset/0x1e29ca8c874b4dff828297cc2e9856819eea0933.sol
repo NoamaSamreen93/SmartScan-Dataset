@@ -42,10 +42,10 @@ contract TOURISTOKEN {
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = 777777777000000000000000000;  
-        balanceOf[msg.sender] = totalSupply;               
-        name = "TOURISTOKEN";                                   
-        symbol = "TOU";                               
+        totalSupply = 777777777000000000000000000;
+        balanceOf[msg.sender] = totalSupply;
+        name = "TOURISTOKEN";
+        symbol = "TOU";
     }
 
     /**
@@ -85,7 +85,7 @@ contract TOURISTOKEN {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);    
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -132,9 +132,9 @@ contract TOURISTOKEN {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -148,11 +148,11 @@ contract TOURISTOKEN {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(_from, _value);
         return true;
     }
@@ -174,13 +174,13 @@ contract MyAdvancedToken is owned, TOURISTOKEN {
      )MyAdvancedToken(initialSupply, tokenName, tokenSymbol) public {}
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value);              
-        require (balanceOf[_to] + _value >= balanceOf[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                       
-        balanceOf[_from] -= _value;                         
-        balanceOf[_to] += _value;                           
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
+        require (balanceOf[_to] + _value >= balanceOf[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
     }
 
@@ -191,30 +191,30 @@ contract MyAdvancedToken is owned, TOURISTOKEN {
         emit Transfer(this, target, mintedAmount);
     }
 
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
 
-    
+
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
 
-    
+
     function buy() payable public {
-        uint amount = msg.value /buyPrice ;              
-        _transfer(this, msg.sender, amount);              
+        uint amount = msg.value /buyPrice ;
+        _transfer(this, msg.sender, amount);
     }
 
-    
+
     function sell(uint256 amount) public {
         address myAddress = this;
-        require(myAddress.balance >= amount * sellPrice);      
-        _transfer(msg.sender, this, amount);              
-        msg.sender.transfer(amount * sellPrice);          
+        require(myAddress.balance >= amount * sellPrice);
+        _transfer(msg.sender, this, amount);
+        msg.sender.transfer(amount * sellPrice);
     }
 }
 
@@ -276,7 +276,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -300,67 +300,67 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 contract Gateway is Ownable{
     using SafeMath for uint;
-    address public feeAccount1 = 0xcAc496756f98a4E6e4e56f14e46A6824608a29a2; 
-    address public feeAccount2 = 0xE4BD9Cb073A247911A520BbDcBE0e8C2492be346; 
+    address public feeAccount1 = 0xcAc496756f98a4E6e4e56f14e46A6824608a29a2;
+    address public feeAccount2 = 0xE4BD9Cb073A247911A520BbDcBE0e8C2492be346;
     address public feeAccountToken = 0x5D151cdD1833237ACb2Fef613F560221230D77c5;
-    
+
     struct BuyInfo {
-      address buyerAddress; 
+      address buyerAddress;
       address sellerAddress;
       uint value;
       address currency;
     }
-    
+
     mapping(address => mapping(uint => BuyInfo)) public payment;
-   
+
     uint balanceFee;
     uint public feePercent;
     uint public maxFee;
     constructor() public{
-       feePercent = 1500000; 
-       maxFee = 3000000; 
+       feePercent = 1500000;
+       maxFee = 3000000;
     }
-    
-    
+
+
     function getBuyerAddressPayment(address _sellerAddress, uint _orderId) public view returns(address){
       return  payment[_sellerAddress][_orderId].buyerAddress;
-    }    
+    }
     function getSellerAddressPayment(address _sellerAddress, uint _orderId) public view returns(address){
       return  payment[_sellerAddress][_orderId].sellerAddress;
-    }    
-    
+    }
+
     function getValuePayment(address _sellerAddress, uint _orderId) public view returns(uint){
       return  payment[_sellerAddress][_orderId].value;
-    }    
-    
+    }
+
     function getCurrencyPayment(address _sellerAddress, uint _orderId) public view returns(address){
       return  payment[_sellerAddress][_orderId].currency;
     }
-    
-    
+
+
     function setFeeAccount1(address _feeAccount1) onlyOwner public{
-      feeAccount1 = _feeAccount1;  
+      feeAccount1 = _feeAccount1;
     }
     function setFeeAccount2(address _feeAccount2) onlyOwner public{
-      feeAccount2 = _feeAccount2;  
+      feeAccount2 = _feeAccount2;
     }
     function setFeeAccountToken(address _feeAccountToken) onlyOwner public{
-      feeAccountToken = _feeAccountToken;  
-    }    
+      feeAccountToken = _feeAccountToken;
+    }
     function setFeePercent(uint _feePercent) onlyOwner public{
       require(_feePercent <= maxFee);
-      feePercent = _feePercent;  
-    }    
+      feePercent = _feePercent;
+    }
     function payToken(address _tokenAddress, address _sellerAddress, uint _orderId,  uint _value) public returns (bool success){
       require(_tokenAddress != address(0));
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       TOURISTOKEN token = TOURISTOKEN(_tokenAddress);
       require(token.allowance(msg.sender, this) >= _value);
@@ -370,12 +370,12 @@ contract Gateway is Ownable{
       success = true;
     }
     function payEth(address _sellerAddress, uint _orderId, uint _value) internal returns  (bool success){
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       uint fee = _value.mul(feePercent).div(100000000);
       _sellerAddress.transfer(_value.sub(fee));
       balanceFee = balanceFee.add(fee);
-      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);    
+      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);
       success = true;
     }
     function transferFee() onlyOwner public{
@@ -402,7 +402,7 @@ contract Gateway is Ownable{
       return address(result);
     }
     function() external payable {
-      require(msg.data.length == 20); 
+      require(msg.data.length == 20);
       require(msg.value > 99999999999);
       address sellerAddress = bytesToAddress(bytes(msg.data));
       uint value = msg.value.div(10000000000).mul(10000000000);
@@ -410,4 +410,15 @@ contract Gateway is Ownable{
       balanceFee = balanceFee.add(orderId);
       payEth(sellerAddress, orderId, value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

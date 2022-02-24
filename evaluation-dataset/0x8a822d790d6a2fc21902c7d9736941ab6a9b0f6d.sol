@@ -1,16 +1,16 @@
 /*
-1. All rights to the smart contract, the PGCT tokens and the receipts are owned by the Golden Currency Group. 
+1. All rights to the smart contract, the PGCT tokens and the receipts are owned by the Golden Currency Group.
 
-2. The PGCT token is a transitional token of the crowdfunding campaign. 
-Token is not a security and does not provide any profit payment for its owners or any rights similar to shareholders rights. 
-The PGCT Token is to be exchanged for the future Golden Currency token, 
-which will be released as part of the main round of the ICO campaign. 
-Future Golden Currency token is planned to become a security token, providing additional incentives for project contributors (like dividends and buyback), 
-yet it will be realized only in case all legal procedures are fulfilled, 
-Golden Currency Group does not ensure it becoming a security token and disclaims all liability relating thereto. 
+2. The PGCT token is a transitional token of the crowdfunding campaign.
+Token is not a security and does not provide any profit payment for its owners or any rights similar to shareholders rights.
+The PGCT Token is to be exchanged for the future Golden Currency token,
+which will be released as part of the main round of the ICO campaign.
+Future Golden Currency token is planned to become a security token, providing additional incentives for project contributors (like dividends and buyback),
+yet it will be realized only in case all legal procedures are fulfilled,
+Golden Currency Group does not ensure it becoming a security token and disclaims all liability relating thereto.
 
-3. The PGCT-future Golden Currency token exchange procedure will include the mandatory KYC process, 
-the exchange will be refused for those who do not pass the KYC procedure. 
+3. The PGCT-future Golden Currency token exchange procedure will include the mandatory KYC process,
+the exchange will be refused for those who do not pass the KYC procedure.
 The exchange will be refused for residents of countries who are legally prohibited from participating in such crowdfunding campaigns.
 */
 
@@ -22,7 +22,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 library SafeMath {
 
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -49,7 +49,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -57,7 +57,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
   mapping(address => bool   ) isInvestor;
   address[] public arrInvestors;
-  
+
   uint256 totalSupply_;
 
   function totalSupply() public view returns (uint256) {
@@ -68,12 +68,12 @@ contract BasicToken is ERC20Basic {
     if (!isInvestor[_newInvestor]){
        isInvestor[_newInvestor] = true;
        arrInvestors.push(_newInvestor);
-    }  
-      
+    }
+
   }
     function getInvestorsCount() public view returns(uint256) {
         return arrInvestors.length;
-        
+
     }
 
 /*
@@ -86,7 +86,7 @@ or only all rest
     } else {
         require(_value == balances[msg.sender]); //only all rest
     }
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
@@ -109,7 +109,7 @@ or only all rest
 
 }
 
- 
+
 
 contract BurnableToken is BasicToken {
 
@@ -137,6 +137,17 @@ contract GoldenCurrencyToken is BurnableToken {
 
   function GoldenCurrencyToken() public {
     totalSupply_ = INITIAL_SUPPLY;
-    balances[msg.sender] = INITIAL_SUPPLY;      
+    balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

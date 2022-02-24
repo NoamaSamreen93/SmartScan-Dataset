@@ -55,8 +55,8 @@ contract Owned {
  *
  * - Collect funds from pre-sale investors
  * - Send funds to an specified address when the pre-sale ends
- * 
- */ 
+ *
+ */
 contract DadaPresaleFundCollector is Owned {
 
   using SafeMathLib for uint;
@@ -79,8 +79,8 @@ contract DadaPresaleFundCollector is Owned {
 
   // turned on when the refund function is allowed to be isExecutionAllowed
   bool public isRefundAllowed;
-  
-  // Used to handle if the cap was reached due to investment received 
+
+  // Used to handle if the cap was reached due to investment received
   // in either Bitcoin or USD
   bool public isCapReached;
 
@@ -101,7 +101,7 @@ contract DadaPresaleFundCollector is Owned {
   }
 
   /**
-  * Whitelist handler function 
+  * Whitelist handler function
   **/
   function updateWhitelist(address whitelistedAddress, bool isWhitelisted) public onlyOwner {
     whitelist[whitelistedAddress] = isWhitelisted;
@@ -126,7 +126,7 @@ contract DadaPresaleFundCollector is Owned {
     address investor = msg.sender;
     // the investor is whitlisted
     require(whitelist[investor]);
-    
+
     // the total balance of the user shouldn't be greater than the maximumIndividualCap
     require((balances[investor].plus(msg.value)) <= maximumIndividualCap);
 
@@ -161,8 +161,8 @@ contract DadaPresaleFundCollector is Owned {
     isFinalized = true;
     moving = true;
     presaleAddressAmountHolder.transfer(this.balance);
-    EmptiedToWallet(presaleAddressAmountHolder); 
-  }  
+    EmptiedToWallet(presaleAddressAmountHolder);
+  }
 
   function flipExecutionSwitchTo(bool state) public onlyOwner{
     isExecutionAllowed = state;
@@ -182,10 +182,19 @@ contract DadaPresaleFundCollector is Owned {
 
   function flipMovingSwitchTo(bool state) public onlyOwner{
     moving = state;
-  }  
+  }
 
   /** Explicitly call function from your wallet. */
   function() public payable {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

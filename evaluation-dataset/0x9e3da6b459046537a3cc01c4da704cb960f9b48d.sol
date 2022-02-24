@@ -273,7 +273,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         emit AddedBlackList(_evilUser);
@@ -444,4 +444,13 @@ contract XUSDToken is Pausable, StandardToken, BlackList {
 
     // Called if contract ever adds fees
     event Params(uint feeBasisPoints, uint maxFee);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

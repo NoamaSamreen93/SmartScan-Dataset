@@ -107,7 +107,7 @@ contract FMWorld is FMWorldAccessControl {
 
     uint256 public balanceForReward;
     uint256 public deposits;
-    
+
     uint256 public countPartnerPlayers;
 
     mapping (uint256 => uint256) public balancesTeams;
@@ -146,12 +146,12 @@ contract FMWorld is FMWorldAccessControl {
 
     function openBoxPlayer(uint256 _league, uint256 _position) external notPause isCalculatedReward payable returns (uint256 _price) {
         if (now > 1525024800) revert();
-        
+
         PlayerToken playerToken = PlayerToken(playerTokenAddress);
         CatalogPlayers catalogPlayers = CatalogPlayers(catalogPlayersAddress);
 
         _price = catalogPlayers.getBoxPrice(_league, _position);
-        
+
         balancesInternal[msg.sender] += msg.value;
         if (balancesInternal[msg.sender] < _price) {
             revert();
@@ -175,10 +175,10 @@ contract FMWorld is FMWorldAccessControl {
     function _getRandom(uint256 max, address addAddress) view internal returns(uint256) {
         return (uint256(block.blockhash(block.number-1)) + uint256(addAddress)) % max;
     }
-    
+
     function _requireTalentSkills(uint256 _playerId, PlayerToken playerToken, uint256 _minTalent, uint256 _minSkills) internal view returns(bool) {
         var (_talent, _tactics, _dribbling, _kick, _speed, _pass, _selection) = playerToken.getPlayer(_playerId);
-        if ((_talent < _minTalent) || (_tactics + _dribbling + _kick + _speed + _pass + _selection < _minSkills)) return false; 
+        if ((_talent < _minTalent) || (_tactics + _dribbling + _kick + _speed + _pass + _selection < _minSkills)) return false;
         return true;
     }
 
@@ -257,10 +257,10 @@ contract FMWorld is FMWorldAccessControl {
         balancesInternal[msg.sender] = 0;
 
     }
-    
+
     function createPartnerPlayer(uint256 _league, uint256 _position, uint256 _classPlayerId, address _toAddress) external notPause isCalculatedReward onlyC {
         if (countPartnerPlayers >= 300) revert();
-        
+
         PlayerToken playerToken = PlayerToken(playerTokenAddress);
         CatalogPlayers catalogPlayers = CatalogPlayers(catalogPlayersAddress);
 
@@ -277,11 +277,11 @@ contract FMWorld is FMWorldAccessControl {
             calculatedReward = true;
             return;
         }
-        
-        if (orderTeamsIds.length != team.getCountTeams()) { 
+
+        if (orderTeamsIds.length != team.getCountTeams()) {
             revert();
         }
-        
+
         for(uint256 teamIndex = 0; teamIndex < orderTeamsIds.length - 1; teamIndex++) {
             if (team.getTeamSumSkills(orderTeamsIds[teamIndex]) < team.getTeamSumSkills(orderTeamsIds[teamIndex + 1])) {
                 revert();
@@ -289,7 +289,7 @@ contract FMWorld is FMWorldAccessControl {
         }
         uint256 k;
         for(uint256 i = 1; i < 51; i++) {
-            if (i == 1) { k = 2000; } 
+            if (i == 1) { k = 2000; }
             else if (i == 2) { k = 1400; }
             else if (i == 3) { k = 1000; }
             else if (i == 4) { k = 600; }
@@ -316,7 +316,7 @@ contract FMWorld is FMWorldAccessControl {
         uint256 balanceTeam = getBalanceTeam(msg.sender);
         return balanceTeam + balancesInternal[msg.sender];
     }
-    
+
     function getBalanceTeam(address _owner) public view returns(uint256 balanceTeam) {
         Team team = Team(teamAddress);
         uint256 _teamId = team.getOwnerTeam(_owner);
@@ -328,4 +328,20 @@ contract FMWorld is FMWorldAccessControl {
         balanceTeam = balancesTeams[_teamId] / _countPlayers * _countPlayersOwner;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

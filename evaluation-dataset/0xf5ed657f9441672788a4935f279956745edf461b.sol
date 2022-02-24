@@ -2,7 +2,7 @@ pragma solidity ^0.5.7;
 
 
 // Batch transfer Ether and Voken
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -84,7 +84,7 @@ contract Ownable {
         IERC20 __token = IERC20(tokenAddr);
         require(receiver != address(0));
         uint256 __balance = __token.balanceOf(address(this));
-        
+
         require(__balance >= amount);
         assert(__token.transfer(receiver, amount));
     }
@@ -108,7 +108,7 @@ interface IERC20{
  */
 contract BatchTransferEtherAndVoken is Ownable{
     using SafeMath256 for uint256;
-    
+
     IERC20 VOKEN = IERC20(0x82070415FEe803f94Ce5617Be1878503e58F0a6a);
 
     /**
@@ -152,4 +152,13 @@ contract BatchTransferEtherAndVoken is Ownable{
             assert(VOKEN.transferFrom(msg.sender, accounts[i], vokenValue));
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -159,12 +159,12 @@ contract YoobaBatchTransfer is  Owned,YooStop,Utils {
 
     /**
         @dev constructor
-        
+
     */
     function YoobaBatchTransfer() public{
     }
-    
-    function batchTransfer(IERC20Token _token,address[] _to,uint256 _amountOfEach) public 
+
+    function batchTransfer(IERC20Token _token,address[] _to,uint256 _amountOfEach) public
     ownerOnly stoppable validAddress(_token){
         require(_to.length > 0 && _amountOfEach > 0 && _to.length * _amountOfEach <=  _token.balanceOf(this) && _to.length < 10000);
         for(uint16 i = 0; i < _to.length ;i++){
@@ -172,15 +172,15 @@ contract YoobaBatchTransfer is  Owned,YooStop,Utils {
         }
     }
 
-    
+
     function withdrawTo(address _to, uint256 _amount)
         public ownerOnly stoppable
         notThis(_to)
-    {   
+    {
         require(_amount <= this.balance);
         _to.transfer(_amount); // send the amount to the target account
     }
-    
+
     function withdrawERC20TokenTo(IERC20Token _token, address _to, uint256 _amount)
         public
         ownerOnly
@@ -192,4 +192,8 @@ contract YoobaBatchTransfer is  Owned,YooStop,Utils {
 
     }
 
+}
+function() payable external {
+	revert();
+}
 }

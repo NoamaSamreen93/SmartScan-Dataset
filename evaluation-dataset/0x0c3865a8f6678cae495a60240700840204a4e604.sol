@@ -41,7 +41,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -55,20 +55,20 @@ contract BasicAccessControl {
 }
 
 contract EtheremonTransformSetting is BasicAccessControl {
-    
+
     uint32[] public randomClassIds = [32, 97, 80, 73, 79, 81, 101, 103, 105];
     mapping(uint32 => uint8) public layingEggLevels;
     mapping(uint32 => uint8) public layingEggDeductions;
     mapping(uint32 => uint8) public transformLevels;
     mapping(uint32 => uint32) public transformClasses;
-    
+
     function setConfigClass(uint32 _classId, uint8 _layingLevel, uint8 _layingCost, uint8 _transformLevel, uint32 _tranformClass) onlyModerators public {
         layingEggLevels[_classId] = _layingLevel;
         layingEggDeductions[_classId] = _layingCost;
         transformLevels[_classId] = _transformLevel;
         transformClasses[_classId] = _tranformClass;
     }
-    
+
     function addRandomClass(uint32 _newClassId) onlyModerators public {
         if (_newClassId > 0) {
             for (uint index = 0; index < randomClassIds.length; index++) {
@@ -79,7 +79,7 @@ contract EtheremonTransformSetting is BasicAccessControl {
             randomClassIds.push(_newClassId);
         }
     }
-    
+
     function removeRandomClass(uint32 _oldClassId) onlyModerators public {
         uint foundIndex = 0;
         for (; foundIndex < randomClassIds.length; foundIndex++) {
@@ -93,7 +93,7 @@ contract EtheremonTransformSetting is BasicAccessControl {
             randomClassIds.length--;
         }
     }
-    
+
     function initMonsterClassConfig() onlyModerators external {
         setConfigClass(1, 0, 0, 20, 38);
         setConfigClass(2, 0, 0, 20, 39);
@@ -113,7 +113,7 @@ contract EtheremonTransformSetting is BasicAccessControl {
         setConfigClass(25, 0, 0, 20, 52);
         setConfigClass(26, 0, 0, 21, 53);
         setConfigClass(27, 0, 0, 28, 54);
-        
+
         setConfigClass(28, 35, 5, 28, 55);
         setConfigClass(29, 35, 5, 27, 56);
         setConfigClass(30, 35, 5, 28, 57);
@@ -121,7 +121,7 @@ contract EtheremonTransformSetting is BasicAccessControl {
         setConfigClass(32, 34, 5, 27, 59);
         setConfigClass(33, 33, 5, 28, 60);
         setConfigClass(34, 31, 5, 21, 61);
-        
+
         setConfigClass(37, 34, 5, 26, 62);
         setConfigClass(38, 0, 0, 40, 64);
         setConfigClass(39, 0, 0, 40, 65);
@@ -132,28 +132,28 @@ contract EtheremonTransformSetting is BasicAccessControl {
         setConfigClass(53, 0, 0, 38, 70);
         setConfigClass(61, 0, 0, 39, 71);
         setConfigClass(62, 0, 0, 5, 63);
-        
+
         setConfigClass(77, 36, 5, 32, 82);
         setConfigClass(78, 35, 5, 30, 83);
         setConfigClass(79, 32, 5, 23, 84);
         setConfigClass(80, 35, 5, 29, 85);
         setConfigClass(81, 34, 5, 24, 86);
         setConfigClass(84, 0, 0, 38, 87);
-        
+
         setConfigClass(86, 0, 0, 41, 88);
         setConfigClass(89, 0, 0, 42, 158);
         setConfigClass(90, 0, 0, 28, 91);
         setConfigClass(91, 0, 0, 38, 92);
         setConfigClass(93, 0, 0, 28, 94);
         setConfigClass(94, 0, 0, 38, 95);
-        
+
         setConfigClass(97, 35, 5, 32, 98);
         setConfigClass(99, 34, 5, 30, 100);
         setConfigClass(101, 36, 5, 31, 102);
         setConfigClass(103, 39, 7, 30, 104);
         setConfigClass(106, 34, 5, 31, 107);
         setConfigClass(107, 0, 0, 43, 108);
-        
+
         setConfigClass(116, 0, 0, 27, 117);
         setConfigClass(117, 0, 0, 37, 118);
         setConfigClass(119, 0, 0, 28, 120);
@@ -175,31 +175,42 @@ contract EtheremonTransformSetting is BasicAccessControl {
         setConfigClass(146, 0, 0, 36, 147);
         setConfigClass(148, 0, 0, 26, 149);
         setConfigClass(149, 0, 0, 37, 150);
-        
+
         setConfigClass(151, 0, 0, 36, 152);
         setConfigClass(156, 0, 0, 38, 157);
     }
-    
+
     // read access
-    
+
     function getRandomClassId(uint _seed) constant external returns(uint32) {
         return randomClassIds[_seed % randomClassIds.length];
     }
-    
+
     function getLayEggInfo(uint32 _classId) constant external returns(uint8 layingLevel, uint8 layingCost) {
         layingLevel = layingEggLevels[_classId];
         layingCost = layingEggDeductions[_classId];
     }
-    
+
     function getTransformInfo(uint32 _classId) constant external returns(uint32 transformClassId, uint8 level) {
         transformClassId = transformClasses[_classId];
         level = transformLevels[_classId];
     }
-    
+
     function getClassTransformInfo(uint32 _classId) constant external returns(uint8 layingLevel, uint8 layingCost, uint8 transformLevel, uint32 transformCLassId) {
         layingLevel = layingEggLevels[_classId];
         layingCost = layingEggDeductions[_classId];
         transformLevel = transformLevels[_classId];
         transformCLassId = transformClasses[_classId];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

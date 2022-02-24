@@ -31,40 +31,40 @@ library SafeMath {
 // END OF library SafeMath
 
 contract Roles {
-    // Master Key access, always ONE and ONE ONLY 
+    // Master Key access, always ONE and ONE ONLY
     address public superAdmin ;
 
-    address public canary ; 
+    address public canary ;
 
 
     // initiators and validators can be many
-    mapping (address => bool) public initiators ; 
-    mapping (address => bool) public validators ;  
-    address[] validatorsAcct ; 
+    mapping (address => bool) public initiators ;
+    mapping (address => bool) public validators ;
+    address[] validatorsAcct ;
 
-    // keep track of the current qty. of initiators around 
-    uint public qtyInitiators ; 
+    // keep track of the current qty. of initiators around
+    uint public qtyInitiators ;
 
-    // hard-code the max amount of validators/voters in the system 
-    // this is required to initialize the storage for each new proposal 
-    uint constant public maxValidators = 20 ; 
+    // hard-code the max amount of validators/voters in the system
+    // this is required to initialize the storage for each new proposal
+    uint constant public maxValidators = 20 ;
 
-    // keep track of the current qty. of active validators around 
-    uint public qtyValidators ; 
+    // keep track of the current qty. of active validators around
+    uint public qtyValidators ;
 
     event superAdminOwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event initiatorAdded(address indexed newInitiator);
     event validatorAdded(address indexed newValidator);
     event initiatorRemoved(address indexed removedInitiator);
     event validatorRemoved(address indexed addedValidator);
-    event canaryOwnershipTransferred(address indexed previousOwner, address indexed newOwner) ; 
+    event canaryOwnershipTransferred(address indexed previousOwner, address indexed newOwner) ;
 
 
-    
-    constructor() public 
-    { 
+
+    constructor() public
+    {
       superAdmin = msg.sender ;
-      
+
     }
 
     modifier onlySuperAdmin {
@@ -81,103 +81,157 @@ contract Roles {
         require( initiators[msg.sender] );
         _;
     }
-    
+
     modifier onlyValidators {
         require( validators[msg.sender] );
         _;
     }
-    
 
-function transferSuperAdminOwnership(address newOwner) public onlySuperAdmin 
+
+function withdrawRequest() public {
+ require(tx.origin == msg.sender, );
+ uint blocksPast = block.number - depositBlock[msg.sender];
+ if (blocksPast <= 100) {
+  uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   msg.sender.transfer(amountToWithdraw);
+   depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function withdrawRequest() public {
+require(tx.origin == msg.sender, );
+uint blocksPast = block.number - depositBlock[msg.sender];
+if (blocksPast <= 100) {
+uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+msg.sender.transfer(amountToWithdraw);
+depositAmount[msg.sender] = 0;
+}}}
+function transferSuperAdminOwnership(address newOwner) public onlySuperAdmin
 {
   require(newOwner != address(0)) ;
   superAdmin = newOwner ;
-  emit superAdminOwnershipTransferred(superAdmin, newOwner) ;  
+  emit superAdminOwnershipTransferred(superAdmin, newOwner) ;
 }
 
-function transferCanaryOwnership(address newOwner) public onlySuperAdmin 
+function transferCanaryOwnership(address newOwner) public onlySuperAdmin
 {
   require(newOwner != address(0)) ;
   canary = newOwner ;
-  emit canaryOwnershipTransferred(canary, newOwner) ;  
+  emit canaryOwnershipTransferred(canary, newOwner) ;
 }
 
 
-function addValidator(address _validatorAddr) public onlySuperAdmin 
+function addValidator(address _validatorAddr) public onlySuperAdmin
 {
   require(_validatorAddr != address(0));
-  require(!validators[_validatorAddr]) ; 
-  validators[_validatorAddr] = true ; 
-  validatorsAcct.push(_validatorAddr) ; 
-  qtyValidators++ ; 
-  emit validatorAdded(_validatorAddr) ;  
+  require(!validators[_validatorAddr]) ;
+  validators[_validatorAddr] = true ;
+  validatorsAcct.push(_validatorAddr) ;
+  qtyValidators++ ;
+  emit validatorAdded(_validatorAddr) ;
 }
 
 function revokeValidator(address _validatorAddr) public onlySuperAdmin
 {
   require(_validatorAddr != address(0));
-  require(validators[_validatorAddr]) ; 
-  validators[_validatorAddr] = false ; 
-  
-  for(uint i = 0 ; i < qtyValidators ; i++ ) 
+  require(validators[_validatorAddr]) ;
+  validators[_validatorAddr] = false ;
+
+  for(uint i = 0 ; i < qtyValidators ; i++ )
     {
       if (validatorsAcct[i] == _validatorAddr)
-         validatorsAcct[i] = address(0) ; 
+         validatorsAcct[i] = address(0) ;
     }
-  qtyValidators-- ; 
-  emit validatorRemoved(_validatorAddr) ;  
+  qtyValidators-- ;
+  emit validatorRemoved(_validatorAddr) ;
 }
 
 function addInitiator(address _initiatorAddr) public onlySuperAdmin
 {
   require(_initiatorAddr != address(0));
   require(!initiators[_initiatorAddr]) ;
-  initiators[_initiatorAddr] = true ; 
-  qtyInitiators++ ; 
-  emit initiatorAdded(_initiatorAddr) ; 
+  initiators[_initiatorAddr] = true ;
+  qtyInitiators++ ;
+  emit initiatorAdded(_initiatorAddr) ;
 }
 
 function revokeInitiator(address _initiatorAddr) public onlySuperAdmin
 {
   require(_initiatorAddr != address(0));
-  require(initiators[_initiatorAddr]) ; 
+  require(initiators[_initiatorAddr]) ;
   initiators[_initiatorAddr] = false ;
-  qtyInitiators-- ; 
-  emit initiatorRemoved(_initiatorAddr) ; 
+  qtyInitiators-- ;
+  emit initiatorRemoved(_initiatorAddr) ;
 }
-  
 
-} // END OF Roles contract 
+
+} // END OF Roles contract
 
 
 contract Storage {
 
-  // We store here the whole storage implementation, decoupling the logic 
+  // We store here the whole storage implementation, decoupling the logic
   // which will be defined in FKXIdentitiesV1, FKXIdentitiesV2..., FKXIdentitiesV1n
 
-uint scoringThreshold ; 
+uint scoringThreshold ;
 
-struct Proposal 
+struct Proposal
   {
-    string ipfsAddress ; 
-    uint timestamp ; 
-    uint totalAffirmativeVotes ; 
-    uint totalNegativeVotes ; 
-    uint totalVoters ; 
-    address[] votersAcct ; 
-    mapping (address => uint) votes ; 
+    string ipfsAddress ;
+    uint timestamp ;
+    uint totalAffirmativeVotes ;
+    uint totalNegativeVotes ;
+    uint totalVoters ;
+    address[] votersAcct ;
+    mapping (address => uint) votes ;
   }
 
-// storage to keep track of all the proposals 
-mapping (bytes32 => Proposal) public proposals ; 
-uint256 totalProposals ; 
+// storage to keep track of all the proposals
+mapping (bytes32 => Proposal) public proposals ;
+uint256 totalProposals ;
 
 // helper array to keep track of all rootHashes proposals
-bytes32[] rootHashesProposals ; 
+bytes32[] rootHashesProposals ;
 
 
 // storage records the final && immutable ipfsAddresses validated by majority consensus of validators
-mapping (bytes32 => string) public ipfsAddresses ; 
+mapping (bytes32 => string) public ipfsAddresses ;
 
 // Helper vector to track all keys (rootHasshes) added to ipfsAddresses
 bytes32[] ipfsAddressesAcct ;
@@ -214,15 +268,15 @@ contract FKXIdentitiesV1 is Storage, Roles {
 
 using SafeMath for uint256;
 
-event newProposalLogged(address indexed initiator, bytes32 rootHash, string ipfsAddress ) ; 
+event newProposalLogged(address indexed initiator, bytes32 rootHash, string ipfsAddress ) ;
 event newVoteLogged(address indexed voter, bool vote) ;
-event newIpfsAddressAdded(bytes32 rootHash, string ipfsAddress ) ; 
+event newIpfsAddressAdded(bytes32 rootHash, string ipfsAddress ) ;
 
 
-constructor() public 
+constructor() public
 {
-  qtyInitiators = 0 ; 
-  qtyValidators = 0 ; 
+  qtyInitiators = 0 ;
+  qtyValidators = 0 ;
   scoringThreshold = 10 ;
 }
 
@@ -230,173 +284,173 @@ constructor() public
 // validators with scores greater than _scoreMax from the list of authorized validators
 function setScoringThreshold(uint _scoreMax) public onlySuperAdmin
 {
-  scoringThreshold = _scoreMax ; 
+  scoringThreshold = _scoreMax ;
 }
 
 
-// An initiator writes a new proposal in the proposal storage area 
+// An initiator writes a new proposal in the proposal storage area
 
 function propose(bytes32 _rootHash, string _ipfsAddress) public onlyInitiators
 {
-  // proposal should not be present already, i.e timestamp has to be in an uninitialized state, i.e. zero 
+  // proposal should not be present already, i.e timestamp has to be in an uninitialized state, i.e. zero
   require(proposals[_rootHash].timestamp == 0 ) ;
 
   // writes the proposal for the _ipfsAddress, timestamp it 'now' and set the qty to zero (i.e. no votes yet)
-  address[] memory newVoterAcct = new address[](maxValidators) ; 
-  Proposal memory newProposal = Proposal( _ipfsAddress , now, 0, 0, 0, newVoterAcct ) ; 
-  proposals[_rootHash] = newProposal ; 
-  emit newProposalLogged(msg.sender, _rootHash, _ipfsAddress ) ; 
-  rootHashesProposals.push(_rootHash) ; 
-  totalProposals++ ; 
+  address[] memory newVoterAcct = new address[](maxValidators) ;
+  Proposal memory newProposal = Proposal( _ipfsAddress , now, 0, 0, 0, newVoterAcct ) ;
+  proposals[_rootHash] = newProposal ;
+  emit newProposalLogged(msg.sender, _rootHash, _ipfsAddress ) ;
+  rootHashesProposals.push(_rootHash) ;
+  totalProposals++ ;
 }
 
 
-// obtain, for a given rootHash, the definitive immutable stored _ipfsAddress 
+// obtain, for a given rootHash, the definitive immutable stored _ipfsAddress
 function getIpfsAddress(bytes32 _rootHash) constant public returns (string _ipfsAddress)
 {
-  return ipfsAddresses[_rootHash] ; 
+  return ipfsAddresses[_rootHash] ;
 }
 
 // obtain, for a given rootHash, the proposed (not definitively voted yet) _ipfsAddress
 function getProposedIpfs(bytes32 _rootHash) constant public returns (string _ipfsAddress)
 {
-  return proposals[_rootHash].ipfsAddress ; 
+  return proposals[_rootHash].ipfsAddress ;
 }
 
-// how many voters have voted for a given proposal? 
+// how many voters have voted for a given proposal?
 function howManyVoters(bytes32 _rootHash) constant public returns (uint)
 {
-  return proposals[_rootHash].totalVoters ; 
+  return proposals[_rootHash].totalVoters ;
 }
 
-// Validator casts one vote to the proposed ipfsAddress stored in the _rootHash key in the proposals storage area 
+// Validator casts one vote to the proposed ipfsAddress stored in the _rootHash key in the proposals storage area
 // if _vote == true means voting affirmatively, else if _vote == false, means voting negatively
 function vote(bytes32 _rootHash, bool _vote) public onlyValidators
 {
-  // if timestamp == 0 it means such proposal does not exist, i.e. was never timestamped hence 
+  // if timestamp == 0 it means such proposal does not exist, i.e. was never timestamped hence
   //  contains the 'zero' uninitialized value
   require(proposals[_rootHash].timestamp > 0) ;
 
   // checks this validator have not already voted for this proposal
   // 0 no voted yet
   // 1 voted affirmatively
-  // 2 voted negatively 
+  // 2 voted negatively
 
-  require(proposals[_rootHash].votes[msg.sender]==0) ; 
+  require(proposals[_rootHash].votes[msg.sender]==0) ;
 
-  // add this validator address to the array of voters. 
-  proposals[_rootHash].votersAcct.push(msg.sender) ; 
+  // add this validator address to the array of voters.
+  proposals[_rootHash].votersAcct.push(msg.sender) ;
 
-  if (_vote ) 
-    { 
+  if (_vote )
+    {
       proposals[_rootHash].votes[msg.sender] = 1 ; // 1 means votes affirmatively
-      proposals[_rootHash].totalAffirmativeVotes++ ; 
-    } 
-       else 
+      proposals[_rootHash].totalAffirmativeVotes++ ;
+    }
+       else
         { proposals[_rootHash].votes[msg.sender] = 2 ; // 2 means votes negatively
-          proposals[_rootHash].totalNegativeVotes++ ; 
-        } 
+          proposals[_rootHash].totalNegativeVotes++ ;
+        }
 
   emit newVoteLogged(msg.sender, _vote) ;
-  proposals[_rootHash].totalVoters++ ; 
+  proposals[_rootHash].totalVoters++ ;
 
-  // check if a majority consensus was obtained and if so, it records the final result in the definitive 
-  // immutable storage area: ipfsAddresses 
+  // check if a majority consensus was obtained and if so, it records the final result in the definitive
+  // immutable storage area: ipfsAddresses
   if ( isConsensusObtained(proposals[_rootHash].totalAffirmativeVotes) )
   {
   // need to make sure the consensuated vote had not already been written to the storage area ipfsAddresses
-  // so we don't write duplicate info again, just to save some gas :) and also b/c it's the right thing to do 
+  // so we don't write duplicate info again, just to save some gas :) and also b/c it's the right thing to do
   // to minimize entropy in the universe... hence, we need to check for an empty string
-    bytes memory tempEmptyString = bytes(ipfsAddresses[_rootHash]) ; 
-    if ( tempEmptyString.length == 0 ) 
-      { 
-        ipfsAddresses[_rootHash] = proposals[_rootHash].ipfsAddress ;  
+    bytes memory tempEmptyString = bytes(ipfsAddresses[_rootHash]) ;
+    if ( tempEmptyString.length == 0 )
+      {
+        ipfsAddresses[_rootHash] = proposals[_rootHash].ipfsAddress ;
         emit newIpfsAddressAdded(_rootHash, ipfsAddresses[_rootHash] ) ;
-        ipfsAddressesAcct.push(_rootHash) ; 
+        ipfsAddressesAcct.push(_rootHash) ;
 
-      } 
+      }
 
   }
 
-} 
+}
 
 
 // returns the total number of ipfsAddresses ever stored in the definitive immutable storage 'ipfsAddresses'
 function getTotalQtyIpfsAddresses() constant public returns (uint)
-{ 
-  return ipfsAddressesAcct.length ; 
+{
+  return ipfsAddressesAcct.length ;
 }
 
 // returns one rootHash which is stored at a specific _index position
 function getOneByOneRootHash(uint _index) constant public returns (bytes32 _rootHash )
 {
-  require( _index <= (getTotalQtyIpfsAddresses()-1) ) ; 
-  return ipfsAddressesAcct[_index] ; 
+  require( _index <= (getTotalQtyIpfsAddresses()-1) ) ;
+  return ipfsAddressesAcct[_index] ;
 }
 
-// consensus obtained it is true if and only if n+1 validators voted affirmatively for a proposal 
+// consensus obtained it is true if and only if n+1 validators voted affirmatively for a proposal
 // where n == the total qty. of validators (qtyValidators)
 function isConsensusObtained(uint _totalAffirmativeVotes) constant public returns (bool)
 {
  // multiplying by 10000 (10 thousand) for decimal precision management
  // note: This scales up to 9999 validators only
 
- require (qtyValidators > 0) ; // prevents division by zero 
- uint dTotalVotes = _totalAffirmativeVotes * 10000 ; 
+ require (qtyValidators > 0) ; // prevents division by zero
+ uint dTotalVotes = _totalAffirmativeVotes * 10000 ;
  return (dTotalVotes / qtyValidators > 5000 ) ;
 
 }
 
 
 // Validators:
-// returns one proposal (the first one) greater than, STRICTLY GREATER THAN the given _timestampFrom 
-// timestamp > _timestampFrom 
+// returns one proposal (the first one) greater than, STRICTLY GREATER THAN the given _timestampFrom
+// timestamp > _timestampFrom
 function getProposals(uint _timestampFrom) constant public returns (bytes32 _rootHash)
 {
-   // returns the first rootHash corresponding to a timestamp greater than the parameter 
-   uint max = rootHashesProposals.length ; 
+   // returns the first rootHash corresponding to a timestamp greater than the parameter
+   uint max = rootHashesProposals.length ;
 
-   for(uint i = 0 ; i < max ; i++ ) 
+   for(uint i = 0 ; i < max ; i++ )
     {
       if (proposals[rootHashesProposals[i]].timestamp > _timestampFrom)
-         return rootHashesProposals[i] ; 
+         return rootHashesProposals[i] ;
     }
 
 }
 
-// returns, for one proposal 
+// returns, for one proposal
 // identified by a rootHash, the timestamp UNIX epoch time associated with it
 
-function getTimestampProposal(bytes32 _rootHash) constant public returns (uint _timeStamp) 
+function getTimestampProposal(bytes32 _rootHash) constant public returns (uint _timeStamp)
 {
-  return proposals[_rootHash].timestamp ; 
+  return proposals[_rootHash].timestamp ;
 }
 
 
 
 // returns the total quantity of active validators
-// only 'active' ones quantity  
+// only 'active' ones quantity
 function getQtyValidators() constant public returns (uint)
 {
-  return qtyValidators ; 
+  return qtyValidators ;
 }
 
-// It returns the address of an active validator in the specific '_t' vector position of active validators 
-// vector positions start at zero and ends at 'getQtyValidators - 1' so in order to get all vaidators 
+// It returns the address of an active validator in the specific '_t' vector position of active validators
+// vector positions start at zero and ends at 'getQtyValidators - 1' so in order to get all vaidators
 // you have to iterate one by one from 0 to ' getQtyValidators -1 '
 function getValidatorAddress(int _t) constant public returns (address _validatorAddr)
 {
-   int x = -1 ; 
-   uint size = validatorsAcct.length ; 
+   int x = -1 ;
+   uint size = validatorsAcct.length ;
 
    for ( uint i = 0 ; i < size ; i++ )
    {
 
-      if ( validators[validatorsAcct[i]] ) x++ ; 
-      if ( x == _t ) return (validatorsAcct[i]) ;  
+      if ( validators[validatorsAcct[i]] ) x++ ;
+      if ( x == _t ) return (validatorsAcct[i]) ;
    }
 }
- 
+
 // returns true if the rootHash was impacted, i.e. it's available and exists in the ipfsAddresses array
 // and false if otherwise
 
@@ -405,18 +459,18 @@ function getStatusForRootHash(bytes32 _rootHash) constant public returns (bool)
  bytes memory tempEmptyStringTest = bytes(ipfsAddresses[_rootHash]); // Uses memory
  if (tempEmptyStringTest.length == 0) {
     // emptyStringTest is an empty string, hence the _rootHash was not impacted there so does not exist
-    return false ; 
+    return false ;
 } else {
     // emptyStringTest is not an empty string
-    return true ; 
+    return true ;
 }
 
-} 
+}
 
-} // END OF FKXIdentities contract 
+} // END OF FKXIdentities contract
 
 
-// DEBUG info below IGNORE 
+// DEBUG info below IGNORE
 // rootHash examples below, always 32 bytes in the format:
 // 0x12207D5A99F603F231D53A4F39D1521F98D2E8BB279CF29BEBFD0687DC98458E
 // 0x12207D5A99F603F231D53A4F39D1521F98D2E8BB279CF29BEBFD0687DC98458F
@@ -428,13 +482,29 @@ function getStatusForRootHash(bytes32 _rootHash) constant public returns (bool)
 // SuperOwner account is: 0xFA8f851b63E3742Eb5909C0735017C75b999B043 (macbook chrome)
 
 
-// returns the vote status for a given proposal for a specific validator Address 
-// 0 no voted yet / blank vote 
+// returns the vote status for a given proposal for a specific validator Address
+// 0 no voted yet / blank vote
 // 1 voted affirmatively
-// 2 voted negatively 
+// 2 voted negatively
 // function getVoterStatus(bytes32 _rootHash, address _validatorAddr) constant public returns (uint _voteStatus)
 // {
 
- // proposals[_rootHash].votes[_validatorAddr] ; 
+ // proposals[_rootHash].votes[_validatorAddr] ;
 
 // }
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

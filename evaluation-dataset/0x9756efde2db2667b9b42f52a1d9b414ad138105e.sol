@@ -27,7 +27,7 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-    
+
     /**
     * @dev Divides two unsigned integers and returns the remainder (unsigned integer modulo),
     * reverts when dividing by zero.
@@ -40,7 +40,7 @@ library SafeMath {
 
 contract dominance {
     using SafeMath for uint;
-    
+
     address public admin = 0xCf5BB540e63d87A104C071770eBfAEF40392aC95;
     address public dev = 0x0b60946a9C39B7b1ab220562b0638244beD3f958;
     uint public hardcap1 = 720 ether;
@@ -49,15 +49,15 @@ contract dominance {
     uint public currentround = 1;
     bool open = true;
     uint public hardcap = hardcap1;
-    
+
     constructor() public{
     }
-    
+
     function deposit(address _referredBy) payable public {
         require(open);
         require(msg.value >= 0.33 ether);
         uint value = msg.value;
-         
+
         currentcap += msg.value;
         if (currentcap >= hardcap && currentround == 1) {
                 currentcap = 0;
@@ -67,23 +67,34 @@ contract dominance {
         else if(currentcap >= hardcap && currentround == 2){
             open = false;
         }
-        
+
         uint referbalance = value.div(4);
         address payable _referral = address(uint160(_referredBy));
         _referral.transfer(referbalance);
         value -= referbalance;
-        
+
         uint devbalance = msg.value.div(100);
         address payable _dev = address(uint160(dev));
         _dev.transfer(devbalance);
         value -= devbalance;
-        
+
         address payable _admin = address(uint160(admin));
         _admin.transfer(value);
-       
+
     }
-    
+
     function () payable external {
        require(false);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

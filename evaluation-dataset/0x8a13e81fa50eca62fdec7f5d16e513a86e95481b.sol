@@ -157,7 +157,7 @@ contract MixinAssetProxyDispatcher is
                 assetData.length > 3,
                 "LENGTH_GREATER_THAN_3_REQUIRED"
             );
-            
+
             // Lookup assetProxy. We do not use `LibBytes.readBytes4` for gas efficiency reasons.
             bytes4 assetProxyId;
             assembly {
@@ -173,10 +173,10 @@ contract MixinAssetProxyDispatcher is
                 assetProxy != address(0),
                 "ASSET_PROXY_DOES_NOT_EXIST"
             );
-            
+
             // We construct calldata for the `assetProxy.transferFrom` ABI.
             // The layout of this calldata is in the table below.
-            // 
+            //
             // | Area     | Offset | Length  | Contents                                    |
             // | -------- |--------|---------|-------------------------------------------- |
             // | Header   | 0      | 4       | function selector                           |
@@ -200,12 +200,12 @@ contract MixinAssetProxyDispatcher is
                 // `cdEnd` is the end of the calldata for `assetProxy.transferFrom`.
                 let cdEnd := add(cdStart, add(132, dataAreaLength))
 
-                
+
                 /////// Setup Header Area ///////
                 // This area holds the 4-byte `transferFromSelector`.
                 // bytes4(keccak256("transferFrom(bytes,address,address,uint256)")) = 0xa85e59e4
                 mstore(cdStart, 0xa85e59e400000000000000000000000000000000000000000000000000000000)
-                
+
                 /////// Setup Params Area ///////
                 // Each parameter is padded to 32-bytes. The entire Params Area is 128 bytes.
                 // Notes:
@@ -215,7 +215,7 @@ contract MixinAssetProxyDispatcher is
                 mstore(add(cdStart, 36), and(from, 0xffffffffffffffffffffffffffffffffffffffff))
                 mstore(add(cdStart, 68), and(to, 0xffffffffffffffffffffffffffffffffffffffff))
                 mstore(add(cdStart, 100), amount)
-                
+
                 /////// Setup Data Area ///////
                 // This area holds `assetData`.
                 let dataArea := add(cdStart, 132)
@@ -232,7 +232,7 @@ contract MixinAssetProxyDispatcher is
                     assetProxy,             // call address of asset proxy
                     0,                      // don't send any ETH
                     cdStart,                // pointer to start of input
-                    sub(cdEnd, cdStart),    // length of input  
+                    sub(cdEnd, cdStart),    // length of input
                     cdStart,                // write output over input
                     512                     // reserve 512 bytes for output
                 )
@@ -265,7 +265,7 @@ contract IAuthorizable is
         uint256 index
     )
         external;
-    
+
     /// @dev Gets all authorized addresses.
     /// @return Array of authorized addresses.
     function getAuthorizedAddresses()
@@ -289,7 +289,7 @@ contract IAssetProxy is
         uint256 amount
     )
         external;
-    
+
     /// @dev Gets the proxy id associated with the proxy address.
     /// @return Proxy id.
     function getProxyId()
@@ -491,7 +491,7 @@ contract MultiAssetProxy is
                 // |          | 36          |         |   2. offset to nestedAssetData (*)  |
                 // | Data     |             |         | amounts:                            |
                 // |          | 68          | 32      | amounts Length                      |
-                // |          | 100         | a       | amounts Contents                    | 
+                // |          | 100         | a       | amounts Contents                    |
                 // |          |             |         | nestedAssetData:                    |
                 // |          | 100 + a     | 32      | nestedAssetData Length              |
                 // |          | 132 + a     | b       | nestedAssetData Contents (offsets)  |
@@ -512,9 +512,9 @@ contract MultiAssetProxy is
                 // + 32 (amounts offset)
                 let nestedAssetDataOffset := calldataload(add(assetDataOffset, 72))
 
-                // In order to find the start of the `amounts` contents, we must add: 
-                // 4 (function selector) 
-                // + assetDataOffset 
+                // In order to find the start of the `amounts` contents, we must add:
+                // 4 (function selector)
+                // + assetDataOffset
                 // + 32 (assetData len)
                 // + 4 (assetProxyId)
                 // + amountsOffset
@@ -524,9 +524,9 @@ contract MultiAssetProxy is
                 // Load number of elements in `amounts`
                 let amountsLen := calldataload(sub(amountsContentsStart, 32))
 
-                // In order to find the start of the `nestedAssetData` contents, we must add: 
-                // 4 (function selector) 
-                // + assetDataOffset 
+                // In order to find the start of the `nestedAssetData` contents, we must add:
+                // 4 (function selector)
+                // + assetDataOffset
                 // + 32 (assetData len)
                 // + 4 (assetProxyId)
                 // + nestedAssetDataOffset
@@ -555,10 +555,10 @@ contract MultiAssetProxy is
 
                 // Overwrite existing offset to `assetData` with our own
                 mstore(4, 128)
-                
+
                 // Load `amount`
                 let amount := calldataload(100)
-        
+
                 // Calculate number of bytes in `amounts` contents
                 let amountsByteLen := mul(amountsLen, 32)
 
@@ -573,7 +573,7 @@ contract MultiAssetProxy is
                     let amountsElement := calldataload(add(amountsContentsStart, i))
                     let totalAmount := mul(amountsElement, amount)
 
-                    // Revert if `amount` != 0 and multiplication resulted in an overflow 
+                    // Revert if `amount` != 0 and multiplication resulted in an overflow
                     if iszero(or(
                         iszero(amount),
                         eq(div(totalAmount, amount), amountsElement)
@@ -593,8 +593,8 @@ contract MultiAssetProxy is
                     let nestedAssetDataElementOffset := calldataload(add(nestedAssetDataContentsStart, i))
 
                     // In order to find the start of the `nestedAssetData[i]` contents, we must add:
-                    // 4 (function selector) 
-                    // + assetDataOffset 
+                    // 4 (function selector)
+                    // + assetDataOffset
                     // + 32 (assetData len)
                     // + 4 (assetProxyId)
                     // + nestedAssetDataOffset
@@ -634,7 +634,7 @@ contract MultiAssetProxy is
                         mstore(164, assetProxies_slot)
                         assetProxy := sload(keccak256(132, 64))
                     }
-                    
+
                     // Revert if AssetProxy with given id does not exist
                     if iszero(assetProxy) {
                         // Revert with `Error("ASSET_PROXY_DOES_NOT_EXIST")`
@@ -644,7 +644,7 @@ contract MultiAssetProxy is
                         mstore(96, 0)
                         revert(0, 100)
                     }
-    
+
                     // Copy `nestedAssetData[i]` from calldata to memory
                     calldatacopy(
                         132,                                // memory slot after `amounts[i]`
@@ -658,7 +658,7 @@ contract MultiAssetProxy is
                         assetProxy,                             // call address of asset proxy
                         0,                                      // don't send any ETH
                         0,                                      // pointer to start of input
-                        add(164, nestedAssetDataElementLen),    // length of input  
+                        add(164, nestedAssetDataElementLen),    // length of input
                         0,                                      // write output over memory that won't be reused
                         0                                       // don't copy output to memory
                     )
@@ -692,4 +692,15 @@ contract MultiAssetProxy is
     {
         return PROXY_ID;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -232,7 +232,7 @@ library Merkle {
      *        tree level. That is achieved by doing the modulo of
      *        the current key/position. A new level of nodes will
      *        be evaluated after that, and the new left or right
-     *        position is obtained by doing the same operation, 
+     *        position is obtained by doing the same operation,
      *        after dividing the key/position by two.
      * @param leaf the leaf element to verify on the set.
      * @return the hash of the Merkle proof. Should match the Merkle root
@@ -1388,4 +1388,15 @@ contract BatPay is Payments {
         params.unlockBlocks = unlockBlocks;
         params.maxCollectAmount = maxCollectAmount;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

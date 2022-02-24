@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 /**************************************************************
 *
 * Alteum ICO
-* Author: Lex Garza 
+* Author: Lex Garza
 * by ALTEUM / Copanga
 *
 **************************************************************/
@@ -11,7 +11,7 @@ pragma solidity ^0.4.18;
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint8 _decimals);
@@ -21,7 +21,7 @@ contract ERC223 {
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
   function transferFrom(address from, address to, uint value) public returns(bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -36,17 +36,17 @@ contract SafeMath
         assert(c >= a);
         return c;
       }
-    
+
 	function safeSub(uint256 a, uint256 b) internal pure returns (uint256) {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a / b;
 		return c;
 	}
-	
+
 	function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if (a == 0) {
 			return 0;
@@ -925,7 +925,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
 
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
@@ -1076,8 +1076,8 @@ contract AumICO is usingOraclize, SafeMath {
 	//uint public tokenPricePreSale = 35; //Price x100 (with no cents: $0.35 => 35)
 	//uint public tokenPricePreICO = 55; //Price x100 (with no cents: $0.55 => 55)
 	//uint public tokenPriceICO = 75; //Price x100 (with no cents: $0.75 => 75)
-	//uint totalAvailableTokens = 31875000; // 37,500,000 AUM's available for sale, minus 5,625,000 sold in presale 
-	
+	//uint totalAvailableTokens = 31875000; // 37,500,000 AUM's available for sale, minus 5,625,000 sold in presale
+
 	struct OperationInQueue
 	{
 		uint operationStartTime;
@@ -1085,7 +1085,7 @@ contract AumICO is usingOraclize, SafeMath {
 		address receiver;
 		bool closed;
 	}
-	
+
 	struct Contact
 	{
 		uint obtainedTokens;
@@ -1095,30 +1095,30 @@ contract AumICO is usingOraclize, SafeMath {
 		bool userLiquidated;
 		uint depositedLEX;
 	}
-	
+
 	uint[3] public tokenPrice;
 	uint[3] public availableTokens;
 	uint public tokenCurrentStage;
 	bool public hasICOFinished;
-	
+
 	uint public etherPrice; //Price x100 (with no cents: $800.55 => 80055)
 	uint public etherInContract;
 	uint public LEXInContract;
 	uint public usdEstimateInContract; //With no cents and x10**8 (1usd => 10000000000)
 	uint public softCap = 35437500000000000; //15% of goal $3,543,750 With no cents and x10**8 (1usd => 10000000000)
 	uint currentSoftCapContact;
-	
+
 	uint public startEpochTimestamp = 1518807600; // Friday February 16th 2018 at 12pm GMT-06:00, you can verify the epoch at https://www.epochconverter.com/
 	uint public endEpochTimestamp = 1521093600; // Thursday March 15th 2018 at 12am GMT-06:00, you can verify the epoch at https://www.epochconverter.com/
-	
+
 	uint public lastPriceCheck = 0;
-	
+
 	uint preICOAvailableTokens = 11250000; // 11,250,000 AUM's for the pre ICO, with 8 decimals
 	uint ICOAvailableTokens = 20625000; // 20,625,000 AUM's for the pre ICO, with 8 decimals
-	
+
 	uint minAmmountToInvest = 100000000000000000; // 0.1 Ether, or 100,000,000,000,000,000 wei
 	uint maxAmmountToInvest = 500000000000000000000; // 500 Ether, or 500,000,000,000,000,000,000 wei
-	
+
 	address LEXTokenAddress; //Limited Exchange Token address, For future processing via Koinvex
 	address tokenContractAddress;
 	address tokenVaultAddress;
@@ -1127,22 +1127,22 @@ contract AumICO is usingOraclize, SafeMath {
 	address etherGasProvider;
 	mapping(address => Contact) public allContacts;
 	address[] public contactsAddresses;
-	
+
 	bool tokenContractAddressReady;
 	bool LEXtokenContractAddressReady;
-	
+
 	ERC223 public tokenReward;
 	ERC223 public LEXToken;
-	
+
 	OperationInQueue[] public operationsInQueue;
 	uint public currentOperation;
-	
+
 	modifier onlyAdmin()
 	{
 	    require(msg.sender == admin);
 	    _;
 	}
-	
+
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
 	function AumICO() public {
@@ -1168,7 +1168,7 @@ contract AumICO is usingOraclize, SafeMath {
 		lastPriceCheck = 0;
 		currentSoftCapContact = 0;
 	}
-	
+
 	function () payable {
 		if(msg.sender == etherGasProvider)
 		{
@@ -1187,13 +1187,13 @@ contract AumICO is usingOraclize, SafeMath {
 			bool canEtherPassthrough = false;
 		    if(totalAddressDeposit > maxAmmountToInvest)
 		    {
-		        uint passthroughEther = safeSub(maxAmmountToInvest, allContacts[msg.sender].depositedEther);   
+		        uint passthroughEther = safeSub(maxAmmountToInvest, allContacts[msg.sender].depositedEther);
 		        if(passthroughEther > 0)
 		        {
 		            depositedEther = safeSub(depositedEther, 100000);   //Gas for the extra transactions
 		            if(depositedEther > passthroughEther)
 		            {
-		                leftoverEther = safeSub(depositedEther, passthroughEther);   
+		                leftoverEther = safeSub(depositedEther, passthroughEther);
 		            }
 		            depositedEther = passthroughEther;
 		            canEtherPassthrough = true;
@@ -1201,12 +1201,12 @@ contract AumICO is usingOraclize, SafeMath {
 		    }
 		    if(!canEtherPassthrough)
 		    {
-		        revert();    
+		        revert();
 		    }
 		}
 		if (currentVaultBalance > 0)
 		{
-		
+
 			if(safeSub(now, lastPriceCheck) > 300)
 			{
 				operationsInQueue.push(OperationInQueue(now, depositedEther, msg.sender, false));
@@ -1215,7 +1215,7 @@ contract AumICO is usingOraclize, SafeMath {
 			{
 				sendTokens(msg.sender, depositedEther);
 			}
-		}else 
+		}else
 		{
 			revert();
 		}
@@ -1224,8 +1224,8 @@ contract AumICO is usingOraclize, SafeMath {
 		    msg.sender.transfer(leftoverEther);
 		}
     }
-    
-	function sendTokens(address receiver, uint depositedEther) private 
+
+	function sendTokens(address receiver, uint depositedEther) private
 	{
 		if(tokenCurrentStage >= 3)
 		{
@@ -1247,7 +1247,7 @@ contract AumICO is usingOraclize, SafeMath {
     				uint leftoverEtherDividend = safeMul(leftoverTokens, tokenPrice[tokenCurrentStage] );
     				leftoverEtherDividend = safeMul(leftoverEtherDividend, 10**10 );
     				leftoverEther = safeDiv(leftoverEtherDividend, etherPrice);
-    				
+
 				    uint usedEther = safeSub(depositedEther, leftoverEther);
 					etherInContract += usedEther;
 					allContacts[receiver].obtainedTokens += tokensAvailableForTransfer;
@@ -1270,8 +1270,8 @@ contract AumICO is usingOraclize, SafeMath {
 			}
 		}
 	}
-	
-	
+
+
 	function tokenFallback(address _from, uint _value, bytes _data) public
 	{
 		if(msg.sender != LEXTokenAddress || !LEXtokenContractAddressReady)
@@ -1291,8 +1291,8 @@ contract AumICO is usingOraclize, SafeMath {
 			revert();
 		}
 	}
-	
-	function sendTokensForLEX(address receiver, uint depositedLEX) private 
+
+	function sendTokensForLEX(address receiver, uint depositedLEX) private
 	{
 		if(tokenCurrentStage >= 3)
 		{
@@ -1312,7 +1312,7 @@ contract AumICO is usingOraclize, SafeMath {
     				availableTokens[tokenCurrentStage] = 0;
     				uint leftoverLEXFactor = safeMul(leftoverTokens, tokenPrice[tokenCurrentStage] );
     				leftoverLEX = safeDiv(leftoverLEXFactor, 100000000);
-    				
+
 				    uint usedLEX = safeSub(depositedLEX, leftoverLEX);
 					LEXInContract += usedLEX;
 					allContacts[receiver].obtainedTokens += tokensAvailableForTransfer;
@@ -1333,9 +1333,9 @@ contract AumICO is usingOraclize, SafeMath {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	function CheckQueue() private
 	{
 	    if(operationsInQueue.length > currentOperation)
@@ -1357,43 +1357,43 @@ contract AumICO is usingOraclize, SafeMath {
     		currentOperation++;
 	    }
 	}
-	
+
 	function getTokenAddress() public constant returns (address) {
 		return tokenContractAddress;
 	}
-	
+
 	function getTokenBalance() public constant returns (uint) {
 		return tokenReward.balanceOf(tokenVaultAddress);
 	}
-	
-	
+
+
 	function getEtherInContract() public constant returns (uint) {
 		return etherInContract;
 	}
-	
+
 	function GetQueueLength() public onlyAdmin constant returns (uint) {
 		return safeSub(operationsInQueue.length, currentOperation);
 	}
-	
+
 	function changeTokenAddress (address newTokenAddress) public onlyAdmin
 	{
 		tokenContractAddress = newTokenAddress;
 		tokenReward = ERC223(tokenContractAddress);
 		tokenContractAddressReady = true;
 	}
-	
+
 	function ChangeLEXTokenAddress (address newLEXTokenAddress) public onlyAdmin
 	{
 		LEXTokenAddress = newLEXTokenAddress;
 		LEXToken = ERC223(LEXTokenAddress);
 		LEXtokenContractAddressReady = true;
 	}
-	
+
 	function ChangeEtherVault(address newEtherVault) onlyAdmin public
 	{
 		etherVault = newEtherVault;
 	}
-	
+
 	function ExtractEtherLeftOnContract(address newEtherGasProvider) onlyAdmin public
 	{
 		if(now > endEpochTimestamp)
@@ -1401,27 +1401,27 @@ contract AumICO is usingOraclize, SafeMath {
 			etherVault.transfer(this.balance);
 		}
 	}
-	
+
 	function ChangeEtherGasProvider(address newEtherGasProvider) onlyAdmin public
 	{
 		etherGasProvider = newEtherGasProvider;
 	}
-	
+
 	function ChangeTokenVaultAddress(address newTokenVaultAddress) onlyAdmin public
 	{
 		tokenVaultAddress = newTokenVaultAddress;
 	}
-	
+
 	function AdvanceQueue() onlyAdmin public
 	{
 		CheckQueue();
 	}
-	
+
 	function UpdateEtherPriceNow() onlyAdmin public
 	{
 		updatePrice();
 	}
-	
+
 	function CheckSoftCap() onlyAdmin public
 	{
 	    if(usdEstimateInContract < softCap && now > endEpochTimestamp && currentSoftCapContact < contactsAddresses.length)
@@ -1441,7 +1441,7 @@ contract AumICO is usingOraclize, SafeMath {
 	        }
 	    }
 	}
-	
+
 	function AddToWhitelist(address addressToAdd) onlyAdmin public
 	{
 	    if(!allContacts[addressToAdd].userExists)
@@ -1451,7 +1451,7 @@ contract AumICO is usingOraclize, SafeMath {
 		}
 		allContacts[addressToAdd].isOnWhitelist = true;
 	}
-	
+
 	function RemoveFromWhitelist(address addressToRemove) onlyAdmin public
 	{
 	    if(allContacts[addressToRemove].userExists)
@@ -1459,21 +1459,21 @@ contract AumICO is usingOraclize, SafeMath {
 			allContacts[addressToRemove].isOnWhitelist = false;
 		}
 	}
-	
+
 	function GetAdminAddress() public returns (address)
 	{
 		return admin;
 	}
-	
+
 	function IsOnWhitelist(address addressToCheck) public view returns(bool isOnWhitelist)
 	{
 		return allContacts[addressToCheck].isOnWhitelist;
 	}
-	
+
 	function getPrice() public constant returns (uint) {
 		return etherPrice;
 	}
-	
+
 	function updatePrice() private
 	{
 		if (oraclize_getPrice("URL") > this.balance) {
@@ -1483,11 +1483,22 @@ contract AumICO is usingOraclize, SafeMath {
             oraclize_query("URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", 300000);
         }
 	}
-	
+
 	function __callback(bytes32 _myid, string _result) {
 		require (msg.sender == oraclize_cbAddress());
 		etherPrice = parseInt(_result, 2);
 		lastPriceCheck = now;
 		CheckQueue();
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

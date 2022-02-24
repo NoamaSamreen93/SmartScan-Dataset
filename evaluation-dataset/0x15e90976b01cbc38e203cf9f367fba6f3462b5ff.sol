@@ -500,7 +500,7 @@ contract XRT is MintableToken, BurnableToken {
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction {
 
     /*
@@ -873,7 +873,7 @@ contract PublicResolver {
         records[node].multihash = hash;
         MultihashChanged(node, hash);
     }
-    
+
     /**
      * Sets the name associated with an ENS node, for reverse records.
      * May only be called by the owner of that node in the ENS registry.
@@ -896,11 +896,11 @@ contract PublicResolver {
     function setABI(bytes32 node, uint256 contentType, bytes data) public only_owner(node) {
         // Content types must be powers of 2
         require(((contentType - 1) & contentType) == 0);
-        
+
         records[node].abis[contentType] = data;
         ABIChanged(node, contentType);
     }
-    
+
     /**
      * Sets the SECP256k1 public key associated with an ENS node.
      * @param node The ENS node to query
@@ -1021,7 +1021,7 @@ contract PublicResolver {
 
 contract LightContract {
     /**
-     * @dev Shared code smart contract 
+     * @dev Shared code smart contract
      */
     address lib;
 
@@ -1084,8 +1084,8 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         if (quotaOf(msg.sender) == 0) {
             uint256 balance = balances[msg.sender];
             balances[msg.sender] = 0;
-            require(xrt.transfer(msg.sender, balance)); 
-            
+            require(xrt.transfer(msg.sender, balance));
+
             uint256 senderIndex = indexOf[msg.sender];
             uint256 lastIndex = members.length - 1;
             if (senderIndex < lastIndex)
@@ -1153,7 +1153,7 @@ contract Lighthouse is LighthouseAPI, LightContract {
         address _lib,
         uint256 _minimalFreeze,
         uint256 _timeoutBlocks
-    ) 
+    )
         public
         LightContract(_lib)
     {
@@ -1183,7 +1183,7 @@ contract RobotLiabilityABI {
     function bid(
         bytes   _model,
         bytes   _objective,
-        
+
         ERC20   _token,
         uint256 _cost,
 
@@ -1275,7 +1275,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
     function bid(
         bytes   _model,
         bytes   _objective,
-        
+
         ERC20   _token,
         uint256 _cost,
 
@@ -1381,7 +1381,7 @@ contract LiabilityFactory {
     }
 
     /**
-     * @dev New liability created 
+     * @dev New liability created
      */
     event NewLiability(address indexed liability);
 
@@ -1416,7 +1416,7 @@ contract LiabilityFactory {
     mapping(address => uint256) public gasUtilizing;
 
     /**
-     * @dev The count of utilized gas for switch to next epoch 
+     * @dev The count of utilized gas for switch to next epoch
      */
     uint256 public constant gasEpoch = 347 * 10**10;
 
@@ -1482,14 +1482,14 @@ contract LiabilityFactory {
 
     /**
      * @dev Create robot liability smart contract
-     * @param _ask ABI-encoded ASK order message 
-     * @param _bid ABI-encoded BID order message 
+     * @param _ask ABI-encoded ASK order message
+     * @param _bid ABI-encoded BID order message
      */
     function createLiability(
         bytes _ask,
         bytes _bid
     )
-        external 
+        external
         onlyLighthouse
         returns (RobotLiability liability)
     {
@@ -1585,4 +1585,15 @@ contract LiabilityFactory {
         require(xrt.mint(tx.origin, wnFromGas(gasUtilizing[msg.sender])));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

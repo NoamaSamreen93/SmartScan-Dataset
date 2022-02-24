@@ -32,7 +32,7 @@ contract UnlockVideo is Owned{
     mapping (address=>uint256) balances;
     event Donate(address indexed _owner, uint256 _amount);
     event Video(address indexed _sender, bytes32 _id);
-        
+
     constructor() public{
         add = 5000000000000000;
         fee = 2;
@@ -40,7 +40,7 @@ contract UnlockVideo is Owned{
         token = 0xCD8aAC9972dc4Ddc48d700bc0710C0f5223fBCfa;
         owner = msg.sender;
     }
-    
+
     function addVideo(bytes32 _id) public returns (bool success){
         require (videos[_id]==address(0x0) && balances[msg.sender]>=add);
         videos[_id] = msg.sender;
@@ -49,13 +49,13 @@ contract UnlockVideo is Owned{
         owner.transfer(add);
         return true;
     }
-    
+
     function changeDonate(uint256 _donate) public returns (bool success){
         require(_donate>0);
         donates[msg.sender] = _donate;
         return true;
     }
-    
+
     function donateVideo(bytes32 _id) public returns (bool success){
         require(videos[_id]!=address(0x0) && balances[msg.sender]>=donates[videos[_id]]);
         balances[videos[_id]] += donates[videos[_id]];
@@ -65,29 +65,29 @@ contract UnlockVideo is Owned{
         emit Video(msg.sender, _id);
         return true;
     }
-    
+
     function changeAdd (uint256 _add) onlyOwner public returns (bool success){
         require (_add>0);
         add=_add;
         return true;
     }
-    
+
     function changeFee (uint8 _fee) onlyOwner public returns (bool success){
         require (_fee>0);
         fee=_fee;
         return true;
     }
-    
+
     function changeBonus (uint8 _bonus) onlyOwner public returns (bool success){
         require (_bonus>0);
         bonus=_bonus;
         return true;
     }
-    
+
     function getBalance(address _owner) view public returns (uint256 balance){
         return balances[_owner];
     }
-    
+
     function withdrawEth(uint256 _amount) public returns (bool success){
         require(_amount>0 && balances[msg.sender]>=_amount);
         uint256 deduct = _amount*fee/100;
@@ -95,11 +95,20 @@ contract UnlockVideo is Owned{
         msg.sender.transfer(_amount-deduct);
         return true;
     }
-    
+
     function () payable external {
         require(msg.value>0);
         uint256 deduct = msg.value*fee/100;
         owner.transfer(deduct);
         balances[msg.sender]+=msg.value-deduct;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

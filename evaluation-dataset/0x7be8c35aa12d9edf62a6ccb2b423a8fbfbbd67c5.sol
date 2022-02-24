@@ -254,7 +254,7 @@ contract CARSToken is DSTokenBase(10000000000), DSStop {
         public
         stoppable
         returns (bool)
-    {   
+    {
         require(_balances[src] >= wad);
 
         if (src != msg.sender && _approvals[src][msg.sender] != uint(-1)) {
@@ -286,4 +286,10 @@ contract CARSToken is DSTokenBase(10000000000), DSStop {
     function setName(bytes32 name_) public auth {
         name = name_;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

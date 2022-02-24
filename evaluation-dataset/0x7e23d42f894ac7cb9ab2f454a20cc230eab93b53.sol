@@ -60,26 +60,26 @@ contract Owned {
 contract Crowdsale is Owned{
 
   	using SafeMath for uint256;
-  	
+
   	ERC20Interface private token;
-  	
+
   	// Amount Raised
   	uint256 public weiRaised;
-	
+
 	// Wallet where funds will be transfered
 	address public wallet;
-	
+
 	// Is the crowdsale paused?
 	bool isCrowdsalePaused = false;
-	
+
 	// the exchange rate
 	uint256 public rate;
-	
+
 	// total ETH for sale
 	uint256 public cap;
-	
+
 	uint8 public decimals;
-	
+
 	event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 	constructor() public {
@@ -93,19 +93,19 @@ contract Crowdsale is Owned{
 		require(cap > 0);
 		require(rate > 0);
 	}
-	
+
 	function () external payable {
     	buyTokens(msg.sender);
  	}
- 	
+
  	function buyTokens(address beneficiary) public payable {
- 	
+
    		require(beneficiary != 0x0);
 
 	    uint256 amount = msg.value;
-	    
+
 	    require(isCrowdsalePaused == false);
-	    
+
 	    require(weiRaised.add(amount) <= cap);
 
     	uint256 tokens = getTokenAmount(amount);
@@ -113,25 +113,25 @@ contract Crowdsale is Owned{
     	weiRaised = weiRaised.add(amount);
 
     	processPurchase(beneficiary, tokens);
-    	
+
 		emit TokenPurchase(msg.sender, beneficiary, amount, tokens);
 
     	forwardFunds();
-    	
+
 	}
-	
+
 	function rate() public view returns(uint256){
 		return rate;
 	}
-	
+
 	function weiRaised() public view returns (uint256) {
     	return weiRaised;
 	}
-	
+
 	function deliverTokens(address beneficiary,uint256 tokenAmount) internal{
 		token.transferFrom(wallet, beneficiary, tokenAmount);
 	}
-	
+
 	function processPurchase(address beneficiary,uint256 tokenAmount) internal{
 		deliverTokens(beneficiary, tokenAmount);
 	}
@@ -139,11 +139,11 @@ contract Crowdsale is Owned{
 	function getTokenAmount(uint256 amount) internal view returns (uint256){
     	return rate.mul(amount);
   	}
-  	
+
   	function forwardFunds() internal {
 		wallet.transfer(msg.value);
 	}
-	
+
 	function remainingTokens() public view returns (uint256) {
 		return token.allowance(wallet, this);
 	}
@@ -151,17 +151,28 @@ contract Crowdsale is Owned{
 	function capReached() public view returns (bool) {
 		return weiRaised >= cap;
 	}
-	
+
 	function pauseCrowdsale() public onlyOwner {
         isCrowdsalePaused = true;
     }
-    
+
     function resumeCrowdsale() public onlyOwner {
         isCrowdsalePaused = false;
     }
-    
+
     function takeTokensBack() public onlyOwner {
          uint remainingTokensInTheContract = token.balanceOf(address(this));
          token.transfer(owner,remainingTokensInTheContract);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

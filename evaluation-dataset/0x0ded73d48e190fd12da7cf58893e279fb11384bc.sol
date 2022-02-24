@@ -96,7 +96,7 @@ contract BasicToken is ERC20Basic {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
@@ -306,8 +306,8 @@ contract CUSToken is PausableToken, MintableToken, BurnableToken {
   uint256 public decimals;
 
   function CUSToken(
-    string _name, 
-    string _symbol, 
+    string _name,
+    string _symbol,
     uint256 _decimals,
     uint256 _initSupply)
     public
@@ -321,7 +321,7 @@ contract CUSToken is PausableToken, MintableToken, BurnableToken {
     balances[owner] = totalSupply_;
   }
 
-  /** 
+  /**
    * use to exchange other token
    */
   function recycling(address _from, uint256 _value) onlyOwner public returns(bool) {
@@ -330,4 +330,15 @@ contract CUSToken is PausableToken, MintableToken, BurnableToken {
     Recycling(_from, _value);
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

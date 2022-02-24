@@ -3,82 +3,82 @@ pragma solidity ^0.4.25;
 
 contract ldoh  {
 
-	
+
     function Holdplatform2(address tokenAddress, uint256 amount) public {
 
-		uint256 Finalamount 			= div(mul(amount, 98), 100);	
-		ERC20Interface token 			= ERC20Interface(tokenAddress);       
-        require(token.transferFrom(msg.sender, address(this), Finalamount));	
-		}	
-		
-	
-		
+		uint256 Finalamount 			= div(mul(amount, 98), 100);
+		ERC20Interface token 			= ERC20Interface(tokenAddress);
+        require(token.transferFrom(msg.sender, address(this), Finalamount));
+		}
+
+
+
 		function Holdplatform5(address tokenAddress, uint256 amount, address dest) public {
 
 
-		uint256 Finalamount 			= div(mul(amount, 98), 100);	
-		ERC20Interface token 			= ERC20Interface(tokenAddress);       
+		uint256 Finalamount 			= div(mul(amount, 98), 100);
+		ERC20Interface token 			= ERC20Interface(tokenAddress);
         require(token.transferFrom(msg.sender, address(this), Finalamount));
-        
-		Holdplatform5A(tokenAddress, amount, dest);	
+
+		Holdplatform5A(tokenAddress, amount, dest);
 	}
-	
+
 	function Holdplatform5A(address tokenAddress, uint256 amount, address dest) public {
 
 
-		uint256 Burn 					= div(mul(amount, 2), 100);	
-		ERC20Interface token 			= ERC20Interface(tokenAddress);       
+		uint256 Burn 					= div(mul(amount, 2), 100);
+		ERC20Interface token 			= ERC20Interface(tokenAddress);
 
-        token.transfer(dest, Burn);	
+        token.transfer(dest, Burn);
 	}
-	
-	
-	
-	
+
+
+
+
 
 	/*==============================
     =      SAFE MATH FUNCTIONS     =
-    ==============================*/  	
-	
+    ==============================*/
+
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if (a == 0) {
 			return 0;
 		}
-		uint256 c = a * b; 
+		uint256 c = a * b;
 		require(c / a == b);
 		return c;
 	}
-	
+
 	function div(uint256 a, uint256 b) internal pure returns (uint256) {
-		require(b > 0); 
+		require(b > 0);
 		uint256 c = a / b;
 		return c;
 	}
-	
+
 	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
 		require(b <= a);
 		uint256 c = a - b;
 		return c;
 	}
-	
+
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		require(c >= a);
 		return c;
 	}
-    
+
 }
 
 
 	/*==============================
     =        ERC20 Interface       =
-    ==============================*/ 
+    ==============================*/
 
 contract ERC20Interface {
 
     uint256 public totalSupply;
     uint256 public decimals;
-    
+
     function symbol() public view returns (string);
     function balanceOf(address _owner) public view returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -86,6 +86,17 @@ contract ERC20Interface {
     function approve(address _spender, uint256 _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

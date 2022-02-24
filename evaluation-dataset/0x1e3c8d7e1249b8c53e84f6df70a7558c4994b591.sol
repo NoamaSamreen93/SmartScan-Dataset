@@ -15,7 +15,7 @@ library SafeMath {
     uint256 c = _a / _b;
     return c;
     }
-    
+
     function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     assert(_b <= _a);
     return _a - _b;
@@ -54,7 +54,7 @@ contract Ownable {
     require(_newOwner != address(0));
     newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public onlyNewOwner returns(bool) {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -72,43 +72,43 @@ contract ERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
- 
+
 
 interface TokenRecipient {
  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
- 
+
 
 contract MCCoin is ERC20, Ownable {
     using SafeMath for uint256;
-    
+
     struct LockupInfo {
     uint256 releaseTime;
     uint256 termOfRound;
     uint256 unlockAmountPerRound;
     uint256 lockupBalance;
     }
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal totalSupply_;
-    
+
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal locks;
     mapping(address => bool) public frozen;
     mapping(address => mapping(address => uint256)) internal allowed;
     mapping(address => LockupInfo) internal lockupInfo;
-    
+
     event Unlock(address indexed holder, uint256 value);
     event Lock(address indexed holder, uint256 value);
     event Burn(address indexed owner, uint256 value);
     event Mint(uint256 value);
     event Freeze(address indexed holder);
     event Unfreeze(address indexed holder);
-    
+
     modifier notFrozen(address _holder) {
     require(!frozen[_holder]);
     _;
@@ -133,26 +133,26 @@ contract MCCoin is ERC20, Ownable {
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-       
+
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
        balances[_from] = balances[_from].sub(_value);
        balances[_to] = balances[_to].add(_value);
       allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
       emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) public notFrozen(msg.sender) returns (bool) {
-    
+
     if (locks[msg.sender]) {
     autoUnlock(msg.sender);
     }
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -162,7 +162,7 @@ contract MCCoin is ERC20, Ownable {
     function balanceOf(address _holder) public view returns (uint256 balance) {
     return balances[_holder] + lockupInfo[_holder].lockupBalance;
     }
-    
+
     function sendwithgas (address _from, address _to, uint256 _value, uint256 _fee) public notFrozen(_from) returns (bool) {
         if(locks[_from]){
             autoUnlock(_from);
@@ -174,26 +174,26 @@ contract MCCoin is ERC20, Ownable {
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
         emit Transfer(_from, msg.sender, _value);
-        
+
         return true;
     }
-     
+
     function transferFrom(address _from, address _to, uint256 _value) public notFrozen(_from) returns (bool) {
 
         if (locks[_from]) {
         autoUnlock(_from);
         }
-    
+
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
 
     _transfer(_from, _to, _value);
-    
+
     return true;
     }
-    
-    
+
+
 
     function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
@@ -218,7 +218,7 @@ contract MCCoin is ERC20, Ownable {
     emit Unfreeze(_holder);
     return true;
     }
-    
+
    function burn(uint256 _value) public onlyOwner returns (bool success) {
     require(_value <= balances[msg.sender]);
     address burner = msg.sender;
@@ -231,7 +231,7 @@ contract MCCoin is ERC20, Ownable {
     function mint( uint256 _amount) onlyOwner public returns (bool) {
     totalSupply_ = totalSupply_.add(_amount);
     balances[owner] = balances[owner].add(_amount);
-    
+
     emit Transfer(address(0), owner, _amount);
     return true;
     }
@@ -246,7 +246,7 @@ contract MCCoin is ERC20, Ownable {
         if (lockupInfo[_holder].releaseTime <= now) {
         return releaseTimeLock(_holder);
         }
-    
+
     return false;
     }
 
@@ -267,9 +267,20 @@ contract MCCoin is ERC20, Ownable {
     lockupInfo[_holder].releaseTime = lockupInfo[_holder].releaseTime.add(lockupInfo[_holder].termOfRound);
     }
 }
-    
+
     emit Unlock(_holder, releaseAmount);
     balances[_holder] = balances[_holder].add(releaseAmount);
     return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

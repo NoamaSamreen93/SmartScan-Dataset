@@ -88,7 +88,7 @@ contract PooTokenERC20 {
         return true;
     }
 
-    
+
     /**
      * 销毁我（创建交易者）账户中指定个代币
      */
@@ -117,4 +117,13 @@ contract PooTokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

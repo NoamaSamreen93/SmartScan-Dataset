@@ -67,8 +67,8 @@ contract CryptoBeauty is AccessControl, ERC721 {
     // Event fired when charities are modified
     event Charity(uint256 charityId, address charity);
 
-    string public constant NAME = "Crypto Beauty"; 
-    string public constant SYMBOL = "BEAUTY"; 
+    string public constant NAME = "Crypto Beauty";
+    string public constant SYMBOL = "BEAUTY";
 
     // Initial price of card
     uint256 private startingPrice = 0.005 ether;
@@ -94,7 +94,7 @@ contract CryptoBeauty is AccessControl, ERC721 {
     Beauty[] public beauties;
 
     address[] public charities;
-    
+
     mapping (uint256 => address) public beautyToOwner;
     mapping (address => uint256) public beautyOwnershipCount;
     mapping (uint256 => address) public beautyToApproved;
@@ -170,7 +170,7 @@ contract CryptoBeauty is AccessControl, ERC721 {
         if (_price <= 0.005 ether) {
             _price = startingPrice;
         }
-        
+
         Beauty memory _beauty = Beauty({
             name: _name,
             price: _price,
@@ -184,7 +184,7 @@ contract CryptoBeauty is AccessControl, ERC721 {
 
 
     }
-    
+
     function newBeauty(string _name, uint256 _price) public onlyAdmins {
         createBeauty(_name, msg.sender, _price);
     }
@@ -210,11 +210,11 @@ contract CryptoBeauty is AccessControl, ERC721 {
         uint sellingPrice = beauties[_tokenId].price;
         // buyer
         address newOwner = msg.sender;
-        
+
         require(oldOwner != newOwner);
         require(newOwner != address(0));
         require(msg.value >= sellingPrice);
-        
+
         uint256 devCut;
         uint256 nextPrice;
 
@@ -235,24 +235,24 @@ contract CryptoBeauty is AccessControl, ERC721 {
         uint256 excess = SafeMath.sub(msg.value, sellingPrice);
 
         if (charityEnabled == true) {
-            
+
             // address of choosen charity
             address charity = charities[_charityId];
 
             // check if charity address is not null
             require(charity != address(0));
-            
+
             // 1% of selling price
             uint256 donate = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 1), 100));
 
             // transfer money to charity
             charity.transfer(donate);
-            
+
         }
 
         // set new price
         beauties[_tokenId].price = nextPrice;
-        
+
         // set maximum price
         beauties[_tokenId].maxPrice = nextPrice;
 
@@ -266,11 +266,11 @@ contract CryptoBeauty is AccessControl, ERC721 {
 
         // emit event that beauty was sold;
         Purchase(_tokenId, sellingPrice, beauties[_tokenId].price, oldOwner, newOwner, _charityId);
-        
+
         // transfer excess back to buyer
         if (excess > 0) {
             newOwner.transfer(excess);
-        }  
+        }
     }
 
     // owner can change price
@@ -283,7 +283,7 @@ contract CryptoBeauty is AccessControl, ERC721 {
 
         // set new price
         beauties[_tokenId].price = _price;
-        
+
         // emit event
         PriceChange(_tokenId, _price);
     }
@@ -385,4 +385,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

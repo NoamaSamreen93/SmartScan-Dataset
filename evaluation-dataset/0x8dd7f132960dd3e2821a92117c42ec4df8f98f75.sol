@@ -316,7 +316,7 @@ contract HomeChainToken is StandardToken, BurnableToken, Ownable {
     string  public constant name = "Home Chain";
     string  public constant symbol = "HMC";
     uint8   public constant decimals = 18;
-    //string  public website = ""; 
+    //string  public website = "";
     uint256 public constant INITIAL_SUPPLY      =  100000000 * (10 ** uint256(decimals));
     //uint256 public constant CROWDSALE_ALLOWANCE =  160000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  100000000 * (10 ** uint256(decimals));
@@ -328,7 +328,7 @@ contract HomeChainToken is StandardToken, BurnableToken, Ownable {
     //address public crowdSaleAddr;           // the address of a crowdsale currently selling this token
     address public adminAddr;               // the address of a crowdsale currently selling this token
     //bool    public transferEnabled = false; // indicates if transferring tokens is enabled or not
-    bool    public transferEnabled = true;  // Enables everyone to transfer tokens 
+    bool    public transferEnabled = true;  // Enables everyone to transfer tokens
 
     // Modifiers
 
@@ -397,4 +397,15 @@ contract HomeChainToken is StandardToken, BurnableToken, Ownable {
         Transfer(msg.sender, address(0x0), _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

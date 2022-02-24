@@ -49,7 +49,7 @@ interface Factory_Interface {
 }
 
 
-//This is the basic wrapped Ether contract. 
+//This is the basic wrapped Ether contract.
 //All money deposited is transformed into ERC20 tokens at the rate of 1 wei = 1 token
 contract Wrapped_Ether {
 
@@ -200,4 +200,15 @@ contract UserContract{
     factory_address = _factory_address;
     factory = Factory_Interface(factory_address);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

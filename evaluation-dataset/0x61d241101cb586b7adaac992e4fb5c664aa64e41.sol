@@ -288,3 +288,7 @@ contract PaymentProcessor is Ownable {
         _;
     }
 }
+function() payable external {
+	revert();
+}
+}

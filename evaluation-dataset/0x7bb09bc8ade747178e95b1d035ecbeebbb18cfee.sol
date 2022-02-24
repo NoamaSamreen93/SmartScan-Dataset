@@ -124,7 +124,7 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
     uint8 public decimals;
 
     uint public _totalSupply;
-    
+
     mapping(address => uint) balances;
 
     mapping(address => mapping(address => uint)) allowed;
@@ -160,8 +160,8 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
     function unfreeze() onlyOwner public{
         frozen = false;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
 
     // Total supply
@@ -203,7 +203,7 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
     function transfer(address to, uint tokens) public returns (bool success) {
 
         require (!frozen);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
 
         balances[to] = balances[to].add(tokens);
@@ -228,7 +228,7 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -248,7 +248,7 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -265,7 +265,7 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
 
         require (!frozen);
-        
+
         balances[from] = balances[from].sub(tokens);
 
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -298,11 +298,11 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
     // Owner can withdraw ether if token received.
     // ------------------------------------------------------------------------
     function withdraw() public onlyOwner returns (bool result) {
-        
+
         return owner.send(this.balance);
-        
+
     }
-    
+
     // ------------------------------------------------------------------------
 
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -315,4 +315,10 @@ contract CryptoValleyAlliance is ERC20Interface, Owned {
 
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

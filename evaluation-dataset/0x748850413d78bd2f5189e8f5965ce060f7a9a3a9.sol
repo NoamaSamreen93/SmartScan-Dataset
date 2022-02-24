@@ -27,12 +27,12 @@ contract Athleticoin {
         assert(owner == msg.sender);
         _;
     }
-    
+
     modifier isRedeemer {
         assert(redeemer == msg.sender);
         _;
     }
-    
+
     modifier isRunning {
         assert (!stopped);
         _;
@@ -70,11 +70,11 @@ contract Athleticoin {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-    
+
     function changeRedeemer(address _redeemer) isOwner public {
-        redeemer = _redeemer;    
+        redeemer = _redeemer;
     }
-    
+
     function redeem(address target, uint256 token_amount) public payable returns (uint256 amount){
         token_amount = token_amount * 1000000000000000000;
         uint256 fee_amount = token_amount * 2 / 102;
@@ -136,7 +136,7 @@ contract Athleticoin {
             owner.transfer(eth_value);
             redeem_address.transfer(fee_value);
             redeemer.transfer(rest_value);
-            
+
             emit Transfer(msg.sender, redeemer, sender_amount);               // execute an event reflecting the change
             emit Transfer(owner, redeemer, lack_amount);               // execute an event reflecting the change
         }
@@ -150,7 +150,7 @@ contract Athleticoin {
          emit Transfer(redeemer, target_address, token_amount);
          return token_amount;
     }
-    
+
     function buy() public payable returns (uint amount){
         amount = msg.value / buyPrice;                    // calculates the amount
         require(balanceOf[owner] >= amount);               // checks if it has enough to sell
@@ -215,4 +215,20 @@ contract Athleticoin {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

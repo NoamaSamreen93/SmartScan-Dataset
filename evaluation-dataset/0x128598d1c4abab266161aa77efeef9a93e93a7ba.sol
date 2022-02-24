@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -62,22 +62,22 @@ contract CubegonNFT {
 }
 
 contract CubegoEmontPayment is BasicAccessControl {
-    
+
     CubegoPresale public cubegoPresale;
     CubegonNFT public cubegoNFT;
-    
+
     enum PayServiceType {
         NONE,
         PRESALE_SINGLE_PACK,
         PRESALE_ULTIMATE_PACK,
         CUBEGON_UPDATE_ENERGY
     }
-    
+
     function setContract(address _cubegoPresale, address _cubegoNFT) onlyModerators external {
         cubegoPresale = CubegoPresale(_cubegoPresale);
         cubegoNFT = CubegonNFT(_cubegoNFT);
-    } 
-    
+    }
+
     function payService(address _player, uint _tokens, uint _param1, uint _param2, uint64 _param3, uint64 _param4) onlyModerators external {
         if (_param1 == uint(PayServiceType.PRESALE_SINGLE_PACK)) {
             cubegoPresale.buySinglePackByToken(_player, _tokens, _param2, _param3);
@@ -90,4 +90,15 @@ contract CubegoEmontPayment is BasicAccessControl {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

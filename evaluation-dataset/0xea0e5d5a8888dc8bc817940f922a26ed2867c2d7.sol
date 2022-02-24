@@ -90,13 +90,13 @@ contract Race{
 
     // constructor
     constructor() public payable {
-        
+
         owner = msg.sender;
-        
+
         horses.BTC = bytes32("BTC");
         horses.ETH = bytes32("ETH");
         horses.LTC = bytes32("LTC");
-        
+
     }
 
     // data access structures
@@ -207,7 +207,7 @@ contract Race{
             require(house_fee < address(this).balance);
             total_reward = total_reward.sub(house_fee);
             house_takeout.transfer(house_fee);
-            
+
             // p3d takeout
             uint mle_fee = house_fee/2;
             require(mle_fee < address(this).balance);
@@ -299,7 +299,7 @@ contract Race{
         chronus.race_end = true;
         chronus.voided_timestamp=uint32(now);
     }
-    
+
     //this methohd can only be called by controller contract in case of timestamp errors
     function forceVoidExternal() external onlyOwner {
         forceVoidRace();
@@ -312,7 +312,7 @@ contract Race{
         uint256 coinPostPrice;
         if (coinIndex[horses.ETH].pre > 0 && coinIndex[horses.BTC].pre > 0 && coinIndex[horses.LTC].pre > 0) {
             coinPrePrice = coinIndex[index].pre;
-        } 
+        }
         if (coinIndex[horses.ETH].post > 0 && coinIndex[horses.BTC].post > 0 && coinIndex[horses.LTC].post > 0) {
             coinPostPrice = coinIndex[index].post;
         }
@@ -323,7 +323,7 @@ contract Race{
     function reward_total() external view returns (uint) {
         return ((coinIndex[horses.BTC].total) + (coinIndex[horses.ETH].total) + (coinIndex[horses.LTC].total));
     }
-    
+
     function getChronus() external view returns (uint32[] memory) {
         uint32[] memory chronusData = new uint32[](3);
         chronusData[0] = chronus.starting_time;
@@ -1693,10 +1693,10 @@ END ORACLIZE_API
 
 contract oraclizeController is usingOraclize {
     address owner;
-    
+
     event newOraclizeQuery();
     event RemoteBettingCloseInfo(address _race);
-    
+
     struct horsesInfo {
         bytes32 BTC;
         bytes32 ETH;
@@ -1704,18 +1704,18 @@ contract oraclizeController is usingOraclize {
         uint256 customPreGasLimit;
         uint256 customPostGasLimit;
     }
-    
+
     struct coinInfo {
         uint256 pre;
         uint256 post;
         bytes32 preOraclizeId;
         bytes32 postOraclizeId;
     }
-    
-    mapping (address => mapping (bytes32 => coinInfo)) public coinIndex; 
+
+    mapping (address => mapping (bytes32 => coinInfo)) public coinIndex;
     mapping (address => mapping (bytes32 => bytes32)) oraclizeIndex; // mapping oraclize IDs with coins
     mapping (bytes32 => address) oraclizeInverseIndex; // mapping oraclize IDs with coins
-    
+
     horsesInfo horses;
     constructor() public {
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
@@ -1728,19 +1728,19 @@ contract oraclizeController is usingOraclize {
         horses.customPreGasLimit = 120000;
         horses.customPostGasLimit = 230000;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
     }
-    
+
     // safemath addition
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
     }
-    
+
     // utility function to convert string to integer with precision consideration
     function stringToUintNormalize(string memory s) internal pure returns (uint result) {
         uint p =2;
@@ -1761,11 +1761,11 @@ contract oraclizeController is usingOraclize {
             p=p-1;
         }
     }
-    
+
     function changeOraclizeGasPrice(uint _newGasPrice) external onlyOwner {
         oraclize_setCustomGasPrice(_newGasPrice);
     }
-    
+
     // method to place the oraclize queries
     function setupRace(uint delay, uint locking_duration, address raceAddress) public payable onlyOwner {
         if (oraclize_getPrice("URL" , horses.customPreGasLimit)*3 + oraclize_getPrice("URL", horses.customPostGasLimit)*3  > address(this).balance) {
@@ -1806,7 +1806,7 @@ contract oraclizeController is usingOraclize {
             coinIndex[raceAddress][horses.BTC].postOraclizeId = temp_ID;
         }
     }
-    
+
     //oraclize callback method
     function __callback(bytes32 myid, string memory result, bytes memory proof) public {
         require (msg.sender == oraclize_cbAddress());
@@ -1816,7 +1816,7 @@ contract oraclizeController is usingOraclize {
         Race race = Race(raceAddress);
         coin_pointer = oraclizeIndex[raceAddress][myid];
         emit RemoteBettingCloseInfo(raceAddress);
-        
+
         if (myid == coinIndex[raceAddress][coin_pointer].preOraclizeId) {
             if (coinIndex[raceAddress][coin_pointer].pre > 0) {
             } else {
@@ -1831,7 +1831,7 @@ contract oraclizeController is usingOraclize {
             }
         }
     }
-    
+
     function ethorseOracle(address raceAddress, bytes32 coin_pointer, string calldata result, bool isPrePrice, uint32 lastUpdated ) external onlyOwner {
         emit RemoteBettingCloseInfo(raceAddress);
         Race race = Race(raceAddress);
@@ -1919,4 +1919,13 @@ contract BettingController is oraclizeController {
             owner.transfer(_amount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

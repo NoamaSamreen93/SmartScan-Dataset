@@ -226,23 +226,23 @@ contract StandardToken is ERC20, BasicToken {
 
 contract CrowdsaleToken is StandardToken {
     using SafeMath for uint256;
-    
+
     uint public _totalSupply = 0;
     uint public constant _maxSupply = 10000000000000000000000000;
     uint private _tokenSupply = 15000000000000000000000000;
-    
+
     uint256 public constant RATE = 4000;
-    
+
     address public owner;
-    
+
     string public constant symbol = "DHP";
     string public constant name = "Diamond Horse Performance Token";
     uint8 public constant decimals = 18;
-    
-    
+
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function () payable {
         createTokens();
     }
@@ -251,25 +251,25 @@ contract CrowdsaleToken is StandardToken {
         balances[msg.sender] = _tokenSupply;
         owner = 0x23790cc4390fb2f2BDAeA3829A92CAb6fCAfa7ab;
     }
-    
+
     function createTokens() payable {
         require(msg.value > 0);
-        
+
         uint256 tokens = msg.value.mul(RATE);
         balances[msg.sender] = balances[msg.sender].add(tokens);
-        
+
         owner.transfer(msg.value);
-        
+
     }
-    
+
     function totalSupply() constant returns (uint256 totalSupply) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
@@ -280,7 +280,7 @@ contract CrowdsaleToken is StandardToken {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(
             allowed[_from][msg.sender] >= _value
@@ -293,17 +293,30 @@ contract CrowdsaleToken is StandardToken {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -62,8 +62,8 @@ contract ERC20Interface {
 
     // This notifies clients about the amount minted
     event Mint(address indexed from, uint256 value);
-    
-    // This generates a public event on the blockchain that will notify clients 
+
+    // This generates a public event on the blockchain that will notify clients
     event FrozenFunds(address target, bool frozen);
 }
 
@@ -303,7 +303,7 @@ contract AWMVoucher is ERC20Interface, SafeMath, StopTrade {
      */
     function burn(uint256 _value) stoppable onlyOwner public returns (bool success) {
         require(balances[msg.sender] >= _value);   // Check if the sender has enough
-        balances[msg.sender] = sub(balances[msg.sender], _value); 
+        balances[msg.sender] = sub(balances[msg.sender], _value);
         _totalSupply = sub(_totalSupply,_value);
         Burn(msg.sender, _value);
         return true;
@@ -349,7 +349,7 @@ contract AWMVoucher is ERC20Interface, SafeMath, StopTrade {
         Transfer(this, _target, _mintedAmount);
     }
 
-    
+
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param _target Address to be frozen
@@ -398,4 +398,13 @@ contract AWMVoucher is ERC20Interface, SafeMath, StopTrade {
          ERC20Interface(_tokenContract).approve(_spender, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

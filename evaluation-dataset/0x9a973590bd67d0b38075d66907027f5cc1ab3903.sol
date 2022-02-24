@@ -76,7 +76,7 @@ contract EABToken is ERCToken,Ownable {
         name = tokenName;                                      // Set the name for display purposes
         symbol = tokenSymbol;
      }
- 
+
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
@@ -152,4 +152,13 @@ contract EABToken is ERCToken,Ownable {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

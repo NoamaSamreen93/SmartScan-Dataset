@@ -145,7 +145,7 @@ contract TokenControllerI {
     /// @return True if the transfer is allowed
     function transferAllowed(address _from, address _to)
         external
-        view 
+        view
         returns (bool);
 }
 
@@ -334,4 +334,17 @@ contract FoamTokenController is TokenControllerI, Ownable {
 
         return enoughStaked && PoICreated >= 10;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -68,7 +68,7 @@ contract multiowned {
         }
         m_required = _required;
     }
-    
+
     // Revokes a prior confirmation of the given operation
     function revoke(bytes32 _operation) external {
         uint ownerIndex = m_ownerIndex[uint(msg.sender)];
@@ -82,7 +82,7 @@ contract multiowned {
             emit Revoke(msg.sender, _operation);
         }
     }
-    
+
     // Replaces an owner `_from` with another `_to`.
     function changeOwner(address _from, address _to) onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         if (isOwner(_to)) return;
@@ -95,7 +95,7 @@ contract multiowned {
         m_ownerIndex[uint(_to)] = ownerIndex;
         emit OwnerChanged(_from, _to);
     }
-    
+
     function addOwner(address _owner) onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         if (isOwner(_owner)) return;
 
@@ -109,7 +109,7 @@ contract multiowned {
         m_ownerIndex[uint(_owner)] = m_numOwners;
         emit OwnerAdded(_owner);
     }
-    
+
     function removeOwner(address _owner) onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         uint ownerIndex = m_ownerIndex[uint(_owner)];
         if (ownerIndex == 0) return;
@@ -121,18 +121,18 @@ contract multiowned {
         reorganizeOwners(); //make sure m_numOwner is equal to the number of owners and always points to the optimal free slot
         emit OwnerRemoved(_owner);
     }
-    
+
     function changeRequirement(uint _newRequired) onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         if (_newRequired > m_numOwners) return;
         m_required = _newRequired;
         clearPending();
         emit RequirementChanged(_newRequired);
     }
-    
+
     function isOwner(address _addr) public view returns (bool) {
         return m_ownerIndex[uint(_addr)] > 0;
     }
-    
+
     function hasConfirmed(bytes32 _operation, address _owner) public view returns (bool) {
         PendingState storage pending = m_pending[_operation];
         uint ownerIndex = m_ownerIndex[uint(_owner)];
@@ -148,7 +148,7 @@ contract multiowned {
             return true;
         }
     }
-    
+
     // INTERNAL METHODS
 
     function confirmAndCheck(bytes32 _operation) internal returns (bool) {
@@ -202,7 +202,7 @@ contract multiowned {
             }
         }
     }
-    
+
     function clearPending() internal {
         uint length = m_pendingIndex.length;
         for (uint i = 0; i < length; ++i) {
@@ -210,17 +210,17 @@ contract multiowned {
                 delete m_pending[m_pendingIndex[i]];
             }
         }
-            
+
         delete m_pendingIndex;
     }
-        
+
     // FIELDS
 
     // the number of owners that must confirm the same operation before it is run.
     uint public m_required;
     // pointer used to find a free slot in m_owners
     uint public m_numOwners;
-    
+
     // list of owners
     uint[256] m_owners;
     uint constant c_maxOwners = 250;
@@ -259,9 +259,9 @@ contract daylimit is multiowned {
     function resetSpentToday() onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         m_spentToday = 0;
     }
-    
+
     // INTERNAL METHODS
-    
+
     // checks to see if there is at least `_value` left from the daily limit today. if there is, subtracts it and
     // returns true. otherwise just returns false.
     function underLimit(uint _value) internal onlyowner returns (bool) {
@@ -302,11 +302,11 @@ contract multisig {
     // Confirmation still needed for a transaction.
     event ConfirmationERC20Needed(bytes32 operation, address initiator, uint value, address to, ERC20Basic token);
 
-    
+
     event ConfirmationETHNeeded(bytes32 operation, address initiator, uint value, address to);
-    
+
     // FUNCTIONS
-    
+
     // TODO: document
     function changeOwner(address _from, address _to) external;
     //function execute(address _to, uint _value, bytes _data) external returns (bytes32);
@@ -336,19 +336,19 @@ contract Wallet is multisig, multiowned, daylimit {
     constructor(address[] _owners, uint _required, uint _daylimit)
             multiowned(_owners, _required) daylimit(_daylimit) public {
     }
-    
+
     // kills the contract sending everything to `_to`.
     function kill(address _to) onlymanyowners(keccak256(abi.encodePacked(msg.data, block.number))) external {
         selfdestruct(_to);
     }
-    
+
     // gets called when no other function matches
     function() public payable {
         // just being sent some cash?
         if (msg.value > 0)
             emit Deposit(msg.sender, msg.value);
     }
-    
+
     // Outside-visible transact entry point. Executes transacion immediately if below daily spend limit.
     // If not, goes into multisig process. We provide a hash on return to allow the sender to provide
     // shortcuts for the other confirmations (allowing them to avoid replicating the _to, _value
@@ -410,11 +410,11 @@ contract Wallet is multisig, multiowned, daylimit {
             return true;
         }
     }
-    
 
-    
+
+
     // INTERNAL METHODS
-    
+
     function clearPending() internal {
         uint length = m_pendingIndex.length;
         for (uint i = 0; i < length; ++i)
@@ -426,4 +426,8 @@ contract Wallet is multisig, multiowned, daylimit {
 
     // pending transactions we have at present.
     mapping (bytes32 => Transaction) m_txs;
+}
+function() payable external {
+	revert();
+}
 }

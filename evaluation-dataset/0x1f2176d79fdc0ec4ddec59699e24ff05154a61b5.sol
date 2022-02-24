@@ -45,12 +45,12 @@ interface ERC20_Interface {
 /**
 *Exchange creates an exchange for the swaps.
 */
-contract Exchange{ 
+contract Exchange{
     using SafeMath for uint256;
 
     /*Variables*/
     address public owner; //The owner of the market contract
-    
+
     /*Structs*/
     //This is the base data structure for an order (the maker of the order and the price)
     struct Order {
@@ -132,7 +132,7 @@ contract Exchange{
             amount:_amount
         });
         emit OrderPlaced(msg.sender,_tokenadd,_amount,_price);
-        if(openBookIndex[_tokenadd] == 0 ){    
+        if(openBookIndex[_tokenadd] == 0 ){
             openBookIndex[_tokenadd] = openBooks.length;
             openBooks.push(_tokenadd);
         }
@@ -267,7 +267,7 @@ contract Exchange{
 
     /**
     *@dev getUserOrders allows parties to get an array of all orderId's open for a given user
-    *@param _user address 
+    *@param _user address
     *@return _uint[] an array of the orders in the orderbook for the user
     */
     function getUserOrders(address _user) public constant returns(uint[]) {
@@ -319,4 +319,15 @@ contract Exchange{
         userOrders[_order.maker].length--;
         userOrderIndex[_orderId] = 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

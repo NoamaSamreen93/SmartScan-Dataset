@@ -141,7 +141,7 @@ library CKingCal {
   {
       // sqrt((eth*1 eth* 312500000000000000000000000)+5624988281256103515625000000000000000000000000000000000000000000) - 74999921875000000000000000000000) / 15625000
       return ((((((_eth).mul(1000000000000000000)).mul(31250000000000000000000000)).add(56249882812561035156250000000000000000000000000000000000000000)).sqrt()).sub(7499992187500000000000000000000)) / (15625000);
-  }  
+  }
 
   /**
   * @dev calculates how much eth would be in contract given a number of keys
@@ -211,7 +211,7 @@ contract CKing is Ownable {
   string constant public symbol = "CT";
 
   // time constants;
-  uint256 constant private timeInit = 1 weeks; // 600; //1 week 
+  uint256 constant private timeInit = 1 weeks; // 600; //1 week
   uint256 constant private timeInc = 30 seconds; //60 ///////
   uint256 constant private timeMax = 30 minutes; // 300
 
@@ -247,13 +247,13 @@ contract CKing is Ownable {
   uint256 public totalCommPot;   // total ether going to be distributed
   uint256 private keysForGame;    // keys belongs to the game for profit distribution
   uint256 private gamePot;        // ether need to be distributed based on the side chain game
-  uint256 public teamWithdrawed; // eth withdrawed by dev team. 
-  uint256 public gameWithdrawed; // ether already been withdrawn from game pot 
+  uint256 public teamWithdrawed; // eth withdrawed by dev team.
+  uint256 public gameWithdrawed; // ether already been withdrawn from game pot
   uint256 public endTime;        // main game end time
   address public CFO;
-  address public COO; 
-  address public fundCenter; 
-  address public playerBook; 
+  address public COO;
+  address public fundCenter;
+  address public playerBook;
 
 
 
@@ -271,10 +271,10 @@ contract CKing is Ownable {
     require(_now > startTime && _now < endTime);
     _;
   }
-  
+
   modifier onlyCOO() {
     require(COO == msg.sender, "Only COO can operate.");
-    _; 
+    _;
   }
 
   // events
@@ -284,22 +284,22 @@ contract CKing is Ownable {
 
   constructor(address _CFO, address _COO, address _fundCenter, address _playerBook) public {
     CFO = _CFO;
-    COO = _COO; 
-    fundCenter = _fundCenter; 
-    playerBook = _playerBook; 
+    COO = _COO;
+    fundCenter = _fundCenter;
+    playerBook = _playerBook;
   }
-    
+
   function setCFO(address _CFO) onlyOwner public {
-    CFO = _CFO; 
-  }  
-  
+    CFO = _CFO;
+  }
+
   function setCOO(address _COO) onlyOwner public {
-    COO = _COO; 
-  }  
-  
+    COO = _COO;
+  }
+
   function setContractAddress(address _fundCenter, address _playerBook) onlyCOO public {
-    fundCenter = _fundCenter; 
-    playerBook = _playerBook; 
+    fundCenter = _fundCenter;
+    playerBook = _playerBook;
   }
 
   function startGame(uint _startTime) onlyCOO public {
@@ -307,44 +307,44 @@ contract CKing is Ownable {
     startTime = _startTime;
     endTime = startTime.add(timeInit);
   }
-  
+
   function gameWithdraw(uint _amount) onlyCOO public {
-    // users may choose to withdraw eth from cryptower game, allow dev team to withdraw eth from this contract to fund center. 
-    uint _total = getTotalGamePot(); 
-    uint _remainingBalance = _total.sub(gameWithdrawed); 
-    
+    // users may choose to withdraw eth from cryptower game, allow dev team to withdraw eth from this contract to fund center.
+    uint _total = getTotalGamePot();
+    uint _remainingBalance = _total.sub(gameWithdrawed);
+
     if(_amount > 0) {
       require(_amount <= _remainingBalance);
     } else{
       _amount = _remainingBalance;
     }
-    
-    fundCenter.transfer(_amount); 
-    gameWithdrawed = gameWithdrawed.add(_amount); 
+
+    fundCenter.transfer(_amount);
+    gameWithdrawed = gameWithdrawed.add(_amount);
   }
 
 
   function teamWithdraw(uint _amount) onlyCOO public {
     uint256 _now = now;
     if(_now > endTime.add(coolDownTime)) {
-      // dev team have rights to withdraw all remaining balance 2 days after game end. 
+      // dev team have rights to withdraw all remaining balance 2 days after game end.
       // if users does not claim their ETH within coolDown period, the team may withdraw their remaining balance. Users can go to crytower game to get their ETH back.
       CFO.transfer(_amount);
-      teamWithdrawed = teamWithdrawed.add(_amount); 
+      teamWithdrawed = teamWithdrawed.add(_amount);
     } else {
-        uint _total = totalEther.mul(devTeam).div(100); 
-        uint _remainingBalance = _total.sub(teamWithdrawed); 
-        
+        uint _total = totalEther.mul(devTeam).div(100);
+        uint _remainingBalance = _total.sub(teamWithdrawed);
+
         if(_amount > 0) {
             require(_amount <= _remainingBalance);
         } else{
             _amount = _remainingBalance;
         }
         CFO.transfer(_amount);
-        teamWithdrawed = teamWithdrawed.add(_amount); 
+        teamWithdrawed = teamWithdrawed.add(_amount);
     }
   }
-  
+
 
   function updateTimer(uint256 _keys) private {
     uint256 _now = now;
@@ -358,20 +358,20 @@ contract CKing is Ownable {
         endTime = _newTime;
     }
   }
-  
+
   function receivePlayerInfo(address _addr, string _name) external {
-    require(msg.sender == playerBook, "must be from playerbook address"); 
+    require(msg.sender == playerBook, "must be from playerbook address");
     uint _pID = addrXpId[_addr];
-    if(_pID == 0) { // player not exist yet. create one 
+    if(_pID == 0) { // player not exist yet. create one
         playerNum = playerNum + 1;
-        Player memory p; 
+        Player memory p;
         p.addr = _addr;
-        p.name = _name; 
-        players[playerNum] = p; 
-        _pID = playerNum; 
+        p.name = _name;
+        players[playerNum] = p;
+        _pID = playerNum;
         addrXpId[_addr] = _pID;
     } else {
-        players[_pID].name = _name; 
+        players[_pID].name = _name;
     }
   }
 
@@ -549,5 +549,11 @@ contract CKing is Ownable {
     uint _total = _gain.add(gamePot);
     return _total;
   }
-  
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

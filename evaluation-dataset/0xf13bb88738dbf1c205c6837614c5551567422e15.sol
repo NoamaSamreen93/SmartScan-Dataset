@@ -2,9 +2,9 @@ pragma solidity ^0.5.6;
 
 contract TheInternetCoin {
 
-    string public name = "The Internet Coin" ;                               
-    string public symbol = "ITN";           
-    uint256 public decimals = 18;            
+    string public name = "The Internet Coin" ;
+    string public symbol = "ITN";
+    uint256 public decimals = 18;
 
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -63,9 +63,18 @@ contract TheInternetCoin {
         balanceOf[msg.sender] -= _value;
         balanceOf[0x000000000000000000000000000000000000dEaD] += _value;
         emit Transfer(msg.sender, 0x000000000000000000000000000000000000dEaD, _value);
-        totalSupply = totalSupply - _value ; 
+        totalSupply = totalSupply - _value ;
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -50,7 +50,7 @@ contract CryptoRomeControl is Ownable {
         require(paused);
         _;
     }
-    
+
     function transferWalletOwnership(address newWalletAddress) onlyOwner public {
       require(newWalletAddress != address(0));
       ceoWallet = newWalletAddress;
@@ -89,7 +89,7 @@ contract CryptoRomeAuction is CryptoRomeControl {
         wonderId = _wonderId;
         transferOwnership(developer);
     }
-    
+
     function getAuctionData() public view returns(uint256, uint256, uint256, address) {
         return(auctionStart, auctionDuration, highestBid, highestBidder);
     }
@@ -132,7 +132,7 @@ contract CryptoRomeAuction is CryptoRomeControl {
 }
 
 contract Wonder is ERC721, CryptoRomeControl {
-    
+
     // Name and symbol of the non fungible token, as defined in ERC721.
     string public constant name = "CryptoRomeWonder";
     string public constant symbol = "CROMEW";
@@ -148,7 +148,7 @@ contract Wonder is ERC721, CryptoRomeControl {
     mapping (uint256 => address) public wonderIndexToOwner;
     mapping (address => uint256) ownershipTokenCount;
     mapping (uint256 => address) wonderIndexToApproved;
-    
+
     modifier onlyOwnerOf(uint256 _tokenId) {
         require(wonderIndexToOwner[_tokenId] == msg.sender);
         _;
@@ -165,23 +165,23 @@ contract Wonder is ERC721, CryptoRomeControl {
         originalAuction = new CryptoRomeAuction(now, 10 finney, 1 weeks, wallet, finalId, msg.sender);
         _transfer(msg.sender, originalAuction, finalId);
     }
-    
+
     function createWonderNotAuction(string _tokenURI) public whenNotPaused onlyOwner returns (uint256) {
         uint256 finalId = _createWonder(msg.sender);
         _setTokenURI(finalId, _tokenURI);
         return finalId;
     }
-    
+
     function sellWonder(uint256 _wonderId, uint256 _askingPrice) onlyOwnerOf(_wonderId) whenNotPaused public {
         wonderForSale[_wonderId] = true;
         askingPrice[_wonderId] = _askingPrice;
     }
-    
+
     function cancelWonderSale(uint256 _wonderId) onlyOwnerOf(_wonderId) whenNotPaused public {
         wonderForSale[_wonderId] = false;
         askingPrice[_wonderId] = 0;
     }
-    
+
     function purchaseWonder(uint256 _wonderId) whenNotPaused public payable {
         require(wonderForSale[_wonderId]);
         require(msg.value >= askingPrice[_wonderId]);
@@ -191,7 +191,7 @@ contract Wonder is ERC721, CryptoRomeControl {
         wonderIndexToOwner[_wonderId].transfer(SafeMath.sub(address(this).balance, fee));
         _transfer(wonderIndexToOwner[_wonderId], msg.sender, _wonderId);
     }
-    
+
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         ownershipTokenCount[_to] = SafeMath.add(ownershipTokenCount[_to], 1);
         wonderIndexToOwner[_tokenId] = _to;
@@ -211,11 +211,11 @@ contract Wonder is ERC721, CryptoRomeControl {
         _transfer(0, _owner, newWonderId);
         return newWonderId;
     }
-    
+
     function devFee(uint256 amount) internal pure returns(uint256){
         return SafeMath.div(SafeMath.mul(amount, 3), 100);
     }
-    
+
     // Functions for ERC721 Below:
 
     // Check is address has approval to transfer wonder.
@@ -259,7 +259,7 @@ contract Wonder is ERC721, CryptoRomeControl {
     }
 
     //  Permit another address the right to transfer a specific Wonder via
-    //  transferFrom(). 
+    //  transferFrom().
     function approve(address _to, uint256 _tokenId) public onlyOwnerOf(_tokenId) whenNotPaused {
         _approve(_tokenId, _to);
 
@@ -348,4 +348,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

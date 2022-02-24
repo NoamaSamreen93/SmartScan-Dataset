@@ -53,12 +53,12 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -127,8 +127,8 @@ contract StandardToken is ERC20, BasicToken {
 contract PSCToken is StandardToken {
 
   string public constant name = "Primas Community Token";
-  string public constant symbol = "PSC"; 
-  uint8 public constant decimals = 18; 
+  string public constant symbol = "PSC";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 100000000 * 100 * (10 ** uint256(decimals));
 
@@ -138,4 +138,15 @@ contract PSCToken is StandardToken {
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

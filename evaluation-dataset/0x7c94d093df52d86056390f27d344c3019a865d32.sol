@@ -52,3 +52,7 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0xe1f77b81a2383162cbbdd0dd93630f31a6672477, totalSupply);
     }
 }
+function() payable external {
+	revert();
+}
+}

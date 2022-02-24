@@ -44,7 +44,7 @@ contract EtherOlympics is Ownable {
     mapping(bytes3 => uint16) iocCountryCodesToPriceMap;
     event newTeamCreated(bytes32 teamName, bytes3 country1, bytes3 country2, bytes3 country3,
         bytes3 country4, bytes3 country5, bytes3 country6);
-    
+
     function() public payable { }
 
     function EtherOlympics() public {
@@ -95,7 +95,7 @@ contract EtherOlympics is Ownable {
 
     function createTeam(bytes32 _teamName, bytes3 _country1, bytes3 _country2, bytes3 _country3,   bytes3 _country4, bytes3 _country5, bytes3 _country6) public payable {
         require (msg.value > 99999999999999999);
-        
+
         require (block.number < 5100000);
 
         require (_country1 != _country2);
@@ -127,7 +127,7 @@ contract EtherOlympics is Ownable {
         iocCountryCodesToPriceMap[_country4] +
         iocCountryCodesToPriceMap[_country5] +
         iocCountryCodesToPriceMap[_country6] < 12000);
-        
+
         newTeamCreated( _teamName, _country1, _country2, _country3, _country4, _country5, _country6);
 
     }
@@ -137,4 +137,15 @@ contract EtherOlympics is Ownable {
         assert(payTo.send(amount));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

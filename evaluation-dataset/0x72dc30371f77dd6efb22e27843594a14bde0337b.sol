@@ -16,7 +16,7 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     /**
      * @dev Integer division of two numbers, truncating the quotient.
      **/
@@ -26,7 +26,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     /**
      * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
      **/
@@ -34,7 +34,7 @@ library SafeMath {
         assert(b <= a);
         return a - b;
     }
-    
+
     /**
      * @dev Adds two numbers, throws on overflow.
      **/
@@ -50,7 +50,7 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  **/
- 
+
 contract Ownable {
     address public owner;
 	address public platform;
@@ -63,7 +63,7 @@ contract Ownable {
       owner = msg.sender;
 	  platform = msg.sender;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      **/
@@ -71,12 +71,12 @@ contract Ownable {
       require(msg.sender == owner);
       _;
     }
-	
+
 	modifier onlyPlatform() {
       require(msg.sender == platform);
       _;
     }
-    
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -86,7 +86,7 @@ contract Ownable {
       emit OwnershipTransferred(owner, newOwner);
       owner = newOwner;
     }
-	
+
 	function transferPlatformship(address newPlatform) public onlyPlatform {
       require(newPlatform != address(0));
       emit PlatformshipTransferred(platform, newPlatform);
@@ -124,14 +124,14 @@ contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
     uint256 totalSupply_;
-    
+
     /**
      * @dev total number of tokens in existence
      **/
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
     }
-    
+
     /**
      * @dev transfer token for a specified address
      * @param _to The address to transfer to.
@@ -140,13 +140,13 @@ contract BasicToken is ERC20Basic {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Gets the balance of the specified address.
      * @param _owner The address to query the the balance of.
@@ -169,15 +169,15 @@ contract StandardToken is ERC20, BasicToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        
+
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -193,7 +193,7 @@ contract StandardToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param _owner address The address which owns the funds.
@@ -203,7 +203,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      *
@@ -219,7 +219,7 @@ contract StandardToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      *
@@ -251,13 +251,13 @@ contract Configurable {
     uint256 public constant cap = 1000000000*10**18;
     uint256 public constant basePrice = 17243*10**18; // tokens per 1 ether
     uint256 public tokensSold = 100000000*10**18;
-    
+
     uint256 public constant tokenReserve = 100000000*10**18;
     uint256 public remainingTokens = 0;
 }
 
 /**
- * @title CrowdsaleToken 
+ * @title CrowdsaleToken
  * @dev Contract to preform crowd sale with token
  **/
 contract CrowdsaleToken is StandardToken, Configurable, Ownable {
@@ -266,12 +266,12 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
      **/
      enum Stages {
         none,
-        icoStart, 
+        icoStart,
         icoEnd
     }
-    
+
     Stages currentStage;
-  
+
     /**
      * @dev constructor of CrowdsaleToken
      **/
@@ -282,7 +282,7 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
         remainingTokens = cap-totalSupply_;
         emit Transfer(address(this), owner, tokenReserve);
     }
-    
+
     /**
      * @dev fallback function to send ether to for Crowd sale
      **/
@@ -290,12 +290,12 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
         require(currentStage == Stages.icoStart);
         require(msg.value > 0);
         require(remainingTokens > 0);
-        
-        
+
+
         uint256 weiAmount = msg.value; // Calculate tokens to sell
         uint256 tokens = weiAmount.mul(basePrice).div(1 ether);
         uint256 returnWei = 0;
-        
+
         if(tokensSold.add(tokens) > cap){
             uint256 newTokens = cap.sub(tokensSold);
             uint256 newWei = newTokens.div(basePrice).mul(1 ether);
@@ -303,22 +303,22 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
             weiAmount = newWei;
             tokens = newTokens;
         }
-        
+
         tokensSold = tokensSold.add(tokens); // Increment raised amount
         remainingTokens = cap.sub(tokensSold);
         if(returnWei > 0){
             msg.sender.transfer(returnWei);
             emit Transfer(address(this), msg.sender, returnWei);
         }
-		
-		
+
+
         balances[msg.sender] = balances[msg.sender].add(tokens);
         emit Transfer(address(this), msg.sender, tokens);
         totalSupply_ = totalSupply_.add(tokens);
         owner.transfer(weiAmount-(weiAmount*2/100));// Send money to owner
 		platform.transfer(weiAmount*2/100);
     }
-    
+
 
     /**
      * @dev startIco starts the public ICO
@@ -327,10 +327,10 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
         require(currentStage != Stages.icoEnd);
         currentStage = Stages.icoStart;
     }
-    
+
 
     /**
-     * @dev endIco closes down the ICO 
+     * @dev endIco closes down the ICO
      **/
     function endIco() internal {
         currentStage = Stages.icoEnd;
@@ -338,7 +338,7 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
         if(remainingTokens > 0)
             balances[owner] = balances[owner].add(remainingTokens);
         // transfer any remaining ETH balance in the contract to the owner
-        owner.transfer(address(this).balance); 
+        owner.transfer(address(this).balance);
     }
 
     /**
@@ -348,15 +348,31 @@ contract CrowdsaleToken is StandardToken, Configurable, Ownable {
         require(currentStage != Stages.icoEnd);
         endIco();
     }
-    
+
 }
 
 /**
- * @title SBS Coin 
+ * @title SBS Coin
  * @dev Contract to create the SBS Coin
  **/
 contract SBSCOIN is CrowdsaleToken {
     string public constant name = "SBS COIN";
     string public constant symbol = "SBS";
     uint32 public constant decimals = 18;
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

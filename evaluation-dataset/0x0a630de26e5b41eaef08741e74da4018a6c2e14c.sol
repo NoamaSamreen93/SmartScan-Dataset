@@ -23,12 +23,12 @@ contract dgame {
     event StartedGame(address initiator, uint regTimeEnd, uint amountSent, uint gameNumber);
     event RegisteredPlayer(address player, uint gameNumber);
     event FoundWinner(address player, uint gameNumber);
-    
+
     // constructor sets default registration duration to 5min
     function dgame() {
         registerDuration = 600;
     }
-    
+
     // fallback function is used for entire game logic
     function() payable {
         // status idle: start new game and transition to status ongoing
@@ -60,4 +60,15 @@ contract dgame {
             RegisteredPlayer(msg.sender, gameNumber);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

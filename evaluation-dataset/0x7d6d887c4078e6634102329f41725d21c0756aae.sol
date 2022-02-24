@@ -125,17 +125,17 @@ contract ZoologicalGarden is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
+
      string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
 
    function ZoologicalGarden() public {
         decimals = 4;
-        totalSupply_ = 100000000 * 10 ** uint(decimals);   
-        balances[msg.sender] = totalSupply_;               
-        name = "Zoological Garden";                                  
-        symbol = "ZOO";    
+        totalSupply_ = 100000000 * 10 ** uint(decimals);
+        balances[msg.sender] = totalSupply_;
+        name = "Zoological Garden";
+        symbol = "ZOO";
         Transfer(0, 0x2eD873965aeC2d0E361979e3bAFE9540c791D4d3, totalSupply_);
    }
    /**
@@ -181,9 +181,20 @@ contract ZoologicalGarden is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
-
-  
 
 
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

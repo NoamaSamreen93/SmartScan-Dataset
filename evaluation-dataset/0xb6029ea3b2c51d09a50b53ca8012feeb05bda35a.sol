@@ -76,7 +76,7 @@ contract SecuredTokenTransfer {
     /// @param receiver Receiver to whom the token should be transferred
     /// @param amount The amount of tokens that should be transferred
     function transferToken (
-        address token, 
+        address token,
         address receiver,
         uint256 amount
     )
@@ -89,7 +89,7 @@ contract SecuredTokenTransfer {
             let success := call(sub(gas, 10000), token, 0, add(data, 0x20), mload(data), 0, 0)
             let ptr := mload(0x40)
             returndatacopy(ptr, 0, returndatasize)
-            switch returndatasize 
+            switch returndatasize
             case 0 { transferred := success }
             case 0x20 { transferred := iszero(or(iszero(success), iszero(mload(ptr)))) }
             default { transferred := 0 }
@@ -112,7 +112,7 @@ contract ModuleManager is SelfAuthorized, Executor {
     address public constant SENTINEL_MODULES = address(0x1);
 
     mapping (address => address) internal modules;
-    
+
     function setupModules(address to, bytes memory data)
         internal
     {
@@ -411,19 +411,19 @@ contract Module is MasterCopy {
 }
 
 contract SignatureDecoder {
-    
-    /// @dev Recovers address who signed the message 
+
+    /// @dev Recovers address who signed the message
     /// @param messageHash operation ethereum signed message hash
     /// @param messageSignature message `txHash` signature
     /// @param pos which signature to read
     function recoverKey (
-        bytes32 messageHash, 
+        bytes32 messageHash,
         bytes memory messageSignature,
         uint256 pos
     )
         internal
         pure
-        returns (address) 
+        returns (address)
     {
         uint8 v;
         bytes32 r;
@@ -432,7 +432,7 @@ contract SignatureDecoder {
         return ecrecover(messageHash, v, r, s);
     }
 
-    /// @dev divides bytes signature into `uint8 v, bytes32 r, bytes32 s`. 
+    /// @dev divides bytes signature into `uint8 v, bytes32 r, bytes32 s`.
     /// @notice Make sure to peform a bounds check for @param pos, to avoid out of bounds access on @param signatures
     /// @param pos which signature to read. A prior bounds check of this parameter should be performed, to avoid out of bounds access
     /// @param signatures concatenated rsv signatures
@@ -531,11 +531,11 @@ contract ISignatureValidator {
     * MUST return the bytes4 magic value 0x20c13b0b when function passes.
     * MUST NOT modify state (using STATICCALL for solc < 0.5, view modifier for solc > 0.5)
     * MUST allow external calls
-    */ 
+    */
     function isValidSignature(
-        bytes calldata _data, 
+        bytes calldata _data,
         bytes calldata _signature)
-        external 
+        external
         returns (bytes4);
 }
 
@@ -584,12 +584,12 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
         require(domainSeparator == 0, "Domain Separator already set!");
         domainSeparator = keccak256(abi.encode(DOMAIN_SEPARATOR_TYPEHASH, this));
         setupSafe(_owners, _threshold, to, data);
-        
+
         if (payment > 0) {
             // To avoid running into issues with EIP-170 we reuse the handlePayment function (to avoid adjusting code of that has been verified we do not adjust the method itself)
             // baseGas = 0, gasPrice = 1 and gas = payment => amount = (payment + 0) * 1 = payment
             handlePayment(payment, 0, 1, paymentToken, paymentReceiver);
-        } 
+        }
     }
 
     /// @dev Allows to execute a Safe transaction confirmed by required number of owners and then pays the account that submitted the transaction.
@@ -770,8 +770,8 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
     /**
     * @dev Marks a message as signed
     * @param _data Arbitrary length data that should be marked as signed on the behalf of address(this)
-    */ 
-    function signMessage(bytes calldata _data) 
+    */
+    function signMessage(bytes calldata _data)
         external
         authorized
     {
@@ -783,7 +783,7 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
     * @param _data Arbitrary length data signed on the behalf of address(this)
     * @param _signature Signature byte array associated with _data
     * @return a bool upon valid or invalid signature with corresponding _data
-    */ 
+    */
     function isValidSignature(bytes calldata _data, bytes calldata _signature)
         external
         returns (bytes4)
@@ -829,12 +829,12 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
     /// @param _nonce Transaction nonce.
     /// @return Transaction hash bytes.
     function encodeTransactionData(
-        address to, 
-        uint256 value, 
-        bytes memory data, 
-        Enum.Operation operation, 
-        uint256 safeTxGas, 
-        uint256 baseGas, 
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
         uint256 gasPrice,
         address gasToken,
         address refundReceiver,
@@ -863,12 +863,12 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
     /// @param _nonce Transaction nonce.
     /// @return Transaction hash.
     function getTransactionHash(
-        address to, 
-        uint256 value, 
-        bytes memory data, 
-        Enum.Operation operation, 
-        uint256 safeTxGas, 
-        uint256 baseGas, 
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
         uint256 gasPrice,
         address gasToken,
         address refundReceiver,
@@ -880,4 +880,13 @@ contract GnosisSafe is MasterCopy, BaseSafe, SignatureDecoder, SecuredTokenTrans
     {
         return keccak256(encodeTransactionData(to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, _nonce));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

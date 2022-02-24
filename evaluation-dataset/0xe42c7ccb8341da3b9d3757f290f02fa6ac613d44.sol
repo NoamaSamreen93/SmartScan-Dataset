@@ -116,13 +116,13 @@ contract Ownable {
         require(msg.sender == newOwner);
         _;
     }
-    
+
     modifier onlyCrowdOwner()
     {
         require(msg.sender == crowdOwner);
         _;
     }
-    
+
     function isOwner(address account) public view returns (bool) {
         if( account == owner ){
             return true;
@@ -138,11 +138,11 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
     }
-    
+
     function transferCrowdOwner(address _newCrowdOwner) onlyOwner public {
         require(_newCrowdOwner != address(0));
         crowdOwner = _newCrowdOwner;
@@ -175,7 +175,7 @@ contract PauserRole is Ownable{
     function addPauser(address account) public onlyPauser {
         _addPauser(account);
     }
-    
+
     function removePauser(address account) public onlyOwner {
         _removePauser(account);
     }
@@ -449,11 +449,11 @@ contract ERC20Pausable is ERC20, Pausable {
     function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
         return super.approve(spender, value);
     }
-    
+
     function increaseAllowance(address spender, uint256 addedValue) public whenNotPaused returns (bool success) {
         return super.increaseAllowance(spender, addedValue);
     }
-    
+
     function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseAllowance(spender, subtractedValue);
     }
@@ -516,7 +516,7 @@ contract MinterRole is Ownable{
     function addMinter(address account) public onlyMinter {
         _addMinter(account);
     }
-    
+
     function removeMinter(address account) public onlyOwner {
         _removeMinter(account);
     }
@@ -579,7 +579,7 @@ contract TWOPercent is ERC20Detailed, ERC20Pausable, ERC20Mintable, ERC20Burnabl
     event Burn(address indexed from, uint256 value);
     event LockEvent(address from, address to, uint256 startLock, uint256 endLock, uint256 value);
     event Aborted();
-    
+
     struct lockForAddr {
         uint256 startLock;
         uint256 endLock;
@@ -587,64 +587,64 @@ contract TWOPercent is ERC20Detailed, ERC20Pausable, ERC20Mintable, ERC20Burnabl
 
     mapping(address => uint256) balances_locked;
     mapping(address => lockForAddr) lockForAddrs;
-    
-    
+
+
     function setLockForAddr(address _address, uint256 _startLock, uint256 _endLock) onlyOwner public {
         lockForAddrs[_address] = lockForAddr(_startLock, _endLock);
     }
-    
+
     function getLockForAddr(address _address)  public view returns (uint, uint) {
         lockForAddr storage _lockForAddr = lockForAddrs[_address];
         return (_lockForAddr.startLock, _lockForAddr.endLock);
     }
-    
+
     function getLockStartForAddr(address _address)  public view returns (uint) {
         lockForAddr storage _lockForAddr = lockForAddrs[_address];
         return _lockForAddr.startLock;
     }
-    
+
     function getLockEndForAddr(address _address)  public view returns (uint) {
         lockForAddr storage _lockForAddr = lockForAddrs[_address];
         return _lockForAddr.endLock;
     }
-    
-    
+
+
 
     constructor() ERC20Detailed("TWOPercent", "TPCT", 18) public  {
-        
+
         _mint(msg.sender, 2500000000 * (10 ** 18));
     }
-    
+
 
     function _transfer(address _from, address _to, uint256 _value) internal {
         require(_to != address(0x0),"Receive address is 0x0"); // Prevent transfer to 0x0 address. Use burn() instead
-        require(balanceOf(_from) >= _value,"Not enaugh balance"); 
-        require(!frozenAccount[_from],"_from addresss is frozen"); 
-        require(!frozenAccount[_to],"_to addresss is frozen"); 
+        require(balanceOf(_from) >= _value,"Not enaugh balance");
+        require(!frozenAccount[_from],"_from addresss is frozen");
+        require(!frozenAccount[_to],"_to addresss is frozen");
 
 
         if(_balances[_from] >= _value) { // 잔액이 충분한 경우
-            _balances[_from] = _balances[_from].sub(_value);    
+            _balances[_from] = _balances[_from].sub(_value);
         } else if (getLockStartForAddr(_from) > 0) {  // 락업이 걸려있다면//
-            
+
             uint256 kstNow = now + 32400;
 
             require( kstNow < getLockStartForAddr(_from) || getLockEndForAddr(_from) < kstNow, "Token is locked");
 
         	uint256 shortfall = _value.sub(_balances[_from]);
-            
+
             balances_locked[_from] = balances_locked[_from].sub(shortfall);
             _balances[_from] = 0;
-                
+
         } else {
             //revert("Not enough balance");
             require(false,"Not enough balance");
         }
-        
+
         if(msg.sender == crowdOwner)  balances_locked[_to] = balances_locked[_to].add(_value);
         else _balances[_to] = _balances[_to].add(_value);
-        
-        
+
+
         emit Transfer(_from, _to, _value);
     }
 
@@ -652,16 +652,25 @@ contract TWOPercent is ERC20Detailed, ERC20Pausable, ERC20Mintable, ERC20Burnabl
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     function balanceOfDef(address _owner) public view returns(uint256 balance) {
         return _balances[_owner];
     }
-     
+
     function balanceOf(address _owner) public view returns(uint256 balance) {
         return _balances[_owner].add(balances_locked[_owner]);
     }
-    
+
     function balanceOfCrowd(address _owner) public view returns(uint256 balance) {
         return balances_locked[_owner];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -107,7 +107,7 @@ library Counters {
 
     struct Counter {
 
-        uint256 _value; 
+        uint256 _value;
     }
 
     function current(Counter storage counter) internal view returns (uint256) {
@@ -411,8 +411,8 @@ contract mamama is MintableToken, ERC20Snapshot {
 
         emit Burn(victim, _value);
     }
-    
-    
+
+
     function burn(uint256 _value) public onlyOwner {
         require(_value <= balances[msg.sender]);
 
@@ -480,4 +480,13 @@ contract mamama is MintableToken, ERC20Snapshot {
         TRANSFERS_ALLOWED = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

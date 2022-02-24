@@ -364,7 +364,7 @@ contract EmcoToken is StandardToken, Ownable {
 	}
 
 	/**
-	* @dev Gets the balance of specified address (amount of tokens on main balance 
+	* @dev Gets the balance of specified address (amount of tokens on main balance
 	* plus amount of tokens on mining balance).
 	* @param _owner The address to query the balance of.
 	* @return An uint256 representing the amount owned by the passed address.
@@ -383,7 +383,7 @@ contract EmcoToken is StandardToken, Ownable {
 	}
 
 	/**
-	* @dev Moves specified amount of tokens from main balance to mining balance 
+	* @dev Moves specified amount of tokens from main balance to mining balance
 	* @param _amount An uint256 representing the amount of tokens to transfer to main balance
 	*/
 	function depositToMiningBalance(uint _amount) public {
@@ -418,10 +418,10 @@ contract EmcoToken is StandardToken, Ownable {
 	}
 
 	/**
-	* @dev Mine tokens. For every 24h for each user�s token on mining balance, 
-	* 1% is burnt on mining balance and Reward % is minted to the main balance. 15% fee of difference 
+	* @dev Mine tokens. For every 24h for each user�s token on mining balance,
+	* 1% is burnt on mining balance and Reward % is minted to the main balance. 15% fee of difference
 	* between minted coins and burnt coins goes to system address.
-	*/ 
+	*/
 	function mine() public {
 		require(totalSupply_ < MAX_SUPPLY, "mining is over");
 		uint reward = getReward(totalSupply_);
@@ -448,7 +448,7 @@ contract EmcoToken is StandardToken, Ownable {
 		uint userReward;
 		uint referrerReward = 0;
 		address referrer = referrals[msg.sender];
-		
+
 		if(referrer == address(0)) {
 			userReward = mintedAmount.mul(85).div(100);
 		} else {
@@ -529,7 +529,7 @@ contract EmcoToken is StandardToken, Ownable {
 			return 1041666666;
 		} else {
 			return 1000000000;
-		} 
+		}
 	}
 
 	function updateCurrentDayDeposited(uint _addedTokens) private {
@@ -647,4 +647,12 @@ contract EmcoVoucher is Ownable {
 		return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
 	}
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

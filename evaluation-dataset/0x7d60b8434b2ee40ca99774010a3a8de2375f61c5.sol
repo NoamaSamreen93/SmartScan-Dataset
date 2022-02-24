@@ -1,5 +1,5 @@
 pragma solidity ^0.4.25;
- 
+
 /**
  *
  * Easy Investment 2 Contract
@@ -17,50 +17,50 @@ pragma solidity ^0.4.25;
  *
  */
 contract EthLong{
-   
+
     using SafeMath for uint256;
- 
+
     mapping(address => uint256) investments;
     mapping(address => uint256) joined;
     mapping(address => uint256) withdrawals;
     mapping(address => uint256) referrer;
- 
+
     uint256 public minimum = 10000000000000000;
     uint256 public step = 33;
     address public ownerWallet;
     address public owner;
     address public bountyManager;
     address promoter = 0xA4410DF42dFFa99053B4159696757da2B757A29d;
- 
+
     event Invest(address investor, uint256 amount);
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-   
+
     /**
      * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor(address _bountyManager) public {
         owner = msg.sender;
         ownerWallet = msg.sender;
         bountyManager = _bountyManager;
     }
- 
+
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
- 
+
     modifier onlyBountyManager() {
         require(msg.sender == bountyManager);
         _;
     }
- 
+
     /**
      * @dev Allows current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -72,7 +72,7 @@ contract EthLong{
         owner = newOwner;
         ownerWallet = newOwnerWallet;
     }
- 
+
     /**
      * @dev Investments
      */
@@ -89,7 +89,7 @@ contract EthLong{
         promoter.transfer(msg.value.div(100).mul(5));
         emit Invest(msg.sender, msg.value);
     }
- 
+
     /**
     * @dev Evaluate current balance
     * @param _address Address of investor
@@ -99,10 +99,10 @@ contract EthLong{
         uint256 percent = investments[_address].mul(step).div(100);
         uint256 different = percent.mul(minutesCount).div(72000);
         uint256 balance = different.sub(withdrawals[_address]);
- 
+
         return balance;
     }
- 
+
     /**
     * @dev Withdraw dividends from contract
     */
@@ -120,7 +120,7 @@ contract EthLong{
             return false;
         }
     }
-   
+
     /**
     * @dev Bounty reward
     */
@@ -134,7 +134,7 @@ contract EthLong{
              }
         }
     }
- 
+
     /**
     * @dev Gets balance of the sender address.
     * @return An uint256 representing the amount owned by the msg.sender.
@@ -142,7 +142,7 @@ contract EthLong{
     function checkBalance() public view returns (uint256) {
         return getBalance(msg.sender);
     }
- 
+
     /**
     * @dev Gets withdrawals of the specified address.
     * @param _investor The address to query the the balance of.
@@ -151,7 +151,7 @@ contract EthLong{
     function checkWithdrawals(address _investor) public view returns (uint256) {
         return withdrawals[_investor];
     }
- 
+
     /**
     * @dev Gets investments of the specified address.
     * @param _investor The address to query the the balance of.
@@ -160,7 +160,7 @@ contract EthLong{
     function checkInvestments(address _investor) public view returns (uint256) {
         return investments[_investor];
     }
- 
+
     /**
     * @dev Gets referrer balance of the specified address.
     * @param _hunter The address of the referrer
@@ -169,7 +169,7 @@ contract EthLong{
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-   
+
     /**
     * @dev Updates referrer balance
     * @param _hunter The address of the referrer
@@ -178,9 +178,9 @@ contract EthLong{
     function updateReferral(address _hunter, uint256 _amount) onlyBountyManager public {
         referrer[_hunter] = referrer[_hunter].add(_amount);
     }
-   
+
 }
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -194,22 +194,33 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
- 
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
- 
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
- 
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

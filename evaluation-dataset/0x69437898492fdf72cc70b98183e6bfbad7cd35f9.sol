@@ -1,12 +1,12 @@
 pragma solidity ^0.4.13;
 contract Token {
-    
+
 	/* Public variables of the token */
 	string public name;
 	string public symbol;
 	uint8 public decimals;
 	uint256 public totalSupply;
-    
+
 	/* This creates an array with all balances */
 	mapping (address => uint256) public balanceOf;
 
@@ -35,5 +35,21 @@ contract Token {
 	/* This unnamed function is called whenever someone tries to send ether to it */
 	function () {
 	revert();     // Prevents accidental sending of ether
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

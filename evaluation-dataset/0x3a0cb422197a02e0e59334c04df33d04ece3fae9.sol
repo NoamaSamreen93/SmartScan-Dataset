@@ -191,7 +191,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
     }
-    
+
     event Mint(address indexed to, uint256 amount);
   event MintFinished();
 
@@ -233,14 +233,14 @@ contract StandardToken is ERC20, BasicToken, Ownable {
 
 /**
  * @title SimpleToken
- * 
- * 
- 
- 
- 
- 
- 
- 
+ *
+ *
+
+
+
+
+
+
  * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
@@ -261,4 +261,15 @@ contract EAAS is StandardToken {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

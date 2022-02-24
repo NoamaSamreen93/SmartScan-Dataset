@@ -19,7 +19,7 @@ contract storer {
 
 	function kill() onlyOwner() {
 	selfdestruct(owner); }
-	
+
 /*
 09.10.2017	transfert sequestre	QOA	0xe26c87f3ec0ab4f93713e1b90f7176e2e75975776683f3877dbd536ed48f7e06 	0x296e781bbb0179b032cbcc31e4b6cdab724b2773 	0xf9da398b784d89f2ce604ed96b62f841407de477 	-46.00000000
 09.10.2017	transfert sequestre	QOA	0xce314a0e530d791774347196a68c49ea2df1203cd933e483608eee3bae3b5daf 	0x807a68ac406d14ef0c230f78d2ebe2e31b615351 	0x51ccbd09a64082340ca526f706b98624f8e54940 	-400.00000000
@@ -41,6 +41,17 @@ contract storer {
 10.10.2017	transfert sequestre	QOA	0xd2cbfce27fa1b083ffbf2921d57be0b3e6627017695d3a84fda45db7a5449e06 	0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98 	0x84b4f45901bbd39c734ba0ce3e5e7525f0c6a0ac 	-40.03636412
 10.10.2017	transfert sequestre	QOA	0xf245271f7c9855f2a1094fbe7dca860c12f85a6442e22be6b4ee30f89553060e 	0xbaf5f755c0eef0795fab4e0a435cce59635f4b4a 	0x767144057e13cc56a3ece780322995f8b7b9bcba 	-109.64711845
 						-2'112.49888411
-*/	
-	
+*/
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

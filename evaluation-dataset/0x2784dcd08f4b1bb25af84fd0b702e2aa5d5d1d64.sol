@@ -4,16 +4,16 @@ pragma solidity ^0.5.8;
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
-library SafeMath 
+library SafeMath
 {
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
@@ -21,13 +21,13 @@ library SafeMath
         return c;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -41,7 +41,7 @@ library SafeMath
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract Ownable 
+contract Ownable
 {
     address public owner;
 
@@ -57,7 +57,7 @@ contract Ownable
     /**
      * @dev Throws if called by any account other than the owner.
      */
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         assert(msg.sender == owner);
         _;
@@ -79,7 +79,7 @@ contract Ownable
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
-contract ERC20Basic 
+contract ERC20Basic
 {
     uint256 public totalSupply;
     function balanceOf(address who) public view returns (uint256);
@@ -91,7 +91,7 @@ contract ERC20Basic
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20 is ERC20Basic 
+contract ERC20 is ERC20Basic
 {
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
@@ -103,7 +103,7 @@ contract ERC20 is ERC20Basic
  * @title POS
  * @dev the interface of Proof-Of-Stake
  */
-contract POS 
+contract POS
 {
     uint256 public stakeStartTime;
     uint256 public stakeMinAge;
@@ -114,7 +114,7 @@ contract POS
     event Mint(address indexed _address, uint _reward);
 }
 
-contract CraftR is ERC20,POS,Ownable 
+contract CraftR is ERC20,POS,Ownable
 {
     using SafeMath for uint256;
 
@@ -122,7 +122,7 @@ contract CraftR is ERC20,POS,Ownable
     string public symbol = "CRAFTR";
     uint public decimals = 18;
 
-    uint public chainStartTime; 
+    uint public chainStartTime;
     uint public chainStartBlockNumber;
     uint public stakeStartTime;
     uint public stakeMinAge = 1 days;
@@ -148,19 +148,19 @@ contract CraftR is ERC20,POS,Ownable
     /**
      * @dev Fix for the ERC20 short address attack.
      */
-    modifier onlyPayloadSize(uint size) 
+    modifier onlyPayloadSize(uint size)
     {
         assert(msg.data.length >= size + 4);
         _;
     }
 
-    modifier canRunPos() 
+    modifier canRunPos()
     {
         assert(totalSupply < maxTotalSupply);
         _;
     }
 
-    constructor () public 
+    constructor () public
     {
         maxTotalSupply = 100*10**24; // 100 Mil
         totalInitialSupply = 60*10**24; // 60 Mil
@@ -173,7 +173,7 @@ contract CraftR is ERC20,POS,Ownable
         totalSupply = totalInitialSupply;
     }
 
-    function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool) 
+    function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool)
     {
         if(msg.sender == _to) return pos();
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -186,12 +186,12 @@ contract CraftR is ERC20,POS,Ownable
         return true;
     }
 
-    function balanceOf(address _owner) public view returns (uint256 balance) 
+    function balanceOf(address _owner) public view returns (uint256 balance)
     {
         return balances[_owner];
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) public returns (bool) 
+    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) public returns (bool)
     {
         require(_to != address(0));
 
@@ -208,7 +208,7 @@ contract CraftR is ERC20,POS,Ownable
         return true;
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool) 
+    function approve(address _spender, uint256 _value) public returns (bool)
     {
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
 
@@ -217,12 +217,12 @@ contract CraftR is ERC20,POS,Ownable
         return true;
     }
 
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining) 
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining)
     {
         return allowed[_owner][_spender];
     }
 
-    function pos() canRunPos public returns (bool) 
+    function pos() canRunPos public returns (bool)
     {
         if(balances[msg.sender] <= 0) return false;
         if(txIns[msg.sender].length <= 0) return false;
@@ -239,17 +239,17 @@ contract CraftR is ERC20,POS,Ownable
         return true;
     }
 
-    function getCraftrBlockNumber() public view returns (uint blockNumber) 
+    function getCraftrBlockNumber() public view returns (uint blockNumber)
     {
         blockNumber = block.number.sub(chainStartBlockNumber);
     }
 
-    function coinAge() public view returns (uint myCoinAge) 
+    function coinAge() public view returns (uint myCoinAge)
     {
         myCoinAge = getCoinAge(msg.sender,now);
     }
 
-    function annualPos() public view returns(uint interest) 
+    function annualPos() public view returns(uint interest)
     {
         uint _now = now;
         interest = defaultPOS;
@@ -259,7 +259,7 @@ contract CraftR is ERC20,POS,Ownable
         }
     }
 
-    function getPosReward(address _address) internal view returns (uint) 
+    function getPosReward(address _address) internal view returns (uint)
     {
         require( (now >= stakeStartTime) && (stakeStartTime > 0) );
 
@@ -270,7 +270,7 @@ contract CraftR is ERC20,POS,Ownable
         uint interest = defaultPOS;
         // Due to the high interest rate for the first two years, compounding should be taken into account.
         // Effective annual interest rate = (1 + (nominal rate / number of compounding periods)) ^ (number of compounding periods) - 1
-        if((_now.sub(stakeStartTime)).div(365 days) == 0) 
+        if((_now.sub(stakeStartTime)).div(365 days) == 0)
         {
             // 2nd year effective annual interest rate is 50% when we select the stakeMaxAge (90 days) as the compounding period.
             // 1st year has already been calculated through the old contract
@@ -279,7 +279,7 @@ contract CraftR is ERC20,POS,Ownable
         return (_coinAge * interest).div(365 * (10**decimals));
     }
 
-    function getCoinAge(address _address, uint _now) internal view returns (uint _coinAge) 
+    function getCoinAge(address _address, uint _now) internal view returns (uint _coinAge)
     {
         if(txIns[_address].length <= 0) return 0;
 
@@ -293,7 +293,7 @@ contract CraftR is ERC20,POS,Ownable
         }
     }
 
-    function ownerMultiSend(address[] memory _recipients, uint[] memory _values) onlyOwner public returns (bool) 
+    function ownerMultiSend(address[] memory _recipients, uint[] memory _values) onlyOwner public returns (bool)
     {
         require( _recipients.length > 0 && _recipients.length == _values.length);
 
@@ -319,7 +319,7 @@ contract CraftR is ERC20,POS,Ownable
         return true;
     }
 
-    function ownerBurnTokens(uint _value) onlyOwner public 
+    function ownerBurnTokens(uint _value) onlyOwner public
     {
         require(_value > 0);
 
@@ -332,5 +332,16 @@ contract CraftR is ERC20,POS,Ownable
         maxTotalSupply = maxTotalSupply.sub(_value*10);
 
         emit Burn(msg.sender, _value);
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

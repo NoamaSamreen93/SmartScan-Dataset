@@ -12,10 +12,10 @@ contract AWAXToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     function AWAXToken() public {
-        totalSupply = 30000000000 * 10 ** uint256(decimals); 
-        balanceOf[msg.sender] = totalSupply;                
-        name = "AWAX Token";                                   
-        symbol = "AWAX";                               
+        totalSupply = 30000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "AWAX Token";
+        symbol = "AWAX";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -45,4 +45,15 @@ contract AWAXToken {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

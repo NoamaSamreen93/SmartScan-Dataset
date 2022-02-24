@@ -1,5 +1,5 @@
 /*
-**   Customs test on Main Ethereum Main Network 
+**   Customs test on Main Ethereum Main Network
 **   10-Apr-2019
 **   partial development by AzDGK
 **   <http://www.Customs
@@ -50,4 +50,15 @@ contract DGK {
         isOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

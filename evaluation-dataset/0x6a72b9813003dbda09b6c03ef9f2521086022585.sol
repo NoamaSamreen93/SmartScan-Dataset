@@ -1156,3 +1156,7 @@ contract BackToLife {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

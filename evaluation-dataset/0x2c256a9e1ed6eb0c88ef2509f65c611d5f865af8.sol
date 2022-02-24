@@ -398,10 +398,10 @@ contract BonumToken is StandardToken, Ownable {
 
 	event Burn(address indexed burner, uint256 value);
 
-	constructor(address _bounty, 
-		address _reserve, 
-		address _team, 
-		address _advisors, 
+	constructor(address _bounty,
+		address _reserve,
+		address _team,
+		address _advisors,
 		uint releaseTime) public {
 		require(_bounty != address(0));
 		require(_reserve != address(0));
@@ -409,7 +409,7 @@ contract BonumToken is StandardToken, Ownable {
 		totalSupply_ = INITIAL_SUPPLY;
 		bounty = _bounty;
 		advisors = _advisors;
-		reserveTimelock = new TokenTimelock(this, _reserve, releaseTime); 
+		reserveTimelock = new TokenTimelock(this, _reserve, releaseTime);
 		teamTimelock = new TokenTimelock(this, _team, releaseTime);
 
 		uint factor = (10 ** uint256(decimals));
@@ -435,7 +435,7 @@ contract BonumToken is StandardToken, Ownable {
     emit Transfer(address(0), msg.sender, ownerBalance);
 
 	}
-	
+
 	/**
 	* @dev Burns a specific amount of tokens, could be called only once
 	* @param _value The amount of token to be burned.
@@ -454,7 +454,7 @@ contract BonumToken is StandardToken, Ownable {
 	}
 
 	/**
-	* @dev Moves locked tokens to reserve account. Could be called only after release time, 
+	* @dev Moves locked tokens to reserve account. Could be called only after release time,
 	* otherwise would throw an exeption.
 	*/
 	function releaseReserveTokens() public {
@@ -462,11 +462,22 @@ contract BonumToken is StandardToken, Ownable {
 	}
 
 	/**
-	* @dev Moves locked tokens to team account. Could be called only after release time, 
+	* @dev Moves locked tokens to team account. Could be called only after release time,
 	* otherwise would throw an exeption.
 	*/
 	function releaseTeamTokens() public {
 		teamTimelock.release();
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -240,7 +240,7 @@ contract AXNETToken is ERC20Interface, Owned {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ contract AXNETToken is ERC20Interface, Owned {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -321,11 +321,11 @@ contract AXNETToken is ERC20Interface, Owned {
     // Owner can withdraw ether if token received.
     // ------------------------------------------------------------------------
     function withdraw() public onlyOwner returns (bool result) {
-        
+
         return owner.send(this.balance);
-        
+
     }
-    
+
     // ------------------------------------------------------------------------
 
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -338,4 +338,15 @@ contract AXNETToken is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

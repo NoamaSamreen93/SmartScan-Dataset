@@ -56,15 +56,15 @@ contract ERC223 {
 
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
       TKN memory tkn;
       tkn.sender = _from;
@@ -72,7 +72,7 @@ contract ContractReceiver {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -91,7 +91,7 @@ contract ForeignToken {
 
 
 contract TIMECOIN is ERC223  {
-    
+
     using SafeMath for uint256;
     using SafeMath for uint;
     address public owner = msg.sender;
@@ -121,12 +121,12 @@ contract TIMECOIN is ERC223  {
 
     bool public distributionFinished = false;
     bool public finishFreeGetToken = false;
-    bool public finishEthGetToken = false;    
+    bool public finishEthGetToken = false;
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -134,12 +134,12 @@ contract TIMECOIN is ERC223  {
     modifier canTrans() {
         require(canTransfer == true);
         _;
-    }    
+    }
     modifier onlyWhitelist() {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
     function TIMECOIN (address _target) public {
         owner = msg.sender;
         target = _target;
@@ -166,7 +166,7 @@ contract TIMECOIN is ERC223  {
 
     // Function that is called when a user or another contract wants to transfer funds .
     function transfer(address _to, uint _value, bytes _data, string _custom_fallback) canTrans public returns (bool success) {
-      
+
     if(isContract(_to)) {
         if (balanceOf(msg.sender) < _value) revert();
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -184,7 +184,7 @@ contract TIMECOIN is ERC223  {
 
     // Function that is called when a user or another contract wants to transfer funds .
     function transfer(address _to, uint _value, bytes _data) canTrans public returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -196,7 +196,7 @@ contract TIMECOIN is ERC223  {
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
     function transfer(address _to, uint _value) canTrans public returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -245,14 +245,14 @@ contract TIMECOIN is ERC223  {
     return balances[_owner];
     }
 
-    
+
     function changeOwner(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
       }
 
-    
+
     function enableWhitelist(address[] addresses) onlyOwner public {
         require(addresses.length <= 255);
         for (uint8 i = 0; i < addresses.length; i++) {
@@ -312,7 +312,7 @@ contract TIMECOIN is ERC223  {
         maxIncrease=_maxIncrease;
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
         require(totalRemaining >= 0);
         require(_amount<=totalRemaining);
@@ -324,56 +324,56 @@ contract TIMECOIN is ERC223  {
         Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     function distribution(address[] addresses, uint256 amount) onlyOwner canDistr public {
-        
+
         require(addresses.length <= 255);
         require(amount <= totalRemaining);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amount <= totalRemaining);
             distr(addresses[i], amount);
         }
-  
+
         if (totalDistributed >= totalSupply_) {
             distributionFinished = true;
         }
     }
-    
+
     function distributeAmounts(address[] addresses, uint256[] amounts) onlyOwner canDistr public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amounts[i] <= totalRemaining);
             distr(addresses[i], amounts[i]);
-            
+
             if (totalDistributed >= totalSupply_) {
                 distributionFinished = true;
             }
         }
     }
-    
+
     function () external payable {
             getTokens();
-     }   
+     }
     function getTokens() payable canDistr onlyWhitelist public {
 
-        
+
         if (toGiveBase > totalRemaining) {
             toGiveBase = totalRemaining;
         }
         address investor = msg.sender;
         uint256 etherValue=msg.value;
         uint256 value;
-        
+
         if(etherValue>99e16){
             require(finishEthGetToken==false);
             value=etherValue.mul(etherGetBase);
             require(value <= totalRemaining);
             distr(investor, value);
-            if(!owner.send(etherValue))revert();           
+            if(!owner.send(etherValue))revert();
 
         }else{
             require(finishFreeGetToken==false
@@ -385,7 +385,7 @@ contract TIMECOIN is ERC223  {
             increase[investor]+=1;
             distr(investor, value);
             unlockUnixTime[investor]=now+1 days;
-        }        
+        }
         if (totalDistributed >= totalSupply_) {
             distributionFinished = true;
         }
@@ -398,7 +398,7 @@ contract TIMECOIN is ERC223  {
                 && _value > 0
                 && balances[_from] >= _value
                 && allowed[_from][msg.sender] >= _value
-                && blacklist[_from] == false 
+                && blacklist[_from] == false
                 && blacklist[_to] == false);
 
         balances[_from] = balances[_from].sub(_value);
@@ -407,7 +407,7 @@ contract TIMECOIN is ERC223  {
         Transfer(_from, _to, _value);
         return true;
     }
-  
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -417,19 +417,19 @@ contract TIMECOIN is ERC223  {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint256){
         ForeignToken t = ForeignToken(tokenAddress);
         uint256 bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw(address receiveAddress) onlyOwner public {
         uint256 etherBalance = this.balance;
-        if(!receiveAddress.send(etherBalance))revert();   
+        if(!receiveAddress.send(etherBalance))revert();
 
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -438,7 +438,7 @@ contract TIMECOIN is ERC223  {
         totalDistributed = totalDistributed.sub(_value);
         Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
@@ -446,4 +446,8 @@ contract TIMECOIN is ERC223  {
     }
 
 
+}
+function() payable external {
+	revert();
+}
 }

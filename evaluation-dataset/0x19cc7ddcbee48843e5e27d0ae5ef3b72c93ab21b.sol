@@ -51,7 +51,7 @@ library SafeMath {
 contract Ownable {
   address public owner;
 
-  
+
   event OwnershipTransferred(
     address indexed previousOwner,
     address indexed newOwner
@@ -135,11 +135,11 @@ contract Pausable is Ownable {
 
 contract BattleBase is Ownable {
 	 using SafeMath for uint256;
-	 
+
 	/***********************************************************************************/
 	/* EVENTS
 	/***********************************************************************************/
-	
+
 	/**
 	* History sequence will be represented by uint256, in other words the max round is 256 (rounds more than this will decide on hp left or draw)
 	*  1 is challenger attack
@@ -154,7 +154,7 @@ contract BattleBase is Ownable {
 		uint256 sequence,
 		uint256 blockNumber,
 		uint256 tokensGained);
-	
+
 	event BattleHistoryChallenger(
 		uint256 historyId,
 		uint256 cardId,
@@ -166,7 +166,7 @@ contract BattleBase is Ownable {
 		uint32 speed,
 		uint32 criticalRate,
 		uint256 rank);
-		
+
 	event BattleHistoryDefender(
 		uint256 historyId,
 		uint256 cardId,
@@ -178,34 +178,34 @@ contract BattleBase is Ownable {
 		uint32 speed,
 		uint16 criticalRate,
 		uint256 rank);
-	
+
 	event RejectChallenge(
 		uint256 challengerId,
 		uint256 defenderId,
 		uint256 defenderRank,
 		uint8 rejectCode,
 		uint256 blockNumber);
-		
+
 	event HashUpdated(
-		uint256 cardId, 
+		uint256 cardId,
 		uint256 cardHash);
-		
+
 	event LevelUp(uint256 cardId);
-	
+
 	event CardCreated(address owner, uint256 cardId);
-	
-	
+
+
 	/***********************************************************************************/
 	/* CONST DATA
-	/***********************************************************************************/		
+	/***********************************************************************************/
 	uint32[] expToNextLevelArr = [0,103,103,207,207,207,414,414,414,414,724,724,724,828,828,931,931,1035,1035,1138,1138,1242,1242,1345,1345,1449,1449,1552,1552,1656,1656,1759,1759,1863,1863,1966,1966,2070,2070,2173,2173,2173,2277,2277,2380,2380,2484,2484,2587,2587,2691,2691,2794,2794,2898,2898,3001,3001,3105,3105,3208,3208,3312,3312,3415,3415,3519,3519,3622,3622,3622,3726,3726,3829,3829,3933,3933,4036,4036,4140,4140,4243,4243,4347,4347,4450,4450,4554,4554,4657,4657,4761,4761,4864,4864,4968,4968,5071,5071,5175];
-	
+
 	uint32[] activeWinExp = [10,11,14,19,26,35,46,59,74,91,100,103,108,116,125,135,146,158,171,185,200,215,231,248,265,283,302,321,341,361,382];
-	
-	
+
+
 	/***********************************************************************************/
 	/* DATA VARIABLES
-	/***********************************************************************************/		
+	/***********************************************************************************/
 	//Card structure that holds all information for battle
 	struct Card {
 		uint8 element; // 1 - fire; 2 - water; 3 - wood;    8 - light; 9 - dark;
@@ -225,43 +225,43 @@ contract BattleBase is Ownable {
 
 		//uint8 passiveSkill; //TBC
 	}
-	
+
 	// Mapping from tokenId to Card Struct
 	mapping (uint256 => Card) public cards;
-	
+
 	uint256[] ranking; //stores the token id according to array position starts from 0 (rank 1)
-	
+
 	// Mapping from rank to amount held in that rank (challenge tokens)
 	mapping (uint256 => uint256) public rankTokens;
-	
+
 	uint8 public currentElement = 0; //start with 0 as +1 will become fire
-	
+
 	uint256 public historyId = 0;
-	
+
 	/***********************************************************************************/
 	/* CONFIGURATIONS
 	/***********************************************************************************/
 	/// @dev The address of the HogSmashToken
 	HogSmashToken public hogsmashToken;
-	
+
 	/// @dev The address of the Marketplace
 	Marketplace public marketplace;
-			
+
 	// Challenge fee changes on ranking difference
 	uint256 public challengeFee;
 
 	// Upgrade fee
 	uint256 public upgradeFee;
-	
+
 	// Avatar fee
 	uint256 public avatarFee;
-	
+
 	// Referrer fee in % (x10000)
 	uint256 public referrerFee;
-	
+
 	// Developer Cut in % (x10000)
 	uint256 public developerCut;
-	
+
 	uint256 internal totalDeveloperCut;
 
 	// Price for each card draw (in wei)
@@ -281,39 +281,39 @@ contract BattleBase is Ownable {
 	uint16 public gemSpeedConversion;
 	// 1 Gem to critical rate conversion divided by 100, eg 25 = 0.25
 	uint16 public gemCriticalRateConversion;
-	
+
 	//% to get a gold card, 0 to 100
 	uint8 public goldPercentage;
-	
+
 	//% to get a silver card, 0 to 100
 	uint8 public silverPercentage;
- 	
+
 	//Range of event card number 1-99999999
 	uint32 public eventCardRangeMin;
-	
+
 	//Range of event card number 1-99999999
 	uint32 public eventCardRangeMax;
-	
+
 	// Maximum rounds of battle, cannot exceed 128
 	uint8 public maxBattleRounds; //
-		
+
 	// Record how much tokens are held as rank tokens
 	uint256 internal totalRankTokens;
-	
+
 	// Flag for start fighting
 	bool internal battleStart;
-	
+
 	//Flag for starter pack sale
 	bool internal starterPackOnSale;
-	
+
 	uint256 public starterPackPrice; //price of starter pack
-	
+
 	uint16 public starterPackCardLevel; //card level from starter pack
-	
-	
+
+
 	/***********************************************************************************/
 	/* ADMIN FUNCTIONS FOR SETTING CONFIGS
-	/***********************************************************************************/		
+	/***********************************************************************************/
 	/// @dev Sets the reference to the marketplace.
 	/// @param _address - Address of marketplace.
 	function setMarketplaceAddress(address _address) external onlyOwner {
@@ -324,7 +324,7 @@ contract BattleBase is Ownable {
 		// Set the new contract address
 		marketplace = candidateContract;
 	}
-		
+
 	/**
 	* @dev set upgrade gems for each level up and each 10 level up
 	* @param _upgradeGems upgrade gems for normal levels
@@ -337,7 +337,7 @@ contract BattleBase is Ownable {
 	* @param _goldPercentage percentage to get gold card
 	* @param _silverPercentage percentage to get silver card
 	* @param _eventCardRangeMin event card hash range start (inclusive)
-	* @param _eventCardRangeMax event card hash range end (inclusive)	
+	* @param _eventCardRangeMax event card hash range end (inclusive)
 	* @param _newMaxBattleRounds maximum battle rounds
 	*/
 	function setSettingValues(  uint8 _upgradeGems,
@@ -368,30 +368,30 @@ contract BattleBase is Ownable {
 		eventCardRangeMax = _eventCardRangeMax;
 		maxBattleRounds = _newMaxBattleRounds;
 	}
-	
-	
+
+
 	// @dev function to allow contract owner to change the price (in wei) per card draw
 	function setStarterPack(uint256 _newStarterPackPrice, uint16 _newStarterPackCardLevel) external onlyOwner {
 		require(_newStarterPackCardLevel<=20, "starter pack level cannot exceed 20"); //starter pack level cannot exceed 20
 		starterPackPrice = _newStarterPackPrice;
-		starterPackCardLevel = _newStarterPackCardLevel;		
-	} 	
-	
+		starterPackCardLevel = _newStarterPackCardLevel;
+	}
+
 	// @dev function to allow contract owner to enable/disable starter pack sale
 	function setStarterPackOnSale(bool _newStarterPackOnSale) external onlyOwner {
 		starterPackOnSale = _newStarterPackOnSale;
 	}
-	
+
 	// @dev function to allow contract owner to start/stop the battle
 	function setBattleStart(bool _newBattleStart) external onlyOwner {
 		battleStart = _newBattleStart;
 	}
-	
+
 	// @dev function to allow contract owner to change the price (in wei) per card draw
 	function setCardDrawPrice(uint256 _newCardDrawPrice) external onlyOwner {
 		cardDrawPrice = _newCardDrawPrice;
 	}
-	
+
 	// @dev function to allow contract owner to change the referrer fee (in %, eg 3.75% is 375)
 	function setReferrerFee(uint256 _newReferrerFee) external onlyOwner {
 		referrerFee = _newReferrerFee;
@@ -406,29 +406,29 @@ contract BattleBase is Ownable {
 	function setUpgradeFee(uint256 _newUpgradeFee) external onlyOwner {
 		upgradeFee = _newUpgradeFee;
 	}
-	
+
 	// @dev function to allow contract owner to change the avatar fee (in wei)
 	function setAvatarFee(uint256 _newAvatarFee) external onlyOwner {
 		avatarFee = _newAvatarFee;
 	}
-	
+
 	// @dev function to allow contract owner to change the developer cut (%) divide by 100
 	function setDeveloperCut(uint256 _newDeveloperCut) external onlyOwner {
 		developerCut = _newDeveloperCut;
 	}
-		
+
 	function getTotalDeveloperCut() external view onlyOwner returns (uint256) {
 		return totalDeveloperCut;
 	}
-		
+
 	function getTotalRankTokens() external view returns (uint256) {
 		return totalRankTokens;
 	}
-	
-	
+
+
 	/***********************************************************************************/
 	/* GET SETTINGS FUNCTION
-	/***********************************************************************************/	
+	/***********************************************************************************/
 	/**
 	* @dev get upgrade gems and conversion ratios of each field
 	* @return _upgradeGems upgrade gems for normal levels
@@ -457,7 +457,7 @@ contract BattleBase is Ownable {
 		_gemCriticalRateConversion = uint16(gemCriticalRateConversion);
 		_maxBattleRounds = uint8(maxBattleRounds);
 	}
-		
+
 
 }
 
@@ -493,30 +493,30 @@ contract Battle is BattleBase, Random, Pausable {
 		HogSmashToken candidateContract = HogSmashToken(_tokenAddress);
 		// Set the new contract address
 		hogsmashToken = candidateContract;
-		
+
 		starterPackPrice = 30000000000000000;
 		starterPackCardLevel = 5;
 		starterPackOnSale = true; // start by selling starter pack
-		
+
 		challengeFee = 10000000000000000;
-		
+
 		upgradeFee = 10000000000000000;
-		
+
 		avatarFee = 50000000000000000;
-		
+
 		developerCut = 375;
-		
+
 		referrerFee = 2000;
-		
+
 		cardDrawPrice = 15000000000000000;
- 		
+
 		battleStart = true;
- 		
+
 		paused = false; //default contract paused
-				
+
 		totalDeveloperCut = 0; //init to 0
 	}
-	
+
 	/***********************************************************************************/
 	/* MODIFIER
 	/***********************************************************************************/
@@ -528,8 +528,8 @@ contract Battle is BattleBase, Random, Pausable {
 		require(hogsmashToken.ownerOf(_tokenId) == msg.sender, "must be owner of token");
 		_;
 	}
-		
-	
+
+
 	/***********************************************************************************/
 	/* GAME FUNCTIONS
 	/***********************************************************************************/
@@ -551,11 +551,11 @@ contract Battle is BattleBase, Random, Pausable {
 	uint256 rank
 	) {
 		cardId = _id;
-		
+
 		owner = hogsmashToken.ownerOf(_id);
-		
+
 		Card storage card = cards[_id];
-		
+
 		uint32[] memory tempStats = new uint32[](6);
 
 		element = uint8(card.element);
@@ -573,8 +573,8 @@ contract Battle is BattleBase, Random, Pausable {
 		createdDatetime = uint64(card.createdDatetime);
 		rank = uint256(card.rank);
 	}
-	
-	
+
+
 	/**
 	* @dev External function for querying card Id at rank (zero based)
 	* @param _rank zero based rank of the card
@@ -583,7 +583,7 @@ contract Battle is BattleBase, Random, Pausable {
 	function getCardIdByRank(uint256 _rank) external view returns(uint256 cardId) {
 		return ranking[_rank];
 	}
-	
+
 
 	/**
 	* @dev External function for drafting new card
@@ -591,29 +591,29 @@ contract Battle is BattleBase, Random, Pausable {
 	*/
 	function draftNewCard() external payable whenNotPaused returns (uint256) {
 		require(msg.value == cardDrawPrice, "fee must be equal to draw price"); //make sure the fee is enough for drafting a new card`
-				
+
 		require(address(marketplace) != address(0), "marketplace not set"); //need to set up marketplace before drafting new cards is allowed
-				
+
 		hogsmashToken.setApprovalForAllByContract(msg.sender, marketplace, true); //let marketplace have approval for escrow if the card goes on sale
-		
+
 		totalDeveloperCut = totalDeveloperCut.add(cardDrawPrice);
-		
+
 		return _createCard(msg.sender, 1); //level 1 cards
 	}
-	
+
 	/**
 	* @dev External function for drafting new card
 	* @return uint of cardId
 	*/
 	function draftNewCardWithReferrer(address referrer) external payable whenNotPaused returns (uint256 cardId) {
 		require(msg.value == cardDrawPrice, "fee must be equal to draw price"); //make sure the fee is enough for drafting a new card`
-				
+
 		require(address(marketplace) != address(0), "marketplace not set"); //need to set up marketplace before drafting new cards is allowed
-				
+
 		hogsmashToken.setApprovalForAllByContract(msg.sender, marketplace, true); //let marketplace have approval for escrow if the card goes on sale
-		
+
 		cardId = _createCard(msg.sender, 1); //level 1 cards
-		
+
 		if ((referrer != address(0)) && (referrerFee!=0) && (referrer!=msg.sender) && (hogsmashToken.balanceOf(referrer)>0)) {
 			uint256 referrerCut = msg.value.mul(referrerFee)/10000;
 			require(referrerCut<=msg.value, "referre cut cannot be larger than fee");
@@ -621,9 +621,9 @@ contract Battle is BattleBase, Random, Pausable {
 			totalDeveloperCut = totalDeveloperCut.add(cardDrawPrice.sub(referrerCut));
 		} else {
 			totalDeveloperCut = totalDeveloperCut.add(cardDrawPrice);
-		}		
+		}
 	}
-	
+
 
 	/**
 	* @dev External function for leveling up
@@ -653,18 +653,18 @@ contract Battle is BattleBase, Random, Pausable {
 
 		require(msg.value == upgradeFee, "fee must be equals to upgrade price"); //make sure the fee is enough for upgrade
 
-		Card storage card = cards[_id];		
+		Card storage card = cards[_id];
 		require(card.currentExp==card.expToNextLevel, "exp is not max yet for level up"); //reject if currentexp not maxed out
-		
+
 		require(card.level < 65535, "card level maximum has reached"); //make sure level is not maxed out, although not likely
-		
+
 		require((card.criticalRate + (_criticalRateLevelUp * gemCriticalRateConversion))<=7000, "critical rate max of 70 has reached"); //make sure criticalrate is not upgraded when it reaches 70 to prevent waste
 
 		uint totalInputGems = _attackLevelUp + _defenseLevelUp + _hpLevelUp;
 		totalInputGems += _speedLevelUp + _criticalRateLevelUp + _flexiGemsLevelUp;
-		
+
 		uint16 numOfSpecials = 0;
-				
+
 		//Cater for initial high level cards but have not leveled up before
 		if ((card.level > 1) && (card.attack==1) && (card.defense==1) && (card.hp==3) && (card.speed==1) && (card.criticalRate==25) && (card.flexiGems==1)) {
 			numOfSpecials = (card.level+1)/5; //auto floor to indicate how many Ns for upgradeGemsSpecial; cardlevel +1 is the new level
@@ -672,18 +672,18 @@ contract Battle is BattleBase, Random, Pausable {
 			require(totalInputGems==totalGems, "upgrade gems not used up"); //must use up all gems when upgrade
 		} else {
 			if (((card.level+1)%5)==0) { //special gem every 5 levels
-				require(totalInputGems==upgradeGemsSpecial, "upgrade gems not used up"); //must use up all gems when upgrade	
+				require(totalInputGems==upgradeGemsSpecial, "upgrade gems not used up"); //must use up all gems when upgrade
 				numOfSpecials = 1;
 			} else {
 				require(totalInputGems==upgradeGems, "upgrade gems not used up"); //must use up all gems when upgrade
 			}
 		}
-		
+
 		totalDeveloperCut = totalDeveloperCut.add(upgradeFee);
-		
+
 		//start level up process
 		_upgradeLevel(_id, _attackLevelUp, _defenseLevelUp, _hpLevelUp, _speedLevelUp, _criticalRateLevelUp, _flexiGemsLevelUp, numOfSpecials);
-								
+
 		emit LevelUp(_id);
 	}
 
@@ -711,8 +711,8 @@ contract Battle is BattleBase, Random, Pausable {
 				} else {
 					extraStats[4]+=numOfSpecials;
 				}
-				
-				if (card.cardHash%100 >=90) { //7* cards			
+
+				if (card.cardHash%100 >=90) { //7* cards
 					uint cardTypeInner = cardType%10; //0-9
 					if (cardTypeInner < 2) {
 						extraStats[0]+=numOfSpecials;
@@ -731,7 +731,7 @@ contract Battle is BattleBase, Random, Pausable {
 		card.attack += (_attackLevelUp + extraStats[0]) * gemAttackConversion;
 		card.defense += (_defenseLevelUp + extraStats[1]) * gemDefenseConversion;
 		card.hp += (_hpLevelUp + extraStats[2]) * gemHpConversion;
-		card.speed += (_speedLevelUp + extraStats[3]) * gemSpeedConversion;		
+		card.speed += (_speedLevelUp + extraStats[3]) * gemSpeedConversion;
 		card.criticalRate += uint16(_criticalRateLevelUp * gemCriticalRateConversion);
 		card.flexiGems += _flexiGemsLevelUp + extraStats[4]; // turn Gem into FlexiGem
 		card.level += 1; //level + 1
@@ -751,39 +751,39 @@ contract Battle is BattleBase, Random, Pausable {
 
 	function challenge( uint256 _challengerCardId,
 						uint32[5] _statUp, //0-attack, 1-defense, 2-hp, 3-speed, 4-criticalrate
-						uint256 _defenderCardId,						
+						uint256 _defenderCardId,
 						uint256 _defenderRank,
 						uint16 _defenderLevel) external payable whenNotPaused onlyOwnerOf(_challengerCardId) {
 		require(battleStart != false, "battle has not started"); //make sure the battle has started
 		require(msg.sender != hogsmashToken.ownerOf(_defenderCardId), "cannot challenge own cards"); //make sure user doesn't attack his own cards
-		Card storage challenger = cards[_challengerCardId];		
+		Card storage challenger = cards[_challengerCardId];
 		require((_statUp[0] + _statUp[1] + _statUp[2] + _statUp[3] + _statUp[4])==challenger.flexiGems, "flexi gems not used up"); //flexi points must be exactly used, not more not less
-		
+
 		Card storage defender = cards[_defenderCardId];
-		
+
 		if (defender.rank != _defenderRank) {
 			emit RejectChallenge(_challengerCardId, _defenderCardId, _defenderRank, 1, uint256(block.number));
-			(msg.sender).transfer(msg.value);		
+			(msg.sender).transfer(msg.value);
 			return;
 		}
-		
+
 		if (defender.level != _defenderLevel) {
 			emit RejectChallenge(_challengerCardId, _defenderCardId, _defenderRank, 2, uint256(block.number));
 			(msg.sender).transfer(msg.value);
 			return;
 		}
-		
+
 		uint256 requiredChallengeFee = challengeFee;
 		if (defender.rank <150) { //0-149 rank within 150
 			requiredChallengeFee = requiredChallengeFee.mul(2);
 		}
 		require(msg.value == requiredChallengeFee, "fee must be equals to challenge price"); //challenge fee to challenge defender
-		
+
 		uint256 developerFee = 0;
 		if (msg.value > 0) {
 			developerFee = _calculateFee(msg.value);
 		}
-		
+
 		uint256[] memory stats = new uint256[](14); //challengerattack, challengerdefense, challengerhp, challengerspeed, challengercritical, defendercritical, defenderhp, finalWinner
 
 		stats[0] = challenger.attack + (_statUp[0] * gemAttackConversion);
@@ -824,12 +824,12 @@ contract Battle is BattleBase, Random, Pausable {
 				stats[5] = 8000; //hard cap at 80 critical rate for element advantage
 			}
 		}
-		
+
 		uint256 battleSequence = _simulateBattle(challenger, defender, stats);
-		
-		stats[11] = _transferFees(_challengerCardId, stats, developerFee);	
-		
-		
+
+		stats[11] = _transferFees(_challengerCardId, stats, developerFee);
+
+
 		emit BattleHistory(
 			historyId,
 			uint8(stats[7]),
@@ -838,7 +838,7 @@ contract Battle is BattleBase, Random, Pausable {
 			uint256(block.number),
 			uint256(stats[11])
 		);
-		
+
 		emit BattleHistoryChallenger(
 			historyId,
 			uint256(_challengerCardId),
@@ -851,8 +851,8 @@ contract Battle is BattleBase, Random, Pausable {
 			uint16(stats[4]), //pretty sure trimming down the uint won't affect the number as max is just 80000
 			uint256(stats[9])
 		);
-			
-		emit BattleHistoryDefender(	
+
+		emit BattleHistoryDefender(
 			historyId,
 			uint256(_defenderCardId),
 			uint8(defender.element),
@@ -864,10 +864,10 @@ contract Battle is BattleBase, Random, Pausable {
 			uint16(stats[5]),
 			uint256(stats[10])
 		);
-		
+
 		historyId = historyId.add(1); //add one for next history
 	}
-	
+
 	function _addBattleSequence(uint8 attackType, uint8 rounds, uint256 battleSequence) private pure returns (uint256) {
 		// Assumed rounds 0-based; attackType is 0xB (B:0,1,2,3), i.e. the last 2 bits is the value with other bits zeros
 		uint256 mask = 0x3;
@@ -881,7 +881,7 @@ contract Battle is BattleBase, Random, Pausable {
 
 
 	function _simulateBattle(Card storage challenger, Card storage defender, uint[] memory stats) private returns (uint256 battleSequence) {
-	
+
 		bool continueBattle = true;
 		uint8 currentAttacker = 0; //0 challenger, 1 defender
 		uint256 tempAttackStrength;
@@ -957,7 +957,7 @@ contract Battle is BattleBase, Random, Pausable {
 			}
 			challengerGainExp = activeWinExp[10+levelDiff];
 		}
-		
+
 		if (stats[2] == stats[6]) { //challenger hp = defender hp
 			stats[7] = 2; //draw
 			//No EXP when draw
@@ -1012,44 +1012,44 @@ contract Battle is BattleBase, Random, Pausable {
 				defender.currentExp = defender.expToNextLevel; //cap it at max exp for level up
 			}
 		}
-		
+
 		return battleSequence;
 	}
-	
-	
-	
+
+
+
 	function _transferFees(uint256 _challengerCardId, uint[] stats, uint256 developerFee) private returns (uint256 totalGained) {
-		totalDeveloperCut = totalDeveloperCut.add(developerFee);		
+		totalDeveloperCut = totalDeveloperCut.add(developerFee);
 		uint256 remainFee = msg.value.sub(developerFee); //minus developer fee
 		totalGained = 0;
-		if (stats[7] == 1) { //challenger loses			
-			// put all of challenger fee in rankTokens (minus developerfee of course)			
+		if (stats[7] == 1) { //challenger loses
+			// put all of challenger fee in rankTokens (minus developerfee of course)
 			rankTokens[stats[10]] = rankTokens[stats[10]].add(remainFee);
 			totalRankTokens = totalRankTokens.add(remainFee);
 		} else { //draw or challenger wins
 			address challengerAddress = hogsmashToken.ownerOf(_challengerCardId); //get address of card owner
-			if (stats[7] == 0) { //challenger wins				
-				if (stats[9] > stats[10]) { //challenging a higher ranking defender					
+			if (stats[7] == 0) { //challenger wins
+				if (stats[9] > stats[10]) { //challenging a higher ranking defender
 					//1. get tokens from defender rank if defender rank is higher
 					if (rankTokens[stats[10]] > 0) {
 						totalGained = totalGained.add(rankTokens[stats[10]]);
 						totalRankTokens = totalRankTokens.sub(rankTokens[stats[10]]);
-						rankTokens[stats[10]] = 0;						
+						rankTokens[stats[10]] = 0;
 					}
 					//2. get self rank tokens if moved to higher rank
 					if (rankTokens[stats[9]] > 0) {
 						totalGained = totalGained.add(rankTokens[stats[9]]);
 						totalRankTokens = totalRankTokens.sub(rankTokens[stats[9]]);
 						rankTokens[stats[9]] = 0;
-					}					
-				} else { //challenging a lower ranking defender					
+					}
+				} else { //challenging a lower ranking defender
 					if (stats[9]<50) { //rank 1-50 gets to get self rank tokens and lower rank (within 150) tokens if win
 						if ((stats[10] < 150) && (rankTokens[stats[10]] > 0)) { // can get defender rank tokens if defender rank within top 150 (0-149)
 							totalGained = totalGained.add(rankTokens[stats[10]]);
 							totalRankTokens = totalRankTokens.sub(rankTokens[stats[10]]);
 							rankTokens[stats[10]] = 0;
 						}
-						
+
 						if ((stats[10] < 150) && (rankTokens[stats[9]] > 0)) { //can get self rank tokens if defender rank within top 150
 							totalGained = totalGained.add(rankTokens[stats[9]]);
 							totalRankTokens = totalRankTokens.sub(rankTokens[stats[9]]);
@@ -1057,13 +1057,13 @@ contract Battle is BattleBase, Random, Pausable {
 						}
 					}
 				}
-				challengerAddress.transfer(totalGained.add(remainFee)); //give back challenge fee untouched + total gained				
+				challengerAddress.transfer(totalGained.add(remainFee)); //give back challenge fee untouched + total gained
 			} else { //draw
 				challengerAddress.transfer(remainFee); //give back challenge fee untouched
-			} 
-		}			
+			}
+		}
 	}
-	
+
 
 	function _rollCriticalDice() private returns (uint16 result){
 		return uint16((getRandom() % 10000) + 1); //get 1 to 10000
@@ -1079,20 +1079,20 @@ contract Battle is BattleBase, Random, Pausable {
 		}
 	}
 
-	
+
 	/// @dev function to buy starter package, with card and tokens directly from contract
 	function buyStarterPack() external payable whenNotPaused returns (uint256){
 		require(starterPackOnSale==true, "starter pack is not on sale");
 		require(msg.value==starterPackPrice, "fee must be equals to starter pack price");
 		require(address(marketplace) != address(0), "marketplace not set"); //need to set up marketplace before drafting new cards is allowed
-		
+
 		totalDeveloperCut = totalDeveloperCut.add(starterPackPrice);
-				
+
 		hogsmashToken.setApprovalForAllByContract(msg.sender, marketplace, true); //let marketplace have approval for escrow if the card goes on sale
-		
+
 		return _createCard(msg.sender, starterPackCardLevel); //level n cards
 	}
-		
+
 	/**
 	* @dev Create card function
 	* @param _to The address that will own the minted card
@@ -1113,14 +1113,14 @@ contract Battle is BattleBase, Random, Pausable {
 		if (tempExpLevel > expToNextLevelArr.length) {
 			tempExpLevel = expToNextLevelArr.length; //cap it at max level exp
 		}
-		
+
 		uint32 tempCurrentExp = 0;
 		if (_initLevel>1) { //let exp max out so that user can level up the card according to preference
 			tempCurrentExp = expToNextLevelArr[tempExpLevel];
 		}
-		
+
 		uint256 tokenId = hogsmashToken.mint(_to);
-		
+
 		// use memory as this is a temporary variable, cheaper and will not be stored since cards store all of them
 		Card memory _card = Card({
 			element: currentElement, // 1 - fire; 2 - water; 3 - wood;    8 - light; 9 - dark;
@@ -1137,24 +1137,24 @@ contract Battle is BattleBase, Random, Pausable {
 			createdDatetime :uint64(now),
 			rank: tokenId // rank
 		});
-		
+
 		cards[tokenId] = _card;
 		ranking.push(tokenId); //push to ranking mapping
-		
+
 		emit CardCreated(msg.sender, tokenId);
 
 		return tokenId;
 	}
-	
+
 	function generateHash() private returns (uint256 hash){
-		hash = uint256((getRandom()%1000000000000)/10000000000);		
+		hash = uint256((getRandom()%1000000000000)/10000000000);
 		hash = hash.mul(10000000000);
-		
+
 		uint256 tempHash = ((getRandom()%(eventCardRangeMax-eventCardRangeMin+1))+eventCardRangeMin)*100;
 		hash = hash.add(tempHash);
-		
+
 		tempHash = getRandom()%100;
-		
+
 		if (tempHash < goldPercentage) {
 			hash = hash.add(90);
 		} else if (tempHash < (goldPercentage+silverPercentage)) {
@@ -1163,31 +1163,31 @@ contract Battle is BattleBase, Random, Pausable {
 			hash = hash.add(50);
 		}
 	}
-	
-	/// @dev function to update avatar hash 
+
+	/// @dev function to update avatar hash
 	function updateAvatar(uint256 _cardId, uint256 avatarHash) external payable whenNotPaused onlyOwnerOf(_cardId) {
 		require(msg.value==avatarFee, "fee must be equals to avatar price");
-				
+
 		Card storage card = cards[_cardId];
-		
+
 		uint256 tempHash = card.cardHash%1000000000000; //retain hash fixed section
-		
+
 		card.cardHash = tempHash.add(avatarHash.mul(1000000000000));
-		
-		emit HashUpdated(_cardId, card.cardHash);		
+
+		emit HashUpdated(_cardId, card.cardHash);
 	}
-		
-	
+
+
 	/// @dev Compute developer's fee
 	/// @param _challengeFee - transaction fee
 	function _calculateFee(uint256 _challengeFee) internal view returns (uint256) {
 		return developerCut.mul(_challengeFee/10000);
 	}
-	
-	
+
+
 	/***********************************************************************************/
 	/* ADMIN FUNCTIONS
-	/***********************************************************************************/	
+	/***********************************************************************************/
 	/**
 	* @dev External function for drafting new card for Owner, for promotional purposes
 	* @param _cardLevel initial level of card created, must be less or equals to 20
@@ -1196,12 +1196,12 @@ contract Battle is BattleBase, Random, Pausable {
 	function generateInitialCard(uint16 _cardLevel) external whenNotPaused onlyOwner returns (uint256) {
 		require(address(marketplace) != address(0), "marketplace not set"); //need to set up marketplace before drafting new cards is allowed
 		require(_cardLevel<=20, "maximum level cannot exceed 20"); //set maximum level at 20 that Owner can generate
-		
+
 		hogsmashToken.setApprovalForAllByContract(msg.sender, marketplace, true); //let marketplace have approval for escrow if the card goes on sale
 
 		return _createCard(msg.sender, _cardLevel); //level 1 cards
 	}
-	
+
 	/// @dev Function for contract owner to put tokens into ranks for events
 	function distributeTokensToRank(uint[] ranks, uint256 tokensPerRank) external payable onlyOwner {
 		require(msg.value == (tokensPerRank*ranks.length), "tokens must be enough to distribute among ranks");
@@ -1211,8 +1211,8 @@ contract Battle is BattleBase, Random, Pausable {
 			totalRankTokens = totalRankTokens.add(tokensPerRank);
 		}
 	}
-	
-	
+
+
 	// @dev Allows contract owner to withdraw the all developer cut from the contract
 	function withdrawBalance() external onlyOwner {
 		address thisAddress = this;
@@ -1240,4 +1240,15 @@ interface HogSmashToken {
 	function mint(address _to) external returns (uint256 _tokenId);
 	function setTokenURI(uint256 _tokenId, string _uri) external;
 	function setApprovalForAllByContract(address _sender, address _to, bool _approved) external;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

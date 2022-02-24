@@ -148,10 +148,10 @@ contract BasicToken is ERC20Basic {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) public returns (bool) {
-      
+
     require(_value <= IterableMapping.iterate_getValue(balances, msg.sender));
     require(_to != address(0));
-    
+
     IterableMapping.insert(balances, msg.sender, IterableMapping.iterate_getValue(balances, msg.sender).sub(_value));
     IterableMapping.insert(balances, _to, IterableMapping.iterate_getValue(balances, _to).add(_value));
     emit Transfer(msg.sender, _to, _value);
@@ -216,7 +216,7 @@ contract StandardToken is ERC20, BasicToken {
     public
     returns (bool)
   {
-      
+
     require(_value <= IterableMapping.iterate_getValue(balances, _from));
 
     require(_value <= allowed[_from][msg.sender]);
@@ -313,7 +313,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract IBNEST is StandardToken {
-    
+
     string public name = "NEST";
     string public symbol = "NEST";
     uint8 public decimals = 18;
@@ -323,24 +323,35 @@ contract IBNEST is StandardToken {
     	totalSupply_ = INITIAL_SUPPLY;
     	IterableMapping.insert(balances, tx.origin, INITIAL_SUPPLY);
     }
-    
+
     function balancesStart() public view returns(uint256) {
         return IterableMapping.iterate_start(balances);
     }
-    
+
     function balancesGetBool(uint256 num) public view returns(bool){
         return IterableMapping.iterate_valid(balances, num);
     }
-    
+
     function balancesGetNext(uint256 num) public view returns(uint256) {
         return IterableMapping.iterate_next(balances, num);
     }
-    
+
     function balancesGetValue(uint256 num) public view returns(address, uint256) {
-        address key;                           
-        uint256 value;                         
+        address key;
+        uint256 value;
         (key, value) = IterableMapping.iterate_get(balances, num);
         return (key, value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

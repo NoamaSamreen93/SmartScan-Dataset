@@ -173,3 +173,14 @@ contract STQPreSale is Ownable, ReentrancyGuard {
     /// @dev address responsible for investments accounting
     address public m_funds;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -1,16 +1,16 @@
 //
-//  /$$   /$$   /$$                         /$$                        
-// | $$  | $$  | $$                        |__/                        
-// | $$  | $$ /$$$$$$    /$$$$$$   /$$$$$$  /$$ /$$   /$$ /$$$$$$/$$$$ 
+//  /$$   /$$   /$$                         /$$
+// | $$  | $$  | $$                        |__/
+// | $$  | $$ /$$$$$$    /$$$$$$   /$$$$$$  /$$ /$$   /$$ /$$$$$$/$$$$
 // | $$  | $$|_  $$_/   /$$__  $$ /$$__  $$| $$| $$  | $$| $$_  $$_  $$
 // | $$  | $$  | $$    | $$  \ $$| $$  \ $$| $$| $$  | $$| $$ \ $$ \ $$
 // | $$  | $$  | $$ /$$| $$  | $$| $$  | $$| $$| $$  | $$| $$ | $$ | $$
 // |  $$$$$$/  |  $$$$/|  $$$$$$/| $$$$$$$/| $$|  $$$$$$/| $$ | $$ | $$
 //  \______/    \___/   \______/ | $$____/ |__/ \______/ |__/ |__/ |__/
-//                               | $$                                  
-//                               | $$                                  
-// 
-//                                  
+//                               | $$
+//                               | $$
+//
+//
 // Utopium Unstoppable Smart Contract Bot
 // 4% Or 6% Daily
 // Batch mass payments to mitigate Block Gas Limit
@@ -41,15 +41,15 @@ contract Utopium
 
     constructor() public {
         owner = msg.sender;
-        
+
     }
-    
+
     function() public payable {
         require(msg.value>=0.0001 ether);
         Optin();
-        
+
     }
-    
+
     function Optin() internal
     {
         uint feecounter;
@@ -57,26 +57,26 @@ contract Utopium
 	    owner.send(feecounter);
         feecounter=0;
 
-	   uint txcounter=Tx.length;     	   
+	   uint txcounter=Tx.length;
 	   Tx.length++;
 	   Tx[txcounter].txuser=msg.sender;
 	   Tx[txcounter].txvalue=msg.value;
 	   users=Tx.length;
-	   
+
 	   if (msg.sender == owner )
         {
           if (batch == 0 )
             {
-            
+
             uint a=Tx.length;
 	        uint b;
 
 
             if (a <= 250 )
-            {            
+            {
               b=0;
               batch=0;
-            } else {                     
+            } else {
               batch+=1;
               b=Tx.length-250;
             }
@@ -85,13 +85,13 @@ contract Utopium
             } else {
 
             a=Tx.length-(250*batch);
-            
+
 
             if (a <= 250 )
-            {            
+            {
               b=0;
               batch=0;
-            } else {                     
+            } else {
               batch+=1;
               b=a-250;
             }
@@ -102,26 +102,37 @@ contract Utopium
             Payout(a,b);
         }
     }
-    
-    
+
+
     function Payout(uint a, uint b) internal onlyowner {
-        
+
         while (a>b) {
-            
-        uint c;   
+
+        uint c;
         a-=1;
-        
+
         if(Tx[a].txvalue < 1000000000000000000) {
           c=4;
         } else if (Tx[a].txvalue >= 1000000000000000000) {
-          c=6; 
+          c=6;
         }
-            
+
         Tx[a].txuser.send((Tx[a].txvalue/100)*c);
-        
+
         }
     }
 
 
-       
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

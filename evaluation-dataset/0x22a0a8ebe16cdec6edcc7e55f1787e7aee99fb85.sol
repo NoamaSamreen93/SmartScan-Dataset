@@ -1,15 +1,15 @@
 pragma solidity ^0.4.25;
 
 //
-//   ____                                      ______                        __      
-//  /\  _`\                                   /\__  _\                      /\ \__   
-//  \ \,\L\_\  __  __  _____      __   _ __   \/_/\ \/ _ __   __  __    ____\ \ ,_\  
-//   \/_\__ \ /\ \/\ \/\ '__`\  /'__`\/\`'__\    \ \ \/\`'__\/\ \/\ \  /',__\\ \ \/  
-//     /\ \L\ \ \ \_\ \ \ \L\ \/\  __/\ \ \/      \ \ \ \ \/ \ \ \_\ \/\__, `\\ \ \_ 
+//   ____                                      ______                        __
+//  /\  _`\                                   /\__  _\                      /\ \__
+//  \ \,\L\_\  __  __  _____      __   _ __   \/_/\ \/ _ __   __  __    ____\ \ ,_\
+//   \/_\__ \ /\ \/\ \/\ '__`\  /'__`\/\`'__\    \ \ \/\`'__\/\ \/\ \  /',__\\ \ \/
+//     /\ \L\ \ \ \_\ \ \ \L\ \/\  __/\ \ \/      \ \ \ \ \/ \ \ \_\ \/\__, `\\ \ \_
 //     \ `\____\ \____/\ \ ,__/\ \____\\ \_\       \ \_\ \_\  \ \____/\/\____/ \ \__\
 //      \/_____/\/___/  \ \ \/  \/____/ \/_/        \/_/\/_/   \/___/  \/___/   \/__/
-//                       \ \_\               
-//                        \/_/                                                        
+//                       \ \_\
+//                        \/_/
 //
 //  ETHEREUM PSEUDO-INVESTMENT SMART CONTRACT
 //
@@ -67,7 +67,7 @@ contract SuperTrust {
 	uint256 public investorCount;
 	uint256 public avgMinedPerDay;
 	uint256 public collectedFee = 0;
-	bool public lastRound = false; 
+	bool public lastRound = false;
     // Hide some data from public access to prevent manipulations
 	mapping(uint256 => mapping(address => Investor)) private investors;
 	mapping(uint256 => mapping(address => address)) private referrals;
@@ -257,7 +257,7 @@ contract SuperTrust {
 			uint256 dailyIncome = (deposit * investorGain) / 100;
 			uint256 divsAmount = (dailyIncome * minedBlocks) / avgMinedPerDay;
 			collectedFee += (divsAmount * payoutFee) / 100;
-			payoutBalanceCheck(msg.sender, divsAmount);	
+			payoutBalanceCheck(msg.sender, divsAmount);
 		}
 		else if (msg.value != 0) {
 			emit LogNewInvestor(msg.sender, ++investorCount);
@@ -317,5 +317,16 @@ contract SuperTrust {
 
 	function () external payable {
 		regularPayment();
-	} 
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

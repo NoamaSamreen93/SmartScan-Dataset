@@ -52,14 +52,14 @@ contract Owned {
 contract DoubleOrNothing {
     // maxWagerWei is the maximum wager in Wei.
     uint256 public maxWagerWei;
-    
+
     // waitTime is the number of blocks before payout is available.
     uint public waitTimeBlocks;
-    
+
     // payoutOdds is the value / 10000 that a payee will win a wager.
     // eg. payoutOdds of 4950 implies a 49.5% chance of winning.
     uint public payoutOdds;
-    
+
     // Wager represents one wager.
     struct Wager {
         address sender;
@@ -67,17 +67,17 @@ contract DoubleOrNothing {
         uint256 creationBlockNumber;
         bool active;
     }
-    
+
     // wagers contains all current outstanding wagers.
     // TODO: Support multiple Wagers per address.
     mapping (address => Wager) wagers;
-    
+
     function makeWager() payable public;
     function payout() public;
 }
 
 contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
-    
+
     // Initialize state by assigning the owner to the contract deployer.
     function DoubleOrNothingImpl() {
         owner = msg.sender;
@@ -85,32 +85,32 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
         waitTimeBlocks = 2;
         payoutOdds = 4950;
     }
-    
+
     // Allow the owner to set maxWagerWei.
     function setMaxWagerWei(uint256 maxWager) public onlyOwner {
         maxWagerWei = maxWager;
     }
-    
+
     // Allow the owner to set waitTimeBlocks.
     function setWaitTimeBlocks(uint waitTime) public onlyOwner {
         waitTimeBlocks = waitTime;
     }
-    
+
     // Allow the owner to set payoutOdds.
     function setPayoutOdds(uint odds) public onlyOwner {
         payoutOdds = odds;
     }
-    
+
     // Allow the owner to cash out the holdings of this contract.
     function withdraw(address recipient, uint256 balance) public onlyOwner {
         recipient.transfer(balance);
     }
-    
+
     // Allow the owner to payout outstanding wagers on others' behalf.
     function ownerPayout(address wager_owner) public onlyOwner {
         _payout(wager_owner);
     }
-    
+
     // Assume that simple transactions are trying to make a wager, unless it is
     // from the owner.
     function () payable public {
@@ -118,7 +118,7 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
             makeWager();
         }
     }
-    
+
     // Make a wager.
     function makeWager() payable public {
         if (msg.value == 0 || msg.value > maxWagerWei) throw;
@@ -133,7 +133,7 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
             active: true,
         });
     }
-    
+
     // View your wager.
     function getMyWager() constant public returns (
         uint256 wagerWei,
@@ -141,7 +141,7 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
         bool active) {
         return getWager(msg.sender);
     }
-    
+
     // View the wager for a given address.
     function getWager(address wager_owner) constant public returns (
         uint256 wagerWei,
@@ -150,12 +150,12 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
         Wager thisWager = wagers[wager_owner];
         return (thisWager.wagerWei, thisWager.creationBlockNumber, thisWager.active);
     }
-    
+
     // Payout any wagers associated with the sending address.
     function payout() public {
         _payout(msg.sender);
     }
-    
+
     // Internal implementation of payout().
     function _payout(address wager_owner) internal {
         if (!wagers[wager_owner].active) {
@@ -179,4 +179,20 @@ contract DoubleOrNothingImpl is DoubleOrNothing, Owned, Random, SafeMath {
             }
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

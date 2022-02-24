@@ -1,6 +1,6 @@
 pragma solidity ^0.4.14;
 
-/* ©CoCoCoin 
+/* ©CoCoCoin
 */
 
 library SafeMath {
@@ -73,11 +73,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -125,13 +125,24 @@ contract CoCoCoin is StandardToken, Ownable {
   string public constant symbol = "CoCo";
   uint public constant decimals = 4;
   uint256 public initialSupply;
-    
+
   // Constructor
-  function CoCoCoin () { 
+  function CoCoCoin () {
      totalSupply = 88000000 * 10 ** decimals;
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -163,14 +163,14 @@ library Bytes {
     function extractAddress(bytes data, uint offset)
         internal
         pure
-        returns (address m) 
+        returns (address m)
     {
         require(offset >= 0 && offset + 20 <= data.length, "offset value should be in the correct range");
 
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             m := and(
-                mload(add(data, add(20, offset))), 
+                mload(add(data, add(20, offset))),
                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             )
         }
@@ -223,11 +223,11 @@ library Bytes {
      * @param size string size to extract
      * @param _offset position of the first byte of the string in bytes
      * @return string
-     */ 
-    function extractString(bytes data, uint8 size, uint _offset) 
-        internal 
-        pure 
-        returns (string) 
+     */
+    function extractString(bytes data, uint8 size, uint _offset)
+        internal
+        pure
+        returns (string)
     {
         bytes memory bytesString = new bytes(size);
         for (uint j = 0; j < size; j++) {
@@ -267,7 +267,7 @@ library Signature {
      * @param signature ECDSA signature containing v, r and s as bytes
      *
      * @return Validity of order signature.
-     */ 
+     */
     function checkRequestSignature(
         bytes       requestData,
         address[]   payeesPaymentAddress,
@@ -315,7 +315,7 @@ library Signature {
      * @param signature ECDSA signature containing v, r and s as bytes
      *
      * @return Validity of order signature.
-     */ 
+     */
     function checkBtcRequestSignature(
         bytes       requestData,
         bytes       payeesPaymentAddress,
@@ -342,7 +342,7 @@ library Signature {
             s
         );
     }
-    
+
     /**
      * @notice Calculates the Keccak-256 hash of a BTC request with specified parameters.
      *
@@ -396,7 +396,7 @@ library Signature {
             )
         );
     }
-    
+
     /**
      * @notice Verifies that a hash signature is valid. 0x style.
      * @param signer address of signer.
@@ -534,8 +534,8 @@ contract FeeCollector is Ownable {
     /**
      * @param _requestBurnerContract Address of the contract where to send the ether.
      * This burner contract will have a function that can be called by anyone and will exchange ether to req via Kyber and burn the REQ
-     */  
-    constructor(address _requestBurnerContract) 
+     */
+    constructor(address _requestBurnerContract)
         public
     {
         requestBurnerContract = _requestBurnerContract;
@@ -546,7 +546,7 @@ contract FeeCollector is Ownable {
      * @dev if the _rateFeesDenominator is 0, it will be treated as 1. (in other words, the computation of the fees will not use it)
      * @param _rateFeesNumerator        numerator rate
      * @param _rateFeesDenominator      denominator rate
-     */  
+     */
     function setRateFees(uint256 _rateFeesNumerator, uint256 _rateFeesDenominator)
         external
         onlyOwner
@@ -559,8 +559,8 @@ contract FeeCollector is Ownable {
     /**
      * @notice Sets the maximum fees in wei.
      * @param _newMaxFees new max
-     */  
-    function setMaxCollectable(uint256 _newMaxFees) 
+     */
+    function setMaxCollectable(uint256 _newMaxFees)
         external
         onlyOwner
     {
@@ -571,8 +571,8 @@ contract FeeCollector is Ownable {
     /**
      * @notice Set the request burner address.
      * @param _requestBurnerContract address of the contract that will burn req token (probably through Kyber)
-     */  
-    function setRequestBurnerContract(address _requestBurnerContract) 
+     */
+    function setRequestBurnerContract(address _requestBurnerContract)
         external
         onlyOwner
     {
@@ -583,7 +583,7 @@ contract FeeCollector is Ownable {
      * @notice Computes the fees.
      * @param _expectedAmount amount expected for the request
      * @return the expected amount of fees in wei
-     */  
+     */
     function collectEstimation(int256 _expectedAmount)
         public
         view
@@ -605,7 +605,7 @@ contract FeeCollector is Ownable {
     /**
      * @notice Sends fees to the request burning address.
      * @param _amount amount to send to the burning address
-     */  
+     */
     function collectForREQBurning(uint256 _amount)
         internal
     {
@@ -689,7 +689,7 @@ contract Administrable is Pausable {
     function getStatusContract(address _contractAddress)
         external
         view
-        returns(uint8) 
+        returns(uint8)
     {
         return trustedCurrencyContracts[_contractAddress];
     }
@@ -749,7 +749,7 @@ contract RequestCore is Administrable {
         // ID address of the payee
         address addr;
 
-        // amount expected for the payee. 
+        // amount expected for the payee.
         // Not uint for evolution (may need negative amounts one day), and simpler operations
         int256 expectedAmount;
 
@@ -760,8 +760,8 @@ contract RequestCore is Administrable {
     // Count of request in the mapping. A maximum of 2^96 requests can be created per Core contract.
     // Integer, incremented for each request of a Core contract, starting from 0
     // RequestId (256bits) = contract address (160bits) + numRequest
-    uint96 public numRequests; 
-    
+    uint96 public numRequests;
+
     // Mapping of all the Requests. The key is the request ID.
     // not anymore public to avoid "UnimplementedFeatureError: Only in-memory reference type can be stored."
     // https://github.com/ethereum/solidity/issues/3577
@@ -772,7 +772,7 @@ contract RequestCore is Administrable {
     mapping(bytes32 => Payee[256]) public subPayees;
 
     /*
-     *  Events 
+     *  Events
      */
     event Created(bytes32 indexed requestId, address indexed payee, address indexed payer, address creator, string data);
     event Accepted(bytes32 indexed requestId);
@@ -780,7 +780,7 @@ contract RequestCore is Administrable {
 
     // Event for Payee & subPayees
     // Separated from the Created Event to allow a 4th indexed parameter (subpayees)
-    event NewSubPayee(bytes32 indexed requestId, address indexed payee); 
+    event NewSubPayee(bytes32 indexed requestId, address indexed payee);
     event UpdateExpectedAmount(bytes32 indexed requestId, uint8 payeeIndex, int256 deltaAmount);
     event UpdateBalance(bytes32 indexed requestId, uint8 payeeIndex, int256 deltaAmount);
 
@@ -803,8 +803,8 @@ contract RequestCore is Administrable {
         address     _payer,
         string      _data)
         external
-        whenNotPaused 
-        returns (bytes32 requestId) 
+        whenNotPaused
+        returns (bytes32 requestId)
     {
         // creator must not be null
         require(_creator != 0, "creator should not be 0"); // not as modifier to lighten the stack
@@ -842,7 +842,7 @@ contract RequestCore is Administrable {
             _creator,
             _data
         );
-        
+
         // Store and declare the sub payees (needed in internal function to avoid "stack too deep")
         initSubPayees(requestId, _payees, _expectedAmounts);
 
@@ -866,12 +866,12 @@ contract RequestCore is Administrable {
             ]
             uint8(data_string_size)
             size(data)
-     * @return Returns the id of the request 
-     */ 
-    function createRequestFromBytes(bytes _data) 
+     * @return Returns the id of the request
+     */
+    function createRequestFromBytes(bytes _data)
         external
-        whenNotPaused 
-        returns (bytes32 requestId) 
+        whenNotPaused
+        returns (bytes32 requestId)
     {
         // call must come from a trusted contract
         require(isTrustedContract(msg.sender), "caller should be a trusted contract"); // not as modifier to lighten the stack
@@ -883,7 +883,7 @@ contract RequestCore is Administrable {
 
         // creator must not be null
         require(creator!=0, "creator should not be 0");
-        
+
         // extract the number of payees
         uint8 payeesCount = uint8(_data[40]);
 
@@ -945,12 +945,12 @@ contract RequestCore is Administrable {
      * @notice Function used by currency contracts to accept a request in the Core.
      * @dev callable only by the currency contract of the request
      * @param _requestId Request id
-     */ 
-    function accept(bytes32 _requestId) 
+     */
+    function accept(bytes32 _requestId)
         external
     {
         Request storage r = requests[_requestId];
-        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request"); 
+        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request");
         r.state = State.Accepted;
         emit Accepted(_requestId);
     }
@@ -959,15 +959,15 @@ contract RequestCore is Administrable {
      * @notice Function used by currency contracts to cancel a request in the Core. Several reasons can lead to cancel a request, see request life cycle for more info.
      * @dev callable only by the currency contract of the request.
      * @param _requestId Request id
-     */ 
+     */
     function cancel(bytes32 _requestId)
         external
     {
         Request storage r = requests[_requestId];
-        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request"); 
+        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request");
         r.state = State.Canceled;
         emit Canceled(_requestId);
-    }   
+    }
 
     /**
      * @notice Function used to update the balance.
@@ -975,12 +975,12 @@ contract RequestCore is Administrable {
      * @param _requestId Request id
      * @param _payeeIndex index of the payee (0 = main payee)
      * @param _deltaAmount modifier amount
-     */ 
+     */
     function updateBalance(bytes32 _requestId, uint8 _payeeIndex, int256 _deltaAmount)
         external
-    {   
+    {
         Request storage r = requests[_requestId];
-        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request"); 
+        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request");
 
         if ( _payeeIndex == 0 ) {
             // modify the main payee
@@ -999,16 +999,16 @@ contract RequestCore is Administrable {
      * @param _requestId Request id
      * @param _payeeIndex index of the payee (0 = main payee)
      * @param _deltaAmount modifier amount
-     */ 
+     */
     function updateExpectedAmount(bytes32 _requestId, uint8 _payeeIndex, int256 _deltaAmount)
         external
-    {   
+    {
         Request storage r = requests[_requestId];
-        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request");  
+        require(r.currencyContract == msg.sender, "caller should be the currency contract of the request");
 
         if ( _payeeIndex == 0 ) {
             // modify the main payee
-            r.payee.expectedAmount = r.payee.expectedAmount.add(_deltaAmount);    
+            r.payee.expectedAmount = r.payee.expectedAmount.add(_deltaAmount);
         } else {
             // modify the sub payee
             Payee storage sp = subPayees[_requestId][_payeeIndex-1];
@@ -1021,8 +1021,8 @@ contract RequestCore is Administrable {
      * @notice Gets a request.
      * @param _requestId Request id
      * @return request as a tuple : (address payer, address currencyContract, State state, address payeeAddr, int256 payeeExpectedAmount, int256 payeeBalance)
-     */ 
-    function getRequest(bytes32 _requestId) 
+     */
+    function getRequest(bytes32 _requestId)
         external
         view
         returns(address payer, address currencyContract, State state, address payeeAddr, int256 payeeExpectedAmount, int256 payeeBalance)
@@ -1043,7 +1043,7 @@ contract RequestCore is Administrable {
      * @param _requestId Request id
      * @param _payeeIndex payee index (0 = main payee)
      * @return payee address
-     */ 
+     */
     function getPayeeAddress(bytes32 _requestId, uint8 _payeeIndex)
         public
         view
@@ -1060,7 +1060,7 @@ contract RequestCore is Administrable {
      * @notice Gets payer of a request.
      * @param _requestId Request id
      * @return payer address
-     */ 
+     */
     function getPayer(bytes32 _requestId)
         public
         view
@@ -1074,7 +1074,7 @@ contract RequestCore is Administrable {
      * @param _requestId Request id
      * @param _payeeIndex payee index (0 = main payee)
      * @return amount expected
-     */     
+     */
     function getPayeeExpectedAmount(bytes32 _requestId, uint8 _payeeIndex)
         public
         view
@@ -1091,7 +1091,7 @@ contract RequestCore is Administrable {
      * @notice Gets number of subPayees for a request.
      * @param _requestId Request id
      * @return number of subPayees
-     */     
+     */
     function getSubPayeesCount(bytes32 _requestId)
         public
         view
@@ -1120,14 +1120,14 @@ contract RequestCore is Administrable {
      * @param _requestId Request id
      * @param _payeeIndex payee index (0 = main payee)
      * @return balance
-     */     
+     */
     function getPayeeBalance(bytes32 _requestId, uint8 _payeeIndex)
         public
         view
         returns(int256)
     {
         if (_payeeIndex == 0) {
-            return requests[_requestId].payee.balance;    
+            return requests[_requestId].payee.balance;
         } else {
             return subPayees[_requestId][_payeeIndex-1].balance;
         }
@@ -1137,7 +1137,7 @@ contract RequestCore is Administrable {
      * @notice Gets balance total of a request.
      * @param _requestId Request id
      * @return balance
-     */     
+     */
     function getBalance(bytes32 _requestId)
         public
         view
@@ -1156,7 +1156,7 @@ contract RequestCore is Administrable {
      * @notice Checks if all the payees balances are null.
      * @param _requestId Request id
      * @return true if all the payees balances are equals to 0
-     */     
+     */
     function areAllBalanceNull(bytes32 _requestId)
         public
         view
@@ -1175,7 +1175,7 @@ contract RequestCore is Administrable {
      * @notice Gets total expectedAmount of a request.
      * @param _requestId Request id
      * @return balance
-     */     
+     */
     function getExpectedAmount(bytes32 _requestId)
         public
         view
@@ -1194,7 +1194,7 @@ contract RequestCore is Administrable {
      * @notice Gets state of a request.
      * @param _requestId Request id
      * @return state
-     */ 
+     */
     function getState(bytes32 _requestId)
         public
         view
@@ -1253,7 +1253,7 @@ contract RequestCore is Administrable {
      */
     function emergencyERC20Drain(ERC20 token, uint amount )
         public
-        onlyOwner 
+        onlyOwner
     {
         token.transfer(owner, amount);
     }
@@ -1273,22 +1273,22 @@ contract RequestCore is Administrable {
 
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            m := and( mload(add(_data, add(20, offset))), 
+            m := and( mload(add(_data, add(20, offset))),
                       0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         }
     }
-    
+
     /**
      * @dev Internal: Init payees for a request (needed to avoid 'stack too deep' in createRequest()).
      * @param _requestId Request id
      * @param _payees array of payees address
      * @param _expectedAmounts array of payees initial expected amounts
-     */ 
+     */
     function initSubPayees(bytes32 _requestId, address[] _payees, int256[] _expectedAmounts)
         internal
     {
         require(_payees.length == _expectedAmounts.length, "payee length should equal expected amount length");
-     
+
         for (uint8 i = 1; i < _payees.length; i = i.add(1)) {
             // payees address cannot be 0x0
             require(_payees[i] != 0, "payee should not be 0");
@@ -1303,11 +1303,11 @@ contract RequestCore is Administrable {
      * @param size string size to extract
      * @param _offset position of the first byte of the string in bytes
      * @return string
-     */ 
-    function extractString(bytes data, uint8 size, uint _offset) 
-        internal 
-        pure 
-        returns (string) 
+     */
+    function extractString(bytes data, uint8 size, uint _offset)
+        internal
+        pure
+        returns (string)
     {
         bytes memory bytesString = new bytes(size);
         for (uint j = 0; j < size; j++) {
@@ -1318,8 +1318,8 @@ contract RequestCore is Administrable {
 
     /**
      * @notice Generates a new unique requestId.
-     * @return a bytes32 requestId 
-     */ 
+     * @return a bytes32 requestId
+     */
     function generateRequestId()
         internal
         returns (bytes32)
@@ -1362,7 +1362,7 @@ contract CurrencyContract is Pausable, FeeCollector {
     /**
      * @param _requestCoreAddress Request Core address
      */
-    constructor(address _requestCoreAddress, address _addressBurner) 
+    constructor(address _requestCoreAddress, address _addressBurner)
         FeeCollector(_addressBurner)
         public
     {
@@ -1441,7 +1441,7 @@ contract CurrencyContract is Pausable, FeeCollector {
         );
 
         for (uint8 i = 0; i < _additionalAmounts.length; i = i.add(1)) {
-            // no need to declare a zero as additional 
+            // no need to declare a zero as additional
             if (_additionalAmounts[i] != 0) {
                 // Store and declare the additional in the core
                 requestCore.updateExpectedAmount(_requestId, i, _additionalAmounts[i].toInt256Safe());
@@ -1473,7 +1473,7 @@ contract CurrencyContract is Pausable, FeeCollector {
         );
 
         for (uint8 i = 0; i < _subtractAmounts.length; i = i.add(1)) {
-            // no need to declare a zero as subtracts 
+            // no need to declare a zero as subtracts
             if (_subtractAmounts[i] != 0) {
                 // subtract must be equal or lower than amount expected
                 require(
@@ -1535,7 +1535,7 @@ contract CurrencyContract is Pausable, FeeCollector {
      * @notice Modifier to check if msg.sender is the main payee.
      * @dev Revert if msg.sender is not the main payee.
      * @param _requestId id of the request
-     */ 
+     */
     modifier onlyRequestPayee(bytes32 _requestId)
     {
         require(requestCore.getPayeeAddress(_requestId, 0) == msg.sender, "only the payee should do this action");
@@ -1546,7 +1546,7 @@ contract CurrencyContract is Pausable, FeeCollector {
      * @notice Modifier to check if msg.sender is payer.
      * @dev Revert if msg.sender is not payer.
      * @param _requestId id of the request
-     */ 
+     */
     modifier onlyRequestPayer(bytes32 _requestId)
     {
         require(requestCore.getPayer(_requestId) == msg.sender, "only the payer should do this action");
@@ -1579,7 +1579,7 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
      * @param _requestCoreAddress Request Core address
      * @param _requestBurnerAddress Request Burner contract address
      */
-    constructor (address _requestCoreAddress, address _requestBurnerAddress) 
+    constructor (address _requestCoreAddress, address _requestBurnerAddress)
         CurrencyContract(_requestCoreAddress, _requestBurnerAddress)
         public
     {
@@ -1638,17 +1638,17 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
             _expectedAmounts,
             _data
         );
-        
+
         // Additional check on the fees: they should be equal to the about of ETH sent
         require(collectedFees == msg.value, "fees should be the correct amout");
-    
+
         extractAndStoreBitcoinAddresses(
             requestId,
             _payeesIdAddress.length,
             _payeesPaymentAddress,
             _payerRefundAddress
         );
-        
+
         return requestId;
     }
 
@@ -1720,7 +1720,7 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
      * @dev function to add refund address for payer
      *
      * @notice msg.sender must be _payer
-     * @notice the refund addresses must not have been already provided 
+     * @notice the refund addresses must not have been already provided
      *
      * @param _requestId                id of the request
      * @param _payerRefundAddress       payer bitcoin addresses for refund as bytes
@@ -1791,7 +1791,7 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
         bytes32     _requestId,
         uint256     _payeesCount,
         bytes       _payeesPaymentAddress,
-        bytes       _payerRefundAddress) 
+        bytes       _payerRefundAddress)
         internal
     {
         // set payment addresses for payees
@@ -1857,10 +1857,10 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
         for (uint8 i = 0; i < payeesCount; i++) {
             // extract the expectedAmount for the payee[i]
             int256 expectedAmountTemp = int256(Bytes.extractBytes32(_requestData, uint256(i).mul(52).add(61)));
-            
+
             // compute the total expected amount of the request
             totalExpectedAmounts = totalExpectedAmounts.add(expectedAmountTemp);
-            
+
             // all expected amount must be positive
             require(expectedAmountTemp > 0, "expected amount should be > 0");
         }
@@ -1874,7 +1874,7 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
         Bytes.updateBytes20inBytes(_requestData, 20, bytes20(msg.sender));
         // store request in the core
         requestId = requestCore.createRequestFromBytes(_requestData);
-        
+
         // set bitcoin addresses
         extractAndStoreBitcoinAddresses(
             requestId,
@@ -1895,14 +1895,20 @@ contract RequestBitcoinNodesValidation is CurrencyContract {
      * @param _requestId id of the request
      * @param _additionals Will increase the ExpectedAmounts of payees
      *
-     */    
+     */
     function acceptAndAdditionals(
         bytes32     _requestId,
         uint256[]   _additionals)
         internal
     {
         acceptAction(_requestId);
-        
+
         additionalAction(_requestId, _additionals);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

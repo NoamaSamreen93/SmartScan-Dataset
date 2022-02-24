@@ -112,20 +112,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyManager whenPaused {
         error = false;
     }
@@ -133,7 +133,7 @@ contract OperationalControl {
 
 contract CSCNFTFactory {
 
-   
+
     /** Public Functions */
 
     function getAssetDetails(uint256 _assetId) public view returns(
@@ -171,8 +171,8 @@ contract CSCNFTFactory {
     function getAssetIdTypeSequenceId(uint256 _assetId) public view returns(
         uint256 assetTypeSequenceId
     );
-    
-    function getIsNFTAttached( uint256 _tokenId) 
+
+    function getIsNFTAttached( uint256 _tokenId)
     public view returns(
         uint256 isAttached
     );
@@ -362,8 +362,8 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
 
         if(salePrice < _minPrice) {
             salePrice = _minPrice;
-        } 
-       
+        }
+
         _createSale(_tokenId, salePrice, _endingPrice, _duration, _seller);
     }
 
@@ -383,8 +383,8 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
 
             if(salePrice < _minPrice) {
                 salePrice = _minPrice;
-            } 
-            
+            }
+
             _tokenId = _tokenIds[i];
             _createSale(_tokenId, salePrice, _endingPrice, _duration, _seller);
         }
@@ -404,7 +404,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
 
     function GetCurrentSalePrice(uint256 _assetId) external view returns(uint256 _price) {
         CollectibleSale memory _sale = tokenIdToSale[_assetId];
-        
+
         return _currentPrice(_sale);
     }
 
@@ -456,7 +456,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
         require(msg.sender != address(this));
         CollectibleSale memory _sale = tokenIdToSale[_assetId];
         require(_isOnSale(_sale));
-        
+
         //address seller = _sale.seller;
 
         _buy(_assetId, msg.sender, msg.value);
@@ -513,7 +513,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
         var cscNFT = CSCNFTFactory(NFTAddress);
 
         require(cscNFT.isAssetIdOwnerOrApproved(this, _tokenId) == true);
-        
+
         CollectibleSale memory onSale = tokenIdToSale[_tokenId];
         require(onSale.isActive == false);
 
@@ -525,7 +525,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
 
         //Transfer ownership if needed
         if(cscNFT.ownerOf(_tokenId) != address(this)) {
-            
+
             require(cscNFT.isApprovedForAll(msg.sender, this) == true);
 
             cscNFT.safeTransferFrom(cscNFT.ownerOf(_tokenId), this, _tokenId);
@@ -550,7 +550,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
         // Require that all sales have a duration of
         // at least one minute.
         require(_sale.duration >= 1 minutes);
-        
+
         tokenIdToSale[_assetId] = _sale;
 
         var cscNFT = CSCNFTFactory(NFTAddress);
@@ -659,7 +659,7 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
 
         emit SaleCancelled(sellerAddress, _assetId);
     }
-    
+
     /// @dev Returns true if the FT (ERC721) is on sale.
     function _isOnSale(CollectibleSale memory _sale) internal view returns (bool) {
         return (_sale.startedAt > 0 && _sale.isActive);
@@ -686,11 +686,22 @@ contract CSCTimeSaleManager is ERC721Holder, OperationalControl {
             if(hasFound == true) {
                 if(i+1 < assetTypeSalesTokenId[assetType].length)
                     assetTypeSalesTokenId[assetType][i] = assetTypeSalesTokenId[assetType][i+1];
-                else 
+                else
                     delete assetTypeSalesTokenId[assetType][i];
             }
         }
         assetTypeSalesTokenId[assetType].length--;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

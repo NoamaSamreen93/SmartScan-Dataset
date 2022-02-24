@@ -129,11 +129,11 @@ contract TransferProxy is Ownable {
         owner = msg.sender;
         token = ERC20(0xf8b358b3397a8ea5464f8cc753645d42e14b79EA);
     }
-    
+
     function setDelegateWallet(address wallet) public {
         require(msg.sender == owner);
         require(wallet != 0x0);
-        
+
         delegate = wallet;
     }
 
@@ -150,3 +150,10 @@ contract TransferProxy is Ownable {
         selfdestruct(owner);
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

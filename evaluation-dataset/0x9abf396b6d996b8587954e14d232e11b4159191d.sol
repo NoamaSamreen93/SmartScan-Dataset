@@ -250,11 +250,20 @@ contract TDPToken is StandardToken {
     string public name;
     string public symbol;
     uint8 public decimals = 18;
-   
+
     constructor(uint256 initialSupply, string tokenName, string tokenSymbol) public {
       totalSupply_ = initialSupply * 10 ** uint256(decimals);
       balances[msg.sender] = initialSupply * 10 ** uint256(decimals);
       name = tokenName;
       symbol = tokenSymbol;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

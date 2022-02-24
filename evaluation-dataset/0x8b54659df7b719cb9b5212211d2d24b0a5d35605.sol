@@ -2,7 +2,7 @@ pragma solidity ^0.4.11;
 
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -30,32 +30,32 @@ library SafeMath {
 }
 
 contract HAI {
-    
+
     using SafeMath for uint256;
-    
+
     string public name = "HAI";      //  token name
-    
+
     string public symbol = "HAI";           //  token symbol
-    
+
     uint256 public decimals = 8;            //  token digit
 
     mapping (address => uint256) public balanceOf;
-    
+
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     mapping (address => uint256) public frozenBalances;
     mapping (address => uint256) public lockedBalances;
-    
+
     mapping (address => uint256) public initTimes;
-    
+
     mapping (address => uint) public initTypes;
-    
+
     uint256 public totalSupply = 0;
 
     uint256 constant valueFounder = 1000000000000000000;
-    
+
     address owner = 0x0;
-    
+
     address operator = 0x0;
     bool inited = false;
 
@@ -63,7 +63,7 @@ contract HAI {
         assert(owner == msg.sender);
         _;
     }
-    
+
     modifier isOperator {
         assert(operator == msg.sender);
         _;
@@ -73,11 +73,11 @@ contract HAI {
         assert(0x0 != msg.sender);
         _;
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Burn(address indexed from, uint256 value);
     event Frozen(address indexed from, uint256 value);
     event UnFrozen(address indexed from, uint256 value);
@@ -90,7 +90,7 @@ contract HAI {
         balanceOf[msg.sender] = valueFounder;
         emit Transfer(0x0, msg.sender, valueFounder);
     }
-    
+
     function _transfer(address _from, address _to, uint256 _value) private {
         require(_to != 0x0);
         require(canTransferBalance(_from) >= _value);
@@ -98,7 +98,7 @@ contract HAI {
         balanceOf[_to] = balanceOf[_to].add(_value);
         emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) validAddress public returns (bool success) {
         _transfer(msg.sender, _to, _value);
         return true;
@@ -117,7 +117,7 @@ contract HAI {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function burn(uint256 _value) validAddress public  returns (bool success) {
         require(canTransferBalance(msg.sender) >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);            // Subtract from the sender
@@ -147,7 +147,7 @@ contract HAI {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function canTransferBalance(address addr) public view returns (uint256){
         if(initTypes[addr]==0x0){
             return balanceOf[addr].sub(frozenBalances[addr]);
@@ -155,7 +155,7 @@ contract HAI {
             uint256 s = now.sub(initTimes[addr]);
             if(initTypes[addr]==0x1){
                 if(s >= 11825 days){
-                    return balanceOf[addr].sub(frozenBalances[addr]);    
+                    return balanceOf[addr].sub(frozenBalances[addr]);
                 }else if(s >= 1825 days){
                     return balanceOf[addr].sub(lockedBalances[addr]).add(lockedBalances[addr].div(10000).mul((s.sub(1825 days).div(1 days) + 1))).sub(frozenBalances[addr]);
                 }else{
@@ -163,7 +163,7 @@ contract HAI {
                 }
             }else if(initTypes[addr]==0x2){
                 if(s >= 11460 days){
-                    return balanceOf[addr].sub(frozenBalances[addr]);    
+                    return balanceOf[addr].sub(frozenBalances[addr]);
                 }else if(s >= 1460 days){
                     return balanceOf[addr].sub(lockedBalances[addr]).add(lockedBalances[addr].div(10000).mul((s.sub(1460 days).div(1 days) + 1))).sub(frozenBalances[addr]);
                 }else{
@@ -171,7 +171,7 @@ contract HAI {
                 }
             }else if(initTypes[addr]==0x3){
                 if(s >= 11095 days){
-                    return balanceOf[addr].sub(frozenBalances[addr]);    
+                    return balanceOf[addr].sub(frozenBalances[addr]);
                 }else if(s >= 1095 days){
                     return balanceOf[addr].sub(lockedBalances[addr]).add(lockedBalances[addr].div(10000).mul((s.sub(1095 days).div(1 days) + 1))).sub(frozenBalances[addr]);
                 }else{
@@ -180,7 +180,7 @@ contract HAI {
             }else{
                 return 0;
             }
-      
+
         }
     }
 
@@ -201,5 +201,16 @@ contract HAI {
     function setOperator(address addr) validAddress isOwner public {
         operator = addr;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

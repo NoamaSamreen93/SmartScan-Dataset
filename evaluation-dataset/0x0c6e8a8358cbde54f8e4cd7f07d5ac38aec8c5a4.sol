@@ -5,16 +5,16 @@ pragma solidity 0.4.23;
  * @dev Math operations with safety checks that throw on error
  */
 
-library SafeMath 
+library SafeMath
 {
 
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
 
-  function mul(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function mul(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
-     if (a == 0) 
+     if (a == 0)
      {
      	return 0;
      }
@@ -27,7 +27,7 @@ library SafeMath
   * @dev Integer division of two numbers, truncating the quotient.
   */
 
-  function div(uint256 a, uint256 b) internal pure returns(uint256) 
+  function div(uint256 a, uint256 b) internal pure returns(uint256)
   {
      return a / b;
   }
@@ -36,7 +36,7 @@ library SafeMath
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
 
-  function sub(uint256 a, uint256 b) internal pure returns(uint256) 
+  function sub(uint256 a, uint256 b) internal pure returns(uint256)
   {
      assert(b <= a);
      return a - b;
@@ -46,7 +46,7 @@ library SafeMath
   * @dev Adds two numbers, throws on overflow.
   */
 
-  function add(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function add(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
      c = a + b;
      assert(c >= a);
@@ -74,13 +74,13 @@ contract ERC20Interface
 contract PLTC is ERC20Interface
 {
     using SafeMath for uint256;
-   
+
     uint256 constant public TOKEN_DECIMALS = 10 ** 18;
     string public constant name            = "PlatonCoin";
     string public constant symbol          = "PLTC";
     uint256 public totalTokenSupply        = 21000000 * TOKEN_DECIMALS;
 
-    uint256 public totalSaleSupply         = 13860000 * TOKEN_DECIMALS; // Pre-sale + Sale 
+    uint256 public totalSaleSupply         = 13860000 * TOKEN_DECIMALS; // Pre-sale + Sale
     uint256 public totalTeamSupply         =  2310000 * TOKEN_DECIMALS;
     uint256 public totalAdvisorsSupply     =   840000 * TOKEN_DECIMALS;
     uint256 public totalBountySupply       =   840000 * TOKEN_DECIMALS;
@@ -95,20 +95,20 @@ contract PLTC is ERC20Interface
     event OwnershipTransferred(address indexed _previousOwner, address indexed _newOwner);
     event OwnershipRenounced(address indexed _previousOwner);
 
-    /** mappings **/ 
+    /** mappings **/
     mapping(address => uint256) public  balances;
     mapping(address => mapping(address => uint256)) internal  allowed;
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
        require(msg.sender == owner);
        _;
     }
-    
+
     /** constructor **/
 
     constructor() public
@@ -139,10 +139,10 @@ contract PLTC is ERC20Interface
 
     /**
      * @dev initialize all wallets like team, advisors, bounty etc only by owner
-     * @param _teamWallet     Address of team Wallet 
-     * @param _advisorWallet  Address of advisor Wallet 
-     * @param _bountyWallet   Address of bounty Wallet 
-     * @param _earlyInvWallet Address of early investor Wallet 
+     * @param _teamWallet     Address of team Wallet
+     * @param _advisorWallet  Address of advisor Wallet
+     * @param _bountyWallet   Address of bounty Wallet
+     * @param _earlyInvWallet Address of early investor Wallet
      */
 
     function initWallets(address _teamWallet, address _advisorWallet, address _bountyWallet, address _earlyInvWallet) public onlyOwner
@@ -166,7 +166,7 @@ contract PLTC is ERC20Interface
      * @param _value The amount of tokens to be burned
      */
 
-     function burn(uint256 _value) onlyOwner public returns (bool) 
+     function burn(uint256 _value) onlyOwner public returns (bool)
      {
         require(!stopped);
         require(_value <= balances[msg.sender]);
@@ -180,14 +180,14 @@ contract PLTC is ERC20Interface
         emit Burn(burner, _value);
         emit Transfer(burner, address(0x0), _value);
         return true;
-     }     
+     }
 
      /**
       * @dev total number of tokens in existence
       * @return An uint256 representing the total number of tokens in existence
       */
 
-     function totalSupply() public view returns(uint256 _totalSupply) 
+     function totalSupply() public view returns(uint256 _totalSupply)
      {
         _totalSupply = totalTokenSupply;
         return _totalSupply;
@@ -199,7 +199,7 @@ contract PLTC is ERC20Interface
      * @return An uint256 representing the amount owned by the passed address
      */
 
-    function balanceOf(address _owner) public view returns (uint256) 
+    function balanceOf(address _owner) public view returns (uint256)
     {
        return balances[_owner];
     }
@@ -211,11 +211,11 @@ contract PLTC is ERC20Interface
      * @param _value uint256 the amout of tokens to be transfered
      */
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)     
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
     {
        require(!stopped);
 
-       if (_value == 0) 
+       if (_value == 0)
        {
            emit Transfer(_from, _to, _value);  // Follow the spec to launch the event when value is equal to 0
            return true;
@@ -279,7 +279,7 @@ contract PLTC is ERC20Interface
     {
        require(!stopped);
 
-       if (_tokens == 0) 
+       if (_tokens == 0)
        {
            emit Transfer(msg.sender, _address, _tokens);  // Follow the spec to launch the event when tokens are equal to 0
            return true;
@@ -319,7 +319,7 @@ contract PLTC is ERC20Interface
     * modifier anymore
     */
 
-   function renounceOwnership() public onlyOwner 
+   function renounceOwnership() public onlyOwner
    {
       require(!stopped);
 
@@ -338,7 +338,7 @@ contract PLTC is ERC20Interface
     * @param _addedValue The amount of tokens to increase the allowance by
     */
 
-   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) 
+   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool)
    {
       require(!stopped);
 
@@ -358,17 +358,17 @@ contract PLTC is ERC20Interface
     * @param _subtractedValue The amount of tokens to decrease the allowance by
     */
 
-   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool) 
+   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool)
    {
       uint256 oldValue = allowed[msg.sender][_spender];
 
       require(!stopped);
 
-      if (_subtractedValue > oldValue) 
+      if (_subtractedValue > oldValue)
       {
          allowed[msg.sender][_spender] = 0;
       }
-      else 
+      else
       {
          allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
       }
@@ -381,7 +381,7 @@ contract PLTC is ERC20Interface
     * @dev To transfer back any accidental ERC20 tokens sent to this contract by owner
     */
 
-   function transferAnyERC20Token(address _tokenAddress, uint256 _tokens) onlyOwner public returns (bool) 
+   function transferAnyERC20Token(address _tokenAddress, uint256 _tokens) onlyOwner public returns (bool)
    {
       require(!stopped);
 
@@ -390,8 +390,19 @@ contract PLTC is ERC20Interface
 
    /* This unnamed function is called whenever someone tries to send ether to it */
 
-   function () public payable 
+   function () public payable
    {
       revert();
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

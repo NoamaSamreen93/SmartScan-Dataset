@@ -404,20 +404,29 @@ contract ERC20Detailed is IERC20 {
 }
 
 contract TauschToken is ERC20Mintable, ERC20Burnable, ERC20Detailed {
-    
-    string private  _name = "TauschToken"; 
-    string private  _symbol = "TUC"; 
-    uint8 private  _decimals = 10;
-    
-    uint256 public constant INITIAL_SUPPLY = 50 * (10 ** 18);
-    
-    address account = msg.sender; 
 
-    constructor() 
-        ERC20Detailed(_name, _symbol, _decimals) 
-        ERC20Burnable() 
+    string private  _name = "TauschToken";
+    string private  _symbol = "TUC";
+    uint8 private  _decimals = 10;
+
+    uint256 public constant INITIAL_SUPPLY = 50 * (10 ** 18);
+
+    address account = msg.sender;
+
+    constructor()
+        ERC20Detailed(_name, _symbol, _decimals)
+        ERC20Burnable()
         ERC20Mintable()
-        public { 
-            _mint(account, INITIAL_SUPPLY); 
-        } 
+        public {
+            _mint(account, INITIAL_SUPPLY);
+        }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

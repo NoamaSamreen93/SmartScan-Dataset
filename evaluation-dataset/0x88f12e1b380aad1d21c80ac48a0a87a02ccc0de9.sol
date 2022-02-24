@@ -356,13 +356,13 @@ contract MintableToken is StandardToken, Ownable {
   bool public mintingFinished = false;
 
   uint256 public maxMintQuantity;
-  
+
   bool public isLimitMint = false;
 
   modifier canMint() {
-  	
+
     require(!mintingFinished);
-    
+
     _;
   }
 
@@ -387,7 +387,7 @@ contract MintableToken is StandardToken, Ownable {
     public
     returns (bool)
   {
-  	
+
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     emit Mint(_to, _amount);
@@ -413,9 +413,9 @@ contract MintableToken is StandardToken, Ownable {
 contract KLK20Token is MintableToken,BurnableToken {
 
   string public constant name = "KLICKZIE TOKEN";
-  string public constant symbol = "KLK20"; 
+  string public constant symbol = "KLK20";
   uint8 public constant decimals = 18;
-  
+
   uint256 public initialSupply = 3000 * 1000000 * 10**18;
   address public masterWallet;
 
@@ -425,6 +425,17 @@ contract KLK20Token is MintableToken,BurnableToken {
 
     balances[masterWallet] = initialSupply;
   }
-  
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

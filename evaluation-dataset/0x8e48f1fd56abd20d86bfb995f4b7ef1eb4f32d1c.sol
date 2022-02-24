@@ -98,7 +98,7 @@ contract SkinBase is Pausable {
 
     // Number of all total valid skins
     // skinId 0 should not correspond to any skin, because skin.mixingWithId==0 indicates not mixing
-    uint256 public nextSkinId = 1;  
+    uint256 public nextSkinId = 1;
 
     // Number of skins an account owns
     mapping (address => uint256) public numSkinOfAccounts;
@@ -113,14 +113,14 @@ contract SkinBase is Pausable {
     //     for (uint256 i = 1; i <= 15; i++) {
     //         if (i < 10) {
     //             skin.appearance = uint128(i);
-    //             if (i < 7) { 
+    //             if (i < 7) {
     //                 skinIdToOwner[i] = account0;
     //                 numSkinOfAccounts[account0] += 1;
-    //             } else {  
+    //             } else {
     //                 skinIdToOwner[i] = account1;
     //                 numSkinOfAccounts[account1] += 1;
     //             }
-    //         } else {  
+    //         } else {
     //             skin.appearance = uint128(block.blockhash(block.number - i + 9));
     //             skinIdToOwner[i] = account1;
     //             numSkinOfAccounts[account1] += 1;
@@ -129,7 +129,7 @@ contract SkinBase is Pausable {
     //         isOnSale[i] = false;
     //         nextSkinId += 1;
     //     }
-    // } 
+    // }
 
     // Get the i-th skin an account owns, for off-chain usage only
     function skinOfAccountById(address account, uint256 id) external view returns (uint256) {
@@ -143,7 +143,7 @@ contract SkinBase is Pausable {
                if (count == id) {
                    // This is the id-th skin of current account, a.k.a, what we need
                     return i;
-               } 
+               }
                count++;
            }
         }
@@ -185,7 +185,7 @@ contract SkinMix is SkinBase {
     event AutoMix(address account, uint256 skinAId, uint256 skinBId, uint64 cooldownEndTime);
     event MixSuccess(address account, uint256 skinId, uint256 skinAId, uint256 skinBId);
 
-    // Set mix formula contract address 
+    // Set mix formula contract address
     function setMixFormulaAddress(address mixFormulaAddress) external onlyOwner {
         mixFormula = MixFormulaInterface(mixFormulaAddress);
     }
@@ -236,7 +236,7 @@ contract SkinMix is SkinBase {
         return (isOnSale[skinId] == false);
     }
 
-    // mix  
+    // mix
     function mix(uint256 skinAId, uint256 skinBId) public whenNotPaused {
 
         // Check whether skins are valid
@@ -317,7 +317,7 @@ contract SkinMarket is SkinMix {
     // Values 0-10,000 map to 0%-100%
     uint128 public trCut = 290;
 
-    // Sale orders list 
+    // Sale orders list
     mapping (uint256 => uint256) public desiredPrice;
 
     // events
@@ -332,13 +332,13 @@ contract SkinMarket is SkinMix {
         // Only owner of skin pass
         require(skinIdToOwner[skinId] == msg.sender);
 
-        // Check whether skin is mixing 
+        // Check whether skin is mixing
         require(skins[skinId].mixingWithId == 0);
 
         // Check whether skin is already on sale
         require(isOnSale[skinId] == false);
 
-        require(price > 0); 
+        require(price > 0);
 
         // Put on sale
         desiredPrice[skinId] = price;
@@ -347,12 +347,12 @@ contract SkinMarket is SkinMix {
         // Emit the Approval event
         PutOnSale(msg.sender, skinId);
     }
-  
+
     // Withdraw an sale order
     function withdrawSale(uint256 skinId) external whenNotPaused {
         // Check whether this skin is on sale
         require(isOnSale[skinId] == true);
-        
+
         // Can only withdraw self's sale
         require(skinIdToOwner[skinId] == msg.sender);
 
@@ -363,7 +363,7 @@ contract SkinMarket is SkinMix {
         // Emit the cancel event
         WithdrawSale(msg.sender, skinId);
     }
- 
+
     // Buy skin in market
     function buyInMarket(uint256 skinId) external payable whenNotPaused {
         // Check whether this skin is on sale
@@ -423,7 +423,7 @@ contract SkinMinting is SkinMarket {
                                      50,
                                      100,
                                      200];
-    
+
     uint256[6] public payMultiple = [1,
                                      2,
                                      4,
@@ -438,7 +438,7 @@ contract SkinMinting is SkinMarket {
 
     // functions
 
-    // Set price 
+    // Set price
     function setBaseSummonPrice(uint256 newPrice) external onlyOwner {
         baseSummonPrice = newPrice;
     }
@@ -465,7 +465,7 @@ contract SkinMinting is SkinMarket {
         putOnSale(nextSkinId, salePrice);
 
         nextSkinId++;
-        numSkinOfAccounts[owner] += 1;   
+        numSkinOfAccounts[owner] += 1;
     }
 
     // Summon
@@ -499,10 +499,10 @@ contract SkinMinting is SkinMarket {
 
         nextSkinId++;
         numSkinOfAccounts[msg.sender] += 1;
-        
+
         accoutToSummonNum[msg.sender] += 1;
-        
-        // Handle the paylevel        
+
+        // Handle the paylevel
         if (payLevel < 5) {
             if (accoutToSummonNum[msg.sender] >= levelSplits[payLevel]) {
                 accoutToPayLevel[msg.sender] = payLevel + 1;
@@ -512,17 +512,17 @@ contract SkinMinting is SkinMarket {
 
     // Bleach some attributes
     function bleach(uint128 skinId, uint128 attributes) external payable whenNotPaused {
-        // Check whether msg.sender is owner of the skin 
+        // Check whether msg.sender is owner of the skin
         require(msg.sender == skinIdToOwner[skinId]);
 
-        // Check whether this skin is on sale 
+        // Check whether this skin is on sale
         require(isOnSale[skinId] == false);
 
         // Check whether there is enough money
         require(msg.value >= bleachPrice);
 
         Skin storage originSkin = skins[skinId];
-        // Check whether this skin is in mixing 
+        // Check whether this skin is in mixing
         require(originSkin.mixingWithId == 0);
 
         uint128 newAppearance = mixFormula.bleachAppearance(originSkin.appearance, attributes);
@@ -539,4 +539,15 @@ contract SkinMinting is SkinMarket {
             levelClearTime = nextDay;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

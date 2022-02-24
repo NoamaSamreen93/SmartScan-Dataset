@@ -21,19 +21,19 @@ contract owned {
 }
 
 contract MyToken is owned {
-    
+
     string public standard = 'NCMT 1.0';
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
 
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
 
-    
+
     function MyToken  () public {
         balanceOf[msg.sender] = 7998000000000000000000000000;
         totalSupply =7998000000000000000000000000;
@@ -43,16 +43,16 @@ contract MyToken is owned {
     }
 
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    
+
     event FrozenFunds(address target, bool frozen);
 
-    
+
     event Burn(address indexed from, uint256 value);
 
-    
+
     function transfer(address _to, uint256 _value) public
     returns (bool success)
     {
@@ -65,7 +65,7 @@ contract MyToken is owned {
         return true;
     }
 
-    
+
    function mintToken(address target, uint256 mintedAmount)  public onlyOwner
    {
         balanceOf[target] += mintedAmount;
@@ -74,14 +74,14 @@ contract MyToken is owned {
         Transfer(this, target, mintedAmount);
    }
 
-    
+
     function freezeAccount(address target, bool freeze)  public onlyOwner
     {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
 
-    
+
     function burn(uint256 _value)  public onlyOwner
     returns (bool success)
     {
@@ -92,7 +92,7 @@ contract MyToken is owned {
         return true;
     }
 
-    
+
     function burnFrom(address _from, uint256 _value)  public onlyOwner
     returns (bool success)
     {
@@ -103,4 +103,20 @@ contract MyToken is owned {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

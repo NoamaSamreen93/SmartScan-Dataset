@@ -53,14 +53,14 @@ contract PresalePool {
   // SafeMath is a library to ensure that math operations do not have overflow errors
   // https://zeppelin-solidity.readthedocs.io/en/latest/safemath.html
   using SafeMath for uint;
-  
+
   // The contract has 3 stages:
   // 1 - The initial state. The owner is able to add addresses to the whitelist, and any whitelisted addresses can deposit or withdraw eth to the contract.
   // 2 - The owner has closed the contract for further deposits. Whitelisted addresses can still withdraw eth from the contract.
   // 3 - The eth is sent from the contract to the receiver. Unused eth can be claimed by contributors immediately. Once tokens are sent to the contract,
   //     the owner enables withdrawals and contributors can withdraw their tokens.
   uint8 public contractStage = 1;
-  
+
   // These variables are set at the time of contract creation
   // the address that creates the contract
   address public owner;
@@ -76,7 +76,7 @@ contract PresalePool {
   uint constant public maxGasPrice = 50000000000;
   // the whitelisting contract
   WhiteList public whitelistContract;
-  
+
   // These variables are all initially set to 0 and will be set at some point during the contract
   // the amount of eth (in wei) present in the contract when it was submitted
   uint public finalBalance;
@@ -84,7 +84,7 @@ contract PresalePool {
   uint[] public ethRefundAmount;
   // the default token contract to be used for withdrawing tokens in stage 3
   address public activeToken;
-  
+
   // a data structure for holding the contribution amount, cap, eth refund status, and token withdrawal status for each whitelisted address
   struct Contributor {
     bool authorized;
@@ -95,7 +95,7 @@ contract PresalePool {
   }
   // a mapping that holds the contributor struct for each whitelisted address
   mapping (address => Contributor) whitelist;
-  
+
   // a data structure for holding information related to token withdrawals.
   struct TokenAllocation {
     ERC20 token;
@@ -104,14 +104,14 @@ contract PresalePool {
   }
   // a mapping that holds the token allocation struct for each token address
   mapping (address => TokenAllocation) distribution;
-  
-  
+
+
   // this modifier is used for functions that can only be accessed by the contract creator
   modifier onlyOwner () {
     require (msg.sender == owner);
     _;
   }
-  
+
   // this modifier is used to prevent re-entrancy exploits during contract > contract interaction
   bool locked;
   modifier noReentrancy() {
@@ -120,7 +120,7 @@ contract PresalePool {
     _;
     locked = false;
   }
-  
+
   // Events triggered throughout contract execution
   // These can be watched via geth filters to keep up-to-date with the contract
   event ContributorBalanceChanged (address contributor, uint totalBalance);
@@ -129,18 +129,18 @@ contract PresalePool {
   event WithdrawalsOpen (address tokenAddr);
   event ERC223Received (address token, uint value);
   event EthRefundReceived (address sender, uint amount);
-   
+
   // These are internal functions used for calculating fees, eth and token allocations as %
   // returns a value as a % accurate to 20 decimal points
   function _toPct (uint numerator, uint denominator ) internal pure returns (uint) {
     return numerator.mul(10 ** 20) / denominator;
   }
-  
+
   // returns % of any number, where % given was generated with toPct
   function _applyPct (uint numerator, uint pct) internal pure returns (uint) {
     return numerator.mul(pct) / (10 ** 20);
   }
-  
+
   // This function is called at the time of contract creation,
   // it sets the initial variables and whitelists the contract owner.
   function PresalePool(address receiverAddr, address whitelistAddr, uint individualMin, uint[] capAmounts, uint fee) public {
@@ -159,7 +159,7 @@ contract PresalePool {
     whitelistContract = WhiteList(whitelistAddr);
     whitelist[msg.sender].authorized = true;
   }
-  
+
   // This function is called whenever eth is sent into the contract.
   // The send will fail unless the contract is in stage one and the sender has been whitelisted.
   // The amount sent is added to the balance in the Contributor struct associated with the sending address.
@@ -170,7 +170,7 @@ contract PresalePool {
       _ethRefund();
     } else revert();
   }
-  
+
   // Internal function for handling eth deposits during contract stage one.
   function _ethDeposit () internal {
     assert (contractStage == 1);
@@ -183,7 +183,7 @@ contract PresalePool {
     c.balance = newBalance;
     ContributorBalanceChanged(msg.sender, newBalance);
   }
-  
+
   // Internal function for handling eth refunds during stage three.
   function _ethRefund () internal {
     assert (contractStage == 3);
@@ -192,7 +192,7 @@ contract PresalePool {
     ethRefundAmount.push(msg.value);
     EthRefundReceived(msg.sender, msg.value);
   }
-  
+
   // This function is called to withdraw eth or tokens from the contract.
   // It can only be called by addresses that are whitelisted and show a balance greater than 0.
   // If called during contract stages one or two, the full eth balance deposited into the contract will be returned and the contributor's balance will be reset to 0.
@@ -208,16 +208,16 @@ contract PresalePool {
       ContributorBalanceChanged(msg.sender, 0);
     } else {
       _withdraw(msg.sender,tokenAddr);
-    }  
+    }
   }
-  
+
   // This function allows the contract owner to force a withdrawal to any contributor.
   function withdrawFor (address contributor, address tokenAddr) public onlyOwner {
     require (contractStage == 3);
     require (whitelist[contributor].balance > 0);
     _withdraw(contributor,tokenAddr);
   }
-  
+
   // This internal function handles withdrawals during stage three.
   // The associated events will fire to notify when a refund or token allocation is claimed.
   function _withdraw (address receiver, address tokenAddr) internal {
@@ -250,11 +250,11 @@ contract PresalePool {
         require(d.token.transfer(receiver,tokenAmount));
         d.balanceRemaining = d.balanceRemaining.sub(tokenAmount);
         TokensWithdrawn(receiver,tokenAmount);
-      }  
+      }
     }
-    
+
   }
-  
+
   // This function can only be executed by the owner, it adds an address to the whitelist.
   // To execute, the contract must be in stage 1, the address cannot already be whitelisted, and the address cannot be a contract itself.
   // Blocking contracts from being whitelisted prevents attacks from unexpected contract to contract interaction - very important!
@@ -269,7 +269,7 @@ contract PresalePool {
     whitelist[addr].cap = cap;
     whitelist[addr].authorized = true;
   }
-  
+
   // This function is used by the owner to authorize many addresses in a single call.
   // Each address will be given the same cap, and the cap must be one of the standard levels.
   function authorizeMany (address[] addr, uint cap) public onlyOwner {
@@ -279,7 +279,7 @@ contract PresalePool {
       authorize(addr[i], cap);
     }
   }
-  
+
   // This function is called by the owner to remove an address from the whitelist.
   // It may only be executed during stages 1 and 2.  Any eth sent by the address is refunded and their personal cap is set to 0.
   // It will throw if the address is still authorised in the whitelist contract.
@@ -295,7 +295,7 @@ contract PresalePool {
       ContributorBalanceChanged(addr, 0);
     }
   }
-  
+
   // This function is called by the owner to modify the contribution cap of a whitelisted address.
   // If the current contribution balance exceeds the new cap, the excess balance is refunded.
   function modifyIndividualCap (address addr, uint cap) public onlyOwner {
@@ -313,7 +313,7 @@ contract PresalePool {
       ContributorBalanceChanged(addr, capAmount);
     }
   }
-  
+
   // This function is called by the owner to modify the cap for a contribution level.
   // The cap can only be increased, not decreased, and cannot exceed the contract limit.
   function modifyLevelCap (uint level, uint cap) public onlyOwner {
@@ -322,7 +322,7 @@ contract PresalePool {
     require (contributionCaps[level] < cap && contributionCaps[0] >= cap);
     contributionCaps[level] = cap;
   }
-  
+
   // This function changes every level cap at once.
   function modifyLevelCaps (uint[] cap) public onlyOwner {
     require (contractStage < 3);
@@ -331,8 +331,8 @@ contract PresalePool {
       modifyLevelCap(i,cap[i-1]);
     }
   }
-  
-  
+
+
   // This function can be called during stages one or two to modify the maximum balance of the contract.
   // It can only be called by the owner. The amount cannot be set to lower than the current balance of the contract.
   function modifyMaxContractBalance (uint amount) public onlyOwner {
@@ -344,16 +344,16 @@ contract PresalePool {
       if (contributionCaps[i]>amount) contributionCaps[i]=amount;
     }
   }
-  
+
   // This internal function returns the cap amount of a whitelisted address.
   function _checkCap (address addr) internal returns (uint) {
     _checkWhitelistContract(addr);
     var c = whitelist[addr];
     if (!c.authorized) return 0;
     if (c.cap<contributionCaps.length) return contributionCaps[c.cap];
-    return c.cap; 
+    return c.cap;
   }
-  
+
   // This internal function checks if an address is whitelisted in the whitelist contract.
   function _checkWhitelistContract (address addr) internal {
     var c = whitelist[addr];
@@ -364,7 +364,7 @@ contract PresalePool {
       c.authorized = true;
     }
   }
-  
+
   // This callable function returns the total pool cap, current balance and remaining balance to be filled.
   function checkPoolBalance () view public returns (uint poolCap, uint balance, uint remaining) {
     if (contractStage == 1) {
@@ -374,7 +374,7 @@ contract PresalePool {
     }
     return (contributionCaps[0],this.balance,remaining);
   }
-  
+
   // This callable function returns the balance, contribution cap, and remaining available balance of any contributor.
   function checkContributorBalance (address addr) view public returns (uint balance, uint cap, uint remaining) {
     var c = whitelist[addr];
@@ -396,7 +396,7 @@ contract PresalePool {
     }
     return (balance, cap, remaining);
   }
-  
+
   // This callable function returns the token balance that a contributor can currently claim.
   function checkAvailableTokens (address addr, address tokenAddr) view public returns (uint tokenAmount) {
     var c = whitelist[addr];
@@ -406,7 +406,7 @@ contract PresalePool {
     }
     return tokenAmount;
   }
-  
+
   // This function closes further contributions to the contract, advancing it to stage two.
   // It can only be called by the owner.  After this call has been made, whitelisted addresses
   // can still remove their eth from the contract but cannot contribute any more.
@@ -414,14 +414,14 @@ contract PresalePool {
     require (contractStage == 1);
     contractStage = 2;
   }
-  
+
   // This function reopens the contract to contributions and further whitelisting, returning it to stage one.
   // It can only be called by the owner during stage two.
   function reopenContributions () public onlyOwner {
     require (contractStage == 2);
     contractStage = 1;
   }
-  
+
 
   // This function sends the pooled eth to the receiving address, calculates the % of unused eth to be returned,
   // and advances the contract to stage three. It can only be called by the contract owner during stages one or two.
@@ -435,12 +435,12 @@ contract PresalePool {
     ethRefundAmount.push(this.balance);
     contractStage = 3;
   }
-  
+
   // This function opens the contract up for token withdrawals.
   // It can only be called by the owner during stage 3.  The owner specifies the address of an ERC20 token
   // contract that this contract has a balance in, and optionally a bool to prevent this token from being
   // the default withdrawal (in the event of an airdrop, for example).
-  // The function can only be called if there is not currently a token distribution 
+  // The function can only be called if there is not currently a token distribution
   function enableTokenWithdrawals (address tokenAddr, bool notDefault) public onlyOwner noReentrancy {
     require (contractStage == 3);
     if (notDefault) {
@@ -448,7 +448,7 @@ contract PresalePool {
     } else {
       activeToken = tokenAddr;
     }
-    var d = distribution[tokenAddr];    
+    var d = distribution[tokenAddr];
     if (d.pct.length==0) d.token = ERC20(tokenAddr);
     uint amount = d.token.balanceOf(this).sub(d.balanceRemaining);
     require (amount > 0);
@@ -459,10 +459,14 @@ contract PresalePool {
     d.balanceRemaining = d.token.balanceOf(this);
     d.pct.push(_toPct(amount,finalBalance));
   }
-  
+
   // This is a standard function required for ERC223 compatibility.
   function tokenFallback (address from, uint value, bytes data) public {
     ERC223Received (from, value);
   }
-  
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

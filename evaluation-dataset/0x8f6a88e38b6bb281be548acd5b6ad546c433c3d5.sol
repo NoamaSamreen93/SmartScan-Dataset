@@ -818,7 +818,7 @@ contract AuctionityLiveToken is ERC721Token {
     );
 
     constructor () public
-        ERC721Token("AuctionityLiveToken", "ALT")        
+        ERC721Token("AuctionityLiveToken", "ALT")
     {
         mintMaster = msg.sender;
     }
@@ -859,4 +859,15 @@ contract AuctionityLiveToken is ERC721Token {
 
         emit Claim(_owner, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

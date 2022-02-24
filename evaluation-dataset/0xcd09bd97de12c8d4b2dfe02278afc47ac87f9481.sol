@@ -303,7 +303,7 @@ contract SimpleBreeding is CKProxy {
     uint256 _breederReward
   ) external {
     require(msg.sender == breeder || msg.sender == owner);
-    
+
     if(msg.sender == owner) {
       require(_breederReward >= originalBreederReward || _breederReward > breederReward, 'Reward value is less than required');
     } else if(msg.sender == breeder) {
@@ -403,7 +403,7 @@ contract SimpleBreedingFactory is Pausable {
     function withdraw(uint256 amount) external onlyOwner {
         owner.transfer(amount);
     }
-    
+
     /**
      * Create new breeding contract for breeder. This function should be called by user during breeder enrollment process.
      * Message value should be greater than breeder reward + commission. Value excess wil be transfered to created contract.
@@ -419,7 +419,7 @@ contract SimpleBreedingFactory is Pausable {
         // or enrolling same breeder by different owner
         bytes32 key = keccak256(abi.encodePacked(_breederAddress, msg.sender));
         require(breederToContract[key] == address(0), "Breeder already enrolled");
-        
+
         //transfer value excess to new contract, owner can widthdraw later or use it for breeding
         uint256 excess = uint256(msg.value).sub(provisionFee);
         SimpleBreeding newContract = new SimpleBreeding(msg.sender, _breederAddress, address(kittyCore), breederReward);
@@ -446,4 +446,13 @@ contract SimpleBreedingFactory is Pausable {
 
         emit ContractRemoved(contractAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

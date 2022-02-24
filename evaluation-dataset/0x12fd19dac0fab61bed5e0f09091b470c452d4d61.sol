@@ -384,7 +384,7 @@ contract Controlled is Ownable{
     function enableTransfer(bool _enable) public onlyOwner{
         transferEnabled = _enable;
     }
-    
+
     function enableLockFlag(bool _enable) public onlyOwner returns (bool success){
         plockFlag = _enable;
         return true;
@@ -413,7 +413,7 @@ contract Controlled is Ownable{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -487,4 +487,15 @@ contract EC is BurnableToken, MintableToken, PausableToken {
             emit Transfer(from, to, value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

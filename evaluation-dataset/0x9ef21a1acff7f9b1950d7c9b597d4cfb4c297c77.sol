@@ -2,7 +2,7 @@ pragma solidity ^0.4.11;
 
 contract owned {
     address public owner;
- 
+
     function owned() public {
         owner = msg.sender;
     }
@@ -39,12 +39,12 @@ contract doccoin is owned {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     modifier canSend() {
         require ( msg.sender == owner ||  now > sendingBanPeriod || msg.sender == crowdsaleContract);
         _;
     }
-    
+
     /**
      * Constrctor function
      */
@@ -52,11 +52,11 @@ contract doccoin is owned {
     ) public {
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-    
+
     function setCrowdsaleContract(address contractAddress) onlyOwner {
         crowdsaleContract = contractAddress;
     }
-     
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -185,10 +185,10 @@ contract doccoin is owned {
 
 
 contract DoccoinPreICO is owned {
-    
+
     address public wallet1 = address(0x0028D118C0c892e5afaF6C10d79D3922bC76840B);
     address public wallet2 = address(0xd7df9e4f97a7bdbff9799e29b9689515af2da3a6);
-    
+
     uint public fundingGoal;
     uint public amountRaised;
     uint public beginTime = 1516838400;
@@ -208,13 +208,13 @@ contract DoccoinPreICO is owned {
     ) {
         tokenReward = addressOfTokenUsedAsReward;
     }
-    
+
     // withdraw tokens from contract
     function withdrawTokens() onlyOwner {
         tokenReward.transfer(msg.sender, tokenReward.balanceOf(this));
         FundTransfer(msg.sender, tokenReward.balanceOf(this), false);
     }
-    
+
     // low level token purchase function
     function buyTokens(address beneficiary) payable {
         require(msg.value >= 200 finney);
@@ -224,7 +224,7 @@ contract DoccoinPreICO is owned {
         FundTransfer(beneficiary, amount, true);
         wallet1.transfer(msg.value*90/100);
         wallet2.transfer(msg.value*10/100);
-        
+
     }
 
     /**
@@ -236,11 +236,20 @@ contract DoccoinPreICO is owned {
         buyTokens(msg.sender);
     }
 
-    modifier onlyCrowdsalePeriod() { 
+    modifier onlyCrowdsalePeriod() {
         require ( now >= beginTime && now <= endTime ) ;
-        _; 
+        _;
     }
 
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

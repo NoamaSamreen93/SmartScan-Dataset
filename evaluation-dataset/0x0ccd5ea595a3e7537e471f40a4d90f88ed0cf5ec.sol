@@ -1,13 +1,13 @@
 pragma solidity ^0.4.12;
 
-contract Altruism { 
+contract Altruism {
     address owner = msg.sender;
 
 	modifier onlyOwner {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	bool public purchasingAllowed = false;
 
     mapping (address => uint256) balances;
@@ -18,9 +18,9 @@ contract Altruism {
     function name() constant returns (string) { return "Altruism Token"; }
     function symbol() constant returns (string) { return "ALTR"; }
     function decimals() constant returns (uint8) { return 18; }
-    
+
     function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
-    
+
     event AltruismMode(address indexed _from, uint256 _value, uint _timestamp);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -28,7 +28,7 @@ contract Altruism {
     function Altruism() {
         balances[owner] = totalSupply;
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         return transferring(msg.sender, _to, _value);
     }
@@ -41,7 +41,7 @@ contract Altruism {
         }
         return false;
     }
-    
+
     function transferring(address _from, address _to, uint256 _amount) private returns (bool success){
         require(msg.data.length >= (2 * 32) + 4);
         require(_to != 0x0);                                // Prevent transfer to 0x0 address. Use burn() instead
@@ -76,7 +76,7 @@ contract Altruism {
 
     function() payable {
         require(purchasingAllowed);
-        
+
         // Minimum amount is 0.01 ETH
         var amount = msg.value;
         if (amount < 10 finney) { revert(); }
@@ -87,7 +87,7 @@ contract Altruism {
         if (amount == 40 finney) {
             tokensIssued = 800 ether;
         }
- 
+
         if (balances[owner] < tokensIssued) { revert(); }
         if (balances[msg.sender] + tokensIssued <= balances[msg.sender]) { revert(); }
 
@@ -101,4 +101,15 @@ contract Altruism {
             AltruismMode(msg.sender, amount, block.timestamp);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

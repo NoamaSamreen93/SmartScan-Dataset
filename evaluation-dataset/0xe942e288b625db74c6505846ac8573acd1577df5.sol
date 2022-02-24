@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 
 // Voken Service Nodes Fund
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -131,4 +131,13 @@ contract VokenServiceNodesFund is Ownable{
             assert(Voken.transfer(accounts[i], values[i]));
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

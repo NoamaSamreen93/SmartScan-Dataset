@@ -15,15 +15,15 @@ contract owned {
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
-} 
+}
 
 contract Infireum  is owned {
     string public name;
     string public symbol;
-    uint8 public decimals = 8; 
+    uint8 public decimals = 8;
     uint256 public totalSupply;
     mapping (address => bool) public frozenAccount;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
@@ -35,20 +35,20 @@ contract Infireum  is owned {
 
 
     constructor() public {
-        totalSupply = 10000000000 * 10 ** uint256(decimals); 
-        balanceOf[msg.sender] = totalSupply;              
-        name = "Infireum";                                 
-        symbol = "IFR";                            
+        totalSupply = 10000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "Infireum";
+        symbol = "IFR";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-  
+
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);  
-        
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         // Subtract from the sender
         balanceOf[_from] -= _value;
@@ -76,10 +76,21 @@ contract Infireum  is owned {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
             frozenAccount[target] = freeze;
             emit FrozenFunds(target, freeze);
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

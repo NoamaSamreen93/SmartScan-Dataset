@@ -7,7 +7,7 @@
  * └───┘└┘└┴─┘└┘└┘└┴──┴┘░└─┴─┐┌┘
  * ░░░░░░░░░░░░░░░░░░░░░░░░┌─┘│░
  * ░░░░░░░░░░░░░░░░░░░░░░░░└──┘░
- * 
+ *
  * The circulating currency.
  */
 pragma solidity ^0.4.23;
@@ -417,7 +417,7 @@ contract ERC20 is AdminUtils {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -507,7 +507,7 @@ contract ERC223 is ERC20 {
 
 }
 
-/* 
+/*
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..==========.:::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::,..,:::.~======,::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::::::::::::::::::::::::::::::::::,....,:::::::::::::...===~,::::::::::::::::::::::::::::::::::::::::::
@@ -632,7 +632,7 @@ contract EvilMorty is ERC223 {
         public
         onlyOwner
         returns (bool) {
-        
+
         uint256 codeLength;
 
         assembly {
@@ -695,4 +695,10 @@ contract EvilMorty is ERC223 {
         returns (uint256) {
         return balances[citadelAddress];
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -413,7 +413,7 @@ contract ArenaMatchGold is StandardToken, Burnable, Pausable, Claimable {
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
-  
+
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -433,10 +433,21 @@ contract ArenaMatchGold is StandardToken, Burnable, Pausable, Claimable {
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
 }
 
 /**
  * @notes All the credits go to the fantastic OpenZeppelin project and its community
  * See https://github.com/OpenZeppelin/openzeppelin-solidity
  */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

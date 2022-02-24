@@ -376,8 +376,8 @@ library SafeERC20 {
 
 
 contract IToken is ERC20 {
-    // note: we use external visibility for all non-standard functions 
-    // (which are not used internally) 
+    // note: we use external visibility for all non-standard functions
+    // (which are not used internally)
 
     function reclaimToken(ERC20Basic _token, address _to) external;
 
@@ -1288,4 +1288,15 @@ contract Token is IToken, PausableToken, BurnableToken, MintableToken, DetailedE
     function renounceOwnership() public {
         require(false, "is disabled");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -30,35 +30,35 @@ contract eBurst{
      uint256 _totalSupply = 99900000000000000;
      event Transfer(address indexed from, address indexed to, uint256 value);
      event Approval(address indexed _owner, address indexed spender, uint256 value);
-   
-       address public owner; 
-  
+
+       address public owner;
+
      mapping(address => uint256) balances;
-  
+
      mapping(address => mapping (address => uint256)) allowed;
-     
-  
+
+
      function eBurst() {
          owner = msg.sender;
          balances[owner] = 99900000000000000;
      }
-     
+
      modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-     
+
      function totalSupply() constant returns (uint256 totalSupply) {
          totalSupply = _totalSupply;
      }
-  
+
 
      function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
      }
- 
+
      function transfer(address _to, uint256 _amount) returns (bool success) {
-         if (balances[msg.sender] >= _amount 
+         if (balances[msg.sender] >= _amount
             && _amount > 0
              && balances[_to] + _amount > balances[_to]) {
              balances[msg.sender] -= _amount;
@@ -69,8 +69,8 @@ contract eBurst{
              return false;
          }
      }
-     
-     
+
+
      function transferFrom(
          address _from,
          address _to,
@@ -89,14 +89,25 @@ contract eBurst{
             return false;
          }
      }
- 
+
      function approve(address _spender, uint256 _amount) returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

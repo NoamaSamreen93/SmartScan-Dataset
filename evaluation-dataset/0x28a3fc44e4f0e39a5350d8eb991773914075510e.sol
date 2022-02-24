@@ -49,7 +49,7 @@ contract Ownable {
         _;
     }
 
-   
+
     function transferOwnership(address newOwner) public onlyOwner {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -102,22 +102,22 @@ contract BasicToken is Ownable, ERC20Basic {
     */
     function transfer(address _to, uint _value) public onlyPayloadSize(2 * 32)  returns (bool) {
         require(balances[msg.sender] >= _value);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
-    
+
     function batchTransfer(address[] _receivers, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {
       uint cnt = _receivers.length;
       uint256 amount = _value.mul(uint256(cnt));
       require(cnt > 0 && cnt <= 100);
       require(_value > 0 && balances[msg.sender] >= amount);
-  
+
       balances[msg.sender] = balances[msg.sender].sub(amount);
-      
+
       for (uint i = 0; i < cnt; i++) {
           balances[_receivers[i]] = balances[_receivers[i]].add(_value);
           emit Transfer(msg.sender, _receivers[i], _value);
@@ -154,7 +154,7 @@ contract StandardToken is BasicToken, ERC20 {
     */
     function transferFrom(address _from, address _to, uint _value) public onlyPayloadSize(3 * 32) returns (bool){
         var _allowance = allowed[_from][msg.sender];
-        
+
         require(_allowance >= _value);
         require(balances[_from] >= _value);
 
@@ -164,7 +164,7 @@ contract StandardToken is BasicToken, ERC20 {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -249,7 +249,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         emit AddedBlackList(_evilUser);
@@ -299,7 +299,7 @@ contract SPAYToken is Pausable, StandardToken, BlackList {
         require(!isBlackListed[msg.sender]);
         return super.transfer(_to, _value);
     }
-    
+
     function batchTransfer (address[] _receivers,uint256 _value ) public whenNotPaused onlyOwner returns (bool)  {
       return super.batchTransfer(_receivers, _value);
     }
@@ -354,4 +354,15 @@ contract SPAYToken is Pausable, StandardToken, BlackList {
 
     event Redeem(uint amount);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

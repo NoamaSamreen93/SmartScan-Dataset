@@ -142,7 +142,7 @@ contract LibMath is
             ),
             "ROUNDING_ERROR"
         );
-        
+
         partialAmount = safeDiv(
             safeMul(numerator, target),
             denominator
@@ -178,7 +178,7 @@ contract LibMath is
             ),
             "ROUNDING_ERROR"
         );
-        
+
         // safeDiv computes `floor(a / b)`. We use the identity (a, b integer):
         //       ceil(a / b) = floor((a + b - 1) / b)
         // To implement `ceil(a / b)` using safeDiv.
@@ -217,7 +217,7 @@ contract LibMath is
         );
         return partialAmount;
     }
-    
+
     /// @dev Calculates partial value given a numerator and denominator rounded down.
     /// @param numerator Numerator.
     /// @param denominator Denominator.
@@ -249,7 +249,7 @@ contract LibMath is
         );
         return partialAmount;
     }
-    
+
     /// @dev Checks if rounding error >= 0.1% when rounding down.
     /// @param numerator Numerator.
     /// @param denominator Denominator.
@@ -268,7 +268,7 @@ contract LibMath is
             denominator > 0,
             "DIVISION_BY_ZERO"
         );
-        
+
         // The absolute rounding error is the difference between the rounded
         // value and the ideal value. The relative rounding error is the
         // absolute rounding error divided by the absolute value of the
@@ -281,11 +281,11 @@ contract LibMath is
         // When the ideal value is zero, we require the absolute error to
         // be zero. Fortunately, this is always the case. The ideal value is
         // zero iff `numerator == 0` and/or `target == 0`. In this case the
-        // remainder and absolute error are also zero. 
+        // remainder and absolute error are also zero.
         if (target == 0 || numerator == 0) {
             return false;
         }
-        
+
         // Otherwise, we want the relative rounding error to be strictly
         // less than 0.1%.
         // The relative error is `remainder / (numerator * target)`.
@@ -303,7 +303,7 @@ contract LibMath is
         isError = safeMul(1000, remainder) >= safeMul(numerator, target);
         return isError;
     }
-    
+
     /// @dev Checks if rounding error >= 0.1% when rounding up.
     /// @param numerator Numerator.
     /// @param denominator Denominator.
@@ -322,7 +322,7 @@ contract LibMath is
             denominator > 0,
             "DIVISION_BY_ZERO"
         );
-        
+
         // See the comments in `isRoundingError`.
         if (target == 0 || numerator == 0) {
             // When either is zero, the ideal value and rounded value are zero
@@ -384,7 +384,7 @@ library LibBytes {
         }
         return memoryAddress;
     }
-    
+
     /// @dev Gets the memory address for the contents of a byte array.
     /// @param input Byte array to lookup.
     /// @return memoryAddress Memory address of the contents of the byte array.
@@ -467,7 +467,7 @@ library LibBytes {
                         source := add(source, 32)
                         dest := add(dest, 32)
                     }
-                    
+
                     // Write the last 32 bytes
                     mstore(dEnd, last)
                 }
@@ -498,7 +498,7 @@ library LibBytes {
                         sEnd := sub(sEnd, 32)
                         dEnd := sub(dEnd, 32)
                     }
-                    
+
                     // Write the first 32 bytes
                     mstore(dest, first)
                 }
@@ -528,7 +528,7 @@ library LibBytes {
             to < b.length,
             "TO_LESS_THAN_LENGTH_REQUIRED"
         );
-        
+
         // Create a new bytes structure and copy contents
         result = new bytes(to - from);
         memCopy(
@@ -538,7 +538,7 @@ library LibBytes {
         );
         return result;
     }
-    
+
     /// @dev Returns a slice from a byte array without preserving the input.
     /// @param b The byte array to take a slice from. Will be destroyed in the process.
     /// @param from The starting index for the slice (inclusive).
@@ -562,7 +562,7 @@ library LibBytes {
             to < b.length,
             "TO_LESS_THAN_LENGTH_REQUIRED"
         );
-        
+
         // Create a new bytes structure around [from, to) in-place.
         assembly {
             result := add(b, from)
@@ -705,7 +705,7 @@ library LibBytes {
                 mload(add(b, index)),
                 0xffffffffffffffffffffffff0000000000000000000000000000000000000000
             )
-            
+
             // Make sure input address is clean.
             // (Solidity does not guarantee this)
             input := and(input, 0xffffffffffffffffffffffffffffffffffffffff)
@@ -853,7 +853,7 @@ library LibBytes {
             b.length >= index + nestedBytesLength,
             "GREATER_OR_EQUAL_TO_NESTED_BYTES_LENGTH_REQUIRED"
         );
-        
+
         // Return a pointer to the byte array as it exists inside `b`
         assembly {
             result := add(b, index)
@@ -984,7 +984,7 @@ contract LibEIP712 {
         // keccak256(abi.encodePacked(
         //     EIP191_HEADER,
         //     EIP712_DOMAIN_HASH,
-        //     hashStruct    
+        //     hashStruct
         // ));
 
         assembly {
@@ -1061,16 +1061,16 @@ contract LibOrder is
 
     // solhint-disable max-line-length
     struct Order {
-        address makerAddress;           // Address that created the order.      
-        address takerAddress;           // Address that is allowed to fill the order. If set to 0, any address is allowed to fill the order.          
-        address feeRecipientAddress;    // Address that will recieve fees when order is filled.      
+        address makerAddress;           // Address that created the order.
+        address takerAddress;           // Address that is allowed to fill the order. If set to 0, any address is allowed to fill the order.
+        address feeRecipientAddress;    // Address that will recieve fees when order is filled.
         address senderAddress;          // Address that is allowed to call Exchange contract methods that affect this order. If set to 0, any address is allowed to call these methods.
-        uint256 makerAssetAmount;       // Amount of makerAsset being offered by maker. Must be greater than 0.        
-        uint256 takerAssetAmount;       // Amount of takerAsset being bid on by maker. Must be greater than 0.        
+        uint256 makerAssetAmount;       // Amount of makerAsset being offered by maker. Must be greater than 0.
+        uint256 takerAssetAmount;       // Amount of takerAsset being bid on by maker. Must be greater than 0.
         uint256 makerFee;               // Amount of ZRX paid to feeRecipient by maker when order is filled. If set to 0, no transfer of ZRX from maker to feeRecipient will be attempted.
         uint256 takerFee;               // Amount of ZRX paid to feeRecipient by taker when order is filled. If set to 0, no transfer of ZRX from taker to feeRecipient will be attempted.
-        uint256 expirationTimeSeconds;  // Timestamp in seconds at which order expires.          
-        uint256 salt;                   // Arbitrary number to facilitate uniqueness of the order's hash.     
+        uint256 expirationTimeSeconds;  // Timestamp in seconds at which order expires.
+        uint256 salt;                   // Arbitrary number to facilitate uniqueness of the order's hash.
         bytes makerAssetData;           // Encoded data that can be decoded by a specified proxy contract when transferring makerAsset. The last byte references the id of this proxy.
         bytes takerAssetData;           // Encoded data that can be decoded by a specified proxy contract when transferring takerAsset. The last byte references the id of this proxy.
     }
@@ -1133,13 +1133,13 @@ contract LibOrder is
             let temp1 := mload(pos1)
             let temp2 := mload(pos2)
             let temp3 := mload(pos3)
-            
+
             // Hash in place
             mstore(pos1, schemaHash)
             mstore(pos2, makerAssetDataHash)
             mstore(pos3, takerAssetDataHash)
             result := keccak256(pos1, 416)
-            
+
             // Restore
             mstore(pos1, temp1)
             mstore(pos2, temp2)
@@ -1346,7 +1346,7 @@ contract ISignatureValidator {
         bytes signature
     )
         external;
-    
+
     /// @dev Approves/unnapproves a Validator contract to verify signatures on signer's behalf.
     /// @param validatorAddress Address of Validator contract.
     /// @param approval Approval or disapproval of  Validator contract.
@@ -1707,7 +1707,7 @@ contract IERC20Token {
     )
         external
         returns (bool);
-    
+
     /// @dev `msg.sender` approves `_spender` to spend `_value` tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @param _value The amount of wei to be approved for transfer
@@ -1722,7 +1722,7 @@ contract IERC20Token {
         external
         view
         returns (uint256);
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return Balance of owner
     function balanceOf(address _owner)
@@ -1769,7 +1769,7 @@ contract IEtherToken is
     function deposit()
         public
         payable;
-    
+
     function withdraw(uint256 amount)
         public;
 }
@@ -1808,7 +1808,7 @@ contract LibConstants {
     bytes4 constant internal ERC20_DATA_ID = bytes4(keccak256("ERC20Token(address)"));
     bytes4 constant internal ERC721_DATA_ID = bytes4(keccak256("ERC721Token(address,uint256)"));
     uint256 constant internal MAX_UINT = 2**256 - 1;
- 
+
      // solhint-disable var-name-mixedcase
     IExchange internal EXCHANGE;
     IEtherToken internal ETHER_TOKEN;
@@ -1939,7 +1939,7 @@ contract MixinWeth is
 
         // Calculate amount of WETH that hasn't been sold.
         uint256 wethRemaining = safeSub(msg.value, wethSold);
-    
+
         // Do nothing if no WETH remaining
         if (wethRemaining > 0) {
             // Convert remaining WETH to ETH
@@ -1975,7 +1975,7 @@ pragma solidity ^0.4.24;
 
 contract IAssets {
 
-    /// @dev Withdraws assets from this contract. The contract requires a ZRX balance in order to 
+    /// @dev Withdraws assets from this contract. The contract requires a ZRX balance in order to
     ///      function optimally, and this function allows the ZRX to be withdrawn by owner. It may also be
     ///      used to withdraw assets that were accidentally sent to this contract.
     /// @param assetData Byte array encoded for the respective asset proxy.
@@ -2141,7 +2141,7 @@ pragma solidity ^0.4.24;
 contract IForwarderCore {
 
     /// @dev Purchases as much of orders' makerAssets as possible by selling transaction's ETH value.
-    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset. 
+    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset.
     /// @param signatures Proofs that orders have been created by makers.
     /// @return Amounts filled and fees paid by makers and taker.
     function marketSellOrdersWithEth(
@@ -2153,7 +2153,7 @@ contract IForwarderCore {
 
     /// @dev Attempt to purchase makerAssetFillAmount of makerAsset by selling ETH provided with transaction.
     ///      Any ETH not spent will be refunded to sender.
-    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset. 
+    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset.
     /// @param makerAssetFillAmount Desired amount of makerAsset to purchase.
     /// @param signatures Proofs that orders have been created by makers.
     /// @return Amounts filled and fees paid by makers and taker.
@@ -2222,7 +2222,7 @@ contract MixinForwarderCore is
     }
 
     /// @dev Purchases as much of orders' makerAssets as possible by selling transaction's ETH value.
-    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset. 
+    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset.
     /// @param signatures Proofs that orders have been created by makers.
     /// @return Amounts filled and fees paid by makers and taker.
     function marketSellOrdersWithEth(
@@ -2257,7 +2257,7 @@ contract MixinForwarderCore is
 
     /// @dev Attempt to purchase makerAssetFillAmount of makerAsset by selling ETH provided with transaction.
     ///      Any ETH not spent will be refunded to sender.
-    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset. 
+    /// @param orders Array of order specifications used containing desired makerAsset and WETH as takerAsset.
     /// @param makerAssetFillAmount Desired amount of makerAsset to purchase.
     /// @param signatures Proofs that orders have been created by makers.
     /// @return Amounts filled and fees paid by makers and taker.
@@ -2273,7 +2273,7 @@ contract MixinForwarderCore is
         convertEthToWeth();
 
         uint256 makerAssetAmountPurchased;
-        
+
         // Attemp to purchase desired amount of makerAsset.
         orderFillResults = marketBuyExactAmountWithWeth(
             orders,
@@ -2478,11 +2478,11 @@ contract IERC721Token {
     /// @dev Throws if `_tokenId` is not a valid NFT.
     /// @param _tokenId The NFT to find the approved address for
     /// @return The approved address for this NFT, or the zero address if there is none
-    function getApproved(uint256 _tokenId) 
+    function getApproved(uint256 _tokenId)
         public
         view
         returns (address);
-    
+
     /// @notice Query if an address is an authorized operator for another address
     /// @param _owner The address that owns the NFTs
     /// @param _operator The address that acts on behalf of the owner
@@ -2531,7 +2531,7 @@ contract MixinAssets is
 
     bytes4 constant internal ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
 
-    /// @dev Withdraws assets from this contract. The contract requires a ZRX balance in order to 
+    /// @dev Withdraws assets from this contract. The contract requires a ZRX balance in order to
     ///      function optimally, and this function allows the ZRX to be withdrawn by owner. It may also be
     ///      used to withdraw assets that were accidentally sent to this contract.
     /// @param assetData Byte array encoded for the respective asset proxy.
@@ -2589,7 +2589,7 @@ contract MixinAssets is
             success,
             "TRANSFER_FAILED"
         );
-        
+
         // Check return data.
         // If there is no return data, we assume the token incorrectly
         // does not return a bool. In this case we expect it to revert
@@ -3092,4 +3092,15 @@ contract Forwarder is
         )
         MixinForwarderCore()
     {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

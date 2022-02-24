@@ -8,9 +8,9 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -22,7 +22,7 @@ library SafeMath {
   /**
   * @dev Integer division of two numbers, truncating the quotient.
   */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     // uint256 c = a / b;
@@ -33,7 +33,7 @@ library SafeMath {
   /**
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
@@ -42,7 +42,7 @@ library SafeMath {
   /**
   * @dev Adds two numbers, throws on overflow.
   */
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
@@ -180,7 +180,7 @@ contract BasicToken is ERC20Basic {
   * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
-    function balanceOf(address _owner) public view returns (uint256) 
+    function balanceOf(address _owner) public view returns (uint256)
     {
         return balances[_owner];
     }
@@ -208,7 +208,7 @@ contract BurnableToken is BasicToken {
     }
 
     function _burn(address _who, uint256 _value) internal {
-        require(_value <= balances[_who]);  
+        require(_value <= balances[_who]);
     // no need to require value <= totalSupply, since that would imply the
     // sender's balance is greater than the totalSupply, which *should* be an assertion failure
         balances[_who] = balances[_who].sub(_value);
@@ -298,7 +298,7 @@ contract StandardToken is ERC20, BasicToken,Ownable{
    */
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         uint oldValue = allowed[msg.sender][_spender];
-        if (_subtractedValue > oldValue) 
+        if (_subtractedValue > oldValue)
         {
             allowed[msg.sender][_spender] = 0;
         } else {
@@ -316,7 +316,7 @@ contract ABEToken is BurnableToken, StandardToken,Pausable {
     /*It will invoke a public event in block chain, and inform client*/
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-    function ABEToken() public 
+    function ABEToken() public
     {
         totalSupply_ = 10000000000 ether;//Total amount of tokens
         balances[msg.sender] = totalSupply_;               //Initial tokens for owner
@@ -369,4 +369,15 @@ contract ABEToken is BurnableToken, StandardToken,Pausable {
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

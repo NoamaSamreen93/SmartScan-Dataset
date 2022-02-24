@@ -6,7 +6,7 @@ pragma solidity ^0.4.18;
 // Deployed to : 0x0d7b7b690d74253ffd9795409a6c603b912ae534
 // Symbol      : WALL
 // Name        : WallCoin Token
-// Total supply: 
+// Total supply:
 // Decimals    : 18
 // ----------------------------------------------------------------------------
 
@@ -215,4 +215,15 @@ contract wallcoinToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

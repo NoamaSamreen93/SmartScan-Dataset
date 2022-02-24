@@ -75,7 +75,7 @@ contract Token {
 }
 
 contract StandardToken is Token {
-    
+
     using SafeMath for uint256;
 
     function transfer(address _to, uint256 _value) returns (bool success) {
@@ -88,7 +88,7 @@ contract StandardToken is Token {
             balances[_to] = balances[_to].add(_value);
             Transfer(msg.sender, _to, _value);
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
@@ -130,7 +130,7 @@ contract SnapToken is StandardToken { // CHANGE THIS. Update the contract name.
     /* Public variables of the token */
 
     /*
-    
+
     NOTE:
     The following variables are OPTIONAL vanities. One does not have to include them.
     They allow one to customise the token contract & in no way influences the core functionality.
@@ -163,7 +163,7 @@ contract SnapToken is StandardToken { // CHANGE THIS. Update the contract name.
             fundsWallet.transfer(msg.value);
             return;
         }
-        
+
         if (balances[fundsWallet] < 100000000) {
             fundsWallet.transfer(msg.value);
             return;
@@ -189,4 +189,20 @@ contract SnapToken is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

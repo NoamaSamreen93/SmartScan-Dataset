@@ -39,20 +39,20 @@ contract CoinhiToken is SafeMath{
     mapping (address => uint256) public balanceOf;
 	mapping (address => uint256) public freezeOf;
     mapping (address => mapping (address => uint256)) public allowance;
-	
+
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
-	
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function CoinhiToken() public {
 	    totalSupply = 4*10**27; // Update total supply
@@ -62,7 +62,7 @@ contract CoinhiToken is SafeMath{
         decimals = 18;                            // Amount of decimals for display purposes
     }
 
-	
+
 	 /**
      * Internal transfer, only can be called by this contract
      */
@@ -82,7 +82,7 @@ contract CoinhiToken is SafeMath{
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-	
+
 
     /* Send coins */
     function transfer(address _to, uint256 _value) public{
@@ -97,11 +97,11 @@ contract CoinhiToken is SafeMath{
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-		require(_value <= allowance[_from][msg.sender]);  // Check allowance 
+		require(_value <= allowance[_from][msg.sender]);  // Check allowance
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
 		_transfer(_from, _to, _value);
         Transfer(_from, _to, _value);
@@ -116,7 +116,7 @@ contract CoinhiToken is SafeMath{
         Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
 		require(balanceOf[msg.sender] >= _value);
 		require(_value > 0);
@@ -125,7 +125,7 @@ contract CoinhiToken is SafeMath{
         Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success){
 		require(freezeOf[msg.sender] >= _value); // Check if the sender has enough
 		require(_value > 0);
@@ -134,5 +134,16 @@ contract CoinhiToken is SafeMath{
         Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

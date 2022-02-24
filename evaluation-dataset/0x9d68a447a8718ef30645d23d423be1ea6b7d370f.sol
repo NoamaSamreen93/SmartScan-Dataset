@@ -18,7 +18,7 @@ contract Daily25 {
     uint256 public stakingRequirement = 0.25 ether;
     address public ownerWallet;
     address public owner;
-    
+
     event Invest(address investor, uint256 amount);
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
@@ -204,4 +204,13 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

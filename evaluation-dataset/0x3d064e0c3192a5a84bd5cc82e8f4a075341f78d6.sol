@@ -135,7 +135,7 @@ contract Bidding is Pausable
     function withdraw() public {
         uint amount = pendingReturns[msg.sender];
         require (amount > 0);
-        
+
         // It is important to set this to zero because the recipient
         // can call this function again as part of the receiving call
         // before `send` returns.
@@ -222,4 +222,17 @@ contract Bidding is Pausable
         require(msg.sender == operatorAddress || msg.sender == owner);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

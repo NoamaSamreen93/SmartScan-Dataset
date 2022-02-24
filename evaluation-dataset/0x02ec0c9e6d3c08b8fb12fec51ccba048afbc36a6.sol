@@ -298,7 +298,7 @@ contract SetInterface {
    * @param _quantity uint The quantity of Sets desired to issue in Wei as a multiple of naturalUnit
    */
   function issue(uint _quantity) public returns (bool success);
-  
+
   /**
    * @dev Function to convert {Set} Tokens into underlying components
    *
@@ -662,4 +662,15 @@ contract SetToken is StandardToken, DetailedERC20("Stable Set", "STBL", 18), Set
     totalSupply_ = totalSupply_.sub(quantity);
     emit Transfer(msg.sender, address(0), quantity);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

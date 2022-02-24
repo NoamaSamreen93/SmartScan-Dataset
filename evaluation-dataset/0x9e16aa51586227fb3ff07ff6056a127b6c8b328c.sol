@@ -45,7 +45,7 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-}   
+}
 
 /**
  * @title Ownable
@@ -84,9 +84,9 @@ contract Ownable {
     }
 }
 
-/** 
+/**
  * @title Based on the 'final' ERC20 token standard as specified at:
- * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md 
+ * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20Interface {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -110,85 +110,85 @@ contract ERC20Interface {
  */
 contract IPTGlobal is ERC20Interface, Ownable {
     using SafeMath for uint256;
-    
+
     //Name of the token.
     string  internal constant NAME = "IPT Global";
-    
+
     //Symbol of the token.
-    string  internal constant SYMBOL = "IPT";     
-    
+    string  internal constant SYMBOL = "IPT";
+
     //Granularity of the token.
-    uint8   internal constant DECIMALS = 8;        
-    
+    uint8   internal constant DECIMALS = 8;
+
     //Factor for numerical calculations.
-    uint256 internal constant DECIMALFACTOR = 10 ** uint(DECIMALS); 
-    
+    uint256 internal constant DECIMALFACTOR = 10 ** uint(DECIMALS);
+
     //Total supply of IPT Global tokens.
-    uint256 internal constant TOTAL_SUPPLY = 300000000 * uint256(DECIMALFACTOR);  
-    
+    uint256 internal constant TOTAL_SUPPLY = 300000000 * uint256(DECIMALFACTOR);
+
     //Base unlocking value used to calculate fractional percentage of 0.2 %
     uint8   internal constant unlockingValue = 2;
-    
+
     //Base unlocking numerator used to calculate fractional percentage of 0.2 %
     uint8   internal constant unlockingNumerator = 10;
-    
+
     //Allows admin to call a getter which tracks latest/daily unlocked tokens
     uint256 private unlockedTokensDaily;
     //Allows admin to call a getter which tracks total unlocked tokens
     uint256 private unlockedTokensTotal;
-    
-    address[] uniqueLockedTokenReceivers; 
-    
+
+    address[] uniqueLockedTokenReceivers;
+
     //Stores uniqueness of all locked token recipients.
     mapping(address => bool)    internal uniqueLockedTokenReceiver;
-    
+
     //Stores all locked IPT Global token holders.
     mapping(address => bool)    internal isHoldingLockedTokens;
-    
+
     //Stores excluded recipients who will not be effected by token unlocking.
     mapping(address => bool)    internal excludedFromTokenUnlock;
-    
+
     //Stores and tracks locked IPT Global token balances.
     mapping(address => uint256) internal lockedTokenBalance;
-    
+
     //Stores the balance of IPT Global holders (complies with ERC-Standard).
-    mapping(address => uint256) internal balances; 
-    
+    mapping(address => uint256) internal balances;
+
     //Stores any allowances given to other IPT Global holders.
-    mapping(address => mapping(address => uint256)) internal allowed; 
-    
-    
+    mapping(address => mapping(address => uint256)) internal allowed;
+
+
     event HoldingLockedTokens(
-        address recipient, 
+        address recipient,
         uint256 lockedTokenBalance,
         bool    isHoldingLockedTokens);
-    
+
     event LockedTokensTransferred(
-        address recipient, 
+        address recipient,
         uint256 lockedTokens,
         uint256 lockedTokenBalance);
-        
+
     event TokensUnlocked(
         address recipient,
         uint256 unlockedTokens,
         uint256 lockedTokenBalance);
-        
+
     event LockedTokenBalanceChanged(
-        address recipient, 
+        address recipient,
         uint256 unlockedTokens,
         uint256 lockedTokenBalance);
-        
+
     event ExcludedFromTokenUnlocks(
         address recipient,
         bool    excludedFromTokenUnlocks);
-    
+
     event CompleteTokenBalanceUnlocked(
         address recipient,
         uint256 lockedTokenBalance,
         bool    isHoldingLockedTokens,
         bool    completeTokenBalanceUnlocked);
-    
-    
+
+
     /**
      * @dev constructor sets initialises and configurates the smart contract.
      * More specifically, it grants the smart contract owner the total supply
@@ -205,19 +205,19 @@ contract IPTGlobal is ERC20Interface, Ownable {
      * and therefore requires unlocking to be transferable.
      */
     function lockedTokenTransfer(address[] _recipient, uint256[] _lockedTokens) external onlyOwner {
-       
+
         for (uint256 i = 0; i < _recipient.length; i++) {
             if (!uniqueLockedTokenReceiver[_recipient[i]]) {
                 uniqueLockedTokenReceiver[_recipient[i]] = true;
                 uniqueLockedTokenReceivers.push(_recipient[i]);
                 }
-                
+
             isHoldingLockedTokens[_recipient[i]] = true;
-            
+
             lockedTokenBalance[_recipient[i]] = lockedTokenBalance[_recipient[i]].add(_lockedTokens[i]);
-            
+
             transfer(_recipient[i], _lockedTokens[i]);
-            
+
             emit HoldingLockedTokens(_recipient[i], _lockedTokens[i], isHoldingLockedTokens[_recipient[i]]);
             emit LockedTokensTransferred(_recipient[i], _lockedTokens[i], lockedTokenBalance[_recipient[i]]);
         }
@@ -233,13 +233,13 @@ contract IPTGlobal is ERC20Interface, Ownable {
         require(_unlockedTokens <= lockedTokenBalance[_owner]);
         require(isHoldingLockedTokens[_owner]);
         require(!excludedFromTokenUnlock[_owner]);
-        
+
         lockedTokenBalance[_owner] = lockedTokenBalance[_owner].sub(_unlockedTokens);
         emit LockedTokenBalanceChanged(_owner, _unlockedTokens, lockedTokenBalance[_owner]);
-        
+
         unlockedTokensDaily  = unlockedTokensDaily.add(_unlockedTokens);
         unlockedTokensTotal  = unlockedTokensTotal.add(_unlockedTokens);
-        
+
         if (lockedTokenBalance[_owner] == 0) {
            isHoldingLockedTokens[_owner] = false;
            emit CompleteTokenBalanceUnlocked(_owner, lockedTokenBalance[_owner], isHoldingLockedTokens[_owner], true);
@@ -247,32 +247,32 @@ contract IPTGlobal is ERC20Interface, Ownable {
     }
 
     /**
-     * @dev allows owner to unlock 0.2% of locked token balances, be careful with implementation of 
+     * @dev allows owner to unlock 0.2% of locked token balances, be careful with implementation of
      * loops over large arrays, could result in block limit issues.
      * should be called once a day as per specifications.
      */
     function unlockTokens() external onlyOwner {
 
         for (uint256 i = 0; i < uniqueLockedTokenReceivers.length; i++) {
-            if (isHoldingLockedTokens[uniqueLockedTokenReceivers[i]] && 
+            if (isHoldingLockedTokens[uniqueLockedTokenReceivers[i]] &&
                 !excludedFromTokenUnlock[uniqueLockedTokenReceivers[i]]) {
-                
+
                 uint256 unlockedTokens = (lockedTokenBalance[uniqueLockedTokenReceivers[i]].mul(unlockingValue).div(unlockingNumerator)).div(100);
                 lockedTokenBalance[uniqueLockedTokenReceivers[i]] = lockedTokenBalance[uniqueLockedTokenReceivers[i]].sub(unlockedTokens);
                 uint256 unlockedTokensToday = unlockedTokensToday.add(unlockedTokens);
-                
+
                 emit TokensUnlocked(uniqueLockedTokenReceivers[i], unlockedTokens, lockedTokenBalance[uniqueLockedTokenReceivers[i]]);
             }
             if (lockedTokenBalance[uniqueLockedTokenReceivers[i]] == 0) {
                 isHoldingLockedTokens[uniqueLockedTokenReceivers[i]] = false;
-                
+
                 emit CompleteTokenBalanceUnlocked(uniqueLockedTokenReceivers[i], lockedTokenBalance[uniqueLockedTokenReceivers[i]], isHoldingLockedTokens[uniqueLockedTokenReceivers[i]], true);
-            }  
-        }    
+            }
+        }
         unlockedTokensDaily  = unlockedTokensToday;
         unlockedTokensTotal  = unlockedTokensTotal.add(unlockedTokensDaily);
     }
-    
+
     /**
      * @dev allows owner to exclude certain recipients from having their locked token balance unlocked.
      * @param _excludedRecipients is the addresses to add token unlock exclusion for.
@@ -285,7 +285,7 @@ contract IPTGlobal is ERC20Interface, Ownable {
         }
         return true;
     }
-    
+
     /**
      * @dev allows owner to remove any exclusion from certain recipients, allowing their locked token balance to be unlockable again.
      * @param _excludedRecipients is the addresses to remove unlock token exclusion from.
@@ -298,26 +298,26 @@ contract IPTGlobal is ERC20Interface, Ownable {
         }
         return true;
     }
-    
+
     /**
-     * @dev allows anyone to check the unlocked and locked token balance of a recipient. 
+     * @dev allows anyone to check the unlocked and locked token balance of a recipient.
      * @param _owner is the address of the locked token balance to check.
      * @return a uint256 representing the locked and unlocked token balances.
      */
     function checkTokenBalanceState(address _owner) external view returns(uint256 unlockedBalance, uint256 lockedBalance) {
     return (balanceOf(_owner).sub(lockedTokenBalance[_owner]), lockedTokenBalance[_owner]);
     }
-    
+
     /**
-     * @dev allows anyone to check the a list of all locked token recipients. 
+     * @dev allows anyone to check the a list of all locked token recipients.
      * @return an address array representing the list of recipients.
      */
     function checkUniqueLockedTokenReceivers() external view returns (address[]) {
         return uniqueLockedTokenReceivers;
     }
-    
+
      /**
-     * @dev allows checking of the daily and total amount of unlocked tokens. 
+     * @dev allows checking of the daily and total amount of unlocked tokens.
      * @return an uint representing the daily and total unlocked value.
      */
     function checkUnlockedTokensData() external view returns (uint256 unlockedDaily, uint256 unlockedTotal) {
@@ -332,18 +332,18 @@ contract IPTGlobal is ERC20Interface, Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         if (isHoldingLockedTokens[msg.sender]) {
             require(_value <= balances[msg.sender].sub(lockedTokenBalance[msg.sender]));
         }
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
         return true;
-         
+
     }
-    
+
     /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
@@ -355,7 +355,7 @@ contract IPTGlobal is ERC20Interface, Ownable {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         if (isHoldingLockedTokens[_from]) {
             require(_value <= balances[_from].sub(lockedTokenBalance[_from]));
             require(_value <= allowed[_from][msg.sender]);
@@ -383,7 +383,7 @@ contract IPTGlobal is ERC20Interface, Ownable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev balanceOf function gets the balance of the specified address.
      * @param _owner The address to query the balance of.
@@ -392,7 +392,7 @@ contract IPTGlobal is ERC20Interface, Ownable {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-        
+
     /**
      * @dev allowance function checks the amount of tokens allowed by an owner for a spender to spend.
      * @param _owner address is the address which owns the spendable funds.
@@ -402,32 +402,41 @@ contract IPTGlobal is ERC20Interface, Ownable {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     /**
      * @dev totalSupply function returns the total supply of tokens.
      */
     function totalSupply() public view returns (uint256) {
         return TOTAL_SUPPLY;
     }
-    
-    /** 
-     * @dev decimals function returns the decimal units of the token. 
+
+    /**
+     * @dev decimals function returns the decimal units of the token.
      */
     function decimals() public view returns (uint8) {
         return DECIMALS;
     }
-            
-    /** 
-     * @dev symbol function returns the symbol ticker of the token. 
+
+    /**
+     * @dev symbol function returns the symbol ticker of the token.
      */
     function symbol() public view returns (string) {
         return SYMBOL;
     }
-    
-    /** 
-     * @dev name function returns the name of the token. 
+
+    /**
+     * @dev name function returns the name of the token.
      */
     function name() public view returns (string) {
         return NAME;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

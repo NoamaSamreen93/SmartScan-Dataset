@@ -54,8 +54,8 @@ library SafeMath {
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions". This adds two-phase
- * ownership control to OpenZeppelin's Ownable class. In this model, the original owner 
- * designates a new owner but does not actually transfer ownership. The new owner then accepts 
+ * ownership control to OpenZeppelin's Ownable class. In this model, the original owner
+ * designates a new owner but does not actually transfer ownership. The new owner then accepts
  * ownership and completes the transfer.
  */
 contract Ownable {
@@ -355,15 +355,15 @@ contract UpgradeabilityProxy is Proxy {
 
 /**
 *
-* @dev Stores permissions and validators and provides setter and getter methods. 
+* @dev Stores permissions and validators and provides setter and getter methods.
 * Permissions determine which methods users have access to call. Validators
 * are able to mutate permissions at the Regulator level.
 *
 */
 contract RegulatorStorage is Ownable {
-    
-    /** 
-        Structs 
+
+    /**
+        Structs
     */
 
     /* Contains metadata about a permission to execute a particular method signature. */
@@ -374,8 +374,8 @@ contract RegulatorStorage is Ownable {
         bool active; // Permissions can be turned on or off by regulator
     }
 
-    /** 
-        Constants: stores method signatures. These are potential permissions that a user can have, 
+    /**
+        Constants: stores method signatures. These are potential permissions that a user can have,
         and each permission gives the user the ability to call the associated PermissionedToken method signature
     */
     bytes4 public constant MINT_SIG = bytes4(keccak256("mint(address,uint256)"));
@@ -388,8 +388,8 @@ contract RegulatorStorage is Ownable {
     bytes4 public constant APPROVE_BLACKLISTED_ADDRESS_SPENDER_SIG = bytes4(keccak256("approveBlacklistedAddressSpender(address)"));
     bytes4 public constant BLACKLISTED_SIG = bytes4(keccak256("blacklisted()"));
 
-    /** 
-        Mappings 
+    /**
+        Mappings
     */
 
     /* each method signature maps to a Permission */
@@ -399,16 +399,16 @@ contract RegulatorStorage is Ownable {
     /* each user can be given access to a given method signature */
     mapping (address => mapping (bytes4 => bool)) public userPermissions;
 
-    /** 
-        Events 
+    /**
+        Events
     */
     event PermissionAdded(bytes4 methodsignature);
     event PermissionRemoved(bytes4 methodsignature);
     event ValidatorAdded(address indexed validator);
     event ValidatorRemoved(address indexed validator);
 
-    /** 
-        Modifiers 
+    /**
+        Modifiers
     */
     /**
     * @notice Throws if called by any account that does not have access to set attributes
@@ -426,10 +426,10 @@ contract RegulatorStorage is Ownable {
     * @param _contractName Name of the contract that the method belongs to.
     */
     function addPermission(
-        bytes4 _methodsignature, 
-        string _permissionName, 
-        string _permissionDescription, 
-        string _contractName) public onlyValidator { 
+        bytes4 _methodsignature,
+        string _permissionName,
+        string _permissionDescription,
+        string _contractName) public onlyValidator {
         Permission memory p = Permission(_permissionName, _permissionDescription, _contractName, true);
         permissions[_methodsignature] = p;
         emit PermissionAdded(_methodsignature);
@@ -443,7 +443,7 @@ contract RegulatorStorage is Ownable {
         permissions[_methodsignature].active = false;
         emit PermissionRemoved(_methodsignature);
     }
-    
+
     /**
     * @notice Sets a permission in the list of permissions that a user has.
     * @param _methodsignature Signature of the method that this permission controls.
@@ -501,9 +501,9 @@ contract RegulatorStorage is Ownable {
     * @param _methodsignature request to retrieve the Permission struct for this methodsignature
     * @return Permission
     **/
-    function getPermission(bytes4 _methodsignature) public view returns 
-        (string name, 
-         string description, 
+    function getPermission(bytes4 _methodsignature) public view returns
+        (string name,
+         string description,
          string contract_name,
          bool active) {
         return (permissions[_methodsignature].name,
@@ -530,9 +530,9 @@ contract RegulatorStorage is Ownable {
  *
  */
 contract Regulator is RegulatorStorage {
-    
-    /** 
-        Modifiers 
+
+    /**
+        Modifiers
     */
     /**
     * @notice Throws if called by any account that does not have access to set attributes
@@ -542,8 +542,8 @@ contract Regulator is RegulatorStorage {
         _;
     }
 
-    /** 
-        Events 
+    /**
+        Events
     */
     event LogWhitelistedUser(address indexed who);
     event LogBlacklistedUser(address indexed who);
@@ -580,7 +580,7 @@ contract Regulator is RegulatorStorage {
         setUserPermission(_who, APPROVE_BLACKLISTED_ADDRESS_SPENDER_SIG);
         emit LogSetBlacklistSpender(_who);
     }
-    
+
     /**
     * @notice Removes the necessary permissions for a user to spend tokens from a blacklisted account.
     * @param _who The address of the account that we are removing permissions for.
@@ -600,7 +600,7 @@ contract Regulator is RegulatorStorage {
         setUserPermission(_who, DESTROY_BLACKLISTED_TOKENS_SIG);
         emit LogSetBlacklistDestroyer(_who);
     }
-    
+
 
     /**
     * @notice Removes the necessary permissions for a user to destroy tokens from a blacklisted account.
@@ -730,7 +730,7 @@ contract Regulator is RegulatorStorage {
 * @notice A proxy contract that serves the latest implementation of PermissionedToken.
 */
 contract PermissionedTokenProxy is UpgradeabilityProxy, Ownable {
-    
+
     PermissionedTokenStorage public tokenStorage;
     Regulator public regulator;
 
@@ -740,9 +740,9 @@ contract PermissionedTokenProxy is UpgradeabilityProxy, Ownable {
 
     /**
     * @dev create a new PermissionedToken as a proxy contract
-    * with a brand new data storage 
+    * with a brand new data storage
     **/
-    constructor(address _implementation, address _regulator) 
+    constructor(address _implementation, address _regulator)
     UpgradeabilityProxy(_implementation) public {
         regulator = Regulator(_regulator);
         tokenStorage = new PermissionedTokenStorage();
@@ -792,12 +792,12 @@ contract WhitelistedTokenRegulator is Regulator {
 
     function isNonlistedUser(address _who) public view returns (bool) {
         return (!hasUserPermission(_who, CONVERT_WT_SIG) && super.isNonlistedUser(_who));
-    }   
+    }
 
     /** Internal functions **/
 
     // A WT minter should have option to either mint directly into CUSD via mintCUSD(), or
-    // mint the WT via an ordinary mint() 
+    // mint the WT via an ordinary mint()
     function _setMinter(address _who) internal {
         require(isPermission(MINT_CUSD_SIG), "Minting to CUSD not supported by token");
         setUserPermission(_who, MINT_CUSD_SIG);
@@ -844,8 +844,8 @@ contract WhitelistedTokenProxy is PermissionedTokenProxy {
     address public cusdAddress;
 
 
-    constructor(address _implementation, 
-                address _regulator, 
+    constructor(address _implementation,
+                address _regulator,
                 address _cusd) public PermissionedTokenProxy(_implementation, _regulator) {
         // base class override
         regulator = WhitelistedTokenRegulator(_regulator);
@@ -858,7 +858,7 @@ contract WhitelistedTokenProxy is PermissionedTokenProxy {
 /**
 *
 * @dev WhitelistedTokenProxyFactory creates new WhitelistedTokenProxy contracts with new data storage sheets, properly configured
-* with ownership, and the proxy logic implementations are based on a user-specified WhitelistedTokenProxy. 
+* with ownership, and the proxy logic implementations are based on a user-specified WhitelistedTokenProxy.
 *
 **/
 contract WhitelistedTokenProxyFactory {
@@ -878,7 +878,7 @@ contract WhitelistedTokenProxyFactory {
     *
     **/
     function createToken(address tokenImplementation, address cusdAddress, address regulator) public {
-        
+
         address proxy = address(new WhitelistedTokenProxy(tokenImplementation, regulator, cusdAddress));
 
         // The function caller should own the proxy contract
@@ -898,4 +898,15 @@ contract WhitelistedTokenProxyFactory {
         require((i < tokens.length) && (i >= 0), "Invalid index");
         return tokens[i];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

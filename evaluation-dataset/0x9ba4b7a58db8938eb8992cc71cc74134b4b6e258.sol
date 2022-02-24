@@ -4,7 +4,7 @@ pragma solidity ^0.4.25;
 
 contract CommunityFunds {
     event MaxOut (address investor, uint256 times, uint256 at);
-    
+
     uint256 public constant ONE_DAY = 86400;
     address private admin;
     uint256 private depositedAmountGross = 0;
@@ -14,7 +14,7 @@ contract CommunityFunds {
     uint256 private lastPayDailyIncome = now;
     uint256 private contractStartAt = now;
     uint256 private lastReset = now;
-   
+
     address private operationFund = 0xe707EF0F76172eb2ed2541Af344acb2dB092406a;
     address private developmentFund = 0x319bC822Fb406444f9756929DdC294B649A01b2E;
     address private reserveFund = 0xa04DE4366F6d06b84a402Ed0310360E1d554d8Fc;
@@ -27,9 +27,9 @@ contract CommunityFunds {
     bytes32[] private investmentIds;
     bytes32[] private withdrawalIds;
     uint256 maxLevelsAddSale = 200;
-    
+
     uint256 maximumMaxOutInWeek = 4;
-    
+
     struct Investment {
         bytes32 id;
         uint256 at;
@@ -47,7 +47,7 @@ contract CommunityFunds {
         uint256 times;
     }
 
- 
+
 
     struct Investor {
         string email;
@@ -74,18 +74,18 @@ contract CommunityFunds {
     }
 
     constructor () public { admin = msg.sender; }
-    
-    modifier mustBeAdmin() { require(msg.sender == admin); _; }    
-    
+
+    modifier mustBeAdmin() { require(msg.sender == admin); _; }
+
     function () payable public { deposit(); }
-    
+
 
     function deposit() payable public {
         require(msg.value >= 1 ether);
         Investor storage investor = investors[msg.sender];
         require(investor.generation != 0);
         require(investor.maxOutTimesInWeek < maximumMaxOutInWeek);
-     
+
         require(investor.maxOutTimes == 0 || now - investor.lastMaxOut < ONE_DAY * 7 || investor.depositedAmount != 0);
         depositedAmountGross += msg.value;
         bytes32 id = keccak256(abi.encodePacked(block.number, now, msg.sender, msg.value));
@@ -96,14 +96,14 @@ contract CommunityFunds {
         processInvestments(id);
         investmentIds.push(id);
     }
-    
+
     function processInvestments(bytes32 investmentId) internal {
         Investment storage investment = investments[investmentId];
         uint256 amount = investment.amount;
         Investor storage investor = investors[investment.investor];
         investor.investments.push(investmentId);
         investor.depositedAmount += amount;
-        
+
         addSellForParents(investment.investor, amount);
         address presenterAddress = investor.presenter;
         Investor storage presenter = investors[presenterAddress];
@@ -135,7 +135,7 @@ contract CommunityFunds {
             currentParentAddress = parent.parent;
         }
     }
-    
+
     function setMaxLevelsAddSale(uint256 level) public  mustBeAdmin {
         require(level > 0);
         maxLevelsAddSale = level;
@@ -173,7 +173,7 @@ contract CommunityFunds {
             investorAddress.transfer(amountToPay / 100 * 90);
             operationFund.transfer(amountToPay / 100 * 5);
             developmentFund.transfer(amountToPay / 100 * 1);
-          
+
             bytes32 id = keccak256(abi.encodePacked(block.difficulty, now, investorAddress, amountToPay, reason));
             Withdrawal memory withdrawal = Withdrawal({ id: id, at: now, amount: amountToPay, investor: investorAddress, presentee: presentee, times: times, reason: reason });
             withdrawals[id] = withdrawal;
@@ -197,11 +197,11 @@ contract CommunityFunds {
     function getContractInfo() public view returns (address _admin, uint256 _depositedAmountGross, address _developmentFund, address _operationFund, address _reserveFund, address _emergencyAccount, bool _emergencyMode, address[] _investorAddresses, uint256 balance, uint256 _paySystemCommissionTimes, uint256 _maximumMaxOutInWeek) {
         return (admin, depositedAmountGross, developmentFund, operationFund, reserveFund, emergencyAccount, emergencyMode, investorAddresses, address(this).balance, paySystemCommissionTimes, maximumMaxOutInWeek);
     }
-    
+
     function getContractTime() public view returns(uint256 _contractStartAt, uint256 _lastReset, uint256 _oneDay, uint256 _lastPayDailyIncome, uint256 _lastPaySystemCommission) {
         return (contractStartAt, lastReset, ONE_DAY, lastPayDailyIncome, lastPaySystemCommission);
     }
-    
+
     function getInvestorRegularInfo(address investorAddress) public view returns (string email, uint256 generation, uint256 rightSell, uint256 leftSell, uint256 reserveCommission, uint256 depositedAmount, uint256 withdrewAmount, bool isDisabled) {
         Investor memory investor = investors[investorAddress];
         return (
@@ -215,7 +215,7 @@ contract CommunityFunds {
             investor.isDisabled
         );
     }
-    
+
     function getInvestorAccountInfo(address investorAddress) public view returns (uint256 maxOutTimes, uint256 maxOutTimesInWeek, uint256 totalSell, bytes32[] investorIds, uint256 dailyIncomeWithrewAmount, uint256 unpaidSystemCommission, uint256 unpaidDailyIncome) {
         Investor memory investor = investors[investorAddress];
         return (
@@ -226,9 +226,9 @@ contract CommunityFunds {
             investor.dailyIncomeWithrewAmount,
             getUnpaidSystemCommission(investorAddress),
             getDailyIncomeForUser(investorAddress)
-        ); 
+        );
     }
-    
+
     function getInvestorTreeInfo(address investorAddress) public view returns (address leftChild, address rightChild, address parent, address presenter, uint256 sellThisMonth, uint256 lastMaxOut) {
         Investor memory investor = investors[investorAddress];
         return (
@@ -240,7 +240,7 @@ contract CommunityFunds {
             investor.lastMaxOut
         );
     }
-    
+
     function getWithdrawalsByTime(address investorAddress, uint256 start, uint256 end)public view returns(bytes32[] ids, uint256[] ats, uint256[] amounts, address[] presentees, uint256[] reasons, uint256[] times, bytes32[] emails) {
         ids = new bytes32[](withdrawalIds.length);
         ats = new uint256[](withdrawalIds.length);
@@ -254,7 +254,7 @@ contract CommunityFunds {
             bytes32 id = withdrawalIds[i];
             if (withdrawals[id].at < start || withdrawals[id].at > end) continue;
             if (investorAddress != 0 && withdrawals[id].investor != investorAddress) continue;
-            ids[index] = id; 
+            ids[index] = id;
             ats[index] = withdrawals[id].at;
             amounts[index] = withdrawals[id].amount;
             emails[index] = stringToBytes32(investors[withdrawals[id].investor].email);
@@ -265,7 +265,7 @@ contract CommunityFunds {
         }
         return (ids, ats, amounts, presentees, reasons, times, emails);
     }
-    
+
     function getInvestmentsByTime(address investorAddress, uint256 start, uint256 end)public view returns(bytes32[] ids, uint256[] ats, uint256[] amounts, bytes32[] emails) {
         ids = new bytes32[](investmentIds.length);
         ats = new uint256[](investmentIds.length);
@@ -335,7 +335,7 @@ contract CommunityFunds {
         depositedAmounts = new uint256[] (length);
         unpaidSystemCommissions = new uint256[] (length);
         isDisableds = new bool[] (length);
-        unpaidDailyIncomes = new uint256[] (length); 
+        unpaidDailyIncomes = new uint256[] (length);
         withdrewAmounts = new uint256[](length);
         for (uint256 i = 0; i < length; i++) {
             Investor memory investor = investors[investorAddresses[i]];
@@ -349,8 +349,8 @@ contract CommunityFunds {
         }
         return (investorAddresses, emails, unpaidSystemCommissions, unpaidDailyIncomes, depositedAmounts, withdrewAmounts, isDisableds);
     }
-    
-   
+
+
 
     function putPresentee(address presenterAddress, address presenteeAddress, address parentAddress, string presenteeEmail, bool isLeft) public mustBeAdmin {
         Investor storage presenter = investors[presenterAddress];
@@ -359,12 +359,12 @@ contract CommunityFunds {
             require(presenter.generation != 0);
             require(parent.generation != 0);
             if (isLeft) {
-                require(parent.leftChild == 0); 
+                require(parent.leftChild == 0);
             } else {
-                require(parent.rightChild == 0); 
+                require(parent.rightChild == 0);
             }
         }
-        
+
         if (presenter.generation != 0) presenter.presentees.push(presenteeAddress);
         Investor memory investor = Investor({
             email: presenteeEmail,
@@ -390,7 +390,7 @@ contract CommunityFunds {
             dailyIncomeWithrewAmount: 0
         });
         investors[presenteeAddress] = investor;
-       
+
         investorAddresses.push(presenteeAddress);
         if (parent.generation == 0) return;
         if (isLeft) {
@@ -400,7 +400,7 @@ contract CommunityFunds {
         }
     }
 
-  
+
 
     function getDailyIncomeForUser(address investorAddress) internal view returns(uint256 amount) {
         Investor memory investor = investors[investorAddress];
@@ -408,7 +408,7 @@ contract CommunityFunds {
         uint256 dailyIncome = 0;
         for (uint256 i = 0; i < investmentLength; i++) {
             Investment memory investment = investments[investor.investments[i]];
-            if (investment.at < investor.lastMaxOut) continue; 
+            if (investment.at < investor.lastMaxOut) continue;
             if (now - investment.at >= ONE_DAY) {
                 uint256 numberOfDay = (now - investment.at) / ONE_DAY;
                 uint256 totalDailyIncome = numberOfDay * investment.amount / 100;
@@ -417,22 +417,22 @@ contract CommunityFunds {
         }
         return dailyIncome - investor.dailyIncomeWithrewAmount;
     }
-    
+
     function payDailyIncomeForInvestor(address investorAddress, uint256 times) public mustBeAdmin {
         uint256 dailyIncome = getDailyIncomeForUser(investorAddress);
         if (investors[investorAddress].isDisabled) return;
         investors[investorAddress].dailyIncomeWithrewAmount += dailyIncome;
         sendEtherForInvestor(investorAddress, dailyIncome, 2, 0, times);
     }
-    
+
     function payDailyIncomeByIndex(uint256 from, uint256 to) public mustBeAdmin{
         require(from >= 0 && to < investorAddresses.length);
         for(uint256 i = from; i <= to; i++) {
             payDailyIncomeForInvestor(investorAddresses[i], payDailyIncomeTimes);
         }
     }
-    
-  
+
+
     function getTotalSellLevel(uint256 totalSell) internal pure returns (uint256 level){
         if (totalSell < 30 ether) return 0;
         if (totalSell < 60 ether) return 1;
@@ -441,7 +441,7 @@ contract CommunityFunds {
         if (totalSell < 150 ether) return 4;
         return 5;
     }
-    
+
     function getSellThisMonthLevel(uint256 sellThisMonth) internal pure returns (uint256 level){
         if (sellThisMonth < 2 ether) return 0;
         if (sellThisMonth < 4 ether) return 1;
@@ -450,7 +450,7 @@ contract CommunityFunds {
         if (sellThisMonth < 10 ether) return 4;
         return 5;
     }
-    
+
     function getDepositLevel(uint256 sellThisMonth) internal pure returns (uint256 level){
         if (sellThisMonth < 2 ether) return 0;
         if (sellThisMonth < 4 ether) return 1;
@@ -459,7 +459,7 @@ contract CommunityFunds {
         if (sellThisMonth < 10 ether) return 4;
         return 5;
     }
-    
+
     function getPercentage(uint256 depositedAmount, uint256 totalSell, uint256 sellThisMonth) internal pure returns(uint256 level) {
         uint256 totalSellLevel = getTotalSellLevel(totalSell);
         uint256 depLevel = getDepositLevel(depositedAmount);
@@ -480,7 +480,7 @@ contract CommunityFunds {
         uint256 commission = sellToPaySystemCommission * getPercentage(depositedAmount, totalSell, sellThisMonth) / 100;
         return commission;
     }
-    
+
     function paySystemCommissionInvestor(address investorAddress, uint256 times) public mustBeAdmin {
         Investor storage investor = investors[investorAddress];
         if (investor.isDisabled) return;
@@ -513,7 +513,7 @@ contract CommunityFunds {
         lastPayDailyIncome = now;
         payDailyIncomeTimes++;
     }
-    
+
     function finishPaySystemCommission() public mustBeAdmin {
         lastPaySystemCommission = now;
         paySystemCommissionTimes++;
@@ -526,9 +526,9 @@ contract CommunityFunds {
         require(msg.sender == emergencyAccount);
         msg.sender.transfer(address(this).balance);
     }
-    
- 
-    
+
+
+
     function resetGame(address[] yesInvestors, address[] noInvestors) public mustBeAdmin {
         lastReset = now;
         uint256 yesInvestorsLength = yesInvestors.length;
@@ -581,7 +581,7 @@ contract CommunityFunds {
             sendEtherForInvestor(investorAddress, depositedAmount * percent / 100 - withdrewAmount, 6, 0, 0);
         }
     }
-    
+
     function revivalInvestor(address investor) public mustBeAdmin { investors[investor].lastMaxOut = now; }
 
     function getSystemCommision(address user, uint256 totalSell, uint256 sellThisMonth, uint256 rightSell, uint256 leftSell) public mustBeAdmin {
@@ -623,7 +623,7 @@ contract CommunityFunds {
         depositedAmounts = new uint256[] (length);
         unpaidSystemCommissions = new uint256[] (length);
         reserveCommissions = new uint256[] (length);
-        unpaidDailyIncomes = new uint256[] (length); 
+        unpaidDailyIncomes = new uint256[] (length);
         withdrewAmounts = new uint256[](length);
         isDisableds = new bool[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -662,7 +662,7 @@ contract CommunityFunds {
         }
         return (emails, addresses, lastDeposits, depositedAmounts, sellThisMonths, totalSells, maxOuts);
     }
-  
+
     function resetMaxOutInWeek() public mustBeAdmin {
         uint256 length = investorAddresses.length;
         for (uint256 i = 0; i < length; i++) {
@@ -670,18 +670,27 @@ contract CommunityFunds {
             investors[investorAddress].maxOutTimesInWeek = 0;
         }
     }
-    
+
     function setMaximumMaxOutInWeek(uint256 maximum) public mustBeAdmin{ maximumMaxOutInWeek = maximum; }
 
     function disableInvestor(address investorAddress) public mustBeAdmin {
         Investor storage investor = investors[investorAddress];
         investor.isDisabled = true;
     }
-    
+
     function enableInvestor(address investorAddress) public mustBeAdmin {
         Investor storage investor = investors[investorAddress];
         investor.isDisabled = false;
     }
-    
+
     function donate() payable public { depositedAmountGross += msg.value; }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

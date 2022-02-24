@@ -114,7 +114,7 @@ contract CccTokenIco is StandardToken {
     string public name = "Crypto Credit Card Token";
     string public symbol = "CCCR";
     uint8 public constant decimals = 6;
-    
+
     uint256 public cntMembers = 0;
     uint256 public totalSupply;
     uint256 public totalRaised;
@@ -124,7 +124,7 @@ contract CccTokenIco is StandardToken {
 
     uint256 public minCap;
     uint256 public maxCap;
-    
+
     uint256 public avgRate = uint256(uint256(10)**(18-decimals)).div(460);
 
     address public stuff = 0x0CcCb9bAAdD61F9e0ab25bD782765013817821bD;
@@ -138,19 +138,19 @@ contract CccTokenIco is StandardToken {
     event Clearing(address to, uint256 amount);
 
     function CccTokenIco(
-    ) 
+    )
     {
         cntMembers = 0;
         startTimestamp = now - 11 days;
         baseowner = msg.sender;
-        minCap = 3000000 * (uint256(10) ** decimals); 
+        minCap = 3000000 * (uint256(10) ** decimals);
         maxCap = 200000000 * (uint256(10) ** decimals);
         totalSupply = maxCap;
         balances[baseowner] = totalSupply;
         Transfer(0x0, baseowner, totalSupply);
     }
 
-    function bva(address partner, uint256 value, uint256 rate, address adviser) isIcoOpen payable public 
+    function bva(address partner, uint256 value, uint256 rate, address adviser) isIcoOpen payable public
     {
       uint256 tokenAmount = calculateTokenAmount(value);
       if(msg.value != 0)
@@ -177,7 +177,7 @@ contract CccTokenIco is StandardToken {
         {
           Clearing(adviser, msg.value.mul(20).div(100));
           adviser.transfer(msg.value.mul(20).div(100));
-        } 
+        }
       }
       totalRaised = totalRaised.add(tokenAmount);
       balances[baseowner] = balances[baseowner].sub(tokenAmount);
@@ -185,7 +185,7 @@ contract CccTokenIco is StandardToken {
       Transfer(baseowner, partner, tokenAmount);
       cntMembers = cntMembers.add(1);
     }
-    
+
     function() isIcoOpen payable public
     {
       if(msg.value != 0)
@@ -209,13 +209,13 @@ contract CccTokenIco is StandardToken {
       }
     }
 
-    function calculateTokenAmount(uint256 count) constant returns(uint256) 
+    function calculateTokenAmount(uint256 count) constant returns(uint256)
     {
         uint256 icoDeflator = getIcoDeflator();
         return count.mul(icoDeflator).div(100);
     }
 
-    function calculateTokenCount(uint256 weiAmount, uint256 rate) constant returns(uint256) 
+    function calculateTokenCount(uint256 weiAmount, uint256 rate) constant returns(uint256)
     {
         if(rate==0)revert();
         uint256 icoDeflator = getIcoDeflator();
@@ -224,16 +224,16 @@ contract CccTokenIco is StandardToken {
 
     function getIcoDeflator() constant returns (uint256)
     {
-        if (now <= startTimestamp + 15 days) 
+        if (now <= startTimestamp + 15 days)
         {
             return 138;
-        }else if (now <= startTimestamp + 29 days) 
+        }else if (now <= startTimestamp + 29 days)
         {
             return 123;
-        }else if (now <= startTimestamp + 43 days) 
+        }else if (now <= startTimestamp + 43 days)
         {
             return 115;
-        }else 
+        }else
         {
             return 109;
         }
@@ -247,23 +247,23 @@ contract CccTokenIco is StandardToken {
       }
     }
 
-    function transfer(address _to, uint _value) isIcoFinished returns (bool) 
+    function transfer(address _to, uint _value) isIcoFinished returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) isIcoFinished returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) isIcoFinished returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
 
-    modifier isStuff() 
+    modifier isStuff()
     {
         require(msg.sender == stuff || msg.sender == founder);
         _;
     }
 
-    modifier isIcoOpen() 
+    modifier isIcoOpen()
     {
         require(now >= startTimestamp);//15.11-29.11 pre ICO
         require(now <= startTimestamp + 14 days || now >= startTimestamp + 19 days);//gap 29.11-04.12
@@ -272,11 +272,27 @@ contract CccTokenIco is StandardToken {
         _;
     }
 
-    modifier isIcoFinished() 
+    modifier isIcoFinished()
     {
         require(now >= startTimestamp);
         require(totalRaised >= maxCap || (now >= (startTimestamp + durationSeconds) && totalRaised >= minCap));
         _;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

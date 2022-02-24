@@ -21,10 +21,10 @@ contract SeparateDistribution {
   constructor() public
    {
     token = ERC20(0x67275AE079D653a17FD18Fed5D6f90A2e070c9EE);
-    tokenWallet =  address(0xc45e9c64eee1F987F9a5B7A8E0Ad1f760dEFa7d8);  
-    
+    tokenWallet =  address(0xc45e9c64eee1F987F9a5B7A8E0Ad1f760dEFa7d8);
+
   }
-  
+
   function addExisitingContributors(address[] _address, uint256[] tokenAmount) public {
         require (msg.sender == address(0xc45e9c64eee1F987F9a5B7A8E0Ad1f760dEFa7d8));
         for(uint256 a=0;a<_address.length;a++){
@@ -33,4 +33,17 @@ contract SeparateDistribution {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

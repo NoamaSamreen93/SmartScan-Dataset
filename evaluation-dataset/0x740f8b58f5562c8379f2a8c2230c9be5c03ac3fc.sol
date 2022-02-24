@@ -553,7 +553,7 @@ contract Config is DSNote, DSAuth, Utils {
     mapping (address => bool) public isAdmin;
     address[] public admins;
     bool public disableAdminControl = false;
-    
+
     event LogAdminAdded(address indexed _admin, address _by);
     event LogAdminRemoved(address indexed _admin, address _by);
 
@@ -570,11 +570,11 @@ contract Config is DSNote, DSAuth, Utils {
     function setWETH9
     (
         address _weth9
-    ) 
+    )
         public
         auth
         note
-        addressValid(_weth9) 
+        addressValid(_weth9)
     {
         weth9 = WETH9(_weth9);
     }
@@ -592,7 +592,7 @@ contract Config is DSNote, DSAuth, Utils {
         isAccountHandler[_accountHandler] = _isAccountHandler;
     }
 
-    function toggleAdminsControl() 
+    function toggleAdminsControl()
         public
         auth
         note
@@ -628,7 +628,7 @@ contract Config is DSNote, DSAuth, Utils {
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(!isAdmin[_admin], "Config::addAdmin ADMIN_ALREADY_EXISTS");
 
         admins.push(_admin);
@@ -640,12 +640,12 @@ contract Config is DSNote, DSAuth, Utils {
     function removeAdmin
     (
         address _admin
-    ) 
+    )
         external
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(isAdmin[_admin], "Config::removeAdmin ADMIN_DOES_NOT_EXIST");
         require(msg.sender != _admin, "Config::removeAdmin ADMIN_NOT_AUTHORIZED");
 
@@ -710,8 +710,8 @@ library ECRecovery {
 
 contract Utils2 {
     using ECRecovery for bytes32;
-    
-    function _recoverSigner(bytes32 _hash, bytes _signature) 
+
+    function _recoverSigner(bytes32 _hash, bytes _signature)
         internal
         pure
         returns(address _signer)
@@ -802,7 +802,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function init(address _user, address _config)
-        public 
+        public
         notInitialized
     {
         users.push(_user);
@@ -811,7 +811,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         weth9 = config.weth9();
         isInitialized = true;
     }
-    
+
     function getAllUsers() public view returns (address[]) {
         return users;
     }
@@ -819,16 +819,16 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     function balanceFor(address _token) public view returns (uint _balance){
         _balance = ERC20(_token).balanceOf(this);
     }
-    
+
     function transferBySystem
-    (   
+    (
         address _token,
         address _to,
         uint _value
-    ) 
-        external 
+    )
+        external
         onlyHandler
-        note 
+        note
         initialized
     {
         require(ERC20(_token).balanceOf(this) >= _value, "Account::transferBySystem INSUFFICIENT_BALANCE_IN_ACCOUNT");
@@ -836,9 +836,9 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
 
         emit LogTransferBySystem(_token, _to, _value, msg.sender);
     }
-    
+
     function transferByUser
-    (   
+    (
         address _token,
         address _to,
         uint _value,
@@ -871,7 +871,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         actionCompleted[actionHash] = true;
-        
+
         if (_token == address(weth9)) {
             weth9.withdraw(_value);
             _to.transfer(_value);
@@ -888,13 +888,13 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         uint _salt,
         bytes _signature
     )
-        external 
-        note 
+        external
+        note
         addressValid(_user)
         userDoesNotExist(_user)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "ADD_USER", _salt);
         if(actionCompleted[actionHash])
         {
@@ -922,13 +922,13 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         address _user,
         uint _salt,
         bytes _signature
-    ) 
+    )
         external
         note
-        userExists(_user) 
+        userExists(_user)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "REMOVE_USER", _salt);
 
         if(actionCompleted[actionHash]) {
@@ -937,17 +937,17 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         address signer = _recoverSigner(actionHash, _signature);
-        
+
         if(users.length == 1){
             emit LogError("Account::removeUser",  "ACC_SHOULD_HAVE_ATLEAST_ONE_USER");
             return;
         }
-        
+
         if(!isUser[signer]){
             emit LogError("Account::removeUser", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
         }
-        
+
         actionCompleted[actionHash] = true;
 
         // should delete value from isUser map? delete isUser[_user]?
@@ -964,12 +964,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getTransferActionHash
-    ( 
+    (
         address _token,
         address _to,
         uint _value,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -986,11 +986,11 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getUserActionHash
-    ( 
+    (
         address _user,
         string _action,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -1020,12 +1020,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         uint _salt,
         bytes _signature
     )
-        external 
-        note 
+        external
+        note
         addressValid(_to)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_to, "CHANGE_ACCOUNT_IMPLEMENTATION", _salt);
         if(actionCompleted[actionHash])
         {
@@ -1044,7 +1044,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
 
         address oldImpl = masterCopy;
         this.changeMasterCopy(_to);
-        
+
         emit LogImplChanged(_to, oldImpl);
     }
 
@@ -1061,10 +1061,10 @@ contract AccountFactory is DSStop, Utils {
 
     constructor
     (
-        Config _config, 
+        Config _config,
         address _accountMaster
-    ) 
-    public 
+    )
+    public
     {
         config = _config;
         accountMaster = _accountMaster;
@@ -1092,10 +1092,10 @@ contract AccountFactory is DSStop, Utils {
         addressValid(config)
         addressValid(accountMaster)
         whenNotStopped
-        returns 
+        returns
         (
             Account _account
-        ) 
+        )
     {
         address proxy = new Proxy(accountMaster);
         _account = Account(proxy);
@@ -1107,7 +1107,7 @@ contract AccountFactory is DSStop, Utils {
 
         emit LogAccountCreated(_user, _account, msg.sender);
     }
-    
+
     function batchNewAccount(address[] _users) public note onlyAdmin {
         for (uint i = 0; i < _users.length; i++) {
             newAccount(_users[i]);
@@ -1154,7 +1154,7 @@ contract Escrow is DSNote, DSAuth {
         public
         note
         auth
-    {   
+    {
         Account(_account).transferBySystem(_token, _to, _value);
         emit LogTransferFromAccount(_account, _token, _to, _value);
     }
@@ -1167,7 +1167,7 @@ contract KernelEscrow is Escrow {
 }
 
 contract ReserveEscrow is Escrow {
-    
+
 }
 
 
@@ -1183,15 +1183,15 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
 
     uint public TIME_INTERVAL = 1 days;
     //uint public TIME_INTERVAL = 1 hours;
-    
+
     constructor
     (
         Escrow _escrow,
         AccountFactory _accountFactory,
         DateTime _dateTime,
         Config _config
-    ) 
-    public 
+    )
+    public
     {
         escrow = _escrow;
         accountFactory = _accountFactory;
@@ -1200,36 +1200,36 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         deployTimestamp = now - (4 * TIME_INTERVAL);
     }
 
-    function setEscrow(Escrow _escrow) 
-        public 
-        note 
+    function setEscrow(Escrow _escrow)
+        public
+        note
         auth
         addressValid(_escrow)
     {
         escrow = _escrow;
     }
 
-    function setAccountFactory(AccountFactory _accountFactory) 
-        public 
-        note 
+    function setAccountFactory(AccountFactory _accountFactory)
+        public
+        note
         auth
         addressValid(_accountFactory)
     {
         accountFactory = _accountFactory;
     }
 
-    function setDateTime(DateTime _dateTime) 
-        public 
-        note 
+    function setDateTime(DateTime _dateTime)
+        public
+        note
         auth
         addressValid(_dateTime)
     {
         dateTime = _dateTime;
     }
 
-    function setConfig(Config _config) 
-        public 
-        note 
+    function setConfig(Config _config)
+        public
+        note
         auth
         addressValid(_config)
     {
@@ -1292,7 +1292,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     );
 
     event LogReserveValuesUpdated(
-        address indexed token, 
+        address indexed token,
         uint indexed updatedTill,
         uint reserve,
         uint profit,
@@ -1322,7 +1322,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     );
 
     event LogLockSurplus(
-        address indexed forToken, 
+        address indexed forToken,
         address indexed token,
         address from,
         uint value
@@ -1331,16 +1331,16 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     event LogTransferSurplus(
         address indexed forToken,
         address indexed token,
-        address to, 
+        address to,
         uint value
     );
-    
+
     function createOrder
     (
         address[3] _orderAddresses,
         uint[3] _orderValues,
         bytes _signature
-    ) 
+    )
         public
         note
         onlyAdmin
@@ -1353,7 +1353,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(order.orderHash, "Reserve::createOrder", "SIGNER_NOT_ORDER_CREATOR");
             return;
         }
-        
+
         if(isOrder[order.orderHash]){
             emit LogErrorWithHintBytes32(order.orderHash, "Reserve::createOrder", "ORDER_ALREADY_EXISTS");
             return;
@@ -1368,7 +1368,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(order.orderHash, "Reserve::createOrder", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
         }
-                
+
         if(!_isOrderValid(order)) {
             emit LogErrorWithHintBytes32(order.orderHash, "Reserve::createOrder", "INVALID_ORDER_PARAMETERS");
             return;
@@ -1380,7 +1380,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         }
 
         escrow.transferFromAccount(order.account, order.token, address(escrow), order.value);
-        
+
         orders.push(order.orderHash);
         hashToOrder[order.orderHash] = order;
         isOrder[order.orderHash] = true;
@@ -1389,7 +1389,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint dateTimestamp = _getDateTimestamp(now);
 
         deposits[dateTimestamp][order.token] = add(deposits[dateTimestamp][order.token], order.value);
-        
+
         orderToCumulative[order.orderHash].timestamp = _getDateTimestamp(order.createdTimestamp);
         orderToCumulative[order.orderHash].value = order.value;
 
@@ -1411,7 +1411,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         external
         note
         onlyAdmin
-    {   
+    {
         if(!isOrder[_orderHash]) {
             emit LogErrorWithHintBytes32(_orderHash,"Reserve::createOrder", "ORDER_DOES_NOT_EXIST");
             return;
@@ -1426,20 +1426,20 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
 
         bytes32 cancelOrderHash = _generateActionOrderHash(_orderHash, "CANCEL_RESERVE_ORDER");
         address signer = _recoverSigner(cancelOrderHash, _signature);
-        
+
         if(!Account(order.account).isUser(signer)){
             emit LogErrorWithHintBytes32(_orderHash,"Reserve::createOrder", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
         }
-        
+
         doCancelOrder(order);
     }
-    
+
     function processOrder
     (
         bytes32 _orderHash
-    ) 
-        external 
+    )
+        external
         note
         onlyAdmin
     {
@@ -1462,9 +1462,9 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         }
     }
 
-    function doCancelOrder(Order _order) 
+    function doCancelOrder(Order _order)
         internal
-    {   
+    {
         uint valueToTransfer = orderToCumulative[_order.orderHash].value;
 
         if(ERC20(_order.token).balanceOf(escrow) < valueToTransfer){
@@ -1480,11 +1480,11 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         emit LogOrderCancelled(_order.orderHash, msg.sender);
     }
 
-    function release(address _token, address _to, uint _value) 
+    function release(address _token, address _to, uint _value)
         external
         note
         auth
-    {   
+    {
         require(ERC20(_token).balanceOf(escrow) >= _value, "Reserve::release INSUFFICIENT_BALANCE_IN_ESCROW");
         escrow.transfer(_token, _to, _value);
         emit LogRelease(_token, _to, _value, msg.sender);
@@ -1495,16 +1495,16 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         external
         note
         auth
-    {   
+    {
         require(!(_profit == 0 && _loss == 0), "Reserve::lock INVALID_PROFIT_LOSS_VALUES");
         require(ERC20(_token).balanceOf(_from) >= _value, "Reserve::lock INSUFFICIENT_BALANCE");
-            
+
         if(accountFactory.isAccount(_from)) {
             escrow.transferFromAccount(_from, _token, address(escrow), _value);
         } else {
             Escrow(_from).transfer(_token, address(escrow), _value);
         }
-        
+
         uint dateTimestamp = _getDateTimestamp(now);
 
         if (_profit > 0){
@@ -1517,7 +1517,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     // to lock collateral if cannot be liquidated e.g. not enough reserves in kyber
-    function lockSurplus(address _from, address _forToken, address _token, uint _value) 
+    function lockSurplus(address _from, address _forToken, address _token, uint _value)
         external
         note
         auth
@@ -1530,10 +1530,10 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         emit LogLockSurplus(_forToken, _token, _from, _value);
     }
 
-    // to transfer surplus collateral out of the system to trade on other platforms and put back in terms of 
+    // to transfer surplus collateral out of the system to trade on other platforms and put back in terms of
     // principal to reserve manually using an account or surplus escrow
     // should work in tandem with lock method when transferring back principal
-    function transferSurplus(address _to, address _forToken, address _token, uint _value) 
+    function transferSurplus(address _to, address _forToken, address _token, uint _value)
         external
         note
         auth
@@ -1551,7 +1551,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         public
         note
         onlyAdmin
-    {   
+    {
         uint lastReserveRun = lastReserveRuns[_token];
 
         if (lastReserveRun == 0) {
@@ -1588,7 +1588,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             );
             lastReserveRuns[_token] = lastReserveRun + TIME_INTERVAL;
             lastReserveRun = lastReserveRuns[_token];
-            
+
             emit LogReserveValuesUpdated(
                 _token,
                 lastReserveRun,
@@ -1596,15 +1596,15 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
                 profits[lastReserveRun][_token],
                 losses[lastReserveRun][_token]
             );
-            
+
         }
     }
 
-    function updateOrderCumulativeValueBatch(bytes32[] _orderHashes, uint[] _forDays) 
+    function updateOrderCumulativeValueBatch(bytes32[] _orderHashes, uint[] _forDays)
         public
         note
         onlyAdmin
-    {   
+    {
         if(_orderHashes.length != _forDays.length) {
             emit LogError("Reserve::updateOrderCumulativeValueBatch", "ARGS_ARRAYLENGTH_MISMATCH");
             return;
@@ -1617,12 +1617,12 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
 
     function updateOrderCumulativeValue
     (
-        bytes32 _orderHash, 
+        bytes32 _orderHash,
         uint _forDays
-    ) 
+    )
         public
         note
-        onlyAdmin 
+        onlyAdmin
     {
         if(!isOrder[_orderHash]) {
             emit LogErrorWithHintBytes32(_orderHash, "Reserve::updateOrderCumulativeValue", "ORDER_DOES_NOT_EXIST");
@@ -1633,10 +1633,10 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(_orderHash, "Reserve::updateOrderCumulativeValue", "ORDER_ALREADY_CANCELLED");
             return;
         }
-        
+
         Order memory order = hashToOrder[_orderHash];
         CumulativeRun storage cumulativeRun = orderToCumulative[_orderHash];
-        
+
         uint profitsAccrued = 0;
         uint lossesAccrued = 0;
         uint cumulativeValue = 0;
@@ -1672,7 +1672,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
                 mul(profits[lastOrderRun + TIME_INTERVAL][order.token], cumulativeValue),
                 reserves[lastOrderRun][order.token]
             );
-                
+
             lossesAccrued = div(
                 mul(losses[lastOrderRun + TIME_INTERVAL][order.token], cumulativeValue),
                 reserves[lastOrderRun][order.token]
@@ -1683,25 +1683,25 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             cumulativeRun.timestamp = lastOrderRun + TIME_INTERVAL;
             cumulativeRun.value = cumulativeValue;
         }
-        
+
         emit LogOrderCumulativeUpdated(_orderHash, cumulativeRun.timestamp, cumulativeRun.value);
     }
 
-    function getAllOrders() 
+    function getAllOrders()
         public
-        view 
-        returns 
+        view
+        returns
         (
             bytes32[]
-        ) 
+        )
     {
         return orders;
     }
 
-    function getOrdersForAccount(address _account) 
+    function getOrdersForAccount(address _account)
         public
-        view 
-        returns 
+        view
+        returns
         (
             bytes32[]
         )
@@ -1710,9 +1710,9 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function getOrder(bytes32 _orderHash)
-        public 
-        view 
-        returns 
+        public
+        view
+        returns
         (
             address _account,
             address _token,
@@ -1722,7 +1722,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             uint _salt,
             uint _createdTimestamp
         )
-    {   
+    {
         Order memory order = hashToOrder[_orderHash];
         return (
             order.account,
@@ -1814,7 +1814,7 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         );
     }
 
-    function _getDateTimestamp(uint _timestamp) 
+    function _getDateTimestamp(uint _timestamp)
         internal
         view
         returns (uint)
@@ -1823,13 +1823,13 @@ contract Reserve is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         return dateTime.toTimestamp(dateTime.getYear(_timestamp), dateTime.getMonth(_timestamp), dateTime.getDay(_timestamp));
         // 1 hour
         //return dateTime.toTimestamp(dateTime.getYear(_timestamp), dateTime.getMonth(_timestamp), dateTime.getDay(_timestamp), dateTime.getHour(_timestamp));
-    } 
+    }
 
 }
 interface ExchangeConnector {
 
     function tradeWithInputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
@@ -1839,7 +1839,7 @@ interface ExchangeConnector {
         returns (uint _destTokenValue, uint _srcTokenValueLeft);
 
     function tradeWithOutputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
@@ -1848,14 +1848,14 @@ interface ExchangeConnector {
     )
         external
         returns (uint _destTokenValue, uint _srcTokenValueLeft);
-    
 
-    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue) 
+
+    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue)
         external
         view
         returns(uint _expectedRate, uint _slippageRate);
-    
-    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue) 
+
+    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue)
         external
         view
         returns(bool);
@@ -1864,13 +1864,13 @@ interface ExchangeConnector {
 
 
 contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
-    
+
     Escrow public escrow;
     AccountFactory public accountFactory;
     Reserve public reserve;
     address public feeWallet;
     Config public config;
-    
+
     constructor
     (
         Escrow _escrow,
@@ -1878,8 +1878,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         Reserve _reserve,
         address _feeWallet,
         Config _config
-    ) 
-    public 
+    )
+    public
     {
         escrow = _escrow;
         accountFactory = _accountFactory;
@@ -1888,9 +1888,9 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         config = _config;
     }
 
-    function setEscrow(Escrow _escrow) 
-        public 
-        note 
+    function setEscrow(Escrow _escrow)
+        public
+        note
         auth
         addressValid(_escrow)
     {
@@ -1898,8 +1898,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function setAccountFactory(AccountFactory _accountFactory)
-        public 
-        note 
+        public
+        note
         auth
         addressValid(_accountFactory)
     {
@@ -1907,8 +1907,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function setReserve(Reserve _reserve)
-        public 
-        note 
+        public
+        note
         auth
         addressValid(_reserve)
     {
@@ -1916,8 +1916,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function setConfig(Config _config)
-        public 
-        note 
+        public
+        note
         auth
         addressValid(_config)
     {
@@ -1925,14 +1925,14 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function setFeeWallet(address _feeWallet)
-        public 
-        note 
+        public
+        note
         auth
         addressValid(_feeWallet)
     {
         feeWallet = _feeWallet;
     }
-    
+
     event LogOrderCreated(
         bytes32 indexed orderHash,
         uint tradeAmount,
@@ -1969,7 +1969,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     struct Order {
         address account;
         address byUser;
-        address principalToken; 
+        address principalToken;
         address collateralToken;
         Trade trade;
         uint principalAmount;
@@ -2012,7 +2012,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint[8] _orderValues,
         address _exchangeConnector,
         bytes _signature
-    )    
+    )
         external
         note
         onlyAdmin
@@ -2062,9 +2062,9 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         {
             emit LogErrorWithHintBytes32(order.orderHash, "MKernel::createOrder","TRADE_NOT_FEASIBLE");
             return;
-        }        
+        }
 
-        
+
         orders.push(order.orderHash);
         hashToOrder[order.orderHash] = order;
         isOrder[order.orderHash] = true;
@@ -2072,7 +2072,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
 
         escrow.transferFromAccount(order.account, order.collateralToken, address(escrow), order.collateralAmount);
         reserve.release(order.principalToken, address(escrow), order.principalAmount);
-    
+
         (initialTradeAmount[order.orderHash],) = _tradeWithFixedInput(
             order,
             ERC20(order.principalToken),
@@ -2085,7 +2085,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             initialTradeAmount[order.orderHash],
             order.expirationTimestamp
         );
-        
+
 
     }
 
@@ -2094,7 +2094,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         bytes32 _orderHash,
         address _exchangeConnector,
         bytes _signature
-    ) 
+    )
         external
         note
         onlyAdmin
@@ -2104,7 +2104,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::liquidateOrder","ORDER_DOES_NOT_EXIST");
             return;
         }
-        
+
         if(isLiquidated[_orderHash]){
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::liquidateOrder","ORDER_ALREADY_LIQUIDATED");
             return;
@@ -2120,7 +2120,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
 
         Order memory order = hashToOrder[_orderHash];
         order.trade.exchangeConnector = _exchangeConnector;
-        
+
         if(!Account(order.account).isUser(signer)){
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::liquidateOrder", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
@@ -2166,7 +2166,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::processTradeForExpiry","ORDER_ALREADY_DEFAULTED");
             return;
         }
-        
+
 
         Order memory order = hashToOrder[_orderHash];
         order.trade.exchangeConnector = _exchangeConnector;
@@ -2203,7 +2203,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         note
         onlyAdmin
         addressValid(_exchangeConnector)
-    {   
+    {
         if(!isOrder[_orderHash]){
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::processTradeForStopLoss","ORDER_DOES_NOT_EXIST");
             return;
@@ -2253,7 +2253,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         note
         onlyAdmin
         addressValid(_exchangeConnector)
-    {   
+    {
         if(!isOrder[_orderHash]){
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::processTradeForStopProfit","ORDER_DOES_NOT_EXIST");
             return;
@@ -2281,7 +2281,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             emit LogErrorWithHintBytes32(_orderHash, "MKernel::processTradeForStopProfit", "INSUFFICIENT_COLLATERAL_BALANCE_IN_ESCROW");
             return;
         }
-        
+
         if(_isPositionAboveStopProfit(order, _tokenPrices, _bufferInPrincipal)) {
             isLiquidated[order.orderHash] = true;
             _performOrderLiquidation(order);
@@ -2292,13 +2292,13 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         emit LogErrorWithHintBytes32(order.orderHash, "MKernel::processTradeForStopProfit", "NO_ACTION_PERFORMED");
     }
 
-    function _performOrderLiquidation(Order _order) 
+    function _performOrderLiquidation(Order _order)
         internal
-    {   
+    {
         uint tradeAmount = initialTradeAmount[_order.orderHash];
         uint valueToRepay = add(_order.principalAmount, _order.premium);
         uint valueToRepayWithFee = add(valueToRepay, _order.fee);
-    
+
         uint principalFromTrade = 0;
         uint principalFromCollateral = 0;
         uint principalNeededFromCollateral = 0;
@@ -2306,9 +2306,9 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint userProfit = 0;
         uint totalPrincipalAcquired = 0;
         uint orderFee = 0;
-        
 
-        
+
+
             (principalFromTrade,) = _tradeWithFixedInput(_order, _order.trade.tradeToken, _order.principalToken, tradeAmount);
 
             if(principalFromTrade >= valueToRepayWithFee) {
@@ -2327,7 +2327,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
                     }
 
                 } else {
-                    (principalFromCollateral, collateralLeft) = _tradeWithFixedOutput(_order, _order.collateralToken, _order.principalToken, _order.collateralAmount, principalNeededFromCollateral);    
+                    (principalFromCollateral, collateralLeft) = _tradeWithFixedOutput(_order, _order.collateralToken, _order.principalToken, _order.collateralAmount, principalNeededFromCollateral);
                 }
 
                 if(principalFromCollateral >= principalNeededFromCollateral) {
@@ -2338,7 +2338,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
                     _performSettlementAfterAllPossibleLiquidations(_order, totalPrincipalAcquired);
                 }
             }
-                       
+
     }
 
     function _tradeWithFixedInput(Order _order, address _srcToken, address _destToken, uint _srcTokenValue)
@@ -2372,7 +2372,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         internal
         view
         returns (bool)
-    {   
+    {
         ExchangeConnector exchangeConnector = ExchangeConnector(_order.trade.exchangeConnector);
         return exchangeConnector.isTradeFeasible(_srcToken, _destToken, _srcTokenValue);
     }
@@ -2405,8 +2405,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint _collateralLeft,
         uint _userProfit,
         uint _fee
-    ) 
-        internal 
+    )
+        internal
     {
         uint closingFromPrincipal = 0;
         uint userEarnings = _userProfit;
@@ -2414,11 +2414,11 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         if(_fee > 0){
             escrow.transfer(_order.principalToken, feeWallet, _fee);
         }
-        
+
         reserve.lock(_order.principalToken, escrow, _valueRepaid, _reserveProfit, _reserveLoss);
-        
+
         if(_collateralLeft > 0) {
-            escrow.transfer(_order.collateralToken, _order.account, _collateralLeft);    
+            escrow.transfer(_order.collateralToken, _order.account, _collateralLeft);
         }
 
         if(_userProfit > 0) {
@@ -2435,11 +2435,11 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function _isPositionAboveStopLoss(Order _order, uint[2] _tokenPrices, uint _bufferInPrincipal)
-        internal 
+        internal
         view
         returns (bool)
     {
-        uint principalPerCollateral = _tokenPrices[0]; 
+        uint principalPerCollateral = _tokenPrices[0];
         uint principalPerTrade = _tokenPrices[1];
         uint tradeAmount = initialTradeAmount[_order.orderHash];
 
@@ -2450,8 +2450,8 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint bufferValue = div(mul(_order.principalAmount, _bufferInPrincipal), WAD);
         uint minValueReq = div(mul(_order.trade.stopLoss, totalCollateralValueInPrincipal), WAD);
 
-        if(add(valueToRepayWithFee, bufferValue) >= totalTradeValueInPrincipal && 
-            sub(add(valueToRepayWithFee, bufferValue), totalTradeValueInPrincipal) >= minValueReq) 
+        if(add(valueToRepayWithFee, bufferValue) >= totalTradeValueInPrincipal &&
+            sub(add(valueToRepayWithFee, bufferValue), totalTradeValueInPrincipal) >= minValueReq)
         {
             return false;
         }
@@ -2460,10 +2460,10 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function _isPositionAboveStopProfit(Order _order, uint[2] _tokenPrices, uint _bufferInPrincipal)
-        internal 
+        internal
         view
         returns (bool)
-    {       
+    {
         if(_order.trade.stopProfit == 0) {
             return false;
         } else {
@@ -2528,7 +2528,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         internal
         view
         returns (Order _order)
-    {   
+    {
         Trade memory trade = _composeTrade(_orderAddresses[4], _orderAddresses[5], _orderValues[6], _orderValues[7]);
 
         Order memory order = Order({
@@ -2549,7 +2549,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         });
 
         order.orderHash = _generateOrderHash(order);
-    
+
         return order;
     }
 
@@ -2560,7 +2560,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         uint _stopProfit,
         uint _stopLoss
     )
-        internal 
+        internal
         pure
         returns (Trade _trade)
     {
@@ -2590,7 +2590,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     function _generateOrderHash1(Order _order)
         internal
         view
-        returns (bytes32 _orderHash1) 
+        returns (bytes32 _orderHash1)
     {
         return keccak256(
             abi.encodePacked(
@@ -2626,9 +2626,9 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function getAllOrders()
-        public 
-        view 
-        returns 
+        public
+        view
+        returns
         (
             bytes32[]
         )
@@ -2636,11 +2636,11 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         return orders;
     }
 
-    
+
     function getOrder(bytes32 _orderHash)
-        public 
-        view 
-        returns 
+        public
+        view
+        returns
         (
             address _account,
             address _byUser,
@@ -2654,7 +2654,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             uint _fee,
             uint _createdTimestamp
         )
-    {   
+    {
         Order memory order = hashToOrder[_orderHash];
         return (
             order.account,
@@ -2672,9 +2672,9 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
     }
 
     function getTrade(bytes32 _orderHash)
-        public 
-        view 
-        returns 
+        public
+        view
+        returns
         (
             address _tradeToken,
             address _closingToken,
@@ -2682,7 +2682,7 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
             uint _stopProfit,
             uint _stopLoss
         )
-    {   
+    {
         Order memory order = hashToOrder[_orderHash];
         return (
             order.trade.tradeToken,
@@ -2693,10 +2693,10 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         );
     }
 
-    function getOrdersForAccount(address _account) 
+    function getOrdersForAccount(address _account)
         public
-        view 
-        returns 
+        view
+        returns
         (
             bytes32[]
         )
@@ -2704,4 +2704,20 @@ contract MKernel is DSStop, DSThing, Utils, Utils2, ErrorUtils {
         return accountToOrders[_account];
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

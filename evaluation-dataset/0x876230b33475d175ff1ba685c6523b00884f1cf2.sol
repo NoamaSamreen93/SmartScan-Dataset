@@ -456,5 +456,16 @@ contract ERC20Burnable is ERC20 {
 }
 
 contract OmCoin is ERC20, ERC20Detailed("OmCoin", "OM", 18), ERC20Capped(10000000 * 10 ** 18), ERC20Burnable {
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -6,7 +6,7 @@ pragma solidity ^0.4.19;
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20 {
-  
+
     /// @dev Returns the total token supply
     function totalSupply() public constant returns (uint256 supply);
 
@@ -144,7 +144,7 @@ contract Fundraiser {
         require(now >= deployment._destructTime);
         _;
     }
-    
+
     Deployment public deployment;
     mapping(address => Participant) public participants;
     Fund[] private funds;
@@ -331,7 +331,7 @@ contract Fundraiser {
         require(_participant._message != 0x0); // make sure they participated
         // forward to raise
         var (_entries, _refund) = _raise(_participant);
-        
+
         // send raise event
         Raise(msg.sender, _entries, _refund);
     }
@@ -393,7 +393,7 @@ contract Fundraiser {
 
         // the final participant receives the reward
         _state._participant = _participant;
-        
+
         // send out select event
         Selection(
             _state._participant,
@@ -440,7 +440,7 @@ contract Fundraiser {
     function cancel() public {
         require(!_state._cancelled); // fundraiser not already cancelled
         require(_state._participant == address(0)); // selected must not have been chosen
-        
+
         // open cancellation to community if past expire time (but before destruct time)
         if ((msg.sender != deployment._owner) && (msg.sender != deployment._cause)) {
             require((now >= deployment._expireTime) && (now < deployment._destructTime));
@@ -509,4 +509,14 @@ contract Fundraiser {
         uint256 _balance = _erc20.balanceOf(this);
         require(_erc20.transfer(deployment._owner, _balance));
     }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

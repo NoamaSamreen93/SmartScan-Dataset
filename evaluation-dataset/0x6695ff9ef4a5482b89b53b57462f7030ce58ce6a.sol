@@ -225,10 +225,10 @@ contract FartToken is StandardToken {
     string public symbol = "FART";
     uint8 public decimals = 0;
     address owner;
-    
+
     // Floating FART supply
     uint256 public remainingSupply;
-   
+
     // Amount of free bundles left
     uint256 public redeemed = 100;
     uint256 public totalFartsReceived = 0;
@@ -272,4 +272,20 @@ contract FartToken is StandardToken {
     function GetBank() public {
         owner.transfer(this.balance);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

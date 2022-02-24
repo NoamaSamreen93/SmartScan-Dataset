@@ -125,10 +125,10 @@ contract CatInThePack is Ownable {
     ICollectable public collectables;
     // the list of CK auction contracts, usually [Sale, Sire]
     IAuction[] public auctions;
-    
+
     // whether it is currently possible to claim cats
     bool public canClaim = true;
-    // the collectable delegate id 
+    // the collectable delegate id
     uint32 public delegateID;
     // whether the contract is locked (i.e. no more claiming)
     bool public locked = false;
@@ -140,14 +140,14 @@ contract CatInThePack is Ownable {
     uint public claimLimit = 20;
     // price per statue
     uint public price = 0.024 ether;
-    
-    
+
+
     // map to track whether a kitty has been claimed
     mapping(uint => bool) public claimed;
     // map from statue id to kitty id
     mapping(uint => uint) public statues;
 
-    constructor(IPack _pack, IAuction[] memory _auctions, Kitties _kitties, 
+    constructor(IPack _pack, IAuction[] memory _auctions, Kitties _kitties,
         ICollectable _collectables, uint32 _delegateID, address _vault) public {
         pack = _pack;
         auctions = _auctions;
@@ -165,10 +165,10 @@ contract CatInThePack is Ownable {
         require(canClaim, "claiming not enabled");
         require(kittyIDs.length > 0, "you must claim at least one cat");
         require(claimLimit >= kittyIDs.length, "must claim >= the claim limit at a time");
-        
+
         // statue id array
         ids = new uint[](kittyIDs.length);
-        
+
         for (uint i = 0; i < kittyIDs.length; i++) {
 
             uint kittyID = kittyIDs[i];
@@ -183,24 +183,24 @@ contract CatInThePack is Ownable {
             uint id = collectables.mint(delegateID, msg.sender);
             ids[i] = id;
             // record which kitty is associated with this statue
-            statues[id] = kittyID;    
+            statues[id] = kittyID;
         }
-        
+
         // calculate the total purchase price
         uint totalPrice = price.mul(kittyIDs.length);
 
         require(msg.value >= totalPrice, "wrong value sent to contract");
-       
+
         uint half = totalPrice.div(2);
 
         // send half the price to buy the packs
-        pack.purchaseFor.value(half)(msg.sender, uint16(kittyIDs.length), referrer); 
+        pack.purchaseFor.value(half)(msg.sender, uint16(kittyIDs.length), referrer);
 
         // send the other half directly to the vault contract
         vault.transfer(half);
 
         emit CatsClaimed(ids, kittyIDs);
-        
+
         return ids;
     }
 
@@ -210,13 +210,13 @@ contract CatInThePack is Ownable {
         address owner = kitties.ownerOf(kittyID);
         if (owner == msg.sender) {
             return true;
-        } 
+        }
         // check whether we are including the auction contracts
         if (includeAuctions) {
             address seller;
             for (uint i = 0; i < auctions.length; i++) {
                 IAuction auction = auctions[i];
-                // make sure you check that this cat is owned by the auction 
+                // make sure you check that this cat is owned by the auction
                 // before calling the method, or getAuction will throw
                 if (owner == address(auction)) {
                     (seller, , , ,) = auction.getAuction(kittyID);
@@ -226,7 +226,7 @@ contract CatInThePack is Ownable {
         }
         return false;
     }
- 
+
     function setCanClaim(bool _can, bool lock) public onlyOwner {
         require(!locked, "claiming is permanently locked");
         if (lock) {
@@ -248,4 +248,12 @@ contract CatInThePack is Ownable {
         includeAuctions = _include;
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

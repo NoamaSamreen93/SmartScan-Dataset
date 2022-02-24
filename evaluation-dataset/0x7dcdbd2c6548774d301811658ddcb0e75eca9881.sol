@@ -61,26 +61,26 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract VETRA is StandardToken { 
+contract VETRA is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'VETRA.04'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;  
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'VETRA.04';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function VETRA() {
-        balances[msg.sender] = 18000000e18;  
-        totalSupply = 18000000e18;  
-        name = "VETRA";                                 
-        decimals = 18;                                              
-        symbol = "VETRA";                                           
-        unitsOneEthCanBuy = 20000;                                
-        fundsWallet = msg.sender;                             
+        balances[msg.sender] = 18000000e18;
+        totalSupply = 18000000e18;
+        name = "VETRA";
+        decimals = 18;
+        symbol = "VETRA";
+        unitsOneEthCanBuy = 20000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -93,12 +93,12 @@ contract VETRA is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
- 
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -106,4 +106,15 @@ contract VETRA is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

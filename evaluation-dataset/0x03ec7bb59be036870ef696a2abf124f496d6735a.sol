@@ -238,7 +238,7 @@ contract StandardToken is ERC20, BasicToken{
     This create Sancoj token and give all amount to creator.
 */
 contract SancojTokenContract is StandardToken,Ownable {
-    string public constant symbol = "SANC";   
+    string public constant symbol = "SANC";
     string public constant name = "Sancoj";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 100000000000 * (10 ** uint256(decimals));
@@ -249,7 +249,7 @@ contract SancojTokenContract is StandardToken,Ownable {
      */
     function SancojTokenContract ()public {
         totalSupply_ = INITIAL_SUPPLY;
-        
+
         // Mint tokens
         balances[msg.sender] = totalSupply_;
         Transfer(address(0x0), msg.sender, totalSupply_);
@@ -258,7 +258,7 @@ contract SancojTokenContract is StandardToken,Ownable {
     }
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     //this function will revert all ether paid to this contract
     function () public payable {
         revert();
@@ -291,7 +291,7 @@ contract SancojTokenContract is StandardToken,Ownable {
         return true;
     }
 
-    
+
 }
 
 
@@ -321,7 +321,7 @@ contract Crowdsale  is Ownable{
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   //Address which allow contract to spend
   address public tokenWallet;
 
@@ -405,7 +405,7 @@ contract Crowdsale  is Ownable{
     return token.allowance(tokenWallet, this);
   }
 
-  
+
   /**
    * @dev Overrides parent behavior by transferring tokens from wallet.
    * @param _beneficiary Token purchaser
@@ -446,4 +446,15 @@ contract Crowdsale  is Ownable{
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

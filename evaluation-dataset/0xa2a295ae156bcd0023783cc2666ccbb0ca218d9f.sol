@@ -1244,3 +1244,12 @@ contract BlockchainCutiesERC1155 is ERC1155MixedFungible, Operators, ERC1155Meta
         emit TransferSingle(msg.sender, _from, to, _id, _value);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

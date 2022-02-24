@@ -89,7 +89,7 @@ contract Owned {
 
 
 // ----------------------------------------------------------------------------
-/// @notice This contract is a test version only. I appreciate anyone who wants to test it, but the transfer of 
+/// @notice This contract is a test version only. I appreciate anyone who wants to test it, but the transfer of
 ///         is real. I am not responsible for lost funds, so please use only small test amounts with this contract
 /// @dev    The INCH.1 token itself is a completely boilerplate ERC20 implementation. All functionality comes from the
 ///         vaultPOC concract
@@ -118,7 +118,7 @@ contract InchWormToken is ERC20Interface, Owned {
         emit Transfer(address(0), owner, _totalSupply);
     }
 
-    
+
     // ------------------------------------------------------------------------
     // returns total supply, not counting what has been sent to the burn address, 0x0
     // ------------------------------------------------------------------------
@@ -217,4 +217,13 @@ contract InchWormToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns(bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

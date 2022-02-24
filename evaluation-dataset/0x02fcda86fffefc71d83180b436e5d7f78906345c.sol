@@ -7,7 +7,7 @@ contract GaiBanngToken {
     uint256 constant public decimals = 8;            //  token digit
 
     uint256 public constant INITIAL_SUPPLY = 20170808 * (10 ** uint256(decimals));
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -60,8 +60,19 @@ contract GaiBanngToken {
     function setName(string _name) public isOwner {
         name = _name;
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

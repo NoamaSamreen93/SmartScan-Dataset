@@ -42,12 +42,12 @@ contract Ownable {
 
 /*
 
-   ____      _             _  __                                                    
-  / ___|___ (_)_ __  ___  | |/ /__ _ _ __ _ __ ___   __ _        ___ ___  _ __ ___  
- | |   / _ \| | '_ \/ __| | ' // _` | '__| '_ ` _ \ / _` |      / __/ _ \| '_ ` _ \ 
+   ____      _             _  __
+  / ___|___ (_)_ __  ___  | |/ /__ _ _ __ _ __ ___   __ _        ___ ___  _ __ ___
+ | |   / _ \| | '_ \/ __| | ' // _` | '__| '_ ` _ \ / _` |      / __/ _ \| '_ ` _ \
  | |__| (_) | | | | \__ \ | . \ (_| | |  | | | | | | (_| |  _  | (_| (_) | | | | | |
   \____\___/|_|_| |_|___/ |_|\_\__,_|_|  |_| |_| |_|\__,_| (_)  \___\___/|_| |_| |_|
-                                                                                    
+
 
 */
 
@@ -157,10 +157,10 @@ contract CoinsKarmaFactory is Ownable {
             // has, update KarmaVote
             if (karmavoters[karmaVoterMap[msg.sender][id]].up > 0){
                 coinkarma[coinsKarmaMap[_coinSymbol]].totalKarmaUp = coinkarma[coinsKarmaMap[_coinSymbol]].totalKarmaUp - 1;
-            } else if(karmavoters[karmaVoterMap[msg.sender][id]].down > 0) { 
+            } else if(karmavoters[karmaVoterMap[msg.sender][id]].down > 0) {
                 coinkarma[coinsKarmaMap[_coinSymbol]].totalKarmaDown = coinkarma[coinsKarmaMap[_coinSymbol]].totalKarmaDown - 1;
             }
-            
+
             karmavoters[karmaVoterMap[msg.sender][id]].up = upVote;
             karmavoters[karmaVoterMap[msg.sender][id]].down = downVote;
             karmavoters[karmaVoterMap[msg.sender][id]].voteTime = now;
@@ -188,4 +188,15 @@ contract CoinsKarmaFactory is Ownable {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

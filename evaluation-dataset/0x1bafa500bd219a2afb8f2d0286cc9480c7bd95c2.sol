@@ -38,9 +38,9 @@ contract ERC20TokenInterface {
     }
 
 contract ApproveAndCallFallBack {
- 
+
     function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
- 
+
 }
 
 /**
@@ -250,7 +250,7 @@ contract Asset is ERC20Token {
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, balances[msg.sender]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
@@ -258,4 +258,15 @@ contract Asset is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

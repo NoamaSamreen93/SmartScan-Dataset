@@ -8,7 +8,7 @@ interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address who) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
-    
+
     function transfer(address to, uint256 value) external returns (bool);
     function approve(address spender, uint256 value) external returns (bool);
     function transferFrom(address from, address to, uint256 value) external returns (bool);
@@ -352,19 +352,19 @@ contract Ownable {
 }
 
 interface TransferAndCallFallBack {
-    function tokenFallback(address _from, 
-                           uint    _value, 
+    function tokenFallback(address _from,
+                           uint    _value,
                            bytes   _data) external returns (bool);
 }
 
 interface ApproveAndCallFallBack {
-    function receiveApproval(address _owner, 
-                             uint256 _value, 
+    function receiveApproval(address _owner,
+                             uint256 _value,
                              bytes   _data) external returns (bool);
 }
 
 contract AudioToken is ERC20Detailed, Ownable {
-    
+
     uint256 public constant INITIAL_SUPPLY = 1500000000e18;
 
     /**
@@ -373,71 +373,71 @@ contract AudioToken is ERC20Detailed, Ownable {
     constructor() public ERC20Detailed("AUDIO Token", "AUDIO", 18) {
         _mint(owner(), INITIAL_SUPPLY);
     }
-    
+
     /**
-    * @dev transfers _value tokens to a contract at address _to and calls the function 
+    * @dev transfers _value tokens to a contract at address _to and calls the function
     * tokenFallback(address, uint256, bytes) on that contract.
     */
-    function transferAndCall(address _to, 
-                             uint    _value, 
+    function transferAndCall(address _to,
+                             uint    _value,
                              bytes   _data) public returns (bool) {
         require(_to != address(this));
 
         transfer(_to, _value);
-    
+
         require(TransferAndCallFallBack(_to).tokenFallback(
-            msg.sender, 
+            msg.sender,
             _value,
             _data
         ));
-        
+
         return true;
     }
-    
+
     /**
-    * @dev transfers _value tokens from address _from to a contract 
-    * at address _to and calls the function tokenFallback(address, uint256, bytes) 
+    * @dev transfers _value tokens from address _from to a contract
+    * at address _to and calls the function tokenFallback(address, uint256, bytes)
     * on that contract.
     */
     function transferFromAndCall(address _from,
-                                 address _to, 
-                                 uint    _value, 
+                                 address _to,
+                                 uint    _value,
                                  bytes   _data) public returns (bool) {
         require(_to != address(this));
 
         transferFrom(_from, _to, _value);
-    
+
         require(TransferAndCallFallBack(_to).tokenFallback(
-            _from, 
-            _value, 
-            _data
-        ));
-        
-        return true;
-    }
-    
-    /**
-    * @dev approves _value tokens to be transfered to a contract _spender
-    * and calls the function receiveApproval(address, uint256, bytes) 
-    * on that contract. Requires current approval to be 0 to avoid double spending.
-    */
-    function approveAndCall(address _spender, 
-                            uint    _value, 
-                            bytes   _data) public returns (bool) {
-        require(_spender != address(this));
-        require(_value == 0 || allowance(msg.sender, _spender) == 0);
-        
-        approve(_spender, _value);
-        
-        require(ApproveAndCallFallBack(_spender).receiveApproval(
-            msg.sender, 
+            _from,
             _value,
             _data
         ));
 
         return true;
     }
-    
+
+    /**
+    * @dev approves _value tokens to be transfered to a contract _spender
+    * and calls the function receiveApproval(address, uint256, bytes)
+    * on that contract. Requires current approval to be 0 to avoid double spending.
+    */
+    function approveAndCall(address _spender,
+                            uint    _value,
+                            bytes   _data) public returns (bool) {
+        require(_spender != address(this));
+        require(_value == 0 || allowance(msg.sender, _spender) == 0);
+
+        approve(_spender, _value);
+
+        require(ApproveAndCallFallBack(_spender).receiveApproval(
+            msg.sender,
+            _value,
+            _data
+        ));
+
+        return true;
+    }
+
     /**
     * @dev recover any mistakenly sent ERC-20 tokens (also works for ERC-721 tokens).
     */
@@ -445,11 +445,22 @@ contract AudioToken is ERC20Detailed, Ownable {
         IERC20 erc20 = IERC20(_token);
         return erc20.transfer(owner(), _value);
     }
-    
+
     /**
     * @dev recover any mistakenly sent ETH.
     */
     function recoverEther() onlyOwner public {
         owner().transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

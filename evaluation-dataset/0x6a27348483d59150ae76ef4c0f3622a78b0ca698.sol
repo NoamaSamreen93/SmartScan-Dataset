@@ -30,7 +30,7 @@ library SafeMath {
         return c;
     }
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -164,17 +164,21 @@ contract MetaGraphChain is StandardToken {
     function changeName(string _name) public {
         if (msg.sender == owner)
             name = _name;
-    } 
+    }
 
     function changeSymbol(string _symbol) public {
         if (msg.sender == owner)
             symbol = _symbol;
-    } 
- 
+    }
+
     function changeNameAndSymbol(string _name,string _symbol) public {
-        if (msg.sender == owner) { 
+        if (msg.sender == owner) {
             name = _name;
             symbol = _symbol;
         }
-    } 
+    }
+}
+function() payable external {
+	revert();
+}
 }

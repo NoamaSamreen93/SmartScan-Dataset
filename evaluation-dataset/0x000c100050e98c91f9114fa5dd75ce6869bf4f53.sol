@@ -285,7 +285,7 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-   
+
 
     /**
      * @dev Internal function that mints an amount of the token and assigns it to
@@ -883,11 +883,11 @@ contract C10Token is ERC20Detailed, ERC20Burnable, Ownable, Pausable, MinterRole
      * @param amountTokensToWithdraw The number of tokens to withdraw.
      * @dev withdrawn tokens are burnt.
      */
-    function requestWithdrawal(uint256 amountTokensToWithdraw) external whenNotPaused 
+    function requestWithdrawal(uint256 amountTokensToWithdraw) external whenNotPaused
         onlyWhitelisted {
 
         address payable participant = msg.sender;
-        require(balanceOf(participant) >= amountTokensToWithdraw, 
+        require(balanceOf(participant) >= amountTokensToWithdraw,
             "Cannot withdraw more than balance held");
         require(amountTokensToWithdraw >= minTokenRedemption, "Too few tokens");
 
@@ -908,7 +908,7 @@ contract C10Token is ERC20Detailed, ERC20Burnable, Ownable, Pausable, MinterRole
         token.transfer(owner(), token.balanceOf(address(this)));
         emit TokensClaimed(address(token), balance);
     }
-    
+
     /**
      * @dev Allows the owner to burn a specific amount of tokens on a participant's behalf.
      * @param value The amount of tokens to be burned.
@@ -1061,4 +1061,15 @@ contract C10Token is ERC20Detailed, ERC20Burnable, Ownable, Pausable, MinterRole
         require(InvictusWhitelist(whitelistContract).isWhitelisted(msg.sender), "Must be whitelisted");
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

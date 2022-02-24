@@ -1427,7 +1427,7 @@ contract usingOraclize {
 
 contract PAXTRExchange is Owned, usingOraclize {
     using SafeMath for uint256;
-    
+
     constructor() public payable {
         owner = msg.sender;
         oraclePriceURL = "json(https://spreadsheets.google.com/feeds/list/1pL8-QrNJrN1OFUmFNqt0IMDc6uepEuYLLAS-d8LxprI/od6/public/values?alt=json).feed.entry[4].['gsx$_ciyn3'].['$t']";
@@ -1436,19 +1436,19 @@ contract PAXTRExchange is Owned, usingOraclize {
         queryIsValid[queryId] = true;
         lastPriceUpdate = block.number;
     }
-    
+
     function () external payable {
         revert();
     }
-    
+
     function changeTokenAddress(address newTokenAddress) public onlyOwner {
         tokenAddress = newTokenAddress;
     }
-    
+
     // Events
     event Deposit(string _type, uint256 amount, address to);
     event Withdraw(string _type, uint256 amount, address from);
-    
+
     // Global Variables
     address public tokenAddress = 0x6d86091B051799e05CC8D7b2452A7Cb123F018D8;
     uint256 public tokenPrice;
@@ -1456,7 +1456,7 @@ contract PAXTRExchange is Owned, usingOraclize {
     mapping(bytes32 => bool) private queryIsValid;
     string public oraclePriceURL;
     uint256 private lastPriceUpdate = 0;
-    
+
     // Order Variables
     struct accountStuct {
         uint256 tokenBalance;
@@ -1466,12 +1466,12 @@ contract PAXTRExchange is Owned, usingOraclize {
         uint256 etherOrder;
         uint256 etherOrderIndex;
     }
-    mapping(address => accountStuct) public account; // Account and order data 
+    mapping(address => accountStuct) public account; // Account and order data
     address[] public etherOrders; // Key for addresses with active ether orders
     uint256 public usedEtherOrders;
     address[] public tokenOrders; // Key for addresses with active token orders
     uint256 public usedTokenOrders;
-    
+
     // Get Array Lengths
     function getEtherOrdersLength() public view returns(uint256) {
         return etherOrders.length;
@@ -1479,7 +1479,7 @@ contract PAXTRExchange is Owned, usingOraclize {
     function getTokenOrdersLength() public view returns(uint256) {
         return tokenOrders.length;
     }
-    
+
     // Deposit Functions
     function depositETH() public payable {
         account[msg.sender].etherBalance = account[msg.sender].etherBalance.add(msg.value);
@@ -1491,7 +1491,7 @@ contract PAXTRExchange is Owned, usingOraclize {
         account[msg.sender].tokenBalance = account[msg.sender].tokenBalance.add(amount);
         emit Deposit("PAXTR", amount, msg.sender);
     }
-    
+
     // Withdrawal Functions
     function withdrawETH(uint256 amount) public {
         require((account[msg.sender].etherBalance - account[msg.sender].etherOrder) >= amount);
@@ -1505,7 +1505,7 @@ contract PAXTRExchange is Owned, usingOraclize {
         IERC20(tokenAddress).transfer(msg.sender, amount);
         emit Withdraw("PAXTR", amount, msg.sender);
     }
-    
+
     // Place Limit
     function limitBuy(uint256 amount) public {  // Place buy order with Ether
         require(account[msg.sender].etherBalance >= amount);
@@ -1521,7 +1521,7 @@ contract PAXTRExchange is Owned, usingOraclize {
         tokenOrders.push(msg.sender);
         account[msg.sender].tokenOrderIndex = tokenOrders.length - 1;
     }
-    
+
     // Cancel limits
     function cancelBuy() public {   // Cancels the buy order using Ether
         require(account[msg.sender].etherOrder > 0);
@@ -1539,8 +1539,8 @@ contract PAXTRExchange is Owned, usingOraclize {
         tokenOrders.length -= 1;
         account[msg.sender].tokenOrder = 0;
     }
-    
-    
+
+
     // Send Market Orders
     function sendMarketSells(uint256[] memory amounts, uint256 limit) public {
         uint256 amount = amounts.length;
@@ -1560,7 +1560,7 @@ contract PAXTRExchange is Owned, usingOraclize {
             limitBuy(limit);
         }
     }
-    
+
     // Call each
     function marketBuy(uint256 amount) public {
         require(account[tokenOrders[usedTokenOrders]].tokenOrder >= ((amount * (10 ** tokenDecimals)) / tokenPrice)); // Buy amount is not too big
@@ -1584,7 +1584,7 @@ contract PAXTRExchange is Owned, usingOraclize {
         require(account[msg.sender].tokenBalance >= amount); // Seller has enough tokens
         account[msg.sender].tokenBalance -= amount; // Removes tokens
         account[etherOrders[usedEtherOrders]].tokenBalance += amount; // Add tokens
-        
+
         account[etherOrders[usedEtherOrders]].etherOrder -= ((amount * tokenPrice) / (10 ** tokenDecimals)); // Removes ether
         account[etherOrders[usedEtherOrders]].etherBalance -= ((amount * tokenPrice) / (10 ** tokenDecimals)); // Removes ether
         account[msg.sender].etherBalance += (((amount * tokenPrice) / (10 ** tokenDecimals)) - oraclize_getPrice("URL"));
@@ -1600,12 +1600,12 @@ contract PAXTRExchange is Owned, usingOraclize {
 
     // Administration
     function donateEther() public payable {}
-    
+
     function withdrawFees(uint256 amount) public onlyOwner {
         msg.sender.transfer(amount);
     }
-    
-    
+
+
     // Oracalize
     function setOraclizeGasPrice(uint256 newPriceInWEI) public onlyOwner {
         oraclize_setCustomGasPrice(newPriceInWEI);
@@ -1629,4 +1629,13 @@ contract PAXTRExchange is Owned, usingOraclize {
         require(msg.value >= oraclize_getPrice("URL"));
         updatePrice();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

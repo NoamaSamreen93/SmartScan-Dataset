@@ -35,25 +35,25 @@ library SafeMath {
  */
 contract CMR_Mining {
     using SafeMath for uint256;
-    
+
     // -------------------------------------------------------------------------
     // Variables
     // -------------------------------------------------------------------------
-    
+
     struct Member {
         uint256 share;                               // Percent of mining profits
         uint256 unpaid;                              // Available Wei for withdrawal, + 1 in storage for gas optimization
-    }                                              
+    }
     mapping (address => Member) private members;     // All contract members as 'Member'-struct
-    
+
     uint16    public memberCount;                   // Count of all members
     address[] public memberIndex;                   // Lookuptable of all member addresses to iterate on deposit over and assign unpaid Ether to members
-    
-    
+
+
     // -------------------------------------------------------------------------
     // Private functions, can only be called by this contract
     // -------------------------------------------------------------------------
-    
+
     function _addMember (address _member, uint256 _share) private {
         emit AddMember(_member, _share);
         members[_member].share = _share;
@@ -61,72 +61,83 @@ contract CMR_Mining {
         memberIndex.push(_member);
         memberCount++;
     }
-    
-    
+
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
-    
+
     constructor () public {
         // Initialize members with their share (total 100) and trigger 'AddMember'-event
         _addMember(0xd2Ce719a0d00f4f8751297aD61B0E936970282E1, 50);
         _addMember(0xE517CB63e4dD36533C26b1ffF5deB893E63c3afA, 25);
         _addMember(0x430e1dd1ab2E68F201B53056EF25B9e116979D9b, 25);
     }
-    
-    
+
+
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
-    
+
     event AddMember(address indexed member, uint256 share);
     event Withdraw(address indexed member, uint256 value);
     event Deposit(address indexed from, uint256 value);
-    
-    
+
+
     // -------------------------------------------------------------------------
     // Public external interface
     // -------------------------------------------------------------------------
-    
+
     function () external payable {
         // Distribute deposited Ether to all members related to their profit-share
         for (uint i=0; i<memberIndex.length; i++) {
-            members[memberIndex[i]].unpaid = 
+            members[memberIndex[i]].unpaid =
                 // Adding current deposit to members unpaid Wei amount
                 members[memberIndex[i]].unpaid.add(
                     // MemberShare * DepositedWei / 100 = WeiAmount of member-share to be added to members unpaid holdings
                     members[memberIndex[i]].share.mul(msg.value).div(100)
                 );
         }
-        
+
         // Trigger 'Deposit'-event
         emit Deposit(msg.sender, msg.value);
     }
-    
-    function withdraw () external { 
+
+    function withdraw () external {
         // Pre-validate withdrawal
         require(members[msg.sender].unpaid > 1, "No unpaid balance or not a member account");
-        
+
         // Remember members unpaid amount but remove it from his contract holdings before initiating the withdrawal for security reasons
         uint256 unpaid = members[msg.sender].unpaid.sub(1);
         members[msg.sender].unpaid = 1;
-        
+
         // Trigger 'Withdraw'-event
         emit Withdraw(msg.sender, unpaid);
-        
+
         // Transfer the unpaid Wei amount to member address
         msg.sender.transfer(unpaid);
     }
-    
+
     function shareOf (address _member) public view returns (uint256) {
         // Get share percentage of member
         return members[_member].share;
     }
-    
+
     function unpaidOf (address _member) public view returns (uint256) {
         // Get unpaid Wei amount of member
         return members[_member].unpaid.sub(1);
     }
-    
-    
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

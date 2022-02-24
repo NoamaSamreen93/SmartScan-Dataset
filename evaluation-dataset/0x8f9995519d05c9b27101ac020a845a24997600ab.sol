@@ -60,7 +60,7 @@ contract SYCoin is StandardToken {
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
     uint256 public totalEthInWei;
     address public fundsWallet;
@@ -75,7 +75,18 @@ contract SYCoin is StandardToken {
         symbol = "SY";                                             // 심볼 설정
         unitsOneEthCanBuy = 0;                                      // 토큰 분배 갯수 설정
         fundsWallet = msg.sender;                                    // 입금받을 지갑주소 설정
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

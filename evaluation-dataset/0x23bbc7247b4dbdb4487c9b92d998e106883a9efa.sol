@@ -258,7 +258,7 @@ contract LogicBase is HasNoContracts {
 }
 
 contract ClockAuction is LogicBase {
-    
+
     // Reference to contract tracking auction state variables
     ClockAuctionStorage public clockAuctionStorage;
 
@@ -273,7 +273,7 @@ contract ClockAuction is LogicBase {
     event AuctionSuccessful(uint256 tokenId, uint256 totalPrice, address winner, address seller, uint256 sellerProceeds);
     event AuctionCancelled(uint256 tokenId);
 
-    function ClockAuction(address _nftAddress, address _storageAddress, uint256 _cut, uint256 _minCutValue) 
+    function ClockAuction(address _nftAddress, address _storageAddress, uint256 _cut, uint256 _minCutValue)
         LogicBase(_nftAddress, _storageAddress) public
     {
         setOwnerCut(_cut);
@@ -318,7 +318,7 @@ contract ClockAuction is LogicBase {
         require(_duration == uint256(uint64(_duration)));
 
         require(msg.sender == address(nonFungibleContract));
-        
+
         // assigning ownership to this clockAuctionStorage when in auction
         // it will throw if transfer fails
         nonFungibleContract.transferFrom(_seller, address(clockAuctionStorage), _tokenId);
@@ -479,7 +479,7 @@ contract SiringClockAuction is ClockAuction {
 
     bool public isSiringClockAuction = true;
 
-    function SiringClockAuction(address _nftAddr, address _storageAddress, uint256 _cut, uint256 _minCutValue) 
+    function SiringClockAuction(address _nftAddr, address _storageAddress, uint256 _cut, uint256 _minCutValue)
         ClockAuction(_nftAddr, _storageAddress, _cut, _minCutValue) public
     {
         require(SiringClockAuctionStorage(_storageAddress).isSiringClockAuctionStorage());
@@ -495,4 +495,15 @@ contract SiringClockAuction is ClockAuction {
         // transfer the monster back to the seller, the winner will get the child
         clockAuctionStorage.transfer(nonFungibleContract, seller, _tokenId);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

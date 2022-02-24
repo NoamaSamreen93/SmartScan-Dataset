@@ -1477,7 +1477,7 @@ contract ClcgCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, WhitelistC
         RefundableCrowdsale(_softCap)
         public
         {
-            
+
         }
 
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal view {
@@ -1491,4 +1491,13 @@ contract ClcgCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, WhitelistC
         tokenAmount = (tokenAmount * cap()) / weiRaised();
         super._deliverTokens(beneficiary, tokenAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

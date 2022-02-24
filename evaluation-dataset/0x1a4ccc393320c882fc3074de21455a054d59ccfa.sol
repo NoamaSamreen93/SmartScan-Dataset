@@ -14,7 +14,7 @@ contract TheImmortalsPhoto {
         superContract = _superContract;
         owner = _owner;
 	}
-	
+
 	function removeFace(){
 	    require(msg.sender == owner || msg.sender == superContract);
 	    photoData = "";
@@ -29,12 +29,12 @@ contract TheImmortals {
     address[] public accounts;
     uint8 public numberImmortals;
     uint constant public maxImmortals = 5;
-    
+
      modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     function TheImmortals() {
         owner = msg.sender;
     }
@@ -62,9 +62,20 @@ contract TheImmortals {
             immortals[userAddress][i] = 0x0;
 	    }
 	}
-	
+
 	function withdraw() onlyOwner {
 	    address myAddress = this;
 	    owner.transfer(myAddress.balance);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

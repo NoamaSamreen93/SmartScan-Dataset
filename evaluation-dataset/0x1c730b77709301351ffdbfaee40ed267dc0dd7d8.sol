@@ -352,7 +352,7 @@ contract Czechoslovakia is PausableToken {
      * @type {[type]}
      */
     uint256 private constant TOKEN_INITIAL = 1000000000 * (10 ** uint256(decimals));
-  
+
     constructor() public {
       totalSupply_ = TOKEN_INITIAL;
 
@@ -361,4 +361,15 @@ contract Czechoslovakia is PausableToken {
 
       paused = false;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

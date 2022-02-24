@@ -386,10 +386,10 @@ contract PausableToken is StandardToken, Pausable {
 /**
 * @dev Pre main Bitcalve BTL token ERC20 contract
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract BTLToken is MintableToken, PausableToken {
-    
+
     // Metadata
     string public constant symbol = "BTL";
     string public constant name = "BitClave Token";
@@ -536,9 +536,9 @@ contract Crowdsale {
 /**
 * @dev Parent crowdsale contract extended with support for pausable crowdsale, meaning crowdsale can be paused by owner at any time
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 * While the contract is in paused state, the contributions will be rejected
-* 
+*
 */
 contract PausableCrowdsale is Crowdsale, Pausable {
 
@@ -557,9 +557,9 @@ contract PausableCrowdsale is Crowdsale, Pausable {
 }
 
 /**
-* @dev Parent crowdsale contract with support for time-based and amount based bonuses 
+* @dev Parent crowdsale contract with support for time-based and amount based bonuses
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract BonusCrowdsale is Crowdsale, Ownable {
 
@@ -570,7 +570,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     uint32[] public BONUS_AMOUNTS;
     uint32[] public BONUS_AMOUNTS_VALUES;
     uint public constant BONUS_COEFF = 1000; // Values should be 10x percents, value 1000 = 100%
-    
+
     // Members
     uint public tokenPriceInCents;
     uint public tokenDecimals;
@@ -633,8 +633,8 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     */
     function buyTokens(address beneficiary) public payable {
         // Compute usd amount = wei * catsInEth * usdcentsInCat / usdcentsPerUsd / weisPerEth
-        uint256 usdValue = msg.value.mul(rate).mul(tokenPriceInCents).div(100).div(1 ether); 
-        
+        uint256 usdValue = msg.value.mul(rate).mul(tokenPriceInCents).div(100).div(1 ether);
+
         // Compute time and amount bonus
         uint256 bonus = computeBonus(usdValue);
 
@@ -646,7 +646,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
     }
 
     /**
-    * @dev Computes overall bonus based on time of contribution and amount of contribution. 
+    * @dev Computes overall bonus based on time of contribution and amount of contribution.
     * The total bonus is the sum of bonus by time and bonus by amount
     * @return bonus percentage scaled by 10
     */
@@ -690,7 +690,7 @@ contract BonusCrowdsale is Crowdsale, Ownable {
 /**
 * @dev Parent crowdsale contract is extended with support for cap in tokens
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract TokensCappedCrowdsale is Crowdsale {
 
@@ -755,9 +755,9 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
 
 
   /**
-   * @dev Main BitCalve Crowdsale contract. 
+   * @dev Main BitCalve Crowdsale contract.
    * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-   * 
+   *
    */
 contract CATCrowdsale is FinalizableCrowdsale, TokensCappedCrowdsale(CATCrowdsale.CAP), PausableCrowdsale(true), BonusCrowdsale(CATCrowdsale.TOKEN_USDCENT_PRICE, CATCrowdsale.DECIMALS) {
 
@@ -901,7 +901,7 @@ contract CATCrowdsale is FinalizableCrowdsale, TokensCappedCrowdsale(CATCrowdsal
         pauseTokens();
     }
 
-    // 
+    //
     /**
     * @dev Allocates tokens for investors that contributed from website. These include
     * whitelisted investors and investors paying with BTC/QTUM/LTC
@@ -912,8 +912,21 @@ contract CATCrowdsale is FinalizableCrowdsale, TokensCappedCrowdsale(CATCrowdsal
         require(now <= endTime);                               // Crowdsale (without startTime check)
         require(!isFinalized);                                 // FinalizableCrowdsale
         require(token.totalSupply().add(tokens) <= tokensCap); // TokensCappedCrowdsale
-        
+
         token.mint(beneficiary, tokens);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

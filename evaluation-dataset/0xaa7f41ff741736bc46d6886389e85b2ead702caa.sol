@@ -1,4 +1,4 @@
-pragma solidity 0.5.1; 
+pragma solidity 0.5.1;
 
 
 library SafeMath {
@@ -143,7 +143,7 @@ contract StandardToken {
     );
 
     event FrozenFunds(
-        address indexed _account, 
+        address indexed _account,
         bool _frozen
     );
 
@@ -252,7 +252,7 @@ contract BurnableToken is StandardToken, Ownable {
      * @param value The amount that will be burnt.
      */
     function _burn(address account, uint256 value) internal {
-        require(account != address(0)); 
+        require(account != address(0));
         totalSupply_ = totalSupply_.sub(value);
         balances[account] = balances[account].sub(value);
         emit Burn(account, value);
@@ -313,12 +313,12 @@ contract AQQToken is PausableToken, BurnableToken {
     string public constant symbol = "AQQ"; // symbol of Token
     uint8 public constant decimals = 18; // decimals of Token
 
-    uint256 internal vestingToken; 
-    uint256 public initialCirculatingToken; 
-    address constant wallet = 0xC151c00E83988ce3774Cde684f0209AD46C12aFC; 
+    uint256 internal vestingToken;
+    uint256 public initialCirculatingToken;
+    address constant wallet = 0xC151c00E83988ce3774Cde684f0209AD46C12aFC;
 
-    uint256 constant _INIT_TOTALSUPPLY = 100000000; 
-    uint256 constant _INIT_VESTING_TOKEN = 60000000; 
+    uint256 constant _INIT_TOTALSUPPLY = 100000000;
+    uint256 constant _INIT_VESTING_TOKEN = 60000000;
     uint256 constant _INIT_CIRCULATE_TOKEN = 10000000;
 
   /**
@@ -361,11 +361,11 @@ contract AQQToken is PausableToken, BurnableToken {
      * @param _value The amount to be transferred.
      */
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    whenNotPaused 
+    )
+    public
+    whenNotPaused
     returns(bool) {
         require(_to != address(0));
         require(!frozenAccount[msg.sender]);
@@ -416,8 +416,8 @@ contract AQQToken is PausableToken, BurnableToken {
    */
     function freezeAccount(address _account, bool _freeze) public onlyOwner returns(bool) {
         frozenAccount[_account] = _freeze;
-        emit FrozenFunds(_account, _freeze);    
-        return true;    
+        emit FrozenFunds(_account, _freeze);
+        return true;
     }
 
   /**
@@ -427,17 +427,17 @@ contract AQQToken is PausableToken, BurnableToken {
    */
     function _batchTransfer(address[] memory _to, uint256[] memory _amount) internal whenNotPaused {
         require(_to.length == _amount.length);
-        uint256 sum = 0; 
+        uint256 sum = 0;
         for(uint256 i = 0;i < _to.length;i += 1){
-            require(_to[i] != address(0)); 
-            require(!frozenAccount[_to[i]]); 
+            require(_to[i] != address(0));
+            require(!frozenAccount[_to[i]]);
             sum = sum.add(_amount[i]);
-            require(sum <= balances[msg.sender]);  
-            balances[_to[i]] = balances[_to[i]].add(_amount[i]); 
+            require(sum <= balances[msg.sender]);
+            balances[_to[i]] = balances[_to[i]].add(_amount[i]);
             emit Transfer(msg.sender, _to[i], _amount[i]);
-        } 
+        }
         _validate(msg.sender, sum);
-        balances[msg.sender] = balances[msg.sender].sub(sum); 
+        balances[msg.sender] = balances[msg.sender].sub(sum);
     }
 
   /**
@@ -456,6 +456,15 @@ contract AQQToken is PausableToken, BurnableToken {
    */
     function burn(uint256 value) public onlyOwner {
         _validate(msg.sender, value);
-        super.burn(value); 
+        super.burn(value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

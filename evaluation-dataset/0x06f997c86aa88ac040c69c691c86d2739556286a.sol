@@ -17,7 +17,7 @@ address public useraddr;
 mapping (address => mapping(address => uint256)) public dep_token;
 mapping (address => uint256) public dep_ETH;
 
- 
+
 constructor() public
 {
 escrow = msg.sender;
@@ -64,9 +64,9 @@ function tok_bal_contract(address token) public view returns(uint256) // show ba
 return ERC20(token).balanceOf(address(this));
 }
 
- 
+
 function depositETH() payable external // this function deposit eth in contract address
- 
+
 {
 dep_ETH[msg.sender] = safeAdd(dep_ETH[msg.sender] , msg.value);
 }
@@ -85,17 +85,28 @@ function admin_withdrawETH(address payable to, uint256 value) public payable ret
     }
 }
 
-function find_Cont_ETH() public view returns(uint256) 
+function find_Cont_ETH() public view returns(uint256)
 {
     return address(this).balance;
 }
 
-// function getAllContETH() public payable returns(uint256) 
+// function getAllContETH() public payable returns(uint256)
 // {
 //     if(escrow==msg.sender)
-//     { 
+//     {
 //         msg.sender.transfer(address(this).balance);
 //     }
 // }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

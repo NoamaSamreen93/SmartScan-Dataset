@@ -108,7 +108,7 @@ contract Test{
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
      * @param _extraData some extra information to send to the approved contract
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -151,4 +151,15 @@ contract Test{
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

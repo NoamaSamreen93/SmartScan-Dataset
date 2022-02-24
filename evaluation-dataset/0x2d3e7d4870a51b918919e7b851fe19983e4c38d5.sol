@@ -265,7 +265,7 @@ contract MintableToken is StandardToken, Ownable {
 
   function mint(address _to, uint256 _amount) public returns (bool) {
     require((msg.sender == saleAgent || msg.sender == owner) && !mintingFinished);
-    
+
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
@@ -710,14 +710,14 @@ contract PreICO is NextSaleAgentFeature, WhiteListFeature {
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function fallback() internal minInvestLimited(msg.value) returns(uint) {
     require(now >= start && now < endSaleDate());
     require(whiteList[msg.sender]);
     wallet.transfer(msg.value);
     return mintTokensByETH(msg.sender, msg.value);
   }
-  
+
 }
 
 // File: contracts/ReceivingContractCallback.sol
@@ -828,4 +828,15 @@ contract Configurator is Ownable {
     ico.transferOwnership(manager);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -13,14 +13,14 @@ library SafeMath {
     uint256 c = a / b;
     return c;
   }
-  
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
     return c;
   }
 
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
@@ -35,7 +35,7 @@ contract Token {
 
 contract LockTokenContract {
     using SafeMath for uint;
- 
+
     uint256[] public FoundationReleaseStage = [
         0,
         0,
@@ -87,7 +87,7 @@ contract LockTokenContract {
         3116666666,
         3400000000
     ];
-    
+
     uint256[] public TeamAndAdviserAddreesOneStage = [
         0,
         0,
@@ -127,7 +127,7 @@ contract LockTokenContract {
         96000000,
         300000000
     ];
-    
+
     uint256[] public TeamAndAdviserAddreesTwoStage = [
         0,
         0,
@@ -167,17 +167,17 @@ contract LockTokenContract {
         224000000,
         1300000000
     ];
-    
-    
+
+
     address public FoundationAddress = address(0x86fC88dACfad94FEE664Ba45b3162101fE2D2E5C);
     address public TeamAndAdviserAddreesOne = address(0x8Af6F7A42ebbc7bF7EC386505ecEC4344dB565FC);
     address public TeamAndAdviserAddreesTwo = address(0x4cB827B58C8d7FCbaC177974da7d1F501a60cF24);
     address public GubiTokenAddress  = address(0x12b2B2331A72d375c453c160B2c8A7010EeA510A);
-    
-    
+
+
     uint public constant StageSection  = 2628288; // 约 30.42 天
     uint public StartTime = 1552089600; // 2019-03-09 00:00:00
-    
+
     mapping(address => uint256) AddressWithdrawals;
 
 
@@ -214,11 +214,11 @@ contract LockTokenContract {
         uint phase = _now
             .sub(StartTime)
             .div(StageSection);
-            
+
         if (phase >= stage.length) {
             phase = stage.length - 1;
         }
-        
+
         uint256 unlockable = stage[phase]
             .sub(AddressWithdrawals[msg.sender]);
 
@@ -229,7 +229,18 @@ contract LockTokenContract {
         if (unlockable > _balance.div(1e18)) {
             return _balance.div(1e18);
         }
-        
+
         return unlockable;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

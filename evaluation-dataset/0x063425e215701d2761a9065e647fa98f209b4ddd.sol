@@ -7,9 +7,9 @@ pragma solidity ^0.4.19;
  */
 contract ERC20Basic {
     function totalSupply() public view returns(uint256);
-    
+
     function balanceOf(address who) public view returns(uint256);
-    
+
     function transfer(address to, uint256 value) public returns(bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
@@ -20,18 +20,18 @@ contract ERC20Basic {
  */
 contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
-    
+
     mapping(address => uint256) balances;
-    
+
     uint256 totalSupply_;
-    
+
     /**
      * @dev total number of tokens in existence
      */
     function totalSupply() public view returns(uint256) {
         return totalSupply_;
     }
-    
+
     /**
      * @dev transfer token for a specified address
      * @param _to The address to transfer to.
@@ -40,14 +40,14 @@ contract BasicToken is ERC20Basic {
     function transfer(address _to, uint256 _value) public returns(bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Gets the balance of the specified address.
      * @param _owner The address to query the the balance of.
@@ -56,7 +56,7 @@ contract BasicToken is ERC20Basic {
     function balanceOf(address _owner) public view returns(uint256 balance) {
         return balances[_owner];
     }
-    
+
 }
 
 /**
@@ -65,9 +65,9 @@ contract BasicToken is ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns(uint256);
-    
+
     function transferFrom(address from, address to, uint256 value) public returns(bool);
-    
+
     function approve(address spender, uint256 value) public returns(bool);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -80,10 +80,10 @@ contract ERC20 is ERC20Basic {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
-    
+
     mapping(address => mapping(address => uint256)) internal allowed;
-    
-    
+
+
     /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
@@ -94,14 +94,14 @@ contract StandardToken is ERC20, BasicToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -117,7 +117,7 @@ contract StandardToken is ERC20, BasicToken {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param _owner address The address which owns the funds.
@@ -127,7 +127,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns(uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      *
@@ -143,7 +143,7 @@ contract StandardToken is ERC20, BasicToken {
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      *
@@ -164,7 +164,7 @@ contract StandardToken is ERC20, BasicToken {
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
 }
 
 /**
@@ -174,9 +174,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract Ownable {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
@@ -184,7 +184,7 @@ contract Ownable {
     function Ownable() public {
         owner = msg.sender;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -192,7 +192,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -202,7 +202,7 @@ contract Ownable {
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
-    
+
 }
 /**
  * @title Pausable
@@ -211,9 +211,9 @@ contract Ownable {
 contract Pausable is Ownable {
     event Pause();
     event Unpause();
-    
+
     bool public paused = false;
-    
+
     /**
      * @dev Modifier to make a function callable only when the contract is not paused.
      */
@@ -221,7 +221,7 @@ contract Pausable is Ownable {
         require(!paused);
         _;
     }
-    
+
     /**
      * @dev Modifier to make a function callable only when the contract is paused.
      */
@@ -229,7 +229,7 @@ contract Pausable is Ownable {
         require(paused);
         _;
     }
-    
+
     /**
      * @dev called by the owner to pause, triggers stopped state
      */
@@ -237,7 +237,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
     /**
      * @dev called by the owner to unpause, returns to normal state
      */
@@ -256,14 +256,14 @@ contract Pausable is Ownable {
 contract MintableToken is StandardToken, Ownable {
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
-    
+
     bool public mintingFinished = false;
-    
+
     modifier canMint() {
         require(!mintingFinished);
         _;
     }
-    
+
     /**
      * @dev Function to mint tokens
      * @param _to The address that will receive the minted tokens.
@@ -277,7 +277,7 @@ contract MintableToken is StandardToken, Ownable {
         Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     /**
      * @dev Function to stop minting new tokens.
      * @return True if the operation was successful.
@@ -294,23 +294,23 @@ contract MintableToken is StandardToken, Ownable {
  * @dev StandardToken modified with pausable transfers.
  **/
 contract PausableToken is StandardToken, Pausable {
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused returns(bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns(bool) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     function approve(address _spender, uint256 _value) public whenNotPaused returns(bool) {
         return super.approve(_spender, _value);
     }
-    
+
     function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns(bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns(bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
@@ -326,11 +326,11 @@ library SafeERC20 {
     function safeTransfer(ERC20Basic token, address to, uint256 value) internal {
         assert(token.transfer(to, value));
     }
-    
+
     function safeTransferFrom(ERC20 token, address from, address to, uint256 value) internal {
         assert(token.transferFrom(from, to, value));
     }
-    
+
     function safeApprove(ERC20 token, address spender, uint256 value) internal {
         assert(token.approve(spender, value));
     }
@@ -342,12 +342,12 @@ library SafeERC20 {
  * The token will be minted by the crowdsale contract only
  */
 contract MavinToken is MintableToken, PausableToken {
-    
+
     string public constant name = "Mavin Token";
     string public constant symbol = "MVN";
     uint8 public constant decimals = 18;
     address public creator;
-    
+
     function MavinToken()
     public
     Ownable()
@@ -356,15 +356,15 @@ contract MavinToken is MintableToken, PausableToken {
         creator = msg.sender;
         paused = true;
     }
-    
+
     function finalize()
     public
     onlyOwner {
         finishMinting(); //this can't be reactivated
         unpause();
     }
-    
-    
+
+
     function ownershipToCreator()
     public {
         require(creator == msg.sender);
@@ -383,19 +383,19 @@ library SafeMath {
         assert(a == 0 || c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns(uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns(uint256) {
         assert(b <= a);
         return a - b;
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns(uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -405,29 +405,29 @@ library SafeMath {
 
 
 library Referral {
-    
+
     /**
      * @dev referral tree
      */
     event LogRef(address member, address referrer);
-    
+
     struct Node {
         address referrer;
         bool valid;
     }
-    
+
     /**
      * @dev tree is a collection of nodes
      */
     struct Tree {
         mapping(address => Referral.Node) nodes;
     }
-    
+
     function addMember(
                        Tree storage self,
                        address _member,
                        address _referrer
-                       
+
                        )
     internal
     returns(bool success) {
@@ -444,22 +444,22 @@ library Referral {
 contract AffiliateTreeStore is Ownable {
     using SafeMath for uint256;
     using Referral for Referral.Tree;
-    
+
     address public creator;
-    
+
     Referral.Tree affiliateTree;
-    
+
     function AffiliateTreeStore()
     public {
         creator = msg.sender;
     }
-    
+
     function ownershipToCreator()
     public {
         require(creator == msg.sender);
         owner = msg.sender;
     }
-    
+
     function getNode(
                      address _node
                      )
@@ -472,7 +472,7 @@ contract AffiliateTreeStore is Ownable {
         }
         return 0;
     }
-    
+
     function getReferrer(
                          address _node
                          )
@@ -485,24 +485,24 @@ contract AffiliateTreeStore is Ownable {
         }
         return 0;
     }
-    
+
     function addMember(
                        address _member,
                        address _referrer
                        )
-    
+
     public
     onlyOwner
     returns(bool success) {
         return affiliateTree.addMember(_member, _referrer);
     }
-    
-    
+
+
     // Fallback Function only ETH with no functionCall
     function() public {
         revert();
     }
-    
+
 }
 /**
  * @title TokenVesting
@@ -513,22 +513,22 @@ contract AffiliateTreeStore is Ownable {
 contract TokenVesting is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20Basic;
-    
+
     event Released(uint256 amount);
     event Revoked();
-    
+
     // beneficiary of tokens after they are released
     address public beneficiary;
-    
+
     uint256 public cliff;
     uint256 public start;
     uint256 public duration;
-    
+
     bool public revocable;
-    
+
     mapping(address => uint256) public released;
     mapping(address => bool) public revoked;
-    
+
     /**
      * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
      * _beneficiary, gradually in a linear fashion until _start + _duration. By then all
@@ -541,30 +541,30 @@ contract TokenVesting is Ownable {
     function TokenVesting(address _beneficiary, uint256 _start, uint256 _cliff, uint256 _duration, bool _revocable) public {
         require(_beneficiary != address(0));
         require(_cliff <= _duration);
-        
+
         beneficiary = _beneficiary;
         revocable = _revocable;
         duration = _duration;
         cliff = _start.add(_cliff);
         start = _start;
     }
-    
+
     /**
      * @notice Transfers vested tokens to beneficiary.
      * @param token ERC20 token which is being vested
      */
     function release(ERC20Basic token) public {
         uint256 unreleased = releasableAmount(token);
-        
+
         require(unreleased > 0);
-        
+
         released[token] = released[token].add(unreleased);
-        
+
         token.safeTransfer(beneficiary, unreleased);
-        
+
         Released(unreleased);
     }
-    
+
     /**
      * @notice Allows the owner to revoke the vesting. Tokens already vested
      * remain in the contract, the rest are returned to the owner.
@@ -573,19 +573,19 @@ contract TokenVesting is Ownable {
     function revoke(ERC20Basic token) public onlyOwner {
         require(revocable);
         require(!revoked[token]);
-        
+
         uint256 balance = token.balanceOf(this);
-        
+
         uint256 unreleased = releasableAmount(token);
         uint256 refund = balance.sub(unreleased);
-        
+
         revoked[token] = true;
-        
+
         token.safeTransfer(owner, refund);
-        
+
         Revoked();
     }
-    
+
     /**
      * @dev Calculates the amount that has already vested but hasn't been released yet.
      * @param token ERC20 token which is being vested
@@ -593,7 +593,7 @@ contract TokenVesting is Ownable {
     function releasableAmount(ERC20Basic token) public view returns(uint256) {
         return vestedAmount(token).sub(released[token]);
     }
-    
+
     /**
      * @dev Calculates the amount that has already vested.
      * @param token ERC20 token which is being vested
@@ -601,7 +601,7 @@ contract TokenVesting is Ownable {
     function vestedAmount(ERC20Basic token) public view returns(uint256) {
         uint256 currentBalance = token.balanceOf(this);
         uint256 totalBalance = currentBalance.add(released[token]);
-        
+
         if (now < cliff) {
             return 0;
         } else if (now >= start.add(duration) || revoked[token]) {
@@ -615,9 +615,9 @@ contract TokenVesting is Ownable {
 
 contract AffiliateManager is Pausable {
     using SafeMath for uint256;
-    
+
     AffiliateTreeStore public affiliateTree; // treeStorage
-    
+
     // The token being sold
     MavinToken public token;
     // endTime
@@ -631,18 +631,18 @@ contract AffiliateManager is Pausable {
         // how many token units a buyer gets per eth
     uint256 public mvnperethBonus;
     // amount of raised money in wei
-    
+
     uint256 public level1Bonus;
     uint256 public level2Bonus;
     // amount of raised money in wei
-    
+
     uint256 public weiRaised;
     // min contribution amount
     uint256 public minAmountWei;
     // creator
     address creator;
-    
-    
+
+
     function AffiliateManager(
                               address _token,
                               address _treestore
@@ -656,69 +656,69 @@ contract AffiliateManager is Pausable {
         mvnperethBonus = 105;
         level1Bonus = 8;
         level2Bonus = 4;
-        
+
         minAmountWei = 0.01 ether;
         cap = 32000 ether;
-        
+
         affiliateTree = AffiliateTreeStore(_treestore);
     }
-    
+
     /// Log buyTokens
     event LogBuyTokens(address owner, uint256 tokens, uint256 tokenprice);
     /// Log LogId
     event LogId(address owner, uint48 id);
-    
+
     modifier onlyNonZeroAddress(address _a) {
         require(_a != address(0));
         _;
     }
-    
+
     modifier onlyDiffAdr(address _referrer, address _sender) {
         require(_referrer != _sender);
         _;
     }
-    
+
     function initAffiliate() public onlyOwner returns(bool) {
         //create first 2 root nodes
         bool success1 = affiliateTree.addMember(vault, 0); //root
         bool success2 = affiliateTree.addMember(msg.sender, vault); //root+1
         return success1 && success2;
     }
-    
-    
+
+
     // execute after all crowdsale tokens are minted
     function finalizeCrowdsale() public onlyOwner returns(bool) {
-        
+
         pause();
-        
+
         uint256 totalSupply = token.totalSupply();
-        
+
         // 6 month cliff, 12 month total
         TokenVesting team = new TokenVesting(vault, now, 24 weeks, 1 years, false);
         uint256 teamTokens = totalSupply.div(60).mul(16);
         token.mint(team, teamTokens);
-        
+
         uint256 reserveTokens = totalSupply.div(60).mul(18);
         token.mint(vault, reserveTokens);
-        
+
         uint256 advisoryTokens = totalSupply.div(60).mul(6);
         token.mint(vault, advisoryTokens);
-        
+
         token.transferOwnership(creator);
     }
-    
+
     function validPurchase() internal constant returns(bool) {
         bool withinCap = weiRaised.add(msg.value) <= cap;
         bool withinTime = endTime > now;
         bool withinMinAmount = msg.value >= minAmountWei;
         return withinCap && withinTime && withinMinAmount;
     }
-    
+
     function presaleMint(
                          address _beneficiary,
                          uint256 _amountmvn,
                          uint256 _mvnpereth
-                         
+
                          )
     public
     onlyOwner
@@ -728,11 +728,11 @@ contract AffiliateManager is Pausable {
         token.mint(_beneficiary, _amountmvn);
         // update state
         weiRaised = weiRaised.add(_weiAmount);
-        
+
         LogBuyTokens(_beneficiary, _amountmvn, _mvnpereth);
         return true;
     }
-    
+
     function joinManual(
                         address _referrer,
                         uint48 _id
@@ -746,8 +746,8 @@ contract AffiliateManager is Pausable {
         LogId(msg.sender, _id);
         return join(_referrer);
     }
-    
-    
+
+
     function join(
                   address _referrer
                   )
@@ -757,59 +757,59 @@ contract AffiliateManager is Pausable {
     onlyDiffAdr(_referrer, msg.sender) // prevent selfreferal
     onlyDiffAdr(_referrer, this) // prevent reentrancy
     returns(bool success)
-    
+
     {
         uint256 weiAmount = msg.value;
         require(_referrer != vault);
         require(validPurchase()); //respect min amount / cap / date
-        
+
         //get existing sender node
         address senderNode = affiliateTree.getNode(msg.sender);
-        
+
         // if senderNode already exists use same referrer
         if (senderNode != address(0)) {
             _referrer =  affiliateTree.getReferrer(msg.sender);
         }
-        
+
         //get referrer
         address referrerNode = affiliateTree.getNode(_referrer);
         //referrer must exist
         require(referrerNode != address(0));
-        
+
         //get referrer of referrer
         address topNode = affiliateTree.getReferrer(_referrer);
         //referrer of referrer must exist
         require(topNode != address(0));
         require(topNode != msg.sender); //selfreferal
-        
 
-        
+
+
         // Add sender to the tree
         if (senderNode == address(0)) {
             affiliateTree.addMember(msg.sender, _referrer);
         }
-        
+
         buyTokens(msg.sender, weiAmount, _referrer, true);
-        
+
         uint256 parentAmount = 0;
         uint256 rootAmount = 0;
-        
+
         //p1
         parentAmount = weiAmount.div(100).mul(level1Bonus); //% commision for p1
         referrerNode.transfer(parentAmount);
         buyTokens(referrerNode, parentAmount,_referrer, false);
-        
+
         //p2
         rootAmount = weiAmount.div(100).mul(level2Bonus); //% commision for p2
         topNode.transfer(rootAmount);
         buyTokens(topNode, rootAmount,_referrer, false);
-        
-        
+
+
         vault.transfer(weiAmount.sub(parentAmount).sub(rootAmount)); //rest goes to vault
-        
+
         return success;
     }
-    
+
     function buyTokens(
            address _beneficiary,
            uint256 _weiAmount,
@@ -821,21 +821,21 @@ contract AffiliateManager is Pausable {
         require(_beneficiary != address(0));
         uint256 tokens = 0;
         uint256 rate = mvnpereth;
-        
+
         if (_hasBonus == true && _referrer != creator) {
             rate = mvnperethBonus;
         }
-        
+
         tokens = _weiAmount.mul(rate);
-        
+
         // update state
         weiRaised = weiRaised.add(_weiAmount);
         success = token.mint(_beneficiary, tokens);
-        
+
         LogBuyTokens(_beneficiary, tokens, rate);
         return success;
     }
-    
+
     function updateBonus(uint256 _minAmountWei, uint256 _buyerrate, uint256 _rate, uint256 _level1, uint256 _level2) onlyOwner public returns(bool success) {
         minAmountWei = _minAmountWei;
         mvnpereth = _rate;
@@ -844,21 +844,32 @@ contract AffiliateManager is Pausable {
         level2Bonus = _level2;
         return true;
     }
-    
+
     function presaleAddTree(address _wallet, address _referrer) onlyOwner public returns (bool success) {
         address node = affiliateTree.getNode(_wallet);
         //node must not exist
         require(node == address(0));
         return affiliateTree.addMember(_wallet, _referrer);
     }
-    
+
     function balanceOf(address _owner) public constant returns(uint256 balance) {
         return token.balanceOf(_owner);
     }
-    
+
     // Fallback Function only ETH with no functionCall
     function() public {
         revert();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

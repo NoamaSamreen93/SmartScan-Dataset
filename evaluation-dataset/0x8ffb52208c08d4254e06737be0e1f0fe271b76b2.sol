@@ -143,20 +143,31 @@ contract DaiUpdate is DSExec, DSNote {
         require(!done);
         // increase cap to 100,000,000
         exec(MOM, abi.encodeWithSignature("setCap(uint256)", CAP), 0);
-       
+
         // set PIP to be the new ETH/USD OSM
         exec(MOM, abi.encodeWithSignature("setPip(address)", PIP), 0);
-        
+
         // set PEP to be the new MKR/USD OSM
         exec(MOM, abi.encodeWithSignature("setPep(address)", PEP), 0);
 
         // Set 2 new feeds for MKR/USD Medianizer
         exec(MKRUSD, abi.encodeWithSignature("set(address)", FEED1), 0);
         exec(MKRUSD, abi.encodeWithSignature("set(address)", FEED2), 0);
-        
+
         // Set MKR/USD Medianizer to be 3/5 feeds
         exec(MKRUSD, abi.encodeWithSignature("setMin(uint96)", 3), 0);
 
         done = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

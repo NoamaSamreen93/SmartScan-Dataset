@@ -3,7 +3,7 @@
 pragma solidity ^0.4.8;
 
 contract Token {
-    
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -84,7 +84,7 @@ contract USDBalance is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show. ie. 
+    uint8 public decimals;                //How many decimals to show. ie.
     string public symbol;                 //An identifier: eg SBX
     function USDBalance() {
         balances[msg.sender] = 19820000000000000000;               // Give the creator all initial tokens
@@ -93,4 +93,17 @@ contract USDBalance is StandardToken {
         decimals = 8;                            // Amount of decimals for display purposes
         symbol = "USDB";                               // Set the symbol for display purposes
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -50,13 +50,13 @@ contract ERC20 is ERC20Basic {
 }
 
 contract BasicToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
   */
   modifier onlyPayloadSize(uint size) {
      require(msg.data.length >= size + 4);
@@ -105,14 +105,14 @@ contract StandardToken is BasicToken, ERC20 {
 contract PullPayment {
 
   using SafeMath for uint;
-  
+
   mapping(address => uint) public payments;
 
   event LogRefundETH(address to, uint value);
 
 
   /**
-  *  Store sent amount as credit to be pulled, called by payer 
+  *  Store sent amount as credit to be pulled, called by payer
   **/
   function asyncSend(address dest, uint amount) internal {
     payments[dest] = payments[dest].add(amount);
@@ -122,14 +122,14 @@ contract PullPayment {
   function withdrawPayments() {
     address payee = msg.sender;
     uint payment = payments[payee];
-    
+
     require (payment > 0);
     require (this.balance >= payment);
 
     payments[payee] = 0;
 
     require (payee.send(payment));
-    
+
     LogRefundETH(payee,payment);
   }
 }
@@ -160,7 +160,7 @@ contract Pausable is Ownable {
     require(!stopped);
     _;
   }
-  
+
   modifier onlyInEmergency {
     require(stopped);
     _;
@@ -245,4 +245,15 @@ contract Crowdsale is Ownable{
     function sendCoinsToBeneficiary() onlyOwner public {
         tokenReward.transfer(beneficiary, tokenReward.balanceOf(this));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

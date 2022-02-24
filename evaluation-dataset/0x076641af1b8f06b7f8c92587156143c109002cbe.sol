@@ -79,10 +79,10 @@ contract SOPToken is ERC20, SafeMath, Owned {
 	mapping(address => mapping(address => uint)) public allowance;
 
 
-	mapping(address=>uint) public lock; 
+	mapping(address=>uint) public lock;
 	mapping(address=>bool) public freezeIn;
 	mapping(address=>bool) public freezeOut;
-	
+
 
 	//event definitions
 	/* This notifies clients about the amount burnt */
@@ -124,7 +124,7 @@ contract SOPToken is ERC20, SafeMath, Owned {
 
 		return true;
 	}
-	
+
 	function transferFrom(address from, address toaddr, uint value) public returns (bool) {
 		require(allowance[from][msg.sender]>=value);
 
@@ -137,7 +137,7 @@ contract SOPToken is ERC20, SafeMath, Owned {
 
 	function approve(address spender, uint amount) public returns (bool) {
 		require((amount == 0) || (allowance[msg.sender][spender] == 0));
-		
+
 		allowance[msg.sender][spender]=amount;
 
 		Approval(msg.sender, spender, amount);
@@ -201,4 +201,15 @@ contract SOPToken is ERC20, SafeMath, Owned {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

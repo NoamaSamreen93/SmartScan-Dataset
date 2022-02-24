@@ -11,7 +11,7 @@ library SafeOpt {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b > 0); 
+        assert(b > 0);
         uint256 c = a / b;
         assert(a == b * c);
         return c;
@@ -32,11 +32,11 @@ library SafeOpt {
     }
 }
 contract CWCCTokenIssue {
-    uint256 public lastYearTotalSupply = 15 * 10 ** 26; 
+    uint256 public lastYearTotalSupply = 15 * 10 ** 26;
     uint8   public affectedCount = 0;
-    bool    public initialYear = true; 
+    bool    public initialYear = true;
 	address public tokenContractAddress;
-    uint16  public preRate = 1000; 
+    uint16  public preRate = 1000;
     uint256 public lastBlockNumber;
 
     function CWCCTokenIssue (address _tokenContractAddress) public{
@@ -171,4 +171,20 @@ contract CWCCToken {
         return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

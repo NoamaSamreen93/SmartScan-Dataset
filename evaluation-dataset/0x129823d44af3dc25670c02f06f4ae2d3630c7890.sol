@@ -414,7 +414,7 @@ contract Controlled is Ownable{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -488,4 +488,15 @@ contract ElectronicSportsCoin is BurnableToken, MintableToken, PausableToken {
             emit Transfer(from, to, value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -46,7 +46,7 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function TokenERC20(
-       
+
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
@@ -186,7 +186,7 @@ contract FIBToken is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function FIBToken(
-        
+
     ) TokenERC20() public {}
 
     /* Internal transfer, only can be called by this contract */
@@ -219,5 +219,16 @@ contract FIBToken is owned, TokenERC20 {
         emit FrozenFunds(target, freeze);
     }
 
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

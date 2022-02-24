@@ -342,3 +342,14 @@ contract LDLMintableToken is MintableToken, BurnableToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

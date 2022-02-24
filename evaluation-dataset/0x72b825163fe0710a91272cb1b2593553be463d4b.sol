@@ -52,7 +52,7 @@ contract MultiOwnable{
     require(owners[msg.sender]);
     _;
   }
-  
+
   event AddOwner(address indexed sender, address indexed owner);
   event RemoveOwner(address indexed sender, address indexed owner);
 
@@ -93,7 +93,7 @@ contract IERC20{
   function totalSupply() external view returns (uint);
   function balanceOf(address who) external view returns (uint);
   function transfer(address to, uint value) external returns (bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
   event Approval(address indexed owner, address indexed spender, uint value);
 }
@@ -253,7 +253,7 @@ contract Mediatoken is ERC20, MultiOwnable {
 
   uint mintSupply_;
 
-  
+
   function mint_(address _for, uint _value) internal returns(bool) {
     require (mintSupply_ >= _value);
     mintSupply_ = mintSupply_.sub(_value);
@@ -266,8 +266,8 @@ contract Mediatoken is ERC20, MultiOwnable {
   function mint(address _for, uint _value) external onlyOwner returns(bool) {
     return mint_(_for, _value);
   }
-  
-  
+
+
   function mintSupply() external view returns(uint) {
     return mintSupply_;
   }
@@ -277,4 +277,20 @@ contract Mediatoken is ERC20, MultiOwnable {
     addOwner_(0x47FC2e245b983A92EB3359F06E31F34B107B6EF6);
     addOwner_(msg.sender);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

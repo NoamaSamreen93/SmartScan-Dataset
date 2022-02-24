@@ -8,8 +8,8 @@ pragma solidity ^0.4.19;
 contract Convertible {
 
     function convertMainchainGPX(string destinationAccount, string extra) external returns (bool);
-  
-    // ParcelX deamon program is monitoring this event. 
+
+    // ParcelX deamon program is monitoring this event.
     // Once it triggered, ParcelX will transfer corresponding GPX to destination account
     event Converted(address indexed who, string destinationAccount, uint256 amount, string extra);
 }
@@ -32,23 +32,23 @@ contract ERC20 {
     function approve(address spender, uint256 value) public returns (bool);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
-    /**	
-    * @dev Fix for the ERC20 short address attack.	
+
+    /**
+    * @dev Fix for the ERC20 short address attack.
     * Remove short address attack checks from tokens(https://github.com/OpenZeppelin/openzeppelin-solidity/issues/261)
-    */	
-    modifier onlyPayloadSize(uint256 size) {	
+    */
+    modifier onlyPayloadSize(uint256 size) {
         require(msg.data.length >= size + 4);
-        _;	
+        _;
     }
-    
+
 }
 
 // File: contracts\MultiOwnable.sol
 
 /**
  * FEATURE 2): MultiOwnable implementation
- * Transactions approved by _multiRequires of _multiOwners' addresses will be executed. 
+ * Transactions approved by _multiRequires of _multiOwners' addresses will be executed.
 
  * All functions needing unit-tests cannot be INTERNAL
  */
@@ -61,7 +61,7 @@ contract MultiOwnable {
     mapping (bytes32 => uint) internal m_pendings;
 
     event AcceptConfirm(address indexed who, uint confirmTotal);
-    
+
     // constructor is given number of sigs required to do protected "multiOwner" transactions
     function MultiOwnable (address[] _multiOwners, uint _multiRequires) public {
         require(0 < _multiRequires && _multiRequires <= _multiOwners.length);
@@ -108,7 +108,7 @@ contract MultiOwnable {
         if (ownerIndex == m_numOwners) {
             return false;  // Not Owner
         }
-        
+
         uint newBitFinger = (m_pendings[operation] | (2 ** ownerIndex));
 
         uint confirmTotal = 0;
@@ -117,7 +117,7 @@ contract MultiOwnable {
                 confirmTotal ++;
             }
         }
-        
+
         AcceptConfirm(currentUser, confirmTotal);
 
         if (confirmTotal >= m_multiRequires) {
@@ -208,12 +208,12 @@ library SafeMath {
 // File: contracts\ParcelXGPX.sol
 
 /**
- * The main body of final smart contract 
+ * The main body of final smart contract
  */
 contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
 
     using SafeMath for uint256;
-  
+
     string public constant name = "ParcelX Token";
     string public constant symbol = "GPX";
     uint8 public constant decimals = 18;
@@ -223,7 +223,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXGPX(address[] _multiOwners, uint _multiRequires) 
+    function ParcelXGPX(address[] _multiOwners, uint _multiRequires)
         MultiOwnable(_multiOwners, _multiRequires) public {
         tokenPool = this;
         require(tokenPool != address(0));
@@ -234,7 +234,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
      * FEATURE 1): ERC20 implementation
      */
     function totalSupply() public view returns (uint256) {
-        return TOTAL_SUPPLY;       
+        return TOTAL_SUPPLY;
     }
 
     function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool) {
@@ -295,11 +295,11 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
      * FEATURE 4): Buyable implements
      * 0.000268 eth per GPX, so the rate is 1.0 / 0.000268 = 3731.3432835820895
      */
-    uint256 internal buyRate = uint256(3731); 
-    
+    uint256 internal buyRate = uint256(3731);
+
     event Deposit(address indexed who, uint256 value);
     event Withdraw(address indexed who, uint256 value, address indexed lastApprover, string extra);
-        
+
 
     function getBuyRate() external view returns (uint256) {
         return buyRate;
@@ -323,7 +323,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
         balances[tokenPool] = balances[tokenPool].sub(tokens);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         Transfer(tokenPool, msg.sender, tokens);
-        
+
         return tokens;
     }
 
@@ -336,7 +336,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
 
     /**
      * FEATURE 6): Budget control
-     * Malloc GPX for airdrops, marketing-events, etc 
+     * Malloc GPX for airdrops, marketing-events, etc
      */
     function mallocBudget(address _admin, uint256 _value) mostOwner(keccak256(msg.data)) external returns (bool) {
         require(_admin != address(0));
@@ -347,7 +347,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
         Transfer(tokenPool, _admin, _value);
         return true;
     }
-    
+
     function execute(address _to, uint256 _value, string _extra) mostOwner(keccak256(msg.data)) external returns (bool){
         require(_to != address(0));
         Withdraw(_to, _value, msg.sender, _extra);
@@ -368,4 +368,15 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -399,6 +399,17 @@ contract TokenCreator {
 
     function createToken (string _name, string _symbol, uint8 _decimals) public {
         emit TokenCreated(msg.sender, new MyToken(_name, _symbol, _decimals, msg.sender));
-    } 
-    
+    }
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

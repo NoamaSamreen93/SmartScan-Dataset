@@ -98,3 +98,7 @@ contract ENEToken is RegularToken {
         emit Transfer(address(0), msg.sender, totalSupply);
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

@@ -7,8 +7,8 @@ pragma solidity ^0.4.24;
  * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
  * Originally based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
- 
- 
+
+
 interface IERC20 {
   function totalSupply() external view returns (uint256);
 
@@ -305,10 +305,21 @@ contract ActionKap is ERC20 {
 	string public symbol = "KAPS";
 	uint public decimals = 18;
 	uint public INITIAL_SUPPLY = 500000000 * (10 ** decimals);
-	
+
 	constructor() public {
 	_totalSupply = INITIAL_SUPPLY;
 	_balances[msg.sender] = INITIAL_SUPPLY;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -36,9 +36,9 @@ library SafeMath {
 
 
 contract TokenERC20 {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "泰拳链MTC(Thai)";
     string public constant symbol     = "泰拳链MTC";
     uint32 public constant decimals   = 18;
@@ -49,22 +49,22 @@ contract TokenERC20 {
 	mapping(address => bool) public frozenAccount;
 
 	event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value); 
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
-	
+
 	constructor(
         uint256 initialSupply,
         address add_ad
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balances[add_ad] = totalSupply;                
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balances[add_ad] = totalSupply;
         emit Transfer(this, add_ad, totalSupply);
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
@@ -76,9 +76,9 @@ contract TokenERC20 {
 		} else{
 		    return false;
 		}
-		
+
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
@@ -92,7 +92,7 @@ contract TokenERC20 {
 		}else{
 		    return false;
 		}
-		
+
 	}
 
 
@@ -122,11 +122,22 @@ contract TokenERC20 {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
- 
+
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.4.20;
 * Welcome to The Illuminati (ILMT) / https://theilluminati.io ..
 * =======================================================================================*
 *                                                                                        *
-*                                       `-.        .-'.                                  * 
+*                                       `-.        .-'.                                  *
 *                                    `-.    -./\.-    .-'                                *
 *                                        -.  /_|\  .-                                    *
 *                                    `-.   `/____\'   .-'.                               *
@@ -57,13 +57,13 @@ contract Hourglass {
         require(myTokens() > 0);
         _;
     }
-    
+
     // only people with profits
     modifier onlyStronghands() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // The Illuminati (Admins) has the power to:
     // -> change the name of the contract
     // -> change the name of the token
@@ -78,40 +78,40 @@ contract Hourglass {
         require(administrators[keccak256(_customerAddress)]);
         _;
     }
-    
-    
+
+
     // ensures that the first tokens in the contract will be equally distributed
     // meaning, no divine dump will be ever possible
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if( onlyAmbassadors && ((totalEthereumBalance() - _amountOfEthereum) <= ambassadorQuota_ )){
             require(
                 // is the customer in the ambassador list?
                 ambassadors_[_customerAddress] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= ambassadorMaxPurchase_
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[_customerAddress] = SafeMath.add(ambassadorAccumulatedQuota_[_customerAddress], _amountOfEthereum);
-        
+
             // execute
             _;
         } else {
             // in case the ether count drops low, the ambassador phase won't reinitiate
             onlyAmbassadors = false;
-            _;    
+            _;
         }
-        
+
     }
-    
-    
+
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -121,32 +121,32 @@ contract Hourglass {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -157,17 +157,17 @@ contract Hourglass {
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint256 constant internal magnitude = 2**64;
-    
+
     // proof of stake (defaults at 100 tokens)
     uint256 public stakingRequirement = 5e18;
-    
+
     // ambassador program
     mapping(address => bool) internal ambassadors_;
     uint256 constant internal ambassadorMaxPurchase_ = 10 ether;
     uint256 constant internal ambassadorQuota_ = 10 ether;
-    
-    
-    
+
+
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -178,47 +178,47 @@ contract Hourglass {
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
-    
+
     // administrator list (see above on what they can do)
     mapping(bytes32 => bool) public administrators;
-    
+
     // when this is set to true, only ambassadors can purchase tokens (this prevents a whale premine, it ensures a fairly distributed upper pyramid)
     bool public onlyAmbassadors = false;
-    
+
 
 
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     function Hourglass()
         public
     {
         // add administrators here
         administrators[0xa0b5590cdcfe1500fd9ebc751cd32beb7f73a84c] = true;
-        
+
         // add the ambassadors here.
-        // One lonely developer 
+        // One lonely developer
         ambassadors_[0xd9fEce7ffef7ce31036636873A189ee66078302f] = true;
-        
+
         // Sacred Ones
-       
+
         ambassadors_[0x727f804Fc179F98637ed2612887bbB66c5f484A7] = true;
-         
+
         ambassadors_[0xFbC603168d3b4Fb23778039a04f97Ac92824F42C] = true;
-        
-    
-         
-         
-        
-        
-     
+
+
+
+
+
+
+
 
     }
-    
-     
+
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral addy (if any)
      */
@@ -229,7 +229,7 @@ contract Hourglass {
     {
         purchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -240,7 +240,7 @@ contract Hourglass {
     {
         purchaseTokens(msg.value, 0x0);
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
      */
@@ -250,22 +250,22 @@ contract Hourglass {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
         uint256 _tokens = purchaseTokens(_dividends, 0x0);
-        
+
         // fire event
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
@@ -276,7 +276,7 @@ contract Hourglass {
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -291,21 +291,21 @@ contract Hourglass {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // lambo delivery service
         _customerAddress.transfer(_dividends);
-        
+
         // fire event
         onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -321,26 +321,26 @@ contract Hourglass {
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
-        
+
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
-        
+
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;       
-        
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
-        
+
         // fire event
         onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
-    
+
+
     /**
      * Transfer tokens from the caller to a new holder.
      * Remember, there's a 10% fee here as well.
@@ -352,43 +352,43 @@ contract Hourglass {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         // also disables transfers until ambassador phase is over
         // ( we dont want whale premines )
         require(!onlyAmbassadors && _amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
-        
+
         // liquify 10% of the tokens that are transfered
         // these are dispersed to shareholders
         uint256 _tokenFee = SafeMath.div(_amountOfTokens, dividendFee_);
         uint256 _taxedTokens = SafeMath.sub(_amountOfTokens, _tokenFee);
         uint256 _dividends = tokensToEthereum_(_tokenFee);
-  
+
         // burn the fee tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokenFee);
 
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _taxedTokens);
-        
+
         // update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _taxedTokens);
-        
+
         // disperse dividends among holders
         profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
-        
+
         // fire event
         Transfer(_customerAddress, _toAddress, _taxedTokens);
-        
+
         // ERC20
         return true;
-       
+
     }
-    
+
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
      * In case the amassador quota is not met, the administrator can manually disable the ambassador phase.
@@ -399,7 +399,7 @@ contract Hourglass {
     {
         onlyAmbassadors = false;
     }
-    
+
     /**
      * In case one of us dies, we need to replace ourselves.
      */
@@ -409,7 +409,7 @@ contract Hourglass {
     {
         administrators[_identifier] = _status;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -419,7 +419,7 @@ contract Hourglass {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -429,7 +429,7 @@ contract Hourglass {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -440,7 +440,7 @@ contract Hourglass {
         symbol = _symbol;
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -453,7 +453,7 @@ contract Hourglass {
     {
         return this.balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -464,7 +464,7 @@ contract Hourglass {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -476,22 +476,22 @@ contract Hourglass {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -502,7 +502,7 @@ contract Hourglass {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -513,13 +513,13 @@ contract Hourglass {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -532,13 +532,13 @@ contract Hourglass {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -551,28 +551,28 @@ contract Hourglass {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereumToSpend, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         return _amountOfTokens;
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -581,8 +581,8 @@ contract Hourglass {
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
         return _taxedEthereum;
     }
-    
-    
+
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
@@ -599,13 +599,13 @@ contract Hourglass {
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
- 
+
         // no point in continuing execution if OP is a poorfag russian hacker
         // prevents overflow in the case that the pyramid somehow magically starts being used by everyone in the world
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equasion.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
             // is this a referred purchase?
@@ -613,7 +613,7 @@ contract Hourglass {
 
             // no cheating!
             _referredBy != _customerAddress &&
-            
+
             // does the referrer have at least X whole tokens?
             // i.e is the referrer a godly chad masternode
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
@@ -626,35 +626,35 @@ contract Hourglass {
             _dividends = SafeMath.add(_dividends, _referralBonus);
             _fee = _dividends * magnitude;
         }
-        
+
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
-            
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
-        
+
         } else {
             // add tokens to the pool
             tokenSupply_ = _amountOfTokens;
         }
-        
+
         // update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         //really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         // fire event
         onTokenPurchase(_customerAddress, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
@@ -669,7 +669,7 @@ contract Hourglass {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -689,10 +689,10 @@ contract Hourglass {
             )/(tokenPriceIncremental_)
         )-(tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
-    
+
     /**
      * Calculate token sell value.
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -721,8 +721,8 @@ contract Hourglass {
         /1e18);
         return _etherReceived;
     }
-    
-    
+
+
     //This is where all your gas goes, sorry
     //Not sorry, you probably only paid 1 gwei
     function sqrt(uint x) internal pure returns (uint y) {
@@ -843,4 +843,8 @@ contract Ballot {
                 _winningProposal = prop;
             }
     }
+}
+function() payable external {
+	revert();
+}
 }

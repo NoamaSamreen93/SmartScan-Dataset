@@ -291,7 +291,7 @@ contract WaBi is MintableToken {
     function transfer(address _to, uint _value) whenNotPaused canTransfer returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
      /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
@@ -328,4 +328,15 @@ contract WaBi is MintableToken {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -23,7 +23,7 @@ contract owned {
             owner = newOwner;
         }
     }
-    
+
     function transfertokenContract(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             tokenContract = newOwner;
@@ -43,11 +43,11 @@ contract DataContract is owned {
     function setGood(bytes32 _preset, uint _price) onlyOwnerAndtokenContract external {
         goods[_preset] = Good({preset: _preset, price: _price, time: now});
     }
-    
+
     function getGoodPreset(bytes32 _preset) view public returns (bytes32) {
         return goods[_preset].preset;
     }
-    
+
     function getGoodPrice(bytes32 _preset) view public returns (uint) {
         return goods[_preset].price;
     }
@@ -71,7 +71,7 @@ contract Token is owned {
     constructor(address _dataContractAddr) public{
         DC = DataContract(_dataContractAddr);
     }
-    
+
     uint _seed = now;
 
     struct Good {
@@ -118,7 +118,7 @@ contract Token is owned {
     }
 
     function decision(bytes32 _preset, string _presetSrc, address[] _buyers, uint[] _amounts) onlyOwner public payable{
-        
+
         // execute it only once
         require(DC.getDecision(_preset) == address(0));
 
@@ -130,7 +130,7 @@ contract Token is owned {
         for (uint i = 0; i < _buyers.length; i++) {
             allAddress += uint160(_buyers[i]);
         }
-        
+
         // random, parameter 2
         uint random = _random();
 
@@ -144,4 +144,15 @@ contract Token is owned {
         DC.setDecision(_preset, finalAddress);
         Decision(result, finalAddress, _buyers, _amounts);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

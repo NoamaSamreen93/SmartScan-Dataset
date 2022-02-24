@@ -94,7 +94,7 @@ contract JBX is owned
     Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // ERC20
   function allowance( address owner, address spender ) constant
   returns (uint256 remaining)
@@ -133,7 +133,7 @@ contract JBX is owned
       return true;
     }
     return false;
-  }        
+  }
 
   // Ethereum Token
   function burn( uint256 value ) returns (bool success)
@@ -223,4 +223,15 @@ contract JBX is owned
     assembly { length := extcodesize(_addr) }
     return (length > 0);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

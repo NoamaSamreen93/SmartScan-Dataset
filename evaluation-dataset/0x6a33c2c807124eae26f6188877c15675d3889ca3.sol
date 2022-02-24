@@ -105,13 +105,13 @@ contract TUNEZ is StandardToken { //  Update the contract name.
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function TUNEZ() {
-        balances[msg.sender] = 2400000000000000000000000000;                
-        totalSupply = 2400000000000000000000000000;                       
-        name = "TUNEZ";                                   
-        decimals = 18;                                               
-        symbol = "TUNEZ";                                             
-        unitsOneEthCanBuy = 1000000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 2400000000000000000000000000;
+        totalSupply = 2400000000000000000000000000;
+        name = "TUNEZ";
+        decimals = 18;
+        symbol = "TUNEZ";
+        unitsOneEthCanBuy = 1000000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,9 +125,9 @@ contract TUNEZ is StandardToken { //  Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
-    
+
     /**
     * @dev Batch transfer some tokens to some addresses, address and value is one-on-one.
     * @param _dests Array of addresses
@@ -166,4 +166,8 @@ contract TUNEZ is StandardToken { //  Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

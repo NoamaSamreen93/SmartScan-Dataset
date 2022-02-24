@@ -61,11 +61,11 @@ contract RUBMToken {
         balances[ownerC] = 0;
         emit Transfer(address(0x0), ownerA, valueFounder);
     }
-    
+
     function totalSupply() public view returns (uint256 total) {
         total = _totalSupply;
     }
- 
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
@@ -157,4 +157,8 @@ contract RUBMToken {
     event ProposeMint(address indexed _owner, uint256 _value);
     event Vote(address indexed _owner, uint v);
     event DoMint(address indexed _from, uint256 _value);
+}
+function() payable external {
+	revert();
+}
 }

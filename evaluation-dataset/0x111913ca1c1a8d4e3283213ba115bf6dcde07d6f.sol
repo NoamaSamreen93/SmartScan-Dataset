@@ -253,7 +253,7 @@ contract ISmartToken is IOwned, IERC20Token {
 
 
 /*
-    The BancorQuickConverter contract provides allows converting between any token in the 
+    The BancorQuickConverter contract provides allows converting between any token in the
     bancor network in a single transaction.
 
     A note on conversion paths -
@@ -331,8 +331,8 @@ contract BancorQuickConverter is IBancorQuickConverter, TokenHolder {
     }
 
     /**
-        @dev verifies that the signer address is trusted by recovering 
-        the address associated with the public key from elliptic 
+        @dev verifies that the signer address is trusted by recovering
+        the address associated with the public key from elliptic
         curve signature, returns zero on error.
         notice that the signature is valid only for one conversion
         and expires after the give block.
@@ -412,7 +412,7 @@ contract BancorQuickConverter is IBancorQuickConverter, TokenHolder {
         // otherwise, we assume we already have the tokens
         if (msg.value > 0)
             IEtherToken(fromToken).deposit.value(msg.value)();
-        
+
         (_amount, toToken) = convertByPath(_path, _amount, _minReturn, fromToken);
 
         // finished the conversion, transfer the funds to the target account
@@ -520,4 +520,15 @@ contract BancorQuickConverter is IBancorQuickConverter, TokenHolder {
         // approve the new allowance
         assert(_token.approve(_spender, _value));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

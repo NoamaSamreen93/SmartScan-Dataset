@@ -183,7 +183,7 @@ contract ERC20 is IERC20, Ownable {
         _transfer(msg.sender, to, value);
         return true;
     }
-    
+
 
     function approve(address spender, uint256 value) public returns (bool) {
         require(spender != address(0));
@@ -216,7 +216,7 @@ contract ERC20 is IERC20, Ownable {
             return true;
         } else {
             return false;
-        }    
+        }
     }
 
     /*
@@ -366,7 +366,7 @@ contract Pausable is PauserRole {
 
 /*
 contract ERC20Pausable is ERC20, Pausable {
-    
+
     function transfer(address to, uint256 value) public whenNotPaused returns (bool) {
         return super.transfer(to, value);
     }
@@ -460,4 +460,15 @@ contract ELB1 is ERC20, ERC20Detailed /* ERC20Burnable, ERC20Mintable, ERC20Paus
     function buildingAddress() public view returns (string memory) {
         return _building_address;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

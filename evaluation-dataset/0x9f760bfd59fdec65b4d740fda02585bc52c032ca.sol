@@ -138,18 +138,18 @@ contract StandardToken is ERC20, Pausable {
     }
 
     function addSupply(uint256 _value) onlyOwner public returns (bool success) {
-        require(_value > 0);      
-        balances[msg.sender] = balances[msg.sender].add(_value);                    
-        totalSupply = totalSupply.add(_value);                          
+        require(_value > 0);
+        balances[msg.sender] = balances[msg.sender].add(_value);
+        totalSupply = totalSupply.add(_value);
         AddSupply(msg.sender, _value);
         return true;
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(_value > 0); 
-        require(balances[msg.sender] >= _value);         
-        balances[msg.sender] = balances[msg.sender].sub(_value);                    
-        totalSupply = totalSupply.sub(_value);                          
+        require(_value > 0);
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         Burn(msg.sender, _value);
         return true;
     }
@@ -162,7 +162,7 @@ contract SILToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 10000e18;
-    address public constant WALLET_SIL   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622; 
+    address public constant WALLET_SIL   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622;
 
     function SILToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -186,4 +186,13 @@ contract SILToken is StandardToken {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

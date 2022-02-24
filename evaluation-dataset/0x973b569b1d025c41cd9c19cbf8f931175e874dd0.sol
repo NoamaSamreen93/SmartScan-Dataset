@@ -52,11 +52,11 @@ contract ERC20Detailed is IERC20 {
   string private _Tokensymbol;
 
   constructor(string memory name, string memory symbol, uint8 decimals) public {
-   
+
    _Tokendecimals = decimals;
     _Tokenname = name;
     _Tokensymbol = symbol;
-    
+
   }
 
   function name() public view returns(string memory) {
@@ -83,9 +83,9 @@ contract BOOM is ERC20Detailed {
   string constant tokenSymbol = "BOOM";
   uint8  constant tokenDecimals = 8;
   uint256 _totalSupply = 99999900000000;
- 
- 
-  
+
+
+
 
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
     _mint(msg.sender, _totalSupply);
@@ -193,4 +193,15 @@ contract BOOM is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

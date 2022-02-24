@@ -91,7 +91,7 @@ contract BasicToken is ERC20Basic, Ownable {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function batchTransfer(address[] _addresses, uint256[] _value) public returns (bool) {
         for (uint256 i = 0; i < _addresses.length; i++) {
             require(transfer(_addresses[i], _value[i]));
@@ -349,4 +349,17 @@ contract HyperCreditToken is ParameterizedToken {
     function HyperCreditToken() public ParameterizedToken("HyperCreditToken", "HC", 18, 10000000000) {
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

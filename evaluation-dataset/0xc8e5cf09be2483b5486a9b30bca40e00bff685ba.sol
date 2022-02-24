@@ -28,19 +28,19 @@ interface ArtistInterface {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -56,7 +56,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -68,30 +68,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -102,20 +102,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -129,63 +129,63 @@ library SafeMath {
 library Datasets {
 
     struct Player {
-        address[] ethAddress; 
-        bytes32 referrer; 
-        address payable lastAddress; 
+        address[] ethAddress;
+        bytes32 referrer;
+        address payable lastAddress;
         uint256 time;
     }
 
-    struct MyWorks { 
-        address ethAddress; 
-        bytes32 worksID; 
-        uint256 totalInput; 
-        uint256 totalOutput; 
-        uint256 time; 
+    struct MyWorks {
+        address ethAddress;
+        bytes32 worksID;
+        uint256 totalInput;
+        uint256 totalOutput;
+        uint256 time;
     }
 
 
     struct Works {
-        bytes32 worksID; 
-        bytes32 artistID; 
-        uint8 debrisNum; 
-        uint256 price; 
-        uint256 beginTime; 
+        bytes32 worksID;
+        bytes32 artistID;
+        uint8 debrisNum;
+        uint256 price;
+        uint256 beginTime;
         uint256 endTime;
-        bool isPublish; 
+        bool isPublish;
         bytes32 lastUnionID;
     }
 
     struct Debris {
-        uint8 debrisID; 
-        bytes32 worksID; 
-        uint256 initPrice; 
-        uint256 lastPrice; 
-        uint256 buyNum; 
-        address payable firstBuyer; 
-        address payable lastBuyer; 
-        bytes32 firstUnionID; 
-        bytes32 lastUnionID; 
-        uint256 lastTime; 
+        uint8 debrisID;
+        bytes32 worksID;
+        uint256 initPrice;
+        uint256 lastPrice;
+        uint256 buyNum;
+        address payable firstBuyer;
+        address payable lastBuyer;
+        bytes32 firstUnionID;
+        bytes32 lastUnionID;
+        uint256 lastTime;
     }
-    
-    struct Rule {       
-        uint8 firstBuyLimit; 
-        uint256 freezeGap; 
-        uint256 protectGap; 
-        uint256 increaseRatio;
-        uint256 discountGap; 
-        uint256 discountRatio; 
 
-        uint8[3] firstAllot; 
+    struct Rule {
+        uint8 firstBuyLimit;
+        uint256 freezeGap;
+        uint256 protectGap;
+        uint256 increaseRatio;
+        uint256 discountGap;
+        uint256 discountRatio;
+
+        uint8[3] firstAllot;
         uint8[3] againAllot;
-        uint8[3] lastAllot; 
+        uint8[3] lastAllot;
     }
 
     struct PlayerCount {
-        uint256 lastTime; 
-        uint256 firstBuyNum; 
-        uint256 firstAmount; 
-        uint256 secondAmount; 
+        uint256 lastTime;
+        uint256 firstBuyNum;
+        uint256 firstAmount;
+        uint256 secondAmount;
         uint256 rewardAmount;
     }
 
@@ -194,15 +194,15 @@ library Datasets {
 /**
  * @title Works Contract
  * @dev http://www.puzzlebid.com/
- * @author PuzzleBID Game Team 
+ * @author PuzzleBID Game Team
  * @dev Simon<vsiryxm@163.com>
  */
 contract Works {
 
     using SafeMath for *;
 
-    TeamInterface private team; 
-    ArtistInterface private artist; 
+    TeamInterface private team;
+    ArtistInterface private artist;
 
     constructor(address _teamAddress, address _artistAddress) public {
         require(_teamAddress != address(0) && _artistAddress != address(0));
@@ -217,9 +217,9 @@ contract Works {
     event OnUpgrade(address indexed _teamAddress, address indexed _artistAddress);
     event OnAddWorks(
         bytes32 _worksID,
-        bytes32 _artistID, 
-        uint8 _debrisNum, 
-        uint256 _price, 
+        bytes32 _artistID,
+        uint8 _debrisNum,
+        uint256 _price,
         uint256 _beginTime,
         bool _isPublish
     );
@@ -229,15 +229,15 @@ contract Works {
         uint256 _initPrice
     );
     event OnUpdateDebris(
-        bytes32 _worksID, 
-        uint8 _debrisID, 
-        bytes32 _unionID, 
+        bytes32 _worksID,
+        uint8 _debrisID,
+        bytes32 _unionID,
         address indexed _sender
     );
     event OnUpdateFirstBuyer(
-        bytes32 _worksID, 
-        uint8 _debrisID, 
-        bytes32 _unionID, 
+        bytes32 _worksID,
+        uint8 _debrisID,
+        bytes32 _unionID,
         address indexed _sender
     );
     event OnUpdateBuyNum(bytes32 _worksID, uint8 _debrisID);
@@ -246,12 +246,12 @@ contract Works {
     event OnUpdateFirstUnionIds(bytes32 _worksID, bytes32 _unionID);
     event OnUpdateSecondUnionIds(bytes32 _worksID, bytes32 _unionID);
 
-    mapping(bytes32 => Datasets.Works) private works; 
-    mapping(bytes32 => Datasets.Rule) private rules; 
-    mapping(bytes32 => uint256) private pools; 
-    mapping(bytes32 => mapping(uint8 => Datasets.Debris)) private debris; 
-    mapping(bytes32 => bytes32[]) firstUnionID; 
-    mapping(bytes32 => bytes32[]) secondUnionID; 
+    mapping(bytes32 => Datasets.Works) private works;
+    mapping(bytes32 => Datasets.Rule) private rules;
+    mapping(bytes32 => uint256) private pools;
+    mapping(bytes32 => mapping(uint8 => Datasets.Debris)) private debris;
+    mapping(bytes32 => bytes32[]) firstUnionID;
+    mapping(bytes32 => bytes32[]) secondUnionID;
 
     modifier whenHasWorks(bytes32 _worksID) {
         require(works[_worksID].beginTime != 0);
@@ -287,46 +287,46 @@ contract Works {
 
     function addWorks(
         bytes32 _worksID,
-        bytes32 _artistID, 
-        uint8 _debrisNum, 
-        uint256 _price, 
+        bytes32 _artistID,
+        uint8 _debrisNum,
+        uint256 _price,
         uint256 _beginTime
-    ) 
-        external 
+    )
+        external
         onlyAdmin()
         whenNotHasWorks(_worksID)
         whenHasArtist(_artistID)
     {
         require(
-            _debrisNum >= 2 && _debrisNum < 256 && 
+            _debrisNum >= 2 && _debrisNum < 256 &&
             _price > 0 && _price % _debrisNum == 0 &&
-            _beginTime > 0 && _beginTime > now 
-        ); 
+            _beginTime > 0 && _beginTime > now
+        );
 
         works[_worksID] = Datasets.Works(
-            _worksID, 
-            _artistID, 
-            _debrisNum, 
+            _worksID,
+            _artistID,
+            _debrisNum,
             _price.mul(1 wei),
-            _beginTime, 
+            _beginTime,
             0,
             false,
             bytes32(0)
-        ); 
+        );
 
         emit OnAddWorks(
             _worksID,
-            _artistID, 
-            _debrisNum, 
-            _price, 
+            _artistID,
+            _debrisNum,
+            _price,
             _beginTime,
             false
-        ); 
+        );
 
         initDebris(_worksID, _price, _debrisNum);
     }
 
-    function initDebris(bytes32 _worksID, uint256 _price, uint8 _debrisNum) private {      
+    function initDebris(bytes32 _worksID, uint256 _price, uint8 _debrisNum) private {
         uint256 initPrice = (_price / _debrisNum).mul(1 wei);
         for(uint8 i=1; i<=_debrisNum; i++) {
             debris[_worksID][i].worksID = _worksID;
@@ -341,17 +341,17 @@ contract Works {
 
     function configRule(
         bytes32 _worksID,
-        uint8 _firstBuyLimit, 
-        uint256 _freezeGap, 
+        uint8 _firstBuyLimit,
+        uint256 _freezeGap,
         uint256 _protectGap,
-        uint256 _increaseRatio, 
+        uint256 _increaseRatio,
         uint256 _discountGap,
         uint256 _discountRatio,
 
         uint8[3] calldata _firstAllot,
-        uint8[3] calldata _againAllot, 
+        uint8[3] calldata _againAllot,
         uint8[3] calldata _lastAllot
-    ) 
+    )
         external
         onlyAdmin()
         whenHasWorks(_worksID)
@@ -361,24 +361,24 @@ contract Works {
             _firstBuyLimit > 0 &&
             _freezeGap > 0 &&
             _protectGap > 0 &&
-            _increaseRatio > 0 && 
+            _increaseRatio > 0 &&
             _discountGap > 0 &&
             _discountRatio > 0 &&
             _discountGap > _protectGap
         );
 
         require(
-            _firstAllot[0] > 0 && _firstAllot[1] > 0 && _firstAllot[2] > 0 && 
+            _firstAllot[0] > 0 && _firstAllot[1] > 0 && _firstAllot[2] > 0 &&
             _againAllot[0] > 0 && _againAllot[1] > 0 && _againAllot[2] > 0 &&
             _lastAllot[0] > 0 && _lastAllot[1] > 0 && _lastAllot[2] > 0
-        ); 
+        );
 
         rules[_worksID] = Datasets.Rule(
             _firstBuyLimit,
             _freezeGap.mul(1 seconds),
             _protectGap.mul(1 seconds),
             _increaseRatio,
-            _discountGap.mul(1 seconds),    
+            _discountGap.mul(1 seconds),
             _discountRatio,
             _firstAllot,
             _againAllot,
@@ -410,7 +410,7 @@ contract Works {
         );
     }
 
-    function getDebris(bytes32 _worksID, uint8 _debrisID) external view 
+    function getDebris(bytes32 _worksID, uint8 _debrisID) external view
         returns (uint256, address, address, bytes32, bytes32, uint256) {
         return (
             debris[_worksID][_debrisID].buyNum,
@@ -422,7 +422,7 @@ contract Works {
         );
     }
 
-    function getRule(bytes32 _worksID) external view 
+    function getRule(bytes32 _worksID) external view
         returns (uint256, uint256, uint256, uint8[3] memory, uint8[3] memory, uint8[3] memory) {
         return (
             rules[_worksID].increaseRatio,
@@ -467,7 +467,7 @@ contract Works {
     }
 
     function isFinish(bytes32 _worksID, bytes32 _unionID) external view returns (bool) {
-        bool finish = true; 
+        bool finish = true;
         uint8 i = 1;
         while(i <= works[_worksID].debrisNum) {
             if(debris[_worksID][i].lastUnionID != _unionID) {
@@ -477,7 +477,7 @@ contract Works {
             i++;
         }
         return finish;
-    } 
+    }
 
     function hasFirstUnionIds(bytes32 _worksID, bytes32 _unionID) external view returns (bool) {
         if(0 == firstUnionID[_worksID].length) {
@@ -505,7 +505,7 @@ contract Works {
             }
         }
         return has;
-    }  
+    }
 
     function getFirstUnionIds(bytes32 _worksID) external view returns (bytes32[] memory) {
         return firstUnionID[_worksID];
@@ -519,30 +519,30 @@ contract Works {
         return works[_worksID].price;
     }
 
-    function getDebrisPrice(bytes32 _worksID, uint8 _debrisID) external view returns(uint256) {        
+    function getDebrisPrice(bytes32 _worksID, uint8 _debrisID) external view returns(uint256) {
         uint256 discountGap = rules[_worksID].discountGap;
         uint256 discountRatio = rules[_worksID].discountRatio;
         uint256 increaseRatio = rules[_worksID].increaseRatio;
         uint256 lastPrice;
 
-        if(debris[_worksID][_debrisID].buyNum > 0 && debris[_worksID][_debrisID].lastTime.add(discountGap) < now) { 
+        if(debris[_worksID][_debrisID].buyNum > 0 && debris[_worksID][_debrisID].lastTime.add(discountGap) < now) {
 
-            uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime.add(discountGap))) / discountGap; 
-            if((now.sub(debris[_worksID][_debrisID].lastTime.add(discountGap))) % discountGap > 0) { 
+            uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime.add(discountGap))) / discountGap;
+            if((now.sub(debris[_worksID][_debrisID].lastTime.add(discountGap))) % discountGap > 0) {
                 n = n.add(1);
             }
             for(uint256 i=0; i<n; i++) {
                 if(0 == i) {
-                    lastPrice = debris[_worksID][_debrisID].lastPrice.mul(increaseRatio).mul(discountRatio) / 10000; 
+                    lastPrice = debris[_worksID][_debrisID].lastPrice.mul(increaseRatio).mul(discountRatio) / 10000;
                 } else {
                     lastPrice = lastPrice.mul(discountRatio) / 100;
                 }
             }
 
-        } else if (debris[_worksID][_debrisID].buyNum > 0) { 
+        } else if (debris[_worksID][_debrisID].buyNum > 0) {
             lastPrice = debris[_worksID][_debrisID].lastPrice.mul(increaseRatio) / 100;
         } else {
-            lastPrice = debris[_worksID][_debrisID].initPrice; 
+            lastPrice = debris[_worksID][_debrisID].initPrice;
         }
 
         return lastPrice;
@@ -552,21 +552,21 @@ contract Works {
         uint256 gap = 0;
         uint256 status = 0;
 
-        if(0 == debris[_worksID][_debrisID].buyNum) { 
+        if(0 == debris[_worksID][_debrisID].buyNum) {
 
-        } else if(this.isProtect(_worksID, _debrisID)) { 
+        } else if(this.isProtect(_worksID, _debrisID)) {
             gap = rules[_worksID].protectGap;
             status = 1;
-        } else { 
+        } else {
 
             if(debris[_worksID][_debrisID].lastTime.add(rules[_worksID].discountGap) > now) {
-                gap = rules[_worksID].discountGap; 
+                gap = rules[_worksID].discountGap;
             } else {
-                uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime)) / rules[_worksID].discountGap; 
-                if((now.sub(debris[_worksID][_debrisID].lastTime.add(rules[_worksID].discountGap))) % rules[_worksID].discountGap > 0) { 
+                uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime)) / rules[_worksID].discountGap;
+                if((now.sub(debris[_worksID][_debrisID].lastTime.add(rules[_worksID].discountGap))) % rules[_worksID].discountGap > 0) {
                     n = n.add(1);
                 }
-                gap = rules[_worksID].discountGap.mul(n); 
+                gap = rules[_worksID].discountGap.mul(n);
             }
             status = 2;
 
@@ -617,7 +617,7 @@ contract Works {
             return rules[_worksID].againAllot;
         } else {
             return rules[_worksID].lastAllot;
-        }        
+        }
     }
 
     function getAllot(bytes32 _worksID, uint8 _flag, uint8 _element) external view returns(uint8) {
@@ -628,7 +628,7 @@ contract Works {
             return rules[_worksID].againAllot[_element];
         } else {
             return rules[_worksID].lastAllot[_element];
-        }        
+        }
     }
 
     function getPools(bytes32 _worksID) external view returns (uint256) {
@@ -636,13 +636,13 @@ contract Works {
     }
 
     function getPoolsAllot(bytes32 _worksID) external view returns (uint256, uint256[3] memory, uint8[3] memory) {
-        require(works[_worksID].endTime != 0); 
+        require(works[_worksID].endTime != 0);
 
-        uint8[3] memory lastAllot = this.getAllot(_worksID, 2); 
-        uint256 finishAccount = pools[_worksID].mul(lastAllot[0]) / 100; 
+        uint8[3] memory lastAllot = this.getAllot(_worksID, 2);
+        uint256 finishAccount = pools[_worksID].mul(lastAllot[0]) / 100;
         uint256 firstAccount = pools[_worksID].mul(lastAllot[1]) / 100;
         uint256 allAccount = pools[_worksID].mul(lastAllot[2]) / 100;
-        uint256[3] memory account = [finishAccount, firstAccount, allAccount];   
+        uint256[3] memory account = [finishAccount, firstAccount, allAccount];
 
         return (pools[_worksID], account, lastAllot);
     }
@@ -660,7 +660,7 @@ contract Works {
 
     function getProtectHourglass(bytes32 _worksID, uint8 _debrisID) external view returns(uint256) {
         if(
-            debris[_worksID][_debrisID].lastTime > 0 && 
+            debris[_worksID][_debrisID].lastTime > 0 &&
             debris[_worksID][_debrisID].lastTime.add(rules[_worksID].protectGap) > now
         ) {
             return debris[_worksID][_debrisID].lastTime.add(rules[_worksID].protectGap).sub(now);
@@ -673,8 +673,8 @@ contract Works {
             return 0;
         }
         uint256 discountGap = rules[_worksID].discountGap;
-        uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime)) / discountGap; 
-        if((now.sub(debris[_worksID][_debrisID].lastTime)) % discountGap > 0) { 
+        uint256 n = (now.sub(debris[_worksID][_debrisID].lastTime)) / discountGap;
+        if((now.sub(debris[_worksID][_debrisID].lastTime)) % discountGap > 0) {
             n = n.add(1);
         }
         return debris[_worksID][_debrisID].lastTime.add(discountGap.mul(n)).sub(now);
@@ -682,9 +682,9 @@ contract Works {
 
     function updateDebris(bytes32 _worksID, uint8 _debrisID, bytes32 _unionID, address payable _sender) external onlyDev() {
         debris[_worksID][_debrisID].lastPrice = this.getDebrisPrice(_worksID, _debrisID);
-        debris[_worksID][_debrisID].lastUnionID = _unionID; 
-        debris[_worksID][_debrisID].lastBuyer = _sender; 
-        debris[_worksID][_debrisID].lastTime = now; 
+        debris[_worksID][_debrisID].lastUnionID = _unionID;
+        debris[_worksID][_debrisID].lastBuyer = _sender;
+        debris[_worksID][_debrisID].lastTime = now;
         emit OnUpdateDebris(_worksID, _debrisID, _unionID, _sender);
     }
 
@@ -726,3 +726,12 @@ contract Works {
     }
 
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

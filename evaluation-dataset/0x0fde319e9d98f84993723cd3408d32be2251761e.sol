@@ -62,10 +62,10 @@ contract Ownable {
     ContractOwnershipTransferred(contractOwner, _newOwner);
     contractOwner = _newOwner;
   }
-  
+
   function payoutFromContract() public onlyContractOwner {
       contractOwner.transfer(this.balance);
-  }  
+  }
 
 }
 
@@ -146,9 +146,9 @@ contract DoggyEthPics is ERC721, Ownable {
 	  _createDoggy("EthDoggy", 0x7cd84443027d2e19473c3657f167ada34417654f, 403655273437500000);
 	  _createDoggy("EthDoggy", 0xe6c58f8e459fe570afff5b4622990ea1744f0e28, 181644873046875000);
 	  _createDoggy("EthDoggy", 0xe6c58f8e459fe570afff5b4622990ea1744f0e28, 423838037109375000);
-	  
+
   }
-  
+
   function getDoggy(uint256 _tokenId) public view returns (string doggyName, uint256 sellingPrice, address owner) {
     Doggy storage doggy = doggies[_tokenId];
     doggyName = doggy.name;
@@ -182,11 +182,11 @@ contract DoggyEthPics is ERC721, Ownable {
 
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 9), 10)); //90% to previous owner
     uint256 divs_payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 1), 20)); //5% divs
-    
+
 	address divs_address = doggyIdToDivs[_tokenId];
-	
+
     // Next price will rise on 50%
-    doggyIdToPrice[_tokenId] = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 3), 2)); 
+    doggyIdToPrice[_tokenId] = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 3), 2));
 
     _transfer(oldOwner, newOwner, _tokenId);
 
@@ -201,28 +201,28 @@ contract DoggyEthPics is ERC721, Ownable {
     }
 
     TokenSold(_tokenId, sellingPrice, doggyIdToPrice[_tokenId], oldOwner, newOwner, doggies[_tokenId].name);
-	
+
     if (msg.value > sellingPrice) { //if excess pay
 	    uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
 		msg.sender.transfer(purchaseExcess);
 	}
   }
-  
+
   function changeDoggy(uint256 _tokenId) public payable { //
     require(doggyIdToPrice[_tokenId] >= 300 finney);
-	
+
     require(doggyIdToOwner[_tokenId] == msg.sender && msg.value == 20 finney); //tax 0.02eth for change
-	
+
 	uint256 newPrice1 =  uint256(SafeMath.div(SafeMath.mul(doggyIdToPrice[_tokenId], 3), 10)); //30%
 	uint256 newPrice2 =  uint256(SafeMath.div(SafeMath.mul(doggyIdToPrice[_tokenId], 7), 10)); //70%
-    
+
     //get two doggies within one
 	createDoggyToken("EthDoggy", newPrice1);
 	createDoggyToken("EthDoggy", newPrice2);
-	
+
 	doggyIdToOwner[_tokenId] = address(this); //return changed doggy to doggypics
 	doggyIdToPrice[_tokenId] = 10 finney;
-	 
+
   }
 
 
@@ -246,35 +246,35 @@ contract DoggyEthPics is ERC721, Ownable {
   }
 
   function ALLownersANDprices(uint256 _startDoggyId) public view returns (address[] owners, address[] divs, uint256[] prices) { //for web site view
-	
+
 	uint256 totalDoggies = totalSupply();
-	
+
     if (totalDoggies == 0 || _startDoggyId >= totalDoggies) {
         // Return an empty array
       return (new address[](0),new address[](0),new uint256[](0));
     }
-	
+
 	uint256 indexTo;
 	if (totalDoggies > _startDoggyId+1000)
 		indexTo = _startDoggyId + 1000;
-	else 	
+	else
 		indexTo = totalDoggies;
-		
-    uint256 totalResultDoggies = indexTo - _startDoggyId;		
-		
+
+    uint256 totalResultDoggies = indexTo - _startDoggyId;
+
 	address[] memory owners_res = new address[](totalResultDoggies);
 	address[] memory divs_res = new address[](totalResultDoggies);
 	uint256[] memory prices_res = new uint256[](totalResultDoggies);
-	
+
 	for (uint256 doggyId = _startDoggyId; doggyId < indexTo; doggyId++) {
 	  owners_res[doggyId - _startDoggyId] = doggyIdToOwner[doggyId];
 	  divs_res[doggyId - _startDoggyId] = doggyIdToDivs[doggyId];
 	  prices_res[doggyId - _startDoggyId] = doggyIdToPrice[doggyId];
 	}
-	
+
 	return (owners_res, divs_res, prices_res);
   }
-  
+
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerToken) { //ERC721 for web site view
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
@@ -336,16 +336,16 @@ contract DoggyEthPics is ERC721, Ownable {
     DoggyCreated(newDoggyId, _name, _owner);
 
     doggyIdToPrice[newDoggyId] = _price;
-	
+
 	if (newDoggyId<3) //migration
 		doggyIdToDivs[newDoggyId] = address(this); //dividents address;
-	else if (newDoggyId>2 && newDoggyId<=4) 
+	else if (newDoggyId>2 && newDoggyId<=4)
 		doggyIdToDivs[newDoggyId] = address(0x28d02f67316123dc0293849a0d254ad86b379b34); //dividents address;
-	else if (newDoggyId>4 && newDoggyId<=6) 
+	else if (newDoggyId>4 && newDoggyId<=6)
 		doggyIdToDivs[newDoggyId] = address(0x7cd84443027d2e19473c3657f167ada34417654f); //dividents address;
-	else if (newDoggyId>6 && newDoggyId<=8) 
+	else if (newDoggyId>6 && newDoggyId<=8)
 		doggyIdToDivs[newDoggyId] = address(0xe6c58f8e459fe570afff5b4622990ea1744f0e28); //dividents address;
-	else 
+	else
 		doggyIdToDivs[newDoggyId] = _owner; //dividents address;
 
     _transfer(address(0), _owner, newDoggyId);
@@ -369,4 +369,15 @@ function _transfer(address _from, address _to, uint256 _tokenId) private {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

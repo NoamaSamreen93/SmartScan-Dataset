@@ -78,7 +78,7 @@ contract TokenERC20 {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     event Approval(address indexed tokenOwner, address indexed spender, uint value);
 
     /**
@@ -267,7 +267,7 @@ contract LexitToken is owned, TokenERC20 {
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public {
         require(newSellPrice > 0);
         require(newBuyPrice > 0);
-        sellPrice = newSellPrice;        
+        sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
 
@@ -284,7 +284,7 @@ contract LexitToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount.mul(sellPrice));          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
@@ -295,9 +295,9 @@ contract LexitToken is owned, TokenERC20 {
 
 contract LxtBountyDistribution is owned {
     using SafeMath for uint;
-    
+
     LexitToken public LXT;
-    address public LXT_OWNER; 
+    address public LXT_OWNER;
 
     uint256 private constant decimalFactor = 10**uint256(18);
 
@@ -307,7 +307,7 @@ contract LxtBountyDistribution is owned {
         uint256 totalAllocated; // Total tokens allocated
         uint256 amountClaimed;  // Total tokens claimed
     }
-  
+
     mapping(address => Allocation) public allocations;
 
     mapping (address => bool) public admins;
@@ -325,11 +325,11 @@ contract LxtBountyDistribution is owned {
     function updateLxtOwner(address _withdrawnWallet) public onlyOwnerOrAdmin {
         LXT_OWNER = _withdrawnWallet;
     }
- 
+
     function setAdmin(address _admin, bool _isAdmin) public onlyOwnerOrAdmin {
         admins[_admin] = _isAdmin;
     }
- 
+
     function setAllocation (address _recipient, uint256 _amount) public onlyOwnerOrAdmin {
         uint256 amount = _amount * decimalFactor;
         uint256 totalAllocated = allocations[_recipient].totalAllocated.add(amount);
@@ -377,5 +377,16 @@ contract LxtBountyDistribution is owned {
             }
         }
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

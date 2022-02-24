@@ -11,7 +11,7 @@ library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
-        
+
         if (a == 0) {
             return 0;
         }
@@ -566,14 +566,14 @@ contract ERC20Burnable is ERC20Pausable {
 }
 
 contract SolareX is ERC20Burnable{
-     
-     
-  string public name;                   
+
+
+  string public name;
   uint8 public decimals;                //How many decimals to show. ie. There could 1000000 base units with 6 decimals. Meaning 0.980900 SRX = 980900 base units. It's like comparing 1 wei to 1 ether.
-  string public symbol;                 
-  string public version;       
-  
-  
+  string public symbol;
+  string public version;
+
+
     constructor() public
     {
       super._mint(msg.sender,2400000000000000);
@@ -581,7 +581,18 @@ contract SolareX is ERC20Burnable{
       decimals = 6;
       symbol = "SRX";
       version = "V2.0";
-      
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

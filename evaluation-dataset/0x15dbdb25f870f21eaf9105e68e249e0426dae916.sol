@@ -44,7 +44,7 @@ contract MillionEther {
         uint imageID;
         uint sellPrice;
     }
-    Block[101][101] private blocks; 
+    Block[101][101] private blocks;
 
     // Images
     uint private numImages = 0;
@@ -115,7 +115,7 @@ contract MillionEther {
     modifier onlyWithin100x100Area (uint8 _fromX, uint8 _fromY, uint8 _toX, uint8 _toY) {
         if ((_fromX < 1) || (_fromY < 1)  || (_toX > 100) || (_toY > 100)) throw;
         _;
-    }    
+    }
 
     modifier onlyByLandlord (uint8 _x, uint8 _y) {
         if (msg.sender != admin) {
@@ -129,14 +129,14 @@ contract MillionEther {
         _;
     }
 
-    modifier stopInEmergency { 
+    modifier stopInEmergency {
         if (msg.sender != admin) {
-            if (setting_stopped) throw; 
+            if (setting_stopped) throw;
         }
         _;
     }
 
-    modifier onlyInRefundMode { 
+    modifier onlyInRefundMode {
         if (!setting_refundMode) throw;
         _;
     }
@@ -148,11 +148,11 @@ contract MillionEther {
         return uint32(now + _setting_delay * (2**(_currentLevel-1)));
     }
 
-    function signIn (address referal) 
-        public 
+    function signIn (address referal)
+        public
         stopInEmergency ()
-        onlyWhenInvitedBy (referal) 
-        returns (uint) 
+        onlyWhenInvitedBy (referal)
+        returns (uint)
     {
         numUsers++;
         // get user's referral handshakes and increase by one
@@ -160,7 +160,7 @@ contract MillionEther {
         users[msg.sender].referal = referal;
         users[msg.sender].handshakes = currentLevel;
         // 1,2,4,8,16,32,64 hours for activation depending on number of handshakes (if setting delay = 1 hour)
-        users[msg.sender].activationTime = getActivationTime (currentLevel, setting_delay); 
+        users[msg.sender].activationTime = getActivationTime (currentLevel, setting_delay);
         users[msg.sender].refunded = false;
         users[msg.sender].userID = numUsers;
         userAddrs[numUsers] = msg.sender;
@@ -172,7 +172,7 @@ contract MillionEther {
  // ** BUY AND SELL BLOCKS ** //
 
     function getBlockPrice (uint8 fromX, uint8 fromY, uint blocksSold) private constant returns (uint) {
-        if (blocks[fromX][fromY].landlord == address(0x0)) { 
+        if (blocks[fromX][fromY].landlord == address(0x0)) {
                 // when buying at initial sale price doubles every 1000 blocks sold
                 return 1 ether * (2 ** (blocksSold/1000));
             } else {
@@ -181,34 +181,34 @@ contract MillionEther {
             }
         }
 
-    function buyBlock (uint8 x, uint8 y) 
-        private  
-        onlyForSale (x, y) 
+    function buyBlock (uint8 x, uint8 y)
+        private
+        onlyForSale (x, y)
         returns (uint)
     {
         uint blockPrice;
         blockPrice = getBlockPrice(x, y, blocksSold);
         // Buy at initial sale
         if (blocks[x][y].landlord == address(0x0)) {
-            blocksSold += 1;  
+            blocksSold += 1;
             totalWeiInvested += blockPrice;
         // Buy from current landlord and pay him or her the blockPrice
         } else {
-            users[blocks[x][y].landlord].balance += blockPrice;  
+            users[blocks[x][y].landlord].balance += blockPrice;
         }
         blocks[x][y].landlord = msg.sender;
         return blockPrice;
     }
 
     // buy an area of blocks at coordinates [fromX, fromY, toX, toY]
-    function buyBlocks (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY) 
+    function buyBlocks (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY)
         public
         payable
         stopInEmergency ()
-        onlySignedIn () 
+        onlySignedIn ()
         onlyWithin100x100Area (fromX, fromY, toX, toY)
-        returns (uint) 
-    {   
+        returns (uint)
+    {
         // Put funds to buyerBalance
         if (users[msg.sender].balance + msg.value < users[msg.sender].balance) throw; //checking for overflow
         uint previousWeiInvested = totalWeiInvested;
@@ -237,19 +237,19 @@ contract MillionEther {
 
 
     //Mark block for sale (set a sell price)
-    function sellBlock (uint8 x, uint8 y, uint sellPrice) 
+    function sellBlock (uint8 x, uint8 y, uint sellPrice)
         private
-        onlyByLandlord (x, y) 
+        onlyByLandlord (x, y)
     {
         blocks[x][y].sellPrice = sellPrice;
     }
 
     // sell an area of blocks at coordinates [fromX, fromY, toX, toY]
-    function sellBlocks (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint priceForEachBlockInWei) 
-        public 
+    function sellBlocks (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint priceForEachBlockInWei)
+        public
         stopInEmergency ()
-        onlyWithin100x100Area (fromX, fromY, toX, toY) 
-        returns (bool) 
+        onlyWithin100x100Area (fromX, fromY, toX, toY)
+        returns (bool)
     {
         if (priceForEachBlockInWei == 0) throw;
         for (uint8 ix=fromX; ix<=toX; ix++) {
@@ -265,7 +265,7 @@ contract MillionEther {
 
 
 // ** ASSIGNING IMAGES ** //
-    
+
     function chargeForImagePlacement () private {
         if (users[msg.sender].balance + msg.value < users[msg.sender].balance) throw; //check for overflow`
         uint buyerBalance = users[msg.sender].balance + msg.value;
@@ -276,21 +276,21 @@ contract MillionEther {
     }
 
     // every block has its own image id assigned
-    function assignImageID (uint8 x, uint8 y, uint _imageID) 
+    function assignImageID (uint8 x, uint8 y, uint _imageID)
         private
-        onlyByLandlord (x, y) 
+        onlyByLandlord (x, y)
     {
         blocks[x][y].imageID = _imageID;
     }
 
     // place new ad to user owned area
-    function placeImage (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, string imageSourceUrl, string adUrl, string adText) 
-        public 
+    function placeImage (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, string imageSourceUrl, string adUrl, string adText)
+        public
         payable
         stopInEmergency ()
         noBannedUsers ()
         onlyWithin100x100Area (fromX, fromY, toX, toY)
-        returns (uint) 
+        returns (uint)
     {
         chargeForImagePlacement();
         numImages++;
@@ -321,7 +321,7 @@ contract MillionEther {
         address iUser = referal;
         address nextUser;
         uint totalPayed = 0;
-        for (uint8 i = 1; i < 7; i++) {                 // maximum 6 handshakes from the buyer 
+        for (uint8 i = 1; i < 7; i++) {                 // maximum 6 handshakes from the buyer
             users[iUser].balance += _amount / (2**i);   // with every handshake far from the buyer reward halves:
             totalPayed += _amount / (2**i);             // 50%, 25%, 12.5%, 6.25%, 3.125%, 1.5625%
             if (iUser == admin) { break; }              // breaks at admin
@@ -342,9 +342,9 @@ contract MillionEther {
     }
 
     // withdraw funds (no external calls for safety)
-    function withdrawAll () 
+    function withdrawAll ()
         public
-        stopInEmergency () 
+        stopInEmergency ()
     {
         uint withdrawAmount = users[msg.sender].balance;
         users[msg.sender].balance = 0;
@@ -367,31 +367,31 @@ contract MillionEther {
         bool refunded,
         uint investments
     ) {
-        referal = users[userAddress].referal; 
-        handshakes = users[userAddress].handshakes; 
-        balance = users[userAddress].balance; 
-        activationTime = users[userAddress].activationTime; 
-        banned = users[userAddress].banned; 
+        referal = users[userAddress].referal;
+        handshakes = users[userAddress].handshakes;
+        balance = users[userAddress].balance;
+        activationTime = users[userAddress].activationTime;
+        banned = users[userAddress].banned;
         userID = users[userAddress].userID;
-        refunded = users[userAddress].refunded; 
+        refunded = users[userAddress].refunded;
         investments = users[userAddress].investments;
     }
 
-    function getUserAddressByID (uint userID) 
-        public constant returns (address userAddress) 
+    function getUserAddressByID (uint userID)
+        public constant returns (address userAddress)
     {
         return userAddrs[userID];
     }
-    
-    function getMyInfo() 
-        public constant returns(uint balance, uint32 activationTime) 
-    {   
+
+    function getMyInfo()
+        public constant returns(uint balance, uint32 activationTime)
+    {
         return (users[msg.sender].balance, users[msg.sender].activationTime);
     }
 
     //BLOCKS
-    function getBlockInfo(uint8 x, uint8 y) 
-        public constant returns (address landlord, uint imageID, uint sellPrice) 
+    function getBlockInfo(uint8 x, uint8 y)
+        public constant returns (address landlord, uint imageID, uint sellPrice)
     {
         return (blocks[x][y].landlord, blocks[x][y].imageID, blocks[x][y].sellPrice);
     }
@@ -400,7 +400,7 @@ contract MillionEther {
         public
         constant
         onlyWithin100x100Area (fromX, fromY, toX, toY)
-        returns (uint) 
+        returns (uint)
     {
         uint blockPrice;
         uint totalPrice = 0;
@@ -408,12 +408,12 @@ contract MillionEther {
         for (uint8 ix=fromX; ix<=toX; ix++) {
             for (uint8 iy=fromY; iy<=toY; iy++) {
                 blockPrice = getBlockPrice(ix,iy,iblocksSold);
-                if (blocks[ix][iy].landlord == address(0x0)) { 
-                        iblocksSold += 1; 
+                if (blocks[ix][iy].landlord == address(0x0)) {
+                        iblocksSold += 1;
                     }
-                if (blockPrice == 0) { 
+                if (blockPrice == 0) {
                     return 0; // not for sale
-                    } 
+                    }
                 totalPrice += blockPrice;
             }
         }
@@ -421,7 +421,7 @@ contract MillionEther {
     }
 
     //IMAGES
-    function getImageInfo(uint imageID) 
+    function getImageInfo(uint imageID)
         public constant returns (uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, string imageSourceUrl, string adUrl, string adText)
     {
         Image i = images[imageID];
@@ -430,10 +430,10 @@ contract MillionEther {
 
     //CONTRACT STATE
     function getStateInfo () public constant returns (
-        uint _numUsers, 
-        uint16 _blocksSold, 
-        uint _totalWeiInvested, 
-        uint _numImages, 
+        uint _numUsers,
+        uint16 _blocksSold,
+        uint _totalWeiInvested,
+        uint _numImages,
         uint _setting_imagePlacementPriceInWei,
         uint _numNewStatus,
         uint32 _setting_delay
@@ -445,14 +445,14 @@ contract MillionEther {
 // ** ADMIN ** //
 
     function adminContractSecurity (address violator, bool banViolator, bool pauseContract, bool refundInvestments)
-        public 
-        onlyAdmin () 
+        public
+        onlyAdmin ()
     {
         //freeze/unfreeze user
         if (violator != address(0x0)) {
             users[violator].banned = banViolator;
         }
-        //pause/resume contract 
+        //pause/resume contract
         setting_stopped = pauseContract;
 
         //terminate contract, refund investments
@@ -463,12 +463,12 @@ contract MillionEther {
     }
 
     function adminContractSettings (uint32 newDelayInSeconds, address newCharityAddress, uint newImagePlacementPriceInWei)
-        public 
-        onlyAdmin () 
-    {   
+        public
+        onlyAdmin ()
+    {
         // setting_delay affects user activation time.
         if (newDelayInSeconds > 0) setting_delay = newDelayInSeconds;
-        // when the charityAddress is set charityBalance immediately transfered to it's balance 
+        // when the charityAddress is set charityBalance immediately transfered to it's balance
         if (newCharityAddress != address(0x0)) {
             if (users[newCharityAddress].referal == address(0x0)) throw;
             charityAddress = newCharityAddress;
@@ -480,9 +480,9 @@ contract MillionEther {
     }
 
     // escape path - withdraw funds at emergency.
-    function emergencyRefund () 
+    function emergencyRefund ()
         public
-        onlyInRefundMode () 
+        onlyInRefundMode ()
     {
         if (!users[msg.sender].refunded) {
             uint totalInvested = users[msg.sender].investments;
@@ -500,4 +500,15 @@ contract MillionEther {
         throw;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

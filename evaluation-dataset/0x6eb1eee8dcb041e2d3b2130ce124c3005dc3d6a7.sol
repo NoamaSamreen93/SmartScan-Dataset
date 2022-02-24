@@ -53,7 +53,7 @@ contract PopeCoin is owned {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
-        
+
         if (centralMinter != 0x00) {
             owner = centralMinter;
         }
@@ -66,10 +66,10 @@ contract PopeCoin is owned {
         require(_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] >= _value);                // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
-        
+
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
-        
+
         // Notify
         Transfer(_from, _to, _value);
     }
@@ -100,7 +100,7 @@ contract PopeCoin is owned {
 
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -114,9 +114,9 @@ contract PopeCoin is owned {
      */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
-        
+
         allowance[msg.sender][_spender] = _value;
-        
+
         return true;
     }
 
@@ -131,9 +131,9 @@ contract PopeCoin is owned {
      */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         returns (bool success) {
-        
+
         tokenRecipient spender = tokenRecipient(_spender);
-        
+
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
@@ -149,13 +149,13 @@ contract PopeCoin is owned {
      */
     function burn(uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
-        
+
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
         totalSupply -= _value;                      // Updates totalSupply
-        
+
         // Notify
         Burn(msg.sender, _value);
-        
+
         return true;
     }
 
@@ -170,34 +170,40 @@ contract PopeCoin is owned {
     function burnFrom(address _from, uint256 _value) returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
-        
+
         balanceOf[_from] -= _value;                         // Subtract from the targeted balance
         allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
         totalSupply -= _value;                              // Update totalSupply
-        
+
         // Notify
         Burn(_from, _value);
-        
+
         return true;
     }
-    
+
     /**
      * Creates more tokens
-     * 
+     *
      * @param _to the address ofwho will get newly minted tokens
      * @param _value the amount of money to create
      */
     function mintToken(address _to, uint256 _value) onlyOwner {
         require(totalSupply + _value > totalSupply); // Check for overflows
-        
+
         balanceOf[_to] += _value;
         totalSupply += _value;
-        
-        // Notify 
+
+        // Notify
         Transfer(0, owner, _value);
-        
+
         if (owner != _to) {
             Transfer(owner, _to, _value);
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

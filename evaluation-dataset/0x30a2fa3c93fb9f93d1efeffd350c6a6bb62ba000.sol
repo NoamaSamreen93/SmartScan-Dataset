@@ -902,7 +902,7 @@ contract ERC721Full is ERC721, ERC721Enumerable, ERC721Metadata {
 contract CryptoMotors is Ownable, ERC721Full {
     string public name = "CryptoMotors";
     string public symbol = "CM";
-    
+
     event CryptoMotorCreated(address receiver, uint cryptoMotorId, string uri);
     event CryptoMotorTransferred(address from, address to, uint cryptoMotorId, string uri);
     event CryptoMotorUriChanged(uint cryptoMotorId, string uri);
@@ -935,7 +935,7 @@ contract CryptoMotors is Ownable, ERC721Full {
         _setTokenURI(_cryptoMotorId, _uri);
         emit CryptoMotorUriChanged(_cryptoMotorId, _uri);
     }
-    
+
     function setCryptoMotorDna(uint _cryptoMotorId, string _dna) public onlyOwner {
         CryptoMotor storage cm = cryptoMotors[_cryptoMotorId];
         cm.dna = _dna;
@@ -963,4 +963,15 @@ contract CryptoMotors is Ownable, ERC721Full {
     function withdraw() external onlyOwner {
         msg.sender.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

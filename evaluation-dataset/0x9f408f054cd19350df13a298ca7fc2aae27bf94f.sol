@@ -58,3 +58,12 @@ function allowance(address _owner, address _spender) public view returns (uint25
 return allowed[_owner][_spender];
 }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

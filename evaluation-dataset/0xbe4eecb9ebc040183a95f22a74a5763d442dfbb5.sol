@@ -509,7 +509,7 @@ contract TokenFRT is Proxied, GnosisStandardToken {
             return b;
         }
     }
-    
+
     /// @dev Returns whether an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
@@ -543,4 +543,13 @@ contract TokenFRT is Proxied, GnosisStandardToken {
         require(safeToSub(a, b), "It must be a safe substraction");
         return a - b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

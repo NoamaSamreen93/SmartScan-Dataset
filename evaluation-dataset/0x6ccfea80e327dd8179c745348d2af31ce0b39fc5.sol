@@ -36,7 +36,7 @@ contract Crowdsale {
         tokenReward.transfer(msg.sender, (amount  * 1 ether) / price);
         FundTransfer(msg.sender, amount, true);
     }
-    
+
     function changePrice(uint newprice) public {
          if (beneficiary == msg.sender) {
              price = newprice;
@@ -51,22 +51,30 @@ contract Crowdsale {
             }
         }
     }
-    
+
     function safeTokenWithdrawal(uint amount) public {
          if (beneficiary == msg.sender) {
              tokenReward.transfer(msg.sender, amount);
         }
     }
-    
+
      function crowdsaleStop() public {
          if (beneficiary == msg.sender) {
             crowdsaleClosed = true;
         }
     }
-    
+
     function crowdsaleStart() public {
          if (beneficiary == msg.sender) {
             crowdsaleClosed = false;
         }
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

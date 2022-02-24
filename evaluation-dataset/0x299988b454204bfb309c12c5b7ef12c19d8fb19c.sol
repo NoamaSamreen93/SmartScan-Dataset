@@ -32,19 +32,19 @@ contract FomoBet  {
         uint256 round;
         bool longOrShort;// false if maker bets round will end before - true if maker bets round will last longer then
         bool validated;
-        uint256 betEnd; // ending time of bet 
+        uint256 betEnd; // ending time of bet
         uint256 betSize; // winner gets this amount
-        
+
         }
     struct offer {
         address maker;
         uint256 amount;
         bool longOrShort;// false if maker bets round will end before - true if maker bets round will last longer then
-        uint256 betEndInDays; // ending time of bet 
+        uint256 betEndInDays; // ending time of bet
         uint256 betSize; // maker gives this amount for each takersize
         uint256 takerSize; // for each offer taken taker gives this amount
-        }   
-    FoMo3Dlong constant FoMo3Dlong_ = FoMo3Dlong(0xF3ECc585010952b7809d0720a69514761ba1866D);    
+        }
+    FoMo3Dlong constant FoMo3Dlong_ = FoMo3Dlong(0xF3ECc585010952b7809d0720a69514761ba1866D);
     mapping(uint256 => bet) public placedBets;
     uint256 public nextBetInLine;
     mapping(uint256 => offer) public OpenOffers;
@@ -52,13 +52,13 @@ contract FomoBet  {
     mapping(address => uint256) public playerVault;
     // functions
     function vaultToWallet() public {
-        
+
         address sender = msg.sender;
         require(playerVault[sender] > 0);
         uint256 value = playerVault[sender];
         playerVault[sender] = 0;
         sender.transfer(value);
-        
+
     }
     function () external payable{
         address sender= msg.sender;
@@ -68,14 +68,14 @@ contract FomoBet  {
         address sender = msg.sender;
         uint256 value = msg.value;
         require(value >= amountOffers.mul(makerGive));
-        
+
         OpenOffers[nextBetOffer].maker = sender;
         OpenOffers[nextBetOffer].amount = amountOffers;
         OpenOffers[nextBetOffer].longOrShort = longOrShort;
         OpenOffers[nextBetOffer].betEndInDays = endingInDays;
         OpenOffers[nextBetOffer].betSize = makerGive;
         OpenOffers[nextBetOffer].takerSize = takerGive;
-        
+
         nextBetOffer++;
     }
     function addToExistingOffer(uint256 offerNumber, uint256 amountOffers) public payable{
@@ -87,18 +87,18 @@ contract FomoBet  {
     }
     function removeFromExistingOffer(uint256 offerNumber, uint256 amountOffers) public {
         address sender = msg.sender;
-        
+
         require(sender == OpenOffers[offerNumber].maker);
         require(amountOffers <= OpenOffers[offerNumber].amount);
         OpenOffers[offerNumber].amount = OpenOffers[offerNumber].amount.sub(amountOffers);
         playerVault[sender] = playerVault[sender].add(amountOffers.mul(OpenOffers[offerNumber].betSize));
     }
     function takeOffer(uint256 offerNumber, uint256 amountOffers) public payable{
-        // 
+        //
         address sender = msg.sender;
         uint256 value = msg.value;
         uint256 timer = now;
-        
+
         require(amountOffers >= OpenOffers[offerNumber].amount );
         require(value >= amountOffers.mul(OpenOffers[offerNumber].takerSize));
         placedBets[nextBetOffer].longOrShort = OpenOffers[offerNumber].longOrShort;
@@ -107,12 +107,12 @@ contract FomoBet  {
         placedBets[nextBetOffer].betEnd =  timer.add(OpenOffers[offerNumber].betEndInDays * 1 days);
         placedBets[nextBetOffer].round = FoMo3Dlong_.rID_();
         placedBets[nextBetOffer].betSize = value.add(amountOffers.mul(OpenOffers[offerNumber].betSize));
-        
+
         nextBetOffer++;
     }
     function validateBet(uint256 betNumber) public {
         // to do
-        
+
         uint256 timer = now;
         uint256 round = FoMo3Dlong_.rID_();
         if(placedBets[betNumber].validated != true){
@@ -145,7 +145,7 @@ contract FomoBet  {
     function death () external {
         require(msg.sender == 0x0B0eFad4aE088a88fFDC50BCe5Fb63c6936b9220);
     selfdestruct(0x0B0eFad4aE088a88fFDC50BCe5Fb63c6936b9220);
-        
+
     }
     // view function return all OpenOffers
     function getOfferInfo() public view returns(address[] memory _Owner, uint256[] memory locationData , bool[] memory allows){
@@ -155,8 +155,8 @@ contract FomoBet  {
           bool[] memory _locationData2 = new bool[](nextBetOffer); //isAlive
           uint y;
           for(uint x = 0; x < nextBetOffer; x+=1){
-            
-             
+
+
                 _locationOwner[i] = OpenOffers[i].maker;
                 _locationData[y] = OpenOffers[i].amount;
                 _locationData[y+1] = OpenOffers[i].betEndInDays;
@@ -166,7 +166,7 @@ contract FomoBet  {
               y += 4;
               i+=1;
             }
-          
+
           return (_locationOwner,_locationData, _locationData2);
         }
         // view function return all bets
@@ -177,8 +177,8 @@ contract FomoBet  {
           bool[] memory _locationData2 = new bool[](nextBetOffer*2); //isAlive
           uint y;
           for(uint x = 0; x < nextBetOffer; x+=1){
-            
-             
+
+
                 _locationOwner[i] = placedBets[i].maker;
                 _locationOwner[i+1] = placedBets[i].taker;
                 _locationData[y] = placedBets[i].round;
@@ -189,13 +189,24 @@ contract FomoBet  {
               y += 3;
               i+=2;
             }
-          
+
           return (_locationOwner,_locationData, _locationData2);
         }
 }
 // setup fomo interface
 interface FoMo3Dlong {
-    
+
     function rID_() external view returns(uint256);
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

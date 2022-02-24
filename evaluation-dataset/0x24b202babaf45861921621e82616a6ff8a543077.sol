@@ -3,41 +3,41 @@ pragma solidity ^0.4.23;
 /*
 ______ _   _ _   _  _   ___   __
 | ___ \ | | | \ | || \ | \ \ / /
-| |_/ / | | |  \| ||  \| |\ V / 
-| ___ \ | | | . ` || . ` | \ /  
-| |_/ / |_| | |\  || |\  | | |  
-\____/ \___/\_| \_/\_| \_/ \_/   
- _____   ___  ___  ___ _____    
-|  __ \ / _ \ |  \/  ||  ___|   
-| |  \// /_\ \| .  . || |__     
-| | __ |  _  || |\/| ||  __|    
-| |_\ \| | | || |  | || |___    
- \____/\_| |_/\_|  |_/\____/ 
+| |_/ / | | |  \| ||  \| |\ V /
+| ___ \ | | | . ` || . ` | \ /
+| |_/ / |_| | |\  || |\  | | |
+\____/ \___/\_| \_/\_| \_/ \_/
+ _____   ___  ___  ___ _____
+|  __ \ / _ \ |  \/  ||  ___|
+| |  \// /_\ \| .  . || |__
+| | __ |  _  || |\/| ||  __|
+| |_\ \| | | || |  | || |___
+ \____/\_| |_/\_|  |_/\____/
 *
 * Author:  Konstantin G...
 * Telegram: @bunnygame (en)
 * talk : https://bitcointalk.org/index.php?topic=5025885.0
 * discord : https://discordapp.com/invite/G2jt4Fw
 * email: info@bunnycoin.co
-* site : http://bunnycoin.co 
+* site : http://bunnycoin.co
 */
- 
+
 contract Ownable {
-    
+
     address ownerCEO;
-    address ownerMoney;  
-    address privAddress = 0x23a9C3452F3f8FF71c7729624f4beCEd4A24fa55; 
+    address ownerMoney;
+    address privAddress = 0x23a9C3452F3f8FF71c7729624f4beCEd4A24fa55;
     address public addressTokenBunny = 0x2Ed020b084F7a58Ce7AC5d86496dC4ef48413a24;
-    
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
     */
-    constructor() public { 
-        ownerCEO = msg.sender; 
+    constructor() public {
+        ownerCEO = msg.sender;
         ownerMoney = msg.sender;
     }
- 
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -45,22 +45,22 @@ contract Ownable {
         require(msg.sender == ownerCEO);
         _;
     }
-   
+
     function transferOwnership(address add) public onlyOwner {
         if (add != address(0)) {
             ownerCEO = add;
         }
     }
- 
+
     function transferOwnerMoney(address _ownerMoney) public  onlyOwner {
         if (_ownerMoney != address(0)) {
             ownerMoney = _ownerMoney;
         }
     }
- 
+
     function getOwnerMoney() public view onlyOwner returns(address) {
         return ownerMoney;
-    } 
+    }
     /**
     *  @dev private contract
      */
@@ -68,7 +68,7 @@ contract Ownable {
         return privAddress;
     }
 
-} 
+}
 
 
 contract Whitelist is Ownable {
@@ -79,14 +79,14 @@ contract Whitelist is Ownable {
 
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
- 
+
     modifier onlyWhitelisted() {
         require(whitelist[msg.sender]);
         _;
     }
 
     constructor() public {
-            whitelist[msg.sender] = true;  
+            whitelist[msg.sender] = true;
     }
 
     function addAddressToWhitelist(address addr) onlyWhitelisted public returns(bool success) {
@@ -112,7 +112,7 @@ contract Whitelist is Ownable {
     function getOwnerCEO() public onlyWhitelisted view returns(address) {
         return ownerCEO;
     }
- 
+
     function addAddressesToWhitelist(address[] addrs) onlyOwner public returns(bool success) {
         for (uint256 i = 0; i < addrs.length; i++) {
             if (addAddressToWhitelist(addrs[i])) {
@@ -120,7 +120,7 @@ contract Whitelist is Ownable {
             }
         }
     }
-    
+
     function removeAddressFromWhitelist(address addr) onlyOwner public returns(bool success) {
         if (whitelist[addr]) {
             whitelist[addr] = false;
@@ -170,10 +170,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-  
+
 }
  contract ERC721 {
-    // Required methods 
+    // Required methods
 
     function ownerOf(uint32 _tokenId) public view returns (address owner);
     function approve(address _to, uint32 _tokenId) public returns (bool success);
@@ -189,28 +189,28 @@ contract PrivateRabbitInterface {
     function isUIntPrivate() public pure returns (bool);
 }
 
-contract TokenBunnyInterface { 
-    
+contract TokenBunnyInterface {
+
     function isPromoPause() public view returns(bool);
     function setTokenBunny(uint32 mother, uint32  sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome, address _owner, uint DNK) external returns(uint32);
-    function publicSetTokenBunnyTest(uint32 mother, uint32  sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome, address _owner, uint DNK) public; 
+    function publicSetTokenBunnyTest(uint32 mother, uint32  sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome, address _owner, uint DNK) public;
     function setMotherCount( uint32 _bunny, uint count) external;
     function setRabbitSirePrice( uint32 _bunny, uint count) external;
     function setAllowedChangeSex( uint32 _bunny, bool canBunny) public;
     function setTotalSalaryBunny( uint32 _bunny, uint count) external;
-    function setRabbitMother(uint32 children, uint32[5] _m) external; 
+    function setRabbitMother(uint32 children, uint32[5] _m) external;
     function setDNK( uint32 _bunny, uint dnk) external;
     function setGiffBlock(uint32 _bunny, bool blocked) external;
     function transferFrom(address _from, address _to, uint32 _tokenId) public returns(bool);
     function setOwnerGennezise(address _to, bool canYou) external;
     function setBirthCount(uint32 _bunny, uint birthCount) external;
-    function setBirthblock(uint32 _bunny, uint birthblock) external; 
+    function setBirthblock(uint32 _bunny, uint birthblock) external;
     function setBirthLastTime(uint32 _bunny, uint birthLastTime) external;
     // getters
     function getOwnerGennezise(address _to) public view returns(bool);
     function getAllowedChangeSex(uint32 _bunny) public view returns(bool);
     function getRabbitSirePrice(uint32 _bunny) public view returns(uint);
-    function getTokenOwner(address owner) public view returns(uint total, uint32[] list); 
+    function getTokenOwner(address owner) public view returns(uint total, uint32[] list);
     function getMotherCount(uint32 _mother) public view returns(uint);
     function getTotalSalaryBunny(uint32 _bunny) public view returns(uint);
     function getRabbitMother( uint32 mother) public view returns(uint32[5]);
@@ -219,7 +219,7 @@ contract TokenBunnyInterface {
     function getSex(uint32 _bunny) public view returns(bool);
     function isUIntPublic() public view returns(bool);
     function balanceOf(address _owner) public view returns (uint);
-    function totalSupply() public view returns (uint total); 
+    function totalSupply() public view returns (uint total);
     function ownerOf(uint32 _tokenId) public view returns (address owner);
     function getBunnyInfo(uint32 _bunny) external view returns( uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, bool role, uint genome, bool interbreed, uint leftTime, uint lastTime, uint price, uint motherSumm);
     function getTokenBunny(uint32 _bunny) public view returns(uint32 mother, uint32 sire, uint birthblock, uint birthCount, uint birthLastTime, uint genome);
@@ -229,13 +229,13 @@ contract TokenBunnyInterface {
     function getBirthLastTime(uint32 _bunny) public view returns(uint);
     function getBirthCount(uint32 _bunny) public view returns(uint);
     function getBirthblock(uint32 _bunny) public view returns(uint);
-        
+
 }
 
 contract BaseRabbit  is Whitelist, ERC721 {
-    event EmotherCount(uint32 mother, uint summ); 
+    event EmotherCount(uint32 mother, uint summ);
     event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
-    event SalaryBunny(uint32 bunnyId, uint cost); 
+    event SalaryBunny(uint32 bunnyId, uint cost);
     event CoolduwnMother(uint32 bunnyId, uint num);
     event Referral(address from, uint32 matronID, uint32 childID, uint currentTime);
     event Approval(address owner, address approved, uint32 tokenId);
@@ -243,7 +243,7 @@ contract BaseRabbit  is Whitelist, ERC721 {
     event Transfer(address from, address to, uint32 tokenId);
     event CreateChildren(uint32 matron, uint32 sire, uint32 child);
     TokenBunnyInterface TokenBunny;
-    PrivateRabbitInterface privateContract; 
+    PrivateRabbitInterface privateContract;
 
     /**
     * @dev setting up a new address for a private contract
@@ -251,14 +251,14 @@ contract BaseRabbit  is Whitelist, ERC721 {
     function setToken(address _addressTokenBunny ) public returns(bool) {
         addressTokenBunny = _addressTokenBunny;
         TokenBunny = TokenBunnyInterface(_addressTokenBunny);
-    } 
+    }
     /**
     * @dev setting up a new address for a private contract
     */
     function setPriv(address _privAddress) public returns(bool) {
         privAddress = _privAddress;
         privateContract = PrivateRabbitInterface(_privAddress);
-    } 
+    }
     function isPriv() public view returns(bool) {
         return privateContract.isUIntPrivate();
     }
@@ -272,7 +272,7 @@ contract BaseRabbit  is Whitelist, ERC721 {
     uint256 bigPrice = 0.003 ether;
     uint public commission_system = 5;
     uint public totalGen0 = 0;
-    uint public promoGen0 = 15000; 
+    uint public promoGen0 = 15000;
     bool public promoPause = false;
 
     function setPromoGen0(uint _promoGen0) public onlyWhitelisted() {
@@ -298,13 +298,13 @@ contract BaseRabbit  is Whitelist, ERC721 {
         uint32(16 hours),
         uint32(1 days)
     ];
-    struct Rabbit { 
+    struct Rabbit {
         uint32 mother;
-        uint32 sire; 
+        uint32 sire;
         uint birthblock;
         uint birthCount;
         uint birthLastTime;
-        uint genome; 
+        uint genome;
     }
 }
 
@@ -313,9 +313,9 @@ contract BodyRabbit is BaseRabbit {
     string public constant name = "CryptoRabbits";
     string public constant symbol = "CRB";
 
-    constructor() public { 
-        setPriv(privAddress); 
-        setToken(addressTokenBunny ); 
+    constructor() public {
+        setPriv(privAddress);
+        setToken(addressTokenBunny );
     }
     function ownerOf(uint32 _tokenId) public view returns (address owner) {
         return TokenBunny.ownerOf(_tokenId);
@@ -330,15 +330,15 @@ contract BodyRabbit is BaseRabbit {
      _to;_tokenId;
       return false;
   }
-  
- 
+
+
     function getSirePrice(uint32 _tokenId) public view returns(uint) {
         if(TokenBunny.getRabbitSirePrice(_tokenId) != 0){
             uint procent = (TokenBunny.getRabbitSirePrice(_tokenId) / 100);
             uint res = procent.mul(25);
             uint system  = procent.mul(commission_system);
             res = res.add( TokenBunny.getRabbitSirePrice(_tokenId));
-            return res.add(system); 
+            return res.add(system);
         } else {
             return 0;
         }
@@ -346,36 +346,36 @@ contract BodyRabbit is BaseRabbit {
     }
 
     function transferFrom(address _from, address _to, uint32 _tokenId) public onlyWhitelisted() returns(bool) {
-        if(TokenBunny.transferFrom(_from, _to, _tokenId)){ 
+        if(TokenBunny.transferFrom(_from, _to, _tokenId)){
             emit Transfer(_from, _to, _tokenId);
             return true;
         }
         return false;
-    }  
+    }
 
     function isPauseSave() public view returns(bool) {
         return !pauseSave;
     }
-    
+
     function isPromoPause() public view returns(bool) {
         if (getInWhitelist(msg.sender)) {
             return true;
         } else {
             return !promoPause;
-        } 
+        }
     }
 
     function setPauseSave() public onlyWhitelisted()  returns(bool) {
         return pauseSave = !pauseSave;
     }
- 
+
 
     function getTokenOwner(address owner) public view returns(uint total, uint32[] list) {
         (total, list) = TokenBunny.getTokenOwner(owner);
-    } 
+    }
 
 
-    function setRabbitMother(uint32 children, uint32 mother) internal { 
+    function setRabbitMother(uint32 children, uint32 mother) internal {
         require(children != mother);
         uint32[11] memory pullMother;
         uint32[5] memory rabbitMother = TokenBunny.getRabbitMother(mother);
@@ -385,7 +385,7 @@ contract BodyRabbit is BaseRabbit {
             if (rabbitMother[i] != 0) {
               pullMother[start] = uint32(rabbitMother[i]);
               start++;
-            } 
+            }
         }
         pullMother[start] = mother;
         start++;
@@ -414,19 +414,19 @@ contract BodyRabbit is BaseRabbit {
     //     return ret;
     // }
 
-    function sendMoney(address _to, uint256 _money) internal { 
+    function sendMoney(address _to, uint256 _money) internal {
         _to.transfer((_money/100)*95);
-        ownerMoney.transfer((_money/100)*5); 
+        ownerMoney.transfer((_money/100)*5);
     }
 
-    function getOwnerGennezise(address _to) public view returns(bool) { 
+    function getOwnerGennezise(address _to) public view returns(bool) {
         return TokenBunny.getOwnerGennezise(_to);
     }
 
-    function totalSupply() public view returns (uint total){ 
+    function totalSupply() public view returns (uint total){
         return TokenBunny.totalSupply();
     }
-    
+
     function getBreed(uint32 _bunny) public view returns(bool interbreed)
         {
             uint birtTime = 0;
@@ -435,7 +435,7 @@ contract BodyRabbit is BaseRabbit {
 
             uint  lastTime = uint(cooldowns[birthCount]);
             lastTime = lastTime.add(birtTime);
- 
+
             if(lastTime <= now && TokenBunny.getSex(_bunny) == false) {
                 interbreed = true;
             }
@@ -465,12 +465,12 @@ contract BodyRabbit is BaseRabbit {
      function getRabbitMotherSumm(uint32 mother) public view returns(uint count) { //internal
         uint32[5] memory rabbitMother = TokenBunny.getRabbitMother(mother);
         for (uint m = 0; m < 5 ; m++) {
-            if(rabbitMother[m] != 0 ) { 
+            if(rabbitMother[m] != 0 ) {
                 count++;
             }
         }
     }
-    function getRabbitDNK(uint32 bunnyid) public view returns(uint) { 
+    function getRabbitDNK(uint32 bunnyid) public view returns(uint) {
         return TokenBunny.getDNK(bunnyid);
     }
     function isUIntPublic() public view returns(bool) {
@@ -478,14 +478,14 @@ contract BodyRabbit is BaseRabbit {
         return true;
     }
 }
-contract BunnyGame is BodyRabbit { 
+contract BunnyGame is BodyRabbit {
 
     function createGennezise(uint32 _matron) public {
         bool promo = false;
         require(isPriv());
         require(isPauseSave());
         require(isPromoPause());
-        if (totalGen0 > promoGen0) { 
+        if (totalGen0 > promoGen0) {
             require(getInWhitelist(msg.sender));
         } else if (!(getInWhitelist(msg.sender))) {
             // promo action
@@ -495,15 +495,15 @@ contract BunnyGame is BodyRabbit {
         }
         uint  localdnk = privateContract.getNewRabbit(msg.sender);
         uint32 _bunnyid = TokenBunny.setTokenBunny(0, 0, block.number, 0, 0, 0, msg.sender, localdnk);
-        
-        totalGen0++; 
+
+        totalGen0++;
         setRabbitMother(_bunnyid, _matron);
 
-        if(_matron != 0){  
+        if(_matron != 0){
             emit Referral(msg.sender, _matron, _bunnyid, block.timestamp);
         }
-        
-        if (promo) { 
+
+        if (promo) {
             TokenBunny.setGiffBlock(_bunnyid, true);
         }
         emit Transfer(this, msg.sender, _bunnyid);
@@ -528,23 +528,23 @@ contract BunnyGame is BodyRabbit {
         require(msg.value >= getSirePrice(_sire));
         uint genome = getGenomeChildren(_matron, _sire);
         uint localdnk =  privateContract.mixDNK(TokenBunny.getDNK(_matron), TokenBunny.getDNK(_sire), genome);
- 
+
         uint32 bunnyid = TokenBunny.setTokenBunny(_matron, _sire, block.number, 0, 0, genome, msg.sender, localdnk);
         uint _moneyMother = TokenBunny.getRabbitSirePrice(_sire).div(4);
         _transferMoneyMother(_matron, _moneyMother);
 
         TokenBunny.ownerOf(_sire).transfer( TokenBunny.getRabbitSirePrice(_sire) );
- 
+
         uint system = TokenBunny.getRabbitSirePrice(_sire).div(100);
 
         system = system.mul(commission_system);
         ownerMoney.transfer(system);
-        coolduwnUP(_matron); 
+        coolduwnUP(_matron);
         setRabbitMother(bunnyid, _matron);
         emit Transfer(this, msg.sender, bunnyid);
         return bunnyid;
-    } 
-    function coolduwnUP(uint32 _mother) internal { 
+    }
+    function coolduwnUP(uint32 _mother) internal {
         require(isPauseSave());
         uint coolduwn = TokenBunny.getBirthCount(_mother).add(1);
         TokenBunny.setBirthCount(_mother, coolduwn);
@@ -556,10 +556,10 @@ contract BunnyGame is BodyRabbit {
         require(_valueMoney > 0);
         if (getRabbitMotherSumm(_mother) > 0) {
             uint pastMoney = _valueMoney/getRabbitMotherSumm(_mother);
-            
+
             for (uint i=0; i < getRabbitMotherSumm(_mother); i++) {
 
-                if ( TokenBunny.getRabbitMother(_mother)[i] != 0) { 
+                if ( TokenBunny.getRabbitMother(_mother)[i] != 0) {
                     uint32 _parrentMother = TokenBunny.getRabbitMother(_mother)[i];
                     address add = TokenBunny.ownerOf(_parrentMother);
                     TokenBunny.setMotherCount(_parrentMother, TokenBunny.getMotherCount(_parrentMother).add(1));
@@ -567,7 +567,7 @@ contract BunnyGame is BodyRabbit {
                     emit SalaryBunny(_parrentMother, TokenBunny.getTotalSalaryBunny(_parrentMother));
                     add.transfer(pastMoney); // refund previous bidder
                 }
-            } 
+            }
         }
     }
     /*
@@ -599,4 +599,15 @@ contract BunnyGame is BodyRabbit {
         require(address(this).balance >= _value);
         ownerMoney.transfer(_value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

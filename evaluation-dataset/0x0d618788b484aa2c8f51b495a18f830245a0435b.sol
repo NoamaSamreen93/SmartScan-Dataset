@@ -5,10 +5,10 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract TokenERC20 {
     string public name;
     string public symbol;
-    uint8 public decimals = 2;  
+    uint8 public decimals = 2;
     uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf;  // 
+    mapping (address => uint256) public balanceOf;  //
     mapping (address => mapping (address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -77,4 +77,15 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

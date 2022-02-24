@@ -411,12 +411,12 @@ pragma solidity ^0.5.0;
 
 /**
  * @title CableCert interface
- * @dev 
+ * @dev
  */
 interface ICert {
     //function transfer(address to, uint256 cert) external returns (bool);
     function deposit(uint256 value) external returns (bool);
- 
+
     function depositNiwixRate() external view returns(uint256);
     function depositTo(address address_to, uint256 value) external returns (bool);
     function getDepositNiwixValue(uint trueuro_amount) external view returns(uint256);
@@ -489,4 +489,13 @@ contract NIWIX is ERC20, Ownable, ERC20Detailed{
         token.transfer(_to, balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

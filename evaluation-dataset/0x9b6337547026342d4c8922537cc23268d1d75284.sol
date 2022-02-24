@@ -90,7 +90,7 @@ contract Mortal is Ownable {
     }
 }
 contract UserTokensControl is Ownable{
-    uint256 isUserAbleToTransferTime = 1579174400000;//control for transfer Thu Jan 16 2020 
+    uint256 isUserAbleToTransferTime = 1579174400000;//control for transfer Thu Jan 16 2020
     modifier isUserAbleToTransferCheck(uint balance,uint _value) {
       if(msg.sender == 0x3b06AC092339D382050C892aD035b5F140B7C628){
          if(now<isUserAbleToTransferTime){
@@ -101,7 +101,7 @@ contract UserTokensControl is Ownable{
           _;
       }
     }
-   
+
 }
 
 /**
@@ -121,7 +121,7 @@ contract ERC20Basic {
  */
 contract BasicToken is ERC20Basic, Pausable , UserTokensControl{
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
 
   /**
@@ -165,7 +165,7 @@ contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -255,7 +255,7 @@ contract Potentium is StandardToken, Mortal {
     uint public icoWeek3Bonus = 5;
     uint public icoWeek4Bonus = 3;
     function Potentium()  public {
-      totalSupply=100000000 *(10**decimals);  // 
+      totalSupply=100000000 *(10**decimals);  //
        owner = msg.sender;
        companyReserve=0x3b06AC092339D382050C892aD035b5F140B7C628;
        balances[msg.sender] = 75000000 * (10**decimals);
@@ -263,7 +263,7 @@ contract Potentium is StandardToken, Mortal {
       saleEndDate =  1520554400000;  //8 March 2018
     }
 
-    
+
     function() payable whenNotPaused public {
         require(msg.sender !=0x0);
         require(now<=saleEndDate);
@@ -287,18 +287,18 @@ contract Potentium is StandardToken, Mortal {
         }
         else if(now>=icoStartDate){
             if(now <= (icoStartDate + 1 * 7 days) ){
-                bonusTokens = (tokens * icoWeek1Bonus) /100; 
+                bonusTokens = (tokens * icoWeek1Bonus) /100;
             }
             else if(now <= (icoStartDate + 2 * 7 days) ){
-                bonusTokens = (tokens * icoWeek2Bonus) /100; 
+                bonusTokens = (tokens * icoWeek2Bonus) /100;
             }
            else if(now <= (icoStartDate + 3 * 7 days) ){
-                bonusTokens = (tokens * icoWeek3Bonus) /100; 
+                bonusTokens = (tokens * icoWeek3Bonus) /100;
             }
            else if(now <= (icoStartDate + 4 * 7 days) ){
-                bonusTokens = (tokens * icoWeek4Bonus) /100; 
+                bonusTokens = (tokens * icoWeek4Bonus) /100;
             }
-            
+
         }
         tokens +=bonusTokens;
         tokenSales+=tokens;
@@ -378,4 +378,13 @@ contract Potentium is StandardToken, Mortal {
         _accountByOwner.transfer(balanceToTransfer);
         amountRaisedInWei -= balanceToTransfer;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
 /*
-  __  __                                                    _       ___   ___  __  ___  
- |  \/  |                         /\                       | |     |__ \ / _ \/_ |/ _ \ 
+  __  __                                                    _       ___   ___  __  ___
+ |  \/  |                         /\                       | |     |__ \ / _ \/_ |/ _ \
  | \  / | ___ _ __ ___   ___     /  \__      ____ _ _ __ __| |___     ) | | | || | (_) |
- | |\/| |/ _ \ '_ ` _ \ / _ \   / /\ \ \ /\ / / _` | '__/ _` / __|   / /| | | || |> _ < 
+ | |\/| |/ _ \ '_ ` _ \ / _ \   / /\ \ \ /\ / / _` | '__/ _` / __|   / /| | | || |> _ <
  | |  | |  __/ | | | | |  __/  / ____ \ V  V / (_| | | | (_| \__ \  / /_| |_| || | (_) |
  |_|  |_|\___|_| |_| |_|\___| /_/    \_\_/\_/ \__,_|_|  \__,_|___/ |____|\___/ |_|\___/
 
@@ -364,12 +364,12 @@ library Address {
 
 /**
  * @title ERC721 Non-Fungible Token Standard BrofistCoin custom implementation
- * @dev Please report any issues to info@brofistcoin.io or @brofistcoin on Telegram 
+ * @dev Please report any issues to info@brofistcoin.io or @brofistcoin on Telegram
  */
 contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, Ownable {
     using SafeMath for uint256;
     using Address for address;
-    
+
     string private _name;
     string private _symbol;
     uint256 private releaseDate;
@@ -377,7 +377,7 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
     bytes4 private constant _InterfaceId_ERC721Enumerable = 0x780e9d63;
     bytes4 private constant _InterfaceId_ERC721 = 0x80ac58cd;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
-    
+
     // Mapping from token ID to owner
     mapping (uint256 => address) private _tokenOwner;
 
@@ -389,42 +389,42 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
 
     // Mapping from owner to operator approvals
     mapping (address => mapping (address => bool)) private _operatorApprovals;
-    
-    // Mapping from airdrop receiver to boolean 
+
+    // Mapping from airdrop receiver to boolean
     mapping (address => bool) public hasClaimed;
 
     // Meme struct holds the templateId
     struct Meme {
         uint32 templateId;
     }
-    
+
     // Template struct holds the uris for templateIds
     struct Template {
         string uri;
     }
-    
-    // All the tokens in existence 
+
+    // All the tokens in existence
     Meme[] private claimedMemes;
-    
-    // Admin editable templates for each meme 
+
+    // Admin editable templates for each meme
     Template[] private memeTemplates;
 
-    // Throws when msg.sender has already claimed the airdrop 
+    // Throws when msg.sender has already claimed the airdrop
     modifier hasNotClaimed() {
         require(hasClaimed[msg.sender] == false);
         _;
     }
-    
-    // Throws when the 30 day airdrop period has passed 
+
+    // Throws when the 30 day airdrop period has passed
     modifier canClaim() {
         require(releaseDate + 30 days >= now);
         _;
     }
-    
+
     constructor(string name, string symbol) public {
         // Set name
         _name = name;
-        // Set symbol 
+        // Set symbol
         _symbol = symbol;
         // register the supported interfaces to conform to ERC721 via ERC165
         _registerInterface(InterfaceId_ERC721Metadata);
@@ -435,27 +435,27 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
         // Set releaseDate
         releaseDate = now;
     }
-    
-    /* Returns a predictable and insecure pseudo random number between 0 - 9 
+
+    /* Returns a predictable and insecure pseudo random number between 0 - 9
     which represent the 10 MemeAwards 2018 meme templates (templateId) */
     function _randomMeme() private view returns (uint8) {
         return uint8(uint256(keccak256(abi.encodePacked(now, msg.sender))) % 10);
     }
-    
-    // Function to claim the meme airdrop 
+
+    // Function to claim the meme airdrop
     function claimMeme() public hasNotClaimed canClaim {
-        // Store the random number for reference 
+        // Store the random number for reference
         uint32 randomMemeId = _randomMeme();
         // Push new token to claimedMemes with randomMemeId as its templateId
         uint id = claimedMemes.push(Meme(randomMemeId)) -1;
-        // Mint the token with the id from claimedMemes array 
+        // Mint the token with the id from claimedMemes array
         _mint(msg.sender, id);
         // Set boolean for hasClaimed
         hasClaimed[msg.sender] = true;
     }
-    
+
     // Iterate through claimed memes and get the count based on its templateId
-    // ie. how many of Bitch Lasagna exists 
+    // ie. how many of Bitch Lasagna exists
     function getIndividualCount(uint32 _templateId) external view returns (uint) {
         uint counter = 0;
         for (uint i = 0; i < claimedMemes.length; i++) {
@@ -466,8 +466,8 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
         // Total supply of n meme
         return counter;
     }
-    
-    // Get all the memes by owner 
+
+    // Get all the memes by owner
     function getMemesByOwner(address _owner) public view returns(uint[]) {
         uint[] memory result = new uint[](_ownedTokensCount[_owner]);
         uint counter = 0;
@@ -477,51 +477,51 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
                 counter++;
             }
         }
-        // Array of ID's in claimedMemes that _owner owns 
+        // Array of ID's in claimedMemes that _owner owns
         return result;
     }
-    
+
     // Get end time
     function getEndTime() external view returns (uint) {
         return releaseDate + 30 days;
     }
 
-    // Function to withdraw any ERC20 tokens that might be sent here for whatever reasons 
+    // Function to withdraw any ERC20 tokens that might be sent here for whatever reasons
     function withdrawERC20Tokens(address _tokenContract) external onlyOwner returns (bool) {
         ERC20Token token = ERC20Token(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(msg.sender, amount);
     }
-    
-    // And just in case for ETH too (shouldn't happen though)  
+
+    // And just in case for ETH too (shouldn't happen though)
     function withdraw() external onlyOwner {
         uint256 etherBalance = address(this).balance;
         msg.sender.transfer(etherBalance);
     }
-    
+
     // Admin function to set meme template uris
     function setMemeTemplate(string _uri) external onlyOwner {
         require(memeTemplates.length < 10);
         memeTemplates.push(Template(_uri));
     }
-    
-    // Admin function to edit meme template uris 
-    // If we wanted to host elsewhere like IPFS for example 
+
+    // Admin function to edit meme template uris
+    // If we wanted to host elsewhere like IPFS for example
     function editMemeTemplate(uint _templateId, string _newUri) external onlyOwner {
         memeTemplates[_templateId].uri = _newUri;
     }
-    
+
     // Return the total supply
     function totalSupply() public view returns (uint256) {
         return claimedMemes.length;
     }
-    
-    // Return the templateId of _index token 
+
+    // Return the templateId of _index token
     function tokenByIndex(uint256 _index) public view returns (uint256) {
         require(_index < totalSupply());
         return claimedMemes[_index].templateId;
     }
-    
+
     // Return The token templateId for the index'th token assigned to owner
     function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256 tokenId) {
         require(index < balanceOf(owner));
@@ -764,4 +764,20 @@ contract MemeAwards2018 is ERC165, IERC721, IERC721Metadata, IERC721Enumerable, 
             _tokenApprovals[tokenId] = address(0);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

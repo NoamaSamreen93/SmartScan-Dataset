@@ -52,10 +52,10 @@ contract Ownable {
 
 contract CFunIPBase is Ownable{
 
-    struct Copyright 
+    struct Copyright
     {
         uint256 copyrightID;
-        string fingerprint; 
+        string fingerprint;
         string title;
         uint256 recordDate;
         address author;
@@ -137,11 +137,11 @@ contract CFunIPBase is Ownable{
     assembly { size := extcodesize(_account) }
     return size > 0;
   }
-  
+
    /**
     * Returns address of string type
     * @dev This function will return  address of string type
-    * @param _addr address 
+    * @param _addr address
     * @return address of string type
     */
   function toString(address _addr) private pure returns (string) {
@@ -151,4 +151,15 @@ contract CFunIPBase is Ownable{
       return string(b);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

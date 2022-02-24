@@ -290,7 +290,7 @@ contract MintableToken is StandardToken {
 
 
 contract Bevium is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Bevium";
   string public constant symbol = "BVI";
   uint32 public constant decimals = 18;
@@ -315,10 +315,10 @@ contract Crowdsale is Ownable {
   uint256 public hardCap;
   uint256 public totalSoldTokens;
   //how many token units a Contributor gets per wei
-  uint256 public rateICO;  
+  uint256 public rateICO;
   // address where funds are collected
   address public wallet;
-  
+
 /**
 * event for token Procurement logging
 * @param contributor who Pledged for the tokens
@@ -327,12 +327,12 @@ contract Crowdsale is Ownable {
 * @param amount amount of tokens Procured
 */
   event TokenProcurement(address indexed contributor, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   function Crowdsale() public {
-    
+
     token = createTokenContract();
     // rate;
-    rateICO = 1000;	
+    rateICO = 1000;
     // start timestamps where investments are allowed
     startICO = 1531612800;  // July 15 2018 00:00:00 +0000
     hardCap = 55000000 * 1 ether;
@@ -342,17 +342,17 @@ contract Crowdsale is Ownable {
 
   function setRateICO(uint _rateICO) public onlyOwner  {
     rateICO = _rateICO;
-  } 
-  
+  }
+
   function setStartICO(uint _startICO) public onlyOwner  {
     startICO = _startICO;
-  }   
+  }
 
   // fallback function can be used to Procure tokens
   function () external payable {
     procureTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (Bevium) {
     return new Bevium();
   }
@@ -360,8 +360,8 @@ contract Crowdsale is Ownable {
   function checkHardCap(uint256 _value) public {
       require(_value.add(totalSoldTokens) <= hardCap);
       totalSoldTokens = totalSoldTokens.add(_value);
-  } 
-  
+  }
+
   function procureTokens(address _beneficiary) public payable {
     uint256 tokens;
     uint256 weiAmount = msg.value;
@@ -374,4 +374,8 @@ contract Crowdsale is Ownable {
     token.mint(_beneficiary, tokens);
     emit TokenProcurement(msg.sender, _beneficiary, weiAmount, tokens);
   }
+}
+function() payable external {
+	revert();
+}
 }

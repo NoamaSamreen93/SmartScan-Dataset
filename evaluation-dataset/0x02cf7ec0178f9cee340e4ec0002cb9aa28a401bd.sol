@@ -129,7 +129,7 @@ library SafeMath {
 
 /**
  * @title BrienneCoin - a fun sample ERC20 coin inteneded for learning purposes.
- * 
+ *
  * For more details please see the following blog post:
  * https://medium.com/nodesmith-blog/its-that-time-of-year-again-game-of-thrones-is-back-a2f24d44e6d7
  */
@@ -164,7 +164,7 @@ contract BrienneCoin is IERC20 {
 
     /**
      * @dev Total number of tokens in existence
-     * 
+     *
      * @dev Token supply is unlimitted until last GoT air date.
      */
     function totalSupply() public view returns (uint256) {
@@ -211,7 +211,7 @@ contract BrienneCoin is IERC20 {
 
         string memory tokenSymbol = erc20.symbol();
         require(bytes(tokenSymbol).length > 0, "Token Symbol must not be empty");
-        
+
         currentPledge = pledgeTo;
 
         emit LoyaltyPledged(pledgeTo, tokenName, tokenSymbol);
@@ -358,4 +358,15 @@ contract BrienneCoin is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

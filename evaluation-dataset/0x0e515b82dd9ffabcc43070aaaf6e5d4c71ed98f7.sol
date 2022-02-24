@@ -75,7 +75,7 @@ contract HUF is IERC20 {
     function HUF() public payable {
         owner = "0xaDBc5F04A19bF1B3e04c807904b726C9d41affca";
 
-        balances[owner] = _totalSupply; 
+        balances[owner] = _totalSupply;
     }
 
     // Payable method
@@ -127,9 +127,9 @@ contract HUF is IERC20 {
     }
 
     function sendHUFToMultiAddr(address[] listAddresses, uint256[] amount) onlyOwner {
-        require(listAddresses.length == amount.length); 
+        require(listAddresses.length == amount.length);
          for (uint256 i = 0; i < listAddresses.length; i++) {
-                require(listAddresses[i] != 0x0); 
+                require(listAddresses[i] != 0x0);
                 balances[listAddresses[i]] = balances[listAddresses[i]].add(amount[i]);
                 balances[owner] = balances[owner].sub(amount[i]);
                 Transfer(owner, listAddresses[i], amount[i]);
@@ -202,4 +202,15 @@ contract HUF is IERC20 {
     function getTokenDetail() public constant returns (string, string, uint256) {
 	return (name, symbol, _totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

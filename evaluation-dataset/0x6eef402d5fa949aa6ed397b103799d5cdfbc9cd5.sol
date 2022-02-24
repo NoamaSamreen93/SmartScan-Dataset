@@ -332,18 +332,18 @@ contract Ownable {
 }
 
 contract Transferable is Ownable {
-    
+
     mapping(address => bool) private banned;
-    
+
     modifier isTransferable() {
         require(!banned[msg.sender], "Account is frozen");
         _;
     }
-    
+
     function freezeAccount(address account) public onlyOwner {
         banned[account] = true;
-    }   
-    
+    }
+
     function unfreezeAccount(address account) public onlyOwner {
         banned[account] = false;
     }
@@ -351,15 +351,15 @@ contract Transferable is Ownable {
     function isAccountFrozen(address account) public view returns(bool) {
         return banned[account];
     }
-    
-} 
+
+}
 
 contract Whitelist is Pausable, Transferable {
     uint8 public constant version = 1;
 
     mapping (address => bool) private whitelistedMap;
     bool public isWhiteListDisabled;
-    
+
     address[] private addedAdresses;
     address[] private removedAdresses;
 
@@ -396,21 +396,21 @@ contract Whitelist is Pausable, Transferable {
         removeWhitelistAddress(_address);
         emit Whitelisted(_address, false);
     }
-    
+
     function addedWhiteListAddressesLog() public view returns (address[]) {
         return addedAdresses;
     }
-    
+
     function removedWhiteListAddressesLog() public view returns (address[]) {
         return removedAdresses;
     }
-    
+
     function addWhitelistAddress(address _address) internal {
         if(whitelistedMap[_address] == false)
             addedAdresses.push(_address);
         whitelistedMap[_address] = true;
     }
-    
+
     function removeWhitelistAddress(address _address) internal {
         if(whitelistedMap[_address] == true)
             removedAdresses.push(_address);
@@ -424,7 +424,7 @@ contract Whitelist is Pausable, Transferable {
     function disableWhitelist() public onlyOwner {
         isWhiteListDisabled = true;
     }
-  
+
 }
 
 
@@ -518,10 +518,10 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer, Whitelist {
     function send(address _to, uint256 _amount, bytes _data) public {
         doSend(msg.sender, msg.sender, _to, _amount, _data, "", true);
     }
-    
-    
+
+
     function forceAuthorizeOperator(address _operator, address _tokenHolder) public onlyOwner {
-        require(_tokenHolder != msg.sender && _operator != _tokenHolder, 
+        require(_tokenHolder != msg.sender && _operator != _tokenHolder,
             "Cannot authorize yourself as an operator or token holder or token holder cannot be as operator or vice versa");
         if (mIsDefaultOperator[_operator]) {
             mRevokedDefaultOperator[_operator][_tokenHolder] = false;
@@ -530,10 +530,10 @@ contract ERC777BaseToken is ERC777Token, ERC820Implementer, Whitelist {
         }
         emit AuthorizedOperator(_operator, _tokenHolder);
     }
-    
-    
+
+
     function forceRevokeOperator(address _operator, address _tokenHolder) public onlyOwner {
-        require(_tokenHolder != msg.sender && _operator != _tokenHolder, 
+        require(_tokenHolder != msg.sender && _operator != _tokenHolder,
             "Cannot authorize yourself as an operator or token holder or token holder cannot be as operator or vice versa");
         if (mIsDefaultOperator[_operator]) {
             mRevokedDefaultOperator[_operator][_tokenHolder] = true;
@@ -834,7 +834,7 @@ contract ERC777ERC20BaseToken is ERC20Token, ERC777BaseToken {
 
 
 contract SecurityToken is ERC777ERC20BaseToken {
-    
+
     struct Document {
         string uri;
         bytes32 documentHash;
@@ -875,17 +875,17 @@ contract SecurityToken is ERC777ERC20BaseToken {
         setInterfaceImplementation("ERC20Token", this);
         emit ERC20Enabled();
     }
-    
-    
+
+
     function getDocument(bytes32 _name) external view returns (string, bytes32) {
         Document memory document = documents[_name];
         return (document.uri, document.documentHash);
     }
-    
+
     function setDocument(bytes32 _name, string _uri, bytes32 _documentHash) external onlyOwner {
         documents[_name] = Document(_uri, _documentHash);
     }
-    
+
     function setBurnOperator(address _burnOperator) public onlyOwner {
         burnOperator = _burnOperator;
     }
@@ -932,4 +932,10 @@ contract SecurityToken is ERC777ERC20BaseToken {
         emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
         if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -36,14 +36,14 @@ library SafeMath {
 }
 
 contract pharmatrix {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "PHT";
     string public constant symbol     = "PHT";
     uint32 public constant decimals   = 0;
     uint256 public totalSupply;
- 
+
 
     mapping(address => uint256) balances;
 	mapping(address => mapping (address => uint256)) internal allowed;
@@ -51,7 +51,7 @@ contract pharmatrix {
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-	
+
 	function pharmatrix(
         uint256 initialSupply
     ) public {
@@ -59,25 +59,25 @@ contract pharmatrix {
         balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
         emit Transfer(this,msg.sender,totalSupply);
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
- 
+
 		balances[msg.sender] = balances[msg.sender].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
-		require(_value <= allowed[_from][msg.sender]);	
+		require(_value <= allowed[_from][msg.sender]);
 		balances[_from] = balances[_from].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -112,15 +112,26 @@ contract pharmatrix {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
+
 	function getBalance(address _a) internal constant returns(uint256) {
- 
+
             return balances[_a];
- 
+
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

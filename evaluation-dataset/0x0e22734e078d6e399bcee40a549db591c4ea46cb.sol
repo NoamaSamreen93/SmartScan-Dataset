@@ -504,14 +504,25 @@ contract Streamity is ERC20Detailed, ERC20Burnable {
         _mint(0xbBB9E0605f0BC7Af1B7238bAC2807a3A8DCb54b5, 4650000 ether); // Team, second part
         _mint(0x464398aC8B96DdAd7e22AC37147822E1c69293Cb, 129780000 ether); // Rest
     }
-    
+
     function multiSend(address[] memory _beneficiaries, uint256[] memory _values) public {
         require(_beneficiaries.length == _values.length);
-    
+
         uint256 length = _beneficiaries.length;
-    
+
         for (uint256 i = 0; i < length; i++) {
           transfer(_beneficiaries[i], _values[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

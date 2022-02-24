@@ -3,25 +3,25 @@ pragma solidity ^0.4.21;
 /*
 ******************** Fundingsecured.me *********************
 *
-* ________ ___  ___  ________   ________  ___  ________   ________             
-*|\  _____\\  \|\  \|\   ___  \|\   ___ \|\  \|\   ___  \|\   ____\            
-*\ \  \__/\ \  \\\  \ \  \\ \  \ \  \_|\ \ \  \ \  \\ \  \ \  \___|            
-* \ \   __\\ \  \\\  \ \  \\ \  \ \  \ \\ \ \  \ \  \\ \  \ \  \  ___          
-*  \ \  \_| \ \  \\\  \ \  \\ \  \ \  \_\\ \ \  \ \  \\ \  \ \  \|\  \         
-*   \ \__\   \ \_______\ \__\\ \__\ \_______\ \__\ \__\\ \__\ \_______\        
-*    \|__|    \|_______|\|__| \|__|\|_______|\|__|\|__| \|__|\|_______|        
-*                                                                              
-*                                                                              
-*                                                                              
-* ________  _______   ________  ___  ___  ________  _______   ________         
-*|\   ____\|\  ___ \ |\   ____\|\  \|\  \|\   __  \|\  ___ \ |\   ___ \        
-*\ \  \___|\ \   __/|\ \  \___|\ \  \\\  \ \  \|\  \ \   __/|\ \  \_|\ \       
-* \ \_____  \ \  \_|/_\ \  \    \ \  \\\  \ \   _  _\ \  \_|/_\ \  \ \\ \      
-*  \|____|\  \ \  \_|\ \ \  \____\ \  \\\  \ \  \\  \\ \  \_|\ \ \  \_\\ \ ___ 
+* ________ ___  ___  ________   ________  ___  ________   ________
+*|\  _____\\  \|\  \|\   ___  \|\   ___ \|\  \|\   ___  \|\   ____\
+*\ \  \__/\ \  \\\  \ \  \\ \  \ \  \_|\ \ \  \ \  \\ \  \ \  \___|
+* \ \   __\\ \  \\\  \ \  \\ \  \ \  \ \\ \ \  \ \  \\ \  \ \  \  ___
+*  \ \  \_| \ \  \\\  \ \  \\ \  \ \  \_\\ \ \  \ \  \\ \  \ \  \|\  \
+*   \ \__\   \ \_______\ \__\\ \__\ \_______\ \__\ \__\\ \__\ \_______\
+*    \|__|    \|_______|\|__| \|__|\|_______|\|__|\|__| \|__|\|_______|
+*
+*
+*
+* ________  _______   ________  ___  ___  ________  _______   ________
+*|\   ____\|\  ___ \ |\   ____\|\  \|\  \|\   __  \|\  ___ \ |\   ___ \
+*\ \  \___|\ \   __/|\ \  \___|\ \  \\\  \ \  \|\  \ \   __/|\ \  \_|\ \
+* \ \_____  \ \  \_|/_\ \  \    \ \  \\\  \ \   _  _\ \  \_|/_\ \  \ \\ \
+*  \|____|\  \ \  \_|\ \ \  \____\ \  \\\  \ \  \\  \\ \  \_|\ \ \  \_\\ \ ___
 *    ____\_\  \ \_______\ \_______\ \_______\ \__\\ _\\ \_______\ \_______\\__\
 *   |\_________\|_______|\|_______|\|_______|\|__|\|__|\|_______|\|_______\|__|
-*   \|_________|                                                               
-*   
+*   \|_________|
+*
 ******************** Fundingsecured.me *********************
 *
 *
@@ -29,7 +29,7 @@ pragma solidity ^0.4.21;
 * [x] 24% Dividends to all FUNDS holders
 * [x] 0% Account transfer fees
 * [x] 1% To Dev Fund for future development costs (Address be updated in the future)
-* [x] Dev Fund Address: 0x6BeF5C40723BaB057a5972f8s43454232EEE1Db50 
+* [x] Dev Fund Address: 0x6BeF5C40723BaB057a5972f8s43454232EEE1Db50
 * [x] Multi-tier Masternode system for exchange buys and sells (3 levels)
 * [x] Refferal approximate % breakdown (4% for 1st, 2.4% for 2nd, 1.6% 3rd)
 * [x] Funding Secured (FUNDS) Token will and can be used for future games
@@ -104,7 +104,7 @@ contract FUNDS {
         require(administrators[_customerAddress]);
         _;
     }
-    
+
     uint ACTIVATION_TIME = 1536258600;
 
 
@@ -113,7 +113,7 @@ contract FUNDS {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -259,7 +259,7 @@ contract FUNDS {
         payable
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, _referredBy);
     }
@@ -272,7 +272,7 @@ contract FUNDS {
         payable
         public
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, 0x0);
     }
@@ -768,8 +768,8 @@ contract FUNDS {
                 _dividends = SafeMath.add(_dividends, _referralBonus - _referralBonus/2);
                 _fee = _dividends * magnitude;
             }
-            
-            
+
+
         } else {
             // no ref purchase
             // add the referral bonus back to the global dividends cake
@@ -808,7 +808,7 @@ contract FUNDS {
 
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
- 
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
@@ -958,4 +958,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

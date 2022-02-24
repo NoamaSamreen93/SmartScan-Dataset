@@ -1,36 +1,36 @@
-/*  
+/*
 
-$$$$$$$\                                 $$\$$\   $$\                       $$$$$$\                                
-$$  __$$\                                $$ $$$\  $$ |                     $$  __$$\                               
-$$ |  $$ |$$$$$$\ $$$$$$\ $$$$$$$\  $$$$$$$ $$$$\ $$ |$$$$$$\ $$\  $$\  $$\$$ /  \__|$$$$$$$\$$$$$$\ $$$$$$\$$$$\  
-$$$$$$$\ $$  __$$\\____$$\$$  __$$\$$  __$$ $$ $$\$$ $$  __$$\$$ | $$ | $$ \$$$$$$\ $$  _____\____$$\$$  _$$  _$$\ 
+$$$$$$$\                                 $$\$$\   $$\                       $$$$$$\
+$$  __$$\                                $$ $$$\  $$ |                     $$  __$$\
+$$ |  $$ |$$$$$$\ $$$$$$\ $$$$$$$\  $$$$$$$ $$$$\ $$ |$$$$$$\ $$\  $$\  $$\$$ /  \__|$$$$$$$\$$$$$$\ $$$$$$\$$$$\
+$$$$$$$\ $$  __$$\\____$$\$$  __$$\$$  __$$ $$ $$\$$ $$  __$$\$$ | $$ | $$ \$$$$$$\ $$  _____\____$$\$$  _$$  _$$\
 $$  __$$\$$ |  \__$$$$$$$ $$ |  $$ $$ /  $$ $$ \$$$$ $$$$$$$$ $$ | $$ | $$ |\____$$\$$ /     $$$$$$$ $$ / $$ / $$ |
 $$ |  $$ $$ |    $$  __$$ $$ |  $$ $$ |  $$ $$ |\$$$ $$   ____$$ | $$ | $$ $$\   $$ $$ |    $$  __$$ $$ | $$ | $$ |
 $$$$$$$  $$ |    \$$$$$$$ $$ |  $$ \$$$$$$$ $$ | \$$ \$$$$$$$\\$$$$$\$$$$  \$$$$$$  \$$$$$$$\$$$$$$$ $$ | $$ | $$ |
 \_______/\__|     \_______\__|  \__|\_______\__|  \__|\_______|\_____\____/ \______/ \_______\_______\__| \__| \__|
 
-           __________                                 
-         .'----------`.                              
-         | .--------. |                             
-         | |$$$$$$$$| |       __________              
-         | |$$$$$$$$| |      /__________\             
+           __________
+         .'----------`.
+         | .--------. |
+         | |$$$$$$$$| |       __________
+         | |$$$$$$$$| |      /__________\
 .--------| `--------' |------|    --=-- |-------------.
-|        `----,-.-----'      |o ======  |             | 
-|       ______|_|_______     |__________|             | 
-|      /  %%%%%%%%%%%%  \                             | 
-|     /  %%%%%%%%%%%%%%  \                            | 
-|     ^^^^^^^^^^^^^^^^^^^^                            | 
+|        `----,-.-----'      |o ======  |             |
+|       ______|_|_______     |__________|             |
+|      /  %%%%%%%%%%%%  \                             |
+|     /  %%%%%%%%%%%%%%  \                            |
+|     ^^^^^^^^^^^^^^^^^^^^                            |
 +-----------------------------------------------------+
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You're always on the ground floor to somewhere...
 
 * No divs. No refs. Only scams
-* Scam price only goes up 
+* Scam price only goes up
 * No guarantee there will be any ETH left when you sell
-* 30-minute time out between buying and selling 
+* 30-minute time out between buying and selling
 * Contract has a built-in equal opportunity ETH drain
-* 5% stupid tax 
+* 5% stupid tax
 * The whole contract can be exit scammed in 48 hours
 
 */
@@ -40,7 +40,7 @@ pragma solidity ^0.4.25;
     contract BrandNewScam {
 
     using ScamMath for uint256;
-    
+
     address public scammerInChief;
     uint256 public greaterFools;
     uint256 public availableBalance;
@@ -52,23 +52,23 @@ pragma solidity ^0.4.25;
     mapping (address => uint256) public userTime;
     mapping (address => uint256) public userScams;
     mapping (address => uint256) public userBalance;
-    
+
     constructor() public payable{
         scammerInChief = msg.sender;
         buyScams();
         countdownToExitScam = now + 48 hours;
     }
-    
-    modifier relax { 
-        require (msg.sender == tx.origin); 
-        _; 
+
+    modifier relax {
+        require (msg.sender == tx.origin);
+        _;
     }
 
-    modifier wait { 
+    modifier wait {
         require (now >= userTime[msg.sender] + timeOut);
-        _; 
+        _;
     }
-    
+
     function () public payable relax {
         buyScams();
     }
@@ -89,7 +89,7 @@ pragma solidity ^0.4.25;
         scammerInChief.transfer(stupidTax);
         greaterFools++;
     }
-    
+
     function sellScams(uint256 _scams) public relax wait {
         require (userScams[msg.sender] > 0 && userScams[msg.sender] >= _scams);
         uint256 scamProfit = _scams.mul(scamPrice);
@@ -100,7 +100,7 @@ pragma solidity ^0.4.25;
         userBalance[msg.sender] += scamProfit;
         userTime[msg.sender] = now;
     }
-        
+
     function withdrawScamEarnings() public relax {
         require (userBalance[msg.sender] > 0);
         uint256 balance = userBalance[msg.sender];
@@ -138,7 +138,7 @@ pragma solidity ^0.4.25;
         require (now >= countdownToExitScam);
         selfdestruct(scammerInChief);
     }
-    
+
     function checkBalance() public view returns(uint256) {
         return address(this).balance;
     }
@@ -168,4 +168,15 @@ library ScamMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

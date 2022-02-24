@@ -1024,7 +1024,7 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[1] memory weiRaisedStartsBoundaries = [uint(0)];
         uint[1] memory weiRaisedEndsBoundaries = [uint(1000000000000000000000)];
@@ -1039,9 +1039,9 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
         // apply amount
         uint[2] memory weiAmountBoundaries = [uint(1000000000000000000000),uint(100000000000000000000)];
         uint[2] memory weiAmountRates = [uint(0),uint(600)];
@@ -1052,7 +1052,7 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
                 break;
             }
         }
-        
+
 
         return bonusRate;
     }
@@ -1061,14 +1061,14 @@ contract BonusableCrowdsale is usingConsts, Crowdsale {
 
 
 contract TemplateCrowdsale is usingConsts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , RefundableCrowdsale
-    
+
     , CappedCrowdsale
-    
+
 {
     event Initialized();
     bool public initialized = false;
@@ -1076,9 +1076,9 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token)
         Crowdsale(START_TIME > now ? START_TIME : now, 1522486740, 10000 * TOKEN_DECIMAL_MULTIPLIER, TARGET_USER)
         CappedCrowdsale(1000000000000000000000)
-        
+
         RefundableCrowdsale(100000000000000000000)
-        
+
     {
         token = _token;
     }
@@ -1087,7 +1087,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
         require(!initialized);
         initialized = true;
 
-        
+
         address[1] memory addresses = [address(0x15917b976598ca9b4662ba953193fb9e4472ce28)];
         uint[1] memory amounts = [uint(6000000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -1100,7 +1100,7 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
                 FreezableMintableToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
         Initialized();
@@ -1115,10 +1115,21 @@ contract TemplateCrowdsale is usingConsts, MainCrowdsale
 
     function finalization() internal {
         super.finalization();
-        
+
         token.transferOwnership(0x1e1fedbeb8ce004a03569a3ff03a1317a6515cf1);
-        
+
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

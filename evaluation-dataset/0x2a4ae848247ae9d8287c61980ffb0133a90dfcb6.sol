@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -116,8 +116,8 @@ contract ERC20Token is StandardToken {
 
     function ERC20Token(
         ) {
-        balances[msg.sender] = 6860000000000000000000000000;               // Give the creator all initial tokens 
-        totalSupply = 6860000000000000000000000000;   // Update total supply 
+        balances[msg.sender] = 6860000000000000000000000000;               // Give the creator all initial tokens
+        totalSupply = 6860000000000000000000000000;   // Update total supply
         name = "Mytoken";        // Set the name for display purposes
         decimals = 18;           // Amount of decimals for display purposes
         symbol = "MT";         // Set the symbol for display purposes
@@ -134,4 +134,15 @@ contract ERC20Token is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

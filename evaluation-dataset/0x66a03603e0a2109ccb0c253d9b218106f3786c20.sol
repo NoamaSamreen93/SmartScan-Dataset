@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -30,41 +30,41 @@ library SafeMath {
 
 
 interface SKWInterface {
-     
+
     function transfer(address _to, uint256 _value) external returns (bool success);
 
 }
 
 contract SKWVesting1 {
-    
+
     using SafeMath for uint256;
-    
+
     address public _beneficiary = 0x0;//受益地址
-    
+
     uint256 public unLockTime_1;
-    
+
     uint256 public unLockTime_2;
-    
+
     uint256 public unLockTime_3;
-    
+
     uint256 public unLockTime_4;
-    
+
     uint256 public unLockTime_5;
-    
+
     uint256 public unLockTime_6;
-    
-    uint256 public released;//释放数量 
-    
-    uint256 public totalBalance;//所有数量 
-    
+
+    uint256 public released;//释放数量
+
+    uint256 public totalBalance;//所有数量
+
     bool public test = false;
-    
+
     SKWInterface constant _token = SKWInterface(0x007ac2F589eb9d4Fe1cEA9f46B5f4f52DaB73dd4);
-    
+
     event Released(uint256 amount);
-    
+
     event TsetReleased(uint256 amount);
-    
+
     constructor() public {
        _beneficiary = 0x61effBFB271De468D54ADb7b154c4b003489ea69;
        unLockTime_1 = 1543075200;//2018-11-25 00:00:00
@@ -76,7 +76,7 @@ contract SKWVesting1 {
        totalBalance = 5000000000000000;// 50000000.00000000 8个0
        released = 0;
     }
-    
+
     function release() public {//释放
         uint256 unreleased = releasableAmount();
         require(unreleased > 0);
@@ -84,7 +84,7 @@ contract SKWVesting1 {
         _token.transfer(_beneficiary, unreleased);
         emit Released(unreleased);
     }
-    
+
     function releasableAmount() public view returns (uint256){
         uint num = getUnLockNum();
         if(num > 0 ){
@@ -94,7 +94,7 @@ contract SKWVesting1 {
             return 0;
         }
     }
-    
+
     function getUnLockNum() public view returns (uint){
         uint256 n = now;
         if(n < unLockTime_1){
@@ -113,12 +113,28 @@ contract SKWVesting1 {
             return 6;
         }
     }
-    
+
     function testRelease() public {//释放
         require(!test);
         uint256 unreleased = 1000000;
         _token.transfer(_beneficiary, unreleased);
         emit TsetReleased(unreleased);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

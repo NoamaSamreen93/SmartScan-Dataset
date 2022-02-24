@@ -173,9 +173,9 @@ contract GrandTheftFOMO is modularShort {
         // (F3D, P3D) + (Pot , Referrals, Community)
             // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = F3Ddatasets.TeamFee(60,0);   // NO P3D SHARES, ALL TEAM SETTINGS 'BEARS' DEFAULT
-        fees_[1] = F3Ddatasets.TeamFee(60,0);  
-        fees_[2] = F3Ddatasets.TeamFee(60,0); 
-        fees_[3] = F3Ddatasets.TeamFee(60,0);   
+        fees_[1] = F3Ddatasets.TeamFee(60,0);
+        fees_[2] = F3Ddatasets.TeamFee(60,0);
+        fees_[3] = F3Ddatasets.TeamFee(60,0);
 
         // how to split up the final pot based on which team was picked
         // (F3D, P3D)
@@ -1916,4 +1916,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

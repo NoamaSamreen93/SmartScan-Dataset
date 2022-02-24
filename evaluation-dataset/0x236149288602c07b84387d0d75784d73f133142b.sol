@@ -1,6 +1,6 @@
 pragma solidity ^0.5.2;
 
-interface ERC223Handler { 
+interface ERC223Handler {
     function tokenFallback(address _from, uint _value, bytes calldata _data) external;
 }
 
@@ -12,12 +12,12 @@ interface ICOStickers {
 contract ICOToken{
     using SafeMath for uint256;
     using SafeMath for uint;
-    
+
 	modifier onlyOwner {
 		require(msg.sender == owner);
 		_;
 	}
-    
+
     constructor(address _s) public{
         stickers = ICOStickers(_s);
         totalSupply = 0;
@@ -25,7 +25,7 @@ contract ICOToken{
     }
 	address owner;
 	address newOwner;
-    
+
     uint256 constant internal MAX_UINT256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
     uint256 constant internal TOKEN_PRICE = 0.0001 ether;
     uint256 constant public fundingCap = 2000 ether;
@@ -40,7 +40,7 @@ contract ICOToken{
     uint256 public beneficiaryTotalShares;
     uint256 public beneficiaryPayoutPerShare;
     uint256 public icoFunding;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public etherSpent;
     mapping(address => mapping (address => uint256)) internal allowances;
@@ -48,15 +48,15 @@ contract ICOToken{
     string constant public symbol = "ZCI";
     uint8 constant public decimals = 18;
     uint256 public totalSupply;
-    
+
     // --Events
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
     event Transfer(address indexed from, address indexed to, uint value);
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
-    
+
     event onICOBuy(address indexed from, uint256 tokens, uint256 bonusTokens);
     // --Events--
-    
+
     // --Owner only functions
     function setNewOwner(address o) public onlyOwner {
 		newOwner = o;
@@ -66,7 +66,7 @@ contract ICOToken{
 		require(msg.sender == newOwner);
 		owner = msg.sender;
 	}
-	
+
     // For the 0xchan ICO, the following beneficieries will be added.
     // 3 - Aritz
     // 3 - Sumpunk
@@ -78,7 +78,7 @@ contract ICOToken{
 	   beneficiaryShares[b] = shares;
 	   beneficiaryTotalShares += shares;
 	}
-	
+
 	function removeBeneficiary(address b, uint256 shares) public onlyOwner {
 	   require(block.timestamp < IcoStartTime, "ICO has started");
 	   require(beneficiaryWithdrawAmount[b] != 0, "Not a beneficiary");
@@ -86,9 +86,9 @@ contract ICOToken{
 	   delete beneficiaryShares[b];
 	   beneficiaryTotalShares -= shares;
 	}
-	
+
 	// --Owner only functions--
-    
+
     // --Public write functions
     function withdrawFunding(uint256 _amount) public {
         if (icoFunding == 0){
@@ -109,28 +109,28 @@ contract ICOToken{
             msg.sender.transfer(_amount);
         }
     }
-    
+
     function() payable external{
         require(block.timestamp >= IcoStartTime, "ICO hasn't started yet");
         require(icoFunding == 0 && block.timestamp < IcoEndTime, "ICO has ended");
         require(msg.value != 0 && ((msg.value % TOKEN_PRICE) == 0), "Must be a multiple of 0.0001 ETH");
-        
-        uint256 thisBalance = address(this).balance; 
+
+        uint256 thisBalance = address(this).balance;
         uint256 msgValue = msg.value;
-        
+
         // While the extra ETH is appriciated, we set ourselves a hardcap and we're gonna stick to it!
         if (thisBalance > fundingCap){
             msgValue -= (thisBalance - fundingCap);
             require(msgValue != 0, "Funding cap has been reached");
             thisBalance = fundingCap;
         }
-        
+
         uint256 oldBalance = thisBalance - msgValue;
         uint256 tokensToGive = (msgValue / TOKEN_PRICE) * 1e18;
         uint256 bonusTokens;
-        
+
         uint256 difference;
-        
+
         while (oldBalance < thisBalance){
             if (oldBalance < 500 ether){
                 difference = min(500 ether, thisBalance) - oldBalance;
@@ -147,30 +147,30 @@ contract ICOToken{
             }
         }
         emit onICOBuy(msg.sender, tokensToGive, bonusTokens);
-        
+
         tokensToGive += bonusTokens;
         balanceOf[msg.sender] += tokensToGive;
         totalSupply += tokensToGive;
-        
+
         if (address(stickers) != address(0)){
             stickers.giveSticker(msg.sender, msgValue);
         }
         emit Transfer(address(this), msg.sender, tokensToGive, "");
         emit Transfer(address(this), msg.sender, tokensToGive);
-        
+
         beneficiaryPayoutPerShare = thisBalance / beneficiaryTotalShares;
         etherSpent[msg.sender] += msgValue;
         if (msgValue != msg.value){
             // Finally return any extra ETH sent.
-            msg.sender.transfer(msg.value - msgValue); 
+            msg.sender.transfer(msg.value - msgValue);
         }
     }
-    
+
     function transfer(address _to, uint _value, bytes memory _data, string memory _function) public returns(bool ok){
         actualTransfer(msg.sender, _to, _value, _data, _function, true);
         return true;
     }
-    
+
     function transfer(address _to, uint _value, bytes memory _data) public returns(bool ok){
         actualTransfer(msg.sender, _to, _value, _data, "", true);
         return true;
@@ -179,7 +179,7 @@ contract ICOToken{
         actualTransfer(msg.sender, _to, _value, "", "", true);
         return true;
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool success) {
         allowances[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -193,9 +193,9 @@ contract ICOToken{
         actualTransfer(_from, _to, _value, "", "", false);
         return true;
     }
-    
+
     // --Public write functions--
-     
+
     // --Public read-only functions
     function beneficiaryStash(address b) public view returns (uint256){
         uint256 withdrawAmount = beneficiaryWithdrawAmount[b];
@@ -207,27 +207,27 @@ contract ICOToken{
         }
         return (beneficiaryPayoutPerShare * beneficiaryShares[b]) - withdrawAmount;
     }
-    
+
     function allowance(address _sugardaddy, address _spender) public view returns (uint remaining) {
         return allowances[_sugardaddy][_spender];
     }
-    
+
     // --Public read-only functions--
-    
-    
-    
+
+
+
     // Internal functions
-    
+
     function actualTransfer (address _from, address _to, uint _value, bytes memory _data, string memory _function, bool _careAboutHumanity) private {
         // You can only transfer this token after the ICO has ended.
         require(icoFunding != 0 || address(this).balance >= fundingCap || block.timestamp >= IcoEndTime, "ICO hasn't ended");
         require(balanceOf[_from] >= _value, "Insufficient balance");
         require(_to != address(this), "You can't sell back your tokens");
-        
+
         // Throwing an exception undos all changes. Otherwise changing the balance now would be a shitshow
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         if(_careAboutHumanity && isContract(_to)) {
             if (bytes(_function).length == 0){
                 ERC223Handler receiver = ERC223Handler(_to);
@@ -242,7 +242,7 @@ contract ICOToken{
         emit Transfer(_from, _to, _value, _data);
         emit Transfer(_from, _to, _value);
     }
-    
+
     //assemble the given address bytecode. If bytecode exists then the _addr is a contract.
     function isContract(address _addr) private view returns (bool is_contract) {
         uint length;
@@ -252,7 +252,7 @@ contract ICOToken{
         }
         return (length>0);
     }
-    
+
     function min(uint256 i1, uint256 i2) private pure returns (uint256) {
         if (i1 < i2){
             return i1;
@@ -266,7 +266,7 @@ contract ICOToken{
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
@@ -278,7 +278,7 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
@@ -288,7 +288,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -296,7 +296,7 @@ library SafeMath {
         assert(b <= a);
         return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
@@ -305,4 +305,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

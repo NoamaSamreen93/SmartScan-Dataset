@@ -752,3 +752,14 @@ contract LockableMixMarvelTokenAll is ERC20, ERC20Detailed, ERC20TransferLockabl
 
     constructor(string memory name, string memory symbol, uint8 decimals, uint256 cap) ERC20TransferLockable() ERC20Burnable() ERC20Capped(cap) ERC20Detailed(name, symbol, decimals) ERC20() public {}
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

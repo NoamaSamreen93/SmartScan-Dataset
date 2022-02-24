@@ -32,30 +32,30 @@ contract AirDrop
 {
     address public owner;
     address public executor;
-    
+
     // Constructor
     function AirDrop() public {
         owner = msg.sender;
         executor = msg.sender;
     }
-    
+
     // Functions with this modifier can only be executed by the owner
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferExecutor(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         executor = newOwner;
     }
-    
+
     // Functions with this modifier can only be executed by the owner
     modifier onlyExecutor() {
         require(msg.sender == executor || msg.sender == owner);
         _;
     }
-    
+
     function MultiTransfer(address _tokenAddr, address[] dests, uint256[] values) public onlyExecutor
     {
         uint256 i = 0;
@@ -65,4 +65,16 @@ contract AirDrop
             i += 1;
         }
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

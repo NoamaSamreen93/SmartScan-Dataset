@@ -155,7 +155,7 @@ contract SaleClockAuctionStorage is ClockAuctionStorage {
         // update system on sale record
         if (systemOnSaleTokens[_tokenId]) {
             delete systemOnSaleTokens[_tokenId];
-            
+
             if (systemOnSaleCount > 0) {
                 systemOnSaleCount--;
             }
@@ -176,7 +176,7 @@ contract SaleClockAuctionStorage is ClockAuctionStorage {
 
     function averageSoldPrice() external view returns (uint256) {
         if (totalSoldCount == 0) return 0;
-        
+
         uint256 sum = 0;
         uint256 len = (totalSoldCount < 3 ? totalSoldCount : 3);
         for (uint256 i = 0; i < len; i++) {
@@ -184,4 +184,20 @@ contract SaleClockAuctionStorage is ClockAuctionStorage {
         }
         return sum / len;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

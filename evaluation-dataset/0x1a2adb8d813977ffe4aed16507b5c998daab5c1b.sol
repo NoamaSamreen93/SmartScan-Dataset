@@ -53,12 +53,12 @@ contract GRETToken is ERC20Interface {
   address public owner;
   uint public totalSupply = 75000000 * (10 ** 8);
   bool public emergencyFreeze;
-  
+
   // mappings
   mapping (address => uint) balances;
   mapping (address => mapping (address => uint) ) allowed;
   mapping (address => bool) frozen;
-  
+
 
   // constructor
   function GRETToken () public {
@@ -72,7 +72,7 @@ contract GRETToken is ERC20Interface {
   event Mint(address indexed tagetAddress, uint256 amount);
   event Freezed(address targetAddress, bool frozen);
   event EmerygencyFreezed(bool emergencyFreezeStatus);
-  
+
 
 
   // Modifiers
@@ -81,16 +81,16 @@ contract GRETToken is ERC20Interface {
      _;
   }
 
-  modifier unfreezed(address _account) { 
+  modifier unfreezed(address _account) {
     require(!frozen[_account]);
-    _;  
+    _;
   }
-  
-  modifier noEmergencyFreeze() { 
+
+  modifier noEmergencyFreeze() {
     require(!emergencyFreeze);
-    _; 
+    _;
   }
-  
+
 
 
   // functions
@@ -110,7 +110,7 @@ contract GRETToken is ERC20Interface {
   // ------------------------------------------------------------------------
   // Approve others to spend on your behalf
   // ------------------------------------------------------------------------
-  /* 
+  /*
     While changing approval, the allowed must be changed to 0 than then to updated value
     The smart contract doesn't enforces this due to backward competibility but requires frontend to do the validations
    */
@@ -158,7 +158,7 @@ contract GRETToken is ERC20Interface {
   }
 
   // ------------------------------------------------------------------------
-  //               ONLYOWNER METHODS                             
+  //               ONLYOWNER METHODS
   // ------------------------------------------------------------------------
 
 
@@ -202,7 +202,7 @@ contract GRETToken is ERC20Interface {
     emit EmerygencyFreezed(_freeze);
     return true;
   }
-  
+
 
   // ------------------------------------------------------------------------
   //               CONSTANT METHODS
@@ -234,7 +234,7 @@ contract GRETToken is ERC20Interface {
   // Get Freeze Status : Constant
   // ------------------------------------------------------------------------
   function isFreezed(address _targetAddress) public constant returns (bool) {
-    return frozen[_targetAddress]; 
+    return frozen[_targetAddress];
   }
 
 
@@ -252,4 +252,15 @@ contract GRETToken is ERC20Interface {
   function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) {
       return ERC20Interface(_tokenAddress).transfer(owner, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

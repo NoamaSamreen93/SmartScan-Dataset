@@ -249,3 +249,7 @@ contract NebulasToken is StandardToken, SafeMath {
         IssueToken(msg.sender, tokens);  // logs token issued
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

@@ -8,13 +8,13 @@ pragma solidity ^0.5.0;
 //BLOCK smashes fork
 //FORK forks the chain
 //CHAIN adds the block
-//plants automatically grow over time 
+//plants automatically grow over time
 //the older the plants get a bigger % bonus for selling
-//choose to sell 1 plant or attack at random every 7 hours 
+//choose to sell 1 plant or attack at random every 7 hours
 //if your random attack wins the rock paper scissors...
 //you sell the targets plant for 50% its base value(no bonus)
 //sucessful attacks raise the value of every other plant, >>DONT MISS ATTACKS<<
-//sold plants have a bonus and reduce the value of every other plant. 
+//sold plants have a bonus and reduce the value of every other plant.
 //Sell bonus is 2x after 42000 blocks, Max bonus of 4x after 69420 blocks
 //sell price = (total eth in contract) * (growth of plant being sold) / (total growth in game) + (big plant bonus)
 //1% dev cut 99% back to players.
@@ -81,7 +81,7 @@ contract p3Dank  {
 
     event sell (address seller, uint256 plantsize, uint256 cashout);
     event battle(address attacker, uint8 ktype, address defender);
-    event win (uint256 position, uint256 sizesold, uint256 amountsent);    
+    event win (uint256 position, uint256 sizesold, uint256 amountsent);
 
     function () external payable{}
 
@@ -130,7 +130,7 @@ contract p3Dank  {
     uint256 lastupdateblock;
     uint256 totaldivpts;
 
-    function updateglobal() internal {                       
+    function updateglobal() internal {
         totaldivpts = gametotaldivs();
         lastupdateblock = block.number;//updated
         lastmove[msg.sender] = block.number; // reset lastmove of attacker
@@ -151,12 +151,12 @@ contract p3Dank  {
             _totalhouses--;//update total houses in game
             _playerhouses[killed]--;//update attacked players houses
             sender.transfer(robbed);//pay the robber
-            emit win(attacked, playerdivpts, robbed);  
+            emit win(attacked, playerdivpts, robbed);
         }
         emit battle(sender, typeToKill, killed);
-        } 
-  
-        
+        }
+
+
 
     function rockattack() canmove() public { //rock attack function
         rekt(3);
@@ -193,7 +193,7 @@ contract p3Dank  {
             totaldivpts = totaldivpts.sub(playerdivpts); //adjust total div points
             sender.transfer(sold);//payout
             emit sell(sender, playerdivpts, sold);
-            } }         
+            } }
 
 
     //view functions
@@ -228,4 +228,15 @@ contract p3Dank  {
     }
 
 //thanks for playing
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

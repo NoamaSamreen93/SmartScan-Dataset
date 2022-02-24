@@ -570,3 +570,7 @@ contract LevelToken is ERC20Interface, AssetProxyInterface, Bytes32 {
         return etoken2;
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

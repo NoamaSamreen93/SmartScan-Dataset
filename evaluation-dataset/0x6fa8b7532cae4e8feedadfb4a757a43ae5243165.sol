@@ -17,8 +17,8 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
- 
+
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
@@ -31,7 +31,7 @@ contract Ownable {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract BING is Ownable {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 18;
@@ -47,11 +47,11 @@ contract BING is Ownable {
     function BING(
         uint256 initialSupply,
         string tokenName,
-        string tokenSymbol) 
+        string tokenSymbol)
         public {
-        totalSupply = initialSupply * 10 ** uint256(decimals); 
-        balanceOf[msg.sender] = totalSupply;           
-        name = tokenName;                           
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
         symbol = tokenSymbol; }
 
 
@@ -71,7 +71,7 @@ contract BING is Ownable {
 
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);  
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true; }
@@ -93,18 +93,24 @@ contract BING is Ownable {
 
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                  
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true; }
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);
-        require(_value <= allowance[_from][msg.sender]);  
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;         
-        totalSupply -= _value;                              
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true; }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

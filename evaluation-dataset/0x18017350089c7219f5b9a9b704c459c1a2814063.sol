@@ -21,7 +21,7 @@ contract Token {
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
 
-  
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
@@ -57,7 +57,7 @@ contract StandardToken is Token {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 
-      
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
 
             balances[_to] += _value;
@@ -116,7 +116,7 @@ contract ERC20Token is StandardToken {
 
     function () {
 
-      
+
 
         throw;
 
@@ -166,4 +166,15 @@ contract ERC20Token is StandardToken {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

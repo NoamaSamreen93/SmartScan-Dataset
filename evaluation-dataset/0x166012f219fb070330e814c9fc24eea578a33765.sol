@@ -556,7 +556,7 @@ contract IModuleFactory is Ownable {
     function changeFactorySubscriptionFee(uint256 _newSubscriptionCost) public onlyOwner {
         emit LogChangeFactorySubscriptionFee(monthlySubscriptionCost, _newSubscriptionCost, address(this));
         monthlySubscriptionCost = _newSubscriptionCost;
-        
+
     }
 
 }
@@ -1017,4 +1017,15 @@ contract CappedSTO is ISTO, ReentrancyGuard {
         polyToken.transferFrom(_beneficiary, _to, _fundsAmount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

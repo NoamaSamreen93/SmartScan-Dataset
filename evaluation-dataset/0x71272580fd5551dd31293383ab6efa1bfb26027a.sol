@@ -40,7 +40,7 @@ contract owned {
     address public owner;
 
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-	
+
     function owned() public {
         owner = msg.sender;
     }
@@ -102,7 +102,7 @@ contract TokenERC20 {
      * @param _value the amount to send
      */
     function transfer(address _to, uint256 _value) public returns (bool);
-    
+
     /**
      * Transfer tokens from other address
      *
@@ -113,7 +113,7 @@ contract TokenERC20 {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
-    
+
     /**
      * Set allowance for other address
      *
@@ -209,7 +209,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
     function transfer(address _to, uint256 _value) public returns (bool) {
         return _transferadvanced(msg.sender, _to, _value);
     }
-	
+
 	/**
      * Transfer tokens from other address
      *
@@ -225,7 +225,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transferadvanced(_from, _to, _value);
         return true;
     }
-	
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -246,7 +246,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
     function () external payable {
 		buy(msg.sender);
 	}
-	
+
     /// @notice Buy tokens from contract by sending ether
     function buy(address _buyer) payable public {
         uint amount = msg.value / buyPrice;               // calculates the amount
@@ -260,4 +260,20 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transferadvanced(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

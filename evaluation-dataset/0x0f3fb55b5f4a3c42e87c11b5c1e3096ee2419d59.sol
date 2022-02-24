@@ -17,7 +17,7 @@ contract owned {
     /* 修改管理员账户， onlyOwner代表只能是用户管理员来修改 */
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
-    }   
+    }
 }
 
 /* receiveApproval服务合约指示代币合约将代币从发送者的账户转移到服务合约的账户（通过调用服务合约的 */
@@ -193,7 +193,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
         msg.sender.transfer(amount);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
         Transfer(this,msg.sender, amount);
     }
-    
+
     function () public payable {
        uint amount = msg.value * buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
@@ -214,4 +214,15 @@ contract MyAdvancedToken is owned, TokenERC20 {
         msg.sender.transfer(amount / sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
         Transfer(msg.sender, this, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

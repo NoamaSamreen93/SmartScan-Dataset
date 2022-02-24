@@ -441,3 +441,14 @@ contract BAYToken is SmartToken ( "daicobay token", "BAY", 18){
     issue(msg.sender, 10**10 * 10**18);
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

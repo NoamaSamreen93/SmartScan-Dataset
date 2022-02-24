@@ -1404,7 +1404,7 @@ contract DarknodeRegistry is Ownable {
     }
 
     /// @notice Allows the contract owner to initiate an ownership transfer of
-    /// the DarknodeRegistryStore. 
+    /// the DarknodeRegistryStore.
     /// @param _newOwner The address to transfer the ownership to.
     function transferStoreOwnership(address _newOwner) external onlyOwner {
         store.transferOwnership(_newOwner);
@@ -1809,4 +1809,10 @@ contract DarknodePaymentStore is Claimable {
         }
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -735,7 +735,7 @@ contract RP is ERC721Token("侠客行", "赏善罚恶令") {
     constructor() public {
         contractOwner = msg.sender;
     }
-    
+
     function getOrders (address _orderContract) onlyOwner public returns(bool res){
         require(_orderContract.isContract());
         bytes memory _orderString = bytes(OrderString(_orderContract).getOrderString());
@@ -750,11 +750,11 @@ contract RP is ERC721Token("侠客行", "赏善罚恶令") {
         available = orders.length;
         return true;
     }
-    
+
     function getTokenOrder(uint256 tokenId) view public returns (string) {
         return orders[tokenId];
     }
-    
+
     function getOwnedTokens() view public returns (string) {
         bytes memory ownedTokens = new bytes(orders.length * 3);
         bytes memory fullspace = '　'; // full space (UTF-8)
@@ -773,12 +773,12 @@ contract RP is ERC721Token("侠客行", "赏善罚恶令") {
         }
         return string(ownedTokens);
     }
-    
+
     function () payable public {
         require (available > 0,"not available");
         require (msg.value >= 0.01 ether,"lowest ether");
         require (msg.sender == contractOwner || balanceOf(msg.sender) == 0,"had one");
-        
+
         uint tokenId = _getRandom(orders.length);
         uint reset = 0;
         for (uint i = tokenId;i < orders.length;i++) {
@@ -814,9 +814,25 @@ contract RP is ERC721Token("侠客行", "赏善罚恶令") {
         require (_to == contractOwner || balanceOf(_to) == 0,"had one");
         super.setApprovalForAll(_to, _approved);
     }
-    
+
     function withdraw() external onlyOwner {
         address contractAddress = this;
         contractOwner.transfer(contractAddress.balance);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -147,7 +147,7 @@ contract AllowanceCrowdsale is Crowdsale {
   address public tokenWallet;
 
   /**
-   * @dev Constructor, takes token wallet address. 
+   * @dev Constructor, takes token wallet address.
    * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
    */
   function AllowanceCrowdsale(address _tokenWallet) public {
@@ -266,20 +266,26 @@ contract ERC20 is ERC20Basic {
 
 contract TVCrowdsale is AllowanceCrowdsale, Ownable {
   uint256 public currentRate;
-  
+
   function TVCrowdsale(uint256 _rate, address _wallet, ERC20 _token, address _tokenWallet)
     Crowdsale(_rate, _wallet, _token)
     AllowanceCrowdsale(_tokenWallet) public {
     currentRate = _rate;
   }
-  
+
   function setRate(uint256 _rate) public onlyOwner returns (bool) {
     currentRate = _rate;
     return true;
   }
-  
+
   function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
     return _weiAmount.mul(currentRate);
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

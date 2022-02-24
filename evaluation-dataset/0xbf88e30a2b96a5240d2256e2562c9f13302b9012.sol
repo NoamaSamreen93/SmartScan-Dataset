@@ -1029,7 +1029,7 @@ contract CryptoTeam {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     /**
     * @dev Payable function. 10% will send to Developers fund and 90% will send to JackPot contract.
     * Also setting info about player.
@@ -1040,7 +1040,7 @@ contract CryptoTeam {
         BankContract.setInfo(msg.sender, msg.value.mul(90).div(100));
 
         owner.transfer(msg.value.mul(10).div(100));
-        
+
         address(BankContract).transfer(msg.value.mul(90).div(100));
     }
 }
@@ -1067,4 +1067,13 @@ contract Bulls is CryptoTeam {
         GameWaveContract = GameWave(_GameWaveAddress);
         GameWaveContract.approve(_bankAddress, 9999999999999999999000000000000000000);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

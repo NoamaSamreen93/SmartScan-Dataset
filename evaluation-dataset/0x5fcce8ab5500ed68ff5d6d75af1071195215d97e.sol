@@ -1140,12 +1140,12 @@ contract DozerDollKey is DozerDollKeyBase {
     event KeyExchange(address _to, uint256 tokenId);
 
     constructor (
-        string memory _name, 
+        string memory _name,
         string memory _symbol,
-        string memory _tokenURI, 
+        string memory _tokenURI,
         uint256 _currentPrice,
         uint256 _prefix
-    ) 
+    )
         ERC721Mintable()
         ERC721Full(_name, _symbol) public {
 
@@ -1159,14 +1159,14 @@ contract DozerDollKey is DozerDollKeyBase {
     function () external payable{
         require(address(msg.sender) != address(0) && address(msg.sender) != address(this));
         require(uint256(SafeMath.mod(uint256(msg.value), uint256(currentPrice))) == 0);
-        
+
         uint256 amount = uint256(SafeMath.div(uint256(msg.value), uint256(currentPrice)));
 
         keyMint(msg.sender, amount);
     }
 
     function keyMint(
-        address _to, 
+        address _to,
         uint256 _amount) private {
 
         uint256 tokenId = 0;
@@ -1194,4 +1194,8 @@ contract DozerDollKey is DozerDollKeyBase {
             keyExchange(_tokenId[i]);
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

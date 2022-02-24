@@ -130,15 +130,15 @@ library SafeMath {
 
 }
 
-contract Ownable 
+contract Ownable
 
 {
 
   address public owner;
 
- 
 
-  constructor(address _owner) public 
+
+  constructor(address _owner) public
 
   {
 
@@ -146,9 +146,9 @@ contract Ownable
 
   }
 
- 
 
-  modifier onlyOwner() 
+
+  modifier onlyOwner()
 
   {
 
@@ -158,13 +158,13 @@ contract Ownable
 
   }
 
- 
 
-  function transferOwnership(address newOwner) onlyOwner 
+
+  function transferOwnership(address newOwner) onlyOwner
 
   {
 
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
 
     owner = newOwner;
 
@@ -192,7 +192,7 @@ contract Balance is Ownable {
 
 	using SafeMath for uint256;
 
-     
+
 
 	mapping (address => mapping (address => uint256)) public account2Token2Balance;
 
@@ -214,7 +214,7 @@ contract Balance is Ownable {
 
 	address public contractMarketData;
 
-	
+
 
 	address public accountCost;
 
@@ -240,7 +240,7 @@ contract Balance is Ownable {
 
 	event OnSellBLK(address account, uint256 amount, uint256 timestamp );
 
-	
+
 
 	event OnDeposit(address token, address account, uint256 amount, uint256 balance, uint256 timestamp);
 
@@ -376,7 +376,7 @@ contract Balance is Ownable {
 
 			assuranceAccount2LastDepositTime[msg.sender]= now;
 
-		 
+
 
 		account2Token2Balance[msg.sender][_token] = account2Token2Balance[msg.sender][_token].add(_amount);
 
@@ -422,7 +422,7 @@ contract Balance is Ownable {
 
 			return true;
 
-		} 
+		}
 
 		else {
 
@@ -438,17 +438,17 @@ contract Balance is Ownable {
 
 
 
-	function getBalance(address _token, address _account) public constant returns (uint256, uint256) {		
+	function getBalance(address _token, address _account) public constant returns (uint256, uint256) {
 
-		return (account2Token2Balance[_account][_token] , getAvailableBalance(_token, _account)); 
+		return (account2Token2Balance[_account][_token] , getAvailableBalance(_token, _account));
 
 	}
 
 
 
-	function getAvailableBalance(address _token, address _account) public constant returns (uint256) {		
+	function getAvailableBalance(address _token, address _account) public constant returns (uint256) {
 
-		return account2Token2Balance[_account][_token].sub(ILoanLogic(contractLoanLogic).getTotalPledgeAmount(_token, _account)); 
+		return account2Token2Balance[_account][_token].sub(ILoanLogic(contractLoanLogic).getTotalPledgeAmount(_token, _account));
 
 	}
 
@@ -488,13 +488,13 @@ contract Balance is Ownable {
 
 		token2ProfitShare[address(0)]= token2ProfitShare[address(0)].add(_amount.sub(_amountCost).sub(_amountToBuyBLK));
 
-		
+
 
 		IBiLinkToken(contractBLK).mint(_profitMaker, _amountToBuyBLK.mul(ETH_BLK_MULTIPLIER));
 
 	}
 
-	
+
 
 	function distributeTokenProfit (address _profitMaker, address _token, uint256 _amount) public {
 
@@ -550,7 +550,7 @@ contract Balance is Ownable {
 
 		require(_newContract != address(0)&& ILoanLogic(contractLoanLogic).hasUnpaidLoan(msg.sender)== false);
 
-    
+
 
 		Balance _newBalance= Balance(_newContract);
 
@@ -576,9 +576,9 @@ contract Balance is Ownable {
 
 			uint256 _amountToken = account2Token2Balance[msg.sender][_token];
 
-      
 
-			if (_amountToken != 0) {      
+
+			if (_amountToken != 0) {
 
 				require(IToken(_token).approve(_newBalance, _amountToken));
 
@@ -596,7 +596,7 @@ contract Balance is Ownable {
 
 	}
 
-	 
+
 
 	function depositFromUserMigration(address _account) public payable {
 
@@ -608,7 +608,7 @@ contract Balance is Ownable {
 
 	}
 
-  
+
 
 	function depositTokenFromUserMigration(address _token, uint _amount, address _account) public {
 
@@ -628,7 +628,7 @@ contract Balance is Ownable {
 
 	}
 
-	
+
 
 	function getRemainBuyBLKAmount() public constant returns (uint256) {
 
@@ -660,4 +660,13 @@ contract Balance is Ownable {
 
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

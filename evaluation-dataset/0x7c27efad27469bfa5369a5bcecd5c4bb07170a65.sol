@@ -8,7 +8,7 @@ contract Refund {
     function Refund() {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -45,4 +45,10 @@ contract Refund {
     function withdraw_ether() onlyOwner {
         owner.transfer(this.balance);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

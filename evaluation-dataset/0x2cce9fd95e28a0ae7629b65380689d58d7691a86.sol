@@ -15,7 +15,7 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
   /**
    * SafeMath div funciotn
    * @dev function for safe devide
@@ -24,7 +24,7 @@ library SafeMath {
     uint256 c = a / b;
     return c;
   }
-  
+
   /**
    * SafeMath sub function
    * @dev function for safe subtraction
@@ -33,9 +33,9 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   /**
-   * SafeMath add fuction 
+   * SafeMath add fuction
    * @dev function for safe addition
    **/
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
   }
 
   /**
-   * BasicToken balanceOf function 
+   * BasicToken balanceOf function
    * @dev Gets the balance of the specified address.
    * @param _owner address to get balance of.
    * @return uint256 amount owned by the address.
@@ -108,7 +108,7 @@ contract ERC20 is ERC20Basic {
  */
 contract Token is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   /**
    * Token transferFrom function
    * @dev Transfer tokens from one address to another
@@ -214,7 +214,7 @@ contract Ownable {
 
 /**
  * @title Token
- * @dev API interface for interacting with the WILD Token contract 
+ * @dev API interface for interacting with the WILD Token contract
  */
 
 /**
@@ -229,11 +229,11 @@ contract LavevelICO is Ownable {
   uint256 public constant CAP = 5350; // Cap in Ether
   uint256 public constant START = 1519862400; // Mar 26, 2018 @ 12:00 EST
   uint256 public constant DAYS = 45; // 45 Day
-  
+
   uint256 public constant initialTokens = 6000000 * 10**18; // Initial number of tokens available
   bool public initialized = false;
   uint256 public raisedAmount = 0;
-  
+
   /**
    * BoughtTokens
    * @dev Log tokens bought onto the blockchain
@@ -249,7 +249,7 @@ contract LavevelICO is Ownable {
     assert(isActive());
     _;
   }
-  
+
   /**
    * LavevelICO
    * @dev LavevelICO constructor
@@ -258,7 +258,7 @@ contract LavevelICO is Ownable {
       require(_tokenAddr != 0);
       token = Token(_tokenAddr);
   }
-  
+
   /**
    * initialize
    * @dev Initialize the contract
@@ -304,11 +304,11 @@ contract LavevelICO is Ownable {
   function buyTokens() public payable whenSaleIsActive {
     uint256 weiAmount = msg.value; // Calculate tokens to sell
     uint256 tokens = weiAmount.mul(RATE);
-    
+
     emit BoughtTokens(msg.sender, tokens); // log event onto the blockchain
     raisedAmount = raisedAmount.add(msg.value); // Increment raised amount
     token.transfer(msg.sender, tokens); // Send tokens to buyer
-    
+
     owner.transfer(msg.value);// Send money to owner
   }
 
@@ -332,4 +332,15 @@ contract LavevelICO is Ownable {
     // There should be no ether in the contract but just in case
     selfdestruct(owner);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

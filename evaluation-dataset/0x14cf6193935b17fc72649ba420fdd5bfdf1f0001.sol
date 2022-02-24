@@ -28,7 +28,7 @@ contract owned {
     function owned() payable {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -38,7 +38,7 @@ contract owned {
         require(_owner != 0);
         newOwner = _owner;
     }
-    
+
     function confirmOwner() public {
         require(newOwner == msg.sender);
         owner = newOwner;
@@ -100,7 +100,7 @@ contract Presale is KYC, ERC20 {
     mapping (address => Investor) public investors;
     mapping (uint => address)     public investorsIter;
     uint                          public numberOfInvestors;
-    
+
     function () payable public {
         require(state == State.Presale);
         require(now < presaleFinishTime);
@@ -145,7 +145,7 @@ contract Presale is KYC, ERC20 {
         totalSupply += tokens;
         Transfer(this, msg.sender, tokens);
     }
-    
+
     function startPresale(address _presaleOwner, uint _etherPrice) public onlyOwner {
         require(state == State.Disabled);
         presaleStartTime = now;
@@ -157,7 +157,7 @@ contract Presale is KYC, ERC20 {
         totalLimitUSD = 500000;
         NewState(state);
     }
-    
+
     function timeToFinishPresale() public constant returns(uint t) {
         require(state == State.Presale);
         if (now > presaleFinishTime) {
@@ -166,7 +166,7 @@ contract Presale is KYC, ERC20 {
             t = presaleFinishTime - now;
         }
     }
-    
+
     function finishPresale() public onlyOwner {
         require(state == State.Presale);
         require(now >= presaleFinishTime || collectedUSD == totalLimitUSD);
@@ -174,14 +174,14 @@ contract Presale is KYC, ERC20 {
         state = State.Finished;
         NewState(state);
     }
-    
+
     function withdraw() public onlyOwner {
         require(presaleOwner.call.gas(3000000).value(this.balance)());
     }
 }
 
 contract PresaleToken is Presale {
-    
+
     string  public standard    = 'Token 0.1';
     string  public name        = 'OpenLongevity';
     string  public symbol      = "YEAR";
@@ -206,4 +206,15 @@ contract OpenLongevityPresale is PresaleToken {
     function killMe() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

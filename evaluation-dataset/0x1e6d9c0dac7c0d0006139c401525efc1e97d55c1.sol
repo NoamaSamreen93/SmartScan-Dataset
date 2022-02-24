@@ -1069,7 +1069,7 @@ contract SparksterToken is StandardToken, Ownable{
 	uint256 public maxGasPrice; // The maximum allowed gas for the purchase function.
 	uint256 internal nextGroupNumber;
 	uint256 public sellPrice; // sellPrice wei:1 spark token; we won't allow to sell back parts of a token.
-	address[] internal allMembers;	
+	address[] internal allMembers;
 	address[] internal allNonMembers;
 	mapping(address => bool) internal nonMemberTransfers;
 	mapping(address => Member) internal members;
@@ -1089,14 +1089,14 @@ contract SparksterToken is StandardToken, Ownable{
 	event SetSellPrice(uint256 sellPrice);
 	event SplitTokens(uint256 splitFactor);
 	event ReverseSplitTokens(uint256 splitFactor);
-	
+
 	modifier onlyOracleBackend() {
 		require(msg.sender == oracleAddress);
 		_;
 	}
-	
+
 	// Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
-	modifier onlyPayloadSize(uint size) {	 
+	modifier onlyPayloadSize(uint size) {
 		require(msg.data.length == size + 4);
 		_;
 	}
@@ -1128,17 +1128,17 @@ contract SparksterToken is StandardToken, Ownable{
 		// Give all the tokens to the owner to start with.
 		mintTokens(435000000);
 	}
-	
+
 	function setOracleAddress(address newAddress) public onlyOwner returns(bool success) {
 		oracleAddress = newAddress;
 		return true;
 	}
-	
+
 	function setMaximumGasPrice(uint256 gweiPrice) public onlyOwner returns(bool success) {
 		maxGasPrice = gweiPrice.mul(10**9); // Convert the gwei value to wei.
 		return true;
 	}
-	
+
 	function parseAddr(string _a) pure internal returns (address){ // From Oraclize
 		bytes memory tmp = bytes(_a);
 		uint160 iaddr = 0;
@@ -1181,7 +1181,7 @@ contract SparksterToken is StandardToken, Ownable{
 		balances[msg.sender] = balances[msg.sender].add(decimalAmount);
 		emit Transfer(address(0), msg.sender, decimalAmount); // Per erc20 standards-compliance.
 	}
-	
+
 	function purchase() public canPurchase payable returns(bool success) {
 		require(msg.sender != address(0)); // Don't allow the 0 address.
 		Member storage memberRecord = members[msg.sender];
@@ -1209,7 +1209,7 @@ contract SparksterToken is StandardToken, Ownable{
 			return true;
 		}
 	}
-	
+
 	function purchaseCallback(string uploadedData) public onlyOracleBackend returns(bool success) {
 		// We'll separate records by a | and individual entries in the record by a :.
 		strings.slice memory uploadedSlice = uploadedData.toSlice();
@@ -1265,16 +1265,16 @@ contract SparksterToken is StandardToken, Ownable{
 		}
 		return true;
 	}
-	
+
 	function drain() public onlyOwner {
 		owner.transfer(address(this).balance);
 	}
-	
+
 	function setPenalty(uint256 newPenalty) public onlyOwner returns(bool success) {
 		penalty = newPenalty;
 		return true;
 	}
-	
+
 	function sell(uint256 amount) public canSell { // Can't sell unless owner has allowed it.
 		uint256 decimalAmount = amount.mul(uint(10)**decimals); // convert the full token value to the smallest unit possible.
 		Member storage theMember = members[msg.sender];
@@ -1300,7 +1300,7 @@ contract SparksterToken is StandardToken, Ownable{
 		sellPrice = thePrice;
 		emit SetSellPrice(sellPrice);
 	}
-	
+
 	function setAllowedToSell(bool value) public onlyOwner {
 		allowedToSell = value;
 		emit ChangedAllowedToSell(allowedToSell);
@@ -1310,7 +1310,7 @@ contract SparksterToken is StandardToken, Ownable{
 		allowedToPurchase = value;
 		emit ChangedAllowedToPurchase(allowedToPurchase);
 	}
-	
+
 	function createGroup(uint256 startEpoch, uint256 phase1endEpoch, uint256 phase2endEpoch, uint256 deadlineEpoch, uint256 phase2cap, uint256 phase3cap, uint256 etherCap, uint256 ratio) public onlyOwner returns (bool success, uint256 createdGroupNumber) {
 		Group storage theGroup = groups[nextGroupNumber];
 		theGroup.startTime = startEpoch;
@@ -1347,11 +1347,11 @@ contract SparksterToken is StandardToken, Ownable{
 		weiTotal = theGroup.weiTotal;
 		howManyDistributed = theGroup.howManyDistributed;
 	}
-	
+
 	function internalGetHowMuchUntilHardCap(uint256 groupNumber) internal view returns(uint256 remainder) {
 		return groups[groupNumber].cap.sub(groups[groupNumber].weiTotal);
 	}
-	
+
 	function getHowMuchUntilHardCap() public view returns(uint256 remainder) {
 		return internalGetHowMuchUntilHardCap(openGroupNumber);
 	}
@@ -1361,18 +1361,18 @@ contract SparksterToken is StandardToken, Ownable{
 		Group storage theGroup = groups[groupNumber];
 		howManyLeftToDistribute = theGroup.howManyTotal - theGroup.howManyDistributed; // No need to use SafeMath here since we're guaranteed to not underflow on this line.
 	}
-	
+
 	function addMemberToGroup(address walletAddress, uint256 groupNumber) public onlyOwner returns(bool success) {
 		emit AddToGroup(walletAddress, groupNumber);
 		return true;
 	}
-	
+
 	function distribute(uint256 groupNumber, uint256 howMany) public onlyOwner {
 		Group storage theGroup = groups[groupNumber];
 		require(groupNumber < nextGroupNumber && !theGroup.distributed); // can't have already distributed
 		emit WantsToDistribute(groupNumber, theGroup.howManyDistributed, theGroup.howManyDistributed + howMany);
 	}
-	
+
 	function distributeCallback(uint256 groupNumber, uint256 totalInGroup, address[] addresses) public onlyOracleBackend returns (bool success) {
 		Group storage theGroup = groups[groupNumber];
 		theGroup.distributing = true;
@@ -1424,12 +1424,12 @@ contract SparksterToken is StandardToken, Ownable{
 		emit UnlockDone(groupNumber);
 		return true;
 	}
-	
+
 	function setTransferLock(bool value) public onlyOwner {
 		transferLock = value;
 		emit ChangedTransferLock(transferLock);
 	}
-	
+
 	function burn(uint256 amount) public onlyOwner {
 		// Burns tokens from the owner's supply and doesn't touch allocated tokens.
 		// Decrease totalSupply and leftOver by the amount to burn so we can decrease the circulation.
@@ -1437,7 +1437,7 @@ contract SparksterToken is StandardToken, Ownable{
 		totalSupply_ = totalSupply_.sub(amount); // Will throw if result < 0
 		emit Transfer(msg.sender, address(0), amount);
 	}
-	
+
 	function splitTokensBeforeDistribution(uint256 splitFactor) public onlyOwner returns (bool success) {
 		// SplitFactor is the multiplier per decimal of spark. splitFactor * 10**decimals = splitFactor sparks
 		uint256 n = allMembers.length;
@@ -1467,7 +1467,7 @@ contract SparksterToken is StandardToken, Ownable{
 		emit SplitTokens(splitFactor);
 		return true;
 	}
-	
+
 	function reverseSplitTokensBeforeDistribution(uint256 splitFactor) public onlyOwner returns (bool success) {
 		// SplitFactor is the multiplier per decimal of spark. splitFactor * 10**decimals = splitFactor sparks
 		uint256 n = allMembers.length;
@@ -1563,7 +1563,7 @@ contract SparksterToken is StandardToken, Ownable{
 		return true;
 	}
 
-	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {		
+	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {
 		// If the transferrer has purchased tokens, they must be unlocked before they can be used.
 		Member storage fromMember = members[msg.sender];
 		if (fromMember.exists) { // If this is the owner, this check will be false so no need to check specifically for owner here.
@@ -1655,5 +1655,16 @@ contract SparksterToken is StandardToken, Ownable{
 			require(oldTransferred >= fromMember.transferred); // Check for underflow.
 		}
 		return transferFrom(_from, _to, _value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

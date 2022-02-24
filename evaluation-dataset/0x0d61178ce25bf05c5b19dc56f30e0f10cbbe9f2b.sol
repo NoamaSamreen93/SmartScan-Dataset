@@ -70,14 +70,14 @@ contract Lottery is Ownable {
     uint256 entryCounter; // counter for the entries
     uint256 public automaticThreshold; // automatic Threshold to close the lottery and pay the winner
     uint256 public ticketPrice = 10 finney; // the price per lottery ticket (0.01 eth)
-    
+
 
 
 
 
     constructor() public {
         contractCall = _Contract(0x05215FCE25902366480696F38C3093e31DBCE69A);
-        automaticThreshold = 56; // 56 tickets 
+        automaticThreshold = 56; // 56 tickets
         ticketPrice = 10 finney; // 10finney = 0.01 eth
         entryCounter = 0;
     }
@@ -118,13 +118,13 @@ contract Lottery is Ownable {
     }
 
     // Other functions
- 
+
     /*
     PRNG(Pseudorandom number generator) :
     PRN can be 0 up to entrycounter-1. (equivalent to 1 up to entrycounter)
     n := entrycounter
 
-    Let n be an arbitrary number 
+    Let n be an arbitrary number
     and
     y := uint256(keccak256(P)) where P is an arbitrary value.
     The returned PRN % (n) is going to be between
@@ -145,7 +145,7 @@ contract Lottery is Ownable {
         uint256 PRN = uint256(keccak256(abi.encodePacked(initialize1,calc1,initialize2,initialize3,calc3)))%(entryCounter);
         return PRN;
     }
-    
+
 
     // Choose a winner and pay him
     function payWinner() internal returns (address) {
@@ -160,7 +160,7 @@ contract Lottery is Ownable {
     }
 
     //
-    function giveawayFee() internal {   
+    function giveawayFee() internal {
         uint256 balance = (address(this).balance / 10);
         owner.transfer(balance);
     }
@@ -216,7 +216,7 @@ contract Lottery is Ownable {
     * Special functions
     */
 
-    /* 
+    /*
     *   In case the threshold is way too high and the owner/admin disappeared (inactive for 30days)
     *   Everyone can call this function then the timestamp gets saved
     *   after 30 days of owner-inactivity someone can call the function again and calls payWinner with it
@@ -264,4 +264,15 @@ contract _Contract
     function exit() public;
     function myTokens() public view returns(uint256);
     function myDividends(bool) public view returns(uint256);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -15,15 +15,15 @@ contract owned {
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
-} 
+}
 
 contract ELearningCoinERC is owned {
     string public name;
     string public symbol;
-    uint8 public decimals = 2; 
+    uint8 public decimals = 2;
     uint256 public totalSupply;
     mapping (address => bool) public frozenAccount;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
@@ -35,22 +35,22 @@ contract ELearningCoinERC is owned {
 
 
     function ELearningCoinERC() public {
-        totalSupply = 10000000 * 10 ** uint256(decimals); 
-        balanceOf[msg.sender] = totalSupply;              
-        name = "eLearningCoin";                                 
-        symbol = "ELRC";                            
+        totalSupply = 10000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "eLearningCoin";
+        symbol = "ELRC";
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-  
+
         require(_to != 0x0);
 
         require(balanceOf[_from] >= _value);
 
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);  
-        
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
         // Subtract from the sender
         balanceOf[_from] -= _value;
@@ -96,15 +96,15 @@ contract ELearningCoinERC is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
     function mintToken(address target, uint256 initialSupply) onlyOwner public {
         balanceOf[target] += initialSupply;
         totalSupply += initialSupply;
         Transfer(0, this, initialSupply);
         Transfer(this, target, initialSupply);
-    } 
-   
-   
+    }
+
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
@@ -112,4 +112,8 @@ contract ELearningCoinERC is owned {
 
 
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

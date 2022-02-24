@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract IRidePreICO {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xBeDF65990326Ed2236C5A17432d9a30dbA3aBFEe;
@@ -30,27 +30,27 @@ contract IRidePreICO {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) isCreator public {
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function kill() isCreator public {
@@ -67,4 +67,15 @@ contract IRidePreICO {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

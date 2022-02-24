@@ -239,9 +239,20 @@ contract MintableToken is ERC23StandardToken, Ownable {
   }
 }
 
-contract NAKED is MintableToken { 
+contract NAKED is MintableToken {
   string public name="NAKED";
   string public symbol="NKD";
   uint8 public decimals=18;
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

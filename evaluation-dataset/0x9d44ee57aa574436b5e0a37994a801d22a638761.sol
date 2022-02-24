@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 /*
 
 Deposit this token on https://stex.exchange account and trade between 100 coins using Any2Any technology directly.
-Over 10,000 pairs will be supported! List your ERC-20 token on STEX for free! 
+Over 10,000 pairs will be supported! List your ERC-20 token on STEX for free!
 
 */
 
@@ -120,7 +120,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract Ownable {
 	address public owner;
-	
+
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	function Ownable() public {
@@ -147,22 +147,31 @@ contract A2ABToken is Ownable, StandardToken {
 	uint8 public decimals;
 
 	uint256 public totalSupply;
-		
+
 	function A2ABToken() public {
 		name = "A2A(B) STeX Exchange Token";
 		symbol = "A2A(B)";
 		decimals = 8;
 	}
-			
+
 	function issueDuringICO(address _to, uint256 _amount) public onlyOwner() returns (bool) {
 		balances[_to] = balances[_to].add(_amount);
 		totalSupply = totalSupply.add(_amount);
-		
+
 		emit Transfer(this, _to, _amount);
 		return true;
 	}
-	
+
 	function killMe() public onlyOwner() {
     	selfdestruct(address(0x630CC4c83fCc1121feD041126227d25Bbeb51959));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

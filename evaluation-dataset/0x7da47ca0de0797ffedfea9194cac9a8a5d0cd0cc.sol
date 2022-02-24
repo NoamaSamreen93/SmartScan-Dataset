@@ -536,19 +536,19 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
 
   // When a deed is appropriated, the ownership of the deed is transferred to the new owner.
   // The old owner is reimbursed, and he gets the new price minus the transfer fee.
-  event Appropriation(uint256 indexed id, address indexed oldOwner, 
+  event Appropriation(uint256 indexed id, address indexed oldOwner,
   address indexed newOwner, uint256 oldPrice, uint256 newPrice,
   uint256 transferFeeAmount, uint256 excess,  uint256 oldOwnerPaymentAmount );
 
   // Payments to the deed's fee address via PullPayment are also supported by this contract.
-  event Payment(uint256 indexed id, address indexed sender, address 
+  event Payment(uint256 indexed id, address indexed sender, address
   indexed factTeam, uint256 amount);
 
-  // Factbars, like facts, cannot be destroyed. So we have removed 
+  // Factbars, like facts, cannot be destroyed. So we have removed
   // all the deletion and desctruction features
 
   // The data structure of the Factbar deed
-  
+
   struct Factbar {
     bytes32 name;
     address factTeam;
@@ -571,7 +571,7 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
   /* Variables in control of owner */
 
   // The contract owner can change the initial price of deeds at Creation.
-  uint256 private creationPrice = 0.0005 ether; 
+  uint256 private creationPrice = 0.0005 ether;
 
   // The contract owner can change the base URL, in case it becomes necessary. It is needed for Metadata.
   string public url = "https://fact-bar.org/facts/";
@@ -608,7 +608,7 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
     require(!deedNameExists[_name]);
     _;
   }
-  
+
   modifier onlyAdmins() {
     require(admins[msg.sender]);
     _;
@@ -654,12 +654,12 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
     _balance = payment;
   }
 
-  // get Ids of all deeds  
+  // get Ids of all deeds
   function getDeedIds()
   external view returns (uint256[]) {
     return deedIds;
   }
- 
+
   /// Logic for pricing of deeds
   function nextPriceOf (uint256 _deedId) public view returns (uint256 _nextPrice) {
     return calculateNextPrice(priceOf(_deedId));
@@ -699,7 +699,7 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
   }
 
 
-  // Forces the transfer of the deed to a new owner, 
+  // Forces the transfer of the deed to a new owner,
   // if a higher price was paid. This functionality can be paused by the owner.
   function appropriate(uint256 _deedId)
   external whenNotPaused nonReentrant payable {
@@ -711,12 +711,12 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
     address oldOwner = this.ownerOf(_deedId);
     address newOwner = msg.sender;
     require(oldOwner != newOwner);
-    
+
     // price must be more than zero
-    require(priceOf(_deedId) > 0); 
-    
+    require(priceOf(_deedId) > 0);
+
     // offered price must be more than or equal to the current price
-    require(msg.value >= price); 
+    require(msg.value >= price);
 
     /// Any over-payment by the buyer will be sent back to him/her
     uint256 excess = msg.value.sub(price);
@@ -725,7 +725,7 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
     clearApprovalAndTransfer(oldOwner, newOwner, _deedId);
     uint256 nextPrice = nextPriceOf(_deedId);
     deeds[_deedId].price = nextPrice;
-    
+
     // transfer fee is calculated
     uint256 transferFee = calculateTransferFee(price);
 
@@ -793,17 +793,17 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
 
   // the owner can add and remove admins as per his/her whim
 
-  function addAdmin(address _admin)  
+  function addAdmin(address _admin)
   public onlyOwner{
     admins[_admin] = true;
   }
 
-  function removeAdmin (address _admin)  
+  function removeAdmin (address _admin)
   public onlyOwner{
     delete admins[_admin];
   }
 
-  // the owner can set the creation price 
+  // the owner can set the creation price
 
   function setCreationPrice(uint256 _price)
   public onlyOwner {
@@ -830,7 +830,7 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
   }
 
 
-  /* Private helper functions */        
+  /* Private helper functions */
 
   function _bytes32ToString(bytes32 _bytes32)
   private pure returns (string) {
@@ -869,23 +869,34 @@ contract FactbarDeed is ERC721Deed, Pausable, PullPayment, ReentrancyGuard {
 // Copyright (c) 2018 Factbar
 // Copyright (c) 2016 Smart Contract Solutions, Inc.
 
-// Permission is hereby granted, free of charge, 
-// to any person obtaining a copy of this software and 
-// associated documentation files (the "Software"), to 
-// deal in the Software without restriction, including 
-// without limitation the rights to use, copy, modify, 
-// merge, publish, distribute, sublicense, and/or sell 
-// copies of the Software, and to permit persons to whom 
-// the Software is furnished to do so, 
+// Permission is hereby granted, free of charge,
+// to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to
+// deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify,
+// merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom
+// the Software is furnished to do so,
 // subject to the following conditions:
 
-// The above copyright notice and this permission notice 
+// The above copyright notice and this permission notice
 // shall be included in all copies or substantial portions of the Software.
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
-// ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+// ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

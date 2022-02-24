@@ -3,9 +3,9 @@ pragma solidity ^0.4.25;
 
 
 library SafeMath {
- 
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-   
+
     if (a == 0) {
       return 0;
     }
@@ -15,14 +15,14 @@ library SafeMath {
 
     return c;
   }
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b > 0);
     uint256 c = a / b;
-    
+
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
@@ -30,14 +30,14 @@ library SafeMath {
     return c;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
 
     return c;
   }
-  
+
   function mod(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b != 0);
     return a % b;
@@ -58,7 +58,7 @@ contract ColorStarToken {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     bool lock = false;
 
     constructor(
@@ -73,9 +73,9 @@ contract ColorStarToken {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -85,7 +85,7 @@ contract ColorStarToken {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -147,4 +147,12 @@ contract ColorStarToken {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

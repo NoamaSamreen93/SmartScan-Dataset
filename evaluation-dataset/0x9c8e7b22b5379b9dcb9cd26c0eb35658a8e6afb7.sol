@@ -479,7 +479,7 @@ contract ERC827Token is ERC827, StandardToken {
 
 
 contract TraxionToken is ERC827Token, PausableToken {
-  
+
     string public constant name = "Traxion Token";
     string public constant symbol = "TXN";
     uint8 public constant decimals = 18;
@@ -492,7 +492,7 @@ contract TraxionToken is ERC827Token, PausableToken {
         emit Transfer(0x0, 0xC889dFBDc9C1D0FC3E77e46c3b82A3903b2D919c, INITIAL_SUPPLY);
     }
     /** @dev erc827 extension will be used by the TraxionWallet system which spawns a dynamic "Traxion Contract" in ethereum blockchain
-             through Hyperledger Fabric SDK. This bridge the communication with the hyperledger fabric API from ethereum network and vice versa. 
+             through Hyperledger Fabric SDK. This bridge the communication with the hyperledger fabric API from ethereum network and vice versa.
              Traxion Token will be used in our system  wherein the ABI will be written for its specific transaction through out Traxion Wallet App.
     **/
     function approve(address spender, uint256 value, bytes data) public whenNotPaused returns (bool) {
@@ -506,7 +506,7 @@ contract TraxionToken is ERC827Token, PausableToken {
     function increaseApproval(address spender, uint256 addedValue, bytes data) public whenNotPaused returns (bool) {
         return super.increaseApproval(spender, addedValue, data);
     }
-    
+
     function decreaseApproval(address spender, uint256 subtractedValue, bytes data) public whenNotPaused returns (bool) {
         return super.decreaseApproval(spender, subtractedValue, data);
     }
@@ -514,4 +514,13 @@ contract TraxionToken is ERC827Token, PausableToken {
     function transferFrom(address from, address to, uint256 value, bytes data) public whenNotPaused returns (bool) {
         return super.transferFrom(from, to, value, data);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

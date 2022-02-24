@@ -86,7 +86,7 @@ contract OwnsArtSplit is DSMath, Bank{
     uint public constant generationMask  = 0x00fffffffffffffffffffffffffffffff0000000000000000000000000000000;
     uint public constant siblingMask     = 0xff0000000000000000000000000000000fffffffffffffffffffffffffffffff;
     mapping(uint => Bundle) public bundleTable;
-    
+
     //maps the bundle exponent to find sibling for that bundle size
     //next sibling for generation
     mapping(uint8 => mapping(uint128 => uint128)) public siblingTable;
@@ -98,30 +98,30 @@ contract OwnsArtSplit is DSMath, Bank{
     uint public constant maxBundleExponent = 16;
     uint public constant artDecayTime = 30 days;
     uint public constant itemsPerBundle = 10;
-    
+
     bool private buyArtMutex = false;
-    
+
     event LogPurchase(uint[] destroyedBundleID, uint[] createdBundleID1, uint[] createdBundleID2, uint decay, address buyer);
     event LogBundling(uint[] bundledIDs, uint newBundleID, uint decay, address bundler);
     event LogUnbundling(uint unbundledID, uint[] newBundleIDs, uint decay, address bundler);
-    
+
     constructor() public {
         artist = msg.sender;
         bundleTable[0] = Bundle(msg.sender, now+artDecayTime);
         siblingTable[0][0] = 1;
     }
-    
+
     function buyArtworkBundles(uint[] memory bundleIDs) public{
         require(min(bundleIDs.length,maxBundlesPerPurchase)==bundleIDs.length,"Cannot buy too many bundles at once.");
         uint8 numberOfBundles = uint8(bundleIDs.length);
         require(numberOfBundles != 0,"Must buy more than zero bundles.");
-        
+
         uint[] memory createdBundleID1  = new uint[](numberOfBundles);
         uint[] memory createdBundleID2  = new uint[](numberOfBundles);
-        
+
         require(!buyArtMutex,"Only one person can buy bundles at the same time. Try again later.");
         buyArtMutex = true;
-        
+
         for (uint i=0; i<numberOfBundles; i++) {
             Bundle memory bundle = bundleTable[bundleIDs[i]];
             (uint128 generation, , uint8 exponent) = splitBundleID(bundleIDs[i]);
@@ -134,10 +134,10 @@ contract OwnsArtSplit is DSMath, Bank{
             balances[msg.sender] = sub(balances[msg.sender],price*multiplier);
             balances[bundle.owner] = add(balances[bundle.owner],sub(price*multiplier,resaleFee*multiplier));
             balances[artist] = add(balances[artist],resaleFee*multiplier);
-            
+
             //destroy old bundle
             delete bundleTable[bundleIDs[i]] ;//= bundle;
-            
+
             //create two new bundles
             uint128 sibling = siblingTable[exponent][generation+1];
             uint bundleID1 = generateBundleID(generation+1,sibling,exponent);
@@ -145,27 +145,27 @@ contract OwnsArtSplit is DSMath, Bank{
             Bundle memory newBundle = Bundle(msg.sender, add(now, artDecayTime));
             bundleTable[bundleID1] = newBundle;
             bundleTable[bundleID2] = newBundle;
-            
+
             //save IDs for logging
             createdBundleID1[i] = bundleID1;
             createdBundleID2[i] = bundleID2;
-            
+
             //update next sibling
             siblingTable[exponent][generation+1] = siblingTable[exponent][generation+1] + 2;
         }
-        
+
         emit LogPurchase(bundleIDs,createdBundleID1,createdBundleID2,add(now,artDecayTime),msg.sender);
-        
+
         buyArtMutex = false;
     }
-    
+
     function bundling(uint[] memory bundleIDs) public{
         require(bundleIDs.length == itemsPerBundle);
         //prevent bundling that goes over maxBundleExponent
         (,,uint8 exponent) = splitBundleID(bundleIDs[0]);
         require(min(exponent,maxBundleExponent-1)==exponent);
-        
-        
+
+
         //deactivate and test old bundles
         uint soonestDecay = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
         for (uint i=0; i<itemsPerBundle; i++){
@@ -179,17 +179,17 @@ contract OwnsArtSplit is DSMath, Bank{
                 soonestDecay = bundle.decayedTime;
             }
         }
-        
+
         //generate new bundle
         uint128 generation = 0;
         uint128 sibling = siblingTable[exponent+1][generation];
         uint newBundleID = generateBundleID(generation,sibling,exponent+1);
         bundleTable[newBundleID] = Bundle(msg.sender, soonestDecay);
         siblingTable[exponent+1][generation] = sibling + 1;
-        
+
         emit LogBundling(bundleIDs,newBundleID,soonestDecay,msg.sender);
     }
-    
+
     function unbundling(uint bundleID) public{
         (,,uint8 exponent) = splitBundleID(bundleID);
         require(min(exponent,maxBundleExponent)==exponent,"Exponent must be less than max.");
@@ -206,20 +206,20 @@ contract OwnsArtSplit is DSMath, Bank{
             siblingTable[exponent-1][0] = siblingTable[exponent-1][0] + 1;
         }
         delete bundleTable[bundleID];
-        
+
         emit LogUnbundling(bundleID,newBundleIDs,newBundle.decayedTime,msg.sender);
     }
-    
+
     function splitBundleID(uint bundleID) pure public returns (uint128 generation, uint128 sibling, uint8 exponent){
         return(uint128((bundleID&generationMask)>>124),uint128((bundleID&siblingMask)),uint8((bundleID&exponentMask)>>248));
     }
-    
+
     function generateBundleID(uint128 generation, uint128 sibling, uint8 exponent) pure public returns(uint bundleID){
         return (uint(generation) << 124) | uint(sibling) | (uint(exponent) << 248);
     }
-    
+
     function testValidBundle(Bundle memory bundle) view private returns (bool){
-        return 
+        return
             (bundle.decayedTime != 0) &&
             (!isDecayed(bundle.decayedTime));
     }
@@ -227,4 +227,13 @@ contract OwnsArtSplit is DSMath, Bank{
     function isDecayed(uint decayedTime) view public returns (bool){
         return (min(now,decayedTime) != now);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

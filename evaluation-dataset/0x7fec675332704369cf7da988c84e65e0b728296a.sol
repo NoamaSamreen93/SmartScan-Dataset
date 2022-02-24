@@ -893,7 +893,7 @@ contract MToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC20Burnab
     using Address for address;
 
     event TransferExtend(address indexed from, address indexed to, uint256 value, string name);
-    
+
     constructor(string memory name, string memory symbol, uint8 decimals, uint256 cap) ERC20Pausable() ERC20Burnable() ERC20Capped(cap) ERC20Detailed(name, symbol, decimals) ERC20() public {}
 
     function mintVesting(address _to, uint256 _amount, uint256 start, uint256 phase, uint256 duration, bool revocable) public onlyMinter whenNotPaused returns (TokenVesting) {
@@ -907,7 +907,7 @@ contract MToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC20Burnab
         vesting.revoke(this);
         return true;
     }
-  
+
     /**
      * @dev Transfer token to a specified address.
      * @param to The address to transfer to.
@@ -950,4 +950,15 @@ contract MToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC20Burnab
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -170,10 +170,10 @@ contract OracleContractAdapter is Object {
     /// @notice Add oracles to whitelist.
     ///
     /// @param _whitelist user list.
-    function addOracles(address[] _whitelist) 
-    onlyContractOwner 
-    external 
-    returns (uint) 
+    function addOracles(address[] _whitelist)
+    onlyContractOwner
+    external
+    returns (uint)
     {
         for (uint _idx = 0; _idx < _whitelist.length; ++_idx) {
             address _oracle = _whitelist[_idx];
@@ -188,10 +188,10 @@ contract OracleContractAdapter is Object {
     /// @notice Removes oracles from whitelist.
     ///
     /// @param _blacklist user in whitelist.
-    function removeOracles(address[] _blacklist) 
-    onlyContractOwner 
-    external 
-    returns (uint) 
+    function removeOracles(address[] _blacklist)
+    onlyContractOwner
+    external
+    returns (uint)
     {
         for (uint _idx = 0; _idx < _blacklist.length; ++_idx) {
             address _oracle = _blacklist[_idx];
@@ -314,7 +314,7 @@ contract Treasury is OracleContractAdapter, ServiceAllowance, TreasuryEmitter {
     }
 
     /* PUBLIC */
-    
+
     function Treasury(address _token) public {
         require(address(_token) != 0x0);
         token = _token;
@@ -948,7 +948,7 @@ contract EmissionProviderEmitter {
 }
 
 contract Token is ERC20 {
-    
+
     bytes32 public smbl;
     address public platform;
 
@@ -1221,16 +1221,16 @@ contract EmissionProvider is OracleContractAdapter, ServiceAllowance, EmissionPr
     /// @param _for user address.
     /// @param _value token amount,
     function issueHardcapToken(
-        address _token, 
-        address _for, 
+        address _token,
+        address _for,
         uint _value
-    ) 
-    onlyOracle 
-    onlyAllowed(_for) 
-    onlySale 
-    notHardcapReached 
+    )
+    onlyOracle
+    onlyAllowed(_for)
+    onlySale
+    notHardcapReached
     public
-    returns (uint) 
+    returns (uint)
     {
         require(_token == token);
         require(_value != 0);
@@ -1263,10 +1263,10 @@ contract EmissionProvider is OracleContractAdapter, ServiceAllowance, EmissionPr
     /// @param _for user address.
     /// @param _value token amount,
     function issueSoftcapToken(
-        address _token, 
-        address _for, 
+        address _token,
+        address _for,
         uint _value
-    ) 
+    )
     onlyOracle
     onlyAllowed(_for)
     onlySale
@@ -1349,4 +1349,15 @@ contract EmissionProvider is OracleContractAdapter, ServiceAllowance, EmissionPr
         require(msg.sender == Token(token).getLatestVersion());
         require(oracles[_sender]);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -361,7 +361,7 @@ contract ERC20 is IERC20 {
 
     // map for lock
     mapping (address => uint) public lockedAccount;
-    
+
     // event for lock
     event Lock(address target, uint amount);
     event UnLock(address target, uint amount);
@@ -547,7 +547,7 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
-    
+
     /**
      * @dev Function to lock tokens of address
      * @param amount The amount of tokens that is locked.
@@ -572,7 +572,7 @@ contract ERC20 is IERC20 {
         lockedAccount[account] = lockedAccount[account].sub(amount);
         _balances[account] = _balances[account].add(amount);
         emit UnLock(account, lockedAccount[account]);
-        
+
         return true;
     }
 }
@@ -650,7 +650,7 @@ contract ERC20Pausable is ERC20, Pausable {
 /**
  * @title UXB token
  *
- * @dev Implementation of the UXB token 
+ * @dev Implementation of the UXB token
  */
 contract UXBToken is Ownable, ERC20Burnable, ERC20Mintable, ERC20Pausable {
 
@@ -725,4 +725,15 @@ contract UXBToken is Ownable, ERC20Burnable, ERC20Mintable, ERC20Pausable {
         require(!frozenAccount[_to]);               // Check if recipient is frozen
         return super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

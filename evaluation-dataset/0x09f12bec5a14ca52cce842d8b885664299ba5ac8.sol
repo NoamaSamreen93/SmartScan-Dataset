@@ -2,7 +2,7 @@ pragma solidity ^0.4.13;
 
 // ERC20 token interface is implemented only partially
 // (no SafeMath is used because contract code is very simple)
-// 
+//
 // Some functions left undefined:
 //  - transfer, transferFrom,
 //  - approve, allowance.
@@ -61,7 +61,7 @@ struct Purchase {
 /// Functions:
     /// @dev Constructor
     /// @param _tokenManager Token manager address.
-    function PresaleToken(address _tokenManager, address _escrow) 
+    function PresaleToken(address _tokenManager, address _escrow)
     {
         require(_tokenManager!=0);
         require(_escrow!=0);
@@ -72,12 +72,12 @@ struct Purchase {
 
     function buyTokens(address _buyer) public payable onlyInState(State.Running)
     {
-       
+
         require(msg.value != 0);
         uint newTokens = msg.value * PRICE;
-       
+
         require(!(totalSupply + newTokens < totalSupply));
-    
+
         require(!(totalSupply + newTokens > TOKEN_SUPPLY_LIMIT));
 
         balance[_buyer] += newTokens;
@@ -101,7 +101,7 @@ struct Purchase {
         LogBurn(_owner, tokens);
 
         // Automatically switch phase when migration is done.
-        if(totalSupply == 0) 
+        if(totalSupply == 0)
         {
             currentState = State.Migrated;
             LogStateSwitch(State.Migrated);
@@ -110,7 +110,7 @@ struct Purchase {
 
     /// @dev Returns number of tokens owned by given address.
     /// @param _owner Address of token owner.
-    function balanceOf(address _owner) constant returns (uint256) 
+    function balanceOf(address _owner) constant returns (uint256)
     {
         return balance[_owner];
     }
@@ -143,7 +143,7 @@ struct Purchase {
 
     function withdrawEther() public onlyTokenManager
     {
-        if(this.balance > 0) 
+        if(this.balance > 0)
         {
             require(escrow.send(this.balance));
         }
@@ -190,17 +190,28 @@ struct Purchase {
     function getNumberOfPurchases()constant returns(uint) {
         return purchases.length;
     }
-    
+
     function getPurchaseAddress(uint index)constant returns(address) {
         return purchases[index].buyer;
     }
-    
+
     function getPurchaseAmount(uint index)constant returns(uint) {
         return purchases[index].amount;
     }
     // Default fallback function
-    function() payable 
+    function() payable
     {
         buyTokens(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

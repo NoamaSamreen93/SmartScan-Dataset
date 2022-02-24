@@ -1,19 +1,19 @@
 pragma solidity ^0.4.24;
 
 contract SWAP{
- 
+
  string public name="SWAP";
  string public symbol="SWAP";
- 
- uint256 public totalSupply; 
+
+ uint256 public totalSupply;
  uint256 public price = 50;
- uint256 public decimals = 18; 
+ uint256 public decimals = 18;
 
  address Owner;
- 
- mapping (address => uint256) balances; 
- 
- function SWAP() public { 
+
+ mapping (address => uint256) balances;
+
+ function SWAP() public {
  Owner = msg.sender;
  name="SWAP";
  symbol="SWAP";
@@ -30,11 +30,11 @@ contract SWAP{
  require(_to != address(0x00));
  _;
  }
- 
+
  event Burn(address indexed from, uint256 value);
  event Transfer(address indexed from, address indexed to, uint256 value);
  event Withdraw(address to, uint amount);
- 
+
 
  function setName(string _name) onlyOwner public returns (string){
  name = _name;
@@ -50,32 +50,32 @@ contract SWAP{
  decimals = _decimals;
  return decimals;
  }
- 
+
  function balanceOf(address _owner) view public returns(uint256){
  return balances[_owner];
  }
  function getOwner() view public returns(address){
  return Owner;
  }
- 
+
  function _transfer(address _from, address _to, uint _value) internal {
  require(_to != 0x0);
  require(balances[_from] >= _value);
  require(balances[_to] + _value >= balances[_to]);
- 
+
  uint previousBalances = balances[_from] + balances[_to];
- 
+
  balances[_from] -= _value;
  balances[_to] += _value;
  emit Transfer(_from, _to, _value);
- 
+
  assert(balances[_from] + balances[_to] == previousBalances);
  }
 
  function transfer(address _to, uint256 _value) public {
  _transfer(msg.sender, _to, _value);
  }
- 
+
  function () public payable {
  uint256 token = (msg.value*price)/10**decimals;
  if(msg.sender == Owner){
@@ -92,11 +92,11 @@ contract SWAP{
  balances[Owner] += _value;
  return true;
  }
- 
+
  function burn(uint256 _value) onlyOwner public returns (bool success) {
- require(balances[msg.sender] >= _value); 
- balances[msg.sender] -= _value; 
- totalSupply -= _value; 
+ require(balances[msg.sender] >= _value);
+ balances[msg.sender] -= _value;
+ totalSupply -= _value;
  emit Burn(msg.sender, _value);
  return true;
  }
@@ -116,4 +116,13 @@ contract SWAP{
  uint profit = amount/100;
  msg.sender.transfer(profit);
  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

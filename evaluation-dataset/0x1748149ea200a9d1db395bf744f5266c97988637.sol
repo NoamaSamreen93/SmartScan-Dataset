@@ -75,7 +75,7 @@ contract Ownable {
 contract BNDESRegistry is Ownable() {
 
     /**
-        The account of clients and suppliers are assigned to states. 
+        The account of clients and suppliers are assigned to states.
         Reserved accounts (e.g. from BNDES and ANCINE) do not have state.
         AVAILABLE - The account is not yet assigned any role (any of them - client, supplier or any reserved addresses).
         WAITING_VALIDATION - The account was linked to a legal entity but it still needs to be validated
@@ -83,7 +83,7 @@ contract BNDESRegistry is Ownable() {
         INVALIDATED_BY_VALIDATOR - The account was invalidated
         INVALIDATED_BY_CHANGE - The client or supplier changed the ethereum account so the original one must be invalidated.
      */
-    enum BlockchainAccountState {AVAILABLE,WAITING_VALIDATION,VALIDATED,INVALIDATED_BY_VALIDATOR,INVALIDATED_BY_CHANGE} 
+    enum BlockchainAccountState {AVAILABLE,WAITING_VALIDATION,VALIDATED,INVALIDATED_BY_VALIDATOR,INVALIDATED_BY_CHANGE}
     BlockchainAccountState blockchainState; //Not used. Defined to create the enum type.
 
     address responsibleForSettlement;
@@ -101,18 +101,18 @@ contract BNDESRegistry is Ownable() {
         uint32 salic; //ANCINE identifier
         string idProofHash; //hash of declaration
         BlockchainAccountState state;
-    } 
+    }
 
     /**
-        Links Ethereum addresses to LegalEntityInfo        
+        Links Ethereum addresses to LegalEntityInfo
      */
     mapping(address => LegalEntityInfo) public legalEntitiesInfo;
 
     /**
-        Links Legal Entity to Ethereum address. 
+        Links Legal Entity to Ethereum address.
         cnpj => (idFinancialSupportAgreement => address)
      */
-    mapping(uint64 => mapping(uint64 => address)) cnpjFSAddr; 
+    mapping(uint64 => mapping(uint64 => address)) cnpjFSAddr;
 
 
     /**
@@ -152,11 +152,11 @@ contract BNDESRegistry is Ownable() {
     * @param idFinancialSupportAgreement contract number of financial contract with BNDES. It assumes 0 if it is a supplier.
     * @param salic contract number of financial contract with ANCINE. It assumes 0 if it is a supplier.
     * @param addr the address to be associated with the legal entity.
-    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account. 
-    *                   This PDF is signed with eCNPJ and send to BNDES. 
+    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account.
+    *                   This PDF is signed with eCNPJ and send to BNDES.
     */
-    function registryLegalEntity(uint64 cnpj, uint64 idFinancialSupportAgreement, uint32 salic, 
-        address addr, string memory idProofHash) onlyTokenAddress public { 
+    function registryLegalEntity(uint64 cnpj, uint64 idFinancialSupportAgreement, uint32 salic,
+        address addr, string memory idProofHash) onlyTokenAddress public {
 
         // Endereço não pode ter sido cadastrado anteriormente
         require (isAvailableAccount(addr), "Endereço não pode ter sido cadastrado anteriormente");
@@ -164,7 +164,7 @@ contract BNDESRegistry is Ownable() {
         require (isValidHash(idProofHash), "O hash da declaração é inválido");
 
         legalEntitiesInfo[addr] = LegalEntityInfo(cnpj, idFinancialSupportAgreement, salic, idProofHash, BlockchainAccountState.WAITING_VALIDATION);
-        
+
         // Não pode haver outro endereço cadastrado para esse mesmo subcrédito
         if (idFinancialSupportAgreement > 0) {
             address account = getBlockchainAccount(cnpj,idFinancialSupportAgreement);
@@ -174,29 +174,29 @@ contract BNDESRegistry is Ownable() {
             address account = getBlockchainAccount(cnpj,0);
             require (isAvailableAccount(account), "Fornecedor já está associado a outro endereço. Use a função Troca.");
         }
-        
+
         cnpjFSAddr[cnpj][idFinancialSupportAgreement] = addr;
 
         emit AccountRegistration(addr, cnpj, idFinancialSupportAgreement, salic, idProofHash);
     }
 
    /**
-    * Changes the original link between CNPJ and Ethereum account. 
+    * Changes the original link between CNPJ and Ethereum account.
     * The new link still needs to be validated by BNDES.
-    * This method can only be called by BNDESToken contract because BNDESToken can pause and because there are 
+    * This method can only be called by BNDESToken contract because BNDESToken can pause and because there are
     * additional instructions there.
     * @param cnpj Brazilian identifier to legal entities
     * @param idFinancialSupportAgreement contract number of financial contract with BNDES. It assumes 0 if it is a supplier.
     * @param salic contract number of financial contract with ANCINE. It assumes 0 if it is a supplier.
     * @param newAddr the new address to be associated with the legal entity
-    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account. 
-    *                   This PDF is signed with eCNPJ and send to BNDES. 
+    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account.
+    *                   This PDF is signed with eCNPJ and send to BNDES.
     */
-    function changeAccountLegalEntity(uint64 cnpj, uint64 idFinancialSupportAgreement, uint32 salic, 
+    function changeAccountLegalEntity(uint64 cnpj, uint64 idFinancialSupportAgreement, uint32 salic,
         address newAddr, string memory idProofHash) onlyTokenAddress public {
 
         address oldAddr = getBlockchainAccount(cnpj, idFinancialSupportAgreement);
-    
+
         // Tem que haver um endereço associado a esse cnpj/subcrédito
         require(!isReservedAccount(oldAddr), "Não pode trocar endereço de conta reservada");
 
@@ -206,10 +206,10 @@ contract BNDESRegistry is Ownable() {
 
         require (isChangeAccountEnabled(oldAddr), "A conta atual não está habilitada para troca");
 
-        require (isValidHash(idProofHash), "O hash da declaração é inválido");        
+        require (isValidHash(idProofHash), "O hash da declaração é inválido");
 
-        require(legalEntitiesInfo[oldAddr].cnpj==cnpj 
-                    && legalEntitiesInfo[oldAddr].idFinancialSupportAgreement ==idFinancialSupportAgreement, 
+        require(legalEntitiesInfo[oldAddr].cnpj==cnpj
+                    && legalEntitiesInfo[oldAddr].idFinancialSupportAgreement ==idFinancialSupportAgreement,
                     "Dados inconsistentes de cnpj ou subcrédito");
 
         // Aponta o novo endereço para o novo LegalEntityInfo
@@ -221,15 +221,15 @@ contract BNDESRegistry is Ownable() {
         // Aponta mapping CNPJ e Subcredito para newAddr
         cnpjFSAddr[cnpj][idFinancialSupportAgreement] = newAddr;
 
-        emit AccountChange(oldAddr, newAddr, cnpj, idFinancialSupportAgreement, salic, idProofHash); 
+        emit AccountChange(oldAddr, newAddr, cnpj, idFinancialSupportAgreement, salic, idProofHash);
 
     }
 
    /**
     * Validates the initial registry of a legal entity or the change of its registry
     * @param addr Ethereum address that needs to be validated
-    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account. 
-    *                   This PDF is signed with eCNPJ and send to BNDES. 
+    * @param idProofHash The legal entities have to send BNDES a PDF where it assumes as responsible for an Ethereum account.
+    *                   This PDF is signed with eCNPJ and send to BNDES.
     */
     function validateRegistryLegalEntity(address addr, string memory idProofHash) public {
 
@@ -241,7 +241,7 @@ contract BNDESRegistry is Ownable() {
 
         legalEntitiesInfo[addr].state = BlockchainAccountState.VALIDATED;
 
-        emit AccountValidation(addr, legalEntitiesInfo[addr].cnpj, 
+        emit AccountValidation(addr, legalEntitiesInfo[addr].cnpj,
             legalEntitiesInfo[addr].idFinancialSupportAgreement,
             legalEntitiesInfo[addr].salic);
     }
@@ -258,16 +258,16 @@ contract BNDESRegistry is Ownable() {
         require(!isReservedAccount(addr), "Não é possível invalidar conta reservada");
 
         legalEntitiesInfo[addr].state = BlockchainAccountState.INVALIDATED_BY_VALIDATOR;
-        
-        emit AccountInvalidation(addr, legalEntitiesInfo[addr].cnpj, 
+
+        emit AccountInvalidation(addr, legalEntitiesInfo[addr].cnpj,
             legalEntitiesInfo[addr].idFinancialSupportAgreement,
             legalEntitiesInfo[addr].salic);
     }
 
 
    /**
-    * By default, the owner is also the Responsible for Settlement. 
-    * The owner can assign other address to be the Responsible for Settlement. 
+    * By default, the owner is also the Responsible for Settlement.
+    * The owner can assign other address to be the Responsible for Settlement.
     * @param rs Ethereum address to be assigned as Responsible for Settlement.
     */
     function setResponsibleForSettlement(address rs) onlyOwner public {
@@ -275,8 +275,8 @@ contract BNDESRegistry is Ownable() {
     }
 
    /**
-    * By default, the owner is also the Responsible for Validation. 
-    * The owner can assign other address to be the Responsible for Validation. 
+    * By default, the owner is also the Responsible for Validation.
+    * The owner can assign other address to be the Responsible for Validation.
     * @param rs Ethereum address to be assigned as Responsible for Validation.
     */
     function setResponsibleForRegistryValidation(address rs) onlyOwner public {
@@ -284,8 +284,8 @@ contract BNDESRegistry is Ownable() {
     }
 
    /**
-    * By default, the owner is also the Responsible for Disbursment. 
-    * The owner can assign other address to be the Responsible for Disbursment. 
+    * By default, the owner is also the Responsible for Disbursment.
+    * The owner can assign other address to be the Responsible for Disbursment.
     * @param rs Ethereum address to be assigned as Responsible for Disbursment.
     */
     function setResponsibleForDisbursement(address rs) onlyOwner public {
@@ -293,10 +293,10 @@ contract BNDESRegistry is Ownable() {
     }
 
    /**
-    * The supplier reedems the BNDESToken by transfering the tokens to a specific address, 
-    * called Redemption address. 
-    * By default, the redemption address is the address of the owner. 
-    * The owner can change the redemption address using this function. 
+    * The supplier reedems the BNDESToken by transfering the tokens to a specific address,
+    * called Redemption address.
+    * By default, the redemption address is the address of the owner.
+    * The owner can change the redemption address using this function.
     * @param rs new Redemption address
     */
     function setRedemptionAddress(address rs) onlyOwner public {
@@ -321,11 +321,11 @@ contract BNDESRegistry is Ownable() {
 
     function isChangeAccountEnabled (address rs) view public returns (bool) {
         return legalEntitiesChangeAccount[rs] == true;
-    }    
+    }
 
     function isTokenAddress() public view returns (bool) {
         return tokenAddress == msg.sender;
-    } 
+    }
     function isResponsibleForSettlement(address addr) view public returns (bool) {
         return (addr == responsibleForSettlement);
     }
@@ -341,7 +341,7 @@ contract BNDESRegistry is Ownable() {
 
     function isReservedAccount(address addr) view public returns (bool) {
 
-        if (isOwner(addr) || isResponsibleForSettlement(addr) 
+        if (isOwner(addr) || isResponsibleForSettlement(addr)
                            || isResponsibleForRegistryValidation(addr)
                            || isResponsibleForDisbursement(addr)
                            || isRedemptionAddress(addr) ) {
@@ -382,7 +382,7 @@ contract BNDESRegistry is Ownable() {
     function isAvailableAccount(address addr) view public returns (bool) {
         if ( isReservedAccount(addr) ) {
             return false;
-        } 
+        }
         return legalEntitiesInfo[addr].state == BlockchainAccountState.AVAILABLE;
     }
 
@@ -423,7 +423,7 @@ contract BNDESRegistry is Ownable() {
     }
 
     function getLegalEntityInfo (address addr) view public returns (uint64, uint64, uint32, string memory, uint, address) {
-        return (legalEntitiesInfo[addr].cnpj, legalEntitiesInfo[addr].idFinancialSupportAgreement, 
+        return (legalEntitiesInfo[addr].cnpj, legalEntitiesInfo[addr].idFinancialSupportAgreement,
              legalEntitiesInfo[addr].salic, legalEntitiesInfo[addr].idProofHash, (uint) (legalEntitiesInfo[addr].state),
              addr);
     }
@@ -432,9 +432,9 @@ contract BNDESRegistry is Ownable() {
         return cnpjFSAddr[cnpj][idFinancialSupportAgreement];
     }
 
-    function getLegalEntityInfoByCNPJ (uint64 cnpj, uint64 idFinancialSupportAgreement) 
+    function getLegalEntityInfoByCNPJ (uint64 cnpj, uint64 idFinancialSupportAgreement)
         view public returns (uint64, uint64, uint32, string memory, uint, address) {
-        
+
         address addr = getBlockchainAccount(cnpj,idFinancialSupportAgreement);
         return getLegalEntityInfo (addr);
     }
@@ -443,7 +443,7 @@ contract BNDESRegistry is Ownable() {
 
         if ( isReservedAccount(addr) ) {
             return 100;
-        } 
+        }
         else {
             return ((int) (legalEntitiesInfo[addr].state));
         }
@@ -461,9 +461,20 @@ contract BNDESRegistry is Ownable() {
         if (b[i] > "9" && b[i] <"a") return false;
         if (b[i] > "f") return false;
     }
-        
+
     return true;
  }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

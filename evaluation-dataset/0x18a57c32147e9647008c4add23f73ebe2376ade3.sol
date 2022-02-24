@@ -87,7 +87,7 @@ contract CryptoEngineerInterface {
     uint256 public prizePool = 0;
 
     function subVirus(address /*_addr*/, uint256 /*_value*/) public pure {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {}
     function fallback() public payable {}
 
     function isEngineerContract() external pure returns(bool) {}
@@ -104,21 +104,21 @@ contract CryptoBossWannaCry is PullPayment{
     bool init = false;
 	address public administrator;
     uint256 public bossRoundNumber;
-    uint256 public BOSS_HP_DEFAULT = 10000000; 
+    uint256 public BOSS_HP_DEFAULT = 10000000;
     uint256 public HALF_TIME_ATK_BOSS = 0;
     // engineer game infomation
-    uint256 constant public VIRUS_MINING_PERIOD = 86400; 
+    uint256 constant public VIRUS_MINING_PERIOD = 86400;
     uint256 public BOSS_DEF_DEFFAULT = 0;
     CryptoEngineerInterface public Engineer;
     CryptoMiningWarInterface public MiningWar;
-    
+
     // player information
     mapping(address => PlayerData) public players;
     // boss information
     mapping(uint256 => BossData) public bossData;
 
     mapping(address => bool)   public miniGames;
-        
+
     struct PlayerData {
         uint256 currentBossRoundNumber;
         uint256 lastBossRoundNumber;
@@ -173,7 +173,7 @@ contract CryptoBossWannaCry is PullPayment{
     }
     function () public payable
     {
-        
+
     }
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
     {
@@ -183,12 +183,12 @@ contract CryptoBossWannaCry is PullPayment{
     {
         return true;
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 /*_miningWarDeadline*/ ) public
     {
-    
+
     }
      //@dev use this function in case of bug
     function upgrade(address addr) public isAdministrator
@@ -198,24 +198,24 @@ contract CryptoBossWannaCry is PullPayment{
     // ---------------------------------------------------------------------------------------
     // SET INTERFACE CONTRACT
     // ---------------------------------------------------------------------------------------
-    
+
     function setMiningWarInterface(address _addr) public isAdministrator
     {
         CryptoMiningWarInterface miningWarInterface = CryptoMiningWarInterface(_addr);
 
         require(miningWarInterface.isMiningWarContract() == true);
-                
+
         MiningWar = miningWarInterface;
     }
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isEngineerContract() == true);
 
         Engineer = engineerInterface;
     }
-    function setContractsMiniGame( address _addr ) public isAdministrator 
+    function setContractsMiniGame( address _addr ) public isAdministrator
     {
         MiniGameInterface MiniGame = MiniGameInterface( _addr );
         if( MiniGame.isContractMiniGame() == false ) { revert(); }
@@ -226,7 +226,7 @@ contract CryptoBossWannaCry is PullPayment{
     function setBossRoundNumber(uint256 _value) public isAdministrator
     {
         bossRoundNumber = _value;
-    } 
+    }
     /**
     * @dev remove mini game contract from main contract
     * @param _addr mini game contract address
@@ -241,7 +241,7 @@ contract CryptoBossWannaCry is PullPayment{
         require(init == false);
         init = true;
         bossData[bossRoundNumber].ended = true;
-    
+
         startNewBoss();
     }
     /**
@@ -250,7 +250,7 @@ contract CryptoBossWannaCry is PullPayment{
     */
     function setDefenceBoss(uint256 _value) public isAdministrator
     {
-        BOSS_DEF_DEFFAULT = _value;  
+        BOSS_DEF_DEFFAULT = _value;
     }
     /**
     * @dev set HP for boss
@@ -258,11 +258,11 @@ contract CryptoBossWannaCry is PullPayment{
     */
     function setBossHPDefault(uint256 _value) public isAdministrator
     {
-        BOSS_HP_DEFAULT = _value;  
+        BOSS_HP_DEFAULT = _value;
     }
     function setHalfTimeAtkBoss(uint256 _value) public isAdministrator
     {
-        HALF_TIME_ATK_BOSS = _value;  
+        HALF_TIME_ATK_BOSS = _value;
     }
     function startNewBoss() private
     {
@@ -274,11 +274,11 @@ contract CryptoBossWannaCry is PullPayment{
         // claim 5% of current prizePool as rewards.
         uint256 engineerPrizePool = Engineer.prizePool();
         uint256 prizePool = SafeMath.div(SafeMath.mul(engineerPrizePool, 5),100);
-        Engineer.claimPrizePool(address(this), prizePool); 
+        Engineer.claimPrizePool(address(this), prizePool);
 
         bossData[bossRoundNumber] = BossData(bossRoundNumber, bossHp, BOSS_DEF_DEFFAULT, prizePool, 0x0, 0, false);
     }
-    function endAtkBoss() private 
+    function endAtkBoss() private
     {
         require(bossData[bossRoundNumber].ended == false);
         require(bossData[bossRoundNumber].totalDame >= bossData[bossRoundNumber].bossHp);
@@ -310,16 +310,16 @@ contract CryptoBossWannaCry is PullPayment{
         require(players[msg.sender].nextTimeAtk <= now);
 
         Engineer.subVirus(msg.sender, _value);
-        
+
         uint256 rate = 50 + randomNumber(msg.sender, now, 60); // 50 - 110%
-        
+
         uint256 atk = SafeMath.div(SafeMath.mul(_value, rate), 100);
-        
+
         updateShareETH(msg.sender);
 
         // update dame
         BossData storage b = bossData[bossRoundNumber];
-        
+
         uint256 currentTotalDame = b.totalDame;
         uint256 dame = 0;
         if (atk > b.def) {
@@ -351,16 +351,16 @@ contract CryptoBossWannaCry is PullPayment{
             isLastHit = true;
             endAtkBoss();
         }
-        
+
         // emit event attack boss
         emit eventAttackBoss(b.bossRoundNumber, msg.sender, _value, dame, p.dame, now, isLastHit, crystalsBonus);
     }
- 
+
     function updateShareETH(address _addr) private
     {
         PlayerData storage p = players[_addr];
-        
-        if ( 
+
+        if (
             bossData[p.currentBossRoundNumber].ended == true &&
             p.lastBossRoundNumber < p.currentBossRoundNumber
             ) {
@@ -376,15 +376,15 @@ contract CryptoBossWannaCry is PullPayment{
     {
         PlayerData memory p = players[_addr];
         BossData memory b = bossData[_bossRoundNumber];
-        if ( 
-            p.lastBossRoundNumber >= p.currentBossRoundNumber && 
-            p.currentBossRoundNumber != 0 
+        if (
+            p.lastBossRoundNumber >= p.currentBossRoundNumber &&
+            p.currentBossRoundNumber != 0
             ) {
             _share = 0;
         } else {
             if (b.totalDame == 0) return 0;
-            _share = SafeMath.div(SafeMath.mul(SafeMath.mul(b.prizePool, 95), p.dame), SafeMath.mul(b.totalDame, 100)); // prizePool * 95% * playerDame / totalDame 
-        } 
+            _share = SafeMath.div(SafeMath.mul(SafeMath.mul(b.prizePool, 95), p.dame), SafeMath.mul(b.totalDame, 100)); // prizePool * 95% * playerDame / totalDame
+        }
         if (b.ended == false)  _share = 0;
     }
     function getCurrentReward(address _addr) public view returns(uint256 _currentReward)
@@ -394,12 +394,12 @@ contract CryptoBossWannaCry is PullPayment{
         _currentReward += calculateShareETH(_addr, p.currentBossRoundNumber);
     }
 
-    function withdrawReward(address _addr) public 
+    function withdrawReward(address _addr) public
     {
         updateShareETH(_addr);
-        
+
         PlayerData storage p = players[_addr];
-        
+
         uint256 reward = SafeMath.add(p.share, p.win);
         if (address(this).balance >= reward && reward > 0) {
             _addr.transfer(reward);
@@ -419,4 +419,15 @@ contract CryptoBossWannaCry is PullPayment{
     {
         return uint256(keccak256(abi.encodePacked(now, _addr, randNonce))) % _maxNumber;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

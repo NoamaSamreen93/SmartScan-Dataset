@@ -3,44 +3,44 @@ pragma solidity 0.4.25;
 
 /**
 * ETH CRYPTOCURRENCY DISTRIBUTION PROJECT
-* 
+*
 * Web              - https://333eth.io
-* 
+*
 * Twitter          - https://twitter.com/333eth_io
-* 
+*
 * Telegram_channel - https://t.me/Ethereum333
-* 
+*
 * EN  Telegram_chat: https://t.me/Ethereum333_chat_en
-* 
+*
 * RU  Telegram_chat: https://t.me/Ethereum333_chat_ru
-* 
+*
 * KOR Telegram_chat: https://t.me/Ethereum333_chat_kor
-* 
+*
 * Email:             mailto:support(at sign)333eth.io
-* 
-* 
-* 
+*
+*
+*
 * When the timer reaches zero then latest bettor takes the bank. Each bet restart a timer again.
-* 
+*
 * Bet 0.01 ETH - if balance < 100 ETH
 * Bet 0.02 ETH - if 100 ETH <= balance <= 200 ETH
 * Bet 0.03 ETH - if 200 ETH < balance
-* 
-* The timer turns on for 5 minutes always. 
-*    
+*
+* The timer turns on for 5 minutes always.
+*
 * You need to send such bet`s amounts. If more was sent, then contract will return the difference to the wallet. For example, sending 0.03 ETH system will perceive as a contribution to 0.01 ETH and difference 0.02
-* 
+*
 * The game does not have a fraudulent Ponzi scheme. No fraudulent referral programs.
-* 
+*
 * In the contract of the game realized the refusal of ownership. It is impossible to stop the flow of bets. Bet from smart contracts is prohibited.
-* 
+*
 * Eth distribution:
 * 50% paid to the winner.
 * 33% is transferred to the next level of the game with the same rules and so on.
 * 17% commission.
-* 
+*
 * RECOMMENDED GAS LIMIT: 150000
-* 
+*
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 */
 
@@ -52,7 +52,7 @@ library Percent {
     uint num;
     uint den;
   }
-  
+
   // storage
   function mul(percent storage p, uint a) internal view returns (uint) {
     if (a == 0) {
@@ -81,7 +81,7 @@ library Percent {
     return Percent.percent(p.num, p.den);
   }
 
-  // memory 
+  // memory
   function mmul(percent memory p, uint a) internal pure returns (uint) {
     if (a == 0) {
       return 0;
@@ -223,7 +223,7 @@ library Timer {
 contract LastHero is Accessibility {
   using Percent for Percent.percent;
   using Timer for Timer.timer;
-  
+
   Percent.percent public bankPercent = Percent.percent(50, 100);
   Percent.percent public nextLevelPercent = Percent.percent(33, 100);
   Percent.percent public adminsPercent = Percent.percent(17, 100);
@@ -298,7 +298,7 @@ contract LastHero is Accessibility {
       amount = 0.03 ether;
     }
   }
-  
+
   function bankAmount() public view returns(uint) {
     if (level <= 3) {
       return jackpot;
@@ -334,7 +334,7 @@ contract LastHero is Accessibility {
         emit LogSendExcessOfEther(bettor, excess, now);
       }
     }
- 
+
     nextLevelBankAmount += nextLevelPercent.mul(betAmount);
     m_bankAmount += bankPercent.mul(betAmount);
     adminsAddress.send(adminsPercent.mul(betAmount));
@@ -360,4 +360,12 @@ contract LastHero is Accessibility {
     level++;
     emit LogNewLevel(level, m_bankAmount, now);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

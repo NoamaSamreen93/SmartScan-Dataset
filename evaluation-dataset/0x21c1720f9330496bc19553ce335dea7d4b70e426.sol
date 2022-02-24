@@ -38,13 +38,13 @@ contract ERC20Interface {
   uint public totalSupply;
   function transfer(address _to, uint256 _value) returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-  
+
   function approve(address _spender, uint256 _value) returns (bool success);
   function allowance(address _owner, address _spender) view returns (uint256 remaining);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
 contract ERC20 is ERC20Interface,SafeMath {
 
     // ?????????????balanceOf????
@@ -125,12 +125,12 @@ contract owned {
 }
 
 contract SelfDesctructionContract is owned {
-   
+
    string  public someValue;
    modifier ownerRestricted {
       require(owner == msg.sender);
       _;
-   } 
+   }
    // constructor
    function SelfDesctructionContract() {
       owner = msg.sender;
@@ -138,7 +138,7 @@ contract SelfDesctructionContract is owned {
    // a simple setter function
    function setSomeValue(string value){
       someValue = value;
-   } 
+   }
    // you can call it anything you want
    function destroyContract() ownerRestricted {
      selfdestruct(owner);
@@ -219,4 +219,15 @@ contract AdvanceToken is ERC20, owned,SelfDesctructionContract{
         emit Burn(msg.sender, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

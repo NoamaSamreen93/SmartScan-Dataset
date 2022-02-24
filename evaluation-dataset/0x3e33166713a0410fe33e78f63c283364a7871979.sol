@@ -8,19 +8,19 @@ pragma solidity ^0.4.24;
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -39,14 +39,14 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -58,30 +58,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -92,20 +92,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -118,8 +118,8 @@ library SafeMath {
 library BMKeysCalcLong {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -130,10 +130,10 @@ library BMKeysCalcLong {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -150,23 +150,23 @@ library BMKeysCalcLong {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -180,15 +180,15 @@ library BMDatasets {
         // 3-5 - air drop tracker (uint 0-999)
         // 6-16 - round end time
         // 17 - winnerTeam
-        // 18 - 28 timestamp 
+        // 18 - 28 timestamp
         // 29 - team
         // 30 - 0 = reinvest (round), 1 = buy (round), 2 = buy (ico), 3 = reinvest (ico)
         // 31 - airdrop happened bool
-        // 32 - airdrop tier 
+        // 32 - airdrop tier
         // 33 - airdrop amount won
     //compressedIDs key
     // [77-52][51-26][25-0]
-        // 0-25 - pID 
+        // 0-25 - pID
         // 26-51 - winPID
         // 52-77 - rID
     struct EventReturns {
@@ -211,9 +211,9 @@ library BMDatasets {
     struct PlayerRounds {
         uint256 eth;    // eth player has added to round (used for eth limiter)
         uint256 keys;   // keys
-        uint256 mask;   // player mask 
+        uint256 mask;   // player mask
     }
-    
+
     struct Round {
         uint256 plyr;   // pID of player in lead
         uint256 team;   // tID of team in lead
@@ -233,12 +233,12 @@ library BMDatasets {
     }
 }
 contract BMEvents {
-    
+
     // fired at end of buy or reload
     event onEndTx
     (
-        uint256 compressedData,     
-        uint256 compressedIDs,      
+        uint256 compressedData,
+        uint256 compressedIDs,
         address playerAddress,
         uint256 ethIn,
         uint256 keysBought,
@@ -249,7 +249,7 @@ contract BMEvents {
         uint256 potAmount,
         uint256 airDropPot
     );
-    
+
 	// fired whenever theres a withdraw
     event onWithdraw
     (
@@ -258,7 +258,7 @@ contract BMEvents {
         uint256 ethOut,
         uint256 timeStamp
     );
-    
+
     // fired whenever a withdraw forces end round to be ran
     event onWithdrawAndDistribute
     (
@@ -271,8 +271,8 @@ contract BMEvents {
         uint256 newPot,
         uint256 genAmount
     );
-    
-    // fired whenever a player tries a buy after round timer 
+
+    // fired whenever a player tries a buy after round timer
     // hit zero, and causes end round to be ran.
     event onBuyAndDistribute
     (
@@ -285,8 +285,8 @@ contract BMEvents {
         uint256 newPot,
         uint256 genAmount
     );
-    
-    // fired whenever a player tries a reload after round timer 
+
+    // fired whenever a player tries a reload after round timer
     // hit zero, and causes end round to be ran.
     event onReLoadAndDistribute
     (
@@ -374,14 +374,14 @@ contract BMGame is BMEvents {
         potSplit_[3] = BMDatasets.PotSplit(10);
         //48% to winner, 40% to next round, 2% to com
     }
-    
+
     //==============================================================================
     // (these are safety checks)
     //==============================================================================
 
     /**
-     * @dev used to make sure no one can interact with contract until it has 
-     * been activated. 
+     * @dev used to make sure no one can interact with contract until it has
+     * been activated.
      */
     modifier isActivated() {
         require(activated_ == true, "its not ready yet.");
@@ -389,7 +389,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev prevents contracts from interacting with bmg 
+     * @dev prevents contracts from interacting with bmg
      */
     modifier isHuman() {
         address _addr = msg.sender;
@@ -401,7 +401,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
@@ -428,7 +428,7 @@ contract BMGame is BMEvents {
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
 
-        // buy core 
+        // buy core
         buyCore(_pID, 2, _eventData_);
     }
 
@@ -452,12 +452,12 @@ contract BMGame is BMEvents {
         // verify a valid team was selected
         _team = verifyTeam(_team);
 
-        // buy core 
+        // buy core
         buyCore(_pID, _team, _eventData_);
     }
 
     /**
-     * @dev essentially the same as buy, but instead of you sending ether 
+     * @dev essentially the same as buy, but instead of you sending ether
      * from your wallet, it uses your unwithdrawn earnings.
      * @param _team what team is the player playing for?
      * @param _eth amount of earnings to use (remainder returned to gen vault)
@@ -489,7 +489,7 @@ contract BMGame is BMEvents {
     isHuman()
     public
     {
-        // setup local rID 
+        // setup local rID
         uint256 _rID = rID_;
 
         // grab time
@@ -577,7 +577,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev returns time left.  dont spam this, you'll ddos yourself from your node 
+     * @dev returns time left.  dont spam this, you'll ddos yourself from your node
      * provider
      * @return time left in seconds
      */
@@ -602,7 +602,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev returns player earnings per vaults 
+     * @dev returns player earnings per vaults
      * @return winnings vault
      * @return general vault
      */
@@ -617,13 +617,13 @@ contract BMGame is BMEvents {
         // if round has ended.  but round end has not been run (so contract has not distributed winnings)
         if (now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
-            // if player is winner 
+            // if player is winner
             if (round_[_rID].plyr == _pID)
             {
                 return
                 (
                 (plyr_[_pID].win).add(((round_[_rID].pot).mul(48)) / 100),
-                (plyr_[_pID].gen).add(getPlayerVaultsHelper(_pID, _rID).sub(plyrRnds_[_pID][_rID].mask))                
+                (plyr_[_pID].gen).add(getPlayerVaultsHelper(_pID, _rID).sub(plyrRnds_[_pID][_rID].mask))
                 );
                 // if player is not the winner
             } else {
@@ -645,7 +645,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * solidity hates stack limits.  this lets us avoid that hate 
+     * solidity hates stack limits.  this lets us avoid that hate
      */
     function getPlayerVaultsHelper(uint256 _pID, uint256 _rID)
     private
@@ -657,13 +657,13 @@ contract BMGame is BMEvents {
 
     /**
      * @dev returns all current round info needed for front end
-     * @return round id 
-     * @return total keys for round 
+     * @return round id
+     * @return total keys for round
      * @return time round ends
      * @return time round started
-     * @return current pot 
-     * @return current team ID & player ID in lead 
-     * @return current player in leads address 
+     * @return current pot
+     * @return current team ID & player ID in lead
+     * @return current player in leads address
      * @return whales eth in for round
      * @return bears eth in for round
      * @return sneks eth in for round
@@ -696,15 +696,15 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev returns player info based on address.  if no address is given, it will 
-     * use msg.sender 
-     * @param _addr address of the player you want to lookup 
-     * @return player ID 
+     * @dev returns player info based on address.  if no address is given, it will
+     * use msg.sender
+     * @param _addr address of the player you want to lookup
+     * @return player ID
      * @return player name
      * @return keys owned (current round)
      * @return winnings vault
-     * @return general vault 
-     * @return affiliate vault 
+     * @return general vault
+     * @return affiliate vault
 	 * @return player round eth
      */
     function getPlayerInfoByAddress(address _addr)
@@ -735,7 +735,7 @@ contract BMGame is BMEvents {
     // (this + tools + calcs + modules = our softwares engine)
     //==============================================================================
     /**
-     * @dev logic runs whenever a buy order is executed.  determines how to handle 
+     * @dev logic runs whenever a buy order is executed.  determines how to handle
      * incoming eth depending on if we are in an active round or not
      */
     function buyCore(uint256 _pID, uint256 _team, BMDatasets.EventReturns memory _eventData_)
@@ -750,7 +750,7 @@ contract BMGame is BMEvents {
         // if round is active
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
-            // call core 
+            // call core
             core(_rID, _pID, msg.value, _team, _eventData_);
 
             // if round is not active
@@ -766,7 +766,7 @@ contract BMGame is BMEvents {
                 _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
                 _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
 
-                // fire buy and distribute event 
+                // fire buy and distribute event
                 emit BMEvents.onBuyAndDistribute
                 (
                     msg.sender,
@@ -782,14 +782,14 @@ contract BMGame is BMEvents {
 
             core(rID_, _pID, msg.value, _team, _eventData_);
 
-            // put eth in players vault 
+            // put eth in players vault
             //plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
 
     /**
-     * @dev logic runs whenever a reload order is executed.  determines how to handle 
-     * incoming eth depending on if we are in an active round or not 
+     * @dev logic runs whenever a reload order is executed.  determines how to handle
+     * incoming eth depending on if we are in an active round or not
      */
     function reLoadCore(uint256 _pID, uint256 _team, uint256 _eth, BMDatasets.EventReturns memory _eventData_)
     private
@@ -804,11 +804,11 @@ contract BMGame is BMEvents {
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
             // get earnings from all vaults and return unused to gen vault
-            // because we use a custom safemath library.  this will throw if player 
+            // because we use a custom safemath library.  this will throw if player
             // tried to spend more eth than they have.
             plyr_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
 
-            // call core 
+            // call core
             core(_rID, _pID, _eth, _team, _eventData_);
 
             // if round is not active and end round needs to be ran
@@ -821,7 +821,7 @@ contract BMGame is BMEvents {
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
 
-            // fire buy and distribute event 
+            // fire buy and distribute event
             emit BMEvents.onReLoadAndDistribute
             (
                 msg.sender,
@@ -834,18 +834,18 @@ contract BMGame is BMEvents {
             );
 
             // get earnings from all vaults and return unused to gen vault
-            // because we use a custom safemath library.  this will throw if player 
+            // because we use a custom safemath library.  this will throw if player
             // tried to spend more eth than they have.
             plyr_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
 
-            // call core 
+            // call core
             core(rID_, _pID, _eth, _team, _eventData_);
 
         }
     }
 
     /**
-     * @dev this is the core logic for any buy/reload that happens while a round 
+     * @dev this is the core logic for any buy/reload that happens while a round
      * is live.
      */
     function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _team, BMDatasets.EventReturns memory _eventData_)
@@ -855,7 +855,7 @@ contract BMGame is BMEvents {
         if (plyrRnds_[_pID][_rID].keys == 0)
             _eventData_ = managePlayer(_pID, _eventData_);
 
-        // early round eth limiter 
+        // early round eth limiter
         if (round_[_rID].eth < 100000000000000000000 && plyrRnds_[_pID][_rID].eth.add(_eth) > 1000000000000000000)
         {
             uint256 _availableLimit = (1000000000000000000).sub(plyrRnds_[_pID][_rID].eth);
@@ -939,7 +939,7 @@ contract BMGame is BMEvents {
             // store the air drop tracker number (number of buys since last airdrop)
             _eventData_.compressedData = _eventData_.compressedData + (airDropTracker_ * 1000);
 
-            // update player 
+            // update player
             plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
             plyrRnds_[_pID][_rID].eth = _eth.add(plyrRnds_[_pID][_rID].eth);
 
@@ -970,11 +970,11 @@ contract BMGame is BMEvents {
         return ((((round_[_rIDlast].mask).mul(plyrRnds_[_pID][_rIDlast].keys)) / (1000000000000000000)).sub(plyrRnds_[_pID][_rIDlast].mask));
     }
 
-    /** 
-     * @dev returns the amount of keys you would get given an amount of eth. 
+    /**
+     * @dev returns the amount of keys you would get given an amount of eth.
      * @param _rID round ID you want price for
-     * @param _eth amount of eth sent in 
-     * @return keys received 
+     * @param _eth amount of eth sent in
+     * @return keys received
      */
     function calcKeysReceived(uint256 _rID, uint256 _eth)
     public
@@ -991,8 +991,8 @@ contract BMGame is BMEvents {
             return ((_eth).keys());
     }
 
-    /** 
-     * @dev returns current eth price for X keys.  
+    /**
+     * @dev returns current eth price for X keys.
      * @param _keys number of keys desired (in 18 decimal format)
      * @return amount of eth needed to send
      */
@@ -1016,7 +1016,7 @@ contract BMGame is BMEvents {
 
     /**
      * @dev gets existing or registers new pID.  use this when a player may be new
-     * @return pID 
+     * @return pID
      */
     function determinePID(BMDatasets.EventReturns memory _eventData_)
     private
@@ -1027,7 +1027,7 @@ contract BMGame is BMEvents {
         if (_pID == 0)
         {
             pID_++;
-            // set up player account 
+            // set up player account
             pIDxAddr_[msg.sender] = pID_;
             plyr_[pID_].addr = msg.sender;
 
@@ -1038,7 +1038,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev checks to make sure user picked a valid team.  if not sets team 
+     * @dev checks to make sure user picked a valid team.  if not sets team
      * to default (sneks)
      */
     function verifyTeam(uint256 _team)
@@ -1053,7 +1053,7 @@ contract BMGame is BMEvents {
     }
 
     /**
-     * @dev decides if round end needs to be run & new round started.  and if 
+     * @dev decides if round end needs to be run & new round started.  and if
      * player unmasked earnings from previously played rounds need to be moved.
      */
     function managePlayer(uint256 _pID, BMDatasets.EventReturns memory _eventData_)
@@ -1091,8 +1091,8 @@ contract BMGame is BMEvents {
         // grab our pot amount
         uint256 _pot = round_[_rID].pot;
 
-        // calculate our winner share, community rewards, gen share, 
-        // and amount reserved for next pot 
+        // calculate our winner share, community rewards, gen share,
+        // and amount reserved for next pot
         uint256 _win = (_pot.mul(48)) / 100;
         uint256 _com = (_pot / 50);
         uint256 _gen = (_pot.mul(potSplit_[_winTID].gen)) / 100;
@@ -1221,11 +1221,11 @@ contract BMGame is BMEvents {
         // calculate gen share
         uint256 _gen = (_eth.mul(fees_[_team].gen)) / 100;
 
-        // toss 5% into airdrop pot 
+        // toss 5% into airdrop pot
         uint256 _air = (_eth / 20);
         airDropPot_ = airDropPot_.add(_air);
 
-        // calculate pot 
+        // calculate pot
         uint256 _pot = _eth.sub(_com).sub(_air).sub(_gen);
 
         // distribute gen share (thats what updateMasks() does) and adjust
@@ -1246,7 +1246,7 @@ contract BMGame is BMEvents {
 
     /**
      * @dev updates masks for round and player when keys are bought
-     * @return dust left over 
+     * @return dust left over
      */
     function updateMasks(uint256 _rID, uint256 _pID, uint256 _gen, uint256 _keys)
     private
@@ -1257,7 +1257,7 @@ contract BMGame is BMEvents {
             the basic thing to understand here.  is were going to have a global
             tracker based on profit per share for each round, that increases in
             relevant proportion to the increase in share supply.
-            
+
             the player will have an additional mask that basically says "based
             on the rounds mask, my shares, and how much i've already withdrawn,
             how much is still owed to me?"
@@ -1287,7 +1287,7 @@ contract BMGame is BMEvents {
         // update gen vault
         updateGenVault(_pID, plyr_[_pID].lrnd);
 
-        // from vaults 
+        // from vaults
         uint256 _earnings = (plyr_[_pID].win).add(plyr_[_pID].gen);
         if (_earnings > 0)
         {
@@ -1327,7 +1327,7 @@ contract BMGame is BMEvents {
     // (activate)
     //==============================================================================
     /** upon contract deploy, it will be deactivated.  this is a one time
-     * use function that will activate the contract.  we do this so devs 
+     * use function that will activate the contract.  we do this so devs
      * have time to set things up on the web end                            **/
     bool public activated_ = false;
 
@@ -1339,7 +1339,7 @@ contract BMGame is BMEvents {
         require(msg.sender == owner, 'only dev!');
         require(activated_ == false, "BiMoney Game already activated");
 
-        // activate the contract 
+        // activate the contract
         activated_ = true;
 
         Banker_Address = msg.sender;
@@ -1351,4 +1351,17 @@ contract BMGame is BMEvents {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

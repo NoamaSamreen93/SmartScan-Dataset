@@ -81,7 +81,7 @@ contract NovaGameAccess is iNovaGame {
   event OperatorPrivilegesChanged(uint indexed game, address indexed account, bool isAdmin);
 
   // Admin addresses are stored both by gameId and address
-  mapping(uint => address[]) public adminAddressesByGameId; 
+  mapping(uint => address[]) public adminAddressesByGameId;
   mapping(address => uint[]) public gameIdsByAdminAddress;
 
   // Stores admin status (as a boolean) by gameId and account
@@ -116,7 +116,7 @@ contract NovaGameAccess is iNovaGame {
   // @dev gets the list of admins for a game
   // @param _game - the gameId of the game
   // @returns address[] - the list of admin addresses for the requested game
-  function getAdminsForGame(uint _game) 
+  function getAdminsForGame(uint _game)
     external
     view
   returns(address[]) {
@@ -126,7 +126,7 @@ contract NovaGameAccess is iNovaGame {
   // @dev gets the list of games that the requested account is the admin of
   // @param _account - the address of the user
   // @returns uint[] - the list of game Ids for the requested account
-  function getGamesForAdmin(address _account) 
+  function getGamesForAdmin(address _account)
     external
     view
   returns(uint[]) {
@@ -158,7 +158,7 @@ contract NovaGameAccess is iNovaGame {
   {
     require(_account != msg.sender);
     require(gameAdmins[_game][_account]);
-    
+
     address[] storage opsAddresses = adminAddressesByGameId[_game];
     uint startingLength = opsAddresses.length;
     // Yes, "i < startingLength" is right. 0 - 1 == uint.maxvalue, not -1.
@@ -240,28 +240,28 @@ contract NovaGame is NovaGameAccess {
   event GameCreated(uint indexed game, address indexed owner, string json, bytes32[] metadata);
 
   event GameMetadataUpdated(
-    uint indexed game, 
+    uint indexed game,
     string json,
-    uint tradeLockSeconds, 
+    uint tradeLockSeconds,
     bytes32[] metadata
   );
 
   mapping(uint => GameData) internal gameData;
 
-  constructor(address _stakingContract) 
-    public 
+  constructor(address _stakingContract)
+    public
     NovaGameAccess(_stakingContract)
   {
     games.push(2**32);
   }
 
-  // @dev Create a new game by setting its data. 
+  // @dev Create a new game by setting its data.
   //   Created games are initially owned and managed by the game's creator
   // @notice - there's a maximum of 2^32 games (4.29 billion games)
   // @param _json - a json encoded string containing the game's name, uri, logo, description, etc
   // @param _tradeLockSeconds - the number of seconds a card remains locked to a purchaser's account
-  // @param _metadata - game-specific metadata, in bytes32 format. 
-  function createGame(string _json, uint _tradeLockSeconds, bytes32[] _metadata) 
+  // @param _metadata - game-specific metadata, in bytes32 format.
+  function createGame(string _json, uint _tradeLockSeconds, bytes32[] _metadata)
     external
   returns(uint _game) {
     // Create the game
@@ -281,7 +281,7 @@ contract NovaGame is NovaGameAccess {
 
   // @dev Gets the number of games in the system
   // @returns the number of games stored in the system
-  function numberOfGames() 
+  function numberOfGames()
     external
     view
   returns(uint) {
@@ -293,7 +293,7 @@ contract NovaGame is NovaGameAccess {
   // @returns game - the game ID of the requested game
   // @returns json - the json data of the game
   // @returns tradeLockSeconds - the number of card sets
-  // @returns balance - the Nova Token balance 
+  // @returns balance - the Nova Token balance
   // @returns metadata - a bytes32 array of metadata used by the game
   function getGameData(uint _game)
     external
@@ -302,7 +302,7 @@ contract NovaGame is NovaGameAccess {
     string json,
     uint tradeLockSeconds,
     uint256 balance,
-    bytes32[] metadata) 
+    bytes32[] metadata)
   {
     GameData storage data = gameData[_game];
     game = _game;
@@ -316,7 +316,7 @@ contract NovaGame is NovaGameAccess {
   // @param _game - the # of the game
   // @param _json - a json encoded string containing the game's name, uri, logo, description, etc
   // @param _tradeLockSeconds - the number of seconds a card remains locked to a purchaser's account
-  // @param _metadata - game-specific metadata, in bytes32 format. 
+  // @param _metadata - game-specific metadata, in bytes32 format.
   function updateGameMetadata(uint _game, string _json, uint _tradeLockSeconds, bytes32[] _metadata)
     public
     onlyGameAdmin(_game)
@@ -332,4 +332,15 @@ contract NovaGame is NovaGameAccess {
 
     emit GameMetadataUpdated(_game, _json, _tradeLockSeconds, _metadata);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

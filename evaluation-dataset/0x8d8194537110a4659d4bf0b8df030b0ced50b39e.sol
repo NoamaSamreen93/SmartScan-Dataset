@@ -139,7 +139,7 @@ contract ProfitSharing is Ownable, Destructible, Pausable {
         token = BalanceHistoryToken(_tokenAddress);
     }
 
-    /// @dev Default payable fallback. 
+    /// @dev Default payable fallback.
     function () public payable {
     }
 
@@ -148,12 +148,12 @@ contract ProfitSharing is Ownable, Destructible, Pausable {
         withdrawFor(msg.sender);
     }
 
-    /// @dev Allows someone to call withdraw on behalf of someone else. 
+    /// @dev Allows someone to call withdraw on behalf of someone else.
     /// Useful if we expose via web3 but metamask account is different than owner of tokens.
     function withdrawFor(address tokenOwner) public whenNotPaused {
         // Ensure that this address hasn't been previously paid out for this period.
         require(!payments[tokenOwner][currentPeriod.block]);
-        
+
         // Check if it is time to calculate the next payout period.
         resetPeriod();
 
@@ -171,7 +171,7 @@ contract ProfitSharing is Ownable, Destructible, Pausable {
     function resetPeriod() internal {
         uint nowTime = getNow();
         if (currentPeriod.endTime < nowTime) {
-            currentPeriod.endTime = uint128(nowTime.add(periodDuration)); 
+            currentPeriod.endTime = uint128(nowTime.add(periodDuration));
             currentPeriod.block = uint128(block.number);
             currentPeriod.balance = uint128(this.balance);
             if (token != address(0x0)) {
@@ -217,7 +217,7 @@ contract ProfitSharing is Ownable, Destructible, Pausable {
     /// @dev Forces a period reset
     function forceResetPeriod() public onlyOwner {
         uint nowTime = getNow();
-        currentPeriod.endTime = uint128(nowTime.add(periodDuration)); 
+        currentPeriod.endTime = uint128(nowTime.add(periodDuration));
         currentPeriod.block = uint128(block.number);
         currentPeriod.balance = uint128(this.balance);
         if (token != address(0x0)) {
@@ -258,7 +258,7 @@ library SafeMath {
 contract FullERC20 {
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-  
+
   uint256 public totalSupply;
   uint8 public decimals;
 
@@ -271,4 +271,15 @@ contract FullERC20 {
 
 contract BalanceHistoryToken is FullERC20 {
   function balanceOfAtBlock(address who, uint256 blockNumber) public view returns (uint256);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

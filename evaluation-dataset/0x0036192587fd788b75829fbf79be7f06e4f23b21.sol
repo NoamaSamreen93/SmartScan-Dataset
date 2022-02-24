@@ -317,7 +317,7 @@ contract AdminableProxy is AdminUpgradeabilityProxy {
   /**
    * Contract constructor.
    */
-  constructor(address _implementation, bytes memory _data) 
+  constructor(address _implementation, bytes memory _data)
   AdminUpgradeabilityProxy(_implementation, _data) public payable {
   }
 
@@ -343,8 +343,19 @@ contract ExitHandler  {
 }
 contract ExitHandlerProxy is AdminableProxy {
 
-  constructor(ExitHandler _implementation, bytes memory _data) 
+  constructor(ExitHandler _implementation, bytes memory _data)
     AdminableProxy(address(_implementation), _data) public payable {
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

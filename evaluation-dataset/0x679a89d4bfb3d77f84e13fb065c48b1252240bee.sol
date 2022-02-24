@@ -32,7 +32,7 @@ contract ERC20TokenInterface is BasicTokenInterface, ApproveAndCallFallBack{
     uint8 public decimals;
     uint256 public totalSupply;
 
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining);   
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
     function transferTokens(address token, uint amount) public returns (bool success);
@@ -45,7 +45,7 @@ pragma experimental "v0.5.0";
 
 
 library SafeMath {
-    
+
     //Guard overflow by making 0 an impassable barrier
     function add(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
@@ -71,17 +71,17 @@ library SafeMath {
 
 contract BasicToken is BasicTokenInterface{
     using SafeMath for uint;
-    
+
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
     uint public totalSupply;
     mapping (address => uint256) internal balances;
-    
+
     modifier checkpayloadsize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
-    } 
+    }
 
     function transfer(address _to, uint256 _value) public checkpayloadsize(2*32) returns (bool success) {
         require(balances[msg.sender] >= _value);
@@ -201,7 +201,7 @@ contract Glitter is ERC20Token {
         totalSupply += tokensBought;
         emit Transfer(address(this),msg.sender,tokensBought);
     }
-    
+
     constructor() public {
         name = "Green Light Rewards ";
         symbol = "GLITTER";
@@ -221,4 +221,20 @@ contract Glitter is ERC20Token {
     function getTokenPrice() public view returns(uint){
         return tokenPrice;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -14,7 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 contract Etherich {
     address public owner;
-    
+
     uint constant public PARTICIPATION_FEE = 0.1 ether;
     uint[] public REFERRAL_RATE = [40, 25, 15, 10, 5];
 
@@ -23,7 +23,7 @@ contract Etherich {
     uint public memberCount;
 
     event HasNewMember(uint memberCount);
-    
+
     function Etherich() public {
         owner = msg.sender;
         members[owner] = 1;
@@ -33,22 +33,22 @@ contract Etherich {
 
         memberCount = 1;
     }
-    
+
     function participate(string referral) public payable {
         require(referralCodes[referral] != 0);
         require(members[msg.sender] == 0);
         require(msg.value == PARTICIPATION_FEE);
-        
+
         address referrer = referralCodes[referral];
         members[msg.sender] = referrer;
         string memory alphabetHash = hash(msg.sender);
         referralCodes[alphabetHash] = msg.sender;
-        
+
         for (uint16 i = 0; i<5; i++) {
             if (referrer == 1) {
                 break;
             }
-            
+
             uint256 amount = SafeMath.div(SafeMath.mul(msg.value, REFERRAL_RATE[i]), 100);
             referrer.transfer(amount);
             referrer = members[referrer];
@@ -57,15 +57,15 @@ contract Etherich {
         memberCount++;
         HasNewMember(memberCount);
     }
-    
+
     function isMember(address a) public view returns(bool) {
         return !(members[a] == 0);
     }
-    
+
     function doesReferralCodeValid(string code) public view returns(bool) {
         return !(referralCodes[code] == 0);
     }
-    
+
     function referralCodeFromAddress(address a) public view returns (string) {
         if (this.isMember(a)) {
             return hash(a);
@@ -77,7 +77,7 @@ contract Etherich {
     function getReferralRates() public view returns (uint[]) {
         return REFERRAL_RATE;
     }
-    
+
     function payout(address receiver, uint amount) public restricted {
         if (amount > this.balance) {
             receiver.transfer(this.balance);
@@ -89,12 +89,12 @@ contract Etherich {
     function changeOwner(address newOwner) public restricted {
         owner = newOwner;
     }
-    
+
     function hash(address a) private pure returns (string) {
         bytes32 sha3Hash = keccak256(bytes20(a));
         return bytes32ToAlphabetString(sha3Hash);
     }
-    
+
     function bytes32ToAlphabetString(bytes32 x) private pure returns (string) {
         bytes memory bytesString = new bytes(32);
         uint8 charCount = 0;
@@ -107,8 +107,8 @@ contract Etherich {
         }
 
         return string(bytesString);
-    } 
-    
+    }
+
     modifier restricted() {
         require(msg.sender == owner);
         _;
@@ -137,4 +137,17 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

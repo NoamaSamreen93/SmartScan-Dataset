@@ -875,7 +875,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1042,23 +1042,23 @@ contract nbagame is usingOraclize {
 	uint public constant BETTING_OPENS = 1520125200;
 	uint public constant BETTING_CLOSES = 1520393400; // Close 5 minutes after scheduled game start
   // -----------------------------------------------------------------------------------------------------
-   
+
   uint public constant TOTAL_POOL_COMMISSION = 10; // Total pool commission psuedo 5% (10% from losing side bet)
   uint public constant EARLY_BET_INCENTIVE_COMMISSION = 4; // The early bettors take pseudo 2% commission to incentivize early betting
   uint public constant OWNER_POOL_COMMISSION = 6; // The owner at the end of the betting phase takes pseudo 3% commission (150% more than creator)
-  
+
   uint public constant MINIMUM_BET = 0.01 ether; // 0.01 ETH is min bet
 
   uint public constant PAYOUT_ATTEMPT_INTERVAL = 64800; // 16 hours for each ping attempt
   uint public constant BET_RELEASE_DATE = BETTING_CLOSES + 172700; // Release funds if invalid result 48 hours later
   uint public constant PAYOUT_DATE = BETTING_CLOSES + PAYOUT_ATTEMPT_INTERVAL; // First payout attempt
-  
+
   uint public constant STAGE_ONE_BET_LIMIT = 0.2 ether; // Staged limits for commission incentive
   //uint public constant STAGE_TWO_BET_LIMIT = 1 ether;
 
   bool public payoutCompleted;
   bool public stage2NotReached = true;
-  
+
   struct Bettor {
     uint[NUM_TEAMS] amountsBet;
 	uint[NUM_TEAMS] amountsBetStage1;
@@ -1076,7 +1076,7 @@ contract nbagame is usingOraclize {
   //uint public numberOfPingsReceived;
   //uint public numberOfSuccessfulPings;
   uint public contractPrice = 0.05 ether;		// Starting price of 0.05 ETH for contract
-  
+
   uint private firstStepLimit = 0.1 ether;      // Step price increase to exit smaller numbers quicker
   uint private secondStepLimit = 0.5 ether;
 
@@ -1103,9 +1103,9 @@ contract nbagame is usingOraclize {
     );
     _;
   }
-  
+
   /* Functions */
-  
+
   // Constructor
   function nbagame() public {
     owner = msg.sender;
@@ -1116,7 +1116,7 @@ contract nbagame is usingOraclize {
   // Creator only, failsafe in case everything fails, we can give everyone their money back.
   function triggerRelease() public onlyCreatorLevel {
     require(now > BET_RELEASE_DATE);
-    
+
     releaseBets();
   }
 
@@ -1125,7 +1125,7 @@ contract nbagame is usingOraclize {
   function _addressNotNull(address _adr) private pure returns (bool) {
     return _adr != address(0);
   }
-  
+
   function pingOracle(uint pingDelay) private {
     // Ping oracle after pingDelay time to query result
     oraclize_query(pingDelay, "WolframAlpha", searchString);
@@ -1135,35 +1135,35 @@ contract nbagame is usingOraclize {
   // Callback from Oraclize
   function __callback(bytes32 queryId, string result, bytes proof) public {
 	//numberOfPingsReceived++;
-	  
+
     require(payoutCompleted == false);
     require(msg.sender == oraclize_cbAddress());
-    
+
     //numberOfSuccessfulPings++;
-    
+
     // Determine winning team index based
     // on its name that the request returned
-    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) { 
+    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) {
       winningTeam = TeamType(0);
     }
     else if (keccak256(TEAM_NAMES[1]) == keccak256(result)) {
       winningTeam = TeamType(1);
     }
-    
+
     // If there's an error (failed authenticity proof, result
     // didn't match any team), then reschedule for next period interval
-    if (winningTeam == TeamType.None) {    
+    if (winningTeam == TeamType.None) {
       // Unless we are past the release date, then release funds back to the bettors
       if (now >= BET_RELEASE_DATE)
         return releaseBets();
       return pingOracle(PAYOUT_ATTEMPT_INTERVAL);
     }
-    
+
     performPayout();
   }
 
   // Returns the total amounts betted for the sender
-  function getUserBets() public constant returns(uint[NUM_TEAMS]) {    
+  function getUserBets() public constant returns(uint[NUM_TEAMS]) {
     return bettorInfo[msg.sender].amountsBet;
   }
 
@@ -1175,12 +1175,12 @@ contract nbagame is usingOraclize {
       bettors[k].transfer(SafeMath.mul(totalBet, SafeMath.div(storedBalance, totalBetAmount)));
     }
   }
-  
+
   // Returns true if betting is allowed within time frame
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES);
   }
-  
+
   // Trigger immediate payout as creator (costs small amount of additional gas)
   function triggerPayout() public onlyCreatorLevel {
     pingOracle(5);
@@ -1201,80 +1201,80 @@ contract nbagame is usingOraclize {
 	if (totalAmountsBet[teamIdx] >= STAGE_ONE_BET_LIMIT) {
 		// Accrue stage 2 commission
 		bettorInfo[msg.sender].amountsBetStage2[teamIdx] += msg.value;
-		
+
 		totalAmountsBetStage2[teamIdx] += msg.value;
 	}
-	
+
 	// If it is less
 	if (totalAmountsBet[teamIdx] < STAGE_ONE_BET_LIMIT) {
 		// Check if it will fit completely in stage 1
 		if (SafeMath.add(totalAmountsBet[teamIdx], msg.value) <= STAGE_ONE_BET_LIMIT) {
 			bettorInfo[msg.sender].amountsBetStage1[teamIdx] += msg.value;
-			
+
 			totalAmountsBetStage1[teamIdx] += msg.value;
 		} else {
 			// If it does not completely fit, include what can, and excess goes to stage 2
 			uint amountLeft = SafeMath.sub(STAGE_ONE_BET_LIMIT, totalAmountsBet[teamIdx]);
 			uint amountExcess = SafeMath.sub(msg.value, amountLeft);
-			
+
 			bettorInfo[msg.sender].amountsBetStage1[teamIdx] += amountLeft;
 			bettorInfo[msg.sender].amountsBetStage2[teamIdx] += amountExcess;
-			
+
 			totalAmountsBetStage1[teamIdx] = STAGE_ONE_BET_LIMIT;
 			totalAmountsBetStage2[teamIdx] += amountExcess;
 		}
 	}
-	
+
     // Perform bet
     bettorInfo[msg.sender].amountsBet[teamIdx] += msg.value;
     numberOfBets++;
     totalBetAmount += msg.value;
     totalAmountsBet[teamIdx] += msg.value;
   }
-  
+
   // Performs payout based on winning team
   function performPayout() private canPerformPayout {
     // Calculate total pool of ETH betted for all different teams, and for the winning pool.
-    
+
     uint losingChunk = SafeMath.sub(this.balance, totalAmountsBet[uint(winningTeam)]);
     uint currentOwnerPayoutCommission = uint256(SafeMath.div(SafeMath.mul(OWNER_POOL_COMMISSION, losingChunk), 100)); // 6% commission
     uint eachStageCommission = uint256(SafeMath.div(SafeMath.mul(1, losingChunk), 100)); // 1% commission for each stage
     // Calculate portion of commission owed to all interested parties
-   
+
     // Weighted payout to bettors based on
     // their contribution to the winning pool
     for (uint k = 0; k < bettors.length; k++) {
       uint betOnWinner = bettorInfo[bettors[k]].amountsBet[uint(winningTeam)];
       uint payout = betOnWinner + ((betOnWinner * (losingChunk - currentOwnerPayoutCommission - (4 * eachStageCommission))) / totalAmountsBet[uint(winningTeam)]);
-      
+
 	  // Pull and calculate the commission payout from stage 1 and stage 2 commission bonuses
 	  // Currently hard coded for 2 team system, check for non zero divisor
 	  if (totalAmountsBetStage1[0] > 0) {
 		  uint stageOneCommissionPayoutTeam0 = ((bettorInfo[bettors[k]].amountsBetStage1[0] * eachStageCommission) / totalAmountsBetStage1[0]);
 		  payout += stageOneCommissionPayoutTeam0;
 	  }
-	  
+
 	  if (totalAmountsBetStage1[1] > 0) {
 		  uint stageOneCommissionPayoutTeam1 = ((bettorInfo[bettors[k]].amountsBetStage1[1] * eachStageCommission) / totalAmountsBetStage1[1]);
 		  payout += stageOneCommissionPayoutTeam1;
 	  }
-	  
+
 	  if (totalAmountsBetStage2[0] > 0) {
 		  uint stageTwoCommissionPayoutTeam0 = ((bettorInfo[bettors[k]].amountsBetStage2[0] * eachStageCommission) / totalAmountsBetStage2[0]);
 		  payout += stageTwoCommissionPayoutTeam0;
 	  }
-	  
+
 	  if (totalAmountsBetStage2[1] > 0) {
 		  uint stageTwoCommissionPayoutTeam1 = ((bettorInfo[bettors[k]].amountsBetStage2[1] * eachStageCommission) / totalAmountsBetStage2[1]);
 		  payout += stageTwoCommissionPayoutTeam1;
 	  }
-	    
+
 	  if (payout > 0)
         bettors[k].transfer(payout);
     }
-	
+
     currentOwner.transfer(currentOwnerPayoutCommission);
-    
+
 	// Transfer remaining balance to creators.  If both teams have reached stage 2, creators get 0% commission
     if (this.balance > 0) {
         creator.transfer(this.balance);
@@ -1282,24 +1282,24 @@ contract nbagame is usingOraclize {
     } else {
 		stage2NotReached = false;
 	}
-	
+
     payoutCompleted = true;
   }
 
   function buyContract() public payable {
     address oldOwner = currentOwner;
     address newOwner = msg.sender;
-  
+
     require(newOwner != oldOwner);
 	require(_addressNotNull(newOwner));
 	require(msg.value >= contractPrice);
 	require(now < BETTING_CLOSES);
-	
+
 	// Take 6% commission on sale, seller gets the rest
 	uint payment = uint(SafeMath.div(SafeMath.mul(contractPrice, 94), 100));
 	uint purchaseExcess = uint(SafeMath.sub(msg.value, contractPrice));
 	uint creatorCommissionValue = uint(SafeMath.sub(contractPrice, payment));
-	
+
 	// Update the prices after purchase to new values based on step price
 	if (contractPrice < firstStepLimit) {
 		// First stage, about 40% increase on paid price
@@ -1311,14 +1311,14 @@ contract nbagame is usingOraclize {
 		// Third stage, about 20% increase on paid price
 		contractPrice = SafeMath.div(SafeMath.mul(contractPrice, 113), 94);
 	}
-	
+
 	// New owner of contract
 	currentOwner = newOwner;
-	
+
 	// Pay the previous owner and the creator commission
 	oldOwner.transfer(payment); // 94%
 	creator.transfer(creatorCommissionValue);
-	
+
 	msg.sender.transfer(purchaseExcess); // Send the buyer any excess they paid for the contract
   }
 }
@@ -1363,4 +1363,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

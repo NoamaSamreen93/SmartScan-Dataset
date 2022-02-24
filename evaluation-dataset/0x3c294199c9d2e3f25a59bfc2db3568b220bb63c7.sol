@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
@@ -42,7 +42,7 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization
  *      control functions, this simplifies the implementation of "user permissions".
  */
- 
+
 contract Ownable {
     address public owner;
 
@@ -78,13 +78,13 @@ contract Ownable {
 
 
 /**
- * 
+ *
  * @title ERC223
  * @dev ERC223 contract interface with ERC20 functions and events
  *      Fully backward compatible with ERC20
  *      Recommended implementation used at https://github.com/Dexaran/ERC223-token-standard/tree/Recommended
  */
- 
+
 contract ERC223 {
     uint public totalSupply;
 
@@ -131,7 +131,7 @@ contract ERC223 {
         tkn.data = _data;
         uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
         tkn.sig = bytes4(u);
-        
+
         /*
          * tkn variable is analogue of msg variable of Ether transaction
          * tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
@@ -144,7 +144,7 @@ contract ERC223 {
 
 
 
- 
+
 contract Zeinun is ERC223, Ownable {
     using SafeMath for uint256;
 
@@ -155,7 +155,7 @@ contract Zeinun is ERC223, Ownable {
     uint256 public totalSupply = 97e5 * 1e7;
     uint256 public distributeAmount = 0;
     bool public mintingFinished = false;
-    
+
     address public founder = 0x97F0AbcC844C21f39582768c345D8d139415d11f;
     address public preSeasonGame = 0x97F0AbcC844C21f39582768c345D8d139415d11f;
     address public activityFunds = 0x97F0AbcC844C21f39582768c345D8d139415d11f;
@@ -165,7 +165,7 @@ contract Zeinun is ERC223, Ownable {
     mapping(address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
-    
+
     event FrozenFunds(address indexed target, bool frozen);
     event LockedFunds(address indexed target, uint256 locked);
     event Burn(address indexed from, uint256 amount);
@@ -173,12 +173,12 @@ contract Zeinun is ERC223, Ownable {
     event MintFinished();
 
 
-    /** 
+    /**
      * @dev Constructor is called only once and can not be called again
      */
     function Zeinun() public {
         owner = activityFunds;
-        
+
         balanceOf[founder] = totalSupply.mul(25).div(100);
         balanceOf[preSeasonGame] = totalSupply.mul(55).div(100);
         balanceOf[activityFunds] = totalSupply.mul(10).div(100);
@@ -230,7 +230,7 @@ contract Zeinun is ERC223, Ownable {
     function lockupAccounts(address[] targets, uint[] unixTimes) onlyOwner public {
         require(targets.length > 0
                 && targets.length == unixTimes.length);
-                
+
         for(uint j = 0; j < targets.length; j++){
             require(unlockUnixTime[targets[j]] < unixTimes[j]);
             unlockUnixTime[targets[j]] = unixTimes[j];
@@ -244,9 +244,9 @@ contract Zeinun is ERC223, Ownable {
      */
     function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -264,9 +264,9 @@ contract Zeinun is ERC223, Ownable {
 
     function transfer(address _to, uint _value, bytes _data) public  returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -282,9 +282,9 @@ contract Zeinun is ERC223, Ownable {
      */
     function transfer(address _to, uint _value) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         bytes memory empty;
@@ -341,9 +341,9 @@ contract Zeinun is ERC223, Ownable {
                 && _value > 0
                 && balanceOf[_from] >= _value
                 && allowance[_from][msg.sender] >= _value
-                && frozenAccount[_from] == false 
+                && frozenAccount[_from] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[_from] 
+                && now > unlockUnixTime[_from]
                 && now > unlockUnixTime[_to]);
 
         balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -404,7 +404,7 @@ contract Zeinun is ERC223, Ownable {
      */
     function mint(address _to, uint256 _unitAmount) onlyOwner canMint public returns (bool) {
         require(_unitAmount > 0);
-        
+
         totalSupply = totalSupply.add(_unitAmount);
         balanceOf[_to] = balanceOf[_to].add(_unitAmount);
         Mint(_to, _unitAmount);
@@ -427,7 +427,7 @@ contract Zeinun is ERC223, Ownable {
      * @dev Function to distribute tokens to the list of addresses by the provided amount
      */
     function distributeAirdrop(address[] addresses, uint256 amount) public returns (bool) {
-        require(amount > 0 
+        require(amount > 0
                 && addresses.length > 0
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
@@ -435,7 +435,7 @@ contract Zeinun is ERC223, Ownable {
         amount = amount.mul(1e8);
         uint256 totalAmount = amount.mul(addresses.length);
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
@@ -453,20 +453,20 @@ contract Zeinun is ERC223, Ownable {
                 && addresses.length == amounts.length
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
-                
+
         uint256 totalAmount = 0;
-        
+
         for(uint j = 0; j < addresses.length; j++){
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e8);
             totalAmount = totalAmount.add(amounts[j]);
         }
         require(balanceOf[msg.sender] >= totalAmount);
-        
+
         for (j = 0; j < addresses.length; j++) {
             balanceOf[addresses[j]] = balanceOf[addresses[j]].add(amounts[j]);
             Transfer(msg.sender, addresses[j], amounts[j]);
@@ -483,13 +483,13 @@ contract Zeinun is ERC223, Ownable {
                 && addresses.length == amounts.length);
 
         uint256 totalAmount = 0;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e8);
             require(balanceOf[addresses[j]] >= amounts[j]);
             balanceOf[addresses[j]] = balanceOf[addresses[j]].sub(amounts[j]);
@@ -504,7 +504,7 @@ contract Zeinun is ERC223, Ownable {
     function setDistributeAmount(uint256 _unitAmount) onlyOwner public {
         distributeAmount = _unitAmount;
     }
-    
+
     /**
      * @dev Function to distribute tokens to the msg.sender automatically
      *      If distributeAmount is 0, this function doesn't work
@@ -515,7 +515,7 @@ contract Zeinun is ERC223, Ownable {
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
         if(msg.value > 0) activityFunds.transfer(msg.value);
-        
+
         balanceOf[activityFunds] = balanceOf[activityFunds].sub(distributeAmount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(distributeAmount);
         Transfer(activityFunds, msg.sender, distributeAmount);
@@ -528,4 +528,17 @@ contract Zeinun is ERC223, Ownable {
         autoDistribute();
      }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

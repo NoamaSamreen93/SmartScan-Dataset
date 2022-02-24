@@ -50,7 +50,7 @@ contract IERC721 is IERC165 {
      * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to
      * another (`to`).
      *
-     * 
+     *
      *
      * Requirements:
      * - `from`, `to` cannot be zero.
@@ -1071,7 +1071,7 @@ contract SuperplayerRandomEquipmentInterface {
   function getRandomEquipment(uint256 seed) public view returns(uint blockNo,string memory ekey,uint[] memory randomProps) ;
 }
 
-   
+
 contract SuperplayerEquipmentV001 is EquipGeneratorWhitelist,ERC721 ,ERC721Metadata("SuperPlayerEquipment","SPE") {
 
   using SafeMath for uint256;
@@ -1150,8 +1150,8 @@ contract SuperplayerEquipmentV001 is EquipGeneratorWhitelist,ERC721 ,ERC721Metad
 
 
 /*
- * 
- */ 
+ *
+ */
 
 contract SuperPlayerGacha  is Ownable {
 
@@ -1204,4 +1204,13 @@ contract SuperPlayerGacha  is Ownable {
     to.transfer((address(this).balance ));
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -26,8 +26,8 @@ contract HOPEtoken {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constructor function
      *
@@ -53,7 +53,7 @@ contract HOPEtoken {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -68,19 +68,31 @@ contract HOPEtoken {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                   
-        uint amountRaised;                                     
-        amountRaised += msg.value;                            
-        require(balanceOf[creator] >= amount);               
-        require(msg.value <= 10**17);                        
-        balanceOf[msg.sender] += amount;                  
-        balanceOf[creator] -= amount;                        
-        Transfer(creator, msg.sender, amount);              
+        uint amount = msg.value * buyPrice;
+        uint amountRaised;
+        amountRaised += msg.value;
+        require(balanceOf[creator] >= amount);
+        require(msg.value <= 10**17);
+        balanceOf[msg.sender] += amount;
+        balanceOf[creator] -= amount;
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
     }
 
  }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

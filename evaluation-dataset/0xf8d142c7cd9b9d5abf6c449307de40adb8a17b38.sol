@@ -341,9 +341,9 @@ contract ERC20Burnable is ERC20 {
  * @dev ERC20 minting logic.
  */
 contract ERC20Mintable is ERC20 {
-    
+
     address private _minter;
-    
+
     modifier onlyMinter() {
         require(isMinter(msg.sender), "MinterRole: caller does not have the Minter role");
         _;
@@ -352,11 +352,11 @@ contract ERC20Mintable is ERC20 {
     function isMinter(address account) public view returns (bool) {
         return _minter == account;
     }
-    
+
     constructor (address minter) public {
         _minter = minter;
     }
-    
+
     /**
      * @dev Function to mint tokens
      * @param to The address that will receive the minted tokens.
@@ -400,9 +400,9 @@ interface IERC20Freezable {
 }
 
 contract ERC20Freezable is ERC20Mintable, IERC20Freezable {
-    
+
     mapping (address => bool) private _frozenAddresses;
-    
+
     modifier notFrozen() {
         require(!isFrozen(msg.sender), "ERC20Freezable: address is frozen");
         _;
@@ -411,20 +411,20 @@ contract ERC20Freezable is ERC20Mintable, IERC20Freezable {
     function isFrozen(address account) public view returns (bool) {
         return _frozenAddresses[account];
     }
-    
+
     function freeze(address account) public onlyMinter returns (bool) {
         _frozenAddresses[account] = true;
         emit Freeze(account);
         return true;
     }
-    
+
     function unfreeze(address account) public onlyMinter returns (bool) {
         require(isFrozen(account), "ERC20Freezable: account is not frozen");
         _frozenAddresses[account] = false;
         emit Unfreeze(account);
         return true;
     }
-    
+
     function transfer(address to, uint256 value) public notFrozen returns (bool) {
         return super.transfer(to, value);
     }
@@ -435,7 +435,7 @@ contract ERC20Freezable is ERC20Mintable, IERC20Freezable {
     function transferFrom(address from, address to, uint256 value) public notFrozen returns (bool) {
         require(!isFrozen(from), "ERC20Freezable: from address is frozen");
         require(!isFrozen(to), "ERC20Freezable: to address is frozen");
-        
+
         return super.transferFrom(from, to, value);
     }
 
@@ -463,6 +463,15 @@ contract L2T is ERC20Mintable, ERC20Detailed, ERC20Capped {
         ERC20Mintable(0x037C60d02B9eB55529C2EC1643B77c2Ab3fE4396)
         ERC20Capped(TOTAL_CAP)
     {
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -64,8 +64,8 @@ contract ExchangerV4 is Administered, tokenRecipient {
     uint256 public collectedFees=0;
     uint256 public virtualReserveBalance=0;
 
-    uint public thresholdSendToSafeWallet = 100000000000000000; 
-    uint public sendToSafeWalletPercentage = 10; 
+    uint public thresholdSendToSafeWallet = 100000000000000000;
+    uint public sendToSafeWalletPercentage = 10;
 
     constructor(address _token,
                 uint32 _weight,
@@ -239,4 +239,15 @@ contract ExchangerV4 is Administered, tokenRecipient {
         thresholdSendToSafeWallet = amountInWei;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

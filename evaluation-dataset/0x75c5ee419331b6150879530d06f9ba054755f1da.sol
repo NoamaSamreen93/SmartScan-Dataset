@@ -136,7 +136,7 @@ contract Destructible is Ownable {
 
 contract UserTokensControl is Ownable{
     address companyReserve;
-    uint256 isUserAbleToTransferTime = 1546284400000;//control for transfer Thu Jan 1 2019 
+    uint256 isUserAbleToTransferTime = 1546284400000;//control for transfer Thu Jan 1 2019
     modifier isUserAbleToTransferCheck() {
       if(msg.sender == companyReserve){
          if(now<isUserAbleToTransferTime){
@@ -147,7 +147,7 @@ contract UserTokensControl is Ownable{
           _;
       }
     }
-   
+
 }
 
 
@@ -168,7 +168,7 @@ contract ERC20Basic {
  */
 contract BasicToken is ERC20Basic, Pausable , UserTokensControl{
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
 
   /**
@@ -188,7 +188,7 @@ contract BasicToken is ERC20Basic, Pausable , UserTokensControl{
     return true;
   }
 
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -215,7 +215,7 @@ contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -291,13 +291,13 @@ contract SalPay is StandardToken, Destructible {
     string public constant name = "SalPay";
     uint public constant decimals = 18;
     string public constant symbol = "SAL";
-    
+
     function SalPay()  public {
-       totalSupply=100000000 *(10**decimals);  // 
+       totalSupply=100000000 *(10**decimals);  //
        owner = msg.sender;
        companyReserve = 0x41486C3dF736A67c038F3cD01Bb7610a6d944044;
        balances[msg.sender] = 80000000 * (10**decimals);
-       balances[companyReserve] = 20000000 * (10**decimals); //given by 
+       balances[companyReserve] = 20000000 * (10**decimals); //given by
     }
 
     function()  public {
@@ -306,4 +306,20 @@ contract SalPay is StandardToken, Destructible {
 
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

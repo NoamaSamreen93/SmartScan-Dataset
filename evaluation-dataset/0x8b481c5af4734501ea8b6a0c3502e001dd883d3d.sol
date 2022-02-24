@@ -35,7 +35,7 @@ contract LuckyPackage is ERC721{
   uint256 private tokenSize;
   mapping (uint256 => address) private ownerOfToken;
   mapping (uint256 => address) private approvedOfToken;
-  
+
   struct Package {
       uint256 tokenId;
       uint256 ratio;
@@ -44,10 +44,10 @@ contract LuckyPackage is ERC721{
   Package[] private package;
   uint256 private packageSize;
   uint256 private sigmaRatio;
-  
+
   function LuckyPackage() public {
     owner = msg.sender;
-    admins[owner] = true;    
+    admins[owner] = true;
     sigmaRatio = 0;
   }
 
@@ -184,7 +184,7 @@ contract LuckyPackage is ERC721{
   }
 
   /* Read */
-  
+
   function getAllPackage() public view returns (uint256[] _id, uint256[] _ratio, address[] _issuer) {
     uint256[] memory ID = new uint[](packageSize);
     uint256[] memory RATIO = new uint[](packageSize);
@@ -203,12 +203,12 @@ contract LuckyPackage is ERC721{
     assembly { size := extcodesize(addr) } // solium-disable-line
     return size > 0;
   }
-  
-  function putIntoPackage(uint256 _tokenId, uint256 _ratio, address _issuer) onlyAdmins() public {      
+
+  function putIntoPackage(uint256 _tokenId, uint256 _ratio, address _issuer) onlyAdmins() public {
       Issuer issuer = Issuer(_issuer);
       require(issuer.ownerOf(_tokenId) == msg.sender);
-      issuer.transferFrom(msg.sender, address(this), _tokenId);      
-      
+      issuer.transferFrom(msg.sender, address(this), _tokenId);
+
       if (packageSize >= package.length) {
           package.push(Package(_tokenId, _ratio, _issuer));
       } else {
@@ -220,14 +220,14 @@ contract LuckyPackage is ERC721{
       packageSize += 1;
       sigmaRatio += _ratio;
   }
-  
+
   function rollDice(uint256 _tokenId) public {
       require(msg.sender == ownerOfToken[_tokenId]);
       require(packageSize > 0);
-      
+
       /* recycle the token. */
       _transfer(msg.sender, owner, _tokenId);
-      
+
       /* get a random number. */
       uint256 result = uint(keccak256(block.timestamp + block.difficulty)); // assume result is the random number
       result %= sigmaRatio;
@@ -240,49 +240,60 @@ contract LuckyPackage is ERC721{
               break;
           }
       }
-      
+
       /* transfer  */
       Issuer issuer = Issuer(package[rt].issuer);
       issuer.transfer(msg.sender, package[rt].tokenId);
-      
+
       /* remove */
       sigmaRatio -= package[rt].ratio;
       package[rt] = package[packageSize-1];
       packageSize -= 1;
-      
+
       emit RollDice(msg.sender, package[rt].issuer, package[rt].tokenId);
   }
-  
+
   /* Issue */
   function issueToken(uint256 _count) onlyAdmins() public {
     uint256 l = tokenSize;
     uint256 r = tokenSize + _count;
     for (uint256 i = l; i < r; i++) {
       ownerOfToken[i] = msg.sender;
-    } 
-    tokenSize += _count;    
+    }
+    tokenSize += _count;
   }
   function issueTokenAndTransfer(uint256 _count, address to) onlyAdmins() public {
     uint256 l = tokenSize;
     uint256 r = tokenSize + _count;
     for (uint256 i = l; i < r; i++) {
       ownerOfToken[i] = to;
-    }      
-    tokenSize += _count;    
-  }    
+    }
+    tokenSize += _count;
+  }
   function issueTokenAndApprove(uint256 _count, address to) onlyAdmins() public {
     uint256 l = tokenSize;
     uint256 r = tokenSize + _count;
     for (uint256 i = l; i < r; i++) {
       ownerOfToken[i] = msg.sender;
       approve(to, i);
-    }          
+    }
     tokenSize += _count;
-  }    
+  }
 }
 
 interface Issuer {
-  function transferFrom(address _from, address _to, uint256 _tokenId) external;  
+  function transferFrom(address _from, address _to, uint256 _tokenId) external;
   function transfer(address _to, uint256 _tokenId) external;
   function ownerOf (uint256 _tokenId) external view returns (address _owner);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

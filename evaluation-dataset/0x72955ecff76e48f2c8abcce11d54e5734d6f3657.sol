@@ -70,12 +70,12 @@ contract BasicToken is ERC20Basic, Ownable {
   mapping(address => uint256) balances;
   mapping(address => uint256) bonusTokens;
   mapping(address => uint256) bonusReleaseTime;
-  
+
   mapping(address => bool) internal blacklist;
   address[] internal blacklistHistory;
-  
+
   bool public isTokenReleased = false;
-  
+
   address addressSaleContract;
   event BlacklistUpdated(address badUserAddress, bool registerStatus);
   event TokenReleased(address tokenOwnerAddress, bool tokenStatus);
@@ -105,11 +105,11 @@ contract BasicToken is ERC20Basic, Ownable {
     require(isTokenReleased);
     require(!blacklist[_to]);
     require(!blacklist[msg.sender]);
-    
+
     if (bonusReleaseTime[msg.sender] > block.timestamp) {
         require(_value <= balances[msg.sender].sub(bonusTokens[msg.sender]));
     }
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -136,9 +136,9 @@ contract BasicToken is ERC20Basic, Ownable {
 	  	  blacklist[_badUserAddress] = true;
           blacklistHistory.push(_badUserAddress);
 	  }
-      emit BlacklistUpdated(_badUserAddress, blacklist[_badUserAddress]);   
+      emit BlacklistUpdated(_badUserAddress, blacklist[_badUserAddress]);
   }
-  
+
   /**
   * @dev Remove the specified address from blacklist.
   * @param _badUserAddress The address of bad user.
@@ -162,7 +162,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function getblacklistHistory() onlyOwner public view returns (address[]) {
       return blacklistHistory;
   }
-  
+
   /**
   * @dev Release the token (enable all token functions).
   */
@@ -172,7 +172,7 @@ contract BasicToken is ERC20Basic, Ownable {
 	  }
       emit TokenReleased(msg.sender, isTokenReleased);
   }
-  
+
   /**
   * @dev Withhold the token (disable all token functions).
   */
@@ -182,13 +182,13 @@ contract BasicToken is ERC20Basic, Ownable {
       }
 	  emit TokenReleased(msg.sender, isTokenReleased);
   }
-  
+
   /**
   * @dev Set bonus token amount and bonus token release time for the specified address.
   * @param _tokenHolder The address of bonus token holder
   *        _bonusTokens The bonus token amount
-  *        _holdingPeriodInDays Bonus token holding period (in days) 
-  */  
+  *        _holdingPeriodInDays Bonus token holding period (in days)
+  */
   function setBonusTokenInDays(address _tokenHolder, uint256 _bonusTokens, uint256 _holdingPeriodInDays) onlyBonusSetter public {
       bonusTokens[_tokenHolder] = _bonusTokens;
       bonusReleaseTime[_tokenHolder] = SafeMath.add(block.timestamp, _holdingPeriodInDays * 1 days);
@@ -199,18 +199,18 @@ contract BasicToken is ERC20Basic, Ownable {
   * @param _tokenHolder The address of bonus token holder
   *        _bonusTokens The bonus token amount
   *        _bonusReleaseTime Bonus token release time
-  */  
+  */
   function setBonusToken(address _tokenHolder, uint256 _bonusTokens, uint256 _bonusReleaseTime) onlyBonusSetter public {
       bonusTokens[_tokenHolder] = _bonusTokens;
       bonusReleaseTime[_tokenHolder] = _bonusReleaseTime;
   }
-  
+
   /**
   * @dev Set bonus token amount and bonus token release time for the specified address.
-  * @param _tokenHolders The address of bonus token holder ["0x...", "0x...", ...] 
-  *        _bonusTokens The bonus token amount [0,0, ...] 
+  * @param _tokenHolders The address of bonus token holder ["0x...", "0x...", ...]
+  *        _bonusTokens The bonus token amount [0,0, ...]
   *        _bonusReleaseTime Bonus token release time
-  */  
+  */
   function setBonusTokens(address[] _tokenHolders, uint256[] _bonusTokens, uint256 _bonusReleaseTime) onlyBonusSetter public {
       for (uint i = 0; i < _tokenHolders.length; i++) {
         bonusTokens[_tokenHolders[i]] = _bonusTokens[i];
@@ -232,12 +232,12 @@ contract BasicToken is ERC20Basic, Ownable {
   function setBonusSetter(address _addressSaleContract) onlyOwner public {
       addressSaleContract = _addressSaleContract;
   }
-  
+
   function getBonusSetter() public view returns (address) {
       require(msg.sender == addressSaleContract || msg.sender == owner);
       return addressSaleContract;
   }
-  
+
   /**
   * @dev Display token holder's bonus token amount.
   * @param _bonusHolderAddress The address of bonus token holder.
@@ -245,7 +245,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function checkBonusTokenAmount (address _bonusHolderAddress) public view returns (uint256) {
       return bonusTokens[_bonusHolderAddress];
   }
-  
+
   /**
   * @dev Display token holder's remaining bonus token holding period.
   * @param _bonusHolderAddress The address of bonus token holder.
@@ -353,7 +353,7 @@ library SafeMath {
  */
 contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -440,7 +440,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _subtractedValue The amount of tokens to decrease the allowance by.
    */
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
-    require(!blacklist[_spender]);    
+    require(!blacklist[_spender]);
 	require(!blacklist[msg.sender]);
 
     uint oldValue = allowed[msg.sender][_spender];
@@ -501,7 +501,7 @@ contract TrustVerseToken is BurnableToken, StandardToken {
    * @param _value uint256 the amount of tokens to be transferred
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    require(EffectiveDateOfAllowance[_from][msg.sender] <= block.timestamp); 
+    require(EffectiveDateOfAllowance[_from][msg.sender] <= block.timestamp);
     return super.transferFrom(_from, _to, _value);
   }
 
@@ -515,7 +515,7 @@ contract TrustVerseToken is BurnableToken, StandardToken {
     require(isTokenReleased);
     require(!blacklist[_spender]);
 	require(!blacklist[msg.sender]);
-    
+
     EffectiveDateOfAllowance[msg.sender][_spender] = _effectiveDate;
     return approve(_spender, _value);
   }
@@ -530,10 +530,10 @@ contract TrustVerseToken is BurnableToken, StandardToken {
     require(isTokenReleased);
     require(!blacklist[_spender]);
 	require(!blacklist[msg.sender]);
-    
+
     EffectiveDateOfAllowance[msg.sender][_spender] = SafeMath.add(block.timestamp, _effectiveDateInDays * 1 days);
     return approve(_spender, _value);
-  }  
+  }
 
   /**
    * @dev Function to check the Effective date of Lost-proof, Inheritance of tokens that an owner allowed to a spender.
@@ -548,4 +548,20 @@ contract TrustVerseToken is BurnableToken, StandardToken {
 
     return EffectiveDateOfAllowance[_owner][_spender];
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

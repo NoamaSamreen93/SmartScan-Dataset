@@ -297,7 +297,7 @@ contract ETYCToken is StandardToken, BurnableToken, Ownable {
     string  public constant name = "Intelligent Shipping Chain";
     string  public constant symbol = "ETYC";
     uint8   public constant decimals = 18;
-    string  public constant website = "www.etyc.io"; 
+    string  public constant website = "www.etyc.io";
     uint256 public constant INITIAL_SUPPLY      =  1000000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =   800000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =   200000000 * (10 ** uint256(decimals));
@@ -308,7 +308,7 @@ contract ETYCToken is StandardToken, BurnableToken, Ownable {
     address public crowdSaleAddr;           // the address of a crowdsale currently selling this token
     address public adminAddr;               // the address of a crowdsale currently selling this token
     //bool    public transferEnabled = false; // indicates if transferring tokens is enabled or not
-    bool    public transferEnabled = true;  // Enables everyone to transfer tokens 
+    bool    public transferEnabled = true;  // Enables everyone to transfer tokens
 
     // Modifiers
 
@@ -415,4 +415,15 @@ contract ETYCToken is StandardToken, BurnableToken, Ownable {
         super.burn(_value);
         Transfer(msg.sender, address(0x0), _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

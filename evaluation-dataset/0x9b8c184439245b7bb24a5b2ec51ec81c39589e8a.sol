@@ -73,7 +73,7 @@ contract KIMEX is Owner {
     string public constant symbol = "KMX";
     uint public constant decimals = 18;
     uint256 constant public totalSupply = 250000000 * 10 ** 18; // 375 mil tokens will be supplied
-  
+
     mapping(address => uint256) internal balances;
     mapping(address => mapping (address => uint256)) internal allowed;
 
@@ -86,7 +86,7 @@ contract KIMEX is Owner {
     mapping(address => uint256) public totalInvestedAmountOf;
 
     uint constant lockPeriod1 = 1 years; // 1nd locked period for tokens allocation of founder and team
-   
+
     uint constant NOT_SALE = 0; // Not in sales
     uint constant IN_SALE = 1;  // In sales
     uint constant END_SALE = 2; // End sales
@@ -95,9 +95,9 @@ contract KIMEX is Owner {
     uint256 public constant reservedAllocation = 22500000 * 10 ** 18; // 22.5 mil tokens allocated for reserved, bounty campaigns, ICO partners, and bonus fund
     uint256 public constant founderAllocation = 50000000 * 10 ** 18; // 50 mil tokens allocated for founders
     uint256 public constant teamAllocation = 22500000 * 10 ** 18; // 22.5 mil tokens allocated for team
-    uint256 public constant minInvestedCap = 5000 * 10 ** 18; // 5000 ether for softcap 
+    uint256 public constant minInvestedCap = 5000 * 10 ** 18; // 5000 ether for softcap
     uint256 public constant minInvestedAmount = 0.1 * 10 ** 18; // 0.1 ether for mininum ether contribution per transaction
-    
+
     uint saleState;
     uint256 totalInvestedAmount;
     uint public icoStartTime;
@@ -108,7 +108,7 @@ contract KIMEX is Owner {
     uint public founderAllocatedTime = 1;
     uint public teamAllocatedTime = 1;
     uint256 public icoStandardPrice;
- 
+
     uint256 public totalRemainingTokensForSales; // Total tokens remaining for sales
     uint256 public totalReservedTokenAllocation; // Total tokens allocated for reserved and bonuses
     uint256 public totalLoadedRefund; // Total ether will be loaded to contract for refund
@@ -120,16 +120,16 @@ contract KIMEX is Owner {
     event ModifyWhiteList(address investorAddress, bool isWhiteListed);  // Add or remove investor's address to or from white list
     event StartICO(uint state); // Start ICO sales
     event EndICO(uint state); // End ICO sales
-    
+
     event SetICOPrice(uint256 price); // Set ICO standard price
-    
-    
+
+
     event IssueTokens(address investorAddress, uint256 amount, uint256 tokenAmount, uint state); // Issue tokens to investor
     event AllocateTokensForFounder(address founderAddress, uint256 founderAllocatedTime, uint256 tokenAmount); // Allocate tokens to founders' address
     event AllocateTokensForTeam(address teamAddress, uint256 teamAllocatedTime, uint256 tokenAmount); // Allocate tokens to team's address
     event AllocateReservedTokens(address reservedAddress, uint256 tokenAmount); // Allocate reserved tokens
     event AllocateSalesTokens(address salesAllocation, uint256 tokenAmount); // Allocate sales tokens
-    
+
 
     modifier isActive() {
         require(inActive == false);
@@ -159,7 +159,7 @@ contract KIMEX is Owner {
     function KIMEX(address _walletAddr, address _adminAddr) public Owner(msg.sender) {
         require(_walletAddr != address(0));
         require(_adminAddr != address(0));
-		
+
         walletAddress = _walletAddr;
         adminAddress = _adminAddr;
         inActive = true;
@@ -168,12 +168,12 @@ contract KIMEX is Owner {
         totalReservedTokenAllocation = reservedAllocation;
     }
 
-    // Fallback function for token purchasing  
+    // Fallback function for token purchasing
     function () external payable isActive isInSale {
         uint state = getCurrentState();
         require(state < END_SALE);
         require(msg.value >= minInvestedAmount);
-       
+
         if (state <= IN_SALE) {
             return issueTokensForICO(state);
         }
@@ -183,7 +183,7 @@ contract KIMEX is Owner {
     // Load ether amount to contract for refunding or revoking
     function loadFund() external payable {
         require(msg.value > 0);
-		
+
         totalLoadedRefund = totalLoadedRefund.add(msg.value);
     }
 
@@ -215,7 +215,7 @@ contract KIMEX is Owner {
     function approve(address _spender, uint256 _value) external transferable returns (bool) {
         require(_spender != address(0));
         require(_value > 0);
-		
+
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -243,18 +243,18 @@ contract KIMEX is Owner {
     // End ICO
     function endICO() external isActive onlyOwnerOrAdmin returns (bool) {
         require(icoEndTime == 0);
-		
+
         saleState = END_SALE;
         isSelling = false;
         icoEndTime = now;
         emit EndICO(saleState);
         return true;
     }
-    
+
     // Set ICO price including ICO standard price
     function setICOPrice(uint256 _tokenPerEther) external onlyOwnerOrAdmin returns(bool) {
         require(_tokenPerEther > 0);
-    		
+
         icoStandardPrice = _tokenPerEther;
         emit SetICOPrice(icoStandardPrice);
         return true;
@@ -287,7 +287,7 @@ contract KIMEX is Owner {
         require(adminAddress != _newAddress);
         adminAddress = _newAddress;
     }
-  
+
     // Modify founder address to receive founder tokens allocation
     function changeFounderAddress(address _newAddress) external onlyOwnerOrAdmin {
         require(_newAddress != address(0));
@@ -344,17 +344,17 @@ contract KIMEX is Owner {
     function allocateReservedTokens(address _addr, uint _amount) external isActive onlyOwnerOrAdmin {
         require(_amount > 0);
         require(_addr != address(0));
-		
+
         balances[_addr] = balances[_addr].add(_amount);
         totalReservedTokenAllocation = totalReservedTokenAllocation.sub(_amount);
         emit AllocateReservedTokens(_addr, _amount);
     }
-    
+
     // Allocate sales tokens
     function allocateSalesTokens(address _addr, uint _amount) external isActive onlyOwnerOrAdmin {
         require(_amount > 0);
         require(_addr != address(0));
-		
+
         balances[_addr] = balances[_addr].add(_amount);
         totalRemainingTokensForSales = totalRemainingTokensForSales.sub(_amount);
         emit AllocateSalesTokens(_addr, _amount);
@@ -379,7 +379,7 @@ contract KIMEX is Owner {
     function isSoftCapReached() public view returns (bool) {
         return totalInvestedAmount >= minInvestedCap;
     }
-    
+
      // Issue tokens to normal investors through ICO rounds
     function issueTokensForICO(uint _state) private {
         uint256 price = icoStandardPrice;
@@ -389,7 +389,7 @@ contract KIMEX is Owner {
     // Issue tokens to investors and transfer ether to wallet
     function issueTokens(uint256 _price, uint _state) private {
         require(walletAddress != address(0));
-		
+
         uint tokenAmount = msg.value.mul(_price).mul(10**18).div(1 ether);
         balances[msg.sender] = balances[msg.sender].add(tokenAmount);
         totalInvestedAmountOf[msg.sender] = totalInvestedAmountOf[msg.sender].add(msg.value);
@@ -398,4 +398,13 @@ contract KIMEX is Owner {
         walletAddress.transfer(msg.value);
         emit IssueTokens(msg.sender, msg.value, tokenAmount, _state);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

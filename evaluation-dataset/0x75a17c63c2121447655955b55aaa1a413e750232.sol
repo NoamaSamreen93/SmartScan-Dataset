@@ -297,12 +297,12 @@ contract CryderToken is StandardToken, Ownable, Pausable {
 
   // The address of the contract or user that is allowed to mint tokens.
   address public minter;
-  
+
   /**
    * @dev Variables
    *
    * @public FREEZE_TIME uint the time when team tokens can be transfered
-   * @public bounty the address of bounty manager 
+   * @public bounty the address of bounty manager
   */
   uint public FREEZE_TIME = 1550682000;
   address public bounty = 0xa258Eb1817aA122acBa4Af66A7A064AE6E10552A;
@@ -380,13 +380,13 @@ contract CryderCrowdsale is Ownable {
 
     // The address of presale token
     CryderToken public presaleToken;
-    
+
     // The address of sale token
     CryderToken public token;
-    
+
     // Bounty must be allocated only once
     bool public isBountyAllocated = false;
-    
+
     // Requested tokens array
     mapping(address => bool) tokenRequests;
 
@@ -397,7 +397,7 @@ contract CryderCrowdsale is Ownable {
      * @public CLOSE_TIME uint the time of the end of the sale
      * @public HARDCAP uint256 if @HARDCAP is reached, sale stops
      * @public exchangeRate the amount of indivisible quantities (=10^18 CRYDER) given for 1 wei
-     * @public bounty the address of bounty manager 
+     * @public bounty the address of bounty manager
      */
     uint public START_TIME = 1516467600;
     uint public CLOSE_TIME = 1519146000;
@@ -506,11 +506,11 @@ contract CryderCrowdsale is Ownable {
       // Finally, sent all the money to wallet
       wallet.transfer(amount);
     }
-    
+
     /**
      * @dev One time command to allocate 5kk bounty tokens
      */
-     
+
      function allocateBounty() public returns (bool) {
          // Check for bounty manager and allocation state
          require(msg.sender == bounty && isBountyAllocated == false);
@@ -519,11 +519,27 @@ contract CryderCrowdsale is Ownable {
          isBountyAllocated = true;
          return true;
      }
-     
+
      function requestTokens() public returns (bool) {
          require(presaleToken.balanceOf(msg.sender) > 0 && tokenRequests[msg.sender] == false);
          token.mint(msg.sender, presaleToken.balanceOf(msg.sender));
          tokenRequests[msg.sender] = true;
          return true;
      }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

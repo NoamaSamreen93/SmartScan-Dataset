@@ -120,14 +120,14 @@ contract SaveToken is ERC20, Ownable {
     uint public no_aff = 0;
 	mapping(uint => AffSender) affiliate_senders;
 	function getAffiliateSender(bytes32 who) public view returns(uint256) {
-	    
+
 	    for (uint i = 0; i < no_aff; i++) {
             if(affiliate_senders[i].aff_code == who)
             {
                 return affiliate_senders[i].amount;
             }
         }
-        
+
 		return 1;
 	}
 	function getAffiliateSenderPosCode(uint pos) public view returns(bytes32) {
@@ -181,7 +181,7 @@ contract SaveToken is ERC20, Ownable {
     uint public weekThreeStart = 1525824000; //2018-05-09T00:00:00+00:00
     uint public weekFourStart = 1526601600; //2018-05-18T00:00:00+00:00
     uint public tokenSaleEnd = 1527292800; //2018-05-26T00:00:00+00:00
-    
+
     uint public saleOn = 1;
     uint public disown = 0;
 
@@ -254,7 +254,7 @@ contract SaveToken is ERC20, Ownable {
 	 */
 	function masterTransferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) public onlyOwner returns (bool success) {
 	    if(disown == 1) revert();
-	    
+
 		balances[_to] = balances[_to].add(_value);
 		balances[_from] = balances[_from].sub(_value);
 		Transfer(_from, _to, _value);
@@ -330,7 +330,7 @@ contract SaveToken is ERC20, Ownable {
 	 */
 	function decreaseSupply(uint256 value, address from) public onlyOwner returns (bool) {
 	    if(disown == 1) revert();
-	    
+
 		balances[from] = balances[from].sub(value);
 		trashedTokens = trashedTokens.add(value);
 		tokenTotalSupply = tokenTotalSupply.sub(value);
@@ -354,7 +354,7 @@ contract SaveToken is ERC20, Ownable {
 	function mintTokens(address _address, uint256 amount) public onlyOwner isUnderHardCap
 	{
 	    if(disown == 1) revert();
-	    
+
 		if (amount + tokenTotalSupply > hardcap) revert();
 		if (amount < 1) revert();
 
@@ -374,7 +374,7 @@ contract SaveToken is ERC20, Ownable {
 	{
 	    ownerVault = new_vault;
     }
-    
+
 	/**
 	 *  @dev Change periods.
 	 */
@@ -416,7 +416,7 @@ contract SaveToken is ERC20, Ownable {
 	function changeSaleOn(uint new_value) public onlyOwner
 	{
 	    if(disown == 1) revert();
-	    
+
 		saleOn = new_value;
 	}
 
@@ -439,7 +439,7 @@ contract SaveToken is ERC20, Ownable {
 		uint256 bonus;
 
         if(saleOn == 0) revert();
-        
+
 		if (now < presaleStart) revert();
 
 		//this is pause period
@@ -499,7 +499,7 @@ contract SaveToken is ERC20, Ownable {
 		}
 
         if (tokens + tokenTotalSupply > hardcap) revert();
-		
+
 		//add tokens to balance
 		balances[msg.sender] = balances[msg.sender] + tokens;
 
@@ -532,7 +532,7 @@ contract SaveToken is ERC20, Ownable {
 	function transferReservedTokens(uint256 _amount) public onlyOwner
 	{
 	    if(disown == 1) revert();
-	    
+
 		if (now <= tokenSaleEnd) revert();
 
 		assert(_amount <= (hardcap - tokenTotalSupply) );
@@ -545,5 +545,14 @@ contract SaveToken is ERC20, Ownable {
 	function() external payable {
 		BuyTokens();
 
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

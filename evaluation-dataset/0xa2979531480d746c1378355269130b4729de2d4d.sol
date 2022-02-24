@@ -383,7 +383,7 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
 
     // address of fee collector
     address public feeCollector;
-   
+
     event TokenBinded(
         address indexed binder,
         address indexed previousToken,
@@ -514,16 +514,16 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
             // deposit tokens to token bank accounts
             deposited[receivers[i]] = deposited[receivers[i]].add(amounts[i]);
             emit Deposited(
-                msg.sender, 
-                receivers[i], 
+                msg.sender,
+                receivers[i],
                 amounts[i],
                 deposited[receivers[i]]
             );
         }
         emit BulkDeposited(msg.sender, totalAmount, receivers.length);
 
-        // if transfer fails, deposits will revert accordingly 
-        bindedToken.safeTransferFrom(msg.sender, address(this), totalAmount);  
+        // if transfer fails, deposits will revert accordingly
+        bindedToken.safeTransferFrom(msg.sender, address(this), totalAmount);
     }
 
     /**
@@ -560,7 +560,7 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
         // length of nums = 4 * withdraw requests
         uint256 total = nums.length.div(4);
         require(
-            (total > 0) 
+            (total > 0)
             && (total.mul(4) == nums.length)
             && (total.mul(2) == addrs.length)
             && (total.mul(2) == rsSigParams.length),
@@ -617,12 +617,12 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
     {
         bytes32 hashed = keccak256(
             abi.encodePacked(
-                "\x19Ethereum Signed Message:\n32", 
+                "\x19Ethereum Signed Message:\n32",
                 keccak256(
                     abi.encodePacked(
-                        address(this), 
-                        from, 
-                        to, 
+                        address(this),
+                        from,
+                        to,
                         amount,
                         fee,
                         timestamp
@@ -656,7 +656,7 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
         // length of nums = 4 * transfer requests
         uint256 total = nums.length.div(4);
         require(
-            (total > 0) 
+            (total > 0)
             && (total.mul(4) == nums.length)
             && (total.mul(2) == addrs.length)
             && (total.mul(2) == rsSigParams.length),
@@ -756,12 +756,12 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
     {
         bytes32 hashed = keccak256(
             abi.encodePacked(
-                "\x19Ethereum Signed Message:\n32", 
+                "\x19Ethereum Signed Message:\n32",
                 keccak256(
                     abi.encodePacked(
-                        address(this), 
-                        from, 
-                        to, 
+                        address(this),
+                        from,
+                        to,
                         amount,
                         fee,
                         timestamp
@@ -775,4 +775,13 @@ contract TokenBank is Ownable, DepositorRole, TraderRole {
             "Failed to transfer due to request was not signed by singer."
         );
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

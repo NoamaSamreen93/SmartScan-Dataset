@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 
-contract ERC20 
+contract ERC20
 {
     function totalSupply() constant returns (uint);
     function balanceOf(address who) constant returns (uint);
@@ -46,14 +46,14 @@ contract workForce
         uint lastTokenConfigDay;
     }
 
-    
+
     /* Using a dynamic array because can't iterate mappings, or use push,length,delete cmds? */
     Employee[] workcrew;
     uint employeeIndex;
     mapping( uint => uint ) employeeIdIndex;
     mapping( string => uint ) employeeNameIndex;
     mapping( address => uint ) employeeAddressIndex;
-    
+
     mapping( address => uint ) public exchangeRates;
     address owner;
     uint creationDate;
@@ -126,7 +126,7 @@ contract workForce
         indexTheWorkcrew();
     }
 
-    function addFunds() payable onlyOwner returns (uint) 
+    function addFunds() payable onlyOwner returns (uint)
     {
         return this.balance;
     }
@@ -160,7 +160,7 @@ contract workForce
         return (workcrew[x].employeeId, workcrew[x].employeeName, workcrew[x].startDate,
                 workcrew[x].employeeAddress, workcrew[x].yearlySalaryUSD );
     }
-    
+
     function getEmployeeInfoByName(string _employeeName) constant onlyOwner returns (uint, string, uint, address, uint)
     {
         uint x = employeeNameIndex[_employeeName];
@@ -181,11 +181,11 @@ contract workForce
     function calculatePayrollRunway() constant onlyOwner returns (uint)
     {
         uint dailyPayout = calculatePayrollBurnrate() / 30;
-        
+
         uint UsdBalance = usdToken.balanceOf(address(this));
         UsdBalance += this.balance / oneUsdToEtherRate;
         UsdBalance += antToken.balanceOf(address(this)) / exchangeRates[antAddr];
-        
+
         uint daysRemaining = UsdBalance / dailyPayout;
         return daysRemaining;
     }
@@ -193,7 +193,7 @@ contract workForce
     function setPercentTokenAllocation(uint _usdTokens, uint _ethTokens, uint _antTokens) onlyEmployee
     {
         if( _usdTokens + _ethTokens + _antTokens != 100 ){revert;}
-        
+
         uint x = employeeAddressIndex[msg.sender];
 
         /* change from 1 hours to 24 weeks */
@@ -218,14 +218,14 @@ contract workForce
         uint usdTransferAmount = paycheck * workcrew[x].usdEthAntTokenDistribution[0] / 100;
         uint ethTransferAmount = paycheck * workcrew[x].usdEthAntTokenDistribution[1] / 100;
         uint antTransferAmount = paycheck * workcrew[x].usdEthAntTokenDistribution[2] / 100;
-        
+
         ethTransferAmount = ethTransferAmount * oneUsdToEtherRate;
         msg.sender.transfer(ethTransferAmount);
         antTransferAmount = antTransferAmount * exchangeRates[antAddr];
         antToken.transfer( workcrew[x].employeeAddress, antTransferAmount );
         usdToken.transfer( workcrew[x].employeeAddress, usdTransferAmount );
     }
-    
+
     /* setting 1 USD equals X amount of tokens */
     function setTokenExchangeRate(address _token, uint _tokenValue) onlyOracle
     {
@@ -249,4 +249,15 @@ contract workForce
         uint tokenAmount = _UsdAmount * exchangeRates[_token];
         return tokenAmount;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -1,23 +1,23 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The ether.online Project.  All rights reserved.
-/* 
-/* https://ether.online  The first RPG game of blockchain 
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* https://ether.online  The first RPG game of blockchain
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -64,11 +64,11 @@ contract AccessNoWithdraw is AccessAdmin {
         _;
     }
 
-    modifier onlyManager() { 
+    modifier onlyManager() {
         require(msg.sender == addrService || msg.sender == addrAdmin || msg.sender == addrFinance);
-        _; 
+        _;
     }
-    
+
     function setService(address _newService) external {
         require(msg.sender == addrService || msg.sender == addrAdmin);
         require(_newService != address(0));
@@ -132,7 +132,7 @@ interface IAgonFight {
 }
 
 contract ActionAgon is AccessNoWithdraw {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     event CreateAgon(uint64 indexed agonId, address indexed master, uint64 indexed outFlag);
     event CancelAgon(uint64 indexed agonId, address indexed master, uint64 indexed outFlag);
@@ -144,7 +144,7 @@ contract ActionAgon is AccessNoWithdraw {
         address challenger;
         uint64 agonPrice;
         uint64 outFlag;
-        uint64 agonFlag;    
+        uint64 agonFlag;
         uint64 result;      // 1-win, 2-lose, 99-cancel
     }
 
@@ -154,7 +154,7 @@ contract ActionAgon is AccessNoWithdraw {
 
     mapping (address => uint64[]) public ownerToAgonIdArray;
     uint256 public maxAgonCount = 6;
-    uint256 public maxResolvedAgonId = 0; 
+    uint256 public maxResolvedAgonId = 0;
     uint256[5] public agonValues = [0.05 ether, 0.2 ether, 0.5 ether, 1 ether, 2 ether];
 
     function ActionAgon() public {
@@ -216,7 +216,7 @@ contract ActionAgon is AccessNoWithdraw {
         require(ownerToAgonIdArray[msg.sender].length < maxAgonCount);
         require(_valId >= 0 && _valId <= 4);
         require(msg.value == agonValues[_valId]);
-        
+
         uint64 newAgonId = uint64(agonArray.length);
         agonArray.length += 1;
         Agon storage agon = agonArray[newAgonId];
@@ -227,7 +227,7 @@ contract ActionAgon is AccessNoWithdraw {
         ownerToAgonIdArray[msg.sender].push(newAgonId);
 
         CreateAgon(uint64(newAgonId), msg.sender, _outFlag);
-    } 
+    }
 
     function _removeAgonIdByOwner(address _owner, uint64 _agonId) internal {
         uint64[] storage agonIdArray = ownerToAgonIdArray[_owner];
@@ -242,7 +242,7 @@ contract ActionAgon is AccessNoWithdraw {
         require(findIndex != 99);
         if (findIndex != (length - 1)) {
             agonIdArray[findIndex] = agonIdArray[length - 1];
-        } 
+        }
         agonIdArray.length -= 1;
     }
 
@@ -337,11 +337,11 @@ contract ActionAgon is AccessNoWithdraw {
             uint64[] agonIds,
             address[] masters,
             address[] challengers,
-            uint64[] agonPrices,           
+            uint64[] agonPrices,
             uint64[] agonOutFlags,
             uint64[] agonFlags,
             uint64[] results
-        ) 
+        )
     {
         uint64 length = uint64(agonArray.length);
         require(_startAgonId < length);
@@ -383,4 +383,12 @@ contract ActionAgon is AccessNoWithdraw {
     function getAgonIdArray(address _owner) external view returns(uint64[]) {
         return ownerToAgonIdArray[_owner];
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

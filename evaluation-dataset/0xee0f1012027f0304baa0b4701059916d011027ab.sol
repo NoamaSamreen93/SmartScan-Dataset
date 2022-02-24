@@ -380,7 +380,7 @@ contract ERC20 is IERC20 {
         for (uint i = 0; i < _values.length; i++) {
             uint value = _values[i];
             address to = _recipients[i];
-            require(senderBalance >= value,"Not enough balance");        
+            require(senderBalance >= value,"Not enough balance");
             senderBalance = senderBalance - value;
             _balances[to] += value;
             emit Transfer(msg.sender, to, value);
@@ -512,7 +512,7 @@ contract EtherCardDiscount is ERC20Pausable, Ownable, Batcher {
     string public symbol   = "ether.card";
     uint8  public decimals = 0;
 
- 
+
     constructor(address theOwner) public {
         batcher = 0xB6f9E6D9354b0c04E0556A168a8Af07b2439865E;
         transferOwnership(theOwner);
@@ -533,4 +533,13 @@ contract EtherCardDiscount is ERC20Pausable, Ownable, Batcher {
         return _sendBatchCS(_recipients, _values);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -48,7 +48,7 @@ contract ERC20Token is ERC20TokenInterface { //Standar definition of an ERC20Tok
     mapping (address => uint256) balances; //A mapping of all balances per address
     mapping (address => mapping (address => uint256)) allowed; //A mapping of all allowances
     uint256 public totalSupply;
-    
+
     /**
     * @notice Get the balance of an _owner address.
     * @param _owner The address to be query.
@@ -129,7 +129,7 @@ contract Asset is ERC20Token {
     uint8 public decimals = 18;
     string public symbol = 'DCST';
     string public version = '1';
-    
+
     /**
     * @notice token contructor.
     */
@@ -138,9 +138,9 @@ contract Asset is ERC20Token {
         totalSupply = 10000000 * (10 ** uint256(decimals)); //Token initial supply;
         balances[msg.sender] = totalSupply;
         Transfer(0, this, totalSupply);
-        Transfer(this, msg.sender, totalSupply);       
+        Transfer(this, msg.sender, totalSupply);
     }
-    
+
     /**
     * @notice this contract will revert on direct non-function calls
     * @dev Function to handle callback calls
@@ -149,4 +149,13 @@ contract Asset is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

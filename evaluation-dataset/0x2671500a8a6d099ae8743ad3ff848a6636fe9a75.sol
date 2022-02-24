@@ -473,7 +473,7 @@ contract ZEONPrivateSale is Haltable, PriceReceiver {
 
   uint public tokensSold = 0;
 
-  uint public startTime; 
+  uint public startTime;
 
   uint public endTime;
 
@@ -523,7 +523,7 @@ contract ZEONPrivateSale is Haltable, PriceReceiver {
 
   function calculateTokens(uint ethReceived) internal view returns (uint) {
     uint actualTokenUsdRate = TokenUsdRate.add(TokenUsdRate.mul((now - startTime).mul(1000).div(MonthsInSeconds).div(100).mul(10)).div(1000));
-    
+
     return ethReceived.mul(ethUsdRate.mul(100)).div(actualTokenUsdRate);
   }
 
@@ -549,7 +549,7 @@ contract ZEONPrivateSale is Haltable, PriceReceiver {
   function doPurchase() private icoActive inNormalState {
     require(!crowdsaleFinished);
 
-    uint tokens = calculateTokens(msg.value); 
+    uint tokens = calculateTokens(msg.value);
 
     uint newTokensSold = tokensSold.add(tokens);
 
@@ -575,7 +575,7 @@ contract ZEONPrivateSale is Haltable, PriceReceiver {
       token.transfer(referral, referralBonus);
       NewReferralTransfer(msg.sender, referral, referralBonus);
     }
-    
+
     beneficiary.transfer(msg.value);
   }
 
@@ -583,4 +583,15 @@ contract ZEONPrivateSale is Haltable, PriceReceiver {
   function transferOwnership(address newOwner) onlyOwner icoEnded {
     super.transferOwnership(newOwner);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -14,15 +14,15 @@ The rest of the ETH is sent to SnailThrone as divs.
 
 contract SnailNumber {
 	using SafeMath for uint;
-	
+
 	event GameBid (address indexed player, uint eth, uint number, uint pot, uint winnerShare);
 	event GameEnd (address indexed player, uint leaderReward, uint throneReward, uint number);
-	
+
 	address payable constant SNAILTHRONE= 0x261d650a521103428C6827a11fc0CBCe96D74DBc;
     uint256 constant SECONDS_IN_DAY = 86400;
     uint256 constant numberMin = 300;
     uint256 constant numberMax = 3000;
-    
+
     uint256 public pot;
     uint256 public bid;
     address payable public leader;
@@ -31,22 +31,22 @@ contract SnailNumber {
     uint256 public timerEnd;
     uint256 public timerStart;
     uint256 public number;
-    
+
     address payable dev;
-    
+
     // CONSTRUCTOR
     // Sets end timer to 24 hours
-    
+
     constructor() public {
         timerStart = now;
         timerEnd = now.add(SECONDS_IN_DAY);
         dev = msg.sender;
     }
-    
+
     // BID
     // Lets player pick number
     // Locks his potential winnings
-    
+
     function Bid(uint256 _number) payable public {
         require(now < timerEnd, "game is over!");
         require(msg.value > bid, "not enough to beat current leader");
@@ -59,47 +59,47 @@ contract SnailNumber {
         shareToThrone = _share.sub(shareToWinner);
         leader = msg.sender;
         number = _number;
-            
+
         emit GameBid(msg.sender, msg.value, number, pot, shareToWinner);
     }
-    
-    // END 
+
+    // END
     // Can be called manually after the game ends
     // Sends pot to winner and snailthrone
-    
+
     function End() public {
         require(now > timerEnd, "game is still running!");
-        
+
         uint256 _throneReward = pot.mul(shareToThrone).div(100);
         pot = pot.sub(_throneReward);
         (bool success, bytes memory data) = SNAILTHRONE.call.value(_throneReward)("");
         require(success);
-        
+
         uint256 _winnerReward = pot;
         pot = 0;
         leader.transfer(_winnerReward);
-        
+
         emit GameEnd(leader, _winnerReward, _throneReward, number);
     }
-    
-    // COMPUTESHARE 
+
+    // COMPUTESHARE
     // Calculates the share of the winner and of the throne, based on time lapsed
     // Decreasing % from 100 to 0. The earlier the bid, the more money
-    
+
     function ComputeShare() public view returns(uint256) {
         uint256 _length = timerEnd.sub(timerStart);
         uint256 _currentPoint = timerEnd.sub(now);
         return _currentPoint.mul(100).div(_length);
     }
-    
+
     // ESCAPEHATCH
     // Just in case a bug stops the "End" function, dev can withdraw all ETH
     // But *only* a full day after the game has already ended!
-    
+
     function EscapeHatch() public {
         require(msg.sender == dev, "you're not the dev");
         require(now > timerEnd.add(SECONDS_IN_DAY), "escape hatch only available 24h after end");
-        
+
         dev.transfer(address(this).balance);
     }
 }
@@ -144,4 +144,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -60,7 +60,7 @@ contract ERC20 {
 
 contract KNBaseToken is ERC20 {
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -161,13 +161,13 @@ contract KnowToken is KNBaseToken, Ownable {
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != address(0));                               
-        require (balances[_from] >= _value);               
-        require (balances[_to].add(_value) >= balances[_to]); 
+        require (_to != address(0));
+        require (balances[_from] >= _value);
+        require (balances[_to].add(_value) >= balances[_to]);
         require(!frozenAccount[_from] || unlockAllTokens);
 
-        balances[_from] = balances[_from].sub(_value);                  
-        balances[_to] = balances[_to].add(_value);                  
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
     }
 
@@ -194,7 +194,7 @@ contract BountyKN {
 tokens[address(0xf10bCED548DAbAFd32A1cDf78919a90D45D0fd80)] = 900;
 tokens[address(0x9e158D913462eB21A301cE4259a9B62B592A45DC)] = 5100;
 tokens[address(0xED61184e80BFDEcB1f7B557c42D954Ed2A12DA97)] = 600;
-tokens[address(0xbC5a62b53A8470b4E9e473C6D8D5018f17217953)] = 13300;  
+tokens[address(0xbC5a62b53A8470b4E9e473C6D8D5018f17217953)] = 13300;
 tokens[address(0x440e9bDDAE3D55E5545dde6Be6e7781918651061)] = 3100;
 tokens[address(0x8915C3d2392A8F0eb60Dc0D61011E5F55AfE3571)] = 13600;
 tokens[address(0xBF5B7E163d6cA81BC12bf346e8eA518310444EB9)] = 2600;
@@ -234,7 +234,7 @@ tokens[address(0x41f8145E60E771693B0b32246e9fB4e278e3B270)] = 12800;
 tokens[address(0xf8203E1A90dEfD0cEa26A84632144787Fe60E55B)] = 1400;
 tokens[address(0x5A937D89D9ff4f1c43684Fc4f9Bbb8E85496D982)] = 1200;
 tokens[address(0x323eCbd99857C19be94d7F7D7662AF840F5Ff6A5)] = 1700;
-tokens[address(0xd5D14CF1c26f78De45B58776cF5F64DbF86a722C)] = 10500; 
+tokens[address(0xd5D14CF1c26f78De45B58776cF5F64DbF86a722C)] = 10500;
 tokens[address(0xB01972DFC6bbCAD5584271EB1D9DbCd0721d2639)] = 17600;
 tokens[address(0xB6170C9d9A879e9B7958cc24c69b8E1dafFE33bb)] = 82900;
 tokens[address(0x0b1970Bc7030E0aE254a34228b613F30F710fD75)] = 3600;
@@ -253,7 +253,7 @@ tokens[address(0xE8DF61368AEc385fbe89d26A47C984f24a480EeD)] = 900;
 tokens[address(0x298acc69206065C929594C270963013180B6823f)] = 4000;
 tokens[address(0x8D3E06145f5BA879b6CF82F06D15eA329154C979)] = 1500;
 tokens[address(0x86341Be59A39daCc60201dC78c247De4bB099891)] = 1900;
-tokens[address(0x0D554C6ee2a2f31441080f23ba6D36B845949d23)] = 21600; 
+tokens[address(0x0D554C6ee2a2f31441080f23ba6D36B845949d23)] = 21600;
 tokens[address(0x985995E7e78723194064AeF580d6D2B850463EC8)] = 2400;
 tokens[address(0x8726e4753651Ed6206B459d592A37fF914ff0b1b)] = 4200;
 tokens[address(0x07D33791A5119D3095BAA1163040BbcAda871CF1)] = 2100;
@@ -268,7 +268,7 @@ tokens[address(0x84E7Eb8033907cbD8Fd9f72a724eA838e1459897)] = 2600;
 tokens[address(0x62D84D039AD9CFdC9e2383A2B536f4eCb98ccf38)] = 600;
 tokens[address(0xb3B9Bb62E31549c1ce1aF76624242da2b2c23C8d)] = 6100;
 tokens[address(0x98Bc47546Ab7336A8B6e57bceb690752890e6460)] = 5700;
-tokens[address(0x5eEB3452Ed391a4f6054986401c85f2fbe041a63)] = 1500; 
+tokens[address(0x5eEB3452Ed391a4f6054986401c85f2fbe041a63)] = 1500;
 tokens[address(0x3916cE72F7b90883eDc484e1955Dd52d6798441F)] = 1600;
 tokens[address(0xD0496f389cF4187f23E8D16F0EC20d2EFe5E8113)] = 7400;
 tokens[address(0x88b3D8fCd43D2492399859067478e77D82B08b4F)] = 4400;
@@ -276,16 +276,16 @@ tokens[address(0xa3cCdf76f19DCe3b69E7033d624a00d4eEc9635E)] = 2200;
 tokens[address(0xC5c0188D0c52A7BA02429D822C2641d816A2e090)] = 4500;
 tokens[address(0xAE83b2057F91167640af2933BC75877B7FBdf800)] = 600;
 tokens[address(0xbF376e8182AbD4C3D939b31a1De70BdccE0cbF29)] = 16700;
-tokens[address(0x24756e1BEc9a789E7977FECAaaC3A31d3589619e)] = 8100; 
+tokens[address(0x24756e1BEc9a789E7977FECAaaC3A31d3589619e)] = 8100;
 tokens[address(0x1b8f93901dE3b353B12D327B68D8E1806B25Af65)] = 1200;
 tokens[address(0x228f9c5e48Dd0B99d96AA27a04066664E4ae6aA7)] = 12100;
 tokens[address(0x4c9d6DB3e0B08ef346BeF080D2e1e05f70F919D0)] = 1300;
 tokens[address(0x1a9218D7151579f57EBf86D80cde8981bC3A6960)] = 12700;
-tokens[address(0x115E9308032dD8a7a647838f7FB5c4A5EC552432)] = 2335; 
+tokens[address(0x115E9308032dD8a7a647838f7FB5c4A5EC552432)] = 2335;
 tokens[address(0x8e37Db3979B6d490d2aEC1F2609bCD2a1ee9721e)] = 2000;
 tokens[address(0x469F2Ec13B4f159C2fC65d1268376aB1087f3e54)] = 2700;
 tokens[address(0xC4Be8FD7826fD63aE3fd9b4493327C492690D747)] = 1900;
-tokens[address(0x2401Ad256bCD3a66BfB68Cb4D9DE5e297eC1b091)] = 4500; 
+tokens[address(0x2401Ad256bCD3a66BfB68Cb4D9DE5e297eC1b091)] = 4500;
 tokens[address(0x934996e684D8c4EaD6D913d2b9ce6174e58CEd1A)] = 1700;
 tokens[address(0xFEeea46C35D1305cfcD6d73b7688896BB952a97b)] = 9500;
 tokens[address(0x7B6CE51816C04eBaDe05d59478603B02931005A6)] = 7600;
@@ -296,7 +296,7 @@ tokens[address(0x953af5FAeb53d3e8Ad1b29d5f6D4bB30a22eFB5C)] = 1100;
 tokens[address(0x211E07dfC428AB92c15Ef77EdC0dB6B760448957)] = 3700;
 tokens[address(0x8De7f22EA8Da641D2D6130A011a04CCabdBA0Bf8)] = 17400;
 tokens[address(0xe07a986b3A99a215C3BF1a06f86C6b183111b199)] = 2100;
-tokens[address(0x5eD2fB840B7F6402B49Fe0C92087E6c11A6e3bB6)] = 2800;  
+tokens[address(0x5eD2fB840B7F6402B49Fe0C92087E6c11A6e3bB6)] = 2800;
 tokens[address(0xC7C27359a6a46196A464259451342b6d2E344724)] = 2600;
 tokens[address(0x360cc28b20B4114B394398f1B671F4eD03B7Ad96)] = 6300;
 tokens[address(0x64497911EAcD46C3B27Ab43c5F795f9c0E51e4Fe)] = 2400;
@@ -312,7 +312,7 @@ tokens[address(0x10f19342Fa7e60091e41e5370a80A1a44634C717)] = 3100;
 tokens[address(0x7A335874A722eb5a8b8172f1e603de6A2C3397bc)] = 1400;
 tokens[address(0x46b66E2857056024DFf5c872F3d2E758F2Ae3275)] = 3100;
 tokens[address(0xa34F7Dfe09448f05547676E3a0911cC966237c1C)] = 2100;
-tokens[address(0xDe9E459CD76f66E7465DF8333177207E50D127e9)] = 3200; 
+tokens[address(0xDe9E459CD76f66E7465DF8333177207E50D127e9)] = 3200;
 tokens[address(0xF7DE7Fa2bfD8570a74FB70049227BB38b48ccB43)] = 1400;
 tokens[address(0x61161EdC78A9835cD27E5d3aDDB875A7a107efF1)] = 18600;
 tokens[address(0x9064Cca032E89C901699e6469D1b63496266F9c5)] = 1600;
@@ -346,7 +346,7 @@ tokens[address(0x2e36Eb01f6753a4e63dd738E254e8915bdd756A2)] = 1600;
 tokens[address(0x1a3Df37a39bEFa5249cA2222b048a5cCf708F2C9)] = 3600;
 tokens[address(0xD7A78bcc6d0aE44A08C8E9926549b5CC44E27C91)] = 3700;
 tokens[address(0xa335175a42939176106A4d6D5D2277F8302f4a98)] = 19900;
-tokens[address(0xCdcd4b05149EC85d20716E8011BD09Dee74a3CC4)] = 3800; 
+tokens[address(0xCdcd4b05149EC85d20716E8011BD09Dee74a3CC4)] = 3800;
 tokens[address(0x19118d1C44210E2d341B56F93c642f2B26C852d4)] = 2200;
 tokens[address(0xa5D3757B0f45cC2a1fE8EF763b48b10E68160e24)] = 10800;
 tokens[address(0x7cd823Dc6558079D52D0fdb3baDf01D20057f096)] = 16900;
@@ -378,7 +378,7 @@ tokens[address(0x789cF264621F1504475BB29315456a1a02977176)] = 4300;
 tokens[address(0x87c2E6D8B2393D77cE6f219D4668E1E256c89538)] = 8700;
 tokens[address(0x31C324a698A9F6bd915605A7321F0a337fF46b7A)] = 4300;
 tokens[address(0x2a3B2C39AE3958B875033349fd573eD14886C2Ee)] = 3400;
-tokens[address(0x884423E02DB1b3716E3c8014e871b7Fe3d3e224B)] = 2400; 
+tokens[address(0x884423E02DB1b3716E3c8014e871b7Fe3d3e224B)] = 2400;
 tokens[address(0x387dC59d381E7fc4de7DC92A0118379A4a1f59cC)] = 1200;
 tokens[address(0x7b249dE6D98D83172E1189764330dB7484EAe568)] = 2400;
 tokens[address(0xcBC204317bF6dC59f933E87A309A2C4C5B419DAa)] = 5900;
@@ -445,7 +445,7 @@ tokens[address(0xE7e07f085FD876d3619af686Dcb3a295778Bb01d)] = 12400;
 tokens[address(0x01F1be5A0a5256C2D420476D4913Ec57B5DAaa3a)] = 2800;
 tokens[address(0xe0706dC72D826c8f25A34bc7951Ac7D1b44D6D3d)] = 2200;
 tokens[address(0xac9e954fa28E2e2C0b1EE2a5E3AED527BBED4e1A)] = 4600;
-tokens[address(0x2997A6b3D503207e5365C8DD8Eb1B0c88d1c04DF)] = 1900; 
+tokens[address(0x2997A6b3D503207e5365C8DD8Eb1B0c88d1c04DF)] = 1900;
 tokens[address(0xCae2d6cE0F959dE16Dd5eEd8E0dC19a623F18B05)] = 1400;
 tokens[address(0x08A1F6543205e47CbDc52b8BC82cB8b9D070B714)] = 9800;
 tokens[address(0xd3dE61685BAa88Ed9b9dd6d96d1Ac4E6209669D5)] = 153200;
@@ -462,16 +462,16 @@ tokens[address(0xa25a3BEbB04DD5F87c5416a36C4c225AF06555ab)] = 3500;
 tokens[address(0x2cdcCec23A8EaB9eB00725868b8D29c6ca21505b)] = 2100;
 tokens[address(0x25D3fe656420Fbdd9587FbA30a7a23B0328Ab2C9)] = 1700;
 tokens[address(0xB656bb3D3F1aa4b34783d4983b53ca281c81B08A)] = 2500;
-tokens[address(0xF360A549C247aBa264f3f99660A0c4Cd7f6b9E74)] = 1600; 
+tokens[address(0xF360A549C247aBa264f3f99660A0c4Cd7f6b9E74)] = 1600;
 tokens[address(0x3F46A12eaB7ae0fFcE32cfCcC8366017c0007c2d)] = 1900;
 tokens[address(0xcc023e9f32b4CbED3d57aa53C706cd9c692AB8cd)] = 24100;
 tokens[address(0xa61342A4811c140D802285c39920745c2c7aEB30)] = 4300;
 tokens[address(0x4E0909135D380545B4115B8DA6cE75bF9047A100)] = 3900;
-tokens[address(0x0D02c5049f032757299142A007ACbDdaB6D4733A)] = 800; 
-tokens[address(0x308dCcb438820aA8563ea34a81E83b2493715B2C)] = 1600; 
+tokens[address(0x0D02c5049f032757299142A007ACbDdaB6D4733A)] = 800;
+tokens[address(0x308dCcb438820aA8563ea34a81E83b2493715B2C)] = 1600;
 tokens[address(0xE1fe7f717bc1f19485e7400DDF8C2BBb8361C817)] = 2300;
     }
-    
+
     function getTotalPossibleTokens(address _who) public view returns(uint256) {
         return tokens[_who];
     }
@@ -479,9 +479,20 @@ tokens[address(0xE1fe7f717bc1f19485e7400DDF8C2BBb8361C817)] = 2300;
     function () public payable {
         require(msg.value == 0 ether, "Contract do not recieve ether!");
         require(tokens[msg.sender] > 0, "Tokens must be greater than 0!");
-        
+
         uint256 toks = tokens[msg.sender].mul(1000000000000000000);
         token.transfer(msg.sender, toks);
         tokens[msg.sender] = tokens[msg.sender].sub(tokens[msg.sender]);
-    }  
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

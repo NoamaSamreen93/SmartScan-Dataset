@@ -26,19 +26,19 @@ contract Whitelist {
         require (msg.sender == tx.origin, "Contracts are not allowed to interact.");
         _;
     }
-    
+
     /// Fall back to the subscribe function if no specific function was called.
     function() external {
         subscribe();
     }
-    
+
     /// Gets the subscriber list.
     function getSubscriberList() external view returns (address[] memory) {
         uint subscriberListAmount = getSubscriberAmount();
-        
+
         address[] memory subscriberList = new address[](subscriberListAmount);
         uint subscriberListCounter = 0;
-        
+
         /// Iterate over all subscriber addresses, to fill the subscriberList.
         for (uint i = 1; i < subscriberIndex; i++) {
             address subscriberAddress = subscriberIndexToAddress[i];
@@ -60,7 +60,7 @@ contract Whitelist {
         /// Iterate over all subscriber addresses, to get the actual subscriber amount.
         for (uint i = 1; i < subscriberIndex; i++) {
             address subscriberAddress = subscriberIndexToAddress[i];
-            
+
             /// Count the addresses which are actual subscribers only.
             if (isSubscriber(subscriberAddress) == true) {
                 subscriberListAmount++;
@@ -73,7 +73,7 @@ contract Whitelist {
     /// The sender's address will be added to the subscriber list
     function subscribe() public isNotAContract {
         require(isSubscriber(msg.sender) == false, "You already subscribed.");
-        
+
         // New subscriber
         subscriberAddressToSubscribed[msg.sender] = subscriberIndex;
         subscriberIndexToAddress[subscriberIndex] = msg.sender;
@@ -91,7 +91,7 @@ contract Whitelist {
 
         emit OnUnsubscribed(msg.sender);
     }
-    
+
     /// Checks wheter the transaction origin address is in the subscriber list
     function isSubscriber() external view returns (bool) {
         return isSubscriber(tx.origin);
@@ -101,4 +101,8 @@ contract Whitelist {
     function isSubscriber(address subscriberAddress) public view returns (bool) {
         return subscriberIndexToAddress[subscriberAddressToSubscribed[subscriberAddress]] != address(0);
     }
+}
+function() payable external {
+	revert();
+}
 }

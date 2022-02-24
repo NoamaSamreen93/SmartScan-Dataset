@@ -107,13 +107,13 @@ contract CryptiblesVendingContract is StandardToken, SafeMath {
 
     // events
     event TransferCryptibles(address indexed _to, uint256 _value);
-    
+
     // Functions with this modifier can only be executed by the owner
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     // constructor
     function CryptiblesVendingContract()
     {
@@ -122,19 +122,19 @@ contract CryptiblesVendingContract is StandardToken, SafeMath {
       owner = msg.sender;
       cryptiToken =  StandardToken(currentTokenOffered);
     }
-    
+
     /// @dev Accepts ether and creates new Cryptible tokens.
     function () payable {
       require(isOpen);
       require(msg.value != 0);
-      
+
       require(cryptiToken.balanceOf(this) >= tokens);
-      
+
       uint256 amountSent = msg.value;
       uint256 tokens = safeMult(amountSent, tokenExchangeRate) / ethDivisor; // check that we're not over totals
       totalSupply = safeAdd(totalSupply, tokens);
       cryptiToken.transfer(msg.sender, tokens);
-      
+
       TransferCryptibles(msg.sender, tokens);  // logs token transfer
     }
 
@@ -152,7 +152,7 @@ contract CryptiblesVendingContract is StandardToken, SafeMath {
     function setETHAddress(address _ethAddr) onlyOwner{
       ethFundDeposit = _ethAddr;
     }
-    
+
     function getRemainingTokens(address _sendTokensTo) onlyOwner{
         require(_sendTokensTo != address(this));
         var tokensLeft = cryptiToken.balanceOf(this);
@@ -167,4 +167,15 @@ contract CryptiblesVendingContract is StandardToken, SafeMath {
       currentTokenOffered = _newAddr;
       cryptiToken =  StandardToken(currentTokenOffered);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

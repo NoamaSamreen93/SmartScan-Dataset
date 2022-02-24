@@ -67,15 +67,26 @@ contract StandardToken is ERC20, SafeMath {
 
 /// @author GSDT DEVTEAM
 
-contract GoldSeedToken is StandardToken 
+contract GoldSeedToken is StandardToken
 {
     string public name = "GoldSeedToken";
     string public symbol = "GSDT";
     uint public decimals = 18;
     uint public totalSupply =  1000 * 1000 * 1000 ether;
 
-    function GoldSeedToken() public 
+    function GoldSeedToken() public
     {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

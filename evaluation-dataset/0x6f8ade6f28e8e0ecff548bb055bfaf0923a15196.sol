@@ -10,11 +10,11 @@ contract SolarSystem {
         uint price;
         uint ownerPlanet;
     }
-    
+
     function SolarSystem() public {
         owner = msg.sender;
     }
-    
+
     //initiate
     function bigBang() public {
         if(msg.sender == owner){
@@ -42,29 +42,29 @@ contract SolarSystem {
             planets[21] = Planet("Pluto",           msg.sender,      800000000000000, 0);
         }
     }
-    
+
     //list the current sale price of a planet
     function listSales(uint id) public{
         if(msg.sender == owner){
             Sale(planets[id].name, planets[id].price, msg.sender);
         }
     }
-    
+
     //list of planets
     mapping (uint => Planet) planets;
-    
+
     //register when a planet is offered for sale
     event Sale(string name, uint price, address new_owner);
-    
+
     //register price increase
     event PriceIncrease(string name, uint price, address new_owner);
-    
+
     //register price decrease
     event PriceDecrease(string name, uint price, address new_owner);
-    
+
     //change message
     event ChangeMessage(string name, string message);
-    
+
     //buy a planet
     function buyPlanet(uint id) public payable {
         if(msg.value >= planets[id].price){
@@ -84,7 +84,7 @@ contract SolarSystem {
             msg.sender.transfer(msg.value);
         }
     }
-    
+
     //increase price with 5%
     function increasePrice(uint id) public {
         if(planets[id].owner == msg.sender){
@@ -93,7 +93,7 @@ contract SolarSystem {
             PriceIncrease(planets[id].name, planets[id].price, msg.sender);
         }
     }
-    
+
     //decrease price with 5%
     function decreasePrice(uint id) public {
         if(planets[id].owner == msg.sender){
@@ -102,10 +102,16 @@ contract SolarSystem {
             PriceDecrease(planets[id].name, planets[id].price, msg.sender);
         }
     }
-    
+
     function changeMessage(uint id, string message) public {
          if(planets[id].owner == msg.sender){
             ChangeMessage(planets[id].name, message);
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

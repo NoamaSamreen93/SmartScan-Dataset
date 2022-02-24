@@ -110,7 +110,7 @@ contract ALT1Token is Ownable, ERC20Basic {
   */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
     totalSupply = totalSupply.add(_amount);
-    if (balances[_to] == 0) { 
+    if (balances[_to] == 0) {
       holders.push(_to);
     }
     balances[_to] = balances[_to].add(_amount);
@@ -204,7 +204,7 @@ contract Crowdsale is Ownable {
 
     uint256 weiAmount = msg.value;
     uint256 tokens = tokensForWei(weiAmount);
-    
+
     weiRaised = weiRaised.add(weiAmount);
 
     token.mint(beneficiary, tokens);
@@ -276,4 +276,13 @@ contract Crowdsale is Ownable {
     return now > endTime;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

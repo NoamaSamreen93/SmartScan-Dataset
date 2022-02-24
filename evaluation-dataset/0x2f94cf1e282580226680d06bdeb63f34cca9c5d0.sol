@@ -257,7 +257,7 @@ contract StandardToken is ERC20,Pausable {
         address _from,
         address _to,
         uint256 _value
-    )   
+    )
         whenNotPaused
         public
         returns (bool)
@@ -284,7 +284,7 @@ contract StandardToken is ERC20,Pausable {
     */
     function approve(address _spender, uint256 _value) whenNotPaused public returns (bool) {
         require(_value == 0 || (allowed[msg.sender][_spender] == 0));
-        
+
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -302,7 +302,7 @@ contract StandardToken is ERC20,Pausable {
     function increaseApproval(
         address _spender,
         uint256 _addedValue
-    )   
+    )
         whenNotPaused
         public
         returns (bool)
@@ -492,7 +492,7 @@ contract GUCN is MintableToken {
     string public constant symbol = "GUCN";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 10000000000;
-    
+
     /**
     * @dev Constructor that gives msg.sender all of existing tokens.
     */
@@ -501,4 +501,15 @@ contract GUCN is MintableToken {
         balances[msg.sender] = totalSupply_;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

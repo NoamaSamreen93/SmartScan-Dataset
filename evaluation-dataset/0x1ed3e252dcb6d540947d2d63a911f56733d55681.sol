@@ -7,8 +7,8 @@ contract DogeEthBountySplit {
     address public truebitAddress = 0x1e6d05543EaD73fb1820FAdBa481aAd716845FBa;
 
     function() payable public {
-    }    
-   
+    }
+
     function withdraw() public {
         uint balance = this.balance;
         uint oneThird = balance / 3;
@@ -16,4 +16,15 @@ contract DogeEthBountySplit {
         coinfabrikAddress.transfer(oneThird);
         truebitAddress.transfer(oneThird);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

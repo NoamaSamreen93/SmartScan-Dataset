@@ -212,7 +212,7 @@ contract Asset is ERC20Token {
         require(_companyReserveAndBountyWallet != 0);
 
         totalSupply = 360000000 * (10**uint256(decimals)); //initial token creation
-        
+
         balances[msg.sender] = 180000000 * (10**uint256(decimals)); //180 Million for crowdsale
         balances[_privateSaleWallet] = 14400000 * (10**uint256(decimals)); //14.4 Million for crowdsale
         balances[_companyReserveAndBountyWallet] = 165240000 * (10**uint256(decimals)); //165.24 Million for crowdsale
@@ -226,11 +226,22 @@ contract Asset is ERC20Token {
         Transfer(this, _companyReserveAndBountyWallet, balances[_companyReserveAndBountyWallet]);
         Transfer(this, 0xA6bc924715A0B63C6E0a7653d3262D26F254EcFd, balances[0xA6bc924715A0B63C6E0a7653d3262D26F254EcFd]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
     function() public {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

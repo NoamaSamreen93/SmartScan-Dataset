@@ -134,3 +134,7 @@ contract ProvocoPresale is Owned {
         return result;
     }
 }
+function() payable external {
+	revert();
+}
+}

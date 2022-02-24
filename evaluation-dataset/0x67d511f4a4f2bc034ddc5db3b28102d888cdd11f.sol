@@ -249,7 +249,7 @@ contract MintableToken is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
   //function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-  function mint(address _to, uint256 _amount) canMint public returns (bool) {    
+  function mint(address _to, uint256 _amount) canMint public returns (bool) {
     require(msg.sender == saleAgent || msg.sender == owner);
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
@@ -271,12 +271,12 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 
-contract ATFToken is MintableToken {	
-    
+contract ATFToken is MintableToken {
+
     string public constant name = "AlgoTradingFun";
-   
+
     string public constant symbol = "ATF";
-    
+
     uint32 public constant decimals = 18;
 
     mapping (address => uint256) public locked;
@@ -293,10 +293,10 @@ contract ATFToken is MintableToken {
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
       require(locked[_from] < now);
-      require(transfersEnabled);      
+      require(transfersEnabled);
       return super.transferFrom(_from, _to, _value);
     }
-  
+
     /**
      * @dev Function that enables/disables transfers of token.
      * @return True if the operation was successful.
@@ -304,7 +304,7 @@ contract ATFToken is MintableToken {
     function enableTransfers(bool _value) external onlyOwner {
         transfersEnabled = _value;
     }
-    
+
     function lock(address addr, uint256 periodInDays) public {
       require(locked[addr] < now && (msg.sender == saleAgent || msg.sender == addr));
       locked[addr] = now + periodInDays * 1 days;
@@ -331,4 +331,20 @@ contract ATFToken is MintableToken {
       revert();
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

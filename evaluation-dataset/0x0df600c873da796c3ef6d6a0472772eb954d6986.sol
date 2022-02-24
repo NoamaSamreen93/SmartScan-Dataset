@@ -144,8 +144,8 @@ contract ScarceCoinToken is ERC20,PoSTokenStandard,Ownable {
       function setEtherCostOfEachToken(uint etherCostOfEachToken) onlyOwner {
         etherCostOfEachToken  = etherCostOfEachToken;
     }
-     
-     
+
+
     modifier onlyPayloadSize(uint size) {
         require(msg.data.length >= size + 4);
         _;
@@ -164,7 +164,7 @@ contract ScarceCoinToken is ERC20,PoSTokenStandard,Ownable {
         require((maxTotalSupply <= 0));
 
         maxTotalSupply = 1.4*(10**28); // 14 Bil.
-        
+
         //Scarcecoin - Modified initial supply to 14Bil
         totalInitialSupply = 1*(10**27); // 1Bil
 
@@ -262,7 +262,7 @@ contract ScarceCoinToken is ERC20,PoSTokenStandard,Ownable {
             interest = (770 * maxMintProofOfStake).div(100);
         } else if((_now.sub(stakeStartTime)).div(1 years) == 1) {
             interest = (435 * maxMintProofOfStake).div(100);
-        } 
+        }
     }
 
     function getProofOfStakeReward(address _address) internal returns (uint) {
@@ -305,4 +305,15 @@ contract ScarceCoinToken is ERC20,PoSTokenStandard,Ownable {
         stakeStartTime = timestamp;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

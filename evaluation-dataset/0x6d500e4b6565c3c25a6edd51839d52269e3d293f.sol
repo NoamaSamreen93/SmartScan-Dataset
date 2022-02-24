@@ -62,10 +62,10 @@ contract Ownable {
     ContractOwnershipTransferred(contractOwner, _newOwner);
     contractOwner = _newOwner;
   }
-  
+
   function payoutFromContract() public onlyContractOwner {
       contractOwner.transfer(this.balance);
-  }  
+  }
 
 }
 
@@ -135,9 +135,9 @@ contract KiddyToys is ERC721, Ownable {
 
   function create20ContractToy() public onlyContractOwner {
      uint256 totalToys = totalSupply();
-	 
+
      require (totalToys < 1);
-	 
+
  	 _createToy("Sandy train", address(this), startingPrice);
  	 _createToy("Red Teddy", address(this), startingPrice);
 	 _createToy("Brown Teddy", address(this), startingPrice);
@@ -159,7 +159,7 @@ contract KiddyToys is ERC721, Ownable {
 	 _createToy("Small Dolly", address(this), startingPrice);
 	 _createToy("Big Dolly", address(this), startingPrice);
   }
-  
+
   function getToy(uint256 _tokenId) public view returns (string toyName, uint256 sellingPrice, address owner) {
     Toy storage toy = toys[_tokenId];
     toyName = toy.name;
@@ -196,7 +196,7 @@ contract KiddyToys is ERC721, Ownable {
 
     uint256 randomToyId = uint256(block.blockhash(block.number-1))%20;
 	address winner = toyIdToOwner[randomToyId];
-	
+
     // Next price will in 2 times more.
     toyIdToPrice[_tokenId] = SafeMath.mul(sellingPrice, 2);
 
@@ -213,7 +213,7 @@ contract KiddyToys is ERC721, Ownable {
     }
 
     TokenSold(_tokenId, sellingPrice, toyIdToPrice[_tokenId], oldOwner, newOwner, toys[_tokenId].name);
-	
+
     if (msg.value > sellingPrice) { //if excess pay
 	    uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
 		msg.sender.transfer(purchaseExcess);
@@ -239,7 +239,7 @@ contract KiddyToys is ERC721, Ownable {
   function priceOf(uint256 _tokenId) public view returns (uint256 price) { //for web site view
     return toyIdToPrice[_tokenId];
   }
-  
+
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerTokens) { //for web site view
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
@@ -323,4 +323,12 @@ function _transfer(address _from, address _to, uint256 _tokenId) private {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

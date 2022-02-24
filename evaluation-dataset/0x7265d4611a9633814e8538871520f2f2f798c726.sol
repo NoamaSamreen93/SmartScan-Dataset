@@ -90,7 +90,7 @@ contract ARCI is ARCInterface {
 
 	using SafeMath for uint256;
 	address owner = msg.sender;
-	
+
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
@@ -103,7 +103,7 @@ contract ARCI is ARCInterface {
     string public name;
     uint256 public decimals;
     string public symbol;
-	
+
     function ARCI(
         uint256 _initialAmount,
         uint256 _decimalUnits,
@@ -140,7 +140,7 @@ contract ARCI is ARCInterface {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-	
+
 	/**
    * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.
    * @param _spender The address which will spend the funds.
@@ -161,13 +161,13 @@ contract ARCI is ARCInterface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-	
+
 	function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-	
+
 	/**
      * @dev Throws if called by any account other than the owner.
      */
@@ -175,7 +175,7 @@ contract ARCI is ARCInterface {
         require(msg.sender == owner);
         _;
     }
-	
+
 	/**
       * @dev Allows the current owner to transfer control of the contract to a newOwner.
       * @param newOwner The address to transfer ownership to.
@@ -185,15 +185,31 @@ contract ARCI is ARCInterface {
             owner = newOwner;
         }
     }
-	
+
 	function withdraw() onlyOwner public {
         uint256 etherBalance = address(this).balance;
         owner.transfer(etherBalance);
     }
-	
+
 	function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

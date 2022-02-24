@@ -74,7 +74,7 @@ contract Killable is Ownable {
 contract ERC20 {
   uint public totalSupply;
   function balanceOf(address who) public constant returns (uint);
-  function allowance(address owner, address spender) public constant returns (uint);  
+  function allowance(address owner, address spender) public constant returns (uint);
   function transfer(address to, uint value) public returns (bool ok);
   function transferFrom(address from, address to, uint value) public returns (bool ok);
   function approve(address spender, uint value) public returns (bool ok);
@@ -87,7 +87,7 @@ contract ERC20 {
 contract SilentNotaryToken is SafeMath, ERC20, Killable {
   string constant public name = "Silent Notary Token";
   string constant public symbol = "SNTR";
- 
+
   /// Holder list
   address[] public holders;
   /// Balance data
@@ -236,4 +236,15 @@ contract SilentNotaryToken is SafeMath, ERC20, Killable {
   function allowance(address _owner, address _spender) constant public returns (uint remaining) {
     return allowed[_owner][_spender];
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

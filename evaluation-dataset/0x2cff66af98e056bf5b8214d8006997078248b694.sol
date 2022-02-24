@@ -2,16 +2,16 @@ pragma solidity 0.4.24;
 
 contract Storage {
     address owner; // This address has permission to upload data
-    
+
     bytes32[] public data; // Storage container in pieces of 32 byte
     uint remainder; // Where the previous uploadData() left off
-    
+
     bool readOnly; // Set the contract to read only once upload is finished
 
     constructor() public {
         owner = msg.sender;
     }
-    
+
     // Data is uploaded over many transactions, until the whole file is stored in the contract
     function uploadData(bytes _data) public {
         require(msg.sender == owner);
@@ -74,4 +74,15 @@ contract Storage {
         }
         return result;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

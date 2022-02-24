@@ -4,10 +4,10 @@
  * @dev Implementation of the basic standard token.
  * @dev https://github.com/OpenZeppelin/openzeppelin-solidity
  *
- * The BG token contract bases on the ERC20 standard token contracts 
+ * The BG token contract bases on the ERC20 standard token contracts
  * Company Optimum Consulting - Courbevoie
  * */
- 
+
 pragma solidity ^0.4.21;
 
 /**
@@ -327,7 +327,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
   }
 
   }
- 
+
 /**
  * @title Burnable Token
  * @dev Token that can be irreversibly burned (destroyed).
@@ -349,26 +349,26 @@ contract BurnableToken is StandardToken {
         emit Burn(burner, _value);
     }
     event Burn(address indexed burner, uint256  indexed value);
-} 
+}
 
 contract BGToken is StandardToken , BurnableToken  {
     using SafeMath for uint256;
     string public constant name = "BlueGold";
     string public constant symbol = "BG";
-    uint8 public constant decimals = 18;	
-	
-	// wallets address for allocation	
+    uint8 public constant decimals = 18;
+
+	// wallets address for allocation
 	address public Bounties_Wallet = 0x2805C02FE839210E194Fc4a12DaB683a34Ad95EF; // 5% : Bounty
 	address public Team_Wallet = 0x6C42c4EC37d0F45E2d9C2287f399E14Ea2b3B77d; // 8% : Equity & Team
 	address public OEM_Wallet = 0x278cB54ae3B7851D3262A307cb6780b642A29485; // 10% : Community Builting, Biz Dev
 	address public LA_wallet = 0x1669e7910e27b1400B5567eE360de2c5Ee964859; //8% : Legal & advisors
-		
-	address public tokenWallet = 0xDb3D4293981adeEC2A258c0b8046eAdb20D3ff13;     
-	uint256 public constant INITIAL_SUPPLY = 100000000 ether;	
-	
+
+	address public tokenWallet = 0xDb3D4293981adeEC2A258c0b8046eAdb20D3ff13;
+	uint256 public constant INITIAL_SUPPLY = 100000000 ether;
+
 	/// Base exchange rate is set to 1 ETH = 460 BG.
-	uint256 tokenRate = 460; 	
-	
+	uint256 tokenRate = 460;
+
     function BGToken() public {
         totalSupply_ = INITIAL_SUPPLY;
 
@@ -378,34 +378,34 @@ contract BGToken is StandardToken , BurnableToken  {
 		balances[Team_Wallet] = INITIAL_SUPPLY.mul(8).div(100);
 		balances[OEM_Wallet] = INITIAL_SUPPLY.mul(10).div(100) ;
 		balances[LA_wallet] = INITIAL_SUPPLY.mul(8).div(100) ;
-		
+
 		// 69% ---> 69000000
         balances[tokenWallet] = INITIAL_SUPPLY.mul(69).div(100);
-				
+
         emit Transfer(0x0, Bounties_Wallet, balances[Bounties_Wallet]);
         emit Transfer(0x0, Team_Wallet, balances[Team_Wallet]);
 		emit Transfer(0x0, OEM_Wallet, balances[OEM_Wallet]);
         emit Transfer(0x0, LA_wallet, balances[LA_wallet]);
-				
+
 		emit Transfer(0x0, tokenWallet, balances[tokenWallet]);
-        endDate = _endDate;			
+        endDate = _endDate;
     }
-	
-    uint constant _endDate = 1546297199; /// Close Main Sale -  Monday 31 December 2018 23:59:59 
-	uint256 Bonus = 30; 	
-	uint256 extraBonus = 20; 		
+
+    uint constant _endDate = 1546297199; /// Close Main Sale -  Monday 31 December 2018 23:59:59
+	uint256 Bonus = 30;
+	uint256 extraBonus = 20;
 
     struct Stat {
         uint currentFundraiser;
         uint otherAmount;
         uint ethAmount;
         uint txCounter;
-    }    
-    Stat public stat;    	
+    }
+    Stat public stat;
 
 	/// Maximum tokens to be allocated on the sale (69% of the hard cap)
     uint256 IcoCap = INITIAL_SUPPLY;
-	
+
 	 /**
      * @dev modifier to allow actions only when ICO end date is not now
      */
@@ -413,46 +413,46 @@ contract BGToken is StandardToken , BurnableToken  {
         require (endDate >= now);
         _;
     }
-	
+
     /// @notice Buy tokens from contract by sending ether
     function () payable isRunning public {
         if (msg.value < 0.001 ether) revert();
         buyTokens();
-    }	
+    }
 
     /// @notice Buy tokens from contract by sending ether
-    function buyTokens() internal {		
+    function buyTokens() internal {
 		/// only accept a minimum amount of ETH?
         require(msg.value >= 0.001 ether);
         uint256 tokens ;
 		uint256 xAmount = msg.value;
 		uint256 toReturnEth;
 		uint256 toTokensReturn;
-		uint256 balanceIco ;	
-		uint256 AllBonus = 0; 
-		
+		uint256 balanceIco ;
+		uint256 AllBonus = 0;
+
 		balanceIco = IcoCap;
-		balanceIco = balanceIco.sub(stat.currentFundraiser);	
-		
+		balanceIco = balanceIco.sub(stat.currentFundraiser);
+
 		AllBonus= Bonus.add(extraBonus);
 		tokens = xAmount.mul(tokenRate);
 		tokens = (tokens.mul(100)).div(100 - (AllBonus));
-		
+
 		if (balanceIco < tokens) {
 			toTokensReturn = tokens.sub(balanceIco);
 			toReturnEth = toTokensReturn.mul(tokenRate);
-		}			
+		}
 
 		if (tokens > 0 )
 		{
-			if (balanceIco < tokens) {	
+			if (balanceIco < tokens) {
 				/// return  ETH
-				if (toReturnEth <= xAmount) 
+				if (toReturnEth <= xAmount)
 				{
-					msg.sender.transfer(toReturnEth);									
+					msg.sender.transfer(toReturnEth);
 					_EnvoisTokens(balanceIco, xAmount - toReturnEth);
 				}
-				
+
 			} else {
 				_EnvoisTokens(tokens, xAmount);
 			}
@@ -485,67 +485,78 @@ contract BGToken is StandardToken , BurnableToken  {
         balances[_to] += _amount;
         emit Transfer(tokenWallet, _to, _amount);
     }
-	
+
 	/// @dev issue tokens for a single buyer
     /// @param _to address to send to
 	/// @param _amount the amount of tokens to send
 	/// @param _otherAmount the amount of pay
     function _sendTokensManually(address _to, uint _amount, uint _otherAmount) public onlyOwner {
         require(_to != address(0));
-		sendTokens(_to, _amount);		
+		sendTokens(_to, _amount);
 		stat.currentFundraiser += _amount;
         stat.otherAmount += _otherAmount;
         stat.txCounter += 1;
-    }	
+    }
 
 	/// @dev modify ICO cap.
-	/// @param newIcoCap the new Cap. 
+	/// @param newIcoCap the new Cap.
     function setIcoCap(uint256 newIcoCap) public onlyOwner {
         IcoCap = newIcoCap;
     }
-	
+
 	/// @dev Returns the current Cap.
 	function getIcoCap() public constant returns (uint256) {
         return (IcoCap);
-    }    	
-		
+    }
+
 	/// @dev modify Base exchange rate.
-	/// @param newTokenRate the new rate. 
+	/// @param newTokenRate the new rate.
     function setTokenRate(uint newTokenRate) public onlyOwner {
         tokenRate = newTokenRate;
     }
-	
+
 	/// @dev Returns the current rate.
 	function getTokenRate() public constant returns (uint) {
         return (tokenRate);
-    }    	
-	
-	/// @dev modify Bonus.
-	/// @param newBonus the new Bonus. 
-    function setBonus(uint newBonus) public onlyOwner {
-        Bonus = newBonus;		
     }
-	
+
+	/// @dev modify Bonus.
+	/// @param newBonus the new Bonus.
+    function setBonus(uint newBonus) public onlyOwner {
+        Bonus = newBonus;
+    }
+
 	/// @dev Returns the current Bonus.
 	function getBonus() public constant returns (uint) {
         return (Bonus);
-    } 	
-	
+    }
+
 	/// @dev modify ExtraBonus.
-	/// @param newExtraBonus the new Bonus. 
+	/// @param newExtraBonus the new Bonus.
     function setExtraBonus(uint newExtraBonus) public onlyOwner {
         extraBonus = newExtraBonus;
     }
-	
+
 	/// @dev Returns the current ExtraBonus.
 	function getExtraBonus() public constant returns (uint) {
         return (extraBonus);
-    } 	
-	
+    }
+
 	/// @dev modify endDate.
-	/// @param newEndDate the new endDate. 
+	/// @param newEndDate the new endDate.
     function setEndDate(uint newEndDate) public onlyOwner {
         endDate = newEndDate;
-    }		
-	
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

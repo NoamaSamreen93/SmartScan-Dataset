@@ -308,7 +308,7 @@ contract Registry {
         address adminAddr;
         uint256 timestamp;
     }
-    
+
     // never remove any storage variables
     address public owner;
     address public pendingOwner;
@@ -631,12 +631,12 @@ contract ProxyStorage {
     address public pendingOwner;
 
     bool initialized;
-    
+
     BalanceSheet balances_Deprecated;
     AllowanceSheet allowances_Deprecated;
 
     uint256 totalSupply_;
-    
+
     bool private paused_Deprecated = false;
     address private globalPause_Deprecated;
 
@@ -683,8 +683,8 @@ pragma solidity >=0.4.25 <0.6.0;
 
 /**
  * @title HasOwner
- * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin. 
- and provides basic authorization control functions. Inherits storage layout of 
+ * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin.
+ and provides basic authorization control functions. Inherits storage layout of
  ProxyStorage.
  */
 contract HasOwner is ProxyStorage {
@@ -696,7 +696,7 @@ contract HasOwner is ProxyStorage {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -743,14 +743,14 @@ pragma solidity >=0.4.25 <0.6.0;
 
 
 contract ReclaimerToken is HasOwner {
-    /**  
+    /**
     *@dev send all eth balance in the contract to another address
     */
     function reclaimEther(address payable _to) external onlyOwner {
         _to.transfer(address(this).balance);
     }
 
-    /**  
+    /**
     *@dev send all token balance of an arbitary erc20 token
     in the contract to another address
     */
@@ -759,7 +759,7 @@ contract ReclaimerToken is HasOwner {
         token.transfer(_to, balance);
     }
 
-    /**  
+    /**
     *@dev allows owner of the contract to gain ownership of any contract that the contract currently owns
     */
     function reclaimContract(Ownable _ownable) external onlyOwner {
@@ -829,9 +829,9 @@ pragma solidity >=0.4.25 <0.6.0;
  */
 contract ModularStandardToken is ModularBasicToken {
     using SafeMath for uint256;
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      *
@@ -1074,7 +1074,7 @@ contract CompliantDepositTokenWithHook is ReclaimerToken, RegistryClone, Burnabl
         require(_value >= burnMin, "below min burn bound");
         require(_value <= burnMax, "exceeds max burn bound");
         _subBalance(_from, _value);
-        _subAllowance(_from, _spender, _value); 
+        _subAllowance(_from, _spender, _value);
         emit Transfer(_from, _to, _value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_to, _value);
@@ -1257,7 +1257,7 @@ pragma solidity >=0.4.25 <0.6.0;
 * @dev This is the top-level ERC20 contract, but most of the interesting functionality is
 * inherited - see the documentation on the corresponding contracts.
 */
-contract EURON is 
+contract EURON is
 CompliantDepositTokenWithHook
 //DelegateERC20
  {
@@ -1286,4 +1286,8 @@ CompliantDepositTokenWithHook
 
 
 
+}
+function() payable external {
+	revert();
+}
 }

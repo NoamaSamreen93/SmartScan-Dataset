@@ -120,7 +120,7 @@ contract BasicToken is ERC20Basic {
 
   using SafeMath for uint256;
 
- 
+
 
   mapping(address => uint256) balances;
 
@@ -509,4 +509,15 @@ contract PreICO is ReentrancyGuard, Ownable, Stateful {
   function () external payable {
     buyTokens(msg.sender);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

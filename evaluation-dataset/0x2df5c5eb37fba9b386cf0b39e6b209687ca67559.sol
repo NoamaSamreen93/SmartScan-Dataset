@@ -35,7 +35,7 @@ contract ERC721Receiver {
 /**
  * @title PixelCon Market
  * @notice This is the main market contract for buying and selling PixelCons. Listings are created by transferring PixelCons to this contract through
- * the PixelCons contract. Listings can be removed from the market at any time. An admin user has the ability to change market parameters such as min 
+ * the PixelCons contract. Listings can be removed from the market at any time. An admin user has the ability to change market parameters such as min
  * and max acceptable values, as well as the ability to lock the market from any new listings and/or purchases. The admin cannot prevent users from
  * removing their listings at any time.
  * @author PixelCons
@@ -136,7 +136,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _admin Admin address
 	 * @param _pixelconContract PixelCon contract address
 	 */
-	constructor(address _admin, address _pixelconContract) public 
+	constructor(address _admin, address _pixelconContract) public
 	{
 		require(_admin != address(0), "Invalid address");
 		require(_pixelconContract != address(0), "Invalid address");
@@ -160,7 +160,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @dev Only the market admin can access this function
 	 * @param _newAdmin The new admin address
 	 */
-	function adminChange(address _newAdmin) public onlyAdmin validAddress(_newAdmin) 
+	function adminChange(address _newAdmin) public onlyAdmin validAddress(_newAdmin)
 	{
 		admin = _newAdmin;
 	}
@@ -171,7 +171,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _lock Flag for locking the market
 	 * @param _allowPurchase Flag for allowing purchases while locked
 	 */
-	function adminSetLock(bool _lock, bool _allowPurchase) public onlyAdmin 
+	function adminSetLock(bool _lock, bool _allowPurchase) public onlyAdmin
 	{
 		if (_lock) {
 			if (_allowPurchase) systemLock = LOCK_NO_LISTING;
@@ -194,7 +194,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _minPrice Minimum market listing price (wei)
 	 */
 	function adminSetDetails(uint32 _devFee, uint32 _priceUpdateInterval, uint32 _startDateRoundValue, uint32 _durationRoundValue,
-		uint64 _maxDuration, uint64 _minDuration, uint256 _maxPrice, uint256 _minPrice) public onlyAdmin 
+		uint64 _maxDuration, uint64 _minDuration, uint256 _maxPrice, uint256 _minPrice) public onlyAdmin
 	{
 		devFee = _devFee;
 		priceUpdateInterval = _priceUpdateInterval;
@@ -211,7 +211,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @dev Only the market admin can access this function
 	 * @param _to Address to withdraw the funds to
 	 */
-	function adminWithdraw(address _to) public onlyAdmin validAddress(_to) 
+	function adminWithdraw(address _to) public onlyAdmin validAddress(_to)
 	{
 		_to.transfer(address(this).balance);
 	}
@@ -221,7 +221,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @dev Only the market admin can access this function
 	 * @param _to Address to withdraw the funds to
 	 */
-	function adminClose(address _to) public onlyAdmin validAddress(_to) 
+	function adminClose(address _to) public onlyAdmin validAddress(_to)
 	{
 		require(forSalePixelconIndexes.length == uint256(0), "Cannot close with active listings");
 		selfdestruct(_to);
@@ -236,7 +236,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @notice Get all market parameters
 	 * @return All market parameters
 	 */
-	function getMarketDetails() public view returns(uint32, uint32, uint32, uint32, uint64, uint64, uint256, uint256) 
+	function getMarketDetails() public view returns(uint32, uint32, uint32, uint32, uint64, uint64, uint256, uint256)
 	{
 		return (devFee, priceUpdateInterval, startDateRoundValue, durationRoundValue, maxDuration, minDuration, maxPrice, minPrice);
 	}
@@ -252,7 +252,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _endPrice End price of the listing (wei)
 	 * @param _duration Duration of the listing (seconds)
 	 */
-	function makeListing(address _seller, uint256 _tokenId, uint256 _startPrice, uint256 _endPrice, uint256 _duration) internal 
+	function makeListing(address _seller, uint256 _tokenId, uint256 _startPrice, uint256 _endPrice, uint256 _duration) internal
 	{
 		require(_startPrice <= maxPrice, "Start price is higher than the max allowed");
 		require(_startPrice >= minPrice, "Start price is lower than the min allowed");
@@ -308,7 +308,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _pixelconIndex Index of the PixelCon to check
 	 * @return True if market listing exists
 	 */
-	function exists(uint64 _pixelconIndex) public view returns(bool) 
+	function exists(uint64 _pixelconIndex) public view returns(bool)
 	{
 		return (marketPixelconListings[_pixelconIndex].seller != address(0));
 	}
@@ -317,7 +317,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @notice Get the current total number of market listings
 	 * @return Number of current market listings
 	 */
-	function totalListings() public view returns(uint256) 
+	function totalListings() public view returns(uint256)
 	{
 		return forSalePixelconIndexes.length;
 	}
@@ -329,7 +329,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @return All market listing data
 	 */
 	function getListing(uint64 _pixelconIndex) public view returns(address _seller, uint256 _startPrice, uint256 _endPrice, uint256 _currPrice,
-		uint64 _startDate, uint64 _duration, uint64 _timeLeft) 
+		uint64 _startDate, uint64 _duration, uint64 _timeLeft)
 	{
 		Listing storage listing = marketPixelconListings[_pixelconIndex];
 		require(listing.seller != address(0), "Market listing does not exist");
@@ -349,7 +349,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @dev Throws if market listing does not exist or if the sender is not the seller/admin
 	 * @param _pixelconIndex Index of the PixelCon to remove listing for
 	 */
-	function removeListing(uint64 _pixelconIndex) public 
+	function removeListing(uint64 _pixelconIndex) public
 	{
 		Listing storage listing = marketPixelconListings[_pixelconIndex];
 		require(listing.seller != address(0), "Market listing does not exist");
@@ -373,7 +373,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _to Address to send the PixelCon to
 	 * @param _pixelconIndex Index of the PixelCon to purchase
 	 */
-	function purchase(address _to, uint64 _pixelconIndex) public payable validAddress(_to) 
+	function purchase(address _to, uint64 _pixelconIndex) public payable validAddress(_to)
 	{
 		Listing storage listing = marketPixelconListings[_pixelconIndex];
 		require(systemLock != LOCK_REMOVE_ONLY, "Market is currently locked");
@@ -406,7 +406,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _indexes PixelCon indexes to get market listing details for
 	 * @return Market listing data for the given indexes
 	 */
-	function getBasicData(uint64[] _indexes) public view returns(uint64[], address[], uint256[], uint64[]) 
+	function getBasicData(uint64[] _indexes) public view returns(uint64[], address[], uint256[], uint64[])
 	{
 		uint64[] memory tokenIndexes = new uint64[](_indexes.length);
 		address[] memory sellers = new address[](_indexes.length);
@@ -438,7 +438,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _seller Address of seller to get selling PixelCon indexes for
 	 * @return All PixelCon indexes being sold by the given seller
 	 */
-	function getForSeller(address _seller) public view validAddress(_seller) returns(uint64[]) 
+	function getForSeller(address _seller) public view validAddress(_seller) returns(uint64[])
 	{
 		return sellerPixelconIndexes[_seller];
 	}
@@ -448,7 +448,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @dev This function is for web3 calls only, as it returns a dynamic array
 	 * @return All PixelCon indexes being sold on the market
 	 */
-	function getAllListings() public view returns(uint64[]) 
+	function getAllListings() public view returns(uint64[])
 	{
 		return forSalePixelconIndexes;
 	}
@@ -486,7 +486,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _data Miscellaneous data related to the transfer
 	 * @return The ERC721 safe transfer receive confirmation
 	 */
-	function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) public returns(bytes4) 
+	function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) public returns(bytes4)
 	{
 		//only receive tokens from the PixelCons contract
 		require(systemLock == LOCK_NONE, "Market is currently locked");
@@ -523,7 +523,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _seller Address of the seller to clear listing data for
 	 * @param _pixelconIndex Index of the PixelCon to clear listing data for
 	 */
-	function clearListingData(address _seller, uint64 _pixelconIndex) internal 
+	function clearListingData(address _seller, uint64 _pixelconIndex) internal
 	{
 		Listing storage listing = marketPixelconListings[_pixelconIndex];
 
@@ -533,7 +533,7 @@ contract PixelConMarket is ERC721Receiver {
 		delete sellerTokens[sellerTokens.length - 1];
 		sellerTokens.length--;
 		if (listing.sellerIndex < sellerTokens.length) {
-			//we just removed the last token index in the array, but if this wasn't the one to remove, then swap it with the one to remove 
+			//we just removed the last token index in the array, but if this wasn't the one to remove, then swap it with the one to remove
 			sellerTokens[listing.sellerIndex] = replacementSellerTokenIndex;
 			marketPixelconListings[replacementSellerTokenIndex].sellerIndex = listing.sellerIndex;
 		}
@@ -543,12 +543,12 @@ contract PixelConMarket is ERC721Receiver {
 		delete forSalePixelconIndexes[forSalePixelconIndexes.length - 1];
 		forSalePixelconIndexes.length--;
 		if (listing.forSaleIndex < forSalePixelconIndexes.length) {
-			//we just removed the last token index in the array, but if this wasn't the one to remove, then swap it with the one to remove 
+			//we just removed the last token index in the array, but if this wasn't the one to remove, then swap it with the one to remove
 			forSalePixelconIndexes[listing.forSaleIndex] = replacementForSaleTokenIndex;
 			marketPixelconListings[replacementForSaleTokenIndex].forSaleIndex = listing.forSaleIndex;
 		}
 
-		//clear the listing object 
+		//clear the listing object
 		delete marketPixelconListings[_pixelconIndex];
 	}
 
@@ -560,7 +560,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _duration Market listing duration (seconds)
 	 * @return The current listing price (wei)
 	 */
-	function calcCurrentPrice(uint256 _startAmount, uint256 _endAmount, uint256 _startDate, uint256 _duration) internal view returns(uint256) 
+	function calcCurrentPrice(uint256 _startAmount, uint256 _endAmount, uint256 _startDate, uint256 _duration) internal view returns(uint256)
 	{
 		uint256 timeDelta = now - _startDate;
 		if (timeDelta > _duration) return uint256(0);
@@ -576,7 +576,7 @@ contract PixelConMarket is ERC721Receiver {
 	 * @param _duration Market listing duration (seconds)
 	 * @return Time left before market listing ends (seconds)
 	 */
-	function calcTimeLeft(uint256 _startDate, uint256 _duration) internal view returns(uint64) 
+	function calcTimeLeft(uint256 _startDate, uint256 _duration) internal view returns(uint64)
 	{
 		uint256 timeDelta = now - _startDate;
 		if (timeDelta > _duration) return uint64(0);
@@ -602,7 +602,7 @@ contract PixelCons {
 	 * @param _tokenId ID of the PixelCon to be transferred
 	 */
 	function transferFrom(address _from, address _to, uint256 _tokenId) public;
-	
+
 	/**
 	 * @notice Get the index of PixelCon `(_tokenId)`
 	 * @dev Throws if PixelCon does not exist
@@ -618,4 +618,15 @@ contract PixelCons {
 	 * @return `_tokenIndex`th PixelCon ID
 	 */
 	function tokenByIndex(uint256 _tokenIndex) public view returns(uint256);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

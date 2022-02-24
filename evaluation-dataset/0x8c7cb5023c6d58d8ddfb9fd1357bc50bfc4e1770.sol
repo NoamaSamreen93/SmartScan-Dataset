@@ -84,7 +84,7 @@ contract ModuleManager is SelfAuthorized, Executor {
     address public constant SENTINEL_MODULES = address(0x1);
 
     mapping (address => address) internal modules;
-    
+
     function setupModules(address to, bytes data)
         internal
     {
@@ -367,19 +367,19 @@ contract Module is MasterCopy {
 }
 
 contract SignatureDecoder {
-    
-    /// @dev Recovers address who signed the message 
+
+    /// @dev Recovers address who signed the message
     /// @param messageHash operation ethereum signed message hash
     /// @param messageSignature message `txHash` signature
     /// @param pos which signature to read
     function recoverKey (
-        bytes32 messageHash, 
+        bytes32 messageHash,
         bytes messageSignature,
         uint256 pos
     )
         internal
         pure
-        returns (address) 
+        returns (address)
     {
         uint8 v;
         bytes32 r;
@@ -437,10 +437,10 @@ contract StateChannelModule is Module, SignatureDecoder {
     /// @param nonce Nonce used for this Safe transaction.
     /// @param signatures Packed signature data ({bytes32 r}{bytes32 s}{uint8 v})
     function execTransaction(
-        address to, 
-        uint256 value, 
-        bytes data, 
-        Enum.Operation operation, 
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation,
         uint256 nonce,
         bytes signatures
     )
@@ -480,10 +480,10 @@ contract StateChannelModule is Module, SignatureDecoder {
     /// @param nonce Transaction nonce.
     /// @return Transaction hash.
     function getTransactionHash(
-        address to, 
-        uint256 value, 
-        bytes data, 
-        Enum.Operation operation, 
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation,
         uint256 nonce
     )
         public
@@ -492,4 +492,15 @@ contract StateChannelModule is Module, SignatureDecoder {
     {
         return keccak256(abi.encodePacked(byte(0x19), byte(0), this, to, value, data, operation, nonce));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

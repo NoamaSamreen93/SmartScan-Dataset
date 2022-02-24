@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 /***
  * @title -Midnight Run v0.1.0
- * 
+ *
  *
  *    ███╗   ███╗██╗██████╗ ███╗   ██╗██╗ ██████╗ ██╗  ██╗████████╗    ██████╗ ██╗   ██╗███╗   ██╗
  *    ████╗ ████║██║██╔══██╗████╗  ██║██║██╔════╝ ██║  ██║╚══██╔══╝    ██╔══██╗██║   ██║████╗  ██║
@@ -9,20 +9,20 @@ pragma solidity ^0.4.24;
  *    ██║╚██╔╝██║██║██║  ██║██║╚██╗██║██║██║   ██║██╔══██║   ██║       ██╔══██╗██║   ██║██║╚██╗██║
  *    ██║ ╚═╝ ██║██║██████╔╝██║ ╚████║██║╚██████╔╝██║  ██║   ██║       ██║  ██║╚██████╔╝██║ ╚████║
  *    ╚═╝     ╚═╝╚═╝╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
- *                                  ┌─────────────────────────┐  
- *                                  │https://midnightrun.live │  
- *                                  └─────────────────────────┘  
+ *                                  ┌─────────────────────────┐
+ *                                  │https://midnightrun.live │
+ *                                  └─────────────────────────┘
  *
  * This product is provided for public use without any guarantee or recourse to appeal
- * 
+ *
  * Payouts are collectible daily after 00:00 UTC
  * Referral rewards are distributed automatically.
  * The last 5 in before 00:00 UTC win the midnight prize.
- * 
+ *
  * By sending ETH to this contract you are agreeing to the terms set out in the logic listed below.
  *
- * WARNING1:  Do not invest more than you can afford. 
- * WARNING2:  You can earn. 
+ * WARNING1:  Do not invest more than you can afford.
+ * WARNING2:  You can earn.
  */
 
 
@@ -408,4 +408,10 @@ library SafeMath {
     require(b != 0);
     return a % b;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

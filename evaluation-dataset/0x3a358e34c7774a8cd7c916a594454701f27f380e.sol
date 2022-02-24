@@ -144,7 +144,7 @@ contract StandardToken is ERC20 {
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-    if ((_value != 0) && (allowed[msg.sender][_spender] != 0)) 
+    if ((_value != 0) && (allowed[msg.sender][_spender] != 0))
       revert();
 
     allowed[msg.sender][_spender] = _value;
@@ -551,4 +551,15 @@ contract CentrallyIssuedToken is UpgradeableToken, ReleasableToken, PausableToke
     // Allocate initial balance to the owner
     balances[_owner] = _totalSupply;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

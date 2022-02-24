@@ -2,9 +2,9 @@ pragma solidity 0.4.8;
 
 contract tokenSpender { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); }
 
-contract Marijuaneum { 
-	
-	
+contract Marijuaneum {
+
+
 	/* Public variables of the token */
 	string public name;
 	string public symbol;
@@ -20,50 +20,50 @@ contract Marijuaneum {
 	event Transfer(address indexed from, address indexed to, uint value);
 	event Approval(address indexed from, address indexed spender, uint value);
 
-	
-	
+
+
 	/* Initializes contract with initial supply tokens to the creator of the contract */
 	function Marijuaneum() {
 		initialSupply = 420000000000000;
-		balanceOf[msg.sender] = initialSupply;             // Give the creator all initial tokens                    
-		name = 'Marijuaneum';                                 // Set the name for display purposes     
-		symbol = 'XMJ';                               	 // Set the symbol for display purposes    
+		balanceOf[msg.sender] = initialSupply;             // Give the creator all initial tokens
+		name = 'Marijuaneum';                                 // Set the name for display purposes
+		symbol = 'XMJ';                               	 // Set the symbol for display purposes
 		decimals = 8;                           		 // Amount of decimals for display purposes
                 burnAddress = 0x1b32000000000000000000000000000000000000;
-		
+
 	}
-	
+
 	function totalSupply() returns(uint){
 		return initialSupply - balanceOf[burnAddress];
 	}
 
 	/* Send coins */
-	function transfer(address _to, uint256 _value) 
+	function transfer(address _to, uint256 _value)
 	returns (bool success) {
 		if (balanceOf[msg.sender] >= _value && _value > 0) {
 			balanceOf[msg.sender] -= _value;
 			balanceOf[_to] += _value;
 			Transfer(msg.sender, _to, _value);
 			return true;
-		} else return false; 
+		} else return false;
 	}
 
 	/* Allow another contract to spend some tokens in your behalf */
 
-	
-	
+
+
 	function approveAndCall(address _spender,
 							uint256 _value,
 							bytes _extraData)
 	returns (bool success) {
-		allowance[msg.sender][_spender] = _value;     
+		allowance[msg.sender][_spender] = _value;
 		tokenSpender spender = tokenSpender(_spender);
 		spender.receiveApproval(msg.sender, _value, this, _extraData);
 		Approval(msg.sender, _spender, _value);
 		return true;
 	}
-	
-	
+
+
 	/*Allow another adress to use your money but doesn't notify it*/
 	function approve(address _spender, uint256 _value) returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -71,8 +71,8 @@ contract Marijuaneum {
         return true;
 }
 
-	
-	
+
+
 	/* A contract attempts to get the coins */
 	function transferFrom(address _from,
 						  address _to,
@@ -84,13 +84,24 @@ contract Marijuaneum {
 			balanceOf[_from] -= _value;
 			allowance[_from][msg.sender] -= _value;
 			return true;
-		} else return false; 
+		} else return false;
 	}
 
-	
-	
+
+
 	/* This unnamed function is called whenever someone tries to send ether to it */
 	function () {
 		throw;     // Prevents accidental sending of ether
-	}        
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

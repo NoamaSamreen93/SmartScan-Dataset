@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 /**
  *  MXL PRE SALE CONTRACTS
- * 
+ *
  *  Adapted from SIKOBA PRE SALE CONTRACTS
  *
 **/
@@ -88,7 +88,7 @@ contract Owned {
 ///  Apr 24 2017 - Alex Kampa     - edited constants and added pre allocation amounts
 ///
 ///  Dec 22 2017 - Carlos Afonso  - edited constants removed pre allocation amounts
-///                                 
+///
 /// ----------------------------------------------------------------------------------------
 contract MXLPresale is Owned {
     // -------------------------------------------------------------------------------------
@@ -101,43 +101,43 @@ contract MXLPresale is Owned {
     //    will not run out of gas as this will vary with the number of preallocation
     //    account entries
     // 5. A stable version of Solidity has been used. Check for any major bugs in the
-    //    Solidity release announcements after this version.    
+    //    Solidity release announcements after this version.
     // -------------------------------------------------------------------------------------
 
     // Keep track of the total funding amount
     uint256 public totalFunding;
 
     // Minimum and maximum amounts per transaction for public participants
-    uint256 public constant MINIMUM_PARTICIPATION_AMOUNT = 0.009 ether; 
+    uint256 public constant MINIMUM_PARTICIPATION_AMOUNT = 0.009 ether;
     uint256 public constant MAXIMUM_PARTICIPATION_AMOUNT = 90 ether;
 
     // Minimum and maximum goals of the pre sale
 	// Based on Budget of 300k€ to 450k€ at 614€ per ETH on 2018-12-28
     uint256 public constant PRESALE_MINIMUM_FUNDING = 486 ether;
     uint256 public constant PRESALE_MAXIMUM_FUNDING = 720 ether;
-	
+
 
     // Total preallocation in wei
     //uint256 public constant TOTAL_PREALLOCATION = 999.999 ether; // no preallocation
 
-    // Public pre sale periods  
+    // Public pre sale periods
 	// Starts 2018-01-03T00:00:00+00:00 in ISO 8601
     uint256 public constant PRESALE_START_DATE = 1514937600;
-	
+
 	// Ends 2018-03-27T18:00:00+00:00 in ISO 8601
     uint256 public constant PRESALE_END_DATE = 1522173600;
-	
+
 	// Limit 30% Bonus 2018-02-18T00:00:00+00:00 in ISO 8601
 	//uint256 public constant PRESALE_30BONUS_END = 1518912000;  // for reference only
 	// Limit 15% Bonus 2018-03-09T00:00:00+00:00 in ISO 8601
 	//uint256 public constant PRESALE_15BONUS_END = 1520553000;  // for reference only
-	
+
 
     // Owner can clawback after a date in the future, so no ethers remain
     // trapped in the contract. This will only be relevant if the
     // minimum funding level is not reached
     // 2018-04-27T00:00:00+00:00 in ISO 8601
-    uint256 public constant OWNER_CLAWBACK_DATE = 1524787200; 
+    uint256 public constant OWNER_CLAWBACK_DATE = 1524787200;
 
     /// @notice Keep track of all participants contributions, including both the
     ///         preallocation and public phases
@@ -151,7 +151,7 @@ contract MXLPresale is Owned {
     event LogParticipation(address indexed sender, uint256 value, uint256 timestamp);
 
     function MXLPresale () public payable {
-		// no preallocated 
+		// no preallocated
         //assertEquals(TOTAL_PREALLOCATION, msg.value);
         // Pre-allocations
         //addBalance(0xe902741cD4666E4023b7E3AB46D3DE2985c996f1, 0.647 ether);
@@ -248,4 +248,15 @@ contract MXLPresale is Owned {
         if (result > base) revert();
         return result;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

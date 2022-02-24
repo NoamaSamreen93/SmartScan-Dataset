@@ -137,3 +137,9 @@ contract CryptotechNetworkToken is ERC20Interface, Owned {
 
 // @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // © CRYPTOTECH 2018 https://cryptotech.network
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

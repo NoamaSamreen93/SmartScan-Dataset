@@ -86,9 +86,9 @@ contract NeverEndingApp {
 
     /// @dev 100 Never Ending App Tokens needed for masternode activation
     uint256 public stakingRequirement = 100e18;
-    
+
     // 7.5% Total extra fee to keep the FOMO going
-    
+
     // Dev (2.5%)
     address internal devFeeAddress = 0x5B2FA02281491E51a97c0b087215c8b2597C8a2f;
     // Yes we need to pay for marketing (1% buy)
@@ -96,12 +96,12 @@ contract NeverEndingApp {
     // To make it rain dividends once in a while (1% sell)
     address internal feedingFeeAddress = 0x8b8158c9D815E7720e16CEc3e1166A2D4F96b8A6;
     // Website and community runners (1% buy)
-    address internal employeeFeeAddress1 = 0x2959114502Fca4d506Ae7cf88f602e7038a29AC1; 
+    address internal employeeFeeAddress1 = 0x2959114502Fca4d506Ae7cf88f602e7038a29AC1;
     // Admin/Moderator
     address internal employeeFeeAddress2 = 0x5B2FA02281491E51a97c0b087215c8b2597C8a2f;
     // Admin/Moderator
     address internal employeeFeeAddress3 = 0x5B2FA02281491E51a97c0b087215c8b2597C8a2f;
-    
+
     address internal admin;
     mapping(address => bool) internal ambassadors_;
 
@@ -120,90 +120,90 @@ contract NeverEndingApp {
     uint256 constant internal ambassadorQuota_ = 5000 ether;
     bool public onlyAmbassadors = true;
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
-    
+
     uint ACTIVATION_TIME = 1543172400;
-    
+
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if(onlyAmbassadors){
             require(
                 // is the customer in the ambassador list?
                 (ambassadors_[msg.sender] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[msg.sender] + _amountOfEthereum) <= ambassadorMaxPurchase_)
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[msg.sender] = SafeMath.add(ambassadorAccumulatedQuota_[msg.sender], _amountOfEthereum);
-        
+
             // execute
             _;
         }else{
             onlyAmbassadors=false;
             _;
         }
-        
+
     }
-    
-    
+
+
     function NeverEndingApp() public{
         admin=msg.sender;
 
-        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; // 
-        ambassadors_[0x77c192342F25a364FB17C25cdDddb194a8d34991] = true; // 
-        ambassadors_[0xE206201116978a48080C4b65cFA4ae9f03DA3F0D] = true; // 
-        ambassadors_[0x21adD73393635b26710C7689519a98b09ecdc474] = true; // 
-        ambassadors_[0xEc31176d4df0509115abC8065A8a3F8275aafF2b] = true; // 
-        ambassadors_[0x77a21F9E0325950f679d28ed99d8715437c74145] = true; // 
+        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; //
+        ambassadors_[0x77c192342F25a364FB17C25cdDddb194a8d34991] = true; //
+        ambassadors_[0xE206201116978a48080C4b65cFA4ae9f03DA3F0D] = true; //
+        ambassadors_[0x21adD73393635b26710C7689519a98b09ecdc474] = true; //
+        ambassadors_[0xEc31176d4df0509115abC8065A8a3F8275aafF2b] = true; //
+        ambassadors_[0x77a21F9E0325950f679d28ed99d8715437c74145] = true; //
         ambassadors_[0xc7F15d0238d207e19cce6bd6C0B85f343896F046] = true; //
         ambassadors_[0xBa21d01125D6932ce8ABf3625977899Fd2C7fa30] = true; //
         ambassadors_[0x2277715856C6d9E0181BA01d21e059f76C79f2bD] = true; //
         ambassadors_[0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF] = true; //
         ambassadors_[0xEafE863757a2b2a2c5C3f71988b7D59329d09A78] = true; //
-        ambassadors_[0xB19772e5E8229aC499C67E820Db53BF52dbaf0dE] = true; //        
+        ambassadors_[0xB19772e5E8229aC499C67E820Db53BF52dbaf0dE] = true; //
         ambassadors_[0x42830382f378d083A8Ae55Eb729A9d789fA4dEA6] = true; //
         ambassadors_[0x87f7baA7e7570DD811e50fC43F5c26d02801F3f4] = true; //
-        ambassadors_[0x53e1eB6a53d9354d43155f76861C5a2AC80ef361] = true; //    
-        ambassadors_[0x80F946BF39531E65DBEdfcA1B9e29CaC562d43a4] = true; //  
-        ambassadors_[0x41a21b264F9ebF6cF571D4543a5b3AB1c6bEd98C] = true; // 
-        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; // 
-        
-        
-        
+        ambassadors_[0x53e1eB6a53d9354d43155f76861C5a2AC80ef361] = true; //
+        ambassadors_[0x80F946BF39531E65DBEdfcA1B9e29CaC562d43a4] = true; //
+        ambassadors_[0x41a21b264F9ebF6cF571D4543a5b3AB1c6bEd98C] = true; //
+        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; //
+
+
+
 
     }
-    
+
   function disableAmbassadorPhase() public{
         require(admin==msg.sender);
         onlyAmbassadors=false;
     }
-    
+
   function changeEmployee1(address _employeeAddress1) public{
         require(admin==msg.sender);
         employeeFeeAddress1=_employeeAddress1;
     }
-    
+
   function changeEmployee2(address _employeeAddress2) public{
         require(admin==msg.sender);
         employeeFeeAddress2=_employeeAddress2;
     }
-    
+
   function changeEmployee3(address _employeeAddress3) public{
         require(admin==msg.sender);
         employeeFeeAddress3=_employeeAddress3;
     }
-    
+
   function changeMarketing(address _marketingAddress) public{
         require(admin==msg.sender);
         marketingFeeAddress=_marketingAddress;
     }
-    
+
     /*=======================================
     =            PUBLIC FUNCTIONS           =
     =======================================*/
@@ -284,7 +284,7 @@ contract NeverEndingApp {
         uint256 _devFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 100);
         uint256 _marketingFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 100);
         uint256 _feedingFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 100);
-        
+
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _devFee), _marketingFee), _feedingFee);
 
         // burn the sold tokens
@@ -305,7 +305,7 @@ contract NeverEndingApp {
         feedingFeeAddress.transfer(_feedingFee);
         // fire event
          onTokenSell(_customerAddress, _tokens, _taxedEthereum, now, buyPrice());
-       
+
     }
 
 
@@ -463,7 +463,7 @@ contract NeverEndingApp {
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
-        
+
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
@@ -643,3 +643,10 @@ library SafeMath {
     }
 
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

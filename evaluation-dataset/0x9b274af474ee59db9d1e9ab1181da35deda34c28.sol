@@ -96,7 +96,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
+
     function transferlottery(address _to, uint256 _value, bytes data) returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -155,7 +155,7 @@ contract LTRToken is StandardToken {
         name = "LTR Token - Lottery Services Global";        // Ten cua token
         decimals = 18;                     // Token khong co phan thapphan (so nguyen thoi)
         symbol = "LTR";                   // Ma token
-        balances[msg.sender] = 100000000000 * (10 ** uint256(decimals));      // Nguoi phathanh se namgiu toanbo token  
+        balances[msg.sender] = 100000000000 * (10 ** uint256(decimals));      // Nguoi phathanh se namgiu toanbo token
 		totalSupply = 100000000000 * (10 ** uint256(decimals));               // Tong cung token 100000000000 * (10 ** uint256(decimals))
     }
 
@@ -171,4 +171,13 @@ contract LTRToken is StandardToken {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

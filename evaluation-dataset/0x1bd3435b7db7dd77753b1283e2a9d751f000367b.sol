@@ -1,10 +1,10 @@
 pragma solidity 0.4.24;
-  
+
 //@title WitToken
-//@author(luoyuanq233@gmail.com) 
+//@author(luoyuanq233@gmail.com)
 //@dev 该合约参考自openzeppelin的erc20实现
 //1.使用openzeppelin的SafeMath库防止运算溢出
-//2.使用openzeppelin的Ownable,Roles,RBAC来做权限控制,自定义了ceo,coo,cro等角色  
+//2.使用openzeppelin的Ownable,Roles,RBAC来做权限控制,自定义了ceo,coo,cro等角色
 //3.ERC20扩展了ERC20Basic，实现了授权转移
 //4.BasicToken,StandardToken,PausableToken均是erc20的具体实现
 //5.BlackListToken加入黑名单方法
@@ -123,14 +123,14 @@ contract RBAC is Ownable {
   string public constant ROLE_CRO = "cro";//风控
   string public constant ROLE_MANAGER = "manager";//经办员
   string public constant ROLE_REVIEWER = "reviewer";//审核员
-  
+
   /**
    * @dev constructor. Sets msg.sender as ceo by default
    */
   constructor() public{
     addRole(msg.sender, ROLE_CEO);
   }
-  
+
   /**
    * @dev reverts if addr does not have role
    * @param addr address
@@ -154,7 +154,7 @@ contract RBAC is Ownable {
   function ownerAddCeo(address addr) onlyOwner public {
     addRole(addr, ROLE_CEO);
   }
-  
+
   function ownerRemoveCeo(address addr) onlyOwner public{
     removeRole(addr, ROLE_CEO);
   }
@@ -162,31 +162,31 @@ contract RBAC is Ownable {
   function ceoAddCoo(address addr) onlyCEO public {
     addRole(addr, ROLE_COO);
   }
-  
+
   function ceoRemoveCoo(address addr) onlyCEO public{
     removeRole(addr, ROLE_COO);
   }
-  
+
   function cooAddManager(address addr) onlyCOO public {
     addRole(addr, ROLE_MANAGER);
   }
-  
+
   function cooRemoveManager(address addr) onlyCOO public {
     removeRole(addr, ROLE_MANAGER);
   }
-  
+
   function cooAddReviewer(address addr) onlyCOO public {
     addRole(addr, ROLE_REVIEWER);
   }
-  
+
   function cooRemoveReviewer(address addr) onlyCOO public {
     removeRole(addr, ROLE_REVIEWER);
   }
-  
+
   function cooAddCro(address addr) onlyCOO public {
     addRole(addr, ROLE_CRO);
   }
-  
+
   function cooRemoveCro(address addr) onlyCOO public {
     removeRole(addr, ROLE_CRO);
   }
@@ -229,7 +229,7 @@ contract RBAC is Ownable {
     checkRole(msg.sender, ROLE_COO);
     _;
   }
-  
+
   /**
    * @dev modifier to scope access to cro
    * // reverts
@@ -238,7 +238,7 @@ contract RBAC is Ownable {
     checkRole(msg.sender, ROLE_CRO);
     _;
   }
-  
+
   /**
    * @dev modifier to scope access to manager
    * // reverts
@@ -247,7 +247,7 @@ contract RBAC is Ownable {
     checkRole(msg.sender, ROLE_MANAGER);
     _;
   }
-  
+
   /**
    * @dev modifier to scope access to reviewer
    * // reverts
@@ -297,7 +297,7 @@ library SafeMath {
 
 
 /**
- * 
+ *
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
@@ -332,10 +332,10 @@ contract BasicToken is ERC20Basic, RBAC {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
-  uint256 public basisPointsRate;//手续费率 
-  uint256 public maximumFee;//最大手续费 
-  address public assetOwner;//收取的手续费和增发的资产都到这个地址上, 赎回资产时会从这个地址销毁资产 
+
+  uint256 public basisPointsRate;//手续费率
+  uint256 public maximumFee;//最大手续费
+  address public assetOwner;//收取的手续费和增发的资产都到这个地址上, 赎回资产时会从这个地址销毁资产
 
   /**
   * @dev total number of tokens in existence
@@ -358,7 +358,7 @@ contract BasicToken is ERC20Basic, RBAC {
         fee = maximumFee;
     }
     uint256 sendAmount = _value.sub(fee);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(sendAmount);
@@ -366,7 +366,7 @@ contract BasicToken is ERC20Basic, RBAC {
         balances[assetOwner] = balances[assetOwner].add(fee);
         emit Transfer(msg.sender, assetOwner, fee);
     }
-    
+
     emit Transfer(msg.sender, _to, sendAmount);
     return true;
   }
@@ -411,7 +411,7 @@ contract StandardToken is ERC20, BasicToken  {
             fee = maximumFee;
         }
     uint256 sendAmount = _value.sub(fee);
-    
+
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(sendAmount);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -566,13 +566,13 @@ contract PausableToken is StandardToken, Pausable {
 
 contract BlackListToken is PausableToken  {
 
-  
+
     function getBlackListStatus(address _maker) external view returns (bool) {
         return isBlackListed[_maker];
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyCRO {
         isBlackListed[_evilUser] = true;
         emit AddedBlackList(_evilUser);
@@ -611,73 +611,73 @@ contract BlackListToken is PausableToken  {
 * 4.经办人提交数据后，复核人执行成功后，需要经办人再次提交才能再次执行
 **/
 contract TwoPhaseToken is BlackListToken{
-    
+
     //保存经办人提交的参数
     struct MethodParam {
         string method; //方法名
         uint value;  //增发或者赎回的数量
         bool state;  //true表示经办人有提交数据,复核人执行成功后变为false
     }
-    
+
     mapping (string => MethodParam) params;
-    
-    //方法名常量 
+
+    //方法名常量
     string public constant ISSUE_METHOD = "issue";
     string public constant REDEEM_METHOD = "redeem";
-    
-    
+
+
     //经办人提交增发数量
     function submitIssue(uint _value) public onlyMANAGER {
         params[ISSUE_METHOD] = MethodParam(ISSUE_METHOD, _value, true);
         emit SubmitIsses(msg.sender,_value);
     }
-    
+
     //复核人第二次确认增发数量并执行
     function comfirmIsses(uint _value) public onlyREVIEWER {
-       
+
         require(params[ISSUE_METHOD].value == _value);
         require(params[ISSUE_METHOD].state == true);
-        
+
         balances[assetOwner]=balances[assetOwner].add(_value);
         totalSupply_ = totalSupply_.add(_value);
-        params[ISSUE_METHOD].state=false; 
+        params[ISSUE_METHOD].state=false;
         emit ComfirmIsses(msg.sender,_value);
     }
-    
+
     //经办人提交赎回数量
     function submitRedeem(uint _value) public onlyMANAGER {
         params[REDEEM_METHOD] = MethodParam(REDEEM_METHOD, _value, true);
          emit SubmitRedeem(msg.sender,_value);
     }
-    
+
     //复核人第二次确认赎回数量并执行
     function comfirmRedeem(uint _value) public onlyREVIEWER {
-       
+
        require(params[REDEEM_METHOD].value == _value);
        require(params[REDEEM_METHOD].state == true);
-       
+
        balances[assetOwner]=balances[assetOwner].sub(_value);
        totalSupply_ = totalSupply_.sub(_value);
        params[REDEEM_METHOD].state=false;
        emit ComfirmIsses(msg.sender,_value);
     }
-    
+
     //根据方法名，查看经办人提交的参数
     function getMethodValue(string _method) public view returns(uint){
         return params[_method].value;
     }
-    
+
     //根据方法名，查看经办人是否有提交数据
     function getMethodState(string _method) public view returns(bool) {
       return params[_method].state;
     }
-   
+
      event SubmitRedeem(address submit, uint _value);
      event ComfirmRedeem(address comfirm, uint _value);
      event SubmitIsses(address submit, uint _value);
      event ComfirmIsses(address comfirm, uint _value);
 
-    
+
 }
 
 
@@ -719,9 +719,9 @@ contract WitToken is TwoPhaseToken {
         assetOwner = msg.sender;
         emit Transfer(address(0x0), msg.sender, _totalTokenAmount);
     }
-    
-    
-    
+
+
+
      // Forward ERC20 methods to upgraded contract if this one is deprecated
      function totalSupply() public view returns (uint256) {
          if (deprecated) {
@@ -730,7 +730,7 @@ contract WitToken is TwoPhaseToken {
             return totalSupply_;
         }
     }
-    
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function balanceOf(address _owner) public view returns (uint256 balance) {
          if (deprecated) {
@@ -740,7 +740,7 @@ contract WitToken is TwoPhaseToken {
         }
     }
 
-    
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function transfer(address _to, uint _value) public validDestination(_to) returns (bool) {
         require(!isBlackListed[msg.sender]);
@@ -749,7 +749,7 @@ contract WitToken is TwoPhaseToken {
         } else {
             return super.transfer(_to, _value);
         }
-        
+
     }
 
 
@@ -760,7 +760,7 @@ contract WitToken is TwoPhaseToken {
         } else {
            return super.allowance(_owner, _spender);
         }
-        
+
     }
 
 
@@ -772,27 +772,27 @@ contract WitToken is TwoPhaseToken {
         } else {
             return super.transferFrom(_from, _to, _value);
         }
-       
+
     }
-    
-    
+
+
      // Forward ERC20 methods to upgraded contract if this one is deprecated
      function approve(address _spender, uint256 _value) public returns (bool) {
           if (deprecated) {
             return UpgradedStandardToken(upgradedAddress).approveByLegacy(msg.sender, _spender, _value);
         } else {
             return super.approve(_spender, _value);
-        } 
+        }
     }
-    
-    
+
+
     // Forward ERC20 methods to upgraded contract if this one is deprecated
     function increaseApproval(address _spender, uint _value) public returns (bool) {
          if (deprecated) {
             return UpgradedStandardToken(upgradedAddress).increaseApprovalByLegacy(msg.sender, _spender, _value);
         } else {
             return super.increaseApproval(_spender, _value);
-        } 
+        }
     }
 
 
@@ -802,46 +802,57 @@ contract WitToken is TwoPhaseToken {
             return UpgradedStandardToken(upgradedAddress).decreaseApprovalByLegacy(msg.sender, _spender, _value);
         } else {
             return super.decreaseApproval(_spender, _value);
-        } 
+        }
    }
-   
-   
+
+
     // deprecate current contract in favour of a new one
     function deprecate(address _upgradedAddress) public onlyCEO whenPaused {
         deprecated = true;
         upgradedAddress = _upgradedAddress;
         emit Deprecate(_upgradedAddress);
     }
-    
+
     // Called when contract is deprecated
     event Deprecate(address newAddress);
-    
-    
+
+
    /**
    * @dev Set up transaction fees
    * @param newBasisPoints  A few ten-thousandth (设置手续费率为万分之几)
    * @param newMaxFee Maximum fee (设置最大手续费,不需要添加decimals)
    */
     function setFeeParams(uint newBasisPoints, uint newMaxFee) public onlyCEO {
-       
+
         basisPointsRate = newBasisPoints;
         maximumFee = newMaxFee.mul(uint(10)**decimals);
         emit FeeParams(basisPointsRate, maximumFee);
     }
-    
+
 
     function transferAssetOwner(address newAssetOwner) public onlyCEO {
       require(newAssetOwner != address(0));
       assetOwner = newAssetOwner;
       emit TransferAssetOwner(assetOwner, newAssetOwner);
     }
-    
+
     event TransferAssetOwner(address assetOwner, address newAssetOwner);
-    
+
      // Called if contract ever adds fees
     event FeeParams(uint feeBasisPoints, uint maxFee);
-    
-    
-    
 
+
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

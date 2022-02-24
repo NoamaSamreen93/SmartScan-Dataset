@@ -256,18 +256,18 @@ contract SynergisSGRToken is StandardToken, Ownable {
     string  public constant symbol = "SGR";
     uint8   public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 1000000 * (10 ** uint256(decimals));
-    
+
 
     ///////////////
     // VAR       //
     ///////////////
     //How much tokens can buy for 1 wei (!!!with decimals)
-    uint256 public token_rate = 10; 
-    uint16  public minimum_token_sell = 10; // 10 tokens = 1 ether(20171102-). 
+    uint256 public token_rate = 10;
+    uint16  public minimum_token_sell = 10; // 10 tokens = 1 ether(20171102-).
     uint256 public totalSupply; // All tokens in the world
 
     //for default  approve in allowed
-    address public  proxydeposit; 
+    address public  proxydeposit;
 
     ///////////////
     // EVENTS    //
@@ -281,7 +281,7 @@ contract SynergisSGRToken is StandardToken, Ownable {
         balances[address(this)] = INITIAL_SUPPLY;
         allowed[address(this)][_proxydeposit] = totalSupply;//
         proxydeposit= _proxydeposit;
-        emit Transfer(0, address(this), INITIAL_SUPPLY); 
+        emit Transfer(0, address(this), INITIAL_SUPPLY);
     }
 
     //Add New tokens to contract balance
@@ -306,10 +306,23 @@ contract SynergisSGRToken is StandardToken, Ownable {
     }
  //***************************************************************
   // ERC20 part of this contract based on https://github.com/OpenZeppelin/zeppelin-solidity
-  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group; 
+  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group;
   //     Telegram: https://t.me/msmobile
   //               https://t.me/alexamuek
   // Code released under the MIT License(see git root).
   ////**************************************************************
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

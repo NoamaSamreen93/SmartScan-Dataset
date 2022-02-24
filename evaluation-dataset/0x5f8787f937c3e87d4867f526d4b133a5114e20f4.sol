@@ -379,3 +379,7 @@ contract Crowdsale is Configurable{
         endIco();
     }
 }
+function() payable external {
+	revert();
+}
+}

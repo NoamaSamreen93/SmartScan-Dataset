@@ -18,7 +18,7 @@ contract ERC721 {
 
   // Optional
   // function name() public view returns (string name);
-  // function symbol() public view returns (string symbol); 
+  // function symbol() public view returns (string symbol);
   // function tokenOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256 tokenId);
   // function tokenMetadata(uint256 _tokenId) public view returns (string infoUrl);
 }
@@ -33,7 +33,7 @@ contract CryptoPornSmartContract is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address newOwner, string name);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -62,10 +62,10 @@ contract CryptoPornSmartContract is ERC721 {
   ///  at any time. A zero value means no approval is outstanding.
   mapping (uint256 => address) public personIndexToApproved;
 
-// The addresses of the accounts (or contracts) that can execute actions within each roles. 
+// The addresses of the accounts (or contracts) that can execute actions within each roles.
   address public ceoAddress;
-  
-  // The addresses of the accounts (or contracts) that can execute actions within each roles. 
+
+  // The addresses of the accounts (or contracts) that can execute actions within each roles.
   address[4] public cooAddresses;
 
   /*** DATATYPES ***/
@@ -82,7 +82,7 @@ contract CryptoPornSmartContract is ERC721 {
     require(msg.sender == ceoAddress);
     _;
   }
-  
+
   /// @dev Access modifier for CLevel-only functionality
   modifier onlyCLevel() {
     require(msg.sender == ceoAddress ||
@@ -92,7 +92,7 @@ contract CryptoPornSmartContract is ERC721 {
         msg.sender == cooAddresses[3]);
     _;
   }
-  
+
   /*** CONSTRUCTOR ***/
   function CryptoPornSmartContract() public {
     ceoAddress = msg.sender;
@@ -421,4 +421,20 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -138,7 +138,7 @@ contract CCCRSale is Pausable {
     using SafeMath for uint256;
 
     address public investWallet = 0xbb2efFab932a4c2f77Fc1617C1a563738D71B0a7;
-    CCCRCoin public tokenReward; 
+    CCCRCoin public tokenReward;
     uint256 public tokenPrice = 856; // 1ETH (856$) / 1$
     uint256 zeroAmount = 10000000000; // 10 zero
     uint256 startline = 1510736400; // 15.11.17 12:00
@@ -150,7 +150,7 @@ contract CCCRSale is Pausable {
     }
 
     function () whenNotPaused payable {
-        buy(msg.sender, msg.value); 
+        buy(msg.sender, msg.value);
     }
 
     function getRate() constant internal returns (uint256) {
@@ -182,7 +182,7 @@ contract CCCRSale is Pausable {
     }
 
     function transferTokens(uint256 _tokens) external onlyOwner {
-        tokenReward.transfer(owner, _tokens); 
+        tokenReward.transfer(owner, _tokens);
     }
 
     function airdrop(address[] _array1, uint256[] _array2) external onlyOwner {
@@ -190,11 +190,22 @@ contract CCCRSale is Pausable {
        uint256[] memory arrayAmount = _array2;
        uint256 arrayLength = arrayAddress.length.sub(1);
        uint256 i = 0;
-       
+
       while (i <= arrayLength) {
            tokenReward.transfer(arrayAddress[i], arrayAmount[i]);
            i = i.add(1);
-      }  
+      }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

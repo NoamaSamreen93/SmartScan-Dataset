@@ -3,7 +3,7 @@ pragma solidity ^0.4.25;
 /**
     Hi this is an hyip contract Golden Ratio Percent
     it is based on 200percent project code
-    
+
     Official site ->  call meth.site_url()
 
     How to use:
@@ -341,4 +341,13 @@ contract GoldenRatioPercent is Ownable {
     function() external payable {
         _deposit();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

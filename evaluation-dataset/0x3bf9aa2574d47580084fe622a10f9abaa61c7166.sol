@@ -873,7 +873,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1130,7 +1130,7 @@ contract KansasvsClemson is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function KansasvsClemson() public payable {
     owner = msg.sender;
@@ -1246,7 +1246,7 @@ contract KansasvsClemson is usingOraclize {
   function collectionsAvailable() public constant returns(bool) {
     return (completed && winningOption != 2 && now >= (winnerDeterminedDate + 600)); // At least 10 mins has to pass between determining winner and enabling payout, so that we have time to revert the bet in case we detect suspicious betting activty (eg. a hacker bets a lot to steal the entire losing pot, and hacks the oracle)
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES && !canceled && !completed);
@@ -1298,7 +1298,7 @@ contract KansasvsClemson is usingOraclize {
     }
 
     // Calculate total pool of ETH
-    // betted for the two outcomes    
+    // betted for the two outcomes
     uint losingChunk = totalAmountsBet[1 - winningOption];
     ownerPayout = (losingChunk - oraclizeFees) / COMMISSION; // Payout to the owner; commission of losing pot, minus a % of the fees
 
@@ -1363,4 +1363,15 @@ contract KansasvsClemson is usingOraclize {
     }
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

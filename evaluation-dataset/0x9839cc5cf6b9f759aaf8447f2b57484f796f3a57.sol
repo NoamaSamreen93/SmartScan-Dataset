@@ -184,15 +184,15 @@ contract ERC20Token is StandardToken {
 
     // Constructors
     constructor (
-        address benefeciary, 
-        string memory _name, 
-        string memory _symbol, 
-        uint _totalSupply, 
+        address benefeciary,
+        string memory _name,
+        string memory _symbol,
+        uint _totalSupply,
         uint _decimals
     )
         public
     {
-        
+
         decimals = _decimals;
         totalSupply = _totalSupply;
         name = _name;
@@ -282,4 +282,15 @@ contract TokenMaker is Ownable {
     function withdrawTokens() public onlyOwner {
       dcToken.transfer(msg.sender, dcToken.balanceOf(address(this)));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

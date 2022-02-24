@@ -360,14 +360,14 @@ contract SparksterToken is StandardToken, Ownable{
 	event ChangedAllowedToPurchase(bool allowedToPurchase);
 	event ChangedAllowedToBuyBack(bool allowedToBuyBack);
 	event SetSellPrice(uint256 sellPrice);
-	
+
 	modifier onlyOwnerOrOracle() {
 		require(msg.sender == owner || msg.sender == oracleAddress);
 		_;
 	}
-	
+
 	// Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
-	modifier onlyPayloadSize(uint size) {	 
+	modifier onlyPayloadSize(uint size) {
 		require(msg.data.length == size + 4);
 		_;
 	}
@@ -400,7 +400,7 @@ contract SparksterToken is StandardToken, Ownable{
 		setMaximumGasPrice(40);
 		mintTokens(435000000);
 	}
-	
+
 	function setOracleAddress(address newAddress) public onlyOwner returns(bool success) {
 		oracleAddress = newAddress;
 		return true;
@@ -450,7 +450,7 @@ contract SparksterToken is StandardToken, Ownable{
 			return true;
 		}
 	}
-	
+
 	function purchaseCallbackOnAccept(uint256 groupNumber, address[] addresses, uint256[] weiAmounts) public onlyOwnerOrOracle returns(bool success) {
 		uint256 n = addresses.length;
 		require(n == weiAmounts.length, "Array lengths mismatch");
@@ -521,16 +521,16 @@ contract SparksterToken is StandardToken, Ownable{
 		theGroup.distributing = false;
 		emit DistributeDone(groupNumber);
 	}
-	
+
 	function drain() public onlyOwner {
 		owner.transfer(address(this).balance);
 	}
-	
+
 	function setPenalty(uint256 newPenalty) public onlyOwner returns(bool success) {
 		penalty = newPenalty;
 		return true;
 	}
-	
+
 	function buyback(uint256 amount) public canSell { // Can't sell unless owner has allowed it.
 		uint256 decimalAmount = amount.mul(uint(10)**decimals); // convert the full token value to the smallest unit possible.
 		require(balances[msg.sender].sub(decimalAmount) >= getLockedTokens_(msg.sender)); // Don't allow to sell locked tokens.
@@ -549,7 +549,7 @@ contract SparksterToken is StandardToken, Ownable{
 	function setSellPrice(uint256 thePrice) public onlyOwner {
 		sellPrice = thePrice;
 	}
-	
+
 	function setAllowedToBuyBack(bool value) public onlyOwner {
 		allowedToBuyBack = value;
 		emit ChangedAllowedToBuyBack(value);
@@ -559,7 +559,7 @@ contract SparksterToken is StandardToken, Ownable{
 		allowedToPurchase = value;
 		emit ChangedAllowedToPurchase(value);
 	}
-	
+
 	function createGroup(uint256 startEpoch, uint256 phase1endEpoch, uint256 phase2endEpoch, uint256 deadlineEpoch, uint256 phase2weiCap, uint256 phase3weiCap, uint256 hardWeiCap, uint256 ratio) public onlyOwner returns (bool success, uint256 createdGroupNumber) {
 		createdGroupNumber = nextGroupNumber;
 		Group storage theGroup = groups[createdGroupNumber];
@@ -595,7 +595,7 @@ contract SparksterToken is StandardToken, Ownable{
 		deadline = theGroup.deadline;
 		weiTotal = theGroup.weiTotal;
 	}
-	
+
 	function getHowMuchUntilHardCap_(uint256 groupNumber) internal view returns(uint256 remainder) {
 		Group storage theGroup = groups[groupNumber];
 		if (theGroup.weiTotal > theGroup.cap) { // calling .sub in this situation will throw.
@@ -603,7 +603,7 @@ contract SparksterToken is StandardToken, Ownable{
 		}
 		return theGroup.cap.sub(theGroup.weiTotal);
 	}
-	
+
 	function getHowMuchUntilHardCap() public view returns(uint256 remainder) {
 		return getHowMuchUntilHardCap_(openGroupNumber);
 	}
@@ -612,13 +612,13 @@ contract SparksterToken is StandardToken, Ownable{
 		emit AddToGroup(walletAddress, groupNumber);
 		return true;
 	}
-	
+
 	function instructOracleToDistribute(uint256 groupNumber) public onlyOwner {
 		Group storage theGroup = groups[groupNumber];
 		require(groupNumber < nextGroupNumber && !theGroup.distributed); // can't have already distributed
 		emit WantsToDistribute(groupNumber);
 	}
-	
+
 	function distributeCallback(uint256 groupNumber, address[] addresses) public onlyOwnerOrOracle returns (bool success) {
 		Group storage theGroup = groups[groupNumber];
 		if (!theGroup.distributing) {
@@ -646,12 +646,12 @@ contract SparksterToken is StandardToken, Ownable{
 		theGroup.unlocked = true;
 		return true;
 	}
-	
+
 	function setGlobalLock(bool value) public onlyOwner {
 		transferLock = value;
 		emit ChangedTransferLock(transferLock);
 	}
-	
+
 	function burn(uint256 amount) public onlyOwner {
 		// Burns tokens from the owner's supply and doesn't touch allocated tokens.
 		// Decrease totalSupply and leftOver by the amount to burn so we can decrease the circulation.
@@ -659,7 +659,7 @@ contract SparksterToken is StandardToken, Ownable{
 		totalSupply_ = totalSupply_.sub(amount); // Will throw if result < 0
 		emit Transfer(msg.sender, address(0), amount);
 	}
-	
+
 	function splitTokensBeforeDistribution(uint256 splitFactor) public onlyOwner returns (bool success) {
 		// SplitFactor is the multiplier per decimal of spark. splitFactor * 10**decimals = splitFactor sparks
 		uint256 ownerBalance = balances[msg.sender];
@@ -717,7 +717,7 @@ contract SparksterToken is StandardToken, Ownable{
 		return true;
 	}
 
-	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {		
+	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {
 		// If the transferrer has purchased tokens, they must be unlocked before they can be used.
 		if (msg.sender != owner) { // Owner can transfer anything to anyone.
 			require(balances[msg.sender].sub(_value) >= getLockedTokens_(msg.sender));
@@ -780,5 +780,11 @@ contract SparksterToken is StandardToken, Ownable{
 		// Will be used if someone sends tokens to an incorrect address by accident. This way, we have the ability to recover the tokens. For example, sometimes there's a problem of lost tokens if someone sends tokens to a contract address that can't utilize the tokens.
 		allowed[_from][msg.sender] = allowed[_from][msg.sender].add(_value); // Authorize the owner to spend on someone's behalf.
 		return transferFrom(_from, _to, _value);
+	}
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
 	}
 }

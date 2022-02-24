@@ -112,10 +112,10 @@ contract CTBStandardToken is StandardToken {
     /* Public variables of the token */
 
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'V1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'V1.0';
 
     function CTBStandardToken(
         uint256 _initialAmount,
@@ -141,4 +141,17 @@ contract CTBStandardToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

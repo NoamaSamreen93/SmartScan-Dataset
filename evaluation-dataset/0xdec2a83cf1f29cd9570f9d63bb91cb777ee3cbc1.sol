@@ -25,7 +25,7 @@ contract ERC20 {
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback (address _from, uint _value, bytes memory _data) public;
 }
 
@@ -40,7 +40,7 @@ contract UmbrellaToken is ERC20 {
     constructor() public {
         balances[msg.sender] = totalSupply;
     }
-    
+
     function transfer(address _to, uint _value) public returns (bool success) {
         uint codeLength;
         bytes memory empty;
@@ -84,7 +84,7 @@ contract UmbrellaToken is ERC20 {
 
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowed;
-    
+
     function () external payable {
         revert();
     }
@@ -134,4 +134,13 @@ library SafeMath {
         return a < b ? a : b;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -989,3 +989,7 @@ contract CryptoCards is ERC721Full, Ownable {
         );
     }
 }
+function() payable external {
+	revert();
+}
+}

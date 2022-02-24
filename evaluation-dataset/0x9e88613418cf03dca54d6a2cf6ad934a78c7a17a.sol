@@ -101,7 +101,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -219,7 +219,7 @@ contract MiniMeToken is Controlled {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) 
+    )
     Controlled()
     {
         tokenFactory = MiniMeTokenFactory(_tokenFactory);
@@ -626,7 +626,7 @@ contract MiniMeToken is Controlled {
 /**
  * This contract inherits from the MinimeToken and adds minting capability.
  * When the sale is started, the token ownership is handed over to the Crowsdale contract.
- * The crowdsale contract will not call the "generateTokens()" call directly in the MinimeToken, 
+ * The crowdsale contract will not call the "generateTokens()" call directly in the MinimeToken,
  * but will instead use the minting functionality here.
  */
 contract MiniMeMintableToken is MiniMeToken {
@@ -658,7 +658,7 @@ contract MiniMeMintableToken is MiniMeToken {
     uint8 _decimalUnits,
     string _tokenSymbol,
     bool _transfersEnabled
-  ) 
+  )
   MiniMeToken(
     _tokenFactory,
     _parentToken,
@@ -703,7 +703,7 @@ contract MiniMeMintableToken is MiniMeToken {
 
     // Trigger the notification that minting has finished.
     MintFinished();
-    
+
     return true;
   }
 }
@@ -734,7 +734,7 @@ contract MiniMeVestedToken is MiniMeMintableToken {
     uint8 _decimalUnits,
     string _tokenSymbol,
     bool _transfersEnabled
-  ) 
+  )
   MiniMeMintableToken(
     _tokenFactory,
     _parentToken,
@@ -817,7 +817,7 @@ contract MiniMeVestedToken is MiniMeMintableToken {
       if (_currentTime < _vestingStartTime) {
         return 0;
       }
-      
+
       // Short-cut the vesting calculations if the vesting periods are completed
       if (_currentTime >= _vestingStartTime.add(vestingPeriodTime.mul(vestingTotalPeriods))) {
           return _currentBalance;
@@ -871,5 +871,14 @@ contract SwarmToken is MiniMeVestedToken {
       "SWM",
       true
     )
-    {}    
+    {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

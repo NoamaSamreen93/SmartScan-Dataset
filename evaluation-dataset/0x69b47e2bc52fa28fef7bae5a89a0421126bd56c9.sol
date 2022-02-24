@@ -185,20 +185,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyManager whenPaused {
         error = false;
     }
@@ -888,7 +888,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
     mapping(uint32 => uint64) internal assetTypeTotalCount;
 
     mapping(uint32 => uint64) internal assetTypeBurnedCount;
-  
+
     // Mapping from index of a Asset Type to get AssetID
     mapping(uint256 => mapping(uint32 => uint64) ) internal sequenceIDToTypeForID;
 
@@ -947,7 +947,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         else {
             require(isApprovedOrOwner(msg.sender, _tokenId));
         }
-        
+
     _;
     }
 
@@ -1020,8 +1020,8 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         uint256 dataB = nftDataB[_assetId];
         assetTypeSequenceId = uint256(uint64(dataB));
     }
-    
-    function getIsNFTAttached( uint256 _assetId) 
+
+    function getIsNFTAttached( uint256 _assetId)
     public view returns(
         uint256 isAttached
     ) {
@@ -1112,19 +1112,19 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
         emit Transfer(_from, _to, _tokenId);
     }
-    
 
-    
+
+
     function multiBatchTransferFrom(
-        uint256[] _assetIds, 
-        address[] _fromB, 
-        address[] _toB) 
+        uint256[] _assetIds,
+        address[] _fromB,
+        address[] _toB)
         public
     {
         uint256 _id;
         address _to;
         address _from;
-        
+
         for (uint256 i = 0; i < _assetIds.length; ++i) {
             _id = _assetIds[i];
             _to = _toB[i];
@@ -1134,21 +1134,21 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
             require(_from != address(0));
             require(_to != address(0));
-    
+
             clearApproval(_from, _id);
             removeTokenFrom(_from, _id);
             addTokenTo(_to, _id);
-    
+
             emit Transfer(_from, _to, _id);
         }
-        
+
     }
-    
-    function batchTransferFrom(uint256[] _assetIds, address _from, address _to) 
+
+    function batchTransferFrom(uint256[] _assetIds, address _from, address _to)
         public
     {
         uint256 _id;
-        
+
         for (uint256 i = 0; i < _assetIds.length; ++i) {
             _id = _assetIds[i];
 
@@ -1156,18 +1156,18 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
             require(_from != address(0));
             require(_to != address(0));
-    
+
             clearApproval(_from, _id);
             removeTokenFrom(_from, _id);
             addTokenTo(_to, _id);
-    
+
             emit Transfer(_from, _to, _id);
         }
     }
-    
+
     function multiBatchSafeTransferFrom(
-        uint256[] _assetIds, 
-        address[] _fromB, 
+        uint256[] _assetIds,
+        address[] _fromB,
         address[] _toB
         )
         public
@@ -1175,7 +1175,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         uint256 _id;
         address _to;
         address _from;
-        
+
         for (uint256 i = 0; i < _assetIds.length; ++i) {
             _id = _assetIds[i];
             _to  = _toB[i];
@@ -1186,8 +1186,8 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
     }
 
     function batchSafeTransferFrom(
-        uint256[] _assetIds, 
-        address _from, 
+        uint256[] _assetIds,
+        address _from,
         address _to
         )
         public
@@ -1201,7 +1201,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
 
     function batchApprove(
-        uint256[] _assetIds, 
+        uint256[] _assetIds,
         address _spender
         )
         public
@@ -1211,7 +1211,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
             _id = _assetIds[i];
             approve(_spender, _id);
         }
-        
+
     }
 
 
@@ -1226,8 +1226,8 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
             _spender = _spenders[i];
             setApprovalForAll(_spender, _approved);
         }
-    }  
-    
+    }
+
     function requestDetachment(
         uint256 _tokenId
     )
@@ -1251,10 +1251,10 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
                 //Is attached, set detachment time and make request to detach
                 emit DetachRequest(msg.sender, _tokenId, block.timestamp);
                 isAttached = block.timestamp;
-            }           
+            }
         } else {
             isAttached = 0;
-        } 
+        }
 
         if(isAttached == 0) {
             emit NFTDetached(msg.sender, _tokenId);
@@ -1291,7 +1291,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         }
     }
 
-    function requestDetachmentOnPause (uint256 _tokenId) public 
+    function requestDetachmentOnPause (uint256 _tokenId) public
     whenPaused {
         //Request can only be made by owner or approved address
         require(isApprovedOrOwner(msg.sender, _tokenId));
@@ -1315,11 +1315,11 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         require(getIsNFTAttached(_assetID) == 0);
 
         require(isApprovedOrOwner(msg.sender, _assetID) == true);
-        
+
         //Updates Type Total Count
         uint256 _assetType = getAssetIdItemType(_assetID);
         assetTypeBurnedCount[uint32(_assetType)] += 1;
-        
+
         _burn(msg.sender, _assetID);
     }
 
@@ -1401,13 +1401,13 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
     }
 
     function burnAssetOperator(uint256 _assetID) public anyOperator {
-        
+
         require(getIsNFTAttached(_assetID) > 0);
 
         //Updates Type Total Count
         uint256 _assetType = getAssetIdItemType(_assetID);
         assetTypeBurnedCount[uint32(_assetType)] += 1;
-        
+
         _burn(ownerOf(_assetID), _assetID);
     }
 
@@ -1442,12 +1442,12 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
     // @dev For creating NFT Collectible
     function _createAsset(address _to, uint256 _assetType, uint256 _assetID, uint256 _attachState, address _creator) internal returns(uint256) {
-        
+
         uint256 _sequenceId = uint256(assetTypeTotalCount[uint32(_assetType)]) + 1;
 
         //Will not allow creation if over limit
         require(assetTypeCreationLimit[uint32(_assetType)] == 0 || assetTypeCreationLimit[uint32(_assetType)] > _sequenceId);
-        
+
         // These requires are not strictly necessary, our calling code should make
         // sure that these conditions are never broken.
         require(_sequenceId == uint256(uint64(_sequenceId)));
@@ -1457,7 +1457,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
         uint256 nftData = uint256(_creator); // 160 bit address of creator
         nftData |= now<<160; // 48 bit creation timestamp
-        nftData |= _assetType<<208; // 32 bit item type 
+        nftData |= _assetType<<208; // 32 bit item type
 
         uint256 nftDataContinued = uint256(_sequenceId); // 64 bit sequence id of item
         nftDataContinued |= _attachState<<64; // 48 bit state and/or timestamp for detachment
@@ -1474,7 +1474,7 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
         return _assetID;
     }
 
-    function updateIsAttached(uint256 _assetID, uint256 _isAttached) 
+    function updateIsAttached(uint256 _assetID, uint256 _isAttached)
     internal
     {
         uint256 nftData = nftDataB[_assetID];
@@ -1489,4 +1489,20 @@ contract CCNFTFactory is ERC721Token, OperationalControl {
 
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

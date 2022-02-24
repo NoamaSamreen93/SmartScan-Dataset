@@ -6,12 +6,12 @@ pragma solidity ^0.5.2;
 *
 *                  upsweep.net
 *
-* Gambling with low gas fees, no edge and no leaks.  
+* Gambling with low gas fees, no edge and no leaks.
 *
-*   
+*
 *                _19^^^^0^^^^1_
 *             .18''           ``2.
-*           .17'      
+*           .17'
 *          .16'   Here's to the   `3.
 *         .15'      unfolding      `4.
 *         ::         of hope.       ::
@@ -22,7 +22,7 @@ pragma solidity ^0.5.2;
 *           `12.                .7'
 *             `11..          ..8'
 *                ^10........9^
-*                    ''''     
+*                    ''''
 *
 *
 /* @title The Upsweep Network; a social and sustainable circle of bets.
@@ -35,7 +35,7 @@ contract UpsweepV1 {
     uint public lastId;
     uint public counter;
     bool public closed;
-    
+
     struct Player {
         bool revealOnce;
         bool claimed;
@@ -45,20 +45,20 @@ contract UpsweepV1 {
     }
 
     mapping(uint => mapping (address => Player)) public player;
-    mapping(uint => uint8[20]) public balancesById;   
+    mapping(uint => uint8[20]) public balancesById;
     mapping(uint => uint8[20]) public bottleneckById;
-    
+
     address payable public owner = msg.sender;
     uint public ticketPrice = 100000000000000000;
-    
+
     mapping(uint => uint) public honour;
-    
+
     event FirstBlock(uint);
     event LastBlock(uint);
     event Join(uint);
     event Reveal(uint seat, uint indexed gameId);
     event NewId(uint);
-    
+
     modifier onlyBy(address _account)
     {
         require(
@@ -67,7 +67,7 @@ contract UpsweepV1 {
         );
         _;
     }
-    
+
     modifier circleIsPrivate(bool _closed) {
         require(
             _closed == true,
@@ -75,15 +75,15 @@ contract UpsweepV1 {
         );
         _;
     }
-    
+
     modifier circleIsPublic(bool _closed) {
         require(
             _closed == false,
             "Next game has not started."
         );
         _;
-    } 
-    
+    }
+
     modifier onlyAfter(uint _time) {
         require(
             block.number > _time,
@@ -91,7 +91,7 @@ contract UpsweepV1 {
         );
         _;
     }
-    
+
     modifier onlyBefore(uint _time) {
         require(
             block.number <= _time,
@@ -99,7 +99,7 @@ contract UpsweepV1 {
         );
         _;
     }
-    
+
     modifier ticketIsAffordable(uint _amount) {
         require(
             msg.value >= _amount,
@@ -109,9 +109,9 @@ contract UpsweepV1 {
         if (msg.value > _amount)
             msg.sender.transfer(msg.value - _amount);
     }
-    
+
     /**
-    * @dev pick a number and cast the hash to the network. 
+    * @dev pick a number and cast the hash to the network.
     * @param _hash is the keccak256 output for the address of the message sender+
     * the number + a passphrase
     */
@@ -124,10 +124,10 @@ contract UpsweepV1 {
     {
         //the circle is only open to 40 players.
         require(
-            counter < 40,       
+            counter < 40,
             "Game is full."
-        );            
-        
+        );
+
         //timer starts when the first ticket of the game is sold
         if (counter == 0) {
             elapsed = block.number;
@@ -135,22 +135,22 @@ contract UpsweepV1 {
         }
 
         player[lastId][msg.sender].commit = _hash;
-        
+
         //when the game is full, timer stops and the countdown to reveal begins
         //NO MORE COMMITS ARE RECEIVED.
-        if (counter == 39) {       
+        if (counter == 39) {
             closed = true;
             uint temp = sub(block.number,elapsed);
             timeout = add(temp,block.number);
             emit LastBlock(timeout);
-        } 
-        
+        }
+
         counter++;
 
         emit Join(counter);
         return lastId;
     }
-   
+
      /**
     * @notice get a refund and exit the game before it begins
     */
@@ -164,17 +164,17 @@ contract UpsweepV1 {
             commit != 0,
             "Player was not in the game."
         );
-        
+
         player[lastId][msg.sender].commit = 0;
         counter --;
         if (counter == 0) {
             elapsed = 0;
             emit FirstBlock(0);
-        }    
+        }
         emit Join(counter);
         msg.sender.transfer(ticketPrice);
         return true;
-    }     
+    }
     /**
     * @notice to make your bet legal, you must reveal the corresponding number
     * @dev a new hash is computed to verify authenticity of the bet
@@ -182,10 +182,10 @@ contract UpsweepV1 {
     * @param passphrase to prevent brute-force validation
     */
     function reveal(
-        uint8 i, 
-        string memory passphrase 
+        uint8 i,
+        string memory passphrase
     )
-        public 
+        public
         circleIsPrivate(closed)
         onlyBefore(timeout)
         returns (bool success)
@@ -195,44 +195,44 @@ contract UpsweepV1 {
             status == false,
             "Player already revealed."
         );
-        
+
         bytes32 commit = player[lastId][msg.sender].commit;
- 
+
         //hash is recalculated to verify authenticity
         bytes32 hash = keccak256(
             abi.encodePacked(msg.sender,i,passphrase)
         );
-            
+
         require(
             hash == commit,
             "Hashes don't match."
         );
-        
+
         player[lastId][msg.sender].revealOnce = true;
         player[lastId][msg.sender].i = i;
-        
+
         //contribution is credited to the chosen number
         balancesById[lastId][i] ++;
         //the list of players inside this numbers grows by one
         bottleneckById[lastId][i] ++;
-        
+
         counter--;
-        //last player to reveal must pay extra gas fees to update the game 
+        //last player to reveal must pay extra gas fees to update the game
         if (counter == 0) {
             timeout = 0;
             updateBalances();
         }
-        
+
         emit Reveal(i,lastId);
         return true;
     }
-  
+
     /**
     * @notice distributes rewards fairly.
     * @dev the circle has no head or foot, node 19 passes to node 0 only if node 0 is not empty.
-    * To successfully distribute contributions, the function loops through all numbers and 
-    * identifies the first empty number, from there the chain of transfers begins. 
-    * 
+    * To successfully distribute contributions, the function loops through all numbers and
+    * identifies the first empty number, from there the chain of transfers begins.
+    *
     */
     function updateBalances()
         public
@@ -242,28 +242,28 @@ contract UpsweepV1 {
     {
         // identify the first empty number.
         for (uint8 i = 0; i < 20; i++) {
-            if (balancesById[lastId][i] == 0) { 
+            if (balancesById[lastId][i] == 0) {
                 // start chain of transfers from the next number.
                 uint j = i + 1;
-                for (uint8 a = 0; a < 19; a++) {   
+                for (uint8 a = 0; a < 19; a++) {
                     if (j == 20) j = 0;
-                    if (j == 19) {       
+                    if (j == 19) {
                         if (balancesById[lastId][0] > 0) {
                             uint8 temp = balancesById[lastId][19];
                             balancesById[lastId][19] = 0;
-                            balancesById[lastId][0] += temp;  
-                            j = 0; 
+                            balancesById[lastId][0] += temp;
+                            j = 0;
                         } else {
                             j = 1;
                         }
-                    } else {            
-                        if (balancesById[lastId][j + 1] > 0) { 
+                    } else {
+                        if (balancesById[lastId][j + 1] > 0) {
                             uint8 temp = balancesById[lastId][j];
                             balancesById[lastId][j] = 0;
-                            balancesById[lastId][j + 1] += temp; 
-                            j += 1; 
-                        } else { 
-                            j += 2; 
+                            balancesById[lastId][j + 1] += temp;
+                            j += 1;
+                        } else {
+                            j += 2;
                         }
                     }
                 }
@@ -282,23 +282,23 @@ contract UpsweepV1 {
             uint among = sub(40,counter);
             honour[lastId] = div(total,among);
             counter = 0;
-        } 
+        }
         lastId ++;
         emit NewId(lastId);
         return true;
     }
-    
+
     /**
     * @notice accumulated rewards are already allocated in specific numbers, if players can
     * prove they picked that "lucky" number, they are allowed to withdraw the accumulated
     * ether.
-    * 
-    * If there is more than one player in a given number, the reward is split equally. 
-    * 
+    *
+    * If there is more than one player in a given number, the reward is split equally.
+    *
     * @param gameId only attempt to withdraw rewards from a valid game, otherwise the transaction
     * will fail.
     */
-    function withdraw(uint gameId) 
+    function withdraw(uint gameId)
         public
         returns (bool success)
     {
@@ -307,31 +307,31 @@ contract UpsweepV1 {
             status == true,
             "Player has not revealed."
         );
-        
+
         bool claim = player[gameId][msg.sender].claimed;
         require(
             claim == false,
             "Player already claimed."
         );
-        
+
         uint8 index = player[gameId][msg.sender].i;
         require(
             balancesById[gameId][index] > 0,
             "Player didn't won."
         );
-        
+
         player[gameId][msg.sender].claimed = true;
-        
+
         uint temp = uint(balancesById[gameId][index]);
         uint among = uint(bottleneckById[gameId][index]);
         uint total = mul(temp, ticketPrice);
         uint payout = div(total, among);
-        
-        msg.sender.transfer(payout);   
-        
+
+        msg.sender.transfer(payout);
+
         return true;
-    }   
-    
+    }
+
     function microTip()
         public
         payable
@@ -340,7 +340,7 @@ contract UpsweepV1 {
         owner.transfer(msg.value);
         return true;
     }
-    
+
     function changeOwner(address payable _newOwner)
         public
         onlyBy(owner)
@@ -349,7 +349,7 @@ contract UpsweepV1 {
         owner = _newOwner;
         return true;
     }
-    
+
     function getHonour(uint _gameId)
         public
         returns (bool success)
@@ -368,7 +368,7 @@ contract UpsweepV1 {
         msg.sender.transfer(honour[_gameId]);
         return true;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
     */
@@ -428,4 +428,13 @@ contract UpsweepV1 {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1334,29 +1334,29 @@ contract MinterWithCivic is Owned, usingOraclize {
     constructor() public {
         owner = 0x7645Ad8D4a2cD5b07D8Bc4ea1690d5c1F765aabC;
     }
-    
+
     address public PAXTRContract = 0xE01516f84ff1bDC4Eb6994224b82e948bbF70dC7;
     mapping(bytes32 => bool) public accountId;
     mapping(address => bool) public accountWallet;
     uint256 public claimPriceInWei = 100000000000000000;
-    
+
     struct AccountCheck {
         address wallet;
         address reff;
         bytes32 uniqueId;
     }
     mapping(bytes32 => AccountCheck) public accountCheck;
-    
+
     bool public contractPaused = false;
-    
+
     function setClaimPrice(uint256 priceInWei) public onlyOwner {
         claimPriceInWei = priceInWei;
     }
-    
+
     function setContractActiveState(bool state) public onlyOwner {
         contractPaused = state;
     }
-    
+
     function activateClaim(address account, string memory addressString, address refferer, string memory idString) public payable {
         bytes32 id = stringToBytes32(idString);
         require(contractPaused == false);
@@ -1369,34 +1369,34 @@ contract MinterWithCivic is Owned, usingOraclize {
         accountCheck[queryId].reff = refferer;
         emit Return(queryId, addressString);
     }
-    
+
     event Return(bytes32 _id, string _data);
-    
+
     function __callback(bytes32 myid, string memory result) public {
         if (msg.sender != oraclize_cbAddress()) revert();
-        
+
         require(accountId[accountCheck[myid].uniqueId] == false);
         require(accountWallet[accountCheck[myid].wallet] == false);
-        
+
         bytes32 __id = stringToBytes32(result);
         require(accountCheck[myid].uniqueId == __id);
-       
+
         accountId[accountCheck[myid].uniqueId] = true;
         accountWallet[accountCheck[myid].wallet] = true;
-        
+
         address _reff;
         if (accountCheck[myid].reff == accountCheck[myid].wallet) {
             _reff = address(0);
         } else {
             _reff = accountCheck[myid].reff;
         }
-        
+
         PAXTRInterface(PAXTRContract).mint(accountCheck[myid].wallet, _reff);
         owner.transfer(address(this).balance);
-        
+
         emit Return(myid, result);
     }
-    
+
     function stringToBytes32(string memory source) public pure returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
@@ -1407,9 +1407,20 @@ contract MinterWithCivic is Owned, usingOraclize {
             result := mload(add(source, 32))
         }
     }
-    
+
     function withdrawEth() public onlyOwner {
         owner.transfer(address(this).balance);
     }
-        
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

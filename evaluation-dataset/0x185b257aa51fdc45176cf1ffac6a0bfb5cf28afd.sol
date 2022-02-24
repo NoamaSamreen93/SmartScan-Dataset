@@ -1073,17 +1073,17 @@ contract HeroAsset is ERC721Full, ERC721Mintable, ERC721Pausable {
 
         uint8 i;
         uint8 index = 0;
-        
+
         for (i = 0; i < prefixBytes.length; i++) {
             tokenURIBytes[index] = prefixBytes[i];
             index++;
         }
-        
+
         for (i = 0; i < tokenIdBytes.length; i++) {
             tokenURIBytes[index] = tokenIdBytes[i];
             index++;
         }
-        
+
         return string(tokenURIBytes);
     }
 
@@ -1180,7 +1180,7 @@ contract OperatorRole is Ownable {
         require(isOperator(msg.sender));
         _;
     }
-    
+
     function isOperator(address account) public view returns (bool) {
         return operators.has(account);
     }
@@ -1337,14 +1337,14 @@ contract HeroGatewayV2 is OperatorRole, DJTBase {
     bytes memory data
   )
   public
-  returns(bytes4) { 
+  returns(bytes4) {
     return 0x150b7a02;
   }
 
   function checkIsPastEvent(bytes32 _eventHash) public view returns (bool) {
     return isPastEvent[_eventHash];
   }
-  
+
   function _transferHeroAsset(address _from, address _to, uint256 _tokenId) private {
     heroAsset.safeTransferFrom(
       _from,
@@ -1362,4 +1362,15 @@ contract HeroGatewayV2 is OperatorRole, DJTBase {
     heroAsset.mintHeroAsset(_assetOwner, _tokenId);
     emit OutgoingEvent(_assetOwner, _tokenId, block.timestamp, _eventHash, 0);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

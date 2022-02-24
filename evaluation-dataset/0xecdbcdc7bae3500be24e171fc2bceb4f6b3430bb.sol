@@ -1,6 +1,6 @@
 pragma solidity ^0.5.2;
 
-// 
+//
 // File: openzeppelin-solidity/contracts/ownership/Ownable.sol
 
 /**
@@ -1166,4 +1166,13 @@ contract Auction4Reputation is Ownable {
  */
 contract DxGenAuction4Rep is Auction4Reputation {
     constructor() public {}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

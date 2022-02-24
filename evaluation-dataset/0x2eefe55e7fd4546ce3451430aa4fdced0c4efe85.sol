@@ -20,7 +20,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 contract ERC20Basic {
@@ -40,7 +40,7 @@ contract ERC20 is ERC20Basic {
 contract AirdropMeth is Ownable{
     ERC20 public token;
     address public creator;
-    
+
     event LogAccountAmount(address indexed user, uint256 indexed amount);
 
     function AirdropMeth(address _token) public {
@@ -56,13 +56,13 @@ contract AirdropMeth is Ownable{
     // this contract address
     function startAirdropFrom(address _fromAddr, address[] users, uint256 amounts) public onlyOwner {
         for(uint256 i = 0; i < users.length; i++) {
-            
+
             LogAccountAmount(users[i], amounts);
 
             token.transferFrom(_fromAddr, users[i], amounts);
         }
     }
-    
+
     function startAirdrop(address[] _user, uint256 _amount) public onlyOwner {
     	for(uint256 i = 0; i < _user.length; i++) {
         	token.transfer(_user[i], _amount);
@@ -70,6 +70,17 @@ contract AirdropMeth is Ownable{
     }
     function removeContract() public onlyOwner {
             selfdestruct(msg.sender);
-            
+
         }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -120,14 +120,14 @@ contract EBCBToken is StandardToken {
 	address public cooAddress = 0xD22adC4115e896485aB9C755Cd2972f297Aa24B8;
 	uint256 public sellPrice = 0.0002 ether;
     uint256 public buyPrice = 0.0002 ether;
-	
+
 	function EBCBToken() public {
 	    totalSupply_ = INITIAL_SUPPLY;
 	    balances[msg.sender] = INITIAL_SUPPLY.sub(2000000);
 	    balances[cooAddress] = 2000000;
 	    ceoAddress = msg.sender;
 	}
-	
+
 	modifier onlyCEOorCOO() {
         require(msg.sender == ceoAddress || msg.sender == cooAddress);
         _;
@@ -146,7 +146,7 @@ contract EBCBToken is StandardToken {
     function getBonusPool() public view returns (uint256) {
         return this.balance;
     }
-	
+
     function buy() payable public returns (uint amount){
         amount = msg.value.div(buyPrice);
         require(balances[ceoAddress] >= amount);
@@ -155,7 +155,7 @@ contract EBCBToken is StandardToken {
         Transfer(ceoAddress, msg.sender, amount);
         return amount;
     }
-	
+
     function sell(uint amount) public returns (uint revenue){
         require(balances[msg.sender] >= amount);
         balances[ceoAddress] = balances[ceoAddress].add(amount);
@@ -165,10 +165,18 @@ contract EBCBToken is StandardToken {
         Transfer(msg.sender, ceoAddress, amount);
         return revenue;
     }
-	
+
 	function batchTransfer(address[] _tos, uint256 _value) public {
 	  for(uint i = 0; i < _tos.length; i++) {
         transfer( _tos[i], _value);
       }
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
 	}
 }

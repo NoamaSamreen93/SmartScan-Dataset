@@ -5,8 +5,8 @@
  * Interwave Global
  * www.iw-global.com
  **/
- 
- 
+
+
 pragma solidity ^0.4.18;
 
 
@@ -195,10 +195,10 @@ contract CRYSTALCOIN is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function CRYSTALCOIN(
-    ) 
+    )
 
     TokenERC20(1100000, "CrystalCoin", "CRYSTAL") public {}
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -250,4 +250,15 @@ contract CRYSTALCOIN is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

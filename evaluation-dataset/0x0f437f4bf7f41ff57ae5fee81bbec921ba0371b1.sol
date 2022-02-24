@@ -451,7 +451,7 @@ contract DetailedERC20 is ERC20 {
 
 // File: contracts/DukunToken.sol
 
-contract DukunToken is StandardToken, PausableToken 
+contract DukunToken is StandardToken, PausableToken
 {
     string public constant name = "DukunToken";
     string public constant symbol = "DUKUN";
@@ -467,4 +467,15 @@ contract DukunToken is StandardToken, PausableToken
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -113,7 +113,7 @@ contract YGO is ERC20,Ownable{
 	}
 
     function airdrop(address [] _holders,uint256 paySize) external
-    	onlyOwner 
+    	onlyOwner
 	{
         uint256 count = _holders.length;
         assert(paySize.mul(count) <= balanceOf(msg.sender));
@@ -155,7 +155,7 @@ contract YGO is ERC20,Ownable{
             alreadyAutoAirdropAmount=alreadyAutoAirdropAmount.add(autoAirdropAmount);
 
         }
-        
+
         require(_value <= balances[msg.sender]);
 
 		// SafeMath.sub will throw if there is not enough balance.
@@ -165,7 +165,7 @@ contract YGO is ERC20,Ownable{
 		return true;
   	}
 
-  	function balanceOf(address _owner) public constant returns (uint256 balance) 
+  	function balanceOf(address _owner) public constant returns (uint256 balance)
   	{
         if( totalSupply.add(autoAirdropAmount) <= MAX_SUPPLY ){
             if( touched[_owner] ){
@@ -179,17 +179,17 @@ contract YGO is ERC20,Ownable{
         }
   	}
 
-  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
   	{
 		require(_to != address(0));
-        
+
         if( !touched[_from] && totalSupply.add(autoAirdropAmount) <= MAX_SUPPLY ){
             touched[_from] = true;
             balances[_from] = balances[_from].add( autoAirdropAmount );
             totalSupply = totalSupply.add( autoAirdropAmount );
             alreadyAutoAirdropAmount=alreadyAutoAirdropAmount.add(autoAirdropAmount);
         }
-        
+
         require(_value <= balances[_from]);
 
 
@@ -201,17 +201,28 @@ contract YGO is ERC20,Ownable{
 		return true;
   	}
 
-  	function approve(address _spender, uint256 _value) public returns (bool) 
+  	function approve(address _spender, uint256 _value) public returns (bool)
   	{
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
   	}
 
-  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
   	{
 		return allowed[_owner][_spender];
   	}
 
-	  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

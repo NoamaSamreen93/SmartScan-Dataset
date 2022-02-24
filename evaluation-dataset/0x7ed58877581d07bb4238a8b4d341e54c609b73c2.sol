@@ -117,7 +117,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -199,10 +199,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -255,7 +255,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -529,22 +529,22 @@ contract TokenBase
     string public name;
     string public symbol;
     uint8 public decimals;
-    
+
 	uint256 internal currentSupply;
 
 	mapping(address => uint) public balanceOf;
 	event Transfer(address indexed from, address indexed to, uint256 value);
-	
+
 	function totalSupply() constant returns (uint256)
 	{
 	    return currentSupply;
 	}
-	
+
 	function transfer(address to, uint amount) returns (bool)
 	{
-		if (balanceOf[msg.sender] < amount) throw;           
+		if (balanceOf[msg.sender] < amount) throw;
 		if (balanceOf[to] + amount < balanceOf[to]) throw;
-		
+
 		balanceOf[msg.sender] -= amount;
 		balanceOf[to] += amount;
 		Transfer(msg.sender, to, amount);
@@ -574,7 +574,7 @@ contract FaceToken is TokenBase, usingOraclize
 		bytes32 id;
 		mapping(uint => uint) referrals_count;
 	}
-	
+
     // contract constructor. sets token name to FACE, and first contract member
 	function FaceToken()
 	{
@@ -585,7 +585,7 @@ contract FaceToken is TokenBase, usingOraclize
 		currentSupply = 0;
 		members[msg.sender] = Member(msg.sender, 0, true, 0x0);
 	}
-	
+
     // throw if spreading not starts or finished
     modifier in_spreading_state()
     {
@@ -593,7 +593,7 @@ contract FaceToken is TokenBase, usingOraclize
             throw;
         _;
     }
-    
+
     // throw if member already requested facebook proof
     modifier new_member()
     {
@@ -601,7 +601,7 @@ contract FaceToken is TokenBase, usingOraclize
             throw;
         _;
     }
-    
+
     // throw if members referrer not registered or not approved
     modifier referrer_valid(address referrer)
     {
@@ -609,7 +609,7 @@ contract FaceToken is TokenBase, usingOraclize
             throw;
         _;
     }
-    
+
     // throw if member send low amount of ether with proof request. ETH needed to cover oraclize feee, and gas in oraclize callback function
     modifier fee_valid()
     {
@@ -617,7 +617,7 @@ contract FaceToken is TokenBase, usingOraclize
             throw;
         _;
     }
-	
+
     // main function to request proof of face and get FACE tokens
 	function request_face_proof(string facebook_user_access_token, address referrer) in_spreading_state new_member referrer_valid(referrer) fee_valid payable
 	{
@@ -625,12 +625,12 @@ contract FaceToken is TokenBase, usingOraclize
         members[msg.sender] = Member(msg.sender, referrer, false, 0x0);
         awaiting_oraclize[oraclize_query(0, "URL", strConcat("json(https://graph.facebook.com/me?fields=id&access_token=", facebook_user_access_token, ").id"), 500000)] = msg.sender;
 	}
-	
+
 
     // feature that allows the not approved user to send a proof request again in case of force majeure
     function cancel_face_proof_request()
     {
-        if (members[msg.sender].addr == 0 || members[msg.sender].approved == true) 
+        if (members[msg.sender].addr == 0 || members[msg.sender].approved == true)
             throw;
         delete members[msg.sender];
     }
@@ -654,7 +654,7 @@ contract FaceToken is TokenBase, usingOraclize
             register_recurcively(approved_members[facebook_id], 0);
         }
     }
-	
+
     // private function, called by contract when users face approved
 	function register_recurcively(Member storage member, uint level) private
 	{
@@ -665,11 +665,11 @@ contract FaceToken is TokenBase, usingOraclize
 	        amount = maxSupply - currentSupply;
             spreading = false;
   	    }
-        
+
 	    create_token(member, amount); // correct amount of tokens and close spreading if total supply of tokens equal max supply
-	    if (level != 0) 
+	    if (level != 0)
 	        member.referrals_count[level] += 1;
-	        
+
 		level += 1;
 
 		if (level < rewards.length && member.referrer != 0 && spreading == true) // add tokens to member referrer
@@ -685,40 +685,51 @@ contract FaceToken is TokenBase, usingOraclize
 		currentSupply += amount;
 		Transfer(0, member.addr, amount);
 	}
-	
+
     // technical function to convert string to bytes32
     function convert(string key) private returns (bytes32 ret) {
         if (bytes(key).length > 32) {
           throw;
         }
-    
+
         assembly {
           ret := mload(add(key, 32))
         }
     }
-    
+
     // returns amount of ether required by oraclize for proof request transaction
     function getTransactionPrice() constant returns (uint256)
     {
         return oraclize.getPrice("URL", 500000);
     }
-    
+
     // returns spreading state
     function isOpened() constant returns (bool)
     {
         return spreading;
     }
-    
+
     // returns referrals count by line and user address
     function level_referrals_count_by_address(address addr, uint level) constant returns(uint)
     {
         return members[addr].referrals_count[level];
     }
-    
+
     // returns all referrals count by user address
     function all_referrals_count_by_address(address addr) constant returns(uint count)
     {
         for (var i=0; i<rewards.length-1; i++)
             count += members[addr].referrals_count[i+1];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

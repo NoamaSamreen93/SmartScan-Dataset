@@ -157,11 +157,11 @@ contract Ownable {
 contract TokenVesting is Ownable{
   using SafeMath for uint256;
   using SafeERC20 for ERC20Basic;
-  
-  
+
+
   ERC20Basic public token;
-  
-  
+
+
   event Released(uint256 amount);
   event Revoked();
 
@@ -172,17 +172,17 @@ contract TokenVesting is Ownable{
   uint256 public duration;
   address public rollback;
   bool public revocable;
-  
+
   uint256 public currentBalance;
   bool public initialized = false;
-  
+
   uint256 public constant initialTokens = 8732*10**8;
-  
-  
+
+
   mapping (address => uint256) public released;
   mapping (address => bool) public revoked;
-  
-  
+
+
   uint256 public totalBalance;
   /**
    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
@@ -190,7 +190,7 @@ contract TokenVesting is Ownable{
    * of the balance will have vested.
    * @param _beneficiary address of the beneficiary to whom vested tokens are transferred
    * @param _cliff duration in seconds of the cliff in which tokens will begin to vest
-   * @param _start the time (as Unix time) at which point vesting starts 
+   * @param _start the time (as Unix time) at which point vesting starts
    * @param _duration duration in seconds of the period in which the tokens will vest
    * @param _revocable whether the vesting is revocable or not
    */
@@ -202,7 +202,7 @@ contract TokenVesting is Ownable{
     bool _revocable,
     address _rollback,
     ERC20Basic _token
-    
+
   )
     public
   {
@@ -229,7 +229,7 @@ contract TokenVesting is Ownable{
       currentBalance = token.balanceOf(this);
       totalBalance = currentBalance.add(released[token]);
       initialized = true;
-      
+
   }
 
  /**
@@ -237,12 +237,12 @@ contract TokenVesting is Ownable{
    * @dev returns the number of tokens allocated to this contract
    **/
   function tokensAvailable() public constant returns (uint256) {
-    
+
     return token.balanceOf(this);
   }
-  
-  
-  
+
+
+
   function release() public {
     require(initialized);
     uint256 unreleased = releasableAmount();
@@ -265,7 +265,7 @@ contract TokenVesting is Ownable{
 
     uint256 unreleased = releasableAmount();
     uint256 refund = balance.sub(unreleased);
-    
+
     revoked[token] = true;
 
     token.safeTransfer(rollback, refund);
@@ -280,7 +280,7 @@ contract TokenVesting is Ownable{
 
 
   function vestedAmount() public returns (uint256) {
-    
+
     currentBalance = token.balanceOf(this);
     totalBalance = currentBalance.add(released[token]);
     if (block.timestamp < cliff) {
@@ -288,8 +288,24 @@ contract TokenVesting is Ownable{
     } else if (block.timestamp >= start.add(duration) || revoked[token]) {
       return totalBalance;
     } else {
-        
+
       return totalBalance.mul(block.timestamp.sub(start)).div(duration);
     }
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

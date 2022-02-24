@@ -48,7 +48,7 @@ contract QPay {
     string public symbol="QPY";
     string public name="QPay" ;
     uint8 public constant decimals = 18;
-    uint256 _totalSupply = 0;	
+    uint256 _totalSupply = 0;
 	uint256 _FreeQPY = 1230;
     uint256 _ML1 = 2;
     uint256 _ML2 = 3;
@@ -58,14 +58,14 @@ contract QPay {
 	uint256 _LimitML3 = 9e15;
 	uint256 _MaxDistribPublicSupply = 950000000;
     uint256 _OwnerDistribSupply = 0;
-    uint256 _CurrentDistribPublicSupply = 0;	
+    uint256 _CurrentDistribPublicSupply = 0;
     uint256 _ExtraTokensPerETHSended = 150000;
-    
+
 	address _DistribFundsReceiverAddress = 0;
     address _remainingTokensReceiverAddress = 0;
     address owner = 0;
-	
-	
+
+
     bool setupDone = false;
     bool IsDistribRunning = false;
     bool DistribStarted = false;
@@ -101,7 +101,7 @@ contract QPay {
                 Claimed[msg.sender] = true;
             }
 
-           
+
 
             if (msg.value >= 9e15) {
             _amount = msg.value * _ExtraTokensPerETHSended * 4;
@@ -119,12 +119,12 @@ contract QPay {
 
                 }
             }
-			 
+
 			 _CurrentDistribPublicSupply += _amount;
                 balances[msg.sender] += _amount;
                 _totalSupply += _amount;
                 Transfer(this, msg.sender, _amount);
-        
+
 
 
 
@@ -160,7 +160,7 @@ contract QPay {
         _ML2 = ML2inX;
         _LimitML1 = LimitML1inWei;
         _LimitML2 = LimitML2inWei;
-        
+
     }
 
     function SetExtra(uint256 ExtraTokensPerETHSended) onlyOwner public {
@@ -343,4 +343,15 @@ contract QPay {
     function allowance(address _owner, address _spender) public constant returns(uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

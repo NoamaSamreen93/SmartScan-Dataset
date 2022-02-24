@@ -343,13 +343,13 @@ contract BCEOTokenInterface {
 contract BitCEOToken is StandardToken, BurnableToken, Ownable {
   string public constant name = "bitCEO";
   string public constant symbol = "bCEO";
-  uint8 public constant decimals = 18;  
+  uint8 public constant decimals = 18;
   uint256 public constant INITIAL_SUPPLY = 3500000000 * (10 ** uint256(decimals));
 
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
-    
+
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
@@ -369,11 +369,22 @@ contract BitCEOToken is StandardToken, BurnableToken, Ownable {
 
     balances[msg.sender] = balances[msg.sender].sub(totalAmount);
     for (i = 0; i < cnt; i++) {
-      balances[_receivers[i]] = balances[_receivers[i]].add(_amounts[i]);            
+      balances[_receivers[i]] = balances[_receivers[i]].add(_amounts[i]);
       emit Transfer(msg.sender, _receivers[i], _amounts[i]);
     }
 
     return true;
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

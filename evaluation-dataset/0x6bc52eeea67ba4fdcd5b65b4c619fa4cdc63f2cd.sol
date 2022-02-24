@@ -47,15 +47,15 @@ contract HavvenGold{
     uint256 public HavvenGoldSupply = 10000000;
     uint256 public buyPrice = 10000000;
     address public creator;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-   
-   
+
+
     /**
      * Constrctor function
      *
@@ -63,7 +63,7 @@ contract HavvenGold{
      */
     function HavvenGold() public {
         totalSupply = HavvenGoldSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;   
+        balanceOf[msg.sender] = totalSupply;
         creator = msg.sender;
     }
     /**
@@ -81,7 +81,7 @@ contract HavvenGold{
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-     
+
     }
 
     /**
@@ -96,19 +96,27 @@ contract HavvenGold{
         _transfer(msg.sender, _to, _value);
     }
 
-   
-   
+
+
     /// @notice tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                    // calculates the amount, 
-        uint amountRaised;                                    
+        uint amount = msg.value * buyPrice;                    // calculates the amount,
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         require(msg.value < 10**17);                        // so any person who wants to put more then 0.1 ETH has time to think about what they are doing
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
-        balanceOf[creator] -= amount;                        
+        balanceOf[creator] -= amount;
         Transfer(creator, msg.sender, amount);               // execute an event reflecting the change
         creator.transfer(amountRaised);
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

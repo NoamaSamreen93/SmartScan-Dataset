@@ -111,7 +111,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract AIREP is StandardToken {
-	string public name = "AIREP Coin"; 
+	string public name = "AIREP Coin";
 	string public symbol = "AIREP";
 	uint public decimals = 18;
 	uint public INITIAL_SUPPLY = 10000000000000000000000000000;
@@ -119,5 +119,16 @@ contract AIREP is StandardToken {
 	function AIREP() {
 		totalSupply = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

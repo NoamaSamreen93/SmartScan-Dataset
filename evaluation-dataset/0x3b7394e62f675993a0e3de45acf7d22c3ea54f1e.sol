@@ -312,7 +312,7 @@ contract LIBRA is ERC20 {
   uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 650000000 * (10 ** uint256(decimals));
-  address public wallet = 0x8DaFC365cDd8472144d9AEFbaacc61F5E06cA19e; 
+  address public wallet = 0x8DaFC365cDd8472144d9AEFbaacc61F5E06cA19e;
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -320,4 +320,15 @@ contract LIBRA is ERC20 {
     _mint(wallet, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

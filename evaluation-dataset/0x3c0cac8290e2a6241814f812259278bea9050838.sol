@@ -134,9 +134,9 @@ contract BurnableToken is BasicToken {
 
 contract BosToken is StandardToken, BurnableToken {
 
-  string public constant name = "BOSTOKEN"; 
-  string public constant symbol = "BOS"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "BOSTOKEN";
+  string public constant symbol = "BOS";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 10000000000 * (10 ** uint256(decimals));
 
@@ -146,4 +146,17 @@ contract BosToken is StandardToken, BurnableToken {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

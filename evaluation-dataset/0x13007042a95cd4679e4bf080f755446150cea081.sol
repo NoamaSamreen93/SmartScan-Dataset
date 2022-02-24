@@ -78,7 +78,7 @@ contract subsetSum {
     function getExpiryDate() public view returns (uint256 expiryTimestamp) {
         return expiryTime;
     }
-    
+
     // Get all the important Data
     function getData() public view returns(uint256[] numberSet, address winningAddress, uint256 prizeFundAmount, uint256 expiryTimestamp) {
         return (numbers, leader.id, address(this).balance, expiryTime);
@@ -142,4 +142,15 @@ contract subsetSum {
         else return b-a;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

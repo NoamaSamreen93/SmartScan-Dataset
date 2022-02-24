@@ -165,3 +165,12 @@ contract WYQToken is TokenERC20 {
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

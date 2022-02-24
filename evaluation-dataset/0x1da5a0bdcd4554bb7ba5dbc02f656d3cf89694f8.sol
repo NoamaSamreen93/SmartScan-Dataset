@@ -13,12 +13,12 @@ contract Token{
 
     function allowance(address _owner, address _spender) constant returns // get the number of tokens that the account _spender can transfer from the account _owner
     (uint256 remaining);
-    
+
     function approve(address _spender, uint256 _value) returns (bool success); // message sending account setting account _spender can transfer the number of token as _value from the sending account
 
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
 }
@@ -35,9 +35,9 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//Receive account increases token number _value
@@ -47,7 +47,7 @@ contract StandardToken is Token {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -65,24 +65,24 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract TIAToken is StandardToken { 
+contract TIAToken is StandardToken {
 
     /* Public variables of the token */
     string public name;                   //eg Simon Bucks
     uint8 public decimals;               //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
-    string public symbol;              
-    string public version = 'H0.1';  
+    string public symbol;
+    string public version = 'H0.1';
 
     function TIAToken(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) {
-        balances[msg.sender] = _initialAmount; 
-        totalSupply = _initialAmount;       
-        name = _tokenName;                   
-        decimals = _decimalUnits;          
-        symbol = _tokenSymbol;            
+        balances[msg.sender] = _initialAmount;
+        totalSupply = _initialAmount;
+        name = _tokenName;
+        decimals = _decimalUnits;
+        symbol = _tokenSymbol;
     }
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -90,4 +90,15 @@ contract TIAToken is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

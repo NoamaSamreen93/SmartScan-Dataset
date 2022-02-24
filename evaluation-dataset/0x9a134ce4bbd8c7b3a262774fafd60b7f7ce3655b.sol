@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -274,7 +274,7 @@ contract LordCoinPreICO is Ownable {
     }
 
     function doPurchase(address _sender, uint256 _value) private onlyAfter(startTime) onlyBefore(endTime) {
-        
+
         require(!crowdsaleFinished);
 
         uint256 lcCount = _value.mul(priceLC).div(priceETH);
@@ -293,4 +293,13 @@ contract LordCoinPreICO is Ownable {
             GoalReached(weiRaised);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

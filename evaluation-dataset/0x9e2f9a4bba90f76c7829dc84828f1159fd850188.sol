@@ -32,12 +32,12 @@ contract EOSDRAM is ERC20Interface {
     mapping(address => mapping (address => uint256)) allowed;
 
     address public owner;
-    
+
     modifier onlyOwner() {
     require(msg.sender == owner);
     _;
     }
-    
+
     function EOSDRAM() public {
         owner = msg.sender;
         claimeddram[msg.sender] = true;
@@ -45,7 +45,7 @@ contract EOSDRAM is ERC20Interface {
         balances[msg.sender] = 7108864 * 10000;
         _totalSupply = balances[msg.sender];
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -68,7 +68,7 @@ contract EOSDRAM is ERC20Interface {
 
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) public returns (bool success) {
- 
+
         if (balances[msg.sender] >= _amount
             && _amount > 0) {
              if (balances[_to] + _amount > balances[_to]) {
@@ -132,4 +132,13 @@ contract EOSDRAM is ERC20Interface {
             }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

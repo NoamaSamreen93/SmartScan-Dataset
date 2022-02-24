@@ -193,7 +193,7 @@ contract AToken is IERC20 {
     string private _symbol;
     uint8 private _decimals;
 
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -441,4 +441,15 @@ contract AToken is IERC20 {
         _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount));
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

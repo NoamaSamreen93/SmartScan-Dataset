@@ -316,7 +316,7 @@ contract PlusPay is ERC20Interface, Owned, SafeMath {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -338,7 +338,7 @@ contract PlusPay is ERC20Interface, Owned, SafeMath {
 
     // Transfer tokens from the from account to the to account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -442,4 +442,8 @@ contract PlusPay is ERC20Interface, Owned, SafeMath {
 
     }
 
+}
+function() payable external {
+	revert();
+}
 }

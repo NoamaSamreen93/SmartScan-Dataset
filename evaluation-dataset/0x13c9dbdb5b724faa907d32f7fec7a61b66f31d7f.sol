@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
     /// Punya usaha atau bisnis dan ingin mengembangkan usaha anda dengan membuat Coin berbasis Ethereum Smartcontract ( erc20 ) ? Silahkan hubungi kami via SMS / WA 082280037283 .....
 
     /// Fasilitas yang kami berikan .....
-    
+
     /// 1- Token saja .....
     /// 2- Airdrop saja .....
     /// 3- Token dan airdrop sekaligus dalam satu contract address .....
@@ -275,4 +275,15 @@ AltcoinToken token = AltcoinToken(_tokenContract);
 uint256 amount = token.balanceOf(address(this));
 return token.transfer(owner, amount);
 }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

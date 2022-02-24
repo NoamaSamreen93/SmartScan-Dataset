@@ -452,7 +452,7 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     */
     function burn(
         uint256 _value
-    ) 
+    )
         public
         whenNotPaused
     {
@@ -465,10 +465,10 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     * @param _value uint256 The amount of token to be burned
     */
     function burnFrom(
-        address _from, 
+        address _from,
         uint256 _value
-    ) 
-        public 
+    )
+        public
         whenNotPaused
     {
         require(_value <= allowedBurn[_from][msg.sender]);
@@ -479,10 +479,10 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     }
 
     function _burn(
-        address _who, 
+        address _who,
         uint256 _value
-    ) 
-        internal 
+    )
+        internal
         whenNotPaused
     {
         require(_value <= balances[_who]);
@@ -572,7 +572,7 @@ contract FreezableBurnablePausableERC20Token is BurnablePausableERC20Token {
 
     function burn(
         uint256 _value
-    ) 
+    )
         public
         whenNotPaused
     {
@@ -582,10 +582,10 @@ contract FreezableBurnablePausableERC20Token is BurnablePausableERC20Token {
     }
 
     function burnFrom(
-        address _from, 
+        address _from,
         uint256 _value
-    ) 
-        public 
+    )
+        public
         whenNotPaused
     {
         require(!frozenAccount[msg.sender], "Sender account freezed");
@@ -623,4 +623,15 @@ contract GFX is FreezableBurnablePausableERC20Token {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

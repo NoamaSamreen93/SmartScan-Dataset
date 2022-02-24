@@ -20,7 +20,7 @@ contract SXDT is ERC20 {
 
   string public constant name = "Spectre.ai D-Token";
   string public constant symbol = "SXDT";
-  uint8 public constant decimals = 18; 
+  uint8 public constant decimals = 18;
 
   mapping (address => mapping (address => uint)) allowed;
   mapping (address => uint) balances;
@@ -55,8 +55,14 @@ contract SXDT is ERC20 {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
   function StandardToken(){
   balances[msg.sender] = 100000000000000000000000000;
 }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

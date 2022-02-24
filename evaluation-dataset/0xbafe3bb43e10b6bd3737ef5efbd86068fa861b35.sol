@@ -12,61 +12,61 @@ contract metahashtoken {
     /* token management data */
     address public ownerContract;   /* contract owner         */
     address public owner;           /* owner                  */
-    
+
     /* arrays */
     mapping (address => uint256) public balance;                  /* array of balance              */
     mapping (address => mapping (address => uint256)) allowed;    /* arrays of allowed transfers  */
-    
+
     /* events */
     event Burn(address indexed from, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 
 
     /* get the total amount of tokens */
     function totalSupply() public view returns (uint256 _totalSupply){
         return totalTokens;
     }
-    
+
     /* get the amount of tokens from a particular user */
     function balanceOf(address _owner) public view returns (uint256 _balance){
         return balance[_owner];
     }
-    
+
     /* transfer tokens */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         /* tokens are not enough */
         if (balance[msg.sender] < _value){
             revert();
         }
-        
+
         /* overflow */
         if ((balance[_to] + _value) < balance[_to]){
             revert();
         }
         balance[msg.sender] -= _value;
         balance[_to] += _value;
-        
-        emit Transfer(msg.sender, _to, _value);  
+
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /* how many tokens were allowed to send */
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     /* Send tokens from the recipient to the recipient */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
         uint256 nAllowance;
         nAllowance = allowed[_from][msg.sender];
-        
+
         /* check of allowed value */
         if (nAllowance < _value){
             revert();
         }
-        
+
         /* not enough tokens */
         if (balance[_from] < _value){
             revert();
@@ -76,14 +76,14 @@ contract metahashtoken {
         if ((balance[_to] + _value) < balance[_to]){
             revert();
         }
-        
+
         balance[_to] += _value;
         balance[_from] -= _value;
         allowed[_from][msg.sender] = nAllowance - _value;
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* allow to send tokens between recipients */
     function approve(address _spender, uint256 _value) public returns (bool success){
         /* overflow */
@@ -95,7 +95,7 @@ contract metahashtoken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /* constructor */
     constructor() public {
         name = 'MetaHash';
@@ -105,14 +105,14 @@ contract metahashtoken {
         totalTokens = 0; /* when creating a token we do not add them */
         finalyze = 0;
     }
-    
+
     /* set contract owner */
     function setContract(address _ownerContract) public {
         if (msg.sender == owner){
             ownerContract = _ownerContract;
         }
     }
-    
+
     function setOptions(uint256 tokenCreate) public {
         /* set the amount, give the tokens to the contract */
         if ((msg.sender == ownerContract) && (finalyze == 0)){
@@ -122,7 +122,7 @@ contract metahashtoken {
             revert();
         }
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
         if (balance[msg.sender] <= _value){
             revert();
@@ -133,7 +133,7 @@ contract metahashtoken {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /* the contract is closed. Either because of the amount reached, or by the deadline. */
     function finalyzeContract() public {
         if (msg.sender != owner){
@@ -141,4 +141,13 @@ contract metahashtoken {
         }
         finalyze = 1;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

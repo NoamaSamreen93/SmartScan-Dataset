@@ -227,10 +227,10 @@ contract IBancorConverterExtended is IBancorConverter, IOwned {
     function getConnectorBalance(IERC20Token _connectorToken) public view returns (uint256);
     function getReserveBalance(IERC20Token _reserveToken) public view returns (uint256);
     function reserves(address _address) public view returns (
-        uint256 virtualBalance, 
-        uint32 weight, 
-        bool isVirtualBalanceEnabled, 
-        bool isPurchaseEnabled, 
+        uint256 virtualBalance,
+        uint32 weight,
+        bool isVirtualBalanceEnabled,
+        bool isPurchaseEnabled,
         bool isSet
     );
 }
@@ -304,7 +304,7 @@ contract BancorConverterUpgrader is IBancorConverterUpgrader, Owned, ContractIds
         IBancorConverterExtended newConverter = createConverter(converter);
         copyConnectors(converter, newConverter, formerVersions);
         copyConversionFee(converter, newConverter);
-        transferConnectorsBalances(converter, newConverter, formerVersions);                
+        transferConnectorsBalances(converter, newConverter, formerVersions);
         ISmartToken token = converter.token();
 
         if (token.owner() == address(converter)) {
@@ -447,11 +447,22 @@ contract BancorConverterUpgrader is IBancorConverterUpgrader, Owned, ContractIds
 
         @return connector's settings
     */
-    function readConnector(IBancorConverterExtended _converter, address _address, bool _isLegacyVersion) 
+    function readConnector(IBancorConverterExtended _converter, address _address, bool _isLegacyVersion)
         private
         view
         returns(uint256 virtualBalance, uint32 weight, bool isVirtualBalanceEnabled, bool isPurchaseEnabled, bool isSet)
     {
         return _isLegacyVersion ? _converter.reserves(_address) : _converter.connectors(_address);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

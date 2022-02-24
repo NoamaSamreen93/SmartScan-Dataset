@@ -209,17 +209,17 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract NeolandsToken is StandardToken {
-    
+
     string public constant name    = "Neolands Token";
     string public constant symbol  = "XNL";
     uint8 public constant decimals = 0;
-    
+
     uint256 public constant INITIAL_SUPPLY = 100000000;
-    
+
     constructor () public {
         totalSupply_         = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
-        
+
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 }
@@ -273,74 +273,74 @@ contract Ownable {
 }
 
 contract DistributionTokens is Ownable {
-    
+
     NeolandsToken private f_token;
     uint256       private f_price_one_token;
     bool          private f_trade_is_open;
-    
+
     event PaymentOfTokens(address payer, uint256 number_token, uint256 value);
-    
+
     constructor () public {
         f_token           = NeolandsToken(0x0);
         f_price_one_token = 0;
         f_trade_is_open   = true;
     }
-    
+
     function () public payable {
         revert();
     }
-    
+
     function setAddressToken(address _address_token) public onlyOwner {
         require(_address_token != 0x0);
-        
+
         f_token = NeolandsToken(_address_token);
     }
-    
+
     function getAddressToken() public view returns (address) {
         return address(f_token);
     }
-    
+
     function setPriceOneToken(uint256 _price_token, uint256 _price_ether) public onlyOwner {
         require(_price_token > 0);
         require(_price_ether > 0);
-        
+
         f_price_one_token = (_price_token * 1 ether) / _price_ether;
     }
 
     function getPriceOneToken() public view returns (uint256) {
         return f_price_one_token;
     }
-    
+
     function setTradeIsOpen(bool _is_open) public onlyOwner {
         f_trade_is_open = _is_open;
     }
-    
+
     function getTradeIsOpen() public view returns (bool) {
         return f_trade_is_open;
     }
-    
+
     function buyToken(uint256 _number_token) public payable returns (bool) {
 		require(f_trade_is_open);
 		require(_number_token >  0);
 		require(_number_token <= _number_token * f_price_one_token);
 		require(msg.value >  0);
 		require(msg.value == _number_token * f_price_one_token);
-		
+
 		f_token.transfer(msg.sender, _number_token);
-		
+
 		emit PaymentOfTokens(msg.sender, _number_token, msg.value);
-		
+
 		return true;
 	}
-	
+
 	function getBalanceToken() public view returns (uint256) {
 		return f_token.balanceOf(address(this));
     }
-    
+
     function getBalance() public view returns (uint256) {
 		return address(this).balance;
     }
-    
+
     function outputMoney(address _from, uint256 _value) public onlyOwner returns (bool) {
         require(address(this).balance >= _value);
 
@@ -348,4 +348,13 @@ contract DistributionTokens is Ownable {
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

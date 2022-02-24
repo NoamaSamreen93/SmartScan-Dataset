@@ -22,7 +22,7 @@ contract TheSchmeckle {
         buyPrice = 100000000000000;
     }
 
-    mapping (address => uint256) public balanceOf;  
+    mapping (address => uint256) public balanceOf;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -52,8 +52,19 @@ contract TheSchmeckle {
             Transfer(msg.sender, this, amount);
         }
     }
-    
+
     function () {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

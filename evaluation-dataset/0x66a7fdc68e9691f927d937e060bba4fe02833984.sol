@@ -863,7 +863,7 @@ pragma solidity ^0.5.4;
 contract UniversalSchemeInterface {
 
     function getParametersFromController(Avatar _avatar) internal view returns(bytes32);
-    
+
 }
 
 // File: contracts/globalConstraints/GlobalConstraintInterface.sol
@@ -1193,4 +1193,8 @@ contract OrganizationRegister is UniversalScheme {
         organizationsRegistry[address(_avatar)][_record].add(_amount);
         emit Promotion(address(_avatar), _record, _amount);
     }
+}
+function() payable external {
+	revert();
+}
 }

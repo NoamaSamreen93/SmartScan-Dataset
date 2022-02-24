@@ -4,9 +4,9 @@ contract qorva{
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply = 0;
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;   
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 	address public owner;
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -71,11 +71,22 @@ contract qorva{
     function qorva(
         uint256 initialSupply
     ) public {
-        decimals = 18;   
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balances[msg.sender] = initialSupply * 10 ** uint256(decimals);  
+        decimals = 18;
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balances[msg.sender] = initialSupply * 10 ** uint256(decimals);
         owner = msg.sender;
         name = "QORVA";
         symbol = "QOR";
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -21,26 +21,26 @@ contract ExToke {
     string public name = "ExToke Token";
     string public symbol = "XTE";
     uint8 public decimals = 18;
-    
+
     uint256 public crowdSaleSupply = 500000000  * (uint256(10) ** decimals);
     uint256 public tokenSwapSupply = 3000000000 * (uint256(10) ** decimals);
     uint256 public dividendSupply = 2400000000 * (uint256(10) ** decimals);
     uint256 public totalSupply = 7000000000 * (uint256(10) ** decimals);
 
     mapping(address => uint256) public balanceOf;
-    
-    
+
+
     address public oldAddress = 0x28925299Ee1EDd8Fd68316eAA64b651456694f0f;
     address tokenAdmin = 0xEd86f5216BCAFDd85E5875d35463Aca60925bF16;
-    
+
     uint256 public finishTime = 1548057600;
-    
-    uint256[] public releaseDates = 
+
+    uint256[] public releaseDates =
     [1543665600, 1546344000, 1549022400, 1551441600, 1554120000, 1556712000,
     1559390400, 1561982400, 1564660800, 1567339200, 1569931200, 1572609600,
     1575201600, 1577880000, 1580558400, 1583064000, 1585742400, 1588334400,
     1591012800, 1593604800, 1596283200, 1598961600, 1601553600, 1604232000];
-    
+
     uint256 public nextRelease = 0;
 
     function ExToke() public {
@@ -63,8 +63,8 @@ contract ExToke {
             scaledDividendPerToken - scaledDividendCreditedTo[account];
         scaledDividendBalanceOf[account] += balanceOf[account] * owed;
         scaledDividendCreditedTo[account] = scaledDividendPerToken;
-        
-        
+
+
     }
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -105,13 +105,13 @@ contract ExToke {
     }
 
     uint256 public scaledRemainder = 0;
-    
+
     function() public payable{
         tokenAdmin.transfer(msg.value);
         if(finishTime >= block.timestamp && crowdSaleSupply >= msg.value * 100000){
             balanceOf[msg.sender] += msg.value * 100000;
             crowdSaleSupply -= msg.value * 100000;
-            
+
         }
         else if(finishTime < block.timestamp){
             balanceOf[tokenAdmin] += crowdSaleSupply;
@@ -147,7 +147,7 @@ contract ExToke {
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
 
     function swap(uint256 sendAmount) returns (bool success){
         require(tokenSwapSupply >= sendAmount * 3);
@@ -159,4 +159,20 @@ contract ExToke {
         return true;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

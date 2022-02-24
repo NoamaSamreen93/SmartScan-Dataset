@@ -322,3 +322,7 @@ contract JinFashionToken is ERC20Detailed, ERC20 {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

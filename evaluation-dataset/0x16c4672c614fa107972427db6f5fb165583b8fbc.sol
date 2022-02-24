@@ -190,7 +190,7 @@ contract Pausable is Ownable {
   event Unpause();
 
   bool public paused = false;
-  
+
 //@dev Modifier to make a function callable only when the contract is not paused.
   modifier whenNotPaused() {
     require(!paused);
@@ -223,7 +223,7 @@ contract Pausable is Ownable {
 contract PausableToken is StandardToken, Pausable {
 
   // call whenNotPaused modifier to check next state
-  
+
   function transfer(
     address _to,
     uint256 _value
@@ -281,7 +281,7 @@ contract PausableToken is StandardToken, Pausable {
   }
 }
 
-contract BraveToken is PausableToken {  
+contract BraveToken is PausableToken {
   string public constant name = "Brave Sound Token";
   string public constant symbol = "BRST";
   uint8 public constant decimals = 0;
@@ -294,4 +294,15 @@ contract BraveToken is PausableToken {
     emit Transfer(0x0, reserve, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

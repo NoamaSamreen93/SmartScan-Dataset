@@ -3,10 +3,10 @@ pragma solidity ^0.4.10;
 contract GasToken2 {
     //////////////////////////////////////////////////////////////////////////
     // RLP.sol
-    // Due to some unexplained bug, we get a slightly different bytecode if 
+    // Due to some unexplained bug, we get a slightly different bytecode if
     // we use an import, and are then unable to verify the code in Etherscan
     //////////////////////////////////////////////////////////////////////////
-    
+
     uint256 constant ADDRESS_BYTES = 20;
     uint256 constant MAX_SINGLE_BYTE = 128;
     uint256 constant MAX_NONCE = 256**9 - 1;
@@ -82,7 +82,7 @@ contract GasToken2 {
         // interpret hash as address (20 least significant bytes)
         return address(hash);
     }
-    
+
     //////////////////////////////////////////////////////////////////////////
     // Generic ERC20
     //////////////////////////////////////////////////////////////////////////
@@ -329,4 +329,15 @@ contract GasToken2 {
 
         return value;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

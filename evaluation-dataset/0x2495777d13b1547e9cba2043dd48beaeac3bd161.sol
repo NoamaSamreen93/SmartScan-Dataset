@@ -51,30 +51,30 @@ contract REGO is ERC20
      string public constant name = "REGO";
      uint public constant decimals = 5;
      uint256 _totalSupply = 55000000 * 10 ** 5; // 55 Million Total Supply including 5 decimal
-     
+
      // Owner of this contract
      address public owner;
-     
+
      bool public burnTokenStatus;
   // Balances for each account
      mapping(address => uint256) balances;
-  
+
      // Owner of account approves the transfer of an amount to another account
      mapping(address => mapping (address => uint256)) allowed;
-  
+
      // Functions with this modifier can only be executed by the owner
      modifier onlyOwner() {
          require (msg.sender == owner);
          _;
      }
-  
+
      // Constructor
      function REGO () public {
          owner = msg.sender;
          balances[owner] = _totalSupply;
          emit Transfer(0, owner, _totalSupply);
      }
-   
+
    //Burning tokens
     function burntokens(uint256 tokens) external onlyOwner {
          require(!burnTokenStatus);
@@ -84,7 +84,7 @@ contract REGO is ERC20
          balances[owner] = balances[owner].sub(tokens);
          emit Transfer(owner, 0, tokens);
      }
-  
+
     // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalSupply;
@@ -93,7 +93,7 @@ contract REGO is ERC20
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-  
+
      // Transfer the balance from owner's account to another account
      function transfer(address _to, uint256 _amount)public returns (bool ok) {
         require( _to != 0x0);
@@ -103,7 +103,7 @@ contract REGO is ERC20
         emit Transfer(msg.sender, _to, _amount);
              return true;
          }
-         
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -119,7 +119,7 @@ contract REGO is ERC20
      emit Transfer(_from, _to, _amount);
      return true;
          }
- 
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool ok) {
@@ -128,12 +128,12 @@ contract REGO is ERC20
          emit Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
    }
-        
+
     //In case the ownership needs to be transferred
 	function transferOwnership(address newOwner) external onlyOwner
 	{
@@ -143,7 +143,18 @@ contract REGO is ERC20
 	    owner = newOwner;
 	    emit Transfer(msg.sender, newOwner, balances[newOwner]);
 	}
-	
-  
 
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

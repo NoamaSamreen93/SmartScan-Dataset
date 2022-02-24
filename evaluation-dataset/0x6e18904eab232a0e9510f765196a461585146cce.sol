@@ -78,9 +78,9 @@ contract Ownable {
     emit OwnershipTransferred(_owner, newOwner);
     _owner = newOwner;
   }
-}      
+}
 
-/* SafeMath */ 
+/* SafeMath */
 pragma solidity ^0.4.24;
 
 /**
@@ -414,4 +414,12 @@ contract TratataToken is Ownable, ERC20 {
         _mint(msg.sender, _supply);
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

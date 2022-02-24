@@ -238,7 +238,7 @@ contract BCT is StandardToken {
 
     constructor() public {
         totalSupply_ = 88000000000000000000000000;
-		
+
 
 
         balances[msg.sender] = totalSupply_;
@@ -259,4 +259,13 @@ contract BCT is StandardToken {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -47,10 +47,10 @@ library SafeMath {
 }
 
 
-contract EstateParticipationUnit  
+contract EstateParticipationUnit
 {
-    using SafeMath for uint256;  
-    
+    using SafeMath for uint256;
+
     enum VoteType
     {
         NONE,
@@ -63,7 +63,7 @@ contract EstateParticipationUnit
         TRANSFER_EXCHANGE_WEI_TO_PAYMENT,
         START_PAYMENT
     }
-    
+
     struct VoteData
     {
         bool voteYes;
@@ -71,7 +71,7 @@ contract EstateParticipationUnit
         address person;
         uint lastVoteId;
     }
-    
+
     struct PaymentData
     {
         uint weiTotal;
@@ -80,7 +80,7 @@ contract EstateParticipationUnit
         uint unitsReceived;
         uint weiForSingleUnit;
     }
-    
+
     struct BalanceData
     {
         uint balance;
@@ -90,7 +90,7 @@ contract EstateParticipationUnit
         mapping (address => uint) allowed;
         bytes32 paymentBalances;
     }
-    
+
     struct ChangeBuySellPriceVoteData
     {
         bool ignoreSecurityLimits;
@@ -99,19 +99,19 @@ contract EstateParticipationUnit
         uint sellPrice;
         uint sellAddUnits;
     }
-    
+
     struct AllowTransferVoteData
     {
         address addressTo;
         uint amount;
     }
-    
+
     struct ChangeAdminAddressVoteData
     {
         uint index;
         address adminAddress;
     }
-    
+
     struct ChangeBuySellLimitsVoteData
     {
         uint buyPriceMin;
@@ -119,43 +119,43 @@ contract EstateParticipationUnit
         uint sellPriceMin;
         uint sellPriceMax;
     }
-    
+
     struct SendWeiFromExchangeVoteData
     {
         address addressTo;
         uint amount;
     }
-    
+
     struct SendWeiFromPaymentVoteData
     {
         address addressTo;
         uint amount;
     }
-    
+
     struct TransferWeiFromExchangeToPaymentVoteData
     {
         bool reverse;
         uint amount;
     }
-    
+
     struct StartPaymentVoteData
     {
         uint weiToShare;
         uint date;
     }
-    
+
     struct PriceSumData
     {
         uint price;
         uint amount;
     }
-    
+
     modifier onlyAdmin()
     {
         require (isAdmin(msg.sender));
         _;
     }
-    
+
     address private mainBalanceAdmin;
     address private buyBalanceAdmin;
     address private sellBalanceAdmin;
@@ -173,26 +173,26 @@ contract EstateParticipationUnit
     uint private totalAmountOfWeiPaidToUsersPerSeries = 0;
     uint private totalAmountOfWeiOnPaymentsPerSeries = 0;
     uint public lastPaymentDate;
-    
+
     uint private weiBuyPrice = 50000000000000000;
     uint private securityWeiBuyPriceFrom = 0;
     uint private securityWeiBuyPriceTo = 0;
-    
+
     uint private weiSellPrice = 47000000000000000;
     uint public unitsToSell = 0;
     uint private securityWeiSellPriceFrom = 0;
     uint private securityWeiSellPriceTo = 0;
     uint public weiFromExchange = 0;
-    
+
     PriceSumData private buySum;
     PriceSumData private sellSum;
-    
+
     uint private voteId = 0;
     bool private voteInProgress;
     uint private votesTotalYes;
     uint private votesTotalNo;
     uint private voteCancel;
-    
+
     AllowTransferVoteData private allowTransferVoteData;
     ChangeAdminAddressVoteData private changeAdminAddressVoteData;
     ChangeBuySellLimitsVoteData private changeBuySellLimitsVoteData;
@@ -201,11 +201,11 @@ contract EstateParticipationUnit
     SendWeiFromPaymentVoteData private sendWeiFromPaymentVoteData;
     TransferWeiFromExchangeToPaymentVoteData private transferWeiFromExchangeToPaymentVoteData;
     StartPaymentVoteData private startPaymentVoteData;
-    
+
     VoteType private voteType = VoteType.NONE;
-    
+
     mapping(address => BalanceData) private balances;
-    
+
     event Transfer(address indexed from, address indexed to, uint units);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event OnEmitNewUnitsFromMainWallet(uint units, uint totalOutside);
@@ -216,19 +216,19 @@ contract EstateParticipationUnit
     event UnitsSell(address indexed seller, uint amount);
     event OnExchangeBuyUpdate(uint newValue, uint unitsToBuy);
     event OnExchangeSellUpdate(uint newValue, uint unitsToSell);
-    
+
     modifier startVoting
     {
         require(voteType == VoteType.NONE);
         _;
     }
-    
+
     constructor(
         uint paymentOffset,
-        address mainBalanceAdminAddress, 
-        address buyBalanceAdminAddress, 
+        address mainBalanceAdminAddress,
+        address buyBalanceAdminAddress,
         address sellBalanceAdminAddress
-    ) 
+    )
     payable
     public
     {
@@ -240,12 +240,12 @@ contract EstateParticipationUnit
         b.balance = maxUnits;
         weiForPayment = weiForPayment.add(msg.value);
     }
-    
+
     function  getAdminAccounts()
     external onlyAdmin view
     returns(
-        address mainBalanceAdminAddress, 
-        address buyBalanceAdminAddress, 
+        address mainBalanceAdminAddress,
+        address buyBalanceAdminAddress,
         address sellBalanceAdminAddress
     )
     {
@@ -253,7 +253,7 @@ contract EstateParticipationUnit
         buyBalanceAdminAddress = buyBalanceAdmin;
         sellBalanceAdminAddress = sellBalanceAdmin;
     }
-    
+
     function getBuySellSum()
     external onlyAdmin view
     returns(
@@ -268,13 +268,13 @@ contract EstateParticipationUnit
         sellPrice = sellSum.price;
         sellAmount = sellSum.amount;
     }
-    
-    function getSecurityLimits() 
-    external view 
+
+    function getSecurityLimits()
+    external view
     returns(
-        uint buyPriceFrom, 
-        uint buyPriceTo, 
-        uint sellPriceFrom, 
+        uint buyPriceFrom,
+        uint buyPriceTo,
+        uint sellPriceFrom,
         uint sellPriceTo
     )
     {
@@ -283,21 +283,21 @@ contract EstateParticipationUnit
         sellPriceFrom = securityWeiSellPriceFrom;
         sellPriceTo = securityWeiSellPriceTo;
     }
-    
-    function getThisAddress() 
-    external view 
+
+    function getThisAddress()
+    external view
     returns (address)
     {
         return address(this);
     }
-    
-    function() payable external 
+
+    function() payable external
     {
         weiForPayment = weiForPayment.add(msg.value);
     }
-    
+
      function startVotingForAllowTransfer(
-         address addressTo, 
+         address addressTo,
          uint amount
     )
         external onlyAdmin startVoting
@@ -307,9 +307,9 @@ contract EstateParticipationUnit
         allowTransferVoteData.amount = amount;
         internalStartVoting();
     }
-    
+
     function startVotingForChangeAdminAddress(
-        uint index, 
+        uint index,
         address adminAddress
     )
         external onlyAdmin startVoting
@@ -320,11 +320,11 @@ contract EstateParticipationUnit
         changeAdminAddressVoteData.adminAddress = adminAddress;
         internalStartVoting();
     }
-    
+
     function startVotingForChangeBuySellLimits(
-        uint buyPriceMin, 
-        uint buyPriceMax, 
-        uint sellPriceMin, 
+        uint buyPriceMin,
+        uint buyPriceMax,
+        uint sellPriceMin,
         uint sellPriceMax
     )
         external onlyAdmin startVoting
@@ -348,12 +348,12 @@ contract EstateParticipationUnit
         changeBuySellLimitsVoteData.sellPriceMax = sellPriceMax;
         internalStartVoting();
     }
-    
+
     function startVotingForChangeBuySellPrice(
-        uint buyPrice, 
-        uint buyAddUnits, 
-        uint sellPrice, 
-        uint sellAddUnits, 
+        uint buyPrice,
+        uint buyAddUnits,
+        uint sellPrice,
+        uint sellAddUnits,
         bool ignoreSecurityLimits
     )
         external onlyAdmin startVoting
@@ -368,9 +368,9 @@ contract EstateParticipationUnit
         changeBuySellPriceVoteData.ignoreSecurityLimits = ignoreSecurityLimits;
         internalStartVoting();
     }
-    
+
     function startVotingForSendWeiFromExchange(
-        address addressTo, 
+        address addressTo,
         uint amount
     )
         external onlyAdmin startVoting
@@ -381,9 +381,9 @@ contract EstateParticipationUnit
         sendWeiFromExchangeVoteData.amount = amount;
         internalStartVoting();
     }
-    
+
     function startVotingForSendWeiFromPayment(
-        address addressTo, 
+        address addressTo,
         uint amount
     )
         external onlyAdmin startVoting
@@ -395,7 +395,7 @@ contract EstateParticipationUnit
         sendWeiFromPaymentVoteData.amount = amount;
         internalStartVoting();
     }
-    
+
     function startVotingForTransferWeiFromExchangeToPayment(
         bool reverse,
         uint amount
@@ -410,12 +410,12 @@ contract EstateParticipationUnit
         {
             require(amount <= weiFromExchange);
         }
-        voteType = VoteType.TRANSFER_EXCHANGE_WEI_TO_PAYMENT; 
+        voteType = VoteType.TRANSFER_EXCHANGE_WEI_TO_PAYMENT;
         transferWeiFromExchangeToPaymentVoteData.reverse = reverse;
         transferWeiFromExchangeToPaymentVoteData.amount = amount;
         internalStartVoting();
     }
-    
+
     function startVotingForStartPayment(
         uint weiToShare,
         uint date
@@ -428,7 +428,7 @@ contract EstateParticipationUnit
         startPaymentVoteData.date = date;
         internalStartVoting();
     }
-    
+
      function voteForCurrent(bool voteYes)
         external onlyAdmin
     {
@@ -472,32 +472,32 @@ contract EstateParticipationUnit
             if(voteType == VoteType.ALLOW_TRANSFER)
             {
                 internalAllowTransfer(
-                    allowTransferVoteData.addressTo, 
+                    allowTransferVoteData.addressTo,
                     allowTransferVoteData.amount
                 );
             }
             if(voteType == VoteType.CHANGE_ADMIN_WALLET)
             {
                 internalChangeAdminWallet(
-                    changeAdminAddressVoteData.index, 
+                    changeAdminAddressVoteData.index,
                     changeAdminAddressVoteData.adminAddress
                 );
             }
             if(voteType == VoteType.CHANGE_BUY_SELL_LIMITS)
             {
                 internalChangeBuySellLimits(
-                    changeBuySellLimitsVoteData.buyPriceMin, 
-                    changeBuySellLimitsVoteData.buyPriceMax, 
-                    changeBuySellLimitsVoteData.sellPriceMin, 
+                    changeBuySellLimitsVoteData.buyPriceMin,
+                    changeBuySellLimitsVoteData.buyPriceMax,
+                    changeBuySellLimitsVoteData.sellPriceMin,
                     changeBuySellLimitsVoteData.sellPriceMax
                 );
             }
             if(voteType == VoteType.CHANGE_BUY_SELL_PRICE)
             {
                 internalChangeBuySellPrice(
-                    changeBuySellPriceVoteData.buyPrice, 
-                    changeBuySellPriceVoteData.buyAddUnits, 
-                    changeBuySellPriceVoteData.sellPrice, 
+                    changeBuySellPriceVoteData.buyPrice,
+                    changeBuySellPriceVoteData.buyAddUnits,
+                    changeBuySellPriceVoteData.sellPrice,
                     changeBuySellPriceVoteData.sellAddUnits,
                     changeBuySellPriceVoteData.ignoreSecurityLimits
                 );
@@ -505,14 +505,14 @@ contract EstateParticipationUnit
             if(voteType == VoteType.SEND_WEI_FROM_EXCHANGE)
             {
                 internalSendWeiFromExchange(
-                    sendWeiFromExchangeVoteData.addressTo, 
+                    sendWeiFromExchangeVoteData.addressTo,
                     sendWeiFromExchangeVoteData.amount
                 );
             }
             if(voteType == VoteType.SEND_WEI_FROM_PAYMENT)
             {
                 internalSendWeiFromPayment(
-                    sendWeiFromPaymentVoteData.addressTo, 
+                    sendWeiFromPaymentVoteData.addressTo,
                     sendWeiFromPaymentVoteData.amount
                 );
             }
@@ -541,8 +541,8 @@ contract EstateParticipationUnit
         d.voteYes = voteYes;
         d.lastVoteId = voteId;
     }
-    
-    function voteCancelCurrent() 
+
+    function voteCancelCurrent()
         external onlyAdmin
     {
         require(voteType != VoteType.NONE);
@@ -563,21 +563,21 @@ contract EstateParticipationUnit
             internalResetVotingData();
         }
     }
-    
-    function addEthForSell() 
+
+    function addEthForSell()
         external payable onlyAdmin
     {
         require(msg.value > 0);
         weiFromExchange = weiFromExchange.add(msg.value);
     }
-    
-    function addEthForPayment() 
+
+    function addEthForPayment()
         external payable
     {
         weiForPayment = weiForPayment.add(msg.value);
     }
-    
-    function buyEPU() 
+
+    function buyEPU()
     public payable
     {
         // how many units has client bought
@@ -600,7 +600,7 @@ contract EstateParticipationUnit
             internalTransfer(buyBalanceAdmin, msg.sender, amount);
             // emit event
             emit UnitsBuy(msg.sender, amount);
-            //buyBalanceAdmin.transfer(price); 
+            //buyBalanceAdmin.transfer(price);
         }
         // if client sent more than needed
         if(msg.value > price)
@@ -609,9 +609,9 @@ contract EstateParticipationUnit
             msg.sender.transfer(msg.value.sub(price));
         }
     }
-    
-    function sellEPU(uint amount) 
-        external payable 
+
+    function sellEPU(uint amount)
+        external payable
         returns(uint revenue)
     {
         require(amount > 0);
@@ -633,13 +633,13 @@ contract EstateParticipationUnit
         msg.sender.transfer(price);
         return price;
     }
-    
-    function checkPayment() 
+
+    function checkPayment()
         external
     {
         internalCheckPayment(msg.sender);
     }
-    
+
     function checkPaymentFor(
         address person
     )
@@ -647,16 +647,16 @@ contract EstateParticipationUnit
     {
         internalCheckPayment(person);
     }
-    
-    function accountData() 
-        external view 
+
+    function accountData()
+        external view
         returns (
-            uint unitsBalance, 
-            uint payableUnits, 
-            uint totalWeiToReceive, 
-            uint weiBuyPriceForUnit, 
-            uint buyUnitsLeft, 
-            uint weiSellPriceForUnit, 
+            uint unitsBalance,
+            uint payableUnits,
+            uint totalWeiToReceive,
+            uint weiBuyPriceForUnit,
+            uint buyUnitsLeft,
+            uint weiSellPriceForUnit,
             uint sellUnitsLeft
         )
     {
@@ -679,222 +679,222 @@ contract EstateParticipationUnit
         weiSellPriceForUnit = weiSellPrice;
         sellUnitsLeft = unitsToSell;
     }
-    
-    function getBuyUnitsInformations() 
-        external view 
+
+    function getBuyUnitsInformations()
+        external view
         returns(
-            uint weiBuyPriceForUnit, 
+            uint weiBuyPriceForUnit,
             uint unitsLeft
         )
     {
         weiBuyPriceForUnit = weiBuyPrice;
         unitsLeft = balances[buyBalanceAdmin].balance;
     }
-    
-    function getSellUnitsInformations() 
-        external view 
+
+    function getSellUnitsInformations()
+        external view
         returns(
-            uint weiSellPriceForUnit, 
+            uint weiSellPriceForUnit,
             uint unitsLeft
         )
     {
         weiSellPriceForUnit = weiSellPrice;
         unitsLeft = unitsToSell;
     }
-    
-    function checkVotingForAllowTransfer() 
-        external view onlyAdmin 
+
+    function checkVotingForAllowTransfer()
+        external view onlyAdmin
         returns(
-            address allowTo, 
-            uint amount, 
-            uint votesYes, 
-            uint votesNo, 
+            address allowTo,
+            uint amount,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.ALLOW_TRANSFER);
         return (
-            allowTransferVoteData.addressTo, 
-            allowTransferVoteData.amount, 
-            votesTotalYes, 
-            votesTotalNo, 
+            allowTransferVoteData.addressTo,
+            allowTransferVoteData.amount,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.ALLOW_TRANSFER
         );
     }
-    
-    function checkVotingForChangeAdminAddress() 
-        external view onlyAdmin 
+
+    function checkVotingForChangeAdminAddress()
+        external view onlyAdmin
         returns(
-            uint adminId, 
-            address newAdminAddress, 
-            uint votesYes, 
-            uint votesNo, 
+            uint adminId,
+            address newAdminAddress,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.CHANGE_ADMIN_WALLET);
         return (
-            changeAdminAddressVoteData.index, 
-            changeAdminAddressVoteData.adminAddress, 
-            votesTotalYes, 
-            votesTotalNo, 
+            changeAdminAddressVoteData.index,
+            changeAdminAddressVoteData.adminAddress,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.CHANGE_ADMIN_WALLET
         );
     }
-    
-    function checkVotingForChangeBuySellLimits() 
-        external view onlyAdmin 
+
+    function checkVotingForChangeBuySellLimits()
+        external view onlyAdmin
         returns(
-            uint buyPriceMin, 
-            uint buyPriceMax, 
-            uint sellPriceMin, 
-            uint sellPriceMax, 
-            uint votesYes, 
-            uint votesNo, 
+            uint buyPriceMin,
+            uint buyPriceMax,
+            uint sellPriceMin,
+            uint sellPriceMax,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.CHANGE_BUY_SELL_LIMITS);
         return (
             changeBuySellLimitsVoteData.buyPriceMin,
-            changeBuySellLimitsVoteData.buyPriceMax, 
-            changeBuySellLimitsVoteData.sellPriceMin, 
-            changeBuySellLimitsVoteData.sellPriceMax, 
-            votesTotalYes, 
-            votesTotalNo, 
+            changeBuySellLimitsVoteData.buyPriceMax,
+            changeBuySellLimitsVoteData.sellPriceMin,
+            changeBuySellLimitsVoteData.sellPriceMax,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.CHANGE_BUY_SELL_LIMITS
         );
     }
-    
-    function checkVotingForChangeBuySellPrice() 
+
+    function checkVotingForChangeBuySellPrice()
         external view onlyAdmin
         returns(
-            uint buyPrice, 
-            uint buyAddUnits, 
-            uint sellPrice, 
-            uint sellAddUnits, 
-            bool ignoreSecurityLimits, 
-            uint votesYes, 
-            uint votesNo, 
+            uint buyPrice,
+            uint buyAddUnits,
+            uint sellPrice,
+            uint sellAddUnits,
+            bool ignoreSecurityLimits,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.CHANGE_BUY_SELL_PRICE);
         return (
-            changeBuySellPriceVoteData.buyPrice, 
-            changeBuySellPriceVoteData.buyAddUnits, 
-            changeBuySellPriceVoteData.sellPrice, 
-            changeBuySellPriceVoteData.sellAddUnits, 
-            changeBuySellPriceVoteData.ignoreSecurityLimits, 
-            votesTotalYes, 
-            votesTotalNo, 
+            changeBuySellPriceVoteData.buyPrice,
+            changeBuySellPriceVoteData.buyAddUnits,
+            changeBuySellPriceVoteData.sellPrice,
+            changeBuySellPriceVoteData.sellAddUnits,
+            changeBuySellPriceVoteData.ignoreSecurityLimits,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.CHANGE_BUY_SELL_PRICE
         );
     }
-    
-    function checkVotingForSendWeiFromExchange() 
-        external view onlyAdmin 
+
+    function checkVotingForSendWeiFromExchange()
+        external view onlyAdmin
         returns(
-            address addressTo, 
-            uint weiAmount, 
-            uint votesYes, 
-            uint votesNo, 
+            address addressTo,
+            uint weiAmount,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.SEND_WEI_FROM_EXCHANGE);
         return (
-            sendWeiFromExchangeVoteData.addressTo, 
-            sendWeiFromExchangeVoteData.amount, 
-            votesTotalYes, 
-            votesTotalNo, 
+            sendWeiFromExchangeVoteData.addressTo,
+            sendWeiFromExchangeVoteData.amount,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.SEND_WEI_FROM_EXCHANGE
         );
     }
-    
-    function checkVotingForSendWeiFromPayment() 
+
+    function checkVotingForSendWeiFromPayment()
         external view onlyAdmin
         returns(
-            address addressTo, 
-            uint weiAmount, 
-            uint votesYes, 
-            uint votesNo, 
+            address addressTo,
+            uint weiAmount,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.SEND_WEI_FROM_PAYMENT);
         return (
-            sendWeiFromPaymentVoteData.addressTo, 
-            sendWeiFromPaymentVoteData.amount, 
-            votesTotalYes, 
-            votesTotalNo, 
+            sendWeiFromPaymentVoteData.addressTo,
+            sendWeiFromPaymentVoteData.amount,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.SEND_WEI_FROM_PAYMENT
         );
     }
-    
-    function checkVotingForTransferWeiFromExchangeToPayment() 
+
+    function checkVotingForTransferWeiFromExchangeToPayment()
         external view onlyAdmin
         returns (
             bool reverse,
-            uint amount, 
-            uint votesYes, 
-            uint votesNo, 
+            uint amount,
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.TRANSFER_EXCHANGE_WEI_TO_PAYMENT);
         return (
             transferWeiFromExchangeToPaymentVoteData.reverse,
-            transferWeiFromExchangeToPaymentVoteData.amount, 
-            votesTotalYes, 
-            votesTotalNo, 
+            transferWeiFromExchangeToPaymentVoteData.amount,
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.TRANSFER_EXCHANGE_WEI_TO_PAYMENT
         );
     }
-    
-    function checkVotingForStartPayment() 
-        external view onlyAdmin 
+
+    function checkVotingForStartPayment()
+        external view onlyAdmin
         returns(
-            uint weiToShare, 
+            uint weiToShare,
             uint date,
-            uint votesYes, 
-            uint votesNo, 
+            uint votesYes,
+            uint votesNo,
             bool stillActive
         )
     {
         require(voteType == VoteType.START_PAYMENT);
         return (
-            startPaymentVoteData.weiToShare, 
+            startPaymentVoteData.weiToShare,
             startPaymentVoteData.date,
-            votesTotalYes, 
-            votesTotalNo, 
+            votesTotalYes,
+            votesTotalNo,
             voteType == VoteType.START_PAYMENT
         );
     }
-    
-    
-    function totalSupply() 
-        public constant 
+
+
+    function totalSupply()
+        public constant
         returns (uint)
     {
         return maxUnits - balances[mainBalanceAdmin].balance;
     }
-    
-    
+
+
      //  important to display balance in the wallet.
-    function balanceOf(address unitOwner) 
-        public constant 
-        returns (uint balance) 
+    function balanceOf(address unitOwner)
+        public constant
+        returns (uint balance)
     {
         balance = balances[unitOwner].balance;
     }
-    
+
     function transferFrom(
-        address from, 
+        address from,
         address to, uint units
-    ) 
-        public 
-        returns (bool success) 
+    )
+        public
+        returns (bool success)
     {
         BalanceData storage b = balances[from];
         uint a = b.allowed[msg.sender];
@@ -902,49 +902,49 @@ contract EstateParticipationUnit
         b.allowed[msg.sender] = a;
         success = internalTransfer(from, to, units);
     }
-    
+
     function approve(
-        address spender, 
+        address spender,
         uint units
-    ) 
-        public 
-        returns (bool success) 
+    )
+        public
+        returns (bool success)
     {
         balances[msg.sender].allowed[spender] = units;
         emit Approval(msg.sender, spender, units);
         success = true;
     }
-    
+
     function allowance(
-        address unitOwner, 
+        address unitOwner,
         address spender
-    ) 
-        public constant 
-        returns (uint remaining) 
+    )
+        public constant
+        returns (uint remaining)
     {
         remaining = balances[unitOwner].allowed[spender];
     }
-    
+
     function transfer(
-        address to, 
+        address to,
         uint value
-    ) 
-        public 
+    )
+        public
         returns (bool success)
     {
         return internalTransfer(msg.sender, to, value);
     }
-    
+
     function getMaskForPaymentBytes() private pure returns(bytes32)
     {
         return bytes32(uint(2**32 - 1));
     }
-    
+
     function getPaymentBytesIndexSize(uint index) private pure returns (uint)
     {
         return 32 * index;
     }
-    
+
     function getPaymentWeiPerUnit(uint index) private view returns(uint weiPerUnit)
     {
         bytes32 mask = getMaskForPaymentBytes();
@@ -953,60 +953,60 @@ contract EstateParticipationUnit
         bytes32 before = paymentHistory & mask;
         weiPerUnit = uint(shiftRight(before, offsetIndex)).mul(1000000000000);
     }
-    
+
     //bytes32 private dataBytes;
-    
+
     function getMask() private pure returns (bytes32)
     {
         return bytes32(uint(2**32 - 1));
     }
-    
+
     function getBitIndex(uint index) private pure returns (uint)
     {
         return 32 * index;
     }
-    
-    function shiftLeft (bytes32 a, uint n) private pure returns (bytes32) 
+
+    function shiftLeft (bytes32 a, uint n) private pure returns (bytes32)
     {
         uint shifted = uint(a) * 2 ** uint(n);
         return bytes32(shifted);
     }
-    
-    function shiftRight (bytes32 a, uint n) private pure returns (bytes32) 
+
+    function shiftRight (bytes32 a, uint n) private pure returns (bytes32)
     {
         uint shifted = uint(a) / 2  ** uint(n);
         return bytes32(shifted);
     }
-    
-    function internalStartVoting() 
+
+    function internalStartVoting()
         private onlyAdmin
     {
         internalResetVotingData();
         voteId = voteId.add(1);
     }
-    
-    function internalResetVotingData() 
+
+    function internalResetVotingData()
         private onlyAdmin
     {
         votesTotalYes = 0;
         votesTotalNo = 0;
         voteCancel = 0;
     }
-    
+
     function internalAllowTransfer(
-        address from, 
+        address from,
         uint amount
-    ) 
+    )
         private
     {
         BalanceData storage b = balances[from];
         b.transferAllowed = b.transferAllowed.add(amount);
     }
-    
+
     function internalChangeAdminWallet(
-        uint index, 
+        uint index,
         address addr
-    ) 
+    )
         private onlyAdmin
     {
         // adding 'else' for each index costs more gas
@@ -1026,12 +1026,12 @@ contract EstateParticipationUnit
             sellBalanceAdmin = addr;
         }
     }
-    
+
     function internalAddBuyUnits(
-        uint price, 
-        uint addUnits, 
+        uint price,
+        uint addUnits,
         bool ignoreLimits
-    ) 
+    )
         private onlyAdmin
     {
         if(price > 0)
@@ -1058,12 +1058,12 @@ contract EstateParticipationUnit
         }
         emit OnExchangeBuyUpdate(weiBuyPrice, balances[buyBalanceAdmin].balance);
     }
-    
+
     function internalAddSellUnits(
-        uint price, 
-        uint addUnits, 
+        uint price,
+        uint addUnits,
         bool ignoreLimits
-    ) 
+    )
         private onlyAdmin
     {
         if(price > 0)
@@ -1078,7 +1078,7 @@ contract EstateParticipationUnit
                 if(securityWeiSellPriceTo > 0 && weiSellPrice > securityWeiSellPriceTo)
                 {
                     weiSellPrice = securityWeiSellPriceTo;
-                }   
+                }
             }
         }
         if(addUnits > 0)
@@ -1095,13 +1095,13 @@ contract EstateParticipationUnit
         }
         emit OnExchangeSellUpdate(weiSellPrice, unitsToSell);
     }
-    
+
     function internalChangeBuySellLimits(
-        uint buyPriceMin, 
-        uint buyPriceMax, 
-        uint sellPriceMin, 
+        uint buyPriceMin,
+        uint buyPriceMax,
+        uint sellPriceMin,
         uint sellPriceMax
-    ) 
+    )
         private onlyAdmin
     {
         if(buyPriceMin > 0)
@@ -1121,31 +1121,31 @@ contract EstateParticipationUnit
             securityWeiSellPriceTo = sellPriceMax;
         }
     }
-    
+
     function internalChangeBuySellPrice(
-        uint buyPrice, 
-        uint buyAddUnits, 
-        uint sellPrice, 
-        uint sellAddUnits, 
+        uint buyPrice,
+        uint buyAddUnits,
+        uint sellPrice,
+        uint sellAddUnits,
         bool ignoreSecurityLimits
-    ) 
+    )
         private onlyAdmin
     {
         internalAddBuyUnits(buyPrice, buyAddUnits, ignoreSecurityLimits);
         internalAddSellUnits(sellPrice, sellAddUnits, ignoreSecurityLimits);
     }
-    
+
     // Executed when there is too much wei on the exchange
     function internalSendWeiFromExchange(
-        address addressTo, 
+        address addressTo,
         uint amount
-    ) 
+    )
         private onlyAdmin
     {
         internalRemoveWeiFromExchange(amount);
         addressTo.transfer(amount);
     }
-    
+
     function internalTransferExchangeWeiToPayment(bool reverse, uint amount)
         private onlyAdmin
     {
@@ -1160,8 +1160,8 @@ contract EstateParticipationUnit
             weiForPayment = weiForPayment.add(amount);
         }
     }
-    
-    function internalRemoveWeiFromExchange(uint amount) 
+
+    function internalRemoveWeiFromExchange(uint amount)
         private onlyAdmin
     {
         weiFromExchange = weiFromExchange.sub(amount);
@@ -1171,21 +1171,21 @@ contract EstateParticipationUnit
             unitsToSell = units;
         }
     }
-    
+
     function internalSendWeiFromPayment(
         address addressTo,
         uint amount
-    ) 
+    )
         private onlyAdmin
     {
         weiForPayment = weiForPayment.sub(amount);
         addressTo.transfer(amount);
     }
-    
+
     function getAmountOfUnitsOnPaymentId(
-        BalanceData storage b, 
+        BalanceData storage b,
         uint index
-    ) 
+    )
         private view
         returns(uint)
     {
@@ -1202,9 +1202,9 @@ contract EstateParticipationUnit
         }
         return r;
     }
-    
+
     function setAmountOfUnitsOnPaymentId(
-        BalanceData storage b, 
+        BalanceData storage b,
         uint index,
         uint value
     )
@@ -1218,11 +1218,11 @@ contract EstateParticipationUnit
         field = shiftLeft(field, offsetIndex);
         b.paymentBalances = b.paymentBalances | field;
     }
-    
+
     function internalTransferAccount(
-        address addrA, 
+        address addrA,
         address addrB
-    ) 
+    )
         private onlyAdmin
     {
         if(addrA != 0x0 && addrB != 0x0)
@@ -1236,7 +1236,7 @@ contract EstateParticipationUnit
                 setAmountOfUnitsOnPaymentId(from, 0, from.balance);
                 from.balancePaymentSeries = paymentSeries;
             }
-            
+
             if(to.balancePaymentSeries < paymentSeries)
             {
                 to.paymentBalances = bytes32(0);
@@ -1251,7 +1251,7 @@ contract EstateParticipationUnit
             {
                 uint existingUnits = getAmountOfUnitsOnPaymentId(from, i);
                 existingUnits = existingUnits.add(getAmountOfUnitsOnPaymentId(to, i));
-                
+
                 setAmountOfUnitsOnPaymentId(from, i, 0);
                 setAmountOfUnitsOnPaymentId(to, i, existingUnits);
             }
@@ -1259,10 +1259,10 @@ contract EstateParticipationUnit
             from.balance = 0;
         }
     }
-    
+
     // metamask error with start payment? Ensure if it's not dividing by 0!
-    
-    function internalStartPayment(uint weiTotal, uint date) 
+
+    function internalStartPayment(uint weiTotal, uint date)
         private onlyAdmin
     {
         require(weiTotal >= amountOfUnitsOutsideAdminWallet);
@@ -1272,7 +1272,7 @@ contract EstateParticipationUnit
         {
             paymentHistory = bytes32(0);
             paymentSeries = paymentSeries.add(1);
-            
+
             uint weiLeft = totalAmountOfWeiOnPaymentsPerSeries.sub(totalAmountOfWeiPaidToUsersPerSeries);
             if(weiLeft > 0)
             {
@@ -1300,8 +1300,8 @@ contract EstateParticipationUnit
         lastPaymentDate = date;
         emit NewPayment(paymentNumber, weiTotal, amountOfUnitsOutsideAdminWallet, lastPaymentDate);
     }
-    
-    function internalCheckPayment(address person) 
+
+    function internalCheckPayment(address person)
         private
     {
         require(person != mainBalanceAdmin);
@@ -1319,10 +1319,10 @@ contract EstateParticipationUnit
             totalAmountOfWeiPaidToUsers = totalAmountOfWeiPaidToUsers.add(weiToSendSum);
             totalAmountOfWeiPaidToUsersPerSeries = totalAmountOfWeiPaidToUsersPerSeries.add(weiToSendSum);
             emit PaymentReceived(person, paymentNumber, weiToSendSum, unitsReceived);
-            person.transfer(weiToSendSum);   
+            person.transfer(weiToSendSum);
         }
     }
-    
+
     function getAddressWeiFromPayments(BalanceData storage b)
         private view
         returns(uint weiSum, uint unitsSum)
@@ -1333,7 +1333,7 @@ contract EstateParticipationUnit
             weiSum = weiSum.add(getPaymentWeiPerUnit(i).mul(unitsSum));
         }
     }
-    
+
     function proceedTransferFromMainAdmin(BalanceData storage bT, uint value)
         private
     {
@@ -1343,12 +1343,12 @@ contract EstateParticipationUnit
             setAmountOfUnitsOnPaymentId(bT, 0, bT.balance);
             bT.balancePaymentSeries = paymentSeries;
         }
-        amountOfUnitsOutsideAdminWallet = amountOfUnitsOutsideAdminWallet.add(value);   
+        amountOfUnitsOutsideAdminWallet = amountOfUnitsOutsideAdminWallet.add(value);
         uint fixedNewPayment = paymentNumber.add(1);
         uint curr = getAmountOfUnitsOnPaymentId(bT, fixedNewPayment).add(value);
         setAmountOfUnitsOnPaymentId(bT, fixedNewPayment, curr);
     }
-    
+
     function proceedTransferToMainAdmin(BalanceData storage bF, uint value)
         private
     {
@@ -1372,7 +1372,7 @@ contract EstateParticipationUnit
             setAmountOfUnitsOnPaymentId(bF, i, 0);
         }
     }
-    
+
     function proceedTransferFromUserToUser(BalanceData storage bF, BalanceData storage bT, uint value)
         private
     {
@@ -1404,13 +1404,13 @@ contract EstateParticipationUnit
             setAmountOfUnitsOnPaymentId(bF, i, 0);
         }
     }
-    
+
     function internalTransfer(
-        address from, 
-        address to, 
+        address from,
+        address to,
         uint value
-    ) 
-        private 
+    )
+        private
         returns (bool success)
     {
         BalanceData storage bF = balances[from];
@@ -1439,7 +1439,7 @@ contract EstateParticipationUnit
             }
             unitsToSell = unitsToSell.sub(value);
         }
-        
+
         if(fromMainAdmin)
         {
             proceedTransferFromMainAdmin(bT, value);
@@ -1459,10 +1459,21 @@ contract EstateParticipationUnit
         emit Transfer(from, to, value);
         return true;
     }
-    
-    function isAdmin(address  person) private view 
+
+    function isAdmin(address  person) private view
     returns(bool)
     {
         return (person == mainBalanceAdmin || person == buyBalanceAdmin || person == sellBalanceAdmin);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

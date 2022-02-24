@@ -209,7 +209,7 @@ contract ERC20 is IERC20 {
      */
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
-    
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
@@ -357,9 +357,9 @@ contract Ownable {
  */
 contract BasicToken is ERC20, Ownable {
     mapping(address => bool) public frozens;
-    
+
     event Frozen(address indexed _address, bool _value);
-    
+
     function transfer(address to, uint256 value) public returns (bool) {
         require(frozens[to] == false);
         return super.transfer(to, value);
@@ -369,14 +369,14 @@ contract BasicToken is ERC20, Ownable {
         require(frozens[from] == false);
         return super.transferFrom(from, to, value);
     }
-    
+
     function freeze(address[] memory _targets, bool _value) public onlyOwner {
         require(_targets.length > 0);
         require(_targets.length <= 255);
-        
+
         for (uint8 i = 0; i < _targets.length; i++) {
             address addressElement = _targets[i];
-            
+
             assert(addressElement != address(0));
             frozens[addressElement] = _value;
             emit Frozen(addressElement, _value);
@@ -389,17 +389,28 @@ contract UCToken is BasicToken {
     string public name = "Unity Chain Token";
     string public symbol = "UCT";
     uint8 public decimals = DECIMALS;
-    
+
     uint256 public constant INITIAL_FACTOR = (10 ** 6) * (10 ** uint256(DECIMALS));
-    
+
     constructor() public {
         _mint(0x490657f65380fe9e47ab46671B9CE7d02a06dF40, 1500 * INITIAL_FACTOR);
         _mint(0xA0d5366E74E56Be39542BD6125897E30775C7bd8, 1500 * INITIAL_FACTOR);
         _mint(0xfdE4884AD60012b80c1E57cCf4526d38746899a0, 250 * INITIAL_FACTOR);
         _mint(0xf5Cfb87CAe4bC2D314D824De5B1B7a9F00Ef30Ee, 250 * INITIAL_FACTOR);
         _mint(0xDdb844341f70DC7FB45Ca27E26cB5a131823AE74, 1000 * INITIAL_FACTOR);
-        
+
         _mint(0x93e307CaCC969A6506E53F5Cb279f23D325d563d, 470573904 * (10 ** uint256(DECIMALS)));
         _mint(0x2EAdc466b18bAb66369C52CF8F37DAf383F793a7, 29426096 * (10 ** uint256(DECIMALS)));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

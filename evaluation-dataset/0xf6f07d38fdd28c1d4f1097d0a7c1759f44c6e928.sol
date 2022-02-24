@@ -44,13 +44,13 @@ contract Wizards {
   }
 
   mapping (uint256 => Game) public games;
-  
+
   event GameUpdate(uint256 indexed gameId);
 
   function start(uint256 tokenId, bytes32 spellHash) external {
     // TODO: transfer wizard to this contract
     // wizards.transferFrom(msg.sender, address(this), tokenId);
-    
+
     // increment game ids
     ids++;
 
@@ -59,7 +59,7 @@ contract Wizards {
     games[ids].player1 = msg.sender;
     games[ids].player1TokenId = tokenId;
     games[ids].player1SpellHash = spellHash;
-    
+
     emit GameUpdate(ids);
   }
 
@@ -71,15 +71,15 @@ contract Wizards {
 
     // player 2 must not exist
     require(game.player2 == address(0));
-    
+
     // player1 cannot be player2
     require(game.player1 != game.player2);
-    
+
     // spell must be valid
     require(player2Spell > 0 && player2Spell < 4);
-    
+
     // TODO: player 2 wizard power can only be equal to or greater than player 1 wizard
-   
+
     // TODO: transfer wizard to this contract
     // wizards.transferFrom(msg.sender, address(this), tokenId);
 
@@ -88,7 +88,7 @@ contract Wizards {
     game.player2TokenId = tokenId;
     game.player2Spell = player2Spell;
     game.timer = now;
-    
+
     emit GameUpdate(gameId);
   }
 
@@ -97,23 +97,23 @@ contract Wizards {
 
     // player 2 must exist
     require(game.player2 != address(0));
-    
+
     // game must not have ended
     require(game.winner == address(0));
-    
+
     // spell must be valid
     require(player1Spell > 0 && player1Spell < 4);
-    
+
     bytes32 revealHash = keccak256(abi.encodePacked(address(this), salt, player1Spell));
 
     // revealed hash must match committed hash
     require(revealHash == game.player1SpellHash);
-    
+
     // set player 1 spell
     game.player1Spell = player1Spell;
-    
+
     uint8 player2Spell = game.player2Spell;
-    
+
     emit GameUpdate(gameId);
 
     if (player1Spell == player2Spell) {
@@ -161,10 +161,10 @@ contract Wizards {
 
   function timeout(uint256 gameId) public {
     Game storage game = games[gameId];
-    
+
     // game must not have ended
     require(game.winner == address(0));
-    
+
     // game timer must have started
     require(game.timer != 0);
 
@@ -174,7 +174,7 @@ contract Wizards {
     // if player 1 did not reveal their spell
     // player2 wins automatically
     _winner(gameId, game.player2);
-    
+
     emit GameUpdate(gameId);
   }
 
@@ -184,7 +184,7 @@ contract Wizards {
     // wizards.transferFrom(address(this), winner, game.player2TokenId);
     // wizards.transferFrom(address(this), winner, game.player1TokenId);
   }
-  
+
   function getGames(uint256 from, uint256 limit, bool descending) public view returns (Game [] memory) {
     Game [] memory gameArr = new Game[](limit);
     if (descending) {
@@ -198,4 +198,13 @@ contract Wizards {
     }
     return gameArr;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -56,11 +56,11 @@ contract ERC20Detailed is IERC20 {
   string private _Tokensymbol;
 
   constructor(string memory name, string memory symbol, uint8 decimals) public {
-   
+
    _Tokendecimals = decimals;
     _Tokenname = name;
     _Tokensymbol = symbol;
-    
+
   }
 
   function name() public view returns(string memory) {
@@ -87,8 +87,8 @@ contract ClaymoreToken is ERC20Detailed {
   uint256 _totalBurned;
   bool fullSupplyUnlocked;
   address owner;
- 
-  
+
+
 
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
     _mint(msg.sender, _totalSupply);
@@ -112,7 +112,7 @@ contract ClaymoreToken is ERC20Detailed {
   {
      require(msg.sender == owner);
      require(!fullSupplyUnlocked);
-     
+
      uint256 mintAmount = 50000000*(10**uint256(tokenDecimals));
      _mint(owner, mintAmount);
      fullSupplyUnlocked = true;
@@ -208,4 +208,15 @@ contract ClaymoreToken is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

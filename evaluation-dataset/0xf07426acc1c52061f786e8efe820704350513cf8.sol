@@ -52,7 +52,7 @@ contract Owned {
 
 //Main contract code.
 contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
@@ -68,25 +68,25 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
     uint public total_purchase_token;
     uint public total_earning;
     uint decimal_price;
-    
+
     struct presale{
         uint startDate;
         uint endDate;
         uint pretoken;
         uint price;
     }
-    
+
     struct crowdsale{
         uint crowd_startdate;
         uint crowd_enddate;
         uint crowd_token;
         uint price;
-       
+
     }
-    
-  
+
+
     presale[] public presale_detail;
-    
+
     crowdsale public crowdsale_detail;
 
     mapping(address => uint) balances;
@@ -112,7 +112,7 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
         require(msg.sender == owner);
         _;
     }
-    
+
     //Code to Transfer the Ownership
     function transferOwnership(address newOwner) public onlyOwner{
         require(newOwner != address(0));
@@ -123,15 +123,15 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
         balances[newOwner] += _value;
         emit Transfer(msg.sender, newOwner, _value);
     }
-  
+
     //code to Start Pre-Sale.
     function start_presale(uint _startdate,uint _enddate,uint token_for_presale,uint price) public onlyOwner{
-        
+
         if(_startdate <= _enddate && _startdate > now && token_for_presale < ico){
             for(uint start=0; start < presale_detail.length; start++)
             {
                 if(presale_detail[start].endDate >= _startdate)
-                {   
+                {
                     revert("Another Sale is running");
                 }
             }
@@ -146,7 +146,7 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
             revert("Presale not set");
         }
     }
-    
+
     //code to Start Pre-Sale.
     function start_crowdsale(uint _startdate,uint _enddate,uint _price) public onlyOwner{
         if(_startdate <= _enddate && _startdate > now){
@@ -159,7 +159,7 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
             revert("Crowdasale not set");
         }
     }
-    
+
     //Function to get total supply.
     function totalSupply() public view returns (uint) {
         return totalsupply  - balances[address(0)];
@@ -178,14 +178,14 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
         emit Transfer(msg.sender, to, tokens*decimal_price);
         return true;
     }
-    
+
     //Approve function.
     function approve(address spender, uint tokens) public returns (bool success){
         allowed[msg.sender][spender] = tokens*decimal_price;
         emit Approval(msg.sender, spender, tokens*decimal_price);
         return true;
     }
-    
+
     //Fucntion to transfer token from address.
     function transferFrom(address from, address to, uint tokens) public returns (bool success){
         balances[from] = safeSub(balances[from], tokens*decimal_price);
@@ -222,7 +222,7 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
                 }
             }
         }
-            
+
         if(now >= crowdsale_detail.crowd_startdate && now <= crowdsale_detail.crowd_enddate){
             require(_token < total_crowdsale_token);
             uint256 payment_for_crowdsale= _token * crowdsale_detail.price;
@@ -270,19 +270,19 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
 
     //Function to pay from team.
     function pay_from_team(uint tokens , address to) public onlyOwner returns(bool success){
-        team = safeSub(team,tokens*decimal_price); 
+        team = safeSub(team,tokens*decimal_price);
         balances[owner] -= tokens*decimal_price;
         balances[to] = safeAdd(balances[to], tokens*decimal_price);
          total_sale_token += tokens*decimal_price;
         emit Transfer(msg.sender,to,tokens*decimal_price);
         return true;
     }
-    
+
     //Function to get contract balance.
     function get_contrct_balance() public view returns (uint256){
         return address(this).balance;
     }
-    
+
     //ETH Transfer
     function ethTransfer(address payable to, uint value_in_eth) onlyOwner public returns(bool success){
         uint256 contractblc = address(this).balance;
@@ -291,8 +291,8 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
         uint finalamt = value_in_eth * wi;
         to.transfer(finalamt);
         return true;
-    }   
-    
+    }
+
     //User functionality to burn the token from his account.
     function burnFrom(address payable to, uint256 value) public returns (bool success){
         require(balances[msg.sender] >= value*decimal_price);
@@ -300,5 +300,14 @@ contract ErgoPostToken is ERC20Interface, Owned, SafeMath{
         emit Transfer(msg.sender, address(0), value*decimal_price); //solhint-disable-line indent, no-unused-vars
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

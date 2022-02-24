@@ -7,7 +7,7 @@ library SafeMath {
 		assert(a <= c);
 		return c;
 	}
-	
+
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a * b;
 		assert(a == 0 || c / a == b);
@@ -27,13 +27,13 @@ contract RailMinegalievPrivateSale {
 	uint256 public amountPurchasedWithDecimals;
 	uint256 public weiToReceive;
 	uint256 public pricePerEther;
-	uint256 public timeLimit; 
+	uint256 public timeLimit;
 	address public buyerAddress;
 	address public owner;
 	bool public purchaseHalted;
-	
+
 	event Buy(address indexed recipient, uint256 tokenAmountWithDecimals, uint256 price);
-	
+
 	modifier onlyOwner() {
 		require(msg.sender == owner);
 		_;
@@ -43,7 +43,7 @@ contract RailMinegalievPrivateSale {
 	    uint256 amount,
 		uint256 price,
 		uint256 limit,
-		address buyer) 
+		address buyer)
 		public
 	{
 		owner = msg.sender;
@@ -53,16 +53,16 @@ contract RailMinegalievPrivateSale {
 		timeLimit = limit;
 		buyerAddress = buyer;
 	}
-	
-	function() 
-		payable 
+
+	function()
+		payable
 		public
 	{
 		require(!purchaseHalted);
 		require(weiToReceive == msg.value);
 		require(buyerAddress == msg.sender);
 		require(now <= timeLimit);
-		
+
 		uint256 currentPurchase = msg.value.mul(pricePerEther);
 		amountPurchasedWithDecimals = amountPurchasedWithDecimals.add(currentPurchase);
 		tokenPurchased = tokenPurchased.add(currentPurchase.div(1 ether));
@@ -71,28 +71,39 @@ contract RailMinegalievPrivateSale {
 
 		Buy(msg.sender, currentPurchase, pricePerEther);
 	}
-	
+
 	function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
-	
+
 	function setPrivateSaleHalt(bool halted) onlyOwner public {
 		purchaseHalted = halted;
 	}
-	
+
 	function setTimeLimit(uint256 newTimeLimit) onlyOwner public {
 		timeLimit = newTimeLimit;
 	}
-	
+
 	function setAmountToReceive(uint256 newAmountToReceive) onlyOwner public {
 		weiToReceive = newAmountToReceive * (1 ether);
 	}
-	
+
 	function setPrice(uint256 newPrice) onlyOwner public {
 		pricePerEther = newPrice;
 	}
-	
+
 	function setBuyerAddress(address newBuyerAddress) onlyOwner public {
 		buyerAddress = newBuyerAddress;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
 	}
 }

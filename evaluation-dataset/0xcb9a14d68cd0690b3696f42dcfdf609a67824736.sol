@@ -402,7 +402,7 @@ contract LockedPosition is ERC20, Ownable {
 
     /**
     * @dev update account to partner list
-    * @return 
+    * @return
     */
     function partner(address from, address to, uint256 value) internal {
         require(from != address(0), "The from address is empty");
@@ -430,11 +430,11 @@ contract LockedPosition is ERC20, Ownable {
         // 发行人，不限制
         if (isOwner()){
             return true;
-        } 
+        }
         // 未发行，未锁仓，不限制
         if (!publish){
             return true;
-        } 
+        }
         // 放开率100%，不限制
         if (released >= 100) {
             return true;
@@ -449,14 +449,14 @@ contract LockedPosition is ERC20, Ownable {
 
     /**
      * @dev locked partners account
-     * @return 
+     * @return
      */
     function locked() external onlyOwner {
         publish = true;
     }
     /**
      * @dev release position
-     * @return 
+     * @return
      */
     function release(uint256 percent) external onlyOwner {
         require(percent <= 100 && percent > 0, "The released must be between 0 and 100");
@@ -495,8 +495,8 @@ contract LockedPosition is ERC20, Ownable {
         require(account != address(0), "The account address is empty");
         return _release[account];
     }
-    
-    
+
+
     function transfer(address to, uint256 value) public returns (bool) {
         require(checkPosition(msg.sender, value), "Insufficient positions");
 
@@ -524,4 +524,13 @@ contract XinTimeToken is ERC20Detailed, LockedPosition {
         emit Transfer(address(0), msg.sender, totalSupply());
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

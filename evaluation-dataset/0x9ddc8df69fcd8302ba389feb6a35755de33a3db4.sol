@@ -112,7 +112,7 @@ contract YACHT is ERC20Interface {
     /// @param _amount Transfered amount in unit
     /// @return Transfer status
     function transfer(address _to, uint256 _amount)
-    
+
         public
 
         returns (bool) {
@@ -183,4 +183,13 @@ contract YACHT is ERC20Interface {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

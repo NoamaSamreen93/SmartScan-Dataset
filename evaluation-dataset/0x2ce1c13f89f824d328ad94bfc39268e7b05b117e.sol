@@ -225,7 +225,7 @@ contract ApproveAndCallToken is StandardToken {
   }
 
   // ERC223 Token improvement to send tokens to smart-contracts
-  function transfer(address _to, uint _value) public returns (bool success) { 
+  function transfer(address _to, uint _value) public returns (bool success) {
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -265,4 +265,15 @@ contract MusereumToken is ApproveAndCallToken {
     balances[msg.sender] = INITIAL_SUPPLY;
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

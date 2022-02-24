@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 /*
      Ⓒ4xcoin.io
- 
+
   4xCoin is the new disruptive tokenizing ledger aimed to bridge crypto space and $5 trillion Forex market via decentralized trustless platform.
 
       Ⓒ2017 4xCoin
@@ -62,11 +62,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -113,11 +113,11 @@ contract Coin is FixedCoin {
   string public constant symbol = "4X";
   uint public constant decimals = 18;
   uint256 public initialSupply;
-    
-  function Coin () { 
+
+  function Coin () {
      totalSupply = 60000000 * 10 ** decimals;
-      balances[msg.sender] = totalSupply; 
-      initialSupply = totalSupply; 
+      balances[msg.sender] = totalSupply;
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
   }
@@ -125,8 +125,24 @@ contract Coin is FixedCoin {
 
 /*
      Ⓒ4xcoin.io
- 
+
   4xCoin is the new disruptive tokenizing ledger aimed to bridge crypto space and $5 trillion Forex market via decentralized trustless platform.
 
       Ⓒ2017 4xCoin
 */
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

@@ -3,13 +3,13 @@ pragma solidity ^0.4.24;
 /*
 * Wall Street Market presents......
 
-.______    __       __    __   _______      ______  __    __   __  .______        _______      ___      .___  ___.  _______ 
+.______    __       __    __   _______      ______  __    __   __  .______        _______      ___      .___  ___.  _______
 |   _  \  |  |     |  |  |  | |   ____|    /      ||  |  |  | |  | |   _  \      /  _____|    /   \     |   \/   | |   ____|
-|  |_)  | |  |     |  |  |  | |  |__      |  ,----'|  |__|  | |  | |  |_)  |    |  |  __     /  ^  \    |  \  /  | |  |__   
-|   _  <  |  |     |  |  |  | |   __|     |  |     |   __   | |  | |   ___/     |  | |_ |   /  /_\  \   |  |\/|  | |   __|  
-|  |_)  | |  `----.|  `--'  | |  |____    |  `----.|  |  |  | |  | |  |         |  |__| |  /  _____  \  |  |  |  | |  |____ 
+|  |_)  | |  |     |  |  |  | |  |__      |  ,----'|  |__|  | |  | |  |_)  |    |  |  __     /  ^  \    |  \  /  | |  |__
+|   _  <  |  |     |  |  |  | |   __|     |  |     |   __   | |  | |   ___/     |  | |_ |   /  /_\  \   |  |\/|  | |   __|
+|  |_)  | |  `----.|  `--'  | |  |____    |  `----.|  |  |  | |  | |  |         |  |__| |  /  _____  \  |  |  |  | |  |____
 |______/  |_______| \______/  |_______|    \______||__|  |__| |__| | _|          \______| /__/     \__\ |__|  |__| |_______|
-                                                                                                                            
+
 (BCHIP)
 
 website:    https://wallstreetmarket.tk
@@ -18,7 +18,7 @@ discord:    https://discord.gg/8AFP9gS
 
 25% Dividends Fees/Payouts
 
-5% of Buy In Fee Will Go into Buying Tokens from the contract for "THE 82" group until 
+5% of Buy In Fee Will Go into Buying Tokens from the contract for "THE 82" group until
 400,000 tokens have been distributed.  25% Fee will apply for these transactions.
 
 After this the 5% fee will be reserved for use in additional card and lending games using BCHIP tokens.
@@ -93,12 +93,12 @@ contract BlueChipGame {
 
 
     modifier onlyActive(){
-        
+
         require(boolContractActive);
         _;
     }
 
- 
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -145,7 +145,7 @@ contract BlueChipGame {
     uint256 constant internal tokenPriceIncremental_ = 0.000000001 ether;
     uint256 constant internal magnitude = 2**64;
 
-   
+
     uint256 public totalEthFundRecieved; // total ETH Bond recieved from this contract
     uint256 public totalEthFundCollected; // total ETH Bond collected in this contract
 
@@ -213,7 +213,7 @@ contract BlueChipGame {
         // add administrators here
         administrators[msg.sender] = true;
 
-    //*  Populate the 82 Mappings 
+    //*  Populate the 82 Mappings
         theGroupofEightyTwo[1] = 0x41fe3738b503cbafd01c1fd8dd66b7fe6ec11b01;
         theGroupofEightyTwo[2] = 0x96762288ebb2560a19f8eadaaa2012504f64278b;
         theGroupofEightyTwo[3] = 0xc29a6dd21801e58566df9f003b7011e30724543e;
@@ -393,7 +393,7 @@ contract BlueChipGame {
         onlyActive()
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, _referredBy);
     }
@@ -410,14 +410,14 @@ contract BlueChipGame {
         require(tx.gasprice <= 0.05 szabo);
 
         if (boolPay82) {  //Add to the Eth Fund if boolPay82 set to true
-            
+
            totalEthFundCollected = SafeMath.add(totalEthFundCollected, msg.value);
 
         } else{
             purchaseTokens(msg.value, 0x0);
         }
 
-        
+
     }
 
 
@@ -426,41 +426,41 @@ contract BlueChipGame {
         onlyAdministrator()
     {
         //Periodically Use the Bond Fund to buy tokens and distribute to the Group of 82
-        if(bool82Mode) 
+        if(bool82Mode)
         {
             uint counter = 83;
             uint _ethToPay = SafeMath.sub(totalEthFundCollected, totalEthFundRecieved);
 
             totalEthFundRecieved = SafeMath.add(totalEthFundRecieved, _ethToPay);
 
-            while (counter > 0) { 
+            while (counter > 0) {
 
                 uint _distAmountLocal = SafeMath.div(SafeMath.mul(_ethToPay, theGroupofEightyTwoAmount[counter]),total82Tokens);
 
                 purchaseTokensfor82(_distAmountLocal, 0x0, counter);
-               
+
                 counter = counter - 1;
-            } 
-           
+            }
+
         }
     }
 
 
     /**
      * Sends Bondf Fund ether to the bond contract
-     * 
+     *
      */
-    function payFund() payable public 
+    function payFund() payable public
     onlyAdministrator()
     {
-        
+
         uint256 ethToPay = SafeMath.sub(totalEthFundCollected, totalEthFundRecieved);
         require(ethToPay > 1);
 
         uint256 _altEthToPay = SafeMath.div(SafeMath.mul(ethToPay,altFundFee_),100);
-      
+
         uint256 _bondEthToPay = SafeMath.div(SafeMath.mul(ethToPay,fundFee_),100);
- 
+
 
         totalEthFundRecieved = SafeMath.add(totalEthFundRecieved, ethToPay);
 
@@ -475,7 +475,7 @@ contract BlueChipGame {
                 totalEthFundRecieved = SafeMath.sub(totalEthFundRecieved, _altEthToPay);
             }
         }
-      
+
     }
 
     /**
@@ -559,7 +559,7 @@ contract BlueChipGame {
 
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, dividendFee_), 100);
         uint256 _fundPayout = SafeMath.div(SafeMath.mul(_ethereum, fundFee_ + altFundFee_), 100);
-        
+
         uint256 _refPayout = _dividends / 3;
         _dividends = SafeMath.sub(_dividends, _refPayout);
         (_dividends,) = handleRef(stickyRef[msg.sender], _refPayout, _dividends, 0);
@@ -692,8 +692,8 @@ contract BlueChipGame {
     //    onlyAmbassadors = false;
     //}
 
-    
-  
+
+
     function setBondFundAddress(address _newBondFundAddress)
         onlyAdministrator()
         public
@@ -701,7 +701,7 @@ contract BlueChipGame {
         bondFundAddress = _newBondFundAddress;
     }
 
-    
+
     function setAltFundAddress(address _newAltFundAddress)
         onlyAdministrator()
         public
@@ -808,7 +808,7 @@ contract BlueChipGame {
         boolContractActive = _bool;
     }
 
-    
+
 
 
     /*----------  HELPERS AND CALCULATORS  ----------*/
@@ -884,7 +884,7 @@ contract BlueChipGame {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
 
- 
+
 
     /**
      * Return the buy price of 1 individual token.
@@ -1034,8 +1034,8 @@ contract BlueChipGame {
                 _dividends = SafeMath.add(_dividends, _referralBonus - _referralBonus/2);
                 _fee = _dividends * magnitude;
             }
-            
-            
+
+
         } else {
             // no ref purchase
             // add the referral bonus back to the global dividends cake
@@ -1047,7 +1047,7 @@ contract BlueChipGame {
 
 
     function purchaseTokens(uint256 _incomingEthereum, address _referredBy)
-       
+
         internal
         returns(uint256)
     {
@@ -1074,7 +1074,7 @@ contract BlueChipGame {
 
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
- 
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
@@ -1106,7 +1106,7 @@ contract BlueChipGame {
 
     //*Seperate function to handle internal purchases for the 82 Group
     function purchaseTokensfor82(uint256 _incomingEthereum, address _referredBy, uint _playerIndex)
-       
+
         internal
         returns(uint256)
     {
@@ -1133,7 +1133,7 @@ contract BlueChipGame {
 
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
- 
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
@@ -1283,4 +1283,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

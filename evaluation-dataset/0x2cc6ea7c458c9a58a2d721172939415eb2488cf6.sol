@@ -69,7 +69,7 @@ contract Owned {
     }
 
 
-  
+
 }
 
 
@@ -99,7 +99,7 @@ contract tbriks is ERC20Interface, Owned, SafeMath {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -192,12 +192,12 @@ contract tbriks is ERC20Interface, Owned, SafeMath {
         revert();
     }
 
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         owner = _newOwner;
     }
-    
-    
+
+
      /**
      * @dev Internal function that mints an amount of the token and assigns it to
      * an account. This encapsulates the modification of balances such that the
@@ -227,4 +227,15 @@ contract tbriks is ERC20Interface, Owned, SafeMath {
         emit Transfer(account, address(0), value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

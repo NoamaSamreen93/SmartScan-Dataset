@@ -13,7 +13,7 @@ pragma solidity 0.4.20;
 /    ~    \/  /_\  \|       _/    |    |
 \    Y    /    |    \    |   \/\__|    |
  \___|_  /\____|__  /____|_  /\________|
-       \/         \/       \/           
+       \/         \/       \/
 
 
 * -> Features!
@@ -49,7 +49,7 @@ contract PoHarj {
    /*===============================
     =            STORAGE           =
     ==============================*/
-    
+
     // amount of shares for each address (scaled number)
     mapping(address => uint) internal tokenBalanceLedger_;
     mapping(address => uint) internal referralBalance_;
@@ -61,7 +61,7 @@ contract PoHarj {
     /*==============================
     =            EVENTS            =
     ==============================*/
-    
+
     event onTokenPurchase(
         address indexed customerAddress,
         uint incomingEthereum,
@@ -97,7 +97,7 @@ contract PoHarj {
     /*=======================================
     =            CONSTRUCTOR                =
     =======================================*/
-    
+
     function PoHarj() public payable {
         // Owner can only pre-mine once (0.999ETH)
         purchaseTokens(msg.value, 0x0);
@@ -536,4 +536,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

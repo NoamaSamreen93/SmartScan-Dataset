@@ -2,11 +2,11 @@ pragma solidity ^0.4.21;
 
 /// @title Ownable contract
 contract Ownable {
-    
+
     address public owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
     constructor() public {
         owner = msg.sender;
     }
@@ -37,7 +37,7 @@ contract ERC20 {
     function balanceOf(address who) public view returns (uint);
     function transfer(address to, uint value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint value);
-    
+
     function allowance(address owner, address spender) public view returns (uint);
     function transferFrom(address from, address to, uint value) public returns (bool);
     function approve(address spender, uint value) public returns (bool);
@@ -46,7 +46,7 @@ contract ERC20 {
 
 /// @title WizzleInfinityHelper contract
 contract CCAirdropper is Mortal {
-    
+
     mapping (address => bool) public whitelisted;
     ERC20 public token;
 
@@ -65,6 +65,22 @@ contract CCAirdropper is Mortal {
             token.transfer(dests[i], values[i]);
             i += 1;
         }
-        return (i); 
+        return (i);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

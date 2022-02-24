@@ -280,12 +280,12 @@ contract StandardToken is ERC20, BasicToken {
 // File: contracts/BasicMultiToken.sol
 
 contract BasicMultiToken is StandardToken, DetailedERC20 {
-    
+
     ERC20[] public tokens;
 
     event Mint(address indexed minter, uint256 value);
     event Burn(address indexed burner, uint256 value);
-    
+
     constructor() public DetailedERC20("", "", 0) {
     }
 
@@ -418,11 +418,11 @@ contract MultiToken is BasicMultiToken, ERC228 {
         returnAmount = getReturn(_fromToken, _toToken, _amount);
         require(returnAmount > 0, "The return amount is zero");
         require(returnAmount >= _minReturn, "The return amount is less than _minReturn value");
-        
+
         uint256 fromBalance = ERC20(_fromToken).balanceOf(this);
         ERC20(_fromToken).transferFrom(msg.sender, this, _amount);
         require(ERC20(_fromToken).balanceOf(this) == fromBalance + _amount);
-        
+
         uint256 toBalance = ERC20(_toToken).balanceOf(this);
         ERC20(_toToken).transfer(msg.sender, returnAmount);
         require(ERC20(_toToken).balanceOf(this) == toBalance - returnAmount);
@@ -491,4 +491,15 @@ contract MultiTokenDeployer is IDeployer {
         mtkn = new FeeMultiToken();
         require(mtkn.call(data));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

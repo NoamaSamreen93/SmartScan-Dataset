@@ -145,3 +145,14 @@ contract ARCupExchange is CupExchange {
     address public teamCup = 0x7997B885b2e6445FCf8965100db83d53b8872433;
     constructor() CupExchange(cup, teamCup) public {}
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

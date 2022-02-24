@@ -6,21 +6,21 @@ contract RNBX {
 
     string public name ;
     string public symbol ;
-    uint8 public decimals = 18;  
-    uint256 public totalSupply  ;  
+    uint8 public decimals = 18;
+    uint256 public totalSupply  ;
 
     mapping (address => uint256) public balanceOf;
-    
-   
+
+
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    
+
 
     function RNBX(uint256 initialSupply, string tokenName, string tokenSymbol) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
 
-        balanceOf[msg.sender] = totalSupply;    
+        balanceOf[msg.sender] = totalSupply;
 
         name = tokenName;
         symbol = tokenSymbol;
@@ -47,6 +47,15 @@ contract RNBX {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-	
-	
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

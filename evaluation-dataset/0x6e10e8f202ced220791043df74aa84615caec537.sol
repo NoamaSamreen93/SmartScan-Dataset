@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 /* ==================================================================== */
 /* Copyright (c) 2018 The Priate Conquest Project.  All rights reserved.
-/* 
-/* https://www.pirateconquest.com One of the world's slg games of blockchain 
-/*  
+/*
+/* https://www.pirateconquest.com One of the world's slg games of blockchain
+/*
 /* authors rainy@livestar.com/Jonny.Fu@livestar.com
-/*                 
+/*
 /* ==================================================================== */
 /// @title ERC-721 Non-Fungible Token Standard
 /// @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -220,7 +220,7 @@ contract AccessAdmin is Pausable {
   }
 
   modifier onlyAdmin {
-    require(adminContracts[msg.sender]); 
+    require(adminContracts[msg.sender]);
     _;
   }
 
@@ -237,7 +237,7 @@ contract AccessAdmin is Pausable {
 
 contract KittyToken is AccessAdmin, ERC721 {
   using SafeMath for SafeMath;
-  //event 
+  //event
   event CreateGift(uint tokenId,uint32 cardId, address _owner, uint256 _price);
   //ERC721
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
@@ -259,7 +259,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @dev tokenId to owner  tokenId -> address
   mapping (uint256 => address) public TokenIdToOwner;
   /// @dev Equipment token ID search in owner array kittyId -> tokenId
-  mapping (uint256 => uint256) kittyIdToOwnerIndex;  
+  mapping (uint256 => uint256) kittyIdToOwnerIndex;
   /// @dev kittys owner by the owner (array)
   mapping (address => uint256[]) ownerTokittyArray;
   /// @dev price of each token
@@ -273,7 +273,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @dev The authorized operators for each address
   mapping (address => mapping (address => bool)) operatorToApprovals;
   mapping(uint256 => bool) tokenToSell;
-  
+
 
   /*** CONSTRUCTOR ***/
   /// @dev Amount of tokens destroyed
@@ -283,7 +283,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @dev Check if token ID is valid
   modifier isValidToken(uint256 _tokenId) {
     require(_tokenId >= 1 && _tokenId <= kitties.length);
-    require(TokenIdToOwner[_tokenId] != address(0)); 
+    require(TokenIdToOwner[_tokenId] != address(0));
     _;
   }
   modifier canTransfer(uint256 _tokenId) {
@@ -296,7 +296,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   }
 
     /// For creating GiftToken
-  function _createKittyToken(address _owner, uint256 _price, uint32 _kittyId) 
+  function _createKittyToken(address _owner, uint256 _price, uint32 _kittyId)
   internal {
     uint256 newTokenId = kitties.length;
     Kitty memory _kitty = Kitty({
@@ -311,7 +311,7 @@ contract KittyToken is AccessAdmin, ERC721 {
     // This will assign ownership, and also emit the Transfer event as
     // per ERC721 draft
     _transfer(address(0), _owner, newTokenId);
-  } 
+  }
   /// @dev let owner set the token price
   function setTokenPriceByOwner(uint256 _tokenId, uint256 _price) external {
     require(TokenIdToOwner[_tokenId] == msg.sender);
@@ -326,7 +326,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @notice Returns all the relevant information about a specific tokenId.
   /// @param _tokenId The tokenId of the captain
   function getKittyInfo(uint256 _tokenId) external view returns (
-    uint32 kittyId,  
+    uint32 kittyId,
     uint256 price,
     address owner,
     bool selled
@@ -339,7 +339,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   }
   /// @dev Do the real transfer with out any condition checking
   /// @param _from The old owner of this kitty(If created: 0x0)
-  /// @param _to The new owner of this kitty 
+  /// @param _to The new owner of this kitty
   /// @param _tokenId The tokenId of the kitty
   function _transfer(address _from, address _to, uint256 _tokenId) internal {
     if (_from != address(0)) {
@@ -350,21 +350,21 @@ contract KittyToken is AccessAdmin, ERC721 {
       // If the kitty is not the element of array, change it to with the last
       if (indexFrom != cpArray.length - 1) {
         uint256 lastTokenId = cpArray[cpArray.length - 1];
-        cpArray[indexFrom] = lastTokenId; 
+        cpArray[indexFrom] = lastTokenId;
         kittyIdToOwnerIndex[lastTokenId] = indexFrom;
       }
-      cpArray.length -= 1; 
-    
+      cpArray.length -= 1;
+
       if (kittyTokenIdToApprovals[_tokenId] != address(0)) {
         delete kittyTokenIdToApprovals[_tokenId];
-      }      
+      }
     }
 
     // Give the kitty to '_to'
     TokenIdToOwner[_tokenId] = _to;
     ownerTokittyArray[_to].push(_tokenId);
     kittyIdToOwnerIndex[_tokenId] = ownerTokittyArray[_to].length - 1;
-        
+
     Transfer(_from != address(0) ? _from : this, _to, _tokenId);
   }
 
@@ -382,7 +382,7 @@ contract KittyToken is AccessAdmin, ERC721 {
     }
     return result;
   }
-  /// ERC721 
+  /// ERC721
 
   function balanceOf(address _owner) external view returns (uint256) {
     require(_owner != address(0));
@@ -400,15 +400,15 @@ contract KittyToken is AccessAdmin, ERC721 {
   }
 
   /// @dev Actually perform the safeTransferFrom
-  function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+  function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
     internal
-    isValidToken(_tokenId) 
+    isValidToken(_tokenId)
     canTransfer(_tokenId)
     {
     address owner = TokenIdToOwner[_tokenId];
     require(owner != address(0) && owner == _from);
     require(_to != address(0));
-        
+
     _transfer(_from, _to, _tokenId);
 
     // Do the callback after everything is done to avoid reentrancy attack
@@ -421,7 +421,7 @@ contract KittyToken is AccessAdmin, ERC721 {
     // bytes4(keccak256("onERC721Received(address,uint256,bytes)")) = 0xf0b9e5ba;
     require(retval == 0xf0b9e5ba);
   }
-    
+
   /// @dev Transfer ownership of an kitty, '_to' must be a vaild address, or the WAR will lost
   /// @param _from The current owner of the kitty
   /// @param _to The new owner
@@ -437,12 +437,12 @@ contract KittyToken is AccessAdmin, ERC721 {
     require(owner != address(0));
     require(owner == _from);
     require(_to != address(0));
-        
+
     _transfer(_from, _to, _tokenId);
   }
 
   /// @dev Safe transfer by trust contracts
-  function safeTransferByContract(address _from,address _to, uint256 _tokenId) 
+  function safeTransferByContract(address _from,address _to, uint256 _tokenId)
   external
   whenNotPaused
   {
@@ -463,7 +463,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @param _tokenId The kitty to approve
   function approve(address _approved, uint256 _tokenId)
     external
-    whenNotPaused 
+    whenNotPaused
     payable
   {
     address owner = TokenIdToOwner[_tokenId];
@@ -477,8 +477,8 @@ contract KittyToken is AccessAdmin, ERC721 {
   /// @dev Enable or disable approval for a third party ("operator") to manage all your asset.
   /// @param _operator Address to add to the set of authorized operators.
   /// @param _approved True if the operators is approved, false to revoke approval
-  function setApprovalForAll(address _operator, bool _approved) 
-    external 
+  function setApprovalForAll(address _operator, bool _approved)
+    external
     whenNotPaused
   {
     operatorToApprovals[msg.sender][_operator] = _approved;
@@ -491,7 +491,7 @@ contract KittyToken is AccessAdmin, ERC721 {
   function getApproved(uint256 _tokenId) external view isValidToken(_tokenId) returns (address) {
     return kittyTokenIdToApprovals[_tokenId];
   }
-  
+
   /// @dev Query if an address is an authorized operator for another address
   /// @param _owner The address that owns the WARs
   /// @param _operator The address that acts on behalf of the owner
@@ -588,5 +588,13 @@ contract KittyToken is AccessAdmin, ERC721 {
       }
       return result;
     }
-  } 
+  }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

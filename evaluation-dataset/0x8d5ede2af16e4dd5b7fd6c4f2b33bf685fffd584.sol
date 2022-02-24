@@ -1,12 +1,12 @@
 pragma solidity ^0.4.11;
 
 contract BLOCKCHAIN_DEPOSIT_BETA {
-	
+
 	/* CONTRACT SETUP */
 
 	uint constant PAYOUT_INTERVAL = 1 days;
 
-	/* NB: Solidity doesn't support fixed or floats yet, so we use promille instead of percent */	
+	/* NB: Solidity doesn't support fixed or floats yet, so we use promille instead of percent */
 	uint constant DEPONENT_INTEREST= 10;
 	uint constant INTEREST_DENOMINATOR = 1000;
 
@@ -14,10 +14,10 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 
 	/* the payout happend */
 	event Payout(uint paidPeriods, uint depositors);
-	
+
 	/* Depositor struct: describes a single Depositor */
 	struct Depositor
-	{	
+	{
 		address etherAddress;
 		uint deposit;
 		uint depositTime;
@@ -37,14 +37,14 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 	/* Array of depositors */
 	Depositor[] private contract_depositors;
 
-	
+
 	/* PUBLIC FUNCTIONS */
 
 	/* contract constructor */
-	function BLOCKCHAIN_DEPOSIT_BETA() 
+	function BLOCKCHAIN_DEPOSIT_BETA()
 	{
 		contract_founder = msg.sender;
-		contract_latestPayoutTime = now;		
+		contract_latestPayoutTime = now;
 	}
 
 	/* fallback function: called when the contract received plain ether */
@@ -55,7 +55,7 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 
 	function Make_Deposit() payable
 	{
-		addDepositor();	
+		addDepositor();
 	}
 
 	function status() constant returns (uint deposit_fond_sum, uint depositorsCount, uint unpaidTime, uint unpaidIntervals)
@@ -74,7 +74,7 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 		uint depositorsDepositPayout;
 
 		while(contract_latestPayoutTime + PAYOUT_INTERVAL < now)
-		{						
+		{
 			uint idx;
 
 			/* pay the depositors  */
@@ -86,20 +86,20 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 				uint payout = (contract_depositors[idx].deposit * DEPONENT_INTEREST) / INTEREST_DENOMINATOR;
 				if(!contract_depositors[idx].etherAddress.send(payout))
 					throw;
-				depositorsDepositPayout += payout;	
+				depositorsDepositPayout += payout;
 			}
-			
+
 			/* save the latest paid time */
 			contract_latestPayoutTime += PAYOUT_INTERVAL;
 			paidPeriods++;
 		}
-			
+
 		/* emit the Payout event */
 		Payout(paidPeriods, depositorsDepositPayout);
 	}
 
 	/* PRIVATE FUNCTIONS */
-	function addDepositor() private 
+	function addDepositor() private
 	{
 		contract_depositors.push(Depositor(msg.sender, msg.value, now));
 	}
@@ -107,8 +107,19 @@ contract BLOCKCHAIN_DEPOSIT_BETA {
 	/* ADMIN FUNCTIONS */
 
 	/* pass the admin rights to another address */
-	function changeFounderAddress(address newFounder) founderOnly 
+	function changeFounderAddress(address newFounder) founderOnly
 	{
 		contract_founder = newFounder;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

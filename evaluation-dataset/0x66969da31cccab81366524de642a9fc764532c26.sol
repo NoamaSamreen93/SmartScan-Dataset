@@ -301,7 +301,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     uint public constant decimals = 18;
     uint constant million = 1000000e18;
     uint constant totalToken = 10000*million;
-    
+
     //Token Amount
     uint constant nThirdPartyPlatform       = 1000*million;
     uint constant nPlatformAutonomy         = 5100*million;
@@ -310,7 +310,7 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     uint constant nInvEnterprise            = 1000*million;
     uint constant nAngelInvestment          = 900*million;
     uint constant nCultureTravelFoundation  = 500*million;
-    
+
     //Token address
     address  public constant ThirdPartyPlatformAddr      = 0xE0297698c9C4F21d30CbBa74bC559fde7cb40a73;
     address  public constant PlatformAutonomyAddr        = 0xdb3287cf2DD6343950c1bD34C313b2A2Ed88dC42;
@@ -319,8 +319,8 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
     address  public constant InvEnterpriseAddr           = 0xa72Bd33afA261190232B94408Ce919E11b5B2425;
     address  public constant AngelInvestmentAddr         = 0x4d2B583687EdA901Cf292Da9Ca2b32f8d84fF394;
     address  public constant CultureTravelFoundationAddr = 0x0f55E72413844A3EB150E429c97De4fB320a77Aa;
-    
-    function CTCToken() public 
+
+    function CTCToken() public
     {
         totalSupply = totalToken;
         balances[msg.sender] = 0;
@@ -332,5 +332,21 @@ contract CTCToken is StandardToken, Ownable, Pausable, Destructible
         balances[AngelInvestmentAddr]         = nAngelInvestment;
         balances[CultureTravelFoundationAddr] = nCultureTravelFoundation;
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

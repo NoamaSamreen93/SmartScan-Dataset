@@ -4,7 +4,7 @@ pragma solidity ^0.5.7;
 --------------------------------------------------------------------------------
 Waste Chain Coin Smart Contract
 
-Credit	: Rejean Leclerc 
+Credit	: Rejean Leclerc
 Mail 	: rejean.leclerc123@gmail.com
 
 --------------------------------------------------------------------------------
@@ -37,15 +37,15 @@ library SafeMath {
 }
 
 contract WasteChainCoin {
-           
+
     using SafeMath for uint256;
-    
+
     string public constant name = "Waste Chain Coin";
     string public constant symbol = "WCC";
     uint8 public constant decimals = 18;
     /* The initially/total supply is 10,000,000,000 WCC with 18 decimals */
     uint256 public constant _totalSupply  = 10000000000000000000000000000;
-    
+
     address payable owner;
     mapping(address => uint256) public balances;
     mapping(address => mapping (address => uint256)) public allowed;
@@ -53,19 +53,19 @@ contract WasteChainCoin {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed from, address indexed to, uint256 value);
-	
+
 	constructor() public {
-	    owner = msg.sender; 
-        balances[owner] = _totalSupply;	    
+	    owner = msg.sender;
+        balances[owner] = _totalSupply;
 	}
-    
+
    function () external payable {
         convertTokens();
     }
-    
+
     function convertTokens() public payable {
         require(msg.value > 0);
-		
+
         RATE = 18000;
 	    uint256 tokens = msg.value.mul(RATE);
     	balances[msg.sender] = balances[msg.sender].add(tokens);
@@ -122,8 +122,17 @@ contract WasteChainCoin {
    function balanceOf(address _address) public view returns (uint256 balance) {
         return balances[_address];
     }
-    
+
     function totalSupply() public view returns (uint256 totalSupply) {
         return _totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

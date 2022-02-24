@@ -1,9 +1,9 @@
 pragma solidity ^0.4.20;
-    
-// Simple contract to split stakes coming into Locus | One Puzzle. 
-// 80% of buy in goes to the jackpot, and the remaining 20% goes 
-// to a dev wallet to support future puzzle development. 
-   
+
+// Simple contract to split stakes coming into Locus | One Puzzle.
+// 80% of buy in goes to the jackpot, and the remaining 20% goes
+// to a dev wallet to support future puzzle development.
+
 contract LocusOne {
 
     	address devAcct;
@@ -11,16 +11,16 @@ contract LocusOne {
     	uint fee;
     	uint pot;
         address public owner;
-        
+
         // PAUSE EVENTS - onlyOwner can pause contract to lock new registration
         // once the bounty has reached its goal.
-        
+
         event Pause();
         event Unpause();
 
         bool public paused = false;
-        
-        
+
+
   modifier whenNotPaused() {
     require(!paused);
     _;
@@ -30,18 +30,18 @@ contract LocusOne {
     require(paused);
     _;
   }
-        
+
     function LocusOne () public payable {
         owner = msg.sender;
     }
-    
+
       modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
 
     function() public payable {
-    require (!paused);    
+    require (!paused);
     _split(msg.value);
     }
 
@@ -50,12 +50,12 @@ contract LocusOne {
         require (msg.value >= 0.1 ether);
         // Define the Locus dev account
         devAcct = 0x1daa0BFDEDfB133ec6aEd2F66D64cA88BeC3f0B4;
-        // Define the Locus Pot account (what you're all playing for)      
+        // Define the Locus Pot account (what you're all playing for)
         potAcct = 0x708294833AEF21a305200b3463A832Ac97852f2e;
 
         // 20% of the total Ether sent will be used to pay devs/support project.
         fee = div(_stake, 5);
-        
+
         // The remaining amount of Ether wll be sent to fund/stake the pot.
         pot = sub(_stake, fee);
 
@@ -111,3 +111,14 @@ contract LocusOne {
     //    return c;
     //}
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

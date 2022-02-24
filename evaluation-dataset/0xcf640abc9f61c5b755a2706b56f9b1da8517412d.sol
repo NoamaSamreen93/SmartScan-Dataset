@@ -103,7 +103,7 @@ contract ERC20 is IERC20 {
         return _totalSupply;
     }
 
-    
+
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
@@ -328,12 +328,21 @@ contract ERC20Detailed is IERC20 {
  */
 contract GEToken is ERC20, ERC20Burnable, ERC20Detailed {
     uint8 public constant DECIMALS = 18;
-    uint256 public constant INITIAL_SUPPLY = 10000000000 * (10 ** uint256(DECIMALS)); 
+    uint256 public constant INITIAL_SUPPLY = 10000000000 * (10 ** uint256(DECIMALS));
 
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
     constructor () public ERC20Detailed("GEToken", "GET", 18) {
-        _mint(msg.sender, INITIAL_SUPPLY); 
+        _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -217,8 +217,8 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Infocash is StandardToken, Owned {
-    string public constant name    = "Infocash";  
-    uint8 public constant decimals = 8;               
+    string public constant name    = "Infocash";
+    uint8 public constant decimals = 8;
     string public constant symbol  = "ICC";
     bool public canClaimToken = false;
     uint256 public constant maxSupply  = 86000000*10**uint256(decimals);
@@ -227,9 +227,9 @@ contract Infocash is StandardToken, Owned {
     uint256 public constant dateIT=dateICO + 365 days;
     uint256 public constant dateMarketing=dateIT + 365 days;
     uint256 public constant dateEco=dateMarketing + 365 days;
-    uint256 public constant dateManager=dateEco + 365 days; 
-    uint256 public constant dateAdmin=dateManager + 365 days;                              
-    
+    uint256 public constant dateManager=dateEco + 365 days;
+    uint256 public constant dateAdmin=dateManager + 365 days;
+
     enum Stage {
         NotCreated,
         ICO,
@@ -263,7 +263,7 @@ contract Infocash is StandardToken, Owned {
     StageRelease public stageMgmtSystem=StageRelease(Stage.MgmtSystem, maxSupply.percent(9), dateManager);
     StageRelease public stageAdmin=StageRelease(Stage.Admin, maxSupply.percent(2), dateAdmin);
 
-    // Send back ether 
+    // Send back ether
     function () {
       revert();
     }
@@ -271,7 +271,7 @@ contract Infocash is StandardToken, Owned {
     function totalSupply() public constant returns (uint256 total) {
       return supplies.total;
     }
-    
+
     function mintToken(address _owner, uint256 _amount, bool _isRaw) onlyOwner internal {
       require(_amount.add(supplies.total)<=maxSupply);
       if (_isRaw) {
@@ -287,7 +287,7 @@ contract Infocash is StandardToken, Owned {
     function transferRaw(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= accounts[msg.sender].rawTokens);
-    
+
 
     // SafeMath.sub will throw if there is not enough balance.
     accounts[msg.sender].rawTokens = accounts[msg.sender].rawTokens.sub(_value);
@@ -319,7 +319,7 @@ contract Infocash is StandardToken, Owned {
         return uint32(block.timestamp);
     }
 
-    function stage() constant returns (Stage) { 
+    function stage() constant returns (Stage) {
       if(blockTime()<=dateInit) {
         return Stage.NotCreated;
       }
@@ -327,7 +327,7 @@ contract Infocash is StandardToken, Owned {
       if(blockTime()<=dateICO) {
         return Stage.ICO;
       }
-        
+
       if(blockTime()<=dateIT) {
         return Stage.IT;
       }
@@ -347,7 +347,7 @@ contract Infocash is StandardToken, Owned {
       if(blockTime()<=dateAdmin) {
         return Stage.Admin;
       }
-      
+
       return Stage.Finalized;
     }
 
@@ -399,17 +399,26 @@ contract Infocash is StandardToken, Owned {
         amountSum=amountSum.add(amount);
         return amountSum;
       }
-      
+
       if(stage()==Stage.Admin ) {
         releaseStage(amount, stageAdmin, isRaw);
         amountSum=amountSum.add(amount);
         return amountSum;
       }
-      
+
       if(stage()==Stage.Finalized) {
         owner=0;
         return 0;
       }
       return amountSum;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

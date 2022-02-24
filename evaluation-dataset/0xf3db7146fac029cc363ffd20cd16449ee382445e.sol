@@ -105,7 +105,7 @@ contract ERC20 is IERC20 {
     string private _name = "Bitcharge Coin";
     string private _symbol = "BCC";
     uint8 private _decimals = 18;
-    
+
     //Total Supply is 3 Billion
     uint256 private _totalSupply = 3000000000 ether;
 
@@ -252,4 +252,13 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

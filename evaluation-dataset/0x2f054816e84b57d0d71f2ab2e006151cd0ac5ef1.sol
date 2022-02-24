@@ -38,31 +38,31 @@ contract ERC20Interface {
  *        |                                |                                      |
  */
 contract ERC677ReceiverInterface {
-    function tokenFallback(address _sender, uint256 _value, bytes _extraData) 
+    function tokenFallback(address _sender, uint256 _value, bytes _extraData)
         public returns (bool);
 }
 
 contract ERC677SenderInterface {
-    function transferAndCall(address _recipient, uint256 _value, bytes _extraData) 
+    function transferAndCall(address _recipient, uint256 _value, bytes _extraData)
         public returns (bool);
 }
 
 /**
- *  ____ ___ ____  ____  ____  ___    _    _   _ 
+ *  ____ ___ ____  ____  ____  ___    _    _   _
  * / ___|_ _|  _ \| __ )|  _ \|_ _|  / \  | \ | |
  * \___ \| || | | |  _ \| |_) || |  / _ \ |  \| |
  *  ___) | || |_| | |_) |  _ < | | / ___ \| |\  |
  * |____/___|____/|____/|_| \_\___/_/   \_\_| \_|
- * 
+ *
  * SIDBRIAN is a token which based on ERC20 standard.
  * Some token will be locked after deploying contract.
  * Activator will unlock token at some specific moment.
  * */
 
 contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
-    
+
     using SafeMath for uint256;
-    
+
     constructor()
         public
     {
@@ -70,77 +70,77 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         totalSupply_ = 1000000000 * (10**18);
         activateTokens_ = 250000000 * (10**18);
         increasingStep_ = 50000000 * (10**18);
-        
+
         balances_[owner_] = activateTokens_;
     }
-    
+
     address public owner_;
-    
+
     string public name = "SIDBRIAN";
     string public symbol = "SIDB";
     uint8 public decimals = 18;
-    
+
     mapping(address => uint256) private balances_;
     mapping(address => mapping(address => uint256)) private allowed_;
     uint256 private totalSupply_;
-    
+
     uint256 public activateTokens_;
     uint256 public increasingStep_;
-    
+
     bool public isPaused_ = false;
-    
+
     mapping(address => bool) activators_;
-    
+
     /**
-     *                   _ _  __ _               
-     *   /\/\   ___   __| (_)/ _(_) ___ _ __ ___ 
+     *                   _ _  __ _
+     *   /\/\   ___   __| (_)/ _(_) ___ _ __ ___
      *  /    \ / _ \ / _` | | |_| |/ _ \ '__/ __|
      * / /\/\ \ (_) | (_| | |  _| |  __/ |  \__ \
      * \/    \/\___/ \__,_|_|_| |_|\___|_|  |___/
-     * 
+     *
      * */
-    
+
     modifier onlyOwner(
         address _address
     )
     {
         require(
-            _address == owner_, 
+            _address == owner_,
             "This action not allowed because of permission."
         );
-        
+
         _;
     }
-    
+
     modifier onlyActivator(
-        address _activator    
+        address _activator
     )
     {
         require(
-            activators_[_activator] == true, 
+            activators_[_activator] == true,
             "The action not allowed because of permission."
         );
         _;
     }
-    
+
     modifier onlyUnpaused
     {
         require(
-            isPaused_ == false, 
+            isPaused_ == false,
             "This action not allowed when pausing"
         );
-        
+
         _;
     }
-    
+
     /**
-     *     __                 _       
-     *    /__\_   _____ _ __ | |_ ___   
+     *     __                 _
+     *    /__\_   _____ _ __ | |_ ___
      *   /_\ \ \ / / _ \ '_ \| __/ __|
      *  //__  \ V /  __/ | | | |_\__ \
      *  \__/   \_/ \___|_| |_|\__|___/
      * */
-     
+
     event Pause();
     event Unpause();
     event Activation(
@@ -153,29 +153,29 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
     event AddActivator(
         address activator
     );
-    
+
     event TransferOwnership(
         address newOwner
     );
-    
+
     /**
-     *      __  __    ___ ____   ___      ___                 _   _                 
-     *     /__\/__\  / __\___ \ / _ \    / __\   _ _ __   ___| |_(_) ___  _ __  ___  
+     *      __  __    ___ ____   ___      ___                 _   _
+     *     /__\/__\  / __\___ \ / _ \    / __\   _ _ __   ___| |_(_) ___  _ __  ___
      *    /_\ / \// / /    __) | | | |  / _\| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
      *   //__/ _  \/ /___ / __/| |_| | / /  | |_| | | | | (__| |_| | (_) | | | \__ \
      *   \__/\/ \_/\____/|_____|\___/  \/    \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
      *  ERC20 Functions
      * */
-    
-    function totalSupply() 
+
+    function totalSupply()
         view
-        public 
-        returns 
+        public
+        returns
         (uint256)
     {
         return totalSupply_;
     }
-    
+
     function balanceOf(
         address _who
     )
@@ -186,9 +186,9 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
     {
         return balances_[_who];
     }
-    
+
     function allowance(
-        address _who, 
+        address _who,
         address _spender
     )
         view
@@ -198,9 +198,9 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
     {
         return allowed_[_who][_spender];
     }
-    
+
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
     )
         public
@@ -210,21 +210,21 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
     {
         require(balances_[msg.sender] >= _value, "Insufficient balance");
         require(_to != address(0));
-        
+
         balances_[msg.sender] = balances_[msg.sender].sub(_value);
         balances_[_to] = balances_[_to].add(_value);
-        
+
         emit Transfer(
             msg.sender,
             _to,
             _value
         );
-        
+
         return true;
     }
-    
+
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
     )
         public
@@ -238,10 +238,10 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
             _value
         );
     }
-    
+
     function transferFrom(
-        address _from, 
-        address _to, 
+        address _from,
+        address _to,
         uint256 _value
     )
         public
@@ -252,18 +252,18 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         require(balances_[_from] >= _value, "Owner Insufficient balance");
         require(allowed_[_from][msg.sender] >= _value, "Spender Insufficient balance");
         require(_to != address(0), "Don't burn the coin.");
-        
+
         balances_[_from] = balances_[_from].sub(_value);
         balances_[_to] = balances_[_to].add(_value);
         allowed_[_from][msg.sender] = allowed_[_from][msg.sender].sub(_value);
-        
+
         emit Transfer(
             _from,
             _to,
             _value
         );
     }
-    
+
     function increaseApproval(
         address _spender,
         uint256 _addValue
@@ -272,16 +272,16 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         returns
         (bool)
     {
-        allowed_[msg.sender][_spender] = 
+        allowed_[msg.sender][_spender] =
             allowed_[msg.sender][_spender].add(_addValue);
-        
+
         emit Approval(
             msg.sender,
             _spender,
             allowed_[msg.sender][_spender]
         );
     }
-    
+
     function decreaseApproval(
         address _spender,
         uint256 _substractValue
@@ -293,46 +293,46 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         uint256 _oldValue = allowed_[msg.sender][_spender];
         if(_oldValue >= _substractValue) {
             allowed_[msg.sender][_spender] = _oldValue.sub(_substractValue);
-        } 
-        else {
-            allowed_[msg.sender][_spender] = 0;    
         }
-        
+        else {
+            allowed_[msg.sender][_spender] = 0;
+        }
+
         emit Approval(
             msg.sender,
             _spender,
             allowed_[msg.sender][_spender]
         );
     }
-    
+
     /**
-     *    ___       _     _ _          ___                 _   _                 
-     *   / _ \_   _| |__ | (_) ___    / __\   _ _ __   ___| |_(_) ___  _ __  ___ 
+     *    ___       _     _ _          ___                 _   _
+     *   / _ \_   _| |__ | (_) ___    / __\   _ _ __   ___| |_(_) ___  _ __  ___
      *  / /_)/ | | | '_ \| | |/ __|  / _\| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
      * / ___/| |_| | |_) | | | (__  / /  | |_| | | | | (__| |_| | (_) | | | \__ \
      * \/     \__,_|_.__/|_|_|\___| \/    \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
      */
-    
+
     function isPaused()
         view
-        public 
+        public
         returns
         (bool)
     {
         return isPaused_;
     }
-    
+
     /**
-     
-     *    ___                                            _       
-     *   /___\__      ___ __   ___ _ __       ___  _ __ | |_   _ 
+
+     *    ___                                            _
+     *   /___\__      ___ __   ___ _ __       ___  _ __ | |_   _
      *  //  //\ \ /\ / / '_ \ / _ \ '__|____ / _ \| '_ \| | | | |
      * / \_//  \ V  V /| | | |  __/ | |_____| (_) | | | | | |_| |
      * \___/    \_/\_/ |_| |_|\___|_|        \___/|_| |_|_|\__, |
-     *                                                     |___/                                               
+     *                                                     |___/
      * The functions that owner can call.
      */
-     
+
     function pause()
         public
         onlyOwner(msg.sender)
@@ -340,16 +340,16 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         isPaused_ = true;
         emit Pause();
     }
-    
+
     function unpaused()
         public
         onlyOwner(msg.sender)
     {
         isPaused_ = false;
-        
+
         emit Unpause();
     }
-    
+
     function addActivator(
         address _activator
     )
@@ -357,10 +357,10 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         onlyOwner(msg.sender)
     {
         activators_[_activator] = true;
-        
+
         emit AddActivator(_activator);
     }
-    
+
     function removeActivator(
         address _activator
     )
@@ -368,12 +368,12 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         onlyOwner(msg.sender)
     {
         activators_[_activator] = false;
-        
+
         emit RemoveActivator(_activator);
     }
-    
+
     function transferOwnership(
-        address _newOwner    
+        address _newOwner
     )
         public
         onlyOwner(msg.sender)
@@ -381,17 +381,17 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         owner_ = _newOwner;
         emit TransferOwnership(_newOwner);
     }
-    
+
     /**
-     *    _        _   _            _                              _       
-     *   /_\   ___| |_(_)_   ____ _| |_ ___  _ __       ___  _ __ | |_   _ 
+     *    _        _   _            _                              _
+     *   /_\   ___| |_(_)_   ____ _| |_ ___  _ __       ___  _ __ | |_   _
      *  //_\\ / __| __| \ \ / / _` | __/ _ \| '__|____ / _ \| '_ \| | | | |
      * /  _  \ (__| |_| |\ V / (_| | || (_) | | |_____| (_) | | | | | |_| |
      * \_/ \_/\___|\__|_| \_/ \__,_|\__\___/|_|        \___/|_| |_|_|\__, |
-     *                                                               |___/                                               
+     *                                                               |___/
      * The functions that only activators can call.
      * */
-     
+
      function activateToken()
         public
         onlyActivator(msg.sender)
@@ -399,16 +399,16 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         require(activateTokens_ <= totalSupply_, "All token have been activated.");
         uint256 _beforeValue = activateTokens_;
         activateTokens_ = _beforeValue.add(increasingStep_);
-        
+
         emit Activation(
             msg.sender,
             activateTokens_
         );
     }
-    
+
     /**
      * @dev ERC677 support
-     * 
+     *
      * */
     function transferAndCall(address _recipient,
                     uint256 _value,
@@ -423,7 +423,7 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
         }
         return true;
     }
-    
+
     function isContract(address _addr) private view returns (bool) {
         uint len;
         assembly {
@@ -434,12 +434,12 @@ contract SIDBRIAN is ERC20Interface, ERC677SenderInterface {
 }
 
 /**
- *   __        __                      _   _     
-    / _\ __ _ / _| ___ _ __ ___   __ _| |_| |__  
-    \ \ / _` | |_ / _ \ '_ ` _ \ / _` | __| '_ \ 
+ *   __        __                      _   _
+    / _\ __ _ / _| ___ _ __ ___   __ _| |_| |__
+    \ \ / _` | |_ / _ \ '_ ` _ \ / _` | __| '_ \
     _\ \ (_| |  _|  __/ | | | | | (_| | |_| | | |
     \__/\__,_|_|  \___|_| |_| |_|\__,_|\__|_| |_|
-      
+
     SafeMath library, thanks to openzeppelin solidity.
     https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol
  * */
@@ -502,4 +502,15 @@ library SafeMath {
     require(b != 0);
     return a % b;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

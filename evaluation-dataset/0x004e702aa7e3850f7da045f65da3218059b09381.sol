@@ -88,7 +88,7 @@ contract PixelStorage is Ownable{
 
     // maps (x | y) to index in the flat arrays
     // Example for first pixel at (5,3)
-    // (5|3) =>  (5 << 16 | 3) => (327680 | 3) => 327683  
+    // (5|3) =>  (5 << 16 | 3) => (327680 | 3) => 327683
     // stores 1 as index the first index
     // since 0 is default mapping value
     // coordinatesToIndex[327683] -> 1;
@@ -99,15 +99,15 @@ contract PixelStorage is Ownable{
     {
         pixelCount = 0;
     }
-    
+
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
-    
+
     function withdraw() onlyOwner public {
         msg.sender.transfer(address(this).balance);
     }
-    
+
     function buyPixel(uint16 _x, uint16 _y, uint32 _rgba) public payable {
 
         require(0 <= _x && _x < 0x200, "X should be in range 0-511");
@@ -120,12 +120,12 @@ contract PixelStorage is Ownable{
             // pixel not owned yet
             // check funds
             require(msg.value >= 1 finney, "Send atleast one finney!");
-            
+
             // bump the pixelCount before usage so it starts with 1 and not the default array value 0
             pixelCount += 1;
             // store the index in mapping
             coordinatesToIndex[coordinate] = pixelCount;
-            
+
             // push values to flat-arrays
             coordinates.push(coordinate);
             rgba.push(_rgba);
@@ -140,14 +140,14 @@ contract PixelStorage is Ownable{
             owners[index-1] = msg.sender;
             rgba[index-1] = _rgba;
         }
-        
+
     }
-    
-    
+
+
     function getPixels() public view returns (uint32[],  uint32[], address[],uint256[]) {
         return (coordinates,rgba,owners,prices);
     }
-    
+
     function getPixel(uint16 _x, uint16 _y) public view returns (uint32, address, uint256){
         uint32 coordinate = uint32(_x) << 16 | _y;
         uint32 index = coordinatesToIndex[coordinate];
@@ -155,10 +155,21 @@ contract PixelStorage is Ownable{
             return (0, address(0x0), 0);
         }else{
             return (
-                rgba[index-1], 
+                rgba[index-1],
                 owners[index-1],
                 prices[index-1]
             );
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

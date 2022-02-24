@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -29,7 +29,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
- 
+
 }
 
 
@@ -62,7 +62,7 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, require mintingFinished before start transfers
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -223,7 +223,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -291,18 +291,18 @@ contract MintableToken is StandardToken, Ownable {
     balances[_from] = 0;
     return true;
   }
- 
+
 }
-  
-   
+
+
 contract ArconaToken is MintableToken {
 
     string public constant name = "Arcona Distribution Contract";
     string public constant symbol = "ARCONA";
     uint8 public constant decimals = 18;
-   
+
     using SafeMath for uint;
-    
+
     address public multisig;
     address public restricted;
     address public registerbot;
@@ -424,7 +424,7 @@ contract ArconaToken is MintableToken {
             certificate[_id] = _owner;
         } else {
             certificate[_id] = owner;
-        }    
+        }
     }
 
     function editCertificate(string _id,  address _newowner) public {
@@ -528,7 +528,7 @@ contract ArconaToken is MintableToken {
         require(_rate > 0);
         return _rate.mul(_weiAmount).div(1 ether);
     }
-    
+
     // BTC external payments
     function foreignBuy(address _holder, uint256 _weiAmount, uint256 _rate) public {
         require(msg.sender == registerbot || msg.sender == owner);
@@ -556,7 +556,7 @@ contract ArconaToken is MintableToken {
                   percent = 27 - (now - startSale).div(1 hours).div(12);
                } else {
                   percent = percent.add(1);
-               }				
+               }
           }
         } else {
             if ( now >= startAuction && now < finishAuction ) {
@@ -580,5 +580,16 @@ contract ArconaToken is MintableToken {
     function() external isRegistered anySaleIsOn isUnderHardCap payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

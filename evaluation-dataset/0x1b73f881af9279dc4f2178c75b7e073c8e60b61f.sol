@@ -35,10 +35,10 @@ contract HasOwner {
     require(msg.sender == owner);
     _;
   }
-  
-  function kill() public onlyOwner { 
-      if (msg.sender == owner) selfdestruct(owner); 
-      
+
+  function kill() public onlyOwner {
+      if (msg.sender == owner) selfdestruct(owner);
+
   }
 }
 
@@ -207,4 +207,15 @@ contract BRT1Token is Mintable {
   string public name = "BRT1 Token";
   string public symbol = "BRT1";
   uint8 public decimals = 0;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,23 +1,23 @@
 pragma solidity ^0.4.19;
 
 contract TeambrellaWallet {
-    
+
     uint public m_opNum;
     uint public m_teamId;
     address public m_owner;
     address[] public m_cosigners;
-    address[] public m_cosignersApprovedDisband;    
-    
+    address[] public m_cosignersApprovedDisband;
+
     modifier orderedOps(uint opNum) {
         require(opNum >= m_opNum);
-        _; 
+        _;
     }
 
     modifier onlyOwner {
         require(msg.sender == m_owner);
-        _; 
+        _;
     }
-    
+
     function() public payable { }
 
 
@@ -102,7 +102,7 @@ contract TeambrellaWallet {
 
         return signed;
     }
-    
+
     function checkSignatures2(
         bytes32 hash,
         bytes sigCosigner0,
@@ -128,7 +128,7 @@ contract TeambrellaWallet {
         b = new bytes(32 * x.length);
         for (uint j = 0; j < x.length; j++) {
             for (uint i = 0; i < 32; i++) {
-                b[j*32 + i] = byte(uint8(x[j] / (2**(8*(31 - i))))); 
+                b[j*32 + i] = byte(uint8(x[j] / (2**(8*(31 - i)))));
             }
         }
     }
@@ -138,7 +138,7 @@ contract TeambrellaWallet {
         b = new bytes(20 * x.length);
         for (uint j = 0; j < x.length; j++) {
             for (uint i = 0; i < 20; i++) {
-                b[j*20 + i] = byte(uint8(uint160(x[j]) / (2**(8*(19 - i))))); 
+                b[j*20 + i] = byte(uint8(uint160(x[j]) / (2**(8*(19 - i)))));
             }
         }
     }
@@ -147,7 +147,7 @@ contract TeambrellaWallet {
         m_opNum = 1;
 		m_owner = msg.sender;
     }
-    
+
      function assignOwner(address[] cosigners, uint teamId, address newOwner) onlyOwner external {
 		if (m_cosigners.length == 0)
 		{
@@ -156,14 +156,14 @@ contract TeambrellaWallet {
 			m_owner = newOwner;
 		}
     }
-       
+
     function changeAllCosigners(
         uint opNum,
         address[] newCosigners,
         uint[3] cosignersPos,
-        bytes sigCosigner0, 
+        bytes sigCosigner0,
         bytes sigCosigner1,
-        bytes sigCosigner2 
+        bytes sigCosigner2
         ) onlyOwner orderedOps(opNum) external {
 
         bytes32 hash = keccak256("NS", m_teamId, opNum, toBytes(newCosigners));
@@ -176,10 +176,10 @@ contract TeambrellaWallet {
     function changeAllCosigners2(
         uint opNum,
         address[] newCosigners,
-        bytes sigCosigner0, 
+        bytes sigCosigner0,
         bytes sigCosigner1,
         bytes sigCosigner2,
-        bytes sigOwner 
+        bytes sigOwner
         ) onlyOwner orderedOps(opNum) external {
 
         bytes32 hash = keccak256("NS", m_teamId, opNum, toBytes(newCosigners));
@@ -189,7 +189,7 @@ contract TeambrellaWallet {
         m_cosignersApprovedDisband.length = 0;
         m_cosigners = newCosigners;
     }
-        
+
     function getsum(uint[] values) private pure returns (uint s) {
         s = 0;
 
@@ -197,16 +197,16 @@ contract TeambrellaWallet {
             s += values[j];
         }
 
-        return s;    
+        return s;
     }
-        
+
     function transfer(
         uint opNum,
-        address[] tos, 
+        address[] tos,
         uint[] values,
         uint[3] cosignersPos,
-        bytes sigCosigner0, 
-        bytes sigCosigner1, 
+        bytes sigCosigner0,
+        bytes sigCosigner1,
         bytes sigCosigner2
         ) onlyOwner orderedOps(opNum) external {
 
@@ -219,7 +219,7 @@ contract TeambrellaWallet {
 
     function transfer2(
         uint opNum,
-        address[] tos, 
+        address[] tos,
         uint[] values,
         bytes sigCosigner0,
         bytes sigCosigner1,
@@ -233,7 +233,7 @@ contract TeambrellaWallet {
         require(ecverify(hash, sigOwner, m_owner));
         m_opNum = opNum + 1;
         realtransfer(tos, values);
-    }    
+    }
 
     function realtransfer(address[] tos, uint[] values) private {
 
@@ -270,4 +270,15 @@ contract TeambrellaWallet {
 
         to.transfer(this.balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

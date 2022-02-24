@@ -206,7 +206,7 @@ contract Exchange {
 
     constructor () public {
         owner = msg.sender;
-    }    
+    }
 
     // Fallback: reverts if Ether is sent to this smart contract by mistake
     function() external {
@@ -288,7 +288,7 @@ contract Exchange {
         tokens[_tokenGet][msg.sender] = tokens[_tokenGet][msg.sender].sub(_amountGet.add(_feeAmount));
         tokens[_tokenGet][_user] = tokens[_tokenGet][_user].add(_amountGet);
         tokens[_tokenGive][_user] = tokens[_tokenGive][_user].sub(_amountGive);
-        tokens[_tokenGive][msg.sender] = tokens[_tokenGive][msg.sender].add(_amountGive);       
+        tokens[_tokenGive][msg.sender] = tokens[_tokenGive][msg.sender].add(_amountGive);
 
         // distribute fees
         uint256 feesCount = getFeeDistributionsCount(ercToken);
@@ -346,7 +346,7 @@ contract Exchange {
     }
 
     /*
-    *       FEE: 
+    *       FEE:
     *              1 = 0.001%
     *           1000 = 1%
     *         100000 = 100%
@@ -404,4 +404,13 @@ contract Exchange {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

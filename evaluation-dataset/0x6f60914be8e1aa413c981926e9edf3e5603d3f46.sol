@@ -112,10 +112,10 @@ contract CKTStandardToken is StandardToken {
     /* Public variables of the token */
 
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'V1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'V1.0';
 
     function CKTStandardToken(
         uint256 _initialAmount,
@@ -141,4 +141,10 @@ contract CKTStandardToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

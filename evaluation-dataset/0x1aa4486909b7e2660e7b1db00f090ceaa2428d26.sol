@@ -671,9 +671,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "OFZ";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0x9925C1e9693f566F2Be59D815bd9B9996417ae14;
-    
+
     uint public constant START_TIME = 1538388420;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -681,9 +681,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -707,5 +707,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

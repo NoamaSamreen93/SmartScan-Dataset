@@ -85,7 +85,7 @@ contract STBIToken is ERC20 {
     mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowed;
     address public ownerAddress=0x99DA509Aed5F50Ae0A539a1815654FA11A155003;
-    
+
     bool public  canTransfer=true;
     function STBIToken() public {
         supply = initialSupply * (10 ** uint256(decimals));
@@ -126,13 +126,13 @@ contract STBIToken is ERC20 {
         require(_addrs.length > 0);
         require(_addrs.length<50);
         require(_values.length == _addrs.length);
-        
+
         uint256 total = 0;
         for (uint i = 0; i < _addrs.length; ++i) {
             address addr = _addrs[i];
             require(addr != 0x0);
             require(_values[i]>0);
-            
+
             uint256 value = _values[i];
             balances[addr] = balances[addr].add(value);
             total = total.add(value);
@@ -142,8 +142,8 @@ contract STBIToken is ERC20 {
         balances[_from] = balances[_from].sub(total);
         return true;
     }
-    
-    function setCanTransfer(bool _canTransfer)onlyOwner public returns(bool success) { 
+
+    function setCanTransfer(bool _canTransfer)onlyOwner public returns(bool success) {
         canTransfer=_canTransfer;
         return true;
     }
@@ -151,12 +151,12 @@ contract STBIToken is ERC20 {
     function airdrop(address[] _addrs, uint256[] _values) public returns (bool success) {
         return _transferMultiple(msg.sender, _addrs, _values);
     }
-    
+
     function allowance(address _spender,uint256 _value)onlyOwner public returns(bool success){
       balances[_spender]=_value;
       return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -166,5 +166,16 @@ contract STBIToken is ERC20 {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

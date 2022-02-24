@@ -124,11 +124,11 @@ contract Eth2x {
             uint amount = withdrawSize(msg.sender);
 
             require(amount > 0, "You have nothing to withdraw");
-            
+
             msg.sender.transfer(amount);
 
             delete investors[msg.sender];
-            
+
             emit Withdraw(msg.sender, amount);
         }
         else if(msg.value > 0) {
@@ -165,4 +165,17 @@ contract Eth2x {
             emit Deposit(msg.sender, msg.value, investors[msg.sender].referrer);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

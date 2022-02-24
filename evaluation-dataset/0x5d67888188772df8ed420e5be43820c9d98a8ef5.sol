@@ -78,3 +78,7 @@ contract ICOCustomerDeposit is Owned {
         throw;
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

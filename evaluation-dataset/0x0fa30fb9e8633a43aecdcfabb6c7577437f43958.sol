@@ -261,9 +261,9 @@ contract Mundo is TokenERC20, Sale {
     function increaseMinPurchaseQty(uint256 newQty) onlyOwner public {
         minPurchaseQty = newQty * 10 ** uint256(decimals);
     }
-    
+
     function airDrop(address[] _recipient, uint _totalTokensToDistribute) onlyOwner public {
-        uint256 total_token_to_transfer = (_totalTokensToDistribute * 10 ** uint256(decimals)).mul(_recipient.length); 
+        uint256 total_token_to_transfer = (_totalTokensToDistribute * 10 ** uint256(decimals)).mul(_recipient.length);
         require(balanceOf[owner] >=  total_token_to_transfer);
         for(uint256 i = 0; i< _recipient.length; i++)
         {
@@ -283,4 +283,15 @@ contract Mundo is TokenERC20, Sale {
         //Transfer ether to fundsWallet
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

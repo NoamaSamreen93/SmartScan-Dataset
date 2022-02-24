@@ -182,12 +182,12 @@ contract BasicToken is ERC20Basic {
   /**
   * @dev Total number of tokens in existence
   */
-  
+
   constructor(uint256 totalSupply) public {
       totalSupply_ = totalSupply;
       balances[msg.sender] = totalSupply_;
   }
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -206,13 +206,13 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public returns (bool) {
       uint cnt = _receivers.length;
       uint256 amount = _value.mul(uint256(cnt));
       require(cnt > 0 && cnt <= 20);
       require(_value > 0 && balances[msg.sender] >= amount);
-  
+
       balances[msg.sender] = balances[msg.sender].sub(amount);
       for (uint i = 0; i < cnt; i++) {
           balances[_receivers[i]] = balances[_receivers[i]].add(_value);
@@ -274,8 +274,8 @@ contract StandardToken is DetailedERC20('IntellishareTestToken','inetest',18), B
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
-  
+
+
 
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -357,7 +357,7 @@ contract StandardToken is DetailedERC20('IntellishareTestToken','inetest',18), B
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
   function recoverLost(
     address lost,
     uint256 amount
@@ -391,7 +391,7 @@ contract PausableToken is StandardToken, Pausable {
       public
       whenNotPaused
       onlyOwner
-      returns (bool) 
+      returns (bool)
     {
       return super.batchTransfer(_receivers, _value);
     }
@@ -440,7 +440,7 @@ contract PausableToken is StandardToken, Pausable {
   {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
   function recoverLost(
       address lost,
       uint256 amount
@@ -452,4 +452,15 @@ contract PausableToken is StandardToken, Pausable {
     {
         return super.recoverLost(lost,amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

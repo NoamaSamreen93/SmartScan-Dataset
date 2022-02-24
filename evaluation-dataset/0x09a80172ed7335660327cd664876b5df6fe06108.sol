@@ -295,7 +295,7 @@ contract OMPxContract is BasicToken, Haltable, Discountable, TransferStatistics 
     using SafeERC20 for OMPxToken;
     /// @dev Token
     OMPxToken public token;
-    Distribution public feeReceiverContract;    
+    Distribution public feeReceiverContract;
     uint256 private feeBalance = 0;
 
     event TransferMoneyBack(address indexed to, uint256 value);
@@ -716,4 +716,15 @@ contract OMPxToken is BurnableToken, MintableToken{
 
     string public constant name = "OMPx Token";
     string public constant symbol = "OMPX";
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

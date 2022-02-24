@@ -27,7 +27,7 @@ library SafeMath {
 
 
 interface ERC20 {
-  function transfer (address _beneficiary, uint256 _tokenAmount) external returns (bool);  
+  function transfer (address _beneficiary, uint256 _tokenAmount) external returns (bool);
   function mint (address _to, uint256 _amount) external returns (bool);
 }
 
@@ -49,7 +49,7 @@ contract Crowdsale is Ownable {
 
   modifier onlyWhileOpen {
       require(
-        (now >= preICOStartDate && now < preICOEndDate) || 
+        (now >= preICOStartDate && now < preICOEndDate) ||
         (now >= ICOStartDate && now < ICOEndDate)
       );
       _;
@@ -100,7 +100,7 @@ contract Crowdsale is Ownable {
   uint8 public referalBonus = 3;
 
   // Бонус приглашенного рефералом, %
-  uint8 public invitedByReferalBonus = 2; 
+  uint8 public invitedByReferalBonus = 2;
 
   // Whitelist
   mapping(address => bool) public whitelist;
@@ -110,11 +110,11 @@ contract Crowdsale is Ownable {
 
   event TokenPurchase(address indexed buyer, uint256 value, uint256 amount);
 
-  function Crowdsale( 
-    address _wallet, 
-    uint256 _preICOStartDate, 
+  function Crowdsale(
+    address _wallet,
+    uint256 _preICOStartDate,
     uint256 _preICOEndDate,
-    uint256 _ICOStartDate, 
+    uint256 _ICOStartDate,
     uint256 _ICOEndDate,
     uint256 _ETHUSD
   ) public {
@@ -142,15 +142,15 @@ contract Crowdsale is Ownable {
   function setWallet (address _wallet) public onlyOwner {
     require (_wallet != 0x0);
     wallet = _wallet;
-      
+
   }
-  
+
 
   // Установить торгуемый токен
   function setToken (ERC20 _token) public onlyOwner {
     token = _token;
   }
-  
+
   // Установить дату начала PreICO
   function setPreICOStartDate (uint256 _preICOStartDate) public onlyOwner {
     require(_preICOStartDate < preICOEndDate);
@@ -209,7 +209,7 @@ contract Crowdsale is Ownable {
 
     // Покупка токенов с реферальным бонусом
   function buyTokensWithReferal(address _referal) public onlyWhileICOOpen payable {
-    address beneficiary = msg.sender;    
+    address beneficiary = msg.sender;
     uint256 weiAmount = msg.value;
 
     _preValidateICOPurchase(beneficiary, weiAmount);
@@ -266,11 +266,11 @@ contract Crowdsale is Ownable {
     require(now > ICOEndDate);
     require(preICOWeiRaised.add(ICOWeiRaised).mul(ETHUSD).div(10**18) < softcap);
     require(investors[msg.sender] > 0);
-    
+
     address investor = msg.sender;
     investor.transfer(investors[investor]);
   }
-  
+
 
   /* Внутренние методы */
 
@@ -278,7 +278,7 @@ contract Crowdsale is Ownable {
    function _isPreICO() internal view returns(bool) {
        return now >= preICOStartDate && now < preICOEndDate;
    }
-   
+
    // Проверка актуальности ICO
    function _isICO() internal view returns(bool) {
        return now >= ICOStartDate && now < ICOEndDate;
@@ -312,7 +312,7 @@ contract Crowdsale is Ownable {
     } else if(usdAmount >= 1000000){
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(3).div(100));
     }
-    
+
     // Считаем бонусы за этап ICO
     if(now < ICOStartDate + 15 days) {
         tokenAmount = tokenAmount.add(baseTokenAmount.mul(20).div(100));
@@ -336,4 +336,15 @@ contract Crowdsale is Ownable {
   function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
     token.mint(_beneficiary, _tokenAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

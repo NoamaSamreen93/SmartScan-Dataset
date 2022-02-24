@@ -78,7 +78,7 @@ contract MultiSigWallet {
         require(ownerCount != 0);
         _;
     }
-        
+
     /// @dev Fallback function allows to deposit ether.
     function()
         payable public
@@ -97,11 +97,11 @@ contract MultiSigWallet {
         public
         validRequirement(_owners.length, _required)
     {
-        for (uint i=0; i<_owners.length; i++) 
+        for (uint i=0; i<_owners.length; i++)
         {
             require(isOwner[_owners[i]] == false);
             require(_owners[i] != 0);
-            
+
             isOwner[_owners[i]] = true;
         }
         owners = _owners;
@@ -451,4 +451,15 @@ contract MultiSigWalletWithDailyLimit is MultiSigWallet {
             return 0;
         return dailyLimit - spentToday;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

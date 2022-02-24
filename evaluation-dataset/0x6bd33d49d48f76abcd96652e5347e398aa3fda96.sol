@@ -36,7 +36,7 @@ contract BancorBuyer {
   address token = 0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C;
   // The developer address.
   address developer = 0x4e6A1c57CdBfd97e8efe831f8f4418b1F2A09e6e;
-  
+
   // Withdraws all ETH deposited by the sender.
   // Called to cancel a user's participation in the sale.
   function withdraw(){
@@ -47,20 +47,20 @@ contract BancorBuyer {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(amount);
   }
-  
+
   // Allow anyone to contribute to the buy executer's reward.
   function add_reward() payable {
     // Update reward value to include received amount.
     reward += msg.value;
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function buy(){
     // Record that the contract has bought the tokens.
     bought_tokens = true;
     // Record the time the contract bought the tokens.
     time_bought = now;
-    // Transfer all the funds (less the caller reward) 
+    // Transfer all the funds (less the caller reward)
     // to the Bancor crowdsale contract to buy tokens.
     // Throws if the crowdsale hasn't started yet or has
     // already completed, preventing loss of funds.
@@ -68,7 +68,7 @@ contract BancorBuyer {
     // Reward the caller for being the first to execute the buy.
     msg.sender.transfer(reward);
   }
-  
+
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
     // Only allow deposits if the contract hasn't already purchased the tokens.
@@ -95,8 +95,16 @@ contract BancorBuyer {
       msg.sender.transfer(msg.value);
     }
   }
-  
+
   function () payable {
     default_helper();
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

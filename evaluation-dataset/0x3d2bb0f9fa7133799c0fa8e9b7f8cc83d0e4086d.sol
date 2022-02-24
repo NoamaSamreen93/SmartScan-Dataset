@@ -106,7 +106,7 @@ contract PluginInterface
         uint40 _cutieId,
         uint256 _parameter,
         address _seller
-    ) 
+    )
     public
     payable;
 
@@ -247,7 +247,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         require(_fee <= 10000);
         require(msg.sender == owner);
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -320,7 +320,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         uint40,
         uint256,
         address
-    ) 
+    )
         public
         payable
         onlyCore
@@ -353,4 +353,17 @@ contract Lottery is CutiePluginBase
     {
         // just accept bid
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -4,7 +4,7 @@ contract Better_Bank_With_Interest {
     //
     ////////////////////////////////////////////////////////////////
     //
-    //  A term deposit bank that pays interest on withdrawal  
+    //  A term deposit bank that pays interest on withdrawal
     //
     //  v0.02 beta, use AT OWN RISK - I am not refunding any lost ether!
     //  And check the code before depositing anything.
@@ -21,7 +21,7 @@ contract Better_Bank_With_Interest {
     ///////////////////////////////////////////////////////////////////
     //
     //  Now you may ask - where do the extra ether come from? :)
-    //  The answer is simple: From people who dont follow the instructions properly! 
+    //  The answer is simple: From people who dont follow the instructions properly!
     //                        And there are usually plenty of those...
     //
     //  Common pitfalls:
@@ -45,15 +45,15 @@ contract Better_Bank_With_Interest {
     mapping(address => uint256) term_deposit_end_block; // store per address the minimum time for the term deposit
                                                          //
     address thebank; // the bank
-    
+
     uint256 public minimum_deposit_amount; // minimum deposits
     uint256 public deposit_fee;     // fee for deposits
     uint256 public contract_alive_until_this_block;
-    
-    uint256 public count_customer_deposits; 
-    
+
+    uint256 public count_customer_deposits;
+
     function Better_Bank_With_Interest() { // create the contract
-        thebank = msg.sender;  
+        thebank = msg.sender;
         minimum_deposit_amount = 250 ether;
         deposit_fee = 5 ether;
         contract_alive_until_this_block = 3000000; // around 2 months from now (mid Jan 2017)
@@ -64,7 +64,7 @@ contract Better_Bank_With_Interest {
         term_deposit_end_block[thebank] = 0;// contract_alive_until_this_block;
         //
     }
-    
+
    //////////////////////////////////////////////////////////////////////////////////////////
     // deposit ether into term-deposit account
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ contract Better_Bank_With_Interest {
         if (msg.value < minimum_deposit_amount) throw; // minimum deposit is at least minimum_payment.
         //
         // no fee for first payment (if the customers's balance is 0)
-        if (balances[msg.sender] == 0) deposit_fee = 0 ether;  
+        if (balances[msg.sender] == 0) deposit_fee = 0 ether;
         //
         if ( msg.sender == thebank ){ // thebank is depositing into bank/interest account, without fee
             balances[thebank] += msg.value;
@@ -82,11 +82,11 @@ contract Better_Bank_With_Interest {
             count_customer_deposits += 1; // count deposits, cannot remove contract any more until end of life
             balances[msg.sender] += msg.value - deposit_fee;  // credit the sender's account
             balances[thebank] += deposit_fee; // difference (fee) to be credited to thebank
-            term_deposit_end_block[msg.sender] = block.number + 30850; //  approx 5 days ( 5 * 86400/14 ); 
+            term_deposit_end_block[msg.sender] = block.number + 30850; //  approx 5 days ( 5 * 86400/14 );
         }
         //
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////
     // withdraw from account, with 10 ether interest  (after term deposit end)
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ contract Better_Bank_With_Interest {
         if (msg.sender == thebank){ // but no interest for thebank (who can't withdraw until block contract_alive_until_this_block anyways)
             interest = 0 ether;
         }
-        //                          
+        //
         if (interest > balances[thebank])   // cant pay more interest than available in the thebank/bank
             interest = balances[thebank];  // so send whatever is left anyways
         //
@@ -116,11 +116,11 @@ contract Better_Bank_With_Interest {
         if (!msg.sender.send(interest)) throw;         // send interest amount, but check for error to roll back if needed
         //
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // HELPER FUNCTIONS
     ////////////////////////////////////////////////////////////////////////////
-    
+
     // set minimum deposit limits
     function set_minimum_payment(uint256 new_limit) {
         if ( msg.sender == thebank ){
@@ -134,7 +134,7 @@ contract Better_Bank_With_Interest {
             deposit_fee = new_fee;
         }
     }
-    
+
     // find out how much money is available for interest payments
     function get_available_interest_amount () constant  returns (uint256) {
         return balances[thebank];
@@ -142,7 +142,7 @@ contract Better_Bank_With_Interest {
     // find out what the end date of the customers term deposit is
     function get_term_deposit_end_date (address query_address) constant  returns (uint256) {
         return term_deposit_end_block[query_address];
-    }    
+    }
     // find out how much money is available for interest payments
     function get_balance (address query_address) constant  returns (uint256) {
         return balances[query_address];
@@ -155,7 +155,7 @@ contract Better_Bank_With_Interest {
     function extend_life_of_contract (uint256 newblock){
         if ( msg.sender != thebank || newblock < contract_alive_until_this_block ) throw;
         // can only extend
-        contract_alive_until_this_block = newblock; 
+        contract_alive_until_this_block = newblock;
         // lock thebank/interest account until new end date
         term_deposit_end_block[thebank] = contract_alive_until_this_block;
     }
@@ -163,16 +163,27 @@ contract Better_Bank_With_Interest {
     // the self destruct after the final block number has been reached (or immediately if there havent been any customer payments yet)
     function close_bank(){
         if (contract_alive_until_this_block < block.number || count_customer_deposits == 0)
-            selfdestruct(thebank); 
+            selfdestruct(thebank);
             // any funds still remaining within the bank will be sent to the creator
             // --> bank customers have to make sure they withdraw their $$$ before the final block.
     }
     ////////////////////////////////////////////////////////////////
     // fallback function
     ////////////////////////////////////////////////////////////
-    function () payable { // any unidentified payments (that didnt call the deposit function) 
+    function () payable { // any unidentified payments (that didnt call the deposit function)
                           // go into the standard interest account of the bank
                           // and become available for interest withdrawal by bank users
         balances[thebank] += msg.value;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

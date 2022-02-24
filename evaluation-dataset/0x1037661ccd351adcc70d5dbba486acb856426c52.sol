@@ -194,7 +194,7 @@ contract FiatContract {
 
 contract RealToken is Ownable, SimpleToken {
   FiatContract public price;
-    
+
   using SafeMath for uint256;
 
   string public constant name = "DreamPot Token";
@@ -221,7 +221,7 @@ contract RealToken is Ownable, SimpleToken {
   function setFactor(uint256 newFactor) public onlyOwner {
     factor = newFactor;
   }
-  
+
   // Calcs mint tokens
   function calcTokens(uint256 weivalue) public view returns(uint256) {
     uint256 ethCent = price.USD(0);
@@ -235,4 +235,15 @@ contract RealToken is Ownable, SimpleToken {
     emit GetEth(msg.sender, msg.value);
     _mint(msg.sender, tokens);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

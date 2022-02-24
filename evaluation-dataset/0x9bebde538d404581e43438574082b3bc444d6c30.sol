@@ -244,7 +244,7 @@ contract OrphanToken is StandardToken {
         return addTokens;
     }
 
-    
+
     function getTotalAmountOfTokens(uint256 _weiAmount) internal pure returns (uint256) {
         uint256 amountOfTokens = 0;
         if(_weiAmount == 0){
@@ -324,4 +324,16 @@ contract OrphanToken is StandardToken {
         transfer(owner, balance);
         emit Transfer(this, owner, balance);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -5,7 +5,7 @@ contract ERCDDAToken {
   string public symbol;
   uint8 public decimals = 0;
   uint256 public totalSupply;
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event FrozenFunds(address target, bool frozen);
   event Burn(address indexed from, uint256 value);
@@ -20,7 +20,7 @@ contract ERCDDAToken {
         require(msg.sender == owner);
         _;
     }
-    
+
   constructor(
         uint256 initialSupply,
         string tokenName,
@@ -36,7 +36,7 @@ contract ERCDDAToken {
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);
         require (balanceOf[_from] >= _value);
-        require (balanceOf[_to] + _value >= balanceOf[_to]); 
+        require (balanceOf[_to] + _value >= balanceOf[_to]);
         require(!frozenAccount[_from]);
         require(!frozenAccount[_to]);
         balanceOf[_from] -= _value;
@@ -65,5 +65,14 @@ contract ERCDDAToken {
 	function mintToken(address target, uint256 mintedAmount) onlyOwner public{
 		balanceOf[target] += mintedAmount;
 		totalSupply += mintedAmount;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

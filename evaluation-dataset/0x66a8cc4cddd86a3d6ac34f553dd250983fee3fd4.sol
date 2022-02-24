@@ -65,8 +65,8 @@ contract Comission is Mortal {
         // Handle value below 100 isn't possible
         if (msg.value < 100) throw;
 
-        var tax = msg.value * taxPerc / 100; 
-        var refill = bytes4(sha3("refill(bytes32)")); 
+        var tax = msg.value * taxPerc / 100;
+        var refill = bytes4(sha3("refill(bytes32)"));
         if ( !ledger.call.value(tax)(refill, taxman)
           || !ledger.call.value(msg.value - tax)(refill, _destination)
            ) throw;
@@ -123,7 +123,7 @@ contract Invoice is Mortal {
         signer = msg.sender;
         PaymentReceived();
     }
-    
+
     /**
      * @dev Payment notification
      */
@@ -151,10 +151,10 @@ contract Builder is Mortal {
      * @dev this event emitted for every builded contract
      */
     event Builded(address indexed client, address indexed instance);
- 
+
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
- 
+
     /**
      * @dev Get last address
      * @return last address contract
@@ -227,11 +227,27 @@ contract BuilderInvoice is Builder {
 
         if (_client == 0)
             _client = msg.sender;
- 
+
         var inst = CreatorInvoice.create(_comission, _description, _beneficiary, _value);
         inst.delegate(_client);
         Builded(_client, inst);
         getContractsOf[_client].push(inst);
         return inst;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -79,7 +79,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -103,7 +103,7 @@ contract NRM is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     address public FreezeAddress;
     uint256 public FreezeTokens;
     uint256 public FreezeTokensReleaseTime;
@@ -197,7 +197,7 @@ contract NRM is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public isRunnning returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -261,7 +261,7 @@ contract NRM is ERC20Interface, Owned {
         _totalSupply = _totalSupply.sub(tokens);
         emit Transfer(msg.sender, address(0), tokens);
         return true;
-    }    
+    }
 
 
     // ------------------------------------------------------------------------
@@ -275,4 +275,15 @@ contract NRM is ERC20Interface, Owned {
         }
         return(i);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

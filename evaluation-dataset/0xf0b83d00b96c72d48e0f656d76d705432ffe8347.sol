@@ -320,7 +320,7 @@ contract BiecologyToken3 is ERC20, ERC20Detailed {
     uint private constant FOURTH_YEAR_PERCENTAGE = 103; // Monthly Increase Percentage in the Fourth Year
     uint private constant FIFTH_YEAR_PERCENTAGE = 103;  // Monthly Increase Percentage in the Fifth Year
     uint256 public quantity = 0; // Current circulation
-    
+
     mapping(address => uint256) balances;
     // Owner of this contract
     address public owner;
@@ -338,7 +338,7 @@ contract BiecologyToken3 is ERC20, ERC20Detailed {
         owner = msg.sender;
         balances[owner] = totalBIB;
         quantity = 0;
-        startTime = 1556215200;  // 2019.4.26 02:00:00 
+        startTime = 1556215200;  // 2019.4.26 02:00:00
     }
 
 
@@ -359,8 +359,8 @@ contract BiecologyToken3 is ERC20, ERC20Detailed {
             uint256 currentPrecentage = 100;
             uint256 lastMonthCoin = 0;
             for (uint i = 1; i <= 50; i++){ // Circular month
-                    if(i<=12) { 
-                        currentPrecentage = FIRST_YEAR_PERCENTAGE; 
+                    if(i<=12) {
+                        currentPrecentage = FIRST_YEAR_PERCENTAGE;
                     }
                     else if(i>12 && i<=24){
                         currentPrecentage = SECOND_YEAR_PERCENTAGE;
@@ -374,8 +374,8 @@ contract BiecologyToken3 is ERC20, ERC20Detailed {
                     else{
                         currentPrecentage = FIFTH_YEAR_PERCENTAGE;
                     }
-                
-                
+
+
                     if(i * 30 * (60*60*24) > operatingTime){
                         uint256 diffDays = 0;
                         uint256 diffTime = operatingTime - ((i-1) * 30 * (60*60*24));
@@ -430,10 +430,19 @@ contract BiecologyToken3 is ERC20, ERC20Detailed {
                     balances[owner] = balances[owner] - bib;
                     balances[_to] =   balances[_to] + bib;
                 }
-                
+
             }
         }
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

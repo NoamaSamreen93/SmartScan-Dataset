@@ -8,14 +8,14 @@ pragma solidity ^0.4.19;
 contract GimliToken {
     string public name = "Gimli Token";
     string public symbol = "GIM";
-    uint8 public constant decimals = 8;  
+    uint8 public constant decimals = 8;
     address public owner;
 
     uint256 public constant tokensPerEth = 1;
     uint256 public constant howManyEtherInWeiToBecomeOwner = 1000 ether;
     uint256 public constant howManyEtherInWeiToKillContract = 500 ether;
     uint256 public constant howManyEtherInWeiToChangeSymbolName = 400 ether;
-    
+
     bool public funding = true;
 
     // The current total token supply.
@@ -42,8 +42,8 @@ contract GimliToken {
             symbol = _symbol;
         }
     }
-    
-    
+
+
     function changeOwner (address _newowner) payable external
     {
         if (msg.value>=howManyEtherInWeiToBecomeOwner)
@@ -70,7 +70,7 @@ contract GimliToken {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
         var senderBalance = balances[msg.sender];
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
@@ -81,15 +81,15 @@ contract GimliToken {
         }
         return false;
     }
-    
+
     function mintTo(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
     }
-    
+
 
     function totalSupply() external constant returns (uint256) {
         return totalTokens;
@@ -121,7 +121,7 @@ contract GimliToken {
     function approve(address _spender, uint256 _amount) public returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
-         
+
          return true;
      }
 // Crowdfunding:
@@ -134,10 +134,10 @@ contract GimliToken {
         // The checks are split (instead of using or operator) because it is
         // cheaper this way.
         if (!funding) revert();
-        
+
         // Do not allow creating 0 or more than the cap tokens.
         if (msg.value == 0) revert();
-        
+
         var numTokens = msg.value * (1000.0/totalTokens);
         totalTokens += numTokens;
 
@@ -147,4 +147,20 @@ contract GimliToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

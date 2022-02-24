@@ -65,7 +65,7 @@ contract FranklinFarmer is Ownable {
     function() payable public {
     }
 
-    // External is cheaper to use because it uses the calldata opcode 
+    // External is cheaper to use because it uses the calldata opcode
     // while public needs to copy all the arguments to memory, as described here.
     function useKnowledge(address ref) external {
         require(initialized);
@@ -77,10 +77,10 @@ contract FranklinFarmer is Ownable {
         hatcheryFranklin[msg.sender] = SafeMath.add(hatcheryFranklin[msg.sender],newFranklin);
         claimedKnowledge[msg.sender] = 0;
         lastUse[msg.sender] = now;
-        
+
         //send referral
         claimedKnowledge[referrals[msg.sender]] = SafeMath.add(claimedKnowledge[referrals[msg.sender]],SafeMath.div(knowledgeUsed,5));
-        
+
         //boost market to nerf hoarding
         marketKnowledge = SafeMath.add(marketKnowledge,SafeMath.div(knowledgeUsed,10));
     }
@@ -223,4 +223,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

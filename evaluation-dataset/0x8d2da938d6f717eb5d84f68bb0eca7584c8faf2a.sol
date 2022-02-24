@@ -132,7 +132,7 @@ contract STCDR is StandardToken {
 		tokenAllocated = newtokenAllocated;
 		whitelist[participant] = true;
 		balances[participant] = safeAdd(balances[participant], thisamountTokens);
-		totalSupply = safeAdd(totalSupply, thisamountTokens);		
+		totalSupply = safeAdd(totalSupply, thisamountTokens);
 	}
 
 	function allocateTokens(address participant, uint256  amountTokens, address recommended) external onlyFundWallet  {
@@ -187,5 +187,16 @@ contract STCDR is StandardToken {
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
 		whitelist[_to] = true;
 		return super.transferFrom(_from, _to, _value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

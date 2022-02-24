@@ -984,7 +984,7 @@ contract CryptoTeam {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     /**
     * @dev Payable function. 10% will send to Developers fund and 90% will send to JackPot contract.
     * Also setting info about player.
@@ -995,7 +995,7 @@ contract CryptoTeam {
         BankContract.setInfo(msg.sender, msg.value.mul(90).div(100));
 
         owner.transfer(msg.value.mul(10).div(100));
-        
+
         address(BankContract).transfer(msg.value.mul(90).div(100));
     }
 }
@@ -1066,4 +1066,15 @@ contract Sale {
         GWContract.transfer(msg.sender, balance);
         address(GWContract).transfer(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,14 +1,14 @@
 pragma solidity ^0.5.2;
 
-// Kotlo Mordo is a great open source alcoholic board game (yes, a physical board game, 
+// Kotlo Mordo is a great open source alcoholic board game (yes, a physical board game,
 // not everything has to be online :) This token belongs to players, who are earning it by
 // participating on the development of the game. For this token they can buy some cool additional
-// stuff as a reward for their great job. Thanks to them, this game can grow itself. 
+// stuff as a reward for their great job. Thanks to them, this game can grow itself.
 // more information about this game -> kotlomordo.sk or info[at]kotlomordo.sk
 //
 // This is not any pump and dump ICO, this is a real exchange token between participation
 // and cool rewards. Do not HODL this token, this token will never go MOON. No Lambos here.
-// 
+//
 // This code was inspired by https://theethereum.wiki/w/index.php/ERC20_Token_Standard
 
 library SafeMath {
@@ -133,4 +133,13 @@ contract KotloMordo is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

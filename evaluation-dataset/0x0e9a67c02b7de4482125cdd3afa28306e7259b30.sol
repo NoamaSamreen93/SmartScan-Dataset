@@ -32,11 +32,11 @@ contract Jackpot {
         _;
     }
 
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
 
     function() external payable {
 
@@ -48,7 +48,7 @@ contract Jackpot {
 
     function addPlayer(address add) public onlyDiceRoll jackpotAreActive{
         tempPlayer.push(add);
-        
+
     }
 
     function createWinner() public onlyOwner jackpotAreActive {
@@ -68,7 +68,7 @@ contract Jackpot {
         require(address(this).balance > amount);
         emit SendJackpotSuccesss(winner, amount,JackpotPeriods);
         winner.transfer(amount);
-        
+
     }
 
     function seTJackpotPersent(uint newPersent) external onlyOwner{
@@ -90,9 +90,20 @@ contract Jackpot {
         diceRollAddress = add;
     }
 
-    function ownerTransferEther(address sendTo, uint amount) public onlyOwner{    
+    function ownerTransferEther(address sendTo, uint amount) public onlyOwner{
         sendTo.transfer(amount);
         emit OwnerTransfer(sendTo, amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

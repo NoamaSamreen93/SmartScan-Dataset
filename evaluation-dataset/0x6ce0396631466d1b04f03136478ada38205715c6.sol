@@ -95,8 +95,8 @@ contract Jackpot is Ownable {
   }
 
 
-  function executeLottery() public { 
-      
+  function executeLottery() public {
+
         if (lastIndex >= numberOfPlayers) {
           uint randomNumber = address(this).balance.mul(16807) % 2147483647;
           randomNumber = randomNumber % lastTicketNumber;
@@ -132,9 +132,9 @@ contract Jackpot is Ownable {
         //   if (!winner.send(balance - balance/10)) throw;
         winner.transfer(balance.sub(balance/10));
         emit  newWinner(winner, randomNumber);
-          
+
         }
-      
+
   }
 
   function getPlayers() public constant returns (address[], uint256[]) {
@@ -190,4 +190,12 @@ contract Jackpot is Ownable {
       executeLottery();
     }
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

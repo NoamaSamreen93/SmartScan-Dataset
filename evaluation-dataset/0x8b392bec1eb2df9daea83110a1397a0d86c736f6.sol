@@ -143,7 +143,7 @@ contract LeapCoin is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -154,7 +154,7 @@ contract LeapCoin is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -177,15 +177,15 @@ contract LeapCoin is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-	function increaseApproval (address _spender, uint _addedValue) public 
+
+	function increaseApproval (address _spender, uint _addedValue) public
 	    returns (bool success) {
 	    allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
 	    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 	    return true;
 	}
 
-	function decreaseApproval (address _spender, uint _subtractedValue) public 
+	function decreaseApproval (address _spender, uint _subtractedValue) public
 	    returns (bool success) {
 	    uint oldValue = allowed[msg.sender][_spender];
 	    if (_subtractedValue > oldValue) {
@@ -195,7 +195,7 @@ contract LeapCoin is ERC20Interface, Owned {
 	    }
 	    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 	    return true;
-	}	
+	}
 
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
@@ -224,4 +224,15 @@ contract LeapCoin is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

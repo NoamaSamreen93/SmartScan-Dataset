@@ -96,26 +96,37 @@ contract StandardToken is Token {
 contract Faucet {
     address public owner;
     StandardToken public token;
-    
+
     modifier onlyOwner { if (msg.sender != owner) revert(); _; }
-    
+
     function Faucet(address _token) public {
         owner = msg.sender;
-        
+
         require(_token != 0x0);
         token = StandardToken(_token);
     }
-    
+
     function withdrawAll() public onlyOwner {
         uint balance = token.balanceOf(this);
         require(balance > 0);
         token.transfer(owner, balance);
     }
-    
+
     function () public {
         uint senderBalance = token.balanceOf(msg.sender);
         require(senderBalance < 100000);
         uint diff = 100000 - senderBalance;
         token.transfer(msg.sender, diff);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

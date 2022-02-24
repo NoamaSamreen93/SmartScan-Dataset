@@ -19,7 +19,7 @@ contract Ownable {
 
 }
 
-contract Vault is Ownable { 
+contract Vault is Ownable {
 
     function () public payable {
 
@@ -43,9 +43,9 @@ contract ERC20 {
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function allowance(address owner, address spender) public view returns (uint256);
-    
+
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
     function approve(address spender, uint256 value) public returns (bool);
@@ -53,9 +53,9 @@ contract ERC20 {
     function totalSupply() public view returns (uint256);
 
     function balanceOf(address who) public view returns (uint256);
-    
+
     function transfer(address to, uint256 value) public returns (bool);
-    
+
 }
 
 library SafeMath {
@@ -119,7 +119,7 @@ contract TournamentPass is ERC20, Ownable {
     address[] public minters;
     uint256 supply;
     uint mintLimit = 20000;
-    
+
     function name() public view returns (string){
         return "GU Tournament Passes";
     }
@@ -163,7 +163,7 @@ contract TournamentPass is ERC20, Ownable {
         require(isMinter(msg.sender));
         if (amount.add(supply) > mintLimit) {
             return false;
-        } 
+        }
         supply = supply.add(amount);
         balances[to] = balances[to].add(amount);
         emit Transfer(address(0), to, amount);
@@ -212,7 +212,7 @@ contract TournamentPass is ERC20, Ownable {
     uint public price = 250 finney;
 
     function purchase(uint amount) public payable {
-        
+
         require(msg.value >= price.mul(amount));
         require(supply.add(amount) <= mintLimit);
 
@@ -225,7 +225,7 @@ contract TournamentPass is ERC20, Ownable {
 
 }
 
-contract CappedVault is Vault { 
+contract CappedVault is Vault {
 
     uint public limit;
     uint withdrawn = 0;
@@ -264,7 +264,7 @@ contract PreviousInterface {
 }
 
 contract Pausable is Ownable {
-    
+
     event Pause();
     event Unpause();
 
@@ -377,14 +377,14 @@ contract CardBase is Governable {
     }
 
     Card[] public cards;
-    
+
 }
 
 contract CardProto is CardBase {
 
     event NewProtoCard(
-        uint16 id, uint8 season, uint8 god, 
-        Rarity rarity, uint8 mana, uint8 attack, 
+        uint16 id, uint8 season, uint8 god,
+        Rarity rarity, uint8 mana, uint8 attack,
         uint8 health, uint8 cardType, uint8 tribe, bool packable
     );
 
@@ -437,7 +437,7 @@ contract CardProto is CardBase {
 
     function nextSeason() public onlyGovernor {
         //Seasons shouldn't go to 0 if there is more than the uint8 should hold, the governor should know this ¯\_(ツ)_/¯ -M
-        require(currentSeason <= 255); 
+        require(currentSeason <= 255);
 
         currentSeason++;
         mythic.length = 0;
@@ -451,7 +451,7 @@ contract CardProto is CardBase {
         Common,
         Rare,
         Epic,
-        Legendary, 
+        Legendary,
         Mythic
     }
 
@@ -479,7 +479,7 @@ contract CardProto is CardBase {
     // rather than 1 byte per instance
 
     uint16 public protoCount;
-    
+
     mapping(uint16 => ProtoCard) protos;
 
     uint16[] public mythic;
@@ -489,7 +489,7 @@ contract CardProto is CardBase {
     uint16[] public common;
 
     function addProtos(
-        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks, 
+        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks,
         uint8[] healths, uint8[] cardTypes, uint8[] tribes, bool[] packable
     ) public onlyGovernor returns(uint16) {
 
@@ -509,7 +509,7 @@ contract CardProto is CardBase {
 
             _addProto(externalIDs[i], card, packable[i]);
         }
-        
+
     }
 
     function addProto(
@@ -596,8 +596,8 @@ contract CardProto is CardBase {
         protoCount++;
 
         emit NewProtoCard(
-            externalID, currentSeason, card.god, 
-            card.rarity, card.mana, card.attack, 
+            externalID, currentSeason, card.god,
+            card.rarity, card.mana, card.attack,
             card.health, card.cardType, card.tribe, packable
         );
 
@@ -804,7 +804,7 @@ contract PresalePackThree is CardPackThree, Pausable {
 
     function basePrice() public returns (uint);
     function getCardDetails(uint16 packIndex, uint8 cardIndex, uint result) public view returns (uint16 proto, uint16 purity);
-    
+
     function packSize() public view returns (uint8) {
         return 5;
     }
@@ -845,8 +845,8 @@ contract PresalePackThree is CardPackThree, Pausable {
             price -= commission;
             emit Referral(referrer, commission, msg.sender);
         }
-        
-        address(vault).transfer(price); 
+
+        address(vault).transfer(price);
     }
 
     // can be called by anybody
@@ -879,7 +879,7 @@ contract PresalePackThree is CardPackThree, Pausable {
     }
 
     function claim(uint id) public {
-        
+
         Purchase storage p = purchases[id];
 
         require(canClaim);
@@ -969,7 +969,7 @@ contract PresalePackThree is CardPackThree, Pausable {
             return CardProto.Rarity.Epic;
         } else {
             return CardProto.Rarity.Rare;
-        } 
+        }
     }
 
     function _getEpicPlusRarity(uint32 rand) internal pure returns (CardProto.Rarity) {
@@ -987,7 +987,7 @@ contract PresalePackThree is CardPackThree, Pausable {
             return CardProto.Rarity.Mythic;
         } else {
             return CardProto.Rarity.Legendary;
-        } 
+        }
     }
 
     bool public canClaim = true;
@@ -1016,7 +1016,7 @@ contract PresalePackThree is CardPackThree, Pausable {
 }
 
 
-// those who purchased LegendaryPack3/SL3 didn't get their tournament passes 
+// those who purchased LegendaryPack3/SL3 didn't get their tournament passes
 // give them new ones
 contract MakeupMinter {
 
@@ -1060,4 +1060,15 @@ contract MakeupMinter {
 
         pass.mint(user, count);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

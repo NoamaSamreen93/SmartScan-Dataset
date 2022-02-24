@@ -205,7 +205,7 @@ contract Star3Dlong is modularLong {
 //    uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
     uint256 public rID_;    // round id number / total rounds that have happened
 //****************
-// PLAYER DATA 
+// PLAYER DATA
 //****************
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (bytes32 => uint256) public pIDxName_;          // (name => pID) returns player id by name
@@ -246,9 +246,9 @@ contract Star3Dlong is modularLong {
 //        // how to split up the final pot based on which team was picked
 //        // (Star, None)
         potSplit_[0] = Star3Ddatasets.PotSplit(20, 30);  //newPot20%  gen30%  dev2% winer48%
-        potSplit_[1] = Star3Ddatasets.PotSplit(15, 35);  
-        potSplit_[2] = Star3Ddatasets.PotSplit(25, 25);  
-        potSplit_[3] = Star3Ddatasets.PotSplit(30, 20);  
+        potSplit_[1] = Star3Ddatasets.PotSplit(15, 35);
+        potSplit_[2] = Star3Ddatasets.PotSplit(25, 25);
+        potSplit_[3] = Star3Ddatasets.PotSplit(30, 20);
 	}
 //==============================================================================
 //     _ _  _  _|. |`. _  _ _  .
@@ -1582,7 +1582,7 @@ contract Star3Dlong is modularLong {
         require(
 			msg.sender == 0x701b5B2F6bc3F74Eb15DaebAcFC65E6eAdFbb0DA, "only team just can activate"
         );
- 
+
         // can only be ran once
         require(activated_ == false, "Star3d already activated");
 
@@ -1910,4 +1910,17 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

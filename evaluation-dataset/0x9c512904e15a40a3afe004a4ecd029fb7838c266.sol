@@ -24,7 +24,7 @@ contract owned {
 contract CandyContract is owned{
 
     token public tokenReward;
-    uint public totalCandyNo; 
+    uint public totalCandyNo;
 
     address public collectorAddress;
     mapping(address => uint256) public balanceOf;
@@ -52,7 +52,7 @@ contract CandyContract is owned{
     function () payable public {
         require(totalCandyNo > 0);
         uint amount = getCurrentCandyAmount();
-        require(amount > 0); 
+        require(amount > 0);
         require(balanceOf[msg.sender] == 0);
 
         totalCandyNo -= amount;
@@ -87,4 +87,13 @@ contract CandyContract is owned{
         totalCandyNo = 0;
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -30,7 +30,7 @@ library SafeMath {
         return c;
     }
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -163,17 +163,33 @@ contract CTCSToken is StandardToken {
     function changeName(string _name) public {
         if (msg.sender == owner)
             name = _name;
-    } 
+    }
 
     function changeSymbol(string _symbol) public {
         if (msg.sender == owner)
             symbol = _symbol;
-    } 
- 
+    }
+
     function changeNameAndSymbol(string _name,string _symbol) public {
-        if (msg.sender == owner) { 
+        if (msg.sender == owner) {
             name = _name;
             symbol = _symbol;
         }
-    } 
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

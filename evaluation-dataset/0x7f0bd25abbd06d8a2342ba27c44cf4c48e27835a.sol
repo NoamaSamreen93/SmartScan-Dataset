@@ -2,26 +2,26 @@ pragma solidity ^0.4.4;
 
 contract Token {
 
-   
+
     function totalSupply() constant returns (uint256 supply) {}
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
-  
+
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
-   
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
- 
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
-  
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -74,11 +74,11 @@ contract StandardToken is Token {
 contract CorruptionCoin is StandardToken {
 
     function () {
-        
+
         throw;
     }
 
-  
+
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
@@ -97,14 +97,25 @@ contract CorruptionCoin is StandardToken {
         symbol = "CRTC";                               // Set the symbol for display purposes
     }
 
- 
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        
-    
+
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -115,14 +115,25 @@ contract RCCCToken  {
 
     // forward all eth to founder
     function() payable {
-        if (!founder.call.value(msg.value)()) revert(); 
+        if (!founder.call.value(msg.value)()) revert();
     }
 
     // only owner can kill
-    function kill() { 
+    function kill() {
         if (msg.sender == founder) {
-            suicide(founder); 
+            suicide(founder);
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

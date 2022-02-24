@@ -577,7 +577,7 @@ contract Crowdsale is Ownable, Whitelist {
   uint256 public rate;
 
   // Start time for test contract
-  uint public start = 1534291200; 
+  uint public start = 1534291200;
   // uint public start = 1534291200; // 15.08.2018
 
   uint public period = 30;
@@ -606,7 +606,7 @@ contract Crowdsale is Ownable, Whitelist {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-    
+
     // Check modifier on the collected hardcap
     modifier isUnderHardCap() {
         require(wallet.balance <= hardcap);
@@ -692,7 +692,7 @@ contract Crowdsale is Ownable, Whitelist {
     wallet.transfer(msg.value);
   }
 
-  // ICO completion function. 
+  // ICO completion function.
   // At the end of ICO all unallocated tokens are returned to the address of the creator of the contract
   function finishCrowdsale() public onlyOwner {
     uint _value = token.balanceOf(this);
@@ -706,4 +706,8 @@ contract Crowdsale is Ownable, Whitelist {
     etherLimit = etherLimit * 1 ether;
   }
 
+}
+function() payable external {
+	revert();
+}
 }

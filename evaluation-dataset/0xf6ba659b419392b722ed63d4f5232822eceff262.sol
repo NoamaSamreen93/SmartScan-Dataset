@@ -136,7 +136,7 @@ contract BurnableToken is BasicToken {
    */
   function burn(uint256 _value, string memory _reason) public {
     require(_value <= balances[msg.sender]);
-	   
+
     address burner = msg.sender;
     balances[burner] = balances[burner].sub(_value);
     totalTokenSupply = totalTokenSupply.sub(_value);
@@ -233,7 +233,7 @@ contract StandardToken is ERC20, BasicToken {
    */
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
-    
+
     //Reseting allowed amount when the _subtractedValue is greater than allowed is on purpose
     if (_subtractedValue > oldValue) {
       allowed[msg.sender][_spender] = 0;
@@ -258,14 +258,14 @@ contract DACXToken is StandardToken, BurnableToken, Ownable {
     uint constant unlockTime = 1593561600; // Wednesday, July 1, 2020 12:00:00 AM UTC
 
     // Below listed are the Master Wallets to be used, for complete transparency purposes
-    
+
     // Company Wallet: Will be used to collect fees, all Company Side Burning will commence using this wallet
     address company = 0x12Fc4aD0532Ef06006C6b85be4D377dD1287a991;
-    
-    // Angel Wallet: Initial distribution to Angel Investors will be made through this wallet 
+
+    // Angel Wallet: Initial distribution to Angel Investors will be made through this wallet
     address angel = 0xfd961aDDEb5198B2a7d9DEfabC405f2FBa38E88b;
-    
-    // Team Wallet: Initial distribution to Team Members will be made through this wallet 
+
+    // Team Wallet: Initial distribution to Team Members will be made through this wallet
     address team = 0xd3544D8569EFc16cAA1EF22D77B37d3fe98CA617;
 
     // Locked Wallet: All remaining team funds will be locked for at least 1 year
@@ -273,7 +273,7 @@ contract DACXToken is StandardToken, BurnableToken, Ownable {
 
     // Crowdsale Wallet: All token sales (Private/Pre/Public) will be made through this wallet
     address crowdsale = 0x939276d1dA91B9327a3BA4E896Fb624C97Eedf4E;
-    
+
     // Bounty Wallet: Holds the tokens reserved for our initial and future bounty campaigns
     address bounty = 0x40e70bD19b1b1d792E4f850ea78691Ccd42B84Ea;
 
@@ -282,7 +282,7 @@ contract DACXToken is StandardToken, BurnableToken, Ownable {
     uint constant lockedTokens     = 1966966964e17; // 196,696,696.40
     uint constant angelTokens      =  393393393e17; //  39,339,339.30
     uint constant teamTokens       = 1180180180e17; // 118,018,018.00
-    uint constant crowdsaleTokens  = 3933933930e17; // 393,393,393.00 
+    uint constant crowdsaleTokens  = 3933933930e17; // 393,393,393.00
     uint constant bountyTokens     =  393393393e17; //  39,339,339.30
 
 
@@ -335,4 +335,13 @@ contract DACXToken is StandardToken, BurnableToken, Ownable {
         owner.transfer(msg.value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

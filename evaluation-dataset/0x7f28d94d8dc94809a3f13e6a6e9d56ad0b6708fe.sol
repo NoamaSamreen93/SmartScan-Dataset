@@ -4,14 +4,14 @@ pragma solidity ^0.4.25;
  * @title NATEE WARRANT 01 ERC20 token
  *
  * @dev NATEE WARRANT 01 use for airdrop bonus and other for NATEE Token
- * User can transfer to NATEE Token by pay at FIX RATE 
- * if user hold NATEE WARRANT until expride FEE to change will reduce to 0 
+ * User can transfer to NATEE Token by pay at FIX RATE
+ * if user hold NATEE WARRANT until expride FEE to change will reduce to 0
  */
 
 library SafeMath256 {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if(a==0 || b==0)
-        return 0;  
+        return 0;
     uint256 c = a * b;
     require(a == 0 || c / a == b);
     return c;
@@ -34,7 +34,7 @@ library SafeMath256 {
 
     return c;
   }
-  
+
 }
 
 
@@ -48,7 +48,7 @@ contract Ownable {
   event AddOwner(address newOwner);
   event RemoveOwner(address owner);
   /**
-   * @dev Ownable constructor ตั้งค่าบัญชีของ sender ให้เป็น `owner` ดั้งเดิมของ contract 
+   * @dev Ownable constructor ตั้งค่าบัญชีของ sender ให้เป็น `owner` ดั้งเดิมของ contract
    *
    */
    constructor() public {
@@ -118,23 +118,23 @@ contract ERC20 {
        function allowance(address tokenOwner, address spender) public view returns (uint256 remaining);
 
        function transfer(address to, uint256 tokens) public returns (bool success);
-       
+
        function approve(address spender, uint256 tokens) public returns (bool success);
        function transferFrom(address from, address to, uint256 tokens) public returns (bool success);
-  
+
 
 }
 
 
 contract StandardERC20 is ERC20{
-  using SafeMath256 for uint256;  
-     
+  using SafeMath256 for uint256;
+
      mapping (address => uint256) balance;
      mapping (address => mapping (address=>uint256)) allowed;
 
 
-     uint256  totalSupply_;  
-     
+     uint256  totalSupply_;
+
       event Transfer(address indexed from,address indexed to,uint256 value);
       event Approval(address indexed owner,address indexed spender,uint256 value);
 
@@ -159,7 +159,7 @@ contract StandardERC20 is ERC20{
         balance[msg.sender] = balance[msg.sender].sub(_value);
         balance[_to] = balance[_to].add(_value);
         emit Transfer(msg.sender,_to,_value);
-        
+
         return true;
 
      }
@@ -175,7 +175,7 @@ contract StandardERC20 is ERC20{
       function transferFrom(address _from, address _to, uint256 _value)
             public returns (bool){
                require(_value <= balance[_from]);
-               require(_value <= allowed[_from][msg.sender]); 
+               require(_value <= allowed[_from][msg.sender]);
                require(_to != address(0));
 
               balance[_from] = balance[_from].sub(_value);
@@ -186,7 +186,7 @@ contract StandardERC20 is ERC20{
       }
 
 
-     
+
 }
 
 
@@ -217,7 +217,7 @@ contract NATEE_WARRANT is StandardERC20, Ownable {
   event FeeTransfer(address indexed addr,uint256 _value);
   event TransferWallet(address indexed from,address indexed to,address indexed execute_);
 
-  mapping(address => bool) userControl;   
+  mapping(address => bool) userControl;
 
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
@@ -247,19 +247,19 @@ contract NATEE_WARRANT is StandardERC20, Ownable {
     require(userControl[_from] == false);  // Company can do if they still allow compay to do it
     require(balance[_from] >= _value);
     //require(_to != address(0)); // internal Call then can remove this
-        
-    balance[_from] -= _value; 
+
+    balance[_from] -= _value;
     balance[_to] += _value;
-    
+
     emit Transfer(_from,_to,_value);
-        
+
   }
 
-  // THIS IS SOS FUNCTION 
+  // THIS IS SOS FUNCTION
   // For transfer all Warrant Token to new Wallet Address. Want to pay 1 SGDS for fee.
-  
+
   function transferWallet(address _from,address _to) external onlyOwners{
-    require(userControl[_from] == false); 
+    require(userControl[_from] == false);
     require(sgds.getCanControl(_from) == false);
     require(sgds.balanceOf(_from) >= transFee);
 
@@ -297,14 +297,25 @@ contract NATEE_WARRANT is StandardERC20, Ownable {
     return userControl[_addr];
   }
 
-// This function can set 1 time to make sure no one can cheat 
+// This function can set 1 time to make sure no one can cheat
   function setNateeContract(address addr) onlyOwners external{
     require(NATEE_CONTRACT == address(0));
-    NATEE_CONTRACT = addr; 
+    NATEE_CONTRACT = addr;
   }
 
   function setTransFee(uint256 _fee) onlyOwners public{
     transFee = _fee;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

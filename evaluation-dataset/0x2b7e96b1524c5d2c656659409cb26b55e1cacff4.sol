@@ -87,10 +87,10 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -104,7 +104,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -145,10 +145,10 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
   constructor() public {
     owner = msg.sender;
   }
@@ -168,9 +168,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -197,24 +197,24 @@ contract MintableToken is StandardToken, Ownable {
     emit MintFinished();
     return true;
   }
-  
+
 }
 
 contract Doli is MintableToken {
-    
+
     string public constant name = "DOLI Token";
-    
+
     string public constant symbol = "DOLI";
-    
+
     uint32 public constant decimals = 18;
 
 }
 
 
 contract DoliCrowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     uint restrictedPercent;
 
     address restrictedAccount;
@@ -222,23 +222,23 @@ contract DoliCrowdsale is Ownable {
     Doli public token = new Doli();
 
     uint startDate;
-	
+
 	uint endDate;
-    
+
     uint period2;
-	
+
 	uint period3;
-	
+
 	uint period4;
-	
+
     uint rate;
-   
+
     uint hardcap;
-    
-   
+
+
 
     constructor() public payable {
-	
+
         restrictedAccount = 0x023770c61B9372be44bDAB41f396f8129C14c377;
         restrictedPercent = 40;
         rate = 100000000000000000000;
@@ -249,55 +249,66 @@ contract DoliCrowdsale is Ownable {
 		endDate = 1569369600;
 
         hardcap = 500000000000000000000000000;
-       
+
     }
     modifier saleIsOn() {
     	require(now > startDate && now < endDate);
     	_;
     }
-	
+
 	modifier isUnderHardCap() {
         require(token.totalSupply() <= hardcap);
         _;
     }
-    
+
     function finishMinting() public onlyOwner {
         uint issuedTokenSupply = token.totalSupply();
         uint restrictedTokens = issuedTokenSupply.mul(restrictedPercent).div(100 - restrictedPercent);
         token.mint(restrictedAccount, restrictedTokens);
         token.finishMinting();
     }
-        
+
     /** value - amount in EURO! */
     function createTokens(address customer, uint256 value) onlyOwner saleIsOn public {
-        
+
         uint256 tokens;
         uint bonusRate = 10;
         if (customer==owner) {
-          revert();  
+          revert();
         }
         if(now >= startDate &&  now < period2) {
           bonusRate = 7;
-        } else 
+        } else
 		if(now >= period2 &&  now < period3) {
           bonusRate = 8;
-        } else 
+        } else
 		if(now >= period3 &&  now < period4) {
           bonusRate = 9;
         } if(now >= period4 &&  now < endDate) {
           bonusRate = 10;
         }
-		tokens = value.mul(1 ether).mul(10).div(bonusRate); 
+		tokens = value.mul(1 ether).mul(10).div(bonusRate);
 		token.mint(owner, tokens);
-		token.transferFrom(owner, customer, tokens); 
+		token.transferFrom(owner, customer, tokens);
     }
-    
+
     function getTokensCount() public constant returns(uint256){
        return token.totalSupply().div(1 ether); }
 
     function getBalance(address customer) onlyOwner public constant returns(uint256){
        return token.balanceOf(customer).div(1 ether); }
-	   
+
      function() external payable  onlyOwner {
        revert();}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

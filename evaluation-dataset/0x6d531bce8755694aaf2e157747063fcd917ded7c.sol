@@ -193,14 +193,14 @@ contract StandardToken is ERC20, BasicToken {
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint _addedValue) public 
+  function increaseApproval (address _spender, uint _addedValue) public
     returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) public 
+  function decreaseApproval (address _spender, uint _subtractedValue) public
     returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -216,7 +216,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract liyk002Token is StandardToken, Ownable{
-    
+
     string public version = "v1.0";
     string public name = "liyk002Token";
     string public symbol = "lyk2";
@@ -224,10 +224,10 @@ contract liyk002Token is StandardToken, Ownable{
     uint8 public  decimals = 18;
 
     mapping(address=>uint256)  lockedBalance;
-    mapping(address=>uint)     timeRelease; 
-    
+    mapping(address=>uint)     timeRelease;
+
     uint256 internal constant INITIAL_SUPPLY = 100 * (10**8) * (10**18);
-    
+
     //address public developer;
     //uint256 internal crowdsaleAvaible;
 
@@ -235,10 +235,10 @@ contract liyk002Token is StandardToken, Ownable{
     event Burn(address indexed burner, uint256 value);
     event Lock(address indexed locker, uint256 value, uint releaseTime);
     event UnLock(address indexed unlocker, uint256 value);
-    
+
 
     // constructor
-    constructor() public { 
+    constructor() public {
         address onwer = msg.sender;
         balances[onwer] = INITIAL_SUPPLY;
         totalSupply = INITIAL_SUPPLY;
@@ -264,8 +264,8 @@ contract liyk002Token is StandardToken, Ownable{
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
-       
-        //if preLock can release 
+
+        //if preLock can release
         uint preRelease = timeRelease[_to];
         if (preRelease <= now && preRelease != 0x0) {
             balances[_to] = balances[_to].add(lockedBalance[_to]);
@@ -273,7 +273,7 @@ contract liyk002Token is StandardToken, Ownable{
         }
 
         lockedBalance[_to] = lockedBalance[_to].add(_value);
-        timeRelease[_to] =  _releaseTime >= timeRelease[_to] ? _releaseTime : timeRelease[_to]; 
+        timeRelease[_to] =  _releaseTime >= timeRelease[_to] ? _releaseTime : timeRelease[_to];
         emit Transfer(msg.sender, _to, _value);
         emit Lock(_to, _value, _releaseTime);
         return true;
@@ -307,7 +307,7 @@ contract liyk002Token is StandardToken, Ownable{
     function burn(uint256 _value) public returns (bool success) {
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-    
+
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
@@ -315,7 +315,15 @@ contract liyk002Token is StandardToken, Ownable{
         return true;
     }
 
-    
 
 
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

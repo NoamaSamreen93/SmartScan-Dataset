@@ -1,16 +1,16 @@
 pragma solidity ^0.4.4;
 
- 
+
 
 contract Token {
 
- 
+
 
     /// @return total amount of tokens
 
     function totalSupply() constant returns (uint256 supply) {}
 
- 
+
 
     /// @param _owner The address from which the balance will be retrieved
 
@@ -18,7 +18,7 @@ contract Token {
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
- 
+
 
     /// @notice send `_value` token to `_to` from `msg.sender`
 
@@ -30,7 +30,7 @@ contract Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
- 
+
 
     /// @notice send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
 
@@ -44,7 +44,7 @@ contract Token {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
- 
+
 
     /// @notice `msg.sender` approves `_addr` to spend `_value` tokens
 
@@ -56,7 +56,7 @@ contract Token {
 
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
- 
+
 
     /// @param _owner The address of the account owning tokens
 
@@ -66,21 +66,21 @@ contract Token {
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
- 
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
- 
+
 
 }
 
- 
+
 
 contract StandardToken is Token {
 
- 
+
 
     function transfer(address _to, uint256 _value) returns (bool success) {
 
@@ -106,7 +106,7 @@ contract StandardToken is Token {
 
     }
 
- 
+
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 
@@ -130,7 +130,7 @@ contract StandardToken is Token {
 
     }
 
- 
+
 
     function balanceOf(address _owner) constant returns (uint256 balance) {
 
@@ -138,7 +138,7 @@ contract StandardToken is Token {
 
     }
 
- 
+
 
     function approve(address _spender, uint256 _value) returns (bool success) {
 
@@ -150,7 +150,7 @@ contract StandardToken is Token {
 
     }
 
- 
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 
@@ -158,7 +158,7 @@ contract StandardToken is Token {
 
     }
 
- 
+
 
     mapping (address => uint256) balances;
 
@@ -168,15 +168,15 @@ contract StandardToken is Token {
 
 }
 
- 
+
 
 contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name.
 
- 
+
 
     /* Public variables of the token */
 
- 
+
 
     /*
 
@@ -200,15 +200,15 @@ contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name
 
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
 
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here. 
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
 
     address public fundsWallet;           // Where should the raised ETH go?
 
     uint256 public totalSupply;
 
- 
 
- 
+
+
 
     // This is a constructor function
 
@@ -232,7 +232,7 @@ contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name
 
     }
 
- 
+
 
     function() payable{
 
@@ -246,25 +246,25 @@ contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name
 
         }
 
- 
+
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
 
         balances[msg.sender] = balances[msg.sender] + amount;
 
- 
+
 
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
- 
+
 
         //Transfer ether to fundsWallet
 
-        fundsWallet.transfer(msg.value);                              
+        fundsWallet.transfer(msg.value);
 
     }
 
- 
+
 
     /* Approves and then calls the receiving contract */
 
@@ -274,7 +274,7 @@ contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name
 
         Approval(msg.sender, _spender, _value);
 
- 
+
 
         //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a contract in here just for this.
 
@@ -288,4 +288,15 @@ contract SitcomToken is StandardToken { // CHANGE THIS. Update the contract name
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

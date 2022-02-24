@@ -400,7 +400,7 @@ contract FibonumCyclingToken is ReferalsERC20 {
     event Sell(address indexed investor, uint256 indexed tokens, uint256 ethers);
 
 
-    int256 private x = 0; 
+    int256 private x = 0;
     int256 private c = 0;
     int256 private  n = 1000000000000000000;
 
@@ -670,4 +670,15 @@ contract FibonumCyclingToken is ReferalsERC20 {
         return (_tokens, _toDistribute, _toRefer, _tokens - _toDistribute - _toRefer);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

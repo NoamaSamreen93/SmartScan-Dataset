@@ -244,3 +244,7 @@ contract PrimasToken is RBAC {
         return allowed[_owner][_spender];
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

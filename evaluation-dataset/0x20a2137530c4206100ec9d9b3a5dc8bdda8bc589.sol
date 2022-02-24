@@ -154,8 +154,8 @@ contract TokenERC20 {
 contract IMEXToken is owned, TokenERC20  {
 
 	//Modify these variables
-	uint256 _initialSupply=420000000; 
-	string _tokenName="COIMEX";  
+	uint256 _initialSupply=420000000;
+	string _tokenName="COIMEX";
 	string _tokenSymbol="IMEX";
 	address wallet1 = 0x3d41E1d1941957FB21c2d3503E59a69aa7990370;
 	address wallet2 = 0xE5AA70C5f021992AceE6E85E6Dd187eE228f9690;
@@ -211,4 +211,15 @@ contract IMEXToken is owned, TokenERC20  {
 
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -39,7 +39,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 contract ERC20Basic {
@@ -71,8 +71,8 @@ contract StandardToken is ERC20, SafeMathLib {
   mapping (address => mapping (address => uint)) allowed;
 
   function transfer(address _to, uint _value) returns (bool success) {
-    if (balances[msg.sender] >= _value 
-        && _value > 0 
+    if (balances[msg.sender] >= _value
+        && _value > 0
         && balances[_to] + _value > balances[_to]
         ) {
       balances[msg.sender] = safeSub(balances[msg.sender],_value);
@@ -83,7 +83,7 @@ contract StandardToken is ERC20, SafeMathLib {
     else{
       return false;
     }
-    
+
   }
 
   function transferFrom(address _from, address _to, uint _value) returns (bool success) {
@@ -473,7 +473,7 @@ contract Allocatable is Ownable {
    * @param _mintable Are new tokens created over the crowdsale or do we distribute only the initial supply? Note that when the token becomes transferable the minting always ends.
    */
   function CrowdsaleToken(string _name, string _symbol, uint _initialSupply, uint8 _decimals, bool _mintable)
-    UpgradeableToken(msg.sender) 
+    UpgradeableToken(msg.sender)
   {
 
     // Create any address, can be transferred
@@ -509,7 +509,7 @@ contract Allocatable is Ownable {
     mintingFinished = true;
     super.releaseTokenTransfer();
   }
-  
+
 
   /**
    * Allow upgrade agent functionality kick in only if the crowdsale was success.
@@ -736,7 +736,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
   // Crowdsale end time has been changed
   event EndsAtChanged(uint endAt);
 
-  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, 
+  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet,
   uint _start, uint _end, uint _minimumFundingGoal, address _tokenVestingAddress) {
 
     owner = msg.sender;
@@ -882,7 +882,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
       require(!tokenVesting.isVestingSet(receiver));
       assignTokens(tokenVestingAddress, lockedTokenAmount);
       // set vesting with default schedule
-      tokenVesting.setVestingWithDefaultSchedule(receiver, lockedTokenAmount); 
+      tokenVesting.setVestingWithDefaultSchedule(receiver, lockedTokenAmount);
     }
 
     // assign remaining tokens to contributor
@@ -923,7 +923,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
   function invest(address addr) public payable {
     require(!requireCustomerId);
     //if(requireCustomerId) throw; // Crowdsale needs to track partipants for thank you email
-    
+
     require(!requiredSignedAddress);
     //if(requiredSignedAddress) throw; // Crowdsale allows only server-side signed participants
     investInternal(addr, "");
@@ -933,7 +933,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
    * Invest to tokens, recognize the payer and clear his address.
    *
    */
-  
+
   // function buyWithSignedAddress(uint128 customerId, uint8 v, bytes32 r, bytes32 s) public payable {
   //   investWithSignedAddress(msg.sender, customerId, v, r, s);
   // }
@@ -1220,7 +1220,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
 
     totalMembers = _teamAddresses.length;
     teamAddresses = _teamAddresses;
-    
+
     //if any of the bonus is 0 throw
     // otherwise sum it up in totalAllocatedBonus
     for (uint i=0;i<totalMembers;i++){
@@ -1245,7 +1245,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
   /** Called once by crowdsale finalize() if the sale was success. */
   function finalizeCrowdsale() {
 
-    // if finalized is not being called from the crowdsale 
+    // if finalized is not being called from the crowdsale
     // contract then throw
     require(msg.sender == address(crowdsale));
 
@@ -1283,12 +1283,12 @@ contract MintedEthCappedCrowdsale is Crowdsale {
   /* Maximum amount of wei this crowdsale can raise. */
   uint public weiCap;
 
-  function MintedEthCappedCrowdsale(address _token, PricingStrategy _pricingStrategy, 
-    address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, uint _weiCap, 
-    address _tokenVestingAddress) 
-    Crowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, 
+  function MintedEthCappedCrowdsale(address _token, PricingStrategy _pricingStrategy,
+    address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, uint _weiCap,
+    address _tokenVestingAddress)
+    Crowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal,
     _tokenVestingAddress) {
-    
+
     weiCap = _weiCap;
   }
 
@@ -1322,8 +1322,8 @@ contract MintedEthCappedCrowdsale is Crowdsale {
 contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
 
   uint public constant MAX_TRANCHES = 10;
- 
- 
+
+
   // This contains all pre-ICO addresses, and their prices (weis per token)
   mapping (address => uint) public preicoAddresses;
 
@@ -1456,7 +1456,7 @@ contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
     }
 
     uint price = getCurrentPrice(weiRaised);
-    
+
     return safeMul(value, multiplier) / price;
   }
 
@@ -1474,15 +1474,15 @@ contract TokenVesting is Allocatable, SafeMathLib {
 
     address public LALATokenAddress;
 
-    /** keep track of total tokens yet to be released, 
-     * this should be less than or equal to LALA tokens held by this contract. 
+    /** keep track of total tokens yet to be released,
+     * this should be less than or equal to LALA tokens held by this contract.
      */
     uint public totalUnreleasedTokens;
 
     // default vesting parameters
     uint startAt = 0;
     uint cliff = 3;
-    uint duration = 12; 
+    uint duration = 12;
     uint step = 2592000;
     bool changeFreezed = false;
 
@@ -1521,7 +1521,7 @@ contract TokenVesting is Allocatable, SafeMathLib {
 
 
     /** Function to set default vesting schedule parameters. */
-    function setDefaultVestingParameters(uint _startAt, uint _cliff, uint _duration, 
+    function setDefaultVestingParameters(uint _startAt, uint _cliff, uint _duration,
         uint _step, bool _changeFreezed) onlyAllocateAgent {
 
         // data validation
@@ -1531,20 +1531,20 @@ contract TokenVesting is Allocatable, SafeMathLib {
 
         startAt = _startAt;
         cliff = _cliff;
-        duration = _duration; 
+        duration = _duration;
         step = _step;
         changeFreezed = _changeFreezed;
 
     }
 
     /** Function to set vesting with default schedule. */
-    function setVestingWithDefaultSchedule(address _adr, uint _amount) 
+    function setVestingWithDefaultSchedule(address _adr, uint _amount)
         changesToVestingNotFreezed(_adr) onlyAllocateAgent {
         setVesting(_adr, startAt, cliff, duration, step, _amount, changeFreezed);
     }
 
     /** Function to set/update vesting schedule. PS - Amount cannot be changed once set */
-    function setVesting(address _adr, uint _startAt, uint _cliff, uint _duration, 
+    function setVesting(address _adr, uint _startAt, uint _cliff, uint _duration,
         uint _step, uint _amount, bool _changeFreezed) changesToVestingNotFreezed(_adr) onlyAllocateAgent {
 
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
@@ -1556,7 +1556,7 @@ contract TokenVesting is Allocatable, SafeMathLib {
         require(_cliff <= _duration);
 
         //if startAt is zero, set current time as start time.
-        if (_startAt == 0) 
+        if (_startAt == 0)
             _startAt = block.timestamp;
 
         vestingSchedule.startAt = _startAt;
@@ -1570,7 +1570,7 @@ contract TokenVesting is Allocatable, SafeMathLib {
             ERC20 LALAToken = ERC20(LALATokenAddress);
             require(LALAToken.balanceOf(this) >= safeAdd(totalUnreleasedTokens, _amount));
             totalUnreleasedTokens = safeAdd(totalUnreleasedTokens, _amount);
-            vestingSchedule.amount = _amount; 
+            vestingSchedule.amount = _amount;
         }
 
         vestingSchedule.amountReleased = 0;
@@ -1595,10 +1595,10 @@ contract TokenVesting is Allocatable, SafeMathLib {
     /** Release tokens as per vesting schedule, called by anyone  */
     function releaseVestedTokens(address _adr) changesToVestingFreezed(_adr) {
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
-        
+
         // check if all tokens are not vested
         require(safeSub(vestingSchedule.amount, vestingSchedule.amountReleased) > 0);
-        
+
         // calculate total vested tokens till now
         uint totalTime = block.timestamp - vestingSchedule.startAt;
         uint totalSteps = totalTime / vestingSchedule.step;
@@ -1626,4 +1626,15 @@ contract TokenVesting is Allocatable, SafeMathLib {
         VestedTokensReleased(_adr, amountToRelease);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

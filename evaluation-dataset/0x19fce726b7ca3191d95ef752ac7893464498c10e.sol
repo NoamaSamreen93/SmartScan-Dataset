@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 contract HOLDx3 {
     using SafeMath for uint;
-    
+
     mapping(address => uint[64]) public invest_amount;
     mapping(address => uint[64]) public invest_time;
     mapping(address => uint) public invest_count;
@@ -57,7 +57,7 @@ contract HOLDx3 {
         uint payout_amount = CalculatePayoutAmount();
         uint hold_payout_amount = CalculateHoldPayoutAmount();
         payout_amount = payout_amount.add(hold_payout_amount);
-        SendPercent(payout_amount); 
+        SendPercent(payout_amount);
     }
 
     function SendPercent(uint _payout_amount) internal {
@@ -85,7 +85,7 @@ contract HOLDx3 {
             msg.sender.transfer(_payout_amount);
         }
     }
- 
+
     function CalculatePayoutAmount() internal view returns (uint){
         uint percent = DayliPercentRate();
         uint _payout_amount = 0;
@@ -108,13 +108,13 @@ contract HOLDx3 {
         uint hold_payout_amount = 0;
         uint time_spent = 0;
         for (uint16 i = 0; i < invest_count[msg.sender]; i++) {
-            if (last_withdraw_time[msg.sender] > invest_time[msg.sender][i]) 
+            if (last_withdraw_time[msg.sender] > invest_time[msg.sender][i])
                 time_spent = (now.sub(last_withdraw_time[msg.sender])).div(stepTime.mul(24));
-            else 
+            else
                 time_spent = (now.sub(invest_time[msg.sender][i])).div(stepTime.mul(24));
 
             if (time_spent > 30) time_spent = 30;
-            
+
             if (time_spent > 0) {
                 uint hold_percent = 117**time_spent;
                 uint devider = 100**time_spent;
@@ -140,7 +140,7 @@ contract HOLDx3 {
             return (6);
         }
         if (contractBalance >= 1000 ether) {
-            return (7); 
+            return (7);
         }
     }
 
@@ -180,4 +180,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

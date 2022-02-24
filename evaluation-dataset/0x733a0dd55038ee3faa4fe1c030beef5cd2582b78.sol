@@ -17,7 +17,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
   /**
   * @dev Integer division of two numbers, truncating the quotient.
   */
@@ -66,7 +66,7 @@ contract Owned {
             revert();
         owner = _newOwner;
         return true;
-        
+
     }
 }
 
@@ -101,7 +101,7 @@ contract TKP is Owned {
         name = "Trish Kelly Portfolio Coin";
         symbol = "TKP";
         decimals = 18;
-       
+
         totalSupply = 60000000000000000000000000;
         balances[msg.sender] = balances[msg.sender].add(totalSupply);
         tokenTransfersFrozen = true;
@@ -109,7 +109,7 @@ contract TKP is Owned {
         contractLaunched = false;
     }
 
-  
+
     function transactionReplay(address _receiver, uint256 _amount)
         onlyOwner
         public
@@ -171,8 +171,8 @@ contract TKP is Owned {
 
     /// @notice Used to transfer funds on behalf of owner to receiver
 
-    function transferFrom(address _owner, address _receiver, uint256 _amount) 
-        public 
+    function transferFrom(address _owner, address _receiver, uint256 _amount)
+        public
         returns (bool success)
     {
         require(allowance[_owner][msg.sender] >= _amount);
@@ -227,7 +227,7 @@ contract TKP is Owned {
         require(totalSupply.add(_amount) > totalSupply);
         return true;
     }
-    
+
 
     /// @notice Used to create new tokens and increase total supply
     /// @param _amount The amount of TKP tokens in wei to create
@@ -242,7 +242,7 @@ contract TKP is Owned {
         return true;
     }
 
-  
+
     /// @notice Reusable code to do sanity check of transfer variables
         function transferCheck(address _sender, address _receiver, uint256 _amount)
         private
@@ -260,7 +260,7 @@ contract TKP is Owned {
 
 
     /// @notice Used to retrieve total supply
-    function totalSupply() 
+    function totalSupply()
         public
         constant
         returns (uint256 _totalSupply)
@@ -280,9 +280,25 @@ contract TKP is Owned {
     /// @notice Used to look up the allowance of someone
     function allowance(address _owner, address _spender)
         public
-        constant 
+        constant
         returns (uint256 _amount)
     {
         return allowance[_owner][_spender];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

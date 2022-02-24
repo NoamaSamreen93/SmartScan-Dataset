@@ -734,3 +734,14 @@ contract CaratToken is MintableToken, BurnableToken, DetailedERC20, AccessContro
     return hasRole(addr, SUPER_ADMIN) || hasRole(addr, LIMITED_ADMIN);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

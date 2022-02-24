@@ -24,10 +24,10 @@ contract TwiceAWeekCoin is SystemTesterCode {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
-    string public name;                   
-    uint8 public decimals;              
-    string public symbol;                 
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function TwiceAWeekCoin(
         uint256 _initialAmount,
@@ -46,7 +46,7 @@ contract TwiceAWeekCoin is SystemTesterCode {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -75,4 +75,13 @@ contract TwiceAWeekCoin is SystemTesterCode {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

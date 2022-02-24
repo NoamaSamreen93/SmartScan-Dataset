@@ -118,14 +118,14 @@ contract CBZToken is StandardToken {
     uint8 public decimals = 8;
     uint256 public totalSupply = 1000000000 * (10 ** uint256(decimals));//Crowdsale supply
 	uint public sellPrice = 1000000000000000 wei;//Tokens are sold for this manual price, rather than predefined price.
-    
+
     //Addresses that are allowed to transfer tokens
     mapping (address => bool) public allowedTransfer;
-	
+
 	//Technical variables to store states
 	bool public TransferAllowed = true;//Token transfers are blocked
     bool public CrowdsalePaused = false; //Whether the Crowdsale is now suspended (true or false)
-	
+
     //Technical variables to store statistical data
 	uint public StatsEthereumRaised = 0 wei;//Total Ethereum raised
 	uint public StatsSold = 0;//Sold tokens amount
@@ -137,31 +137,31 @@ contract CBZToken is StandardToken {
     event Mint(address indexed from, uint tokens);// This notifies clients about the amount minted
     event Burn(address indexed from, uint tokens);// This notifies clients about the amount burnt
     event PriceChanged(string _text, uint _tokenPrice);//Manual token price
-    
+
     address public owner = 0x0;//Admin actions
     address public minter = 0x0;//Minter tokens
     address public wallet = 0x0;//Wallet to receive ETH
- 
+
 function CBZToken(address _owner, address _minter, address _wallet) payable {
-    
+
       owner = _owner;
       minter = _minter;
       wallet = _wallet;
-    
+
       balances[owner] = 0;
       balances[minter] = 0;
       balances[wallet] = 0;
-    
+
       allowedTransfer[owner] = true;
       allowedTransfer[minter] = true;
       allowedTransfer[wallet] = true;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyMinter() {
         require(msg.sender == minter);
         _;
@@ -171,28 +171,28 @@ function CBZToken(address _owner, address _minter, address _wallet) payable {
     function() payable {
         buy();
     }
-    
+
     //See the current token price in wei (https://etherconverter.online to convert to other units, such as ETH)
     function price() constant returns (uint) {
         return sellPrice;
     }
-    
+
     //Manually set the token price (in wei - https://etherconverter.online)
     function setTokenPrice(uint _tokenPrice) external onlyOwner {
         sellPrice = _tokenPrice;
         PriceChanged("New price is ", _tokenPrice);
     }
-     
+
     //Allow or prohibit token transfers
     function setTransferAllowance(bool _allowance) external onlyOwner {
         TransferAllowed = _allowance;
     }
-    
+
     //Temporarily suspend token sale
     function eventPause(bool _pause) external onlyOwner {
         CrowdsalePaused = _pause;
     }
-    
+
     // Send `_amount` of tokens to `_target`
     function mintTokens(address _target, uint _amount) onlyMinter external returns (bool) {
         require(_amount > 0);//Number of tokens must be greater than 0
@@ -205,7 +205,7 @@ function CBZToken(address _owner, address _minter, address _wallet) payable {
         Mint(_target, _amount);
         return true;
     }
-    
+
     // Decrease user balance
     function decreaseTokens(address _target, uint _amount) onlyMinter external returns (bool) {
         require(_amount > 0);//Number of tokens must be greater than 0
@@ -216,7 +216,7 @@ function CBZToken(address _owner, address _minter, address _wallet) payable {
         Burn(_target, _amount);
         return true;
     }
-    
+
     // Allow `_target` make token tranfers
     function allowTransfer(address _target, bool _allow) external onlyOwner {
         allowedTransfer[_target] = _allow;
@@ -233,43 +233,43 @@ function CBZToken(address _owner, address _minter, address _wallet) payable {
 
         uint tokens = msg.value/price();//Number of tokens to be received by the buyer
         require(tokens > 0);//Number of tokens must be greater than 0
-        
+
         require(safeAdd(StatsTotal, tokens) <= totalSupply);//The amount of tokens cannot be greater than Total supply
-        
+
         wallet.transfer(msg.value);//Send received ETH to the fundraising purse
-        
+
         //Crediting of tokens to the buyer
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         StatsSold = safeAdd(StatsSold, tokens);//Update number of tokens sold
         StatsTotal = safeAdd(StatsTotal, tokens);//Update total number of tokens
         Transfer(0, this, tokens);
         Transfer(this, msg.sender, tokens);
-        
+
         StatsEthereumRaised = safeAdd(StatsEthereumRaised, msg.value);//Update total ETH collected
-        
+
         //Record event logs to the blockchain
         Buy(msg.sender, msg.value, tokens);
 
         return true;
     }
-    
+
     function transfer(address _to, uint _value) returns (bool success) {
-        
+
         //Forbid token transfers
         if(!TransferAllowed){
             require(allowedTransfer[msg.sender]);
         }
-        
+
     return super.transfer(_to, _value);
     }
 
     function transferFrom(address _from, address _to, uint _value) returns (bool success) {
-        
+
         //Forbid token transfers
         if(!TransferAllowed){
             require(allowedTransfer[msg.sender]);
         }
-        
+
         return super.transferFrom(_from, _to, _value);
     }
 
@@ -293,4 +293,15 @@ function CBZToken(address _owner, address _minter, address _wallet) payable {
         balances[wallet] = 0;
         wallet = _to;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

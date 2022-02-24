@@ -107,7 +107,7 @@ contract ERC20 is ERC20Events{
 
 
 contract Math {
-    
+
     /*
     standard uint256 functions
      */
@@ -370,7 +370,7 @@ contract Stoppable is Auth, Note {
 
 contract Token is ERC20, Stoppable {
 
-    bytes32 public symbol;    
+    bytes32 public symbol;
     string public name; // Optional token name
     uint256 public decimals = 18; // standard token precision. override to customize
     TokenLogic public logic;
@@ -411,7 +411,7 @@ contract Token is ERC20, Stoppable {
         Transfer(msg.sender, dst, wad);
         return retVal;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) stoppable note returns (bool) {
         bool retVal = logic.transferFrom(src, dst, wad);
         Transfer(src, dst, wad);
@@ -594,33 +594,33 @@ contract TokenLogic is ERC20Events, Math, Stoppable {
     function allowance(address src, address guy) constant returns (uint256) {
         return data.approvals(src, guy);
     }
-    
+
     function transfer(address src, address dst, uint wad) tokenOnly returns (bool) {
         require(balanceOf(src) >= wad);
-        
+
         data.setBalances(src, sub(data.balances(src), wad));
         data.setBalances(dst, add(data.balances(dst), wad));
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) tokenOnly returns (bool) {
         require(data.balances(src) >= wad);
         require(data.approvals(src, dst) >= wad);
-        
+
         data.setApprovals(src, dst, sub(data.approvals(src, dst), wad));
         data.setBalances(src, sub(data.balances(src), wad));
         data.setBalances(dst, add(data.balances(dst), wad));
-        
+
         return true;
     }
-    
+
     function approve(address src, address guy, uint256 wad) tokenOnly returns (bool) {
 
         data.setApprovals(src, guy, wad);
-        
+
         Approval(src, guy, wad);
-        
+
         return true;
     }
 
@@ -697,4 +697,10 @@ contract TokenLogic is ERC20Events, Math, Stoppable {
 
         return tokenAmount;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

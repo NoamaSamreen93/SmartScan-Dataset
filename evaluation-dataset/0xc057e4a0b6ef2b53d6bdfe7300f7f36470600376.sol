@@ -136,7 +136,7 @@ contract SaveWon is IERC20, Ownable, PartnerShip {
     string private _name;
     string private _symbol;
     uint256 private _totalSupply;
-    
+
     uint8 private _decimals = 18;
 
     mapping (address => uint256) internal _balances;
@@ -144,14 +144,14 @@ contract SaveWon is IERC20, Ownable, PartnerShip {
 
 
     event Burn(address indexed from, uint256 value);
-    
+
     constructor() public {
         _name = "SAVEWON";
         _symbol = "SW";
         uint256 INITIAL_SUPPLY = 50000000000 * (10 ** uint256(_decimals));
         _totalSupply = _totalSupply.add(INITIAL_SUPPLY);
         _balances[msg.sender] = _balances[msg.sender].add(INITIAL_SUPPLY);
-        
+
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
@@ -167,7 +167,7 @@ contract SaveWon is IERC20, Ownable, PartnerShip {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -243,4 +243,13 @@ contract SaveWon is IERC20, Ownable, PartnerShip {
        return false;
      }
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

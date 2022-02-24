@@ -75,7 +75,7 @@ contract Owned {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   function addAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == false );
     isAdmin[_a] = true;
@@ -87,13 +87,13 @@ contract Owned {
     isAdmin[_a] = false;
     AdminChange(_a, false);
   }
-  
+
 }
 
 
 // ----------------------------------------------------------------------------
 //
-// ERC721(ish) Token Interface 
+// ERC721(ish) Token Interface
 //
 // ----------------------------------------------------------------------------
 
@@ -135,12 +135,12 @@ interface ERC721Enumerable /* is ERC721 */ {
 // ----------------------------------------------------------------------------
 
 contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned {
-  
+
   using SafeMath for uint;
 
   uint public ownerCount = 0;
   uint public deedCount = 0;
-  
+
   mapping(address => uint) public balances;
   mapping(uint => address) public mIdOwner;
   mapping(uint => address) public mIdApproved;
@@ -161,7 +161,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   }
 
   /* Transfer token */
-  
+
   function transfer(address _to, uint _id) external {
     // check ownership and address
     require( msg.sender == mIdOwner[_id] );
@@ -179,7 +179,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   }
 
   /* Transfer from */
-  
+
   function transferFrom(address _from, address _to, uint _id) external {
     // check if the sender has the right to transfer
     require( _from == mIdOwner[_id] && mIdApproved[_id] == msg.sender );
@@ -196,7 +196,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   }
 
   /* Approve token transfer (we do not make it payable) */
-  
+
    function approve(address _approved, uint _id) external {
        require( msg.sender == mIdOwner[_id] );
        require( msg.sender != _approved );
@@ -208,7 +208,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
 
 
   // Enumeration Functions ------------
-  
+
   function totalSupply() external view returns (uint count) {
     count = deedCount;
   }
@@ -216,14 +216,14 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
   function deedByIndex(uint _index) external view returns (uint id) {
     id = _index;
     require( id < deedCount );
-  }  
-  
+  }
+
   function countOfOwners() external view returns (uint count) {
     count = ownerCount;
   }
-  
+
   // Internal functions ---------------
-  
+
   function updateBalances(address _from, address _to) internal {
     // process from (skip if minted)
     if (_from != address(0x0)) {
@@ -234,7 +234,7 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
     balances[_to]++;
     if (balances[_to] == 1) { ownerCount++; }
   }
-      
+
 }
 
 
@@ -247,62 +247,62 @@ contract ERC721Token is ERC721Interface, ERC721Metadata, ERC721Enumerable, Owned
 contract GizerItems is ERC721Token {
 
   /* Basic token data */
-  
+
   string constant cName   = "Gizer Item";
   string constant cSymbol = "GZR721";
-  
+
   /* uuid information */
 
   bytes32[] public code;
   uint[] public weight;
   uint public sumOfWeights;
-  
+
   mapping(bytes32 => uint) public mCodeIndexPlus; // index + 1
 
   /* Pseudo-randomisation variables */
 
   uint public nonce = 0;
   uint public lastRandom = 0;
-  
+
   /* mapping from item index to uuid */
-  
+
   mapping(uint => bytes32) public mIdxUuid;
-  
+
   // Events ---------------------------
-  
+
   event MintToken(address indexed minter, address indexed _owner, bytes32 indexed _code, uint _input);
-  
+
   event CodeUpdate(uint8 indexed _type, bytes32 indexed _code, uint _weight, uint _sumOfWeights);
-  
+
   // Basic Functions ------------------
-  
+
   function GizerItems() public { }
-  
+
   function () public payable { revert(); }
-  
+
   // Information functions ------------
 
   function name() external pure returns (string) {
     return cName;
   }
-  
+
   function symbol() external pure returns (string) {
     return cSymbol;
   }
-  
+
   function deedUri(uint _id) external view returns (string) {
     return bytes32ToString(mIdxUuid[_id]);
   }
-  
+
   function getUuid(uint _id) external view returns (string) {
     require( _id < code.length );
-    return bytes32ToString(code[_id]);  
+    return bytes32ToString(code[_id]);
   }
 
   // Token Minting --------------------
-  
+
   function mint(address _to) public onlyAdmin returns (uint idx) {
-    
+
     // initial checks
     require( sumOfWeights > 0 );
     require( _to != address(0x0) );
@@ -323,9 +323,9 @@ contract GizerItems is ERC721Token {
     // log event and return
     MintToken(msg.sender, _to, uuid32, idx);
   }
-  
+
   // Random
-  
+
   function getRandomUuid() internal returns (bytes32) {
     // case where there is only one item type
     if (code.length == 1) return code[0];
@@ -353,11 +353,11 @@ contract GizerItems is ERC721Token {
         block.difficulty
     ));
   }
-  
+
   // uuid functions -------------------
-  
+
   /* add a new code + weight */
-  
+
   function addCode(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
     bytes32 uuid32 = stringToBytes32(_code);
@@ -379,9 +379,9 @@ contract GizerItems is ERC721Token {
     CodeUpdate(1, uuid32, _weight, sumOfWeights);
     return true;
   }
-  
+
   /* update the weight of an existing code */
-  
+
   function updateCodeWeight(string _code, uint _weight) public onlyAdmin returns (bool success) {
 
     bytes32 uuid32 = stringToBytes32(_code);
@@ -400,9 +400,9 @@ contract GizerItems is ERC721Token {
     CodeUpdate(2, uuid32, _weight, sumOfWeights);
     return true;
   }
-  
+
   /* remove an existing code */
-  
+
   function removeCode(string _code) public onlyAdmin returns (bool success) {
 
     bytes32 uuid32 = stringToBytes32(_code);
@@ -441,11 +441,11 @@ contract GizerItems is ERC721Token {
   function transferAnyERC20Token(address tokenAddress, uint amount) public onlyOwner returns (bool success) {
       return ERC20Interface(tokenAddress).transfer(owner, amount);
   }
-  
+
   // Utility functions ----------------
 
   /* https://ethereum.stackexchange.com/questions/9142/how-to-convert-a-string-to-bytes32 */
-  
+
   function stringToBytes32(string memory source) public pure returns (bytes32 result) {
     bytes memory tempEmptyStringTest = bytes(source);
     if (tempEmptyStringTest.length == 0) {
@@ -456,7 +456,7 @@ contract GizerItems is ERC721Token {
         result := mload(add(source, 32))
     }
   }
-  
+
   /* https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string */
 
   function bytes32ToString(bytes32 x) public pure returns (string) {
@@ -475,7 +475,7 @@ contract GizerItems is ERC721Token {
     }
     return string(bytesStringTrimmed);
   }
-  
+
 }
 
 // ----------------------------------------------------------------------------
@@ -487,4 +487,12 @@ contract GizerItems is ERC721Token {
 
 contract ERC20Interface {
   function transfer(address _to, uint _value) public returns (bool success);
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

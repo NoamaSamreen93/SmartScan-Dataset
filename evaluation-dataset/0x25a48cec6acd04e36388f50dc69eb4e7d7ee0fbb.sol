@@ -26,7 +26,7 @@ contract Ownable {
 
 
 contract ERC721 {
-    
+
     function totalSupply() public view returns (uint256 total);
     function balanceOf(address _owner) public view returns (uint256 balance);
     function ownerOf(uint256 _tokenId) external view returns (address owner, uint256 tokenId);
@@ -37,9 +37,9 @@ contract ERC721 {
 
     event Transfer(address from, address to, uint256 tokenId);
     event Approval(address owner, address approved, uint256 tokenId);
-    
-    
-    
+
+
+
 }
 
 
@@ -48,7 +48,7 @@ contract JockeyControl  {
 
     address public ceoAddress=0xf75Da6b04108394fDD349f47d58452A6c8Aeb236;
     address public ctoAddress=0x833184cE7DF8E56a716B7738548BfC488E428Da5;
- 
+
 
     modifier onCEO() {
         require(msg.sender == ceoAddress);
@@ -68,7 +68,7 @@ contract JockeyControl  {
         _;
     }
 
- 
+
 }
 
 
@@ -76,9 +76,9 @@ contract JockeyControl  {
 
 
 contract HoresBasis is  JockeyControl {
-   
+
     event Birth(address owner, uint256 JockeyId);
-   
+
     event Transfer(address from, address to, uint256 tokenId);
 
     struct Jockey {
@@ -91,22 +91,22 @@ contract HoresBasis is  JockeyControl {
         uint256 dna6;
         uint256 dna7;
         uint256 dna8;
-        
+
     }
 
 
     Jockey[] jockeys;
 
     mapping (uint256 => address) jockeyOwnerIndex;
-    
+
     mapping (uint256 => uint256) public jockeyIndexPrice;
-    
+
     mapping (uint256 => uint256) public jockeyHair;
-    
+
     mapping (uint256 => uint256) public jockeySkin;
-    
+
     mapping (uint256 => uint256) public jockeyHLength;
-    
+
     mapping (uint256 => bool)  jockeyIndexForSale;
 
     mapping (address => uint256) tokenOwnershipCount;
@@ -114,65 +114,65 @@ contract HoresBasis is  JockeyControl {
 
    uint256 public saleFee = 20;
 
-   
-   
- 
+
+
+
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         tokenOwnershipCount[_to]++;
         jockeyOwnerIndex[_tokenId] = _to;
-        
+
         if (_from != address(0)) {
             tokenOwnershipCount[_from]--;
-         
+
         }
        emit Transfer(_from, _to, _tokenId);
-       
+
     }
-    
-    
+
+
     function _sell(address _from,  uint256 _tokenId, uint256 value) internal {
-     
+
      if(jockeyIndexForSale[_tokenId]==true){
-         
+
               uint256 price = jockeyIndexPrice[_tokenId];
-            
+
             require(price<=value);
-            
+
          uint256 Fee = price / saleFee;
-            
+
           uint256  oPrice= price - Fee;
-            
+
             address _to = msg.sender;
-            
+
             tokenOwnershipCount[_to]++;
             jockeyOwnerIndex[_tokenId] = _to;
-            
+
             jockeyIndexForSale[_tokenId]=false;
-            
-            
+
+
             if (_from != address(0)) {
                 tokenOwnershipCount[_from]--;
-               
+
             }
-                 
+
            emit Transfer(_from, _to, _tokenId);
-             
+
              _from.transfer(oPrice);
-             
+
              ceoAddress.transfer(Fee);
-             
+
             uint256 bidExcess = value - oPrice - Fee;
             _to.transfer(bidExcess);
-            
-            
+
+
      }else{
           _to.transfer(value);
      }
-      
+
     }
-    
-    
-	
+
+
+
     function _newJockey(
         uint256 _genes1,
         uint256 _genes2,
@@ -187,14 +187,14 @@ contract HoresBasis is  JockeyControl {
         internal
         returns (uint)
     {
-   
-   
-   
-   
+
+
+
+
         Jockey memory _jockey = Jockey({
            birthTime: uint64(now),
-           
-             
+
+
         dna1:_genes1,
         dna2: _genes2,
         dna3 : _genes3,
@@ -203,26 +203,26 @@ contract HoresBasis is  JockeyControl {
         dna6 : _genes6,
         dna7:_genes7,
         dna8: _genes8
-            
+
         });
-       
-       
-        
+
+
+
        uint256 newJockeyId;
-	   
+
      newJockeyId = jockeys.push(_jockey)-1;
-     
-  
+
+
         require(newJockeyId == uint256(uint32(newJockeyId)));
 
 
-        
-        
+
+
        emit Birth(_owner, newJockeyId);
 
         _transfer(0, _owner, newJockeyId);
 
-        return newJockeyId;  
+        return newJockeyId;
     }
 
 
@@ -234,25 +234,25 @@ contract JockeyOwnership is HoresBasis, ERC721{
 
   string public constant  name = "CryptoJockey";
     string public constant symbol = "CHJ";
-     uint8 public constant decimals = 0; 
+     uint8 public constant decimals = 0;
 
     function jockeyForSale(uint256 _tokenId, uint256 price) external {
-  
+
      address  ownerof =  jockeyOwnerIndex[_tokenId];
         require(ownerof == msg.sender);
         jockeyIndexPrice[_tokenId] = price;
         jockeyIndexForSale[_tokenId]= true;
 		}
-		
+
  function changePrice(uint256 _tokenId, uint256 price) external {
-  
+
      address  ownerof =  jockeyOwnerIndex[_tokenId];
         require(ownerof == msg.sender);
         require(jockeyIndexForSale[_tokenId] == true);
-       
-             
+
+
               jockeyIndexPrice[_tokenId] = price;
-         
+
 		}
 
  function jockeyNotForSale(uint256 _tokenId) external {
@@ -280,9 +280,9 @@ contract JockeyOwnership is HoresBasis, ERC721{
         payable
     {
         require(_to != address(0));
-		
+
         require(_to != address(this));
- 
+
         require(_owns(msg.sender, _tokenId));
        _transfer(msg.sender, _to, _tokenId);
     }
@@ -291,7 +291,7 @@ contract JockeyOwnership is HoresBasis, ERC721{
         address _to,
         uint256 _tokenId
     )
-        external 
+        external
     {
        require(_owns(msg.sender, _tokenId));
 
@@ -299,19 +299,19 @@ contract JockeyOwnership is HoresBasis, ERC721{
     }
 
     function transferFrom(address _from, address _to, uint256 _tokenId ) external payable {
-        
+
         if(_from != msg.sender){
               require(_to == msg.sender);
-                 
+
                 require(_from==jockeyOwnerIndex[_tokenId]);
-        
+
                _sell(_from,  _tokenId, msg.value);
-            
+
         }else{
-            
+
           _to.transfer(msg.value);
         }
- 
+
     }
 
     function totalSupply() public view returns (uint) {
@@ -321,30 +321,30 @@ contract JockeyOwnership is HoresBasis, ERC721{
     function ownerOf(uint256 _tokenId)  external view returns (address owner, uint256 tokenId)  {
         owner = jockeyOwnerIndex[_tokenId];
         tokenId=_tokenId;
-       
+
        return;
-       
+
     }
 
        function jockeyFS(uint256 _tokenId) external view  returns (bool buyable, uint256 tokenId) {
         buyable = jockeyIndexForSale[_tokenId];
         tokenId=_tokenId;
        return;
-       
+
     }
-	
+
 	function jockeyPr(uint256 _tokenId) external view  returns (uint256 price, uint256 tokenId) {
         price = jockeyIndexPrice[_tokenId];
         tokenId=_tokenId;
        return;
-       
+
     }
 
  function setSaleFee(uint256 val) external onCTO {
         saleFee = val;
     }
 
-    
+
 }
 
 
@@ -355,23 +355,23 @@ contract JockeyMinting is JockeyOwnership {
 
     function createJockey(uint256 _genes1,uint256 _genes2,uint256 _genes3,uint256 _genes4,uint256 _genes5,uint256 _genes6,uint256 _genes7,uint256 _genes8,uint256 jHair,uint256 jHLenth,uint256 jSkin, address _owner) external onlyC {
         address jockeyOwner = _owner;
-        
+
    require(jockeys.length < JOCKEY_LIMIT);
 
-            
+
               _newJockey(  _genes1, _genes2, _genes3, _genes4, _genes5, _genes6,_genes7, _genes8,  jockeyOwner);
-            
-            
+
+
         uint256   jId=jockeys.length;
-            
+
         jockeyHair[jId] = jHair;
         jockeyHLength[jId] = jHLenth;
         jockeySkin[jId] = jSkin;
-            
-        
+
+
     }
 
-   
+
 }
 
 
@@ -394,7 +394,7 @@ contract GetTheJockey is JockeyMinting {
         uint256 _genes6,
         uint256 _genes7,
         uint256 _genes8
-		
+
     ) {
 		price = jockeyIndexPrice[_id];
         id = uint256(_id);
@@ -406,12 +406,23 @@ contract GetTheJockey is JockeyMinting {
         _genes3 = horseman.dna3;
         _genes4 = horseman.dna4;
         _genes5 = horseman.dna5;
-        _genes6 = horseman.dna6;  
+        _genes6 = horseman.dna6;
         _genes7 = horseman.dna7;
         _genes8 = horseman.dna8;
 
     }
 
-  
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

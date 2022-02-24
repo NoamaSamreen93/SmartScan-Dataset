@@ -12,7 +12,7 @@ contract OwnerBase {
 
     // @dev Keeps track whether the contract is paused. When that is true, most actions are blocked
     bool public paused = false;
-    
+
     /// constructor
     function OwnerBase() public {
        ceoAddress = msg.sender;
@@ -31,7 +31,7 @@ contract OwnerBase {
         require(msg.sender == cfoAddress);
         _;
     }
-    
+
     /// @dev Access modifier for COO-only functionality
     modifier onlyCOO() {
         require(msg.sender == cooAddress);
@@ -54,7 +54,7 @@ contract OwnerBase {
 
         cfoAddress = _newCFO;
     }
-    
+
     /// @dev Assigns a new address to act as the COO. Only available to the current CEO.
     /// @param _newCOO The address of the new COO
     function setCOO(address _newCOO) external onlyCEO {
@@ -90,17 +90,17 @@ contract OwnerBase {
         // can't unpause if contract was upgraded
         paused = false;
     }
-	
-	
+
+
 	/// @dev check wether target address is a contract or not
     function isNormalUser(address addr) internal view returns (bool) {
 		if (addr == address(0)) {
 			return false;
 		}
         uint size = 0;
-        assembly { 
-		    size := extcodesize(addr) 
-		} 
+        assembly {
+		    size := extcodesize(addr)
+		}
         return size == 0;
     }
 }
@@ -149,7 +149,7 @@ contract SafeMath {
     function min256(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? a : b;
     }
- 
+
 }
 
 
@@ -159,13 +159,13 @@ contract SafeMath {
 contract PartnerHolder {
     //
     function isHolder() public pure returns (bool);
-    
+
     // Required methods
     function bonusAll() payable public ;
-	
-	
+
+
 	function bonusOne(uint id) payable public ;
-    
+
 }
 
 /// @title Contract for partner. Holds all partner structs, events and base variables.
@@ -173,7 +173,7 @@ contract PartnerHolder {
 contract Partners is OwnerBase, SafeMath, PartnerHolder {
 
     event Bought(uint16 id, address newOwner, uint price, address oldOwner);
-    
+
 	// data of Casino
     struct Casino {
 		uint16 id;
@@ -183,30 +183,30 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 		string name;
 		string desc;
     }
-	
+
 	// address to balance.
 	mapping(address => uint) public balances;
-	
-	
+
+
 	mapping(uint => Casino) public allCasinos; // key is id
-	
+
 	// all ids of casinos
 	uint[] public ids;
-	
-	
+
+
 	uint public masterCut = 200;
-	
+
 	// master balance;
 	uint public masterHas = 0;
-	
-	
+
+
 	function Partners() public {
 		ceoAddress = msg.sender;
         cooAddress = msg.sender;
         cfoAddress = msg.sender;
-		
+
 	}
-	
+
 	function initCasino() public onlyCOO {
 		addCasino(5, 100000000000000000, 'Las Vegas Bellagio Casino', 'Five star Casino');
 		addCasino(4, 70000000000000000, 'London Ritz Club Casino', 'Four star Casino');
@@ -243,9 +243,9 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 		//receive ether.
 		masterHas = safeAdd(masterHas, msg.value);
 	}
-	
-	/// @dev add a new casino 
-	function addCasino(uint16 _star, uint _price, string _name, string _desc) internal 
+
+	/// @dev add a new casino
+	function addCasino(uint16 _star, uint _price, string _name, string _desc) internal
 	{
 		uint newID = ids.length + 1;
 		Casino memory item = Casino({
@@ -259,18 +259,18 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 		allCasinos[newID] = item;
 		ids.push(newID);
 	}
-	
+
 	/// @dev set casino name and description by coo
-	function setCasinoName(uint16 id, string _name, string _desc) public onlyCOO 
+	function setCasinoName(uint16 id, string _name, string _desc) public onlyCOO
 	{
 		Casino storage item = allCasinos[id];
 		require(item.id > 0);
 		item.name = _name;
 		item.desc = _desc;
 	}
-	
+
 	/// @dev check wether the address is a casino owner.
-	function isOwner( address addr) public view returns (uint16) 
+	function isOwner( address addr) public view returns (uint16)
 	{
 		for(uint16 id = 1; id <= 29; id++) {
 			Casino storage item = allCasinos[id];
@@ -280,13 +280,13 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 		}
 		return 0;
 	}
-	
+
 	/// @dev identify this contract is a partner holder.
 	function isHolder() public pure returns (bool) {
 		return true;
 	}
-	
-	
+
+
 	/// @dev give bonus to all partners, and the owners can withdraw it soon.
 	function bonusAll() payable public {
 		uint total = msg.value;
@@ -307,7 +307,7 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 				} else {
 					fund = safeDiv(safeMul(total, 100), 10000);
 				}
-				
+
 				if (remain >= fund) {
 					remain -= fund;
 					address owner = item.owner;
@@ -318,10 +318,10 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 				}
 			}
 		}
-		
+
 	}
-	
-	
+
+
 	/// @dev bonus to casino which has the specific id
 	function bonusOne(uint id) payable public {
 		Casino storage item = allCasinos[id];
@@ -333,49 +333,49 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 			masterHas = safeAdd(masterHas, msg.value);
 		}
 	}
-	
-	
-	/// @dev user withdraw, 
+
+
+	/// @dev user withdraw,
 	function userWithdraw() public {
 		uint fund = balances[msg.sender];
 		require (fund > 0);
 		delete balances[msg.sender];
 		msg.sender.transfer(fund);
 	}
-	
-	
-    
+
+
+
     /// @dev buy a casino without any agreement.
     function buy(uint16 _id) payable public returns (bool) {
 		Casino storage item = allCasinos[_id];
 		uint oldPrice = item.price;
 		require(oldPrice > 0);
 		require(msg.value >= oldPrice);
-		
+
 		address oldOwner = item.owner;
 		address newOwner = msg.sender;
 		require(oldOwner != address(0));
 		require(oldOwner != newOwner);
 		require(isNormalUser(newOwner));
-		
+
 		item.price = calcNextPrice(oldPrice);
 		item.owner = newOwner;
 		emit Bought(_id, newOwner, oldPrice, oldOwner);
-		
+
 		// Transfer payment to old owner minus the developer's cut.
 		uint256 devCut = safeDiv(safeMul(oldPrice, masterCut), 10000);
 		oldOwner.transfer(safeSub(oldPrice, devCut));
 		masterHas = safeAdd(masterHas, devCut);
-		
+
 		uint256 excess = msg.value - oldPrice;
 		if (excess > 0) {
 			newOwner.transfer(excess);
 		}
     }
-	
-	
-	
-	/// @dev calculate next price 
+
+
+
+	/// @dev calculate next price
 	function calcNextPrice (uint _price) public pure returns (uint nextPrice) {
 		if (_price >= 5 ether ) {
 			return safeDiv(safeMul(_price, 110), 100);
@@ -389,23 +389,34 @@ contract Partners is OwnerBase, SafeMath, PartnerHolder {
 			return safeDiv(safeMul(_price, 200), 100);
 		}
 	}
-	
-	
+
+
 	// @dev Allows the CFO to capture the balance.
     function cfoWithdraw() external onlyCFO {
 		cfoAddress.transfer(masterHas);
 		masterHas = 0;
     }
-	
-	
-	
-	/// @dev cfo withdraw dead ether. 
+
+
+
+	/// @dev cfo withdraw dead ether.
     function withdrawDeadFund( address addr) external onlyCFO {
         uint fund = balances[addr];
         require (fund > 0);
         delete balances[addr];
         cfoAddress.transfer(fund);
     }
-	
-	
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

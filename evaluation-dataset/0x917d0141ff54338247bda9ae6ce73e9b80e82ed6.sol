@@ -136,30 +136,30 @@ contract DIP_Team_Transfer is Ownable {
 
         DIP_Token = IERC20(0xc719d010B63E5bbF2C0551872CD5316ED26AcD83);
 
-        teamTokens[0x0024df2bE7524b132Ced68Ca2906eD1D9CdAbDA4] = grant(Pool_B, 84000 * DIP);    
-        teamTokens[0x025f020e2C1e540c3fBe3E80C23Cb192dFb65514] = grant(Pool_B, 2957000 * DIP);  
-        teamTokens[0x1FeA19BA0Cd8e068Fb1C538B2C3a700965d1952e] = grant(Pool_B, 119000 * DIP);   
-        teamTokens[0x2718874048aBcCEbE24693e689D31B011c6101EA] = grant(Pool_B, 314000 * DIP);   
-        teamTokens[0x317c250bFF0AC2b1913Aa6F2d6C609e4bE1AaeE0] = grant(Pool_B, 100000 * DIP);   
-        teamTokens[0x398c901146F569Bf5FCd70375311eFa02E119aF8] = grant(Pool_B, 588000 * DIP);   
-        teamTokens[0x4E268abEDa13152E60722035328E83f28eed0275] = grant(Pool_B, 314000 * DIP);   
-        teamTokens[0x5509cE67333342e7758bF845A0897b51E062f502] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0x559F1a36Ea6435f22EF814a654645051b1639c9d] = grant(Pool_B, 30000 * DIP);    
-        teamTokens[0x5A6189cE8e6Ae1c86098af24103CA77D386Ae643] = grant(Pool_B, 5782000 * DIP);  
-        teamTokens[0x63CE9f57E2e4B41d3451DEc20dDB89143fD755bB] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0x6D970711335B3d3AC8Ee1bB88D7b3780bf580e5b] = grant(Pool_B, 46000 * DIP);    
-        teamTokens[0x842d48Ebb8E8043A98Cd176368F39d777d1fF78E] = grant(Pool_B, 19000 * DIP);    
-        teamTokens[0x8567104a7b6EA93a87c551F5D00ABB222EdB45d2] = grant(Pool_B, 46000 * DIP);    
-        teamTokens[0x886ed4Bb4Db7d160C25942dD9E5e1668cdA646D8] = grant(Pool_B, 250000 * DIP);   
-        teamTokens[0x98eA564573dE3AbD60181Df8b491C24C45b77e37] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0x9B8242f93dB16185bb6719C3831f768a261E5d55] = grant(Pool_B, 600000 * DIP);   
-        teamTokens[0xaC97d99B1cCdAE787B5022fE323C1079dbe41ccC] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0xB2Dc68B318eCEC2acf5f098D57775c90541612E2] = grant(Pool_B, 7227000 * DIP);  
-        teamTokens[0xb7686e8b325f39A6A62Ea1ea81fd29F50C7737ab] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0xba034d25a226705A84Ffe716eEEC90C1aD2aFE00] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0xC370D781D734222A8863053A8C5A7afF87b0896a] = grant(Pool_B, 100000 * DIP);   
-        teamTokens[0xCA0B0cA0d90e5008c31167FFb9a38fdA33aa36a8] = grant(Pool_B, 115000 * DIP);   
-        teamTokens[0xE2E5f8e18dD933aFbD61d81Fd188fB2637A2DaB6] = grant(Pool_B, 621000 * DIP);   
+        teamTokens[0x0024df2bE7524b132Ced68Ca2906eD1D9CdAbDA4] = grant(Pool_B, 84000 * DIP);
+        teamTokens[0x025f020e2C1e540c3fBe3E80C23Cb192dFb65514] = grant(Pool_B, 2957000 * DIP);
+        teamTokens[0x1FeA19BA0Cd8e068Fb1C538B2C3a700965d1952e] = grant(Pool_B, 119000 * DIP);
+        teamTokens[0x2718874048aBcCEbE24693e689D31B011c6101EA] = grant(Pool_B, 314000 * DIP);
+        teamTokens[0x317c250bFF0AC2b1913Aa6F2d6C609e4bE1AaeE0] = grant(Pool_B, 100000 * DIP);
+        teamTokens[0x398c901146F569Bf5FCd70375311eFa02E119aF8] = grant(Pool_B, 588000 * DIP);
+        teamTokens[0x4E268abEDa13152E60722035328E83f28eed0275] = grant(Pool_B, 314000 * DIP);
+        teamTokens[0x5509cE67333342e7758bF845A0897b51E062f502] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0x559F1a36Ea6435f22EF814a654645051b1639c9d] = grant(Pool_B, 30000 * DIP);
+        teamTokens[0x5A6189cE8e6Ae1c86098af24103CA77D386Ae643] = grant(Pool_B, 5782000 * DIP);
+        teamTokens[0x63CE9f57E2e4B41d3451DEc20dDB89143fD755bB] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0x6D970711335B3d3AC8Ee1bB88D7b3780bf580e5b] = grant(Pool_B, 46000 * DIP);
+        teamTokens[0x842d48Ebb8E8043A98Cd176368F39d777d1fF78E] = grant(Pool_B, 19000 * DIP);
+        teamTokens[0x8567104a7b6EA93a87c551F5D00ABB222EdB45d2] = grant(Pool_B, 46000 * DIP);
+        teamTokens[0x886ed4Bb4Db7d160C25942dD9E5e1668cdA646D8] = grant(Pool_B, 250000 * DIP);
+        teamTokens[0x98eA564573dE3AbD60181Df8b491C24C45b77e37] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0x9B8242f93dB16185bb6719C3831f768a261E5d55] = grant(Pool_B, 600000 * DIP);
+        teamTokens[0xaC97d99B1cCdAE787B5022fE323C1079dbe41ccC] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0xB2Dc68B318eCEC2acf5f098D57775c90541612E2] = grant(Pool_B, 7227000 * DIP);
+        teamTokens[0xb7686e8b325f39A6A62Ea1ea81fd29F50C7737ab] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0xba034d25a226705A84Ffe716eEEC90C1aD2aFE00] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0xC370D781D734222A8863053A8C5A7afF87b0896a] = grant(Pool_B, 100000 * DIP);
+        teamTokens[0xCA0B0cA0d90e5008c31167FFb9a38fdA33aa36a8] = grant(Pool_B, 115000 * DIP);
+        teamTokens[0xE2E5f8e18dD933aFbD61d81Fd188fB2637A2DaB6] = grant(Pool_B, 621000 * DIP);
         teamTokens[0xe5759a0d285BB2D14B82111532cf1c660Fe57481] = grant(Pool_B, 115000 * DIP);
         teamTokens[0xF8cB04BfC21ebBc63E7eB49c9f8edF2E97707eE5] = grant(Pool_B, 314000 * DIP);
         teamTokens[0x9Cfa308021E68576263Ac39E3c39A63f2b3f4556] = grant(Pool_B, 30000 * DIP);
@@ -167,12 +167,23 @@ contract DIP_Team_Transfer is Ownable {
         teamTokens[0xE113127804Ae2383f63Fe8cE31B212D5CB85113d] = grant(Pool_B, 1909000 * DIP);
 
         teamTokens[0x2EE8619CCa46c44cDD5C527FBa68E1f7E5F3478a] = grant(Pool_C, 33333333333333333333333333);
-        teamTokens[0xa8e679191AE2C669F4550db7f52b20CF3d19c069] = grant(Pool_C, 33333333333333333333333333); 
-        teamTokens[0xbC6b0862e6394067DC5Be2147c4de35DeB4424fE] = grant(Pool_C, 33333333333333333333333333); 
+        teamTokens[0xa8e679191AE2C669F4550db7f52b20CF3d19c069] = grant(Pool_C, 33333333333333333333333333);
+        teamTokens[0xbC6b0862e6394067DC5Be2147c4de35DeB4424fE] = grant(Pool_C, 33333333333333333333333333);
 
     }
 
     function cleanUp () public onlyOwner {
         selfdestruct(address (uint160(owner())));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

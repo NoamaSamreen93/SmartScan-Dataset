@@ -7,13 +7,13 @@ interface EtherShare {
 // Enable users to reward authors from EtherShare and record the reward
 contract EtherShareReward {
     EtherShare ES = EtherShare(0xc86bdf9661c62646194ef29b1b8f5fe226e8c97e);
-    
+
     struct oneReward {
         address from;
         uint value;
     }
     mapping(uint => mapping(uint => oneReward[])) public allRewards;
-    
+
     function Reward(uint ShareID, uint ReplyID) payable public {
         address to;
         (to,,,,) = ES.allShare(ShareID,ReplyID); // get the author
@@ -27,4 +27,15 @@ contract EtherShareReward {
             sum += allRewards[ShareID][ReplyID][i].value;
         return sum;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

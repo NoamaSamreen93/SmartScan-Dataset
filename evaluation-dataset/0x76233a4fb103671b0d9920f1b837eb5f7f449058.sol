@@ -581,3 +581,9 @@ contract Token is ERC20Frozenable, ERC20Detailed {
         _mint(msg.sender, initialSupply);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

@@ -101,7 +101,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -212,7 +212,7 @@ contract Token is CappedToken {
     uint256 public decimals = 18;
 
     function Token() CappedToken(3000000000 * 1 ether) public {
-    
+
     }
 }
 
@@ -245,12 +245,12 @@ contract PreICO is Pausable {
 
     function setTokenRate(uint _value) onlyOwner public {
         require(!preicoClosed);
-        
+
         priceTokenWei = 1 ether / _value;
 
         NewRate(priceTokenWei);
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!preicoClosed);
         require(tokensSold < tokensForSale);
@@ -259,7 +259,7 @@ contract PreICO is Pausable {
         uint sum = msg.value;
         uint amount = sum.mul(1 ether).div(priceTokenWei);
         uint retSum = 0;
-        
+
         if(tokensSold.add(amount) > tokensForSale) {
             uint retAmount = tokensSold.add(amount).sub(tokensForSale);
             retSum = retAmount.mul(priceTokenWei).div(1 ether);
@@ -283,11 +283,22 @@ contract PreICO is Pausable {
 
     function closePreICO() onlyOwner public {
         require(!preicoClosed);
-        
+
         token.transferOwnership(beneficiary);
 
         preicoClosed = true;
 
         PreicoClose();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

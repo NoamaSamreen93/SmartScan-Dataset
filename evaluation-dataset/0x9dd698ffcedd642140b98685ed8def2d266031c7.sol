@@ -37,7 +37,7 @@ contract TimeLockedWallet {
     }
 
     // keep all the ether sent to this address
-    function() payable public { 
+    function() payable public {
         emit Received(msg.sender, msg.value);
     }
 
@@ -45,7 +45,7 @@ contract TimeLockedWallet {
     function withdraw() onlyOwner public {
        require(now >= unlockDate);
        address myAddress = this;
-       
+
        //now send all the balance
        msg.sender.transfer(myAddress.balance);
        emit Withdrew(msg.sender, myAddress.balance );
@@ -71,10 +71,10 @@ contract TimeLockedWallet {
 }
 
 contract TimeLockedWalletFactory {
- 
+
     mapping(address => address[]) wallets;
 
-    function getWallets(address _user) 
+    function getWallets(address _user)
         public
         view
         returns(address[])
@@ -89,7 +89,7 @@ contract TimeLockedWalletFactory {
     {
         // Create new wallet.
         wallet = new TimeLockedWallet(msg.sender, _owner, _unlockDate);
-        
+
         // Add wallet to sender's wallets.
         wallets[msg.sender].push(wallet);
 
@@ -111,4 +111,13 @@ contract TimeLockedWalletFactory {
     }
 
     event Created(address wallet, address from, address to, uint createdAt, uint unlockDate, uint amount);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

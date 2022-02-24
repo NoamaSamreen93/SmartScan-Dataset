@@ -94,10 +94,10 @@ contract BPPToken is StandardToken {
 
     /* Public variables of the token */
     string public name;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public symbol;
     string public version = '1.0';
-    
+
     constructor() public {
         name = 'Bpp';
         decimals = 18;
@@ -114,4 +114,8 @@ contract BPPToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

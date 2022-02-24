@@ -315,7 +315,7 @@ contract ERC20Detailed is IERC20 {
 contract TitaniumToken is ERC20Detailed, ERC20
 {
     constructor (uint256 totalSupply) ERC20Detailed("Titanium", "TIT", 7) public {
-    
+
         _mint(msg.sender, totalSupply * 10 ** 7);
     }
 }
@@ -327,46 +327,46 @@ contract TitaniumCrowdsale
     uint256 constant price = 333;
     uint256 public offset;
     TitaniumToken public token;
-    
+
     address payable constant owner = 0x1fE398Fa2447b442a303fbB93F5d3cDaDB86d6BB;
-    
+
     constructor () public {
-        
+
         token = new TitaniumToken(20000000);
         offset = 10 ** (18 - (uint256)(token.decimals()));
     }
-    
+
     function () external payable
     {
         require(msg.value > 0);
-        buyTokens(msg.sender, msg.value);   
+        buyTokens(msg.sender, msg.value);
     }
-    
+
     function buyTokens(address sender, uint weiAmount) private
     {
         uint256 tokens = calculateNumberOfTokens(weiAmount);
         require(tokens > 0);
-        
+
         token.transfer(sender, tokens);
         owner.transfer(weiAmount);
     }
-    
-    function calculateNumberOfTokens(uint weiAmount) public view returns (uint256) 
+
+    function calculateNumberOfTokens(uint weiAmount) public view returns (uint256)
     {
         uint256 tokens = weiAmount.div(offset).mul(price);
         uint256 bonus = getBonus(weiAmount);
         if(bonus > 0)
         {
-            tokens = tokens.add(tokens.mul(bonus).div(100));    
+            tokens = tokens.add(tokens.mul(bonus).div(100));
         }
-        
+
         return tokens;
     }
-    
-    function getBonus(uint256 weiAmount) public pure returns (uint256) 
+
+    function getBonus(uint256 weiAmount) public pure returns (uint256)
     {
         uint256 bonus = 0;
-        
+
         if(weiAmount >= 0.55 ether && weiAmount < 1.1 ether)
         {
             bonus = 10;
@@ -379,7 +379,11 @@ contract TitaniumCrowdsale
         {
             bonus = 40;
         }
-        
+
         return bonus;
     }
+}
+function() payable external {
+	revert();
+}
 }

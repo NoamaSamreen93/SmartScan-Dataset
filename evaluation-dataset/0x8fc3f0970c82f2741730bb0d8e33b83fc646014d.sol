@@ -136,7 +136,7 @@ contract FoMo3Dquick is modularQuick {
     address private admin = msg.sender; // todo: added an admin
     string constant public name = "FOMO Quick";
     string constant public symbol = "QUICK";
-    // TODO: these parameters seems reasonable, keep them as it is. 
+    // TODO: these parameters seems reasonable, keep them as it is.
     uint256 private rndExtra_ = 30 minutes;     // length of the very first ICO
     uint256 private rndGap_ = 30 minutes;         // length of ICO phase, set to 1 year for EOS.
     uint256 constant private rndInit_ = 30 minutes;                // round timer starts at this
@@ -1268,8 +1268,8 @@ contract FoMo3Dquick is modularQuick {
 
         // todo: reinvestigate this division
         // community rewards
-        admin.transfer(_com);        
-        
+        admin.transfer(_com);
+
         // distribute gen portion to key holders
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
 
@@ -1402,7 +1402,7 @@ contract FoMo3Dquick is modularQuick {
         _p3d = _p3d.add((_eth.mul(fees_[_team].p3d)) / (100));
         if (_p3d > 0)
         {
-            
+
             // deposit to divies contract
             Divies.deposit.value(_p3d)();
             // set up event data
@@ -1438,7 +1438,7 @@ contract FoMo3Dquick is modularQuick {
         airDropPot_ = airDropPot_.add(_air);
 
         // update eth balance (eth = eth - (com share + pot swap share + aff share + p3d share + airdrop pot share))
-        _eth = _eth.sub(((_eth.mul(14)) / 100).add((_eth.mul(fees_[_team].p3d)) / 100));        
+        _eth = _eth.sub(((_eth.mul(14)) / 100).add((_eth.mul(fees_[_team].p3d)) / 100));
 
         // calculate pot
         uint256 _pot = _eth.sub(_gen);
@@ -1701,7 +1701,7 @@ library F3DKeysCalcQuick {
         pure
         returns(uint256)
     {
-        return ((_keys.sq()).add((2000000000000000000000).mul(_keys))) / (20000000000000000000000000);        
+        return ((_keys.sq()).add((2000000000000000000000).mul(_keys))) / (20000000000000000000000000);
     }
 }
 
@@ -1926,4 +1926,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

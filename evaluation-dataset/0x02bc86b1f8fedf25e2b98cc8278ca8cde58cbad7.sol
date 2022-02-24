@@ -121,7 +121,7 @@ contract DrifeToken is ERC20Interface, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(spender != address(0));
@@ -134,7 +134,7 @@ contract DrifeToken is ERC20Interface, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens  from the 'from' account to the 'to' account
-    // 
+    //
     // NOTE: The calling account must already have sufficient tokens approve(...)-d
     // for spending from the 'from' account and
     // - 'From' account must have sufficient balance to transfer
@@ -143,7 +143,7 @@ contract DrifeToken is ERC20Interface, SafeMath {
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         require(from != address(0));
-        require(to != address(0));        
+        require(to != address(0));
         require(tokens <= balances[from]);
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -183,4 +183,15 @@ contract DrifeToken is ERC20Interface, SafeMath {
         revert();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

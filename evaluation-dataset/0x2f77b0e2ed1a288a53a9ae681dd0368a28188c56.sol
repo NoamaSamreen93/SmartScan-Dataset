@@ -42,13 +42,13 @@ contract Ownable {
     owner = msg.sender;
   }
 
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
 
- 
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -160,20 +160,20 @@ contract StandardToken is ERC20, BasicToken {
     uint public amountRaised;
     uint256 public buyPrice = 50000;
     bool public crowdsaleClosed;
-    
+
      function PAD() public {
       totalSupply_ = INITIAL_SUPPLY;
       balances[msg.sender] = INITIAL_SUPPLY;
       Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         Transfer(_from, _to, _value);
     }
 
@@ -195,4 +195,15 @@ contract StandardToken is ERC20, BasicToken {
         balances[msg.sender] = balances[msg.sender].sub(total);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

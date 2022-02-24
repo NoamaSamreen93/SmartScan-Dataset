@@ -238,7 +238,7 @@ contract DecentralizedExchanges is Pausable {
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
@@ -341,7 +341,7 @@ contract DecentralizedExchanges is Pausable {
         uint remain = info.eth.sub(info.fill);
 
         uint remainAmount = remain.mul(info.amount).div(info.eth);
-        
+
         uint tradeAmount = remainAmount < amount ? remainAmount : amount;
         // token从卖家转到合约
         ERC20(info.token).safeTransferFrom(msg.sender, this, tradeAmount);
@@ -350,9 +350,9 @@ contract DecentralizedExchanges is Pausable {
         require(total > 0);
 
         info.fill = info.fill.add(total);
-        
+
         msg.sender.transfer(total);
-        
+
         // token从合约转到买家
         if (info.isSpecialERC20) {
             SpecialERC20(info.token).transfer(info.owner, tradeAmount);
@@ -407,5 +407,11 @@ contract DecentralizedExchanges is Pausable {
 
         emit Trade(hash, info.owner, info.token, tradeAmount, msg.sender, total);
     }
-  
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

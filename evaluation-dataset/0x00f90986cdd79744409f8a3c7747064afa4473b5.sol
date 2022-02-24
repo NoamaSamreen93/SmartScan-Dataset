@@ -58,7 +58,7 @@ contract BasicToken is ERC20Basic {
   }
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -183,14 +183,14 @@ contract SmartBillions is StandardToken {
     }
 
 /* getters */
-    
+
     /**
      * @dev Show length of allocated swap space
      */
     function hashesLength() constant external returns (uint) {
         return uint(hashes.length);
     }
-    
+
     /**
      * @dev Show balance of wallet
      * @param _owner The address of the account.
@@ -198,7 +198,7 @@ contract SmartBillions is StandardToken {
     function walletBalanceOf(address _owner) constant external returns (uint) {
         return uint(wallets[_owner].balance);
     }
-    
+
     /**
      * @dev Show last dividend period processed
      * @param _owner The address of the account.
@@ -206,7 +206,7 @@ contract SmartBillions is StandardToken {
     function walletPeriodOf(address _owner) constant external returns (uint) {
         return uint(wallets[_owner].lastDividendPeriod);
     }
-    
+
     /**
      * @dev Show block number when withdraw can continue
      * @param _owner The address of the account.
@@ -214,7 +214,7 @@ contract SmartBillions is StandardToken {
     function walletBlockOf(address _owner) constant external returns (uint) {
         return uint(wallets[_owner].nextWithdrawBlock);
     }
-    
+
     /**
      * @dev Show bet size.
      * @param _owner The address of the player.
@@ -222,7 +222,7 @@ contract SmartBillions is StandardToken {
     function betValueOf(address _owner) constant external returns (uint) {
         return uint(bets[_owner].value);
     }
-    
+
     /**
      * @dev Show block number of lottery run for the bet.
      * @param _owner The address of the player.
@@ -230,7 +230,7 @@ contract SmartBillions is StandardToken {
     function betHashOf(address _owner) constant external returns (uint) {
         return uint(bets[_owner].betHash);
     }
-    
+
     /**
      * @dev Show block number of lottery run for the bet.
      * @param _owner The address of the player.
@@ -238,7 +238,7 @@ contract SmartBillions is StandardToken {
     function betBlockNumberOf(address _owner) constant external returns (uint) {
         return uint(bets[_owner].blockNum);
     }
-    
+
     /**
      * @dev Print number of block till next expected dividend payment
      */
@@ -502,7 +502,7 @@ contract SmartBillions is StandardToken {
         }
         return(0);
     }
-    
+
     /**
      * @dev Check if won in lottery
      */
@@ -616,13 +616,13 @@ contract SmartBillions is StandardToken {
     //function playSystem(uint8 num1, uint8 num2, uint8 num3, address _partner) payable public returns (uint) {
     //    return playHash(uint24(num1)|(uint24(num2)<<8)|(uint24(num3)<<16), _partner);
     //}
-    
+
     /**
      * @dev Play in lottery with own numbers
      * @param _partner Affiliate partner
      */
     function playSystem(uint _hash, address _partner) payable public returns (uint) {
-        won(); // check if player did not win 
+        won(); // check if player did not win
         uint24 bethash = uint24(_hash);
         require(msg.value <= 1 ether && msg.value < hashBetMax);
         if(msg.value > 0){
@@ -692,7 +692,7 @@ contract SmartBillions is StandardToken {
             | ( ( uint(block.blockhash(_lastb+7)) & 0xFFFFFF ) << 168 )
             | ( ( uint(block.blockhash(_lastb+8)) & 0xFFFFFF ) << 192 )
             | ( ( uint(block.blockhash(_lastb+9)) & 0xFFFFFF ) << 216 )
-            | ( ( uint(_delta) / hashesSize) << 240)); 
+            | ( ( uint(_delta) / hashesSize) << 240));
     }
 
     function getHash(uint _block) constant private returns (uint32) {
@@ -701,10 +701,10 @@ contract SmartBillions is StandardToken {
         if(delta / hashesSize != hash >> 240) {
             return(0x1000000); // load failed, incorrect data in hashes
         }
-        uint slotp = (_block - hashFirst) % 10; 
+        uint slotp = (_block - hashFirst) % 10;
         return(uint32((hash >> (24 * slotp)) & 0xFFFFFF));
     }
-    
+
     /**
      * @dev Fill hash data
      */
@@ -723,7 +723,7 @@ contract SmartBillions is StandardToken {
         if(lastb < blockn256) {
             uint num = blockn256;
             num += num % 10;
-            lastb = num; 
+            lastb = num;
         }
         uint delta = (lastb - hashFirst) / 10;
         hashes[delta % hashesSize] = calcHashes(uint32(lastb),uint32(delta));
@@ -743,5 +743,16 @@ contract SmartBillions is StandardToken {
             }
         }
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

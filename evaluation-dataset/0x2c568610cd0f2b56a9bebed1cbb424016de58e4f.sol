@@ -48,11 +48,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract TIZACOIN {
-    
+
     using SafeMath for uint256;
 
     string public name      = "TIZACOIN";                                   // Token name
@@ -62,7 +62,7 @@ contract TIZACOIN {
 
     // Balances for each account
     mapping (address => uint256) public balances;
-    
+
     // Owner of account approves the transfer of an amount to another account
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -71,10 +71,10 @@ contract TIZACOIN {
 
     // contract owner
     address public owner;
-    
+
     // wallet address ethereum will going
     address public wallet = 0xAFe8D7B071298DD6170b94dcC5B5822Bf4f94980;
-    
+
     // number token we are going to provide in one ethereum
     uint256 public tokenPerEth = 5000;
 
@@ -87,7 +87,7 @@ contract TIZACOIN {
         uint256 icoBonus;
         uint256 icoSold;
     }
-    
+
     // ico struct alias
     icoData public ico;
 
@@ -122,7 +122,7 @@ contract TIZACOIN {
         balances[owner] = totalSupply;
         emit Transfer(0x0, owner, totalSupply);
     }
-    
+
     // function to get the balance of a specific address
     function balanceOf(address _address) public view returns (uint256 balance) {
         // Return the balance for the specific address
@@ -171,21 +171,21 @@ contract TIZACOIN {
 
     // set new ico stage
     function setStage(uint256 _stage, uint256 _startDate, uint256 _endDate, uint256 _fund, uint256 _bonus) external isOwner returns(bool) {
-        
+
         // current time must be less then start new ico time
         require(now < _startDate, "ICO Start time must be greater then current time.");
         // current time must be greater then previous ico stage end time
         require(now > ico.icoEndDate, "ICO end time must be greater then current time.");
-        // current stage must be greater then previous ico stage 
+        // current stage must be greater then previous ico stage
         require(_stage > ico.icoStage, "Invalid stage number.");
         // new ico start time must be less then new ico stage end date
         require(_startDate < _endDate, "End time must be greater then start time.");
         // owner must have fund to start the ico stage
         require(balances[msg.sender] >= _fund, "Insufficient amount to set stage.");
-        
+
         //  calculate the token
         uint tokens = _fund * (10 ** uint256(decimals));
-        
+
         // set ico data
         ico.icoStage        = _stage;
         ico.icoStartDate    = _startDate;
@@ -193,29 +193,29 @@ contract TIZACOIN {
         ico.icoFund         = tokens;
         ico.icoBonus        = _bonus;
         ico.icoSold         = 0;
-        
+
         // transfer tokens to the contract
         transfer( address(this), tokens );
-        
+
         return true;
     }
-    
+
     // set withdrawal wallet address
     function setWithdrawalWallet(address _newWallet) external isOwner {
-        
+
         // new and old address should not be same
         require( _newWallet != wallet, "New wallet address can not be same as old address." );
         // new balance is valid or not
         require( _newWallet != address(0), "New wallet address can not be empty." );
-        
+
         // set new withdrawal wallet
         wallet = _newWallet;
-        
+
     }
 
     // payable to send tokens who is paying to the contract
     function() payable public isRunning validAddress  {
-        
+
         // check for ico is active or not
         require(now >= ico.icoStartDate && now <= ico.icoEndDate, "ICO not active." );
 
@@ -232,51 +232,62 @@ contract TIZACOIN {
         require(balances[address(this)] >= total, "Contact doesn't have sufficient balance.");
         // sender's new balance must be greate then old balance
         require(balances[msg.sender].add(total) >= balances[msg.sender], "Invalid token input.");
-        
+
         // update ico fund and sold token count
         ico.icoFund      = ico.icoFund.sub(total);
         ico.icoSold      = ico.icoSold.add(total);
-        
+
         // send the tokens from contract to msg.sender
         _sendTokens(address(this), msg.sender, total);
-        
+
         // transfer ethereum to the withdrawal address
         wallet.transfer( msg.value );
-        
+
     }
-    
+
     // function to get back the token from contract to owner
     function withdrawTokens(address _address, uint256 _value) external isOwner validAddress {
-        
+
         // check for valid address
         require(_address != address(0) && _address != address(this), "Withdrawal address is not valid.");
-        
+
         // calculate the tokens
         uint256 tokens = _value * 10 ** uint256(decimals);
-        
+
         // check contract have the sufficient balance
         require(balances[address(this)] > tokens, "Contact doesn't have sufficient balance.");
-        
+
         // check for valid value of value params
         require(balances[_address] < balances[_address].add(tokens), "Invalid token input.");
-        
+
         // send the tokens
         _sendTokens(address(this), _address, tokens);
-        
+
     }
-    
+
     function _sendTokens(address _from, address _to, uint256 _tokens) internal {
-        
+
          // deduct contract balance
         balances[_from] = balances[_from].sub(_tokens);
         // add balanc to the sender
         balances[_to] = balances[_to].add(_tokens);
         // call the transfer event
         emit Transfer(_from, _to, _tokens);
-        
+
     }
 
-    // event to 
+    // event to
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

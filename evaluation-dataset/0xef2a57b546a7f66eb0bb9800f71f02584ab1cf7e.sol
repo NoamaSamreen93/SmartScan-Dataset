@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -148,7 +148,7 @@ contract StandardToken is IERC20 {
     mapping (address => mapping (address => uint256)) internal _allowed;
 
     uint256 internal _totalSupply;
-    
+
     /**
      * @dev Total number of tokens in existence.
      */
@@ -324,7 +324,7 @@ contract FreezableToken is StandardToken, Ownable {
         frozenCheck(_from);
         frozenCheck(_to);
         return super.transferFrom(_from, _to, _value);
-    }    
+    }
 
     /**
      * @dev Rewrite the _approve function to check if the address participating is frozen.
@@ -406,8 +406,8 @@ contract BurnableToken is FreezableToken {
 }
 
 contract GGCToken is MintableToken, BurnableToken {
-    string public constant name = "Global Gold Coins"; // name of Token 
-    string public constant symbol = "GGC"; // symbol of Token 
+    string public constant name = "Global Gold Coins"; // name of Token
+    string public constant symbol = "GGC"; // symbol of Token
     uint8 public constant decimals = 18;
 
     /**
@@ -429,5 +429,14 @@ contract GGCToken is MintableToken, BurnableToken {
         require(_balances[msg.sender] >= amount, "Not enough tokens to transfer");
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
         return true;
-    }        
+    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

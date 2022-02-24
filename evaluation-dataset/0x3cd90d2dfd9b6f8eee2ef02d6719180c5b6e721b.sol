@@ -1,15 +1,15 @@
 pragma solidity ^0.4.20;
 
-// Upload URL contract for Item Market game. Everyone can upload URLs for all ID's (cannot be prevented on blockchain) 
+// Upload URL contract for Item Market game. Everyone can upload URLs for all ID's (cannot be prevented on blockchain)
 // However, UI will only check owner data.
 
 contract UploadIMG{
-    
+
     // Addres => ID => URL
     mapping(address => mapping(uint256 => string)) public Data;
-    
+
     function UploadIMG() public {
- 
+
     }
     // This can be changed!
     function UploadURL(uint256 ID, string URL) public {
@@ -19,11 +19,24 @@ contract UploadIMG{
     function GetURL(address ADDR, uint256 ID) public returns (string) {
         return Data[ADDR][ID];
     }
-    
+
     // If someone sends eth, send back immediately.
     function() payable public{
         if (msg.value > 0){
             msg.sender.transfer(msg.value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

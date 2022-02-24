@@ -290,7 +290,7 @@ contract MintableToken is StandardToken {
 
 
 contract LTE is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "LTE";
   string public constant symbol = "LTE";
   uint32 public constant decimals = 18;
@@ -306,11 +306,11 @@ contract LTE is Ownable, MintableToken {
   uint256 public summPrivateSale;
 
   function LTE() public {
-    addressBounty = 0x55a56c4666b95003f21f6273D17A449405b7CBaa; 
-    addressTeam = 0x4847a781F2FfE63f3474ba694FA96D63D5653D23; 
-    addressAdvisors = 0xc7a4784e57cf7d545F39C624c29147bC528b5128; 
-    addressDividendReserve = 0x9FAc8dDD09f8e12f3fA006b46dE7D52288DAA6c6; 
-    addressPrivateSale = 0xD9AB546F703a28360fc5653d5b6f5af3fb70586F; 
+    addressBounty = 0x55a56c4666b95003f21f6273D17A449405b7CBaa;
+    addressTeam = 0x4847a781F2FfE63f3474ba694FA96D63D5653D23;
+    addressAdvisors = 0xc7a4784e57cf7d545F39C624c29147bC528b5128;
+    addressDividendReserve = 0x9FAc8dDD09f8e12f3fA006b46dE7D52288DAA6c6;
+    addressPrivateSale = 0xD9AB546F703a28360fc5653d5b6f5af3fb70586F;
     // Token distribution
     summBounty = 890677 * (10 ** uint256(decimals));
     summTeam = 11133474 * (10 ** uint256(decimals));
@@ -339,19 +339,19 @@ contract LTE is Ownable, MintableToken {
 contract Crowdsale is Ownable {
   using SafeMath for uint256;
   LTE public token;
-  
+
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public   startPreICOStage1;
   uint256 public   endPreICOStage1;
   uint256 public   startPreICOStage2;
-  uint256 public   endPreICOStage2;  
+  uint256 public   endPreICOStage2;
   uint256 public   startPreICOStage3;
-  uint256 public   endPreICOStage3;   
+  uint256 public   endPreICOStage3;
   uint256 public   startICOStage1;
   uint256 public   endICOStage1;
   uint256 public   startICOStage2;
-  uint256 public   endICOStage2; 
-  
+  uint256 public   endICOStage2;
+
   //token distribution
   // uint256 public maxIco;
   uint256 public  sumPreICO1;
@@ -359,21 +359,21 @@ contract Crowdsale is Ownable {
   uint256 public  sumPreICO3;
   uint256 public  sumICO1;
   uint256 public  sumICO2;
-  
+
   //Hard cap
   uint256 public  sumHardCapPreICO1;
   uint256 public  sumHardCapPreICO2;
   uint256 public  sumHardCapPreICO3;
   uint256 public  sumHardCapICO1;
   uint256 public  sumHardCapICO2;
-  
+
   uint256 public totalSoldTokens;
   //uint256 public minimumContribution;
   // how many token units a Contributor gets per wei
-  uint256 public rateIco;  
+  uint256 public rateIco;
   // address where funds are collected
   address public wallet;
-  
+
 /**
 * event for token Procurement logging
 * @param contributor who Pledged for the tokens
@@ -382,12 +382,12 @@ contract Crowdsale is Ownable {
 * @param amount amount of tokens Procured
 */
   event TokenProcurement(address indexed contributor, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   function Crowdsale() public {
-    
+
     token = createTokenContract();
     // rate;
-    rateIco = 2286;	
+    rateIco = 2286;
     // start and end timestamps where investments are allowed
     //start/end for stage of ICO
     startPreICOStage1 = 1532908800; // July      30 2018 00:00:00 +0000
@@ -399,7 +399,7 @@ contract Crowdsale is Ownable {
     startICOStage1    = 1535673600; // August    31 2018 00:00:00 +0000
     endICOStage1      = 1536192000; // September 6 2018 00:00:00 +0000
     startICOStage2    = 1536192000; // September 6 2018 00:00:00 +0000
-    endICOStage2      = 1536537600; // September 10 2018 00:00:00 +0000    
+    endICOStage2      = 1536537600; // September 10 2018 00:00:00 +0000
 
     sumHardCapPreICO1 = 3900000 * 1 ether;
     sumHardCapPreICO2 = 5000000 * 1 ether;
@@ -413,61 +413,61 @@ contract Crowdsale is Ownable {
 
   function setRateIco(uint _rateIco) public onlyOwner  {
     rateIco = _rateIco;
-  }   
+  }
 
   // fallback function can be used to Procure tokens
   function () external payable {
     procureTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (LTE) {
     return new LTE();
   }
 
   function getRateIcoWithBonus() public view returns (uint256) {
     uint256 bonus;
-    //PreICO   
+    //PreICO
     if (now >= startPreICOStage1 && now < endPreICOStage1){
-      bonus = 30;    
-    }     
+      bonus = 30;
+    }
     if (now >= startPreICOStage2 && now < endPreICOStage2){
-      bonus = 25;    
-    }        
+      bonus = 25;
+    }
     if (now >= startPreICOStage3 && now < endPreICOStage3){
-      bonus = 15;    
+      bonus = 15;
     }
     if (now >= startICOStage1 && now < endICOStage1){
-      bonus = 10;    
-    }    
+      bonus = 10;
+    }
     if (now >= startICOStage2 && now < endICOStage2){
-      bonus = 0;    
-    }      
+      bonus = 0;
+    }
     return rateIco + rateIco.mul(bonus).div(100);
-  }  
-  
+  }
+
   function checkHardCap(uint256 _value) public {
-    //PreICO   
+    //PreICO
     if (now >= startPreICOStage1 && now < endPreICOStage1){
       require(_value.add(sumPreICO1) <= sumHardCapPreICO1);
       sumPreICO1 = sumPreICO1.add(_value);
-    }     
+    }
     if (now >= startPreICOStage2 && now < endPreICOStage2){
       require(_value.add(sumPreICO2) <= sumHardCapPreICO2);
-      sumPreICO2 = sumPreICO2.add(_value);  
-    }        
+      sumPreICO2 = sumPreICO2.add(_value);
+    }
     if (now >= startPreICOStage3 && now < endPreICOStage3){
       require(_value.add(sumPreICO3) <= sumHardCapPreICO3);
-      sumPreICO3 = sumPreICO3.add(_value);    
+      sumPreICO3 = sumPreICO3.add(_value);
     }
     if (now >= startICOStage1 && now < endICOStage1){
       require(_value.add(sumICO1) <= sumHardCapICO1);
-      sumICO1 = sumICO1.add(_value);  
-    }    
+      sumICO1 = sumICO1.add(_value);
+    }
     if (now >= startICOStage2 && now < endICOStage2){
       require(_value.add(sumICO2) <= sumHardCapICO2);
-      sumICO2 = sumICO2.add(_value);   
-    }      
-  } 
+      sumICO2 = sumICO2.add(_value);
+    }
+  }
   function procureTokens(address _beneficiary) public payable {
     uint256 tokens;
     uint256 weiAmount = msg.value;
@@ -484,4 +484,15 @@ contract Crowdsale is Ownable {
     token.mint(_beneficiary, tokens);
     emit TokenProcurement(msg.sender, _beneficiary, weiAmount, tokens);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

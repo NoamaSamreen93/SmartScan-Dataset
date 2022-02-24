@@ -1,9 +1,9 @@
 pragma solidity ^0.4.17;
 
 contract Base {
-  
+
   // Use safe math additions for extra security
-  
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -27,8 +27,8 @@ contract Base {
     assert(c >= a);
     return c;
   }
-  
-  
+
+
     event Deposit(address sender, uint value);
 
     event PayInterest(address receiver, uint value);
@@ -39,28 +39,28 @@ contract Base {
 
 
 contract InterestFinal is Base {
-    
+
     address public creator;
-    address public OwnerO; 
+    address public OwnerO;
     address public Owner1;
     uint256 public etherLimit = 2 ether;
-    
+
     mapping (address => uint256) public balances;
     mapping (address => uint256) public interestPaid;
 
     function initOwner(address owner) {
         OwnerO = owner;
     }
-    
+
     function initOwner1(address owner) internal {
         Owner1 = owner;
     }
-    
-    /* This function is called automatically when constructing 
-        the contract and will 
+
+    /* This function is called automatically when constructing
+        the contract and will
         set the owners as the trusted administrators
     */
-    
+
     function InterestFinal(address owner1, address owner2) {
         creator = msg.sender;
         initOwner(owner1);
@@ -74,16 +74,16 @@ contract InterestFinal is Base {
         }
     }
 
-    /* 
-    
+    /*
+
     Minimum investment is 2 ether
      which will be kept in the contract
      and the depositor will earn interest on it
      remember to check your gas limit
-    
-    
+
+
      */
-    
+
     function deposit(address sender) payable {
         if (msg.value >= etherLimit) {
             uint amount = msg.value;
@@ -91,9 +91,9 @@ contract InterestFinal is Base {
             Deposit(sender, msg.value);
         }
     }
-    
+
     // calculate interest rate
-    
+
     function calculateInterest(address investor, uint256 interestRate) returns (uint256) {
         return balances[investor] * (interestRate) / 100;
     }
@@ -106,17 +106,17 @@ contract InterestFinal is Base {
             }
         }
     }
-    
+
     function currentBalance() returns (uint256) {
         return this.balance;
     }
-    
-    
-        
-    /* 
-     
-     ############################################################ 
-     
+
+
+
+    /*
+
+     ############################################################
+
         The pay interest function is called by an administrator
         -------------------
     */
@@ -127,4 +127,15 @@ contract InterestFinal is Base {
             payout(recipient, weiAmount);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

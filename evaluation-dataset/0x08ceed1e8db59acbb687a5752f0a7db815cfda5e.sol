@@ -95,7 +95,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Ownable {
 
@@ -121,13 +121,13 @@ contract BasicToken is ERC20Basic, Ownable {
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
 }
 
 
@@ -188,7 +188,7 @@ contract StandardToken is ERC20, BasicToken {
 
     /**
     * approve should be called when allowed[_spender] == 0. To increment
-    * allowed value is better to use this function to avoid 2 calls (and wait until 
+    * allowed value is better to use this function to avoid 2 calls (and wait until
     * the first transaction is mined)
     * From MonolithDAO Token.sol
     */
@@ -222,7 +222,7 @@ contract Pausable is StandardToken {
     bool public paused = false;
 
     address public founder;
-    
+
     /**
     * @dev modifier to allow actions only when the contract IS paused
     */
@@ -304,4 +304,15 @@ contract MyAdvancedToken is PausableToken {
         balances[msg.sender] = totalSupply;
         emit Transfer(0x0, msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

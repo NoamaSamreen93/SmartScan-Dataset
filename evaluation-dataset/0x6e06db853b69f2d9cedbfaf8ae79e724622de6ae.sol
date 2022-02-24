@@ -8,7 +8,7 @@ contract owned {
     constructor() public payable {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -25,7 +25,7 @@ contract owned {
 }
 
 contract Crowdsale is owned {
-    
+
     uint256 public totalSupply;
     string public priceOneTokenSokol = "1 token SOKOL = 0.01 ETH";
     mapping (address => uint256) public balanceOf;
@@ -65,7 +65,7 @@ contract Crowdsale is owned {
 }
 
 contract Token is Crowdsale {
-    
+
     string  public name        = "Sokolov Coin";
     string  public symbol      = "SOKOL";
     uint8   public decimals    = 0;
@@ -85,8 +85,16 @@ contract Token is Crowdsale {
 contract SokolCrowdsale is Token {
 
     constructor() public payable Token() {}
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(address(this).balance);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -7,7 +7,7 @@ contract DPToken{
   string public symbol = "3DP";
   uint8 public  decimals = 2;
   uint256 public totalSupply=30000000000;
-  
+
   mapping (address => uint256) public balanceOf;
   mapping (address => mapping (address => uint256)) public allowance;
   event Transfer(address indexed from, address indexed to, uint256 value);
@@ -17,10 +17,10 @@ contract DPToken{
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = 30000000000;  
+        totalSupply = 30000000000;
         balanceOf[msg.sender] = totalSupply;
-        name = tokenName;                   
-        symbol = tokenSymbol;               
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -62,20 +62,24 @@ contract DPToken{
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);              
-        require(_value <= allowance[_from][msg.sender]);  
-        balanceOf[_from] -= _value;                       
-        allowance[_from][msg.sender] -= _value;           
-        totalSupply -= _value;                            
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

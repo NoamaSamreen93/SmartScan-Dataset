@@ -60,7 +60,7 @@ contract Token is SafeMath {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Burned(uint amount);
 }
 
@@ -114,7 +114,7 @@ contract StandardToken is Token {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-    
+
     function burn(){
     	//if tokens have not been burned already and the ICO ended
     	if(!burned && now> icoEnd){
@@ -129,76 +129,76 @@ contract StandardToken is Token {
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
-    
+
     uint256 public icoStart = 1520244000;
-    
+
     uint256 public icoEnd = 1520244000 + 45 days;
-    
+
     //ownerFreezeTokens tokens will be freezed during this period after ICO
     uint256 public blockPeriod = 1 years;
-    
+
     //after this period after ICO end token holders can operate with them
     uint256 public lockedPeriod = 15 days;
-    
+
     //owners negotiable token that he can spend in any time
     uint256 public ownerNegTokens = 13500000000000000000000000;
-    
+
     //owner tokens to be feezed on year
     uint256 public ownerFreezeTokens = 13500000000000000000000000;
-    
+
     //max number of tokens that can be sold
-    uint256 public tokensToSell = 63000000000000000000000000; 
-    
+    uint256 public tokensToSell = 63000000000000000000000000;
+
     bool burned = false;
-    
-    string public name;                   
-    uint8 public decimals = 18;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei = 0;          
+
+    string public name;
+    uint8 public decimals = 18;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei = 0;
     address public fundsWallet;
 }
 
 contract EpsToken is StandardToken {
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function EpsToken() {
-        balances[msg.sender] = 90000000000000000000000000;              
-        totalSupply = 90000000000000000000000000;                     
-        name = "Epsilon";                                            
-        symbol = "EPS";                                             
-        unitsOneEthCanBuy = 28570;                                      
-        fundsWallet = msg.sender;                         
+        balances[msg.sender] = 90000000000000000000000000;
+        totalSupply = 90000000000000000000000000;
+        name = "Epsilon";
+        symbol = "EPS";
+        unitsOneEthCanBuy = 28570;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
-        
+
         if (now < icoStart || now > icoEnd || tokensToSell <= 0) {
             return;
         }
-        
+
         totalEthInWei = totalEthInWei + msg.value;
         uint256 amount = msg.value * unitsOneEthCanBuy;
         uint256 valueInWei = msg.value;
-        
+
         if (tokensToSell < amount) {
             amount = tokensToSell;
             valueInWei = amount / unitsOneEthCanBuy;
             msg.sender.transfer(msg.value - valueInWei);
         }
-        
+
         tokensToSell -= amount;
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        
-        
+
+
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(valueInWei);                               
+        fundsWallet.transfer(valueInWei);
     }
 
     /* Approves and then calls the receiving contract */
@@ -212,4 +212,15 @@ contract EpsToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

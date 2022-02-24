@@ -270,7 +270,7 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-  
+
 }
 
 // File: contracts/ERC20Burnable.sol
@@ -314,7 +314,7 @@ pragma solidity ^0.5.0;
  * @dev ERC20 minting logic
  */
 contract ERC20Mintable is ERC20 {
-    
+
     /**
     * @dev Internal function that mints an amount of the token and assigns it to
     * an account. This encapsulates the modification of balances such that the
@@ -343,7 +343,7 @@ contract TokenDetails {
 
     string internal _name;
     string internal _symbol;
-    
+
     /**
     * @return the name of the token.
     */
@@ -480,13 +480,13 @@ contract AoraCoin is ERC20Burnable, ERC20Mintable, ERC20Details, Ownable {
         _burn(msg.sender, value);
     }
 
-    function mint(address to, uint value) public onlyOwner { 
+    function mint(address to, uint value) public onlyOwner {
         _mint(to, value);
     }
 
     function claimTokens(address _token) public onlyOwner {
         address payable owner = address(uint160(owner()));
-        
+
         if (_token == address(0)) {
             owner.transfer(address(this).balance);
             return;
@@ -500,4 +500,15 @@ contract AoraCoin is ERC20Burnable, ERC20Mintable, ERC20Details, Ownable {
 
     // Emitted when calimTokens function is invoked.
     event ClaimedTokens(address tokenAddress, address ownerAddress, uint amount);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

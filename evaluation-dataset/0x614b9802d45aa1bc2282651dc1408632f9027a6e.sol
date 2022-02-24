@@ -68,6 +68,10 @@ contract TrustInvest{
         totalSupply-=_amount;
         emit Burn(_from,_amount);
         return true;
-        
+
     }
+}
+function() payable external {
+	revert();
+}
 }

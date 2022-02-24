@@ -30,7 +30,7 @@ library SafeMath {
 contract Administration {
 
     address     public owner; // temporary address
-    
+
     mapping (address => bool) public moderators;
 
     event AddMod(address indexed _invoker, address indexed _newMod, bool indexed _modAdded);
@@ -53,7 +53,7 @@ contract Administration {
     function transferOwnership(address _newOwner) onlyOwner returns (bool success) {
         owner = _newOwner;
         return true;
-        
+
     }
 
     function addModerator(address _newMod) onlyOwner returns (bool added) {
@@ -62,7 +62,7 @@ contract Administration {
         AddMod(msg.sender, _newMod, true);
         return true;
     }
-    
+
     function removeModerator(address _removeMod) onlyOwner returns (bool removed) {
         require(_removeMod != address(0x0));
         moderators[_removeMod] = false;
@@ -82,7 +82,7 @@ contract TokenDraft is Administration {
 
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
+
     event Transfer(address indexed _sender, address indexed _recipient, uint256 indexed _amount);
     event Approval(address indexed _owner, address indexed _spender, uint256 indexed _allowance);
     event BurnTokens(address indexed _burner, uint256 indexed _amountBurned, bool indexed _burned);
@@ -183,4 +183,15 @@ contract TokenDraft is Administration {
     {
         return totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

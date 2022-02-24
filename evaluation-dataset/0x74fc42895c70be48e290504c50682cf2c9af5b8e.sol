@@ -55,7 +55,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused {
         paused = false;
         Unpause();
@@ -142,7 +142,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -177,7 +177,7 @@ contract Token is BurnableToken, Ownable {
     string public name = "RealStart Token";
     string public symbol = "RST";
     uint256 public decimals = 18;
-    
+
     uint256 public INITIAL_SUPPLY = 10000000 * 1 ether;                             // Amount tokens
 
     function Token() {
@@ -200,12 +200,12 @@ contract Crowdsale is Pausable {
     uint public priceTokenWei = 1 ether / 2000;
     uint public priceTokenWeiPreICO = 333333333333333; // 1 ether / 3000;
 
-    uint public startTime = 1513299600;                                             
-    uint public endTime = 1517360399;                                               
+    uint public startTime = 1513299600;
+    uint public endTime = 1517360399;
     bool public crowdsaleFinished = false;
     bool public refundOpen = false;
 
-    mapping(address => uint256) saleBalances; 
+    mapping(address => uint256) saleBalances;
 
     event NewContribution(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
     event Refunded(address indexed holder, uint256 etherAmount);
@@ -218,7 +218,7 @@ contract Crowdsale is Pausable {
     function() payable {
         purchase();
     }
-    
+
     /// @dev Test purchase: new Crowdsale(); $0.purchase()(10); new $0.token.Token(); $2.balanceOf(@0) == 2e+22
     /// @dev Test min purchase: new Crowdsale(); !$0.purchase()(0.0009); $0.purchase()(0.001)
     /// @dev Test max purchase: new Crowdsale(); !$0.purchase()(10001); $0.purchase()(10000)
@@ -231,7 +231,7 @@ contract Crowdsale is Pausable {
         uint sum = msg.value;
         uint amount = sum.div(priceTokenWeiPreICO).mul(1 ether);
         uint retSum = 0;
-        
+
         if(tokensSold.add(amount) > tokensForSale) {
             uint retAmount = tokensSold.add(amount).sub(tokensForSale);
             retSum = retAmount.mul(priceTokenWeiPreICO).div(1 ether);
@@ -267,13 +267,13 @@ contract Crowdsale is Pausable {
         else {
             beneficiary.transfer(this.balance);
         }
-        
+
         token.transferOwnership(beneficiary);
         crowdsaleFinished = true;
 
         Withdraw();
     }
-    
+
     function refund() {
         require(crowdsaleFinished);
         require(refundOpen);
@@ -285,7 +285,23 @@ contract Crowdsale is Pausable {
         refundedWei = refundedWei.add(sum);
 
         msg.sender.transfer(sum);
-        
+
         Refunded(msg.sender, sum);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

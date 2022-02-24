@@ -1,6 +1,6 @@
 // Bravo Coin ICO Phase 3
 // 1 ETH = 2857 BRV
-// 1 BRV = 0.00035 ETH 
+// 1 BRV = 0.00035 ETH
 
 pragma solidity ^0.4.18;
 
@@ -80,20 +80,20 @@ library SafeMath {
     uint256 c = a * b;
     assert(c / a == b);
     return c; }
-    
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c; }
-    
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b; }
-    
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
     return c;}}
-    
+
 contract ERC20Basic {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
@@ -105,3 +105,14 @@ contract ERC20 is ERC20Basic {
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

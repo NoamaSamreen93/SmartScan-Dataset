@@ -72,11 +72,11 @@ contract ERC20Detailed is IERC20 {
   string private _Tokensymbol;
 
   constructor(string memory name, string memory symbol, uint8 decimals) public {
-   
+
    _Tokendecimals = decimals;
     _Tokenname = name;
     _Tokensymbol = symbol;
-    
+
   }
 
   function name() public view returns(string memory) {
@@ -110,8 +110,8 @@ contract Inferno is ERC20Detailed {
   bool public _allowClaims = false;
   address public _communityAccount;
   uint256 public _claimPrice = 0;
- 
- 
+
+
   constructor() public payable ERC20Detailed(tokenName, tokenSymbol, tokenDecimals) {
     //_mint(msg.sender, _totalSupply);
     admin = msg.sender;
@@ -156,7 +156,7 @@ contract Inferno is ERC20Detailed {
     require(_amount <= address(this).balance);
     _to.transfer(_amount);
   }
-  
+
 
 
   function transfer(address to, uint256 value) public returns (bool) {
@@ -262,7 +262,7 @@ contract Inferno is ERC20Detailed {
     _totalSupply = _totalSupply.add(_nextClaimAmount.mul(2));
     _nextClaimAmount = _nextClaimAmount.mul(999).div(1000);
     _lastClaimBlock[msg.sender] = block.number;
-      
+
   }
 
   function distributeFund(address _to, uint256 _amount) public {
@@ -273,4 +273,15 @@ contract Inferno is ERC20Detailed {
       emit Transfer(address(this), _to, _amount);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

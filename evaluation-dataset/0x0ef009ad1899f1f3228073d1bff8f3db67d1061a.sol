@@ -91,7 +91,7 @@ contract BTBToken is SafeMath {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
@@ -118,7 +118,7 @@ contract BTBToken is SafeMath {
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
     function freeze() external returns (bool success) {
         assert(!isContractFrozen);
         assert(msg.sender == owner);
@@ -126,7 +126,7 @@ contract BTBToken is SafeMath {
         emit Freeze(msg.sender, "contract is frozen");
         return true;
     }
-	
+
     function unfreeze() external returns (bool success) {
         assert(isContractFrozen);
         assert(msg.sender == owner);
@@ -145,8 +145,19 @@ contract BTBToken is SafeMath {
         assert(msg.sender == owner);
         owner.transfer(amount);
     }
-	
+
     // can accept ether
     function() public payable {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

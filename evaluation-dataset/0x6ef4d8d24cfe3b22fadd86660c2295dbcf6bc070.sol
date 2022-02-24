@@ -15,8 +15,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -58,7 +58,7 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = 0x0;
     }
@@ -105,7 +105,7 @@ contract ERC20 {
 
 
 interface TokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
@@ -140,10 +140,10 @@ contract ROA is ERC20, Ownable, Pausable {
     }
 
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
-        
+
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -161,7 +161,7 @@ contract ROA is ERC20, Ownable, Pausable {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -175,7 +175,7 @@ contract ROA is ERC20, Ownable, Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         require(isContract(_spender));
         TokenRecipient spender = TokenRecipient(_spender);
@@ -219,4 +219,10 @@ contract ROA is ERC20, Ownable, Pausable {
         return size > 0;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -16,7 +16,7 @@ contract owned {
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
     }
-}    
+}
 
 contract x32323 is owned{
 
@@ -187,4 +187,15 @@ contract x32323 is owned{
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

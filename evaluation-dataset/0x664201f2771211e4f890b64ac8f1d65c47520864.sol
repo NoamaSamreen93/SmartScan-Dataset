@@ -117,31 +117,31 @@ contract RegistryInterface {
 // File: contracts/lib/platform/SampleContest.sol
 
 /*
-Contest where users can bond to contestant curves which mint tokens( unbondabe*), 
+Contest where users can bond to contestant curves which mint tokens( unbondabe*),
 winner decided by oracle
 contract unbonds from loser curves
 holders of winning token allowed to take share of reserve token(zap) which was unbonded from loser curves
 
 Starting Contest:
-    
+
     deploys with contest uninitialized: status = Uninitialized
-    
-    anyone can initialize new token:backed curve 
-    
+
+    anyone can initialize new token:backed curve
+
     owner initializes contest with oracle: status = Initialized
 
 Ending Contest:
-    
+
     owner calls close: status = ReadyToSettle
-    
+
     oracle calls judge to set winning curve: status = Judged
-    
+
     anyone calls settle, contest unbonds from losing curves: status = Settled
-    
-    holders of winnning token call redeem to retrieve their share of reserve token 
+
+    holders of winnning token call redeem to retrieve their share of reserve token
     based on their holding of winning token
-    
-    *holders of winning token can optionally unbond 
+
+    *holders of winning token can optionally unbond
 */
 
 contract SampleContest is Ownable {
@@ -152,16 +152,16 @@ contract SampleContest is Ownable {
     TokenFactoryInterface public tokenFactory;
     BondageInterface bondage;
 
-    enum ContestStatus { 
-        Uninitialized,    //  
+    enum ContestStatus {
+        Uninitialized,    //
         Initialized,      // ready for buys
-        ReadyToSettle,    // ready for judgement 
-        Judged,           // winner determined 
-        Settled           // value of winning tokens determined 
+        ReadyToSettle,    // ready for judgement
+        Judged,           // winner determined
+        Settled           // value of winning tokens determined
     }
 
     address public oracle;    // address of oracle who will choose the winner
-    bytes32 public winner;    // curve identifier of the winner 
+    bytes32 public winner;    // curve identifier of the winner
     uint256 public winValue;  // final value of the winning token
     ContestStatus public status; //state of contest
 
@@ -170,36 +170,36 @@ contract SampleContest is Ownable {
 
     mapping(address => uint8) public redeemed; // map of address redemption state
     address[] public redeemed_list;
-    
+
     event DotTokenCreated(address tokenAddress);
-    event Bonded(bytes32 indexed endpoint, uint256 indexed numDots, address indexed sender); 
+    event Bonded(bytes32 indexed endpoint, uint256 indexed numDots, address indexed sender);
     event Unbonded(bytes32 indexed endpoint, uint256 indexed numDots, address indexed sender);
 
     event Initialized(address indexed oracle);
     event Closed();
     event Judged(bytes32 winner);
-    event Settled(uint256 winValue, uint256 winTokens); 
+    event Settled(uint256 winValue, uint256 winTokens);
     event Reset();
 
     constructor(
-        address coordinator, 
+        address coordinator,
         address factory,
         uint256 providerPubKey,
-        bytes32 providerTitle 
+        bytes32 providerTitle
     ){
-        coord = ZapCoordinatorInterface(coordinator); 
+        coord = ZapCoordinatorInterface(coordinator);
         reserveToken = FactoryTokenInterface(coord.getContract("ZAP_TOKEN"));
         //always allow bondage to transfer from wallet
         reserveToken.approve(coord.getContract("BONDAGE"), ~uint256(0));
         tokenFactory = TokenFactoryInterface(factory);
 
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         registry.initiateProvider(providerPubKey, providerTitle);
         status = ContestStatus.Uninitialized;
     }
 
 // contest lifecycle
- 
+
     function initializeContest(
         address oracleAddress
     ) onlyOwner public {
@@ -210,7 +210,7 @@ contract SampleContest is Ownable {
     }
 
     function close() onlyOwner {
-        status = ContestStatus.ReadyToSettle; 
+        status = ContestStatus.ReadyToSettle;
         emit Closed();
     }
 
@@ -230,15 +230,15 @@ contract SampleContest is Ownable {
         for( uint256 i = 0; i < curves_list.length; i++) {
 
             if(curves_list[i] != winner) {
-                dots =  bondage.getDotsIssued(address(this), curves_list[i]);  
+                dots =  bondage.getDotsIssued(address(this), curves_list[i]);
                 if( dots > 0) {
-                    bondage.unbond(address(this), curves_list[i], dots);                 
-                }  
+                    bondage.unbond(address(this), curves_list[i], dots);
+                }
             }
-        } 
+        }
 
-        // how many winning dots    
-        uint256 numWin =  bondage.getDotsIssued(address(this), winner);  
+        // how many winning dots
+        uint256 numWin =  bondage.getDotsIssued(address(this), winner);
         // redeemable value of each dot token
         winValue = reserveToken.balanceOf(address(this)) / numWin;
         status = ContestStatus.Settled;
@@ -246,35 +246,35 @@ contract SampleContest is Ownable {
     }
 
 
-    //TODO ensure all has been redeemed or enough time has elasped 
+    //TODO ensure all has been redeemed or enough time has elasped
     function reset() public {
         require(status == ContestStatus.Settled, "contest not settled");
         require(msg.sender == oracle);
-        
+
         delete redeemed_list;
         delete curves_list;
-        status = ContestStatus.Initialized; 
+        status = ContestStatus.Initialized;
         emit Reset();
     }
 
 /// TokenDotFactory methods
 
     function initializeCurve(
-        bytes32 endpoint, 
-        bytes32 symbol, 
+        bytes32 endpoint,
+        bytes32 symbol,
         int256[] curve
     ) public returns(address) {
-        
+
         require(curves[endpoint] == 0, "Curve endpoint already exists or used in the past. Please choose new");
-        
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         require(registry.isProviderInitiated(address(this)), "Provider not intiialized");
 
         registry.initiateProviderCurve(endpoint, curve, address(this));
         curves[endpoint] = newToken(bytes32ToString(endpoint), bytes32ToString(symbol));
-        curves_list.push(endpoint);        
+        curves_list.push(endpoint);
         registry.setProviderParameter(endpoint, toBytes(curves[endpoint]));
-        
+
         DotTokenCreated(curves[endpoint]);
         return curves[endpoint];
     }
@@ -282,7 +282,7 @@ contract SampleContest is Ownable {
     //whether this contract holds tokens or coming from msg.sender,etc
     function bond(bytes32 endpoint, uint numDots) public  {
 
-        require( status == ContestStatus.Initialized, " contest not live"); 
+        require( status == ContestStatus.Initialized, " contest not live");
 
         bondage = BondageInterface(coord.getContract("BONDAGE"));
         uint256 issued = bondage.getDotsIssued(address(this), endpoint);
@@ -304,9 +304,9 @@ contract SampleContest is Ownable {
     //whether this contract holds tokens or coming from msg.sender,etc
     function unbond(bytes32 endpoint, uint numDots) public {
 
-        require( status == ContestStatus.Settled, " contest not settled"); 
+        require( status == ContestStatus.Settled, " contest not settled");
         require(redeemed[msg.sender] == 0, "already redeeemed");
-        require(winner==endpoint, "only winners can unbond"); 
+        require(winner==endpoint, "only winners can unbond");
 
         bondage = BondageInterface(coord.getContract("BONDAGE"));
         uint issued = bondage.getDotsIssued(address(this), winner);
@@ -320,7 +320,7 @@ contract SampleContest is Ownable {
         FactoryTokenInterface curveToken = FactoryTokenInterface(curves[winner]);
 
         uint reward = winValue * FactoryTokenInterface(getTokenAddress(winner)).balanceOf(msg.sender);
-        
+
         //burn user's unbonded tokens
         curveToken.burnFrom(msg.sender, numDots);
 
@@ -333,9 +333,9 @@ contract SampleContest is Ownable {
     function newToken(
         string name,
         string symbol
-    ) 
+    )
         public
-        returns (address tokenAddress) 
+        returns (address tokenAddress)
     {
         FactoryTokenInterface token = tokenFactory.create(name, symbol);
         tokenAddress = address(token);
@@ -343,7 +343,7 @@ contract SampleContest is Ownable {
     }
 
     function getTokenAddress(bytes32 endpoint) public view returns(address) {
-        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY")); 
+        RegistryInterface registry = RegistryInterface(coord.getContract("REGISTRY"));
         return bytesToAddr(registry.getProviderParameter(address(this), endpoint));
     }
 
@@ -371,4 +371,20 @@ contract SampleContest is Ownable {
         }
         return address(result);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

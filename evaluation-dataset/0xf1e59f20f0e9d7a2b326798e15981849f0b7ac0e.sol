@@ -75,21 +75,21 @@ contract Ownable {
         owner = newOwner;
     }
 
-    /** 
+    /**
     * Stop ICO/Contract
     */
     function stop() onlyOwner public{
         stopped = true;
     }
 
-    /** 
+    /**
     * Start ICO/Contract
     */
     function start() onlyOwner public{
         stopped = false;
     }
 
-    /** 
+    /**
     Validate if ICO running
     */
     modifier isRunning {
@@ -141,7 +141,7 @@ contract BasicToken is ERC20Basic {
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
-    }  
+    }
 
 }
 
@@ -302,5 +302,14 @@ contract ExtoToken is StandardToken, BurnableToken {
         super.transferFrom(_from, _to, _value);
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

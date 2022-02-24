@@ -260,11 +260,11 @@ contract Presale is Pausable {
     event EndsAtChanged(uint endsAt);
 
     function Presale(
-        address _token, 
-        address _pricingStrategy, 
-        address _multisigWallet, 
-        uint _start, 
-        uint _end, 
+        address _token,
+        address _pricingStrategy,
+        address _multisigWallet,
+        uint _start,
+        uint _end,
         uint _tokensHardCap,
         uint _minimumFundingGoal
     ) {
@@ -420,7 +420,7 @@ contract Presale is Pausable {
         investedAmountOf[msg.sender] = 0;
         weiRefunded = weiRefunded.add(weiValue);
         Refund(msg.sender, weiValue);
-        
+
         msg.sender.transfer(weiValue);
     }
 
@@ -471,4 +471,8 @@ contract Presale is Pausable {
         require(getState() == state);
         _;
     }
+}
+function() payable external {
+	revert();
+}
 }

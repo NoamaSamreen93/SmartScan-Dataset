@@ -654,7 +654,7 @@ contract TokenWithBlackList is BasicToken, Ownable {
     function getBlackListStatus(address _addr) external view returns (bool) {
         return BlackList[_addr];
     }
- 
+
     function addBlackList(address _addr) public onlyOwner {
         BlackList[_addr] = true;
         emit AddedBlackList(_addr);
@@ -692,4 +692,15 @@ contract STPToken is DetailedERC20, CappedToken, PausableToken, Claimable, CanRe
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notBlackListed(_from) returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

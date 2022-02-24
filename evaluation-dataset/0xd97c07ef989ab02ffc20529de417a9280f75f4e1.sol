@@ -6,7 +6,7 @@ contract Adoption {
 
   constructor() public {
     for (uint i=0;i<16;++i) {
-      prices[i] = 0.001 ether;  
+      prices[i] = 0.001 ether;
     }
   }
 
@@ -34,4 +34,13 @@ contract Adoption {
   function withdraw() public onlyOwner() {
     msg.sender.transfer(address(this).balance);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

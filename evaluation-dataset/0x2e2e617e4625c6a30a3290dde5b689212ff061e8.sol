@@ -15,24 +15,24 @@ interface ERC20 {
 
 /**
  * Owned Contract
- * 
- * This is a contract trait to inherit from. Contracts that inherit from Owned 
+ *
+ * This is a contract trait to inherit from. Contracts that inherit from Owned
  * are able to modify functions to be only callable by the owner of the
  * contract.
- * 
+ *
  * By default it is impossible to change the owner of the contract.
  */
 contract Owned {
     /**
      * Contract owner.
-     * 
+     *
      * This value is set at contract creation time.
      */
     address owner;
 
     /**
      * Contract constructor.
-     * 
+     *
      * This sets the owner of the Owned contract at the time of contract
      * creation.
      */
@@ -51,14 +51,14 @@ contract Owned {
 
 /**
  * Aethia Chi Token Sale
- * 
+ *
  * This contract represent the 50% off sale for the in-game currency of Aethia.
  * The normal exchange rate in-game is 0.001 ETH for 1 CHI. During the sale, the
  * exchange rate will be 0.0005 ETH for 1 CHI.
- * 
+ *
  * The contract only exchanges whole (integer) values of CHI. If the sender
  * sends a value of 0.00051 ETH, the sender will get 1 CHI and 0.00001 ETH back.
- * 
+ *
  * In the case not enough CHI tokens remain to fully exchange the sender's value
  * from ETH to CHI, the remaining CHI will be paid out, and the remaining ETH
  * will be returned to the sender.
@@ -71,14 +71,14 @@ contract ChiSale is Owned {
 
     /**
      * The start date of the CHI sale in seconds since the UNIX epoch.
-     * 
+     *
      * This is equivalent to February 17th, 12:00:00 UTC.
      */
     uint256 constant START_DATE = 1518868800;
 
     /**
      * The end date of the CHI sale in seconds since the UNIX epoch.
-     * 
+     *
      * This is equivalent to February 19th, 12:00:00 UTC.
      */
     uint256 constant END_DATE = 1519041600;
@@ -87,7 +87,7 @@ contract ChiSale is Owned {
      * The price per CHI token in ETH.
      */
     uint256 tokenPrice = 0.0005 ether;
-    
+
     /**
      * The number of Chi tokens for sale.
      */
@@ -95,17 +95,17 @@ contract ChiSale is Owned {
 
     /**
      * Chi token sale event.
-     * 
-     * For audit and logging purposes, all chi token sales are logged by 
+     *
+     * For audit and logging purposes, all chi token sales are logged by
      * acquirer.
      */
     event LogChiSale(address indexed _acquirer, uint256 _amount);
 
     /**
      * Contract constructor.
-     * 
+     *
      * This passes the address of the Chi token contract address to the
-     * Chi sale contract. Additionally it sets the owner to the contract 
+     * Chi sale contract. Additionally it sets the owner to the contract
      * creator.
      */
     function ChiSale(address _chiTokenAddress) Owned() public {
@@ -114,7 +114,7 @@ contract ChiSale is Owned {
 
     /**
      * Buy Chi tokens.
-     * 
+     *
      * The cost of a Chi token during the sale is 0.0005 ether per token. This
      * contract accepts any amount equal to or above 0.0005 ether. It tries to
      * exchange as many Chi tokens for the sent value as possible. The remaining
@@ -123,7 +123,7 @@ contract ChiSale is Owned {
      * In the case where not enough Chi tokens are available for the to exchange
      * for the entirety of the sent value, an attempt will be made to exchange
      * as much as possible. The remaining ether is then sent back.
-     * 
+     *
      * The sale starts at February 17th, 12:00:00 UTC, and ends at February
      * 19th, 12:00:00 UTC, lasting a total of 48 hours. Transactions that occur
      * outside this time period are rejected.
@@ -139,7 +139,7 @@ contract ChiSale is Owned {
 
         // If there aren't enough tokens to exchange, try to exchange as many
         // as possible, and pay out the remainder. Else, if there are enough
-        // tokens, pay the remaining ether that couldn't be exchanged for tokens 
+        // tokens, pay the remaining ether that couldn't be exchanged for tokens
         // back to the sender.
         if (tokens > tokensForSale) {
             tokens = tokensForSale;
@@ -148,7 +148,7 @@ contract ChiSale is Owned {
         } else {
             remainder = msg.value % tokenPrice;
         }
-        
+
         tokensForSale -= tokens;
 
         LogChiSale(msg.sender, tokens);
@@ -173,7 +173,7 @@ contract ChiSale is Owned {
 
     /**
      * Withdraw all funds from contract.
-     * 
+     *
      * Additionally, this moves all remaining Chi tokens back to the original
      * owner to be used for redistribution.
      */
@@ -184,8 +184,19 @@ contract ChiSale is Owned {
 
         owner.transfer(this.balance);
     }
-    
+
     function remainingTokens() external view returns (uint256) {
         return tokensForSale;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

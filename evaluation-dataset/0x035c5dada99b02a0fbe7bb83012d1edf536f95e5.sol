@@ -8,7 +8,7 @@ contract FastGameMultiplier {
     //Проценты
 	uint constant public PRIZE_PERCENT = 3;
     uint constant public SUPPORT_PERCENT = 2;
-    
+
     //ограничения депозита
     uint constant public MAX_INVESTMENT =  0.2 ether;
     uint constant public MIN_INVESTMENT = 0.01 ether;
@@ -19,7 +19,7 @@ contract FastGameMultiplier {
     //успешность игры, минимальное количество участников
     uint constant public SIZE_TO_SAVE_INVEST = 10; //минимальное количество участников
     uint constant public TIME_TO_SAVE_INVEST = 5 minutes; //время после которого игру можно отменить
-    
+
     //сетка процентов для вложения в одном старте, старт каждый час (тестово)
     uint8[] MULTIPLIERS = [
         115, //первый
@@ -30,7 +30,7 @@ contract FastGameMultiplier {
     //описание депозита
     struct Deposit {
         address depositor; //Адрес депозита
-        uint128 deposit;   //Сумма депозита 
+        uint128 deposit;   //Сумма депозита
         uint128 expect;    //Сколько выплатить по депозиту (115%-125%)
     }
 
@@ -40,7 +40,7 @@ contract FastGameMultiplier {
         uint128 count;
     }
 
-	//Описание последнего и предпоследнего депозита 
+	//Описание последнего и предпоследнего депозита
     struct LastDepositInfo {
         uint128 index;
         uint128 time;
@@ -57,54 +57,54 @@ contract FastGameMultiplier {
     uint public prizeStageAmount = 0; //Сумма приза Prize в текущем запуске amount accumulated for the last depositor
     int public stage = 0; //Количество стартов Number of contract runs
     uint128 public lastDepositTime = 0; //Время последнего депозита
-    
+
     mapping(address => DepositCount) public depositsMade; //The number of deposits of different depositors
 
     constructor() public {
-        support = msg.sender; 
+        support = msg.sender;
         proceedToNewStage(getCurrentStageByTime() + 1);
     }
-    
+
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
         require(tx.gasprice <= GAS_PRICE_MAX * 1000000000);
         require(gasleft() >= 250000, "We require more gas!"); //условие ограничения газа
-        
+
         checkAndUpdateStage();
-        
+
         if(msg.value > 0){
             require(msg.value >= MIN_INVESTMENT && msg.value <= MAX_INVESTMENT); //Условие  депозита
-            require(lastDepositInfoForPrize.time <= now + MAX_IDLE_TIME); 
+            require(lastDepositInfoForPrize.time <= now + MAX_IDLE_TIME);
 
-            
+
 
             require(getNextStageStartTime() >= now + MAX_IDLE_TIME + 10 minutes);//нельзя инвестировать за MAX_IDLE_TIME до следующего старта
 
             //Pay to first investors in line
             if(currentQueueSize < SIZE_TO_SAVE_INVEST){ //страховка от плохого старта
-                
+
                 addDeposit(msg.sender, msg.value);
-                
+
             } else {
-                
+
                 addDeposit(msg.sender, msg.value);
-                pay(); 
-                
+                pay();
+
             }
-            
+
         } else if(msg.value == 0 && currentQueueSize > SIZE_TO_SAVE_INVEST){
-            
+
             withdrawPrize(); //выплата приза
-            
+
         } else if(msg.value == 0){
-            
+
             require(currentQueueSize <= SIZE_TO_SAVE_INVEST); //Для возврата должно быть менее, либо равно SIZE_TO_SAVE_INVEST игроков
             require(lastDepositTime > 0 && (now - lastDepositTime) >= TIME_TO_SAVE_INVEST); //Для возврата должно пройти время TIME_TO_SAVE_INVEST
-            
+
             returnPays(); //Вернуть все депозиты
-            
-        } 
+
+        }
     }
 
     //Used to pay to current investors
@@ -112,7 +112,7 @@ contract FastGameMultiplier {
         //Try to send all the money on contract to the first investors in line
         uint balance = address(this).balance;
         uint128 money = 0;
-        
+
         if(balance > prizeStageAmount) //The opposite is impossible, however the check will not do any harm
             money = uint128(balance - prizeStageAmount);
 
@@ -120,21 +120,21 @@ contract FastGameMultiplier {
         uint128 moneyS = uint128(money*SUPPORT_PERCENT/100);
         support.send(moneyS);
         money -= moneyS;
-        
+
         //We will do cycle on the queue
         for(uint i=currentReceiverIndex; i<currentQueueSize; i++){
 
             Deposit storage dep = queue[i]; //get the info of the first investor
 
             if(money >= dep.expect){  //If we have enough money on the contract to fully pay to investor
-                    
-                dep.depositor.send(dep.expect); 
-                money -= dep.expect;          
-                
+
+                dep.depositor.send(dep.expect);
+                money -= dep.expect;
+
                 //После выплаты депозиты + процента удаляется из очереди this investor is fully paid, so remove him
                 delete queue[i];
-            
-                
+
+
             }else{
                 //Here we don't have enough money so partially pay to investor
 
@@ -150,23 +150,23 @@ contract FastGameMultiplier {
 
         currentReceiverIndex = i; //Update the index of the current first investor
     }
-    
+
     function returnPays() private {
         //Try to send all the money on contract to the first investors in line
         uint balance = address(this).balance;
         uint128 money = 0;
-        
+
         if(balance > prizeAmount) //The opposite is impossible, however the check will not do any harm
             money = uint128(balance - prizeAmount);
-        
+
         //We will do cycle on the queue
         for(uint i=currentReceiverIndex; i<currentQueueSize; i++){
 
             Deposit storage dep = queue[i]; //get the info of the first investor
 
                 dep.depositor.send(dep.deposit); //Игра не состоялась, возврат
-                money -= dep.deposit;            
-                
+                money -= dep.deposit;
+
                 //После выплаты депозиты + процента удаляется из очереди this investor is fully paid, so remove him
                 delete queue[i];
 
@@ -192,14 +192,14 @@ contract FastGameMultiplier {
 
         //Compute the multiplier percent for this depositor
         uint multiplier = getDepositorMultiplier(depositor);
-        
+
         push(depositor, value, value*multiplier/100);
 
         //Increment number of deposits the depositors made this round
         c.count++;
 
         lastDepositTime = uint128(now);
-        
+
         //Save money for prize
         prizeStageAmount += value*PRIZE_PERCENT/100;
     }
@@ -217,10 +217,10 @@ contract FastGameMultiplier {
     function proceedToNewStage(int _stage) private {
         //Старт новой игры
         stage = _stage;
-        currentQueueSize = 0; 
+        currentQueueSize = 0;
         currentReceiverIndex = 0;
         lastDepositTime = 0;
-        prizeAmount += prizeStageAmount; 
+        prizeAmount += prizeStageAmount;
         prizeStageAmount = 0;
         delete queue;
         delete previosDepositInfoForPrize;
@@ -249,7 +249,7 @@ contract FastGameMultiplier {
         }
 
         queue[lastDepositInfoForPrize.index].depositor.send(prize);
-        
+
         proceedToNewStage(getCurrentStageByTime() + 1);
     }
 
@@ -317,4 +317,15 @@ contract FastGameMultiplier {
             timeLeft = int(lastDepositInfoForPrize.time + MAX_IDLE_TIME) - int(now);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

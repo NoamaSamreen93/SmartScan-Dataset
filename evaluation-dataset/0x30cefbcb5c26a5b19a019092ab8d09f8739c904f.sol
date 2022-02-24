@@ -11,7 +11,7 @@ Veredictum's Ventana token product.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See MIT Licence for further details.
 <https://opensource.org/licenses/MIT>.
 
@@ -43,7 +43,7 @@ contract VentanaTokenConfig
     // Owner has power to abort, discount addresses, sweep successful funds,
     // change owner, sweep alien tokens.
     address public          owner           = 0xF4b087Ad256ABC5BE11E0433B15Ed012c8AEC8B4; // veredictumPrimary address checksummed
-    
+
     // Fund wallet should also be audited prior to deployment
     // NOTE: Must be checksummed address!
     address public          fundWallet      = 0xd6514387236595e080B97c8ead1cBF12f9a6Ab65; // multiSig address checksummed
@@ -53,18 +53,18 @@ contract VentanaTokenConfig
 
     // Ether market price in USD
     uint public constant    USD_PER_ETH     = 258; // calculated from 60 day moving average as at 14th August 2017
-    
+
     // Minimum and maximum target in USD
     uint public constant    MIN_USD_FUND    = 2000000;  // $2m
     uint public constant    MAX_USD_FUND    = 20000000; // $20m
-    
+
     // Non-KYC contribution limit in USD
     uint public constant    KYC_USD_LMT     = 10000;
-    
+
     // There will be exactly 300,000,000 tokens regardless of number sold
     // Unsold tokens are put into the Strategic Growth token pool
     uint public constant    MAX_TOKENS      = 300000000;
-    
+
     // Funding begins on 14th August 2017
     // `+ new Date('19:00 14 August 2017')/1000`
     uint public constant    START_DATE      = 1502701200; // Mon Aug 14 2017 19:00:00 GMT+1000 (AEST)
@@ -81,19 +81,19 @@ library SafeMath
         c = a + b;
         assert(c >= a);
     }
-    
+
     // a subtract b
     function sub(uint a, uint b) internal returns (uint c) {
         c = a - b;
         assert(c <= a);
     }
-    
+
     // a multiplied by b
     function mul(uint a, uint b) internal returns (uint c) {
         c = a * b;
         assert(a == 0 || c / a == b);
     }
-    
+
     // a divided by b
     function div(uint a, uint b) internal returns (uint c) {
         c = a / b;
@@ -129,18 +129,18 @@ contract ERC20Token
 /* Constants */
 
     // none
-    
+
 /* State variable */
 
     /// @return The Total supply of tokens
     uint public totalSupply;
-    
+
     /// @return Token symbol
     string public symbol;
-    
+
     // Token ownership mapping
     mapping (address => uint) balances;
-    
+
     // Allowances mapping
     mapping (address => mapping (address => uint)) allowed;
 
@@ -161,10 +161,10 @@ contract ERC20Token
 /* Modifiers */
 
     // none
-    
+
 /* Functions */
 
-    // Using an explicit getter allows for function overloading    
+    // Using an explicit getter allows for function overloading
     function balanceOf(address _addr)
         public
         constant
@@ -172,8 +172,8 @@ contract ERC20Token
     {
         return balances[_addr];
     }
-    
-    // Using an explicit getter allows for function overloading    
+
+    // Using an explicit getter allows for function overloading
     function allowance(address _owner, address _spender)
         public
         constant
@@ -196,7 +196,7 @@ contract ERC20Token
         returns (bool)
     {
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         return xfer(_from, _to, _amount);
     }
@@ -209,13 +209,13 @@ contract ERC20Token
         require(_amount <= balances[_from]);
 
         Transfer(_from, _to, _amount);
-        
+
         // avoid wasting gas on 0 token transfers
         if(_amount == 0) return true;
-        
+
         balances[_from] = balances[_from].sub(_amount);
         balances[_to]   = balances[_to].add(_amount);
-        
+
         return true;
     }
 
@@ -273,7 +273,7 @@ contract VentanaTokenAbstract
 
     // This fuse blows upon calling abort() which forces a fail state
     bool public __abortFuse = true;
-    
+
     // Set to true after the fund is swept to the fund wallet, allows token
     // transfers and prevents abort()
     bool public icoSuccessful;
@@ -283,23 +283,23 @@ contract VentanaTokenAbstract
 
     // An address authorised to take ownership
     address public newOwner;
-    
+
     // The Veredictum smart contract address
     address public veredictum;
-    
+
     // Total ether raised during funding
     uint public etherRaised;
-    
+
     // Preauthorized tranch discount addresses
     // holder => discount
     mapping (address => bool) public kycAddresses;
-    
+
     // Record of ether paid per address
     mapping (address => uint) public etherContributed;
 
     // Return `true` if MIN_FUNDS were raised
     function fundSucceeded() public constant returns (bool);
-    
+
     // Return `true` if MIN_FUNDS were not raised before END_DATE
     function fundFailed() public constant returns (bool);
 
@@ -308,33 +308,33 @@ contract VentanaTokenAbstract
 
     // Returns an amount in eth equivilent to USD at the set rate
     function usdToEth(uint) public constant returns(uint);
-    
+
     // Returns the USD value of ether at the set USD/ETH rate
     function ethToUsd(uint _wei) public constant returns (uint);
 
-    // Returns token/ether conversion given ether value and address. 
+    // Returns token/ether conversion given ether value and address.
     function ethToTokens(uint _eth)
         public constant returns (uint);
 
     // Processes a token purchase for a given address
     function proxyPurchase(address _addr) payable returns (bool);
 
-    // Owner can move funds of successful fund to fundWallet 
+    // Owner can move funds of successful fund to fundWallet
     function finaliseICO() public returns (bool);
-    
+
     // Registers a discounted address
     function addKycAddress(address _addr, bool _kyc)
         public returns (bool);
 
-    // Refund on failed or aborted sale 
+    // Refund on failed or aborted sale
     function refund(address _addr) public returns (bool);
 
     // To cancel token sale prior to START_DATE
     function abort() public returns (bool);
-    
+
     // Change the Veredictum backend contract address
     function changeVeredictum(address _addr) public returns (bool);
-    
+
     // For owner to salvage tokens sent to contract
     function transferAnyERC20Token(address tokenAddress, uint amount)
         returns (bool);
@@ -347,7 +347,7 @@ contract VentanaTokenAbstract
 
 \*----------------------------------------------------------------------------*/
 
-contract VentanaToken is 
+contract VentanaToken is
     ReentryProtected,
     ERC20Token,
     VentanaTokenAbstract,
@@ -359,7 +359,7 @@ contract VentanaToken is
 // Constants
 //
 
-    // USD to ether conversion factors calculated from `VentanaTokenConfig` constants 
+    // USD to ether conversion factors calculated from `VentanaTokenConfig` constants
     uint public constant TOKENS_PER_ETH = TOKENS_PER_USD * USD_PER_ETH;
     uint public constant MIN_ETH_FUND   = 1 ether * MIN_USD_FUND / USD_PER_ETH;
     uint public constant MAX_ETH_FUND   = 1 ether * MAX_USD_FUND / USD_PER_ETH;
@@ -396,13 +396,13 @@ contract VentanaToken is
         require(MAX_USD_FUND > MIN_USD_FUND);
         require(START_DATE > 0);
         require(FUNDING_PERIOD > 0);
-        
+
         // Setup and allocate token supply to 18 decimal places
         totalSupply = MAX_TOKENS * 1e18;
         balances[fundWallet] = totalSupply;
         Transfer(0x0, fundWallet, totalSupply);
     }
-    
+
     // Default function
     function ()
         payable
@@ -422,7 +422,7 @@ contract VentanaToken is
         return !__abortFuse
             || (now > END_DATE && etherRaised < MIN_ETH_FUND);
     }
-    
+
     // Funding succeeds if not aborted, minimum funds are raised before end date
     function fundSucceeded() public constant returns (bool)
     {
@@ -435,24 +435,24 @@ contract VentanaToken is
     {
         return USD_PER_ETH.mul(_wei).div(1 ether);
     }
-    
+
     // Returns the ether value of USD at the set USD/ETH rate
     function usdToEth(uint _usd) public constant returns (uint)
     {
         return _usd.mul(1 ether).div(USD_PER_ETH);
     }
-    
+
     // Returns the USD value of ether raised at the set USD/ETH rate
     function usdRaised() public constant returns (uint)
     {
         return ethToUsd(etherRaised);
     }
-    
-    // Returns the number of tokens for given amount of ether for an address 
+
+    // Returns the number of tokens for given amount of ether for an address
     function ethToTokens(uint _wei) public constant returns (uint)
     {
         uint usd = ethToUsd(_wei);
-        
+
         // Percent bonus funding tiers for USD funding
         uint bonus =
             usd >= 2000000 ? 35 :
@@ -461,8 +461,8 @@ contract VentanaToken is
             usd >= 25000   ? 15 :
             usd >= 10000   ? 10 :
             usd >= 5000    ? 5  :
-                             0;  
-        
+                             0;
+
         // using n.2 fixed point decimal for whole number percentage.
         return _wei.mul(TOKENS_PER_ETH).mul(bonus + 100).div(100);
     }
@@ -484,7 +484,7 @@ contract VentanaToken is
         delete __abortFuse;
         return true;
     }
-    
+
     // General addresses can purchase tokens during funding
     function proxyPurchase(address _addr)
         payable
@@ -495,7 +495,7 @@ contract VentanaToken is
         require(!icoSuccessful);
         require(now <= END_DATE);
         require(msg.value > 0);
-        
+
         // Non-KYC'ed funders can only contribute up to $10000 after prefund period
         if(!kycAddresses[_addr])
         {
@@ -505,22 +505,22 @@ contract VentanaToken is
 
         // Get ether to token conversion
         uint tokens = ethToTokens(msg.value);
-        
+
         // transfer tokens from fund wallet
         xfer(fundWallet, _addr, tokens);
-        
+
         // Update holder payments
         etherContributed[_addr] = etherContributed[_addr].add(msg.value);
-        
+
         // Update funds raised
         etherRaised = etherRaised.add(msg.value);
-        
+
         // Bail if this pushes the fund over the USD cap or Token cap
         require(etherRaised <= MAX_ETH_FUND);
 
         return true;
     }
-    
+
     // Owner can KYC (or revoke) addresses until close of funding
     function addKycAddress(address _addr, bool _kyc)
         public
@@ -534,7 +534,7 @@ contract VentanaToken is
         KYCAddress(_addr, _kyc);
         return true;
     }
-    
+
     // Owner can sweep a successful funding to the fundWallet
     // Contract can be aborted up until this action.
     function finaliseICO()
@@ -551,7 +551,7 @@ contract VentanaToken is
         fundWallet.transfer(this.balance);
         return true;
     }
-    
+
     // Refunds can be claimed from a failed ICO
     function refund(address _addr)
         public
@@ -559,7 +559,7 @@ contract VentanaToken is
         returns (bool)
     {
         require(fundFailed());
-        
+
         uint value = etherContributed[_addr];
 
         // Transfer tokens back to origin
@@ -569,7 +569,7 @@ contract VentanaToken is
         // garbage collect
         delete etherContributed[_addr];
         delete kycAddresses[_addr];
-        
+
         Refunded(_addr, value);
         if (value > 0) {
             _addr.transfer(value);
@@ -610,7 +610,7 @@ contract VentanaToken is
             require(Notify(veredictum).notify(msg.sender, _amount));
         return true;
     }
-    
+
     function approve(address _spender, uint _amount)
         public
         noReentry
@@ -661,7 +661,7 @@ contract VentanaToken is
         veredictum = _addr;
         return true;
     }
-    
+
     // The contract can be selfdestructed after abort and ether balance is 0.
     function destroy()
         public
@@ -672,13 +672,13 @@ contract VentanaToken is
         require(this.balance == 0);
         selfdestruct(owner);
     }
-    
+
     // Owner can salvage ERC20 tokens that may have been sent to the account
     function transferAnyERC20Token(address tokenAddress, uint amount)
         public
         onlyOwner
         preventReentry
-        returns (bool) 
+        returns (bool)
     {
         require(ERC20Token(tokenAddress).transfer(owner, amount));
         return true;
@@ -689,7 +689,7 @@ contract VentanaToken is
 interface Notify
 {
     event Notified(address indexed _from, uint indexed _amount);
-    
+
     function notify(address _from, uint _amount) public returns (bool);
 }
 
@@ -697,13 +697,24 @@ interface Notify
 contract VeredictumTest is Notify
 {
     address public vnt;
-    
+
     function setVnt(address _addr) { vnt = _addr; }
-    
+
     function notify(address _from, uint _amount) public returns (bool)
     {
         require(msg.sender == vnt);
         Notified(_from, _amount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -98,7 +98,7 @@ contract StandardToken is ERC20 {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -219,7 +219,7 @@ contract BurnableToken is StandardToken {
 
     function burnFrom(address _from, uint256 _value) public {
         require(_value <= allowed[_from][msg.sender]);
-        
+
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         _burn(_from, _value);
     }
@@ -313,7 +313,7 @@ contract Manageable is Ownable {
         for(; index < managers.length - 1; index++) {
             managers[index] = managers[index + 1];
         }
-        
+
         managers.length--;
         emit ManagerRemoved(_manager);
     }
@@ -325,7 +325,7 @@ contract Manageable is Ownable {
 */
 contract Token is CappedToken, BurnableToken, Withdrawable {
     constructor() CappedToken(250000000e8) StandardToken("CRB Token", "CRB", 8) public {
-        
+
     }
 }
 
@@ -337,7 +337,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     constructor() public {
         token = new Token();
     }
@@ -356,4 +356,10 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         emit CrowdsaleClose();
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

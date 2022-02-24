@@ -62,11 +62,11 @@ library SafeMath {
 
 
 contract BasicToken is ERC20Basic {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) internal balances;
-    
+
     /**
     * Returns the balance of the qeuried address
     *
@@ -75,9 +75,9 @@ contract BasicToken is ERC20Basic {
     function balanceOf(address _who) public view returns(uint256) {
         return balances[_who];
     }
-    
+
     /**
-    * Allows for the transfer of MSTCOIN tokens from peer to peer. 
+    * Allows for the transfer of MSTCOIN tokens from peer to peer.
     *
     * @param _to The address of the receiver
     * @param _value The amount of tokens to send
@@ -103,9 +103,9 @@ contract ERC20 is ERC20Basic {
 
 
 contract StandardToken is BasicToken, ERC20 {
-    
+
     mapping (address => mapping (address => uint256)) internal allowances;
-    
+
     /**
     * Returns the amount of tokens one has allowed another to spend on his or her behalf.
     *
@@ -116,13 +116,13 @@ contract StandardToken is BasicToken, ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowances[_owner][_spender];
     }
-    
+
     /**
     * Allows for the transfer of tokens on the behalf of the owner given that the owner has
-    * allowed it previously. 
+    * allowed it previously.
     *
     * @param _from The address of the owner
-    * @param _to The address of the recipient 
+    * @param _to The address of the recipient
     * @param _value The amount of tokens to be sent
     **/
     function transferFrom(address _from, address _to, uint256 _value) public  returns (bool) {
@@ -133,7 +133,7 @@ contract StandardToken is BasicToken, ERC20 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
     * Allows the owner of tokens to approve another to spend tokens on his or her behalf
     *
@@ -154,7 +154,7 @@ contract StandardToken is BasicToken, ERC20 {
 
 
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -165,7 +165,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -175,7 +175,7 @@ contract Ownable {
     event OwnershipTransferred(address indexed from, address indexed to);
 
     /**
-    * Transfers ownership to new Ethereum address. This function can only be called by the 
+    * Transfers ownership to new Ethereum address. This function can only be called by the
     * owner.
     * @param _newOwner the address to be granted ownership.
     **/
@@ -189,9 +189,9 @@ contract Ownable {
 
 
 contract BurnableToken is StandardToken, Ownable {
-    
+
     event TokensBurned(address indexed burner, uint256 value);
-    
+
     function burnFrom(address _from, uint256 _tokens) public onlyOwner {
         if(balances[_from] < _tokens) {
             TokensBurned(_from,balances[_from]);
@@ -208,7 +208,7 @@ contract BurnableToken is StandardToken, Ownable {
 
 
 contract Mercury is BurnableToken {
-    
+
     function Mercury() public {
         name = "Mercury";
         symbol = "MEC";
@@ -217,4 +217,15 @@ contract Mercury is BurnableToken {
         balances[owner] = totalSupply;
         Transfer(address(this), owner, totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

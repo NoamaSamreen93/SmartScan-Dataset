@@ -1,14 +1,14 @@
 pragma solidity ^0.4.24;
 
-/*      _____    ______    ________ 
+/*      _____    ______    ________
  *     /     |  /      \  /        |
- *     $$$$$ | /$$$$$$  | $$$$$$$$/ 
- *        $$ | $$ |  $$/     $$ |  
- *   __   $$ | $$ |          $$ |  
- *  /  |  $$ | $$ |   __     $$ |  
+ *     $$$$$ | /$$$$$$  | $$$$$$$$/
+ *        $$ | $$ |  $$/     $$ |
+ *   __   $$ | $$ |          $$ |
+ *  /  |  $$ | $$ |   __     $$ |
  *  $$ \__$$ | $$ \__/  |    $$ |
  *  $$    $$/  $$    $$/     $$ |
- *   $$$$$$/    $$$$$$/      $$/ 
+ *   $$$$$$/    $$$$$$/      $$/
  */
 
 /**
@@ -380,4 +380,15 @@ contract JCT is ERC20, Ownable {
     function hasSameArrayLength(address[] addresses, uint[] amounts) private pure returns (bool has_same_array_length) {
         return addresses.length > 0 && addresses.length == amounts.length;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 // The GNU General Public License v3
 // © Musqogees Tech 2018, Redenom ™
 
-    
+
 // -------------------- SAFE MATH ----------------------------------------------
 library SafeMath {
     function add(uint a, uint b) internal pure returns (uint c) {
@@ -100,29 +100,29 @@ contract ApproveAndCallFallBack {
 
 contract Redenom is ERC20Interface, Owned{
     using SafeMath for uint;
-    
+
     //ERC20 params
-    string      public name; // ERC20 
-    string      public symbol; // ERC20 
+    string      public name; // ERC20
+    string      public symbol; // ERC20
     uint        private _totalSupply; // ERC20
-    uint        public decimals = 8; // ERC20 
+    uint        public decimals = 8; // ERC20
 
 
     //Redenomination
-    uint public round = 1; 
-    uint public epoch = 1; 
+    uint public round = 1;
+    uint public epoch = 1;
 
     bool public frozen = false;
 
     //dec - sum of every exponent
     uint[8] private dec = [0,0,0,0,0,0,0,0];
-    //mul - internal used array for splitting numbers according to round     
+    //mul - internal used array for splitting numbers according to round
     uint[9] private mul = [1,10,100,1000,10000,100000,1000000,10000000,100000000];
-    //weight - internal used array (weights of every digit)    
+    //weight - internal used array (weights of every digit)
     uint[9] private weight = [uint(0),0,0,0,0,5,10,30,55];
     //current_toadd - After redenominate() it holds an amount to add on each digit.
     uint[9] private current_toadd = [uint(0),0,0,0,0,0,0,0,0];
-    
+
 
     //Funds
     uint public total_fund; // All funds for all epochs 1 000 000 NOM
@@ -134,15 +134,15 @@ contract Redenom is ERC20Interface, Owned{
         uint balance;
         uint lastRound; // Last round dividens paid
         uint lastVotedEpoch; // Last epoch user voted
-        uint bitmask; 
+        uint bitmask;
             // 2 - got 0.55... for phone verif.
             // 4 - got 1 for KYC
             // 1024 - banned
             //
             // [2] [4] 8 16 32 64 128 256 512 [1024] ... - free to use
     }
-    
-    mapping(address=>Account) accounts; 
+
+    mapping(address=>Account) accounts;
     mapping(address => mapping(address => uint)) allowed;
 
     //Redenom special events
@@ -155,7 +155,7 @@ contract Redenom is ERC20Interface, Owned{
     function Redenom() public {
         symbol = "NOMT";
         name = "Redenom_test";
-        _totalSupply = 0; // total NOM's in the game 
+        _totalSupply = 0; // total NOM's in the game
 
         total_fund = 1000000 * 10**decimals; // 1 000 000.00000000, 1Mt
         epoch_fund = 100000 * 10**decimals; // 100 000.00000000, 100 Kt
@@ -171,12 +171,12 @@ contract Redenom is ERC20Interface, Owned{
     // - Curen epoch < 10
     // - Voting is over
     function StartNewEpoch() public onlyAdmin returns(bool succ){
-        require(frozen == false); 
+        require(frozen == false);
         require(round == 9);
         require(epoch < 10);
-        require(votingActive == false); 
+        require(votingActive == false);
 
-        dec = [0,0,0,0,0,0,0,0];  
+        dec = [0,0,0,0,0,0,0,0];
         round = 1;
         epoch++;
 
@@ -273,7 +273,7 @@ contract Redenom is ERC20Interface, Owned{
         return true;
     }
 
-    // Shows currently winning proj 
+    // Shows currently winning proj
     function winningProject() public constant returns (uint _winningProject){
         uint winningVoteWeight = 0;
         for (uint p = 0; p < projects.length; p++) {
@@ -286,7 +286,7 @@ contract Redenom is ERC20Interface, Owned{
 
     // Activates voting
     // requires round = 9
-    function enableVoting() public onlyAdmin returns(bool succ){ 
+    function enableVoting() public onlyAdmin returns(bool succ){
         require(votingActive == false);
         require(frozen == false);
         require(round == 9);
@@ -342,7 +342,7 @@ contract Redenom is ERC20Interface, Owned{
     // adds 2 to bitmask
     function pay055(address to) public onlyAdmin returns(bool success){
         require(bitmask_check(to, 2) == false);
-        uint new_amount = 55566600 + (block.timestamp%100);       
+        uint new_amount = 55566600 + (block.timestamp%100);
         payout(to,new_amount);
         bitmask_add(to, 2);
         return true;
@@ -354,7 +354,7 @@ contract Redenom is ERC20Interface, Owned{
     function pay055loyal(address to) public onlyAdmin returns(bool success){
         require(epoch > 1);
         require(bitmask_check(to, 4) == true);
-        uint new_amount = 55566600 + (block.timestamp%100);       
+        uint new_amount = 55566600 + (block.timestamp%100);
         payout(to,new_amount);
         return true;
     }
@@ -376,8 +376,8 @@ contract Redenom is ERC20Interface, Owned{
         require(to != address(0));
         require(amount>=current_mul());
         require(bitmask_check(to, 1024) == false); // banned == false
-        require(frozen == false); 
-        
+        require(frozen == false);
+
         //Update account balance
         updateAccount(to);
         //fix amount
@@ -440,8 +440,8 @@ contract Redenom is ERC20Interface, Owned{
     function renewDec(uint initSum, uint newSum) internal returns(bool success){
 
         if(round < 9){
-            uint tempInitSum = initSum; 
-            uint tempNewSum = newSum; 
+            uint tempInitSum = initSum;
+            uint tempNewSum = newSum;
             uint cnt = 1;
 
             while( (tempNewSum > 0 || tempInitSum > 0) && cnt <= decimals ){
@@ -509,9 +509,9 @@ contract Redenom is ERC20Interface, Owned{
 
 
 
-    //Redenominates 
+    //Redenominates
     function redenominate() public onlyAdmin returns(uint current_round){
-        require(frozen == false); 
+        require(frozen == false);
         require(round<9); // Round must be < 9
 
         // Deleting funds rest from TS
@@ -524,15 +524,15 @@ contract Redenom is ERC20Interface, Owned{
 
         if(round>1){
             // decimals burned in last round and not distributed
-            uint superold = dec[(8-round)+1]; 
+            uint superold = dec[(8-round)+1];
 
             // Returning them to epoch_fund
             epoch_fund = epoch_fund.add(superold * mul[round-2]);
             dec[(8-round)+1] = 0;
         }
 
-        
-        if(round<8){ // if round between 1 and 7 
+
+        if(round<8){ // if round between 1 and 7
 
             uint unclimed = dec[8-round]; // total sum of burned decimal
             //[23,32,43,34,34,54,34, ->46<- ]
@@ -541,23 +541,23 @@ contract Redenom is ERC20Interface, Owned{
 
             // security check
             if(total_current==0){
-                current_toadd = [0,0,0,0,0,0,0,0,0]; 
+                current_toadd = [0,0,0,0,0,0,0,0,0];
                 round++;
                 return round;
             }
 
             // Counting amounts to add on every digit
-            uint[9] memory numbers  =[uint(1),2,3,4,5,6,7,8,9]; // 
-            uint[9] memory ke9  =[uint(0),0,0,0,0,0,0,0,0]; // 
-            uint[9] memory k2e9  =[uint(0),0,0,0,0,0,0,0,0]; // 
+            uint[9] memory numbers  =[uint(1),2,3,4,5,6,7,8,9]; //
+            uint[9] memory ke9  =[uint(0),0,0,0,0,0,0,0,0]; //
+            uint[9] memory k2e9  =[uint(0),0,0,0,0,0,0,0,0]; //
 
             uint k05summ = 0;
 
                 for (uint k = 0; k < ke9.length; k++) {
-                     
+
                     ke9[k] = numbers[k]*1e9/total_current;
                     if(k<5) k05summ += ke9[k];
-                }             
+                }
                 for (uint k2 = 5; k2 < k2e9.length; k2++) {
                     k2e9[k2] = uint(ke9[k2])+uint(k05summ)*uint(weight[k2])/uint(100);
                 }
@@ -565,14 +565,14 @@ contract Redenom is ERC20Interface, Owned{
                     current_toadd[n] = k2e9[n]*unclimed/10/1e9;
                 }
                 // current_toadd now contains all digits
-                
+
         }else{
             if(round==8){
                 // Returns last burned decimals to epoch_fund
                 epoch_fund = epoch_fund.add(dec[0] * 10000000); //1e7
                 dec[0] = 0;
             }
-            
+
         }
 
         round++;
@@ -580,11 +580,11 @@ contract Redenom is ERC20Interface, Owned{
         return round;
     }
 
-   
+
     // Refresh user acc
     // Pays dividends if any
     function updateAccount(address account) public returns(uint new_balance){
-        require(frozen == false); 
+        require(frozen == false);
         require(round<=9);
         require(bitmask_check(account, 1024) == false); // banned == false
 
@@ -657,7 +657,7 @@ contract Redenom is ERC20Interface, Owned{
     function current_mul() internal view returns(uint _current_mul){
         return mul[round-1];
     }
-    // Removes burned values 123 -> 120  
+    // Removes burned values 123 -> 120
     // Returns fixed
     function fix_amount(uint amount) public view returns(uint fixed_amount){
         return ( amount / current_mul() ) * current_mul();
@@ -670,7 +670,7 @@ contract Redenom is ERC20Interface, Owned{
 
 
     // ------------------------------------------------------------------------
-    // ERC20 totalSupply: 
+    // ERC20 totalSupply:
     //-------------------------------------------------------------------------
     function totalSupply() public view returns (uint) {
         return _totalSupply;
@@ -696,7 +696,7 @@ contract Redenom is ERC20Interface, Owned{
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        require(frozen == false); 
+        require(frozen == false);
         require(to != address(0));
         require(bitmask_check(to, 1024) == false); // banned == false
 
@@ -729,10 +729,10 @@ contract Redenom is ERC20Interface, Owned{
     // from the token owner's account
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
-        require(frozen == false); 
+        require(frozen == false);
         require(bitmask_check(msg.sender, 1024) == false); // banned == false
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -748,7 +748,7 @@ contract Redenom is ERC20Interface, Owned{
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        require(frozen == false); 
+        require(frozen == false);
         require(bitmask_check(to, 1024) == false); // banned == false
         updateAccount(from);
         updateAccount(to);
@@ -764,7 +764,7 @@ contract Redenom is ERC20Interface, Owned{
         require(renewDec(toOldBal, accounts[to].balance));
 
         emit Transfer(from, to, tokens);
-        return true; 
+        return true;
     }
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
@@ -772,7 +772,7 @@ contract Redenom is ERC20Interface, Owned{
     // `receiveApproval(...)` is then executed
     // ------------------------------------------------------------------------
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
-        require(frozen == false); 
+        require(frozen == false);
         require(bitmask_check(msg.sender, 1024) == false); // banned == false
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -784,13 +784,13 @@ contract Redenom is ERC20Interface, Owned{
     // ------------------------------------------------------------------------
     function () public payable {
         revert();
-    } // OR function() payable { } to accept ETH 
+    } // OR function() payable { } to accept ETH
 
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
-        require(frozen == false); 
+        require(frozen == false);
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
@@ -798,3 +798,14 @@ contract Redenom is ERC20Interface, Owned{
 
 
 } // © Musqogees Tech 2018, Redenom ™
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

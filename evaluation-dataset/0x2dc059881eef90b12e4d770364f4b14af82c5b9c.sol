@@ -54,7 +54,7 @@ contract Owned {
   constructor() public {
     owner = msg.sender;
   }
-  
+
   modifier onlyOwner {
     require(msg.sender == owner);
     _;
@@ -134,4 +134,15 @@ contract ModuleToken is ERC20Token, Owned {
   function transferAnyERC20Token(address _tokenAddress, uint256 _value) public onlyOwner returns (bool) {
     return ERC20(_tokenAddress).transfer(rescueAddress, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

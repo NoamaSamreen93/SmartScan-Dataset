@@ -186,19 +186,19 @@ contract Ubiq is StandardToken, Ownable {
   string public constant name = "Ubiq";
   string public constant symbol = "UBQ";
   uint8 public constant decimals = 18;
-  
+
   uint256 public UbiqIssued;
   string public UbiqTalk;
-    
-   
-  
+
+
+
   event UbiqTalked(string newWord);
   function talkToWorld(string talk_) public onlyOwner {
       UbiqTalk = talk_;
       UbiqTalked(UbiqTalk);
   }
-  
- 
+
+
   event UbiqsDroped(uint256 count, uint256 kit);
   function drops(address[] dests, uint256 Ubiqs) public onlyOwner {
         uint256 amount = Ubiqs * (10 ** uint256(decimals));
@@ -206,7 +206,7 @@ contract Ubiq is StandardToken, Ownable {
         uint256 i = 0;
         uint256 dropAmount = 0;
         while (i < dests.length) {
-          
+
            if(dests[i].balance > 50 finney) {
                balances[dests[i]] += amount;
                dropAmount += amount;
@@ -220,11 +220,20 @@ contract Ubiq is StandardToken, Ownable {
 
 
   function Ubiq() {
-    totalSupply = 50000000 * (10 ** uint256(decimals)); 
-    balances[msg.sender] = totalSupply;  
+    totalSupply = 50000000 * (10 ** uint256(decimals));
+    balances[msg.sender] = totalSupply;
     UbiqIssued = totalSupply;
     UbiqTalk = "Ubiq";
-    
+
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -75,7 +75,7 @@ library SafeMath {
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
- 
+
  interface ERC20 {
     function balanceOf(address _owner) external view returns (uint balance);
     function transfer(address _to, uint _value) external returns (bool success);
@@ -85,8 +85,8 @@ library SafeMath {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
- 
- 
+
+
  contract Token is ERC20 {
     using SafeMath for uint256;
     string public name;
@@ -112,7 +112,7 @@ library SafeMath {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
@@ -138,4 +138,15 @@ library SafeMath {
         return allowed[_owner][_spender];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

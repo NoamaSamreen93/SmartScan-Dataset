@@ -36,7 +36,7 @@ contract Base{
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
-    } 
+    }
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -52,4 +52,15 @@ contract TRE is Base {
         name = "TreChain";
         symbol = "TRE";
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

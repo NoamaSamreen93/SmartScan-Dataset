@@ -4,7 +4,7 @@ pragma solidity ^0.4.21;
  * @title SafeMath for performing valid mathematics.
  */
 library SafeMath {
- 
+
   function Mul(uint a, uint b) internal pure returns (uint) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -21,19 +21,19 @@ library SafeMath {
   function Sub(uint a, uint b) internal pure returns (uint) {
     assert(b <= a);
     return a - b;
-  } 
+  }
 
   function Add(uint a, uint b) internal pure returns (uint) {
     uint256 c = a + b;
     assert(c >= a);
     return c;
-  } 
+  }
 }
 
 /**
 * @title Contract that will work with ERC223 tokens.
 */
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     /**
      * @dev Standard ERC223 function that will handle incoming token transfers.
      *
@@ -169,26 +169,26 @@ contract ECHO is ERC20 {
     uint256 public totalWeiReceived;
     //type of sale: 1=presale, 2=ICO
     uint256 public saleType;
-    
+
 
     //Mapping to relate owner and spender to the tokens allowed to transfer from owner
     mapping(address => mapping(address => uint256)) allowed;
     //Mapping to relate number of token to the account
     mapping(address => uint256) balances;
-    
+
     function isSaleRunning() public view returns (bool){
         bool status = false;
         // 1522972800 = 6 april 2018
         // 1525392000 = 4 may 2018
         // 1527811200 = 1 june 2018
         // 1531094400 = 9 july 2018
-        
+
         //Presale is going on
         if(now >= startTime  && now <= 1525392000){
             //Aprill 6 to before 4 may
             status = true;
         }
-    
+
         //ICO is going on
         if(now >= 1527811200 && now <= endTime){
             // june 1 to before july 9
@@ -217,16 +217,16 @@ contract ECHO is ERC20 {
         _;
     }
 
-    modifier onlyUnlocked() { 
-        require (!locked); 
-        _; 
+    modifier onlyUnlocked() {
+        require (!locked);
+        _;
     }
 
     modifier validTimeframe(){
         require(isSaleRunning());
         _;
     }
-    
+
     function setEthCollector(address _ethCollector) public onlyOwner{
         require(_ethCollector != address(0));
         ethCollector = _ethCollector;
@@ -307,7 +307,7 @@ contract ECHO is ERC20 {
         }
         emit Transfer(msg.sender, _to, _value);
         return true;
-        
+
     }
 
     /**
@@ -316,7 +316,7 @@ contract ECHO is ERC20 {
     * @param _from The address which you want to send tokens from
     * @param _to The address which you want to transfer to
     * @param _value the amount of tokens to be transferred
-    * @return A bool if the transfer was a success or not 
+    * @return A bool if the transfer was a success or not
     */
     function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3*32) public onlyUnlocked returns (bool){
         bytes memory _empty;
@@ -372,15 +372,15 @@ contract ECHO is ERC20 {
 
     function getBonus(uint256 _tokensBought)public view returns(uint256){
         uint256 bonus = 0;
-        /*April 6- April 13 -- 20% 
-        April 14- April 21 -- 10% 
-        April 22 - May 3-- 5% 
-        
-        ICO BONUS WEEKS: 
-        June 1 - June 9 -- 20% 
-        June 10 - June 17 -- 10% 
-        June 18 - June 30 -- 5% 
-        July 1 - July 9 -- No bonus 
+        /*April 6- April 13 -- 20%
+        April 14- April 21 -- 10%
+        April 22 - May 3-- 5%
+
+        ICO BONUS WEEKS:
+        June 1 - June 9 -- 20%
+        June 10 - June 17 -- 10%
+        June 18 - June 30 -- 5%
+        July 1 - July 9 -- No bonus
         */
         // 1522972800 = 6 april 2018
         // 1523577600 = 13 April 2018
@@ -434,7 +434,7 @@ contract ECHO is ERC20 {
         tokensBought = tokensBought.Add(getBonus(tokensBought));
         balances[beneficiary] = balances[beneficiary].Add(tokensBought);
         totalSupply = totalSupply.Add(tokensBought);
-       
+
         assert(totalSupply <= HARD_CAP);
         totalWeiReceived = totalWeiReceived.Add(msg.value);
         ethCollector.transfer(msg.value);
@@ -466,4 +466,15 @@ contract ECHO is ERC20 {
     function drain() public onlyOwner {
         owner.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

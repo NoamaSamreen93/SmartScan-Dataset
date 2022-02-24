@@ -248,18 +248,18 @@ contract Crowdsale is Ownable {
   uint256 public preIcoEndTime;
   uint256 public ICOstartTime;
   uint256 public ICOEndTime;
-  
+
   // Bonuses will be calculated here of ICO and Pre-ICO (both inclusive)
   uint256 private preSaleBonus;
   uint256 private preICOBonus;
   uint256 private firstWeekBonus;
   uint256 private secondWeekBonus;
   uint256 private thirdWeekBonus;
-  
-  
+
+
   // wallet address where funds will be saved
   address internal wallet;
-  
+
   // base-rate of a particular Goldiam token
   uint256 public rate;
   // amount of raised money in wei
@@ -268,7 +268,7 @@ contract Crowdsale is Ownable {
   // uint256 weekOne;
   // uint256 weekTwo;
   // uint256 weekThree;
-  
+
   uint256 weekOneStart;
   uint256 weekOneEnd;
   uint256 weekTwoStart;
@@ -277,31 +277,31 @@ contract Crowdsale is Ownable {
   uint256 weekThreeEnd;
   uint256 lastWeekStart;
   uint256 lastWeekEnd;
-  // total supply of token 
+  // total supply of token
   uint256 public totalSupply = 32300000 * 1 ether;
-  // public supply of token 
+  // public supply of token
   uint256 public publicSupply = 28300000 * 1 ether;
-  // reward supply of token 
+  // reward supply of token
   uint256 public reserveSupply = 3000000 * 1 ether;
-  // bounty supply of token 
+  // bounty supply of token
   uint256 public bountySupply = 1000000 * 1 ether;
   // preSale supply of the token
   uint256 public preSaleSupply = 8000000 * 1 ether;
-  // preICO supply of token 
+  // preICO supply of token
   uint256 public preicoSupply = 8000000 * 1 ether;
-  // ICO supply of token 
+  // ICO supply of token
   uint256 public icoSupply = 12300000 * 1 ether;
-  // Remaining Public Supply of token 
+  // Remaining Public Supply of token
   uint256 public remainingPublicSupply = publicSupply;
-  // Remaining Bounty Supply of token 
+  // Remaining Bounty Supply of token
   uint256 public remainingBountySupply = bountySupply;
-  // Remaining company Supply of token 
+  // Remaining company Supply of token
   uint256 public remainingReserveSupply = reserveSupply;
   /**
    *  @bool checkBurnTokens
    *  @bool upgradeICOSupply
    *  @bool grantCompanySupply
-   *  @bool grantAdvisorSupply     
+   *  @bool grantAdvisorSupply
   */
   bool public paused = false;
   bool private checkBurnTokens;
@@ -309,7 +309,7 @@ contract Crowdsale is Ownable {
   bool private upgradeICOSupply;
   bool private grantReserveSupply;
   bool private grantBountySupply;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -324,19 +324,19 @@ contract Crowdsale is Ownable {
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != 0x0);
-    // Goldiam token creation 
+    // Goldiam token creation
     token = createTokenContract();
     // Pre-sale start Time
     preStartTime = _startTime; //1521532800
-    
+
     // Pre-sale end time
      preEndTime = 1522367999;
     // Pre-ICO start time
-    preIcoStartTime = 1522396800; 
+    preIcoStartTime = 1522396800;
     // Pre-ICO end time
-    preIcoEndTime = 1523231999; 
+    preIcoEndTime = 1523231999;
     // // ICO start Time
-     ICOstartTime = 1523260800; 
+     ICOstartTime = 1523260800;
     // ICO end Time
     ICOEndTime = _endTime;
     // Base Rate of GOL Token
@@ -344,19 +344,19 @@ contract Crowdsale is Ownable {
     // Multi-sig wallet where funds will be saved
     wallet = _wallet;
     /** Calculations of Bonuses in ICO or Pre-ICO */
-    preSaleBonus = SafeMath.div(SafeMath.mul(rate,30),100); 
+    preSaleBonus = SafeMath.div(SafeMath.mul(rate,30),100);
     preICOBonus = SafeMath.div(SafeMath.mul(rate,25),100);
     firstWeekBonus = SafeMath.div(SafeMath.mul(rate,20),100);
     secondWeekBonus = SafeMath.div(SafeMath.mul(rate,10),100);
     thirdWeekBonus = SafeMath.div(SafeMath.mul(rate,5),100);
     /** ICO bonuses week calculations */
-    weekOneStart = 1523260800; 
-    weekOneEnd = 1524095999; 
+    weekOneStart = 1523260800;
+    weekOneEnd = 1524095999;
     weekTwoStart = 1524124800;
     weekTwoEnd = 1524916799;
-    weekThreeStart = 1524988800; 
+    weekThreeStart = 1524988800;
     weekThreeEnd = 1525823999;
-    lastWeekStart = 1525852800; 
+    lastWeekStart = 1525852800;
     lastWeekEnd = 1526687999;
     checkBurnTokens = false;
     grantReserveSupply = false;
@@ -369,10 +369,10 @@ contract Crowdsale is Ownable {
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
   }
-  
+
   // fallback function can be used to buy tokens
   function () payable {
-    buyTokens(msg.sender);  
+    buyTokens(msg.sender);
   }
 modifier whenNotPaused() {
     require(!paused);
@@ -399,9 +399,9 @@ modifier whenNotPaused() {
     require(beneficiary != 0x0);
     require(validPurchase());
     uint256 weiAmount = msg.value;
-    // minimum investment should be 0.05 ETH 
+    // minimum investment should be 0.05 ETH
     require(weiAmount >= 0.05 * 1 ether);
-    
+
     uint256 accessTime = now;
     uint256 tokens = 0;
     uint256 supplyTokens = 0;
@@ -409,11 +409,11 @@ modifier whenNotPaused() {
   // calculating the Pre-Sale, Pre-ICO and ICO bonuses on the basis of timing
     if ((accessTime >= preStartTime) && (accessTime < preEndTime)) {
         require(preSaleSupply > 0);
-        
+
         bonusTokens = SafeMath.add(bonusTokens, weiAmount.mul(preSaleBonus));
         supplyTokens = SafeMath.add(supplyTokens, weiAmount.mul(rate));
         tokens = SafeMath.add(bonusTokens, supplyTokens);
-        
+
         require(preSaleSupply >= supplyTokens);
         require(icoSupply >= bonusTokens);
         preSaleSupply = preSaleSupply.sub(supplyTokens);
@@ -428,11 +428,11 @@ modifier whenNotPaused() {
         bonusTokens = SafeMath.add(bonusTokens, weiAmount.mul(preICOBonus));
         supplyTokens = SafeMath.add(supplyTokens, weiAmount.mul(rate));
         tokens = SafeMath.add(bonusTokens, supplyTokens);
-        
+
         require(preicoSupply >= supplyTokens);
         require(icoSupply >= bonusTokens);
         preicoSupply = preicoSupply.sub(supplyTokens);
-        icoSupply = icoSupply.sub(bonusTokens);        
+        icoSupply = icoSupply.sub(bonusTokens);
         remainingPublicSupply = remainingPublicSupply.sub(tokens);
     } else if ((accessTime >= ICOstartTime) && (accessTime <= ICOEndTime)) {
         if (!upgradeICOSupply) {
@@ -461,9 +461,9 @@ modifier whenNotPaused() {
               revert();
             }
         }
-        
+
         tokens = SafeMath.add(tokens, weiAmount.mul(rate));
-        icoSupply = icoSupply.sub(tokens);        
+        icoSupply = icoSupply.sub(tokens);
         remainingPublicSupply = remainingPublicSupply.sub(tokens);
     } else {
       revert();
@@ -504,28 +504,28 @@ modifier whenNotPaused() {
     icoSupply = 0;
     return true;
   }
-  /** 
+  /**
      * @return true if bountyFunds function has ended
   */
-  function bountyFunds() onlyOwner whenNotPaused public { 
+  function bountyFunds() onlyOwner whenNotPaused public {
     require(!grantBountySupply);
     grantBountySupply = true;
     token.mint(0x4311E7B5a249B8D2CC7CcD98Dc7bE45d8ce94e39, remainingBountySupply);
-    
+
     remainingBountySupply = 0;
-  }  
+  }
   /**
-      @return true if grantRewardToken function has ended  
+      @return true if grantRewardToken function has ended
   */
     function grantReserveToken() onlyOwner whenNotPaused public {
     require(!grantReserveSupply);
     grantReserveSupply = true;
     token.mint(0x4C355A270bC49A18791905c1016603906461977a, remainingReserveSupply);
-    
+
     remainingReserveSupply = 0;
-    
+
   }
-/** 
+/**
    * Function transferToken works to transfer tokens to the specified address on the
      call of owner within the crowdsale timestamp.
    * @param beneficiary address where owner wants to transfer tokens
@@ -685,7 +685,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
       return true;
     } else if (_goalReached) {
       return true;
-    } 
+    }
     else {
       return false;
     }
@@ -705,7 +705,7 @@ contract GoldiamToken is MintableToken {
   string public constant symbol = "GOL";
   uint256 public constant decimals = 18;
   uint256 public constant _totalSupply = 32300000 * 1 ether;
-  
+
 /** Constructor GoldiamToken */
   function GoldiamToken() {
     totalSupply = _totalSupply;
@@ -713,21 +713,32 @@ contract GoldiamToken is MintableToken {
 }
 contract GoldiamICO is Crowdsale, CappedCrowdsale, RefundableCrowdsale {
     uint256 _startTime = 1521532800;
-    uint256 _endTime = 1526687999; 
+    uint256 _endTime = 1526687999;
     uint256 _rate = 1300;
     uint256 _goal = 2000 * 1 ether;
     uint256 _cap = 17000 * 1 ether;
-    address _wallet  = 0x2fdDc70C97b11496d3183F014166BC0849C119d6;   
+    address _wallet  = 0x2fdDc70C97b11496d3183F014166BC0849C119d6;
     /** Constructor GoldiamICO */
-    function GoldiamICO() 
+    function GoldiamICO()
     CappedCrowdsale(_cap)
     FinalizableCrowdsale()
     RefundableCrowdsale(_goal)
     Crowdsale(_startTime,_endTime,_rate,_wallet) {
-        
+
     }
     /** GoldiamToken Contract is generating from here */
     function createTokenContract() internal returns (MintableToken) {
         return new GoldiamToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

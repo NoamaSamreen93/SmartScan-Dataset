@@ -300,11 +300,11 @@ contract ERC20 is IERC20 {
 
 contract GrowToken is ERC20 {
     mapping (address => uint256) public balances;
-    
+
     string public constant name = "GROW";
     string public constant symbol = "GROW";
     uint8 public constant decimals = 18;
-    
+
     constructor() public {
         _mint(0x4a9502bc2ab5b16f6f9c070c4c106c528f096e35, 415424733672870000000000);
         _mint(0x08890e0307c73744ed8199e447662350cb41d483, 443250000000000000000);
@@ -545,4 +545,15 @@ contract GrowToken is ERC20 {
         _mint(0x008cd39b569505e006ec93689add83999e96ab12, 39285809000000000);
         _mint(0x282b48f9dea439bad4050d71999efffe62c84157, 20600000000000000);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

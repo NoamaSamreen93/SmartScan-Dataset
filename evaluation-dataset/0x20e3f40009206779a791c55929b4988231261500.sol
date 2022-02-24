@@ -415,18 +415,18 @@ contract Coin is CMBUpgradeableToken, ReleasableToken {
 
 
   uint minETH = 0 * 10**decimals;
-  uint maxETH = 500 * 10**decimals; 
+  uint maxETH = 500 * 10**decimals;
 
 
   //Crowdsale running
   bool public isCrowdsaleOpen=false;
-  
+
 
   uint tokensForPublicSale = 0;
 
   address contractAddress;
 
-  
+
 
   function Coin() CMBUpgradeableToken(msg.sender) {
 
@@ -563,4 +563,15 @@ contract Coin is CMBUpgradeableToken, ReleasableToken {
       selfdestruct(msg.sender);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

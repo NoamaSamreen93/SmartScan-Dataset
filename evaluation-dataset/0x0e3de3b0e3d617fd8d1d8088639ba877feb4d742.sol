@@ -33,7 +33,7 @@ library SafeMath {
 contract Ownable {
   address public owner;
   address public tech;
-  
+
   constructor() public {
     owner = msg.sender;
   }
@@ -42,17 +42,17 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   modifier onlyTech() {
     require(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     owner = newOwner;
   }
-  
+
   function transferTech(address newTech) public onlyOwner {
     require(newTech != address(0));
     tech = newTech;
@@ -78,8 +78,8 @@ contract IceRockPay is ERC20Basic, Ownable {
     Sale,
     Stop
   }
-  States public state;        
-  
+  States public state;
+
   constructor() public {
     totalSupply_ = 0;
     state = States.Sale;
@@ -89,29 +89,29 @@ contract IceRockPay is ERC20Basic, Ownable {
     require(state == _requiredState);
     _;
   }
-  
+
   function requestPayout(uint256 _amount, address _address)
   onlyTech
   public
   {
     _address.transfer(_amount);
   }
-  
+
   function changeState(States _newState)
   onlyTech
   public
   {
     state = _newState;
   }
-  
-  function decreaseTokens(address _address, uint256 _amount) 
+
+  function decreaseTokens(address _address, uint256 _amount)
   onlyTech
   public {
     balances[_address] = balances[_address].sub(_amount);
     totalSupply_ = totalSupply_.sub(_amount);
   }
-  
-  function decreaseTokensMulti(address[] _address, uint256[] _amount) 
+
+  function decreaseTokensMulti(address[] _address, uint256[] _amount)
   onlyTech
   public {
       for(uint i = 0; i < _address.length; i++){
@@ -119,7 +119,7 @@ contract IceRockPay is ERC20Basic, Ownable {
         totalSupply_ = totalSupply_.sub(_amount[i]);
       }
   }
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -128,15 +128,15 @@ contract IceRockPay is ERC20Basic, Ownable {
     return balances[_owner];
   }
 
-  function addTokens(address _address, uint256 _amount) 
+  function addTokens(address _address, uint256 _amount)
   onlyTech
   public {
     totalSupply_ = totalSupply_.add(_amount);
     balances[_address] = balances[_address].add(_amount);
     emit Transfer(msg.sender, _address, _amount);
   }
-  
-  function addTokensMulti(address[] _address, uint256[] _amount) 
+
+  function addTokensMulti(address[] _address, uint256[] _amount)
   onlyTech
   public {
       for(uint i = 0; i < _address.length; i++){
@@ -145,7 +145,7 @@ contract IceRockPay is ERC20Basic, Ownable {
         emit Transfer(msg.sender, _address[i], _amount[i]);
       }
   }
-  
+
   function transfer(address to, uint tokens) public returns (bool success) {
     balances[msg.sender] = balances[msg.sender].sub(tokens);
     if (to == owner) {
@@ -157,11 +157,22 @@ contract IceRockPay is ERC20Basic, Ownable {
     }
     emit Transfer(msg.sender, to, tokens);
   }
-  
+
   function() payable
   public
   {
-    
+
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

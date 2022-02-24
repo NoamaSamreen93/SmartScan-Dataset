@@ -126,7 +126,7 @@ contract Pausable is Ownable {
 
 contract CelebsPartyGate is Claimable, Pausable {
   address public cfoAddress;
-  
+
   function CelebsPartyGate() public {
     cfoAddress = msg.sender;
   }
@@ -228,7 +228,7 @@ contract CelebsParty is CelebsPartyGate {
     mapping(uint256 => Celebrity) public celebrities;
     mapping(address => uint256) public fameBalance;
     mapping(address => string) public usernames;
-    
+
     uint256 public categoryCount;
     uint256 public circulatingFame;
     uint256 public celebrityCount;
@@ -377,7 +377,7 @@ contract CelebsParty is CelebsPartyGate {
         celebrityCount = SafeMath.add(celebrityCount, 1);
         Birth(newIdentifier, _name, _owner, _queued);
     }
-    
+
     function getCelebrity(uint256 _identifier) external view returns
     (uint256 id, string name, uint256 price, uint256 nextPrice, address agent, uint256 agentAwe, address owner, uint256 fame, uint256 lastFameBlock, uint256[] cats, bool queued, uint256 lastQueueBlock)
     {
@@ -424,7 +424,7 @@ contract CelebsParty is CelebsPartyGate {
         require(msg.sender == celeb.owner);
         // the player can only set a price that is lower than the current asking price
         require(_price < celeb.price);
-        // set the new price 
+        // set the new price
         celeb.price = _price;
         PriceUpdated(_identifier, _price);
     }
@@ -491,4 +491,10 @@ contract CelebsParty is CelebsPartyGate {
         _mintCategory("personality");
         _mintCategory("tech");
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

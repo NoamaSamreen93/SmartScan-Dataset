@@ -16,7 +16,7 @@ pragma solidity ^0.4.11;
 */
 
 /**
- * Storage contract for Etherep to store ratings and score data.  It's been 
+ * Storage contract for Etherep to store ratings and score data.  It's been
  * separated from the main contract because this is much less likely to change
  * than the other parts.  It would allow for upgrading the main contract without
  * losing data.
@@ -42,18 +42,18 @@ contract RatingStore {
     /**
      * Only the manager or controller can use this method
      */
-    modifier restricted() { 
+    modifier restricted() {
         require(msg.sender == manager || tx.origin == manager || msg.sender == controller);
-        _; 
+        _;
     }
 
     /**
      * Only a certain address can use this modified method
      * @param by The address that can use the method
      */
-    modifier onlyBy(address by) { 
+    modifier onlyBy(address by) {
         require(msg.sender == by);
-        _; 
+        _;
     }
 
     /**
@@ -170,13 +170,13 @@ contract RatingStore {
 
 /** Etherep - Simple Ethereum reputation by address
 
-    Contract that takes ratings and calculates a reputation score.  It uses the 
+    Contract that takes ratings and calculates a reputation score.  It uses the
     RatingStore contract as its data storage.
 
-    Ratings can be from -5(worst) to 5(best) and are weighted according to the 
+    Ratings can be from -5(worst) to 5(best) and are weighted according to the
     score of the rater. This weight can have a significant skewing towards the
-    positive or negative but the representative score can not be below -5 or 
-    above 5.  Raters can not rate more often than waitTime, nor can they rate 
+    positive or negative but the representative score can not be below -5 or
+    above 5.  Raters can not rate more often than waitTime, nor can they rate
     themselves.
 
     Scores are returned as a false-float, where 425 = 4.25 on the Etherep scale.
@@ -199,8 +199,8 @@ contract Etherep {
     event DebugInt(int message);
     event DebugUint(uint message);
     event Rating(
-        address by, 
-        address who, 
+        address by,
+        address who,
         int rating
     );
     event FeeChanged(uint f);
@@ -210,9 +210,9 @@ contract Etherep {
      * Only a certain address can use this modified method
      * @param by The address that can use the method
      */
-    modifier onlyBy(address by) { 
+    modifier onlyBy(address by) {
         require(msg.sender == by);
-        _; 
+        _;
     }
 
     /**
@@ -233,7 +233,7 @@ contract Etherep {
         _;
     }
 
-    /** 
+    /**
      * Constructor
      * @param _manager The key that can make changes to this contract
      * @param _fee The variable fee that will be charged per rating
@@ -322,7 +322,7 @@ contract Etherep {
         manager.transfer(this.balance);
     }
 
-    /** 
+    /**
      * Adds a rating to an address' cumulative score
      * @param who The address that is being rated
      * @param rating The rating(-5 to 5)
@@ -338,7 +338,7 @@ contract Etherep {
 
         // Get an instance of the RatingStore contract
         RatingStore store = RatingStore(storageAddress);
-        
+
         // Standard weight
         int weight = 0;
 
@@ -359,7 +359,7 @@ contract Etherep {
         int senderCumulative = 0;
         (senderScore, senderRatings) = store.get(msg.sender);
 
-        // Calculate cumulative score if available for use in weighting. We're 
+        // Calculate cumulative score if available for use in weighting. We're
         // acting as-if the two right-most places are decimals
         if (senderScore != 0) {
             senderCumulative = (senderScore / (int(senderRatings) * 100)) * 100;
@@ -368,8 +368,8 @@ contract Etherep {
         // Calculate the weight if the sender has a positive rating
         if (senderCumulative > 0 && absRating != 0) {
 
-            // Calculate a weight to add to the final rating calculation.  Only 
-            // raters who have a positive cumulative score will have any extra 
+            // Calculate a weight to add to the final rating calculation.  Only
+            // raters who have a positive cumulative score will have any extra
             // weight.  Final weight should be between 40 and 100 and scale down
             // depending on how strong the rating is.
             weight = (senderCumulative + absRating) / 10;
@@ -380,7 +380,7 @@ contract Etherep {
             }
 
         }
-        
+
         // Add the weight to the rating
         workRating += weight;
 
@@ -404,17 +404,17 @@ contract Etherep {
 
         // Get an instance of our storage contract: RatingStore
         RatingStore store = RatingStore(storageAddress);
-        
+
         int cumulative;
         uint ratings;
 
         // Get the raw scores from RatingStore
         (cumulative, ratings) = store.get(who);
-        
+
         // Calculate the score as a false-float as an average of all ratings
         score = cumulative / int(ratings);
 
-        // We only want to display a maximum of 500 or minimum of -500, even 
+        // We only want to display a maximum of 500 or minimum of -500, even
         // if it's weighted outside of that range
         if (score > 500) {
             score = 500;
@@ -434,16 +434,25 @@ contract Etherep {
 
         // Get an instance of our storage contract: RatingStore
         RatingStore store = RatingStore(storageAddress);
-        
+
         int cumulative;
 
         // Get the raw scores from RatingStore
         (cumulative, ratings) = store.get(who);
-        
-        // The score should have room for 2 decimal places, but ratings is a 
+
+        // The score should have room for 2 decimal places, but ratings is a
         // single count
         score = cumulative / int(ratings);
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

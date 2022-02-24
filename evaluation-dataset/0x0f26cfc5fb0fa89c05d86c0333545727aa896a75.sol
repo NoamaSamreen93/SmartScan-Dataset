@@ -134,7 +134,7 @@ contract StandardToken is ERC20, BasicToken {
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-    
+
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
 
     allowed[msg.sender][_spender] = _value;
@@ -187,28 +187,28 @@ contract POWToken is StandardToken {
   string public constant symbol = "POW";
   uint8 public constant decimals = 18; // 18 decimal to fully comply with ERC20 Standard.
 
-//30 million POWtokens will be distributed via CrowdSale for Early Adopters. 
+//30 million POWtokens will be distributed via CrowdSale for Early Adopters.
 //30 million POWtokens will be available only by mining or staking in-game with the previously distributed tokens.
-//All tokens are transferable through the Ethereum Blockchain. 
-//All tokens are redeemable for tournament prizes and ether at regular token prize in-platform. 
-//Since number of tokens is limited, the price of each token will increase as the number of users and demand increases. 
+//All tokens are transferable through the Ethereum Blockchain.
+//All tokens are redeemable for tournament prizes and ether at regular token prize in-platform.
+//Since number of tokens is limited, the price of each token will increase as the number of users and demand increases.
 
-  uint256 public constant totalSupplyWithDecimals = 60000000000000000000000000; //60 million unique tokens for a single distribution and 18 decimal places to fully comply with ERC20 Standard. 
-  
+  uint256 public constant totalSupplyWithDecimals = 60000000000000000000000000; //60 million unique tokens for a single distribution and 18 decimal places to fully comply with ERC20 Standard.
+
   uint256 public mineableSupply;                        //Amount of POWTokens stored for in-platform mining, staking and prizes.
   address public mineableTokenStorageContract;          //Smart Contract to store in-platform tokens.
-  uint256 public openSaleSupply;                        //Amount of POWTokens distributed to Early Adpoters. 
+  uint256 public openSaleSupply;                        //Amount of POWTokens distributed to Early Adpoters.
   address public openDistributionContract;              //Smart Contract to store tokens for Open Distribution (CrowdSale).
 
   //No tokens for founders. Full-transparency distribution.
 
   string public tokenCreationDate;
-          
+
   /**
    * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function POWToken()public {
-    
+
     balances[msg.sender] = totalSupplyWithDecimals;
 
   }
@@ -216,15 +216,26 @@ contract POWToken is StandardToken {
 
 // setup contract addresses.
   function setupFunctionalAddresses(address _mineableTokenStorageContract, address _OpenDistributionContract) public returns (bytes32 response) {
-      
-          mineableSupply = 30000000000000000000000000;                           
+
+          mineableSupply = 30000000000000000000000000;
           mineableTokenStorageContract = _mineableTokenStorageContract;
           openSaleSupply = 30000000000000000000000000;
           openDistributionContract = _OpenDistributionContract;
           tokenCreationDate = "December-27-2017";
-          
+
           return "Addresses Setup.";
 
          }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

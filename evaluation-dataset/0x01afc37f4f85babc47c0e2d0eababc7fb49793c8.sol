@@ -153,7 +153,7 @@ contract TokenWrapper is ERC20Base(0), TokenWrapperInterface, TokenWrapperEvents
         else {
             broker = DepositBroker(_owner2broker[msg.sender]);
         }
-        
+
         return broker;
     }
     function notifyDeposit(uint amount) {
@@ -175,4 +175,15 @@ contract TokenWrapper is ERC20Base(0), TokenWrapperInterface, TokenWrapperEvents
     function getBroker(address owner) returns (DepositBrokerInterface) {
         return DepositBroker(_owner2broker[msg.sender]);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

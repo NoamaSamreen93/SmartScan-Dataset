@@ -18,7 +18,7 @@ contract TCC{
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -27,10 +27,10 @@ contract TCC{
 
     /* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
     /* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
-	
+
     /**
      * Constructor function
      *
@@ -44,7 +44,7 @@ contract TCC{
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
 	owner = msg.sender;		// Set the symbol for display purposes
     }
 
@@ -164,30 +164,43 @@ contract TCC{
         emit Burn(_from, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);            // Check if the sender has enough
 	require(freezeOf[msg.sender] + _value > freezeOf[msg.sender]);
-	require(_value > 0); 
+	require(_value > 0);
         balanceOf[msg.sender] -= _value;                      // Subtract from the sender
         freezeOf[msg.sender] += _value;                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         require(freezeOf[msg.sender] >= _value);            // Check if the sender has enough
 	require(balanceOf[msg.sender] + _value > balanceOf[msg.sender]);
-	require(_value > 0); 
+	require(_value > 0);
         freezeOf[msg.sender] -= _value;                      // Subtract from the sender
 	balanceOf[msg.sender] += _value;
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) public {
 		require(msg.sender == owner);
 		owner.transfer(amount);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
 	}
 }

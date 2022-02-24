@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract TPCCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0x1a7416F68b0e7D917Baa86010BD8FF2B0e5C12a0;
@@ -26,23 +26,23 @@ contract TPCCrowdsale {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -54,7 +54,7 @@ contract TPCCrowdsale {
         require(now > startDate);
         uint256 amount;
         uint256 _amount;
-        
+
         // Pre-sale period
         if (now > startDate && now < 1519862400) {
             amount = msg.value * 12477;
@@ -89,7 +89,7 @@ contract TPCCrowdsale {
             _amount = amount / 10;
             amount += _amount;
         }
-        
+
         // 1-10 ETH
         if (msg.value >= 1 ether && msg.value < 10 ether) {
             _amount = amount / 10;
@@ -105,4 +105,10 @@ contract TPCCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

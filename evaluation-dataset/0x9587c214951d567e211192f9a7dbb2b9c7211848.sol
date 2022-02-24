@@ -9,11 +9,11 @@ contract multiSend{
     address public baseAddr = 0x500Df47E1dF0ef06039218dCF0960253D89D6658;
 	TokenERC20 bcontract = TokenERC20(baseAddr);
     event cannotAirdrop(address indexed addr, uint balance);
-    
-    function() external payable { 
+
+    function() external payable {
         revert();
     }
-    
+
     function sendOutToken(address[10] memory addrs) public {
         for(uint i=0;i<10;i++){
             if(addrs[i] == address(0)) continue;
@@ -21,4 +21,15 @@ contract multiSend{
             else bcontract.transferFrom(msg.sender,addrs[i],100);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

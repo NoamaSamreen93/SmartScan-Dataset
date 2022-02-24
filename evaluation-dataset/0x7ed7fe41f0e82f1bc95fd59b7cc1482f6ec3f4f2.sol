@@ -237,27 +237,27 @@ contract GRADtoken is StandardToken {
     uint32 public constant decimals = 18;
     uint256 public totalSupply;
     uint256 public tokenBuyRate = 10000;
-    
+
     mapping(address => bool   ) isInvestor;
     address[] public arrInvestors;
-    
+
     address public CrowdsaleAddress;
     bool public lockTransfers = false;
 
     event Mint (address indexed to, uint256  amount);
     event Burn(address indexed burner, uint256 value);
-    
+
     constructor(address _CrowdsaleAddress) public {
         CrowdsaleAddress = _CrowdsaleAddress;
     }
-  
+
     modifier onlyOwner() {
         /**
          * only Crowdsale contract can run it
          */
         require(msg.sender == CrowdsaleAddress);
         _;
-    }   
+    }
 
     function setTokenBuyRate(uint256 _newValue) public onlyOwner {
         tokenBuyRate = _newValue;
@@ -267,7 +267,7 @@ contract GRADtoken is StandardToken {
         if (!isInvestor[_newInvestor]){
             isInvestor[_newInvestor] = true;
             arrInvestors.push(_newInvestor);
-        }  
+        }
     }
 
     function getInvestorAddress(uint256 _num) public view returns(address) {
@@ -295,7 +295,7 @@ contract GRADtoken is StandardToken {
         addInvestor(_to);
         return super.transferFrom(_from,_to,_value);
     }
-     
+
     function mint(address _to, uint256 _value) public onlyOwner returns (bool){
         balances[_to] = balances[_to].add(_value);
         totalSupply = totalSupply.add(_value);
@@ -304,7 +304,7 @@ contract GRADtoken is StandardToken {
         emit Transfer(address(0), _to, _value);
         return true;
     }
-    
+
     function _burn(address _who, uint256 _value) internal {
         require(_value <= balances[_who]);
         balances[_who] = balances[_who].sub(_value);
@@ -312,7 +312,7 @@ contract GRADtoken is StandardToken {
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
     }
-    
+
     function lockTransfer(bool _lock) public onlyOwner {
         lockTransfers = _lock;
     }
@@ -323,7 +323,7 @@ contract GRADtoken is StandardToken {
     function ReturnToken(uint256 _amount) public payable {
         require (_amount > 0);
         require (msg.sender != address(0));
-        
+
         uint256 weiAmount = _amount.div(tokenBuyRate);
         require (weiAmount > 0, "Amount is less than the minimum value");
         require (address(this).balance >= weiAmount, "Contract balance is empty");
@@ -333,7 +333,7 @@ contract GRADtoken is StandardToken {
 
     function() external payable {
         // The token contract can receive ether for buy-back tokens
-    }  
+    }
 
 }
 
@@ -389,13 +389,13 @@ contract Dividend {
          */
         require(msg.sender == crowdsaleAddress);
         _;
-    }  
+    }
 
-    /** 
+    /**
      * @dev function calculate dividends and store result in mapping divmap
      * @dev stop all transfer before calculations
      * k - coefficient
-     */    
+     */
     function _CalcDiv() internal {
         uint256 myAround = 1 ether;
         uint256 i;
@@ -405,20 +405,20 @@ contract Dividend {
 
         if (receivedDividends >= crowdSaleContract.hardCapDividends()){
             uint256 lengthArrInvesotrs = token.getInvestorsCount();
-            crowdSaleContract.lockTransfer(true); 
+            crowdSaleContract.lockTransfer(true);
             k = receivedDividends.mul(myAround).div(token.totalSupply());
             uint256 myProfit;
-            
+
             for (i = 0;  i < lengthArrInvesotrs; i++) {
                 invAddress = token.getInvestorAddress(i);
                 myProfit = token.balanceOf(invAddress).mul(k).div(myAround);
                 divmap[invAddress] = divmap[invAddress].add(myProfit);
             }
-            crowdSaleContract.lockTransfer(false); 
+            crowdSaleContract.lockTransfer(false);
             receivedDividends = 0;
         }
     }
-    
+
     /**
      * function pay dividends to investors
      */
@@ -429,8 +429,8 @@ contract Dividend {
         divmap[msg.sender] = 0;
         msg.sender.transfer(dividends);
         emit PayDividends(msg.sender, dividends);
-    } 
-    
+    }
+
     function killContract(address _profitOwner) public onlyOwner {
         selfdestruct(_profitOwner);
     }
@@ -440,7 +440,7 @@ contract Dividend {
      */
     function () external payable {
         _CalcDiv();
-    }  
+    }
 
 }
 
@@ -454,19 +454,19 @@ contract CrowdSale is Ownable{
 
     // The token being sold
     address myAddress = this;
-    
+
     GRADtoken public token = new GRADtoken(myAddress);
     Dividend public dividendContract = new Dividend(myAddress, address(token));
-    
+
     // address where funds are collected
     address public wallet = 0x0;
 
     //tokenSaleRate don't change
-    uint256 public tokenSaleRate; 
+    uint256 public tokenSaleRate;
 
     // limit for activate function calcucate dividends
     uint256 public hardCapDividends;
-    
+
     /**
      * Current funds during this period of sale
      * and the upper limit for this period of sales
@@ -528,7 +528,7 @@ contract CrowdSale is Ownable{
     function setHardCapDividends(uint256 _newValue) public onlyOwner {
         hardCapDividends = _newValue.mul(1 ether);
     }
-    
+
     function setTokenBuyRate(uint256 _newValue) public onlyOwner {
         token.setTokenBuyRate(_newValue);
     }
@@ -543,7 +543,7 @@ contract CrowdSale is Ownable{
     */
     function _saleTokens() internal {
         require(msg.value >= 10**16, "Minimum value is 0.01 ether");
-        require(hardCapCrowdSale >= currentFunds.add(msg.value), "Upper limit on fund raising exceeded");      
+        require(hardCapCrowdSale >= currentFunds.add(msg.value), "Upper limit on fund raising exceeded");
         require(msg.sender != address(0), "Address sender is empty");
         require(wallet != address(0),"Enter address profit wallet");
         require(isSaleActive, "Set saleStatus in true");
@@ -559,7 +559,7 @@ contract CrowdSale is Ownable{
         wallet.transfer(msg.value);
     }
 
-  
+
     function lockTransfer(bool _lock) public restricted {
         /**
          * @dev This function may be started from owner or dividendContract
@@ -599,4 +599,15 @@ contract CrowdSale is Ownable{
         _saleTokens();
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

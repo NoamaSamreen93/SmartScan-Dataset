@@ -10,7 +10,7 @@ contract Token {
 
 contract KryptoniexDEX {
 
-    
+
     address admin;
 
     constructor(address _admin) public{
@@ -39,9 +39,9 @@ contract KryptoniexDEX {
         require(tokenallowance(tokenaddr,fromaddr) > 0);
               Token(tokenaddr).transferFrom(fromaddr,address(this), tokenAmount);
               return true;
-        
+
     }
-  
+
 
     function tokenWithdraw(address tokenAddr,address withdrawaddr, uint256 tokenAmount) public returns(bool)
     {
@@ -50,16 +50,25 @@ contract KryptoniexDEX {
          return true;
 
     }
-    
+
      function viewTokenBalance(address tokenAddr,address baladdr)public view returns(uint256){
         return Token(tokenAddr).balanceOf(baladdr);
     }
-    
+
     function tokenallowance(address tokenAddr,address owner) public view returns(uint256){
         return Token(tokenAddr).allowance(owner,address(this));
     }
-    
 
 
 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

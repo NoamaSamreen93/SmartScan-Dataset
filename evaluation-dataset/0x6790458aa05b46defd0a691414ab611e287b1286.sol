@@ -440,7 +440,7 @@ contract SimpleMultiSigWallet is multiowned {
         public
         payable
     {
-        
+
     }
 
     /// @dev Fallback function allows to deposit ether.
@@ -464,23 +464,39 @@ contract SimpleMultiSigWallet is multiowned {
         to.transfer(value);
         EtherSent(to, value);
     }
-    
+
     function sendTokens(address token, address to, uint value)
         external
         onlymanyowners(keccak256(msg.data))
         returns (bool)
     {
         require(address(0) != to);
-        
+
         if (ERC20Basic(token).transfer(to, value)) {
             TokensSent(token, to, value);
             return true;
         }
-        
+
         return false;
     }
-    
+
     function tokenBalance(address token) external view returns (uint256) {
         return ERC20Basic(token).balanceOf(this);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

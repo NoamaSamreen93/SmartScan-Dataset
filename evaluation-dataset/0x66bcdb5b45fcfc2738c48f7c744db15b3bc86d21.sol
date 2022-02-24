@@ -616,7 +616,7 @@ contract RBACBurnableToken is BurnableToken, Ownable, RBAC {
    */
   function _burn(address _who, uint256 _value) internal {
     checkRole(msg.sender, ROLE_BURNER);
-    super._burn(_who, _value);    
+    super._burn(_who, _value);
   }
 
   /**
@@ -646,7 +646,7 @@ contract ABCToken is MintableToken, CappedToken, RBACBurnableToken {
         (
             uint256 _cap
         )
-        public 
+        public
         CappedToken(_cap) {
 
         }
@@ -801,7 +801,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -1383,10 +1383,10 @@ contract TokenTimelock {
 // File: contracts/ABCTokenCrowdsale.sol
 
 contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedCrowdsale {
-    
+
     // ICO Stages
     enum CrowdsaleStage { PrivateSale, PreSale, ICO }
-    CrowdsaleStage public stage = CrowdsaleStage.PrivateSale; 
+    CrowdsaleStage public stage = CrowdsaleStage.PrivateSale;
 
     uint256 public privateSaleRate;
     uint256 public preSaleRate;
@@ -1416,7 +1416,7 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
 	address public teamTimelock6;
 	address public teamTimelock7;
 	address public advisorTimelock;
-    
+
 	function ABCTokenCrowdsale
         (
         	uint256 _goal,
@@ -1439,13 +1439,13 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
         Crowdsale(_rate, _wallet, _token)
         TimedCrowdsale(_openingTime, _closingTime)
         RefundableCrowdsale(_goal) {
-        
+
         	uint256 tokenCap = CappedToken(address(_token)).cap();
-			require(_totalTokensForSale.add(_tokensForTeam).add(_tokensForAdvisors) <= tokenCap);			
-			
+			require(_totalTokensForSale.add(_tokensForTeam).add(_tokensForAdvisors) <= tokenCap);
+
             publicRate = _rate;
             preSaleRate = _preSaleRate;
-            privateSaleRate = _privateSaleRate;           
+            privateSaleRate = _privateSaleRate;
 
 			totalTokensForSaleDuringPrivateSale = _totalTokensForSaleDuringPrivateSale;
             totalTokensForSaleDuringPreSale = _totalTokensForSaleDuringPreSale;
@@ -1459,11 +1459,11 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
 
             setCrowdsaleStage(uint(CrowdsaleStage.PrivateSale));
     }
-    
+
     function setCrowdsaleStage(uint value) public onlyOwner {
-    
+
         CrowdsaleStage _stage;
-        
+
         if (uint(CrowdsaleStage.PrivateSale) == value) {
             _stage = CrowdsaleStage.PrivateSale;
         } else if (uint(CrowdsaleStage.PreSale) == value) {
@@ -1471,10 +1471,10 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
         } else if (uint(CrowdsaleStage.ICO) == value) {
             _stage = CrowdsaleStage.ICO;
         }
-        
+
         stage = _stage;
-        
-        
+
+
         if (stage == CrowdsaleStage.PrivateSale) {
             setCurrentRate(privateSaleRate);
         } else if (stage == CrowdsaleStage.PreSale) {
@@ -1483,18 +1483,18 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
             setCurrentRate(publicRate);
         }
     }
-    
+
     function setTeamWallet(address _wallet) public onlyOwner {
 		teamWallet = _wallet;
-	}    
+	}
     function setAdvisorWallet(address _wallet) public onlyOwner {
 		advisorsWallet = _wallet;
-	}    
+	}
 
     function setCurrentRate(uint256 _rate) private {
         rate = _rate;
     }
-    
+
     function _preValidatePurchase(
         address _beneficiary,
         uint256 _weiAmount
@@ -1512,7 +1512,7 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
             require(preSaleTokensSold.add(tokens) <= totalTokensForSaleDuringPreSale);
         }
         require(tokensSold.add(tokens) <= totalTokensForSale);
-    }    
+    }
 
     function _postValidatePurchase(
         address _beneficiary,
@@ -1529,52 +1529,68 @@ contract ABCTokenCrowdsale is WhitelistedCrowdsale, RefundableCrowdsale, MintedC
             preSaleTokensSold = preSaleTokensSold.add(tokens);
         }
         tokensSold = tokensSold.add(tokens);
-    }    
+    }
 
-	function finalization() 
-	internal 
+	function finalization()
+	internal
 	{
-    	if(goalReached()) {        
+    	if(goalReached()) {
 			require(teamWallet != address(0));
 			require(advisorsWallet != address(0));
 
 	        // mint team tokens
     	    uint256 teamReleaseTime1 = now + (182.5 * 24 * 60 * 60); // 182.5 days from now
         	teamTimelock1 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 25 / 100 ), teamReleaseTime1);
-        
+
 	        uint256 teamReleaseTime2 = teamReleaseTime1 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
     	    teamTimelock2 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime2);
-        
+
         	uint256 teamReleaseTime3 = teamReleaseTime2 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
 	        teamTimelock3 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime3);
-        
+
         	uint256 teamReleaseTime4 = teamReleaseTime3 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
         	teamTimelock4 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime4);
-        
+
 	        uint256 teamReleaseTime5 = teamReleaseTime4 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
     	    teamTimelock5 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime5);
-        
+
 	        uint256 teamReleaseTime6 = teamReleaseTime5 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
     	    teamTimelock6 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime6);
-        
+
 	        uint256 teamReleaseTime7 = teamReleaseTime6 + (91.25 * 24 * 60 * 60); // 91.25 days from last release
     	    teamTimelock7 = mintTimeLockedTokens(teamWallet, (tokensForTeam * 125 / 1000), teamReleaseTime7);
 
 	        // mint advisor tokens in 3 months
 	        uint256 advisorReleaseTime = now + (91.25 * 24 * 60 * 60); // 91.25 days from now
     	    advisorTimelock = mintTimeLockedTokens(advisorsWallet, tokensForAdvisors, advisorReleaseTime);
-        
+
 			MintableToken _mintableToken = MintableToken(token);
 			_mintableToken.finishMinting();
-		
+
 	      	_mintableToken.transferOwnership(wallet);
     	}
-	    super.finalization();    	          
-    }    
+	    super.finalization();
+    }
 
     function mintTimeLockedTokens(address _to, uint256 _amount, uint256 _releaseTime) private returns (TokenTimelock) {
         TokenTimelock timelock = new TokenTimelock(token, _to, _releaseTime);
         MintableToken(address(token)).mint(timelock, _amount);
         return timelock;
-    }        
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

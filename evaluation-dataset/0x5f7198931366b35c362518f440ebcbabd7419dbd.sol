@@ -52,7 +52,7 @@ contract AtomaxKyc {
 
     // Must be implemented in descending contract to assign tokens to the buyers. Called after the KYC verification is passed
     function releaseTokensTo(address buyer) internal returns(bool);
-    
+
     function buyTokens(bytes32 buyerId, uint maxAmount, uint8 v, bytes32 r, bytes32 s) public payable returns (bool) {
         return buyImplementation(msg.sender, buyerId, maxAmount, v, r, s);
     }
@@ -61,18 +61,18 @@ contract AtomaxKyc {
         // check the signature
         bytes32 hash = hasher ( _buyerAddress,  _buyerId,  _maxAmount );
         address signer = ecrecover(hash, _v, _r, _s);
-		
+
 		require( isKycSigner[signer], "isKycSigner[signer]");
-        
+
 		uint256 totalPayed = alreadyPayed[_buyerId].add(msg.value);
 		require(totalPayed <= _maxAmount);
 		alreadyPayed[_buyerId] = totalPayed;
-		
+
 		emit KycVerified(signer, _buyerAddress, _buyerId, _maxAmount);
 		return releaseTokensTo(_buyerAddress);
 
     }
-    
+
     function hasher (address _buyerAddress, bytes32 _buyerId, uint256 _maxAmount) public view returns ( bytes32 hash ) {
         hash = keccak256(abi.encodePacked("Atomax authorization:", this, _buyerAddress, _buyerId, _maxAmount));
     }
@@ -80,41 +80,51 @@ contract AtomaxKyc {
 
 contract CoinCrowdReservedContract is AtomaxKyc {
     using SafeMath for uint256;
-    
+
     tokenInterface public xcc;
     TokedoDaicoInterface public tokenSaleContract;
-    
+
     mapping (address => uint256) public tkd_amount;
-    
+
     constructor(address _xcc, address _tokenSaleAddress) public {
         xcc = tokenInterface(_xcc);
         tokenSaleContract = TokedoDaicoInterface(_tokenSaleAddress);
-    } 
+    }
 
     function releaseTokensTo(address _buyer) internal returns(bool) {
         require ( msg.sender == tx.origin, "msg.sender == tx.orgin" );
-		
+
 		uint256 xcc_amount = xcc.balanceOf(msg.sender);
 		require( xcc_amount > 0, "xcc_amount > 0" );
-		
+
 		xcc.originBurn(xcc_amount);
 		tokenSaleContract.sendTokens(_buyer, xcc_amount);
-		
+
 		if ( msg.value > 0 ) msg.sender.transfer(msg.value);
-		
+
         return true;
     }
-    
+
     modifier onlyTokenSaleOwner() {
         require(msg.sender == tokenSaleContract.owner() );
         _;
     }
-    
+
     function withdrawTokens(address tknAddr, address to, uint256 value) public onlyTokenSaleOwner returns (bool) { //emergency function
         return tokenInterface(tknAddr).transfer(to, value);
     }
-    
+
     function withdraw(address to, uint256 value) public onlyTokenSaleOwner { //emergency function
         to.transfer(value);
     }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

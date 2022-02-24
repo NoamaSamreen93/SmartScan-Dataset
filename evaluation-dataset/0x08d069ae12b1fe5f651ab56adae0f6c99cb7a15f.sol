@@ -300,3 +300,14 @@ contract JobeumToken is CommonBsToken {
         0x1D2b0A204f9609c9d044Bde67b70D511d6273527 // address _seller (main holder of all tokens)
     ) { }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

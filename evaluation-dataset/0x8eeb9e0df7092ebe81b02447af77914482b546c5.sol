@@ -23,14 +23,14 @@ contract Z_ERC20 is Z_ERC20Basic {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
- 
+
 
 /**
  * @title Basic token implementation
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract Z_BasicToken is Z_ERC20Basic {
-   
+
   mapping(address => uint256) balances;
 
   /**
@@ -60,7 +60,7 @@ contract Z_BasicToken is Z_ERC20Basic {
 }
 
 /**
- * @title Standard ERC20 token, implementing  transfer by agents 
+ * @title Standard ERC20 token, implementing  transfer by agents
  *
  * @dev Implementation of the basic standard token with allowances.
  * @dev https://github.com/ethereum/EIPs/issues/20
@@ -69,9 +69,9 @@ contract Z_BasicToken is Z_ERC20Basic {
 contract Z_StandardToken is Z_ERC20, Z_BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
- 
+
   /**
-   * @dev Transfer tokens from one address to another by agents within allowance limit 
+   * @dev Transfer tokens from one address to another by agents within allowance limit
    * @param _from address The address which you want to send tokens from
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
@@ -211,9 +211,9 @@ contract Z_Ownable {
    */
   function  isOwner() internal view returns (bool) {
     return (msg.sender == owner );
-    
+
   }
-  
+
   /**
    * @dev Throws if called by any account other than admins.
    */
@@ -228,9 +228,9 @@ contract Z_Ownable {
    */
   function  isAdmin() internal view returns (bool) {
     return  (admin_accounts[msg.sender]==true);
-    
+
   }
- 
+
 }
 
 
@@ -268,7 +268,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     // sale status variable: 0 ~ 13 (enum Sale_Status )
     Sale_Status  public  sale_status= Sale_Status.Initialized_STATUS;
 
-    // sale stage index : 0 ~ 4 ( 0:1~2,  1:3~4, 2:5~6, 3:7~8, 4:9~10) 
+    // sale stage index : 0 ~ 4 ( 0:1~2,  1:3~4, 2:5~6, 3:7~8, 4:9~10)
     uint256   public  sale_stage_index= 0; // 0 ~ 4 for stage0 ~ 4
 
     // initiazlied time
@@ -321,14 +321,14 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
       address _from;
       address _to;
       uint256 _token_value; // in viva token
-      uint256 _when; 
+      uint256 _when;
     }
 
     // struct definition for token burning history
     struct history_token_burning_obj {
       address _from;
       uint256 _token_value_burned; // in viva token
-      uint256 _when; 
+      uint256 _when;
     }
 
     // token transfer history
@@ -344,11 +344,11 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     mapping (address => uint256) internal sale_amount_stage3_account;
     mapping (address => uint256) internal sale_amount_stage4_account;
 
-    
+
     // array for list of  holders and their receiving amounts
     mapping (address => uint256) internal holders_received_accumul;
 
-    // array for list of holders accounts (including even inactive holders) 
+    // array for list of holders accounts (including even inactive holders)
     address[] public holders;
 
     // array for list of sale holders accounts for each sale stage
@@ -357,7 +357,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     address[] public holders_stage2_sale;
     address[] public holders_stage3_sale;
     address[] public holders_stage4_sale;
-    
+
     // array for list of trading holders which are not sale holders
     address[] public holders_trading;
 
@@ -385,51 +385,51 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     // cryptocurrency exchange office  ether address, for monitorig purpose
     address[] public cryptocurrency_exchange_company_accounts;
 
-    
+
     /////////////////////////////////////////////////////////////////////////
- 
+
     event AddNewAdministrator(address indexed _admin, uint256 indexed _when);
     event RemoveAdministrator(address indexed _admin, uint256 indexed _when);
-  
+
     /**
-     *  @dev   add new admin accounts 
-     *        (run by admin, public function) 
+     *  @dev   add new admin accounts
+     *        (run by admin, public function)
      *  @param _newAdmin   new admin address
      */
     function z_admin_add_admin(address _newAdmin) public onlyOwner {
       require(_newAdmin != address(0));
       admin_accounts[_newAdmin]=true;
-    
+
       emit AddNewAdministrator(_newAdmin, block.timestamp);
     }
-  
+
     /**
      *  @dev   remove old admin accounts
-     *        (run by admin, public function) 
+     *        (run by admin, public function)
      *  @param _oldAdmin   old admin address
      */
     function z_admin_remove_admin(address _oldAdmin) public onlyOwner {
       require(_oldAdmin != address(0));
       require(admin_accounts[_oldAdmin]==true);
       admin_accounts[_oldAdmin]=false;
-    
+
       emit RemoveAdministrator(_oldAdmin, block.timestamp);
     }
-  
+
     event AddNewExchangeAccount(address indexed _exchange_account, uint256 indexed _when);
 
     /**
      *  @dev   add new exchange office accounts
-     *        (run by admin, public function) 
+     *        (run by admin, public function)
      *  @param _exchange_account   new exchange address
      */
     function z_admin_add_exchange(address _exchange_account) public onlyAdmin {
       require(_exchange_account != address(0));
       cryptocurrency_exchange_company_accounts.push(_exchange_account);
-    
+
       emit AddNewExchangeAccount(_exchange_account, block.timestamp);
     }
- 
+
     event SaleTokenPriceSet(uint256 _stage_index, uint256 _wei_per_viva_value, uint256 indexed _when);
 
     /**
@@ -438,7 +438,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
      * return  _how_many_wei_per_viva   new token sale price (wei per viva)
      */
     function z_admin_set_sale_price(uint256 _how_many_wei_per_viva) public
-        onlyAdmin 
+        onlyAdmin
     {
         if(_how_many_wei_per_viva == 0) revert();
         if(sale_stage_index >= 5) revert();
@@ -478,11 +478,11 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
            revert();
         sale_status= Sale_Status(1 + sale_stage_index * 2); // 0=>1, 1=>3, 2=>5, 3=>7, 4=>9
         when_stageN_sale_started[sale_stage_index]= block.timestamp;
-        if(sale_stage_index==0) emit StartStage0TokenSale(block.timestamp); 
-        if(sale_stage_index==1) emit StartStage1TokenSale(block.timestamp); 
-        if(sale_stage_index==2) emit StartStage2TokenSale(block.timestamp); 
-        if(sale_stage_index==3) emit StartStage3TokenSale(block.timestamp); 
-        if(sale_stage_index==4) emit StartStage4TokenSale(block.timestamp); 
+        if(sale_stage_index==0) emit StartStage0TokenSale(block.timestamp);
+        if(sale_stage_index==1) emit StartStage1TokenSale(block.timestamp);
+        if(sale_stage_index==2) emit StartStage2TokenSale(block.timestamp);
+        if(sale_stage_index==3) emit StartStage3TokenSale(block.timestamp);
+        if(sale_stage_index==4) emit StartStage4TokenSale(block.timestamp);
     }
 
 
@@ -497,17 +497,17 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
      * @dev  stop this [_old_sale_stage_index] sale stage
      *     (run by admin )
      */
-    function stop_StageN_Sale(uint256 _old_sale_stage_index) internal 
+    function stop_StageN_Sale(uint256 _old_sale_stage_index) internal
     {
         if(sale_stage_index != _old_sale_stage_index)
            revert();
         sale_status= Sale_Status(2 + sale_stage_index * 2); // 0=>2, 1=>4, 2=>6, 3=>8, 4=>10
         when_stageN_sale_stopped[sale_stage_index]= block.timestamp;
-        if(sale_stage_index==0) emit StopStage0TokenSale(block.timestamp); 
-        if(sale_stage_index==1) emit StopStage1TokenSale(block.timestamp); 
-        if(sale_stage_index==2) emit StopStage2TokenSale(block.timestamp); 
-        if(sale_stage_index==3) emit StopStage3TokenSale(block.timestamp); 
-        if(sale_stage_index==4) emit StopStage4TokenSale(block.timestamp); 
+        if(sale_stage_index==0) emit StopStage0TokenSale(block.timestamp);
+        if(sale_stage_index==1) emit StopStage1TokenSale(block.timestamp);
+        if(sale_stage_index==2) emit StopStage2TokenSale(block.timestamp);
+        if(sale_stage_index==3) emit StopStage3TokenSale(block.timestamp);
+        if(sale_stage_index==4) emit StopStage4TokenSale(block.timestamp);
     }
 
 
@@ -515,20 +515,20 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     event StartTradePublicSaleTokens(uint256 indexed _when);
 
     /**
-     *  @dev  allow stage1~4 token trading 
+     *  @dev  allow stage1~4 token trading
      *      (run by admin )
      */
     function start_Public_Trade() internal
         onlyAdmin
     {
-        // if current sale stage had not been stopped, first stop current active sale stage 
+        // if current sale stage had not been stopped, first stop current active sale stage
         Sale_Status new_sale_status= Sale_Status(2 + sale_stage_index * 2);
         if(new_sale_status > sale_status)
           stop_StageN_Sale(sale_stage_index);
 
         sale_status= Sale_Status.Public_Allowed_To_Trade_STATUS;
         when_public_allowed_to_trade_started= block.timestamp;
-        emit StartTradePublicSaleTokens(block.timestamp); 
+        emit StartTradePublicSaleTokens(block.timestamp);
     }
 
     event StartTradeStage0SaleTokens(uint256 indexed _when);
@@ -541,22 +541,22 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
         onlyAdmin
     {
         if(sale_status!= Sale_Status.Public_Allowed_To_Trade_STATUS) revert();
-        
+
         // allowed 1 year later after stage1 tokens trading is enabled
 
         uint32 stage0_locked_year= 1;
- 
-        bool is_debug= false; // change to false if this contract source  is release version 
+
+        bool is_debug= false; // change to false if this contract source  is release version
         if(is_debug==false && block.timestamp <  stage0_locked_year*365*24*60*60
-            + when_public_allowed_to_trade_started  )  
+            + when_public_allowed_to_trade_started  )
 	      revert();
         if(is_debug==true  && block.timestamp <  stage0_locked_year*10*60
-            + when_public_allowed_to_trade_started  )  
+            + when_public_allowed_to_trade_started  )
 	      revert();
-	      
+
         sale_status= Sale_Status.Stage0_Allowed_To_Trade_STATUS;
         when_stage0_allowed_to_trade_started= block.timestamp;
-        emit StartTradeStage0SaleTokens(block.timestamp); 
+        emit StartTradeStage0SaleTokens(block.timestamp);
     }
 
 
@@ -578,19 +578,19 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
         when_initialized= block.timestamp;
 
-        holders.push(msg.sender); 
+        holders.push(msg.sender);
         holders_received_accumul[msg.sender] += _totalTokenAmount;
 
         emit Transfer(address(0x0), msg.sender, _totalTokenAmount);
         emit InitializedStage(block.timestamp);
-        emit CreateTokenContract(block.timestamp); 
+        emit CreateTokenContract(block.timestamp);
     }
 
 
 
 
     /**
-     * @dev check if specified token transfer request is valid 
+     * @dev check if specified token transfer request is valid
      *           ( internal modifier function).
      *           revert  if transfer should be NOT allowed, otherwise do nothing
      * @param _from   source account from whom tokens should be transferred
@@ -612,7 +612,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
             // if stage0 token trading is not enabled yet, disallow this request
             if( sale_amount_stage0_account[_from] > 0 ) {
-                if(sale_status < Sale_Status.Stage0_Allowed_To_Trade_STATUS)  
+                if(sale_status < Sale_Status.Stage0_Allowed_To_Trade_STATUS)
                     revert();
             }  else {
             }
@@ -625,19 +625,19 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
          uint _token_value, uint256 indexed _when);
     event TransferTokenFrom(address indexed _from_whom,address indexed _to_whom, address _agent,
 	 uint _token_value, uint256 indexed _when);
-    event TransferTokenFromByAdmin(address indexed _from_whom,address indexed _to_whom, address _admin, 
+    event TransferTokenFromByAdmin(address indexed _from_whom,address indexed _to_whom, address _admin,
  	 uint _token_value, uint256 indexed _when);
 
     /**
-     * @dev transfer specified amount of tokens from my account to _to account 
+     * @dev transfer specified amount of tokens from my account to _to account
      *     (run by self, public function)
      * @param _to   destination account to whom tokens should be transferred
      * @param _value   number of tokens to be transferred
      * @return _success   report if transfer was successful, on failure revert()
      */
-    function transfer(address _to, uint _value) public 
+    function transfer(address _to, uint _value) public
         validTransaction(msg.sender, _to,  _value)
-    returns (bool _success) 
+    returns (bool _success)
     {
         _success= super.transfer(_to, _value);
         if(_success==false) revert();
@@ -647,7 +647,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 	// check if new trading holder
         if(holders_received_accumul[_to]==0x0) {
 	   // new holder comes
-           holders.push(_to); 
+           holders.push(_to);
            holders_trading.push(_to);
 	   emit NewHolderTrading(_to, block.timestamp);
         }
@@ -670,9 +670,9 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
      * @param _value   number of tokens to be transferred
      * @return _success   report if transfer was successful, on failure revert()
      */
-    function transferFrom(address _from, address _to, uint _value) public 
+    function transferFrom(address _from, address _to, uint _value) public
         validTransaction(_from, _to, _value)
-    returns (bool _success) 
+    returns (bool _success)
     {
         if(isAdmin()==true) {
             // admins can transfer tokens of **ANY** accounts
@@ -686,12 +686,12 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
         }
 
         if(_success==false) revert();
-        
+
 	// check if new trading holder
         if(holders_received_accumul[_to]==0x0) {
 	   // new holder comes
-           holders.push(_to); 
-           holders_trading.push(_to); 
+           holders.push(_to);
+           holders_trading.push(_to);
 	   emit NewHolderTrading(_to, block.timestamp);
         }
         holders_received_accumul[_to] += _value;
@@ -706,7 +706,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
     }
 
-    
+
     event IssueTokenSale(address indexed _buyer, uint _ether_value, uint _token_value,
            uint _exchange_rate_viva_per_wei, uint256 indexed _when);
 
@@ -719,23 +719,23 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
     event NewHolderTrading(address indexed _new_comer, uint256 indexed _when);
     event NewHolderSale(address indexed _new_comer, uint256 indexed _when);
-    
+
     /**
      *  @dev   buy viva tokens by sending some ethers  to this contract address
      *       (payable public function )
      */
     function buy() public payable {
-        if(sale_status < Sale_Status.Stage0_Sale_Started_STATUS) 
+        if(sale_status < Sale_Status.Stage0_Sale_Started_STATUS)
            revert();
-        
-        if(sale_status > Sale_Status.Stage4_Sale_Stopped_STATUS) 
+
+        if(sale_status > Sale_Status.Stage4_Sale_Stopped_STATUS)
            revert();
-        
+
         if((uint256(sale_status)%2)!=1)  revert(); // not in started sale status
         if(isAdmin()==true)  revert(); // admins are not allowed to buy tokens
-	  
+
         uint256 tokens;
-        
+
         uint256 wei_per_viva= sale_price_per_stage_wei_per_viva[sale_stage_index];
 
         // if sent ether value is less than exch_rate, revert
@@ -743,15 +743,15 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
         // calculate num of bought tokens based on sent ether value (in wei)
 	tokens = uint256( msg.value /  wei_per_viva );
-      
+
         if (tokens + sold_tokens_total > totalSupply) revert();
 
         // update token sale statistics  per stage
-	if(sale_stage_index==0) sale_amount_stage0_account[msg.sender] += tokens; else	
-	if(sale_stage_index==1) sale_amount_stage1_account[msg.sender] += tokens; else	
-	if(sale_stage_index==2) sale_amount_stage2_account[msg.sender] += tokens; else	
-	if(sale_stage_index==3) sale_amount_stage3_account[msg.sender] += tokens; else	
-	if(sale_stage_index==4) sale_amount_stage4_account[msg.sender] += tokens;	
+	if(sale_stage_index==0) sale_amount_stage0_account[msg.sender] += tokens; else
+	if(sale_stage_index==1) sale_amount_stage1_account[msg.sender] += tokens; else
+	if(sale_stage_index==2) sale_amount_stage2_account[msg.sender] += tokens; else
+	if(sale_stage_index==3) sale_amount_stage3_account[msg.sender] += tokens; else
+	if(sale_stage_index==4) sale_amount_stage4_account[msg.sender] += tokens;
 	sold_tokens_per_stage[sale_stage_index] += tokens;
         sold_tokens_total += tokens;
 
@@ -764,19 +764,19 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 	// check if this holder is new
         if(holders_received_accumul[msg.sender]==0x0) {
 	   // new holder comes
-           holders.push(msg.sender); 
-	   if(sale_stage_index==0) holders_stage0_sale.push(msg.sender); else 
-	   if(sale_stage_index==1) holders_stage1_sale.push(msg.sender); else 
-	   if(sale_stage_index==2) holders_stage2_sale.push(msg.sender); else 
-	   if(sale_stage_index==3) holders_stage3_sale.push(msg.sender); else 
-	   if(sale_stage_index==4) holders_stage4_sale.push(msg.sender); 
+           holders.push(msg.sender);
+	   if(sale_stage_index==0) holders_stage0_sale.push(msg.sender); else
+	   if(sale_stage_index==1) holders_stage1_sale.push(msg.sender); else
+	   if(sale_stage_index==2) holders_stage2_sale.push(msg.sender); else
+	   if(sale_stage_index==3) holders_stage3_sale.push(msg.sender); else
+	   if(sale_stage_index==4) holders_stage4_sale.push(msg.sender);
 	   emit NewHolderSale(msg.sender, block.timestamp);
         }
         holders_received_accumul[msg.sender] += tokens;
 
         emit IssueTokenSale(msg.sender, msg.value, tokens, wei_per_viva, block.timestamp);
-        
-        // if target ether is reached, stop this sale stage 
+
+        // if target ether is reached, stop this sale stage
 	if( target_ethers_per_stage[sale_stage_index] <= raised_ethers_per_stage[sale_stage_index])
     	    stop_StageN_Sale(sale_stage_index);
     }
@@ -784,26 +784,26 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
 
     event FreezeAccount(address indexed _account_to_freeze, uint256 indexed _when);
     event UnfreezeAccount(address indexed _account_to_unfreeze, uint256 indexed _when);
-    
+
     /**
-     * @dev freeze a holder account, prohibit further token transfer 
+     * @dev freeze a holder account, prohibit further token transfer
      *     (run by ADMIN, public function)
      * @param _account_to_freeze   account to freeze
      */
     function z_admin_freeze(address _account_to_freeze) public onlyAdmin   {
         account_frozen_time[_account_to_freeze]= block.timestamp;
         holders_frozen.push(_account_to_freeze);
-        emit FreezeAccount(_account_to_freeze,block.timestamp); 
+        emit FreezeAccount(_account_to_freeze,block.timestamp);
     }
 
     /**
-     * @dev unfreeze a holder account 
+     * @dev unfreeze a holder account
      *     (run by ADMIN, public function)
      * @param _account_to_unfreeze   account to unfreeze (previously frozen)
      */
     function z_admin_unfreeze(address _account_to_unfreeze) public onlyAdmin   {
         account_frozen_time[_account_to_unfreeze]= 0; // reset time to zero
-        emit UnfreezeAccount(_account_to_unfreeze,block.timestamp); 
+        emit UnfreezeAccount(_account_to_unfreeze,block.timestamp);
     }
 
 
@@ -812,22 +812,22 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     event CloseTokenContract(uint256 indexed _when);
 
     /**
-     * @dev close this contract after burning all tokens 
+     * @dev close this contract after burning all tokens
      *     (run by ADMIN, public function )
      */
     function closeContract() onlyAdmin internal {
 	if(sale_status < Sale_Status.Stage0_Allowed_To_Trade_STATUS)  revert();
 	if(totalSupply > 0)  revert();
     	address ScAddress = this;
-        emit CloseTokenContract(block.timestamp); 
-        emit WithdrawEther(owner,ScAddress.balance,block.timestamp); 
+        emit CloseTokenContract(block.timestamp);
+        emit WithdrawEther(owner,ScAddress.balance,block.timestamp);
 	selfdestruct(owner);
-    } 
+    }
 
 
 
     /**
-     * @dev retrieve contract's ether balance info 
+     * @dev retrieve contract's ether balance info
      *     (public view function)
      * @return _current_ether_balane   current contract ethereum balance ( in wei unit)
      * @return _ethers_withdrawn   withdrawen ethers in wei
@@ -837,17 +837,17 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     returns (
       uint256 _current_ether_balance,
       uint256 _ethers_withdrawn,
-      uint256 _ethers_raised_total 
+      uint256 _ethers_raised_total
      ) {
 	_current_ether_balance= address(this).balance;
 	_ethers_withdrawn= totalEtherWithdrawed;
 	_ethers_raised_total= raised_ethers_total;
-    } 
+    }
 
     event WithdrawEther(address indexed _addr, uint256 _value, uint256 indexed _when);
 
     /**
-     * @dev transfer this contract ether balance to owner's account 
+     * @dev transfer this contract ether balance to owner's account
      *    ( public function )
      * @param _withdraw_wei_value   amount to widthdraw ( in wei unit)
      */
@@ -857,19 +857,19 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     	//if(owner.call.value(_withdraw_wei_value).gas(5000)()==false) revert();
     	if(owner.send(_withdraw_wei_value)==false) revert();
         totalEtherWithdrawed += _withdraw_wei_value;
-        emit WithdrawEther(owner,_withdraw_wei_value,block.timestamp); 
-    } 
+        emit WithdrawEther(owner,_withdraw_wei_value,block.timestamp);
+    }
 
 
     /**
-     * @dev return  list of active holders accounts and their balances 
+     * @dev return  list of active holders accounts and their balances
      *     ( public view function )
      * @param _max_num_of_items_to_display   Max Number of latest accounts items to display ( 0 means 1 )
      * @return  _num_of_active_holders   number of latest holders accounts
      * @return  _active_holders   array of active( balance > 0) holders
-     * @return  _token_balances   array of token balances 
+     * @return  _token_balances   array of token balances
      */
-    function list_active_holders_and_balances(uint _max_num_of_items_to_display) public view 
+    function list_active_holders_and_balances(uint _max_num_of_items_to_display) public view
       returns (uint _num_of_active_holders,address[] _active_holders,uint[] _token_balances){
       uint len = holders.length;
       _num_of_active_holders = 0;
@@ -901,7 +901,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
      * @return  _tokens   array of tokens transferred
      * @return  _whens   array of transfer times
      */
-    function list_history_of_token_transfer(uint _max_num_of_items_to_display) public view 
+    function list_history_of_token_transfer(uint _max_num_of_items_to_display) public view
       returns (uint _num,address[] _senders,address[] _receivers,uint[] _tokens,uint[] _whens){
       uint len = history_token_transfer.length;
       uint n= len;
@@ -923,7 +923,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     }
 
     /**
-     * @dev return  list of latest address-filtered #N transfer history 
+     * @dev return  list of latest address-filtered #N transfer history
      *     ( public view function )
      * @param _addr   address as filter for transfer history (default 0x0)
      * @return  _num   number of latest transfer history items
@@ -932,7 +932,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
      * @return  _tokens   array of tokens transferred
      * @return  _whens   array of transfer times
      */
-    function list_history_of_token_transfer_filtered_by_addr(address _addr) public view 
+    function list_history_of_token_transfer_filtered_by_addr(address _addr) public view
       returns (uint _num,address[] _senders,address[] _receivers,uint[] _tokens,uint[] _whens){
       uint len = history_token_transfer.length;
       uint _max_num_of_items_to_display= 0;
@@ -960,7 +960,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     }
 
     /**
-     * @dev return frozen accounts and their balances 
+     * @dev return frozen accounts and their balances
      *     ( public view function )
      * @param _max_num_of_items_to_display   Max Number of items to display ( 0 means 1 )
      * @return  _num   number of currently frozen accounts
@@ -994,7 +994,7 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
     /**
      * @dev Admin menu: Token Sale Status management
      *      (run by admin, public function)
-     * @param _next_status  next status index (1 ~ 13). refer to enum Sale_Status 
+     * @param _next_status  next status index (1 ~ 13). refer to enum Sale_Status
      */
     function z_admin_next_status(Sale_Status _next_status) onlyAdmin public {
       if(_next_status== Sale_Status.Stage0_Sale_Started_STATUS) { start_StageN_Sale(0); return;} // 1
@@ -1011,6 +1011,17 @@ contract VIVACHAIN is Z_StandardToken, Z_Ownable {
       if(_next_status== Sale_Status.Stage0_Allowed_To_Trade_STATUS) { start_Stage0_Trade(); return;} //12
       if(_next_status== Sale_Status.Closed_STATUS) { closeContract(); return;} //13
       revert();
-    } 
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

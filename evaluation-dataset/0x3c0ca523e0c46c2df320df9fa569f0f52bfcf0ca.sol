@@ -57,48 +57,48 @@ library SafeMath {
 }
 
 contract AuctionPotato {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
     // static
     address public owner;
     uint public startTime;
     uint public endTime;
     string name;
-    
+
     // pototo
     uint public potato;
     uint oldPotato;
     uint oldHighestBindingBid;
-    
+
     // state
     bool public canceled;
-    
+
     uint public highestBindingBid;
     address public highestBidder;
-    
+
     // used to immidiately block placeBids
     bool blockerPay;
     bool blockerWithdraw;
-    
+
     mapping(address => uint256) public fundsByBidder;
     bool ownerHasWithdrawn;
 
     event LogBid(address bidder, address highestBidder, uint oldHighestBindingBid, uint highestBindingBid);
     event LogWithdrawal(address withdrawer, address withdrawalAccount, uint amount);
     event LogCanceled();
-    
-    
+
+
     // initial settings on contract creation
     constructor() public {
-        
+
         blockerWithdraw = false;
         blockerPay = false;
-        
+
         owner = msg.sender;
 
         // 0.003 ETH
         highestBindingBid = 3000000000000000;
         potato = 0;
-        
+
         // 2018-10-30 18:00:00
         startTime = 1540922400;
         endTime = startTime + 3 hours;
@@ -106,8 +106,8 @@ contract AuctionPotato {
         name = "Pumpkinhead 3";
 
     }
-    
-    function setStartTime(uint _time) onlyOwner public 
+
+    function setStartTime(uint _time) onlyOwner public
     {
         require(now < startTime);
         startTime = _time;
@@ -119,20 +119,20 @@ contract AuctionPotato {
     function nextBid() public view returns (uint _nextBid) {
         return highestBindingBid.add(potato);
     }
-    
-    
+
+
     // calculates the bid after the current bid so nifty hackers can skip the queue
     // this is not in our frontend and no one knows if it actually works
     function nextNextBid() public view returns (uint _nextBid) {
         return highestBindingBid.add(potato).add((highestBindingBid.add(potato)).mul(4).div(9));
     }
-    
-    
+
+
     function queryAuction() public view returns (string, uint, address, uint, uint, uint)
     {
-        
+
         return (name, nextBid(), highestBidder, highestBindingBid, startTime, endTime);
-        
+
     }
 
 
@@ -143,14 +143,14 @@ contract AuctionPotato {
         onlyNotCanceled
         onlyNotOwner
         returns (bool success)
-    {   
+    {
         // we are only allowing to increase in bidIncrements to make for true hot potato style
         require(msg.value == highestBindingBid.add(potato));
         require(msg.sender != highestBidder);
         require(now > startTime);
         require(blockerPay == false);
         blockerPay = true;
-        
+
         // calculate the user's total bid based on the current amount they've sent to the contract
         // plus whatever has been sent with this transaction
 
@@ -159,16 +159,16 @@ contract AuctionPotato {
 
         highestBidder.transfer(fundsByBidder[highestBidder]);
         fundsByBidder[highestBidder] = 0;
-        
+
         oldHighestBindingBid = highestBindingBid;
-        
+
         // set new highest bidder
         highestBidder = msg.sender;
         highestBindingBid = highestBindingBid.add(potato);
 
         oldPotato = potato;
         potato = highestBindingBid.mul(4).div(9);
-        
+
         emit LogBid(msg.sender, highestBidder, oldHighestBindingBid, highestBindingBid);
         blockerPay = false;
         return true;
@@ -185,16 +185,16 @@ contract AuctionPotato {
         return true;
     }
 
-    function withdraw() public onlyOwner returns (bool success) 
+    function withdraw() public onlyOwner returns (bool success)
     {
         require(now > endTime);
-        
+
         msg.sender.transfer(address(this).balance);
-        
+
         return true;
     }
-    
-    
+
+
     function balance() public view returns (uint _balance) {
         return address(this).balance;
     }
@@ -223,5 +223,18 @@ contract AuctionPotato {
         if (canceled) revert();
         _;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

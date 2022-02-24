@@ -26,7 +26,7 @@ pragma solidity 0.5.9; // optimization enabled, runs: 10000, evm: constantinople
  * the contract they control currently has a deployed contract at that address).
  * Once a contract undergoes metamorphosis, all existing storage will be deleted
  * and any existing contract code will be replaced with the deployed contract
- * code of the new implementation contract. The mechanisms behind this contract 
+ * code of the new implementation contract. The mechanisms behind this contract
  * are highly experimental - proceed with caution and please share any exploits
  * or optimizations you discover.
  */
@@ -781,14 +781,14 @@ interface IERC1412 {
   /// @param _from The current owner of the NFT
   /// @param _to The new owner
   /// @param _tokenIds The NFTs to transfer
-  /// @param _data Additional data with no specified format, sent in call to `_to`  
+  /// @param _data Additional data with no specified format, sent in call to `_to`
   function safeBatchTransferFrom(address _from, address _to, uint256[] calldata _tokenIds, bytes calldata _data) external;
-  
+
   /// @notice Transfers the ownership of multiple NFTs from one address to another address
   /// @param _from The current owner of the NFT
   /// @param _to The new owner
-  /// @param _tokenIds The NFTs to transfer  
-  function safeBatchTransferFrom(address _from, address _to, uint256[] calldata _tokenIds) external; 
+  /// @param _tokenIds The NFTs to transfer
+  function safeBatchTransferFrom(address _from, address _to, uint256[] calldata _tokenIds) external;
 }
 
 
@@ -1538,7 +1538,7 @@ contract ERC721Enumerable is ERC165, ERC721, IERC721Enumerable {
  * the contract they control currently has a deployed contract at that address).
  * Once a contract undergoes metamorphosis, all existing storage will be deleted
  * and any existing contract code will be replaced with the deployed contract
- * code of the new implementation contract. The mechanisms behind this contract 
+ * code of the new implementation contract. The mechanisms behind this contract
  * are highly experimental - proceed with caution and please share any exploits
  * or optimizations you discover.
  */
@@ -1650,7 +1650,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     // Verify the derivation of the deployment address.
     bytes32 initialDeployKey = bytes32(
       0x486f6d65576f726b20f09f8fa0f09f9ba0efb88faa3c548a76f9bd3c000c0000
-    );    
+    );
     assert(address(this) == address(
       uint160(                      // Downcast to match the address type.
         uint256(                    // Convert to uint to truncate upper digits.
@@ -1796,7 +1796,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.exists = true;
     home.controller = address(this);
 
-    // Emit an event signifying that this contract is now the controller. 
+    // Emit an event signifying that this contract is now the controller.
     emit NewController(key, address(this));
 
     // Mint the ERC721 token to the designated owner.
@@ -1833,7 +1833,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     // Assign the new controller to the corresponding home address.
     _home[key].controller = controller;
 
-    // Emit an event with the new controller. 
+    // Emit an event with the new controller.
     emit NewController(key, controller);
   }
 
@@ -1864,7 +1864,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.exists = true;
     home.controller = controller;
 
-    // Emit an event with the new controller. 
+    // Emit an event with the new controller.
     emit NewController(key, controller);
   }
 
@@ -1887,7 +1887,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.exists = true;
     home.controller = address(0);
 
-    // Emit an event with the null address as the controller. 
+    // Emit an event with the null address as the controller.
     emit NewController(key, address(0));
   }
 
@@ -1958,7 +1958,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.controller = controller;
     home.deploys += 1;
 
-    // Emit an event with the new controller. 
+    // Emit an event with the new controller.
     emit NewController(key, controller);
 
     // Use metamorphic initialization code to deploy contract to home address.
@@ -1990,7 +1990,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       home.exists = true;
       home.controller = msg.sender;
 
-      // Emit an event with the sender as the new controller. 
+      // Emit an event with the sender as the new controller.
       emit NewController(key, msg.sender);
     }
   }
@@ -2040,7 +2040,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     // Mint the ERC721 token to the designated owner.
     _mint(owner, uint256(key));
 
-    // Emit an event signifying that this contract is now the controller. 
+    // Emit an event signifying that this contract is now the controller.
     emit NewController(key, address(this));
   }
 
@@ -2079,7 +2079,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.exists = true;
     home.controller = controller;
 
-    // Emit an event with the new controller. 
+    // Emit an event with the new controller.
     emit NewController(key, controller);
   }
 
@@ -2110,7 +2110,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.exists = true;
     home.controller = address(0);
 
-    // Emit an event with the null address as the controller. 
+    // Emit an event with the null address as the controller.
     emit NewController(key, address(0));
   }
 
@@ -2292,7 +2292,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     home.controller = controller;
     home.deploys += 1;
 
-    // Emit an event with the new controller. 
+    // Emit an event with the new controller.
     emit NewController(key, controller);
 
     // Use metamorphic initialization code to deploy contract to home address.
@@ -2442,7 +2442,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       home.exists = true;
       home.controller = address(this);
 
-      // Emit an event signifying that this contract is now the controller. 
+      // Emit an event signifying that this contract is now the controller.
       emit NewController(key, address(this));
 
       // Mint the ERC721 token to the designated owner.
@@ -2493,7 +2493,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       home.exists = true;
       home.controller = address(this);
 
-      // Emit an event signifying that this contract is now the controller. 
+      // Emit an event signifying that this contract is now the controller.
       emit NewController(key, address(this));
 
       // Mint the ERC721 token to the designated owner.
@@ -2542,7 +2542,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
    * @param from address The current owner of the tokens.
    * @param to address The account to receive ownership of the given tokens.
    * @param tokenIds uint256[] ID of the tokens to be transferred.
-   * @param data bytes A data payload to include with each transfer.   
+   * @param data bytes A data payload to include with each transfer.
    */
   function safeBatchTransferFrom(
     address from,
@@ -2615,7 +2615,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       home.exists = true;
       home.controller = address(this);
 
-      // Emit an event signifying that this contract is now the controller. 
+      // Emit an event signifying that this contract is now the controller.
       emit NewController(key, address(this));
 
       // Mint the ERC721 token to the designated owner.
@@ -2648,7 +2648,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       let deploymentAddress := create2(0, 0, 32, key)
 
       // Revert and return the metamorphic init code on successful deployment.
-      if deploymentAddress {        
+      if deploymentAddress {
         revert(0, 32)
       }
     }
@@ -2901,7 +2901,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
 
     // Get the checksummed, ascii-encoded representation of the home address.
     string memory asciiHomeAddress = _toChecksummedAsciiString(homeAddress);
-    
+
     bytes memory uriEndSegment = _getTokenURIStorageRuntime();
 
     // Insert checksummed address into URI in name and image fields and return.
@@ -3106,7 +3106,7 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
   function _deployToHomeAddress(bytes32 key)
     internal
     returns (address homeAddress, bytes32 runtimeCodeHash)
-  {    
+  {
     assembly {
       // Write the 32-byte metamorphic initialization code to scratch space.
       mstore(
@@ -3158,9 +3158,9 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
       home.controller = msg.sender;
       home.deploys += 1;
 
-      // Emit an event signifying that this contract is now the controller. 
+      // Emit an event signifying that this contract is now the controller.
       emit NewController(key, msg.sender);
-    
+
     } else {
       home.deploys += 1;
     }
@@ -3221,14 +3221,14 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
     if (_initializationRuntimeStorageContract != address(0)) {
       // Place the current runtime storage contract address in memory.
       currentStorage = _initializationRuntimeStorageContract;
-      
+
       // Remove the existing runtime storage contract address from storage.
       delete _initializationRuntimeStorageContract;
     }
 
     // Set gas to use when performing dry-run deployment (future-proof a bit).
     uint256 checkGas = 27000 + (block.gaslimit / 1000);
-    
+
     // As a last resort, deploy a contract to the address and revert on success.
     (bool contractExists, bytes memory code) = address(this).call.gas(checkGas)(
       abi.encodeWithSelector(this.staticCreate2Check.selector, key)
@@ -3315,20 +3315,20 @@ contract HomeWork is IHomeWork, ERC721Enumerable, IERC721Metadata, IERC1412 {
   {
     // Bring the tokenURI storage address into memory for use in assembly block.
     address target = _URI_END_SEGMENT_STORAGE;
-    
+
     assembly {
       // Retrieve the size of the external code.
       let size := extcodesize(target)
-      
+
       // Allocate output byte array.
       runtime := mload(0x40)
-      
+
       // Set new "memory end" including padding.
       mstore(0x40, add(runtime, and(add(size, 0x3f), not(0x1f))))
-      
+
       // Store length in memory.
       mstore(runtime, size)
-      
+
       // Get the code using extcodecopy.
       extcodecopy(target, add(runtime, 0x20), 0, size)
     }
@@ -3616,7 +3616,7 @@ contract HomeWorkDeployer {
    */
   function phaseTwo(bytes32 key) external onlyUntilDisabled {
     // Deploy runtime storage contract with the string used to construct end of
-    // token URI for issued ERC721s (data URI with a base64-encoded jpeg image).    
+    // token URI for issued ERC721s (data URI with a base64-encoded jpeg image).
     bytes memory code = abi.encodePacked(
       hex"222c226465736372697074696f6e223a22546869732532304e465425323063616e25",
       hex"3230626525323072656465656d65642532306f6e253230486f6d65576f726b253230",
@@ -3867,4 +3867,15 @@ contract HomeWorkDeployer {
     require(!_disabled, "Contract is disabled.");
     _;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

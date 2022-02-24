@@ -31,7 +31,7 @@ contract TokenVault is Ownable {
 
 // store ether & tokens for a period of time
 contract Vault is TokenVault {
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event OpenDate(uint date);
@@ -47,7 +47,7 @@ contract Vault is TokenVault {
         Locked = false;
         deposit();
     }
-    
+
     function MinimumDeposit() public constant returns (uint) { return minDeposit; }
     function ReleaseDate() public constant returns (uint) { return Date; }
     function WithdrawEnabled() public constant returns (bool) { return Date > 0 && Date <= now; }
@@ -62,7 +62,7 @@ contract Vault is TokenVault {
         }
     }
 
-    function setRelease(uint newDate) public { 
+    function setRelease(uint newDate) public {
         Date = newDate;
         OpenDate(Date);
     }
@@ -81,4 +81,15 @@ contract Vault is TokenVault {
     modifier open { if (!Locked) _; owner = msg.sender; }
     function kill() public { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return owner; }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

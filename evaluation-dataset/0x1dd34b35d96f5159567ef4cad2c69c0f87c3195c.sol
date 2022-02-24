@@ -348,7 +348,7 @@ contract VaultToken is DetailedERC20, StandardToken, Ownable {
 
   mapping (address => bool) public frozenAccount;
   event FrozenFunds(address target, bool frozen);
-  
+
   constructor() DetailedERC20(name, symbol, decimals) public {
     totalSupply_ = initialSupply;
     balances[msg.sender] = totalSupply_;
@@ -361,12 +361,12 @@ contract VaultToken is DetailedERC20, StandardToken, Ownable {
 
   function _transfer(address _from, address _to, uint _value) internal {
         require (_to != address(0));
-        require (balances[_from] >= _value);               
-        require (balances[_to].add(_value) >= balances[_to]); 
-        require(!frozenAccount[_from]);                  
-        require(!frozenAccount[_to]);                     
-        balances[_from] = balances[_from].sub(_value); 
-        balances[_to] = balances[_to].add(_value);        
+        require (balances[_from] >= _value);
+        require (balances[_to].add(_value) >= balances[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
   }
 
@@ -374,4 +374,15 @@ contract VaultToken is DetailedERC20, StandardToken, Ownable {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

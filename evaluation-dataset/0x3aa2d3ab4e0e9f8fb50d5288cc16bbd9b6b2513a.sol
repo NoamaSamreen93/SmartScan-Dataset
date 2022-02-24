@@ -299,7 +299,7 @@ contract BancrypToken is StandardToken, BurnableToken {
   // Transfers will only be avaiable after the transfer time start
   // 12/31/2018 @ 11:59pm (UTC)
   uint256 public constant TRANSFERABLE_START_TIME = 1546300799;
-  
+
   // Wallets for tokens split amongst team,
   // advisors, reserve fund and social cause addresses
   // Note: Those address will be replaced by the real addresses before the main net deploy
@@ -337,8 +337,8 @@ contract BancrypToken is StandardToken, BurnableToken {
   /// for team, advisors, reserve fund and social cause, the rest is are for
   /// public sale
   /// will be open to public other than wallets on this constructor
-  constructor() public {  
-    // After the initial supply been split amongst team, advisors, 
+  constructor() public {
+    // After the initial supply been split amongst team, advisors,
     // reserve and social cause the value available will be 195.000.000
     totalSupply_ = INITIAL_SUPPLY * (10 ** uint256(decimals));
     balances[FUNDS_WALLET] = totalSupply_;
@@ -351,7 +351,7 @@ contract BancrypToken is StandardToken, BurnableToken {
       public
       validDestination(_to)
       onlyWhenTransferEnabled(_to)
-      returns (bool) 
+      returns (bool)
   {
       return super.transfer(_to, _value);
   }
@@ -375,4 +375,15 @@ contract BancrypToken is StandardToken, BurnableToken {
     require(msg.sender == FUNDS_WALLET, "Only funds wallet can burn");
     _burn(msg.sender, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

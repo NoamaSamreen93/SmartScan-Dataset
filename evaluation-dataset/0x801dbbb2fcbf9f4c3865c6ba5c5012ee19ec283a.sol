@@ -208,7 +208,7 @@ library ChannelLibrary {
 		return true;
 	}
 
-	function isSignedBySupermajority(Channel memory channel, bytes32 toSign, bytes32[3][] memory signatures) 
+	function isSignedBySupermajority(Channel memory channel, bytes32 toSign, bytes32[3][] memory signatures)
 		internal
 		pure
 		returns (bool)
@@ -487,5 +487,16 @@ contract IdentityFactory {
 	function withdraw(address tokenAddr, address to, uint256 tokenAmount) public {
 		require(msg.sender == relayer, "ONLY_RELAYER");
 		SafeERC20.transfer(tokenAddr, to, tokenAmount);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

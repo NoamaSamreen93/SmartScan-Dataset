@@ -32,7 +32,7 @@ contract Token {
   string public name = "FDEX";                                      //DetailedERC20.sol
   string public symbol = "DESIA";                                    //DetailedERC20.sol
   string public version = "DESIA v1.1";              // new
-  uint256 public decimals = 18;                                        //DetailedERC20.sol  
+  uint256 public decimals = 18;                                        //DetailedERC20.sol
   uint256 totalSupply_ = 12e8 * (10**uint256(decimals));             //BasicToken.sol
   uint256 public cap = totalSupply_;                                 //CappedToken.sol
   bool public paused = false;                                         //Pausable.sol
@@ -53,7 +53,7 @@ contract Token {
   event Unlock(address indexed LockedAddress);           // new
   event CapChange(uint256 Cap, string reason);           // new
 
-  constructor() public { 
+  constructor() public {
     owner = msg.sender;
     balances[owner] = totalSupply_ ;
   }
@@ -72,7 +72,7 @@ contract Token {
   function totalSupply() public view returns (uint256) {  //BasicToken.sol
     return totalSupply_;
   }
-  
+
   function burn(uint256 _value) public { //BurnableToken.sol
     _burn(msg.sender, _value);
   }
@@ -84,13 +84,13 @@ contract Token {
     emit Burn(_who, _value);
     emit Transfer(_who, address(0), _value);
   }
-  
+
   function burnFrom(address _from, uint256 _value) public {  //StandardBurnableToken.sol
     require(_value <= allowed[_from][msg.sender]);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     _burn(_from, _value);
   }
-  
+
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
       //StandardToken.sol, PausableToken.sol
     allowed[msg.sender][_spender] = _value;
@@ -127,7 +127,7 @@ contract Token {
     return true;
   }
 
-  function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns(bool) {  
+  function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns(bool) {
       //StandardToken.sol, PausableToken.sol
     require(_to != address(0));
     require(_value <= balances[_from]);
@@ -160,7 +160,7 @@ contract Token {
     emit Unpause();
   }
 
-  function mint(address _to, uint256 _amount, string _reason) hasMintPermission canMint public returns (bool)  { 
+  function mint(address _to, uint256 _amount, string _reason) hasMintPermission canMint public returns (bool)  {
       //MintableToken.sol, CappedToken.sol
     require(totalSupply_.add(_amount) <= cap);
     totalSupply_ = totalSupply_.add(_amount);
@@ -179,7 +179,7 @@ contract Token {
   function destroyAndSend(address _recipient) onlyOwner public {   //Destructible.sol
     selfdestruct(_recipient);
   }
-  
+
 /* new functions */
   function startMinting(string reason) onlyOwner cannotMint public returns (bool) {
     mintingFinished = false;
@@ -199,7 +199,7 @@ contract Token {
     cap = _cap;
     emit CapChange(_cap, _reason);
   }
-  
+
   function multiTransfer(address[] _to, uint256[] _amount) whenNotPaused public returns (bool) {
     require(_to.length == _amount.length);
     uint256 i;
@@ -218,7 +218,7 @@ contract Token {
     balances[msg.sender] = balances[msg.sender].sub(amountSum);
     return true;
   }
-  
+
   function multiMint(address[] _to, uint256[] _amount, string _reason) hasMintPermission canMint public returns (bool) {
     require(_to.length == _amount.length);
     uint16 i;              // less than 65536 at one time
@@ -234,7 +234,7 @@ contract Token {
     }
     return true;
   }
-  
+
   function lock(address _lockAddress, uint256 _lockAmount) public onlyOwner returns (bool) {  // stop _lockAddress's transfer
     require(_lockAddress != address(0));
     require(_lockAddress != owner);
@@ -268,4 +268,15 @@ contract Token {
     return locked[_address];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

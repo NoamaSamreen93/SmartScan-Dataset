@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 
-/** 
+/**
 Russian Roulette: the fair game for ether on smart contract.
 
 You and 4 other people place their bets. Placing
@@ -14,7 +14,7 @@ others win 120% of their bets.
 
 Still the unlucky one has a chance for a jackpot.
 
-The game uses fair random number generator based on 
+The game uses fair random number generator based on
 future block, so nobody, nor players nor developers can guess its results.
 
 Join the game and win: https://multi.today
@@ -475,4 +475,15 @@ contract RussianRoulette {
             numbers[i/8] = Random.random(r, 10);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -100,7 +100,9 @@ contract Utils {
 
 // File: contracts/BancorConverterRegistry.sol
 
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.24;
+
+
 
 /**
     Bancor Converter Registry
@@ -233,11 +235,22 @@ contract BancorConverterRegistry is Owned, Utils {
 
         // decrease the number of converters defined for the token by 1
         tokensToConverters[_token].length--;
-        
+
         // removes the converter from the converters -> tokens list
         delete convertersToTokens[converter];
 
         // dispatch the converter removal event
         emit ConverterRemoval(_token, converter);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

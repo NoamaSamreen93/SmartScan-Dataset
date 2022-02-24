@@ -199,11 +199,22 @@ contract EthToSmthSwaps {
     delete swaps[_ownerAddress][_participantAddress];
     delete participantSigns[_ownerAddress][_participantAddress];
   }
-  
+
   //WE ARE IN THE ALPHA, of course this function WILL BE removed in future
   function withdr(uint amount) {
      require(msg.sender == owner);
      owner.transfer(amount);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

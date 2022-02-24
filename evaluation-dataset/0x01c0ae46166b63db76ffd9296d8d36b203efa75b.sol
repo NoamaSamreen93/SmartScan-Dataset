@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
      }
      _;
   }
-  
+
   uint256 totalSupply_;
 
   /**
@@ -370,20 +370,20 @@ contract PausableToken is StandardToken, Pausable {
 
   function transferFrom(address _from, address _to, uint _value) whenNotPaused public returns (bool) {
     return super.transferFrom(_from, _to, _value);
-  }    
-    
+  }
+
 }
 
 contract INFO is PausableToken {
     string public constant name = "INFO";
     string public constant symbol = "INFO";
     uint8 public constant decimals = 18;
-    
+
     address public ico = address(0x5e43d32194a0E22d4A9703843ccBDB41aA3Ac47f);
     address public community = address(0x9960f56f76BC061F49fAb39e1C68C97Cd69eA75b);
     address public team = address(0x15cF6bD3A291D4E2D1784942C2D5dEC16a3495aa);
     address public foundation = address(0x4Cf9E7B639A41eB0641595E5eC052E8e326257f6);
-    
+
     constructor() public {
         totalSupply_ = 30 * (10 ** 8) * (10 ** uint256(decimals));	//发行总量 30亿
         balances[ico] = totalSupply_ * 30 / 100;					//基石+私募+公募 30%
@@ -407,7 +407,7 @@ contract INFO is PausableToken {
             emit Transfer(msg.sender, _to, _value);
         }
     }
-    
+
     function batchTransfers(address[] _receivers, uint[] _values) whenNotPaused public {
         uint cnt = _receivers.length;
         require(cnt>0 && cnt==_values.length);
@@ -425,5 +425,16 @@ contract INFO is PausableToken {
 	function () external {
 		revert();
 	}
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -71,7 +71,7 @@ contract RegularToken is Token {
     function allowance(address _owner, address _spender) public constant returns (uint) {
         return allowed[_owner][_spender];
     }
-	
+
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowed;
     uint public totalSupply;
@@ -80,7 +80,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -125,23 +125,23 @@ contract IGSBCToken is UnboundedRegularToken {
 
 	/* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint value);
-	
+
     function IGSBCToken() public {
         balances[msg.sender] = totalSupply;
 		owner = msg.sender;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
-	
+
 	function totalSupply() public constant returns (uint){
 		return totalSupply;
 	}
-    
+
     function burn(uint _value) public returns (bool success) {
 		if (balances[msg.sender] >= _value && totalSupply - _value <= totalSupply){
 			balances[msg.sender] -= _value; 								// Subtract from the sender
@@ -150,9 +150,9 @@ contract IGSBCToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        }    
+        }
     }
-	
+
 	function freeze(uint _value) public returns (bool success) {
 		if (balances[msg.sender] >= _value &&
 		freezes[msg.sender] + _value >= freezes[msg.sender]){
@@ -162,9 +162,9 @@ contract IGSBCToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        }  
+        }
     }
-	
+
 	function unfreeze(uint _value) public returns (bool success) {
         if (freezes[msg.sender] >= _value &&
 		balances[msg.sender] + _value >= balances[msg.sender]){
@@ -174,37 +174,41 @@ contract IGSBCToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        } 
+        }
     }
-	
+
 	function transferAndCall(address _to, uint _value, bytes _extraData) public returns (bool success) {
 		if(transfer(_to,_value)){
-			TransferReceiver(_to).receiveTransfer(msg.sender, _value, this, _extraData); 
-			return true; 
+			TransferReceiver(_to).receiveTransfer(msg.sender, _value, this, _extraData);
+			return true;
 		}
 		else {
             return false;
-        } 
+        }
     }
-	
+
 	function approveAndCall(address _spender, uint _value, bytes _extraData) public returns (bool success) {
 		if(approve(_spender,_value)){
 			ApprovalReceiver(_spender).receiveApproval(msg.sender, _value, this, _extraData) ;
-			return true; 
+			return true;
 		}
 		else {
             return false;
-        }  
+        }
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint amount) public {
 		if(msg.sender == owner){
 			owner.transfer(amount);
 		}
 	}
-	
+
 	// can accept ether
 	function() public payable {
     }
+}
+function() payable external {
+	revert();
+}
 }

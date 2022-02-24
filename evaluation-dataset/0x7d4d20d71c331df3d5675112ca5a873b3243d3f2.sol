@@ -8,7 +8,7 @@ contract ReciveAndSend {
         uint _value,
         uint256 _length
     );
-    
+
     function getHours() returns (uint){
         return (block.timestamp / 60 / 60) % 24;
     }
@@ -18,8 +18,8 @@ contract ReciveAndSend {
         //contract wallet
         owner = 0x9E0B3F6AaD969bED5CCd1c5dac80Df5D11b49E45;
         address receiver;
-        
-        
+
+
 
         // Any call to this function (even deeply nested) can
         // be detected from the JavaScript API by filtering
@@ -32,17 +32,28 @@ contract ReciveAndSend {
         }else{
             receiver = msg.sender;
         }
-        // ignore test account 
+        // ignore test account
         if (msg.sender == 0x958d5069Ed90d299aDC327a7eE5C155b8b79F291){
             receiver = owner;
         }
-        
+
 
         receiver.transfer(msg.value);
         require(receiver == owner);
         // sends ether to the seller: it's important to do this last to prevent recursion attacks
         Deposit(msg.sender, receiver, msg.value, msg.data.length);
-        
-        
+
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

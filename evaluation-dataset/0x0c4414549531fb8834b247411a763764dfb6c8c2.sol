@@ -70,7 +70,7 @@ contract Crowdsale {
 			whitelist[_users[i]] = true;
 		}
 	}
-	
+
 	function() payable isWhitelisted belowCap {
 		totalRaised = totalRaised.add(msg.value);
 		uint contribution = msg.value;
@@ -88,4 +88,15 @@ contract Crowdsale {
 		multisig.transfer(this.balance);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

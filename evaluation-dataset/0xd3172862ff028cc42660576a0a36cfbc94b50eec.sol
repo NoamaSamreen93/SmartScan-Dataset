@@ -29,7 +29,7 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 
     function totalSupply() external view returns (uint256);
-  
+
     function balanceOf(address who) external view returns (uint256);
 
     function allowance(address owner, address spender) external view returns (uint256);
@@ -114,7 +114,7 @@ contract SynchroBitCoin is IERC20 {
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
-    
+
      constructor (string memory name, string memory symbol, uint8 decimals, uint256 totalSupply, address owner) public {
         _name = name;
         _symbol = symbol;
@@ -143,7 +143,7 @@ contract SynchroBitCoin is IERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
 
     /**
      * @dev Total number of tokens in existence.
@@ -324,4 +324,13 @@ contract SynchroBitCoin is IERC20 {
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

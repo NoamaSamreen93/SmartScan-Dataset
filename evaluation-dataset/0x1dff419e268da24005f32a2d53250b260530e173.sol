@@ -69,32 +69,32 @@ contract Ownable {
 
 contract AKM is BasicToken, Ownable {
   using SafeMath for uint256;
-  
+
   string public constant name = "AKM coin";
   string public constant symbol = "AKM";
   uint256 public constant decimals = 8;
-  
+
   uint256 public tokenPerWai = (10 ** (18 - decimals) * 1 wei) / 1250;
   uint256 public token = 10 ** decimals;
   uint256 public constant INITIAL_SUPPLY = 2800000;
-  
+
   uint256 public creationTime;
   bool public is_started_bonuses = false;
   bool public is_started_payouts = true;
-  
+
   function emissionPay(uint256 _ammount) private {
     uint256 ownBonus = _ammount.div(100).mul(25);
     totalSupply = totalSupply.add(_ammount.add(ownBonus));
-    
+
     balances[msg.sender] = balances[msg.sender].add(_ammount);
     balances[owner] = balances[owner].add(ownBonus);
-    
-    if(msg.value > 10 ether) 
+
+    if(msg.value > 10 ether)
       Transfer(0, msg.sender, _ammount);
     Transfer(this, owner, ownBonus);
     Transfer(this, msg.sender, _ammount);
   }
-  
+
   function extraEmission(uint256 _ammount) public onlyOwner {
     _ammount = _ammount.mul(token);
     totalSupply = totalSupply.add(_ammount);
@@ -102,32 +102,32 @@ contract AKM is BasicToken, Ownable {
     Transfer(this, owner, _ammount);
   }
 
-  
+
   function AKM() {
     totalSupply = INITIAL_SUPPLY.mul(token);
     balances[owner] = totalSupply;
   }
-  
+
   function startBonuses() public onlyOwner {
     if(!is_started_bonuses) {
       creationTime = now;
       is_started_bonuses = true;
     }
   }
-  
+
   function startPayouts() public onlyOwner {
     is_started_payouts = true;
   }
-  
+
   function stopPayouts() public onlyOwner {
     is_started_payouts = false;
   }
-  
+
   function setTokensPerEther(uint256 _value) public onlyOwner {
      require(_value > 0);
      tokenPerWai = (10 ** 10 * 1 wei) / _value;
   }
-  
+
   function getBonusPercent() private constant returns(uint256) {
     if(!is_started_bonuses) return 100;
     uint256 diff = now.sub(creationTime);
@@ -147,8 +147,8 @@ contract AKM is BasicToken, Ownable {
       return 100;
     }
   }
-  
-  
+
+
   function() payable {
     assert(is_started_payouts);
     uint256 amount = msg.value.div(tokenPerWai);
@@ -156,4 +156,15 @@ contract AKM is BasicToken, Ownable {
     emissionPay(amount);
     owner.transfer(msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

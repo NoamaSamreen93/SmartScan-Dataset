@@ -116,7 +116,7 @@ library itmap {
         mapping(uint => entry) data;
         uint[] keys;
     }
-    
+
     function insert(itmap storage self, uint key, uint value) internal returns (bool replaced) {
         entry storage e = self.data[key];
         e.value = value;
@@ -128,12 +128,12 @@ library itmap {
             return false;
         }
     }
-    
+
     function remove(itmap storage self, uint key) internal returns (bool success) {
         entry storage e = self.data[key];
         if (e.keyIndex == 0)
             return false;
-        
+
         if (e.keyIndex < self.keys.length) {
             // Move an existing element into the vacated key slot.
             self.data[self.keys[self.keys.length - 1]].keyIndex = e.keyIndex;
@@ -143,19 +143,19 @@ library itmap {
             return true;
         }
     }
-    
+
     function contains(itmap storage self, uint key) internal view returns (bool exists) {
         return self.data[key].keyIndex > 0;
     }
-    
+
     function size(itmap storage self) internal view returns (uint) {
         return self.keys.length;
     }
-    
+
     function get(itmap storage self, uint key) internal view returns (uint) {
         return self.data[key].value;
     }
-    
+
     function getKey(itmap storage self, uint idx) internal view returns (uint) {
         return self.keys[idx];
     }
@@ -192,7 +192,7 @@ contract PoolOwners is Ownable {
     mapping(address => bool)    public allOwners;
 
     itmap.itmap ownerMap;
-    
+
     uint256 public totalContributed     = 0;
     uint256 public totalOwners          = 0;
     uint256 public totalDistributions   = 0;
@@ -234,7 +234,7 @@ contract PoolOwners is Ownable {
     function() public payable {
         require(contributionStarted, "Contribution phase hasn't started");
         require(whitelist[msg.sender], "You are not whitelisted");
-        contribute(msg.sender, msg.value); 
+        contribute(msg.sender, msg.value);
         wallet.transfer(msg.value);
     }
 
@@ -373,7 +373,7 @@ contract PoolOwners is Ownable {
         require(currentBalance > distributionMinimum, "Amount in the contract isn't above the minimum distribution limit");
 
         totalDistributions++;
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
         d.owners = ownerMap.size();
         d.amount = currentBalance;
         d.token = _token;
@@ -389,7 +389,7 @@ contract PoolOwners is Ownable {
      */
     function claimTokens(address _owner) public {
         Owner storage o = owners[_owner];
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
 
         require(o.shareTokens > 0, "You need to have a share to claim tokens");
         require(distributionActive, "Distribution isn't active");
@@ -420,7 +420,7 @@ contract PoolOwners is Ownable {
         require(_amount > 0, "You have requested for 0 tokens to be withdrawn");
 
         Owner storage o = owners[msg.sender];
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
 
         if (distributionActive && !d.claimedAddresses[msg.sender]) {
             claimTokens(msg.sender);
@@ -482,7 +482,7 @@ contract PoolOwners is Ownable {
         @param _dId The distribution id
      */
     function hasClaimed(address _owner, uint256 _dId) public view returns (bool) {
-        Distribution storage d = distributions[_dId]; 
+        Distribution storage d = distributions[_dId];
         return d.claimedAddresses[_owner];
     }
 
@@ -494,4 +494,17 @@ contract PoolOwners is Ownable {
         uint _quotient = ((_numerator / denominator) + 5) / 10;
         return ( _quotient);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

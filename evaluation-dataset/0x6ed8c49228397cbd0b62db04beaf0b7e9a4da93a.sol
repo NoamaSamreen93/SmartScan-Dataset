@@ -325,3 +325,9 @@ contract ETVRToken is PausableToken, BurnableToken, MintableToken {
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

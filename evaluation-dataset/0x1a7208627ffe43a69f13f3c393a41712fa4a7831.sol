@@ -1,10 +1,10 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The ether.online Project.  All rights reserved.
-/* 
-/* https://ether.online  The first RPG game of blockchain 
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* https://ether.online  The first RPG game of blockchain
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
@@ -39,13 +39,13 @@ interface ERC721TokenReceiver {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -104,8 +104,8 @@ contract AccessService is AccessAdmin {
         addrFinance = _newFinance;
     }
 
-    function withdraw(address _target, uint256 _amount) 
-        external 
+    function withdraw(address _target, uint256 _amount)
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         require(_amount > 0);
@@ -115,7 +115,7 @@ contract AccessService is AccessAdmin {
             receiver.transfer(_amount);
         } else {
             receiver.transfer(this.balance);
-        }      
+        }
     }
 }
 
@@ -243,7 +243,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev This emits when an operator is enabled or disabled for an owner.
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-    /// @dev This emits when the equipment ownership changed 
+    /// @dev This emits when the equipment ownership changed
     event Transfer(address indexed from, address indexed to, uint256 tokenId);
 
     /// @dev This emits when the equipment created
@@ -254,7 +254,7 @@ contract WarToken is ERC721, AccessAdmin {
 
     /// @dev This emits when the equipment destroyed
     event DeleteFashion(address indexed owner, uint256 tokenId, uint16 deleteType);
-    
+
     function WarToken() public {
         addrAdmin = msg.sender;
         fashionArray.length += 1;
@@ -264,7 +264,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev Check if token ID is valid
     modifier isValidToken(uint256 _tokenId) {
         require(_tokenId >= 1 && _tokenId <= fashionArray.length);
-        require(fashionIdToOwner[_tokenId] != address(0)); 
+        require(fashionIdToOwner[_tokenId] != address(0));
         _;
     }
 
@@ -279,7 +279,7 @@ contract WarToken is ERC721, AccessAdmin {
         // ERC165 || ERC721 || ERC165^ERC721
         return (_interfaceId == 0x01ffc9a7 || _interfaceId == 0x80ac58cd || _interfaceId == 0x8153916a) && (_interfaceId != 0xffffffff);
     }
-        
+
     function name() public pure returns(string) {
         return "WAR Token";
     }
@@ -308,7 +308,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _to The new owner
     /// @param _tokenId The WAR to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         external
         whenNotPaused
     {
@@ -319,7 +319,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _from The current owner of the WAR
     /// @param _to The new owner
     /// @param _tokenId The WAR to transfer
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
         external
         whenNotPaused
     {
@@ -340,7 +340,7 @@ contract WarToken is ERC721, AccessAdmin {
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
     }
 
@@ -362,8 +362,8 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev Enable or disable approval for a third party ("operator") to manage all your asset.
     /// @param _operator Address to add to the set of authorized operators.
     /// @param _approved True if the operators is approved, false to revoke approval
-    function setApprovalForAll(address _operator, bool _approved) 
-        external 
+    function setApprovalForAll(address _operator, bool _approved)
+        external
         whenNotPaused
     {
         operatorToApprovals[msg.sender][_operator] = _approved;
@@ -394,7 +394,7 @@ contract WarToken is ERC721, AccessAdmin {
 
     /// @dev Do the real transfer with out any condition checking
     /// @param _from The old owner of this WAR(If created: 0x0)
-    /// @param _to The new owner of this WAR 
+    /// @param _to The new owner of this WAR
     /// @param _tokenId The tokenId of the WAR
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         if (_from != address(0)) {
@@ -405,35 +405,35 @@ contract WarToken is ERC721, AccessAdmin {
             // If the WAR is not the element of array, change it to with the last
             if (indexFrom != fsArray.length - 1) {
                 uint256 lastTokenId = fsArray[fsArray.length - 1];
-                fsArray[indexFrom] = lastTokenId; 
+                fsArray[indexFrom] = lastTokenId;
                 fashionIdToOwnerIndex[lastTokenId] = indexFrom;
             }
-            fsArray.length -= 1; 
-            
+            fsArray.length -= 1;
+
             if (fashionIdToApprovals[_tokenId] != address(0)) {
                 delete fashionIdToApprovals[_tokenId];
-            }      
+            }
         }
 
         // Give the WAR to '_to'
         fashionIdToOwner[_tokenId] = _to;
         ownerToFashionArray[_to].push(_tokenId);
         fashionIdToOwnerIndex[_tokenId] = ownerToFashionArray[_to].length - 1;
-        
+
         Transfer(_from != address(0) ? _from : this, _to, _tokenId);
     }
 
     /// @dev Actually perform the safeTransferFrom
-    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         internal
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
         canTransfer(_tokenId)
     {
         address owner = fashionIdToOwner[_tokenId];
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
 
         // Do the callback after everything is done to avoid reentrancy attack
@@ -453,8 +453,8 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _owner Owner of the equipment created
     /// @param _attrs Attributes of the equipment created
     /// @return Token ID of the equipment created
-    function createFashion(address _owner, uint16[9] _attrs, uint16 _createType) 
-        external 
+    function createFashion(address _owner, uint16[9] _attrs, uint16 _createType)
+        external
         whenNotPaused
         returns(uint256)
     {
@@ -472,16 +472,16 @@ contract WarToken is ERC721, AccessAdmin {
         if (_attrs[3] != 0) {
             fs.health = _attrs[3];
         }
-        
+
         if (_attrs[4] != 0) {
             fs.atkMin = _attrs[4];
             fs.atkMax = _attrs[5];
         }
-       
+
         if (_attrs[6] != 0) {
             fs.defence = _attrs[6];
         }
-        
+
         if (_attrs[7] != 0) {
             fs.crit = _attrs[7];
         }
@@ -489,7 +489,7 @@ contract WarToken is ERC721, AccessAdmin {
         if (_attrs[8] != 0) {
             fs.isPercent = _attrs[8];
         }
-        
+
         _transfer(0, _owner, newFashionId);
         CreateFashion(_owner, newFashionId, _attrs[0], _attrs[1], _attrs[2], _createType);
         return newFashionId;
@@ -521,10 +521,10 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _idxArray Stats order that must be modified
     /// @param _params Stat value that must be modified
     /// @param _changeType Modification type such as enhance, socket, etc.
-    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType) 
-        external 
+    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType)
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
@@ -552,23 +552,23 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _tokenId Equipment Token ID
     /// @param _deleteType Destruction type, such as craft
     function destroyFashion(uint256 _tokenId, uint16 _deleteType)
-        external 
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
         address _from = fashionIdToOwner[_tokenId];
         uint256 indexFrom = fashionIdToOwnerIndex[_tokenId];
-        uint256[] storage fsArray = ownerToFashionArray[_from]; 
+        uint256[] storage fsArray = ownerToFashionArray[_from];
         require(fsArray[indexFrom] == _tokenId);
 
         if (indexFrom != fsArray.length - 1) {
             uint256 lastTokenId = fsArray[fsArray.length - 1];
-            fsArray[indexFrom] = lastTokenId; 
+            fsArray[indexFrom] = lastTokenId;
             fashionIdToOwnerIndex[lastTokenId] = indexFrom;
         }
-        fsArray.length -= 1; 
+        fsArray.length -= 1;
 
         fashionIdToOwner[_tokenId] = address(0);
         delete fashionIdToOwnerIndex[_tokenId];
@@ -580,7 +580,7 @@ contract WarToken is ERC721, AccessAdmin {
     }
 
     /// @dev Safe transfer by trust contracts
-    function safeTransferByContract(uint256 _tokenId, address _to) 
+    function safeTransferByContract(uint256 _tokenId, address _to)
         external
         whenNotPaused
     {
@@ -649,7 +649,7 @@ contract WarToken is ERC721, AccessAdmin {
                 attrs[index + 6] = fs.attrExt1;
                 attrs[index + 7] = fs.attrExt2;
                 attrs[index + 8] = fs.attrExt3;
-            }   
+            }
         }
     }
 }
@@ -661,15 +661,15 @@ contract ActionMining is Random, AccessService {
     event MiningResolved(uint256 indexed index, address indexed miner, uint64 chestCnt);
 
     struct MiningOrder {
-        address miner;      
-        uint64 chestCnt;    
-        uint64 tmCreate;    
-        uint64 tmResolve;   
+        address miner;
+        uint64 chestCnt;
+        uint64 tmCreate;
+        uint64 tmResolve;
     }
 
     /// @dev Max fashion suit id
     uint16 maxProtoId;
-    /// @dev If the recommender can get reward 
+    /// @dev If the recommender can get reward
     bool isRecommendOpen;
     /// @dev prizepool percent
     uint256 constant prizePoolPercent = 50;
@@ -692,7 +692,7 @@ contract ActionMining is Random, AccessService {
 
         tokenContract = WarToken(_nftAddr);
         maxProtoId = _maxProtoId;
-        
+
         MiningOrder memory order = MiningOrder(0, 0, 1, 1);
         ordersArray.push(order);
     }
@@ -709,7 +709,7 @@ contract ActionMining is Random, AccessService {
         require(_addr != address(0));
         dataContract = IDataMining(_addr);
     }
-    
+
     function setPrizePool(address _addr) external onlyAdmin {
         require(_addr != address(0));
         poolContract = _addr;
@@ -848,8 +848,8 @@ contract ActionMining is Random, AccessService {
                 if (poolContract != address(0) && pVal > 0) {
                     poolContract.transfer(pVal);
                 }
-            } 
-        } 
+            }
+        }
         if (!recommenderSended) {
             fVal = ethVal.mul(prizePoolPercent).div(100);
             pVal = ethVal.sub(fVal);
@@ -876,9 +876,9 @@ contract ActionMining is Random, AccessService {
         MiningResolved(0, msg.sender, 1);
     }
 
-    function miningOneSelf() 
-        external 
-        payable 
+    function miningOneSelf()
+        external
+        payable
         whenNotPaused
     {
         require(msg.value >= 0.01 ether);
@@ -896,9 +896,9 @@ contract ActionMining is Random, AccessService {
         MiningResolved(0, msg.sender, 1);
     }
 
-    function miningOne() 
-        external 
-        payable 
+    function miningOne()
+        external
+        payable
         whenNotPaused
     {
         require(msg.value >= 0.01 ether);
@@ -911,9 +911,9 @@ contract ActionMining is Random, AccessService {
         }
     }
 
-    function miningThree() 
-        external 
-        payable 
+    function miningThree()
+        external
+        payable
         whenNotPaused
     {
         require(msg.value >= 0.03 ether);
@@ -926,9 +926,9 @@ contract ActionMining is Random, AccessService {
         }
     }
 
-    function miningFive() 
-        external 
-        payable 
+    function miningFive()
+        external
+        payable
         whenNotPaused
     {
         require(msg.value >= 0.0475 ether);
@@ -941,13 +941,13 @@ contract ActionMining is Random, AccessService {
         }
     }
 
-    function miningTen() 
-        external 
-        payable 
+    function miningTen()
+        external
+        payable
         whenNotPaused
     {
         require(msg.value >= 0.09 ether);
-        
+
         _addOrder(msg.sender, 10);
         _transferHelper(0.09 ether);
 
@@ -956,8 +956,8 @@ contract ActionMining is Random, AccessService {
         }
     }
 
-    function miningResolve(uint256 _orderIndex, uint256 _seed) 
-        external 
+    function miningResolve(uint256 _orderIndex, uint256 _seed)
+        external
         onlyService
     {
         require(_orderIndex > 0 && _orderIndex < ordersArray.length);
@@ -978,4 +978,15 @@ contract ActionMining is Random, AccessService {
         order.tmResolve = uint64(block.timestamp);
         MiningResolved(_orderIndex, miner, chestCnt);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

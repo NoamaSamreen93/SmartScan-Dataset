@@ -89,7 +89,7 @@ contract BankrollLending is Owned, SafeMath {
   /** The minimum staking amount required **/
   uint public minStakingAmount;
   /** The maximum number of addresses to process in one batch of stake updates **/
-  uint public maxUpdates; 
+  uint public maxUpdates;
   /** The maximum number of addresses that can be assigned in one batch **/
   uint public maxBatchAssignment;
   /** remembers the last index updated per cycle **/
@@ -141,7 +141,7 @@ contract BankrollLending is Owned, SafeMath {
   function setUpdateGasCost(uint gasCost) public onlyAuthorized {
     updateGasCost = gasCost;
   }
-  
+
   /**
    * Sets the maximum number of user stakes to update at once
    * @param newMax the new maximum
@@ -149,7 +149,7 @@ contract BankrollLending is Owned, SafeMath {
   function setMaxUpdates(uint newMax) public onlyAuthorized{
     maxUpdates = newMax;
   }
-  
+
   /**
    * Sets the minimum amount of user stakes
    * @param amount the new minimum
@@ -157,7 +157,7 @@ contract BankrollLending is Owned, SafeMath {
   function setMinStakingAmount(uint amount) public onlyAuthorized {
     minStakingAmount = amount;
   }
-  
+
   /**
    * Sets the maximum number of addresses that can be assigned at once
    * @param newMax the new maximum
@@ -165,7 +165,7 @@ contract BankrollLending is Owned, SafeMath {
   function setMaxBatchAssignment(uint newMax) public onlyAuthorized {
     maxBatchAssignment = newMax;
   }
-  
+
   /**
    * Allows the user to deposit funds, where the sender address and max allowed value have to be signed together with the cycle
    * number by the casino. The method verifies the signature and makes sure, the deposit was made in time, before updating
@@ -203,7 +203,7 @@ contract BankrollLending is Owned, SafeMath {
     assert(newTotalStakes < tokenBalance());
     totalStakes = newTotalStakes;
   }
-  
+
   /**
    * updates the stake of an address.
    * @param to the address
@@ -318,7 +318,7 @@ contract BankrollLending is Owned, SafeMath {
     address from = ecrecover(keccak256(to, value, cycle), v, r, s);
     makeWithdrawal(from, to, value, index);
   }
-  
+
   /**
    * internal method for processing the withdrawal.
    * @param from the stakeholder
@@ -379,7 +379,7 @@ contract BankrollLending is Owned, SafeMath {
     else
       stakeholders.push(holder);
   }
-  
+
   /**
   * Removes a stakeholder from the list.
   * @param holder the address of the stakeholder
@@ -425,7 +425,7 @@ contract BankrollLending is Owned, SafeMath {
     }
     return StatePhases.withdraw;
   }
-  
+
   //check if the sender is an authorized casino wallet
   modifier onlyAuthorized {
     require(casino.authorized(msg.sender));
@@ -456,4 +456,10 @@ contract BankrollLending is Owned, SafeMath {
     _;
   }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

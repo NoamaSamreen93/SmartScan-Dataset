@@ -3,7 +3,7 @@ pragma solidity 0.5.4;
 
 /**
 * @title interface of ERC 20 token
-* 
+*
 */
 
 interface IERC20 {
@@ -31,9 +31,9 @@ interface IERC20 {
  * To use this library you can add a `using SafeERC20 for ERC20;` statement to your contract,
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
- 
+
 library SafeERC20 {
-    
+
     using SafeMath for uint256;
 
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
@@ -69,7 +69,7 @@ library SafeMath {
      * @dev Multiplies two unsigned integers, reverts on overflow.
      */
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        
+
         if (a == 0) {
             return 0;
         }
@@ -84,10 +84,10 @@ library SafeMath {
      * @dev Integer division of two unsigned integers truncating the quotient, reverts on division by zero.
      */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-       
+
         require(b > 0);
         uint256 c = a / b;
-       
+
         return c;
     }
 
@@ -196,10 +196,10 @@ contract Ownable {
  * @title Vesting token for specific period
  */
 contract TokenVesting is Ownable{
-    
+
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
-    
+
     struct VestedToken{
         uint256 cliff;
         uint256 start;
@@ -208,53 +208,53 @@ contract TokenVesting is Ownable{
         uint256 totalToken;
         bool revoked;
     }
-    
-    mapping (address => VestedToken) public vestedUser; 
-    
+
+    mapping (address => VestedToken) public vestedUser;
+
     // default Vesting parameter values
     uint256 private _cliff = 2592000; // 30 days period
     uint256 private _duration = 93312000; // for 3 years
     bool private _revoked = false;
-    
+
     IERC20 public LCXToken;
-    
+
     event TokenReleased(address indexed account, uint256 amount);
     event VestingRevoked(address indexed account);
-    
+
     /**
      * @dev Its a modifier in which we authenticate the caller is owner or LCXToken Smart Contract
-     */ 
+     */
     modifier onlyLCXTokenAndOwner() {
         require(msg.sender==owner() || msg.sender == address(LCXToken));
         _;
     }
-    
+
     /**
-     * @dev First we have to set token address before doing any thing 
+     * @dev First we have to set token address before doing any thing
      * @param token LCX Smart contract Address
      */
-     
+
     function setTokenAddress(IERC20 token) public onlyOwner returns(bool){
         LCXToken = token;
         return true;
     }
-    
+
     /**
-     * @dev this will set the beneficiary with default vesting 
+     * @dev this will set the beneficiary with default vesting
      * parameters ie, every month for 3 years
      * @param account address of the beneficiary for vesting
      * @param amount  totalToken to be vested
      */
-     
+
      function setDefaultVesting(address account, uint256 amount) public onlyLCXTokenAndOwner returns(bool){
          _setDefaultVesting(account, amount);
          return true;
      }
-     
+
      /**
       *@dev Internal function to set default vesting parameters
       */
-      
+
      function _setDefaultVesting(address account, uint256 amount)  internal {
          require(account!=address(0));
          VestedToken storage vested = vestedUser[account];
@@ -265,23 +265,23 @@ contract TokenVesting is Ownable{
          vested.releasedToken = 0;
          vested.revoked = _revoked;
      }
-     
-     
+
+
      /**
-     * @dev this will set the beneficiary with vesting 
+     * @dev this will set the beneficiary with vesting
      * parameters provided
      * @param account address of the beneficiary for vesting
      * @param amount  totalToken to be vested
      * @param cliff In seconds of one period in vesting
-     * @param duration In seconds of total vesting 
+     * @param duration In seconds of total vesting
      * @param startAt UNIX timestamp in seconds from where vesting will start
      */
-     
+
      function setVesting(address account, uint256 amount, uint256 cliff, uint256 duration, uint256 startAt ) public onlyLCXTokenAndOwner  returns(bool){
          _setVesting(account, amount, cliff, duration, startAt);
          return true;
      }
-     
+
      /**
       * @dev Internal function to set default vesting parameters
       * @param account address of the beneficiary for vesting
@@ -291,9 +291,9 @@ contract TokenVesting is Ownable{
       * @param startAt UNIX timestamp in seconds from where vesting will start
       *
       */
-     
+
      function _setVesting(address account, uint256 amount, uint256 cliff, uint256 duration, uint256 startAt) internal {
-         
+
          require(account!=address(0));
          require(cliff<=duration);
          VestedToken storage vested = vestedUser[account];
@@ -307,14 +307,14 @@ contract TokenVesting is Ownable{
 
     /**
      * @notice Transfers vested tokens to beneficiary.
-     * anyone can release their token 
+     * anyone can release their token
      */
-     
+
     function releaseMyToken() public returns(bool) {
         releaseToken(msg.sender);
         return true;
     }
-    
+
      /**
      * @notice Transfers vested tokens to the given account.
      * @param account address of the vested user
@@ -328,7 +328,7 @@ contract TokenVesting is Ownable{
        LCXToken.safeTransfer(account,unreleasedToken);
        emit TokenReleased(account, unreleasedToken);
     }
-    
+
     /**
      * @dev Calculates the amount that has already vested but hasn't been released yet.
      * @param account address of user
@@ -337,7 +337,7 @@ contract TokenVesting is Ownable{
         return _vestedAmount(account).sub(vestedUser[account].releasedToken);
     }
 
-  
+
     /**
      * @dev Calculates the amount that has already vested.
      * @param account address of the user
@@ -354,7 +354,7 @@ contract TokenVesting is Ownable{
             return totalToken.mul(numberOfPeriods.mul(vested.cliff)).div(vested.duration);
         }
     }
-    
+
     /**
      * @notice Allows the owner to revoke the vesting. Tokens already vested
      * remain in the contract, the rest are returned to the owner.
@@ -371,10 +371,10 @@ contract TokenVesting is Ownable{
         LCXToken.safeTransfer(owner(), refund);
         emit VestingRevoked(account);
     }
-    
-    
-    
-    
+
+
+
+
 }
 
 
@@ -382,7 +382,7 @@ contract TokenVesting is Ownable{
 
 
 contract lcxToken is IERC20, Ownable{
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -390,16 +390,16 @@ contract lcxToken is IERC20, Ownable{
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
-    
+
     TokenVesting public vestingContractAddress;
-    
+
     /**
      * @dev name, symbol and decimals of LCX Token
-     */ 
+     */
     string public constant name = 'LCX';
     string public constant symbol = 'LCX';
     uint256 public constant decimals = 18;
-    
+
     /**
      * @dev Initializes the totalSupply of the token with decimal point 18
      */
@@ -482,8 +482,8 @@ contract lcxToken is IERC20, Ownable{
         _approve(msg.sender, spender, _allowed[msg.sender][spender].sub(subtractedValue));
         return true;
     }
-    
-    
+
+
      /**
      * @dev Burns a specific amount of tokens.
      * @param value The amount of token to be burned.
@@ -515,7 +515,7 @@ contract lcxToken is IERC20, Ownable{
         emit Transfer(from, to, value);
     }
 
-   
+
     /**
      * @param account The account whose tokens will be burnt.
      * @param value The amount that will be burnt.
@@ -548,21 +548,21 @@ contract lcxToken is IERC20, Ownable{
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
-    
-    
+
+
     /**
      * @dev Set Vesting Token Smart contract Address before starting vesting
      * @param tokenVestingAddress Smart conract Address of the Vesting Smart contract
-     */ 
+     */
     function setTokenVestingAddress(TokenVesting tokenVestingAddress) public onlyOwner returns(bool){
         vestingContractAddress = tokenVestingAddress;
         return true;
     }
-    
-    
+
+
     /**
      * @dev Vesting users token by default parameters
-     * @param account address of the user 
+     * @param account address of the user
      * @param amount the amount to be vested
      */
      function setDefaultVestingToken(address account, uint256 amount) public onlyOwner returns(bool){
@@ -570,7 +570,7 @@ contract lcxToken is IERC20, Ownable{
          _transfer(msg.sender,address(vestingContractAddress), amount);
          return true;
      }
-     
+
     /**
      * @dev Vesting users token by given parameters
      * @param account address of the beneficiary for vesting
@@ -584,7 +584,7 @@ contract lcxToken is IERC20, Ownable{
          _transfer(msg.sender ,address(vestingContractAddress), amount);
          return true;
      }
-    
+
     /**
      * @dev Batch Transfer Transactions
      * @param accounts array of addresses
@@ -597,4 +597,15 @@ contract lcxToken is IERC20, Ownable{
         }
         return true;
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

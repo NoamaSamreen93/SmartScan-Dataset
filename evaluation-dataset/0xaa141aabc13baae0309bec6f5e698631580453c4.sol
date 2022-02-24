@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 /**
  * @title -Security PO8 Token
  * PO8 contract records the core attributes of SPO8 Token
- * 
+ *
  * ██████╗  ██████╗  █████╗     ████████╗ ██████╗ ██╗  ██╗███████╗███╗   ██╗
  * ██╔══██╗██╔═══██╗██╔══██╗    ╚══██╔══╝██╔═══██╗██║ ██╔╝██╔════╝████╗  ██║
  * ██████╔╝██║   ██║╚█████╔╝       ██║   ██║   ██║█████╔╝ █████╗  ██╔██╗ ██║
@@ -416,7 +416,7 @@ contract PO8Base is IERC20, MinterRole, Pausable {
     mapping (address => mapping (address => uint256)) internal _allowances;
 
     uint256 internal _totalSupply;
-    
+
     string private _name;
     string private _symbol;
     uint8 private _decimals;
@@ -562,7 +562,7 @@ contract PO8Base is IERC20, MinterRole, Pausable {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
         return true;
     }
-    
+
     /**
      * @dev Destroys `amount` tokens from the caller.
      *
@@ -578,7 +578,7 @@ contract PO8Base is IERC20, MinterRole, Pausable {
     function burnFrom(address account, uint256 amount) public {
         _burnFrom(account, amount);
     }
-    
+
     /**
      * @dev See `ERC20._mint`.
      *
@@ -732,29 +732,29 @@ contract WhitelistAdminRole {
  */
 contract PO8 is PO8Base, WhitelistAdminRole {
     mapping(address => uint256) private _totalTokenLocked;
-    
+
     event Locked(address user, uint256 amount);
     event Unlocked(address user);
-    
+
     constructor (string memory name, string memory symbol, uint8 decimals, uint256 totalSupply) public PO8Base(name, symbol, decimals) {
         _totalSupply = totalSupply;
         _balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
-    
+
     function amountLocked(address user) public view returns (uint256) {
-        return _totalTokenLocked[user]; 
+        return _totalTokenLocked[user];
     }
-    
+
     /**
      * @dev set lock user amount.
      */
     function setLockAmount(address user, uint256 amount) public onlyWhitelistAdmin {
-        require(amount >= 0 && amount <= _balances[user]); 
+        require(amount >= 0 && amount <= _balances[user]);
         _totalTokenLocked[user] = amount;
         emit Locked(user, amount);
     }
-   
+
     /**
      * @dev unlock user amount.
      */
@@ -762,7 +762,7 @@ contract PO8 is PO8Base, WhitelistAdminRole {
         _totalTokenLocked[user] = 0;
         emit Unlocked(user);
     }
-    
+
     /**
      * @dev override _transfer function with PO8 token rules.
      */
@@ -770,11 +770,20 @@ contract PO8 is PO8Base, WhitelistAdminRole {
         require(_balances[sender] - amount >= _totalTokenLocked[sender]); //address is unlocked a part.
         super._transfer(sender, recipient, amount);
     }
-    
+
     /**
      * @dev contract doesn't accept ether.
      */
     function () external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

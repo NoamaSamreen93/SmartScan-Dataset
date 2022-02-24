@@ -6,9 +6,9 @@ pragma solidity ^0.4.18;
         uint8 public decimals;
         /* This creates an array with all balances */
         mapping (address => uint256) public balanceOf;
-        
+
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function EthereumMoon(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits) public {
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
@@ -17,13 +17,24 @@ pragma solidity ^0.4.18;
     }
 
 	function transfer(address _to, uint256 _value) public {
-	    
+
 	    require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value >= balanceOf[_to]);
-	    
+
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += _value;
-		
+
 		        /* Notify anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

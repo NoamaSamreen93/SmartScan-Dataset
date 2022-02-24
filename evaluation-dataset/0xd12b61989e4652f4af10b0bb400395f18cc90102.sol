@@ -296,7 +296,7 @@ contract TestToken is ERC20, ERC20Detailed {
 
     function burn(uint256 value) public returns(bool) {
         burned = burned.add(value);
-        
+
 
 
 
@@ -311,4 +311,13 @@ _burn(msg.sender, value);
         _burnFrom(from, value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

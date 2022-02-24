@@ -74,7 +74,7 @@ contract MultiSigWallet {
                 && _required > 0 );
         _;
     }
-    
+
     /// @dev Contract constructor sets initial owners and required number of confirmations.
     /// @param _owners List of initial owners.
     /// @param _required Number of required confirmations.
@@ -120,7 +120,7 @@ contract MultiSigWallet {
         ownerExists(owner) {
         // DO NOT remove last owner
         require(owners.length > 1);
-        
+
         isOwner[owner] = false;
         for (uint i=0; i<owners.length - 1; i++)
             if (owners[i] == owner) {
@@ -147,7 +147,7 @@ contract MultiSigWallet {
     /// @param destination Transaction target address.
     /// @param value Transaction ether value.
     /// @param data Transaction data payload.
-    /// @param nonce 
+    /// @param nonce
     /// @return transactionId.
     function addTransaction(address destination, uint value, bytes data, uint nonce)
         private
@@ -172,7 +172,7 @@ contract MultiSigWallet {
     /// @param destination Transaction target address.
     /// @param value Transaction ether value.
     /// @param data Transaction data payload.
-    /// @param nonce 
+    /// @param nonce
     /// @return transactionId.
     function submitTransaction(address destination, uint value, bytes data, uint nonce)
         external
@@ -193,14 +193,14 @@ contract MultiSigWallet {
         executeTransaction(transactionId);
     }
 
-    
+
     /// @dev Allows anyone to execute a confirmed transaction.
     /// @param transactionId transaction Id.
     function executeTransaction(bytes32 transactionId)
         public
         notExecuted(transactionId) {
         if (isConfirmed(transactionId)) {
-            Transaction storage txn = transactions[transactionId]; 
+            Transaction storage txn = transactions[transactionId];
             txn.executed = true;
             if (!txn.destination.call.value(txn.value)(txn.data))
                 revert();
@@ -285,4 +285,20 @@ contract MultiSigWallet {
         returns (bytes32[]) {
         return filterTransactions(false);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

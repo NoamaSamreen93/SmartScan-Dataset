@@ -46,7 +46,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -67,7 +67,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -270,7 +270,7 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-/** 
+/**
  * @title TokenDestructible:
  * @author Remco Bloemen <remco@2π.com>
  * @dev Base contract that can be destroyed by owner. All funds in contract including
@@ -278,9 +278,9 @@ contract MintableToken is StandardToken, Ownable {
  */
 contract TokenDestructible is Ownable {
 
-  function TokenDestructible() payable { } 
+  function TokenDestructible() payable { }
 
-  /** 
+  /**
    * @notice Terminate contract and refund to owner
    * @param tokens List of addresses of ERC20 or ERC20Basic token contracts to
    refund.
@@ -351,11 +351,11 @@ contract JesusCoin is StandardToken, Ownable, TokenDestructible {
 
 
 /**
- * @title Crowdsale 
+ * @title Crowdsale
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end block, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a wallet 
+ * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
 contract JesusCrowdsale is Ownable, Pausable, TokenDestructible {
@@ -384,7 +384,7 @@ contract JesusCrowdsale is Ownable, Pausable, TokenDestructible {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   event BountyDistributed(address indexed bountyAddress, uint256 amount);
 
@@ -421,7 +421,7 @@ contract JesusCrowdsale is Ownable, Pausable, TokenDestructible {
 
     // calculate token amount to be minted
     uint256 tokens = weiAmount.mul(getRate()).div(10);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
@@ -444,7 +444,7 @@ contract JesusCrowdsale is Ownable, Pausable, TokenDestructible {
     token.mint(bountyWallet, amount);
     BountyDistributed(bountyWallet, amount);
   }
-  
+
   /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
@@ -456,4 +456,15 @@ contract JesusCrowdsale is Ownable, Pausable, TokenDestructible {
     return token.finishMinting();
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

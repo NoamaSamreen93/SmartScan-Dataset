@@ -371,7 +371,7 @@ contract OperatorRole {
         require(isOperator(msg.sender));
         _;
     }
-    
+
     function isOperator(address account) public view returns (bool) {
         return operators.has(account);
     }
@@ -459,7 +459,7 @@ contract MCHPrime is OperatorRole, DJTBase {
 	mapping(address => uint256) public addressToExpiredAt;
 
 	address public validater;
-  
+
 	event PrimeFeeUpdated(
 		uint128 PrimeFeeUpdated
 	);
@@ -564,4 +564,13 @@ contract MCHPrime is OperatorRole, DJTBase {
 		return (signer == validater);
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

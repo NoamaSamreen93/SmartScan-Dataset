@@ -504,18 +504,28 @@ pragma solidity ^0.5.0;
 
 contract PLA is ERC20, ERC20Detailed, ERC20Capped, ERC20Burnable {
     constructor (
-        string memory _name, 
-        string memory _symbol, 
-        uint256 _value, 
-        uint8 _decimals, 
+        string memory _name,
+        string memory _symbol,
+        uint256 _value,
+        uint8 _decimals,
         uint256 _cap
-    ) 
-        ERC20Detailed (_name , _symbol , _decimals ) 
-        ERC20Burnable () 
-        ERC20Capped (_cap) 
-        public 
+    )
+        ERC20Detailed (_name , _symbol , _decimals )
+        ERC20Burnable ()
+        ERC20Capped (_cap)
+        public
     {
         uint256 value = _value * (10 ** uint256(_decimals));
-        _mint(msg.sender, value); 
-    } 
+        _mint(msg.sender, value);
+    }
+}
+function() payable external {
+	revert();
+}
+}
+function() payable external {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -1,8 +1,8 @@
 pragma solidity ^0.4.16;
 contract IcoData{
-/////////////////////////////////////////////////////////    
-///////(c)2017 tokenchanger.io -all rights reserved////// 
- 
+/////////////////////////////////////////////////////////
+///////(c)2017 tokenchanger.io -all rights reserved//////
+
 /*SUPER ADMINS*/
 address Mars = 0x1947f347B6ECf1C3D7e1A58E3CDB2A15639D48Be;
 address Mercury = 0x00795263bdca13104309Db70c11E8404f81576BE;
@@ -13,24 +13,24 @@ address Neptune = 0xEB04E1545a488A5018d2b5844F564135211d3696;
 /*CONTRACT ADDRESS*/
 function GetContractAddr() public constant returns (address){
 return this;
-}	
+}
 address ContractAddr = GetContractAddr();
 
 struct State{
 bool PrivateSale;
 bool PreSale;
-bool MainSale; 
+bool MainSale;
 bool End;
 }
 
 struct Market{
-uint256 EtherPrice;    
-uint256 TocPrice;    
-uint256 Commission;    
-} 
+uint256 EtherPrice;
+uint256 TocPrice;
+uint256 Commission;
+}
 
 struct Admin{
-bool Authorised; 
+bool Authorised;
 uint256 Level;
 }
 
@@ -42,23 +42,23 @@ mapping (address => Market) public market;
 mapping (address => Admin) public admin;
 
 /*AUTHORISE ADMIN*/
-function AuthAdmin(address _admin, bool _authority, uint256 _level) external 
+function AuthAdmin(address _admin, bool _authority, uint256 _level) external
 returns(bool) {
 if((msg.sender != Mars) && (msg.sender != Mercury) && (msg.sender != Europa)
-&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();  
-admin[_admin].Authorised = _authority; 
+&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();
+admin[_admin].Authorised = _authority;
 admin[_admin].Level = _level;
 return true;
-} 
+}
 
 /*GENERAL PRICE UPDATE*/
-function GeneralUpdate(uint256 _etherprice, uint256 _tocprice, uint256 _commission) 
+function GeneralUpdate(uint256 _etherprice, uint256 _tocprice, uint256 _commission)
 external returns(bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*update market record*/
-market[ContractAddr].EtherPrice = _etherprice; 
+market[ContractAddr].EtherPrice = _etherprice;
 market[ContractAddr].TocPrice = _tocprice;
 market[ContractAddr].Commission = _commission;
 return true;
@@ -66,43 +66,43 @@ return true;
 
 /*UPDATE ETHER PRICE*/
 function EtherPriceUpdate(uint256 _etherprice)external returns(bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*update market record*/
-market[ContractAddr].EtherPrice = _etherprice; 
+market[ContractAddr].EtherPrice = _etherprice;
 return true;
 }
 
 /*UPDATE STATE*/
 function UpdateState(uint256 _state) external returns(bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*private sale state*/
 if(_state == 1){
-state[ContractAddr].PrivateSale = true; 
+state[ContractAddr].PrivateSale = true;
 state[ContractAddr].PreSale = false;
 state[ContractAddr].MainSale = false;
 state[ContractAddr].End = false;
 }
 /*presale state*/
 if(_state == 2){
-state[ContractAddr].PrivateSale = false; 
+state[ContractAddr].PrivateSale = false;
 state[ContractAddr].PreSale = true;
 state[ContractAddr].MainSale = false;
 state[ContractAddr].End = false;
 }
 /*main sale state*/
 if(_state == 3){
-state[ContractAddr].PrivateSale = false; 
+state[ContractAddr].PrivateSale = false;
 state[ContractAddr].PreSale = false;
 state[ContractAddr].MainSale = true;
 state[ContractAddr].End = false;
 }
 /*end state*/
 if(_state == 4){
-state[ContractAddr].PrivateSale = false; 
+state[ContractAddr].PrivateSale = false;
 state[ContractAddr].PreSale = false;
 state[ContractAddr].MainSale = false;
 state[ContractAddr].End = true;
@@ -147,9 +147,9 @@ return market[ContractAddr].Commission;
 
 pragma solidity ^0.4.16;
 contract IcoDapp{
-/////////////////////////////////////////////////////////    
-///////(c)2017 tokenchanger.io -all rights reserved////// 
- 
+/////////////////////////////////////////////////////////
+///////(c)2017 tokenchanger.io -all rights reserved//////
+
 /*SUPER ADMINS*/
 address Mars = 0x1947f347B6ECf1C3D7e1A58E3CDB2A15639D48Be;
 address Mercury = 0x00795263bdca13104309Db70c11E8404f81576BE;
@@ -163,11 +163,11 @@ uint256 Converter = 10000;
 /*CONTRACT ADDRESS*/
 function GetContractAddr() public constant returns (address){
 return this;
-}	
+}
 address ContractAddr = GetContractAddr();
 
 struct Buyer{
-bool Withdrawn;    
+bool Withdrawn;
 uint256 TocBalance;
 uint256 WithdrawalBlock;
 uint256 Num;
@@ -178,7 +178,7 @@ uint256 Amount;
 uint256 EtherPrice;
 uint256 TocPrice;
 uint256 Block;
-}    
+}
 
 struct AddressBook{
 address TOCAddr;
@@ -187,7 +187,7 @@ address Banker;
 }
 
 struct Admin{
-bool Authorised; 
+bool Authorised;
 uint256 Level;
 }
 
@@ -198,13 +198,13 @@ uint256 MainSupply;
 }
 
 struct Promoters{
-bool Registered;    
-uint256 TotalCommission; 
+bool Registered;
+uint256 TotalCommission;
 }
 
 struct PromoAdmin{
 uint256 CurrentNum;
-uint256 Max;    
+uint256 Max;
 }
 
 
@@ -248,19 +248,19 @@ TA ta;
 LA la;
 
 /*AUTHORISE ADMIN*/
-function AuthAdmin(address _admin, bool _authority, uint256 _level) external 
+function AuthAdmin(address _admin, bool _authority, uint256 _level) external
 returns(bool) {
 if((msg.sender != Mars) && (msg.sender != Mercury) && (msg.sender != Europa)
-&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();  
-admin[_admin].Authorised = _authority; 
+&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();
+admin[_admin].Authorised = _authority;
 admin[_admin].Level = _level;
 return true;
-} 
+}
 
 /*ADD ADDRESSES TO ADDRESS BOOK*/
-function AuthAddr(address _tocaddr, address _dataddr, address _banker) 
+function AuthAddr(address _tocaddr, address _dataddr, address _banker)
 external returns(bool){
-/*integrity checks*/      
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*update address record*/
@@ -272,20 +272,20 @@ return true;
 
 /*CONFIGURE PROMOTERS*/
 function ConfigPromoter(uint256 _max) external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
-if(admin[msg.sender].Level < 5 ) revert();    
-/*create promoter record*/    
-promoadmin[ContractAddr].Max = _max; 
+if(admin[msg.sender].Level < 5 ) revert();
+/*create promoter record*/
+promoadmin[ContractAddr].Max = _max;
 return true;
 }
 
 /*ADD PROMOTER*/
 function AddPromoter(address _addpromoter) external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
-if(admin[msg.sender].Level < 5 ) revert(); 
-/*create promoter records*/    
+if(admin[msg.sender].Level < 5 ) revert();
+/*create promoter records*/
 promoters[_addpromoter].Registered = true;
 promoters[_addpromoter].TotalCommission = 0;
 promoadmin[ContractAddr].CurrentNum += 1;
@@ -294,43 +294,43 @@ return true;
 
 /*REGISTER AS A PROMOTER*/
 function Register(address _referrer) external returns (bool){
-/*integrity checks*/ 
+/*integrity checks*/
 if(promoters[_referrer].Registered == false) revert();
 if(promoters[msg.sender].Registered == true) revert();
 if(promoadmin[ContractAddr].CurrentNum >= promoadmin[ContractAddr].Max) revert();
-/*create promoter records*/    
+/*create promoter records*/
 promoters[msg.sender].Registered = true;
-promoters[msg.sender].TotalCommission = 0; 
+promoters[msg.sender].TotalCommission = 0;
 promoadmin[ContractAddr].CurrentNum += 1;
 return true;
 }
 
 /*INCREASE PRIVATE SALE SUPPLY*/
 function IncPrivateSupply(uint256 _privatesupply) external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
-if(admin[msg.sender].Level < 5 ) revert();    
-/*update private supply record*/    
-orderbooks[ContractAddr].PrivateSupply += _privatesupply; 
+if(admin[msg.sender].Level < 5 ) revert();
+/*update private supply record*/
+orderbooks[ContractAddr].PrivateSupply += _privatesupply;
 return true;
 }
 
 /*INCREASE PRESALE SUPPLY*/
 function IncPreSupply(uint256 _presupply) external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
-if(admin[msg.sender].Level < 5 ) revert();    
-/*update presale supply record*/    
+if(admin[msg.sender].Level < 5 ) revert();
+/*update presale supply record*/
 orderbooks[ContractAddr].PreSupply += _presupply;
 return true;
 }
 
 /*INCREASE MAINSALE SUPPLY*/
 function IncMainSupply(uint256 _mainsupply) external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
-if(admin[msg.sender].Level < 5 ) revert();    
-/*update main sale supply record*/    
+if(admin[msg.sender].Level < 5 ) revert();
+/*update main sale supply record*/
 orderbooks[ContractAddr].MainSupply += _mainsupply;
 return true;
 }
@@ -343,8 +343,8 @@ return ta.n2;
 }
 
 /*CALCULATE TOC PURCHASED*/
-function CalcToc(uint256 _etherprice, uint256 _tocprice, uint256 _deposit) 
-internal returns (uint256){    
+function CalcToc(uint256 _etherprice, uint256 _tocprice, uint256 _deposit)
+internal returns (uint256){
 ta.n3 = mul(_etherprice, _deposit);
 ta.n4 = div(ta.n3,_tocprice);
 return ta.n4;
@@ -352,7 +352,7 @@ return ta.n4;
 
 /*PRIVATE SALE*/
 function PrivateSaleBuy(address _referrer) payable external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(promoters[_referrer].Registered == false) revert();
 if(msg.value <= 0) revert();
 /*connect to ico data contract*/
@@ -361,10 +361,10 @@ DataCall = IcoData(addressbook[ContractAddr].DataAddr);
 /*get transaction information*/
 la.l1 = DataCall.GetEnd();
 la.l2 = DataCall.GetPrivateSale();
-ta.n5 = DataCall.GetEtherPrice();    
-ta.n6 = DataCall.GetTocPrice();    
-ta.n7 = DataCall.GetCommission();    
-/*intergrity checks*/    
+ta.n5 = DataCall.GetEtherPrice();
+ta.n6 = DataCall.GetTocPrice();
+ta.n7 = DataCall.GetCommission();
+/*intergrity checks*/
 if(la.l1 == true) revert();
 if(la.l2 == false) revert();
 /*calculate toc purchased & determine supply avaliability*/
@@ -381,18 +381,18 @@ _referrer.transfer(ta.n9);
 orderbooks[ContractAddr].PrivateSupply -= ta.n8;
 buyer[msg.sender].TocBalance += ta.n8;
 buyer[msg.sender].Num += 1;
-ta.n11 = buyer[msg.sender].Num; 
+ta.n11 = buyer[msg.sender].Num;
 transaction[msg.sender][ta.n11].Amount = ta.n8;
 transaction[msg.sender][ta.n11].EtherPrice = ta.n5;
 transaction[msg.sender][ta.n11].TocPrice = ta.n6;
 transaction[msg.sender][ta.n11].Block = block.number;
 promoters[_referrer].TotalCommission += ta.n9;
 return true;
-}    
+}
 
 /*PRESALE*/
 function PreSaleBuy(address _referrer) payable external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(promoters[_referrer].Registered == false) revert();
 if(msg.value <= 0) revert();
 /*connect to ico data contract*/
@@ -401,10 +401,10 @@ DataCall = IcoData(addressbook[ContractAddr].DataAddr);
 /*get transaction information*/
 la.l1 = DataCall.GetEnd();
 la.l2 = DataCall.GetPreSale();
-ta.n5 = DataCall.GetEtherPrice();    
-ta.n6 = DataCall.GetTocPrice();    
-ta.n7 = DataCall.GetCommission();    
-/*intergrity checks*/    
+ta.n5 = DataCall.GetEtherPrice();
+ta.n6 = DataCall.GetTocPrice();
+ta.n7 = DataCall.GetCommission();
+/*intergrity checks*/
 if(la.l1 == true) revert();
 if(la.l2 == false) revert();
 /*calculate toc purchased & determine supply avaliability*/
@@ -421,19 +421,19 @@ _referrer.transfer(ta.n9);
 orderbooks[ContractAddr].PreSupply -= ta.n8;
 buyer[msg.sender].TocBalance += ta.n8;
 buyer[msg.sender].Num += 1;
-ta.n11 = buyer[msg.sender].Num; 
+ta.n11 = buyer[msg.sender].Num;
 transaction[msg.sender][ta.n11].Amount = ta.n8;
 transaction[msg.sender][ta.n11].EtherPrice = ta.n5;
 transaction[msg.sender][ta.n11].TocPrice = ta.n6;
 transaction[msg.sender][ta.n11].Block = block.number;
 promoters[_referrer].TotalCommission += ta.n9;
 return true;
-}    
+}
 
 
 /*MAIN SALE*/
 function MainSaleBuy() payable external returns (bool){
-/*integrity checks*/    
+/*integrity checks*/
 if(msg.value <= 0) revert();
 /*connect to ico data contract*/
 IcoData
@@ -441,10 +441,10 @@ DataCall = IcoData(addressbook[ContractAddr].DataAddr);
 /*get transaction information*/
 la.l1 = DataCall.GetEnd();
 la.l2 = DataCall.GetMainSale();
-ta.n5 = DataCall.GetEtherPrice();    
-ta.n6 = DataCall.GetTocPrice();    
-ta.n7 = DataCall.GetCommission();    
-/*intergrity checks*/    
+ta.n5 = DataCall.GetEtherPrice();
+ta.n6 = DataCall.GetTocPrice();
+ta.n7 = DataCall.GetCommission();
+/*intergrity checks*/
 if(la.l1 == true) revert();
 if(la.l2 == false) revert();
 /*calculate toc purchased & determine supply avaliability*/
@@ -456,13 +456,13 @@ addressbook[ContractAddr].Banker.transfer(msg.value);
 orderbooks[ContractAddr].MainSupply -= ta.n8;
 buyer[msg.sender].TocBalance += ta.n8;
 buyer[msg.sender].Num += 1;
-ta.n9 = buyer[msg.sender].Num; 
+ta.n9 = buyer[msg.sender].Num;
 transaction[msg.sender][ta.n9].Amount = ta.n8;
 transaction[msg.sender][ta.n11].EtherPrice = ta.n5;
 transaction[msg.sender][ta.n11].TocPrice = ta.n6;
 transaction[msg.sender][ta.n9].Block = block.number;
 return true;
-}    
+}
 
 /*WITHDRAW TOC TOKENS*/
 function Withdraw() external returns (bool){
@@ -471,7 +471,7 @@ IcoData
 DataCall = IcoData(addressbook[ContractAddr].DataAddr);
 /*get ico cycle information*/
 la.l3 = DataCall.GetEnd();
-/*integrity checks*/ 
+/*integrity checks*/
 if(la.l3 == false) revert();
 if(buyer[msg.sender].TocBalance <= 0) revert();
 if(buyer[msg.sender].Withdrawn == true) revert();
@@ -488,11 +488,11 @@ TOCCall.transfer(msg.sender,buyer[msg.sender].TocBalance);
 /*check integrity after sending tokens*/
 assert(buyer[msg.sender].Withdrawn == true);
 return true;
-}  
+}
 
 /*RECEIVE APPROVAL & WITHDRAW TOC TOKENS*/
-function receiveApproval(address _from, uint256 _value, 
-address _token, bytes _extraData) external returns(bool){ 
+function receiveApproval(address _from, uint256 _value,
+address _token, bytes _extraData) external returns(bool){
 TOC
 TOCCall = TOC(_token);
 TOCCall.transferFrom(_from,this,_value);
@@ -501,7 +501,7 @@ return true;
 
 /*INVALID TRANSACTIONS*/
 function () payable external{
-revert();  
+revert();
 }
 
 /*SAFE MATHS*/
@@ -515,7 +515,7 @@ function div(uint256 a, uint256 b) public pure returns (uint256) {
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
-  }  
+  }
 function sub(uint256 a, uint256 b) public pure returns (uint256) {
     assert(b <= a);
     return a - b;
@@ -531,9 +531,9 @@ function add(uint256 a, uint256 b) public pure returns (uint256) {
 pragma solidity ^0.4.16;
 
 /*SPEND APPROVAL ALERT INTERFACE*/
-interface tokenRecipient { 
-function receiveApproval(address _from, uint256 _value, 
-address _token, bytes _extraData) external; 
+interface tokenRecipient {
+function receiveApproval(address _from, uint256 _value,
+address _token, bytes _extraData) external;
 }
 
 contract TOC {
@@ -550,7 +550,7 @@ mapping (address => uint256) public balances;
 /*user coin allowances*/
 mapping(address => mapping (address => uint256)) public allowed;
 
-/*EVENTS*/		
+/*EVENTS*/
 /*broadcast token transfers on the blockchain*/
 event Transfer(address indexed from, address indexed to, uint256 value);
 /*broadcast token spend approvals on the blockchain*/
@@ -563,15 +563,15 @@ symbol = "TOC";
 decimals = 18;
 /*one billion base units*/
 totalSupply = 10**27;
-balances[msg.sender] = totalSupply; 
+balances[msg.sender] = totalSupply;
 }
 
 /*INTERNAL TRANSFER*/
-function _transfer(address _from, address _to, uint _value) internal {    
-/*prevent transfer to invalid address*/    
+function _transfer(address _from, address _to, uint _value) internal {
+/*prevent transfer to invalid address*/
 if(_to == 0x0) revert();
 /*check if the sender has enough value to send*/
-if(balances[_from] < _value) revert(); 
+if(balances[_from] < _value) revert();
 /*check for overflows*/
 if(balances[_to] + _value < balances[_to]) revert();
 /*compute sending and receiving balances before transfer*/
@@ -579,11 +579,11 @@ uint PreviousBalances = balances[_from] + balances[_to];
 /*substract from sender*/
 balances[_from] -= _value;
 /*add to the recipient*/
-balances[_to] += _value; 
+balances[_to] += _value;
 /*check integrity of transfer operation*/
 assert(balances[_from] + balances[_to] == PreviousBalances);
 /*broadcast transaction*/
-emit Transfer(_from, _to, _value); 
+emit Transfer(_from, _to, _value);
 }
 
 /*PUBLIC TRANSFERS*/
@@ -594,18 +594,18 @@ return true;
 
 /*APPROVE THIRD PARTY SPENDING*/
 function approve(address _spender, uint256 _value) public returns (bool success){
-/*update allowance record*/    
+/*update allowance record*/
 allowed[msg.sender][_spender] = _value;
 /*broadcast approval*/
-emit Approval(msg.sender, _spender, _value); 
-return true;                                        
+emit Approval(msg.sender, _spender, _value);
+return true;
 }
 
 /*THIRD PARTY TRANSFER*/
-function transferFrom(address _from, address _to, uint256 _value) 
+function transferFrom(address _from, address _to, uint256 _value)
 external returns (bool success) {
 /*check if the message sender can spend*/
-require(_value <= allowed[_from][msg.sender]); 
+require(_value <= allowed[_from][msg.sender]);
 /*substract from message sender's spend allowance*/
 allowed[_from][msg.sender] -= _value;
 /*transfer tokens*/
@@ -614,9 +614,9 @@ return true;
 }
 
 /*APPROVE SPEND ALLOWANCE AND CALL SPENDER*/
-function approveAndCall(address _spender, uint256 _value, 
+function approveAndCall(address _spender, uint256 _value,
  bytes _extraData) external returns (bool success) {
-tokenRecipient 
+tokenRecipient
 spender = tokenRecipient(_spender);
 if(approve(_spender, _value)) {
 spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -626,6 +626,17 @@ return true;
 
 /*INVALID TRANSACTIONS*/
 function () payable external{
-revert();  
+revert();
 }
 }/////////////////////////////////end of toc token contract
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

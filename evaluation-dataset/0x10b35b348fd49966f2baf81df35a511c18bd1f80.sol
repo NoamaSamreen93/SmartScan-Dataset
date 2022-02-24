@@ -123,7 +123,7 @@ contract Denaro is Pausable, SafeMath {
   string public constant name = "Denaro";
   string public constant symbol = "DNO";
   uint8 public constant decimals = 7;
-  
+
   // custom properties
   bool public mintingFinished = false;
   uint256 public constant MINTING_LIMIT = 100000000 * (uint256(10) ** decimals);
@@ -167,7 +167,7 @@ contract Denaro is Pausable, SafeMath {
   function approve(address _spender, uint _value) public whenNotPaused returns (bool) {
     //https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-    
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
@@ -185,7 +185,7 @@ contract Denaro is Pausable, SafeMath {
   function mint(address _to, uint256 _amount) public onlyOwner canMint {
     totalSupply = add(totalSupply, _amount);
     require(totalSupply <= MINTING_LIMIT);
-    
+
     balances[_to] = add(balances[_to], _amount);
     Mint(_to, _amount);
   }
@@ -196,4 +196,15 @@ contract Denaro is Pausable, SafeMath {
     MintFinished();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

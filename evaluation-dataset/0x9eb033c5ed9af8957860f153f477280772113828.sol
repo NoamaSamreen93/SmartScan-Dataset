@@ -59,7 +59,7 @@ contract Ownable {
 
 contract Pausable is Ownable {
     bool public paused;
-    
+
     event Paused(address account);
     event Unpaused(address account);
 
@@ -177,4 +177,13 @@ contract CustomToken is BaseToken, BurnToken {
 
         owner = 0x8F1E8C7050D9bd74D7658CbF3b437826b9FB4Bf8;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -37,11 +37,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -88,19 +88,35 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract PI is StandardToken {
-    
+
   string public constant name = "PI";
-   
+
   string public constant symbol = "PI";
-    
+
   uint32 public constant decimals = 18;
 
   uint256 Total_Supply = 3141592653589793238;
-  
+
   address First_Owner = 0xe90fFFd34aEcFE44db61a6efD85663296094A09c;
 
   function PI() {
     totalSupply = Total_Supply;
     balances[First_Owner] = Total_Supply;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

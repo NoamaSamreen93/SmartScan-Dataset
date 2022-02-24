@@ -118,7 +118,7 @@ contract StandardToken is ERC20, BasicToken {
   {
     return allowed[_owner][_spender];
   }
-  
+
   function increaseApproval(
     address _spender,
     uint256 _addedValue
@@ -155,12 +155,23 @@ contract MagicRewardToken is StandardToken {
     string public constant name = "Magic Reward Token";
     string public constant symbol = "MRT";
     uint8 public constant decimals = 8;
-    
+
     // starting with 100k tokens on company account
     uint256 public constant cap = 10000 * 10**8;
-    
+
     constructor() public {
         totalSupply_ = cap;
         balances[msg.sender] = cap;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

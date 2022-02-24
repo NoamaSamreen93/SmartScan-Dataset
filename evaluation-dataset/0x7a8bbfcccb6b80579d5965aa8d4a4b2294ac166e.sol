@@ -177,13 +177,13 @@ contract mkethToken is owned, TokenERC20 {
 
     uint256 public sellPrice;
     uint256 public buyPrice;
-	
+
 	string public tokenName = "kfc";
     string public tokenSymbol = "kfc";
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public initialSupply = 10000000000;
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -243,4 +243,10 @@ contract mkethToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

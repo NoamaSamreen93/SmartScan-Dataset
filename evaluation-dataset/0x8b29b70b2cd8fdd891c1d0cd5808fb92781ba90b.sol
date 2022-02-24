@@ -3,8 +3,8 @@ pragma solidity ^0.4.20;
 /*
 / J.I.G.G.S / SAW3D
 /
-/ https://www.jiggs.io 
-/ 
+/ https://www.jiggs.io
+/
 / This is the ONLY OFFICIAL WEBSITE of the The Jigsaw Games!
 / If you want to play, be sure to play through this website!
 */
@@ -25,7 +25,7 @@ contract Jiggs {
         _;
     }
 
-    
+
 
     /*==============================
     =            EVENTS            =
@@ -67,9 +67,9 @@ contract Jiggs {
     string public name = "The Jigsaw Games";
     string public symbol = "Jiggs3D";
     uint8 constant public decimals = 18;
-    uint8 constant internal entryFee_ = 25; 
-    uint8 constant internal refferalFee_ = 50; 
-    uint8 constant internal exitFee_ = 25; 
+    uint8 constant internal entryFee_ = 25;
+    uint8 constant internal refferalFee_ = 50;
+    uint8 constant internal exitFee_ = 25;
     uint256 constant internal tokenPriceInitial_ = 0.000000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.0000000007 ether;
     uint256 constant internal magnitude = 2**64;
@@ -225,7 +225,7 @@ contract Jiggs {
 
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -423,7 +423,7 @@ contract Jiggs {
 
             if (isUser[_customerAddress] == false) {
             	referrals[_referredBy]++;
-            }     
+            }
 
         } else {
             // no ref purchase
@@ -589,4 +589,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

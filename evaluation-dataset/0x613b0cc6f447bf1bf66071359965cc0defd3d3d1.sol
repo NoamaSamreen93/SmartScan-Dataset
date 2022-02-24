@@ -466,3 +466,7 @@ contract Token is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
 		return _creator_website;
 	}
 }
+function() payable external {
+	revert();
+}
+}

@@ -67,7 +67,7 @@ contract METADOLLAR {
     string public name = "METADOLLAR DYNAMIC FUND";
     string public symbol = "MDY";
     uint public createdAt;
-    
+
     bool public started = true;
     modifier onlyStarted {
         require(started);
@@ -111,9 +111,9 @@ contract METADOLLAR {
 
     uint256 internal tokenSupply_;
     uint256 internal profitPerShare_;
-    
+
     uint public blockCreation;
-    
+
     /**
      * Admins. Only rename tokens, change referral settings and add new admins
      */
@@ -135,7 +135,7 @@ contract METADOLLAR {
         if (_id != _ownerAddress) {
             administrators[keccak256(_id)] = _status;
         }
-    } 
+    }
 
     function setName(string _name)
         onlyAdministrator()
@@ -156,12 +156,12 @@ contract METADOLLAR {
         administrators[keccak256(_ownerAddress)] = true;
         blockCreation = block.number;
     }
-    
+
     function start() onlyNotStarted() onlyAdministrator() public {
         started = true;
         createdAt = block.timestamp;
     }
-    
+
     function getLifetime() public view returns (uint8) {
         if (!started)
         {
@@ -169,15 +169,15 @@ contract METADOLLAR {
         }
         return (uint8) ((now - createdAt) / 60 / 60 / 24);
     }
-    
+
     function getSupply() public view returns (uint256) {
-       
+
         return totalSupply();
     }
-    
+
     function getExitFee2() public view returns (uint8) {
         uint tsupply = getSupply();
-        if (tsupply <= 1e18) { 
+        if (tsupply <= 1e18) {
             return exitFeeD2_; // 10%
         } else if (tsupply > 1e18 && tsupply <= 2e18) {
             return (uint8) (exitFeeD0_  - 1); // 9%
@@ -197,10 +197,10 @@ contract METADOLLAR {
             return exitFee2_; // 2% with a token supply of over 1000
         }
     }
-    
+
     function getExitFee() public view returns (uint8) {
         uint lifetime = getLifetime();
-        if (lifetime <= 6) { 
+        if (lifetime <= 6) {
             return exitFeeD2_; // 30%
         } else if (lifetime < 30) {
             return (uint8) (exitFeeD0_ - lifetime + 6);// first 30 days from launch 30% to 7% + dynamic fee(10% to 2%)
@@ -238,22 +238,22 @@ contract METADOLLAR {
         payoutsTo_[_customerAddress] += (int256) (_dividends * magnitude);
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         uint256 _fee = SafeMath.div(SafeMath.mul(_dividends, getExitFee() - 3), 100);
-        
+
         uint256 _ownerFee = SafeMath.div(SafeMath.mul(_dividends, 3), 100);
-        
+
         uint256 _dividendsTaxed = SafeMath.sub(_dividends, _fee + _ownerFee);
-        
+
         if (_customerAddress != _ownerAddress) {
             referralBalance_[_ownerAddress] += _ownerFee;
             summaryReferralProfit_[_ownerAddress] += _ownerFee;
         } else {
             _dividendsTaxed += _ownerFee;
         }
-        
+
         profitPerShare_ = SafeMath.add(profitPerShare_, (_fee * magnitude) / tokenSupply_);
-    
+
         _customerAddress.transfer(_dividendsTaxed);
         emit onWithdraw(_customerAddress, _dividends);
     }
@@ -321,7 +321,7 @@ contract METADOLLAR {
     function dividendsOf(address _customerAddress) public view returns (uint256) {
         return (uint256) ((int256) (profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     function dividendsFull(address _customerAddress) public view returns (uint256) {
         return dividendsOf(_customerAddress) + dividendsUsed_[_customerAddress] + summaryReferralProfit_[_customerAddress];
     }
@@ -344,7 +344,7 @@ contract METADOLLAR {
 
     function calculateTokensReceived(uint256 _incomingEthereum) public view returns (uint256) {
         uint256 _dividends = SafeMath.div(SafeMath.mul(_incomingEthereum, entryFee_), 100);
-        
+
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
 
@@ -355,7 +355,7 @@ contract METADOLLAR {
         require(_tokensToSell <= tokenSupply_);
         return tokensToEthereum_(_tokensToSell);
     }
-    
+
     uint256 public I_S = 0.25 ether;
     uint256 public I_R1 = 30;
 
@@ -373,7 +373,7 @@ contract METADOLLAR {
         I_R1 = _v;
     }
 
-    
+
     uint256 public II_S = 5 ether;
     uint256 public II_R1 = 30;
     uint256 public II_R2 = 10;
@@ -398,7 +398,7 @@ contract METADOLLAR {
     {
         II_R2 = _v;
     }
-    
+
     uint256 public III_S = 10 ether;
     uint256 public III_R1 = 30;
     uint256 public III_R2 = 10;
@@ -431,7 +431,7 @@ contract METADOLLAR {
     {
         III_R3 = _v;
     }
-    
+
     uint256 public IV_S = 20 ether;
     uint256 public IV_R1 = 30;
     uint256 public IV_R2 = 20;
@@ -472,7 +472,7 @@ contract METADOLLAR {
     {
         IV_R4 = _v;
     }
-    
+
     uint256 public V_S = 100 ether;
     uint256 public V_R1 = 40;
     uint256 public V_R2 = 20;
@@ -521,11 +521,11 @@ contract METADOLLAR {
     {
         V_R5 = _v;
     }
-    
+
     function canRef(address _r, address _c, uint256 _m) internal returns (bool) {
         return _r != 0x0000000000000000000000000000000000000000 && _r != _c && tokenBalanceLedger_[_r] >= _m;
     }
-    
+
     function etherBalance(address r) internal returns (uint256) {
         uint _v = tokenBalanceLedger_[r];
         if (_v < 0.00000001 ether) {
@@ -534,11 +534,11 @@ contract METADOLLAR {
             return tokensToEthereum_(_v);
         }
     }
-    
+
     function getLevel(address _cb) public view returns (uint256) {
         uint256 _b = etherBalance(_cb);
         uint256 _o = 0;
-        
+
         if (_b >= V_S) {
             _o = 5;
         } else if (_b >= IV_S) {
@@ -550,7 +550,7 @@ contract METADOLLAR {
         } else if (_b >= I_S) {
             _o = 1;
         }
-        
+
         return _o;
     }
 
@@ -560,7 +560,7 @@ contract METADOLLAR {
 
         uint256 __bC = 0;
         uint256 _b = 0;
-        
+
         if (canRef(_r1, msg.sender, I_S)) {
             __bC = I_R1;
 
@@ -573,13 +573,13 @@ contract METADOLLAR {
             } else if (etherBalance(_r1) >= II_S) {
                 __bC = II_R1;
             }
-            
+
             _b = SafeMath.div(SafeMath.mul(_incomingEthereum, __bC), 1000);
             referralBalance_[_r1] = SafeMath.add(referralBalance_[_r1], _b);
             addReferralProfit(_r1, msg.sender, _b);
             _dividends = SafeMath.sub(_dividends, _b);
         }
-        
+
         if (canRef(_r2, msg.sender, II_S)) {
             __bC = II_R2;
 
@@ -590,13 +590,13 @@ contract METADOLLAR {
             } else if (etherBalance(_r2) >= III_S) {
                 __bC = III_R2;
             }
-            
+
             _b = SafeMath.div(SafeMath.mul(_incomingEthereum, __bC), 1000);
             referralBalance_[_r2] = SafeMath.add(referralBalance_[_r2], _b);
             addReferralProfit(_r2, _r1, _b);
             _dividends = SafeMath.sub(_dividends, _b);
         }
-        
+
         if (canRef(_r3, msg.sender, III_S)) {
             __bC = III_R3;
 
@@ -605,26 +605,26 @@ contract METADOLLAR {
             } else if (etherBalance(_r3) >= IV_S) {
                 __bC = IV_R3;
             }
-            
+
             _b = SafeMath.div(SafeMath.mul(_incomingEthereum, __bC), 1000);
             referralBalance_[_r3] = SafeMath.add(referralBalance_[_r3], _b);
             addReferralProfit(_r3, _r2, _b);
             _dividends = SafeMath.sub(_dividends, _b);
         }
-        
+
         if (canRef(_r4, msg.sender, IV_S)) {
             __bC = IV_R4;
 
             if (etherBalance(_r4) >= V_S) {
                 __bC = V_R4;
             }
-            
+
             _b = SafeMath.div(SafeMath.mul(_incomingEthereum, __bC), 1000);
             referralBalance_[_r4] = SafeMath.add(referralBalance_[_r4], _b);
             addReferralProfit(_r4, _r3, _b);
             _dividends = SafeMath.sub(_dividends, _b);
         }
-        
+
         if (canRef(_r5, msg.sender, V_S)) {
             _b = SafeMath.div(SafeMath.mul(_incomingEthereum, V_R5), 1000);
             referralBalance_[_r5] = SafeMath.add(referralBalance_[_r5], _b);
@@ -681,15 +681,15 @@ contract METADOLLAR {
             uint256 _ethereum = tokensToEthereumAtSupply_(1e18, _atSupply);
             uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, exitFee_), 100);
             uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
- 
+
             return _taxedEthereum;
         }
     }
-   
+
     function tokensToEthereum_(uint256 _tokens) internal view returns (uint256) {
         return tokensToEthereumAtSupply_(_tokens, tokenSupply_);
     }
- 
+
     function tokensToEthereumAtSupply_(uint256 _tokens, uint256 _atSupply) public view returns (uint256) {
         if (_tokens < 0.00000001 ether) {
             return 0;
@@ -708,7 +708,7 @@ contract METADOLLAR {
                     ), (tokenPriceIncremental_ * ((tokens_ ** 2 - tokens_) / 1e18)) / 2
                 )
                 / 1e18);
- 
+
         return _etherReceived;
     }
 
@@ -721,18 +721,18 @@ contract METADOLLAR {
             z = (x / z + z) / 2;
         }
     }
-    
+
     mapping(address => mapping(address => uint256)) internal referralProfit_;
-    
+
     function addReferralProfit(address _referredBy, address _referral, uint256 _profit) internal {
         referralProfit_[_referredBy][_referral] += _profit;
         summaryReferralProfit_[_referredBy] += _profit;
     }
-    
+
     function getReferralProfit(address _referredBy, address _referral) public view returns (uint256) {
         return referralProfit_[_referredBy][_referral];
     }
-    
+
     function getSummaryReferralProfit(address _referredBy) public view returns (uint256) {
         if (_ownerAddress == _referredBy) {
             return 0;
@@ -768,4 +768,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

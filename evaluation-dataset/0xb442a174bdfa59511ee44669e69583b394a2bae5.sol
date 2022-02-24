@@ -240,7 +240,7 @@ contract Ownable {
 
 /**
  * @title AlkionToken interface based ERC-20
- * @dev www.alkion.io  
+ * @dev www.alkion.io
  */
 interface IAlkionToken {
     function transfer(address sender, address to, uint256 value) external returns (bool);
@@ -248,15 +248,15 @@ interface IAlkionToken {
     function transferFrom(address sender, address from, address to, uint256 value) external returns (uint256);
 	function burn(address sender, uint256 value) external;
 	function burnFrom(address sender, address from, uint256 value) external returns(uint256);
-	
+
     function totalSupply() external view returns (uint256);
     function balanceOf(address who) external view returns (uint256);
 	function totalBalanceOf(address who) external view returns (uint256);
-	function lockedBalanceOf(address who) external view returns (uint256);     
+	function lockedBalanceOf(address who) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
-	
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);    
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 // File: contracts/AlkionToken.sol
@@ -272,122 +272,131 @@ contract AlkionToken is IERC20, Pausable, Ownable {
 	string public constant name = "Alkion Token";
 	string public constant symbol = "ALK";
 	uint8 public constant decimals = 18;
-  
+
 	uint256 internal constant INITIAL_SUPPLY = 50000000000 * (10 ** uint256(decimals));
 
 	string internal constant NOT_OWNER = 'You are not owner';
 	string internal constant INVALID_TARGET_ADDRESS = 'Invalid target address';
-	
+
 	IAlkionToken internal _tokenImpl;
-		
+
 	modifier onlyOwner() {
 		require(isOwner(), NOT_OWNER);
 		_;
 	}
-		
-	constructor() 
-		public 
-	{	
+
+	constructor()
+		public
+	{
 	}
-	
+
 	function impl(IAlkionToken tokenImpl)
-		onlyOwner 
-		public 
+		onlyOwner
+		public
 	{
 		require(address(tokenImpl) != address(0), INVALID_TARGET_ADDRESS);
 		_tokenImpl = tokenImpl;
 	}
-	
-	function addressImpl() 
-		public 
-		view 
-		returns (address) 
+
+	function addressImpl()
+		public
+		view
+		returns (address)
 	{
 		if(!isOwner()) return address(0);
 		return address(_tokenImpl);
-	} 
-	
-	function totalSupply() 
-		public 
-		view 
-		returns (uint256) 
+	}
+
+	function totalSupply()
+		public
+		view
+		returns (uint256)
 	{
 		return _tokenImpl.totalSupply();
 	}
-	
-	function balanceOf(address who) 
-		public 
-		view 
-		returns (uint256) 
+
+	function balanceOf(address who)
+		public
+		view
+		returns (uint256)
 	{
 		return _tokenImpl.balanceOf(who);
 	}
-	
+
 	function allowance(address owner, address spender)
-		public 
-		view 
-		returns (uint256) 
+		public
+		view
+		returns (uint256)
 	{
 		return _tokenImpl.allowance(owner, spender);
 	}
-	
-	function transfer(address to, uint256 value) 
-		whenNotPaused 
-		public 
-		returns (bool result) 
+
+	function transfer(address to, uint256 value)
+		whenNotPaused
+		public
+		returns (bool result)
 	{
 		result = _tokenImpl.transfer(msg.sender, to, value);
 		emit Transfer(msg.sender, to, value);
 	}
-	
+
 	function approve(address spender, uint256 value)
-		whenNotPaused 
-		public 
-		returns (bool result) 
+		whenNotPaused
+		public
+		returns (bool result)
 	{
 		result = _tokenImpl.approve(msg.sender, spender, value);
 		emit Approval(msg.sender, spender, value);
 	}
-	
+
 	function transferFrom(address from, address to, uint256 value)
-		whenNotPaused 
-		public 
-		returns (bool) 
+		whenNotPaused
+		public
+		returns (bool)
 	{
 		uint256 aB = _tokenImpl.transferFrom(msg.sender, from, to, value);
 		emit Transfer(from, to, value);
 		emit Approval(from, msg.sender, aB);
 		return true;
 	}
-	
-	function burn(uint256 value) 
-		public 
+
+	function burn(uint256 value)
+		public
 	{
 		_tokenImpl.burn(msg.sender, value);
 		emit Transfer(msg.sender, address(0), value);
 	}
 
-	function burnFrom(address from, uint256 value) 
-		public 
+	function burnFrom(address from, uint256 value)
+		public
 	{
 		uint256 aB = _tokenImpl.burnFrom(msg.sender, from, value);
 		emit Transfer(from, address(0), value);
 		emit Approval(from, msg.sender, aB);
 	}
 
-	function totalBalanceOf(address _of) 
-		public 
-		view 
+	function totalBalanceOf(address _of)
+		public
+		view
 		returns (uint256)
 	{
 		return _tokenImpl.totalBalanceOf(_of);
 	}
-	
-	function lockedBalanceOf(address _of) 
-		public 
-		view 
+
+	function lockedBalanceOf(address _of)
+		public
+		view
 		returns (uint256)
 	{
 		return _tokenImpl.lockedBalanceOf(_of);
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

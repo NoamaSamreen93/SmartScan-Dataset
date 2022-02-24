@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
-/** 
+/**
 *@title ERC721 interface
 */
 contract ERC721 {
@@ -171,7 +171,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   mapping(uint256 => uint256) private ownedTokensIndex;
 
   // Balances from % payouts.
-  mapping (address => uint256) private payoutBalances; 
+  mapping (address => uint256) private payoutBalances;
 
   // Events
   event Purchased(uint256 indexed _tokenId, address indexed _owner, uint256 _purchasePrice);
@@ -219,13 +219,13 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   function createToken(uint256 _tokenId, uint256 _price, uint256 _lastPrice, uint256 _payoutPercentage, uint8 _kind, uint256 _mayorTokenId, address _owner) onlyOwner() public {
     require(_price > 0);
     require(_lastPrice < _price);
-    
+
     // make sure token hasn't been used yet
     require(tokens[_tokenId].price == 0);
-    
+
     // check for kinds
     require(_kind > 0 && _kind <= 3);
-    
+
     // create new token
     Token storage newToken = tokens[_tokenId];
 
@@ -239,7 +239,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 
     // store token in storage
     listed.push(_tokenId);
-    
+
     // mint new token
     _mint(_owner, _tokenId);
   }
@@ -286,7 +286,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   * @dev Purchase toekn from previous owner
   * @param _tokenId uint256 of token
   */
-  function purchase(uint256 _tokenId) public 
+  function purchase(uint256 _tokenId) public
     payable
     isNotContract(msg.sender)
   {
@@ -305,9 +305,9 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
     // Calculate pool cut for taxes.
     uint256 priceDelta = price.sub(token.lastPrice);
     uint256 poolCut = calculatePoolCut(priceDelta);
-    
+
     _updatePools(token.kind, poolCut);
-    
+
     uint256 fee = price.mul(feePercentage).div(100);
     devOwed = devOwed.add(fee);
 
@@ -335,12 +335,12 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 
     // Calculate overspending
     uint256 excess = msg.value - price;
-    
+
     if (excess > 0) {
         // Refund overspending
         msg.sender.transfer(excess);
     }
-    
+
     // set last purchase price to storage
     lastPurchase = now;
   }
@@ -395,7 +395,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
       paid = paid.add(tax);
     }
 
-    if (tokens[_token.mayorTokenId].owner != address(0)) { 
+    if (tokens[_token.mayorTokenId].owner != address(0)) {
       tokens[_token.mayorTokenId].owner.transfer(tax);
       paid = paid.add(tax);
     }
@@ -452,7 +452,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
     uint256 owed;
     for (uint256 i = 0; i < ownerTokens.length; i++) {
         uint256 totalOwed;
-        
+
         if (tokens[ownerTokens[i]].kind == CITY) {
           totalOwed = cityPoolTotal * tokens[ownerTokens[i]].payout / 10000;
         } else if (tokens[ownerTokens[i]].kind == LANDMARK) {
@@ -463,7 +463,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 
         uint256 totalTokenOwed = totalOwed.sub(tokens[ownerTokens[i]].withdrawn);
         owed += totalTokenOwed;
-        
+
         tokens[ownerTokens[i]].withdrawn += totalTokenOwed;
     }
     payoutBalances[_owner] += owed;
@@ -480,7 +480,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   **/
   function updateSinglePayout(address _owner, uint256 _tokenId) internal {
     uint256 totalOwed;
-        
+
     if (tokens[_tokenId].kind == CITY) {
       totalOwed = cityPoolTotal * tokens[_tokenId].payout / 10000;
     } else if (tokens[_tokenId].kind == LANDMARK) {
@@ -490,7 +490,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
     }
 
     uint256 totalTokenOwed = totalOwed.sub(tokens[_tokenId].withdrawn);
-        
+
     tokens[_tokenId].withdrawn += totalTokenOwed;
     payoutBalances[_owner] += totalTokenOwed;
   }
@@ -517,8 +517,8 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   * @dev Return all token data
   * @param _tokenId uint256 of token
   */
-  function getToken (uint256 _tokenId) external view 
-  returns (address _owner, uint256 _price, uint256 _lastPrice, uint256 _nextPrice, uint256 _payout, uint8 _kind, uint256 _mayorTokenId, address[5] _previosOwners) 
+  function getToken (uint256 _tokenId) external view
+  returns (address _owner, uint256 _price, uint256 _lastPrice, uint256 _nextPrice, uint256 _payout, uint8 _kind, uint256 _mayorTokenId, address[5] _previosOwners)
   {
     Token memory token = tokens[_tokenId];
     return (token.owner, token.price, token.lastPrice, getNextPrice(token.price), token.payout, token.kind, token.mayorTokenId, token.previousOwners);
@@ -641,7 +641,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
   function isApprovedFor(address _owner, uint256 _tokenId) internal view returns (bool) {
     return approvedFor(_tokenId) == _owner;
   }
-  
+
   /**
   * @dev Internal function to clear current approval and transfer the ownership of a given token ID
   * @param _from address which you want to send tokens from
@@ -736,7 +736,7 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 
     feePercentage = _newFee;
   }
-  
+
   function setMainPoolCutPercentage(uint256 _newFee) onlyOwner public {
     require(_newFee <= 30);
     require(_newFee >= 5);
@@ -779,6 +779,12 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 }
 
 interface OldContract {
-  function getToken (uint256 _tokenId) external view 
+  function getToken (uint256 _tokenId) external view
   returns (address _owner, uint256 _price, uint256 _lastPrice, uint256 _nextPrice, uint256 _payout, uint8 _kind, uint256 _mayorTokenId);
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

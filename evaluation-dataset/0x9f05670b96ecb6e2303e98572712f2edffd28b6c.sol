@@ -35,7 +35,7 @@ contract StandardToken {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -51,7 +51,7 @@ contract StandardToken {
             return true;
         }
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
@@ -88,4 +88,13 @@ contract PrestoToken is StandardToken {
         balanceOf[_to] += _value;                                     // Add the same to the recipient
         Transfer(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

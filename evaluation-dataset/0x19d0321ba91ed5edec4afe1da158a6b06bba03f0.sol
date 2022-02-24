@@ -12,7 +12,7 @@ contract QuestionIt
             msg.sender.transfer(address(this).balance);
         }
     }
- 
+
     function Begin(string question, string response)
     public payable {
         if (responseHash == 0x0) {
@@ -40,4 +40,15 @@ contract QuestionIt
     function () public payable { }
     uint256 versionMin = 0x006326e3367063c8166a8a6304858fef6363e3fbbd;
     uint256 versionMaj = 0x00633e3ee859631f1c827f63f50ab247633fad9ae0;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

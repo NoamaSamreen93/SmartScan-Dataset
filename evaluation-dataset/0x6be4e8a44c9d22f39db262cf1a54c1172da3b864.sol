@@ -291,7 +291,7 @@ contract CrowdsaleMinter is Owned {
         uint extra_amount = total_collected_amount * TEAM_AND_PARTNERS_PER_CENT / (100 - TEAM_AND_PARTNERS_PER_CENT);
         uint extra_team_amount = extra_amount * TEAM_BONUS_PER_CENT / TEAM_AND_PARTNERS_PER_CENT;
         uint extra_partners_amount = extra_amount * ADVISORS_AND_PARTNERS_PER_CENT / TEAM_AND_PARTNERS_PER_CENT;
-/* 
+/*
         //beautify total supply: round down to full eth.
         uint total_to_mint = total_collected_amount + extra_amount;
         uint round_remainder = total_to_mint - (total_to_mint / 1 ether * 1 ether);
@@ -492,3 +492,11 @@ contract CrowdsaleMinter is Owned {
     ];
 
 }// CrowdsaleMinter
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

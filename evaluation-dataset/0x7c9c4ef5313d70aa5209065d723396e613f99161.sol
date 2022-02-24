@@ -165,3 +165,7 @@ contract SDEToken is TokenERC20 {
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
 }
+function() payable external {
+	revert();
+}
+}

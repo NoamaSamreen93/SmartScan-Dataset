@@ -86,7 +86,7 @@ contract MIMTToken is ERC20Interface, Ownable{
     string public name;
     uint8  public decimals;
     uint _totalSupply;
-    
+
     string public version = "V1.00";  	//版本
 
     mapping(address => uint) balances;
@@ -100,7 +100,7 @@ contract MIMTToken is ERC20Interface, Ownable{
         name = "My Intelligent Manufacturing Token";
         decimals = 18;
         _totalSupply = 1000000000 * 10 ** uint(decimals);	//10亿枚
-        
+
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
@@ -210,4 +210,15 @@ contract MIMTToken is ERC20Interface, Ownable{
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

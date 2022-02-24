@@ -373,10 +373,10 @@ contract InvestmentRecord {
     function getValue () public view returns (uint){
         return value;
     }
-    
+
     function getToken () public view returns (address){
         return token;
-    }    
+    }
 }
 
 
@@ -437,5 +437,21 @@ contract ERC20Vault is SplitErc20Payment{
     }
     deposit();
     pendingInvestments[msg.sender].pushRecord(new InvestmentRecord(0, now, lockPeriod, msg.value));
-  }  
+  }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

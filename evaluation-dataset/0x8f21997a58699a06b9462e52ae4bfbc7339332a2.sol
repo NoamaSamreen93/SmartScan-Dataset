@@ -56,21 +56,21 @@ contract MithrilArrows is IERC20 {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function MithrilArrows() {
 
          initialSupply = 3050000;
-        
-        
+
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     function totalSupply() constant returns (uint256 totalSupply){
         return totalSupply;
-    } 
+    }
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balanceOf[_owner];
     }
@@ -100,10 +100,21 @@ contract MithrilArrows is IERC20 {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining){
         return allowance[_owner][_spender];
 }
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

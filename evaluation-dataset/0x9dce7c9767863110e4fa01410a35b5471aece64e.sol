@@ -74,7 +74,7 @@ contract IBancorFormula {
 contract IBancorNetwork {
     function convert(IERC20Token[] _path, uint256 _amount, uint256 _minReturn) public payable returns (uint256);
     function convertFor(IERC20Token[] _path, uint256 _amount, uint256 _minReturn, address _for) public payable returns (uint256);
-    
+
     function convertForPrioritized3(
         IERC20Token[] _path,
         uint256 _amount,
@@ -86,7 +86,7 @@ contract IBancorNetwork {
         bytes32 _r,
         bytes32 _s
     ) public payable returns (uint256);
-    
+
     // deprecated, backward compatibility
     function convertForPrioritized2(
         IERC20Token[] _path,
@@ -605,7 +605,7 @@ contract IBancorX {
 contract BancorConverter is IBancorConverter, SmartTokenController, Managed, ContractIds, FeatureIds {
     using SafeMath for uint256;
 
-    
+
     uint32 private constant MAX_WEIGHT = 1000000;
     uint64 private constant MAX_CONVERSION_FEE = 1000000;
 
@@ -1123,10 +1123,10 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
 
         IBancorFormula formula = IBancorFormula(registry.addressOf(ContractIds.BANCOR_FORMULA));
         uint256 amount = formula.calculateCrossConnectorReturn(
-            getConnectorBalance(_fromConnectorToken), 
-            fromConnector.weight, 
-            getConnectorBalance(_toConnectorToken), 
-            toConnector.weight, 
+            getConnectorBalance(_fromConnectorToken),
+            fromConnector.weight,
+            getConnectorBalance(_toConnectorToken),
+            toConnector.weight,
             _sellAmount);
         uint256 finalAmount = getFinalAmount(amount, 2);
 
@@ -1354,7 +1354,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
 
         @param _path             conversion path, see conversion path format in the BancorNetwork contract
         @param _minReturn        if the conversion results in an amount smaller than the minimum return - it is cancelled, must be nonzero
-        @param _conversionId     pre-determined unique (if non zero) id which refers to this transaction 
+        @param _conversionId     pre-determined unique (if non zero) id which refers to this transaction
         @param _block            if the current block exceeded the given parameter - it is cancelled
         @param _v                (signature[128:130]) associated with the signer address and helps to validate if the signature is legit
         @param _r                (signature[0:64]) associated with the signer address and helps to validate if the signature is legit
@@ -1538,4 +1538,13 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
         assert(_feeAmount <= 2 ** 255);
         emit Conversion(_fromToken, _toToken, msg.sender, _amount, _returnAmount, int256(_feeAmount));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

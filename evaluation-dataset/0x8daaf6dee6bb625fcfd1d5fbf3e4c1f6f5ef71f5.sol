@@ -38,11 +38,11 @@ contract RumFactoryETH{
         hatcheryShrimp[msg.sender]=SafeMath.add(hatcheryShrimp[msg.sender],newShrimp);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
-        
+
+
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
-        
+
+
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
     function sellEggs() public{
@@ -50,7 +50,7 @@ contract RumFactoryETH{
         uint256 hasEggs=getMyEggs();
         uint256 eggValue=calculateEggSell(hasEggs);
         uint256 fee=devFee(eggValue);
-        
+
         hatcheryShrimp[msg.sender]=SafeMath.mul(SafeMath.div(hatcheryShrimp[msg.sender],3),2);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
@@ -65,7 +65,7 @@ contract RumFactoryETH{
         ceoAddress.transfer(devFee(msg.value));
         claimedEggs[msg.sender]=SafeMath.add(claimedEggs[msg.sender],eggsBought);
     }
-    
+
     function calculateTrade(uint256 rt,uint256 rs, uint256 bs) public view returns(uint256){
         //(PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
         return SafeMath.div(SafeMath.mul(PSN,bs),SafeMath.add(PSNH,SafeMath.div(SafeMath.add(SafeMath.mul(PSN,rs),SafeMath.mul(PSNH,rt)),rt)));
@@ -156,4 +156,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

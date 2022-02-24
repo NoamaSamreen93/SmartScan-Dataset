@@ -43,20 +43,20 @@ contract Ownable
   	event ChangeOwner_creator(address indexed _from, address indexed _to);
   	event ChangeOwner_manager(address indexed _from, address indexed _to);
 
-  	modifier onlyOwner_master{ 
+  	modifier onlyOwner_master{
           require(msg.sender == Owner_master);	_; 	}
-  	modifier onlyOwner_creator{ 
+  	modifier onlyOwner_creator{
           require(msg.sender == Owner_creator); _; }
-  	modifier onlyOwner_manager{ 
+  	modifier onlyOwner_manager{
           require(msg.sender == Owner_manager); _; }
-  	constructor() public { 
+  	constructor() public {
           Owner_master = msg.sender; }
-  	
-    
-    
-    
-    
-    
+
+
+
+
+
+
     function transferOwnership_master(address _to) onlyOwner_master public{
         	require(_to != Owner_master);
         	require(_to != Owner_creator);
@@ -65,7 +65,7 @@ contract Ownable
 
 		address from = Owner_master;
   	    	Owner_master = _to;
-  	    
+
   	    	emit ChangeOwner_master(from, _to);}
 
   	function transferOwner_creator(address _to) onlyOwner_master public{
@@ -74,9 +74,9 @@ contract Ownable
         	require(_to != Owner_manager);
 	        require(_to != address(0x0));
 
-		address from = Owner_creator;        
+		address from = Owner_creator;
 	    	Owner_creator = _to;
-        
+
     		emit ChangeOwner_creator(from, _to);}
 
   	function transferOwner_manager(address _to) onlyOwner_master public{
@@ -84,10 +84,10 @@ contract Ownable
 	        require(_to != Owner_creator);
         	require(_to != Owner_manager);
 	        require(_to != address(0x0));
-        	
+
 		address from = Owner_manager;
     		Owner_manager = _to;
-        
+
 	    	emit ChangeOwner_manager(from, _to);}
 }
 
@@ -95,7 +95,7 @@ contract Helper
 {
     event Transfer( address indexed _from, address indexed _to, uint _value);
     event Approval( address indexed _owner, address indexed _spender, uint _value);
-    
+
     function totalSupply() view public returns (uint _supply);
     function balanceOf( address _who ) public view returns (uint _value);
     function transfer( address _to, uint _value) public returns (bool _success);
@@ -107,84 +107,84 @@ contract Helper
 contract SBtesting is Helper, Ownable
 {
     using SafeMath for uint;
-    
+
     string public name;
     string public symbol;
     uint public decimals;
-    
+
     uint constant private zeroAfterDecimal = 10**18;
-    
+
     uint constant public maxSupply             = 2500000 * zeroAfterDecimal;
-    
+
     uint constant public maxSupply_SeedBlock        =   2500000 * zeroAfterDecimal;
 
-    
+
     uint public issueToken_Total;
-    
+
     uint public issueToken_SeedBlock;
-    
+
     uint public burnTokenAmount;
-    
+
     mapping (address => uint) public balances;
     mapping (address => mapping ( address => uint )) public approvals;
 
     bool public tokenLock = true;
     bool public saleTime = true;
     uint public endSaleTime = 0;
-    
+
     event Burn(address indexed _from, uint _value);
-    
+
     event Issue_SeedBlock(address indexed _to, uint _tokens);
-    
+
     event TokenUnLock(address indexed _to, uint _tokens);
 
-    
+
     constructor() public
     {
         name        = "SBtesting";
         decimals    = 18;
         symbol      = "SBtest";
-        
+
         issueToken_Total      = 0;
-        
+
         issueToken_SeedBlock     = 0;
 
-        
+
         require(maxSupply == maxSupply_SeedBlock);
 
     }
-    
+
     // ERC - 20 Interface -----
 
     function totalSupply() view public returns (uint) {
         return issueToken_Total;}
-    
+
     function balanceOf(address _who) view public returns (uint) {
         uint balance = balances[_who];
-        
+
         return balance;}
-    
+
     function transfer(address _to, uint _value) public returns (bool) {
         require(isTransferable() == true);
         require(balances[msg.sender] >= _value);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
-        
+
         return true;}
-    
+
     function approve(address _spender, uint _value) public returns (bool){
         require(isTransferable() == true);
         require(balances[msg.sender] >= _value);
-        
+
         approvals[msg.sender][_spender] = _value;
-        
+
         emit Approval(msg.sender, _spender, _value);
-        
+
         return true; }
-    
+
     function allowance(address _owner, address _spender) view public returns (uint) {
         return approvals[_owner][_spender];}
 
@@ -192,17 +192,17 @@ contract SBtesting is Helper, Ownable
         require(isTransferable() == true);
         require(balances[_from] >= _value);
         require(approvals[_from][msg.sender] >= _value);
-        
+
         approvals[_from][msg.sender] = approvals[_from][msg.sender].sub(_value);
         balances[_from] = balances[_from].sub(_value);
         balances[_to]  = balances[_to].add(_value);
-        
+
         emit Transfer(_from, _to, _value);
-        
+
         return true;}
-    
+
     // -----
-    
+
     // Issue Function -----
 
 
@@ -210,17 +210,17 @@ contract SBtesting is Helper, Ownable
     {
         uint tokens = _value * zeroAfterDecimal;
         require(maxSupply_SeedBlock >= issueToken_SeedBlock.add(tokens));
-        
+
         balances[_to] = balances[_to].add(tokens);
-        
+
         issueToken_Total = issueToken_Total.add(tokens);
         issueToken_SeedBlock = issueToken_SeedBlock.add(tokens);
-        
+
         emit Issue_SeedBlock(_to, tokens);
-    }    
-    
+    }
+
        // Lock Function -----
-    
+
     function isTransferable() private view returns (bool)
     {
         if(tokenLock == false)
@@ -231,46 +231,46 @@ contract SBtesting is Helper, Ownable
         {
             return true;
         }
-        
+
         return false;
     }
-    
+
     function setTokenUnlock() onlyOwner_manager public
     {
         require(tokenLock == true);
         require(saleTime == false);
-        
+
         tokenLock = false;
     }
-    
+
     function setTokenLock() onlyOwner_manager public
     {
         require(tokenLock == false);
-        
+
         tokenLock = true;
     }
-    
+
     // -----
-    
+
     // ETC / Burn Function -----
-    
+
     function () payable external
     {
         revert();
     }
-    
+
     function endSale() onlyOwner_manager public
     {
         require(saleTime == true);
-        
+
         saleTime = false;
-        
+
         uint time = now;
-        
+
         endSaleTime = time;
-        
+
     }
-    
+
     function withdrawTokens(address _contract, uint _decimals, uint _value) onlyOwner_manager public
     {
 
@@ -283,29 +283,40 @@ contract SBtesting is Helper, Ownable
         {
             uint tokens = _value.mul(10 ** _decimals);
             Helper(_contract).transfer(msg.sender, tokens);
-            
+
             emit Transfer(address(0x0), msg.sender, tokens);
         }
     }
-    
+
     function burnToken(uint _value) onlyOwner_manager public
     {
         uint tokens = _value * zeroAfterDecimal;
-        
+
         require(balances[msg.sender] >= tokens);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
-        
+
         burnTokenAmount = burnTokenAmount.add(tokens);
         issueToken_Total = issueToken_Total.sub(tokens);
-        
+
         emit Burn(msg.sender, tokens);
     }
-    
+
     function close() onlyOwner_master public
     {
         selfdestruct(msg.sender);
     }
-    
+
     // -----
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

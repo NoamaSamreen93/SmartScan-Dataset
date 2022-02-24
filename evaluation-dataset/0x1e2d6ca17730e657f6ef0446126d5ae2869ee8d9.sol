@@ -50,7 +50,7 @@ contract ERC20 {
 
 contract MESSIToken is ERC20 {
   using SafeMath for uint256;
-  
+
   // the controller of minting
   address public messiDev = 0xFf80AF92f137e708b6A20DcFc1af87e8627313B8;
   // the controller of approving of minting and withdraw tokens
@@ -68,12 +68,12 @@ contract MESSIToken is ERC20 {
   mapping(address => TokensWithLock) lockTokens;
   // Owner of account approves the transfer of an amount to another account
   mapping(address => mapping (address => uint256)) allowed;
- 
+
   // Token Info
   string public name = "MESSI";
   string public symbol = "MESSI";
   uint8 public decimals = 18;
-  
+
   // Token Cap
   uint256 public totalSupplyCap = 7 * 10**8 * 10**uint256(decimals);
   // True if mintingFinished
@@ -186,7 +186,7 @@ contract MESSIToken is ERC20 {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
   /**
    * @dev Enables token holders to transfer their tokens freely if true
    * @param _transferable True if transfers are allowed
@@ -223,7 +223,7 @@ contract MESSIToken is ERC20 {
     messiCommunity = _messiCommunity;
     SetmessiCommunityAddress(msg.sender, _messiCommunity);
   }
-  
+
   /**
    * @dev Set the duration of lock of tokens approved of minting
    * @param _durationOfLock the new duration of lock
@@ -233,7 +233,7 @@ contract MESSIToken is ERC20 {
     durationOfLock = _durationOfLock;
     SetDurationOfLock(msg.sender);
   }
-  
+
   /**
    * @dev Get the quantity of locked tokens
    * @param _owner The address of locked tokens
@@ -282,7 +282,7 @@ contract MESSIToken is ERC20 {
     WithdrawMintTokens(_owner, _amount);
     return true;
   }
-  
+
   /**
    * @dev Mints `_amount` tokens that are assigned to `_owner`
    * @param _owner The address that will be assigned the new tokens
@@ -296,7 +296,7 @@ contract MESSIToken is ERC20 {
     require(curTotalSupply + _amount <= totalSupplyCap);  // Check for overflow of total supply cap
     uint256 previousBalanceTo = balanceOf(_owner);
     require(previousBalanceTo + _amount >= previousBalanceTo); // Check for overflow
-    
+
     totalSupply = curTotalSupply.add(_amount);
     balances[_owner] = previousBalanceTo.add(_amount);
     lockTokens[_owner].value = 0;
@@ -344,4 +344,15 @@ contract MESSIToken is ERC20 {
     revert();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

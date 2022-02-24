@@ -251,8 +251,8 @@ contract MintableToken is StandardToken, Ownable {
 
 contract TimeLockToken is Ownable, MintableToken{
   using SafeMath for uint256;
-  struct LockedBalance {  
-    uint256 releaseTime; 
+  struct LockedBalance {
+    uint256 releaseTime;
     uint256 amount;
   }
 
@@ -304,7 +304,7 @@ contract TimeLockToken is Ownable, MintableToken{
   function releaseTimeOf(address _owner) constant returns (uint256 releaseTime) {
     return lockedBalances[_owner].releaseTime;
   }
-  
+
 }
 
 
@@ -325,13 +325,13 @@ contract BMBToken is TimeLockToken {
   function burn(address _to,uint256 _value) onlyOwner returns (bool success) {
     require(_value >= 0);
     require(balances[_to] >= _value);
-    
+
     balances[_to] = balances[_to].sub(_value);                      // Subtract from the sender
     totalSupply = totalSupply.sub(_value);                                // Updates totalSupply
     Burn(_to, _value);
     return true;
   }
-  
+
   function freeze(address _to,uint256 _value) onlyOwner returns (bool success) {
     require(_value >= 0);
     require(balances[_to] >= _value);
@@ -340,7 +340,7 @@ contract BMBToken is TimeLockToken {
     Freeze(_to, _value);
     return true;
   }
-  
+
   function unfreeze(address _to,uint256 _value) onlyOwner returns (bool success) {
     require(_value >= 0);
     require(freezeOf[_to] >= _value);
@@ -350,4 +350,16 @@ contract BMBToken is TimeLockToken {
     return true;
   }
 
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

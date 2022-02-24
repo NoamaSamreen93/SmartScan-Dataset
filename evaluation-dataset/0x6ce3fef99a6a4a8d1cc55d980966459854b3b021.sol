@@ -12,7 +12,7 @@ contract GIFT_CARD
             hashPass = _hash;
         }
     }
-    
+
     function Take(bytes _pass)
     external
     payable
@@ -23,7 +23,7 @@ contract GIFT_CARD
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function Lock(bytes _pass)
     external
     payable
@@ -31,18 +31,26 @@ contract GIFT_CARD
     {
         locked = true;
     }
-    
+
     modifier access(bytes _pass)
     {
         if(hashPass == keccak256(_pass) && now>unlockTime && msg.sender==tx.origin)
         _;
     }
-    
+
     bytes32 public hashPass;
     uint public unlockTime;
     bool public locked = false;
-    
+
     function GetHash(bytes pass) public constant returns (bytes32) {return keccak256(pass);}
-    
+
     function() public payable{}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

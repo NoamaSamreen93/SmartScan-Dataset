@@ -475,12 +475,12 @@ contract ERC20Mintable is ERC20, MinterRole {
  * @title ERC20Mintable
  * @dev ERC20 minting logic
  */
- 
+
 contract W1Coin is ERC20Detailed,ERC20Mintable
 {
- 
-    
-    
+
+
+
     Roles.Role private minters1 ;
   constructor(
         string name,
@@ -492,7 +492,18 @@ contract W1Coin is ERC20Detailed,ERC20Mintable
         ERC20()
         public
     {
-        
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

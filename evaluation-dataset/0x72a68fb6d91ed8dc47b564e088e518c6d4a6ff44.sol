@@ -15,16 +15,16 @@ contract DXF_Tokens{
   uint256 public totalTokens;
   uint256 public constant tokensCreationMin = 25000 ether;
   uint256 public constant tokensCreationCap = 75000 ether;
-  //Cap of 12500 ethers worth of tokens to be distributed 
+  //Cap of 12500 ethers worth of tokens to be distributed
   //to previous DO members in exchange for their rouleth accounts
   uint256 public remainingTokensVIPs=12500 ether;
-  uint256 public constant tokensCreationVIPsCap = 12500 ether; 
+  uint256 public constant tokensCreationVIPsCap = 12500 ether;
 
 
   mapping (address => uint256) balances;
   mapping (address => bool) vips;
   mapping (address => uint256) indexMembers;
-  
+
   struct Member
   {
     address member;
@@ -69,12 +69,12 @@ contract DXF_Tokens{
       throw;
     }
 
-  //USER FUNCTIONS  
+  //USER FUNCTIONS
   /// @notice Create tokens when funding is active.
   /// @notice By using this function you accept the terms of DXF
   /// @dev Required state: Funding Active
   /// @dev State transition: -> Funding Success (only if cap reached)
-  function acceptTermsAndJoinDXF() payable external 
+  function acceptTermsAndJoinDXF() payable external
   {
     // refuse if more than 12 months have passed
     if (now>startingDateFunding+365 days) throw;
@@ -184,12 +184,12 @@ contract DXF_Tokens{
     if (_vip==0) throw;
     if (_vip!=_vip_confirm) throw;
     //don't allow migration to a non empty address
-    if (balances[_vip]!=0) throw; 
+    if (balances[_vip]!=0) throw;
     if (_previous_balance==0) throw;
     uint numberTokens=_previous_balance+(_previous_balance/3);
     totalTokens+=numberTokens;
     //too many tokens created via VIP migration
-    if (numberTokens>remainingTokensVIPs) throw;     
+    if (numberTokens>remainingTokensVIPs) throw;
     remainingTokensVIPs-=numberTokens;
     balances[_vip]+=numberTokens;
     indexMembers[_vip]=members.length;
@@ -207,7 +207,7 @@ contract DXF_Tokens{
     address memberRefunded=members[i].member;
     if (memberRefunded==0) throw;
     uint amountTokens=msg.value;
-    if (vips[memberRefunded]) 
+    if (vips[memberRefunded])
       {
 	amountTokens+=amountTokens/3;
 	remainingTokensVIPs+=amountTokens;
@@ -215,7 +215,7 @@ contract DXF_Tokens{
     if (amountTokens>balances[memberRefunded]) throw;
     balances[memberRefunded]-=amountTokens;
     totalTokens-=amountTokens;
-    if (balances[memberRefunded]==0) 
+    if (balances[memberRefunded]==0)
       {
 	delete members[i];
 	vips[memberRefunded]=false;
@@ -238,7 +238,7 @@ contract DXF_Tokens{
   }
 
   //@notice called to seal the DO
-  //@dev can not be opened again, marks the end of the fundraising 
+  //@dev can not be opened again, marks the end of the fundraising
   //and the recruitment in the DO
   function closeFunding()
     onlyAdmin
@@ -253,7 +253,7 @@ contract DXF_Tokens{
       }
     else
       {
-        //send balance, but should not be necessary.      
+        //send balance, but should not be necessary.
 	if(!admin.send(this.balance)) throw;
       }
   }
@@ -280,17 +280,17 @@ contract DXF_Tokens{
 
 
   //Constant Functions
-  function totalSupply() external constant returns (uint256) 
+  function totalSupply() external constant returns (uint256)
   {
     return totalTokens;
   }
 
-  function balanceOf(address _owner) external constant returns (uint256) 
+  function balanceOf(address _owner) external constant returns (uint256)
   {
     return balances[_owner];
   }
 
-  function accountInformation(address _owner) external constant returns (bool vip, uint balance_dxf, uint share_dxf_per_thousands) 
+  function accountInformation(address _owner) external constant returns (bool vip, uint balance_dxf, uint share_dxf_per_thousands)
   {
     vip=vips[_owner];
     balance_dxf=balances[_owner]/(1 ether);
@@ -298,4 +298,20 @@ contract DXF_Tokens{
   }
 
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

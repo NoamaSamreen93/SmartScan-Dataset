@@ -159,7 +159,7 @@ contract DSTokenBase is ERC20, DSMath {
 contract DSToken is DSTokenBase(60000000000000000000000000), DSStop {
 
     string  public  symbol = "HER";
-    uint8  public  decimals = 18; 
+    uint8  public  decimals = 18;
     event Freeze(address indexed guy, uint wad);
 
     function approve(address guy, uint wad) public stoppable returns (bool) {
@@ -172,7 +172,7 @@ contract DSToken is DSTokenBase(60000000000000000000000000), DSStop {
         returns (bool)
     {
         require(_balances[src] - _frozens[src] >= wad);
-        
+
         if (src != msg.sender && _approvals[src][msg.sender] != uint(-1)) {
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
@@ -186,7 +186,7 @@ contract DSToken is DSTokenBase(60000000000000000000000000), DSStop {
     }
     function freezeAccount(address guy, uint wad) public auth {
         require(_balances[guy] >= wad);
-        
+
         _frozens[guy] = add(0, wad);
         emit Freeze(guy, wad);
     }
@@ -196,8 +196,19 @@ contract DSToken is DSTokenBase(60000000000000000000000000), DSStop {
     function setName(string name_) public auth {
         name = name_;
     }
-    
+
     function setSymbol(string symbol_) public auth {
         symbol = symbol_;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

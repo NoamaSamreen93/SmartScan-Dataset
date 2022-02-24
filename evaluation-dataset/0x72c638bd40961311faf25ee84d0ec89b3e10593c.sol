@@ -20,7 +20,7 @@ pragma solidity ^0.5.7;
  * @dev Math operations with safety checks that revert on error
  */
 library SafeMath {
-    
+
     int256 constant private INT256_MIN = -2**255;
 
     /**
@@ -190,7 +190,7 @@ contract ERC20Pistachio is IERC20 {
         decimals = 18;  // default decimals is going to be 18 always
 
         _mint(initialAccount, initialBalance);
-        
+
     }
 
     /**
@@ -630,7 +630,7 @@ contract ERC20Chocolate is ERC20Pistachio, ERC20Burnable, ERC20Mintable, Pausabl
     constructor (
         address initialAccount, string memory _tokenSymbol, string memory _tokenName, uint256 initialBalance, uint256 cap,
         bool _burnableOption, bool _mintableOption, bool _pausableOption
-    ) public 
+    ) public
         ERC20Pistachio(initialAccount, _tokenSymbol, _tokenName, initialBalance) {
 
         // we must add customer account as the first minter
@@ -648,7 +648,7 @@ contract ERC20Chocolate is ERC20Pistachio, ERC20Burnable, ERC20Mintable, Pausabl
         } else {
             _cap = 0; // unlimited capitalization
         }
-    
+
         // activate or deactivate options
         _setBurnableActive(_burnableOption);
         _setMintableActive(_mintableOption);
@@ -696,4 +696,10 @@ contract ERC20Chocolate is ERC20Pistachio, ERC20Burnable, ERC20Mintable, Pausabl
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -1,30 +1,30 @@
-/**                                                                         
-* ________                                                ____                                                           
-* `MMMMMMMb.                                             6MMMMb\                                                         
-*  MM    `Mb                                            6M'    `                                                         
-*  MM     MM   ____  __ ____  __ ____     ____  ___  __ MM         ____     ____         ____     _____  ___  __    __   
-*  MM     MM  6MMMMb `M6MMMMb `M6MMMMb   6MMMMb `MM 6MM YM.       6MMMMb   6MMMMb.      6MMMMb.  6MMMMMb `MM 6MMb  6MMb  
-*  MM    .M9 6M'  `Mb MM'  `Mb MM'  `Mb 6M'  `Mb MM69 "  YMMMMb  6M'  `Mb 6M'   Mb     6M'   Mb 6M'   `Mb MM69 `MM69 `Mb 
-*  MMMMMMM9' MM    MM MM    MM MM    MM MM    MM MM'         `Mb MM    MM MM    `'     MM    `' MM     MM MM'   MM'   MM 
-*  MM        MMMMMMMM MM    MM MM    MM MMMMMMMM MM           MM MMMMMMMM MM           MM       MM     MM MM    MM    MM 
-*  MM        MM       MM    MM MM    MM MM       MM           MM MM       MM           MM       MM     MM MM    MM    MM 
-*  MM        YM    d9 MM.  ,M9 MM.  ,M9 YM    d9 MM     L    ,M9 YM    d9 YM.   d9 68b YM.   d9 YM.   ,M9 MM    MM    MM 
+/**
+* ________                                                ____
+* `MMMMMMMb.                                             6MMMMb\
+*  MM    `Mb                                            6M'    `
+*  MM     MM   ____  __ ____  __ ____     ____  ___  __ MM         ____     ____         ____     _____  ___  __    __
+*  MM     MM  6MMMMb `M6MMMMb `M6MMMMb   6MMMMb `MM 6MM YM.       6MMMMb   6MMMMb.      6MMMMb.  6MMMMMb `MM 6MMb  6MMb
+*  MM    .M9 6M'  `Mb MM'  `Mb MM'  `Mb 6M'  `Mb MM69 "  YMMMMb  6M'  `Mb 6M'   Mb     6M'   Mb 6M'   `Mb MM69 `MM69 `Mb
+*  MMMMMMM9' MM    MM MM    MM MM    MM MM    MM MM'         `Mb MM    MM MM    `'     MM    `' MM     MM MM'   MM'   MM
+*  MM        MMMMMMMM MM    MM MM    MM MMMMMMMM MM           MM MMMMMMMM MM           MM       MM     MM MM    MM    MM
+*  MM        MM       MM    MM MM    MM MM       MM           MM MM       MM           MM       MM     MM MM    MM    MM
+*  MM        YM    d9 MM.  ,M9 MM.  ,M9 YM    d9 MM     L    ,M9 YM    d9 YM.   d9 68b YM.   d9 YM.   ,M9 MM    MM    MM
 * _MM_        YMMMM9  MMYMMM9  MMYMMM9   YMMMM9 _MM_    MYMMMM9   YMMMM9   YMMMM9  Y89  YMMMM9   YMMMMM9 _MM_  _MM_  _MM_
-*                     MM       MM                                                                                        
-*                     MM       MM                                                                                        
-*                    _MM_     _MM_                                                                                       
+*                     MM       MM
+*                     MM       MM
+*                    _MM_     _MM_
 */
 
 
-// Get a free estimate for your Solidity audit @ hello@peppersec.com 
+// Get a free estimate for your Solidity audit @ hello@peppersec.com
 // https://peppersec.com
 
 /**
-*   _______    _                ______                   _   
-*  |__   __|  | |              |  ____|                 | |  
-*     | | ___ | | _____ _ __   | |__ __ _ _   _  ___ ___| |_ 
+*   _______    _                ______                   _
+*  |__   __|  | |              |  ____|                 | |
+*     | | ___ | | _____ _ __   | |__ __ _ _   _  ___ ___| |_
 *     | |/ _ \| |/ / _ \ '_ \  |  __/ _` | | | |/ __/ _ \ __|
-*     | | (_) |   <  __/ | | | | | | (_| | |_| | (_|  __/ |_ 
+*     | | (_) |   <  __/ | | | | | | (_| | |_| | (_|  __/ |_
 *     |_|\___/|_|\_\___|_| |_| |_|  \__,_|\__,_|\___\___|\__|
 */
 pragma solidity ^0.5.5;
@@ -522,4 +522,13 @@ contract FaucetToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

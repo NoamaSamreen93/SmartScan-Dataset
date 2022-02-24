@@ -12,7 +12,7 @@ contract ERC721 {
   	function totalSupply() public view returns (uint256 total);
   	function transferFrom(address _from, address _to, uint256 _tokenId) public;
   	function transfer(address _to, uint256 _tokenId) public;
-	
+
   	event Transfer(address indexed from, address indexed to, uint256 tokenId);
   	event Approval(address indexed owner, address indexed approved, uint256 tokenId);
 }
@@ -128,9 +128,9 @@ contract Elements is ERC721 {
   	function approve(address _to, uint256 _tokenId) public {
   	  	// Caller must own token.
   	  	require(_owns(msg.sender, _tokenId));
-	
+
 	  	elementIndexToApproved[_tokenId] = _to;
-	
+
 	  	Approval(msg.sender, _to, _tokenId);
   	}
 
@@ -223,7 +223,7 @@ contract Elements is ERC721 {
 	    } else {
 	    	fee_for_dev = SafeMath.add(fee_for_dev, feeOnce);
 	    }
-	        
+
     	if (purchaseExcess > 0) {
     		msg.sender.transfer(purchaseExcess);
     	}
@@ -400,8 +400,8 @@ contract Elements is ERC721 {
   		// to start from 1001
   		scientistCTR = SafeMath.add(scientistCTR, 1);
     	uint256 _id = SafeMath.add(scientistCTR, scientistSTART);
-    	
-    	_createElement(_id, _name, address(this), scientistStartingPrice, scientistSTART);	
+
+    	_createElement(_id, _name, address(this), scientistStartingPrice, scientistSTART);
   	}
 
   	// @dev Creates a new Special Card with the given name Id
@@ -414,7 +414,7 @@ contract Elements is ERC721 {
     	uint256 _id = SafeMath.add(specialCTR, specialSTART);
 
     	_createElement(_id, _name, address(this), specialStartingPrice, scientistSTART);
-    	
+
   	}
 
   	// Check for token ownership
@@ -549,4 +549,20 @@ library SafeMath {
     	assert(c >= a);
     	return c;
   	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

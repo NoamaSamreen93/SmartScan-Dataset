@@ -223,7 +223,7 @@ contract StandardToken is ERC20, BasicToken {
 contract Epocket is DetailedERC20, StandardToken {
 
     address public founderAddress;
-    
+
     event ChangeFounderAddress(uint256 _blockTimeStamp, address indexed _founderAddress);
 
     constructor
@@ -232,7 +232,7 @@ contract Epocket is DetailedERC20, StandardToken {
         string  _symbol,
         uint8   _decimals,
         address _founderAddress
-    ) 
+    )
     DetailedERC20(_name, _symbol, _decimals)
     public
     {
@@ -261,4 +261,15 @@ contract Epocket is DetailedERC20, StandardToken {
         emit Transfer(address(0), addr, alloc);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -304,7 +304,7 @@ contract Gentrion is StandardToken, Ownable {
   uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
   string public symbol;                 // An identifier: eg SBX, XPR etc..
   string public version = 'H1.0';
-  
+
   struct UserHistory{
     address rUser;  //uint160 20byte
     string word1;   //unlimited
@@ -337,4 +337,15 @@ contract Gentrion is StandardToken, Ownable {
   function getTokenInfoCount() onlyOwner public view returns (uint256) {
     return hisCount;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

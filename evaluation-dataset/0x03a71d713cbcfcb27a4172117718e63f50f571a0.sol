@@ -1,27 +1,27 @@
 pragma solidity ^0.5.6;
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
- */ 
+ */
 library SafeMath{
     function mul(uint a, uint b) internal pure returns (uint){
         uint c = a * b;
         assert(a == 0 || c / a == b);
         return c;
     }
- 
+
     function div(uint a, uint b) internal pure returns (uint){
         uint c = a / b;
         return c;
     }
- 
+
     function sub(uint a, uint b) internal pure returns (uint){
-        assert(b <= a); 
-        return a - b; 
-    } 
-  
-    function add(uint a, uint b) internal pure returns (uint){ 
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint a, uint b) internal pure returns (uint){
         uint c = a + b; assert(c >= a);
         return c;
     }
@@ -34,25 +34,25 @@ library SafeMath{
  */
 contract Ownable {
     address public owner;
- 
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
     constructor() public{
         owner = msg.sender;
     }
- 
+
    /**
     * @dev Throws if called by any account other than the owner.
-    */ 
+    */
    modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
- 
+
    /**
     * @dev Allows the current owner to transfer control of the contract to a newOwner.
     * @param newOwner The address to transfer ownership to.
-    */ 
+    */
    function transferOwnership(address newOwner) onlyOwner public{
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
@@ -66,24 +66,24 @@ contract Ownable {
  */
 contract ITCMoney is Ownable{
     using SafeMath for uint;
-    
+
     string public constant name = "ITC Money";
     string public constant symbol = "ITCM";
     uint32 public constant decimals = 18;
-    
+
     address payable public companyAddr = address(0);
     address public constant bonusAddr   = 0xaEA6949B27C44562Dd446c2C44f403cF6D13a2fD;
     address public constant teamAddr    = 0xe0b70c54a1baa2847e210d019Bb8edc291AEA5c7;
     address public constant sellerAddr  = 0x95E1f32981F909ce39d45bF52C9108f47e0FCc50;
-    
+
     uint public totalSupply = 0;
     uint public maxSupply = 17000000000 * 1 ether; // Maximum of tokens to be minted. 1 ether multiplier is decimal.
     mapping(address => uint) balances;
     mapping (address => mapping (address => uint)) internal allowed;
-    
+
     bool public transferAllowed = false;
     mapping(address => bool) internal customTransferAllowed;
-    
+
     uint public tokenRate = 170 * 1 finney; // Start token rate * 10000 (0.017 CHF * 10000). 1 finney multiplier is for decimal.
     uint private tokenRateDays = 0;
     // growRate is the sequence of periods and percents of rate grow. First element is timestamp of period start. Second is grow percent * 10000.
@@ -93,7 +93,7 @@ contract ITCMoney is Ownable{
         [1564617600,  17],
         [1572566400,   0]
     ];
-    
+
     uint public rateETHCHF = 0;
     mapping(address => uint) balancesCHF;
     bool public amountBonusAllowed = true;
@@ -107,7 +107,7 @@ contract ITCMoney is Ownable{
         [uint32(150000), 2000],
         [uint32(500000), 2500]
     ];
-    
+
     // timeBonus describes the token bonus that depends from date. First element is the timestamp of start date. Second one is bonus percent * 100.
     uint[2][] private timeBonus = [
         [1535673600, 2000], // 2018-08-31
@@ -134,7 +134,7 @@ contract ITCMoney is Ownable{
     event ConstantBonus(uint value);
     event NewTokenRate(uint tokenRate);
 
-    /** 
+    /**
      * @dev Gets the balance of the specified address.
      * @param _owner The address to query the the balance of.
      * @return An uint256 representing the amount owned by the passed address.
@@ -142,12 +142,12 @@ contract ITCMoney is Ownable{
     function balanceOf(address _owner) public view returns (uint){
         return balances[_owner];
     }
- 
+
     /**
      * @dev Transfer token for a specified address
      * @param _to The address to transfer to.
      * @param _value The amount to be transferred.
-     */ 
+     */
     function transfer(address _to, uint _value) public returns (bool){
         require(_to != address(0));
         require(transferAllowed || _to == sellerAddr || customTransferAllowed[msg.sender]);
@@ -155,15 +155,15 @@ contract ITCMoney is Ownable{
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
-        return true; 
-    } 
+        return true;
+    }
 
     /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
      * @param _to address The address which you want to transfer to
      * @param _value uint256 the amount of tokens to be transferred
-     */ 
+     */
     function transferFrom(address _from, address _to, uint _value) public returns (bool){
         require(_to != address(0));
         require(transferAllowed || _to == sellerAddr || customTransferAllowed[_from]);
@@ -174,7 +174,7 @@ contract ITCMoney is Ownable{
         emit Transfer(_from, _to, _value);
         return true;
     }
- 
+
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
      * @param _spender The address which will spend the funds.
@@ -185,17 +185,17 @@ contract ITCMoney is Ownable{
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
- 
-    /** 
+
+    /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param _owner address The address which owns the funds.
      * @param _spender address The address which will spend the funds.
      * @return A uint256 specifying the amount of tokens still available for the spender.
      */
     function allowance(address _owner, address _spender) public view returns (uint){
-        return allowed[_owner][_spender]; 
-    } 
- 
+        return allowed[_owner][_spender];
+    }
+
     /**
      * @dev Increase approved amount of tokents that could be spent on behalf of msg.sender.
      * @param _spender The address which will spend the funds.
@@ -203,10 +203,10 @@ contract ITCMoney is Ownable{
      */
     function increaseApproval(address _spender, uint _addedValue) public returns (bool){
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
-        return true; 
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
     }
- 
+
     /**
      * @dev Decrease approved amount of tokents that could be spent on behalf of msg.sender.
      * @param _spender The address which will spend the funds.
@@ -222,7 +222,7 @@ contract ITCMoney is Ownable{
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Function changes the company address. Ether moves to company address from contract.
      * @param newCompany New company address.
@@ -240,7 +240,7 @@ contract ITCMoney is Ownable{
         transferAllowed = true;
         emit TransfersAllowed();
     }
- 
+
     /**
      * @dev Allow ITCM token transfer for spcified address.
      * @param _to Address to which token transfers become allowed.
@@ -249,7 +249,7 @@ contract ITCMoney is Ownable{
         customTransferAllowed[_to] = true;
         emit TransfersAllowedTo(_to);
     }
-    
+
     /**
      * @dev Stop adding token bonus that depends from accumulative CHF amount.
      */
@@ -257,12 +257,12 @@ contract ITCMoney is Ownable{
         amountBonusAllowed = false;
         emit CHFBonusStopped();
     }
-    
+
     /**
      * @dev Emit new tokens and transfer from 0 to client address. This function will generate tokens for bonus and team addresses.
      * @param _to The address to transfer to.
      * @param _value The amount to be transferred.
-     */ 
+     */
     function _mint(address _to, uint _value) private returns (bool){
         // 3% of token amount to bonus address
         uint bonusAmount = _value.mul(3).div(87);
@@ -270,12 +270,12 @@ contract ITCMoney is Ownable{
         uint teamAmount = _value.mul(10).div(87);
         // Restore the total token amount
         uint total = _value.add(bonusAmount).add(teamAmount);
-        
+
         require(total <= maxSupply);
-        
+
         maxSupply = maxSupply.sub(total);
         totalSupply = totalSupply.add(total);
-        
+
         balances[_to] = balances[_to].add(_value);
         balances[bonusAddr] = balances[bonusAddr].add(bonusAmount);
         balances[teamAddr] = balances[teamAddr].add(teamAmount);
@@ -291,7 +291,7 @@ contract ITCMoney is Ownable{
      * @dev This is wrapper for _mint.
      * @param _to The address to transfer to.
      * @param _value The amount to be transferred.
-     */ 
+     */
     function mint(address _to, uint _value) onlyOwner public returns (bool){
         return _mint(_to, _value);
     }
@@ -300,7 +300,7 @@ contract ITCMoney is Ownable{
      * @dev Similar to mint function but take array of addresses and values.
      * @param _to The addresses to transfer to.
      * @param _value The amounts to be transferred.
-     */ 
+     */
     function mint(address[] memory _to, uint[] memory _value) onlyOwner public returns (bool){
         require(_to.length == _value.length);
 
@@ -312,8 +312,8 @@ contract ITCMoney is Ownable{
         }
         return true;
     }
-    
-    /** 
+
+    /**
      * @dev Gets the accumulative CHF balance of the specified address.
      * @param _owner The address to query the the CHF balance of.
      * @return An uint256 representing the amount owned by the passed address.
@@ -322,7 +322,7 @@ contract ITCMoney is Ownable{
         return balancesCHF[_owner];
     }
 
-    /** 
+    /**
      * @dev Increase CHF amount for address to which the tokens were minted.
      * @param _to Target address.
      * @param _value The amount of CHF.
@@ -332,7 +332,7 @@ contract ITCMoney is Ownable{
         emit AddedCHF(_to, _value);
     }
 
-    /** 
+    /**
      * @dev Increase CHF amounts for addresses to which the tokens were minted.
      * @param _to Target addresses.
      * @param _value The amounts of CHF.
@@ -346,8 +346,8 @@ contract ITCMoney is Ownable{
             emit AddedCHF(_to[i], _value[i]);
         }
     }
- 
-    /** 
+
+    /**
      * @dev Sets the rate ETH to CHF that represents UINT (rate * 10000).
      * @param _rate ETH CHF rate * 10000.
      */
@@ -355,8 +355,8 @@ contract ITCMoney is Ownable{
         rateETHCHF = _rate;
         emit NewRateCHF(_rate);
     }
-    
-    /** 
+
+    /**
      * @dev Set new period and grow percent at the day.
      * @param _startTime timestamp when the rate will start grow.
      * @param _rate Grow percent * 10000.
@@ -365,8 +365,8 @@ contract ITCMoney is Ownable{
         growRate.push([_startTime, _rate]);
         emit AddedGrowPeriod(_startTime, _rate);
     }
- 
-    /** 
+
+    /**
      * @dev Set constant token bonus for each address that applies in fallback.
      * @param _value Grow percent * 100.
      */
@@ -375,7 +375,7 @@ contract ITCMoney is Ownable{
         emit ConstantBonus(_value);
     }
 
-    /** 
+    /**
      * @dev Calculate and store current token rate.
      *      The rate grows every day per percent that is shown in growRate starting from timestamp that was set for the rate.
      */
@@ -409,8 +409,8 @@ contract ITCMoney is Ownable{
         }
         return tokenRate;
     }
-    
-    /** 
+
+    /**
      * @dev Function that receives the ether, transfers it to company address and mints tokens to address that initiates payment. Company, bonus and team addresses gets the tokens as well.
      */
     function () external payable {
@@ -418,7 +418,7 @@ contract ITCMoney is Ownable{
         require(msg.data.length == 0);
         require(msg.value > 0);
         require(rateETHCHF > 0);
-        
+
         // Calculate token amount (amount of CHF / current rate). Remember that token rate is multiplied by 1 finney, add the same multiplier for ether amount.
         uint amount = (msg.value * rateETHCHF * 1 finney) / getTokenRate();
         // Calculate CHF amount analogue, then store it for customer.
@@ -463,30 +463,41 @@ contract ITCMoney is Ownable{
                 bonus = bonus.add(amount.mul(percent).div(10000));
             }
         }
-        
+
         amount = amount.add(bonus);
-        
+
         // 3% of token amount to bonus address
         uint bonusAmount = amount.mul(3).div(87);
         // 10% of token amount to team address
         uint teamAmount = amount.mul(10).div(87);
         // Restore the total token amount
         uint total = amount.add(bonusAmount).add(teamAmount);
-        
+
         require(total <= maxSupply);
-        
+
         maxSupply = maxSupply.sub(total);
         totalSupply = totalSupply.add(total);
-        
+
         balances[msg.sender] = balances[msg.sender].add(amount);
         balancesCHF[msg.sender] = totalCHF;
         balances[bonusAddr] = balances[bonusAddr].add(bonusAmount);
         balances[teamAddr] = balances[teamAddr].add(teamAmount);
 
         companyAddr.transfer(msg.value);
-        
+
         emit Transfer(address(0), msg.sender, amount);
         emit Transfer(address(0), bonusAddr, bonusAmount);
         emit Transfer(address(0), teamAddr, teamAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

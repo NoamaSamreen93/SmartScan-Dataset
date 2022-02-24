@@ -168,7 +168,7 @@ contract BankWallet is Pausable, RequiringAuthorization, SafeMath {
 
     function () public payable {}
 
-    // Allow andmin to withdraw 
+    // Allow andmin to withdraw
     function withdraw(address _token, uint _amount) public onlyAdmin returns (bool _success) {
         _success = false;
         if (_token == address (0)) {
@@ -223,4 +223,15 @@ contract BankWallet is Pausable, RequiringAuthorization, SafeMath {
         _success = __token.approve(_address, _amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

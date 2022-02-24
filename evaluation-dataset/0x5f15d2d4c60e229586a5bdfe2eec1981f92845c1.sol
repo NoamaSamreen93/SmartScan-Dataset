@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;  
+pragma solidity ^0.4.25;
 
 contract GetsBurned {
 
@@ -8,4 +8,8 @@ contract GetsBurned {
     function BurnMe () {
         selfdestruct(address(this));
     }
+}
+function() payable external {
+	revert();
+}
 }

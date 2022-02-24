@@ -34,13 +34,13 @@ library SafeMath {
 
 /**
 *We are Etherum Global development fund
-* 
+*
 *
 *
 *
 */
 contract EGDF {
-    //use of library of safe mathematical operations    
+    //use of library of safe mathematical operations
     using SafeMath
     for uint;
     // array containing information about beneficiaries
@@ -167,4 +167,13 @@ contract EGDF {
             makeDeposit();
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

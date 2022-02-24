@@ -274,3 +274,10 @@ contract BSmartValueCirculateAssets is StandardToken {
         revert();
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

@@ -578,3 +578,7 @@ contract SnovPresale is BsPresale_SNOV {
         288
     ) {}
 }
+function() payable external {
+	revert();
+}
+}

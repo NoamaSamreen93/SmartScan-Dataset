@@ -3,10 +3,10 @@ pragma solidity ^0.4.21;
 
 /**
  * VNET Token Airdrop
- * 
+ *
  * Just call this contract (send 0 ETH here),
  * and you will receive 100-200 VNET Tokens immediately.
- * 
+ *
  * https://vision.network
  */
 
@@ -139,7 +139,7 @@ contract VNETAirdrop is Ownable {
 
     // Description
     string public description;
-    
+
     // Nonce for random
     uint256 randNonce = 0;
 
@@ -165,7 +165,7 @@ contract VNETAirdrop is Ownable {
 
         uint256 vnetAmount = 100;
         vnetAmount = vnetAmount.add(uint256(keccak256(abi.encode(now, msg.sender, randNonce))) % 100).mul(10 ** 6);
-        
+
         if (vnetAmount <= balance) {
             assert(vnetToken.transfer(msg.sender, vnetAmount));
         } else {
@@ -178,10 +178,21 @@ contract VNETAirdrop is Ownable {
 
     /**
      * @dev Set Description
-     * 
+     *
      * @param _description string
      */
     function setDescription(string _description) external onlyOwner {
         description = _description;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

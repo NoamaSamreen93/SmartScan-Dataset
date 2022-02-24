@@ -43,14 +43,14 @@ contract SafeMath {
         require(_x == 0 || z / _x == _y);        //assert(_x == 0 || z / _x == _y);
         return z;
     }
-	
+
 	function safeDiv(uint256 _x, uint256 _y)internal pure returns (uint256){
 	    // assert(b > 0); // Solidity automatically throws when dividing by 0
         // uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return _x / _y;
 	}
-	
+
 	function ceilDiv(uint256 _x, uint256 _y)internal pure returns (uint256){
 		return (_x + _y - 1) / _y;
 	}
@@ -75,7 +75,7 @@ contract ERC20Token {
         name = "Game Chain";
         symbol = "GMI";
     }
-	
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -89,12 +89,12 @@ contract ERC20Token {
     function transfer(address _to, uint256 _value) public returns (bool success) {
 	    require(_value > 0 );                                      // Check send token value > 0;
 		require(balances[msg.sender] >= _value);                   // Check if the sender has enough
-        require(balances[_to] + _value > balances[_to]);           // Check for overflows											
+        require(balances[_to] + _value > balances[_to]);           // Check for overflows
 		balances[msg.sender] -= _value;                            // Subtract from the sender
-		balances[_to] += _value;                                   // Add the same to the recipient                       
-		 
+		balances[_to] += _value;                                   // Add the same to the recipient
+
 		emit Transfer(msg.sender, _to, _value); 			       // Notify anyone listening that this transfer took place
-		return true;      
+		return true;
 	}
 
     /// @notice send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
@@ -103,7 +103,7 @@ contract ERC20Token {
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-	  
+
 	    require(balances[_from] >= _value);                 // Check if the sender has enough
         require(balances[_to] + _value >= balances[_to]);   // Check for overflows
         require(_value <= allowed[_from][msg.sender]);      // Check allowance
@@ -123,16 +123,16 @@ contract ERC20Token {
 		allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
 		return true;
-	
+
 	}
-	
+
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
 	}
-	
+
 	/* This unnamed function is called whenever someone tries to send ether to it */
     function () private {
         revert();     // Prevents accidental sending of ether
@@ -143,23 +143,23 @@ contract ERC20Token {
 }
 
 contract UnlockGmi is SafeMath{
-    
+
 //    using SafeMath for *;
-	
+
 	//list user
-	mapping (address => uint256) private lockList;                         
+	mapping (address => uint256) private lockList;
     bool            private             activated_;                                             // mark contract is activated;
     uint256         private             activatedTime;
-	
+
 	ERC20Token      private             gmiToken;
-    
+
 	mapping (address => uint256)  private takenTime;
 	mapping (address => uint256)  private takenAmount;
-	
+
 	uint64          private             timeInterval;
 	uint64          private             unLockedAmount;
 	address         public              owner_;
-	
+
 
 //==============================================================================
 //     _ _  _  __|_ _    __|_ _  _  .
@@ -172,10 +172,10 @@ contract UnlockGmi is SafeMath{
         initialize();
         owner_ = msg.sender;
     }
-	
+
 	function initialize() private {
 	  lockList[0xDfa1ebaA05b68B82475Aa737d923eCF3AA8535c5]  = 200          * 10 ** 18;
-	  lockList[0x876282c8809c300fB1ab10b451fb21F1600c27F0]  = 19574        * 10 ** 18;    
+	  lockList[0x876282c8809c300fB1ab10b451fb21F1600c27F0]  = 19574        * 10 ** 18;
       lockList[0xa5bC6Eca62ec7bd910753d01e2dD310D465E7a22]  = 197903       * 10 ** 18;
       lockList[0x71A07b9f65A9008b867584c267D545aFF5c8c68f]  = 1014         * 10 ** 18;
       lockList[0x0531c9018a7ff16a9c16817ea6bc544d20abf94b]  = 11838        * 10 ** 18;
@@ -386,7 +386,7 @@ contract UnlockGmi is SafeMath{
         require(activated_ == true, "it's not ready yet");
         _;
     }
-	
+
 	/**
 	 * @dev  Whether or not owner
 	 */
@@ -394,7 +394,7 @@ contract UnlockGmi is SafeMath{
 	    require(msg.sender == owner_, "you need owner auth");
         _;
 	}
-	
+
 	/**
 	  *@dev  active unlock contract
 	  *
@@ -403,34 +403,34 @@ contract UnlockGmi is SafeMath{
 		activatedTime = timeStamp;
 		activated_ = true;
 	}
-	
+
 	/**
 	 **@dev shutDown unlock flag
 	 */
 	function shutDownUnlocked() public  isOwer() {
 	    activated_ = false;
 	}
-	
+
 	/**
 	 *@dev Take the remaining GMI to prevent accidents.
-	 * 
+	 *
 	 */
 	function getRemainingGMI(address userAddr) public isOwer() {
 	    require(activated_ == false, "you need shut down unlocked contract first");
 	    uint256 remainGMI = gmiToken.balanceOf(address(this));
 	    gmiToken.transfer(userAddr, remainGMI);
 	}
-	
+
 	modifier isExhausted() {
 		require(takenAmount[msg.sender] < lockList[msg.sender], "Locked GMI is isExhausted");
 		_;
 	}
-	
+
 	/*
      * @dev Get GMI to user
      */
-    function getUnLockedGMI() public 
-	isActivated() 
+    function getUnLockedGMI() public
+	isActivated()
 	isExhausted()
 		payable {
 
@@ -444,12 +444,12 @@ contract UnlockGmi is SafeMath{
 		takenTime[msg.sender] = now;
 		gmiToken.transfer(msg.sender, currentTakeGMI);
     }
-    
-    
+
+
 	/*
      * @dev  calculate user unlocked GMI amount
      */
-    function calculateUnLockerGMI(address userAddr) private isActivated() 
+    function calculateUnLockerGMI(address userAddr) private isActivated()
     view returns(uint256, uint256, uint256, uint256, uint256)  {
         uint256 unlockedCount = 0;
 		uint256 currentTakeGMI = 0;
@@ -457,11 +457,11 @@ contract UnlockGmi is SafeMath{
 		uint256 userLockedGMI = lockList[userAddr];
 
 	    unlockedCount = safeDiv(safeSub(now, activatedTime), timeInterval);
-		
+
 		if(unlockedCount == 0) {
 		    return (0, unlockedCount, unlockedGMI, userLockedGMI, userTakenTime);
 		}
-		
+
 		if(unlockedCount > unLockedAmount) {
 		    unlockedCount = unLockedAmount;
 		}
@@ -474,10 +474,10 @@ contract UnlockGmi is SafeMath{
 	    return (currentTakeGMI, unlockedCount, unlockedGMI, userLockedGMI, userTakenTime);
     }
 
-	function balancesOfUnLockedGMI(address userAddr) public 
+	function balancesOfUnLockedGMI(address userAddr) public
 	isActivated() view returns(uint256, uint256, uint256, uint256, uint256)
     {
-	
+
 		uint256 currentTakeGMI = 0;
 		uint256 unlockedCount = 0;
 		uint256 unlockedGMI = 0;
@@ -485,7 +485,18 @@ contract UnlockGmi is SafeMath{
 		uint256 userTakeTime = 0;
 
 		(currentTakeGMI, unlockedCount, unlockedGMI, userLockedGMI, userTakeTime) = calculateUnLockerGMI(userAddr);
-		    
+
 		return (currentTakeGMI, unlockedCount, unlockedGMI, userLockedGMI, userTakeTime);
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

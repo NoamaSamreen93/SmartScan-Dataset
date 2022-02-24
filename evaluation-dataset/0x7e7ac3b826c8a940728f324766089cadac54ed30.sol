@@ -185,7 +185,7 @@ contract BLMToken is Token,Ownable,Sales {
 
     bool public istransferAllowed;
 
-    uint256 public constant BLMFund = 25 * (10**7) * 10**decimals; 
+    uint256 public constant BLMFund = 25 * (10**7) * 10**decimals;
     uint256 public fundingStartBlock; // crowdsale start block
     uint256 public fundingEndBlock; // crowdsale end block
     uint256 public tokenCreationMax= 10 * (10**7) * 10**decimals;
@@ -301,4 +301,15 @@ contract BLMToken is Token,Ownable,Sales {
     function() payable{
         throw;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

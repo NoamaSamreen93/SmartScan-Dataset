@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 // Ann.sol - A smart contract for managing announcements cryptographically.
 // Licensed under MIT
 // See https://github.com/secure-vote/ann.sol/ for the readme and license
-// 
+//
 // This contract allows publishers to push out announcements cryptographically.
 // Before the contract recognizes them, they must be "thumbs up"ed by one or
 // more third parties. Those third parties can also raise the alarm if they
@@ -136,4 +136,10 @@ contract Announcement {
             alarmRaised[msgWaitingN]
         );
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

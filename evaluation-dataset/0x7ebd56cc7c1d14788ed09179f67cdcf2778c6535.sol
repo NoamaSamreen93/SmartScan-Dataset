@@ -101,17 +101,17 @@ contract Pausable is Ownable {
 
 contract JCLYLong is Pausable  {
     using SafeMath for *;
-	
+
     event KeyPurchase(address indexed purchaser, uint256 eth, uint256 amount);
     event LeekStealOn();
 
-    address private constant WALLET_ETH_COM1   = 0x2509CF8921b95bef38DEb80fBc420Ef2bbc53ce3; 
-    address private constant WALLET_ETH_COM2   = 0x18d9fc8e3b65124744553d642989e3ba9e41a95a; 
+    address private constant WALLET_ETH_COM1   = 0x2509CF8921b95bef38DEb80fBc420Ef2bbc53ce3;
+    address private constant WALLET_ETH_COM2   = 0x18d9fc8e3b65124744553d642989e3ba9e41a95a;
 
     // Configurables  ====================
-    uint256 constant private rndInit_ = 10 hours;      
-    uint256 constant private rndInc_ = 30 seconds;   
-    uint256 constant private rndMax_ = 24 hours;    
+    uint256 constant private rndInit_ = 10 hours;
+    uint256 constant private rndInc_ = 30 seconds;
+    uint256 constant private rndMax_ = 24 hours;
 
     // eth limiter
     uint256 constant private ethLimiterRange1_ = 1e20;
@@ -122,7 +122,7 @@ contract JCLYLong is Pausable  {
     // whitelist range
     uint256 constant private whitelistRange_ = 1 days;
 
-    // for price 
+    // for price
     uint256 constant private priceStage1_ = 500e18;
     uint256 constant private priceStage2_ = 1000e18;
     uint256 constant private priceStage3_ = 2000e18;
@@ -154,29 +154,29 @@ contract JCLYLong is Pausable  {
     uint256 public allMaskGu_; // for sharing eth-profit by holding gu
     uint256 public allGuGiven_; // for sharing eth-profit by holding gu
     mapping (uint256 => uint256) public playOrders_; // playCounter => pID
-// AIRDROP DATA 
+// AIRDROP DATA
     uint256 public airDropPot_;             // person who gets the airdrop wins part of this pot
     uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
     mapping (uint256 => mapping (uint256 => uint256)) public airDropWinners_; // counter => pID => winAmt
     uint256 public airDropCount_;
-// LEEKSTEAL DATA 
+// LEEKSTEAL DATA
     uint256 public leekStealPot_;             // person who gets the first leeksteal wins part of this pot
     uint256 public leekStealTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning leek steal
     uint256 public leekStealToday_;
     bool public leekStealOn_;
     mapping (uint256 => uint256) public dayStealTime_; // dayNum => time that makes leekSteal available
     mapping (uint256 => uint256) public leekStealWins_; // pID => winAmt
-// PLAYER DATA 
+// PLAYER DATA
     uint256 public pID_;        // total number of players
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     // mapping (bytes32 => uint256) public pIDxName_;          // (name => pID) returns player id by name
     mapping (uint256 => Datasets.Player) public plyr_;   // (pID => data) player data
     mapping (uint256 => mapping (uint256 => Datasets.PlayerRounds)) public plyrRnds_;    // (pID => rID => data) player round data by player id & round id
     mapping (uint256 => mapping (uint256 => Datasets.PlayerPhrases)) public plyrPhas_;    // (pID => phraseID => data) player round data by player id & round id
-// ROUND DATA 
+// ROUND DATA
     uint256 public rID_;    // round id number / total rounds that have happened
     mapping (uint256 => Datasets.Round) public round_;   // (rID => data) round data
-// PHRASE DATA 
+// PHRASE DATA
     uint256 public phID_; // gu phrase ID
     mapping (uint256 => Datasets.Phrase) public phrase_;   // (phID_ => data) round data
 // WHITELIST
@@ -187,26 +187,26 @@ contract JCLYLong is Pausable  {
         public
     {
         // set genesis player
-        pIDxAddr_[owner] = 0; 
-        plyr_[0].addr = owner; 
-        pIDxAddr_[WALLET_ETH_COM1] = 1; 
-        plyr_[1].addr = WALLET_ETH_COM1; 
-        pIDxAddr_[WALLET_ETH_COM2] = 2; 
-        plyr_[2].addr = WALLET_ETH_COM2; 
+        pIDxAddr_[owner] = 0;
+        plyr_[0].addr = owner;
+        pIDxAddr_[WALLET_ETH_COM1] = 1;
+        plyr_[1].addr = WALLET_ETH_COM1;
+        pIDxAddr_[WALLET_ETH_COM2] = 2;
+        plyr_[2].addr = WALLET_ETH_COM2;
         pID_ = 2;
     }
 
 // Modifiers ====================
 
     modifier isActivated() {
-        require(activated_ == true); 
+        require(activated_ == true);
         _;
     }
-    
+
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
@@ -215,17 +215,17 @@ contract JCLYLong is Pausable  {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000);
         require(_eth <= 100000000000000000000000);
-        _;    
+        _;
     }
 
     modifier withinMigrationPeriod() {
         require(now < 1535637600);
         _;
     }
-    
+
 // Public functions ====================
 
-    function deposit() 
+    function deposit()
         isWithinLimits(msg.value)
         onlyOwner
         public
@@ -233,7 +233,7 @@ contract JCLYLong is Pausable  {
     {}
 
     function migrateBasicData(uint256 allMaskGu, uint256 allGuGiven,
-        uint256 airDropPot, uint256 airDropTracker, uint256 leekStealPot, uint256 leekStealTracker, uint256 leekStealToday, 
+        uint256 airDropPot, uint256 airDropTracker, uint256 leekStealPot, uint256 leekStealTracker, uint256 leekStealToday,
         uint256 pID, uint256 rID, uint256 phID)
         withinMigrationPeriod
         onlyOwner
@@ -252,7 +252,7 @@ contract JCLYLong is Pausable  {
     }
 
     function migratePlayerData1(uint256 _pID, address addr, uint256 win,
-        uint256 gen, uint256 genGu, uint256 aff, uint256 refund, uint256 lrnd, 
+        uint256 gen, uint256 genGu, uint256 aff, uint256 refund, uint256 lrnd,
         uint256 laff, uint256 withdraw)
         withinMigrationPeriod
         onlyOwner
@@ -271,7 +271,7 @@ contract JCLYLong is Pausable  {
         plyr_[_pID].withdraw = withdraw;
     }
 
-    function migratePlayerData2(uint256 _pID, address addr, uint256 maskGu, 
+    function migratePlayerData2(uint256 _pID, address addr, uint256 maskGu,
     uint256 gu, uint256 referEth, uint256 lastClaimedPhID)
         withinMigrationPeriod
         onlyOwner
@@ -326,7 +326,7 @@ contract JCLYLong is Pausable  {
         round_[1].withdraw = withdraw;
     }
 
-    function migratePhraseData(uint256 eth, uint256 guGiven, uint256 mask, 
+    function migratePhraseData(uint256 eth, uint256 guGiven, uint256 mask,
         uint256 minEthRequired, uint256 guPoolAllocation)
         withinMigrationPeriod
         onlyOwner
@@ -361,16 +361,16 @@ contract JCLYLong is Pausable  {
         uint256 _pID = pIDxAddr_[msg.sender];
         if (_pID == 0)
         {
-            pID_++; // grab their player ID and last aff ID, from player names contract 
-            pIDxAddr_[msg.sender] = pID_; // set up player account 
-            plyr_[pID_].addr = msg.sender; // set up player account 
+            pID_++; // grab their player ID and last aff ID, from player names contract
+            pIDxAddr_[msg.sender] = pID_; // set up player account
+            plyr_[pID_].addr = msg.sender; // set up player account
             _pID = pID_;
-        } 
-        
-        // buy core 
+        }
+
+        // buy core
         buyCore(_pID, plyr_[_pID].laff);
     }
- 
+
     function buyXid(uint256 _affID)
         isActivated()
         isHuman()
@@ -382,29 +382,29 @@ contract JCLYLong is Pausable  {
         uint256 _pID = pIDxAddr_[msg.sender]; // fetch player id
         if (_pID == 0)
         {
-            pID_++; // grab their player ID and last aff ID, from player names contract 
-            pIDxAddr_[msg.sender] = pID_; // set up player account 
-            plyr_[pID_].addr = msg.sender; // set up player account 
+            pID_++; // grab their player ID and last aff ID, from player names contract
+            pIDxAddr_[msg.sender] = pID_; // set up player account
+            plyr_[pID_].addr = msg.sender; // set up player account
             _pID = pID_;
-        } 
-        
+        }
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own
         if (_affID == 0 || _affID == _pID || _affID > pID_)
         {
-            _affID = plyr_[_pID].laff; // use last stored affiliate code 
+            _affID = plyr_[_pID].laff; // use last stored affiliate code
 
-        // if affiliate code was given & its not the same as previously stored 
-        } 
-        else if (_affID != plyr_[_pID].laff) 
+        // if affiliate code was given & its not the same as previously stored
+        }
+        else if (_affID != plyr_[_pID].laff)
         {
             if (plyr_[_pID].laff == 0)
-                plyr_[_pID].laff = _affID; // update last affiliate 
-            else 
+                plyr_[_pID].laff = _affID; // update last affiliate
+            else
                 _affID = plyr_[_pID].laff;
-        } 
+        }
 
-        // buy core 
+        // buy core
         buyCore(_pID, _affID);
     }
 
@@ -424,7 +424,7 @@ contract JCLYLong is Pausable  {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
 
@@ -432,62 +432,62 @@ contract JCLYLong is Pausable  {
         if (_now < round_[rID_].strt + whitelistRange_) {
             require(whitelisted_Prebuy[plyr_[_pID].addr] || whitelisted_Prebuy[plyr_[_affID].addr]);
         }
-        
+
         // if round is active
-        if (_now > round_[_rID].strt && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
             uint256 _eth = withdrawEarnings(_pID, false);
-            
+
             if (_eth > 0) {
-                // call core 
+                // call core
                 core(_rID, _pID, _eth, _affID);
             }
-        
-        // if round is not active and end round needs to be ran   
+
+        // if round is not active and end round needs to be ran
         } else if (_now > round_[_rID].end && round_[_rID].ended == false) {
             // end the round (distributes pot) & start new round
             round_[_rID].ended = true;
             endRound();
         }
     }
-    
+
     function withdraw()
         isActivated()
         isHuman()
         public
     {
-        // setup local rID 
+        // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // setup temp var for player eth
         uint256 _eth;
-        
+
         // check to see if round has ended and no one has run round end yet
         if (_now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
-        {   
+        {
             // end the round (distributes pot)
 			round_[_rID].ended = true;
             endRound();
-            
+
 			// get their earnings
             _eth = withdrawEarnings(_pID, true);
-            
+
             // gib moni
             if (_eth > 0)
-                plyr_[_pID].addr.transfer(_eth);    
-            
-            
+                plyr_[_pID].addr.transfer(_eth);
+
+
         // in any other situation
         } else {
             // get their earnings
             _eth = withdrawEarnings(_pID, true);
-            
+
             // gib moni
             if (_eth > 0)
                 plyr_[_pID].addr.transfer(_eth);
@@ -500,7 +500,7 @@ contract JCLYLong is Pausable  {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
 
@@ -508,28 +508,28 @@ contract JCLYLong is Pausable  {
         if (_now < round_[rID_].strt + whitelistRange_) {
             require(whitelisted_Prebuy[plyr_[_pID].addr] || whitelisted_Prebuy[plyr_[_affID].addr]);
         }
-        
+
         // if round is active
-        if (_now > round_[_rID].strt && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
-            // call core 
+            // call core
             core(_rID, _pID, msg.value, _affID);
-        
-        // if round is not active     
+
+        // if round is not active
         } else {
             // check to see if end round needs to be ran
-            if (_now > round_[_rID].end && round_[_rID].ended == false) 
+            if (_now > round_[_rID].end && round_[_rID].ended == false)
             {
                 // end the round (distributes pot) & start new round
 			    round_[_rID].ended = true;
                 endRound();
             }
-            
-            // put eth in players vault 
+
+            // put eth in players vault
             plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
-    
+
     function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID)
         private
     {
@@ -540,10 +540,10 @@ contract JCLYLong is Pausable  {
             // from that round to gen vault.
             if (plyr_[_pID].lrnd != 0)
                 updateGenVault(_pID, plyr_[_pID].lrnd);
-            
+
             plyr_[_pID].lrnd = rID_; // update player's last round played
         }
-        
+
         // early round eth limiter (0-100 eth)
         uint256 _availableLimit;
         uint256 _refund;
@@ -560,13 +560,13 @@ contract JCLYLong is Pausable  {
             plyr_[_pID].refund = plyr_[_pID].refund.add(_refund);
             _eth = _availableLimit;
         }
-        
+
         // if eth left is greater than min eth allowed (sorry no pocket lint)
-        if (_eth > 1e9) 
+        if (_eth > 1e9)
         {
             // mint the new keys
             uint256 _keys = keysRec(round_[_rID].eth, _eth);
-            
+
             // if they bought at least 1 whole key
             if (_keys >= 1e18)
             {
@@ -578,7 +578,7 @@ contract JCLYLong is Pausable  {
 
                 emit KeyPurchase(plyr_[round_[_rID].plyr].addr, _eth, _keys);
             }
-            
+
             // manage airdrops
             if (_eth >= 1e17)
             {
@@ -592,29 +592,29 @@ contract JCLYLong is Pausable  {
                         // calculate prize and give it to winner
                         _prize = ((airDropPot_).mul(75)) / 100;
                         plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                        
-                        // adjust airDropPot 
+
+                        // adjust airDropPot
                         airDropPot_ = (airDropPot_).sub(_prize);
-                        
-                        // let event know a tier 3 prize was won 
+
+                        // let event know a tier 3 prize was won
                     } else if (_eth >= 1e18 && _eth < 1e19) {
                         // calculate prize and give it to winner
                         _prize = ((airDropPot_).mul(50)) / 100;
                         plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                        
-                        // adjust airDropPot 
+
+                        // adjust airDropPot
                         airDropPot_ = (airDropPot_).sub(_prize);
-                        
-                        // let event know a tier 2 prize was won 
+
+                        // let event know a tier 2 prize was won
                     } else if (_eth >= 1e17 && _eth < 1e18) {
                         // calculate prize and give it to winner
                         _prize = ((airDropPot_).mul(25)) / 100;
                         plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                        
-                        // adjust airDropPot 
+
+                        // adjust airDropPot
                         airDropPot_ = (airDropPot_).sub(_prize);
-                        
-                        // let event know a tier 3 prize was won 
+
+                        // let event know a tier 3 prize was won
                     }
 
                     // reset air drop tracker
@@ -624,21 +624,21 @@ contract JCLYLong is Pausable  {
                     airDropCount_++;
                     airDropWinners_[airDropCount_][_pID] = _prize;
                 }
-            }   
-            
+            }
+
             leekStealGo();
 
-            // update player 
+            // update player
             plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
             plyrRnds_[_pID][_rID].eth = _eth.add(plyrRnds_[_pID][_rID].eth);
             round_[_rID].playCtr++;
             playOrders_[round_[_rID].playCtr] = pID_; // for recording the 500 winners
-            
+
             // update round
             round_[_rID].allkeys = _keys.add(round_[_rID].allkeys);
             round_[_rID].keys = _keys.add(round_[_rID].keys);
             round_[_rID].eth = _eth.add(round_[_rID].eth);
-    
+
             // distribute eth
             distributeExternal(_rID, _pID, _eth, _affID);
             distributeInternal(_rID, _pID, _eth, _keys);
@@ -654,7 +654,7 @@ contract JCLYLong is Pausable  {
     // zero out keys if the accumulated profit doubled
     function checkDoubledProfit(uint256 _pID, uint256 _rID)
         private
-    {   
+    {
         // if pID has no keys, skip this
         uint256 _keys = plyrRnds_[_pID][_rID].keys;
         if (_keys > 0) {
@@ -667,14 +667,14 @@ contract JCLYLong is Pausable  {
             {
                 // put only calculated-remain-profit into gen vault
                 uint256 _remainProfit = _doubleProfit.sub(_genVault).sub(_genWithdraw);
-                plyr_[_pID].gen = _remainProfit.add(plyr_[_pID].gen); 
+                plyr_[_pID].gen = _remainProfit.add(plyr_[_pID].gen);
                 plyrRnds_[_pID][_rID].keyProfit = _remainProfit.add(plyrRnds_[_pID][_rID].keyProfit); // follow maskKey
 
                 round_[_rID].keys = round_[_rID].keys.sub(_keys);
                 plyrRnds_[_pID][_rID].keys = plyrRnds_[_pID][_rID].keys.sub(_keys);
 
                 plyrRnds_[_pID][_rID].maskKey = 0; // treat this player like a new player
-            }   
+            }
         }
     }
 
@@ -774,7 +774,7 @@ contract JCLYLong is Pausable  {
             plyr_[_affID].referEth = _eth.add(plyr_[_affID].referEth);
             phrase_[_newPhID].eth = _eth.add(phrase_[_newPhID].eth);
         }
-            
+
         uint256 _remainGuReward = phrase_[_newPhID].guPoolAllocation.sub(phrase_[_newPhID].guGiven);
         // if 1) one has referral amt larger than requirement, 2) has remaining => then distribute certain amt of Gu, i.e. update gu instead of adding gu
         if (plyrPhas_[_affID][_newPhID].eth >= phrase_[_newPhID].minEthRequired && _remainGuReward >= 1e18) {
@@ -804,10 +804,10 @@ contract JCLYLong is Pausable  {
         }
     }
 
-    function transferGu(address _to, uint256 _guAmt) 
+    function transferGu(address _to, uint256 _guAmt)
         public
         whenNotPaused_2
-        returns (bool) 
+        returns (bool)
     {
        require(_to != address(0));
 
@@ -819,7 +819,7 @@ contract JCLYLong is Pausable  {
             require(plyr_[_pIDTo].addr == _to);
 
             // update profit for playerFrom
-            uint256 _profit = (allMaskGu_.mul(_guAmt)/1e18).sub(  (plyr_[_pIDFrom].maskGu.mul(_guAmt) / plyr_[_pIDFrom].gu)   ); 
+            uint256 _profit = (allMaskGu_.mul(_guAmt)/1e18).sub(  (plyr_[_pIDFrom].maskGu.mul(_guAmt) / plyr_[_pIDFrom].gu)   );
             plyr_[_pIDFrom].genGu = _profit.add(plyr_[_pIDFrom].genGu); // put in genGu vault
             plyr_[_pIDFrom].guProfit = _profit.add(plyr_[_pIDFrom].guProfit);
 
@@ -833,64 +833,64 @@ contract JCLYLong is Pausable  {
             plyr_[_pIDTo].gu = plyr_[_pIDTo].gu.add(_guAmt);
 
             return true;
-        } 
+        }
         else
             return false;
     }
-    
-    function updateGuPhrase() 
+
+    function updateGuPhrase()
         private
         returns (uint256) // return phraseNum
     {
         if (now <= contractStartDate_ + guPhrase1_) {
             phrase_[1].minEthRequired = 5e18;
             phrase_[1].guPoolAllocation = 100e18;
-            return 1; 
+            return 1;
         }
         if (now <= contractStartDate_ + guPhrase2_) {
             phrase_[2].minEthRequired = 4e18;
             phrase_[2].guPoolAllocation = 200e18;
-            return 2; 
+            return 2;
         }
         if (now <= contractStartDate_ + guPhrase3_) {
             phrase_[3].minEthRequired = 3e18;
             phrase_[3].guPoolAllocation = 400e18;
-            return 3; 
+            return 3;
         }
         if (now <= contractStartDate_ + guPhrase4_) {
             phrase_[4].minEthRequired = 2e18;
             phrase_[4].guPoolAllocation = 800e18;
-            return 4; 
+            return 4;
         }
         if (now <= contractStartDate_ + guPhrase5_) {
             phrase_[5].minEthRequired = 1e18;
             phrase_[5].guPoolAllocation = 1600e18;
-            return 5; 
+            return 5;
         }
         if (now <= contractStartDate_ + guPhrase6_) {
             phrase_[6].minEthRequired = 1e18;
             phrase_[6].guPoolAllocation = 3200e18;
-            return 6; 
+            return 6;
         }
         if (now <= contractStartDate_ + guPhrase7_) {
             phrase_[7].minEthRequired = 1e18;
             phrase_[7].guPoolAllocation = 6400e18;
-            return 7; 
+            return 7;
         }
         if (now <= contractStartDate_ + guPhrase8_) {
             phrase_[8].minEthRequired = 1e18;
             phrase_[8].guPoolAllocation = 12800e18;
-            return 8; 
+            return 8;
         }
         if (now <= contractStartDate_ + guPhrase9_) {
             phrase_[9].minEthRequired = 1e18;
             phrase_[9].guPoolAllocation = 25600e18;
-            return 9; 
+            return 9;
         }
         if (now <= contractStartDate_ + guPhrase10_) {
             phrase_[10].minEthRequired = 1e18;
             phrase_[10].guPoolAllocation = 51200e18;
-            return 10; 
+            return 10;
         }
         phrase_[11].minEthRequired = 0;
         phrase_[11].guPoolAllocation = 0;
@@ -918,31 +918,31 @@ contract JCLYLong is Pausable  {
         else
             return 0;
     }
-    
+
     function endRound()
         private
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab our winning player id
         uint256 _winPID = round_[_rID].plyr;
-        
+
         // grab our pot amount
         uint256 _pot = round_[_rID].pot;
-        
-        // calculate our winner share, community rewards, gen share, 
-        // jcg share, and amount reserved for next pot 
+
+        // calculate our winner share, community rewards, gen share,
+        // jcg share, and amount reserved for next pot
         uint256 _win = (_pot.mul(40)) / 100;
         uint256 _res = (_pot.mul(10)) / 100;
 
-        
+
         // pay our winner
         plyr_[_winPID].win = _win.add(plyr_[_winPID].win);
 
         // pay the rest of the 500 winners
         pay500Winners(_pot);
-        
+
         // start next round
         rID_++;
         _rID++;
@@ -973,9 +973,9 @@ contract JCLYLong is Pausable  {
             plyr_[playOrders_[k]].win = _win4.add(plyr_[playOrders_[k]].win);
         }
     }
-    
+
     function updateGenVault(uint256 _pID, uint256 _rIDlast)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedKeyEarnings(_pID, _rIDlast);
         if (_earnings > 0)
@@ -989,7 +989,7 @@ contract JCLYLong is Pausable  {
     }
 
     function updateGenGuVault(uint256 _pID)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedGuEarnings(_pID);
         if (_earnings > 0)
@@ -1004,7 +1004,7 @@ contract JCLYLong is Pausable  {
 
     // update gu-reward for referrals
     function updateReferralGu(uint256 _pID)
-        private 
+        private
     {
         // get current phID
         uint256 _phID = phID_;
@@ -1018,7 +1018,7 @@ contract JCLYLong is Pausable  {
             uint256 _guShares;
             for (uint i = (_lastClaimedPhID + 1); i < _phID; i++) {
                 _guShares = (((phrase_[i].mask).mul(plyrPhas_[_pID][i].eth))/1e18).add(_guShares);
-            
+
                 // update record
                 plyr_[_pID].lastClaimedPhID = i;
                 phrase_[i].guGiven = _guShares.add(phrase_[i].guGiven);
@@ -1034,41 +1034,41 @@ contract JCLYLong is Pausable  {
             allGuGiven_ = _guShares.add(allGuGiven_);
         }
     }
-    
+
     function updateTimer(uint256 _keys, uint256 _rID)
         private
     {
         // grab time
         uint256 _now = now;
-        
+
         // calculate time based on number of keys bought
         uint256 _newTime;
         if (_now > round_[_rID].end && round_[_rID].plyr == 0)
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(_now);
         else
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(round_[_rID].end);
-        
+
         // compare to max and set new end time
         if (_newTime < (rndMax_).add(_now))
             round_[_rID].end = _newTime;
         else
             round_[_rID].end = rndMax_.add(_now);
     }
-    
+
     function airdrop()
-        private 
-        view 
+        private
+        view
         returns(bool)
     {
         uint256 seed = uint256(keccak256(abi.encodePacked(
-            
+
             (block.timestamp).add
             (block.difficulty).add
             ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (now)).add
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) < airDropTracker_)
             return(true);
@@ -1077,19 +1077,19 @@ contract JCLYLong is Pausable  {
     }
 
     function randomNum(uint256 _tracker)
-        private 
-        view 
+        private
+        view
         returns(bool)
     {
         uint256 seed = uint256(keccak256(abi.encodePacked(
-            
+
             (block.timestamp).add
             (block.difficulty).add
             ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (now)).add
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) < _tracker)
             return(true);
@@ -1104,10 +1104,10 @@ contract JCLYLong is Pausable  {
         uint256 _com = _eth / 100;
         address(WALLET_ETH_COM1).transfer(_com); // 1%
         address(WALLET_ETH_COM2).transfer(_com); // 1%
-        
+
         // distribute 10% share to affiliate (8% + 2%)
         uint256 _aff = _eth / 10;
-        
+
         // check: affiliate must not be self, and must have an ID
         if (_affID != _pID && _affID != 0) {
             plyr_[_affID].aff = (_aff.mul(8)/10).add(plyr_[_affID].aff); // distribute 8% to 1st aff
@@ -1120,7 +1120,7 @@ contract JCLYLong is Pausable  {
             plyr_[1].aff = _aff.add(plyr_[_affID].aff);
         }
     }
-    
+
     function distributeInternal(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _keys)
         private
     {
@@ -1129,26 +1129,26 @@ contract JCLYLong is Pausable  {
 
         // calculate jcg share
         uint256 _jcg = (_eth.mul(20)) / 100; // 20%
-        
-        // toss 3% into airdrop pot 
+
+        // toss 3% into airdrop pot
         uint256 _air = (_eth.mul(3)) / 100;
         airDropPot_ = airDropPot_.add(_air);
 
-        // toss 5% into leeksteal pot 
+        // toss 5% into leeksteal pot
         uint256 _steal = (_eth / 20);
         leekStealPot_ = leekStealPot_.add(_steal);
-        
+
         // update eth balance (eth = eth - (2% com share + 3% airdrop + 5% leekSteal + 10% aff share))
-        _eth = _eth.sub(((_eth.mul(20)) / 100)); 
-        
-        // calculate pot 
+        _eth = _eth.sub(((_eth.mul(20)) / 100));
+
+        // calculate pot
         uint256 _pot = _eth.sub(_gen).sub(_jcg);
-        
+
         // distribute gen n jcg share (thats what updateMasks() does) and adjust
         // balances for dust.
         uint256 _dustKey = updateKeyMasks(_rID, _pID, _gen, _keys);
         uint256 _dustGu = updateGuMasks(_pID, _jcg);
-        
+
         // add eth to pot
         round_[_rID].pot = _pot.add(_dustKey).add(_dustGu).add(round_[_rID].pot);
     }
@@ -1161,12 +1161,12 @@ contract JCLYLong is Pausable  {
         // calc profit per key & round mask based on this buy:  (dust goes to pot)
         uint256 _ppt = (_gen.mul(1e18)) / (round_[_rID].keys);
         round_[_rID].maskKey = _ppt.add(round_[_rID].maskKey);
-            
+
         // calculate player earning from their own buy (only based on the keys
         // they just bought).  & update player earnings mask
         uint256 _pearn = (_ppt.mul(_keys)) / (1e18);
         plyrRnds_[_pID][_rID].maskKey = (((round_[_rID].maskKey.mul(_keys)) / (1e18)).sub(_pearn)).add(plyrRnds_[_pID][_rID].maskKey);
-        
+
         // calculate & return dust
         return(_gen.sub((_ppt.mul(round_[_rID].keys)) / (1e18)));
     }
@@ -1175,19 +1175,19 @@ contract JCLYLong is Pausable  {
     function updateGuMasks(uint256 _pID, uint256 _jcg)
         private
         returns(uint256)
-    {   
+    {
         if (allGuGiven_ > 0) {
             // calc profit per gu & round mask based on this buy:  (dust goes to pot)
             uint256 _ppg = (_jcg.mul(1e18)) / allGuGiven_;
             allMaskGu_ = _ppg.add(allMaskGu_);
-            
+
             // calculate & return dust
             return (_jcg.sub((_ppg.mul(allGuGiven_)) / (1e18)));
         } else {
             return _jcg;
         }
     }
-    
+
     function withdrawEarnings(uint256 _pID, bool isWithdraw)
         whenNotPaused_3
         private
@@ -1201,9 +1201,9 @@ contract JCLYLong is Pausable  {
 
         checkDoubledProfit(_pID, _rID);
         updateGenVault(_pID, _rID);
-        
 
-        // from all vaults 
+
+        // from all vaults
         uint256 _earnings = plyr_[_pID].gen.add(plyr_[_pID].win).add(plyr_[_pID].genGu).add(plyr_[_pID].aff).add(plyr_[_pID].refund);
         if (_earnings > 0)
         {
@@ -1234,22 +1234,22 @@ contract JCLYLong is Pausable  {
     {
         // can only be ran once
         require(activated_ == false);
-        
-        // activate the contract 
+
+        // activate the contract
         activated_ = true;
         contractStartDate_ = now;
-        
+
         // lets start first round
         rID_ = 1;
         round_[1].strt = now;
         round_[1].end = now + rndInit_;
     }
 
-    function leekStealGo() 
-        private 
+    function leekStealGo()
+        private
     {
-        // get a number for today dayNum 
-        uint leekStealToday_ = (now.sub(round_[rID_].strt)) / 1 days; 
+        // get a number for today dayNum
+        uint leekStealToday_ = (now.sub(round_[rID_].strt)) / 1 days;
         if (dayStealTime_[leekStealToday_] == 0) // if there hasn't a winner today, proceed
         {
             leekStealTracker_++;
@@ -1261,16 +1261,16 @@ contract JCLYLong is Pausable  {
         }
     }
 
-    function stealTheLeek() 
+    function stealTheLeek()
         whenNotPaused_4
-        public 
+        public
     {
         if (leekStealOn_)
-        {   
+        {
             if (now.sub(dayStealTime_[leekStealToday_]) > 300) // if time passed 5min, turn off and exit
             {
                 leekStealOn_ = false;
-            } else {   
+            } else {
                 // if yes then assign the 1eth, if the pool has 1eth
                 if (leekStealPot_ > 1e18) {
                     uint256 _pID = pIDxAddr_[msg.sender]; // fetch player ID
@@ -1283,16 +1283,16 @@ contract JCLYLong is Pausable  {
     }
 
 // Getters ====================
-    
+
     function getPrice()
         public
         view
         returns(uint256)
-    {   
+    {
         uint256 keys = keysRec(round_[rID_].eth, 1e18);
         return (1e36 / keys);
     }
-    
+
     function getTimeLeft()
         public
         view
@@ -1300,10 +1300,10 @@ contract JCLYLong is Pausable  {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         if (_now < round_[_rID].end)
             if (_now > round_[_rID].strt)
                 return( (round_[_rID].end).sub(_now) );
@@ -1312,7 +1312,7 @@ contract JCLYLong is Pausable  {
         else
             return(0);
     }
-    
+
     function getDisplayGenVault(uint256 _pID)
         private
         view
@@ -1324,7 +1324,7 @@ contract JCLYLong is Pausable  {
         uint256 _genVault = plyr_[_pID].gen;
         uint256 _genEarning = calcUnMaskedKeyEarnings(_pID, _lrnd);
         uint256 _doubleProfit = (plyrRnds_[_pID][_rID].eth).mul(2);
-        
+
         uint256 _displayGenVault = _genVault.add(_genEarning);
         if (_genVault.add(_genEarning) > _doubleProfit)
             _displayGenVault = _doubleProfit;
@@ -1338,13 +1338,13 @@ contract JCLYLong is Pausable  {
         returns(uint256 ,uint256, uint256, uint256, uint256)
     {
         uint256 _rID = rID_;
-        
+
         // if round has ended.  but round end has not been run (so contract has not distributed winnings)
         if (now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
-        {   
+        {
             uint256 _winVault;
-            if (round_[_rID].plyr == _pID) // if player is winner 
-            {   
+            if (round_[_rID].plyr == _pID) // if player is winner
+            {
                 _winVault = (plyr_[_pID].win).add( ((round_[_rID].pot).mul(40)) / 100 );
             } else {
                 _winVault = plyr_[_pID].win;
@@ -1370,7 +1370,7 @@ contract JCLYLong is Pausable  {
             );
         }
     }
-    
+
     function getCurrentRoundInfo()
         public
         view
@@ -1378,7 +1378,7 @@ contract JCLYLong is Pausable  {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         return
         (
             _rID,                           //0
@@ -1401,7 +1401,7 @@ contract JCLYLong is Pausable  {
     {
         // setup local phID
         uint256 _phID = phID_;
-        
+
         return
         (
             _phID,                            //0
@@ -1413,20 +1413,20 @@ contract JCLYLong is Pausable  {
     }
 
     function getPlayerInfoByAddress(address _addr)
-        public 
-        view 
+        public
+        view
         returns(uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
     {
         // setup local rID, phID
         uint256 _rID = rID_;
         uint256 _phID = phID_;
-        
+
         if (_addr == address(0))
         {
             _addr == msg.sender;
         }
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         return
         (
             _pID,      // 0
@@ -1443,8 +1443,8 @@ contract JCLYLong is Pausable  {
     }
 
     function getPlayerWithdrawal(uint256 _pID, uint256 _rID)
-        public 
-        view 
+        public
+        view
         returns(uint256, uint256, uint256, uint256, uint256)
     {
         return
@@ -1471,7 +1471,7 @@ library Datasets {
         uint256 laff;   // last affiliate id used
         uint256 withdraw; // sum of withdraw
         uint256 maskGu; // player mask gu: for sharing eth-profit by holding gu
-        uint256 gu;     
+        uint256 gu;
         uint256 guProfit; // record profit by gu
         uint256 referEth; // total referral eth
         uint256 lastClaimedPhID; // at which phID player has claimed the remaining gu
@@ -1506,7 +1506,7 @@ library Datasets {
     }
     struct Phrase {
         uint256 eth;   // amount of total eth in of the referral
-        uint256 guGiven; // amount of gu distributed 
+        uint256 guGiven; // amount of gu distributed
         uint256 mask;  // a rate of remainGu per ethIn shares: for sharing gu-reward by referral eth
         uint256 minEthRequired;  // min refer.eth to get 1 gu
         uint256 guPoolAllocation; // total number of gu
@@ -1514,14 +1514,14 @@ library Datasets {
 }
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -1542,7 +1542,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -1554,30 +1554,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -1588,20 +1588,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -1609,4 +1609,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

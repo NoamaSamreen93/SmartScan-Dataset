@@ -110,7 +110,7 @@ contract SchedulerInterface {
 }
 
 contract TransactionRequestInterface {
-    
+
     // Primary actions
     function execute() public returns (bool);
     function cancel() public returns (bool);
@@ -222,7 +222,7 @@ contract TransactionRequestCore is TransactionRequestInterface {
         public payable returns (bool success)
     {
         require(txnRequest.meta.owner == msg.sender && txnRequest.schedule.isAfterWindow());
-        
+
         /* solium-disable-next-line */
         return _to.call.value(msg.value)(_data);
     }
@@ -304,7 +304,7 @@ contract TransactionRecorder {
 
 contract Proxy {
     SchedulerInterface public scheduler;
-    address public receipient; 
+    address public receipient;
     address public scheduledTransaction;
     address public owner;
 
@@ -338,7 +338,7 @@ contract Proxy {
     function sendOwnerEther(address _receipient) public {
         if (msg.sender == owner && _receipient != 0x0) {
             TransactionRequestInterface(scheduledTransaction).sendOwnerEther(_receipient);
-        }   
+        }
     }
 }
 
@@ -446,8 +446,8 @@ contract BaseScheduler is SchedulerInterface {
      * @param _uintArgs [5] The fee attached to this transaction.
      * @param _uintArgs [6] The bounty attached to this transaction.
      * @param _uintArgs [7] The deposit required to claim this transaction.
-     * @return The address of the new TransactionRequest.   
-     */ 
+     * @return The address of the new TransactionRequest.
+     */
     function schedule (
         address   _toAddress,
         bytes     _callData,
@@ -651,7 +651,7 @@ library ExecutionLib {
      * may consume.  The EXTRA_GAS value represents the overhead involved in
      * request execution.
      */
-    function CALL_GAS_CEILING(uint EXTRA_GAS) 
+    function CALL_GAS_CEILING(uint EXTRA_GAS)
         internal view returns (uint)
     {
         return block.gaslimit - EXTRA_GAS;
@@ -719,7 +719,7 @@ library MathLib {
     /*
      * Return the larger of a or b.  Returns a if a == b.
      */
-    function max(uint a, uint b) 
+    function max(uint a, uint b)
         public pure returns (uint)
     {
         if (a >= b) {
@@ -732,7 +732,7 @@ library MathLib {
     /*
      * Return the larger of a or b.  Returns a if a == b.
      */
-    function min(uint a, uint b) 
+    function min(uint a, uint b)
         public pure returns (uint)
     {
         if (a <= b) {
@@ -747,13 +747,13 @@ library MathLib {
      * exception if casting to signed integer would result in a negative
      * number.
      */
-    function safeCastSigned(uint a) 
+    function safeCastSigned(uint a)
         public pure returns (int)
     {
         assert(a <= INT_MAX);
         return int(a);
     }
-    
+
 }
 
 /**
@@ -768,7 +768,7 @@ library RequestMetaLib {
         address createdBy;          /// The address of the RequestFactory which created this request.
 
         bool isCancelled;           /// Was the TransactionRequest cancelled?
-        
+
         bool wasCalled;             /// Was the TransactionRequest called?
 
         bool wasSuccessful;         /// Was the return value from the TransactionRequest execution successful?
@@ -814,7 +814,7 @@ library RequestLib {
         address[4]  _addressArgs,
         uint[12]    _uintArgs,
         uint        _endowment
-    ) 
+    )
         public view returns (bool[6] isValid)
     {
         // The order of these errors matters as it determines which
@@ -855,7 +855,7 @@ library RequestLib {
         address[4]      _addressArgs,
         uint[12]        _uintArgs,
         bytes           _callData
-    ) 
+    )
         public returns (bool)
     {
         address[6] memory addressValues = [
@@ -895,7 +895,7 @@ library RequestLib {
 
         return true;
     }
- 
+
     function serialize(Request storage self)
         internal view returns(address[6], bool[3], uint[15], uint8[1])
     {
@@ -993,7 +993,7 @@ library RequestLib {
         return true;
     }
 
-    function execute(Request storage self) 
+    function execute(Request storage self)
         internal returns (bool)
     {
         /*
@@ -1017,7 +1017,7 @@ library RequestLib {
          *         - block.number <= windowStart + windowSize
          *     else:
          *         - throw (should be impossible)
-         *  
+         *
          *  6. gasleft() == callGas
          *  7. tx.gasprice >= txnData.gasPrice
          *
@@ -1082,7 +1082,7 @@ library RequestLib {
 
         // Send the transaction...
         // The transaction is allowed to fail and the executing agent will still get the bounty.
-        // `.sendTransaction()` will return false on a failed exeuction. 
+        // `.sendTransaction()` will return false on a failed exeuction.
         self.meta.wasSuccessful = self.txnData.sendTransaction();
 
         // +----------------+
@@ -1140,7 +1140,7 @@ library RequestLib {
         // Log the bounty and fee. Otherwise it is non-trivial to figure
         // out how much was payed.
         emit Executed(self.paymentData.bountyOwed, totalFeePayment, measuredGasConsumption);
-    
+
         // Attempt to send the bounty. as with `.sendFee()` it may fail and need to be caled after execution.
         self.paymentData.sendBounty();
 
@@ -1159,7 +1159,7 @@ library RequestLib {
     // `TransactionRequest.execute()` contract into the `RequestLib.execute()`
     // method at the point where the gas check happens.
     uint public constant PRE_EXECUTION_GAS = 25000;   // TODO is this number still accurate?
-    
+
     /*
      * The amount of gas needed to complete the execute method after
      * the transaction has been sent.
@@ -1182,8 +1182,8 @@ library RequestLib {
     {
         return EXECUTION_GAS_OVERHEAD;
     }
-    
-    function requiredExecutionGas(Request storage self) 
+
+    function requiredExecutionGas(Request storage self)
         public view returns (uint requiredGas)
     {
         requiredGas = self.txnData.callGas.add(EXECUTION_GAS_OVERHEAD);
@@ -1198,7 +1198,7 @@ library RequestLib {
      *    * not wasCalled && afterExecutionWindow
      *    * not claimed && beforeFreezeWindow && msg.sender == owner
      */
-    function isCancellable(Request storage self) 
+    function isCancellable(Request storage self)
         public view returns (bool)
     {
         if (self.meta.isCancelled) {
@@ -1222,7 +1222,7 @@ library RequestLib {
      *  payment is issued to the party that cancels the request if they are not
      *  the owner.
      */
-    function cancel(Request storage self) 
+    function cancel(Request storage self)
         public returns (bool)
     {
         uint startGas = gasleft();
@@ -1280,7 +1280,7 @@ library RequestLib {
      * @dev Performs some checks to verify that a transaction request is claimable.
      * @param self The Request object.
      */
-    function isClaimable(Request storage self) 
+    function isClaimable(Request storage self)
         internal view returns (bool)
     {
         // Require not claimed and not cancelled.
@@ -1298,11 +1298,11 @@ library RequestLib {
      * @param self The Request object.
      * Payable because it requires the sender to send enough ether to cover the claimDeposit.
      */
-    function claim(Request storage self) 
+    function claim(Request storage self)
         internal returns (bool claimed)
     {
         require(isClaimable(self));
-        
+
         emit Claimed();
         return self.claimData.claim(self.schedule.computePaymentModifier());
     }
@@ -1321,7 +1321,7 @@ library RequestLib {
      * Send fee. Wrapper over the real function that perform an extra
      * check to see if it's after the execution window (and thus the first transaction failed)
      */
-    function sendFee(Request storage self) 
+    function sendFee(Request storage self)
         public returns (bool)
     {
         if (self.schedule.isAfterWindow()) {
@@ -1334,7 +1334,7 @@ library RequestLib {
      * Send bounty. Wrapper over the real function that performs an extra
      * check to see if it's after execution window (and thus the first transaction failed)
      */
-    function sendBounty(Request storage self) 
+    function sendBounty(Request storage self)
         public returns (bool)
     {
         /// check wasCalled
@@ -1344,14 +1344,14 @@ library RequestLib {
         return false;
     }
 
-    function canSendOwnerEther(Request storage self) 
-        public view returns(bool) 
+    function canSendOwnerEther(Request storage self)
+        public view returns(bool)
     {
         return self.meta.isCancelled || self.schedule.isAfterWindow() || self.meta.wasCalled;
     }
 
     /**
-     * Send owner ether. Wrapper over the real function that performs an extra 
+     * Send owner ether. Wrapper over the real function that performs an extra
      * check to see if it's after execution window (and thus the first transaction failed)
      */
     function sendOwnerEther(Request storage self, address recipient)
@@ -1365,7 +1365,7 @@ library RequestLib {
     }
 
     /**
-     * Send owner ether. Wrapper over the real function that performs an extra 
+     * Send owner ether. Wrapper over the real function that performs an extra
      * check to see if it's after execution window (and thus the first transaction failed)
      */
     function sendOwnerEther(Request storage self)
@@ -1377,7 +1377,7 @@ library RequestLib {
         return false;
     }
 
-    function _sendOwnerEther(Request storage self, address recipient) 
+    function _sendOwnerEther(Request storage self, address recipient)
         private returns (bool)
     {
         // Note! This does not do any checks since it is used in the execute function.
@@ -1431,7 +1431,7 @@ library RequestScheduleLib {
      * @param self The ExecutionWindow object.
      * @return The unsigned integer representation of `now` in appropiate temporal units.
      */
-    function getNow(ExecutionWindow storage self) 
+    function getNow(ExecutionWindow storage self)
         public view returns (uint)
     {
         return _getNow(self.temporalUnit);
@@ -1441,12 +1441,12 @@ library RequestScheduleLib {
      * @dev Internal function to return the `now` based on the appropiate temporal units.
      * @param _temporalUnit The assigned TemporalUnit to this transaction.
      */
-    function _getNow(TemporalUnit _temporalUnit) 
+    function _getNow(TemporalUnit _temporalUnit)
         internal view returns (uint)
     {
         if (_temporalUnit == TemporalUnit.Timestamp) {
             return block.timestamp;
-        } 
+        }
         if (_temporalUnit == TemporalUnit.Blocks) {
             return block.number;
         }
@@ -1458,13 +1458,13 @@ library RequestScheduleLib {
      * @dev The modifier that will be applied to the bounty value depending
      * on when a call was claimed.
      */
-    function computePaymentModifier(ExecutionWindow storage self) 
+    function computePaymentModifier(ExecutionWindow storage self)
         internal view returns (uint8)
-    {        
+    {
         uint paymentModifier = (getNow(self).sub(firstClaimBlock(self)))
             .mul(100)
-            .div(self.claimWindowSize); 
-        assert(paymentModifier <= 100); 
+            .div(self.claimWindowSize);
+        assert(paymentModifier <= 100);
 
         return uint8(paymentModifier);
     }
@@ -1491,7 +1491,7 @@ library RequestScheduleLib {
     /*
      *  Helper: computes the time when the request will be frozen until execution.
      */
-    function freezeStart(ExecutionWindow storage self) 
+    function freezeStart(ExecutionWindow storage self)
         internal view returns (uint)
     {
         return self.windowStart.sub(self.freezePeriod);
@@ -1500,7 +1500,7 @@ library RequestScheduleLib {
     /*
      *  Helper: computes the time when the request will be frozen until execution.
      */
-    function firstClaimBlock(ExecutionWindow storage self) 
+    function firstClaimBlock(ExecutionWindow storage self)
         internal view returns (uint)
     {
         return freezeStart(self).sub(self.claimWindowSize);
@@ -1518,7 +1518,7 @@ library RequestScheduleLib {
     /*
      *  Helper: Returns boolean if we are after the execution window.
      */
-    function isAfterWindow(ExecutionWindow storage self) 
+    function isAfterWindow(ExecutionWindow storage self)
         internal view returns (bool)
     {
         return getNow(self) > windowEnd(self);
@@ -1546,7 +1546,7 @@ library RequestScheduleLib {
     /*
      * @dev Helper: Returns boolean if we are inside the claim window.
      */
-    function inClaimWindow(ExecutionWindow storage self) 
+    function inClaimWindow(ExecutionWindow storage self)
         internal view returns (bool)
     {
         /// Checks that the firstClaimBlock is in the past or now.
@@ -1557,7 +1557,7 @@ library RequestScheduleLib {
     /*
      *  Helper: Returns boolean if we are before the freeze period.
      */
-    function isBeforeFreeze(ExecutionWindow storage self) 
+    function isBeforeFreeze(ExecutionWindow storage self)
         internal view returns (bool)
     {
         return getNow(self) < freezeStart(self);
@@ -1595,7 +1595,7 @@ library RequestScheduleLib {
      * @param _windowStart The time in the future which represents the start of the execution window.
      * @return True if the windowStart is at least freezePeriod amount of time in the future.
      */
-    function validateWindowStart(TemporalUnit _temporalUnit, uint _freezePeriod, uint _windowStart) 
+    function validateWindowStart(TemporalUnit _temporalUnit, uint _freezePeriod, uint _windowStart)
         public view returns (bool)
     {
         return _getNow(_temporalUnit).add(_freezePeriod) <= _windowStart;
@@ -1604,7 +1604,7 @@ library RequestScheduleLib {
     /*
      *  Validation: ensure that the temporal unit passed in is constrained to 0 or 1
      */
-    function validateTemporalUnit(uint _temporalUnitAsUInt) 
+    function validateTemporalUnit(uint _temporalUnitAsUInt)
         public pure returns (bool)
     {
         return (_temporalUnitAsUInt != uint(TemporalUnit.Null) &&
@@ -1630,9 +1630,9 @@ library ClaimLib {
      * @param paymentModifier The payment modifier.
      */
     function claim(
-        ClaimData storage self, 
+        ClaimData storage self,
         uint8 _paymentModifier
-    ) 
+    )
         internal returns (bool)
     {
         self.claimedBy = msg.sender;
@@ -1644,7 +1644,7 @@ library ClaimLib {
     /*
      * Helper: returns whether this request is claimed.
      */
-    function isClaimed(ClaimData storage self) 
+    function isClaimed(ClaimData storage self)
         internal view returns (bool)
     {
         return self.claimedBy != 0x0;
@@ -1656,7 +1656,7 @@ library ClaimLib {
      * @param self The Request.ClaimData
      * Called in RequestLib's `cancel()` and `refundClaimDeposit()`
      */
-    function refundDeposit(ClaimData storage self) 
+    function refundDeposit(ClaimData storage self)
         internal returns (bool)
     {
         // Check that the claim deposit is non-zero.
@@ -1676,7 +1676,7 @@ library ClaimLib {
  * Library containing the functionality for the bounty and fee payments.
  * - Bounty payments are the reward paid to the executing agent of transaction
  * requests.
- * - Fee payments are the cost of using a Scheduler to make transactions. It is 
+ * - Fee payments are the cost of using a Scheduler to make transactions. It is
  * a way for developers to monetize their work on the EAC.
  */
 library PaymentLib {
@@ -1710,9 +1710,9 @@ library PaymentLib {
     }
 
     /**
-     * @dev Computes the amount to send to the feeRecipient. 
+     * @dev Computes the amount to send to the feeRecipient.
      */
-    function getFee(PaymentData storage self) 
+    function getFee(PaymentData storage self)
         internal view returns (uint)
     {
         return self.fee;
@@ -1726,7 +1726,7 @@ library PaymentLib {
     {
         return self.bounty;
     }
- 
+
     /**
      * @dev Computes the amount to send to the address that fulfilled the request
      *       with an additional modifier. This is used when the call was claimed.
@@ -1745,7 +1745,7 @@ library PaymentLib {
      * @dev Send the feeOwed amount to the feeRecipient.
      * Note: The send is allowed to fail.
      */
-    function sendFee(PaymentData storage self) 
+    function sendFee(PaymentData storage self)
         internal returns (bool)
     {
         uint feeAmount = self.feeOwed;
@@ -1790,7 +1790,7 @@ library PaymentLib {
         uint _callValue,
         uint _gasPrice,
         uint _gasOverhead
-    ) 
+    )
         public pure returns (uint)
     {
         return _bounty
@@ -1831,7 +1831,7 @@ library IterTools {
      * @param _values A boolean array of length 6.
      * @return True if all values are true, False if _any_ are false.
      */
-    function all(bool[6] _values) 
+    function all(bool[6] _values)
         public pure returns (bool)
     {
         for (uint i = 0; i < _values.length; i++) {
@@ -1892,7 +1892,7 @@ contract CloneFactory {
 contract DelayedPayment {
 
     SchedulerInterface public scheduler;
-    
+
     address recipient;
     address owner;
     address public payment;
@@ -1912,7 +1912,7 @@ contract DelayedPayment {
         recipient = _recipient;
         owner = msg.sender;
         value = _value;
-   
+
         uint endowment = scheduler.computeEndowment(
             twentyGwei,
             twentyGwei,
@@ -1953,13 +1953,13 @@ contract DelayedPayment {
         public returns (bool)
     {
         require(block.number >= lockedUntil);
-        
+
         recipient.transfer(value);
         return true;
     }
 
     function collectRemaining()
-        public returns (bool) 
+        public returns (bool)
     {
         owner.transfer(address(this).balance);
     }
@@ -1968,7 +1968,7 @@ contract DelayedPayment {
 /// Example of using the Scheduler from a smart contract to delay a payment.
 contract RecurringPayment {
     SchedulerInterface public scheduler;
-    
+
     uint paymentInterval;
     uint paymentValue;
     uint lockedUntil;
@@ -1994,12 +1994,12 @@ contract RecurringPayment {
     }
 
     function ()
-        public payable 
+        public payable
     {
         if (msg.value > 0) { //this handles recieving remaining funds sent while scheduling (0.1 ether)
             return;
-        } 
-        
+        }
+
         process();
     }
 
@@ -2013,14 +2013,14 @@ contract RecurringPayment {
     {
         require(block.number >= lockedUntil);
         require(address(this).balance >= paymentValue);
-        
+
         recipient.transfer(paymentValue);
 
         emit PaymentExecuted(currentScheduledTransaction, recipient, paymentValue);
         return true;
     }
 
-    function schedule() 
+    function schedule()
         private returns (bool)
     {
         lockedUntil = block.number + paymentInterval;
@@ -2058,8 +2058,8 @@ contract RequestFactory is RequestFactoryInterface, CloneFactory, Pausable {
 
     constructor(
         address _transactionRequestCore
-    ) 
-        public 
+    )
+        public
     {
         require(_transactionRequestCore != 0x0);
 
@@ -2164,7 +2164,7 @@ contract RequestFactory is RequestFactoryInterface, CloneFactory, Pausable {
 
             // Try to return the ether sent with the message
             msg.sender.transfer(msg.value);
-            
+
             return 0x0;
         }
 
@@ -2243,4 +2243,15 @@ contract RequestFactory is RequestFactoryInterface, CloneFactory, Pausable {
         }
         return sign * int(windowStart - (windowStart % bucketSize));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

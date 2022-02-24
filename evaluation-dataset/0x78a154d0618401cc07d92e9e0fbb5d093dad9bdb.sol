@@ -1,10 +1,10 @@
 pragma solidity 0.5.7; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
 
@@ -15,15 +15,15 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 ██╔══██║██║╚██╗██║██║  ██║██╔══██║██║╚██╔╝██║██╔══██║██║╚██╗██║    ██║     ██║   ██║██║██║╚██╗██║
 ██║  ██║██║ ╚████║██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚████║    ╚██████╗╚██████╔╝██║██║ ╚████║
 ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝     ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝
-                                                                                                 
- 
-  
+
+
+
 // ----------------------------------------------------------------------------
 // 'ANM' Token contract with following features
 //      => ERC20 Compliance
 //      => Higher degree of control by owner - safeguard functionality
 //      => selfdestruct ability by owner
-//      => SafeMath implementation 
+//      => SafeMath implementation
 //      => Burnable and minting
 //      => air drop
 //
@@ -35,8 +35,8 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 // Copyright (c) 2019 onwards Andamaner.com. All rights reserved ( http://andamaner.com )
 // Contract designed by EtherAuthority ( https://EtherAuthority.io )
 // ----------------------------------------------------------------------------
-  
-*/ 
+
+*/
 
 //*******************************************************************//
 //------------------------ SafeMath Library -------------------------//
@@ -54,19 +54,19 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -78,30 +78,30 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
     contract owned {
         address payable public owner;
-        
+
          constructor () public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address payable newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
- 
+
+
 
 //***************************************************************//
 //------------------ ERC20 Standard Template -------------------//
 //***************************************************************//
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
@@ -110,17 +110,17 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
         uint256 public decimals = 18; // 18 decimals is the strongly suggested default, avoid changing it
         uint256 public totalSupply;
         bool public safeguard = false;  //putting safeguard on will halt all non-owner functions
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
@@ -131,15 +131,15 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             string memory tokenName,
             string memory tokenSymbol
         ) public {
-            
+
             totalSupply = initialSupply * (10**decimals);         // Update total supply with the decimal amount
-            balanceOf[msg.sender] = totalSupply;          
+            balanceOf[msg.sender] = totalSupply;
             name = tokenName;                                   // Set the name for display purposes
             symbol = tokenSymbol;                               // Set the symbol for display purposes
             emit Transfer(address(0), msg.sender, totalSupply);// Emit event to log this transaction
-            
+
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -161,7 +161,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -174,7 +174,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             _transfer(msg.sender, _to, _value);
             return true;
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -191,7 +191,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -206,8 +206,8 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
-    
+
+
         /**
          * Destroy tokens
          *
@@ -223,7 +223,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -242,36 +242,36 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             emit  Burn(_from, _value);
             return true;
         }
-        
+
     }
-    
+
 //****************************************************************************//
 //---------------------  ANM MAIN CODE STARTS HERE ---------------------//
 //****************************************************************************//
-    
+
     contract AndamanCoin is owned, TokenERC20 {
-        
+
 
         /*********************************/
         /* Code for the ERC20 ANM Token */
         /*********************************/
-    
+
         /* Public variables of the token */
         string private tokenName = "Andaman coin";
         string private tokenSymbol = "ANM";
         uint256 private initialSupply = 1000000000;  //1 Billion
-        
-        
-        
+
+
+
         /* Records for the fronzen accounts */
         mapping (address => bool) public frozenAccount;
-        
+
         /* This generates a public event on the blockchain that will notify clients */
         event FrozenFunds(address target, bool frozen);
-    
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
         constructor () TokenERC20(initialSupply, tokenName, tokenSymbol) public {
-            
+
         }
 
         /* Internal transfer, only can be called by this contract */
@@ -286,7 +286,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
             emit Transfer(_from, _to, _value);
         }
-        
+
         /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
         /// @param target Address to be frozen
         /// @param freeze either to freeze it or not
@@ -294,7 +294,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 frozenAccount[target] = freeze;
             emit  FrozenFunds(target, freeze);
         }
-        
+
         /// @notice Create `mintedAmount` tokens and send it to `target`
         /// @param target Address to receive the tokens
         /// @param mintedAmount the amount of tokens it will receive
@@ -304,22 +304,22 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             emit Transfer(address(0), target, mintedAmount);
         }
 
-          
+
         //Just in rare case, owner wants to transfer Ether from contract to owner address
         function manualWithdrawEther()onlyOwner public{
             address(owner).transfer(address(this).balance);
         }
-        
+
         function manualWithdrawTokens(uint256 tokenAmount) public onlyOwner{
             // no need for overflow checking as that will be done in transfer function
             _transfer(address(this), owner, tokenAmount);
         }
-        
+
         //selfdestruct function. just in case owner decided to destruct this contract.
         function destructContract()onlyOwner public{
             selfdestruct(owner);
         }
-        
+
         /**
          * Change safeguard status on or off
          *
@@ -331,14 +331,14 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 safeguard = true;
             }
             else{
-                safeguard = false;    
+                safeguard = false;
             }
         }
-        
+
         /********************************/
         /*    Code for the Air drop     */
         /********************************/
-        
+
         /**
          * Run an Air-Drop
          *
@@ -355,4 +355,10 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             }
         }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -779,9 +779,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "CFSS";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xf4e50aF1555c2e86867561a8115f354eFCB7A4c5;
-    
+
     uint constant START_TIME = 1522530000;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -842,9 +842,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -1085,7 +1085,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[7] memory weiRaisedStartsBoundaries = [uint(0),uint(0),uint(0),uint(0),uint(0),uint(0),uint(0)];
         uint[7] memory weiRaisedEndsBoundaries = [uint(198018199980000000000000),uint(198018199980000000000000),uint(198018199980000000000000),uint(198018199980000000000000),uint(198018199980000000000000),uint(198018199980000000000000),uint(198018199980000000000000)];
@@ -1100,9 +1100,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1111,12 +1111,12 @@ contract BonusableCrowdsale is Consts, Crowdsale {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , CappedCrowdsale
-    
+
 {
     event Initialized();
     bool public initialized = false;
@@ -1124,7 +1124,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token) public
         Crowdsale(START_TIME > now ? START_TIME : now, 1546290000, 50000 * TOKEN_DECIMAL_MULTIPLIER, 0xf4e50aF1555c2e86867561a8115f354eFCB7A4c5)
         CappedCrowdsale(198018199980000000000000)
-        
+
     {
         token = _token;
     }
@@ -1137,7 +1137,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
 
         transferOwnership(TARGET_USER);
 
@@ -1151,5 +1151,21 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         return MintableToken(0);
     }
 
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

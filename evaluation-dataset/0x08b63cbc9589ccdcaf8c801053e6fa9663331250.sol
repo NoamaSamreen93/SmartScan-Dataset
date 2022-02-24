@@ -220,7 +220,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 
     if (ethRaised + contributionAmount >= minCap && minCap > ethRaised) {
       MinCapReached(block.timestamp);
-    } 
+    }
 
     if (contributorList[_contributor].contributionAmount == 0) {                // Check if contributor has already contributed
       contributorList[_contributor].contributionAmount = contributionAmount;    // Set their contribution
@@ -235,7 +235,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 
 	  if (returnAmount != 0) {
       _contributor.transfer(returnAmount);                                      // Return overflow of ether
-    } 
+    }
   }
 
   //
@@ -363,7 +363,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 }
 
 contract DataFundSeedCrowdsale is SeedCrowdsaleContract {
-  
+
   function DataFundSeedCrowdsale() {
 
     presaleStartTime = 1512032400;
@@ -374,4 +374,15 @@ contract DataFundSeedCrowdsale is SeedCrowdsaleContract {
     maxP1Cap = 534 ether;
     maxCap = 594 ether;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

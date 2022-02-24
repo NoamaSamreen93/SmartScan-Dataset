@@ -8,12 +8,12 @@ pragma solidity 0.4.12;
  * ║ ╔═╝   ║ ║ ║ ║     ║   ╚╝   ║       ║ ║    ║ ║ ║ ║ ║ ╔╗ ╚╗ ║ ╔═══╝  ║ ║╚╗╚╝ ║
  * ║ ║     ║ ║ ║ ╚═══╣ ║ ╔╗  ╔╗ ║       ║ ║    ║ ╚═╝ ║ ║ ║╚╗ ║ ║ ╚════╗ ║ ║ ╚╗  ║
  * ╩═╩     ╩═╩ ╩═════╝ ╩═╝╚══╝╚═╩       ╩═╩    ╚═════╝ ╩═╩ ╚═╩ ╚══════╝ ╩═╩  ╚══╝
- * 
+ *
  * ╔═╗╦ ╦  ╔╦╗  ╔═╗ ╔═╗╔═╗╔═╗  ┌─┐┬─┐┌─┐┌─┐┌─┐┌┐┌┌┬┐┌─┐
  * ╠╣ ║ ║  ║║║  ╠═╩╗╠═╣╚═╗╠╣   ├─┘├┬┘├┤ └─┐├┤ │││ │ └─┐
- * ╩  ╩ ╚═╝╩ ╩  ╩══╝╩ ╩╚═╝╚═╝  ┴  ┴└─└─┘└─┘└─┘┘└┘ ┴ └─┘ 
+ * ╩  ╩ ╚═╝╩ ╩  ╩══╝╩ ╩╚═╝╚═╝  ┴  ┴└─└─┘└─┘└─┘┘└┘ ┴ └─┘
  */
- 
+
 contract owned {
     address public owner;
 
@@ -74,7 +74,7 @@ contract token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -101,7 +101,7 @@ contract token {
 contract FILMToken is owned, token {
 
     mapping (address => bool) public frozenAccount;
-    bool frozen = false; 
+    bool frozen = false;
     event FrozenFunds(address target, bool frozen);
 
     function FILMToken(
@@ -164,21 +164,32 @@ contract FILMToken is owned, token {
 
   event Unfreeze ();
 
-    function burn(uint256 _value) public returns (bool success) {        
+    function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(msg.sender, _value);        
+        Burn(msg.sender, _value);
         return true;
     }
-    
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {        
+
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(_from, _value);        
+        Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

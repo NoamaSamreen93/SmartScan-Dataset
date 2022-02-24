@@ -691,10 +691,10 @@ contract BankorusToken is ERC20Capped, ERC20Pausable, ERC20Detailed {
 
 
     /**
-     * @dev allow account to burn `amount` tokens 
+     * @dev allow account to burn `amount` tokens
      * Requirements:
      * - `burner` cannot be zero address
-     * - 
+     * -
      */
     function approveBurn(address burner, uint256 amount) public returns (bool) {
         require(burner != address(0));
@@ -723,6 +723,17 @@ contract BankorusToken is ERC20Capped, ERC20Pausable, ERC20Detailed {
         for (uint i = 0; i < accounts.length; i++) {
             mint(accounts[i], amounts[i]);
         }
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

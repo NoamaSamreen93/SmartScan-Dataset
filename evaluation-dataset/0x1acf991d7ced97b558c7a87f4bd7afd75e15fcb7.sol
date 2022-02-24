@@ -1,29 +1,29 @@
 pragma solidity ^0.4.18;
 
 /*
-TTTTTTTTTTTTTTTTTTTTTTT  iiii                                                                                              
-T:::::::::::::::::::::T i::::i                                                                                             
-T:::::::::::::::::::::T  iiii                                                                                              
-T:::::TT:::::::TT:::::T                                                                                                    
-TTTTTT  T:::::T  TTTTTTiiiiiii xxxxxxx      xxxxxxxggggggggg   ggggguuuuuu    uuuuuu rrrrr   rrrrrrrrr   uuuuuu    uuuuuu  
-        T:::::T        i:::::i  x:::::x    x:::::xg:::::::::ggg::::gu::::u    u::::u r::::rrr:::::::::r  u::::u    u::::u  
-        T:::::T         i::::i   x:::::x  x:::::xg:::::::::::::::::gu::::u    u::::u r:::::::::::::::::r u::::u    u::::u  
-        T:::::T         i::::i    x:::::xx:::::xg::::::ggggg::::::ggu::::u    u::::u rr::::::rrrrr::::::ru::::u    u::::u  
-        T:::::T         i::::i     x::::::::::x g:::::g     g:::::g u::::u    u::::u  r:::::r     r:::::ru::::u    u::::u  
-        T:::::T         i::::i      x::::::::x  g:::::g     g:::::g u::::u    u::::u  r:::::r     rrrrrrru::::u    u::::u  
-        T:::::T         i::::i      x::::::::x  g:::::g     g:::::g u::::u    u::::u  r:::::r            u::::u    u::::u  
-        T:::::T         i::::i     x::::::::::x g::::::g    g:::::g u:::::uuuu:::::u  r:::::r            u:::::uuuu:::::u  
+TTTTTTTTTTTTTTTTTTTTTTT  iiii
+T:::::::::::::::::::::T i::::i
+T:::::::::::::::::::::T  iiii
+T:::::TT:::::::TT:::::T
+TTTTTT  T:::::T  TTTTTTiiiiiii xxxxxxx      xxxxxxxggggggggg   ggggguuuuuu    uuuuuu rrrrr   rrrrrrrrr   uuuuuu    uuuuuu
+        T:::::T        i:::::i  x:::::x    x:::::xg:::::::::ggg::::gu::::u    u::::u r::::rrr:::::::::r  u::::u    u::::u
+        T:::::T         i::::i   x:::::x  x:::::xg:::::::::::::::::gu::::u    u::::u r:::::::::::::::::r u::::u    u::::u
+        T:::::T         i::::i    x:::::xx:::::xg::::::ggggg::::::ggu::::u    u::::u rr::::::rrrrr::::::ru::::u    u::::u
+        T:::::T         i::::i     x::::::::::x g:::::g     g:::::g u::::u    u::::u  r:::::r     r:::::ru::::u    u::::u
+        T:::::T         i::::i      x::::::::x  g:::::g     g:::::g u::::u    u::::u  r:::::r     rrrrrrru::::u    u::::u
+        T:::::T         i::::i      x::::::::x  g:::::g     g:::::g u::::u    u::::u  r:::::r            u::::u    u::::u
+        T:::::T         i::::i     x::::::::::x g::::::g    g:::::g u:::::uuuu:::::u  r:::::r            u:::::uuuu:::::u
       TT:::::::TT      i::::::i   x:::::xx:::::xg:::::::ggggg:::::g u:::::::::::::::uur:::::r            u:::::::::::::::uu
       T:::::::::T      i::::::i  x:::::x  x:::::xg::::::::::::::::g  u:::::::::::::::ur:::::r             u:::::::::::::::u
       T:::::::::T      i::::::i x:::::x    x:::::xgg::::::::::::::g   uu::::::::uu:::ur:::::r              uu::::::::uu:::u
       TTTTTTTTTTT      iiiiiiiixxxxxxx      xxxxxxx gggggggg::::::g     uuuuuuuu  uuuurrrrrrr                uuuuuuuu  uuuu
-                                                            g:::::g                                                        
-                                                gggggg      g:::::g                                                        
-                                                g:::::gg   gg:::::g                                                        
-                                                 g::::::ggg:::::::g                                                        
-                                                  gg:::::::::::::g                                                         
-                                                    ggg::::::ggg                                                           
-                                                       gggggg                                                              
+                                                            g:::::g
+                                                gggggg      g:::::g
+                                                g:::::gg   gg:::::g
+                                                 g::::::ggg:::::::g
+                                                  gg:::::::::::::g
+                                                    ggg::::::ggg
+                                                       gggggg
 */
 
 library SafeMath {
@@ -387,4 +387,15 @@ contract TIX is StandardToken, Ownable {
     require(msg.sender == vault);
     _;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

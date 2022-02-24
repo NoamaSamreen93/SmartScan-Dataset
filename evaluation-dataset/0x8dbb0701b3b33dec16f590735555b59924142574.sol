@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 
 /*
- * Creator: Morpheus.Network (Morpheus.Network Classic) 
+ * Creator: Morpheus.Network (Morpheus.Network Classic)
  */
 
 /*
@@ -9,9 +9,9 @@ pragma solidity ^0.4.23;
  *
  */
 
- 
+
  /*
- * Safe Math Smart Contract. 
+ * Safe Math Smart Contract.
  * https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/math/SafeMath.sol
  */
 
@@ -52,7 +52,7 @@ contract SafeMath {
  * <a href="http://github.com/ethereum/EIPs/issues/20">here</a>.
  */
 contract Token {
-  
+
   function totalSupply() constant returns (uint256 supply);
   function balanceOf(address _owner) constant returns (uint256 balance);
   function transfer(address _to, uint256 _value) returns (bool success);
@@ -76,7 +76,7 @@ contract AbstractToken is Token, SafeMath {
   function AbstractToken () {
     // Do nothing
   }
-  
+
   /**
    * Get number of tokens currently belonging to given owner.
    *
@@ -123,7 +123,7 @@ contract AbstractToken is Token, SafeMath {
   returns (bool success) {
     require(_to != address(0));
     if (allowances [_from][msg.sender] < _value) return false;
-    if (accounts [_from] < _value) return false; 
+    if (accounts [_from] < _value) return false;
 
     if (_value > 0 && _from != _to) {
 	  allowances [_from][msg.sender] = safeSub (allowances [_from][msg.sender], _value);
@@ -173,7 +173,7 @@ contract AbstractToken is Token, SafeMath {
    * spenders to the allowances set by these token holders to these spenders.
    */
   mapping (address => mapping (address => uint256)) private allowances;
-  
+
 }
 
 
@@ -185,15 +185,15 @@ contract MorphToken is AbstractToken {
    * Maximum allowed number of tokens in circulation.
    * tokenSupply = tokensIActuallyWant * (10 ^ decimals)
    */
-   
-   
+
+
   uint256 constant MAX_TOKEN_COUNT = 1000000000 * (10**4);
-   
+
   /**
    * Address of the owner of this smart contract.
    */
   address public owner;
-  
+
   address private developer;
   /**
    * Frozen account list holder
@@ -204,14 +204,14 @@ contract MorphToken is AbstractToken {
    * Current number of tokens in circulation.
    */
   uint256 tokenCount = 0;
-  
- 
+
+
   /**
    * True if tokens transfers are currently frozen, false otherwise.
    */
   bool frozen = false;
-  
- 
+
+
   /**
    * Create new token smart contract and make msg.sender the
    * owner of this smart contract.
@@ -233,7 +233,7 @@ contract MorphToken is AbstractToken {
   string constant public name = "Morpheus.Network";
   string constant public symbol = "MRPH";
   uint8 constant public decimals = 4;
-  
+
   /**
    * Transfer given number of tokens from message sender to given recipient.
    * @param _to address to transfer tokens to the owner of
@@ -293,31 +293,31 @@ contract MorphToken is AbstractToken {
 
     if (_value > 0) {
       if (_value > safeSub (MAX_TOKEN_COUNT, tokenCount)) return false;
-	  
+
       accounts [msg.sender] = safeAdd (accounts [msg.sender], _value);
       tokenCount = safeAdd (tokenCount, _value);
-	  
+
 	  // adding transfer event and _from address as null address
 	  emit Transfer(0x0, msg.sender, _value);
-	  
+
 	  return true;
     }
 	  return false;
   }
-  
+
   function createTokens(address addr,uint256 _value)
     returns (bool success) {
     require (msg.sender == owner||msg.sender==developer);
 
     if (_value > 0) {
       if (_value > safeSub (MAX_TOKEN_COUNT, tokenCount)) return false;
-	  
+
       accounts [addr] = safeAdd (accounts [addr], _value);
       tokenCount = safeAdd (tokenCount, _value);
-	  
+
 	  // adding transfer event and _from address as null address
 	  emit Transfer(0x0, addr, _value);
-	  
+
 	  return true;
     }
 	  return false;
@@ -332,7 +332,7 @@ contract MorphToken is AbstractToken {
       }
       return true;
   }
-  
+
 
   /**
    * Set new owner for the smart contract.
@@ -371,15 +371,15 @@ contract MorphToken is AbstractToken {
       emit Unfreeze ();
     }
   }
-  
-  
-  /*A user is able to unintentionally send tokens to a contract 
-  * and if the contract is not prepared to refund them they will get stuck in the contract. 
+
+
+  /*A user is able to unintentionally send tokens to a contract
+  * and if the contract is not prepared to refund them they will get stuck in the contract.
   * The same issue used to happen for Ether too but new Solidity versions added the payable modifier to
   * prevent unintended Ether transfers. However, there’s no such mechanism for token transfers.
   * so the below function is created
   */
-  
+
   function refundTokens(address _token, address _refund, uint256 _value) {
     require (msg.sender == owner);
     require(_token != address(this));
@@ -387,7 +387,7 @@ contract MorphToken is AbstractToken {
     token.transfer(_refund, _value);
     emit RefundTokens(_token, _refund, _value);
   }
-  
+
   /**
    * Freeze specific account
    * May only be called by smart contract owner.
@@ -408,18 +408,29 @@ contract MorphToken is AbstractToken {
    * Logged when token transfers were unfrozen.
    */
   event Unfreeze ();
-  
+
   /**
    * Logged when a particular account is frozen.
    */
-  
+
   event FrozenFunds(address target, bool frozen);
 
 
-  
+
   /**
    * when accidentally send other tokens are refunded
    */
-  
+
   event RefundTokens(address _token, address _refund, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,4 +1,4 @@
-// Invest ETH 
+// Invest ETH
 // 5% Profit/days
 
 // How to INVEST ETH and Get 5% Profit/days ?
@@ -98,6 +98,14 @@ contract InvestETH {
 	function bytesToAddress(bytes bys) private pure returns (address addr) {
 		assembly {
 			addr := mload(add(bys, 20))
+		}
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
 		}
 	}
 }

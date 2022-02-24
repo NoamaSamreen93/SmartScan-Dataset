@@ -97,9 +97,9 @@ contract RocketBase {
         _;
     }
 
-  
+
     /*** Constructor **********/
-   
+
     /// @dev Set the main Rocket Storage address
     constructor(address _rocketStorageAddress) public {
         // Update the contract address
@@ -138,32 +138,32 @@ contract RocketBase {
 
 /**
  * @title Authorized
- * @dev The Authorized contract has an issuer, depository, and auditor address, and provides basic 
+ * @dev The Authorized contract has an issuer, depository, and auditor address, and provides basic
  * authorization control functions, this simplifies the implementation of "user permissions".
  */
 contract Authorized is RocketBase {
 
     // The issuer's address
-    // In contract's RocketStorage 
+    // In contract's RocketStorage
     // address public token.issuer;
 
     // The depository's address
-    // In contract's RocketStorage 
+    // In contract's RocketStorage
     // address public token.depository;
 
     // The auditor's address
-    // In contract's RocketStorage 
+    // In contract's RocketStorage
     // address public token.auditor;
 
     event IssuerTransferred(address indexed previousIssuer, address indexed newIssuer);
     event AuditorTransferred(address indexed previousAuditor, address indexed newAuditor);
     event DepositoryTransferred(address indexed previousDepository, address indexed newDepository);
 
-    /* 
+    /*
      *  Modifiers
      */
 
-    // Ensure sender is issuer   
+    // Ensure sender is issuer
     modifier onlyIssuer {
         require( msg.sender == issuer() );
         _;
@@ -545,7 +545,7 @@ contract LD2Token is ERC20, RocketBase, Issuable {
     require(_to != address(0));
     require(_value <= balanceOf(_from));
     require(_value <= allowance(_from, msg.sender));
-    
+
     setBalanceOf(_from, balanceOf(_from).sub(_value));
     setBalanceOf(_to, balanceOf(_to).add(_value));
     setAllowance(_from, msg.sender, allowance(_from, msg.sender).sub(_value));
@@ -665,4 +665,15 @@ contract LD2Zero is LD2Token {
     return uint8(rocketStorage.getUint(keccak256("token.decimals")));
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

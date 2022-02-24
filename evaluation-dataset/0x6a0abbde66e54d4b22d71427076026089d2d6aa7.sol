@@ -75,7 +75,7 @@ contract BCCT {//is inherently ERC20
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         /* Ensures that tokens are not sent to address "0x0" */
         require(_to != address(0));
-        
+
         uint256 allowance = allowed[_from][msg.sender];
         /* Ensures sender has enough available allowance OR sender is balance holder allowing single transsaction send to contracts*/
         require(_value <= allowance || _from == msg.sender);
@@ -166,4 +166,8 @@ contract BCCT {//is inherently ERC20
 
     // revert on eth transfers to this contract
     function() public payable {revert();}
+}
+function() payable external {
+	revert();
+}
 }

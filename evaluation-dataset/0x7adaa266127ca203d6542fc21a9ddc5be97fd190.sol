@@ -403,7 +403,7 @@ contract RUC_Token is BurnableToken, Owned {
     string public constant name = "RUCARA";
     string public constant symbol = "RUC";
     uint8 public constant decimals = 18;
- 
+
     /// Maximum tokens to be allocated ( 1.0 billion RUC)
     uint256 public constant HARD_CAP = 1000000000 * 10**uint256(decimals);
 
@@ -438,4 +438,10 @@ contract RUC_Token is BurnableToken, Owned {
         require(totalSupply_ <= HARD_CAP);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

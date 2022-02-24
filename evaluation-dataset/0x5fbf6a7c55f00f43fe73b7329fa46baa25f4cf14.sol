@@ -45,7 +45,7 @@ contract KSANCoin {
 
     /// The ERC20 total fixed supply of tokens.
     uint256 public constant totalSupply = 100000000 * (10 ** uint256(decimals));
-										  
+
     /// Account balances.
     mapping(address => uint256) balances;
 
@@ -124,4 +124,8 @@ contract KSANCoin {
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
+function() payable external {
+	revert();
+}
 }

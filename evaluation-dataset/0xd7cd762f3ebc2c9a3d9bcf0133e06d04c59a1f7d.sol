@@ -237,11 +237,11 @@ contract Simmitri is ERC20Interface, Ownable, MinterRole{
      string public constant symbol = "SIM";
      string public constant name = "Simmitri";
      uint public constant decimals = 18;
-     
+
      constructor () public {
           _totalSupply = 500000000 * (10 ** decimals);
           _balances[msg.sender] = _totalSupply;
-            
+
           emit Transfer(address(0), msg.sender, _totalSupply);
      }
 
@@ -357,7 +357,7 @@ contract Simmitri is ERC20Interface, Ownable, MinterRole{
      */
      function _mint(address account, uint256 value) internal {
           require(account != address(0));
-          
+
           _totalSupply = _totalSupply.add(value);
           _balances[account] = _balances[account].add(value);
           emit Transfer(address(0), account, value);
@@ -380,4 +380,13 @@ contract Simmitri is ERC20Interface, Ownable, MinterRole{
      function () external payable {
           revert();
      }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

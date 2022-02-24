@@ -186,7 +186,7 @@ contract Adminable {
 contract Authorizable is Adminable {
 
     address public authorizedAddress;
-    
+
     modifier onlyAuthorized() {
         require(msg.sender == authorizedAddress);
         _;
@@ -203,10 +203,10 @@ contract Authorizable is Adminable {
 /**
     @title Soar Storage
     @author Marek Tlacbaba (marek@soar.earth)
-    @dev This smart contract behave as simple storage and can be 
+    @dev This smart contract behave as simple storage and can be
     accessed only by authorized caller who is responsible for any
-    checks and validation. The authorized caller can updated by 
-    admins so it allows to update application logic 
+    checks and validation. The authorized caller can updated by
+    admins so it allows to update application logic
     and keeping data and events untouched.
 */
 
@@ -215,7 +215,7 @@ contract Authorizable is Adminable {
 contract SoarStorage is Authorizable {
 
     /**
-    Status: 
+    Status:
         0 - unknown
         1 - created
         2 - updated
@@ -237,22 +237,22 @@ contract SoarStorage is Authorizable {
         bytes32 filehash,
         address indexed owner,
         address indexed sponsor,
-        string previewUrl, 
-        string url, 
+        string previewUrl,
+        string url,
         string pointWKT,
-        bytes12 geohash, 
+        bytes12 geohash,
         string metadata
     );
 
     event ListingUpdated (
         bytes32 filehash,
-        address indexed owner, 
+        address indexed owner,
         address indexed sponsor,
-        string previewUrl, 
-        string url, 
+        string previewUrl,
+        string url,
         string pointWKT,
-        bytes12 geohash, 
-        string metadata 
+        bytes12 geohash,
+        string metadata
     );
 
     event ListingDeleted (
@@ -262,26 +262,26 @@ contract SoarStorage is Authorizable {
     );
 
     event Sale(
-        address indexed buyer, 
-        bytes32 id, 
-        address indexed owner, 
+        address indexed buyer,
+        bytes32 id,
+        address indexed owner,
         address sponsor,
         bytes32 indexed filehash,
-        uint price 
+        uint price
     );
 
     function putListing (
         bytes32 _filehash,
         address _owner,
         address _sponsor,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
         string memory _metadata
-    ) 
-        public 
-        onlyAuthorized 
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].owner = _owner;
         listings[_filehash].sponsor = _sponsor;
@@ -289,13 +289,13 @@ contract SoarStorage is Authorizable {
         listings[_filehash].status = 1;
         counter++;
         emit Listing(
-            _filehash, 
+            _filehash,
             _owner,
-            _sponsor, 
-            _previewUrl, 
-            _url, 
-            _pointWKT, 
-            _geohash, 
+            _sponsor,
+            _previewUrl,
+            _url,
+            _pointWKT,
+            _geohash,
             _metadata
         );
     }
@@ -304,34 +304,34 @@ contract SoarStorage is Authorizable {
         bytes32 _filehash,
         address _owner,
         address _sponsor,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
-        string memory _metadata 
-    ) 
-        public 
-        onlyAuthorized 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
+        string memory _metadata
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].geohash = _geohash;
         listings[_filehash].status = 2;
         emit ListingUpdated(
-            _filehash, 
+            _filehash,
             _owner,
-            _sponsor, 
-            _previewUrl, 
-            _url, 
-            _pointWKT, 
-            _geohash, 
+            _sponsor,
+            _previewUrl,
+            _url,
+            _pointWKT,
+            _geohash,
             _metadata
         );
     }
 
     function deleteListing(
-        bytes32 _filehash 
+        bytes32 _filehash
     )
-        public 
-        onlyAuthorized 
+        public
+        onlyAuthorized
     {
         listings[_filehash].status = 3;
         counter--;
@@ -341,18 +341,18 @@ contract SoarStorage is Authorizable {
     function putSale (
         address _buyer,
         bytes32 _id,
-        bytes32 _filehash, 
+        bytes32 _filehash,
         uint256 _price
-    ) 
-        public 
-        onlyAuthorized 
+    )
+        public
+        onlyAuthorized
     {
         listings[_filehash].sales[_buyer][_id] = _price;
         listings[_filehash].salesCount++;
         emit Sale(_buyer, _id, listings[_filehash].owner, listings[_filehash].sponsor, _filehash, _price);
     }
 
-    function getListingDetails(bytes32 _filehash, address _user, bytes32 _id) 
+    function getListingDetails(bytes32 _filehash, address _user, bytes32 _id)
         public view
         returns (
             address owner_,
@@ -377,10 +377,10 @@ contract SoarStorage is Authorizable {
     @author Marek Tlacbaba (marek@soar.earth)
     @dev Main Soar smart contract with bussiness logic composing
     all other parts together and it is by design upgradable. When all
-    development is finished then all admins can be removed and no more 
+    development is finished then all admins can be removed and no more
     upgrade will be allowed.
 */
- 
+
 contract Soar is Pausable, Adminable {
 
     // attributes
@@ -421,7 +421,7 @@ contract Soar is Pausable, Adminable {
         require(sponsor == _sponsor, "Incorrect sponsor");
         _;
     }
-    
+
     constructor() public {}
 
     /**
@@ -431,11 +431,11 @@ contract Soar is Pausable, Adminable {
         address _sponsor,
         address _owner,
         bytes32 _filehash,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
-        string memory _metadata) 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
+        string memory _metadata)
         public
         whenNotPaused
         listingNotExistOrDeleted(_filehash)
@@ -451,11 +451,11 @@ contract Soar is Pausable, Adminable {
         address _sponsor,
         address _owner,
         bytes32 _filehash,
-        string memory _previewUrl, 
-        string memory _url, 
-        string memory _pointWKT, 
-        bytes12 _geohash, 
-        string memory _metadata) 
+        string memory _previewUrl,
+        string memory _url,
+        string memory _pointWKT,
+        bytes12 _geohash,
+        string memory _metadata)
         public
         whenNotPaused
         onlySponsorListingOwner(_filehash, _sponsor)
@@ -468,7 +468,7 @@ contract Soar is Pausable, Adminable {
     */
     function sponsorDeleteListing(
         address _sponsor,
-        bytes32 _filehash) 
+        bytes32 _filehash)
         public
         whenNotPaused
         onlySponsorListingOwner(_filehash, _sponsor)
@@ -476,10 +476,10 @@ contract Soar is Pausable, Adminable {
         soarStorageContract.deleteListing(_filehash);
     }
 
-    function listingExist(bytes32 _filehash) 
+    function listingExist(bytes32 _filehash)
         public view
-        whenNotPaused  
-        returns (bool exists_) 
+        whenNotPaused
+        returns (bool exists_)
     {
         (,,,uint8 status,) = soarStorageContract.getListingDetails(_filehash, msg.sender, emptyUserId);
         exists_ = (status == 1 || status == 2);
@@ -489,38 +489,49 @@ contract Soar is Pausable, Adminable {
     ADMIN FUNCTIONS
      */
 
-    function addSponsorAdmin(address _sponsor, address _admin) 
-        public 
+    function addSponsorAdmin(address _sponsor, address _admin)
+        public
         whenNotPaused
-        onlyAdmin 
+        onlyAdmin
     {
         sponsors[_sponsor][_admin] = true;
         emit SponsorAdminAdded(_sponsor, _admin);
     }
 
-    function removeSponsorAdmin(address _sponsor, address _admin) 
+    function removeSponsorAdmin(address _sponsor, address _admin)
         public
         whenNotPaused
-        onlyAdmin 
+        onlyAdmin
     {
         sponsors[_sponsor][_admin] = false;
         emit SponsorAdminRemoved(_sponsor, _admin);
     }
 
-    function isSponsorAdmin(address _sponsor) 
+    function isSponsorAdmin(address _sponsor)
         public view
         returns (bool isSponsorAdmin_)
     {
         isSponsorAdmin_ = sponsors[_sponsor][msg.sender] == true;
     }
 
-    function setSoarStorageContract(address _address) 
+    function setSoarStorageContract(address _address)
         public
-        whenNotPaused 
-        onlyAdmin 
+        whenNotPaused
+        onlyAdmin
     {
         soarStorageContract = SoarStorage(_address);
         soarStorageAddress = _address;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

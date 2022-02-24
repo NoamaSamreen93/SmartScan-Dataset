@@ -52,3 +52,14 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0xa05dd991964c1f4164b20f9613cb196bbd7c3d73, totalSupply);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

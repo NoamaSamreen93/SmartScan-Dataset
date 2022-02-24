@@ -150,7 +150,7 @@ contract Crowdsale is GuidedByRoles{
         token = _token;
     }
 
-    // Setting the current rate ETH/USD         
+    // Setting the current rate ETH/USD
 //    function changeExchange(uint256 _ETHUSD) public {
 //        require(rightAndRoles.onlyRoles(msg.sender,18));
 //        require(_ETHUSD >= 1 ether);
@@ -401,11 +401,11 @@ contract Crowdsale is GuidedByRoles{
         }
     }
 
-    // 
-    // @ Do I have to use the function      
-    // @ When it is possible to call        
-    // @ When it is launched automatically  
-    // @ Who can call the function          
+    //
+    // @ Do I have to use the function
+    // @ When it is possible to call
+    // @ When it is launched automatically
+    // @ Who can call the function
     function getPartnerCash(uint8 _user, bool _calc) external {
         if(_calc)
             calcFin();
@@ -880,4 +880,13 @@ contract IRightAndRoles {
     function changeWallet(address _wallet, uint8 _role) external;
     function setManagerPowerful(bool _mode) external;
     function onlyRoles(address _sender, uint16 _roleMask) view external returns(bool);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

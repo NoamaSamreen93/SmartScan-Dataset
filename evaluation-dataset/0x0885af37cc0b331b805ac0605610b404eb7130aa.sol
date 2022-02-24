@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 /**
- * (E)t)h)e)x) Jackpot Contract 
+ * (E)t)h)e)x) Jackpot Contract
  *  This smart-contract is the part of Ethex Lottery fair game.
- *  See latest version at https://github.com/ethex-bet/ethex-lottery 
+ *  See latest version at https://github.com/ethex-bet/ethex-lottery
  *  http://ethex.bet
  */
 
@@ -40,24 +40,24 @@ contract EthexJackpot {
     uint256 private seasonalNumberEndPrev;
     address public lotoAddress;
     address payable private owner;
-    
+
     event Jackpot (
         uint256 number,
         uint256 count,
         uint256 amount,
         byte jackpotType
     );
-    
+
     event Ticket (
         bytes16 indexed id,
         uint256 number
     );
-    
+
     uint256 constant DAILY = 5000;
     uint256 constant WEEKLY = 35000;
     uint256 constant MONTHLY = 140000;
     uint256 constant SEASONAL = 420000;
-    
+
     constructor() public payable {
         owner = msg.sender;
         dailyStart = block.number / DAILY * DAILY;
@@ -78,12 +78,12 @@ contract EthexJackpot {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyLoto {
         require(msg.sender == lotoAddress, "Loto only");
         _;
     }
-    
+
     function migrate(address payable newContract) external onlyOwner {
         newContract.transfer(address(this).balance);
     }
@@ -110,11 +110,11 @@ contract EthexJackpot {
         tickets[number] = gamer;
         emit Ticket(id, number);
     }
-    
+
     function setLoto(address loto) external onlyOwner {
         lotoAddress = loto;
     }
-    
+
     function payIn() external payable {
         uint256 amount = msg.value / 4;
         dailyAmount += amount;
@@ -122,7 +122,7 @@ contract EthexJackpot {
         monthlyAmount += amount;
         seasonalAmount += amount;
     }
-    
+
     function settleJackpot() external {
         if (block.number >= dailyEnd) {
             setDaily();
@@ -136,12 +136,12 @@ contract EthexJackpot {
         if (block.number >= seasonalEnd) {
             setSeasonal();
         }
-        
+
         if (block.number == dailyStart)
             return;
-        
+
         uint48 modulo = uint48(bytes6(blockhash(dailyStart) << 29));
-        
+
         uint256 dailyPayAmount;
         uint256 weeklyPayAmount;
         uint256 monthlyPayAmount;
@@ -151,7 +151,7 @@ contract EthexJackpot {
         uint256 monthlyWin;
         uint256 seasonalWin;
         if (dailyProcessed == false) {
-            dailyPayAmount = dailyAmount; 
+            dailyPayAmount = dailyAmount;
             dailyAmount = 0;
             dailyProcessed = true;
             dailyWin = getNumber(dailyNumberStartPrev, dailyNumberEndPrev, modulo);
@@ -187,7 +187,7 @@ contract EthexJackpot {
         if (seasonalPayAmount > 0)
             tickets[seasonalWin].transfer(seasonalPayAmount);
     }
-    
+
     function setDaily() private {
         dailyProcessed = dailyNumberEndPrev == numberEnd;
         dailyStart = dailyEnd;
@@ -195,7 +195,7 @@ contract EthexJackpot {
         dailyNumberStartPrev = dailyNumberStart;
         dailyNumberEndPrev = numberEnd;
     }
-    
+
     function setWeekly() private {
         weeklyProcessed = weeklyNumberEndPrev == numberEnd;
         weeklyStart = weeklyEnd;
@@ -203,7 +203,7 @@ contract EthexJackpot {
         weeklyNumberStartPrev = weeklyNumberStart;
         weeklyNumberEndPrev = numberEnd;
     }
-    
+
     function setMonthly() private {
         monthlyProcessed = monthlyNumberEndPrev == numberEnd;
         monthlyStart = monthlyEnd;
@@ -211,7 +211,7 @@ contract EthexJackpot {
         monthlyNumberStartPrev = monthlyNumberStart;
         monthlyNumberEndPrev = numberEnd;
     }
-    
+
     function setSeasonal() private {
         seasonalProcessed = seasonalNumberEndPrev == numberEnd;
         seasonalStart = seasonalEnd;
@@ -219,8 +219,19 @@ contract EthexJackpot {
         seasonalNumberStartPrev = seasonalNumberStart;
         seasonalNumberEndPrev = numberEnd;
     }
-    
+
     function getNumber(uint256 startNumber, uint256 endNumber, uint48 modulo) pure private returns (uint256) {
         return startNumber + modulo % (endNumber - startNumber + 1);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

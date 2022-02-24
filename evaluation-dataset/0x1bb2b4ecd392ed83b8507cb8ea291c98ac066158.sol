@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 Name         : Trixchain
 Symbol       : TRIX
 Total Supply : 1.000.000.000.000 TRIX
-Decimals     : 18 
+Decimals     : 18
 Contract     : 0x1bb2b4ecd392ed83b8507cb8ea291c98ac066158
 
 Chat Group   : https://t.me/joinchat/Jc2Vrkb0C11mxRmFnVploQ
@@ -15,30 +15,30 @@ TOKENSALE DETAILS
 Total Supply ---------: 1.000.000.000.000 TRIX
 Tokensale             : 250.000.000.000 TRIX
 Future Project -------: 250.000.000.000 TRIX
-Foundation            : 75.000.000.000 TRIX 
-Team -----------------: 25.000.000.000 TRIX 
-Monthly Holder Reward : 400.000.000.000 TRIX 
+Foundation            : 75.000.000.000 TRIX
+Team -----------------: 25.000.000.000 TRIX
+Monthly Holder Reward : 400.000.000.000 TRIX
 
-*With Our Mecanism , All TRIX Holder will get monthly reward for more than 20 Years* 
-After Tokensale Finished TRIX will list on exchange, our first target TRIX will list on Okex , Hotbit , Cryptopia , Mercatox , idex 
+*With Our Mecanism , All TRIX Holder will get monthly reward for more than 20 Years*
+After Tokensale Finished TRIX will list on exchange, our first target TRIX will list on Okex , Hotbit , Cryptopia , Mercatox , idex
 
-Official website , Official twitter and official twitter will launch on December 2018 
+Official website , Official twitter and official twitter will launch on December 2018
 -----------------------------
-TOKENSALE PHASE 1 
-TOKENSALE CONTRACT ADDRESS for PHASE 1 
+TOKENSALE PHASE 1
+TOKENSALE CONTRACT ADDRESS for PHASE 1
 "  0x5df18eF4055c807082797b44A09323e31e66AeF6  "
 
 DATE : Oct 3,2018  to  Nov 3,2018
 Rate 1 ETH = 50.000.000 TRIX + Bonus 100%
 No Minimum Contribution
-How to Contribute : 
+How to Contribute :
 Use Myetherwallet :
-Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 1 
-Example : Send 1 ETH to 0x5df18eF4055c807082797b44A09323e31e66AeF6 
+Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 1
+Example : Send 1 ETH to 0x5df18eF4055c807082797b44A09323e31e66AeF6
 Gas Price always check on ethgasstation.info
 Gas Limits : 150.000
 Data : 0xa6f2ae3a
-Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction 
+Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction
 Use Metamask :
 Open Your Metamask and access the link below :
 https://wizard.oracles.org/invest?addr=0x5df18eF4055c807082797b44A09323e31e66AeF6&networkID=1
@@ -46,41 +46,41 @@ https://wizard.oracles.org/invest?addr=0x5df18eF4055c807082797b44A09323e31e66AeF
 ------------------------------
 
 TOKENSALE PHASE 2
-TOKENSALE CONTRACT ADDRESS for PHASE 2 
+TOKENSALE CONTRACT ADDRESS for PHASE 2
 "  0xba2D53ef55876F2247FBAA669c10bf9F2800D61E  "
 
-DATE : Nov 4,2018 to Dec 15,2018 
+DATE : Nov 4,2018 to Dec 15,2018
 Rate 1 ETH = 50.000.000 TRIX + Bonus 50%
 No Minimum Contribution
-How to Contribute : 
+How to Contribute :
 Use Myetherwallet :
-Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 2 
-Example : Send 1 ETH to 0xba2D53ef55876F2247FBAA669c10bf9F2800D61E 
+Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 2
+Example : Send 1 ETH to 0xba2D53ef55876F2247FBAA669c10bf9F2800D61E
 Gas Price always check on ethgasstation.info
 Gas Limits : 150.000
 Data : 0xa6f2ae3a
-Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction 
+Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction
 Use Metamask :
 Open Your Metamask and access the link below :
 https://wizard.oracles.org/invest?addr=0xba2D53ef55876F2247FBAA669c10bf9F2800D61E&networkID=1
 
 ------------------------------
 
-TOKENSALE PHASE 3 
-TOKENSALE CONTRACT ADDRESS for PHASE 3 
+TOKENSALE PHASE 3
+TOKENSALE CONTRACT ADDRESS for PHASE 3
 "  0x1e1B917E8F1F882f481A1c7CFB0a5b1C75946Cef  "
 
 DATE : Dec 16,2018  to  Jan 30,2019
 Rate 1 ETH = 50.000.000 TRIX (no bonus)
 No Minimum Contribution
-How to Contribute : 
+How to Contribute :
 Use Myetherwallet :
-Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 3 
-Example : Send 1 ETH to 0x1e1B917E8F1F882f481A1c7CFB0a5b1C75946Cef 
+Send ETH to TOKENSALE CONTRACT ADDRESS for PHASE 3
+Example : Send 1 ETH to 0x1e1B917E8F1F882f481A1c7CFB0a5b1C75946Cef
 Gas Price always check on ethgasstation.info
 Gas Limits : 150.000
 Data : 0xa6f2ae3a
-Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction 
+Warning You Should input the Data "0xa6f2ae3a" or you will fail send the transaction
 Use Metamask :
 Open Your Metamask and access the link below :
 https://wizard.oracles.org/invest?addr=0x1e1B917E8F1F882f481A1c7CFB0a5b1C75946Cef&networkID=1
@@ -547,9 +547,9 @@ contract MintableTokenExt is StandardToken, Ownable {
   }
 
   function setReservedTokensListMultiple(
-    address[] addrs, 
-    uint[] inTokens, 
-    uint[] inPercentageUnit, 
+    address[] addrs,
+    uint[] inTokens,
+    uint[] inPercentageUnit,
     uint[] inPercentageDecimals
   ) public canMint onlyOwner {
     assert(!reservedTokensDestinationsAreSet);
@@ -594,8 +594,8 @@ contract MintableTokenExt is StandardToken, Ownable {
     }
 
     reservedTokensList[addr] = ReservedTokensData({
-      inTokens: inTokens, 
-      inPercentageUnit: inPercentageUnit, 
+      inTokens: inTokens,
+      inPercentageUnit: inPercentageUnit,
       inPercentageDecimals: inPercentageDecimals,
       isReserved: true,
       isDistributed: false
@@ -721,4 +721,15 @@ contract CrowdsaleTokenExt is ReleasableToken, MintableTokenExt, UpgradeableToke
     ClaimedTokens(_token, owner, balance);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -11,12 +11,12 @@ contract MoneyBox {
       if (msg.sender!=owner) revert();
       _;
     }
-    
+
     function MoneyBox() public {
     	owner = msg.sender;
     	targets[owner] = mintarget;
     }
-    
+
     function setMinTarget(uint256 minTarget) public onlyOwner returns (bool ok){
         mintarget = minTarget;
         return true;
@@ -26,7 +26,7 @@ contract MoneyBox {
         targets[msg.sender] = target;
         return true;
     }
-    
+
     function withdrawMoney(uint256 sum) public returns (bool ok){
         if (sum<=0 || balances[msg.sender]<targets[msg.sender] || balances[msg.sender]<sum) revert();
         balances[msg.sender] -= sum;
@@ -36,14 +36,27 @@ contract MoneyBox {
         Withdrawn(msg.sender,sum);
         return true;
     }
-    
+
     function reserveMoney() private{
         balances[msg.sender] += msg.value;
         targets[msg.sender] = mintarget;
         Reserved(msg.sender,msg.value);
     }
-    
+
     function () payable public {
         reserveMoney();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

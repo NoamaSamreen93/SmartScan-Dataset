@@ -150,7 +150,7 @@ contract DeaultERC20 is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -160,7 +160,7 @@ contract DeaultERC20 is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -228,7 +228,7 @@ contract IGCoin is DeaultERC20 {
     uint256 constant private S = 1e8; // s.t. S*R = integer
     uint256 constant private RS = 8; // 1.00000008*S-S=8
     uint256 constant private lnS = 18; // ln(S) = 18
-    
+
     /* Constants to support ln() */
     uint256 private constant ONE = 1;
     uint32 private constant MAX_WETokenHT = 1000000;
@@ -242,7 +242,7 @@ contract IGCoin is DeaultERC20 {
     uint8   private constant LN2_EXPONENT = 122;
 
     mapping (address => bool) public frozenAccount;
-    event FrozenFunds(address target, bool frozen); 
+    event FrozenFunds(address target, bool frozen);
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -258,55 +258,55 @@ contract IGCoin is DeaultERC20 {
 
         reserveAddress = new Contract("Reserve");  // Create contract to hold reserve
         quoteAsk();
-        quoteBid();        
+        quoteBid();
     }
 
     /// @notice Deposits '_value' in wei to the reserve address
-    /// @param _value The number of wei to be transferred to the 
+    /// @param _value The number of wei to be transferred to the
     /// reserve address
     function deposit(uint256 _value) private {
         reserveAddress.transfer(_value);
         balances[reserveAddress] += _value;
     }
-  
+
     /// @notice Withdraws '_value' in wei from the reserve address
-    /// @param _value The number of wei to be transferred from the 
-    /// reserve address    
+    /// @param _value The number of wei to be transferred from the
+    /// reserve address
     function withdraw(uint256 _value) private pure {
         // TODO
          _value = _value;
     }
-    
+
     /// @notice Transfers '_value' in wei to the '_to' address
     /// @param _to The recipient address
     /// @param _value The amount of wei to transfer
     function transfer(address _to, uint256 _value) public returns (bool success) {
         /* Check if sender has balance and for overflows */
         require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
-        
+
         /* Check if amount is nonzero */
         require(_value > 0);
 
         /* Add and subtract new balances */
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-    
+
         /* Notify anyone listening that this transfer took place */
         emit Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
-    
-    /// @notice `freeze? Prevent | Allow` `target` from sending 
+
+    /// @notice `freeze? Prevent | Allow` `target` from sending
     /// & receiving tokens
     /// @param _target Address to be frozen
     /// @param _freeze either to freeze it or not
     function freezeAccount(address _target, bool _freeze) public onlyOwner {
         frozenAccount[_target] = _freeze;
         emit FrozenFunds(_target, _freeze);
-    }    
- 
-    /// @notice Calculates the ask price in wei per aToken based on the 
+    }
+
+    /// @notice Calculates the ask price in wei per aToken based on the
     /// current reserve amount
     /// @return Price of aToken in wei
     function quoteAsk() public returns (uint256) {
@@ -321,10 +321,10 @@ contract IGCoin is DeaultERC20 {
 
         return ask;
     }
-    
-    /// @notice Calculates the bid price in wei per aToken based on the 
+
+    /// @notice Calculates the bid price in wei per aToken based on the
     /// current reserve amount
-    /// @return Price of aToken in wei    
+    /// @return Price of aToken in wei
     function quoteBid() public returns (uint256) {
         if(initialSaleComplete)
         {
@@ -339,11 +339,11 @@ contract IGCoin is DeaultERC20 {
     }
 
     /// @notice Buys aToken in exchnage for wei at the current ask price
-    /// @return refunds remainder of wei from purchase   
+    /// @return refunds remainder of wei from purchase
     function buy() public payable returns (uint256 amount){
         uint256 refund = 0;
         debugVal = 0;
-        
+
         if(initialSaleComplete)
         {
             uint256 units_to_buy = 0;
@@ -361,7 +361,7 @@ contract IGCoin is DeaultERC20 {
             reserveAddress.transfer(etherToReserve);        // send the ask amount to the reserve
             mintToken(msg.sender, amount);                  // Mint the coin
             refund = etherRemaining;
-            msg.sender.transfer(refund);                    // Issue refund            
+            msg.sender.transfer(refund);                    // Issue refund
         }
         else
         {
@@ -379,14 +379,14 @@ contract IGCoin is DeaultERC20 {
             if(_totalSupply >= ICOAmount)
             {
                 initialSaleComplete = true;
-            }             
+            }
         }
-        
-        
+
+
         return amount;                                    // ends function and returns
     }
 
-    /// @notice Sells aToken in exchnage for wei at the current bid 
+    /// @notice Sells aToken in exchnage for wei at the current bid
     /// price, reduces resreve
     /// @return Proceeds of wei from sale of aToken
     function sell(uint amount) public returns (uint revenue){
@@ -398,8 +398,8 @@ contract IGCoin is DeaultERC20 {
         require(msg.sender.send(revenue));                // sends ether to the seller: it's important to do this last to prevent recursion attacks
         emit Transfer(msg.sender, reserveAddress, amount);               // executes an event reflecting on the change
         return revenue;                                   // ends function and returns
-    }    
-    
+    }
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -408,8 +408,8 @@ contract IGCoin is DeaultERC20 {
         _totalSupply += mintedAmount;
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, target, mintedAmount);
-    }    
-    
+    }
+
 
     /// @notice Compute '_k * (1+1/_q) ^ _n', with precision '_p'
     /// @dev The higher the precision, the higher the gas cost. It should be
@@ -420,7 +420,7 @@ contract IGCoin is DeaultERC20 {
     /// @param _q input param q
     /// @param _n input param n
     /// @param _p input param p
-    /// @return '_k * (1+1/_q) ^ _n'   
+    /// @return '_k * (1+1/_q) ^ _n'
     function fracExp(uint256 _k, uint256 _q, uint256 _n, uint256 _p) public pure returns (uint256) {
       uint256 s = 0;
       uint256 N = 1;
@@ -432,9 +432,9 @@ contract IGCoin is DeaultERC20 {
       }
       return s;
     }
-    
+
     /// @notice Compute the natural logarithm
-    /// @dev This functions assumes that the numerator is larger than or equal 
+    /// @dev This functions assumes that the numerator is larger than or equal
     /// to the denominator, because the output would be negative otherwise.
     /// @param _numerator is a value between 1 and 2 ^ (256 - MAX_PRECISION) - 1
     /// @param _denominator is a value between 1 and 2 ^ (256 - MAX_PRECISION) - 1
@@ -462,11 +462,11 @@ contract IGCoin is DeaultERC20 {
                 }
             }
         }
-        
+
         return ((res * LN2_MANTISSA) >> LN2_EXPONENT) / FIXED_3;
     }
 
-    /// @notice Compute the largest integer smaller than or equal to 
+    /// @notice Compute the largest integer smaller than or equal to
     /// the binary logarithm of the input
     /// @param _n Operand of the function
     /// @return Floor(Log2(_n))
@@ -491,6 +491,22 @@ contract IGCoin is DeaultERC20 {
         }
 
         return res;
-    }    
-  
+    }
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

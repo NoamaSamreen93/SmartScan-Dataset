@@ -907,9 +907,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "CLC";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0x69D8fD25c05d07D3Fc5280040ba0BDe4d5C4d399;
-    
+
     uint public constant START_TIME = 1550230200;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -1021,9 +1021,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1047,7 +1047,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1117,7 +1117,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 _weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[2] memory weiRaisedStartsBounds = [uint(0),uint(0)];
         uint[2] memory weiRaisedEndsBounds = [uint(700000000000000000000000),uint(700000000000000000000000)];
@@ -1132,9 +1132,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1145,12 +1145,12 @@ contract BonusableCrowdsale is Consts, Crowdsale {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
-    
-    
+
+
+
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1160,7 +1160,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(4000 * TOKEN_DECIMAL_MULTIPLIER, 0x8651Dbfa480fAC7721afB8fc75dd15df5C3FeeFF, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1555189200)
         CappedCrowdsale(700000000000000000000000)
-        
+
     {
     }
 
@@ -1172,7 +1172,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[5] memory addresses = [address(0x69d8fd25c05d07d3fc5280040ba0bde4d5c4d399),address(0xe011be20adc30aaea2def2b8df8d62f38dc6ce59),address(0x9e336bb3bb2e31c20f6728133d8b281760840437),address(0x109184b0c6d1bc3e5c6bda2a7fd5e58e86a2023d),address(0x7ae2620c28160446f140958c6fd5f9a8b3088c25)];
         uint[5] memory amounts = [uint(2100000000000000000000000000),uint(1500000000000000000000000000),uint(800000000000000000000000000),uint(800000000000000000000000000),uint(2000000000000000000000000000)];
         uint64[5] memory freezes = [uint64(1555189263),uint64(1555189263),uint64(1555189263),uint64(1555189263),uint64(1555189263)];
@@ -1184,14 +1184,14 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
+
     /**
      * @dev override hasClosed to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1200,11 +1200,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 250000000000000000;
         return super.hasClosed() || remainValue;
     }
-    
 
-    
 
-    
+
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < closingTime);
@@ -1214,13 +1214,13 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         closingTime = _endTime;
     }
-    
 
-    
 
-    
 
-    
+
+
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
@@ -1231,13 +1231,24 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     )
         internal
     {
-        
+
         require(msg.value >= 250000000000000000);
-        
-        
+
+
         require(msg.value <= 4000000000000000000000);
-        
+
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

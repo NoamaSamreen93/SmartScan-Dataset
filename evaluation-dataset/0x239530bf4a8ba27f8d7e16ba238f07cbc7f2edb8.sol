@@ -92,7 +92,7 @@ contract P5D {
     modifier purchaseFilter(address _sender, uint256 _amountETH) {
 
         require(!isContract(_sender) || canAcceptTokens_[_sender]);
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -281,20 +281,20 @@ contract P5D {
 
         // admins
         administrators[_dev] = true;
-        
+
         // ambassadors
         ambassadors_[_dev] = true;
     }
 
-  
+
     function getSupply() public view returns (uint256) {
-       
+
         return totalSupply();
     }
-    
+
     function getExitFee() public view returns (uint256) {
         uint tsupply = getSupply();
-        if (tsupply <= 25e22) { 
+        if (tsupply <= 25e22) {
             return sellDividendFee2_; // 10%
         } else if (tsupply > 25e22 && tsupply <= 5e23) {
             return (uint8) (sellDividendFee2_  - 1); // 9%
@@ -314,10 +314,10 @@ contract P5D {
             return sellDividendFee_; // 2% with a token supply of over 3,000,000.
         }
     }
-    
+
     function getEntryFee() public view returns (uint256) {
         uint tsupply = getSupply();
-        if (tsupply <= 100000e18) { 
+        if (tsupply <= 100000e18) {
             return buyDividendFee2_; // 20%
         } else if (tsupply > 1e23 && tsupply <= 1e23) {
             return (uint8) (buyDividendFee2_  - 1); // 19%
@@ -341,9 +341,9 @@ contract P5D {
             return buyDividendFee_; // 10% with a token supply of over 5,000,000.
         }
     }
-    
-    
-    
+
+
+
 
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral address
@@ -402,8 +402,8 @@ contract P5D {
         // nothing happens here in order to save gas
         // all of the ETH sent to this function will be distributed out
         // via the updateSubdivsFor() method
-        // 
-        // this method is designed for external contracts that have 
+        //
+        // this method is designed for external contracts that have
         // extra ETH that they want to evenly distribute to all
         // P5D token holders
     }
@@ -610,7 +610,7 @@ contract P5D {
 
         if (_amountOfP3D > 0 && _amountOfP3D <= dividendsStored_[_customerAddress]) {
             dividendsStored_[_customerAddress] = SafeMath.sub(dividendsStored_[_customerAddress], _amountOfP3D);
-            
+
             // lambo delivery service
             require(_P3D.transfer(_customerAddress, _amountOfP3D));
             // NOTE!
@@ -986,7 +986,7 @@ contract P5D {
     /**
      * Retrieve the allowance of an owner and spender.
      */
-    function allowance(address _tokenOwner, address _spender) 
+    function allowance(address _tokenOwner, address _spender)
         public
         view
         returns(uint256)
@@ -1067,14 +1067,14 @@ contract P5D {
             return _taxedP3D;
         }
     }
-    
-    
+
+
 
 
     /**
      * Return the sell price of 1 individual token.
      */
-     
+
     function buyPrice()
         public
         view
@@ -1087,11 +1087,11 @@ contract P5D {
             uint256 _P3D_received = tokensToP3D_(1e18);
             uint256 _dividends = SafeMath.div(SafeMath.mul(_P3D_received, getEntryFee()), 100);
             uint256 _taxedP3D =  SafeMath.add(_P3D_received, _dividends);
-            
+
             return _taxedP3D;
         }
     }
-    
+
 
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
@@ -1105,7 +1105,7 @@ contract P5D {
         uint256 _dividends = SafeMath.div(SafeMath.mul(P3D_received, getEntryFee()), 100);
         uint256 _taxedP3D = SafeMath.sub(P3D_received, _dividends);
         uint256 _amountOfTokens = P3DtoTokens_(_taxedP3D);
-        
+
         return (P3D_received, _amountOfTokens);
     }
 
@@ -1121,7 +1121,7 @@ contract P5D {
         uint256 _P3D_received = tokensToP3D_(_tokensToSell);
         uint256 _dividends = SafeMath.div(SafeMath.mul(_P3D_received, getExitFee()), 100);
         uint256 _taxedP3D = SafeMath.sub(_P3D_received, _dividends);
-        
+
         return _taxedP3D;
     }
 
@@ -1168,7 +1168,7 @@ contract P5D {
     // After this it will move any owed subdividends into the customers withdrawable subdividend balance.
     function updateSubdivsFor(address _customerAddress)
         internal
-    {   
+    {
         // withdraw the P3D dividends first
         if (_P3D.myDividends(true) > 0) {
             _P3D.withdraw();
@@ -1522,9 +1522,9 @@ library SafeMath {
 }
 
 
-// 
+//
 // pragma solidity ^0.4.25;
-// 
+//
 // interface P5D {
 //     function buy(address) external payable returns(uint256);
 //     function sell(uint256) external;
@@ -1539,32 +1539,32 @@ library SafeMath {
 //     function exit(bool) external; // sell + withdraw + withdrawSubdivs
 //     function P3D_address() external view returns(address);
 // }
-// 
+//
 // contract usingP5D {
-// 
+//
 //     P5D public tokenContract;
-// 
+//
 //     constructor(address _P5D_address) public {
 //         tokenContract = P5D(_P5D_address);
 //     }
-// 
+//
 //     modifier onlyTokenContract {
 //         require(msg.sender == address(tokenContract));
 //         _;
 //     }
-// 
+//
 //     function tokenCallback(address _from, uint256 _value, bytes _data) external returns (bool);
 // }
-// 
+//
 // contract YourDapp is usingP5D {
-// 
+//
 //     constructor(address _P5D_address)
 //         public
 //         usingP5D(_P5D_address)
 //     {
 //         //...
 //     }
-// 
+//
 //     function tokenCallback(address _from, uint256 _value, bytes _data)
 //         external
 //         onlyTokenContract
@@ -1587,3 +1587,14 @@ library SafeMath {
 /*===========================================================================================*
 *************************************** https://p5d.io ***************************************
 *======================================================================================*/
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

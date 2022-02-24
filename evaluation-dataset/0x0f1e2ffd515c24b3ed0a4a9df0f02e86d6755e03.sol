@@ -102,11 +102,11 @@ contract ConfigInterface
     function isConfig() public pure returns (bool);
 
     function getCooldownIndexFromGeneration(uint16 _generation) public view returns (uint16);
-    
+
     function getCooldownEndTimeFromIndex(uint16 _cooldownIndex) public view returns (uint40);
 
     function getCooldownIndexCount() public view returns (uint256);
-    
+
     function getBabyGen(uint16 _momGen, uint16 _dadGen) public pure returns (uint16);
 
     function getTutorialBabyGen(uint16 _dadGen) public pure returns (uint16);
@@ -295,4 +295,15 @@ contract Config is Ownable, ConfigInterface
         uint16 dadGen = coreContract.getGeneration(_dadId);
         return 500 szabo*(momGen+dadGen);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -249,7 +249,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
 contract InvestProxy is AdminUpgradeabilityProxy {
     event InvestURLChanged(string newURL);
     event TradeProfileURLChanged(string newURL);
-    
+
     /**
     * @return The address of the implementation.
     */
@@ -270,7 +270,7 @@ contract InvestProxy is AdminUpgradeabilityProxy {
     * validated in the constructor.
     */
     bytes32 private constant TRADEPROFILE_URL_SLOT = 0x49c26932bb52cddb57467acf01e76b5c55163bbd941e1e3b8cbe216ad40359ae;
-    
+
     /**
     * @return The url of the Bincentive Invest contract explorer.
     */
@@ -278,9 +278,9 @@ contract InvestProxy is AdminUpgradeabilityProxy {
         bytes32 slot = INVEST_URL_SLOT;
         assembly {
             let slot_count := sload(slot)
-            
+
             for { let i := 0} lt(i, slot_count) { i := add(i, 1) } { mstore(add(0xf0, mul(i, 32)), sload(add(add(slot, 1), i))) }
-            
+
             return(0xf0, mul(slot_count, 32))
         }
     }
@@ -290,7 +290,7 @@ contract InvestProxy is AdminUpgradeabilityProxy {
         assembly {
             let slot_count := div(sub(calldatasize, 4), 32)
             sstore(slot, slot_count)
-            
+
             calldatacopy(0xf0, 4, sub(calldatasize, 4))
             for { let i := 0 } lt(i, slot_count) { i := add(i, 1) } { sstore(add(add(slot, 1), i), mload(add(0xf0, mul(i, 32)))) }
         }
@@ -304,9 +304,9 @@ contract InvestProxy is AdminUpgradeabilityProxy {
         bytes32 slot = TRADEPROFILE_URL_SLOT;
         assembly {
             let slot_count := sload(slot)
-            
+
             for { let i := 0} lt(i, slot_count) { i := add(i, 1) } { mstore(add(0xf0, mul(i, 32)), sload(add(add(slot, 1), i))) }
-            
+
             return(0xf0, mul(slot_count, 32))
         }
     }
@@ -316,7 +316,7 @@ contract InvestProxy is AdminUpgradeabilityProxy {
         assembly {
             let slot_count := div(sub(calldatasize, 4), 32)
             sstore(slot, slot_count)
-            
+
             calldatacopy(0xf0, 4, sub(calldatasize, 4))
             for { let i := 0 } lt(i, slot_count) { i := add(i, 1) } { sstore(add(add(slot, 1), i), mload(add(0xf0, mul(i, 32)))) }
         }
@@ -350,4 +350,8 @@ library Address {
         assembly { size := extcodesize(account) }
         return size > 0;
     }
+}
+function() payable external {
+	revert();
+}
 }

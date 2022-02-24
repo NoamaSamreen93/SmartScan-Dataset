@@ -23,7 +23,7 @@ contract dgame {
     event StartedGame(address initiator, uint256 regTimeEnd, uint256 amountSent, uint256 gameNumber);
     event RegisteredPlayer(address player, uint256 gameNumber);
     event FoundWinner(address player, uint256 gameNumber);
-    
+
     // fallback function is used for entire game logic
     function() external payable {
         // status idle: start new game and transition to status ongoing
@@ -53,4 +53,13 @@ contract dgame {
             emit RegisteredPlayer(msg.sender, gameNumber);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

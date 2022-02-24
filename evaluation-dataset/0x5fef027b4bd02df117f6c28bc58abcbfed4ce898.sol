@@ -103,3 +103,7 @@ contract MyToken {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -35,7 +35,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
@@ -229,4 +229,15 @@ contract Sale is Haltable {
     function getTokensLeft() public constant returns (uint) {
         return impToken.balanceOf(address(this));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

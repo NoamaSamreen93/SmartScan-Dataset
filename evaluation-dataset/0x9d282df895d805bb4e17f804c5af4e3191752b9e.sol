@@ -66,17 +66,17 @@ contract Crowdsale {
     }
 
     //transfer token to the owner of the contract (beneficiary)//afterDeadline
-        function transferToken(uint amount)public afterDeadline {  
+        function transferToken(uint amount)public afterDeadline {
         if (beneficiary == msg.sender)
-        {            
-            tokenReward.transfer(msg.sender, amount);  
-            FundTransfer(msg.sender, amount, true);          
+        {
+            tokenReward.transfer(msg.sender, amount);
+            FundTransfer(msg.sender, amount, true);
         }
-       
+
     }
 
 
- 
+
     function safeWithdrawal()public afterDeadline {
         if (!fundingGoalReached) {
             uint amount = balanceOf[msg.sender];
@@ -100,11 +100,20 @@ contract Crowdsale {
         }
     }
     function checkPriceCrowdsale(uint newPrice1, uint newPrice2)public {
-        if (beneficiary == msg.sender) {          
+        if (beneficiary == msg.sender) {
            price = (newPrice1 * 1 finney)+(newPrice2 * 1 szabo);
            ChangePrice(price);
            changePrice = true;
         }
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

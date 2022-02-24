@@ -11,7 +11,7 @@ contract Owned {
 
     /**
      * @dev Delegate contract to another person
-     * @param _owner New owner address 
+     * @param _owner New owner address
      */
     function setOwner(address _owner) onlyOwner
     { owner = _owner; }
@@ -23,7 +23,7 @@ contract Owned {
 }
 
 /**
- * @title Common pattern for destroyable contracts 
+ * @title Common pattern for destroyable contracts
  */
 contract Destroyable {
     address public hammer;
@@ -37,7 +37,7 @@ contract Destroyable {
 
     /**
      * @dev Destroy contract and scrub a data
-     * @notice Only hammer can call it 
+     * @notice Only hammer can call it
      */
     function destroy() onlyHammer
     { suicide(msg.sender); }
@@ -60,7 +60,7 @@ contract Object is Owned, Destroyable {
 
 // Standard token interface (ERC 20)
 // https://github.com/ethereum/EIPs/issues/20
-contract ERC20 
+contract ERC20
 {
 // Functions:
     /// @return total amount of tokens
@@ -112,11 +112,11 @@ contract Token is Object, ERC20 {
 
     /* Fixed point position */
     uint8 public decimals;
-    
+
     /* Token approvement system */
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowances;
- 
+
     /**
      * @dev Get balance of plain address
      * @param _owner is a target address
@@ -124,7 +124,7 @@ contract Token is Object, ERC20 {
      */
     function balanceOf(address _owner) constant returns (uint256)
     { return balances[_owner]; }
- 
+
     /**
      * @dev Take allowed tokens
      * @param _owner The address of the account owning tokens
@@ -142,7 +142,7 @@ contract Token is Object, ERC20 {
         totalSupply = _count;
         balances[msg.sender] = _count;
     }
- 
+
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
@@ -164,7 +164,7 @@ contract Token is Object, ERC20 {
      * @dev Transfer with approvement mechainsm
      * @param _from source address, `_value` tokens shold be approved for `sender`
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
@@ -220,10 +220,10 @@ contract Builder is Object {
      * @dev this event emitted for every builded contract
      */
     event Builded(address indexed client, address indexed instance);
- 
+
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
- 
+
     /**
      * @dev Get last address
      * @return last address contract
@@ -296,7 +296,7 @@ contract BuilderToken is Builder {
 
         if (_client == 0)
             _client = msg.sender;
- 
+
         var inst = CreatorToken.create(_name, _symbol, _decimals, _count);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
@@ -305,4 +305,12 @@ contract BuilderToken is Builder {
         inst.setHammer(_client);
         return inst;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

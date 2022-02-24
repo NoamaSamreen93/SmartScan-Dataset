@@ -242,12 +242,23 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract TocosToken is StandardToken {
-    string public name = "Tocos"; 
+    string public name = "Tocos";
     string public symbol = "TOCOS";
     uint public decimals = 8;
     uint public totalSupply = 1000000000 * (10 ** decimals);
-    
+
     constructor() public {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

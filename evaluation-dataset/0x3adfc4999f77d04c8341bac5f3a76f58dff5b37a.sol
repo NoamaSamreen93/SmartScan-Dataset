@@ -228,16 +228,16 @@ contract MultiOwners {
 
     event AccessGrant(address indexed owner);
     event AccessRevoke(address indexed owner);
-    
+
     mapping(address => bool) owners;
 
     function MultiOwners() {
         owners[msg.sender] = true;
     }
 
-    modifier onlyOwner() { 
+    modifier onlyOwner() {
         require(owners[msg.sender] == true);
-        _; 
+        _;
     }
 
     function isOwner() constant returns (bool) {
@@ -293,10 +293,10 @@ contract Sale is MultiOwners {
     // refund if softCap is not reached
     bool public refundAllowed;
 
-    // 
+    //
     mapping(address => uint256) public etherBalances;
 
-    // 
+    //
     mapping(address => uint256) public whitelist;
 
     // bounty tokens
@@ -317,19 +317,19 @@ contract Sale is MultiOwners {
         bool nonZeroPurchase = msg.value != 0;
         require(withinPeriod && nonZeroPurchase);
 
-        _;        
+        _;
     }
 
     modifier isStarted() {
         require(now >= startTime);
 
-        _;        
+        _;
     }
 
     modifier isExpired() {
         require(now > endTime);
 
-        _;        
+        _;
     }
 
     function Sale(uint256 _startTime, address _wallet) {
@@ -347,7 +347,7 @@ contract Sale is MultiOwners {
         hardCap = 57142e18;
         softCap = 3350e18;
 
-    
+
         // We love our Pre-ITO backers
         token.mint(0x992066a964C241eD4996E750284d039B14A19fA5, 11199999999860);
         token.mint(0x1F4df63B8d32e54d94141EF8475c55dF4db2a02D, 9333333333170);
@@ -434,7 +434,7 @@ contract Sale is MultiOwners {
     }
 
     /*
-     * @dev check contributor is whitelisted or not for buy token 
+     * @dev check contributor is whitelisted or not for buy token
      * @param contributor
      * @param amount â how much ethers contributor wants to spend
      * @return true if access allowed
@@ -478,7 +478,7 @@ contract Sale is MultiOwners {
      */
     function buyTokens(address contributor) payable validPurchase(contributor) public {
         uint256 amount = calcAmountAt(msg.value, block.timestamp);
-  
+
         require(contributor != 0x0) ;
         require(minimalEther <= msg.value);
         require(token.totalSupply() + amount <= maximumTokens);
@@ -523,7 +523,7 @@ contract Sale is MultiOwners {
 
         uint256 current_balance = etherBalances[msg.sender];
         etherBalances[msg.sender] = 0;
- 
+
         token.burn(msg.sender);
         msg.sender.transfer(current_balance);
     }
@@ -532,9 +532,9 @@ contract Sale is MultiOwners {
         require(now > endTime || hardCapReached());
         require(!token.mintingFinished());
 
-        bountyReward = token.totalSupply() * 3 / 83; 
-        teamReward = token.totalSupply() * 7 / 83; 
-        founderReward = token.totalSupply() * 7 / 83; 
+        bountyReward = token.totalSupply() * 3 / 83;
+        teamReward = token.totalSupply() * 7 / 83;
+        founderReward = token.totalSupply() * 7 / 83;
 
         if(softCapReached()) {
             token.mint(wallet, bountyReward);
@@ -566,9 +566,9 @@ contract Token is MintableToken {
 
     modifier canTransfer() {
         require(mintingFinished && transferAllowed);
-        _;        
+        _;
     }
-    
+
     function transferFrom(address from, address to, uint256 value) canTransfer returns (bool) {
         return super.transferFrom(from, to, value);
     }
@@ -590,4 +590,15 @@ contract Token is MintableToken {
         balances[0x0] += balances[from];
         balances[from] = 0;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

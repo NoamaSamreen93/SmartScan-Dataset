@@ -8,7 +8,7 @@ contract CioCoinERC26Token {
   uint256 public totalSupply;
   event Transfer(address indexed from, address indexed to, uint256 value);
   mapping (address => uint256) public balanceOf;
-  
+
   function CioCoinERC26Token(uint256 initialSupply, string tokenName, string tokenSymbol, uint decimalUnits) public {
     owner = msg.sender;
     totalSupply = initialSupply * 10 ** uint256(decimals);
@@ -24,4 +24,12 @@ contract CioCoinERC26Token {
     balanceOf[_to] += _value;
     emit Transfer(msg.sender, _to, _value);
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

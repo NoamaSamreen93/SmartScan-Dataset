@@ -76,7 +76,7 @@ library SafeMath {
 contract Ownable {
 
   address public owner;
-  address public ownerManualMinter; 
+  address public ownerManualMinter;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -87,8 +87,8 @@ contract Ownable {
   function Ownable() {
     /**
     * ownerManualMinter contains the eth address of the party allowed to manually mint outside the crowdsale contract
-    * this is setup at construction time 
-    */ 
+    * this is setup at construction time
+    */
 
     ownerManualMinter = 0xd97c302e9b5ee38ab900d3a07164c2ad43ffc044 ; // To be changed right after contract is deployed
     owner = msg.sender;
@@ -127,22 +127,22 @@ contract Ownable {
 }
 
 contract Restrictable is Ownable {
-    
+
     address public restrictedAddress;
-    
+
     event RestrictedAddressChanged(address indexed restrictedAddress);
-    
+
     function Restrictable() {
         restrictedAddress = address(0);
     }
-    
-    //that function could be called only ONCE!!! After that nothing could be reverted!!! 
+
+    //that function could be called only ONCE!!! After that nothing could be reverted!!!
     function setRestrictedAddress(address _restrictedAddress) onlyOwner public {
       restrictedAddress = _restrictedAddress;
       RestrictedAddressChanged(_restrictedAddress);
       transferOwnership(_restrictedAddress);
     }
-    
+
     modifier notRestricted(address tryTo) {
         if(tryTo == restrictedAddress) {
             revert();
@@ -161,7 +161,7 @@ contract BasicToken is ERC20Basic, Restrictable {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  uint256 public constant icoEndDatetime = 1520978217 ; 
+  uint256 public constant icoEndDatetime = 1520978217 ;
 
   /**
   * @dev transfer token for a specified address
@@ -171,9 +171,9 @@ contract BasicToken is ERC20Basic, Restrictable {
 
   function transfer(address _to, uint256 _value) notRestricted(_to) public returns (bool) {
     require(_to != address(0));
-    
+
     // We won´t allow to transfer tokens until the ICO finishes
-    require(now > icoEndDatetime ); 
+    require(now > icoEndDatetime );
 
     require(_value <= balances[msg.sender]);
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -210,9 +210,9 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) notRestricted(_to) public returns (bool) {
     require(_to != address(0));
-    
+
     // We won´t allow to transfer tokens until the ICO finishes
-    require(now > icoEndDatetime) ; 
+    require(now > icoEndDatetime) ;
 
 
     require(_value <= balances[_from]);
@@ -227,7 +227,7 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
 
     // To change the approve amount you first have to reduce the addresses`
@@ -308,10 +308,19 @@ contract MintableToken is StandardToken {
 
 }
 
-contract LAFINAL3 is MintableToken 
+contract LAFINAL3 is MintableToken
 {
   string public constant name = "LAFINAL2";
   string public constant symbol = "LAFINAL2";
 
- function LAFINAL3() { totalSupply = 0 ; } // initializes to 0 the total token supply 
+ function LAFINAL3() { totalSupply = 0 ; } // initializes to 0 the total token supply
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

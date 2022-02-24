@@ -328,22 +328,22 @@ contract StartToken is Startable, ERC223TokenCompatible, StandardToken {
   /** ******************************** */
   /** START: ADDED BY HORIZON GLOBEX   */
   /** ******************************** */
-  
-  
+
+
     // KYC submission hashes accepted by KYC service provider for AML/KYC review.
     bytes32[] public kycHashes;
 
     // All users that have passed the external KYC verification checks.
     address[] public kycValidated;
 
-	
+
     /**
      * The hash for all Know Your Customer information is calculated outside but stored here.
      * This storage will be cleared once the ICO completes, see closeIco().
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's KYC app will register a hash of the Contributors
-     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be 
+     * KYC submission on the blockchain. Our Swiss financial-intermediary KYC provider will be
      * notified of the submission and retrieve the Contributor data for formal review.
      *
      * All Contributors must successfully complete our ICO KYC review prior to being allowed on-board.
@@ -361,7 +361,7 @@ contract StartToken is Startable, ERC223TokenCompatible, StandardToken {
      *
      * ---- ICO-Platform Note ----
      * The horizon-globex.com ICO platform's registered KYC provider submits their approval
-     * for this Contributor to particpate using the ICO-Platform portal. 
+     * for this Contributor to particpate using the ICO-Platform portal.
      *
      * Each Contributor will then be sent the Ethereum, Bitcoin and IBAN account numbers to
      * deposit their Approved Contribution in exchange for VOX Tokens.
@@ -374,7 +374,7 @@ contract StartToken is Startable, ERC223TokenCompatible, StandardToken {
         kycValidated.push(who);
     }
 
-	
+
     /**
      * Retrieve the KYC hash from the specified index.
      *
@@ -393,12 +393,12 @@ contract StartToken is Startable, ERC223TokenCompatible, StandardToken {
         return kycValidated[index];
     }
 
-	
+
     /**
      * During the ICO phase the owner will allocate tokens once KYC completes and funds are deposited.
      *
      * ---- ICO-Platform Note ----
-     * The horizon-globex.com ICO platform's portal shall issue VOX Token to Contributors on receipt of 
+     * The horizon-globex.com ICO platform's portal shall issue VOX Token to Contributors on receipt of
      * the Approved Contribution funds at the KYC providers Escrow account/wallets.
      * Only after VOX Tokens are issued to the Contributor can the Swiss KYC provider allow the transfer
      * of funds from their Escrow to Company.
@@ -411,15 +411,15 @@ contract StartToken is Startable, ERC223TokenCompatible, StandardToken {
     function icoTransfer(address to, uint256 value) public onlyOwner {
         // If an attempt is made to transfer more tokens than owned, transfer the remainder.
         uint256 toTransfer = (value > (balances[msg.sender])) ? (balances[msg.sender]) : value;
-        
+
         transferFunction(msg.sender, to, toTransfer);
     }
 
 	/** ******************************** */
 	/** END: ADDED BY HORIZON GLOBEX     */
 	/** ******************************** */
-  
-  
+
+
   function transfer(address _to, uint256 _value) public whenStarted returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -517,4 +517,15 @@ contract TokenBurn is Token, BurnToken {
     Token(_name, _symbol, _decimals, _totalSupply) {
         initialSupply = totalSupply;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

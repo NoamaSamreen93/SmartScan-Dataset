@@ -80,7 +80,7 @@ contract Ownable {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
 pragma solidity 0.5.7;
 
 
@@ -98,7 +98,7 @@ contract Utils {
  * @title Manageable Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
  pragma solidity 0.5.7;
 
 
@@ -132,7 +132,7 @@ contract Manageable is Ownable, Utils {
         emit ChangedManager(_manager, _active);
     }
 
-    /** OVERRIDE 
+    /** OVERRIDE
     * @notice does not allow owner to give up ownership
     */
     function renounceOwnership() public onlyOwner {
@@ -199,7 +199,7 @@ contract GlobalWhitelist is Ownable, Manageable {
         }
     }
 
-    /** 
+    /**
     * @notice toggle the whitelist by the parent contract; ExporoTokenFactory
     */
     function toggleWhitelist() external onlyOwner {
@@ -840,11 +840,11 @@ library Snapshots {
      * @return The index of the Snapshot array
      */
     function findBlockIndex(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 blockNumber
-    ) 
+    )
         internal
-        view 
+        view
         returns (uint256)
     {
         // Find lower bound of the array
@@ -868,7 +868,7 @@ library Snapshots {
                 }
             }
             return low;
-        }   
+        }
     }
 
     /**
@@ -878,7 +878,7 @@ library Snapshots {
      * @return The value of the queried moment
      */
     function getValueAt(
-        SnapshotList storage item, 
+        SnapshotList storage item,
         uint256 blockNumber
     )
         internal
@@ -901,11 +901,11 @@ library Snapshots {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 /* solhint-disable no-empty-blocks */
-interface IERC20Snapshot {   
+interface IERC20Snapshot {
     /**
     * @dev Queries the balance of `_owner` at a specific `_blockNumber`
     * @param _owner The address from which the balance will be retrieved
@@ -929,7 +929,7 @@ interface IERC20Snapshot {
  * @dev This is an ERC20 compatible token that takes snapshots of account balances.
  * @author Validity Labs AG <info@validitylabs.org>
  */
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
@@ -938,8 +938,8 @@ pragma solidity 0.5.7;
 contract ERC20Snapshot is ERC20, IERC20Snapshot {
     using Snapshots for Snapshots.SnapshotList;
 
-    mapping(address => Snapshots.SnapshotList) private _snapshotBalances; 
-    Snapshots.SnapshotList private _snapshotTotalSupply;   
+    mapping(address => Snapshots.SnapshotList) private _snapshotBalances;
+    Snapshots.SnapshotList private _snapshotTotalSupply;
 
     event AccountSnapshotCreated(address indexed account, uint256 indexed blockNumber, uint256 value);
     event TotalSupplySnapshotCreated(uint256 indexed blockNumber, uint256 value);
@@ -959,10 +959,10 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
      * @param blockNumber The block number of the moment when token supply is queried
      * @return The balance of the queried token holder at "blockNumber"
      */
-    function balanceOfAt(address owner, uint256 blockNumber) 
-        external 
-        view 
-        returns (uint256) 
+    function balanceOfAt(address owner, uint256 blockNumber)
+        external
+        view
+        returns (uint256)
     {
         return _snapshotBalances[owner].getValueAt(blockNumber);
     }
@@ -993,7 +993,7 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
 
         _snapshotBalances[account].createSnapshot(balanceOf(account));
         _snapshotTotalSupply.createSnapshot(totalSupply());
-        
+
         emit AccountSnapshotCreated(account, block.number, balanceOf(account));
         emit TotalSupplySnapshotCreated(block.number, totalSupply());
     }
@@ -1021,7 +1021,7 @@ contract ERC20Snapshot is ERC20, IERC20Snapshot {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
@@ -1035,7 +1035,7 @@ contract ERC20ForcedTransfer is Ownable, ERC20 {
     /**
     * @notice takes funds from _confiscatee and sends them to _receiver
     * @param _confiscatee address who's funds are being confiscated
-    * @param _receiver address who's receiving the funds 
+    * @param _receiver address who's receiving the funds
     * @param _amount uint256 amount of tokens to force transfer away
     */
     function forceTransfer(address _confiscatee, address _receiver, uint256 _amount) public onlyOwner {
@@ -1052,13 +1052,13 @@ contract ERC20ForcedTransfer is Ownable, ERC20 {
  * @author Validity Labs AG <info@validitylabs.org>
  */
 
-pragma solidity 0.5.7;  
+pragma solidity 0.5.7;
 
 
 
 
 
-contract ERC20Whitelist is Ownable, ERC20 {   
+contract ERC20Whitelist is Ownable, ERC20 {
     GlobalWhitelist public whitelist;
     bool public isWhitelisting = true;  // default to true
 
@@ -1073,7 +1073,7 @@ contract ERC20Whitelist is Ownable, ERC20 {
     */
     function toggleWhitelist() external onlyOwner {
         isWhitelisting = isWhitelisting ? false : true;
-        
+
         if (isWhitelisting) {
             emit ESTWhitelistingEnabled();
         } else {
@@ -1142,7 +1142,7 @@ contract ERC20Whitelist is Ownable, ERC20 {
  * @title ERC20 Document Registry Contract
  * @author Validity Labs AG <info@validitylabs.org>
  */
- 
+
  pragma solidity 0.5.7;
 
 
@@ -1161,7 +1161,7 @@ contract ERC20DocumentRegistry is Ownable {
         string documentUri;
     }
 
-    // array of all documents 
+    // array of all documents
     HashedDocument[] private _documents;
 
     event LogDocumentedAdded(string documentUri, uint256 indexed documentIndex);
@@ -1185,9 +1185,9 @@ contract ERC20DocumentRegistry is Ownable {
 
     /**
     * @notice fetch the latest document on the array
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
-    function currentDocument() external view 
+    function currentDocument() external view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
             require(_documents.length > 0, "no documents exist");
             uint256 last = _documents.length.sub(1);
@@ -1199,7 +1199,7 @@ contract ERC20DocumentRegistry is Ownable {
     /**
     * @notice fetches a document's uri
     * @param documentIndex uint256
-    * @return uint256, string, uint256 
+    * @return uint256, string, uint256
     */
     function getDocument(uint256 documentIndex) external view
         returns (uint256 timestamp, string memory documentUri, uint256 index) {
@@ -1279,7 +1279,7 @@ contract ExporoToken is Ownable, ERC20Snapshot, ERC20Detailed, ERC20Burnable, ER
     */
     /* solhint-disable */
     constructor(string memory _name, string memory _symbol, uint8 _decimal, address _whitelist, uint256 _initialSupply, address _recipient)
-        public 
+        public
         ERC20Detailed(_name, _symbol, _decimal) {
             _mint(_recipient, _initialSupply);
 
@@ -1308,14 +1308,14 @@ contract ExporoTokenFactory is Manageable {
 
     /*** EVENTS ***/
     event NewTokenDeployed(address indexed contractAddress, string name, string symbol, uint8 decimals);
-   
+
     /*** FUNCTIONS ***/
     /**
     * @dev constructor
     * @param _whitelist address of the whitelist
     */
-    constructor(address _whitelist) 
-        public 
+    constructor(address _whitelist)
+        public
         onlyValidAddress(_whitelist) {
             whitelist = _whitelist;
         }
@@ -1323,16 +1323,16 @@ contract ExporoTokenFactory is Manageable {
     /**
     * @dev allows a manager to launch a new token with a new name, symbol, and decimals.
     * Defaults to using whitelist stored in this contract. If _whitelist is address(0), else it will use
-    * _whitelist as the param to pass into the new token's constructor upon deployment 
+    * _whitelist as the param to pass into the new token's constructor upon deployment
     * @param _name string
     * @param _symbol string
-    * @param _decimals uint8 
+    * @param _decimals uint8
     * @param _initialSupply uint256 initial total supply cap
     * @param _recipient address to recieve the initial token supply
     */
-    function newToken(string calldata _name, string calldata _symbol, uint8 _decimals, uint256 _initialSupply, address _recipient) 
-        external 
-        onlyManager 
+    function newToken(string calldata _name, string calldata _symbol, uint8 _decimals, uint256 _initialSupply, address _recipient)
+        external
+        onlyManager
         onlyValidAddress(_recipient)
         returns (address) {
             require(bytes(_name).length > 0, "name cannot be blank");
@@ -1342,13 +1342,13 @@ contract ExporoTokenFactory is Manageable {
             ExporoToken token = new ExporoToken(_name, _symbol, _decimals, whitelist, _initialSupply, _recipient);
 
             emit NewTokenDeployed(address(token), _name, _symbol, _decimals);
-            
+
             return address(token);
         }
-    
+
     /** MANGER FUNCTIONS **/
     /**
-    * @notice Prospectus and Quarterly Reports 
+    * @notice Prospectus and Quarterly Reports
     * @dev string null check is done at the token level - see ERC20DocumentRegistry
     * @param _est address of the targeted EST
     * @param _documentUri string IPFS URI to the document
@@ -1382,9 +1382,9 @@ contract ExporoTokenFactory is Manageable {
     * @param _receiver address to receive the balance of tokens
     * @param _amount uint256 amount to take away from _confiscatee
     */
-    function forceTransferEST(address _est, address _confiscatee, address _receiver, uint256 _amount) 
-        public 
-        onlyValidAddress(_est) 
+    function forceTransferEST(address _est, address _confiscatee, address _receiver, uint256 _amount)
+        public
+        onlyValidAddress(_est)
         onlyValidAddress(_confiscatee)
         onlyValidAddress(_receiver)
         onlyManager {
@@ -1409,4 +1409,13 @@ contract ExporoTokenFactory is Manageable {
     function whitelistSetManager(address _manager, bool _active) public onlyValidAddress(_manager) onlyManager {
         GlobalWhitelist(whitelist).setManager(_manager, _active);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

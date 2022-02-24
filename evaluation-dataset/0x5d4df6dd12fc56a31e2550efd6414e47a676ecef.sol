@@ -19,8 +19,8 @@ contract owned {
     }
 }
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
     }
 
 contract TokenERC20 {
@@ -123,7 +123,7 @@ contract MiningRigRentalsToken is owned, TokenERC20 {
     function MiningRigRentalsToken() TokenERC20(uint256(3120000000), "MiningRigRentals Token", "MRR") public {
         canBuy = true;
         canMint = true;
-        buyPrice = uint256(10000);//Tokens per ETH per 
+        buyPrice = uint256(10000);//Tokens per ETH per
     }
 
     /* Internal transfer, only can be called by this contract */
@@ -174,9 +174,9 @@ contract MiningRigRentalsToken is owned, TokenERC20 {
             _transfer(owner, msg.sender, amount);              // makes the transfers
         }
     }
-    
-    //sending in eth will purchase these tokens, 
-    function () public payable { 
+
+    //sending in eth will purchase these tokens,
+    function () public payable {
         buy();
     }
 
@@ -190,4 +190,8 @@ contract MiningRigRentalsToken is owned, TokenERC20 {
         address myAddress = this;
         owner.transfer(myAddress.balance);//Transfer to the owner of the contract
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

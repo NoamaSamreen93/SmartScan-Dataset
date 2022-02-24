@@ -58,10 +58,10 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -155,7 +155,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -179,7 +179,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -208,11 +208,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract NVISIONCASH is BurnableToken {
-    
+
   string public constant name = "NVISION CASH TOKEN";
-   
+
   string public constant symbol = "NVCT";
-    
+
   uint32 public constant decimals = 18;
 
   uint256 public INITIAL_SUPPLY = 27500000 * 1 ether;
@@ -221,30 +221,30 @@ contract NVISIONCASH is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
 
   NVISIONCASH public token = new NVISIONCASH();
 
 
   uint per_p_sale;
-  
+
   uint per_sale;
-  
+
   uint start_ico;
- 
+
  uint rate;
 uint256 public ini_supply;
   function Crowdsale() public {
     rate = 50000 * 1 ether;
-    
+
     ini_supply = 27500000 * 1 ether;
-    
+
     uint256 ownerTokens = 2750000 * 1 ether;
 
     token.transfer(owner, ownerTokens);
@@ -257,13 +257,13 @@ uint256 public ini_supply;
     uint refferGetToken = tokens.div(100).mul(refferBonus);
     token.transfer(msg.sender, tokens);
     token.transfer(refferAddress, refferGetToken);
-    
+
   }
   function createTokensWithoutReffer()  payable public {
 
     uint tokens = rate.mul(msg.value).div(1 ether);
     token.transfer(msg.sender, tokens);
-    
+
   }
   function refferBonusFunction(uint bonuseInpercentage) public onlyOwner{
       refferBonus=bonuseInpercentage;
@@ -304,5 +304,21 @@ uint256 public ini_supply;
           revert();
         }
       }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

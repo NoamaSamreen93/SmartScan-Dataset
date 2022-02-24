@@ -94,7 +94,7 @@ contract Bitcratic is  Owned,SafeMath, ERC20 {
     mapping(address => mapping(address => uint)) internal allowed;
 
     event Burned(address indexed burner, uint256 value);
-    
+
 
 
     // ------------------------------------------------------------------------
@@ -216,4 +216,15 @@ contract Bitcratic is  Owned,SafeMath, ERC20 {
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

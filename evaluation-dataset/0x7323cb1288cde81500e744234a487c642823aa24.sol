@@ -348,7 +348,7 @@ contract ERC20 is IERC20 {
   * @param value The amount to be transferred.
   */
   function _transfer(address from, address to, uint256 value) internal {
-   
+
     require(value <= _balances[from]);
     require(to != address(0));
     _balances[from] = _balances[from].sub(value);
@@ -375,7 +375,7 @@ contract ERC20 is IERC20 {
    * @param value The amount that will be burnt.
    */
   function _burn(address account, uint256 value) internal {
-    
+
     require(account != 0);
     require(value <= _balances[account]);
     _totalSupply = _totalSupply.sub(value);
@@ -390,7 +390,7 @@ contract ERC20 is IERC20 {
    * @param value The amount that will be burnt.
    */
   function _burnFrom(address account, uint256 value) internal {
-  
+
     require(value <= _allowed[account][msg.sender]);
     // Should https://github.com/OpenZeppelin/zeppelin-solidity/issues/707 be accepted,
     // this function needs to emit an event with the updated approval.
@@ -669,7 +669,7 @@ contract ReentrancyGuard {
   }
 }
 contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Burnable, Ownable , ReentrancyGuard {
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _cap) 
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _cap)
         ERC20Detailed(_name, _symbol, _decimals)
         ERC20Capped (_cap * 1 ether)
         public {
@@ -717,9 +717,9 @@ contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Bu
         address beneficiary,
         uint256 weiAmount
     )
-    internal 
-    pure 
-    
+    internal
+    pure
+
     {
         require(beneficiary != address(0));
         require(weiAmount != 0);
@@ -743,4 +743,20 @@ contract DncToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC20Bu
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

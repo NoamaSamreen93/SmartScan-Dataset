@@ -691,17 +691,17 @@ pragma solidity 0.5.3;
  * @dev Implementation of the Ocean Token.
  */
 contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
-    
+
     using SafeMath for uint256;
-    
+
     uint8 constant DECIMALS = 18;
     uint256 constant CAP = 690900000;
     uint256 TOTALSUPPLY = CAP.mul(uint256(10) ** DECIMALS);
-    
+
     // keep track token holders
     address[] private accounts = new address[](0);
     mapping(address => bool) private tokenHolders;
-    
+
     /**
      * @dev OceanToken constructor
      * @param contractOwner refers to the owner of the contract
@@ -720,7 +720,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
         renounceMinter();
         transferOwnership(contractOwner);
     }
-    
+
     /**
      * @dev transfer tokens when not paused (pausable transfer function)
      * @param _to receiver address
@@ -740,7 +740,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
         }
         return success;
     }
-    
+
     /**
      * @dev transferFrom transfers tokens only when token is not paused
      * @param _from sender address
@@ -762,7 +762,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
         }
         return success;
     }
-    
+
     /**
      * @dev retrieve the address & token balance of token holders (each time retrieve partial from the list)
      * @param _start index
@@ -782,12 +782,12 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
             _start <= _end && _end < accounts.length,
             'Array index out of bounds'
         );
-        
+
         uint256 length = _end.sub(_start).add(1);
-        
+
         address[] memory _tokenHolders = new address[](length);
         uint256[] memory _tokenBalances = new uint256[](length);
-        
+
         for (uint256 i = _start; i <= _end; i++)
         {
             address account = accounts[i];
@@ -798,10 +798,10 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
                 _tokenHolders[i] = account;
             }
         }
-        
+
         return (_tokenHolders, _tokenBalances);
     }
-    
+
     /**
      * @dev get length of account list
      */
@@ -813,7 +813,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
     {
         return accounts.length;
     }
-    
+
     /**
      * @dev kill the contract and destroy all tokens
      */
@@ -823,7 +823,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
     {
         selfdestruct(address(uint160(owner())));
     }
-    
+
     /**
      * @dev fallback function prevents ether transfer to this contract
      */
@@ -833,7 +833,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
     {
         revert('Invalid ether transfer');
     }
-    
+
     /*
      * @dev tryToAddTokenHolder try to add the account to the token holders structure
      * @param account address
@@ -849,7 +849,7 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
             tokenHolders[account] = true;
         }
     }
-    
+
     /*
      * @dev updateTokenHolders maintains the accounts array and set the address as a promising token holder
      * @param sender address
@@ -864,4 +864,15 @@ contract OceanToken is Ownable, ERC20Pausable, ERC20Detailed, ERC20Capped {
         tryToAddTokenHolder(sender);
         tryToAddTokenHolder(receiver);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

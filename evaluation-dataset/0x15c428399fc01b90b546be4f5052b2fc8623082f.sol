@@ -76,7 +76,7 @@ library SafeMath {
 
 
 library UrlStr {
-  
+
   // generate url by tokenId
   // baseUrl must end with 00000000
   function generateUrl(string url,uint256 _tokenId) internal pure returns (string _url){
@@ -95,7 +95,7 @@ library UrlStr {
 }
 
 interface ERC165 {
-  
+
   /**
    * @notice Query if a contract implements an interface
    * @param _interfaceId The interface identifier, as specified in ERC-165
@@ -458,7 +458,7 @@ contract Pausable is Operator {
   event FrozenFunds(address target, bool frozen);
 
   bool public isPaused = false;
-  
+
   mapping(address => bool)  frozenAccount;
 
   modifier whenNotPaused {
@@ -468,7 +468,7 @@ contract Pausable is Operator {
 
   modifier whenPaused {
     require(isPaused);
-    _;  
+    _;
   }
 
   modifier whenNotFreeze(address _target) {
@@ -681,8 +681,8 @@ ERC998ERC20TopDown, ERC998ERC20TopDownEnumerable {
         require(_from != address(0));
         require(tokenIdToTokenOwner[_tokenId] == _from);
         require(_to != address(0));
-        require(!frozenAccount[_from]);                  
-        require(!frozenAccount[_to]); 
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
         if(msg.sender != _from) {
             bytes32 rootOwner;
             bool callSuccess;
@@ -794,7 +794,7 @@ ERC998ERC20TopDown, ERC998ERC20TopDownEnumerable {
 
     function safeTransferChild(uint256 _fromTokenId, address _to, address _childContract, uint256 _childTokenId, bytes _data) external {
         _transferChild(_fromTokenId, _to, _childContract, _childTokenId);
-        ERC721(_childContract).safeTransferFrom(this, _to, _childTokenId, _data); 
+        ERC721(_childContract).safeTransferFrom(this, _to, _childTokenId, _data);
     }
 
     function transferChild(uint256 _fromTokenId, address _to, address _childContract, uint256 _childTokenId) external {
@@ -1061,7 +1061,7 @@ contract ERC998TopDownToken is SupportsInterfaceWithLookup, ERC721Enumerable, ER
    *   bytes4(keccak256('tokenByIndex(uint256)'))
    */
   bytes4 private constant InterfaceId_ERC721Metadata = 0x5b5e139f;
-              
+
   // Mapping from owner to list of owned token IDs
   mapping(address => uint256[]) internal ownedTokens;
 
@@ -1086,7 +1086,7 @@ contract ERC998TopDownToken is SupportsInterfaceWithLookup, ERC721Enumerable, ER
 
   modifier existsToken(uint256 _tokenId){
     address owner = tokenIdToTokenOwner[_tokenId];
-    require(owner != address(0), "This tokenId is invalid"); 
+    require(owner != address(0), "This tokenId is invalid");
     _;
   }
 
@@ -1231,7 +1231,7 @@ interface AvatarChildService {
 interface AvatarService {
   function updateAvatarInfo(address _owner, uint256 _tokenId, string _name, uint256 _dna) external;
   function createAvatar(address _owner, string _name, uint256 _dna) external  returns(uint256);
-  function getMountedChildren(address _owner,uint256 _tokenId, address _childAddress) external view returns(uint256[]); 
+  function getMountedChildren(address _owner,uint256 _tokenId, address _childAddress) external view returns(uint256[]);
   function getAvatarInfo(uint256 _tokenId) external view returns (string _name, uint256 _dna);
   function getOwnedAvatars(address _owner) external view returns(uint256[] _avatars);
   function unmount(address _owner, address _childContract, uint256[] _children, uint256 _avatarId) external;
@@ -1239,7 +1239,7 @@ interface AvatarService {
 }
 
 contract AvatarToken is ERC998TopDownToken, AvatarService {
-  
+
   using UrlStr for string;
 
   enum ChildHandleType{NULL, MOUNT, UNMOUNT}
@@ -1251,15 +1251,15 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
   struct Avatar {
     // avatar name
     string name;
-    // avatar gen,this decide avatar appearance 
+    // avatar gen,this decide avatar appearance
     uint256 dna;
   }
-  
+
   // avatar id index
   uint256 internal avatarIndex = 0;
   // avatar id => avatar
   mapping(uint256 => Avatar) avatars;
-  // true avatar can do transfer 
+  // true avatar can do transfer
   bool public avatarTransferState = false;
 
   function changeAvatarTransferState(bool _newState) public onlyOwner {
@@ -1274,15 +1274,15 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
 
   function getMountedChildren(address _owner, uint256 _avatarId, address _childAddress)
   external
-  view 
+  view
   onlyOperator
-  existsToken(_avatarId) 
+  existsToken(_avatarId)
   returns(uint256[]) {
     require(_childAddress != address(0));
     require(tokenIdToTokenOwner[_avatarId] == _owner);
     return childTokens[_avatarId][_childAddress];
   }
-  
+
   function updateAvatarInfo(address _owner, uint256 _avatarId, string _name, uint256 _dna) external onlyOperator existsToken(_avatarId){
     require(_owner != address(0), "Invalid address");
     require(_owner == tokenIdToTokenOwner[_avatarId] || msg.sender == owner);
@@ -1305,18 +1305,18 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
   function unmount(address _owner, address _childContract, uint256[] _children, uint256 _avatarId) external onlyOperator {
     if(_children.length == 0) return;
     require(ownerOf(_avatarId) == _owner); // check avatar owner
-    uint256[] memory mountedChildren = childTokens[_avatarId][_childContract]; 
+    uint256[] memory mountedChildren = childTokens[_avatarId][_childContract];
     if (mountedChildren.length == 0) return;
-    uint256[] memory unmountChildren = new uint256[](_children.length); // record unmount children 
+    uint256[] memory unmountChildren = new uint256[](_children.length); // record unmount children
     for(uint8 i = 0; i < _children.length; i++) {
       uint256 child = _children[i];
-      if(_isMounted(mountedChildren, child)){  
+      if(_isMounted(mountedChildren, child)){
         unmountChildren[i] = child;
         _removeChild(_avatarId, _childContract, child);
         ERC721(_childContract).transferFrom(this, _owner, child);
       }
     }
-    if(unmountChildren.length > 0 ) 
+    if(unmountChildren.length > 0 )
       emit ChildHandle(_owner, _avatarId, _childContract, unmountChildren, ChildHandleType.UNMOUNT);
   }
 
@@ -1325,7 +1325,7 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
     require(ownerOf(_avatarId) == _owner); // check avatar owner
     for(uint8 i = 0; i < _children.length; i++) {
       uint256 child = _children[i];
-      require(ERC721(_childContract).ownerOf(child) == _owner); // check child owner  
+      require(ERC721(_childContract).ownerOf(child) == _owner); // check child owner
       _receiveChild(_owner, _avatarId, _childContract, child);
       ERC721(_childContract).transferFrom(_owner, this, child);
     }
@@ -1357,7 +1357,7 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
     return false;
   }
 
-  // create avatar 
+  // create avatar
   function _createAvatar(address _owner, string _name, uint256 _dna) private returns(uint256 _avatarId) {
     require(_owner != address(0));
     Avatar memory avatar = Avatar(_name, _dna);
@@ -1366,7 +1366,7 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
     _mint(_owner, _avatarId);
   }
 
-  // override  
+  // override
   function _transferFrom(address _from, address _to, uint256 _avatarId) internal whenNotPaused {
     // add transfer control
     require(avatarTransferState == true, "current time not allown transfer avatar");
@@ -1382,4 +1382,15 @@ contract AvatarToken is ERC998TopDownToken, AvatarService {
   function () public payable {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

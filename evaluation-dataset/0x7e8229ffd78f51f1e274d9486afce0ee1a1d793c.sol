@@ -85,13 +85,13 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 
-/** 
+/**
  * @title Contracts that should not own Contracts
  * @author Remco Bloemen <remco@2π.com>
  * @dev Should contracts (anything Ownable) end up being owned by this contract, it allows the owner
@@ -143,7 +143,7 @@ contract HasNoTokens is Ownable {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -164,7 +164,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -289,4 +289,15 @@ contract DraftToken is MintableToken, HasNoContracts, HasNoTokens { //MintableTo
     string public symbol = "DFS";
     uint256 public decimals = 18;
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

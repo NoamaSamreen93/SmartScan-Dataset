@@ -5,16 +5,16 @@ pragma solidity 0.4.23;
  * @dev Math operations with safety checks that throw on error
  */
 
-library SafeMath 
+library SafeMath
 {
 
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
 
-  function mul(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function mul(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
-     if (a == 0) 
+     if (a == 0)
      {
      	return 0;
      }
@@ -27,7 +27,7 @@ library SafeMath
   * @dev Integer division of two numbers, truncating the quotient.
   */
 
-  function div(uint256 a, uint256 b) internal pure returns(uint256) 
+  function div(uint256 a, uint256 b) internal pure returns(uint256)
   {
      return a / b;
   }
@@ -36,7 +36,7 @@ library SafeMath
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
 
-  function sub(uint256 a, uint256 b) internal pure returns(uint256) 
+  function sub(uint256 a, uint256 b) internal pure returns(uint256)
   {
      assert(b <= a);
      return a - b;
@@ -46,7 +46,7 @@ library SafeMath
   * @dev Adds two numbers, throws on overflow.
   */
 
-  function add(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function add(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
      c = a + b;
      assert(c >= a);
@@ -74,28 +74,28 @@ contract ERC20
 contract OppOpenWiFi is ERC20
 {
     using SafeMath for uint256;
-   
+
     uint256 constant public TOKEN_DECIMALS = 10 ** 18;
     string public constant name            = "OppOpenWiFi Token";
     string public constant symbol          = "OPP";
-    uint256 public totalTokenSupply        = 4165000000 * TOKEN_DECIMALS;  
+    uint256 public totalTokenSupply        = 4165000000 * TOKEN_DECIMALS;
     address public owner;
     uint8 public constant decimals = 18;
 
-    /** mappings **/ 
+    /** mappings **/
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => uint256) balances;
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
        require(msg.sender == owner);
        _;
     }
-    
+
     /** constructor **/
 
     constructor() public
@@ -104,12 +104,12 @@ contract OppOpenWiFi is ERC20
        balances[address(this)] = totalTokenSupply;
        emit Transfer(address(0x0), address(this), balances[address(this)]);
     }
-    
+
     /**
      * @dev total number of tokens in existence
     */
 
-    function totalSupply() public view returns(uint256 _totalSupply) 
+    function totalSupply() public view returns(uint256 _totalSupply)
     {
        _totalSupply = totalTokenSupply;
        return _totalSupply;
@@ -117,11 +117,11 @@ contract OppOpenWiFi is ERC20
 
     /**
      * @dev Gets the balance of the specified address.
-     * @param _owner The address to query the the balance of. 
+     * @param _owner The address to query the the balance of.
      * @return An uint256 representing the amount owned by the passed address.
      */
 
-    function balanceOf(address _owner) public view returns (uint256 balance) 
+    function balanceOf(address _owner) public view returns (uint256 balance)
     {
        return balances[_owner];
     }
@@ -133,9 +133,9 @@ contract OppOpenWiFi is ERC20
      * @param _value uint256 the amout of tokens to be transfered
      */
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)     
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
     {
-       if (_value == 0) 
+       if (_value == 0)
        {
            emit Transfer(_from, _to, _value);  // Follow the spec to launch the event when value is equal to 0
            return;
@@ -193,7 +193,7 @@ contract OppOpenWiFi is ERC20
 
     function transfer(address _address, uint256 _tokens)public returns(bool)
     {
-       if (_tokens == 0) 
+       if (_tokens == 0)
        {
            emit Transfer(msg.sender, _address, _tokens);  // Follow the spec to launch the event when tokens are equal to 0
            return;
@@ -207,16 +207,16 @@ contract OppOpenWiFi is ERC20
        emit Transfer(msg.sender, _address, _tokens);
        return true;
     }
-    
+
     /**
     * @dev transfer token from smart contract to another account, only by owner
     * @param _address The address to transfer to.
     * @param _tokens The amount to be transferred.
     */
 
-    function transferTo(address _address, uint256 _tokens) external onlyOwner returns(bool) 
+    function transferTo(address _address, uint256 _tokens) external onlyOwner returns(bool)
     {
-       require( _address != address(0x0)); 
+       require( _address != address(0x0));
        require( balances[address(this)] >= _tokens.mul(TOKEN_DECIMALS) && _tokens.mul(TOKEN_DECIMALS) > 0);
 
        balances[address(this)] = ( balances[address(this)]).sub(_tokens.mul(TOKEN_DECIMALS));
@@ -224,7 +224,7 @@ contract OppOpenWiFi is ERC20
        emit Transfer(address(this), _address, _tokens.mul(TOKEN_DECIMALS));
        return true;
     }
-	
+
     /**
     * @dev transfer ownership of this contract, only by owner
     * @param _newOwner The address of the new owner to transfer ownership
@@ -244,7 +244,7 @@ contract OppOpenWiFi is ERC20
    * @dev Increase the amount of tokens that an owner allowed to a spender
    */
 
-   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool success) 
+   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool success)
    {
       allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
       emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -254,15 +254,15 @@ contract OppOpenWiFi is ERC20
    /**
    * @dev Decrease the amount of tokens that an owner allowed to a spender
    */
-   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool success) 
+   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool success)
    {
       uint256 oldValue = allowed[msg.sender][_spender];
 
-      if (_subtractedValue > oldValue) 
+      if (_subtractedValue > oldValue)
       {
          allowed[msg.sender][_spender] = 0;
       }
-      else 
+      else
       {
          allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
       }
@@ -270,4 +270,13 @@ contract OppOpenWiFi is ERC20
       return true;
    }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

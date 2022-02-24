@@ -78,7 +78,7 @@ contract MapAirDrop is Owned {
   uint256 private constant decimalFactor = 10**uint256(18);
   // Keeps track of whether or not a token airdrop has been made to a particular address
   mapping (address => bool) public airdrops;
-  
+
   /**
     * @dev Constructor function - Set the token token address
     */
@@ -87,7 +87,7 @@ contract MapAirDrop is Owned {
     token = Token(_tokenContractAdd);
     owner = _owner;
   }
-  
+
   /**
     * @dev perform a transfer of allocations
     * @param _recipient is a list of recipients
@@ -103,4 +103,15 @@ contract MapAirDrop is Owned {
         // }
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

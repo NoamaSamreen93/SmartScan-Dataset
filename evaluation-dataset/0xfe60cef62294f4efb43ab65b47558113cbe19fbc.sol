@@ -358,5 +358,14 @@ contract ExtraTerrestrial is ERC20Detailed, ERC20, Ownable {
     {
         _mint(_tokenHolder, 30000000000000000000000000);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

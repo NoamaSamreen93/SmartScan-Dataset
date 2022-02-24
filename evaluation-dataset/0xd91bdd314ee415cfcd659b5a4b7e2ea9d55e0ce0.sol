@@ -256,7 +256,7 @@ contract PicoStocksAsset is StandardToken {
     event LogBudget(uint proposalBudget);
     event LogAccepted(uint proposalDividendPerShare,uint proposalBudget,uint proposalTokens,uint proposalPrice);
     event LogRejected(uint proposalDividendPerShare,uint proposalBudget,uint proposalTokens,uint proposalPrice);
-    
+
     modifier onlyOwner() {
         assert(msg.sender == owner);
         _;
@@ -455,7 +455,7 @@ contract PicoStocksAsset is StandardToken {
     }
 
     /**
-     * @dev Pay dividend per share 
+     * @dev Pay dividend per share
      * @param _wei The amount of wei to pay per share
      */
     function payDividend(uint _wei) internal returns (uint) {
@@ -1031,4 +1031,13 @@ contract PicoStocksAsset is StandardToken {
           require(success);}
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

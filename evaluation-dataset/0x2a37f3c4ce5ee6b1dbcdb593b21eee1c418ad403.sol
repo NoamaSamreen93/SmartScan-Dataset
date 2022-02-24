@@ -660,3 +660,14 @@ contract FlightDelayLedger is FlightDelayControlledContract, FlightDelayLedgerIn
         FD_DB.setLedger(uint8(_to), int(_amount));
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

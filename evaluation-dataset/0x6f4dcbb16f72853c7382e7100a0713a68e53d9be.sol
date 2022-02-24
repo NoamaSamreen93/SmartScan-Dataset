@@ -868,7 +868,7 @@ contract CelebrityToken is ERC721 {
     public
     view
     returns (address owner);
-    
+
   function payout(address _to) public;
 
   // Allows someone to send ether and obtain the token
@@ -981,4 +981,10 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

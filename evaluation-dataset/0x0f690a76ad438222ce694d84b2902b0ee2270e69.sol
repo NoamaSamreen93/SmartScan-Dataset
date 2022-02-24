@@ -1,21 +1,21 @@
 pragma solidity ^0.4.18;
 
-/** 
+/**
  * BlackBox - Secure Ether Storage
  * Proof Of Concept - Lock ether with a proof set derived off-chain.  The proof
- * encodes a blinded receiver to accept funds once the correct caller executes 
+ * encodes a blinded receiver to accept funds once the correct caller executes
  * the unlockAmount() function with the correct seed.
-*/ 
+*/
 
 contract Secure {
     enum Algorithm { sha, keccak }
 
-    // function for off-chain proof derivation.  Use the return values as input for the 
-    // lockAmount() function.  Execute unlockAmount() with the correct caller 
+    // function for off-chain proof derivation.  Use the return values as input for the
+    // lockAmount() function.  Execute unlockAmount() with the correct caller
     // and seed to transfer funds to an encoded recipient.
     function generateProof(
         string seed,
-        address caller, 
+        address caller,
         address receiver,
         Algorithm algorithm
     ) pure public returns(bytes32 hash, bytes32 operator, bytes32 check, address check_receiver, bool valid) {
@@ -26,8 +26,8 @@ contract Secure {
     }
 
     function _escrow(
-        string seed, 
-        address caller, 
+        string seed,
+        address caller,
         address receiver,
         Algorithm algorithm
     ) pure internal returns(bytes32 index, bytes32 operator, bytes32 check) {
@@ -43,10 +43,10 @@ contract Secure {
             check = x^keccak256(receiver);
         }
     }
-    
+
     // internal function for hashing the seed
     function hash_seed(
-        string seed, 
+        string seed,
         Algorithm algorithm
     ) pure internal returns(bytes32) {
         if (algorithm == Algorithm.sha) {
@@ -55,10 +55,10 @@ contract Secure {
             return keccak256(seed);
         }
     }
-    
+
    // internal function for hashing bytes
     function hash_data(
-        bytes32 key, 
+        bytes32 key,
         Algorithm algorithm
     ) pure internal returns(bytes32) {
         if (algorithm == Algorithm.sha) {
@@ -67,7 +67,7 @@ contract Secure {
             return keccak256(key);
         }
     }
-    
+
     // internal function for hashing an address
     function blind(
         address addr,
@@ -79,7 +79,7 @@ contract Secure {
             return keccak256(addr);
         }
     }
-    
+
 }
 
 
@@ -92,7 +92,7 @@ contract BlackBox is Secure {
         bytes32 operator;
         bytes32 check;
     }
-    
+
     mapping(bytes32 => Proof) public proofs;
     mapping(bytes32 => bool) public used;
     mapping(address => uint256) private donations;
@@ -101,7 +101,7 @@ contract BlackBox is Secure {
     event Unlocked(string _key, bytes32 _hash, address _receiver);
     event Locked(bytes32 _hash, bytes32 _operator, bytes32 _check);
     event Donation(address _from, uint256 value);
-    
+
     function BlackBox() public {
         owner = msg.sender;
     }
@@ -162,7 +162,7 @@ contract BlackBox is Secure {
         delete proofs[hash];
         // check the balance to send to the receiver
         if (bal <= this.balance && bal > 0) {
-            // transfer to receiver 
+            // transfer to receiver
             // this could fail if receiver is another contract, so fallback
             if(!receiver.send(bal)){
                 require(msg.sender.send(bal));
@@ -170,12 +170,23 @@ contract BlackBox is Secure {
         }
         Unlocked(seed, hash, receiver);
     }
-    
+
     // deposits get stored for the owner
     function() public payable {
         require(msg.value > 0);
         donations[owner] += msg.value;
         Donation(msg.sender, msg.value);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

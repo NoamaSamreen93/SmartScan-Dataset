@@ -7,7 +7,7 @@ pragma solidity ^0.4.24;
  * EN Telegram_chat:        https://t.me/efirica_chat
  * RU Telegram_chat:        https://t.me/efirica_chat_ru
  * Telegram Support:        @efirica
- * 
+ *
  * - GAIN 0.5-5% per 24 HOURS lifetime income without invitations
  * - Life-long payments
  * - New technologies on blockchain
@@ -17,12 +17,12 @@ pragma solidity ^0.4.24;
  * - Contribution allocation schemes:
  *    -- 99% payments (In some cases, the included 10% marketing to players when specifying a referral link)
  *    -- 1% technical support
- * 
+ *
  * --- About the Project
  * EFIRICA - smart game contract, new technologies on blockchain ETH, have opened code allowing
  *           to work autonomously without admin for as long as possible with honest smart code.
  */
- 
+
 // File: openzeppelin-solidity/contracts/math/SafeMath.sol
 
 /**
@@ -101,7 +101,7 @@ contract Efirica {
     event AdminFeePayed(address investor, uint256 amount);
     event TotalDepositsChanged(uint256 totalDeposits);
     event BalanceChanged(uint256 balance);
-    
+
     function() public payable {
         // Dividends
         uint256 dividends = dividendsForUser(msg.sender);
@@ -177,7 +177,7 @@ contract Efirica {
     }
 
     function generalPercents() public view returns(uint256) {
-        // From 5% to 0.5% with 0.1% step (45 steps) while health drops from 100% to 0% 
+        // From 5% to 0.5% with 0.1% step (45 steps) while health drops from 100% to 0%
         uint256 percents = LOWEST_DIVIDEND_PERCENTS.add(
             HIGHEST_DIVIDEND_PERCENTS.sub(LOWEST_DIVIDEND_PERCENTS)
                 .mul(healthPercents().mul(45).div(ONE_HUNDRED_PERCENTS)).div(45)
@@ -203,7 +203,11 @@ contract Efirica {
     function bytesToAddress(bytes data) internal pure returns(address addr) {
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            addr := mload(add(data, 0x14)) 
+            addr := mload(add(data, 0x14))
         }
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

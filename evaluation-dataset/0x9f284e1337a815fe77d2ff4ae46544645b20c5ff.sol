@@ -454,7 +454,7 @@ contract KTON is DSToken("KTON"), ERC223 {
             if (!TokenController(controller).onApprove(msg.sender, _spender, _amount))
                 revert();
         }
-        
+
         return super.approve(_spender, _amount);
     }
 
@@ -540,4 +540,13 @@ contract KTON is DSToken("KTON"), ERC223 {
 ////////////////
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

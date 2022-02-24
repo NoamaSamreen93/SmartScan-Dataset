@@ -123,7 +123,7 @@ contract Controlled is Owned{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -184,7 +184,7 @@ contract MESH is StandardToken {
     string public version = 'v0.1';       //MESH 0.1 standard. Just an arbitrary versioning scheme.
     uint256 public allocateEndTime;
 
-    
+
     // The nonce for avoid transfer replay attacks
     mapping(address => uint256) nonces;
 
@@ -299,4 +299,15 @@ contract MESH is StandardToken {
             balances[to] += value;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -506,7 +506,7 @@ pragma solidity ^0.4.21;
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -632,7 +632,7 @@ pragma solidity ^0.4.24;
 
 
 contract BasicCrowdsale is MintedCrowdsale, FinalizableCrowdsale {
-    
+
     uint256 public cap = 100000000 * (10 ** 18); // Total number of MYO tokens that would be created
     uint256 public capForSale = 71000000 * (10 ** 18); // Total MYO tokens that could be sold during the ICO
     uint256 public bountyTokensCap = 5000000 * (10 ** 18); // Total number of MYO tokens that would be given as a reward
@@ -680,7 +680,7 @@ contract BasicCrowdsale is MintedCrowdsale, FinalizableCrowdsale {
         if(now <= privateSaleEndDate) {
             require(MintableToken(token).totalSupply().add(amount) < PRIVATE_SALE_CAP);
         }
-        
+
         require(MintableToken(token).totalSupply().add(amount) <= capForSale);
         super.buyTokens(beneficiary);
     }
@@ -707,7 +707,7 @@ contract BasicCrowdsale is MintedCrowdsale, FinalizableCrowdsale {
         multiBeneficiariesValidation(beneficiaries, amount);
         for(uint i = 0; i < beneficiaries.length; i++){
             mintFiatToken(beneficiaries[i], amount[i]);
-        } 
+        }
         emit LogFiatTokenMintedToMany(msg.sender, beneficiaries, amount);
         return true;
     }
@@ -729,7 +729,7 @@ contract BasicCrowdsale is MintedCrowdsale, FinalizableCrowdsale {
         for(uint i = 0; i < beneficiaries.length; i++){
             mintBountyToken(beneficiaries[i], amount[i]);
         }
-        
+
         emit LogBountyTokenMintedToMany(msg.sender, beneficiaries, amount);
         return true;
     }
@@ -895,4 +895,13 @@ contract WhitelistedBasicCrowdsale is BasicCrowdsale, MultipleWhitelistedCrowdsa
     MultipleWhitelistedCrowdsale()
     public {
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

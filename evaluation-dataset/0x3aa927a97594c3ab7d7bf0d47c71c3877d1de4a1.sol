@@ -14,7 +14,7 @@ contract ERC20 {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -1091,7 +1091,7 @@ contract MatchingMarket is MatchingEvents, ExpiringMarket, DSNote {
     internal
     returns (bool)
     {
-        uint uid = _head;               //id of an offer in unsorted offers list 
+        uint uid = _head;               //id of an offer in unsorted offers list
         uint pre = uid;                 //id of previous offer in unsorted offers list
 
         require(!isOfferSorted(id));    //make sure offer id is not in sorted offers list
@@ -1112,4 +1112,15 @@ contract MatchingMarket is MatchingEvents, ExpiringMarket, DSNote {
         _near[id] = 0;                  //delete order from unsorted order list
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

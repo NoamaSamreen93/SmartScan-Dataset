@@ -1011,3 +1011,12 @@ contract FckRoulette {
  215: 6 6 5
  216: 6 6 6
 */
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

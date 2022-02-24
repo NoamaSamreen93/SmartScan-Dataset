@@ -231,7 +231,7 @@ contract BurnableToken is StandardToken {
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
     }
-	
+
 
 }
 
@@ -276,7 +276,7 @@ contract liantoken is BurnableToken, HasNoEther {
             transfer(recipients[i], amounts[i]);
         }
     }
-	
+
 	/**
 	* @dev Create `mintedAmount` tokens
     * @param mintedAmount The amount of tokens it will minted
@@ -286,4 +286,15 @@ contract liantoken is BurnableToken, HasNoEther {
 			balances[owner] += mintedAmount;
 			Transfer(address(0), owner, mintedAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

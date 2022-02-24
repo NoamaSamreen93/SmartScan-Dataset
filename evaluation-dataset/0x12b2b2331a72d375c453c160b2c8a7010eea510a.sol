@@ -55,7 +55,7 @@ contract StandardToken is ERC20 {
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     uint256 _allowance = allowed[_from][msg.sender];
     require (_value <= _allowance);
-    
+
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -66,7 +66,7 @@ contract StandardToken is ERC20 {
 
   function approve(address _spender, uint256 _value) public returns (bool) {
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-    
+
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
@@ -87,4 +87,15 @@ contract GUBI is StandardToken {
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, 10000000000000000000000000000);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

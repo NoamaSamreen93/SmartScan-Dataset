@@ -32,7 +32,7 @@ contract SafeMath {
 
 /*
  * Base Token for ERC20 compatibility
- * ERC20 interface 
+ * ERC20 interface
  * see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 {
@@ -121,7 +121,7 @@ contract Freezable is Ownable{
         frozenAccount[target] = false;
         emit FrozenFunds(target, false);
     }
-    
+
     function makeAdmin(address target, bool isAdmin) onlyOwner public{
         admins[target] = isAdmin;
     }
@@ -160,14 +160,14 @@ contract StandardToken is ERC20, SafeMath, Freezable, AddressHolder{
 
     /* approve() allowances */
     mapping (address => mapping (address => uint)) internal allowed;
-    
+
     /**
      *
      * Transfer with ERC223 specification
      *
      * http://vessenes.com/the-erc20-short-address-attack-explained/
      */
-    function transfer(address _to, uint _value) 
+    function transfer(address _to, uint _value)
     public
     returns (bool success)
     {
@@ -189,7 +189,7 @@ contract StandardToken is ERC20, SafeMath, Freezable, AddressHolder{
 
     function transferFrom(address _from, address _to, uint _value)
     public
-    returns (bool success) 
+    returns (bool success)
     {
         require(_to != address(0));
         require(_value <= balances[_from]);
@@ -214,7 +214,7 @@ contract StandardToken is ERC20, SafeMath, Freezable, AddressHolder{
         return balances[_owner];
     }
 
-    function approve(address _spender, uint _value) 
+    function approve(address _spender, uint _value)
     public
     returns (bool success)
     {
@@ -281,7 +281,7 @@ contract StandardToken is ERC20, SafeMath, Freezable, AddressHolder{
 
 contract Geco is StandardToken {
     string public name;
-    uint8 public decimals; 
+    uint8 public decimals;
     string public symbol;
     string public version = "1.0";
     uint totalEthInWei;
@@ -298,7 +298,7 @@ contract Geco is StandardToken {
     }
 
     /* Approves and then calls the receiving contract */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData)
     public
     returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -311,4 +311,20 @@ contract Geco is StandardToken {
     function() payable public{
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

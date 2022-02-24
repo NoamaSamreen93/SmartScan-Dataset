@@ -73,7 +73,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -94,7 +94,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -479,19 +479,19 @@ contract EGLToken is VestedToken {
   string public name = "eGold";
   string public symbol = "EGL";
   uint public decimals = 4;
-  
+
   //CONSTANTS
   // Time limits
   uint public constant STAGE_ONE_TIME_END = 24 hours; // first day bonus
   uint public constant STAGE_TWO_TIME_END = 1 weeks; // first week bonus
   uint public constant STAGE_THREE_TIME_END = 28 days; // around one month
-  
+
   // Multiplier for the decimals
   uint private constant MULTIPLIER = 10000;
 
   //Prices of EGL
   uint public constant PRICE_STANDARD    =  888 *MULTIPLIER; // EGL received per one ETH; MAX_SUPPLY / (valuation / ethPrice)
-  uint public constant PRICE_PREBUY      = 1066 *MULTIPLIER; // 1ETH = 20% more EGL 
+  uint public constant PRICE_PREBUY      = 1066 *MULTIPLIER; // 1ETH = 20% more EGL
   uint public constant PRICE_STAGE_ONE   = 1021 *MULTIPLIER; // 1ETH = 15% more EGL
   uint public constant PRICE_STAGE_TWO   =  976 *MULTIPLIER; // 1ETH = 10% more EGL
   uint public constant PRICE_STAGE_THREE =  888 *MULTIPLIER;
@@ -500,12 +500,12 @@ contract EGLToken is VestedToken {
   uint public constant ALLOC_TEAM =          4444444 *MULTIPLIER; // team + advisors + everything else
   uint public constant ALLOC_CROWDSALE =    (4444444-266666) *MULTIPLIER;
   uint public constant ALLOC_SC = 	          266666 *MULTIPLIER;
-  
+
   uint public constant ALLOC_MAX_PRE =        888888 *MULTIPLIER;
-  
+
   // More ERC20
-  uint public totalSupply =                  8888888 *MULTIPLIER; 
-  
+  uint public totalSupply =                  8888888 *MULTIPLIER;
+
   // ASSIGNED IN INITIALIZATION
   // Start and end times
   uint public publicStartTime; // Time in seconds public crowd fund starts.
@@ -520,14 +520,14 @@ contract EGLToken is VestedToken {
   uint public weiRaised; // Total Ether raised.
   uint public EGLSold; // Total EGL sold. Not to exceed ALLOC_CROWDSALE
   uint public prebuyPortionTotal; // Total of Tokens purchased by pre-buy. Not to exceed ALLOC_MAX_PRE.
-  
+
   // booleans
   bool public halted; // halts the crowd sale if true.
 
   // Is completed
   function isCrowdfundCompleted()
     internal
-    returns (bool) 
+    returns (bool)
   {
     if (
       now > publicEndTime
@@ -567,7 +567,7 @@ contract EGLToken is VestedToken {
     multisigAddress = _multisig;
 
     hardcapInWei = _hardcapInWei;
-    
+
     balances[0x8c6a58B551F38d4D51C0db7bb8b7ad29f7488702] += ALLOC_SC;
 
     // will be transferred to the team address when it's vested
@@ -608,13 +608,13 @@ contract EGLToken is VestedToken {
   }
 
   // calculates wmount of EGL we get, given the wei and the rates we've defined per 1 eth
-  function calcAmount(uint _wei, uint _rate) 
+  function calcAmount(uint _wei, uint _rate)
     constant
-    returns (uint) 
+    returns (uint)
   {
     return SafeMath.div(SafeMath.mul(_wei, _rate), 1 ether);
-  } 
-  
+  }
+
   // Given the rate of a purchase and the remaining tokens in this tranche, it
   // will throw if the sale would take it past the limit of the tranche.
   // Returns `amount` in scope as the number of EGL tokens that it will purchase.
@@ -651,7 +651,7 @@ contract EGLToken is VestedToken {
     } else {
       amount = processPurchase(getPriceRate(), SafeMath.sub(ALLOC_CROWDSALE, EGLSold));
     }
-    
+
     Buy(msg.sender, amount);
   }
 
@@ -669,15 +669,15 @@ contract EGLToken is VestedToken {
     require(ownerAddress.send(this.balance));
   }
 
-  // public constant 
-  function getStatus() 
+  // public constant
+  function getStatus()
     constant
     public
     returns (string)
   {
     if (EGLSold >= ALLOC_CROWDSALE) return "tokensSoldOut";
     if (weiRaised >= hardcapInWei) return "hardcapReached";
-    
+
     if (now < publicStartTime) {
       // presale
       if (prebuyPortionTotal >= ALLOC_MAX_PRE) return "presaleSoldOut";
@@ -689,4 +689,15 @@ contract EGLToken is VestedToken {
       return "saleOver";
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

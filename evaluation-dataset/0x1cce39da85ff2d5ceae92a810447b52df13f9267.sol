@@ -1,5 +1,5 @@
 /**
- * Early prototype of the Edgeless Black Jack contract. 
+ * Early prototype of the Edgeless Black Jack contract.
  * Allows an user to initialize a round of black jack, withdraw the win in case he won or both on the same time,
  * while verifying the game data.
  * author: Julia Altenried
@@ -7,7 +7,7 @@
 pragma solidity ^0.4.10;
 
 contract owned {
-  address public owner; 
+  address public owner;
   modifier onlyOwner {
       if (msg.sender != owner)
           throw;
@@ -40,7 +40,7 @@ contract blackjack is mortal {
     uint start;
   }
 
-  /** the value of the cards: Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K . Ace can be 1 or 11, of course. 
+  /** the value of the cards: Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K . Ace can be 1 or 11, of course.
    *   the value of a card can be determined by looking up cardValues[cardId%13]**/
   uint8[13] cardValues = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
 
@@ -52,7 +52,7 @@ contract blackjack is mortal {
   uint public maximumBet;
   /** the address which signs the number of cards dealt **/
   address public signer;
-  
+
   /** notify listeners that a new round of blackjack started **/
   event NewGame(uint indexed id, bytes32 deck, bytes32 srvSeed, bytes32 cSeed, address player, uint bet);
   /** notify listeners of the game outcome **/
@@ -67,8 +67,8 @@ contract blackjack is mortal {
     signer = signerAddress;
   }
 
-  /** 
-   *   initializes a round of blackjack with an id, the hash of the (partial) deck and the hash of the server seed. 
+  /**
+   *   initializes a round of blackjack with an id, the hash of the (partial) deck and the hash of the server seed.
    *   accepts the bet.
    *   throws an exception if the bet is too low or a game with the given id already exists.
    **/
@@ -80,13 +80,13 @@ contract blackjack is mortal {
     _initGame(id, deck, srvSeed, cSeed, msg.value);
   }
 
-  /** 
+  /**
    * first checks if deck and the player's number of cards are correct, then checks if the player won and if so, sends the win.
    **/
   function stand(uint gameId, uint8[] deck, bytes32 seed, uint8 numCards, uint8 v, bytes32 r, bytes32 s) {
     uint win = _stand(gameId,deck,seed,numCards,v,r,s, true);
   }
-  
+
   /**
   *   first stands, then inits a new game with only one transaction
   **/
@@ -101,10 +101,10 @@ contract blackjack is mortal {
       throw;
     }
   }
-  
-  /** 
-   *   internal function to initialize a round of blackjack with an id, the hash of the (partial) deck, 
-   *   the hash of the server seed and the bet. 
+
+  /**
+   *   internal function to initialize a round of blackjack with an id, the hash of the (partial) deck,
+   *   the hash of the server seed and the bet.
    **/
   function _initGame(uint id, bytes32 deck, bytes32 srvSeed, bytes32 cSeed, uint bet) internal{
     //throw if game with id already exists. later maybe throw only if game with id is still running
@@ -112,7 +112,7 @@ contract blackjack is mortal {
     games[id] = Game(id, deck, srvSeed, msg.sender, bet, now);
     NewGame(id, deck, srvSeed, cSeed, msg.sender, bet);
   }
-  
+
   /**
   * first checks if deck and the player's number of cards are correct, then checks if the player won and if so, calculates the win.
   **/
@@ -136,7 +136,7 @@ contract blackjack is mortal {
       Error(4);
       return 0;
     }
-    
+
     win = determineOutcome(gameId, deck, numCards);
     if (payout && win > 0 && !msg.sender.send(win)){
       Error(5);
@@ -145,7 +145,7 @@ contract blackjack is mortal {
     }
     Result(gameId, msg.sender, win);
   }
-  
+
   /**
   * check if deck and casino seed are correct.
   **/
@@ -154,13 +154,13 @@ contract blackjack is mortal {
     if(sha3(convertToBytes(deck), seed) != games[gameId].deck) return false;
     return true;
   }
-  
+
   function convertToBytes(uint8[] byteArray) returns (bytes b){
     b = new bytes(byteArray.length);
     for(uint8 i = 0; i < byteArray.length; i++)
       b[i] = byte(byteArray[i]);
   }
-  
+
   /**
   * check if user and casino agree on the number of cards
   **/
@@ -170,7 +170,7 @@ contract blackjack is mortal {
   }
 
   /**
-   * determines the outcome of a game and returns the win. 
+   * determines the outcome of a game and returns the win.
    * in case of a loss, win is 0.
    **/
   function determineOutcome(uint gameId, uint8[] cards, uint8 numCards) constant returns(uint win) {
@@ -185,7 +185,7 @@ contract blackjack is mortal {
       if(isSuited(cards[0], cards[2]))
         return games[gameId].bet * 3; //pay 2 to 1
       else
-        return games[gameId].bet * 5 / 2; 
+        return games[gameId].bet * 5 / 2;
     }
     else if(playerValue == 21 && numCards == 5) //automatic win on 5-card 21
       return games[gameId].bet * 2;
@@ -206,7 +206,7 @@ contract blackjack is mortal {
    *   numCards: the number of cards the player holds
    **/
   function getPlayerValue(uint8[] cards, uint8 numCards) constant internal returns(uint8 playerValue) {
-    //player receives first and third card and  all further cards after the 4. until he stands 
+    //player receives first and third card and  all further cards after the 4. until he stands
     //determine value of the player's hand
     uint8 numAces;
     uint8 card;
@@ -231,7 +231,7 @@ contract blackjack is mortal {
    *   numCards: the number of cards the player holds
    **/
   function getDealerValue(uint8[] cards, uint8 numCards) constant internal returns(uint8 dealerValue, bool bj) {
-    
+
     //dealer always receives second and forth card
     uint8 card  = cards[1] % 13;
     uint8 card2 = cards[3] % 13;
@@ -246,7 +246,7 @@ contract blackjack is mortal {
     else if(dealerValue==21){
       return (21, true);
     }
-    //take cards until value reaches 17 or more. 
+    //take cards until value reaches 17 or more.
     uint8 i;
     while (dealerValue < 17) {
       card = cards[numCards + i + 2] % 13 ;
@@ -259,35 +259,46 @@ contract blackjack is mortal {
       i++;
     }
   }
-  
+
   /** determines if two cards have the same color **/
   function isSuited(uint8 card1, uint8 card2) internal returns(bool){
     return card1/13 == card2/13;
   }
-  
+
   /** the fallback function can be used to send ether to increase the casino bankroll **/
   function() payable onlyOwner{
   }
-  
+
   /** allows the owner to withdraw funds **/
   function withdraw(uint amount) onlyOwner{
     if(amount < address(this).balance)
       if(!owner.send(amount))
         Error(6);
   }
-  
+
   /** allows the owner to change the signer address **/
   function setSigner(address signerAddress) onlyOwner{
     signer = signerAddress;
   }
-  
+
   /** allows the owner to change the minimum bet **/
   function setMinimumBet(uint newMin) onlyOwner{
     minimumBet = newMin;
   }
-  
+
   /** allows the owner to change the mximum **/
   function setMaximumBet(uint newMax) onlyOwner{
     minimumBet = newMax;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

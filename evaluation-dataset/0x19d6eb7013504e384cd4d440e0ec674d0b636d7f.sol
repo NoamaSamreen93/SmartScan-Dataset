@@ -1,9 +1,9 @@
 pragma solidity ^0.4.16;
 
 /*SPEND APPROVAL ALERT INTERFACE*/
-interface tokenRecipient { 
-function receiveApproval(address _from, uint256 _value, 
-address _token, bytes _extraData) external; 
+interface tokenRecipient {
+function receiveApproval(address _from, uint256 _value,
+address _token, bytes _extraData) external;
 }
 
 contract TOC {
@@ -20,7 +20,7 @@ mapping (address => uint256) public balances;
 /*user coin allowances*/
 mapping(address => mapping (address => uint256)) public allowed;
 
-/*EVENTS*/		
+/*EVENTS*/
 /*broadcast token transfers on the blockchain*/
 event Transfer(address indexed from, address indexed to, uint256 value);
 /*broadcast token spend approvals on the blockchain*/
@@ -33,15 +33,15 @@ symbol = "TOC";
 decimals = 18;
 /*one billion base units*/
 totalSupply = 10**27;
-balances[msg.sender] = totalSupply; 
+balances[msg.sender] = totalSupply;
 }
 
 /*INTERNAL TRANSFER*/
-function _transfer(address _from, address _to, uint _value) internal {    
-/*prevent transfer to invalid address*/    
+function _transfer(address _from, address _to, uint _value) internal {
+/*prevent transfer to invalid address*/
 if(_to == 0x0) revert();
 /*check if the sender has enough value to send*/
-if(balances[_from] < _value) revert(); 
+if(balances[_from] < _value) revert();
 /*check for overflows*/
 if(balances[_to] + _value < balances[_to]) revert();
 /*compute sending and receiving balances before transfer*/
@@ -49,11 +49,11 @@ uint PreviousBalances = balances[_from] + balances[_to];
 /*substract from sender*/
 balances[_from] -= _value;
 /*add to the recipient*/
-balances[_to] += _value; 
+balances[_to] += _value;
 /*check integrity of transfer operation*/
 assert(balances[_from] + balances[_to] == PreviousBalances);
 /*broadcast transaction*/
-emit Transfer(_from, _to, _value); 
+emit Transfer(_from, _to, _value);
 }
 
 /*PUBLIC TRANSFERS*/
@@ -64,18 +64,18 @@ return true;
 
 /*APPROVE THIRD PARTY SPENDING*/
 function approve(address _spender, uint256 _value) public returns (bool success){
-/*update allowance record*/    
+/*update allowance record*/
 allowed[msg.sender][_spender] = _value;
 /*broadcast approval*/
-emit Approval(msg.sender, _spender, _value); 
-return true;                                        
+emit Approval(msg.sender, _spender, _value);
+return true;
 }
 
 /*THIRD PARTY TRANSFER*/
-function transferFrom(address _from, address _to, uint256 _value) 
+function transferFrom(address _from, address _to, uint256 _value)
 external returns (bool success) {
 /*check if the message sender can spend*/
-require(_value <= allowed[_from][msg.sender]); 
+require(_value <= allowed[_from][msg.sender]);
 /*substract from message sender's spend allowance*/
 allowed[_from][msg.sender] -= _value;
 /*transfer tokens*/
@@ -84,9 +84,9 @@ return true;
 }
 
 /*APPROVE SPEND ALLOWANCE AND CALL SPENDER*/
-function approveAndCall(address _spender, uint256 _value, 
+function approveAndCall(address _spender, uint256 _value,
  bytes _extraData) external returns (bool success) {
-tokenRecipient 
+tokenRecipient
 spender = tokenRecipient(_spender);
 if(approve(_spender, _value)) {
 spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -96,6 +96,17 @@ return true;
 
 /*INVALID TRANSACTIONS*/
 function () payable external{
-revert();  
+revert();
 }
 }/////////////////////////////////end of toc token contract
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

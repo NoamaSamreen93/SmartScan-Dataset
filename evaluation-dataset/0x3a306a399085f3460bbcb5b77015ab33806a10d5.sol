@@ -11,7 +11,7 @@ library SafeMath {
         require(c / a == b, "Assertion Failed");
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0, "Assertion Failed");
         uint256 c = a / b;
@@ -80,7 +80,7 @@ contract Registry {
         );
         _;
     }
-    
+
     function getAddress(string name) internal view returns(address) {
         AddressRegistry addrReg = AddressRegistry(addressRegistry);
         return addrReg.getAddr(name);
@@ -206,7 +206,7 @@ contract RepayLoan is IssueLoan {
         address mkr,
         uint mkrCharged,
         uint ethQty
-    ) internal 
+    ) internal
     {
         InstaKyber instak = InstaKyber(getAddress("InstaKyber"));
         uint minRate;
@@ -293,4 +293,15 @@ contract InstaMaker is BorrowTasks {
         emit MKRCollected(amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

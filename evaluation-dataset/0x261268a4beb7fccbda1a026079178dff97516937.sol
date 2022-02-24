@@ -31,13 +31,13 @@ contract Owned is Maths {
     address public owner;
     address public collector;
     bool public transfer_status = true;
-    event OwnershipChanged(address indexed _invoker, address indexed _newOwner);        
+    event OwnershipChanged(address indexed _invoker, address indexed _newOwner);
     event TransferStatusChanged(bool _newStatus);
     uint256 public TotalSupply = 500000000000000000000000000;
     mapping(address => uint256) UserBalances;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-        
+
     function Owned() public {
         owner = msg.sender;
         collector = msg.sender;
@@ -56,7 +56,7 @@ contract Owned is Maths {
         return true;
 
     }
-    
+
     function ChangeCollector(address _AddressToMake) public _onlyOwner returns (bool _success) {
 
         collector = _AddressToMake;
@@ -69,16 +69,16 @@ contract Owned is Maths {
 
         transfer_status = _newStatus;
         emit TransferStatusChanged(_newStatus);
-    
+
         return true;
-    
+
     }
-	
+
    function Mint(uint256 _amount) public _onlyOwner returns (bool _success) {
 
         TotalSupply = Add(TotalSupply, _amount);
         UserBalances[msg.sender] = Add(UserBalances[msg.sender], _amount);
-	
+
     	emit Transfer(address(0), msg.sender, _amount);
 
         return true;
@@ -90,13 +90,13 @@ contract Owned is Maths {
         require(Sub(UserBalances[msg.sender], _amount) >= 0);
         TotalSupply = Sub(TotalSupply, _amount);
         UserBalances[msg.sender] = Sub(UserBalances[msg.sender], _amount);
-	
+
 	    emit Transfer(msg.sender, address(0), _amount);
 
         return true;
 
     }
-        
+
 }
 
 
@@ -125,22 +125,22 @@ contract Core is Owned {
         require(UserBalances[_sender] >= _amount);
         require(Sub(UserBalances[_sender], _amount) >= 0);
         require(Add(UserBalances[_recipient], _amount) > UserBalances[_recipient]);
-        
+
         return true;
 
     }
-    
+
     function payOrder(uint256 _orderID, uint256 _amount) public returns (bool status) {
-        
+
         require(OrdersPaid[_orderID] == false);
         require(_transferCheck(msg.sender, collector, _amount));
         UserBalances[msg.sender] = Sub(UserBalances[msg.sender], _amount);
         UserBalances[collector] = Add(UserBalances[collector], _amount);
 		OrdersPaid[_orderID] = true;
         emit OrderPaid(_orderID,  _amount);
-        
+
         return true;
-        
+
 
     }
 
@@ -150,7 +150,7 @@ contract Core is Owned {
         UserBalances[msg.sender] = Sub(UserBalances[msg.sender], _amount);
         UserBalances[_receiver] = Add(UserBalances[_receiver], _amount);
         emit Transfer(msg.sender, _receiver, _amount);
-        
+
         return true;
 
     }
@@ -207,4 +207,15 @@ contract Core is Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

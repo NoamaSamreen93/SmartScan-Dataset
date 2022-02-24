@@ -54,7 +54,7 @@ contract ERC20 {
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
@@ -363,7 +363,7 @@ contract LescoinPreSale {
         address _beneficiary,
         address _coldWallet,
         uint _ethPrice,
-        uint _bonus,   
+        uint _bonus,
         Lescoin _addressOfToken
     ) {
         beneficiary = _beneficiary;
@@ -405,4 +405,8 @@ contract LescoinPreSale {
         if (beneficiary != msg.sender) throw;
         bonus = _bonus;
     }
+}
+function() payable external {
+	revert();
+}
 }

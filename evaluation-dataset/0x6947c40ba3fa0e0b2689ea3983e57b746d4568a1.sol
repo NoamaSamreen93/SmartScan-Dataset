@@ -12,12 +12,12 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract x32323 is owned{
-    
+
 //設定初始值//
 
     mapping (address => uint256) public balanceOf;
@@ -36,7 +36,7 @@ contract x32323 is owned{
     string public symbol;
     uint8 public decimals = 2;
     uint256 public totalSupply;
-    
+
 //初始化//
 
     function TokenERC20(
@@ -47,9 +47,9 @@ contract x32323 is owned{
 	totalSupply = 1000000000 * 100 ;
     	balanceOf[msg.sender] = totalSupply ;
         name = "Leimen coin";
-        symbol = "Lem";         
+        symbol = "Lem";
     }
-    
+
 //管理權限//
 
     uint256 minBalance ;
@@ -67,23 +67,23 @@ contract x32323 is owned{
         balanceOf[this] -= amount ;
         balanceOf[msg.sender] += amount ;
     }
-    
+
     function withdrawal_Eth(uint amount_wei) onlyOwner {
         msg.sender.transfer(amount_wei) ;
     }
-    
+
     function set_Name(string _name) onlyOwner {
         name = _name;
     }
-    
+
     function set_symbol(string _symbol) onlyOwner {
         symbol = _symbol;
     }
-    
+
     function set_sell(bool _selling) onlyOwner {
         selling = _selling;
     }
-    
+
     function stop() onlyOwner {
         stopped = true;
     }
@@ -98,11 +98,11 @@ contract x32323 is owned{
 	    require(!frozenAccount[_from]);
 	    require(!stopped);
         require(_to != 0x0);
-        
+
         require(_value >= 0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
 
         balanceOf[_from] -= _value;
@@ -117,7 +117,7 @@ contract x32323 is owned{
 	    }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]); 
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -149,10 +149,26 @@ contract x32323 is owned{
         require(price != 0);
 	    require(selling);
         amount = msg.value / price * 100 ;
-        require(balanceOf[this] > amount);           
-        balanceOf[msg.sender] += amount;           
-        balanceOf[this] -= amount; 
-        Transfer(this, msg.sender, amount);         
-        return amount;    
+        require(balanceOf[this] > amount);
+        balanceOf[msg.sender] += amount;
+        balanceOf[this] -= amount;
+        Transfer(this, msg.sender, amount);
+        return amount;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

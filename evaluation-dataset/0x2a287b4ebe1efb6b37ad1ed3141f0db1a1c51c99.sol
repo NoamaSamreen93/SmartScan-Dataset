@@ -4,46 +4,46 @@ contract Token{
 
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) public returns   
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success);
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success);
-    
-    function allowance(address _owner, address _spender) public constant returns 
+
+    function allowance(address _owner, address _spender) public constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
 contract STS is Token {
-    
-    string public name;                  
-    uint8 public decimals;            
-    string public symbol;             
-    
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+
     function STS(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public {
-        totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);      
+        totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);
         balances[msg.sender] = totalSupply;
-        
-        name = _tokenName;                   
-        decimals = _decimalUnits;          
+
+        name = _tokenName;
+        decimals = _decimalUnits;
         symbol = _tokenSymbol;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]);
         require(_to != 0x0);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
@@ -57,8 +57,8 @@ contract STS is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
-    { 
+    function approve(address _spender, uint256 _value) public returns (bool success)
+    {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -69,4 +69,15 @@ contract STS is Token {
     }
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

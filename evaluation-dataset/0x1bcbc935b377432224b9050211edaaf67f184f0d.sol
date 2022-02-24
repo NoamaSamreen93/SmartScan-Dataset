@@ -45,7 +45,7 @@ contract subSale{
 
   function listSubName(bytes32 node,uint price,uint expiry) node_owner(node){
     require(records[node].subSale != true);
- 
+
     records[node].originalOwner=msg.sender;
     records[node].subSale=true;
     records[node].subPrice=price;
@@ -104,4 +104,15 @@ contract subSale{
     admin.transfer(msg.value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

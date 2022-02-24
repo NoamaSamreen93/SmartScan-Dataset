@@ -442,7 +442,7 @@ contract SolarDaoTokenCrowdsale is Haltable, Killable, SafeMath {
     tokenAmountOf[receiver] = safeAdd(tokenAmountOf[receiver], tokensAmount);
     // Update totals
     weiRaised = safeAdd(weiRaised, weiAmount);
-    tokensSold = safeAdd(tokensSold, tokensAmount);   
+    tokensSold = safeAdd(tokensSold, tokensAmount);
 
     assignTokens(receiver, tokensAmount);
     var teamBonusTokens = safeDiv(safeMul(tokensAmount, TEAM_BONUS_PERCENT), 100 - TEAM_BONUS_PERCENT);
@@ -473,7 +473,7 @@ contract SolarDaoTokenCrowdsale is Haltable, Killable, SafeMath {
   }
 
   /// @dev Finalize a succcesful crowdsale.
-  function finalizeCrowdsale() internal {    
+  function finalizeCrowdsale() internal {
     token.releaseTokenTransfer();
   }
 
@@ -498,19 +498,19 @@ contract SolarDaoTokenCrowdsale is Haltable, Killable, SafeMath {
      exchangeRateAgent = newAgent;
    }
  }
- 
+
   /// @dev Method set data from migrated contract
   /// @param _tokensSold tokens sold
   /// @param _weiRaised _wei raised
   /// @param _investorCount investor count
- function setCrowdsaleData(uint _tokensSold, uint _weiRaised, uint _investorCount) onlyOwner {  
+ function setCrowdsaleData(uint _tokensSold, uint _weiRaised, uint _investorCount) onlyOwner {
 	require(_tokensSold > 0);
 	require(_weiRaised > 0);
 	require(_investorCount > 0);
-	
+
 	tokensSold = _tokensSold;
 	weiRaised = _weiRaised;
-	investorCount = _investorCount;	
+	investorCount = _investorCount;
  }
 
   function getDifference(int one, int two) private constant returns (uint) {
@@ -585,7 +585,7 @@ contract SolarDaoTokenCrowdsale is Haltable, Killable, SafeMath {
     assert (usdAmount >= PRICE);
 
     return safeMul(usdAmount, safeDiv(multiplier, PRICE));
-  }  
+  }
 
    /// @dev Check if the pre ICO goal was reached.
    /// @return true if the preICO has raised enough money to be a success
@@ -606,4 +606,15 @@ contract SolarDaoTokenCrowdsale is Haltable, Killable, SafeMath {
    function assignTokens(address receiver, uint tokenAmount) private {
      token.mint(receiver, tokenAmount);
    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

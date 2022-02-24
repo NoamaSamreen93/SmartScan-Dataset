@@ -1,6 +1,6 @@
 // our mirrors:
 // ftec.io
-// ftec.ai 
+// ftec.ai
 // our official Telegram group:
 // t.me/FTECofficial
 
@@ -56,7 +56,7 @@ contract MultiOwnable {
         require(isOwner[msg.sender]);
         _;
     }
-    
+
     function ownerHistoryCount() public view returns (uint) {
         return ownerHistory.length;
     }
@@ -93,16 +93,16 @@ contract ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint;
 
     mapping(address => uint256) balances;
-    
+
     mapping(address => mapping(address => uint256)) allowed;
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -113,7 +113,7 @@ contract StandardToken is ERC20 {
         require(_to != address(0));
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -129,7 +129,7 @@ contract StandardToken is ERC20 {
         require(_value > 0);
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_to] = balances[_to].add(_value);
         balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -155,17 +155,17 @@ contract StandardToken is ERC20 {
 }
 
 contract CommonToken is StandardToken, MultiOwnable {
-    
+
     string public name   = 'FTEC';
     string public symbol = 'FTEC';
     uint8 public decimals = 18;
-    
+
     uint256 public saleLimit;   // 85% of tokens for sale.
     uint256 public teamTokens;  // 7% of tokens goes to the team and will be locked for 1 year.
-    
+
     // 7% of team tokens will be locked at this address for 1 year.
     address public teamWallet; // Team address.
-    
+
     uint public unlockTeamTokensTime = now + 1 years;
 
     // The main account that holds all tokens at the beginning and during tokensale.
@@ -176,7 +176,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
     // Lock the transfer functions during tokensales to prevent price speculations.
     bool public locked = true;
-    
+
     event SellEvent(address indexed _seller, address indexed _buyer, uint256 _value);
     event ChangeSellerEvent(address indexed _oldSeller, address indexed _newSeller);
     event Burn(address indexed _burner, uint256 _value);
@@ -186,7 +186,7 @@ contract CommonToken is StandardToken, MultiOwnable {
         address _seller,
         address _teamWallet
     ) MultiOwnable() public {
-        
+
         totalSupply = 998400000 ether;
         saleLimit   = 848640000 ether;
         teamTokens  =  69888000 ether;
@@ -197,22 +197,22 @@ contract CommonToken is StandardToken, MultiOwnable {
         uint sellerTokens = totalSupply.sub(teamTokens);
         balances[seller] = sellerTokens;
         Transfer(0x0, seller, sellerTokens);
-        
+
         balances[teamWallet] = teamTokens;
         Transfer(0x0, teamWallet, teamTokens);
     }
-    
+
     modifier ifUnlocked(address _from) {
         require(!locked);
-        
+
         // If requested a transfer from the team wallet:
         if (_from == teamWallet) {
             require(now >= unlockTeamTokensTime);
         }
-        
+
         _;
     }
-    
+
     /** Can be called once by super owner. */
     function unlock() onlyOwner public {
         require(locked);
@@ -232,7 +232,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
         seller = newSeller;
         ChangeSellerEvent(oldSeller, newSeller);
-        
+
         return true;
     }
 
@@ -259,7 +259,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
         return true;
     }
-    
+
     /**
      * Until all tokens are sold, tokens can be transfered to/from owner's accounts.
      */
@@ -289,7 +289,18 @@ contract CommonToken is StandardToken, MultiOwnable {
 
 contract ProdToken is CommonToken {
     function ProdToken() CommonToken(
-        0x2c21095Ef1E885eB398C802E70DE839311D0B889, 
-        0xB66aDcdba22BDb8597399DbC23d5bE123F239A7E  
+        0x2c21095Ef1E885eB398C802E70DE839311D0B889,
+        0xB66aDcdba22BDb8597399DbC23d5bE123F239A7E
     ) public {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

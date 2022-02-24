@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -60,21 +60,21 @@ library SafeMath {
  * @dev See https://eips.ethereum.org/EIPS/eip-20
  */
 interface IERC20 {
-    function transfer(address to, uint256 value) external returns (bool); 
+    function transfer(address to, uint256 value) external returns (bool);
 
-    function approve(address spender, uint256 value) external returns (bool); 
+    function approve(address spender, uint256 value) external returns (bool);
 
-    function transferFrom(address from, address to, uint256 value) external returns (bool); 
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
 
-    function totalSupply() external view returns (uint256); 
+    function totalSupply() external view returns (uint256);
 
     function balanceOf(address who) external view returns (uint256);
 
-    function allowance(address owner, address spender) external view returns (uint256); 
+    function allowance(address owner, address spender) external view returns (uint256);
 
-    event Transfer(address indexed from, address indexed to, uint256 value); 
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
-    event Approval(address indexed owner, address indexed spender, uint256 value); 
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**
@@ -83,9 +83,9 @@ interface IERC20 {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    address internal _owner; 
+    address internal _owner;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner); 
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @return the address of the owner.
@@ -126,7 +126,7 @@ contract Ownable {
      * @param newOwner The address to transfer ownership to.
      */
     function transferOwnership(address newOwner) public onlyOwner {
-        _transferOwnership(newOwner); 
+        _transferOwnership(newOwner);
     }
 
     /**
@@ -135,8 +135,8 @@ contract Ownable {
      */
     function _transferOwnership(address newOwner) internal {
         require(newOwner != address(0), "Cannot transfer control of the contract to the zero address");
-        emit OwnershipTransferred(_owner, newOwner); 
-        _owner = newOwner; 
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
     }
 }
 
@@ -145,18 +145,18 @@ contract Ownable {
  * @dev Implementation of the basic standard token.
  */
 contract StandardToken is IERC20 {
-    using SafeMath for uint256; 
-    
-    mapping (address => uint256) internal _balances; 
-    mapping (address => mapping (address => uint256)) internal _allowed; 
-    
-    uint256 internal _totalSupply; 
-    
+    using SafeMath for uint256;
+
+    mapping (address => uint256) internal _balances;
+    mapping (address => mapping (address => uint256)) internal _allowed;
+
+    uint256 internal _totalSupply;
+
     /**
      * @dev Total number of tokens in existence.
      */
     function totalSupply() public view returns (uint256) {
-        return _totalSupply; 
+        return _totalSupply;
     }
 
     /**
@@ -198,7 +198,7 @@ contract StandardToken is IERC20 {
      * @param value The amount of tokens to be spent.
      */
     function approve(address spender, uint256 value) public returns (bool) {
-        _approve(msg.sender, spender, value); 
+        _approve(msg.sender, spender, value);
         return true;
     }
 
@@ -211,8 +211,8 @@ contract StandardToken is IERC20 {
      * @param value The amount of tokens to be transferred.
      */
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
-        _transfer(from, to, value); 
-        _approve(from, msg.sender, _allowed[from][msg.sender].sub(value)); 
+        _transfer(from, to, value);
+        _approve(from, msg.sender, _allowed[from][msg.sender].sub(value));
         return true;
     }
 
@@ -227,7 +227,7 @@ contract StandardToken is IERC20 {
      * @param addedValue The amount of tokens to increase the allowance by.
      */
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _approve(msg.sender, spender, _allowed[msg.sender][spender].add(addedValue)); 
+        _approve(msg.sender, spender, _allowed[msg.sender][spender].add(addedValue));
         return true;
     }
 
@@ -253,10 +253,10 @@ contract StandardToken is IERC20 {
      * @param value The amount to be transferred.
      */
     function _transfer(address from, address to, uint256 value) internal {
-        require(to != address(0), "Cannot transfer to the zero address"); 
-        _balances[from] = _balances[from].sub(value); 
-        _balances[to] = _balances[to].add(value); 
-        emit Transfer(from, to, value); 
+        require(to != address(0), "Cannot transfer to the zero address");
+        _balances[from] = _balances[from].sub(value);
+        _balances[to] = _balances[to].add(value);
+        emit Transfer(from, to, value);
     }
 
     /**
@@ -266,10 +266,10 @@ contract StandardToken is IERC20 {
      * @param value The number of tokens that can be spent.
      */
     function _approve(address owner, address spender, uint256 value) internal {
-        require(spender != address(0), "Cannot approve to the zero address"); 
-        require(owner != address(0), "Setter cannot be the zero address"); 
+        require(spender != address(0), "Cannot approve to the zero address");
+        require(owner != address(0), "Setter cannot be the zero address");
 	    _allowed[owner][spender] = value;
-        emit Approval(owner, spender, value); 
+        emit Approval(owner, spender, value);
     }
 
 }
@@ -279,18 +279,18 @@ contract StandardToken is IERC20 {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    event Pause(); 
-    event Unpause(); 
-    
-    bool public paused = false; 
-    
+    event Pause();
+    event Unpause();
+
+    bool public paused = false;
+
 
 
     /**
      * @dev Modifier to make a function callable only when the contract is not paused.
      */
     modifier whenNotPaused() {
-        require(!paused, "Only when the contract is not paused"); 
+        require(!paused, "Only when the contract is not paused");
         _;
     }
 
@@ -298,7 +298,7 @@ contract Pausable is Ownable {
      * @dev Modifier to make a function callable only when the contract is paused.
      */
     modifier whenPaused() {
-        require(paused, "Only when the contract is paused"); 
+        require(paused, "Only when the contract is paused");
         _;
     }
 
@@ -306,16 +306,16 @@ contract Pausable is Ownable {
      * @dev Called by the owner to pause, trigger stopped state.
      */
     function pause() public onlyOwner whenNotPaused {
-        paused = true; 
-        emit Pause(); 
+        paused = true;
+        emit Pause();
     }
 
     /**
      * @dev Called by the owner to unpause, return to normal state.
      */
     function unpause() public onlyOwner whenPaused {
-        paused = false; 
-        emit Unpause(); 
+        paused = false;
+        emit Unpause();
     }
 }
 
@@ -324,25 +324,25 @@ contract Pausable is Ownable {
  * @dev ERC20 modified with pausable transfers.
  */
 contract PausableToken is StandardToken, Pausable {
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
-        return super.transfer(_to, _value); 
+        return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
-        return super.transferFrom(_from, _to, _value); 
+        return super.transferFrom(_from, _to, _value);
     }
-    
+
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
-        return super.approve(_spender, _value); 
+        return super.approve(_spender, _value);
     }
-    
+
     function increaseAllowance(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
-        return super.increaseAllowance(_spender, _addedValue); 
+        return super.increaseAllowance(_spender, _addedValue);
     }
-    
+
     function decreaseAllowance(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
-        return super.decreaseAllowance(_spender, _subtractedValue); 
+        return super.decreaseAllowance(_spender, _subtractedValue);
     }
 }
 
@@ -381,11 +381,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract VFDToken is BurnableToken, PausableToken {
-    string public constant name = "Micro Payment Shield";  
-    string public constant symbol = "VFD";  
+    string public constant name = "Micro Payment Shield";
+    string public constant symbol = "VFD";
     uint8 public constant decimals = 18;
-    uint256 internal constant INIT_TOTALSUPPLY = 65000000; 
-    
+    uint256 internal constant INIT_TOTALSUPPLY = 65000000;
+
     /**
      * @dev Constructor, initialize the basic information of contract.
      */
@@ -396,4 +396,13 @@ contract VFDToken is BurnableToken, PausableToken {
         _balances[_owner] = _totalSupply;
         emit Transfer(address(0), _owner, _totalSupply);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

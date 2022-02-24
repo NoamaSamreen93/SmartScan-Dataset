@@ -18,7 +18,7 @@ pragma solidity ^0.4.24;
  *  After the dividend is paid, the rate of return is returned to 1.23 % per day
  *
  *           For example: if the Deposit is 10 ETH
- * 
+ *
  *                days      |   %    |   profit
  *          --------------------------------------
  *            1 (>24 hours) | 1.24 % | 0.124 ETH
@@ -306,4 +306,17 @@ contract SmartPyramid {
         waveStartUp = block.timestamp + 7 days;
         emit LogNewWave(waveStartUp);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

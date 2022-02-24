@@ -1,7 +1,7 @@
 pragma solidity 0.5.7;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -61,7 +61,7 @@ library SafeMath {
  */
 contract GOMC {
     using SafeMath for uint256;
-    
+
     string public constant name = "GGOOUMCHAIN Token";
     string public constant symbol = "GOMC";
     uint8 public constant decimals = 18;
@@ -187,4 +187,13 @@ contract GOMC {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

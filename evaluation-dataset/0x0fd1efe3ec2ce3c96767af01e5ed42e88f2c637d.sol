@@ -565,7 +565,7 @@ contract Releaseable is Frozenable {
         else if (releaseCount <= 540) {
             releaseAmountPerDay = standardReleaseAmount.div(4);
         }
-        
+
     }
 }
 contract CoinCool is Releaseable {
@@ -574,4 +574,15 @@ contract CoinCool is Releaseable {
     string public symbol = 'CCT';
     uint8 public decimals = 8;
     function CoinCool() Releaseable(0x9515fbCd9Ccb293f8874b99c8D8c6Bd5713268d3, mulDecimals.mul(55000000)) public {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -5,7 +5,7 @@ pragma solidity ^0.5.0;
 library Set {
     // We define a new struct datatype that will be used to
     // hold its data in the calling contract.
-    struct Data { 
+    struct Data {
         mapping(address => bool) flags;
     }
 
@@ -61,15 +61,15 @@ contract Crowdsourcing {
     mapping(address => bool) public paid;
     mapping(address => string) private answers;
     Set.Data workers;
-    
+
     event toVerification (
         address indexed id
     );
-    
+
     event rejection (
         address indexed rejected
     );
-    
+
     constructor(address owner, uint total, string memory content, uint money) public payable{
         require(money % total == 0);
         _owner = owner;
@@ -78,15 +78,15 @@ contract Crowdsourcing {
         _content = content;
 
     }
-    
+
     function getTotal() public view returns (uint) {
         return _total;
     }
-    
+
     function getAmount() public view returns (uint) {
         return _amount;
     }
-    
+
     function getContent() public view returns (string memory) {
         return _content;
     }
@@ -94,25 +94,25 @@ contract Crowdsourcing {
     function isPaying() public view returns (bool) {
         return _current  < _total;
     }
-    
+
     function getAnswers(address f) public view returns (string memory) {
         require (msg.sender == _owner);
         return answers[f];
     }
-    
+
     function addMoney() public payable {
         require((msg.value + _amount) % _total == 0);
         _amount += msg.value;
     }
-    
+
     // fallback function
     function() external payable { }
-    
+
     function stop() public {
         require (msg.sender == _owner);
         selfdestruct(msg.sender);
     }
-    
+
     function accept(address payable target) public payable {
         require(msg.sender == _owner);
         require(!paid[target]);
@@ -122,7 +122,7 @@ contract Crowdsourcing {
         _current ++;
         target.transfer(_amount / _total);
     }
-    
+
     function reject(address payable target) public payable {
         require(msg.sender == _owner);
         require(!paid[target]);
@@ -131,7 +131,7 @@ contract Crowdsourcing {
         emit rejection(target);
         answers[target] = '';
     }
-    
+
     function answer(string calldata ans) external {
         answers[msg.sender] = ans;
         workersArr.push(msg.sender);
@@ -156,11 +156,11 @@ contract Crowdsourcing {
     function isPaid(address a) public view returns (bool) {
         return paid[a];
     }
-    
+
     function myPay() public view returns (bool) {
         return paid[msg.sender];
     }
-    
+
     function myAnswer() public view returns (string memory) {
         if (bytes(answers[msg.sender]).length == 0) return "";
         return answers[msg.sender];
@@ -184,9 +184,18 @@ contract CrdSet {
         emit newContract(a);
         return a;
     }
-    
+
     function getContracCount() public view returns (uint) {
         return list.length;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

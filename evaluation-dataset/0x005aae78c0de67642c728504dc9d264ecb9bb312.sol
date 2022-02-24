@@ -17,7 +17,7 @@ contract EC {
         gys.push(gy);
         gzs.push(1);
     }
-    
+
     function prepare(uint count) public
     {
         require(gxs.length < 256);
@@ -187,7 +187,7 @@ contract EC {
                 (acx,acy,acz) = _ecAdd(acx,acy,acz, gxs[i],gys[i],gzs[i]);
             }
         }
-        
+
         acz = _inverse(acz);
         (qx,qy) = (mulmod(acx,acz,n),mulmod(acy,acz,n));
     }
@@ -204,4 +204,15 @@ contract EC {
         qy = mulmod(y , z ,n);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -39,11 +39,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -92,7 +92,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Ownable {
-    
+
   address public owner;
 
   function Ownable() {
@@ -105,7 +105,7 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -113,9 +113,9 @@ contract Ownable {
 
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -137,30 +137,30 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract Testcoin is MintableToken {
-    
+
     string public constant name = "Testcoin Token";
-    
+
     string public constant symbol = "TSTC";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
 
     Testcoin public token = new Testcoin();
 
     uint start;
-    
+
     uint period;
 
     uint hardcap;
@@ -179,12 +179,12 @@ contract Crowdsale is Ownable {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(multisig.balance <= hardcap);
         _;
     }
-    
+
     function finishMinting() public onlyOwner {
     token.finishMinting();
     }
@@ -203,5 +203,21 @@ contract Crowdsale is Ownable {
     function() external payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

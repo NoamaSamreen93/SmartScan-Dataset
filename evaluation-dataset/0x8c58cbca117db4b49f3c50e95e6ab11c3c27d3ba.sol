@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract RETHCrowdsale {
-    
+
     Token public tokenReward;
     address owner = 0x269b07eF928110683123a9CDb99156D58B5bb737;
     address creator;
@@ -41,4 +41,15 @@ contract RETHCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

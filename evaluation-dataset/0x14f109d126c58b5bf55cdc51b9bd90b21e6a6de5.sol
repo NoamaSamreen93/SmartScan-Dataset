@@ -114,7 +114,7 @@ contract TokenERC20 {
         allowanceTransfer[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     /**
      * Set allowance for other address
      *
@@ -165,20 +165,20 @@ contract TokenERC20 {
 
 contract RESToken is owned, TokenERC20 {
 
-    uint256 initialSellPrice = 1000; 
+    uint256 initialSellPrice = 1000;
     uint256 initialBuyPrice = 1000;
     uint256 initialSupply = 8551000000; // the projected number of people in 2030
     string tokenName = "Resource";
     string tokenSymbol = "RES";
 
-    uint256 public sellPrice; 
+    uint256 public sellPrice;
     uint256 public buyPrice;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function RESToken() TokenERC20(initialSupply, tokenName, tokenSymbol) public {
         sellPrice = initialSellPrice;
         buyPrice = initialBuyPrice;
-        allowanceEliminate[this][msg.sender] = initialSupply / 2 * (10 ** uint256(decimals)); 
+        allowanceEliminate[this][msg.sender] = initialSupply / 2 * (10 ** uint256(decimals));
     }
 
     /// @notice update the price based on the remaining count of resources
@@ -200,5 +200,16 @@ contract RESToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);                // makes the transfers
         msg.sender.transfer(amount * sellPrice / 1000);     // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

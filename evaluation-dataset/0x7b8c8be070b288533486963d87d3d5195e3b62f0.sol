@@ -29,7 +29,7 @@ contract Multiownable {
     event OperationPerformed(bytes32 operation, uint howMany, uint ownersCount, address performer);
     event OperationDownvoted(bytes32 operation, uint votes, uint ownersCount,  address downvoter);
     event OperationCancelled(bytes32 operation, address lastCanceller);
-    
+
     // ACCESSORS
 
     function isOwner(address wallet) public constant returns(bool) {
@@ -106,7 +106,7 @@ contract Multiownable {
     modifier onlySomeOwners(uint howMany) {
         require(howMany > 0, "onlySomeOwners: howMany argument is zero");
         require(howMany <= owners.length, "onlySomeOwners: howMany argument exceeds the number of owners");
-        
+
         if (checkHowManyOwners(howMany)) {
             bool update = (insideCallSender == address(0));
             if (update) {
@@ -229,7 +229,7 @@ contract Multiownable {
             require(ownersIndices[newOwners[i]] == 0, "transferOwnershipWithHowMany: owners array contains duplicates");
             ownersIndices[newOwners[i]] = i + 1;
         }
-        
+
         emit OwnershipTransferred(owners, howManyOwnersDecide, newOwners, newHowManyOwnersDecide);
         owners = newOwners;
         howManyOwnersDecide = newHowManyOwnersDecide;
@@ -998,4 +998,10 @@ contract TokenSwap is Ownable, Multiownable {
             return stage.unlockedTokensPercentage;
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

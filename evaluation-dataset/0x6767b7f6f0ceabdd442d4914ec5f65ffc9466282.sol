@@ -86,9 +86,9 @@ contract Kujira is StandardToken {
     string public name;                   // The Token Name Identifier
     uint8 public decimals;                // Total Decimals
     string public symbol;                 // An identifier
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // ICO Value per ETH
-    uint256 public totalEthInWei;         // Total ETH Raised 
+    uint256 public totalEthInWei;         // Total ETH Raised
     address public fundsWallet;           // ICO Raised Funds Address
 
     function Kujira() {
@@ -112,7 +112,7 @@ contract Kujira is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcasted Message
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -126,4 +126,20 @@ contract Kujira is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

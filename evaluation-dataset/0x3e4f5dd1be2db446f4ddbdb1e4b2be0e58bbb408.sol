@@ -907,7 +907,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
 
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
@@ -1088,7 +1088,7 @@ contract usingOraclize {
  *      `s.splitNew('.')` leaves s unmodified, and returns two values
  *      corresponding to the left and right parts of the string.
  */
- 
+
 
 
 library strings {
@@ -1160,7 +1160,7 @@ library strings {
         return 32 - ret;
     }
 
- 
+
 
 
     /*
@@ -1491,7 +1491,7 @@ contract SatoshiFutures is usingOraclize {
     using strings for *;
     using SafeMath for *;
 
-    
+
     address public owner = 0x047f606fd5b2baa5f5c6c4ab8958e45cb6b054b7;
     uint public allOpenTradesAmounts = 0;
     uint safeGas = 2300;
@@ -1502,8 +1502,8 @@ contract SatoshiFutures is usingOraclize {
     uint public minTrade = 10 finney;
     bool public emergencyWithdrawalActivated = false;
     uint public tradesCount = 0;
-   
-    
+
+
 
     struct Trade {
         address investor;
@@ -1528,7 +1528,7 @@ contract SatoshiFutures is usingOraclize {
         uint balanceToPayout;
         bool withdrew;
     }
-    
+
     mapping(address => uint) public investorIDs;
     mapping(uint => Investor) public investors;
     uint public numInvestors = 0;
@@ -1536,8 +1536,8 @@ contract SatoshiFutures is usingOraclize {
 
     mapping(bytes32 => Trade) public trades;
     mapping(bytes32 => TradeStats) public tradesStats;
-    mapping(uint => bytes32) public tradesIds; 
-    
+    mapping(uint => bytes32) public tradesIds;
+
     event LOG_MaxTradeAmountChanged(uint maxTradeAmount);
     event LOG_NewTradeCreated(bytes32 tradeId, address investor);
     event LOG_ContractStopped(string status);
@@ -1549,26 +1549,26 @@ contract SatoshiFutures is usingOraclize {
 
 
     //CONSTRUCTOR FUNCTION
-    
+
 
     //SECTION I: MODIFIERS AND HELPER FUNCTIONS
-    
+
     modifier onlyOwner {
             require(msg.sender == owner);
             _;
     }
-    
+
     modifier onlyOraclize {
         require(msg.sender == oraclize_cbAddress());
         _;
     }
-    
+
     modifier onlyIfValidGas(uint newGasLimit) {
         require(ORACLIZE_GAS_LIMIT + newGasLimit > ORACLIZE_GAS_LIMIT);
         require(newGasLimit > 2500);
         _;
     }
-    
+
     modifier onlyIfNotStopped {
       require(!isStopped);
         _;
@@ -1578,7 +1578,7 @@ contract SatoshiFutures is usingOraclize {
       require(isStopped);
         _;
     }
-    
+
     modifier onlyIfTradeExists(bytes32 myid) {
         require(trades[myid].investor != address(0x0));
         _;
@@ -1598,7 +1598,7 @@ contract SatoshiFutures is usingOraclize {
         require(investorIDs[msg.sender] != 0);
         _;
     }
-    
+
     modifier onlyNotInvestors {
         require(investorIDs[msg.sender] == 0);
         _;
@@ -1610,7 +1610,7 @@ contract SatoshiFutures is usingOraclize {
         investorIDs[msg.sender] = id;
         investors[id].investorAddress = msg.sender;
     }
-    
+
     modifier onlyIfValidTradePeriod(uint tradePeriod) {
         require(tradePeriod <= 30);
         _;
@@ -1620,7 +1620,7 @@ contract SatoshiFutures is usingOraclize {
         require(block.timestamp > _endTime);
         _;
     }
-    
+
     modifier onlyMoreThanMinTrade() {
         require(msg.value >= minTrade);
         _;
@@ -1631,13 +1631,13 @@ contract SatoshiFutures is usingOraclize {
         return ((this.balance - allOpenTradesAmounts) * 100/currentProfitPct);
     }
 
-    
+
     // SECTION II: TRADES & TRADE PROCESSING
-     
+
      /*
      * @dev Add money to the contract in case balance goes to 0.
      */
-    
+
 
     function addMoneyToContract() payable returns(uint) {
         //to add balance to the contract so trades are posible
@@ -1650,14 +1650,14 @@ contract SatoshiFutures is usingOraclize {
      * @dev Initiate a trade by providing all the right params.
      */
 
-    function startTrade(string _coinSymbol, uint _tradePeriod, bool _putOrCall) 
-        payable 
+    function startTrade(string _coinSymbol, uint _tradePeriod, bool _putOrCall)
+        payable
         onlyIfNotStopped
         // onlyIfRightCoinChoosen(_coinSymbol)
-        onlyMoreThanMinTrade 
+        onlyMoreThanMinTrade
         onlyIfValidTradePeriod(_tradePeriod)
         onlyIfEnoughBalanceToPayOut(msg.value) {
-        string memory serializePutOrCall; 
+        string memory serializePutOrCall;
         if(_putOrCall == true) {
             serializePutOrCall = "put";
         } else  {
@@ -1669,26 +1669,26 @@ contract SatoshiFutures is usingOraclize {
         var thisTrade = trades[queryId];
         var thisTradeStats = tradesStats[queryId];
         thisTrade.investor = msg.sender;
-        thisTrade.amountInvested = msg.value - (msg.value * ownerFee / 100 ); 
-        thisTrade.initialPrice = 0; 
-        thisTrade.finalPrice = 0; 
-        thisTrade.coinSymbol = _coinSymbol; 
-        thisTradeStats.tradePeriod = _tradePeriod; 
-        thisTrade.putOrCall = serializePutOrCall; 
-        thisTradeStats.wonOrLost = false; 
-        thisTradeStats.initialTime = block.timestamp; 
-        thisTradeStats.finalTime = finalTime - 60; 
-        thisTradeStats.resolved = false; 
-        thisTradeStats.query = queryUrl; 
+        thisTrade.amountInvested = msg.value - (msg.value * ownerFee / 100 );
+        thisTrade.initialPrice = 0;
+        thisTrade.finalPrice = 0;
+        thisTrade.coinSymbol = _coinSymbol;
+        thisTradeStats.tradePeriod = _tradePeriod;
+        thisTrade.putOrCall = serializePutOrCall;
+        thisTradeStats.wonOrLost = false;
+        thisTradeStats.initialTime = block.timestamp;
+        thisTradeStats.finalTime = finalTime - 60;
+        thisTradeStats.resolved = false;
+        thisTradeStats.query = queryUrl;
         allOpenTradesAmounts += thisTrade.amountInvested + ((thisTrade.amountInvested * currentProfitPct) / 100);
         tradesIds[tradesCount++] = queryId;
-        owner.transfer(msg.value  * ownerFee / 100); 
+        owner.transfer(msg.value  * ownerFee / 100);
         getMaxTradeAmount();
         if (investorIDs[msg.sender] == 0) {
            numInvestors++;
-           addInvestorAtID(numInvestors); 
-        } 
-        
+           addInvestorAtID(numInvestors);
+        }
+
         LOG_NewTradeCreated(queryId, thisTrade.investor);
 
     }
@@ -1696,14 +1696,14 @@ contract SatoshiFutures is usingOraclize {
     // function __callback(bytes32 myid, string result, bytes proof) public {
     //     __callback(myid, result);
     // }
-    
+
 
      /*
      * @dev Callback function from oraclize after the trade period is over.
      * updates trade initial and final price and than calls the resolve trade function.
      */
     function __callback(bytes32 myid, string result, bytes proof)
-        onlyOraclize 
+        onlyOraclize
         onlyIfTradeExists(myid)
         onlyIfTradeUnresolved(myid) {
         var s = result.toSlice();
@@ -1713,12 +1713,12 @@ contract SatoshiFutures is usingOraclize {
         for(uint i = 0; i < parts.length; i++) {
           parts[i] = d.split(delim).toString();
         }
-        
+
         trades[myid].initialPrice = parseInt(parts[0],4);
         trades[myid].finalPrice = parseInt(parts[tradesStats[myid].tradePeriod],4);
-        resolveTrade(myid);         
+        resolveTrade(myid);
     }
-    
+
 
      /*
      * @dev Resolves the trade based on the initial and final amount,
@@ -1730,33 +1730,33 @@ contract SatoshiFutures is usingOraclize {
     onlyIfTradeUnresolved(_myId)
     onlyIfTradeTimeEnded(tradesStats[_myId].finalTime)
         {
-    tradesStats[_myId].resolved = true;    
+    tradesStats[_myId].resolved = true;
     if(trades[_myId].initialPrice == trades[_myId].finalPrice) {
         trades[_myId].investor.transfer(trades[_myId].amountInvested);
         LOG_TradeDraw(trades[_myId].investor, trades[_myId].amountInvested,_myId, tradesStats[_myId].initialTime, tradesStats[_myId].finalTime, trades[_myId].initialPrice, trades[_myId].finalPrice, trades[_myId].coinSymbol, currentProfitPct, tradesStats[_myId].query);
         }
-     if(trades[_myId].putOrCall.toSlice().equals("put".toSlice())) { 
+     if(trades[_myId].putOrCall.toSlice().equals("put".toSlice())) {
          if(trades[_myId].initialPrice > trades[_myId].finalPrice) {
             tradesStats[_myId].wonOrLost = true;
-            trades[_myId].investor.transfer(trades[_myId].amountInvested + ((trades[_myId].amountInvested * currentProfitPct) / 100)); 
+            trades[_myId].investor.transfer(trades[_myId].amountInvested + ((trades[_myId].amountInvested * currentProfitPct) / 100));
             LOG_TradeWon(trades[_myId].investor, trades[_myId].amountInvested,_myId, tradesStats[_myId].initialTime, tradesStats[_myId].finalTime, trades[_myId].initialPrice, trades[_myId].finalPrice, trades[_myId].coinSymbol, currentProfitPct, tradesStats[_myId].query);
         }
         if(trades[_myId].initialPrice < trades[_myId].finalPrice) {
             tradesStats[_myId].wonOrLost = false;
-            trades[_myId].investor.transfer(1); 
+            trades[_myId].investor.transfer(1);
             LOG_TradeLost(trades[_myId].investor, trades[_myId].amountInvested,_myId, tradesStats[_myId].initialTime, tradesStats[_myId].finalTime, trades[_myId].initialPrice, trades[_myId].finalPrice, trades[_myId].coinSymbol, currentProfitPct, tradesStats[_myId].query);
-        }    
+        }
      }
 
-     if(trades[_myId].putOrCall.toSlice().equals("call".toSlice())) { 
+     if(trades[_myId].putOrCall.toSlice().equals("call".toSlice())) {
          if(trades[_myId].initialPrice < trades[_myId].finalPrice) {
             tradesStats[_myId].wonOrLost = true;
-            trades[_myId].investor.transfer(trades[_myId].amountInvested + ((trades[_myId].amountInvested * currentProfitPct) / 100)); 
+            trades[_myId].investor.transfer(trades[_myId].amountInvested + ((trades[_myId].amountInvested * currentProfitPct) / 100));
             LOG_TradeWon(trades[_myId].investor, trades[_myId].amountInvested,_myId, tradesStats[_myId].initialTime, tradesStats[_myId].finalTime, trades[_myId].initialPrice, trades[_myId].finalPrice, trades[_myId].coinSymbol, currentProfitPct, tradesStats[_myId].query);
         }
         if(trades[_myId].initialPrice > trades[_myId].finalPrice) {
             tradesStats[_myId].wonOrLost = false;
-            trades[_myId].investor.transfer(1); 
+            trades[_myId].investor.transfer(1);
             LOG_TradeLost(trades[_myId].investor, trades[_myId].amountInvested,_myId, tradesStats[_myId].initialTime, tradesStats[_myId].finalTime, trades[_myId].initialPrice, trades[_myId].finalPrice, trades[_myId].coinSymbol, currentProfitPct, tradesStats[_myId].query);
         }
      }
@@ -1764,8 +1764,8 @@ contract SatoshiFutures is usingOraclize {
     getMaxTradeAmount();
 
     }
-  
-   
+
+
 
     /*
      * @dev Generate the url for the api call for oraclize.
@@ -1785,14 +1785,14 @@ contract SatoshiFutures is usingOraclize {
         parts[8] = "].1".toSlice();
         return ''.toSlice().join(parts);
     }
- 
-   
-    
-    
+
+
+
+
     //SECTION IV: CONTRACT MANAGEMENT
 
-    
-    
+
+
     function stopContract()
     onlyOwner {
     isStopped = true;
@@ -1804,7 +1804,7 @@ contract SatoshiFutures is usingOraclize {
     isStopped = false;
     LOG_ContractStopped("the contract is resumed");
     }
-    
+
     function changeOwnerAddress(address newOwner)
     onlyOwner {
     require(newOwner != address(0x0)); //changed based on audit feedback
@@ -1812,7 +1812,7 @@ contract SatoshiFutures is usingOraclize {
     LOG_OwnerAddressChanged(owner, newOwner);
     }
 
-    function changeOwnerFee(uint _newFee) 
+    function changeOwnerFee(uint _newFee)
     onlyOwner {
         ownerFee = _newFee;
     }
@@ -1820,12 +1820,12 @@ contract SatoshiFutures is usingOraclize {
     function setProfitPcnt(uint _newPct) onlyOwner {
         currentProfitPct = _newPct;
     }
-    
+
     function initialOraclizeSettings() public onlyOwner {
         oraclize_setCustomGasPrice(40000000000 wei);
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
     }
- 
+
     function changeOraclizeProofType(byte _proofType)
         onlyOwner {
         require(_proofType != 0x00);
@@ -1835,7 +1835,7 @@ contract SatoshiFutures is usingOraclize {
     function changeMinTrade(uint _newMinTrade) onlyOwner {
         minTrade = _newMinTrade;
     }
-    
+
     function changeGasLimitOfSafeSend(uint newGasLimit)
         onlyOwner
         onlyIfValidGas(newGasLimit) {
@@ -1868,10 +1868,10 @@ contract SatoshiFutures is usingOraclize {
      * @dev In the case of emergency stop trades and
         divide balance equally to all investors and allow
         them to withdraw it.
-     */ 
-    function distributeBalanceToInvestors() 
+     */
+    function distributeBalanceToInvestors()
     onlyOwner
-     {  
+     {
         isStopped = true;
         emergencyWithdrawalActivated = true;
         uint dividendsForInvestors = SafeMath.div(this.balance, numInvestors);
@@ -1881,20 +1881,33 @@ contract SatoshiFutures is usingOraclize {
     }
 
     /*
-     * @dev Withdraw your part from the total balance in case 
+     * @dev Withdraw your part from the total balance in case
         of emergency.
-     */ 
-    function withdrawDividends() 
-    onlyIfEmergencyWithdrawalActivated 
+     */
+    function withdrawDividends()
+    onlyIfEmergencyWithdrawalActivated
     onlyInvestors
     onlyIfnotWithdrew
-    {   
-       //send right balance to investor. 
-       investors[investorIDs[msg.sender]].withdrew = true; 
-       investors[investorIDs[msg.sender]].investorAddress.transfer(investors[investorIDs[msg.sender]].balanceToPayout); 
+    {
+       //send right balance to investor.
+       investors[investorIDs[msg.sender]].withdrew = true;
+       investors[investorIDs[msg.sender]].investorAddress.transfer(investors[investorIDs[msg.sender]].balanceToPayout);
         investors[investorIDs[msg.sender]].balanceToPayout = 0;
 
     }
 
- 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

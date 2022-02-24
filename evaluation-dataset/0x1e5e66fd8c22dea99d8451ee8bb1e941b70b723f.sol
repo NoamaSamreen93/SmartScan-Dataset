@@ -51,13 +51,13 @@ contract SWAP is SafeMath{
          symbol = _symbol;
          return symbol;
      }
-    
+
      function setDecimals(uint256 _decimals) onlyOwner public returns (uint256){
          decimals = _decimals;
          return decimals;
      }
-    
-    
+
+
      function getOwner() view public returns(address){
         return owner;
      }
@@ -70,28 +70,28 @@ contract SWAP is SafeMath{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-    
+
     event Withdraw(address to, uint amount);
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor() public payable {
         balanceOf[msg.sender] = 100000000000*10**18;
         totalSupply = balanceOf[msg.sender];
-        name = 'SWAP'; 
-        symbol = 'SWAP'; 
-        decimals = 18; 
+        name = 'SWAP';
+        symbol = 'SWAP';
+        decimals = 18;
 		owner = msg.sender;
     }
 
-   
+
     function _transfer(address _from, address _to, uint _value) internal{
-        require(_to != 0x0); 
-		require(_value > 0); 
-        require(balanceOf[_from] >= _value);   
+        require(_to != 0x0);
+		require(_value > 0);
+        require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);    
-        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);               
-        emit Transfer(_from, _to, _value);       
+        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);
+        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
+        emit Transfer(_from, _to, _value);
     }
 
 
@@ -103,50 +103,61 @@ contract SWAP is SafeMath{
     function approve(address _spender, uint256 _value)
         public
         returns (bool success) {
-		require(_value > 0); 
+		require(_value > 0);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
     public
     payable  {
-        require (_to != 0x0) ;             
-		require (_value > 0); 
-        require (balanceOf[_from] >= _value) ;       
+        require (_to != 0x0) ;
+		require (_value > 0);
+        require (balanceOf[_from] >= _value) ;
         require (balanceOf[_to] + _value >= balanceOf[_to]) ;
-        require (_value <= allowance[_from][msg.sender]) ;   
-        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);               
-        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);  
+        require (_value <= allowance[_from][msg.sender]) ;
+        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);
+        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);    
-		require (_value > 0) ; 
+        require(balanceOf[msg.sender] >= _value);
+		require (_value > 0) ;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
         totalSupply = SafeMath.safeSub(totalSupply,_value); // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
     function create(uint256 _value) public onlyOwner returns (bool success) {
-        require (_value > 0) ; 
+        require (_value > 0) ;
         totalSupply = SafeMath.safeAdd(totalSupply,_value);
         balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         return true;
     }
-    
+
 	// transfer balance to owner
 	function withdraw() external onlyOwner{
 		require(msg.sender == owner);
 		msg.sender.transfer(address(this).balance);
         emit Withdraw(msg.sender,address(this).balance);
 	}
-	
+
 	// can accept ether
 	function() private payable {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

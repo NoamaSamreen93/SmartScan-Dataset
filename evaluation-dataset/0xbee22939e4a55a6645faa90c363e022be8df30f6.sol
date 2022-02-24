@@ -14,7 +14,7 @@ contract BlockMiracleToken is ERC20 {
     string public symbol = "BMT";
     uint8 public decimals = 10;
     uint256 public totalSupply = 100000000000000000000;
-	
+
     using SafeMath for uint256;
 
     mapping (address => uint256) public balanceOf;
@@ -39,7 +39,7 @@ contract BlockMiracleToken is ERC20 {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != address(0x0) && _value > 0);
         require (balanceOf[_from] >= _value && _value <= allowance[_from][msg.sender]);
@@ -95,4 +95,13 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

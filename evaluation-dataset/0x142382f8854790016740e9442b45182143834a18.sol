@@ -353,7 +353,7 @@ contract MintableToken is StandardToken, Ownable {
 
   modifier notLocked(address sender) {
     require(mintingFinished ||
-            sender == saleAgent || 
+            sender == saleAgent ||
             sender == owner ||
             (!mintingFinished && unlockedAddressesDuringITO[sender]));
     _;
@@ -574,7 +574,7 @@ contract WalletsPercents is Ownable {
     wallets.push(wallet);
     percents[wallet] = percent;
   }
- 
+
   function cleanWallets() public onlyOwner {
     wallets.length = 0;
   }
@@ -807,7 +807,7 @@ contract PreITO is NextSaleAgentFeature, SoftcapFeature, AssembledCommonSale {
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function mintTokensByETH(address to, uint _invested) internal returns(uint) {
     uint _tokens = super.mintTokensByETH(to, _invested);
     updateBalance(to, _invested);
@@ -932,4 +932,15 @@ contract Configurator is Ownable {
     ito.transferOwnership(manager);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract TokenERC20 {
@@ -54,13 +54,13 @@ contract TokenERC20 {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     /**
      * tokens balance
      *
      * Get `_owner` tokens
      *
-     * @param _owner The address 
+     * @param _owner The address
      */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balanceOf[_owner];
@@ -159,4 +159,15 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

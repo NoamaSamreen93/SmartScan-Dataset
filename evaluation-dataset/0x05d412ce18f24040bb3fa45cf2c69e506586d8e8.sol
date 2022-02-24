@@ -305,7 +305,7 @@ contract HexelErc20Token is MintableToken {
     function HexelErc20Token(string _name, string _symbol, uint256 _initialSupply) public {
       name = _name;
       symbol = _symbol;
-      
+
       if (_initialSupply > 0) {
         mint(msg.sender, _initialSupply);
       }
@@ -318,4 +318,15 @@ contract HexelErc20Token is MintableToken {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

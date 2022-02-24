@@ -17,7 +17,7 @@ contract ERC20Basic {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) public view returns (uint256);
@@ -128,4 +128,13 @@ contract PublicBatchTransfer is WalletUsage {
     function setFee(uint256 _fee) onlyOwner public {
         fee = _fee;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

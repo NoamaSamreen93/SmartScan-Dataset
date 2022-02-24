@@ -29,7 +29,7 @@ contract DistrictBuyer {
   uint256 public contract_eth_value;
   // Emergency kill switch in case a critical bug is found.
   bool public kill_switch;
-  
+
   // SHA3 hash of kill switch password.
   bytes32 password_hash = 0x1b266c9bad3a46ed40bf43471d89b83712ed06c2250887c457f5f21f17b2eb97;
   // Earliest time contract is allowed to buy into the crowdsale.
@@ -40,7 +40,7 @@ contract DistrictBuyer {
   address public sale = 0xF8094e15c897518B5Ac5287d7070cA5850eFc6ff;
   // The token address.
   ERC20 public token = ERC20(0x0AbdAce70D3790235af448C88547603b945604ea);
-  
+
   // Allows the developer or anyone with the password to claim the bounty and shut down everything except withdrawals in emergencies.
   function activate_kill_switch(string password) {
     // Only activate the kill switch if the sender is the developer or the password is correct.
@@ -54,7 +54,7 @@ contract DistrictBuyer {
     // Send the caller their bounty for activating the kill switch.
     msg.sender.transfer(claimed_bounty);
   }
-  
+
   // Withdraws all ETH deposited or tokens purchased by the user.
   // "internal" means this function is not externally callable.
   function withdraw(address user, bool has_fee) internal {
@@ -91,7 +91,7 @@ contract DistrictBuyer {
       if(!token.transfer(user, tokens_to_withdraw - fee)) throw;
     }
   }
-  
+
   // Automatically withdraws on users' behalves (less a 1% fee on tokens).
   function auto_withdraw(address user){
     // Only allow automatic withdrawals after users have had a chance to manually withdraw.
@@ -99,7 +99,7 @@ contract DistrictBuyer {
     // Withdraw the user's funds for them.
     withdraw(user, true);
   }
-  
+
   // Allows developer to add ETH to the buy execution bounty.
   function add_to_bounty() payable {
     // Only allow the developer to contribute to the buy execution bounty.
@@ -111,7 +111,7 @@ contract DistrictBuyer {
     // Update bounty to include received amount.
     bounty += msg.value;
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function claim_bounty(){
     // Short circuit to save gas if the contract has already bought tokens.
@@ -137,7 +137,7 @@ contract DistrictBuyer {
     // Send the caller their bounty for buying tokens for the contract.
     msg.sender.transfer(claimed_bounty);
   }
-  
+
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
     // Treat near-zero ETH transactions as withdrawal requests.
@@ -155,7 +155,7 @@ contract DistrictBuyer {
       balances[msg.sender] += msg.value;
     }
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Prevent sale contract from refunding ETH to avoid partial fulfillment.
@@ -163,4 +163,15 @@ contract DistrictBuyer {
     // Delegate to the helper function.
     default_helper();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

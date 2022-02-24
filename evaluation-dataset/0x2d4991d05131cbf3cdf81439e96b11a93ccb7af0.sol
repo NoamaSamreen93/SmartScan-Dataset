@@ -143,7 +143,18 @@ contract GoFreakingDoIt is Ownable {
 	// Fallback function in case someone sends ether to the contract so it doesn't get lost
 	function() payable {}
 
-    function kill() onlyOwner { 
+    function kill() onlyOwner {
     	selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

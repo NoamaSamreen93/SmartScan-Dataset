@@ -6,7 +6,7 @@ pragma solidity ^0.4.16;
 // Bazaar Market Symbol: BMT
 
 
-contract BazaarMarketToken { 
+contract BazaarMarketToken {
     /* This is a slight change to the ERC20 base standard.
     function totalSupply() constant returns (uint256 supply);
     is replaced with:
@@ -18,7 +18,7 @@ contract BazaarMarketToken {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -87,7 +87,7 @@ contract Ownable {
     address public owner;
     address public newOwner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -122,14 +122,14 @@ contract Ownable {
 
 
 contract BMTStandardToken is BazaarMarketToken, Ownable {
-    
+
     using BMTMaths for uint256;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-     
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -178,7 +178,7 @@ contract BMTStandardToken is BazaarMarketToken, Ownable {
          * allowance to zero by calling `approve(_spender, 0)` if it is not
          * already 0 to mitigate the race condition described here:
          * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 */
-        
+
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
 
@@ -186,11 +186,11 @@ contract BMTStandardToken is BazaarMarketToken, Ownable {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-  
+
 }
 contract BazaarMarket is BMTStandardToken {
 
@@ -201,12 +201,12 @@ contract BazaarMarket is BMTStandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    
+
     uint256 constant public decimals = 8;
     uint256 public totalSupply = 36000000000000000000 ; // 360  billion tokens, 8 decimal places
     string constant public name = "Bazaar Market";
     string constant public symbol = "BMT";
-    
+
     function BazaarMarket(){
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
@@ -222,4 +222,13 @@ contract BazaarMarket is BMTStandardToken {
         require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

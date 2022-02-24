@@ -582,7 +582,7 @@ contract Consts {
     string constant TOKEN_SYMBOL = "BOD";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xC4a79A1FfD198cdD8828A1dfa6e65C614eDc8cc8;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -643,9 +643,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract BOXOFDATA is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -662,7 +662,7 @@ contract BOXOFDATA is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0xC4a79A1FfD198cdD8828A1dfa6e65C614eDc8cc8)];
         uint[1] memory amounts = [uint(650000000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -674,7 +674,7 @@ contract BOXOFDATA is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -682,7 +682,7 @@ contract BOXOFDATA is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         Initialized();
     }
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -705,4 +705,20 @@ contract BOXOFDATA is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

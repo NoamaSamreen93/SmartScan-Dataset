@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 // input  /Users/chae/dev/colorcoin/coin-ver2/color-erc20.sol
 // flattened :  Thursday, 10-Jan-19 03:27:25 UTC
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
@@ -16,12 +16,12 @@ library SafeMath {
         if (a == 0) {
           return 0;
         }
-        
+
         c = a * b;
         assert(c / a == b);
         return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
@@ -31,15 +31,15 @@ library SafeMath {
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
-        return a - b;   
+        return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
@@ -52,38 +52,38 @@ library SafeMath {
 
 
 contract ERC20 {
- 
+
     // Get the total token supply
     function totalSupply() public constant returns (uint256);
 
-    // Get the account balance of another account with address _owner   
+    // Get the account balance of another account with address _owner
     function balanceOf(address who) public view returns (uint256);
-    
+
     // Send _value amount of tokens to address _to
     function transfer(address to, uint256 value) public returns (bool);
-    
+
     // Send _value amount of tokens from address _from to address _to
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
-    // this function is required for some DEX functionality   
+    // this function is required for some DEX functionality
     function approve(address spender, uint256 value) public returns (bool);
 
     // Returns the amount which _spender is still allowed to withdraw from _owner
     function allowance(address owner, address spender) public view returns (uint256);
- 
-    // Triggered when tokens are transferred. 
+
+    // Triggered when tokens are transferred.
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    // Triggered whenever approve(address _spender, uint256 _value) is called. 
+    // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed owner,address indexed spender,uint256 value);
- 
+
 }
 
 //
 // Color Coin v2.0
-// 
+//
 contract ColorCoin is ERC20 {
 
     // Time Lock and Vesting
@@ -102,29 +102,29 @@ contract ColorCoin is ERC20 {
       uint256 unlockPercent4;
       uint256 unlockPercent5;
     }
-    
+
     using SafeMath for uint256;
 
     mapping (address => mapping (address => uint256)) private allowed;
-    
+
     mapping(address => accountData) private accounts;
-    
+
     mapping(address => bool) private lockedAddresses;
-    
+
     address private admin;
-    
+
     address private founder;
-    
+
     bool public isTransferable = false;
-    
+
     string public name;
-    
+
     string public symbol;
-    
+
     uint256 public __totalSupply;
-    
+
     uint8 public decimals;
-    
+
     constructor(string _name, string _symbol, uint256 _totalSupply, uint8 _decimals, address _founder, address _admin) public {
         name = _name;
         symbol = _symbol;
@@ -136,31 +136,31 @@ contract ColorCoin is ERC20 {
         accounts[founder].balance = __totalSupply;
         emit Transfer(0x0, founder, __totalSupply);
     }
-    
+
     // define onlyAdmin
     modifier onlyAdmin {
         require(admin == msg.sender);
         _;
     }
-    
+
     // define onlyFounder
     modifier onlyFounder {
         require(founder == msg.sender);
         _;
     }
-    
+
     // define transferable
     modifier transferable {
         require(isTransferable);
         _;
     }
-    
+
     // define notLocked
     modifier notLocked {
         require(!lockedAddresses[msg.sender]);
         _;
     }
-    
+
     // ERC20 spec.
     function totalSupply() public constant returns (uint256) {
         return __totalSupply;
@@ -170,7 +170,7 @@ contract ColorCoin is ERC20 {
     function balanceOf(address _owner) public view returns (uint256) {
         return accounts[_owner].balance;
     }
-        
+
     // ERC20 spec.
     function transfer(address _to, uint256 _value) transferable notLocked public returns (bool) {
         require(_to != address(0));
@@ -183,7 +183,7 @@ contract ColorCoin is ERC20 {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     // ERC20 spec.
     function transferFrom(address _from, address _to, uint256 _value) transferable notLocked public returns (bool) {
         require(_to != address(0));
@@ -199,14 +199,14 @@ contract ColorCoin is ERC20 {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     // ERC20 spec.
     function approve(address _spender, uint256 _value) transferable notLocked public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     // ERC20 spec.
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
@@ -216,7 +216,7 @@ contract ColorCoin is ERC20 {
     function distribute(address _to, uint256 _value) onlyFounder public returns (bool) {
         require(_to != address(0));
         require(_value <= accounts[msg.sender].balance);
-        
+
         accounts[msg.sender].balance = accounts[msg.sender].balance.sub(_value);
         accounts[_to].balance = accounts[_to].balance.add(_value);
         accounts[_to].init_balance = accounts[_to].init_balance.add(_value);
@@ -225,7 +225,7 @@ contract ColorCoin is ERC20 {
     }
 
     // Change founder
-    function changeFounder(address who) onlyFounder public {   
+    function changeFounder(address who) onlyFounder public {
         founder = who;
     }
 
@@ -244,34 +244,34 @@ contract ColorCoin is ERC20 {
         return admin;
     }
 
-    
+
     // Lock individual transfer flag
     function lock(address who) onlyAdmin public {
-        
+
         lockedAddresses[who] = true;
     }
 
     // Unlock individual transfer flag
     function unlock(address who) onlyAdmin public {
-        
+
         lockedAddresses[who] = false;
     }
-    
+
     // Check individual transfer flag
     function isLocked(address who) public view returns(bool) {
-        
+
         return lockedAddresses[who];
     }
 
     // Enable global transfer flag
     function enableTransfer() onlyAdmin public {
-        
+
         isTransferable = true;
     }
-    
-    // Disable global transfer flag 
+
+    // Disable global transfer flag
     function disableTransfer() onlyAdmin public {
-        
+
         isTransferable = false;
     }
 
@@ -288,13 +288,13 @@ contract ColorCoin is ERC20 {
         } else if (accounts[who].unlockTime2 > now) {
            total_percent = accounts[who].unlockPercent1;
 
-           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100)) 
+           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100))
              return false;
         } else if (accounts[who].unlockTime3 > now) {
            total_percent = accounts[who].unlockPercent1;
            total_percent = total_percent.add(accounts[who].unlockPercent2);
 
-           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100)) 
+           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100))
              return false;
 
         } else if (accounts[who].unlockTime4 > now) {
@@ -302,7 +302,7 @@ contract ColorCoin is ERC20 {
            total_percent = total_percent.add(accounts[who].unlockPercent2);
            total_percent = total_percent.add(accounts[who].unlockPercent3);
 
-           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100)) 
+           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100))
              return false;
         } else if (accounts[who].unlockTime5 > now) {
            total_percent = accounts[who].unlockPercent1;
@@ -310,21 +310,21 @@ contract ColorCoin is ERC20 {
            total_percent = total_percent.add(accounts[who].unlockPercent3);
            total_percent = total_percent.add(accounts[who].unlockPercent4);
 
-           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100)) 
+           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100))
              return false;
-        } else { 
+        } else {
            total_percent = accounts[who].unlockPercent1;
            total_percent = total_percent.add(accounts[who].unlockPercent2);
            total_percent = total_percent.add(accounts[who].unlockPercent3);
            total_percent = total_percent.add(accounts[who].unlockPercent4);
            total_percent = total_percent.add(accounts[who].unlockPercent5);
 
-           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100)) 
+           if (accounts[who].init_balance.mul(total_percent) < total_vol.mul(100))
              return false;
         }
-        
-        return true; 
-       
+
+        return true;
+
     }
 
     // Founder sets unlockTime1
@@ -432,4 +432,8 @@ contract ColorCoin is ERC20 {
     function getInitBalance(address _owner) public view returns (uint256) {
         return accounts[_owner].init_balance;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

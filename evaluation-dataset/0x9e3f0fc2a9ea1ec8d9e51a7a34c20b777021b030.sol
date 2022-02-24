@@ -20,7 +20,7 @@ contract OwnedByWinsome {
   function changeOwner(address _new_owner) onlyOwner{
     owner = _new_owner;
   }
-						    
+
   modifier onlyAllowedWorker{
     if (!allowedWorker[msg.sender]){
       throw;
@@ -35,7 +35,7 @@ contract OwnedByWinsome {
     _;
   }
 
-  
+
 }
 
 /**
@@ -99,9 +99,9 @@ contract BasicToken {
   event Transfer(address indexed from, address indexed to, uint value);
   mapping(address => uint) balances;
   uint public     totalSupply =    0;    			 // Total supply of 500 million Tokens
-  
+
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
    */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -119,15 +119,15 @@ contract BasicToken {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 
 contract StandardToken is BasicToken{
-  
+
   event Approval(address indexed owner, address indexed spender, uint value);
 
-  
+
   mapping (address => mapping (address => uint)) allowed;
 
   function transferFrom(address _from, address _to, uint _value) {
@@ -159,7 +159,7 @@ contract WinToken is StandardToken, OwnedByWinsome{
   string public   name =           "Winsome.io Token";
   string public   symbol =         "WIN";
   uint public     decimals =       18;
-  
+
   mapping (address => bool) allowedMinter;
 
   function WinToken(address _owner){
@@ -188,7 +188,16 @@ contract WinToken is StandardToken, OwnedByWinsome{
   function destroyTokens(address _for, uint _value_wei) onlyAllowedMinter {
     balances[_for] = balances[_for].sub(_value_wei);
     totalSupply = totalSupply.sub(_value_wei);
-    Transfer(_for, address(0), _value_wei);    
+    Transfer(_for, address(0), _value_wei);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

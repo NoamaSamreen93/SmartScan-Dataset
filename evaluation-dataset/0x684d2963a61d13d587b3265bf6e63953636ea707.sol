@@ -307,10 +307,10 @@ constructor () public {
     openingTime = 1537135200;
     closingTime = 1538344800;
     cap = 0;
-    bonusCap = 1000000000000000000000000; //1M WPT 
+    bonusCap = 1000000000000000000000000; //1M WPT
     minInvestmentValue = 0.02 ether;
     ethRaised = 0;
-        
+
     checksOn = true;
     gasAmount = 25000;
   }
@@ -356,7 +356,7 @@ constructor () public {
   function setGasAmount(uint256 _gasAmount) public onlyOwner {
     gasAmount = _gasAmount;
   }
-  
+
    /**
    * @dev Set cap for current round.
    */
@@ -582,7 +582,7 @@ constructor () public {
     closingTime = 1535320800;
 
     minInvestmentValue = 0.02 ether;
-        
+
     checksOn = true;
     gasAmount = 25000;
   }
@@ -712,7 +712,7 @@ constructor () public {
     tokensRaised = tokensRaised.add(tokens);
 
     minterContract.mint(_beneficiary, tokens);
-    
+
     emit TokenPurchase(
       msg.sender,
       _beneficiary,
@@ -777,4 +777,20 @@ constructor () public {
         isTransferDone
         );
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

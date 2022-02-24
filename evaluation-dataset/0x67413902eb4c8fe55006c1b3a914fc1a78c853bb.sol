@@ -56,7 +56,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -144,21 +144,21 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
     /*
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint _addedValue) 
+  function increaseApproval (address _spender, uint _addedValue)
     returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) 
+  function decreaseApproval (address _spender, uint _subtractedValue)
     returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -179,44 +179,44 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Great token to buy.
  * @dev Maximum 5% risk, potentially infinite upside.
  */
- 
+
 contract G5 is StandardToken {
     uint256 ceiling;
     uint256 floor;
     uint256 lastUpdate;
-    
+
     string public name = "G5";
     string public symbol = "G5";
     uint8 public decimals = 8;
-    
+
     function updateCeiling() private {
         // ceiling is always 5% above the value of the floor
         ceiling = floor*21/20;
     }
-    
+
     function SafeToken() {
         // 9523 tokens per ETH to start
         floor = 1 ether / 10000 * 1e8;
         updateCeiling();
         lastUpdate = block.number;
     }
-    
+
     function() payable {
         buy();
     }
-    
+
     function buy() payable {
         require (msg.value > 0);
-        
+
         // buy at the ceiling
         uint256 _amount = msg.value / ceiling;
 
-        // mint token            
+        // mint token
         totalSupply = totalSupply.add(_amount);
         balances[msg.sender] = balances[msg.sender].add(_amount);
         Mint(msg.sender, _amount);
         Transfer(0x0, msg.sender, _amount);
-    
+
         // set floor and ceiling if it's been at least 3 blocks since last update
         if (block.number >= lastUpdate+3) {
             floor = this.balance / totalSupply;
@@ -224,19 +224,35 @@ contract G5 is StandardToken {
             lastUpdate = block.number;
         }
     }
-    
+
     function sell(uint _value) {
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply = totalSupply.sub(_value);
         Burn(msg.sender, _value);
-        
+
         // sell at the floor
         msg.sender.transfer(_value * floor);
     }
 
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed burner, uint indexed value);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

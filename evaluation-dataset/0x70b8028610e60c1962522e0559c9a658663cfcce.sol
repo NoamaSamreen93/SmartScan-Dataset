@@ -2,14 +2,14 @@ pragma solidity ^0.4.25;
 
 contract Olympus {
     using SafeMath for uint;
-    
+
     address private constant supportAddress = 0x0bD47808d4A09aD155b00C39dBb101Fb71e1C0f0;
     uint private constant supportPercent = 1;
-    
+
     mapping(address => uint) private shares;
     uint private totalShares;
     uint private totalPersons;
-    
+
     function getBalance(address _account) public constant returns (uint) {
         if (totalShares == 0)
             return 0;
@@ -17,7 +17,7 @@ contract Olympus {
         uint profitPercent = calculateProfitPercent(contractBalance, totalPersons);
         return contractBalance.mul(shares[_account]).mul(profitPercent).div(totalShares).div(100);
     }
-    
+
     function() public payable {
         address sender = msg.sender;
         uint amount = msg.value;
@@ -42,7 +42,7 @@ contract Olympus {
                 supportAddress.transfer(address(this).balance);
         }
     }
-    
+
     function calculateProfitPercent(uint _balance, uint _totalPersons) private pure returns (uint) {
         if (_balance >= 8e20 || _totalPersons == 1) // 800 ETH
             return 95;
@@ -57,7 +57,7 @@ contract Olympus {
         else
             return 90;
     }
-    
+
     function calculateSupportPercent(uint _amount) private pure returns (uint) {
         return _amount * supportPercent / 100;
     }
@@ -72,27 +72,43 @@ library SafeMath {
         require(c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0); // Solidity only automatically asserts when dividing by 0
         uint256 c = a / b;
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         uint256 c = a - b;
         return c;
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a);
         return c;
     }
-    
+
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

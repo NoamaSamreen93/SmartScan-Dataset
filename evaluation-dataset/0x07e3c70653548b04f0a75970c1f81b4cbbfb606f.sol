@@ -110,3 +110,14 @@ contract HumanStandardToken is StandardToken {
 
 // Creates 130,271,020.035721000000000000 Agrello Delta Tokens
 contract Delta is HumanStandardToken(130271020035721000000000000, "Delta", 18, "DLT") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

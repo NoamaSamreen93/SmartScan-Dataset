@@ -461,7 +461,7 @@ library Strings {
 
 
 /**
- * @title F1 Delta Time Non-Fungible Token 
+ * @title F1 Delta Time Non-Fungible Token
  * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  */
 contract DeltaTimeNFTBase is ERC165, IERC721, IERC721Metadata, Pausable, MinterRole {
@@ -986,4 +986,17 @@ contract DeltaTimeNFT is DeltaTimeNFTBase {
     uint256 properties = tokenProperties(tokenId);
     return (properties & (0xFFFF << 168)) >> 168;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

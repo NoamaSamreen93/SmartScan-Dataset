@@ -486,7 +486,7 @@ contract Aavio is IERC20, ERC20, ERC20Detailed, ERC20Capped {
         uint256 initialSupply = 300000000000000000000000000;  // 300 million tokens + 18 decimals
         _mint(msg.sender, initialSupply);
     }
-    
+
     /**
     * @dev Transfer token for a specified address
     * @param to The address to transfer to.
@@ -512,4 +512,15 @@ contract Aavio is IERC20, ERC20, ERC20Detailed, ERC20Capped {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -50,21 +50,21 @@ library SafeMath {
 contract CryptoLeaders {
   //ETHEREUM SOLIDITY VERSION 4.19
   //CRYPTOCOLLECTED LTD
-  
+
   //INITIALIZATION VALUES
   address ceoAddress = 0xc10A6AedE9564efcDC5E842772313f0669D79497;
   struct Leaders {
     address currentLeaderOwner;
     uint256 currentValue;
-   
+
   }
 
   Leaders[32] data;
-  
+
   //No-Arg Constructor initializes basic low-end values.
   function CryptoLeaders() public {
     for (uint i = 0; i < 32; i++) {
-     
+
       data[i].currentValue = 15000000000000000;
       data[i].currentLeaderOwner = msg.sender;
     }
@@ -92,10 +92,10 @@ contract CryptoLeaders {
       // Double price
       data[uniqueLeaderID].currentValue = (data[uniqueLeaderID].currentValue / 10) * 12;
     }
-    
+
     require(msg.value >= data[uniqueLeaderID].currentValue * uint256(1));
     // Call payPreviousOwner() after purchase.
-    payPreviousOwner(data[uniqueLeaderID].currentLeaderOwner,  (data[uniqueLeaderID].currentValue / 100) * (88)); 
+    payPreviousOwner(data[uniqueLeaderID].currentLeaderOwner,  (data[uniqueLeaderID].currentValue / 100) * (88));
     transactionFee(ceoAddress, (data[uniqueLeaderID].currentValue / 100) * (12));
     // Assign owner.
     data[uniqueLeaderID].currentLeaderOwner = msg.sender;
@@ -103,7 +103,7 @@ contract CryptoLeaders {
     return (uniqueLeaderID, data[uniqueLeaderID].currentValue);
 
   }
-  // Gets the current list of heroes, their owners, and prices. 
+  // Gets the current list of heroes, their owners, and prices.
   function getCurrentLeaderOwners() external view returns (address[], uint256[]) {
     address[] memory currentLeaderOwners = new address[](32);
     uint256[] memory currentValues =  new uint256[](32);
@@ -113,5 +113,16 @@ contract CryptoLeaders {
     }
     return (currentLeaderOwners,currentValues);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -18,7 +18,7 @@ contract Deed {
 
 contract subdomainSale{
   AbstractENS ens = AbstractENS(0x314159265dD8dbb310642f98f50C066173C1259b);
-  Registrar registrar = Registrar(0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef);  
+  Registrar registrar = Registrar(0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef);
   address admin = 0x8301Fb8945760Fa2B3C669e8F420B8795Dc03766;
 
 
@@ -35,14 +35,14 @@ contract subdomainSale{
 
   modifier deed_check(bytes32 label){
      Deed deed;
-     (,deed,,,) = registrar.entries(label); 
+     (,deed,,,) = registrar.entries(label);
      if(deed.owner() != address(this)) throw;
      _;
   }
- 
+
   modifier prevOwn_check(bytes32 label){
     Deed deed;
-     (,deed,,,) = registrar.entries(label); 
+     (,deed,,,) = registrar.entries(label);
      if(deed.previousOwner() != msg.sender) throw;
      _;
   }
@@ -61,8 +61,8 @@ contract subdomainSale{
   function subdomainSale() {}
 
   function listSubName(bytes32 label,bytes32 node,uint commit, uint price,uint expiry) prevOwn_check(label) deed_check(label) ens_check(node){
-    require(records[node].subSale == false); 
-    require(expiry>=604800);   
+    require(records[node].subSale == false);
+    require(expiry>=604800);
     require(expiry<=commit);
 
     records[node].originalOwner=msg.sender;
@@ -73,11 +73,11 @@ contract subdomainSale{
   }
 
   function unlistSubName(bytes32 label,bytes32 node) recorded_owner(node) ens_check(node) deed_check(label){
-    require(records[node].commitPeriod <= now);    
+    require(records[node].commitPeriod <= now);
 
     ens.setOwner(node,records[node].originalOwner);
     registrar.transfer(label,records[node].originalOwner);
- 
+
     records[node].originalOwner=address(0x0);
     records[node].subSale=false;
     records[node].subPrice = 0;
@@ -113,7 +113,7 @@ contract subdomainSale{
     require( (records[ensName].subExpiry + now + 5) < records[ensName].commitPeriod );
     require(records[ensName].subSale == true);
     require(msg.value >= records[ensName].subPrice);
-    
+
     require(records[newNode].regPeriod < now);
 
     uint fee = msg.value/20;
@@ -135,4 +135,13 @@ contract subdomainSale{
     admin.transfer(msg.value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

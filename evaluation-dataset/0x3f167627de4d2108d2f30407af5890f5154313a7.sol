@@ -49,15 +49,15 @@ contract Controlled {
 
     /// @notice The address of the controller is the only address that can call
     ///  a function with this modifier
-    modifier onlyController { 
-        require(controllers[msg.sender]); 
-        _; 
+    modifier onlyController {
+        require(controllers[msg.sender]);
+        _;
     }
 
     address public controller;
 
-    constructor() internal { 
-        controllers[msg.sender] = true; 
+    constructor() internal {
+        controllers[msg.sender] = true;
         controller = msg.sender;
     }
 
@@ -122,18 +122,18 @@ interface ERC20Token {
 }
 
 contract SNTGiveaway is Controlled {
-    
+
     mapping(address => bool) public sentToAddress;
     mapping(bytes5 => bool) public codeUsed;
-    
+
     ERC20Token public SNT;
-    
+
     uint public ethAmount;
     uint public sntAmount;
     bytes32 public root;
-    
+
     event AddressFunded(address dest, bytes5 code, uint ethAmount, uint sntAmount);
-    
+
     /// @notice Constructor
     /// @param _sntAddress address SNT contract address
     /// @param _ethAmount uint Amount of ETH in wei to send
@@ -164,13 +164,13 @@ contract SNTGiveaway is Controlled {
 
         sentToAddress[_dest] = true;
         codeUsed[_code] = true;
-        
+
         require(SNT.transfer(_dest, sntAmount), "Transfer did not work");
         _dest.transfer(ethAmount);
-        
+
         emit AddressFunded(_dest, _code, ethAmount, sntAmount);
     }
-    
+
     /// @notice Update configuration settings
     /// @param _ethAmount uint Amount of ETH in wei to send
     /// @param _sntAmount uint Amount of SNT in wei to send
@@ -179,7 +179,7 @@ contract SNTGiveaway is Controlled {
         ethAmount = _ethAmount;
         sntAmount = _sntAmount;
         root = _root;
-        
+
     }
 
     function manualSend(address _dest, bytes5 _code) public onlyController {
@@ -190,10 +190,10 @@ contract SNTGiveaway is Controlled {
 
         require(SNT.transfer(_dest, sntAmount), "Transfer did not work");
         _dest.transfer(ethAmount);
-        
+
         emit AddressFunded(_dest, _code, ethAmount, sntAmount);
     }
-    
+
     /// @notice Extract balance in ETH + SNT from the contract and destroy the contract
     function boom() public onlyController {
         uint sntBalance = SNT.balanceOf(address(this));
@@ -203,8 +203,19 @@ contract SNTGiveaway is Controlled {
 
 
     function() public payable {
-          
+
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

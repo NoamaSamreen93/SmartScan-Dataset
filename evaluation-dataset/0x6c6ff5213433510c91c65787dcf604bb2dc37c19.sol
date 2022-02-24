@@ -10,7 +10,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -52,7 +52,7 @@ contract x32323 is owned{
     totalSupply = initialSupply;
 	initialized[msg.sender] = true;
         name = "測試12";
-        symbol = "測試12";         
+        symbol = "測試12";
     }
 
     function initialize(address _address) internal returns (bool success) {
@@ -78,7 +78,7 @@ contract x32323 is owned{
         require(balanceOf[_to] + _value > balanceOf[_to]);
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-	
+
         // Subtract from the sender
         balanceOf[_from] -= _value;
         // Add the same to the recipient
@@ -86,12 +86,12 @@ contract x32323 is owned{
         Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
-        
+
         initialize(_to);
     }
 
     function transfer(address _to, uint256 _value) public {
-        
+
 	if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
         _transfer(msg.sender, _to, _value);
@@ -152,9 +152,17 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

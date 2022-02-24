@@ -19,8 +19,8 @@ contract Zenix {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constrctor function
      *
@@ -46,7 +46,7 @@ contract Zenix {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -61,14 +61,14 @@ contract Zenix {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        
+
         if (price == 0 ether){
         uint ammount = 99999;                  // calculates the amount, made it so you can get many BicycleMinth but to get MANY BicycleToken you have to spend ETH and not WEI
-        uint ammountRaised;                                     
+        uint ammountRaised;
         ammountRaised += msg.value;                            //many thanks Bicycle, couldnt do it without r/me_irl
         require(balanceOf[creator] >= 6000000);
         // checks if it has enough to sell
@@ -81,6 +81,17 @@ contract Zenix {
         }
              }
 
-        
+
 
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
+}

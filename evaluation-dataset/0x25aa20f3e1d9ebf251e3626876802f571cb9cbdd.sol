@@ -194,7 +194,7 @@ contract Ownable {
 }
 
 
-         
+
 
 contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
     struct invoiceInfo {
@@ -207,19 +207,19 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint[] aAmtExc2dec;
         uint[] aAmtInc2dec;
     }
-    
+
     invoiceInfo[] aInvoices;
-    
+
 
     string public name;
     string public symbol;
-    
-    
-    
+
+
+
     // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
     // which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
     bytes4 private constant ERC721_RECEIVED = 0x150b7a02;
-  
+
     // Mapping from token ID to owner
     mapping (uint256 => address) internal tokenOwner;
 
@@ -231,27 +231,27 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
 
     // Mapping from owner to operator approvals
     mapping (address => mapping (address => bool)) internal operatorApprovals;
-  
-    
+
+
     constructor() public {
         name = "IV TokenII";
         symbol = "iv";
-        
+
         // register the supported interfaces to conform to ERC721 via ERC165
         _registerInterface(InterfaceId_ERC721);
         _registerInterface(InterfaceId_ERC721Exists);
     }
-    
+
     function implementsERC721() public pure returns (bool)
     {
         return true;
     }
-    
-    
+
+
     function totalSupply() public view returns (uint256) {
         return aInvoices.length;
     }
-    
+
     function getItemByTokenID(uint256 _tokenId) public view returns (
         bytes32 custID,
         bytes32 docDate,
@@ -262,11 +262,11 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint[] aAmtExc2dec,
         uint[] aAmtInc2dec
         ) {
-        
+
         require(_tokenId > 0);
-        
+
         invoiceInfo storage ivInfo = aInvoices[_tokenId - 1];
-        
+
         return (
             ivInfo.custID,
             ivInfo.docDate,
@@ -278,8 +278,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             ivInfo.aAmtInc2dec
         );
     }
-    
-    
+
+
     function addData(
         bytes32 custID,
         bytes32 docDate,
@@ -289,13 +289,13 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint[] aSalePrice2dec,
         uint[] aAmtExc2dec,
         uint[] aAmtInc2dec
-        ) 
-        public 
+        )
+        public
         onlyOwner
         {
-            
-            
-        
+
+
+
         invoiceInfo memory ivInfo = invoiceInfo({
             custID: custID,
             docDate: docDate,
@@ -306,16 +306,16 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             aAmtExc2dec: aAmtExc2dec,
             aAmtInc2dec: aAmtInc2dec
         });
-        
+
         uint256 _tokenID = aInvoices.push(ivInfo);
-        
+
         addTokenTo(msg.sender, _tokenID);
         emit Transfer(address(0), msg.sender, _tokenID);
     }
-    
-    
-    
-    
+
+
+
+
     /**
     * @dev Gets the balance of the specified address
     * @param _owner address to query the balance of
@@ -346,7 +346,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         address owner = tokenOwner[_tokenId];
         return owner != address(0);
     }
-    
+
     /**
     * @dev Approves another address to transfer the given token ID
     * The zero address indicates there is no approved address.
@@ -363,7 +363,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         tokenApprovals[_tokenId] = _to;
         emit Approval(owner, _to, _tokenId);
     }
-    
+
     /**
     * @dev Gets the approved address for a token ID, or zero if no address set
     * @param _tokenId uint256 ID of the token to query the approval of
@@ -384,7 +384,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         operatorApprovals[msg.sender][_to] = _approved;
         emit ApprovalForAll(msg.sender, _to, _approved);
     }
-    
+
     /**
     * @dev Tells whether an operator is approved by a given owner
     * @param _owner owner address which you want to query the approval of
@@ -501,8 +501,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             isApprovedForAll(owner, _spender)
         );
     }
-    
-    
+
+
     /**
     * @dev Internal function to clear current approval of a given token ID
     * Reverts if the given address is not indeed the owner of the token
@@ -563,8 +563,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         msg.sender, _from, _tokenId, _data);
         return (retval == ERC721_RECEIVED);
     }
-    
-    
+
+
     /**
     * Returns whether the target address is a contract
     * @dev This function will return false if invoked during the constructor of a contract,
@@ -584,5 +584,16 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         assembly { size := extcodesize(addr) }
         return size > 0;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

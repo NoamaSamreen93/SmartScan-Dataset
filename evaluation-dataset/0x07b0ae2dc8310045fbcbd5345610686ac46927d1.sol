@@ -7,22 +7,22 @@ contract Village {
         bool landclaimed;
         bool registered;
     }
-    struct Land { 
+    struct Land {
         address owner;
         bool house;
-        uint8 xcoord; 
-        uint8 ycoord; 
+        uint8 xcoord;
+        uint8 ycoord;
         uint8 width;
         uint8 length;
     }
     mapping(address => User) public UserRegistry;
     mapping(string => address) NameRegistry;
-    Land[] public LandRegistry; 
-    uint8[50][50] public mapGrid;   
-    uint8[50][50] public landGrid;  
+    Land[] public LandRegistry;
+    uint8[50][50] public mapGrid;
+    uint8[50][50] public landGrid;
 
     constructor() public {
-        LandRegistry.push(Land(address(0), false, 0, 0, 0, 0)); 
+        LandRegistry.push(Land(address(0), false, 0, 0, 0, 0));
         initFauna();
     }
 
@@ -31,13 +31,13 @@ contract Village {
         require(UserRegistry[msg.sender].registered == true, "Only registered can call this.");
         _;
     }
-    modifier onlyUnregistered() { 
+    modifier onlyUnregistered() {
         require(UserRegistry[msg.sender].registered == false, "Only Unregistered can call this.");
         _;
     }
 
     //=>EVENT
-    event LandClaimed(uint x); 
+    event LandClaimed(uint x);
     event HouseBuilt(uint x);
     event UserRegistered(address user);
 
@@ -64,7 +64,7 @@ contract Village {
             length[i] = LandRegistry[i].length;
         }
         return (addr, house, x, y, width, length);
-    } 
+    }
     function getUser(address addr) public view returns(string memory, bool) {
         return (UserRegistry[addr].name, UserRegistry[addr].landclaimed);
     }
@@ -94,8 +94,8 @@ contract Village {
         require(width>=4 && width<=7, "size invalid");
         require(length>=4 && length<=7, "size invalid");
         uint8 landindex = uint8(LandRegistry.length);
-        for(uint x = xcoord; x < xcoord+width; x++) { 
-            for(uint y = ycoord; y < ycoord+length+1; y++) { 
+        for(uint x = xcoord; x < xcoord+width; x++) {
+            for(uint y = ycoord; y < ycoord+length+1; y++) {
                 if(landGrid[x][y] == 0) {
                     landGrid[x][y] = landindex;
                 } else {
@@ -138,4 +138,15 @@ contract Village {
         mapGrid[19][27] = 5;
         mapGrid[34][8] = 5;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

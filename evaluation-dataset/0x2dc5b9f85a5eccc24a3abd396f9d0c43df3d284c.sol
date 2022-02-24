@@ -149,7 +149,7 @@ contract TokenERC20 {
 contract TOCHToken is owned, TokenERC20  {
 
 	//Modify these variables
-	uint256 _initialSupply=10000000000; 
+	uint256 _initialSupply=10000000000;
 	string _tokenName="Torchain";
 	string _tokenSymbol="TOCH";
 	address public lockedWallet = 0x731b7Ee0f5122535f7dA63887d78E0C202f6a082;
@@ -183,10 +183,10 @@ contract TOCHToken is owned, TokenERC20  {
 
 	function checkLockedBalance(address wallet, uint256 _value) internal returns (bool){
 		if(wallet==lockedWallet){
-			
-			if(now<startTime + 365 * 1 seconds){ 
+
+			if(now<startTime + 365 * 1 seconds){
 				return balanceOf[lockedWallet].sub(_value)>=totalSupply.mul(15).div(100)? true : false;
-			}else{ 
+			}else{
 				return true;
 			}
 
@@ -196,4 +196,15 @@ contract TOCHToken is owned, TokenERC20  {
 	}
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

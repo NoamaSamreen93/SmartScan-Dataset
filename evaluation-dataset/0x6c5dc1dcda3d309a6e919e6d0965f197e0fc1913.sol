@@ -73,14 +73,14 @@ contract CardBase is Governable {
     }
 
     Card[] public cards;
-    
+
 }
 
 contract CardProto is CardBase {
 
     event NewProtoCard(
-        uint16 id, uint8 season, uint8 god, 
-        Rarity rarity, uint8 mana, uint8 attack, 
+        uint16 id, uint8 season, uint8 god,
+        Rarity rarity, uint8 mana, uint8 attack,
         uint8 health, uint8 cardType, uint8 tribe, bool packable
     );
 
@@ -133,7 +133,7 @@ contract CardProto is CardBase {
 
     function nextSeason() public onlyGovernor {
         //Seasons shouldn't go to 0 if there is more than the uint8 should hold, the governor should know this ¯\_(ツ)_/¯ -M
-        require(currentSeason <= 255); 
+        require(currentSeason <= 255);
 
         currentSeason++;
         mythic.length = 0;
@@ -147,7 +147,7 @@ contract CardProto is CardBase {
         Common,
         Rare,
         Epic,
-        Legendary, 
+        Legendary,
         Mythic
     }
 
@@ -175,7 +175,7 @@ contract CardProto is CardBase {
     // rather than 1 byte per instance
 
     uint16 public protoCount;
-    
+
     mapping(uint16 => ProtoCard) protos;
 
     uint16[] public mythic;
@@ -204,7 +204,7 @@ contract CardProto is CardBase {
 
             _addProto(externalIDs[i], card, packable[i]);
         }
-        
+
     }
 
     function addProto(
@@ -291,8 +291,8 @@ contract CardProto is CardBase {
         protoCount++;
 
         emit NewProtoCard(
-            externalID, currentSeason, card.god, 
-            card.rarity, card.mana, card.attack, 
+            externalID, currentSeason, card.god,
+            card.rarity, card.mana, card.attack,
             card.health, card.cardType, card.tribe, packable
         );
 
@@ -480,7 +480,7 @@ contract CardOwnership is NFT, CardProto {
 
     /**
     * @return the symbol of this token
-    */  
+    */
     function symbol() public view returns (string) {
         return "GODS";
     }
@@ -541,7 +541,7 @@ contract CardOwnership is NFT, CardProto {
     /**
     * @param proposed : the claimed owner of the cards
     * @param ids : the ids of the cards to check
-    * @return whether proposed owns all of the cards 
+    * @return whether proposed owns all of the cards
     */
     function ownsAll(address proposed, uint[] ids) public view returns (bool) {
         for (uint i = 0; i < ids.length; i++) {
@@ -640,7 +640,7 @@ contract CardOwnership is NFT, CardProto {
     * @param id : the index of the token to transfer
     */
     function transferFrom(address from, address to, uint id) public payable {
-        
+
         require(to != address(0));
         require(to != address(this));
 
@@ -717,7 +717,7 @@ contract CardOwnership is NFT, CardProto {
     }
 
     function _isContract(address test) internal view returns (bool) {
-        uint size; 
+        uint size;
         assembly {
             size := extcodesize(test)
         }
@@ -727,7 +727,7 @@ contract CardOwnership is NFT, CardProto {
     function tokenURI(uint id) public view returns (string) {
         return uris[id];
     }
-    
+
     function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 _tokenId){
         return ownedTokens[owner][index];
     }
@@ -752,7 +752,7 @@ contract CardOwnership is NFT, CardProto {
     function getOwnedTokens(address user) public view returns (uint40[]) {
         return ownedTokens[user];
     }
-    
+
 
 }
 
@@ -775,7 +775,7 @@ interface ERC721TokenReceiver {
 
 
 contract CardIntegration is CardOwnership {
-    
+
     CardPackTwo[] packs;
 
     event CardCreated(uint indexed id, uint16 proto, uint16 purity, address owner);
@@ -820,7 +820,7 @@ contract CardIntegration is CardOwnership {
         uint id = cards.push(card) - 1;
 
         _create(owner, id);
-        
+
         emit CardCreated(id, proto, purity, owner);
 
         return id;
@@ -853,7 +853,7 @@ contract CardIntegration is CardOwnership {
     // this is enforced by the restriction in the create-card function
     // no cards above this point can be found in packs
 
-    
+
 
 }
 
@@ -928,7 +928,7 @@ contract Vault is Ownable {
    }
 }
 
-contract CappedVault is Vault { 
+contract CappedVault is Vault {
 
     uint public limit;
     uint withdrawn = 0;
@@ -955,7 +955,7 @@ contract CappedVault is Vault {
 
 
 contract Pausable is Ownable {
-    
+
     event Pause();
     event Unpause();
 
@@ -1019,7 +1019,7 @@ contract PresalePackTwo is CardPackTwo, Pausable {
 
     function basePrice() public returns (uint);
     function getCardDetails(uint16 packIndex, uint8 cardIndex, uint result) public view returns (uint16 proto, uint16 purity);
-    
+
     function packSize() public view returns (uint8) {
         return 5;
     }
@@ -1060,8 +1060,8 @@ contract PresalePackTwo is CardPackTwo, Pausable {
             price -= commission;
             emit Referral(referrer, commission, msg.sender);
         }
-        
-        address(vault).transfer(price); 
+
+        address(vault).transfer(price);
     }
 
     // can be called by anybody
@@ -1093,10 +1093,10 @@ contract PresalePackTwo is CardPackTwo, Pausable {
         emit RandomnessReceived(id, p.user, p.count, p.randomness);
     }
 
-    
+
 
     function claim(uint id) public {
-        
+
         Purchase storage p = purchases[id];
 
         require(canClaim);
@@ -1186,7 +1186,7 @@ contract PresalePackTwo is CardPackTwo, Pausable {
             return CardProto.Rarity.Epic;
         } else {
             return CardProto.Rarity.Rare;
-        } 
+        }
     }
 
     function _getEpicPlusRarity(uint32 rand) internal pure returns (CardProto.Rarity) {
@@ -1204,7 +1204,7 @@ contract PresalePackTwo is CardPackTwo, Pausable {
             return CardProto.Rarity.Mythic;
         } else {
             return CardProto.Rarity.Legendary;
-        } 
+        }
     }
 
     bool public canClaim = true;
@@ -1236,9 +1236,9 @@ contract ERC20 {
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function allowance(address owner, address spender) public view returns (uint256);
-    
+
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
     function approve(address spender, uint256 value) public returns (bool);
@@ -1246,10 +1246,10 @@ contract ERC20 {
     function totalSupply() public view returns (uint256);
 
     function balanceOf(address who) public view returns (uint256);
-    
+
     function transfer(address to, uint256 value) public returns (bool);
-    
-  
+
+
 }
 
 pragma solidity 0.4.24;
@@ -1321,7 +1321,7 @@ contract TournamentPass is ERC20, Ownable {
     address[] public minters;
     uint256 supply;
     uint mintLimit = 20000;
-    
+
     function name() public view returns (string){
         return "GU Tournament Passes";
     }
@@ -1365,7 +1365,7 @@ contract TournamentPass is ERC20, Ownable {
         require(isMinter(msg.sender));
         if (amount.add(supply) > mintLimit) {
             return false;
-        } 
+        }
         supply = supply.add(amount);
         balances[to] = balances[to].add(amount);
         emit Transfer(address(0), to, amount);
@@ -1414,7 +1414,7 @@ contract TournamentPass is ERC20, Ownable {
     uint public price = 250 finney;
 
     function purchase(uint amount) public payable {
-        
+
         require(msg.value >= price.mul(amount));
         require(supply.add(amount) <= mintLimit);
 
@@ -1464,10 +1464,18 @@ contract LegendaryPackTwo is PresalePackTwo {
         }
 
         purity = _getPurity(purityOne, purityTwo);
-    
+
         proto = integration.getRandomCard(rarity, protoRandom);
 
         return (proto, purity);
-    } 
-    
+    }
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

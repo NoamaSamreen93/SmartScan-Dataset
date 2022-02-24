@@ -32,17 +32,17 @@ contract OysterPrePearl {
         owner = msg.sender;
         partner = 0x0524Fe637b77A6F5f0b3a024f7fD9Fe1E688A291;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyAuth {
         require(msg.sender == owner || msg.sender == partner);
         _;
     }
-    
+
     function closeSale() onlyOwner {
         saleClosed = true;
     }
@@ -50,7 +50,7 @@ contract OysterPrePearl {
     function openSale() onlyOwner {
         saleClosed = false;
     }
-    
+
     function () payable {
         require(!saleClosed);
         require(msg.value >= 100 finney);
@@ -68,12 +68,12 @@ contract OysterPrePearl {
         else buyPrice = 7500;//50% bonus
         uint amount;
         amount = msg.value * buyPrice;                    // calculates the amount
-        totalSupply += amount;                            // increases the total supply 
+        totalSupply += amount;                            // increases the total supply
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
         funds += msg.value;                               // track eth amount raised
         Transfer(this, msg.sender, amount);               // execute an event reflecting the change
     }
-    
+
     function withdrawFunds() onlyAuth {
         uint256 payout = (this.balance/2) - 2;
         owner.transfer(payout);
@@ -194,4 +194,20 @@ contract OysterPrePearl {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

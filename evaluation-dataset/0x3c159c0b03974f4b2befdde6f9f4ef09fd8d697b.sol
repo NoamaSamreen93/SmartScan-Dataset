@@ -29,7 +29,7 @@ library SafeMath {
 
 /// @title Ownable contract
 contract Ownable {
-  
+
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -58,7 +58,7 @@ contract Pausable is Ownable {
   /// Used to pause transfers
   bool public transferPaused;
   address public crowdsale;
-  
+
   function Pausable() public {
     transferPaused = false;
     crowdsale = msg.sender; // or address(0)
@@ -105,7 +105,7 @@ contract ERC20 {
   function balanceOf(address who) public constant returns (uint);
   function transfer(address to, uint value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint value);
-  
+
   function allowance(address owner, address spender) public constant returns (uint);
   function transferFrom(address from, address to, uint value) public returns (bool);
   function approve(address spender, uint value) public returns (bool);
@@ -125,7 +125,7 @@ contract ExtendedToken is ERC20, Pausable {
   /// @param _amount Amount of tokens to be burned from owner address
   /// @return True if successfully burned
   function burn(uint _amount) public onlyOwner returns (bool) {
-	  require(balances[msg.sender] >= _amount);     
+	  require(balances[msg.sender] >= _amount);
     balances[msg.sender] = balances[msg.sender].sub(_amount);
     totalSupply = totalSupply.sub(_amount);
     Burn(msg.sender, _amount);
@@ -139,7 +139,7 @@ contract ExtendedToken is ERC20, Pausable {
     balances[_to] = balances[_to].add(_value);
     Transfer(_from, _to, _value);
   }
-  
+
   /// @dev Transfer tokens
   /// @param _to Address to receive the tokens
   /// @param _value Amount of tokens to be sent
@@ -148,7 +148,7 @@ contract ExtendedToken is ERC20, Pausable {
     _transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function transferFrom(address _from, address _to, uint _value) public returns (bool) {
     require(_value <= allowed[_from][msg.sender]);
     _transfer(_from, _to, _value);
@@ -222,9 +222,22 @@ contract CulturalCoinToken is ExtendedToken {
   uint8 public constant decimals = 18;
   string public constant version = "v1";
 
-  function CulturalCoinToken() public { 
+  function CulturalCoinToken() public {
     totalSupply = 1500 * 10**24;    // 1500m tokens
     balances[owner] = totalSupply;  // Tokens will be initially set to the owner account. From there 900m will be sent to Crowdsale
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

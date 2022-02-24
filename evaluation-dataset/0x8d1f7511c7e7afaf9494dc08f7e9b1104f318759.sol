@@ -1,12 +1,12 @@
 pragma solidity ^0.4.25;
 
 
-// library for basic math operation + - * / to prevent and protect overflow error 
+// library for basic math operation + - * / to prevent and protect overflow error
 // (Overflow and Underflow) which can be occurred from unit256 (Unsigned int 256)
  library SafeMath256 {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if(a==0 || b==0)
-        return 0;  
+        return 0;
     uint256 c = a * b;
     require(a == 0 || c / a == b);
     return c;
@@ -29,7 +29,7 @@ pragma solidity ^0.4.25;
 
     return c;
   }
-  
+
 }
 
 
@@ -43,28 +43,28 @@ contract ERC20 {
        function allowance(address tokenOwner, address spender) public view returns (uint256 remaining);
 
        function transfer(address to, uint256 tokens) public returns (bool success);
-       
+
        function approve(address spender, uint256 tokens) public returns (bool success);
        function transferFrom(address from, address to, uint256 tokens) public returns (bool success);
-  
+
 
 }
 
 
 // Contract Ownable is used to specified which person has right/permission to execute/invoke the specific function.
 // Different from OnlyOwner which is the only owner of the smart contract who has right/permission to call
-// the specific function. Aside from OnlyOwner, 
+// the specific function. Aside from OnlyOwner,
 // OnlyOwners can also be used which any of Owners can call the particular function.
 
 contract Ownable {
 
 
-// A list of owners which will be saved as a list here, 
-// and the values are the owner’s names. 
-// This to allow investors / NATEE Token buyers to trace/monitor 
+// A list of owners which will be saved as a list here,
+// and the values are the owner’s names.
+// This to allow investors / NATEE Token buyers to trace/monitor
 // who executes which functions written in this NATEE smart contract  string [] ownerName;
 
-  string [] ownerName;  
+  string [] ownerName;
   mapping (address=>bool) owners;
   mapping (address=>uint256) ownerToProfile;
   address owner;
@@ -74,13 +74,13 @@ contract Ownable {
   event AddOwner(address newOwner,string name);
   event RemoveOwner(address owner);
   /**
-   * @dev Ownable constructor , initializes sender’s account and 
+   * @dev Ownable constructor , initializes sender’s account and
    * set as owner according to default value according to contract
    *
    */
 
    // this function will be executed during initial load and will keep the smart contract creator (msg.sender) as Owner
-   // and also saved in Owners. This smart contract creator/owner is 
+   // and also saved in Owners. This smart contract creator/owner is
    // Mr. Samret Wajanasathian CTO of Seitee Pte Ltd (https://seitee.com.sg , https://natee.io)
 
    constructor() public {
@@ -107,7 +107,7 @@ contract Ownable {
 
   }
 
-// function to check if the executor is the owner? This to ensure that only the person 
+// function to check if the executor is the owner? This to ensure that only the person
 // who has right to execute/call the function has the permission to do so.
   modifier onlyOwner(){
     require(msg.sender == owner);
@@ -116,7 +116,7 @@ contract Ownable {
 
 // This function has only one Owner. The ownership can be transferrable and only
 //  the current Owner will only be  able to execute this function.
-  
+
   function transferOwnership(address newOwner,string newOwnerName) public onlyOwner{
     require(isContract(newOwner) == false);
     uint256 idx;
@@ -134,7 +134,7 @@ contract Ownable {
 
 // Function to check if the person is listed in a group of Owners and determine
 // if the person has the any permissions in this smart contract such as Exec permission.
-  
+
   modifier onlyOwners(){
     require(owners[msg.sender] == true);
     _;
@@ -142,7 +142,7 @@ contract Ownable {
 
 // Function to add Owner into a list. The person who wanted to add a new owner into this list but be an existing
 // member of the Owners list. The log will be saved and can be traced / monitor who’s called this function.
-  
+
   function addOwner(address newOwner,string newOwnerName) public onlyOwners{
     require(owners[newOwner] == false);
     require(newOwner != msg.sender);
@@ -173,8 +173,8 @@ contract Ownable {
     return owners[_owner];
   }
 
-// Function to check who’s executed the functions of smart contract. This returns the name of 
-// Owner and this give transparency of whose actions on this NATEE Smart Contract. 
+// Function to check who’s executed the functions of smart contract. This returns the name of
+// Owner and this give transparency of whose actions on this NATEE Smart Contract.
 
   function getOwnerName(address ownerAddr) public view returns(string){
   	require(ownerToProfile[ownerAddr] > 0);
@@ -183,11 +183,11 @@ contract Ownable {
   }
 }
 
-// ContractToken is for managing transactions of wallet address or contract address with its own 
+// ContractToken is for managing transactions of wallet address or contract address with its own
 // criterias and conditions such as settlement.
 
 contract ControlToken is Ownable{
-	
+
 	mapping (address => bool) lockAddr;
 	address[] lockAddrList;
 	uint32  unlockDate;
@@ -202,15 +202,15 @@ contract ControlToken is Ownable{
 	event Call2YLock(address caller);
 
 // Initially the lockin period is set for 100 years starting from the date of Smart Contract Deployment.
-// The company will have to adjust it to 2 years for lockin period starting from the first day that 
+// The company will have to adjust it to 2 years for lockin period starting from the first day that
 // NATEE token listed in exchange (in any exchange).
 
 	constructor() public{
 		unlockDate = uint32(now) + 36500 days;  // Start Lock 100 Year first
-		
+
 	}
 
-// function to set Wallet Address that belong to Exclusive Exchange. 
+// function to set Wallet Address that belong to Exclusive Exchange.
 // The lockin period for this setting has its minimum of 6 months.
 
 	function setExchangeAddr(address _addr) onlyOwners public{
@@ -228,13 +228,13 @@ contract ControlToken is Ownable{
 	}
 
 // This function is used to set duration from 100 years to 2 years, start counting from the date that execute this function.
-// To prevent early execution and to ensure that only the legitimate Owner can execute this function, 
+// To prevent early execution and to ensure that only the legitimate Owner can execute this function,
 // Seitee Pte Ltd has logged all activities from this function which open for public for transparency.
 // The generated log will be publicly published on ERC20 network, anyone can check/trace from the log
 // that this function will never been called if there no confirmed Exchange that accepts NATEE Token.
-// Any NATEE token holders who still serving lockin period, can ensure that there will be no repeatedly 
-// execution for this function (the repeatedly execution could lead to lockin period extension to more than 2 years). 
-// The constraint “call2YLock” is initialized as boolean “False” when the NATEE Smart Contract is created and will only 
+// Any NATEE token holders who still serving lockin period, can ensure that there will be no repeatedly
+// execution for this function (the repeatedly execution could lead to lockin period extension to more than 2 years).
+// The constraint “call2YLock” is initialized as boolean “False” when the NATEE Smart Contract is created and will only
 // be set to “true” when this function is executed. One the value changed from false > true, it will preserve the value forever.
 
 	function start2YearLock() onlyOwners public{
@@ -244,7 +244,7 @@ contract ControlToken is Ownable{
 
 			emit Call2YLock(msg.sender);
 		}
-	
+
 	}
 
 	function lockAddress(address _addr) internal{
@@ -259,19 +259,19 @@ contract ControlToken is Ownable{
 		return lockAddr[_addr];
 	}
 
-// this internal function is used to add address into the locked address list. 
-	
+// this internal function is used to add address into the locked address list.
+
 	function addLockAddress(address _addr) onlyOwners public{
 		if(lockAddr[_addr] == false)
 		{
 			lockAddr[_addr] = true;
-			lockAddrList.push(_addr);		
+			lockAddrList.push(_addr);
 		}
 	}
 
 // Function to unlock the token for all addresses. This function is open as public modifier
 // stated to allow anyone to execute it. This to prevent the doubtful of delay of unlocking
-// or any circumstances that prolong the unlocking. This just simply means, anyone can unlock 
+// or any circumstances that prolong the unlocking. This just simply means, anyone can unlock
 // the address for anyone in this Smart Contract.
 
 	function unlockAllAddress() public{
@@ -302,13 +302,13 @@ contract ControlToken is Ownable{
 	}
 
 // NATEE Token system prevents the transfer of token to non-verified Wallet Address
-// (the Wallet Address that hasn’t been verified thru KYC). This can also means that 
-// Token wont be transferable to other Wallet Address that not saved in this Smart Contract. 
+// (the Wallet Address that hasn’t been verified thru KYC). This can also means that
+// Token wont be transferable to other Wallet Address that not saved in this Smart Contract.
 // This function is created for everyone to unlock the Wallet Address, once the Wallet Address is unlocked,
-// the Wallet Address can’t be set to lock again. Our Smart Contract doesn’t have any line that 
-// contains “disableBlock = false”. The condition is when there is a new exchange in the system and 
+// the Wallet Address can’t be set to lock again. Our Smart Contract doesn’t have any line that
+// contains “disableBlock = false”. The condition is when there is a new exchange in the system and
 // fulfill the 6 months lockin period or less (depends on the value set).
-   
+
     function setDisableLock() public{
     	if(uint256(now) >= exchangeTimeOut && exchangeAddress.length > 0)
     	{
@@ -319,8 +319,8 @@ contract ControlToken is Ownable{
 
 }
 
-// NATEE token smart contract stored KYC Data on Blockchain for transparency. 
-// Only Seitee Pte Ltd has the access to this KYC data. The authorities/Government 
+// NATEE token smart contract stored KYC Data on Blockchain for transparency.
+// Only Seitee Pte Ltd has the access to this KYC data. The authorities/Government
 // Agencies can be given the access to view this KYC data, too (subject to approval).
 // Please note, this is not open publicly.
 
@@ -328,14 +328,14 @@ contract KYC is ControlToken{
 
 
 	struct KYCData{
-		bytes8    birthday; // yymmdd  
-		bytes16   phoneNumber; 
+		bytes8    birthday; // yymmdd
+		bytes16   phoneNumber;
 
 		uint16    documentType; // 2 byte;
 		uint32    createTime; // 4 byte;
 		// --- 32 byte
 		bytes32   peronalID;  // Passport หรือ idcard
-		// --- 32 byte 
+		// --- 32 byte
 		bytes32    name;
 		bytes32    surName;
 		bytes32    email;
@@ -347,7 +347,7 @@ contract KYC is ControlToken{
 	mapping (uint256=>address) kycDataForOwners;
 	mapping (address=>uint256) OwnerToKycData;
 
-	mapping (uint256=>address) internal kycSOSToOwner; //keccak256 for SOS function 
+	mapping (uint256=>address) internal kycSOSToOwner; //keccak256 for SOS function
 
 
 	event ChangePassword(address indexed owner_,uint256 kycIdx_);
@@ -364,7 +364,7 @@ contract KYC is ControlToken{
 										 							  bytes32 email_){
 		require(_idx <= kycDatas.length && _idx > 0,"ERROR GetKYCData 01");
 		KYCData memory _kyc;
-		uint256  kycKey = _idx - 1; 
+		uint256  kycKey = _idx - 1;
 		_kyc = kycDatas[kycKey];
 
 		phoneNumber_ = _kyc.phoneNumber;
@@ -375,7 +375,7 @@ contract KYC is ControlToken{
 		surname_ = _kyc.surName;
 		email_ = _kyc.email;
 
-		} 
+		}
 
 	// function to view KYC data from registered Wallet Address. Only Seitee Pte Ltd has right to view this data.
 	function getKYCDataByAddr(address _addr) onlyOwners view public returns(bytes16 phoneNumber_,
@@ -387,7 +387,7 @@ contract KYC is ControlToken{
 										 							  bytes32 email_){
 		require(OwnerToKycData[_addr] > 0,"ERROR GetKYCData 02");
 		KYCData memory _kyc;
-		uint256  kycKey = OwnerToKycData[_addr] - 1; 
+		uint256  kycKey = OwnerToKycData[_addr] - 1;
 		_kyc = kycDatas[kycKey];
 
 		phoneNumber_ = _kyc.phoneNumber;
@@ -398,7 +398,7 @@ contract KYC is ControlToken{
 		surname_ = _kyc.surName;
 		email_ = _kyc.email;
 
-		} 
+		}
 
 	// The Owner can view the history records from KYC processes.
 	function getKYCData() view public returns(bytes16 phoneNumber_,
@@ -425,7 +425,7 @@ contract KYC is ControlToken{
 
 // 6 chars password which the Owner can update the password by himself/herself. Only the Owner can execute this function.
 	function changePassword(bytes8 oldPass_, bytes8 newPass_) public returns(bool){
-		require(OwnerToKycData[msg.sender] > 0,"ERROR changePassword"); 
+		require(OwnerToKycData[msg.sender] > 0,"ERROR changePassword");
 		uint256 id = OwnerToKycData[msg.sender] - 1;
 		if(kycDatas[id].password == oldPass_)
 		{
@@ -448,8 +448,8 @@ contract KYC is ControlToken{
 		uint256 sosHash = uint256(keccak256(abi.encodePacked(_name, _surname , _email, _password)));
 
 		OwnerToKycData[_wallet] = id;
-		kycDataForOwners[id] = _wallet; 
-		kycSOSToOwner[sosHash] = _wallet; 
+		kycDataForOwners[id] = _wallet;
+		kycSOSToOwner[sosHash] = _wallet;
 		emit CreateKYCData(_wallet,id);
 
 		return id;
@@ -469,14 +469,14 @@ contract KYC is ControlToken{
 // Standard ERC20 function, no overriding at the moment.
 
 contract StandarERC20 is ERC20{
-	using SafeMath256 for uint256;  
-     
+	using SafeMath256 for uint256;
+
      mapping (address => uint256) balance;
      mapping (address => mapping (address=>uint256)) allowed;
 
 
-     uint256 public totalSupply_;  
-     
+     uint256 public totalSupply_;
+
 
      address[] public  holders;
      mapping (address => uint256) holderToId;
@@ -486,16 +486,16 @@ contract StandarERC20 is ERC20{
      event Approval(address indexed owner,address indexed spender,uint256 value);
 
 
-// Total number of Tokens 
+// Total number of Tokens
     function totalSupply() public view returns (uint256){
      	return totalSupply_;
     }
 
      function balanceOf(address _walletAddress) public view returns (uint256){
-        return balance[_walletAddress]; 
+        return balance[_walletAddress];
      }
 
-// function to check on how many tokens set to be transfer between _owner and _spender. This is to check prior to confirm the transaction. 
+// function to check on how many tokens set to be transfer between _owner and _spender. This is to check prior to confirm the transaction.
      function allowance(address _owner, address _spender) public view returns (uint256){
           return allowed[_owner][_spender];
         }
@@ -504,11 +504,11 @@ contract StandarERC20 is ERC20{
      function transfer(address _to, uint256 _value) public returns (bool){
         require(_value <= balance[msg.sender]);
         require(_to != address(0));
-        
+
         balance[msg.sender] = balance[msg.sender].sub(_value);
         balance[_to] = balance[_to].add(_value);
 
-        emit Transfer(msg.sender,_to,_value); 
+        emit Transfer(msg.sender,_to,_value);
         return true;
 
      }
@@ -522,13 +522,13 @@ contract StandarERC20 is ERC20{
             }
 
 
-// standard function to request the money used after the sender has initialize the 
-// transition of money transfer. Only the beneficiary able to execute this function 
-// and the amount of money has been set as transferable by the sender.  
+// standard function to request the money used after the sender has initialize the
+// transition of money transfer. Only the beneficiary able to execute this function
+// and the amount of money has been set as transferable by the sender.
       function transferFrom(address _from, address _to, uint256 _value)
             public returns (bool){
                require(_value <= balance[_from]);
-               require(_value <= allowed[_from][msg.sender]); 
+               require(_value <= allowed[_from][msg.sender]);
                require(_to != address(0));
 
               balance[_from] = balance[_from].sub(_value);
@@ -554,16 +554,16 @@ contract StandarERC20 is ERC20{
      	return holders.length;
      }
 
-// function to read all indexes of NATEE Token holders. 
+// function to read all indexes of NATEE Token holders.
      function getHolder(uint256 idx) external view returns(address){
      	return holders[idx];
      }
-     
+
 }
 
 
 // Contract for co-founders and advisors which is total of 5,000,000 Tokens for co-founders
-// and 4,000,000 tokens for advisors. Maximum NATEE token for advisor is 200,000 Tokens and 
+// and 4,000,000 tokens for advisors. Maximum NATEE token for advisor is 200,000 Tokens and
 // the deficit from 4,000,000 tokens allocated to advisors, will be transferred to co-founders.
 
 contract FounderAdvisor is StandarERC20,Ownable,KYC {
@@ -583,7 +583,7 @@ contract FounderAdvisor is StandarERC20,Ownable,KYC {
 
 	// Will have this value after close ICO
 
-	uint256 public TOKEN_PER_FOUNDER = 0 ether; 
+	uint256 public TOKEN_PER_FOUNDER = 0 ether;
 	uint256 public TOKEN_PER_ADVISOR = 0 ether;
 
 	event AddFounder(address indexed newFounder,string nane,uint256  curFoounder);
@@ -597,7 +597,7 @@ contract FounderAdvisor is StandarERC20,Ownable,KYC {
 	event ChangeFounderAddr(address indexed oldAddr_, address indexed newAddr_);
 
 
-// function to add founders, name and surname will be logged. This 
+// function to add founders, name and surname will be logged. This
 // function will be disabled after ICO closed.
 	function addFounder(address newAddr, string _name) onlyOwners external returns (bool){
 		require(closeICO == false);
@@ -639,7 +639,7 @@ contract FounderAdvisor is StandarERC20,Ownable,KYC {
 		return true;
 	}
 
-// function to update founder’s Wallet Address. To remove the founder, 
+// function to update founder’s Wallet Address. To remove the founder,
 // pass the value of address = 0. This function will be disabled after ICO closed.
 	function changeFounderAddr(address oldAddr, address newAddr) onlyOwners external returns(bool){
 		require(closeICO == false);
@@ -667,19 +667,19 @@ contract FounderAdvisor is StandarERC20,Ownable,KYC {
 }
 
 // Contract MyToken is created for extra permission to make a transfer of token. Typically,
-// NATEE Token will be held and will only be able to transferred to those who has successfully 
-// done the KYC. For those who holds NATEE PRIVATE TOKEN at least 8,000,000 tokens is able to 
+// NATEE Token will be held and will only be able to transferred to those who has successfully
+// done the KYC. For those who holds NATEE PRIVATE TOKEN at least 8,000,000 tokens is able to
 // transfer the token to anyone with no limit.
 
 contract MyToken is FounderAdvisor {
-	 using SafeMath256 for uint256;  
+	 using SafeMath256 for uint256;
      mapping(address => uint256) privateBalance;
 
 
      event SOSTranfer(address indexed oldAddr_, address indexed newAddr_);
 
 // standard function according to ERC20, modified by adding the condition of lockin period (2 years)
-// for founders and advisors. Including the check whether the address has been KYC verified and is 
+// for founders and advisors. Including the check whether the address has been KYC verified and is
 // NATEE PRIVATE TOKEN holder will be able to freedomly trade the token.
 
      function transfer(address _to, uint256 _value) public returns (bool){
@@ -696,7 +696,7 @@ contract MyToken is FounderAdvisor {
         		require(OwnerToKycData[_to] > 0,"You not have permission to Recieve");
         	}
    		 }
-        
+
          addHolder(_to);
 
         if(super.transfer(_to, _value) == true)
@@ -731,12 +731,12 @@ contract MyToken is FounderAdvisor {
             if(privateBalance[_from] < _value)
             {
             	if(disableBlock == false)
-            	{	
+            	{
          	    	require(OwnerToKycData[msg.sender] > 0, "You Not Have permission to Send");
             		require(OwnerToKycData[_to] > 0,"You not have permission to recieve");
         		}
         	}
-           
+
             addHolder(_to);
 
             if(super.transferFrom(_from, _to, _value) == true)
@@ -761,7 +761,7 @@ contract MyToken is FounderAdvisor {
       // function to transfer all asset from the old wallet to new wallet. This is used, just in case, the owner forget the private key.
       // The owner who which to update the wallet by calling this function must have successfully done KYC and the 6 alpha numeric password
       // must be used and submit to Seitee Pte Ltd. The company will recover the old wallet address and transfer the assets to the new wallet
-      // address on behave of the owner of the wallet address.  
+      // address on behave of the owner of the wallet address.
       function sosTransfer(bytes32 _name, bytes32 _surname, bytes32 _email,bytes8 _password,address _newAddr) onlyOwners public returns(bool){
 
       	uint256 sosHash = uint256(keccak256(abi.encodePacked(_name, _surname , _email, _password)));
@@ -801,11 +801,11 @@ contract MyToken is FounderAdvisor {
 
       	return true;
       }
-     
+
 // function for internal transfer between wallets that the controls have been given to
 // the company (The owner can revoke these controls after ICO closed). Only the founders
-// of Seitee Pte Ltd can execute this function. All activities will be publicly logged. 
-// The user can trace/view the log to check transparency if any founders of the company 
+// of Seitee Pte Ltd can execute this function. All activities will be publicly logged.
+// The user can trace/view the log to check transparency if any founders of the company
 // make the transfer of assets from your wallets. Again, Transparency is the key here.
 
       function inTransfer(address _from, address _to,uint256 value) onlyOwners public{
@@ -826,12 +826,12 @@ contract MyToken is FounderAdvisor {
         	privateBalance[_to] = privateBalance[_to].add(value);
         }
 
-        emit Transfer(_from,_to,value); 
+        emit Transfer(_from,_to,value);
       }
 
 
      function balanceOfPrivate(address _walletAddress) public view returns (uint256){
-        return privateBalance[_walletAddress]; 
+        return privateBalance[_walletAddress];
      }
 
 }
@@ -842,12 +842,12 @@ contract MyToken is FounderAdvisor {
 
 // Contract for NATEE PRIVATE TOKEN (1 NATEE PRIVATE TOKEN equivalent to 8 NATEE TOKEN)
 contract NateePrivate {
-	
+
     function redeemToken(address _redeem, uint256 _value) external;
 	function getMaxHolder() view external returns(uint256);
 	function getAddressByID(uint256 _id) view external returns(address);
 	function balancePrivate(address _walletAddress)  public view returns (uint256);
-	
+
 }
 
 // The interface of SGDS (Singapore Dollar Stable)
@@ -918,7 +918,7 @@ contract Marketing is MyToken{
 				}else if(referals[idx].summaryInvest >80000 && referals[idx].summaryInvest <=320000){
 					referals[idx].allCommission = 2000 + (referals[idx].summaryInvest / 10 / 2); // 10%
 				}else if(referals[idx].summaryInvest > 320000){
-					referals[idx].allCommission = 2000 + 12000 + (referals[idx].summaryInvest * 15 / 100 / 2); // 10%					
+					referals[idx].allCommission = 2000 + 12000 + (referals[idx].summaryInvest * 15 / 100 / 2); // 10%
 				}
 			}
 			else if(refType == 2 || refType == 5){
@@ -960,7 +960,7 @@ contract Marketing is MyToken{
 //	2. Set allocated tokens for sales during public-sales, prices and the duration for public-sales is 90 days.
 //	3. The entire duration pre-sales / public sales is no more than 270 days (9 months).
 //	4. If the ICO fails to reach Soft Cap, the investors can request for refund by using SGDS and the company will give back into ETH (the exchange rate and ETH price depends on the market)
-//	5. There are 2 addresses which will get 1% of fund raised and 5% but not more then 200,000 SGDS . These two addresses helped us in shaping up Business Model and Smart Contract. 
+//	5. There are 2 addresses which will get 1% of fund raised and 5% but not more then 200,000 SGDS . These two addresses helped us in shaping up Business Model and Smart Contract.
 
 contract ICO_Token is  Marketing{
 
@@ -1001,10 +1001,10 @@ contract ICO_Token is  Marketing{
 	event Refund(address indexed,uint256 sgds,uint256 totalBuy);
 
 	constructor() public {
-		//sgds = 
-		//warrant = 
+		//sgds =
+		//warrant =
 		pauseICO = false;
-		icoEndTime = uint32(now + 365 days); 
+		icoEndTime = uint32(now + 365 days);
 	}
 
 	function pauseSellICO() onlyOwners external{
@@ -1014,7 +1014,7 @@ contract ICO_Token is  Marketing{
 		pauseICO = true;
 
 	}
-// NEW FUNCTION 
+// NEW FUNCTION
 	function resumeSellICO() onlyOwners external{
 		require(pauseICO == true);
 		pauseICO = false;
@@ -1026,7 +1026,7 @@ contract ICO_Token is  Marketing{
 		pauseICO = false;
 	}
 
-// Function to kicks start the ICO, Auto triggered as soon as the first 
+// Function to kicks start the ICO, Auto triggered as soon as the first
 // NATEE TOKEN transfer committed.
 
 	function startSellICO() internal returns(bool){
@@ -1040,11 +1040,11 @@ contract ICO_Token is  Marketing{
 		return true;
 	}
 
-// this function will be executed automatically as soon as Soft Cap reached. By limited additional 90 days 
+// this function will be executed automatically as soon as Soft Cap reached. By limited additional 90 days
 // for public-sales in the total remain days is more than 90 days (the entire ICO takes no more than 270 days).
-// For example, if the pre-sales takes 200 days, the public sales duration will be 70 days (270-200). 
+// For example, if the pre-sales takes 200 days, the public sales duration will be 70 days (270-200).
 // Starting from the date that // Soft Cap reached
-// if the pre-sales takes 150 days, the public sales duration will be 90 days starting from the date that 
+// if the pre-sales takes 150 days, the public sales duration will be 90 days starting from the date that
 // Soft Cap reached
 	function passSoftCap() internal returns(bool){
 		icoPass = true;
@@ -1073,7 +1073,7 @@ contract ICO_Token is  Marketing{
 		}
 		if(uint32(now) >= icoEndTime)
 		{
-			if(totalBuyICO[msg.sender] > 0) 
+			if(totalBuyICO[msg.sender] > 0)
 			{
 				uint256  totalSGDS = totalBuyICO[msg.sender] * TOKEN_PRICE;
 				uint256  totalNatee = totalBuyICO[msg.sender] * _1Token;
@@ -1082,24 +1082,24 @@ contract ICO_Token is  Marketing{
 				emit Refund(msg.sender,totalSGDS,totalBuyICO[msg.sender]);
 				totalBuyICO[msg.sender] = 0;
 				sgds.transfer(msg.sender,totalSGDS);
-			}	
+			}
 		}
 	}
 
 // This function is to allow the owner of Wallet Address to set the value (Boolean) to grant/not grant the permission to himself/herself.
-// This clearly shows that no one else could set the value to the anyone’s Wallet Address, only msg.sender or the executor of this 
+// This clearly shows that no one else could set the value to the anyone’s Wallet Address, only msg.sender or the executor of this
 // function can set the value in this function.
 
 	function userSetAllowControl(bool allow) public{
 		require(closeICO == true);
 		allowControl[msg.sender] = allow;
 	}
-	
+
 // function to calculate the bonus. The bonus will be paid in Warrant according to listed in Bounty section in NATEE Whitepaper
 
 	function bonusWarrant(address _addr,uint256 buyToken) internal{
 	// 1-4M GOT 50%
-	// 4,000,0001 - 12M GOT 40% 	
+	// 4,000,0001 - 12M GOT 40%
 	// 12,000,0001 - 20M GOT 30%
 	// 20,000,0001 - 30M GOT 20%
 	// 30,000,0001 - 40M GOT 10%
@@ -1117,7 +1117,7 @@ contract ICO_Token is  Marketing{
 			}
 			else
 			{
-				gotWarrant = buyToken * 40 / 100; 
+				gotWarrant = buyToken * 40 / 100;
 			}
 		}
 		else if(totalSell >= 12000001 && totalSell <= 20000000)
@@ -1125,17 +1125,17 @@ contract ICO_Token is  Marketing{
 			if(totalSell - buyToken < 4000000)
 			{
 				gotWarrant = (4000000 - (totalSell - buyToken)) / 2;
-				gotWarrant += 2400000; //8000000 * 40 / 100; fix got 2.4 M Token 
-				gotWarrant += (totalSell - 12000000) * 30 / 100; 
+				gotWarrant += 2400000; //8000000 * 40 / 100; fix got 2.4 M Token
+				gotWarrant += (totalSell - 12000000) * 30 / 100;
 			}
 			else if(totalSell - buyToken < 12000000 )
 			{
 				gotWarrant = (12000000 - (totalSell - buyToken)) * 40 / 100;
-				gotWarrant += (totalSell - 12000000) * 30 / 100; 				
+				gotWarrant += (totalSell - 12000000) * 30 / 100;
 			}
 			else
 			{
-				gotWarrant = buyToken * 30 / 100; 
+				gotWarrant = buyToken * 30 / 100;
 			}
 		}
 		else if(totalSell >= 20000001 && totalSell <= 30000000) // public ROUND
@@ -1176,15 +1176,15 @@ contract ICO_Token is  Marketing{
 	}
 
 // NATEE Token can only be purchased by using SGDS
-// function to purchase NATEE token, if the purchase transaction committed, the address will be controlled. 
-// The address wont be able to make any transfer 
+// function to purchase NATEE token, if the purchase transaction committed, the address will be controlled.
+// The address wont be able to make any transfer
 
 	function buyNateeToken(address _addr, uint256 value,bool refer) onlyOwners external returns(bool){
-		
+
 		require(closeICO == false);
 		require(pauseICO == false);
 		require(uint32(now) <= icoEndTime);
-		require(value % 2 == 0); // 
+		require(value % 2 == 0); //
 
 		if(startICO == false) startSellICO();
 		uint256  sgdWant;
@@ -1205,7 +1205,7 @@ contract ICO_Token is  Marketing{
 			if(buyToken > (PRE_ICO_ROUND + ICO_ROUND) - totalSell)
 				buyToken = (PRE_ICO_ROUND + ICO_ROUND) - totalSell;
 		}
-		
+
 		sgdWant = buyToken * TOKEN_PRICE;
 
 		require(sgds.balanceOf(_addr) >= sgdWant);
@@ -1217,7 +1217,7 @@ contract ICO_Token is  Marketing{
 		//-------------------------------------
 		// Add TotalSupply HERE
 		totalSupply_ += buyToken * _1Token;
-		//-------------------------------------  
+		//-------------------------------------
 		totalSell += buyToken;
 		if(totalBuyICO[_addr] >= 8000 && referToID[_addr] == 0)
 			addReferal(_addr,1,0);
@@ -1230,7 +1230,7 @@ contract ICO_Token is  Marketing{
 			hardCap = true;
 			setCloseICO();
 		}
-		
+
 		setAllowControl(_addr);
 		addHolder(_addr);
 
@@ -1244,9 +1244,9 @@ contract ICO_Token is  Marketing{
 	}
 
 
-// function to withdraw the earned commission. This depends on type of referral code you holding. 
+// function to withdraw the earned commission. This depends on type of referral code you holding.
 // If Soft Cap pass is required, you will earn SGDS and withdraw the commission to be paid in ETH
-	
+
 	function redeemCommision(address addr,uint256 value) public{
 		require(referToID[addr] > 0);
 		uint256 idx = referToID[addr] - 1;
@@ -1259,7 +1259,7 @@ contract ICO_Token is  Marketing{
 		require(value <= referals[idx].allCommission - referals[idx].redeemCom);
 
 		// TRANSFER SGDS TO address
-		referals[idx].redeemCom += value; 
+		referals[idx].redeemCom += value;
 		sgds.transfer(addr,value);
 
 		emit RedeemCommision(addr,value,referals[idx].allCommission - referals[idx].redeemCom);
@@ -1277,7 +1277,7 @@ contract ICO_Token is  Marketing{
 	}
 
 
-// VALUE IN SGDS 
+// VALUE IN SGDS
 // Function for AGC and ICZ REDEEM SHARING  // 100 % = 10000
 	function addCOPartner(address addr,uint256 percent,uint256 maxFund) onlyOwners public {
 			require(redeemPercent[addr] == 0);
@@ -1291,7 +1291,7 @@ contract ICO_Token is  Marketing{
 		require(redeemPercent[addr] > 0);
 		uint256 maxRedeem;
 
-		maxRedeem = (totalSell * TOKEN_PRICE) * redeemPercent[addr] / 10000;  
+		maxRedeem = (totalSell * TOKEN_PRICE) * redeemPercent[addr] / 10000;
 		if(maxRedeem > redeemMax[addr]) maxRedeem = redeemMax[addr];
 
 		require(redeemed[addr] + value <= maxRedeem);
@@ -1304,9 +1304,9 @@ contract ICO_Token is  Marketing{
 	function checkRedeemFund(address addr) public view returns (uint256) {
 		uint256 maxRedeem;
 
-		maxRedeem = (totalSell * TOKEN_PRICE) * redeemPercent[addr] / 10000;  
+		maxRedeem = (totalSell * TOKEN_PRICE) * redeemPercent[addr] / 10000;
 		if(maxRedeem > redeemMax[addr]) maxRedeem = redeemMax[addr];
-		
+
 		return maxRedeem - redeemed[addr];
 
 	}
@@ -1334,7 +1334,7 @@ contract ICO_Token is  Marketing{
 		maxAdvisor = 0;
 		for(i=0;i<advisors.length;i++)
 		{
-			if(advisors[i] != address(0)) 
+			if(advisors[i] != address(0))
 				maxAdvisor++;
 		}
 
@@ -1348,7 +1348,7 @@ contract ICO_Token is  Marketing{
 		TOKEN_PER_ADVISOR = ADVISOR_SUPPLY / maxAdvisor;
 
 		// Maximum 200,000 Per Advisor or less
-		if(TOKEN_PER_ADVISOR > 200000 ether) { 
+		if(TOKEN_PER_ADVISOR > 200000 ether) {
 			TOKEN_PER_ADVISOR = 200000 ether;
 		}
 
@@ -1358,7 +1358,7 @@ contract ICO_Token is  Marketing{
 		TOKEN_PER_FOUNDER = (FOUNDER_SUPPLY + lessAdvisor) / maxFounder;
 		emit CloseICO();
 
-		// Start Send Token to Found and Advisor 
+		// Start Send Token to Found and Advisor
 		for(i=0;i<advisors.length;i++)
 		{
 			if(advisors[i] != address(0))
@@ -1393,13 +1393,13 @@ contract ICO_Token is  Marketing{
 
 	}
 
-} 
+}
 
 
 // main Conttract of NATEE Token, total token is 100 millions and there is no burn token function.
-// The token will be auto generated from this function every time after the payment is confirmed 
-// from the buyer. In short, NATEE token will only be issued, based on the payment. 
-// There will be no NATEE Token issued in advance. There is no NATEE Token inventory, no stocking,hence, 
+// The token will be auto generated from this function every time after the payment is confirmed
+// from the buyer. In short, NATEE token will only be issued, based on the payment.
+// There will be no NATEE Token issued in advance. There is no NATEE Token inventory, no stocking,hence,
 // there is no need to have the burning function to burn the token/coin in this Smart Contract unlike others ICOs.
 
 
@@ -1408,9 +1408,9 @@ contract NATEE is ICO_Token {
 	string public name = "NATEE";
 	string public symbol = "NATEE"; // Real Name NATEE
 	uint256 public decimals = 18;
-	
+
 	uint256 public INITIAL_SUPPLY = 100000000 ether;
-	
+
 	NateePrivate   public nateePrivate;
 	bool privateRedeem;
 	uint256 public nateeWExcRate = 100; // SGDS Price
@@ -1431,7 +1431,7 @@ contract NATEE is ICO_Token {
 	//ICZ is the ICO portal who provides ERC20 solutions and audit NATEE IC
 		ICZ_ADDR = 0x1F10C47A07BAc12eDe10270bCe1471bcfCEd4Baf; // 5% payment to ICZ capped at 200k SGD
 		addCOPartner(ICZ_ADDR,500,20000000);
-		// 20M Internal use to send to NATEE SDK USER 
+		// 20M Internal use to send to NATEE SDK USER
 		SEITEE_INTERNAL_USE = 0x1219058023bE74FA30C663c4aE135E75019464b4;
 
 		balance[RM_PRIVATE_INVESTOR_ADDR] = 3000000 ether;
@@ -1475,7 +1475,7 @@ contract NATEE is ICO_Token {
     		nateeWExcRateExp = expPrice;
     	}
     }
-    
+
 
 // function to convert Warrant to NATEE Token, the Warrant holders must have SGDS paid for the conversion fee.
 
@@ -1484,7 +1484,7 @@ contract NATEE is ICO_Token {
 		require(closeICO == true);
 		require(sgds.getUserControl(addr) == false);
 
-		uint256 sgdsPerToken; 
+		uint256 sgdsPerToken;
 		uint256 totalSGDSUse;
 		uint256 wRedeem;
 		uint256 nateeGot;
@@ -1496,14 +1496,14 @@ contract NATEE is ICO_Token {
 		else
 			sgdsPerToken = nateeWExcRateExp;
 
-		wRedeem = value / _1Token; 
-		require(wRedeem > 0); 
+		wRedeem = value / _1Token;
+		require(wRedeem > 0);
 		totalSGDSUse = wRedeem * sgdsPerToken;
 
 		//check enought SGDS to redeem warrant;
 		require(sgds.balanceOf(addr) >= totalSGDSUse);
 		// Start Redeem Warrant;
-		if(sgds.useSGDS(addr,totalSGDSUse) == true) 
+		if(sgds.useSGDS(addr,totalSGDSUse) == true)
 		{
 			nateeGot = wRedeem * _1Token;
 			warrant.redeemWarrant(addr,nateeGot); // duduct Warrant;
@@ -1525,7 +1525,7 @@ contract NATEE is ICO_Token {
 	}
 
 
-// function to distribute NATEE PRIVATE TOKEN to early investors (from private-sales) 
+// function to distribute NATEE PRIVATE TOKEN to early investors (from private-sales)
 	function reddemAllPrivate() onlyOwners public returns(bool){
 
 		require(privateRedeem == false);
@@ -1557,4 +1557,15 @@ contract NATEE is ICO_Token {
         privateRedeem = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

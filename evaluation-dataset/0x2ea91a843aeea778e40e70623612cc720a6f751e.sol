@@ -333,7 +333,7 @@ contract PausableToken is StandardToken, Pausable {
 
 
 contract CPToken is PausableToken {
-    
+
     string public name = 'Chain Partners';
     string public symbol = 'CP';
     uint8 public decimals = 4;
@@ -343,4 +343,15 @@ contract CPToken is PausableToken {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

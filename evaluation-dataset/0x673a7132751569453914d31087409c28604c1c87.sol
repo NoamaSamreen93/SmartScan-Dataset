@@ -1314,7 +1314,7 @@ contract Dice is usingOraclize {
         uint    winningNumber;
         uint    winAmount;
     }
-    
+
     // Lookup state for oraclizeQueryIds
 
     mapping (bytes32 => oraclizeCallback) oraclizeStructs;
@@ -1335,7 +1335,7 @@ contract Dice is usingOraclize {
     event PlayerCashout(address _contract, address _winner, uint _winningNumber, uint _winAmount);
     event GameFinalized(address _contract);
 
-    constructor() 
+    constructor()
         public
     {
         minimumBet = 0.01 ether;
@@ -1343,18 +1343,18 @@ contract Dice is usingOraclize {
     }
 
 
-    function rollDice(uint[] memory betNumbers) 
-        public 
+    function rollDice(uint[] memory betNumbers)
+        public
         payable
         returns (bool success)
     {
-        
+
         bytes32 oraclizeQueryId;
-        
+
         address payable player = msg.sender;
-        
+
         uint betAmount = msg.value;
-        
+
         require(betAmount >= minimumBet);
         require(betNumbers.length >= 1);
 
@@ -1370,7 +1370,7 @@ contract Dice is usingOraclize {
             oraclizeQueryId = oraclize_query("URL", "https://www.random.org/integers/?num=1&min=1&max=6&col=1&base=8&format=plain");
 
             // Recording the bet info for future reference.
-            
+
             oraclizeStructs[oraclizeQueryId].status = false;
             oraclizeStructs[oraclizeQueryId].queryId = oraclizeQueryId;
             oraclizeStructs[oraclizeQueryId].player = player;
@@ -1378,21 +1378,21 @@ contract Dice is usingOraclize {
             oraclizeStructs[oraclizeQueryId].betAmount = betAmount;
 
             // Recording oraclize indices.
-            
+
             oraclizedIndices.push(oraclizeQueryId) -1;
-  
+
             emit NumberGeneratorQuery(address(this), player, oraclizeQueryId);
- 
- 
+
+
         } else {
-            
+
             // Player bets on every number, that's an invalid bet, money are returned back to the player.
 
             msg.sender.transfer(msg.value);
 
         }
-    
-    
+
+
         emit AwaitingRandomOrgCallback(address(this), oraclizeQueryId);
 
         return true;
@@ -1400,39 +1400,39 @@ contract Dice is usingOraclize {
     }
 
 
-    function __callback(bytes32 myid, string memory result) 
+    function __callback(bytes32 myid, string memory result)
         public
-        payable 
+        payable
     {
-        
+
         // All the action takes place on when we receive a new number from random.org
 
         bool playerWins;
-        
+
         uint winAmount;
-    
+
         emit RandomOrgCallback(address(this), myid);
-    
+
         address oraclize_cb = oraclize_cbAddress();
 
         require(msg.sender == oraclize_cb);
-        
-        
+
+
         address payable player = oraclizeStructs[myid].player;
 
 
         emit NumberGeneratorResponse(address(this), msg.sender, myid, result);
-        
+
         uint winningNumber = parseInt(result);
-        
-        
+
+
         uint[] memory betNumbers = oraclizeStructs[myid].betNumbers;
-        
+
         emit WinningNumber(address(this), myid, betNumbers, winningNumber);
 
 
         oraclizeStructs[myid].winningNumber = winningNumber;
-        
+
 
         uint betAmount = oraclizeStructs[myid].betAmount;
 
@@ -1447,10 +1447,10 @@ contract Dice is usingOraclize {
             }
 
         }
-        
-        
+
+
         if(playerWins) {
-            
+
             // Calculate how much player wins..
 
             if(betNumbers.length == 1) {
@@ -1477,9 +1477,9 @@ contract Dice is usingOraclize {
             if(winAmount > 0) {
 
                 // Substract the casino edge 4% and pay the winner..
-                
+
                 uint casino_edge = (winAmount / 100) * 4;
-                
+
                 winAmount = winAmount - casino_edge;
 
                 address(player).transfer(winAmount);
@@ -1487,9 +1487,9 @@ contract Dice is usingOraclize {
                 oraclizeStructs[myid].winAmount = winAmount;
 
                 emit PlayerCashout(address(this), player, winningNumber, winAmount);
-            
+
             }
-            
+
         }
 
         if(playerWins==false) {
@@ -1503,7 +1503,7 @@ contract Dice is usingOraclize {
         oraclizeStructs[myid].status = true;
 
     }
-    
+
     function payRoyalty()
         public
         payable
@@ -1553,4 +1553,8 @@ contract Dice is usingOraclize {
         return (address(this).balance);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

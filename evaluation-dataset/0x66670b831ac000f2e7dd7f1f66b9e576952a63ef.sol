@@ -19,11 +19,11 @@ contract BIXCPRO {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
-  
+
+
+
     function BIXCPRO () public {
-        totalSupply = bixcproSupply * 10 ** uint256(decimals);  
+        totalSupply = bixcproSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;
         creator = msg.sender;
     }
@@ -35,26 +35,42 @@ contract BIXCPRO {
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
- 
+
+
+
     function () payable internal {
-        uint amount = msg.value * buyPrice ;                    
-        uint amountRaised;                                     
-        amountRaised += msg.value;                            
-        require(balanceOf[creator] >= amount);               
-        require(msg.value >=0);                        
-        balanceOf[msg.sender] += amount;                  
-        balanceOf[creator] -= amount;                        
-        Transfer(creator, msg.sender, amount);               
+        uint amount = msg.value * buyPrice ;
+        uint amountRaised;
+        amountRaised += msg.value;
+        require(balanceOf[creator] >= amount);
+        require(msg.value >=0);
+        balanceOf[msg.sender] += amount;
+        balanceOf[creator] -= amount;
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
-    }    
-    
+    }
+
  }
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

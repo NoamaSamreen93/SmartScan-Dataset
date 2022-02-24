@@ -127,7 +127,7 @@ contract QIU3Devents {
         uint256 gapGoalsOpt,
         uint256 bothGoalOpt,
         uint256 halfAndFullMatResOpt,
-        uint256 ticketValue,     
+        uint256 ticketValue,
         uint256 cost
     );
     //fired whenever buy bet
@@ -186,10 +186,10 @@ contract QIU3D is QIU3Devents, Ownable {
     uint256 constant InvalidTotalGoals = 88;
     uint256 constant InvalidGapGoals = 88;
     uint256 constant InvalidBothGoals = 0;
-    uint256 constant InvalidHalfAndFullMatchResult = 0; 
+    uint256 constant InvalidHalfAndFullMatchResult = 0;
 
     //ticket price settings
-    uint256 constant private TicketInitPrice = 100000000000000;     //Ticket initial price when match begin 
+    uint256 constant private TicketInitPrice = 100000000000000;     //Ticket initial price when match begin
     uint256 constant private TicketIncreasePrice = 100000000000;    //Ticket increase price by each transaction
     uint256 constant private PriceThreshold = 1000;                 //Speed up price incrase whenever ticket value is a large number
 
@@ -208,7 +208,7 @@ contract QIU3D is QIU3Devents, Ownable {
     mapping(uint256 => QIU3Ddatasets.MatchBetOptions) public betOptions_;   //(matchId => MatchBetOptions) return bet options by match ID
 
     //Player data
-    mapping(address => QIU3Ddatasets.Player) public players_;       //(address => Player) return player by player address    
+    mapping(address => QIU3Ddatasets.Player) public players_;       //(address => Player) return player by player address
 
     //ticket option values storage array
     //|2-0| full match result option array
@@ -220,7 +220,7 @@ contract QIU3D is QIU3Devents, Ownable {
 
     constructor(address _matchDataAddress) public
     {
-        openMatchId_ = 0; 
+        openMatchId_ = 0;
         MatchDataInt_ = Q3DMatchDataInterface(_matchDataAddress);
         foundationAddress_ = msg.sender;
     }
@@ -236,16 +236,16 @@ contract QIU3D is QIU3Devents, Ownable {
     //==================================================
     // Modifier
     //==================================================
-    modifier isHuman() 
+    modifier isHuman()
     {
         require(msg.sender == tx.origin, "sorry humans only");
         _;
     }
 
-    modifier isWithinLimits(uint256 _eth) 
+    modifier isWithinLimits(uint256 _eth)
     {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
-        _;    
+        _;
     }
 
     /**
@@ -254,13 +254,13 @@ contract QIU3D is QIU3Devents, Ownable {
     function() public isHuman() isWithinLimits(msg.value) payable
     {
         buyTicketCore_(
-            openMatchId_, 
-            2, 
-            InvalidTotalGoals, 
-            InvalidGapGoals, 
-            InvalidBothGoals, 
-            InvalidHalfAndFullMatchResult, 
-            msg.value, 
+            openMatchId_,
+            2,
+            InvalidTotalGoals,
+            InvalidGapGoals,
+            InvalidBothGoals,
+            InvalidHalfAndFullMatchResult,
+            msg.value,
             address(0));
     }
 
@@ -285,18 +285,18 @@ contract QIU3D is QIU3Devents, Ownable {
         uint256 _bothGoalOpt,
         uint256 _halfAndFullMatResOpt,
         address _inviteAddr
-        ) 
+        )
         public
         isHuman() isWithinLimits(msg.value) payable
     {
         buyTicketCore_(
-            _matchId, 
-            _fullMatResOpt, 
-            _goalsOpt, 
-            _gapGoalsOpt, 
-            _bothGoalOpt, 
-            _halfAndFullMatResOpt, 
-            msg.value, 
+            _matchId,
+            _fullMatResOpt,
+            _goalsOpt,
+            _gapGoalsOpt,
+            _bothGoalOpt,
+            _halfAndFullMatResOpt,
+            msg.value,
             _inviteAddr);
     }
 
@@ -325,19 +325,19 @@ contract QIU3D is QIU3Devents, Ownable {
         isHuman() isWithinLimits(_vaultEth)
     {
         uint256 withdrawn = 0;
-        uint256 totalProfit = 0; 
+        uint256 totalProfit = 0;
         (totalProfit, withdrawn) = getPlayerVault_();
         require(totalProfit >= withdrawn.add(_vaultEth), "no balance");
         QIU3Ddatasets.Player storage _player_ = players_[msg.sender];
         _player_.withdraw = withdrawn.add(_vaultEth);
         buyTicketCore_(
-            _matchId, 
-            _fullMatResOpt, 
-            _goalsOpt, 
-            _gapGoalsOpt, 
-            _bothGoalOpt, 
-            _halfAndFullMatResOpt, 
-            _vaultEth, 
+            _matchId,
+            _fullMatResOpt,
+            _goalsOpt,
+            _gapGoalsOpt,
+            _bothGoalOpt,
+            _halfAndFullMatResOpt,
+            _vaultEth,
             _inviteAddr);
         emit onWithdraw(msg.sender, _vaultEth, 1);
     }
@@ -367,7 +367,7 @@ contract QIU3D is QIU3Devents, Ownable {
         isHuman() isWithinLimits(_vaultEth)
     {
         uint256 withdrawn = 0;
-        uint256 totalProfit = 0; 
+        uint256 totalProfit = 0;
         (totalProfit, withdrawn) = getPlayerVault_();
         require(totalProfit >= withdrawn.add(_vaultEth), "no balance");
         QIU3Ddatasets.Player storage _player_ = players_[msg.sender];
@@ -376,14 +376,14 @@ contract QIU3D is QIU3Devents, Ownable {
         emit onWithdraw(msg.sender, _vaultEth, 2);
     }
 
-    
+
     /**
      * @dev player withdraw profit and dividend, everytime player call withdraw will empty balance
      */
     function withdraw() public isHuman()
     {
         uint256 withdrawn = 0;
-        uint256 totalProfit = 0; 
+        uint256 totalProfit = 0;
         (totalProfit, withdrawn) = getPlayerVault_();
         require(totalProfit > withdrawn, "no balance");
         QIU3Ddatasets.Player storage _player_ = players_[msg.sender];
@@ -395,7 +395,7 @@ contract QIU3D is QIU3Devents, Ownable {
     //==================================================
     // view functions (getter in contract)
     //==================================================
-    /** 
+    /**
      * @dev returns game basic information
      * @return the ID of current match
      * @return ticket price in real time
@@ -413,7 +413,7 @@ contract QIU3D is QIU3Devents, Ownable {
         }
     }
 
-    /** 
+    /**
      * @dev returns player information in QIU3D game
      * @return last match id which player buy ticket
      * @return total withdraw amount
@@ -447,7 +447,7 @@ contract QIU3D is QIU3Devents, Ownable {
         );
     }
 
-    /** 
+    /**
      * @dev returns player profit in special match
      * @param matchId ID of match
      * @return ticket dividend, show before match end.
@@ -463,8 +463,8 @@ contract QIU3D is QIU3Devents, Ownable {
         return(ticketProfit, ticketDividend, betProfit);
     }
 
-    /** 
-     * @dev returns the current bet information 
+    /**
+     * @dev returns the current bet information
      * @return return if bet opened
      * @return home win odds
      * @return draw odds
@@ -488,7 +488,7 @@ contract QIU3D is QIU3Devents, Ownable {
         );
     }
 
-    /** 
+    /**
      * @dev returns player's ticket profit and profit in special match
      */
     function getTicketProfitAndDividend(uint256 _matchId, uint256 _ticketId) public view returns(uint256, uint256)
@@ -528,12 +528,12 @@ contract QIU3D is QIU3Devents, Ownable {
     //==================================================
     // private functions - calculate player ticket and bet profit
     //==================================================
-    /** 
+    /**
      * @dev calculate one ticket profit in special match
      */
     function calculateTicketProfit_(
-        uint256 _matchId, 
-        QIU3Ddatasets.TicketEventIntReturns memory _profitReturns_, 
+        uint256 _matchId,
+        QIU3Ddatasets.TicketEventIntReturns memory _profitReturns_,
         QIU3Ddatasets.Ticket memory _ticket_
         ) private view returns(uint256)
     {
@@ -562,12 +562,12 @@ contract QIU3D is QIU3Devents, Ownable {
         return ticketProfit;
     }
 
-    /** 
+    /**
      * @dev calculate one ticket dividend in special match
      */
     function calculateTicketDividend_(
-        uint256 _matchId, 
-        uint256 _remainTicketJackpot, 
+        uint256 _matchId,
+        uint256 _remainTicketJackpot,
         QIU3Ddatasets.Ticket memory _ticket_
         ) private view returns(uint256)
     {
@@ -580,13 +580,13 @@ contract QIU3D is QIU3Devents, Ownable {
         return dividend;
     }
 
-    /** 
+    /**
      * @dev calculate ticket profit assign in special match, returns all option profit
      */
     function calculateTicketProfitAssign_(
-        uint256 _matchId, 
-        uint256 _compressResult, 
-        uint256 _ticketJackpot, 
+        uint256 _matchId,
+        uint256 _compressResult,
+        uint256 _ticketJackpot,
         QIU3Ddatasets.TicketEventIntReturns memory _eventReturns_
         ) private view returns(QIU3Ddatasets.TicketEventIntReturns)
     {
@@ -641,7 +641,7 @@ contract QIU3D is QIU3Devents, Ownable {
         return(_eventReturns_);
     }
 
-    /** 
+    /**
      * @dev get player bet profit in special match
      */
     function getBetProfit_(uint256 _matchId) public view returns(uint256)
@@ -659,7 +659,7 @@ contract QIU3D is QIU3Devents, Ownable {
     }
 
 
-    /** 
+    /**
      * @dev calculate one bet profit in special match
      */
     function calculateBetProfit_(QIU3Ddatasets.Match storage _match_, uint256 betId) private view returns(uint256){
@@ -673,7 +673,7 @@ contract QIU3D is QIU3Devents, Ownable {
         }
     }
 
-    /** 
+    /**
     * @dev get bet cleared profit
     */
     function getBetClearedProfit_(uint256 _matchId, uint256 _compressedData) private view returns(uint256)
@@ -690,7 +690,7 @@ contract QIU3D is QIU3Devents, Ownable {
         }
     }
 
-    /** 
+    /**
      * @dev get player total profit and withdraw
      */
     function getPlayerVault_() private view returns(uint256, uint256){
@@ -707,7 +707,7 @@ contract QIU3D is QIU3Devents, Ownable {
     //==================================================
     // private functions - buy ticket
     //==================================================
-    /** 
+    /**
     * @dev buy ticket core
     */
     function buyTicketCore_(
@@ -735,19 +735,19 @@ contract QIU3D is QIU3Devents, Ownable {
         _ticket_.playerAddr = msg.sender;
         _ticket_.cost = _eth;
         _ticket_.ticketValue = (_eth.mul(1000000000000000000)).div(_match_.currentPrice);
-        
+
         _match_.ticketIds.push(_ticketId);
         _match_.tickets[_ticketId] = _ticket_;
         _match_.ticketFund = _match_.ticketFund.add(_ticket_.cost.sub(_inviteProfit));
         _match_.currentPrice = getTicketPrice_(_match_.currentPrice, _ticket_.ticketValue);
-    
+
         updatePlayerWithTicket_(_ticket_, _match_);
         updateMatchTicketOptions_(openMatchId_, _ticket_.compressedData, _ticket_.ticketValue);
 
         emit onNewTicket(
-            msg.sender, 
-            openMatchId_, 
-            _ticketId, 
+            msg.sender,
+            openMatchId_,
+            _ticketId,
             _fullMatResOpt,
             _goalsOpt,
             _gapGoalsOpt,
@@ -758,7 +758,7 @@ contract QIU3D is QIU3Devents, Ownable {
         );
     }
 
-    /** 
+    /**
     * @dev determine if active new match
     */
     function determineMatch_(uint256 _matchId) private
@@ -788,7 +788,7 @@ contract QIU3D is QIU3Devents, Ownable {
         }
     }
 
-    /** 
+    /**
     * @dev start a new match
     */
     function startNewMatch_(uint256 _matchId) private
@@ -808,7 +808,7 @@ contract QIU3D is QIU3Devents, Ownable {
         matches_[_newMatchId] = _match_;
     }
 
-    /** 
+    /**
     * @dev grant invitor profit
     */
     function grantInvitation_(uint256 _eth, address _inviteAddr) private returns(uint256)
@@ -873,7 +873,7 @@ contract QIU3D is QIU3Devents, Ownable {
 
         //open gambling conditions
         if(!_betOption_.betOpened){
-            //condition 1: at least one player selected each full match result option(home/draw/away) 
+            //condition 1: at least one player selected each full match result option(home/draw/away)
             if(ticketOptionValues_[_matchId][0] != 0 && ticketOptionValues_[_matchId][1] != 0 && ticketOptionValues_[_matchId][2] != 0){
                 uint256 totalOptionValues;
                 uint256 fullMatchOptionValue;
@@ -899,7 +899,7 @@ contract QIU3D is QIU3Devents, Ownable {
             //newPrice = _currentPrice + TicketIncreasePrice * (_ticketValue/PriceThreshold + 1)
             return (_currentPrice.add(TicketIncreasePrice.mul((tv.div(PriceThreshold)).add(1))));
         }
-    }  
+    }
 
 
     //==================================================
@@ -925,15 +925,15 @@ contract QIU3D is QIU3Devents, Ownable {
     /**
     * @dev compress ticket options value to uint256
     */
-    function getCompressedOptions_(uint256 _fullResult, uint256 _totalGoals, uint256 _gapGoals, uint256 _bothGoals, uint256 _halfAndFullResult) 
+    function getCompressedOptions_(uint256 _fullResult, uint256 _totalGoals, uint256 _gapGoals, uint256 _bothGoals, uint256 _halfAndFullResult)
         private pure returns (uint256)
     {
         //Ticket default settings
-        uint256 fullMatResOpt = InvalidFullMatchResult; 
-        uint256 goalsOpt = InvalidTotalGoals; 
-        uint256 gapGoalsOpt = InvalidGapGoals; 
-        uint256 bothGoalOpt = InvalidBothGoals; 
-        uint256 halfAndFullMatResOpt = InvalidHalfAndFullMatchResult; 
+        uint256 fullMatResOpt = InvalidFullMatchResult;
+        uint256 goalsOpt = InvalidTotalGoals;
+        uint256 gapGoalsOpt = InvalidGapGoals;
+        uint256 bothGoalOpt = InvalidBothGoals;
+        uint256 halfAndFullMatResOpt = InvalidHalfAndFullMatchResult;
         uint256 vaildOptions = 0;
 
         if(_fullResult > 0 && _fullResult <= 3){
@@ -973,7 +973,7 @@ contract QIU3D is QIU3Devents, Ownable {
     /**
     * @dev check ticket option's valid count
     */
-    function getValidOptions_(uint256 _compressData, QIU3Ddatasets.TicketEventBoolReturns memory _eventReturns_) 
+    function getValidOptions_(uint256 _compressData, QIU3Ddatasets.TicketEventBoolReturns memory _eventReturns_)
         private pure returns (QIU3Ddatasets.TicketEventBoolReturns)
     {
         _eventReturns_.fullMatch = (_compressData % 10 != InvalidFullMatchResult);
@@ -988,8 +988,8 @@ contract QIU3D is QIU3Devents, Ownable {
     //==================================================
     // private functions - buy bet
     //==================================================
-    
-    /** 
+
+    /**
     * @dev buy bet core
     */
     function betCore_(uint256 _option, uint256 _odds, uint256 _eth) private
@@ -1041,7 +1041,7 @@ contract QIU3D is QIU3Devents, Ownable {
 
         updatePlayerWithBet_(_bet_, _match_);
         updateMatchBetOptions_(_bet_);
-        
+
         emit onNewBet(msg.sender, _match_.matchId, _betId, _option, _bet_.odds, _eth);
     }
 
@@ -1065,9 +1065,9 @@ contract QIU3D is QIU3Devents, Ownable {
         }
         return (_betReturn_);
     }
-    
+
     /**
-    * @dev update player information with bet 
+    * @dev update player information with bet
     */
     function updatePlayerWithBet_(QIU3Ddatasets.Bet memory _bet_, QIU3Ddatasets.Match storage _match_) private
     {
@@ -1087,7 +1087,7 @@ contract QIU3D is QIU3Devents, Ownable {
     }
 
     /**
-    * @dev update bet return with bet 
+    * @dev update bet return with bet
     */
     function updateMatchBetOptions_(QIU3Ddatasets.Bet memory _bet_) private
     {
@@ -1161,11 +1161,11 @@ contract QIU3D is QIU3Devents, Ownable {
         uint256 _betClearedProfit = getBetClearedProfit_(_matchId, _match_.compressedData);
         uint256 _ticketJackpot = getTicketJackpot_(_matchId, _betClearedProfit);
         QIU3Ddatasets.TicketEventIntReturns memory _profitReturns_ = calculateTicketProfitAssign_(
-            _matchId, 
-            _match_.compressedData, 
-            _ticketJackpot, 
+            _matchId,
+            _match_.compressedData,
+            _ticketJackpot,
             _profitReturns_);
-        
+
         if(_profitReturns_.count == 0){
             _totalDividend = _totalDividend.add(_ticketJackpot);
         }
@@ -1177,7 +1177,7 @@ contract QIU3D is QIU3Devents, Ownable {
     /**
     * @dev compare two compressed ticket option and return bool resuts
     */
-    function compareOptionsResult_(uint256 optionData, uint256 resultData, QIU3Ddatasets.TicketEventBoolReturns memory _eventReturns_) 
+    function compareOptionsResult_(uint256 optionData, uint256 resultData, QIU3Ddatasets.TicketEventBoolReturns memory _eventReturns_)
         private pure returns(QIU3Ddatasets.TicketEventBoolReturns)
     {
         _eventReturns_.fullMatch = (optionData % 10 == resultData % 10);
@@ -1269,7 +1269,7 @@ contract QIU3D is QIU3Devents, Ownable {
     /**
     * @dev decompress ticket options
     */
-    function getDecompressedOptions_(uint256 _compressData, QIU3Ddatasets.TicketEventIntReturns memory _eventReturns_) 
+    function getDecompressedOptions_(uint256 _compressData, QIU3Ddatasets.TicketEventIntReturns memory _eventReturns_)
         private pure returns (QIU3Ddatasets.TicketEventIntReturns)
     {
         _eventReturns_.fullMatch = _compressData % 10;
@@ -1292,14 +1292,14 @@ interface Q3DMatchDataInterface {
 }
 
 //==================================================
-// Structs - Storage 
+// Structs - Storage
 //==================================================
 
 library QIU3Ddatasets{
 
     struct Match{
         bool ended;                     //if match ended
-        uint256 matchId;                //ID of soccer match      
+        uint256 matchId;                //ID of soccer match
         uint256 endts;                  //match end timestamp
         uint256 currentPrice;           //current ticket price
         uint256 ticketFund;             //fund of ticket
@@ -1320,7 +1320,7 @@ library QIU3Ddatasets{
     }
 
     struct MatchPlayer{
-        uint256[] ticketIds; 
+        uint256[] ticketIds;
         uint256[] betIds;
     }
 
@@ -1329,9 +1329,9 @@ library QIU3Ddatasets{
     // [7][6][5][4-3][2-1][0]
     // [0]: Full time match result option(0 - 9)
         // 0 - none
-        // 1 - home team win 
+        // 1 - home team win
         // 2 - draw
-        // 3 - away team win 
+        // 3 - away team win
     // [2-1]: Full time total goals option(0 - 9)
         // 88 - none
     // [4-3]: Home goals minus Away goals option(0 - 99)
@@ -1385,7 +1385,7 @@ library QIU3Ddatasets{
         uint256 awayOdds;
         uint256 homeMaxSell;
         uint256 drawMaxSell;
-        uint256 awayMaxSell; 
+        uint256 awayMaxSell;
     }
 
     struct TicketEventIntReturns{
@@ -1405,4 +1405,10 @@ library QIU3Ddatasets{
         bool halfAndFullMatch;
         uint256 count;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

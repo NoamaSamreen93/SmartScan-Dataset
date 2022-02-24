@@ -35,7 +35,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
@@ -88,7 +88,7 @@ contract myUsingOraclize is Ownable {
     function oraclize_getPrice(string datasource) internal returns (uint) {
         return oraclize.getPrice(datasource, oraclize_gaslimit);
     }
-    
+
     function oraclize_setGasPrice(uint _gasPrice) onlyOwner public {
         oraclize.setCustomGasPrice(_gasPrice);
     }
@@ -448,4 +448,15 @@ contract InterCrypto is Ownable, myUsingOraclize {
 
     // _______________PRIVATE FUNCTIONS_______________
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

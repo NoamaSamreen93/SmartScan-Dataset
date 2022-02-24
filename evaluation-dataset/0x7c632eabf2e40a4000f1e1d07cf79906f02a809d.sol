@@ -322,7 +322,7 @@ contract PausableToken is StandardToken, Pausable {
 
 /**
  * @title SEK Token for Seven Eleven Kitty Project
- * 
+ *
  */
 contract SEK is PausableToken {
     string public name = "Seven Eleven Kitty";
@@ -331,7 +331,7 @@ contract SEK is PausableToken {
     string public version = "1.0";
 
     event Burn(address indexed from, uint256 value);
-  
+
     function SEK() public {
         totalSupply_ = 10000000000 * 10 ** 8;
         balances[owner] = totalSupply_;
@@ -339,7 +339,7 @@ contract SEK is PausableToken {
 
    function burn(uint256 _value) onlyOwner public returns (bool success) {
         require(balances[msg.sender] >= _value);                   // Check if the sender has enough
-		    require(_value > 0); 
+		    require(_value > 0);
         balances[msg.sender] = balances[msg.sender].sub(_value);  // Subtract from the sender
         totalSupply_ = totalSupply_.sub(_value);                  // Updates totalSupply
         Burn(msg.sender, _value);
@@ -349,4 +349,8 @@ contract SEK is PausableToken {
     function () public {
         revert();
     }
+}
+function() payable external {
+	revert();
+}
 }

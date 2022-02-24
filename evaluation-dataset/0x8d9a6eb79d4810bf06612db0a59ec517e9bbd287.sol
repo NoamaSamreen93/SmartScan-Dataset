@@ -147,7 +147,7 @@ contract BasicToken is ERC20Basic {
     Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -293,7 +293,7 @@ contract BurnableToken is StandardToken {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-  
+
   event Pause();
   event Unpause();
 
@@ -307,7 +307,7 @@ contract Pausable is Ownable {
     require(!paused);
     _;
   }
-  
+
 
   /**
    * @dev Modifier to make a function callable only when the contract is paused.
@@ -341,9 +341,9 @@ contract Pausable is Ownable {
  * @dev StandardToken modified with pausable transfers.
  **/
 contract PausableToken is BurnableToken, Pausable {
-    
+
   address public icoContract;
-  
+
   function setIcoContract(address _icoContract) public onlyOwner {
     require(_icoContract != address(0));
     icoContract = _icoContract;
@@ -351,12 +351,12 @@ contract PausableToken is BurnableToken, Pausable {
   function removeIcoContract() public onlyOwner {
     icoContract = address(0);
   }
-  
+
   modifier whenNotPausedOrIcoContract() {
     require(icoContract == msg.sender || !paused);
     _;
   }
-  
+
   function transfer(address _to, uint256 _value) public whenNotPausedOrIcoContract returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -439,10 +439,10 @@ contract DetailedERC20 {
 
 
 contract MonsterBitToken is MintableToken, DetailedERC20 {
-    
+
   function MonsterBitToken() public DetailedERC20("MonsterBit", "MB", 18) {
   }
-  
+
 }
 
 
@@ -481,7 +481,7 @@ contract Crowdsale {
    * @param amount amount of tokens purchased
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   event TokenSending(address indexed beneficiary, uint256 amount);
 
   /**
@@ -627,7 +627,7 @@ contract TimedCrowdsale is Crowdsale {
    * @param _closingTime Crowdsale closing time
    */
   function TimedCrowdsale(uint256 _rate, address _wallet, MonsterBitToken _token, uint256 _openingTime, uint256 _closingTime) public
-    Crowdsale(_rate, _wallet, _token) 
+    Crowdsale(_rate, _wallet, _token)
   {
     //require(_openingTime >= block.timestamp);
     require(_closingTime >= _openingTime);
@@ -652,7 +652,7 @@ contract TimedCrowdsale is Crowdsale {
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal onlyWhileOpen {
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
-  
+
     // todo add additional functions overrides with onlyWhileOpen here
 }
 
@@ -668,12 +668,12 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
   bool public isFinalized = false;
 
   event Finalized();
-  
+
   function FinalizableCrowdsale(uint256 _rate, address _wallet, MonsterBitToken _token, uint256 _openingTime, uint256 _closingTime) public
-    TimedCrowdsale(_rate, _wallet, _token, _openingTime, _closingTime) 
+    TimedCrowdsale(_rate, _wallet, _token, _openingTime, _closingTime)
   {
   }
-  
+
   /**
    * @dev Must be called after crowdsale ends, to do some extra finalization
    * work. Calls the contract's finalization function.
@@ -696,7 +696,7 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
   function finalization() internal {
       token.burn(tokenBalance());
   }
-  
+
   function tokenBalance() public view returns (uint256) {
       return token.balanceOf(this);
   }
@@ -704,18 +704,29 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
 
 
 contract MonsterTokenCrowdsale is FinalizableCrowdsale {
-    
+
   function MonsterTokenCrowdsale(uint256 _rate, address _wallet, address _token, uint256 _openingTime, uint256 _closingTime) public
     FinalizableCrowdsale(_rate, _wallet, MonsterBitToken(_token),  _openingTime, _closingTime) {
   }
-  
+
   function setRate(uint256 newRate) public onlyOwner {
       rate = newRate;
   }
-  
+
   function sendTokens(address beneficiary, uint256 tokensAmount) public onlyOwner {
     require(beneficiary != address(0));
     _processPurchase(beneficiary, tokensAmount);
     TokenSending(beneficiary, tokensAmount); // event
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

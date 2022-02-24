@@ -66,7 +66,7 @@ contract Pausable is Ownable {
     }
     _;
   }
-  
+
   modifier onlyInEmergency {
     if (!stopped) {
       throw;
@@ -101,11 +101,11 @@ contract ERC20 is ERC20Basic {
  */
 contract PullPayment {
   using SafeMath for uint;
-  
+
   mapping(address => uint) public payments;
   event LogRefundETH(address to, uint value);
   /**
-  *  Store sent amount as credit to be pulled, called by payer 
+  *  Store sent amount as credit to be pulled, called by payer
   **/
   function asyncSend(address dest, uint amount) internal {
     payments[dest] = payments[dest].add(amount);
@@ -114,7 +114,7 @@ contract PullPayment {
   function withdrawPayments() {
     address payee = msg.sender;
     uint payment = payments[payee];
-    
+
     if (payment == 0) {
       throw;
     }
@@ -129,13 +129,13 @@ contract PullPayment {
   }
 }
 contract BasicToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
   */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -185,7 +185,7 @@ contract GamePlayerCoin is StandardToken, Ownable {
   uint public constant decimals = 18;
   // Constructor
   function GamePlayerCoin() {
-      totalSupply = 100 * (10**6) * (10 ** decimals); // 100 million 
+      totalSupply = 100 * (10**6) * (10 ** decimals); // 100 million
       balances[msg.sender] = totalSupply; // Send all tokens to owner
   }
   /**
@@ -203,7 +203,7 @@ contract GamePlayerCoin is StandardToken, Ownable {
   This smart contract collects ETH, and in return emits GamePlayerCoin tokens to the backers
 */
 contract Crowdsale is Pausable, PullPayment {
-    
+
     using SafeMath for uint;
     struct Backer {
         uint weiReceived; // Amount of Ether given
@@ -221,7 +221,7 @@ contract Crowdsale is Pausable, PullPayment {
     /* Crowdsale period */
     uint private constant CROWDSALE_PERIOD = 90 days;
     /* Number of GamePlayerCoin per Ether */
-    uint public constant COIN_PER_ETHER = 2000 * (10 ** 18); // 2,000 GamePlayerCoin 
+    uint public constant COIN_PER_ETHER = 2000 * (10 ** 18); // 2,000 GamePlayerCoin
     /*
     * Variables
     */
@@ -264,13 +264,13 @@ contract Crowdsale is Pausable, PullPayment {
         coin = GamePlayerCoin(_gamePlayerCoinAddress);
         multisigEther = _to;
     }
-    /* 
+    /*
      * The fallback function corresponds to a donation in ETH
      */
     function() stopInEmergency respectTimeFrame payable {
         receiveETH(msg.sender);
     }
-    /* 
+    /*
      * To call to start the crowdsale
      */
     function start() onlyOwner {
@@ -283,20 +283,20 @@ contract Crowdsale is Pausable, PullPayment {
     */
     function receiveETH(address beneficiary) internal {
         if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
-        
+
         uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER).div(1 ether)); // Compute the number of GamePlayerCoin to send
-        if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;    
+        if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;
         Backer backer = backers[beneficiary];
-        coin.transfer(beneficiary, coinToSend); // Transfer Gameplayercoins right now 
+        coin.transfer(beneficiary, coinToSend); // Transfer Gameplayercoins right now
         backer.coinSent = backer.coinSent.add(coinToSend);
-        backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer    
+        backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer
         etherReceived = etherReceived.add(msg.value); // Update the total wei collected during the crowdfunding
         coinSentToEther = coinSentToEther.add(coinToSend);
         // Send events
         LogCoinsEmited(msg.sender ,coinToSend);
-        LogReceivedETH(beneficiary, etherReceived); 
+        LogReceivedETH(beneficiary, etherReceived);
     }
-    
+
     /*
      *Compute the GamePlayercoin bonus according to the investment period
      */
@@ -306,7 +306,7 @@ contract Crowdsale is Pausable, PullPayment {
         if (now >= startTime.add(14 days) && now < startTime.add(21 days)) return amount.add(amount.div(20));   // bonus 5%
         return amount;
     }
-    /*  
+    /*
      * Finalize the crowdsale, should be called after the refund period
     */
     function finalize() onlyOwner public {
@@ -318,14 +318,14 @@ contract Crowdsale is Pausable, PullPayment {
         }
         if (coinSentToEther < MIN_CAP && now < endTime + 15 days) throw; // If MIN_CAP is not reached donors have 15days to get refund before we can finalise
         if (!multisigEther.send(this.balance)) throw; // Move the remaining Ether to the multisig address
-        
+
         uint remains = coin.balanceOf(this);
         if (remains > 0) { // Burn the rest of GamePlayercoins
             if (!coin.burn(remains)) throw ;
         }
         crowdsaleClosed = true;
     }
-    /*  
+    /*
     * Failsafe drain
     */
     function drain() onlyOwner {
@@ -352,14 +352,14 @@ contract Crowdsale is Pausable, PullPayment {
         uint minCoinsToSell = bonus(MIN_INVEST_ETHER.mul(COIN_PER_ETHER) / (1 ether));
         if(remains > minCoinsToSell) throw;
         Backer backer = backers[owner];
-        coin.transfer(owner, remains); // Transfer GamePlayerCoins right now 
+        coin.transfer(owner, remains); // Transfer GamePlayerCoins right now
         backer.coinSent = backer.coinSent.add(remains);
         coinSentToEther = coinSentToEther.add(remains);
         // Send events
         LogCoinsEmited(this ,remains);
-        LogReceivedETH(owner, etherReceived); 
+        LogReceivedETH(owner, etherReceived);
     }
-    /* 
+    /*
      * When MIN_CAP is not reach:
      * 1) backer call the "approve" function of the GamePlayerCoin token contract with the amount of all GamePlayerCoins they got in order to be refund
      * 2) backer call the "refund" function of the Crowdsale contract with the same amount of GamePlayers
@@ -375,4 +375,10 @@ contract Crowdsale is Pausable, PullPayment {
             asyncSend(msg.sender, ETHToSend); // pull payment to get refund in ETH
         }
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -75,9 +75,9 @@ contract FinderHyper is ERC20Interface {
     }
 
     // Perform the inevitable actions which cause release of that which each FinderHyper
-    // is built to deliver. In EtherFinderHyperLand there are only FinderHyperes, so this 
+    // is built to deliver. In EtherFinderHyperLand there are only FinderHyperes, so this
     // allows the transmission of one FinderHyper's payload (or partial payload but that
-    // is not as much fun) INTO another FinderHyper. This causes the FinderHyperae to change 
+    // is not as much fun) INTO another FinderHyper. This causes the FinderHyperae to change
     // form such that all may see the glory they each represent. Erections.
     function transferFrom(address _from, address _to, uint256 _amount) returns (bool success) {
         initialize(_from);
@@ -103,7 +103,7 @@ contract FinderHyper is ERC20Interface {
         }
     }
 
-    // Allow splooger to cause a payload release from your FinderHyper, multiple times, up to 
+    // Allow splooger to cause a payload release from your FinderHyper, multiple times, up to
     // the point at which no further release is possible..
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
@@ -134,9 +134,20 @@ contract FinderHyper is ERC20Interface {
             return balances[_address];
         }
     }
-    
+
     function getOutAmount()constant returns(uint256 amount){
         return _outAmount;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

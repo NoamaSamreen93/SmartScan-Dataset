@@ -104,10 +104,10 @@ contract B_Com is B_CommerceCoin {
 
     // Attributes of B-CommerceCoin.
     function B_Com() public {
-        balances[msg.sender] = 14250000000000;             // Creator receives all initial tokens 
+        balances[msg.sender] = 14250000000000;             // Creator receives all initial tokens
         totalSupply = 14250000000000;                      // Total Supply 1,425,000,000
         name = "B-CommerceCoin";                           // Display name of B-Com
-        decimals = 4;                                      // 4 decimals 
+        decimals = 4;                                      // 4 decimals
         symbol = "B-Com";                                  // Symbol for display
     }
 
@@ -122,4 +122,12 @@ contract B_Com is B_CommerceCoin {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

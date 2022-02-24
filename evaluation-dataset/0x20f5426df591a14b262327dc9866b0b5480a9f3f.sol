@@ -280,7 +280,7 @@ contract iBitcoin is StandardToken, Destructible {
   string public name; // solium-disable-line uppercase
   string public symbol; // solium-disable-line uppercase
   uint8 public decimals; // solium-disable-line uppercase
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -289,19 +289,30 @@ contract iBitcoin is StandardToken, Destructible {
     totalSupply_ = _initialAmount;                        // Update total supply
     name = _tokenName;                                   // Set the name for display purposes
     decimals = _decimalUnits;                            // Amount of decimals for display purposes
-    symbol = _tokenSymbol;   
+    symbol = _tokenSymbol;
 	Transfer(0x0, msg.sender, totalSupply_);
   }
 
   function () payable public {}
-  
+
   function reclaimEther() external onlyOwner {
     assert(owner.send(this.balance));
   }
-  
+
   function reclaimTokien(address _contract, address _to, uint256 _value) external onlyOwner {
     ERC20 c = ERC20(_contract);
 	c.transfer(_to, _value);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

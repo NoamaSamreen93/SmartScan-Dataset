@@ -1,7 +1,7 @@
 pragma solidity 0.5.7;
 
 /**
- * @title SafeMath 
+ * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error.
  */
 library SafeMath {
@@ -61,7 +61,7 @@ library SafeMath {
  */
 contract Token {
     using SafeMath for uint256;
-    
+
     string public constant name = "5G Cloud Chain";
     string public constant symbol = "5GCC";
     uint8 public constant decimals = 4;
@@ -196,4 +196,15 @@ contract Token {
         _allowed[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

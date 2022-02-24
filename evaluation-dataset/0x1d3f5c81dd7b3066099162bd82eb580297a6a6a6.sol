@@ -390,3 +390,14 @@ contract ERC20Token is ERC20, ERC20Detailed, Ownable, ERC20Burnable {
       _mint(msg.sender, INITIAL_SUPPLY);
   }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -3,7 +3,7 @@ pragma solidity ^0.4.6;
 // Presale Smart Contract
 //
 // **** START:  PARANOIA DISCLAIMER ****
-// A carefull reader will find here some unnecessary checks and excessive code consuming some extra valueable gas. It is intentionally. 
+// A carefull reader will find here some unnecessary checks and excessive code consuming some extra valueable gas. It is intentionally.
 // Even contract will works without these parts, they make the code more secure in production as well for future refactorings.
 // Additionally it shows more clearly what we have took care of.
 // You are welcome to discuss that places.
@@ -29,17 +29,17 @@ contract Presale {
 	uint public constant WITHDRAWAL_END = 3044666;
 	address public constant OWNER = 0xF55DFd2B02Cf3282680C94BD01E9Da044044E6A2;
     /* ====== configuration END ====== */
-	
+
     string[5] private stateNames = ["BEFORE_START",  "PRESALE_RUNNING", "WITHDRAWAL_RUNNING", "REFUND_RUNNING", "CLOSED" ];
     enum State { BEFORE_START,  PRESALE_RUNNING, WITHDRAWAL_RUNNING, REFUND_RUNNING, CLOSED }
 
     uint public total_received_amount;
 	mapping (address => uint) public balances;
-	
+
     uint private constant MIN_TOTAL_AMOUNT_TO_RECEIVE = MIN_TOTAL_AMOUNT_TO_RECEIVE_ETH * 1 ether;
     uint private constant MAX_TOTAL_AMOUNT_TO_RECEIVE = MAX_TOTAL_AMOUNT_TO_RECEIVE_ETH * 1 ether;
     uint private constant MIN_ACCEPTED_AMOUNT = MIN_ACCEPTED_AMOUNT_FINNEY * 1 finney;
-	
+
 
     //constructor
     function Presale () validSetupOnly() { }
@@ -134,8 +134,8 @@ contract Presale {
         } else if (this.balance > 0){
             return State.REFUND_RUNNING;
         } else {
-            return State.CLOSED;		
-		} 
+            return State.CLOSED;
+		}
     }
 
     //
@@ -151,9 +151,9 @@ contract Presale {
 
     //fails if something in setup is looking weird
     modifier validSetupOnly() {
-        if ( OWNER == 0x0 
-            || PRESALE_START == 0 
-            || PRESALE_END == 0 
+        if ( OWNER == 0x0
+            || PRESALE_START == 0
+            || PRESALE_END == 0
             || WITHDRAWAL_END ==0
             || PRESALE_START <= block.number
             || PRESALE_START >= PRESALE_END
@@ -179,7 +179,7 @@ contract Presale {
 
 
     // don`t accept transactions with value less than allowed minimum
-    modifier notTooSmallAmountOnly(){	
+    modifier notTooSmallAmountOnly(){
         if (msg.value < MIN_ACCEPTED_AMOUNT) throw;
         _;
     }
@@ -194,3 +194,7 @@ contract Presale {
         locked = false;
     }
 }//contract
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

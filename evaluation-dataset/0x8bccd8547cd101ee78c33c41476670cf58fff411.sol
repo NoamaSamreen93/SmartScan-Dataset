@@ -13,7 +13,7 @@ contract BMCAssetProxy {
     address public bmcPlatform;
     function __transferWithReference(address _to, uint _value, string _reference, address _sender) returns(bool);
     function __transferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) returns(bool);
-    function __approve(address _spender, uint _value, address _sender) returns(bool);    
+    function __approve(address _spender, uint _value, address _sender) returns(bool);
     function getLatestVersion() returns(address);
     function init(address _bmcPlatform, string _symbol, string _name);
     function proposeUpgrade(address _newVersion);
@@ -152,4 +152,15 @@ contract BMC is BMCAsset {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

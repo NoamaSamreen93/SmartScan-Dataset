@@ -124,11 +124,11 @@ contract Whitelist is Ownable {
     */
     event Disapproved(address indexed investor);
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
-        
+
     }
 
     /** @param _investor the address of investor to be checked
@@ -405,9 +405,9 @@ contract MintableToken is StandardToken, Ownable {
         _;
     }
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
 
     }
@@ -561,8 +561,8 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       */
     constructor(
         address _owner,
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals,
         address whitelistAddress,
         address recipient,
@@ -670,7 +670,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param _value amount of tokens to be transferred
       */
     function transferFrom(address _from, address _to, uint256 _value)
-        public 
+        public
         checkIsInvestorApproved(_from)
         checkIsInvestorApproved(_to)
         checkIsValueValid(_value)
@@ -678,7 +678,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
     {
         uint256 allowedTransferAmount = allowed[_from][msg.sender];
         uint256 pendingAmount = pendingApprovalAmount[_from][msg.sender];
-        
+
         if (_from == feeRecipient) {
             require(_value.add(pendingAmount) <= balances[_from]);
             require(_value.add(pendingAmount) <= allowedTransferAmount);
@@ -707,13 +707,13 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param nonce request recorded at this particular nonce
       */
     function approveTransfer(uint256 nonce)
-        external 
-        onlyValidator 
+        external
+        onlyValidator
         checkIsInvestorApproved(pendingTransactions[nonce].from)
         checkIsInvestorApproved(pendingTransactions[nonce].to)
         checkIsValueValid(pendingTransactions[nonce].value)
         returns (bool)
-    {   
+    {
         address from = pendingTransactions[nonce].from;
         address spender = pendingTransactions[nonce].spender;
         address to = pendingTransactions[nonce].to;
@@ -733,7 +733,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
 
             if (spender != address(0)) {
                 allowedTransferAmount = allowedTransferAmount.sub(value);
-            } 
+            }
             pendingAmount = pendingAmount.sub(value);
 
         } else {
@@ -759,7 +759,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             to,
             value
         );
-        
+
         balances[from] = balanceFrom;
         balances[to] = balanceTo;
         allowed[from][spender] = allowedTransferAmount;
@@ -772,10 +772,10 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param reason reason for rejection
       */
     function rejectTransfer(uint256 nonce, uint256 reason)
-        external 
+        external
         onlyValidator
         checkIsAddressValid(pendingTransactions[nonce].from)
-    {        
+    {
         address from = pendingTransactions[nonce].from;
         address spender = pendingTransactions[nonce].spender;
 
@@ -786,7 +786,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             pendingApprovalAmount[from][spender] = pendingApprovalAmount[from][spender]
                 .sub(pendingTransactions[nonce].value).sub(pendingTransactions[nonce].fee);
         }
-        
+
         emit TransferRejected(
             from,
             pendingTransactions[nonce].to,
@@ -794,7 +794,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             nonce,
             reason
         );
-        
+
         delete pendingTransactions[nonce];
     }
 }
@@ -916,7 +916,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
     bool public isFinalized = false;
 
     event Finalized();
- 
+
     constructor(address _owner) public Ownable(_owner) {}
 
     /**
@@ -1035,11 +1035,11 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
     }
 
     /** @dev Updates whitelist contract address
-      * @param whitelistAddress address of the new whitelist contract 
+      * @param whitelistAddress address of the new whitelist contract
       */
     function setWhitelistContract(address whitelistAddress)
-        public 
-        onlyValidator 
+        public
+        onlyValidator
         checkIsAddressValid(whitelistAddress)
     {
         whiteListingContract = Whitelist(whitelistAddress);
@@ -1050,7 +1050,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param beneficiary the address to which the tokens have to be minted
       */
     function buyTokens(address beneficiary)
-        public 
+        public
         payable
         checkIsInvestorApproved(beneficiary)
     {
@@ -1071,8 +1071,8 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param nonce request recorded at this particular nonce
       */
     function approveMint(uint256 nonce)
-        external 
-        onlyValidator 
+        external
+        onlyValidator
         checkIsInvestorApproved(pendingMints[nonce].to)
         returns (bool)
     {
@@ -1081,7 +1081,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
 
         //No need to use mint-approval on token side, since the minting is already approved in the crowdsale side
         token.mint(pendingMints[nonce].to, pendingMints[nonce].tokens);
-        
+
         emit TokenPurchase(
             msg.sender,
             pendingMints[nonce].to,
@@ -1100,12 +1100,12 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param reason reason for rejection
       */
     function rejectMint(uint256 nonce, uint256 reason)
-        external 
-        onlyValidator 
+        external
+        onlyValidator
         checkIsAddressValid(pendingMints[nonce].to)
     {
         rejectedMintBalance[pendingMints[nonce].to] = rejectedMintBalance[pendingMints[nonce].to].add(pendingMints[nonce].weiAmount);
-        
+
         emit MintRejected(
             pendingMints[nonce].to,
             pendingMints[nonce].tokens,
@@ -1113,7 +1113,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
             nonce,
             reason
         );
-        
+
         delete pendingMints[nonce];
     }
 
@@ -1138,7 +1138,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param newToken New token contract address
       */
     function setTokenContract(address newToken)
-        external 
+        external
         onlyOwner
         checkIsAddressValid(newToken)
     {
@@ -1149,7 +1149,7 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
       * @param newOwner New owner of the token contract
       */
     function transferTokenOwnership(address newOwner)
-        public 
+        public
         onlyOwner
         checkIsAddressValid(newOwner)
     {
@@ -1159,4 +1159,12 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
     function forwardFunds(uint256 amount) internal {
         wallet.transfer(amount);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

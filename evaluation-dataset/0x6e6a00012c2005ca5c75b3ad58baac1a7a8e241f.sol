@@ -94,24 +94,24 @@ contract MoringaCoin is StandardToken { // CHANGE THIS. Update the contract name
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function MoringaCoin() {
-        balances[msg.sender] = 9000000000000000000000000000;      
+        balances[msg.sender] = 9000000000000000000000000000;
         totalSupply = 9000000000000000000000000000;
-        name = "Moringa Coin";                                   
-        decimals = 18;                                        
-        symbol = "MRC";                                       
+        name = "Moringa Coin";
+        decimals = 18;
+        symbol = "MRC";
         unitsOneEthCanBuy = 20000000;
-        fundsWallet = msg.sender;                             
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,7 +125,7 @@ contract MoringaCoin is StandardToken { // CHANGE THIS. Update the contract name
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -139,4 +139,10 @@ contract MoringaCoin is StandardToken { // CHANGE THIS. Update the contract name
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

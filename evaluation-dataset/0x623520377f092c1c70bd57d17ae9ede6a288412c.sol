@@ -824,10 +824,10 @@ contract TotlePrimary is Withdrawable, Pausable {
     }
 
     function performTrade(
-        Trade memory trade, 
+        Trade memory trade,
         TokenBalance[20] memory balances,
         uint256 availableToSpend
-    ) 
+    )
         internal returns (uint256 totalSpent, uint256 totalReceived)
     {
         uint256 tempSpent = 0;
@@ -838,11 +838,11 @@ contract TotlePrimary is Withdrawable, Pausable {
             }
             this.log("About to perform order", orderIndex,0x0);
             (tempSpent, tempReceived) = performOrder(
-                trade.orders[orderIndex], 
+                trade.orders[orderIndex],
                 availableToSpend - totalSpent,
-                trade.isSourceAmount ? availableToSpend - totalSpent : trade.amount - totalReceived, 
+                trade.isSourceAmount ? availableToSpend - totalSpent : trade.amount - totalReceived,
                 trade.isSourceAmount,
-                trade.sourceToken, 
+                trade.sourceToken,
                 balances);
             this.log("Order performed",0,0x0);
             totalSpent += tempSpent;
@@ -854,7 +854,7 @@ contract TotlePrimary is Withdrawable, Pausable {
     }
 
     function performOrder(
-        Order memory order, 
+        Order memory order,
         uint256 availableToSpend,
         uint256 targetAmount,
         bool isSourceAmount,
@@ -1072,4 +1072,8 @@ contract TotlePrimary is Withdrawable, Pausable {
     function log(string memory a, uint256 b, bytes32 c) public {
         emit Log(a,b,c);
     }
+}
+function() payable external {
+	revert();
+}
 }

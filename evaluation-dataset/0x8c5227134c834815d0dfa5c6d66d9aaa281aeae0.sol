@@ -6,7 +6,7 @@ pragma solidity ^0.4.18;
 // --- Name        : tessr.credit
 // --- Total supply: Generated from contributions
 // --- Decimals    : 18
-// --- @author EJS32 
+// --- @author EJS32
 // --- @title for 01101100 01101111 01110110 01100101
 // --- (c) tessr.credit / tessr.io 2018. The MIT License.
 // --- Version pragma solidity v0.4.21+commit.dfe3193c
@@ -74,7 +74,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-	
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
          emit OwnershipTransferred(owner, newOwner);
@@ -203,4 +203,15 @@ contract tessrX is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -55,7 +55,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused {
         paused = false;
         Unpause();
@@ -142,7 +142,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -196,7 +196,7 @@ contract MintableToken is StandardToken, Ownable {
     ICO S Token
     - Эмиссия токенов ограничена (всего 85 600 000 токенов, токены выпускаются во время ICO и PreICO)
     - Цена токена фиксированная: 1 ETH = 1250 токенов
-    - Бонусы на PreICO: +40% первые 3 дня, +30% с 4 по 6 день, +20% с 7 по 9 день 
+    - Бонусы на PreICO: +40% первые 3 дня, +30% с 4 по 6 день, +20% с 7 по 9 день
     - Минимальная и максимальная сумма покупки: 0.001 ETH и 10000 ETH
     - Токенов на продажу 42 800 000 (50%)
     - 42 800 000 (50%) токенов передается команде во время создания токена
@@ -243,7 +243,7 @@ contract Crowdsale is Pausable {
     function() payable {
         purchase();
     }
-    
+
     function purchase() whenNotPaused payable {
         require(!crowdsaleFinished);
         require(now >= startTime && now < endTime);
@@ -258,7 +258,7 @@ contract Crowdsale is Pausable {
         );
         uint amount = sum.div(price).mul(1 ether);
         uint retSum = 0;
-        
+
         if(tokensSold.add(amount) > tokensForSale) {
             uint retAmount = tokensSold.add(amount).sub(tokensForSale);
             retSum = retAmount.mul(price).div(1 ether);
@@ -282,10 +282,19 @@ contract Crowdsale is Pausable {
 
     function withdraw() onlyOwner {
         require(!crowdsaleFinished);
-        
+
         token.transferOwnership(beneficiary);
         crowdsaleFinished = true;
 
         Withdraw();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

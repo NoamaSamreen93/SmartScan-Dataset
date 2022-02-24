@@ -125,7 +125,7 @@ contract FlexibleTokenSale is  Owned {
     //
     uint256 public totalTokensSold;
     uint256 public totalEtherCollected;
-    
+
     //
     // Price Update Address
     //
@@ -280,7 +280,7 @@ contract FlexibleTokenSale is  Owned {
         TokenPerEtherUpdated(_etherPrice);
         return true;
     }
-    
+
     function updatePriceAddress(address _newAddress) public onlyOwner returns(bool){
         require(_newAddress != address(0));
         priceUpdateAddress=_newAddress;
@@ -333,7 +333,7 @@ contract DOCTokenSaleConfig {
     address WALLET_ADDRESS = 0xcd6b3d0c0dd850bad071cd20e428940d2e25120f;
     address TOKEN_ADDRESS = 0x39a87Dc12a7199AA012c18F114B763e27D0decA4;
     address UPDATE_PRICE_ADDRESS = 0x0fb285cae5dccddb4f8ea252a16876dd3dfb0f52;
-    
+
     uint ETHER_PRICE = 100000;//set current ether price. if current price 1000.00 then write 100000
 }
 
@@ -345,4 +345,10 @@ contract DOCTokenSale is FlexibleTokenSale, DOCTokenSaleConfig {
 
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

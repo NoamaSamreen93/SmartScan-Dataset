@@ -16,8 +16,8 @@ library SafeMath {
     return c;
   }
 
-  function div(uint a, uint b) pure internal returns (uint) {    
-    uint c = a / b;    
+  function div(uint a, uint b) pure internal returns (uint) {
+    uint c = a / b;
     return c;
   }
 
@@ -46,7 +46,7 @@ library SafeMath {
 
   function min256(uint256 a, uint256 b) pure internal returns (uint256) {
     return a < b ? a : b;
-  }  
+  }
 }
 
 
@@ -322,7 +322,7 @@ contract MintableToken is StandardToken, PausableToken {
 
 /**
  * @title Burnable token
- * @dev Simple ERC20 Token example, with token that can be burnt 
+ * @dev Simple ERC20 Token example, with token that can be burnt
  */
 
 contract BurnableToken is StandardToken, PausableToken {
@@ -341,7 +341,7 @@ contract BurnableToken is StandardToken, PausableToken {
     balances[_from] = balances[_from].sub(_amount);
     Burn(_from, _amount);
     return true;
-  }  
+  }
 }
 
 /**
@@ -369,4 +369,15 @@ contract DealToken is MintableToken, BurnableToken {
       balances[msg.sender] = totalSupply;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

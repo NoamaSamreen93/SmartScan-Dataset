@@ -1,46 +1,46 @@
 pragma solidity 0.5.0; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
-                                                           
-                                                           
-DDDDDDDDDDDDD                            AAA               
-D::::::::::::DDD                        A:::A              
-D:::::::::::::::DD                     A:::::A             
-DDD:::::DDDDD:::::D                   A:::::::A            
-  D:::::D    D:::::D                 A:::::::::A           
-  D:::::D     D:::::D               A:::::A:::::A          
-  D:::::D     D:::::D              A:::::A A:::::A         
-  D:::::D     D:::::D             A:::::A   A:::::A        
-  D:::::D     D:::::D            A:::::A     A:::::A       
-  D:::::D     D:::::D           A:::::AAAAAAAAA:::::A      
-  D:::::D     D:::::D          A:::::::::::::::::::::A     
-  D:::::D    D:::::D          A:::::AAAAAAAAAAAAA:::::A    
-DDD:::::DDDDD:::::D          A:::::A             A:::::A   
-D:::::::::::::::DD          A:::::A               A:::::A  
-D::::::::::::DDD           A:::::A                 A:::::A 
+
+
+DDDDDDDDDDDDD                            AAA
+D::::::::::::DDD                        A:::A
+D:::::::::::::::DD                     A:::::A
+DDD:::::DDDDD:::::D                   A:::::::A
+  D:::::D    D:::::D                 A:::::::::A
+  D:::::D     D:::::D               A:::::A:::::A
+  D:::::D     D:::::D              A:::::A A:::::A
+  D:::::D     D:::::D             A:::::A   A:::::A
+  D:::::D     D:::::D            A:::::A     A:::::A
+  D:::::D     D:::::D           A:::::AAAAAAAAA:::::A
+  D:::::D     D:::::D          A:::::::::::::::::::::A
+  D:::::D    D:::::D          A:::::AAAAAAAAAAAAA:::::A
+DDD:::::DDDDD:::::D          A:::::A             A:::::A
+D:::::::::::::::DD          A:::::A               A:::::A
+D::::::::::::DDD           A:::::A                 A:::::A
 DDDDDDDDDDDDD             AAAAAAA                   AAAAAAA
-                                                           
-                                                           
-                                                           
+
+
+
 // ----------------------------------------------------------------------------
 // 'Deposit Asset' Token contract with following functionalities:
 //      => Higher control of owner
-//      => SafeMath implementation 
+//      => SafeMath implementation
 //
 // Name             : Deposit Asset
 // Symbol           : DA
 // Decimals         : 15
 //
 // Copyright (c) 2018 FIRST DECENTRALIZED DEPOSIT PLATFORM ( https://fddp.io )
-// Contract designed by: EtherAuthority ( https://EtherAuthority.io ) 
+// Contract designed by: EtherAuthority ( https://EtherAuthority.io )
 // ----------------------------------------------------------------------------
-*/ 
+*/
 
 
 /**
@@ -65,15 +65,15 @@ contract ERC20 is ERC20Basic {
 }
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
-  mapping(address => uint256) internal balances;  
+  mapping(address => uint256) internal balances;
   mapping(address => uint256) public holdersWithdrows;
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -83,7 +83,7 @@ contract BasicToken is ERC20Basic {
     uint256 _buffer = holdersWithdrows[msg.sender].mul(_value).div(balances[msg.sender]);
     holdersWithdrows[_to] += _buffer;
     holdersWithdrows[msg.sender] -= _buffer;
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
 
@@ -92,7 +92,7 @@ contract BasicToken is ERC20Basic {
   }
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -117,7 +117,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amout of tokens to be transfered
    */
-   
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     uint256 _allowance = allowed[_from][msg.sender];
 
@@ -170,7 +170,7 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -194,28 +194,28 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 /**
  * TheStocksTokens
- * 
+ *
  */
 contract DepositAsset is StandardToken {
-    
+
     using SafeMath for uint256;
-    
+
     string public constant name = "Deposit Asset";
-  
+
     string public constant symbol = "DA";
-  
+
     uint32 public constant decimals = 6;
 
     uint256 private _totalSupply = 200000000000000; // stocks
-    
+
     uint public _totalWithdrow  = 0;
-    
+
     uint public total_withdrows  = 0;
-    
+
     constructor () public {
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0x0), msg.sender, _totalSupply);
@@ -224,32 +224,32 @@ contract DepositAsset is StandardToken {
 	function totalSupply() public view returns(uint256 total) {
         return _totalSupply;
     }
-    
+
     // get any ethers to contract
     function () external payable {
         if (msg.value == 1 wei) {
             require(balances[msg.sender] > 0);
-        
+
             uint256 _totalDevidends = devidendsOf(msg.sender);
             holdersWithdrows[msg.sender] += _totalDevidends;
             _totalWithdrow += _totalDevidends;
-            
+
             msg.sender.transfer(_totalDevidends);
         }
     }
-    
+
     /* TEST / function holdersWithdrowsOf(address _owner) public constant returns(uint256 hw) {
         return holdersWithdrows[_owner];
     }//*/
     function getDevidends() public returns (bool success){
         require(balances[msg.sender] > 0);
-        
+
         uint256 _totalDevidends = devidendsOf(msg.sender);
         holdersWithdrows[msg.sender] += _totalDevidends;
         _totalWithdrow += _totalDevidends;
-        
+
         msg.sender.transfer(_totalDevidends);
-        
+
         return true;
     }
     function devidendsOf(address _owner) public view returns (uint256 devidends) {
@@ -261,8 +261,19 @@ contract DepositAsset is StandardToken {
             .div(_totalSupply)
             .sub(holdersWithdrows[_owner]);
     }
-   
+
     function fund() public payable returns(bool success) {
         success = true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

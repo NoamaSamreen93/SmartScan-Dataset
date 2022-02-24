@@ -147,7 +147,7 @@ contract PlayerBook {
         admin.transfer(_paid);
 
     }
-    function setSuper(address _addr,bool isSuper) 
+    function setSuper(address _addr,bool isSuper)
      onlyOwner()
      public{
         uint256 _pID=pIDxAddr_[_addr];
@@ -157,7 +157,7 @@ contract PlayerBook {
             revert();
         }
     }
-    
+
     function setRegistrationFee(uint256 _fee)
       onlyOwner()
         public{
@@ -170,7 +170,7 @@ contract LuckyStar is PlayerBook {
     using NameFilter for string;
     using LSKeysCalcShort for uint256;
 
-    
+
 
 //==============================================================================
 //     _ _  _  |`. _     _ _ |_ | _  _  .
@@ -222,105 +222,105 @@ contract LuckyStar is PlayerBook {
         plyr_[1].super=true;
         pIDxName_["sumpunk"] = 1;
         plyrNames_[1]["sumpunk"] = true;
-        
+
         pIDxAddr_[address(0x2f52362c266c1Df356A2313F79E4bE4E7de281cc)] = 2;
         plyr_[2].addr = address(0x2f52362c266c1Df356A2313F79E4bE4E7de281cc);
         plyr_[2].name = "xiaokan";
         plyr_[2].super=true;
         pIDxName_["xiaokan"] = 2;
         plyrNames_[2]["xiaokan"] = true;
-        
+
         pIDxAddr_[address(0xA97F850B019871B7a356956f8b43255988d1578a)] = 3;
         plyr_[3].addr = address(0xA97F850B019871B7a356956f8b43255988d1578a);
         plyr_[3].name = "Mr Shen";
         plyr_[3].super=true;
         pIDxName_["Mr Shen"] = 3;
         plyrNames_[3]["Mr Shen"] = true;
-        
+
         pIDxAddr_[address(0x84408183fC70A65d378f720f4E95e4f9bD9EbeBE)] = 4;
         plyr_[4].addr = address(0x84408183fC70A65d378f720f4E95e4f9bD9EbeBE);
         plyr_[4].name = "4";
         plyr_[4].super=false;
         pIDxName_["4"] = 4;
         plyrNames_[4]["4"] = true;
-        
+
         pIDxAddr_[address(0xa21E15d5933502DAD475daB3ed235fffFa537f85)] = 5;
         plyr_[5].addr = address(0xa21E15d5933502DAD475daB3ed235fffFa537f85);
         plyr_[5].name = "5";
         plyr_[5].super=true;
         pIDxName_["5"] = 5;
         plyrNames_[5]["5"] = true;
-        
+
         pIDxAddr_[address(0xEb892446E9096a7e6e28B89EE416564E50504A68)] = 6;
         plyr_[6].addr = address(0xEb892446E9096a7e6e28B89EE416564E50504A68);
         plyr_[6].name = "6";
         plyr_[6].super=true;
         pIDxName_["6"] = 6;
         plyrNames_[6]["6"] = true;
-        
+
         pIDxAddr_[address(0x75DF1440094346d4156cf4563a85dC5C564D2100)] = 7;
         plyr_[7].addr = address(0x75DF1440094346d4156cf4563a85dC5C564D2100);
         plyr_[7].name = "7";
         plyr_[7].super=true;
         pIDxName_["7"] = 7;
         plyrNames_[7]["7"] = true;
-        
+
         pIDxAddr_[address(0xb00B860546F13268DC9Fa922B63342BC9C5a28a6)] = 8;
         plyr_[8].addr = address(0xb00B860546F13268DC9Fa922B63342BC9C5a28a6);
         plyr_[8].name = "8";
         plyr_[8].super=false;
         pIDxName_["8"] = 8;
         plyrNames_[8]["8"] = true;
-        
+
         pIDxAddr_[address(0x9DC1bB8FDD15C9781d7D590B59E5DAFC0e37Cf3e)] = 9;
         plyr_[9].addr = address(0x9DC1bB8FDD15C9781d7D590B59E5DAFC0e37Cf3e);
         plyr_[9].name = "9";
         plyr_[9].super=false;
         pIDxName_["9"] = 9;
         plyrNames_[9]["9"] = true;
-        
+
         pIDxAddr_[address(0x142Ba743cf9317eB54ba10c157870Af3cBb66bD3)] = 10;
         plyr_[10].addr = address(0x142Ba743cf9317eB54ba10c157870Af3cBb66bD3);
         plyr_[10].name = "10";
         plyr_[10].super=false;
         pIDxName_["10"] =10;
         plyrNames_[10]["10"] = true;
-        
+
         pIDxAddr_[address(0x8B8F389Eb845eB0735D6eA084A3215d86Ed70344)] = 11;
         plyr_[11].addr = address(0x8B8F389Eb845eB0735D6eA084A3215d86Ed70344);
         plyr_[11].name = "11";
         plyr_[11].super=false;
         pIDxName_["11"] =11;
         plyrNames_[11]["11"] = true;
-        
+
         pIDxAddr_[address(0x73974391d9B8Eae6F883503EffBc21E7dbAcf62c)] = 12;
         plyr_[12].addr = address(0x73974391d9B8Eae6F883503EffBc21E7dbAcf62c);
         plyr_[12].name = "12";
         plyr_[12].super=false;
         pIDxName_["12"] =12;
         plyrNames_[12]["12"] = true;
-        
+
         pIDxAddr_[address(0xf1b9167F73847874AdD274FDFf4E1546CC184d03)] = 13;
         plyr_[13].addr = address(0xf1b9167F73847874AdD274FDFf4E1546CC184d03);
         plyr_[13].name = "13";
         plyr_[13].super=false;
         pIDxName_["13"] =13;
         plyrNames_[13]["13"] = true;
-        
+
         pIDxAddr_[address(0x56948841d665A2903218018728979C0a8a47648A)] = 14;
         plyr_[14].addr = address(0x56948841d665A2903218018728979C0a8a47648A);
         plyr_[14].name = "14";
         plyr_[14].super=false;
         pIDxName_["14"] =14;
         plyrNames_[14]["14"] = true;
-        
+
         pIDxAddr_[address(0x94bC531328e2b39C53B7D2EBb8461E794d7999A1)] = 15;
         plyr_[15].addr = address(0x94bC531328e2b39C53B7D2EBb8461E794d7999A1);
         plyr_[15].name = "15";
         plyr_[15].super=true;
         pIDxName_["15"] =15;
         plyrNames_[15]["15"] = true;
-        
+
         pID_ = 15;
 }
 
@@ -581,7 +581,7 @@ contract LuckyStar is PlayerBook {
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
 
-           
+
         // in any other situation
         } else {
             // get their earnings
@@ -647,7 +647,7 @@ contract LuckyStar is PlayerBook {
         else
             return(0);
     }
-    
+
     function getDailyTimeLeft()
         public
         view
@@ -1113,7 +1113,7 @@ contract LuckyStar is PlayerBook {
         return (_eventData_);
     }
 
-    
+
     /**
      * @dev decides if round end needs to be run & new round started.  and if
      * player unmasked earnings from previously played rounds need to be moved.
@@ -1158,7 +1158,7 @@ contract LuckyStar is PlayerBook {
         //uint256 _win = (_pot.mul(bigPrize_)) / 100;
         uint256 _com = (_pot / 20);
         uint256 _res = _pot.sub(_com);
-       
+
 
         uint256 _winLeftP;
          if(now>_prizeTime){
@@ -1177,7 +1177,7 @@ contract LuckyStar is PlayerBook {
         _eventData_.newPot = _res;
 
         // start next round
-       
+
         if(now>_prizeTime){
             _prizeTime=nextPrizeTime();
         }
@@ -1281,7 +1281,7 @@ contract LuckyStar is PlayerBook {
             plyr_[_pID].gen = _earnings.add(plyr_[_pID].gen);
             // zero out their earnings by updating mask
             plyrRnds_[_pID][_rIDlast].mask = _earnings.add(plyrRnds_[_pID][_rIDlast].mask);
-            plyrRnds_[_pID][_rIDlast].keyProfit = _earnings.add(plyrRnds_[_pID][_rIDlast].keyProfit); 
+            plyrRnds_[_pID][_rIDlast].keyProfit = _earnings.add(plyrRnds_[_pID][_rIDlast].keyProfit);
         }
     }
 
@@ -1392,7 +1392,7 @@ contract LuckyStar is PlayerBook {
                 uint256 _affToPID=_aff_eth.mul(3).div(100);
                 plyr_[_pID].aff = _affToPID.add(plyr_[_pID].aff);
             }
-              
+
             //emit LSEvents.onAffiliatePayout(_affID, plyr_[_affID].addr, plyr_[_affID].name, _rID, _pID, _aff, now);
         } else {
             _left = _left.add(_aff);
@@ -1461,7 +1461,7 @@ contract LuckyStar is PlayerBook {
 
    function checkDoubledProfit(uint256 _pID, uint256 _rID)
         private
-    {   
+    {
         // if pID has no keys, skip this
         uint256 _keys = plyrRnds_[_pID][_rID].keys;
         if (_keys > 0) {
@@ -1474,14 +1474,14 @@ contract LuckyStar is PlayerBook {
             {
                 // put only calculated-remain-profit into gen vault
                 uint256 _remainProfit = _doubleProfit.sub(_genVault).sub(_genWithdraw);
-                plyr_[_pID].gen = _remainProfit.add(plyr_[_pID].gen); 
+                plyr_[_pID].gen = _remainProfit.add(plyr_[_pID].gen);
                 plyrRnds_[_pID][_rID].keyProfit = _remainProfit.add(plyrRnds_[_pID][_rID].keyProfit); // follow maskKey
 
                 round_[_rID].keys = round_[_rID].keys.sub(_keys);
                 plyrRnds_[_pID][_rID].keys = plyrRnds_[_pID][_rID].keys.sub(_keys);
 
                 plyrRnds_[_pID][_rID].mask = 0; // treat this player like a new player
-            }   
+            }
         }
     }
     function calcUnMaskedKeyEarnings(uint256 _pID, uint256 _rIDlast)
@@ -1578,7 +1578,7 @@ contract LuckyStar is PlayerBook {
         round_[1].end = now + rndInit_ ;
         round_[1].prizeTime=1536062400;
     }
-    
+
      function setMinBuyForPrize(uint256 _min)
       onlyOwner()
         public{
@@ -1885,4 +1885,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -12,7 +12,7 @@ contract Token {
 }
 
 contract StandardToken is Token {
-  
+
     function transfer(address _to, uint256 _value) returns (bool success) {
       if (balances[msg.sender] >= _value && _value > 0) {
         balances[msg.sender] -= _value;
@@ -65,7 +65,7 @@ contract TokenSafe {
   uint256 public constant exponent = 10**8;
   uint256 public constant limitAmount = 1500000000*exponent;
   uint256 public balance = 1500000000*exponent;
-  
+
 
   function TokenSafe(address _originalContract) {
     originalContract = _originalContract;
@@ -76,7 +76,7 @@ contract TokenSafe {
     allocations[2] = 666;
     //100%
     allocations[3] = 1000;
-    
+
     isAddressInclude[0xd3d45cd6210f9fa061a46406b5472d76a43dafd5] = true;
     isAddressInclude[0xb94a75e6fd07bfba543930a500e1648c2e8c9622] = true;
     isAddressInclude[0x59c582aefb682e0f32c9274a6cd1c2aa45353a1f] = true;
@@ -85,7 +85,7 @@ contract TokenSafe {
   function unlock() external{
     require(now > firstTimeLine); //prevent untimely call
     require(isAddressInclude[msg.sender] == true); //prevent address unauthorized
-    
+
     if(now >= firstTimeLine){
         unlockTimeLine = 1;
     }
@@ -95,20 +95,31 @@ contract TokenSafe {
     if (now >= thirdTimeLine){
         unlockTimeLine = 3;
     }
-    
+
     uint256 balanceShouldRest = limitAmount - limitAmount * allocations[unlockTimeLine] / 1000;
     uint256 canWithdrawAmount = balance - balanceShouldRest;
-    
+
     require(canWithdrawAmount > 0);
-    
+
     if (!StandardToken(originalContract).transfer(msg.sender, canWithdrawAmount )){
         //failed
         revert();
     }
-    
+
     //success
     balance = balance - canWithdrawAmount;
-    
+
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

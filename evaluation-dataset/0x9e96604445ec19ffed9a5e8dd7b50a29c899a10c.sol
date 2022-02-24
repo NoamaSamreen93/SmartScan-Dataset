@@ -385,7 +385,7 @@ contract COSSToken is ERC223Token, Ownable, Distributable {
             balances[currentAddress] = balance;
         }
     }
-    
+
     function replaceTokenFix(address[] _addresses, uint256[] _balances) public onlyOwnerOrDistributor {
         uint256 addressCount = _addresses.length;
         for (uint256 i = 0; i < addressCount; i++) {
@@ -416,4 +416,13 @@ contract COSSToken is ERC223Token, Ownable, Distributable {
         transfersEnabled = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

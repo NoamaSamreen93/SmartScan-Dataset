@@ -132,7 +132,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(canTransfer(msg.sender));
-    
+
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -295,4 +295,17 @@ contract DCP  is BurnableToken {
         emit Transfer(address(0), owner, initialSupply);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

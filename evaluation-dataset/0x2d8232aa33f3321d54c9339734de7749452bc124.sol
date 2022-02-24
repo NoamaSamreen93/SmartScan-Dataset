@@ -15,10 +15,10 @@ contract IOwned {
 
 /*
     This is the "owned" utility contract used by bancor with one additional function - transferOwnershipNow()
-    
+
     The original unmodified version can be found here:
     https://github.com/bancorprotocol/contracts/commit/63480ca28534830f184d3c4bf799c1f90d113846
-    
+
     Provides support and utilities for contract ownership
 */
 contract Owned is IOwned {
@@ -162,4 +162,15 @@ contract Logger is Owned, ILogger  {
     function emitGenericLog(string messageType, string message) public hasLoggerPermissions(msg.sender) {
         emit GenericLog(msg.sender, messageType, message);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

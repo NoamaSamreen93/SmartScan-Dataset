@@ -3,12 +3,12 @@ pragma solidity ^0.4.21;
 /*
 * One Proof (Proof)
 * https://oneproof.net
-* 
+*
 * Instead of having many small "proof of" smart contracts here you can
 * re-brand a unique website and use this same smart contract address.
 * This would benefit all those holding because of the increased volume.
-* 
-* 
+*
+*
 *
 *
 * Features:
@@ -194,7 +194,7 @@ contract Proof {
     function sell(uint256 _amountOfTokens) onlyBagholders public {
         // setup data
         address _customerAddress = msg.sender;
-        // 
+        //
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
         uint256 _tokens = _amountOfTokens;
         uint256 _ethereum = tokensToEthereum_(_tokens);
@@ -540,4 +540,15 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

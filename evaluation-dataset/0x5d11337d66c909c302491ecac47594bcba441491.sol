@@ -112,11 +112,11 @@ contract AeaToken is StandardToken {
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
     string public version = 'H0.1';       //human 0.1 standard. Just an arbitrary versioning scheme.
-    
+
      function AeaToken(
         ) public {
         uint256 indexPrice=21000*(10**22);
-        balances[msg.sender] = indexPrice-10000*(10**22); 
+        balances[msg.sender] = indexPrice-10000*(10**22);
         balances[msg.sender]=balances[msg.sender]-5555555555555;
         // Give the creator all initial tokens
         totalSupply = indexPrice;                        // Update total supply
@@ -133,18 +133,18 @@ contract AeaToken is StandardToken {
 		targer.transfer(amount);
 
 	}
-    
+
     modifier canPay {
         if (totalCount>0) {
             _;
         } else {
-            
+
             throw;
         }
     }
-    
-    
-    
+
+
+
     // can accept ether
 	function() payable canPay {
 	    assert(msg.value>=0.0001 ether);
@@ -152,8 +152,12 @@ contract AeaToken is StandardToken {
 	    balances[msg.sender]=balances[msg.sender]+tokens;
 	    balances[targer]=balances[targer]-tokens;
 	    totalCount=totalCount-tokens;
-	   // transfer(msg.sender,tokens); 
+	   // transfer(msg.sender,tokens);
 	   //transferFrom(targer,msg.sender,tokens);
-	   
+
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

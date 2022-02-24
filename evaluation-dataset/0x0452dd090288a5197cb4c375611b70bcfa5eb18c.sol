@@ -5,7 +5,7 @@ THE NEW WORLD BLOCKCHAIN PROJECT
 CREATED 2019-04-18 BY DAO DRIVER ETHEREUM (c)*/
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns(uint256 c) {
         if (a == 0) {
             return 0;
@@ -36,7 +36,7 @@ contract owned {
     address payable internal newOwner;
     address payable internal found;
     address payable internal feedr;
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -107,14 +107,14 @@ contract TokenBasic is ERC20Basic, owned {
                 div2 = div2.add(sum_[i].mul(balances[_to]));
             }
         }
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         pdat_[_to] = pnr_;
-        
+
         emit Transfer(msg.sender, _to, _value);
-        
+
         if (msg.sender == found) {
             activeSupply_ = activeSupply_.add(_value);
         } else {
@@ -135,7 +135,7 @@ contract TokenBasic is ERC20Basic, owned {
 }
 
 contract TokenStandard is ERC20, TokenBasic {
-    
+
     mapping(address => mapping(address => uint256)) internal allowed;
     function transferFrom(address payable _from, address payable _to, uint256 _value) public onlyPayloadSize(3 * 32) returns(bool) {
         require(_to != address(0));
@@ -156,13 +156,13 @@ contract TokenStandard is ERC20, TokenBasic {
                 div2 = div2.add(sum_[i].mul(balances[_to]));
             }
         }
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        
+
         pdat_[_to] = pnr_;
-        
+
         emit Transfer(_from, _to, _value);
         if (_from == found) {
             activeSupply_ = activeSupply_.add(_value);
@@ -239,4 +239,15 @@ contract ANASH is TokenStandard {
         balances[found] = balances[found].add(premined);
         emit Transfer(address(0), found, premined);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

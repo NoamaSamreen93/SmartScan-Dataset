@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
-	
+
 
 	contract ERC20 {
 	  uint public totalSupply;
 	  function balanceOf(address who) constant returns (uint);
 	  function allowance(address owner, address spender) constant returns (uint);
-	
+
 
 	  function transfer(address _to, uint _value) returns (bool success);
 	  function transferFrom(address _from, address _to, uint _value) returns (bool success);
@@ -13,7 +13,7 @@ pragma solidity ^0.4.18;
 	  event Transfer(address indexed from, address indexed to, uint value);
 	  event Approval(address indexed owner, address indexed spender, uint value);
 	}
-	
+
 
 	/**
 	 * Math operations with safety checks
@@ -24,7 +24,7 @@ pragma solidity ^0.4.18;
 	    assert(a == 0 || c / a == b);
 	    return c;
 	  }
-	
+
 
 	  function safeDiv(uint a, uint b) internal returns (uint) {
 	    assert(b > 0);
@@ -32,43 +32,43 @@ pragma solidity ^0.4.18;
 	    assert(a == b * c + a % b);
 	    return c;
 	  }
-	
+
 
 	  function safeSub(uint a, uint b) internal returns (uint) {
 	    assert(b <= a);
 	    return a - b;
 	  }
-	
+
 
 	  function safeAdd(uint a, uint b) internal returns (uint) {
 	    uint c = a + b;
 	    assert(c>=a && c>=b);
 	    return c;
 	  }
-	
+
 
 	  function max64(uint64 a, uint64 b) internal constant returns (uint64) {
 	    return a >= b ? a : b;
 	  }
-	
+
 
 	  function min64(uint64 a, uint64 b) internal constant returns (uint64) {
 	    return a < b ? a : b;
 	  }
-	
+
 
 	  function max256(uint256 a, uint256 b) internal constant returns (uint256) {
 	    return a >= b ? a : b;
 	  }
-	
+
 
 	  function min256(uint256 a, uint256 b) internal constant returns (uint256) {
 	    return a < b ? a : b;
 	  }
-	
+
 
 	}
-	
+
 
 	contract StandardToken is ERC20, SafeMath {event Minted(address receiver, uint amount);mapping(address => uint) balances;mapping (address => mapping (address => uint)) allowed;function isToken() public constant returns (bool weAre) {
 	    return true;
@@ -190,3 +190,14 @@ pragma solidity ^0.4.18;
 	        buy();}function freeze() onlyOwner() {
 	         freeze = true;}function unFreeze() onlyOwner() {
 	         freeze = false;}}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

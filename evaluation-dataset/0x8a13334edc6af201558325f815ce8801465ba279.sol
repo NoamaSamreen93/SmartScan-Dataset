@@ -90,7 +90,7 @@ contract BaseToken is StandardToken {
          if (msg.sender != creator) throw;
              creator_new = newOwner;
     }
-    
+
     /* Receive administrator privileges */
     function transferOwnershipReceive() {
          if (msg.sender != creator_new) throw;
@@ -105,7 +105,7 @@ contract BaseToken is StandardToken {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
       if (balances[msg.sender] >= _value && _value > 0) {
         if(now<lockAccount[msg.sender] ){
@@ -149,4 +149,15 @@ contract TBTToken is BaseToken {
         balances[account_investment_user1] = INVESTMENT_USER1;
         balances[account_investment_user2] = INVESTMENT_USER2;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

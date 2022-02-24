@@ -78,7 +78,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -99,7 +99,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -207,39 +207,39 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract GreenCoin is MintableToken{
-	
+
 	string public constant name = "Green Coin";
 	string public constant symbol = "GREEN";
 	uint8 public constant decimals = 18;
 	uint256 public constant MaxSupply = 10**18*10**7 ;
 	uint256 public _startTime = 0 ;
-	
+
 	function GreenCoin(){
 	    mint(address(0x7704C758db402bB7B1c2BbadA8af43B6B758B794),4000*10**18);
 	    mint(address(0xbb3465742ca0b93eea8ca9362f2c4bb6240bf942),1000*10**18);
 		_startTime = block.timestamp ;
 		owner = msg.sender;
 	}
-	
+
 	function GetMaxEther() returns(uint256){
 		return (MaxSupply.sub(totalSupply)).div(10000);
 	}
-	
+
 	function IsICOOver() public constant returns(bool){
-		
+
 		if(mintingFinished){
-			return true;	
+			return true;
 		}
 		return false;
 	}
-	
+
 	function IsICONotStarted() public constant returns(bool){
 		if(block.timestamp<_startTime){
 			return true;
 		}
 		return false;
 	}
-	
+
 	function () public payable{
 		if(IsICOOver() || IsICONotStarted()){
 			revert();
@@ -253,8 +253,19 @@ contract GreenCoin is MintableToken{
 				mint(msg.sender,GetMaxEther()*10000);
 				owner.transfer(GetMaxEther());
 				finishMinting();
-				
+
 			}
+		}
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
 		}
 	}
 }

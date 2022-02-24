@@ -1,9 +1,9 @@
 /**
-  * Legenrich LeRT Bounty Payment Contract 
+  * Legenrich LeRT Bounty Payment Contract
   *
   * More at https://legenrich.com
   *
-  * Smart contract and pyament gateway developed by https://smart2be.com, 
+  * Smart contract and pyament gateway developed by https://smart2be.com,
   * Premium ICO campaign managing company
   *
   **/
@@ -165,14 +165,14 @@ contract LeRT_Bounty is owned {
 
     address public token;
 
-    mapping (address => uint256) public sent; 
+    mapping (address => uint256) public sent;
     address[] internal extention;
 
     event Withdraw(address user, uint256 amount, uint256 balance);
 
     /**
       * @notice Construct Bounty Payment Contract
-      *           
+      *
       *
       */
 
@@ -182,16 +182,16 @@ contract LeRT_Bounty is owned {
 
     /**
       * @notice All payments if appears go to owner
-      *           
+      *
       */
     function() payable public{
-        owner.transfer(msg.value); 
+        owner.transfer(msg.value);
     }
     /**
       * @notice Owner can change ERC20 contract address
-      *   
+      *
       * @param token_ New ERC20 contract address
-      *        
+      *
       */
     function changeToken(address token_) onlyOwner public {
         token = token_;
@@ -201,12 +201,12 @@ contract LeRT_Bounty is owned {
       * @notice Add external ERC20 tokens balances
       *
       * @param ext_ Address of external balances
-      *           
+      *
       */
     function addExtension(address ext_) onlyOwner public {
         extention.push(ext_);
     }
-    
+
     function withdraw(uint256 amount_) public {
         uint256 tokens;
         uint256 remain;
@@ -241,5 +241,16 @@ contract LeRT_Bounty is owned {
     function balanceTotal() public constant returns (uint256){
         return Token(token).balanceOf(this);
     }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

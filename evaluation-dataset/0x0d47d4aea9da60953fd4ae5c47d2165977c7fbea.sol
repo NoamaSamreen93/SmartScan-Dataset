@@ -25,7 +25,7 @@ contract EtherprisesLLC {
     mapping (bytes32 => address) public seriesByName;
     //This maps series' address to a name
     mapping (address => bytes32) public seriesByAddress;
-    
+
     //Events for external monitoring:
     event AmendmentAdded (string newAmendment);
     event FeePaid (address which);
@@ -33,13 +33,13 @@ contract EtherprisesLLC {
     event FactorySet(address newFactory);
     event DepositMade(address where, uint amount);
     event SeriesCreated(address addr, uint id);
-    
+
     /// @dev This is the initialization function, here we just mark
     /// ourselves as the General Manager for this series organization.
     function EtherprisesLLC() {
         generalManager = msg.sender;
     }
-    
+
     /// @dev This modifier is used to check if the user is the GM.
     modifier ifGeneralManager {
         if (msg.sender != generalManager)
@@ -47,7 +47,7 @@ contract EtherprisesLLC {
 
         _;
     }
-    
+
     /// @dev This modifier is used to check is the caller a series.
     modifier ifSeries {
         if (expiresAt[msg.sender] == 0)
@@ -55,13 +55,13 @@ contract EtherprisesLLC {
 
         _;
     }
-    
+
     /// @dev Withdrawal happens here from Etherprises LLC to the GM.
     /// For bookkeeping and tax reasons we only want GM to withdraw.
     function withdraw() ifGeneralManager {
         generalManager.send(this.balance);
     }
-    
+
     /// @dev This checks if the series is expired. This is meant to be
     /// called inside the series, and terminate the series if expired.
     /// @param addr Address of the series we want to check
@@ -72,7 +72,7 @@ contract EtherprisesLLC {
         else
             return true;
     }
-    
+
     /// @dev Amending rules of the organization, only those rules which
     /// were present upon creation of the Series, apply to the Series.
     /// @param newAmendment String containing new amendment. Remember to
@@ -81,43 +81,43 @@ contract EtherprisesLLC {
         // Only GM can amend the rules.
         // Series obey only the rules which are set when series is created
         prose.push(newAmendment);
-        
+
         AmendmentAdded(newAmendment);
     }
-    
+
     /// @dev This function pays the yearly fee of 1 ETH.
     /// @return Boolean TRUE, if everything was successful
     function payFee() ifSeries payable returns (bool) {
         // Receiving fee of one ETH here
         if (msg.value != 1 ether)
             throw;
-            
+
         expiresAt[msg.sender] += 1 years;
-        
+
         FeePaid(msg.sender);
         return true;
     }
-    
+
     /// @dev Sets the general manager for the main organization.
     /// There is just one member for Etherprises LLC, which is the GM.
     /// @param newManger Address of the new manager
     function setManager(address newManger) ifGeneralManager {
         generalManager = newManger;
-        
+
         ManagerSet(newManger);
     }
-    
+
     /// @dev This sets the factory proxy contract, which uses the factory.
     /// @param newFactory Address of the new factory proxy
     function setFactory(address newFactory) ifGeneralManager {
         seriesFactory = newFactory;
-        
+
         FactorySet(newFactory);
     }
-    
+
     /// @dev This creates a new series, called also from the fallback
     /// with default values.
-    /// @notice This will create new series. Specify the name here: 
+    /// @notice This will create new series. Specify the name here:
     /// This is the only place to define a name, the name is immutable.
     /// Please note, that the name must start with an alpha character
     /// (despite otherwise being UTF-8).
@@ -142,7 +142,7 @@ contract EtherprisesLLC {
         uint seriesId
     ) {
         seriesId = series.length;
-        
+
         var(latestAddress, latestName) = SeriesFactory(seriesFactory).createSeries.value(msg.value)(seriesId, name, shares, industry, symbol, msg.sender, extraContract);
         if (latestAddress == 0)
             throw;
@@ -157,11 +157,11 @@ contract EtherprisesLLC {
         expiresAt[latestAddress] = now + 1 years;
         latestSeriesForUser[msg.sender] = latestAddress;
         seriesByAddress[latestAddress] = latestName;
-        
+
         SeriesCreated(latestAddress, seriesId);
         return (latestAddress, seriesId);
     }
-    
+
     /// @dev This is here for Registrar ABI support.
     /// @param _name Name of the series we want to search, please note
     /// this is only the search key and not full name
@@ -169,7 +169,7 @@ contract EtherprisesLLC {
     function addr(bytes32 _name) constant returns(address o_address) {
         return seriesByName[_name];
     }
-    
+
     /// @dev This is here for Registrar ABI support: return the search key
     /// for a contract.
     /// @param _owner Name of the series we want to search, please note
@@ -178,7 +178,7 @@ contract EtherprisesLLC {
     function name(address _owner) constant returns(bytes32 o_name){
         return seriesByAddress[_owner];
     }
-    
+
     /// @dev Here the fallback function either creates a new series,
     /// or transfers funds to existing one.
     function () payable {
@@ -218,4 +218,15 @@ contract SeriesFactory {
 
         return (newSeries, _newName);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

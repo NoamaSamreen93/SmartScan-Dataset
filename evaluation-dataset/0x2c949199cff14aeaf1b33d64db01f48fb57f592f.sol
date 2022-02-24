@@ -104,7 +104,7 @@ contract CONI is StandardToken {
     string public name = "CoinBene Coin";
     uint8 public decimals = 8;
     string public symbol = "CONI";
-    string public version = 'v1'; 
+    string public version = 'v1';
 
     address public founder; // The address of the founder
 
@@ -135,4 +135,15 @@ contract CONI is StandardToken {
         if(!_spender.call(_extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

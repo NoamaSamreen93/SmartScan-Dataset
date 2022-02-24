@@ -89,12 +89,12 @@ contract StandardToken is ERC20 {
 
 contract JDLEOToken2 is StandardToken{
     using SafeMath for uint256;
-    
+
     string public name="JDLEOToken2";
     string public symbol="JDLEO2";
     uint256 public decimals=18;
     address owner;
-    
+
     event Burn(uint256 amount);
 
     modifier onlyOwner() {
@@ -107,7 +107,7 @@ contract JDLEOToken2 is StandardToken{
         balances[msg.sender]=totalSupply_;
         owner=msg.sender;
     }
-    
+
     function burn(uint256 _amount) onlyOwner public returns (bool) {
         require(0 < _amount && _amount <= balances[msg.sender]);
         balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -115,12 +115,21 @@ contract JDLEOToken2 is StandardToken{
         emit Burn(_amount);
         return true;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         _transferOwnership(newOwner);
     }
-    
+
     function _transferOwnership(address newOwner) internal {
         owner = newOwner;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

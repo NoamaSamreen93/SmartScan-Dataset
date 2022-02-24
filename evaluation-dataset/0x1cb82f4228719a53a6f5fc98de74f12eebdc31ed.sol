@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
 // 'Fusionchain' Token contract
 //
 // Deployed to : 0xAfa5b5e0C7cd2E1882e710B63EAb0D6f8cbDbf43
-// Symbol      : FIX	
+// Symbol      : FIX
 // Name        : Fusionchain
 // Total supply: 7,300,000,000 FIX
 // Decimals    : 7
@@ -18,27 +18,27 @@ pragma solidity ^0.4.24;
 // Safe maths
 // ----------------------------------------------------------------------------
 
-contract FusionchainSafeMath 
+contract FusionchainSafeMath
 {
-	function safeAdd(uint a, uint b) public pure returns (uint c) 
+	function safeAdd(uint a, uint b) public pure returns (uint c)
 	{
 		c = a + b;
 		require(c >= a);
 	}
 
-	function safeSub(uint a, uint b) public pure returns (uint c) 
+	function safeSub(uint a, uint b) public pure returns (uint c)
 	{
 		require(b <= a);
 		c = a - b;
 	}
 
-	function safeMul(uint a, uint b) public pure returns (uint c) 
+	function safeMul(uint a, uint b) public pure returns (uint c)
 	{
 		c = a * b;
 		require(a == 0 || c / a == b);
 	}
-	
-	function safeDiv(uint a, uint b) public pure returns (uint c) 
+
+	function safeDiv(uint a, uint b) public pure returns (uint c)
 	{
 		require(b > 0);
 		c = a / b;
@@ -50,7 +50,7 @@ contract FusionchainSafeMath
 //  Interface
 // ----------------------------------------------------------------------------
 
-contract FusionchainInterface 
+contract FusionchainInterface
 {
 	function totalSupply() public constant returns (uint);
 	function balanceOf(address tokenOwner) public constant returns (uint balance);
@@ -75,7 +75,7 @@ contract FusionchainInterface
 //
 // ----------------------------------------------------------------------------
 
-contract FusionchainApproveAndCallFallBack 
+contract FusionchainApproveAndCallFallBack
 {
 	function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
 }
@@ -84,30 +84,30 @@ contract FusionchainApproveAndCallFallBack
 // FusionchainOwned contract
 // ----------------------------------------------------------------------------
 
-contract FusionchainOwned 
+contract FusionchainOwned
 {
 	address public owner;
 	address public newOwner;
 
 	event OwnershipTransferred(address indexed _from, address indexed _to);
 
-	constructor() public 
+	constructor() public
 	{
 		owner = msg.sender;
 	}
 
-	modifier onlyOwner 
+	modifier onlyOwner
 	{
 		require(msg.sender == owner);
 		_;
 	}
 
-	function transferOwnership(address _newOwner) public onlyOwner 
+	function transferOwnership(address _newOwner) public onlyOwner
 	{
 		newOwner = _newOwner;
 	}
 
-	function acceptOwnership() public 
+	function acceptOwnership() public
 	{
 		require(msg.sender == newOwner);
 		emit OwnershipTransferred(owner, newOwner);
@@ -124,14 +124,14 @@ contract FusionchainOwned
 contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeMath
  {
 	// Public variables of the token
-	string public symbol; 	
-	string public name;  	
-	uint   public decimals;  
+	string public symbol;
+	string public name;
+	uint   public decimals;
 	uint   public _totalSupply;
 
 	// This creates an array with all balances
 	mapping(address => uint) balances;
-	// Owner of account approves the transfer of an amount to another account    
+	// Owner of account approves the transfer of an amount to another account
 	mapping(address => mapping(address => uint)) allowed;
 
 
@@ -141,14 +141,14 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
      * Initializes contract with initial supply tokens to the creator of the contract
     */
 
-	function Fusionchain () public 
+	function Fusionchain () public
 	{
 		symbol = "FIX";       //Token symbol
 		name = "Fusionchain";    //Token name
 		decimals = 7;        // 7 is the most common number of decimal places
-		_totalSupply = 7300000000*10**decimals; // 7,300,000,000 FIX, 7 decimal places 
+		_totalSupply = 7300000000*10**decimals; // 7,300,000,000 FIX, 7 decimal places
 		balances[0xAfa5b5e0C7cd2E1882e710B63EAb0D6f8cbDbf43] = _totalSupply;
-		
+
 		emit Transfer(address(0), 0xAfa5b5e0C7cd2E1882e710B63EAb0D6f8cbDbf43, _totalSupply);
 	}
 
@@ -156,7 +156,7 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
 	// Total supply
 	// ------------------------------------------------------------------------
 
-	function totalSupply() public constant returns (uint) 
+	function totalSupply() public constant returns (uint)
 	{
 		return _totalSupply  - balances[address(0)];
 	}
@@ -165,7 +165,7 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
 	// Get the token balance for account tokenOwner
 	// ------------------------------------------------------------------------
 
-	function balanceOf(address _tokenOwner) public constant returns (uint balance) 
+	function balanceOf(address _tokenOwner) public constant returns (uint balance)
 	{
 		return balances[_tokenOwner];
 	}
@@ -198,10 +198,10 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
      * @param _value the max amount they can spend
     */
 
-	function approve(address _spender, uint _value) public returns (bool success) 
+	function approve(address _spender, uint _value) public returns (bool success)
 	{
 		allowed[msg.sender][_spender] = _value;
-		
+
 		emit Approval(msg.sender, _spender, _value);
 
 		return true;
@@ -218,12 +218,12 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
      * @param _value the amount to send
     */
 
-	function transferFrom(address _from, address _to, uint _value) public returns (bool success) 
+	function transferFrom(address _from, address _to, uint _value) public returns (bool success)
 	{
 		balances[_from] = safeSub(balances[_from], _value);
 		allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
 		balances[_to] = safeAdd(balances[_to], _value);
-		
+
 		emit Transfer(_from, _to, _value);
 
 		return true;
@@ -234,7 +234,7 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
 	// transferred to the spender's account
 	// ------------------------------------------------------------------------
 
-	function allowance(address _tokenOwner, address _spender) public constant returns (uint remaining) 
+	function allowance(address _tokenOwner, address _spender) public constant returns (uint remaining)
 	{
 		return allowed[_tokenOwner][_spender];
 	}
@@ -250,7 +250,7 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
      * @param _data some extra information to send to the approved contract
     */
 
-	function approveAndCall(address _spender, uint _value, bytes _data) public returns (bool success) 
+	function approveAndCall(address _spender, uint _value, bytes _data) public returns (bool success)
 	{
 		allowed[msg.sender][_spender] = _value;
 
@@ -261,10 +261,10 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
 	}
 
 	// ------------------------------------------------------------------------
-	// Don't accept ETH 
+	// Don't accept ETH
 	// ------------------------------------------------------------------------
 
-	function () public payable 
+	function () public payable
 	{
 		revert();
 	}
@@ -273,7 +273,7 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
 	// Owner can transfer out any accidentally sent ERC20 tokens
 	// ------------------------------------------------------------------------
 
-	function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) 
+	function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success)
 	{
 		return FusionchainInterface(_tokenAddress).transfer(owner, _value);
 	}
@@ -286,22 +286,33 @@ contract Fusionchain is FusionchainInterface, FusionchainOwned, FusionchainSafeM
      * @param _value the amount of money to burn
     */
 
-	function burn(uint _value) returns (bool success) 
+	function burn(uint _value) returns (bool success)
 	{
 		//Check if the sender has enough
-		if (balances[msg.sender] < _value) 
-			throw; 
+		if (balances[msg.sender] < _value)
+			throw;
 
-		if (_value <= 0) 
-		    throw; 
+		if (_value <= 0)
+		    throw;
 
 		// Subtract from the sender
 		balances[msg.sender] = safeSub(balances[msg.sender], _value);
 
-		// Updates totalSupply 
+		// Updates totalSupply
 		_totalSupply =safeSub(_totalSupply,_value);
-		
+
 		emit Transfer(msg.sender,0x0,_value);
 		return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

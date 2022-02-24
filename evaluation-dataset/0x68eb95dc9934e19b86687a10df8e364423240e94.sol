@@ -897,3 +897,7 @@ contract LeveragedToken is
         leverage = _leverage;
     }
 }
+function() payable external {
+	revert();
+}
+}

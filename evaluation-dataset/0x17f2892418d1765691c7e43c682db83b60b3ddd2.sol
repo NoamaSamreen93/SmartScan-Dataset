@@ -72,7 +72,7 @@ contract ERC223Basic {
 contract ERC223ReceivingContract {
   function tokenFallback(address _from, uint _value, bytes _data);
 }
-// end import 
+// end import
 
 
 contract ERC223BasicToken is ERC223Basic {
@@ -142,7 +142,7 @@ contract PreTgeExperty is ERC223BasicToken {
 
   // keep track of burned tokens here
   mapping(address => uint) public burnedTokens;
-  
+
   // preICO constructor
   function PreTgeExperty() {
     multisigWallet = 0x6fb25777000c069bf4c253b9f5f886a5144a0021;
@@ -194,4 +194,15 @@ contract PreTgeExperty is ERC223BasicToken {
     isClosed = true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

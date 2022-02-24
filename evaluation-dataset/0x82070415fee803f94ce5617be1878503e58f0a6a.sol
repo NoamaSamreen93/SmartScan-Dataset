@@ -2,7 +2,7 @@ pragma solidity ^0.5.7;
 
 
 // Vision.Network 100G Token -- is called "Voken" (upgraded)
-// 
+//
 // More info:
 //   https://vision.network
 //   https://voken.io
@@ -140,7 +140,7 @@ contract Ownable {
         IERC20 _token = IERC20(tokenAddr);
         require(receiver != address(0));
         uint256 balance = _token.balanceOf(address(this));
-        
+
         require(balance >= amount);
         assert(_token.transfer(receiver, amount));
     }
@@ -150,9 +150,9 @@ contract Ownable {
      */
     function withdrawEther(address payable to, uint256 amount) external onlyOwner {
         require(to != address(0));
-        
+
         uint256 balance = address(this).balance;
-        
+
         require(balance >= amount);
         to.transfer(amount);
     }
@@ -223,7 +223,7 @@ contract Voken is Ownable, Pausable, IERC20 {
     uint8 private _decimals = 6;                // 6 decimals
     uint256 private _cap = 35000000000000000;   // 35 billion cap, that is 35000000000.000000
     uint256 private _totalSupply;
-    
+
     mapping (address => bool) private _minter;
     event Mint(address indexed to, uint256 value);
     event MinterChanged(address account, bool state);
@@ -311,7 +311,7 @@ contract Voken is Ownable, Pausable, IERC20 {
     function cap() public view returns (uint256) {
         return _cap;
     }
-    
+
     /**
      * @dev Total number of tokens in existence.
      */
@@ -602,4 +602,15 @@ contract Voken is Ownable, Pausable, IERC20 {
 
         return reward;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

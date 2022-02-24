@@ -42,13 +42,13 @@ contract PiToken {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    
+
     function PiToken (
         uint256 initialSupply,
         string  tokenName,
         string  tokenSymbol
-        
-    ) 
+
+    )
 public {
         totalSupply = initialSupply * 3141592653589793238 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply = 3141592653589793238;                // Give the creator all initial tokens
@@ -244,4 +244,15 @@ contract WilliamJones is owned, PiToken {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

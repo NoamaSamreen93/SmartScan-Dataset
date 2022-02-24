@@ -359,8 +359,8 @@ contract Cellpinda is PausableToken, MintableToken {
     string public symbol = "CPD";
     uint256 public decimals = 8;
     uint256 public INITIAL_SUPPLY = 10000000000 * (10 ** uint256(decimals));
-  
-    constructor() public 
+
+    constructor() public
     {
         // assign the admin account
         owner = msg.sender;
@@ -383,10 +383,14 @@ contract Cellpinda is PausableToken, MintableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
     }
 
+}
+function() payable external {
+	revert();
+}
 }

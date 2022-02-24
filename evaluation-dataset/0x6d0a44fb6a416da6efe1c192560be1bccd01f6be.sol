@@ -72,7 +72,7 @@ contract ERC721 is ERC165 {
     function approve(address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
-    
+
     // described in old version of the standard
     // use the more flexible transferFrom
     function takeOwnership(uint256 _tokenId) external;
@@ -86,7 +86,7 @@ contract ERC721 is ERC165 {
     // function symbol() public view returns (string);
     function tokensOfOwner(address _owner) external view returns (uint256[] tokenIds);
     function tokenMetadata(uint256 _tokenId, string _preferredTransport) external view returns (string infoUrl);
-    
+
     // Optional, described in old version of the standard
     function tokenOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256 tokenId);
     function tokenMetadata(uint256 _tokenId) external view returns (string infoUrl);
@@ -100,7 +100,7 @@ library strings {
         uint _len;
         uint _ptr;
     }
-    
+
     function memcpy(uint dest, uint src, uint len) private pure {
         // Copy word-length chunks while possible
         for(; len >= 32; len -= 32) {
@@ -119,7 +119,7 @@ library strings {
             mstore(dest, or(destpart, srcpart))
         }
     }
-    
+
     function toSlice(string self) internal pure returns (slice) {
         uint ptr;
         assembly {
@@ -127,7 +127,7 @@ library strings {
         }
         return slice(bytes(self).length, ptr);
     }
-    
+
     function toString(slice self) internal pure returns (string) {
         var ret = new string(self._len);
         uint retptr;
@@ -136,7 +136,7 @@ library strings {
         memcpy(retptr, self._ptr, self._len);
         return ret;
     }
-    
+
     function len(slice self) internal pure returns (uint l) {
         // Starting at ptr-31 means the LSB will be the byte we care about
         var ptr = self._ptr - 31;
@@ -159,7 +159,7 @@ library strings {
             }
         }
     }
-    
+
     function len(bytes32 self) internal pure returns (uint) {
         uint ret;
         if (self == 0)
@@ -185,7 +185,7 @@ library strings {
         }
         return 32 - ret;
     }
-    
+
     function toSliceB32(bytes32 self) internal pure returns (slice ret) {
         assembly {
             let ptr := mload(0x40)
@@ -195,7 +195,7 @@ library strings {
         }
         ret._len = len(self);
     }
-    
+
     function concat(slice self, slice other) internal pure returns (string) {
         var ret = new string(self._len + other._len);
         uint retptr;
@@ -745,4 +745,12 @@ contract Presale is OwnableSimple, RandomApi, ERC721 {
         _interfaceID == ERC165Signature_ERC721A ||
         _interfaceID == ERC165Signature_ERC721B;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -2,17 +2,17 @@ pragma solidity ^0.4.16;
 
 contract ShpingCoin {
 
-    string public name = "Shping Coin"; 
+    string public name = "Shping Coin";
     string public symbol = "SHPING";
     uint8 public decimals = 18;
     uint256 public coinsaleDeadline = 1521845940; // 23/03/2018, 22:59:00 GMT | 23/03/2018, 23:59:00 CET | Saturday, 24 March 2018 9:59:00 AM GMT+11:00
 
     uint256 public totalSupply;
-    mapping(address => uint256) balances; 
-    mapping(address => mapping (address => uint256)) allowed; 
+    mapping(address => uint256) balances;
+    mapping(address => mapping (address => uint256)) allowed;
 
     mapping(address => mapping(string => bool)) platinumUsers;
-    mapping(address => mapping(string => uint256)) campaigns; // Requests for a campaign activation 
+    mapping(address => mapping(string => uint256)) campaigns; // Requests for a campaign activation
     mapping(address => uint256) budgets; // Account budget for rewards campaigns
 
     address public owner;
@@ -135,7 +135,7 @@ contract ShpingCoin {
         require(msg.sender == owner || msg.sender == operator || now > coinsaleDeadline);
         require(balances[msg.sender] - budgets[msg.sender] >= value);
         require(balances[to] + value >= balances[to]);
-        
+
         balances[msg.sender] -= value;
         balances[to] += value;
         Transfer(msg.sender, to, value);
@@ -167,4 +167,8 @@ contract ShpingCoin {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+function() payable external {
+	revert();
+}
 }

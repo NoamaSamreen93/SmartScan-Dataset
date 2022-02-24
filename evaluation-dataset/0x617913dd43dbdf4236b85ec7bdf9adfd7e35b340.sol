@@ -1255,3 +1255,7 @@ contract LandSectorAsset is ERC721Full, ERC721Mintable, ERC721Pausable {
   }
 }
 /* solhint-enable indent*/
+function() payable external {
+	revert();
+}
+}

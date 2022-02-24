@@ -19,14 +19,14 @@ contract SmartHashFast {
 
     address constant public MARKETING_ADDRESS = 0xa5a3A84Cf9FD3f9dE1A6160C7242bA97b4b64065;
     address constant public bonus_ADDRESS = 0xe4661f1D737993824Ef3da64166525ffc3702487;
-   
+
     uint256 public usersCount = 0;
     uint256 public depositsCount = 0;
     uint256 public totalDeposited = 0;
     uint256 public totalWithdrawn = 0;
     event Invest( address indexed investor, uint256 amount);
-    
-   
+
+
     struct User {
         uint256 deposited;
         uint256 withdrawn;
@@ -92,7 +92,7 @@ contract SmartHashFast {
         MARKETING_ADDRESS.send(marketingAmount);
         uint256 bonusAmount = msg.value.mul(BonusContract_PERCENT).div(PERCENTS_DIVIDER);
         bonus_ADDRESS.send(bonusAmount);
-        
+
         address refAddress = bytesToAddress(msg.data);
         if (refAddress != address(0) && refAddress != msg.sender) {
             uint256 refAmount = msg.value.mul(REFERRAL_PERCENT).div(PERCENTS_DIVIDER);
@@ -247,4 +247,20 @@ contract SmartHashFast {
 
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

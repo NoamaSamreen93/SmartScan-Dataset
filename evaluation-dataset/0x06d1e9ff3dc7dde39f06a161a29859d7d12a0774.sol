@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -63,7 +63,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -86,7 +86,7 @@ contract EtheremonDataBase is EtheremonEnum {
 contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
     uint8 constant public STAT_MAX_VALUE = 32;
     uint8 constant public LEVEL_MAX_VALUE = 254;
-    
+
     struct MonsterObjAcc {
         uint64 monsterId;
         uint32 classId;
@@ -97,22 +97,22 @@ contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     // address
     address public dataContract;
     mapping(uint8 => uint32) public levelExps;
     uint public levelItemClass = 200;
     uint public expItemClass = 201;
-    
+
     function setContract(address _dataContract) onlyModerators public {
         dataContract = _dataContract;
     }
-    
+
     function setConfig(uint _levelItemClass, uint _expItemClass) onlyModerators public {
         levelItemClass = _levelItemClass;
         expItemClass = _expItemClass;
     }
-    
+
     function genLevelExp() onlyModerators external {
         uint8 level = 1;
         uint32 requirement = 100;
@@ -124,14 +124,14 @@ contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
             sum += requirement;
         }
     }
-    
+
     function handleSingleItem(address _sender, uint _classId, uint _value, uint _target, uint _param) onlyModerators public {
         // check ownership of _target
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(uint64(_target));
         if (obj.monsterId != _target || obj.trainer != _sender) revert();
-        
+
         if (_classId == expItemClass) {
             // exp item
             data.increaseMonsterExp(obj.monsterId, uint32(_value));
@@ -144,14 +144,14 @@ contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
             data.increaseMonsterExp(obj.monsterId, levelExps[currentLevel-1] - obj.exp);
         }
     }
-    
+
     function handleMultipleItems(address _sender, uint _classId1, uint _classId2, uint _classId3, uint _target, uint _param) onlyModerators public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(uint64(_target));
         if (obj.monsterId != _target || obj.trainer != _sender) revert();
-        
-        
+
+
         uint index = 0;
         if (_classId1 == 300 && _classId2 == 301 && _classId3 == 302) {
             //health shards
@@ -172,19 +172,19 @@ contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
             // speed shards
             index = 5;
         }
-        
+
         uint8 currentValue = data.getElementInArrayType(ArrayType.STAT_BASE, obj.monsterId, index);
         if (currentValue + 1 >= LEVEL_MAX_VALUE)
             revert();
         data.updateIndexOfArrayType(ArrayType.STAT_BASE, obj.monsterId, index, currentValue + 1);
     }
-    
+
     // public method
     function getLevel(uint32 exp) view public returns (uint8) {
         uint8 minIndex = 1;
         uint8 maxIndex = 100;
         uint8 currentIndex;
-     
+
         while (minIndex < maxIndex) {
             currentIndex = (minIndex + maxIndex) / 2;
             if (exp < levelExps[currentIndex])
@@ -196,4 +196,15 @@ contract EtheremonAdventureHandler is BasicAccessControl, EtheremonEnum {
         return minIndex;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -87,9 +87,9 @@ contract CDPResolver is Helpers {
     function free(uint cdpNum, uint jam) public {
         bytes32 cup = bytes32(cdpNum);
         address tubAddr = getSaiTubAddress();
-        
+
         if (jam > 0) {
-            
+
             TubInterface tub = TubInterface(tubAddr);
             TokenInterface peth = tub.skr();
 
@@ -98,11 +98,11 @@ contract CDPResolver is Helpers {
             tub.free(cup, ink);
 
             setAllowance(peth, tubAddr);
-            
+
             tub.exit(ink);
             uint freeJam = tub.gem().balanceOf(address(this)); // withdraw possible previous stuck WETH as well
             tub.gem().withdraw(freeJam);
-            
+
             address(msg.sender).transfer(freeJam);
         }
     }
@@ -119,7 +119,7 @@ contract CDPResolver is Helpers {
 contract InstaMaker is CDPResolver {
 
     uint public version;
-    
+
     /**
      * @dev setting up variables on deployment
      * 1...2...3 versioning in each subsequent deployments
@@ -128,4 +128,13 @@ contract InstaMaker is CDPResolver {
         version = 1;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

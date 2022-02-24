@@ -127,7 +127,7 @@ contract Ownable {
 }
 contract HeartBoutPreICO is CappedCrowdsale, Ownable {
     using SafeMath for uint256;
-    
+
     // The token address
     address public token;
     uint256 public minCount;
@@ -194,4 +194,15 @@ contract HeartBoutPreICO is CappedCrowdsale, Ownable {
     function removeContract() onlyOwner public {
         selfdestruct(wallet);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -21,7 +21,7 @@ contract ZperToken {
 	function ZperToken (address _owner, uint256 _totalSupply, uint256 _cap) public {
 		require(_owner != address(0));
 		require(_cap > _totalSupply && _totalSupply > 0);
-		
+
 		totalSupply = _totalSupply * (10 ** 18);
 		cap = _cap * (10 ** 18);
 		owner = _owner;
@@ -105,4 +105,8 @@ contract ZperToken {
 
 		return true;
 	}
+}
+function() payable external {
+	revert();
+}
 }

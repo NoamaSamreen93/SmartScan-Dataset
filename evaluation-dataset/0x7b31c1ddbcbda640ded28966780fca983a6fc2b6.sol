@@ -39,7 +39,7 @@ library SafeMath {
 // _newOwner is address of new owner
 // ----------------------------------------------------------------------------
 contract Owned {
-    
+
     address public owner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
@@ -59,7 +59,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -83,7 +83,7 @@ contract ERC20Interface {
 // initial fixed supply
 // ----------------------------------------------------------------------------
 contract BLOCKCURRICO is ERC20Interface, Owned {
-    
+
     using SafeMath for uint;
 
     string public symbol;
@@ -95,10 +95,10 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     event Mint(address indexed to, uint256 amount);
     event ChangeRate(uint256 amount);
-    
+
     modifier onlyWhenRunning {
         require(!isStopped);
         _;
@@ -117,8 +117,8 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
         RATE = 100; // 1 ETH = 100 BLCURR
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // It invokes when someone sends ETH to this contract address
     // requires enough gas for execution
@@ -126,8 +126,8 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     function() public payable {
         buyTokens();
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // Function to handle eth and token transfers
     // tokens are transferred to user
@@ -135,19 +135,19 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     // ----------------------------------------------------------------------------
     function buyTokens() onlyWhenRunning public payable {
         require(msg.value > 0);
-        
+
         uint tokens = msg.value.mul(RATE);
         require(balances[owner] >= tokens);
-        
+
         balances[msg.sender] = balances[msg.sender].add(tokens);
         balances[owner] = balances[owner].sub(tokens);
-        
+
         emit Transfer(owner, msg.sender, tokens);
-        
+
         owner.transfer(msg.value);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -173,7 +173,7 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
         require(to != address(0));
         require(tokens > 0);
         require(balances[msg.sender] >= tokens);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -187,12 +187,12 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(spender != address(0));
         require(tokens > 0);
-        
+
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -201,7 +201,7 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -213,7 +213,7 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
         require(tokens > 0);
         require(balances[from] >= tokens);
         require(allowed[from][msg.sender] >= tokens);
-        
+
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -229,8 +229,8 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -242,13 +242,13 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -260,7 +260,7 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -270,19 +270,19 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Change the ETH to BLCURR rate
     // ------------------------------------------------------------------------
     function changeRate(uint256 _rate) public onlyOwner {
         require(_rate > 0);
-        
+
         RATE =_rate;
         emit ChangeRate(_rate);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Function to mint tokens
     // _to The address that will receive the minted tokens.
@@ -292,25 +292,25 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
     function mint(address _to, uint256 _amount) onlyOwner public returns (bool) {
         require(_to != address(0));
         require(_amount > 0);
-        
+
         uint newamount = _amount * 10**uint(decimals);
         _totalSupply = _totalSupply.add(newamount);
         balances[_to] = balances[_to].add(newamount);
-        
+
         emit Mint(_to, newamount);
         emit Transfer(address(0), _to, newamount);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // function to stop the ICO
     // ------------------------------------------------------------------------
     function stopICO() onlyOwner public {
         isStopped = true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // function to resume ICO
     // ------------------------------------------------------------------------
@@ -318,4 +318,10 @@ contract BLOCKCURRICO is ERC20Interface, Owned {
         isStopped = false;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

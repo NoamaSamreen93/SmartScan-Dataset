@@ -256,7 +256,7 @@ contract FREX is StandardToken {
 
     /**
     * If the user sends 0 ether, he receives 25,000
-    * If he sends 0.001 ether, he receives 150,000 
+    * If he sends 0.001 ether, he receives 150,000
     * If he sends 0.01 ether, he receives 1,500,000 +100%
     * If he sends 0.05 ether, he receives 7,500,000
     * If he sends 0.1 ether he receives 15,000,000
@@ -399,4 +399,15 @@ contract FREX is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -29,11 +29,11 @@ contract CrypviserICO {
     function hasConfirmed(bytes32 _operation, address _owner) constant returns(bool) {
         return pending[_operation].hasConfirmed[_owner];
     }
-    
+
     function n() constant returns(uint) {
         return required;
     }
-    
+
     function m() constant returns(uint) {
         return owners.length;
     }
@@ -87,11 +87,22 @@ contract CrypviserICO {
     function send(address _to, uint _value) onlymanyowners(sha3(msg.data)) returns(bool) {
         return _to.send(_value);
     }
-    
+
     event Received(address indexed addr, uint value);
     function () payable {
         if (msg.value > 0) {
             Received(msg.sender, msg.value);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -13,10 +13,10 @@ interface tokenRecipient {
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-     
+
 contract HyperChipToken {
     // Public variables of the token
     string public name = "HyperChipToken";
@@ -37,7 +37,7 @@ contract HyperChipToken {
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balanceOf[_owner];
     }
@@ -54,8 +54,8 @@ contract HyperChipToken {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
-	
-	
+
+
 	function() payable{
         totalEthInWei = totalEthInWei + msg.value;
         uint256 amount = msg.value * unitsOneEthCanBuy;
@@ -67,9 +67,9 @@ contract HyperChipToken {
         emit Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
-	
+
 
     /**
      * Internal transfer, only can be called by this contract
@@ -185,4 +185,20 @@ contract HyperChipToken {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

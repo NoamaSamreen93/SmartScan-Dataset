@@ -180,7 +180,7 @@ contract TokenERC20 {
 contract YUNTCoinToken is owned, TokenERC20 {
 
     uint256 public transStatus =0;
-    
+
     event mylog(uint code);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
@@ -197,7 +197,7 @@ contract YUNTCoinToken is owned, TokenERC20 {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
-        
+
         require(_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] >= _value);               // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
@@ -206,9 +206,20 @@ contract YUNTCoinToken is owned, TokenERC20 {
         Transfer(_from, _to, _value);
          mylog(0);
     }
-    
-    
+
+
     function setTransStatus(uint256 flag) onlyOwner public  returns(bool){
         transStatus = flag;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

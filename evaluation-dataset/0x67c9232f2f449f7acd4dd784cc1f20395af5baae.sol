@@ -106,7 +106,7 @@ contract ERC20 is ERC20Basic {
 
 
 contract Drainable is Ownable {
-	function withdrawToken(address tokenaddr) 
+	function withdrawToken(address tokenaddr)
 		onlyOwner
 		public
 	{
@@ -115,7 +115,7 @@ contract Drainable is Ownable {
 		token.transfer(msg.sender, bal);
 	}
 
-	function withdrawEther() 
+	function withdrawEther()
 		onlyOwner
 		public
 	{
@@ -140,11 +140,11 @@ contract ADXExchangeInterface {
 	function deposit(uint _amount) public;
 	function withdraw(uint _amount) public;
 
-	// constants 
-	function getBid(bytes32 _bidId) 
-		constant external 
+	// constants
+	function getBid(bytes32 _bidId)
+		constant external
 		returns (
-			uint, uint, uint, uint, uint, 
+			uint, uint, uint, uint, uint,
 			// advertiser (advertiser, ad unit, confiration)
 			address, bytes32, bytes32,
 			// publisher (publisher, ad slot, confirmation)
@@ -173,14 +173,14 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
  	mapping (address => uint) balances;
 
  	// escrowed on bids
- 	mapping (address => uint) onBids; 
+ 	mapping (address => uint) onBids;
 
  	// bid info
 	mapping (bytes32 => Bid) bids;
 	mapping (bytes32 => BidState) bidStates;
 
 
-	enum BidState { 
+	enum BidState {
 		DoesNotExist, // default state
 
 		// There is no 'Open' state - the Open state is just a signed message that you're willing to place such a bid
@@ -219,7 +219,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		bytes32 advertiserConfirmation;
 	}
 
-	// Schema hash 
+	// Schema hash
 	// keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this)
 	bytes32 constant public SCHEMA_HASH = keccak256(
 		"address Advertiser",
@@ -259,7 +259,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 	//
 	// Bid actions
-	// 
+	//
 
 	// the bid is accepted by the publisher
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s, uint8 sigMode)
@@ -277,7 +277,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
 		require(didSign(_advertiser, bidId, v, r, s, sigMode));
-		
+
 		// advertier and publisher cannot be the same
 		require(_advertiser != msg.sender);
 
@@ -335,7 +335,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		bidStates[_bidId] = BidState.Canceled;
 
 		onBids[bid.advertiser] -= bid.amount;
-	
+
 		LogBidCanceled(_bidId);
 	}
 
@@ -417,7 +417,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		returns (bool)
 	{
 		bytes32 message = hash;
-		
+
 		if (mode == 1) {
 			// Geth mode
 			message = keccak256("\x19Ethereum Signed Message:\n32", hash);
@@ -432,11 +432,11 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	//
 	// Public constant functions
 	//
-	function getBid(bytes32 _bidId) 
+	function getBid(bytes32 _bidId)
 		constant
 		external
 		returns (
-			uint, uint, uint, uint, uint, 
+			uint, uint, uint, uint, uint,
 			// advertiser (advertiser, ad unit, confiration)
 			address, bytes32, bytes32,
 			// publisher (publisher, ad slot, confirmation)
@@ -468,5 +468,21 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 			SCHEMA_HASH,
 			keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this)
 		);
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

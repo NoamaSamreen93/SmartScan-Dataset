@@ -5,7 +5,7 @@ pragma solidity 0.4.23;
 interface EthPriceFeedI {
     function updateRate(uint256 _weiPerUnitRate) external;
     function getRate() external view returns(uint256);
-    function getLastTimeUpdated() external view returns(uint256); 
+    function getLastTimeUpdated() external view returns(uint256);
 }
 
 // File: contracts/interfaces/ReadableI.sol
@@ -118,7 +118,7 @@ contract Ownable {
 
 contract MakerDAOPriceFeed is Ownable, EthPriceFeedI {
     using SafeMath for uint256;
-    
+
     uint256 public constant RATE_THRESHOLD_PERCENTAGE = 10;
     uint256 public constant MAKERDAO_FEED_MULTIPLIER = 10**36;
 
@@ -126,8 +126,8 @@ contract MakerDAOPriceFeed is Ownable, EthPriceFeedI {
 
     uint256 private weiPerUnitRate;
 
-    uint256 private lastTimeUpdated; 
-    
+    uint256 private lastTimeUpdated;
+
     event RateUpdated(uint256 _newRate, uint256 _timeUpdated);
 
     modifier isValidRate(uint256 _weiPerUnitRate) {
@@ -142,31 +142,31 @@ contract MakerDAOPriceFeed is Ownable, EthPriceFeedI {
         weiPerUnitRate = convertToRate(_makerDAOMedianizer.read());
         lastTimeUpdated = now;
     }
-    
+
     /// @dev Receives rate from outside oracle
     /// @param _weiPerUnitRate calculated off chain and received to the contract
-    function updateRate(uint256 _weiPerUnitRate) 
-        external 
+    function updateRate(uint256 _weiPerUnitRate)
+        external
         onlyOwner
         isValidRate(_weiPerUnitRate)
     {
         weiPerUnitRate = _weiPerUnitRate;
 
-        lastTimeUpdated = now; 
+        lastTimeUpdated = now;
 
         emit RateUpdated(_weiPerUnitRate, now);
     }
 
     /// @dev View function to see the rate stored in the contract.
-    function getRate() 
-        public 
-        view 
+    function getRate()
+        public
+        view
         returns(uint256)
     {
-        return weiPerUnitRate; 
+        return weiPerUnitRate;
     }
 
-    /// @dev View function to see that last time that the rate was updated. 
+    /// @dev View function to see that last time that the rate was updated.
     function getLastTimeUpdated()
         public
         view
@@ -194,4 +194,15 @@ contract MakerDAOPriceFeed is Ownable, EthPriceFeedI {
         uint256 value = uint256(_fromMedianizer);
         return MAKERDAO_FEED_MULTIPLIER.div(value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

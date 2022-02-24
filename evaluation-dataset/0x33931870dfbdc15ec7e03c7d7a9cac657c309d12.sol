@@ -4,7 +4,7 @@ pragma solidity ^0.5;
  * @title ERC20 token
  *
  */
- 
+
  /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -26,7 +26,7 @@ interface IERC20 {
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 library SafeMath {
     /**
     * @dev Multiplies two numbers, reverts on overflow.
@@ -150,7 +150,7 @@ contract ERC20 is IERC20 {
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
      * @param owner address The address which owns the funds.
@@ -252,4 +252,15 @@ contract ERC20 is IERC20 {
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

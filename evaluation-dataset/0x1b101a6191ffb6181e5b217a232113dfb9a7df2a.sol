@@ -83,7 +83,7 @@ contract BirdFeeder is Ownable {
 
    constructor() public{
    }
-   
+
    // fallback
    function() external payable {
 
@@ -93,35 +93,46 @@ contract BirdFeeder is Ownable {
 
       // pass #1
       for (uint i=0; i<8; i++) {
-        
+
         // see if lowest needs updating
         if(contributors[top8[i]] <= lowestAmount) {
-            
+
             lowestAmount = contributors[top8[i]];
             lowest = i;
-        }    
-        
+        }
+
         // if user is already in top 8, we're done
         if(top8[i]==msg.sender){
             insert=false;
         }
-        
+
       }
-      
+
       if(contributors[top8[lowest]] < contributors[msg.sender] && insert){
-        top8[lowest] = msg.sender; // replace the lowest memeber with 
+        top8[lowest] = msg.sender; // replace the lowest memeber with
         lowestAmount = contributors[msg.sender];
       }
       // lets just say the most recent is the lowest now
       // we'll correct that assumption before doing anything with it.
    }
-   
+
    function dispense(address payable dst, uint sum) external onlyOwner {
        dst.transfer(sum);
    }
-   
+
    function getBalance() public view returns (uint){
        return address(this).balance;
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

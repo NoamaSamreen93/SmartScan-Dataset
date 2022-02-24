@@ -101,7 +101,7 @@ contract BaseTokenVesting is Ownable() {
 		uint _cliff,
 		uint _vestingPeriod,
 		address _token
-	) internal 
+	) internal
 	{
         require(_benificiary != address(0), 'can not send to zero-address');
 
@@ -129,7 +129,7 @@ contract BaseTokenVesting is Ownable() {
     function vestedAmount() public view returns (uint _amount);
 }
 contract TokenVestingWithFloatingPercent is BaseTokenVesting {
-	
+
     uint[] public periodPercents;
 
     constructor(
@@ -138,9 +138,9 @@ contract TokenVestingWithFloatingPercent is BaseTokenVesting {
         uint _vestingPeriod,
         address _tokenAddress,
         uint[] _periodPercents
-    ) 
+    )
         BaseTokenVesting(_benificiary, _cliff, _vestingPeriod, _tokenAddress)
-        public 
+        public
     {
         uint sum = 0;
         for (uint i = 0; i < _periodPercents.length; i++) {
@@ -158,7 +158,7 @@ contract TokenVestingWithFloatingPercent is BaseTokenVesting {
         require(unreleased > 0, 'released amount has to be greter than zero');
         require(token.transfer(beneficiary, unreleased), 'revert on transfer failure');
         released = released.add(unreleased);
-        emit Released(unreleased);	
+        emit Released(unreleased);
     }
 
     function releasableAmount() public view returns (uint _amount) {
@@ -189,4 +189,12 @@ contract TokenVestingWithFloatingPercent is BaseTokenVesting {
         }
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -74,14 +74,14 @@ contract CardBase is Governable {
     }
 
     Card[] public cards;
-    
+
 }
 
 contract CardProto is CardBase {
 
     event NewProtoCard(
-        uint16 id, uint8 season, uint8 god, 
-        Rarity rarity, uint8 mana, uint8 attack, 
+        uint16 id, uint8 season, uint8 god,
+        Rarity rarity, uint8 mana, uint8 attack,
         uint8 health, uint8 cardType, uint8 tribe, bool packable
     );
 
@@ -134,7 +134,7 @@ contract CardProto is CardBase {
 
     function nextSeason() public onlyGovernor {
         //Seasons shouldn't go to 0 if there is more than the uint8 should hold, the governor should know this ¯\_(ツ)_/¯ -M
-        require(currentSeason <= 255); 
+        require(currentSeason <= 255);
 
         currentSeason++;
         mythic.length = 0;
@@ -148,7 +148,7 @@ contract CardProto is CardBase {
         Common,
         Rare,
         Epic,
-        Legendary, 
+        Legendary,
         Mythic
     }
 
@@ -176,7 +176,7 @@ contract CardProto is CardBase {
     // rather than 1 byte per instance
 
     uint16 public protoCount;
-    
+
     mapping(uint16 => ProtoCard) protos;
 
     uint16[] public mythic;
@@ -186,7 +186,7 @@ contract CardProto is CardBase {
     uint16[] public common;
 
     function addProtos(
-        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks, 
+        uint16[] externalIDs, uint8[] gods, Rarity[] rarities, uint8[] manas, uint8[] attacks,
         uint8[] healths, uint8[] cardTypes, uint8[] tribes, bool[] packable
     ) public onlyGovernor returns(uint16) {
 
@@ -206,7 +206,7 @@ contract CardProto is CardBase {
 
             _addProto(externalIDs[i], card, packable[i]);
         }
-        
+
     }
 
     function addProto(
@@ -293,8 +293,8 @@ contract CardProto is CardBase {
         protoCount++;
 
         emit NewProtoCard(
-            externalID, currentSeason, card.god, 
-            card.rarity, card.mana, card.attack, 
+            externalID, currentSeason, card.god,
+            card.rarity, card.mana, card.attack,
             card.health, card.cardType, card.tribe, packable
         );
 
@@ -448,7 +448,7 @@ contract Ownable {
 }
 
 contract Pausable is Ownable {
-    
+
     event Pause();
     event Unpause();
 
@@ -619,7 +619,7 @@ contract AuctionPack is CardPackFour, Pausable {
     Auction[] auctions;
 
     constructor(MigrationInterface _migration) public CardPackFour(_migration) {
-        
+
     }
 
     function getAuction(uint id) public view returns (
@@ -639,14 +639,14 @@ contract AuctionPack is CardPackFour, Pausable {
         require(auctions.length > id);
         Auction memory a = auctions[id];
         return (
-            a.status, a.proto, a.purity, a.highestBid, 
-            a.highestBidder, a.start, a.length, a.bonusProto, 
+            a.status, a.proto, a.purity, a.highestBid,
+            a.highestBidder, a.start, a.length, a.bonusProto,
             a.bonusPurity, a.bufferPeriod, a.minIncreasePercent, a.beneficiary
         );
     }
 
     function createAuction(
-        address beneficiary, uint16 proto, uint16 purity, 
+        address beneficiary, uint16 proto, uint16 purity,
         uint minBid, uint64 length, uint16 bonusProto, uint16 bonusPurity,
         uint64 bufferPeriod, uint minIncrease
     ) public onlyOwner whenNotPaused returns (uint) {
@@ -685,8 +685,8 @@ contract AuctionPack is CardPackFour, Pausable {
     }
 
     // dummy implementation to support interface
-    function purchase(uint16, address) public payable { 
-        
+    function purchase(uint16, address) public payable {
+
     }
 
     function getMinBid(uint id) public view returns (uint) {
@@ -694,7 +694,7 @@ contract AuctionPack is CardPackFour, Pausable {
         Auction memory auction = auctions[id];
 
         uint highest = auction.highestBid;
-        
+
         // calculate one percent of the number
         // highest will always be >= 100
         uint numerator = highest.div(100);
@@ -718,17 +718,17 @@ contract AuctionPack is CardPackFour, Pausable {
         require(end >= block.number);
 
         uint threshold = getMinBid(id);
-        
+
         require(msg.value >= threshold);
 
-        
+
         // if within the buffer period of the auction
         // extend to the buffer period of blocks
 
         uint64 differenceToEnd = end.sub(uint64(block.number));
 
         if (auction.bufferPeriod > differenceToEnd) {
-            
+
             // extend the auction period to be at least the buffer period
             uint64 toAdd = auction.bufferPeriod.sub(differenceToEnd);
 
@@ -744,7 +744,7 @@ contract AuctionPack is CardPackFour, Pausable {
             // let's just go with the safe option rather than using send(): probably fine but no loss
             owed[auction.highestBidder] = owed[auction.highestBidder].add(auction.highestBid);
 
-            // give the previous bidder their bonus/consolation card 
+            // give the previous bidder their bonus/consolation card
             if (auction.bonusProto != 0) {
                 uint cardID = migration.createCard(auction.highestBidder, auction.bonusProto, auction.bonusPurity);
                 emit Bonus(id, cardID, auction.highestBidder, auction.bonusProto, auction.bonusPurity);
@@ -765,7 +765,7 @@ contract AuctionPack is CardPackFour, Pausable {
         require(block.number > end);
 
         require(auction.status == Status.Open);
-        
+
         auction.status = Status.Claimed;
 
         uint cardID = migration.createCard(auction.highestBidder, auction.proto, auction.purity);
@@ -788,5 +788,14 @@ contract AuctionPack is CardPackFour, Pausable {
     function getOwed(address user) public view returns (uint) {
         return owed[user];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

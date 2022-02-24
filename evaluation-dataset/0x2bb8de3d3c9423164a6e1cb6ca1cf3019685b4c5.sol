@@ -11,9 +11,9 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
-  } 
+  }
 }
 
 contract Token is Ownable{
@@ -47,9 +47,9 @@ contract StandardToken is Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
-        balances[_from] -= _value; 
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
-        Transfer(_from, _to, _value); 
+        Transfer(_from, _to, _value);
         return true;
     }
     function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -66,27 +66,27 @@ contract StandardToken is Token {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract WanChainToken is StandardToken { 
+contract WanChainToken is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;               
-    string public symbol; 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     uint256 public createTime;
     uint public releaseAmount = 350000000;
-    mapping(uint => bool) public releaseMapping; 
-     
+    mapping(uint => bool) public releaseMapping;
+
 
     function WanChainToken() {
-        balances[msg.sender] = 3000000000; 
-        totalSupply = 10000000000;         
-        name = "Wan Chain Token";                   
-        decimals = 1;           
-        symbol = "WLZJ";  
+        balances[msg.sender] = 3000000000;
+        totalSupply = 10000000000;
+        name = "Wan Chain Token";
+        decimals = 1;
+        symbol = "WLZJ";
         createTime = now;
     }
 
@@ -104,4 +104,15 @@ contract WanChainToken is StandardToken {
         releaseMapping[month] = true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

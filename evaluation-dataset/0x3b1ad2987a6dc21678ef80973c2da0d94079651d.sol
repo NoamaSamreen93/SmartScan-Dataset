@@ -151,7 +151,7 @@ contract UpgradeAgent {
  */
 contract UpgradeableToken is StandardToken {
 
-    /** Contract / person who can set the upgrade path. 
+    /** Contract / person who can set the upgrade path.
         This can be the same as team multisig wallet, as what it is with its default value. */
     address public upgradeMaster;
 
@@ -239,7 +239,7 @@ contract UpgradeableToken is StandardToken {
         upgradeAgent = UpgradeAgent(agent);
 
         // Bad interface
-        if (!upgradeAgent.isUpgradeAgent()) revert();      
+        if (!upgradeAgent.isUpgradeAgent()) revert();
 
         emit UpgradeAgentSet(upgradeAgent);
     }
@@ -311,11 +311,11 @@ contract ReleasableToken is ERC20, Ownable {
     /* The finalizer contract that allows unlift the transfer limits on this token */
     address public releaseAgent;
 
-    /** A crowdsale contract can release us to the wild if ICO success. 
+    /** A crowdsale contract can release us to the wild if ICO success.
         If false we are are in transfer lock up period.*/
     bool public released = false;
 
-    /** Map of agents that are allowed to transfer tokens regardless of the lock down period. 
+    /** Map of agents that are allowed to transfer tokens regardless of the lock down period.
         These are crowdsale contracts and possible the team multisig itself. */
     mapping (address => bool) public transferAgents;
 
@@ -353,7 +353,7 @@ contract ReleasableToken is ERC20, Ownable {
     /**
     * One way function to release the tokens to the wild.
     *
-    * Can be called only from the release agent that is the final ICO contract. 
+    * Can be called only from the release agent that is the final ICO contract.
     * It is only called if the crowdsale has been success (first milestone reached).
     */
     function releaseTokenTransfer() public onlyReleaseAgent {
@@ -469,9 +469,9 @@ contract MintableTokenExt is StandardToken, Ownable {
     }
 
     function setReservedTokensListMultiple(
-        address[] addrs, 
-        uint[] inTokens, 
-        uint[] inPercentageUnit, 
+        address[] addrs,
+        uint[] inTokens,
+        uint[] inPercentageUnit,
         uint[] inPercentageDecimals,
         bool[] isVested
         ) public canMint onlyOwner {
@@ -515,7 +515,7 @@ contract MintableTokenExt is StandardToken, Ownable {
         emit MintingAgentChanged(addr, state);
     }
 
-    function setReservedTokensList(address addr, uint inTokens, uint inPercentageUnit, uint inPercentageDecimals,bool isVested) 
+    function setReservedTokensList(address addr, uint inTokens, uint inPercentageUnit, uint inPercentageDecimals,bool isVested)
     private canMint onlyOwner {
         assert(addr != address(0));
         if (!isAddressReserved(addr)) {
@@ -570,10 +570,10 @@ contract CrowdsaleTokenExt is ReleasableToken, MintableTokenExt, UpgradeableToke
     * @param _symbol Token symbol - should be all caps
     * @param _initialSupply How many tokens we start with
     * @param _decimals Number of decimal places
-    * @param _mintable Are new tokens created over the crowdsale or do we distribute only the initial supply? 
+    * @param _mintable Are new tokens created over the crowdsale or do we distribute only the initial supply?
     * Note that when the token becomes transferable the minting always ends.
     */
-    constructor(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable, uint _globalMinCap) 
+    constructor(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable, uint _globalMinCap)
     public UpgradeableToken(msg.sender) {
 
         // Create any address, can be transferred
@@ -681,15 +681,15 @@ contract CrowdsaleTokenExtv1 is CrowdsaleTokenExt {
     * @param _symbol Token symbol - should be all caps
     * @param _initialSupply How many tokens we start with
     * @param _decimals Number of decimal places
-    * @param _mintable Are new tokens created over the crowdsale or do we distribute only the initial supply? 
+    * @param _mintable Are new tokens created over the crowdsale or do we distribute only the initial supply?
     * Note that when the token becomes transferable the minting always ends.
     */
-    constructor(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable, 
-    uint _globalMinCap, address _oldTokenAddress, uint _originalSupply) 
-    public CrowdsaleTokenExt(_name, _symbol, _initialSupply, _decimals, _mintable, _globalMinCap) {    
+    constructor(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable,
+    uint _globalMinCap, address _oldTokenAddress, uint _originalSupply)
+    public CrowdsaleTokenExt(_name, _symbol, _initialSupply, _decimals, _mintable, _globalMinCap) {
         originalSupply = _originalSupply;
         oldTokenAddress = _oldTokenAddress;
-        isUpgradeAgent = true;    
+        isUpgradeAgent = true;
     }
 
     function upgradeFrom(address _from, uint256 value) public {
@@ -701,4 +701,15 @@ contract CrowdsaleTokenExtv1 is CrowdsaleTokenExt {
         totalSupply = totalSupply.plus(value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,10 +1,10 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The TokenTycoon Project.  All rights reserved.
-/* 
+/*
 /* https://tokentycoon.io
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 pragma solidity ^0.4.23;
 
@@ -56,13 +56,13 @@ interface ERC721MetadataProvider {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     constructor() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -95,7 +95,7 @@ contract AccessAdmin {
     }
 }
 
-interface TokenRecipient { 
+interface TokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
@@ -120,7 +120,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @dev This emits when the approved address for an TTM is changed or reaffirmed.
     event Approval
     (
-        address indexed _owner, 
+        address indexed _owner,
         address indexed _approved,
         uint256 _tokenId
     );
@@ -133,14 +133,14 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
         bool _approved
     );
 
-    /// @dev This emits when the equipment ownership changed 
+    /// @dev This emits when the equipment ownership changed
     event Transfer
     (
         address indexed from,
         address indexed to,
         uint256 tokenId
     );
-    
+
     constructor() public {
         addrAdmin = msg.sender;
         managerArray.length += 1;
@@ -150,7 +150,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @dev Check if token ID is valid
     modifier isValidToken(uint256 _tokenId) {
         require(_tokenId >= 1 && _tokenId <= managerArray.length, "TokenId out of range");
-        require(tokenIdToOwner[_tokenId] != address(0), "Token have no owner"); 
+        require(tokenIdToOwner[_tokenId] != address(0), "Token have no owner");
         _;
     }
 
@@ -201,7 +201,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @param _to The new owner
     /// @param _tokenId The TTM to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         external
         whenNotPaused
     {
@@ -212,7 +212,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @param _from The current owner of the TTM
     /// @param _to The new owner
     /// @param _tokenId The TTM to transfer
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
         external
         whenNotPaused
     {
@@ -233,7 +233,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
         require(owner != address(0), "Owner is 0");
         require(_to != address(0), "Transfer target address is 0");
         require(owner == _from, "Transfer to self");
-        
+
         _transfer(_from, _to, _tokenId);
     }
 
@@ -252,8 +252,8 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @dev Enable or disable approval for a third party ("operator") to manage all your asset.
     /// @param _operator Address to add to the set of authorized operators.
     /// @param _approved True if the operators is approved, false to revoke approval
-    function setApprovalForAll(address _operator, bool _approved) 
-        external 
+    function setApprovalForAll(address _operator, bool _approved)
+        external
         whenNotPaused
     {
         operatorToApprovals[msg.sender][_operator] = _approved;
@@ -263,11 +263,11 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @dev Get the approved address for a single TTM
     /// @param _tokenId The TTM to find the approved address for
     /// @return The approved address for this TTM, or the zero address if there is none
-    function getApproved(uint256 _tokenId) 
-        external 
-        view 
-        isValidToken(_tokenId) 
-        returns (address) 
+    function getApproved(uint256 _tokenId)
+        external
+        view
+        isValidToken(_tokenId)
+        returns (address)
     {
         return tokenIdToApprovals[_tokenId];
     }
@@ -290,10 +290,10 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @dev Enumerate valid TTMs
     /// @param _index A counter less than totalSupply
     /// @return The token identifier for the `_index`th TTM,
-    function tokenByIndex(uint256 _index) 
+    function tokenByIndex(uint256 _index)
         external
-        view 
-        returns (uint256) 
+        view
+        returns (uint256)
     {
         require(_index < managerArray.length);
         return _index;
@@ -303,10 +303,10 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     /// @param _owner Token owner address
     /// @param _index A counter less than balanceOf(_owner)
     /// @return The TTM tokenId
-    function tokenOfOwnerByIndex(address _owner, uint256 _index) 
-        external 
-        view 
-        returns (uint256) 
+    function tokenOfOwnerByIndex(address _owner, uint256 _index)
+        external
+        view
+        returns (uint256)
     {
         require(_owner != address(0));
         require(_index < ownerToManagerArray[_owner].length);
@@ -315,7 +315,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
 
     /// @dev Do the real transfer with out any condition checking
     /// @param _from The old owner of this TTM(If created: 0x0)
-    /// @param _to The new owner of this TTM 
+    /// @param _to The new owner of this TTM
     /// @param _tokenId The tokenId of the TTM
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         if (_from != address(0)) {
@@ -325,34 +325,34 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
 
             if (indexFrom != ttmArray.length - 1) {
                 uint256 lastTokenId = ttmArray[ttmArray.length - 1];
-                ttmArray[indexFrom] = lastTokenId; 
+                ttmArray[indexFrom] = lastTokenId;
                 tokenIdToOwnerIndex[lastTokenId] = indexFrom;
             }
-            ttmArray.length -= 1; 
-            
+            ttmArray.length -= 1;
+
             if (tokenIdToApprovals[_tokenId] != address(0)) {
                 delete tokenIdToApprovals[_tokenId];
-            }      
+            }
         }
 
         tokenIdToOwner[_tokenId] = _to;
         ownerToManagerArray[_to].push(_tokenId);
         tokenIdToOwnerIndex[_tokenId] = ownerToManagerArray[_to].length - 1;
-        
+
         emit Transfer(_from != address(0) ? _from : this, _to, _tokenId);
     }
 
     /// @dev Actually perform the safeTransferFrom
-    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         internal
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
         canTransfer(_tokenId)
     {
         address owner = tokenIdToOwner[_tokenId];
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
 
         // Do the callback after everything is done to avoid reentrancy attack
@@ -365,7 +365,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
         // bytes4(keccak256("onERC721Received(address,uint256,bytes)")) = 0xf0b9e5ba;
         require(retval == 0xf0b9e5ba);
     }
-    
+
     function setSafeContract(address _actionAddr, bool _useful) external onlyAdmin {
         safeContracts[_actionAddr] = _useful;
     }
@@ -383,8 +383,8 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
         return ownerToManagerArray[_owner];
     }
 
-    function safeGiveByContract(uint256 _tokenId, address _to) 
-        external 
+    function safeGiveByContract(uint256 _tokenId, address _to)
+        external
         whenNotPaused
     {
         require(safeContracts[msg.sender]);
@@ -396,7 +396,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     }
 
     /// @dev Safe transfer by trust contracts
-    function safeTransferByContract(uint256 _tokenId, address _to) 
+    function safeTransferByContract(uint256 _tokenId, address _to)
         external
         whenNotPaused
     {
@@ -414,7 +414,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     function initManager(uint256 _gene, uint256 _count) external {
         require(safeContracts[msg.sender] || msg.sender == addrAdmin);
         require(_gene > 0 && _count <= 128);
-        
+
         address owner = address(this);
         uint256[] storage ttmArray = ownerToManagerArray[owner];
         uint256 newTokenId;
@@ -431,7 +431,7 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     function approveAndCall(address _spender, uint256 _tokenId, bytes _extraData)
         external
         whenNotPaused
-        returns (bool success) 
+        returns (bool success)
     {
         TokenRecipient spender = TokenRecipient(_spender);
         approve(_spender, _tokenId);
@@ -440,9 +440,9 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
     }
 
     function getProtoIdByTokenId(uint256 _tokenId)
-        external 
-        view 
-        returns(uint256 protoId) 
+        external
+        view
+        returns(uint256 protoId)
     {
         if (_tokenId > 0 && _tokenId < managerArray.length) {
             return managerArray[_tokenId];
@@ -451,8 +451,8 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
 
     function getOwnerTokens(address _owner)
         external
-        view 
-        returns(uint256[] tokenIdArray, uint256[] protoIdArray) 
+        view
+        returns(uint256[] tokenIdArray, uint256[] protoIdArray)
     {
         uint256[] storage ownTokens = ownerToManagerArray[_owner];
         uint256 count = ownTokens.length;
@@ -463,4 +463,15 @@ contract ManagerToken is ERC721, ERC721Metadata, ERC721Enumerable, AccessAdmin {
             protoIdArray[i] = managerArray[tokenIdArray[i]];
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -5,7 +5,7 @@ pragma solidity ^0.4.11;
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ pragma solidity ^0.4.11;
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -28,13 +28,13 @@ contract ERC20Interface {
     uint public totalSupply;
     function balanceOf(address _owner) constant returns (uint balance);
     function transfer(address _to, uint _value) returns (bool success);
-    function transferFrom(address _from, address _to, uint _value) 
+    function transferFrom(address _from, address _to, uint _value)
         returns (bool success);
     function approve(address _spender, uint _value) returns (bool success);
-    function allowance(address _owner, address _spender) constant 
+    function allowance(address _owner, address _spender) constant
         returns (uint remaining);
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    event Approval(address indexed _owner, address indexed _spender, 
+    event Approval(address indexed _owner, address indexed _spender,
         uint _value);
 }
 
@@ -44,7 +44,7 @@ contract ERC20Interface {
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ contract Owned {
         newOwner = _newOwner;
     }
 
- 
+
     // ------------------------------------------------------------------------
     // New owner has to accept transfer of contract
     // ------------------------------------------------------------------------
@@ -101,7 +101,7 @@ contract Owned {
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ library SafeMath {
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -168,14 +168,14 @@ contract OpenANXTokenConfig {
     // Tranche 1 crowdsale start date and end date
     // Do not use the `now` function here
     // Start - Thursday, 22-Jun-17 13:00:00 UTC / 1pm GMT 22 June 2017
-    // End - Saturday, 22-Jul-17 13:00:00 UTC / 1pm GMT 22 July 2017 
+    // End - Saturday, 22-Jul-17 13:00:00 UTC / 1pm GMT 22 July 2017
     // ------------------------------------------------------------------------
     uint public constant START_DATE = 1498136400;
     uint public constant END_DATE = 1500728400;
 
     // ------------------------------------------------------------------------
     // 1 year and 2 year dates for locked tokens
-    // Do not use the `now` function here 
+    // Do not use the `now` function here
     // ------------------------------------------------------------------------
     uint public constant LOCKED_1Y_DATE = START_DATE + 365 days;
     uint public constant LOCKED_2Y_DATE = START_DATE + 2 * 365 days;
@@ -194,7 +194,7 @@ contract OpenANXTokenConfig {
 //
 // Refer to http://openanx.org/ for further information.
 //
-// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) openANX and BokkyPooBah / Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -212,7 +212,7 @@ contract LockedTokens is OpenANXTokenConfig {
     // ------------------------------------------------------------------------
     uint public constant TOKENS_LOCKED_1Y_TOTAL = 14000000 * DECIMALSFACTOR;
     uint public constant TOKENS_LOCKED_2Y_TOTAL = 26000000 * DECIMALSFACTOR;
-    
+
     // ------------------------------------------------------------------------
     // Tokens locked for 1 year for sale 2 in the following account
     // ------------------------------------------------------------------------
@@ -244,7 +244,7 @@ contract LockedTokens is OpenANXTokenConfig {
 
         // --- 1y locked tokens ---
 
-        // Confirm 1Y totals        
+        // Confirm 1Y totals
         add1Y(0x4beE088efDBCC610EEEa101ded7204150AF1C8b9,1000000 * DECIMALSFACTOR);
         add1Y(0x839551201f866907Eb5017bE79cEB48aDa58650c,925000 * DECIMALSFACTOR);
         add1Y(0xa92d4Cd3412862386c234Be572Fe4A8FA4BB09c6,925000 * DECIMALSFACTOR);
@@ -309,7 +309,7 @@ contract LockedTokens is OpenANXTokenConfig {
         remainingTokens = remainingTokens.sub(totalSupplyLocked1Y);
         // Minus 2y locked tokens
         remainingTokens = remainingTokens.sub(totalSupplyLocked2Y);
-        // Unsold tranche1 and tranche2 tokens to be locked for 1y 
+        // Unsold tranche1 and tranche2 tokens to be locked for 1y
         add1Y(TRANCHE2_ACCOUNT, remainingTokens);
     }
 
@@ -420,9 +420,9 @@ contract ERC20Token is ERC20Interface, Owned {
     // Constructor
     // ------------------------------------------------------------------------
     function ERC20Token(
-        string _symbol, 
-        string _name, 
-        uint8 _decimals, 
+        string _symbol,
+        string _name,
+        uint8 _decimals,
         uint _totalSupply
     ) Owned() {
         symbol = _symbol;
@@ -505,7 +505,7 @@ contract ERC20Token is ERC20Interface, Owned {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint remaining) {
         return allowed[_owner][_spender];
@@ -528,7 +528,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
     // This can be adjusted as the ETH/USD rate changes
     //
     // Indicative rate of ETH per token of 0.00290923 at 8 June 2017
-    // 
+    //
     // This is the same as 1 / 0.00290923 = 343.733565238912015 OAX per ETH
     //
     // tokensPerEther  = 343.733565238912015
@@ -543,7 +543,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
     LockedTokens public lockedTokens;
 
     // ------------------------------------------------------------------------
-    // Wallet receiving the raised funds 
+    // Wallet receiving the raised funds
     // ------------------------------------------------------------------------
     address public wallet;
 
@@ -557,7 +557,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    function OpenANXToken(address _wallet) 
+    function OpenANXToken(address _wallet)
         ERC20Token(SYMBOL, NAME, DECIMALS, 0)
     {
         wallet = _wallet;
@@ -601,7 +601,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
 
     // ------------------------------------------------------------------------
     // Accept ethers from one account for tokens to be created for another
-    // account. Can be used by exchanges to purchase tokens on behalf of 
+    // account. Can be used by exchanges to purchase tokens on behalf of
     // it's user
     // ------------------------------------------------------------------------
     function proxyPayment(address participant) payable {
@@ -631,7 +631,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
         balances[participant] = balances[participant].add(tokens);
         totalSupply = totalSupply.add(tokens);
 
-        // Log the tokens purchased 
+        // Log the tokens purchased
         Transfer(0x0, participant, tokens);
         TokensBought(participant, msg.value, this.balance, tokens,
              totalSupply, tokensPerKEther);
@@ -642,13 +642,13 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
         // Transfer the contributed ethers to the crowdsale wallet
         if (!wallet.send(msg.value)) throw;
     }
-    event TokensBought(address indexed buyer, uint ethers, 
-        uint newEtherBalance, uint tokens, uint newTotalSupply, 
+    event TokensBought(address indexed buyer, uint ethers,
+        uint newEtherBalance, uint tokens, uint newTotalSupply,
         uint tokensPerKEther);
 
 
     // ------------------------------------------------------------------------
-    // openANX to finalise the crowdsale - to adding the locked tokens to 
+    // openANX to finalise the crowdsale - to adding the locked tokens to
     // this contract and the total supply
     // ------------------------------------------------------------------------
     function finalise() onlyOwner {
@@ -704,7 +704,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
     // balance to another account, with KYC verification check for the
     // crowdsale participant's first transfer
     // ------------------------------------------------------------------------
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
         returns (bool success)
     {
         // Cannot transfer before crowdsale ends
@@ -727,7 +727,7 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
 
 
     // ------------------------------------------------------------------------
-    // Any account can burn _from's tokens as long as the _from account has 
+    // Any account can burn _from's tokens as long as the _from account has
     // approved the _amount to be burnt using
     //   approve(0x0, _amount)
     // ------------------------------------------------------------------------
@@ -828,8 +828,24 @@ contract OpenANXToken is ERC20Token, OpenANXTokenConfig {
     // openANX can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint amount)
-      onlyOwner returns (bool success) 
+      onlyOwner returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

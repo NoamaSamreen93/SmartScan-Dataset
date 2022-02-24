@@ -26,7 +26,7 @@ contract MyTestToken is owned {
     uint256 public creationDate;
     string public name;
     string public symbol;
-    uint8 public decimals = 18;    
+    uint8 public decimals = 18;
     uint256 public totalSupply;
     uint8 public tipoCongelamento = 0;
         // 0 = unfreeze; 1 = frozen by 10 minutes; 2 = frozen by 30 minutes; 3 = frozen by 1 hour
@@ -37,7 +37,7 @@ contract MyTestToken is owned {
                            uint256 initialSupply,
                            string tokenName,
                            string tokenSymbol
-        ) owned() public 
+        ) owned() public
     {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
@@ -49,9 +49,9 @@ contract MyTestToken is owned {
     /* Send coins */
     function transfer2(address _to, uint256 _value) public
     {
-        require(b_enableTransfer); 
-        
-        
+        require(b_enableTransfer);
+
+
         _transfer(_to, _value);
     }
 
@@ -71,37 +71,37 @@ contract MyTestToken is owned {
         if(tipoCongelamento == 2) // 30 minutes
         {
             if(now >= creationDate + 30 * 1 minutes) _transfer(_to, _value);
-        }        
+        }
         if(tipoCongelamento == 3) // 1 hour
         {
             if(now >= creationDate + 1 * 1 hours) _transfer(_to, _value);
-        }        
+        }
         if(tipoCongelamento == 4) // 2 hours
         {
             if(now >= creationDate + 2 * 1 hours) _transfer(_to, _value);
-        }        
+        }
         if(tipoCongelamento == 5) // 1 day
         {
             if(now >= creationDate + 1 * 1 days) _transfer(_to, _value);
-        }        
+        }
         if(tipoCongelamento == 6) // 2 days
         {
             if(now >= creationDate + 2 * 1 days) _transfer(_to, _value);
-        }        
+        }
     }
 
     function freezingStatus() view public returns (string)
     {
         // 0 = unfreeze; 1 = frozen by 10 minutes; 2 = frozen by 30 minutes; 3 = frozen by 1 hour
         // 4 = frozen by 2 hours; 5 = frozen by 1 day; 6 = frozen by 2 days
-        
+
         if(tipoCongelamento == 0) return ( "Tokens free to transfer!");
         if(tipoCongelamento == 1) return ( "Tokens frozen by 10 minutes.");
         if(tipoCongelamento == 2) return ( "Tokens frozen by 30 minutes.");
         if(tipoCongelamento == 3) return ( "Tokens frozen by 1 hour.");
-        if(tipoCongelamento == 4) return ( "Tokens frozen by 2 hours.");        
-        if(tipoCongelamento == 5) return ( "Tokens frozen by 1 day.");        
-        if(tipoCongelamento == 6) return ( "Tokens frozen by 2 days.");                
+        if(tipoCongelamento == 4) return ( "Tokens frozen by 2 hours.");
+        if(tipoCongelamento == 5) return ( "Tokens frozen by 1 day.");
+        if(tipoCongelamento == 6) return ( "Tokens frozen by 2 days.");
 
     }
 
@@ -111,16 +111,25 @@ contract MyTestToken is owned {
         tipoCongelamento = _mode;
     }
 
-    function _transfer(address _to, uint256 _value) private 
+    function _transfer(address _to, uint256 _value) private
     {
         require(balanceOf[msg.sender] >= _value);           // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] -= _value;                    // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
     }
-    
+
     function enableTransfer(bool _enableTransfer) onlyOwner public
     {
         b_enableTransfer = _enableTransfer;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

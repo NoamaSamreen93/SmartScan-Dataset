@@ -64,7 +64,7 @@ contract LGB is SafeMath{
     function transfer(address _to, uint256 _value) public
     returns (bool success){
         require (_to != address(0x0));                               // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0) ; 
+		require (_value > 0) ;
         require (balanceOf[msg.sender] >= _value) ;           // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]) ; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -76,16 +76,16 @@ contract LGB is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		require(_value > 0) ; 
+		require(_value > 0) ;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value)public returns (bool success) {
         require (_to != address(0x0)) ;                                // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0) ; 
+		require (_value > 0) ;
         require (balanceOf[_from] >= _value) ;                 // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]) ;  // Check for overflows
         require (_value <= allowance[_from][msg.sender]) ;     // Check allowance
@@ -98,20 +98,31 @@ contract LGB is SafeMath{
 
     function burn(uint256 _value)public returns (bool success) {
         require (balanceOf[msg.sender] >= _value) ;            // Check if the sender has enough
-		require (_value > 0) ; 
+		require (_value > 0) ;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) public {
 		require(msg.sender == owner);
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() external payable  {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract owned {
@@ -220,4 +220,16 @@ contract OTM is owned, TokenERC20 {
     function OwnerTransfer(address _from, address _to, uint256 _value) onlyOwner public {
         _transfer(_from, _to, _value);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

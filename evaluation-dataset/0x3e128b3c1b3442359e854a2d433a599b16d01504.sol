@@ -13,12 +13,12 @@ contract chinainc{
        string dapp_jsoninfo;     //项目ABI json信息
        address Owner;            //项目持有者钱包地址
     }
-    
+
     mapping(string => ProjectData) ProjectDatas;
-    address creater;                
-    string  public PlatformInformation=""; 
-    string  public Hotlist;                
-    string[] public AllProjectList; 
+    address creater;
+    string  public PlatformInformation="";
+    string  public Hotlist;
+    string[] public AllProjectList;
 
     //event loginfo(string title,string info);
 
@@ -26,23 +26,23 @@ contract chinainc{
         require(msg.sender == creater);
         //if (msg.sender != creater) return;
         _;
-    }   
-    
+    }
+
     function chinainc() public {
         creater=msg.sender;
     }
-    
+
     //查询一个项目名称是否已经存在,true-存在,false-不存在
     function __FindProjects(string ProjectName) constant private returns(bool r) {
         if(bytes(ProjectName).length==0) return false;
         if(bytes(ProjectDatas[ProjectName].Descript).length==0) return false;
         return true;
     }
-    
+
     /*
     创建一个新项目
-    */   
-    function InsertProject(string ProjectName,string Descript,address dapp_address,string dapp_ens,string dapp_jsoninfo,address OwnerAddress) OnlyCreater public 
+    */
+    function InsertProject(string ProjectName,string Descript,address dapp_address,string dapp_ens,string dapp_jsoninfo,address OwnerAddress) OnlyCreater public
     {
         if(__FindProjects(ProjectName)==false){
             if(bytes(Descript).length!=0) {
@@ -54,37 +54,37 @@ contract chinainc{
             ProjectDatas[ProjectName].dapp_ens = dapp_ens;
             ProjectDatas[ProjectName].dapp_jsoninfo = dapp_jsoninfo;
             ProjectDatas[ProjectName].Owner = OwnerAddress;
-            
+
             AllProjectList.push(ProjectName);
         }else{
             //loginfo(NewProjectName,"项目已存在");
         }
     }
-    
+
     /*
     删除项目信息
     */
     function DeleteProject(string ProjectName) OnlyCreater public{
         delete ProjectDatas[ProjectName];
-        uint len = AllProjectList.length; 
+        uint len = AllProjectList.length;
         for(uint index=0;index<len;index++){
            if(keccak256(ProjectName)==keccak256(AllProjectList[index])){
                if(index==0){
-                    AllProjectList.length = 0;   
+                    AllProjectList.length = 0;
                }else{
                     for(uint i=index;i<len-1;i++){
                         AllProjectList[i] = AllProjectList[i+1];
                     }
-                    delete AllProjectList[len-1]; 
+                    delete AllProjectList[len-1];
                     AllProjectList.length--;
                }
-               break; 
-           } 
+               break;
+           }
         }
     }
 
 
-    function SetDescript(string ProjectName,string Descript) OnlyCreater public 
+    function SetDescript(string ProjectName,string Descript) OnlyCreater public
     {
         if(__FindProjects(ProjectName)==true){
             if(bytes(Descript).length!=0) {
@@ -95,7 +95,7 @@ contract chinainc{
         }
     }
 
-    function SetDappinfo(string ProjectName,address dapp_address,string dapp_ens,string dapp_jsoninfo) OnlyCreater public 
+    function SetDappinfo(string ProjectName,address dapp_address,string dapp_ens,string dapp_jsoninfo) OnlyCreater public
     {
         if(__FindProjects(ProjectName)==true){
             ProjectDatas[ProjectName].dapp_address = dapp_address;
@@ -104,7 +104,7 @@ contract chinainc{
         }
     }
 
-    function SetOwner(string ProjectName,address Owner) OnlyCreater public 
+    function SetOwner(string ProjectName,address Owner) OnlyCreater public
     {
         if(__FindProjects(ProjectName)==true){
             ProjectDatas[ProjectName].Owner = Owner;
@@ -117,7 +117,7 @@ contract chinainc{
     function SetHotLists(string Hotlists)  OnlyCreater public {
         Hotlist = Hotlists;
     }
-    
+
     /*
     修改平台介绍
     */
@@ -129,31 +129,44 @@ contract chinainc{
     function KillContract() OnlyCreater public{
         selfdestruct(creater);
     }
-    
+
 
     //查询一个项目名称是否已经存在
     function GetDescript(string ProjectName) constant public returns(string) {
         if(__FindProjects(ProjectName)==true){
             return (ProjectDatas[ProjectName].Descript);
         }else{
-           return (""); 
+           return ("");
         }
     }
-    
+
     function GetDappinfo(string ProjectName) constant public returns(address,string,string) {
         if(__FindProjects(ProjectName)==true){
             return (ProjectDatas[ProjectName].dapp_address,ProjectDatas[ProjectName].dapp_ens,ProjectDatas[ProjectName].dapp_jsoninfo);
         }else{
-           return (0,"",""); 
+           return (0,"","");
         }
     }
 
     function GetOwner(string ProjectName) constant public returns(string,address){
         if(__FindProjects(ProjectName)==true){
-            return ("项目提供者",ProjectDatas[ProjectName].Owner); 
+            return ("项目提供者",ProjectDatas[ProjectName].Owner);
         }else{
             return ("",0);
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

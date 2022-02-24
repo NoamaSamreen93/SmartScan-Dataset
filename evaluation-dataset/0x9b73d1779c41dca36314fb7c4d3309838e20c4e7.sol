@@ -286,7 +286,7 @@ contract ENJToken is ERC20Token, TokenHolder {
     uint256 constant public ENJ_UNIT = 10 ** 18;
     uint256 public totalSupply = 1 * (10**9) * ENJ_UNIT;
 
-    //  Constants 
+    //  Constants
     uint256 constant public maxPresaleSupply = 600 * 10**6 * ENJ_UNIT;           // Total presale supply at max bonus
     uint256 constant public minCrowdsaleAllocation = 200 * 10**6 * ENJ_UNIT;     // Min amount for crowdsale
     uint256 constant public incentivisationAllocation = 100 * 10**6 * ENJ_UNIT;  // Incentivisation Allocation
@@ -312,13 +312,13 @@ contract ENJToken is ERC20Token, TokenHolder {
 
 ///////////////////////////////////////// MODIFIERS /////////////////////////////////////////
 
-    // Enjin Team timelock    
+    // Enjin Team timelock
     modifier safeTimelock() {
         require(now >= endTime + 6 * 4 weeks);
         _;
     }
 
-    // Advisor Team timelock    
+    // Advisor Team timelock
     modifier advisorTimelock() {
         require(now >= endTime + 2 * 4 weeks);
         _;
@@ -366,7 +366,7 @@ contract ENJToken is ERC20Token, TokenHolder {
             assert(super.transfer(_to, _value));
             return true;
         }
-        revert();        
+        revert();
     }
 
     /**
@@ -381,7 +381,7 @@ contract ENJToken is ERC20Token, TokenHolder {
         @return true if the transfer was successful, throws if it wasn't
     */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (isTransferAllowed() == true || msg.sender == crowdFundAddress || msg.sender == incentivisationFundAddress) {        
+        if (isTransferAllowed() == true || msg.sender == crowdFundAddress || msg.sender == incentivisationFundAddress) {
             assert(super.transferFrom(_from, _to, _value));
             return true;
         }
@@ -472,7 +472,7 @@ contract ENJToken is ERC20Token, TokenHolder {
     */
     function allowTransfers() ownerOnly {
         isReleasedToPublic = true;
-    } 
+    }
 
     /**
         @dev User transfers are allowed/rejected
@@ -514,8 +514,8 @@ contract ENJCrowdfund is TokenHolder {
         @param _totalPresaleTokensYetToAllocate     Total amount of presale tokens sold
         @param _beneficiary                         Address that will be receiving the ETH contributed
     */
-    function ENJCrowdfund(uint256 _totalPresaleTokensYetToAllocate, address _beneficiary) 
-    validAddress(_beneficiary) 
+    function ENJCrowdfund(uint256 _totalPresaleTokensYetToAllocate, address _beneficiary)
+    validAddress(_beneficiary)
     {
         totalPresaleTokensYetToAllocate = _totalPresaleTokensYetToAllocate;
         beneficiary = _beneficiary;
@@ -566,14 +566,14 @@ contract ENJCrowdfund is TokenHolder {
     function deliverPresaleTokens(address[] _batchOfAddresses, uint256[] _amountofENJ) external tokenIsSet ownerOnly returns (bool success) {
         require(now < startTime);
         for (uint256 i = 0; i < _batchOfAddresses.length; i++) {
-            deliverPresaleTokenToClient(_batchOfAddresses[i], _amountofENJ[i]);            
+            deliverPresaleTokenToClient(_batchOfAddresses[i], _amountofENJ[i]);
         }
         return true;
     }
 
     /**
         @dev Logic to transfer presale tokens
-        Can only be called while the there are leftover presale tokens to allocate. Any multiple contribution from 
+        Can only be called while the there are leftover presale tokens to allocate. Any multiple contribution from
         the same address will be aggregated.
         @param _accountHolder user address
         @param _amountofENJ balance to send out
@@ -616,7 +616,7 @@ contract ENJCrowdfund is TokenHolder {
 
 
 ///////////////////////////////////////// CONSTANT FUNCTIONS /////////////////////////////////////////
-    
+
     /**
         @dev Returns total tokens allocated so far
         Constant function that simply returns a number
@@ -626,7 +626,7 @@ contract ENJCrowdfund is TokenHolder {
     function totalEnjSold() public constant returns(uint256 total) {
         return token.totalAllocated();
     }
-    
+
     /**
         @dev computes the number of tokens that should be issued for a given contribution
         @param _contribution    contribution amount
@@ -643,7 +643,7 @@ contract ENJCrowdfund is TokenHolder {
         } else {
             return currentTokenRate = safeMul(_contribution, 3000);
         }
-        
+
     }
 
     /**
@@ -654,4 +654,13 @@ contract ENJCrowdfund is TokenHolder {
     function() payable {
         contributeETH(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

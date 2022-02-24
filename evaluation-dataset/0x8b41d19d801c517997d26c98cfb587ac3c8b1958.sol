@@ -23,17 +23,17 @@ contract Settings {
     address public owner;
 
     uint public contentCount = 0;
- 
+
     // our settings
     mapping (uint => uint) public settings;
-    
+
     event Setting(uint indexed version, uint indexed timePage, uint indexed field, uint value, string dataInfo);
 
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -42,7 +42,7 @@ contract Settings {
     function () public {
         revert();
     }
-    
+
     function kill() public onlyOwner {
         selfdestruct(owner);
     }
@@ -56,4 +56,15 @@ contract Settings {
     function get(uint _field) public constant returns (uint) {
         return settings[_field];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

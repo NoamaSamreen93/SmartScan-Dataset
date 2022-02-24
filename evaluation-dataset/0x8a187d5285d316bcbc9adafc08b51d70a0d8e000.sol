@@ -55,7 +55,7 @@ contract AuthenticationManager {
     /* Fired whenever an account-reader contract is removed. */
     event AccountReaderRemoved(address removedBy, address account);
 
-    /* When this contract is first setup we use the creator as the first admin */    
+    /* When this contract is first setup we use the creator as the first admin */
     function AuthenticationManager() {
         /* Set the first admin to be the person creating the contract */
         adminAddresses[msg.sender] = true;
@@ -105,7 +105,7 @@ contract AuthenticationManager {
         // Fail if this account is already admin
         if (adminAddresses[_address])
             throw;
-        
+
         // Add the user
         adminAddresses[_address] = true;
         AdminAdded(msg.sender, _address);
@@ -141,7 +141,7 @@ contract AuthenticationManager {
         // Fail if this account is already in the list
         if (accountReaderAddresses[_address])
             throw;
-        
+
         // Add the user
         accountReaderAddresses[_address] = true;
         AccountReaderAdded(msg.sender, _address);
@@ -167,7 +167,7 @@ contract AuthenticationManager {
 
 contract IcoPhaseManagement {
     using SafeMath for uint256;
-    
+
     /* Defines whether or not we are in the ICO phase */
     bool public icoPhase = true;
 
@@ -176,7 +176,7 @@ contract IcoPhaseManagement {
 
     /* Defines whether or not the SIFT contract address has yet been set.  */
     bool siftContractDefined = false;
-    
+
     /* Defines the sale price during ICO */
     uint256 constant icoUnitPrice = 10 finney;
 
@@ -200,7 +200,7 @@ contract IcoPhaseManagement {
 
     /* Defines our event fired if the ICO is abandoned */
     event IcoAbandoned(string details);
-    
+
     /* Ensures that once the ICO is over this contract cannot be used until the point it is destructed. */
     modifier onlyDuringIco {
         bool contractValid = siftContractDefined && !smartInvestmentFundToken.isClosed();
@@ -260,7 +260,7 @@ contract IcoPhaseManagement {
         if (!msg.sender.send(this.balance))
             throw;
     }
-    
+
     /* Handle receiving ether in ICO phase - we work out how much the user has bought, allocate a suitable balance and send their change */
     function () onlyDuringIco payable {
         // Forbid funding outside of ICO
@@ -326,7 +326,7 @@ contract IcoPhaseManagement {
         // This functionality only exists if an ICO was abandoned
         if (!icoAbandoned || abandonedIcoBalances[msg.sender] == 0)
             throw;
-        
+
         // Attempt to send them to funds
         uint256 funds = abandonedIcoBalances[msg.sender];
         abandonedIcoBalances[msg.sender] = 0;
@@ -374,10 +374,10 @@ contract SmartInvestmentFundToken {
 
     /* Fired when the fund is eventually closed. */
     event FundClosed();
-    
+
     /* Our transfer event to fire whenever we shift SMRT around */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     /* Our approval event when one user approves another to control */
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -395,7 +395,7 @@ contract SmartInvestmentFundToken {
         authenticationManager = AuthenticationManager(_authenticationManagerAddress);
         if (authenticationManager.contractVersion() != 100201707171503)
             throw;
-        
+
         /* Store our special addresses */
         icoContractAddress = _icoContractAddress;
     }
@@ -403,7 +403,7 @@ contract SmartInvestmentFundToken {
     modifier onlyPayloadSize(uint numwords) {
         assert(msg.data.length == numwords * 32 + 4);
         _;
-    } 
+    }
 
     /* This modifier allows a method to only be called by account readers */
     modifier accountReaderOnly {
@@ -429,7 +429,7 @@ contract SmartInvestmentFundToken {
         /* SIFT contract identifies as 500YYYYMMDDHHMM */
         return 500201707171440;
     }
-    
+
     /* Transfer funds between two addresses that are not the current msg.sender - this requires approval to have been set separately and follows standard ERC20 guidelines */
     function transferFrom(address _from, address _to, uint256 _amount) fundSendablePhase onlyPayloadSize(3) returns (bool) {
         if (balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount && _amount > 0 && balances[_to].add(_amount) > balances[_to]) {
@@ -456,7 +456,7 @@ contract SmartInvestmentFundToken {
     function tokenHolder(uint256 _index) accountReaderOnly constant returns (address) {
         return allTokenHolders[_index];
     }
- 
+
     /* Adds an approval for the specified account to spend money of the message sender up to the defined limit */
     function approve(address _spender, uint256 _amount) fundSendablePhase onlyPayloadSize(2) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
@@ -511,7 +511,7 @@ contract SmartInvestmentFundToken {
             if (allTokenHolders[i] == _addr)
                 /* Already found so we can abort now */
                 return;
-        
+
         /* They don't seem to exist, so let's add them */
         allTokenHolders.length++;
         allTokenHolders[allTokenHolders.length - 1] = _addr;
@@ -530,11 +530,11 @@ contract SmartInvestmentFundToken {
                 found = true;
                 break;
             }
-        
+
         /* If we didn't find them just return */
         if (!found)
             return;
-        
+
         /* We now need to shuffle down the array */
         for (i = foundIndex; i < tokenHolderCount - 1; i++)
             allTokenHolders[i] = allTokenHolders[i + 1];
@@ -555,4 +555,15 @@ contract SmartInvestmentFundToken {
             tokenOwnerAdd(_address);
         Transfer(0, _address, _amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

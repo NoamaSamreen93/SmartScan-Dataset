@@ -44,7 +44,7 @@ library SafeMath {
 }
 
 /**
- * DreamTeam tokens vesting smart contract. 
+ * DreamTeam tokens vesting smart contract.
  * This vesting smart contracts releases 25% of tokens 6 months after the smart contract was initialized,
  * 50% of tokens after 1 year, 75% of tokens after 1 year 6 months and 100% tokens are available after 2 years.
  * 0.1% of tokens are available right after vesting contract initialization.
@@ -86,7 +86,7 @@ contract TwoYearDreamTokensVesting {
      * Address which will receive tokens. This address is set during initialization.
      */
     address payable public withdrawalAddress = address(0x0);
-    
+
     uint256 public constant halfOfYear = 182 days + 15 hours; // x2 = ~365.25 days in a year
 
     /**
@@ -228,4 +228,15 @@ contract TwoYearDreamTokensVesting {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

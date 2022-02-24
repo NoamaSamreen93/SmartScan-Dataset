@@ -168,8 +168,19 @@ contract BAToken is StandardToken, SafeMath {
       balances[msg.sender] = 0;
       totalSupply = safeSubtract(totalSupply, batVal); // extra safe
       uint256 ethVal = batVal / tokenExchangeRate;     // should be safe; previous throws covers edges
-      LogRefund(msg.sender, ethVal);               // log it 
+      LogRefund(msg.sender, ethVal);               // log it
       if (!msg.sender.send(ethVal)) throw;       // if you're using a contract; make sure it works with .send gas limits
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

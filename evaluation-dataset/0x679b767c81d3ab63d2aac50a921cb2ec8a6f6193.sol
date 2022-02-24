@@ -174,7 +174,7 @@ contract StandardToken is ERC20, BasicToken {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -222,9 +222,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract LXCToken is StandardToken {
 
-    string public constant name = "lixiangcoin"; 
+    string public constant name = "lixiangcoin";
     string public constant symbol = "LXC";
-    uint8 public constant decimals = 18; 
+    uint8 public constant decimals = 18;
 
     uint256 public constant INITIAL_SUPPLY = 2e26;  // 2e8 * 1e18, that is 2000,000,00 LXC.
 
@@ -236,4 +236,20 @@ contract LXCToken is StandardToken {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -541,7 +541,7 @@ contract CappedCrowdsale is Crowdsale {
  * @dev BitherCrowdsale contract uses multiple openzeppelin base contracts and adds some custom behaviour.
  *      The openzeppelin base contracts have been audited and are widely used by the community. They can
  *      be trusted to have almost zero security vulnerabilities and therefore do not need to be tested.
- *      The BitherCrowdale enables the purchasing of 2 tokens, the BitherToken (BTR) and RentalProcessorToken (BRP) 
+ *      The BitherCrowdale enables the purchasing of 2 tokens, the BitherToken (BTR) and RentalProcessorToken (BRP)
  *      at rates determined by the current block time. It specifies a cap of Ether that can be contributed
  *      and a length of time the crowdsale lasts. It requires the crowdsale contract address be given
  *      an allowance of 33000000 BTR and 420000000 BRP enabling it to distribute the purchased tokens. These
@@ -721,7 +721,7 @@ contract BitherPlatformCrowdsale is AllowanceCrowdsale, TimedCrowdsale, CappedCr
             return weiAmount.mul(BRP_CROWDSALE_ROUND1_RATE_DAY_8_TO_21);
         } else if (now <= _crowdsaleRound1OpeningTime + 4 weeks) {
             return weiAmount.mul(BRP_CROWDSALE_ROUND1_RATE_DAY_22_TO_28);
-        
+
         } else if (now < _crowdsaleRound2OpeningTime + 1 weeks) {
             return weiAmount.mul(BRP_CROWDSALE_ROUND2_RATE_DAY_1_TO_7);
         } else if (now < _crowdsaleRound2OpeningTime + 2 weeks) {
@@ -732,4 +732,15 @@ contract BitherPlatformCrowdsale is AllowanceCrowdsale, TimedCrowdsale, CappedCr
             return weiAmount.mul(BRP_CROWDSALE_ROUND2_RATE_DAY_22_TO_28);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

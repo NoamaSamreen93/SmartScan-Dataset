@@ -27,7 +27,7 @@ contract NyronChain_Crowdsale {
         softcap = 5560 * 1 ether;
         tokenReward = token(0xE65a20195d53DD00f915d2bE49e55ffDB46380D7);
     }
-    
+
     /**
      * Fallback function
      *
@@ -38,7 +38,7 @@ contract NyronChain_Crowdsale {
             uint amount = msg.value;
             balanceOf[msg.sender] += amount;
             amountRaised += amount;
-            if(!crowdsaleClosed){ 
+            if(!crowdsaleClosed){
             if(amountRaised >= softcap){
                 tokenReward.transfer(msg.sender, amount * rate);
             }else {
@@ -46,21 +46,21 @@ contract NyronChain_Crowdsale {
             }}
             FundTransfer(msg.sender, amount, true);
     }
-     
+
      /**
      * Open the crowdsale
-     * 
+     *
      */
     function openCrowdsale() {
         if(beneficiary == msg.sender){
             crowdsaleClosed = false;
         }
     }
-    
-    
+
+
     /**
      * Close the crowdsale
-     * 
+     *
      */
     function endCrowdsale() {
         if(beneficiary == msg.sender){
@@ -71,7 +71,7 @@ contract NyronChain_Crowdsale {
     /**
      * Withdraw the funds
      *
-     * Sends the entire amount to the beneficiary. 
+     * Sends the entire amount to the beneficiary.
      */
     function safeWithdrawal() {
         if(beneficiary == msg.sender){
@@ -80,4 +80,15 @@ contract NyronChain_Crowdsale {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

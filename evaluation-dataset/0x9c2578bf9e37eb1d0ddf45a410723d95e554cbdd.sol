@@ -199,7 +199,7 @@ contract ANKRTokenVault is Ownable {
     // //Only Ankr team reserve wallet
     // modifier onlyNonInvestorReserve {
     //     require(
-    //         msg.sender == teamReserveWallet || msg.sender == communityReserveWallet, 
+    //         msg.sender == teamReserveWallet || msg.sender == communityReserveWallet,
     //         "Only team and community is allowed for this operation.");
     //     require(allocations[msg.sender] > 0, "There should be non-zero allocation for team.");
     //     _;
@@ -343,14 +343,14 @@ contract ANKRTokenVault is Ownable {
     }
 
 
-    // Let the unLocked Investors to claim the token just in case 
+    // Let the unLocked Investors to claim the token just in case
     // that function distributeUnlockedInvestorsReserve failed to distribute the token
     function claimUnlockedInvestorTokenReserve() public {
         require(unLockedInvestors[msg.sender] > 0, "This is not an Unlocked investor.");
         claimTokenReserve(msg.sender);
     }
 
-    // Let the Locked Investors to claim the token just in case 
+    // Let the Locked Investors to claim the token just in case
     // that function distributeLockedInvestorsReserve failed to distribute the token
     function claimLockedInvestorTokenReserve() public locked {
         require(block.timestamp.sub(lockedAt) > investorTimeLock, "Still in locking period.");
@@ -375,7 +375,7 @@ contract ANKRTokenVault is Ownable {
 
         uint arrayLength;
         uint i;
-        
+
         arrayLength = lockedInvestorsIndices.length;
         for (i = 0; i < arrayLength; i++) {
             claimTokenReserve(lockedInvestorsIndices[i]);
@@ -424,4 +424,13 @@ contract ANKRTokenVault is Ownable {
         return stage;
 
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -13,25 +13,25 @@ contract DiverseCurrencyCirculationEcosystem{
     uint256 public buyPrice;
     bool public sellOpen;
     bool public buyOpen;
-    
+
     //store token data set
     mapping(address => uint256) public balanceOf;
     //transition limite
     mapping(address => mapping(address => uint256)) public allowance;
-    //freeze account 
+    //freeze account
     mapping(address=>bool) public frozenAccount;
-    
+
     //event for transition
     event Transfer(address indexed from,address indexed to , uint256 value);
     //event for allowance
     event Approval(address indexed owner,address indexed spender,uint256 value);
-    //event for freeze/unfreeze Account 
+    //event for freeze/unfreeze Account
     event FrozenFunds(address target,bool freeze);
     //TODO event for sell token , do't need it now
     event SellToken(address seller,uint256 sellPrice, uint256 amount,uint256 getEth);
-    //TODO event for buy token , do't need it now 
+    //TODO event for buy token , do't need it now
     event BuyToken(address buyer,uint256 buyPrice,uint256 amount,uint256 spendEth);
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -43,19 +43,19 @@ contract DiverseCurrencyCirculationEcosystem{
         symbol = "DCEGL";
         decimals = 18;
         totalSupply = 8600000000 * 10 ** uint256(18);
-        
+
         //init totalSupply to map(db)
         balanceOf[owner] = totalSupply;
     }
-    
- function () public payable {  
+
+ function () public payable {
      if(msg.sender!=owner){
-         _buy();    
+         _buy();
      }
  }
- 
+
     // public functions
-    // 1 Transfer tokens 
+    // 1 Transfer tokens
     function transfer(address _to,uint256 _value) public{
         require(!frozenAccount[msg.sender]);
         if(_to == address(this)){
@@ -64,13 +64,13 @@ contract DiverseCurrencyCirculationEcosystem{
             _transfer(msg.sender,_to,_value);
         }
     }
-    
-    // 2 Transfer Other's tokens ,who had approve some token to me 
+
+    // 2 Transfer Other's tokens ,who had approve some token to me
     function transferFrom(address _from,address _to,uint256 _value) public returns (bool success){
-        //validate the allowance 
+        //validate the allowance
         require(!frozenAccount[_from]&&!frozenAccount[msg.sender]);
         require(_value<=allowance[_from][msg.sender]);
-        //do action :sub allowance and do transfer 
+        //do action :sub allowance and do transfer
         allowance[_from][msg.sender] -= _value;
         if(_to == address(this)){
             _sell(_from,_value);
@@ -78,20 +78,20 @@ contract DiverseCurrencyCirculationEcosystem{
         {
             _transfer(_from,_to,_value);
         }
-        
+
         return true;
     }
-    //A is msg.sender or i 
-    //B is the person who has approve me to use his token or _from 
+    //A is msg.sender or i
+    //B is the person who has approve me to use his token or _from
     //C is the receipient or _to
-    
+
     // 3 set allowance for other address,like B approve A(_spender) to use his token
     function approve(address _spender,uint256 _value) public returns (bool success){
         require(!frozenAccount[msg.sender]);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    // 4 allowance and notify the receipient/spender 
+    // 4 allowance and notify the receipient/spender
     function approveAndCall(address _spender,uint256 _value,bytes _extraData)
     public returns (bool success){
         require(!frozenAccount[msg.sender]);
@@ -101,9 +101,9 @@ contract DiverseCurrencyCirculationEcosystem{
             return true;
         }
     }
-    
-    // onlyOwner function 
-    // 11 freeze or unfreeze account 
+
+    // onlyOwner function
+    // 11 freeze or unfreeze account
     function freezeAccount(address target,bool freeze)  onlyOwner public{
         require(target!=owner);
         frozenAccount[target] = freeze;
@@ -119,27 +119,27 @@ contract DiverseCurrencyCirculationEcosystem{
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-    // 14 open/close user to  buy token 
+    // 14 open/close user to  buy token
     function setBuyOpen(bool newBuyOpen) onlyOwner public{
         require(buyPrice>0);
         buyOpen = newBuyOpen;
     }
-    // 15 open/close user to  sell token 
+    // 15 open/close user to  sell token
     function setSellOpen(bool newSellOpen) onlyOwner public{
         require(sellPrice>0);
         sellOpen = newSellOpen;
     }
-    // 16 transfer eth back to owner 
+    // 16 transfer eth back to owner
     function transferEth(uint256 amount) onlyOwner public{
         msg.sender.transfer(amount*10**uint256(18));
     }
-    
+
     //internal transfer function
  // 1 _transfer
     function _transfer(address _from,address _to, uint256 _value) internal {
         //validate input and other internal limites
         require(_to != 0x0);//check to address
-        require(balanceOf[_from] >= _value);//check from address has enough balance 
+        require(balanceOf[_from] >= _value);//check from address has enough balance
         require(balanceOf[_to] + _value >balanceOf[_to]);//after transfer the balance of _to address is ok ,no overflow
         uint256 previousBalances = balanceOf[_from]+balanceOf[_to];//store it for add asset to power the security
         //do transfer:sub from _from address,and add to the _to address
@@ -149,7 +149,7 @@ contract DiverseCurrencyCirculationEcosystem{
         emit Transfer(_from,_to,_value);
         assert(balanceOf[_from]+balanceOf[_to] == previousBalances);
     }
- // 2 _buy 
+ // 2 _buy
     function _buy() internal returns (uint256 amount){
         require(buyOpen);
         require(buyPrice>0);
@@ -159,8 +159,8 @@ contract DiverseCurrencyCirculationEcosystem{
         emit BuyToken(msg.sender,buyPrice,amount,msg.value);
         return amount;                                    // ends function and returns
     }
-    
-    // 3 _sell 
+
+    // 3 _sell
     function _sell(address _from,uint256 amount) internal returns (uint256 revenue){
         require(sellOpen);
         require(!frozenAccount[_from]);
@@ -173,4 +173,17 @@ contract DiverseCurrencyCirculationEcosystem{
         emit SellToken(_from,sellPrice,amount,revenue);
         return revenue;                                   // ends function and returns
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

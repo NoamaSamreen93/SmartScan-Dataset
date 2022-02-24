@@ -217,13 +217,13 @@ contract CrowdliKYCProvider is Pausable, WhitelistAdminRole {
 	/**
 	 * The verification levels supported by this ICO
 	 */
-	enum VerificationTier { None, KYCAccepted, VideoVerified, ExternalTokenAgent } 
-    
+	enum VerificationTier { None, KYCAccepted, VideoVerified, ExternalTokenAgent }
+
     /**
      * Defines the max. amount of tokens an investor can purchase for a given verification level (tier)
      */
-	mapping (uint => uint) public maxTokenAmountPerTier; 
-    
+	mapping (uint => uint) public maxTokenAmountPerTier;
+
     /**
     * Dictionary that maps addresses to investors which have successfully been verified by the external KYC process
     */
@@ -241,13 +241,13 @@ contract CrowdliKYCProvider is Pausable, WhitelistAdminRole {
         addWhitelistAdmin(_kycConfirmer);
         // Max token amount for non-verified investors
         maxTokenAmountPerTier[uint(VerificationTier.None)] = 0;
-        
+
         // Max token amount for auto KYC auto verified investors
         maxTokenAmountPerTier[uint(VerificationTier.KYCAccepted)] = _maxTokenForKYCAcceptedTier;
-        
+
         // Max token amount for auto KYC video verified investors
         maxTokenAmountPerTier[uint(VerificationTier.VideoVerified)] = _maxTokensForVideoVerifiedTier;
-        
+
         // Max token amount for external token sell providers
         maxTokenAmountPerTier[uint(VerificationTier.ExternalTokenAgent)] = _maxTokensForExternalTokenAgent;
     }
@@ -260,8 +260,19 @@ contract CrowdliKYCProvider is Pausable, WhitelistAdminRole {
     function hasVerificationLevel(address _investor, VerificationTier _verificationTier) public view returns (bool) {
         return (verificationTiers[_investor] == _verificationTier);
     }
-    
+
     function getMaxChfAmountForInvestor(address _investor) public view returns (uint) {
         return maxTokenAmountPerTier[uint(verificationTiers[_investor])];
-    }    
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

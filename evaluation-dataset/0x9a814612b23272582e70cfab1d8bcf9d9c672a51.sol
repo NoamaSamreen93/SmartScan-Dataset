@@ -180,12 +180,21 @@ contract PazCoin is owned, StandardToken {
 
         assert(balances[msg.sender] == pre_balance - num);
     }
-    
+
         function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
-    
 
+
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

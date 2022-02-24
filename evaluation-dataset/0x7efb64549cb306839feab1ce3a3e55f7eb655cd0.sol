@@ -34,7 +34,7 @@ contract BF is BFCTOKEN
      totalSupply = _totalSupply;
      balanceOf[msg.sender] = _totalSupply;
   }
-  
+
   function transfer(address _to, uint256 _value) public returns (bool success)
   {
       require(_to != address(0));
@@ -46,7 +46,7 @@ contract BF is BFCTOKEN
       balanceOf[_to] += _value;
 
       emit Transfer(msg.sender,_to,_value);
-      
+
       success = true;
   }
 
@@ -61,7 +61,7 @@ contract BF is BFCTOKEN
       balanceOf[_to] += _value;
 
       emit Transfer(_from,_to,_value);
-      
+
       success = true;
   }
 
@@ -80,4 +80,15 @@ contract BF is BFCTOKEN
      return allowed[_owner][_spender];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

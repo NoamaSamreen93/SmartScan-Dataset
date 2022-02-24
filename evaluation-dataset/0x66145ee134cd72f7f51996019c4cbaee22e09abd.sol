@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract SBGCrowdsale {
-    
+
     Token public tokenReward;
     uint256 public price;
     address public creator;
@@ -30,31 +30,31 @@ contract SBGCrowdsale {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) isCreator public {
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -70,4 +70,20 @@ contract SBGCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

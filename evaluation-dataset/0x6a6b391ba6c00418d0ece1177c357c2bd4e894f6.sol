@@ -70,7 +70,7 @@ contract Managed {
 
 	constructor(
 		address roleManagerAddr,
-		address opt, 
+		address opt,
 		uint optCoolDown
 	) public {
 		roleManagerAddress = roleManagerAddr;
@@ -79,9 +79,9 @@ contract Managed {
 		operationCoolDown = optCoolDown;
 	}
 
-	function updateRoleManager(address newManagerAddr) 
-		inUpdateWindow() 
-		public 
+	function updateRoleManager(address newManagerAddr)
+		inUpdateWindow()
+		public
 	returns (bool) {
 		require(roleManager.passedContract(newManagerAddr));
 		roleManagerAddress = newManagerAddr;
@@ -91,10 +91,10 @@ contract Managed {
 		return true;
 	}
 
-	function updateOperator() public inUpdateWindow() returns (bool) {	
-		address updater = msg.sender;	
+	function updateOperator() public inUpdateWindow() returns (bool) {
+		address updater = msg.sender;
 		operator = roleManager.provideAddress(updater, 0);
-		emit UpdateOperator(updater, operator);	
+		emit UpdateOperator(updater, operator);
 		return true;
 	}
 
@@ -119,10 +119,10 @@ contract Magi is Managed {
 	Price public firstPrice;
 	Price public secondPrice;
 	Price public lastPrice;
-	address public priceFeed1; 
-	address public priceFeed2; 
+	address public priceFeed1;
+	address public priceFeed2;
 	address public priceFeed3;
-	uint public priceTolInBP = 500; 
+	uint public priceTolInBP = 500;
 	uint public priceFeedTolInBP = 100;
 	uint public priceFeedTimeTol = 1 minutes;
 	uint public priceUpdateCoolDown;
@@ -156,9 +156,9 @@ contract Magi is Managed {
 		address roleManagerAddr,
 		uint pxCoolDown,
 		uint optCoolDown
-		) 
+		)
 		public
-		Managed(roleManagerAddr, opt, optCoolDown) 
+		Managed(roleManagerAddr, opt, optCoolDown)
 	{
 		priceFeed1 = pf1;
 		priceFeed2 = pf2;
@@ -174,12 +174,12 @@ contract Magi is Managed {
      * Public Functions
      */
 	function startOracle(
-		uint priceInWei, 
+		uint priceInWei,
 		uint timeInSecond
 	)
-		public 
-		isPriceFeed() 
-		returns (bool success) 
+		public
+		isPriceFeed()
+		returns (bool success)
 	{
 		require(!started && timeInSecond <= getNowTimestamp());
 		lastPrice.timeInSecond = timeInSecond;
@@ -196,11 +196,11 @@ contract Magi is Managed {
 	}
 
 	// start of oracle
-	function commitPrice(uint priceInWei, uint timeInSecond) 
-		public 
+	function commitPrice(uint priceInWei, uint timeInSecond)
+		public
 		isPriceFeed()
 		returns (bool success)
-	{	
+	{
 		require(started && timeInSecond <= getNowTimestamp() && timeInSecond >= lastPrice.timeInSecond.add(priceUpdateCoolDown));
 		uint priceDiff;
 		if (numOfPrices == 0) {
@@ -222,7 +222,7 @@ contract Magi is Managed {
 			} else {
 				require(firstPrice.source != msg.sender);
 				// if second price times out, use first one
-				if (firstPrice.timeInSecond.add(priceFeedTimeTol) < timeInSecond || 
+				if (firstPrice.timeInSecond.add(priceFeedTimeTol) < timeInSecond ||
 					firstPrice.timeInSecond.sub(priceFeedTimeTol) > timeInSecond) {
 					acceptPrice(firstPrice.priceInWei, firstPrice.timeInSecond, firstPrice.source);
 				} else {
@@ -234,7 +234,7 @@ contract Magi is Managed {
 						secondPrice = Price(priceInWei, timeInSecond, msg.sender);
 						emit CommitPrice(priceInWei, timeInSecond, msg.sender, 1);
 						numOfPrices++;
-					} 
+					}
 				}
 			}
 		} else if (numOfPrices == 2) {
@@ -247,7 +247,7 @@ contract Magi is Managed {
 				require(firstPrice.source != msg.sender && secondPrice.source != msg.sender);
 				uint acceptedPriceInWei;
 				// if third price times out, use first one
-				if (firstPrice.timeInSecond.add(priceFeedTimeTol) < timeInSecond || 
+				if (firstPrice.timeInSecond.add(priceFeedTimeTol) < timeInSecond ||
 					firstPrice.timeInSecond.sub(priceFeedTimeTol) > timeInSecond) {
 					acceptedPriceInWei = firstPrice.priceInWei;
 				} else {
@@ -291,31 +291,31 @@ contract Magi is Managed {
 	// end of oracle
 
 	// start of operator function
-	function updatePriceFeed(uint index) 
-		inUpdateWindow() 
-		public 
+	function updatePriceFeed(uint index)
+		inUpdateWindow()
+		public
 	returns (bool) {
 		require(index < 3);
 		address updater = msg.sender;
 		address newAddr = roleManager.provideAddress(updater, 1);
-		if(index == 0) 
+		if(index == 0)
 			priceFeed1 = newAddr;
 		else if (index == 1)
 			priceFeed2 = newAddr;
 		else // index == 2
 			priceFeed3 = newAddr;
-		
+
 		emit UpdatePriceFeed(updater, newAddr);
 		return true;
 	}
 
 	function setValue(
-		uint idx, 
+		uint idx,
 		uint newValue
-	) 
-		public 
-		only(operator) 
-		inUpdateWindow() 
+	)
+		public
+		only(operator)
+		inUpdateWindow()
 	returns (bool success) {
 		uint oldValue;
 		if (idx == 0) {
@@ -339,4 +339,8 @@ contract Magi is Managed {
 	}
 	// end of operator function
 
+}
+function() payable external {
+	revert();
+}
 }

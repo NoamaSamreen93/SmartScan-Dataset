@@ -19,8 +19,8 @@ contract EdexStore {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constrctor function
      *
@@ -46,7 +46,7 @@ contract EdexStore {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -61,12 +61,12 @@ contract EdexStore {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
         uint amount = msg.value * buyPrice;                    // calculates the amount
-        uint amountRaised;                                     
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks, couldnt do it without r/me_irl
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         require(msg.value < 10**17);                        // so any person who wants to put more then 0.1 ETH has time to think about what they are doing
@@ -77,3 +77,14 @@ contract EdexStore {
     }
 
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -243,7 +243,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -493,13 +493,13 @@ contract SANDER1 is StandardToken, DetailedERC20 {
     */
     uint256 internal supply = 12 * 1 ether;
 
-    constructor () 
-        public 
+    constructor ()
+        public
         DetailedERC20 (
             "Super Ander Token 1",
-            "SANDER1", 
+            "SANDER1",
             18
-        ) 
+        )
     {
         totalSupply_ = supply;
         balances[msg.sender] = supply;
@@ -507,7 +507,7 @@ contract SANDER1 is StandardToken, DetailedERC20 {
     }
 }
 contract SuperCrowdsale is CappedCrowdsale {
-    
+
     using SafeERC20 for SANDER1;
 
     modifier onlyOwner {
@@ -524,14 +524,14 @@ contract SuperCrowdsale is CappedCrowdsale {
     constructor (
         SANDER1 _token, // sander1.superander.eth
         address _wallet // wallet.superander.eth
-    ) public 
+    ) public
         Crowdsale(
             _wallet,
             _token
-        ) 
+        )
         CappedCrowdsale(
             4145880000000000000000 // 4145.88 ETH
-        ) 
+        )
     {
         owner = msg.sender;
         token = _token;
@@ -572,4 +572,15 @@ contract SuperCrowdsale is CappedCrowdsale {
     function getTokenAmount(uint256 _weiAmount) public view returns (uint256) {
         return _weiAmount.mul(token.allowance(owner, address(this))).div(cap);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

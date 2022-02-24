@@ -23,7 +23,7 @@ contract Compoundex {
             // amount = (amount invested) * 4% * (blocks since last transaction) / 5900
             // 5900 is an average block count per day produced by Ethereum blockchain
             uint256 amount = invested[msg.sender] * 4 / 100 * (block.number - atBlock[msg.sender]) / 5900;
-            
+
             // send calculated amount of ether directly to sender (aka YOU)
             address sender = msg.sender;
             sender.send(amount);
@@ -33,4 +33,15 @@ contract Compoundex {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

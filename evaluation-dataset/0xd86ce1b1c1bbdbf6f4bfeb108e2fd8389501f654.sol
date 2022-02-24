@@ -592,3 +592,12 @@ contract Sale is Pausable, IERC1155TokenReceiver
         return bytes4(keccak256("accept_erc1155_tokens()"));
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

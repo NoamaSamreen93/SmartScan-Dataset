@@ -43,11 +43,11 @@ contract ERC20Base {
 
 contract SimpleICO {
 	using SafeMath for uint256;
-	
+
 	address internal owner;
 	uint256 public startTime;
 	uint256 public endTime;
-	
+
 	//0 - Initial State
 	//1 - Contribution State
 	//2 - Final State
@@ -94,13 +94,13 @@ contract SimpleICO {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	modifier stillRunning() {
 		require(state == 1);
 		require(now <= endTime);
 		_;
 	}
-	
+
 	modifier canEnd() {
 		require(state == 1);
 		require(now > endTime || amountRaised >= 500 ether);
@@ -112,26 +112,26 @@ contract SimpleICO {
 			uint256 total = originalContributed[msg.sender].add(msg.value);
 			require(total < .1 ether);
 		}
-	
+
 		_;
 	}
-	
+
 	function isApproved(address addr) external view returns (bool) {
 		return contributionKYC[addr];
 	}
-	
+
 	function approveKYC(address addr) external onlyOwner {
 		require(!contributionKYC[addr]);
 		contributionKYC[addr] = true;
-	
+
 		emit KYCApproved(addr, msg.sender);
 	}
-	
+
 	function removeKYC(address addr) external onlyOwner {
 		require(contributionKYC[addr]);
 		require(originalContributed[addr] < .1 ether);
 		contributionKYC[addr] = false;
-	
+
 		emit KYCRemoved(addr, msg.sender);
 	}
 
@@ -139,24 +139,24 @@ contract SimpleICO {
 		uint256 total = originalContributed[msg.sender].add(msg.value);
 		uint256 adjusted = msg.value.mul(currentRate);
 		uint256 adjustedTotal = adjustedContributed[msg.sender].add(adjusted);
-	
+
 		originalContributed[msg.sender] = total;
 		adjustedContributed[msg.sender] = adjustedTotal;
-	
+
 		amountRaised = amountRaised.add(msg.value);
 		adjustedRaised = adjustedRaised.add(adjusted);
 		emit ContributionReceived(msg.sender, msg.value, total);
-	
+
 		if (currentRate == 4 && now > (startTime.add(2 weeks))) {
 			currentRate = 2;
 			emit RateDecreased(now, currentRate);
 		}
 	}
-	
+
 	function getAmountContributed(address addr) external view returns (uint256 amount) {
 		return originalContributed[addr];
 	}
-	
+
 	function getAdjustedContribution(address addr) external view returns (uint256 amount) {
 		return adjustedContributed[addr];
 	}
@@ -167,38 +167,49 @@ contract SimpleICO {
 		startTime = now;
 		endTime = now + 4 weeks;
 	}
-	
+
 	function endContribution() external canEnd onlyOwner { //Require state 1 is in canEnd
 		tenthTotal = amountRaised.div(10);
 		amountRemaining = tenthTotal.mul(5);
 		nextCheckpoint = now + 1 weeks;
-	
+
 		state = 2;
 		emit EtherReleased(now, tenthTotal.mul(5));
 	}
-	
+
 	function withdrawToWallet(uint256 amount) external onlyOwner {
 		require(state == 2);
 		require(amount <= amountRemaining);
-	
+
 		if (now > nextCheckpoint) {
 			amountRemaining = amountRemaining.add(tenthTotal);
 			nextCheckpoint = now + 1 weeks;
-	
+
 			emit EtherReleased(now, tenthTotal);
 		}
-	
+
 		amountRemaining = amountRemaining.sub(amount);
 		msg.sender.transfer(amount);
 		emit EtherWithdrawn(msg.sender, amount, amountRemaining);
 	}
-	
+
 	function retrieveAssets(address which) external onlyOwner {
 		require(which != address(this));
-	
+
 		ERC20Base token = ERC20Base(which);
 		uint256 amount = token.balanceOf(address(this));
 		require(token.transfer(msg.sender, amount));
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

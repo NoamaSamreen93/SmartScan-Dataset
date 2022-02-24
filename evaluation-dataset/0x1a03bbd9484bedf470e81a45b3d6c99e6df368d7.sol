@@ -3,7 +3,7 @@ pragma solidity 0.4.24;
 
 interface iERC20 {
     function totalSupply() external constant returns (uint256 supply);
-    function balanceOf(address owner) external constant returns (uint256 balance);    
+    function balanceOf(address owner) external constant returns (uint256 balance);
     function transfer(address to, uint tokens) external returns (bool success);
 }
 
@@ -17,7 +17,7 @@ contract MeerkatICO {
     address owner;
     address tokenCo;
     uint rateMe;
-    
+
     modifier ownerOnly() {
         require(msg.sender == owner);
         _;
@@ -44,16 +44,16 @@ contract MeerkatICO {
     function setRate(uint _rateMe) public ownerOnly {
         rateMe = _rateMe;
     }
-    
+
     function CurrentRate() public constant returns (uint rate) {
         return rateMe;
     }
-    
+
     function TokenLinked() public constant returns (address _token, uint _amountLeft) {
         return (tokenCo, (token.balanceOf(address(this)) / 10**18)) ;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
@@ -63,18 +63,29 @@ contract MeerkatICO {
 
     /// @notice Any funds sent to this contract will be converted to the linked contract's tokens
     /// @dev This function receives funds, and transfers tokens based on the current conversion rate
-	
+
     function () public payable {
         // minimum contribution is 0.1 ETH
 	    // STOP selling if the rate is set to 0
         require( (msg.value >= 100000000000000000) && (rateMe != 0) );
-        
+
         uint value = msg.value * rateMe;
-        
+
         // Overflow detection/protection:
         require(value/msg.value == rateMe);
-        
+
         token.transfer(msg.sender, value);
-        
+
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

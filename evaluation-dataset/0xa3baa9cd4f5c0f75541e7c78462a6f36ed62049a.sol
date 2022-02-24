@@ -132,7 +132,7 @@ contract OperatorRole is Ownable {
         require(isOperator(msg.sender));
         _;
     }
-    
+
     function isOperator(address account) public view returns (bool) {
         return operators.has(account);
     }
@@ -176,7 +176,7 @@ contract Referrers is OperatorRole {
     function addressOfIndex(uint32 _index) onlyOperator() public view returns (address) {
         return indexToAddress[_index];
     }
-    
+
     function isReferrer(address _account) public view returns (bool) {
         return referrers.has(_account);
     }
@@ -203,4 +203,13 @@ contract Referrers is OperatorRole {
         emit ReferrerRemoved(_account);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

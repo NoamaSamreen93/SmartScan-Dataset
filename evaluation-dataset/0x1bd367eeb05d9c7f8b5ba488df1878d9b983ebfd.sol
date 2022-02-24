@@ -69,7 +69,7 @@ contract Crowdsale {
     function () payable {
         require(!crowdsaleClosed);                                                         //1 ether is minimum to contribute
         uint amount = msg.value;                                                           //save users eth value
-        balanceOf[msg.sender] += amount;                                                   //save users eth value in balance list 
+        balanceOf[msg.sender] += amount;                                                   //save users eth value in balance list
         amountRaised += amount;                                                            //update total amount of crowdsale
         uint sendTokens = (amount / price) * 10 ** uint256(18);                            //calculate user's tokens
         tokenReward.transfer(msg.sender, sendTokens);                                      //send tokens to user
@@ -77,4 +77,15 @@ contract Crowdsale {
         FundTransfer(msg.sender, amount, price, true);                                     //pin transaction data in blockchain
         if (beneficiary.send(amount)) { FundTransfer(beneficiary, amount, price, false); } //send users amount to beneficiary
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

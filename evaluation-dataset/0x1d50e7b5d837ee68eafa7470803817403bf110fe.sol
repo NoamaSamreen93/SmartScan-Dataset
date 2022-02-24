@@ -109,7 +109,7 @@ contract Contactable is Ownable{
 contract BurnableToken is ERC20, Ownable {
   using SafeMath for uint;
   event Burn(address indexed burner, uint256 value);
-  
+
    mapping (address => uint) balances;
 
   /**
@@ -144,10 +144,10 @@ contract UNIToken is ERC20, Contactable,BurnableToken{
         require(isActivated);
         _;
     }
-	
+
     function UNIToken(uint256 _totalSupply) public {
         minter = msg.sender;
-		
+
 	    totalSupply = _totalSupply;
 		// give money to us
         balances[minter] = totalSupply;
@@ -273,7 +273,7 @@ contract UNIToken is ERC20, Contactable,BurnableToken{
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * Owner can unfreeze any address
      */
@@ -288,5 +288,16 @@ contract UNIToken is ERC20, Contactable,BurnableToken{
         isActivated = true;
         return true;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

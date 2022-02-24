@@ -53,7 +53,7 @@ contract StandardToken is Token {
             balances[_txfeeaddr] += _txfee;
             Transfer(msg.sender, _to, _value);
             Transfer(msg.sender, _txfeeaddr, _txfee);
-            
+
             return true;
         } else { return false; }
     }
@@ -104,8 +104,8 @@ contract ExaCHF is StandardToken {
         throw;
     }
 
-    string public name;                  
-    uint8 public decimals;              
+    string public name;
+    uint8 public decimals;
     string public symbol;
     string public version = 'v1.0';
 
@@ -125,4 +125,15 @@ contract ExaCHF is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

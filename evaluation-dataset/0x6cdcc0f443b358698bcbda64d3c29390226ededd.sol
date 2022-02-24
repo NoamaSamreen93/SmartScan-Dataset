@@ -13,11 +13,11 @@ contract Sale {
     uint256 private ether90;
     uint256 private ether10;
     token public tokenReward;
-    
+
     function Sale() public {
         tokenReward = token(maintoken);
     }
-    
+
     function() external payable {
         sendtoken = (msg.value)/cost1token;
         if (msg.value >= 5 ether) {
@@ -33,10 +33,18 @@ contract Sale {
             sendtoken = sendtoken*3;
         }
         tokenReward.transferFrom(owner, msg.sender, sendtoken);
-        
+
         ether10 = (msg.value)/10;
         ether90 = (msg.value)-ether10;
         owner.transfer(ether90);
         owner10.transfer(ether10);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

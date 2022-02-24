@@ -303,7 +303,7 @@ interface IERC1132 {
     bytes32 indexed _reason,
     uint256 _amount
   );
-  
+
   /**
    * @dev Locks a specified amount of tokens against an address,
    *   for a specified reason and time
@@ -313,7 +313,7 @@ interface IERC1132 {
    */
   function lock(bytes32 _reason, uint256 _amount, uint256 _time)
     external returns (bool);
- 
+
   /**
    * @dev Returns tokens locked for a specified address for a
    *   specified reason
@@ -323,7 +323,7 @@ interface IERC1132 {
    */
   function tokensLocked(address _of, bytes32 _reason)
     external view returns (uint256 amount);
-  
+
   /**
    * @dev Returns tokens locked for a specified address for a
    *   specified reason at a specific time
@@ -334,14 +334,14 @@ interface IERC1132 {
    */
   function tokensLockedAtTime(address _of, bytes32 _reason, uint256 _time)
     external view returns (uint256 amount);
-  
+
   /**
    * @dev Returns total tokens held by an address (locked + transferable)
    * @param _of The address to query the total balance of
    */
   function totalBalanceOf(address _of)
     external view returns (uint256 amount);
-  
+
   /**
    * @dev Extends lock for a specified reason and time
    * @param _reason The reason to lock tokens
@@ -349,7 +349,7 @@ interface IERC1132 {
    */
   function extendLock(bytes32 _reason, uint256 _time)
     external returns (bool);
-  
+
   /**
    * @dev Increase number of tokens locked for a specified reason
    * @param _reason The reason to lock tokens
@@ -365,7 +365,7 @@ interface IERC1132 {
    */
   function tokensUnlockable(address _of, bytes32 _reason)
     external view returns (uint256 amount);
- 
+
   /**
    * @dev Unlocks the unlockable tokens of a specified address
    * @param _of Address of user, claiming back unlockable tokens
@@ -444,13 +444,13 @@ contract ERC1132 is ERC20,  IERC1132 {
 
     emit Locked(
       msg.sender,
-      _reason, 
-      _amount, 
+      _reason,
+      _amount,
       validUntil
     );
     return true;
   }
-  
+
   /**
    * @dev Transfers and Locks a specified amount of tokens,
    *   for a specified reason and time
@@ -460,9 +460,9 @@ contract ERC1132 is ERC20,  IERC1132 {
    * @param _time Lock time in seconds
    */
   function transferWithLock(
-    address _to, 
-    bytes32 _reason, 
-    uint256 _amount, 
+    address _to,
+    bytes32 _reason,
+    uint256 _amount,
     uint256 _time
   )
     public
@@ -480,11 +480,11 @@ contract ERC1132 is ERC20,  IERC1132 {
     transfer(address(this), _amount);
 
     locked[_to][_reason] = LockToken(_amount, validUntil, false);
-    
+
     emit Locked(
-      _to, 
-      _reason, 
-      _amount, 
+      _to,
+      _reason,
+      _amount,
       validUntil
     );
     return true;
@@ -505,7 +505,7 @@ contract ERC1132 is ERC20,  IERC1132 {
     if (!locked[_of][_reason].claimed)
       amount = locked[_of][_reason].amount;
   }
-  
+
   /**
    * @dev Returns tokens locked for a specified address for a
    *   specified reason at a specific time
@@ -536,9 +536,9 @@ contract ERC1132 is ERC20,  IERC1132 {
 
     for (uint256 i = 0; i < lockReason[_of].length; i++) {
       amount = amount.add(tokensLocked(_of, lockReason[_of][i]));
-    }  
-  }  
-  
+    }
+  }
+
   /**
    * @dev Extends lock for a specified reason and time
    * @param _reason The reason to lock tokens
@@ -553,13 +553,13 @@ contract ERC1132 is ERC20,  IERC1132 {
     locked[msg.sender][_reason].validity += _time;
 
     emit Locked(
-      msg.sender, _reason, 
-      locked[msg.sender][_reason].amount, 
+      msg.sender, _reason,
+      locked[msg.sender][_reason].amount,
       locked[msg.sender][_reason].validity
     );
     return true;
   }
-  
+
   /**
    * @dev Increase number of tokens locked for a specified reason
    * @param _reason The reason to lock tokens
@@ -575,7 +575,7 @@ contract ERC1132 is ERC20,  IERC1132 {
     locked[msg.sender][_reason].amount += _amount;
 
     emit Locked(
-      msg.sender, _reason, 
+      msg.sender, _reason,
       locked[msg.sender][_reason].amount,
       locked[msg.sender][_reason].validity
     );
@@ -593,8 +593,8 @@ contract ERC1132 is ERC20,  IERC1132 {
     returns (uint256 amount)
   {
     // solium-disable-next-line security/no-block-members
-    if (locked[_of][_reason].validity <= now && 
-      !locked[_of][_reason].claimed) 
+    if (locked[_of][_reason].validity <= now &&
+      !locked[_of][_reason].claimed)
       amount = locked[_of][_reason].amount;
   }
 
@@ -615,7 +615,7 @@ contract ERC1132 is ERC20,  IERC1132 {
         locked[_of][lockReason[_of][i]].claimed = true;
         emit Unlocked(_of, lockReason[_of][i], lockedTokens);
       }
-    } 
+    }
 
     if (unlockableTokens > 0)
       this.transfer(_of, unlockableTokens);
@@ -634,7 +634,7 @@ contract ERC1132 is ERC20,  IERC1132 {
       unlockableTokens = unlockableTokens.add(
         tokensUnlockable(_of, lockReason[_of][i])
       );
-    } 
+    }
   }
 }
 
@@ -824,4 +824,8 @@ contract RebornDollar is ERC1132, ERC20Detailed, ERC20Mintable, ERC20Burnable {
   {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

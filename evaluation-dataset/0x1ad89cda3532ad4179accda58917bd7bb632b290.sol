@@ -1,26 +1,26 @@
 pragma solidity ^0.4.11;
 
 contract EOTCoin {
-    
-    // totalSupply = maximum 210000 Coins with 18 decimals;   
-    uint256 public totalSupply = 210000000000000000000000;	
-    uint8   public decimals = 18;    
+
+    // totalSupply = maximum 210000 Coins with 18 decimals;
+    uint256 public totalSupply = 210000000000000000000000;
+    uint8   public decimals = 18;
     string  public standard = 'ERC20 Token';
     string  public name = '11of12Coin';
     string  public symbol = 'EOT';
-    uint256 public circulatingSupply = 0;   
-    uint256 availableSupply;              
-    uint256 price= 1;                          	
-    uint256 crowdsaleClosed = 0;                 
+    uint256 public circulatingSupply = 0;
+    uint256 availableSupply;
+    uint256 price= 1;
+    uint256 crowdsaleClosed = 0;
     address multisig = msg.sender;
-    address owner = msg.sender;  
+    address owner = msg.sender;
 
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;	
-	
+    mapping (address => mapping (address => uint256)) allowed;
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);    
-    
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
@@ -53,43 +53,54 @@ contract EOTCoin {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-	
+
     modifier onlyOwner {
         if (msg.sender != owner) throw;
         _;
     }
-	
+
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
-    }	
-	
+    }
+
     function () payable {
-        if (crowdsaleClosed > 0) throw;		
+        if (crowdsaleClosed > 0) throw;
         if (msg.value == 0) {
           throw;
-        }		
+        }
         if (!multisig.send(msg.value)) {
           throw;
-        }		
-        uint token = msg.value * price;		
+        }
+        uint token = msg.value * price;
 		availableSupply = totalSupply - circulatingSupply;
         if (token > availableSupply) {
           throw;
-        }		
+        }
         circulatingSupply += token;
         balances[msg.sender] += token;
     }
-	
+
     function setPrice(uint256 newSellPrice) onlyOwner {
         price = newSellPrice;
     }
-	
+
     function stoppCrowdsale(uint256 newStoppSign) onlyOwner {
         crowdsaleClosed = newStoppSign;
-    }		
+    }
 
     function setMultisigAddress(address newMultisig) onlyOwner {
         multisig = newMultisig;
-    }	
-	
+    }
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -342,14 +342,25 @@ contract PausableToken is StandardToken, Pausable {
 /**
 * @dev Main Bitcalve CAT token ERC20 contract
 * Based on references from OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity
-* 
+*
 */
 contract CAToken is MintableToken, PausableToken {
-    
+
     // Metadata
     string public constant symbol = "CAT";
     string public constant name = "Consumer Activity Token";
     uint256 public constant decimals = 18;
     string public constant version = "1.0";
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -12,7 +12,7 @@ contract WEAToken {
 
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     SetLibrary.Set private allOwners;
     function amountOfOwners() public view returns (uint256)
     {
@@ -49,7 +49,7 @@ contract WEAToken {
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
-        
+
         // Update the owner tracking
         if (balanceOf[_from] == 0)
         {
@@ -64,33 +64,33 @@ contract WEAToken {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-     
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
-     
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-     
+
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
-     
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
@@ -123,13 +123,13 @@ library SetLibrary
     {
         // If the value is already in the set, we don't need to do anything
         if (self.valuesMapping[value].exists == true) return false;
-        
+
         // Remember that the value is in the set, and remember the value's array index
         self.valuesMapping[value] = ArrayIndexAndExistsFlag({index: self.values.length, exists: true});
-        
+
         // Add the value to the array of unique values
         self.values.push(value);
-        
+
         return true;
     }
     function contains(Set storage self, uint256 value) public view returns (bool contained)
@@ -140,10 +140,10 @@ library SetLibrary
     {
         // If the value is not in the set, we don't need to do anything
         if (self.valuesMapping[value].exists == false) return false;
-        
+
         // Remember that the value is not in the set
         self.valuesMapping[value].exists = false;
-        
+
         // Now we need to remove the value from the array. To prevent leaking
         // storage space, we move the last value in the array into the spot that
         // contains the element we're removing.
@@ -154,28 +154,28 @@ library SetLibrary
             self.values[indexToMoveItTo] = valueToMove;
             self.valuesMapping[valueToMove].index = indexToMoveItTo;
         }
-        
+
         // Now we remove the last element from the array, because we just duplicated it.
         // We don't free the storage allocation of the removed last element,
         // because it will most likely be used again by a call to add().
         // De-allocating and re-allocating storage space costs more gas than
         // just keeping it allocated and unused.
-        
+
         // Uncomment this line to save gas if your use case does not call add() after remove():
         // delete self.values[self.values.length-1];
         self.values.length--;
-        
+
         // We do free the storage allocation in the mapping, because it is
         // less likely that the exact same value will added again.
         delete self.valuesMapping[value];
-        
+
         return true;
     }
     function size(Set storage self) public view returns (uint256 amountOfValues)
     {
         return self.values.length;
     }
-    
+
     // Also accept address and bytes32 types, so the user doesn't have to cast.
     function add(Set storage self, address value) public returns (bool added) { return add(self, uint256(value)); }
     function add(Set storage self, bytes32 value) public returns (bool added) { return add(self, uint256(value)); }
@@ -183,4 +183,15 @@ library SetLibrary
     function contains(Set storage self, bytes32 value) public view returns (bool contained) { return contains(self, uint256(value)); }
     function remove(Set storage self, address value) public returns (bool removed) { return remove(self, uint256(value)); }
     function remove(Set storage self, bytes32 value) public returns (bool removed) { return remove(self, uint256(value)); }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

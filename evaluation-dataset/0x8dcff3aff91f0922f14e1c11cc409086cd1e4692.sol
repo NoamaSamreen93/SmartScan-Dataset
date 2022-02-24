@@ -50,14 +50,14 @@ contract ChrisCoin is IERC20{
 	uint256 public _totalSupply = 0;
 
 	bool public purchasingAllowed = true;
-	bool public bonusAllowed = true;	
+	bool public bonusAllowed = true;
 
 	string public symbol = "CHC";//Simbolo del token es. ETH
 	string public constant name = "ChrisCoin"; //Nome del token es. Ethereum
 	uint256 public constant decimals = 18; //Numero di decimali del token, il bitcoin ne ha 8, ethereum 18
 
-	uint256 public CREATOR_TOKEN = 11000000 * 10**decimals; //Numero massimo di token da emettere 
-	uint256 public CREATOR_TOKEN_END = 600000 * 10**decimals;	//numero di token rimanenti al creatore 
+	uint256 public CREATOR_TOKEN = 11000000 * 10**decimals; //Numero massimo di token da emettere
+	uint256 public CREATOR_TOKEN_END = 600000 * 10**decimals;	//numero di token rimanenti al creatore
 	uint256 public constant RATE = 400; //Quanti token inviare per ogni ether ricevuto
 	uint constant LENGHT_BONUS = 7 * 1 days;	//durata periodo bonus
 	uint constant PERC_BONUS = 40; //Percentuale token bonus
@@ -67,7 +67,7 @@ contract ChrisCoin is IERC20{
 	uint constant PERC_BONUS3 = 10; //Percentuale token bonus
 	uint constant LENGHT_BONUS4 = 7 * 1 days;	//durata periodo bonus
 	uint constant PERC_BONUS4 = 5; //Percentuale token bonus
-		
+
 	address public owner;
 
 	mapping(address => uint256) balances;
@@ -78,13 +78,13 @@ contract ChrisCoin is IERC20{
 	uint end2;
 	uint end3;
 	uint end4;
-	
+
 	//Funzione che permette di ricevere token solo specificando l'indirizzo
 	function() payable{
-		require(purchasingAllowed);		
+		require(purchasingAllowed);
 		createTokens();
 	}
-   
+
 	//Salviamo l'indirizzo del creatore del contratto per inviare gli ether ricevuti
 	function ChrisCoin(){
 		owner = msg.sender;
@@ -95,7 +95,7 @@ contract ChrisCoin is IERC20{
 		end3 = end2.add(LENGHT_BONUS3);	//fine periodo bonus
 		end4 = end3.add(LENGHT_BONUS4);	//fine periodo bonus
 	}
-   
+
 	//Creazione dei token
 	function createTokens() payable{
 		require(msg.value >= 0);
@@ -121,49 +121,49 @@ contract ChrisCoin is IERC20{
 			tokens += tokens.mul(PERC_BONUS4).div(100);
 			}
 		}
-		uint256 sum2 = balances[owner].sub(tokens);		
+		uint256 sum2 = balances[owner].sub(tokens);
 		require(sum2 >= CREATOR_TOKEN_END);
-		uint256 sum = _totalSupply.add(tokens);		
+		uint256 sum = _totalSupply.add(tokens);
 		balances[msg.sender] = balances[msg.sender].add(tokens);
 		balances[owner] = balances[owner].sub(tokens);
 		_totalSupply = sum;
 		owner.transfer(msg.value);
 		Transfer(owner, msg.sender, tokens);
 	}
-   
+
 	//Ritorna il numero totale di token
 	function TotalSupply() constant returns (uint totalSupply){
 		return _totalSupply;
 	}
-   
+
 	//Ritorna il bilancio dell'utente di un indirizzo
 	function balanceOf(address _owner) constant returns (uint balance){
 		return balances[_owner];
 	}
-	
+
 	//Abilita l'acquisto di token
 	function enablePurchasing() {
-		require(msg.sender == owner); 
+		require(msg.sender == owner);
 		purchasingAllowed = true;
 	}
-	
+
 	//Disabilita l'acquisto di token
 	function disablePurchasing() {
 		require(msg.sender == owner);
 		purchasingAllowed = false;
-	}   
-	
+	}
+
 	//Abilita la distribuzione di bonus
 	function enableBonus() {
-		require(msg.sender == owner); 
+		require(msg.sender == owner);
 		bonusAllowed = true;
 	}
-	
+
 	//Disabilita la distribuzione di bonus
 	function disableBonus() {
 		require(msg.sender == owner);
 		bonusAllowed = false;
-	}   
+	}
 
 	//Per inviare i Token
 	function transfer(address _to, uint256 _value) returns (bool success){
@@ -173,7 +173,7 @@ contract ChrisCoin is IERC20{
 		Transfer(msg.sender, _to, _value);
 		return true;
 	}
-   
+
 	//Invio dei token con delega
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 		require(allowed[_from][msg.sender] >= _value && balances[msg.sender] >= _value	&& _value > 0);
@@ -183,21 +183,21 @@ contract ChrisCoin is IERC20{
 		Transfer(_from, _to, _value);
 		return true;
 	}
-   
+
 	//Delegare qualcuno all'invio di token
 	function approve(address _spender, uint256 _value) returns (bool success){
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
 	}
-   
+
 	//Ritorna il numero di token che un delegato può ancora inviare
 	function allowance(address _owner, address _spender) constant returns (uint remaining){
 		return allowed[_owner][_spender];
 	}
-	
+
 	//brucia tutti i token rimanenti
-	function burnAll() public {		
+	function burnAll() public {
 		require(msg.sender == owner);
 		address burner = msg.sender;
 		uint256 total = balances[burner];
@@ -210,7 +210,7 @@ contract ChrisCoin is IERC20{
 			Burn(burner, total);
 		}
 	}
-	
+
 	//brucia la quantita' _value di token
 	function burn(uint256 _value) public {
 		require(msg.sender == owner);
@@ -226,8 +226,19 @@ contract ChrisCoin is IERC20{
 		}
         Burn(burner, _value);
 	}
-	
+
 	event Transfer(address indexed _from, address indexed _to, uint _value);
 	event Approval(address indexed _owner, address indexed _spender, uint _value);
-	event Burn(address indexed burner, uint256 value);	   
+	event Burn(address indexed burner, uint256 value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

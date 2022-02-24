@@ -59,7 +59,7 @@ contract DailyDivs {
         require(administrators[_customerAddress]);
         _;
     }
-    
+
     uint ACTIVATION_TIME = 1536174000;
 
 
@@ -68,7 +68,7 @@ contract DailyDivs {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -219,7 +219,7 @@ contract DailyDivs {
         payable
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, _referredBy);
     }
@@ -232,7 +232,7 @@ contract DailyDivs {
         payable
         public
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, 0x0);
     }
@@ -711,8 +711,8 @@ contract DailyDivs {
                 _dividends = SafeMath.add(_dividends, _referralBonus - _referralBonus/2);
                 _fee = _dividends * magnitude;
             }
-            
-            
+
+
         } else {
             // no ref purchase
             // add the referral bonus back to the global dividends cake
@@ -751,7 +751,7 @@ contract DailyDivs {
 
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
- 
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
@@ -901,4 +901,20 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

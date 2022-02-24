@@ -23,7 +23,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             //balances[_to] += _value;
@@ -37,7 +37,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -66,18 +66,18 @@ contract StandardToken is Token {
     function () {
         throw;
     }
-    string public name = 'MicroFinance Coin';                  
-    uint8 public decimals = 18;                
-    string public symbol = 'MFC';               
-    string public version = 'V2.0';      
+    string public name = 'MicroFinance Coin';
+    uint8 public decimals = 18;
+    string public symbol = 'MFC';
+    string public version = 'V2.0';
 
     function MicroFinanceCoin(
         ) {
         balances[msg.sender] = 20000000000000000000000000;
-        totalSupply = 99999997000000000000000000;                      
-        name = "MicroFinance Coin";                                   
-        decimals = 18;                            
-        symbol = "MFC";                              
+        totalSupply = 99999997000000000000000000;
+        name = "MicroFinance Coin";
+        decimals = 18;
+        symbol = "MFC";
     }
 
     /* Approves and then calls the receiving contract */
@@ -95,7 +95,7 @@ contract StandardToken is Token {
  */
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
-    uint256 c = a * b; 
+    uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
@@ -115,4 +115,17 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

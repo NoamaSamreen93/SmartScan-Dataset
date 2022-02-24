@@ -107,3 +107,7 @@ contract lockEtherPay is Ownable {
     isReleased = true;
   }
 }
+function() payable external {
+	revert();
+}
+}

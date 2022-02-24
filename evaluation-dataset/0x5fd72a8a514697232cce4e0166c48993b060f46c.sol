@@ -267,3 +267,7 @@ contract VanityURL is Ownable,Pausable {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

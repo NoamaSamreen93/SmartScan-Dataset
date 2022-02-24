@@ -97,7 +97,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -118,7 +118,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -204,7 +204,7 @@ contract PGDToken is StandardToken,Ownable{
 	uint256 public constant TEAM_KEEPING=100000000*10**decimals;
 
 	uint256 public constant rate=17000;
-	
+
 	uint256 public totalFundingSupply;
 	uint256 public totalTeamWithdrawSupply;
 
@@ -213,7 +213,7 @@ contract PGDToken is StandardToken,Ownable{
 	address[] public allFundingUsers;
 
 	mapping(address=>uint256) public fundBalance;
-	
+
 
 	function PGDToken(){
 		totalSupply = 0 ;
@@ -268,7 +268,7 @@ contract PGDToken is StandardToken,Ownable{
 			//增加已众筹份额
 			uint256 amount=msg.value.mul(rate);
 			totalFundingSupply = totalFundingSupply.add(amount);
-			
+
 			//另外记录众筹数据，以避免受转账影响
 			allFundingUsers.push(msg.sender);
 			fundBalance[msg.sender]=fundBalance[msg.sender].add(amount);
@@ -321,4 +321,20 @@ contract PGDToken is StandardToken,Ownable{
 		startBlock=_startBlock;
 		endBlock=_endBlock;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

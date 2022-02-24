@@ -15,10 +15,10 @@ library SafeMath {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-     
+
         require(b > 0);
         uint256 c = a / b;
-   
+
         return c;
     }
 
@@ -44,9 +44,9 @@ library SafeMath {
 
 interface IERC20 {
     function totalSupply() external view returns (uint256);
-    
+
     function balanceOf(address who) external view returns (uint256);
-      
+
     function transfer(address to, uint256 value) external returns (bool);
 
     function transferFrom(address from, address to, uint256 value) external returns (bool);
@@ -63,13 +63,13 @@ interface IERC20 {
 
 
 contract ERC20 is IERC20 {
-    
+
     using SafeMath for uint256;
     uint8 constant DECIMALS = 18;
     uint256 private _totalSupply;
     string private _name;
     string private _symbol;
-    
+
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
 
@@ -97,29 +97,29 @@ contract ERC20 is IERC20 {
         _approve(msg.sender, spender, value);
         return true;
     }
-    
+
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowed[owner][spender];
     }
-    
+
     function burn(uint256 value) public {
         _burn(msg.sender, value);
     }
-    
+
     function _mint(address account, uint256 value) internal {
         require(account != address(0));
         _totalSupply = _totalSupply.add(value);
         _balances[account] = _balances[account].add(value);
         emit Transfer(address(0), account, value);
     }
-    
+
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
-      
+
     }
 
     function _approve(address owner, address spender, uint256 value) internal {
@@ -129,10 +129,10 @@ contract ERC20 is IERC20 {
         _allowed[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
-    
+
     function _burn(address account, uint256 value) internal {
         require(account != address(0));
-    
+
         _totalSupply = _totalSupply.sub(value);
         _balances[account] = _balances[account].sub(value);
         emit Transfer(account, address(0), value);
@@ -182,4 +182,13 @@ contract SaveWon is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("SaveWon", "SVW", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

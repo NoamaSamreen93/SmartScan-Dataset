@@ -142,7 +142,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
      *
      * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
      * recommends that there are no checks for the approval double-spend attack
-     * as this should be implemented in user interfaces 
+     * as this should be implemented in user interfaces
      */
     function approve(address spender, uint256 tokens) onlyPayloadSize(3 * 32) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -192,4 +192,12 @@ contract FixedSupplyToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

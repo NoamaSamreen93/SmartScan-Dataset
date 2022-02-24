@@ -862,7 +862,7 @@ contract AllowanceCrowdsale is Crowdsale {
      * @param wallet Address where collected funds will be forwarded to
      * @param token Address of the token being sold
      */
-    constructor (address allowanceWallet, uint256 rate, address payable wallet, IERC20 token) public 
+    constructor (address allowanceWallet, uint256 rate, address payable wallet, IERC20 token) public
         Crowdsale( rate, wallet, token )
     {
         require(allowanceWallet != address(0));
@@ -896,7 +896,7 @@ contract AllowanceCrowdsale is Crowdsale {
 
 //-------------------------------------------------------------------------------------
 contract ZikToken is ERC20Capped, ERC20Detailed {
-    constructor() public 
+    constructor() public
         ERC20Detailed( "Ziktalk Token", "ZIK", 18 )
         ERC20Capped( 1e27 )
     {
@@ -918,4 +918,13 @@ contract ZikToken is ERC20Capped, ERC20Detailed {
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

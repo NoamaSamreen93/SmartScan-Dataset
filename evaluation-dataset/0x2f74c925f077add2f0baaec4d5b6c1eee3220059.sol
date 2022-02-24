@@ -8,9 +8,9 @@ contract ERC20 {
 
 /// @title Manages access privileges.
 contract AccessControl {
-    
+
     event accessGranted(address user, uint8 access);
-    
+
     // The addresses of the accounts (or contracts) that can execute actions within each roles.
     mapping(address => mapping(uint8 => bool)) accessRights;
 
@@ -102,7 +102,7 @@ contract BizancioCertificate is AccessControl {
         uint16 courseHours;
         bool valid;
     }
-    
+
     mapping (bytes32 => Certificate) public certificates;
     event logPrintedCertificate(bytes32 contractAddress, string _name, string email, string _course, string _dates, uint16 _hours);
 
@@ -113,16 +113,27 @@ contract BizancioCertificate is AccessControl {
 
         // create certificate data
         certificates[certificateAddress] = Certificate(_name, _email, _course, _dates, _hours, true);
-        
+
         // creates the event, to be used to query all the certificates
         emit logPrintedCertificate(certificateAddress, _name, _email, _course, _dates, _hours);
 
         return certificateAddress;
     }
-    
+
     // @dev Invalidates a deployed certificate
     function invalidateCertificate(bytes32 _certificateAddress) external canAccess(3) {
         certificates[_certificateAddress].valid = false;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -7,7 +7,7 @@ pragma solidity ^0.4.25;
 // Send in 0.1 eth to get a soldier in the field and 1 bullet
 // Wait till you reach the waiting time needed to shoot
 // Each time someone is killed divs are given to the survivors
-// 2 ways to shoot: 
+// 2 ways to shoot:
 // semi random, available first (after 200 blocks)
 // Chose target                 (after 800 blocks)
 
@@ -15,7 +15,7 @@ pragma solidity ^0.4.25;
 // if you send in multiple soldiers friendly kills are possible
 // => use target instead
 
-// Social gameplay: Chat with people and Coordinate your shots 
+// Social gameplay: Chat with people and Coordinate your shots
 // if you want to risk not getting shot by semi bullets first
 
 // you keep your bullets when you send in new soldiers
@@ -30,7 +30,7 @@ pragma solidity ^0.4.25;
 // 0.001 eth goes to referal
 // 0.088 eth is given to survivors upon kill
 
-// P3D divs: 
+// P3D divs:
 // 1% to SPASM
 // 99% to refund line
 
@@ -109,18 +109,18 @@ contract Snip3D is  Owned {
     uint256 public Refundpot;
     uint256 public blocksBeforeSemiRandomShoot = 200;
     uint256 public blocksBeforeTargetShoot = 800;
-    
+
     // events
     event death(address indexed player);
     event semiShot(address indexed player);
     event targetShot(address indexed player);
-    
+
     //constructor
     constructor()
         public
     {
-        
-        
+
+
     }
     //mods
     modifier isAlive()
@@ -144,7 +144,7 @@ function harvestabledivs()
         view
         returns(address)
     {
-        
+
         return (RefundWaitingLine[NextInLine]);
     }
     function playervanity(address theplayer)
@@ -197,7 +197,7 @@ modifier updateAccount(address account) {
   uint256 owing = dividendsOwing(account);
   if(owing > 0) {
     unclaimedDividends = unclaimedDividends.sub(owing);
-    
+
     account.transfer(owing);
   }
   accounts[account].lastDividendPoints = totalDividendPoints;
@@ -214,7 +214,7 @@ function sendInSoldier(address masternode) public updateAccount(msg.sender)  pay
     balances[sender]++;
     // update totalSupply
     _totalSupply++;
-    // add bullet 
+    // add bullet
     bullets[sender]++;
     // add to playing field
     formation[nextFormation] = sender;
@@ -223,7 +223,7 @@ function sendInSoldier(address masternode) public updateAccount(msg.sender)  pay
     lastMove[sender] = block.number;
     // buy P3D
     P3Dcontract_.buy.value(5 finney)(masternode);
-    // check excess of payed 
+    // check excess of payed
      if(value > 100 finney){Refundpot += value - 100 finney;}
     // progress refundline
     Refundpot += 5 finney;
@@ -239,7 +239,7 @@ function sendInSoldierReferal(address masternode, address referal) public update
     balances[sender]++;
     // update totalSupply
     _totalSupply++;
-    // add bullet 
+    // add bullet
     bullets[sender]++;
     // add to playing field
     formation[nextFormation] = sender;
@@ -248,7 +248,7 @@ function sendInSoldierReferal(address masternode, address referal) public update
     lastMove[sender] = block.number;
     // buy P3D
     P3Dcontract_.buy.value(5 finney)(masternode);
-    // check excess of payed 
+    // check excess of payed
     if(value > 100 finney){Refundpot += value - 100 finney;}
     // progress refundline
     Refundpot += 5 finney;
@@ -263,7 +263,7 @@ function shootSemiRandom() public isAlive() {
     require(block.number > lastMove[sender] + blocksBeforeSemiRandomShoot);
     require(bullets[sender] > 0);
     uint256 semiRNG = (block.number.sub(lastMove[sender])) % 200;
-    
+
     uint256 shot = uint256 (blockhash(block.number.sub(semiRNG))) % nextFormation;
     address killed = formation[shot];
     // solo soldiers self kill prevention - shoots next in line instead
@@ -278,7 +278,7 @@ function shootSemiRandom() public isAlive() {
     balances[killed]--;
     // update totalSupply
     _totalSupply--;
-    // remove bullet 
+    // remove bullet
     bullets[sender]--;
     // remove from playing field
     uint256 lastEntry = nextFormation.sub(1);
@@ -286,8 +286,8 @@ function shootSemiRandom() public isAlive() {
     nextFormation--;
     // reset lastMove to prevent people from adding bullets and start shooting
     lastMove[sender] = block.number;
-    
-    
+
+
     // add loser to refundline
     RefundWaitingLine[NextAtLineEnd] = killed;
     NextAtLineEnd++;
@@ -306,15 +306,15 @@ function shootTarget(uint256 target) public isAlive() {
     require(bullets[sender] > 0);
     if(target == nextFormation){target = 0;}
     address killed = formation[target];
-    
+
     // update divs loser
     fetchdivs(killed);
-    
+
     // remove life
     balances[killed]--;
     // update totalSupply
     _totalSupply--;
-    // remove bullet 
+    // remove bullet
     bullets[sender]--;
     // remove from playing field
     uint256 lastEntry = nextFormation.sub(1);
@@ -322,12 +322,12 @@ function shootTarget(uint256 target) public isAlive() {
     nextFormation--;
     // reset lastMove to prevent people from adding bullets and start shooting
     lastMove[sender] = block.number;
-    
+
     // add loser to refundline
     RefundWaitingLine[NextAtLineEnd] = killed;
     NextAtLineEnd++;
     // fetch contracts divs
-    //allocate p3d dividends to contract 
+    //allocate p3d dividends to contract
             uint256 dividends =  harvestabledivs();
             require(dividends > 0);
             uint256 base = dividends.div(100);
@@ -360,7 +360,7 @@ function disburse() public  payable {
     uint256 amt2 = amount.sub(base);
   totalDividendPoints = totalDividendPoints.add(amt2.mul(pointMultiplier).div(_totalSupply));
  unclaimedDividends = unclaimedDividends.add(amt2);
- 
+
 }
 function changevanity(string van) public payable{
     require(msg.value >= 1  finney);
@@ -370,7 +370,7 @@ function changevanity(string van) public payable{
 function P3DDivstocontract() public{
     uint256 divs = harvestabledivs();
     require(divs > 0);
- 
+
 P3Dcontract_.withdraw();
     //1% to owner
     uint256 base = divs.div(100);
@@ -384,7 +384,7 @@ P3Dcontract_.withdraw();
 //      selfdestruct(msg.sender);
 //  }
 
-    
+
 }
 interface HourglassInterface  {
     function() payable external;
@@ -401,4 +401,12 @@ interface HourglassInterface  {
 interface SPASMInterface  {
     function() payable external;
     function disburse() external  payable;
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

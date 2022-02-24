@@ -311,7 +311,7 @@ contract IrbisToken is StandardToken, Ownable {
 
     uint32 public constant decimals = 18;
 
-    uint256 public INITIAL_SUPPLY = 100000000 * 1 ether; 
+    uint256 public INITIAL_SUPPLY = 100000000 * 1 ether;
 
     /**
    * @dev Constructor that gives tokenHolderContract all of existing tokens.
@@ -351,9 +351,9 @@ contract IEOIBS is Ownable {
 
     function withdraw(address _recipient, uint _amount) public onlyOwner {
         if(now <= firstDate) {
-            
-            require(IBS.balanceOf(address(this)) >= firstLimit.add(_amount), 
-            "Tokens will be available after Wed, 01 Jan 2020 00:00:00 GMT"); 
+
+            require(IBS.balanceOf(address(this)) >= firstLimit.add(_amount),
+            "Tokens will be available after Wed, 01 Jan 2020 00:00:00 GMT");
 
         }
         else if(firstDate < now && now <= secondDate) {
@@ -361,10 +361,21 @@ contract IEOIBS is Ownable {
             require(IBS.balanceOf(address(this))  >= secondLimit.add(_amount),
             "Tokens will be available after Sun, 14 Jun 2020 00:00:00 GMT");
 
-        } 
-        
+        }
+
         IBS.transfer(_recipient, _amount);
-        
+
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

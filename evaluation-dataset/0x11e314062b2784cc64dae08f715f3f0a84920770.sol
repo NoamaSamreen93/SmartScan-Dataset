@@ -219,7 +219,7 @@ contract Ownable {
 
 contract InvestorsFeature is Ownable, StandardToken {
     using SafeMath for uint;
-    
+
     address[] public investors;
     mapping(address => bool) isInvestor;
     function deposit(address investor, uint) internal {
@@ -228,41 +228,41 @@ contract InvestorsFeature is Ownable, StandardToken {
             isInvestor[investor] = true;
         }
     }
-    
+
     function sendp(address addr, uint amount) internal {
         require(addr != address(0));
         require(amount > 0);
         deposit(addr, amount);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[this] = balances[this].sub(amount);
         balances[addr] = balances[addr].add(amount);
         Transfer(this, addr, amount);
     }
-    
+
 
 
 }
 
 contract nCryptToken is Ownable, StandardToken, InvestorsFeature  {
-    
+
 
   string public constant name = "nCryptToken";
   string public constant symbol = "NCT";
   uint8 public constant decimals = 18;
-  
+
   uint256 public constant INITIAL_SUPPLY = (10 * (10**6)) * (10 ** uint256(decimals));
-  
-  
-  
+
+
+
   function nCryptToken() public {
     totalSupply = INITIAL_SUPPLY;
     balances[this] = INITIAL_SUPPLY;
     Transfer(address(0), this, INITIAL_SUPPLY);
   }
-  
 
-  
+
+
   function send(address addr, uint amount) public onlyOwner {
       sendp(addr, amount);
   }
@@ -271,11 +271,22 @@ contract nCryptToken is Ownable, StandardToken, InvestorsFeature  {
       require(addr != 0x0);
       addr.transfer(this.balance);
   }
-  
+
   function burnRemainder(uint) public onlyOwner {
       uint value = balances[this];
       totalSupply = totalSupply.sub(value);
       balances[this] = 0;
   }
- 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

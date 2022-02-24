@@ -31,15 +31,15 @@ contract BetBuyer {
   uint256 public time_bought;
   // Emergency kill switch in case a critical bug is found.
   bool public kill_switch;
-  
+
   // Ratio of BET tokens received to ETH contributed
   uint256 bet_per_eth = 2000;
-  
+
   // The BET Token address and sale address are the same.
   DaoCasinoToken public token = DaoCasinoToken(0xFd08655DFcaD0d42B57Dc8f1dc8CC39eD8b6B071);
   // The developer address.
   address developer = 0x000Fb8369677b3065dE5821a86Bc9551d5e5EAb9;
-  
+
   // Allows the developer to shut down everything except withdrawals in emergencies.
   function activate_kill_switch() {
     // Only allow the developer to activate the kill switch.
@@ -47,7 +47,7 @@ contract BetBuyer {
     // Irreversibly activate the kill switch.
     kill_switch = true;
   }
-  
+
   // Withdraws all ETH deposited or BET purchased by the sender.
   function withdraw(){
     // If called before the ICO, cancel caller's participation in the sale.
@@ -77,7 +77,7 @@ contract BetBuyer {
       if(!token.transfer(msg.sender, bet_amount - fee)) throw;
     }
   }
-  
+
   // Allow developer to add ETH to the buy execution bounty.
   function add_to_bounty() payable {
     // Only allow the developer to contribute to the buy execution bounty.
@@ -89,7 +89,7 @@ contract BetBuyer {
     // Update bounty to include received amount.
     bounty += msg.value;
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function claim_bounty(){
     // Short circuit to save gas if the contract has already bought tokens.
@@ -107,7 +107,7 @@ contract BetBuyer {
     // Send the caller their bounty for buying tokens for the contract.
     msg.sender.transfer(bounty);
   }
-  
+
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
     // Treat near-zero ETH transactions as check ins and withdrawal requests.
@@ -132,10 +132,21 @@ contract BetBuyer {
       balances[msg.sender] += msg.value;
     }
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Delegate to the helper function.
     default_helper();
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

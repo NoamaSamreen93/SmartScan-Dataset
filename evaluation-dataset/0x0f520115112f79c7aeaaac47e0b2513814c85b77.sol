@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
 // ----------------------------------------------------------------------------
-// Abab.io preICO 
+// Abab.io preICO
 // The MIT Licence
 // ----------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ contract Owned {
     function transferOwnership(address _newOwner) onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     function acceptOwnership() {
         if (msg.sender == newOwner) {
             OwnershipTransferred(owner, newOwner);
@@ -156,7 +156,7 @@ contract ERC20Token is Owned {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -176,9 +176,9 @@ contract AbabPreICOToken is ERC20Token {
     string public constant name     = "AbabPreICOToken_Ver2";
     uint8  public constant decimals = 18;
 
-    uint256 public STARTDATE;  
-    uint256 public ENDDATE;    
-    uint256 public BUYPRICE;   
+    uint256 public STARTDATE;
+    uint256 public ENDDATE;
+    uint256 public BUYPRICE;
     uint256 public CAP;
 
     function AbabPreICOToken() {
@@ -186,7 +186,7 @@ contract AbabPreICOToken is ERC20Token {
         ENDDATE   = 1817029631;        // 31 July 2027 г., 10:27:11
         BUYPRICE  = 3333;              // $0.06 @ $200 ETH/USD
         CAP       = 2500*1 ether;      // in eth ($500K / 0.05 ) / etherPrice
-        
+
 InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0x2EDE66ED71E557CC90B9A76C298185C09591991B, 0.25 ether);
 InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0x56B8729FFCC28C4BB5718C94261543477A4EB4E5, 0.5  ether);
 InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0x56B8729FFCC28C4BB5718C94261543477A4EB4E5, 0.5  ether);
@@ -203,19 +203,19 @@ InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0x72EC91441AB84639CCAB04
 InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0xE5389809FEDFB0225719D136D9734845A7252542, 2    ether);
 InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0xE1D8D6D31682D8A901833E60DA15EE1A870B8370, 5    ether);
     }
-	
-    function ActualizePrice(uint256 _start, uint256 _end, uint256 _buyPrice, uint256 _cap) 
-    onlyOwner returns (bool success) 
+
+    function ActualizePrice(uint256 _start, uint256 _end, uint256 _buyPrice, uint256 _cap)
+    onlyOwner returns (bool success)
     {
         STARTDATE = _start;
         ENDDATE   = _end;
         BUYPRICE  = _buyPrice;
-        CAP       = _cap; 
+        CAP       = _cap;
         return true;
     }
-    
+
     uint BUYPRICE961e593b36920a767dad75f9fda07723231d9b77 = 4000;
-    
+
     function InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(address sender, uint val)
     onlyOwner
     {
@@ -280,7 +280,7 @@ InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0xE1D8D6D31682D8A901833E
     // balance to another account, with a check that the crowdsale is
     // finalised
     // ------------------------------------------------------------------------
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
         returns (bool success)
     {
         // Cannot transfer before crowdsale ends or cap reached
@@ -294,8 +294,19 @@ InitBalanceFrom961e593b36920a767dad75f9fda07723231d9b77(0xE1D8D6D31682D8A901833E
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint amount)
-      onlyOwner returns (bool success) 
+      onlyOwner returns (bool success)
     {
         return ERC20Token(tokenAddress).transfer(owner, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

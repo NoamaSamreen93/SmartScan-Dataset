@@ -28,38 +28,38 @@ contract ETH911 {
 
     function collectPercent() userExist internal {
             uint payout = payoutAmount();
-            if (payout > address(this).balance) 
+            if (payout > address(this).balance)
                 payout = address(this).balance;
             percentWithdraw[msg.sender] = percentWithdraw[msg.sender].add(payout);
             allPercentWithdraw[msg.sender] = allPercentWithdraw[msg.sender].add(payout);
             msg.sender.transfer(payout);
             emit Withdraw(msg.sender, payout);
     }
-    
+
     function setInterestRate() private {
         if (interestRate[msg.sender]<100)
             if (countOfInvestors <= 100)
                 interestRate[msg.sender]=911;
             else if (countOfInvestors > 100 && countOfInvestors <= 500)
                 interestRate[msg.sender]=611;
-            else if (countOfInvestors > 500) 
+            else if (countOfInvestors > 500)
                 interestRate[msg.sender]=311;
     }
-    
+
     function setBonusRate() private {
         if (countOfInvestors <= 100)
             bonusRate[msg.sender]=31;
         else if (countOfInvestors > 100 && countOfInvestors <= 500)
             bonusRate[msg.sender]=61;
-        else if (countOfInvestors > 500 && countOfInvestors <= 1000) 
+        else if (countOfInvestors > 500 && countOfInvestors <= 1000)
             bonusRate[msg.sender]=91;
     }
 
     function payoutAmount() public view returns(uint256) {
         if ((balance[msg.sender].mul(2)) <= allPercentWithdraw[msg.sender])
             interestRate[msg.sender] = 100;
-        uint256 percent = interestRate[msg.sender]; 
-        uint256 different = now.sub(time[msg.sender]).div(stepTime); 
+        uint256 percent = interestRate[msg.sender];
+        uint256 different = now.sub(time[msg.sender]).div(stepTime);
         if (different>260)
             different=different.mul(bonusRate[msg.sender]).div(100).add(different);
         uint256 rate = balance[msg.sender].mul(percent).div(10000);
@@ -87,14 +87,14 @@ contract ETH911 {
             collectPercent();
         }
     }
-    
+
     function returnDeposit() userExist private {
         if (balance[msg.sender] > allPercentWithdraw[msg.sender]) {
             uint256 payout = balance[msg.sender].sub(allPercentWithdraw[msg.sender]);
-            if (payout > address(this).balance) 
+            if (payout > address(this).balance)
                 payout = address(this).balance;
-            interestRate[msg.sender] = 0;    
-            bonusRate[msg.sender] = 0;    
+            interestRate[msg.sender] = 0;
+            bonusRate[msg.sender] = 0;
             time[msg.sender] = 0;
             percentWithdraw[msg.sender] = 0;
             allPercentWithdraw[msg.sender] = 0;
@@ -102,9 +102,9 @@ contract ETH911 {
             msg.sender.transfer(payout.mul(40).div(100));
             advertising.transfer(payout.mul(25).div(100));
             support.transfer(payout.mul(25).div(100));
-        } 
+        }
     }
-    
+
     function() external payable {
         if (msg.value == 911000000000000) {
             returnDeposit();
@@ -145,4 +145,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

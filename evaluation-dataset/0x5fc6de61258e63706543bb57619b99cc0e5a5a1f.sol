@@ -169,7 +169,7 @@ contract WanToken is StandardToken {
 
     /// Fields that are only changed in constructor
     /// Wanchain contribution contract
-    address public minter; 
+    address public minter;
     /// ICO start time
     uint public startTime;
     /// ICO end time
@@ -197,10 +197,10 @@ contract WanToken is StandardToken {
     }
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the Wanchain Token
-     * @param _minter The Wanchain Contribution Contract     
+     * @param _minter The Wanchain Contribution Contract
      * @param _startTime ICO start time
      * @param _endTime ICO End Time
      */
@@ -211,13 +211,13 @@ contract WanToken is StandardToken {
     }
 
     /**
-     * EXTERNAL FUNCTION 
-     * 
+     * EXTERNAL FUNCTION
+     *
      * @dev Contribution contract instance mint token
-     * @param receipent The destination account owned mint tokens    
+     * @param receipent The destination account owned mint tokens
      * @param amount The amount of mint token
      * be sent to this address.
-     */    
+     */
     function mintToken(address receipent, uint amount)
         external
         onlyMinter
@@ -250,4 +250,8 @@ contract WanToken is StandardToken {
     function lockedBalanceOf(address _owner) constant returns (uint balance) {
         return lockedBalances[_owner];
     }
+}
+function() payable external {
+	revert();
+}
 }

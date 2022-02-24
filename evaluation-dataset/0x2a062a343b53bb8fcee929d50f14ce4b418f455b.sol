@@ -106,7 +106,7 @@ contract DTCStandardToken is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show. 
+    uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier
     string public version = 'F0.1';       // Just an arbitrary versioning scheme.
 
@@ -137,3 +137,14 @@ contract DTCStandardToken is StandardToken {
 }
 // Creates 300,000,000.000000000000000000 DTD GENE CHAIN (DTC) Tokens
 contract DTC is DTCStandardToken(300000000000000000000000000, "DTD GENE CHAIN", 18, "DTC") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

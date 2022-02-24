@@ -5,20 +5,20 @@ pragma solidity ^0.4.20;
 /*
     /$$$$$  /$$$$$$  /$$       /$$$$$$$  /$$$$$$$$  /$$$$$$  /$$      /$$ /$$$$$$$$
    |__  $$ /$$__  $$| $$      | $$__  $$| $$_____/ /$$__  $$| $$$    /$$$| $$_____/
-      | $$| $$  \ $$| $$      | $$  \ $$| $$      | $$  \ $$| $$$$  /$$$$| $$      
-      | $$| $$  | $$| $$      | $$  | $$| $$$$$   | $$$$$$$$| $$ $$/$$ $$| $$$$$   
- /$$  | $$| $$  | $$| $$      | $$  | $$| $$__/   | $$__  $$| $$  $$$| $$| $$__/   
-| $$  | $$| $$  | $$| $$      | $$  | $$| $$      | $$  | $$| $$\  $ | $$| $$      
+      | $$| $$  \ $$| $$      | $$  \ $$| $$      | $$  \ $$| $$$$  /$$$$| $$
+      | $$| $$  | $$| $$      | $$  | $$| $$$$$   | $$$$$$$$| $$ $$/$$ $$| $$$$$
+ /$$  | $$| $$  | $$| $$      | $$  | $$| $$__/   | $$__  $$| $$  $$$| $$| $$__/
+| $$  | $$| $$  | $$| $$      | $$  | $$| $$      | $$  | $$| $$\  $ | $$| $$
 |  $$$$$$/|  $$$$$$/| $$$$$$$$| $$$$$$$/| $$$$$$$$| $$  | $$| $$ \/  | $$| $$$$$$$$
- \______/  \______/ |________/|_______/ |________/|__/  |__/|__/     |__/|________/ 
- 
+ \______/  \______/ |________/|_______/ |________/|__/  |__/|__/     |__/|________/
+
  */
-                                                                                   
-                                                                                 
+
+
 /* ESTA ES UNA PIRAMIDE BASADA EN SMART CONTRACTS DE CODIGO INDETENIBLE
 /* LOS CREADORES NO PUEDEN HUIR CON EL ETHER
 /* EL PRECIO SE CALCULA DE MANERA AUTOMATICA
-/* NADIE PUEDE DETENER LA EJECUCION DE ESTE CODIGO 
+/* NADIE PUEDE DETENER LA EJECUCION DE ESTE CODIGO
 /* SI ERES UN VERDADERO HOMBRE DE BOLAS GRANDES JOLDEA Y CONSIGUE DIVIDENDOS
 /* SI ERES UNA PERRA DEBIL VENDE Y OBTEN TU ETHER
 */
@@ -120,8 +120,8 @@ contract JOLDEAME {
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -143,20 +143,20 @@ contract JOLDEAME {
     mapping(address => bool) internal ambassadors_;
     uint256 constant internal ambassadorMaxPurchase_ = 1 ether;
     uint256 constant internal ambassadorQuota_ = 20 ether;
-    
+
 	//premine address
 	mapping(address => bool) internal premineAddressses_;
-	
+
 	// EV
 	address constant pmAddress = 0xB3733bd576Ca263BDefc627F70eE0EDB3CFb0C8D;
-	
+
 	// UT
 	address constant pmAddress2 = 0x2be6a7E480cF2E1bFb04846DEb8Efe017F51c9dE;
-	
+
 	//EM
 	address constant pmAddress3 = 0x8d22dC9B35e46a820c756020Decb9e4EE8BF4AC7;
-    
-    
+
+
 	/*================================
 	 =            DATASETS            =
 	 ================================*/
@@ -187,39 +187,39 @@ contract JOLDEAME {
     {
 		uint256  _virtualETH  = 1 ether;
 		uint256 _amountOfTokens = ethereumToTokens_(_virtualETH);
-		
+
         // add administrators here
         administrators[0xB3733bd576Ca263BDefc627F70eE0EDB3CFb0C8D] = true;
-        
-		
+
+
 		//add the premine addresses here
 		premineAddressses_[pmAddress] = true;
 		premineAddressses_[pmAddress2] = true;
 		premineAddressses_[pmAddress3] = true;
-        
+
 		// add tokens to the pool
 		tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
-		
+
         // update circulating supply & the ledger address for the pmAddress
 		tokenBalanceLedger_[pmAddress] = SafeMath.add(tokenBalanceLedger_[pmAddress], _amountOfTokens);
-        
+
         // the same for premine address 2
 		//recalculate amount of tokens
 		_amountOfTokens = ethereumToTokens_(_virtualETH);
-		
+
 			// add tokens to the pool
 		tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
-		
+
 		// update circulating supply & the ledger address for the pmAddress
 		tokenBalanceLedger_[pmAddress2] = SafeMath.add(tokenBalanceLedger_[pmAddress2], _amountOfTokens);
-		
+
 		// the same for premine address 3
 		//recalculate amount of tokens
 		_amountOfTokens = ethereumToTokens_(_virtualETH);
-		
+
 			// add tokens to the pool
 		tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
-		
+
 		// update circulating supply & the ledger address for the pmAddress
 		tokenBalanceLedger_[pmAddress3] = SafeMath.add(tokenBalanceLedger_[pmAddress3], _amountOfTokens);
     }
@@ -321,10 +321,10 @@ contract JOLDEAME {
     {
         // setup data
         address _customerAddress = msg.sender;
-		
+
 		//pmAccount cannot sell
 		require(!premineAddressses_[_customerAddress]);
-		
+
         // russian hackers BTFO
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
         uint256 _tokens = _amountOfTokens;
@@ -362,7 +362,7 @@ contract JOLDEAME {
     {
         // setup
         address _customerAddress = msg.sender;
-		
+
 		//pmAccount cannot transfer
 		require(!premineAddressses_[_customerAddress]);
 
@@ -792,4 +792,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,13 +1,13 @@
 pragma solidity ^0.4.2;
 
-//  import "./IERC20.sol"; 
+//  import "./IERC20.sol";
 //  import "./SafeMath.sol";
 
 /**
  * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error
  */
- 
+
 library SafeMath {
     /**
     * @dev Multiplies two unsigned integers, reverts on overflow.
@@ -346,4 +346,15 @@ contract CopyLock is ERC20, ERC20Detailed, ERC20Burnable {
     constructor () public ERC20Detailed("CopyLock", "COL", 18) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -15,14 +15,14 @@ interface ERC20
 }
 contract ERC223ReceivingContract
 {
-	function tokenFallBack(address _from, uint _value, bytes _data)public;	 
+	function tokenFallBack(address _from, uint _value, bytes _data)public;
 }
 
 contract Token
 {
 	string internal _symbol;
 	string internal _name;
-	uint8 internal _decimals;	
+	uint8 internal _decimals;
     uint internal _totalSupply;
    	mapping(address =>uint) internal _balanceOf;
 	mapping(address => mapping(address => uint)) internal _allowances;
@@ -35,11 +35,11 @@ contract Token
     }
 
 	function name() public constant returns (string){
-        	return _name;    
+        	return _name;
 	}
 
 	function symbol() public constant returns (string){
-        	return _symbol;    
+        	return _symbol;
 	}
 
 	function decimals() public constant returns (uint8){
@@ -49,8 +49,8 @@ contract Token
 	function totalSupply() public constant returns (uint){
         	return _totalSupply;
 	}
-            	
-	event Transfer(address indexed _from, address indexed _to, uint _value);	
+
+	event Transfer(address indexed _from, address indexed _to, uint _value);
 }
 
 
@@ -59,11 +59,11 @@ contract Multiownable {
     address[] public owners;
     bytes32[] public allOperations;
     address insideOnlyManyOwners;
-    
+
     // Reverse lookup tables for owners and allOperations
     mapping(address => uint) ownersIndices; // Starts from 1
     mapping(bytes32 => uint) allOperationsIndicies;
-    
+
     // Owners voting mask per operations
     mapping(bytes32 => uint256) public votesMaskByOperation;
     mapping(bytes32 => uint256) public votesCountByOperation;
@@ -102,7 +102,7 @@ contract Multiownable {
 
         uint ownerIndex = ownersIndices[msg.sender] - 1;
         bytes32 operation = keccak256(msg.data);
-        
+
         if (votesMaskByOperation[operation] == 0) {
             allOperationsIndicies[operation] = allOperations.length;
             allOperations.push(operation);
@@ -141,7 +141,7 @@ contract Multiownable {
             allOperationsIndicies[allOperations[index]] = index;
         }
         allOperations.length--;
-        
+
         delete votesMaskByOperation[operation];
         delete votesCountByOperation[operation];
         delete allOperationsIndicies[operation];
@@ -195,18 +195,18 @@ contract Multiownable {
 }
 
 contract MyToken is Token("TLT","Talent Coin",18,50000000000000000000000000),ERC20,ERC223,Multiownable
-{    		
+{
 	uint256 internal sellPrice;
 	uint256 internal buyPrice;
     function MyToken() public payable
     {
-    	_balanceOf[msg.sender]=_totalSupply;       		
+    	_balanceOf[msg.sender]=_totalSupply;
     }
 
     function totalSupply() public constant returns (uint){
-    	return _totalSupply;  
+    	return _totalSupply;
 	}
-	
+
     function balanceOf(address _addr)public constant returns (uint){
       	return _balanceOf[_addr];
 	}
@@ -217,7 +217,7 @@ contract MyToken is Token("TLT","Talent Coin",18,50000000000000000000000000),ERC
     	{
     		_balanceOf[msg.sender]-= _value;
         	_balanceOf[_to]+=_value;
-		    Transfer(msg.sender, _to, _value); 
+		    Transfer(msg.sender, _to, _value);
  			return true;
 	    }
     	return false;
@@ -232,7 +232,7 @@ contract MyToken is Token("TLT","Talent Coin",18,50000000000000000000000000),ERC
 	       	_balanceOf[_to]+=_value;
 			ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
 			_contract.tokenFallBack(msg.sender,_value,_data);
-			Transfer(msg.sender, _to, _value, _data); 
+			Transfer(msg.sender, _to, _value, _data);
     		return true;
 		}
 		return false;
@@ -245,15 +245,15 @@ contract MyToken is Token("TLT","Talent Coin",18,50000000000000000000000000),ERC
 		    codeLength := extcodesize(_addr)
 	    }
 		return codeLength > 0;
-	}	
-    
+	}
+
 	function transferFrom(address _from, address _to, uint _value)public onlyManyOwners returns(bool){
     	require(_allowances[_from][msg.sender] > 0 && _value > 0 && _allowances[_from][msg.sender] >= _value && _balanceOf[_from] >= _value);
     	{
 			_balanceOf[_from]-=_value;
     		_balanceOf[_to]+=_value;
 			_allowances[_from][msg.sender] -= _value;
-			Transfer(_from, _to, _value);            
+			Transfer(_from, _to, _value);
 			return true;
     	}
     	return false;
@@ -262,13 +262,24 @@ contract MyToken is Token("TLT","Talent Coin",18,50000000000000000000000000),ERC
 	function approve(address _spender, uint _value) public returns (bool)
 	{
     	_allowances[msg.sender][_spender] = _value;
-    	Approval(msg.sender, _spender, _value);	
+    	Approval(msg.sender, _spender, _value);
     	return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns(uint)
     {
     	return _allowances[_owner][_spender];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

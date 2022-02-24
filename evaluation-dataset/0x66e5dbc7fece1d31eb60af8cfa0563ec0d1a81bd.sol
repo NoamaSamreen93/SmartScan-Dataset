@@ -55,7 +55,7 @@ contract ERC20Token is SafeMath {
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-  modifier onlyPayloadSize(uint size) {   
+  modifier onlyPayloadSize(uint size) {
     require(msg.data.length == size + 4);
     _;
   }
@@ -101,7 +101,7 @@ contract ERC20Token is SafeMath {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function approve(address _spender, uint256 _value)
     public
     onlyPayloadSize(2 * 32)
@@ -148,4 +148,20 @@ contract BitEyeToken is ERC20Token, Ownable {
     balances[_airdropAddr] = 50000000 * 1e18;
     Transfer(address(0), _airdropAddr, 50000000 * 1e18);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

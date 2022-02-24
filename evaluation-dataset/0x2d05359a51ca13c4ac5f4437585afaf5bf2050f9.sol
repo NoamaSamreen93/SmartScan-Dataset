@@ -124,7 +124,7 @@ contract usingOraclize {
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_useCoupon(string code) oraclizeAPI internal {
         oraclize.useCoupon(code);
     }
@@ -136,7 +136,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -218,10 +218,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -274,7 +274,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -384,10 +384,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, bytes[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[2] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](2);
         dynargs[0] = args[0];
@@ -440,7 +440,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[4] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](4);
         dynargs[0] = args[0];
@@ -522,7 +522,7 @@ contract usingOraclize {
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -667,7 +667,7 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
+
     function stra2cbor(string[] arr) internal returns (bytes) {
             uint arrlen = arr.length;
 
@@ -751,17 +751,17 @@ contract usingOraclize {
             }
             return res;
         }
-        
-        
+
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-    
+
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
         bytes memory nbytes = new bytes(1);
@@ -775,26 +775,26 @@ contract usingOraclize {
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        bytes[3] memory args = [unonce, nbytes, sessionKeyHash]; 
+        bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
-    
+
     mapping(bytes32=>bytes32) oraclize_randomDS_args;
     mapping(bytes32=>bool) oraclize_randomDS_sessionKeysHashVerified;
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool){
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -806,8 +806,8 @@ contract usingOraclize {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(sha3(pubkey)) == signer) return true;
         else {
@@ -818,119 +818,119 @@ contract usingOraclize {
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) return false;
-        
-        
+
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) throw;
-        
+
         _;
     }
-    
+
     function oraclize_randomDS_proofVerify__returnCode(bytes32 _queryId, string _result, bytes _proof) internal returns (uint8){
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) return 1;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) return 2;
-        
+
         return 0;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
         bool match_ = true;
-        
+
         for (var i=0; i<prefix.length; i++){
             if (content[i] != prefix[i]) match_ = false;
         }
-        
+
         return match_;
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
-        
+
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
         if (checkok == false) return false;
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
-        
+
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) return false;
-        
-        
+
+
         // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
-        
-        
+
+
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
         checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
         if (checkok == false) return false;
-        
+
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
             oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
         uint minLength = length + toOffset;
@@ -955,7 +955,7 @@ contract usingOraclize {
 
         return to;
     }
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     // Duplicate Solidity's ecrecover, but catching the CALL return value
     function safer_ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal returns (bool, address) {
@@ -981,7 +981,7 @@ contract usingOraclize {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
 
@@ -1025,7 +1025,7 @@ contract usingOraclize {
 
         return safer_ecrecover(hash, v, r, s);
     }
-        
+
 }
 // </ORACLIZE_API>
 
@@ -1770,14 +1770,14 @@ contract token { function transfer(address receiver, uint amount){ receiver; amo
  * @dev user choose a num in [2,99] system generate a num in [1,100], if num user choosed  > num system generated, user win, otherwise user lose
  */
 contract Etherwow is usingOraclize, SafeMath {
-    
+
      using strings for *;
 
     /*
      * checks user profit, bet size and user number is within range
     */
     modifier betIsValid(uint _betSize, uint _userNumber) {
-        require(((((_betSize * (100-(safeSub(_userNumber,1)))) / (safeSub(_userNumber,1))+_betSize))*houseEdge/houseEdgeDivisor)-_betSize <= maxProfit && _betSize >= minBet && _userNumber >= minNumber && _userNumber <= maxNumber); 
+        require(((((_betSize * (100-(safeSub(_userNumber,1)))) / (safeSub(_userNumber,1))+_betSize))*houseEdge/houseEdgeDivisor)-_betSize <= maxProfit && _betSize >= minBet && _userNumber >= minNumber && _userNumber <= maxNumber);
         _;
     }
 
@@ -1787,7 +1787,7 @@ contract Etherwow is usingOraclize, SafeMath {
     modifier gameIsActive {
         require(gamePaused == false);
         _;
-    }     
+    }
 
     /*
      * checks only Oraclize address is calling
@@ -1812,7 +1812,7 @@ contract Etherwow is usingOraclize, SafeMath {
          require((msg.sender == owner || msg.sender == operator.addr) && msg.sender != 0x0);
          _;
     }
-    
+
     /*
      * token vars
     */
@@ -1825,29 +1825,29 @@ contract Etherwow is usingOraclize, SafeMath {
 
     /*
      * game vars
-    */ 
+    */
     uint constant public maxProfitDivisor = 1000000;
-    uint constant public houseEdgeDivisor = 1000;    
-    uint constant public maxNumber = 99; 
+    uint constant public houseEdgeDivisor = 1000;
+    uint constant public maxNumber = 99;
     uint constant public minNumber = 2;
-    
+
     bool public gamePaused;
     uint32 public gasForOraclize;
     address public owner;
     uint public contractBalance;
-    uint public houseEdge;     
-    uint public maxProfit;   
-    uint public maxProfitAsPercentOfHouse;                    
-    uint public minBet; 
+    uint public houseEdge;
+    uint public maxProfit;
+    uint public maxProfitAsPercentOfHouse;
+    uint public minBet;
     uint public maxPendingPayouts;
     uint public randomQueryID;
     uint public randomGenerateMethod;
     string private randomApiKey;
-    
-    /* init discontinued contract data */     
+
+    /* init discontinued contract data */
     uint public totalBets = 0;
     uint public totalWeiWon = 0;
-    uint public totalWeiWagered = 0; 
+    uint public totalWeiWagered = 0;
 
     /* access control */
     Operator public operator;
@@ -1858,7 +1858,7 @@ contract Etherwow is usingOraclize, SafeMath {
         uint refundAmtApprove;  /* when refundAmtApprove not enough, use ownerModOperator() to set again */
     }
 
- 
+
 
     /*
      * user vars
@@ -1867,22 +1867,22 @@ contract Etherwow is usingOraclize, SafeMath {
     mapping (bytes32 => address) public userTempAddress;
     mapping (bytes32 => bytes32) public userBetId;
     mapping (bytes32 => uint) public  userBetValue;
-    mapping (bytes32 => uint) public  userTempBetValue;               
+    mapping (bytes32 => uint) public  userTempBetValue;
     mapping (bytes32 => uint) public  userDieResult;
     mapping (bytes32 => uint) public  userNumber;
-    mapping (address => uint) public  userPendingWithdrawals;      
+    mapping (address => uint) public  userPendingWithdrawals;
     mapping (bytes32 => uint) public  userProfit;
-    mapping (bytes32 => uint) public  userTempReward;           
+    mapping (bytes32 => uint) public  userTempReward;
     /* Status: 0=lose, 1=win, 2=win + failed send, 3=refund, 4=refund + failed send, 5=pending, 6=manual refund */
-    mapping (bytes32 => uint8) public  betStatus;           
+    mapping (bytes32 => uint8) public  betStatus;
 
     /*
      * events
     */
     /* log bets + output to web3 for precise 'payout on win' field in UI */
-    event LogBet(bytes32 indexed BetID, address indexed UserAddress, uint indexed RewardValue, uint ProfitValue, uint BetValue, uint UserNumber, uint RandomQueryID);      
+    event LogBet(bytes32 indexed BetID, address indexed UserAddress, uint indexed RewardValue, uint ProfitValue, uint BetValue, uint UserNumber, uint RandomQueryID);
     /* output to web3 UI on bet result*/
-    event LogResult(bytes32 indexed BetID, address indexed UserAddress, uint UserNumber, uint DiceResult, uint Value, uint tokenReward, uint8 Status, uint RandomGenerateMethod, bytes Proof, uint indexed SerialNumberOfResult);   
+    event LogResult(bytes32 indexed BetID, address indexed UserAddress, uint UserNumber, uint DiceResult, uint Value, uint tokenReward, uint8 Status, uint RandomGenerateMethod, bytes Proof, uint indexed SerialNumberOfResult);
     /* log manual refunds */
     event LogRefund(bytes32 indexed BetID, address indexed UserAddress, uint indexed RefundValue);
     /* log owner transfers */
@@ -1895,19 +1895,19 @@ contract Etherwow is usingOraclize, SafeMath {
     function Etherwow() {
 
         owner = msg.sender;
-        oraclize_setNetwork(networkID_auto);        
+        oraclize_setNetwork(networkID_auto);
         /* init 990 = 99% (1% houseEdge)*/
         ownerSetHouseEdge(990);
         /* init 10,000 = 1%  */
         ownerSetMaxProfitAsPercentOfHouse(10000);
         /* init min bet (0.1 ether) */
-        ownerSetMinBet(100000000000000000);        
-        /* init gas for oraclize */        
-        gasForOraclize = 300000;  
+        ownerSetMinBet(100000000000000000);
+        /* init gas for oraclize */
+        gasForOraclize = 300000;
         /* init gas price for callback (default 20 gwei)*/
         oraclize_setCustomGasPrice(20000000000 wei);
         /* defult random num generation method 0-random.org */
-        randomGenerateMethod = 0; 
+        randomGenerateMethod = 0;
 
     }
 
@@ -1931,10 +1931,10 @@ contract Etherwow is usingOraclize, SafeMath {
 
                 string memory queryString1_2 = queryString1.toSlice().concat(queryString2.toSlice());
 
-                string memory queryString1_2_3 = queryString1_2.toSlice().concat(queryString3.toSlice()); 
+                string memory queryString1_2_3 = queryString1_2.toSlice().concat(queryString3.toSlice());
 
                 oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
-                return oraclize_query("nested", queryString1_2_3, gasForOraclize);               
+                return oraclize_query("nested", queryString1_2_3, gasForOraclize);
         }
 
         // /* random num solution from oraclize(by default), prove fair paper: http://www.oraclize.it/papers/random_datasource-rev1.pdf */
@@ -1945,7 +1945,7 @@ contract Etherwow is usingOraclize, SafeMath {
         //         oraclize_setProof(proofType_Ledger);
         //         return oraclize_newRandomDSQuery(delay, N, gasForOraclize); /* this function internally generates the correct oraclize_query and returns its queryId */
         // }
-        
+
 
     }
 
@@ -1953,14 +1953,14 @@ contract Etherwow is usingOraclize, SafeMath {
      * @dev validate roll dice request, and log the bet info
      * @param number player choosen, from [2,99]
      */
-    function userRollDice(uint rollUnder) public 
+    function userRollDice(uint rollUnder) public
         payable
         gameIsActive
         betIsValid(msg.value, rollUnder)
-    {       
+    {
 
-        bytes32 rngId = generateRandomNum(); 
-       
+        bytes32 rngId = generateRandomNum();
+
         /* map bet id to this oraclize query */
         userBetId[rngId] = rngId;
         /* map user lucky number to this oraclize query */
@@ -1969,8 +1969,8 @@ contract Etherwow is usingOraclize, SafeMath {
         userBetValue[rngId] = msg.value;
         /* map user address to this oraclize query */
         userAddress[rngId] = msg.sender;
-        /* safely map user profit to this oraclize query */                     
-        userProfit[rngId] = ((((msg.value * (100-(safeSub(rollUnder,1)))) / (safeSub(rollUnder,1))+msg.value))*houseEdge/houseEdgeDivisor)-msg.value;        
+        /* safely map user profit to this oraclize query */
+        userProfit[rngId] = ((((msg.value * (100-(safeSub(rollUnder,1)))) / (safeSub(rollUnder,1))+msg.value))*houseEdge/houseEdgeDivisor)-msg.value;
         /* safely increase maxPendingPayouts liability - calc all pending payouts under assumption they win */
         maxPendingPayouts = safeAdd(maxPendingPayouts, userProfit[rngId]);
         /* check contract can payout on win */
@@ -1978,10 +1978,10 @@ contract Etherwow is usingOraclize, SafeMath {
         /* bet status = 5-pending */
         betStatus[rngId] = 5;
         /* provides accurate numbers for web3 and allows for manual refunds in case of no oraclize __callback */
-        emit LogBet(userBetId[rngId], userAddress[rngId], safeAdd(userBetValue[rngId], userProfit[rngId]), userProfit[rngId], userBetValue[rngId], userNumber[rngId], randomQueryID);          
+        emit LogBet(userBetId[rngId], userAddress[rngId], safeAdd(userBetValue[rngId], userProfit[rngId]), userProfit[rngId], userBetValue[rngId], userNumber[rngId], randomQueryID);
 
-    }   
-             
+    }
+
 
     /*
      * @dev oraclize callback, only oraclize can call, payout should in active status
@@ -1989,9 +1989,9 @@ contract Etherwow is usingOraclize, SafeMath {
      * @param query result
      * @param query proof
      */
-    function __callback(bytes32 myid, string result, bytes proof) public   
+    function __callback(bytes32 myid, string result, bytes proof) public
         onlyOraclize
-    {  
+    {
         /* user address mapped to query id does not exist */
         require(userAddress[myid]!=0x0);
 
@@ -2000,18 +2000,18 @@ contract Etherwow is usingOraclize, SafeMath {
                 /* keep oraclize honest by retrieving the serialNumber from random.org result */
                 var sl_result = result.toSlice();
                 sl_result.beyond("[".toSlice()).until("]".toSlice());
-                uint serialNumberOfResult = parseInt(sl_result.split(', '.toSlice()).toString());          
+                uint serialNumberOfResult = parseInt(sl_result.split(', '.toSlice()).toString());
 
                 /* map random result to user */
-                userDieResult[myid] = parseInt(sl_result.beyond("[".toSlice()).until("]".toSlice()).toString());                 
-        } 
+                userDieResult[myid] = parseInt(sl_result.beyond("[".toSlice()).until("]".toSlice()).toString());
+        }
 
-        // /* random num solution from oraclize */        
+        // /* random num solution from oraclize */
         // if (randomGenerateMethod == 1){
         //         uint maxRange = 100; this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
         //         userDieResult[myid] = uint(sha3(result)) % maxRange + 1; /* this is an efficient way to get the uint out in the [0, maxRange] range */
         // }
-      
+
         /* get the userAddress for this query id */
         userTempAddress[myid] = userAddress[myid];
         /* delete userAddress for this query id */
@@ -2020,29 +2020,29 @@ contract Etherwow is usingOraclize, SafeMath {
         /* map the userProfit for this query id */
         userTempReward[myid] = userProfit[myid];
         /* set  userProfit for this query id to 0 */
-        userProfit[myid] = 0; 
+        userProfit[myid] = 0;
 
         /* safely reduce maxPendingPayouts liability */
-        maxPendingPayouts = safeSub(maxPendingPayouts, userTempReward[myid]);         
+        maxPendingPayouts = safeSub(maxPendingPayouts, userTempReward[myid]);
 
         /* map the userBetValue for this query id */
         userTempBetValue[myid] = userBetValue[myid];
         /* set  userBetValue for this query id to 0 */
-        userBetValue[myid] = 0; 
+        userBetValue[myid] = 0;
 
         /* total number of bets */
         totalBets += 1;
 
         /* total wagered */
-        totalWeiWagered += userTempBetValue[myid];                                                           
+        totalWeiWagered += userTempBetValue[myid];
 
         /*
         * refund
         * if result is 0 result is empty or no proof refund original bet value
         * if refund fails save refund value to userPendingWithdrawals
         */
-        if(userDieResult[myid] == 0 || bytes(result).length == 0 || bytes(proof).length == 0){ 
-             /* Status: 0=lose, 1=win, 2=win + failed send, 3=refund, 4=refund + failed send*/ 
+        if(userDieResult[myid] == 0 || bytes(result).length == 0 || bytes(proof).length == 0){
+             /* Status: 0=lose, 1=win, 2=win + failed send, 3=refund, 4=refund + failed send*/
              /* 3 = refund */
              betStatus[myid] = 3;
             /*
@@ -2052,9 +2052,9 @@ contract Etherwow is usingOraclize, SafeMath {
             */
             if(!userTempAddress[myid].send(userTempBetValue[myid])){
                 /* 4 = refund + failed send */
-                betStatus[myid] = 4;              
+                betStatus[myid] = 4;
                 /* if send failed let user withdraw via userWithdrawPendingTransactions */
-                userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], userTempBetValue[myid]);                        
+                userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], userTempBetValue[myid]);
             }
             jackpotTokenReward = 0;
             emit LogResult(userBetId[myid], userTempAddress[myid], userNumber[myid], userDieResult[myid], userTempBetValue[myid], jackpotTokenReward, betStatus[myid], randomGenerateMethod, proof, serialNumberOfResult);
@@ -2065,21 +2065,21 @@ contract Etherwow is usingOraclize, SafeMath {
         * pay winner
         * update contract balance to calculate new max bet
         * send reward
-        * if send of reward fails save value to userPendingWithdrawals        
+        * if send of reward fails save value to userPendingWithdrawals
         */
-        if(userDieResult[myid] < userNumber[myid]){ 
+        if(userDieResult[myid] < userNumber[myid]){
 
             /* safely reduce contract balance by user profit */
-            contractBalance = safeSub(contractBalance, userTempReward[myid]); 
+            contractBalance = safeSub(contractBalance, userTempReward[myid]);
 
             /* update total wei won */
-            totalWeiWon = safeAdd(totalWeiWon, userTempReward[myid]);              
+            totalWeiWon = safeAdd(totalWeiWon, userTempReward[myid]);
 
             /* safely calculate payout via profit plus original wager */
-            userTempReward[myid] = safeAdd(userTempReward[myid], userTempBetValue[myid]); 
+            userTempReward[myid] = safeAdd(userTempReward[myid], userTempBetValue[myid]);
 
             /* 1 = win */
-            betStatus[myid] = 1;                           
+            betStatus[myid] = 1;
 
             /* update maximum profit */
             setMaxProfit();
@@ -2087,9 +2087,9 @@ contract Etherwow is usingOraclize, SafeMath {
             if (jackpotTokenWinRewardRate > 0) {
                 /* calculate win token return */
                 jackpotTokenReward = userTempBetValue[myid]*jackpotTokenEthRate*jackpotTokenWinRewardRate/rewardRateDivisor;
-            
+
                 /* transfer token to user */
-                jackpotToken.transfer(userTempAddress[myid], jackpotTokenReward);                  
+                jackpotToken.transfer(userTempAddress[myid], jackpotTokenReward);
             }
 
             /*
@@ -2099,11 +2099,11 @@ contract Etherwow is usingOraclize, SafeMath {
             */
             if(!userTempAddress[myid].send(userTempReward[myid])){
                 /* 2 = win + failed send */
-                betStatus[myid] = 2;                   
+                betStatus[myid] = 2;
                 /* if send failed let user withdraw via userWithdrawPendingTransactions */
-                userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], userTempReward[myid]);                               
+                userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], userTempReward[myid]);
             }
-            
+
             emit LogResult(userBetId[myid], userTempAddress[myid], userNumber[myid], userDieResult[myid], userTempBetValue[myid], jackpotTokenReward, betStatus[myid], randomGenerateMethod, proof, serialNumberOfResult);
             return;
 
@@ -2117,46 +2117,46 @@ contract Etherwow is usingOraclize, SafeMath {
         if(userDieResult[myid] >= userNumber[myid]){
 
             /* 0 = lose */
-            betStatus[myid] = 0;                          
+            betStatus[myid] = 0;
 
-            /*  
+            /*
             *  safe adjust contractBalance
             *  setMaxProfit
             *  send 1 wei to losing bet
             */
-            contractBalance = safeAdd(contractBalance, (userTempBetValue[myid]-1));                                                                         
+            contractBalance = safeAdd(contractBalance, (userTempBetValue[myid]-1));
 
             /* update maximum profit */
-            setMaxProfit(); 
- 
+            setMaxProfit();
+
             if (jackpotTokenLoseRewardRate > 0){
                 /* calculate token reward */
                 jackpotTokenReward = userTempBetValue[myid]*jackpotTokenEthRate*safeSub(100,userNumber[myid])*jackpotTokenLoseRewardRate/(rewardRateDivisor*100);
 
                 /* transfer token to user */
-                jackpotToken.transfer(userTempAddress[myid], jackpotTokenReward);                
+                jackpotToken.transfer(userTempAddress[myid], jackpotTokenReward);
             }
 
             /*
-            * send 1 wei - external call to an untrusted contract                  
+            * send 1 wei - external call to an untrusted contract
             */
             if(!userTempAddress[myid].send(1)){
-                /* if send failed let user withdraw via userWithdrawPendingTransactions */                
-               userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], 1);                                
-            }                                   
-            
-            emit LogResult(userBetId[myid], userTempAddress[myid], userNumber[myid], userDieResult[myid], userTempBetValue[myid], jackpotTokenReward, betStatus[myid], randomGenerateMethod, proof, serialNumberOfResult);  
+                /* if send failed let user withdraw via userWithdrawPendingTransactions */
+               userPendingWithdrawals[userTempAddress[myid]] = safeAdd(userPendingWithdrawals[userTempAddress[myid]], 1);
+            }
+
+            emit LogResult(userBetId[myid], userTempAddress[myid], userNumber[myid], userDieResult[myid], userTempBetValue[myid], jackpotTokenReward, betStatus[myid], randomGenerateMethod, proof, serialNumberOfResult);
             return;
 
         }
 
     }
-    
+
     /*
      * @dev in case of a failed refund or win send, user can withdraw later
      * @return true - withdraw success, false - withdraw failed
      */
-    function userWithdrawPendingTransactions() public 
+    function userWithdrawPendingTransactions() public
         gameIsActive
         returns (bool)
      {
@@ -2186,8 +2186,8 @@ contract Etherwow is usingOraclize, SafeMath {
      * @dev sets max profit
      */
     function setMaxProfit() internal {
-        maxProfit = (contractBalance*maxProfitAsPercentOfHouse)/maxProfitDivisor;  
-    }      
+        maxProfit = (contractBalance*maxProfitAsPercentOfHouse)/maxProfitDivisor;
+    }
 
     /*
      * @dev fallback method
@@ -2197,11 +2197,11 @@ contract Etherwow is usingOraclize, SafeMath {
         onlyOwnerOrOperator
     {
         /* safely update contract balance */
-        contractBalance = safeAdd(contractBalance, msg.value);        
+        contractBalance = safeAdd(contractBalance, msg.value);
         /* update the maximum profit */
         setMaxProfit();
-    } 
-     
+    }
+
      /*
      * @dev owner can set operator & permission
      * if want to revoke a permission, just set address to "0x0"
@@ -2210,28 +2210,28 @@ contract Etherwow is usingOraclize, SafeMath {
      * @param operator transfer approve amt
      * @param operator refund permission
      * @param operator refund approve amt
-     */  
-    function ownerModOperator(address newAddress, bool newRefundPermission, uint newRefundAmtApprove) public 
+     */
+    function ownerModOperator(address newAddress, bool newRefundPermission, uint newRefundAmtApprove) public
         onlyOwner
     {
         operator.addr = newAddress;
         operator.refundPermission = newRefundPermission;
-        operator.refundAmtApprove = newRefundAmtApprove;            
+        operator.refundAmtApprove = newRefundAmtApprove;
     }
 
     /*
      * @dev onlyOwnerOrOperator set gas price for oraclize callback
      */
-    function ownerSetCallbackGasPrice(uint newCallbackGasPrice) public 
+    function ownerSetCallbackGasPrice(uint newCallbackGasPrice) public
         onlyOwnerOrOperator
     {
         oraclize_setCustomGasPrice(newCallbackGasPrice);
-    }     
+    }
 
     /*
      * @dev onlyOwnerOrOperator set gas limit for oraclize query
      */
-    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public 
+    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public
         onlyOwnerOrOperator
     {
         gasForOraclize = newSafeGasToOraclize;
@@ -2240,16 +2240,16 @@ contract Etherwow is usingOraclize, SafeMath {
     /*
      * @dev onlyOwnerOrOperator adjust contract balance variable (only used for max profit calc)
      */
-    function ownerUpdateContractBalance(uint newContractBalanceInWei) public 
+    function ownerUpdateContractBalance(uint newContractBalanceInWei) public
         onlyOwnerOrOperator
-    {        
+    {
        contractBalance = newContractBalanceInWei;
-    }    
+    }
 
     /*
      * @dev owner set houseEdge
-     */    
-    function ownerSetHouseEdge(uint newHouseEdge) public 
+     */
+    function ownerSetHouseEdge(uint newHouseEdge) public
         onlyOwnerOrOperator
     {
         if(msg.sender == operator.addr && newHouseEdge > 990) throw;
@@ -2258,8 +2258,8 @@ contract Etherwow is usingOraclize, SafeMath {
 
     /*
      * @dev onlyOwnerOrOperator set maxProfitAsPercentOfHouse
-     */    
-    function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent) public 
+     */
+    function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent) public
         onlyOwnerOrOperator
     {
         /* restrict each bet to a maximum profit of 5% contractBalance */
@@ -2271,25 +2271,25 @@ contract Etherwow is usingOraclize, SafeMath {
 
     /*
      * @dev onlyOwnerOrOperator set minBet
-     */        
-    function ownerSetMinBet(uint newMinimumBet) public 
+     */
+    function ownerSetMinBet(uint newMinimumBet) public
         onlyOwnerOrOperator
     {
         minBet = newMinimumBet;
-    }       
+    }
 
     /*
      * @dev owner transfer ether
-     */  
-    function ownerTransferEther(address sendTo, uint amount) public 
+     */
+    function ownerTransferEther(address sendTo, uint amount) public
         onlyOwner
-    {        
+    {
         /* safely update contract balance when sending out funds*/
-        contractBalance = safeSub(contractBalance, amount);     
+        contractBalance = safeSub(contractBalance, amount);
         /* update max profit */
         setMaxProfit();
         sendTo.transfer(amount);
-        emit LogOwnerTransfer(sendTo, amount); 
+        emit LogOwnerTransfer(sendTo, amount);
     }
 
     /*
@@ -2308,9 +2308,9 @@ contract Etherwow is usingOraclize, SafeMath {
      * @param original user profit
      * @param original bet value
     */
-    function ownerRefundUser(bytes32 originalUserBetId, address sendTo, uint originalUserProfit, uint originalUserBetValue) public 
+    function ownerRefundUser(bytes32 originalUserBetId, address sendTo, uint originalUserProfit, uint originalUserBetValue) public
         onlyOwnerOrOperator
-    {        
+    {
         /* check operator permission */
         require(msg.sender == owner || (msg.sender == operator.addr && operator.refundPermission == true && safeToSubtract(operator.refundAmtApprove, originalUserBetValue)));
         /* status should be 5-pending */
@@ -2326,14 +2326,14 @@ contract Etherwow is usingOraclize, SafeMath {
         /* update betStatus = 6-manual refund */
         betStatus[originalUserBetId] = 6;
         /* log refunds */
-        emit LogRefund(originalUserBetId, sendTo, originalUserBetValue);        
-    }    
+        emit LogRefund(originalUserBetId, sendTo, originalUserBetValue);
+    }
 
     /*
      * @dev onlyOwnerOrOperator set system emergency pause
      * @param true: pause, false: not pause
-     */ 
-    function ownerPauseGame(bool newStatus) public 
+     */
+    function ownerPauseGame(bool newStatus) public
         onlyOwnerOrOperator
     {
         gamePaused = newStatus;
@@ -2343,8 +2343,8 @@ contract Etherwow is usingOraclize, SafeMath {
     /*
      * @dev owner set new owner
      * @param new owner address
-     */ 
-    function ownerChangeOwner(address newOwner) public 
+     */
+    function ownerChangeOwner(address newOwner) public
         onlyOwner
     {
         owner = newOwner;
@@ -2353,22 +2353,22 @@ contract Etherwow is usingOraclize, SafeMath {
     /*
      * @dev onlyOwnerOrOperator set random.org api key
      * @param new api key
-     */ 
-    function ownerSetRandomApiKey(string newApiKey) public 
+     */
+    function ownerSetRandomApiKey(string newApiKey) public
         onlyOwnerOrOperator
     {
         randomApiKey = newApiKey;
-    } 
+    }
 
     /*
      * @dev onlyOwnerOrOperator can set randomGenerateMethod
      * @param 0-random num solution from random.org, 1-random num solution from oraclize
-     */  
-    function ownerSetRandomGenerateMethod(uint newRandomGenerateMethod) public 
+     */
+    function ownerSetRandomGenerateMethod(uint newRandomGenerateMethod) public
         onlyOwnerOrOperator
     {
         randomGenerateMethod = newRandomGenerateMethod;
-    } 
+    }
 
     /*
      * @dev onlyOwnerOrOperator can set jackpotToken
@@ -2376,7 +2376,7 @@ contract Etherwow is usingOraclize, SafeMath {
      * @param ether to token rate
      * @param win reward rate, defult 10(divisor 1000)
      * @param lose reward rate, defult 1000(divisor 1000)
-     */  
+     */
     function ownerSetJackpotToken(address newTokenAddr, uint newTokenEthRate, uint newWinRewardRate, uint newLoseRewardRate) public onlyOwnerOrOperator{
         jackpotToken = token(newTokenAddr);
         jackpotTokenEthRate = newTokenEthRate;
@@ -2388,19 +2388,30 @@ contract Etherwow is usingOraclize, SafeMath {
      * @dev transfer token
      * @param to address
      * @param token amount
-     */  
+     */
     function ownerTransferJackpotToken(address toAddress, uint amount ) public onlyOwner{
-        jackpotToken.transfer(toAddress, amount); 
+        jackpotToken.transfer(toAddress, amount);
     }
 
     /*
      * @dev owner selfdestruct contract ***BE CAREFUL! EMERGENCY ONLY / CONTRACT UPGRADE***
-     */ 
-    function ownerkill() public 
+     */
+    function ownerkill() public
         onlyOwner
     {
         selfdestruct(owner);
-    }    
+    }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

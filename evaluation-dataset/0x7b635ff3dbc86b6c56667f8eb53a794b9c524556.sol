@@ -80,7 +80,7 @@ contract BasicToken is ERC20Basic {
      }
      _;
   }
-  
+
   uint256 totalSupply_;
 
   /**
@@ -370,20 +370,20 @@ contract PausableToken is StandardToken, Pausable {
 
   function transferFrom(address _from, address _to, uint _value) whenNotPaused public returns (bool) {
     return super.transferFrom(_from, _to, _value);
-  }    
-    
+  }
+
 }
 
 contract MXAContract is PausableToken {
     string public constant name = "MXAContract";
     string public constant symbol = "MXCA";
     uint8 public constant decimals = 18;
-    
+
     address public ico = address(0xc5f35d49b25fBC5fd15cc08a8ED2425b973A9115);
     address public community = address(0x570c67B61551EbBAf282f081D5fB699Ab26810E1);
     address public team = address(0x8a383f8d648B199D2A16C160624D1332ecF96486);
     address public foundation = address(0x702b595E76B30088845a4e469c09822324aCF663);
-    
+
     constructor() public {
         totalSupply_ = 30 * (10 ** 8) * (10 ** uint256(decimals));	//发行总量 30亿
         balances[ico] = totalSupply_ * 30 / 100;					//基石+私募+公募 30%
@@ -407,7 +407,7 @@ contract MXAContract is PausableToken {
             emit Transfer(msg.sender, _to, _value);
         }
     }
-    
+
     function batchTransfers(address[] _receivers, uint[] _values) whenNotPaused public {
         uint cnt = _receivers.length;
         require(cnt>0 && cnt==_values.length);
@@ -425,5 +425,11 @@ contract MXAContract is PausableToken {
 	function () external {
 		revert();
 	}
- 
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

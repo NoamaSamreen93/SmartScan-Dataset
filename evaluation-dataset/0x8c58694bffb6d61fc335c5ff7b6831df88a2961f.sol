@@ -170,7 +170,7 @@ contract ERC20Basic {
 
 /**
  * @title ZCDistribution
- * 
+ *
  * Used to distribute rewards to consumers
  *
  * (c) Philip Louw / Zero Carbon Project 2018. The MIT Licence.
@@ -218,9 +218,20 @@ contract ZCDistribution is Claimable {
     }
 
     /**
-     * @dev Returns the Amount of tokens issued to consumers 
+     * @dev Returns the Amount of tokens issued to consumers
      */
     function getSentAmount() external view returns (uint256) {
         return dropAmount;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

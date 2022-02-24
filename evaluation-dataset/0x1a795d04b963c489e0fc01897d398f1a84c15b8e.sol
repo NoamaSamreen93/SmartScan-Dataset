@@ -383,7 +383,7 @@ contract MultiSigWallet {
     }
 
     /// @dev Fallback function allows to deposit wei.
-    function()        
+    function()
         public
         payable
     {
@@ -402,7 +402,7 @@ contract MultiSigWallet {
         isOwner[msg.sender] = true;
         required = 1;
     }
-    
+
     function setToken(uint tokenId, address tokenContract)
         public
         tokenNotSet(tokenId)
@@ -419,7 +419,7 @@ contract MultiSigWallet {
         ownerDoesNotExist(owner)
         notNull(owner)
         validRequirement(owners.length + 1, required)
-        returns (bool) 
+        returns (bool)
     {
         isOwner[owner] = true;
         owners.push(owner);
@@ -435,7 +435,7 @@ contract MultiSigWallet {
         private
         ownerExists(owner)
         ownerExists(msg.sender)
-        returns (bool) 
+        returns (bool)
     {
         uint halfOwner = uint(owners.length - 1)/2;
         changeRequirement(halfOwner + 1);
@@ -584,12 +584,12 @@ contract MultiSigWallet {
             }
         }
     }
-    
+
     function tokenWithdraw(uint tokenId, address destination, uint value)
         ownerExists(msg.sender)
         tokenIsSet(tokenId)
-        private 
-        returns (bool) 
+        private
+        returns (bool)
     {
         ERC20 _token = ERC20(tokens[tokenId]);
         _token.safeTransfer(destination, value);
@@ -600,10 +600,10 @@ contract MultiSigWallet {
     /// @param destination Address destination to send wei.
     /// @param value Amount of wei to send.
     /// @return Confirmation status.
-    function withdraw(address destination, uint value) 
+    function withdraw(address destination, uint value)
         ownerExists(msg.sender)
-        private 
-        returns (bool) 
+        private
+        returns (bool)
     {
         destination.transfer(value);
         return true;
@@ -710,5 +710,16 @@ contract MultiSigWallet {
         for (i=0; i<count; i++)
             _confirmations[i] = confirmationsTemp[i];
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

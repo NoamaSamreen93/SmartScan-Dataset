@@ -61,7 +61,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -82,7 +82,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -213,7 +213,7 @@ contract ConpayToken is StandardToken, Ownable {
 
   uint256 public tokensSold;
 
-  bool public stopped; 
+  bool public stopped;
   event SaleStart();
   event SaleStop();
 
@@ -289,3 +289,10 @@ contract ConpayToken is StandardToken, Ownable {
     return super.transferFrom(_from, _to, _value);
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

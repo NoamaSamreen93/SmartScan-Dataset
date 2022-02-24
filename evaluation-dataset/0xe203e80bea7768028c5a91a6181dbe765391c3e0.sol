@@ -895,7 +895,7 @@ contract StandardFeeTable  is YourOwnable {
 
 /** @title FeeTable contract to store fees via name (fees per platform per assettoken for certain name). */
 contract FeeTable is StandardFeeTable {
-    
+
 ///////////////////
 // Constructor
 ///////////////////
@@ -954,10 +954,10 @@ contract FeeTable is StandardFeeTable {
     /// @param _amountInFeeBaseUnit amount in fee base unit (currently in unit tokens).
     /// @return fee value. Unit is WAD (converted it).
     function getFeeFor(bytes32 _feeName, address _regardingAssetToken, uint256 _amountInFeeBaseUnit, address /*oracle*/)
-        public view returns (uint256) 
-    {   
+        public view returns (uint256)
+    {
         uint256 fee = getFee(_feeName, _regardingAssetToken);
-        
+
         //1000000000000000 is 0,001 as WAD
         //example fee 0.001 for amount 3: 3 tokens * 1000000000000000 fee = 3000000000000000 (0.003)
         return _amountInFeeBaseUnit.mul(fee);
@@ -1353,96 +1353,96 @@ contract UintStorage is StorageAdministratorRole
 ///////////////////
 
     function setUint(bytes32 _name, uint256 _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setUint(_name, _value);
     }
 
-    function getUint(bytes32 _name) 
-        public view 
-        returns (uint256) 
+    function getUint(bytes32 _name)
+        public view
+        returns (uint256)
     {
         return _getUint(_name);
     }
 
     function _setUint(bytes32 _name, uint256 _value)
-        private 
+        private
     {
         if(_name != "") {
             uintStorage[_name] = _value;
         }
     }
 
-    function _getUint(bytes32 _name) 
-        private view 
-        returns (uint256) 
+    function _getUint(bytes32 _name)
+        private view
+        returns (uint256)
     {
         return uintStorage[_name];
     }
 
     function get2Uint(
-        bytes32 _name1, 
-        bytes32 _name2) 
-        public view 
-        returns (uint256, uint256) 
+        bytes32 _name1,
+        bytes32 _name2)
+        public view
+        returns (uint256, uint256)
     {
         return (_getUint(_name1), _getUint(_name2));
     }
-    
+
     function get3Uint(
-        bytes32 _name1, 
-        bytes32 _name2, 
-        bytes32 _name3) 
-        public view 
-        returns (uint256, uint256, uint256) 
+        bytes32 _name1,
+        bytes32 _name2,
+        bytes32 _name3)
+        public view
+        returns (uint256, uint256, uint256)
     {
         return (_getUint(_name1), _getUint(_name2), _getUint(_name3));
     }
 
     function get4Uint(
-        bytes32 _name1, 
-        bytes32 _name2, 
-        bytes32 _name3, 
-        bytes32 _name4) 
-        public view 
-        returns (uint256, uint256, uint256, uint256) 
+        bytes32 _name1,
+        bytes32 _name2,
+        bytes32 _name3,
+        bytes32 _name4)
+        public view
+        returns (uint256, uint256, uint256, uint256)
     {
         return (_getUint(_name1), _getUint(_name2), _getUint(_name3), _getUint(_name4));
     }
 
     function get5Uint(
-        bytes32 _name1, 
-        bytes32 _name2, 
-        bytes32 _name3, 
-        bytes32 _name4, 
-        bytes32 _name5) 
-        public view 
-        returns (uint256, uint256, uint256, uint256, uint256) 
+        bytes32 _name1,
+        bytes32 _name2,
+        bytes32 _name3,
+        bytes32 _name4,
+        bytes32 _name5)
+        public view
+        returns (uint256, uint256, uint256, uint256, uint256)
     {
-        return (_getUint(_name1), 
-            _getUint(_name2), 
-            _getUint(_name3), 
-            _getUint(_name4), 
+        return (_getUint(_name1),
+            _getUint(_name2),
+            _getUint(_name3),
+            _getUint(_name4),
             _getUint(_name5));
     }
 
     function set2Uint(
-        bytes32 _name1, uint256 _value1, 
+        bytes32 _name1, uint256 _value1,
         bytes32 _name2, uint256 _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setUint(_name1, _value1);
         _setUint(_name2, _value2);
     }
 
     function set3Uint(
-        bytes32 _name1, uint256 _value1, 
+        bytes32 _name1, uint256 _value1,
         bytes32 _name2, uint256 _value2,
         bytes32 _name3, uint256 _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setUint(_name1, _value1);
         _setUint(_name2, _value2);
@@ -1450,12 +1450,12 @@ contract UintStorage is StorageAdministratorRole
     }
 
     function set4Uint(
-        bytes32 _name1, uint256 _value1, 
+        bytes32 _name1, uint256 _value1,
         bytes32 _name2, uint256 _value2,
         bytes32 _name3, uint256 _value3,
         bytes32 _name4, uint256 _value4)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setUint(_name1, _value1);
         _setUint(_name2, _value2);
@@ -1464,13 +1464,13 @@ contract UintStorage is StorageAdministratorRole
     }
 
     function set5Uint(
-        bytes32 _name1, uint256 _value1, 
+        bytes32 _name1, uint256 _value1,
         bytes32 _name2, uint256 _value2,
         bytes32 _name3, uint256 _value3,
         bytes32 _name4, uint256 _value4,
         bytes32 _name5, uint256 _value5)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setUint(_name1, _value1);
         _setUint(_name2, _value2);
@@ -1515,69 +1515,69 @@ contract AddrStorage is StorageAdministratorRole
 ///////////////////
 
     function setAddr(bytes32 _name, address _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setAddr(_name, _value);
     }
 
-    function getAddr(bytes32 _name) 
-        public view 
-        returns (address) 
+    function getAddr(bytes32 _name)
+        public view
+        returns (address)
     {
         return _getAddr(_name);
     }
 
     function _setAddr(bytes32 _name, address _value)
-        private 
+        private
     {
         if(_name != "") {
             addrStorage[_name] = _value;
         }
     }
 
-    function _getAddr(bytes32 _name) 
-        private view 
-        returns (address) 
+    function _getAddr(bytes32 _name)
+        private view
+        returns (address)
     {
         return addrStorage[_name];
     }
 
     function get2Address(
-        bytes32 _name1, 
-        bytes32 _name2) 
-        public view 
-        returns (address, address) 
+        bytes32 _name1,
+        bytes32 _name2)
+        public view
+        returns (address, address)
     {
         return (_getAddr(_name1), _getAddr(_name2));
     }
-    
+
     function get3Address(
-        bytes32 _name1, 
-        bytes32 _name2, 
-        bytes32 _name3) 
-        public view 
-        returns (address, address, address) 
+        bytes32 _name1,
+        bytes32 _name2,
+        bytes32 _name3)
+        public view
+        returns (address, address, address)
     {
         return (_getAddr(_name1), _getAddr(_name2), _getAddr(_name3));
     }
 
     function set2Address(
-        bytes32 _name1, address _value1, 
+        bytes32 _name1, address _value1,
         bytes32 _name2, address _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr(_name1, _value1);
         _setAddr(_name2, _value2);
     }
 
     function set3Address(
-        bytes32 _name1, address _value1, 
+        bytes32 _name1, address _value1,
         bytes32 _name2, address _value2,
         bytes32 _name3, address _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr(_name1, _value1);
         _setAddr(_name2, _value2);
@@ -1608,7 +1608,7 @@ contract AddrStorage is StorageAdministratorRole
 /** @title Addr2UintStorage address to uint mapping storage. */
 contract Addr2UintStorage is StorageAdministratorRole
 {
-    
+
 ///////////////////
 // Mappings
 ///////////////////
@@ -1620,21 +1620,21 @@ contract Addr2UintStorage is StorageAdministratorRole
 ///////////////////
 
     function setAddr2Uint(bytes32 _name, address _address, uint256 _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setAddr2Uint(_name, _address, _value);
     }
 
     function getAddr2Uint(bytes32 _name, address _address)
-        public view 
-        returns (uint256) 
+        public view
+        returns (uint256)
     {
         return _getAddr2Uint(_name, _address);
     }
 
     function _setAddr2Uint(bytes32 _name, address _address, uint256 _value)
-        private 
+        private
     {
         if(_name != "") {
             addr2UintStorage[_name][_address] = _value;
@@ -1642,8 +1642,8 @@ contract Addr2UintStorage is StorageAdministratorRole
     }
 
     function _getAddr2Uint(bytes32 _name, address _address)
-        private view 
-        returns (uint256) 
+        private view
+        returns (uint256)
     {
         return addr2UintStorage[_name][_address];
     }
@@ -1651,41 +1651,41 @@ contract Addr2UintStorage is StorageAdministratorRole
     function get2Addr2Uint(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2)
-        public view 
-        returns (uint256, uint256) 
+        public view
+        returns (uint256, uint256)
     {
-        return (_getAddr2Uint(_name1, _address1), 
+        return (_getAddr2Uint(_name1, _address1),
             _getAddr2Uint(_name2, _address2));
     }
-    
+
     function get3Addr2Addr2Uint(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2,
-        bytes32 _name3, address _address3) 
-        public view 
-        returns (uint256, uint256, uint256) 
+        bytes32 _name3, address _address3)
+        public view
+        returns (uint256, uint256, uint256)
     {
-        return (_getAddr2Uint(_name1, _address1), 
-            _getAddr2Uint(_name2, _address2), 
+        return (_getAddr2Uint(_name1, _address1),
+            _getAddr2Uint(_name2, _address2),
             _getAddr2Uint(_name3, _address3));
     }
 
     function set2Addr2Uint(
-        bytes32 _name1, address _address1, uint256 _value1, 
+        bytes32 _name1, address _address1, uint256 _value1,
         bytes32 _name2, address _address2, uint256 _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Uint(_name1, _address1, _value1);
         _setAddr2Uint(_name2, _address2, _value2);
     }
 
     function set3Addr2Uint(
-        bytes32 _name1, address _address1, uint256 _value1, 
+        bytes32 _name1, address _address1, uint256 _value1,
         bytes32 _name2, address _address2, uint256 _value2,
         bytes32 _name3, address _address3, uint256 _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Uint(_name1, _address1, _value1);
         _setAddr2Uint(_name2, _address2, _value2);
@@ -1727,21 +1727,21 @@ contract Addr2AddrStorage is StorageAdministratorRole
 ///////////////////
 
     function setAddr2Addr(bytes32 _name, address _address, address _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setAddr2Addr(_name, _address, _value);
     }
 
     function getAddr2Addr(bytes32 _name, address _address)
-        public view 
-        returns (address) 
+        public view
+        returns (address)
     {
         return _getAddr2Addr(_name, _address);
     }
 
     function _setAddr2Addr(bytes32 _name, address _address, address _value)
-        private 
+        private
     {
         if(_name != "") {
             addr2AddrStorage[_name][_address] = _value;
@@ -1749,8 +1749,8 @@ contract Addr2AddrStorage is StorageAdministratorRole
     }
 
     function _getAddr2Addr(bytes32 _name, address _address)
-        private view 
-        returns (address) 
+        private view
+        returns (address)
     {
         return addr2AddrStorage[_name][_address];
     }
@@ -1758,41 +1758,41 @@ contract Addr2AddrStorage is StorageAdministratorRole
     function get2Addr2Addr(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2)
-        public view 
-        returns (address, address) 
+        public view
+        returns (address, address)
     {
-        return (_getAddr2Addr(_name1, _address1), 
+        return (_getAddr2Addr(_name1, _address1),
             _getAddr2Addr(_name2, _address2));
     }
-    
+
     function get3Addr2Addr2Addr(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2,
-        bytes32 _name3, address _address3) 
-        public view 
-        returns (address, address, address) 
+        bytes32 _name3, address _address3)
+        public view
+        returns (address, address, address)
     {
-        return (_getAddr2Addr(_name1, _address1), 
-            _getAddr2Addr(_name2, _address2), 
+        return (_getAddr2Addr(_name1, _address1),
+            _getAddr2Addr(_name2, _address2),
             _getAddr2Addr(_name3, _address3));
     }
 
     function set2Addr2Addr(
-        bytes32 _name1, address _address1, address _value1, 
+        bytes32 _name1, address _address1, address _value1,
         bytes32 _name2, address _address2, address _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Addr(_name1, _address1, _value1);
         _setAddr2Addr(_name2, _address2, _value2);
     }
 
     function set3Addr2Addr(
-        bytes32 _name1, address _address1, address _value1, 
+        bytes32 _name1, address _address1, address _value1,
         bytes32 _name2, address _address2, address _value2,
         bytes32 _name3, address _address3, address _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Addr(_name1, _address1, _value1);
         _setAddr2Addr(_name2, _address2, _value2);
@@ -1823,7 +1823,7 @@ contract Addr2AddrStorage is StorageAdministratorRole
 /** @title Addr2BoolStorage address to address mapping storage. */
 contract Addr2BoolStorage is StorageAdministratorRole
 {
-    
+
 ///////////////////
 // Mappings
 ///////////////////
@@ -1835,21 +1835,21 @@ contract Addr2BoolStorage is StorageAdministratorRole
 ///////////////////
 
     function setAddr2Bool(bytes32 _name, address _address, bool _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setAddr2Bool(_name, _address, _value);
     }
 
     function getAddr2Bool(bytes32 _name, address _address)
-        public view  
-        returns (bool) 
+        public view
+        returns (bool)
     {
         return _getAddr2Bool(_name, _address);
     }
 
     function _setAddr2Bool(bytes32 _name, address _address, bool _value)
-        private 
+        private
     {
         if(_name != "") {
             addr2BoolStorage[_name][_address] = _value;
@@ -1857,8 +1857,8 @@ contract Addr2BoolStorage is StorageAdministratorRole
     }
 
     function _getAddr2Bool(bytes32 _name, address _address)
-        private view 
-        returns (bool) 
+        private view
+        returns (bool)
     {
         return addr2BoolStorage[_name][_address];
     }
@@ -1866,41 +1866,41 @@ contract Addr2BoolStorage is StorageAdministratorRole
     function get2Addr2Bool(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2)
-        public view 
-        returns (bool, bool) 
+        public view
+        returns (bool, bool)
     {
-        return (_getAddr2Bool(_name1, _address1), 
+        return (_getAddr2Bool(_name1, _address1),
             _getAddr2Bool(_name2, _address2));
     }
-    
+
     function get3Address2Address2Bool(
         bytes32 _name1, address _address1,
         bytes32 _name2, address _address2,
-        bytes32 _name3, address _address3) 
-        public view 
-        returns (bool, bool, bool) 
+        bytes32 _name3, address _address3)
+        public view
+        returns (bool, bool, bool)
     {
-        return (_getAddr2Bool(_name1, _address1), 
-            _getAddr2Bool(_name2, _address2), 
+        return (_getAddr2Bool(_name1, _address1),
+            _getAddr2Bool(_name2, _address2),
             _getAddr2Bool(_name3, _address3));
     }
 
     function set2Address2Bool(
-        bytes32 _name1, address _address1, bool _value1, 
+        bytes32 _name1, address _address1, bool _value1,
         bytes32 _name2, address _address2, bool _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Bool(_name1, _address1, _value1);
         _setAddr2Bool(_name2, _address2, _value2);
     }
 
     function set3Address2Bool(
-        bytes32 _name1, address _address1, bool _value1, 
+        bytes32 _name1, address _address1, bool _value1,
         bytes32 _name2, address _address2, bool _value2,
         bytes32 _name3, address _address3, bool _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setAddr2Bool(_name1, _address1, _value1);
         _setAddr2Bool(_name2, _address2, _value2);
@@ -1943,69 +1943,69 @@ contract BytesStorage is StorageAdministratorRole
 ///////////////////
 
     function setBytes(bytes32 _name, bytes32 _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         return _setBytes(_name, _value);
     }
 
-    function getBytes(bytes32 _name) 
-        public view 
-        returns (bytes32) 
+    function getBytes(bytes32 _name)
+        public view
+        returns (bytes32)
     {
         return _getBytes(_name);
     }
 
     function _setBytes(bytes32 _name, bytes32 _value)
-        private 
+        private
     {
         if(_name != "") {
             bytesStorage[_name] = _value;
         }
     }
 
-    function _getBytes(bytes32 _name) 
-        private view 
-        returns (bytes32) 
+    function _getBytes(bytes32 _name)
+        private view
+        returns (bytes32)
     {
         return bytesStorage[_name];
     }
 
     function get2Bytes(
-        bytes32 _name1, 
-        bytes32 _name2) 
-        public view 
-        returns (bytes32, bytes32) 
+        bytes32 _name1,
+        bytes32 _name2)
+        public view
+        returns (bytes32, bytes32)
     {
         return (_getBytes(_name1), _getBytes(_name2));
     }
-    
+
     function get3Bytes(
-        bytes32 _name1, 
-        bytes32 _name2, 
-        bytes32 _name3) 
-        public view 
-        returns (bytes32, bytes32, bytes32) 
+        bytes32 _name1,
+        bytes32 _name2,
+        bytes32 _name3)
+        public view
+        returns (bytes32, bytes32, bytes32)
     {
         return (_getBytes(_name1), _getBytes(_name2), _getBytes(_name3));
     }
 
     function set2Bytes(
-        bytes32 _name1, bytes32 _value1, 
+        bytes32 _name1, bytes32 _value1,
         bytes32 _name2, bytes32 _value2)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setBytes(_name1, _value1);
         _setBytes(_name2, _value2);
     }
 
     function set3Bytes(
-        bytes32 _name1, bytes32 _value1, 
+        bytes32 _name1, bytes32 _value1,
         bytes32 _name2, bytes32 _value2,
         bytes32 _name3, bytes32 _value3)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         _setBytes(_name1, _value1);
         _setBytes(_name2, _value2);
@@ -2048,15 +2048,15 @@ contract Addr2AddrArrStorage is StorageAdministratorRole
 ///////////////////
 
     function addToAddr2AddrArr(bytes32 _name, address _address, address _value)
-        public 
-        onlyStorageAdministrator 
+        public
+        onlyStorageAdministrator
     {
         addr2AddrArrStorage[_name][_address].push(_value);
     }
 
     function getAddr2AddrArr(bytes32 _name, address _address)
-        public view 
-        returns (address[] memory) 
+        public view
+        returns (address[] memory)
     {
         return addr2AddrArrStorage[_name][_address];
     }
@@ -2089,7 +2089,7 @@ contract Addr2AddrArrStorage is StorageAdministratorRole
 
 
 /** @title StorageHolder holds the fine-grained generic storage functions. */
-contract StorageHolder is 
+contract StorageHolder is
     UintStorage,
     BytesStorage,
     AddrStorage,
@@ -2103,25 +2103,25 @@ contract StorageHolder is
 // Functions
 ///////////////////
 
-    function getMixedUBA(bytes32 _uintName, bytes32 _bytesName, bytes32 _addressName) 
+    function getMixedUBA(bytes32 _uintName, bytes32 _bytesName, bytes32 _addressName)
         public view
-        returns (uint256, bytes32, address) 
+        returns (uint256, bytes32, address)
     {
         return (getUint(_uintName), getBytes(_bytesName), getAddr(_addressName));
     }
 
     function getMixedMapA2UA2BA2A(
-        bytes32 _a2uName, 
-        address _a2uAddress, 
-        bytes32 _a2bName, 
-        address _a2bAddress, 
-        bytes32 _a2aName, 
+        bytes32 _a2uName,
+        address _a2uAddress,
+        bytes32 _a2bName,
+        address _a2bAddress,
+        bytes32 _a2aName,
         address _a2aAddress)
         public view
-        returns (uint256, bool, address) 
+        returns (uint256, bool, address)
     {
-        return (getAddr2Uint(_a2uName, _a2uAddress), 
-            getAddr2Bool(_a2bName, _a2bAddress), 
+        return (getAddr2Uint(_a2uName, _a2uAddress),
+            getAddr2Bool(_a2bName, _a2bAddress),
             getAddr2Addr(_a2aName, _a2aAddress));
     }
 }
@@ -2243,7 +2243,7 @@ contract AT2CSStorage is StorageAdministratorRole {
         require(!storageHolder.getAddr2Bool("isCS", _crowdsale), "is assigned");
         require(IBasicAssetToken(_assetToken).isTokenAlive(), "not alive");
         require(ERC20Detailed(_assetToken).decimals() == 0, "decimal not 0");
-        
+
         storageHolder.setAddr2Bool("isCS", _crowdsale, true);
         storageHolder.setAddr2Addr("cs2at", _crowdsale, _assetToken);
     }
@@ -2386,9 +2386,9 @@ library ControllerL {
     /// @param _crowdsale the crowdsale address.
     /// @param _amountInWei the amount desired to be converted into tokens.
     function convertEthToEurApplyRateGetTokenAmountFromCrowdsale(
-        Data storage _self, 
+        Data storage _self,
         address _crowdsale,
-        uint256 _amountInWei) 
+        uint256 _amountInWei)
         public view returns (uint256 _effectiveTokensNoDecimals, uint256 _overpaidEthWhenZeroDecimals)
     {
         uint256 amountInEur = convertEthToEur(_self, _amountInWei);
@@ -2407,7 +2407,7 @@ library ControllerL {
         require(checkTrustedPlatform(_self, _self.crowdsaleToPlatform[_crowdsale]), "not trusted PF0");
         require(_self.store.checkTrustedCrowdsaleInternal(_crowdsale), "not trusted CS1");
 
-        return true;   
+        return true;
     }
 
     /// @notice Checks if a AssetToken is trusted or fail.
@@ -2417,7 +2417,7 @@ library ControllerL {
         //here just a minimal check for active (simple check on transfer).
         require(_self.store.checkTrustedAssetToken(_assetToken), "untrusted AT");
 
-        return true;   
+        return true;
     }
 
     /// @notice Checks if a platform is certified or fail.
@@ -2473,14 +2473,14 @@ library ControllerL {
     /// @param _to beneficiary of tokens.
     /// @param _amountInWei the invested ETH amount (unit WEI).
     function buyFromCrowdsale(
-        Data storage _self, 
-        address _to, 
-        uint256 _amountInWei) 
+        Data storage _self,
+        address _to,
+        uint256 _amountInWei)
         public returns (uint256 _tokensCreated, uint256 _overpaidRefund)
     {
         (uint256 effectiveTokensNoDecimals, uint256 overpaidEth) = convertEthToEurApplyRateGetTokenAmountFromCrowdsale(
-            _self, 
-            msg.sender, 
+            _self,
+            msg.sender,
             _amountInWei);
 
         checkValidTokenAssignmentFromCrowdsale(_self, _to);
@@ -2510,15 +2510,15 @@ library ControllerL {
     /// @param _crowdsale being used.
     /// @return amount of tokens being created.
     function doTokenAssignment(
-        Data storage _self, 
-        address _to, 
-        uint256 _tokensToMint, 
-        address _crowdsale) 
-        private returns 
+        Data storage _self,
+        address _to,
+        uint256 _tokensToMint,
+        address _crowdsale)
+        private returns
         (uint256 _tokensCreated)
     {
         address assetToken = _self.store.getAssetTokenOfCrowdsale(_crowdsale);
-    
+
         require(assetToken != address(0), "assetTokenIs0");
         ERC20Mintable(assetToken).mint(_to, _tokensToMint);
 
@@ -2550,9 +2550,9 @@ library ControllerL {
     /// @param _tokensToMint the tokens being created.
     /// @param _feeName the name of the fee (key in mapping).
     function payFeeKnowingCrowdsale(
-        Data storage _self, 
-        address _crowdsale, 
-        address _ownerAssetToken, 
+        Data storage _self,
+        address _crowdsale,
+        address _ownerAssetToken,
         uint256 _tokensToMint, //tokensToMint requires precalculations and is base for fees
         bytes32 _feeName)
         private
@@ -2560,11 +2560,11 @@ library ControllerL {
         address platform = _self.crowdsaleToPlatform[_crowdsale];
 
         uint256 feePromilleRootPlatform = getFeeKnowingCrowdsale(
-            _self, 
-            _crowdsale, 
+            _self,
+            _crowdsale,
             getFeeTableAddressForPlatform(_self, _self.rootPlatformAddress),
-            _tokensToMint, 
-            false, 
+            _tokensToMint,
+            false,
             _feeName);
 
         payWithCrwd(_self, _ownerAssetToken, _self.rootPlatformAddress, feePromilleRootPlatform);
@@ -2583,18 +2583,18 @@ library ControllerL {
     /// @param _tokensToMint the tokens being handled.
     /// @param _feeName the name of the fee (key in mapping).
     function payFeeKnowingAssetToken(
-        Data storage _self, 
-        address _assetToken, 
-        address _initiator, 
+        Data storage _self,
+        address _assetToken,
+        address _initiator,
         uint256 _tokensToMint, //tokensToMint requires precalculations and is base for fees
-        bytes32 _feeName) 
-        public 
+        bytes32 _feeName)
+        public
     {
         uint256 feePromille = getFeeKnowingAssetToken(
-            _self, 
-            _assetToken, 
-            _initiator, 
-            _tokensToMint, 
+            _self,
+            _assetToken,
+            _initiator,
+            _tokensToMint,
             _feeName);
 
         payWithCrwd(_self, _initiator, _self.rootPlatformAddress, feePromille);
@@ -2633,19 +2633,19 @@ library ControllerL {
     /// @return amount of fees that would/will be paid.
     function getFeeKnowingCrowdsale(
         Data storage _self,
-        address _crowdsale, 
-        address _feeTableAddr, 
+        address _crowdsale,
+        address _feeTableAddr,
         uint256 _amountInTokensOrEth,
         bool _amountRequiresConversion,
-        bytes32 _feeName) 
-        public view returns (uint256) 
+        bytes32 _feeName)
+        public view returns (uint256)
     {
         uint256 tokens = _amountInTokensOrEth;
 
         if(_amountRequiresConversion) {
             (tokens, ) = convertEthToEurApplyRateGetTokenAmountFromCrowdsale(_self, _crowdsale, _amountInTokensOrEth);
         }
-        
+
         FeeTable feeTable = FeeTable(_feeTableAddr);
         address assetTokenOfCrowdsale = _self.store.getAssetTokenOfCrowdsale(_crowdsale);
 
@@ -2658,12 +2658,12 @@ library ControllerL {
     /// @param _feeName the name of the fee being paid.
     /// @return amount of fees that would/will be paid.
     function getFeeKnowingAssetToken(
-        Data storage _self, 
-        address _assetToken, 
-        address /*_from*/, 
-        uint256 _tokenAmount, 
-        bytes32 _feeName) 
-        public view returns (uint256) 
+        Data storage _self,
+        address _assetToken,
+        address /*_from*/,
+        uint256 _tokenAmount,
+        bytes32 _feeName)
+        public view returns (uint256)
     {
         FeeTable feeTable = getFeeTableForPlatform(_self, _self.rootPlatformAddress);
         return feeTable.getFeeFor(_feeName, _assetToken, _tokenAmount, _self.exchangeRateOracle);
@@ -2691,7 +2691,7 @@ library ControllerL {
         require(_self.rootPlatformAddress != address(0), "no rootPF");
 
         _self.trustedPlatform[_platformWallet] = _trusted;
-        
+
         if(_trusted && !_self.onceTrustedPlatform[msg.sender]) {
             _self.onceTrustedPlatform[_platformWallet] = true;
             FeeTable ft = new FeeTable(_self.rootPlatformAddress);
@@ -2803,7 +2803,7 @@ contract PermissionHolder  is AssetTokenAdministratorRole, At2CsConnectorRole, L
 
 /** @title MainInfoProvider holding simple getters and setters and events without much logic. */
 contract MainInfoProvider is PermissionHolder {
-    
+
 ///////////////////
 // Events
 ///////////////////
@@ -2841,7 +2841,7 @@ contract MainInfoProvider is PermissionHolder {
     /// @return address of FeeTable of platform.
     function getFeeTableAddressForPlatform(address _platform) public view returns (address) {
         return controllerData.getFeeTableAddressForPlatform(_platform);
-    }   
+    }
 
     /// @notice Set rate of AssetToken.
     /// @dev Rate is from BaseCurrency (currently EUR). E.g. rate 2 means 2 tokens per 1 EUR.
@@ -2861,7 +2861,7 @@ contract MainInfoProvider is PermissionHolder {
     function getRootPlatform() public view returns (address) {
         return controllerData.rootPlatformAddress;
     }
-    
+
     /// @notice Set platform address to trusted. A platform can receive fees.
     /// @param _platformWallet the wallet that will receive fees.
     /// @param _trusted true means trusted and false means not (=default).
@@ -2942,9 +2942,9 @@ contract ManageAssetToken  is MainInfoProvider {
     /// @notice Add trusted AssetToken.
     /// @param _ownerWallet requires CRWD for fees, receives ETH on successful campaign.
     /// @param _rate the rate of tokens per basecurrency (currently EUR).
-    function addTrustedAssetToken(address _ownerWallet, address _assetToken, uint256 _rate) 
-        public 
-        onlyAssetTokenAdministrator 
+    function addTrustedAssetToken(address _ownerWallet, address _assetToken, uint256 _rate)
+        public
+        onlyAssetTokenAdministrator
     {
         controllerData.addTrustedAssetToken(_ownerWallet, _assetToken, _rate);
     }
@@ -2969,10 +2969,10 @@ contract ManageAssetToken  is MainInfoProvider {
     /// @param _feeName the name of the fee being paid.
     /// @return amount of fees that would/will be paid.
     function getFeeKnowingAssetToken(
-        address _assetToken, 
-        address _from, 
-        uint256 _tokenAmount, 
-        bytes32 _feeName) 
+        address _assetToken,
+        address _from,
+        uint256 _tokenAmount,
+        bytes32 _feeName)
         public view returns (uint256)
     {
         return controllerData.getFeeKnowingAssetToken(_assetToken, _from, _tokenAmount, _feeName);
@@ -3055,9 +3055,9 @@ contract ManageCrowdsale is MainInfoProvider {
     /// @param _assetToken the AssetToken being sold.
     /// @param _crowdsale the crowdsale that takes ETH (if enabled) and triggers assignment of tokens.
     /// @param _platformWallet the wallet of the platform. Fees are paid to this address.
-    function assignCrowdsale(address _assetToken, address _crowdsale, address _platformWallet) 
-        public 
-        onlyAt2CsConnector 
+    function assignCrowdsale(address _assetToken, address _crowdsale, address _platformWallet)
+        public
+        onlyAt2CsConnector
     {
         controllerData.assignCrowdsale(_assetToken, _crowdsale, _platformWallet);
     }
@@ -3076,12 +3076,12 @@ contract ManageCrowdsale is MainInfoProvider {
     /// @param _feeName the name of the fee being paid.
     /// @return amount of fees that would/will be paid.
     function getFeeKnowingCrowdsale(
-        address _crowdsale, 
-        address _feeTableAddr, 
-        uint256 _amountInTokensOrEth, 
+        address _crowdsale,
+        address _feeTableAddr,
+        uint256 _amountInTokensOrEth,
         bool _amountRequiresConversion,
-        bytes32 _feeName) 
-        public view returns (uint256) 
+        bytes32 _feeName)
+        public view returns (uint256)
     {
         return controllerData.getFeeKnowingCrowdsale(_crowdsale, _feeTableAddr, _amountInTokensOrEth, _amountRequiresConversion, _feeName);
     }
@@ -3196,9 +3196,9 @@ contract ManageWhitelist  is MainInfoProvider {
 
 
 /** @title ManagerHolder combining all managers into single contract to be inherited. */
-contract ManagerHolder is 
-    ManageAssetToken, 
-    ManageFee, 
+contract ManagerHolder is
+    ManageAssetToken,
+    ManageFee,
     ManageCrowdsale,
     ManagePlatform,
     ManageWhitelist
@@ -3231,7 +3231,7 @@ contract CRWDController is ManagerHolder, ICRWDController {
 
     constructor(bool _feesEnabled, bool _whitelistEnabled, address _rootPlatformAddress, address _storage) public {
         controllerData.assignStore(_storage);
-        
+
         setRootPlatform(_rootPlatformAddress);
 
         configure(_feesEnabled, _whitelistEnabled);
@@ -3261,7 +3261,7 @@ contract CRWDController is ManagerHolder, ICRWDController {
             checkWhitelistedWallet(_to); //receiver must be whitelisted
         }
 
-        // Caller must be a trusted AssetToken. Otherwise anyone could make investor pay fees for no reason. 
+        // Caller must be a trusted AssetToken. Otherwise anyone could make investor pay fees for no reason.
         require(checkTrustedAssetToken(msg.sender), "untrusted");
 
         if (controllerData.feesEnabled) {
@@ -3300,7 +3300,7 @@ contract CRWDController is ManagerHolder, ICRWDController {
     }
 
 ////////////////
-// Rescue Tokens 
+// Rescue Tokens
 ////////////////
 
     /// @dev Can rescue tokens accidentally assigned to this contract
@@ -3312,4 +3312,13 @@ contract CRWDController is ManagerHolder, ICRWDController {
     {
         controllerData.rescueToken(_foreignTokenAddress, _to);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

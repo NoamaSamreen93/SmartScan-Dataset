@@ -48,7 +48,7 @@ contract ERC20 {
     function allowance(address owner, address spender) public constant returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
     function approve(address spender, uint256 value) public returns (bool);
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
@@ -330,7 +330,7 @@ contract ICO is Token {
 
         require(msg.sender != address(0));
         require(isInTier1(msg.sender) || isInTier2(msg.sender) || isInWhitelist(msg.sender));
-        
+
         require(inPrivatePreSalePeriod() || inPublicPreSalePeriod() || inAngelPeriod() || inMainSalePeriod());
 
         if (isInTier1(msg.sender)) {
@@ -419,4 +419,15 @@ contract ICO is Token {
         require(whitelistAdmins[msg.sender]);
         _;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

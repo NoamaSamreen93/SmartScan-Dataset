@@ -62,7 +62,7 @@ contract UpgradeHelper {
         tokenController.issueClaimOwnership(allowanceSheetAddress);
         tokenController.transferChild(balanceSheetAddress, newTrueUSD);
         tokenController.transferChild(allowanceSheetAddress, newTrueUSD);
-        
+
         newTrueUSD.transferOwnership(tokenController);
         tokenController.issueClaimOwnership(newTrueUSD);
         tokenController.setTrueUSD(newTrueUSD);
@@ -76,10 +76,21 @@ contract UpgradeHelper {
         tokenController.transferChild(oldTrueUSD, address(this));
         oldTrueUSD.claimOwnership();
         oldTrueUSD.delegateToNewContract(newTrueUSD);
-        
+
         // Controller owns both old and new TrueUSD
         oldTrueUSD.transferOwnership(tokenController);
         tokenController.issueClaimOwnership(oldTrueUSD);
         tokenController.transferOwnership(endOwner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

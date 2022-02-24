@@ -18,14 +18,14 @@ contract TokenERC20 {
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
-  
+
     function TokenERC20() public {
         totalSupply = totalSupply;        // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = name;                                   // Set the name for display purposes
         symbol = symbol;                               // Set the symbol for display purposes
     }
- 
+
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -88,4 +88,17 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

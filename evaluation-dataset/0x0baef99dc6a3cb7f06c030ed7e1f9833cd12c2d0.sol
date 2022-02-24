@@ -10,7 +10,7 @@ pragma solidity ^0.4.23;
 
 /// @title Defines an interface for EIP20 token smart contract
 contract ERC20Interface {
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed from, address indexed spender, uint256 value);
 
@@ -227,7 +227,7 @@ contract MultiEventsHistoryAdapter is EventsHistorySourceAdapter {
         localEventsHistory = _eventsHistory;
         return true;
     }
-    
+
     function _emitErrorCode(uint _errorCode) internal returns (uint) {
         MultiEventsHistoryAdapter(getEventsHistory()).emitErrorCode(_errorCode);
         return _errorCode;
@@ -368,4 +368,15 @@ contract StorageManager is Owned, MultiEventsHistoryAdapter {
     function _getKey(address _actor, bytes32 _role) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(_actor, _role));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

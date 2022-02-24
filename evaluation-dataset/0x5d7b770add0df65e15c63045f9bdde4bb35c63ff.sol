@@ -62,7 +62,7 @@ contract StandardToken is ERC20, SafeMath {
     }
 }
 
-contract EderCoin is StandardToken 
+contract EderCoin is StandardToken
 {
     string public name = "EderCoin";
     string public symbol = "EDC";
@@ -72,4 +72,8 @@ contract EderCoin is StandardToken
     function EderCoin() public {
         balances[msg.sender] = totalSupply;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

@@ -73,7 +73,7 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
     balances[_to] = balances[_to].add(_value);
@@ -83,7 +83,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
 
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -106,8 +106,8 @@ contract Ownable {
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
-   
-    
+
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -136,23 +136,34 @@ contract IPM is StandardToken ,Ownable {
   string public constant name = "IPMCOIN";
   string public constant symbol = "IPM";
   uint256 public constant decimals = 18;
-  
+
   uint256 public constant INITIAL_SUPPLY = 3000000000 * 10 ** uint256(decimals);
 
-  
+
   function IPM() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     owner=msg.sender;
   }
-  
+
 
   function Airdrop(ERC20 token, address[] _addresses, uint256 amount) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], amount);
         }
     }
- 
 
- 
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,10 +2,10 @@
  *
  * Contract: Quant Compute Credit
  * Ticker: XQC
- * 
+ *
  * Type: ERC-20
  * Website: https://www.quantom.cloud/token
- * 
+ *
  * This token is a form of payment on Quantom Cloud. Users accrue charges for
  * using CPU time, disk space, and other features of the cloud. At the end of
  * the month they can choose to pay the bill with QCC tokens at 20% discount
@@ -424,4 +424,15 @@ contract QuantomComputeCredit is ERC20, ERC20Detailed, Ownable {
       constructor() public ERC20Detailed("Quantom Compute Credit", "XQC", 18) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

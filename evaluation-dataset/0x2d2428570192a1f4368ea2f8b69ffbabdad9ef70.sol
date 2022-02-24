@@ -337,9 +337,9 @@ contract StandardToken is ERC20, BasicToken {
  */
 contract CBPRO is StandardToken, Ownable {
 
-  string public constant name = "Certified Blockchain Professional"; 
-  string public constant symbol = "CBPRO"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "Certified Blockchain Professional";
+  string public constant symbol = "CBPRO";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 21000000 * (10 ** uint256(decimals));
 
@@ -351,5 +351,16 @@ contract CBPRO is StandardToken, Ownable {
 	balances[_admin] = INITIAL_SUPPLY;
 	emit Transfer(address(0x0), _admin, INITIAL_SUPPLY);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

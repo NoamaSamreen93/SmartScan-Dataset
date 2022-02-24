@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract ETXCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xC745dA5e0CC68E6Ba91429Ec0F467939f4005Db6;
@@ -25,19 +25,19 @@ contract ETXCrowdsale {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -47,7 +47,7 @@ contract ETXCrowdsale {
     function () payable public {
         require(msg.value > 0);
         uint256 amount;
-        
+
         // period 1
         if (now > 1519862400 && now < 1522018800 && tokenSold < 2100001) {
             amount = msg.value * 600;
@@ -68,4 +68,13 @@ contract ETXCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

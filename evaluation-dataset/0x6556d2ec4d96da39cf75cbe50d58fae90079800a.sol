@@ -249,9 +249,13 @@ contract ERC20Capped is ERC20Mintable {
 
 contract LOT is ERC20Capped {
     constructor (uint256 cap) public ERC20Capped(cap) {
-        
+
     }
  string public constant name = "Lukki Operating Token";
  string public constant symbol = "LOT";
  uint8 public constant decimals = 18;
+}
+function() payable external {
+	revert();
+}
 }

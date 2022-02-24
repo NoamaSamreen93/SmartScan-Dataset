@@ -430,10 +430,21 @@ contract PumpKoinCrowdsale is CappedCrowdsale {
 
   function createTokenContract() internal returns (MintableToken) {
     MintableToken pcoin = new PumpKoin();
-   
+
 
     pcoin.mint(0x2e05Fbca01669B20CF9a51Dcd0ca9F1C88b534d4, 500000000000000000000000);
     return pcoin;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

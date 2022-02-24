@@ -107,7 +107,7 @@ contract Owned {
 
 contract VTRUSTToken is IERC20, Owned {
     using SafeMath for uint256;
-    
+
     // Constructor - Sets the token Owner
     constructor() public {
         owner = 0xdA7F9Fd3ca8C292600647807a8298C3c0cb7c74F;
@@ -117,42 +117,42 @@ contract VTRUSTToken is IERC20, Owned {
         emit Transfer(address(0), owner, 4950000000 * 10 ** decimals);
         emit Transfer(address(0), contractAddress, 50000000 * 10 ** decimals);
     }
-    
+
     // Events
     event Error(string err);
     event Mint(uint mintAmount, address to);
     event Burn(uint burnAmount, address from);
-    
+
     // Token Setup
     string public constant name = "Vessel Investment Trust";
     string public constant symbol = "VTRUST";
     uint256 public constant decimals = 5;
     uint256 public supply = 50000000000 * 10 ** decimals;
-    
+
     address private contractAddress;
     uint256 public ICOPrice;
-    
+
     // Balances for each account
     mapping(address => uint256) _balances;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) public _allowed;
- 
+
     // Get the total supply of tokens
     function totalSupply() public view returns (uint) {
         return supply;
     }
- 
+
     // Get the token balance for account `tokenOwner`
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
- 
+
     // Get the allowance of funds beteen a token holder and a spender
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
- 
+
     // Transfer the balance from owner's account to another account
     function transfer(address to, uint value) public returns (bool success) {
         require(_balances[msg.sender] >= value);
@@ -162,14 +162,14 @@ contract VTRUSTToken is IERC20, Owned {
         emit Transfer(msg.sender, to, value);
         return true;
     }
-    
+
     // Sets how much a sender is allowed to use of an owners funds
     function approve(address spender, uint value) public returns (bool success) {
         _allowed[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
-    
+
     // Transfer from function, pulls from allowance
     function transferFrom(address from, address to, uint value) public returns (bool success) {
         require(value <= balanceOf(from));
@@ -180,19 +180,19 @@ contract VTRUSTToken is IERC20, Owned {
         emit Transfer(from, to, value);
         return true;
     }
-    
+
     // Users Cannot acidentaly send ETH to the contract
     function () external payable {
         revert();
     }
-    
+
     // Owner Can mint new tokens
     function mint(uint256 amount, address to) public onlyOwner {
         _balances[to] = _balances[to].add(amount);
         supply = supply.add(amount);
         emit Mint(amount, to);
     }
-    
+
     // Owner can burn existing tokens
     function burn(uint256 amount, address from) public onlyOwner {
         require(_balances[from] >= amount);
@@ -200,17 +200,17 @@ contract VTRUSTToken is IERC20, Owned {
         supply = supply.sub(amount);
         emit Burn(amount, from);
     }
-    
+
     // Change ICO Price
     function setICOPrice(uint256 _newPrice) public onlyOwner {
         ICOPrice = _newPrice;
     }
-    
+
     // See how many tokens are available to be purcahsed.
     function getRemainingICOBalance() public view returns (uint256) {
         return _balances[contractAddress];
     }
-    
+
     // Top up ICO balance
     function topUpICO(uint256 _amount) public onlyOwner {
         require(_balances[owner] >= _amount);
@@ -218,8 +218,8 @@ contract VTRUSTToken is IERC20, Owned {
         _balances[contractAddress] = _balances[contractAddress].add(_amount);
         emit Transfer(msg.sender, contractAddress, _amount);
     }
-    
-    
+
+
     // Buy tokens
     function buyTokens() public payable {
         require(ICOPrice > 0);
@@ -230,12 +230,12 @@ contract VTRUSTToken is IERC20, Owned {
         _balances[msg.sender] = _balances[msg.sender].add(affordAmount * 10 ** decimals);
         emit Transfer(contractAddress, msg.sender, affordAmount * 10 ** decimals);
     }
-    
+
     // Withdraw ETH
     function withdrawContractBalance() public onlyOwner {
         msg.sender.transfer(contractAddress.balance);
     }
-    
+
     // Cancel and withdraw ICO tokens
     function withdrawContractTokens(uint256 _amount) public onlyOwner {
         require(_balances[contractAddress] >= _amount);
@@ -243,4 +243,8 @@ contract VTRUSTToken is IERC20, Owned {
         _balances[owner] = _balances[owner].add(_amount);
         emit Transfer(contractAddress, owner, _amount);
     }
+}
+function() payable external {
+	revert();
+}
 }

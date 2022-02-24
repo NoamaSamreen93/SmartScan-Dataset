@@ -8,16 +8,16 @@ contract SimpleMultiSigWallet {
         bytes data;
         mapping (address => bool) voted;
     }
-    
+
     mapping (bytes32 => Proposal) internal proposals;
     mapping (address => uint8) public voteCount;
-    
-    uint8 constant public maximumVotes = 2; 
+
+    uint8 constant public maximumVotes = 2;
     constructor() public{
         voteCount[0x8c070C3c66F62E34bAe561951450f15f3256f67c] = 1; // ARitz Cracker
         voteCount[0x7ac74Fcc1a71b106F12c55ee8F802C9F672Ce40C] = 1; // Sumpunk
     }
-    
+
     function proposeTransaction(address payable to, uint256 amount, bytes memory data) public{
         require(voteCount[msg.sender] != 0, "You cannot vote");
         bytes32 hash = keccak256(abi.encodePacked(to, amount, data));
@@ -44,13 +44,24 @@ contract SimpleMultiSigWallet {
             }
         }
     }
-    
+
     // Yes we will take your free ERC223 tokens, thank you very much
     function tokenFallback(address from, uint value, bytes memory data) public{
-        
+
     }
-    
+
     function() external payable{
         // Accept free ETH
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

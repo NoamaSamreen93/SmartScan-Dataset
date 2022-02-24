@@ -117,14 +117,14 @@ contract YouCollectBase is Owned {
   /*** CONSTANTS ***/
   string public constant NAME = "Crypto - YouCollect";
   string public constant SYMBOL = "CYC";
-  uint8 public constant DECIMALS = 18;  
+  uint8 public constant DECIMALS = 18;
 
   uint256 public totalSupply;
   uint256 constant private MAX_UINT256 = 2**256 - 1;
   mapping (address => uint256) public balances;
   mapping (address => mapping (address => uint256)) public allowed;
 
-  event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+  event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
   /// @dev Required for ERC-20 compliance.
@@ -181,7 +181,7 @@ contract YouCollectBase is Owned {
 
   function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
       return allowed[_owner][_spender];
-  }   
+  }
 
 
   // Payout
@@ -554,8 +554,8 @@ contract CollectibleToken is ERC721YC {
     if (purchaseExcess>0)
       msg.sender.transfer(purchaseExcess);
   }
-  
-  
+
+
   //
   //  Mining
   //
@@ -723,4 +723,10 @@ contract CollectibleToken is ERC721YC {
   //
   //  Mining end
   //
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

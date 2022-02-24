@@ -5,16 +5,16 @@ pragma solidity 0.4.25;
  * @dev Math operations with safety checks that throw on error
  */
 
-library SafeMath 
+library SafeMath
 {
 
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
 
-  function mul(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function mul(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
-     if (a == 0) 
+     if (a == 0)
      {
      	return 0;
      }
@@ -27,7 +27,7 @@ library SafeMath
   * @dev Integer division of two numbers, truncating the quotient.
   */
 
-  function div(uint256 a, uint256 b) internal pure returns(uint256) 
+  function div(uint256 a, uint256 b) internal pure returns(uint256)
   {
      return a / b;
   }
@@ -36,7 +36,7 @@ library SafeMath
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
 
-  function sub(uint256 a, uint256 b) internal pure returns(uint256) 
+  function sub(uint256 a, uint256 b) internal pure returns(uint256)
   {
      assert(b <= a);
      return a - b;
@@ -46,7 +46,7 @@ library SafeMath
   * @dev Adds two numbers, throws on overflow.
   */
 
-  function add(uint256 a, uint256 b) internal pure returns(uint256 c) 
+  function add(uint256 a, uint256 b) internal pure returns(uint256 c)
   {
      c = a + b;
      assert(c >= a);
@@ -74,7 +74,7 @@ contract ERC20Interface
 contract LAAR is ERC20Interface
 {
     using SafeMath for uint256;
-   
+
     uint256 constant public TOKEN_DECIMALS = 10 ** 18;
     string public constant name            = "LaariCoin";
     string public constant symbol          = "LAAR";
@@ -90,27 +90,27 @@ contract LAAR is ERC20Interface
     event Burn(address indexed _burner, uint256 _value);
     event OwnershipTransferred(address indexed _previousOwner, address indexed _newOwner);
 
-    struct ClaimLimit 
+    struct ClaimLimit
     {
        uint256 time_limit_epoch;
        bool    limitSet;
     }
 
-    /** mappings **/ 
+    /** mappings **/
     mapping(address => ClaimLimit) public claimLimits;
     mapping(address => uint256) public  balances;
     mapping(address => mapping(address => uint256)) internal  allowed;
- 
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
        require(msg.sender == owner);
        _;
     }
-    
+
     /** constructor **/
 
     constructor() public
@@ -142,13 +142,13 @@ contract LAAR is ERC20Interface
 
     /**
      * @dev    initialize reserveWallet to store LAAR reserve tokens for future use
-     * @param  _reserveWallet  Address of reserve Wallet 
+     * @param  _reserveWallet  Address of reserve Wallet
      */
 
-    function initReserveWallet(address _reserveWallet) onlyOwner public 
+    function initReserveWallet(address _reserveWallet) onlyOwner public
     {
        require(!stopped);
-       require( _reserveWallet != address(0x0)); 
+       require( _reserveWallet != address(0x0));
 
        balances[_reserveWallet] = totalReserveSupply;
 
@@ -160,7 +160,7 @@ contract LAAR is ERC20Interface
      * @param _value The amount of tokens to be burned
      */
 
-     function burn(uint256 _value) onlyOwner public returns (bool) 
+     function burn(uint256 _value) onlyOwner public returns (bool)
      {
         require(!stopped);
         require(_value <= balances[msg.sender]);
@@ -174,14 +174,14 @@ contract LAAR is ERC20Interface
         emit Burn(burner, _value);
         emit Transfer(burner, address(0x0), _value);
         return true;
-     }     
+     }
 
      /**
       * @dev total number of tokens in existence
       * @return An uint256 representing the total number of tokens in existence
       */
 
-     function totalSupply() public view returns(uint256 _totalSupply) 
+     function totalSupply() public view returns(uint256 _totalSupply)
      {
         _totalSupply = totalTokenSupply;
         return _totalSupply;
@@ -193,7 +193,7 @@ contract LAAR is ERC20Interface
      * @return An uint256 representing the amount owned by the passed address
      */
 
-    function balanceOf(address _owner) public view returns (uint256) 
+    function balanceOf(address _owner) public view returns (uint256)
     {
        return balances[_owner];
     }
@@ -205,11 +205,11 @@ contract LAAR is ERC20Interface
      * @param _value uint256 the amout of tokens to be transfered
      */
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)     
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
     {
        require(!stopped);
 
-       if (_value == 0) 
+       if (_value == 0)
        {
            emit Transfer(_from, _to, _value);  // Follow the spec to launch the event when value is equal to 0
            return true;
@@ -233,9 +233,9 @@ contract LAAR is ERC20Interface
      * @param _tokens The amount to be transferred
      */
 
-    function transferTo(address _address, uint256 _tokens) external onlyOwner returns(bool) 
+    function transferTo(address _address, uint256 _tokens) external onlyOwner returns(bool)
     {
-       require( _address != address(0x0)); 
+       require( _address != address(0x0));
        require( balances[address(this)] >= _tokens.mul(TOKEN_DECIMALS) && _tokens.mul(TOKEN_DECIMALS) > 0);
 
        balances[address(this)] = ( balances[address(this)]).sub(_tokens.mul(TOKEN_DECIMALS));
@@ -292,7 +292,7 @@ contract LAAR is ERC20Interface
     {
        require(!stopped);
 
-       if (_tokens == 0) 
+       if (_tokens == 0)
        {
            emit Transfer(msg.sender, _address, _tokens);  // Follow the spec to launch the event when tokens are equal to 0
            return true;
@@ -336,7 +336,7 @@ contract LAAR is ERC20Interface
     * @param _addedValue The amount of tokens to increase the allowance by
     */
 
-   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) 
+   function increaseApproval(address _spender, uint256 _addedValue) public returns (bool)
    {
       require(!stopped);
 
@@ -356,17 +356,17 @@ contract LAAR is ERC20Interface
     * @param _subtractedValue The amount of tokens to decrease the allowance by
     */
 
-   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool) 
+   function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool)
    {
       uint256 oldValue = allowed[msg.sender][_spender];
 
       require(!stopped);
 
-      if (_subtractedValue > oldValue) 
+      if (_subtractedValue > oldValue)
       {
          allowed[msg.sender][_spender] = 0;
       }
-      else 
+      else
       {
          allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
       }
@@ -386,15 +386,15 @@ contract LAAR is ERC20Interface
       require(claimLimits[msg.sender].limitSet, "Limit not set");
 
       require (now > claimLimits[msg.sender].time_limit_epoch, "Time limit");
-       
+
       uint256 tokens = balances[msg.sender];
-       
+
       balances[msg.sender] = (balances[msg.sender]).sub(tokens);
       balances[_recipient] = (balances[_recipient]).add(tokens);
-       
+
       emit Transfer(msg.sender, _recipient, tokens);
    }
- 
+
    /**
     * @dev Set limit on a claim per address
     */
@@ -404,7 +404,7 @@ contract LAAR is ERC20Interface
       require(balances[_address] > 0, "No tokens");
 
       claimLimits[_address].time_limit_epoch = (now + ((_days).mul(1 days)));
-   		
+
       claimLimits[_address].limitSet = true;
    }
 
@@ -417,4 +417,15 @@ contract LAAR is ERC20Interface
       claimLimits[_address].limitSet = false;
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

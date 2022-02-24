@@ -62,17 +62,17 @@ contract DCN {
   User[18446744073709551616] users;
   Asset[4294967296] assets;
   Exchange[4294967296] exchanges;
-  
+
   constructor() public  {
     assembly {
       sstore(creator_slot, caller)
       sstore(creator_recovery_slot, caller)
     }
   }
-  
-  function get_security_state() public view 
+
+  function get_security_state() public view
   returns (uint256 locked_features, uint256 locked_features_proposed, uint256 proposed_unlock_timestamp) {
-    
+
     uint256[3] memory return_value_mem;
     assembly {
       mstore(return_value_mem, sload(security_locked_features_slot))
@@ -81,10 +81,10 @@ contract DCN {
       return(return_value_mem, 96)
     }
   }
-  
-  function get_creator() public view 
+
+  function get_creator() public view
   returns (address dcn_creator, address dcn_creator_recovery, address dcn_creator_recovery_proposed) {
-    
+
     uint256[3] memory return_value_mem;
     assembly {
       mstore(return_value_mem, sload(creator_slot))
@@ -93,10 +93,10 @@ contract DCN {
       return(return_value_mem, 96)
     }
   }
-  
-  function get_asset(uint32 asset_id) public view 
+
+  function get_asset(uint32 asset_id) public view
   returns (string memory symbol, uint192 unit_scale, address contract_address) {
-    
+
     uint256[5] memory return_value_mem;
     assembly {
       let asset_count := sload(asset_count_slot)
@@ -115,13 +115,13 @@ contract DCN {
       return(return_value_mem, 136)
     }
   }
-  
-  function get_exchange(uint32 exchange_id) public view 
+
+  function get_exchange(uint32 exchange_id) public view
   returns (
     string memory name, bool locked, address owner,
     address withdraw_address, address recovery_address, address recovery_address_proposed
   ) {
-    
+
     uint256[8] memory return_value_mem;
     assembly {
       let exchange_count := sload(exchange_count_slot)
@@ -145,10 +145,10 @@ contract DCN {
       return(return_value_mem, 236)
     }
   }
-  
-  function get_exchange_balance(uint32 exchange_id, uint32 asset_id) public view 
+
+  function get_exchange_balance(uint32 exchange_id, uint32 asset_id) public view
   returns (uint256 exchange_balance) {
-    
+
     uint256[1] memory return_value_mem;
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -157,43 +157,43 @@ contract DCN {
       return(return_value_mem, 32)
     }
   }
-  
-  function get_exchange_count() public view 
+
+  function get_exchange_count() public view
   returns (uint32 count) {
-    
+
     uint256[1] memory return_value_mem;
     assembly {
       mstore(return_value_mem, sload(exchange_count_slot))
       return(return_value_mem, 32)
     }
   }
-  
-  function get_asset_count() public view 
+
+  function get_asset_count() public view
   returns (uint32 count) {
-    
+
     uint256[1] memory return_value_mem;
     assembly {
       mstore(return_value_mem, sload(asset_count_slot))
       return(return_value_mem, 32)
     }
   }
-  
-  function get_user_count() public view 
+
+  function get_user_count() public view
   returns (uint32 count) {
-    
+
     uint256[1] memory return_value_mem;
     assembly {
       mstore(return_value_mem, sload(user_count_slot))
       return(return_value_mem, 32)
     }
   }
-  
-  function get_user(uint64 user_id) public view 
+
+  function get_user(uint64 user_id) public view
   returns (
     address trade_address,
     address withdraw_address, address recovery_address, address recovery_address_proposed
   ) {
-    
+
     uint256[4] memory return_value_mem;
     assembly {
       let user_count := sload(user_count_slot)
@@ -209,10 +209,10 @@ contract DCN {
       return(return_value_mem, 128)
     }
   }
-  
-  function get_balance(uint64 user_id, uint32 asset_id) public view 
+
+  function get_balance(uint64 user_id, uint32 asset_id) public view
   returns (uint256 return_balance) {
-    
+
     uint256[1] memory return_value_mem;
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -221,10 +221,10 @@ contract DCN {
       return(return_value_mem, 32)
     }
   }
-  
-  function get_session(uint64 user_id, uint32 exchange_id) public view 
+
+  function get_session(uint64 user_id, uint32 exchange_id) public view
   returns (uint256 unlock_at, address trade_address) {
-    
+
     uint256[2] memory return_value_mem;
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -234,10 +234,10 @@ contract DCN {
       return(return_value_mem, 64)
     }
   }
-  
-  function get_session_balance(uint64 user_id, uint32 exchange_id, uint32 asset_id) public view 
+
+  function get_session_balance(uint64 user_id, uint32 exchange_id, uint32 asset_id) public view
   returns (uint128 total_deposit, uint64 unsettled_withdraw_total, uint64 asset_balance) {
-    
+
     uint256[3] memory return_value_mem;
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -250,17 +250,17 @@ contract DCN {
       return(return_value_mem, 96)
     }
   }
-  
+
   function get_market_state(
     uint64 user_id, uint32 exchange_id,
     uint32 quote_asset_id, uint32 base_asset_id
-  ) public view 
+  ) public view
   returns (
     int64 quote_qty, int64 base_qty, uint64 fee_used, uint64 fee_limit,
     int64 min_quote_qty, int64 min_base_qty, uint64 long_max_price, uint64 short_min_price,
     uint64 limit_version, int96 quote_shift, int96 base_shift
   ) {
-    
+
     uint256[11] memory return_value_mem;
     assembly {
       base_shift := base_asset_id
@@ -309,7 +309,7 @@ contract DCN {
       return(return_value_mem, 352)
     }
   }
-  
+
   function security_lock(uint256 lock_features) public  {
     assembly {
       {
@@ -324,7 +324,7 @@ contract DCN {
       sstore(security_locked_features_proposed_slot, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
     }
   }
-  
+
   function security_propose(uint256 proposed_locked_features) public  {
     assembly {
       {
@@ -343,7 +343,7 @@ contract DCN {
       sstore(security_locked_features_proposed_slot, proposed_locked_features)
     }
   }
-  
+
   function security_set_proposed() public  {
     assembly {
       {
@@ -361,7 +361,7 @@ contract DCN {
       sstore(security_locked_features_slot, sload(security_locked_features_proposed_slot))
     }
   }
-  
+
   function creator_update(address new_creator) public  {
     assembly {
       let creator_recovery := sload(creator_recovery_slot)
@@ -372,7 +372,7 @@ contract DCN {
       sstore(creator_slot, new_creator)
     }
   }
-  
+
   function creator_propose_recovery(address recovery) public  {
     assembly {
       let creator_recovery := sload(creator_recovery_slot)
@@ -383,7 +383,7 @@ contract DCN {
       sstore(creator_recovery_proposed_slot, recovery)
     }
   }
-  
+
   function creator_set_recovery() public  {
     assembly {
       let creator_recovery_proposed := sload(creator_recovery_proposed_slot)
@@ -395,7 +395,7 @@ contract DCN {
       sstore(creator_recovery_proposed_slot, 0)
     }
   }
-  
+
   function set_exchange_locked(uint32 exchange_id, bool locked) public  {
     assembly {
       {
@@ -414,14 +414,14 @@ contract DCN {
       }
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
       let exchange_0 := sload(exchange_ptr)
-      sstore(exchange_ptr, or(and(0xffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffff, exchange_0), 
+      sstore(exchange_ptr, or(and(0xffffffffffffffffffffff00ffffffffffffffffffffffffffffffffffffffff, exchange_0),
         /* locked */ mul(locked, 0x10000000000000000000000000000000000000000)))
     }
   }
-  
-  function user_create() public 
+
+  function user_create() public
   returns (uint64 user_id) {
-    
+
     uint256[2] memory log_data_mem;
     assembly {
       {
@@ -441,15 +441,15 @@ contract DCN {
       sstore(add(user_ptr, 0), caller)
       sstore(add(user_ptr, 1), caller)
       sstore(add(user_ptr, 2), caller)
-      
+
       /* Log event: UserCreated */
       mstore(log_data_mem, user_id)
       log2(log_data_mem, 32, /* UserCreated */ 0x49d7af0c8ce0d26f4490c17a316a59a7a5d28599a2208862554b648ebdf193f4, caller)
     }
   }
-  
+
   function user_set_trade_address(uint64 user_id, address trade_address) public  {
-    
+
     uint256[1] memory log_data_mem;
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -459,13 +459,13 @@ contract DCN {
         revert(63, 1)
       }
       sstore(add(user_ptr, 0), trade_address)
-      
+
       /* Log event: UserTradeAddressUpdated */
       mstore(log_data_mem, user_id)
       log1(log_data_mem, 32, /* UserTradeAddressUpdated */ 0x0dcac7e45506b3812319ae528c780b9035570ee3b3557272431dce5b397d880a)
     }
   }
-  
+
   function user_set_withdraw_address(uint64 user_id, address withdraw_address) public  {
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -477,7 +477,7 @@ contract DCN {
       sstore(add(user_ptr, 1), withdraw_address)
     }
   }
-  
+
   function user_propose_recovery_address(uint64 user_id, address proposed) public  {
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -489,7 +489,7 @@ contract DCN {
       sstore(add(user_ptr, 3), proposed)
     }
   }
-  
+
   function user_set_recovery_address(uint64 user_id) public  {
     assembly {
       let user_ptr := add(users_slot, mul(237684487561239756867226304516, user_id))
@@ -503,7 +503,7 @@ contract DCN {
       sstore(add(user_ptr, 2), recovery_address_proposed)
     }
   }
-  
+
   function exchange_set_owner(uint32 exchange_id, address new_owner) public  {
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -513,11 +513,11 @@ contract DCN {
         revert(63, 1)
       }
       let exchange_0 := sload(exchange_ptr)
-      sstore(exchange_ptr, or(and(exchange_0, 0xffffffffffffffffffffffff0000000000000000000000000000000000000000), 
+      sstore(exchange_ptr, or(and(exchange_0, 0xffffffffffffffffffffffff0000000000000000000000000000000000000000),
         /* owner */ new_owner))
     }
   }
-  
+
   function exchange_set_withdraw(uint32 exchange_id, address new_withdraw) public  {
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -529,7 +529,7 @@ contract DCN {
       sstore(add(exchange_ptr, 1), new_withdraw)
     }
   }
-  
+
   function exchange_propose_recovery(uint32 exchange_id, address proposed) public  {
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -541,7 +541,7 @@ contract DCN {
       sstore(add(exchange_ptr, 3), proposed)
     }
   }
-  
+
   function exchange_set_recovery(uint32 exchange_id) public  {
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -553,8 +553,8 @@ contract DCN {
       sstore(add(exchange_ptr, 2), caller)
     }
   }
-  
-  function add_asset(string memory symbol, uint192 unit_scale, address contract_address) public 
+
+  function add_asset(string memory symbol, uint192 unit_scale, address contract_address) public
   returns (uint64 asset_id) {
     assembly {
       {
@@ -590,7 +590,7 @@ contract DCN {
         revert(63, 1)
       }
       let asset_symbol := mload(add(symbol, 32))
-      let asset_data_0 := or(asset_symbol, 
+      let asset_data_0 := or(asset_symbol,
         /* unit_scale */ unit_scale)
       let asset_ptr := add(assets_slot, mul(2, asset_id))
       sstore(asset_ptr, asset_data_0)
@@ -598,8 +598,8 @@ contract DCN {
       sstore(asset_count_slot, add(asset_id, 1))
     }
   }
-  
-  function add_exchange(string memory name, address addr) public 
+
+  function add_exchange(string memory name, address addr) public
   returns (uint64 exchange_id) {
     assembly {
       {
@@ -628,7 +628,7 @@ contract DCN {
       }
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
       let name_data := mload(add(name, 32))
-      let exchange_0 := or(name_data, 
+      let exchange_0 := or(name_data,
         /* owner */ addr)
       sstore(exchange_ptr, exchange_0)
       sstore(add(exchange_ptr, 1), addr)
@@ -636,12 +636,12 @@ contract DCN {
       sstore(exchange_count_slot, add(exchange_id, 1))
     }
   }
-  
+
   function exchange_withdraw(uint32 exchange_id, uint32 asset_id,
                              address destination, uint64 quantity) public  {
-    
+
     uint256[3] memory transfer_in_mem;
-    
+
     uint256[1] memory transfer_out_mem;
     assembly {
       let exchange_ptr := add(exchanges_slot, mul(4294967300, exchange_id))
@@ -686,11 +686,11 @@ contract DCN {
       }
     }
   }
-  
+
   function exchange_deposit(uint32 exchange_id, uint32 asset_id, uint64 quantity) public  {
-    
+
     uint256[3] memory transfer_in_mem;
-    
+
     uint256[1] memory transfer_out_mem;
     assembly {
       {
@@ -752,11 +752,11 @@ contract DCN {
       }
     }
   }
-  
+
   function user_deposit(uint64 user_id, uint32 asset_id, uint256 amount) public  {
-    
+
     uint256[4] memory transfer_in_mem;
-    
+
     uint256[1] memory transfer_out_mem;
     assembly {
       {
@@ -818,11 +818,11 @@ contract DCN {
       }
     }
   }
-  
+
   function user_withdraw(uint64 user_id, uint32 asset_id, address destination, uint256 amount) public  {
-    
+
     uint256[3] memory transfer_in_mem;
-    
+
     uint256[1] memory transfer_out_mem;
     assembly {
       if iszero(amount) {
@@ -881,9 +881,9 @@ contract DCN {
       }
     }
   }
-  
+
   function user_session_set_unlock_at(uint64 user_id, uint32 exchange_id, uint256 unlock_at) public  {
-    
+
     uint256[3] memory log_data_mem;
     assembly {
       {
@@ -913,14 +913,14 @@ contract DCN {
         sstore(add(session_ptr, 1), caller)
       }
       sstore(unlock_at_ptr, unlock_at)
-      
+
       /* Log event: SessionUpdated */
       mstore(log_data_mem, user_id)
       mstore(add(log_data_mem, 32), exchange_id)
       log1(log_data_mem, 64, /* SessionUpdated */ 0x1b0c381a98d9352dd527280acefa9a69d2c111b6a9d3aa3063aac6c2ec7f3163)
     }
   }
-  
+
   function user_market_reset(uint64 user_id, uint32 exchange_id,
                              uint32 quote_asset_id, uint32 base_asset_id) public  {
     assembly {
@@ -956,13 +956,13 @@ contract DCN {
       let market_state_2_ptr := add(market_state_ptr, 2)
       let market_state_2 := sload(market_state_2_ptr)
       let limit_version := add(and(div(market_state_2, 0x1000000000000000000000000000000000000000000000000), 0xffffffffffffffff), 1)
-      sstore(market_state_2_ptr, 
+      sstore(market_state_2_ptr,
         /* limit_version */ mul(limit_version, 0x1000000000000000000000000000000000000000000000000))
     }
   }
-  
+
   function transfer_to_session(uint64 user_id, uint32 exchange_id, uint32 asset_id, uint64 quantity) public  {
-    
+
     uint256[4] memory log_data_mem;
     assembly {
       {
@@ -1016,9 +1016,9 @@ contract DCN {
       let updated_total_deposit := add(and(div(session_balance_0, 0x100000000000000000000000000000000), 0xffffffffffffffffffffffffffffffff), quantity)
       sstore(user_balance_ptr, sub(user_balance, scaled_quantity))
       sstore(session_balance_ptr, or(and(0xffffffffffffffff0000000000000000, session_balance_0), or(
-        /* total_deposit */ mul(updated_total_deposit, 0x100000000000000000000000000000000), 
+        /* total_deposit */ mul(updated_total_deposit, 0x100000000000000000000000000000000),
         /* asset_balance */ updated_exchange_balance)))
-      
+
       /* Log event: ExchangeDeposit */
       mstore(log_data_mem, user_id)
       mstore(add(log_data_mem, 32), exchange_id)
@@ -1026,9 +1026,9 @@ contract DCN {
       log1(log_data_mem, 96, /* ExchangeDeposit */ 0x7a2923ebfa019dc20de0ae2be0c8639b07e068b143e98ed7f7a74dc4d4f5ab45)
     }
   }
-  
+
   function transfer_from_session(uint64 user_id, uint32 exchange_id, uint32 asset_id, uint64 quantity) public  {
-    
+
     uint256[4] memory log_data_mem;
     assembly {
       if iszero(quantity) {
@@ -1078,7 +1078,7 @@ contract DCN {
         mstore(32, 6)
         revert(63, 1)
       }
-      sstore(session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, session_balance_0), 
+      sstore(session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, session_balance_0),
         /* asset_balance */ updated_exchange_balance))
       let asset_ptr := add(assets_slot, mul(2, asset_id))
       let unit_scale := and(sload(asset_ptr), 0xffffffffffffffffffffffffffffffffffffffffffffffff)
@@ -1093,13 +1093,13 @@ contract DCN {
       sstore(user_balance_ptr, updated_user_balance)
     }
   }
-  
+
   function user_deposit_to_session(uint64 user_id, uint32 exchange_id, uint32 asset_id, uint64 quantity) public  {
-    
+
     uint256[4] memory transfer_in_mem;
-    
+
     uint256[1] memory transfer_out_mem;
-    
+
     uint256[3] memory log_data_mem;
     assembly {
       {
@@ -1139,7 +1139,7 @@ contract DCN {
       let scaled_quantity := mul(quantity, unit_scale)
       let updated_total_deposit := add(and(div(session_balance_0, 0x100000000000000000000000000000000), 0xffffffffffffffffffffffffffffffff), quantity)
       sstore(session_balance_ptr, or(and(0xffffffffffffffff0000000000000000, session_balance_0), or(
-        /* total_deposit */ mul(updated_total_deposit, 0x100000000000000000000000000000000), 
+        /* total_deposit */ mul(updated_total_deposit, 0x100000000000000000000000000000000),
         /* asset_balance */ updated_exchange_balance)))
       mstore(transfer_in_mem, /* fn_hash("transferFrom(address,address,uint256)") */ 0x23b872dd00000000000000000000000000000000000000000000000000000000)
       mstore(add(transfer_in_mem, 4), caller)
@@ -1165,7 +1165,7 @@ contract DCN {
             revert(63, 1)
           }
       }
-      
+
       /* Log event: ExchangeDeposit */
       mstore(log_data_mem, user_id)
       mstore(add(log_data_mem, 32), exchange_id)
@@ -1181,7 +1181,7 @@ contract DCN {
   struct UnsettledWithdrawUser {
     uint64 user_id;
   }
-  
+
   function recover_unsettled_withdraws(bytes memory data) public  {
     assembly {
       {
@@ -1228,7 +1228,7 @@ contract DCN {
               revert(63, 1)
             }
             sstore(session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffff00000000000000000000000000000000, session_balance_0), or(
-              /* unsettled_withdraw_total */ mul(unsettled_balance, 0x10000000000000000), 
+              /* unsettled_withdraw_total */ mul(unsettled_balance, 0x10000000000000000),
               /* asset_balance */ asset_balance)))
           }
         }
@@ -1248,7 +1248,7 @@ contract DCN {
     uint64 user_id;
     uint64 quantity;
   }
-  
+
   function exchange_transfer_from(bytes memory data) public  {
     assembly {
       {
@@ -1346,7 +1346,7 @@ contract DCN {
             revert(63, 1)
           }
           sstore(session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffff00000000000000000000000000000000, session_balance_0), or(
-            /* unsettled_withdraw_total */ mul(unsettled_withdraw_total_updated, 0x10000000000000000), 
+            /* unsettled_withdraw_total */ mul(unsettled_withdraw_total_updated, 0x10000000000000000),
             /* asset_balance */ session_balance_updated)))
           sstore(user_balance_ptr, updated_user_balance)
         }
@@ -1386,14 +1386,14 @@ contract DCN {
     uint256 quote_shift;
     uint256 base_shift;
   }
-  
+
   function exchange_set_limits(bytes memory data) public  {
-    
+
     uint256[14] memory to_hash_mem;
     uint256 cursor;
     uint256 cursor_end;
     uint256 exchange_id;
-    
+
     uint256[224] memory set_limit_memory_space;
     assembly {
       {
@@ -1563,8 +1563,8 @@ contract DCN {
             }
           }
           let new_market_state_0 := or(or(or(
-            /* quote_qty */ mul(and(quote_qty, 0xffffffffffffffff), 0x1000000000000000000000000000000000000000000000000), 
-            /* base_qty */ mul(and(base_qty, 0xffffffffffffffff), 0x100000000000000000000000000000000)), 
+            /* quote_qty */ mul(and(quote_qty, 0xffffffffffffffff), 0x1000000000000000000000000000000000000000000000000),
+            /* base_qty */ mul(and(base_qty, 0xffffffffffffffff), 0x100000000000000000000000000000000)),
             /* fee_limit */ and(update_limit_0, 0xffffffffffffffff)), and(0xffffffffffffffff0000000000000000, market_state_0))
           sstore(market_state_ptr, new_market_state_0)
           sstore(add(market_state_ptr, 1), update_limit_1)
@@ -1586,9 +1586,9 @@ contract DCN {
     int64 base_delta;
     uint64 fees;
   }
-  
+
   function exchange_apply_settlement_groups(bytes memory data) public  {
-    
+
     uint256[6] memory variables;
     assembly {
       {
@@ -1691,9 +1691,9 @@ contract DCN {
               revert(63, 1)
             }
             market_state_0 := or(or(or(
-              /* quote_qty */ mul(quote_qty, 0x1000000000000000000000000000000000000000000000000), 
-              /* base_qty */ mul(and(base_qty, 0xFFFFFFFFFFFFFFFF), 0x100000000000000000000000000000000)), 
-              /* fee_used */ mul(fee_used, 0x10000000000000000)), 
+              /* quote_qty */ mul(quote_qty, 0x1000000000000000000000000000000000000000000000000),
+              /* base_qty */ mul(and(base_qty, 0xFFFFFFFFFFFFFFFF), 0x100000000000000000000000000000000)),
+              /* fee_used */ mul(fee_used, 0x10000000000000000)),
               /* fee_limit */ fee_limit)
             let market_state_1 := sload(add(market_state_ptr, 1))
             {
@@ -1753,9 +1753,9 @@ contract DCN {
             revert(63, 1)
           }
           sstore(market_state_ptr, market_state_0)
-          sstore(quote_session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, quote_session_balance_0), 
+          sstore(quote_session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, quote_session_balance_0),
             /* asset_balance */ quote_balance))
-          sstore(base_session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, base_session_balance_0), 
+          sstore(base_session_balance_ptr, or(and(0xffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000, base_session_balance_0),
             /* asset_balance */ base_balance))
         }
         if or(quote_net, base_net) {
@@ -1766,4 +1766,15 @@ contract DCN {
       }
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

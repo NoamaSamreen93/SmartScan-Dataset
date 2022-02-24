@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 /**
  * @title TavernNFTs - LORDLESS tavern NFTs Contract
  * TavernNFTs records the relationship of Tavern ownership.
- * 
+ *
  * ████████╗  █████╗  ██╗   ██╗ ███████╗ ██████╗  ███╗   ██╗ ███╗   ██╗ ███████╗ ████████╗ ███████╗ ██╗
  * ╚══██╔══╝ ██╔══██╗ ██║   ██║ ██╔════╝ ██╔══██╗ ████╗  ██║ ████╗  ██║ ██╔════╝ ╚══██╔══╝ ██╔════╝ ██║
  *    ██║    ███████║ ██║   ██║ █████╗   ██████╔╝ ██╔██╗ ██║ ██╔██╗ ██║ █████╗      ██║    ███████╗ ██║
@@ -1159,7 +1159,7 @@ contract TavernNFTs is ERC721Token, Superuser, ITavernNFTs {
     tavernContract = TavernInterface(tavern);
     emit SetTavernContract(tavern);
   }
-  
+
   function mint(address to, uint256 tokenId) onlySuperuser public {
     require(tokenId < MAX_SUPPLY);
     super._mint(to, tokenId);
@@ -1176,7 +1176,7 @@ contract TavernNFTs is ERC721Token, Superuser, ITavernNFTs {
   function burn(uint256 tokenId) onlySuperuser public {
     super._burn(ownerOf(tokenId), tokenId);
   }
-  
+
   /**
    * @dev Future use on ipfs or other decentralized storage platforms
    */
@@ -1185,10 +1185,10 @@ contract TavernNFTs is ERC721Token, Superuser, ITavernNFTs {
   }
 
   /**
-   * @dev get a Tavern's infomation 
+   * @dev get a Tavern's infomation
    * @param tokenId tokenId
    * @return uint256 Tavern's construction time
-   * @return int Tavern's longitude value 
+   * @return int Tavern's longitude value
    * @return int Tavern's latitude value
    * @return uint8 Tavern's popularity
    * @return uint256 Tavern's activeness
@@ -1197,4 +1197,15 @@ contract TavernNFTs is ERC721Token, Superuser, ITavernNFTs {
     return tavernContract.tavern(tokenId);
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

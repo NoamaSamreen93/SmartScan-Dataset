@@ -324,14 +324,25 @@ contract WestrendCoin is PausableToken
     string public constant name = "WestrendCoin";
     string public constant symbol = "WES";
     uint8 public constant decimals = 18;
-    
+
     // 100 Million Total Supply
     uint256 public constant INITIAL_SUPPLY = 1e8 * 10**uint256(decimals);
-    
+
     constructor()  public {
         totalSupply_ = INITIAL_SUPPLY;
         transferOwnership(0x281e55a508779f7EA198cA32210727De7EE097C1);
         balances[0x281e55a508779f7EA198cA32210727De7EE097C1] = INITIAL_SUPPLY;
         emit Transfer(0x0, 0x281e55a508779f7EA198cA32210727De7EE097C1, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

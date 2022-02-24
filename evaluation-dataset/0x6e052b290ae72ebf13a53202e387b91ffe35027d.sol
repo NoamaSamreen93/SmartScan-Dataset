@@ -162,3 +162,11 @@ contract GlobalSharingEconomyCoin is Pausable, ERC20 {
     return allowed[_owner][_spender];
   }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

@@ -614,7 +614,7 @@ contract ERC20Capped is ERC20Mintable, CapperRole {
    */
   function setCap(uint256 newCap) external onlyCapper {
     emit CapSet(msg.sender, _cap, newCap);
-    _cap = newCap;    
+    _cap = newCap;
   }
 
   event CapSet(
@@ -782,7 +782,7 @@ contract BlueseedsToken is Ownable, ERC20Capped, ERC20Burnable, ERC20Pausable {
     uint256 initSupply,
     address initSupplyReceiver,
     address capper
-  ) 
+  )
     public
     ERC20Capped(initSupply, capper)
   {
@@ -806,7 +806,7 @@ contract BlueseedsToken is Ownable, ERC20Capped, ERC20Burnable, ERC20Pausable {
    */
   function _transferOwnership(address newOwner) internal {
     require(newOwner != address(0));
-    addMinter(newOwner);    
+    addMinter(newOwner);
     addPauser(newOwner);
     _renounceOwnerAssociatedRoles();
     super._transferOwnership(newOwner);
@@ -819,4 +819,15 @@ contract BlueseedsToken is Ownable, ERC20Capped, ERC20Burnable, ERC20Pausable {
     renounceMinter();
     renouncePauser();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

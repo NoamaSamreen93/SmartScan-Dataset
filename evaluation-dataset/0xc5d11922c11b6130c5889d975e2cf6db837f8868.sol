@@ -79,8 +79,8 @@ contract Ownable {
 pragma solidity 0.5.6;
 
 /**
- * @dev Math operations with safety checks that throw on error. This contract is based on the 
- * source code at: 
+ * @dev Math operations with safety checks that throw on error. This contract is based on the
+ * source code at:
  * https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol.
  */
 library SafeMath
@@ -181,7 +181,7 @@ library SafeMath
   )
     internal
     pure
-    returns (uint256 remainder) 
+    returns (uint256 remainder)
   {
     require(_divisor != 0);
     remainder = _dividend % _divisor;
@@ -194,7 +194,7 @@ library SafeMath
 pragma solidity 0.5.6;
 
 /**
- * @dev ERC-721 interface for accepting safe transfers. 
+ * @dev ERC-721 interface for accepting safe transfers.
  * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
  */
 interface ERC721TokenReceiver
@@ -223,12 +223,12 @@ interface ERC721TokenReceiver
     returns(bytes4);
 
 	function onERC721Received(
-    address _from, 
-    uint256 _tokenId, 
+    address _from,
+    uint256 _tokenId,
     bytes calldata _data
-  ) 
-  external 
-  returns 
+  )
+  external
+  returns
   (bytes4);
 
 }
@@ -397,7 +397,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
      * @dev CryptoKitties KittyCore Contract address.
      */
     address constant internal  CryptoKittiesAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
-    
+
     /**
      * @dev Magic value of a smart contract that can recieve NFT.
      * Equal to: bytes4(keccak256("onERC721Received(address,address,uint256,bytes)")).
@@ -416,12 +416,12 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     mapping (address => mapping (uint256 => address)) internal TokenToOwner;
 
     /**
-    * @dev A mapping from owner address to specific contract address's all NFT IDs 
+    * @dev A mapping from owner address to specific contract address's all NFT IDs
     */
     mapping (address => mapping (address => uint256[])) internal OwnerToTokens;
 
     /**
-    * @dev A mapping from specific contract address's NFT ID to its index in owner tokens array 
+    * @dev A mapping from specific contract address's NFT ID to its index in owner tokens array
     */
     mapping (address => mapping(uint256 => uint256)) internal TokenToIndex;
 
@@ -444,7 +444,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @dev A mapping from matchorder to owner address
     */
     mapping (bytes32 => address) internal MatchOrderToOwner;
-   
+
     /**
     * @dev A mapping from order to all matchorder it owns
     */
@@ -476,7 +476,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
 
         // NFT's contract address
         address contractAddress;
-        
+
         // NFT's id
         uint256 tokenId;
     }
@@ -487,15 +487,15 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     mapping (bytes32 => OrderObj) internal HashToOrderObj;
 
     /**
-    * @dev This emits when someone called receiveErc721Token and success transfer NFT to 
+    * @dev This emits when someone called receiveErc721Token and success transfer NFT to
     * exchange contract.
-    * @param _from Owner of NFT  
+    * @param _from Owner of NFT
     * @param _contractAddress NFT's contract address
     * @param _tokenId NFT's id
     */
     event ReceiveToken(
-        address indexed _from, 
-        address _contractAddress, 
+        address indexed _from,
+        address _contractAddress,
         uint256 _tokenId
     );
 
@@ -503,13 +503,13 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     /**
     * @dev This emits when someone called SendBackToken and transfer NFT from
     * exchange contract to it owner
-    * @param _owner Owner of NFT  
+    * @param _owner Owner of NFT
     * @param _contractAddress NFT's contract address
     * @param _tokenId NFT's id
     */
     event SendBackToken(
-        address indexed _owner, 
-        address _contractAddress, 
+        address indexed _owner,
+        address _contractAddress,
         uint256 _tokenId
     );
 
@@ -520,15 +520,15 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @param _tokenId NFT's id
     */
     event SendToken(
-        address indexed _to, 
-        address _contractAddress, 
+        address indexed _to,
+        address _contractAddress,
         uint256 _tokenId
     );
 
     /**
-    * @dev This emits when an OrderObj be created 
+    * @dev This emits when an OrderObj be created
     * @param _hash order's hash
-    * @param _owner Owner of NFT  
+    * @param _owner Owner of NFT
     * @param _contractAddress NFT's contract address
     * @param _tokenId NFT's id
     */
@@ -536,11 +536,11 @@ contract Exchange is Ownable, ERC721TokenReceiver {
         bytes32 indexed _hash,
         address _owner,
         address _contractAddress,
-        uint256 _tokenId   
+        uint256 _tokenId
     );
 
     /**
-    * @dev This emits when an order be created 
+    * @dev This emits when an order be created
     * @param _from this order's owner
     * @param _orderHash this order's hash
     * @param _contractAddress NFT's contract address
@@ -554,7 +554,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     );
 
     /**
-    * @dev This emits when an matchorder be created 
+    * @dev This emits when an matchorder be created
     * @param _from this order's owner
     * @param _orderHash order's hash which matchorder pairing
     * @param _matchOrderHash this matchorder's hash
@@ -570,7 +570,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     );
 
     /**
-    * @dev This emits when an order be deleted 
+    * @dev This emits when an order be deleted
     * @param _from this order's owner
     * @param _orderHash this order's hash
     */
@@ -580,7 +580,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     );
 
     /**
-    * @dev This emits when an matchorder be deleted 
+    * @dev This emits when an matchorder be deleted
     * @param _from this matchorder's owner
     * @param _orderHash order which matchorder pairing
     * @param _matchOrderHash this matchorder
@@ -598,9 +598,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @param tokenId NFT's id
     */
     modifier onlySenderIsOriginalOwner(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
+    )
     {
         require(TokenToOwner[contractAddress][tokenId] == msg.sender, "original owner should be message sender");
         _;
@@ -635,11 +635,11 @@ contract Exchange is Ownable, ERC721TokenReceiver {
    * @dev NFT contract will call when it use safeTransferFrom method
    */
     function onERC721Received(
-        address _from, 
-        uint256 _tokenId, 
+        address _from,
+        uint256 _tokenId,
         bytes calldata _data
-    ) 
-    external 
+    )
+    external
     returns (bytes4)
     {
         return ERC721_RECEIVED_THREE_INPUT;
@@ -669,14 +669,14 @@ contract Exchange is Ownable, ERC721TokenReceiver {
    * @param tokenId NFT's id
    */
     function createOrder(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    external 
+    )
+    external
     onlySenderIsOriginalOwner(
-        contractAddress, 
+        contractAddress,
         tokenId
-    ) 
+    )
     {
         bytes32 orderHash = keccak256(abi.encodePacked(contractAddress, tokenId, msg.sender));
         require(OrderToOwner[orderHash] != msg.sender, "Order already exist");
@@ -690,10 +690,10 @@ contract Exchange is Ownable, ERC721TokenReceiver {
    * @param orderHash order's hash
    */
     function _addOrder(
-        address sender, 
+        address sender,
         bytes32 orderHash
-    ) 
-    internal 
+    )
+    internal
     {
         uint index = OwnerToOrders[sender].push(orderHash).sub(1);
         OrderToOwner[orderHash] = sender;
@@ -716,7 +716,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     }
 
    /**
-   * @dev Remove order information on exchange contract 
+   * @dev Remove order information on exchange contract
    * @param sender order's owner
    * @param orderHash order's hash
    */
@@ -742,22 +742,22 @@ contract Exchange is Ownable, ERC721TokenReceiver {
    * @dev If your are interested in specfic order's NFT, create a matchorder and pair with it so order's owner
    * can know and choose to exchange with you
    * @notice You must call receiveErc721Token method first to send your NFT to exchange contract,
-   * if your NFT already create order, then you will be prohibit create matchorder until you delete this NFT's 
+   * if your NFT already create order, then you will be prohibit create matchorder until you delete this NFT's
    * order.
    * @param contractAddress NFT's contract address
    * @param tokenId NFT's id
-   * @param orderHash order's hash which matchorder want to pair with 
+   * @param orderHash order's hash which matchorder want to pair with
    */
     function createMatchOrder(
         address contractAddress,
-        uint256 tokenId, 
+        uint256 tokenId,
         bytes32 orderHash
-    ) 
-    external 
+    )
+    external
     onlySenderIsOriginalOwner(
-        contractAddress, 
+        contractAddress,
         tokenId
-    ) 
+    )
     {
         bytes32 matchOrderHash = keccak256(abi.encodePacked(contractAddress, tokenId, msg.sender));
         require(OrderToOwner[matchOrderHash] != msg.sender, "Order already exist");
@@ -766,24 +766,24 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     }
 
    /**
-   * @dev add matchorder information on exchange contract 
+   * @dev add matchorder information on exchange contract
    * @param matchOrderHash matchorder's hash
-   * @param orderHash order's hash which matchorder pair with 
+   * @param orderHash order's hash which matchorder pair with
    */
     function _addMatchOrder(
-        bytes32 matchOrderHash, 
+        bytes32 matchOrderHash,
         bytes32 orderHash
-    ) 
-    internal 
+    )
+    internal
     {
         uint inOrderIndex = OrderToMatchOrders[orderHash].push(matchOrderHash).sub(1);
         OrderToMatchOrderIndex[orderHash][matchOrderHash] = inOrderIndex;
     }
 
    /**
-   * @dev delete matchorder information on exchange contract 
+   * @dev delete matchorder information on exchange contract
    * @param matchOrderHash matchorder's hash
-   * @param orderHash order's hash which matchorder pair with 
+   * @param orderHash order's hash which matchorder pair with
    */
     function deleteMatchOrder(
         bytes32 matchOrderHash,
@@ -798,8 +798,8 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     }
 
   /**
-   * @dev delete matchorder information on exchange contract 
-   * @param orderHash order's hash which matchorder pair with 
+   * @dev delete matchorder information on exchange contract
+   * @param orderHash order's hash which matchorder pair with
    * @param matchOrderHash matchorder's hash
    */
     function _removeMatchOrder(
@@ -819,16 +819,16 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     }
 
     /**
-    * @dev order's owner can choose NFT to exchange from it's match order array, when function 
+    * @dev order's owner can choose NFT to exchange from it's match order array, when function
     * execute, order will be deleted, both NFT will be exchanged and send to corresponding address.
-    * @param order order's hash which matchorder pair with 
+    * @param order order's hash which matchorder pair with
     * @param matchOrder matchorder's hash
     */
     function exchangeToken(
         bytes32 order,
         bytes32 matchOrder
-    ) 
-    external 
+    )
+    external
     {
         require(OrderToOwner[order] == msg.sender, "this order doesn't belongs to this address");
         OrderObj memory orderObj = HashToOrderObj[order];
@@ -845,18 +845,18 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     /**
     * @dev if you want to create order and matchorder on exchange contract, you must call this function
     * to send your NFT to exchange contract, if your NFT is followed erc165 and erc721 standard, exchange
-    * contract will checked and execute sucessfully, then contract will record your information so you 
+    * contract will checked and execute sucessfully, then contract will record your information so you
     * don't need worried about NFT lost.
-    * @notice because contract can't directly transfer your NFT, so you should call setApprovalForAll 
+    * @notice because contract can't directly transfer your NFT, so you should call setApprovalForAll
     * on NFT contract first, so this function can execute successfully.
     * @param contractAddress NFT's Contract address
-    * @param tokenId NFT's id 
+    * @param tokenId NFT's id
     */
     function receiveErc721Token(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    external  
+    )
+    external
     {
         bool checkSupportErc165Interface = false;
         if(contractAddress != CryptoKittiesAddress){
@@ -887,12 +887,12 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @param tokenId NFT's id
     */
     function _addToken(
-        address sender, 
-        address contractAddress, 
+        address sender,
+        address contractAddress,
         uint256 tokenId
-    ) 
-    internal 
-    {   
+    )
+    internal
+    {
         bytes32 matchOrderHash = keccak256(abi.encodePacked(contractAddress, tokenId, sender));
         MatchOrderToOwner[matchOrderHash] = sender;
         HashToOrderObj[matchOrderHash] = OrderObj(sender,contractAddress,tokenId);
@@ -909,17 +909,17 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @notice matchorder will not be deleted because cost too high, but they will be useless and other
     * people can't choose your match order to exchange
     * @param contractAddress NFT's Contract address
-    * @param tokenId NFT's id 
+    * @param tokenId NFT's id
     */
     function sendBackToken(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    external 
+    )
+    external
     onlySenderIsOriginalOwner(
-        contractAddress, 
+        contractAddress,
         tokenId
-    ) 
+    )
     {
         bytes32 orderHash = keccak256(abi.encodePacked(contractAddress, tokenId, msg.sender));
         if(OrderToExist[orderHash] == true) {
@@ -927,12 +927,12 @@ contract Exchange is Ownable, ERC721TokenReceiver {
         }
         _sendToken(msg.sender, contractAddress, tokenId);
         emit SendBackToken(msg.sender, contractAddress, tokenId);
-    }  
+    }
 
 
     /**
     * @dev Drive NFT contract to send NFT to corresponding address
-    * @notice because cryptokittes contract method are not the same as general NFT contract, so 
+    * @notice because cryptokittes contract method are not the same as general NFT contract, so
     * need treat it individually
     * @param sendAddress NFT's owner
     * @param contractAddress NFT's contract address
@@ -940,11 +940,11 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function _sendToken(
         address sendAddress,
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
     )
     internal
-    {   
+    {
         if(contractAddress != CryptoKittiesAddress){
             Erc721Interface erc721Contract = Erc721Interface(contractAddress);
             require(erc721Contract.ownerOf(tokenId) == address(this), "exchange contract should have this token");
@@ -964,10 +964,10 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @param tokenId NFT's id
     */
     function _removeToken(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    internal 
+    )
+    internal
     {
         address owner = TokenToOwner[contractAddress][tokenId];
         bytes32 orderHash = keccak256(abi.encodePacked(contractAddress, tokenId, owner));
@@ -991,44 +991,44 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     * @return NFT owner address
     */
     function getTokenOwner(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (address)
     {
         return TokenToOwner[contractAddress][tokenId];
     }
-    
+
     /**
-    * @dev get owner's specfic contract address's all NFT array 
+    * @dev get owner's specfic contract address's all NFT array
     * @param ownerAddress owner address
     * @param contractAddress  NFT's contract address
     * @return NFT's array
     */
     function getOwnerTokens(
-        address ownerAddress, 
+        address ownerAddress,
         address contractAddress
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (uint256[] memory)
     {
         return OwnerToTokens[ownerAddress][contractAddress];
     }
 
     /**
-    * @dev get NFT's index in owner NFT's array 
+    * @dev get NFT's index in owner NFT's array
     * @param contractAddress NFT's contract address
     * @param tokenId NFT's id
     * @return NFT's index
     */
     function getTokenIndex(
-        address contractAddress, 
+        address contractAddress,
         uint256 tokenId
-    ) 
-    external 
+    )
+    external
     view
     returns (uint256)
     {
@@ -1042,9 +1042,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function getOwnerOrders(
         address ownerAddress
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (bytes32[] memory){
         return OwnerToOrders[ownerAddress];
     }
@@ -1056,9 +1056,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function getOrderOwner(
         bytes32 order
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (address)
     {
         return OrderToOwner[order];
@@ -1071,9 +1071,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function getOrderIndex(
         bytes32 order
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (uint)
     {
         return OrderToIndex[order];
@@ -1082,7 +1082,7 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     /**
     * @dev get order exist or not in exchange contract
     * @param order order's hash
-    * @return boolean to express order exist 
+    * @return boolean to express order exist
     */
     function getOrderExist(
         bytes32 order
@@ -1100,9 +1100,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function getMatchOrderOwner(
         bytes32 matchOrder
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (address)
     {
         return MatchOrderToOwner[matchOrder];
@@ -1116,9 +1116,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     function getOrderMatchOrderIndex(
         bytes32 order,
         bytes32 matchOrder
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (uint)
     {
         return OrderToMatchOrderIndex[order][matchOrder];
@@ -1131,9 +1131,9 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     */
     function getOrderMatchOrders(
         bytes32 order
-    ) 
-    external 
-    view 
+    )
+    external
+    view
     returns (bytes32[] memory)
     {
         return OrderToMatchOrders[order];
@@ -1150,8 +1150,8 @@ contract Exchange is Ownable, ERC721TokenReceiver {
     external
     view
     returns(
-        address, 
-        address, 
+        address,
+        address,
         uint256
     )
     {
@@ -1162,4 +1162,13 @@ contract Exchange is Ownable, ERC721TokenReceiver {
             orderObj.tokenId
         );
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

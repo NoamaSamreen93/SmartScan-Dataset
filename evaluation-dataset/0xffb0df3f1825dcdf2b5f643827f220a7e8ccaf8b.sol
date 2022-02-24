@@ -21,18 +21,18 @@ contract GasToken is ERC20Interface {
     string public constant name = "Gas";
     string public constant symbol = "GAS";
     uint8 public constant decimals = 18;
-    
+
     uint256 public _totalSupply;
 
     mapping (address => uint256) balances;
-    
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
 
     constructor() public {
         _totalSupply = 0;
     }
-    
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -46,7 +46,7 @@ contract GasToken is ERC20Interface {
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     // ------------------------------------------------------------------------
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
@@ -64,13 +64,13 @@ contract GasToken is ERC20Interface {
         _totalSupply += tokens;
         return tokens;
     }
-    
+
     // ------------------------------------------------------------------------
     // Sell gas at the transaction's gas gasprice.
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     function sell(uint tokens) public returns (uint revenue) {
         require(balances[msg.sender] >= tokens);           // Check if the sender has enough
-        balances[msg.sender] -= tokens;        
+        balances[msg.sender] -= tokens;
         _totalSupply -= tokens;
         revenue = tokens * tx.gasprice;
         msg.sender.transfer(revenue);
@@ -106,7 +106,7 @@ contract GasToken is ERC20Interface {
         emit Transfer(from, to, tokens);
         return true;
     }
- 
+
     // Allow `spender` to withdraw from your account, multiple times, up to the `tokens` amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address spender, uint tokens) public returns (bool success) {
@@ -114,11 +114,20 @@ contract GasToken is ERC20Interface {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
     function () external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

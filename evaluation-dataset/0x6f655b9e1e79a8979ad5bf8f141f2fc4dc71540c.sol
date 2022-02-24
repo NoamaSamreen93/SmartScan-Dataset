@@ -1413,7 +1413,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract TokenFreeze is Ownable, StandardToken {
   uint256 public unfreeze_date;
-  
+
   event FreezeDateChanged(string message, uint256 date);
 
   function TokenFreeze() public {
@@ -1430,7 +1430,7 @@ contract TokenFreeze is Ownable, StandardToken {
     unfreeze_date = datetime;
   emit  FreezeDateChanged("Unfreeze Date: ", datetime);
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) freezed public returns (bool) {
     super.transferFrom(_from, _to, _value);
   }
@@ -1444,7 +1444,7 @@ contract TokenFreeze is Ownable, StandardToken {
 contract Whitelisted  {
 
   Whitelist.List private _list;
-  
+
   modifier onlyWhitelisted() {
     require(Whitelist.check(_list, msg.sender) == true);
     _;
@@ -1452,7 +1452,7 @@ contract Whitelisted  {
 
   event AddressAdded(address _addr);
   event AddressRemoved(address _addr);
-  
+
   function WhitelistedAddress()
   public
   {
@@ -1472,7 +1472,7 @@ contract Whitelisted  {
     Whitelist.remove(_list, _addr);
    emit AddressRemoved(_addr);
   }
-  
+
   function WhitelistAddressisListed(address _addr)
   public
   view
@@ -1492,14 +1492,14 @@ contract Whitelisted  {
 contract MintableToken is TokenFreeze, Whitelisted {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
-  
+
   string public constant name = "Vertex";
   string public constant symbol = "VTEX";
   uint8 public constant decimals = 5;  // 18 is the most common number of decimal places
   bool public mintingFinished = false;
- 
-  mapping (address => bool) public whitelist; 
-  
+
+  mapping (address => bool) public whitelist;
+
   modifier canMint() {
     require(!mintingFinished);
     _;
@@ -1512,13 +1512,13 @@ contract MintableToken is TokenFreeze, Whitelisted {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    
+
     totalSupply = totalSupply.add(_amount);
     require(totalSupply <= 30000000000000);
     balances[_to] = balances[_to].add(_amount);
     emit  Mint(_to, _amount);
     emit Transfer(address(0), _to, _amount);
-    
+
     return true;
   }
 
@@ -1534,11 +1534,11 @@ contract MintableToken is TokenFreeze, Whitelisted {
 }
 
 library Whitelist {
-  
+
   struct List {
     mapping(address => bool) registry;
   }
-  
+
   function add(List storage list, address _addr)
     internal
   {
@@ -1567,7 +1567,7 @@ contract WhitelistToken is Whitelisted {
     onlyWhitelisted
     view
     external
-  {    
+  {
   }
 
 }
@@ -1614,10 +1614,10 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
 
         rate = _rate;
         wallet = _wallet;
-        
+
         token.changeFreezeDate(_unfreeze_date);
     }
-   
+
     // function startICO() onlyOwner public {
     //     require(ICOStartTime == 0);
     //     ICOStartTime = now;
@@ -1627,11 +1627,11 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
     //     require(ICOEndTime > now);
     //     ICOEndTime = now;
     // }
-    
+
     function changeTokenFreezeDate(uint256 _new_date) onlyOwner public {
         token.changeFreezeDate(_new_date);
     }
-    
+
     function unfreezeTokens() onlyOwner public {
         token.changeFreezeDate(now);
     }
@@ -1693,14 +1693,14 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
 
         return string(_new_s);
     }
-    // callback for oraclize 
+    // callback for oraclize
     function __callback(bytes32 myid, string result) public {
         if (msg.sender != oraclize_cbAddress()) revert();
         string memory converted = stringFloatToUnsigned(result);
         rate = parseInt(converted);
-        rate = SafeMath.div(1000000000000000000, rate); // price for 1 USD in WEI 
+        rate = SafeMath.div(1000000000000000000, rate); // price for 1 USD in WEI
     }
-    // price updater 
+    // price updater
     function updatePrice() payable public {
         oraclize_setProof(proofType_NONE);
         if (oraclize_getPrice("URL") > address(this).balance) {
@@ -1711,9 +1711,9 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
         }
     }
     //amy
-    
-    
-     
+
+
+
      function withdraw(uint amount) onlyOwner returns(bool) {
          require(amount < this.balance);
         wallet.transfer(amount);
@@ -1721,13 +1721,13 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
 
     }
 
-   
+
 
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
-    
-    
+
+
    //end
     // low level token purchase function
     function buyTokens(address beneficiary) public payable {
@@ -1742,7 +1742,7 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
         uint256 weiAmount = SafeMath.mul(msg.value, 10**uint256(token.decimals()));
         uint256 tokens = SafeMath.div(weiAmount, _convert_rate);
         require(tokens > 0);
-        
+
         //do not need bonus of contrib amount calc
         // tokens = calcBonus(tokens, msg.value.div(10**uint256(token.decimals())));
 
@@ -1777,7 +1777,7 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
        // bool withinPrivateSalePeriod = now >= PrivateSaleStartTime && now <= PrivateSaleEndTime;
         bool withinICOPeriod = now >= ICOStartTime && now <= ICOEndTime;
         bool nonZeroPurchase = msg.value != 0;
-        
+
         // private-sale hardcap
         uint256 total_tokens = SafeMath.div(totalTokenSupply(), token.decimals());
         // if (withinPrivateSalePeriod && total_tokens >= 30000000)
@@ -1785,13 +1785,19 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
         //     stopPrivateSale();
         //     return false;
         // }
-        
+
         // return hardCapOk && (withinICOPeriod || withinPrivateSalePeriod) && nonZeroPurchase;
          return hardCapOk && withinICOPeriod && nonZeroPurchase;
     }
-    
+
     // total supply of tokens
     function totalTokenSupply() public view returns (uint256) {
         return token.totalSupply();
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

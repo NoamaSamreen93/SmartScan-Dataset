@@ -25,7 +25,7 @@ library SafeMath {
     return c;
   }
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b > 0); 
+    assert(b > 0);
     uint256 c = a / b;
     assert(a == b * c + a % b);
     return c;
@@ -171,3 +171,14 @@ contract WFRA_MGNS_Derivative is PausableToken, MintableToken {
 }
 //SOME ©LIII A.D. STAR TREK - VALTHEFOX FOR MGNS.
 //MAINLY INSPIRED BY OPEN SOURCE CODE - MERCI LES BARBUS !
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

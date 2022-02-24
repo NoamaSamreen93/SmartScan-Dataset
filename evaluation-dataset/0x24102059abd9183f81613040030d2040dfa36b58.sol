@@ -53,7 +53,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -134,7 +134,7 @@ contract LUVTOKEN is StandardToken {
 
     function LUVTOKEN(
         ) {
-        decimals = 18; 
+        decimals = 18;
         totalSupply = 200000000 * (10 ** uint256(decimals));                        // Update total supply (100000 for example)
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens (100000 for example)
         name = "LUVTOKEN";                                   // Set the name for display purposes
@@ -198,7 +198,7 @@ contract Ownable {
 }
 
 /**
- * @title Token 
+ * @title Token
  * @dev API interface for interacting with the LUVTOKEN contract
  * /
  interface Token {
@@ -230,11 +230,11 @@ contract LUV_Crowdsale is Ownable {
 
   // Max amount of wei accepted in the crowdsale
   uint256 public cap;
-  
+
   // Min amount of wei an investor can send
   uint256 public minInvest;
-  
-  
+
+
   // address where funds are collected
   address public wallet;
 
@@ -242,8 +242,8 @@ contract LUV_Crowdsale is Ownable {
   uint256 public phase_1_rate = 13000;
   uint256 public phase_2_rate = 12000;
   uint256 public phase_3_rate = 11000;
-  
-  
+
+
   // amount of raised money in wei
   uint256 public weiRaised;
 
@@ -261,7 +261,7 @@ contract LUV_Crowdsale is Ownable {
       else if(current_time > phase_2_Time && current_time < endTime){
       return phase_3_rate;
     }
-      
+
   }
 
   /**
@@ -329,7 +329,7 @@ contract LUV_Crowdsale is Ownable {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
+
 /**
  * @notice Terminate contract and refund to owner
  */
@@ -338,10 +338,21 @@ contract LUV_Crowdsale is Ownable {
      uint256 balance = token.balanceOf(this);
      assert (balance > 0);
      token.transfer(owner,balance);
-     
+
      // There should be no ether in the contract but just in case
      selfdestruct(owner);
-     
+
  }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

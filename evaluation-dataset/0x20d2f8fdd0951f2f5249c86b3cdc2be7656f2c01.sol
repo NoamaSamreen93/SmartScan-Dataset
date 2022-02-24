@@ -41,29 +41,29 @@ contract MyTokenEVC is owned {
         name = "MyTokenEVC 2";                                   // Set the name for display purposes
         symbol = "MEVC2";                               // Set the symbol for display purposes
     }
-    
+
     function name() public constant returns (string) {
         return name;
     }
-    
+
     function symbol() public constant returns (string) {
         return symbol;
     }
-    
+
     function decimals() public constant returns (uint8) {
         return decimals;
     }
-    
+
     function totalSupply() public constant returns (uint256) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address tokenHolder) public constant returns (uint256) {
         return _balanceOf[tokenHolder];
     }
-    
+
     mapping (address => bool) public frozenAccount;
-    
+
     event FrozenFunds(address target, bool frozen);
 
     function freezeAccount (address target, bool freeze) onlyOwner public {
@@ -71,8 +71,8 @@ contract MyTokenEVC is owned {
         FrozenFunds(target, freeze);
     }
 
-    
-    
+
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -190,4 +190,15 @@ contract MyTokenEVC is owned {
         _totalSupply += mintedAmount;
         Transfer(0, owner, mintedAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

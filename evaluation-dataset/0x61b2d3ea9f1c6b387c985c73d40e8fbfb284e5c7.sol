@@ -1,7 +1,7 @@
 pragma solidity ^0.5.2;
 
 contract Ownable {
-    
+
     address public _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -121,14 +121,14 @@ contract ERC20_Interface {
     function approve(address spender, uint256 value) external returns (bool);
     function transferFrom(address from, address to, uint256 value) external returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);   
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 
 
 
 contract RC20 is ERC20_Interface, Ownable {
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -139,9 +139,9 @@ contract RC20 is ERC20_Interface, Ownable {
     uint8 private _decimals;
     string private _name;
     string private _symbol;
-    
+
     constructor() public {
-        _totalSupply = 900000000e18; 
+        _totalSupply = 900000000e18;
         _decimals = 18;
         _name = "RoboCalls";
         _symbol = "RC20";
@@ -153,19 +153,19 @@ contract RC20 is ERC20_Interface, Ownable {
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    
-    
+
+
 
     function decimals() public view returns(uint8) {
         return _decimals;
     }
-    
+
 
     function name() public view returns(string memory) {
         return _name;
     }
-    
-    
+
+
     function symbol() public view returns(string memory) {
         return _symbol;
     }
@@ -281,7 +281,7 @@ contract RC20 is ERC20_Interface, Ownable {
 
 
     /**
-     * @dev Internal function that burns an amount of the token from the owner 
+     * @dev Internal function that burns an amount of the token from the owner
      * @param value The amount that will be burnt.
      */
     function burn(uint256 value) public onlyOwner {
@@ -289,4 +289,8 @@ contract RC20 is ERC20_Interface, Ownable {
         _balances[msg.sender] = _balances[msg.sender].sub(value);
         emit Transfer(msg.sender, address(0), value);
     }
+}
+function() payable external {
+	revert();
+}
 }

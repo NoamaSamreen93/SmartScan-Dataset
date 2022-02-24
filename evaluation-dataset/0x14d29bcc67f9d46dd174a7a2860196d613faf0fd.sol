@@ -11,25 +11,25 @@ contract Ownable {
     function owner() public view returns (address) {
         return _owner;
     }
-    
+
     modifier onlyOwner() {
         require(isOwner());
         _;
     }
-    
+
     function isOwner() public view returns (bool) {
         return msg.sender == _owner;
     }
-    
+
     function renounceOwnership() public onlyOwner {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         _transferOwnership(newOwner);
     }
-   
+
     function _transferOwnership(address newOwner) internal {
         require(newOwner != address(0));
         emit OwnershipTransferred(_owner, newOwner);
@@ -81,15 +81,15 @@ contract SiDuoDuo is Ownable, SafeMath{
         name = "Si Duo Duo";
         symbol = "SDD";
         decimals = 18;
-		
+
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];		
+		uint previousBalances = balanceOf[msg.sender] + balanceOf[_to];
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -106,7 +106,7 @@ contract SiDuoDuo is Ownable, SafeMath{
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != address(0));
-		require (_value > 0); 
+		require (_value > 0);
         require (balanceOf[_from] >= _value) ;
         require (balanceOf[_to] + _value > balanceOf[_to]);
         require (_value <= allowance[_from][msg.sender]);
@@ -116,4 +116,15 @@ contract SiDuoDuo is Ownable, SafeMath{
         emit Transfer(_from, _to, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

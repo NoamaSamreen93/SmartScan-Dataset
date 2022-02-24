@@ -58,7 +58,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         assert(b <= a);
         return a - b;
@@ -67,7 +67,7 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -87,11 +87,11 @@ contract StandardToken is ERC20 {
     address private owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event MintFinished();
-    
+
     bool public mintingFinished = false;
 
   mapping(address => uint256) balances;
-  
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
@@ -191,21 +191,21 @@ contract StandardToken is ERC20 {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
     /**
-   * @dev Function to transfer token ownership. 
+   * @dev Function to transfer token ownership.
    */
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
     modifier canMint() {
     require(!mintingFinished);
     _;
   }
-  
+
     /**
    * @dev Function to stop minting new guild member tokens.
    * @return True if the operation was successful.
@@ -216,7 +216,7 @@ contract StandardToken is ERC20 {
     return true;
   }
 }
- 
+
  /**
  * @title Mintable Tribute Token
  * @dev Simple ERC20 Token example, with mintable token creation and amendable tribute system
@@ -254,26 +254,26 @@ constructor(string memory _symbol, string memory _name, uint _totalSupply, addre
     require(!mintingFinished);
     _;
   }
-  
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
-   * @dev Function to update tribute amount for guild token mint. 
+   * @dev Function to update tribute amount for guild token mint.
    */
   function updateTribute(uint _tribute) onlyOwner public {
     	tribute = _tribute;
 	}
-    	
+
   /**
-   * @dev Function to update guild address for tribute transfer. 
-   */	
+   * @dev Function to update guild address for tribute transfer.
+   */
   function updateGuild(address _guild) onlyOwner public {
     	guild = _guild;
 	}
-  
+
   /**
    * @dev Function to mint new guild tokens after tribute attached.
    * @return A boolean that indicates if the operation was successful.
@@ -298,9 +298,9 @@ constructor(string memory _symbol, string memory _name, uint _totalSupply, addre
     emit MintFinished();
     return true;
   }
-  
+
   /**
-   * @dev Function to transfer token ownership. 
+   * @dev Function to transfer token ownership.
    */
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
@@ -348,4 +348,20 @@ contract Factory {
         instantiations[msg.sender].push(instantiation);
         emit ContractInstantiation(msg.sender, instantiation);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

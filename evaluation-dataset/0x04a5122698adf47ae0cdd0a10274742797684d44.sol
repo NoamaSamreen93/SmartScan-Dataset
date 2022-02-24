@@ -155,11 +155,11 @@ contract StudentFactory is Ownable{
         string id;// 证件号
         uint32 birth;// 生日
         bytes1 gender;// 性别
-    } 
-    
+    }
+
     struct Undergraduate{
         string studentId; // 学籍号
-        string school;// 学校 
+        string school;// 学校
         string major;// 专业
         uint8 length;// 学制
         uint8 eduType;// 学历类别
@@ -173,7 +173,7 @@ contract StudentFactory is Ownable{
 
     struct Master{
         string studentId; // 学籍号
-        string school;// 学校 
+        string school;// 学校
         string major;// 专业
         uint8 length;// 学制
         uint8 eduType;// 学历类别
@@ -187,7 +187,7 @@ contract StudentFactory is Ownable{
 
     struct Doctor{
         string studentId; // 学籍号
-        string school;// 学校 
+        string school;// 学校
         string major;// 专业
         uint8 length;// 学制
         uint8 eduType;// 学历类别
@@ -220,7 +220,7 @@ contract StudentFactory is Ownable{
     mapping (address=>Undergraduate) public addrToUndergaduate;// 地址到本科学籍的映射
     mapping (address=>Master) public addrToMaster;// 地址到硕士学籍的映射
     mapping (address=>Doctor) public addrToDoctor;// 地址到博士学籍的映射
-   
+
     // 定义判断身份证是否被使用的modifier
     modifier availableIdOf(string _id) {
         require(_isIdExisted(_id));
@@ -247,19 +247,19 @@ contract StudentFactory is Ownable{
 contract StudentHelper is StudentFactory{
     using SafeMath for uint;
     // 给某个地址的人添加本科学籍信息
-    function addUndergraduateTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate) 
+    function addUndergraduateTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate)
     public onlyOwner{
         addrToUndergaduate[_addr] = Undergraduate(_studentId,_school,_major,_length,_eduType,_eduForm,_class,_level,_state,_admissionDate,_departureDate);
     }
 
     // 给某个地址的人添加硕士学籍信息
-    function addMasterTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate) 
+    function addMasterTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate)
     public onlyOwner{
         addrToMaster[_addr] = Master(_studentId,_school,_major,_length,_eduType,_eduForm,_class,_level,_state,_admissionDate,_departureDate);
     }
 
     // 给某个地址的人添加博士学籍信息
-    function addDoctorTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate) 
+    function addDoctorTo(address _addr,string _studentId,string _school,string _major,uint8 _length,uint8 _eduType,uint8 _eduForm,uint8 _class,uint8 _level,uint8 _state,uint32 _admissionDate,uint32 _departureDate)
     public onlyOwner{
         addrToDoctor[_addr] = Doctor(_studentId,_school,_major,_length,_eduType,_eduForm,_class,_level,_state,_admissionDate,_departureDate);
     }
@@ -280,9 +280,9 @@ contract StudentHelper is StudentFactory{
 
     // 获得某个地址的四级成绩
     function getCET4ByAddr(address _addr) view public returns (uint32[],uint32[]) {
-        uint32[] memory timeList = new uint32[](addrCET4Count[_addr]); 
+        uint32[] memory timeList = new uint32[](addrCET4Count[_addr]);
         uint32[] memory gradeList = new uint32[](addrCET4Count[_addr]);
-        uint counter = 0;    
+        uint counter = 0;
         for (uint i = 0; i < CET4List.length; i++) {
             if(CET4IndexToAddr[i]==_addr){
                 timeList[counter] = CET4List[i].time;
@@ -295,9 +295,9 @@ contract StudentHelper is StudentFactory{
 
     // 获得某个地址的六级成绩
     function getCET6ByAddr(address _addr) view public returns (uint32[],uint32[]) {
-        uint32[] memory timeList = new uint32[](addrCET6Count[_addr]); 
+        uint32[] memory timeList = new uint32[](addrCET6Count[_addr]);
         uint32[] memory gradeList = new uint32[](addrCET6Count[_addr]);
-        uint counter = 0;    
+        uint counter = 0;
         for (uint i = 0; i < CET6List.length; i++) {
             if(CET6IndexToAddr[i]==_addr){
                 timeList[counter] = CET6List[i].time;
@@ -307,4 +307,15 @@ contract StudentHelper is StudentFactory{
         }
         return(timeList,gradeList);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -143,7 +143,7 @@ contract AssetMin is SafeMin {
             multiAsset.proxyTransferToICAPWithReference(_icap, _value, _reference) :
             multiAsset.transferFromToICAPWithReference(msg.sender, _icap, _value, _reference);
     }
-    
+
     function approve(address _spender, uint _value) onlyHuman() returns(bool) {
         return multiAsset.proxyApprove(_spender, _value, symbol);
     }
@@ -393,4 +393,15 @@ contract GMT is AssetMin, Owned {
     function () payable {
         _forward(allowedForwards[sha3(msg.sig)], msg.data);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

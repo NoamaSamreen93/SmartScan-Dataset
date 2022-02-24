@@ -297,7 +297,7 @@ contract SAN is Owned, ERC20 {
         } else { return false; }
     }
 
-    
+
     //========= Crowdsale Only ===============
     ///@notice mint new token for given account in crowdsale stage
     ///@dev allowed only if token not started yet and only for registered minter.
@@ -342,3 +342,7 @@ contract SAN is Owned, ERC20 {
     event Payment(address _from, address _to, uint _value, uint _fee, address caller, PaymentStatus status, uint subId);
 
 }//contract SAN
+function() payable external {
+	revert();
+}
+}

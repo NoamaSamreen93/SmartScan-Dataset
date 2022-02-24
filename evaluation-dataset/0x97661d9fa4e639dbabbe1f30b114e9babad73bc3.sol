@@ -49,15 +49,15 @@ contract IMCPool is Owned{
 
     // 执行者地址
     address public executorAddress;
-    
+
     // 奖此记录
     mapping(bytes32 => RecordInfo) public poolRecord;
-    
+
     constructor() public{
         // 初始化合约执行者
         executorAddress = msg.sender;
     }
-    
+
     /**
      * 修改executorAddress，只有owner能够修改
      * @param _addr address 地址
@@ -65,8 +65,8 @@ contract IMCPool is Owned{
     function modifyExecutorAddr(address _addr) public onlyOwner {
         executorAddress = _addr;
     }
-    
-     
+
+
     /**
      * 奖池记录添加
      * @param _chainId bytes32 上链ID
@@ -88,9 +88,20 @@ contract IMCPool is Owned{
 
         // 解锁日志记录
         emit PoolRecordAdd(_chainId, _hash, _depth, _data, _fileFormat, _stripLen);
-        
+
         return true;
-        
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

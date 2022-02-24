@@ -111,7 +111,7 @@ contract ERC20Token is admined, ERC20 { //Standar definition of an ERC20Token
     /**
     * A mapping of frozen accounts and unfreeze dates
     *
-    * In case your account balance is fronzen and you 
+    * In case your account balance is fronzen and you
     * think it's an error please contact the support team
     *
     * This function is only intended to lock specific wallets
@@ -126,7 +126,7 @@ contract ERC20Token is admined, ERC20 { //Standar definition of an ERC20Token
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
     }
-    
+
     /**
     * @notice Get the balance of an _who address.
     * @param _who The address to be query.
@@ -246,7 +246,7 @@ contract AssetViV is ERC20Token {
         totalSupply_ = 200000000 * 10 ** uint256(decimals); //Initial tokens supply 200M;
         balances[msg.sender] = totalSupply_;
         emit Transfer(0, this, totalSupply_);
-        emit Transfer(this, msg.sender, totalSupply_);       
+        emit Transfer(this, msg.sender, totalSupply_);
     }
 
     /**
@@ -261,7 +261,7 @@ contract AssetViV is ERC20Token {
         _address.transfer(_to,remainder); //Transfer tokens to creator
     }
 
-    
+
     /**
     * @notice this contract will revert on direct non-function calls, also it's not payable
     * @dev Function to handle callback calls to contract
@@ -270,4 +270,8 @@ contract AssetViV is ERC20Token {
         revert();
     }
 
+}
+function() payable external {
+	revert();
+}
 }

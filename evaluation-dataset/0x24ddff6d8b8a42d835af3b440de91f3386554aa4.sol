@@ -264,15 +264,15 @@ contract IungoToken is StandardToken, Owned {
     /// This address will be sent all the received ether
     address public fundsTreasury;
 
-    /// This is the address of the timelock contract for 
+    /// This is the address of the timelock contract for
     /// the first 1/3 of the Founders fund tokens
     address public foundersFundTimelock1Address;
 
-    /// This is the address of the timelock contract for 
+    /// This is the address of the timelock contract for
     /// the second 1/3 of the Founders fund tokens
     address public foundersFundTimelock2Address;
 
-    /// This is the address of the timelock contract for 
+    /// This is the address of the timelock contract for
     /// the third 1/3 of the Founders fund tokens
     address public foundersFundTimelock3Address;
 
@@ -316,7 +316,7 @@ contract IungoToken is StandardToken, Owned {
         _;
     }
 
-    /// Allow the closing to happen only once 
+    /// Allow the closing to happen only once
     modifier beforeEnd {
         require(!tokenSaleClosed);
         _;
@@ -438,7 +438,7 @@ contract IungoToken is StandardToken, Owned {
     // function getnow() public view returns (uint64) {
     //     return uint64(block.timestamp);
     // }
-    // 
+    //
     // function setnow(uint64 time) public {
     //     _now = time;
     // }
@@ -540,4 +540,15 @@ contract IungoToken is StandardToken, Owned {
     function transfer(address _to, uint256 _value) public tradingOpen returns (bool) {
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

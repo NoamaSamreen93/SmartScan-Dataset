@@ -396,7 +396,7 @@ contract ERC20 is IERC20 {
     * Originally based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
 */
 contract PartialERC20 is ERC20 {
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) internal _balances;
@@ -563,32 +563,32 @@ contract PartialERC20 is ERC20 {
 
 // File: contracts/PrivateToken.sol
 
-/**  
+/**
 * @title Private Token
 * @dev This Private token used for early adoption for token holders, and have mechanism for migration to a production token.
 * @dev Migration Flow:
 *       Step1: call freeze()
 *       Step2: Loop mint for all holders on a production token.
-*/  
+*/
 
 
 contract PrivateToken is PartialERC20, Ownable {
-    
+
     bool public isFreezed = false;
-    
+
     address[] public holders;
     mapping(address => uint32) indexOfHolders;
 
     event Freezed(address commander);
     event RecordNewTokenHolder(address holder);
     event RemoveTokenHolder(address holder);
-    
+
     function numberOfTokenHolders() public view returns(uint32) {
         return uint32(holders.length);
     }
 
     function isTokenHolder(address addr) public view returns(bool) {
-        return indexOfHolders[addr] > 0;        
+        return indexOfHolders[addr] > 0;
     }
 
     modifier isNotFreezed() {
@@ -607,7 +607,7 @@ contract PrivateToken is PartialERC20, Ownable {
         if (!isTokenHolder(holder)) {
             holders.push(holder);
             indexOfHolders[holder] = uint32(holders.length);
-            
+
             emit RecordNewTokenHolder(holder);
         }
     }
@@ -624,12 +624,12 @@ contract PrivateToken is PartialERC20, Ownable {
                 address lastHolder = holders[holders.length - 1];
                 holders[holders.length - 1] = holders[index];
                 holders[index] = lastHolder;
-                
+
                 indexOfHolders[lastHolder] = indexOfHolders[holder];
             }
             holders.length--;
             indexOfHolders[holder] = 0;
-            
+
             emit RemoveTokenHolder(holder);
         }
     }
@@ -639,8 +639,8 @@ contract PrivateToken is PartialERC20, Ownable {
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
-    function transfer(address to, uint256 value) 
-        public 
+    function transfer(address to, uint256 value)
+        public
         isNotFreezed
         returns (bool) {
 
@@ -658,17 +658,17 @@ contract PrivateToken is PartialERC20, Ownable {
         * @param to address The address which you want to transfer to
         * @param value uint256 the amount of tokens to be transferred
         */
-    function transferFrom(address from, address to, uint256 value) 
-        public 
+    function transferFrom(address from, address to, uint256 value)
+        public
         isNotFreezed
         returns (bool) {
 
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
-        
+
         // Record new holder
         _recordNewTokenHolder(to);
-        
+
         return true;
     }
 }
@@ -683,22 +683,22 @@ contract PrivateToken is PartialERC20, Ownable {
     * Originally based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
 */
 contract KTFForTestMigration is PartialERC20, Ownable {
-    // uint256 public totalSupply;  
-    string public name;  
-    string public symbol;  
-    uint32 public decimals; 
+    // uint256 public totalSupply;
+    string public name;
+    string public symbol;
+    uint32 public decimals;
 
     PrivateToken public pktf;
 
     uint32 public holderCount;
 
-    constructor(PrivateToken _pktf) public {  
-        symbol = "KTF";  
-        name = "Katinrun Foundation";  
-        decimals = 18;  
+    constructor(PrivateToken _pktf) public {
+        symbol = "KTF";
+        name = "Katinrun Foundation";
+        decimals = 18;
         _totalSupply = 0;
-        
-        _balances[msg.sender] = _totalSupply;  
+
+        _balances[msg.sender] = _totalSupply;
 
         pktf = _pktf;
     }
@@ -709,7 +709,7 @@ contract KTFForTestMigration is PartialERC20, Ownable {
 
         uint32 numberOfPKTFHolders = pktf.numberOfTokenHolders();
         holderCount = numberOfPKTFHolders;
-        
+
         for(uint256 i = 0; i < numberOfPKTFHolders; i++) {
           address user = pktf.holders(i);
           uint256 balance = pktf.balanceOf(user);
@@ -724,7 +724,7 @@ contract KTFForTestMigration is PartialERC20, Ownable {
         * @param value The amount of tokens to mint.
         * @return A boolean that indicates if the operation was successful.
         */
-    function mint(address to,uint256 value) 
+    function mint(address to,uint256 value)
         public
         onlyOwner
         returns (bool)
@@ -740,12 +740,12 @@ contract KTFForTestMigration is PartialERC20, Ownable {
 contract MintableWithVoucher is PrivateToken {
     mapping(uint64 => bool) usedVouchers;
     mapping(bytes32 => uint32) holderRedemptionCount;
-    
+
     event VoucherUsed(
         uint64 voucherID,
-        uint64 parityCode, 
-        uint256 amount,  
-        uint256 expired,  
+        uint64 parityCode,
+        uint256 amount,
+        uint256 expired,
         address indexed receiver, // use indexed for easy to filter event
         bytes32 socialHash
     );
@@ -753,7 +753,7 @@ contract MintableWithVoucher is PrivateToken {
     function isVoucherUsed(uint64 _voucherID) public view returns (bool) {
         return usedVouchers[_voucherID];
     }
-    
+
     function markVoucherAsUsed(uint64 _voucherID) private {
         usedVouchers[_voucherID] = true;
     }
@@ -777,8 +777,8 @@ contract MintableWithVoucher is PrivateToken {
     // Implement voucher system
     // * Amount is in unit of ether *
     function redeemVoucher(
-        uint8 _v, 
-        bytes32 _r, 
+        uint8 _v,
+        bytes32 _r,
         bytes32 _s,
         uint64 _voucherID,
         uint64 _parityCode,
@@ -786,8 +786,8 @@ contract MintableWithVoucher is PrivateToken {
         uint256 _expired,
         address _receiver,
         bytes32 _socialHash
-    )  
-    public 
+    )
+    public
     isNotFreezed
     {
         require(!isVoucherUsed(_voucherID), "Voucher has already been used.");
@@ -810,14 +810,14 @@ contract MintableWithVoucher is PrivateToken {
 
         emit VoucherUsed(_voucherID, _parityCode, _amount,  _expired, _receiver, _socialHash);
     }
-    
+
     /**
         * @dev Function to mint tokens
         * @param to The address that will receive the minted tokens.
         * @param value The amount of tokens to mint.
         * @return A boolean that indicates if the operation was successful.
         */
-    function mint(address to,uint256 value) 
+    function mint(address to,uint256 value)
         public
         onlyOwner // todo: or onlyMinter
         isNotFreezed
@@ -835,7 +835,7 @@ contract MintableWithVoucher is PrivateToken {
         * @dev Burns a specific amount of tokens. Only owner can burn themself.
         * @param value The amount of token to be burned.
         */
-    function burn(uint256 value) 
+    function burn(uint256 value)
         public
         onlyOwner
         isNotFreezed {
@@ -848,7 +848,7 @@ contract MintableWithVoucher is PrivateToken {
         * @dev Burns a specific amount of tokens. Only owner can burn themself.
         * @param value The amount of token to be burned.
         */
-    function burn(address account, uint256 value) 
+    function burn(address account, uint256 value)
         public
         onlyOwner
         isNotFreezed {
@@ -863,9 +863,9 @@ contract MintableWithVoucher is PrivateToken {
         * @param account The account whose tokens will be burnt.
         * @param value The amount that will be burnt.
         */
-    function burnFrom(address account, uint256 value) 
-        public 
-        isNotFreezed 
+    function burnFrom(address account, uint256 value)
+        public
+        isNotFreezed
         {
         require(account != address(0));
 
@@ -880,27 +880,27 @@ contract MintableWithVoucher is PrivateToken {
 // File: contracts/PrivateKatinrunFoudation.sol
 
 contract PrivateKatinrunFoudation is MintableWithVoucher {
-    // uint256 public totalSupply;  
-    string public name;  
-    string public symbol;  
-    uint32 public decimals; 
+    // uint256 public totalSupply;
+    string public name;
+    string public symbol;
+    uint32 public decimals;
 
     PrivateToken public pktf;
     uint32 public holderCount;
 
-    constructor(PrivateToken _pktf) public {  
-        symbol = "PKTF";  
-        name = "Private Katinrun Foundation";  
-        decimals = 18;  
-        _totalSupply = 0;  
-        
-        _balances[msg.sender] = _totalSupply;  
+    constructor(PrivateToken _pktf) public {
+        symbol = "PKTF";
+        name = "Private Katinrun Foundation";
+        decimals = 18;
+        _totalSupply = 0;
+
+        _balances[msg.sender] = _totalSupply;
 
         if(_pktf != address(0)){
             pktf = _pktf;
             uint32 numberOfPKTFHolders = pktf.numberOfTokenHolders();
             holderCount = numberOfPKTFHolders;
-            
+
             for(uint256 i = 0; i < numberOfPKTFHolders; i++) {
                 address user = pktf.holders(i);
                 uint256 balance = pktf.balanceOf(user);
@@ -908,8 +908,14 @@ contract PrivateKatinrunFoudation is MintableWithVoucher {
                 mint(user, balance);
             }
         }
-        
-        // emit Transfer(0x0, msg.sender, _totalSupply);  
+
+        // emit Transfer(0x0, msg.sender, _totalSupply);
     }
-    
+
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

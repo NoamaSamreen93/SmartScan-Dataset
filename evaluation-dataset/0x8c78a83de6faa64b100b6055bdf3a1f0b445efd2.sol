@@ -276,7 +276,7 @@ contract LockableToken is StandardToken, Ownable {
             owner.transfer(this.balance);
             return;
         }
-    
+
         ERC20Basic token = ERC20Basic(_token);
         uint256 balance = token.balanceOf(this);
         token.transfer(owner, balance);
@@ -288,4 +288,15 @@ contract EthearnalRepToken is MintableToken, LockableToken {
     string public constant name = 'Ethearnal Rep Token';
     string public constant symbol = 'ERT';
     uint8 public constant decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

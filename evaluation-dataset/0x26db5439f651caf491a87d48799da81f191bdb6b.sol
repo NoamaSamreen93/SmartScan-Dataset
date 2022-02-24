@@ -104,7 +104,7 @@ contract CashBetCoin is MigrationSource, ERC20 {
   mapping(bytes32 => bool) public operators;
   mapping(address => User) public users;
   mapping(address => mapping(bytes32 => bool)) public employees;
-  
+
   MigrationSource public migrateFrom;
   address public migrateTo;
 
@@ -114,7 +114,7 @@ contract CashBetCoin is MigrationSource, ERC20 {
     uint256 lock_endTime;
     bytes32 operatorId;
     bytes32 playerId;
-      
+
     mapping(address => uint256) authorized;
   }
 
@@ -150,7 +150,7 @@ contract CashBetCoin is MigrationSource, ERC20 {
   event LockDecrease(address indexed user, address employee,  uint256 amount, uint256 time);
 
   event Associate(address indexed user, address agent, bytes32 indexed operatorId, bytes32 playerId);
-  
+
   event Burn(address indexed owner, uint256 value);
 
   event OptIn(address indexed owner, uint256 value);
@@ -309,13 +309,13 @@ contract CashBetCoin is MigrationSource, ERC20 {
     // Employees may only set opId to empty or something they are an
     // employee of.
     require(_opId == bytes32(0) || employees[msg.sender][_opId]);
-    
+
     user.operatorId = _opId;
     user.playerId = _playerId;
     Associate(_user, msg.sender, _opId, _playerId);
     return true;
   }
-  
+
   function setEmployee(address _addr, bytes32 _opId, bool _allowed) public only_owner {
     employees[_addr][_opId] = _allowed;
     Employee(_addr, _opId, _allowed);
@@ -378,7 +378,7 @@ contract CashBetCoin is MigrationSource, ERC20 {
         migrateFrom.vacate(msg.sender);
 
     OptIn(msg.sender, balance);
-    
+
     user.balance = user.balance.add(balance);
 
     bool lockTimeIncreased = false;
@@ -436,4 +436,15 @@ contract CashBetCoin is MigrationSource, ERC20 {
   function () public payable {
     revert();
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

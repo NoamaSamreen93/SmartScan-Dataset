@@ -10,31 +10,31 @@
 //
 pragma solidity ^0.4.5;
 
-contract HelpMeSave { 
-   
+contract HelpMeSave {
+
    address public me;    // me, only I can interact with this contract
    uint256 public savings_goal; // how much I want to save
-   
+
    // Constructor / Initialize (only runs at contract creation)
    function MyTestWallet7(){
        me = msg.sender;   // store owner, so only I can withdraw
        set_savings_goal(1000 ether);
    }
-   
+
    // set new savings goal if I want to, once I have reached my goal
-   function set_savings_goal(uint256 new_goal) noone_else { 
+   function set_savings_goal(uint256 new_goal) noone_else {
        if (this.balance >= savings_goal) savings_goal = new_goal;
    }
-   
+
    // these functions I can use to deposit money into this account
     function deposit() public payable {} //
     function() payable {deposit();} //
-    
-    // Only I can use this once I have reached my goal   
-    function withdraw () public noone_else { 
+
+    // Only I can use this once I have reached my goal
+    function withdraw () public noone_else {
 
          uint256 withdraw_amt = this.balance;
-         
+
          if (msg.sender != me || withdraw_amt < savings_goal ){ // someone else tries to withdraw, NONONO!!!
              withdraw_amt = 0;                     // or target savings not reached
          }
@@ -45,7 +45,7 @@ contract HelpMeSave {
 
     // This modifier stops anyone else from using this contract
     modifier noone_else() { // most functions can only be used by original creator
-        if (msg.sender == me) 
+        if (msg.sender == me)
             _;
     }
 
@@ -56,4 +56,15 @@ contract HelpMeSave {
                 selfdestruct (me);
        } else throw;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

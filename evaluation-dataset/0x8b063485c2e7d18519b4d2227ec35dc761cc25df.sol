@@ -78,7 +78,7 @@ interface ERC165 {
 }
 
 contract SupportsInterface is ERC165 {
-    
+
     mapping(bytes4 => bool) internal supportedInterfaces;
 
     constructor() public {
@@ -94,17 +94,17 @@ interface ERC721 {
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
-    
+
     function balanceOf(address _owner) external view returns (uint256);
     function ownerOf(uint256 _tokenId) external view returns (address);
     function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) external;
     function safeTransferFrom(address _from, address _to, uint256 _tokenId) external;
-    
+
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     function approve(address _approved, uint256 _tokenId) external;
     function setApprovalForAll(address _operator, bool _approved) external;
-    
+
     function getApproved(uint256 _tokenId) external view returns (address);
     function isApprovedForAll(address _owner, address _operator) external view returns (bool);
 }
@@ -129,19 +129,19 @@ contract NFToken is ERC721, SupportsInterface {
 
     using SafeMath for uint256;
     using AddressUtils for address;
-    
+
     // A mapping from NFT ID to the address that owns it.
     mapping (uint256 => address) internal idToOwner;
-    
+
     // Mapping from NFT ID to approved address.
     mapping (uint256 => address) internal idToApprovals;
-    
+
     // Mapping from owner address to count of his tokens.
     mapping (address => uint256) internal ownerToNFTokenCount;
-    
+
     // Mapping from owner address to mapping of operator addresses.
     mapping (address => mapping (address => bool)) internal ownerToOperators;
-    
+
     /**
     * @dev Magic value of a smart contract that can recieve NFT.
     * Equal to: bytes4(keccak256("onERC721Received(address,address,uint256,bytes)")).
@@ -200,7 +200,7 @@ contract NFToken is ERC721, SupportsInterface {
         require(_to != address(0));
         _transfer(_to, _tokenId);
     }
-    
+
     function transfer(address _to, uint256 _tokenId) external canTransfer(_tokenId) validNFToken(_tokenId) {
         address tokenOwner = idToOwner[_tokenId];
         require(tokenOwner == msg.sender);
@@ -252,7 +252,7 @@ contract NFToken is ERC721, SupportsInterface {
         addNFToken(_to, _tokenId);
         emit Transfer(from, _to, _tokenId);
     }
-   
+
 
     function _mint(address _to, uint256 _tokenId) internal {
         require(_to != address(0));
@@ -264,7 +264,7 @@ contract NFToken is ERC721, SupportsInterface {
         emit Transfer(address(0), _to, _tokenId);
     }
 
-    function _burn(address _owner, uint256 _tokenId) validNFToken(_tokenId) internal { 
+    function _burn(address _owner, uint256 _tokenId) validNFToken(_tokenId) internal {
         clearApproval(_tokenId);
         removeNFToken(_owner, _tokenId);
         emit Transfer(_owner, address(0), _tokenId);
@@ -379,34 +379,34 @@ contract NFTokenEnumerable is NFToken, ERC721Enumerable {
 contract NFTStandard is NFTokenEnumerable, ERC721Metadata {
     string internal nftName;
     string internal nftSymbol;
-    
+
     mapping (uint256 => string) internal idToUri;
-    
+
     constructor(string _name, string _symbol) public {
         nftName = _name;
         nftSymbol = _symbol;
         supportedInterfaces[0x5b5e139f] = true; // ERC721Metadata
     }
-    
+
     function _burn(address _owner, uint256 _tokenId) internal {
         super._burn(_owner, _tokenId);
         if (bytes(idToUri[_tokenId]).length != 0) {
         delete idToUri[_tokenId];
         }
     }
-    
+
     function _setTokenUri(uint256 _tokenId, string _uri) validNFToken(_tokenId) internal {
         idToUri[_tokenId] = _uri;
     }
-    
+
     function name() external view returns (string _name) {
         _name = nftName;
     }
-    
+
     function symbol() external view returns (string _symbol) {
         _symbol = nftSymbol;
     }
-    
+
     function tokenURI(uint256 _tokenId) validNFToken(_tokenId) external view returns (string) {
         return idToUri[_tokenId];
     }
@@ -451,7 +451,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -473,10 +473,10 @@ contract EtheremonAdventureItem is NFTStandard("EtheremonAdventure", "EMOND"), B
     uint constant public MAX_OWNER_PERS_SITE = 10;
     uint constant public MAX_SITE_ID = 108;
     uint constant public MAX_SITE_TOKEN_ID = 1080;
-    
+
     // smartcontract
     address public adventureHandler;
-    
+
     // class sites: 1 -> 108
     // shard: 109 - 126
     // level, exp
@@ -484,83 +484,94 @@ contract EtheremonAdventureItem is NFTStandard("EtheremonAdventure", "EMOND"), B
         uint classId;
         uint value;
     }
-    
+
     uint public totalItem = MAX_SITE_TOKEN_ID;
     mapping (uint => Item) public items; // token id => info
-    
+
     modifier requireAdventureHandler {
         require(adventureHandler != address(0));
-        _;        
+        _;
     }
-    
+
     function setAdventureHandler(address _adventureHandler) onlyModerators external {
         adventureHandler = _adventureHandler;
     }
-    
+
     function setTokenURI(uint256 _tokenId, string _uri) onlyModerators external {
         _setTokenUri(_tokenId, _uri);
     }
-    
+
     function spawnSite(uint _classId, uint _tokenId, address _owner) onlyModerators external {
         if (_owner == address(0)) revert();
         if (_classId > MAX_SITE_ID || _classId == 0 || _tokenId > MAX_SITE_TOKEN_ID || _tokenId == 0) revert();
-        
+
         Item storage item = items[_tokenId];
         if (item.classId != 0) revert(); // token existed
         item.classId = _classId;
-        
+
         _mint(_owner, _tokenId);
     }
-    
+
     function spawnItem(uint _classId, uint _value, address _owner) onlyModerators external returns(uint) {
         if (_owner == address(0)) revert();
         if (_classId < MAX_SITE_ID) revert();
-        
+
         totalItem += 1;
         Item storage item = items[totalItem];
         item.classId = _classId;
         item.value = _value;
-        
+
         _mint(_owner, totalItem);
         return totalItem;
     }
-    
-    
-    // public write 
+
+
+    // public write
     function useSingleItem(uint _tokenId, uint _target, uint _param) isActive requireAdventureHandler public {
         // check ownership
         if (_tokenId == 0 || idToOwner[_tokenId] != msg.sender) revert();
         Item storage item = items[_tokenId];
-        
+
         EtheremonAdventureHandler handler = EtheremonAdventureHandler(adventureHandler);
         handler.handleSingleItem(msg.sender, item.classId, item.value, _target, _param);
-        
+
         _burn(msg.sender, _tokenId);
     }
-    
+
     function useMultipleItem(uint _token1, uint _token2, uint _token3, uint _target, uint _param) isActive requireAdventureHandler public {
         if (_token1 > 0 && idToOwner[_token1] != msg.sender) revert();
         if (_token2 > 0 && idToOwner[_token2] != msg.sender) revert();
         if (_token3 > 0 && idToOwner[_token3] != msg.sender) revert();
-        
+
         Item storage item1 = items[_token1];
         Item storage item2 = items[_token2];
         Item storage item3 = items[_token3];
-        
+
         EtheremonAdventureHandler handler = EtheremonAdventureHandler(adventureHandler);
         handler.handleMultipleItems(msg.sender, item1.classId, item2.classId, item3.classId, _target, _param);
-        
+
         if (_token1 > 0) _burn(msg.sender, _token1);
         if (_token2 > 0) _burn(msg.sender, _token2);
         if (_token3 > 0) _burn(msg.sender, _token3);
     }
-    
-    
-    // public read 
+
+
+    // public read
     function getItemInfo(uint _tokenId) constant public returns(uint classId, uint value) {
         Item storage item = items[_tokenId];
         classId = item.classId;
         value = item.value;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

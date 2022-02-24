@@ -103,7 +103,7 @@ contract SKYFNetworkDevelopmentFund is Ownable{
     uint256 public constant startTime = 1534334400;
     uint256 public constant firstYearEnd = startTime + 365 days;
     uint256 public constant secondYearEnd = firstYearEnd + 365 days;
-    
+
     uint256 public initialSupply;
     SKYFTokenInterface public token;
 
@@ -121,7 +121,7 @@ contract SKYFNetworkDevelopmentFund is Ownable{
         if (initialSupply == 0) {
             initialSupply = balance;
         }
-        
+
         if (now < firstYearEnd) {
             require(balance.sub(_value).mul(2) >= initialSupply); //no less than 50%(1/2) should be left on account after first year
         } else if (now < secondYearEnd) {
@@ -131,4 +131,20 @@ contract SKYFNetworkDevelopmentFund is Ownable{
         token.transfer(_to, _value);
 
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

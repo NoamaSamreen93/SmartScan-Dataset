@@ -151,3 +151,7 @@ contract TokenERC20 {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

@@ -28,7 +28,7 @@ contract SafeMath {
     return c;
   }
 
-  
+
 }
 contract test5cash is SafeMath{
     string public name;
@@ -47,10 +47,10 @@ contract test5cash is SafeMath{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -68,7 +68,7 @@ contract test5cash is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
         if (_to == address(0)) revert('transfer');                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) revert('transfer'); 
+		if (_value <= 0) revert('transfer');
         if (balanceOf[msg.sender] < _value) revert('transfer');           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert('transfer'); // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -79,16 +79,16 @@ contract test5cash is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		if (_value <= 0) revert('approve'); 
+		if (_value <= 0) revert('approve');
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)  {
         if (_to == address(0)) revert('transferFrom');                                // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) revert('transferFrom'); 
+		if (_value <= 0) revert('transferFrom');
         if (balanceOf[_from] < _value) revert('transferFrom');                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert('transferFrom');  // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert('transferFrom');     // Check allowance
@@ -101,37 +101,48 @@ contract test5cash is SafeMath{
 
     function burn(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert('burn');            // Check if the sender has enough
-		if (_value <= 0) revert('burn'); 
+		if (_value <= 0) revert('burn');
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert('freeze');            // Check if the sender has enough
-		if (_value <= 0) revert('freeze'); 
+		if (_value <= 0) revert('freeze');
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         if (freezeOf[msg.sender] < _value) revert('unfreeze');            // Check if the sender has enough
-		if (_value <= 0) revert('unfreeze'); 
+		if (_value <= 0) revert('unfreeze');
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) public {
 		if(msg.sender != owner) revert('withdrawEther');
 		owner.transfer(amount);
 	}
-	
+
 // can accept ether
-	function () external payable {} 
+	function () external payable {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

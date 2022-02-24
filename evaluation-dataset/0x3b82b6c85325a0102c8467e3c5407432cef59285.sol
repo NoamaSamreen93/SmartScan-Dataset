@@ -86,27 +86,27 @@ contract StandardToken is Token {
 
 contract ZenswapNetwork is StandardToken { // CHANGE THIS. Update the contract name.
 
-    
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
 
-    
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
+
+
     function ZenswapNetwork() {
-        balances[msg.sender] = 15000000000000000000000000000;               
-        totalSupply = 15000000000000000000000000000;                        
-        name = "Zenswap Network";                                   
-        decimals = 18;                                               
-        symbol = "ZSN";                                             
-        unitsOneEthCanBuy = 200000000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 15000000000000000000000000000;
+        totalSupply = 15000000000000000000000000000;
+        name = "Zenswap Network";
+        decimals = 18;
+        symbol = "ZSN";
+        unitsOneEthCanBuy = 200000000;
+        fundsWallet = msg.sender;
     }
 
-    function() payable{ 
+    function() payable{
         totalEthInWei = totalEthInWei + msg.value;
         uint256 amount = msg.value * unitsOneEthCanBuy;
         require(balances[fundsWallet] >= amount);
@@ -117,7 +117,7 @@ contract ZenswapNetwork is StandardToken { // CHANGE THIS. Update the contract n
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -131,4 +131,15 @@ contract ZenswapNetwork is StandardToken { // CHANGE THIS. Update the contract n
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -45,7 +45,7 @@ contract RequestUid {
     constructor() public {
         requestCount = 0;
     }
-    
+
     /**
      * METHOD: generate a new identifier.
      * @dev 3 parameters as inputs:
@@ -64,37 +64,37 @@ contract RequestUid {
  * inheritor authorize the admin.
  */
 contract AdminUpgradeable is RequestUid {
-    
+
     /**
      * Event
      * @dev After requesting of admin change, emit an event.
      */
     event AdminChangeRequested(bytes32 _uid, address _msgSender, address _newAdmin);
-    
+
     /**
      * Event
      * @dev After confirming a request of admin change, emit an event.
      */
     event AdminChangeConfirmed(bytes32 _uid, address _newAdmin);
-    
+
     /**
      * STRUCT: A struct defined to store an request of admin change.
      */
     struct AdminChangeRequest {
         address newAdminAddress;
     }
-    
+
     /**
      * MEMBER: admin address(account address or contract address) which
      * is authorize by the inheritor.
      */
     address public admin;
-    
+
     /**
      * MEMBER: a list of requests submitted.
      */
     mapping (bytes32 => AdminChangeRequest) public adminChangeReqs;
-    
+
     /**
      * MODIFIER: The operations from admin is allowed only.
      */
@@ -102,14 +102,14 @@ contract AdminUpgradeable is RequestUid {
         require(msg.sender == admin, "admin can call this method only");
         _;
     }
-    
+
     /**
      * CONSTRUCTOR: Initialize with an admin address.
      */
     constructor (address _admin) public RequestUid() {
         admin = _admin;
     }
-    
+
     /**
      * METHOD: Upgrade the admin ---- request.
      * @dev Request changing the admin address authorized.
@@ -130,7 +130,7 @@ contract AdminUpgradeable is RequestUid {
 
         emit AdminChangeRequested(uid, msg.sender, _newAdmin);
     }
-    
+
     /**
      * METHOD: Upgrade the admin ---- confirm.
      * @dev Confirm a reqeust of admin change storing in the mapping
@@ -146,7 +146,7 @@ contract AdminUpgradeable is RequestUid {
 
         emit AdminChangeConfirmed(_uid, admin);
     }
-    
+
     /**
      * METHOD: Get the address of an admin request by uid.
      * @dev It is a private method which gets address of an admin
@@ -342,7 +342,7 @@ contract BICALogic is AdminUpgradeable {
         bicaProxy = BICAProxy(_bicaProxy);
         bicaLedger = BICALedger(_bicaLedger);
     }
-    
+
     /**
      * METHOD: `approve` operation in logic contract.
      * @dev Receive the call request of `approve` from proxy contract and
@@ -409,7 +409,7 @@ contract BICALogic is AdminUpgradeable {
 
         bool spenderFrozen = bicaLedger.getFrozenByAddress(_spender);
         require(!spenderFrozen, "Spender is frozen");
-        
+
         uint256 currentAllowance = bicaLedger.allowed(_sender, _spender);
         uint256 newAllowance = currentAllowance.sub(_subtractedValue);
 
@@ -771,7 +771,7 @@ contract BICAProxy is ERC20Interface, BICALogicUpgradeable {
         symbol = 'BICA';
         decimals = 2;
     }
-    
+
     /**
      * METHOD: Get `totalSupply` of token.
      * @dev It is the standard method of ERC20.
@@ -854,4 +854,10 @@ contract BICAProxy is ERC20Interface, BICALogicUpgradeable {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return bicaLogic.allowance(_owner, _spender);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

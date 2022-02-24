@@ -441,13 +441,13 @@ interface AttributeRegistryInterface {
 interface BasicJurisdictionInterface {
   // declare events
   event AttributeTypeAdded(uint256 indexed attributeTypeID, string description);
-  
+
   event AttributeTypeRemoved(uint256 indexed attributeTypeID);
-  
+
   event ValidatorAdded(address indexed validator, string description);
-  
+
   event ValidatorRemoved(address indexed validator);
-  
+
   event ValidatorApprovalAdded(
     address validator,
     uint256 indexed attributeTypeID
@@ -587,7 +587,7 @@ interface BasicJurisdictionInterface {
   function getAttributeTypeDescription(
     uint256 attributeTypeID
   ) external view returns (string description);
-  
+
   /**
    * @notice Get a description of the validator at account `validator`.
    * @param validator address The account of the validator in question.
@@ -681,7 +681,7 @@ interface ExtendedJurisdictionInterface {
     uint256 indexed attribute,
     uint256 amount
   );
-  
+
   event TransactionRebatePaid(
     address indexed submitter,
     address indexed payee,
@@ -907,7 +907,7 @@ interface ExtendedJurisdictionInterface {
     uint256 minimumRequiredStake,
     uint256 jurisdictionFee
   );
-  
+
   /**
    * @notice Get a validator's signing key.
    * @param validator address The account of the validator.
@@ -983,7 +983,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
   // once attribute types are assigned to an ID, they cannot be modified
   mapping(uint256 => bytes32) private _attributeTypeHashes;
 
-  // submitted attribute approvals are retained to prevent reuse after removal 
+  // submitted attribute approvals are retained to prevent reuse after removal
   mapping(bytes32 => bool) private _invalidAttributeApprovalHashes;
 
   // attribute approvals by validator are held in a mapping
@@ -998,7 +998,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
   // addresses for all designated validators are also held in an array
   address[] private _validatorAccounts;
 
-  // track any recoverable funds locked in the contract 
+  // track any recoverable funds locked in the contract
   uint256 private _recoverableFunds;
 
   /**
@@ -1051,7 +1051,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
       description: description
       // NOTE: no approvedValidators variable declaration - must be added later
     });
-    
+
     // add the attribute type id to the end of the attributeID array
     _attributeIDs.push(ID);
 
@@ -1110,7 +1110,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
       description: description
       // NOTE: no approvedValidators variable declaration - must be added later
     });
-    
+
     // add the attribute type id to the end of the attributeID array
     _attributeIDs.push(ID);
 
@@ -1231,7 +1231,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // update the index of the attribute type that was moved
     _attributeTypes[lastAttributeID].index = _attributeTypes[ID].index;
-    
+
     // remove the (now duplicate) attribute ID at the end by trimming the array
     _attributeIDs.length--;
 
@@ -1267,7 +1267,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
       _signingKeys[validator] == address(0),
       "a signing key matching the provided address already exists"
     );
-    
+
     // create a record for the validator
     _validators[validator] = Validator({
       exists: true,
@@ -1281,7 +1281,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // add the validator to the end of the _validatorAccounts array
     _validatorAccounts.push(validator);
-    
+
     // log the addition of the new validator
     emit ValidatorAdded(validator, description);
   }
@@ -1333,7 +1333,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // update the index of the attribute type that was moved
     _validators[lastAccount].index = _validators[validator].index;
-    
+
     // remove (duplicate) validator address at the end by trimming the array
     _validatorAccounts.length--;
 
@@ -1426,7 +1426,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // remove the record of the index of the removed approval
     delete _validatorApprovalsIndex[validator][attributeTypeID];
-    
+
     // log the removal of the validator's attribute type approval
     emit ValidatorApprovalRemoved(validator, attributeTypeID);
   }
@@ -1448,7 +1448,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
     require(
       isValidator(msg.sender),
       "only validators may modify validator signing keys");
- 
+
     // prevent duplicate signing keys from being created
     require(
       _signingKeys[newSigningKey] == address(0),
@@ -1555,7 +1555,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // determine the assigned validator on the user attribute
     address validator = _issuedAttributes[account][attributeTypeID].validator;
-    
+
     // caller must be either the jurisdiction owner or the assigning validator
     require(
       msg.sender == validator || msg.sender == owner(),
@@ -1787,7 +1787,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
       } else {
         refundAddress = operator;
       }
-    }    
+    }
 
     // remove the attribute from the user address
     delete _issuedAttributes[msg.sender][attributeTypeID];
@@ -2000,7 +2000,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
     address validator = _signingKeys[
       hash.toEthSignedMessageHash().recover(signature) // signingKey
     ];
-    
+
     // caller must be either the jurisdiction owner or the assigning validator
     require(
       msg.sender == validator || msg.sender == owner(),
@@ -2021,7 +2021,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
    * function MUST NOT cause the caller to revert.
    */
   function hasAttribute(
-    address account, 
+    address account,
     uint256 attributeTypeID
   ) external view returns (bool) {
     address validator = _issuedAttributes[account][attributeTypeID].validator;
@@ -2280,7 +2280,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
     return (
       interfaceID == this.supportsInterface.selector || // ERC165
       interfaceID == (
-        this.hasAttribute.selector 
+        this.hasAttribute.selector
         ^ this.getAttributeValue.selector
         ^ this.countAttributeTypes.selector
         ^ this.getAttributeTypeID.selector
@@ -2348,7 +2348,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // recover the address associated with the signature of the message hash
     address signingKey = hash.toEthSignedMessageHash().recover(signature);
-    
+
     // retrieve variables necessary to perform checks
     address validator = _signingKeys[signingKey];
     uint256 minimumStake = _attributeTypes[attributeTypeID].minimumStake;
@@ -2396,7 +2396,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
 
     // recover the address associated with the signature of the message hash
     address signingKey = hash.toEthSignedMessageHash().recover(signature);
-    
+
     // retrieve variables necessary to perform checks
     address validator = _signingKeys[signingKey];
     uint256 minimumStake = _attributeTypes[attributeTypeID].minimumStake;
@@ -2435,7 +2435,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
   /**
    * @notice Check for recoverable funds that have become locked in the
    * jurisdiction as a result of improperly configured receivers for payments of
-   * fees or remaining stake. Note that funds sent into the jurisdiction as a 
+   * fees or remaining stake. Note that funds sent into the jurisdiction as a
    * result of coinbase assignment or as the recipient of a selfdestruct will
    * not be recoverable.
    * @return The total tracked recoverable funds.
@@ -2465,10 +2465,10 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
    * @param account address The account to send recovered tokens.
    * @param value uint256 The amount of tokens to be sent.
    */
-  function recoverFunds(address account, uint256 value) public onlyOwner {    
+  function recoverFunds(address account, uint256 value) public onlyOwner {
     // safely deduct the value from the total tracked recoverable funds.
     _recoverableFunds = _recoverableFunds.sub(value);
-    
+
     // transfer the value to the specified account & revert if any error occurs.
     account.transfer(value);
   }
@@ -2552,7 +2552,7 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
     assembly {
       let encodedParams_data := add(0x20, encodedParams)
       let encodedParams_size := mload(encodedParams)
-      
+
       let output := mload(0x40) // get storage start from free memory pointer
       mstore(output, 0x0)       // set up the location for output of staticcall
 
@@ -2566,9 +2566,20 @@ contract ExtendedJurisdiction is Ownable, Pausable, AttributeRegistryInterface, 
       )
 
       switch success            // instrumentation bug: use switch instead of if
-      case 1 {                  // only recognize successful staticcall output 
+      case 1 {                  // only recognize successful staticcall output
         result := mload(output) // set the output to the return value
       }
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

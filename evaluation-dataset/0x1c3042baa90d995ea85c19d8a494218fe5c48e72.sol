@@ -53,7 +53,7 @@ contract ItemsInterfaceForEternalStorage {
     function createGun(uint256 _itemId) public;
     function createMicroModule(uint256 _itemId) public;
     function createArtefact(uint256 _itemId) public;
-    
+
     function addItem(string _itemType) public returns(uint256);
 }
 
@@ -93,7 +93,7 @@ contract EternalStorage {
         require(msg.sender == logicContractAddress);
         _;
     }
-    
+
     /* ------ INITIALISATION ------ */
 
     function initWithShips() public onlyOwnerOfStorage {
@@ -277,7 +277,7 @@ contract EternalStorage {
             uintStorage[_b1("artefacts", _artefactId, "bonus")]
         );
     }
-    
+
     /* ------ DEV CREATION METHODS ------ */
 
     // Ships
@@ -411,4 +411,15 @@ contract EternalStorage {
         require(_newLogicContractAddress != address(0));
         logicContractAddress = _newLogicContractAddress;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

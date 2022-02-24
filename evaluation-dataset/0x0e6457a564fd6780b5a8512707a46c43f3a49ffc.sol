@@ -145,3 +145,14 @@ contract ESPCupExchange is CupExchange {
     address public teamCup = 0xB22abf2E02838150D23a75C7001d6987150F02DB;
     constructor() CupExchange(cup, teamCup) public {}
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

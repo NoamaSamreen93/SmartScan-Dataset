@@ -812,7 +812,7 @@ contract PGOMonthlyPresaleVault is PGOMonthlyInternalVault {
             vested = investments[beneficiary].totalBalance.div(3);
         }
         if (block.timestamp >= cliff && block.timestamp < end) {
-            // after cliff -> 1/27 of totalBalance every month, must skip first 9 month 
+            // after cliff -> 1/27 of totalBalance every month, must skip first 9 month
             uint256 unlockedStartBalance = investments[beneficiary].totalBalance.div(3);
             uint256 totalBalance = investments[beneficiary].totalBalance;
             uint256 lockedBalance = totalBalance.sub(unlockedStartBalance);
@@ -828,4 +828,15 @@ contract PGOMonthlyPresaleVault is PGOMonthlyInternalVault {
         }
         return vested;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

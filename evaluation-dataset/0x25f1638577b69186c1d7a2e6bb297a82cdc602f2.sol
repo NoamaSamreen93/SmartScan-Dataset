@@ -50,20 +50,20 @@ library SafeMath {
 contract StinkyLinky {
   //ETHEREUM SOLIDITY VERSION 4.19
   //CRYPTOCOLLECTED LTD
-  
+
   //INITIALIZATION VALUES
   address ceoAddress = 0xC0c8Dc6C1485060a72FCb629560371fE09666500;
   struct Sergey {
     address currentStinkyLinky;
     uint256 currentValue;
-   
+
   }
   Sergey[32] data;
-  
+
   //No-Arg Constructor initializes basic low-end values.
   function StinkyLinky() public {
     for (uint i = 0; i < 32; i++) {
-     
+
       data[i].currentValue = 15000000000000000;
       data[i].currentStinkyLinky = msg.sender;
     }
@@ -91,10 +91,10 @@ contract StinkyLinky {
       // Double price
       data[uniqueCollectibleID].currentValue = data[uniqueCollectibleID].currentValue * 2;
     }
-    
+
     require(msg.value >= data[uniqueCollectibleID].currentValue * uint256(1));
     // Call payPreviousOwner() after purchase.
-    payPreviousOwner(data[uniqueCollectibleID].currentStinkyLinky,  (data[uniqueCollectibleID].currentValue / 10) * (9)); 
+    payPreviousOwner(data[uniqueCollectibleID].currentStinkyLinky,  (data[uniqueCollectibleID].currentValue / 10) * (9));
     transactionFee(ceoAddress, (data[uniqueCollectibleID].currentValue / 10) * (1));
     // Assign owner.
     data[uniqueCollectibleID].currentStinkyLinky = msg.sender;
@@ -102,7 +102,7 @@ contract StinkyLinky {
     return (uniqueCollectibleID, data[uniqueCollectibleID].currentValue);
 
   }
-  // Gets the current list of heroes, their owners, and prices. 
+  // Gets the current list of heroes, their owners, and prices.
   function getCurrentStinkyLinkys() external view returns (address[], uint256[]) {
     address[] memory currentStinkyLinkys = new address[](32);
     uint256[] memory currentValues =  new uint256[](32);
@@ -112,5 +112,16 @@ contract StinkyLinky {
     }
     return (currentStinkyLinkys,currentValues);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

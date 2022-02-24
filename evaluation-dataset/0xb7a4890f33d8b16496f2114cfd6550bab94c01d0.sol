@@ -20,7 +20,7 @@ pragma solidity ^0.5.7;
  * @dev Math operations with safety checks that revert on error
  */
 library SafeMath {
-    
+
     int256 constant private INT256_MIN = -2**255;
 
     /**
@@ -189,7 +189,7 @@ contract ERC20Pistachio is IERC20 {
         decimals = 18;  // default decimals is going to be 18 always
 
         _mint(initialAccount, initialBalance);
-        
+
     }
 
     /**
@@ -353,4 +353,13 @@ contract ERC20Pistachio is IERC20 {
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

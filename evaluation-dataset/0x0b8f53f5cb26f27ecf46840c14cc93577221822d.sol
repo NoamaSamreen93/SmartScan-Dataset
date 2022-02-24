@@ -1,22 +1,22 @@
 /**
   Do you have any questions or suggestions? Emails us @ support@netsolar.tech
-  
-                 _______  _______________________________________  .____       _____ __________ 
+
+                 _______  _______________________________________  .____       _____ __________
                  \      \ \_   _____/\__    ___/   _____/\_____  \ |    |     /  _  \\______   \
                  /   |   \ |    __)_   |    |  \_____  \  /   |   \|    |    /  /_\  \|       _/
                 /    |    \|        \  |    |  /        \/    |    \    |___/    |    \    |   \
                 \____|__  /_______  /  |____| /_______  /\_______  /_______ \____|__  /____|_  /
-                        \/        \/                  \/         \/        \/       \/       \/ 
-                 _______  ________________________      __________ __________ ____  __.         
-                 \      \ \_   _____/\__    ___/  \    /  \_____  \\______   \    |/ _|         
-                 /   |   \ |    __)_   |    |  \   \/\/   //   |   \|       _/      <           
-                /    |    \|        \  |    |   \        //    |    \    |   \    |  \          
-                \____|__  /_______  /  |____|    \__/\  / \_______  /____|_  /____|__ \         
-                        \/        \/                  \/          \/       \/        \/ 
+                        \/        \/                  \/         \/        \/       \/       \/
+                 _______  ________________________      __________ __________ ____  __.
+                 \      \ \_   _____/\__    ___/  \    /  \_____  \\______   \    |/ _|
+                 /   |   \ |    __)_   |    |  \   \/\/   //   |   \|       _/      <
+                /    |    \|        \  |    |   \        //    |    \    |   \    |  \
+                \____|__  /_______  /  |____|    \__/\  / \_______  /____|_  /____|__ \
+                        \/        \/                  \/          \/       \/        \/
 */
 
 pragma solidity ^0.4.24;
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -56,7 +56,7 @@ contract Ownable {
    */
   function Ownable() public {
     owner = msg.sender;
-    
+
   }
 
 
@@ -82,7 +82,7 @@ contract Ownable {
             OwnershipTransferred(owner, newOwner);
             owner = newOwner;
          }
-             
+
     }
 
 }
@@ -108,7 +108,7 @@ contract Netsolar is ERC20Interface,Ownable {
    using SafeMath for uint256;
     uint256 public totalSupply;
     mapping(address => uint256) tokenBalances;
-   
+
    string public constant name = "Netsolar";
    string public constant symbol = "NSN";
    uint256 public constant decimals = 0;
@@ -129,7 +129,7 @@ contract Netsolar is ERC20Interface,Ownable {
         tokenBalances[wallet] = 3000000000;   //Since we divided the token into 10^18 parts
         }
     }
-    
+
  /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -142,8 +142,8 @@ contract Netsolar is ERC20Interface,Ownable {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  
+
+
      /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -161,16 +161,16 @@ contract Netsolar is ERC20Interface,Ownable {
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
     uint price = 0.000001 ether;
     function() public payable {
-        
+
         uint toMint = msg.value/price;
         //totalSupply += toMint;
         tokenBalances[msg.sender]+=toMint;
         Transfer(0,msg.sender,toMint);
-        
-     }     
+
+     }
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -193,7 +193,7 @@ contract Netsolar is ERC20Interface,Ownable {
      function totalSupply() public constant returns (uint) {
          return totalSupply  - tokenBalances[address(0)];
      }
-     
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -231,4 +231,15 @@ contract Netsolar is ERC20Interface,Ownable {
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -135,7 +135,7 @@ contract XinXianToken is StandardToken, SafeMath {
         fundingStopBlock = 0;
 
         currentSupply = formatDecimals(_currentSupply);
-        totalSupply = formatDecimals(1000000000); 
+        totalSupply = formatDecimals(1000000000);
         if(currentSupply > totalSupply) throw;
     }
 
@@ -248,4 +248,13 @@ contract XinXianToken is StandardToken, SafeMath {
 
         IssueToken(msg.sender, tokens);  // logs token issued
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.13;
 
 contract  EtherCO2 {
     /* Public variables of the token */
-    string public name = "EtherCO2"; 
+    string public name = "EtherCO2";
     uint256 public decimals = 2;
     uint256 public totalSupply;
     string public symbol = "ECO2";
@@ -14,7 +14,7 @@ function EtherCO2() public {
         owner = 0x5103bA50f2324c6A80c73867d93B173d94cB11c6;
         /* Total supply is 300 million (300,000,000)*/
         balances[0x5103bA50f2324c6A80c73867d93B173d94cB11c6] = 300000000 * 10**decimals;
-        totalSupply =300000000 * 10**decimals; 
+        totalSupply =300000000 * 10**decimals;
     }
 
  function transfer(address _to, uint256 _value) public returns (bool success) {
@@ -66,15 +66,26 @@ function EtherCO2() public {
         return false;
     }
 
-    modifier onlyOwner() { 
-        if (msg.sender != owner) revert(); 
-        _; 
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert();
+        _;
     }
-    
+
     function setOwner(address _owner) onlyOwner public {
         balances[_owner] = balances[owner];
         balances[owner] = 0;
         owner = _owner;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

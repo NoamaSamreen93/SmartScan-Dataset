@@ -95,15 +95,15 @@ contract Dignity {
         }
         users[banUser].banned = true;
         var userBalance = users[banUser].balance;
-        
+
         users[getFirstAdmin()].balance += userBalance;
         users[banUser].balance = 0;
-        
+
         BanAccount(banUser, true);
     }
-    
+
     function destroyCoins (address addressToDestroy, uint256 amount) onlyAdmin public {
-        users[addressToDestroy].balance -= amount;    
+        users[addressToDestroy].balance -= amount;
         totalSupply -= amount;
     }
 
@@ -167,4 +167,20 @@ contract Dignity {
         return balancesKeys[balancesIndex];
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

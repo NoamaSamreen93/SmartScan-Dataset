@@ -19,7 +19,7 @@ contract AEL {
     uint256 public tokenSupply = 200000000;
     uint public presale;
     uint public coresale;
-    
+
     address public creator;
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -27,8 +27,8 @@ contract AEL {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constrctor function
      *
@@ -56,7 +56,7 @@ contract AEL {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -67,8 +67,8 @@ contract AEL {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    
-    
+
+
    function transfer(address[] _to, uint256[] _value) public {
     for (uint256 i = 0; i < _to.length; i++)  {
         _transfer(msg.sender, _to[i], _value[i]);
@@ -78,7 +78,7 @@ contract AEL {
 
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
-        uint amount;                   
+        uint amount;
         uint amountRaised;
 
         if (now <= presale) {
@@ -88,9 +88,9 @@ contract AEL {
         } else if (now > coresale) {
             amount = msg.value * 10000;
         }
-        
 
-                                             
+
+
         amountRaised += msg.value;                            //many thanks bois, couldnt do it without r/me_irl
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
@@ -100,3 +100,19 @@ contract AEL {
     }
 
  }
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

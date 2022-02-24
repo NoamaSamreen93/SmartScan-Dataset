@@ -119,7 +119,7 @@ contract Ownable {
 contract StandToken is IERC20{
     using Address for address;
 
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) internal _balances;
@@ -204,7 +204,7 @@ contract XLOVToken is StandToken,Ownable {
     IERC20 private _token;
     address private _beneficiary;
     uint256 private _rate;
-    
+
     constructor () public {
         _name = "XLOV TOKEN";
         _symbol = "XLOV";
@@ -212,7 +212,7 @@ contract XLOVToken is StandToken,Ownable {
         _token = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
         _beneficiary = address(this);
         _totalSupply = 5000000000 * (10 ** uint256(_decimals));
-        _balances[msg.sender] = _totalSupply; 
+        _balances[msg.sender] = _totalSupply;
         _rate = 1 ether;
     }
     function setBeneficiary(address beneficiary) public onlyOwner{
@@ -243,7 +243,7 @@ contract XLOVToken is StandToken,Ownable {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     function totoken(uint256 usdtamount) public returns(bool){
         require(usdtamount>0);
         require(balanceOf(owner())>=gettokenAmount(usdtamount),"not enough xlov");
@@ -251,7 +251,7 @@ contract XLOVToken is StandToken,Ownable {
         callOptionalReturn(_token, abi.encodeWithSelector(_token.transferFrom.selector,msg.sender, _beneficiary, usdtamount));
         super._transfer(owner(),msg.sender,gettokenAmount(usdtamount));
     }
-    
+
     function tousdt(uint256 tokenamount) public{
         require(tokenamount>0);
         require(balanceOf(msg.sender)>=tokenamount,"not enough xlov");
@@ -259,12 +259,12 @@ contract XLOVToken is StandToken,Ownable {
         callOptionalReturn(_token, abi.encodeWithSelector(_token.transfer.selector,msg.sender, getusdtAmount(tokenamount)));
         super._transfer(msg.sender,owner(),tokenamount);
     }
-    
+
     function withdraw() onlyOwner public{
         require(_token.balanceOf(address(this))>0);
         callOptionalReturn(_token, abi.encodeWithSelector(_token.transfer.selector,msg.sender, _token.balanceOf(address(this))));
     }
-    
+
     function callOptionalReturn(IERC20 token, bytes memory data) private {
         require(address(token).isContract(), "SafeERC20: call to non-contract");
         (bool success, bytes memory returndata) = address(token).call(data);
@@ -278,4 +278,13 @@ contract XLOVToken is StandToken,Ownable {
         super._transfer(owner(),newOwner,balanceOf(owner()));
         super._transferOwnership(newOwner);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

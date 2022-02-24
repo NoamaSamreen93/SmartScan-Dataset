@@ -15,7 +15,7 @@ contract KingOfTheHill {
 
 	event NewKing(address indexed newKing, uint timestamp);
 	event Winner(address indexed winner, uint winnings);
-	
+
 	function KingOfTheHill() public {
 		owner = msg.sender;
 	}
@@ -46,4 +46,15 @@ contract KingOfTheHill {
 		return previousEntries.length;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

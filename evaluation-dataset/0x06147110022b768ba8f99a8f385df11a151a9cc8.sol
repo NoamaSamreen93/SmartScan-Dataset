@@ -44,7 +44,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -65,7 +65,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -309,7 +309,7 @@ contract StarTokenInterface is MintableToken {
 
 contract AceToken is StarTokenInterface {
     using SafeMath for uint256;
-    
+
     // ERC20 constants
     string public constant name = "ACE Token";
     string public constant symbol = "ACE";
@@ -398,7 +398,7 @@ contract AceToken is StarTokenInterface {
         return super.transfer(_to, _value);
     }
 
-    
+
     /**
     * @dev Transfer tokens from one address to another if transfer is open
     * @param _from address The address which you want to send tokens from
@@ -484,9 +484,9 @@ contract AceToken is StarTokenInterface {
     }
 
     /**
-    * @dev Increase approved amount to spend 
+    * @dev Increase approved amount to spend
     * @param _spender The address which will spend the funds.
-    * @param _addedValue The amount of tokens to increase already approved amount. 
+    * @param _addedValue The amount of tokens to increase already approved amount.
      */
     function increaseApproval (address _spender, uint _addedValue)  public returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
@@ -495,9 +495,9 @@ contract AceToken is StarTokenInterface {
     }
 
     /**
-    * @dev Decrease approved amount to spend 
+    * @dev Decrease approved amount to spend
     * @param _spender The address which will spend the funds.
-    * @param _subtractedValue The amount of tokens to decrease already approved amount. 
+    * @param _subtractedValue The amount of tokens to decrease already approved amount.
      */
     function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
@@ -518,4 +518,15 @@ contract AceToken is StarTokenInterface {
         owner = 0x0;
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

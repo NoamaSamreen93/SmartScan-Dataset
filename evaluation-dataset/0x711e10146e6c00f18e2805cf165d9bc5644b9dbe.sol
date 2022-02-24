@@ -20,44 +20,44 @@ contract BurnableOpenPayment {
     address public payer;
     address public recipient;
     address constant burnAddress = 0x0;
-    
+
     //Note that these will track, but not influence the BOP logic.
     uint public amountDeposited;
     uint public amountBurned;
     uint public amountReleased;
-    
+
     //payerString and recipientString enable rudimentary communication/publishing.
     //Although the two parties might quickly move to another medium with better privacy or convenience,
     //beginning with this is nice because it's already trustless/transparent/signed/pseudonymous/etc.
     string public payerString;
     string public recipientString;
-    
+
     //Amount of ether a prospective recipient must pay to permanently become the recipient. See commit().
     uint public commitThreshold;
-    
+
     //What if the payer falls off the face of the planet?
     //A BOP is instantiated with a chosen defaultAction, which cannot be changed after instantiation.
     enum DefaultAction {None, Release, Burn}
     DefaultAction public defaultAction;
-    
+
     //if defaultAction != None, how long should we wait allowing the default action to be called?
     uint public defaultTimeoutLength;
-    
+
     //Calculated from defaultTimeoutLength in commit(),
     //and recaluclated whenever the payer (or possibly the recipient) calls delayDefaultAction()
     uint public defaultTriggerTime;
-    
+
     //Most action happens in the Committed state.
     enum State {Open, Committed, Expended}
     State public state;
     //Note that a BOP cannot go from Committed back to Open, but it can go from Expended back to Committed
     //(this would retain the committed recipient). Search for Expended and Unexpended events to see how this works.
-    
+
     modifier inState(State s) { require(s == state); _; }
     modifier onlyPayer() { require(msg.sender == payer); _; }
     modifier onlyRecipient() { require(msg.sender == recipient); _; }
     modifier onlyPayerOrRecipient() { require((msg.sender == payer) || (msg.sender == recipient)); _; }
-    
+
     event Created(address payer, uint commitThreshold, BurnableOpenPayment.DefaultAction defaultAction, uint defaultTimeoutLength, string initialPayerString);
     event FundsAdded(uint amount);//The payer has added funds to the BOP.
     event PayerStringUpdated(string newPayerString);
@@ -70,42 +70,42 @@ contract BurnableOpenPayment {
     event Unexpended();
     event DefaultActionDelayed();
     event DefaultActionCalled();
-    
+
     function BurnableOpenPayment(address _payer, uint _commitThreshold, DefaultAction _defaultAction, uint _defaultTimeoutLength, string _payerString)
     public
     payable {
         Created(_payer, _commitThreshold, _defaultAction, _defaultTimeoutLength, _payerString);
-        
+
         if (msg.value > 0) {
             FundsAdded(msg.value);
             amountDeposited += msg.value;
         }
-            
+
         state = State.Open;
         payer = _payer;
-        
+
         commitThreshold = _commitThreshold;
-        
+
         defaultAction = _defaultAction;
-        if (defaultAction != DefaultAction.None) 
+        if (defaultAction != DefaultAction.None)
             defaultTimeoutLength = _defaultTimeoutLength;
-        
+
         payerString = _payerString;
     }
-    
+
     function getFullState()
     public
     constant
     returns (State, string, address, string, uint, uint, uint, uint) {
         return (state, payerString, recipient, recipientString, amountDeposited, amountBurned, amountReleased, defaultTriggerTime);
     }
-    
+
     function addFunds()
     public
     onlyPayer()
     payable {
         require(msg.value > 0);
-        
+
         FundsAdded(msg.value);
         amountDeposited += msg.value;
         if (state == State.Expended) {
@@ -113,7 +113,7 @@ contract BurnableOpenPayment {
             Unexpended();
         }
     }
-    
+
     function recoverFunds()
     public
     onlyPayer()
@@ -122,43 +122,43 @@ contract BurnableOpenPayment {
         FundsRecovered();
         selfdestruct(payer);
     }
-    
+
     function commit()
     public
     inState(State.Open)
     payable
     {
         require(msg.value >= commitThreshold);
-        
+
         if (msg.value > 0) {
             FundsAdded(msg.value);
             amountDeposited += msg.value;
         }
-        
+
         recipient = msg.sender;
         state = State.Committed;
         Committed(recipient);
-        
+
         if (defaultAction != DefaultAction.None) {
             defaultTriggerTime = now + defaultTimeoutLength;
         }
     }
-    
+
     function internalBurn(uint amount)
     private
     inState(State.Committed)
     {
         burnAddress.transfer(amount);
-        
+
         amountBurned += amount;
         FundsBurned(amount);
-        
+
         if (this.balance == 0) {
             state = State.Expended;
             Expended();
         }
     }
-    
+
     function burn(uint amount)
     public
     inState(State.Committed)
@@ -166,22 +166,22 @@ contract BurnableOpenPayment {
     {
         internalBurn(amount);
     }
-    
+
     function internalRelease(uint amount)
     private
     inState(State.Committed)
     {
         recipient.transfer(amount);
-        
+
         amountReleased += amount;
         FundsReleased(amount);
-        
+
         if (this.balance == 0) {
             state = State.Expended;
             Expended();
         }
     }
-    
+
     function release(uint amount)
     public
     inState(State.Committed)
@@ -189,7 +189,7 @@ contract BurnableOpenPayment {
     {
         internalRelease(amount);
     }
-    
+
     function setPayerString(string _string)
     public
     onlyPayer()
@@ -197,7 +197,7 @@ contract BurnableOpenPayment {
         payerString = _string;
         PayerStringUpdated(payerString);
     }
-    
+
     function setRecipientString(string _string)
     public
     onlyRecipient()
@@ -205,18 +205,18 @@ contract BurnableOpenPayment {
         recipientString = _string;
         RecipientStringUpdated(recipientString);
     }
-    
+
     function delayDefaultAction()
     public
     onlyPayerOrRecipient()
     inState(State.Committed)
     {
         require(defaultAction != DefaultAction.None);
-        
+
         defaultTriggerTime = now + defaultTimeoutLength;
         DefaultActionDelayed();
     }
-    
+
     function callDefaultAction()
     public
     onlyPayerOrRecipient()
@@ -224,7 +224,7 @@ contract BurnableOpenPayment {
     {
         require(defaultAction != DefaultAction.None);
         require(now >= defaultTriggerTime);
-        
+
         if (defaultAction == DefaultAction.Burn) {
             internalBurn(this.balance);
         }
@@ -237,7 +237,7 @@ contract BurnableOpenPayment {
 
 contract BurnableOpenPaymentFactory {
     event NewBOP(address newBOPAddress, address payer, uint commitThreshold, BurnableOpenPayment.DefaultAction defaultAction, uint defaultTimeoutLength, string initialPayerString);
-    
+
     function newBurnableOpenPayment(address payer, uint commitThreshold, BurnableOpenPayment.DefaultAction defaultAction, uint defaultTimeoutLength, string initialPayerString)
     public
     payable
@@ -247,4 +247,20 @@ contract BurnableOpenPaymentFactory {
         NewBOP(newBOPAddr, payer, commitThreshold, defaultAction, defaultTimeoutLength, initialPayerString);
         return newBOPAddr;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

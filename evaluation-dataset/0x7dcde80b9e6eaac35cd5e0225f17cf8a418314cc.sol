@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
 contract Owned {
-    
+
     address public owner;
     mapping(address => bool) public owners;
 
@@ -142,7 +142,7 @@ contract TokenERC20 is Owned {
 
 
 contract MifflinToken is Owned, TokenERC20 {
-    
+
     uint8 public tokenId;
     uint256 ethDolRate = 1000;
     uint256 weiRate = 1000000000000000000;
@@ -300,7 +300,7 @@ contract NapNickel is Owned, MifflinToken {
         amountToGive += msg.value / price;
         buy(amountToGive);
     }
-    
+
     struct _DateTime {
                 uint16 year;
                 uint8 month;
@@ -352,7 +352,7 @@ contract NapNickel is Owned, MifflinToken {
                         return 28;
                 }
         }
-        
+
         function parseTimestampParts(uint timestamp) public pure returns (uint16 year,uint8 month,uint8 day, uint8 hour,uint8 minute,uint8 second,uint8 weekday) {
             _DateTime memory dt = parseTimestamp(timestamp);
             return (dt.year,dt.month,dt.day,dt.hour,dt.minute,dt.second,dt.weekday);
@@ -493,7 +493,7 @@ contract QuabityQuarter is Owned, MifflinToken {
 
 
 contract KelevinKoin is Owned, MifflinToken {
-    
+
     function KelevinKoin(address exchange)
 	MifflinToken(exchange, 5, 69000000, "Kelevin Koin", "KLEV", 8) public {
         buyPrice = weiRate / ethDolRate / uint(10) ** decimals / 50; // 2c
@@ -514,8 +514,8 @@ contract KelevinKoin is Owned, MifflinToken {
 
 
 contract NnexNote is Owned, MifflinToken {
-    
-    function NnexNote(address exchange) 
+
+    function NnexNote(address exchange)
 	MifflinToken(exchange, 6, 666000000, "Nnex Note", "NNEX", 8) public {
         buyPrice = weiRate / ethDolRate / uint(10) ** decimals / 100; // 1c
     }
@@ -597,7 +597,7 @@ contract DundieDollar is Owned, MifflinToken {
 
         } else { // only take awards that they have
             uint left = _value;
-      
+
       		for (uint8 i = 0; i < awardsCount; i++) {
                 uint256 bal = awardBalanceOf(_from,award);
                 if(bal > 0){
@@ -615,7 +615,7 @@ contract DundieDollar is Owned, MifflinToken {
             }
         }
     }
-    
+
     function transferAwards(address from, address to, uint8 award , uint value) internal {
         //dont try to take specific awards from the contract
         if(from != address(this)) {
@@ -625,12 +625,12 @@ contract DundieDollar is Owned, MifflinToken {
         //dont try to send specific awards to the contract
         if(to != address(this)) awardsOf[to][award] += value;
     }
-    
+
 
     function awardBalanceOf(address addy,uint8 award) view public returns(uint){
         return awardsOf[addy][award];
     }
-    
+
     function awardName(uint8 id) view public returns(string) {
         return awards[id];
     }
@@ -643,11 +643,11 @@ contract MifflinMarket is Owned {
     mapping(uint8 => mapping(uint8 => int256)) public totalExchanged;
     uint8 rewardTokenId = 1;
     bool active;
-    
+
      function MifflinMarket() public {
          active = true;
      }
-    
+
      modifier onlyTokens {
         MifflinToken mt = MifflinToken(msg.sender);
         // make sure sender is a token contract
@@ -662,7 +662,7 @@ contract MifflinMarket is Owned {
     function removeToken(uint8 id) public onlyOwner { // Only add tokens that were created by owner
         tokenIds[id] = 0;
     }
-    
+
     function setActive(bool act) public onlyOwner {
         active = act;
     }
@@ -675,7 +675,7 @@ contract MifflinMarket is Owned {
         require(tokenIds[id] > 0);
         return MifflinToken(tokenIds[id]);
     }
-    
+
     function getTokenByAddress(address addy) public view returns(MifflinToken){
         MifflinToken token = MifflinToken(addy);
         uint8 tokenId = token.tokenId();
@@ -726,4 +726,15 @@ contract MifflinMarket is Owned {
             reward.take(to, 1);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -562,7 +562,7 @@ contract Pausable is Ownable {
 
 contract TCNXToken is  FreezableToken, BurnableToken, Pausable
 {
-    
+
     address public fundsWallet = 0x368E1ED074e2F6bBEca5731C8BaE8460d1cA2529;
 
     // 20B total supply
@@ -575,7 +575,7 @@ contract TCNXToken is  FreezableToken, BurnableToken, Pausable
         balances[fundsWallet] = totalSupply;
         Transfer(0x0, fundsWallet, totalSupply);
     }
-    
+
 
     function name() public pure returns (string _name) {
         return "Tercet Network";
@@ -611,4 +611,15 @@ contract TCNXToken is  FreezableToken, BurnableToken, Pausable
         }
         return false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

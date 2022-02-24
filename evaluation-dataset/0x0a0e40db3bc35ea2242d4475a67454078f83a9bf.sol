@@ -28,14 +28,14 @@ pragma solidity ^0.4.19;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -45,7 +45,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -55,7 +55,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
@@ -367,7 +367,7 @@ contract StandardToken is EIP20Token, Burnable, Mintable {
     // We can remove this after there is a standardized minting event
     Transfer(0, receiver, amount);
   }
-  
+
 }
 
 /**
@@ -562,7 +562,7 @@ contract UpgradeableToken is EIP20Token, Burnable {
 
     // Upgrade agent reissues the tokens
     upgradeAgent.upgradeFrom(msg.sender, value);
-    
+
     // Take tokens out from circulation
     burnTokens(msg.sender, value);
     totalUpgraded = totalUpgraded.add(value);
@@ -927,7 +927,7 @@ contract GenericCrowdsale is Haltable {
     (weiAmount, tokenAmount) = calculateTokenAmount(msg.value, receiver);
     // Sanity check against bad implementation.
     assert(weiAmount <= msg.value);
-    
+
     // Dust transaction if no tokens can be given
     require(tokenAmount != 0);
 
@@ -995,7 +995,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the receiver.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyOnBehalfWithCustomerId(address receiver, uint128 customerId) public payable validCustomerId(customerId) unsignedBuyAllowed {
@@ -1024,7 +1024,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the payer.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyWithCustomerId(uint128 customerId) public payable {
@@ -1114,7 +1114,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Returns any excess wei received
-   * 
+   *
    * This function can be overriden to provide a different refunding method.
    */
   function returnExcedent(uint excedent, address receiver) internal {
@@ -1123,7 +1123,7 @@ contract GenericCrowdsale is Haltable {
     }
   }
 
-  /** 
+  /**
    *  Calculate the amount of tokens that corresponds to the received amount.
    *  The wei amount is returned too in case not all of it can be invested.
    *
@@ -1222,7 +1222,7 @@ contract TokenTranchePricing {
   function getTranchesLength() public view returns (uint) {
     return tranches.length;
   }
-  
+
   // The configuration from the constructor was moved to the configurationTokenTranchePricing function.
   //
   /// @dev Construction, creating a list of tranches
@@ -1281,13 +1281,13 @@ contract TokenTranchePricing {
 contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, TokenTranchePricing {
   uint public sellable_tokens;
   uint public initial_tokens;
-  uint public milieurs_per_eth; 
+  uint public milieurs_per_eth;
 
   /*
    * The constructor for the crowdsale was removed given it didn't receive any arguments nor had any body.
    *
    * The configuration from the constructor was moved to the configurationCrowdsale function which creates the token contract and also calls the configuration functions from GenericCrowdsale and TokenTranchePricing.
-   * 
+   *
    *
    * @param team_multisig Address of the multisignature wallet of the team that will receive all the funds contributed in the crowdsale.
    * @param start Timestamp where the crowdsale will be officially started. It should be greater than the timestamp in which the contract is deployed.
@@ -1297,14 +1297,14 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
 
   function configurationCrowdsale(address team_multisig, uint start, uint end, address token_retriever, uint[] init_tranches, uint multisig_supply, uint crowdsale_supply, uint8 token_decimals, uint max_tokens_to_sell) public onlyOwner {
 
-      
-      initial_tokens = multisig_supply;  
+
+      initial_tokens = multisig_supply;
       token = new CrowdsaleToken(multisig_supply, token_decimals, team_multisig, token_retriever);
       // Necessary if assignTokens mints
       token.setMintAgent(address(this), true);
       // Necessary if finalize is overriden to release the tokens for public trading.
       token.setReleaseAgent(address(this));
-      // Necessary for the execution of buy function and of the subsequent CrowdsaleToken's transfer function. 
+      // Necessary for the execution of buy function and of the subsequent CrowdsaleToken's transfer function.
       token.setTransferAgent(address(this), true);
       // Crowdsale mints to himself the initial supply
       token.mint(address(this), crowdsale_supply);
@@ -1330,7 +1330,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
     weiAllowed = maxWeiAllowed.min256(weiAmount);
 
     require(token.balanceOf(receiver).add(weiAllowed) >= 100);
-    
+
     if (weiAmount < maxWeiAllowed) {
       //Divided by 1000 because eth eth_price_in_eurs is multiplied by 1000
       tokenAmount = tokensPerEth.mul(weiAmount).div(1 ether);
@@ -1353,7 +1353,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
    * Note that by default tokens are not in a released state.
    */
   function finalize() public inState(State.Success) onlyOwner stopInEmergency {
-    //Tokens sold + bounties represent 75% of the total, the other 25% goes ti the multisig to the partners and to regulate market 
+    //Tokens sold + bounties represent 75% of the total, the other 25% goes ti the multisig to the partners and to regulate market
     uint sold = tokensSold.add(  initial_tokens);
     uint toShare = sold.mul(25).div(75).mul(10**uint(token.decimals()));
     token.setMintAgent(address(this), true);
@@ -1391,4 +1391,15 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
     require(milieurs_amount >= 100);
     milieurs_per_eth = milieurs_amount;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

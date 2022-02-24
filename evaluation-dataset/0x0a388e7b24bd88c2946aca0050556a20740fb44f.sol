@@ -94,24 +94,24 @@ contract Etheroneum is StandardToken { // CHANGE THIS. Update the contract name.
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function Etheroneum() {
-        balances[msg.sender] = 30000000000000000000000000000;      
+        balances[msg.sender] = 30000000000000000000000000000;
         totalSupply = 30000000000000000000000000000;
-        name = "Etheroneum";                                   
-        decimals = 18;                                        
-        symbol = "ETN";                                       
+        name = "Etheroneum";
+        decimals = 18;
+        symbol = "ETN";
         unitsOneEthCanBuy = 10000000;
-        fundsWallet = msg.sender;                             
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,7 +125,7 @@ contract Etheroneum is StandardToken { // CHANGE THIS. Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -139,4 +139,15 @@ contract Etheroneum is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -798,7 +798,7 @@ contract BitexTokenCrowdSale is Crowdsale, RefundableCrowdsale {
     FinalizableCrowdsale()
     RefundableCrowdsale(_goal)
     Crowdsale(_startTime, _endTime, _rate, _wallet) public
-    { 
+    {
         require(_minimumAmount >= 0);
         require(_maxTokenSupply > 0);
         require(_walletRemaining != address(0));
@@ -1024,7 +1024,7 @@ contract BitexTokenCrowdSale is Crowdsale, RefundableCrowdsale {
 
     function minted() public view returns(uint256)
     {
-        return token.totalSupply().sub(initialTokenAmount); 
+        return token.totalSupply().sub(initialTokenAmount);
     }
 
     // overriding Crowdsale#hasEnded to add cap logic
@@ -1058,7 +1058,7 @@ contract BitexTokenCrowdSale is Crowdsale, RefundableCrowdsale {
       */
     function changeRate(uint256 _rate) onlyOwner public {
         require(_rate > 0);
-        
+
         rate = _rate;
     }
 
@@ -1090,7 +1090,7 @@ contract BitexTokenCrowdSale is Crowdsale, RefundableCrowdsale {
         vault.transferOwnership(newOwner);
 
     }
-   
+
 }
 
 // File: contracts/IcoController.sol
@@ -1129,7 +1129,7 @@ contract IcoController is Ownable {
 
     address public walletRemaining;
 
-    // maximum tokens that can be minted in all the crowd sales 
+    // maximum tokens that can be minted in all the crowd sales
     uint256 public maxTokenSupply = 0;
 
     uint256 public finalizePreIcoDate;
@@ -1239,7 +1239,7 @@ contract IcoController is Ownable {
         ) onlyOwner public
     {
         // only before rounds
-        require(statePhase<=1); 
+        require(statePhase<=1);
 
         // need to check that the max token supply constraint is respected
         currentIco = new BitexTokenCrowdSale(
@@ -1332,7 +1332,7 @@ contract IcoController is Ownable {
         {
             token.modifyTransferableHash(_spender,value);
        }else{
-           // during the crowdsale, it shall not be allowed 
+           // during the crowdsale, it shall not be allowed
            // but if it is needed by the project owner it can by calling the crowdsale object
            // own by 'this'
            currentIco.modifyTransferableHash(_spender, value);
@@ -1445,4 +1445,15 @@ contract IcoController is Ownable {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

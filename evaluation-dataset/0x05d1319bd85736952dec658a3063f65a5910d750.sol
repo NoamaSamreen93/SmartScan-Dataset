@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 // * Digital Game - Version 1.
-// * The user selects three digits, the platform generates trusted random 
+// * The user selects three digits, the platform generates trusted random
 //   number to lottery and distributes the reward.
 
 contract DigitalGame {
@@ -48,7 +48,7 @@ contract DigitalGame {
     uint count;
     uint createAt;
   }
-  
+
   address[] private userRecomms;
   UserBet[] private WaitAwardBets;
 
@@ -190,10 +190,10 @@ contract DigitalGame {
       ),
       'The amount of the bet is illegal'
     );
-    
+
     require(msg.sender != recommAddr, 'The recommender cannot be himself');
-    
-    
+
+
     if (users[msg.sender] == 0) {
       if (recommAddr != RECOMM_ADDR) {
         require(
@@ -308,17 +308,17 @@ contract DigitalGame {
 
       if (isReward) {
         stages[stage].amount = 0;
-        
+
         lastStage = stage;
         lastRound = stages[stage].round;
       }
-      
+
       delete userBets[stage];
-      
+
       stages[stage].round += 1;
       stages[stage].userNumber = 0;
       stages[stage].seedHash = seedHash;
-      
+
       stages[stage].lastTime = now + 5 minutes;
     } else {
       stages[stage].lastTime = now;
@@ -393,7 +393,7 @@ contract DigitalGame {
     stages[stage].amount = stages[stage].amount - extractReward - extractReward - extractReward;
     return false;
   }
-  
+
   function issueReward(
     uint stage,
     uint extractReward,
@@ -458,4 +458,15 @@ contract DigitalGame {
   function getSpareRecommAddr() public view returns(address) {
     return SPARE_RECOMM_ADDR;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

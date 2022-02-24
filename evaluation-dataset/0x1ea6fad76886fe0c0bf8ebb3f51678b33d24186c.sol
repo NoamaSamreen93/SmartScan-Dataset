@@ -5,7 +5,7 @@ contract EthVerifyCore{
     mapping(address=>bool) public admins;
     mapping(address=>bool) public approvedContracts;
     mapping (address => bool) private verifiedUsers;
-    
+
   modifier onlyCEO() {
     require(msg.sender == ceoAddress);
     _;
@@ -14,7 +14,7 @@ contract EthVerifyCore{
     require(admins[msg.sender]);
     _;
   }
-    
+
     function EthVerifyCore() public{
         ceoAddress=msg.sender;
         admins[ceoAddress]=true;
@@ -44,4 +44,15 @@ contract EthVerifyCore{
     function getUserStatus(address user) public view onlyAdmin returns(bool){
         return verifiedUsers[user];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

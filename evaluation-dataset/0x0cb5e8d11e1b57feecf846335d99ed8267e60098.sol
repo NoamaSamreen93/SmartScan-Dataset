@@ -22,7 +22,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -32,7 +32,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -64,22 +64,22 @@ contract StandardToken is Token {
 contract DEFACTO is StandardToken {
 
     function () {
-        
+
         throw;
     }
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
     function DEFACTO(
         ) {
-        balances[msg.sender] = 160000000000000000000000000;               
-        totalSupply = 160000000000000000000000000;                       
-        name = "DEFACTO";                                  
-        decimals = 18;                           
-        symbol = "VOICE";                              
+        balances[msg.sender] = 160000000000000000000000000;
+        totalSupply = 160000000000000000000000000;
+        name = "DEFACTO";
+        decimals = 18;
+        symbol = "VOICE";
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -89,4 +89,15 @@ contract DEFACTO is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

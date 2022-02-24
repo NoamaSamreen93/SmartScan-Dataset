@@ -367,3 +367,7 @@ contract ListingContract is ApplicationAsset {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

@@ -13,7 +13,7 @@ contract MultiOwners {
 
     event AccessGrant(address indexed owner);
     event AccessRevoke(address indexed owner);
-    
+
     mapping(address => bool) owners;
     address public publisher;
 
@@ -22,9 +22,9 @@ contract MultiOwners {
         publisher = msg.sender;
     }
 
-    modifier onlyOwner() { 
+    modifier onlyOwner() {
         require(owners[msg.sender] == true);
-        _; 
+        _;
     }
 
     function isOwner() public constant returns (bool) {
@@ -76,7 +76,7 @@ contract UserRegistry is MultiOwners, UserRegistryInterface {
     AddIdentity(_who);
     return true;
   }
-  
+
   function knownAddress(address _who) public constant returns(bool) {
     return addresses[_who];
   }
@@ -92,4 +92,15 @@ contract UserRegistry is MultiOwners, UserRegistryInterface {
   function systemAddresses(address _to, address _from) public constant returns(bool) {
     return systemAddress(_to) || systemAddress(_from);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

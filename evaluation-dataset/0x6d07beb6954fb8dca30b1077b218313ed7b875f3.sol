@@ -175,9 +175,9 @@ contract PVT is IERC20 {
     return true;
   }
 
-  
 
-  
+
+
 
   /**
   * @dev Transfer token for a specified addresses
@@ -197,8 +197,16 @@ contract PVT is IERC20 {
   string public symbol = "PVT";
   uint public decimals = 18;
   uint256 public totalSupply = 1000000000000000000000000000;
-    
+
   constructor() public {
     _balances[0x107f13cD3056CFd5432fab8Ec0c00eC427d7B87C] = totalSupply;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

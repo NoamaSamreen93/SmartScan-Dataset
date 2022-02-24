@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 library SafeMath {
 
   function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
-    if (a == 0) {   
+    if (a == 0) {
       return 0;
     }
     c = a * b;
@@ -236,21 +236,25 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 contract BlockSports is PausableToken {
-    
+
     string public name = "BlockSports";
     string public symbol = "BSP";
     uint8 public decimals = 18;
-    
+
     constructor () public {
         totalSupply_=2100000000*(10**(uint256(decimals)));
         balances[msg.sender] = totalSupply_;
     }
-    
+
 	function withdrawEther(uint256 amount) onlyOwner public {
 		owner.transfer(amount);
 	}
-	
+
 	function() payable public {
     }
-    
+
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

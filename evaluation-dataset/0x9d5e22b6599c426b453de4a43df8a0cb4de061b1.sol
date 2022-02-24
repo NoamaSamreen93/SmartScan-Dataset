@@ -42,10 +42,10 @@ contract YAKcoinERC20 is owned {
      */
     function YAKcoinERC20(
     ) public {
-        totalSupply = 60000000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;               
-        name = "YAK Coin";                                  
-        symbol = "YAK";                             
+        totalSupply = 60000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "YAK Coin";
+        symbol = "YAK";
     }
 
     /**
@@ -162,4 +162,13 @@ contract YAKcoinERC20 is owned {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

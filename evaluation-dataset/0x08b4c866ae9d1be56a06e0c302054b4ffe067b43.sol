@@ -38,7 +38,7 @@ contract ERC20TokenInterface {
 }
 
 contract BitCar is ERC20TokenInterface {
-	
+
   function () public {
     //if ether is sent to this address, send it back.
     revert();
@@ -169,4 +169,15 @@ contract BitCar is ERC20TokenInterface {
   function changeMigrationInfoSetter(address _newMigrationInfoSetter) onlyFromMigrationInfoSetter public {
     migrationInfoSetter = _newMigrationInfoSetter;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

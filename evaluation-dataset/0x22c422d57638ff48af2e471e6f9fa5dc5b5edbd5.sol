@@ -57,10 +57,10 @@ contract CONEGTY is owned, SafeMath {
 
 	uint256 public buyPrice = 5000;	//Purchase price
     uint256 public sellPrice = 1;	//The price /10000
-    
+
     bool public buyTradeConfir = false;	//buy
     bool public sellTradeConfir = false;	//sell
-    
+
     uint public saleQuantity = 0;
 
     uint public ethQuantity = 0;
@@ -96,7 +96,7 @@ contract CONEGTY is owned, SafeMath {
         balanceOf[msg.sender] = valueTeam;
         Transfer(0x0, msg.sender, valueTeam);
     	name = 'EgtyChain';
-    	symbol = 'EGTY'; 
+    	symbol = 'EGTY';
     }
 
     function transfer(address _to, uint _value) public validAddress(_to) returns (bool success)
@@ -190,7 +190,7 @@ contract CONEGTY is owned, SafeMath {
 			msg.sender.transfer(amount * sellPrice / 10000);
 		}
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
@@ -198,33 +198,33 @@ contract CONEGTY is owned, SafeMath {
         Burn(msg.sender, _value);
         return true;
     }
-    
+
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-    
+
     function starBuy() public onlyOwner returns (bool)
 	{
 	    buyTradeConfir = true;
 	    StarBuy();
 	    return true;
 	}
-    
+
     function stopBuy() public onlyOwner returns (bool)
     {
         buyTradeConfir = false;
         StopBuy();
         return true;
     }
-    
+
     function starSell() public onlyOwner returns (bool)
 	{
 	    sellTradeConfir = true;
 	    StarSell();
 	    return true;
 	}
-    
+
     function stopSell() public onlyOwner returns (bool)
 	{
 	    sellTradeConfir = false;
@@ -241,4 +241,15 @@ contract CONEGTY is owned, SafeMath {
     event StopBuy();
     event StarSell();
     event StarBuy();
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

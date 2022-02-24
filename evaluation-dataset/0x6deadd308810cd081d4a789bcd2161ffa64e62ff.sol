@@ -48,12 +48,12 @@ contract ImmAirDropA{
     address public wallet;
     ERC20 public token;
     mapping (address => bool) public admins;
-	
+
     modifier onlyOwner {
        require(msg.sender == owner);
        _;
     }
-	
+
      function ImmAirDropA(ERC20 _token, address _wallet) public {
         require(_token != address(0));
         token = _token;
@@ -72,12 +72,12 @@ contract ImmAirDropA{
 			admins[_userlist] = true;
 		}
 	}
-	
+
 	function reClaimBalance() public onlyAdmin{
 		uint256 taBal = token.balanceOf(this);
 		token.transfer(wallet, taBal);
 	}
-	
+
 	function adminUpdateWallet(address _wallet) public onlyAdmin{
 		require(_wallet != address(0));
 		wallet = _wallet;
@@ -91,9 +91,17 @@ contract ImmAirDropA{
     		}
     	}
     }
-	
+
 	function () external payable {
 		revert();
 	}
-	
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

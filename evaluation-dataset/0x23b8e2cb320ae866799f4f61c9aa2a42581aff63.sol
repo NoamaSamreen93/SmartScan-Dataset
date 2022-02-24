@@ -7,7 +7,7 @@ contract JCFv1 {
     uint8 public decimals;
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function JCFv1(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits) public {
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
@@ -15,7 +15,7 @@ contract JCFv1 {
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
         /* Check if sender has balance and for overflows */
@@ -24,8 +24,19 @@ contract JCFv1 {
         /* Add and subtract new balances */
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-        
+
         /* Notify anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

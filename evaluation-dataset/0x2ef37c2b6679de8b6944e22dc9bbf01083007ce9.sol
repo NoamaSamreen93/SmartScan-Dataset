@@ -116,7 +116,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract Fanship is StandardToken
 {
-  string public name = "Fanship"; 
+  string public name = "Fanship";
   string public symbol = "FANS";
   uint public decimals = 8;
   uint public INITIAL_SUPPLY = 10000000000 * (10 ** decimals);
@@ -125,4 +125,15 @@ contract Fanship is StandardToken
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

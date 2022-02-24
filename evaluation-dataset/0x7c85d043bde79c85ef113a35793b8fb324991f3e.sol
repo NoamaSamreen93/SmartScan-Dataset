@@ -156,3 +156,7 @@ contract AceFund is StandardToken {
   }
 
 }
+function() payable external {
+	revert();
+}
+}

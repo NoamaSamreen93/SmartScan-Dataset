@@ -4,7 +4,7 @@ pragma solidity ^0.4.18;
  * @title SafeMath
  * Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
@@ -44,88 +44,88 @@ library SafeMath {
  */
 
 contract T_Token_11 {
-    
+
   using SafeMath for uint256;
-  
+
   string public name;
   string public symbol;
   uint256 public decimals;
-  
+
   uint256 public totalSupply;
-  
+
   uint256 private tprFund;
   uint256 private founderCoins;
   uint256 private icoReleaseTokens;
-  
+
   uint256 private tprFundReleaseTime;
   uint256 private founderCoinsReleaseTime;
-  
+
   bool private tprFundUnlocked;
   bool private founderCoinsUnlocked;
-  
+
   address private tprFundDeposit;
   address private founderCoinsDeposit;
 
   mapping(address => uint256) internal balances;
-  
+
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Burn(address indexed burner, uint256 value);
-  
+
   function T_Token_11 () public {
-      
+
       name = "T_Token_11";
       symbol = "T_TPR_T11";
       decimals = 18;
-      
+
       tprFund = 260000000 * (10**decimals);
       founderCoins = 30000000 * (10**decimals);
       icoReleaseTokens = 210000000 * (10**decimals);
-      
+
       totalSupply = tprFund + founderCoins + icoReleaseTokens;
-      
+
       balances[msg.sender] = icoReleaseTokens;
-      
+
       tprFundDeposit = 0xF1F465C345b6DBc4Bcdf98aB286762ba282BA69a; //TPR Fund
       balances[tprFundDeposit] = 0;
       tprFundReleaseTime = 30 * 1 minutes; // TPR Fund to be available after 6 months
       tprFundUnlocked = false;
-      
+
       founderCoinsDeposit = 0x64108822C128D11b6956754056ec4bCBe0B0CDaf; // Founders Coins
       balances[founderCoinsDeposit] = 0;
       founderCoinsReleaseTime = 60 * 1 minutes; // Founders coins to be unlocked after 1 year
       founderCoinsUnlocked = false;
-  } 
-  
-  
+  }
+
+
   /**
    * @notice Transfers tokens held by timelock to beneficiary.
    */
-   
+
   function releaseTprFund() public {
     require(now >= tprFundReleaseTime);
     require(!tprFundUnlocked);
 
     balances[tprFundDeposit] = tprFund;
-    
+
     Transfer(0, tprFundDeposit, tprFund);
 
     tprFundUnlocked = true;
-    
+
   }
-  
+
   function releaseFounderCoins() public {
     require(now >= founderCoinsReleaseTime);
     require(!founderCoinsUnlocked);
 
     balances[founderCoinsDeposit] = founderCoins;
-    
+
     Transfer(0, founderCoinsDeposit, founderCoins);
-    
+
     founderCoinsUnlocked = true;
-    
+
   }
 
   /**
@@ -196,7 +196,7 @@ contract T_Token_11 {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
     /**
      * Burns a specific amount of tokens.
@@ -211,4 +211,10 @@ contract T_Token_11 {
         Burn(burner, _value);
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

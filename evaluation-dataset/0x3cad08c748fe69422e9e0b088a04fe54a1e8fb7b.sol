@@ -15,8 +15,8 @@ pragma solidity ^0.5.2;
  *
  *  HAVE COMMAND PREPARATION TIME DURING IT WILL BE RETURN ONLY INVESTED AMOUNT AND NOT MORE!
  *  Only special command will run X3 MODE!
- * 
- *  After restart system automaticaly make deposits for damage users in damaged part, 
+ *
+ *  After restart system automaticaly make deposits for damage users in damaged part,
  *   but before it users must self make promotion deposit by any amount first.
  *
  *  INSTRUCTIONS:
@@ -30,15 +30,15 @@ pragma solidity ^0.5.2;
  *     Admin voice power is equal 10 simple participants.
  *  TO RESTART, ANY USER CAN VOTE 0.00000101 ETH to contract address.
  *     Admin voice power is equal 10 simple participants.
- *  TO VOICE FOR SEAL/UNSEAL CONTRACT, ADMIN CAN VOTE 0.00000102 ETH 
+ *  TO VOICE FOR SEAL/UNSEAL CONTRACT, ADMIN CAN VOTE 0.00000102 ETH
  *     to contract address.
- * 
- *  Minimal investment is more than 0.000000001 ether, else if equal or smaller 
+ *
+ *  Minimal investment is more than 0.000000001 ether, else if equal or smaller
  *  then only withdrawn will performed
  *
  *  RECOMMENDED GAS LIMIT 350000
  */
- 
+
 contract X3ProfitInMonthV6 {
 
 	struct Investor {
@@ -46,7 +46,7 @@ contract X3ProfitInMonthV6 {
 		int iteration;
           // array containing information about beneficiaries
 		uint deposit;
-		  // sum locked to remove in predstart period, gived by contract for 
+		  // sum locked to remove in predstart period, gived by contract for
 		  // compensation of previous iteration restart
 		uint lockedDeposit;
            //array containing information about the time of payment
@@ -64,13 +64,13 @@ contract X3ProfitInMonthV6 {
 	}
 
     mapping(address => Investor) public investors;
-	
+
     //fund to transfer percent for MAIN OUR CONTRACT EasyInvestForeverProtected2
     address payable public constant ADDRESS_MAIN_FUND = 0x3Bd33FF04e1F2BF01C8BF15C395D607100b7E116;
     address payable public constant ADDRESS_ADMIN =     0x6249046Af9FB588bb4E70e62d9403DD69239bdF5;
     //time through which you can take dividends
     uint private constant TIME_QUANT = 1 days;
-	
+
     //start percent 10% per day
     uint private constant PERCENT_DAY = 10;
     uint private constant PERCENT_DECREASE_PER_ITERATION = 1;
@@ -96,11 +96,11 @@ contract X3ProfitInMonthV6 {
 
     // max contract balance in ether for overflow protection in calculations only
     // 340 quintillion 282 quadrillion 366 trillion 920 billion 938 million 463 thousand 463
-	uint public constant maxBalance = 340282366920938463463374607431768211456 wei; //(2^128) 
-	uint public constant maxDeposit = maxBalance / 1000; 
-	
+	uint public constant maxBalance = 340282366920938463463374607431768211456 wei; //(2^128)
+	uint public constant maxDeposit = maxBalance / 1000;
+
 	// X3 Mode status
-    bool public isProfitStarted = false; 
+    bool public isProfitStarted = false;
     bool public isContractSealed = false;
 
     modifier isUserExists() {
@@ -132,7 +132,7 @@ contract X3ProfitInMonthV6 {
         uint payout = payoutPlanned(addr);
         if(payout == 0) return 0;
         if(payout > address(this).balance) payout = address(this).balance;
-        if(!isContractSealed && !isProfitStarted) 
+        if(!isContractSealed && !isProfitStarted)
         {
             Investor memory inv = investors[addr];
             uint activDep = inv.deposit - inv.lockedDeposit;
@@ -155,14 +155,14 @@ contract X3ProfitInMonthV6 {
                 uint delta = 0;
                 if(amountOfReturnDebt < amountOfDebt) delta = amountOfDebt - amountOfReturnDebt;
                 if (inv.isWeHaveDebt) {
-                    if(inv.deposit < delta) 
-                        delta -= inv.deposit; 
+                    if(inv.deposit < delta)
+                        delta -= inv.deposit;
                     else
                         delta = 0;
                 }
-                if(delta > 0) delta = PERCENT_DIVIDER * delta / (PERCENT_DIVIDER - PERCENT_MAIN_FUND) + 1; 
+                if(delta > 0) delta = PERCENT_DIVIDER * delta / (PERCENT_DIVIDER - PERCENT_MAIN_FUND) + 1;
                 // Sealed contract must transfer funds despite of complete debt payed
-                if(address(this).balance > delta) 
+                if(address(this).balance > delta)
                     return address(this).balance - delta;
                 return 0;
             }
@@ -205,14 +205,14 @@ contract X3ProfitInMonthV6 {
 			        inv.deposit -= inv.withdrawnPure;
 		        else
 		            inv.deposit = 0;
-		        if(inv.deposit + msg.value > maxDeposit) 
+		        if(inv.deposit + msg.value > maxDeposit)
 		            inv.deposit = maxDeposit - msg.value;
 				inv.withdrawn = 0;
 				inv.withdrawnPure = 0;
 				inv.time = now;
 				inv.lockedDeposit = inv.deposit;
 			    amountOfDebt += inv.lockedDeposit;
-				
+
 				inv.isVoteProfit = false;
 				inv.isVoteRestart = false;
                 inv.isWeHaveDebt = true;
@@ -246,14 +246,14 @@ contract X3ProfitInMonthV6 {
     }
     function charityToContract() external payable {
 	    amountOfCharity += msg.value;
-    }    
+    }
     function() external payable {
         if(msg.data.length > 0){
     	    amountOfCharity += msg.value;
-            return;        
+            return;
         }
         require(msg.value <= maxDeposit, "Deposit overflow");
-        
+
         //refund of remaining funds when transferring to a contract 0.00000112 ether
         Investor storage inv = investors[msg.sender];
         if (!isContractSealed &&
@@ -264,7 +264,7 @@ contract X3ProfitInMonthV6 {
             //start/restart X3 Mode on 0.00000111 ether / 0.00000101 ether
             if ((!isContractSealed &&
                 (msg.value == 0.00000111 ether || msg.value == 0.00000101 ether)) ||
-                (msg.value == 0.00000102 ether&&msg.sender == ADDRESS_ADMIN)) 
+                (msg.value == 0.00000102 ether&&msg.sender == ADDRESS_ADMIN))
             {
                 if(inv.iteration != iterationIndex)
                     makeDeposit();
@@ -291,7 +291,7 @@ contract X3ProfitInMonthV6 {
                         inv.isVoteRestart = false;
                     }
                     if((countOfReStartVoices > 10 &&
-                        countOfReStartVoices > countOfInvestors / 2) || 
+                        countOfReStartVoices > countOfInvestors / 2) ||
                         msg.sender == ADDRESS_ADMIN)
                     {
         			    undoDecreaseIteration++;
@@ -311,23 +311,23 @@ contract X3ProfitInMonthV6 {
                         inv.isVoteProfit = false;
                     }
                     if((countOfStartVoices > 10 &&
-                        countOfStartVoices > countOfInvestors / 2) || 
+                        countOfStartVoices > countOfInvestors / 2) ||
                         msg.sender == ADDRESS_ADMIN)
-                        start(msg.sender);        			    
+                        start(msg.sender);
                 }
-            } 
+            }
             else
             {
-                require(        
+                require(
                     msg.value <= 0.000000001 ether ||
-                    address(this).balance <= maxBalance, 
+                    address(this).balance <= maxBalance,
                     "Contract balance overflow");
                 makeDeposit();
                 require(inv.deposit <= maxDeposit, "Deposit overflow");
             }
         }
     }
-    
+
     function start(address payable addr) private {
         if (isContractSealed) return;
 	    isProfitStarted = true;
@@ -338,7 +338,7 @@ contract X3ProfitInMonthV6 {
             _payout(addr, payout, false);
         }
     }
-    
+
     function restart() private {
         if (isContractSealed) return;
         if(dailyPercent() == PERCENT_DECREASE_MINIMUM)
@@ -355,7 +355,7 @@ contract X3ProfitInMonthV6 {
 		amountOfReturnDebt = 0;
 		countOfReturnDebt = 0;
 	}
-	
+
     //Pays out, takes taxes according to holding time
     function _payout(address payable addr, uint amount, bool retDep) private {
         if(amount == 0)
@@ -392,7 +392,7 @@ contract X3ProfitInMonthV6 {
             interestPure = advTax;
             advTax = amount - interestPure;
         }
-        
+
 		inv.withdrawnPure += interestPure;
 		inv.withdrawn += amount;
 		inv.time = now;
@@ -401,20 +401,20 @@ contract X3ProfitInMonthV6 {
         if(advTax > 0)
         {
             (bool success, bytes memory data) = ADDRESS_MAIN_FUND.call.value(advTax)("");
-            if(success) 
+            if(success)
                 countOfAdvTax += advTax;
             else
                 inv.withdrawn -= advTax;
         }
         if(interestPure > 0) addr.transfer(interestPure);
-        
+
         if(inv.isWeHaveDebt && inv.withdrawnPure >= inv.deposit)
         {
             amountOfReturnDebt += inv.deposit;
             countOfReturnDebt++;
             inv.isWeHaveDebt = false;
         }
-        
+
         if(isDeleteNeed)
 			_delete(addr);
 
@@ -436,4 +436,17 @@ contract X3ProfitInMonthV6 {
         inv.iteration = -1;
         countOfInvestors--;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

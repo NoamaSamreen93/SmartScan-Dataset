@@ -582,7 +582,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
   uint256 public totalPoolBalance;
   /// @notice a mapping from invitationCode => memberAddress, so invitation rewards can be applied.
   mapping(bytes32 => address) public registeredInvitationCodes;
- 
+
 
   /*      Constants      */
 
@@ -635,7 +635,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     address _memberAddress,
     bytes32 _invitationCode,
     bytes32 _referralInvitationCode
-  ) 
+  )
     public
     onlyValidator
     isNotMember(_memberAddress)
@@ -825,7 +825,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
       require(
         totalPoolBalance >= amountToWithdraw &&
         ixtToken.transfer(msg.sender, amountToWithdraw),
-        "Unable to withdraw this value of IXT."  
+        "Unable to withdraw this value of IXT."
       );
       totalPoolBalance = SafeMath.sub(totalPoolBalance, amountToWithdraw);
     }
@@ -872,7 +872,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     );
     totalPoolBalance = 0;
     emit PoolDrained(msg.sender, totalPoolBalance);
-    
+
     emit ContractDrained(msg.sender);
   }
 
@@ -939,7 +939,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
 
   function refundUserBalance(
     address memberAddress
-  ) 
+  )
     internal
     returns (uint256)
   {
@@ -953,7 +953,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     if (stakeToRefund > 0 && userStaking) {
       require(
         ixtToken.transfer(memberAddress, stakeToRefund),
-        "Unable to withdraw this value of IXT."  
+        "Unable to withdraw this value of IXT."
       );
       totalMemberBalance = SafeMath.sub(totalMemberBalance, stakeToRefund);
     }
@@ -989,7 +989,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     );
     require(
       ixtToken.transfer(memberAddress, rewardAmount),
-      "Unable to withdraw this value of IXT."  
+      "Unable to withdraw this value of IXT."
     );
     /// @dev we know this is safe as totalPoolBalance >= rewardAmount
     totalPoolBalance -= rewardAmount;
@@ -1010,7 +1010,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     address depositer,
     uint256 amount,
     bool isPoolDeposit
-  ) 
+  )
     internal
     returns (uint256)
   {
@@ -1021,7 +1021,7 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
       ixtToken.allowance(depositer, address(this)) >= amount &&
       ixtToken.balanceOf(depositer) >= amount &&
       ixtToken.transferFrom(depositer, address(this), amount),
-      "Unable to deposit IXT - check allowance and balance."  
+      "Unable to deposit IXT - check allowance and balance."
     );
     if (isPoolDeposit) {
       totalPoolBalance = SafeMath.add(totalPoolBalance, amount);
@@ -1032,4 +1032,13 @@ contract IxtProtect is IxtEvents, RoleManager, StakeManager, RewardManager {
     }
     return amount;
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

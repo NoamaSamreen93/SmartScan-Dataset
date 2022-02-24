@@ -653,7 +653,7 @@ contract AviationSecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721Bas
         string liscence;
         string URL;
     }
-    
+
     mapping(uint256 => Data) internal tokenData;
     /**
      * @dev Constructor function
@@ -792,18 +792,29 @@ contract AviationSecurityToken is SupportsInterfaceWithLookup, ERC721, ERC721Bas
         allTokensIndex[_id] = _id;
         super._mint(_to, _id);
     }
-    
+
     function addTokenData(uint _tokenId, string _liscence, string _URL) public {
             require(ownerOf(_tokenId) == msg.sender);
             tokenData[_tokenId].liscence = _liscence;
             tokenData[_tokenId].URL = _URL;
 
-        
+
     }
-    
+
     function getTokenData(uint _tokenId) public view returns(string Liscence, string URL){
         require(exists(_tokenId));
         Liscence = tokenData[_tokenId].liscence;
         URL = tokenData[_tokenId].URL;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

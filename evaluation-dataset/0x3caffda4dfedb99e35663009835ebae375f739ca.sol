@@ -4,23 +4,23 @@ contract Ownable {
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
   function Ownable() public {
     owner = msg.sender;
   }
 
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 
 }
 
@@ -103,10 +103,10 @@ contract DMPNGCrowdsale is Ownable {
   // Amount of wei raised
   uint256 public weiRaised;
 
-  
+
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  
+
   function DMPNGCrowdsale(uint256 _rate, address _wallet, ERC20 _token) public {
     require(_rate > 0);
     require(_wallet != address(0));
@@ -117,22 +117,22 @@ contract DMPNGCrowdsale is Ownable {
     token = _token;
 }
 
-  
+
 
   // -----------------------------------------
   // Crowdsale external interface
   // -----------------------------------------
 
-  function allocateRemainingTokens() onlyOwner public {    
+  function allocateRemainingTokens() onlyOwner public {
     uint256 remaining = token.balanceOf(this);
     token.transfer(owner, remaining);
   }
-  
+
   function () external payable {
     buyTokens(msg.sender);
   }
 
-  
+
   function buyTokens(address _beneficiary) public payable {
 
     uint256 weiAmount = msg.value;
@@ -150,48 +150,61 @@ contract DMPNGCrowdsale is Ownable {
       _beneficiary,
       weiAmount,
       tokens
-    );   
+    );
 
     _forwardFunds();
-   
+
   }
 
   // -----------------------------------------
   // Internal interface (extensible)
   // -----------------------------------------
 
-  
+
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) pure internal {
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
-  }  
-  
+  }
 
-  
+
+
   function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
     token.transfer(_beneficiary, _tokenAmount);
   }
 
-  
+
   function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
     _deliverTokens(_beneficiary, _tokenAmount);
-  }   
+  }
 
-  
+
   function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
 
     uint256 tokensIssued = _weiAmount.mul(rate);
-    
+
     if( 10 * (10 ** 18) < tokensIssued && 100 * (10 ** 18) > tokensIssued ) tokensIssued = tokensIssued + (1 * (10 ** 18));
     else if( 100 * (10 ** 18) <= tokensIssued ) tokensIssued = tokensIssued + (15 * (10 ** 18));
-   
+
 
     return tokensIssued;
-   
+
   }
-  
+
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

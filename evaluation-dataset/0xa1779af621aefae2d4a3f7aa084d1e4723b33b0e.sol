@@ -1715,7 +1715,7 @@ pragma solidity ^0.5.4;
 interface DxToken4RepInterface {
     function claim(address _beneficiary) external returns(bytes32);
     function redeem(address _beneficiary) external returns(uint256 reputation);
-    
+
 }
 
 // File: contracts/helpers/DxDaoClaimRedeemHelper.sol
@@ -1758,11 +1758,11 @@ contract DxDaoClaimRedeemHelper {
 
     /// @dev batch claiming
     function claimAll(
-        address[] calldata userAddresses, 
+        address[] calldata userAddresses,
         DxTokenContracts4Rep mapIdx
-    ) 
-        external 
-        returns(bytes32[] memory) 
+    )
+        external
+        returns(bytes32[] memory)
     {
         require(uint(mapIdx) < 3, "mapIdx cannot be greater than 2");
 
@@ -1789,12 +1789,12 @@ contract DxDaoClaimRedeemHelper {
 
     /// @dev batch redeeming
     function redeemAll(
-        address[] calldata userAddresses, 
+        address[] calldata userAddresses,
         DxTokenContracts4Rep mapIdx
-    ) 
-        external 
-        returns(uint256[] memory) 
-    {        
+    )
+        external
+        returns(uint256[] memory)
+    {
         require(uint(mapIdx) < 3, "mapIdx cannot be greater than 2");
 
         DxToken4RepInterface redeemingContract;
@@ -1820,12 +1820,12 @@ contract DxDaoClaimRedeemHelper {
 
     /// @dev batch redeeming (dxGAR only)
     function redeemAllGAR(
-        address[] calldata userAddresses, 
+        address[] calldata userAddresses,
         uint256[] calldata auctionIndices
-    ) 
-        external 
-        returns(uint256[] memory) 
-    {        
+    )
+        external
+        returns(uint256[] memory)
+    {
         require(userAddresses.length == auctionIndices.length, "userAddresses and auctioIndices must be the same length arrays");
 
         uint length = userAddresses.length;
@@ -1838,4 +1838,13 @@ contract DxDaoClaimRedeemHelper {
 
         return returnArray;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

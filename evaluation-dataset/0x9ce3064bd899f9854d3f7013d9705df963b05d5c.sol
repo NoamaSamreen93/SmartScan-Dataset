@@ -125,7 +125,7 @@ contract FlexibleTokenSale is  Owned {
     //
     uint256 public totalTokensSold;
     uint256 public totalEtherCollected;
-    
+
     //
     // Price Update Address
     //
@@ -280,7 +280,7 @@ contract FlexibleTokenSale is  Owned {
         TokenPerEtherUpdated(_etherPrice);
         return true;
     }
-    
+
     function updatePriceAddress(address _newAddress) public onlyOwner returns(bool){
         require(_newAddress != address(0));
         priceUpdateAddress=_newAddress;
@@ -344,4 +344,13 @@ contract DOCTokenSale is FlexibleTokenSale, DOCTokenSaleConfig {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -149,7 +149,7 @@ contract KYCCrowdsale is Ownable{
 
     function disableKYC() external onlyOwner {
         require(isKYCRequired); // kyc is enabled
-        isKYCRequired = false; 
+        isKYCRequired = false;
     }
 
     //TODO: handle single address can be whiteListed multiple time using unique signed hashes
@@ -171,7 +171,7 @@ contract KYCCrowdsale is Ownable{
  */
 contract Crowdsale is Pausable, KYCCrowdsale{
   using SafeMath for uint256;
-    
+
   // The token interface
   ERC20 public token;
 
@@ -187,7 +187,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
 
   // token rate in wei
   uint256 public rate;
-  
+
   uint256 public roundOneRate;
   uint256 public roundTwoRate;
   uint256 public defaultBonussRate;
@@ -234,7 +234,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
     roundOneRate = (rate.mul(6)).div(10);       // price at 40% discount
     roundTwoRate = (rate.mul(65)).div(100);     // price at 35% discount
     defaultBonussRate = (rate.mul(8)).div(10);  // price at 20% discount
-    
+
     wallet =  0xccB84A750f386bf5A4FC8C29611ad59057968605;
     token = ERC20(0xE6FF2834b6Cf56DC23282A5444B297fAcCcA1b28);
     tokenWallet =  0x4AA48F9cF25eB7d2c425780653c321cfaC458FA4;
@@ -261,7 +261,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
     tokensSold = tokensSold.add(tokens);
     deposited[msg.sender] = deposited[msg.sender].add(weiAmount);
     updateRoundLimits(tokens);
-   
+
     uint256 lockedFor = assignTokens(beneficiary, tokens);
     emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens, lockedFor);
 
@@ -272,10 +272,10 @@ contract Crowdsale is Pausable, KYCCrowdsale{
   function hasEnded() public view returns (bool) {
     return now > endTime;
   }
-  
+
    uint256 public roundOneLimit = 9500000 ether;
    uint256 public roundTwoLimit = 6750000 ether;
-   
+
   function updateRoundLimits(uint256 _amount) private {
       if (roundOneLimit > 0){
           if(roundOneLimit > _amount){
@@ -290,22 +290,22 @@ contract Crowdsale is Pausable, KYCCrowdsale{
   }
 
   function getTokenAmount(uint256 weiAmount) public view returns(uint256) {
-  
+
       uint256 buffer = 0;
       uint256 tokens = 0;
       if(weiAmount < 1 ether)
-      
+
         // 20% disount = $0.28 EQUI Price , default category
         // 1 ETH = 2400 EQUI
         return (weiAmount.div(defaultBonussRate)).mul(1 ether);
 
       else if(weiAmount >= 1 ether) {
-          
-          
+
+
           if(roundOneLimit > 0){
-              
+
               uint256 amount = roundOneRate * roundOneLimit;
-              
+
               if (weiAmount > amount){
                   buffer = weiAmount - amount;
                   tokens =  (amount.div(roundOneRate)).mul(1 ether);
@@ -314,14 +314,14 @@ contract Crowdsale is Pausable, KYCCrowdsale{
                   // 1 ETH = 3333
                   return (weiAmount.div(roundOneRate)).mul(1 ether);
               }
-        
+
           }
-          
+
           if(buffer > 0){
               uint256 roundTwo = (buffer.div(roundTwoRate)).mul(1 ether);
               return tokens + roundTwo;
           }
-          
+
           return (weiAmount.div(roundTwoRate)).mul(1 ether);
       }
   }
@@ -443,14 +443,14 @@ contract Crowdsale is Pausable, KYCCrowdsale{
  */
 contract Refundable is Crowdsale {
 
-  uint256 public available; 
+  uint256 public available;
   bool public refunding = false;
 
   event RefundStatusUpdated();
   event Deposited();
   event Withdraw(uint256 _amount);
   event Refunded(address indexed beneficiary, uint256 weiAmount);
-  
+
   function deposit() onlyOwner public payable {
     available = available.add(msg.value);
     emit Deposited();
@@ -461,7 +461,7 @@ contract Refundable is Crowdsale {
     emit RefundStatusUpdated();
   }
 
-  
+
   function refund() public {
     require(refunding);
     uint256 depositedValue = deposited[msg.sender];
@@ -469,12 +469,28 @@ contract Refundable is Crowdsale {
     msg.sender.transfer(depositedValue);
     emit Refunded(msg.sender, depositedValue);
   }
-  
+
   function withDrawBack() onlyOwner public{
       owner.transfer(this.balance);
   }
-  
+
   function Contractbalance() view external returns( uint256){
       return this.balance;
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

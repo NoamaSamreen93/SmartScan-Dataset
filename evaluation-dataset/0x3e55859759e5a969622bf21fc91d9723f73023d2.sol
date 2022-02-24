@@ -83,7 +83,7 @@ contract ERC20 {
   string public name;
   string public symbol;
   uint8 public decimals;
-  uint public totalSupply;  
+  uint public totalSupply;
   function ERC20(string _name, string _symbol, uint8 _decimals) public {
     name = _name;
     symbol = _symbol;
@@ -123,7 +123,7 @@ contract Token is Pausable, ERC20 {
     return (now < unlocktime && !manualUnlock);
   }
 
-  modifier lockCheck(address from, uint value) { 
+  modifier lockCheck(address from, uint value) {
     if (isLocked()) {
       require(value <= balances[from] - balanceOfLocked[from]);
     } else {
@@ -197,4 +197,17 @@ contract Token is Pausable, ERC20 {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -15,13 +15,19 @@ contract GetDecimals {
             return token.decimals();
         }
     }
-    
+
     function testRevert() public pure returns(string) {
         revert("ilan is the king");
         return "hello world";
     }
-    
+
     function testRevertTx() public returns(string) {
         return testRevert();
-    }    
+    }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

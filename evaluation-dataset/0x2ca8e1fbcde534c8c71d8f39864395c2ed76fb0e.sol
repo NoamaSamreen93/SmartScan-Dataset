@@ -76,7 +76,7 @@ contract StandardToken is ERC20Token {
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
-        } else { return false; 
+        } else { return false;
                 revert();}
     }
 
@@ -114,9 +114,9 @@ contract StandardToken is ERC20Token {
 
 contract ChozunCoin is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function ChozunCoin(){
 
@@ -127,4 +127,15 @@ contract ChozunCoin is StandardToken {
         symbol = "CZN";                               // Set the symbol for display purposes
 
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

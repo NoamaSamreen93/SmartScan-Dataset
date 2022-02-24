@@ -499,10 +499,10 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  function mul(uint256 a, uint256 b) 
-      internal 
-      pure 
-      returns (uint256 c) 
+  function mul(uint256 a, uint256 b)
+      internal
+      pure
+      returns (uint256 c)
   {
     if (a == 0) {
       return 0;
@@ -518,7 +518,7 @@ library SafeMath {
   function sub(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256) 
+      returns (uint256)
   {
     require(b <= a, "SafeMath sub failed");
     return a - b;
@@ -530,30 +530,30 @@ library SafeMath {
   function add(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256 c) 
+      returns (uint256 c)
   {
     c = a + b;
     require(c >= a, "SafeMath add failed");
     return c;
   }
-  
+
   /**
     * @dev gives square root of given x.
     */
   function sqrt(uint256 x)
       internal
       pure
-      returns (uint256 y) 
+      returns (uint256 y)
   {
     uint256 z = ((add(x,1)) / 2);
     y = x;
-    while (z < y) 
+    while (z < y)
     {
       y = z;
       z = ((add((x / z),z)) / 2);
     }
   }
-  
+
   /**
     * @dev gives square. batchplies x by x
     */
@@ -564,20 +564,20 @@ library SafeMath {
   {
     return (mul(x,x));
   }
-  
+
   /**
-    * @dev x to the power of y 
+    * @dev x to the power of y
     */
   function pwr(uint256 x, uint256 y)
-      internal 
-      pure 
+      internal
+      pure
       returns (uint256)
   {
     if (x==0)
         return (0);
     else if (y==0)
         return (1);
-    else 
+    else
     {
       uint256 z = x;
       for (uint256 i=1; i < y; i++)
@@ -613,14 +613,14 @@ interface INFTsCrowdsale {
 
   function batchNewAuctions(uint128[] prices, uint256[] tokenIds, uint256[] startAts, uint256[] endAts) external;
 
-  function payByEth (uint256 tokenId) external payable; 
+  function payByEth (uint256 tokenId) external payable;
 
   function payByErc20 (uint256 tokenId) external;
 
   function cancelAuction (uint256 tokenId) external;
 
   function batchCancelAuctions (uint256[] tokenIds) external;
-  
+
   /* Events */
 
   event NewAuction (
@@ -644,7 +644,7 @@ interface INFTsCrowdsale {
   event PayByErc20 (
     bytes32 id,
     address indexed seller,
-    address indexed buyer, 
+    address indexed buyer,
     uint256 price,
     uint256 endAt,
     uint256 indexed tokenId
@@ -675,11 +675,11 @@ contract NFTsCrowdsaleBase is Superuser, INFTsCrowdsale {
     uint256 price; // eth in wei
     uint256 startAt; //  Auction startAt
     uint256 endAt; //  Auction endAt
-    uint256 tokenId; // ERC721 tokenId 
+    uint256 tokenId; // ERC721 tokenId
   }
 
   mapping (uint256 => Auction) tokenIdToAuction;
-  
+
   constructor(address _erc721Address,address _erc20Address, uint _eth2erc20) public {
     erc721Contract = ERC721(_erc721Address);
     erc20Contract = ERC20(_erc20Address);
@@ -741,7 +741,7 @@ contract NFTsCrowdsaleBase is Superuser, INFTsCrowdsale {
     bytes32 auctionId = keccak256(
       abi.encodePacked(block.timestamp, _seller, _tokenId, _price)
     );
-    
+
     Auction memory _order = Auction(
       auctionId,
       _seller,
@@ -798,7 +798,7 @@ contract NFTsCrowdsaleBase is Superuser, INFTsCrowdsale {
     emit PayByErc20(_auction.id, _auction.seller, msg.sender, _auction.price, _auction.endAt, _auction.tokenId);
     delete tokenIdToAuction[_tokenId];
   }
-  
+
 }
 
 // File: contracts/crowdsale/Pausable.sol
@@ -875,7 +875,7 @@ contract Pausable is Ownable {
 
 contract NFTsCrowdsale is NFTsCrowdsaleBase, Pausable {
 
-  constructor(address erc721Address, address erc20Address, uint eth2erc20) public 
+  constructor(address erc721Address, address erc20Address, uint eth2erc20) public
   NFTsCrowdsaleBase(erc721Address, erc20Address, eth2erc20){}
 
   /**
@@ -893,7 +893,7 @@ contract NFTsCrowdsale is NFTsCrowdsaleBase, Pausable {
   }
 
   /**
-   * @dev batch New Auctions 
+   * @dev batch New Auctions
    * @param prices Array price in wei
    * @param tokenIds Array Tavern's tokenid
    * @param endAts  Array auction end time
@@ -911,7 +911,7 @@ contract NFTsCrowdsale is NFTsCrowdsaleBase, Pausable {
    * @param tokenId tavern tokenid
    */
   function payByEth (uint256 tokenId) whenNotPaused external payable {
-    _payByEth(tokenId); 
+    _payByEth(tokenId);
   }
 
   /**
@@ -941,4 +941,20 @@ contract NFTsCrowdsale is NFTsCrowdsaleBase, Pausable {
       i += 1;
     }
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

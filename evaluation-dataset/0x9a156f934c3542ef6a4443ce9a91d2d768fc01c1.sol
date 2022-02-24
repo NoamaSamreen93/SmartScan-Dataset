@@ -23,7 +23,7 @@ contract SafeMath {
         assert(z >= x);
         return z;
     }
-	
+
 	/**
     * @dev Integer division of two numbers, reverts on division by zero.
     */
@@ -31,15 +31,15 @@ contract SafeMath {
         uint256 z = x / y;
         return z;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
-    */	
-    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
+    */
+    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
         if (x == 0) {
             return 0;
         }
-    
+
         uint256 z = x * y;
         assert(z / x == y);
         return z;
@@ -52,16 +52,16 @@ contract SafeMath {
         if (x == 0) {
             return 0;
         }
-        
+
         uint256 z = x * y;
-        assert(z / x == y);    
+        assert(z / x == y);
         z = z / 10000; // percent to hundredths
         return z;
     }
 
     /**
     * @dev Returns the minimum value of two numbers.
-    */	
+    */
     function min(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x <= y ? x : y;
         return z;
@@ -78,7 +78,7 @@ contract SafeMath {
 
 
 /**
- * @title DAppDEXI - Interface 
+ * @title DAppDEXI - Interface
  */
 interface DAppDEXI {
 
@@ -90,7 +90,7 @@ interface DAppDEXI {
     function getFeeMake(uint256 type_ ) external view returns(uint256);
     function getFeeTake(uint256 type_ ) external view returns(uint256);
     function changeFeeAccount(address feeAccount_) external;
-    
+
     function setWhitelistTokens(address token) external;
     function setWhitelistTokens(address token, bool active, uint256 timestamp, bytes32 typeERC) external;
     function depositToken(address token, uint amount) external;
@@ -102,7 +102,7 @@ interface DAppDEXI {
     function balanceOf(address token, address user) external view returns (uint);
 
     function order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce) external;
-    function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) external;    
+    function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) external;
     function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) external;
     function testTrade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount, address sender) external view returns(bool);
     function availableVolume(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) external view returns(uint);
@@ -120,11 +120,11 @@ interface ERC20I {
 
   function totalSupply() external view returns (uint256);
   function transfer(address _to, uint256 _value) external returns (bool success);
-  
+
   function allowance(address _owner, address _spender) external view returns (uint256);
   function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
   function approve(address _spender, uint256 _value) external returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -134,12 +134,12 @@ interface ERC20I {
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -161,7 +161,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -180,7 +180,7 @@ contract Ownable {
 /**
  * @title SDADI - Interface
  */
-interface SDADI  {	
+interface SDADI  {
   function AddToken(address token) external;
   function DelToken(address token) external;
 }
@@ -189,10 +189,10 @@ interface SDADI  {
 /**
  * @title Standard ERC20 token + balance on date
  * @dev Implementation of the basic standard token.
- * @dev https://github.com/ethereum/EIPs/issues/20 
+ * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20Base is ERC20I, SafeMath {
-	
+
   uint256 totalSupply_;
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
@@ -205,40 +205,40 @@ contract ERC20Base is ERC20I, SafeMath {
   mapping (address => bool) public ownersIndex;
 
   struct _Prop {
-    uint propID;          // proposal ID in DAO    
+    uint propID;          // proposal ID in DAO
     uint endTime;         // end time of voting
   }
-  
+
   _Prop[] public ActiveProposals;  // contains active proposals
 
   // contains voted Tokens on proposals
   mapping (uint => mapping (address => uint)) public voted;
 
-  /** 
+  /**
    * @dev Total Supply
-   * @return totalSupply_ 
-   */  
+   * @return totalSupply_
+   */
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
-  /** 
+
+  /**
    * @dev Tokens balance
    * @param _owner holder address
-   * @return balance amount 
+   * @return balance amount
    */
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
 
-  /** 
+  /**
    * @dev Balance of tokens on date
    * @param _owner holder address
-   * @return balance amount 
+   * @return balance amount
    */
   function balanceOf(address _owner, uint _date) public view returns (uint256) {
     require(_date >= start);
-    uint256 N1 = (_date - start) / period + 1;    
+    uint256 N1 = (_date - start) / period + 1;
 
     uint256 N2 = 1;
     if (block.timestamp > start) {
@@ -258,7 +258,7 @@ contract ERC20Base is ERC20I, SafeMath {
     return uint256(B);
   }
 
-  /** 
+  /**
    * @dev Tranfer tokens to address
    * @param _to dest address
    * @param _value tokens amount
@@ -282,7 +282,7 @@ contract ERC20Base is ERC20I, SafeMath {
       ownersIndex[_to] = true;
       owners.push(_to);
     }
-    
+
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
 
@@ -293,12 +293,12 @@ contract ERC20Base is ERC20I, SafeMath {
 
     ChangeOverPeriod[msg.sender][N] = ChangeOverPeriod[msg.sender][N] - int256(_value);
     ChangeOverPeriod[_to][N] = ChangeOverPeriod[_to][N] + int256(_value);
-   
+
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
 
-  /** 
+  /**
    * @dev Token allowance
    * @param _owner holder address
    * @param _spender spender address
@@ -308,7 +308,7 @@ contract ERC20Base is ERC20I, SafeMath {
     return allowed[_owner][_spender];
   }
 
-  /**    
+  /**
    * @dev Transfer tokens from one address to another
    * @param _from source address
    * @param _to dest address
@@ -326,20 +326,20 @@ contract ERC20Base is ERC20I, SafeMath {
         }
       }
     }
-    
+
     require(safeSub(balances[_from], lock) >= _value);
-    
+
     require(allowed[_from][msg.sender] >= _value);
 
     if (ownersIndex[_to] == false && _value > 0) {
       ownersIndex[_to] = true;
       owners.push(_to);
     }
-    
+
     balances[_from] = safeSub(balances[_from], _value);
     balances[_to] = safeAdd(balances[_to], _value);
     allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
-    
+
     uint256 N = 1;
     if (block.timestamp > start) {
       N = (block.timestamp - start) / period + 1;
@@ -351,25 +351,25 @@ contract ERC20Base is ERC20I, SafeMath {
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
-  /** 
+
+  /**
    * @dev Approve transfer
    * @param _spender holder address
    * @param _value tokens amount
-   * @return result  
+   * @return result
    */
   function approve(address _spender, uint256 _value) public returns (bool success) {
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     allowed[msg.sender][_spender] = _value;
-    
+
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
-  /** 
+  /**
    * @dev Trim owners with zero balance
    */
-  function trim(uint offset, uint limit) external returns (bool) { 
+  function trim(uint offset, uint limit) external returns (bool) {
     uint k = offset;
     uint ln = limit;
     while (k < ln) {
@@ -412,11 +412,11 @@ contract ERC20Base is ERC20I, SafeMath {
       if (ActiveProposals[k].propID == _propID) {
         require(ActiveProposals[k].endTime < now);
         ActiveProposals[k] = ActiveProposals[ActiveProposals.length-1];
-        ActiveProposals.length = ActiveProposals.length-1;   
+        ActiveProposals.length = ActiveProposals.length-1;
       } else {
         k++;
       }
-    }    
+    }
   }
 
   function getVoted(uint _propID, address _voter) external view returns (uint) {
@@ -434,16 +434,16 @@ contract Dividends is ERC20Base, Ownable {
 
   address[] public tokens;
   mapping (address => uint) public tokensIndex;
-  
+
   mapping (uint => mapping (address => uint)) public dividends;
-  mapping (address => mapping (address => uint)) public ownersbal;  
+  mapping (address => mapping (address => uint)) public ownersbal;
   mapping (uint => mapping (address => mapping (address => bool))) public AlreadyReceived;
 
   uint public multiplier = 100000; // precision to ten thousandth percent (0.001%)
 
   event Payment(address indexed sender, uint amount);
   event setDEXContractEvent(address dex);
-   
+
   function AddToken(address token) public {
     require(msg.sender == address(DEX));
     tokens.push(token);
@@ -452,7 +452,7 @@ contract Dividends is ERC20Base, Ownable {
 
   function DelToken(address token) public {
     require(msg.sender == address(DEX));
-    require(tokens[tokensIndex[token]] != 0);    
+    require(tokens[tokensIndex[token]] != 0);
     tokens[tokensIndex[token]] = tokens[tokens.length-1];
     tokens.length = tokens.length-1;
   }
@@ -463,9 +463,9 @@ contract Dividends is ERC20Base, Ownable {
     require (offset < limit);
 
     uint N = (block.timestamp - start) / period;
-    
+
     require (N > 0);
-    
+
     for (uint k = offset; k < limit; k++) {
       if(dividends[N][tokens[k]] == 0 ) {
           uint amount = DEX.balanceOf(tokens[k], address(this));
@@ -483,7 +483,7 @@ contract Dividends is ERC20Base, Ownable {
   function () public payable {
       emit Payment(msg.sender, msg.value);
   }
-  
+
   // PayDividends to owners
   function PayDividends(address token, uint offset, uint limit) external {
     //require (address(this).balance > 0);
@@ -492,7 +492,7 @@ contract Dividends is ERC20Base, Ownable {
 
     uint N = (block.timestamp - start) / period; // current - 1
     uint date = start + N * period - 1;
-    
+
     require(dividends[N][token] > 0);
 
     uint share = 0;
@@ -504,7 +504,7 @@ contract Dividends is ERC20Base, Ownable {
 
         share = safePerc(dividends[N][token], share);
         share = safeDiv(share, safeDiv(multiplier, 100));  // safeDiv(multiplier, 100) - convert to hundredths
-        
+
         ownersbal[owners[k]][token] = safeAdd(ownersbal[owners[k]][token], share);
         AlreadyReceived[N][token][owners[k]] = true;
       }
@@ -519,21 +519,21 @@ contract Dividends is ERC20Base, Ownable {
     uint date = start + N * period - 1;
 
     require(dividends[N][token] > 0);
-    
-    if (!AlreadyReceived[N][token][msg.sender]) {      
+
+    if (!AlreadyReceived[N][token][msg.sender]) {
       uint share = safeMul(balanceOf(msg.sender, date), multiplier);
       share = safeDiv(safeMul(share, 100), totalSupply_); // calc the percentage of the totalSupply_ (from 100%)
 
       share = safePerc(dividends[N][token], share);
       share = safeDiv(share, safeDiv(multiplier, 100));  // safeDiv(multiplier, 100) - convert to hundredths
-        
+
       ownersbal[msg.sender][token] = safeAdd(ownersbal[msg.sender][token], share);
       AlreadyReceived[N][token][msg.sender] = true;
     }
   }
 
   // withdraw dividends
-  function withdraw(address token, uint _value) external {    
+  function withdraw(address token, uint _value) external {
     require(ownersbal[msg.sender][token] >= _value);
     ownersbal[msg.sender][token] = safeSub(ownersbal[msg.sender][token], _value);
     if (token == address(0)) {
@@ -542,26 +542,26 @@ contract Dividends is ERC20Base, Ownable {
       ERC20I(token).transfer(msg.sender, _value);
     }
   }
-  
+
   // withdraw dividends to address
-  function withdraw(address token, uint _value, address _receiver) external {    
+  function withdraw(address token, uint _value, address _receiver) external {
     require(ownersbal[msg.sender][token] >= _value);
     ownersbal[msg.sender][token] = safeSub(ownersbal[msg.sender][token], _value);
     if (token == address(0)) {
       _receiver.transfer(_value);
     } else {
       ERC20I(token).transfer(_receiver, _value);
-    }    
+    }
   }
 
   function setMultiplier(uint _value) external onlyOwner {
     require(_value > 0);
     multiplier = _value;
   }
-  
+
   function getMultiplier() external view returns (uint ) {
     return multiplier;
-  }  
+  }
 
   // link to DEX contract
   function setDEXContract(address _contract) external onlyOwner {
@@ -577,7 +577,7 @@ contract Dividends is ERC20Base, Ownable {
 interface CommonI {
     function transferOwnership(address _newOwner) external;
     function acceptOwnership() external;
-    function updateAgent(address _agent, bool _state) external;    
+    function updateAgent(address _agent, bool _state) external;
 }
 
 
@@ -587,7 +587,7 @@ interface CommonI {
 contract DAO is Dividends {
 
     //minimum balance for adding proposal - default 10000 tokens
-    uint minBalance = 1000000000000; 
+    uint minBalance = 1000000000000;
     // minimum quorum - number of votes must be more than minimum quorum
     uint public minimumQuorum;
     // debating period duration
@@ -608,7 +608,7 @@ contract DAO is Dividends {
         uint votesSupport;
         // against votes
         uint votesAgainst;
-        
+
         // the address where the `amount` will go to if the proposal is accepted
         address recipient;
         // the amount to transfer to `recipient` if the proposal is accepted.
@@ -626,7 +626,7 @@ contract DAO is Dividends {
 
     event ProposalAdded(uint proposalID, address recipient, uint amount, string description, string fullDescHash);
     event Voted(uint proposalID, bool position, address voter, string justification);
-    event ProposalTallied(uint proposalID, uint votesSupport, uint votesAgainst, uint quorum, bool active);    
+    event ProposalTallied(uint proposalID, uint votesSupport, uint votesAgainst, uint quorum, bool active);
     event ChangeOfRules(uint newMinimumQuorum, uint newdebatingPeriodDuration, uint newRequisiteMajority);
     event Payment(address indexed sender, uint amount);
 
@@ -676,7 +676,7 @@ contract DAO is Dividends {
             _debatingPeriodDuration = debatingPeriodDuration;
         }
 
-        Proposals.push(_Proposal({      
+        Proposals.push(_Proposal({
             endTimeOfVoting: now + _debatingPeriodDuration * 1 minutes,
             executed: false,
             proposalPassed: false,
@@ -689,7 +689,7 @@ contract DAO is Dividends {
             desc: _desc,
             fullDescHash: _fullDescHash
         }));
-        
+
         // add proposal in ERC20 base contract for block transfer
         super.addProposal(Proposals.length-1, Proposals[Proposals.length-1].endTimeOfVoting);
 
@@ -709,7 +709,7 @@ contract DAO is Dividends {
     function checkProposalCode(uint _proposalID, address _recipient, uint _amount, bytes _transactionByteCode) view public returns (bool) {
         require(Proposals[_proposalID].recipient == _recipient);
         require(Proposals[_proposalID].amount == _amount);
-        // compare ByteCode        
+        // compare ByteCode
         return Proposals[_proposalID].transactionHash == keccak256(abi.encodePacked(_recipient, _amount, _transactionByteCode));
     }
 
@@ -724,7 +724,7 @@ contract DAO is Dividends {
      */
     function vote(uint _proposalID, bool _supportsProposal, string _justificationText) onlyMembers public returns (uint) {
         // Get the proposal
-        _Proposal storage p = Proposals[_proposalID]; 
+        _Proposal storage p = Proposals[_proposalID];
         require(now <= p.endTimeOfVoting);
 
         // get numbers of votes for msg.sender
@@ -735,13 +735,13 @@ contract DAO is Dividends {
 
         // Increase the number of votes
         p.numberOfVotes = p.numberOfVotes + votes;
-        
+
         if (_supportsProposal) {
             p.votesSupport = p.votesSupport + votes;
         } else {
             p.votesAgainst = p.votesAgainst + votes;
         }
-        
+
         emit Voted(_proposalID, _supportsProposal, msg.sender, _justificationText);
         return p.numberOfVotes;
     }
@@ -775,7 +775,7 @@ contract DAO is Dividends {
 
         // delete proposal from active list
         super.delProposal(_proposalID);
-       
+
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
     }
@@ -783,7 +783,7 @@ contract DAO is Dividends {
     // function is needed if execution transactionByteCode in Proposal failed
     function delActiveProposal(uint _proposalID) public onlyOwner {
         // delete proposal from active list
-        super.delProposal(_proposalID);   
+        super.delProposal(_proposalID);
     }
 
     /**
@@ -798,11 +798,11 @@ contract DAO is Dividends {
      * @dev Accept transferOwnership on a this (DAO) contract
      */
     function acceptOwnership(address _contract) public onlyOwner {
-        CommonI(_contract).acceptOwnership();        
+        CommonI(_contract).acceptOwnership();
     }
 
     function updateAgent(address _contract, address _agent, bool _state) public onlyOwner {
-        CommonI(_contract).updateAgent(_agent, _state);        
+        CommonI(_contract).updateAgent(_agent, _state);
     }
 
     /**
@@ -823,20 +823,20 @@ contract Agent is Ownable {
   address public defAgent;
 
   mapping(address => bool) public Agents;
-  
-  constructor() public {    
+
+  constructor() public {
     Agents[msg.sender] = true;
   }
-  
+
   modifier onlyAgent() {
     assert(Agents[msg.sender]);
     _;
   }
-  
+
   function updateAgent(address _agent, bool _status) public onlyOwner {
     assert(_agent != address(0));
     Agents[_agent] = _status;
-  }  
+  }
 }
 
 
@@ -844,7 +844,7 @@ contract Agent is Ownable {
  * @title SDAD - ERC20 Token based on ERC20Base, DAO, Dividends smart contracts
  */
 contract SDAD is SDADI, DAO {
-	
+
   uint public initialSupply = 10 * 10**6; // 10 million tokens
   uint public decimals = 8;
 
@@ -866,7 +866,7 @@ contract SDAD is SDADI, DAO {
     totalSupply_ = initialSupply*10**decimals;
 
     // creating initial tokens
-    balances[_dexowner] = totalSupply_;    
+    balances[_dexowner] = totalSupply_;
     emit Transfer(0x0, _dexowner, balances[_dexowner]);
 
     ownersIndex[_dexowner] = true;
@@ -883,7 +883,7 @@ contract SDAD is SDADI, DAO {
     // add ETH
     tokens.push(address(0));
     tokensIndex[address(0)] = tokens.length-1;
-  } 
+  }
 
   /**
   * Owner can update token information here.
@@ -906,7 +906,7 @@ contract SDAD is SDADI, DAO {
   */
   function setPeriod(uint _period) public onlyOwner {
     period = _period;
-    emit UpdatedPeriod(_period);    
+    emit UpdatedPeriod(_period);
   }
 
   /**
@@ -917,4 +917,13 @@ contract SDAD is SDADI, DAO {
     owner = address(this);
     emit OwnershipTransferred(msg.sender, address(this));
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

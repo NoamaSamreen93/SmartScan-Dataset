@@ -58,7 +58,7 @@ library SafeMath {
 contract MultiOwnable {
   address public root;
   mapping (address => address) public owners; // owner => parent of owner
-  
+
   /**
   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
   * account.
@@ -67,7 +67,7 @@ contract MultiOwnable {
     root = msg.sender;
     owners[root] = root;
   }
-  
+
   /**
   * @dev Throws if called by any account other than the owner.
   */
@@ -75,7 +75,7 @@ contract MultiOwnable {
     require(owners[msg.sender] != 0);
     _;
   }
-  
+
   /**
   * @dev Adding new owners
   */
@@ -84,7 +84,7 @@ contract MultiOwnable {
     owners[_owner] = msg.sender;
     return true;
   }
-  
+
   /**
     * @dev Deleting owners
     */
@@ -360,7 +360,7 @@ contract HUMToken is MintableToken, BurnableToken {
   uint256 public constant INITIAL_SUPPLY = 2500 * 1000 * 1000 * (10 ** uint256(decimals)); // 2,500,000,000 HUM
 
   bool public isUnlocked = false;
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -382,7 +382,7 @@ contract HUMToken is MintableToken, BurnableToken {
   function transfer(address _to, uint256 _value) public onlyTransferable returns (bool) {
       return super.transfer(_to, _value);
   }
-  
+
   function unlockTransfer() public onlyOwner {
       isUnlocked = true;
   }
@@ -570,7 +570,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -705,7 +705,7 @@ contract WhitelistedCrowdsale is Crowdsale, MultiOwnable {
 
 
 contract HUMPresale is WhitelistedCrowdsale, IndividuallyCappedCrowdsale {
-  
+
   uint256 public constant minimum = 100000000000000000; // 0.1 ether
   bool public isOnSale = false;
 
@@ -722,11 +722,11 @@ contract HUMPresale is WhitelistedCrowdsale, IndividuallyCappedCrowdsale {
     address _wallet,
     HUMToken _token,
     uint256 _individualCapEther
-  ) 
+  )
     public
     Crowdsale(_rate, _wallet, _token)
     IndividuallyCappedCrowdsale(_individualCapEther.mul(10 ** 18))
-  { 
+  {
     bonusPercent = _bonusPercent;
   }
 
@@ -749,7 +749,7 @@ contract HUMPresale is WhitelistedCrowdsale, IndividuallyCappedCrowdsale {
     super._preValidatePurchase(_beneficiary, _weiAmount);
 
     bool isOverMinimum = _weiAmount >= minimum;
-  
+
     require(isOverMinimum && isOnSale);
   }
 
@@ -805,7 +805,7 @@ contract HUMPresale is WhitelistedCrowdsale, IndividuallyCappedCrowdsale {
         count += 1;
       }
     }
-    
+
     address[] memory _bonusList = new address[](count);
     for (i = 0; i < count; i++) {
       _bonusList[i] = contributorsTmp[i];
@@ -829,4 +829,15 @@ contract HUMPresale is WhitelistedCrowdsale, IndividuallyCappedCrowdsale {
     emit DistrubuteBonusTokens(msg.sender);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

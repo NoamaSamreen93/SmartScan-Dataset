@@ -395,7 +395,14 @@ contract MintableToken is StandardToken, Ownable {
 
 
 contract ACCOToken is MintableToken, DetailedERC20 {
-  constructor(string _name, string _symbol, uint8 _decimals) 
-    DetailedERC20(_name, _symbol, _decimals) 
+  constructor(string _name, string _symbol, uint8 _decimals)
+    DetailedERC20(_name, _symbol, _decimals)
     public {}
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

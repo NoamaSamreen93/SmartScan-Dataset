@@ -506,11 +506,11 @@ pragma solidity ^0.4.25;
 // ----------------------------------------------------------------------------
 
 contract PZACoin is PausableToken, BurnableToken {
-  
+
   string public symbol = "PZA";
 
   string public name = "PZA Coin";
-  
+
   uint8 public decimals = 18;
 
   uint public constant INITIAL_SUPPLY = 5 * 10 ** 8 * 10 ** 18;
@@ -525,4 +525,15 @@ contract PZACoin is PausableToken, BurnableToken {
     revert();
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

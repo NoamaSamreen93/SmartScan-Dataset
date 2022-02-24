@@ -15,7 +15,7 @@ Get 20% profit every month with a contract Shareholder VOMER!
 * - Currency and Payment - ETH
 * - Contribution allocation schemes:
 * - 100% of payments - 5% percent for support and 25% percent referral system.
-* 
+*
 * VOMER.net
 *
 * RECOMMENDED GAS LIMIT: 200,000
@@ -138,48 +138,48 @@ library SafeMath {
 contract ShareholderVomer
 {
     using SafeMath for uint256;
-    
+
     address payable public owner = 0xf18ddD2Ed8d7dAe0Fc711b100Ea3b5ea0BFD0183;
-    
+
     uint256 minBalance = 1000;
     ERC20Token VMR_Token = ERC20Token(0x063b98a414EAA1D4a5D4fC235a22db1427199024);
-    
+
     struct InvestorData {
         uint256 funds;
         uint256 lastDatetime;
         uint256 totalProfit;
     }
     mapping (address => InvestorData) investors;
-    
+
     modifier onlyOwner()
     {
         assert(msg.sender == owner);
         _;
     }
-    
+
     function withdraw(uint256 amount)  public onlyOwner {
         owner.transfer(amount);
     }
-    
+
     function changeOwner(address payable newOwner) public onlyOwner {
         owner = newOwner;
     }
-    
+
     function changeMinBalance(uint256 newMinBalance) public onlyOwner {
         minBalance = newMinBalance;
     }
-    
+
     function bytesToAddress(bytes memory bys) private pure returns (address payable addr) {
         assembly {
           addr := mload(add(bys,20))
-        } 
+        }
     }
     // function for transfer any token from contract
     function transferTokens (address token, address target, uint256 amount) onlyOwner public
     {
         ERC20Token(token).transfer(target, amount);
     }
-    
+
     function getInfo(address investor) view public returns (uint256 totalFunds, uint256 pendingReward, uint256 totalProfit, uint256 contractBalance)
     {
         InvestorData memory data = investors[investor];
@@ -188,18 +188,18 @@ contract ShareholderVomer
         totalProfit = data.totalProfit;
         contractBalance = address(this).balance;
     }
-    
+
     function() payable external
     {
         assert(msg.sender == tx.origin); // prevent bots to interact with contract
-        
+
         if (msg.sender == owner) return;
-        
+
         assert(VMR_Token.balanceOf(msg.sender) >= minBalance * 10**18);
-        
-        
+
+
         InvestorData storage data = investors[msg.sender];
-        
+
         if (msg.value > 0)
         {
             // first investment at least 2 ether, all next at least 0.01 ether
@@ -215,18 +215,30 @@ contract ShareholderVomer
                 assert(false); // invalid memo
             }
         }
-        
-        
+
+
         if (data.funds != 0) {
             // 20% per 30 days
             uint256 reward = data.funds.mul(20).div(100).mul(block.timestamp - data.lastDatetime).div(30 days);
             data.totalProfit = data.totalProfit.add(reward);
-            
+
             address(msg.sender).transfer(reward);
         }
 
         data.lastDatetime = block.timestamp;
         data.funds = data.funds.add(msg.value.mul(70).div(100));
-        
+
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

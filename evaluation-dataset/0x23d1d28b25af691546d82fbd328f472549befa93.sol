@@ -30,14 +30,14 @@ contract CertiMe {
         c.amount += msg.value;
     }
 */
-  /*  
+  /*
     function certHashExist(string value) constant returns (uint) {
         for (uint i=1; i<numCerts+1; i++) {
               if(stringsEqual(certificates[i].certHash,value)){
                 return i;
               }
         }
-        
+
         return 0;
     }*/
     function getMatchCountAddress(uint addr_type,address value) public constant returns (uint){
@@ -46,7 +46,7 @@ contract CertiMe {
               if((addr_type==0&&certificates[i].issuer_addr==value)||(addr_type==1&&certificates[i].recepient_addr==value)){
                 counter++;
               }
-        }        
+        }
         return counter;
     }
     function getCertsByIssuer(address value) public constant returns (uint[]) {
@@ -57,7 +57,7 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
     function getCertsByRecepient(address value) public constant returns (uint[]) {
@@ -68,9 +68,9 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
-    }   
+    }
 
     function getMatchCountString(uint string_type,string value) public constant returns (uint){
         uint counter = 0;
@@ -90,10 +90,10 @@ contract CertiMe {
                     counter++;
                 }
               }
-        }        
+        }
         return counter;
     }
-    
+
     function getCertsByProof(string value) public constant returns (uint[]) {
         uint256[] memory matches=new uint[](getMatchCountString(0,value));
         uint matchCount=0;
@@ -102,9 +102,9 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
-    }    
+    }
     function getCertsByVersion(string value) public constant returns (uint[]) {
         uint256[] memory matches=new uint[](getMatchCountString(1,value));
         uint matchCount=0;
@@ -113,7 +113,7 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
     function getCertsByContent(string value) public constant returns (uint[]) {
@@ -124,15 +124,15 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
-    
+
 /*    function getCertIssuer(string key) constant returns (address,address,string,string) {
          return (certHashKey[key].issuer_addr,certHashKey[key].recepient_addr,certHashKey[key].version,certHashKey[key].content);
     }
 */
-    
+
 	function stringsEqual(string storage _a, string memory _b) internal constant returns (bool) {
 		bytes storage a = bytes(_a);
 		bytes memory b = bytes(_b);
@@ -143,6 +143,17 @@ contract CertiMe {
 			if (a[i] != b[i])
 				return false;
 		return true;
-	}    
-    
+	}
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

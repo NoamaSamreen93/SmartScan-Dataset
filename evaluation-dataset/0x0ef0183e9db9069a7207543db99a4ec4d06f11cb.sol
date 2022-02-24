@@ -34,7 +34,7 @@ library SafeMath {
 contract owned {
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -93,7 +93,7 @@ contract Pausable is owned {
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 interface ERC20Token {
 
-  
+
 
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
@@ -112,24 +112,24 @@ interface ERC20Token {
     /// @return Whether the transfer was successful or not
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
 
-    
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
 }
 
 
 
 contract StandardToken is ERC20Token, Pausable {
  using SafeMath for uint;
- 
- /** 
+
+ /**
  Mitigation for short address attack
  */
   modifier onlyPayloadSize(uint size) {
      assert(msg.data.length >= size.add(4));
      _;
-   } 
+   }
 
 /**
   * @dev Transfer token for a specified address
@@ -167,7 +167,7 @@ contract StandardToken is ERC20Token, Pausable {
     function balanceOf(address _owner) view external returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /// @notice `msg.sender` approves `_addr` to spend `_value` tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @param _value The amount of wei to be approved for transfer
@@ -181,7 +181,7 @@ contract StandardToken is ERC20Token, Pausable {
     }
 
 
-   
+
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
     /// @return Amount of remaining tokens allowed to spent
@@ -240,10 +240,10 @@ contract TansalCoin is StandardToken{
 
     /* Public variables of the token */
 
-    
-    string public name;                   
+
+    string public name;
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
-    string public symbol;                 
+    string public symbol;
     string public version = 'V1.0';       //Version 0.1 standard. Just an arbitrary versioning scheme.
     uint256 private fulltoken;
     // This notifies clients about the amount burnt
@@ -254,7 +254,7 @@ contract TansalCoin is StandardToken{
 
     constructor(
         ) public{
-        fulltoken = 700000000;       
+        fulltoken = 700000000;
         decimals = 3;                            // Amount of decimals for display purposes
         _totalSupply = fulltoken.mul(10 ** uint256(decimals)); // Update total supply (100000 for example)
         balances[msg.sender] = _totalSupply;               // Give the creator all initial tokens (100000 for example)
@@ -281,10 +281,10 @@ contract TansalCoin is StandardToken{
             return true;
            }
     }
-    
+
       /// @return total amount of tokens
     function totalSupply() public view returns (uint256 supply){
-        
+
         return _totalSupply;
     }
 
@@ -324,13 +324,13 @@ contract TansalCoin is StandardToken{
     }
      function onlyPayForFuel() public payable onlyOwner{
         // Owner will pay in contract to bear the gas price if transactions made from contract
-        
+
     }
     function withdrawEtherFromcontract(uint _amountInwei) public onlyOwner{
         require(address(this).balance > _amountInwei);
       require(msg.sender == owner);
       owner.transfer(_amountInwei);
-     
+
     }
 	 function withdrawTokensFromContract(uint _amountOfTokens) public onlyOwner{
         require(balances[this] >= _amountOfTokens);
@@ -338,7 +338,7 @@ contract TansalCoin is StandardToken{
 	    balances[msg.sender] = balances[msg.sender].add(_amountOfTokens);                        // adds the amount to owner's balance
         balances[this] = balances[this].sub(_amountOfTokens);                  // subtracts the amount from contract balance
 		emit Transfer(this, msg.sender, _amountOfTokens);               // execute an event reflecting the change
-     
+
     }
      /* Get the contract constant _name */
     function name() public view returns (string _name) {
@@ -354,5 +354,16 @@ contract TansalCoin is StandardToken{
     function decimals() public view returns (uint8 _decimals) {
         return decimals;
     }
-      
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

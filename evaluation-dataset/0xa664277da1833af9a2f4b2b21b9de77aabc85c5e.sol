@@ -50,7 +50,7 @@ contract IERC721 is IERC165 {
      * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to
      * another (`to`).
      *
-     * 
+     *
      *
      * Requirements:
      * - `from`, `to` cannot be zero.
@@ -1005,7 +1005,7 @@ contract SuperplayerRandomEquipment  is Ownable{
     uint weight;
   //  EquipmentPart part;
   //  EquipmentRareness rareness;
-    uint[] randomKeyIds; 
+    uint[] randomKeyIds;
   }
 
 
@@ -1265,8 +1265,8 @@ pblue_shoes_hp[3] = 231;
 pblue_shoes_hp[4] = 231;
 _addEquipToPool("blue_shoes_hp",pblue_shoes_hp,0);
 
-     
-     
+
+
 
   }
   function _initRtables1 () internal {
@@ -1506,4 +1506,13 @@ _addRandomValuesforRTable(222,v222,w222);
   }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

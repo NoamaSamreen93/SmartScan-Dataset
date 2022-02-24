@@ -204,7 +204,7 @@ contract HumanStandardToken is PausableToken {
     }
     string public name;
     uint8 public decimals;
-    string public symbol; 
+    string public symbol;
     string public version = '1.0';
 
     constructor (uint256 _initialAmount, string _tokenName,uint8 _decimalUnits, string _tokenSymbol) internal {
@@ -224,3 +224,14 @@ contract HumanStandardToken is PausableToken {
 }
 
 contract DVPToken is HumanStandardToken(5000000000*(10**18),"Decentralized Vulnerability Platform",18,"DVP") {}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

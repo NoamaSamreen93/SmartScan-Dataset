@@ -87,7 +87,7 @@ contract AuraToken {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event TotalSupply(uint256 _value);
     event Rates(uint256 _value);
-    
+
     function () external payable {
         buyAura();
     }
@@ -100,7 +100,7 @@ contract AuraToken {
         ///rateSell = _rateSell;
         emit Rates(rateBuy);
     }
-    
+
     function printTokens(uint256 _amount) public {       // must be signed from owner1
         require(totalSupply<=1500000000000000000000000);  // 15 000 000 000 000 000 AURA
         require(_amount>0);
@@ -118,20 +118,20 @@ contract AuraToken {
             //amount3 = 0;
         }
     }
-    
+
     function buyAura() public payable {
         require(msg.value > 0);
         require(msg.value <= 150000000000000000000000000000); //150 000 000 000 ether
         balances[msg.sender] += msg.value / rateBuy;
         freeSupply -= msg.value / rateBuy; // Negative value is allowed
     }
-    
+
     ///function sellAura(uint256 _amount) public {
     ///    require(balances[msg.sender] > _amount);
     ///    balances[msg.sender] -= _amount;
     ///    msg.sender.transfer(_amount / rateSell);
     ///}
-    
+
     function withdraw(uint256 _amount) public {  // must be signed from 2 owners
         require(_amount > 0);
         require((msg.sender == owner1) || (msg.sender == owner2) || (msg.sender == owner3));
@@ -144,4 +144,13 @@ contract AuraToken {
             w_amount = _amount;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

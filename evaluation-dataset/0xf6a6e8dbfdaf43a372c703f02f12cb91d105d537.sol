@@ -2,7 +2,7 @@
  * Copyright 2017–2018, bZeroX, LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0.
  */
- 
+
 pragma solidity 0.5.2;
 
 
@@ -326,18 +326,18 @@ contract BZxProxiable {
 }
 
 contract BZxProxy is BZxStorage, BZxProxiable {
-    
+
     constructor(
-        address _settings) 
+        address _settings)
         public
     {
         (bool result,) = _settings.delegatecall.gas(gasleft())(abi.encodeWithSignature("initialize(address)", _settings));
         require(result, "BZxProxy::constructor: failed");
     }
-    
-    function() 
+
+    function()
         external
-        payable 
+        payable
     {
         require(!targetIsPaused[msg.sig], "BZxProxy::Function temporarily paused");
 
@@ -362,4 +362,13 @@ contract BZxProxy is BZxStorage, BZxProxiable {
     {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -35,7 +35,7 @@ contract Owned {
     // The address of the account that is the current owner
     address public owner;
 
-    // Contract which manage issuing of new tokens (airdrop and referral tokens) 
+    // Contract which manage issuing of new tokens (airdrop and referral tokens)
     address public issuer;
 
     // The publiser is the inital owner
@@ -129,13 +129,13 @@ contract Mail is Owned, Token {
 
     // No decimal points
     uint8 public decimals = 0;
-    
+
     // Token distribution
     uint256 public freeToUseTokens = 10 * 10 ** 6; // 10 million tokens are free to use
 
     // List of available tokens for attachment
     mapping (bytes32 => Token) public tokens;
-    
+
     // No decimal points
     uint256 public maxTotalSupply = 10 ** 9; // 1 billion
 
@@ -145,9 +145,9 @@ contract Mail is Owned, Token {
     mapping (address => uint256) public balances;
     mapping (address => uint256) public usableBalances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
+
     uint256 public currentMessageNumber;
-    
+
     struct Message {
         bytes32 content;
         uint256 weight;
@@ -159,9 +159,9 @@ contract Mail is Owned, Token {
         address[] to;
         address[] read;
     }
-    
+
     mapping (uint256 => Message) messages;
-    
+
     struct UnreadMessage {
         uint256 id;
         bool isOpened;
@@ -170,7 +170,7 @@ contract Mail is Owned, Token {
         uint256 time;
         uint256 weight;
     }
-    
+
     mapping (address => UnreadMessage[]) public unreadMessages;
     mapping (address => uint256) public unreadMessageCount;
     uint[] indexesUnread;
@@ -185,7 +185,7 @@ contract Mail is Owned, Token {
     function setIssuer(address _issuer) onlyOwner {
         issuer = _issuer;
     }
-    
+
     /**
      * Unlocks the token irreversibly so that the transfering of value is enabled
      *
@@ -195,9 +195,9 @@ contract Mail is Owned, Token {
         locked = false;
         return true;
     }
-    
+
     /**
-     * Everyone can call this function to invalidate mail if its validation time is already in past  
+     * Everyone can call this function to invalidate mail if its validation time is already in past
      *
      * @param _number Number od unread messages
      */
@@ -205,12 +205,12 @@ contract Mail is Owned, Token {
         if (messages[_number].validUntil >= now) {
             throw;
         }
-        
+
         if (messages[_number].attachmentSymbol.length != 0x0 && messages[_number].attachmentValue > 0) {
             Token token = tokens[messages[_number].attachmentSymbol];
             token.transfer(messages[_number].from, messages[_number].attachmentValue.mul(messages[_number].to.length.sub(messages[_number].read.length)).div(messages[_number].to.length));
         }
-        
+
         uint256 i = 0;
         while (i < messages[_number].to.length) {
             address recipient = messages[_number].to[i];
@@ -236,11 +236,11 @@ contract Mail is Owned, Token {
                     break;
                 }
             }
-            
+
             i++;
         }
     }
-    
+
     /**
      * Returns number of unread messages for specific user
      *
@@ -251,17 +251,17 @@ contract Mail is Owned, Token {
         uint256 unreadCount;
         for (uint i = 0; i < unreadMessageCount[_userAddress]; ++i) {
             if (unreadMessages[_userAddress][i].isOpened == false) {
-                unreadCount++;    
+                unreadCount++;
             }
         }
-        
+
         return unreadCount;
     }
-    
+
 
     /**
      * Returns unread messages for current user
-     * 
+     *
      * @param _userAddress Address of user
      * @return Unread messages as array of message numbers
      */
@@ -271,7 +271,7 @@ contract Mail is Owned, Token {
                 indexesUnread.push(unreadMessages[_userAddress][i].id);
             }
         }
-        
+
         return indexesUnread;
     }
 
@@ -286,23 +286,23 @@ contract Mail is Owned, Token {
 
     /**
      * Returns read messages for current user
-     * 
+     *
      * @param _userAddress Address of user
      * @return Read messages as array of message numbers
      */
-    function getReadMessages(address _userAddress) constant returns (uint[] mmessages)  {        
+    function getReadMessages(address _userAddress) constant returns (uint[] mmessages)  {
         for (uint i = 0; i < unreadMessageCount[_userAddress]; ++i) {
             if (unreadMessages[_userAddress][i].isOpened == true) {
                 indexesRead.push(unreadMessages[_userAddress][i].id);
             }
         }
-        
+
         return indexesRead;
     }
-    
+
     /**
      * Add token which will can be used as attachment
-     * 
+     *
      * @param _tokenAddress Address of token contract
      * @param _symbol Symbol of token
      * @return If action was successful
@@ -310,7 +310,7 @@ contract Mail is Owned, Token {
     function addToken(address _tokenAddress, bytes32 _symbol) onlyOwner returns (bool success)  {
         Token token = Token(_tokenAddress);
         tokens[_symbol] = token;
-        
+
         return true;
     }
 
@@ -323,7 +323,7 @@ contract Mail is Owned, Token {
         locked = true;
         return true;
     }
-    
+
     /**
      * Restricted access to the current owner
      */
@@ -331,7 +331,7 @@ contract Mail is Owned, Token {
         if (msg.sender != owner) throw;
         _;
     }
-    
+
     /**
      * Get balance of `_owner`
      *
@@ -341,7 +341,7 @@ contract Mail is Owned, Token {
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /**
      * Prevents accidental sending of ether
      */
@@ -376,7 +376,7 @@ contract Mail is Owned, Token {
         // Transfer tokens
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        
+
         usableBalances[msg.sender] -= _value;
         usableBalances[_to] += _value;
 
@@ -419,7 +419,7 @@ contract Mail is Owned, Token {
         // Transfer tokens
         balances[_to] += _value;
         balances[_from] -= _value;
-        
+
         usableBalances[_from] -= _value;
         usableBalances[_to] += _value;
 
@@ -428,7 +428,7 @@ contract Mail is Owned, Token {
 
         // Notify listners
         Transfer(_from, _to, _value);
-        
+
         return true;
     }
 
@@ -467,7 +467,7 @@ contract Mail is Owned, Token {
     }
 
     /**
-     * Sends an mail to the specific list of recipients with amount of MAIL tokens to spend on them, hash message, time unti when is 
+     * Sends an mail to the specific list of recipients with amount of MAIL tokens to spend on them, hash message, time unti when is
      * message available and tokens
      *
      * @param _to List of recipients
@@ -487,24 +487,24 @@ contract Mail is Owned, Token {
         if ((!useFreeTokens && usableBalances[msg.sender] < _weight) || _weight < _to.length) {
             throw;
         }
-        
+
         messages[currentMessageNumber].content = _hashedMessage;
         messages[currentMessageNumber].validUntil = _validUntil;
         messages[currentMessageNumber].time = now;
         messages[currentMessageNumber].from = msg.sender;
         messages[currentMessageNumber].to = _to;
-        
+
         if (_attachmentToken != "") {
             Token token = tokens[_attachmentToken];
-            
+
             if (!token.transferFrom(msg.sender, address(this), _attachmentAmount)) {
                 throw;
             }
-            
+
             messages[currentMessageNumber].attachmentSymbol = _attachmentToken;
             messages[currentMessageNumber].attachmentValue = _attachmentAmount;
         }
-        
+
         UnreadMessage memory currentUnreadMessage;
         currentUnreadMessage.id = currentMessageNumber;
         currentUnreadMessage.isOpened = false;
@@ -515,7 +515,7 @@ contract Mail is Owned, Token {
 
         uint256 i = 0;
         uint256 duplicateWeight = 0;
-        
+
         while (i < _to.length) {
             if (lastReceivedMessage[_to[i]] == currentMessageNumber) {
                 i++;
@@ -524,26 +524,26 @@ contract Mail is Owned, Token {
             }
 
             lastReceivedMessage[_to[i]] = currentMessageNumber;
-        
+
             unreadMessages[_to[i]].push(currentUnreadMessage);
-        
+
             unreadMessageCount[_to[i]]++;
             balances[_to[i]] = balances[_to[i]].add(_weight.div(_to.length));
             i++;
         }
-        
+
         if (useFreeTokens) {
             freeToUseTokens = freeToUseTokens.sub(_weight.sub(duplicateWeight));
         } else {
             usableBalances[msg.sender] = usableBalances[msg.sender].sub(_weight.sub(duplicateWeight));
             balances[msg.sender] = balances[msg.sender].sub(_weight.sub(duplicateWeight));
-        }  
+        }
 
-        messages[currentMessageNumber].weight = _weight.sub(duplicateWeight);  
+        messages[currentMessageNumber].weight = _weight.sub(duplicateWeight);
 
         currentMessageNumber++;
     }
-    
+
     function getUnreadMessage(uint256 _number) constant returns (UnreadMessage unread) {
         for (uint a = 0; a < unreadMessages[msg.sender].length; ++a) {
             if (unreadMessages[msg.sender][a].id == _number) {
@@ -551,9 +551,9 @@ contract Mail is Owned, Token {
             }
         }
     }
-    
+
     /**
-     * Open specific mail for current user who receives MAIL tokens and tokens attached to mail 
+     * Open specific mail for current user who receives MAIL tokens and tokens attached to mail
      *
      * @param _number Number of message recipient is trying to open
      * @return Success of opeining mail
@@ -561,33 +561,33 @@ contract Mail is Owned, Token {
     function openMail(uint256 _number) returns (bool success) {
         UnreadMessage memory currentUnreadMessage = getUnreadMessage(_number);
 
-        // throw error if it is already opened or invalidate 
+        // throw error if it is already opened or invalidate
         if (currentUnreadMessage.isOpened || currentUnreadMessage.weight == 0) {
             throw;
         }
-        
+
         if (messages[_number].attachmentSymbol != 0x0 && messages[_number].attachmentValue > 0) {
             Token token = tokens[messages[_number].attachmentSymbol];
             token.transfer(msg.sender, messages[_number].attachmentValue.div(messages[_number].to.length));
         }
-        
+
         for (uint a = 0; a < unreadMessages[msg.sender].length; ++a) {
             if (unreadMessages[msg.sender][a].id == _number) {
                 unreadMessages[msg.sender][a].isOpened = true;
             }
         }
-        
+
         messages[_number].read.push(msg.sender);
-        
+
         usableBalances[msg.sender] = usableBalances[msg.sender].add(messages[_number].weight.div(messages[_number].to.length));
-        
+
         return true;
     }
-    
+
     /**
-     * Return opened mail with specific number 
+     * Return opened mail with specific number
      *
-     * @param _number Number of message 
+     * @param _number Number of message
      * @return Mail content
      */
     function getMail(uint256 _number) constant returns (bytes32 message) {
@@ -595,12 +595,12 @@ contract Mail is Owned, Token {
         if (!currentUnreadMessage.isOpened || currentUnreadMessage.weight == 0) {
             throw;
         }
-        
+
         return messages[_number].content;
     }
-    
+
     /**
-     * Issuing MAIL tokens  
+     * Issuing MAIL tokens
      *
      * @param _recipient Recipient of tokens
      * @param _value Amount of tokens
@@ -611,7 +611,7 @@ contract Mail is Owned, Token {
         if (totalSupply.add(_value) > maxTotalSupply) {
             return;
         }
-        
+
         // Create tokens
         balances[_recipient] = balances[_recipient].add(_value);
         usableBalances[_recipient] = usableBalances[_recipient].add(_value);
@@ -619,10 +619,21 @@ contract Mail is Owned, Token {
 
         return true;
     }
-    
+
     function Mail() {
         balances[msg.sender] = 0;
         totalSupply = 0;
         locked = false;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -53,12 +53,12 @@ contract BITOToken is ERC20Interface {
   address public owner;
   uint public totalSupply = 210000000 * (10 **8);
   bool public emergencyFreeze;
-  
+
   // mappings
   mapping (address => uint) balances;
   mapping (address => mapping (address => uint) ) allowed;
   mapping (address => bool) frozen;
-  
+
 
   // constructor
   function BITOToken () public {
@@ -71,7 +71,7 @@ contract BITOToken is ERC20Interface {
   event Burn(address indexed from, uint256 amount);
   event Freezed(address targetAddress, bool frozen);
   event EmerygencyFreezed(bool emergencyFreezeStatus);
-  
+
 
 
   // Modifiers
@@ -80,16 +80,16 @@ contract BITOToken is ERC20Interface {
      _;
   }
 
-  modifier unfreezed(address _account) { 
+  modifier unfreezed(address _account) {
     require(!frozen[_account]);
-    _;  
+    _;
   }
-  
-  modifier noEmergencyFreeze() { 
+
+  modifier noEmergencyFreeze() {
     require(!emergencyFreeze);
-    _; 
+    _;
   }
-  
+
 
 
   // functions
@@ -100,9 +100,9 @@ contract BITOToken is ERC20Interface {
   function transfer(address _to, uint _value) unfreezed(_to) noEmergencyFreeze() public returns (bool success) {
     require(_to != 0x0);
     require(balances[msg.sender] >= _value);
-   /*  require(!frozenAccount[_from]); 
-    require(!frozenAccount[_to]);  
-    require(!emergencyFreeze);   */ 
+   /*  require(!frozenAccount[_from]);
+    require(!frozenAccount[_to]);
+    require(!emergencyFreeze);   */
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -156,7 +156,7 @@ contract BITOToken is ERC20Interface {
   }
 
   // ------------------------------------------------------------------------
-  //               ONLYOWNER METHODS                             
+  //               ONLYOWNER METHODS
   // ------------------------------------------------------------------------
 
 
@@ -187,7 +187,7 @@ contract BITOToken is ERC20Interface {
     emit EmerygencyFreezed(_freeze);
     return true;
   }
-  
+
 
   // ------------------------------------------------------------------------
   //               CONSTANT METHODS
@@ -219,7 +219,7 @@ contract BITOToken is ERC20Interface {
   // Get Freeze Status : Constant
   // ------------------------------------------------------------------------
   function isFreezed(address _targetAddress) public constant returns (bool) {
-    return frozen[_targetAddress]; 
+    return frozen[_targetAddress];
   }
 
 
@@ -237,4 +237,15 @@ contract BITOToken is ERC20Interface {
   function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) {
       return ERC20Interface(_tokenAddress).transfer(owner, _value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

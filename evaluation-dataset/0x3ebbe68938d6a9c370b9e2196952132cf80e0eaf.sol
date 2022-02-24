@@ -812,6 +812,19 @@ contract Frethan is ERC20Detailed, ERC20, ERC20Mintable, ERC20Burnable, ERC20Cap
           _mint(msg.sender, initialSupply);
 
         }
-        
+
 
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
+}

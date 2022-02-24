@@ -854,7 +854,7 @@ pragma solidity ^0.5.0;
 contract XSRToken is ERC20Detailed, ERC20, ERC20Mintable, ERC20Pausable, ERC20Burnable, Ownable {
 
     using SafeMath for uint256;
-    
+
     constructor (
             string memory name,
             string memory symbol,
@@ -864,4 +864,13 @@ contract XSRToken is ERC20Detailed, ERC20, ERC20Mintable, ERC20Pausable, ERC20Bu
     public {
         _mint(owner(), totalSupply * 10**uint(decimals));
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

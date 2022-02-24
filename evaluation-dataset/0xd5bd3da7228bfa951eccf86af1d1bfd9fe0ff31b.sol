@@ -205,11 +205,11 @@ interface RegistryInterface {
     function registerDerivative(address[] calldata counterparties, address derivativeAddress) external;
 
     // Adds a new derivative creator to this list of authorized creators. Only the owner of this contract can call
-    // this method.   
+    // this method.
     function addDerivativeCreator(address derivativeCreator) external;
 
     // Removes a derivative creator to this list of authorized creators. Only the owner of this contract can call this
-    // method.  
+    // method.
     function removeDerivativeCreator(address derivativeCreator) external;
 
     // Returns whether the derivative has been registered with the registry (and is therefore an authorized participant
@@ -410,4 +410,13 @@ contract CentralizedOracle is OracleInterface, Withdrawable, Testable {
     }
 
     event AddSupportedIdentifier(bytes32 indexed identifier);
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

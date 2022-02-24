@@ -45,14 +45,14 @@ contract owned {
 }
 
 contract FSCToken is owned {
-    
+
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
-    uint8 public decimals = 6; 
+    uint8 public decimals = 6;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) allowance;
 
@@ -62,9 +62,9 @@ contract FSCToken is owned {
 
     //Token Basic
     constructor() public {
-        totalSupply = 1e8 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                   
-        name = "Four S Coin";                                      
+        totalSupply = 1e8 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "Four S Coin";
         symbol = "FSC";
     }
 
@@ -103,17 +103,17 @@ contract FSCToken is owned {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowancecheck(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowance[_owner][_spender];
     }
-    
+
     function increaseApproval (address _spender, uint _addedValue) public returns (bool success) {
         allowance[msg.sender][_spender] = allowance[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowance[msg.sender][_spender]);
         return true;
     }
-    
+
     function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowance[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
@@ -134,17 +134,17 @@ contract FSCToken is owned {
     }
 
     function burnToken(uint256 burnAmount)onlyOwner public returns (bool success) {
-        require(balanceOf[msg.sender] >= burnAmount);   
+        require(balanceOf[msg.sender] >= burnAmount);
         uint burn=burnAmount.mul(1e6);
-        balanceOf[owner] -= burn;            
-        totalSupply -= burn;                      
+        balanceOf[owner] -= burn;
+        totalSupply -= burn;
         emit Burn(owner, burnAmount);
         return true;
     }
-    
+
     mapping(bytes => bool) signatures;
     event TransferPreSigned(address indexed from, address indexed to, address indexed delegate, uint256 amount, uint256 fee);
-    
+
     //transferPreSigned
     function transferPreSigned(
     bytes memory _signature,
@@ -152,7 +152,7 @@ contract FSCToken is owned {
     uint256 _value,
     uint256 _fee,
     uint _nonc)public returns (bool)
-    
+
     {
         require(_to != address(0));
         require(signatures[_signature] == false);
@@ -168,7 +168,7 @@ contract FSCToken is owned {
         emit TransferPreSigned(from, _to, msg.sender, _value, _fee);
         return true;
     }
-    
+
     function transferPreSignedHashing(
         address _token,
         address _to,
@@ -183,7 +183,7 @@ contract FSCToken is owned {
         /* "48664c16": transferPreSignedHashing(address,address,address,uint256,uint256,uint256) */
         return (keccak256(abi.encodePacked(bytes4(0x48664c16), _token, _to, _value, _fee,_nonc)));
     }
-    
+
     function recover(bytes32 hash, bytes memory sig) public pure returns (address) {
       bytes32  r;
       bytes32  s;
@@ -209,4 +209,13 @@ contract FSCToken is owned {
         return ecrecover(hash, v, r, s);
       }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

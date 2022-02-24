@@ -1,5 +1,5 @@
 /**
- * The OGXNext "Orgura Exchange" token contract bases on the ERC20 standard token contracts 
+ * The OGXNext "Orgura Exchange" token contract bases on the ERC20 standard token contracts
  * OGX Coin ICO. (Orgura group)
  * authors: Roongrote Suranart
  * */
@@ -234,13 +234,13 @@ contract StandardToken is ERC20, BasicToken {
 
 contract Owned {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     function Owned() public {
         owner = msg.sender;
     }
-    
+
     /**
     * @dev Allows the current owner to transfer control of the contract to a newOwner.
     * @param newOwner The address to transfer ownership to.
@@ -294,10 +294,10 @@ contract OrguraExchange is StandardToken, Owned {
 
     /// Token trading opening time (14.07.2018)
     uint64 private constant date14July2018 = 1531526400;
-    
+
     /// token caps for each round
     uint256[5] private roundCaps = [
-        50000000* 10**uint256(decimals), // Sale Seed 50M  
+        50000000* 10**uint256(decimals), // Sale Seed 50M
         50000000* 10**uint256(decimals), // Sale Presale 50M
         100000000* 10**uint256(decimals), // Sale Round 1 100M
         100000000* 10**uint256(decimals), // Sale Round 2 100M
@@ -342,7 +342,7 @@ contract OrguraExchange is StandardToken, Owned {
     modifier tradingOpen {
         //Begin ad token sale closed
         //require(tokenSaleClosed);
-        //_; 
+        //_;
 
         //Begin at date trading open setting
         require(uint64(block.timestamp) > date14July2018);
@@ -365,10 +365,10 @@ contract OrguraExchange is StandardToken, Owned {
         require(msg.value >= 0.01 ether);
 
         uint256 tokens = computeTokenAmount(msg.value);
-        
+
         // roll back if hard cap reached
         require(totalSupply.add(tokens) <= TOKENS_SALE_HARD_CAP);
-        
+
         doIssueTokens(_beneficiary, tokens);
 
         /// forward the raised funds to the contract creator
@@ -424,7 +424,7 @@ contract OrguraExchange is StandardToken, Owned {
         tokens = tokenBase.mul(100)/(100 - (roundDiscountPercentages[roundNum]));
         while(tokens.add(totalSupply) > roundCaps[roundNum] && roundNum < 4){
            roundNum++;
-           tokens = tokenBase.mul(100)/(100 - (roundDiscountPercentages[roundNum])); 
+           tokens = tokenBase.mul(100)/(100 - (roundDiscountPercentages[roundNum]));
         }
     }
 
@@ -442,7 +442,7 @@ contract OrguraExchange is StandardToken, Owned {
     /// @dev Determine the current sale tier.
     /// @return the index of the current sale tier by date.
     function currentRoundIndexByDate() internal view returns (uint8 roundNum) {
-        require(now <= date14June2018); 
+        require(now <= date14June2018);
         if(now > dateSaleR3) return 4;
         if(now > dateSaleR2) return 3;
         if(now > dateSaleR1) return 2;
@@ -455,13 +455,13 @@ contract OrguraExchange is StandardToken, Owned {
 
       /// Company team advisor and group tokens are equal to 37.5%
         uint256 amount_lockedTokens = 300000000; // No decimals
-        
-        uint256 lockedTokens = amount_lockedTokens* 10**uint256(decimals); // 300M Reserve for Founder and team are added to the locked tokens 
-        
+
+        uint256 lockedTokens = amount_lockedTokens* 10**uint256(decimals); // 300M Reserve for Founder and team are added to the locked tokens
+
         //resevred tokens are available from the beginning 25%
         uint256 reservedTokens =  100000000* 10**uint256(decimals); // 100M Reserve for parner
-        
-        //Sum tokens of locked and Reserved tokens 
+
+        //Sum tokens of locked and Reserved tokens
         uint256 sumlockedAndReservedTokens = lockedTokens + reservedTokens;
 
         //Init fegment
@@ -475,13 +475,13 @@ contract OrguraExchange is StandardToken, Owned {
         }
 
         //issueLockedTokens(lockedTokens);
-        
+
         //-----------------------------------------------
         // Locked until Loop calculat
 
         uint256 _total_lockedTokens =0;
 
-        for (uint256 i = 0; i < lockedTillPercentages.length; i = i.add(1)) 
+        for (uint256 i = 0; i < lockedTillPercentages.length; i = i.add(1))
         {
             _total_lockedTokens =0;
             _total_lockedTokens = amount_lockedTokens.mul(lockedTillPercentages[i])* 10**uint256(decimals)/100;
@@ -493,11 +493,11 @@ contract OrguraExchange is StandardToken, Owned {
 
 
         issueReservedTokens(reservedTokens);
-        
-        
+
+
         /// increase token total supply
         totalSupply = totalSupply.add(sumlockedAndReservedTokens);
-        
+
         /// burn the unallocated tokens - no more tokens can be issued after this line
         tokenSaleClosed = true;
 
@@ -517,7 +517,7 @@ contract OrguraExchange is StandardToken, Owned {
         balances[timelockContractAddress] = balances[timelockContractAddress].add(lockedTokens);
         /// fire event when tokens issued
         Transfer(address(0), timelockContractAddress, lockedTokens);
-        
+
     }
 
     function issueLockedTokensCustom( uint lockedTokens , uint64 _dateTokensLockedTill) internal{
@@ -527,11 +527,11 @@ contract OrguraExchange is StandardToken, Owned {
         balances[timelockContractAddress] = balances[timelockContractAddress].add(lockedTokens);
         /// fire event when tokens issued
         Transfer(address(0), timelockContractAddress, lockedTokens);
-        
+
     }
 
     /**
-     * issue the tokens for Reserved 
+     * issue the tokens for Reserved
      * @param reservedTokens & bounty Tokens the amount of tokens to be issued
      * */
     function issueReservedTokens(uint reservedTokens) internal{
@@ -549,4 +549,13 @@ contract OrguraExchange is StandardToken, Owned {
         return super.transfer(_to, _value);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

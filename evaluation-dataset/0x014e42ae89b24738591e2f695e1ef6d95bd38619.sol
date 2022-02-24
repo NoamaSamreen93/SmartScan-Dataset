@@ -404,27 +404,27 @@ contract MintableToken is StandardToken, Ownable {
   event MintFinished();
 
   bool public mintingFinished = false;
-  
- 
+
+
   /** List of agents that are allowed to create new tokens */
   mapping (address => bool) public saleAgent;
 
   modifier canMint() {
     require(!mintingFinished);
     _;
-    
+
   }
-  
+
    modifier onlySaleAgent() {
  // Only crowdsale contracts are allowed to mint new tokens
-     require(saleAgent[msg.sender]);    
+     require(saleAgent[msg.sender]);
     _;
   }
-  
+
   function setSaleAgent(address addr, bool state) onlyOwner canMint public {
     saleAgent[addr] = state;
-  } 
-  
+  }
+
 
   /**
    * @dev Function to mint tokens
@@ -458,13 +458,13 @@ contract MintableToken is StandardToken, Ownable {
 contract CappedToken is MintableToken {
 
   uint256 public cap;
-  
+
 
   function CappedToken(uint256 _cap) public {
     require(_cap > 0);
     cap = _cap;
   }
-  
+
 
 
   /**
@@ -490,11 +490,22 @@ contract AgroTechFarmToken is PausableToken, CappedToken {
   string public constant symbol = "ATF";
   uint8 public constant decimals = 18;
   uint256 private constant TOKEN_CAP = 5 * 10**24;
-  
-  
+
+
   function AgroTechFarmToken() public CappedToken(TOKEN_CAP) {
   paused = true;
   }
-  
 
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

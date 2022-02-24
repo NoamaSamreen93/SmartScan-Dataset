@@ -221,7 +221,7 @@ contract LavaToken is ECRecovery{
 
         balances[from] = balances[from].add(amount);
         _totalSupply = _totalSupply.add(amount);
-        
+
         emit Transfer(address(0), from, amount);
 
         return true;
@@ -239,11 +239,11 @@ contract LavaToken is ECRecovery{
     function unmutateTokens( uint amount) public returns (bool)
     {
         address from = msg.sender;
-        require( amount >= 0 );              
-        
+        require( amount >= 0 );
+
         balances[from] = balances[from].sub(amount);
         _totalSupply = _totalSupply.sub(amount);
-        
+
         emit Transfer(from, address(0), amount);
 
         require( ERC20Interface( masterToken ).transfer( from, amount) );
@@ -517,4 +517,13 @@ contract LavaToken is ECRecovery{
 
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

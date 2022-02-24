@@ -3,9 +3,9 @@ pragma solidity 0.5.7;
 contract InternetCoin {
     using SafeMath for uint256;
 
-    string constant public name = "Internet Coin" ;                               
-    string constant public symbol = "ITN";           
-    uint8 constant public decimals = 18;            
+    string constant public name = "Internet Coin" ;
+    string constant public symbol = "ITN";
+    uint8 constant public decimals = 18;
 
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -121,4 +121,13 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

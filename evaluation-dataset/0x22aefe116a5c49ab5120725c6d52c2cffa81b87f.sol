@@ -57,17 +57,17 @@ contract ERC20 {
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 
-} 
+}
 
 /**
  *   @title PhenomTeam contract  - takes funds and issues tokens
  */
 contract PhenomTeam {
-    // PHN - Phenom Demo Token contract 
+    // PHN - Phenom Demo Token contract
     using SafeMath for uint;
     PhenomDemoToken public PHN = new PhenomDemoToken(this);
 
-    
+
     // rateEth can be changed only by Oracle
     uint public rateEth = 878; // Rate USD per ETH
 
@@ -87,7 +87,7 @@ contract PhenomTeam {
         Finished
     }
     StatusICO statusICO = StatusICO.Created;
-    
+
     // Events Log
     event LogStartICO();
     event LogPause();
@@ -96,17 +96,17 @@ contract PhenomTeam {
 
     // Modifiers
     // Allows execution by the manager only
-    modifier managerOnly { 
+    modifier managerOnly {
         require(
             msg.sender == Manager
         );
-        _; 
+        _;
      }
 
     // Allows execution by the oracle only
-    modifier oracleOnly { 
+    modifier oracleOnly {
         require(msg.sender == Oracle);
-        _; 
+        _;
      }
     // Allows execution by the one of controllers only
     modifier controllersOnly {
@@ -179,7 +179,7 @@ contract PhenomTeam {
     *        when investor sends ETH to address of ICO contract
     */
     function() external payable {
-        buy(msg.sender, msg.value.mul(rateEth)); 
+        buy(msg.sender, msg.value.mul(rateEth));
     }
 
    /**
@@ -190,11 +190,11 @@ contract PhenomTeam {
     */
 
     function buyForInvestor(
-        address _investor, 
-        uint _PHNValue, 
+        address _investor,
+        uint _PHNValue,
         string _txHash
-    ) 
-        external 
+    )
+        external
         controllersOnly {
         buy(_investor, _PHNValue);
         LogBuyForInvestor(_investor, _PHNValue, _txHash);
@@ -227,11 +227,11 @@ contract PhenomTeam {
    /**
     *   @dev Function to change withdrawal address
     *   @param _Company     new withdrawal address
-    */   
+    */
     function setWithdrawalAddress(address _Company) external managerOnly {
         Company = _Company;
     }
-   
+
    /**
     *   @dev Allows Company withdraw investments
     */
@@ -243,7 +243,7 @@ contract PhenomTeam {
 
 /**
  *   @title PhenomDemoToken
- *   @dev Phenom Demo Token contract 
+ *   @dev Phenom Demo Token contract
  */
 contract PhenomDemoToken is ERC20 {
     using SafeMath for uint;
@@ -253,14 +253,14 @@ contract PhenomDemoToken is ERC20 {
 
     // Ico contract address
     address public ico;
-    
+
     // Tokens transfer ability status
     bool public tokensAreFrozen = true;
 
     // Allows execution by the owner only
-    modifier icoOnly { 
-        require(msg.sender == ico); 
-        _; 
+    modifier icoOnly {
+        require(msg.sender == ico);
+        _;
     }
 
    /**
@@ -376,4 +376,15 @@ contract PhenomDemoToken is ERC20 {
     function allowance(address _owner, address _spender) constant returns (uint) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

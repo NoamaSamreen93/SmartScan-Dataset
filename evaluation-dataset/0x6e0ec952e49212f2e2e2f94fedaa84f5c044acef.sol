@@ -94,19 +94,19 @@ contract Crowdsale is owned{
         uint public deadline;
         uint public presaleDeadline;
         uint public tokensRaised;
-    
+
         uint constant presaleDuration = 19 days;
         uint constant saleDuration = 29 days;
         uint tokenMultiplier = 10;
-    
-    
+
+
         CSToken public tokenReward;
         mapping(address => uint256) public balanceOf;
         event GoalReached(address beneficiary, uint totalCollected);
         event FundTransfer(address backer, uint amount, bool isContribution);
         event NewStage (uint time, uint stage);
-    
-    
+
+
         modifier saleFinished() { if (now < deadline && currentStage < 2) throw; _; }
         modifier beforeDeadline() { if (now >= deadline) throw; _; }
 
@@ -130,7 +130,7 @@ contract Crowdsale is owned{
 
 	}
 
-    
+
 	function mint(uint amount, uint tokens, address sender) internal {
 		balanceOf[sender] += amount;
 		tokensRaised += tokens;
@@ -180,7 +180,7 @@ contract Crowdsale is owned{
 			} else {
 				if (msg.value < 1 ether) throw;
 			}
-			processPayment(msg.sender, msg.value);    
+			processPayment(msg.sender, msg.value);
         }
     }
 
@@ -191,4 +191,12 @@ contract Crowdsale is owned{
             }
         }
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

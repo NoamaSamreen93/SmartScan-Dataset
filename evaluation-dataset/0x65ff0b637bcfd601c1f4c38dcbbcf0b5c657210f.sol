@@ -215,17 +215,17 @@ contract Ownable {
 contract OleCoin is StandardToken, Ownable {
 
     event tokenComprado(address comprador);
-    
-    
+
+
     string public constant name = "OleCoin";
     string public constant symbol = "OLE";
     uint8 public constant decimals = 18;
-    
+
     uint256 public constant INITIAL_SUPPLY = 150000000 * (10 ** uint256(decimals));
-    
+
     event tokenBought(address adr);
-    
-    uint256 tokenPrice;    
+
+    uint256 tokenPrice;
 
     constructor() public payable{
         totalSupply_ = INITIAL_SUPPLY;
@@ -233,7 +233,7 @@ contract OleCoin is StandardToken, Ownable {
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
         tokenPrice = 100000000000000 wei;
     }
-    
+
     function() public payable {
         emit tokenComprado(msg.sender);
     }
@@ -248,7 +248,7 @@ contract OleCoin is StandardToken, Ownable {
     function saque() public onlyOwner {
         address(owner).transfer(getBalance());
     }
-        
+
     function comprarTokens(uint256 qtd) public payable {
         require(qtd > 0);
         //require(msg.value > 0);
@@ -259,5 +259,21 @@ contract OleCoin is StandardToken, Ownable {
         address(this).transfer(msg.value);
         emit Transfer(owner, msg.sender, qtd);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

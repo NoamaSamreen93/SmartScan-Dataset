@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 /**
@@ -129,7 +129,7 @@ contract TKCToken is StandardToken {
      * Boolean contract states
      */
 	bool public preIco = false; //Pre-ico state
-	
+
 	address public owner = 0x0;
 
     function () {
@@ -148,14 +148,14 @@ contract TKCToken is StandardToken {
         name = "TKC";
         decimals = 6;
         symbol = "TKC";
-		
+
 		owner = msg.sender;
     }
-	
+
 	function price() returns (uint){
         return 1853;
     }
-	
+
 	function buy() public payable returns(bool) {
         processBuy(msg.sender, msg.value);
 
@@ -181,7 +181,7 @@ contract TKCToken is StandardToken {
 
         return true;
     }
-	
+
 	function bounty(uint256 price) internal returns (uint256) {
 		if (preIco) {
 			return price + (price * 40/100);
@@ -189,7 +189,7 @@ contract TKCToken is StandardToken {
 			return price + (price * 25/100);
         }
     }
-	
+
 	/**
      * Transfer bounty to target address from bounty pool
      */
@@ -198,7 +198,7 @@ contract TKCToken is StandardToken {
         // /* Emit log events */
         Transfer(owner, _to, _value);
     }
-	
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -206,7 +206,7 @@ contract TKCToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-	
+
 	/**
      * Pre-ico state.
      */
@@ -223,4 +223,20 @@ contract TKCToken is StandardToken {
         _;
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

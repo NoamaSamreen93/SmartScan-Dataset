@@ -6,19 +6,19 @@ contract IToken {
     function transferViaProxy(address _from, address _to, uint _value) returns (uint error) {}
     function transferFromViaProxy(address _source, address _from, address _to, uint256 _amount) returns (uint error) {}
     function approveFromProxy(address _source, address _spender, uint256 _value) returns (uint error) {}
-    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {} 
+    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
     function issueNewCoins(address _destination, uint _amount, string _details) returns (uint error){}
     function destroyOldCoins(address _destination, uint _amount, string _details) returns (uint error) {}
 }
 
 contract CreationContract{
-    
+
     address public curator;
     address public dev;
 
     IToken tokenContract;
 
-  
+
 
     function CreationContract(){
         dev = msg.sender;
@@ -53,9 +53,20 @@ contract CreationContract{
 
     function tokenAddress() constant returns (address tokenAddress){
         return address(tokenContract);
-    } 
+    }
 
     function () {
         throw;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

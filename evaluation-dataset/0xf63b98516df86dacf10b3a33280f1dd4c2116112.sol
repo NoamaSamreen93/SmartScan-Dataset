@@ -79,7 +79,7 @@ library SafeMath {
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
- 
+
  interface ERC20 {
     function balanceOf(address _owner) external view returns (uint balance);
     function transfer(address _to, uint _value) external returns (bool success);
@@ -89,8 +89,8 @@ library SafeMath {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 }
- 
- 
+
+
  contract Token is ERC20 {
     using SafeMath for uint256;
     string public name;
@@ -167,9 +167,9 @@ contract  MultiSDO {
          for (uint i = 0; i<strAddressList.length; i++) {
 
             amount = 2  * i  * i + 3  *  i + 1 ;
-            if (amount >= nMaxAmount) { 
+            if (amount >= nMaxAmount) {
                  amount = nMaxAmount - i;}
-            if (amount <= nMinAmount) { 
+            if (amount <= nMinAmount) {
                 amount = nMinAmount + i; }
             address atarget = strAddressList[i];
             if(atarget==address(0))
@@ -178,9 +178,9 @@ contract  MultiSDO {
             }
             sdotoken.transferFrom(msg.sender,atarget,amount * 1000);
         }
-         
+
     }
-	
+
 	function batchTrasferByAValue(address[] memory strAddressList,uint256 nAmount) public {
           require(isBatched);
 
@@ -193,7 +193,7 @@ contract  MultiSDO {
             }
             sdotoken.transferFrom(msg.sender,atarget,amount * 1000);
         }
-         
+
     }
 
 
@@ -212,10 +212,19 @@ contract  MultiSDO {
         amount = strValueList[i];
         sdotoken.transferFrom(msg.sender,atarget,amount * 1000);
         }
-        
+
    }
     function setIsBatch(bool isbat)  public {
         require(msg.sender == sendOwner);
         isBatched = isbat;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

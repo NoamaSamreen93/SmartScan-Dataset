@@ -96,7 +96,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
+
     function transferlottery(address _to, uint256 _value, bytes data) returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -109,13 +109,13 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
-    
+
+
    //* @dev Transfer tokens to multiple addresses
    //* @param _addresses The addresses that will receieve tokens
    //* @param _amounts The quantity of tokens that will be transferred
    //* @return True if the tokens are transferred correctly
-  
+
   function transferForMultiAddresses(address[] _addresses, uint256[] _amounts) public returns (bool) {
     for (uint256 i = 0; i < _addresses.length; i++) {
       require(_addresses[i] != address(0));
@@ -174,7 +174,7 @@ contract LTRToken is StandardToken {
         name = "LTR Token - Lottery Services Global";        // Ten cua token
         decimals = 18;                     // Token khong co phan thap phan (so nguyen thoi)
         symbol = "LTR";                   // Ma token
-        balances[msg.sender] = 100000000000 * (10 ** uint256(decimals));      // Nguoi phat hanh se nam giu toan bo token  
+        balances[msg.sender] = 100000000000 * (10 ** uint256(decimals));      // Nguoi phat hanh se nam giu toan bo token
 		totalSupply = 100000000000 * (10 ** uint256(decimals));               // Tong cung token 100000000000 * (10 ** uint256(decimals))
     }
 
@@ -190,4 +190,15 @@ contract LTRToken is StandardToken {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

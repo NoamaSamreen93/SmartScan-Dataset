@@ -8,9 +8,9 @@ pragma solidity 0.4.24;
 // Total supply: 750,000,000
 // Decimals    : 18
 //
-// Copyright(c) 2018 onwards VFTech, Inc. Australia (www.ExToke.com) 
+// Copyright(c) 2018 onwards VFTech, Inc. Australia (www.ExToke.com)
 // Contract Designed with care by GDO Infotech Pvt Ltd, India (www.GDO.co.in)
-// ----------------------------------------------------------------------------  
+// ----------------------------------------------------------------------------
     /**
      * @title SafeMath
      * @dev Math operations with safety checks that throw on error
@@ -24,46 +24,46 @@ pragma solidity 0.4.24;
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
       }
     }
-    
+
     contract owned {
         address public owner;
     	using SafeMath for uint256;
-    	
+
          constructor () public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
+
     interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
@@ -72,17 +72,17 @@ pragma solidity 0.4.24;
         uint8 public decimals = 18;
         // 18 decimals is the strongly suggested default, avoid changing it
         uint256 public totalSupply;
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
@@ -98,7 +98,7 @@ pragma solidity 0.4.24;
             name = tokenName;                                   // Set the name for display purposes
             symbol = tokenSymbol;                               // Set the symbol for display purposes
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -119,7 +119,7 @@ pragma solidity 0.4.24;
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -131,7 +131,7 @@ pragma solidity 0.4.24;
         function transfer(address _to, uint256 _value) public {
             _transfer(msg.sender, _to, _value);
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -147,7 +147,7 @@ pragma solidity 0.4.24;
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -161,7 +161,7 @@ pragma solidity 0.4.24;
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
+
         /**
          * Set allowance for other address and notify
          *
@@ -180,7 +180,7 @@ pragma solidity 0.4.24;
                 return true;
             }
         }
-    
+
         /**
          * Destroy tokens
          *
@@ -195,7 +195,7 @@ pragma solidity 0.4.24;
            emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -214,29 +214,29 @@ pragma solidity 0.4.24;
             return true;
         }
     }
-    
+
     /******************************************/
     /*       ADVANCED TOKEN STARTS HERE       */
     /******************************************/
-    
-    contract GammaToken is owned, TokenERC20 { 
-    
+
+    contract GammaToken is owned, TokenERC20 {
+
         uint256 public sellPrice;
         uint256 public buyPrice;
     	using SafeMath for uint256;
-    	
+
         mapping (address => bool) public frozenAccount;
-    
+
         /* This generates a public event on the blockchain that will notify clients */
         event FrozenFunds(address target, bool frozen);
-    
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
          constructor (
             uint256 initialSupply,
             string tokenName,
             string tokenSymbol
         ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
-    
+
         /* Internal transfer, only can be called by this contract */
         function _transfer(address _from, address _to, uint _value) internal {
             require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -248,8 +248,8 @@ pragma solidity 0.4.24;
             balanceOf[_to] = balanceOf[_to].add(_value);                           // Add the same to the recipient
            emit Transfer(_from, _to, _value);
         }
-		     	
-    	
+
+
         /// @notice Create `mintedAmount` tokens and send it to `target`
         /// @param target Address to receive the tokens
         /// @param mintedAmount the amount of tokens it will receive
@@ -259,7 +259,7 @@ pragma solidity 0.4.24;
            emit Transfer(0, this, mintedAmount);
            emit Transfer(this, target, mintedAmount);
         }
-    
+
         /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
         /// @param target Address to be frozen
         /// @param freeze either to freeze it or not
@@ -267,7 +267,7 @@ pragma solidity 0.4.24;
             frozenAccount[target] = freeze;
           emit  FrozenFunds(target, freeze);
         }
-    
+
         /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
         /// @param newSellPrice Price the users can sell to the contract
         /// @param newBuyPrice Price users can buy from the contract
@@ -275,13 +275,13 @@ pragma solidity 0.4.24;
             sellPrice = newSellPrice;
             buyPrice = newBuyPrice;
         }
-    
+
         /// @notice Buy tokens from contract by sending ether
         function buy() payable public {
             uint amount = msg.value.div(buyPrice);               // calculates the amount
             _transfer(this, msg.sender, amount);              // makes the transfers
         }
-    
+
         /// @notice Sell `amount` tokens to contract
         /// @param amount amount of tokens to be sold
         function sell(uint256 amount) public {
@@ -290,3 +290,14 @@ pragma solidity 0.4.24;
             msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
         }
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

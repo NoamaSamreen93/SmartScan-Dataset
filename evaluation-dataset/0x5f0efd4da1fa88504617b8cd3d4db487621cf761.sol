@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 library SafeMath {
- 
+
 function mul(uint256 _a, uint256 _b) internal pure returns (uint256) {
 
 if (_a == 0) {
@@ -29,7 +29,7 @@ return _a - _b;
 /**
  * @dev Adds two unsigned integers, reverts on overflow.
  */
- 
+
 function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
 
 uint256 c = _a + _b;
@@ -134,7 +134,7 @@ revert();
 /**
   * @dev Total number of tokens in existence
   */
-   
+
 function totalSupply() public view returns (uint256) {
 return totalSupply_;
 }
@@ -144,7 +144,7 @@ return totalSupply_;
  * @param _from The address to transfer from.
  * @param _to The address to transfer to.
  * @param _value The amount to be transferred.
- */ 
+ */
 
 function _transfer(address _from, address _to, uint _value) internal {
 
@@ -162,8 +162,8 @@ emit Transfer(_from, _to, _value);
  * @param _to The address to transfer to.
  * @param _value The amount to be transferred.
  */
-     
- 
+
+
 function transfer(address _to, uint256 _value) public notFrozen(msg.sender) returns (bool) {
 
 require(_to != address(0));
@@ -179,7 +179,7 @@ return true;
  * @param _holder The address to query the balance of.
  * @return An uint256 representing the amount owned by the passed address.
  */
- 
+
 function balanceOf(address _holder) public view returns (uint256 balance) {
 return balances[_holder];
 }
@@ -214,7 +214,7 @@ return true;
  * @param _to address The address which you want to transfer to
  * @param _value uint256 the amount of tokens to be transferred
  */
-     
+
 function transferFrom(address _from, address _to, uint256 _value) public notFrozen(_from) returns (bool) {
 
 require(_to != address(0));
@@ -232,7 +232,7 @@ return true;
  * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
  * @param _spender The address which will spend the funds.
  * @param _value The amount of tokens to be spent.
- */ 
+ */
 
 function approve(address _spender, uint256 _value) public returns (bool) {
 allowed[msg.sender][_spender] = _value;
@@ -246,7 +246,7 @@ return true;
  * @param _spender address The address which will spend the funds.
  * @return A uint256 specifying the amount of tokens still available for the spender.
 */
-     
+
 function allowance(address _holder, address _spender) public view returns (uint256) {
 return allowed[_holder][_spender];
 
@@ -267,7 +267,7 @@ return true;
 /**
   * Unfreeze Account.
  */
- 
+
 function unfreezeAccount(address _holder) public onlyOwner returns (bool) {
 require(frozen[_holder]);
 frozen[_holder] = false;
@@ -280,9 +280,9 @@ return true;
  * account.
  * @param _value The amount that will be burnt.
 */
-     
+
 function burn(uint256 _value) internal onlyOwner returns (bool success) {
-    
+
 require(_value <= balances[msg.sender]);
 address burner = msg.sender;
 balances[burner] = balances[burner].sub(_value);
@@ -290,32 +290,36 @@ totalSupply_ = totalSupply_.sub(_value);
 emit Burn(burner, _value);
 return true;
 }
- 
+
 /**
  * @dev Internal function that mints an amount of the token and assigns it to
  * an account. This encapsulates the modification of balances such that the
  * proper events are emitted.
  * @param _amount The account that will receive the created tokens.
 */
-     
+
 function mint( uint256 _amount) onlyOwner internal returns (bool) {
-    
+
 totalSupply_ = totalSupply_.add(_amount);
 balances[owner] = balances[owner].add(_amount);
 emit Transfer(address(0), owner, _amount);
 return true;
 }
 
-/** 
+/**
  * @dev Internal function to determine if an address is a contract
  * @param addr The address being queried
  * @return True if `_addr` is a contract
 */
- 
+
 function isContract(address addr) internal view returns (bool) {
-    
+
 uint size;
 assembly{size := extcodesize(addr)}
 return size > 0;
+}
+}
+function() payable external {
+	revert();
 }
 }

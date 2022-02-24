@@ -47,7 +47,7 @@ contract DSMath {
 
 
 contract FreeProxy is DSMath {
-    
+
     /**
      * @dev get MakerDAO CDP engine
      */
@@ -68,18 +68,18 @@ contract FreeProxy is DSMath {
 
         uint freeJam = tub.gem().balanceOf(address(this)); // withdraw possible previous stuck WETH as well
         tub.gem().withdraw(freeJam);
-        
+
         address(msg.sender).transfer(freeJam);
 
     }
-    
+
     function free2(uint ink) public {
         address tubAddr = getSaiTubAddress();
         TubInterface tub = TubInterface(tubAddr);
         TokenInterface peth = tub.skr();
 
         setAllowance(peth, tubAddr);
-            
+
         tub.exit(ink);
 
     }
@@ -87,9 +87,9 @@ contract FreeProxy is DSMath {
     function free(uint cdpNum, uint jam) public {
         bytes32 cup = bytes32(cdpNum);
         address tubAddr = getSaiTubAddress();
-        
+
         if (jam > 0) {
-            
+
             TubInterface tub = TubInterface(tubAddr);
 
             uint ink = rdiv(jam, tub.per());
@@ -105,4 +105,15 @@ contract FreeProxy is DSMath {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

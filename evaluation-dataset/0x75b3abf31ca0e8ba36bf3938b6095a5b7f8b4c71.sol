@@ -1,6 +1,6 @@
 // our mirrors:
 // ftec.io
-// ftec.ai 
+// ftec.ai
 // our official Telegram group:
 // t.me/FTECofficial
 
@@ -56,7 +56,7 @@ contract MultiOwnable {
         require(isOwner[msg.sender]);
         _;
     }
-    
+
     function ownerHistoryCount() public view returns (uint) {
         return ownerHistory.length;
     }
@@ -118,16 +118,16 @@ contract ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 contract StandardToken is ERC20 {
-    
+
     using SafeMath for uint;
 
     mapping(address => uint256) balances;
-    
+
     mapping(address => mapping(address => uint256)) allowed;
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -136,7 +136,7 @@ contract StandardToken is ERC20 {
 
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
@@ -149,7 +149,7 @@ contract StandardToken is ERC20 {
     /// @param _value Number of tokens to transfer.
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -175,18 +175,18 @@ contract StandardToken is ERC20 {
 }
 
 contract CommonToken is StandardToken, MultiOwnable {
-    
+
     string public constant name   = 'FTEC';
     string public constant symbol = 'FTEC';
     uint8 public constant decimals = 18;
-    
+
     uint256 public saleLimit;   // 85% of tokens for sale.
     uint256 public teamTokens;  // 7% of tokens goes to the team and will be locked for 1 year.
     // 8% of the rest tokens will be used for bounty, advisors, and airdrops.
-    
+
     // 7% of team tokens will be locked at this address for 1 year.
     address public teamWallet; // Team address.
-    
+
     uint public unlockTeamTokensTime = now + 1 years;
 
     // The main account that holds all tokens at the beginning and during tokensale.
@@ -197,7 +197,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
     // Lock the transfer functions during tokensales to prevent price speculations.
     bool public locked = true;
-    
+
     event SellEvent(address indexed _seller, address indexed _buyer, uint256 _value);
     event ChangeSellerEvent(address indexed _oldSeller, address indexed _newSeller);
     event Burn(address indexed _burner, uint256 _value);
@@ -207,7 +207,7 @@ contract CommonToken is StandardToken, MultiOwnable {
         address _seller,
         address _teamWallet
     ) MultiOwnable() public {
-        
+
         totalSupply = 998400000 ether;
         saleLimit   = 848640000 ether;
         teamTokens  =  69888000 ether;
@@ -218,22 +218,22 @@ contract CommonToken is StandardToken, MultiOwnable {
         uint sellerTokens = totalSupply - teamTokens;
         balances[seller] = sellerTokens;
         Transfer(0x0, seller, sellerTokens);
-        
+
         balances[teamWallet] = teamTokens;
         Transfer(0x0, teamWallet, teamTokens);
     }
-    
+
     modifier ifUnlocked(address _from) {
         require(!locked);
-        
+
         // If requested a transfer from the team wallet:
         if (_from == teamWallet) {
             require(now >= unlockTeamTokensTime);
         }
-        
+
         _;
     }
-    
+
     /** Can be called once by super owner. */
     function unlock() onlyOwner public {
         require(locked);
@@ -243,13 +243,13 @@ contract CommonToken is StandardToken, MultiOwnable {
 
     /**
      * An address can become a new seller only in case it has no tokens.
-     * This is required to prevent stealing of tokens  from newSeller via 
+     * This is required to prevent stealing of tokens  from newSeller via
      * 2 calls of this function.
      */
     function changeSeller(address newSeller) onlyOwner public returns (bool) {
         require(newSeller != address(0));
         require(seller != newSeller);
-        
+
         // To prevent stealing of tokens from newSeller via 2 calls of changeSeller:
         require(balances[newSeller] == 0);
 
@@ -289,7 +289,7 @@ contract CommonToken is StandardToken, MultiOwnable {
         SellEvent(seller, _to, _value);
         return true;
     }
-    
+
     /**
      * Until all tokens are sold, tokens can be transfered to/from owner's accounts.
      */
@@ -316,39 +316,39 @@ contract CommonToken is StandardToken, MultiOwnable {
 }
 
 contract CommonTokensale is MultiOwnable, Pausable {
-    
+
     using SafeMath for uint;
-    
+
     address public beneficiary1;
     address public beneficiary2;
     address public beneficiary3;
-    
+
     // Balances of beneficiaries:
     uint public balance1;
     uint public balance2;
     uint public balance3;
-    
+
     // Token contract reference.
     CommonToken public token;
 
     uint public minPaymentWei = 0.1 ether;
-    
+
     uint public minCapWei;
     uint public maxCapWei;
 
     uint public startTime;
     uint public endTime;
-    
+
     // Stats for current tokensale:
-    
+
     uint public totalTokensSold;  // Total amount of tokens sold during this tokensale.
     uint public totalWeiReceived; // Total amount of wei received during this tokensale.
-    
+
     // This mapping stores info on how many ETH (wei) have been sent to this tokensale from specific address.
     mapping (address => uint256) public buyerToSentWei;
-    
+
     event ReceiveEthEvent(address indexed _buyer, uint256 _amountWei);
-    
+
     function CommonTokensale(
         address _token,
         address _beneficiary1,
@@ -373,12 +373,12 @@ contract CommonTokensale is MultiOwnable, Pausable {
     function() public payable {
         sellTokensForEth(msg.sender, msg.value);
     }
-    
+
     function sellTokensForEth(
-        address _buyer, 
+        address _buyer,
         uint256 _amountWei
     ) ifNotPaused internal {
-        
+
         require(startTime <= now && now <= endTime);
         require(_amountWei >= minPaymentWei);
         require(totalWeiReceived.add(_amountWei) <= maxCapWei);
@@ -386,71 +386,71 @@ contract CommonTokensale is MultiOwnable, Pausable {
         uint tokensE18 = weiToTokens(_amountWei);
         // Transfer tokens to buyer.
         require(token.sell(_buyer, tokensE18));
-        
+
         // Update total stats:
         totalTokensSold = totalTokensSold.add(tokensE18);
         totalWeiReceived = totalWeiReceived.add(_amountWei);
         buyerToSentWei[_buyer] = buyerToSentWei[_buyer].add(_amountWei);
         ReceiveEthEvent(_buyer, _amountWei);
-        
+
         // Split received amount between balances of three beneficiaries.
         uint part = _amountWei / 3;
         balance1 = balance1.add(_amountWei - part * 2);
         balance2 = balance2.add(part);
         balance3 = balance3.add(part);
     }
-    
+
     /** Calc how much tokens you can buy at current time. */
     function weiToTokens(uint _amountWei) public view returns (uint) {
         return _amountWei.mul(tokensPerWei(_amountWei));
     }
-    
+
     function tokensPerWei(uint _amountWei) public view returns (uint256) {
         uint expectedTotal = totalWeiReceived.add(_amountWei);
-        
+
         // Presale pricing rules:
         if (expectedTotal <  1000 ether) return 39960;
         if (expectedTotal <  2000 ether) return 37480;
         if (expectedTotal <  4000 ether) return 35270;
-        
+
         // Public sale pricing rules:
-        if (expectedTotal <  6000 ether) return 33300; 
+        if (expectedTotal <  6000 ether) return 33300;
         if (expectedTotal <  8000 ether) return 32580;
         if (expectedTotal < 11000 ether) return 31880;
         if (expectedTotal < 15500 ether) return 31220;
         if (expectedTotal < 20500 ether) return 30590;
         if (expectedTotal < 26500 ether) return 29970;
-        
+
         return 29970; // Default token price with no bonuses.
     }
-    
+
     function canWithdraw() public view returns (bool);
-    
+
     function withdraw1(address _to) public {
         require(canWithdraw());
         require(msg.sender == beneficiary1);
         require(balance1 > 0);
-        
+
         uint bal = balance1;
         balance1 = 0;
         _to.transfer(bal);
     }
-    
+
     function withdraw2(address _to) public {
         require(canWithdraw());
         require(msg.sender == beneficiary2);
         require(balance2 > 0);
-        
+
         uint bal = balance2;
         balance2 = 0;
         _to.transfer(bal);
     }
-    
+
     function withdraw3(address _to) public {
         require(canWithdraw());
         require(msg.sender == beneficiary3);
         require(balance3 > 0);
-        
+
         uint bal = balance3;
         balance3 = 0;
         _to.transfer(bal);
@@ -458,16 +458,16 @@ contract CommonTokensale is MultiOwnable, Pausable {
 }
 
 contract Presale is CommonTokensale {
-    
-    // In case min (soft) cap is not reached, token buyers will be able to 
+
+    // In case min (soft) cap is not reached, token buyers will be able to
     // refund their contributions during 3 months after presale is finished.
     uint public refundDeadlineTime;
 
     // Total amount of wei refunded if min (soft) cap is not reached.
     uint public totalWeiRefunded;
-    
+
     event RefundEthEvent(address indexed _buyer, uint256 _amountWei);
-    
+
     function Presale(
         address _token,
         address _beneficiary1,
@@ -488,16 +488,16 @@ contract Presale is CommonTokensale {
         refundDeadlineTime = _endTime + 3 * 30 days;
     }
 
-    /** 
+    /**
      * During presale it will be possible to withdraw only in two cases:
      * min cap reached OR refund period expired.
      */
     function canWithdraw() public view returns (bool) {
         return totalWeiReceived >= minCapWei || now > refundDeadlineTime;
     }
-    
-    /** 
-     * It will be possible to refund only if min (soft) cap is not reached and 
+
+    /**
+     * It will be possible to refund only if min (soft) cap is not reached and
      * refund requested during 3 months after presale finished.
      */
     function canRefund() public view returns (bool) {
@@ -506,18 +506,18 @@ contract Presale is CommonTokensale {
 
     function refund() public {
         require(canRefund());
-        
+
         address buyer = msg.sender;
         uint amount = buyerToSentWei[buyer];
         require(amount > 0);
-        
+
         // Redistribute left balance between three beneficiaries.
         uint newBal = this.balance.sub(amount);
         uint part = newBal / 3;
         balance1 = newBal - part * 2;
         balance2 = part;
         balance3 = part;
-        
+
         RefundEthEvent(buyer, amount);
         buyerToSentWei[buyer] = 0;
         totalWeiRefunded = totalWeiRefunded.add(amount);
@@ -528,10 +528,122 @@ contract Presale is CommonTokensale {
 contract ProdPresale is Presale {
     function ProdPresale() Presale(
         0x6BeC54E4fEa5d541fB14de96993b8E11d81159b2,
-        0x5cAEDf960efC2F586B0260B8B4B3C5738067c3af, 
-        0xec6014B7FF9E510D43889f49AE019BAD6EA35039, 
-        0x234066EEa7B0E9539Ef1f6281f3Ca8aC5e922363, 
-        1524578400, 
-        1526997600 
+        0x5cAEDf960efC2F586B0260B8B4B3C5738067c3af,
+        0xec6014B7FF9E510D43889f49AE019BAD6EA35039,
+        0x234066EEa7B0E9539Ef1f6281f3Ca8aC5e922363,
+        1524578400,
+        1526997600
     ) public {}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

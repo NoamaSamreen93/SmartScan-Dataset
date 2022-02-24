@@ -755,3 +755,9 @@ contract FUTM is MintableToken, BurnableToken, RBAC {
     removeRole(msg.sender, ROLE_SUPER);
   }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

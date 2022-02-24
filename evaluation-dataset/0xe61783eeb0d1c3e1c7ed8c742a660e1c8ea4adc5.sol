@@ -339,12 +339,21 @@ library SafeMath {
  */
 contract ndwtToken is ERC20, ERC20Burnable, ERC20Detailed {
     uint8 public constant DECIMALS = 18;
-    uint256 public constant INITIAL_SUPPLY = 40000000000 * (10 ** uint256(DECIMALS)); 
+    uint256 public constant INITIAL_SUPPLY = 40000000000 * (10 ** uint256(DECIMALS));
 
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
     constructor () public ERC20Detailed("Summit Token", "SMIT", 18) {
-        _mint(msg.sender, INITIAL_SUPPLY); 
+        _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

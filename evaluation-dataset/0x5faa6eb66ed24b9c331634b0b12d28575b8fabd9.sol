@@ -285,3 +285,7 @@ contract ETAOToken is ERC20, Ownable {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

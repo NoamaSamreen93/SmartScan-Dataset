@@ -54,7 +54,7 @@ contract AuPetitCoinToken is StandardToken {
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
     uint256 public totalEthInWei;
     address public fundsWallet;
@@ -81,7 +81,7 @@ contract AuPetitCoinToken is StandardToken {
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -90,4 +90,8 @@ contract AuPetitCoinToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
 }

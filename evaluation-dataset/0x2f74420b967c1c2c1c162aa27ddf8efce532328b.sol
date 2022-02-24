@@ -5,17 +5,17 @@ pragma solidity ^0.4.20;
 *
 *   This contract keeps a list of offers to sell PHX coins
 *   and acts as a market-maker matching sellers to buyers.
-*   
+*
 * //*** Developed By:
-*   _____       _         _         _ ___ _         
-*  |_   _|__ __| |_  _ _ (_)__ __ _| | _ (_)___ ___ 
+*   _____       _         _         _ ___ _
+*  |_   _|__ __| |_  _ _ (_)__ __ _| | _ (_)___ ___
 *    | |/ -_) _| ' \| ' \| / _/ _` | |   / (_-</ -_)
 *    |_|\___\__|_||_|_||_|_\__\__,_|_|_|_\_/__/\___|
-*   
-*   © 2018 TechnicalRise.  Written in March 2018.  
+*
+*   © 2018 TechnicalRise.  Written in March 2018.
 *   All rights reserved.  Do not copy, adapt, or otherwise use without permission.
 *   https://www.reddit.com/user/TechnicalRise/
-*  
+*
 */
 
 contract ERC20Token {
@@ -28,16 +28,16 @@ contract ERC20Token {
 }
 
 contract SimplePHXSalesContract {
-    
+
     // ScaleFactor
     // It needs to be possible to make PHX cost less than 1 Wei / Rise
-    uint public ScaleFactor = 10 ** 18;  
-    
+    uint public ScaleFactor = 10 ** 18;
+
     // Array of offerors
     mapping(uint256 => address) public offerors;
 	mapping(address => uint256) public AddrNdx;
     uint public nxtAddr;
-    
+
 	// Array between each address and their tokens offered and buy prices.
 	mapping(address => uint256) public tokensOffered;
 	mapping(address => uint256) public pricePerToken; // In qWeiPerRise (need to multiply by 10 ** 36 to get it to ETH / PHX)
@@ -66,7 +66,7 @@ contract SimplePHXSalesContract {
     function _canceloffer(address _offeror) internal {
         delete tokensOffered[_offeror];
         delete pricePerToken[_offeror];
-        
+
         uint Ndx = AddrNdx[_offeror];
         nxtAddr--;
 
@@ -79,7 +79,7 @@ contract SimplePHXSalesContract {
         } else {
             delete offerors[Ndx];
         }
-        
+
         delete AddrNdx[_offeror]; // !important
     }
 
@@ -88,7 +88,7 @@ contract SimplePHXSalesContract {
         phxCoin.transfer(msg.sender, tokensOffered[msg.sender]); // Return the Tokens
         _canceloffer(msg.sender);
     }
-    
+
     function buy(uint _ndx) payable public {
         require(_humanSender(msg.sender));
         address _offeror = offerors[_ndx];
@@ -98,32 +98,32 @@ contract SimplePHXSalesContract {
         _offeror.transfer(_purchasePrice);
         _canceloffer(_offeror);
     }
-    
+
     function updatePrice(uint _newPrice) public {
         // Make sure that this offeror has an offer out there
-        require(tokensOffered[msg.sender] != 0); 
+        require(tokensOffered[msg.sender] != 0);
         pricePerToken[msg.sender] = _newPrice;
     }
-    
+
     function getOfferor(uint _ndx) public constant returns (address _offeror) {
         return offerors[_ndx];
     }
-    
+
     function getOfferPrice(uint _ndx) public constant returns (uint _tokenPrice) {
         return pricePerToken[offerors[_ndx]];
     }
-    
+
     function getOfferAmount(uint _ndx) public constant returns (uint _tokensOffered) {
         return tokensOffered[offerors[_ndx]];
     }
-    
+
     function withdrawEth() public {
         owner.transfer(address(this).balance);
     }
-    
+
     function () payable public {
     }
-    
+
     // Determine if the "_from" address is a contract
     function _humanSender(address _from) private view returns (bool) {
       uint codeLength;
@@ -132,4 +132,15 @@ contract SimplePHXSalesContract {
       }
       return (codeLength == 0); // If this is "true" sender is most likely a Wallet
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

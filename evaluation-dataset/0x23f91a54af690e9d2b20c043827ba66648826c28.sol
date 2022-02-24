@@ -28,7 +28,7 @@ contract MyToken {
         if (balanceOf[msg.sender] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
         balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;          
+        balanceOf[_to] += _value;
         Transfer(msg.sender, _to, _value);
     }
 
@@ -45,14 +45,14 @@ contract MyToken {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) throw;
         if (balanceOf[_from] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
         if (_value > allowance[_from][msg.sender]) throw;
-        balanceOf[_from] -= _value;   
+        balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
@@ -75,4 +75,15 @@ contract MyToken {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

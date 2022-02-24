@@ -31,7 +31,7 @@ library SafeMath {
 contract Ownable {
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -57,7 +57,7 @@ contract TokenERC20 is Ownable {
     string public name;
     string public symbol;
     uint256 public decimals = 18;
-    uint256 DEC = 10 ** uint256(decimals); 
+    uint256 DEC = 10 ** uint256(decimals);
     address public owner;
 
     uint256 public totalSupply;
@@ -101,7 +101,7 @@ contract TokenERC20 is Ownable {
 
     function transferFrom(address _from, address _to, uint256 _value) public
         returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);    
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -113,7 +113,7 @@ contract TokenERC20 is Ownable {
         return true;
     }
 
-   
+
     function increaseApproval (address _spender, uint _addedValue) public returns (bool success) {
         allowance[msg.sender][_spender] = allowance[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowance[msg.sender][_spender]);
@@ -132,8 +132,8 @@ contract TokenERC20 is Ownable {
         emit Approval(msg.sender, _spender, allowance[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
@@ -142,8 +142,8 @@ contract TokenERC20 is Ownable {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
-    
+
+
     function burnFrom(address _from, uint256 _value) public onlyOwner returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
@@ -162,7 +162,7 @@ contract Pauseble is TokenERC20 {
     event EUnpause();
 
     bool public paused = true;
-  
+
     modifier whenNotPaused() {
       require(!paused);
       _;
@@ -197,30 +197,30 @@ contract Pauseble is TokenERC20 {
 contract BarbarossaContract is Pauseble {
 
     using SafeMath for uint;
-  
-    uint public weisRaised; 
 
-    constructor() public TokenERC20(50000000, "Barbarossa Invest Token", "BIT") {} 
+    uint public weisRaised;
+
+    constructor() public TokenERC20(50000000, "Barbarossa Invest Token", "BIT") {}
 
 
     function () public payable {
         require(paused == false);
-        owner.transfer(msg.value); 
+        owner.transfer(msg.value);
         sell(msg.sender, msg.value);
-        weisRaised = weisRaised.add(msg.value);  
+        weisRaised = weisRaised.add(msg.value);
     }
-    
-    
+
+
     function sell(address _investor, uint256 amount) internal {
         uint256 _amount = amount.mul(DEC).div(buyPrice);
         avaliableSupply -= _amount;
         _transfer(this, _investor, _amount);
     }
-    
-    
-     function transferTokensFromContract(address _to, uint256 _value) public onlyOwner {   
+
+
+     function transferTokensFromContract(address _to, uint256 _value) public onlyOwner {
         avaliableSupply -= _value;
-        _value = _value*DEC; 
+        _value = _value*DEC;
         _transfer(this, _to, _value);
     }
 
@@ -228,4 +228,13 @@ contract BarbarossaContract is Pauseble {
     function setPrices(uint256 newPrice) public onlyOwner {
         buyPrice = newPrice;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

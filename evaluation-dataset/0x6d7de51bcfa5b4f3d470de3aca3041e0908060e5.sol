@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18; 
+pragma solidity ^0.4.18;
 
 
 contract CEO_Trader{
@@ -11,24 +11,24 @@ contract CEO_Trader{
     uint256 public lastPot;
     mapping (address => uint256) public cantBidUntil;
     Potato[] public potatoes;
-    
-    uint256 public TIME_TO_COOK=6 hours; 
+
+    uint256 public TIME_TO_COOK=6 hours;
     uint256 public NUM_POTATOES=9;
     uint256 public START_PRICE=0.005 ether;
     uint256 public CONTEST_INTERVAL=12 hours;
-    
+
     /*** DATATYPES ***/
     struct Potato {
         address owner;
         uint256 price;
     }
-    
+
      /// Access modifier for contract owner only functionality
      modifier onlyContractOwner() {
          require(msg.sender == ceoAddress);
         _;
      }
-    
+
     /*** CONSTRUCTOR ***/
     function CEO_Trader() public{
         ceoAddress=msg.sender;
@@ -39,11 +39,11 @@ contract CEO_Trader{
             potatoes.push(newpotato);
         }
     }
-    
+
     /*** PUBLIC FUNCTIONS ***/
     function buyPotato(uint256 index) public payable{
         require(block.timestamp>contestStartTime);
-        if(_endContestIfNeeded()){ 
+        if(_endContestIfNeeded()){
 
         }
         else{
@@ -67,7 +67,7 @@ contract CEO_Trader{
             msg.sender.transfer(purchaseExcess);//returns excess eth
         }
     }
-    
+
     function getBalance() public view returns(uint256 value){
         return this.balance;
     }
@@ -92,7 +92,7 @@ contract CEO_Trader{
     function payout() public onlyContractOwner {
     ceoAddress.transfer(this.balance);
     }
-    
+
     /*** PRIVATE FUNCTIONS ***/
     function _endContestIfNeeded() private returns(bool){
         if(timePassed()>=TIME_TO_COOK){
@@ -101,8 +101,8 @@ contract CEO_Trader{
             ceoAddress.transfer(devFee); //To pump winning stock
             dev1.transfer(devFee); //To pump winning stock
             uint256 faucetFee = uint256(SafeMath.div(SafeMath.mul(this.balance, 1), 100));
-            msg.sender.transfer(faucetFee); 
-            msg.sender.transfer(msg.value); 
+            msg.sender.transfer(faucetFee);
+            msg.sender.transfer(msg.value);
             lastPot=this.balance;
             lastHotPotatoHolder=hotPotatoHolder;
             uint256 potRevard = uint256(SafeMath.div(SafeMath.mul(this.balance, 90), 100));
@@ -170,4 +170,12 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

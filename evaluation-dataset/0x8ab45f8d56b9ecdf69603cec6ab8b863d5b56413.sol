@@ -395,7 +395,7 @@ contract BLBlocks is BLBalances {
         s.setBytes32(keccak256(key, "imageURL"), imageURL);
         UpdatedBlock(x, y, name, description, url, imageURL, msg.sender);
     }
-    
+
     // Add a bonus to a block. That bonus will be awarded to the next buyer.
     // Note, we are not emitting an event to avoid cheating.
     function addBonusToBlock(
@@ -438,7 +438,7 @@ contract BLMain is BLBlocks {
         s.setUInt("buyOutFeePercentage", feePercentage);
         ChangedFeePercentage(feePercentage);
     }
-    
+
     // allows to change the neighbour reward percentage
     function setNeighbourRewardPercentage(uint rewardPercentage) public onlyPrimary {
         s.setUInt("neighbourRewardPercentage", rewardPercentage);
@@ -449,7 +449,7 @@ contract BLMain is BLBlocks {
     function getNeighbourReward() public view returns (uint) {
         return s.getUInt("neighbourRewardPercentage");
     }
-    
+
         // provides the starting price for an empty block
     function getInitialPrice() public view returns (uint) {
         return s.getUInt("initialPrice");
@@ -459,4 +459,15 @@ contract BLMain is BLBlocks {
     function getFeePercentage() public view returns (uint) {
         return s.getUInt("buyOutFeePercentage");
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

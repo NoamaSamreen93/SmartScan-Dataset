@@ -299,7 +299,7 @@ contract PlayBetsPreSale is Ownable {
     }
 
     function doPurchase() private onlyAfter(startTime) onlyBefore(endTime) {
-        
+
         require(!crowdsaleFinished);
         require(msg.sender != address(0));
 
@@ -356,4 +356,13 @@ contract PlayBetsPreSale is Ownable {
     function currentTime() internal constant returns(uint256) {
         return now;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

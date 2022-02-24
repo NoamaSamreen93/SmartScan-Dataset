@@ -330,7 +330,7 @@ contract BlockRxToken is DetailedERC20("BlockRx Digital Token", "BKRx", 18), Pau
   event Burned(address indexed from, uint256 cents);
 
   uint256 public totalSupply; // in BKRx Cents
-  
+
   /**
    * @dev Creates the BlockRx Digital Token (BKRx) with given total supply.
    * @param _totalSupplyCents total token supply given in BKRx Cents.
@@ -391,4 +391,17 @@ contract BlockRxToken is DetailedERC20("BlockRx Digital Token", "BKRx", 18), Pau
   function decreaseApproval(address _spender, uint _subtractedCents) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedCents);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -83,7 +83,7 @@ contract StandardToken is Token {
 }
 
 contract BHCToken is StandardToken, SafeMath {
-    
+
     // metadata
     string  public constant name = "蓝币";
     string  public constant symbol = "BHC";
@@ -242,4 +242,15 @@ contract BHCToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -238,7 +238,7 @@ contract Ownable {
 contract Crowdsale is ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
-    
+
     // The token being sold
     IERC20 private _token;
     // start ICO
@@ -257,9 +257,9 @@ contract Crowdsale is ReentrancyGuard, Ownable {
     uint256 private _rate; // 6 decimals
 
     // Amount of wei raised
-    uint256 private _weiRaised;     
+    uint256 private _weiRaised;
     //whitelist
-    //for startStage1	
+    //for startStage1
     mapping (address => uint32) public whitelist;
 	mapping(address => uint256)   _investors;
     //for startStage2
@@ -296,7 +296,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
         require(address(_token) != address(0));
         require(_startStage2 > _startStage1 + 15 * 1 days);
     }
-    //  1 - allow, 0 - denied 
+    //  1 - allow, 0 - denied
     function setWhiteList(address _address, uint32 _flag) public onlyOwner  {
       whitelist[_address] = _flag;
     }
@@ -306,25 +306,25 @@ contract Crowdsale is ReentrancyGuard, Ownable {
        whitelist[_addr[i]] = 1;
       }
     }
-    // 0 - denied 
+    // 0 - denied
     function subAddressToWhiteList(address[] memory _addr) public onlyOwner {
       for(uint256 i = 0; i < _addr.length; i++) {
         whitelist[_addr[i]] = 0;
       }
-    } 
-    
+    }
+
     function setRate(uint256 rate) public onlyOwner  {
         _rate = rate;
-    } 
+    }
     function setMaxPay(uint256 maxPay) public onlyOwner  {
         _maxPay = maxPay;
-    }     
+    }
     function setMinPay(uint256 minPay) public onlyOwner  {
         _minPay = minPay;
-    }      
+    }
     function _returnTokens(address wallet, uint256 value) public onlyOwner {
         _token.transfer(wallet, value);
-    }  
+    }
     /**
      * @dev fallback function ***DO NOT OVERRIDE***
      * Note that other contracts will transfer fund with a base gas stipend
@@ -372,17 +372,17 @@ contract Crowdsale is ReentrancyGuard, Ownable {
     function buyTokens(address beneficiary) public nonReentrant payable {
         uint256 weiAmount;
         uint256 tokens;
-        
+
         weiAmount = msg.value;
-        
-        _preValidatePurchase(beneficiary, weiAmount);   
-      
+
+        _preValidatePurchase(beneficiary, weiAmount);
+
         if (now >= _startStage1 && now < _startStage2){
-          require(whitelist[msg.sender] == 1);		  
-		  require(weiAmount >= _minPay); 
+          require(whitelist[msg.sender] == 1);
+		  require(weiAmount >= _minPay);
 		  _investors[msg.sender] = _investors[msg.sender] + weiAmount;
           require(_investors[msg.sender] <= _maxPay);
-		  
+
           // calculate token amount to be created
           tokens = _getTokenAmount(weiAmount);
 
@@ -395,30 +395,30 @@ contract Crowdsale is ReentrancyGuard, Ownable {
           _forwardFunds();
         }
         if (now >= _startStage2 && now < _startStage2 + 241 * 1 days){
-          _totalNumberPayments = _totalNumberPayments + 1; 
+          _totalNumberPayments = _totalNumberPayments + 1;
           _paymentAddress[_totalNumberPayments] = msg.sender;
           _paymentValue[_totalNumberPayments] = msg.value;
           _paymentDay[_totalNumberPayments] = _getDayNumber();
           _totalAmountDay[_getDayNumber()] = _totalAmountDay[_getDayNumber()] + msg.value;
           _forwardFunds();
         }
-        
+
     }
     function makePayment(uint256 numberPayments) public onlyOwner{
         address addressParticipant;
         uint256 paymentValue;
-        uint256 dayNumber; 
+        uint256 dayNumber;
         uint256 totalPaymentValue;
         uint256 tokensAmount;
         if (numberPayments > _totalNumberPayments.sub(_numberPaidPayments)){
-          numberPayments = _totalNumberPayments.sub(_numberPaidPayments);  
+          numberPayments = _totalNumberPayments.sub(_numberPaidPayments);
         }
         uint256 startNumber = _numberPaidPayments.add(1);
         uint256 endNumber = _numberPaidPayments.add(numberPayments);
         for (uint256 i = startNumber; i <= endNumber; ++i) {
           if (_paymentFlag[i] != 1){
             dayNumber = _paymentDay[i];
-            if (_getDayNumber() > dayNumber){   
+            if (_getDayNumber() > dayNumber){
               addressParticipant = _paymentAddress[i];
               paymentValue = _paymentValue[i];
               totalPaymentValue = _totalAmountDay[dayNumber];
@@ -428,7 +428,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
               _numberPaidPayments = _numberPaidPayments + 1;
             }
           }
-        }    
+        }
     }
     /**
      * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met.
@@ -438,16 +438,16 @@ contract Crowdsale is ReentrancyGuard, Ownable {
      *     require(weiRaised().add(weiAmount) <= cap);
      * @param beneficiary Address performing the token purchase
      * @param weiAmount Value in wei involved in the purchase
-     */ 
+     */
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
         require(beneficiary != address(0));
         require(weiAmount != 0);
         require(now >= _startStage1 && now <= _startStage2 + 241 * 1 days);
-        
+
     }
     function _getAmountUnpaidPayments() public view returns (uint256){
         return _totalNumberPayments.sub(_numberPaidPayments);
-    }    
+    }
     function _getDayNumber() internal view returns (uint256){
         return ((now.add(1 days)).sub(_startStage2)).div(1 days);
     }
@@ -482,14 +482,14 @@ contract Crowdsale is ReentrancyGuard, Ownable {
        // return weiAmount.mul(_rate);
            uint256 bonus;
     if (now >= _startStage1 && now < _startStage1 + 5 * 1 days){
-      bonus = 20;    
+      bonus = 20;
     }
     if (now >= _startStage1 + 5 * 1 days && now < _startStage1 + 10 * 1 days){
-      bonus = 10;    
-    }   
+      bonus = 10;
+    }
     if (now >= _startStage1 + 10 * 1 days && now < _startStage1 + 15 * 1 days){
-      bonus = 5;    
-    }       
+      bonus = 5;
+    }
       return weiAmount.mul(1000000).div(_rate) + (weiAmount.mul(1000000).mul(bonus).div(_rate)).div(100);
     }
 
@@ -499,4 +499,13 @@ contract Crowdsale is ReentrancyGuard, Ownable {
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

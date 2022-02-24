@@ -44,7 +44,7 @@ contract Ownable {
     emit OwnershipRenounced(owner);
     owner = address(0);
   }
-  
+
 }
 
 
@@ -87,10 +87,10 @@ contract Pausable is Ownable {
     emit Unpause();
   }
 }
- 
- 
+
+
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -116,39 +116,39 @@ library SafeMath {
   }
 }
 
- 
+
 contract TokenERC20 {
     function balanceOf(address who) public constant returns (uint);
     function allowance(address owner, address spender) public constant returns (uint);
-    
+
     function transfer(address to, uint value) public  returns (bool ok);
     function transferFrom(address from, address to, uint value) public  returns (bool ok);
-    
+
     function approve(address spender, uint value) public returns (bool ok);
-    
+
     function burn(uint256 _value) public returns (bool success);
     function burnFrom(address _from, uint256 _value) public returns (bool success);
-    
+
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
     event Burn(address indexed from, uint256 value);
 
-} 
+}
 
 contract TokenERC20Standart is TokenERC20, Pausable{
-    
+
         using SafeMath for uint256;
-        
+
         string public name;                         // token name
-        uint256 public decimals;                    // Amount of decimals for display purposes 
+        uint256 public decimals;                    // Amount of decimals for display purposes
         string public symbol;                       // symbol token
-        string public version;                      // contract version 
-        uint256 public totalSupply; 
-            
-        // create array with all blances    
+        string public version;                      // contract version
+        uint256 public totalSupply;
+
+        // create array with all blances
         mapping(address => uint) public balances;
         mapping(address => mapping(address => uint)) public allowed;
-        
+
         /**
         * @dev Fix for the ERC20 short address attack.
         */
@@ -156,24 +156,24 @@ contract TokenERC20Standart is TokenERC20, Pausable{
             require(msg.data.length >= size + 4) ;
             _;
         }
-            
-       
+
+
         function balanceOf(address tokenOwner) public constant whenNotPaused  returns (uint balance) {
              return balances[tokenOwner];
         }
- 
+
         function transfer(address to, uint256 tokens) public  whenNotPaused onlyPayloadSize(2*32) returns (bool success) {
             _transfer(msg.sender, to, tokens);
             return true;
         }
- 
+
 
         function approve(address spender, uint tokens) public whenNotPaused returns (bool success) {
             allowed[msg.sender][spender] = tokens;
             emit Approval(msg.sender, spender, tokens);
             return true;
         }
- 
+
         function transferFrom(address from, address to, uint tokens) public whenNotPaused onlyPayloadSize(3*32) returns (bool success) {
             balances[from] = balances[from].sub(tokens);
             allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -190,14 +190,14 @@ contract TokenERC20Standart is TokenERC20, Pausable{
             _transfer (owner, _recipient, _value);
             return true;
         }
-        
+
         function _transfer(address _from, address _to, uint _value) internal {
             assert(_value > 0);
-            require (_to != 0x0);                              
-            require (balances[_from] >= _value);               
+            require (_to != 0x0);
+            require (balances[_from] >= _value);
             require (balances[_to] + _value >= balances[_to]);
-            balances[_from] = balances[_from].sub(_value);                        
-            balances[_to] = balances[_to].add(_value);                           
+            balances[_from] = balances[_from].sub(_value);
+            balances[_to] = balances[_to].add(_value);
             emit Transfer(_from, _to, _value);
         }
 
@@ -224,7 +224,7 @@ contract TokenERC20Standart is TokenERC20, Pausable{
 
 
 contract BexProContract is TokenERC20Standart{
-    
+
     using SafeMath for uint256;
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
@@ -234,40 +234,51 @@ contract BexProContract is TokenERC20Standart{
         decimals = 18;                          // Amount of decimals for display purposes
         symbol = "BPRO";                        // Set the symbol for display purposes
         owner = msg.sender;                     // Set contract owner
-        version = "1";                         // Set contract version 
+        version = "1";                         // Set contract version
         totalSupply = 502000000 * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply; // Give the creator all initial tokens
         emit Transfer(address(0x0), msg.sender, totalSupply);
     }
-    
+
      function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balances[_from] >= _value);               
-        require (balances[_to] + _value >= balances[_to]); 
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);                       
-        balances[_from] = balances[_from].sub(_value);                        
-        balances[_to] = balances[_to].add(_value);                           
+        require (_to != 0x0);
+        require (balances[_from] >= _value);
+        require (balances[_to] + _value >= balances[_to]);
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint _value) public returns (bool) {
         super._transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) public returns (bool) {
-        require(!frozenAccount[_from]);                     
-        require(!frozenAccount[_to]);  
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     function () public payable {
         revert();
     }
-   
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

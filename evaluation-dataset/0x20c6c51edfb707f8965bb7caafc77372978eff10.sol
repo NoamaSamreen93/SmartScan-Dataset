@@ -22,8 +22,8 @@ pragma solidity ^0.4.20;
 * -> What about the last projects?
 * All other PROOF contracts are DED .
 * The dev team is the dev team from before, Thanks P3D!
-* The difference here is the mistakes have been addressed from not only the perspective of the small player but also core marketing elements have been improved. 
-* 
+* The difference here is the mistakes have been addressed from not only the perspective of the small player but also core marketing elements have been improved.
+*
 * -> Who worked on this project?
 * - BlvckMoneySteeze (POSM Visionary, N00B Solidity Dev)
 * - Mantso (Solidity dev) by DE FACTO & Inspiration only
@@ -736,4 +736,15 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

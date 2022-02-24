@@ -221,7 +221,7 @@ contract MajorityGame {
     function submitChoose(uint _chooseValue) public payable notEnded withinGameTime {
         require(!option1List[msg.sender] && !option2List[msg.sender]);
         require(msg.value == gameBet);
-		
+
         if (_chooseValue == 1) {
             option1List[msg.sender] = true;
             option1AddressList.push(msg.sender);
@@ -335,7 +335,7 @@ contract MajorityGame {
 
     /**
      * send award to winner
-     **/    
+     **/
     function sendAward() public isEnded {
         require(awardCounter > 0);
 
@@ -354,7 +354,7 @@ contract MajorityGame {
 
     /**
      * send award to last winner of the list
-     **/    
+     **/
     function sendAwardToLastOne() public isEnded {
 		require(awardCounter > 0);
         if(winnerSide == 1){
@@ -362,7 +362,7 @@ contract MajorityGame {
         }else{
             address(option2AddressList[awardCounter - 1]).transfer(award);
         }
-        
+
         awardCounter--;
 
         if(awardCounter == 0){
@@ -433,4 +433,15 @@ contract MajorityGame {
         return option1AddressList;
       }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

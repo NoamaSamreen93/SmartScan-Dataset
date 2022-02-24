@@ -36,7 +36,7 @@ contract Base
         if (IsLimitPart(level, part)) return PARTWEIGHT_LIMIT;
         return PARTWEIGHT_NORMAL;
     }
-    
+
     function GetPartNum(uint8 level) internal pure returns(uint)
     {
         if (level <= 2) return 3;
@@ -97,7 +97,7 @@ contract BasicAuth is Base
     {
         return from == creator || from == master;
     }
-    
+
     function SetAuth(address target) external
     {
         require(CanHandleAuth(tx.origin) || CanHandleAuth(msg.sender));
@@ -174,4 +174,15 @@ contract StoreGifts is BasicAuth
         return g_Exchange[acc][key];
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

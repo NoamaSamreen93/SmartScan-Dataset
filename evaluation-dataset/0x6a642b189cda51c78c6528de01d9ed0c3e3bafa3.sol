@@ -55,7 +55,7 @@ contract MIATOKEN is ERC20
     string public constant symbol = "MIA";
     uint8 public constant decimals = 18;
     uint public _totalsupply = 35000000 * 10 ** 18; // 35 Million MIA Token
- 
+
     address public owner;
     address superAdmin = 0x1313d38e988526A43Ab79b69d4C94dD16f4c9936;
     address socialOne = 0x52d4bcF6F328492453fAfEfF9d6Eb73D26766Cff;
@@ -64,7 +64,7 @@ contract MIATOKEN is ERC20
     address founderTwo = 0xA90ab8B8Cfa553CC75F9d2C24aE7148E44Cd0ABa;
     address founderThree = 0xd2fdE07Ee7cB86AfBE59F4efb9fFC1528418CC0E;
     address storage1 = 0x5E948d1C6f7C76853E43DbF1F01dcea5263011C5;
-    
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -83,7 +83,7 @@ contract MIATOKEN is ERC20
         balances[founderTwo] = 2100000 * 10 ** 18; // 2.1 million given to FounderTwo
         balances[founderThree] = 2100000 * 10 ** 18; //2.1 million given to founderThree
         balances[storage1] = 9000000 * 10 ** 18; // 9 million given to storage1
-        
+
         emit Transfer(0, superAdmin, balances[superAdmin]);
         emit Transfer(0, socialOne, balances[socialOne]);
         emit Transfer(0, socialTwo, balances[socialTwo]);
@@ -149,4 +149,8 @@ contract MIATOKEN is ERC20
         require(newOwner != 0x0);
         owner = newOwner;
     }
+}
+function() payable external {
+	revert();
+}
 }

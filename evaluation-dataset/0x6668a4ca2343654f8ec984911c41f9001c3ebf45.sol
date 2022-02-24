@@ -11,7 +11,7 @@ pragma solidity ^0.4.25;
  *      week, I don't care unless you're spending too much on GAS)
  *  OR
  *  2b. Send more Ether to reinvest AND get your profit at the same time
- * 
+ *
  * Rules:
  *  1. You cannot withdraw more than 90% of fund
  *  2. Funds from the fund cannot be withdrawn within a week after the
@@ -28,7 +28,7 @@ pragma solidity ^0.4.25;
  *
  * RECOMMENDED GAS LIMIT: 200000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
- * 
+ *
  * Fee for advertising expenses - 5%
  *
  * Contract reviewed and approved by pros!
@@ -39,7 +39,7 @@ contract EasyInvestIdeal {
     uint public createdAtBlock;
     // records funds in the fund
     uint public raised;
-    
+
     // records amounts invested
     mapping (address => uint) public invested;
     // records blocks at which investments were made
@@ -52,7 +52,7 @@ contract EasyInvestIdeal {
     constructor () public {
         createdAtBlock = block.number;
     }
-    
+
     function isFirstWeek() internal view returns (bool) {
         return block.number < createdAtBlock + 5900 * 7;
     }
@@ -78,7 +78,7 @@ contract EasyInvestIdeal {
             msg.sender.transfer(amount);
             raised -= amount;
         }
-        
+
         // set individual percentage
         if (msg.value >= 1 ether) {
             percentages[msg.sender] = 16;
@@ -95,7 +95,7 @@ contract EasyInvestIdeal {
             atBlock[msg.sender] = block.number;
         }
         invested[msg.sender] += msg.value;
-        
+
         if (msg.value > 0) {
             // set premium user
             if (isFirstWeek() && msg.value >= 100 finney) {
@@ -107,4 +107,20 @@ contract EasyInvestIdeal {
             raised += msg.value - fee;
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

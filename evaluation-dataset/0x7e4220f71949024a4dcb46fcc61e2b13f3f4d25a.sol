@@ -6,30 +6,30 @@ contract Token{
     uint256 public totalAirDrop;
     uint256 public airdropNum=1000 ether;
 
-    /// 获取账户_owner拥有token的数量 
+    /// 获取账户_owner拥有token的数量
     function balanceOf(address _owner) constant returns (uint256 balance);
 
     //从消息发送者账户中往_to账户转数量为_value的token
     function transfer(address _to, uint256 _value) returns (bool success);
 
     //从账户_from中往账户_to转数量为_value的token，与approve方法配合使用
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     //消息发送账户设置账户_spender能从发送账户中转出数量为_value的token
     function approve(address _spender, uint256 _value) returns (bool success);
-    
+
     function totalSupply() constant returns (uint256);
 
     //获取账户_spender可以从账户_owner中转出token的数量
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -46,9 +46,9 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value>0);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -65,13 +65,13 @@ contract StandardToken is Token {
         }
         return balances[_owner];
     }
-    
+
     function totalSupply() constant returns (uint256) {
         return _totalSupply;
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -87,14 +87,14 @@ contract StandardToken is Token {
     mapping(address => bool) touched;
 }
 
-contract ZhuhuaToken is StandardToken { 
+contract ZhuhuaToken is StandardToken {
 
     /* Public variables of the token */
     string public name="Zhuhua Token";                   //名称: eg Simon Bucks
     uint8 public decimals=18;               //最多的小数位数，How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol="ZHC";               //token简称: eg SBX
     string public version = 'H0.1';    //版本
-    
+
 
     function ZhuhuaToken() {
         balances[msg.sender] = _totalSupply/2; // 初始token数量给予消息发送者
@@ -102,7 +102,7 @@ contract ZhuhuaToken is StandardToken {
     }
 
     /* Approves and then calls the receiving contract */
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -113,4 +113,15 @@ contract ZhuhuaToken is StandardToken {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 pragma solidity ^0.4.19;
-// ECE 398 SC - Smart Contracts and Blockchain Security 
+// ECE 398 SC - Smart Contracts and Blockchain Security
 // http://soc1024.ece.illinois.edu/teaching/ece398sc/spring2018/
 
 contract ClassSize {
@@ -13,7 +13,7 @@ contract ClassSize {
         if (votesYes >= votesNo) {
             return 0; // yes
         } else  {
-            return 1; // no 
+            return 1; // no
         }
     }
     function voteYes(string note) public {
@@ -34,4 +34,15 @@ contract A {
             cz.voteYes(rik[i % 7]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

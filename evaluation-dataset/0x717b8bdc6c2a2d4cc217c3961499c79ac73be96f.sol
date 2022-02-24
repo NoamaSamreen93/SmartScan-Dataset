@@ -106,7 +106,7 @@ contract NEBCStandardToken is StandardToken {
     Some wallets/interfaces might not even bother to look at this information.
     */
     string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show. 
+    uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier
     string public version = 'F0.1';       // Just an arbitrary versioning scheme.
 
@@ -137,3 +137,19 @@ contract NEBCStandardToken is StandardToken {
 }
 // Creates 990,000,000.000000000000000000 (NEBC) Tokens
 contract NEBC is NEBCStandardToken(990000000000000000000000000, "中子链", 18, "NEBC") {}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
+}

@@ -95,3 +95,7 @@ contract Membership is Owned
     Token(_tok).transfer( _to, _qty );
   }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

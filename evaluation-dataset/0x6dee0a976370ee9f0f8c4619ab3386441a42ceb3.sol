@@ -8,13 +8,13 @@ contract CoinifinexToken {
 	uint256 constant public TOKEN_FOR_ICO = 650 * 10 ** 6;
 	uint256 constant public TOKEN_FOR_COMPANY = 200 * 10 ** 6;
 	uint256 constant public TOKEN_FOR_BONUS = 50 * 10 ** 6;
-	
+
 	mapping (address => uint256) public tokenForTeam;
 	mapping (address => uint256) public tokenForTeamGet;
 	address[] public teamAddress;
 
 	uint public startTime;
-	
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -42,10 +42,10 @@ contract CoinifinexToken {
         totalSupply = TOTAL_TOKEN * 10 ** uint256(decimals); // Update total supply with the decimal amount
         name = "Coinifinex";                                 // Set the name for display purposes
         symbol = "CFX";                               		// Set the symbol for display purposes
-		
+
 		// Initializes
 		startTime = 1538265600; // 09/30/2018 @ 12:00am (UTC)
-		
+
 		tokenForTeam[0x4B7786bD8eB1F738699290Bb83cA8E28fEDea4b0] =	20 * 10 ** 6 * 10 ** uint256(decimals);
 		tokenForTeam[0x040440286a443822211dDe0e7E9DA3F49aF2EBC7] =	20 * 10 ** 6 * 10 ** uint256(decimals);
 		tokenForTeam[0x4f7a5A2BafAd56562ac4Ccc85FE004BB84435F71] =	20 * 10 ** 6 * 10 ** uint256(decimals);
@@ -62,7 +62,7 @@ contract CoinifinexToken {
 		tokenForTeam[0xe4dB43bcB8aecFf58C720F70414A9d36Fd7B9F78] =	5 * 10 ** 6 * 10 ** uint256(decimals);
 		tokenForTeam[0xf28edB52E808cd9DCe18A87fD94D373D6B9f65ae] =	5 * 10 ** 6 * 10 ** uint256(decimals);
 		tokenForTeam[0x87CE30ad0B66266b30c206a9e39A3FC0970db5eF] =	5 * 10 ** 6 * 10 ** uint256(decimals);
-		
+
 		// address of teams
 		teamAddress.push(0x4B7786bD8eB1F738699290Bb83cA8E28fEDea4b0);
 		teamAddress.push(0x040440286a443822211dDe0e7E9DA3F49aF2EBC7);
@@ -206,24 +206,32 @@ contract CoinifinexToken {
         Burn(_from, _value);
         return true;
     }
-	
+
 	function getTeamFund() public {
 		// Second period after 9 months
 		if (now >= startTime + 270 days) {
 			if (tokenForTeamGet[msg.sender] <  tokenForTeam[msg.sender] * 55 / 100) {
 				uint256 getValue2 = tokenForTeam[msg.sender] * 45 / 100;
 				tokenForTeamGet[msg.sender] += getValue2; // first period
-				balanceOf[msg.sender] += getValue2;		
+				balanceOf[msg.sender] += getValue2;
 			}
 		}
-		
+
 		// Third period after 9 + 6 months
 		if (now >= startTime + 450 days) {
 			if (tokenForTeamGet[msg.sender] <  tokenForTeam[msg.sender]) {
 				uint256 getValue3 = tokenForTeam[msg.sender] * 45 / 100;
 				tokenForTeamGet[msg.sender] += getValue3; // first period
-				balanceOf[msg.sender] += getValue3;	
-			}			
+				balanceOf[msg.sender] += getValue3;
+			}
 		}
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

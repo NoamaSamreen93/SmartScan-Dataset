@@ -135,7 +135,7 @@ contract ViToken is ERC20Token, Owned {
 
     // SET current initial token supply
     uint256 public initialSupply = 250000000;
-    // 
+    //
     bool public fundingEnabled = true;
     // The maximum tokens available for sale
     uint256 public maxSaleToken;
@@ -146,7 +146,7 @@ contract ViToken is ERC20Token, Owned {
     // Funding wallets, which allowed the transaction during the crowdfunding
     address[] public wallets;
     // The flag indicates if the Vimarket contract is in enable / disable transfers
-    bool public transfersEnabled = true; 
+    bool public transfersEnabled = true;
 
     // List wallets to allow transactions tokens
     uint[256] private nWallets;
@@ -166,7 +166,7 @@ contract ViToken is ERC20Token, Owned {
         // Initializing 72% of tokens for sale
         // maxSaleToken = initialSupply * 72 / 100 (72% this is maxSaleToken & 100% this is initialSupply)
         // totalProjectToken will be calculated in function finalize()
-        // 
+        //
         // |------------maxSaleToken------totalProjectToken|
         // |================72%================|====28%====|
         // |------------------totalSupply------------------|
@@ -268,4 +268,15 @@ contract ViToken is ERC20Token, Owned {
 
         DisableTransfers();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

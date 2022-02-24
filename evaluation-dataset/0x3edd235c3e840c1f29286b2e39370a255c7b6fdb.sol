@@ -99,7 +99,7 @@ function transfer(address _to, uint256 _value) returns (bool success) {
 
 }
 
-function transferFrom(address _from, address _to, uint256 _value) returns (bool success) { 
+function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 	require(
 	allowed[_from][msg.sender] >= _value
 	&& balances[_from] >= _value
@@ -116,7 +116,7 @@ function transferFrom(address _from, address _to, uint256 _value) returns (bool 
 function approve(address _spender, uint256 _value) returns (bool success) {
 	allowed[msg.sender][_spender] = _value;
 	Approval(msg.sender, _spender, _value);
-	return true;	
+	return true;
 }
 
 function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
@@ -127,4 +127,17 @@ function allowance(address _owner, address _spender) constant returns (uint256 r
 event Transfer(address indexed _from, address indexed _to, uint256 _value);
 event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

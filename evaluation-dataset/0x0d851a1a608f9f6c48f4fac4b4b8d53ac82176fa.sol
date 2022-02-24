@@ -14,12 +14,12 @@ library SafeMath {
     uint256 c = _a / _b;
     return c;
     }
-    
+
     function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     assert(_b <= _a);
     return _a - _b;
     }
-    
+
     function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
     uint256 c = _a + _b;
     assert(c >= _a);
@@ -52,7 +52,7 @@ contract Ownable {
     require(_newOwner != address(0));
     newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public onlyNewOwner returns(bool) {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -63,7 +63,7 @@ contract Pausable is Ownable {
     event Pause();
     event Unpause();
     bool public paused = false;
-    
+
     modifier whenNotPaused() {
     require(!paused);
     _;
@@ -77,7 +77,7 @@ contract Pausable is Ownable {
     paused = true;
     emit Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused public {
     paused = false;
     emit Unpause();
@@ -102,20 +102,20 @@ interface TokenRecipient {
 contract YoloCoin is ERC20, Ownable, Pausable {
     uint128 internal MONTH = 30 * 24 * 3600; // 1 month
     using SafeMath for uint256;
-    
+
     struct LockupInfo {
     uint256 releaseTime;
     uint256 termOfRound;
     uint256 unlockAmountPerRound;
     uint256 lockupBalance;
     }
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal totalSupply_;
-    
+
     mapping(address => uint256) internal balances;
     mapping(address => bool) public frozen;
     mapping(address => mapping(address => uint256)) internal allowed;
@@ -123,7 +123,7 @@ contract YoloCoin is ERC20, Ownable, Pausable {
     event Mint(uint256 value);
     event Freeze(address indexed holder);
     event Unfreeze(address indexed holder);
-    
+
     modifier notFrozen(address _holder) {
     require(!frozen[_holder]);
     _;
@@ -148,21 +148,21 @@ contract YoloCoin is ERC20, Ownable, Pausable {
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-       
+
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
        balances[_from] = balances[_from].sub(_value);
        balances[_to] = balances[_to].add(_value);
       allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
       emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -172,7 +172,7 @@ contract YoloCoin is ERC20, Ownable, Pausable {
     function balanceOf(address _holder) public view returns (uint256 balance) {
     return balances[_holder];
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
 
     require(_to != address(0));
@@ -180,10 +180,10 @@ contract YoloCoin is ERC20, Ownable, Pausable {
     require(_value <= allowed[_from][msg.sender]);
 
     _transfer(_from, _to, _value);
-    
+
     return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
@@ -216,12 +216,23 @@ contract YoloCoin is ERC20, Ownable, Pausable {
     emit Burn(burner, _value);
     return true;
     }
-    
+
     function mint( uint256 _amount) onlyOwner public returns (bool) {
     totalSupply_ = totalSupply_.add(_amount);
     balances[owner] = balances[owner].add(_amount);
-    
+
     emit Transfer(address(0), owner, _amount);
     return true;
-    }    
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

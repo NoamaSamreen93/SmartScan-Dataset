@@ -9,10 +9,10 @@ pragma solidity ^0.4.23;
      */
     contract Ownable {
       address public owner;
-    
+
       event OwnershipRenounced(address indexed previousOwner);
       event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
       /**
        * @dev The Ownable constructor sets the original `owner` of the contract to the sender
        * account.
@@ -21,7 +21,7 @@ pragma solidity ^0.4.23;
       constructor() public {
         owner = msg.sender;
       }
-    
+
       /**
        * @dev Throws if called by any account other than the owner.
        */
@@ -29,7 +29,7 @@ pragma solidity ^0.4.23;
         require(msg.sender == owner);
         _;
       }
-    
+
       /**
        * @dev Allows the current owner to transfer control of the contract to a newOwner.
        * @param newOwner The address to transfer ownership to.
@@ -39,7 +39,7 @@ pragma solidity ^0.4.23;
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
       }
-    
+
       /**
        * @dev Allows the current owner to relinquish control of the contract.
        */
@@ -55,7 +55,7 @@ contract CeoOwner is Ownable{
 
 	// The primary address which is permitted to interact with the contract
 	// Address of wallet account on WEB3.js account.
-	address public ceoAddress; 
+	address public ceoAddress;
 
 	modifier onlyCEO() {
 		require(msg.sender == ceoAddress);
@@ -103,7 +103,7 @@ contract CeoOwner is Ownable{
      * @dev Math operations with safety checks that throw on error
      */
      library SafeMath {
-      
+
       /**
       * @dev Multiplies two numbers, throws on overflow.
       */
@@ -115,7 +115,7 @@ contract CeoOwner is Ownable{
         assert(c / a == b);
         return c;
       }
-      
+
       /**
       * @dev Integer division of two numbers, truncating the quotient.
       */
@@ -125,7 +125,7 @@ contract CeoOwner is Ownable{
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
       }
-      
+
       /**
       * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
       */
@@ -133,7 +133,7 @@ contract CeoOwner is Ownable{
         assert(b <= a);
         return a - b;
       }
-      
+
       /**
       * @dev Adds two numbers, throws on overflow.
       */
@@ -146,41 +146,41 @@ contract CeoOwner is Ownable{
 
 // File: contracts/CertificateCore.sol
 
-contract CertificateCore is CeoOwner, ReentrancyGuard { 
-   
-    using SafeMath for uint256; 
+contract CertificateCore is CeoOwner, ReentrancyGuard {
+
+    using SafeMath for uint256;
 
     uint256 public constant KEY_CREATION_LIMIT = 10000;
     uint256 public totalSupplyOfKeys;
     uint256 public totalReclaimedKeys;
-    
-    // Track who is making the deposits and the amount made
-    mapping(address => uint256) public balanceOf; 
 
-    // Main data structure to hold all of the public keys   
+    // Track who is making the deposits and the amount made
+    mapping(address => uint256) public balanceOf;
+
+    // Main data structure to hold all of the public keys
     mapping(address => bool) public allThePublicKeys;
-    
+
     // A bonus deposit has been made
-    event DepositBonusEvent(address sender, uint256 amount); 
-    
+    event DepositBonusEvent(address sender, uint256 amount);
+
     // A new certificate has been successfully sold and a deposit added
     event DepositCertificateSaleEvent(address sender, address publicKey, uint256 amount);
 
     // A certificate has been payed out.
     event CertPayedOutEvent(address sender, address recpublicKey, uint256 payoutValue);
-    
+
 
     constructor(address _ceoAddress) public{
         require(_ceoAddress != address(0));
         owner = msg.sender;
         ceoAddress = _ceoAddress;
     }
- 
-    
+
+
     /**
      *
      * Main function for creating certificates
-     * 
+     *
      */
     //function createANewCert(address _publicKey, uint256 _amount) external payable onlyCEO{
     function depositCertificateSale(address _publicKey, uint256 _amount) external payable onlyCEO{
@@ -190,47 +190,47 @@ contract CertificateCore is CeoOwner, ReentrancyGuard {
         require(_publicKey != address(0));
         require(totalSupplyOfKeys < KEY_CREATION_LIMIT);
         require(totalReclaimedKeys < KEY_CREATION_LIMIT);
- 
+
         require(!allThePublicKeys[_publicKey]);
 
         allThePublicKeys[_publicKey]=true;
         totalSupplyOfKeys ++;
 
         balanceOf[msg.sender] = balanceOf[msg.sender].add(_amount);
-        
+
         emit DepositCertificateSaleEvent(msg.sender, _publicKey, _amount);
     }
-    
+
     /**
      *  Allow the CEO to deposit ETH without creating a new certificate
-     * 
+     *
      * */
     //function deposit(uint256 _amount) external payable onlyCEO {
     function depositBonus(uint256 _amount) external payable onlyCEO {
         require(_amount > 0);
         require(msg.value == _amount);
-      
+
         require((totalSupplyOfKeys > 0) && (totalSupplyOfKeys < KEY_CREATION_LIMIT));
         require(totalReclaimedKeys < KEY_CREATION_LIMIT);
-      
+
         balanceOf[msg.sender] = balanceOf[msg.sender].add(_amount);
-        
+
         emit DepositBonusEvent(msg.sender, _amount);
     }
-    
+
     /**
-     * Payout a certificate. 
-     * 
+     * Payout a certificate.
+     *
      */
     function payoutACert(bytes32 _msgHash, uint8 _v, bytes32 _r, bytes32 _s) external nonReentrant{
         require(msg.sender != address(0));
         require(address(this).balance > 0);
         require(totalSupplyOfKeys > 0);
         require(totalReclaimedKeys < KEY_CREATION_LIMIT);
-         
+
         address _recoveredAddress = ecrecover(_msgHash, _v, _r, _s);
         require(allThePublicKeys[_recoveredAddress]);
-    
+
         allThePublicKeys[_recoveredAddress]=false;
 
         uint256 _validKeys = totalSupplyOfKeys.sub(totalReclaimedKeys);
@@ -238,10 +238,10 @@ contract CertificateCore is CeoOwner, ReentrancyGuard {
 
         msg.sender.transfer(_payoutValue);
         emit CertPayedOutEvent(msg.sender, _recoveredAddress, _payoutValue);
-        
+
         totalReclaimedKeys ++;
     }
- 
+
      /**
      * Update payout value per certificate.
      */
@@ -259,8 +259,8 @@ contract CertificateCore is CeoOwner, ReentrancyGuard {
             _etherValue = address(this).balance.div(_validKeys);
         }
     }
- 
- 
+
+
     /**
      * Check to see if a Key has been payed out or if it's still valid
      */
@@ -274,25 +274,25 @@ contract CertificateCore is CeoOwner, ReentrancyGuard {
     ){
         contractBalance = address(this).balance;
     }
-    
+
     /**
      * Saftey Mechanism
-     * 
+     *
      */
-    function kill() external onlyOwner 
-    { 
-        selfdestruct(owner); 
+    function kill() external onlyOwner
+    {
+        selfdestruct(owner);
     }
- 
+
     /**
      * Payable fallback function.
-     * No Tipping! 
-     * 
+     * No Tipping!
+     *
      */
     //function () payable public{
     //    throw;
     //}
-    
+
 }
 
 // File: contracts/Migrations.sol
@@ -318,4 +318,20 @@ contract Migrations {
     Migrations upgraded = Migrations(new_address);
     upgraded.setCompleted(last_completed_migration);
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

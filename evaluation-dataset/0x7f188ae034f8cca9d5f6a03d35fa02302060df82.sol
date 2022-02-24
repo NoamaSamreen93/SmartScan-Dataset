@@ -1,11 +1,11 @@
 pragma solidity ^0.4.23;
 
 interface ERC721 /* is ERC165 */ {
-   
+
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
-    
+
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
     function balanceOf(address _owner) external view returns (uint256);
@@ -28,18 +28,18 @@ interface ERC721 /* is ERC165 */ {
 }
 
 interface ERC165 {
-   
+
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
 
 /// @dev Note: the ERC-165 identifier for this interface is 0x150b7a02.
 interface ERC721TokenReceiver {
-  
+
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) external returns(bytes4);
 }
 
 interface ERC721Metadata /* is ERC721 */ {
-    
+
     function name() external view returns (string _name);
 
     function symbol() external view returns (string _symbol);
@@ -48,7 +48,7 @@ interface ERC721Metadata /* is ERC721 */ {
 }
 
 interface ERC721Enumerable /* is ERC721 */ {
-    
+
     function totalSupply() external view returns (uint256);
 
     function tokenByIndex(uint256 _index) external view returns (uint256);
@@ -57,7 +57,7 @@ interface ERC721Enumerable /* is ERC721 */ {
 }
 
 library Strings {
-    
+
   // via https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol
   function strConcat(string _a, string _b, string _c, string _d, string _e) internal pure returns (string) {
       bytes memory _ba = bytes(_a);
@@ -179,7 +179,7 @@ library SafeMath {
 contract MyTokenBadgeFootStone is ERC721, ERC165 {
 
     bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
-    
+
     bytes4 public constant InterfaceId_ERC165 = 0x01ffc9a7;
 
     bytes4 private constant InterfaceId_ERC721 = 0x80ac58cd;
@@ -302,7 +302,7 @@ contract MyTokenBadgeFootStone is ERC721, ERC165 {
         tokenOwner[_tokenId] = _to;
 
         uint256 length = ownedTokens[_to].length;
-        
+
         require(length == uint32(length));
         ownedTokens[_to].push(uint8(_tokenId));
 
@@ -361,7 +361,7 @@ interface MetadataConverter {
     function tokenSLogoBGURI() view returns (string);
     function tokenBLogoBGURI() view returns (string);
 	function tokenBGURI() view returns (string);
-	function tokenURI(uint256 _tokenId) view returns (string);	
+	function tokenURI(uint256 _tokenId) view returns (string);
 	function name(uint256 _tokenId) view returns (string);
 }
 
@@ -601,4 +601,15 @@ contract GenesisBadge is MyTokenBadgeFootStone, ManagerContract, ERC721Enumerabl
 		require(_index < balanceOf(_owner));
         return ownedTokens[_owner][_index];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

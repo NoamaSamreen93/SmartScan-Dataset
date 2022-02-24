@@ -198,13 +198,13 @@ contract Ecoprotech is ERC223, Ownable {
      */
     constructor(address _owner, address _marketor1, address _marketor2) public {
 
-        marketor = _marketor1;                                     
-        address tokenSale = 0xbc9019f01acf8e508157ced0744168bf63e2ca50;              
-        address organization = 0x6400e8f9f71d3b4d886098b19520f40502c5bbb6;           
-        address advisor = 0x62148bd0cf4d44fa045130aa39c2fcd6e7b70a20;                
-        address developer = 0xed45f100028964156800e2a24116196cd767d78b;              
-        address team = 0x2ca0da7ae78179600d476f0de59b8d22fd865bdf;                   
-        address seedInvestors = 0x13596d3bf16852b07696e535cad877d0665a6756;          
+        marketor = _marketor1;
+        address tokenSale = 0xbc9019f01acf8e508157ced0744168bf63e2ca50;
+        address organization = 0x6400e8f9f71d3b4d886098b19520f40502c5bbb6;
+        address advisor = 0x62148bd0cf4d44fa045130aa39c2fcd6e7b70a20;
+        address developer = 0xed45f100028964156800e2a24116196cd767d78b;
+        address team = 0x2ca0da7ae78179600d476f0de59b8d22fd865bdf;
+        address seedInvestors = 0x13596d3bf16852b07696e535cad877d0665a6756;
 
         initialize(tokenSale, 45);
         initialize(_marketor1, 15);
@@ -363,4 +363,20 @@ contract Ecoprotech is ERC223, Ownable {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowance[_owner][_spender];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

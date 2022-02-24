@@ -398,3 +398,14 @@ contract FactsToken is PausableToken, MintableToken {
   // If the user transfers ETH to contract, it will revert
   function () public payable{ revert(); }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -50,7 +50,7 @@ contract Pausable is Ownable {
     require(!stopped);
     _;
   }
-  
+
   modifier onlyInEmergency {
     require(stopped);
     _;
@@ -117,22 +117,22 @@ contract ICO is SafeMath, Pausable{
     event ReceivedETH(address addr, uint value);
 	event ReceivedBTC(address addr, uint value);
 	event ReceivedGBP(address addr, uint value);
-    
-	modifier ICOactive{ 
-	    require(!crowdsaleClosed); 
-	    _; 
+
+	modifier ICOactive{
+	    require(!crowdsaleClosed);
+	    _;
 	}
-	
-	modifier ICOinactive{ 
-	    require(crowdsaleClosed); 
-	    _; 
+
+	modifier ICOinactive{
+	    require(crowdsaleClosed);
+	    _;
 	}
-	
+
 	modifier onlyBy(address a){
 	    require(msg.sender == a);
 		_;
 	}
-	
+
     /**
      * Constrctor function
      *
@@ -167,7 +167,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedETH(msg.sender,msg.value);
         }
     }
-    
+
     function ReceiveBTC(address addr, uint value) public stopInEmergency ICOactive onlyBy(BTCproxy){
         require(value >= 0.01 ether);
         uint amount = amountToSend(value);
@@ -180,7 +180,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedBTC(addr,value);
         }
     }
-    
+
     function ReceiveGBP(address addr, uint value) public stopInEmergency ICOactive onlyBy(GBPproxy){
         require(value >= 0.01 ether);
         uint amount = amountToSend(value);
@@ -194,7 +194,7 @@ contract ICO is SafeMath, Pausable{
             ReceivedGBP(addr,value);
         }
     }
-    
+
     function amountToSend(uint amount) internal returns(uint){
         uint toSend = 0;
         if (tokensSold <= 5 * (10 ** 6) * (10 ** 6)){
@@ -235,7 +235,7 @@ contract ICO is SafeMath, Pausable{
 		crowdsaleClosed = true;
 	}
 
-    
+
     function safeWithdrawal() public ICOinactive{
         if (!fundingGoalReached) {
             uint amount = balanceOf[msg.sender];
@@ -249,4 +249,15 @@ contract ICO is SafeMath, Pausable{
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

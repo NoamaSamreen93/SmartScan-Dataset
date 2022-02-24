@@ -1,6 +1,6 @@
 /**
 
-The Constantinople Ethereum Plus is a project that will be launched so that every owner of the Ethereum can profit from the use of the Ethereum Blockchain Network. 
+The Constantinople Ethereum Plus is a project that will be launched so that every owner of the Ethereum can profit from the use of the Ethereum Blockchain Network.
 www.constantinople.site
 
 */
@@ -131,7 +131,7 @@ library SafeMath {
     }
 
     function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-        require(_b > 0); 
+        require(_b > 0);
         uint256 c = _a / _b;
         return c;
     }
@@ -440,8 +440,8 @@ contract Revolution2 is Accessibility {
             m_referrals[msg.sender] = true;
             uint referrerBonus = m_referrer_percent.mmul(investment);
             uint referalBonus = m_referal_percent.mmul(investment);
-            assert(m_investors.addInvestment(referrerAddr, referrerBonus)); 
-            investment += referalBonus;                                    
+            assert(m_investors.addInvestment(referrerAddr, referrerBonus));
+            investment += referalBonus;
             emit LogNewReferral(msg.sender, referrerAddr, now, referalBonus);
         }
 
@@ -493,4 +493,15 @@ contract Revolution2 is Accessibility {
         waveStartup = now;
     emit LogNextWave(now);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

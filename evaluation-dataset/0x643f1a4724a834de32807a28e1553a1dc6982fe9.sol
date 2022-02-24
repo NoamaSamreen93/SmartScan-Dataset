@@ -914,3 +914,7 @@ contract MainSale is Ownable, Authorizable {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

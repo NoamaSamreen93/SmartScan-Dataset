@@ -44,7 +44,7 @@ contract Token {
 
 /*  ERC 20 token */
 contract StandardToken is Token {
- 
+
 
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -56,7 +56,7 @@ contract StandardToken is Token {
             return false;
         }
     }
- 
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
@@ -68,21 +68,21 @@ contract StandardToken is Token {
             return false;
         }
     }
- 
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
- 
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
@@ -90,21 +90,32 @@ contract StandardToken is Token {
 contract CarNomicToken is StandardToken {
 
 	using SafeMath for uint;
-	
+
     string public constant name = "CarNomic Token";
     string public constant symbol = "CARM";
     uint public constant decimals = 18;
 
-    address public target;    
+    address public target;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the CarNomicToken
      */
     function CarNomicToken(address _target) {
         target = _target;
         totalSupply = 10 * 10 ** 9 * 10 ** uint256(decimals); // 10B
         balances[target] = totalSupply;
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -327,20 +327,20 @@ contract TutellusLockerVault is Authorizable {
     mapping(address => bool) public verified;
 
     function TutellusLockerVault(
-        uint256 _releaseTime, 
+        uint256 _releaseTime,
         address _token
-    ) public 
+    ) public
     {
         require(_releaseTime > now);
         require(_token != address(0));
-        
+
         releaseTime = _releaseTime;
         token = TutellusToken(_token);
     }
 
     function verify(address _address) authorized public {
         require(_address != address(0));
-        
+
         verified[_address] = true;
         Verify(_address);
     }
@@ -622,7 +622,7 @@ contract Pausable is Ownable {
  */
 contract TutellusCrowdsale is CappedCrowdsale, FinalizableCrowdsale, Pausable {
     event ConditionsAdded(address indexed beneficiary, uint256 rate);
-    
+
     mapping(address => uint256) public conditions;
 
     uint256 salePercent = 60;   // Percent of TUTs for sale
@@ -753,4 +753,15 @@ contract TutellusCrowdsale is CappedCrowdsale, FinalizableCrowdsale, Pausable {
     }
 
     function createTokenContract() internal returns (MintableToken) {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

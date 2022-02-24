@@ -2,7 +2,7 @@ pragma solidity ^0.4.15;
 
 contract Owned {
 
-    // The address of the account that is the current owner 
+    // The address of the account that is the current owner
     address internal owner;
 
 
@@ -73,7 +73,7 @@ contract ITransferableOwnership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner);
 }
@@ -85,7 +85,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -94,7 +94,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
 
 
 /**
- * @title IWhitelist 
+ * @title IWhitelist
  *
  * Whitelist authentication interface
  *
@@ -102,10 +102,10 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
  * #author Frank Bonnet
  */
 contract IWhitelist {
-    
+
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is on the whitelist
      *
@@ -117,7 +117,7 @@ contract IWhitelist {
 
 
 /**
- * @title Whitelist 
+ * @title Whitelist
  *
  * Whitelist authentication list
  *
@@ -150,7 +150,7 @@ contract Whitelist is IWhitelist, TransferableOwnership {
     /**
      * Add `_account` to the whitelist
      *
-     * If an account is currently disabled, the account is reenabled. Otherwise 
+     * If an account is currently disabled, the account is reenabled. Otherwise
      * a new entry is created
      *
      * @param _account The account to add
@@ -187,7 +187,7 @@ contract Whitelist is IWhitelist, TransferableOwnership {
 
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is on the whitelist
      *
@@ -197,4 +197,15 @@ contract Whitelist is IWhitelist, TransferableOwnership {
     function authenticate(address _account) public constant returns (bool) {
         return list[_account].accepted;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

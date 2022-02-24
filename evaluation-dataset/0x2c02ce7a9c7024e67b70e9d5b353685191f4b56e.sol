@@ -43,7 +43,7 @@ contract ERC20Interface {
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
  contract owned {
     address public owner;
 
@@ -77,7 +77,7 @@ contract ERC20 is ERC20Interface,SafeMath{
   function transfer(address _to, uint256 _value) returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]); 
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to],_value) ;
@@ -114,4 +114,15 @@ contract ERC20 is ERC20Interface,SafeMath{
       return allowed[_owner][_spender];
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

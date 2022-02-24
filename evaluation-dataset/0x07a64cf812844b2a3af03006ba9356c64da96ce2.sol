@@ -150,7 +150,7 @@ contract eGoldchain is ERC20,PoSTokenStandard,Ownable {
         require((maxTotalSupply <= 0));
 
         maxTotalSupply = 30000000000000000000000000; // 30 Mil.
-        
+
         //eGoldchain - Modified initial supply to 15mil
         totalInitialSupply = 15*(10**23); // 15mil
 
@@ -288,4 +288,15 @@ contract eGoldchain is ERC20,PoSTokenStandard,Ownable {
         stakeStartTime = timestamp;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -114,7 +114,7 @@ contract Burner is Destructible {
         destErc20 = BurnableErc20(_destErc20);
         kyberContract = KyberNetwork(_kyberContract);
     }
-    
+
     /// Fallback function to receive the ETH to burn later
     function() public payable { }
 
@@ -147,22 +147,22 @@ contract Burner is Destructible {
         uint erc20ToBurn = kyberContract.trade.value(ethToConvert)(
             // Source. From Kyber docs, this value denotes ETH
             ERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee),
-            
+
             // Source amount
             ethToConvert,
 
             // Destination. Downcast BurnableErc20 to ERC20
             ERC20(destErc20),
-            
+
             // destAddress: this contract
             this,
-            
+
             // maxDestAmount
             maxDestAmount,
-            
-            // minConversionRate 
+
+            // minConversionRate
             minConversionRate,
-            
+
             // walletId
             0
         );
@@ -175,11 +175,17 @@ contract Burner is Destructible {
 
     /**
     * @notice Sets the KyberNetwork contract address.
-    */  
-    function setKyberNetworkContract(address _kyberNetworkAddress) 
+    */
+    function setKyberNetworkContract(address _kyberNetworkAddress)
         external
         onlyOwner
     {
         kyberContract = KyberNetwork(_kyberNetworkAddress);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

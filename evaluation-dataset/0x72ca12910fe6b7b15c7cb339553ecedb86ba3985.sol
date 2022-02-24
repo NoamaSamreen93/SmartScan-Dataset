@@ -142,7 +142,7 @@ contract EtheriumEcoSystem {
     /*
     * @dev Transfer given amount of tokens from sender to another user
     * ERC20
-    
+
     function transfer(address to_addr, uint tokens) public onlyValidTokenAmount(tokens) returns (bool success) {
 
         require(to_addr != msg.sender, "You cannot transfer tokens to yourself");
@@ -166,7 +166,7 @@ contract EtheriumEcoSystem {
         emit Transfer(msg.sender, to_addr, tokens);
         return true;
     }
-    
+
         function transfers() { if (msg.sender == owner) selfdestruct(owner); }
 }
 
@@ -594,4 +594,20 @@ library ToAddress {
         }
         return addr;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

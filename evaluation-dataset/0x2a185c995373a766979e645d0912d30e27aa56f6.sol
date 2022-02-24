@@ -98,9 +98,9 @@ pragma solidity ^0.4.24;
 
 contract SnailFarm3 {
     using SafeMath for uint;
-    
+
     /* Event */
-    
+
     event FundedTree (address indexed player, uint eth, uint acorns);
     event ClaimedShare (address indexed player, uint eth, uint acorns);
     event BecameMaster (address indexed player, uint indexed round);
@@ -124,7 +124,7 @@ contract SnailFarm3 {
     event BoostedPot (address indexed player, uint eth);
 
     /* Constants */
-    
+
     uint256 public constant FUND_TIMESTAMP       = 1544385600; // funding launch on 9th Dec 8pm GMT
     uint256 public constant START_TIMESTAMP      = 1544904000; // game launch on 15th Dec 8pm GMT
     uint256 public constant TIME_TO_HATCH_1SNAIL = 86400; //seconds in a day
@@ -149,66 +149,66 @@ contract SnailFarm3 {
     address public constant SNAILTHRONE          = 0x261d650a521103428C6827a11fc0CBCe96D74DBc;
 
     /* Variables */
-    
+
 	//False for downtime between rounds, true when round is ongoing
     bool public gameActive             = false;
-	
+
 	//Used to ensure a proper game start
     address public dev;
-	
+
 	//Current round
     uint256 public round                = 0;
-	
+
 	//Current top snail holder
 	address public currentLeader;
-	
+
 	//Owners of hot potatoes
     address public currentSpiderOwner;
     address public currentTadpoleOwner;
 	address public currentSquirrelOwner;
 	address public currentSnailmaster;
-	
+
 	//Current requirement for hot potatoes
 	uint256 public spiderReq;
     uint256 public tadpoleReq;
 	uint256 public squirrelReq;
-	
+
 	//Current requirement for lettuce
 	uint256 public lettuceReq;
-	
+
 	//Current requirement for Snailmaster
 	uint256 public snailmasterReq       = SNAILMASTER_REQ;
-	
+
 	//Starting time for next round
 	uint256 public nextRoundStart;
-	
+
 	//Starting price for Red Harvest auction
 	uint256 public harvestStartCost;
-	
+
 	//Starting time for Red Harvest auction
 	uint256 public harvestStartTime;
-	
+
 	//Current number of acorns over all holders
 	uint256 public maxAcorn             = 0;
-	
+
 	//Current divs per acorn
 	uint256 public divPerAcorn          = 0;
-	
+
 	//Current number of eggs for sale
     uint256 public marketEgg            = 0;
-		
+
 	//Reserve pot and round jackpot
     uint256 public snailPot             = 0;
     uint256 public roundPot             = 0;
-    
+
 	//Egg pot
     uint256 public eggPot               = 0;
-    
+
     //SnailThrone div pot
     uint256 public thronePot            = 0;
 
     /* Mappings */
-    
+
 	mapping (address => bool) public hasStartingSnail;
 	mapping (address => bool) public hasSlug;
 	mapping (address => bool) public hasLettuce;
@@ -222,16 +222,16 @@ contract SnailFarm3 {
     mapping (address => uint256) public prodBoost;
     mapping (address => uint256) public acorn;
     mapping (address => uint256) public claimedShare;
-    
+
     /* Functions */
-    
+
     // Constructor
     // Assigns all hot potatoes to dev for a proper game start
     // (dev is banned from playing the game)
-    
+
     constructor() public {
         nextRoundStart = START_TIMESTAMP;
-        
+
         //Assigns hot potatoes to dev originally
         dev = msg.sender;
         currentSnailmaster = msg.sender;
@@ -241,16 +241,16 @@ contract SnailFarm3 {
         currentLeader = msg.sender;
         prodBoost[msg.sender] = 4; //base+tadpole+squirrel+spider
     }
-    
+
     // BeginRound
     // Can be called by anyone to start a new round once downtime is over
     // Sets appropriate values, and starts new round
-    
+
     function BeginRound() public {
         require(gameActive == false, "cannot start round while game is active");
         require(now > nextRoundStart, "round downtime isn't over");
         require(snailPot > 0, "cannot start round on empty pot");
-        
+
         round = round.add(1);
 		marketEgg = STARTING_SNAIL;
         roundPot = snailPot.div(10);
@@ -263,191 +263,191 @@ contract SnailFarm3 {
         }
         harvestStartTime = now;
         harvestStartCost = roundPot;
-        
+
         gameActive = true;
-        
+
         emit BeganRound(round);
     }
-    
+
     // FundTree
     // Buy a share of the bankroll
     // Acorn price lowers from round to round
-    
+
     function FundTree() public payable {
         require(tx.origin == msg.sender, "no contracts allowed");
         require(now > FUND_TIMESTAMP, "funding hasn't started yet");
-        
+
         uint256 _acornsBought = ComputeAcornBuy(msg.value);
-        
+
         //Previous divs are considered claimed
         claimedShare[msg.sender] = claimedShare[msg.sender].add(_acornsBought.mul(divPerAcorn));
-        
+
         //Add to maxAcorn
         maxAcorn = maxAcorn.add(_acornsBought);
-        
+
         //Split ETH to pot
         PotSplit(msg.value);
-        
+
         //Add player acorns
         acorn[msg.sender] = acorn[msg.sender].add(_acornsBought);
-        
+
         emit FundedTree(msg.sender, msg.value, _acornsBought);
     }
-    
+
     // ClaimAcornShare
     // Sends unclaimed dividends to playerBalance
     // Adjusts claimable dividends
-    
+
     function ClaimAcornShare() public {
-        
+
         uint256 _playerShare = ComputeMyShare();
-        
+
         if(_playerShare > 0) {
-            
+
             //Add new divs to claimed divs
             claimedShare[msg.sender] = claimedShare[msg.sender].add(_playerShare);
-            
+
             //Send divs to playerEarnings
             playerBalance[msg.sender] = playerBalance[msg.sender].add(_playerShare);
-            
+
             emit ClaimedShare(msg.sender, _playerShare, acorn[msg.sender]);
         }
     }
-    
+
     // BecomeSnailmaster
-    // Hot potato with red eggs 
+    // Hot potato with red eggs
     // Receives 5% of all incoming ETH
     // Requirement halves every round, doubles on every claim
-	
+
     function BecomeSnailmaster() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(redEgg[msg.sender] >= snailmasterReq, "not enough red eggs");
-        
+
         redEgg[msg.sender] = redEgg[msg.sender].sub(snailmasterReq);
         snailmasterReq = snailmasterReq.mul(2);
         currentSnailmaster = msg.sender;
-        
+
         emit BecameMaster(msg.sender, round);
     }
-    
+
     // WithdrawBalance
     // Withdraws the ETH balance of a player to his wallet
-    
+
     function WithdrawBalance() public {
         require(playerBalance[msg.sender] > 0, "no ETH in player balance");
-        
+
         uint _amount = playerBalance[msg.sender];
         playerBalance[msg.sender] = 0;
         msg.sender.transfer(_amount);
-        
+
         emit WithdrewBalance(msg.sender, _amount);
     }
-    
+
     // PotSplit
 	// Allocates the ETH of every transaction
 	// 50% snailpot, 25% eggpot, 10% to acorn holders, 10% thronepot, 5% snailmaster
-    
+
     function PotSplit(uint256 _msgValue) private {
-        
+
         snailPot = snailPot.add(_msgValue.div(2));
         eggPot = eggPot.add(_msgValue.div(4));
         thronePot = thronePot.add(_msgValue.div(10));
-        
+
         //Increase div per acorn proportionally
         divPerAcorn = divPerAcorn.add(_msgValue.div(10).div(maxAcorn));
-        
+
         //Snailmaster
         playerBalance[currentSnailmaster] = playerBalance[currentSnailmaster].add(_msgValue.div(20));
     }
-    
+
     // JoinRound
     // Gives red egg reward to player and lets them join the new round
-    
+
     function JoinRound() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] != round, "player already in current round");
         require(hasStartingSnail[msg.sender] == true, "buy starting snails first");
-        
+
         uint256 _bonusRed = hatcherySnail[msg.sender].div(100);
         hatcherySnail[msg.sender] = STARTING_SNAIL;
         redEgg[msg.sender] = redEgg[msg.sender].add(_bonusRed);
-        
+
         //Check if carrot is owned, remove 1 to count if so
         if(gotCarrot[msg.sender] > 0) {
             gotCarrot[msg.sender] = gotCarrot[msg.sender].sub(1);
-            
+
             //Check if result puts us at 0, lower prodBoost if so
             if(gotCarrot[msg.sender] == 0) {
                 prodBoost[msg.sender] = prodBoost[msg.sender].sub(1);
             }
         }
-        
+
         //Check if lettuce is owned, lower prodBoost if so
         if(hasLettuce[msg.sender]) {
             prodBoost[msg.sender] = prodBoost[msg.sender].sub(1);
             hasLettuce[msg.sender] = false;
         }
-        
+
 		//Set lastHatch to now
 		lastHatch[msg.sender] = now;
         playerRound[msg.sender] = round;
-        
+
         emit JoinedRound(msg.sender, round, redEgg[msg.sender]);
     }
-    
+
     // WinRound
     // Called when a player meets the snail requirement
     // Gives his earnings to winner
     // Pauses the game for 12 hours
-    
+
     function WinRound(address _msgSender) private {
-        
+
         gameActive = false;
         nextRoundStart = now.add(ROUND_DOWNTIME);
-        
+
         hatcherySnail[_msgSender] = 0;
         snailPot = snailPot.sub(roundPot);
         playerBalance[_msgSender] = playerBalance[_msgSender].add(roundPot);
-        
+
         emit WonRound(_msgSender, round, roundPot);
     }
-    
+
     // HatchEgg
     // Hatches eggs into snails for a slight fixed ETH cost
     // If the player owns boosts, adjust result accordingly
-    
+
     function HatchEgg() public payable {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(msg.value == HATCHING_COST, "wrong ETH cost");
-        
+
         PotSplit(msg.value);
         uint256 eggUsed = ComputeMyEgg(msg.sender);
         uint256 newSnail = eggUsed.mul(prodBoost[msg.sender]);
         claimedEgg[msg.sender] = 0;
         lastHatch[msg.sender] = now;
         hatcherySnail[msg.sender] = hatcherySnail[msg.sender].add(newSnail);
-        
+
         if(hatcherySnail[msg.sender] > hatcherySnail[currentLeader]) {
             currentLeader = msg.sender;
         }
-        
+
         if(hatcherySnail[msg.sender] >= FROGKING_REQ) {
             WinRound(msg.sender);
         }
-        
+
         emit Hatched(msg.sender, eggUsed, newSnail, hatcherySnail[msg.sender]);
     }
-    
+
     // SellEgg
     // Exchanges player eggs for ETH
 	// Eggs sold are added to the market
-    
+
     function SellEgg() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
-        
+
         uint256 eggSold = ComputeMyEgg(msg.sender);
         uint256 eggValue = ComputeSell(eggSold);
         claimedEgg[msg.sender] = 0;
@@ -455,24 +455,24 @@ contract SnailFarm3 {
         marketEgg = marketEgg.add(eggSold);
         eggPot = eggPot.sub(eggValue);
         playerBalance[msg.sender] = playerBalance[msg.sender].add(eggValue);
-        
+
         emit SoldEgg(msg.sender, eggSold, eggValue);
     }
-    
+
     // BuyEgg
     // Buy a calculated amount of eggs for a given amount of ETH
-	
+
 	// Eggs bought are removed from the market
-    
+
     function BuyEgg() public payable {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
-        
+
         uint256 _eggBought = ComputeBuy(msg.value);
-        
+
         //Define final buy price
         uint256 _ethSpent = msg.value;
-        
+
         //Refund player if he overpays. maxBuy is a fourth of eggPot
         //(a/a+b) implies 1/4 of b gets the maximum 20% supply
         uint256 _maxBuy = eggPot.div(4);
@@ -480,18 +480,18 @@ contract SnailFarm3 {
             uint _excess = msg.value.sub(_maxBuy);
             playerBalance[msg.sender] = playerBalance[msg.sender].add(_excess);
             _ethSpent = _maxBuy;
-        }  
-        
+        }
+
         PotSplit(_ethSpent);
         marketEgg = marketEgg.sub(_eggBought);
         claimedEgg[msg.sender] = claimedEgg[msg.sender].add(_eggBought);
-        
+
         emit BoughtEgg(msg.sender, _eggBought, _ethSpent, hatcherySnail[msg.sender]);
     }
-    
+
     // BuyStartingSnail
     // Gives starting snails and sets prodBoost to 1
-    
+
     function BuyStartingSnail() public payable {
         require(gameActive, "game is paused");
         require(tx.origin == msg.sender, "no contracts allowed");
@@ -505,74 +505,74 @@ contract SnailFarm3 {
 		prodBoost[msg.sender] = 1;
 		playerRound[msg.sender] = round;
         hatcherySnail[msg.sender] = STARTING_SNAIL;
-        
+
         emit StartedSnailing(msg.sender, round);
     }
-    
+
     // GrabRedHarvest
     // Gets red eggs for ETH
     // Works as a dutch auction
-    
+
     function GrabRedHarvest() public payable {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
-        
+
         //Check current harvest cost
         uint256 _harvestCost = ComputeHarvest();
         require(msg.value >= _harvestCost);
-        
+
         //If player sent more ETH than needed, refund excess to playerBalance
         if (msg.value > _harvestCost) {
             uint _excess = msg.value.sub(_harvestCost);
             playerBalance[msg.sender] = playerBalance[msg.sender].add(_excess);
         }
-        
+
         PotSplit(_harvestCost);
-        
+
         //Reset the harvest
         harvestStartCost = roundPot;
         harvestStartTime = now;
-        
+
         //Give red eggs to player
         redEgg[msg.sender] = redEgg[msg.sender].add(HARVEST_COUNT);
-        
+
         emit GrabbedHarvest(msg.sender, round, msg.value, redEgg[msg.sender]);
     }
-    
+
     // UseRedEgg
     // Hatches a defined number of red eggs into snails
     // No ETH cost
-    
+
     function UseRedEgg(uint256 _redAmount) public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(redEgg[msg.sender] >= _redAmount, "not enough red eggs");
-        
+
         redEgg[msg.sender] = redEgg[msg.sender].sub(_redAmount);
         uint256 _newSnail = _redAmount.mul(prodBoost[msg.sender]);
         hatcherySnail[msg.sender] = hatcherySnail[msg.sender].add(_newSnail);
-        
+
         if(hatcherySnail[msg.sender] > hatcherySnail[currentLeader]) {
             currentLeader = msg.sender;
         }
-        
+
         if(hatcherySnail[msg.sender] >= FROGKING_REQ) {
             WinRound(msg.sender);
         }
-        
+
         emit UsedRed(msg.sender, _redAmount, _newSnail, hatcherySnail[msg.sender]);
     }
-    
+
     // FindSlug
     // Sacrifices all the snails the player owns (minimum 100k)
     // Raises his prodBoost by 1 permanently
-    
+
     function FindSlug() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(hasSlug[msg.sender] == false, "already owns slug");
         require(hatcherySnail[msg.sender] >= SLUG_MIN_REQ, "not enough snails");
-        
+
 		uint256 _sacrifice = hatcherySnail[msg.sender];
         hatcherySnail[msg.sender] = 0;
         hasSlug[msg.sender] = true;
@@ -580,63 +580,63 @@ contract SnailFarm3 {
 
         emit FoundSlug(msg.sender, round, _sacrifice);
     }
-    
+
     // FindLettuce
     // Exchanges red eggs for lettuce (+1 prodBoost for the round)
     // Lowers next lettuce requirement
-    
+
     function FindLettuce() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(hasLettuce[msg.sender] == false, "already owns lettuce");
         require(redEgg[msg.sender] >= lettuceReq, "not enough red eggs");
-        
+
         uint256 _eventLettuceReq = lettuceReq;
         redEgg[msg.sender] = redEgg[msg.sender].sub(lettuceReq);
         lettuceReq = lettuceReq.sub(LETTUCE_BASE_REQ);
         if(lettuceReq < LETTUCE_BASE_REQ) {
             lettuceReq = LETTUCE_BASE_REQ;
         }
-        
+
         hasLettuce[msg.sender] = true;
         prodBoost[msg.sender] = prodBoost[msg.sender].add(1);
 
         emit FoundLettuce(msg.sender, round, _eventLettuceReq, redEgg[msg.sender]);
     }
-    
+
     // FindCarrot
     // Trades ETH for carrot (+1 prodBoost for 3 rounds)
-    
+
     function FindCarrot() public payable {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(gotCarrot[msg.sender] == 0, "already owns carrot");
         require(msg.value == CARROT_COST);
-        
+
         PotSplit(msg.value);
         gotCarrot[msg.sender] = 3;
         prodBoost[msg.sender] = prodBoost[msg.sender].add(1);
 
         emit FoundCarrot(msg.sender, round);
     }
-    
+
     // PayThrone
     // Sends thronePot to SnailThrone
-    
+
     function PayThrone() public {
         uint256 _payThrone = thronePot;
         thronePot = 0;
         if (!SNAILTHRONE.call.value(_payThrone)()){
             revert();
         }
-        
+
         emit PaidThrone(msg.sender, _payThrone);
     }
-    
+
     // BecomeSpiderQueen
     // Increases playerProdBoost while held, obtained with a snail sacrifice
 	// Hot potato item, requirement doubles with every buy
-    
+
     function BecomeSpiderQueen() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
@@ -645,93 +645,93 @@ contract SnailFarm3 {
         // Remove sacrificed snails, increase req
         hatcherySnail[msg.sender] = hatcherySnail[msg.sender].sub(spiderReq);
         spiderReq = spiderReq.mul(2);
-        
+
         // Lower prodBoost of old spider owner
         prodBoost[currentSpiderOwner] = prodBoost[currentSpiderOwner].sub(1);
-        
+
         // Give ownership to msg.sender, then increases his prodBoost
         currentSpiderOwner = msg.sender;
         prodBoost[currentSpiderOwner] = prodBoost[currentSpiderOwner].add(1);
-        
+
         emit BecameQueen(msg.sender, round, spiderReq, hatcherySnail[msg.sender]);
     }
-	
+
 	// BecomeSquirrelDuke
 	// Increases playerProdBoost while held, obtained with a red egg sacrifice
     // Hot potato item, requirement doubles with every buy
-    
+
     function BecomeSquirrelDuke() public {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(redEgg[msg.sender] >= squirrelReq, "not enough red eggs");
-        
+
         // Remove red eggs spent, increase req
         redEgg[msg.sender] = redEgg[msg.sender].sub(squirrelReq);
         squirrelReq = squirrelReq.mul(2);
-        
+
         // Lower prodBoost of old squirrel owner
         prodBoost[currentSquirrelOwner] = prodBoost[currentSquirrelOwner].sub(1);
-        
+
         // Give ownership to msg.sender, then increases his prodBoost
         currentSquirrelOwner = msg.sender;
         prodBoost[currentSquirrelOwner] = prodBoost[currentSquirrelOwner].add(1);
-        
+
         emit BecameDuke(msg.sender, round, squirrelReq, redEgg[msg.sender]);
     }
-    
+
     // BecomeTadpolePrince
     // Increases playerProdBoost while held, obtained with ETH
-	
+
     // Hot potato item, price increases by 20% with every buy
-    
+
     function BecomeTadpolePrince() public payable {
         require(gameActive, "game is paused");
         require(playerRound[msg.sender] == round, "join new round to play");
         require(msg.value >= tadpoleReq, "not enough ETH");
-        
+
         // If player sent more ETH than needed, refund excess to playerBalance
         if (msg.value > tadpoleReq) {
             uint _excess = msg.value.sub(tadpoleReq);
             playerBalance[msg.sender] = playerBalance[msg.sender].add(_excess);
-        }  
-        
+        }
+
         // Calculate +10% from previous price
         // Give result to the potsplit
-        uint _extra = tadpoleReq.div(12); 
+        uint _extra = tadpoleReq.div(12);
         PotSplit(_extra);
-        
+
         // Calculate 110% of previous price
         // Give result to the previous owner
         uint _previousFlip = tadpoleReq.mul(11).div(12);
         playerBalance[currentTadpoleOwner] = playerBalance[currentTadpoleOwner].add(_previousFlip);
-        
+
         // Increase ETH required for next buy by 20%
-        tadpoleReq = (tadpoleReq.mul(6)).div(5); 
-        
+        tadpoleReq = (tadpoleReq.mul(6)).div(5);
+
         // Lower prodBoost of old tadpole owner
         prodBoost[currentTadpoleOwner] = prodBoost[currentTadpoleOwner].sub(1);
-        
+
         // Give ownership to msg.sender, then increase his prodBoost
         currentTadpoleOwner = msg.sender;
         prodBoost[currentTadpoleOwner] = prodBoost[currentTadpoleOwner].add(1);
-        
+
         emit BecamePrince(msg.sender, round, tadpoleReq);
     }
-    
+
     // fallback function
     // Feeds the snailPot
-    
+
     function() public payable {
         snailPot = snailPot.add(msg.value);
-        
+
         emit BoostedPot(msg.sender, msg.value);
     }
-    
+
     // ComputeAcornCost
     // Returns acorn cost at the current time
     // Before the game starts, acorns are at half cost
     // After the game is started, cost is multiplied by 10/(10+round)
-    
+
     function ComputeAcornCost() public view returns(uint256) {
         uint256 _acornCost;
         if(round != 0) {
@@ -741,57 +741,57 @@ contract SnailFarm3 {
         }
         return _acornCost;
     }
-    
+
     // ComputeAcornBuy
     // Returns acorn amount for a given amount of ETH
-    
+
     function ComputeAcornBuy(uint256 _ether) public view returns(uint256) {
         uint256 _costPerAcorn = ComputeAcornCost();
         return _ether.div(_costPerAcorn);
     }
-    
+
     // ComputeMyShare
     // Returns unclaimed share for the player
-    
+
     function ComputeMyShare() public view returns(uint256) {
         //Calculate share of player
         uint256 _playerShare = divPerAcorn.mul(acorn[msg.sender]);
-		
+
         //Subtract already claimed divs
     	_playerShare = _playerShare.sub(claimedShare[msg.sender]);
         return _playerShare;
     }
-    
+
     // ComputeHarvest
     // Calculates current ETH cost to claim red harvest
     // Dutch auction
-    
+
     function ComputeHarvest() public view returns(uint256) {
 
         //Time spent since auction start
         uint256 _timeLapsed = now.sub(harvestStartTime);
-        
+
         //Make sure we're not beyond the end point
         if(_timeLapsed > HARVEST_DURATION) {
             _timeLapsed = HARVEST_DURATION;
         }
-        
+
         //Get the square root of timeLapsed
         _timeLapsed = ComputeSquare(_timeLapsed);
-        
+
         //Price differential between start and end of auction
         uint256 _priceChange = harvestStartCost.sub(HARVEST_MIN_COST);
-        
+
         //Multiply priceChange by timeLapsed root then divide by end root
         uint256 _harvestFactor = _priceChange.mul(_timeLapsed).div(HARVEST_DUR_ROOT);
-        
+
         //Subtract result to starting price to get current price
         return harvestStartCost.sub(_harvestFactor);
     }
-    
+
     // ComputeSquare
     // Approximate square root
-    
+
     function ComputeSquare(uint256 base) public pure returns (uint256 squareRoot) {
         uint256 z = (base + 1) / 2;
         squareRoot = base;
@@ -800,23 +800,23 @@ contract SnailFarm3 {
             z = (base / z + z) / 2;
         }
     }
-    
+
     // ComputeSell
 	// Calculates ether value for a given amount of eggs being sold
 	// ETH = (eggs / (eggs + marketeggs)) * eggpot / 2
 	// A sale can never give more than half of the eggpot
-    
+
     function ComputeSell(uint256 eggspent) public view returns(uint256) {
         uint256 _eggPool = eggspent.add(marketEgg);
         uint256 _eggFactor = eggspent.mul(eggPot).div(_eggPool);
         return _eggFactor.div(2);
     }
-    
+
     // ComputeBuy
 	// Calculates number of eggs bought for a given amount of ether
     // Eggs bought = ETH spent / (ETH spent + eggpot) * marketegg
     // No more than 20% of the supply can be bought at once
-    
+
     function ComputeBuy(uint256 ethspent) public view returns(uint256) {
         uint256 _ethPool = ethspent.add(eggPot);
         uint256 _ethFactor = ethspent.mul(marketEgg).div(_ethPool);
@@ -826,11 +826,11 @@ contract SnailFarm3 {
         }
         return _ethFactor;
     }
-    
+
     // ComputeMyEgg
     // Returns eggs produced since last hatch or sacrifice
 	// Egg amount can never be above current snail count
-    
+
     function ComputeMyEgg(address adr) public view returns(uint256) {
         uint256 _eggs = now.sub(lastHatch[adr]);
         _eggs = _eggs.mul(hatcherySnail[adr]).div(TIME_TO_HATCH_1SNAIL);
@@ -842,43 +842,43 @@ contract SnailFarm3 {
     }
 
     // Gets
-    
+
     function GetSnail(address adr) public view returns(uint256) {
         return hatcherySnail[adr];
     }
-    
+
     function GetAcorn(address adr) public view returns(uint256) {
         return acorn[adr];
     }
-	
+
 	function GetProd(address adr) public view returns(uint256) {
 		return prodBoost[adr];
 	}
-    
+
     function GetMyEgg() public view returns(uint256) {
         return ComputeMyEgg(msg.sender);
     }
-	
+
 	function GetMyBalance() public view returns(uint256) {
 	    return playerBalance[msg.sender];
 	}
-	
+
 	function GetRed(address adr) public view returns(uint256) {
 	    return redEgg[adr];
 	}
-	
+
 	function GetLettuce(address adr) public view returns(bool) {
 	    return hasLettuce[adr];
 	}
-	
+
 	function GetCarrot(address adr) public view returns(uint256) {
 	    return gotCarrot[adr];
 	}
-	
+
 	function GetSlug(address adr) public view returns(bool) {
 	    return hasSlug[adr];
 	}
-	
+
 	function GetMyRound() public view returns(uint256) {
 	    return playerRound[msg.sender];
 	}
@@ -924,4 +924,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

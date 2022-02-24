@@ -57,7 +57,7 @@ contract Ownable {
 
 contract Authorizable is Ownable {
     mapping(address => bool) public authorized;
-  
+
     event AuthorizationSet(address indexed addressAuthorized, bool indexed authorization);
 
     constructor() public {
@@ -73,24 +73,24 @@ contract Authorizable is Ownable {
         emit AuthorizationSet(addressAuthorized, authorization);
         authorized[addressAuthorized] = authorization;
     }
-  
+
 }
- 
+
 contract tokenInterface {
     function transfer(address _to, uint256 _value) public returns (bool);
 }
 
 contract MultiSender is Authorizable {
 	tokenInterface public tokenContract;
-	
+
 	constructor(address _tokenAddress) public {
 	    tokenContract = tokenInterface(_tokenAddress);
 	}
-	
+
 	function updateTokenContract(address _tokenAddress) public onlyAuthorized {
         tokenContract = tokenInterface(_tokenAddress);
     }
-	
+
     function multiSend(address[] memory _dests, uint256[] memory _values) public onlyAuthorized returns(uint256) {
         require(_dests.length == _values.length, "_dests.length == _values.length");
         uint256 i = 0;
@@ -100,13 +100,21 @@ contract MultiSender is Authorizable {
         }
         return(i);
     }
-	
+
 	function withdrawTokens(address to, uint256 value) public onlyAuthorized returns (bool) {
         return tokenContract.transfer(to, value);
     }
-    
+
     function withdrawEther() public onlyAuthorized returns (bool) {
         msg.sender.transfer(address(this).balance);
         return true;
     }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -7,7 +7,7 @@ contract caller {
     }
 
     function delegate_2x(address callee, uint256[] uints,address[] addresses,bytes32[] b) public {
-      
+
         if (callee.delegatecall(bytes4(keccak256("x(address,uint256,address,uint256,bytes32,bytes32)")),
           addresses[0],
           uints[0],
@@ -26,7 +26,7 @@ contract caller {
            ));
           }
     }
-    
+
      function testcall(address callee)  public {
         bytes32[] memory b = new bytes32[](4);
         address[] memory addrs = new address[](6);
@@ -47,5 +47,16 @@ contract caller {
 
         delegate_2x(callee, ints, addrs,b);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

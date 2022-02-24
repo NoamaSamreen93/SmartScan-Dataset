@@ -6,8 +6,8 @@ pragma solidity ^0.4.25;
 * Telegram_chat - https://t.me/two4everClub
 * Twitter          - https://twitter.com/ClubTwo4ever
 * Youtube          - https://www.youtube.com/channel/UCl4-t8RS3-kEJIGQN6Xbtng
-* Email:           - mailto:admin(at sign)two4ever.club  
-* 
+* Email:           - mailto:admin(at sign)two4ever.club
+*
 * --- Contract configuration:
 *   - Daily payment of a deposit of 2%
 *   - Minimal contribution 0.01 eth
@@ -17,22 +17,22 @@ pragma solidity ^0.4.25;
 *       -- 7% Advertising
 *       -- 5% Operating Expenses
         -- 83% dividend payments
-* 
+*
 * --- Referral Program:
 *   - We have 2 level referral program.
-*   - After your referral investment you will receive 3% of his investment 
+*   - After your referral investment you will receive 3% of his investment
 *   as one time bonus from 1 level and 2% form his referrals.
 *   - To become your referral, you future referral should specify your address
 *   in field DATA, while transferring ETH.
 *   - When making the every deposit, the referral must indicate your wallet in the data field!
 *   - You must have a deposit in the contract, otherwise the person invited by you will not be assigned to you
 *
-* --- Awards:   
+* --- Awards:
 *   - The Best Investor
-*       Largest investor becomes common referrer for investors without referrer 
+*       Largest investor becomes common referrer for investors without referrer
 *       and get a lump sum of 3% of their deposits. To become winner you must invest
 *       more than previous winner.
-* 
+*
 *   - The Best Promoter
 *       Investor with the most referrals becomes common referrer for investors without referrer
 *       and get a lump sum of 2% of their deposits. To become winner you must invite more than
@@ -45,26 +45,26 @@ pragma solidity ^0.4.25;
 *   is written into a smart contract, uploaded to the Ethereum blockchain and can be freely accessed online.
 *   In order to insure our investors' complete secuirty, full control over the project has been transferred
 *   from the organizers to the smart contract: nobody can influence the system's permanent autonomous functioning.
-* 
+*
 * --- How to invest:
 *  1. Send from ETH wallet to the smart contract address any amount from 0.01 ETH.
-*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address 
+*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address
 *     of your wallet.
 * --- How to get dividends:
 *     Send 0 air to the address of the contract. Be careful. You can get your dividends only once every 24 hours.
-*  
+*
 * --- RECOMMENDED GAS PRICE: https://ethgasstation.info/
 *     You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
-* 
+*
 * Main contract - Two4ever. You can view the contract code by scrolling down.
 */
 contract Storage {
-// define investor model   
+// define investor model
     struct investor {
         uint keyIndex;
         uint value;
@@ -82,7 +82,7 @@ contract Storage {
         uint strg;
         uint invested;
     }
-  
+
     struct Data {
         mapping(uint => recordStats) stats;
         mapping(address => investor) investors;
@@ -97,11 +97,11 @@ contract Storage {
     event LogBestInvestorChanged(address indexed addr, uint when, uint invested);
     event LogBestPromoterChanged(address indexed addr, uint when, uint refs);
 
-    //creating contract 
+    //creating contract
     constructor() public {
         d.keys.length++;
     }
-    //insert new investor  
+    //insert new investor
     function insert(address addr, uint value) public  returns (bool) {
         uint keyIndex = d.investors[addr].keyIndex;
         if (keyIndex != 0) return false;
@@ -110,7 +110,7 @@ contract Storage {
         d.investors[addr].keyIndex = keyIndex;
         d.keys[keyIndex] = addr;
         updateBestInvestor(addr, d.investors[addr].value);
-    
+
         return true;
     }
     // get full information about investor by "addr"
@@ -139,7 +139,7 @@ contract Storage {
         d.investors[addr].refBonus
         );
     }
-    // get current  Best Investor 
+    // get current  Best Investor
     function getBestInvestor() public view returns(uint, address) {
         return (
         d.bestInvestor.value,
@@ -147,7 +147,7 @@ contract Storage {
         );
     }
 
-    // get current  Best Promoter 
+    // get current  Best Promoter
     function getBestPromoter() public view returns(uint, address) {
         return (
         d.bestPromoter.value,
@@ -155,7 +155,7 @@ contract Storage {
         );
     }
 
-    // add referral bonus to address 
+    // add referral bonus to address
     function addRefBonus(address addr, uint refBonus) public  returns (bool) {
         if (d.investors[addr].keyIndex == 0) return false;
         d.investors[addr].refBonus += refBonus;
@@ -171,7 +171,7 @@ contract Storage {
         return true;
     }
 
-    //add  amount of invest by the address of  investor 
+    //add  amount of invest by the address of  investor
     function addValue(address addr, uint value) public  returns (bool) {
         if (d.investors[addr].keyIndex == 0) return false;
         d.investors[addr].value += value;
@@ -187,7 +187,7 @@ contract Storage {
 
     // get current statistics
     function stats(uint dt) public view returns (uint invested, uint strg) {
-        return ( 
+        return (
         d.stats[dt].invested,
         d.stats[dt].strg
         );
@@ -199,7 +199,7 @@ contract Storage {
             d.bestInvestor.value = investorValue;
             d.bestInvestor.addr = addr;
             emit LogBestInvestorChanged(addr, now, d.bestInvestor.value);
-        }      
+        }
     }
 
     // update value of current "Best Promoter"
@@ -208,10 +208,10 @@ contract Storage {
             d.bestPromoter.value = investorRefs;
             d.bestPromoter.addr = addr;
             emit LogBestPromoterChanged(addr, now, d.bestPromoter.value);
-        }      
+        }
     }
 
-    // set time of payment 
+    // set time of payment
     function setPaymentTime(address addr, uint paymentTime) public  returns (bool) {
         if (d.investors[addr].keyIndex == 0) return false;
         d.investors[addr].paymentTime = paymentTime;
@@ -282,21 +282,21 @@ contract Two4ever is Accessibility  {
   // define constants
   //size of minimal investing
     uint public constant minInvesment = 10 finney; // 0.01 eth
-  //max size of balance 
-    uint public constant maxBalance = 100000 ether; 
+  //max size of balance
+    uint public constant maxBalance = 100000 ether;
   // time period when dividends can be accrued
     uint public constant dividendsPeriod = 24 hours; //24 hours
 
-  // define contracts percents 
-    // percent of main dividends 
+  // define contracts percents
+    // percent of main dividends
     percent private dividends;
-    // percent of admin interest 
+    // percent of admin interest
     percent private adminInterest ;
-   // percent of 1-st level referral 
+   // percent of 1-st level referral
     percent private ref1Bonus ;
-   // percent of 2-nd level referral 
+   // percent of 2-nd level referral
     percent private ref2Bonus ;
-   // percent of advertising interest 
+   // percent of advertising interest
     percent private advertisePersent ;
     // event call when Balance has Changed
     event LogBalanceChanged(uint when, uint balance);
@@ -318,8 +318,8 @@ contract Two4ever is Accessibility  {
         adminInterest = percent(5, 100); //  5%
         ref1Bonus = percent(3, 100); //  3%
         ref2Bonus = percent(2, 100); //  2%
-        advertisePersent = percent(7, 100); //  7% 
-    // start new wave 
+        advertisePersent = percent(7, 100); //  7%
+    // start new wave
         startNewWave();
     }
     // set the value of the wallet address for advertising expenses
@@ -349,7 +349,7 @@ contract Two4ever is Accessibility  {
             return;
         }
 
-    // getting referral address from data of request 
+    // getting referral address from data of request
         address a = msg.data.toAddr();
     //call invest function
         invest(a);
@@ -379,13 +379,13 @@ contract Two4ever is Accessibility  {
     // calc valaue of dividends
         uint value = Math.div(Math.mul(dividends.val,investor.value),dividends.den) * daysAfter;
     // add referral bonus to dividends
-        uint divid = value+ investor.refBonus; 
+        uint divid = value+ investor.refBonus;
     // check if enough money on balance of contract for payment
         if (address(this).balance < divid) {
             startNewWave();
             return;
         }
-  
+
     // send dividends and ref bonus
         if (investor.refBonus > 0) {
             assert(strg.setRefBonus(msg.sender, 0));
@@ -394,7 +394,7 @@ contract Two4ever is Accessibility  {
         } else {
     //send dividends to investor
             msg.sender.transfer(value);
-        }      
+        }
     }
     // public function for calling get dividends
     function getDividends() public balanceChanged {
@@ -417,15 +417,15 @@ contract Two4ever is Accessibility  {
                 referrals[msg.sender] = ref;
 
         //process second level of referrals
-                if (notZeroNotSender(referrals[ref]) && strg.contains(referrals[ref]) && ref != referrals[ref]) { 
+                if (notZeroNotSender(referrals[ref]) && strg.contains(referrals[ref]) && ref != referrals[ref]) {
          //calc the reward
                     reward = Math.div(Math.mul(ref2Bonus.val, value),ref2Bonus.den);
                     assert(strg.addRefBonus(referrals[ref], reward)); // referrer 2 bonus
                 }
                 }else{
-         // get current Best Investor  
+         // get current Best Investor
                 Storage.bestAddress memory bestInvestor = getMemBestInvestor();
-        // get current Best Promoter  
+        // get current Best Promoter
                 Storage.bestAddress memory bestPromoter = getMemBestPromoter();
 
                 if(notZeroNotSender(bestInvestor.addr)){
@@ -443,9 +443,9 @@ contract Two4ever is Accessibility  {
 
     // send admins share
         adminAddr.transfer(Math.div(Math.mul(adminInterest.val, msg.value),adminInterest.den));
-    // send advertise share 
+    // send advertise share
         advertiseAddr.transfer(Math.div(Math.mul(advertisePersent.val, msg.value),advertisePersent.den));
-    
+
     // update statistics
         if (strg.contains(msg.sender)) {
             assert(strg.addValue(msg.sender, value));
@@ -454,7 +454,7 @@ contract Two4ever is Accessibility  {
             assert(strg.insert(msg.sender, value));
             strg.updateStats(now, value, 1);
         }
-    
+
         assert(strg.setPaymentTime(msg.sender, now));
     //increase count of investments
         totalInvestors++;
@@ -465,7 +465,7 @@ contract Two4ever is Accessibility  {
     // show number of investors
     function investorsNumber() public view returns(uint) {
         return strg.size()-1;
-    // -1 because see Storage constructor where keys.length++ 
+    // -1 because see Storage constructor where keys.length++
     }
     //show current contract balance
     function balanceETH() public view returns(uint) {
@@ -485,7 +485,7 @@ contract Two4ever is Accessibility  {
     }
     // show value of referral of 1-st level percent
     function FirstLevelReferrerPercent() public view returns(uint) {
-        return ref1Bonus.val; 
+        return ref1Bonus.val;
     }
     // show value of referral of 2-nd level percent
     function SecondLevelReferrerPercent() public view returns(uint) {
@@ -513,12 +513,12 @@ contract Two4ever is Accessibility  {
         (uint a, uint b, uint c, uint d, uint e) = strg.investorFullInfo(addr);
         return Storage.investor(a, b, c, d, e);
     }
-  //return best investor  info 
+  //return best investor  info
     function getMemBestInvestor() internal view returns(Storage.bestAddress) {
         (uint value, address addr) = strg.getBestInvestor();
         return Storage.bestAddress(value, addr);
     }
-  //return best investor promoter 
+  //return best investor promoter
     function getMemBestPromoter() internal view returns(Storage.bestAddress) {
         (uint value, address addr) = strg.getBestPromoter();
         return Storage.bestAddress(value, addr);
@@ -529,7 +529,7 @@ contract Two4ever is Accessibility  {
     }
 
 /**end views */
-// start wave  
+// start wave
     function startNewWave() private {
         strg = new Storage();
         totalInvestors = 0;
@@ -545,23 +545,23 @@ library Math {
         if (num1 == 0) {
             return 0;
         }
-        return num1 * num2;   
+        return num1 * num2;
     }
     //divide
     function div(uint256 num1, uint256 num2) internal pure returns (uint256) {
         uint256 result = 0;
-        require(num2 > 0); 
+        require(num2 > 0);
         result = num1 / num2;
         return result;
     }
-    //subtract 
+    //subtract
     function sub(uint256 num1, uint256 num2) internal pure returns (uint256) {
         require(num2 <= num1);
         uint256 result = 0;
         result = num1 - num2;
         return result;
     }
-    //add 
+    //add
     function add(uint256 num1, uint256 num2) internal pure returns (uint256) {
         uint256 result = num1 + num2;
         require(result >= num1);
@@ -572,7 +572,7 @@ library Math {
     function mod(uint256 num1, uint256 num2) internal pure returns (uint256) {
         require(num2 != 0);
         return num1 % num2;
-    } 
+    }
 }
 // Helper library with simple additional functions
 library Helper{
@@ -584,7 +584,7 @@ library Helper{
     function isEmptyAddr(address addr) internal pure returns(bool) {
         return addr == address(0);
     }
-    // convert to address 
+    // convert to address
     function toAddr(uint source) internal pure returns(address) {
         return address(source);
     }
@@ -593,4 +593,17 @@ library Helper{
         assembly { addr := mload(add(source,0x14)) }
         return addr;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

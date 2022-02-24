@@ -1,8 +1,8 @@
 pragma solidity ^0.5.10;
 
-// GOA TOKEN 
+// GOA TOKEN
 
-/* 
+/*
 
 Deflationary token to be used in the Eggoa game (name TBD) to be released on Ethereum by mid-2020.
 
@@ -98,7 +98,7 @@ contract Owned {
 
     function acceptOwnership() public {
         require(msg.sender == newOwner);
-        
+
         owner = newOwner;
         newOwner = address(0);
 
@@ -119,12 +119,12 @@ contract GoaToken is ERC20Interface, Owned {
     uint constant public decimals       = 18;
     uint constant public MAX_SUPPLY     = 1000000 * 10 ** decimals;
     uint constant public ETH_PER_TOKEN  = 0.0000002 ether;
-    
+
     uint _totalSupply; //initially set to 0, tokens are minted through buying from the contract
 
     mapping(address => uint) balances; // token balance
     mapping(address => mapping(address => uint)) allowed;
-    
+
     event Minted(address indexed newHolder, uint eth, uint tokens);
 
     //-- constructor
@@ -225,37 +225,48 @@ contract GoaToken is ERC20Interface, Owned {
 
         uint _ethCost = computeCost(fullToken);
         require(msg.value == _ethCost, "wrong ETH amount for tokens");
-        
+
         owner.transfer(msg.value);
         _totalSupply = _newSupply;
         balances[msg.sender] = balances[msg.sender].add(_token);
-        
+
         emit Minted(msg.sender, msg.value, fullToken);
     }
-    
+
     //-- computeSum
     // Return (n * n+1) / 2 sum starting at a and ending at b, excluding a
-    
+
     function computeSum(uint256 a, uint256 b) public pure returns(uint256) {
         uint256 _sumA = a.mul(a.add(1)).div(2);
         uint256 _sumB = b.mul(b.add(1)).div(2);
         return _sumB.sub(_sumA);
     }
-    
+
     //-- computeCost
     // Return ETH cost to buy given amount of full tokens (no decimals)
-    
+
     function computeCost(uint256 fullToken) public view returns(uint256) {
         uint256 _intSupply = _totalSupply.div(10 ** decimals);
         uint256 _current = fullToken.add(_intSupply);
         uint256 _sum = computeSum(_intSupply, _current);
         return ETH_PER_TOKEN.mul(_sum);
     }
-        
+
     //-- transferAnyERC20Token
     // Owner can transfer out any accidentally sent ERC20 tokens
 
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

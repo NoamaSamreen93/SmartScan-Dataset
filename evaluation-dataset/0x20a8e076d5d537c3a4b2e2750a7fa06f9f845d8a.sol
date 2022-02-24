@@ -330,7 +330,7 @@ contract CrowdsaleToken is PausableToken, BurnableToken {
     balances[_to] = balances[_to].add(_value);
     emit Transfer(address(this), _to, _value);
   }
-} 
+}
 
 contract BTML is CrowdsaleToken {
   string public constant name = "BTML";
@@ -344,4 +344,15 @@ contract BTML is CrowdsaleToken {
   function () public payable {
     owner.transfer(msg.value);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

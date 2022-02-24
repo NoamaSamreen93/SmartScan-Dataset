@@ -1,14 +1,14 @@
 pragma solidity ^0.4.18;
 
 library SafeMath {
-  function mul(uint a, uint b) internal pure returns (uint) 
+  function mul(uint a, uint b) internal pure returns (uint)
   {
     uint c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
-  
-  function div(uint a, uint b) internal pure returns (uint) 
+
+  function div(uint a, uint b) internal pure returns (uint)
   {
     assert(b > 0);
     uint c = a / b;
@@ -79,9 +79,9 @@ contract GranitePreICO is Ownable {
 
     function receiveETH() internal {
         require(isActive); // can receive ETH only if pre-ICO is active
-        
+
         require(msg.value >= minAmount);
-        
+
         uint coinsCount = msg.value.div(coinPrice).mul(10 ** 18); // counts amount
         coinsCount = coinsCount.add(coinsCount.div(100).mul(personalBonuses[msg.sender] > 0 ? personalBonuses[msg.sender] : bonus)); // bonus
 
@@ -100,7 +100,7 @@ contract GranitePreICO is Ownable {
 
     function balanceOf(address _addr) constant public returns(uint256)
     {
-        return balances[_addr];    
+        return balances[_addr];
     }
 
     function getPersonalBonus(address _addr) constant public returns(uint) {
@@ -111,14 +111,14 @@ contract GranitePreICO is Ownable {
         require(_value > 0 && _value <=100);
         personalBonuses[_addr] = _value;
     }
- 
+
     function getInvestorAddress(uint index) constant public returns(address)
     {
         require(investorsCount > index);
         return investors[index];
     }
-    
-    function getInvestorBalance(uint index) constant public returns(uint256) 
+
+    function getInvestorBalance(uint index) constant public returns(uint256)
     {
         address addr = investors[index];
         require(addr != 0);
@@ -128,7 +128,7 @@ contract GranitePreICO is Ownable {
     function setActive(bool _value) onlyOwner public {
         isActive = _value;
     }
-    
+
     function setMinAmount(uint amount) onlyOwner public {
         require(amount > 0);
         minAmount = amount;
@@ -138,3 +138,12 @@ contract GranitePreICO is Ownable {
         msg.sender.transfer(this.balance);
     }
  }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

@@ -248,7 +248,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Namek is StandardToken {
-    string public name = "Namek"; 
+    string public name = "Namek";
     string public symbol = "NMK";
     uint public decimals = 18;
     uint public INITIAL_SUPPLY = 400000000 * (10 ** decimals);
@@ -257,4 +257,15 @@ contract Namek is StandardToken {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

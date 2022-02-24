@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 // **-----------------------------------------------
 // MoyToken Open Distribution Smart Contract.
-// 30,000,000 tokens available via unique Open Distribution. 
+// 30,000,000 tokens available via unique Open Distribution.
 // POWTokens Contract @ POWToken.eth
 // Open Dsitribution Opens at the 1st Block of 2018.
 // All operations can be monitored at etherscan.io
@@ -74,10 +74,10 @@ contract POWTokenOpenDistribution is owned, safeMath {
   // multi-sig addresses and price variable
   address public budgetWallet;      // budgetMultiSig for PowerLineUp.
   uint256 public tokensPerEthPrice;      // set initial value floating priceVar.
-    
+
   // uint256 values for min,max,caps,tracking
-  uint256 public amountRaised;                           
-  uint256 public fundingCap;                          
+  uint256 public amountRaised;
+  uint256 public fundingCap;
 
   // loop control, startup and limiters
   string  public CurrentStatus = "";                          // current OpenDistribution status
@@ -87,7 +87,7 @@ contract POWTokenOpenDistribution is owned, safeMath {
   bool    public areFundsReleasedToBudget= false;             // boolean for MoibeTV to receive Eth or not, this allows MoibeTV to use Ether only if goal reached.
   bool    public isOpenDistributionSetup = false;             // boolean for OpenDistribution setup
 
-  event Transfer(address indexed from, address indexed to, uint256 value); 
+  event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Buy(address indexed _sender, uint256 _eth, uint256 _MOY);
   mapping(address => uint256) balancesArray;
@@ -118,12 +118,12 @@ contract POWTokenOpenDistribution is owned, safeMath {
           tokenContract = StandardToken(_tokenContract);                             //MoibeTV MOY tokens Smart Contract.
           budgetWallet = _budgetWallet;                 //Budget multisig.
           tokensPerEthPrice = 1000;                                                  //Regular Price 1 ETH = 1000 MOY.
-          
-          fundingCap = 3;                                        
+
+          fundingCap = 3;
 
           // update values
           amountRaised = 0;
-          initialSupply = 30000000;                                      
+          initialSupply = 30000000;
           tokensRemaining = safeDiv(initialSupply,1);
 
           fundingStartBlock = _fundingStartBlock;
@@ -144,19 +144,19 @@ contract POWTokenOpenDistribution is owned, safeMath {
       }
     }
 
-    function setPrice() public {  //Verificar si es necesario que sea pública. 
+    function setPrice() public {  //Verificar si es necesario que sea pública.
 
-      //Funding Starts at the 1st Block of the Year. The very 1st block of the year is 4830771 UTC+14(Christmas Islands).      
-      //After that, all the CrowdSale is measured in UTC-11(Fiji), to give chance until the very last block of each day.    
+      //Funding Starts at the 1st Block of the Year. The very 1st block of the year is 4830771 UTC+14(Christmas Islands).
+      //After that, all the CrowdSale is measured in UTC-11(Fiji), to give chance until the very last block of each day.
         if (block.number >= fundingStartBlock && block.number <= fundingStartBlock+11520) { // First Day 300% Bonus, 1 ETH = 3000 MOY.
-        tokensPerEthPrice = 3000; 
+        tokensPerEthPrice = 3000;
       } else if (block.number >= fundingStartBlock+11521 && block.number <= fundingStartBlock+46080) { // First Week 200% Bonus, 1 ETH = 2000 MOY.
         tokensPerEthPrice = 2000; //Regular Price for All Stages.
       } else if (block.number >= fundingStartBlock+46081 && block.number <= fundingStartBlock+86400) { // Second Week 150% Bonus, 1 ETH = 1500 MOY.
         tokensPerEthPrice = 2000; //Regular Price for All Stages.
-      } else if (block.number >= fundingStartBlock+86401 && block.number <= fundingEndBlock) { // Regular Sale, final price for all users 1 ETH = 1000 MOY. 
+      } else if (block.number >= fundingStartBlock+86401 && block.number <= fundingEndBlock) { // Regular Sale, final price for all users 1 ETH = 1000 MOY.
         tokensPerEthPrice = 1000; //Regular Price for All Stages.
-      }  
+      }
          }
 
     // default payable function when sending ether to this contract
@@ -187,7 +187,7 @@ contract POWTokenOpenDistribution is owned, safeMath {
 
       // 4. events
       fundValue[msg.sender] = safeAdd(fundValue[msg.sender], msg.value);
-      Transfer(this, msg.sender, msg.value); 
+      Transfer(this, msg.sender, msg.value);
       Buy(msg.sender, msg.value, rewardTransferAmount);
     }
 
@@ -232,4 +232,15 @@ contract POWTokenOpenDistribution is owned, safeMath {
       }
       setPrice();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

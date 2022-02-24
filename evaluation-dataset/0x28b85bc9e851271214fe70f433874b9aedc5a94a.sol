@@ -62,7 +62,7 @@ contract IDMONEY is ERC20
     uint256 tokensold;
     uint256 public total_token_sold;
     bool stopped = false;
- 
+
     address public owner;
     address superAdmin = 0x1313d38e988526A43Ab79b69d4C94dD16f4c9936;
     address socialOne = 0x52d4bcF6F328492453fAfEfF9d6Eb73D26766Cff;
@@ -71,7 +71,7 @@ contract IDMONEY is ERC20
     address founderTwo = 0xA90ab8B8Cfa553CC75F9d2C24aE7148E44Cd0ABa;
     address founderThree = 0xd2fdE07Ee7cB86AfBE59F4efb9fFC1528418CC0E;
     address storage1 = 0x5E948d1C6f7C76853E43DbF1F01dcea5263011C5;
-    
+
     mapping(address => uint) balances;
     mapping(address => bool) public refund;              //checks the refund status
     mapping(address => bool) public whitelisted;         //checks the whitelist status of the address
@@ -97,12 +97,12 @@ contract IDMONEY is ERC20
             // Contract not in expected state
          _;
     }
-    
+
      modifier onlyOwner() {
         require (msg.sender == owner);
         _;
     }
-    
+
      modifier onlySuperAdmin() {
         require (msg.sender == superAdmin);
         _;
@@ -148,9 +148,9 @@ contract IDMONEY is ERC20
     //calculation for the bonus for 1 million tokens
     function bonuscal() private returns(uint)
     {
-       
+
         c = tokensold / 10 ** 23;
-        if (c == 0) 
+        if (c == 0)
         {
            return  90;
 
@@ -278,7 +278,7 @@ contract IDMONEY is ERC20
         return true;
     }
 
- 
+
 
     //In case the ownership needs to be transferred
     function transferOwnership(address newOwner)public onlySuperAdmin
@@ -293,4 +293,15 @@ contract IDMONEY is ERC20
         superAdmin.transfer(myAddress.balance);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

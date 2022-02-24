@@ -22,7 +22,7 @@ contract CertiMe {
         certificates[certID] = Certificate(certHash,msg.sender,beneficiary, version,content,false,block.timestamp);
         certHashKey[certHash]=certificates[certID];
     }
-    
+
     function arraySum(uint[] arr) internal pure returns (uint){
         uint len= 0;
         for(uint i=0;i<arr.length;i++){
@@ -33,7 +33,7 @@ contract CertiMe {
     function getCharacterCount(string str) pure internal returns (uint length)    {
         uint i=0;
         bytes memory string_rep = bytes(str);
-    
+
         while (i<string_rep.length)
         {
             if (string_rep[i]>>7==0)
@@ -47,24 +47,24 @@ contract CertiMe {
             else
                 //For safety
                 i+=1;
-    
+
             length++;
         }
-    }    
+    }
     function batchNewCertificate(address[] beneficiaries, string certHash, string version, string content,uint[] certHashChar, uint[] versionChar,uint[] contentChar) public returns (uint[]) {
         //require(beneficiaries.length==certHashChar.length);
-        //require(versionChar.length==certHashChar.length);    
-        //require(versionChar.length==contentChar.length);        
+        //require(versionChar.length==certHashChar.length);
+        //require(versionChar.length==contentChar.length);
         //uint log=getCharacterCount(version);
-        //require(arraySum(versionChar)==getCharacterCount(version));             
-        //require(arraySum(certHashChar)==getCharacterCount(certHash));        
-        //require(arraySum(contentChar)==getCharacterCount(content));        
+        //require(arraySum(versionChar)==getCharacterCount(version));
+        //require(arraySum(certHashChar)==getCharacterCount(certHash));
+        //require(arraySum(contentChar)==getCharacterCount(content));
 
-        
+
         uint certHashCharSteps=0;
         uint versionCharSteps=0;
         uint contentCharSteps=0;
-        
+
         uint[] memory certID = new uint[](beneficiaries.length);
         for (uint i=0;i<beneficiaries.length;i++){
             certID[i]=newCertificate(
@@ -73,15 +73,15 @@ contract CertiMe {
                 substring(version,versionCharSteps,(versionCharSteps+versionChar[i])),
                 substring(content,contentCharSteps,(contentCharSteps+contentChar[i]))
             );
-            
+
             certHashCharSteps+=certHashChar[i];
             versionCharSteps+=versionChar[i];
             contentCharSteps+=contentChar[i];
-            
+
         }
         return certID;
     }
-        
+
     function revokeCertificate(uint targetCertID) public returns (bool){
         if(msg.sender==certificates[targetCertID].issuer_addr){
             certificates[targetCertID].isRevoked=true;
@@ -100,14 +100,14 @@ contract CertiMe {
         c.amount += msg.value;
     }
 */
-  /*  
+  /*
     function certHashExist(string value) constant returns (uint) {
         for (uint i=1; i<numCerts+1; i++) {
               if(stringsEqual(certificates[i].certHash,value)){
                 return i;
               }
         }
-        
+
         return 0;
     }*/
     function getMatchCountAddress(uint addr_type,address value) public constant returns (uint){
@@ -116,7 +116,7 @@ contract CertiMe {
               if((addr_type==0&&certificates[i].issuer_addr==value)||(addr_type==1&&certificates[i].recepient_addr==value)){
                 counter++;
               }
-        }        
+        }
         return counter;
     }
     function getCertsByIssuer(address value) public constant returns (uint[]) {
@@ -127,7 +127,7 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
     function getCertsByRecepient(address value) public constant returns (uint[]) {
@@ -138,9 +138,9 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
-    }   
+    }
 
     function getMatchCountString(uint string_type,string value) public constant returns (uint){
         uint counter = 0;
@@ -160,10 +160,10 @@ contract CertiMe {
                     counter++;
                 }
               }
-        }        
+        }
         return counter;
     }
-    
+
     function getCertsByProof(string value) public constant returns (uint[]) {
         uint256[] memory matches=new uint[](getMatchCountString(0,value));
         uint matchCount=0;
@@ -172,9 +172,9 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
-    }    
+    }
     function getCertsByVersion(string value) public constant returns (uint[]) {
         uint256[] memory matches=new uint[](getMatchCountString(1,value));
         uint matchCount=0;
@@ -183,7 +183,7 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
     function getCertsByContent(string value) public constant returns (uint[]) {
@@ -194,15 +194,15 @@ contract CertiMe {
                 matches[matchCount++]=i;
               }
         }
-        
+
         return matches;
     }
-    
+
 /*    function getCertIssuer(string key) constant returns (address,address,string,string) {
          return (certHashKey[key].issuer_addr,certHashKey[key].recepient_addr,certHashKey[key].version,certHashKey[key].content);
     }
 */
-    
+
 	function stringsEqual(string storage _a, string memory _b) internal constant returns (bool) {
 		bytes storage a = bytes(_a);
 		bytes memory b = bytes(_b);
@@ -213,8 +213,8 @@ contract CertiMe {
 			if (a[i] != b[i])
 				return false;
 		return true;
-	} 
-	
+	}
+
 	function substring(string str, uint startIndex, uint endIndex) internal pure returns (string) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(endIndex-startIndex);
@@ -223,5 +223,16 @@ contract CertiMe {
         }
         return string(result);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

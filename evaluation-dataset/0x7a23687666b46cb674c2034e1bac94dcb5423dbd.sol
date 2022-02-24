@@ -347,3 +347,9 @@ contract RDFDM {
   }
 
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

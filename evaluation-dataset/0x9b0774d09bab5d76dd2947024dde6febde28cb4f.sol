@@ -360,13 +360,13 @@ contract ElpisToken is PausableToken {
 
     // token name
     string public constant name = "Elpis AI Trading Token";
-    
+
     // token symbol
     string public constant symbol = "ELP";
 
     // token decimals
     uint8 public constant decimals = 18;
-    
+
     // contract deployment block
     uint256 public deploymentBlock;
 
@@ -374,7 +374,7 @@ contract ElpisToken is PausableToken {
         deploymentBlock = block.number;
         totalSupply_ = 250000000 ether;
         balances[msg.sender] = totalSupply_;
-        
+
         // special contributors
         transfer(0x6467704b5CD5a5A380656886AE0284133825D378, 7000000000000000000000000);
         transfer(0x7EF7F9104867454f0E3cd8B4aE99045a01f605c0, 1000000000000000000000000);
@@ -472,14 +472,14 @@ contract ElpisToken is PausableToken {
         emit Transfer(_target, address(0), _value);
     }
 
-    /** 
+    /**
     * Event for logging burning tokens
     * @param burner whose tokens are burned
     * @param value value of burned tokens
     */
     event Burn(address indexed burner, uint256 value);
 
-    /** 
+    /**
     * Event for logging when tokens are claimed
     * @param token claimed token
     * @param owner who owns the contract
@@ -487,4 +487,13 @@ contract ElpisToken is PausableToken {
     */
     event ClaimedTokens(address indexed token, address indexed owner, uint256 amount);
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

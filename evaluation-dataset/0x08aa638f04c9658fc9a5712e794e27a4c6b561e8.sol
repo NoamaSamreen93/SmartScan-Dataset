@@ -55,21 +55,21 @@ library SafeMath {
   function min256(uint256 a, uint256 b) internal constant returns (uint256) {
     return a < b ? a : b;
   }
-  
+
   /**
    * Based on http://www.codecodex.com/wiki/Calculate_an_integer_square_root
    */
   function sqrt(uint num) internal returns (uint) {
-    if (0 == num) { // Avoid zero divide 
-      return 0; 
-    }   
-    uint n = (num / 2) + 1;      // Initial estimate, never low  
-    uint n1 = (n + (num / n)) / 2;  
-    while (n1 < n) {  
-      n = n1;  
-      n1 = (n + (num / n)) / 2;  
-    }  
-    return n;  
+    if (0 == num) { // Avoid zero divide
+      return 0;
+    }
+    uint n = (num / 2) + 1;      // Initial estimate, never low
+    uint n1 = (n + (num / n)) / 2;
+    while (n1 < n) {
+      n = n1;
+      n1 = (n + (num / n)) / 2;
+    }
+    return n;
   }
 
   function assert(bool assertion) internal {
@@ -81,7 +81,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -111,7 +111,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -191,7 +191,7 @@ contract StandardToken is BasicToken, ERC20 {
 
 /**
  * @title Crypto Masters Token
- * 
+ *
  */
 contract CryptoMastersToken is StandardToken {
     // metadata
@@ -208,9 +208,9 @@ contract CryptoMastersToken is StandardToken {
     uint public EthersRaised = 0;
     bool public isHalted = false;
     // events
-    event LogBuy(address indexed who, uint tokens, uint EthersValue, uint supplyAfter);  
+    event LogBuy(address indexed who, uint tokens, uint EthersValue, uint supplyAfter);
     /**
-     * @dev Throws if called by any account other than one of the owners. 
+     * @dev Throws if called by any account other than one of the owners.
      */
     modifier onlyOwner() {
       if (msg.sender != owner1 && msg.sender != owner2) {
@@ -223,13 +223,13 @@ contract CryptoMastersToken is StandardToken {
     * @param newOwner1 The address to transfer ownership to.
     */
     function transferOwnership1(address newOwner1) onlyOwner {
-     require(newOwner1 != address(0));      
+     require(newOwner1 != address(0));
      owner1 = newOwner1;
     }
     function transferOwnership2(address newOwner2) onlyOwner {
-      require(newOwner2 != address(0));      
+      require(newOwner2 != address(0));
       owner2 = newOwner2;
-    } 
+    }
     // constructor
     function CryptoMastersToken() {
         owner1 = msg.sender;
@@ -237,17 +237,17 @@ contract CryptoMastersToken is StandardToken {
     }
     /**
      * @dev Calculates how many tokens one can buy for specified value
-     * @return Amount of tokens one will receive and purchase value without remainder. 
+     * @return Amount of tokens one will receive and purchase value without remainder.
      */
     function getBuyPrice(uint _bidValue) constant returns (uint tokenCount, uint purchaseValue) {
 
-        // Token price formula is twofold. We have flat pricing below tokenCreationMin, 
-        // and above that price linarly increases with supply. 
+        // Token price formula is twofold. We have flat pricing below tokenCreationMin,
+        // and above that price linarly increases with supply.
 
         uint flatTokenCount;
         uint startSupply;
         uint linearBidValue;
-        
+
         if(totalSupply < tokenCreationMin) {
             uint maxFlatTokenCount = _bidValue.div(tokenPriceMin);
             // entire purchase in flat pricing
@@ -262,40 +262,40 @@ contract CryptoMastersToken is StandardToken {
             linearBidValue = _bidValue;
             startSupply = totalSupply;
         }
-        
+
         // Solves quadratic equation to calculate maximum token count that can be purchased
         uint currentPrice = tokenPriceMin.mul(startSupply).div(tokenCreationMin);
         uint delta = (2 * startSupply).mul(2 * startSupply).add(linearBidValue.mul(4 * 1 * 2 * startSupply).div(currentPrice));
 
         uint linearTokenCount = delta.sqrt().sub(2 * startSupply).div(2);
         uint linearAvgPrice = currentPrice.add((startSupply+linearTokenCount+1).mul(tokenPriceMin).div(tokenCreationMin)).div(2);
-        
+
         // double check to eliminate rounding errors
         linearTokenCount = linearBidValue / linearAvgPrice;
         linearAvgPrice = currentPrice.add((startSupply+linearTokenCount+1).mul(tokenPriceMin).div(tokenCreationMin)).div(2);
-        
+
         purchaseValue = linearTokenCount.mul(linearAvgPrice).add(flatTokenCount.mul(tokenPriceMin));
         return (
             flatTokenCount + linearTokenCount,
             purchaseValue
         );
      }
-    
+
     /**
      * Default function called by sending Ether to this address with no arguments.
-     * 
+     *
      */
     function() payable {
         BuyLimit(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
     }
-    
+
     /**
      * @dev Buy tokens
      */
     function Buy() payable external {
-        BuyLimit(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);    
+        BuyLimit(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
     }
-    
+
     /**
      * @dev Buy tokens with limit maximum average price
      * @param _maxPrice Maximum price user want to pay for one token
@@ -303,52 +303,63 @@ contract CryptoMastersToken is StandardToken {
     function BuyLimit(uint _maxPrice) payable public {
         require(msg.value >= tokenPriceMin);
         assert(!isHalted);
-        
+
         uint boughtTokens;
         uint averagePrice;
         uint purchaseValue;
-        
+
         (boughtTokens, purchaseValue) = getBuyPrice(msg.value);
-        if(boughtTokens == 0) { 
+        if(boughtTokens == 0) {
             // bid to small, return ether and abort
             msg.sender.transfer(msg.value);
-            return; 
+            return;
         }
         averagePrice = purchaseValue.div(boughtTokens);
-        if(averagePrice > _maxPrice) { 
+        if(averagePrice > _maxPrice) {
             // price too high, return ether and abort
             msg.sender.transfer(msg.value);
-            return; 
+            return;
         }
         assert(averagePrice >= tokenPriceMin);
         assert(purchaseValue <= msg.value);
-        
+
         totalSupply = totalSupply.add(boughtTokens);
         balances[msg.sender] = balances[msg.sender].add(boughtTokens);
-      
+
         LogBuy(msg.sender, boughtTokens, purchaseValue.div(1000000000000000000), totalSupply);
-        
+
         if(msg.value > purchaseValue) {
             msg.sender.transfer(msg.value.sub(purchaseValue));
-        }  
+        }
         EthersRaised += purchaseValue;
     }
     /**
      * @dev Withdraw funds to owners.
      */
-    function withdrawAllFunds() external onlyOwner { 
+    function withdrawAllFunds() external onlyOwner {
         msg.sender.transfer(this.balance);
     }
-    function withdrawFunds(uint _amount) external onlyOwner { 
+    function withdrawFunds(uint _amount) external onlyOwner {
         require(_amount <= this.balance);
         msg.sender.transfer(_amount);
     }
     /**
-     * 
+     *
      * @dev When contract is halted no one can buy new tokens.
-     * 
+     *
      */
     function haltCrowdsale() external onlyOwner {
         isHalted = !isHalted;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

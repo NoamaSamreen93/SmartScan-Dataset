@@ -748,7 +748,7 @@ contract ERC20Burnable is ERC20, MinterRole {
 
 /**
  * @title SKM Protocol ERC20 Token Contract
- * @author 
+ * @author
  *
  * @dev Implementation of the New SKM Token.
  */
@@ -765,4 +765,15 @@ contract SkrumbleToken is ERC20Detailed, ERC20Capped, ERC20Burnable, ERC20Pausab
     {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

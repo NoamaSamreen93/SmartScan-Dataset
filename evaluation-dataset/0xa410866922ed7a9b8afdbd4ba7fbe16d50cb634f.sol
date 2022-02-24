@@ -371,10 +371,19 @@ contract CDEXToken is BurnableToken, AntiTheftToken, PausableToken {
         symbol = _symbol;
         name = _name;
         decimals = _decimals;
-        
+
         totalSupply = _max_supply * (10 ** _decimals);
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0x0), msg.sender, totalSupply);
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

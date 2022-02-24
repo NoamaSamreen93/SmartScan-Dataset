@@ -50,7 +50,7 @@ contract IERC721 is IERC165 {
      * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to
      * another (`to`).
      *
-     * 
+     *
      *
      * Requirements:
      * - `from`, `to` cannot be zero.
@@ -1073,7 +1073,7 @@ contract SuperplayerRandomEquipmentInterface {
   function getRandomEquipment(uint256 seed) public view returns(uint blockNo,string memory ekey,uint[] memory randomProps) ;
 }
 
-   
+
 contract SuperplayerEquipmentV001 is EquipGeneratorWhitelist,ERC721 ,ERC721Metadata("SuperPlayerEquipment","SPE") {
 
   using SafeMath for uint256;
@@ -1151,12 +1151,12 @@ contract SuperplayerEquipmentV001 is EquipGeneratorWhitelist,ERC721 ,ERC721Metad
    */
   function createEquip(address to, string memory key, uint[] memory randomProps) canGenerate public returns(uint256){
     uint256 uintkey =  uint256(keccak256(abi.encodePacked(bytes(key))));
-    uint256 currentTypCnt = typeCurrCntMap[uintkey]; 
+    uint256 currentTypCnt = typeCurrCntMap[uintkey];
 
     // limit checkt
     require(currentTypCnt < typeLimitsMap[uintkey]) ;
 
-    uint[] memory emptyProps = new uint[](0); 
+    uint[] memory emptyProps = new uint[](0);
     Equipment memory newEquip = Equipment({
       key : key,
       randomProperties : randomProps,
@@ -1197,5 +1197,16 @@ contract SuperplayerEquipmentV001 is EquipGeneratorWhitelist,ERC721 ,ERC721Metad
 
 
 /*
- * 
+ *
  */
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -355,7 +355,7 @@ contract XRT is MintableToken, BurnableToken {
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction {
 
     /*
@@ -608,4 +608,15 @@ contract DutchAuction {
 
         endTime = now;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

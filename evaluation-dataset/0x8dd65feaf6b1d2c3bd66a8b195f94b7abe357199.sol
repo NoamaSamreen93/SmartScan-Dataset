@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 library BWUtility {
-    
+
     // -------- UTILITY FUNCTIONS ----------
 
 
@@ -14,7 +14,7 @@ library BWUtility {
     // xxx
     // xox
     // xxx
-    // All x (_x2, _xy2) are adjacent to o (_x1, _y1) in this ascii image. 
+    // All x (_x2, _xy2) are adjacent to o (_x1, _y1) in this ascii image.
     // Adjacency does not wrapp around map edges so if y2 = 255 and y1 = 0 then they are not ajacent
     function isAdjacent(uint8 _x1, uint8 _y1, uint8 _x2, uint8 _y2) pure public returns (bool) {
         return ((_x1 == _x2 &&      (_y2 - _y1 == 1 || _y1 - _y2 == 1))) ||      // Same column
@@ -34,7 +34,7 @@ library BWUtility {
         uint8 x = uint8(_tileId >> 8);
         return (x, y);
     }
-    
+
     function getBoostFromTile(address _claimer, address _attacker, address _defender, uint _blockValue) pure public returns (uint, uint) {
         if (_claimer == _attacker) {
             return (_blockValue, 0);
@@ -53,10 +53,10 @@ contract BWData {
     uint private blockValueBalance = 0;
     uint private feeBalance = 0;
     uint private BASE_TILE_PRICE_WEI = 1 finney; // 1 milli-ETH.
-    
+
     mapping (address => User) private users; // user address -> user information
     mapping (uint16 => Tile) private tiles; // tileId -> list of TileClaims for that particular tile
-    
+
     // Info about the users = those who have purchased tiles.
     struct User {
         uint creationTime;
@@ -98,14 +98,14 @@ contract BWData {
         }
         _;
     }
-    
+
     modifier isOwner {
         if (msg.sender != owner) {
             revert();
         }
         _;
     }
-    
+
     function setBwServiceValidCaller(address _bwService) public isOwner {
         bwService = _bwService;
     }
@@ -116,16 +116,16 @@ contract BWData {
 
     function setBwMarketValidCaller(address _bwMarket) public isOwner {
         bwMarket = _bwMarket;
-    }    
-    
+    }
+
     // ----------USER-RELATED GETTER FUNCTIONS------------
-    
+
     //function getUser(address _user) view public returns (bytes32) {
         //BWUtility.User memory user = users[_user];
         //require(user.creationTime != 0);
         //return (user.creationTime, user.imageUrl, user.tag, user.email, user.homeUrl, user.creationTime, user.censored, user.battleValue);
     //}
-    
+
     function addUser(address _msgSender) public isValidCaller {
         User storage user = users[_msgSender];
         require(user.creationTime == 0);
@@ -135,7 +135,7 @@ contract BWData {
     function hasUser(address _user) view public isValidCaller returns (bool) {
         return users[_user].creationTime != 0;
     }
-    
+
 
     // ----------TILE-RELATED GETTER FUNCTIONS------------
 
@@ -143,17 +143,17 @@ contract BWData {
         Tile storage currentTile = tiles[_tileId];
         return (currentTile.claimer, currentTile.blockValue, currentTile.creationTime, currentTile.sellPrice);
     }
-    
+
     function getTileClaimerAndBlockValue(uint16 _tileId) view public isValidCaller returns (address, uint) {
         Tile storage currentTile = tiles[_tileId];
         return (currentTile.claimer, currentTile.blockValue);
     }
-    
+
     function isNewTile(uint16 _tileId) view public isValidCaller returns (bool) {
         Tile storage currentTile = tiles[_tileId];
         return currentTile.creationTime == 0;
     }
-    
+
     function storeClaim(uint16 _tileId, address _claimer, uint _blockValue) public isValidCaller {
         tiles[_tileId] = Tile(_claimer, _blockValue, block.timestamp, 0);
     }
@@ -169,7 +169,7 @@ contract BWData {
     function updateTileTimeStamp(uint16 _tileId) public isValidCaller {
         tiles[_tileId].creationTime = block.timestamp;
     }
-    
+
     function getCurrentClaimerForTile(uint16 _tileId) view public isValidCaller returns (address) {
         Tile storage currentTile = tiles[_tileId];
         if (currentTile.creationTime == 0) {
@@ -185,7 +185,7 @@ contract BWData {
         }
         return (currentTile.blockValue, currentTile.sellPrice);
     }
-    
+
     function getBlockValueBalance() view public isValidCaller returns (uint){
         return blockValueBalance;
     }
@@ -201,15 +201,15 @@ contract BWData {
     function setFeeBalance(uint _feeBalance) public isValidCaller {
         feeBalance = _feeBalance;
     }
-    
+
     function getUserBattleValue(address _userId) view public isValidCaller returns (uint) {
         return users[_userId].battleValue;
     }
-    
+
     function setUserBattleValue(address _userId, uint _battleValue) public  isValidCaller {
         users[_userId].battleValue = _battleValue;
     }
-    
+
     function verifyAmount(address _msgSender, uint _msgValue, uint _amount, bool _useBattleValue) view public isValidCaller {
         User storage user = users[_msgSender];
         require(user.creationTime != 0);
@@ -221,7 +221,7 @@ contract BWData {
             require(_amount == _msgValue);
         }
     }
-    
+
     function addBoostFromTile(Tile _tile, address _attacker, address _defender, Boost memory _boost) pure private {
         if (_tile.claimer == _attacker) {
             require(_boost.attackBoost + _tile.blockValue >= _tile.blockValue); // prevent overflow
@@ -247,7 +247,7 @@ contract BWData {
             if (x != 255) {
                 addBoostFromTile(tiles[BWUtility.toTileId(x+1, y+1)], _attacker, _defender, boost);
             }
-            
+
             addBoostFromTile(tiles[BWUtility.toTileId(x, y+1)], _attacker, _defender, boost);
 
             if (x != 0) {
@@ -293,17 +293,17 @@ contract BWData {
 
         return (boost.attackBoost, boost.defendBoost);
     }
-    
+
     function censorUser(address _userAddress, bool _censored) public isValidCaller {
         User storage user = users[_userAddress];
         require(user.creationTime != 0);
         user.censored = _censored;
     }
-    
+
     function deleteTile(uint16 _tileId) public isValidCaller {
         delete tiles[_tileId];
     }
-    
+
     function setSellPrice(uint16 _tileId, uint _sellPrice) public isValidCaller {
         tiles[_tileId].sellPrice = _sellPrice;  //testrpc cannot estimate gas when delete is used.
     }
@@ -326,13 +326,13 @@ contract BWService {
     BWData private bwData;
     uint private seed = 42;
     uint private WITHDRAW_FEE = 20; //1/20 = 5%
-    
+
     modifier isOwner {
         if (msg.sender != owner) {
             revert();
         }
         _;
-    }  
+    }
 
     modifier isValidCaller {
         if (msg.sender != bw && msg.sender != bwMarket) {
@@ -343,8 +343,8 @@ contract BWService {
 
     event TileClaimed(uint16 tileId, address newClaimer, uint priceInWei, uint creationTime);
     event TileFortified(uint16 tileId, address claimer, uint addedValueInWei, uint priceInWei, uint fortifyTime); // Sent when a user fortifies an existing claim by bumping its value.
-    event TileAttackedSuccessfully(uint16 tileId, address attacker, uint attackAmount, uint totalAttackAmount, address defender, uint defendAmount, uint totalDefendAmount, uint attackRoll, uint attackTime); // Sent when a user successfully attacks a tile.    
-    event TileDefendedSuccessfully(uint16 tileId, address attacker, uint attackAmount, uint totalAttackAmount, address defender, uint defendAmount, uint totalDefendAmount, uint attackRoll, uint defendTime); // Sent when a user successfully defends a tile when attacked.    
+    event TileAttackedSuccessfully(uint16 tileId, address attacker, uint attackAmount, uint totalAttackAmount, address defender, uint defendAmount, uint totalDefendAmount, uint attackRoll, uint attackTime); // Sent when a user successfully attacks a tile.
+    event TileDefendedSuccessfully(uint16 tileId, address attacker, uint attackAmount, uint totalAttackAmount, address defender, uint defendAmount, uint totalDefendAmount, uint attackRoll, uint defendTime); // Sent when a user successfully defends a tile when attacked.
     event BlockValueMoved(uint16 sourceTileId, uint16 destTileId, address owner, uint movedBlockValue, uint postSourceValue, uint postDestValue, uint moveTime); // Sent when a user buys a tile from another user, by accepting a tile offer
     event UserBattleValueUpdated(address userAddress, uint battleValue, bool isWithdraw);
 
@@ -367,7 +367,7 @@ contract BWService {
     function setValidBwCaller(address _bw) public isOwner {
         bw = _bw;
     }
-    
+
     function setValidBwMarketCaller(address _bwMarket) public isOwner {
         bwMarket = _bwMarket;
     }
@@ -386,7 +386,7 @@ contract BWService {
         uint valuePerBlockInWei = _claimAmount / tileCount; // Due to requires above this is guaranteed to be an even number
 
         if (_useBattleValue) {
-            subUserBattleValue(_msgSender, _claimAmount, false);  
+            subUserBattleValue(_msgSender, _claimAmount, false);
         }
 
         addGlobalBlockValueBalance(_claimAmount);
@@ -426,7 +426,7 @@ contract BWService {
             if (_useBattleValue) {
                 subUserBattleValue(_msgSender, addedValuePerTileInWei, false);
             }
-            
+
             fortifyClaim(_msgSender, _claimedTileIds[i], addedValuePerTileInWei);
         }
     }
@@ -438,7 +438,7 @@ contract BWService {
         uint updatedBlockValue = blockValue + _fortifyAmount;
         // Send fortify event
         emit TileFortified(_claimedTileId, _msgSender, _fortifyAmount, updatedBlockValue, block.timestamp);
-        
+
         // Update tile value. The tile has been fortified by bumping up its value.
         bwData.updateTileBlockValue(_claimedTileId, updatedBlockValue);
 
@@ -465,7 +465,7 @@ contract BWService {
         address claimer;
         uint blockValue;
         (claimer, blockValue) = bwData.getTileClaimerAndBlockValue(_tileId);
-        
+
         require(claimer != 0); // Can't do this on never-owned tiles
         require(claimer != _msgSender); // Can't attack one's own tiles
         require(claimer != owner); // Can't attack owner's tiles because it is used for raffle.
@@ -543,7 +543,7 @@ contract BWService {
         require(_moveAmount >= 1 finney); // Can't be less
         require(_moveAmount % 1 finney == 0); // Move amount must be in multiples of 1 finney
         // require(sourceTile.blockValue - _moveAmount >= BASE_TILE_PRICE_WEI); // Must always leave some at source
-        
+
         require(sourceTileBlockValue - _moveAmount < sourceTileBlockValue); // Prevent overflow
         require(destTileBlockValue + _moveAmount > destTileBlockValue); // Prevent overflow
         require(BWUtility.isAdjacent(_xSource, _ySource, _xDest, _yDest));
@@ -561,7 +561,7 @@ contract BWService {
 
         bwData.updateTileBlockValue(destTileId, destTileBlockValue);
         bwData.deleteOffer(destTileId);   // Offer invalid since block value has changed
-        emit BlockValueMoved(sourceTileId, destTileId, _msgSender, _moveAmount, sourceTileBlockValue, destTileBlockValue, block.timestamp);        
+        emit BlockValueMoved(sourceTileId, destTileId, _msgSender, _moveAmount, sourceTileBlockValue, destTileBlockValue, block.timestamp);
     }
 
 
@@ -588,7 +588,7 @@ contract BWService {
         bwData.setUserBattleValue(_userId, newBattleValue); // Don't include boost here!
         emit UserBattleValueUpdated(_userId, newBattleValue, false);
     }
-    
+
     function subUserBattleValue(address _userId, uint _amount, bool _isWithdraw) public isValidCaller {
         uint userBattleValue = bwData.getUserBattleValue(_userId);
         require(_amount <= userBattleValue); // Must be less than user's battle value - also implicitly checks that underflow isn't possible
@@ -609,4 +609,15 @@ contract BWService {
         ERC20I token = ERC20I(_tokenAddress);
         require(token.transfer(_recipient, token.balanceOf(this)));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -164,7 +164,7 @@ contract BitbattleExchange{
         require(_namiMultiSigWallet != address(0));
         escrow = _escrow;
         namiMultiSigWallet = _namiMultiSigWallet;
-        
+
         // init token
         // BinanceCoin
         TokenAddress[0] = 0xB8c77482e45F1F44dE1745F52C74426C631bDD52;
@@ -196,7 +196,7 @@ contract BitbattleExchange{
         TokenAddress[13] = 0x6f259637dcD74C767781E37Bc6133cd6A68aa161;
         // Status
         TokenAddress[14] = 0x744d70FDBE2Ba4CF95131626614a1763DF805B9E;
-        
+
         // Nami
         TokenAddress[15] = 0x8d80de8A78198396329dfA769aD54d24bF90E7aa;
         // Dai
@@ -233,7 +233,7 @@ contract BitbattleExchange{
 
     // Gathered funds can be withdraw only to namimultisigwallet's address.
     address public namiMultiSigWallet;
-    
+
     // Token Address
     mapping(uint256 => address) public TokenAddress;
 
@@ -263,7 +263,7 @@ contract BitbattleExchange{
         _;
     }
 
-    
+
     /**
      * Admin function
      */
@@ -326,7 +326,7 @@ contract BitbattleExchange{
         require(isController[_controller]);
         isController[_controller] = false;
     }
-    
+
     /**
      * update token address
      */
@@ -343,7 +343,7 @@ contract BitbattleExchange{
     {
         require(_account != address(0x0) && _amount != 0);
         require(_amount >= minWithdraw && _amount <= maxWithdraw);
-        
+
         // check valid token index
         require(TokenAddress[_tokenIndex] != address(0));
         EIP20 ERC20Token = EIP20(TokenAddress[_tokenIndex]);
@@ -355,4 +355,15 @@ contract BitbattleExchange{
         // emit event
         emit Withdraw(_account, _amount, now, _tokenIndex);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

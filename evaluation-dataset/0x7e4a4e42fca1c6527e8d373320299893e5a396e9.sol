@@ -139,7 +139,7 @@ contract ParallelWorld {
       //winner gets the prize amount minus developer cut
       ownerOf(_itemId).transfer(winneramount);
     }
-    
+
 
   }
 
@@ -176,7 +176,7 @@ contract ParallelWorld {
     require(_price > 0);
     require(priceOfItem[_itemId] == 0);
     require(ownerOfItem[_itemId] == address(0));
-    
+
 
     ownerOfItem[_itemId] = this; //set the contract as original owner of teams
     priceOfItem[_itemId] = _price;
@@ -236,10 +236,10 @@ contract ParallelWorld {
     address oldOwner = ownerOf(_itemId);
     address newOwner = msg.sender;
     uint256 price = priceOf(_itemId);
-    
+
     _transfer(oldOwner, newOwner, _itemId);
     priceOfItem[_itemId] = nextPriceOf(_itemId);
-    
+
     uint256 excess = msg.value.sub(priceOfItem[_itemId]);
 
     TransactionOccured(_itemId, priceOfItem[_itemId], oldOwner, newOwner);
@@ -251,22 +251,22 @@ contract ParallelWorld {
       //send to old owner,the original amount they paid, plus 20% of the price difference between what they paid and new owner pays
       uint256 oldOwnercut = priceOfItem[_itemId].sub(pricedifference.mul(80).div(100));
       oldOwner.transfer(oldOwnercut);
-      
+
       //send to developer, 10% of price diff
       owner.transfer(calculateDevCut(pricedifference));
-    
+
     }
     else
     {
       //first transaction to purchase from contract, send 10% of tx to dev
       owner.transfer(calculateDevCut(msg.value));
-    
+
     }
 
     if (excess > 0) {
       newOwner.transfer(excess);
     }
-    
+
   }
 
   /* ERC721 */
@@ -429,7 +429,7 @@ contract ParallelWorld {
     return size > 0;
   }
 
-  
+
 }
 
 interface IItemRegistry {
@@ -437,4 +437,15 @@ interface IItemRegistry {
   function ownerOf (uint256 _itemId) public view returns (address _owner);
   function priceOf (uint256 _itemId) public view returns (uint256 _price);
   function nameOf (uint256 _itemId) public view returns (bytes32 _nameofItemlocal);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

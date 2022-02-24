@@ -41,30 +41,30 @@ contract Token {
     uint internal _totalSupply = 1000;
     mapping (address => uint) internal _balanceOf;
     mapping (address => mapping(address => uint)) internal _allowances;
-    
+
     constructor(string symbol, string name, uint8 decimals, uint totalSupply) public {
         _symbol = symbol;
         _name = name;
         _decimals = decimals;
         _totalSupply = totalSupply;
     }
-    
+
     function name() public constant returns (string) {
         return _name;
     }
-    
+
     function symbol() public constant returns (string) {
         return _symbol;
     }
-    
+
     function decimals() public constant returns (uint8){
         return _decimals;
     }
-    
+
     function totalSupply() public constant returns (uint){
         return _totalSupply;
     }
-    
+
     function balanceOf(address _addr) public constant returns (uint);
     function transfer(address _to, uint _value) public returns (bool);
     event Transfer(address indexed _from, address indexed _to, uint _value);
@@ -72,33 +72,33 @@ contract Token {
 
 contract PapaBoxToken is Token("PaPB", "Papa Box Beta", 6, 10 ** 15 ), ERC20 {
     using SafeMath for uint256;
-    
+
     constructor() public {
         _balanceOf[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address addr) public constant returns(uint) {
         return _balanceOf[addr];
     }
-    
+
     function transfer(address _to, uint _value) public returns (bool){
         if(_value > 0 &&
             _value <= _balanceOf[msg.sender] &&
             !isContract(_to)) {
-                
+
             _balanceOf[msg.sender] = _balanceOf[msg.sender].safesub(_value);
             _balanceOf[_to] = _balanceOf[_to].safeadd(_value);
-            
+
             emit Transfer(msg.sender, _to, _value);
             return true;
         }
         return false;
     }
-    
+
     function isContract(address _addr) private constant returns(bool) {
         uint codeSize;
         _addr = _addr;
@@ -107,26 +107,42 @@ contract PapaBoxToken is Token("PaPB", "Papa Box Beta", 6, 10 ** 15 ), ERC20 {
         }
         return codeSize > 0;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) public returns(bool)  {
         if(_allowances[_from][msg.sender] > 0 &&
             _value > 0 &&
             _allowances[_from][msg.sender] >= _value) {
-                
+
                 _balanceOf[_from] = _balanceOf[_from].safesub(_value);
                 _balanceOf[_to] = _balanceOf[_to].safeadd(_value);
                 return true;
             }
             return false;
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool success) {
-        _allowances[msg.sender][_spender] = _value; 
+        _allowances[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return _allowances[_owner][_spender];
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

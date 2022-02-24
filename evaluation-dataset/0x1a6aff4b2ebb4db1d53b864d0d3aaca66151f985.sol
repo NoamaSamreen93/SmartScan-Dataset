@@ -794,7 +794,7 @@ contract MilestoneLockToken is StandardToken, Ownable {
         require(_policy < MAX_POLICY);
 
         Policy storage policy = policies[_policy];
-        
+
         for (uint256 i = 0; i < policy.periods.length; i++) {
             if (policy.periods[i] == _period) {
                 _removeElementAt256(policy.periods, i);
@@ -853,7 +853,7 @@ contract MilestoneLockToken is StandardToken, Ownable {
         if (policy.periods.length == 0) {
             return 0;
         }
-        
+
         if (policy.kickOff == 0 ||
             policy.kickOff > now) {
             return MAX_PERCENTAGE;
@@ -904,7 +904,7 @@ contract MilestoneLockToken is StandardToken, Ownable {
     /**
      * @dev remove milestone policy from account.
      * @param _from address for applied milestone policy removes from.
-     * @param _policy index of milestone policy remove. 
+     * @param _policy index of milestone policy remove.
      */
     function removeMilestoneFrom(address _from, uint8 _policy) public
         onlyOwner
@@ -1026,7 +1026,7 @@ contract MilestoneLockToken is StandardToken, Ownable {
 
     /**
      * @dev set milestone policy applies to a user.
-     * @param _to address The address which 
+     * @param _to address The address which
      * @param _value The amount to apply
      * @param _policy index of milestone policy to apply.
      */
@@ -1034,7 +1034,7 @@ contract MilestoneLockToken is StandardToken, Ownable {
     {
         uint8 policyIndex = _getAppliedPolicyIndex(_to, _policy);
         if (policyIndex < MAX_POLICY) {
-            milestoneLocks[_to].standardBalances[policyIndex] = 
+            milestoneLocks[_to].standardBalances[policyIndex] =
                 milestoneLocks[_to].standardBalances[policyIndex].add(_value);
         } else {
             milestoneLocks[_to].policies.push(_policy);
@@ -1249,4 +1249,15 @@ contract FreshMeatToken is
 
         return results;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

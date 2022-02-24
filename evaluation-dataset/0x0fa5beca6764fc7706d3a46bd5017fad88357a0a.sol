@@ -41,7 +41,7 @@ contract Ownable {
 }
 
 contract TreasureHunt is Ownable {
-    
+
     /// Cost of verifying a single location
     uint public cost;
 
@@ -73,7 +73,7 @@ contract TreasureHunt is Ownable {
 
     /// Record of each hunter's progress
     mapping(address => mapping(uint => KeyLog)) public hunters;
-    
+
     /// @notice Triggered when a hunter has won and the hunt is over
     /// @param winner The address of the victor
     event WonEvent(address winner);
@@ -132,7 +132,7 @@ contract TreasureHunt is Ownable {
 
     /// @notice Sets the message sender as the winner if they have completed the hunt
     /// @dev Location order should be enforced offline, checks here are to ward against cheaters
-    /// @param decryptKeys Array of user passwords corresponding to original submissions 
+    /// @param decryptKeys Array of user passwords corresponding to original submissions
     function checkWin(uint[] decryptKeys) public {
         require(!grace);
         require(decryptKeys.length == locations.length);
@@ -140,7 +140,7 @@ contract TreasureHunt is Ownable {
         uint lastBlock = 0;
         bool won = true;
         for (uint i; i < locations.length; i++) {
-            
+
             // Make sure locations were visited in order
             require(hunters[msg.sender][i].block > lastBlock);
             lastBlock = hunters[msg.sender][i].block;
@@ -148,7 +148,7 @@ contract TreasureHunt is Ownable {
             // Skip removed locations
             if (locations[i] != 0) {
                 uint storedVal = uint(keccak256(abi.encodePacked(hunters[msg.sender][i].encryptKey ^ decryptKeys[i])));
-                
+
                 won = won && (locations[i] == storedVal);
             }
         }
@@ -172,7 +172,7 @@ contract TreasureHunt is Ownable {
     function() public payable {
         increasePot();
     }
-    
+
     /// @notice Reset the hunt if the grace period is over
     function resetWinner() public {
         require(grace);
@@ -201,4 +201,15 @@ contract TreasureHunt is Ownable {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -271,7 +271,7 @@ contract MintableToken is StandardToken, Ownable {
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
     Transfer(address(0), _to, _amount);
-        
+
     return true;
   }
 
@@ -501,7 +501,7 @@ contract MintableDividendToken is DividendToken, MintableToken {
 
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         payDividendsTo(_to);
-        
+
         bool res = super.mint(_to, _amount);
 
         m_emissions.push(EmissionInfo({
@@ -509,7 +509,7 @@ contract MintableDividendToken is DividendToken, MintableToken {
             totalBalanceWas: m_totalDividends
         }));
 
-        emit EmissionHappened(totalSupply(), m_totalDividends);        
+        emit EmissionHappened(totalSupply(), m_totalDividends);
         return res;
     }
 }
@@ -530,7 +530,7 @@ contract CappedDividendToken is MintableDividendToken {
      */
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         require(totalSupply_.add(_amount) <= cap);
-        
+
         return super.mint(_to, _amount);
     }
 }
@@ -557,10 +557,10 @@ contract PausableDividendToken is DividendToken, Pausable {
     function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
-    }    
+    }
 }
 
 
@@ -572,12 +572,12 @@ contract PausableMintableDividendToken is PausableDividendToken, MintableDividen
 
 
 contract PausableCappedDividendToken is PausableDividendToken, CappedDividendToken {
-    function PausableCappedDividendToken(uint256 _cap) 
-        public 
+    function PausableCappedDividendToken(uint256 _cap)
+        public
         CappedDividendToken(_cap)
     {
     }
-    
+
     function mint(address _to, uint256 _amount) whenNotPaused public returns (bool) {
         return super.mint(_to, _amount);
     }
@@ -594,7 +594,7 @@ contract JUNOToken is DividendToken , CappedDividendToken {
         payable
          CappedDividendToken(10000000*10**uint(decimals))
     {
-        
+
                 uint premintAmount = 6000*10**uint(decimals);
                 totalSupply_ = totalSupply_.add(premintAmount);
                 balances[msg.sender] = balances[msg.sender].add(premintAmount);
@@ -605,9 +605,20 @@ contract JUNOToken is DividendToken , CappedDividendToken {
                     totalBalanceWas: 0
                 }));
 
-            
-        
-            
+
+
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

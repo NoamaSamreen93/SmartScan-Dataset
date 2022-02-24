@@ -9,9 +9,9 @@ contract SafeCreativeAudit {
         uint mineTime;
         uint blockNumber;
     }
-    
+
     mapping (bytes32 => Record) private docHashes;
-    
+
     modifier ownerOnly {
         require(owner == msg.sender, "Unauthorized: only owner");
         _;   // <--- note the '_', which represents the modified function's body
@@ -35,4 +35,13 @@ contract SafeCreativeAudit {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

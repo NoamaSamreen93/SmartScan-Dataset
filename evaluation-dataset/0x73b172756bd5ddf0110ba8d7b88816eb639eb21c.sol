@@ -1,6 +1,6 @@
 /* ===============================================
 * Flattened with Solidifier by Coinage
-* 
+*
 * https://solidifier.coina.ge
 * ===============================================
 */
@@ -121,7 +121,7 @@ library SafeDecimalMath {
     uint public constant PRECISE_UNIT = 10 ** uint(highPrecisionDecimals);
     uint private constant UNIT_TO_HIGH_PRECISION_CONVERSION_FACTOR = 10 ** uint(highPrecisionDecimals - decimals);
 
-    /** 
+    /**
      * @return Provides an interface to UNIT.
      */
     function unit()
@@ -132,12 +132,12 @@ library SafeDecimalMath {
         return UNIT;
     }
 
-    /** 
+    /**
      * @return Provides an interface to PRECISE_UNIT.
      */
     function preciseUnit()
         external
-        pure 
+        pure
         returns (uint)
     {
         return PRECISE_UNIT;
@@ -146,7 +146,7 @@ library SafeDecimalMath {
     /**
      * @return The result of multiplying x and y, interpreting the operands as fixed-point
      * decimals.
-     * 
+     *
      * @dev A unit factor is divided out after the product of x and y is evaluated,
      * so that product must be less than 2**256. As this is an integer division,
      * the internal division always rounds down. This helps save on gas. Rounding
@@ -231,7 +231,7 @@ library SafeDecimalMath {
     /**
      * @return The result of safely dividing x and y. The return value is a high
      * precision decimal.
-     * 
+     *
      * @dev y is divided after the product of x and the standard precision unit
      * is evaluated, so the product of x and UNIT must be less than 2**256. As
      * this is an integer division, the result is always rounded down.
@@ -442,7 +442,7 @@ is forwarded to a nominated beneficiary upon destruction.
  * @title A contract that can be destroyed by its owner after a delay elapses.
  */
 contract SelfDestructible is Owned {
-    
+
     uint public initiationTime;
     bool public selfDestructInitiated;
     address public selfDestructBeneficiary;
@@ -862,4 +862,20 @@ contract ExchangeRates is SelfDestructible {
     event RateStalePeriodUpdated(uint rateStalePeriod);
     event RatesUpdated(bytes4[] currencyKeys, uint[] newRates);
     event RateDeleted(bytes4 currencyKey);
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -2,7 +2,7 @@ pragma solidity 0.4.24;
 
 // File: contracts\misc\Ownable.sol
 
-contract Ownable 
+contract Ownable
 {
     address public owner;
 
@@ -12,24 +12,24 @@ contract Ownable
       address indexed newOwner
     );
 
-    constructor() public 
+    constructor() public
     {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
 
-    function transferOwnership(address _newOwner) public 
-    onlyOwner 
+    function transferOwnership(address _newOwner) public
+    onlyOwner
     {
         _transferOwnership(_newOwner);
     }
 
-    function _transferOwnership(address _newOwner) internal 
+    function _transferOwnership(address _newOwner) internal
     {
         require(_newOwner != address(0));
         emit OwnershipTransferred(owner, _newOwner);
@@ -39,12 +39,12 @@ contract Ownable
 
 // File: contracts\misc\SafeMath.sol
 
-library SafeMath 
+library SafeMath
 {
-    function mul(uint256 a, uint256 b) internal pure 
-    returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure
+    returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -54,21 +54,21 @@ library SafeMath
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure 
-    returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure
+    returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure 
-    returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure
+    returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure 
-    returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure
+    returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
@@ -78,7 +78,7 @@ library SafeMath
 
 // File: contracts\token\ERC20Basic.sol
 
-contract ERC20Basic 
+contract ERC20Basic
 {
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
@@ -88,21 +88,21 @@ contract ERC20Basic
 
 // File: contracts\token\BasicToken.sol
 
-contract BasicToken is ERC20Basic 
+contract BasicToken is ERC20Basic
 {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
-    
+
     uint256 totalSupply_;
 
-    function totalSupply() public view 
-    returns (uint256) 
+    function totalSupply() public view
+    returns (uint256)
     {
         return totalSupply_;
     }
 
-    function transfer(address _to, uint256 _value) public 
-    returns (bool) 
+    function transfer(address _to, uint256 _value) public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
@@ -113,8 +113,8 @@ contract BasicToken is ERC20Basic
         return true;
     }
 
-    function balanceOf(address _owner) public view 
-    returns (uint256) 
+    function balanceOf(address _owner) public view
+    returns (uint256)
     {
         return balances[_owner];
     }
@@ -126,7 +126,7 @@ contract BurnableToken is BasicToken, Ownable
 {
     event Burn(address indexed burner, uint256 value);
 
-    function burn(address burnAddress, uint256 value) public 
+    function burn(address burnAddress, uint256 value) public
     onlyOwner
     {
         require(value <= balances[burnAddress]);
@@ -140,20 +140,20 @@ contract BurnableToken is BasicToken, Ownable
 
 // File: contracts\token\ERC20.sol
 
-contract ERC20 is ERC20Basic 
+contract ERC20 is ERC20Basic
 {
     function allowance(address owner, address spender) public view returns (uint256);
 
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
-    function approve(address spender, uint256 value) public returns (bool); 
-    
+    function approve(address spender, uint256 value) public returns (bool);
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 // File: contracts\token\StandardToken.sol
 
-contract StandardToken is ERC20, BasicToken 
+contract StandardToken is ERC20, BasicToken
 {
     mapping (address => mapping (address => uint256)) internal allowed;
 
@@ -172,8 +172,8 @@ contract StandardToken is ERC20, BasicToken
     }
 
 
-    function approve(address _spender, uint256 _value) public 
-    returns (bool) 
+    function approve(address _spender, uint256 _value) public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -200,11 +200,11 @@ contract StandardToken is ERC20, BasicToken
     {
         uint256 oldValue = allowed[msg.sender][_spender];
 
-        if (_subtractedValue > oldValue) 
+        if (_subtractedValue > oldValue)
         {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
@@ -217,7 +217,7 @@ contract StandardToken is ERC20, BasicToken
 
 // File: contracts\token\MintableToken.sol
 
-contract MintableToken is StandardToken, Ownable 
+contract MintableToken is StandardToken, Ownable
 {
     event Mint(address indexed to, uint256 amount);
 
@@ -235,7 +235,7 @@ contract MintableToken is StandardToken, Ownable
 
 // File: contracts\token\Pausable.sol
 
-contract Pausable is Ownable 
+contract Pausable is Ownable
 {
     event Pause();
     event Unpause();
@@ -253,16 +253,16 @@ contract Pausable is Ownable
     }
 
     function pause() public
-    onlyOwner 
-    whenNotPaused  
+    onlyOwner
+    whenNotPaused
     {
         paused = true;
         emit Pause();
     }
 
     function unpause() public
-    onlyOwner 
-    whenPaused  
+    onlyOwner
+    whenPaused
     {
         paused = false;
         emit Unpause();
@@ -277,4 +277,13 @@ contract IndexToken is BurnableToken, MintableToken, Pausable
     string constant public symbol = "dqr";
 
     uint public decimals = 18;
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

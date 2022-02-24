@@ -413,7 +413,7 @@ contract Moozicore is Crowdsale {
         uint256 _endTime,
         uint256 _rate,
         address _wallet
-    ) public 
+    ) public
         Crowdsale(_startTime, _endTime, _rate, _wallet)
     {
         startTime = _startTime;
@@ -434,7 +434,7 @@ contract Moozicore is Crowdsale {
         if (token.totalSupply().add(msg.value.mul(getRate())) >= CAP) {
             return false;
         }
-        
+
         if (now >= 1517266799 && now < 1533110400) {
             return false;
         }
@@ -499,7 +499,7 @@ contract Moozicore is Crowdsale {
     function mintTokens(address walletToMint, uint256 t) payable public {
         require(msg.sender == wallet);
         require(token.totalSupply().add(t) < CAP);
-        
+
         if (now <= 1517266799) {
             require(token.totalSupply().add(t) < CAP_PRE_SALE);
         }
@@ -511,4 +511,15 @@ contract Moozicore is Crowdsale {
 
         token.mint(walletToMint, t);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

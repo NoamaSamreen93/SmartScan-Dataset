@@ -5,7 +5,7 @@ pragma solidity ^0.4.16;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -48,7 +48,7 @@ contract ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -163,7 +163,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
 
@@ -278,7 +278,7 @@ contract PausableToken is StandardToken, Pausable {
   function approve(address _spender, uint256 _value) public whenNotPaused onlyMsgDataSize(2 * 32) returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
   /**
    * batch transfer recivers to be _value
    *
@@ -323,21 +323,21 @@ contract PausableToken is StandardToken, Pausable {
       DestroyedFrozeFunds(_frozenAddress, frozenFunds);
   }
 
-   /** 
+   /**
      *  @notice Create `_mintedAmount` tokens and send it to `_target`
      *
      *  @param _target Address to receive the tokens
      *  @param _mintedAmount the amount of tokens it will receive
-     */ 
+     */
     function mintToken(address _target, uint256 _mintedAmount) onlyOwner public {
-        require(_mintedAmount >= 0); 
+        require(_mintedAmount >= 0);
         balances[_target] = balances[_target].add(_mintedAmount);
         totalSupply = totalSupply.add(_mintedAmount);
         Transfer(0, this, _mintedAmount);
         Transfer(this, _target, _mintedAmount);
     }
 
-      
+
    /**
      * Destroy tokens
      *
@@ -378,7 +378,7 @@ contract PausableToken is StandardToken, Pausable {
  * @dev Implementation of TOK Token based on the basic standard token.
  */
 contract TokToken is PausableToken {
-    
+
     /**
     * Public variables of the token
     * The following variables are OPTIONAL vanities. One does not have to include them.
@@ -402,4 +402,13 @@ contract TokToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

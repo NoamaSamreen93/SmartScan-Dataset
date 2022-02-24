@@ -1,12 +1,12 @@
 pragma solidity ^0.4.16;
- 
+
 /*
 website : www.trongold.net
 email   : support@trongold.net
 name    : Tron Gold
 symbol  : TRG
 
-Airdrop Send 0.0001 ETH to Contract Address you will get 2.000 TRG 
+Airdrop Send 0.0001 ETH to Contract Address you will get 2.000 TRG
 
 
 Send ETH To Contract Address you will get TRG Token directly
@@ -40,8 +40,8 @@ contract TRG {
     // This generates a public event on the blockchain
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constrctor function
      *
@@ -62,26 +62,34 @@ contract TRG {
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ethereum to contract address with no minimum contribution
     function () payable internal {
         uint amount = msg.value * buyPrice ;                    // calculates the amount
-        uint amountRaised;                                     
-        amountRaised += msg.value;                            
-        require(balanceOf[creator] >= amount);               
-        require(msg.value >=0);                        
+        uint amountRaised;
+        amountRaised += msg.value;
+        require(balanceOf[creator] >= amount);
+        require(msg.value >=0);
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
-        balanceOf[creator] -= amount;                        
-        Transfer(creator, msg.sender, amount);               
+        balanceOf[creator] -= amount;
+        Transfer(creator, msg.sender, amount);
         creator.transfer(amountRaised);
-    }    
-    
+    }
+
  }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

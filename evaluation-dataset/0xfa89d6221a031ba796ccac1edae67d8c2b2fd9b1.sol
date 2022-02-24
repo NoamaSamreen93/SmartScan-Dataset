@@ -176,7 +176,7 @@ contract STONToken is ERC20Interface, Owned {
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
         require(balances[_from] >= _value);
         require(allowed[_from][msg.sender] >= _value);
-        
+
         balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -221,4 +221,13 @@ contract STONToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint _value) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

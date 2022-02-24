@@ -92,7 +92,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract TOKEN4 is StandardToken { 
+contract TOKEN4 is StandardToken {
 
     /* Public variables of the token */
 
@@ -105,9 +105,9 @@ contract TOKEN4 is StandardToken {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
 
@@ -121,19 +121,19 @@ contract TOKEN4 is StandardToken {
         unitsOneEthCanBuy = 600;
         fundsWallet = msg.sender;
     }
-    /** 
-   *  sale start 
+    /**
+   *  sale start
     * ---------------------
-    
+
     * presale
 	uint public presaleStartTime = 1537876800; // Monday, 10 June 2019 19:00:00 GMT+07:00
     uint256 public presalePerEth = 600;
-    
-   
+
+
 	*/
-    
-    
-    
+
+
+
 
     function() payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -146,7 +146,7 @@ contract TOKEN4 is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -160,4 +160,15 @@ contract TOKEN4 is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

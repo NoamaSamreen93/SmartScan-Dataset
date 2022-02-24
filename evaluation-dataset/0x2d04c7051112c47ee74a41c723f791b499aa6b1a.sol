@@ -5,11 +5,11 @@ pragma solidity ^0.4.24;
  * Prohibits any unauthorized copying and modification.
  * It is allowed through ABI calls.
  */
- 
+
 //==============================================================================
 // Begin: This part comes from openzeppelin-solidity
 //        https://github.com/OpenZeppelin/openzeppelin-solidity
-//============================================================================== 
+//==============================================================================
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -329,14 +329,14 @@ contract Ownable {
 }
 //==============================================================================
 // End: This part comes from openzeppelin-solidity
-//============================================================================== 
+//==============================================================================
 
 
 /**
- * @dev Lottery Interface  
- */ 
+ * @dev Lottery Interface
+ */
 contract LotteryInterface {
-  function checkLastMintData(address addr) external;   
+  function checkLastMintData(address addr) external;
   function getLastMintAmount(address addr) view external returns(uint256, uint256);
   function getReferrerEarnings(address addr) view external returns(uint256);
   function checkReferrerEarnings(address addr) external;
@@ -355,32 +355,32 @@ contract YHToken is StandardBurnableToken, Ownable {
   string public constant name = "YHToken";
   string public constant symbol = "YHT";
   uint8 public constant decimals = 18;
-  
+
   uint256 constant private kAutoCombineBonusesCount = 50;           // if the last two balance snapshot records are not far apart, they will be merged automatically.
-  
-  struct Bonus {                                                                    
+
+  struct Bonus {
     uint256 payment;                                                // payment of dividends
-    uint256 currentTotalSupply;                                     // total supply at the payment time point  
+    uint256 currentTotalSupply;                                     // total supply at the payment time point
   }
-  
+
   struct BalanceSnapshot {
-    uint256 balance;                                                // balance of snapshot     
+    uint256 balance;                                                // balance of snapshot
     uint256 bonusIdBegin;                                           // begin of bonusId
     uint256 bonusIdEnd;                                             // end of bonusId
   }
-  
+
   struct User {
-    uint256 extraEarnings;                                              
+    uint256 extraEarnings;
     uint256 bonusEarnings;
     BalanceSnapshot[] snapshots;                                    // the balance snapshot array
-    uint256 snapshotsLength;                                        // the length of balance snapshot array    
+    uint256 snapshotsLength;                                        // the length of balance snapshot array
   }
-  
+
   LotteryInterface public Lottery;
   uint256 public bonusRoundId_;                                     // next bonus id
   mapping(address => User) public users_;                           // user informations
   mapping(uint256 => Bonus) public bonuses_;                        // the records of all bonuses
-    
+
   event Started(address lottery);
   event AddTotalSupply(uint256 addValue, uint256 total);
   event AddExtraEarnings(address indexed from, address indexed to, uint256 amount);
@@ -396,10 +396,10 @@ contract YHToken is StandardBurnableToken, Ownable {
    * @dev only the lottery contract can transfer earnings
    */
   modifier isLottery() {
-    require(msg.sender == address(Lottery)); 
+    require(msg.sender == address(Lottery));
     _;
   }
-  
+
   /**
    * @dev Function to start. just start once.
    */
@@ -408,14 +408,14 @@ contract YHToken is StandardBurnableToken, Ownable {
     Lottery = LotteryInterface(lottery);
     emit Started(lottery);
   }
-  
+
   /**
    * @dev record a snapshot of balance
-   * with the bonuses information can accurately calculate the earnings 
-   */ 
+   * with the bonuses information can accurately calculate the earnings
+   */
   function balanceSnapshot(address addr, uint256 bonusRoundId) private {
-    uint256 currentBalance = balances[addr];     
-    User storage user = users_[addr];   
+    uint256 currentBalance = balances[addr];
+    User storage user = users_[addr];
     if (user.snapshotsLength == 0) {
       user.snapshotsLength = 1;
       user.snapshots.push(BalanceSnapshot(currentBalance, bonusRoundId, 0));
@@ -423,51 +423,51 @@ contract YHToken is StandardBurnableToken, Ownable {
     else {
       BalanceSnapshot storage lastSnapshot = user.snapshots[user.snapshotsLength - 1];
       assert(lastSnapshot.bonusIdEnd == 0);
-      
+
       // same as last record point just updated balance
       if (lastSnapshot.bonusIdBegin == bonusRoundId) {
-        lastSnapshot.balance = currentBalance;      
+        lastSnapshot.balance = currentBalance;
       }
       else {
         assert(lastSnapshot.bonusIdBegin < bonusRoundId);
-        
+
         // if this snapshot is not the same as the last time, automatically merges part of the earnings
         if (bonusRoundId - lastSnapshot.bonusIdBegin < kAutoCombineBonusesCount) {
            uint256 amount = computeRoundBonuses(lastSnapshot.bonusIdBegin, bonusRoundId, lastSnapshot.balance);
            user.bonusEarnings = user.bonusEarnings.add(amount);
-           
+
            lastSnapshot.balance = currentBalance;
            lastSnapshot.bonusIdBegin = bonusRoundId;
            lastSnapshot.bonusIdEnd = 0;
         }
         else {
-          lastSnapshot.bonusIdEnd = bonusRoundId;     
-          
-          /* 
+          lastSnapshot.bonusIdEnd = bonusRoundId;
+
+          /*
           reuse this array to store data, based on code from
           https://ethereum.stackexchange.com/questions/3373/how-to-clear-large-arrays-without-blowing-the-gas-limit?answertab=votes#tab-top
           */
           if (user.snapshotsLength == user.snapshots.length) {
-            user.snapshots.length += 1;  
-          } 
+            user.snapshots.length += 1;
+          }
           user.snapshots[user.snapshotsLength++] = BalanceSnapshot(currentBalance, bonusRoundId, 0);
         }
       }
     }
   }
-  
+
   /**
    * @dev mint to add balance then do snapshot
-   */ 
+   */
   function mint(address to, uint256 amount, uint256 bonusRoundId) private {
     balances[to] = balances[to].add(amount);
-    emit Transfer(address(0), to, amount); 
-    balanceSnapshot(to, bonusRoundId);  
+    emit Transfer(address(0), to, amount);
+    balanceSnapshot(to, bonusRoundId);
   }
-  
+
   /**
    * @dev add total supply and mint extra to founder team
-   */  
+   */
   function mintToFounder(address to, uint256 amount, uint256 normalAmount) isLottery external {
     checkLastMint(to);
     uint256 value = normalAmount.add(amount);
@@ -475,29 +475,29 @@ contract YHToken is StandardBurnableToken, Ownable {
     emit AddTotalSupply(value, totalSupply_);
     mint(to, amount, bonusRoundId_);
   }
-  
+
   /**
    * @dev mint tokens for player
-   */ 
+   */
   function mintToNormal(address to, uint256 amount, uint256 bonusRoundId) isLottery external {
     require(bonusRoundId < bonusRoundId_);
     mint(to, amount, bonusRoundId);
   }
-  
+
   /**
    * @dev check player last mint status, mint for player if necessary
-   */ 
+   */
   function checkLastMint(address addr) private {
-    Lottery.checkLastMintData(addr);  
+    Lottery.checkLastMintData(addr);
   }
 
   function balanceSnapshot(address addr) private {
-    balanceSnapshot(addr, bonusRoundId_);  
+    balanceSnapshot(addr, bonusRoundId_);
   }
 
   /**
    * @dev get balance snapshot
-   */ 
+   */
   function getBalanceSnapshot(address addr, uint256 index) view public returns(uint256, uint256, uint256) {
     BalanceSnapshot storage snapshot = users_[addr].snapshots[index];
     return (
@@ -519,7 +519,7 @@ contract YHToken is StandardBurnableToken, Ownable {
     balanceSnapshot(msg.sender);
     balanceSnapshot(_to);
     return true;
-  } 
+  }
 
   /**
    * @dev Transfer tokens from one address to another
@@ -535,27 +535,27 @@ contract YHToken is StandardBurnableToken, Ownable {
     balanceSnapshot(_to);
     return true;
   }
-  
+
   function _burn(address _who, uint256 _value) internal {
-    checkLastMint(_who);  
-    super._burn(_who, _value);  
+    checkLastMint(_who);
+    super._burn(_who, _value);
     balanceSnapshot(_who);
-  } 
-  
+  }
+
   /**
-   * @dev clear warnings for unused variables  
-   */ 
-  function unused(uint256) pure private {} 
-  
+   * @dev clear warnings for unused variables
+   */
+  function unused(uint256) pure private {}
+
  /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256) {
-    (uint256 lastMintAmount, uint256 lastBonusRoundId) = Lottery.getLastMintAmount(_owner);  
+    (uint256 lastMintAmount, uint256 lastBonusRoundId) = Lottery.getLastMintAmount(_owner);
     unused(lastBonusRoundId);
-    return balances[_owner].add(lastMintAmount);  
+    return balances[_owner].add(lastMintAmount);
   }
 
   /**
@@ -567,13 +567,13 @@ contract YHToken is StandardBurnableToken, Ownable {
     if (msg.sender != address(Lottery)) {
       require(msg.value > 662607004);
       require(msg.value < 66740800000000000000000);
-    }  
-    users_[to].extraEarnings = users_[to].extraEarnings.add(msg.value);   
+    }
+    users_[to].extraEarnings = users_[to].extraEarnings.add(msg.value);
     emit AddExtraEarnings(msg.sender, to, msg.value);
   }
-  
+
   /**
-   * @dev Others contract transfer bonus earnings to all the people who hold YHT  
+   * @dev Others contract transfer bonus earnings to all the people who hold YHT
    * It is open interface, more game contracts may be used in the future
    */
   function transferBonusEarnings() external payable returns(uint256) {
@@ -581,58 +581,58 @@ contract YHToken is StandardBurnableToken, Ownable {
     require(totalSupply_ > 0);
     if (msg.sender != address(Lottery)) {
       require(msg.value > 314159265358979323);
-      require(msg.value < 29979245800000000000000);   
+      require(msg.value < 29979245800000000000000);
     }
-    
+
     uint256 bonusRoundId = bonusRoundId_;
     bonuses_[bonusRoundId].payment = msg.value;
     bonuses_[bonusRoundId].currentTotalSupply = totalSupply_;
     emit AddBonusEarnings(msg.sender, msg.value, bonusRoundId_, totalSupply_);
-    
+
     ++bonusRoundId_;
     return bonusRoundId;
   }
 
   /**
-   * @dev get earings of user, can directly withdraw 
-   */ 
+   * @dev get earings of user, can directly withdraw
+   */
   function getEarnings(address addr) view public returns(uint256) {
-    User storage user = users_[addr];  
+    User storage user = users_[addr];
     uint256 amount;
     (uint256 lastMintAmount, uint256 lastBonusRoundId) = Lottery.getLastMintAmount(addr);
     if (lastMintAmount > 0) {
       amount = computeSnapshotBonuses(user, lastBonusRoundId);
       amount = amount.add(computeRoundBonuses(lastBonusRoundId, bonusRoundId_, balances[addr].add(lastMintAmount)));
     } else {
-      amount = computeSnapshotBonuses(user, bonusRoundId_);     
+      amount = computeSnapshotBonuses(user, bonusRoundId_);
     }
     uint256 referrerEarnings = Lottery.getReferrerEarnings(addr);
     return user.extraEarnings + user.bonusEarnings + amount + referrerEarnings;
   }
-  
+
   /**
-   * @dev get bonuses 
+   * @dev get bonuses
    * @param begin begin bonusId
    * @param end end bonusId
-   * @param balance the balance in the round 
+   * @param balance the balance in the round
    * Not use SafeMath, it is core loop, not use SafeMath will be saved 20% gas
-   */ 
+   */
   function computeRoundBonuses(uint256 begin, uint256 end, uint256 balance) view private returns(uint256) {
     require(begin != 0);
-    require(end != 0);  
-    
+    require(end != 0);
+
     uint256 amount = 0;
     while (begin < end) {
-      uint256 value = balance * bonuses_[begin].payment / bonuses_[begin].currentTotalSupply;      
+      uint256 value = balance * bonuses_[begin].payment / bonuses_[begin].currentTotalSupply;
       amount += value;
-      ++begin;    
+      ++begin;
     }
     return amount;
   }
-  
+
   /**
    * @dev compute snapshot bonuses
-   */ 
+   */
   function computeSnapshotBonuses(User storage user, uint256 lastBonusRoundId) view private returns(uint256) {
     uint256 amount = 0;
     uint256 length = user.snapshotsLength;
@@ -645,10 +645,10 @@ contract YHToken is StandardBurnableToken, Ownable {
     }
     return amount;
   }
-    
+
   /**
    * @dev add earnings from bonuses
-   */ 
+   */
   function combineBonuses(address addr) private {
     checkLastMint(addr);
     User storage user = users_[addr];
@@ -659,12 +659,12 @@ contract YHToken is StandardBurnableToken, Ownable {
         user.snapshotsLength = 1;
         user.snapshots[0].balance = balances[addr];
         user.snapshots[0].bonusIdBegin = bonusRoundId_;
-        user.snapshots[0].bonusIdEnd = 0;     
+        user.snapshots[0].bonusIdEnd = 0;
       }
     }
     Lottery.checkReferrerEarnings(addr);
   }
-  
+
   /**
    * @dev withdraws all of your earnings
    */
@@ -678,15 +678,15 @@ contract YHToken is StandardBurnableToken, Ownable {
     }
     emit Withdraw(msg.sender, amount);
   }
-  
+
   /**
    * @dev withdraw immediateness to bet
-   */ 
+   */
   function withdrawForBet(address addr, uint256 value) isLottery external {
     combineBonuses(addr);
-    uint256 extraEarnings = users_[addr].extraEarnings; 
+    uint256 extraEarnings = users_[addr].extraEarnings;
     if (extraEarnings >= value) {
-      users_[addr].extraEarnings -= value;    
+      users_[addr].extraEarnings -= value;
     } else {
       users_[addr].extraEarnings = 0;
       uint256 remain = value - extraEarnings;
@@ -695,7 +695,7 @@ contract YHToken is StandardBurnableToken, Ownable {
     }
     Lottery.deposit.value(value)();
   }
-  
+
   /**
    * @dev get user informations at once
    */
@@ -704,6 +704,17 @@ contract YHToken is StandardBurnableToken, Ownable {
       totalSupply_,
       balanceOf(addr),
       getEarnings(addr)
-    );  
+    );
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

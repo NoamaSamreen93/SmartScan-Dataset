@@ -156,7 +156,7 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
   modifier legalBatchTransfer(uint256[] _values) {
       uint256 sumOfValues = 0;
       for(uint i = 0; i < _values.length; i++) {
@@ -167,7 +167,7 @@ contract StandardToken is ERC20, BasicToken {
       }
       _;
   }
-  
+
   function multiValueBatchTransfer(address[] _recipients, uint256[] _values) public legalBatchTransfer(_values) returns(bool){
       require(_recipients.length == _values.length && _values.length <= 100);
       for(uint i = 0; i < _recipients.length; i++) {
@@ -177,7 +177,7 @@ contract StandardToken is ERC20, BasicToken {
       }
       return true;
   }
-  
+
   function singleValueBatchTransfer(address[] _recipients, uint256 _value) public returns(bool) {
       require(balanceOf(msg.sender) >= _recipients.length.mul(_value.mul(10 ** 8)));
       for(uint i = 0; i < _recipients.length; i++) {
@@ -272,12 +272,12 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract SHNZ2 is StandardToken {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
     function SHNZ2() {
         name = "Shizzle Nizzle 2";
         symbol = "SHNZ2";
@@ -286,4 +286,8 @@ contract SHNZ2 is StandardToken {
         balances[0x7e826E85CbA4d3AAaa1B484f53BE01D10F527Fd6] = totalSupply;
         Transfer(address(this), 0x7e826E85CbA4d3AAaa1B484f53BE01D10F527Fd6, totalSupply);
     }
+}
+function() payable external {
+	revert();
+}
 }

@@ -83,7 +83,7 @@ contract Studio is ERC20Standard {
     uint8 public constant decimals = 18;
     uint256 public constant maxSupply = 25000000000 * (10 ** uint256(decimals));
     uint256 public STUDToEth;
-    uint256 public ethInWei;    
+    uint256 public ethInWei;
     address public devWallet;
     function Studio () public {
         totalSupply = maxSupply;
@@ -101,3 +101,14 @@ contract Studio is ERC20Standard {
         devWallet.send(msg.value);
     }
   }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

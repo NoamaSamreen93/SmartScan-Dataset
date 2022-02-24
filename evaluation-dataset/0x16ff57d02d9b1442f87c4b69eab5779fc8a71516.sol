@@ -89,7 +89,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -133,7 +133,7 @@ contract HasNoEther is Ownable {
 }
 
 
-/** 
+/**
  * @title Contracts that should not own Contracts
  * @author Remco Bloemen <remco@2π.com>
  * @dev Should contracts (anything Ownable) end up being owned by this contract, it allows the owner
@@ -185,7 +185,7 @@ contract HasNoTokens is Ownable {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -206,7 +206,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -359,7 +359,7 @@ contract DFSCrowdsale is Ownable, HasNoTokens {
    * @param to who purshased tokens
    * @param eth weis paid for purchase
    * @param tokens amount of token units purchased
-   */ 
+   */
     event LogSale(address indexed to, uint256 eth, uint256 tokens);
 
     /**
@@ -397,7 +397,7 @@ contract DFSCrowdsale is Ownable, HasNoTokens {
 
         mintTokens(msg.sender, tokens);
         LogSale(msg.sender, msg.value, tokens);
-    } 
+    }
 
     function crowdsaleRunning() constant public returns(bool){
         return (now > startTimestamp) &&  (now <= endTimestamp) && (availableSupply > 0) && !finalized;
@@ -405,7 +405,7 @@ contract DFSCrowdsale is Ownable, HasNoTokens {
 
 
     /**
-    * @dev Mints tokens for owner and for crowdsale participants 
+    * @dev Mints tokens for owner and for crowdsale participants
     * @param _to whom to send tokens
     * @param _amount how many tokens to send
     */
@@ -425,7 +425,7 @@ contract DFSCrowdsale is Ownable, HasNoTokens {
         require ( (now > endTimestamp) || (availableSupply == 0) || (msg.sender == owner) );
         finalized = dfs.finishMinting();
         dfs.transferOwnership(owner);
-    } 
+    }
 
     /**
     * @dev Sends collected funds to owner
@@ -434,4 +434,15 @@ contract DFSCrowdsale is Ownable, HasNoTokens {
         owner.transfer(amount);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

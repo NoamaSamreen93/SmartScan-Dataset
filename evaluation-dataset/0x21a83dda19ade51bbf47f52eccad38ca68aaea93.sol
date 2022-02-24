@@ -129,7 +129,7 @@ contract NEC is StandardToken, SafeMath {
         balances[msg.sender] = totalSupply;
         if(currentSupply > totalSupply) revert();
     }
-    
+
     function initializeSaleWalletAddress() private {
         ethFundDeposit = 0x54ED20e3Aefc01cAf7CB536a9F49186caF2A6251;
     }
@@ -243,4 +243,15 @@ contract NEC is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  // log record
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

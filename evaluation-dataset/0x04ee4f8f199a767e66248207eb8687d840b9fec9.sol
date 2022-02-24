@@ -100,7 +100,7 @@ contract PrivateSale {
     require(msg.value >= 0.2 ether);
     require(msg.value <= 500 ether);
     require(msg.sender != address(0));
-    
+
     uint256 contribution = msg.value;
     // add to sender's weiPaid record
     weiPaid[msg.sender] += msg.value;
@@ -184,4 +184,15 @@ contract PrivateSale {
       whitelist[_users[i]] = false;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

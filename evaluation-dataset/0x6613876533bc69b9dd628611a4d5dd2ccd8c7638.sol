@@ -8,9 +8,9 @@ library SafeMath {
         return c;
     }
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b > 0); 
+        assert(b > 0);
         uint256 c = a / b;
-        assert(a == b * c + a % b); 
+        assert(a == b * c + a % b);
         return c;
     }
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -26,14 +26,14 @@ library SafeMath {
 
 // interface of your Customize token
 interface ToqqnInterface {
-    
+
     function totalSupply() external view returns (uint);
     function balanceOf(address tokenOwner) external view returns (uint balance);
     function allowance(address tokenOwner, address spender) external view returns (uint remaining);
     function transfer(address to, uint tokens) external returns (bool success);
     function approve(address spender, uint tokens) external returns (bool success);
     function transferFrom(address from, address to, uint tokens) external returns (bool success);
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -58,9 +58,9 @@ contract Toqqn is ToqqnInterface {
     string public  name;
     uint8 public decimals;
     uint256 internal _totalSupply;
-    
+
     address owner;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
 
@@ -71,7 +71,7 @@ contract Toqqn is ToqqnInterface {
         }
          _;
     }
-	
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ contract Toqqn is ToqqnInterface {
 		emit Transfer(address(0),owner,_totalSupply);
     }
 
-    
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -176,19 +176,23 @@ contract Toqqn is ToqqnInterface {
     function () external payable {
         revert();
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent Toqqns
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return ToqqnInterface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent Toqqns
     // ------------------------------------------------------------------------
     function transferReserveToken(address tokenAddress, uint256 tokens) public onlyOwner returns (bool success) {
         return this.transferFrom(owner,tokenAddress, tokens);
     }
-    
+
+}
+function() payable external {
+	revert();
+}
 }

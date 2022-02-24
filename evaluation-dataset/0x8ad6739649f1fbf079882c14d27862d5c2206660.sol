@@ -1,9 +1,9 @@
-pragma solidity ^0.4.24;  
+pragma solidity ^0.4.24;
 ////////////////////////////////////////////////////////////////////////////////
 library     SafeMath
 {
     //--------------------------------------------------------------------------
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256)
     {
         if (a == 0)     return 0;
         uint256 c = a * b;
@@ -11,18 +11,18 @@ library     SafeMath
         return c;
     }
     //--------------------------------------------------------------------------
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a/b;
     }
     //--------------------------------------------------------------------------
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
     //--------------------------------------------------------------------------
-    function add(uint256 a, uint256 b) internal pure returns (uint256) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -30,14 +30,14 @@ library     SafeMath
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-contract    ERC20 
+contract    ERC20
 {
     using SafeMath  for uint256;
-    
+
     //----- VARIABLES
 
     address public              owner;          // Owner of this contract
-    address public              admin;          // The one who is allowed to do changes 
+    address public              admin;          // The one who is allowed to do changes
 
     mapping(address => uint256)                         balances;       // Maintain balance in a mapping
     mapping(address => mapping (address => uint256))    allowances;     // Allowances index-1 = Owner account   index-2 = spender account
@@ -48,7 +48,7 @@ contract    ERC20
     string  public  constant    symbol     = "IOUX";
     uint256 public  constant    decimals   = 18;      // Handle the coin as FIAT (2 decimals). ETH Handles 18 decimal places
     uint256 public  constant    initSupply       = 800000000 * 10**decimals;        // 10**18 max
-    uint256 public  constant    supplyReserveVal = 600000000 * 10**decimals;          // if quantity => the ##MACRO## addrs "* 10**decimals" 
+    uint256 public  constant    supplyReserveVal = 600000000 * 10**decimals;          // if quantity => the ##MACRO## addrs "* 10**decimals"
 
     //-----
 
@@ -62,13 +62,13 @@ contract    ERC20
 
     uint256 public              icoDeadLine = 1545177600;     // 2018-12-19 00:00 (GMT+0)
 
-    bool    public              isIcoPaused            = false; 
+    bool    public              isIcoPaused            = false;
     bool    public              isStoppingIcoOnHardCap = false;
 
     //--------------------------------------------------------------------------
 
     modifier duringIcoOnlyTheOwner()  // if not during the ico : everyone is allowed at anytime
-    { 
+    {
         require( now>icoDeadLine || msg.sender==owner );
         _;
     }
@@ -97,7 +97,7 @@ contract    ERC20
 
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    constructor()   public 
+    constructor()   public
     {
         owner       = msg.sender;
         admin       = owner;
@@ -107,7 +107,7 @@ contract    ERC20
 
         balances[owner] = initSupply;   // send the tokens to the owner
         totalSupply     = initSupply;
-        icoSalesSupply  = totalSupply;   
+        icoSalesSupply  = totalSupply;
 
         //----- Handling if there is a special maximum amount of tokens to spend during the ICO or not
 
@@ -119,24 +119,24 @@ contract    ERC20
     //----- ERC20 FUNCTIONS
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
-    function balanceOf(address walletAddress) public constant returns (uint256 balance) 
+    function balanceOf(address walletAddress) public constant returns (uint256 balance)
     {
         return balances[walletAddress];
     }
     //--------------------------------------------------------------------------
-    function transfer(address toAddr, uint256 amountInWei)  public   duringIcoOnlyTheOwner   returns (bool)     // don't icoNotPaused here. It's a logic issue. 
+    function transfer(address toAddr, uint256 amountInWei)  public   duringIcoOnlyTheOwner   returns (bool)     // don't icoNotPaused here. It's a logic issue.
     {
         require(toAddr!=0x0 && toAddr!=msg.sender && amountInWei>0);     // Prevent transfer to 0x0 address and to self, amount must be >0
 
         uint256 availableTokens = balances[msg.sender];
 
-        //----- Checking Token reserve first : if during ICO    
+        //----- Checking Token reserve first : if during ICO
 
         if (msg.sender==owner && now <= icoDeadLine)                    // ICO Reserve Supply checking: Don't touch the RESERVE of tokens when owner is selling
         {
             assert(amountInWei<=availableTokens);
 
-            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);      
+            uint256 balanceAfterTransfer = availableTokens.sub(amountInWei);
 
             assert(balanceAfterTransfer >= icoReserveSupply);           // We try to sell more than allowed during an ICO
         }
@@ -156,7 +156,7 @@ contract    ERC20
         return allowances[walletAddress][spender];
     }
     //--------------------------------------------------------------------------
-    function transferFrom(address fromAddr, address toAddr, uint256 amountInWei)  public  returns (bool) 
+    function transferFrom(address fromAddr, address toAddr, uint256 amountInWei)  public  returns (bool)
     {
         if (amountInWei <= 0)                                   return false;
         if (allowances[fromAddr][msg.sender] < amountInWei)     return false;
@@ -170,7 +170,7 @@ contract    ERC20
         return true;
     }
     //--------------------------------------------------------------------------
-    function approve(address spender, uint256 amountInWei) public returns (bool) 
+    function approve(address spender, uint256 amountInWei) public returns (bool)
     {
         require((amountInWei == 0) || (allowances[msg.sender][spender] == 0));
         allowances[msg.sender][spender] = amountInWei;
@@ -179,7 +179,7 @@ contract    ERC20
         return true;
     }
     //--------------------------------------------------------------------------
-    function() public                       
+    function() public
     {
         assert(true == false);      // If Ether is sent to this address, don't handle it -> send it back.
     }
@@ -250,7 +250,7 @@ contract    ERC20
     /*--------------------------------------------------------------------------
     //
     // When ICO is closed, send the remaining (unsold) tokens to address 0x0
-    // So no one will be able to use it anymore... 
+    // So no one will be able to use it anymore...
     // Anyone can check address 0x0, so to proove unsold tokens belong to no one anymore
     //
     //--------------------------------------------------------------------------*/
@@ -274,7 +274,7 @@ contract    ERC20
         //Transfer(msg.sender, toAddr, amountToBurn);
 
         return 1;
-    }        
+    }
 
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
@@ -286,10 +286,21 @@ contract    Token  is  ERC20
     using SafeMath  for uint256;
 
     //-------------------------------------------------------------------------- Constructor
-    constructor()   public 
+    constructor()   public
     {
     }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

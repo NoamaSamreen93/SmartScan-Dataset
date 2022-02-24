@@ -27,7 +27,7 @@ contract TwoCoinsOneMoonGame {
 
     uint256 public jackpotBlue;
     uint256 public jackpotRed;
-    
+
     uint256 public startBetBlue;
     uint256 public endBetBlue;
     uint256 public startBetRed;
@@ -55,7 +55,7 @@ contract TwoCoinsOneMoonGame {
 
         jackpotBlue = 0;
         jackpotRed = 0;
-        
+
         startBetBlue = 0;
         startBetRed = 0;
 
@@ -226,7 +226,7 @@ contract TwoCoinsOneMoonGame {
 
         jackpotBlue = 0;
         jackpotRed = 0;
-        
+
         startBetBlue = bettorsBlue.length;
         startBetRed = bettorsRed.length;
     }
@@ -240,4 +240,20 @@ contract TwoCoinsOneMoonGame {
             burstBubble();
         }
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

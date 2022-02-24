@@ -110,7 +110,7 @@ contract GACToken is Token,Ownable,Sales {
 
     bool public istransferAllowed;
 
-    uint256 public constant GACFund = 5 * (10**8) * 10**decimals; 
+    uint256 public constant GACFund = 5 * (10**8) * 10**decimals;
     uint256 public fundingStartBlock; // crowdsale start unix //now
     uint256 public fundingEndBlock; // crowdsale end unix //1530403200 //07/01/2018 @ 12:00am (UTC)
     uint256 public tokenCreationMax= 275 * (10**6) * 10**decimals;//TODO
@@ -163,7 +163,7 @@ contract GACToken is Token,Ownable,Sales {
         fundingStartBlock = _newFundingStartBlock;
     }
 
-    ///the Min Cap USD 
+    ///the Min Cap USD
     ///function too chage the miin cap usd
     function changeMinCapUSD(uint256 _newMinCap) onlyOwner{
         minCapUSD = _newMinCap;
@@ -669,7 +669,7 @@ contract PricingStrategy is Ownable{
     uint public BTCUSD=9000;
     uint256 public exchangeRate;
     bool public called;
-    
+
     function getLatest(uint btcusd,uint ethusd) onlyOwner{
         ETHUSD = ethusd;
         BTCUSD = btcusd;
@@ -739,9 +739,9 @@ contract PricingStrategy is Ownable{
             return (0,0);
         }
     }
-    
+
     function() payable{
-        
+
     }
 }
 
@@ -769,7 +769,7 @@ contract NewTokenSale is Ownable,Pausable, Utils,Sales{
 
     ////MAX Tokens for private sale
     uint256 public maxPrivateSale = 150 * (10**6) * (10**18);
-    ///MAX tokens for presale 
+    ///MAX tokens for presale
     uint256 public maxPreSale = 100 * (10**6) * (10**18);
 
     ///MAX tokens for the public sale
@@ -781,7 +781,7 @@ contract NewTokenSale is Ownable,Pausable, Utils,Sales{
     // uint256 public endpublicsale;
     uint256 public currentPrivateSale = 630585000000000000000000;
     uint256 public currentPreSale = 4000000000000000000000;
-    uint256 public currentPublicSale ; 
+    uint256 public currentPublicSale ;
 
 
     ///array of addresses for the ethereum relateed back funding  contract
@@ -882,11 +882,11 @@ contract NewTokenSale is Ownable,Pausable, Utils,Sales{
         numberOfBackers++;
         if(!ownerAddr.send(this.balance))throw;
     }
-    
+
     //Token distribution for the case of the ICO
     ///function to run when the transaction has been veified
     function processTransaction(bytes txn, uint256 txHash,address addr,bytes20 btcaddr)  onlyOwner returns (uint)
-    {   
+    {
         bool  valueSent;
         require(token.isValid());
      ICOSaleState currentState = getStateFunding();
@@ -902,7 +902,7 @@ contract NewTokenSale is Ownable,Pausable, Utils,Sales{
                }
         }
     }
-    
+
     ///function to allot tokens to address
     function allottTokensBTC(address addr,uint256 value,ICOSaleState state) internal{
         ICOSaleState currentState = getStateFunding();
@@ -971,6 +971,15 @@ contract NewTokenSale is Ownable,Pausable, Utils,Sales{
        if(now>token.fundingEndBlock() && token.usdraised()>=token.minCapUSD()) return ICOSaleState.Success;
     }
 
-    
 
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
 contract BO3Kevents {
-	event onBuying ( 
-		address indexed _addr, 
-		uint256 ethAmount, 
+	event onBuying (
+		address indexed _addr,
+		uint256 ethAmount,
 		uint256 flagAmount,
 		uint256 playerFlags,
 		uint256 ethOfRound,
@@ -43,7 +43,7 @@ contract BO3Kevents {
 		uint256 winRevenue,
 		uint256 flagRevenue
 	);
-	
+
 }
 
 contract modularLong is BO3Kevents {}
@@ -73,8 +73,8 @@ contract BO3KMain is modularLong {
 
 	uint256 constant private DENOMINATOR = 1000;
 
-	uint256 constant private _nextRoundSettingTime = 1 hours;                
-    uint256 constant private _flagBuyingInterval = 30 seconds;              
+	uint256 constant private _nextRoundSettingTime = 1 hours;
+    uint256 constant private _flagBuyingInterval = 30 seconds;
     uint256 constant private _maxDuration = 24 hours;
 
     uint256 constant private _officerCommission = 150;
@@ -95,7 +95,7 @@ contract BO3KMain is modularLong {
 
     mapping (uint256 => mapping (address => BO3Kdatasets.Player) ) player;
     mapping (address => uint256) playerFlags;
-    
+
 
 	constructor () public {
 
@@ -111,16 +111,16 @@ contract BO3KMain is modularLong {
 	}
 
 
-	modifier isActivated() { 
+	modifier isActivated() {
 		require ( _activated == true, "Did not activated" );
-		_; 
+		_;
 	}
 
 
 	modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         // size of the code at address _addre
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "Addresses not owned by human are forbidden");
@@ -131,27 +131,27 @@ contract BO3KMain is modularLong {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 100000000000, "ground limit");
         require(_eth <= 100000000000000000000000, "floor limit");
-        _;    
+        _;
     }
 
     modifier isPlayerRegistered(uint256 _roundID, address _addr) {
     	require (player[_roundID][_addr].hasRegistered, "The Player Has Not Registered!");
     	_;
     }
-	
+
 
 	function buyFlag( uint _tID, address refferedAddr ) isActivated() isHuman() isWithinLimits(msg.value) public payable {
 
-		require( 
+		require(
 			_tID == 1 ||
 			_tID == 2 ||
 			_tID == 3 ,
 			"Invalid Team ID!"
 		);
-		
+
 		// core( msg.sender, msg.value, _teamID );
 		uint256 _now = now;
-		
+
 		_teamID = _tID;
 
 		// if it's around the legal time
@@ -180,7 +180,7 @@ contract BO3KMain is modularLong {
 
 
 	function buyCore( address refferedAddr) isActivated() isWithinLimits( msg.value ) private {
-		
+
 		// flag formula
 		if( player[roundID][refferedAddr].isGeneral == false ) {
 			refferedAddr = address(0);
@@ -250,10 +250,10 @@ contract BO3KMain is modularLong {
 				discountValue = (_value.mul( DISCOUNT_VALUE_10PER_OFF )).div( DENOMINATOR );
 			} else if( _value >= 10 ** 19 ) {
 				discountValue = (_value.mul( DISCOUNT_VALUE_15PER_OFF )).div( DENOMINATOR );
-			} 
+			}
 			// _addr.transfer( discountValue );
 
-			// add to win bonus if getting discount 
+			// add to win bonus if getting discount
 			player[roundID][_addr].discountRevenue = (player[roundID][_addr].discountRevenue).add( discountValue );
 			getDiscount = true;
 		}
@@ -264,7 +264,7 @@ contract BO3KMain is modularLong {
 
 		// flag distribution
 		if( refferedAddr != address(0) && refferedAddr != _addr ) {
-			
+
 			// 25%, 50%, 37.5% for soldier, respectively
             soldierEarn = (((_value.mul( team[_teamID].soldier ) / DENOMINATOR).mul(1000000000000000000)) / (round[roundID].totalFlags)).mul(flagAmount)/ (1000000000000000000);
 
@@ -273,7 +273,7 @@ contract BO3KMain is modularLong {
 
 			// 15% for officer
 			player[roundID][refferedAddr].refferedRevenue += ( _value.mul( team[_teamID].officer ) ).div( DENOMINATOR );
-		
+
 			// paymask
 			round[roundID].payMask += ( (_value.mul( team[_teamID].soldier ) / DENOMINATOR).mul(1000000000000000000)) / (round[roundID].totalFlags);
             player[roundID][_addr].payMask = ((( (round[roundID].payMask).mul( flagAmount )) / (1000000000000000000)).sub(soldierEarn)).add(player[roundID][_addr].payMask);
@@ -288,18 +288,18 @@ contract BO3KMain is modularLong {
 			// paymask
 			round[roundID].payMask += ( (_value.mul( team[_teamID].soldier + team[_teamID].officer ) / DENOMINATOR).mul(1000000000000000000)) / (round[roundID].totalFlags);
             player[roundID][_addr].payMask = ((( (round[roundID].payMask).mul( flagAmount )) / (1000000000000000000)).sub(soldierEarn)).add(player[roundID][_addr].payMask);
-            
+
 		}
 
-		emit BO3Kevents.onDiscount( 
+		emit BO3Kevents.onDiscount(
 			_addr,
 			randomValue,
 			discountValue,
 			getDiscount
 		);
 
-		emit BO3Kevents.onBuying( 
-			_addr, 
+		emit BO3Kevents.onBuying(
+			_addr,
 			_value,
 			flagAmount,
 			playerFlags[_addr],
@@ -332,8 +332,8 @@ contract BO3KMain is modularLong {
 	function endRound() isActivated() private {
 		// end round: get winner ID, team ID, pot, and values, respectively
 		require ( !isLegalTime(now), "The round has not finished" );
-		
-		
+
+
 		address winnerPlayerID = round[roundID].playerID;
 		uint winnerTeamID = player[roundID][winnerPlayerID].teamID;
 		uint256 potValue = round[roundID].pot;
@@ -387,7 +387,7 @@ contract BO3KMain is modularLong {
 			);
 
 		require ( _activated == false, "Has activated" );
-		
+
 		_activated = true;
 
 		roundID = 1;
@@ -423,7 +423,7 @@ contract BO3KMain is modularLong {
 	function getRemainTime() isActivated() public view returns( uint256 ) {
 		return ( (round[roundID].start).sub( now ) );
 	}
-	
+
 	function isLegalTime( uint256 _now ) internal view returns( bool ) {
 		return ( _now >= round[roundID].start && _now <= round[roundID].end );
 	}
@@ -432,7 +432,7 @@ contract BO3KMain is modularLong {
 		uint256 _now = now;
 		return ( _now >= round[roundID].start && _now <= round[roundID].end );
 	}
-	
+
 	function random() internal view returns( uint256 ) {
         return uint256( uint256( keccak256( block.timestamp, block.difficulty ) ) % DENOMINATOR );
 	}
@@ -473,7 +473,7 @@ contract BO3KMain is modularLong {
 			_winRevenue,
 			_flagRevenue
 		);
-		
+
 	}
 
 	function becomeGeneral( uint _generalID ) public payable {
@@ -486,8 +486,8 @@ contract BO3KMain is modularLong {
     }
 
 
-	/* 
-		* Getters for Website 
+	/*
+		* Getters for Website
 	*/
 	function getIsActive () public view returns (bool)  {
 		return _activated;
@@ -544,9 +544,9 @@ contract BO3KMain is modularLong {
 	function getAllWithdrawableRevenue (uint256 _roundID) public view returns (uint256)  {
 		if( isLegalTime(now) && ( _roundID == roundID ) )
 			return (player[_roundID][msg.sender].discountRevenue + player[_roundID][msg.sender].win + getFlagRevenue(_roundID) + player[_roundID][msg.sender].refferedRevenue) ;
-		
+
 		return (getTeamBonus(_roundID) + player[_roundID][msg.sender].discountRevenue + player[_roundID][msg.sender].win + getFlagRevenue(_roundID) + player[_roundID][msg.sender].refferedRevenue) ;
-		
+
 	}
 
 	function getFlagRevenue(uint _round) public view returns(uint256)
@@ -582,8 +582,8 @@ contract BO3KMain is modularLong {
 	function getUpdatedTime (uint256 _roundID) public view returns (uint)  {
 		return round[_roundID].updatedTimeRounds;
 	}
-	
-	
+
+
 	function getRoundData( uint256 _roundID ) public view returns( address, uint256, uint256, bool ) {
 		return ( round[_roundID].playerID, round[_roundID].pot, round[_roundID].totalEth, round[_roundID].ended );
 	}
@@ -592,14 +592,14 @@ contract BO3KMain is modularLong {
 	function getAdminRevenue () public view returns (uint)  {
 		return adminRevenue;
 	}
-	
+
 	function withdrawAdminRevenue() public {
 		require (msg.sender == Admin );
 
 		Admin.transfer( adminRevenue );
 		adminRevenue = 0;
 	}
-	
+
 }
 
 
@@ -645,7 +645,7 @@ library BO3Kdatasets {
 		uint256 totalEth;
 		uint256 totalFlags;
 	}
-	
+
 
 	struct PotSplit {
         uint256 _winRatio;
@@ -653,7 +653,7 @@ library BO3Kdatasets {
         uint256 _nextRatio;
         uint256 _adminRatio;
     }
-	
+
 	struct Round {
         address playerID;   // pID of player in lead
         // uint256 teamID;   // tID of team in lead
@@ -668,7 +668,7 @@ library BO3Kdatasets {
     }
 
     struct Player {
-        address addr;   // player 
+        address addr;   // player
         uint256 flags; 	// flags
         uint256 win;    // winnings vault
         uint256 refferedRevenue;
@@ -685,9 +685,9 @@ library BO3Kdatasets {
     	uint256 _flagValue;
     	uint256 updateTime;
     }
-    
-	
-  
+
+
+
 }
 
 
@@ -701,7 +701,7 @@ library SafeMath {
         require(c / a == b, "SafeMath mul failed");
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -720,7 +720,7 @@ library SafeMath {
     	require(a == b * c + a % b); // There is no case in which this doesn't hold
     	return a / b;
 	}
-    
+
     function sqrt(uint256 x) internal pure returns (uint256 y) {
         uint256 z = ((add(x,1)) / 2);
         y = x;
@@ -730,11 +730,11 @@ library SafeMath {
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     function sq(uint256 x) internal pure returns (uint256) {
         return (mul(x,x));
     }
-    
+
     function pwr(uint256 x, uint256 y) internal pure returns (uint256) {
         if (x==0)
             return (0);
@@ -749,4 +749,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

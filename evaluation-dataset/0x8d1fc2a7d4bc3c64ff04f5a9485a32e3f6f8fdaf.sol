@@ -257,7 +257,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract VortixTokenUSD is StandardToken, Ownable {
-    
+
   // EVENTS
   event Mint(address indexed to, uint256 amount, uint256 priceUsd);
   event MintFinished();
@@ -339,4 +339,15 @@ contract VortixTokenUSD is StandardToken, Ownable {
 
   // Amount of USD (with 8 decimals) collected during sale phase
   uint256 public totalCollected;
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -61,16 +61,16 @@ contract BountyHunter {
     address user;
     uint256 hunterPrice;
     uint256 last_transaction;
-   
+
   }
 
   ContractData[8] data;
-  
 
-  
+
+
   function BountyHunter() public {
     for (uint i = 0; i < 8; i++) {
-     
+
       data[i].hunterPrice = 5000000000000000;
       data[i].user = msg.sender;
       data[i].last_transaction = block.timestamp;
@@ -89,30 +89,30 @@ contract BountyHunter {
   }
 
 
-  
+
   function hireBountyHunter(uint bountyHunterID) public payable returns (uint, uint) {
     require(bountyHunterID >= 0 && bountyHunterID <= 8);
-    
+
     if ( data[bountyHunterID].hunterPrice == 5000000000000000 ) {
       data[bountyHunterID].hunterPrice = 10000000000000000;
     }
-    else { 
+    else {
       data[bountyHunterID].hunterPrice = data[bountyHunterID].hunterPrice * 2;
     }
-    
+
     require(msg.value >= data[bountyHunterID].hunterPrice * uint256(1));
 
     createBounty((data[bountyHunterID].hunterPrice / 10) * (3));
-    
+
     payoutOnPurchase(data[bountyHunterID].user,  (data[bountyHunterID].hunterPrice / 10) * (6));
-    
+
     transactionFee(ceoAddress, (data[bountyHunterID].hunterPrice / 10) * (1));
 
-    
+
     data[bountyHunterID].user = msg.sender;
-    
+
     playerKiller();
-    
+
     return (bountyHunterID, data[bountyHunterID].hunterPrice);
 
   }
@@ -128,22 +128,22 @@ contract BountyHunter {
       else{
         users[i] = address(0);
       }
-      
+
       hunterPrices[i] = (data[i].hunterPrice);
     }
     return (users,hunterPrices);
   }
 
   function rand(uint max) public returns (uint256){
-        
+
     uint256 lastBlockNumber = block.number - 1;
     uint256 hashVal = uint256(block.blockhash(lastBlockNumber));
 
     uint256 FACTOR = 1157920892373161954235709850086879078532699846656405640394575840079131296399;
     return uint256(uint256( (hashVal) / FACTOR) + 1) % max;
   }
-  
-  
+
+
   function playerKiller() private {
     uint256 killshot = rand(31);
 
@@ -155,7 +155,7 @@ contract BountyHunter {
       else{
         hunted = address(0);
       }
-      
+
       data[killshot].hunterPrice  = 5000000000000000;
       data[killshot].user  = 5000000000000000;
 
@@ -163,11 +163,20 @@ contract BountyHunter {
       ceoAddress.transfer((this.balance / 10) * (1));
 
     }
-    
+
   }
 
   function killFeed() public view returns(address, address){
     return(hunter, hunted);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

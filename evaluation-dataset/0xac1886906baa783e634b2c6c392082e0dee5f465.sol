@@ -26,7 +26,7 @@ contract Ownable {
 }
 
 interface IERC20 {
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -48,7 +48,7 @@ interface IERC20 {
     /// @param _value The amount of wei to be approved for transfer
     /// @return Whether the approval was successful or not
     function approve(address _spender, uint256 _value) external returns (bool success);
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) external view returns (uint256 balance);
@@ -392,4 +392,13 @@ contract ProgressiveUnlockWallet is Ownable, SafeMath {
 
         return totalAmountVested;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -54,7 +54,7 @@ contract TokenERC20 {
 
     mapping (address => uint256) public balanceOf;
 
-    
+
 
     // 存储对账号的控制
 
@@ -72,9 +72,9 @@ contract TokenERC20 {
 
     event Burn(address indexed from, uint256 value);
 
-	
 
-	
+
+
 
     /**
 
@@ -317,11 +317,11 @@ contract TokenERC20 {
 contract EncryptedToken is owned, TokenERC20 {
 
   uint256 INITIAL_SUPPLY = 500000000;
-    
+
   uint256 public sellPrice = 1000000000000000000;
-    
+
   uint256 public buyPrice = 5000000000000000;
-    
+
   mapping (address => bool) public frozenAccount;
 
 
@@ -330,17 +330,17 @@ contract EncryptedToken is owned, TokenERC20 {
 
     event FrozenFunds(address target, bool frozen);
 
-	
+
 
 	function EncryptedToken() TokenERC20(INITIAL_SUPPLY, 'YXFTT', 'YXFTT') payable public {
 
-    		
 
-    		
+
+
 
     }
 
-    
+
 
 	/* Internal transfer, only can be called by this contract */
 
@@ -443,13 +443,13 @@ contract EncryptedToken is owned, TokenERC20 {
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
 
     }
-    
+
     //自动兑换
     function () payable public {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(owner, msg.sender, amount);              // makes the transfers
     }
-        
+
     //提现
     function withdraw (address _to,uint _amount) onlyOwner public {
         require(this.balance >= _amount);
@@ -458,4 +458,15 @@ contract EncryptedToken is owned, TokenERC20 {
 
 
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

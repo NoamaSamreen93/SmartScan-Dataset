@@ -7,7 +7,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -17,17 +17,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -35,7 +35,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -47,8 +47,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 contract SafeMath {
     function safeAdd(uint x, uint y) pure internal returns(uint) {
       uint z = x + y;
@@ -67,8 +67,8 @@ contract SafeMath {
       assert((x == 0)||(z/x == y));
       return z;
     }
-    
-     
+
+
 
     function getRandomNumber(uint16 maxRandom, uint8 min, address privateAddress) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1)) + uint256(privateAddress);
@@ -87,21 +87,21 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
 
 contract IPetCardData is AccessControl, Enums {
-    uint8 public totalPetCardSeries;    
+    uint8 public totalPetCardSeries;
     uint64 public totalPets;
-    
+
     // write
     function createPetCardSeries(uint8 _petCardSeriesId, uint32 _maxTotal) onlyCREATOR public returns(uint8);
     function setPet(uint8 _petCardSeriesId, address _owner, string _name, uint8 _luck, uint16 _auraRed, uint16 _auraYellow, uint16 _auraBlue) onlySERAPHIM external returns(uint64);
@@ -124,59 +124,59 @@ contract IPetCardData is AccessControl, Enums {
 
 contract RetirePets is AccessControl, SafeMath {
 
-  
-   
+
+
     address public petCardDataContract = 0xB340686da996b8B3d486b4D27E38E38500A9E926;
 
 
-   
+
     // events
-   
+
     event EventNewPet(uint64 petID);
 
-  
+
 
 
 
     // write functions
     function DataContacts( address _petCardDataContract) onlyCREATOR external {
         petCardDataContract = _petCardDataContract;
-      
-    }
-    
 
-       
+    }
+
+
+
     function checkPet (uint64  petID) private constant returns (uint8) {
               IPetCardData petCardData = IPetCardData(petCardDataContract);
-              
+
         //check if a pet both exists and is owned by the message sender.
-        // This function also returns the petcardSeriesID. 
-     
+        // This function also returns the petcardSeriesID.
+
         if ((petID <= 0) || (petID > petCardData.getTotalPets())) {return 0;}
-        
+
         address petowner;
         uint8 petcardSeriesID;
-     
+
       (,petcardSeriesID,,,,,,,,petowner) = petCardData.getPet(petID);
-    
+
          if  (petowner != msg.sender)  {return 0;}
-        
+
         return petcardSeriesID;
-        
-        
+
+
 }
      function retireWildEasy(uint64 pet1, uint64 pet2, uint64 pet3, uint64 pet4, uint64 pet5, uint64 pet6) public {
             IPetCardData petCardData = IPetCardData(petCardDataContract);
-         // Send this function the petIds of 6 of your Wild Easy (2 star pets) to receive 1 3 star pet. 
-         
-         //won't throw an error if you send a level3 pet, but will still recycle. This is to reduce gas costs for everyone. 
+         // Send this function the petIds of 6 of your Wild Easy (2 star pets) to receive 1 3 star pet.
+
+         //won't throw an error if you send a level3 pet, but will still recycle. This is to reduce gas costs for everyone.
          if (checkPet(pet1) <5) {revert();}
          if (checkPet(pet2) <5) {revert();}
          if (checkPet(pet3) <5) {revert();}
          if (checkPet(pet4) <5) {revert();}
          if (checkPet(pet5) <5) {revert();}
          if (checkPet(pet6) <5) {revert();}
-         
+
        petCardData.transferPet(msg.sender, address(0), pet1);
        petCardData.transferPet(msg.sender, address(0), pet2);
        petCardData.transferPet(msg.sender, address(0), pet3);
@@ -184,21 +184,21 @@ contract RetirePets is AccessControl, SafeMath {
        petCardData.transferPet(msg.sender, address(0), pet5);
        petCardData.transferPet(msg.sender, address(0), pet6);
         getNewPetCard(getRandomNumber(12,9,msg.sender));
-         
+
      }
 
     function retireWildHard(uint64 pet1, uint64 pet2, uint64 pet3, uint64 pet4, uint64 pet5, uint64 pet6) public {
             IPetCardData petCardData = IPetCardData(petCardDataContract);
-         // Send this function the petIds of 6 of your Wild Hard (3 star pets) to receive 1 four star pet. 
-         
-        
+         // Send this function the petIds of 6 of your Wild Hard (3 star pets) to receive 1 four star pet.
+
+
          if (checkPet(pet1) <9) {revert();}
          if (checkPet(pet2) <9) {revert();}
          if (checkPet(pet3) <9) {revert();}
          if (checkPet(pet4) <9) {revert();}
          if (checkPet(pet5) <9) {revert();}
          if (checkPet(pet6) <9) {revert();}
-         
+
        petCardData.transferPet(msg.sender, address(0), pet1);
        petCardData.transferPet(msg.sender, address(0), pet2);
        petCardData.transferPet(msg.sender, address(0), pet3);
@@ -206,21 +206,21 @@ contract RetirePets is AccessControl, SafeMath {
        petCardData.transferPet(msg.sender, address(0), pet5);
        petCardData.transferPet(msg.sender, address(0), pet6);
         getNewPetCard(getRandomNumber(16,13,msg.sender));
-         
+
      }
 
 
-    
+
    function getNewPetCard(uint8 opponentId) private {
         uint16 _auraRed = 0;
         uint16 _auraYellow = 0;
         uint16 _auraBlue = 0;
-        
+
         uint32 _auraColor = getRandomNumber(2,0,msg.sender);
         if (_auraColor == 0) { _auraRed = 14;}
         if (_auraColor == 1) { _auraYellow = 14;}
         if (_auraColor == 2) { _auraBlue = 14;}
-        
+
         uint8 _newLuck = getRandomNumber(39,30,msg.sender);
         IPetCardData petCardData = IPetCardData(petCardDataContract);
         uint64 petId = petCardData.setPet(opponentId+4, msg.sender, 'Rover', _newLuck, _auraRed, _auraYellow, _auraBlue);
@@ -228,8 +228,17 @@ contract RetirePets is AccessControl, SafeMath {
         }
 
 
- 
+
       function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

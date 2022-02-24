@@ -26,7 +26,7 @@ library SafeMath {
         require(c >= a);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
@@ -169,9 +169,9 @@ contract FourArt is StandardToken, Owned {
     uint8 public constant decimals = 18;
     uint256 public sellPrice = 0; // eth
     uint256 public buyPrice = 0; // eth
-    mapping (address => bool) private SubFounders;       
+    mapping (address => bool) private SubFounders;
     mapping (address => bool) private TeamAdviserPartner;
-    
+
     //FounderAddress1 is main founder
     address private FounderAddress1;
     address private FounderAddress2;
@@ -184,17 +184,17 @@ contract FourArt is StandardToken, Owned {
     address private bountyAddress;
     address private affiliateAddress;
     address private miscAddress;
-    
+
     function FourArt(
-        address _founderAddress1, 
+        address _founderAddress1,
         address _founderAddress2,
-        address _founderAddress3, 
-        address _founderAddress4, 
-        address _founderAddress5, 
-        address _teamAddress, 
-        address _adviserAddress, 
-        address _partnershipAddress, 
-        address _bountyAddress, 
+        address _founderAddress3,
+        address _founderAddress4,
+        address _founderAddress5,
+        address _teamAddress,
+        address _adviserAddress,
+        address _partnershipAddress,
+        address _bountyAddress,
         address _affiliateAddress,
         address _miscAddress
         )  {
@@ -212,7 +212,7 @@ contract FourArt is StandardToken, Owned {
         bountyAddress = _bountyAddress;
         affiliateAddress = _affiliateAddress;
         miscAddress =  _miscAddress;
-        
+
         //Assign tokens to the addresses at contract deployment
         balances[FounderAddress1] = 1390000000e18;
         balances[FounderAddress2] = 27500000e18;
@@ -226,16 +226,16 @@ contract FourArt is StandardToken, Owned {
         balances[affiliateAddress] = 364000000e18;
         balances[miscAddress] = 100000000e18;
 
-        //checks for tokens transfer        
-        SubFounders[FounderAddress2] = true;        
-        SubFounders[FounderAddress3] = true;        
-        SubFounders[FounderAddress4] = true;        
-        SubFounders[FounderAddress5] = true;        
-        TeamAdviserPartner[teamAddress] = true;     
-        TeamAdviserPartner[adviserAddress] = true;  
+        //checks for tokens transfer
+        SubFounders[FounderAddress2] = true;
+        SubFounders[FounderAddress3] = true;
+        SubFounders[FounderAddress4] = true;
+        SubFounders[FounderAddress5] = true;
+        TeamAdviserPartner[teamAddress] = true;
+        TeamAdviserPartner[adviserAddress] = true;
         TeamAdviserPartner[partnershipAddress] = true;
     }
-    
+
     // desposit funds to smart contract
     function () public payable {
     }
@@ -255,14 +255,14 @@ contract FourArt is StandardToken, Owned {
 
     // @notice Sell `amount` tokens to contract
     function sell(uint256 amount) public {
-        require(now > 1543536000); // seconds since 01.01.1970 to 30.11.2018 (18:00:00 o'clock GMT) 
+        require(now > 1543536000); // seconds since 01.01.1970 to 30.11.2018 (18:00:00 o'clock GMT)
         require(amount > 0);
         require(balances[msg.sender] >= amount);
         uint256 requiredBalance = amount.mul(sellPrice);
         require(this.balance >= requiredBalance);  // checks if the contract has enough ether to pay
         balances[msg.sender] -= amount;
         balances[owner] += amount;
-        Transfer(msg.sender, owner, amount); 
+        Transfer(msg.sender, owner, amount);
         msg.sender.transfer(requiredBalance);    // sends ether to the seller.
     }
 
@@ -285,12 +285,12 @@ contract FourArt is StandardToken, Owned {
         require(_value <= this.balance);
         owner.transfer(_value);
     }
-    
+
     // @dev if someone wants to transfer tokens to other account.
     function transferTokens(address _to, uint256 _tokens) lockTokenTransferBeforeStage4 TeamTransferConditions(_tokens, msg.sender)   public {
         _transfer(msg.sender, _to, _tokens);
     }
-    
+
     // @dev Transfer tokens from one address to another
     function transferFrom(address _from, address _to, uint256 _value) lockTokenTransferBeforeStage4 TeamTransferConditions(_value, _from)  public returns (bool) {
         require(_to != address(0));
@@ -302,33 +302,33 @@ contract FourArt is StandardToken, Owned {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     modifier lockTokenTransferBeforeStage4{
         if(msg.sender != owner){
            require(now > 1533513600); // Locking till stage 4 starting date (ICO).
         }
         _;
     }
-    
+
     modifier TeamTransferConditions(uint256 _tokens,  address _address) {
         if(SubFounders[_address]){
             require(now > 1543536000);
             if(now > 1543536000 && now < 1569628800){
                 //90% lock of total 27500000e18
                 isLocked(_tokens, 24750000e18, _address);
-            } 
+            }
             if(now > 1569628800 && now < 1601251200){
                //50% lock of total 27500000e18
                isLocked(_tokens, 13750000e18, _address);
             }
         }
-        
+
         if(TeamAdviserPartner[_address]){
             require(now > 1543536000);
             if(now > 1543536000 && now < 1569628800){
                 //85% lock of total 39000000e18
                 isLocked(_tokens, 33150000e18, _address);
-            } 
+            }
             if(now > 1569628800 && now < 1601251200){
                //60% lock of total 39000000e18
                isLocked(_tokens, 23400000e18, _address);
@@ -337,10 +337,21 @@ contract FourArt is StandardToken, Owned {
         _;
     }
 
-    // @dev if someone wants to transfer tokens to other account.    
+    // @dev if someone wants to transfer tokens to other account.
     function isLocked(uint256 _value,uint256 remainingTokens, address _address)  internal returns (bool) {
             uint256 remainingBalance = balances[_address].sub(_value);
             require(remainingBalance >= remainingTokens);
             return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

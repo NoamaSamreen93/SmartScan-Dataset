@@ -1035,7 +1035,7 @@ contract Functions {
     /// @param _width of canvas
     /// @param _height of canvas
     /// @return arrays of randomly picked assets defining ids, coordinates, zoom, rotation and layers
-    function getImage(uint _finalSeed, bytes32[] _potentialAssets, uint _width, uint _height) public pure 
+    function getImage(uint _finalSeed, bytes32[] _potentialAssets, uint _width, uint _height) public pure
     returns(uint[] finalPicked, uint[] x, uint[] y, uint[] zoom, uint[] rotation, uint[] layers) {
         require(_finalSeed != 0);
         require(_potentialAssets.length > 0);
@@ -1071,16 +1071,16 @@ contract Functions {
     /// @param _width of canvas
     /// @param _height of canvas
     /// @return tuple of uints representing x,y,zoom,and rotation
-    function pickRandomAssetPosition(uint _randomSeed, uint _width, uint _height) public pure 
+    function pickRandomAssetPosition(uint _randomSeed, uint _width, uint _height) public pure
     returns (uint x, uint y, uint zoom, uint rotation, uint layer) {
-        
+
         x = _randomSeed % _width;
         y = _randomSeed % _height;
         zoom = _randomSeed % 200 + 800;
         rotation = _randomSeed % 360;
         // using random number for now
         // if two layers are same, sort by (keccak256(layer, assetId))
-        layer = _randomSeed % 1234567; 
+        layer = _randomSeed % 1234567;
     }
 
     /// @notice Function to calculate final random seed for user
@@ -1128,7 +1128,7 @@ contract UserManager {
     event NewUser(address indexed user, string username, bytes32 profilePicture);
 
     function register(string _username, bytes32 _hashToProfilePicture) public {
-        require(usernameExists[_username] == false || 
+        require(usernameExists[_username] == false ||
                 keccak256(abi.encodePacked(getUsername(msg.sender))) == keccak256(abi.encodePacked(_username))
         );
 
@@ -1164,7 +1164,7 @@ contract UserManager {
 
     function getUsername(address _address) public view returns(string) {
         return addressToUser[_address].username;
-    } 
+    }
 
     function getProfilePicture(address _address) public view returns(bytes32) {
         return addressToUser[_address].hashToProfilePicture;
@@ -1235,8 +1235,8 @@ contract DigitalPrintImage is ERC721Token("DigitalPrintImage", "DPM"), UserManag
 
         uint[] memory pickedAssets;
         uint finalSeed;
-       
-        (pickedAssets, finalSeed) = getPickedAssetsAndFinalSeed(_potentialAssets, _randomHashIds, _timestamp, _iterations); 
+
+        (pickedAssets, finalSeed) = getPickedAssetsAndFinalSeed(_potentialAssets, _randomHashIds, _timestamp, _iterations);
         uint[] memory pickedAssetPacks = assetManager.pickUniquePacks(pickedAssets);
         uint finalPrice = 0;
 
@@ -1247,7 +1247,7 @@ contract DigitalPrintImage is ERC721Token("DigitalPrintImage", "DPM"), UserManag
                 assetManager.buyAssetPack.value(assetManager.getAssetPackPrice(pickedAssetPacks[i]))(msg.sender, pickedAssetPacks[i]);
             }
         }
-        
+
         require(msg.value >= finalPrice);
 
         uint id = totalSupply();
@@ -1286,7 +1286,7 @@ contract DigitalPrintImage is ERC721Token("DigitalPrintImage", "DPM"), UserManag
     /// @param _marketplaceContract address of marketplace contract
     function addMarketplaceContract(address _marketplaceContract) public onlyOwner {
         require(address(marketplaceContract) == 0x0);
-        
+
         marketplaceContract = _marketplaceContract;
     }
 
@@ -1327,8 +1327,8 @@ contract DigitalPrintImage is ERC721Token("DigitalPrintImage", "DPM"), UserManag
     }
 
     /// @notice Method returning informations needed for gallery page
-    /// @param _imageId id of image 
-    function getGalleryData(uint _imageId) public view 
+    /// @param _imageId id of image
+    function getGalleryData(uint _imageId) public view
     returns(address, address, string, bytes32, string, string) {
         require(_imageId < totalSupply());
 
@@ -1433,7 +1433,7 @@ contract Marketplace is Ownable {
 
         emit SellingImage(_imageId, _price);
     }
-    
+
     function getActiveAds() public view returns (uint[], uint[]) {
         uint count;
         for (uint i = 0; i < numberOfAds; i++) {
@@ -1498,7 +1498,7 @@ contract Marketplace is Ownable {
     }
 
     function withdraw() public {
-        
+
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
 
@@ -1510,4 +1510,15 @@ contract Marketplace is Ownable {
     function removeOrder(uint _imageId) private {
         sellAds[_imageId].active = false;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

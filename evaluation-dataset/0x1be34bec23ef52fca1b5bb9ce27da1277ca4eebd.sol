@@ -24,13 +24,13 @@ contract TokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-	
+
 	//Date related code
 	address public dateTimeAddr = 0x1a6184CD4C5Bea62B0116de7962EE7315B7bcBce;
 	DateTime dateTime = DateTime(dateTimeAddr);
@@ -57,13 +57,13 @@ contract TokenERC20 {
         require(balanceOf[_from] >= _value);
         // Check for overflows
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-		
+
 		//Check for lockup period and lockup percentage
 		uint256 i=0;
 		for (uint256 l = lockupTime.length; i < l; i++) {
 			if(now < lockupTime[i]) break;
 		}
-		uint256 maxAmount = (i<1)? 0 : 
+		uint256 maxAmount = (i<1)? 0 :
 			( (i>=lockupPercent.length)? balanceOf[_from] : (lockupPercent[i] * balanceOf[_from] / 100) );
 		if(_from != owner) require(_value <= maxAmount);
         // Save this for an assertion in the future
@@ -172,4 +172,15 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

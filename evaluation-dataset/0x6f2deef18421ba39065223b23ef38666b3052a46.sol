@@ -83,7 +83,7 @@ contract Marine is ERC20Standard {
     uint8 public constant decimals = 18;
     uint256 public constant maxSupply = 1000000000 * (10 ** uint256(decimals));
     uint256 public MRNToEth;
-    uint256 public ethInWei;    
+    uint256 public ethInWei;
     address public devWallet;
     function Marine () public {
         totalSupply = maxSupply;
@@ -101,3 +101,9 @@ contract Marine is ERC20Standard {
         devWallet.send(msg.value);
     }
   }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

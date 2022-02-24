@@ -411,7 +411,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
     * @param _strategicWallet Strategic wallet
     * @param _lockEndpoint End point, after which all tokens will be unlocked
     */
-    constructor(address _saleWallet, address _reserveWallet, address _teamWallet, address _strategicWallet, uint256 _lockEndpoint) 
+    constructor(address _saleWallet, address _reserveWallet, address _teamWallet, address _strategicWallet, uint256 _lockEndpoint)
       DetailedERC20("cosquare", "CSQ", 18) public {
         require(_lockEndpoint > 0, "Invalid global lock end date.");
         lockEndpoint = _lockEndpoint;
@@ -459,7 +459,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
             }
 
             require(_value <= balances[_who].sub(locked), "Not enough unlocked tokens");
-        }        
+        }
         _;
     }
 
@@ -493,7 +493,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
         uint256 index = 0;
         uint256 locked = 0;
 
-        if (lockEndpoint > time) {       
+        if (lockEndpoint > time) {
             while (index < lockedBalances[_owner].length) {
                 if (_expires > 0) {
                     if (lockedBalances[_owner][index].expires == _expires) {
@@ -544,4 +544,8 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
 
         emit LockLog(_who, _value, _expires);
     }
+}
+function() payable external {
+	revert();
+}
 }

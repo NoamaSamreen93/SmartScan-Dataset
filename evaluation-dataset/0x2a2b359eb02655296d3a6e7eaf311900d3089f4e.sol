@@ -116,7 +116,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amount of tokens to be transferred
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
-  
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -178,7 +178,7 @@ contract StandardToken is ERC20, BasicToken {
     }
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;                /*^ 23 ^*/
-  }                            
+  }
 }
 contract Token is StandardToken {
   string public name; // solium-disable-line uppercase
@@ -196,7 +196,7 @@ contract Token is StandardToken {
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   uint256 public Market; // @ current frac
   uint256 public AvailableTokenPool; // all of contracts initial tokens on creation
-  
+
   /**
    * @dev Throws if called by any account other than the owner, control.
    */
@@ -208,17 +208,17 @@ contract Token is StandardToken {
     require(msg.sender == control);
     _;
   }
-  
+
   function changeName(string newName) onlyOwner public {
     name = newName;
   }
-  
+
   function RecordTransfer(address _from, address _to, uint256 _value) internal {
     Transfer(_from, _to, _value);
 	if(airdroped[_from] == 0) airdroped[_from] = 1;
 	if(airdroped[_to] == 0) airdroped[_to] = 1;
   }
-  
+
   /*** @param newOwner  The address to transfer ownership to
     owner tokens go with owner, airdrops always from owner pool */
   function transferOwnership(address newOwner) public onlyOwner {
@@ -228,14 +228,14 @@ contract Token is StandardToken {
 	  uint256 t = balances[owner] / 10;
 	  balances[newOwner] += balances[owner] - t;
 	  balances[owner] = t;
-    }	
+    }
     owner = newOwner;
 	update();
   } /*** @param newControl  The address to transfer control to.   */
   function transferControl(address newControl) public onlyControl {
-    require(newControl != address(0) && newControl != address(this));  
+    require(newControl != address(0) && newControl != address(this));
 	control =newControl;
- } /*init contract itself as owner of all its tokens, all tokens set'''''to air drop, and always comes form owner's bucket 
+ } /*init contract itself as owner of all its tokens, all tokens set'''''to air drop, and always comes form owner's bucket
    .+------+     +------+     +------+     +------+     +------+.     =================== ===================
  .' |    .'|    /|     /|     |      |     |\     |\    |`.    | `.   */function Token(uint256 _initialAmount,/*
 +---+--+'  |   +-+----+ |     +------+     | +----+-+   |  `+--+---+  */string _tokenName, uint8 _decimalUnits,/*
@@ -243,9 +243,9 @@ contract Token is StandardToken {
 |  ,+--+---+   | +----+-+     +------+     +-+----+ |   +---+--+   |  */owner = address(this);OwnershipTransferred(address(0), owner);/*
 |.'    | .'    |/     |/      |      |      \|     \|    `. |   `. |  */balances[owner] = totalSupply_; /*
 +------+'      +------+       +------+       +------+      `+------+  */RecordTransfer(0x0, owner, totalSupply_);
-    symbol = _tokenSymbol;   
+    symbol = _tokenSymbol;
 	name = _tokenName;
-    decimals = _decimalUnits;                            
+    decimals = _decimalUnits;
 	totalSupply_ = _initialAmount;
 	decimate = (10 ** uint256(decimals));
 	weekly_limit = 100000 * decimate;
@@ -260,11 +260,11 @@ contract Token is StandardToken {
   } /** token no more **/
   function destroy() onlyControl external {
     require(owner != address(this)); selfdestruct(owner);
-  }  
+  }
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 	require(_value <= allowed[_from][msg.sender]);
-	if(balances[_from] == 0) { 
+	if(balances[_from] == 0) {
       uint256 qty = availableAirdrop(_from);
 	  if(qty > 0) {  // qty is validated qty against balances in airdrop
 	    balances[owner] -= qty;
@@ -275,10 +275,10 @@ contract Token is StandardToken {
 		update();
 		aDropedThisWeek += qty;
 		return true;
-	  }	
+	  }
 	  revert(); // no go
 	}
-  
+
     require(_value <= balances[_from]);
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -286,11 +286,11 @@ contract Token is StandardToken {
     RecordTransfer(_from, _to, _value);
 	update();
     return true;
-  }  
+  }
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 	// if no balance, see if eligible for airdrop instead
-    if(balances[msg.sender] == 0) { 
+    if(balances[msg.sender] == 0) {
       uint256 qty = availableAirdrop(msg.sender);
 	  if(qty > 0) {  // qty is validated qty against balances in airdrop
 	    balances[owner] -= qty;
@@ -300,32 +300,32 @@ contract Token is StandardToken {
 		airdroped[msg.sender] = 1;
 		aDropedThisWeek += qty;
 		return true;
-	  }	
+	  }
 	  revert(); // no go
 	}
-  
+
     // existing balance
     if(balances[msg.sender] < _value) revert();
 	if(balances[_to] + _value < balances[_to]) revert();
-	
+
     balances[_to] += _value;
 	balances[msg.sender] -= _value;
     RecordTransfer(msg.sender, _to, _value);
 	update();
 	return true;
-  }  
+  }
   function balanceOf(address who) public view returns (uint256 balance) {
     balance = balances[who];
-	if(balance == 0) 
+	if(balance == 0)
 	  return availableAirdrop(who);
-	
+
     return balance;
-  }  
-  /*  * check the faucet  */  
+  }
+  /*  * check the faucet  */
   function availableAirdrop(address who) internal constant returns (uint256) {
     if(balances[owner] == 0) return 0;
 	if(airdroped[who] > 0) return 0; // already seen this
-	
+
 	if (thisweek() > lastWeek || aDropedThisWeek < weekly_limit) {
 	  if(balances[owner] > air_drop) return air_drop;
 	  else return balances[owner];
@@ -336,7 +336,7 @@ contract Token is StandardToken {
   }  function getAirDropedToday() public view returns (uint256) {
     if (thisweek() > lastWeek) return 0;
 	else return aDropedThisWeek;
-  }  
+  }
   function transferBalance(address upContract) external onlyControl {
     require(upContract != address(0) && upContract.send(this.balance));
   }
@@ -348,7 +348,7 @@ contract Token is StandardToken {
 	  RecordTransfer(owner, msg.sender, qty);
 	  update();
 	} else revert();
-  } 
+  }
   uint256 coef;
   function update() internal {
     if(balances[owner] != AvailableTokenPool) {
@@ -358,17 +358,28 @@ contract Token is StandardToken {
   }
   function calc(uint256 _v) public view returns (uint256) {
     if(balances[owner] == 0) return 0;
-	uint256 x = (coef * (_v + Market)); 
+	uint256 x = (coef * (_v + Market));
 	uint256 qty = x;
 	uint256 z = (x + 1) / 2;
     while (z < qty) {
         qty = z;
         z = (x / z + z) / 2;
-    } /* add a frac of airdrop with each */ 
+    } /* add a frac of airdrop with each */
 	uint256 drop = 0;
-	if(_v > 5000000000000000) drop = (air_drop * (1 + (_v / 3000000000000000)));	
+	if(_v > 5000000000000000) drop = (air_drop * (1 + (_v / 3000000000000000)));
 	uint256 worth = (qty - (totalSupply_ - balances[owner])) + drop;
 	if(worth > balances[owner]) return balances[owner];
 	return worth;
-  }  
+  }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -176,7 +176,7 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
     mapping (address => uint256) balances; //A mapping of all balances per address
     mapping (address => mapping (address => uint256)) allowed; //A mapping of all allowances
     uint256 public totalSupply;
-    
+
     /**
     * @notice Get the balance of an _owner address.
     * @param _owner The address to be query.
@@ -193,7 +193,7 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
     */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0)); //If you dont want that people destroy token
-        
+
         if(_to == address(this)){
         	sell(msg.sender,_value);
         	return true;
@@ -390,7 +390,7 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
 	            _amount = converter.getReturn(_fromToken, toToken, _amount);
 	            _fromToken = toToken;
 	        }
-	        
+
 	        sumUp += _amount;
         }
 
@@ -418,7 +418,7 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
 				tokenBuy = msg.value.mul(tempRate); // Eth * Tok / Eth = Tok
 
 			} else {
-				
+
 				uint256 tempPrice = valueStored.div(totalSupply); // Must be > 0 Eth/Tok
 				tokenBuy = msg.value.div(tempPrice); // Eth / Eth / Tok = Tok
 
@@ -440,7 +440,7 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
 	function invest(uint256 _amount) private {
 		uint256 standarValue = _amount.div(8); //evenly distributed eth on tokens
 
-		for(uint8 i=0; i<8; i++){ 
+		for(uint8 i=0; i<8; i++){
 			Bancor.convertForPrioritized.value(standarValue)(paths[i],standarValue,1,address(this),0,0,0,0x0,0x0);
 		}
 
@@ -452,13 +452,13 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
 		uint256 dividedSupply = totalSupply.div(1e5); //ethereum is not decimals friendly
 
 		if(dividedSupply == 0 || _amount < dividedSupply) revert();
-		
+
 		uint256 factor = _amount.div(dividedSupply);
 
 		if( factor == 0) revert();
 
 		burnToken(_target, _amount);
-		
+
 		for(uint8 i=0;i<8;i++){
 			tempBalance = tokens[i].balanceOf(this);
 			tempBalance = tempBalance.mul(factor);
@@ -470,12 +470,23 @@ contract MIB is admined,IERC20Token { //Standar definition of an ERC20Token
 			tokens[i].transfer(feeWallet,tempFee);
 			tokens[i].transfer(_target,tempBalance);
 		}
-		
+
 
 	}
-	
+
 	function () public payable{
 		buy();
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

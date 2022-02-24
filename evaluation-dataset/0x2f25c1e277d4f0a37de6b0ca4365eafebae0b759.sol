@@ -251,7 +251,7 @@ contract BasicToken is ERC20Basic {
     uint8 public decimals = 18;
     uint public allSupply = 12600000; // 21000000 * 0.6
     uint public freezeSupply = 8400000 * 10 ** uint256(decimals);   // 21000000 * 0.4
-    uint256 totalSupply_ = freezeSupply; 
+    uint256 totalSupply_ = freezeSupply;
 
     constructor() public {
         balances[msg.sender] = 0;
@@ -291,10 +291,10 @@ contract FBToken is ERC20, BasicToken {
     address owner;
 
 
-    uint public lastRelease = 15 * 10000000;   
-    uint public lastMonth = 1;                
+    uint public lastRelease = 15 * 10000000;
+    uint public lastMonth = 1;
     uint public divBase = 100 * 10000000;
-    uint256 public award = 0;    
+    uint256 public award = 0;
 
     event ReleaseSupply(address indexed receiver, uint256 value, uint256 releaseTime);
 
@@ -370,11 +370,11 @@ contract FBToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     function releaseToday() public onlyOwner returns (uint256 _actualRelease) {
         return releaseSupply(now);
     }
-    
+
     function releaseSupply(uint256 timestamp) public onlyOwner returns (uint256 _actualRelease) {
         require(timestamp >= createTime && timestamp <= now);
         require(!judgeReleaseRecordExist(timestamp));
@@ -413,4 +413,15 @@ contract FBToken is ERC20, BasicToken {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

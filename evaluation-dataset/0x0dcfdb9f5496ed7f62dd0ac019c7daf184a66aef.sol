@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract LVRCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xC9167F51CDEa635634E6d92D25664379dde36484;
@@ -26,34 +26,34 @@ contract LVRCrowdsale {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) public {
         require(msg.sender == creator);
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) public {
         require(msg.sender == creator);
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) public {
         require(msg.sender == creator);
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
-    
+
     function kill() public {
         require(msg.sender == creator);
         selfdestruct(owner);
@@ -65,12 +65,12 @@ contract LVRCrowdsale {
         require(now < endDate);
 	    uint amount = msg.value * price;
         uint _amount = amount / 20;
-        
+
         // period 1 : 30%
         if(now > 1522839600 && now < 1523098800) {
             amount += _amount * 6;
         }
-        
+
         // period 2 : 20%
         if(now > 1523098800 && now < 1523703600) {
             amount += _amount * 4;
@@ -85,4 +85,15 @@ contract LVRCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

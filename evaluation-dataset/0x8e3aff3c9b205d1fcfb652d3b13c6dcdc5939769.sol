@@ -1,12 +1,12 @@
 pragma solidity ^0.4.19;
 
-/* 
+/*
     http://thegoliathcorp.com/
     https://twitter.com/goliathcoin
 
     GoliathCoin; the first trustless, decentralized, pre-mined, smart contracting blockchain in the history of cryptocoins. Or something.
 
-    “This thing is basically the new Mt Gox.” 
+    “This thing is basically the new Mt Gox.”
 */
 
 contract Owned {
@@ -92,4 +92,15 @@ contract GoliathCoin is Owned {
         balanceOf[to] += value;
         Transfer(from, to, value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -32,45 +32,45 @@ contract AirDrop
 {
     address public owner;
     address public executor;
-    
+
     event eTransferExecutor(address newOwner);
     event eMultiTransfer(address _tokenAddr, address[] dests, uint256[] values);
     event eMultiTransferETH(address[] dests, uint256[] values);
-    
+
     function () public payable {
     }
-    
+
     // Constructor
     function AirDrop() public {
         owner = msg.sender;
         executor = msg.sender;
     }
-    
+
     // Functions with this modifier can only be executed by the owner
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferExecutor(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         executor = newOwner;
         eTransferExecutor(newOwner);
     }
-    
+
     // Functions with this modifier can only be executed by the owner
     modifier onlyExecutor() {
         require(msg.sender == executor || msg.sender == owner);
         _;
     }
-    
+
     function MultiTransfer(address _tokenAddr, address[] dests, uint256[] values) public onlyExecutor
     {
         uint256 i = 0;
         ERC20Interface T = ERC20Interface(_tokenAddr);
-        
+
         require(dests.length > 0 && (dests.length == values.length || values.length == 1));
-        
+
         if (values.length > 1)
         {
             while (i < dests.length) {
@@ -78,7 +78,7 @@ contract AirDrop
                 i += 1;
             }
         }
-        else    
+        else
         {
             while (i < dests.length) {
                 T.transfer(dests[i], values[0]);
@@ -87,13 +87,13 @@ contract AirDrop
         }
         eMultiTransfer(_tokenAddr, dests, values);
     }
-    
+
     function MultiTransferETH(address[] dests, uint256[] values) public onlyExecutor
     {
         uint256 i = 0;
         require(dests.length > 0 && (dests.length == values.length || values.length == 1));
-        
-        
+
+
         if (values.length > 1)
         {
             while (i < dests.length) {
@@ -101,7 +101,7 @@ contract AirDrop
                 i += 1;
             }
         }
-        else    
+        else
         {
             while (i < dests.length) {
                 dests[i].transfer(values[0]);
@@ -110,4 +110,20 @@ contract AirDrop
         }
         eMultiTransferETH(dests, values);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

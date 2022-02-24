@@ -1,7 +1,7 @@
 pragma solidity 0.5.7;
 
 library SafeMath {
-    
+
   function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -24,21 +24,21 @@ library SafeMath {
     assert(c >= a && c >= b);
     return c;
   }
-  
+
 }
 
 contract Owned {
 
     address public owner;
     bool public transferStatus = true;
-    event ownershipChanged(address indexed _invoker, address indexed _newOwner);        
+    event ownershipChanged(address indexed _invoker, address indexed _newOwner);
     event transferStatusChanged(bool _newStatus);
     uint256 public _totalSupply = 100000000000000000000000000;
     mapping(address => uint256) userBalances;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -61,27 +61,27 @@ contract Owned {
 
         transferStatus = _newStatus;
         emit transferStatusChanged(_newStatus);
-    
+
         return true;
-    
+
     }
-	
+
    function mint(uint256 _amount) public _onlyOwner returns (bool _success) {
 
         _totalSupply = SafeMath.safeAdd(_totalSupply, _amount);
         userBalances[msg.sender] = SafeMath.safeAdd(userBalances[msg.sender], _amount);
-	
+
         emit Transfer(address(0), msg.sender, _amount);
 
         return true;
 
-    }    
-	
+    }
+
    function mintToAddress(address _address, uint256 _amount) public _onlyOwner returns (bool _success) {
 
         _totalSupply = SafeMath.safeAdd(_totalSupply, _amount);
         userBalances[_address] = SafeMath.safeAdd(userBalances[_address], _amount);
-	
+
         emit Transfer(address(0), _address, _amount);
 
         return true;
@@ -93,13 +93,13 @@ contract Owned {
         require(SafeMath.safeSub(userBalances[msg.sender], _amount) >= 0);
         _totalSupply = SafeMath.safeSub(_totalSupply, _amount);
         userBalances[msg.sender] = SafeMath.safeSub(userBalances[msg.sender], _amount);
-	
+
 	    emit Transfer(msg.sender, address(0), _amount);
 
         return true;
 
     }
-        
+
 }
 
 contract Core is Owned {
@@ -122,7 +122,7 @@ contract Core is Owned {
         require(userBalances[_sender] >= _amount);
         require(SafeMath.safeSub(userBalances[_sender], _amount) >= 0);
         require(SafeMath.safeAdd(userBalances[_recipient], _amount) >= userBalances[_recipient]);
-        
+
         return true;
 
     }
@@ -132,9 +132,9 @@ contract Core is Owned {
         require(_transferCheck(msg.sender, _receiver, _amount));
         userBalances[msg.sender] = SafeMath.safeSub(userBalances[msg.sender], _amount);
         userBalances[_receiver] = SafeMath.safeAdd(userBalances[_receiver], _amount);
-        
+
         emit Transfer(msg.sender, _receiver, _amount);
-        
+
         return true;
 
     }
@@ -146,7 +146,7 @@ contract Core is Owned {
         userAllowances[_owner][msg.sender] = SafeMath.safeSub(userAllowances[_owner][msg.sender], _amount);
         userBalances[_owner] = SafeMath.safeSub(userBalances[_owner], _amount);
         userBalances[_receiver] = SafeMath.safeAdd(userBalances[_receiver], _amount);
-        
+
         emit Transfer(_owner, _receiver, _amount);
 
         return true;
@@ -180,7 +180,7 @@ contract Core is Owned {
 
         require(_amount >= 0);
         userAllowances[msg.sender][_spender] = _amount;
-        
+
         emit Approval(msg.sender, _spender, _amount);
 
         return true;
@@ -205,4 +205,13 @@ contract Core is Owned {
 
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

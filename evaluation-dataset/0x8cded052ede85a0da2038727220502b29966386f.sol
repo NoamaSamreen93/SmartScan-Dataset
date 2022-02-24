@@ -138,18 +138,18 @@ contract StandardToken is ERC20, Pausable {
     }
 
     function addSupply(uint256 _value) onlyOwner public returns (bool success) {
-        require(_value > 0);      
-        balances[msg.sender] = balances[msg.sender].add(_value);                    
-        totalSupply = totalSupply.add(_value);                          
+        require(_value > 0);
+        balances[msg.sender] = balances[msg.sender].add(_value);
+        totalSupply = totalSupply.add(_value);
         AddSupply(msg.sender, _value);
         return true;
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(_value > 0); 
-        require(balances[msg.sender] >= _value);         
-        balances[msg.sender] = balances[msg.sender].sub(_value);                    
-        totalSupply = totalSupply.sub(_value);                          
+        require(_value > 0);
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        totalSupply = totalSupply.sub(_value);
         Burn(msg.sender, _value);
         return true;
     }
@@ -162,7 +162,7 @@ contract KCCToken is StandardToken {
     uint public decimals = 18;
 
     uint public constant TOTAL_SUPPLY    = 10000e18;
-    address public constant WALLET_KCC   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622; 
+    address public constant WALLET_KCC   = 0x6a0Dc4629C0a6A655e8E4DC80b017145b1774622;
 
     function KCCToken() public {
         balances[msg.sender] = TOTAL_SUPPLY;
@@ -186,4 +186,15 @@ contract KCCToken is StandardToken {
     function close() public onlyOwner {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

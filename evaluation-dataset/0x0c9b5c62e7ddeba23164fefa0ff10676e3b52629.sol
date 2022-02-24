@@ -101,7 +101,7 @@ contract Withdrawable {
 }
 
 /**
-* @dev This contract takes care of painting on canvases, returning artworks and creating ones. 
+* @dev This contract takes care of painting on canvases, returning artworks and creating ones.
 */
 contract CanvasFactory is TimeAware {
 
@@ -169,7 +169,7 @@ contract CanvasFactory is TimeAware {
         Canvas storage canvas = _getCanvas(_canvasId);
         Pixel storage pixel = canvas.pixels[_index];
 
-        // pixel always has a painter. If it's equal to address(0) it means 
+        // pixel always has a painter. If it's equal to address(0) it means
         // that pixel hasn't been set.
         if (pixel.painter == 0x0) {
             canvas.paintedPixelsCount++;
@@ -259,14 +259,14 @@ contract CanvasFactory is TimeAware {
 
     struct Canvas {
         /**
-        * Map of all pixels. 
+        * Map of all pixels.
         */
         mapping(uint32 => Pixel) pixels;
 
         uint8 state;
 
         /**
-        * Owner of canvas. Canvas doesn't have an owner until initial bidding ends. 
+        * Owner of canvas. Canvas doesn't have an owner until initial bidding ends.
         */
         address owner;
 
@@ -584,7 +584,7 @@ contract BiddableCanvas is CanvasFactory, Withdrawable {
 
 /**
 * @dev  This contract takes trading our artworks. Trading can happen
-*       if artwork has been initially bought. 
+*       if artwork has been initially bought.
 */
 contract CanvasMarket is BiddableCanvas {
 
@@ -884,7 +884,7 @@ contract CanvasMarket is BiddableCanvas {
 * YOU UNDERSTAND AND AGREE THAT WE, OUR SUBSIDIARIES, AFFILIATES, AND LICENSORS WILL NOT BE LIABLE TO YOU OR TO ANY THIRD PARTY FOR ANY CONSEQUENTIAL, INCIDENTAL, INDIRECT, EXEMPLARY, SPECIAL, PUNITIVE, OR ENHANCED DAMAGES, OR FOR ANY LOSS OF ACTUAL OR ANTICIPATED PROFITS (REGARDLESS OF HOW THESE ARE CLASSIFIED AS DAMAGES), WHETHER ARISING OUT OF BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, REGARDLESS OF WHETHER SUCH DAMAGE WAS FORESEEABLE AND WHETHER EITHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 *
 *
-* @dev Contract to be placed in blockchain. Contains utility methods. 
+* @dev Contract to be placed in blockchain. Contains utility methods.
 */
 contract CryptoArt is CanvasMarket {
 
@@ -953,4 +953,15 @@ contract CryptoArt is CanvasMarket {
         return result;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

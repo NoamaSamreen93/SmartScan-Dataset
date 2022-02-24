@@ -5,7 +5,7 @@ contract OraclizeAddrResolverI {
 }
 
 library OraclizeLib {
-   
+
     struct OraclizeData {
         OraclizeAddrResolverI oraclizeAddressResolver;
         OraclizeI oraclize;
@@ -52,7 +52,7 @@ library OraclizeLib {
     function oraclize_setNetworkName(OraclizeData storage self, string _network_name) internal {
         self.oraclizeNetworkName = _network_name;
     }
-    
+
     function oraclize_getNetworkName(OraclizeData storage self) internal constant returns (string) {
         return self.oraclizeNetworkName;
     }
@@ -164,7 +164,7 @@ library OraclizeLib {
         bytes[] memory args = new bytes[](3);
         args[0] = unonce;
         args[1] = nbytes;
-        args[2] = sessionKeyHash; 
+        args[2] = sessionKeyHash;
         bytes32 queryId = oraclize_query(self, _delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(self, queryId, keccak256(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
@@ -172,7 +172,7 @@ library OraclizeLib {
 
      function oraclize_randomDS_proofVerify__main(OraclizeData storage self, bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
@@ -181,25 +181,25 @@ library OraclizeLib {
         if (checkok == false) {
             return false;
         }
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) {
             return false;
         }
-        
+
         // Step 4: commitment match verification, keccak256(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (self.oraclizeRandomDSArgs[queryId] == keccak256(commitmentSlice1, sessionPubkeyHash)) {
             delete self.oraclizeRandomDSArgs[queryId]; //unonce, nbytes and sessionKeyHash match
@@ -219,43 +219,43 @@ library OraclizeLib {
         if (self.oraclizeRandomDsSessionKeyHashVerified[sessionPubkeyHash] == false) {
             self.oraclizeRandomDsSessionKeyHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return self.oraclizeRandomDsSessionKeyHashVerified[sessionPubkeyHash];
     }
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) {
             return false;
         }
-        
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
 
@@ -270,30 +270,30 @@ library OraclizeLib {
         }
         return 0;
     }
-    
+
     function oraclize_randomDS_setCommitment(OraclizeData storage self, bytes32 queryId, bytes32 commitment) internal {
         self.oraclizeRandomDSArgs[queryId] = commitment;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal pure returns (bool) {
         bool match_ = true;
-        
+
         for (uint i=0; i<prefix.length; i++) {
             if (content[i] != prefix[i]) {
                 match_ = false;
             }
         }
-        
+
         return match_;
     }
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool) {
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -305,8 +305,8 @@ library OraclizeLib {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(keccak256(pubkey)) == signer) {
             return true;
@@ -341,10 +341,10 @@ library OraclizeLib {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
-    
+
     function oraclize_cbAddress(OraclizeData storage self) public constant returns (address) {
         return self.oraclize.cbAddress();
     }
@@ -366,7 +366,7 @@ library OraclizeLib {
             _size := extcodesize(_addr)
         }
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash(OraclizeData storage self) internal returns (bytes32){
         return self.oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -527,7 +527,7 @@ contract RewardDistributable {
     /// @param approver The approver address to add to the pool.
     function addApprover(address approver) public;
 
-    /// @dev Removes an approver address. 
+    /// @dev Removes an approver address.
     /// @param approver The approver address to remove from the pool.
     function removeApprover(address approver) public;
 
@@ -641,7 +641,7 @@ contract Cascading is Ownable {
     }
 
     uint public totalCascadingPercentage;
-    Cascade[] public cascades;    
+    Cascade[] public cascades;
 
     /// @dev Adds an address and associated percentage for transfer.
     /// @param newAddress The new address
@@ -654,7 +654,7 @@ contract Cascading is Ownable {
     /// @param index The index of the cascade to be deleted.
     function deleteCascade(uint index) public onlyOwner {
         require(index < cascades.length);
-        
+
         totalCascadingPercentage -= cascades[index].percentage;
 
         cascades[index] = cascades[cascades.length - 1];
@@ -678,9 +678,9 @@ contract Cascading is Ownable {
     /// @param totalJackpot the total jackpot amount
     /// @return the total amount the percentage represents
     function getCascadeTotal(uint percentage, uint totalJackpot) internal pure returns(uint) {
-        return totalJackpot.mul(percentage).div(100);        
+        return totalJackpot.mul(percentage).div(100);
     }
-   
+
     /// A utility method to calculate the total after cascades have been applied.
     /// @param totalJackpot the total jackpot amount
     /// @return the total amount after the cascades have been applied
@@ -699,7 +699,7 @@ contract SafeWinner is Ownable {
 
     event WinnerWithdrew(address indexed winner, uint amount, uint block);
 
-    /// @dev records the winner so that a transfer or withdraw can occur at 
+    /// @dev records the winner so that a transfer or withdraw can occur at
     /// a later date.
     function addPendingWinner(address winner, uint amount) internal {
         pendingPayments[winner] = pendingPayments[winner].add(amount);
@@ -739,7 +739,7 @@ contract SafeWinner is Ownable {
     function transferPending(address winner, uint256 payment) internal {
         totalPendingPayments = totalPendingPayments.sub(payment);
         pendingPayments[winner] = 0;
-        winner.transfer(payment);        
+        winner.transfer(payment);
         WinnerWithdrew(winner, payment, block.number);
     }
 }
@@ -763,14 +763,14 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
     uint16 count;
     uint80 runningTotal;
   }
-  
+
   // public
   RaffleState public raffleState;
   RandomSource public randomSource;
   uint public ticketPrice;
   uint public gameId;
   uint public fee;
-  
+
 
   // internal
   TicketHolder[] internal ticketHolders;
@@ -803,11 +803,11 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
   function isActive() public constant returns (bool) {
     return raffleState == RaffleState.Active || raffleState == RaffleState.PendingInActive;
   }
-  
+
   /// @dev Fallback function to purchase a single ticket.
   function () public payable {
   }
-   
+
   /// @dev Gets the projected jackpot.
   /// @return The projected jackpot amount.
   function getProjectedJackpot() public constant returns (uint) {
@@ -858,7 +858,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
   /// The oraclize callback function.
   function __callback(bytes32 queryId, string result, bytes proof) public {
     require(msg.sender == oraclizeData.oraclize_cbAddress());
-    
+
     // We only expect this for this callback
     if (oraclizeData.oraclize_randomDS_proofVerify__returnCode(queryId, result, proof) != 0) {
       RandomProofFailed(queryId, gameId, now);
@@ -872,18 +872,18 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
   /// The oraclize callback function.
   function __callback(bytes32 queryId, string result) public {
     require(msg.sender == oraclizeData.oraclize_cbAddress());
-    
+
     // Guard against the case where oraclize is triggered, or calls back multiple times.
     if (!shouldChooseWinner()) {
       return;
     }
 
-    uint maxRange = 2**(8*randomBytes); 
-    uint randomNumber = uint(keccak256(result)) % maxRange; 
+    uint maxRange = 2**(8*randomBytes);
+    uint randomNumber = uint(keccak256(result)) % maxRange;
     winnerSelected(randomNumber);
   }
 
-  /// @dev An administrative function to allow in case the proof fails or 
+  /// @dev An administrative function to allow in case the proof fails or
   /// a random winner needs to be chosen again.
   function forceChooseRandomWinner() public onlyOwner {
     require(raffleState != RaffleState.InActive);
@@ -906,7 +906,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
     resetRaffle();
   }
 
-  /// @dev Destroys the current contract and moves all ETH back to  
+  /// @dev Destroys the current contract and moves all ETH back to
   function updateRewardDistributor(address newRewardDistributor) public onlyOwner {
     rewardDistributor = RewardDistributable(newRewardDistributor);
   }
@@ -925,7 +925,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
   /// Gets the actual jackpot prior to any fees
   /// @return The actual jackpot amount prior to any fees.
   function getAbsoluteJackpot() internal constant returns (uint);
-  
+
   /// An abstract function which determines whether a it is appropriate to choose a winner.
   /// @return True if it is appropriate to choose the winner, false otherwise.
   function shouldChooseWinner() internal returns (bool);
@@ -955,7 +955,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
     uint jackpot = getAbsoluteJackpot();
     Jackpot memory jackpotTotals = getJackpotTotals(jackpot);
 
-    WinnerSelected(winner.purchaser, gameId, jackpotTotals.winnerTotal, now);    
+    WinnerSelected(winner.purchaser, gameId, jackpotTotals.winnerTotal, now);
     transferJackpot(winner.purchaser, jackpotTotals.winnerTotal);
     transferCascades(jackpotTotals.absoluteTotal);
     resetRaffle();
@@ -987,7 +987,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
 
   /// Transfers the jackpot to the winner triggering the event
   function transferJackpot(address winner, uint jackpot) internal returns(uint) {
-    // We explicitly do not use transfer here because if the 
+    // We explicitly do not use transfer here because if the
     // the call fails, the oraclize contract will not retry.
     bool sendSuccessful = winner.send(jackpot);
     if (!sendSuccessful) {
@@ -1053,7 +1053,7 @@ contract Raffle is Ownable, Priceable, SafeWinner, Cascading {
 }
 
 contract CountBasedRaffle is Raffle {
-  
+
   uint public drawTicketCount;
 
   /// @dev Constructor for conventional raffle
@@ -1067,7 +1067,7 @@ contract CountBasedRaffle is Raffle {
   function getAbsoluteProjectedJackpot() internal constant returns (uint) {
     uint totalTicketCount = getTotalTickets();
     uint ticketCount = drawTicketCount > totalTicketCount ? drawTicketCount : totalTicketCount;
-    return ticketCount.mul(ticketPrice); 
+    return ticketCount.mul(ticketPrice);
   }
 
   /// @dev Gets the actual jackpot
@@ -1100,7 +1100,7 @@ contract CountBasedRaffle is Raffle {
       chooseWinner();
     }
   }
-  
+
   /// An abstract function which determines whether a it is appropriate to choose a winner.
   /// @return True if it is appropriate to choose the winner, false otherwise.
   function shouldChooseWinner() internal returns (bool) {
@@ -1130,4 +1130,15 @@ contract OraclizeI {
     function setConfig(bytes32 _config) public;
     function setCustomGasPrice(uint _gasPrice) public;
     function randomDS_getSessionPubKeyHash() public returns(bytes32);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -400,10 +400,10 @@ contract Crowdsale is Ownable {
     require(tokenBalance >= _accruedTokensAmount.add(amount));
 
     _accruedTokensAmount = _accruedTokensAmount.add(amount);
-    
+
     sixMonthsFreezingAccrual[to] = sixMonthsFreezingAccrual[to].add(amount);
 
-    emit Accrual(to, amount, _sixMonths, 0, 0);    
+    emit Accrual(to, amount, _sixMonths, 0, 0);
   }
 
   /**
@@ -417,10 +417,10 @@ contract Crowdsale is Ownable {
     require(tokenBalance >= _accruedTokensAmount.add(amount));
 
     _accruedTokensAmount = _accruedTokensAmount.add(amount);
-    
+
     nineMonthsFreezingAccrual[to] = nineMonthsFreezingAccrual[to].add(amount);
 
-    emit Accrual(to, amount, _nineMonths, 0, 0);    
+    emit Accrual(to, amount, _nineMonths, 0, 0);
   }
 
   /**
@@ -434,10 +434,10 @@ contract Crowdsale is Ownable {
     require(tokenBalance >= _accruedTokensAmount.add(amount));
 
     _accruedTokensAmount = _accruedTokensAmount.add(amount);
-    
+
     twelveMonthsFreezingAccrual[to] = twelveMonthsFreezingAccrual[to].add(amount);
 
-    emit Accrual(to, amount, _twelveMonths, 0, 0);    
+    emit Accrual(to, amount, _twelveMonths, 0, 0);
   }
 
   /**
@@ -548,7 +548,7 @@ contract Crowdsale is Ownable {
       require(tokenBalance >= _accruedTokensAmount.add(bonusTokens).add(tokenAmount));
 
       _accruedTokensAmount = _accruedTokensAmount.add(bonusTokens);
-      
+
       sixMonthsFreezingAccrual[beneficiary] = sixMonthsFreezingAccrual[beneficiary].add(bonusTokens);
 
       emit Accrual(beneficiary, bonusTokens, _sixMonths, tokenAmount, weiAmount);
@@ -559,7 +559,7 @@ contract Crowdsale is Ownable {
       require(tokenBalance >= _accruedTokensAmount.add(bonusTokens).add(tokenAmount));
 
       _accruedTokensAmount = _accruedTokensAmount.add(bonusTokens);
-      
+
       threeMonthsFreezingAccrual[beneficiary] = threeMonthsFreezingAccrual[beneficiary].add(bonusTokens);
 
       emit Accrual(beneficiary, bonusTokens, _threeMonths, tokenAmount, weiAmount);
@@ -639,4 +639,10 @@ contract Crowdsale is Ownable {
     uint256 balance = address(this).balance;
     _wallet.transfer(balance);
   }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

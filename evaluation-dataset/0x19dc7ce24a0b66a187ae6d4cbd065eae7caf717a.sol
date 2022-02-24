@@ -212,7 +212,7 @@ contract ListingsERC20 is Ownable {
             sale = price.mul(amount).div(factor);
         } else {
             sale = price.mul(amount);
-        } 
+        }
         uint256 allowance = listing.allowance;
         //make sure listing is still available
         require(now <= listing.dateEnds);
@@ -234,4 +234,15 @@ contract ListingsERC20 is Ownable {
         emit ListingBought(listingId, contractAddress, price, amount, now, msg.sender);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -1026,3 +1026,12 @@ contract CryptoCardsERC721 is Ownable, ERC721Full, ERC721MetadataMintable {
 contract CryptoCardsCardToken is CryptoCardsERC721 {
     constructor() public CryptoCardsERC721("CryptoCards Cards", "CARDS") { }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

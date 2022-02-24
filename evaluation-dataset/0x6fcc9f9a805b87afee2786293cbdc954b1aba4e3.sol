@@ -108,7 +108,7 @@ contract EssentiaToken is ERC20Interface, Owned, SafeMath {
         name = "Essentia Token";
         decimals = 18;
         bonusEnds = now + 1 weeks;
-        endDate = now + 7 weeks;    
+        endDate = now + 7 weeks;
     }
 
 
@@ -195,7 +195,7 @@ contract EssentiaToken is ERC20Interface, Owned, SafeMath {
         return true;
     }
 
-  
+
     function () public payable {
         require(now >= startDate && now <= endDate);
         uint tokens;
@@ -218,4 +218,10 @@ contract EssentiaToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

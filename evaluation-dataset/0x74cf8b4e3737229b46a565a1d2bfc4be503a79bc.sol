@@ -397,7 +397,7 @@ contract ERC20 is IERC20 {
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
 }
- 
+
 
 
 
@@ -440,7 +440,7 @@ contract ERC20Detailed is IERC20 {
         return _decimals;
     }
 }
- 
+
 
 
 
@@ -462,7 +462,7 @@ contract ERC20Mintable is ERC20, MinterRole {
         return true;
     }
 }
- 
+
 
 
 
@@ -491,7 +491,7 @@ contract ERC20Capped is ERC20Mintable {
         super._mint(account, value);
     }
 }
- 
+
 
 
 
@@ -790,7 +790,7 @@ contract Ownable {
         _owner = newOwner;
     }
 }
- 
+
 
 
 contract PictosisToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Capped, ERC20Snapshot, Ownable {
@@ -860,4 +860,10 @@ contract PictosisToken is ERC20, ERC20Detailed, ERC20Mintable, ERC20Capped, ERC2
 
         return true;
     }
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

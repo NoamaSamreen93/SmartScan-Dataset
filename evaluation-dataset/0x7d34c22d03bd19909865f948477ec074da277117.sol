@@ -216,7 +216,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -316,7 +316,7 @@ interface KyberNetworkProxyInterface {
 
 // File: contracts/vendors/kyber/SimpleNetworkInterface.sol
 
-/// @title simple interface for Kyber Network 
+/// @title simple interface for Kyber Network
 interface SimpleNetworkInterface {
     function swapTokenToToken(ERC20 src, uint srcAmount, ERC20 dest, uint minConversionRate) public returns(uint);
     function swapEtherToToken(ERC20 token, uint minConversionRate) public payable returns(uint);
@@ -474,7 +474,7 @@ contract KyberNetworkProxy is KyberNetworkProxyInterface, SimpleNetworkInterface
         returns(uint)
     {
         require(src == ETH_TOKEN_ADDRESS || msg.value == 0);
-        
+
         UserBalance memory userBalanceBefore;
 
         userBalanceBefore.srcBalance = getBalance(src, msg.sender);
@@ -1231,39 +1231,39 @@ contract KyberConverter is TokenConverter, AvailableProvider, Ownable {
 
     function getReturn(
         Token from,
-        Token to, 
+        Token to,
         uint256 srcQty
     ) external view returns (uint256) {
         ERC20 srcToken = ERC20(from);
-        ERC20 destToken = ERC20(to);   
+        ERC20 destToken = ERC20(to);
         (uint256 amount,) = kyber.getExpectedRate(srcToken, destToken, srcQty);
         return amount;
     }
 
     function convert(
         Token from,
-        Token to, 
-        uint256 srcQty, 
+        Token to,
+        uint256 srcQty,
         uint256 minReturn
     ) external payable returns (uint256 destAmount) {
 
         ERC20 srcToken = ERC20(from);
-        ERC20 destToken = ERC20(to);       
+        ERC20 destToken = ERC20(to);
 
         if (srcToken == ETH_TOKEN_ADDRESS && destToken != ETH_TOKEN_ADDRESS) {
             require(msg.value == srcQty, "ETH not enought");
             execSwapEtherToToken(srcToken, srcQty, msg.sender);
         } else if (srcToken != ETH_TOKEN_ADDRESS && destToken == ETH_TOKEN_ADDRESS) {
-            require(msg.value == 0, "ETH not required");    
+            require(msg.value == 0, "ETH not required");
             execSwapTokenToEther(srcToken, srcQty, destToken);
         } else {
-            require(msg.value == 0, "ETH not required");    
+            require(msg.value == 0, "ETH not required");
             execSwapTokenToToken(srcToken, srcQty, destToken, msg.sender);
         }
 
-        require(destAmount > minReturn, "Return amount too low");   
+        require(destAmount > minReturn, "Return amount too low");
         emit Swap(msg.sender, srcToken, destToken, destAmount);
-    
+
         return destAmount;
     }
 
@@ -1273,7 +1273,7 @@ contract KyberConverter is TokenConverter, AvailableProvider, Ownable {
     @param destAddress address to send swapped tokens to
     */
     function execSwapEtherToToken(
-        ERC20 token, 
+        ERC20 token,
         uint srcQty,
         address destAddress
     ) internal returns (uint) {
@@ -1297,11 +1297,11 @@ contract KyberConverter is TokenConverter, AvailableProvider, Ownable {
     @param destAddress address to send swapped ETH to
     */
     function execSwapTokenToEther(
-        ERC20 token, 
-        uint256 tokenQty, 
+        ERC20 token,
+        uint256 tokenQty,
         address destAddress
     ) internal returns (uint) {
-            
+
         // Check that the player has transferred the token to this contract
         require(token.transferFrom(msg.sender, this, tokenQty), "Error pulling tokens");
 
@@ -1328,9 +1328,9 @@ contract KyberConverter is TokenConverter, AvailableProvider, Ownable {
     @param destAddress address to send swapped tokens to
     */
     function execSwapTokenToToken(
-        ERC20 srcToken, 
-        uint256 srcQty, 
-        ERC20 destToken, 
+        ERC20 srcToken,
+        uint256 srcQty,
+        ERC20 destToken,
         address destAddress
     ) internal returns (uint) {
 
@@ -1379,4 +1379,15 @@ contract KyberConverter is TokenConverter, AvailableProvider, Ownable {
     }
 
     function() external payable {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

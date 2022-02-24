@@ -57,7 +57,7 @@ pragma solidity ^0.4.24; contract DSMath {
     balances[msg.sender] = sub(balances[msg.sender],amount);
     msg.sender.transfer(amount);
     return balances[msg.sender];
-  } 
+  }
 
 function balance() view public returns (uint) {
     return balances[msg.sender];
@@ -93,7 +93,7 @@ function balance() view public returns (uint) {
     balances[msg.sender] = sub(balances[msg.sender],price);
     balances[artOwner] = add(balances[artOwner],sub(price,resaleFee));
     balances[artist] = add(balances[artist],resaleFee);
-    artOwner = msg.sender; 
+    artOwner = msg.sender;
     if(min(resalePrice,price)==resalePrice){
       resaleFee = 0 ether;
     } else{
@@ -108,4 +108,15 @@ function balance() view public returns (uint) {
   } function maxResalePrice() view public returns (uint){
     return add(add(rdiv(mul(price,maxPercentIncreaseAmount),100*RAY),price),maxFlatIncreaseAmount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

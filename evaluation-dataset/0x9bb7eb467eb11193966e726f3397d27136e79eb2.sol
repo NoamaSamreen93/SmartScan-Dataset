@@ -19,18 +19,18 @@ contract TMN {
 
     function TMN() {
         totalSupply = 4955000000000;
-        balanceOf[msg.sender] = totalSupply;                                     
-        name = 'Transmission';                                   
-        symbol = 'TMN';                          
-        decimals = 4;                            
+        balanceOf[msg.sender] = totalSupply;
+        name = 'Transmission';
+        symbol = 'TMN';
+        decimals = 4;
     }
 
     function transfer(address _to, uint256 _value) {
-        if (balanceOf[msg.sender] < _value) throw;           
-        if (balanceOf[_to] + _value < balanceOf[_to]) throw; 
-        balanceOf[msg.sender] -= _value;                     
-        balanceOf[_to] += _value;                            
-        Transfer(msg.sender, _to, _value);                  
+        if (balanceOf[msg.sender] < _value) throw;
+        if (balanceOf[_to] + _value < balanceOf[_to]) throw;
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        Transfer(msg.sender, _to, _value);
     }
 
     function approve(address _spender, uint256 _value)
@@ -46,14 +46,14 @@ contract TMN {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (balanceOf[_from] < _value) throw;                
-        if (balanceOf[_to] + _value < balanceOf[_to]) throw;  
-        if (_value > allowance[_from][msg.sender]) throw;   
-        balanceOf[_from] -= _value;                          
-        balanceOf[_to] += _value;                            
+        if (balanceOf[_from] < _value) throw;
+        if (balanceOf[_to] + _value < balanceOf[_to]) throw;
+        if (_value > allowance[_from][msg.sender]) throw;
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
@@ -62,4 +62,13 @@ contract TMN {
     function () {
         throw;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

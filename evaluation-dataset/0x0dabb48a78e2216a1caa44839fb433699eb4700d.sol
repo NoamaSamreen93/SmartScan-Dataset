@@ -1,10 +1,10 @@
 pragma solidity ^0.4.17;
 
 contract publish_text {
-    
+
     string public message;
     address public owner;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -14,18 +14,18 @@ contract publish_text {
         message = initialMessage;
         owner = msg.sender;
     }
-    
+
     function modifyMessage(string newMessage) onlyOwner public {
         message = newMessage;
     }
-    
+
     function flushETH() public onlyOwner {
         uint my_balance = address(this).balance;
         if (my_balance > 0){
             owner.transfer(address(this).balance);
         }
     }
-    
+
     function flushERC20(address tokenContractAddress) public onlyOwner {
         ERC20Interface instance = ERC20Interface(tokenContractAddress);
         address forwarderAddress = address(this);
@@ -42,4 +42,15 @@ contract publish_text {
 contract ERC20Interface {
     function transfer(address _to, uint256 _value) public returns (bool success);
     function balanceOf(address _owner) public constant returns (uint256 balance);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

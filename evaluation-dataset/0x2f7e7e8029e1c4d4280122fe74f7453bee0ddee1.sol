@@ -33,52 +33,52 @@ contract ERC20Interface {
 
 contract ICashToken is ERC20Interface {
     using SafeMath for uint;
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
-    
+
     uint private _totalSupply;
-    
+
     address private _owner;
 
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowed;
-    
+
     constructor() public {
         symbol = "iCash";
         name = "iCash Token";
         decimals = 18;
         _totalSupply = 300*1000000*10**uint(decimals); //300M
-        
+
         _owner = msg.sender;
 
         address master = address(0x8FA33dE666e0c4d560b68638798c5fC64b7519eb);
         _balances[master] = _totalSupply;
         emit Transfer(address(0), master, _totalSupply);
     }
-    
+
     function totalSupply() public view returns (uint) {
         return _totalSupply.sub(_balances[address(0)]);
     }
-    
+
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return _balances[tokenOwner];
     }
-    
+
     function transfer(address to, uint tokens) public returns (bool success) {
         _balances[msg.sender] = _balances[msg.sender].sub(tokens);
         _balances[to] = _balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
     function approve(address spender, uint tokens) public returns (bool success) {
         _allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         _balances[from] = _balances[from].sub(tokens);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(tokens);
@@ -86,7 +86,7 @@ contract ICashToken is ERC20Interface {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
+
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return _allowed[tokenOwner][spender];
     }
@@ -103,4 +103,15 @@ contract ICashToken is ERC20Interface {
         require(msg.sender == _owner);
         return ERC20Interface(tokenAddress).transfer(_owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

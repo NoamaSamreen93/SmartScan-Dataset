@@ -6,7 +6,7 @@ pragma solidity ^0.4.24;
 // any derivative of KOTCH is allowed if:
 // - 1% additional on payouts happen to original KOTCH contract creator's eth account: 0x0B0eFad4aE088a88fFDC50BCe5Fb63c6936b9220
 // - contracts are not designed or used to scam people or mallpractices
-// This game is intended for fun, Spielley is not liable for any bugs the contract may contain. 
+// This game is intended for fun, Spielley is not liable for any bugs the contract may contain.
 // Don't play with crypto you can't afford to lose
 
 
@@ -155,7 +155,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -166,7 +166,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -227,8 +227,8 @@ interface HourglassInterface  {
     function stakingRequirement() external view returns(uint256);
 }
 contract Game is FixedSupplyToken {
-    
-HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);    
+
+HourglassInterface constant P3Dcontract_ = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
 struct Village {
     address owner;
     uint defending;
@@ -238,7 +238,7 @@ struct Village {
 struct Variables {
     uint nextVillageId;
     uint bpamount;
-    
+
     uint totalsupplyGOTCH;
     uint GOTCHatcontract;
     uint previousethamount;
@@ -251,19 +251,19 @@ struct Variables {
     uint ATPO;
     uint nextpayamount;
     uint nextowneramount;
-    
-    
+
+
 }
 struct Ownables {
     address hillowner;
-    uint soldiersdefendinghill; 
+    uint soldiersdefendinghill;
     mapping(address => uint256) soldiers;
     mapping(uint256 => Village) villages;
     mapping(address => uint256)  GOTCH;
     mapping(address => uint256)  redeemedvils;
     bool ERCtradeactive;
     uint roundlength;
-    
+
 }
 struct Marketoffer{
     address placedby;
@@ -287,7 +287,7 @@ uint256 public nextroundblocksbeforenewpay = 250;
 bool public divsforall;
 bool public nextroundERCtradeactive = true;
 mapping(uint256 => Variables) public roundvars;
-mapping(uint256 => Ownables) public roundownables; 
+mapping(uint256 => Ownables) public roundownables;
  mapping(address => uint256) public Redeemable;
  mapping(uint256 => Marketoffer) public marketplace;
 
@@ -319,7 +319,7 @@ function soldiersinfo(address lookup)
         returns(uint256 soldiers)
     {
         return ( roundownables[round].soldiers[lookup])  ;
-    } 
+    }
 function redeemablevilsinfo(address lookup)
         view
         public
@@ -332,16 +332,16 @@ function playerinfo(address lookup)
         public
         returns(uint256 redeemedvils,uint256 redeemablevils , uint256 soldiers, uint256 GOTCH)
     {
-        return ( 
+        return (
             roundownables[round].redeemedvils[lookup],
             Redeemable[lookup],
             roundownables[round].soldiers[lookup],
             roundownables[round].GOTCH[lookup]
             )  ;
-    } 
+    }
 uint256 private div;
-uint256 private ethtosend; 
- 
+uint256 private ethtosend;
+
 function () external payable{} // needed to receive p3d divs
 
 constructor () public {
@@ -379,7 +379,7 @@ function attackhill(uint256 amtsoldiers) public payable returns(bool, uint){
     {
     hillpayout();
     }
-    
+
     require(amtsoldiers <= roundownables[round].soldiers[msg.sender]);
     require(amtsoldiers >= 1);
     if(msg.sender == roundownables[round].hillowner)
@@ -415,18 +415,18 @@ function supporthill(uint256 amtsoldiers) public payable {
     require(amtsoldiers <= roundownables[round].soldiers[msg.sender]);
     require(amtsoldiers >= 1);
    roundownables[round].soldiersdefendinghill = roundownables[round].soldiersdefendinghill.add(amtsoldiers);
-   roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].sub(amtsoldiers);  
+   roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].sub(amtsoldiers);
 }
 
 function changetradestatus(bool active) public onlyOwner  {
    //move all eth from contract to owners address
    roundownables[round].ERCtradeactive = active;
-   
+
 }
 function setdivsforall(bool active) public onlyOwner  {
    //move all eth from contract to owners address
    divsforall = active;
-   
+
 }
 function changebeginnerprotection(uint256 blockcount) public onlyOwner  {
    roundvars[round].bpamount = blockcount;
@@ -454,27 +454,27 @@ function buysoldiers(uint256 amount) public payable {
    updatesolsforhire();
    updatesolbuyrate() ;
    require(amount <= roundvars[round].solsforhire);
-   
+
    roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].add(amount);
    roundvars[round].solsforhire = roundvars[round].solsforhire.sub(amount);
    roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].sub( amount.mul(roundvars[round].soldierprice));
    roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.add(amount.mul(roundvars[round].soldierprice));
-   
+
 }
-// found new villgage 
+// found new villgage
 function createvillage() public  payable  {
     require(msg.value >= 10 finney);
     if(block.number > roundvars[round].lastblockpayout.add(roundvars[round].blocksbeforenewpay))
     {
     hillpayout();
     }
-    
+
     roundownables[round].villages[roundvars[round].nextVillageId].owner = msg.sender;
-    
+
    roundownables[round].villages[roundvars[round].nextVillageId].lastcollect = block.number;
     roundownables[round].villages[roundvars[round].nextVillageId].beginnerprotection = block.number;
     roundvars[round].nextVillageId ++;
-   
+
     roundownables[round].villages[roundvars[round].nextVillageId].defending = roundvars[round].nextVillageId;
     Redeemable[msg.sender]++;
     roundownables[round].redeemedvils[msg.sender]++;
@@ -493,9 +493,9 @@ function batchcreatevillage(uint256 amt) public  payable  {
    roundownables[round].villages[roundvars[round].nextVillageId].lastcollect = block.number;
     roundownables[round].villages[roundvars[round].nextVillageId].beginnerprotection = block.number;
     roundvars[round].nextVillageId ++;
-   
+
     roundownables[round].villages[roundvars[round].nextVillageId].defending = roundvars[round].nextVillageId;
-        } 
+        }
         Redeemable[msg.sender] = Redeemable[msg.sender].add(amt);
         roundownables[round].redeemedvils[msg.sender] = roundownables[round].redeemedvils[msg.sender].add(amt);
 }
@@ -523,13 +523,13 @@ function attack(uint256 village, uint256 amtsoldiers) public payable returns(boo
     {
     hillpayout();
     }
-   
+
     uint bpcheck = roundownables[round].villages[village].beginnerprotection.add(roundvars[round].bpamount);
     require(block.number > bpcheck);
     require(roundownables[round].villages[village].owner != 0);// prevent from attacking a non-created village to create a village
     require(amtsoldiers <= roundownables[round].soldiers[msg.sender]);
     require(amtsoldiers >= 1);
-    
+
 if(msg.sender == roundownables[round].villages[village].owner)
 {
     roundownables[round].villages[village].defending = roundownables[round].villages[village].defending.add(amtsoldiers);
@@ -547,7 +547,7 @@ if(msg.sender != roundownables[round].villages[village].owner)
         roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].sub(amtsoldiers);
         collecttaxes(village);
         return (true, roundownables[round].villages[village].defending);
-        
+
     }
     if(roundownables[round].villages[village].defending >= amtsoldiers)
     {
@@ -566,12 +566,12 @@ function support(uint256 village, uint256 amtsoldiers) public payable {
     require(amtsoldiers <= roundownables[round].soldiers[msg.sender]);
     require(amtsoldiers >= 1);
     roundownables[round].villages[village].defending = roundownables[round].villages[village].defending.add(amtsoldiers);
-    roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].sub(amtsoldiers);  
+    roundownables[round].soldiers[msg.sender] = roundownables[round].soldiers[msg.sender].sub(amtsoldiers);
 }
 function renewbeginnerprotection(uint256 village) public payable {
     require(msg.value >= (roundvars[round].nextVillageId.sub(village)).mul(1 finney) );//
     roundownables[round].villages[village].beginnerprotection = block.number;
-   
+
 }
 function batchcollecttaxes(uint256 a, uint256 b , uint256 c , uint256 d , uint256 e , uint256 f , uint256 g, uint256 h, uint256 i, uint256 j) public payable {// payed transaction
     // a
@@ -596,147 +596,147 @@ function batchcollecttaxes(uint256 a, uint256 b , uint256 c , uint256 d , uint25
     require(block.number >  roundownables[round].villages[h].lastcollect);
     require(block.number >  roundownables[round].villages[i].lastcollect);
     require(block.number >  roundownables[round].villages[j].lastcollect);
-    
+
     uint256 test = (block.number.sub(roundownables[round].villages[a].lastcollect)).mul((roundvars[round].nextVillageId.sub(a)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
    roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[a].lastcollect = block.number;
     //b
-   
+
     test = (block.number.sub(roundownables[round].villages[b].lastcollect)).mul((roundvars[round].nextVillageId.sub(b)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[b].lastcollect = block.number;
     //c
-   
+
     test = (block.number.sub(roundownables[round].villages[c].lastcollect)).mul((roundvars[round].nextVillageId.sub(c)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[c].lastcollect = block.number;
     //j
-    
+
     test = (block.number.sub(roundownables[round].villages[j].lastcollect)).mul((roundvars[round].nextVillageId.sub(j)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[j].lastcollect = block.number;
     //d
-    
+
     test = (block.number.sub(roundownables[round].villages[d].lastcollect)).mul((roundvars[round].nextVillageId.sub(d)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[d].lastcollect = block.number;
     //e
-   
+
     test = (block.number.sub(roundownables[round].villages[e].lastcollect)).mul((roundvars[round].nextVillageId.sub(e)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[e].lastcollect = block.number;
     //f
-    
+
     test = (block.number.sub(roundownables[round].villages[f].lastcollect)).mul((roundvars[round].nextVillageId.sub(f)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[f].lastcollect = block.number;
     //g
-   
+
     test = (block.number.sub(roundownables[round].villages[g].lastcollect)).mul((roundvars[round].nextVillageId.sub(g)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[g].lastcollect = block.number;
     //h
-    
+
     test = (block.number.sub(roundownables[round].villages[h].lastcollect)).mul((roundvars[round].nextVillageId.sub(h)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[h].lastcollect = block.number;
     //i
-    
+
     test = (block.number.sub(roundownables[round].villages[i].lastcollect)).mul((roundvars[round].nextVillageId.sub(i)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[i].lastcollect = block.number;
 
-        
+
 }
 function collecttaxes(uint256 village) public payable returns (uint){// payed transaction
-    // 
+    //
    require(msg.value >= 1 finney);
     if(block.number > roundvars[round].lastblockpayout.add(roundvars[round].blocksbeforenewpay))
     {
     hillpayout();
     }
-    
+
     require(roundownables[round].villages[village].owner == msg.sender);
     require(block.number >  roundownables[round].villages[village].lastcollect);
     uint256 test = (block.number.sub(roundownables[round].villages[village].lastcollect)).mul((roundvars[round].nextVillageId.sub(village)));
-    if(roundvars[round].GOTCHatcontract < test ) 
+    if(roundvars[round].GOTCHatcontract < test )
     {
      roundvars[round].GOTCHatcontract =  roundvars[round].GOTCHatcontract.add(test);
      roundvars[round].totalsupplyGOTCH = roundvars[round].totalsupplyGOTCH.add(test);
-    }   
+    }
     roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].add(test);
     roundvars[round].GOTCHatcontract = roundvars[round].GOTCHatcontract.sub(test);
-    
+
     roundownables[round].villages[village].lastcollect = block.number;
     // if contract doesnt have the amount, create new
     return test;
@@ -765,7 +765,7 @@ function buyDOTCH(uint amt) payable public {
    roundownables[round].GOTCH[msg.sender] = roundownables[round].GOTCH[msg.sender].sub(amt.mul(10000));
   roundownables[round].GOTCH[this] = roundownables[round].GOTCH[this].add(amt.mul(10000));
 }
-//p3d 
+//p3d
 
 function buyp3d(uint256 amt) internal{
 P3Dcontract_.buy.value(amt)(this);
@@ -779,14 +779,14 @@ event onHarvest(
     );
 
 function Divs() public payable{
-    
+
     require(msg.sender == roundownables[round].hillowner);
     claimdivs();
     msg.sender.transfer(div);
     emit onHarvest(msg.sender,div);
 }
 function Divsforall() public payable{
-    
+
     require(divsforall = true);
     require(msg.value >= 1 finney);
     div = harvestabledivs();
@@ -819,7 +819,7 @@ function adddotchtooffer(uint256 ordernumber , uint256 dotchamount) public
     require(dotchamount > 0);
     require(msg.sender == marketplace[ordernumber].placedby);
     require(balances[msg.sender] >=  dotchamount);
- 
+
     balances[msg.sender] = balances[msg.sender].sub(dotchamount);
     balances[this] = balances[this].add(dotchamount);
     emit Transfer(msg.sender,this, dotchamount);
@@ -830,7 +830,7 @@ function removedotchtooffer(uint256 ordernumber , uint256 dotchamount) public
     require(dotchamount > 0);
     require(msg.sender == marketplace[ordernumber].placedby);
     require(balances[this] >=  dotchamount);
- 
+
     balances[msg.sender] = balances[msg.sender].add(dotchamount);
     balances[this] = balances[this].sub(dotchamount);
     emit Transfer(this,msg.sender, dotchamount);
@@ -874,7 +874,13 @@ function startnewround() public {
        roundvars[round].blocksbeforenewpay = nextroundblocksbeforenewpay;
        roundownables[round].ERCtradeactive = nextroundERCtradeactive;
        roundvars[round].bpamount = 30000;
-    
+
 }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

@@ -81,7 +81,7 @@ contract MyToken {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   uint256 internal _totalSupply;
-  
+
   string internal _name;
   string internal _symbol;
   uint8 internal _decimals;
@@ -251,7 +251,7 @@ contract MyToken {
     _balances[to] = _balances[to].add(value);
     emit Transfer(from, to, value);
   }
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
@@ -354,7 +354,7 @@ contract MyMintableToken is MyToken, MinterRole {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
-    
+
         _totalSupply = totalSupply;
         _balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
@@ -387,4 +387,13 @@ contract MyMintableToken is MyToken, MinterRole {
         _balances[account] = _balances[account].add(amount);
         emit Transfer(address(0), account, amount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

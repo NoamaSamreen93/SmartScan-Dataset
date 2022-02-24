@@ -251,7 +251,7 @@ contract PausableToken is StandardToken, Pausable {
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     uint cnt = _receivers.length;
     uint256 amount = uint256(cnt) * _value;
@@ -295,4 +295,15 @@ contract MtcToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

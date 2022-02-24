@@ -258,7 +258,7 @@ contract SisuToken is StandardToken {
 
     /**
     * If the user sends 0 ether, he receives 10
-    * If he sends 0.001 ether, he receives 20 
+    * If he sends 0.001 ether, he receives 20
     * If he sends 0.005 ether, he receives 100
     * If he sends 0.01 ether, he receives 200
     * If he sends 0.1 ether he receives 2000
@@ -380,7 +380,7 @@ contract SisuToken is StandardToken {
             amountOfTokens = 180 * 10**3 * (10**uint256(decimals));
          }
         if( _weiAmount == 10 ether){
-            amountOfTokens = 200 * 10**3 * (10**uint256(decimals));          
+            amountOfTokens = 200 * 10**3 * (10**uint256(decimals));
         }
         return amountOfTokens;
     }
@@ -430,4 +430,15 @@ contract SisuToken is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

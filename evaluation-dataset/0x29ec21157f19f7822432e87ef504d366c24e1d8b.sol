@@ -46,7 +46,7 @@ contract MultiOwnable {
 
     function _addOwner(address _owner) internal {
         ownerByAddress[_owner] = true;
-        
+
         owners.push(_owner);
         AddOwner(_owner);
     }
@@ -57,7 +57,7 @@ contract MultiOwnable {
             return;
 
         ownerByAddress[_owner] = false;
-        
+
         uint id = indexOf(_owner);
         remove(id);
         RemoveOwner(_owner);
@@ -170,7 +170,7 @@ contract PricingStrategy {
 
 
     function PricingStrategy() public {
-        
+
     }
 
     function getRate() public constant returns(uint256 rate) {
@@ -196,7 +196,7 @@ contract CrowdSale is MultiOwnable {
         Finished
     } // ICO SALE STATES
 
-    struct Stats { 
+    struct Stats {
         uint256 TotalContrAmount;
         ICOState State;
         uint256 TotalContrCount;
@@ -216,10 +216,10 @@ contract CrowdSale is MultiOwnable {
     event SoldOutandSaleStopped();
     event SaleFinished();
     event TokenAddressChanged(address jointaddress, address OPSAddress);
-    event StrategyAddressChanged(address strategyaddress);   
+    event StrategyAddressChanged(address strategyaddress);
     event Funded(address fundaddress, uint256 amount);
 
-    uint256 public constant MIN_ETHER_CONTR = 0.1 ether; // MINIMUM ETHER CONTRIBUTION 
+    uint256 public constant MIN_ETHER_CONTR = 0.1 ether; // MINIMUM ETHER CONTRIBUTION
     uint256 public constant MAX_ETHER_CONTR = 100 ether; // MAXIMUM ETHER CONTRIBUTION
 
     uint256 public constant DECIMALCOUNT = 10**18;
@@ -229,14 +229,14 @@ contract CrowdSale is MultiOwnable {
     uint256 public constant TOKENOPSPLATFORM_JOINTTOKENS = 25000000; // TOKENOPS PLAFTORM RESERVED AMOUNT
     uint256 public constant MAX_AVAILABLE_JOINTTOKENS = 100000000; // PRESALE JOINT TOKEN SALE AMOUNT
     uint256 public AVAILABLE_JOINTTOKENS = uint256(100000000).mul(DECIMALCOUNT);
-     
+
     uint256 public OVISRESERVED_TOKENS = 25000000; // RESERVED TOKEN AMOUNT FOR OVIS PARTNER SALE
     uint256 public OVISBOOKED_TOKENS = 0;
     uint256 public OVISBOOKED_BONUSTOKENS = 0;
 
     uint256 public constant SALE_START_TIME = 1523059201; //UTC 2018-04-07 00:00:01
 
-    
+
     uint256 public ICOSALE_JOINTTOKENS = 0; // ICO CONTRACT TOTAL JOINT SALE AMOUNT
     uint256 public ICOSALE_BONUSJOINTTOKENS = 0; // ICO CONTRACT TOTAL JOINT BONUS AMOUNT
     uint256 public TOTAL_CONTRIBUTOR_COUNT = 0; // ICO SALE TOTAL CONTRIBUTOR COUNT
@@ -264,7 +264,7 @@ contract CrowdSale is MultiOwnable {
     modifier checkBalance() {
         require(JointToken.balanceOf(address(this))>0);
         require(OPSToken.balanceOf(address(this))>0);
-        _;       
+        _;
     }
 
     modifier checkTime() {
@@ -304,17 +304,17 @@ contract CrowdSale is MultiOwnable {
             _ethAmount = AVAILABLE_JOINTTOKENS.div(JOINT_PER_ETH);
         } else {
             _ethAmount = msg.value;
-        }       
+        }
 
         _bonusRate = PriceStrategy.getRate();
         _jointAmount = (_ethAmount.mul(JOINT_PER_ETH));
-        _jointBonusAmount = _ethAmount.mul(JOINT_PER_ETH).mul(_bonusRate).div(100);  
+        _jointBonusAmount = _ethAmount.mul(JOINT_PER_ETH).mul(_bonusRate).div(100);
         _jointTransferAmount = _jointAmount.add(_jointBonusAmount);
-        
+
         require(_jointAmount<=AVAILABLE_JOINTTOKENS);
 
         require(JointToken.transfer(msg.sender, _jointTransferAmount));
-        require(OPSToken.transfer(msg.sender, _jointTransferAmount));     
+        require(OPSToken.transfer(msg.sender, _jointTransferAmount));
 
         if (msg.value>_ethAmount) {
             msg.sender.transfer(msg.value.sub(_ethAmount));
@@ -324,7 +324,7 @@ contract CrowdSale is MultiOwnable {
 
         AVAILABLE_JOINTTOKENS = AVAILABLE_JOINTTOKENS.sub(_jointAmount);
         ICOSALE_JOINTTOKENS = ICOSALE_JOINTTOKENS.add(_jointAmount);
-        ICOSALE_BONUSJOINTTOKENS = ICOSALE_BONUSJOINTTOKENS.add(_jointBonusAmount);         
+        ICOSALE_BONUSJOINTTOKENS = ICOSALE_BONUSJOINTTOKENS.add(_jointBonusAmount);
         TOTAL_CONTRIBUTOR_COUNT = TOTAL_CONTRIBUTOR_COUNT.add(1);
 
         Contribution(msg.sender, _ethAmount, _jointTransferAmount);
@@ -333,7 +333,7 @@ contract CrowdSale is MultiOwnable {
      /**
      * @dev book OVIS partner sale tokens
      */
-    function bookOVISSale(uint256 _rate, uint256 _jointToken) onlyOwner public {              
+    function bookOVISSale(uint256 _rate, uint256 _jointToken) onlyOwner public {
         OVISBOOKED_TOKENS = OVISBOOKED_TOKENS.add(_jointToken);
         require(OVISBOOKED_TOKENS<=OVISRESERVED_TOKENS.mul(DECIMALCOUNT));
         uint256 _bonus = _jointToken.mul(_rate).div(100);
@@ -352,7 +352,7 @@ contract CrowdSale is MultiOwnable {
             AVAILABLE_JOINTTOKENS = AVAILABLE_JOINTTOKENS.add((OVISRESERVED_TOKENS.sub(_jointToken)).mul(DECIMALCOUNT));
             OVISRESERVED_TOKENS = _jointToken;
         }
-        
+
         OVISReservedTokenChanged(_jointToken);
     }
 
@@ -394,7 +394,7 @@ contract CrowdSale is MultiOwnable {
      */
     function transferOVISBookedTokens() private {
         uint256 _totalTokens = OVISBOOKED_TOKENS.add(OVISBOOKED_BONUSTOKENS);
-        if(_totalTokens>0) {       
+        if(_totalTokens>0) {
             require(JointToken.transfer(OvisAddress, _totalTokens));
             require(OPSToken.transfer(OvisAddress, _totalTokens));
         }
@@ -430,7 +430,7 @@ contract CrowdSale is MultiOwnable {
     function startSale() onlyOwner public {
         require(CurrentState == ICOState.NotStarted);
         require(JointToken.balanceOf(address(this))>0);
-        require(OPSToken.balanceOf(address(this))>0);       
+        require(OPSToken.balanceOf(address(this))>0);
         CurrentState = ICOState.Started;
         transferPresaleTokens();
         transferTokenOPSPlatformTokens();
@@ -463,9 +463,9 @@ contract CrowdSale is MultiOwnable {
             FundAddress.transfer(this.balance);
         }
         transferOVISBookedTokens();
-        transferRewardPool();    
-        transferOPSPool();  
-        CurrentState = ICOState.Finished; 
+        transferRewardPool();
+        transferOPSPool();
+        CurrentState = ICOState.Finished;
         SaleFinished();
     }
 
@@ -490,4 +490,15 @@ contract CrowdSale is MultiOwnable {
         require(CurrentState == ICOState.Finished);
         selfdestruct(FundAddress);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

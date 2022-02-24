@@ -1,4 +1,4 @@
-/*   
+/*
  *    Exodus adaptation of OasisDirectProxy by MakerDAO.
  *    Edited by Konnor Klashinsky (kklash).
  *    Work in progress, first Mainnet iteration.
@@ -77,7 +77,7 @@ contract TokenInterface {
 contract Control {
 /* TODO: convert to DSAuth if needed */
     address owner;
-    
+
     modifier auth {
          require(msg.sender == owner);
          _; /* func body goes here */
@@ -86,7 +86,7 @@ contract Control {
     function withdrawTo(address _to, uint amt) public auth {
         _to.transfer(amt);
     }
-    
+
     function withdrawTokenTo(TokenInterface token, address _to, uint amt) public auth {
         require(token.transfer(_to, amt));
     }
@@ -98,7 +98,7 @@ contract Control {
 
 contract OasisDirectProxy is Control, DSMath {
     uint feePercentageWad;
-    
+
     constructor() public {
         owner = msg.sender;
         feePercentageWad = 0.01 ether; /* set initial fee to 1% */
@@ -114,17 +114,17 @@ contract OasisDirectProxy is Control, DSMath {
         fee = wmul(amt*WAD, feePercentageWad) / WAD;
         remaining = sub(amt, fee);
     }
-    
+
     function withdrawAndSend(TokenInterface wethToken, uint wethAmt) internal {
         wethToken.withdraw(wethAmt);
         require(msg.sender.call.value(wethAmt)());
     }
-    
+
     function sellAllAmount(
         OtcInterface otc,
-        TokenInterface payToken, 
-        uint payAmt, 
-        TokenInterface buyToken, 
+        TokenInterface payToken,
+        uint payAmt,
+        TokenInterface buyToken,
         uint minBuyAmt
     ) public returns (uint) {
         require(payToken.transferFrom(msg.sender, this, payAmt));
@@ -157,9 +157,9 @@ contract OasisDirectProxy is Control, DSMath {
 
     function sellAllAmountBuyEth(
         OtcInterface otc,
-        TokenInterface payToken, 
-        uint payAmt, 
-        TokenInterface wethToken, 
+        TokenInterface payToken,
+        uint payAmt,
+        TokenInterface wethToken,
         uint minBuyAmt
     ) public returns (uint) {
         require(payToken.transferFrom(msg.sender, this, payAmt));
@@ -168,16 +168,16 @@ contract OasisDirectProxy is Control, DSMath {
         }
         uint wethAmt = otc.sellAllAmount(payToken, payAmt, wethToken, minBuyAmt);
         (uint feeAmt, uint wethAmtRemainder) = takeFee(wethAmt);
-        require(wethToken.transfer(owner, feeAmt)); /* fee is taken in WETH */ 
+        require(wethToken.transfer(owner, feeAmt)); /* fee is taken in WETH */
         withdrawAndSend(wethToken, wethAmtRemainder);
         return wethAmtRemainder;
     }
 
     function buyAllAmount(
-        OtcInterface otc, 
-        TokenInterface buyToken, 
-        uint buyAmt, 
-        TokenInterface payToken, 
+        OtcInterface otc,
+        TokenInterface buyToken,
+        uint buyAmt,
+        TokenInterface payToken,
         uint maxPayAmt
     ) public returns (uint payAmt) {
         uint payAmtNow = otc.getPayAmount(payToken, buyToken, buyAmt);
@@ -185,16 +185,16 @@ contract OasisDirectProxy is Control, DSMath {
         require(payToken.transferFrom(msg.sender, this, payAmtNow));
         if (payToken.allowance(this, otc) < payAmtNow) {
             payToken.approve(otc, uint(-1));
-        } 
+        }
         payAmt = otc.buyAllAmount(buyToken, buyAmt, payToken, payAmtNow);
         require(buyToken.transfer(msg.sender, min(buyAmt, buyToken.balanceOf(this)))); // To avoid rounding issues we check the minimum value
                                 /* TODO: Find out what this is for, before touching it */
     }
 
     function buyAllAmountPayEth(
-        OtcInterface otc, 
-        TokenInterface buyToken, 
-        uint buyAmt, 
+        OtcInterface otc,
+        TokenInterface buyToken,
+        uint buyAmt,
         TokenInterface wethToken
     ) public payable returns (uint wethAmt) {
         // In this case user needs to send more ETH than a estimated value, then contract will send back the rest
@@ -209,10 +209,10 @@ contract OasisDirectProxy is Control, DSMath {
     }
 
     function buyAllAmountBuyEth(
-        OtcInterface otc, 
-        TokenInterface wethToken, 
-        uint wethAmt, 
-        TokenInterface payToken, 
+        OtcInterface otc,
+        TokenInterface wethToken,
+        uint wethAmt,
+        TokenInterface payToken,
         uint maxPayAmt
     ) public returns (uint payAmt) {
         uint payAmtNow = otc.getPayAmount(payToken, wethToken, wethAmt);
@@ -228,4 +228,15 @@ contract OasisDirectProxy is Control, DSMath {
     }
 
     function() public payable {}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

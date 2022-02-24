@@ -1,46 +1,46 @@
 pragma solidity ^0.4.8;
 
-   
+
 
 interface ERC20Interface {
 
-   
+
 
     function totalSupply() constant returns (uint256 totalSupply) ;
 
-       
+
 
     function balanceOf(address _owner) constant returns (uint256 balance);
 
-       
+
 
     function transfer(address _to, uint256 _value) returns (bool success);
 
-       
+
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
 
-       
+
 
     function approve(address _spender, uint256 _value) returns (bool success);
 
-       
+
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
-       
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-       
+
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-       
+
 
  }
 
-     
+
 
  contract BRC is ERC20Interface {
 
@@ -52,23 +52,23 @@ interface ERC20Interface {
 
       uint256 _totalSupply = 58000000000000000;
 
-    
+
 
       address public owner;
 
-      
+
 
       mapping(address => uint256) balances;
 
-      
 
-    
+
+
 
       mapping(address => mapping (address => uint256)) allowed;
 
-      
 
-         
+
+
 
       modifier onlyOwner() {
 
@@ -82,7 +82,7 @@ interface ERC20Interface {
 
       }
 
-      
+
 
       function BRC() {
 
@@ -92,7 +92,7 @@ interface ERC20Interface {
 
       }
 
-      
+
 
       function totalSupply() constant returns (uint256 totalSupply) {
 
@@ -100,7 +100,7 @@ interface ERC20Interface {
 
       }
 
-      
+
 
       function balanceOf(address _owner) constant returns (uint256 balance) {
 
@@ -108,11 +108,11 @@ interface ERC20Interface {
 
       }
 
-      
+
 
       function transfer(address _to, uint256 _amount) returns (bool success) {
 
-          if (balances[msg.sender] >= _amount 
+          if (balances[msg.sender] >= _amount
 
               && _amount > 0
 
@@ -134,7 +134,7 @@ interface ERC20Interface {
 
       }
 
-      
+
 
       function transferFrom(
 
@@ -172,7 +172,7 @@ interface ERC20Interface {
 
      }
 
-   
+
 
      function approve(address _spender, uint256 _amount) returns (bool success) {
 
@@ -184,7 +184,7 @@ interface ERC20Interface {
 
      }
 
-     
+
 
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 
@@ -193,3 +193,14 @@ interface ERC20Interface {
      }
 
  }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

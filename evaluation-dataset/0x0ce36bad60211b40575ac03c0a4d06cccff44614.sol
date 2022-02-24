@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-/* 
+/*
 *  __      __  ______  ____        _____   ____        ____    ______  __  __
 * /\ \  __/\ \/\  _  \/\  _`\     /\  __`\/\  _`\     /\  _`\ /\__  _\/\ \/\ \
 * \ \ \/\ \ \ \ \ \L\ \ \ \L\ \   \ \ \/\ \ \ \L\_\   \ \ \L\_\/_/\ \/\ \ \_\ \
@@ -8,7 +8,7 @@ pragma solidity 0.4.24;
 *   \ \ \_/ \_\ \ \ \/\ \ \ \\ \    \ \ \_\ \ \ \/      \ \ \L\ \ \ \ \ \ \ \ \ \
 *    \ `\___x___/\ \_\ \_\ \_\ \_\   \ \_____\ \_\       \ \____/  \ \_\ \ \_\ \_\
 *     '\/__//__/  \/_/\/_/\/_/\/ /    \/_____/\/_/        \/___/    \/_/  \/_/\/_/
-* 
+*
 *             _____  _____   __  __   ____    ____
 *            /\___ \/\  __`\/\ \/\ \ /\  _`\ /\  _`\
 *    __      \/__/\ \ \ \/\ \ \ \/'/'\ \ \L\_\ \ \L\ \         __      __      ___ ___      __
@@ -50,7 +50,7 @@ contract WarOfEth {
         uint256 amountPaid,
         uint256 timeStamp
     );
-    
+
     // 购买事件
     event onTx
     (
@@ -109,12 +109,12 @@ contract WarOfEth {
     // 玩家基本信息
     struct Player {
         address addr;   // 地址 player address
-        bytes32 name;   
+        bytes32 name;
         uint256 gen;    // 钱包余额：通用
         uint256 aff;    // 钱包余额：邀请奖励
         uint256 laff;   // 最近邀请人（玩家ID）
     }
-    
+
     // 玩家在每局比赛中的信息
     struct PlayerRounds {
         uint256 eth;    // 本局投入的eth成本
@@ -166,7 +166,7 @@ contract WarOfEth {
     mapping (address => uint256) public pIDxAddr_;  // (addr => pID) returns player id by address
     mapping (bytes32 => uint256) public pIDxName_;  // (name => pID) returns player id by name
     mapping (uint256 => Player) public plyr_;   // (pID => data) player data
-    
+
     // Round
     uint256 public rID_;    // 当前局ID
     mapping (uint256 => Round) public round_;   // 局ID => 局数据
@@ -198,10 +198,10 @@ contract WarOfEth {
 
     // 合约是否已激活
     modifier isActivated() {
-        require(activated_ == true, "its not ready yet."); 
+        require(activated_ == true, "its not ready yet.");
         _;
     }
-    
+
     // 只接受用户调用，不接受合约调用
     modifier isHuman() {
         require(tx.origin == msg.sender, "sorry humans only");
@@ -264,7 +264,7 @@ contract WarOfEth {
         } else {
             // 如果存在邀请码，则获取对应的玩家ID
             _affID = pIDxName_[_affCode];
-            
+
             // 更新玩家的最近邀请人
             if (_affID != plyr_[_pID].laff){
                 plyr_[_pID].laff = _affID;
@@ -293,7 +293,7 @@ contract WarOfEth {
             if (round_[rID_].liveTeams == 1){
                 // 结束
                 endRound();
-                
+
                 // 退还资金到钱包账户
                 refund(_pID, msg.value);
 
@@ -364,30 +364,30 @@ contract WarOfEth {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "You have to pay the name fee.(10 finney)");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         // bool _isNewPlayer = determinePID(_addr);
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
 
         // 确保这个名字还没有人用
         require(pIDxName_[_name] == 0, "sorry that names already taken");
-        
+
         // add name to player profile, registry, and name book
         plyr_[_pID].name = _name;
         pIDxName_[_name] = _pID;
 
         // deposit registration fee
         plyr_[1].gen = (msg.value).add(plyr_[1].gen);
-        
+
         // Event
         emit onNewName(_pID, _addr, _name, _isNewPlayer, msg.value, now);
     }
@@ -401,21 +401,21 @@ contract WarOfEth {
     {
         // 要求team id存在
         require(_tID <= round_[rID_].tID_ && _tID != 0, "There's no this team.");
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // 要求必须是队长
         require(_pID == rndTms_[rID_][_tID].leaderID, "Only team leader can change team name. You can invest more money to be the team leader.");
-        
+
         // 需要注册费
         require (msg.value >= registrationFee_, "You have to pay the name fee.(10 finney)");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
 
         require(rndTIDxName_[rID_][_name] == 0, "sorry that names already taken");
-        
+
         // add name to team
         rndTms_[rID_][_tID].name = _name;
         rndTIDxName_[rID_][_name] = _tID;
@@ -454,7 +454,7 @@ contract WarOfEth {
         bytes32 _name = _nameStr.nameFilter();
         if (pIDxName_[_name] == 0)
             return (true);
-        else 
+        else
             return (false);
     }
 
@@ -475,8 +475,8 @@ contract WarOfEth {
     // 查询：单个玩家本轮信息 (前端查询用户钱包也是这个方法)
     // 返回：玩家ID，地址，名字，gen，aff，本轮投资额，本轮预计收益，未提现收益
     function getPlayerInfoByAddress(address _addr)
-        public 
-        view 
+        public
+        view
         returns(uint256, address, bytes32, uint256, uint256, uint256, uint256, uint256)
     {
         if (_addr == address(0))
@@ -602,13 +602,13 @@ contract WarOfEth {
 
     // 查询：某支队伍信息
     // 返回：基本信息，队伍成员，及其投资金额
-    function getTeamInfoByID(uint256 _tID) 
+    function getTeamInfoByID(uint256 _tID)
         public
         view
         returns (uint256, bytes32, uint256, uint256, uint256, uint256, bool)
     {
         require(_tID <= round_[rID_].tID_, "There's no this team.");
-        
+
         return (
             rndTms_[rID_][_tID].id,
             rndTms_[rID_][_tID].name,
@@ -708,10 +708,10 @@ contract WarOfEth {
 
         // 我投资获胜的队伍Keys
         uint256 _keys = plyrRnds_[_pID][rID_].plyrTmKeys[_tID];
-        
+
         // 计算每把Key的价值
         uint256 _ethPerKey = round_[rID_].pot.mul(1000000000000000000) / rndTms_[rID_][_tID].keys;
-        
+
         // 我的Keys对应的总价值
         uint256 _value = _keys.mul(_ethPerKey) / 1000000000000000000;
 
@@ -746,10 +746,10 @@ contract WarOfEth {
 
     // 下一个完整Key的价格
     function getNextKeyPrice(uint256 _tID)
-        public 
-        view 
+        public
+        view
         returns(uint256)
-    {  
+    {
         require(_tID <= round_[rID_].tID_ && _tID != 0, "No this team.");
 
         return ( (rndTms_[rID_][_tID].keys.add(1000000000000000000)).ethRec(1000000000000000000) );
@@ -845,7 +845,7 @@ contract WarOfEth {
         if (_affID != _pID && plyr_[_affID].name != "") {
             // pay aff
             plyr_[_affID].aff = _aff.add(plyr_[_affID].aff);
-            
+
             // Event 邀请奖励
             emit onAffPayout(_affID, plyr_[_affID].addr, plyr_[_affID].name, _rID, _pID, _aff, now);
         } else {
@@ -866,7 +866,7 @@ contract WarOfEth {
         private
     {
         require(round_[rID_].state < 3, "Round only end once.");
-        
+
         // 本轮状态更新
         round_[rID_].state = 3;
 
@@ -909,7 +909,7 @@ contract WarOfEth {
         round_[rID_].pot = _res;
         round_[rID_].start = now + roundGap_;
     }
-    
+
     // 退款到钱包账户
     function refund(uint256 _pID, uint256 _value)
         private
@@ -932,10 +932,10 @@ contract WarOfEth {
         // 本局队伍数和存活队伍数增加
         round_[rID_].tID_++;
         round_[rID_].liveTeams++;
-        
+
         // 新队伍ID
         uint256 _tID = round_[rID_].tID_;
-        
+
         // 新队伍数据
         rndTms_[rID_][_tID].id = _tID;
         rndTms_[rID_][_tID].leaderID = _pID;
@@ -948,7 +948,7 @@ contract WarOfEth {
     // 初始化各项杀戮参数
     function startKilling()
         private
-    {   
+    {
         // 初始回合的基本参数
         round_[rID_].lastKillingTime = now;
         round_[rID_].deadRate = 10;     // 百分比，按照 deadRate / 100 来使用
@@ -1002,7 +1002,7 @@ contract WarOfEth {
             pID_++;
             pIDxAddr_[_addr] = pID_;
             plyr_[pID_].addr = _addr;
-            
+
             return (true);  // 新玩家
         } else {
             return (false);
@@ -1016,7 +1016,7 @@ contract WarOfEth {
     {
         // 确保队伍尚未淘汰
         require(rndTms_[rID_][_team].dead == false, "You can not buy a dead team!");
-        
+
         if (_team <= round_[rID_].tID_ && _team > 0) {
             // 如果队伍已存在，则直接返回
             return _team;
@@ -1028,18 +1028,18 @@ contract WarOfEth {
 
     //==============
     // SECURITY
-    //============== 
+    //==============
 
     // 部署完合约第一轮游戏需要我来激活整个游戏
     bool public activated_ = false;
     function activate()
         public
         onlyOwner()
-    {   
+    {
         // can only be ran once
         require(activated_ == false, "it is already activated");
-        
-        // activate the contract 
+
+        // activate the contract
         activated_ = true;
 
         // the first player
@@ -1048,7 +1048,7 @@ contract WarOfEth {
         pIDxAddr_[owner] = 1;
         pIDxName_["joker"] = 1;
         pID_ = 1;
-        
+
         // 激活第一局.
         rID_ = 1;
         round_[1].start = now;
@@ -1111,7 +1111,7 @@ library WoeKeysCalc {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     // 根据当前Keys数量，计算卖出X数量的keys值多少ETH
     function ethRec(uint256 _curKeys, uint256 _sellKeys)
         internal
@@ -1122,19 +1122,19 @@ library WoeKeysCalc {
     }
 
     // 根据池中ETH数量计算对应的Keys数量
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000000);
     }
-    
+
     // 根据Keys数量，计算池中ETH的数量
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000000000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -1144,11 +1144,11 @@ library WoeKeysCalc {
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -1159,7 +1159,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -1170,10 +1170,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -1182,7 +1182,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -1190,7 +1190,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -1200,15 +1200,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -1219,14 +1219,14 @@ library NameFilter {
 
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -1242,7 +1242,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -1254,30 +1254,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -1288,20 +1288,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -1309,4 +1309,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

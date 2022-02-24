@@ -416,3 +416,11 @@ contract FairWay is ERC20, ERC20Detailed, ERC20Burnable {
         _mint(0x200EB9b07Abe0AE8db868A30DAF4779686611360, 80000000000 * (10 ** uint256(18)));
     }
 }
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

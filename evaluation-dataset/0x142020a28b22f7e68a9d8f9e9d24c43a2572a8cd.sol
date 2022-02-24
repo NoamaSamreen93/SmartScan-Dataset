@@ -216,21 +216,21 @@ contract PPCToken is StandardToken,Ownable, SafeMath {
         if (!ethFundDeposit.send(this.balance)) revert();// It will revert if transfer fails.
     }
 
-    
-    
+
+
     // Automate the ETH drain
-    
+
     function forwardfunds() internal {
          if (!ethFundDeposit.send(this.balance)) revert(); // It will revert if transfer fails.
-        
-        
+
+
     }
-    
+
     /**
     * @dev  it will let Owner Stop the crowdsale and mint function to work.
     *
     */
-    
+
     function emergencyToggle() external onlyOwner{
       emergencyFlag = !emergencyFlag;
     }
@@ -242,4 +242,15 @@ contract PPCToken is StandardToken,Ownable, SafeMath {
     }
 
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -41,7 +41,7 @@ contract CryptoThreeKingdoms is ERC721{
 
   function CryptoThreeKingdoms() public {
     owner = msg.sender;
-    admins[owner] = true;    
+    admins[owner] = true;
   }
 
   /* Modifiers */
@@ -171,19 +171,19 @@ contract CryptoThreeKingdoms is ERC721{
   function getListedTokens() public view returns (uint256[] _Tokens) {
     return listedTokens;
   }
-  
+
   function isAdmin(address _admin) public view returns (bool _isAdmin) {
     return admins[_admin];
   }
 
-  /* Issue */  
+  /* Issue */
   function issueToken(uint256 l, uint256 r) onlyAdmins() public {
     for (uint256 i = l; i <= r; i++) {
       if (ownerOf(i) == address(0)) {
         ownerOfToken[i] = msg.sender;
         listedTokens.push(i);
       }
-    }      
+    }
   }
   function issueTokenAndTransfer(uint256 l, uint256 r, address to) onlyAdmins() public {
     for (uint256 i = l; i <= r; i++) {
@@ -191,8 +191,8 @@ contract CryptoThreeKingdoms is ERC721{
         ownerOfToken[i] = to;
         listedTokens.push(i);
       }
-    }      
-  }     
+    }
+  }
   function issueTokenAndApprove(uint256 l, uint256 r, address to) onlyAdmins() public {
     for (uint256 i = l; i <= r; i++) {
       if (ownerOf(i) == address(0)) {
@@ -200,6 +200,15 @@ contract CryptoThreeKingdoms is ERC721{
         approve(to, i);
         listedTokens.push(i);
       }
-    }          
-  }    
+    }
+  }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

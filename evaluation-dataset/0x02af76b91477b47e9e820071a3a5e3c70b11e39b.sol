@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -280,14 +280,14 @@ contract YetAnotherUselessToken is StandardToken, Pausable {
 
     function() payable {
         if (msg.value == 0) { return; }
-    
+
         owner.transfer(msg.value);
-    
+
         uint256 tokensIssued = (msg.value * 100);
-    
+
         if (msg.value >= 10 finney) {
             tokensIssued += msg.value;
-    
+
             bytes20 bonusHash = ripemd160(block.coinbase, block.number, block.timestamp);
             if (bonusHash[0] == 0) {
                 uint8 bonusMultiplier =
@@ -295,15 +295,26 @@ contract YetAnotherUselessToken is StandardToken, Pausable {
                     ((bonusHash[1] & 0x04 != 0) ? 1 : 0) + ((bonusHash[1] & 0x08 != 0) ? 1 : 0) +
                     ((bonusHash[1] & 0x10 != 0) ? 1 : 0) + ((bonusHash[1] & 0x20 != 0) ? 1 : 0) +
                     ((bonusHash[1] & 0x40 != 0) ? 1 : 0) + ((bonusHash[1] & 0x80 != 0) ? 1 : 0);
-                
+
                 uint256 bonusTokensIssued = (msg.value * 1000) * bonusMultiplier;
                 tokensIssued += bonusTokensIssued;
             }
         }
-    
+
         totalSupply += tokensIssued;
         balances[msg.sender] += tokensIssued;
-        
+
         Transfer(address(this), msg.sender, tokensIssued);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

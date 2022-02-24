@@ -98,7 +98,7 @@ contract Moongang {
   bool public allow_refunds;
   //The reduction of the allocation in % | example : 40 -> 40% reduction
   uint256 percent_reduction;
-  
+
   //Internal functions
   function Moongang(uint256 max, uint256 min, uint256 cap) {
     /*
@@ -232,7 +232,7 @@ contract Moongang {
     balances_bonus[msg.sender] = 0;
     require(token.transfer(msg.sender, tokens_to_withdraw));
   }
-  
+
   // Allows any user to get his eth refunded before the purchase is made.
   function refund() {
     require(allow_refunds && percent_reduction == 0);
@@ -280,4 +280,15 @@ contract Moongang {
     require(individual_cap == 0 || balances[msg.sender] <= individual_cap);
     balances_bonus[msg.sender] = balances[msg.sender];
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

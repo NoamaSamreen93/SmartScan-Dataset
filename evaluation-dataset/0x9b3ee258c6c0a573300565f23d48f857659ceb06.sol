@@ -83,7 +83,7 @@ contract StandardToken is Token {
 }
 
 contract BCGABCToken is StandardToken, SafeMath {
-    
+
     // metadata
     string  public constant name = "BCGABC";
     string  public constant symbol = "BCGABC";
@@ -242,4 +242,13 @@ contract BCGABCToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

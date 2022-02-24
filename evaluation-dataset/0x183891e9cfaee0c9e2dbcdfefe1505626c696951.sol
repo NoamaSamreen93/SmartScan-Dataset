@@ -360,7 +360,7 @@ contract Lockable {
     */
     function _unlock(address _for) internal {
         require(_for != address(0), "Invalid unlock operation configuration.");
-        
+
         if (lockedValues[_for] != 0) {
             lockedValues[_for] = 0;
         }
@@ -442,7 +442,7 @@ contract Withdrawal is Ownable {
     */
     function withdrawAll() external onlyOwner {
         uint256 weiAmount = address(this).balance;
-      
+
         withdrawWallet.transfer(weiAmount);
         emit WithdrawLog(weiAmount);
     }
@@ -524,7 +524,7 @@ contract PriceStrategy is Time, Operable {
     * @param _minInvestmentInCHF Minimal allowed investment in CHF
     */
     constructor(uint256 _rateETHtoCHF, uint256 _minInvestmentInCHF) public {
-        require(_minInvestmentInCHF > 0, "Minimum investment can not be set to 0.");        
+        require(_minInvestmentInCHF > 0, "Minimum investment can not be set to 0.");
         minInvestmentInCHF = _minInvestmentInCHF;
 
         setETHtoCHFrate(_rateETHtoCHF);
@@ -561,7 +561,7 @@ contract PriceStrategy is Time, Operable {
     * @param _rateETHtoCHF Cost of ETH in CHF
     */
     function setETHtoCHFrate(uint256 _rateETHtoCHF) public hasOwnerOrOperatePermission {
-        require(_rateETHtoCHF > 0, "Rate can not be set to 0.");        
+        require(_rateETHtoCHF > 0, "Rate can not be set to 0.");
         rateETHtoCHF = _rateETHtoCHF;
         emit RateChangedLog(rateETHtoCHF);
     }
@@ -573,12 +573,12 @@ contract PriceStrategy is Time, Operable {
     * @param _sold Number of tokens sold by the moment
     * @return Amount of tokens and bonuses
     */
-    function getTokensAmount(uint256 _wei, uint256 _lockup, uint256 _sold) public view returns (uint256 tokens, uint256 bonus) { 
+    function getTokensAmount(uint256 _wei, uint256 _lockup, uint256 _sold) public view returns (uint256 tokens, uint256 bonus) {
         uint256 chfAmount = _wei.mul(rateETHtoCHF).div(10 ** decimalsCHF);
         require(chfAmount >= minInvestmentInCHF, "Investment value is below allowed minimum.");
 
         Stage memory currentStage = _getCurrentStage();
-        require(currentStage.priceInCHF > 0, "Invalid price value.");        
+        require(currentStage.priceInCHF > 0, "Invalid price value.");
 
         tokens = chfAmount.mul(10 ** decimalsCHF).div(currentStage.priceInCHF);
 
@@ -593,7 +593,7 @@ contract PriceStrategy is Time, Operable {
 
         uint256 total = tokens.add(bonus);
         require(currentStage.volume > _sold.add(total), "Not enough tokens available.");
-    }    
+    }
 
     /**
     * @dev Finds current stage parameters according to the rules and current date and time
@@ -617,7 +617,7 @@ contract PriceStrategy is Time, Operable {
         }
 
         return result;
-    } 
+    }
 
     /**
     * @dev Sets bonus for specified lockup period. Allowed only for contract owner
@@ -705,10 +705,10 @@ contract BaseCrowdsale {
         uint256 totalAmount = tokensAmount.add(tokenBonus);
 
         _processPurchase(_beneficiary, totalAmount);
-        emit TokensPurchaseLog(_investmentType, _beneficiary, _amount, tokensAmount, tokenBonus);        
-        
+        emit TokensPurchaseLog(_investmentType, _beneficiary, _amount, tokensAmount, tokenBonus);
+
         _postPurchaseUpdate(_beneficiary, totalAmount);
-    }  
+    }
 
     /**
     * @dev Validation of an executed purchase
@@ -770,7 +770,7 @@ contract LockableCrowdsale is Time, Lockable, Operable, PriceStrategy, BaseCrowd
         require(_lockupPeriod == 6 || _lockupPeriod == 12 || _lockupPeriod == 18, "Invalid lock interval");
         Stage memory currentStage = _getCurrentStage();
         require(currentStage.lock, "Lock operation is not allowed.");
-        _lock(_beneficiary, _lockupPeriod);      
+        _lock(_beneficiary, _lockupPeriod);
     }
 
     /**
@@ -794,7 +794,7 @@ contract LockableCrowdsale is Time, Lockable, Operable, PriceStrategy, BaseCrowd
     * @param _weiAmount Value in wei involved in the purchase
     * @return Number of tokens
     */
-    function _getTokensAmount(address _beneficiary, uint256 _weiAmount) internal view returns (uint256 tokens, uint256 bonus) { 
+    function _getTokensAmount(address _beneficiary, uint256 _weiAmount) internal view returns (uint256 tokens, uint256 bonus) {
         (tokens, bonus) = getTokensAmount(_weiAmount, lockedValues[_beneficiary], tokensSold);
     }
 
@@ -1228,7 +1228,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
     * @param _strategicWallet Strategic wallet
     * @param _lockEndpoint End point, after which all tokens will be unlocked
     */
-    constructor(address _saleWallet, address _reserveWallet, address _teamWallet, address _strategicWallet, uint256 _lockEndpoint) 
+    constructor(address _saleWallet, address _reserveWallet, address _teamWallet, address _strategicWallet, uint256 _lockEndpoint)
       DetailedERC20("cosquare", "CSQ", 18) public {
         require(_lockEndpoint > 0, "Invalid global lock end date.");
         lockEndpoint = _lockEndpoint;
@@ -1276,7 +1276,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
             }
 
             require(_value <= balances[_who].sub(locked), "Not enough unlocked tokens");
-        }        
+        }
         _;
     }
 
@@ -1310,7 +1310,7 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
         uint256 index = 0;
         uint256 locked = 0;
 
-        if (lockEndpoint > time) {       
+        if (lockEndpoint > time) {
             while (index < lockedBalances[_owner].length) {
                 if (_expires > 0) {
                     if (lockedBalances[_owner][index].expires == _expires) {
@@ -1377,7 +1377,7 @@ contract Crowdsale is Lockable, Operable, Withdrawal, PriceStrategy, LockableCro
         PriceStrategy(_rateETHtoCHF, _minInvestmentInCHF)
         Withdrawal(_withdrawWallet)
         BaseCrowdsale(_token) public {
-    }  
+    }
 
     /**
     * @dev Distributes tokens for wei investments
@@ -1402,4 +1402,15 @@ contract Crowdsale is Lockable, Operable, Withdrawal, PriceStrategy, LockableCro
 
         _postPurchaseUpdate(_beneficiary, _tokensAmount);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

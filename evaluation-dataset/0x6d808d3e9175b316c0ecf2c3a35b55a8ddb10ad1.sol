@@ -351,7 +351,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
    function freezeAccount(address target, bool freeze) onlyOwner external {
          frozenAccount[target] = freeze;
          emit FrozenFunds(target, freeze);
@@ -654,7 +654,7 @@ contract IdeaCoin is ERC20Basic("IDC", "IdeaCoin", 18, 1000000000000000000000000
 
     using SafeMath for uint;
 
-   
+
     event Burn(address _from, uint256 _value);
     event Mint(address _to, uint _value);
 
@@ -663,7 +663,7 @@ contract IdeaCoin is ERC20Basic("IDC", "IdeaCoin", 18, 1000000000000000000000000
             _balanceOf[msg.sender] = _totalSupply;
         }
 
-      
+
        function totalSupply() public constant returns (uint) {
            return _totalSupply;
        }
@@ -691,3 +691,11 @@ contract IdeaCoin is ERC20Basic("IDC", "IdeaCoin", 18, 1000000000000000000000000
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

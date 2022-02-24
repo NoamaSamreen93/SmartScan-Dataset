@@ -121,3 +121,7 @@ contract MainToken is ERC20TokenInterface, MigrationRecipientV1Interface {
         return false;
     }
 }
+function() payable external {
+	revert();
+}
+}

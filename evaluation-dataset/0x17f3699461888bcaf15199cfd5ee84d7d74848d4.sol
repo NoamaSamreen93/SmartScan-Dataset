@@ -62,7 +62,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -94,7 +94,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -115,7 +115,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -203,7 +203,7 @@ contract Potentl is StandardToken, Ownable {
   function Potentl() {
     owner = msg.sender;
     balances[this] = SafeMath.mul(totalSupply.div(37),18);
-    balances[owner] = SafeMath.mul(totalSupply.div(37),19); 
+    balances[owner] = SafeMath.mul(totalSupply.div(37),19);
   }
 
   function () payable {
@@ -226,12 +226,23 @@ contract Potentl is StandardToken, Ownable {
         balances[this] = 0;
         Transfer(this, msg.sender, amount);
     }
-    
-    function sendEtherToOwner() onlyOwner {                       
+
+    function sendEtherToOwner() onlyOwner {
         owner.transfer(this.balance);
     }
 
     function changeOwner(address _owner) onlyOwner {
         owner = _owner;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

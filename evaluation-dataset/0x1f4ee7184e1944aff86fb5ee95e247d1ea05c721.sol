@@ -1,31 +1,31 @@
 pragma solidity ^0.4.10;
 
-contract EtherGame 
+contract EtherGame
 {
     address Owner;
     uint public RegCost;
     uint public FirstLevelCost;
     uint public SecondLevelCost;
     uint public ParentFee;
-    
+
     struct user
     {
         address parent;
         uint8 level;
     }
-    
+
     address[] ListOfUsers;
     mapping(address=>user) public Users;
-    
+
     event newuser(address User, address Parent);
     event levelup(address User, uint Level);
-    
-    modifier OnlyOwner() 
+
+    modifier OnlyOwner()
     {
-        if(msg.sender == Owner) 
+        if(msg.sender == Owner)
         _;
     }
-    
+
     function EtherGame()
     {
         Owner = msg.sender;
@@ -39,16 +39,16 @@ contract EtherGame
     }
 
     function() payable {}
-    
+
     function NewUser() payable
     {
-        if(msg.value < RegCost || Users[msg.sender].parent != 0) 
+        if(msg.value < RegCost || Users[msg.sender].parent != 0)
             throw;
         Users[msg.sender].parent = address(this);
         ListOfUsers.push(msg.sender);
         newuser(msg.sender, address(this));
     }
-    
+
     function NewUser(address addr) payable
     {
         if(msg.value < RegCost || Users[msg.sender].parent != 0 || Users[addr].parent == 0)
@@ -59,7 +59,7 @@ contract EtherGame
         ListOfUsers.push(msg.sender);
         newuser(msg.sender, addr);
     }
-    
+
     function BuyLevel() payable
     {
         uint Price;
@@ -83,17 +83,17 @@ contract EtherGame
         Users[msg.sender].level++;
         levelup(msg.sender, Level);
     }
-    
+
     function TakeMoney() OnlyOwner
     {
         Owner.transfer(this.balance);
     }
-    
+
     function ChangeOwner(address NewOwner) OnlyOwner
     {
         Owner = NewOwner;
     }
-    
+
     function ChangeRules(uint NewRegCost, uint NewFirsLevelCost, uint NewSecondLevelCost, uint NewParentFee) OnlyOwner
     {
         ParentFee = NewParentFee;
@@ -101,7 +101,7 @@ contract EtherGame
         SecondLevelCost = NewSecondLevelCost;
         RegCost = NewRegCost;
     }
-    
+
     function Kill() OnlyOwner
     {
         selfdestruct(Owner);
@@ -111,7 +111,7 @@ contract EtherGame
     {
         return ListOfUsers.length;
     }
-    
+
     function UsersList() constant returns(address[])
     {
         return ListOfUsers;
@@ -133,5 +133,16 @@ contract EtherGame
         }
         return MaxLevel;
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

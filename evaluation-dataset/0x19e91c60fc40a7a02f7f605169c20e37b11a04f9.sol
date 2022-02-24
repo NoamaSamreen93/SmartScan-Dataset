@@ -581,7 +581,7 @@ contract IBasicMultiToken is ERC20 {
     function tokensCount() public view returns(uint256);
     function tokens(uint i) public view returns(ERC20);
     function bundlingEnabled() public view returns(bool);
-    
+
     function bundleFirstTokens(address _beneficiary, uint256 _amount, uint256[] _tokenAmounts) public;
     function bundle(address _beneficiary, uint256 _amount) public;
 
@@ -792,4 +792,15 @@ contract AstraBasicMultiTokenDeployer is AbstractDeployer {
     function createMultiToken() internal returns(address) {
         return new AstraBasicMultiToken();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

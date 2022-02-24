@@ -47,9 +47,9 @@ contract VCCoin is StandardToken {
     function () {
         throw;
     }
-    string public name="VCCoin";            
-    uint8 public decimals=18;         
-    string public symbol="VCC";          
+    string public name="VCCoin";
+    uint8 public decimals=18;
+    string public symbol="VCC";
     string public version = 'VCC0.1';
     function VCCoin(
         uint256 _initialAmount,
@@ -61,7 +61,7 @@ contract VCCoin is StandardToken {
         totalSupply = _initialAmount;
         name = _tokenName;
         decimals = _decimalUnits;
-        symbol = _tokenSymbol;   
+        symbol = _tokenSymbol;
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -70,4 +70,15 @@ contract VCCoin is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

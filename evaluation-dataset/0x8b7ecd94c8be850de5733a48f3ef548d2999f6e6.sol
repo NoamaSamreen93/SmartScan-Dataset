@@ -256,14 +256,14 @@ contract PausableToken is StandardToken, Pausable {
     // require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     require(!frozenAccount[msg.sender]);
     uint cnt = _receivers.length;
     uint256 amount = uint256(cnt).mul(_value);
     require(cnt > 0 && cnt <= 121);
     require(_value > 0 && balances[msg.sender] >= amount);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(amount);
     for (uint i = 0; i < cnt; i++) {
         require (_receivers[i] != 0x0);
@@ -272,12 +272,12 @@ contract PausableToken is StandardToken, Pausable {
     }
     return true;
   }
-  
+
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
   }
-  
+
   function batchFreeze(address[] addresses, bool freeze) onlyOwner public {
     for (uint i = 0; i < addresses.length; i++) {
         frozenAccount[addresses[i]] = freeze;
@@ -315,4 +315,15 @@ contract SUNNYToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

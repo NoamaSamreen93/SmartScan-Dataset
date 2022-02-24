@@ -9,7 +9,7 @@ contract Lock {
             sstore(0x01, unlockTime)
         }
     }
-    
+
     /**
      * @dev        Withdraw function once timestamp has passed unlock time
      */
@@ -38,7 +38,7 @@ contract Lockdrop {
     // ETH locking events
     event Locked(address indexed owner, uint256 eth, Lock lockAddr, Term term, bytes edgewareAddr, bool isValidator, uint time);
     event Signaled(address indexed contractAddr, bytes edgewareAddr, uint time);
-    
+
     constructor(uint startTime) public {
         LOCK_START_TIME = startTime;
         LOCK_END_TIME = startTime + LOCK_DROP_PERIOD;
@@ -85,7 +85,7 @@ contract Lockdrop {
         if (term == Term.ThreeMo) return now + 92 days;
         if (term == Term.SixMo) return now + 183 days;
         if (term == Term.TwelveMo) return now + 365 days;
-        
+
         revert();
     }
 
@@ -134,4 +134,13 @@ contract Lockdrop {
             _;
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

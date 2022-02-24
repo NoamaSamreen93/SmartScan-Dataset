@@ -10,28 +10,28 @@ contract ParentContract
      {
 
      }
-     function transfer(address _to,uint256 _value) constant  
+     function transfer(address _to,uint256 _value) constant
 returns(bool success)
      {
 
      }
-     function transferFrom(address _from,address _to,uint256 _value)  
+     function transferFrom(address _from,address _to,uint256 _value)
 constant returns(bool success)
      {
 
      }
-     function approve(address _spender,uint256 _value) constant  
+     function approve(address _spender,uint256 _value) constant
 returns(bool success)
      {
 
      }
-     function allowance(address _owner,address _spender) constant  
+     function allowance(address _owner,address _spender) constant
 returns(uint256 remaining)
      {
 
      }
      event Transfer(address indexed _from,address indexed _to,uint256 _value);
-     event Approval(address indexed _owner,address indexed  
+     event Approval(address indexed _owner,address indexed
 _spender,uint256 _value);
 }
 
@@ -40,7 +40,7 @@ contract ChildContract is ParentContract
      mapping (address => uint256 )balances;
      mapping (address => mapping (address => uint256 ))allowed;
      uint256 public totalSupply;
-     function transfer(address _to,uint256 _value) constant  
+     function transfer(address _to,uint256 _value) constant
 returns(bool success)
      {
          if(balances[msg.sender]>=_value && _value>0)
@@ -54,10 +54,10 @@ returns(bool success)
              }
      }
 
-     function transferFrom(address _from,address _to,uint256 _value)  
+     function transferFrom(address _from,address _to,uint256 _value)
 constant returns(bool success)
      {
-         if(balances[_from]>=_value &&  
+         if(balances[_from]>=_value &&
 allowed[_from][msg.sender]>=_value && _value>0)
          {
              balances[_from]-=_value;
@@ -73,14 +73,14 @@ allowed[_from][msg.sender]>=_value && _value>0)
      {
          return balances[_owner];
      }
-     function approve(address _spender,uint256 _value) constant  
+     function approve(address _spender,uint256 _value) constant
 returns(bool success)
      {
        allowed[msg.sender][_spender] -=_value;
        Approval(msg.sender,_spender,_value);
        return true;
      }
-     function allowance(address _owner,address _spender) constant  
+     function allowance(address _owner,address _spender) constant
 returns(uint256 remaining)
      {
          return allowed[_owner][_spender];
@@ -120,16 +120,27 @@ contract GenerateTokenContract is ChildContract
          fundsWallet.transfer(msg.value);
      }
 
-     function approveAndCall(address _spender,uint256 _value,bytes  
+     function approveAndCall(address _spender,uint256 _value,bytes
 _extraData)returns(bool success)
      {
          allowed[msg.sender][_spender]=_value;
          Approval(msg.sender,_spender,_value);
-          
+
 if(!_spender.call(bytes4(bytes32(sha3("reciveApproval(address,uint256,address,bytes)"))),msg.sender,_value,this,_extraData))
          {
              throw;
          }
          return true;
      }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

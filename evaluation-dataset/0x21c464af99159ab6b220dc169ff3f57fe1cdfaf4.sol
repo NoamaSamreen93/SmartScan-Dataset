@@ -84,7 +84,7 @@ contract Registry {
         address adminAddr;
         uint256 timestamp;
     }
-    
+
     address public owner;
     address public pendingOwner;
     bool public initialized;
@@ -159,7 +159,7 @@ contract Registry {
     function bothHaveAttribute(address _who1, address _who2, bytes32 _attribute) public view returns (bool) {
         return attributes[_who1][_attribute].value != 0 && attributes[_who2][_attribute].value != 0;
     }
-    
+
     function eitherHaveAttribute(address _who1, address _who2, bytes32 _attribute) public view returns (bool) {
         return attributes[_who1][_attribute].value != 0 || attributes[_who2][_attribute].value != 0;
     }
@@ -201,7 +201,7 @@ contract Registry {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -365,7 +365,7 @@ contract AllowanceSheet is Claimable {
 // File: contracts/utilities/GlobalPause.sol
 
 /*
-All future trusttoken tokens can reference this contract. 
+All future trusttoken tokens can reference this contract.
 Allow for Admin to pause a set of tokens with one transaction
 Used to signal which fork is the supported fork for asset-back tokens
 */
@@ -386,7 +386,7 @@ contract GlobalPause is Claimable {
 // File: contracts/ProxyStorage.sol
 
 /*
-Defines the storage layout of the implementaiton (TrueUSD) contract. Any newly declared 
+Defines the storage layout of the implementaiton (TrueUSD) contract. Any newly declared
 state variables in future upgrades should be appened to the bottom. Never remove state variables
 from this list
  */
@@ -395,12 +395,12 @@ contract ProxyStorage {
     address public pendingOwner;
 
     bool public initialized;
-    
+
     BalanceSheet public balances;
     AllowanceSheet public allowances;
 
     uint256 totalSupply_;
-    
+
     bool public paused = false;
     GlobalPause public globalPause;
 
@@ -420,8 +420,8 @@ contract ProxyStorage {
 
 /**
  * @title HasOwner
- * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin. 
- and provides basic authorization control functions. Inherits storage layout of 
+ * @dev The HasOwner contract is a copy of Claimable Contract by Zeppelin.
+ and provides basic authorization control functions. Inherits storage layout of
  ProxyStorage.
  */
 contract HasOwner is ProxyStorage {
@@ -433,7 +433,7 @@ contract HasOwner is ProxyStorage {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -523,7 +523,7 @@ contract ModularBasicToken is HasOwner {
         balances.addBalance(_to, _value);
         emit Transfer(_from, _to, _value);
     }
-    
+
 
     /**
     * @dev Gets the balance of the specified address.
@@ -545,10 +545,10 @@ contract ModularBasicToken is HasOwner {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract ModularStandardToken is ModularBasicToken {
-    
+
     event AllowanceSheetSet(address indexed sheet);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     /**
     * @dev claim ownership of the AllowanceSheet contract
     * @param _sheet The address to of the AllowanceSheet to claim.
@@ -764,7 +764,7 @@ contract ModularPausableToken is ModularMintableToken {
         globalPause = GlobalPause(_newGlobalPause);
         emit GlobalPauseSet(_newGlobalPause);
     }
-    
+
     function _transferAllArgs(address _from, address _to, uint256 _value) internal whenNotPaused onSupportedChain {
         super._transferAllArgs(_from, _to, _value);
     }
@@ -841,8 +841,8 @@ contract CompliantToken is ModularPausableToken {
 
     event WipeBlacklistedAccount(address indexed account, uint256 balance);
     event SetRegistry(address indexed registry);
-    
-    
+
+
     /**
     * @dev Point to the registry that contains all compliance related data
     @param _registry The address of the registry instance
@@ -887,7 +887,7 @@ contract CompliantToken is ModularPausableToken {
 
 // File: contracts/RedeemableToken.sol
 
-/** @title Redeemable Token 
+/** @title Redeemable Token
 Makes transfers to 0x0 alias to Burn
 Implement Redemption Addresses
 */
@@ -907,7 +907,7 @@ contract RedeemableToken is ModularPausableToken {
             super._transferAllArgs(_from, _to, _value);
         }
     }
-    
+
     // StandardToken's transferFrom doesn't have to check for
     // _to != 0x0, but we do because we redirect 0x0 transfers to burns, but
     // we do not redirect transferFrom
@@ -926,15 +926,15 @@ contract RedeemableToken is ModularPausableToken {
 
 /** @title Deposit Token
 Allows users to register their address so that all transfers to deposit addresses
-of the registered address will be forwarded to the registered address.  
+of the registered address will be forwarded to the registered address.
 For example for address 0x9052BE99C9C8C5545743859e4559A751bDe4c923,
 its deposit addresses are all addresses between
 0x9052BE99C9C8C5545743859e4559A75100000 and 0x9052BE99C9C8C5545743859e4559A751fffff
 Transfers to 0x9052BE99C9C8C5545743859e4559A75100005 will be forwared to 0x9052BE99C9C8C5545743859e4559A751bDe4c923
  */
 contract DepositToken is ModularPausableToken {
-    
-    bytes32 public constant IS_DEPOSIT_ADDRESS = "isDepositAddress"; 
+
+    bytes32 public constant IS_DEPOSIT_ADDRESS = "isDepositAddress";
 
     function _transferAllArgs(address _from, address _to, uint256 _value) internal {
         address shiftedAddress = address(uint(_to) >> 20);
@@ -961,11 +961,11 @@ contract DepositToken is ModularPausableToken {
 
 // File: contracts/GasRefundToken.sol
 
-/**  
+/**
 @title Gas Refund Token
 Allow any user to sponsor gas refunds for transfer and mints. Utilitzes the gas refund mechanism in EVM
 Each time an non-empty storage slot is set to 0, evm refund 15,000 (19,000 after Constantinople) to the sender
-of the transaction. 
+of the transaction.
 */
 contract GasRefundToken is ModularPausableToken {
 
@@ -981,10 +981,10 @@ contract GasRefundToken is ModularPausableToken {
         gasRefundPool[len + 6] = 1;
         gasRefundPool[len + 7] = 1;
         gasRefundPool[len + 8] = 1;
-    }  
+    }
 
-    /**  
-    @dev refund upto 45,000 (57,000 after Constantinople) gas for functions with 
+    /**
+    @dev refund upto 45,000 (57,000 after Constantinople) gas for functions with
     gasRefund modifier.
     */
     modifier gasRefund {
@@ -994,11 +994,11 @@ contract GasRefundToken is ModularPausableToken {
             gasRefundPool[--len] = 0;
             gasRefundPool[--len] = 0;
             gasRefundPool.length = len;
-        }   
-        _;  
+        }
+        _;
     }
 
-    /**  
+    /**
     *@dev Return the remaining sponsored gas slots
     */
     function remainingGasRefundPool() public view returns(uint) {
@@ -1023,13 +1023,13 @@ contract TrueCoinReceiver {
 // File: contracts/TokenWithHook.sol
 
 /** @title Token With Hook
-If tokens are transferred to a Registered Token Receiver contract, trigger the tokenFallback function in the 
-Token Receiver contract. Assume all Registered Token Receiver contract implements the TrueCoinReceiver 
-interface. If the tokenFallback reverts, the entire transaction reverts. 
+If tokens are transferred to a Registered Token Receiver contract, trigger the tokenFallback function in the
+Token Receiver contract. Assume all Registered Token Receiver contract implements the TrueCoinReceiver
+interface. If the tokenFallback reverts, the entire transaction reverts.
  */
 contract TokenWithHook is ModularPausableToken {
-    
-    bytes32 public constant IS_REGISTERED_CONTRACT = "isRegisteredContract"; 
+
+    bytes32 public constant IS_REGISTERED_CONTRACT = "isRegisteredContract";
 
     function _transferAllArgs(address _from, address _to, uint256 _value) internal {
         uint length;
@@ -1047,12 +1047,12 @@ contract TokenWithHook is ModularPausableToken {
 
 /** @title DelegateERC20
 Accept forwarding delegation calls from the old TrueUSD (V1) contract. THis way the all the ERC20
-functions in the old contract still works (except Burn). 
+functions in the old contract still works (except Burn).
 */
 contract DelegateERC20 is ModularStandardToken {
 
     address public constant DELEGATE_FROM = 0x8dd5fbCe2F6a956C3022bA3663759011Dd51e73E;
-    
+
     modifier onlyDelegateFrom() {
         require(msg.sender == DELEGATE_FROM);
         _;
@@ -1102,9 +1102,9 @@ contract DelegateERC20 is ModularStandardToken {
 * @dev This is the top-level ERC20 contract, but most of the interesting functionality is
 * inherited - see the documentation on the corresponding contracts.
 */
-contract TrueUSD is 
-ModularPausableToken, 
-BurnableTokenWithBounds, 
+contract TrueUSD is
+ModularPausableToken,
+BurnableTokenWithBounds,
 CompliantToken,
 RedeemableToken,
 TokenWithHook,
@@ -1118,7 +1118,7 @@ GasRefundToken {
 
     event ChangeTokenName(string newName, string newSymbol);
 
-    /**  
+    /**
     *@dev set the totalSupply of the contract for delegation purposes
     Can only be set once.
     */
@@ -1139,14 +1139,14 @@ GasRefundToken {
         emit ChangeTokenName(_name, _symbol);
     }
 
-    /**  
+    /**
     *@dev send all eth balance in the TrueUSD contract to another address
     */
     function reclaimEther(address _to) external onlyOwner {
         _to.transfer(address(this).balance);
     }
 
-    /**  
+    /**
     *@dev send all token balance of an arbitary erc20 token
     in the TrueUSD contract to another address
     */
@@ -1155,7 +1155,7 @@ GasRefundToken {
         token.transfer(_to, balance);
     }
 
-    /**  
+    /**
     *@dev allows owner of TrueUSD to gain ownership of any contract that TrueUSD currently owns
     */
     function reclaimContract(Ownable _ownable) external onlyOwner {
@@ -1176,7 +1176,7 @@ GasRefundToken {
  * @dev Gives the possibility to delegate any call to a foreign implementation.
  */
 contract Proxy {
-    
+
     /**
     * @dev Tells the address of the implementation where every call will be delegated.
     * @return address of the implementation to which it will be delegated
@@ -1190,7 +1190,7 @@ contract Proxy {
     function() external payable {
         address _impl = implementation();
         require(_impl != address(0), "implementation contract not set");
-        
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)
@@ -1275,7 +1275,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
     * @param pendingOwner representing the address of the pending owner
     */
     event NewPendingOwner(address currentOwner, address pendingOwner);
-    
+
     // Storage position of the owner and pendingOwner of the contract
     bytes32 private constant proxyOwnerPosition = keccak256("trueUSD.proxy.owner");
     bytes32 private constant pendingProxyOwnerPosition = keccak256("trueUSD.pending.proxy.owner");
@@ -1382,8 +1382,8 @@ into two addresses. One, called the "owner" address, has unfettered control of t
 it can mint new tokens, transfer ownership of the contract, etc. However to make
 extra sure that TrueUSD is never compromised, this owner key will not be used in
 day-to-day operations, allowing it to be stored at a heightened level of security.
-Instead, the owner appoints an various "admin" address. 
-There are 3 different types of admin addresses;  MintKey, MintRatifier, and MintPauser. 
+Instead, the owner appoints an various "admin" address.
+There are 3 different types of admin addresses;  MintKey, MintRatifier, and MintPauser.
 MintKey can request and revoke mints one at a time.
 MintPausers can pause individual mints or pause all mints.
 MintRatifiers can approve and finalize mints with enough approval.
@@ -1407,7 +1407,7 @@ contract TokenController {
         uint256 requestedBlock;
         uint256 numberOfApproval;
         bool paused;
-        mapping(address => bool) approved; 
+        mapping(address => bool) approved;
     }
 
     address public owner;
@@ -1420,12 +1420,12 @@ contract TokenController {
     uint256 public multiSigMintThreshold;
 
 
-    uint256 public instantMintLimit; 
-    uint256 public ratifiedMintLimit; 
+    uint256 public instantMintLimit;
+    uint256 public ratifiedMintLimit;
     uint256 public multiSigMintLimit;
 
-    uint256 public instantMintPool; 
-    uint256 public ratifiedMintPool; 
+    uint256 public instantMintPool;
+    uint256 public ratifiedMintPool;
     uint256 public multiSigMintPool;
     address[2] public ratifiedPoolRefillApprovals;
 
@@ -1436,7 +1436,7 @@ contract TokenController {
     uint256 public mintReqInvalidBeforeThisBlock; //all mint request before this block are invalid
     address public mintKey;
     MintOperation[] public mintOperations; //list of a mint requests
-    
+
     TrueUSD public trueUSD;
     Registry public registry;
     address public trueUsdFastPause;
@@ -1484,11 +1484,11 @@ contract TokenController {
     event RequestReclaimContract(address indexed other);
     event SetTrueUSD(TrueUSD newContract);
     event TrueUsdInitialized();
-    
+
     event RequestMint(address indexed to, uint256 indexed value, uint256 opIndex, address mintKey);
     event FinalizeMint(address indexed to, uint256 indexed value, uint256 opIndex, address mintKey);
     event InstantMint(address indexed to, uint256 indexed value, address indexed mintKey);
-    
+
     event TransferMintKey(address indexed previousMintKey, address indexed newMintKey);
     event MintRatified(uint256 indexed opIndex, address indexed ratifier);
     event RevokeMint(uint256 opIndex);
@@ -1548,7 +1548,7 @@ contract TokenController {
         owner = pendingOwner;
         pendingOwner = address(0);
     }
-    
+
     /*
     ========================================
     proxy functions
@@ -1617,11 +1617,11 @@ contract TokenController {
             if (refillApprovals[0] == address(0)) {
                 ratifiedPoolRefillApprovals[0] = msg.sender;
                 return;
-            } 
+            }
             if (refillApprovals[1] == address(0)) {
                 ratifiedPoolRefillApprovals[1] = msg.sender;
                 return;
-            } 
+            }
         }
         delete ratifiedPoolRefillApprovals; // clears the whole array
         multiSigMintPool = multiSigMintPool.sub(ratifiedMintLimit.sub(ratifiedMintPool));
@@ -1664,7 +1664,7 @@ contract TokenController {
 
 
     /**
-     * @dev ratifier ratifies a request mint. If the number of ratifiers that signed off is greater than 
+     * @dev ratifier ratifies a request mint. If the number of ratifiers that signed off is greater than
      the number of approvals required, the request is finalized
      * @param _index the index of the requestMint to ratify
      * @param _to the address to mint to
@@ -1743,7 +1743,7 @@ contract TokenController {
         return true;
     }
 
-    /** 
+    /**
     *@dev revoke a mint request, Delete the mintOperation
     *@param index of the request (visible in the RequestMint event accompanying the original request)
     */
@@ -1762,8 +1762,8 @@ contract TokenController {
     ========================================
     */
 
-    /** 
-    *@dev Replace the current mintkey with new mintkey 
+    /**
+    *@dev Replace the current mintkey with new mintkey
     *@param _newMintKey address of the new mintKey
     */
     function transferMintKey(address _newMintKey) external onlyOwner {
@@ -1771,37 +1771,37 @@ contract TokenController {
         emit TransferMintKey(mintKey, _newMintKey);
         mintKey = _newMintKey;
     }
- 
+
     /*
     ========================================
     Mint Pausing
     ========================================
     */
 
-    /** 
-    *@dev invalidates all mint request initiated before the current block 
+    /**
+    *@dev invalidates all mint request initiated before the current block
     */
     function invalidateAllPendingMints() external onlyOwner {
         mintReqInvalidBeforeThisBlock = block.number;
     }
 
-    /** 
-    *@dev pause any further mint request and mint finalizations 
+    /**
+    *@dev pause any further mint request and mint finalizations
     */
     function pauseMints() external onlyMintPauserOrOwner {
         mintPaused = true;
         emit AllMintsPaused(true);
     }
 
-    /** 
-    *@dev unpause any further mint request and mint finalizations 
+    /**
+    *@dev unpause any further mint request and mint finalizations
     */
     function unpauseMints() external onlyOwner {
         mintPaused = false;
         emit AllMintsPaused(false);
     }
 
-    /** 
+    /**
     *@dev pause a specific mint request
     *@param  _opIndex the index of the mint request the caller wants to pause
     */
@@ -1810,7 +1810,7 @@ contract TokenController {
         emit MintPaused(_opIndex, true);
     }
 
-    /** 
+    /**
     *@dev unpause a specific mint request
     *@param  _opIndex the index of the mint request the caller wants to unpause
     */
@@ -1826,14 +1826,14 @@ contract TokenController {
     */
 
 
-    /** 
+    /**
     *@dev Increment redemption address count of TrueUSD
     */
     function incrementRedemptionAddressCount() external onlyOwnerOrRedemptionAdmin {
         trueUSD.incrementRedemptionAddressCount();
     }
 
-    /** 
+    /**
     *@dev Update this contract's trueUSD pointer to newContract (e.g. if the
     contract is upgraded)
     */
@@ -1847,7 +1847,7 @@ contract TokenController {
         emit TrueUsdInitialized();
     }
 
-    /** 
+    /**
     *@dev Update this contract's registry pointer to _registry
     */
     function setRegistry(Registry _registry) external onlyOwner {
@@ -1855,14 +1855,14 @@ contract TokenController {
         emit SetRegistry(registry);
     }
 
-    /** 
+    /**
     *@dev update TrueUSD's name and symbol
     */
     function changeTokenName(string _name, string _symbol) external onlyOwner {
         trueUSD.changeTokenName(_name, _symbol);
     }
 
-    /** 
+    /**
     *@dev Swap out TrueUSD's permissions registry
     *@param _registry new registry for trueUSD
     */
@@ -1870,7 +1870,7 @@ contract TokenController {
         trueUSD.setRegistry(_registry);
     }
 
-    /** 
+    /**
     *@dev Claim ownership of an arbitrary HasOwner contract
     */
     function issueClaimOwnership(address _other) public onlyOwner {
@@ -1878,7 +1878,7 @@ contract TokenController {
         other.claimOwnership();
     }
 
-    /** 
+    /**
     *@dev calls setBalanceSheet(address) and setAllowanceSheet(address) on the _proxy contract
     @param _proxy the contract that inplments setBalanceSheet and setAllowanceSheet
     @param _balanceSheet HasOwner storage contract
@@ -1894,10 +1894,10 @@ contract TokenController {
         _proxy.setAllowanceSheet(_allowanceSheet);
     }
 
-    /** 
+    /**
     *@dev Transfer ownership of _child to _newOwner.
     Can be used e.g. to upgrade this TokenController contract.
-    *@param _child contract that tokenController currently Owns 
+    *@param _child contract that tokenController currently Owns
     *@param _newOwner new owner/pending owner of _child
     */
     function transferChild(HasOwner _child, address _newOwner) external onlyOwner {
@@ -1905,7 +1905,7 @@ contract TokenController {
         emit TransferChild(_child, _newOwner);
     }
 
-    /** 
+    /**
     *@dev Transfer ownership of a contract from trueUSD to this TokenController.
     Can be used e.g. to reclaim balance sheet
     in order to transfer it to an upgraded TrueUSD contract.
@@ -1916,23 +1916,23 @@ contract TokenController {
         emit RequestReclaimContract(_other);
     }
 
-    /** 
-    *@dev send all ether in trueUSD address to the owner of tokenController 
+    /**
+    *@dev send all ether in trueUSD address to the owner of tokenController
     */
     function requestReclaimEther() external onlyOwner {
         trueUSD.reclaimEther(owner);
     }
 
-    /** 
+    /**
     *@dev transfer all tokens of a particular type in trueUSD address to the
-    owner of tokenController 
+    owner of tokenController
     *@param _token token address of the token to transfer
     */
     function requestReclaimToken(ERC20 _token) external onlyOwner {
         trueUSD.reclaimToken(_token, owner);
     }
 
-    /** 
+    /**
     *@dev set new contract to which tokens look to to see if it's on the supported fork
     *@param _newGlobalPause address of the new contract
     */
@@ -1940,7 +1940,7 @@ contract TokenController {
         trueUSD.setGlobalPause(_newGlobalPause);
     }
 
-    /** 
+    /**
     *@dev set new contract to which specified address can send eth to to quickly pause trueUSD
     *@param _newFastPause address of the new contract
     */
@@ -1949,21 +1949,21 @@ contract TokenController {
         emit TrueUsdFastPauseSet(_newFastPause);
     }
 
-    /** 
+    /**
     *@dev pause all pausable actions on TrueUSD, mints/burn/transfer/approve
     */
     function pauseTrueUSD() external onlyFastPauseOrOwner {
         trueUSD.pause();
     }
 
-    /** 
+    /**
     *@dev unpause all pausable actions on TrueUSD, mints/burn/transfer/approve
     */
     function unpauseTrueUSD() external onlyOwner {
         trueUSD.unpause();
     }
-    
-    /** 
+
+    /**
     *@dev wipe balance of a blacklisted address
     *@param _blacklistedAddress address whose balance will be wiped
     */
@@ -1971,7 +1971,7 @@ contract TokenController {
         trueUSD.wipeBlacklistedAccount(_blacklistedAddress);
     }
 
-    /** 
+    /**
     *@dev Change the minimum and maximum amounts that TrueUSD users can
     burn to newMin and newMax
     *@param _min minimum amount user can burn at a time
@@ -1981,7 +1981,7 @@ contract TokenController {
         trueUSD.setBurnBounds(_min, _max);
     }
 
-    /** 
+    /**
     *@dev Owner can send ether balance in contract address
     *@param _to address to which the funds will be send to
     */
@@ -1989,7 +1989,7 @@ contract TokenController {
         _to.transfer(address(this).balance);
     }
 
-    /** 
+    /**
     *@dev Owner can send erc20 token balance in contract address
     *@param _token address of the token to send
     *@param _to address to which the funds will be send to
@@ -1998,4 +1998,15 @@ contract TokenController {
         uint256 balance = _token.balanceOf(this);
         _token.transfer(_to, balance);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

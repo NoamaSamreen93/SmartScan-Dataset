@@ -151,3 +151,7 @@ contract FFG {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

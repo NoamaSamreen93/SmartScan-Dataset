@@ -100,7 +100,7 @@ contract OptionToken is VariableSupplyToken {
 }
 
 contract Protocol {
-    
+
     address public lib;
     ERC20x public usdERC20;
     ERC20x public protocolToken;
@@ -180,7 +180,7 @@ contract Protocol {
             escrow /= 1 ether;
             require(usdERC20.transferFrom(msg.sender, address(this), escrow));
         }
-        
+
         openInterest[_series] += amount;
         totalInterest[_series] += amount;
         writers[_series][msg.sender] += amount;
@@ -199,7 +199,7 @@ contract Protocol {
         writers[_series][msg.sender] -= amount;
         openInterest[_series] -= amount;
         totalInterest[_series] -= amount;
-        
+
         if (series.flavor == Flavor.Call) {
             msg.sender.transfer(amount);
         } else {
@@ -207,7 +207,7 @@ contract Protocol {
         }
         return true;
     }
-    
+
     function exercise(address _series, uint amount) public payable {
         OptionSeries memory series = seriesInfo[_series];
 
@@ -231,7 +231,7 @@ contract Protocol {
             usdERC20.transfer(msg.sender, usd);
         }
     }
-    
+
     function receive() public payable returns (bool) {
         require(expectValue[msg.sender] == msg.value);
         expectValue[msg.sender] = 0;
@@ -259,7 +259,7 @@ contract Protocol {
 
         uint offer;
         uint givGet;
-        
+
         BidderInterface bidder = BidderInterface(msg.sender);
 
         if (series.flavor == Flavor.Call) {
@@ -288,7 +288,7 @@ contract Protocol {
             if (msg.value == 0) {
                 require(expectValue[msg.sender] == 0);
                 expectValue[msg.sender] = amount;
-                
+
                 bidder.receiveUSD(_series, givGet);
                 require(expectValue[msg.sender] == 0);
             } else {
@@ -373,10 +373,10 @@ contract Protocol {
             return a;
         return b;
     }
-    
+
     function _unsLn(uint x) pure public returns (uint log) {
         log = 0;
-        
+
         // not a true ln function, we can't represent the negatives
         if (x < 1 ether)
             return 0;
@@ -385,7 +385,7 @@ contract Protocol {
             log += 0.405465 ether;
             x = x * 2 / 3;
         }
-        
+
         x = x - 1 ether;
         uint y = x;
         uint i = 1;
@@ -398,7 +398,16 @@ contract Protocol {
             i = i + 1;
             y = y * x / 1 ether;
         }
-         
+
         return(log);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

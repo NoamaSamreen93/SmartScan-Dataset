@@ -123,7 +123,7 @@ contract Ownable {
 
 contract InterfaceContracts is Ownable {
     InterfaceContracts public _internalMod;
-    
+
     function setModifierContract (address _t) onlyOwner public {
         _internalMod = InterfaceContracts(_t);
     }
@@ -137,34 +137,34 @@ contract InterfaceContracts is Ownable {
       require(msg.sender == _internalMod._contract_token(), "Wrong sender");
       _;
     }
-    
+
     modifier onlyMasternodeContract() {
       require(msg.sender == _internalMod._contract_masternode(), "Wrong sender");
       _;
     }
-    
+
     modifier onlyVotingOrOwner() {
       require(msg.sender == _internalMod._contract_voting() || msg.sender == owner, "Wrong sender");
       _;
     }
-    
+
     modifier onlyVotingContract() {
       require(msg.sender == _internalMod._contract_voting() || msg.sender == owner, "Wrong sender");
       _;
     }
-      
+
     function _contract_voting () public view returns (address) {
         return _internalMod._contract_voting();
     }
-    
+
     function _contract_masternode () public view returns (address) {
         return _internalMod._contract_masternode();
     }
-    
+
     function _contract_token () public view returns (address) {
         return _internalMod._contract_token();
     }
-    
+
     function _contract_miner () public view returns (address) {
         return _internalMod._contract_miner();
     }
@@ -506,4 +506,15 @@ contract CaelumMasternode is InterfaceContracts, CaelumAbstractMasternode {
         rewardsMasternode = masternodereward;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

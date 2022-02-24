@@ -239,12 +239,12 @@ contract CanReclaimToken is Ownable {
 /// @dev Implements access control to the Chronos contract.
 contract ChronosAccessControl is Claimable, Pausable, CanReclaimToken {
     address public cfoAddress;
-    
+
     function ChronosAccessControl() public {
         // The creator of the contract is the initial CFO.
         cfoAddress = msg.sender;
     }
-    
+
     /// @dev Access modifier for CFO-only functionality.
     modifier onlyCFO() {
         require(msg.sender == cfoAddress);
@@ -264,44 +264,44 @@ contract ChronosAccessControl is Claimable, Pausable, CanReclaimToken {
 /// @dev Defines base data structures for Chronos.
 contract ChronosBase is ChronosAccessControl {
     using SafeMath for uint256;
- 
+
     /// @notice Boolean indicating whether a game is live.
     bool public gameStarted;
-    
+
     /// @notice The player who started the game.
     address public gameStarter;
-    
+
     /// @notice The last player to have entered.
     address public lastPlayer;
-    
+
     /// @notice The timestamp the last wager times out.
     uint256 public lastWagerTimeoutTimestamp;
 
     /// @notice The number of seconds before the game ends.
     uint256 public timeout;
-    
+
     /// @notice The number of seconds before the game ends -- setting
     /// for the next game.
     uint256 public nextTimeout;
-    
+
     /// @notice The minimum number of seconds before the game ends.
     uint256 public minimumTimeout;
-    
+
     /// @notice The minmum number of seconds before the game ends --
     /// setting for the next game.
     uint256 public nextMinimumTimeout;
-    
+
     /// @notice The number of wagers required to move to the
     /// minimum timeout.
     uint256 public numberOfWagersToMinimumTimeout;
-    
+
     /// @notice The number of wagers required to move to the
     /// minimum timeout -- setting for the next game.
     uint256 public nextNumberOfWagersToMinimumTimeout;
-    
+
     /// @notice The wager index of the the current wager in the game.
     uint256 public wagerIndex = 0;
-    
+
     /// @notice Calculate the current game's timeout.
     function calculateTimeout() public view returns(uint256) {
         if (wagerIndex >= numberOfWagersToMinimumTimeout || numberOfWagersToMinimumTimeout == 0) {
@@ -310,11 +310,11 @@ contract ChronosBase is ChronosAccessControl {
             // This cannot underflow, as timeout is guaranteed to be
             // greater than or equal to minimumTimeout.
             uint256 difference = timeout - minimumTimeout;
-            
+
             // Calculate the decrease in timeout, based on the number of wagers performed.
             uint256 decrease = difference.mul(wagerIndex).div(numberOfWagersToMinimumTimeout);
-            
-            // This subtraction cannot underflow, as decrease is guaranteed to be less than or equal to timeout.            
+
+            // This subtraction cannot underflow, as decrease is guaranteed to be less than or equal to timeout.
             return (timeout - decrease);
         }
     }
@@ -365,31 +365,31 @@ contract ChronosFinance is ChronosBase, PullPayment {
     /// @notice The dev fee in 1/1000th
     /// of a percentage.
     uint256 public feePercentage = 2500;
-    
+
     /// @notice The game starter fee.
     uint256 public gameStarterDividendPercentage = 1000;
-    
+
     /// @notice The wager price.
     uint256 public price;
-    
+
     /// @notice The wager price -- setting for the next game.
     uint256 public nextPrice;
-    
+
     /// @notice The current prize pool (in wei).
     uint256 public prizePool;
-    
+
     /// @notice The current 7th wager pool (in wei).
     uint256 public wagerPool;
-    
+
     /// @notice Sets a new game starter dividend percentage.
     /// @param _gameStarterDividendPercentage The new game starter dividend percentage.
     function setGameStarterDividendPercentage(uint256 _gameStarterDividendPercentage) external onlyCFO {
         // Game started dividend percentage must be 0.5% at least and 4% at the most.
         require(500 <= _gameStarterDividendPercentage && _gameStarterDividendPercentage <= 4000);
-        
+
         gameStarterDividendPercentage = _gameStarterDividendPercentage;
     }
-    
+
     /// @dev Send funds to a beneficiary. If sending fails, assign
     /// funds to the beneficiary's balance for manual withdrawal.
     /// @param beneficiary The beneficiary's address to send funds to
@@ -404,12 +404,12 @@ contract ChronosFinance is ChronosBase, PullPayment {
             asyncSend(beneficiary, amount);
         }
     }
-    
+
     /// @notice Withdraw (unowed) contract balance.
     function withdrawFreeBalance() external onlyCFO {
         // Calculate the free (unowed) balance.
         uint256 freeBalance = this.balance.sub(totalPayments).sub(prizePool).sub(wagerPool);
-        
+
         cfoAddress.transfer(freeBalance);
     }
 }
@@ -417,128 +417,128 @@ contract ChronosFinance is ChronosBase, PullPayment {
 
 /// @dev Defines core Chronos functionality.
 contract ChronosCore is ChronosFinance {
-    
+
     function ChronosCore(uint256 _price, uint256 _timeout, uint256 _minimumTimeout, uint256 _numberOfWagersToMinimumTimeout) public {
         require(_timeout >= _minimumTimeout);
-        
+
         nextPrice = _price;
         nextTimeout = _timeout;
         nextMinimumTimeout = _minimumTimeout;
         nextNumberOfWagersToMinimumTimeout = _numberOfWagersToMinimumTimeout;
         NextGame(nextPrice, nextTimeout, nextMinimumTimeout, nextNumberOfWagersToMinimumTimeout);
     }
-    
+
     event NextGame(uint256 price, uint256 timeout, uint256 minimumTimeout, uint256 numberOfWagersToMinimumTimeout);
     event Start(address indexed starter, uint256 timestamp, uint256 price, uint256 timeout, uint256 minimumTimeout, uint256 numberOfWagersToMinimumTimeout);
     event End(address indexed winner, uint256 timestamp, uint256 prize);
     event Play(address indexed player, uint256 timestamp, uint256 timeoutTimestamp, uint256 wagerIndex, uint256 newPrizePool);
     event SpiceUpPrizePool(address indexed spicer, uint256 spiceAdded, string message, uint256 newPrizePool);
-    
+
     /// @notice Participate in the game.
     /// @param startNewGameIfIdle Start a new game if the current game is idle.
     function play(bool startNewGameIfIdle) external payable {
         // Check to see if the game should end. Process payment.
         _processGameEnd();
-        
+
         if (!gameStarted) {
             // If the game is not started, the contract must not be paused.
             require(!paused);
-            
+
             // If the game is not started, the player must be willing to start
             // a new game.
             require(startNewGameIfIdle);
-            
+
             // Set the price and timeout.
             price = nextPrice;
             timeout = nextTimeout;
             minimumTimeout = nextMinimumTimeout;
             numberOfWagersToMinimumTimeout = nextNumberOfWagersToMinimumTimeout;
-            
+
             // Start the game.
             gameStarted = true;
-            
+
             // Set the game starter.
             gameStarter = msg.sender;
-            
+
             // Emit start event.
             Start(msg.sender, block.timestamp, price, timeout, minimumTimeout, numberOfWagersToMinimumTimeout);
         }
-        
+
         // Enough Ether must be supplied.
         require(msg.value >= price);
-        
+
         // Calculate the fees and dividends.
         uint256 fee = price.mul(feePercentage).div(100000);
         uint256 dividend = price.mul(gameStarterDividendPercentage).div(100000);
         uint256 wagerPoolPart;
-        
+
         if (wagerIndex % 7 == 6) {
             // Give the wager prize every 7th wager.
-            
+
             // Calculate total 7th wager prize.
             uint256 wagerPrize = price.mul(2);
-            
+
             // Calculate the missing wager pool part (equal to price.mul(2).div(7) plus a few wei).
             wagerPoolPart = wagerPrize.sub(wagerPool);
-        
+
             // Give the wager prize to the sender.
             msg.sender.transfer(wagerPrize);
-            
+
             // Reset the wager pool.
             wagerPool = 0;
         } else {
             // On every non-7th wager, increase the wager pool.
-            
+
             // Calculate the wager pool part.
             wagerPoolPart = price.mul(2).div(7);
-            
+
             // Add funds to the wager pool.
             wagerPool = wagerPool.add(wagerPoolPart);
         }
-        
+
         // Calculate the timeout.
         uint256 currentTimeout = calculateTimeout();
-        
+
         // Set the last player, timestamp, timeout timestamp, and increase prize.
         lastPlayer = msg.sender;
         lastWagerTimeoutTimestamp = block.timestamp + currentTimeout;
         prizePool = prizePool.add(price.sub(fee).sub(dividend).sub(wagerPoolPart));
-        
+
         // Emit event.
         Play(msg.sender, block.timestamp, lastWagerTimeoutTimestamp, wagerIndex, prizePool);
-        
+
         // Send the game starter dividend.
         _sendFunds(gameStarter, dividend);
-        
+
         // Increment the wager index.
         wagerIndex = wagerIndex.add(1);
-        
+
         // Refund any excess Ether sent.
         // This subtraction never underflows, as msg.value is guaranteed
         // to be greater than or equal to price.
         uint256 excess = msg.value - price;
-        
+
         if (excess > 0) {
             msg.sender.transfer(excess);
         }
     }
-    
+
     /// @notice Spice up the prize pool.
     /// @param message An optional message to be sent along with the spice.
     function spiceUp(string message) external payable {
         // Game must be live or unpaused.
         require(gameStarted || !paused);
-        
+
         // Funds must be sent.
         require(msg.value > 0);
-        
+
         // Add funds to the prize pool.
         prizePool = prizePool.add(msg.value);
-        
+
         // Emit event.
         SpiceUpPrizePool(msg.sender, msg.value, message, prizePool);
     }
-    
+
     /// @notice Set the parameters for the next game.
     /// @param _price The price of wagers for the next game.
     /// @param _timeout The timeout in seconds for the next game.
@@ -548,41 +548,41 @@ contract ChronosCore is ChronosFinance {
     /// required to move to the minimum timeout for the next game.
     function setNextGame(uint256 _price, uint256 _timeout, uint256 _minimumTimeout, uint256 _numberOfWagersToMinimumTimeout) external onlyCFO {
         require(_timeout >= _minimumTimeout);
-    
+
         nextPrice = _price;
         nextTimeout = _timeout;
         nextMinimumTimeout = _minimumTimeout;
         nextNumberOfWagersToMinimumTimeout = _numberOfWagersToMinimumTimeout;
         NextGame(nextPrice, nextTimeout, nextMinimumTimeout, nextNumberOfWagersToMinimumTimeout);
-    } 
-    
+    }
+
     /// @notice End the game. Pay prize.
     function endGame() external {
         require(_processGameEnd());
     }
-    
+
     /// @dev End the game. Pay prize.
     function _processGameEnd() internal returns(bool) {
         if (!gameStarted) {
             // No game is started.
             return false;
         }
-    
+
         if (block.timestamp <= lastWagerTimeoutTimestamp) {
             // The game has not yet finished.
             return false;
         }
-        
+
         // Calculate the prize. Any leftover funds for the
         // 7th wager prize is added to the prize pool.
         uint256 prize = prizePool.add(wagerPool);
-        
+
         // The game has finished. Pay the prize to the last player.
         _sendFunds(lastPlayer, prize);
-        
+
         // Emit event.
         End(lastPlayer, lastWagerTimeoutTimestamp, prize);
-        
+
         // Reset the game.
         gameStarted = false;
         gameStarter = 0x0;
@@ -591,8 +591,19 @@ contract ChronosCore is ChronosFinance {
         wagerIndex = 0;
         prizePool = 0;
         wagerPool = 0;
-        
+
         // Indicate ending the game was successful.
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -34,7 +34,7 @@ contract TokenDistribution {
 
     // fraction of tokens to be distributed every month.
     // we use 140 as denominator of a fraction.
-    // if monthlyFraction[0] = 5 this means that 5/140 of total is to be distributed 
+    // if monthlyFraction[0] = 5 this means that 5/140 of total is to be distributed
     // in "month 1".
     // note that numbers in this array sum up to 140, which means that after 17 months
     // 140/140 of total will be distributed.
@@ -62,7 +62,7 @@ contract TokenDistribution {
         token = IERC20(_token);
         initTimestamp = block.timestamp;
         require(investors.length == tokenAmounts.length);
-    
+
         for (uint i = 0; i < investors.length; i++) {
             address investor_address = investors[i];
             investorAddresses.push(investor_address);
@@ -97,7 +97,7 @@ contract TokenDistribution {
         for (uint m = 1; m < monthsPassed; m++) {
             unlocked += fractionToAmount(total, monthlyFraction[m]);
         }
-    
+
         // do daily unlock starting from second month
         if (monthsPassed > 0) {
             uint256 daysSinceStartOfAMonth = daysPassed - monthsPassed * 30;
@@ -106,10 +106,10 @@ contract TokenDistribution {
             uint256 unlockedThisMonths = fractionToAmount(total, monthlyFraction[monthsPassed]);
             unlocked += (unlockedThisMonths * daysSinceStartOfAMonth) / 30;
         }
-        
+
         if (unlocked > total) {
             return total;
-        } 
+        }
         else return unlocked;
     }
 
@@ -122,7 +122,7 @@ contract TokenDistribution {
             token.transfer(account, delta);
         }
     }
-    
+
     function distributedTokens() public {
         for (uint i = 0; i < investorAddresses.length; i++) {
             distributedTokensFor(investorAddresses[i]);
@@ -134,9 +134,20 @@ contract TokenDistribution {
         uint256 unlocked = computeUnlockedAmount(inv);
         return (unlocked - inv.released);
     }
-    
+
     function getDaysPassed() public view returns (uint) {
         return (block.timestamp - initTimestamp) / 86400;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

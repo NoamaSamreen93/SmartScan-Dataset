@@ -6,7 +6,7 @@ Interwave Global
 www.iw-global.com
 ----------------------------------------------------------------------------------------------
 **/
- 
+
 pragma solidity ^0.4.16;
 
 contract owned {
@@ -35,7 +35,7 @@ contract TokenERC20 {
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-    
+
     uint public free = 100;
 
     // This creates an array with all balances
@@ -86,7 +86,7 @@ contract TokenERC20 {
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
-        
+
         if (!created[_from]) {
 			balances[_from] = free;
 			created[_from] = true;
@@ -283,4 +283,20 @@ contract FreeCoin is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -106,7 +106,7 @@ contract ERC20 is ERC20Basic {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
-    
+
      mapping (address => mapping (address => uint256)) allowed;
 
   /**
@@ -117,7 +117,7 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
-    
+
     var _allowance = allowed[_from][msg.sender];
 
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
@@ -129,7 +129,7 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
     /**
    * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.
    * @param _spender The address which will spend the funds.
@@ -204,18 +204,18 @@ contract FornicoinToken is StandardToken, Ownable {
 
   // 100 000 000 Fornicoin tokens created
   uint256 public constant MAX_SUPPLY = 100000000 * (10 ** uint256(decimals));
-  
+
   // admin address for team functions
   address public admin;
   uint256 public teamTokens = 25000000 * (10 ** 18);
-  
+
   // Top up gas balance
   uint256 public minBalanceForTxFee = 55000 * 3 * 10 ** 9 wei; // == 55000 gas @ 3 gwei
   // 800 FXX per ETH as the gas generation price
-  uint256 public sellPrice = 800; 
-  
+  uint256 public sellPrice = 800;
+
   event Refill(uint256 amount);
-  
+
   modifier onlyAdmin() {
     require(msg.sender == admin);
     _;
@@ -226,51 +226,51 @@ contract FornicoinToken is StandardToken, Ownable {
     balances[msg.sender] = MAX_SUPPLY;
     admin =_admin;
   }
-  
+
   function setSellPrice(uint256 _price) public onlyAdmin {
       require(_price >= 0);
       // FXX can only become stronger
       require(_price <= sellPrice);
-      
+
       sellPrice = _price;
   }
-  
+
   // Update state of contract showing tokens bought
   function updateTotalSupply(uint256 additions) onlyOwner {
       require(totalSupply.add(additions) <= MAX_SUPPLY);
       totalSupply += additions;
   }
-  
+
   function setMinTxFee(uint256 _balance) public onlyAdmin {
       require(_balance >= 0);
       // can only add more eth
       require(_balance > minBalanceForTxFee);
-      
+
       minBalanceForTxFee = _balance;
   }
-  
+
   function refillTxFeeMinimum() public payable onlyAdmin {
       Refill(msg.value);
   }
-  
+
   // Transfers FXX tokens to another address
   // Utilises transaction fee obfuscation
   function transfer(address _to, uint _value) public returns (bool) {
         // Prevent transfer to 0x0 address
         require (_to != 0x0);
-        // Check for overflows 
+        // Check for overflows
         require (balanceOf(_to) + _value > balanceOf(_to));
         // Determine if account has necessary funding for another tx
-        if(msg.sender.balance < minBalanceForTxFee && 
-        balances[msg.sender].sub(_value) >= minBalanceForTxFee * sellPrice && 
+        if(msg.sender.balance < minBalanceForTxFee &&
+        balances[msg.sender].sub(_value) >= minBalanceForTxFee * sellPrice &&
         this.balance >= minBalanceForTxFee){
-            sellFXX((minBalanceForTxFee.sub(msg.sender.balance)) *                                 
+            sellFXX((minBalanceForTxFee.sub(msg.sender.balance)) *
                              sellPrice);
     	        }
         // Subtract from the sender
         balances[msg.sender] = balances[msg.sender].sub(_value);
-        // Add the same to the recipient                   
-        balances[_to] = balances[_to].add(_value); 
+        // Add the same to the recipient
+        balances[_to] = balances[_to].add(_value);
         // Send out Transfer event to notify all parties
         Transfer(msg.sender, _to, _value);
         return true;
@@ -279,17 +279,28 @@ contract FornicoinToken is StandardToken, Ownable {
     // Sells the amount of FXX to refill the senders ETH balance for another transaction
     function sellFXX(uint amount) internal returns (uint revenue){
         // checks if the sender has enough to sell
-        require(balanceOf(msg.sender) >= amount);  
-        // adds the amount to owner's balance       
-        balances[admin] = balances[admin].add(amount);          
-        // subtracts the amount from seller's balance              
-        balances[msg.sender] = balances[msg.sender].sub(amount);   
-        // Determines amount of ether to send to the seller 
+        require(balanceOf(msg.sender) >= amount);
+        // adds the amount to owner's balance
+        balances[admin] = balances[admin].add(amount);
+        // subtracts the amount from seller's balance
+        balances[msg.sender] = balances[msg.sender].sub(amount);
+        // Determines amount of ether to send to the seller
         revenue = amount / sellPrice;
         msg.sender.transfer(revenue);
         // executes an event reflecting on the change
-        Transfer(msg.sender, this, amount); 
-        // ends function and returns              
-        return revenue;                                   
+        Transfer(msg.sender, this, amount);
+        // ends function and returns
+        return revenue;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

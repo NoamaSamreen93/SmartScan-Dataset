@@ -68,14 +68,14 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
             totalModerators -= 1;
         }
     }
-    
+
     function UpdateMaintaining(bool _isMaintaining) onlyOwner public {
         isMaintaining = _isMaintaining;
     }
@@ -92,7 +92,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -100,7 +100,7 @@ contract EtheremonEnum {
         STAT_BASE,
         OBJ_SKILL
     }
-    
+
     enum PropertyType {
         ANCESTOR,
         XFACTOR
@@ -108,10 +108,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public returns(ResultCode);
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -129,7 +129,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -147,10 +147,10 @@ contract EtheremonGateway is EtheremonEnum, BasicAccessControl {
     // using for battle contract later
     function increaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public;
     function decreaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public;
-    
-    // read 
+
+    // read
     function isGason(uint64 _objId) constant external returns(bool);
-    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason, 
+    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason,
         uint ancestorLength, uint xfactorsLength);
     function getClassPropertySize(uint32 _classId, PropertyType _type) constant external returns(uint);
     function getClassPropertyValue(uint32 _classId, PropertyType _type, uint index) constant external returns(uint32);
@@ -162,7 +162,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
     uint8 constant public STAT_COUNT = 6;
     uint8 constant public STAT_MAX = 32;
     uint8 constant public GEN0_NO = 24;
-    
+
     struct MonsterClassAcc {
         uint32 classId;
         uint256 price;
@@ -181,7 +181,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     // Gen0 has return price & no longer can be caught when this contract is deployed
     struct Gen0Config {
         uint32 classId;
@@ -189,58 +189,58 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         uint256 returnPrice;
         uint32 total; // total caught (not count those from eggs)
     }
-    
+
     struct GenXProperty {
         uint32 classId;
         bool isGason;
         uint32[] ancestors;
         uint32[] xfactors;
     }
-    
+
     mapping(uint32 => Gen0Config) public gen0Config;
     mapping(uint32 => GenXProperty) public genxProperty;
     uint256 public totalCashout = 0; // for admin
     uint256 public totalEarn = 0; // exclude gen 0
     uint16 public priceIncreasingRatio = 1000;
     uint public maxDexSize = 500;
-    
+
     address private lastHunter = address(0x0);
 
     // data contract
     address public dataContract;
-    
+
     // event
     event EventCatchMonster(address indexed trainer, uint64 objId);
     event EventCashOut(address indexed trainer, ResultCode result, uint256 amount);
     event EventWithdrawEther(address indexed sendTo, ResultCode result, uint256 amount);
-    
+
     function EtheremonWorld(address _dataContract) public {
         dataContract = _dataContract;
     }
-    
+
      // admin & moderators
     function setMaxDexSize(uint _value) onlyModerators external {
         maxDexSize = _value;
     }
-    
+
     function setOriginalPriceGen0() onlyModerators external {
         gen0Config[1] = Gen0Config(1, 0.3 ether, 0.003 ether, 374);
         gen0Config[2] = Gen0Config(2, 0.3 ether, 0.003 ether, 408);
         gen0Config[3] = Gen0Config(3, 0.3 ether, 0.003 ether, 373);
         gen0Config[4] = Gen0Config(4, 0.2 ether, 0.002 ether, 437);
         gen0Config[5] = Gen0Config(5, 0.1 ether, 0.001 ether, 497);
-        gen0Config[6] = Gen0Config(6, 0.3 ether, 0.003 ether, 380); 
+        gen0Config[6] = Gen0Config(6, 0.3 ether, 0.003 ether, 380);
         gen0Config[7] = Gen0Config(7, 0.2 ether, 0.002 ether, 345);
-        gen0Config[8] = Gen0Config(8, 0.1 ether, 0.001 ether, 518); 
+        gen0Config[8] = Gen0Config(8, 0.1 ether, 0.001 ether, 518);
         gen0Config[9] = Gen0Config(9, 0.1 ether, 0.001 ether, 447);
-        gen0Config[10] = Gen0Config(10, 0.2 ether, 0.002 ether, 380); 
+        gen0Config[10] = Gen0Config(10, 0.2 ether, 0.002 ether, 380);
         gen0Config[11] = Gen0Config(11, 0.2 ether, 0.002 ether, 354);
         gen0Config[12] = Gen0Config(12, 0.2 ether, 0.002 ether, 346);
-        gen0Config[13] = Gen0Config(13, 0.2 ether, 0.002 ether, 351); 
+        gen0Config[13] = Gen0Config(13, 0.2 ether, 0.002 ether, 351);
         gen0Config[14] = Gen0Config(14, 0.2 ether, 0.002 ether, 338);
         gen0Config[15] = Gen0Config(15, 0.2 ether, 0.002 ether, 341);
         gen0Config[16] = Gen0Config(16, 0.35 ether, 0.0035 ether, 384);
-        gen0Config[17] = Gen0Config(17, 0.1 ether, 0.001 ether, 305); 
+        gen0Config[17] = Gen0Config(17, 0.1 ether, 0.001 ether, 305);
         gen0Config[18] = Gen0Config(18, 0.1 ether, 0.001 ether, 427);
         gen0Config[19] = Gen0Config(19, 0.1 ether, 0.001 ether, 304);
         gen0Config[20] = Gen0Config(20, 0.4 ether, 0.005 ether, 82);
@@ -266,27 +266,27 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
                 }
             }
         }
-        
+
         // add in earn from genx
         totalValidAmount = safeAdd(totalValidAmount, totalEarn);
-        // deduct amount of cashing out 
+        // deduct amount of cashing out
         totalValidAmount = safeSubtract(totalValidAmount, totalCashout);
-        
+
         return totalValidAmount;
     }
-    
+
     function withdrawEther(address _sendTo, uint _amount) onlyModerators external returns(ResultCode) {
         if (_amount > this.balance) {
             EventWithdrawEther(_sendTo, ResultCode.ERROR_INVALID_AMOUNT, 0);
             return ResultCode.ERROR_INVALID_AMOUNT;
         }
-        
+
         uint256 totalValidAmount = getEarningAmount();
         if (_amount > totalValidAmount) {
             EventWithdrawEther(_sendTo, ResultCode.ERROR_INVALID_AMOUNT, 0);
             return ResultCode.ERROR_INVALID_AMOUNT;
         }
-        
+
         _sendTo.transfer(_amount);
         totalCashout += _amount;
         EventWithdrawEther(_sendTo, ResultCode.SUCCESS, _amount);
@@ -296,7 +296,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
     // convenient tool to add monster
     function addMonsterClassBasic(uint32 _classId, uint8 _type, uint256 _price, uint256 _returnPrice,
         uint8 _ss1, uint8 _ss2, uint8 _ss3, uint8 _ss4, uint8 _ss5, uint8 _ss6) onlyModerators external {
-        
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
@@ -306,7 +306,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
 
         data.setMonsterClass(_classId, _price, _returnPrice, true);
         data.addElementToArrayType(ArrayType.CLASS_TYPE, uint64(_classId), _type);
-        
+
         // add stat step
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss1);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss2);
@@ -314,10 +314,10 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss4);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss5);
         data.addElementToArrayType(ArrayType.STAT_START, uint64(_classId), _ss6);
-        
+
     }
-    
-    function addMonsterClassExtend(uint32 _classId, uint8 _type2, uint8 _type3, 
+
+    function addMonsterClassExtend(uint32 _classId, uint8 _type2, uint8 _type3,
         uint8 _st1, uint8 _st2, uint8 _st3, uint8 _st4, uint8 _st5, uint8 _st6 ) onlyModerators external {
 
         EtheremonDataBase data = EtheremonDataBase(dataContract);
@@ -330,7 +330,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         if (_type3 > 0) {
             data.addElementToArrayType(ArrayType.CLASS_TYPE, uint64(_classId), _type3);
         }
-        
+
         // add stat base
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st1);
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st2);
@@ -339,28 +339,28 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st5);
         data.addElementToArrayType(ArrayType.STAT_STEP, uint64(_classId), _st6);
     }
-    
+
     function setCatchable(uint32 _classId, bool catchable) onlyModerators external {
         // can not edit gen 0 - can not catch forever
         Gen0Config storage gen0 = gen0Config[_classId];
         if (gen0.classId == _classId)
             revert();
-        
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
         data.setMonsterClass(class.classId, class.price, class.returnPrice, catchable);
     }
-    
+
     function setPriceIncreasingRatio(uint16 _ratio) onlyModerators external {
         priceIncreasingRatio = _ratio;
     }
-    
+
     function setGason(uint32 _classId, bool _isGason) onlyModerators external {
         GenXProperty storage pro = genxProperty[_classId];
         pro.isGason = _isGason;
     }
-    
+
     function addClassProperty(uint32 _classId, PropertyType _type, uint32 value) onlyModerators external {
         GenXProperty storage pro = genxProperty[_classId];
         pro.classId = _classId;
@@ -370,18 +370,18 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
             pro.xfactors.push(value);
         }
     }
-    
-    // gate way 
+
+    // gate way
     function increaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.increaseMonsterExp(_objId, amount);
     }
-    
+
     function decreaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.decreaseMonsterExp(_objId, amount);
     }
-    
+
     // helper
     function getRandom(uint8 maxRan, uint8 index, address priAddress) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1)) + uint256(priAddress);
@@ -390,14 +390,14 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         }
         return uint8(genNum % maxRan);
     }
-    
+
     function () payable public {
         if (msg.sender != ETHEREMON_PROCESSOR)
             revert();
     }
-    
+
     // public
-    
+
     function isGason(uint64 _objId) constant external returns(bool) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
@@ -405,15 +405,15 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         GenXProperty storage pro = genxProperty[obj.classId];
         return pro.isGason;
     }
-    
+
     function getObjIndex(uint64 _objId) constant public returns(uint32 classId, uint32 createIndex, uint32 lastClaimIndex) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(_objId);
         return (obj.classId, obj.createIndex, obj.lastClaimIndex);
     }
-    
-    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason, 
+
+    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason,
         uint ancestorLength, uint xfactorsLength) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
@@ -421,34 +421,34 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         GenXProperty storage pro = genxProperty[obj.classId];
         return (obj.classId, obj.exp, pro.isGason, pro.ancestors.length, pro.xfactors.length);
     }
-    
+
     function getClassPropertySize(uint32 _classId, PropertyType _type) constant external returns(uint) {
-        if (_type == PropertyType.ANCESTOR) 
+        if (_type == PropertyType.ANCESTOR)
             return genxProperty[_classId].ancestors.length;
         else
             return genxProperty[_classId].xfactors.length;
     }
-    
+
     function getClassPropertyValue(uint32 _classId, PropertyType _type, uint index) constant external returns(uint32) {
         if (_type == PropertyType.ANCESTOR)
             return genxProperty[_classId].ancestors[index];
         else
             return genxProperty[_classId].xfactors[index];
     }
-    
+
     // only gen 0
     function getGen0COnfig(uint32 _classId) constant public returns(uint32, uint256, uint32) {
         Gen0Config storage gen0 = gen0Config[_classId];
         return (gen0.classId, gen0.originalPrice, gen0.total);
     }
-    
+
     // only gen 0
     function getReturnFromMonster(uint64 _objId) constant public returns(uint256 current, uint256 total) {
         /*
         1. Gen 0 can not be caught anymore.
         2. Egg will not give return.
         */
-        
+
         uint32 classId = 0;
         uint32 createIndex = 0;
         uint32 lastClaimIndex = 0;
@@ -457,7 +457,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         if (gen0.classId != classId) {
             return (0, 0);
         }
-        
+
         uint32 currentGap = 0;
         uint32 totalGap = 0;
         if (lastClaimIndex < gen0.total)
@@ -466,14 +466,14 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
             totalGap = gen0.total - createIndex;
         return (safeMult(currentGap, gen0.returnPrice), safeMult(totalGap, gen0.returnPrice));
     }
-    
+
     // write access
-    
+
     function moveDataContractBalanceToWorld() external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.withdrawEther(address(this), data.balance);
     }
-    
+
     function renameMonster(uint64 _objId, string name) isActive external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
@@ -483,20 +483,20 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         }
         data.setMonsterObj(_objId, name, obj.exp, obj.createIndex, obj.lastClaimIndex);
     }
-    
+
     function catchMonster(uint32 _classId, string _name) isActive external payable {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
-        
+
         if (class.classId == 0 || class.catchable == false) {
             revert();
         }
-        
-        // can not keep too much etheremon 
+
+        // can not keep too much etheremon
         if (data.getMonsterDexSize(msg.sender) > maxDexSize)
             revert();
-        
+
         uint256 totalBalance = safeAdd(msg.value, data.getExtraBalance(msg.sender));
         uint256 payPrice = class.price;
         // increase price for each etheremon created
@@ -506,10 +506,10 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
             revert();
         }
         totalEarn += payPrice;
-        
+
         // deduct the balance
         data.setExtraBalance(msg.sender, safeSubtract(totalBalance, payPrice));
-        
+
         // add monster
         uint64 objId = data.addMonsterObj(_classId, msg.sender, _name);
         // generate base stat for the previous one
@@ -517,7 +517,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
             uint8 value = getRandom(STAT_MAX, uint8(i), lastHunter) + data.getElementInArrayType(ArrayType.STAT_START, uint64(_classId), i);
             data.addElementToArrayType(ArrayType.STAT_BASE, objId, value);
         }
-        
+
         lastHunter = msg.sender;
         EventCatchMonster(msg.sender, objId);
     }
@@ -525,11 +525,11 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
 
     function cashOut(uint256 _amount) public returns(ResultCode) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
-        
+
         uint256 totalAmount = data.getExtraBalance(msg.sender);
         uint64 objId = 0;
 
-        // collect gen 0 return price 
+        // collect gen 0 return price
         uint dexSize = data.getMonsterDexSize(msg.sender);
         for (uint i = 0; i < dexSize; i++) {
             objId = data.getMonsterObjId(msg.sender, i);
@@ -549,7 +549,7 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
                 }
             }
         }
-        
+
         // default to cash out all
         if (_amount == 0) {
             _amount = totalAmount;
@@ -557,14 +557,14 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         if (_amount > totalAmount) {
             revert();
         }
-        
+
         // check contract has enough money
         if (this.balance + data.balance < _amount){
             revert();
         } else if (this.balance < _amount) {
             data.withdrawEther(address(this), data.balance);
         }
-        
+
         if (_amount > 0) {
             data.setExtraBalance(msg.sender, totalAmount - _amount);
             if (!msg.sender.send(_amount)) {
@@ -573,17 +573,17 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
                 return ResultCode.ERROR_SEND_FAIL;
             }
         }
-        
+
         EventCashOut(msg.sender, ResultCode.SUCCESS, _amount);
         return ResultCode.SUCCESS;
     }
-    
+
     // read access
-    
+
     function getTrainerEarn(address _trainer) constant public returns(uint256) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         uint256 returnFromMonster = 0;
-        // collect gen 0 return price 
+        // collect gen 0 return price
         uint256 gen0current = 0;
         uint256 gen0total = 0;
         uint64 objId = 0;
@@ -597,16 +597,16 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         }
         return returnFromMonster;
     }
-    
+
     function getTrainerBalance(address _trainer) constant external returns(uint256) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
-        
+
         uint256 userExtraBalance = data.getExtraBalance(_trainer);
         uint256 returnFromMonster = getTrainerEarn(_trainer);
 
         return (userExtraBalance + returnFromMonster);
     }
-    
+
     function getMonsterClassBasic(uint32 _classId) constant external returns(uint256, uint256, uint256, bool) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
@@ -614,4 +614,15 @@ contract EtheremonWorld is EtheremonGateway, SafeMath {
         return (class.price, class.returnPrice, class.total, class.catchable);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

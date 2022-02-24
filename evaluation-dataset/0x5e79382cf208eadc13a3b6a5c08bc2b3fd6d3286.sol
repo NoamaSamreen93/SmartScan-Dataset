@@ -79,7 +79,7 @@ contract EthmoMinter {
     uint FIWDeploy;
     uint FIWMint;
     uint mult;
-    
+
     function createContract (bytes32 EthmojiName,bytes32 EthmojiNicknameOrSymbol,uint Amount) public payable{
         if (msg.sender==Admin || msg.sender==Tummy || msg.sender==Willy || msg.sender==Nicky || msg.sender==Artem){
         }else{
@@ -96,8 +96,8 @@ contract EthmoMinter {
 
         newContracts.push(newContract);
 
-    } 
-    
+    }
+
     function MintMoreEthmojis (address EthmojiAddress,uint Amount) public payable{
         if (msg.sender==Admin || msg.sender==Tummy || msg.sender==Willy || msg.sender==Nicky || msg.sender==Artem){
         }else{
@@ -113,13 +113,13 @@ contract EthmoMinter {
         Contract mints=Contract(EthmojiAddress);
         mints.MintMore(Sender,Amount,Legit);
     }
-    
-    
+
+
     function () public payable{
         Admin.transfer(msg.value);
     }
-        
-   
+
+
 
 }
 
@@ -127,7 +127,7 @@ contract EthmoMinter {
 contract VIPs {
     function IsVIP(address Address)returns(uint Multiplier);
 }
-    
+
 
 contract EthmoFees {
     function GetFeeEthmoDeploy()returns(uint);
@@ -150,7 +150,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
 
 
     function Contract (bytes32 EthmojiName,bytes32 EthmojiNicknameOrSymbol,uint Amount,address Sender) public {
-        
+
     bytes memory bytesString = new bytes(32);
     uint charCount = 0;
     for (uint j = 0; j < 32; j++) {
@@ -164,7 +164,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     for (j = 0; j < charCount; j++) {
         bytesStringTrimmed[j] = bytesString[j];
     }
-    
+
 
     bytes memory bytesStringsw = new bytes(32);
     uint charCountsw = 0;
@@ -194,7 +194,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     }
 
 
-   
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
@@ -217,7 +217,7 @@ contract Contract is ERC20Interface, Owned, SafeMath {
     }
 
 
-  
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -249,8 +249,8 @@ contract Contract is ERC20Interface, Owned, SafeMath {
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), Sender, tokens);
     }
-    
-    
+
+
 
     function () public payable{
         Admin.transfer(msg.value);
@@ -261,3 +261,10 @@ contract Contract is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

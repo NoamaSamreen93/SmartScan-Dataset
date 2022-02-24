@@ -3,28 +3,28 @@ contract Token{
     // token总量，默认会为public变量生成一个getter函数接口，名称为totalSupply().
     uint256 public totalSupply;
 
-    /// 获取账户_owner拥有token的数量 
+    /// 获取账户_owner拥有token的数量
     function balanceOf(address _owner) constant returns (uint256 balance);
 
     //从消息发送者账户中往_to账户转数量为_value的token
     function transfer(address _to, uint256 _value) returns (bool success);
 
     //从账户_from中往账户_to转数量为_value的token，与approve方法配合使用
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     //消息发送账户设置账户_spender能从发送账户中转出数量为_value的token
     function approve(address _spender, uint256 _value) returns (bool success);
 
     //获取账户_spender可以从账户_owner中转出token的数量
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -40,9 +40,9 @@ contract StandardToken is Token {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -51,12 +51,12 @@ contract StandardToken is Token {
         Transfer(_from, _to, _value);//触发转币交易事件
         return true;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -79,9 +79,20 @@ contract IntelligenceChainToken is StandardToken {
     uint256 public constant MILLION_TOKENS = (10**6) * ONE_TOKENS;
     uint256 public constant TOTAL_TOKENS = 1800 * MILLION_TOKENS;
 
-    function IntelligenceChainToken ()    
+    function IntelligenceChainToken ()
     {
         balances[msg.sender] = TOTAL_TOKENS; // 初始token数量给予消息发送者
         totalSupply = TOTAL_TOKENS;         // 设置初始总量
-    }   
+    }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -28,3 +28,9 @@ contract exForward{
         emit eth_deposit(msg.sender,msg.value);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

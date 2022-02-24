@@ -108,7 +108,7 @@ library SafeMath {
  * @dev This is the main contract for the SeedDex exchange.
  */
 contract SeedDex {
-  
+
   using SafeMath for uint;
 
   /// Variables
@@ -149,7 +149,7 @@ contract SeedDex {
      require(msg.sender == manager || msg.sender == admin );
       _;
   }
-    
+
   /// Constructor function. This is only called on contract creation.
   function SeedDex(address admin_, address manager_, address feeAccount_, uint feeTakeMaker_, uint feeTakeSender_,  uint feeTakeMakerFic_, uint feeTakeSenderFic_,  address predecessor_) public {
     admin = admin_;
@@ -161,7 +161,7 @@ contract SeedDex {
     feeTakeSenderFic = feeTakeSenderFic_;
     depositingTokenFlag = false;
     predecessor = predecessor_;
-    
+
     if (predecessor != address(0)) {
       version = SeedDex(predecessor).version() + 1;
     } else {
@@ -195,7 +195,7 @@ contract SeedDex {
   function changeFeeTakeMaker(uint feeTakeMaker_) public isManager {
     feeTakeMaker = feeTakeMaker_;
   }
-  
+
   function changeFeeTakeSender(uint feeTakeSender_) public isManager {
     feeTakeSender = feeTakeSender_;
   }
@@ -203,17 +203,17 @@ contract SeedDex {
   function changeFeeTakeMakerFic(uint feeTakeMakerFic_) public isManager {
     feeTakeMakerFic = feeTakeMakerFic_;
   }
-  
+
   function changeFeeTakeSenderFic(uint feeTakeSenderFic_) public isManager {
     feeTakeSenderFic = feeTakeSenderFic_;
   }
-  
+
   /// Changes the successor. Used in updating the contract.
   function setSuccessor(address successor_) public isAdmin {
     require(successor_ != address(0));
     successor = successor_;
   }
-  
+
   ////////////////////////////////////////////////////////////////////////////////
   // Deposits, Withdrawals, Balances
   ////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ contract SeedDex {
         revert();
       }
   }
-  
+
   /**
   * This function handles withdrawals of Ethereum based tokens from the contract.
   * Does not allow Ether.
@@ -311,8 +311,8 @@ contract SeedDex {
   /**
   * Stores the active order inside of the contract.
   * Emits an Order event.
-  * 
-  * 
+  *
+  *
   * Note: tokenGet & tokenGive can be the Ethereum contract address.
   * @param tokenGet Ethereum contract address of the token to receive
   * @param amountGet uint amount of tokens being received
@@ -359,7 +359,7 @@ contract SeedDex {
     orderFills[user][hash] = orderFills[user][hash].add(amount);
     Trade(tokenGet, amount, tokenGive, amountGive.mul(amount) / amountGet, user, msg.sender,now);
   }
-  
+
   /**
   * This is a private function and is only being called from trade().
   * Handles the movement of funds when a trade occurs.
@@ -375,36 +375,36 @@ contract SeedDex {
   * @param amount uint amount in terms of tokenGet that will be "buy" in the trade
   */
   function tradeBalances(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user, uint amount) private {
-    
+
     uint feeTakeXferM = 0;
     uint feeTakeXferS = 0;
     uint feeTakeXferFicM = 0;
     uint feeTakeXferFicS = 0;
-    
+
     feeTakeXferM = amount.mul(feeTakeMaker).div(1 ether);
     feeTakeXferS = amount.mul(feeTakeSender).div(1 ether);
     feeTakeXferFicM = amount.mul(feeTakeMakerFic).div(1 ether);
     feeTakeXferFicS = amount.mul(feeTakeSenderFic).div(1 ether);
-    
-    
-    
+
+
+
     if (tokenGet == FicAddress || tokenGive == FicAddress) {
     tokens[tokenGet][msg.sender] = tokens[tokenGet][msg.sender].sub(amount.add(feeTakeXferFicS));
     tokens[tokenGet][user] = tokens[tokenGet][user].add(amount.sub(feeTakeXferFicM));
     tokens[tokenGet][feeAccount] = tokens[tokenGet][feeAccount].add(feeTakeXferFicM);
     tokens[tokenGet][feeAccount] = tokens[tokenGet][feeAccount].add(feeTakeXferFicS);
     }
-  
+
     else {
     tokens[tokenGet][msg.sender] = tokens[tokenGet][msg.sender].sub(amount.add(feeTakeXferS));
     tokens[tokenGet][user] = tokens[tokenGet][user].add(amount.sub(feeTakeXferM));
     tokens[tokenGet][feeAccount] = tokens[tokenGet][feeAccount].add(feeTakeXferM);
     tokens[tokenGet][feeAccount] = tokens[tokenGet][feeAccount].add(feeTakeXferS);
     }
-    
+
     tokens[tokenGive][user] = tokens[tokenGive][user].sub(amountGive.mul(amount).div(amountGet));
     tokens[tokenGive][msg.sender] = tokens[tokenGive][msg.sender].add(amountGive.mul(amount).div(amountGet));
-  
+
   }
 
   /**
@@ -429,7 +429,7 @@ contract SeedDex {
     if (!(
       tokens[tokenGet][sender] >= amount &&
       availableVolume(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, user, v, r, s) >= amount
-      )) { 
+      )) {
       return false;
     } else {
       return true;
@@ -514,11 +514,11 @@ contract SeedDex {
   }
 
 
-  
+
   ////////////////////////////////////////////////////////////////////////////////
   // Contract Versioning / Migration
   ////////////////////////////////////////////////////////////////////////////////
-  
+
   /**
   * User triggered function to migrate funds into a new contract to ease updates.
   * Emits a FundsMigrated event.
@@ -526,9 +526,9 @@ contract SeedDex {
   * @param tokens_ Array of token addresses that we will be migrating to the new contract
   */
   function migrateFunds(address newContract, address[] tokens_) public {
-  
+
     require(newContract != address(0));
-    
+
     SeedDex newExchange = SeedDex(newContract);
 
     // Move Ether into new exchange.
@@ -543,8 +543,8 @@ contract SeedDex {
       address token = tokens_[n];
       require(token != address(0)); // Ether is handled above.
       uint tokenAmount = tokens[token][msg.sender];
-      
-      if (tokenAmount != 0) {      
+
+      if (tokenAmount != 0) {
         require(IERC20(token).approve(newExchange, tokenAmount));
         tokens[token][msg.sender] = 0;
         newExchange.depositTokenForUser(token, tokenAmount, msg.sender);
@@ -553,7 +553,7 @@ contract SeedDex {
 
     FundsMigrated(msg.sender, newContract);
   }
-  
+
   /**
   * This function handles deposits of Ether into the contract, but allows specification of a user.
   * Note: This is generally used in migration of funds.
@@ -564,7 +564,7 @@ contract SeedDex {
     require(msg.value > 0);
     tokens[0][user] = tokens[0][user].add(msg.value);
   }
-  
+
   /**
   * This function handles deposits of Ethereum based tokens into the contract, but allows specification of a user.
   * Does not allow Ether.
@@ -587,4 +587,15 @@ contract SeedDex {
       bytes32 hash = keccak256(tokenGet);
       LogEvent('hash',hash);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

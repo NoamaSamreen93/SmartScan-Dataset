@@ -7,11 +7,11 @@ pragma solidity ^0.5.5;
 interface ERC721 {
     // Required methods
     function totalSupply() external view returns (uint256 total);
-    
+
     function balanceOf(address _owner) external view returns (uint256 balance);
     function ownerOf(uint256 _tokenId) external view returns (address owner);
     function exists(uint256 _tokenId) external view returns (bool _exists);
-    
+
     function approve(address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
@@ -40,9 +40,9 @@ interface WLCCompatible {
     function getWLCReward(uint256 _boughtWLCAmount, address _owner) external returns (uint256 _remaining);
     function setWLCParams(address _address, uint256 _reward) external;
     function resetWLCParams() external;
-    
+
     function getForWLC(address _owner) external;
-    
+
     function getWLCRewardAmount() external view returns (uint256 _amount);
     function getWLCAddress() external view returns (address _address);
 }
@@ -50,17 +50,17 @@ interface WLCCompatible {
 contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     string internal constant tokenName   = 'DreamCarCoin3';
     string internal constant tokenSymbol = 'DCC3';
-    
+
     uint8 public constant decimals = 0;
-    
+
     //ERC721 VARIABLES
-    
+
     //the total count of wishes
     uint256 internal totalTokenSupply;
-    
+
     //this address is the CEO
     address payable public CEO;
-    
+
     bytes4 constant InterfaceSignature_ERC165 =
         bytes4(keccak256('supportsInterface(bytes4)'));
 
@@ -75,49 +75,49 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         bytes4(keccak256('transferFrom(address,address,uint256)')) ^
         bytes4(keccak256('tokensOfOwner(address)')) ^
         bytes4(keccak256('tokenMetadata(uint256,string)'));
-    
+
     // Mapping from owner to number of owned tokens
     //mapping (address => uint256) internal tokensBalanceOf;
-    
+
     // Mapping from token ID to owner
     mapping (uint256 => address) internal tokenOwner;
-    
+
     // Optional mapping for token URIs
     mapping(uint256 => string) internal tokenURIs;
-    
+
     //TOKEN SPECIFIC VARIABLES
 
     mapping (address => uint256) internal tokenBallanceOf;
-    
+
     //Token price in WEI
     uint256 public tokenPrice;
-    
+
     //A list of price admins; they can change price, in addition to the CEO
     address[] public priceAdmins;
-    
+
     //Next id that will be assigned to token
     uint256 internal nextTokenId = 1;
-    
+
     //The winning token id
     uint256 public winningTokenId = 0;
-    
+
     //The winner's address, it will be empty, until the reward is claimed
-    address public winnerAddress; 
-    
+    address public winnerAddress;
+
     //WLC CONTRACT INTERACTION VARIABLES
-    
+
     //WLC tokens in a single purchase to earn a DCC token
     uint256 internal WLCRewardAmount;
-    
+
     //WLC deployed contract address
     address internal WLCAdress;
-    
+
     //ERC721 FUNCTIONS IMPLEMENTATIONS
-    
+
     function supportsInterface(bytes4 _interfaceID) external view returns (bool) {
         return ((_interfaceID == InterfaceSignature_ERC165) || (_interfaceID == InterfaceSignature_ERC721));
     }
-    
+
     /**
      * Gets the total amount of tokens stored by the contract
      * @return uint256 representing the total amount of tokens
@@ -125,7 +125,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function totalSupply() public view returns (uint256 total) {
         return totalTokenSupply;
     }
-    
+
     /**
      * Gets the balance of the specified address
      * @param _owner address to query the balance of
@@ -134,7 +134,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function balanceOf(address _owner) public view returns (uint256 _balance) {
         return tokenBallanceOf[_owner];
     }
-    
+
     /**
      * Gets the owner of the specified token ID
      * @param _tokenId uint256 ID of the token to query the owner of
@@ -143,7 +143,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function ownerOf(uint256 _tokenId) public view returns (address _owner) {
         return tokenOwner[_tokenId];
     }
-    
+
     /**
      * Returns whether the specified token exists
      * @param _tokenId uint256 ID of the token to query the existence of
@@ -153,22 +153,22 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         address owner = tokenOwner[_tokenId];
         return owner != address(0);
     }
-    
+
     /**
      * Not necessary in the contract
      */
     function transfer(address _to, uint256 _tokenId) external { }
-    
+
     /**
      * Not necessary in the contract
      */
     function approve(address _to, uint256 _tokenId) external { }
-    
+
     /**
      * Not necessary in the contract - reverts
      */
     function transferFrom(address _from, address _to, uint256 _tokenId) external { }
-    
+
     /**
      * Internal function to set the token URI for a given token
      * Reverts if the token ID does not exist
@@ -179,7 +179,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         require(exists(_tokenId));
         tokenURIs[_tokenId] = _uri;
     }
-    
+
     //ERC721Metadata FUNCTIONS IMPLEMENTATIONS
     /**
      * Gets the token name
@@ -188,7 +188,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function name() external view returns (string memory _name) {
         return tokenName;
     }
-    
+
     /**
      * Gets the token symbol
      * @return string representing the token symbol
@@ -196,7 +196,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function symbol() external view returns (string memory _symbol) {
         return tokenSymbol;
     }
-    
+
     /**
      * Returns an URI for a given token ID
      * Throws if the token ID does not exist. May return an empty string.
@@ -206,15 +206,15 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         require(exists(_tokenId));
         return tokenURIs[_tokenId];
     }
-    
+
     //TOKEN SPECIFIC FUNCTIONS
-    
+
     event Buy(address indexed from, uint256 amount, uint256 fromTokenId, uint256 toTokenId);
-    
+
     event RewardIsClaimed(address indexed from, uint256 tokenId);
-    
+
     event WinnerIsChosen(address indexed from, uint256 tokenId);
-    
+
     /**
      * Ensures that the caller of the function is the CEO of contract
      */
@@ -222,19 +222,19 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         require(msg.sender == CEO, 'You need to be the CEO to do that!');
         _;
     }
-    
+
     /**
      * Constructor of the contract
      * @param _ceo address the CEO (owner) of the contract
      */
     constructor (address payable _ceo) public {
         CEO = _ceo;
-        
+
         totalTokenSupply = 20000;
-        
+
         tokenPrice = 41501723917762739; // (if eth = 156.62USD, 6.5 USD for token)
     }
-    
+
     /**
      * Gets the last existing token ids
      * @return uint256 the id of the token
@@ -242,14 +242,14 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function lastTokenId() public view returns (uint256 tokenId) {
         return nextTokenId - 1;
     }
-    
+
     /**
      * Sets a new price for the tokensExchangedBy
      * @param _newPrice uint256 the new price in WEI
      */
     function setTokenPriceInWEI(uint256 _newPrice) public {
         bool transactionAllowed = false;
-        
+
         if (msg.sender == CEO) {
             transactionAllowed = true;
         } else {
@@ -260,11 +260,11 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
                 }
             }
         }
-        
+
         require((transactionAllowed == true), 'You cannot do that!');
         tokenPrice = _newPrice;
     }
-    
+
     /**
      * Add a new price admin address to the list
      * @param _newPriceAdmin address the address of the new price admin
@@ -272,7 +272,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function addPriceAdmin(address _newPriceAdmin) onlyCEO public {
         priceAdmins.push(_newPriceAdmin);
     }
-    
+
     /**
      * Remove existing price admin address from the list
      * @param _existingPriceAdmin address the address of the existing price admin
@@ -285,7 +285,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
             }
         }
     }
-    
+
     /**
      * Adds the specified number of tokens to the specified address
      * Internal method, used when creating new tokens
@@ -296,21 +296,21 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         for (uint256 i = 0; i < _amount; i++) {
             tokenOwner[nextTokenId + i] = _to;
         }
-        
+
         tokenBallanceOf[_to] += _amount;
-        
+
         nextTokenId += _amount;
     }
-    
+
     /**
      * Checks if the specified token is owned by the transaction sender
      */
     function ensureAddressIsTokenOwner(address _owner, uint256 _tokenId) internal view {
         require(balanceOf(_owner) >= 1, 'You do not own any tokens!');
-        
+
         require(tokenOwner[_tokenId] == _owner, 'You do not own this token!');
     }
-    
+
     /**
      * Generates a random number between 1 and totalTokenSupply variable
      * This is used to choose the winning token id
@@ -324,7 +324,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
                 )%totalTokenSupply
             ) + 1;
     }
-    
+
     /**
      * Chooses a winning token id, if all tokens are purchased
      */
@@ -332,9 +332,9 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
          if ((nextTokenId - 1) == totalTokenSupply) {
             winningTokenId = getRandomNumber();
             emit WinnerIsChosen(tokenOwner[winningTokenId], winningTokenId);
-        } 
+        }
     }
-    
+
     /**
      * Scales the amount of tokens in a purchase, to ensure it will be less or equal to the amount of unsold tokens
      * If there are no tokens left, it will return 0
@@ -345,7 +345,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         if (nextTokenId + _amount - 1 > totalTokenSupply) {
             _amount = totalTokenSupply - nextTokenId + 1;
         }
-        
+
         return _amount;
     }
 
@@ -357,24 +357,24 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     */
     function buy() payable public {
         require(msg.value >= tokenPrice, "You did't send enough ETH");
-        
+
         uint256 amount = scalePurchaseTokenAmountToMatchRemainingTokens(msg.value / tokenPrice);
-        
+
         require(amount > 0, "Not enough tokens are available for purchase!");
-        
+
         _addTokensToAddress(msg.sender, amount);
-        
+
         emit Buy(msg.sender, amount, nextTokenId - amount, nextTokenId - 1);
-        
+
         //transfer ETH to CEO
         CEO.transfer((amount * tokenPrice));
-        
+
         //returns excessive ETH
         msg.sender.transfer(msg.value - (amount * tokenPrice));
-        
+
         chooseWinner();
     }
-    
+
     /**
     * Allows user to destroy a specified token
     * This would allow a user to claim his prize for the destroyed token
@@ -383,16 +383,16 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function claimReward(uint256 _tokenId) public {
         require(winningTokenId > 0, "The is not winner yet!");
         require(_tokenId == winningTokenId, "This token is not the winner!");
-        
+
         ensureAddressIsTokenOwner(msg.sender, _tokenId);
-        
+
         winnerAddress = msg.sender;
-        
+
         emit RewardIsClaimed(msg.sender, _tokenId);
     }
-    
+
     //WLC INTERACTION FUNCTIONS
-    
+
     /**
      * Allows the CEO to set the address and the reward values for a connected WishListToken
      * @param _address address the address of the deployed contract
@@ -402,7 +402,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         WLCAdress = _address;
         WLCRewardAmount = _reward;
     }
-    
+
     /**
      * Allows the CEO to revmove a connected WishListToken
      * This revokes the reward and exchange functions
@@ -411,7 +411,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
         WLCAdress = address(0);
         WLCRewardAmount = 0;
     }
-    
+
     /**
      * How many WLC tokens need to be bought in a single transaction to the one DCC token
      * @return _amount uint256
@@ -419,7 +419,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function getWLCRewardAmount() public view returns (uint256 _amount) {
         return WLCRewardAmount;
     }
-    
+
     /**
      * The address of the deployed WLC contract
      * @return _address address
@@ -427,7 +427,7 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function getWLCAddress() public view returns (address _address) {
         return WLCAdress;
     }
-    
+
     /**
      * Allows the buyer of at least the number of WLC tokens, specified in WLCRewardAmount
      * to receive a DCC as a bonus.
@@ -438,23 +438,23 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
     function getWLCReward(uint256 _boughtWLCAmount, address _owner) public returns (uint256 _remaining) {
         if (WLCAdress != address(0) && WLCRewardAmount > 0 && _boughtWLCAmount >= WLCRewardAmount) {
             require(WLCAdress == msg.sender, "You cannot invoke this function directly!");
-            
+
             uint256 DCCAmount = scalePurchaseTokenAmountToMatchRemainingTokens(_boughtWLCAmount / WLCRewardAmount);
-            
+
             if (DCCAmount > 0) {
                 _addTokensToAddress(_owner, DCCAmount);
-                
+
                 emit Buy(_owner, DCCAmount, nextTokenId - DCCAmount, nextTokenId - 1);
-                
+
                 chooseWinner();
-                
+
                 return _boughtWLCAmount - (DCCAmount * WLCRewardAmount);
             }
         }
-        
+
         return _boughtWLCAmount;
     }
-    
+
     /**
      * Allows an onwer of WLC token to excange it for DCC token
      * This can only be called by the deployed WLC contract, by the address specified in WLCAdress
@@ -462,13 +462,26 @@ contract DreamCarToken3 is ERC721, ERC721Metadata, WLCCompatible {
      */
     function getForWLC(address _owner) public {
         require(WLCAdress == msg.sender, "You cannot invoke this function directly!");
-        
+
         require(nextTokenId <= totalTokenSupply, "Not enough tokens are available for purchase!");
-        
+
         _addTokensToAddress(_owner, 1);
-        
+
         emit Buy(_owner, 1, nextTokenId - 1, nextTokenId - 1);
-        
+
         chooseWinner();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

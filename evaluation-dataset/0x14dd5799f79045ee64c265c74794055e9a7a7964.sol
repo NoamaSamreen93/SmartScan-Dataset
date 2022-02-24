@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -207,30 +207,30 @@ contract BurnableToken is StandardToken {
 }
 
 contract SimpleCoinToken is BurnableToken {
-    
+
   string public constant name = "Bitcoin Bank Token";
-   
+
   string public constant symbol = "MBB";
-    
+
   uint32 public constant decimals = 18;
 
   uint256 public INITIAL_SUPPLY = 70000000 * 1 ether;
   uint256 public Public_Sale_SUPPLY = 42000000 * 1 ether;
   address for_save=0x51A0aF8dd8cf3EFF0c1422361AcF0c02Cf64c892;
-  
+
 
   function SimpleCoinToken() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = Public_Sale_SUPPLY;
     balances[for_save] = INITIAL_SUPPLY-Public_Sale_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address multisig;
 
   uint restrictedPercent;
@@ -240,7 +240,7 @@ contract Crowdsale is Ownable {
   SimpleCoinToken public token = new SimpleCoinToken();
 
   uint start;
-    
+
   uint period;
 
   uint rate;
@@ -277,5 +277,16 @@ contract Crowdsale is Ownable {
   function() external payable {
     createTokens();
   }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -653,9 +653,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "MLIV";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0x3e9611D1b334C1631F756bF1F42BE071cCbE66d4;
-    
+
     uint public constant START_TIME = 1563561000;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -663,9 +663,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -689,5 +689,16 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

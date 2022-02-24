@@ -18,7 +18,7 @@ pragma solidity 0.5.6;
 contract MetamorphicContractFactory {
   // fires when a metamorphic contract is deployed by cloning another contract.
   event Metamorphosed(address metamorphicContract, address newImplementation);
-  
+
   // fires when a metamorphic contract is deployed through a transient contract.
   event MetamorphosedWithConstructor(
     address metamorphicContract,
@@ -49,8 +49,8 @@ contract MetamorphicContractFactory {
    * @param transientContractInitializationCode bytes The initialization code
    * that will be used to deploy any transient contracts, which will deploy any
    * metamorphic contracts that require the use of a constructor.
-   * 
-   * Metamorphic contract initialization code (29 bytes): 
+   *
+   * Metamorphic contract initialization code (29 bytes):
    *
    *       0x5860208158601c335a63aaf10f428752fa158151803b80938091923cf3
    *
@@ -110,7 +110,7 @@ contract MetamorphicContractFactory {
    * 18 3b extcodesize    [0, 0, address, size]                     <>
    *
    * ** dup and swap size for use by return at end of init code **
-   * 19 80 dup1           [0, 0, address, size, size]               <> 
+   * 19 80 dup1           [0, 0, address, size, size]               <>
    * 20 93 swap4          [size, 0, address, size, 0]               <>
    *
    * ** push code position 0 to stack and reorder stack items for extcodecopy **
@@ -568,7 +568,7 @@ contract MetamorphicContractFactory {
    */
   function _getMetamorphicContractAddressWithConstructor(
     address transientContractAddress
-  ) internal pure returns (address) { 
+  ) internal pure returns (address) {
     // determine the address of the metamorphic contract.
     return address(
       uint160(                          // downcast to match the address type.
@@ -601,4 +601,15 @@ contract MetamorphicContractFactory {
     );
     _;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

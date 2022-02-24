@@ -7,19 +7,19 @@ contract nice_chance
     payable
     {
         require(msg.sender == tx.origin);
-        
+
         if(responseHash == keccak256(_response) && msg.value>1 ether)
         {
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGame(string _question,string _response)
     public
     payable
@@ -27,32 +27,43 @@ contract nice_chance
         if(responseHash==0x0)
         {
             responseHash = keccak256(_response);
-            
+
             question = _question;
-            
+
             questionSender = msg.sender;
         }
     }
-    
+
     function StopGame()
     public
     payable
     {
        require(msg.sender==questionSender);
-       
+
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
     {
         require(msg.sender==questionSender);
-        
+
         question = _question;
-        
+
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

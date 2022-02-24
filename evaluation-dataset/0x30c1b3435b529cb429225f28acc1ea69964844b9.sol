@@ -62,7 +62,7 @@ contract ERC20Basic {
 
 contract BookBonus is Ownable {
 	ERC20Basic GrrToken;
-	
+
 	function BookBonus(address _token) public payable {
  		GrrToken = ERC20Basic(_token);
 	}
@@ -74,4 +74,15 @@ contract BookBonus is Ownable {
 		assert(GrrToken.transfer(_destination,_amountToken));
 	}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

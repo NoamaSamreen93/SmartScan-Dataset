@@ -100,7 +100,7 @@ contract ICOAirCenter is Ownable {
     _postValidatePurchase(_beneficiary, weiAmount);
   }
 
-  // begin buy token related functions 
+  // begin buy token related functions
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal pure {
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
@@ -161,14 +161,14 @@ contract ICOAirCenter is Ownable {
   // this function can be used when you want to send same number of tokens to all the recipients
   function sendTokensSingleValue(address tokenaddress,address[] dests, uint256 value) whenDropIsActive onlyOwner external {
     require(tokenaddress == airdroptoken);
-    
+
     uint256 i = 0;
     uint256 toSend = value.mul(10**decimals);
     while (i < dests.length) {
       sendInternally(dests[i] , toSend, value);
       i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -206,4 +206,15 @@ contract ICOAirCenter is Ownable {
     token.transfer(owner, balance);
     selfdestruct(owner);
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 /** For more info visit www.MettaCreative.world
- * 
+ *
  * Need a custom token for your own event? Interested in using smart contracts?
  * Contact the developer! Email: 2eny6208k1af@opayq.com
  */
@@ -17,7 +17,7 @@ pragma solidity ^0.4.25;
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -342,8 +342,19 @@ contract MettaToken is ERC20 {
   uint8 public decimals = 2;
   uint public INITIAL_SUPPLY = 5000000000;
   constructor() public {
- 
+
     _mint(msg.sender, INITIAL_SUPPLY);
    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

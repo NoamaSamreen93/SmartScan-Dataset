@@ -396,7 +396,7 @@ contract BurnableToken is PreminedToken {
     function burn(uint _amount) public {
         _burn(msg.sender, _amount);
     }
-    
+
     function burnFrom(address from, uint256 value) public {
         _burnFrom(from, value);
     }
@@ -1355,4 +1355,15 @@ contract Engine is DSMath {
     {
         return PriceSourceInterface(registry.priceSource());
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

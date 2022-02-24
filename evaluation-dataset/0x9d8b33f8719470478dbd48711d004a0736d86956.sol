@@ -239,12 +239,12 @@ contract CanReclaimToken is Ownable {
 /// @dev Implements access control to the MetaGame contract.
 contract MetaGameAccessControl is Claimable, Pausable, CanReclaimToken {
     address public cfoAddress;
-    
+
     function MetaGameAccessControl() public {
         // The creator of the contract is the initial CFO.
         cfoAddress = msg.sender;
     }
-    
+
     /// @dev Access modifier for CFO-only functionality.
     modifier onlyCFO() {
         require(msg.sender == cfoAddress);
@@ -264,21 +264,21 @@ contract MetaGameAccessControl is Claimable, Pausable, CanReclaimToken {
 /// @dev Defines base data structures for MetaGame.
 contract MetaGameBase is MetaGameAccessControl {
     using SafeMath for uint256;
-    
+
     mapping (uint256 => address) identifierToOwner;
     mapping (uint256 => address) identifierToApproved;
     mapping (address => uint256) ownershipDeedCount;
-    
+
     mapping (uint256 => uint256) identifierToParentIdentifier;
-    
+
     /// @dev All existing identifiers.
     uint256[] public identifiers;
-    
+
     /// @notice Get all minted identifiers;
     function getAllIdentifiers() external view returns(uint256[]) {
         return identifiers;
     }
-    
+
     /// @notice Returns the identifier of the parent of an identifier.
     /// The parent identifier is 0 if the identifier has no parent.
     /// @param identifier The identifier to get the parent identifier of.
@@ -372,9 +372,9 @@ interface ERC721 {
     ///  `deedId` or if `msg.sender` currently owns `_deedId`.
     /// @param _deedId The deed that is being transferred
     function takeOwnership(uint256 _deedId) external;
-    
+
     // SPEC EXTENSIONS /////////////////////////////////////////////////////////
-    
+
     /// @notice Transfer a deed to a new owner.
     /// @dev Throws if `msg.sender` does not own deed `_deedId` or if
     ///  `_to` == 0x0.
@@ -426,17 +426,17 @@ interface ERC721Metadata {
 
 /// @dev Holds deed functionality such as approving and transferring. Implements ERC721.
 contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
-    
+
     /// @notice Name of the collection of deeds (non-fungible token), as defined in ERC721Metadata.
     function name() public pure returns (string _deedName) {
         _deedName = "MetaGame";
     }
-    
+
     /// @notice Symbol of the collection of deeds (non-fungible token), as defined in ERC721Metadata.
     function symbol() public pure returns (string _deedSymbol) {
         _deedSymbol = "MG";
     }
-    
+
     /// @dev ERC-165 (draft) interface signature for itself
     bytes4 internal constant INTERFACE_SIGNATURE_ERC165 = // 0x01ffc9a7
         bytes4(keccak256('supportsInterface(bytes4)'));
@@ -449,13 +449,13 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
         bytes4(keccak256('deedOfOwnerByIndex(address,uint256)')) ^
         bytes4(keccak256('approve(address,uint256)')) ^
         bytes4(keccak256('takeOwnership(uint256)'));
-        
+
     /// @dev ERC-165 (draft) interface signature for ERC721
     bytes4 internal constant INTERFACE_SIGNATURE_ERC721Metadata = // 0x2a786f11
         bytes4(keccak256('name()')) ^
         bytes4(keccak256('symbol()')) ^
         bytes4(keccak256('deedUri(uint256)'));
-    
+
     /// @notice Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     /// Returns true for any standardized interfaces implemented by this contract.
     /// (ERC-165 and ERC-721.)
@@ -466,32 +466,32 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
             || (_interfaceID == INTERFACE_SIGNATURE_ERC721Metadata)
         );
     }
-    
+
     /// @dev Checks if a given address owns a particular deed.
     /// @param _owner The address of the owner to check for.
     /// @param _deedId The deed identifier to check for.
     function _owns(address _owner, uint256 _deedId) internal view returns (bool) {
         return identifierToOwner[_deedId] == _owner;
     }
-    
+
     /// @dev Approve a given address to take ownership of a deed.
     /// @param _from The address approving taking ownership.
     /// @param _to The address to approve taking ownership.
     /// @param _deedId The identifier of the deed to give approval for.
     function _approve(address _from, address _to, uint256 _deedId) internal {
         identifierToApproved[_deedId] = _to;
-        
+
         // Emit event.
         Approval(_from, _to, _deedId);
     }
-    
+
     /// @dev Checks if a given address has approval to take ownership of a deed.
     /// @param _claimant The address of the claimant to check for.
     /// @param _deedId The identifier of the deed to check for.
     function _approvedFor(address _claimant, uint256 _deedId) internal view returns (bool) {
         return identifierToApproved[_deedId] == _claimant;
     }
-    
+
     /// @dev Assigns ownership of a specific deed to an address.
     /// @param _from The address to transfer the deed from.
     /// @param _to The address to transfer the deed to.
@@ -500,38 +500,38 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
         // The number of deeds is capped at rows * cols, so this cannot
         // be overflowed if those parameters are sensible.
         ownershipDeedCount[_to]++;
-        
+
         // Transfer ownership.
         identifierToOwner[_deedId] = _to;
-        
+
         // When a new deed is minted, the _from address is 0x0, but we
         // do not track deed ownership of 0x0.
         if (_from != address(0)) {
             ownershipDeedCount[_from]--;
-            
+
             // Clear taking ownership approval.
             delete identifierToApproved[_deedId];
         }
-        
+
         // Emit the transfer event.
         Transfer(_from, _to, _deedId);
     }
-    
+
     // ERC 721 implementation
-    
+
     /// @notice Returns the total number of deeds currently in existence.
     /// @dev Required for ERC-721 compliance.
     function countOfDeeds() public view returns (uint256) {
         return identifiers.length;
     }
-    
+
     /// @notice Returns the number of deeds owned by a specific address.
     /// @param _owner The owner address to check.
     /// @dev Required for ERC-721 compliance
     function countOfDeedsByOwner(address _owner) public view returns (uint256) {
         return ownershipDeedCount[_owner];
     }
-    
+
     /// @notice Returns the address currently assigned ownership of a given deed.
     /// @dev Required for ERC-721 compliance.
     function ownerOf(uint256 _deedId) external view returns (address _owner) {
@@ -539,7 +539,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
 
         require(_owner != address(0));
     }
-    
+
     /// @notice Approve a given address to take ownership of a deed.
     /// @param _to The address to approve taking owernship.
     /// @param _deedId The identifier of the deed to give approval for.
@@ -547,28 +547,28 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
     function approve(address _to, uint256 _deedId) external whenNotPaused {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
-        
+
         approveMultiple(_to, _deedIds);
     }
-    
+
     /// @notice Approve a given address to take ownership of multiple deeds.
     /// @param _to The address to approve taking ownership.
     /// @param _deedIds The identifiers of the deeds to give approval for.
     function approveMultiple(address _to, uint256[] _deedIds) public whenNotPaused {
         // Ensure the sender is not approving themselves.
         require(msg.sender != _to);
-    
+
         for (uint256 i = 0; i < _deedIds.length; i++) {
             uint256 _deedId = _deedIds[i];
-            
+
             // Require the sender is the owner of the deed.
             require(_owns(msg.sender, _deedId));
-            
+
             // Perform the approval.
             _approve(msg.sender, _to, _deedId);
         }
     }
-    
+
     /// @notice Transfer a deed to another address. If transferring to a smart
     /// contract be VERY CAREFUL to ensure that it is aware of ERC-721, or your
     /// deed may be lost forever.
@@ -578,10 +578,10 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
     function transfer(address _to, uint256 _deedId) external whenNotPaused {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
-        
+
         transferMultiple(_to, _deedIds);
     }
-    
+
     /// @notice Transfers multiple deeds to another address. If transferring to
     /// a smart contract be VERY CAREFUL to ensure that it is aware of ERC-721,
     /// or your deeds may be lost forever.
@@ -590,13 +590,13 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
     function transferMultiple(address _to, uint256[] _deedIds) public whenNotPaused {
         // Safety check to prevent against an unexpected 0x0 default.
         require(_to != address(0));
-        
+
         // Disallow transfers to this contract to prevent accidental misuse.
         require(_to != address(this));
-    
+
         for (uint256 i = 0; i < _deedIds.length; i++) {
             uint256 _deedId = _deedIds[i];
-            
+
             // One can only transfer their own deeds.
             require(_owns(msg.sender, _deedId));
 
@@ -604,7 +604,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
             _transfer(msg.sender, _to, _deedId);
         }
     }
-    
+
     /// @notice Transfer a deed owned by another address, for which the calling
     /// address has previously been granted transfer approval by the owner.
     /// @param _deedId The identifier of the deed to be transferred.
@@ -612,10 +612,10 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
     function takeOwnership(uint256 _deedId) external whenNotPaused {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
-        
+
         takeOwnershipMultiple(_deedIds);
     }
-    
+
     /// @notice Transfer multiple deeds owned by another address, for which the
     /// calling address has previously been granted transfer approval by the owner.
     /// @param _deedIds The identifier of the deed to be transferred.
@@ -623,7 +623,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
         for (uint256 i = 0; i < _deedIds.length; i++) {
             uint256 _deedId = _deedIds[i];
             address _from = identifierToOwner[_deedId];
-            
+
             // Check for transfer approval
             require(_approvedFor(msg.sender, _deedId));
 
@@ -631,7 +631,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
             _transfer(_from, msg.sender, _deedId);
         }
     }
-    
+
     /// @notice Returns a list of all deed identifiers assigned to an address.
     /// @param _owner The owner whose deeds we are interested in.
     /// @dev This method MUST NEVER be called by smart contract code. It's very
@@ -647,7 +647,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
             uint256[] memory result = new uint256[](deedCount);
             uint256 totalDeeds = countOfDeeds();
             uint256 resultIndex = 0;
-            
+
             for (uint256 deedNumber = 0; deedNumber < totalDeeds; deedNumber++) {
                 uint256 identifier = identifiers[deedNumber];
                 if (identifierToOwner[identifier] == _owner) {
@@ -659,7 +659,7 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
             return result;
         }
     }
-    
+
     /// @notice Returns a deed identifier of the owner at the given index.
     /// @param _owner The address of the owner we want to get a deed for.
     /// @param _index The index of the deed we want.
@@ -670,19 +670,19 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
         // Loop through all deeds, accounting the number of deeds of the owner we've seen.
         uint256 seen = 0;
         uint256 totalDeeds = countOfDeeds();
-        
+
         for (uint256 deedNumber = 0; deedNumber < totalDeeds; deedNumber++) {
             uint256 identifier = identifiers[deedNumber];
             if (identifierToOwner[identifier] == _owner) {
                 if (seen == _index) {
                     return identifier;
                 }
-                
+
                 seen++;
             }
         }
     }
-    
+
     /// @notice Returns an (off-chain) metadata url for the given deed.
     /// @param _deedId The identifier of the deed to get the metadata
     /// url for.
@@ -690,10 +690,10 @@ contract MetaGameDeed is MetaGameBase, ERC721, ERC721Metadata {
     function deedUri(uint256 _deedId) external pure returns (string uri) {
         // Assume a maximum deed id length.
         require (_deedId < 1000000);
-        
+
         uri = "https://meta.quazr.io/card/xxxxxxx";
         bytes memory _uri = bytes(uri);
-        
+
         for (uint256 i = 0; i < 7; i++) {
             _uri[33 - i] = byte(48 + (_deedId / 10 ** i) % 10);
         }
@@ -742,74 +742,74 @@ contract PullPayment {
 
 /// @dev Defines base data structures for MetaGame.
 contract MetaGameFinance is MetaGameDeed, PullPayment {
-    /// @notice The dividend given to all parents of a deed, 
+    /// @notice The dividend given to all parents of a deed,
     /// in 1/1000th of a percentage.
     uint256 public dividendParentsPercentage = 1000;
-    
+
     /// @notice The minimum fee for the contract in 1/1000th
     /// of a percentage.
     uint256 public minimumFeePercentage = 2500;
-    
+
     /// @notice The minimum total paid in fees and dividends.
     /// If there are (almost) no dividends to be paid, the fee
     /// for the contract is higher. This happens for deeds at
     /// or near the top of the hierarchy. In 1/1000th of a
     /// percentage.
     uint256 public minimumFeePlusDividendsPercentage = 8000;
-    
+
     /// @notice Most-recent card buyers. These will be given
     /// dividends on the next sale. Then, the buyers will be
     /// shifted, the least recent buyer dropped, and the buyer
     /// of this sale is added as the most recent buyer.
     address[] public recentBuyers = new address[](6);
-    
+
     /// @notice The dividend given to the most recent buyers,
     /// in 1/1000th of a percentage. The dividend decreases by
     /// the given factor for subsequent levels of recent buyers.
     uint256 public dividendRecentBuyersPercentage = 1000;
     uint256 public dividendRecentBuyersPercentageDecreaseFactor = 2;
-    
+
     // @dev A mapping from deed identifiers to the buyout price.
     mapping (uint256 => uint256) public identifierToPrice;
-    
+
     /// @notice The threshold for a payment to be sent directly,
     /// instead of added to a beneficiary's balance.
     uint256 public directPaymentThreshold = 0 ether;
-    
+
     /// @notice Boolean indicating whether deed price can be changed
     /// manually.
     bool public allowChangePrice = false;
-    
+
     /// @notice The maximum depth for which dividends will be paid to parents.
     uint256 public maxDividendDepth = 6;
-    
+
     /// @dev This event is emitted when a deed's buyout price is initially set or changed.
     event Price(uint256 indexed identifier, uint256 price, uint256 nextPrice);
-    
+
     /// @dev This event is emitted when a deed is bought out.
     event Buy(address indexed oldOwner, address indexed newOwner, uint256 indexed identifier, uint256 price, uint256 ownerWinnings);
-    
+
     /// @dev This event is emitted when a dividend is paid.
     event DividendPaid(address indexed beneficiary, uint256 indexed identifierBought, uint256 indexed identifier, uint256 dividend);
-    
+
     /// @notice Set the threshold for a payment to be sent directly.
     /// @param threshold The threshold for a payment to be sent directly.
     function setDirectPaymentThreshold(uint256 threshold) external onlyCFO {
         directPaymentThreshold = threshold;
     }
-    
+
     /// @notice Set whether prices can be changed manually.
     /// @param _allowChangePrice Bool indiciating wether prices can be changed manually.
     function setAllowChangePrice(bool _allowChangePrice) external onlyCFO {
         allowChangePrice = _allowChangePrice;
     }
-    
+
     /// @notice Set the maximum dividend depth.
     /// @param _maxDividendDepth The maximum dividend depth.
     function setMaxDividendDepth(uint256 _maxDividendDepth) external onlyCFO {
         maxDividendDepth = _maxDividendDepth;
     }
-    
+
     /// @notice Calculate the next price given the current price.
     /// @param currentPrice The current price.
     function nextPrice(uint256 currentPrice) public pure returns(uint256) {
@@ -821,37 +821,37 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
             return currentPrice.mul(135).div(100); // 35% increase
         }
     }
-    
+
     /// @notice Set the price of a deed.
     /// @param identifier The identifier of the deed to change the price of.
     /// @param newPrice The new price of the deed.
     function changeDeedPrice(uint256 identifier, uint256 newPrice) public {
         // The message sender must be the deed owner.
         require(identifierToOwner[identifier] == msg.sender);
-        
+
         // Price changes must be enabled.
         require(allowChangePrice);
-        
+
         // The new price must be lower than the current price.
         require(newPrice < identifierToPrice[identifier]);
-        
+
         // Set the new price.
         identifierToPrice[identifier] = newPrice;
         Price(identifier, newPrice, nextPrice(newPrice));
     }
-    
+
     /// @notice Set the initial price of a deed.
     /// @param identifier The identifier of the deed to change the price of.
     /// @param newPrice The new price of the deed.
-    function changeInitialPrice(uint256 identifier, uint256 newPrice) public onlyCFO {        
+    function changeInitialPrice(uint256 identifier, uint256 newPrice) public onlyCFO {
         // The deed must be owned by the contract.
         require(identifierToOwner[identifier] == address(this));
-        
+
         // Set the new price.
         identifierToPrice[identifier] = newPrice;
         Price(identifier, newPrice, nextPrice(newPrice));
     }
-    
+
     /// @dev Pay dividends to parents of a deed.
     /// @param identifierBought The identifier of the deed that was bought.
     /// @param identifier The identifier of the deed to pay its parents dividends for (recursed).
@@ -862,21 +862,21 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
         returns(uint256 totalDividendsPaid)
     {
         uint256 parentIdentifier = identifierToParentIdentifier[identifier];
-        
+
         if (parentIdentifier != 0 && depth < maxDividendDepth) {
             address parentOwner = identifierToOwner[parentIdentifier];
-        
-            if (parentOwner != address(this)) {            
+
+            if (parentOwner != address(this)) {
                 // Send dividend to the owner of the parent.
                 _sendFunds(parentOwner, dividend);
                 DividendPaid(parentOwner, identifierBought, parentIdentifier, dividend);
             }
-            
+
             totalDividendsPaid = dividend;
-        
+
             // Recursively pay dividends to parents of parents.
             uint256 dividendsPaid = _payParentDividends(identifierBought, parentIdentifier, dividend, depth + 1);
-            
+
             totalDividendsPaid = totalDividendsPaid.add(dividendsPaid);
         } else {
             // Not strictly necessary to set this to 0 explicitly... but makes
@@ -884,7 +884,7 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
             totalDividendsPaid = 0;
         }
     }
-    
+
     /// @dev Pay dividends to recent buyers.
     /// @param price The price of the card that was bought.
     function _payRecentBuyerDividends(uint256 price)
@@ -892,41 +892,41 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
         returns(uint256 totalDividendsPaid)
     {
         uint256 dividend = price.mul(dividendRecentBuyersPercentage).div(100000);
-        
+
         // Pay first dividend.
         if (recentBuyers[0] != 0x0) {
             _sendFunds(recentBuyers[0], dividend);
         }
         totalDividendsPaid = dividend;
-        
+
         // Pay second dividend.
         dividend = dividend.div(dividendRecentBuyersPercentageDecreaseFactor);
         if (recentBuyers[1] != 0x0) {
             _sendFunds(recentBuyers[1], dividend);
         }
         totalDividendsPaid = totalDividendsPaid.add(dividend);
-        
+
         // Pay third dividend.
         dividend = dividend.div(dividendRecentBuyersPercentageDecreaseFactor);
         if (recentBuyers[2] != 0x0) {
             _sendFunds(recentBuyers[2], dividend);
         }
         totalDividendsPaid = totalDividendsPaid.add(dividend);
-        
+
         // Pay fourth dividend.
         dividend = dividend.div(dividendRecentBuyersPercentageDecreaseFactor);
         if (recentBuyers[3] != 0x0) {
             _sendFunds(recentBuyers[3], dividend);
         }
         totalDividendsPaid = totalDividendsPaid.add(dividend);
-        
+
         // Pay fifth dividend.
         dividend = dividend.div(dividendRecentBuyersPercentageDecreaseFactor);
         if (recentBuyers[4] != 0x0) {
             _sendFunds(recentBuyers[4], dividend);
         }
         totalDividendsPaid = totalDividendsPaid.add(dividend);
-        
+
         // Pay sixth dividend.
         dividend = dividend.div(dividendRecentBuyersPercentageDecreaseFactor);
         if (recentBuyers[5] != 0x0) {
@@ -934,7 +934,7 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
         }
         totalDividendsPaid = totalDividendsPaid.add(dividend);
     }
-    
+
     /// @dev Pay trade dividends.
     /// @param price The identifier of the card that was bought.
     /// @param price The price of the card that was bought.
@@ -945,26 +945,26 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
         // Pay parent dividends.
         uint256 parentDividend = price.mul(dividendParentsPercentage).div(100000);
         totalDividendsPaid = _payParentDividends(identifier, identifier, parentDividend, 0);
-        
+
         // Pay recent buyer dividends.
         totalDividendsPaid = totalDividendsPaid.add(_payRecentBuyerDividends(price));
     }
-    
+
     /// @dev Calculate the contract fee.
     /// @param price The price of the buyout.
     /// @param dividendsPaid The total amount paid in dividends.
     function calculateFee(uint256 price, uint256 dividendsPaid) public view returns(uint256 fee) {
         // Calculate the absolute minimum fee.
         fee = price.mul(minimumFeePercentage).div(100000);
-        
+
         // Calculate the minimum fee plus dividends payable.
         // See also the explanation at the definition of
         // minimumFeePlusDividends.
         uint256 _minimumFeePlusDividends = price.mul(minimumFeePlusDividendsPercentage).div(100000);
-        
+
         if (_minimumFeePlusDividends > dividendsPaid) {
             uint256 feeMinusDividends = _minimumFeePlusDividends.sub(dividendsPaid);
-        
+
             // The minimum total paid in 'fees plus dividends', minus dividends, is
             // greater than the minimum fee. Set the fee to this value.
             if (feeMinusDividends > fee) {
@@ -972,7 +972,7 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
             }
         }
     }
-    
+
     /// @dev Shift the 6 most recent buyers, and add the new buyer
     /// to the front.
     /// @param newBuyer The buyer to add to the front of the recent
@@ -985,7 +985,7 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
         recentBuyers[1] = recentBuyers[0];
         recentBuyers[0] = newBuyer;
     }
-    
+
     /// @dev Send funds to a beneficiary. If sending fails, assign
     /// funds to the beneficiary's balance for manual withdrawal.
     /// @param beneficiary The beneficiary's address to send funds to
@@ -1004,14 +1004,14 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
             asyncSend(beneficiary, amount);
         }
     }
-    
+
     /// @notice Withdraw (unowed) contract balance.
     function withdrawFreeBalance() external onlyCFO {
         // Calculate the free (unowed) balance. This never underflows, as
         // totalPayments is guaranteed to be less than or equal to the
         // contract balance.
         uint256 freeBalance = this.balance - totalPayments;
-        
+
         cfoAddress.transfer(freeBalance);
     }
 }
@@ -1019,12 +1019,12 @@ contract MetaGameFinance is MetaGameDeed, PullPayment {
 
 /// @dev Defines core MetaGame functionality.
 contract MetaGameCore is MetaGameFinance {
-    
+
     function MetaGameCore() public {
         // Start the contract paused.
         paused = true;
     }
-    
+
     /// @notice Create a collectible.
     /// @param identifier The identifier of the collectible that is to be created.
     /// @param owner The address of the initial owner. Blank if this contract should
@@ -1036,96 +1036,96 @@ contract MetaGameCore is MetaGameFinance {
         // The identifier must be valid. Identifier 0 is reserved
         // to mark a collectible as having no parent.
         require(identifier >= 1);
-    
+
         // The identifier must not exist yet.
         require(identifierToOwner[identifier] == 0x0);
-        
+
         // Add the identifier to the list of existing identifiers.
         identifiers.push(identifier);
-        
+
         address initialOwner = owner;
-        
+
         if (initialOwner == 0x0) {
             // Set the initial owner to be the contract itself.
             initialOwner = address(this);
         }
-        
+
         // Transfer the collectible to the initial owner.
         _transfer(0x0, initialOwner, identifier);
-        
+
         // Set the parent identifier.
         identifierToParentIdentifier[identifier] = parentIdentifier;
-        
+
         // Set the initial price.
         identifierToPrice[identifier] = price;
-        
+
         // Emit price event.
         Price(identifier, price, nextPrice(price));
     }
-    
+
     /// @notice Set the parent collectible of a collectible.
     function setParent(uint256 identifier, uint256 parentIdentifier) external onlyCFO {
         // The deed must exist.
         require(identifierToOwner[identifier] != 0x0);
-        
+
         identifierToParentIdentifier[identifier] = parentIdentifier;
     }
-    
+
     /// @notice Buy a collectible.
     function buy(uint256 identifier) external payable whenNotPaused {
         // The collectible must exist.
         require(identifierToOwner[identifier] != 0x0);
-        
+
         address oldOwner = identifierToOwner[identifier];
         uint256 price = identifierToPrice[identifier];
-        
+
         // The old owner must not be the same as the buyer.
         require(oldOwner != msg.sender);
-        
+
         // Enough ether must be provided.
         require(msg.value >= price);
-        
+
         // Set the new price.
         uint256 newPrice = nextPrice(price);
         identifierToPrice[identifier] = newPrice;
-        
+
         // Transfer the collectible.
         _transfer(oldOwner, msg.sender, identifier);
-        
+
         // Emit price change event.
         Price(identifier, newPrice, nextPrice(newPrice));
-        
+
         // Emit buy event.
         Buy(oldOwner, msg.sender, identifier, price, oldOwnerWinnings);
-        
+
         // Pay dividends.
         uint256 dividendsPaid = _payDividends(identifier, price);
-        
+
         // Calculate the contract fee.
         uint256 fee = calculateFee(price, dividendsPaid);
-        
+
         // Calculate the winnings for the previous owner.
         uint256 oldOwnerWinnings = price.sub(dividendsPaid).sub(fee);
-        
+
         // Add the buyer to the recent buyer list.
         _shiftRecentBuyers(msg.sender);
-        
+
         if (oldOwner != address(this)) {
             // The old owner is not this contract itself.
             // Pay the old owner.
             _sendFunds(oldOwner, oldOwnerWinnings);
         }
-        
+
         // Calculate overspent ether. This cannot underflow, as the require
         // guarantees price to be greater than or equal to msg.value.
         uint256 excess = msg.value - price;
-        
+
         if (excess > 0) {
             // Refund overspent Ether.
             msg.sender.transfer(excess);
         }
     }
-    
+
     /// @notice Return a collectible's details.
     /// @param identifier The identifier of the collectible to get details for.
     function getDeed(uint256 identifier)
@@ -1138,4 +1138,13 @@ contract MetaGameCore is MetaGameFinance {
         buyPrice = identifierToPrice[identifier];
         nextBuyPrice = nextPrice(buyPrice);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

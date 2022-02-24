@@ -84,7 +84,7 @@ contract ERC20 is ERC20Basic {
 contract StandardToken is ERC20 {
 
   using SafeMath for uint256;
-  
+
   address public owner;
 
   mapping(address => uint256) balances;
@@ -94,50 +94,50 @@ contract StandardToken is ERC20 {
 
   uint256 minAmount = 10; // minimum amount to be sent
   uint256 maxAmount = 100000; // maximum amount to be sent
-  
+
   /**
    * Init contract creator
    */
   constructor() public {
     owner = msg.sender;
   }
-  
+
   /**
    * @dev get minimal amount to be sent
    */
    function getMinAmount() public view returns (uint256) {
      return minAmount;
    }
-   
+
    /**
    * @dev get maximum amount to be sent
    */
    function getMaxAmount() public view returns (uint256) {
      return maxAmount;
    }
-   
+
   /**
    * @dev set minimal amount to be sent
    */
    function setMinAmount(uint256 newMinAmount) public returns (bool) {
      require(msg.sender == owner);
      require(newMinAmount < maxAmount);
-     
+
      minAmount = newMinAmount;
      return true;
    }
-   
+
   /**
    * @dev set maximum amount to be sent
    */
    function setMaxAmount(uint256 newMaxAmount) public returns (bool) {
      require(msg.sender == owner);
      require(newMaxAmount > minAmount);
-    
+
      maxAmount = newMaxAmount;
      return true;
    }
-  
+
   /**
   * @dev total number of tokens in existence
   */
@@ -302,4 +302,15 @@ contract MobarakToken is StandardToken {
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -491,3 +491,14 @@ contract FckDice {
     uint constant POPCNT_MODULO = 0x3F;
     uint constant MASK40 = 0xFFFFFFFFFF;
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

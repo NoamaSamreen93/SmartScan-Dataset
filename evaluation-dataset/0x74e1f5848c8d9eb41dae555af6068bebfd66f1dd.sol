@@ -59,7 +59,7 @@ interface ERC20 {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
   /* Allowance Methods and Events */
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
@@ -76,7 +76,7 @@ interface ERC20 {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20 {
-  
+
   /**
    * @title Basic token
    * @dev Basic version of StandardToken, with no allowances.
@@ -275,7 +275,7 @@ contract BurnableToken is StandardToken {
 /**
  * @title DappDev Token
  * @dev DappDevs Membership Token
- * @dev Mint more tokens when 
+ * @dev Mint more tokens when
  * Based on OpenZeppelin Mintable Token (infinite minting)
  */
 contract DappDevToken is MintableToken, BurnableToken {
@@ -284,4 +284,20 @@ contract DappDevToken is MintableToken, BurnableToken {
   string public symbol = 'DDV';
   uint8 public decimals = 0;
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

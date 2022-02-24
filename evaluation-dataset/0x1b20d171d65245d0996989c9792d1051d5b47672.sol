@@ -133,7 +133,7 @@ library SafeMath {
     */
     function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
         // Gas optimization: this is cheaper than asserting 'a' not being zero, but the
-        // benefit is lost if 'b' is also tested.       
+        // benefit is lost if 'b' is also tested.
         if (a == 0) {
             return 0;
         }
@@ -203,7 +203,7 @@ contract StandardToken is ERC20, BasicToken {
     * Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
     * Beware that changing an allowance with this method brings the risk that someone may use both the old
     * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
-    * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:  
+    * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
     * @param _spender The address which will spend the funds.
     * @param _value The amount of tokens to be spent.
     */
@@ -234,7 +234,7 @@ contract StandardToken is ERC20, BasicToken {
     * Increase the amount of tokens that an owner allowed to a spender.
     * approve should be called when allowed[_spender] == 0. To increment
     * allowed value is better to use this function to avoid 2 calls (and wait until
-    * the first transaction is mined) 
+    * the first transaction is mined)
     * @param _spender The address which will spend the funds.
     * @param _addedValue The amount of tokens to increase the allowance by.
     */
@@ -255,7 +255,7 @@ contract StandardToken is ERC20, BasicToken {
     * Decrease the amount of tokens that an owner allowed to a spender.
     * approve should be called when allowed[_spender] == 0. To decrement
     * allowed value is better to use this function to avoid 2 calls (and wait until
-    * the first transaction is mined)   
+    * the first transaction is mined)
     * @param _spender The address which will spend the funds.
     * @param _subtractedValue The amount of tokens to decrease the allowance by.
     */
@@ -331,9 +331,9 @@ contract MintableToken is StandardToken, Ownable {
 contract SUREToken is MintableToken {
     address private deployedAddress = 0x65E5fF263Dd264b78ADcb08c1788c4CEC8910B4B; //Replace this address by the Ethereum main net
     string public name = "SURE";
-    string public symbol = "SURE Token";    
+    string public symbol = "SURE Token";
     uint public decimals = 6;
-    uint public totalSupplyToken = 500000000;  
+    uint public totalSupplyToken = 500000000;
 
     /* The finalizer contract that allows unlift the transfer limits on this token */
     address public releaseAgent;
@@ -343,17 +343,17 @@ contract SUREToken is MintableToken {
 
      /* Map of agents that are allowed to transfer tokens regardless of the lock down period. These are crowdsale contracts and possible the team multisig itself. */
     mapping (address => bool) public transferAgents;
-    
-    constructor() public {                    
+
+    constructor() public {
         totalSupply_ = totalSupplyToken * (10 ** decimals);
         balances[deployedAddress] = totalSupply_;
-        transferAgents[deployedAddress] = true;        
+        transferAgents[deployedAddress] = true;
         releaseAgent = deployedAddress;
         emit Transfer(address(0), deployedAddress, totalSupply_);
-    }   
-   
+    }
+
     /**
-    * Limit token transfer until the crowdsale is over.    
+    * Limit token transfer until the crowdsale is over.
     */
     modifier canTransfer(address _sender) {
 
@@ -366,9 +366,9 @@ contract SUREToken is MintableToken {
     }
 
     /**
-    * Set the contract that can call release and make the token transferable.  
+    * Set the contract that can call release and make the token transferable.
     */
-    function setReleaseAgent(address addr) onlyOwner inReleaseState(false) public {      
+    function setReleaseAgent(address addr) onlyOwner inReleaseState(false) public {
         releaseAgent = addr;
     }
 
@@ -409,11 +409,22 @@ contract SUREToken is MintableToken {
         _;
     }
 
-    function transfer(address _to, uint256 _value) canTransfer(msg.sender) public returns (bool success) {        
+    function transfer(address _to, uint256 _value) canTransfer(msg.sender) public returns (bool success) {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) canTransfer(_from) public returns (bool success) {        
+    function transferFrom(address _from, address _to, uint _value) canTransfer(_from) public returns (bool success) {
         return super.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

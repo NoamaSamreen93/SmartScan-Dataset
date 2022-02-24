@@ -28,7 +28,7 @@ contract Ownable {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);  
+        require(msg.sender == owner);
         _;
     }
 
@@ -49,16 +49,16 @@ contract ERC20 {
 
     // Возвращает баланс адреса
     function balanceOf(address _owner) constant returns (uint balance);
-    
+
     // Отправляет токены _value на адрес _to
     function transfer(address _to, uint _value) returns (bool success);
-    
+
     // Отправляет токены _value с адреса _from на адрес _to
     function transferFrom(address _from, address _to, uint _value) returns (bool success);
-    
+
     // Позволяет адресу _spender снимать <= _value с вашего аккаунта
     function approve(address _spender, uint _value) returns (bool success);
-    
+
     // Возвращает сколько _spender может снимать с вашего аккаунта
     function allowance(address _owner, address _spender) constant returns (uint remaining);
     event Transfer(address indexed _from, address indexed _to, uint _value);
@@ -77,7 +77,7 @@ contract RelestToken is ERC20, Ownable {
     uint256 step1Price = 1500;
     uint256 step2Price = 1300;
     uint256 step3Price = 1150;
-    
+
     uint256 minPriceRate = 1000;
     uint256 public ethGoal = 1000 ether;
 
@@ -105,7 +105,7 @@ contract RelestToken is ERC20, Ownable {
     event Bounty(address indexed to, uint256 amount);
 
     // MODIFIERS
-    
+
     modifier validPurchase() {
         assert(msg.value >= minEth && msg.sender != 0x0);
         _;
@@ -125,7 +125,7 @@ contract RelestToken is ERC20, Ownable {
 
     function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) returns (bool success) {
         require(preSaleEnded && SaleEnded);
-        require(_to != 0x0 && _value > 0 && balances[msg.sender] >= _value && 
+        require(_to != 0x0 && _value > 0 && balances[msg.sender] >= _value &&
             balances[_to] + _value > balances[_to]);
         balances[_to] += _value;
         balances[msg.sender] -= _value;
@@ -134,7 +134,7 @@ contract RelestToken is ERC20, Ownable {
     }
     function transferFrom(address _from, address _to, uint _value) onlyPayloadSize(2 * 32) returns (bool success) {
         require(preSaleEnded && SaleEnded);
-        require(_to != 0x0 && _value > 0 && balances[msg.sender] >= _value && 
+        require(_to != 0x0 && _value > 0 && balances[msg.sender] >= _value &&
             balances[_to] + _value > balances[_to] && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
         balances[_from] -= _value;
@@ -231,3 +231,14 @@ contract RelestToken is ERC20, Ownable {
     }
 }
 // ¯\_(ツ)_/¯
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -388,7 +388,7 @@ contract ERC20 is IERC20 {
 	/**
 	* @dev Increase the amount of tokens that an owner allowed to a spender.
 	* approve should be called when _allowed[msg.sender][spender] == 0. To increment
-	* allowed value is better to use this function to avoid 2 calls 
+	* allowed value is better to use this function to avoid 2 calls
 	*/
 	function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
 		_approve(msg.sender, spender, _allowed[msg.sender][spender].add(addedValue));
@@ -579,12 +579,12 @@ contract ETOToken is ERC20Mintable, ETORoles {
 		ITIN = newValue;
 		emit ITINUpdated(newValue);
 	}
-	
+
 	/* Function to set the required allowance before seizing assets */
 	function approveFor(address seizee, uint256 seizableAmount) public onlyAssetSeizer {
 	    _approve(seizee, msg.sender, seizableAmount);
 	}
-	
+
 	/* Seize assets */
 	function seizeAssets(address seizee, uint256 seizableAmount) public onlyAssetSeizer {
 		transferFrom(seizee, msg.sender, seizableAmount);
@@ -770,5 +770,14 @@ contract ETOVotes is ETOToken {
 			}
 		}
 		return adder;
+	}
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
 	}
 }

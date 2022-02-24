@@ -16,7 +16,7 @@ contract Manager {
     * account.
     */
     function Manager() public {
-        coo = msg.sender; 
+        coo = msg.sender;
         cfo = 0x7810704C6197aFA95e940eF6F719dF32657AD5af;
         ceo = 0x96C0815aF056c5294Ad368e3FBDb39a1c9Ae4e2B;
         cao = 0xC4888491B404FfD15cA7F599D624b12a9D845725;
@@ -39,9 +39,9 @@ contract Manager {
         require(msg.sender == cao);
         _;
     }
-    
+
     bool allowTransfer = false;
-    
+
     function changeAllowTransferState() public onlyCOO {
         if (allowTransfer) {
             allowTransfer = false;
@@ -49,7 +49,7 @@ contract Manager {
             allowTransfer = true;
         }
     }
-    
+
     modifier whenTransferAllowed() {
         require(allowTransfer);
         _;
@@ -232,7 +232,7 @@ contract AlchemyPatent is AlchemyBase {
         // the time when owner get the patent
         uint256 beginTime;
         // whether this patent is on sale
-        bool onSale; 
+        bool onSale;
         // the sale price
         uint256 price;
         // last deal price
@@ -272,7 +272,7 @@ contract AlchemyPatent is AlchemyBase {
         } else {
             require(sellPrice <= 1 ether);
         }
-        
+
         require(!patent.onSale);
 
         patent.onSale = true;
@@ -658,7 +658,7 @@ contract AlchemyMinting is AlchemySynthesize {
     // Limit the nubmer of zero order assets the owner can create every day
     uint256 public zoDailyLimit = 2500; // we can create 4 * 2500 = 10000 0-order asset each day
     uint256[4] public zoCreated;
-    
+
     // Limit the number each account can buy every day
     mapping(address => bytes32) public accountsBoughtZoAsset;
     mapping(address => uint256) public accountsZoLastRefreshTime;
@@ -691,7 +691,7 @@ contract AlchemyMinting is AlchemySynthesize {
                 accountsZoLastRefreshTime[msg.sender] = zoLastRefreshTime;
             }
         }
- 
+
         uint256 currentCount = 0;
         uint256 count = 0;
 
@@ -710,7 +710,7 @@ contract AlchemyMinting is AlchemySynthesize {
             count += currentCount;
 
             // Check whether this account has bought too many assets
-            maskedResult = uint256(history & mask); 
+            maskedResult = uint256(history & mask);
             maskedResult += maskedValue;
             require(maskedResult < (2 ** (8 * (i + 1))));
 
@@ -743,7 +743,7 @@ contract AlchemyMinting is AlchemySynthesize {
 
         // Write updated history
         accountsBoughtZoAsset[msg.sender] = history;
-        
+
         // Emit BuyZeroOrderAsset event
         emit BuyZeroOrderAsset(msg.sender, values);
 
@@ -773,10 +773,10 @@ contract AlchemyMarket is AlchemyMinting {
         // Desired price
         uint128 desiredPrice;
         // Seller
-        address seller; 
+        address seller;
     }
 
-    // Max number of sale orders of each account 
+    // Max number of sale orders of each account
     uint128 public maxSaleNum = 20;
 
     // Cut ratio for a transaction
@@ -786,7 +786,7 @@ contract AlchemyMarket is AlchemyMinting {
     // Next sale id
     uint256 public nextSaleId = 1;
 
-    // Sale orders list 
+    // Sale orders list
     mapping (uint256 => SaleOrder) public saleOrderList;
 
     // Sale information of each account
@@ -809,7 +809,7 @@ contract AlchemyMarket is AlchemyMinting {
         // One account can have no more than maxSaleNum sale orders
         require(accountToSaleNum[msg.sender] < maxSaleNum);
 
-        // check whether zero order asset is to be sold 
+        // check whether zero order asset is to be sold
         // which is not allowed
         require(assetId > 3 && assetId < 248);
         require(amount > 0 && amount < 256);
@@ -849,7 +849,7 @@ contract AlchemyMarket is AlchemyMinting {
         // Emit the Approval event
         emit PutOnSale(msg.sender, nextSaleId-1);
     }
-  
+
     // Withdraw an sale order
     function withdrawSale(uint256 saleId) external whenNotPaused {
         // Can only withdraw self's sale order
@@ -883,14 +883,14 @@ contract AlchemyMarket is AlchemyMinting {
         // Emit the cancel event
         emit WithdrawSale(msg.sender, saleId);
     }
- 
+
 //     // Change sale order
 //     function changeSale(uint256 assetId, uint256 amount, uint256 price, uint256 saleId) external whenNotPaused {
 //         // Check if msg sender is the seller
 //         require(msg.sender == saleOrderList[saleId].seller);
-// 
+//
 //     }
- 
+
     // Buy assets in market
     function buyInMarket(uint256 saleId, uint256 amount) external payable whenNotPaused {
         address seller = saleOrderList[saleId].seller;
@@ -957,10 +957,10 @@ contract AlchemyMarket is AlchemyMinting {
 
 contract AlchemyMove is AlchemyMarket {
 
-    // 
+    //
     bool public isMovingEnable = true;
 
-    // 
+    //
     function disableMoving() external onlyCOO {
         isMovingEnable = false;
     }
@@ -1004,7 +1004,7 @@ contract AlchemyMove is AlchemyMarket {
 
     function movePatentData(uint16[] ids, address[] owners, uint256[] beginTimes, bool[] onsaleStates, uint256[] prices, uint256[] lastprices, uint256[] selltimes) external onlyCOO {
         require(isMovingEnable);
-        
+
         //Patent memory _patent;
         uint16 id;
         for (uint256 i = 0; i < ids.length; i++) {
@@ -1021,7 +1021,7 @@ contract AlchemyMove is AlchemyMarket {
 
     function moveMarketData(uint256[] saleIds, uint64[] assetIds, uint64[] amounts, uint128[] desiredPrices, address[] sellers) external onlyCOO {
         require(isMovingEnable);
-        
+
         SaleOrder memory _saleOrder;
         uint256 _saleId;
         for (uint256 i = 0; i < saleIds.length; i++) {
@@ -1038,4 +1038,13 @@ contract AlchemyMove is AlchemyMarket {
         require(isMovingEnable);
         nextSaleId = _id;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

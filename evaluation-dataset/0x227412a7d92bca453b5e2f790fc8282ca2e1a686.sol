@@ -7,7 +7,7 @@ pragma solidity ^0.4.24;
  * Homepage: https://MonetaryCoin.org  Distribution: https://MonetaryCoin.io
  *
  * Full source code: https://github.com/Monetary-Foundation/MonetaryCoin
- * 
+ *
  * Licenced MIT - The Monetary Foundation 2018
  *
  */
@@ -383,10 +383,10 @@ contract MintableToken is StandardToken, Ownable {
  * @dev ERC20 Token with Pos mining.
  * The blockReward_ is controlled by a GDP oracle tied to the national identity or currency union identity of the subject MonetaryCoin.
  * This type of mining will be used during both the initial distribution period and when GDP growth is positive.
- * For mining during negative growth period please refer to MineableM5Token.sol. 
+ * For mining during negative growth period please refer to MineableM5Token.sol.
  * Unlike standard erc20 token, the totalSupply is sum(all user balances) + totalStake instead of sum(all user balances).
 */
-contract MineableToken is MintableToken { 
+contract MineableToken is MintableToken {
   event Commit(address indexed from, uint value,uint atStake, int onBlockReward);
   event Withdraw(address indexed from, uint reward, uint commitment);
 
@@ -405,18 +405,18 @@ contract MineableToken is MintableToken {
   /**
   * @dev commit _value for minning
   * @notice the _value will be substructed from user balance and added to the stake.
-  * if user previously commited, add to an existing commitment. 
-  * this is done by calling withdraw() then commit back previous commit + reward + new commit 
+  * if user previously commited, add to an existing commitment.
+  * this is done by calling withdraw() then commit back previous commit + reward + new commit
   * @param _value The amount to be commited.
   * @return the commit value: _value OR prevCommit + reward + _value
   */
   function commit(uint256 _value) public returns (uint256 commitmentValue) {
     require(0 < _value);
     require(_value <= balances[msg.sender]);
-    
+
     commitmentValue = _value;
     uint256 prevCommit = miners[msg.sender].value;
-    //In case user already commited, withdraw and recommit 
+    //In case user already commited, withdraw and recommit
     // new commitment value: prevCommit + reward + _value
     if (0 < prevCommit) {
       // withdraw Will revert if reward is negative
@@ -437,7 +437,7 @@ contract MineableToken is MintableToken {
       totalStake_, // atStake = current stake + commitments value
       blockReward_ // onBlockReward
       );
-    
+
     emit Commit(msg.sender, commitmentValue, totalStake_, blockReward_); // solium-disable-line
 
     return commitmentValue;
@@ -451,7 +451,7 @@ contract MineableToken is MintableToken {
     }
   */
   function withdraw() public returns (uint256 reward, uint256 commitmentValue) {
-    require(miners[msg.sender].value > 0); 
+    require(miners[msg.sender].value > 0);
 
     //will revert if reward is negative:
     reward = getReward(msg.sender);
@@ -460,15 +460,15 @@ contract MineableToken is MintableToken {
     commitmentValue = commitment.value;
 
     uint256 withdrawnSum = commitmentValue.add(reward);
-    
+
     totalStake_ = totalStake_.sub(commitmentValue);
     totalSupply_ = totalSupply_.add(reward);
-    
+
     balances[msg.sender] = balances[msg.sender].add(withdrawnSum);
     emit Transfer(address(0), msg.sender, commitmentValue.add(reward));
-    
+
     delete miners[msg.sender];
-    
+
     emit Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
     return (reward, commitmentValue);
   }
@@ -476,11 +476,11 @@ contract MineableToken is MintableToken {
   /**
   * @dev Calculate the reward if withdraw() happans on this block
   * @notice The reward is calculated by the formula:
-  * (numberOfBlocks) * (effectiveBlockReward) * (commitment.value) / (effectiveStake) 
+  * (numberOfBlocks) * (effectiveBlockReward) * (commitment.value) / (effectiveStake)
   * effectiveBlockReward is the average between the block reward during commit and the block reward during the call
   * effectiveStake is the average between the stake during the commit and the stake during call (liniar aproximation)
   * @return An uint256 representing the reward amount
-  */ 
+  */
   function getReward(address _miner) public view returns (uint256) {
     if (miners[_miner].value == 0) {
       return 0;
@@ -489,22 +489,22 @@ contract MineableToken is MintableToken {
     Commitment storage commitment = miners[_miner];
 
     int256 averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
-    
+
     require(0 <= averageBlockReward);
-    
+
     uint256 effectiveBlockReward = uint256(averageBlockReward);
-    
+
     uint256 effectiveStake = average(commitment.atStake, totalStake_);
-    
+
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
     uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value).div(effectiveStake);
-       
+
     return miningReward;
   }
 
   /**
-  * @dev Calculate the average of two integer numbers 
+  * @dev Calculate the average of two integer numbers
   * @notice 1.5 will be rounded toward zero
   * @return An uint256 representing integer average
   */
@@ -513,7 +513,7 @@ contract MineableToken is MintableToken {
   }
 
   /**
-  * @dev Calculate the average of two signed integers numbers 
+  * @dev Calculate the average of two signed integers numbers
   * @notice 1.5 will be toward zero
   * @return An int256 representing integer average
   */
@@ -549,13 +549,13 @@ contract MineableToken is MintableToken {
     "int256 onBlockReward": block reward when commited.
     }
   */
-  function getCommitment(address _miner) public view 
+  function getCommitment(address _miner) public view
   returns (
     uint256 value,             // value commited to mining
     uint256 onBlockNumber,     // commited on block
     uint256 atStake,           // stake during commit
     int256 onBlockReward       // block reward during commit
-    ) 
+    )
   {
     value = miners[_miner].value;
     onBlockNumber = miners[_miner].onBlockNumber;
@@ -584,7 +584,7 @@ contract MineableToken is MintableToken {
 /**
  * @title GDPOraclizedToken
  * @dev This is an interface for the GDP Oracle to control the mining rate.
- * For security reasons, two distinct functions were created: 
+ * For security reasons, two distinct functions were created:
  * setPositiveGrowth() and setNegativeGrowth()
  */
 contract GDPOraclizedToken is MineableToken {
@@ -602,7 +602,7 @@ contract GDPOraclizedToken is MineableToken {
     require(msg.sender == GDPOracle_);
     _;
   }
-  
+
   /**
    * @dev Modifier throws if called by any account other than the pendingGDPOracle.
    */
@@ -630,19 +630,19 @@ contract GDPOraclizedToken is MineableToken {
   }
 
   /**
-   * @dev Chnage block reward according to GDP 
+   * @dev Chnage block reward according to GDP
    * @param newBlockReward the new block reward in case of possible growth
    */
   function setPositiveGrowth(int256 newBlockReward) public onlyGDPOracle returns(bool) {
     // protect against error / overflow
     require(0 <= newBlockReward);
-    
+
     emit BlockRewardChanged(blockReward_, newBlockReward);
     blockReward_ = newBlockReward;
   }
 
   /**
-   * @dev Chnage block reward according to GDP 
+   * @dev Chnage block reward according to GDP
    * @param newBlockReward the new block reward in case of negative growth
    */
   function setNegativeGrowth(int256 newBlockReward) public onlyGDPOracle returns(bool) {
@@ -678,8 +678,8 @@ contract GDPOraclizedToken is MineableToken {
  * The logic for M5 mining will be finalized in advance of the close of the initial distribution period – see the White Paper for additional details.
  * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permanently seal the upgradeability of the contract.
 */
-contract MineableM5Token is GDPOraclizedToken { 
-  
+contract MineableM5Token is GDPOraclizedToken {
+
   event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
   event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
   event FinishUpgrade();
@@ -735,7 +735,7 @@ contract MineableM5Token is GDPOraclizedToken {
   }
 
   /**
-   * @dev Allows to set the M5 token contract 
+   * @dev Allows to set the M5 token contract
    * @param newM5Token The address of the new contract
    */
   function upgradeM5Token(address newM5Token) public onlyUpgradeManager { // solium-disable-line
@@ -745,7 +745,7 @@ contract MineableM5Token is GDPOraclizedToken {
   }
 
   /**
-   * @dev Allows the upgrade the M5 logic contract 
+   * @dev Allows the upgrade the M5 logic contract
    * @param newM5Logic The address of the new contract
    */
   function upgradeM5Logic(address newM5Logic) public onlyUpgradeManager { // solium-disable-line
@@ -805,7 +805,7 @@ contract MineableM5Token is GDPOraclizedToken {
     uint8 callResult;
     // result from target.getM5Reward()
     uint256 result;
-    
+
     assembly { // solium-disable-line
         // return _dest.delegatecall(msg.data)
         mstore(0x0, signature) // 4 bytes of method signature
@@ -814,10 +814,10 @@ contract MineableM5Token is GDPOraclizedToken {
         // providing g gas and v wei and output area mem[out..(out+outsize)) returning 0 on error (eg. out of gas) and 1 on success
         // keep caller and callvalue
         callResult := delegatecall(sub(gas, 10000), target, 0x0, inputSize, 0x0, returnSize)
-        switch callResult 
-        case 0 
-          { revert(0,0) } 
-        default 
+        switch callResult
+        case 0
+          { revert(0,0) }
+        default
           { result := mload(0x0) }
     }
     return result;
@@ -835,14 +835,14 @@ contract MineableM5Token is GDPOraclizedToken {
   function withdrawM5() public returns (uint256 reward, uint256 commitmentValue) {
     require(M5Logic_ != address(0));
     require(M5Token_ != address(0));
-    require(miners[msg.sender].value > 0); 
-    
+    require(miners[msg.sender].value > 0);
+
     // will revert if reward is positive
     reward = getM5Reward(msg.sender);
     commitmentValue = miners[msg.sender].value;
-    
+
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
-    
+
     return (reward,commitmentValue);
   }
 
@@ -850,7 +850,7 @@ contract MineableM5Token is GDPOraclizedToken {
   event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
-  * @dev swap M5 tokens back to regular tokens when GDP is back to positive 
+  * @dev swap M5 tokens back to regular tokens when GDP is back to positive
   * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */
@@ -859,7 +859,7 @@ contract MineableM5Token is GDPOraclizedToken {
     require(M5Token_ != address(0));
 
     require(M5Logic_.delegatecall(bytes4(keccak256("swap(uint256)")),_value)); // solium-disable-line
-    
+
     return true;
   }
 }
@@ -872,7 +872,7 @@ contract MineableM5Token is GDPOraclizedToken {
  * The supply of a minable coin in a period is defined by an oracle that reports GDP data from the country related to that coin.
  * Example: If the GDP of a given country grows by 3%, then 3% more coins will be available for forging (i.e. mining) in the next period.
  * Coins will be distributed by the proof of stake forging mechanism both during and after the initial distribution period.
- * The Proof of stake forging is defined by the MineableToken.sol contract. 
+ * The Proof of stake forging is defined by the MineableToken.sol contract.
  */
 contract MCoin is MineableM5Token {
 
@@ -886,11 +886,11 @@ contract MCoin is MineableM5Token {
     uint256 blockReward, // will be transformed using toDecimals()
     address GDPOracle,
     address upgradeManager
-    ) public 
+    ) public
     {
     require(GDPOracle != address(0));
     require(upgradeManager != address(0));
-    
+
     name = tokenName;
     symbol = tokenSymbol;
 
@@ -913,4 +913,15 @@ contract MCoin is MineableM5Token {
     return value;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

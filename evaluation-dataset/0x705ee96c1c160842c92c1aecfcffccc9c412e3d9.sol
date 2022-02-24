@@ -3,21 +3,21 @@ pragma solidity ^0.4.15;
 contract ERC20Interface {
     // Get the total token supply
     function totalSupply() constant returns (uint256 tS);
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) constant returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) returns (bool success);
- 
+
     // Send _value amount of tokens from address _from to address _to
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     // this function is required for some DEX functionality
     function approve(address _spender, uint256 _value) returns (bool success);
- 
+
     // Returns the amount which _spender is still allowed to withdraw from _owner
     function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
@@ -26,30 +26,30 @@ contract ERC20Interface {
 
     // Used for burning 100 tokens for every completed poll up to maximum of 10% of totalSupply.
     function burnPoll(uint256 _value) returns (bool success);
- 
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     // Triggered whenever tokens are destroyed
     event Burn(address indexed from, uint256 value);
 }
- 
+
 contract POLLToken is ERC20Interface {
 
     string public constant symbol = "POLL";
     string public constant name = "ClearPoll Token";
     uint8 public constant decimals = 18;
     uint256 _totalSupply = 10000000 * 10 ** uint256(decimals);
-    
+
     address public owner;
-    
+
     bool public excessTokensBurnt = false;
 
     uint256 public pollCompleted = 0;
-    
+
     uint256 public pollBurnInc = 100 * 10 ** uint256(decimals);
 
     uint256 public pollBurnQty = 0;
@@ -59,7 +59,7 @@ contract POLLToken is ERC20Interface {
     uint256 public pollBurnQtyMax;
 
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
 
     // Handle ether mistakenly sent to contract
@@ -78,15 +78,15 @@ contract POLLToken is ERC20Interface {
     function totalSupply() constant returns (uint256 tS) {
         tS = _totalSupply;
     }
- 
+
     // What is the balance of a particular account?
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -97,7 +97,7 @@ contract POLLToken is ERC20Interface {
             return false;
         }
     }
- 
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -119,7 +119,7 @@ contract POLLToken is ERC20Interface {
             return false;
         }
     }
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) returns (bool success) {
@@ -127,7 +127,7 @@ contract POLLToken is ERC20Interface {
         Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -141,10 +141,10 @@ contract POLLToken is ERC20Interface {
         pollBurnQtyMax = totalSupply() / 10;
         excessTokensBurnt = true;
         return true;
-    }   
+    }
 
     // Used for burning 100 tokens for every completed poll up to maximum of 10% of totalSupply.
-    function burnPoll(uint256 _value) public returns (bool success) {    	
+    function burnPoll(uint256 _value) public returns (bool success) {
         require(msg.sender == owner && excessTokensBurnt && _value > pollCompleted && !pollBurnCompleted);
         uint256 burnQty;
         if ((_value * pollBurnInc) <= pollBurnQtyMax) {
@@ -170,4 +170,20 @@ contract POLLToken is ERC20Interface {
         }
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

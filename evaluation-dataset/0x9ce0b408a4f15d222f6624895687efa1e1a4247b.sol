@@ -142,25 +142,25 @@ contract ETHERKUN {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-    
+
     using SafeMath for uint256;
     uint cooldownTime = 10 minutes;
-    
+
     struct kun {
         uint price;
         uint atk;
         uint readyTime;
     }
-    
+
     kun[] public kuns;
-    
+
     mapping (uint => address) public kunToOwner;
-    
+
     function getKun() external {
         uint id = kuns.push(kun(0, 0, now)) - 1;
         kunToOwner[id] = msg.sender;
     }
-    
+
     //查询拥有的kun
   function getKunsByOwner(address _owner) external view returns(uint[]) {
     uint[] memory result = new uint[](kuns.length);
@@ -173,11 +173,11 @@ contract ETHERKUN {
     }
     return result;
   }
-  
+
   function getKunsNum() external view returns(uint) {
     return kuns.length;
   }
-  
+
   //
   function getBattleKuns(uint _price) external view returns(uint[]) {
     uint[] memory result = new uint[](kuns.length);
@@ -190,19 +190,19 @@ contract ETHERKUN {
     }
     return result;
   }
-  
+
   uint randNonce = 0;
     //Evolution price
     uint public testFee = 0.001 ether;
-  
+
   event Evolution(address indexed owner, uint kunId,uint newAtk, uint oldAtk);
   event KunSell(address indexed owner, uint kunId,uint price);
-  
+
   function randMod() internal returns(uint) {
     randNonce = randNonce.add(1);
     return uint(keccak256(now, randNonce, block.blockhash(block.number - 1), block.coinbase)) % 100;
   }
-  
+
   //owner可以调整费率
   function setTestFee(uint _fee) external onlyOwner {
     testFee = _fee;
@@ -212,7 +212,7 @@ contract ETHERKUN {
     require(msg.sender == kunToOwner[_kunId]);
     _;
   }
-  
+
     //进入冷却 change to uint
   function _triggerCooldown(kun storage _kun) internal {
     _kun.readyTime = uint(now + cooldownTime);
@@ -237,7 +237,7 @@ contract ETHERKUN {
     _triggerCooldown(mykun);
     Evolution(msg.sender, _kunId, mykun.atk, oldAtk);
   }
-  
+
   function feed10(uint _kunId) external onlyOwnerOf(_kunId) payable {
     require(msg.value == testFee * 10);
     kun storage mykun = kuns[_kunId];
@@ -256,7 +256,7 @@ contract ETHERKUN {
     _triggerCooldown(mykun);
     Evolution(msg.sender, _kunId, mykun.atk, oldAtk);
   }
-  
+
   function feed50(uint _kunId) external onlyOwnerOf(_kunId) payable {
     require(msg.value == testFee * 50);
     kun storage mykun = kuns[_kunId];
@@ -275,7 +275,7 @@ contract ETHERKUN {
     _triggerCooldown(mykun);
     Evolution(msg.sender, _kunId, mykun.atk, oldAtk);
   }
-  
+
   function feed100(uint _kunId) external onlyOwnerOf(_kunId) payable {
     require(msg.value == testFee * 100);
     kun storage mykun = kuns[_kunId];
@@ -294,7 +294,7 @@ contract ETHERKUN {
     _triggerCooldown(mykun);
     Evolution(msg.sender, _kunId, mykun.atk, oldAtk);
   }
-  
+
   function feed100AndPay(uint _kunId) external onlyOwnerOf(_kunId) payable {
     require(msg.value == testFee * 110);
     kun storage mykun = kuns[_kunId];
@@ -305,7 +305,7 @@ contract ETHERKUN {
     _triggerCooldown(mykun);
     Evolution(msg.sender, _kunId, mykun.atk, oldAtk);
   }
-    
+
     //sellKun
     function sellKun(uint _kunId) external onlyOwnerOf(_kunId) {
         kun storage mykun = kuns[_kunId];
@@ -322,23 +322,23 @@ contract ETHERKUN {
         mykun.atk = 0;
         kunToOwner[_kunId] = 0;
     }
-    
+
     event kunAttackResult(address indexed _from,uint atk1, address _to, uint atk2, uint random, uint price);
-  
+
   //判断是否ready
   function _isReady(kun storage _kun) internal view returns (bool) {
       return (_kun.readyTime <= now);
   }
-  
+
   //attack
   function attack(uint _kunId, uint _targetId) external onlyOwnerOf(_kunId) {
     kun storage mykun = kuns[_kunId];
-    kun storage enemykun = kuns[_targetId]; 
+    kun storage enemykun = kuns[_targetId];
     require(_isReady(enemykun));
     require(enemykun.atk > 299 && mykun.atk > 0);
     uint rand = randMod();
     uint probability = mykun.atk * 100 /(mykun.atk + enemykun.atk) ;
-    
+
     if (rand < probability) {
         //win
         msg.sender.transfer(enemykun.price);
@@ -356,4 +356,13 @@ contract ETHERKUN {
         mykun.atk = 0;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

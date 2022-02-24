@@ -17,7 +17,7 @@ contract StandardToken is ERC20 {
 	uint256 public totalSupply;
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     modifier when_can_transfer(address _from, uint256 _value) {
         if (balances[_from] >= _value) _;
     }
@@ -78,9 +78,9 @@ contract ZBCToken is StandardToken {
 
 	//ZBC Token total supply - included decimals below
 	uint public constant MAX_SUPPLY = 300000000000;
-	
+
 	//ASSIGNED IN INITIALIZATION
-	address public ownerAddress;  // Address of the contract owner. 
+	address public ownerAddress;  // Address of the contract owner.
 	bool public halted;           // halts the controller if true.
 	mapping(address => uint256) public issuedTokens;
 
@@ -110,8 +110,8 @@ contract ZBCToken is StandardToken {
 		halted = _halted;
 	}
 
-	function issueToken(address _recipent, uint _amount) 
-		only_owner 
+	function issueToken(address _recipent, uint _amount)
+		only_owner
 		is_not_halted
 		returns (bool o_success)
 	{
@@ -137,5 +137,21 @@ contract ZBCToken is StandardToken {
 		returns (bool o_success)
 	{
 		return super.transferFrom(_from, _recipient, _amount);
+	}
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
 	}
 }

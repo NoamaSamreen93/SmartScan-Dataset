@@ -653,9 +653,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "MPLT";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0xd32Ca1815A347589E922c3A58d42c8f4F8A9770b;
-    
+
     uint public constant START_TIME = 1538847900;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -663,9 +663,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -689,5 +689,13 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

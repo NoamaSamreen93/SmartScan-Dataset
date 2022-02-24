@@ -226,7 +226,7 @@ contract EthernalCup is Ownable {
 
 		for(uint8 i = 0; i < 32; i++) {
 			countries[i] = Country(withdrawWallet, i, startPrice);
-		}			
+		}
 	}
 
 	/// @dev Set address withdaw wallet
@@ -249,7 +249,7 @@ contract EthernalCup is Ownable {
 	function buy(uint8 id) external payable buyAvailable unlocked {
 
 		require(id < 32);
-		
+
 		uint price = getPrice(countries[id].price);
 
 		require(msg.value > startPrice);
@@ -259,7 +259,7 @@ contract EthernalCup is Ownable {
 
 		// Add sell price minus fees to previous country owner
 		balances[countries[id].owner] += msg.value.sub(fee);
-	
+
 
 		// Add fee to developers balance
 		balances[withdrawWallet] += fee;
@@ -284,7 +284,7 @@ contract EthernalCup is Ownable {
 
 		// Add sell price minus fees to previous cup owner
 		balances[cup.owner] += msg.value.sub(fee);
-	
+
 		// Add fee to developers balance
 		balances[withdrawWallet] += fee;
 
@@ -380,4 +380,15 @@ contract EthernalCup is Ownable {
 		return now;
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -2,13 +2,13 @@ pragma solidity 0.4.19;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -17,7 +17,7 @@ contract Ownable {
   }
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -26,7 +26,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     if (newOwner != address(0)) {
@@ -94,14 +94,14 @@ library SafeMath {
 contract HardCap is Ownable {
   using SafeMath for uint;
   event CapUpdated(uint timestamp, bytes32 symbol, uint rate);
-  
+
   mapping(bytes32 => uint) public caps;
   uint hardcap = 0;
 
   /**
    * @dev Allows the current owner to update a single cap.
-   * @param _symbol The symbol to be updated. 
-   * @param _cap the cap for the symbol. 
+   * @param _symbol The symbol to be updated.
+   * @param _cap the cap for the symbol.
    */
   function updateCap(string _symbol, uint _cap) public onlyOwner {
     caps[sha3(_symbol)] = _cap;
@@ -111,7 +111,7 @@ contract HardCap is Ownable {
 
   /**
    * @dev Allows the current owner to update multiple caps.
-   * @param data an array that alternates sha3 hashes of the symbol and the corresponding cap . 
+   * @param data an array that alternates sha3 hashes of the symbol and the corresponding cap .
    */
   function updateCaps(uint[] data) public onlyOwner {
     require(data.length % 2 == 0);
@@ -128,12 +128,12 @@ contract HardCap is Ownable {
 
   /**
    * @dev Allows the anyone to read the current cap.
-   * @param _symbol the symbol to be retrieved. 
+   * @param _symbol the symbol to be retrieved.
    */
   function getCap(string _symbol) public constant returns(uint) {
     return caps[sha3(_symbol)];
   }
-  
+
   /**
    * @dev Allows the anyone to read the current hardcap.
    */
@@ -141,4 +141,15 @@ contract HardCap is Ownable {
     return hardcap;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

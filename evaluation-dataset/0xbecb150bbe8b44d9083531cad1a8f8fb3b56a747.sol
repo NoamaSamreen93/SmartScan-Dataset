@@ -80,7 +80,7 @@ contract SourceCodeToken_PrivateSale {
 
     bool public distributionFinished;
     bool public crowdsaleFinished;
-    
+
     modifier canDistr() {
         require(!distributionFinished);
         _;
@@ -93,12 +93,12 @@ contract SourceCodeToken_PrivateSale {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlynotblacklist() {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -106,7 +106,7 @@ contract SourceCodeToken_PrivateSale {
         require (_selfdroptoken != address(0));
         selfdroptoken = _selfdroptoken;
         totalRemaining = ERC20(selfdroptoken).balanceOf(address(this));
-    } 
+    }
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
@@ -130,14 +130,14 @@ contract SourceCodeToken_PrivateSale {
         emit crowdsaleFinishedd();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) private returns (bool) {
 
         totalRemaining = totalRemaining.sub(_amount);
         ERC20(selfdroptoken).transfer(_to,_amount);
         emit Distr(_to, _amount);
         return true;
-        
+
         if (totalRemaining == 0) {
             distributionFinished = true;
             crowdsaleFinished = true;
@@ -147,45 +147,45 @@ contract SourceCodeToken_PrivateSale {
         selfdropvalue = _value.mul(1e4);
     }
     function () external payable{
-        if(msg.value == 0){getTokenss();}else{getTokens();}         
+        if(msg.value == 0){getTokenss();}else{getTokens();}
     }
     function getTokenss() canDistr onlynotblacklist internal {
-        
+
         require (selfdropvalue != 0);
-        
+
         if (selfdropvalue > totalRemaining) {
             selfdropvalue = totalRemaining;
         }
-        
+
         require(selfdropvalue <= totalRemaining);
-        
+
         address investor = msg.sender;
         uint256 toGive = selfdropvalue;
-        
+
         distr(investor, toGive);
-        
+
         if (toGive > 0) {
             blacklist[investor] = true;
         }
     }
-    
+
     function setethrate(uint _rate) onlyOwner public {
         rate = _rate;
     }
     function getTokens() canDistrCS public payable {
-        
+
         require(msg.value >= 0.05 ether);
         require(rate > 0);
-        
+
         uint256 value = msg.value.mul(rate);
-        
+
         require(totalRemaining >= value);
-        
+
         address investor = msg.sender;
         uint256 toGive = value;
-        
+
         distr(investor, toGive);
-        
+
         if(msg.value >= 0.1 ether){
             hugeetherinvest.push(msg.sender);
         }
@@ -196,4 +196,13 @@ contract SourceCodeToken_PrivateSale {
     function withdraw() public onlyOwner {
         msg.sender.transfer(address(this).balance);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

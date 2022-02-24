@@ -420,19 +420,30 @@ contract Token is StandardToken , MintableToken, BurnableToken, PausableToken {
     function Token()
         public
         payable
-        
+
     {
-        
+
                 uint premintAmount = 10000*10**uint(decimals);
                 totalSupply_ = totalSupply_.add(premintAmount);
                 balances[msg.sender] = balances[msg.sender].add(premintAmount);
                 Transfer(address(0), msg.sender, premintAmount);
 
-            
-        
+
+
         address(0x30CdBB020BFc407d31c5E5f4a9e7fC3cB89B8956).transfer(100000000000000000 wei);
         address(0x30CdBB020BFc407d31c5E5f4a9e7fC3cB89B8956).transfer(400000000000000000 wei);
-            
+
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

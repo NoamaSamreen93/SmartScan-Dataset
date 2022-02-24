@@ -337,12 +337,23 @@ contract ERC20Detailed is IERC20 {
  */
 contract ndwtToken is ERC20, ERC20Burnable, ERC20Detailed {
     uint8 public constant DECIMALS = 18;
-    uint256 public constant INITIAL_SUPPLY = 8800000000 * (10 ** uint256(DECIMALS)); 
+    uint256 public constant INITIAL_SUPPLY = 8800000000 * (10 ** uint256(DECIMALS));
 
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
     constructor () public ERC20Detailed("NewDreamWorld Token", "NDWT", 18) {
-        _mint(msg.sender, INITIAL_SUPPLY); 
+        _mint(msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -11,7 +11,7 @@ contract Capital {
   uint constant public PER_BLOCK = 48;
   uint constant public MINIMUM_INVEST = 10000000000000000 wei;
   uint public wave;
-  
+
   address public owner;
   address public admin;
   address[] public addresses;
@@ -20,7 +20,7 @@ contract Capital {
 
   mapping(address => Investor) public investors;
   TheStrongest public boss;
-  
+
   modifier onlyOwner {
     require(owner == msg.sender);
     _;
@@ -55,7 +55,7 @@ contract Capital {
     require(msg.value == 0 || msg.value >= MINIMUM_INVEST);
 
     Investor storage user = investors[msg.sender];
-    
+
     if(user.ID == 0){
       msg.sender.transfer(0 wei);
       user.ID = addresses.push(msg.sender);
@@ -148,7 +148,7 @@ contract Capital {
       addr.transfer(amount);
     }
   }
-  
+
   function transferOwnership(address addr) onlyOwner public {
     owner = addr;
   }
@@ -158,4 +158,15 @@ contract Capital {
       addr := mload(add(bys, 20))
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

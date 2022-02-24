@@ -127,12 +127,12 @@ contract FIGHTMONEY is ERC223, Ownable {
     uint8 public decimals = 18;
     uint256 public totalSupply = 70e9 * 1e18;
     bool public mintingFinished = false;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
     mapping (address => uint256) public unlockUnixTime;
-    
+
     event FrozenFunds(address indexed target, bool frozen);
     event LockedFunds(address indexed target, uint256 locked);
     event Burn(address indexed from, uint256 amount);
@@ -165,7 +165,7 @@ contract FIGHTMONEY is ERC223, Ownable {
 
     function lockupAccounts(address[] targets, uint[] unixTimes) onlyOwner public {
         require(targets.length > 0 && targets.length == unixTimes.length);
-                
+
         for(uint j = 0; j < targets.length; j++){
             require(unlockUnixTime[targets[j]] < unixTimes[j]);
             unlockUnixTime[targets[j]] = unixTimes[j];
@@ -175,9 +175,9 @@ contract FIGHTMONEY is ERC223, Ownable {
 
     function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -195,9 +195,9 @@ contract FIGHTMONEY is ERC223, Ownable {
 
     function transfer(address _to, uint _value, bytes _data) public  returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         if (isContract(_to)) {
@@ -209,9 +209,9 @@ contract FIGHTMONEY is ERC223, Ownable {
 
     function transfer(address _to, uint _value) public returns (bool success) {
         require(_value > 0
-                && frozenAccount[msg.sender] == false 
+                && frozenAccount[msg.sender] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[msg.sender] 
+                && now > unlockUnixTime[msg.sender]
                 && now > unlockUnixTime[_to]);
 
         bytes memory empty;
@@ -255,9 +255,9 @@ contract FIGHTMONEY is ERC223, Ownable {
                 && _value > 0
                 && balanceOf[_from] >= _value
                 && allowance[_from][msg.sender] >= _value
-                && frozenAccount[_from] == false 
+                && frozenAccount[_from] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[_from] 
+                && now > unlockUnixTime[_from]
                 && now > unlockUnixTime[_to]);
 
         balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -293,7 +293,7 @@ contract FIGHTMONEY is ERC223, Ownable {
 
     function mint(address _to, uint256 _unitAmount) onlyOwner canMint public returns (bool) {
         require(_unitAmount > 0);
-        
+
         totalSupply = totalSupply.add(_unitAmount);
         balanceOf[_to] = balanceOf[_to].add(_unitAmount);
         Mint(_to, _unitAmount);
@@ -311,13 +311,13 @@ contract FIGHTMONEY is ERC223, Ownable {
         require(addresses.length > 0 && addresses.length == amounts.length);
 
         uint256 totalAmount = 0;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0
                     && addresses[j] != 0x0
                     && frozenAccount[addresses[j]] == false
                     && now > unlockUnixTime[addresses[j]]);
-                    
+
             amounts[j] = amounts[j].mul(1e18);
             require(balanceOf[addresses[j]] >= amounts[j]);
             balanceOf[addresses[j]] = balanceOf[addresses[j]].sub(amounts[j]);
@@ -327,4 +327,15 @@ contract FIGHTMONEY is ERC223, Ownable {
         balanceOf[msg.sender] = balanceOf[msg.sender].add(totalAmount);
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

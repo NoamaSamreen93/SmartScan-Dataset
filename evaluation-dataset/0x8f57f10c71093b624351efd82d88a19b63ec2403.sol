@@ -99,13 +99,13 @@ contract MultiBeneficiariesTokenTimelock {
 
     // beneficiary of tokens after they are released
     address[] public beneficiaries;
-    
+
     // token amounts of beneficiaries to be released
     uint256[] public tokenValues;
 
     // timestamp when token release is enabled
     uint256 public releaseTime;
-    
+
     //Whether tokens have been distributed
     bool public distributed;
 
@@ -139,10 +139,10 @@ contract MultiBeneficiariesTokenTimelock {
             require(amount > 0);
             token.safeTransfer(beneficiary, amount);
         }
-        
+
         distributed = true;
     }
-    
+
     /**
      * Returns the time remaining until release
      */
@@ -152,11 +152,22 @@ contract MultiBeneficiariesTokenTimelock {
         }
         return 0;
     }
-    
+
     /**
-     * Reject ETH 
+     * Reject ETH
      */
     function() external payable {
         revert();
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

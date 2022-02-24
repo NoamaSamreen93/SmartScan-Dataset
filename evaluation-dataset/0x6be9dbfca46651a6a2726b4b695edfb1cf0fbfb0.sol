@@ -10,8 +10,8 @@ contract Escrow {
     ContentUtils.ContentMapping public content;
     address escrowAddr = address(this);
 
-    uint256 public claimable = 0; 
-    uint256 public currentBalance = 0; 
+    uint256 public claimable = 0;
+    uint256 public currentBalance = 0;
     mapping(bytes32 => uint256) public claimableRewards;
 
     /// @notice valid reward and user has enough funds
@@ -24,7 +24,7 @@ contract Escrow {
     function completeDeliverable(bytes32 _id, address _creator, address _brand) internal returns(bool) {
         require(content.isFulfilled(_id, _creator, _brand));
         content.completeDeliverable(_id);
-        return _approveEscrow(_id, content.rewardOf(_id));       
+        return _approveEscrow(_id, content.rewardOf(_id));
     }
 
     /// @notice update current balance, if proper token amount approved
@@ -48,7 +48,7 @@ contract Escrow {
         string name,
         string description,
         uint reward,
-        uint addedOn) 
+        uint addedOn)
     {
         var (_content, exist) = content.getContentByName(_name);
         if (exist) {
@@ -179,10 +179,10 @@ library ContentUtils {
     string constant KEY_NOT_FOUND_ERR = "Key not found";
 
     /// @notice put item into mapping
-    function put(ContentMapping storage self, 
-        string _name, 
-        string _description, 
-        uint _reward) public returns (bool) 
+    function put(ContentMapping storage self,
+        string _name,
+        string _description,
+        uint _reward) public returns (bool)
     {
             require(!self.locked);
 
@@ -193,7 +193,7 @@ library ContentUtils {
             self.keys.push(_id);
             return true;
     }
-    
+
     /// @notice get amount of items in mapping
     function size(ContentMapping storage self) public view returns (uint) {
         return self.keys.length;
@@ -220,7 +220,7 @@ library ContentUtils {
         return (self.data[_id], self.data[_id].id == bytes32(0));
     }
 
-    /// @notice get content by _index into key array 
+    /// @notice get content by _index into key array
     function getContentByKeyIndex(ContentMapping storage self, uint _index) public view returns (Content storage _content) {
         isValidIndex(_index, self.keys.length);
         return (self.data[self.keys[_index]]);
@@ -256,14 +256,14 @@ library ContentUtils {
 
 
 contract Agreement is Escrow {
-    
+
     bool public locked;
     uint  public createdOn;
     uint public expiration;
     uint public startTime;
     address public brand;
     address public creator;
-    
+
     constructor(address _creator, uint _expiration, address _token) public {
         brand = msg.sender;
         creator = _creator;
@@ -307,9 +307,9 @@ contract Agreement is Escrow {
     }
 
     /// @notice add content to the agreement
-    function addContent(string _name, 
-        string _description, 
-        uint _reward) notLocked onlyBrand validReward(_reward) 
+    function addContent(string _name,
+        string _description,
+        uint _reward) notLocked onlyBrand validReward(_reward)
         public returns(bool _success) {
             return content.put(_name, _description, _reward);
     }
@@ -330,7 +330,7 @@ contract Agreement is Escrow {
     function approveDeliverable(bytes32 _id) onlyBrand public returns (bool) {
         return _fulfill(_id);
     }
-    
+
     function claim(bytes32 _id) external onlyCreator {
         claimableRewards[_id] = 0;
     }
@@ -529,7 +529,7 @@ contract CCOIN is ERC20, Ownable {
 
     function Airdrop(address _to, uint256 _tokens) external onlyAuthorized returns(bool) {
         require(transfer(_to, _tokens));
-    } 
+    }
 
     function transfer(address _to, uint _value) public onlyUnlocked returns (bool) {
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
@@ -647,4 +647,12 @@ contract CCOIN is ERC20, Ownable {
         emit RestartedCrowdsale();
     }
 
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

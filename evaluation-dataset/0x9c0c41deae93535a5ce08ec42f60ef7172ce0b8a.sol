@@ -11,7 +11,7 @@ pragma solidity ^0.5.4;
     LICENSE:  Under proprietary rights. All rights reserved.
               Except <lib.SafeMath, cont.Ownable> under The MIT License (MIT)
     AUTHOR:   http://t.me/pironmind
-    
+
 */
 
 library SafeMath {
@@ -322,4 +322,16 @@ contract LotteryData is Ownable {
     function() external payable {
         paymentValidator(msg.sender, msg.value);
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

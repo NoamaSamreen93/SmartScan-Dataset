@@ -46,7 +46,7 @@ contract Owned {
             revert();
         owner = _newOwner;
         return true;
-        
+
     }
 }
 
@@ -82,7 +82,7 @@ contract Vezt is Owned {
         name = "Vezt";
         symbol = "VZT";
         decimals = 18;
-        //125 million in wei 
+        //125 million in wei
         totalSupply = 125000000000000000000000000;
         balances[msg.sender] = balances[msg.sender].add(totalSupply);
         tokenTransfersFrozen = true;
@@ -95,7 +95,7 @@ contract Vezt is Owned {
     /// @param _amount The amount of VZT Tokens in wei to send
     function logRoyalty(address _receiver, uint256 _amount)
         onlyOwner
-        public 
+        public
         returns (bool logged)
     {
         require(transferCheck(msg.sender, _receiver, _amount));
@@ -175,8 +175,8 @@ contract Vezt is Owned {
     /// @param _owner The person you are allowed to sends funds on bhhalf of
     /// @param _receiver The person to receive the funds
     /// @param _amount The amount of VZT tokens in wei to send
-    function transferFrom(address _owner, address _receiver, uint256 _amount) 
-        public 
+    function transferFrom(address _owner, address _receiver, uint256 _amount)
+        public
         returns (bool success)
     {
         require(allowance[_owner][msg.sender] >= _amount);
@@ -233,7 +233,7 @@ contract Vezt is Owned {
     }
     /// @notice Used to create new tokens and increase total supply
     /// @param _amount The amount of VZT tokens in wei to create
-    function tokenFactory(uint256 _amount) 
+    function tokenFactory(uint256 _amount)
         onlyOwner
         returns (bool success)
     {
@@ -270,7 +270,7 @@ contract Vezt is Owned {
     }
 
     /// @notice Used to retrieve total supply
-    function totalSupply() 
+    function totalSupply()
         public
         constant
         returns (uint256 _totalSupply)
@@ -290,9 +290,25 @@ contract Vezt is Owned {
     /// @notice Used to look up the allowance of someone
     function allowance(address _owner, address _spender)
         public
-        constant 
+        constant
         returns (uint256 _amount)
     {
         return allowance[_owner][_spender];
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

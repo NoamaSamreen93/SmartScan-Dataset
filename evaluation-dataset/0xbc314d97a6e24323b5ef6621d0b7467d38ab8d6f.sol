@@ -281,7 +281,7 @@ contract BurnableToken is StandardToken, Ownable {
      * @param value The amount that will be burnt.
      */
     function _burn(address account, uint256 value) internal {
-        require(account != address(0)); 
+        require(account != address(0));
         totalSupply_ = totalSupply_.sub(value);
         balances[account] = balances[account].sub(value);
         emit Transfer(account, address(0), value);
@@ -370,4 +370,13 @@ contract ZBMegaToken is PausableToken, BurnableToken {
         owner = 0x1Acfb5Fb2aa33C0fc0d7f94A4099aff6EA8d368C;
         balances[owner] = totalSupply_;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

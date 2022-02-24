@@ -74,25 +74,25 @@ contract YAB is ERC20Detailed {
 
   using SafeMath for uint256;
   address _owner;
-  
+
   mapping (address => uint256) private _balances;
   mapping (address => mapping (address => uint256)) private _allowed;
   mapping (address => bool) public whitelist;
-  
+
   string constant tokenName = "Yet Another Bomb";
   string constant tokenSymbol = "YAB";
-  
+
   uint8 constant tokenDecimals = 0;
   uint256 public _totalSupply = 1000000;
   uint256 public _totalClaimed = 999700;
   uint256 public basePercent = 100;
   uint256 public airdropAmount;
-  
+
   modifier onlyOwner() {
       require(msg.sender == _owner);
       _;
   }
-  
+
   modifier onlyWhitelist() {
       require(whitelist[msg.sender] == true);
       _;
@@ -102,30 +102,30 @@ contract YAB is ERC20Detailed {
     _owner = msg.sender;
     airdropAmount = 400;
   }
-  
+
   function setAirdropAmount(uint256 _amount) external onlyOwner {
       airdropAmount = _amount;
   }
-  
+
   function enableWhitelist(address[] memory addresses) public onlyOwner {
       for (uint i = 0; i < addresses.length; i++) {
           whitelist[addresses[i]] = true;
       }
   }
-  
+
   function withdrawForeignTokens(address _contract) external {
       IERC20 token = IERC20(_contract);
       uint256 amount = token.balanceOf(address(this));
       token.transfer(_owner, amount);
   }
-  
+
   function getAirdrop() external onlyWhitelist {
       require(_totalClaimed.add(airdropAmount) <= _totalSupply);
       _totalClaimed = _totalClaimed.add(airdropAmount);
       whitelist[msg.sender] = false;
       _mint(msg.sender, airdropAmount);
   }
-  
+
   function checkWhitelist() public view returns (bool) {
       return whitelist[msg.sender];
   }
@@ -236,4 +236,15 @@ contract YAB is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

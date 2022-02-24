@@ -209,7 +209,7 @@ contract GreedyCoin is Owner,ERC721 {
   function balanceOf(address owner) external view returns (uint256 balance){
     balance = stOwnerTokenCount[owner];
   }
-  
+
   /**
    * @dev query the owner of one GreedyCoin
    */
@@ -491,19 +491,19 @@ contract Market is GreedyCoin {
     if ( is_recommend ) {
       if ( stTokens.length > 0 ) {
         require(recommend_token_id >= 0 && recommend_token_id < stTokens.length);
-      } 
+      }
     }
   }
 
-  modifier aboveMinNextPrice(uint next_price) { 
+  modifier aboveMinNextPrice(uint next_price) {
     require (next_price >= PRICE_MIN && next_price <= PRICE_LIMIT);
     _;
   }
 
   // must be a normal address
-  modifier mustCommonAddress() { 
+  modifier mustCommonAddress() {
     require (_isContract(msg.sender) == false);
-    _; 
+    _;
   }
 
   // check if it is the address of contract
@@ -513,4 +513,15 @@ contract Market is GreedyCoin {
     return size > 0;
   }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

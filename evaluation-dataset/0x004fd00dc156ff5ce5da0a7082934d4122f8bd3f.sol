@@ -9,7 +9,7 @@ contract Delegate {
     function setApprovalForAll(address _sender, address _operator, bool _approved) public returns (bool);
 
     function transferFrom(address _sender, address _from, address _to, uint256 _tokenId) public returns (bool);
-    
+
     function safeTransferFrom(address _sender, address _from, address _to, uint256 _tokenId) public returns (bool);
 
     function safeTransferFrom(address _sender, address _from, address _to, uint256 _tokenId, bytes memory _data) public returns (bool);
@@ -70,7 +70,7 @@ contract BasicMintable is Delegate, Ownable {
     function transferFrom(address, address, address, uint256) public returns (bool) {
         return true;
     }
-    
+
     function safeTransferFrom(address, address, address, uint256) public returns (bool) {
         return true;
     }
@@ -79,4 +79,15 @@ contract BasicMintable is Delegate, Ownable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

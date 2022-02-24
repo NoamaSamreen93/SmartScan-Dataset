@@ -613,7 +613,7 @@ contract StakeTreeWithTokenization {
   uint public totalCurrentFunders = 0; // Keeps track of total funders
   uint public withdrawalCounter = 0; // Keeps track of how many withdrawals have taken place
   uint public sunsetWithdrawDate;
-  
+
   MiniMeToken public tokenContract;
   MiniMeTokenFactory public tokenFactory;
   bool public tokenized = false;
@@ -635,9 +635,9 @@ contract StakeTreeWithTokenization {
   event Sunset(bool hasSunset);
 
   function StakeTreeWithTokenization(
-    address beneficiaryAddress, 
-    uint withdrawalPeriodInit, 
-    uint withdrawalStart, 
+    address beneficiaryAddress,
+    uint withdrawalPeriodInit,
+    uint withdrawalStart,
     uint sunsetWithdrawPeriodInit,
     uint minimumFundingAmountInit) {
 
@@ -645,7 +645,7 @@ contract StakeTreeWithTokenization {
     withdrawalPeriod = withdrawalPeriodInit;
     sunsetWithdrawalPeriod = sunsetWithdrawPeriodInit;
 
-    lastWithdrawal = withdrawalStart; 
+    lastWithdrawal = withdrawalStart;
     nextWithdrawal = lastWithdrawal + withdrawalPeriod;
 
     minimumFundingAmount = minimumFundingAmountInit;
@@ -711,7 +711,7 @@ contract StakeTreeWithTokenization {
         contributionClaimed: 0
       });
     }
-    else { 
+    else {
       consolidateFunder(msg.sender, msg.value);
     }
 
@@ -725,7 +725,7 @@ contract StakeTreeWithTokenization {
   * Due to no floating points in Solidity, we will lose some fidelity
   * if there's wei on the last digit. The beneficiary loses a neglibible amount
   * to withdraw but this benefits the beneficiary again on later withdrawals.
-  * We multiply by 10 (which corresponds to the 10%) 
+  * We multiply by 10 (which corresponds to the 10%)
   * then divide by 100 to get the actual part.
   */
   function calculateWithdrawalAmount(uint startAmount) public returns (uint){
@@ -735,10 +735,10 @@ contract StakeTreeWithTokenization {
   /*
   * This function calculates the refund amount for the funder.
   * Due to no floating points in Solidity, we will lose some fidelity.
-  * The funder loses a neglibible amount to refund. 
+  * The funder loses a neglibible amount to refund.
   * The left over wei gets pooled to the fund.
   */
-  function calculateRefundAmount(uint amount, uint withdrawalTimes) public returns (uint) {    
+  function calculateRefundAmount(uint amount, uint withdrawalTimes) public returns (uint) {
     for(uint i=0; i<withdrawalTimes; i++){
       amount = amount.mul(9).div(10);
     }
@@ -749,7 +749,7 @@ contract StakeTreeWithTokenization {
 
   /*
   * To calculate the refund amount we look at how many times the beneficiary
-  * has withdrawn since the funder added their funds. 
+  * has withdrawn since the funder added their funds.
   * We use that deduct 10% for each withdrawal.
   */
 
@@ -943,11 +943,11 @@ contract StakeTreeWithTokenization {
   }
 
   /* --- Token Contract Forwarding Controller Functions --- */
-  /* 
+  /*
   * Allows beneficiary to call two additional functions on the token contract:
   * claimTokens
   * enabledTransfers
-  * 
+  *
   */
   function tokenContractClaimTokens(address _token) onlyByBeneficiary onlyWhenTokenized {
     tokenContract.claimTokens(_token);
@@ -955,4 +955,15 @@ contract StakeTreeWithTokenization {
   function tokenContractEnableTransfers(bool _transfersEnabled) onlyByBeneficiary onlyWhenTokenized {
     tokenContract.enableTransfers(_transfersEnabled);
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -95,11 +95,11 @@ contract HIPHOP is ERC20Interface, Owned {
     uint8 public decimals;
     uint256 public _totalSupply;
     bool    internal Open;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
-    
+
+
     uint256 public hardCap;
     uint256 public softCap;
     uint256 public fundsRaised;
@@ -113,12 +113,12 @@ contract HIPHOP is ERC20Interface, Owned {
     address payable wallet;
     uint256 internal minTx;
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    
+
     modifier onlyWhileOpen {
         require(Open);
         _;
     }
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -131,22 +131,22 @@ contract HIPHOP is ERC20Interface, Owned {
         wallet = _wallet;
         balances[owner] = totalSupply();
         Open = true;
-        
+
         emit Transfer(address(0),owner, totalSupply());
-        
+
         hardCap = 1e7; // 10 million
         softCap = 0;   // 0
         _setTimes();
         minTx = 1 ether;
     }
-    
-    
+
+
     /** ERC20Interface function's implementation **/
-    
+
     function totalSupply() public view returns (uint){
-       return _totalSupply * 1e18; // 100 billion 
+       return _totalSupply * 1e18; // 100 billion
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -168,9 +168,9 @@ contract HIPHOP is ERC20Interface, Owned {
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender,to,tokens);
         return true;
-        
+
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -183,7 +183,7 @@ contract HIPHOP is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -199,7 +199,7 @@ contract HIPHOP is ERC20Interface, Owned {
         emit Transfer(from,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
@@ -207,29 +207,29 @@ contract HIPHOP is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     function _setTimes() internal {
         firststageopeningTime    = 1548979200; // 1st FEB 2019      00:00:00 GMT
         firststageclosingTime    = 1551398400; // 1st MARCH 2019    00:00:00 GMT
-        secondstageopeningTime   = 1554076800; // 1st APR 2019      00:00:00 GMT 
+        secondstageopeningTime   = 1554076800; // 1st APR 2019      00:00:00 GMT
         secondstageclosingTime   = 1556668800; // 1st MAY 2019      00:00:00 GMT
         laststageopeningTime     = 1559347200; // 1st JUN 2019      00:00:00 GMT
         laststageclosingTime     = 1561939200; // 1st JULY 2019     00:00:00 GMT
-        
+
     }
-    
+
     function burnTokens(address account, uint256 value) public onlyOwner {
         _burn(account, value);
     }
-    
+
     function pause() public onlyOwner {
         Open = false;
     }
-    
+
     function unPause() public onlyOwner {
         Open = true;
     }
-    
+
     /**
      * @dev Internal function that burns an amount of the token of a given
      * account.
@@ -243,22 +243,22 @@ contract HIPHOP is ERC20Interface, Owned {
         balances[account] = balances[account].sub(value);
         emit Transfer(account, address(0), value);
     }
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
 
     function buyTokens(address _beneficiary) public payable onlyWhileOpen {
         require(msg.value >= minTx);
-    
+
         uint256 weiAmount = msg.value;
-    
+
         _preValidatePurchase(_beneficiary, weiAmount);
-        
+
         uint256 tokens = _getTokenAmount(weiAmount);
-        
+
         tokens = _getBonus(tokens);
-        
+
         fundsRaised = fundsRaised.add(weiAmount);
 
         _processPurchase(_beneficiary, tokens);
@@ -271,35 +271,35 @@ contract HIPHOP is ERC20Interface, Owned {
             revert();
         }
     }
-    
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal pure{
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
-  
+
     function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
-        uint256 rate = _getRate(); //per wei 
+        uint256 rate = _getRate(); //per wei
         return _weiAmount.mul(rate);
     }
-    
+
     function _getRate() internal view returns (uint256) {
         uint256 rate;
         // DURING FIRST STAGE
-        if(now >= firststageopeningTime && now <= firststageclosingTime) { 
+        if(now >= firststageopeningTime && now <= firststageclosingTime) {
             rate = 1205; // 10 CENTS = USD 120
-        } 
+        }
         // DURING SECOND STAGE
         else if (now >= secondstageopeningTime && now <= secondstageclosingTime) {
             rate = 240; // 50 CENTS = usd 120
-        } 
+        }
         // DURING LAST STAGE
         else if (now >= laststageopeningTime && now <= laststageclosingTime) {
             rate = 120; // 1 dollar = usd 120
         }
-        
+
         return rate;
     }
-    
+
     function _getBonus(uint256 tokens) internal view returns (uint256) {
         if(purchasers <= 1000){
             // give 50% bonus
@@ -324,9 +324,22 @@ contract HIPHOP is ERC20Interface, Owned {
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-    
+
     function _forwardFunds(uint256 _amount) internal {
         wallet.transfer(_amount);
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

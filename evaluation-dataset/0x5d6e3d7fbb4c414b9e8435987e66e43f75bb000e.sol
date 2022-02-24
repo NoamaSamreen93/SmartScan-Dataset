@@ -235,3 +235,7 @@ contract GlobexCrowdsale is StandardToken {
         Transfer(this, owner, balance);
     }
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

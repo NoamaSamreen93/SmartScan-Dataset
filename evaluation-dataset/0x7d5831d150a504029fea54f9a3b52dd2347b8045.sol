@@ -115,7 +115,7 @@ contract IERC721 {
     function setApprovalForAll(address operator, bool _approved) public;
 
     function isApprovedForAll(address owner, address operator) public view returns (bool);
-    
+
     function transfer(address to, uint256 tokenId) public;
 
     function transferFrom(address from, address to, uint256 tokenId) public;
@@ -245,7 +245,7 @@ contract Bussiness is Ownable {
 
     function getTokenPrice(address _game, uint256 _tokenId) public returns (address owner, uint256 price, uint256 fee, uint256 hbfee, uint isHightlight, uint isHBHightlight) {
         IERC721 erc721Address = IERC721(_game);
-        if(erc721Address.ownerOf(_tokenId) != Games[_game].tokenPrice[_tokenId].tokenOwner 
+        if(erc721Address.ownerOf(_tokenId) != Games[_game].tokenPrice[_tokenId].tokenOwner
         && erc721Address.ownerOf(_tokenId) != address(this)) resetPrice(_game, _tokenId);
         return (Games[_game].tokenPrice[_tokenId].tokenOwner,
         Games[_game].tokenPrice[_tokenId].price, Games[_game].tokenPrice[_tokenId].fee,
@@ -279,7 +279,7 @@ contract Bussiness is Ownable {
         IERC721 erc721Address = IERC721(_game);
         return erc721Address.getApproved(_tokenId);
     }
-    
+
     function setPrice(address _game, uint256 _tokenId, uint256 _ethPrice, uint256 _ethfee, uint _hbfee, uint _isHightLight, uint _isHightLightByHb) internal {
         Games[_game].tokenPrice[_tokenId] = Price(msg.sender, _ethPrice, _ethfee, _hbfee, _isHightLight, _isHightLightByHb);
         Games[_game].tokenIdSale.push(_tokenId);
@@ -447,7 +447,7 @@ contract Bussiness is Ownable {
             resetPrice(_game, _tokenId);
         }
     }
-    
+
     function cancelBussinessByGame(address _game) private onlyCeoAddress {
         uint256[] memory _arrTokenId = Games[_game].tokenIdSale;
         for (uint i = 0; i < _arrTokenId.length; i++) {
@@ -462,7 +462,7 @@ contract Bussiness is Ownable {
         }
         _withdraw(address(this).balance, hbwalletToken.balanceOf(address(this)));
     }
-    
+
     function revenue() public view returns (uint256, uint){
 
         uint256 ethfee;
@@ -512,7 +512,7 @@ contract Bussiness is Ownable {
         Games[_game].tokenPrice[tokenId].tokenOwner.transfer(msg.value);
         resetPrice(_game, tokenId);
     }
-    
+
     function buyFromSmartcontract(address _game, uint256 _tokenId) public payable {
         IERC721 erc721Address = IERC721(_game);
         require(Games[_game].tokenPrice[_tokenId].price == msg.value);
@@ -549,4 +549,15 @@ contract Bussiness is Ownable {
             }
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

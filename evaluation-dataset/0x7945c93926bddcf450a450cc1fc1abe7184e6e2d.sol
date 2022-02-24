@@ -908,7 +908,7 @@ pragma solidity ^0.5.2;
 
 
 contract ContinuousToken is BancorBondingCurve, Ownable, ERC20 {
-    
+
     using SafeMath for uint256;
 
     uint256 public scale = 10**18;
@@ -1049,4 +1049,10 @@ contract SpaceMiners is Ownable, ContinuousToken {
 
   function() external payable {}
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

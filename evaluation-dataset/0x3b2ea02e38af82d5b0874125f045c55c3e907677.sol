@@ -34,7 +34,7 @@ contract ERC20 {
     function transfer(address recipientAddress, uint tokens) public returns (bool success);
     function transferFrom(address fromAddress, address recipientAddress, uint tokens) public returns (bool success);
     function balanceOf(address userAddress) public constant returns (uint balance);
-    
+
     event Transfer(address indexed from, address indexed recipient, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
@@ -53,7 +53,7 @@ contract Owned {
         require(msg.sender == Owner);
         _;
     }
-    
+
     /*
         Assigns the initial address to the owner.
     */
@@ -74,7 +74,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
 }
 
 /*
@@ -85,7 +85,7 @@ contract BEAT is ERC20, Owned, SafeMath {
     string public symbol;
     uint public _totalSupply;
     uint8 public decimals;
-    
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -138,7 +138,7 @@ contract BEAT is ERC20, Owned, SafeMath {
         Transfer(from, to, tokens);
         return true;
     }
-    
+
     /*
         Owner can transfer any ERC20 tokens sent to contract.
     */
@@ -164,11 +164,22 @@ contract BEAT is ERC20, Owned, SafeMath {
         return allowed[tokenOwner][spender];
     }
 
-    
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         Approval(msg.sender, spender, tokens);
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

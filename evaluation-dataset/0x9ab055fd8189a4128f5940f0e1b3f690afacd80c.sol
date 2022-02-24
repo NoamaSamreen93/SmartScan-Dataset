@@ -161,7 +161,7 @@ contract Hodler is Ownable {
     uint256 public TOKEN_HODL_9M;
     // total amount of tokens claimed so far
     uint256 public claimedTokens;
-    
+
     event LogHodlSetStake(address indexed _setter, address indexed _beneficiary, uint256 _value);
     event LogHodlClaimed(address indexed _setter, address indexed _beneficiary, uint256 _value);
     event LogHodlStartSet(address indexed _setter, uint256 _time);
@@ -184,7 +184,7 @@ contract Hodler is Ownable {
         // real change and valid _beneficiary is needed
         if (_stake == 0 || _beneficiary == address(0))
             return;
-        
+
         // add stake and maintain count
         if (hodlerStakes[_beneficiary].stake == 0)
             hodlerTotalCount = hodlerTotalCount.add(1);
@@ -200,7 +200,7 @@ contract Hodler is Ownable {
         // real change and valid _beneficiary is needed
         if (hodlerStakes[_beneficiary].stake == _stake || _beneficiary == address(0))
             return;
-        
+
         // add stake and maintain count
         if (hodlerStakes[_beneficiary].stake == 0 && _stake > 0) {
             hodlerTotalCount = hodlerTotalCount.add(1);
@@ -226,7 +226,7 @@ contract Hodler is Ownable {
         hodlerTime9M = _time.add(270 days);
         LogHodlStartSet(msg.sender, _time);
     }
-    /// @notice Invalidates hodler account 
+    /// @notice Invalidates hodler account
     /// @dev Gets called by EthealController#onTransfer before every transaction
     function invalidate(address _account) public onlyOwner {
         if (hodlerStakes[_account].stake > 0 && !hodlerStakes[_account].invalid) {
@@ -246,7 +246,7 @@ contract Hodler is Ownable {
         // only when the address has a valid stake
         require(hodlerStakes[_beneficiary].stake > 0 && !hodlerStakes[_beneficiary].invalid);
         uint256 _stake = 0;
-        
+
         // update hodl total values
         updateAndGetHodlTotalValue();
         // claim hodl if not claimed
@@ -293,4 +293,13 @@ contract Hodler is Ownable {
         }
         return hodlerTotalValue;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

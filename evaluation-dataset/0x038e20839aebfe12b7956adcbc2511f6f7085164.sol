@@ -11,12 +11,12 @@ contract ETHVault is Owned {
 
     event Deposit(uint amount);
     event Withdraw(uint amount);
-    
+
     function Vault() payable {
         Owner = msg.sender;
         deposit();
     }
-    
+
     function() payable {
         revert();
     }
@@ -28,16 +28,27 @@ contract ETHVault is Owned {
                 Deposit(msg.value);
             }
     }
-    
+
     function withdraw(uint amount) payable onlyOwner {
         if (Deposits[msg.sender] > 0 && amount <= Deposits[msg.sender]) {
             msg.sender.transfer(amount);
             Withdraw(amount);
         }
     }
-    
+
     function kill() payable onlyOwner {
         if (this.balance == 0)
             selfdestruct(msg.sender);
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

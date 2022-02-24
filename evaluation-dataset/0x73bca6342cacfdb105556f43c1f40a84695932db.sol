@@ -5,7 +5,7 @@ library SafeMath {
     c = a + b;
     require(c >= a);
   }
-  
+
   function sub(uint a, uint b) internal pure returns (uint c) {
     require(b <= a);
     c = a - b;
@@ -52,7 +52,7 @@ contract Ownable {
 contract Regulated is Ownable {
   event Whitelisted(address indexed customer);
   event Blacklisted(address indexed customer);
-  
+
   mapping(address => bool) regulationStatus;
 
   function whitelist(address customer) public onlyOwner {
@@ -64,12 +64,12 @@ contract Regulated is Ownable {
     regulationStatus[customer] = false;
     Blacklisted(customer);
   }
-  
+
   function ensureRegulated(address customer) public constant {
     require(regulationStatus[customer] == true);
   }
 
-  function isRegulated(address customer) public constant returns (bool approved) { 
+  function isRegulated(address customer) public constant returns (bool approved) {
     return regulationStatus[customer];
   }
 }
@@ -115,7 +115,7 @@ contract VaultbankVotingToken is ERC20, Regulated, Nonpayable {
   function issue(address recipient, uint tokens) public onlyOwner returns (bool success) {
     require(recipient != address(0));
     require(recipient != owner);
-    
+
     whitelist(recipient);
     transfer(recipient, tokens);
     return true;
@@ -130,7 +130,7 @@ contract VaultbankVotingToken is ERC20, Regulated, Nonpayable {
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     require(newOwner != owner);
-   
+
     whitelist(newOwner);
     transfer(newOwner, balances[owner]);
     owner = newOwner;
@@ -147,7 +147,7 @@ contract VaultbankVotingToken is ERC20, Regulated, Nonpayable {
   function transfer(address to, uint tokens) public returns (bool success) {
     ensureRegulated(msg.sender);
     ensureRegulated(to);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(tokens);
     balances[to] = balances[to].add(tokens);
     Transfer(msg.sender, to, tokens);
@@ -157,7 +157,7 @@ contract VaultbankVotingToken is ERC20, Regulated, Nonpayable {
   function approve(address spender, uint tokens) public returns (bool success) {
     // Put a check for race condition issue with approval workflow of ERC20
     require((tokens == 0) || (allowed[msg.sender][spender] == 0));
-    
+
     allowed[msg.sender][spender] = tokens;
     Approval(msg.sender, spender, tokens);
     return true;
@@ -177,4 +177,20 @@ contract VaultbankVotingToken is ERC20, Regulated, Nonpayable {
   function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
     return allowed[tokenOwner][spender];
   }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

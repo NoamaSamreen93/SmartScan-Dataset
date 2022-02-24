@@ -29,22 +29,22 @@ contract Ownable {
   }
 }
 contract FrenchIco_Coprorate is Ownable {
-    
+
     bool internal PauseAllContracts= false;
     uint public maxAmount;
     mapping(address => uint) internal role;
-    
+
     event WhitelistedAddress(address addr, uint _role);
 
 /** GENERAL STOPPABLE
   * All the Project are stoppable by the Company
   **/
- 
+
     function GeneralPause() onlyOwner external {
         if (PauseAllContracts==false) {PauseAllContracts=true;}
         else {PauseAllContracts=false;}
     }
-    
+
     function setupMaxAmount(uint _maxAmount) onlyOwner external {
         maxAmount = _maxAmount;
     }
@@ -55,25 +55,34 @@ contract FrenchIco_Coprorate is Ownable {
      * @ STANDARD = 1
      * @ PREMIUM = 2
      * @ PREMIUM PRO = 3
-      */   
-   
+      */
+
     function RoleSetup(address addr, uint _role) onlyOwner public {
          role[addr]= _role;
          emit WhitelistedAddress(addr, _role);
       }
-      
+
     function newMember() public payable {
          require (role[msg.sender]==0,"user has to be new");
          role[msg.sender]= 1;
          owner.transfer(msg.value);
          emit WhitelistedAddress(msg.sender, 1);
       }
-      
-/** USABLE BY EXTERNAL CONTRACT*/ 
-	     
+
+/** USABLE BY EXTERNAL CONTRACT*/
+
     function isGeneralPaused() external view returns (bool) {return PauseAllContracts;}
     function GetRole(address addr) external view returns (uint) {return role[addr];}
     function GetWallet_FRENCHICO() external view returns (address) {return owner;}
     function GetMaxAmount() external view returns (uint) {return maxAmount;}
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

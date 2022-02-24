@@ -39,7 +39,7 @@ contract owned {
  */
 contract token {
     /* 公共变量 */
-    string public site = 'WWW.CBANK.IN'; // 合约银行 www.contractbank.cn 
+    string public site = 'WWW.CBANK.IN'; // 合约银行 www.contractbank.cn
     string public name; //代币名称
     string public symbol; //代币符号比如'$'
     uint8 public decimals = 18;  //代币单位，展示的小数点后面多少个0,和以太币一样后面是是18个0
@@ -362,4 +362,15 @@ contract MyAdvancedToken is owned, token {
 
         msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

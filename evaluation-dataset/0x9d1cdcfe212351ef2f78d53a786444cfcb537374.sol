@@ -65,7 +65,7 @@ contract ERC20 is ERC20Basic {
 }
 
 contract Quest is ERC20 {
-    
+
     using SafeMath for uint256;
     address public owner;
 
@@ -76,62 +76,62 @@ contract Quest is ERC20 {
     string public constant name = "Quest";
     string public constant symbol = "QST";
     uint public constant decimals = 8;
-    
+
     uint256 public maxSupply = 10000000000e8;
     uint256 public QSTPerEth = 30000000e8;
     uint256 public claimable = 20000e8;
     uint256 public constant minContrib = 1 ether / 100;
     uint256 public maxClaim = 0;
-    
-    
+
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event TransferEther(address indexed _from, address indexed _to, uint256 _value);
     event Burn(address indexed burner, uint256 value);
-    
-    
+
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     //mitigates the ERC20 short address attack
     //suggested by izqui9 @ http://bit.ly/2NMMCNv
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     modifier onlyAllowedClaimer() {
         require(claimer[msg.sender] == false);
         _;
     }
-    
+
     constructor () public {
         totalSupply = maxSupply;
         owner = msg.sender;
         balances[owner] = maxSupply;
     }
-    
+
     function transferOwnership(address _newOwner) onlyOwner public {
         if (_newOwner != address(0)) {
             owner = _newOwner;
         }
     }
-    
-    function updateTokensPerEth(uint _QSTPerEth) public onlyOwner {        
+
+    function updateTokensPerEth(uint _QSTPerEth) public onlyOwner {
         QSTPerEth = _QSTPerEth;
     }
-           
+
     function () public payable {
         getQST();
      }
-    
+
     function dividend(uint256 _amount) internal view returns (uint256){
         if(_amount >= QSTPerEth) return ((7*_amount).div(100)).add(_amount);
         return _amount;
     }
-    
+
     function getQST() payable public {
         if(msg.value >= minContrib){
             address investor = msg.sender;
@@ -140,11 +140,11 @@ contract Quest is ERC20 {
             require(balances[owner] >= tokenAmt);
             balances[owner] = balances[owner].sub(tokenAmt);
             balances[investor] = balances[investor].add(tokenAmt);
-            emit Transfer(this, investor, tokenAmt);    
+            emit Transfer(this, investor, tokenAmt);
         }else{
             freeClaim();
         }
-        
+
     }
     function freeClaim() payable onlyAllowedClaimer public{
         address investor = msg.sender;
@@ -159,7 +159,7 @@ contract Quest is ERC20 {
     function balanceOf(address _owner) constant public returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
@@ -168,16 +168,16 @@ contract Quest is ERC20 {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
-    function doDistro(address[] _addresses, uint256 _amount) public onlyOwner {        
+
+    function doDistro(address[] _addresses, uint256 _amount) public onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) {transfer(_addresses[i], _amount);}
     }
-    
+
     function doDistroAmount(address[] addresses, uint256[] amounts) onlyOwner public {
         require(addresses.length == amounts.length);
         for (uint i = 0; i < addresses.length; i++) {transfer(addresses[i], amounts[i]);}
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[_from]);
@@ -188,7 +188,7 @@ contract Quest is ERC20 {
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
@@ -196,27 +196,27 @@ contract Quest is ERC20 {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function transferEther(address _receiver, uint256 _amount) public onlyOwner {
         require(_amount <= address(this).balance);
         emit TransferEther(this, _receiver, _amount);
         _receiver.transfer(_amount);
     }
-    
-    function doEthDistro(address[] addresses, uint256 amount) public onlyOwner {        
+
+    function doEthDistro(address[] addresses, uint256 amount) public onlyOwner {
         for (uint i = 0; i < addresses.length; i++) { transferEther(addresses[i], amount);}
     }
-    
+
     function withdrawFund() onlyOwner public {
         address thisCont = this;
         uint256 ethBal = thisCont.balance;
         owner.transfer(ethBal);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -224,19 +224,19 @@ contract Quest is ERC20 {
         totalSupply = totalSupply.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function getForeignTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-    
+
      function disallowClaimer(address[] addresses) onlyOwner public {
         for (uint i = 0; i < addresses.length; i++) {
             claimer[addresses[i]] = true;
@@ -249,4 +249,13 @@ contract Quest is ERC20 {
         }
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -1,6 +1,6 @@
 /**
  *  CE7.sol v1.0.0
- * 
+ *
  *  Bilal Arif - https://twitter.com/furusiyya_
  *  Draglet GbmH
  */
@@ -80,14 +80,14 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 
 contract Pausable is Ownable {
-  
+
   event Pause(bool indexed state);
 
   bool private paused = false;
@@ -281,7 +281,7 @@ contract CE7 is Pausable, ReentrancyGuard {
    * @notice Migrate tokens to the new token contract.
    * @dev Required state: Operational Migration
    * @param _value The amount of token to be migrated
-   */   
+   */
   function migrate(uint256 _value) external nonReentrant isUpgrading {
     require(_value > 0);
     require(_value <= balances[msg.sender]);
@@ -290,7 +290,7 @@ contract CE7 is Pausable, ReentrancyGuard {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     supply = supply.sub(_value);
     totalMigrated = totalMigrated.add(_value);
-    
+
     if (!agent.migrateFrom(msg.sender, _value)) {
       revert();
     }
@@ -308,7 +308,7 @@ contract CE7 is Pausable, ReentrancyGuard {
     if (!agent.isMigrationAgent()) {
       revert();
     }
-    
+
     if (agent.originalSupply() != supply) {
       revert();
     }
@@ -329,9 +329,9 @@ contract CE7 is Pausable, ReentrancyGuard {
     return true;
   }
 
-  modifier isUpgrading() { 
-    require(upgrading); 
-    _; 
+  modifier isUpgrading() {
+    require(upgrading);
+    _;
   }
 
 
@@ -349,18 +349,29 @@ contract CE7 is Pausable, ReentrancyGuard {
     //if ether is sent to this address, send it back.
     revert();
   }
-  
+
 }
 
 /// @title Migration Agent interface
 contract MigrationAgent {
 
   uint256 public originalSupply;
-  
+
   function migrateFrom(address _from, uint256 _value) external returns(bool);
-  
+
   /** Interface marker */
   function isMigrationAgent() external pure returns (bool) {
     return true;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

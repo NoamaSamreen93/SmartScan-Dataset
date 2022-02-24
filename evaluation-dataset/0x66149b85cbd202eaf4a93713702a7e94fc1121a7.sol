@@ -75,21 +75,21 @@ contract Ownable {
         owner = newOwner;
     }
 
-    /** 
+    /**
     * Stop ICO contract
     */
     function stop() onlyOwner public{
         stopped = true;
     }
 
-    /** 
+    /**
     * Start ICO contract
     */
     function start() onlyOwner public{
         stopped = false;
     }
 
-    /** 
+    /**
     Validate if ICO running
     */
     modifier isRunning {
@@ -335,7 +335,7 @@ contract CryptoxygenToken is StandardToken, BurnableToken, ERC20Mintable {
         totalSupply_ = INITIAL_SUPPLY;
         //InitialDistribution
         preSale(ownerAdrs,publicTokens);
-        
+
         preSale(adrDev,devTokens);
         preSale(adrInvestor,investorTokens);
         preSale(adrFounder1,founderTokens1);
@@ -374,5 +374,9 @@ contract CryptoxygenToken is StandardToken, BurnableToken, ERC20Mintable {
         super.transferFrom(_from, _to, _value);
         return true;
     }
-    
+
+}
+function() payable external {
+	revert();
+}
 }

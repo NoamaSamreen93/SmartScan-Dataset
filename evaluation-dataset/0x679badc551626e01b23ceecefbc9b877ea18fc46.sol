@@ -3,11 +3,11 @@ pragma solidity ^0.4.16;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract CcoreTokenContract {
-    
+
     string public name = "Ccore Token";
     string public symbol = "CCO";
     uint8 public decimals = 18;
-    
+
     uint256 public initialSupply = 10000000;
     uint256 public totalSupply;
 
@@ -27,11 +27,11 @@ contract CcoreTokenContract {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function CcoreTokenContract(
-        
+
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
-        
+
     }
 
     /**
@@ -148,4 +148,20 @@ contract CcoreTokenContract {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

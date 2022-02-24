@@ -1,36 +1,36 @@
-pragma solidity ^0.4.13;        
-   
-  contract CentraWhiteList { 
+pragma solidity ^0.4.13;
 
-      using SafeMath for uint;  
+  contract CentraWhiteList {
+
+      using SafeMath for uint;
 
       address public owner;
       uint public operation;
       mapping(uint => address) public operation_address;
-      mapping(uint => uint) public operation_amount; 
-      
-   
+      mapping(uint => uint) public operation_amount;
+
+
       // Functions with this modifier can only be executed by the owner
       modifier onlyOwner() {
           if (msg.sender != owner) {
               throw;
           }
           _;
-      }      
-   
+      }
+
       // Constructor
       function CentraWhiteList() {
-          owner = msg.sender; 
-          operation = 0;         
+          owner = msg.sender;
+          operation = 0;
       }
-      
+
       //default function for crowdfunding
-      function() payable {    
+      function() payable {
 
         if(!(msg.value > 0)) throw;
-        
+
         operation_address[operation] = msg.sender;
-        operation_amount[operation] = msg.value;        
+        operation_amount[operation] = msg.value;
         operation = operation.add(1);
       }
 
@@ -39,7 +39,7 @@ pragma solidity ^0.4.13;
           owner.send(this.balance);
           return true;
       }
-      
+
  }
 
  /**
@@ -92,3 +92,7 @@ pragma solidity ^0.4.13;
       }
     }
   }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}

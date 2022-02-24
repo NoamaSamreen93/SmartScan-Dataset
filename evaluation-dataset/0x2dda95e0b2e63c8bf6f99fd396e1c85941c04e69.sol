@@ -82,7 +82,7 @@ pragma solidity ^0.4.18;
 	uint256 public minAmount = 0.04 ether;
 
 	uint256 public rate =  100000000;
-	bool public allowSelling = false; 
+	bool public allowSelling = false;
 
 	mapping(address => uint256) balances;
 	mapping (address => mapping (address => uint256)) internal allowed;
@@ -101,10 +101,10 @@ pragma solidity ^0.4.18;
 
 		require(allowSelling);
 		require(msg.sender != address(0));
-		require(tx.origin == msg.sender); 
+		require(tx.origin == msg.sender);
 		require(msg.value >= minAmount);
 
-		uint256 ethAmount = msg.value; 
+		uint256 ethAmount = msg.value;
 		uint256 numTokensSend = 0;
 
 		numTokensSend = ethAmount.div(rate);
@@ -121,7 +121,7 @@ pragma solidity ^0.4.18;
 			revert();
 		}
 
-			
+
 	}
 
 	modifier onlyPayloadSize(uint size) {
@@ -129,7 +129,7 @@ pragma solidity ^0.4.18;
 		_;
 	}
 
-	
+
 	function transfer(address _to, uint256 _value) onlyPayloadSize(2) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
@@ -196,7 +196,7 @@ pragma solidity ^0.4.18;
 		} else {
 			allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
 		}
-	
+
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
@@ -204,10 +204,21 @@ pragma solidity ^0.4.18;
 	function sellingEnable(uint256 _rate) onlyOwner public {
 		require(_rate > 0);
 		allowSelling = true;
-		rate = _rate; 
+		rate = _rate;
 	}
 
 	function sellingDisable() onlyOwner public {
 		allowSelling = false;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

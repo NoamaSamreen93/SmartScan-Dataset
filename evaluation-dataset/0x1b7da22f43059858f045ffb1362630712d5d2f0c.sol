@@ -3,9 +3,9 @@ pragma solidity ^0.4.24;
 
 library SafeMath {
 
- 
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-   
+
     if (a == 0) {
       return 0;
     }
@@ -16,15 +16,15 @@ library SafeMath {
     return c;
   }
 
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b > 0);
     uint256 c = a / b;
-    
+
     return c;
   }
 
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
@@ -32,7 +32,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
@@ -40,7 +40,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function mod(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b != 0);
     return a % b;
@@ -62,10 +62,10 @@ contract VOTOToken {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-   
+
     bool lock = false;
 
     constructor(
@@ -80,10 +80,10 @@ contract VOTOToken {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
-	
+
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -93,7 +93,7 @@ contract VOTOToken {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -103,8 +103,8 @@ contract VOTOToken {
             owner = newOwner;
         }
     }
-	
-	
+
+
 
     function transfer(
         address _to,
@@ -135,12 +135,12 @@ contract VOTOToken {
         emit Transfer(_from, _to, _value);
         return true;
     }
-	
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
-    }	
-	
+    }
+
     function balanceOf(
         address _owner
     ) public view returns (uint256) {
@@ -162,4 +162,15 @@ contract VOTOToken {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

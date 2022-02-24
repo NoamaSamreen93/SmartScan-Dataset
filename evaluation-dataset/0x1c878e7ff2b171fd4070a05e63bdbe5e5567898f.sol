@@ -1096,9 +1096,20 @@ contract NodeOn is ERC721Full, ERC721Mintable, ERC721MetadataMintable, ERC721Bur
         safeTransferFrom(msg.sender, _to, _tokenId);
     }
 
-    function transferAll(address _to, uint256[] memory _tokenId) public { 
+    function transferAll(address _to, uint256[] memory _tokenId) public {
         for (uint i = 0; i < _tokenId.length; i++) {
             safeTransferFrom(msg.sender, _to, _tokenId[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

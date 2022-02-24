@@ -80,14 +80,14 @@ contract Ownable {
     require(newOwner != address(0));
     owner = newOwner;
   }
-    
+
 }
 
 contract HasAddresses {
     address founder1FirstLockup = 0xfC866793142059C79E924d537C26E5E68a3d0CB4;
     address founder1SecondLockup = 0xa5c5EdA285866a89fbe9434BF85BC7249Fa98D45;
     address founder1ThirdLockup = 0xBE2D892D27309EE50D53aa3460fB21A2762625d6;
-    
+
     address founder2FirstLockup = 0x7aeFB5F308C60D6fD9f9D79D6BEb32e2BbEf8F3C;
     address founder2SecondLockup = 0x9d92785510fadcBA9D0372e96882441536d6876a;
     address founder2ThirdLockup = 0x0e0B9943Ea00393B596089631D520bF1489d4d2E;
@@ -100,7 +100,7 @@ contract HasAddresses {
 
 
 contract VestingPeriods{
-    uint firstLockup = 1544486400; // Human time (GMT): Tuesday, 11 December 2018 00:00:00  
+    uint firstLockup = 1544486400; // Human time (GMT): Tuesday, 11 December 2018 00:00:00
     uint secondLockup = 1560211200; // Human time (GMT): Tuesday, 11 June 2019 00:00:00
     uint thirdLockup = 1576022400; // Human time (GMT): Wednesday, 11 December 2019 00:00:00
 }
@@ -147,23 +147,23 @@ contract IsUpgradable{
  * @notice The ERC20 Token.
  */
 contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPeriods, IsUpgradable {
-    
+
     using SafeMathLib for uint256;
-    
+
     uint256 public constant totalTokenSupply = 1009208335 * 10**16;    // Total Supply:10,092,083.35
 
     uint256 public burntTokens;
 
     string public constant name = "Blockonix";    // Blockonix
     string public constant symbol = "BDT";  // BDT
-    uint8 public constant decimals = 18;            
+    uint8 public constant decimals = 18;
 
     mapping (address => uint256) public balances;
     mapping(address => mapping(address => uint256)) approved;
-    
-    event Upgraded(address _owner, uint256 amount); 
+
+    event Upgraded(address _owner, uint256 amount);
     constructor() public {
-        
+
         uint256 lockedTokenPerAddress = 280335648611111000000000;   // Total Founder Tokens(LOCKED): 2,523,020.8375, divided equally in 9 chunks
         balances[founder1FirstLockup] = lockedTokenPerAddress;
         balances[founder2FirstLockup] = lockedTokenPerAddress;
@@ -178,7 +178,7 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         emit Transfer(address(this), founder1FirstLockup, lockedTokenPerAddress);
         emit Transfer(address(this), founder2FirstLockup, lockedTokenPerAddress);
         emit Transfer(address(this), founder3FirstLockup, lockedTokenPerAddress);
-        
+
         emit Transfer(address(this), founder1SecondLockup, lockedTokenPerAddress);
         emit Transfer(address(this), founder2SecondLockup, lockedTokenPerAddress);
         emit Transfer(address(this), founder3SecondLockup, lockedTokenPerAddress);
@@ -207,17 +207,17 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         balances[msg.sender] = balances[msg.sender].minus(_value);
         burntTokens += _value;
         emit BurnToken(msg.sender, _value);
-    } 
+    }
 
-    
+
     function totalSupply() view public returns (uint256 _totalSupply) {
         return totalTokenSupply - burntTokens;
     }
-    
+
     function balanceOf(address _owner) view public returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -238,7 +238,7 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @notice Send `_value` tokens to `_to` on behalf of `_from`
      * @param _from The address of the sender
@@ -252,7 +252,7 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @notice Approve `_value` tokens for `_spender`
      * @param _spender The address of the sender
@@ -267,7 +267,7 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         }
         return false;
     }
-        
+
     /**
      * @notice Check `_value` tokens allowed to `_spender` by `_owner`
      * @param _owner The address of the Owner
@@ -276,15 +276,15 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
     function allowance(address _owner, address _spender) view public returns (uint256 remaining) {
         return approved[_owner][_spender];
     }
-        
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     event BurnToken(address _owner, uint256 _value);
-    
+
      /**
-     * Upgrade function, requires the owner to first approve tokens equal to their old token balance to this address 
+     * Upgrade function, requires the owner to first approve tokens equal to their old token balance to this address
      *
      */
     function upgrade() external {
@@ -297,4 +297,20 @@ contract BlockonixToken is IERC20, Ownable, Vestable, HasAddresses, VestingPerio
         emit Upgraded(msg.sender, balance);
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

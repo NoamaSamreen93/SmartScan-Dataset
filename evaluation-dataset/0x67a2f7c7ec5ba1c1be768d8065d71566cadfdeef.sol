@@ -381,7 +381,7 @@ contract LccxToken is BurnableToken, Ownable {
         _;
     }
 
-    constructor(address _lccxTeamAddress, address _advisorsTokensAddress, 
+    constructor(address _lccxTeamAddress, address _advisorsTokensAddress,
                         address _referralTokensAddress, address _saleTokensAddress) public {
         require(_lccxTeamAddress != address(0));
         require(_advisorsTokensAddress != address(0));
@@ -411,14 +411,14 @@ contract LccxToken is BurnableToken, Ownable {
         totalSupply = totalSupply.add(advisorsTokens);
         balances[advisorsTokensAddress] = advisorsTokens;
         emit Transfer(0x0, advisorsTokensAddress, advisorsTokens);
-        
+
         /// Team tokens - 18M LXT
         uint256 teamTokens = 18000000 * 10**uint256(decimals);
         totalSupply = totalSupply.add(teamTokens);
         lccxTeamTokensVesting = address(new TokenVesting(lccxTeamAddress, now, 30 days, 540 days, false));
         balances[lccxTeamTokensVesting] = teamTokens;
         emit Transfer(0x0, lccxTeamTokensVesting, teamTokens);
-        
+
         require(totalSupply <= HARD_CAP);
     }
 
@@ -435,4 +435,20 @@ contract LccxToken is BurnableToken, Ownable {
 
         saleClosed = true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

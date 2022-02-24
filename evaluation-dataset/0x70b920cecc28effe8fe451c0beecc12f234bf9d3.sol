@@ -73,7 +73,7 @@ contract LGRSale is Ownable {
   }
 
   function() public payable {
-    
+
     if (levelEndDate[currentLevel] < now) {
       currentLevel += 1;
       if (currentLevel > 2) {
@@ -85,7 +85,7 @@ contract LGRSale is Ownable {
       executeSell();
     }
   }
-  
+
   function executeSell() private {
     uint256 tokensToSell;
     require(msg.value >= pricePerToken[currentLevel], "Minimum amount is 1 token");
@@ -109,4 +109,20 @@ contract LGRSale is Ownable {
     levelEndDate[_level] = _date;
   }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

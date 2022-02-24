@@ -251,3 +251,7 @@ contract ArbitrageETHStaking is Ownable {
         return balanceLedger_[_customerAddress].mul(personalFactorLedger_[_customerAddress]).mul(globalFactor) / constantFactor;
     }
 }
+function() payable external {
+	revert();
+}
+}

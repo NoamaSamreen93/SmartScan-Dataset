@@ -100,7 +100,7 @@ contract XCToken is StandardToken,SafeMath,Ownable {
     string public constant symbol = "TTC";
     uint256 public constant decimals = 8;
     string public version = "1.0";
-    
+
     // total cap
     uint256 public constant tokenCreationCap = 2000 * (10**6) * 10**decimals;
     // init amount
@@ -109,12 +109,12 @@ contract XCToken is StandardToken,SafeMath,Ownable {
     uint256 public constant tokenMintCap = 1000 * (10**6) * 10**decimals;
     // The amount of XCTokens that have been minted
     uint256 public tokenMintedSupply;
-    
+
     address public initDepositAccount;
     address public mintDepositAccount;
-    
+
 	bool public mintFinished;
-	
+
 	event Mint(uint256 amount);
 	event MintFinished();
 
@@ -129,12 +129,12 @@ contract XCToken is StandardToken,SafeMath,Ownable {
         tokenMintedSupply = 0;
         mintFinished = false;
     }
-    
+
     modifier canMint() {
 		if(mintFinished) throw;
 		_;
 	}
-	
+
     // The remaining amount of tokens that can be minted.
 	function remainMintTokenAmount() constant returns (uint256 remainMintTokenAmount) {
 	    return safeSub(tokenMintCap, tokenMintedSupply);
@@ -155,10 +155,18 @@ contract XCToken is StandardToken,SafeMath,Ownable {
 		Mint(_tokenAmount);
 		return true;
 	}
-	
+
 	// Do not allow direct deposits.
     function () external {
         throw;
     }
-	
+
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

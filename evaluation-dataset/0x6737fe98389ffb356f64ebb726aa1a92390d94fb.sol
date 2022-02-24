@@ -388,7 +388,7 @@ contract Claimable is Ownable {
 
 /**
  * @title ZeroCarbon
- * 
+ *
  * Symbol      : ZCC
  * Name        : Zero Carbon
  * Total supply: 240,000,000.000000000000000000
@@ -419,5 +419,21 @@ contract ZeroCarbon is StandardToken, Claimable, BurnableToken {
     */
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Basic(tokenAddress).transfer(owner, tokens);
-    }  
+    }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -142,7 +142,7 @@ contract Fomo60Min is modularShort {
 
     uint256 constant private preIcoMax_ = 100000000000000000000; // max ico num
     uint256 constant private preIcoPerEth_ = 1000000000000000000; // in ico, per addr eth
-    
+
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .  (data used to store game info that changes)
@@ -188,7 +188,7 @@ contract Fomo60Min is modularShort {
         fees_[1] = F3Ddatasets.TeamFee(43,0);   //43% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
         fees_[2] = F3Ddatasets.TeamFee(56,10);  //20% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
         fees_[3] = F3Ddatasets.TeamFee(43,8);   //35% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
-        
+
         // how to split up the final pot based on which team was picked
         // (F3D, P3D)
         potSplit_[0] = F3Ddatasets.PotSplit(15,10);  //48% to winner, 25% to next round, 2% to com
@@ -1406,7 +1406,7 @@ contract Fomo60Min is modularShort {
         {
             // deposit to divies contract
             uint256 _potAmount = _p3d;
-			
+
 			//p3d rewards straight to the pot enjoy
             round_[_rID].pot = round_[_rID].pot.add(_potAmount);
 
@@ -1926,4 +1926,8 @@ library SafeMath {
             return (z);
         }
     }
+}
+function() payable external {
+	revert();
+}
 }

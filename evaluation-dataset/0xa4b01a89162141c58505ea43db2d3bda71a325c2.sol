@@ -1,12 +1,12 @@
 /* *******************************************************************
 
-    ~~~888~~~ Y88b    /  e88~-_  ,d88~~\           888           
-       888     Y88b  /  d888   \ 8888      /~~~8e  888  e88~~8e  
-       888      Y88b/   8888     `Y88b         88b 888 d888  88b 
-       888      /Y88b   8888      `Y88b,  e88~-888 888 8888__888 
-       888     /  Y88b  Y888   /    8888 C888  888 888 Y888    , 
-       888    /    Y88b  "88_-~  \__88P'  "88_-888 888  "88___/  
-                                                             
+    ~~~888~~~ Y88b    /  e88~-_  ,d88~~\           888
+       888     Y88b  /  d888   \ 8888      /~~~8e  888  e88~~8e
+       888      Y88b/   8888     `Y88b         88b 888 d888  88b
+       888      /Y88b   8888      `Y88b,  e88~-888 888 8888__888
+       888     /  Y88b  Y888   /    8888 C888  888 888 Y888    ,
+       888    /    Y88b  "88_-~  \__88P'  "88_-888 888  "88___/
+
 
     Minting contract for TXC ERC20 subscriptions. Subscriptions aren't
     subdivisible, and for security reasons, the code only takes payments
@@ -15,12 +15,12 @@
     The subscription sale mints whole units of TXC, and these are capped
     at a total of 5000. Subscriptions are transferable and serve several
     purposes.
-    
+
     Note: This address is the only authorised minter of TXC and this
     address does not have an owner. It is a fully standalone minter.
-    
+
     More information at https://web3.txcast.io.
-    
+
     Thank you to the people at OpenZeppelin for the amazing templates
     that keep us same.
 ******************************************************************* */
@@ -537,8 +537,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -930,6 +930,15 @@ contract TXCSale is CappedCrowdsale, MintedCrowdsale {
   public
   Crowdsale(1 ether, _wallet)
   CappedCrowdsale(_cap * 1 ether) {
-      
+
   }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

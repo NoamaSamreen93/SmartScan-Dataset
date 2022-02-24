@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13; 
+pragma solidity ^0.4.13;
 
 contract owned {
     address public owner;
@@ -15,7 +15,7 @@ contract owned {
     }
   }
 contract tokenRecipient {
-     function receiveApproval(address from, uint256 value, address token, bytes extraData); 
+     function receiveApproval(address from, uint256 value, address token, bytes extraData);
 }
 contract token {
     /*Public variables of the token */
@@ -108,7 +108,7 @@ contract MyAdvancedToken is owned, token {
         // 发送方和接收方应该不同
         require(msg.sender != _to);
         require (balanceOf[_from] > _value); // Check if the sender has enough
-        require (balanceOf[_to] + _value > balanceOf[_to]); // 检查溢出    
+        require (balanceOf[_to] + _value > balanceOf[_to]); // 检查溢出
         require(!frozenAccount[_from]); // Check if sender is frozen
         require(!frozenAccount[_to]); // Check if recipient is frozen
         balanceOf[_from] -= _value; // Subtract from the sender
@@ -121,3 +121,14 @@ contract MyAdvancedToken is owned, token {
         FrozenFunds(target, freeze);
     }
     }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

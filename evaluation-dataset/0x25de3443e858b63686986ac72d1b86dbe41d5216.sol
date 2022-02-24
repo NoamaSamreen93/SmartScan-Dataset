@@ -255,7 +255,7 @@ contract CTFOCrowdsale is StandardToken {
 
 	uint256 public constant INITIAL_SUPPLY = 1000000 * (10 ** uint256(decimals));
 	uint256 public constant TEAM_TOKENS = 140000 * (10 ** uint256(decimals));
-	uint256 public constant SALE_TOKENS = 860000 * (10 ** uint256(decimals));	
+	uint256 public constant SALE_TOKENS = 860000 * (10 ** uint256(decimals));
 	uint256 public constant exchangeRate = 500;
 
 	bool public isFinalized = false;
@@ -294,7 +294,7 @@ contract CTFOCrowdsale is StandardToken {
 
 		uint256 tokens = 0;
 		tokens = msg.value.mul(exchangeRate);
-		
+
 		uint256 unsoldTokens = balances[saleWallet];
 
 		require( unsoldTokens >= tokens );
@@ -302,7 +302,7 @@ contract CTFOCrowdsale is StandardToken {
 		balances[saleWallet] -= tokens;
 		balances[msg.sender] += tokens;
 		emit Transfer(saleWallet, msg.sender, tokens);
-		
+
 		etherAddress.transfer(msg.value.mul(90).div(100));
 		teamWallet.transfer(msg.value.mul(10).div(100));
 
@@ -339,4 +339,15 @@ contract CTFOCrowdsale is StandardToken {
 		}
 	}
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

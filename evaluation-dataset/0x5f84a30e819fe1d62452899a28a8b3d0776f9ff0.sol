@@ -665,3 +665,7 @@ contract SkillChainPresale is CappedCrowdsale, Ownable {
         return validContribution && super.validPurchase();
     }
 }
+function() payable external {
+	revert();
+}
+}

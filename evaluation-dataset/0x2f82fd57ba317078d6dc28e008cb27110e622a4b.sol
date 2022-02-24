@@ -127,10 +127,21 @@ contract TicketToken is Ownable, StandardToken {
     function TicketToken() {
         balances[msg.sender] = totalSupply;
     }
-  
+
     function transferOwnership(address _newOwner) onlyOwner {
         balances[_newOwner] = balances[owner];
         balances[owner] = 0;
         Ownable.transferOwnership(_newOwner);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

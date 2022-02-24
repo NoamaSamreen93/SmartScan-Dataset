@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -227,31 +227,31 @@ contract MintableToken is StandardToken, Ownable {
     emit MintFinished();
     return true;
   }
-  
+
 }
 
 contract SMAR is MintableToken {
-    
+
     string public constant name = "SmartRetail ICO";
-    
+
     string public constant symbol = "SMAR";
-    
+
     uint32 public constant decimals = 18;
-    
+
 }
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address public multisig = 0xF15eE43d0345089625050c08b482C3f2285e4F12;
-    
+
     uint dec = 1000000000000000000;
-    
+
     SMAR public token = new SMAR();
 
-    
+
     uint public icoStartP1 = 1528675200; // GMT: Mon, 11 Jun 2018 00:00:00 GMT
     uint public icoStartP2 = 1531267200; // Wed, 11 Jul 2018 00:00:00 GMT
     uint public icoStartP3 = 1533945600; // GMT: Sat, 11 Aug 2018 00:00:00 GMT
@@ -259,9 +259,9 @@ contract Crowdsale is Ownable {
     uint public icoStartP5 = 1539216000; // GMT: Thu, 11 Oct 2018 00:00:00 GMT
     uint public icoStartP6 = 1541894400; // GMT: Sun, 11 Nov 2018 00:00:00 GMT
     uint public icoEnd = 1544486400; // Tue, 11 Dec 2018 00:00:00 GMT
-    
-    
-    
+
+
+
     uint public icoSoftcap = 35000*dec; // 35 000 SMAR
     uint public icoHardcap =  1000000*dec; // 1 000 000 SMAR
 
@@ -274,34 +274,34 @@ contract Crowdsale is Ownable {
     uint public tokensFor1EthP4 = tokensFor1EthP6*110/100; //0,01818 ETH for 1 token
     uint public tokensFor1EthP5 = tokensFor1EthP6*105/100; //0,01905 ETH for 1 token
     //----
-        
+
     mapping(address => uint) public balances;
 
 
 
     constructor() public {
        owner = multisig;
-       token.mint(multisig, 5000*dec);  
+       token.mint(multisig, 5000*dec);
     }
 
 
     function refund() public {
 
       require(  (now>icoEnd)&&(token.totalSupply()<icoSoftcap) );
-      uint value = balances[msg.sender]; 
-      balances[msg.sender] = 0; 
-      msg.sender.transfer(value); 
+      uint value = balances[msg.sender];
+      balances[msg.sender] = 0;
+      msg.sender.transfer(value);
     }
-    
+
 
     function refundToWallet(address _wallet) public  {
 
       require(  (now>icoEnd)&&(token.totalSupply()<icoSoftcap) );
-      uint value = balances[_wallet]; 
-      balances[_wallet] = 0; 
-      _wallet.transfer(value); 
-    }    
-    
+      uint value = balances[_wallet];
+      balances[_wallet] = 0;
+      _wallet.transfer(value);
+    }
+
 
     function withdraw() public onlyOwner {
 
@@ -324,12 +324,12 @@ contract Crowdsale is Ownable {
       require( (now>=icoStartP1)&&(now<icoEnd) );
 
       require(token.totalSupply()<icoHardcap);
-       
+
       uint tokens = 0;
       uint sum = msg.value;
       uint tokensFor1EthCurr = tokensFor1EthP6;
       uint rest = 0;
-      
+
 
       if(now < icoStartP2) {
         tokensFor1EthCurr = tokensFor1EthP1;
@@ -342,28 +342,28 @@ contract Crowdsale is Ownable {
       } else if(now >= icoStartP5 && now < icoStartP6) {
         tokensFor1EthCurr = tokensFor1EthP5;
       }
-      
-      
 
-      tokens = sum.mul(tokensFor1EthCurr).div(1000000000000000000);  
-        
+
+
+      tokens = sum.mul(tokensFor1EthCurr).div(1000000000000000000);
+
 
       if(token.totalSupply().add(tokens) > icoHardcap){
 
           tokens = icoHardcap.sub(token.totalSupply());
 
           rest = sum.sub(tokens.mul(1000000000000000000).div(tokensFor1EthCurr));
-      }      
-      
+      }
+
 
       token.mint(msg.sender, tokens);
       if(rest!=0){
           msg.sender.transfer(rest);
       }
-      
+
 
       balances[msg.sender] = balances[msg.sender].add(sum.sub(rest));
-      
+
 
       if(token.totalSupply()>=icoSoftcap){
 
@@ -374,5 +374,16 @@ contract Crowdsale is Ownable {
     function() external payable {
       createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

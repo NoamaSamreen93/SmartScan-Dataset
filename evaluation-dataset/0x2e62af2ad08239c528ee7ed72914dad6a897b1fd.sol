@@ -37,8 +37,8 @@ contract Owned {
 	address public owner;
 
 	function Owned () {
-		owner = msg.sender;	
-	}	
+		owner = msg.sender;
+	}
 
 	function transferOwner(address newOwner) public onlyOwner {
 		owner = newOwner;
@@ -73,7 +73,7 @@ contract CryptoTokenConstants {
 	uint256 constant ICO_PHASE_03_BONUS = 5;
 	uint256 constant ICO_PHASE_04_BONUS = 0;
 
-	uint256 constant BUY_RATE = 1500; 
+	uint256 constant BUY_RATE = 1500;
 	uint256 constant BUY_PRICE = (10 ** 18) / BUY_RATE;
 
 	// 1 ETH = ? inETH
@@ -146,7 +146,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 		symbol = bytes(_symbol).length > 0 ? _symbol : "INETH";
 		decimals = _decimals > 0 ? _decimals : 18;
 		wallet = _wallet != 0x0 ? _wallet : 0x634dA488e1E122A9f2ED83e91ccb6Db3414e3984;
-		
+
 		_totalSupply = _totalSupply > 0 ? _totalSupply : 500000000;
 
 		totalSupply = _totalSupply * (10 ** uint256(decimals));
@@ -160,7 +160,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 
 		developers[owner] = true;
 		developers[wallet] = true;
-	}	
+	}
 
 	function balanceOf(address addr) public constant returns (uint256) {
 		return balances[addr];
@@ -196,8 +196,8 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 
 	function decreaseApproval(address spender , uint256 value) public returns (bool) {
 		require(value > 0);
-		require(allowed[msg.sender][spender] - value >= 0);	
-		require(allowed[msg.sender][spender] - value < allowed[msg.sender][spender]);	
+		require(allowed[msg.sender][spender] - value >= 0);
+		require(allowed[msg.sender][spender] - value < allowed[msg.sender][spender]);
 
 		value = allowed[msg.sender][spender].sub(value);
 		return _approve(msg.sender , spender , value);
@@ -295,7 +295,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 
 		_transfer(owner , msg.sender , units);
 		Buy(msg.sender , msg.value , units);
-		
+
 		totalContributors = totalContributors.add(1);
 		totalContribution = totalContribution.add(msg.value);
 		contributions[msg.sender] = contributions[msg.sender].add(msg.value);
@@ -314,7 +314,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 		_transfer(msg.sender , owner , units);
 
 		Sell(msg.sender , value , units);
-		msg.sender.transfer(value);	
+		msg.sender.transfer(value);
 		return value;
 	}
 
@@ -327,7 +327,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 		contributions[msg.sender] = 0;
 
 		Refund(msg.sender, value);
-		msg.sender.transfer(value);	
+		msg.sender.transfer(value);
 		return value;
 	}
 
@@ -374,7 +374,7 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 
 		_addSupply(to, value);
 		_subSupply(from, value);
-		
+
 		Transfer(from, to, value);
 		return true;
 	}
@@ -413,5 +413,16 @@ contract CryptoToken is Owned, Payload, CryptoTokenConstants {
 			require(balances[owner] == availSupply);
 		}
 		return true;
+	}
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
 	}
 }

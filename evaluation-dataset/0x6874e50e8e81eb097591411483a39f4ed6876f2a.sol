@@ -1,21 +1,21 @@
 pragma solidity 0.4.25; /*
 
 ___________________________________________________________________
-  _      _                                        ______           
-  |  |  /          /                                /              
+  _      _                                        ______
+  |  |  /          /                                /
 --|-/|-/-----__---/----__----__---_--_----__-------/-------__------
-  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )     
+  |/ |/    /___) /   /   ' /   ) / /  ) /___)     /      /   )
 __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 
 
 
-##    ## ######## ##      ##    ########  ######## ##     ## 
-##   ##  ##       ##  ##  ##    ##     ## ##        ##   ##  
-##  ##   ##       ##  ##  ##    ##     ## ##         ## ##   
-#####    ######   ##  ##  ##    ##     ## ######      ###    
-##  ##   ##       ##  ##  ##    ##     ## ##         ## ##   
-##   ##  ##       ##  ##  ##    ##     ## ##        ##   ##  
-##    ## ########  ###  ###     ########  ######## ##     ## 
+##    ## ######## ##      ##    ########  ######## ##     ##
+##   ##  ##       ##  ##  ##    ##     ## ##        ##   ##
+##  ##   ##       ##  ##  ##    ##     ## ##         ## ##
+#####    ######   ##  ##  ##    ##     ## ######      ###
+##  ##   ##       ##  ##  ##    ##     ## ##         ## ##
+##   ##  ##       ##  ##  ##    ##     ## ##        ##   ##
+##    ## ########  ###  ###     ########  ######## ##     ##
 
 
 
@@ -25,7 +25,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 //      => ERC20 Compliance
 //      => Higher control of ICO by owner
 //      => selfdestruct functionality
-//      => SafeMath implementation 
+//      => SafeMath implementation
 //      => Air-drop
 //      => User whitelisting
 //      => Minting/Burning tokens by owner
@@ -37,9 +37,9 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 // Decimals         : 8
 //
 // Copyright (c) 2018 KewDex Inc. ( https://KewDex.com ) The MIT Licence.
-// Contract designed by: EtherAuthority ( https://EtherAuthority.io ) 
+// Contract designed by: EtherAuthority ( https://EtherAuthority.io )
 // ----------------------------------------------------------------------------
-*/ 
+*/
 
 
 //*******************************************************************//
@@ -58,19 +58,19 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -82,51 +82,51 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
 //*******************************************************************//
 //------------------ Contract to Manage Ownership -------------------//
 //*******************************************************************//
-    
+
     contract owned {
         address public owner;
-        
+
          constructor () public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
+
     interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 
 //***************************************************************//
 //------------------ ERC20 Standard Template -------------------//
 //***************************************************************//
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
         string public name;
         string public symbol;
-        uint256 public decimals = 8; 
+        uint256 public decimals = 8;
         uint256 public totalSupply;
         uint256 public reservedForICO;
         bool public safeguard = false;  //putting safeguard on will halt all non-owner functions
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
@@ -145,7 +145,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             name = tokenName;                               // Set the name for display purposes
             symbol = tokenSymbol;                           // Set the symbol for display purposes
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -167,7 +167,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -180,7 +180,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             _transfer(msg.sender, _to, _value);
             return true;
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -197,7 +197,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -212,7 +212,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
+
         /**
          * Set allowance for other address and notify
          *
@@ -232,7 +232,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 return true;
             }
         }
-    
+
         /**
          * Destroy tokens
          *
@@ -248,7 +248,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -267,21 +267,21 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             emit  Burn(_from, _value);
             return true;
         }
-        
+
     }
-    
+
 //************************************************************************//
 //---------------------  KEWDEX MAIN CODE STARTS HERE --------------------//
 //************************************************************************//
-    
+
     contract KewDex is owned, TokenERC20 {
-        
+
         /*************************************/
         /*  User whitelisting functionality  */
         /*************************************/
         bool public whitelistingStatus = false;
         mapping (address => bool) public whitelisted;
-        
+
         /**
          * Change whitelisting status on or off
          *
@@ -292,10 +292,10 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 whitelistingStatus = true;
             }
             else{
-                whitelistingStatus = false;    
+                whitelistingStatus = false;
             }
         }
-        
+
         /**
          * Whitelist any user address - only Owner can do this
          *
@@ -306,7 +306,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             require(userAddress != 0x0);
             whitelisted[userAddress] = true;
         }
-        
+
         /**
          * Whitelist Many user address at once - only Owner can do this
          * It will require maximum of 150 addresses to prevent block gas limit max-out and DoS attack
@@ -321,26 +321,26 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 whitelisted[userAddresses[i]] = true;
             }
         }
-        
-        
-        
+
+
+
         /********************************/
         /* Code for the ERC20 KEW Token */
         /********************************/
-    
+
         /* Public variables of the token */
         string private tokenName = "KewDex";
         string private tokenSymbol = "KEW";
         uint256 private initialSupply = 75000000000;     // 75 Billion
         uint256 private allocatedForICO = 60000000000;   // 60 Billion
-        
-        
+
+
         /* Records for the fronzen accounts */
         mapping (address => bool) public frozenAccount;
-        
+
         /* This generates a public event on the blockchain that will notify clients */
         event FrozenFunds(address target, bool frozen);
-    
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
         constructor () TokenERC20(initialSupply, allocatedForICO, tokenName, tokenSymbol) public {}
 
@@ -356,7 +356,7 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
             emit Transfer(_from, _to, _value);
         }
-        
+
         /// @notice Create `mintedAmount` tokens and send it to `target`
         /// @param target Address to receive the tokens
         /// @param mintedAmount the amount of tokens it will receive
@@ -378,15 +378,15 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
         /******************************/
         /* Code for the KEW Crowdsale */
         /******************************/
-        
+
         /* TECHNICAL SPECIFICATIONS:
-        
+
         => ICO starts           :  Will be specified by owner
         => ICO Ends             :  Will be specified by owner
-        => Token Exchange Rate  :  1 ETH = 45,000,000 Tokens 
-        => Bonus                :  66%   
+        => Token Exchange Rate  :  1 ETH = 45,000,000 Tokens
+        => Bonus                :  66%
         => Coins reserved for ICO : 60,000,000,000  (60 Billion)
-        => Contribution Limits  : No minimum or maximum Contribution 
+        => Contribution Limits  : No minimum or maximum Contribution
         => Ether Withdrawal     : Ether can only be transfered after ICO is over
 
         */
@@ -394,10 +394,10 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
         //public variables for the Crowdsale
         uint256 public icoStartDate = 123 ;         // ICO start timestamp will be updated by owner after contract deployment
         uint256 public icoEndDate   = 999999999999; // ICO end timestamp will be updated by owner after contract deployment
-        uint256 public exchangeRate = 45000000;     // 1 ETH = 45 Million Tokens 
+        uint256 public exchangeRate = 45000000;     // 1 ETH = 45 Million Tokens
         uint256 public tokensSold = 0;              // How many tokens sold through crowdsale
         uint256 public purchaseBonus = 66;          // Purchase Bonus purcentage - 66%
-        
+
         //@dev fallback function, only accepts ether if pre-sale or ICO is running or Reject
         function () payable external {
             require(!safeguard);
@@ -409,10 +409,10 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             uint256 finalTokens = token.add(calculatePurchaseBonus(token));     //add bonus if available
             tokensSold = tokensSold.add(finalTokens);
             _transfer(this, msg.sender, finalTokens);                           //makes the transfers
-            
+
         }
 
-        
+
         //calculating purchase bonus
         //SafeMath library is not used here at some places intentionally, as overflow is impossible here
         //And thus it saves gas cost if we avoid using SafeMath in such cases
@@ -424,11 +424,11 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 return 0;
             }
         }
-        
+
 
         //Function to update an ICO parameter.
         //It requires: timestamp of start and end date, exchange rate (1 ETH = ? Tokens)
-        //Owner need to make sure the contract has enough tokens for ICO. 
+        //Owner need to make sure the contract has enough tokens for ICO.
         //If not enough, then he needs to transfer some tokens into contract addresss from his wallet
         //If there are no tokens in smart contract address, then ICO will not work.
         function updateCrowdsale(uint256 icoStartDateNew, uint256 icoEndDateNew, uint256 exchangeRateNew) onlyOwner public {
@@ -437,14 +437,14 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             icoEndDate = icoEndDateNew;
             exchangeRate = exchangeRateNew;
         }
-        
+
         //Stops an ICO.
         //It will just set the ICO end date to zero and thus it will stop an ICO
         function stopICO() onlyOwner public{
             icoEndDate = 0;
         }
-        
-        //function to check wheter ICO is running or not. 
+
+        //function to check wheter ICO is running or not.
         //It will return current state of the crowdsale
         function icoStatus() public view returns(string){
             if(icoStartDate < now && icoEndDate > now ){
@@ -455,25 +455,25 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 return "ICO is over";
             }
         }
-        
-        //Function to set ICO Exchange rate. 
+
+        //Function to set ICO Exchange rate.
         //1 ETH = How many Tokens ?
         function setICOExchangeRate(uint256 newExchangeRate) onlyOwner public {
             exchangeRate=newExchangeRate;
         }
-        
-        //Function to update ICO Purchase Bonus. 
+
+        //Function to update ICO Purchase Bonus.
         //Enter percentage of the bonus. eg, 66 for 66% bonus
         function updatePurchaseBonus(uint256 newPurchaseBonus) onlyOwner public {
             purchaseBonus=newPurchaseBonus;
         }
-        
+
         //Just in case, owner wants to transfer Tokens from contract to owner address
         function manualWithdrawToken(uint256 _amount) onlyOwner public {
             uint256 tokenAmount = _amount * (1e8);
             _transfer(this, msg.sender, tokenAmount);
         }
-          
+
         //When owner wants to transfer Ether from contract to owner address
         //ICO must be over in order to do the ether transfer
         //Entire Ether balance will be transfered to owner address
@@ -481,12 +481,12 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             require(icoEndDate < now, 'ICO is not over!');
             address(owner).transfer(address(this).balance);
         }
-        
+
         //selfdestruct function. just in case owner decided to destruct this contract.
         function destructContract() onlyOwner public{
             selfdestruct(owner);
         }
-        
+
         /**
          * Change safeguard status on or off
          *
@@ -498,15 +498,15 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                 safeguard = true;
             }
             else{
-                safeguard = false;    
+                safeguard = false;
             }
         }
-        
-        
+
+
         /********************************/
         /* Code for the Air drop of KEW */
         /********************************/
-        
+
         /**
          * Run an Air-Drop
          *
@@ -522,4 +522,20 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
                   _transfer(this, recipients[i], tokenAmount * (1e8));
             }
         }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

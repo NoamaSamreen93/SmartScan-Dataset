@@ -18,8 +18,8 @@ interface ERC223 {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 
     /**
     * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -534,10 +534,10 @@ contract BurnableToken is BasicToken {
  * @dev This Token is the Mintable and Burnable to allow variety of actions to be done by users.
  * @dev It also complies with both ERC20 and ERC223.
  * @notice Trying to use JSE Token to Contracts that doesn't accept tokens and doesn't have tokenFallback function will fail, and all contracts
- * must comply to ERC223 compliance. 
+ * must comply to ERC223 compliance.
 */
 contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorManaged {
-    
+
     event Finalized();
 
     string public name = "JSE Token";
@@ -549,7 +549,7 @@ contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorMana
 
     constructor() OperatorManaged() public {
         totalSupply_ = initialSupply;
-        balances[msg.sender] = initialSupply; 
+        balances[msg.sender] = initialSupply;
 
         emit Transfer(0x0, msg.sender, initialSupply);
     }
@@ -605,7 +605,7 @@ contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorMana
         return true;
     }
 
-    /** 
+    /**
     * @dev Owner can transfer out any accidentally sent ERC20 tokens
     */
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
@@ -631,4 +631,15 @@ contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorMana
 
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

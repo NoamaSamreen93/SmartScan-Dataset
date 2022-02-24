@@ -33,7 +33,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public onlyOwner returns (bool) {
         require(newOwner != address(0));
         require(newOwner != address(this));
-        require(newOwner != owner);  
+        require(newOwner != owner);
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         return true;
@@ -316,10 +316,10 @@ contract MooToken is MintableToken {
 
     function isOwner(address _owner) public view returns(bool){
         if (owner == _owner) {
-            return true;    
+            return true;
     } else {
-            return false;    
-    } 
+            return false;
+    }
     }
 }
 
@@ -332,11 +332,11 @@ contract MooTokenSale is Ownable {
     uint256 public decimals;
     uint256 public oneCoin;
 
-  // start and end block where investments are allowed 
+  // start and end block where investments are allowed
     uint256 public PRESALE_STARTTIMESTAMP;
     uint256 public PRESALE_ENDTIMESTAMP;
 
-  // start and end block where investments are allowed 
+  // start and end block where investments are allowed
     uint256 public PUBLICSALE_STARTTIMESTAMP;
     uint256 public PUBLICSALE_ENDTIMESTAMP;
 
@@ -347,7 +347,7 @@ contract MooTokenSale is Ownable {
         multiSig = _newWallet;
         WalletUpdated(_newWallet);
         return true;
-    } 
+    }
 
     uint256 rate; // how many token units a buyer gets per wei
     uint256 public minContribution = 0.0001 ether;  // minimum contributio to participate in tokensale
@@ -364,9 +364,9 @@ contract MooTokenSale is Ownable {
     uint256 public maxTokens;
 
   // maximum amount of tokens for sale
-    uint256 public tokensForSale;  
+    uint256 public tokensForSale;
   // maximum amount of tokens for presale
-  // uint256 public tokensForPreSale; 
+  // uint256 public tokensForPreSale;
 
   // number of participants in presale
     uint256 public numberOfContributors = 0;
@@ -383,7 +383,7 @@ contract MooTokenSale is Ownable {
     uint public maxTokenCap;
   // for suspension
     bool public suspended;
- 
+
 
     mapping (address => bool) public authorised; // just to annoy the heck out of americans
     mapping (address => uint) adminCallMintToTeamCount; // count to admin only once can call MintToTeamAndAdvisors
@@ -400,7 +400,7 @@ contract MooTokenSale is Ownable {
     event SaleResumed();
     event SaleSuspended();
     event WalletUpdated(address newwallet);
-   
+
 
     function MooTokenSale() public {
         PRESALE_STARTTIMESTAMP = 1516896000;
@@ -409,11 +409,11 @@ contract MooTokenSale is Ownable {
         //1522209600 converts to Wednesday March 28, 2018 12:00:00 (pm) in time zone Asia/Singapore (+08)
         PUBLICSALE_STARTTIMESTAMP = 1522382400;
         //  1522382400 converts to Friday March 30, 2018 12:00:00 (pm) in time zone Asia/Singapore (+08)
-        PUBLICSALE_ENDTIMESTAMP = 1525060800; 
+        PUBLICSALE_ENDTIMESTAMP = 1525060800;
         // 1525060800 converts to Monday April 30, 2018 12:00:00 (pm) in time zone Asia/Singapore (+08)
-      
+
         multiSig = 0x90420B8aef42F856a0AFB4FFBfaA57405FB190f3;
-   
+
         token = new MooToken();
         decimals = token.decimals();
         oneCoin = 10 ** decimals;
@@ -435,7 +435,7 @@ contract MooTokenSale is Ownable {
     * @dev Calculates the rate with bonus in the publis sale
     */
     function getCurrentRate() public view returns (uint256) {
-    
+
         if (currentTime() <= PRESALE_ENDTIMESTAMP) {
             return basicRate * 5/4;
         }
@@ -457,7 +457,7 @@ contract MooTokenSale is Ownable {
         if (currentTime() > PUBLICSALE_ENDTIMESTAMP)
             return true; // if  the time is over
         if (tokenRaised >= tokensForSale)
-            return true; // if we reach the tokensForSale 
+            return true; // if we reach the tokensForSale
         return false;
     }
 
@@ -482,7 +482,7 @@ contract MooTokenSale is Ownable {
         return true;
     }
 
-  
+
   // @dev throws if person sending is not contract Admin or cs role
     modifier onlyCSorAdmin() {
         require((msg.sender == Admin) || (msg.sender==cs));
@@ -522,14 +522,14 @@ contract MooTokenSale is Ownable {
   * @dev authorise a lot of accounts in one go
   */
     function authoriseManyAccounts(address[] many) onlyCSorAdmin public returns(bool) {
-        require(many.length > 0);  
+        require(many.length > 0);
         for (uint256 i = 0; i < many.length; i++) {
             require(many[i] != address(0));
-            require(many[i] != address(this));  
+            require(many[i] != address(this));
             authorised[many[i]] = true;
             AuthoriseStatusUpdated(many[i], true);
         }
-        return true;            
+        return true;
     }
 
   /**
@@ -549,7 +549,7 @@ contract MooTokenSale is Ownable {
     function setCS(address newCS) onlyOwner public returns (bool){
         require(newCS != address(0));
         require(newCS != address(this));
-        require(newCS != owner);  
+        require(newCS != owner);
         cs = newCS;
         CsUpdated(newCS);
         return true;
@@ -561,14 +561,14 @@ contract MooTokenSale is Ownable {
     function setAdmin(address newAdmin) onlyOwner public returns (bool) {
         require(newAdmin != address(0));
         require(newAdmin != address(this));
-        require(newAdmin != owner);  
+        require(newAdmin != owner);
         Admin = newAdmin;
         AdminUpdated(newAdmin);
         return true;
     }
 
   /**
-  * @dev set a new Rate BE CAREFULL: when we calculate the bonus better if we have'nt remainder 
+  * @dev set a new Rate BE CAREFULL: when we calculate the bonus better if we have'nt remainder
   */
     function setBasicRate(uint newRate) onlyAdmin public returns (bool){
         require(0 < newRate && newRate < 5000);
@@ -581,29 +581,29 @@ contract MooTokenSale is Ownable {
         maxTokenCap = _newMaxTokenCap;
         return true;
     }
-  
+
     function isOwner(address _owner) public view returns(bool){
         if (owner == _owner) {
-            return true;    
+            return true;
     } else {
-            return false;    
-    } 
+            return false;
     }
-  
+    }
+
     function isAdmin(address _admin) public view returns(bool){
         if (Admin == _admin) {
-            return true;    
+            return true;
     } else {
-            return false;    
-    } 
+            return false;
+    }
     }
 
     function isCS(address _cs) public view returns(bool){
         if (cs == _cs) {
-            return true;    
+            return true;
     } else {
-            return false;    
-    } 
+            return false;
+    }
     }
 
 /**
@@ -611,7 +611,7 @@ contract MooTokenSale is Ownable {
   */
     function placeTokens(address beneficiary, uint256 _tokens) onlyAdmin public returns(bool){
 
-    // *************************************************************************************************************  
+    // *************************************************************************************************************
         require(tokenRaised.add(_tokens) <= tokensForSale); // we dont want to overmint ********************************
     // *************************************************************************************************************
 
@@ -628,7 +628,7 @@ contract MooTokenSale is Ownable {
 
   // low level token purchase function
     function buyTokens(address beneficiary, uint256 amount) onlyAuthorised internal returns (bool){
-      
+
         rate = getCurrentRate();
       // check we are in pre sale , bonus 25%
         if (currentTime() <= PRESALE_ENDTIMESTAMP) {
@@ -643,11 +643,11 @@ contract MooTokenSale is Ownable {
     //check minimum and maximum amount
         require(msg.value >= minContribution);
         require(msg.value <= maxContribution);
-    
-    // Calculate token amount to be purchased    
+
+    // Calculate token amount to be purchased
         uint256 tokens = amount.mul(rate);
-   
-   
+
+
     // *************************************************************************************************************
         require(tokenRaised.add(tokens) <= tokensForSale); //if dont want to overmint ******************************
     // *************************************************************************************************************
@@ -671,7 +671,7 @@ contract MooTokenSale is Ownable {
     function finishSale() public onlyOwner {
         require(hasEnded());
     // assign the rest of the 300 M tokens to the reserve
-        uint unassigned;    
+        uint unassigned;
         if(tokensForSale > tokenRaised) {
             unassigned = tokensForSale.sub(tokenRaised);
             tokenRaised = tokenRaised.add(unassigned);
@@ -679,11 +679,11 @@ contract MooTokenSale is Ownable {
             TokenPlaced(multiSig,unassigned);
     }
         SaleClosed();
-        token.startTrading(); 
+        token.startTrading();
         TradingStarted();
     // from now everyone can trade the tokens  and the owner of the tokencontract stay the salecontract
     }
- 
+
 /**
 *****************************************************************************************
 *****************************************************************************************
@@ -702,7 +702,7 @@ contract MooTokenSale is Ownable {
         require(1535644800 <= currentTime() && currentTime() <= 1535731200);  // Admin have 24h to call this function
       //1535644800 converts to Friday August 31, 2018 00:00:00 (am) in time zone Asia/Singapore (+08)
       //1535731200 converts to Saturday September 01, 2018 00:00:00 (am) in time zone Asia/Singapore (+08)
-        adminCallMintToTeamCount[msg.sender]++; 
+        adminCallMintToTeamCount[msg.sender]++;
         tokenRaised = tokenRaised.add(tokensOfTeamAndAdvisors);
         token.mint(multiSig,tokensOfTeamAndAdvisors);
         TokenPlaced(multiSig, tokensOfTeamAndAdvisors);
@@ -710,21 +710,21 @@ contract MooTokenSale is Ownable {
  /**
 *****************************************************************************************
 *****************************************************************************************
-  * @dev only Admin can mint from "SaleClosed" to "Closed" 
+  * @dev only Admin can mint from "SaleClosed" to "Closed"
   * _tokens given by client (limit if we reach the maxTokens)
   * multiSig was given by client
 *****************************************************************************************
 *****************************************************************************************
- */ 
+ */
     function afterSaleMinting(uint _tokens) public onlyAdmin {
         require(hasEnded());
-        uint limit = maxTokens.sub(tokensOfTeamAndAdvisors); 
+        uint limit = maxTokens.sub(tokensOfTeamAndAdvisors);
      // we dont want to mint the reserved tokens for Team and Advisors
-        require(tokenRaised.add(_tokens) <= limit);  
+        require(tokenRaised.add(_tokens) <= limit);
         tokenRaised = tokenRaised.add(_tokens);
         token.mint(multiSig,_tokens);
         TokenPlaced(multiSig, _tokens);
-    }  
+    }
 /**
 *****************************************************************************************
 *****************************************************************************************
@@ -770,4 +770,15 @@ contract MooTokenSale is Ownable {
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

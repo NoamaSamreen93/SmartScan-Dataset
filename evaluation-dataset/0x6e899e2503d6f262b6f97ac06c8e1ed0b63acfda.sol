@@ -181,3 +181,9 @@ contract TokenHolder is Ownable {
         return now.sub(start).div(vestingInterval).mul(value);
     }
 }
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
+}

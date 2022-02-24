@@ -79,7 +79,7 @@ contract CitodelProject is ERC20Interface, Owned, SafeMath {
     mapping(address => mapping(address => uint)) allowed;
 
 
-    
+
     constructor() public {
         symbol = "CTP";
         name = "Citodel Project";
@@ -90,19 +90,19 @@ contract CitodelProject is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
 
 
-    
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
 
 
-    
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
@@ -117,7 +117,7 @@ contract CitodelProject is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
@@ -127,13 +127,13 @@ contract CitodelProject is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
 
-    
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -142,14 +142,25 @@ contract CitodelProject is ERC20Interface, Owned, SafeMath {
     }
 
 
-    
+
     function () public payable {
         revert();
     }
 
 
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

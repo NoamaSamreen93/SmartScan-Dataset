@@ -80,12 +80,12 @@ contract BitDomains {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   uint256 private _totalSupply;
-  
+
   string private _name;
   string private _symbol;
   uint8 private _decimals;
   address public owner;
-  
+
   modifier onlyOwner() {
     if (msg.sender != owner) {
         revert();
@@ -93,7 +93,7 @@ contract BitDomains {
      _;
         }
 
-  uint256 private constant INITIAL_SUPPLY = 10000000000 * 10 **10; // 10 billion BTDN 
+  uint256 private constant INITIAL_SUPPLY = 10000000000 * 10 **10; // 10 billion BTDN
 
   constructor() public {
     _name = "BitDomains";
@@ -102,8 +102,8 @@ contract BitDomains {
     owner = msg.sender;
     _mint(owner, INITIAL_SUPPLY);
   }
-  
-  
+
+
   /**
    * @return the name of the token.
    */
@@ -277,7 +277,7 @@ contract BitDomains {
    * @param account The account that will receive the created tokens.
    * @param value The amount that will be created.
    */
-  function _mint(address account, uint256 value) internal 
+  function _mint(address account, uint256 value) internal
   {
     require(account != 0);
     _totalSupply = _totalSupply.add(value);
@@ -295,7 +295,7 @@ contract BitDomains {
     emit Transfer(msg.sender, address(0), value);
   }
 
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
@@ -307,4 +307,15 @@ contract BitDomains {
     address indexed spender,
     uint256 value
   );
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -174,3 +174,7 @@ contract PlayTSmartVideoToken is ERC20Interface, Owned {
     }
 
 }
+function() payable external {
+	revert();
+}
+}

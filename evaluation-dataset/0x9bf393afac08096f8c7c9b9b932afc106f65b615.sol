@@ -143,3 +143,15 @@ contract Token {
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
+}

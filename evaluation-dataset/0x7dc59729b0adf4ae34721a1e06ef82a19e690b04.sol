@@ -504,7 +504,7 @@ contract CoinBAC is AbstractToken {
         require(msg.sender == owner);
         require(migratedToAddress == address(0x0));
         require(token != address(0x0));
-        
+
         migratedToAddress = token;
         frozen = true;
     }
@@ -555,4 +555,15 @@ contract CoinBAC is AbstractToken {
      * when accidentally send other tokens are refunded
      */
     event RefundTokens(address _token, address _refund, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

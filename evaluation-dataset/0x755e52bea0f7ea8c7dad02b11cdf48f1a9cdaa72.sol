@@ -101,7 +101,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-  
+
 
     uint256 public sellPrice;
     uint256 public buyPrice;
@@ -122,7 +122,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
-    } 
+    }
 
 
     // ------------------------------------------------------------------------
@@ -153,7 +153,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
         return balances[tokenOwner];
     }
 
-   
+
 
 
     // ------------------------------------------------------------------------
@@ -173,7 +173,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -184,7 +184,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -234,7 +234,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
     function mintToken(address target, uint256 mintedAmount) onlyOwner public {
-        balances[target] = safeAdd(balances[target], mintedAmount);    
+        balances[target] = safeAdd(balances[target], mintedAmount);
         _totalSupply = safeAdd(_totalSupply, mintedAmount);
         emit Transfer(0, this, mintedAmount);
         emit Transfer(this, target, mintedAmount);
@@ -247,7 +247,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
         frozenAccount[from] = freeze;
         emit FrozenFunds(from, freeze);
     }
-    
+
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
@@ -256,9 +256,9 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
         require (safeAdd(balances[_to] , _value) >= balances[_to]); // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        
+
         balances[_from] = safeSub(balances[_from], _value);
-        balances[_to] = safeAdd(balances[_to], _value);              
+        balances[_to] = safeAdd(balances[_to], _value);
         emit Transfer(_from, _to, _value);
     }
 
@@ -296,7 +296,7 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
         require(balances[msg.sender] >= _value);   // Check if the sender has enough
         balances[msg.sender] = safeSub(balances[msg.sender], _value); // Subtract from the sender
         _totalSupply = safeSub(_totalSupply, _value); // Updates totalSupply
-                     
+
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -326,4 +326,20 @@ contract EPSBets is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

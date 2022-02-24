@@ -27,7 +27,7 @@ library SafeMath {
 
 
 contract Ownable {
-    
+
     address public owner;
 
     event OwnershipTransferred(address from, address to);
@@ -40,7 +40,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -48,8 +48,8 @@ contract Ownable {
     }
 
     /**
-     * Transfers ownership provided that a valid address is given. This function can 
-     * only be called by the owner of the contract. 
+     * Transfers ownership provided that a valid address is given. This function can
+     * only be called by the owner of the contract.
      */
     function transferOwnership(address _newOwner) public onlyOwner {
         require(_newOwner != 0x0);
@@ -101,7 +101,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint balance) {
@@ -116,9 +116,9 @@ contract StandardToken is BasicToken, ERC20 {
     mapping (address => mapping (address => uint256)) allowances;
 
     /**
-     * Transfers tokens from the account of the owner by an approved spender. 
-     * The spender cannot spend more than the approved amount. 
-     * 
+     * Transfers tokens from the account of the owner by an approved spender.
+     * The spender cannot spend more than the approved amount.
+     *
      * @param _from The address of the owners account.
      * @param _amount The amount of tokens to transfer.
      * */
@@ -131,12 +131,12 @@ contract StandardToken is BasicToken, ERC20 {
     }
 
     /**
-     * Allows another account to spend a given amount of tokens on behalf of the 
+     * Allows another account to spend a given amount of tokens on behalf of the
      * owner's account. If the owner has previously allowed a spender to spend
      * tokens on his or her behalf and would like to change the approval amount,
      * he or she will first have to set the allowance back to 0 and then update
      * the allowance.
-     * 
+     *
      * @param _spender The address of the spenders account.
      * @param _amount The amount of tokens the spender is allowed to spend.
      * */
@@ -149,7 +149,7 @@ contract StandardToken is BasicToken, ERC20 {
 
     /**
      * Returns the approved allowance from an owners account to a spenders account.
-     * 
+     *
      * @param _owner The address of the owners account.
      * @param _spender The address of the spenders account.
      **/
@@ -175,7 +175,7 @@ contract MintableToken is StandardToken {
   /**
    * Mints a given amount of tokens to the provided address. This function can only be called by the contract's
    * owner, which in this case is the ICO contract itself. From there, the founders of the ICO contract will be
-   * able to invoke this function. 
+   * able to invoke this function.
    *
    * @param _to The address which will receive the tokens.
    * @param _amount The total amount of ETCL tokens to be minted.
@@ -201,7 +201,7 @@ contract MintableToken is StandardToken {
 
 
 contract Ethercloud is MintableToken {
-    
+
     uint8 public decimals;
     string public name;
     string public symbol;
@@ -247,7 +247,7 @@ contract ICO is Ownable {
     function ICO() public {
         ETCL = new Ethercloud();
         success = false;
-        rate = 1288; 
+        rate = 1288;
         rateWithBonus = 1674;
         bountiesIssued = 0;
         tokensSold = 0;
@@ -277,7 +277,7 @@ contract ICO is Ownable {
      * Allows investors to buy ETCL tokens by sending ETH and automatically receiving tokens
      * to the provided address.
      *
-     * @param _beneficiary The address which will receive the tokens. 
+     * @param _beneficiary The address which will receive the tokens.
      */
     function buyTokens(address _beneficiary) public payable {
         require(_beneficiary != 0x0 && validPurchase() && this.balance.sub(msg.value) < hardCap);
@@ -303,7 +303,7 @@ contract ICO is Ownable {
     }
 
     /**
-     * Returns the current rate with bonus percentage of the tokens. 
+     * Returns the current rate with bonus percentage of the tokens.
      */
     function getCurrentRateWithBonus() internal returns (uint256) {
         rateWithBonus = (rate.mul(getBonusPercentage()).div(100)).add(rate);
@@ -311,12 +311,12 @@ contract ICO is Ownable {
     }
 
     /**
-     * Returns the current bonus percentage. 
+     * Returns the current bonus percentage.
      */
     function getBonusPercentage() internal view returns (uint256 bonusPercentage) {
         uint256 timeStamp = now;
         if (timeStamp > bonusStages[2]) {
-            bonusPercentage = 0; 
+            bonusPercentage = 0;
         }
         if (timeStamp <= bonusStages[2]) {
             bonusPercentage = 5;
@@ -326,7 +326,7 @@ contract ICO is Ownable {
         }
         if (timeStamp <= bonusStages[0]) {
             bonusPercentage = 30;
-        } 
+        }
         return bonusPercentage;
     }
 
@@ -338,14 +338,14 @@ contract ICO is Ownable {
      * @param _amount The total amount of tokens to be minted.
      */
     function issueTokens(address _beneficiary, uint256 _amount) public onlyOwner {
-        require(_beneficiary != 0x0 && _amount > 0 && tokensSold.add(_amount) <= tokensForSale); 
+        require(_beneficiary != 0x0 && _amount > 0 && tokensSold.add(_amount) <= tokensForSale);
         ETCL.mint(_beneficiary, _amount);
         tokensSold = tokensSold.add(_amount);
         TokensPurchased(_beneficiary, _amount);
     }
 
     /**
-     * Checks whether or not a purchase is valid. If not, then the buy tokens function will 
+     * Checks whether or not a purchase is valid. If not, then the buy tokens function will
      * not execute.
      */
     function validPurchase() internal constant returns (bool) {
@@ -356,10 +356,10 @@ contract ICO is Ownable {
 
     /**
      * Allows investors to claim refund in the case that the soft cap has not been reached and
-     * the duration of the ICO has passed. 
+     * the duration of the ICO has passed.
      *
      * @param _addr The address to be refunded. If no address is provided, the _addr will default
-     * to the message sender. 
+     * to the message sender.
      */
     function getRefund(address _addr) public {
         if (_addr == 0x0) {
@@ -373,11 +373,11 @@ contract ICO is Ownable {
     }
 
     /**
-     * Mints new tokens for the bounty campaign. This function can only be called by the owner 
-     * of the contract. 
+     * Mints new tokens for the bounty campaign. This function can only be called by the owner
+     * of the contract.
      *
-     * @param _beneficiary The address which will receive the tokens. 
-     * @param _amount The total amount of tokens that will be minted. 
+     * @param _beneficiary The address which will receive the tokens.
+     * @param _amount The total amount of tokens that will be minted.
      */
     function issueBounty(address _beneficiary, uint256 _amount) public onlyOwner {
         require(bountiesIssued.add(_amount) <= tokensForBounty && _beneficiary != 0x0);
@@ -388,7 +388,7 @@ contract ICO is Ownable {
 
     /**
      * Withdraws the total amount of ETH raised to the owners address. This function can only be
-     * called by the owner of the contract given that the ICO is a success and the duration has 
+     * called by the owner of the contract given that the ICO is a success and the duration has
      * passed.
      */
     function withdraw() public onlyOwner {
@@ -405,7 +405,7 @@ contract ICO is Ownable {
     }
 
     /**
-     * Returns true if the duration of the ICO has passed, false otherwise. 
+     * Returns true if the duration of the ICO has passed, false otherwise.
      */
     function hasEnded() public constant returns (bool) {
         return now > endTime;
@@ -419,7 +419,7 @@ contract ICO is Ownable {
     }
 
     /**
-     * Returns the total investment of a given ETH address. 
+     * Returns the total investment of a given ETH address.
      *
      * @param _addr The address being queried.
      */
@@ -428,11 +428,27 @@ contract ICO is Ownable {
     }
 
     /**
-     * Finishes the minting period. This function can only be called by the owner of the 
-     * contract given that the duration of the ICO has ended. 
+     * Finishes the minting period. This function can only be called by the owner of the
+     * contract given that the duration of the ICO has ended.
      */
     function finishMinting() public onlyOwner {
         require(hasEnded());
         ETCL.finishMinting();
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

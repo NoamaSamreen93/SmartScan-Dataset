@@ -34,42 +34,42 @@ library SafeMath {
 }
 
 contract POLToken {
-    
+
     using SafeMath for uint256;
-    
+
     string public name = "Polaris";      //  token name
-    
+
     string public symbol = "POL";           //  token symbol
-    
+
     uint256 public decimals = 8;            //  token digit
 
     mapping (address => uint256) public balanceOf;
-    
+
     mapping (address => mapping (address => uint256)) public allowance;
- 
-    
+
+
     uint256 public totalSupply = 0;
 
     uint256 constant valueFounder = 2100000000000000;
-    
-    
+
+
 
     modifier validAddress {
         assert(0x0 != msg.sender);
         _;
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     constructor() public {
 
         totalSupply = valueFounder;
         balanceOf[msg.sender] = valueFounder;
         emit Transfer(0x0, msg.sender, valueFounder);
     }
-    
+
     function _transfer(address _from, address _to, uint256 _value) private {
         require(_to != 0x0);
         require(balanceOf[_from] >= _value);
@@ -77,7 +77,7 @@ contract POLToken {
         balanceOf[_to] = balanceOf[_to].add(_value);
         emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) validAddress public returns (bool success) {
         _transfer(msg.sender, _to, _value);
         return true;
@@ -96,4 +96,20 @@ contract POLToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

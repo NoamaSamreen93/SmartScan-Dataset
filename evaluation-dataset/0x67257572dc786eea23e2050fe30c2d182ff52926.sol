@@ -41,7 +41,7 @@ contract Control {
  * all income will be split to holders according to their holds
  * user can buy holds from shareholders at his will
  */
-contract Share is Control {    
+contract Share is Control {
     /**
      * the holds of every holder
      * the total holds stick to total
@@ -53,7 +53,7 @@ contract Share is Control {
      * and we don't want to loop holders list everytime when income
      *
      * we use a mechanism called 'watermark'
-     * 
+     *
      * the watermark indicates the value that brought into each holds from the begining
      * it only goes up when new income send to the contract
 
@@ -69,15 +69,15 @@ contract Share is Control {
      */
     mapping (address => uint256) public sellPrice;
     mapping (address => uint256) public toSell;
-    
+
     mapping (address => mapping(address => uint256)) public allowance;
     uint256 public watermark;
     uint256 public total;
     uint256 public decimals;
-    
+
     string public symbol;
     string public name;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint256 tokens);
     event INCOME(uint256);
@@ -89,7 +89,7 @@ contract Share is Control {
     /**
      * at start the owner has 100% share, which is 10,000 holds
      */
-    constructor(string _symbol, string _name, uint256 _total) public {        
+    constructor(string _symbol, string _name, uint256 _total) public {
         symbol = _symbol;
         name = _name;
         owner = msg.sender;
@@ -120,7 +120,7 @@ contract Share is Control {
     function bonus() public view returns (uint256) {
         return (watermark - fullfilled[msg.sender]) * holds[msg.sender];
     }
-    
+
     function setPrice(uint256 price, uint256 sell) public {
         sellPrice[msg.sender] = price;
         toSell[msg.sender] = sell;
@@ -154,7 +154,7 @@ contract Share is Control {
 
         uint256 fromBonus = (watermark - fullfilled[from]) * amount;
         uint256 toBonus = (watermark - fullfilled[to]) * holds[to];
-        
+
 
         holds[from] -= amount;
         holds[to] += amount;
@@ -186,32 +186,32 @@ contract Share is Control {
 
         toSell[from] -= amount;
         transferHolds(from, msg.sender, amount);
-        
+
         from.transfer(msg.value);
         emit SELL_HOLDS(from, msg.sender, amount, sellPrice[from]);
     }
-    
+
     function balanceOf(address _addr) public view returns (uint256) {
         return holds[_addr];
     }
-    
+
     function transfer(address to, uint amount) public whenNotPaused returns(bool) {
         transferHolds(msg.sender, to, amount);
         return true;
     }
-    
+
     function transferFrom(address from, address to, uint256 amount) public whenNotPaused returns (bool) {
         require(allowance[from][msg.sender] >= amount);
-        
+
         allowance[from][msg.sender] -= amount;
         transferHolds(from, to, amount);
-        
+
         return true;
     }
-    
+
     function approve(address to, uint256 amount) public returns (bool) {
         allowance[msg.sender][to] = amount;
-        
+
         emit Approval(msg.sender, to, amount);
         return true;
     }
@@ -219,4 +219,20 @@ contract Share is Control {
     function totalSupply() public view returns (uint256) {
         return total;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

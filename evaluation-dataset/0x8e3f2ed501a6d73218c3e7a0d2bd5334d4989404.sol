@@ -9,7 +9,7 @@ contract TokenERC20 {
     uint8 public decimals;
     uint256 public totalSupply;
     address public owner;
-    
+
     struct locked_balances_info{
         uint amount;
         uint time;
@@ -41,14 +41,14 @@ contract TokenERC20 {
         totalSupply = initialSupply;                        // Update total supply
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
-        decimals = decimalUnits; 
+        decimals = decimalUnits;
         owner = msg.sender;                                 // Amount of decimals for display purposes
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
-        
+
     if(balanceOf[_from] < _value) {
             uint length = lockedBalanceOf[_from].length;
             uint index = 0;
@@ -79,7 +79,7 @@ contract TokenERC20 {
         balanceOf[_to] += _value;                            // Add the same to the recipient
         Transfer(_from, _to, _value);
     }
-    
+
     function balanceOf(address _owner) constant public returns (uint256 balance){
         balance = balanceOf[_owner];
         uint length = lockedBalanceOf[_owner].length;
@@ -87,17 +87,17 @@ contract TokenERC20 {
             balance += lockedBalanceOf[_owner][i].amount;
         }
     }
-    
+
      function balanceOfOld(address _owner) constant public returns (uint256 balance) {
         balance = balanceOf[_owner];
     }
-    
+
     function _transferAndLock(address _from, address _to, uint _value, uint _time) internal {
         require (_to != 0x0);                                // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);                // Check if the sender has enough
         require (balanceOf[_to] + _value > balanceOf[_to]);  // Check for overflows
         balanceOf[_from] -= _value;                          // Subtract from the sender
-     
+
         lockedBalanceOf[_to].push(locked_balances_info(_value, _time));
         TransferAndLock(_from, _to, _value, _time);
     }
@@ -108,7 +108,7 @@ contract TokenERC20 {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     function transferAndLock(address _to, uint256 _value, uint _time) public {
         _transferAndLock(msg.sender, _to, _value, _time + now);
     }
@@ -144,6 +144,17 @@ contract TokenERC20 {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

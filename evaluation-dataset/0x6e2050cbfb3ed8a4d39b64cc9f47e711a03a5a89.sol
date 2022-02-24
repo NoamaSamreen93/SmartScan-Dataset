@@ -54,7 +54,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -213,7 +213,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -296,7 +296,7 @@ contract StandardTokenExt is StandardToken {
  *
  * First envisioned by Golem and Lunyr projects.
  */
- 
+
 contract UpgradeableToken is StandardTokenExt {
 
   /** Contract / person who can set the upgrade path. This can be the same as team multisig wallet, as what it is with its default value. */
@@ -583,4 +583,12 @@ contract StreamSpaceToken is BurnableToken, CrowdsaleToken {
     CrowdsaleToken(_name, _symbol, _initialSupply, _decimals, _mintable) {
 
   }
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

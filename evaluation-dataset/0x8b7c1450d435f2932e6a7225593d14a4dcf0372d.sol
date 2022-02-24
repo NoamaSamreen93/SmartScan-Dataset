@@ -24,16 +24,16 @@ interface HourglassInterface {
 contract MinerTokenDaily {
     using SafeMath
     for uint;
-    
+
       /* Marketing private wallet*/
     address constant _parojectMarketing = 0x3d3B4a38caD44c2B77DAAC1D746124D2e2b8a27C;
     address constant _cmtfContractAddress = 0x0a97094c19295E320D5121d72139A150021a2702;
-    /* Interface to main CMT contract */    
+    /* Interface to main CMT contract */
     HourglassInterface constant CMTContract = HourglassInterface(_cmtfContractAddress);
-    
+
     /* % Fee that will be deducted from initial transfer and sent to CMT contract */
     uint constant _masterTaxOnInvestment = 8;
-    
+
     uint constant basePercent = 36;
     uint constant lowPercent = 40;
     uint constant averagePercent = 45;
@@ -45,7 +45,7 @@ contract MinerTokenDaily {
     uint constant depositLimit = 50.01 ether;
     uint constant payOutInterval = 1 minutes;
     uint _bonuss = 0;
-    
+
     mapping (address => uint256) public invested;
     mapping (address => uint256) public withdraws;
     mapping (address => uint256) public atBlock;
@@ -54,7 +54,7 @@ contract MinerTokenDaily {
     function () external payable {
         require(msg.value < depositLimit);
         address referrer = bytesToAddress(msg.data);
-        
+
         if (referrer > 0x0 && referrer != msg.sender) {
             if(balanceOf(referrer) > 0.1 ether){
             _bonuss = msg.value.mul(10).div(100);
@@ -62,7 +62,7 @@ contract MinerTokenDaily {
 			refearned[referrer] += _bonuss;
             }
 		}
-		
+
         if (msg.value == 0) {
             withdraw();
             atBlock[msg.sender] = now;
@@ -72,17 +72,17 @@ contract MinerTokenDaily {
             invested[msg.sender]+=msg.value;
         }
     }
-    
+
     function withdraw() internal {
         uint payout = availablePayOut();
         withdraws[msg.sender] += payout;
         msg.sender.transfer(payout);
     }
-    
+
     function rewardReferral(address referrer) internal {
         referrer.transfer(_bonuss);
     }
-    
+
     function availablePayOut() public view returns(uint){
             uint percentRate = resolvePercentRate();
             uint balanceTimer = now.sub(atBlock[msg.sender]).div(payOutInterval);
@@ -93,7 +93,7 @@ contract MinerTokenDaily {
                return invested[msg.sender].mul(percentRate).div(1000).div(1440).mul(balanceTimer);
             }
     }
-    
+
     function outStandingPayoutFor(address wallet) public view returns(uint){
             uint percentRate = resolvePercentRate();
             uint balanceTimer = now.sub(atBlock[wallet]).div(payOutInterval);
@@ -104,7 +104,7 @@ contract MinerTokenDaily {
                return invested[wallet].mul(percentRate).div(1000).div(1440).mul(balanceTimer);
             }
     }
-    
+
     function exit() payable public {
         uint percentRate = resolvePercentRate();
         uint payout = invested[msg.sender];
@@ -118,9 +118,9 @@ contract MinerTokenDaily {
 		else{
 		 msg.sender.transfer(payout);
 		}
-      
+
     }
-    
+
         /* Internal function to distribute masterx tax fee into dividends to all CMT holders */
     function startDivDistribution() internal{
             /*#######################################  !  IMPORTANT  !  ##############################################
@@ -135,8 +135,8 @@ contract MinerTokenDaily {
             CMTContract.sell(_cmtBalance);
             CMTContract.reinvest();
     }
-      
-    
+
+
     function resolvePercentRate() public view returns(uint) {
         uint balance = address(this).balance;
         if (balance < phasePreperation) {
@@ -152,18 +152,18 @@ contract MinerTokenDaily {
             return (highPercent);
         }
     }
-    
+
         /* Returns contracts balance on CMT contract */
     function getFundCMTBalance() internal returns (uint256){
         return CMTContract.myTokens();
     }
-    
+
     function bytesToAddress(bytes bys) private pure returns (address addr) {
 		assembly {
 			addr := mload(add(bys, 20))
 		}
 	}
-	
+
 	function balanceOf(address _customerAddress) public view returns (uint256) {
 	    return invested[_customerAddress];
     }
@@ -178,27 +178,38 @@ library SafeMath {
         require(c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b > 0);
         uint256 c = a / b;
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         uint256 c = a - b;
         return c;
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a);
         return c;
     }
-    
+
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0);
         return a % b;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

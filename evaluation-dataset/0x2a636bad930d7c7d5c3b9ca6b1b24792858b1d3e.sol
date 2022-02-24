@@ -161,3 +161,14 @@ contract PriorityPassContract is Owned {
         return (accounts[_accountAddress].level, accounts[_accountAddress].limit, accounts[_accountAddress].active);
     }
 }
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
+}

@@ -129,22 +129,22 @@ contract ShareTokenSale is Ownable {
     ERC20 public token;
     address public receiverAddr;
     uint256 public totalSaleAmount;
-    uint256 public totalWannaBuyAmount; 
+    uint256 public totalWannaBuyAmount;
     uint256 public startTime;
     uint256 public endTime;
     uint256 public userWithdrawalStartTime;
     uint256 public clearStartTime;
     uint256 public withdrawn;
     uint256 public proportion = 1 ether;
-    mapping(uint256 => uint256) public globalAmounts;    
+    mapping(uint256 => uint256) public globalAmounts;
 
 
     struct Stage {
         uint256 rate;
         uint256 duration;
-        uint256 startTime;       
+        uint256 startTime;
     }
-    Stage[] public stages;    
+    Stage[] public stages;
 
 
     struct PurchaserInfo {
@@ -188,13 +188,13 @@ contract ShareTokenSale is Ownable {
         require(_startTime > 0);
         receiverAddr = _receiverAddr;
         token = ERC20(_tokenAddr);
-        totalSaleAmount = _totalSaleAmount;       
-        startTime = _startTime;        
+        totalSaleAmount = _totalSaleAmount;
+        startTime = _startTime;
     }
 
     function isStarted() public view returns(bool) {
         return 0 < startTime && startTime <= now && endTime != 0;
-    }   
+    }
 
     function isEnded() public view returns(bool) {
         return now > endTime;
@@ -207,7 +207,7 @@ contract ShareTokenSale is Ownable {
     function isClearTime() public view returns(bool) {
         return now > clearStartTime;
     }
-    
+
     function startSale(uint256[] rates, uint256[] durations, uint256 userWithdrawalDelaySec, uint256 clearDelaySec) public onlyOwner {
         require(endTime == 0);
         require(durations.length == rates.length);
@@ -215,14 +215,14 @@ contract ShareTokenSale is Ownable {
         endTime = startTime;
         for (uint256 i = 0; i < durations.length; i++) {
             uint256 rate = rates[i];
-            uint256 duration = durations[i];            
+            uint256 duration = durations[i];
             stages.push(Stage({rate: rate, duration: duration, startTime:endTime}));
             endTime = endTime.add(duration);
         }
         userWithdrawalStartTime = endTime.add(userWithdrawalDelaySec);
         clearStartTime = endTime.add(clearDelaySec);
     }
-    
+
     function getCurrentStage() public onlyOpenTime view returns(uint256) {
         for (uint256 i = stages.length - 1; i >= 0; i--) {
             if (now >= stages[i].startTime) {
@@ -242,30 +242,30 @@ contract ShareTokenSale is Ownable {
             proportion = 1 ether;
             return;
         }
-        proportion = totalSaleAmount.mul(1 ether).div(totalWannaBuyAmount);        
+        proportion = totalSaleAmount.mul(1 ether).div(totalWannaBuyAmount);
     }
 
     function getSaleInfo(address purchaser) public view returns (uint256, uint256, uint256) {
         PurchaserInfo storage pi = purchaserMapping[purchaser];
         uint256 sendEther = 0;
         uint256 usedEther = 0;
-        uint256 getToken = 0;        
+        uint256 getToken = 0;
         for (uint256 i = 0; i < stages.length; i++) {
             sendEther = sendEther.add(pi.amounts[i]);
             uint256 stageUsedEther = pi.amounts[i].mul(proportion).div(1 ether);
             uint256 stageGetToken = stageUsedEther.mul(stages[i].rate);
-            if (stageGetToken > 0) {         
+            if (stageGetToken > 0) {
                 getToken = getToken.add(stageGetToken);
                 usedEther = usedEther.add(stageUsedEther);
             }
-        }        
+        }
         return (sendEther, usedEther, getToken);
     }
-    
-    function () payable public {        
+
+    function () payable public {
         buy();
     }
-    
+
     function buy() payable public onlyOpenTime {
         require(msg.value >= 0.1 ether);
         uint256 stageIndex = getCurrentStage();
@@ -280,10 +280,10 @@ contract ShareTokenSale is Ownable {
         totalWannaBuyAmount = totalWannaBuyAmount.add(amount.mul(stages[stageIndex].rate));
         _calcProportion();
     }
-    
+
     function _withdrawal(address purchaser) internal {
         require(purchaser != 0x0);
-        PurchaserInfo storage pi = purchaserMapping[purchaser];        
+        PurchaserInfo storage pi = purchaserMapping[purchaser];
         if (pi.withdrew) {
             return;
         }
@@ -293,31 +293,42 @@ contract ShareTokenSale is Ownable {
         if (usedEther > 0 && getToken > 0) {
             receiverAddr.transfer(usedEther);
             token.transfer(purchaser, getToken);
-            if (sendEther.sub(usedEther) > 0) {                
-                purchaser.transfer(sendEther.sub(usedEther));   
-            }           
+            if (sendEther.sub(usedEther) > 0) {
+                purchaser.transfer(sendEther.sub(usedEther));
+            }
         } else {
             purchaser.transfer(sendEther);
         }
         return;
     }
-    
+
     function withdrawal() payable public onlyUserWithdrawalTime {
         _withdrawal(msg.sender);
     }
-    
+
     function withdrawalFor(uint256 index, uint256 stop) payable public onlyAutoWithdrawalTime onlyOwner {
         for (; index < stop; index++) {
             _withdrawal(purchaserList[index]);
         }
     }
-    
+
     function clear(uint256 tokenAmount, uint256 etherAmount) payable public purchasersAllWithdrawn onlyClearTime onlyOwner {
         if (tokenAmount > 0) {
             token.transfer(receiverAddr, tokenAmount);
         }
         if (etherAmount > 0) {
             receiverAddr.transfer(etherAmount);
-        }        
+        }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

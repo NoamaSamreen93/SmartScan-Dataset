@@ -574,7 +574,7 @@ contract ERC20Interface {
  */
 contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
   using SafeMath for uint256;
-  string  public symbol; 
+  string  public symbol;
   string  public name;
   uint8   public decimals;
   uint256 public fundsRaised;
@@ -588,7 +588,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
   uint256 internal tempValue;
   string public EthUsdRate;
   uint internal ethusdrate;
-  
+
   mapping(address => uint) balances;
   mapping(address => mapping(address => uint)) allowed;
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
@@ -599,7 +599,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         require(Open && balances[this] > 1e27); // should be open and the balance of contract should be greater than reserves
         _;
     }
-  
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -617,7 +617,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         Open = true;
         emit Transfer(address(0), this, totalSupply());
     }
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
@@ -626,26 +626,26 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         tempSender = msg.sender;
         tempValue = msg.value;
         _preValidatePurchase(_beneficiary, tempValue);
-        _updateEthereumPrice();    
+        _updateEthereumPrice();
     }
-    
+
     function _updateEthereumPrice() internal {
         if (oraclize_getPrice("json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0") > address(this).balance) {
             emit LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
             revert();
-            
+
         }
         else {
         emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
         oraclize_query("URL","json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
         }
     }
-    
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal pure{
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
-    
+
     function __callback (bytes32 myid, string result) {
         if (msg.sender != oraclize_cbAddress()) revert();
             EthUsdRate = result;
@@ -655,21 +655,21 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
                 _continueTokenPurchase(tempSender, tempValue);
             }
     }
-    
+
     function _continueTokenPurchase(address _beneficiary, uint256 _weiAmount) internal{
         uint256 _tokens = _getTokenAmount(_weiAmount);
-        
+
         fundsRaised = fundsRaised.add(_weiAmount);
 
         _processPurchase(_beneficiary, _tokens);
         emit TokenPurchase(this, _beneficiary, _weiAmount, _tokens);
     }
-    
+
     function _getTokenAmount(uint256 _weiAmount) internal constant returns (uint256) {
         uint256 rate = _getRate();
         return _weiAmount.mul(rate);
     }
-    
+
     function _getRate() internal constant returns (uint256){
         uint256 rate;
         if (lot1 > 0){ // ICO lot1
@@ -684,22 +684,22 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         }
         return rate;
     }
-    
+
     function _setPriceFactor(uint cents) internal constant returns (uint256){
       uint256 ETHUSD2CENTS = ethusdrate.mul(100); // convert USD price per ethers to cents
-      uint256 tokenRatePerWei = ((ETHUSD2CENTS.mul(1000)).div(cents)); // calculates the rate of the tokens to be given per wei, checking the rate in cents  
+      uint256 tokenRatePerWei = ((ETHUSD2CENTS.mul(1000)).div(cents)); // calculates the rate of the tokens to be given per wei, checking the rate in cents
       return tokenRatePerWei;
     }
-    
+
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-    
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         _transfer(_beneficiary, _tokenAmount);
         _updateLots(_tokenAmount);
     }
-    
+
     function _updateLots(uint256 _tokenAmount) internal {
         if(lot1 != 0){
             if(_tokenAmount > lot1){
@@ -725,11 +725,11 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
             lot3 = lot3.sub(_tokenAmount); //subtract the distributed tokens from lot3
         }
     }
-    
+
     function _forwardFunds() internal {
         wallet.transfer(address(this).balance);
     }
-    
+
     function _transfer(address to, uint tokens) internal returns (bool success) {
         // prevent transfer to 0x0, use burn instead
         require(to != 0x0);
@@ -740,29 +740,29 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         emit Transfer(this,to,tokens);
         return true;
     }
-    
+
     function freeTokens(address receiver, uint tokenAmount) external onlyOwner {
         require(balances[this] != 0);
         _transfer(receiver,tokenAmount*10**uint(decimals));
     }
-    
+
     function drainFunds() external onlyOwner {
         _forwardFunds();
     }
-    
+
     function changeWallet(address _newWallet) external onlyOwner {
         wallet = _newWallet;
     }
-    
+
     function stopICO() external onlyOwner {
         Open = false;
     }
-    
+
     /* ERC20Interface function's implementation */
     function totalSupply() public constant returns (uint){
-       return 12e27; // 12 billion 
+       return 12e27; // 12 billion
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -785,7 +785,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     function transferWithMsg(address to, uint tokens, string message) public returns (bool success){
         // prevent transfer to 0x0, use burn instead
         require(to != 0x0);
@@ -797,7 +797,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         emit TransferWithMsg(msg.sender, to, tokens, message);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -810,7 +810,7 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -834,4 +834,20 @@ contract OUT2ICO is ERC20Interface, Owned, usingOraclize {
         return allowed[tokenOwner][spender];
     }
 
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

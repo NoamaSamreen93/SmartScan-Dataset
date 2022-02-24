@@ -69,7 +69,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -93,7 +93,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -101,7 +101,7 @@ contract EtheremonEnum {
         STAT_BASE,
         OBJ_SKILL
     }
-    
+
     enum PropertyType {
         ANCESTOR,
         XFACTOR
@@ -109,10 +109,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public returns(ResultCode);
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -130,7 +130,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -161,7 +161,7 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
     uint8 constant public STAT_COUNT = 6;
     uint8 constant public STAT_MAX = 32;
     uint8 constant public GEN0_NO = 24;
-    
+
     struct MonsterClassAcc {
         uint32 classId;
         uint256 price;
@@ -180,28 +180,28 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     // linked smart contract
     address public dataContract;
     address public battleContract;
     address public tokenContract;
-    
+
     address private lastHunter = address(0x0);
-    
+
     // config
     uint public brickPrice = 2 * 10 ** 8; // 2 tokens
     uint public tokenPrice = 0.004 ether / 10 ** 8;
     uint public maxDexSize = 500;
-    
+
     // event
     event EventCatchMonster(address indexed trainer, uint64 objId);
-    
+
     // modifier
     modifier requireDataContract {
         require(dataContract != address(0));
-        _;        
+        _;
     }
-    
+
     modifier requireBattleContract {
         require(battleContract != address(0));
         _;
@@ -211,13 +211,13 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         require(tokenContract != address(0));
         _;
     }
-    
+
     function EtheremonPayment(address _dataContract, address _battleContract, address _tokenContract) public {
         dataContract = _dataContract;
         battleContract = _battleContract;
         tokenContract = _tokenContract;
     }
-    
+
     // helper
     function getRandom(uint8 maxRan, uint8 index, address priAddress) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1)) + uint256(priAddress);
@@ -226,7 +226,7 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         return uint8(genNum % maxRan);
     }
-    
+
     // admin
     function withdrawToken(address _sendTo, uint _amount) onlyModerators requireTokenContract external {
         ERC20Interface token = ERC20Interface(tokenContract);
@@ -235,19 +235,19 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         token.transfer(_sendTo, _amount);
     }
-    
+
     function setContract(address _dataContract, address _battleContract, address _tokenContract) onlyModerators external {
         dataContract = _dataContract;
         battleContract = _battleContract;
         tokenContract = _tokenContract;
     }
-    
+
     function setConfig(uint _brickPrice, uint _tokenPrice, uint _maxDexSize) onlyModerators external {
         brickPrice = _brickPrice;
         tokenPrice = _tokenPrice;
         maxDexSize = _maxDexSize;
     }
-    
+
     // battle
     function giveBattleBonus(address _trainer, uint _amount) isActive requireBattleContract requireTokenContract public {
         if (msg.sender != battleContract)
@@ -255,7 +255,7 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         ERC20Interface token = ERC20Interface(tokenContract);
         token.transfer(_trainer, _amount);
     }
-    
+
     function createCastle(address _trainer, uint _tokens, string _name, uint64 _a1, uint64 _a2, uint64 _a3, uint64 _s1, uint64 _s2, uint64 _s3) isActive requireBattleContract requireTokenContract public returns(uint){
         if (msg.sender != tokenContract)
             revert();
@@ -263,20 +263,20 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
         battle.createCastleWithToken(_trainer, uint32(_tokens/brickPrice), _name, _a1, _a2, _a3, _s1, _s2, _s3);
         return _tokens;
     }
-    
+
     function catchMonster(address _trainer, uint _tokens, uint32 _classId, string _name) isActive requireDataContract requireTokenContract public returns(uint){
         if (msg.sender != tokenContract)
             revert();
-        
+
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterClassAcc memory class;
         (class.classId, class.price, class.returnPrice, class.total, class.catchable) = data.getMonsterClass(_classId);
-        
+
         if (class.classId == 0 || class.catchable == false) {
             revert();
         }
-        
-        // can not keep too much etheremon 
+
+        // can not keep too much etheremon
         if (data.getMonsterDexSize(_trainer) > maxDexSize)
             revert();
 
@@ -291,15 +291,31 @@ contract EtheremonPayment is EtheremonEnum, BasicAccessControl, SafeMath {
             uint8 value = getRandom(STAT_MAX, uint8(i), lastHunter) + data.getElementInArrayType(ArrayType.STAT_START, uint64(_classId), i);
             data.addElementToArrayType(ArrayType.STAT_BASE, objId, value);
         }
-        
+
         lastHunter = _trainer;
         EventCatchMonster(_trainer, objId);
         return requiredToken;
     }
-    
+
     /*
     function payService(address _trainer, uint _tokens, uint32 _type, string _text, uint64 _param1, uint64 _param2, uint64 _param3) public returns(uint) {
         if (msg.sender != tokenContract)
             revert();
     }*/
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -26,7 +26,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 contract Ownable {
   address public owner;
 
@@ -76,85 +76,85 @@ contract ERC20Interface {
 }
 
 contract Buyers{
-   
+
     struct Buyer{
-        
-        string   name;  
+
+        string   name;
         string   country;
-        string   city; 
+        string   city;
         string   b_address;
-        string   mobile;  
+        string   mobile;
     }
     mapping(address=>Buyer) public registerbuyer;
     event BuyerAdded(address  from, string name,string country,string city,string b_address,string mobile);
-    
-    
-      
+
+
+
     function registerBuyer(string _name,string _country,string _city,string _address,string _mobile) public returns(bool){
-      
+
          require(bytes(_name).length!=0 &&
              bytes(_country).length!=0 &&
              bytes(_city).length!=0 &&
              bytes(_address).length!=0 &&
-             bytes(_mobile).length!=0  
-             
+             bytes(_mobile).length!=0
+
         );
         registerbuyer[msg.sender]=Buyer(_name,_country,_city,_address,_mobile);
         emit BuyerAdded(msg.sender,_name,_country,_city,_address,_mobile);
         return true;
-        
+
     }
-   
+
     function getBuyer() public constant returns(string name,string country, string city,string _address,string mobile ){
         return (registerbuyer[msg.sender].name,registerbuyer[msg.sender].country,registerbuyer[msg.sender].city,registerbuyer[msg.sender].b_address,registerbuyer[msg.sender].mobile);
     }
-    
+
     function getBuyerbyaddress(address _useraddress) public constant returns(string name,string country, string city,string _address,string mobile ){
         return (registerbuyer[_useraddress].name,registerbuyer[_useraddress].country,registerbuyer[_useraddress].city,registerbuyer[_useraddress].b_address,registerbuyer[_useraddress].mobile);
     }
-    
+
 }
 
 contract ProductsInterface {
-     
+
     struct Product { // Struct
         uint256  id;
-        string   name;  
+        string   name;
         string   image;
         uint256  price;
         string   detail;
         address  _seller;
-         
+
     }
     event ProductAdded(uint256 indexed id,address seller, string  name,string  image, uint256  price,string  detail );
-   
-   
+
+
     function addproduct(string _name,string _image,uint256 _price,string _detail)   public   returns (bool success);
     function updateprice(uint _index, uint _price) public returns (bool success);
-  
+
    function getproduuct(uint _index) public constant returns(uint256 id,string name,string image,uint256  price,string detail, address _seller);
    function getproductprices() public constant returns(uint256[]);
-   
+
 }
 
 contract OrderInterface{
     struct Order { // Struct
         uint256  id;
-        uint256   quantity;  
-        uint256   product_index;  
+        uint256   quantity;
+        uint256   product_index;
         uint256  price;
-       
+
         address  buyer;
         address  seller;
         uint256 status;
-         
+
     }
     uint256 public order_counter;
     mapping (uint => Order) public orders;
-     
+
     function placeorder(  uint256   quantity,uint256   product_index)  public returns(uint256);
     event OrderPlace(uint256 indexed id, uint256   quantity,uint256   product_index,string   name,address  buyer, address  seller );
-   
+
 }
 
 contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,Buyers {
@@ -176,7 +176,7 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
    address ownerWallet;
    // Owner of account approves the transfer of an amount to another account
    mapping (address => mapping (address => uint256)) allowed;
-   
+
    /**
    * @dev Contructor that gives msg.sender all of existing tokens.
    */
@@ -188,12 +188,12 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
         _totalSupply = 1000000000 * 10 ** uint(decimals);
         tokenBalances[ msg.sender] = _totalSupply;   //Since we divided the token into 10^18 parts
     }
-    
+
      // Get the token balance for account `tokenOwner`
      function balanceOf(address tokenOwner) public constant returns (uint balance) {
          return tokenBalances[tokenOwner];
      }
-  
+
      // Transfer the balance from owner's account to another account
      function transfer(address to, uint tokens) public returns (bool success) {
          require(to != address(0));
@@ -206,17 +206,17 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
      }
      function checkUser() public constant returns(string ){
          require(bytes(registerbuyer[msg.sender].name).length!=0);
-          
+
              return "Register User";
      }
-     
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
    */
-   
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= tokenBalances[_from]);
@@ -228,7 +228,7 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -247,9 +247,9 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
      function totalSupply() public constant returns (uint) {
          return _totalSupply  - tokenBalances[address(0)];
      }
-     
-    
-     
+
+
+
      // ------------------------------------------------------------------------
      // Returns the amount of tokens approved by the owner that can be
      // transferred to the spender's account
@@ -257,7 +257,7 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
-     
+
      /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
    *
@@ -287,47 +287,47 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
     return true;
   }
 
-     
+
      // ------------------------------------------------------------------------
      // Don't accept ETH
      // ------------------------------------------------------------------------
      function () public payable {
          revert();
      }
- 
- 
+
+
      // ------------------------------------------------------------------------
      // Owner can transfer out any accidentally sent ERC20 tokens
      // ------------------------------------------------------------------------
      function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
          return ERC20Interface(tokenAddress).transfer(owner, tokens);
      }
-     
-    
+
+
      function placeorder( uint256   quantity,uint256   product_index)  public  returns(uint256) {
-         
+
         require(counter>=product_index && product_index>0);
         require(bytes(registerbuyer[msg.sender].name).length!=0);//to place order you first register yourself
-         
+
         transfer(seller_products[product_index]._seller,seller_products[product_index].price*quantity);
         orders[order_counter] = Order(order_counter,quantity,product_index,seller_products[product_index].price, msg.sender,seller_products[product_index]._seller,0);
-        
+
         emit OrderPlace(order_counter,quantity, product_index,  seller_products[product_index].name, msg.sender, seller_products[product_index]._seller );
         order_counter++;
         return counter;
     }
-    
+
     //------------------------------------------------------------------------
     // product methods
     //------------------------------------------------------------------------
-   
-   
+
+
     function addproduct(string _name,string _image,uint256 _price,string _detail)   public   returns (bool success){
           require(bytes(_name).length!=0 &&
              bytes(_image).length!=0 &&
-             bytes(_detail).length!=0 
-            
-             
+             bytes(_detail).length!=0
+
+
         );
         counter++;
         seller_products[counter] = Product(counter,_name,_image, _price,_detail,msg.sender);
@@ -335,30 +335,41 @@ contract FeedToken is  ProductsInterface,OrderInterface, ERC20Interface,Ownable,
         emit ProductAdded(counter,msg.sender,_name,_image,_price,_detail);
         return true;
    }
-  
+
    function updateprice(uint _index, uint _price) public returns (bool success){
       require(seller_products[_index]._seller==msg.sender);
-       
-     
+
+
       seller_products[_index].price=_price;
       products_price[_index]=_price;
       return true;
   }
-  
+
    function getproduuct(uint _index) public constant returns(uint256 ,string ,string ,uint256  ,string , address )
    {
        return(seller_products[_index].id,seller_products[_index].name,seller_products[_index].image,products_price[_index],seller_products[_index].detail,seller_products[_index]._seller);
    }
-   
+
    function getproductprices() public constant returns(uint256[])
    {
        uint256[] memory price = new uint256[](counter);
-        
+
         for (uint i = 0; i <counter; i++) {
-           
+
             price[i]=products_price[i+1];
-             
+
         }
       return price;
    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

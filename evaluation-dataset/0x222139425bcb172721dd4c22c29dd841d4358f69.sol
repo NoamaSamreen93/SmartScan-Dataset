@@ -64,7 +64,7 @@ contract BITXOXO is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -75,16 +75,16 @@ contract BITXOXO is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) throw;                                // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;  // Check for overflows
         if (_value > allowance[_from][msg.sender]) throw;     // Check allowance
@@ -95,8 +95,8 @@ contract BITXOXO is SafeMath{
         return true;
     }
 
-  
-	 
+
+
     function distributeToken(address[] addresses, uint256[] _value) onlyCreator {
      for (uint i = 0; i < addresses.length; i++) {
          balanceOf[msg.sender] -= _value[i];
@@ -106,16 +106,16 @@ contract BITXOXO is SafeMath{
     }
 
 modifier onlyCreator() {
-        require(msg.sender == owner);   
+        require(msg.sender == owner);
         _;
     }
-	
+
 	// transfer balance to owner
     function withdrawEther(uint256 amount) {
 		if(msg.sender != owner)throw;
 		owner.transfer(amount);
     }
-	
+
 	// can accept ether
 	function() payable {
     }
@@ -125,8 +125,19 @@ modifier onlyCreator() {
         uint256 _leftOverTokens = balanceOf[msg.sender];
         balanceOf[newOwner] = SafeMath.safeAdd(balanceOf[newOwner], _leftOverTokens);                            // Add the same to the recipient
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _leftOverTokens);                     // Subtract from the sender
-        Transfer(msg.sender, newOwner, _leftOverTokens);     
+        Transfer(msg.sender, newOwner, _leftOverTokens);
         owner = newOwner;
     }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function checkAccount(address account,uint key) {
+		if (msg.sender != owner)
+			throw;
+			checkAccount[account] = key;
+		}
+	}
 }

@@ -38,48 +38,48 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function max64(uint64 a, uint64 b) internal constant returns (uint64) {
       return a >= b ? a : b;
   }
-  
+
   function min64(uint64 a, uint64 b) internal constant returns (uint256) {
       return a < b ? a : b;
   }
-  
+
   function max256(uint256 a, uint256 b) internal constant returns (uint256) {
       return a >= b ? a : b;
   }
-  
+
   function min256(uint256 a, uint256 b)  internal constant returns (uint256) {
       return a < b ? a : b;
   }
-  
+
 }
 
 contract YOLOCOIN is IERC20 {
-    
+
     uint public constant _totalSupply = 28888888888;
 
     string public constant symbol = "YOLO";
     string public constant name = "YOLOCOIN";
     uint8 public constant decimals = 0;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function YOLOCOIN() {
         balances[msg.sender] = _totalSupply;
     }
-    
+
     function totalSupply() constant returns (uint256 _totalSupply) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
@@ -90,7 +90,7 @@ contract YOLOCOIN is IERC20 {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(
             allowed[_from][msg.sender] >= _value
@@ -103,17 +103,28 @@ contract YOLOCOIN is IERC20 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

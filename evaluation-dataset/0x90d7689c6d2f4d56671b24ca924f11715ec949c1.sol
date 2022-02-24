@@ -137,7 +137,7 @@ contract BasicToken is ERC20Basic {
     require(_to != address(0));
     require(_to != address(this));
     require(_value <= balances[msg.sender]);
-    
+
 
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -278,4 +278,15 @@ contract ZUCToken is StandardToken, Ownable {
     constructor() public {
         balances[msg.sender] = totalSupply_;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

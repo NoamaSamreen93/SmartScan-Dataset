@@ -1727,10 +1727,10 @@ interface PlayerBookInterface {
 
 /**
 * @title -Name Filter- v0.1.9
-*     
+*
 
-*          
-*     
+*
+*
 
 *                                  _____                      _____
 *                                 (, /     /)       /) /)    (, /      /)          /)
@@ -1746,10 +1746,10 @@ interface PlayerBookInterface {
 *=============| |\ |  / /\  | |\/| | |_ =====| |_  | | | |    | |  | |_  | |_)==============*
 *=============|_| \| /_/--\ |_|  | |_|__=====|_|   |_| |_|__  |_|  |_|__ |_| \==============*
 *
-*    
+*
 
-*  nventor 
-* ة    
+*  nventor
+* ة
 
 */
 
@@ -1930,4 +1930,15 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

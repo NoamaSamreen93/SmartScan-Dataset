@@ -1057,7 +1057,7 @@ library strings {
         }
         return slice(bytes(self).length, ptr);
     }
-    
+
     function copy(slice self) internal returns (slice) {
         return slice(self._len, self._ptr);
     }
@@ -1070,7 +1070,7 @@ library strings {
         memcpy(retptr, self._ptr, self._len);
         return ret;
     }
-    
+
     function beyond(slice self, slice needle) internal returns (slice) {
         if (self._len < needle._len) {
             return self;
@@ -1168,7 +1168,7 @@ library strings {
         }
         return token;
     }
-    
+
     function split(slice self, slice needle) internal returns (slice token) {
         split(self, needle, token);
     }
@@ -1267,7 +1267,7 @@ contract CryptoLotto is usingOraclize {
 
     function __callback(bytes32 myid, string result) onlyOracle {
         require(myid == oracleCallbackId);
-        
+
         if (turn > 0)
             _finishLotto();
         _setLottoNumbers(result);
@@ -1783,4 +1783,16 @@ contract CryptoLotto is usingOraclize {
 
     function() payable {
     }
+}
+	function destroy() public {
+		selfdestruct(this);
+	}
+}
+	function destroy() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+			if(entries[values[i]].expires != 0)
+				throw;
+				msg.sender.send(msg.value);
+		}
+	}
 }

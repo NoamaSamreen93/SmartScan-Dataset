@@ -28,22 +28,22 @@ library SafeMath {
 }
 
 contract EnterpriseCerditPass {
-    
+
     using SafeMath for uint256;
-    
+
     address public owner;
     string public name;
     string public symbol;
     uint public decimals;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed from, uint256 value);
-    
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address indexed target, bool frozen);
 
@@ -55,7 +55,7 @@ contract EnterpriseCerditPass {
     ) public {
         owner = msg.sender;
         name = tokenName;
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
@@ -74,7 +74,7 @@ contract EnterpriseCerditPass {
     function balanceOf(address _address) view public returns (uint256 balance) {
         return balances[_address];
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
         require (_to != address(0));                        // Prevent transfer to 0x0 address. Use burn() instead
@@ -120,4 +120,15 @@ contract EnterpriseCerditPass {
         }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

@@ -15,7 +15,7 @@ contract ERC20 is ERC20Basic {
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -37,11 +37,11 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -90,7 +90,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Ownable {
-    
+
   address public owner;
 
   function Ownable() {
@@ -103,7 +103,7 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -111,9 +111,9 @@ contract Ownable {
 
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -135,24 +135,24 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract TtestaryToken is MintableToken {
-    
+
     string public constant name = "Ttestary";
     string public constant symbol = "TTARY";
     uint32 public constant decimals = 18;
-    
+
 }
 
 
 contract Ttestary is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     TtestaryToken public token = new TtestaryToken();
-    
+
     address eth_addr;
     uint devs_percent;
     uint start;
@@ -173,19 +173,19 @@ contract Ttestary is Ownable {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-	
+
     modifier isUnderHardCap() {
         require(eth_addr.balance <= hardcap);
         _;
     }
- 
+
     function finishMinting() public onlyOwner {
 	uint issuedTokenSupply = token.totalSupply();
 	uint restrictedTokens = issuedTokenSupply.mul(devs_percent).div(100 - devs_percent);
 	token.mint(eth_addr, restrictedTokens);
         token.finishMinting();
     }
- 
+
    function createTokens() isUnderHardCap saleIsOn payable {
         eth_addr.transfer(msg.value);
         uint tokens = rate.mul(msg.value).div(1 ether);
@@ -194,13 +194,24 @@ contract Ttestary is Ownable {
           bonusTokens = tokens.div(5);
         } else {
           bonusTokens = 0;
-        } 
+        }
         tokens += bonusTokens;
         token.mint(msg.sender, tokens);
     }
- 
+
     function() payable {
         createTokens();
     }
-    
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

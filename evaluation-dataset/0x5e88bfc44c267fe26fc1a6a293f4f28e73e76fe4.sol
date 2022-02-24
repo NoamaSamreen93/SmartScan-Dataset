@@ -108,3 +108,10 @@ contract lockEtherPay is Ownable {
     isReleased = true;
   }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

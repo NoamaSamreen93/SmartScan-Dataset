@@ -27,12 +27,12 @@ contract MERIDIANERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function MERIDIANERC20
-      (string tokenName, string tokenSymbol) 
+      (string tokenName, string tokenSymbol)
         public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName ="Meridian";                                   
-        symbol = tokenSymbol ="MDN";                             
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName ="Meridian";
+        symbol = tokenSymbol ="MDN";
     }
 
     /**
@@ -119,11 +119,22 @@ contract MERIDIANERC20 {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

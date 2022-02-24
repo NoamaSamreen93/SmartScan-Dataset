@@ -7,7 +7,7 @@ contract locaToken {
     function allowance(address _owner, address _spender) public view returns (uint);
 }
 
-// Safemath library  
+// Safemath library
 library SafeMath {
     function sub(uint _base, uint _value)
     internal
@@ -57,12 +57,12 @@ contract Donation  {
     event Donated(address indexed buyer, uint tokens);
      // Available tokens for donation
     uint private _tokenDonation;
-  
+
 
     // constructor to set the contract owner
     constructor() public {
 
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
 
@@ -81,9 +81,9 @@ contract Donation  {
         _;
     }
     // Donation amount has to be between 0.02 and 0.03 ETH
-    // regardless the donation amount,  250 LOCAs will be send 
+    // regardless the donation amount,  250 LOCAs will be send
     modifier validDonation {
-        require (msg.value >= 20000000000000000 && msg.value <= 30000000000000000);                                                                                        
+        require (msg.value >= 20000000000000000 && msg.value <= 30000000000000000);
         _;
     }
 
@@ -99,12 +99,12 @@ contract Donation  {
        //  _tokensold = msg.value.mul(_convrate).div(Devider);
         _tokenGift = 25000000000;
         _tokenDonation = _tokenDonation.sub(_tokenGift);
-        
+
         emit Donated(msg.sender, _tokenGift);
 
         token.transferFrom(owner, msg.sender, _tokenGift);
 
-        
+
 
     }
 
@@ -122,14 +122,25 @@ contract Donation  {
 
     // Withdraw Ether from the contract
     function getDonation(address _to) public onlyOwner {
-       
+
         _to.transfer(address(this).balance);
-    
-    } 
+
+    }
 
     function CloseDonation() public onlyOwner {
 
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

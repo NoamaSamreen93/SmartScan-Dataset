@@ -14,7 +14,7 @@ contract ACLCERC20{
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
 
@@ -23,7 +23,7 @@ contract ACLCERC20{
         totalSupply = 10000000000 * (10**18); // Update total supply
         balanceOf[msg.sender] = totalSupply; // Give the creator all initial tokens
         name = "accounting ledger coin";    // Set the name for display purposes
-        symbol = "ACLC";                   // Set the symbol for display purposes                 
+        symbol = "ACLC";                   // Set the symbol for display purposes
     }
 
     /* Internal transfer, only can be called by this contract */
@@ -85,4 +85,20 @@ contract ACLCERC20{
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

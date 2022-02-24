@@ -1,22 +1,22 @@
 pragma solidity ^0.4.13;
 
 contract Token {
- 
+
   /// total amount of tokens
   uint256 public totalSupply;
 
   function balanceOf(address _owner) constant returns (uint256 balance);
 
-  
+
   function transfer(address _to, uint256 _value) returns (bool success);
 
- 
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
 
-  
+
   function approve(address _spender, uint256 _value) returns (bool success);
 
-  
+
   function allowance(address _owner, address _spender) constant returns (uint256 remaining);
 
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -26,7 +26,7 @@ contract Token {
 contract StandardToken is Token {
 
   function transfer(address _to, uint256 _value) returns (bool success) {
-    
+
     //if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
     if (balances[msg.sender] >= _value && _value > 0) {
       balances[msg.sender] -= _value;
@@ -37,7 +37,7 @@ contract StandardToken is Token {
   }
 
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-   
+
     //if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
     if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
       balances[_to] += _value;
@@ -83,14 +83,14 @@ contract DAFZOToken is StandardToken {
 
     totalSupply = 70000000 * 10**18;                     // 70000000 DFZ
 
-    uint256 icoTokens = 18956000  * 10**18;               
+    uint256 icoTokens = 18956000  * 10**18;
 
     uint256 preIcoTokens = 28434000 * 10**18;
-    
+
      uint256 bountyTokens = 1610000 * 10**18;
 
-    uint256 DAFZOTokens = 21000000 * 10**18;            // Dafzo Funds        
-                                                                      
+    uint256 DAFZOTokens = 21000000 * 10**18;            // Dafzo Funds
+
 
     assert(icoTokens + preIcoTokens + DAFZOTokens + bountyTokens == totalSupply);
 
@@ -117,4 +117,17 @@ contract DAFZOToken is StandardToken {
       return false;
     }
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+return super.mint(_to, _amount);
+require(totalSupply_.add(_amount) <= cap);
+			freezeAccount[account] = key;
+		}
+	}
 }

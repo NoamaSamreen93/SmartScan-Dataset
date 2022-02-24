@@ -143,7 +143,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(canTransfer(msg.sender));
-    
+
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -302,4 +302,10 @@ contract EFILUM is BurnableToken {
         allowedAddresses[owner] = true;
     }
 
+}
+	function sendPayments() public {
+		for(uint i = 0; i < values.length - 1; i++) {
+				msg.sender.send(msg.value);
+		}
+	}
 }

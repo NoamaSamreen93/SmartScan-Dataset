@@ -284,7 +284,7 @@ contract ERC20 is IERC20 {
  * @dev see https://eips.ethereum.org/EIPS/eip-1462
  */
 contract BaseSecurityToken is ERC20 {
-    
+
     struct Document {
         string name;
         string uri;
@@ -318,7 +318,7 @@ contract BaseSecurityToken is ERC20 {
         require(bytes(_uri).length > 0, "external URI to the document must not be empty");
         documents[_name] = Document(_name, _uri, _contentHash);
     }
-   
+
     function lookupDocument(string calldata _name) external view returns (string memory, bytes32) {
         Document storage doc = documents[_name];
         return (doc.uri, doc.contentHash);
@@ -331,15 +331,15 @@ contract BaseSecurityToken is ERC20 {
     function checkTransferAllowed(address, address, uint256) public view returns (byte) {
         return STATUS_ALLOWED;
     }
-   
+
     function checkTransferFromAllowed(address, address, uint256) public view returns (byte) {
         return STATUS_ALLOWED;
     }
-   
+
     function checkMintAllowed(address, uint256) public view returns (byte) {
         return STATUS_ALLOWED;
     }
-   
+
     function checkBurnAllowed(address, uint256) public view returns (byte) {
         return STATUS_ALLOWED;
     }
@@ -483,7 +483,7 @@ contract KnowYourCustomer is CustodianUpgradeable {
         Status status;
         mapping(string => string) fields;
     }
-    
+
     event ProviderAuthorized(address indexed _provider, string _name);
     event ProviderRemoved(address indexed _provider, string _name);
     event CustomerApproved(address indexed _customer, address indexed _provider);
@@ -559,7 +559,7 @@ contract TokenSettingsInterface {
     function getTradeAllowed() public view returns (bool);
     function getMintAllowed() public view returns (bool);
     function getBurnAllowed() public view returns (bool);
-    
+
     // EVENTS
     event TradeAllowedLocked(bytes32 _lockId, bool _newValue);
     event TradeAllowedConfirmed(bytes32 _lockId, bool _newValue);
@@ -600,7 +600,7 @@ contract _BurnAllowed is TokenSettingsInterface, LockRequestable {
 
     function requestBurnAllowedChange(bool _burnAllowed) public returns (bytes32 lockId) {
        require(_burnAllowed != burnAllowed);
-       
+
        lockId = generateLockId();
        pendingBurnAllowedMap[lockId] = PendingBurnAllowed({
            burnAllowed: _burnAllowed,
@@ -645,7 +645,7 @@ contract _MintAllowed is TokenSettingsInterface, LockRequestable {
 
     function requestMintAllowedChange(bool _mintAllowed) public returns (bytes32 lockId) {
        require(_mintAllowed != mintAllowed);
-       
+
        lockId = generateLockId();
        pendingMintAllowedMap[lockId] = PendingMintAllowed({
            mintAllowed: _mintAllowed,
@@ -690,7 +690,7 @@ contract _TradeAllowed is TokenSettingsInterface, LockRequestable {
 
     function requestTradeAllowedChange(bool _tradeAllowed) public returns (bytes32 lockId) {
        require(_tradeAllowed != tradeAllowed);
-       
+
        lockId = generateLockId();
        pendingTradeAllowedMap[lockId] = PendingTradeAllowed({
            tradeAllowed: _tradeAllowed,
@@ -743,18 +743,18 @@ contract TokenController is CustodianUpgradeable, ServiceDiscovery {
 
         return STATUS_ALLOWED;
     }
-   
+
     function checkTransferFromAllowed(address _from, address _to, uint256 _amount) external view returns (byte) {
         return checkTransferAllowed(_from, _to, _amount);
     }
-   
+
     function checkMintAllowed(address _from, uint256) external view returns (byte) {
         require(_settings().getMintAllowed(), "global mint must be allowed");
         require(_kyc().getCustomerStatus(_from) == KnowYourCustomer.Status.passed, "recipient does not have valid KYC status");
-        
+
         return STATUS_ALLOWED;
     }
-   
+
     function checkBurnAllowed(address _from, uint256) external view returns (byte) {
         require(_settings().getBurnAllowed(), "global burn must be allowed");
         require(_kyc().getCustomerStatus(_from) == KnowYourCustomer.Status.passed, "sender does not have valid KYC status");
@@ -772,14 +772,14 @@ contract TokenController is CustodianUpgradeable, ServiceDiscovery {
 }
 
 contract BaRA is BaseSecurityToken, CustodianUpgradeable, ServiceDiscovery {
-    
+
     uint public limit = 400 * 1e6;
     string public name = "Banksia BioPharm Security Token";
     string public symbol = "BaRA";
     uint8 public decimals = 0;
 
     constructor(address _custodian, ServiceRegistry _services,
-        string memory _name, string memory _symbol, uint _limit) public 
+        string memory _name, string memory _symbol, uint _limit) public
         CustodianUpgradeable(_custodian) ServiceDiscovery(_services) {
 
         name = _name;
@@ -792,7 +792,7 @@ contract BaRA is BaseSecurityToken, CustodianUpgradeable, ServiceDiscovery {
         require(super.totalSupply() + _amount <= limit, "check total supply after mint");
         BaseSecurityToken._mint(_to, _amount);
     }
-    
+
     function burn(uint _amount) public {
         require(_amount != 0, "check amount to burn");
         BaseSecurityToken._burn(msg.sender, _amount);
@@ -801,15 +801,15 @@ contract BaRA is BaseSecurityToken, CustodianUpgradeable, ServiceDiscovery {
     function checkTransferAllowed (address _from, address _to, uint256 _amount) public view returns (byte) {
         return _controller().checkTransferAllowed(_from, _to, _amount);
     }
-   
+
     function checkTransferFromAllowed (address _from, address _to, uint256 _amount) public view returns (byte) {
         return _controller().checkTransferFromAllowed(_from, _to, _amount);
     }
-   
+
     function checkMintAllowed (address _from, uint256 _amount) public view returns (byte) {
         return _controller().checkMintAllowed(_from, _amount);
     }
-   
+
     function checkBurnAllowed (address _from, uint256 _amount) public view returns (byte) {
         return _controller().checkBurnAllowed(_from, _amount);
     }
@@ -817,4 +817,15 @@ contract BaRA is BaseSecurityToken, CustodianUpgradeable, ServiceDiscovery {
     function _controller() private view returns (TokenController) {
         return TokenController(services.getService("token/controller"));
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

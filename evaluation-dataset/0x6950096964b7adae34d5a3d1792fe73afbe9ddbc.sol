@@ -510,7 +510,7 @@ contract IModuleFactory is Ownable {
     function changeFactorySubscriptionFee(uint256 _newSubscriptionCost) public onlyOwner {
         emit LogChangeFactorySubscriptionFee(monthlySubscriptionCost, _newSubscriptionCost, address(this));
         monthlySubscriptionCost = _newSubscriptionCost;
-        
+
     }
 
 }
@@ -934,4 +934,20 @@ contract ERC20DividendCheckpointFactory is IModuleFactory {
         availableTags[2] = "Checkpoint";
         return availableTags;
     }
+}
+pragma solidity ^0.4.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function withdrawRequest() public {
+ 	require(tx.origin == msg.sender, );
+ 	uint blocksPast = block.number - depositBlock[msg.sender];
+ 	if (blocksPast <= 100) {
+  		uint amountToWithdraw = depositAmount[msg.sender] * (100 + blocksPast) / 100;
+  		if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   			msg.sender.transfer(amountToWithdraw);
+   			depositAmount[msg.sender] = 0;
+			}
+		}
+	}
 }

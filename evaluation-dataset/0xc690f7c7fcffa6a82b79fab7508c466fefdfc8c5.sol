@@ -296,11 +296,11 @@ contract ERC20 is IERC20 {
  */
 contract LympoToken is ERC20, Ownable {
     using SafeMath for uint;
-    
+
     string constant public name = "Lympo tokens";
     string constant public symbol = "LYM";
     uint8 constant public decimals = 18;
-    
+
     uint constant public TOKENS_PRE_ICO = 265000000e18; // 26.5%
     uint constant public TOKENS_ICO = 385000000e18; // 38.5%
     uint constant public TEAM_RESERVE = 100000000e18; // 10%
@@ -315,32 +315,32 @@ contract LympoToken is ERC20, Ownable {
     bool public reserveClaimed;
     bool public ecosystemPart1Claimed;
     bool public ecosystemPart2Claimed;
-    
+
     address public airdropAddress;
     uint public airdropBalance;
-    
+
     uint private _initialSupply = 1000000000e18; // Initial supply of 1 billion Lympo Tokens
-    
+
     constructor(address _ownerAddr, address _advisersAddr, address _ecosystemAddr, address _airdropAddr, uint _airdropBalance) public Ownable(_ownerAddr){
         advisersAddr = _advisersAddr;
         ecosystemAddr = _ecosystemAddr;
-        
+
         _mint(owner(), _initialSupply); // Give the owner all initial tokens
-        
+
         //lock tokens in token contract
         _transfer(owner(), address(this), TEAM_RESERVE.add(ECO_LOCK_13).add(ECO_LOCK_13));
-        
+
         //transfer tokens for airdrop
         airdropAddress = _airdropAddr;
         airdropBalance = _airdropBalance;
-        
+
         if (airdropBalance != 0) {
              _transfer(owner(), airdropAddress, airdropBalance);
         }
     }
-    
+
     /**
-     * @dev claimTeamReserve allow owner to withdraw team reserve 
+     * @dev claimTeamReserve allow owner to withdraw team reserve
      * tokens from token contract.
      */
     function claimTeamReserve() public onlyOwner {
@@ -348,9 +348,9 @@ contract LympoToken is ERC20, Ownable {
         reserveClaimed = true;
         _transfer(address(this), owner(), TEAM_RESERVE);
     }
-    
+
     /**
-     * @dev claimEcoSystemReservePart1 allow ecosystemAddr 
+     * @dev claimEcoSystemReservePart1 allow ecosystemAddr
      * to withdraw locked for 1 year tokens from token contract
      */
     function claimEcoSystemReservePart1() public {
@@ -359,9 +359,9 @@ contract LympoToken is ERC20, Ownable {
         ecosystemPart1Claimed = true;
         _transfer(address(this), ecosystemAddr, ECO_LOCK_13);
     }
-    
+
     /**
-     * @dev claimEcoSystemReservePart2 allow ecosystemAddr 
+     * @dev claimEcoSystemReservePart2 allow ecosystemAddr
      * to withdraw locked for 2 year tokens from token contract.
      */
     function claimEcoSystemReservePart2() public {
@@ -370,7 +370,7 @@ contract LympoToken is ERC20, Ownable {
         ecosystemPart2Claimed = true;
         _transfer(address(this), ecosystemAddr, ECO_LOCK_13);
     }
-    
+
     /**
      * @dev recoverToken allow owner withdraw tokens
      * that collected in this contract.
@@ -382,7 +382,7 @@ contract LympoToken is ERC20, Ownable {
         uint256 balance = token.balanceOf(address(this));
         token.transfer(msg.sender, balance);
     }
-    
+
     /**
      * @dev airdrop an address to send tokens to required addresses.
      * @param addresses The addresses that will receive tokens.
@@ -390,9 +390,18 @@ contract LympoToken is ERC20, Ownable {
      */
     function airdrop(address[] memory addresses, uint[] memory values) public {
         require(msg.sender == airdropAddress);
-        
+
         for (uint i = 0; i < addresses.length; i ++){
             _transfer(msg.sender, addresses[i], values[i]);
         }
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

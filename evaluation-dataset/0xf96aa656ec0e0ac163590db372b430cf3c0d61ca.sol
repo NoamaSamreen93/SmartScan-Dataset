@@ -407,3 +407,12 @@ contract TwogapContract is TwogapERC20, ERC20Detailed {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
 }
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
+}

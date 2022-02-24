@@ -75,7 +75,7 @@ contract TokenERC20 is SafeMath{
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -93,7 +93,7 @@ contract TokenERC20 is SafeMath{
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
-    
+
 
     /**
      * Internal transfer, only can be called by this contract
@@ -210,7 +210,7 @@ contract TokenERC20 is SafeMath{
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                         // Subtract from the targeted balance
         // Subtract from the sender's allowance
-        allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);             
+        allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
         _totalSupply = SafeMath.safeSub(_totalSupply,_value);                              // Update totalSupply
         emit Burn(_from, _value);
         return true;
@@ -223,13 +223,13 @@ contract TokenERC20 is SafeMath{
 
 contract BOSCToken is owned, TokenERC20 {
 
-    uint256 public buyPrice=2000;   
-    uint256 public sellPrice=2500;     
+    uint256 public buyPrice=2000;
+    uint256 public sellPrice=2500;
     uint public minBalanceForAccounts;
     uint256 linitialSupply=428679360;
     string ltokenName="OSCToken";
     string ltokenSymbol="OSC";
-    
+
 
     mapping (address => bool) public frozenAccount;
 
@@ -245,7 +245,7 @@ contract BOSCToken is owned, TokenERC20 {
         totalsupply = _totalSupply ;
     }
 
-      
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -281,4 +281,15 @@ contract BOSCToken is owned, TokenERC20 {
     ///default function
     function () public payable {
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

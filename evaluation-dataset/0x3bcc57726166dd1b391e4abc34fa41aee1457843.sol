@@ -149,7 +149,7 @@ contract ERC20Basic {
  */
 contract BasicToken is ERC20Basic, Pausable {
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
     address[] allParticipants;
     mapping (address => bool) isParticipated;
@@ -208,7 +208,7 @@ contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -290,7 +290,7 @@ contract DeedSaft is StandardToken, Destructible {
     address[] allParticipants;
     mapping (address => bool) isParticipated;
     function DeedSaft()  public {
-       totalSupply = 55999999 * (10**decimals);  // 
+       totalSupply = 55999999 * (10**decimals);  //
        owner = msg.sender;
        balances[msg.sender] = totalSupply;
     }
@@ -298,6 +298,17 @@ contract DeedSaft is StandardToken, Destructible {
     function()  public {
      revert();
     }
-   
-  
+
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

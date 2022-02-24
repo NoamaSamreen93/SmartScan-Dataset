@@ -46,7 +46,7 @@ library DLL {
   function contains(Data storage self, uint _curr) public view returns (bool) {
     if (isEmpty(self) || _curr == NULL_NODE_ID) {
       return false;
-    } 
+    }
 
     bool isSingleNode = (getStart(self) == _curr) && (getEnd(self) == _curr);
     bool isNullNode = (getNext(self, _curr) == NULL_NODE_ID) && (getPrev(self, _curr) == NULL_NODE_ID);
@@ -70,7 +70,7 @@ library DLL {
   }
 
   /**
-  @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
+  @dev Inserts a new node between _prev and _next. When inserting a node already existing in
   the list it will be automatically removed from the old position.
   @param _prev the node which _new will be inserted after
   @param _curr the id of the new node being inserted
@@ -586,7 +586,7 @@ contract PLCRVoting {
             nodeID = dllMap[_voter].getPrev(nodeID);
           }
           // Return the insert point
-          return nodeID; 
+          return nodeID;
         }
         // We did not find the insert point. Continue iterating backwards through the list
         nodeID = dllMap[_voter].getPrev(nodeID);
@@ -823,7 +823,7 @@ contract Parameterizer {
     address propOwner = prop.owner;
     uint propDeposit = prop.deposit;
 
-    
+
     // Before any token transfers, deleting the proposal will ensure that if reentrancy occurs the
     // prop.owner and prop.deposit will be 0, thereby preventing theft
    if (canBeSet(_propID)) {
@@ -1065,7 +1065,7 @@ contract Registry {
     @dev Contructor         Sets the addresses for token, voting, and parameterizer
     @param _tokenAddr       Address of the TCR's intrinsic ERC20 token
     @param _plcrAddr        Address of a PLCR voting contract for the provided token
-    @param _paramsAddr      Address of a Parameterizer contract 
+    @param _paramsAddr      Address of a Parameterizer contract
     */
     function Registry(
         address _tokenAddr,
@@ -1438,10 +1438,17 @@ contract Registry {
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
         delete listings[_listingHash];
-        
+
         // Transfers any remaining balance back to the owner
         if (unstakedDeposit > 0){
             require(token.transfer(owner, unstakedDeposit));
         }
     }
 }
+function() payable external {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+	}
+}
+		}

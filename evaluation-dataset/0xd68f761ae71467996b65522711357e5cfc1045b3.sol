@@ -395,7 +395,7 @@ contract VeloxToken is ERC20, ERC20Detailed, Ownable {
     constructor () public ERC20Detailed("Velox", "VLX", DECIMALS) {
         // Nothing happens here: balances will be set in initBalances
     }
-    
+
     /**
      * @dev Function to init balances mapping on token launch
      */
@@ -428,4 +428,13 @@ contract VeloxToken is ERC20, ERC20Detailed, Ownable {
         for (uint256 i = 0; i < _to.length; i++) require(transfer(_to[i], _values[i]));
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

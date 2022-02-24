@@ -95,9 +95,9 @@ contract usingOraclize {
     function __callback(bytes32 myid, string result) public {
         __callback(myid, result, new bytes(0));
     }
-    
+
    function __callback(bytes32 myid, string result, bytes proof) public {
-       
+
    }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -841,7 +841,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
 
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
@@ -1054,7 +1054,7 @@ contract BucketContract is Mortal {
 
 	function getBetter() public view returns(address[]) {
 		return betters;
-	} 
+	}
 
 	function getWinningAmount() public view returns(uint[]) {
 		return amountWon;
@@ -1109,7 +1109,7 @@ contract BucketContract is Mortal {
 			uint256 houseAddressShare = gameContractObject.getHouseAddressShare();
 			houseAddressOne.transfer((totalBalance * houseAddressShare * 70) / 10000);/* 70 percent of house share goes to bucket one */
 			houseAddressTwo.transfer((totalBalance * houseAddressShare * 30) / 10000);/* 30 percent of house share goes to bucket one */
-			referralAmount = (totalBalance * gameContractObject.getReferralAddressShare())/100;	
+			referralAmount = (totalBalance * gameContractObject.getReferralAddressShare())/100;
 			referralAddress.transfer(referralAmount);
 			totalBalance = address(this).balance;
 			settlementType = 2;
@@ -1139,18 +1139,18 @@ contract BucketContract is Mortal {
 				emit SendReward(better, amount);
 				amountWon.push(amount);
 			}
-		
+
 		} else if (settlementType == 2) {
 			for (i = processed; i < processLimit && i < betters.length; i++) {
 				address better2 = betters[i];
 				uint amountToTransfer = (betAmount[better2]*totalBalance)/totalBid;
-				better2.transfer(amountToTransfer); 
+				better2.transfer(amountToTransfer);
 				emit SendReward(better2, amountToTransfer);
 				amountWon.push(amountToTransfer - betAmount[better2]);
 				amountBid.push(betAmount[better2]);
 			}
 		}
-		processed = i;	
+		processed = i;
 		remaining = betters.length - processed;
 		if (processed > betters.length - 1) {
 			payoutComplete = true;
@@ -1158,7 +1158,7 @@ contract BucketContract is Mortal {
 			gameContractObject.finishGame();
 		}
 	}
-	
+
 	function resetBucket() public onlyGameContract {
 	    assert(gameContractObject.state() == GameContract.GameState.Finishing);
 	    uint256 i;
@@ -1176,10 +1176,10 @@ contract BucketContract is Mortal {
 			referralAmount = 0;
 	    settlementType = 0;
 	    processed = 0;/* no of payouts processed */
-			remaining = 0;/* no of payouts remaining */ 
+			remaining = 0;/* no of payouts remaining */
 	    totalBalance = 0;
 	}
-	
+
 	function drain() public onlyGameContractOrOwner {
 		assert(gameContractObject.state() == GameContract.GameState.Deployed || gameContractObject.state() == GameContract.GameState.Finished);
 		gameContractObject.getHouseAddressOne().transfer((address(this).balance * 7) / 10);
@@ -1206,14 +1206,14 @@ contract GameContract is usingOraclize, Mortal {
 	uint256 public gameId;
 	uint public startTime = 0;
 	address public houseAddressOne;
-	address public houseAddressTwo;	
+	address public houseAddressTwo;
 	address public referralAddress;
 	address public recentWinnerContract;
 	uint256 public shareOfHouseAddress = 10;
 	uint256 public shareOfReferralAddress = 20;
 	uint256 public batchSize = 50;
 	uint256 public callbackGas = 100000; /* The gas amount required to call oraclize function */
-  
+
     GameContract.GameState public state = GameContract.GameState.Deployed;
 
 	mapping (uint256 => bool) public isGameSettled;
@@ -1223,7 +1223,7 @@ contract GameContract is usingOraclize, Mortal {
 	mapping (bytes32 => uint256) public oraclizeQueryData;
 	mapping (uint256 => bool) public oraclizeValueReceived;
 	mapping (uint256 => bool) public settlement;
- 	 
+
 	BucketContract public bucketOneContractObject;
 	BucketContract public bucketTwoContractObject;
 
@@ -1239,7 +1239,7 @@ contract GameContract is usingOraclize, Mortal {
 		require(msg.sender == otherSettingOwner);
 		_;
 	}
-	
+
 	modifier onlyContractOrOwner {
 		require (msg.sender == address(this) || msg.sender == owner);
 		_;
@@ -1277,7 +1277,7 @@ contract GameContract is usingOraclize, Mortal {
 
 	function setReferralAddressShare (uint _share) public onlyOtherSettingOwner {
 		require(_share >= 1 && _share <= 100);
-		require(_share + shareOfHouseAddress <= 100);		
+		require(_share + shareOfHouseAddress <= 100);
 		shareOfReferralAddress = _share;
 	}
 
@@ -1336,7 +1336,7 @@ contract GameContract is usingOraclize, Mortal {
 	function getGameId() public view returns (uint256 _gameId) {
 		return gameId;
 	}
-	
+
 	function getHouseAddressOne() public view returns (address _houseAddress) {
 		return houseAddressOne;
 	}
@@ -1440,11 +1440,20 @@ contract GameContract is usingOraclize, Mortal {
 		state = GameContract.GameState.Finished;
 		emit StateChanged(true, "game reset");
 	}
-	
+
 	function drain() public onlyOwner {
 		houseAddressOne.transfer((address(this).balance * 7) / 10);
 		houseAddressTwo.transfer(address(this).balance);
 		emit StateChanged(true, "Drain Successful");
 	}
-    
+
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

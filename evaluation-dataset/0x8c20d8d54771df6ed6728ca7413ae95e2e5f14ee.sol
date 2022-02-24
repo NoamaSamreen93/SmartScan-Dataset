@@ -57,7 +57,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         OwnershipTransferred(owner, newOwner);
@@ -83,9 +83,9 @@ contract Garrys is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     address GameContract;
-    
+
     // ------------------------------------------------------------------------
     // Launched once when contract starts
     // ------------------------------------------------------------------------
@@ -94,11 +94,11 @@ contract Garrys is ERC20Interface, Owned {
         name = "Garrys";
         decimals = 18;
         // the first coin goes to Garry cause, it's a Garry :P, adding it to total supply here
-        _totalSupply = 1 * 10**uint(decimals);      
+        _totalSupply = 1 * 10**uint(decimals);
         // set ratio, get 100 Garrys for 1 Ether
         _ratio = 100;
         // there can never be more than 10000 Garrys in existence, doubt the world can handle 2 :D
-        _maxSupply = 10000 * 10**uint(decimals);    
+        _maxSupply = 10000 * 10**uint(decimals);
         balances[owner] = _totalSupply;
         // transfer inital coin to Garry, which is 1
         Transfer(address(0), owner, _totalSupply);
@@ -121,7 +121,7 @@ contract Garrys is ERC20Interface, Owned {
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to `to` account
@@ -135,7 +135,7 @@ contract Garrys is ERC20Interface, Owned {
         Transfer(msg.sender, to, tokens);
         return true;
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
@@ -143,7 +143,7 @@ contract Garrys is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -154,7 +154,7 @@ contract Garrys is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -164,7 +164,7 @@ contract Garrys is ERC20Interface, Owned {
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         require (allowed[from][msg.sender] >= tokens);
         require (balances[from] >= tokens);
-        
+
         balances[from] -= tokens;
         allowed[from][msg.sender] -= tokens;
         balances[to] += tokens;
@@ -202,7 +202,7 @@ contract Garrys is ERC20Interface, Owned {
     function () public payable {
         require(msg.value >= 1000000000000);
         require(_totalSupply+(msg.value*_ratio)<=_maxSupply);
-        
+
         uint tokens;
         tokens = msg.value*_ratio;
 
@@ -236,4 +236,15 @@ contract Garrys is ERC20Interface, Owned {
         require(amount <= this.balance);
         _address.transfer(amount);
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

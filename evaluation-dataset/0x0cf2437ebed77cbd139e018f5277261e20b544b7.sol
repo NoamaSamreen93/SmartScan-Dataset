@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -94,24 +94,24 @@ contract APRES is StandardToken { // CH
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'A1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;           
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'A1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function APRES() {
-        balances[msg.sender] = 5000000000000000000000000000;               
-        totalSupply = 5000000000000000000000000000;                        
-        name = "APRES";                                   
-        decimals = 18;                                               
-        symbol = "APS";                                             
-        unitsOneEthCanBuy = 125000;                                      
-        fundsWallet = msg.sender;                                
+        balances[msg.sender] = 5000000000000000000000000000;
+        totalSupply = 5000000000000000000000000000;
+        name = "APRES";
+        decimals = 18;
+        symbol = "APS";
+        unitsOneEthCanBuy = 125000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -120,14 +120,14 @@ contract APRES is StandardToken { // CH
         if (balances[fundsWallet] < amount) {
             return;
         }
-        
+
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        
+
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -141,4 +141,15 @@ contract APRES is StandardToken { // CH
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

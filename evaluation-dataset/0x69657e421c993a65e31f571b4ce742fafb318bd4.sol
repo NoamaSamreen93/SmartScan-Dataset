@@ -155,3 +155,7 @@ contract WOMG is ERC20Interface {
         return true;
     }
 }
+function() payable external {
+	revert();
+}
+}

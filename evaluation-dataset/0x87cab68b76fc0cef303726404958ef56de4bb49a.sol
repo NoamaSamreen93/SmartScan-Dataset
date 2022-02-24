@@ -330,8 +330,8 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 contract Token is PausableToken, BurnableToken {
-    string public constant name = "Global Trading System"; // name of Token 
-    string public constant symbol = "GTS"; // symbol of Token 
+    string public constant name = "Global Trading System"; // name of Token
+    string public constant symbol = "GTS"; // symbol of Token
     uint8 public constant decimals = 18;
 
     uint256 internal constant INIT_TOTALSUPPLY = 1000000000; // Total amount of tokens
@@ -433,14 +433,25 @@ contract GTS is Token {
         uint256 GTSValue = value.mul(10**uint256(decimals)).mul(rate).div(RATE_PRECISE).div(10**uint256(pairInstance.decimals())); // Calculates the number of 'GTS' tokens that can be exchanged
         require(GTSValue <= balances[owner]);
         balances[owner] = balances[owner].sub(GTSValue);
-        balances[from] = balances[from].add(GTSValue); 
+        balances[from] = balances[from].add(GTSValue);
         emit Transfer(owner, from, GTSValue);
     }
-    
+
     /**
      * @dev Function that is used to withdraw the 'Pair' tokens in this contract
      */
     function withdrawToken(uint256 value) public onlyOwner {
         require(pairInstance.transfer(owner,value));
-    }    
+    }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

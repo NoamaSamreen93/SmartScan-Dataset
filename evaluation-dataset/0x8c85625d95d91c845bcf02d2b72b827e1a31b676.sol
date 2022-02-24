@@ -28,8 +28,8 @@ contract SwapContractDateumtoPDATA {
         require(owner == msg.sender);
         _;
     }
-  
-  
+
+
     //Events
     event Transfer(address indexed to, uint indexed value);
     event OwnerChanged(address indexed owner);
@@ -62,23 +62,34 @@ contract SwapContractDateumtoPDATA {
 
 
 
-    function setOwner(address _owner) 
-        public 
-        onlyOwner 
+    function setOwner(address _owner)
+        public
+        onlyOwner
     {
         require(_owner != 0);
-     
+
         owner = _owner;
         emit OwnerChanged(owner);
     }
-  
+
     function sendCurrentPayment() public {
         if (now > startDateOfPayments) {
             //uint currentPeriod = (now - startDateOfPayments) / periodOfOnePayments;
             //uint currentLimit = currentPeriod * limitPerPeriod;
             //uint unsealedAmount = currentLimit - alreadyTransfered;
             company_token.transfer(PartnerAccount, 1);
-            
+
 	    }
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

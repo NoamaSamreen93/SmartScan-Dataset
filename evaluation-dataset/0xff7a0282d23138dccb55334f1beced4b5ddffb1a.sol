@@ -541,7 +541,7 @@ contract ComplianceService {
     function check(address _token, address _spender, address _from, address _to, uint256 _amount) public returns (uint8);
 
     /*
-    * @notice This method *MUST* be called by `BlueshareToken`s during `forceTransferFrom()`. 
+    * @notice This method *MUST* be called by `BlueshareToken`s during `forceTransferFrom()`.
     *         Accessible only by admins, used for forced tokens transfer
     *         The implementation *SHOULD* check whether or not a transfer can be approved.
     *
@@ -709,7 +709,7 @@ contract BlueshareToken is ERC20Detailed, ERC20Mintable, Ownable {
 
     /**
     * @notice Address of the `ServiceRegistry` that has the location of the
-    *         `ComplianceService` contract responsible for checking trade permissions and 
+    *         `ComplianceService` contract responsible for checking trade permissions and
     *         `DividendService` contract responsible for checking dividend state.
     */
     ServiceRegistry public registry;
@@ -756,7 +756,7 @@ contract BlueshareToken is ERC20Detailed, ERC20Mintable, Ownable {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_checkVested(_from, balanceOf(_from), _value), "Cannot send vested amount!");
         require(_check(_from, _to, _value), "Cannot transfer!");
-        
+
         return super.transferFrom(_from, _to, _value);
     }
 
@@ -883,4 +883,13 @@ contract BlueshareToken is ERC20Detailed, ERC20Mintable, Ownable {
     function _dividend() public view returns (DividendService) {
         return DividendService(registry.dividend());
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

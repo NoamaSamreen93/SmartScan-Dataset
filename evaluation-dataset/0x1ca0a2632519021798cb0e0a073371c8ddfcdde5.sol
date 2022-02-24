@@ -10,18 +10,18 @@ contract ShareHolder
 }
 // --- End of ShareHolder forward declaration ---
 
-contract Ownable 
+contract Ownable
 {
 	address m_addrOwner;
 
-	function Ownable() 	
-	{ 
-		m_addrOwner = msg.sender; 
+	function Ownable()
+	{
+		m_addrOwner = msg.sender;
 	}
 
-	modifier onlyOwner() 
+	modifier onlyOwner()
 	{
-		if (msg.sender != m_addrOwner) 
+		if (msg.sender != m_addrOwner)
 		{
 			revert();
 		}
@@ -30,7 +30,7 @@ contract Ownable
 
 	// ---
 
-	function transferOwnership(address newOwner) onlyOwner 
+	function transferOwnership(address newOwner) onlyOwner
 	{
 		m_addrOwner = newOwner;
 	}
@@ -65,12 +65,12 @@ contract DukeOfEther is Ownable
 		uint m_nCurrentDukePaid;
 		string m_strCountry;
 	}
-	
+
 	mapping (string => Country) m_Countries;	// Russia, USA, China... Add more using addNewCountry()
-    
+
     // --- Events ---
 
-	event updateDukeHistory(string strCountry, bool bIsDestroyed, string strNickName, 
+	event updateDukeHistory(string strCountry, bool bIsDestroyed, string strNickName,
         address indexed addrCurrentDuke, uint nCurrentDukePaid, uint date);
 	event errorMessage(string strMessage);
 
@@ -89,11 +89,11 @@ contract DukeOfEther is Ownable
 	}
 
 	// ---
-	
+
 	function addCountry(string strCountry) internal
 	{
 	    Country memory newCountryInfo;
-	    
+
         newCountryInfo.m_bIsDestroyed = false;
 		newCountryInfo.m_strNickName = "Vacant";
 		newCountryInfo.m_addrCurrentDuke = m_addrOwner;
@@ -102,14 +102,14 @@ contract DukeOfEther is Ownable
         newCountryInfo.m_strCountry = strCountry;
         newCountryInfo.m_nLastDukeRiseDate = now;
 		m_Countries[strCountry] = newCountryInfo;
-        
+
         updateDukeHistory(strCountry, false, "Vacant", m_addrOwner, 0, now);
-        
+
         m_nNumberOfActiveCountries++;
 	}
-	
+
 	// ---
-	
+
 	function verifyNickNameAndCountry(string strCountry, string strNickName) internal
     {
 		if(bytes(strNickName).length > 30 || bytes(strCountry).length > 30)
@@ -120,9 +120,9 @@ contract DukeOfEther is Ownable
 	}
 
 	// ---
-	
+
 	function processShareHolderFee(uint nFee, string strNickName) internal
-	{	
+	{
 		// --- ShareHolder interface ---
 		if(m_addrShareHolder != 0)
         {
@@ -132,7 +132,7 @@ contract DukeOfEther is Ownable
 	}
 
 	// ---
-	
+
 	function addRemoveCountry(string strCountry, string strNickName, bool bDestroy) payable
 	{
 		verifyNickNameAndCountry(strCountry, strNickName);
@@ -147,27 +147,27 @@ contract DukeOfEther is Ownable
             errorMessage("There should be at least 3 countries alive");
             revert();
         }
-        
+
         // Demiurg pays more, then gets even
         if(msg.value < getPaymentToAddRemoveCountry(strCountry, bDestroy))
 		{
 			errorMessage("Sorry, but country costs more");
 			revert();
 		}
-      
-        // Note that we do not check if the country exists: 
+
+        // Note that we do not check if the country exists:
         // we take money and promote next Duke or Destroyer
 
 		address addrPrevDuke = m_Countries[strCountry].m_addrCurrentDuke;
-		
+
 		uint nFee = msg.value / 25;	// 4%
         uint nAmount = msg.value - nFee;
         uint nDemiurgsEffectiveAmount = 100 * nAmount / m_NextDukePaymentIncrease;
-	
+
 		processShareHolderFee(nFee, strNickName);
-        
-        updateDukeHistory(strCountry, bDestroy, strNickName, msg.sender, msg.value, now);    
-        
+
+        updateDukeHistory(strCountry, bDestroy, strNickName, msg.sender, msg.value, now);
+
 		Country memory newCountryInfo;
         newCountryInfo.m_bIsDestroyed = bDestroy;
         newCountryInfo.m_strCountry = strCountry;
@@ -175,21 +175,21 @@ contract DukeOfEther is Ownable
 		newCountryInfo.m_nLastDukeRiseDate = now;
 		newCountryInfo.m_addrCurrentDuke = msg.sender;
 		newCountryInfo.m_nCurrentDukePaid = nDemiurgsEffectiveAmount;
-        
+
 		m_Countries[strCountry] = newCountryInfo;
-        
+
         if(bDestroy)
             m_nNumberOfActiveCountries--;
         else
             m_nNumberOfActiveCountries++;
-        
+
         m_nOwnersMoney += (nAmount - nDemiurgsEffectiveAmount);
-                
+
         addrPrevDuke.transfer(nDemiurgsEffectiveAmount);
 	}
-	
+
 	// ---
-	
+
 	function becomeDuke(string strCountry, string strNickName) payable
 	{
 		if(msg.value < getMinNextBet(strCountry))
@@ -200,60 +200,60 @@ contract DukeOfEther is Ownable
             errorMessage("String too long: keep strNickName and strCountry <= 30");
             revert();
         }
-            
+
         Country memory countryInfo = m_Countries[strCountry];
         if(countryInfo.m_addrCurrentDuke == 0 || countryInfo.m_bIsDestroyed == true)
 		{
 			errorMessage("This country does not exist: use addRemoveCountry first");
 			revert();
 		}
-		
+
 		address addrPrevDuke = m_Countries[strCountry].m_addrCurrentDuke;
-            
+
 		uint nFee = msg.value / 25;	// 4%
 		uint nOwnersFee = msg.value / 100;	// 1%
 		m_nOwnersMoney += nOwnersFee;
 
         uint nPrevDukeReceived = msg.value - nFee - nOwnersFee;
-       
+
         countryInfo.m_bIsDestroyed = false;
         countryInfo.m_strNickName = strNickName;
 		countryInfo.m_nLastDukeRiseDate = now;
 		countryInfo.m_addrCurrentDuke = msg.sender;
 		countryInfo.m_nCurrentDukePaid = msg.value;
 		countryInfo.m_strCountry = strCountry;
-        
+
         m_Countries[strCountry] = countryInfo;
-        
-        updateDukeHistory(strCountry, false, strNickName, msg.sender, msg.value, now); 
+
+        updateDukeHistory(strCountry, false, strNickName, msg.sender, msg.value, now);
 
 		processShareHolderFee(nFee, strNickName);
-        
+
         addrPrevDuke.transfer(nPrevDukeReceived);
 	}
-	
+
 	// ---
-	
+
 	function withdrawDukeOwnersMoney() onlyOwner
 	{
 		m_addrOwner.transfer(m_nOwnersMoney);
 	}
-	
+
 	// ---
-	
+
     function setShareHolder(address addr) onlyOwner { m_addrShareHolder = addr; }
-    
+
 	function isDestroyed(string strCountry) constant returns (bool) { return m_Countries[strCountry].m_bIsDestroyed; }
 	function getInitBlock() constant returns (uint nInitBlock) { return m_deployedAtBlock; }
-	function getDukeNickName(string strCountry) constant returns (string) 
+	function getDukeNickName(string strCountry) constant returns (string)
         { return m_Countries[strCountry].m_strNickName; }
-	function getDukeDate(string strCountry) constant returns (uint date) 
+	function getDukeDate(string strCountry) constant returns (uint date)
         { return m_Countries[strCountry].m_nLastDukeRiseDate; }
-	function getCurrentDuke(string strCountry) constant returns (address addr) 
+	function getCurrentDuke(string strCountry) constant returns (address addr)
         { return m_Countries[strCountry].m_addrCurrentDuke; }
-	function getCurrentDukePaid(string strCountry) constant returns (uint nPaid) 
+	function getCurrentDukePaid(string strCountry) constant returns (uint nPaid)
         { return m_Countries[strCountry].m_nCurrentDukePaid; }
-	function getMinNextBet(string strCountry) constant returns (uint nNextBet) 
+	function getMinNextBet(string strCountry) constant returns (uint nNextBet)
 	{
 		if(m_Countries[strCountry].m_nCurrentDukePaid == 0)
 			return 1 finney;
@@ -265,23 +265,34 @@ contract DukeOfEther is Ownable
 
         uint nCurrentDukeDue = m_Countries[strCountry].m_nCurrentDukePaid;
         if(nDaysSinceLastRise > m_nDaysBeforeDeteriorationStarts)
-            nCurrentDukeDue = nCurrentDukeDue * (nDaysSinceLastRise - m_nDaysBeforeDeteriorationStarts) * m_nDeterioration / 100; 
-            
-		return  m_NextDukePaymentIncrease * nCurrentDukeDue / 100; 
+            nCurrentDukeDue = nCurrentDukeDue * (nDaysSinceLastRise - m_nDaysBeforeDeteriorationStarts) * m_nDeterioration / 100;
+
+		return  m_NextDukePaymentIncrease * nCurrentDukeDue / 100;
 	}
 
 	function getPaymentToAddRemoveCountry(string strCountry, bool bRemove) constant returns (uint)
 	{
 		if(bRemove && m_Countries[strCountry].m_addrCurrentDuke == 0)
 			return 0;
-		else if(!bRemove && m_Countries[strCountry].m_addrCurrentDuke != 0 && m_Countries[strCountry].m_bIsDestroyed == false)	
+		else if(!bRemove && m_Countries[strCountry].m_addrCurrentDuke != 0 && m_Countries[strCountry].m_bIsDestroyed == false)
 			return 0;
 
 		uint nPrice = m_NextDukePaymentIncrease * getMinNextBet(strCountry) / 100;
 		if(nPrice < m_nNewCountryPrice)
 			nPrice = m_nNewCountryPrice;
-		return nPrice;	
+		return nPrice;
 	}
-	
+
     // TBD: make it deletable
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

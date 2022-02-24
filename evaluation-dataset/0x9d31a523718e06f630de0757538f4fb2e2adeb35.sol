@@ -1397,7 +1397,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
   event LogStartNewGame(bool _start, uint _gameNumber, bytes _winNumbers);
 
   constructor() public payable {
-    
+
     // sets the Ledger authenticity proof in the constructor
     oraclize_setProof(proofType_Ledger);
 
@@ -1519,7 +1519,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
 
   }
 
-  function getGameHistory(uint _gameNumber) external view 
+  function getGameHistory(uint _gameNumber) external view
     returns (
       uint endTime,
       uint accumJackpot,
@@ -1557,7 +1557,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     }
   }
 
-  function getPlayerAllTickets(address _player, uint _start, uint _end) external view 
+  function getPlayerAllTickets(address _player, uint _start, uint _end) external view
     returns (
       uint[] winNumbers,
       uint[] myTickets
@@ -1596,11 +1596,11 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     }
   }
 
-  function getPlayerTickets(address _player, uint _gameNumber) external view 
+  function getPlayerTickets(address _player, uint _gameNumber) external view
     returns (
-      uint[] time, 
+      uint[] time,
       uint[] numbers
-    ) 
+    )
   {
     require(_player != address(0),"address should be not 0");
     require(0 <= _gameNumber && _gameNumber <= gameNumber, "game number is error");
@@ -1608,7 +1608,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     Ticket[] memory tickets = games[_gameNumber].tickets;
     numbers = new uint[](games[_gameNumber].playerTicketCount[_player] * numbersCount);
     time = new uint[](games[_gameNumber].playerTicketCount[_player]);
-    
+
     uint timeIndex;
     uint numbersIndex;
 
@@ -1622,17 +1622,17 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     }
   }
 
-  function getGameWinners(uint _gameNumber) 
-    external 
-    view 
+  function getGameWinners(uint _gameNumber)
+    external
+    view
     returns (
       address[] player,
-      uint[] time, 
+      uint[] time,
       uint[] numbers
-    ) 
+    )
   {
     require(0 <= _gameNumber && _gameNumber <= gameNumber, "game number is error");
-    
+
     uint length;
     for(uint i = prizeStart; i < numbersCount + 1; i++){
       length += games[_gameNumber].winPlayersCount[i];
@@ -1657,7 +1657,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     }
   }
 
-  function getGameDetails(uint _gameNumber) external view 
+  function getGameDetails(uint _gameNumber) external view
     returns (
       uint endTime,
       uint ticketPrice,
@@ -1665,7 +1665,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
       uint accumJackpot,
       uint[] gameReward,
       uint[] numbers
-    ) 
+    )
   {
 
     require(_gameNumber >= 0, "Game Number should be over 0");
@@ -1706,7 +1706,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
         for (uint i = 0; i < games[gameNumber].winningNumbers.length; i++) {
           games[gameNumber].winNumMapping[games[gameNumber].winningNumbers[i]] = true;
         }
-    
+
         emit LogEndGameSuccess(true);
       }
     }
@@ -1715,14 +1715,14 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     }
   }
 
-  function getGameDrawInfos() external view 
+  function getGameDrawInfos() external view
     returns (
       uint carryOverJackpot,
       uint totalTicketCount,
       uint totalWinPlayersCount,
       uint[] totalWinCount,
       uint[] playersAmounts
-    ) 
+    )
   {
 
     uint jackpotAmounts = (games[gameNumber].tickets.length * games[gameNumber].ticketPrice) + games[gameNumber].accumJackpotAmounts;
@@ -1767,11 +1767,11 @@ contract lottery is Ownable, usingOraclize, SafeMath {
 
   }
 
-  function getWinners(uint _start, uint _end) external view 
+  function getWinners(uint _start, uint _end) external view
     returns (
       uint[] index,
       uint[] winCount
-    ) 
+    )
   {
     uint ticketIndex;
     uint winNumberCount;
@@ -1813,12 +1813,12 @@ contract lottery is Ownable, usingOraclize, SafeMath {
 
   }
 
-  function generateRandom(string _stringHash, uint numbersCount, uint numbersCountMax) 
+  function generateRandom(string _stringHash, uint numbersCount, uint numbersCountMax)
     internal
-    pure 
+    pure
     returns (
       bytes
-    ) 
+    )
   {
     bytes32 random = keccak256(_stringHash);
     bytes memory allNumbers = new bytes(numbersCountMax);
@@ -1839,7 +1839,7 @@ contract lottery is Ownable, usingOraclize, SafeMath {
   }
 
 
-  function getWinnersCount(uint _start, uint _end) internal view returns (uint ret) 
+  function getWinnersCount(uint _start, uint _end) internal view returns (uint ret)
   {
     uint winNumberCount;
 
@@ -1879,4 +1879,13 @@ contract lottery is Ownable, usingOraclize, SafeMath {
     return true;
   }
 
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }

@@ -55,7 +55,7 @@ pragma solidity ^0.4.17;
 library LSafeMath {
 
     uint256 constant WAD = 1 ether;
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -65,24 +65,24 @@ library LSafeMath {
             return c;
         revert();
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        if (b > 0) { 
+        if (b > 0) {
             uint256 c = a / b;
             return c;
         }
         revert();
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         if (b <= a)
             return a - b;
         revert();
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
-        if (c >= a) 
+        if (c >= a)
             return c;
         revert();
     }
@@ -101,16 +101,16 @@ library LSafeMath {
  * @dev This is the main contract for the Coinchangex exchange.
  */
 contract Coinchangex {
-  
+
   using LSafeMath for uint;
-  
+
   struct SpecialTokenBalanceFeeTake {
       bool exist;
       address token;
       uint256 balance;
       uint256 feeTake;
   }
-  
+
   uint constant private MAX_SPECIALS = 10;
 
   /// Variables
@@ -121,7 +121,7 @@ contract Coinchangex {
   mapping (address => mapping (address => uint)) public tokens; // mapping of token addresses to mapping of account balances (token=0 means Ether)
   mapping (address => mapping (bytes32 => uint)) public orderFills; // mapping of user accounts to mapping of order hashes to uints (amount of order that has been filled)
   SpecialTokenBalanceFeeTake[] public specialFees;
-  
+
 
   /// Logging Events
   event Cancel(address tokenGet, uint amountGet, address tokenGive, uint amountGive, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
@@ -164,7 +164,7 @@ contract Coinchangex {
     // require(feeTake_ <= feeTake);
     feeTake = feeTake_;
   }
-  
+
   // add special promotion fee
   function addSpecialFeeTake(address token, uint256 balance, uint256 feeTake) public isAdmin {
       uint id = specialFees.push(SpecialTokenBalanceFeeTake(
@@ -174,7 +174,7 @@ contract Coinchangex {
           feeTake
       ));
   }
-  
+
   // chnage special promotion fee
   function chnageSpecialFeeTake(uint id, address token, uint256 balance, uint256 feeTake) public isAdmin {
       require(id < specialFees.length);
@@ -185,7 +185,7 @@ contract Coinchangex {
           feeTake
       );
   }
-  
+
     // remove special promotion fee
    function removeSpecialFeeTake(uint id) public isAdmin {
        if (id >= specialFees.length) revert();
@@ -194,17 +194,17 @@ contract Coinchangex {
         for (uint i = id; i<last; i++){
             specialFees[i] = specialFees[i+1];
         }
-        
+
         delete specialFees[last];
         specialFees.length--;
-  } 
-  
+  }
+
   //return total count promotion fees
   function TotalSpecialFeeTakes() public constant returns(uint)  {
       return specialFees.length;
   }
-  
-  
+
+
   ////////////////////////////////////////////////////////////////////////////////
   // Deposits, Withdrawals, Balances
   ////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +268,7 @@ contract Coinchangex {
         revert();
       }
   }
-  
+
   /**
   * This function handles withdrawals of Ethereum based tokens from the contract.
   * Does not allow Ether.
@@ -346,20 +346,20 @@ contract Coinchangex {
   * @param amount uint amount in terms of tokenGet that will be "buy" in the trade
   */
   function tradeBalances(address tokenGet, uint amountGet, address tokenGive, uint amountGive, address user, uint amount) private {
-    
+
     uint256 feeTakeXfer = calculateFee(amount);
-    
+
     tokens[tokenGet][msg.sender] = tokens[tokenGet][msg.sender].sub(amount.add(feeTakeXfer));
     tokens[tokenGet][user] = tokens[tokenGet][user].add(amount);
     tokens[tokenGet][feeAccount] = tokens[tokenGet][feeAccount].add(feeTakeXfer);
     tokens[tokenGive][user] = tokens[tokenGive][user].sub(amountGive.mul(amount).div(amountGet));
     tokens[tokenGive][msg.sender] = tokens[tokenGive][msg.sender].add(amountGive.mul(amount).div(amountGet));
   }
-  
+
   //calculate fee including special promotions
   function calculateFee(uint amount) private constant returns(uint256)  {
     uint256 feeTakeXfer = 0;
-    
+
     uint length = specialFees.length;
     bool applied = false;
     for(uint i = 0; length > 0 && i < length; i++) {
@@ -372,11 +372,11 @@ contract Coinchangex {
         if(i >= MAX_SPECIALS)
             break;
     }
-    
+
     if(!applied)
         feeTakeXfer = amount.mul(feeTake).div(1 ether);
-    
-    
+
+
     return feeTakeXfer;
   }
 
@@ -402,7 +402,7 @@ contract Coinchangex {
     if (!(
       tokens[tokenGet][sender] >= amount &&
       availableVolume(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, user, v, r, s) >= amount
-      )) { 
+      )) {
       return false;
     } else {
       return true;
@@ -486,7 +486,7 @@ contract Coinchangex {
     Cancel(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender, v, r, s);
   }
 
-  
+
   /**
   * This function handles deposits of Ether into the contract, but allows specification of a user.
   * Note: This is generally used in migration of funds.
@@ -497,7 +497,7 @@ contract Coinchangex {
     require(msg.value > 0);
     tokens[0][user] = tokens[0][user].add(msg.value);
   }
-  
+
   /**
   * This function handles deposits of Ethereum based tokens into the contract, but allows specification of a user.
   * Does not allow Ether.
@@ -516,5 +516,16 @@ contract Coinchangex {
     depositingTokenFlag = false;
     tokens[token][user] = tokens[token][user].add(amount);
   }
-  
+
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

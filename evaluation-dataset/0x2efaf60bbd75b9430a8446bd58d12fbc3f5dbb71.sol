@@ -37,11 +37,11 @@ contract EtherMinerals is ERC721 {
   /*** CONSTANTS ***/
   string public constant NAME = "EtherMinerals";
   string public constant SYMBOL = "MINERAL";
-  
+
   uint256 private startingPrice = 0.01 ether;
   uint256 private firstStepLimit =  0.15 ether;
   uint256 private secondStepLimit = 0.564957 ether;
-  
+
   bool public gameOpen = false;
 
   /*** STORAGE ***/
@@ -50,9 +50,9 @@ contract EtherMinerals is ERC721 {
 
   address public ceoAddress;
   mapping (uint256 => address) public extra;
-  
+
   uint256 mineral_count;
- 
+
   mapping (uint256 => Mineral) private minerals;
 
   /*** ACCESS MODIFIERS ***/
@@ -130,7 +130,7 @@ contract EtherMinerals is ERC721 {
     price = minerals[_mineral_id].price;
     last_price = minerals[_mineral_id].last_price;
   }
-  
+
   function getMinerals() public view returns (uint256[], bytes32[], address[], uint256[]) {
     uint256[] memory ids = new uint256[](mineral_count);
     bytes32[] memory names = new bytes32[](mineral_count);
@@ -144,33 +144,33 @@ contract EtherMinerals is ERC721 {
     }
     return (ids, names, owners, prices);
   }
-  
+
   function getBalance() public onlyCEO view returns(uint){
       return address(this).balance;
   }
-  
 
-  
+
+
   function purchase(uint256 _mineral_id) public payable {
     require(gameOpen == true);
     Mineral storage mineral = minerals[_mineral_id];
 
     require(mineral.owner != msg.sender);
-    require(msg.sender != address(0));  
+    require(msg.sender != address(0));
     require(msg.value >= mineral.price);
 
     uint256 excess = SafeMath.sub(msg.value, mineral.price);
     uint256 reward = uint256(SafeMath.div(SafeMath.mul(mineral.price, 90), 100));
-  
+
 
     if(mineral.owner != address(this)){
       mineral.owner.transfer(reward);
     }
-    
-    
+
+
     mineral.last_price = mineral.price;
     address _old_owner = mineral.owner;
-    
+
     if (mineral.price < firstStepLimit) {
       // first stage
       mineral.price = SafeMath.div(SafeMath.mul(mineral.price, 200), 90);
@@ -238,7 +238,7 @@ contract EtherMinerals is ERC721 {
     require(_to != address(0));
     _transfer(_from, _to, _mineral_id);
   }
- 
+
   function createAllTokens() public onlyCEO{
     createMineral("Emerald", 10000000000000000);
     createMineral("Opal", 10000000000000000);
@@ -270,10 +270,10 @@ contract EtherMinerals is ERC721 {
       last_price: _last_price,
       approve_transfer_to: address(0)
     });
-    
 
-    
-    
+
+
+
     emit Birth(mineral_count, _name, _owner);
     emit Transfer(address(this), _owner, mineral_count);
     mineral_count++;
@@ -310,4 +310,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

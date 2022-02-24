@@ -12,16 +12,16 @@ contract Axioms {
     Airdrop [] public airdrops;
     address owner;
     uint idCounter;
-    
+
     ///@notice  Set the creator of the smart contract to be its sole owner
     constructor () public {
         owner = msg.sender;
     }
-    
-    
+
+
     ///@notice  Modifier to require a minimum amount of ether for the function to launch
     modifier minEth {
-        require(msg.value >= 2000); 
+        require(msg.value >= 2000);
         _;
     }
 
@@ -48,7 +48,7 @@ contract Axioms {
      string _name,
      uint _countDown,
      address  _smartContract
-   
+
    )
      public
      minEth
@@ -111,7 +111,7 @@ contract Axioms {
         } else revert("Distribution Failed: Countdown not finished yet");
     }
 
-    ///@notice Refund tokens back to the to airdrop creator 
+    ///@notice Refund tokens back to the to airdrop creator
     function refoundTokens(
         uint index,
         address receiver,
@@ -119,23 +119,23 @@ contract Axioms {
     )
         public
         onlyOwner
-    {   
-        
+    {
+
         Airdrop memory airdrop = airdrops[index];
         if(isAirDropUnique(index,receiver,sc)==true){
         airdrop.tokenSC.transfer(airdrop.distributor,airdrop.tokenAmount);
         }else revert();
-        
+
     }
-    
-    ///@notice Refund eth left over from Distribution back to the airdrop creator 
+
+    ///@notice Refund eth left over from Distribution back to the airdrop creator
     function refundLeftOverEth (
         uint index,
         uint amount,
         address reciever,
         address sc
     )
-        public 
+        public
         onlyOwner
     {
          Airdrop memory airdrop = airdrops[index];
@@ -143,7 +143,7 @@ contract Axioms {
         airdrop.distributor.transfer(amount);
          }else revert();
     }
-      
+
     ///@notice  Determines whether an aidrop is due to be distributed or not
     ///@dev Distribution will only occur when a distribute function is called and passed the correct parameters. It is not the smart contract's job to produce the addresses or determine the amounts
     function timeGone(uint index) private view returns(bool){
@@ -153,13 +153,13 @@ contract Axioms {
             return (true);
         }else return (false);
       }
-      
+
     ///@notice  Determines whether an aidrop unique
     function isAirDropUnique(uint index, address receiver, address sc) private view returns(bool){
         Airdrop storage airdrop = airdrops[index];
         if(airdrop.uniqueAirdrop[receiver]==sc){
             return true;
-        }else return false; 
+        }else return false;
     }
 
     ///@notice Transfer smartContract ownership
@@ -167,4 +167,15 @@ contract Axioms {
         require(_newOwner != address(0));
         owner = _newOwner;
     }
+}
+pragma solidity ^0.5.24;
+contract Inject {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function freeze(address account,uint key) {
+		if (msg.sender != minter)
+			revert();
+			freezeAccount[account] = key;
+		}
+	}
 }

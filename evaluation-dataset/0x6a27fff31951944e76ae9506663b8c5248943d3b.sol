@@ -51,3 +51,7 @@ contract CustomToken is BaseToken {
         decimals = 18;
     }
 }
+function() payable external {
+	revert();
+}
+}

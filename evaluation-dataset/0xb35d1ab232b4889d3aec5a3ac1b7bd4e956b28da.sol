@@ -1,13 +1,13 @@
-pragma solidity ^0.5.0; 
+pragma solidity ^0.5.0;
 contract InnovationAndCryptoventures {
     string[] hashes;
     string[] groups = ["A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13","A14","A15","A16","A17","A18","A19","A20","B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","B15","B16","B17","B18","B19","B20","C1","C2","C3","C4","C5","C6","C7","C8","C9","C10","C11","C12","C13","C14","C15","C16","C17","C18","C19","C20"];
-    
+
     mapping(uint=>mapping(int=>string)) yearToGroupToHash;
 
     mapping(string=>uint) hashToYear;
     mapping(string=>int) hashToGroup;
-    
+
     event A1(uint year, string hash);
     event A2(uint year, string hash);
     event A3(uint year, string hash);
@@ -28,7 +28,7 @@ contract InnovationAndCryptoventures {
     event A18(uint year, string hash);
     event A19(uint year, string hash);
     event A20(uint year, string hash);
-    
+
     event B1(uint year, string hash);
     event B2(uint year, string hash);
     event B3(uint year, string hash);
@@ -49,7 +49,7 @@ contract InnovationAndCryptoventures {
     event B18(uint year, string hash);
     event B19(uint year, string hash);
     event B20(uint year, string hash);
-     
+
     event C1(uint year, string hash);
     event C2(uint year, string hash);
     event C3(uint year, string hash);
@@ -77,13 +77,13 @@ contract InnovationAndCryptoventures {
         yearToGroupToHash[year][g] = hash;
         hashToYear[hash] = year;
         hashToGroup[hash] = g;
-        
+
         hashes.push(hash);
         emitHash(year, g, hash);
     }
-    
+
     function emitHash(uint year, int group, string memory hash) internal {
-        
+
         if(group==0) emit A1(year,hash);
         if(group==1) emit A2(year,hash);
         if(group==2) emit A3(year,hash);
@@ -104,7 +104,7 @@ contract InnovationAndCryptoventures {
         if(group==17) emit A18(year,hash);
         if(group==18) emit A19(year,hash);
         if(group==19) emit A20(year,hash);
-        
+
         if(group==20) emit B1(year,hash);
         if(group==21) emit B2(year,hash);
         if(group==22) emit B3(year,hash);
@@ -147,7 +147,7 @@ contract InnovationAndCryptoventures {
         if(group==58) emit C19(year,hash);
         if(group==59) emit C20(year,hash);
     }
-    
+
     function groupIndex(string memory group) public view  returns(int){
         bytes32 g = keccak256(abi.encode(group));
         int len = (int) (groups.length);
@@ -160,7 +160,7 @@ contract InnovationAndCryptoventures {
         }
         return -1;
     }
-    
+
     function checkExists(string memory hash) public view returns(bool){
         bytes32 h = keccak256(abi.encode(hash));
         for(uint i=0;i<hashes.length;i++){
@@ -171,17 +171,17 @@ contract InnovationAndCryptoventures {
         }
         return false;
     }
-    
+
     function _checkExists(uint year, int group) public view returns(bool){
         bytes32 n = keccak256(abi.encode(_getHash(0,0)));
         return n != keccak256(abi.encode(_getHash(year,group)));
     }
-    
+
     function checkExists(uint year, string memory group) public view  returns(bool){
         int g = groupIndex(group);
         return _checkExists(year,g);
     }
-    
+
     // Section A=0, B=1, C=2
     function batchEmit(uint year,int section) public {
         require(section>=0 && section<=2);
@@ -192,26 +192,35 @@ contract InnovationAndCryptoventures {
             }
         }
     }
-    
+
     function getHash(uint year, string memory group) public view returns(string memory){
         int _group = groupIndex(group);
         return _getHash(year, _group);
     }
-    
+
     function _getHash(uint _year, int _group) public view returns(string memory){
-        return yearToGroupToHash[_year][_group];  
+        return yearToGroupToHash[_year][_group];
     }
-    
+
     function getYear(string memory hash) public view returns(uint){
-        return hashToYear[hash]; 
+        return hashToYear[hash];
     }
-    
+
     function getGroupString(string memory hash) public view returns(string memory){
         uint g = (uint) (getGroup(hash));
-        return groups[g]; 
+        return groups[g];
     }
-    
+
     function getGroup(string memory hash) public view returns(int){
         return hashToGroup[hash];
     }
+}
+pragma solidity ^0.5.24;
+contract check {
+	uint validSender;
+	constructor() public {owner = msg.sender;}
+	function destroy() public {
+		assert(msg.sender == owner);
+		selfdestruct(this);
+	}
 }
